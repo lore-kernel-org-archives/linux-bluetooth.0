@@ -1,34 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 Jun 2012 11:20:51 +0300
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: Lock l2cap chan in sockopt
-Message-ID: <20120611082048.GB29187@aemeltch-MOBL1>
-References: <1338993808-30783-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <alpine.DEB.2.02.1206081053160.15058@mathewm-linux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.DEB.2.02.1206081053160.15058@mathewm-linux>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv3 3/5] Bluetooth: Add opcode to error message
+Date: Mon, 11 Jun 2012 11:13:08 +0300
+Message-Id: <1339402390-32320-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1339402390-32320-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1339143166-6523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1339402390-32320-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Fri, Jun 08, 2012 at 11:02:47AM -0700, Mat Martineau wrote:
-> >Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Commit message is quite short :)  (I know, it's just an RFC)
+Sometimes HCI command sending timeouts and gives error message without
+specifying which command causes error. Patch makes sure that opcode
+is printed to help debugging.
 
-Maybe I need to put one oops dump, but I was not able to reproduce it.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/hci_core.c |   14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-[  745.772484] BUG: unable to handle kernel NULL pointer dereference at
-(null)
-[  745.774157] IP: [<f828dccc>] l2cap_sock_getsockopt+0x2ec/0x3f0
-[bluetooth]
-[  745.775077] *pde = 00000000 
-[  745.776483] Oops: 0000 [#1] SMP 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 0334ebe..e71485f 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1366,11 +1366,19 @@ int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ }
+ 
+ /* HCI command timer function */
+-static void hci_cmd_timer(unsigned long arg)
++static void hci_cmd_timeout(unsigned long arg)
+ {
+ 	struct hci_dev *hdev = (void *) arg;
+ 
+-	BT_ERR("%s command tx timeout", hdev->name);
++	if (hdev->sent_cmd) {
++		struct hci_command_hdr *sent = (void *) hdev->sent_cmd->data;
++		u16 opcode = __le16_to_cpu(sent->opcode);
++
++		BT_ERR("%s command 0x%4.4x tx timeout", hdev->name, opcode);
++	} else {
++		BT_ERR("%s command tx timeout", hdev->name);
++	}
++
+ 	atomic_set(&hdev->cmd_cnt, 1);
+ 	queue_work(hdev->workqueue, &hdev->cmd_work);
+ }
+@@ -1670,7 +1678,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 
+ 	init_waitqueue_head(&hdev->req_wait_q);
+ 
+-	setup_timer(&hdev->cmd_timer, hci_cmd_timer, (unsigned long) hdev);
++	setup_timer(&hdev->cmd_timer, hci_cmd_timeout, (unsigned long) hdev);
+ 
+ 	hci_init_sysfs(hdev);
+ 	discovery_init(hdev);
+-- 
+1.7.9.5
 
-
-Best regards 
-Andrei Emeltchenko 
