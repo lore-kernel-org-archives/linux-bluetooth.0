@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 5/5] Bluetooth: Fix not setting HCI_RESET flag for AMP
-Date: Mon, 11 Jun 2012 11:13:10 +0300
-Message-Id: <1339402390-32320-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 4/5] Bluetooth: Correct debug print specifier for u16 objects
+Date: Mon, 11 Jun 2012 11:13:09 +0300
+Message-Id: <1339402390-32320-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1339402390-32320-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1339143166-6523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1339402390-32320-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,52 +12,73 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Move reset function to common initialization section fixing
-not setting HCI_RESET flag for amp_init.
+Some functions print u16 objects as "0xc03" others as "0x0c03". Patch
+ensures that opcodes printed are the in the same format and consistent
+with bluetooth code.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/hci_core.c |   13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+ net/bluetooth/hci_core.c |   12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 4f804ff..7a6ff57 100644
+index e71485f..4f804ff 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -188,12 +188,6 @@ static void bredr_init(struct hci_dev *hdev)
+@@ -61,7 +61,7 @@ static void hci_notify(struct hci_dev *hdev, int event)
  
- 	/* Mandatory initialization */
- 
--	/* Reset */
--	if (!test_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks)) {
--		set_bit(HCI_RESET, &hdev->flags);
--		hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
--	}
--
- 	/* Read Local Supported Features */
- 	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_FEATURES, 0, NULL);
- 
-@@ -234,9 +228,6 @@ static void amp_init(struct hci_dev *hdev)
+ void hci_req_complete(struct hci_dev *hdev, __u16 cmd, int result)
  {
- 	hdev->flow_ctl_mode = HCI_FLOW_CTL_MODE_BLOCK_BASED;
+-	BT_DBG("%s command 0x%04x result 0x%2.2x", hdev->name, cmd, result);
++	BT_DBG("%s command 0x%4.4x result 0x%2.2x", hdev->name, cmd, result);
  
--	/* Reset */
--	hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
--
- 	/* Read Local Version */
- 	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
+ 	/* If this is the init phase check if the completed command matches
+ 	 * the last init command, and if not just return.
+@@ -2095,7 +2095,7 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+ 	struct hci_command_hdr *hdr;
+ 	struct sk_buff *skb;
  
-@@ -262,6 +253,10 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
- 	}
- 	skb_queue_purge(&hdev->driver_init);
+-	BT_DBG("%s opcode 0x%x plen %d", hdev->name, opcode, plen);
++	BT_DBG("%s opcode 0x%4.4x plen %d", hdev->name, opcode, plen);
  
-+	/* Reset */
-+	if (!test_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks))
-+		hci_reset_req(hdev, 0);
-+
- 	switch (hdev->dev_type) {
- 	case HCI_BREDR:
- 		bredr_init(hdev);
+ 	skb = bt_skb_alloc(len, GFP_ATOMIC);
+ 	if (!skb) {
+@@ -2262,7 +2262,7 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
+ 	if (hdr->opcode != cpu_to_le16(opcode))
+ 		return NULL;
+ 
+-	BT_DBG("%s opcode 0x%x", hdev->name, opcode);
++	BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
+ 
+ 	return hdev->sent_cmd->data + HCI_COMMAND_HDR_SIZE;
+ }
+@@ -2332,7 +2332,7 @@ void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags)
+ 	struct hci_conn *conn = chan->conn;
+ 	struct hci_dev *hdev = conn->hdev;
+ 
+-	BT_DBG("%s chan %p flags 0x%x", hdev->name, chan, flags);
++	BT_DBG("%s chan %p flags 0x%4.4x", hdev->name, chan, flags);
+ 
+ 	skb->dev = (void *) hdev;
+ 
+@@ -2832,7 +2832,7 @@ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 	flags  = hci_flags(handle);
+ 	handle = hci_handle(handle);
+ 
+-	BT_DBG("%s len %d handle 0x%x flags 0x%x", hdev->name, skb->len,
++	BT_DBG("%s len %d handle 0x%4.4x flags 0x%4.4x", hdev->name, skb->len,
+ 	       handle, flags);
+ 
+ 	hdev->stat.acl_rx++;
+@@ -2874,7 +2874,7 @@ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	handle = __le16_to_cpu(hdr->handle);
+ 
+-	BT_DBG("%s len %d handle 0x%x", hdev->name, skb->len, handle);
++	BT_DBG("%s len %d handle 0x%4.4x", hdev->name, skb->len, handle);
+ 
+ 	hdev->stat.sco_rx++;
+ 
 -- 
 1.7.9.5
 
