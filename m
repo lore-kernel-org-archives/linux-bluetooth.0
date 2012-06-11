@@ -1,52 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 Jun 2012 12:40:11 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon@janc.net.pl>
+Date: Mon, 11 Jun 2012 11:20:51 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] mgmtops: Fix adding UUID when EBUSY error is returned
-Message-ID: <20120611094011.GA16742@x220.ger.corp.intel.com>
-References: <1339357852-6326-1-git-send-email-szymon@janc.net.pl>
+Subject: Re: [RFC] Bluetooth: Lock l2cap chan in sockopt
+Message-ID: <20120611082048.GB29187@aemeltch-MOBL1>
+References: <1338993808-30783-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <alpine.DEB.2.02.1206081053160.15058@mathewm-linux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1339357852-6326-1-git-send-email-szymon@janc.net.pl>
+In-Reply-To: <alpine.DEB.2.02.1206081053160.15058@mathewm-linux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Mat,
 
-On Sun, Jun 10, 2012, Szymon Janc wrote:
-> +static void mgmt_add_uuid_resend(int sk, uint16_t index)
-> +{
-> +	struct controller_info *info;
-> +	struct pending_uuid *pending;
-> +
-> +	DBG("index %d", index);
-> +
-> +	info = &controllers[index];
-> +
-> +	pending = info->pending_uuids->data;
-> +
-> +	send_uuid(index, &pending->uuid, pending->svc_hint);
-> +}
-> +
->  static void mgmt_cmd_status(int sk, uint16_t index, void *buf, size_t len)
->  {
->  	struct mgmt_ev_cmd_status *ev = buf;
-> @@ -1460,6 +1479,10 @@ static void mgmt_cmd_status(int sk, uint16_t index, void *buf, size_t len)
->  	case MGMT_OP_READ_LOCAL_OOB_DATA:
->  		read_local_oob_data_failed(sk, index);
->  		break;
-> +	case MGMT_OP_ADD_UUID:
-> +		if (ev->status == MGMT_STATUS_BUSY)
-> +			mgmt_add_uuid_resend(sk, index);
-> +		break;
->  	}
->  }
+On Fri, Jun 08, 2012 at 11:02:47AM -0700, Mat Martineau wrote:
+> >Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Commit message is quite short :)  (I know, it's just an RFC)
 
-It's there a risk that this ends up in an infinite loop if the kernel is
-in some state where it always keeps sending STATUS_BUSY? Would it make
-sense to add a counter for retries and give up after 5 or 10 attempts?
-Would it also make sense to add a small delay before resending the
-command?
+Maybe I need to put one oops dump, but I was not able to reproduce it.
 
-Johan
+[  745.772484] BUG: unable to handle kernel NULL pointer dereference at
+(null)
+[  745.774157] IP: [<f828dccc>] l2cap_sock_getsockopt+0x2ec/0x3f0
+[bluetooth]
+[  745.775077] *pde = 00000000 
+[  745.776483] Oops: 0000 [#1] SMP 
+
+
+Best regards 
+Andrei Emeltchenko 
