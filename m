@@ -1,37 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 Jun 2012 11:06:18 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCHv2 3/5] Bluetooth: Add opcode to error message
-Message-ID: <20120611080611.GA29187@aemeltch-MOBL1>
-References: <1339143166-6523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1339153405-12070-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1339153405-12070-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <201206081317.42898.szymon.janc@tieto.com>
+From: Vishal Agarwal <vishal.agarwal@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: <vishal.agarwal@stericsson.com>
+Subject: [PATCH] Bluetooth: Fix sending HCI_Disconnect only after connection
+Date: Mon, 11 Jun 2012 11:49:44 +0530
+Message-ID: <1339395584-3223-1-git-send-email-vishal.agarwal@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <201206081317.42898.szymon.janc@tieto.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+HCI_Disconnet should only be sent after connection is established.
+If connection is not yet established and hci_disconnect is called
+then disconnection complete will be received with a handle which
+does not exist and hence this event will be ignored.
+But as mgmt.c will not receive this event, its variable for pending
+command is not cleared.This will result in future Disconnect commands
+for that BD Address to be blocked with error busy.
 
-On Fri, Jun 08, 2012 at 01:17:42PM +0200, Szymon Janc wrote:
-> > -	BT_ERR("%s command tx timeout", hdev->name);
-> > +	if (hdev->sent_cmd) {
-> > +		struct hci_command_hdr *sent = (void *) hdev->sent_cmd->data;
-> > +		u16 opcode = __le16_to_cpu(sent->opcode);
-> > +
-> > +		BT_ERR("%s command 0x%4.4x tx timeout", hdev->name, opcode);
-> > +	} else
-> > +		BT_ERR("%s command tx timeout", hdev->name);
-> > +
-> 
-> Just a minor, 'else' should have braces as well.
+Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
+---
+ net/bluetooth/mgmt.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Sure, thanks for pointing out. I will send updated version soon.
-
-Best regards 
-Andrei Emeltchenko 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 958f764..3a857bf 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1598,7 +1598,7 @@ static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	else
+ 		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->addr.bdaddr);
+ 
+-	if (!conn) {
++	if (!conn || conn->state == BT_OPEN || conn->state == BT_CLOSED) {
+ 		err = cmd_status(sk, hdev->id, MGMT_OP_DISCONNECT,
+ 				 MGMT_STATUS_NOT_CONNECTED);
+ 		goto failed;
+-- 
+1.7.0.4
 
