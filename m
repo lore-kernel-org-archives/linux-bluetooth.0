@@ -1,300 +1,538 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] audio: Separate profile specific fields from media_transport
-Date: Mon, 11 Jun 2012 15:55:10 +0300
-Message-Id: <1339419310-4777-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC] Bluetooth: Use %pMR BT addr print spec instead of batostr
+Date: Mon, 11 Jun 2012 15:53:20 +0300
+Message-Id: <1339419200-581-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Clean up old unsafe batostr function and use %pMR print specifier
+for printing Bluetooth addresses.
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- audio/transport.c |  116 +++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 82 insertions(+), 34 deletions(-)
+	* Note that the patch shall be only applied when the tree is rebased against
+	very latest linux-next where specifier patch is added.
+<------8<-----------------------------------------------------
+|
+|  The patch titled
+|       Subject: vsprintf: add %pMR for Bluetooth MAC address
+|  has been added to the -mm tree.  Its filename is
+|       vsprintf-add-%pmr-for-bluetooth-mac-address.patch
+|
+<------8<-----------------------------------------------------
 
-diff --git a/audio/transport.c b/audio/transport.c
-index 1fccff8..3953c4e 100644
---- a/audio/transport.c
-+++ b/audio/transport.c
-@@ -62,11 +62,20 @@ struct media_owner {
- 	guint			watch;
- };
+ include/net/bluetooth/bluetooth.h |    1 -
+ net/bluetooth/bnep/core.c         |    3 +--
+ net/bluetooth/cmtp/core.c         |    2 +-
+ net/bluetooth/hci_conn.c          |    6 +++---
+ net/bluetooth/hci_core.c          |   22 +++++++++++-----------
+ net/bluetooth/hci_event.c         |   15 +++++++--------
+ net/bluetooth/hci_sysfs.c         |   10 +++++-----
+ net/bluetooth/hidp/core.c         |    6 ++++--
+ net/bluetooth/l2cap_core.c        |   11 +++++------
+ net/bluetooth/lib.c               |   21 ---------------------
+ net/bluetooth/rfcomm/core.c       |   15 +++++++--------
+ net/bluetooth/rfcomm/sock.c       |    9 ++++-----
+ net/bluetooth/rfcomm/tty.c        |    6 +++---
+ net/bluetooth/sco.c               |   12 ++++++------
+ 14 files changed, 57 insertions(+), 82 deletions(-)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 565d4be..d22686d 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -179,7 +179,6 @@ static inline void bacpy(bdaddr_t *dst, bdaddr_t *src)
+ }
  
-+struct a2dp_transport {
-+	struct avdtp		*session;
-+	uint16_t		delay;
-+	uint16_t		volume;
-+};
-+
-+struct headset_transport {
-+	unsigned int		nrec_id;
-+};
-+
- struct media_transport {
- 	DBusConnection		*conn;
- 	char			*path;		/* Transport object path */
- 	struct audio_device	*device;	/* Transport device */
--	struct avdtp		*session;	/* Signalling session (a2dp only) */
- 	struct media_endpoint	*endpoint;	/* Transport endpoint */
- 	GSList			*owners;	/* Transport owners */
- 	uint8_t			*configuration; /* Transport configuration */
-@@ -74,9 +83,6 @@ struct media_transport {
- 	int			fd;		/* Transport file descriptor */
- 	uint16_t		imtu;		/* Transport input mtu */
- 	uint16_t		omtu;		/* Transport output mtu */
--	uint16_t		delay;		/* Transport delay (a2dp only) */
--	unsigned int		nrec_id;	/* Transport nrec watch (headset only) */
--	uint16_t		volume;		/* Transport volume */
- 	gboolean		read_lock;
- 	gboolean		write_lock;
- 	gboolean		in_use;
-@@ -93,6 +99,8 @@ struct media_transport {
- 					struct media_transport *transport,
- 					const char *property,
- 					DBusMessageIter *value);
-+	GDestroyNotify		destroy;
-+	void			*data;
- };
+ void baswap(bdaddr_t *dst, bdaddr_t *src);
+-char *batostr(bdaddr_t *ba);
  
- void media_transport_destroy(struct media_transport *transport)
-@@ -276,26 +284,26 @@ fail:
- static guint resume_a2dp(struct media_transport *transport,
- 				struct media_owner *owner)
+ /* Common socket structures and functions */
+ 
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index 4a6620b..a5b6397 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -182,8 +182,7 @@ static int bnep_ctrl_set_mcfilter(struct bnep_session *s, u8 *data, int len)
+ 			a2 = data;
+ 			data += ETH_ALEN;
+ 
+-			BT_DBG("mc filter %s -> %s",
+-				batostr((void *) a1), batostr((void *) a2));
++			BT_DBG("mc filter %pMR -> %pMR", a1, a2);
+ 
+ 			/* Iterate from a1 to a2 */
+ 			set_bit(bnep_mc_hash(a1), (ulong *) &s->mc_filter);
+diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
+index 6c9c1fd..e0a6ebf 100644
+--- a/net/bluetooth/cmtp/core.c
++++ b/net/bluetooth/cmtp/core.c
+@@ -353,7 +353,7 @@ int cmtp_add_connection(struct cmtp_connadd_req *req, struct socket *sock)
+ 
+ 	BT_DBG("mtu %d", session->mtu);
+ 
+-	sprintf(session->name, "%s", batostr(&bt_sk(sock->sk)->dst));
++	sprintf(session->name, "%pMR", &bt_sk(sock->sk)->dst);
+ 
+ 	session->sock  = sock;
+ 	session->state = BT_CONFIG;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 2fcced3..858907f 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -319,7 +319,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
  {
-+	struct a2dp_transport *a2dp = transport->data;
- 	struct media_endpoint *endpoint = transport->endpoint;
- 	struct audio_device *device = transport->device;
- 	struct a2dp_sep *sep = media_endpoint_get_sep(endpoint);
+ 	struct hci_conn *conn;
  
--	if (transport->session == NULL) {
--		transport->session = avdtp_get(&device->src, &device->dst);
--		if (transport->session == NULL)
-+	if (a2dp->session == NULL) {
-+		a2dp->session = avdtp_get(&device->src, &device->dst);
-+		if (a2dp->session == NULL)
- 			return 0;
+-	BT_DBG("%s dst %s", hdev->name, batostr(dst));
++	BT_DBG("%s dst %pMR", hdev->name, dst);
+ 
+ 	conn = kzalloc(sizeof(struct hci_conn), GFP_KERNEL);
+ 	if (!conn)
+@@ -436,7 +436,7 @@ struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src)
+ 	int use_src = bacmp(src, BDADDR_ANY);
+ 	struct hci_dev *hdev = NULL, *d;
+ 
+-	BT_DBG("%s -> %s", batostr(src), batostr(dst));
++	BT_DBG("%pMR -> %pMR", src, dst);
+ 
+ 	read_lock(&hci_dev_list_lock);
+ 
+@@ -478,7 +478,7 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 	struct hci_conn *sco;
+ 	struct hci_conn *le;
+ 
+-	BT_DBG("%s dst %s", hdev->name, batostr(dst));
++	BT_DBG("%s dst %pMR", hdev->name, dst);
+ 
+ 	if (type == LE_LINK) {
+ 		le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 08994ec..13d3622 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -410,7 +410,7 @@ struct inquiry_entry *hci_inquiry_cache_lookup(struct hci_dev *hdev,
+ 	struct discovery_state *cache = &hdev->discovery;
+ 	struct inquiry_entry *e;
+ 
+-	BT_DBG("cache %p, %s", cache, batostr(bdaddr));
++	BT_DBG("cache %p, %pMR", cache, bdaddr);
+ 
+ 	list_for_each_entry(e, &cache->all, all) {
+ 		if (!bacmp(&e->data.bdaddr, bdaddr))
+@@ -426,7 +426,7 @@ struct inquiry_entry *hci_inquiry_cache_lookup_unknown(struct hci_dev *hdev,
+ 	struct discovery_state *cache = &hdev->discovery;
+ 	struct inquiry_entry *e;
+ 
+-	BT_DBG("cache %p, %s", cache, batostr(bdaddr));
++	BT_DBG("cache %p, %pMR", cache, bdaddr);
+ 
+ 	list_for_each_entry(e, &cache->unknown, list) {
+ 		if (!bacmp(&e->data.bdaddr, bdaddr))
+@@ -443,7 +443,7 @@ struct inquiry_entry *hci_inquiry_cache_lookup_resolve(struct hci_dev *hdev,
+ 	struct discovery_state *cache = &hdev->discovery;
+ 	struct inquiry_entry *e;
+ 
+-	BT_DBG("cache %p bdaddr %s state %d", cache, batostr(bdaddr), state);
++	BT_DBG("cache %p bdaddr %pMR state %d", cache, bdaddr, state);
+ 
+ 	list_for_each_entry(e, &cache->resolve, list) {
+ 		if (!bacmp(bdaddr, BDADDR_ANY) && e->name_state == state)
+@@ -480,7 +480,7 @@ bool hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data,
+ 	struct discovery_state *cache = &hdev->discovery;
+ 	struct inquiry_entry *ie;
+ 
+-	BT_DBG("cache %p, %s", cache, batostr(&data->bdaddr));
++	BT_DBG("cache %p, %pMR", cache, &data->bdaddr);
+ 
+ 	if (ssp)
+ 		*ssp = data->ssp_mode;
+@@ -1264,7 +1264,7 @@ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
+ 		list_add(&key->list, &hdev->link_keys);
  	}
  
- 	if (transport->in_use == TRUE)
- 		goto done;
+-	BT_DBG("%s key for %s type %u", hdev->name, batostr(bdaddr), type);
++	BT_DBG("%s key for %pMR type %u", hdev->name, bdaddr, type);
  
--	transport->in_use = a2dp_sep_lock(sep, transport->session);
-+	transport->in_use = a2dp_sep_lock(sep, a2dp->session);
- 	if (transport->in_use == FALSE)
- 		return 0;
+ 	/* Some buggy controller combinations generate a changed
+ 	 * combination key for legacy pairing even when there's no
+@@ -1343,7 +1343,7 @@ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ 	if (!key)
+ 		return -ENOENT;
  
- done:
--	return a2dp_resume(transport->session, sep, a2dp_resume_complete,
--				owner);
-+	return a2dp_resume(a2dp->session, sep, a2dp_resume_complete, owner);
+-	BT_DBG("%s removing %s", hdev->name, batostr(bdaddr));
++	BT_DBG("%s removing %pMR", hdev->name, bdaddr);
+ 
+ 	list_del(&key->list);
+ 	kfree(key);
+@@ -1359,7 +1359,7 @@ int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ 		if (bacmp(bdaddr, &k->bdaddr))
+ 			continue;
+ 
+-		BT_DBG("%s removing %s", hdev->name, batostr(bdaddr));
++		BT_DBG("%s removing %pMR", hdev->name, bdaddr);
+ 
+ 		list_del(&k->list);
+ 		kfree(k);
+@@ -1398,7 +1398,7 @@ int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ 	if (!data)
+ 		return -ENOENT;
+ 
+-	BT_DBG("%s removing %s", hdev->name, batostr(bdaddr));
++	BT_DBG("%s removing %pMR", hdev->name, bdaddr);
+ 
+ 	list_del(&data->list);
+ 	kfree(data);
+@@ -1437,7 +1437,7 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
+ 	memcpy(data->hash, hash, sizeof(data->hash));
+ 	memcpy(data->randomizer, randomizer, sizeof(data->randomizer));
+ 
+-	BT_DBG("%s for %s", hdev->name, batostr(bdaddr));
++	BT_DBG("%s for %pMR", hdev->name, bdaddr);
+ 
+ 	return 0;
  }
+@@ -2305,8 +2305,8 @@ static void hci_link_tx_to(struct hci_dev *hdev, __u8 type)
+ 	/* Kill stalled connections */
+ 	list_for_each_entry_rcu(c, &h->list, list) {
+ 		if (c->type == type && c->sent) {
+-			BT_ERR("%s killing stalled connection %s",
+-			       hdev->name, batostr(&c->dst));
++			BT_ERR("%s killing stalled connection %pMR",
++			       hdev->name, &c->dst);
+ 			hci_acl_disconn(c, HCI_ERROR_REMOTE_USER_TERM);
+ 		}
+ 	}
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 47656be..1ef7c62 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1209,7 +1209,7 @@ static void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
  
- static void a2dp_suspend_complete(struct avdtp *session,
-@@ -303,6 +311,7 @@ static void a2dp_suspend_complete(struct avdtp *session,
- {
- 	struct media_owner *owner = user_data;
- 	struct media_transport *transport = owner->transport;
-+	struct a2dp_transport *a2dp = transport->data;
- 	struct a2dp_sep *sep = media_endpoint_get_sep(transport->endpoint);
+ 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
  
- 	/* Release always succeeds */
-@@ -312,7 +321,7 @@ static void a2dp_suspend_complete(struct avdtp *session,
- 		media_owner_remove(owner);
+-	BT_DBG("%s bdaddr %s conn %p", hdev->name, batostr(&cp->bdaddr), conn);
++	BT_DBG("%s bdaddr %pMR conn %p", hdev->name, &cp->bdaddr, conn);
+ 
+ 	if (status) {
+ 		if (conn && conn->state == BT_CONNECT) {
+@@ -1627,8 +1627,7 @@ static void hci_cs_le_create_conn(struct hci_dev *hdev, __u8 status)
+ 
+ 	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->peer_addr);
+ 
+-	BT_DBG("%s bdaddr %s conn %p", hdev->name, batostr(&cp->peer_addr),
+-	       conn);
++	BT_DBG("%s bdaddr %pMR conn %p", hdev->name, &cp->peer_addr, conn);
+ 
+ 	if (status) {
+ 		if (conn && conn->state == BT_CONNECT) {
+@@ -1818,7 +1817,7 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	struct hci_ev_conn_request *ev = (void *) skb->data;
+ 	int mask = hdev->link_mode;
+ 
+-	BT_DBG("%s bdaddr %s type 0x%x", hdev->name, batostr(&ev->bdaddr),
++	BT_DBG("%s bdaddr %pMR type 0x%x", hdev->name, &ev->bdaddr,
+ 	       ev->link_type);
+ 
+ 	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, ev->link_type);
+@@ -2682,13 +2681,13 @@ static void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	key = hci_find_link_key(hdev, &ev->bdaddr);
+ 	if (!key) {
+-		BT_DBG("%s link key not found for %s", hdev->name,
+-		       batostr(&ev->bdaddr));
++		BT_DBG("%s link key not found for %pMR", hdev->name,
++		       &ev->bdaddr);
+ 		goto not_found;
  	}
  
--	a2dp_sep_unlock(sep, transport->session);
-+	a2dp_sep_unlock(sep, a2dp->session);
- 	transport->in_use = FALSE;
- 	media_transport_remove(transport, owner);
- }
-@@ -320,17 +329,17 @@ static void a2dp_suspend_complete(struct avdtp *session,
- static guint suspend_a2dp(struct media_transport *transport,
- 						struct media_owner *owner)
+-	BT_DBG("%s found key type %u for %s", hdev->name, key->type,
+-	       batostr(&ev->bdaddr));
++	BT_DBG("%s found key type %u for %pMR", hdev->name, key->type,
++	       &ev->bdaddr);
+ 
+ 	if (!test_bit(HCI_DEBUG_KEYS, &hdev->dev_flags) &&
+ 	    key->type == HCI_LK_DEBUG_COMBINATION) {
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index a20e61c..55cceee 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -38,7 +38,7 @@ static ssize_t show_link_address(struct device *dev,
+ 				 struct device_attribute *attr, char *buf)
  {
-+	struct a2dp_transport *a2dp = transport->data;
- 	struct media_endpoint *endpoint = transport->endpoint;
- 	struct a2dp_sep *sep = media_endpoint_get_sep(endpoint);
- 
- 	if (!owner) {
--		a2dp_sep_unlock(sep, transport->session);
-+		a2dp_sep_unlock(sep, a2dp->session);
- 		transport->in_use = FALSE;
- 		return 0;
- 	}
- 
--	return a2dp_suspend(transport->session, sep, a2dp_suspend_complete,
--				owner);
-+	return a2dp_suspend(a2dp->session, sep, a2dp_suspend_complete, owner);
+ 	struct hci_conn *conn = to_hci_conn(dev);
+-	return sprintf(buf, "%s\n", batostr(&conn->dst));
++	return sprintf(buf, "%pMR\n", &conn->dst);
  }
  
- static void cancel_a2dp(struct media_transport *transport, guint id)
-@@ -745,10 +754,12 @@ static int set_property_a2dp(struct media_transport *transport,
- 						const char *property,
- 						DBusMessageIter *value)
+ static ssize_t show_link_features(struct device *dev,
+@@ -224,7 +224,7 @@ static ssize_t show_address(struct device *dev,
+ 			    struct device_attribute *attr, char *buf)
  {
-+	struct a2dp_transport *a2dp = transport->data;
-+
- 	if (g_strcmp0(property, "Delay") == 0) {
- 		if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_UINT16)
- 			return -EINVAL;
--		dbus_message_iter_get_basic(value, &transport->delay);
-+		dbus_message_iter_get_basic(value, &a2dp->delay);
- 
- 		/* FIXME: send new delay */
- 		return 0;
-@@ -763,7 +774,7 @@ static int set_property_a2dp(struct media_transport *transport,
- 		if (volume > 127)
- 			return -EINVAL;
- 
--		if (transport->volume == volume)
-+		if (a2dp->volume == volume)
- 			return 0;
- 
- 		return avrcp_set_volume(transport->device, volume);
-@@ -855,11 +866,13 @@ static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
- static void get_properties_a2dp(struct media_transport *transport,
- 						DBusMessageIter *dict)
- {
--	dict_append_entry(dict, "Delay", DBUS_TYPE_UINT16, &transport->delay);
-+	struct a2dp_transport *a2dp = transport->data;
-+
-+	dict_append_entry(dict, "Delay", DBUS_TYPE_UINT16, &a2dp->delay);
- 
--	if (transport->volume <= 127)
-+	if (a2dp->volume <= 127)
- 		dict_append_entry(dict, "Volume", DBUS_TYPE_UINT16,
--							&transport->volume);
-+							&a2dp->volume);
+ 	struct hci_dev *hdev = to_hci_dev(dev);
+-	return sprintf(buf, "%s\n", batostr(&hdev->bdaddr));
++	return sprintf(buf, "%pMR\n", &hdev->bdaddr);
  }
  
- static void get_properties_headset(struct media_transport *transport,
-@@ -957,6 +970,28 @@ static const GDBusSignalTable transport_signals[] = {
- 	{ }
- };
+ static ssize_t show_features(struct device *dev,
+@@ -406,8 +406,8 @@ static int inquiry_cache_show(struct seq_file *f, void *p)
  
-+static void destroy_a2dp(void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct a2dp_transport *a2dp = transport->data;
-+
-+	if (a2dp->session)
-+		avdtp_unref(a2dp->session);
-+
-+	g_free(a2dp);
-+}
-+
-+static void destroy_headset(void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct headset_transport *headset = transport->data;
-+
-+	if (headset->nrec_id > 0)
-+		headset_remove_nrec_cb(transport->device, headset->nrec_id);
-+
-+	g_free(headset);
-+}
-+
- static void media_transport_free(void *data)
+ 	list_for_each_entry(e, &cache->all, all) {
+ 		struct inquiry_data *data = &e->data;
+-		seq_printf(f, "%s %d %d %d 0x%.2x%.2x%.2x 0x%.4x %d %d %u\n",
+-			   batostr(&data->bdaddr),
++		seq_printf(f, "%pMR %d %d %d 0x%.2x%.2x%.2x 0x%.4x %d %d %u\n",
++			   &data->bdaddr,
+ 			   data->pscan_rep_mode, data->pscan_period_mode,
+ 			   data->pscan_mode, data->dev_class[2],
+ 			   data->dev_class[1], data->dev_class[0],
+@@ -440,7 +440,7 @@ static int blacklist_show(struct seq_file *f, void *p)
+ 	hci_dev_lock(hdev);
+ 
+ 	list_for_each_entry(b, &hdev->blacklist, list)
+-		seq_printf(f, "%s\n", batostr(&b->bdaddr));
++		seq_printf(f, "%pMR\n", &b->bdaddr);
+ 
+ 	hci_dev_unlock(hdev);
+ 
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index ccd985d..001fc13 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -932,8 +932,10 @@ static int hidp_setup_hid(struct hidp_session *session,
+ 	hid->country = req->country;
+ 
+ 	strncpy(hid->name, req->name, 128);
+-	strncpy(hid->phys, batostr(&bt_sk(session->ctrl_sock->sk)->src), 64);
+-	strncpy(hid->uniq, batostr(&bt_sk(session->ctrl_sock->sk)->dst), 64);
++	snprintf(hid->phys, "%pMR", &bt_sk(session->ctrl_sock->sk)->src,
++		 sizeof(hid->phys);
++	snprintf(hid->uniq, "%pMR", &bt_sk(session->ctrl_sock->sk)->dst,
++		 sizeof(hid->uniq));
+ 
+ 	hid->dev.parent = &session->conn->dev;
+ 	hid->ll_driver = &hidp_hid_driver;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index f9bffe3..cf4ec39 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1422,7 +1422,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 	__u8 auth_type;
+ 	int err;
+ 
+-	BT_DBG("%s -> %s (type %u) psm 0x%2.2x", batostr(src), batostr(dst),
++	BT_DBG("%pMR -> %pMR (type %u) psm 0x%2.2x", src, dst,
+ 	       dst_type, __le16_to_cpu(chan->psm));
+ 
+ 	hdev = hci_get_route(dst, src);
+@@ -5282,7 +5282,7 @@ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ 	int exact = 0, lm1 = 0, lm2 = 0;
+ 	struct l2cap_chan *c;
+ 
+-	BT_DBG("hdev %s, bdaddr %s", hdev->name, batostr(bdaddr));
++	BT_DBG("hdev %s, bdaddr %pMR", hdev->name, bdaddr);
+ 
+ 	/* Find listening sockets and check their link_mode */
+ 	read_lock(&chan_list_lock);
+@@ -5312,7 +5312,7 @@ int l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
  {
- 	struct media_transport *transport = data;
-@@ -970,11 +1005,8 @@ static void media_transport_free(void *data)
+ 	struct l2cap_conn *conn;
  
- 	g_slist_free(transport->owners);
+-	BT_DBG("hcon %p bdaddr %s status %d", hcon, batostr(&hcon->dst), status);
++	BT_DBG("hcon %p bdaddr %pMR status %d", hcon, &hcon->dst, status);
  
--	if (transport->session)
--		avdtp_unref(transport->session);
+ 	if (!status) {
+ 		conn = l2cap_conn_add(hcon, status);
+@@ -5572,9 +5572,8 @@ static int l2cap_debugfs_show(struct seq_file *f, void *p)
+ 	list_for_each_entry(c, &chan_list, global_l) {
+ 		struct sock *sk = c->sk;
+ 
+-		seq_printf(f, "%s %s %d %d 0x%4.4x 0x%4.4x %d %d %d %d\n",
+-					batostr(&bt_sk(sk)->src),
+-					batostr(&bt_sk(sk)->dst),
++		seq_printf(f, "%pMR %pMR %d %d 0x%4.4x 0x%4.4x %d %d %d %d\n",
++					&bt_sk(sk)->src, &bt_sk(sk)->dst,
+ 					c->state, __le16_to_cpu(c->psm),
+ 					c->scid, c->dcid, c->imtu, c->omtu,
+ 					c->sec_level, c->mode);
+diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
+index 340cd82..b3fbc73 100644
+--- a/net/bluetooth/lib.c
++++ b/net/bluetooth/lib.c
+@@ -41,27 +41,6 @@ void baswap(bdaddr_t *dst, bdaddr_t *src)
+ }
+ EXPORT_SYMBOL(baswap);
+ 
+-char *batostr_old(bdaddr_t *ba)
+-{
+-	static char str[2][18];
+-	static int i = 1;
 -
--	if (transport->nrec_id)
--		headset_remove_nrec_cb(transport->device, transport->nrec_id);
-+	if (transport->destroy != NULL)
-+		transport->destroy(transport);
- 
- 	if (transport->conn)
- 		dbus_connection_unref(transport->conn);
-@@ -1015,26 +1047,38 @@ struct media_transport *media_transport_create(DBusConnection *conn,
- 	transport->size = size;
- 	transport->path = g_strdup_printf("%s/fd%d", device->path, fd++);
- 	transport->fd = -1;
--	transport->volume = -1;
- 
- 	uuid = media_endpoint_get_uuid(endpoint);
- 	if (strcasecmp(uuid, A2DP_SOURCE_UUID) == 0 ||
- 			strcasecmp(uuid, A2DP_SINK_UUID) == 0) {
-+		struct a2dp_transport *a2dp;
-+
-+		a2dp = g_new0(struct a2dp_transport, 1);
-+		a2dp->volume = -1;
-+
- 		transport->resume = resume_a2dp;
- 		transport->suspend = suspend_a2dp;
- 		transport->cancel = cancel_a2dp;
- 		transport->get_properties = get_properties_a2dp;
- 		transport->set_property = set_property_a2dp;
-+		transport->data = a2dp;
-+		transport->destroy = destroy_a2dp;
- 	} else if (strcasecmp(uuid, HFP_AG_UUID) == 0 ||
- 			strcasecmp(uuid, HSP_AG_UUID) == 0) {
-+		struct headset_transport *headset;
-+
-+		headset = g_new0(struct headset_transport, 1);
-+		headset->nrec_id = headset_add_nrec_cb(device,
-+							headset_nrec_changed,
-+							transport);
-+
- 		transport->resume = resume_headset;
- 		transport->suspend = suspend_headset;
- 		transport->cancel = cancel_headset;
- 		transport->get_properties = get_properties_headset;
- 		transport->set_property = set_property_headset;
--		transport->nrec_id = headset_add_nrec_cb(device,
--							headset_nrec_changed,
--							transport);
-+		transport->data = headset;
-+		transport->destroy = destroy_headset;
- 	} else if (strcasecmp(uuid, HFP_HS_UUID) == 0 ||
- 			strcasecmp(uuid, HSP_HS_UUID) == 0) {
- 		transport->resume = resume_gateway;
-@@ -1068,15 +1112,17 @@ const char *media_transport_get_path(struct media_transport *transport)
- void media_transport_update_delay(struct media_transport *transport,
- 							uint16_t delay)
+-	i ^= 1;
+-	sprintf(str[i], "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
+-		ba->b[5], ba->b[4], ba->b[3],
+-		ba->b[2], ba->b[1], ba->b[0]);
+-
+-	return str[i];
+-}
+-
+-char *batostr(bdaddr_t *ba)
+-{
+-	BT_DBG("\t\t!!! New: %pMR", ba);
+-
+-	return batostr_old(ba);
+-}
+-EXPORT_SYMBOL(batostr);
+-
+ /* Bluetooth error codes to Unix errno mapping */
+ int bt_to_errno(__u16 code)
  {
-+	struct a2dp_transport *a2dp = transport->data;
-+
- 	/* Check if delay really changed */
--	if (transport->delay == delay)
-+	if (a2dp->delay == delay)
- 		return;
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index c75107e..fb1d83d 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -377,8 +377,8 @@ static int __rfcomm_dlc_open(struct rfcomm_dlc *d, bdaddr_t *src, bdaddr_t *dst,
+ 	int err = 0;
+ 	u8 dlci;
  
--	transport->delay = delay;
-+	a2dp->delay = delay;
+-	BT_DBG("dlc %p state %ld %s %s channel %d",
+-			d, d->state, batostr(src), batostr(dst), channel);
++	BT_DBG("dlc %p state %ld %pMR -> %pMR channel %d",
++	       d, d->state, src, dst, channel);
  
- 	emit_property_changed(transport->conn, transport->path,
- 				MEDIA_TRANSPORT_INTERFACE, "Delay",
--				DBUS_TYPE_UINT16, &transport->delay);
-+				DBUS_TYPE_UINT16, &a2dp->delay);
+ 	if (channel < 1 || channel > 30)
+ 		return -EINVAL;
+@@ -676,7 +676,7 @@ static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
+ 	struct socket *sock;
+ 	struct sock *sk;
+ 
+-	BT_DBG("%s %s", batostr(src), batostr(dst));
++	BT_DBG("%pMR -> %pMR", src, dst);
+ 
+ 	*err = rfcomm_l2sock_create(&sock);
+ 	if (*err < 0)
+@@ -2125,11 +2125,10 @@ static int rfcomm_dlc_debugfs_show(struct seq_file *f, void *x)
+ 		list_for_each_entry(d, &s->dlcs, list) {
+ 			struct sock *sk = s->sock->sk;
+ 
+-			seq_printf(f, "%s %s %ld %d %d %d %d\n",
+-						batostr(&bt_sk(sk)->src),
+-						batostr(&bt_sk(sk)->dst),
+-						d->state, d->dlci, d->mtu,
+-						d->rx_credits, d->tx_credits);
++			seq_printf(f, "%pMR %pMR %ld %d %d %d %d\n",
++				   &bt_sk(sk)->src, &bt_sk(sk)->dst,
++				   d->state, d->dlci, d->mtu,
++				   d->rx_credits, d->tx_credits);
+ 		}
+ 	}
+ 
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 7e1e596..cdfb990 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -334,7 +334,7 @@ static int rfcomm_sock_bind(struct socket *sock, struct sockaddr *addr, int addr
+ 	struct sock *sk = sock->sk;
+ 	int err = 0;
+ 
+-	BT_DBG("sk %p %s", sk, batostr(&sa->rc_bdaddr));
++	BT_DBG("sk %p %pMR", sk, &sa->rc_bdaddr);
+ 
+ 	if (!addr || addr->sa_family != AF_BLUETOOTH)
+ 		return -EINVAL;
+@@ -973,10 +973,9 @@ static int rfcomm_sock_debugfs_show(struct seq_file *f, void *p)
+ 	read_lock(&rfcomm_sk_list.lock);
+ 
+ 	sk_for_each(sk, node, &rfcomm_sk_list.head) {
+-		seq_printf(f, "%s %s %d %d\n",
+-				batostr(&bt_sk(sk)->src),
+-				batostr(&bt_sk(sk)->dst),
+-				sk->sk_state, rfcomm_pi(sk)->channel);
++		seq_printf(f, "%pMR %pMR %d %d\n",
++			   &bt_sk(sk)->src, &bt_sk(sk)->dst,
++			   sk->sk_state, rfcomm_pi(sk)->channel);
+ 	}
+ 
+ 	read_unlock(&rfcomm_sk_list.lock);
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index cb96077..6baf64d 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -166,7 +166,7 @@ static struct device *rfcomm_get_device(struct rfcomm_dev *dev)
+ static ssize_t show_address(struct device *tty_dev, struct device_attribute *attr, char *buf)
+ {
+ 	struct rfcomm_dev *dev = dev_get_drvdata(tty_dev);
+-	return sprintf(buf, "%s\n", batostr(&dev->dst));
++	return sprintf(buf, "%pMR\n", &dev->dst);
  }
  
- struct audio_device *media_transport_get_dev(struct media_transport *transport)
-@@ -1087,13 +1133,15 @@ struct audio_device *media_transport_get_dev(struct media_transport *transport)
- void media_transport_update_volume(struct media_transport *transport,
- 								uint8_t volume)
+ static ssize_t show_channel(struct device *tty_dev, struct device_attribute *attr, char *buf)
+@@ -663,8 +663,8 @@ static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
+ 	if (!dev)
+ 		return -ENODEV;
+ 
+-	BT_DBG("dev %p dst %s channel %d opened %d", dev, batostr(&dev->dst),
+-				dev->channel, dev->port.count);
++	BT_DBG("dev %p dst %pMR channel %d opened %d", dev, &dev->dst,
++	       dev->channel, dev->port.count);
+ 
+ 	spin_lock_irqsave(&dev->port.lock, flags);
+ 	if (++dev->port.count > 1) {
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 40bbe25..20680f2 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -163,7 +163,7 @@ static int sco_connect(struct sock *sk)
+ 	struct hci_dev  *hdev;
+ 	int err, type;
+ 
+-	BT_DBG("%s -> %s", batostr(src), batostr(dst));
++	BT_DBG("%pMR -> %pMR", src, dst);
+ 
+ 	hdev = hci_get_route(dst, src);
+ 	if (!hdev)
+@@ -451,7 +451,7 @@ static int sco_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_le
+ 	struct sock *sk = sock->sk;
+ 	int err = 0;
+ 
+-	BT_DBG("sk %p %s", sk, batostr(&sa->sco_bdaddr));
++	BT_DBG("sk %p %pMR", sk, &sa->sco_bdaddr);
+ 
+ 	if (!addr || addr->sa_family != AF_BLUETOOTH)
+ 		return -EINVAL;
+@@ -894,7 +894,7 @@ int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ 	struct hlist_node *node;
+ 	int lm = 0;
+ 
+-	BT_DBG("hdev %s, bdaddr %s", hdev->name, batostr(bdaddr));
++	BT_DBG("hdev %s, bdaddr %pMR", hdev->name, bdaddr);
+ 
+ 	/* Find listening sockets */
+ 	read_lock(&sco_sk_list.lock);
+@@ -915,7 +915,7 @@ int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ 
+ int sco_connect_cfm(struct hci_conn *hcon, __u8 status)
  {
-+	struct a2dp_transport *a2dp = transport->data;
-+
- 	/* Check if volume really changed */
--	if (transport->volume == volume)
-+	if (a2dp->volume == volume)
- 		return;
+-	BT_DBG("hcon %p bdaddr %s status %d", hcon, batostr(&hcon->dst), status);
++	BT_DBG("hcon %p bdaddr %pMR status %d", hcon, &hcon->dst, status);
+ 	if (!status) {
+ 		struct sco_conn *conn;
  
--	transport->volume = volume;
-+	a2dp->volume = volume;
+@@ -963,8 +963,8 @@ static int sco_debugfs_show(struct seq_file *f, void *p)
+ 	read_lock(&sco_sk_list.lock);
  
- 	emit_property_changed(transport->conn, transport->path,
- 				MEDIA_TRANSPORT_INTERFACE, "Volume",
--				DBUS_TYPE_UINT16, &transport->volume);
-+				DBUS_TYPE_UINT16, &a2dp->volume);
- }
+ 	sk_for_each(sk, node, &sco_sk_list.head) {
+-		seq_printf(f, "%s %s %d\n", batostr(&bt_sk(sk)->src),
+-			   batostr(&bt_sk(sk)->dst), sk->sk_state);
++		seq_printf(f, "%pMR %pMR %d\n", &bt_sk(sk)->src,
++			   &bt_sk(sk)->dst, sk->sk_state);
+ 	}
+ 
+ 	read_unlock(&sco_sk_list.lock);
 -- 
-1.7.10.2
+1.7.9.5
 
