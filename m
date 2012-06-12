@@ -1,104 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Joohi RASTOGI <joohi.rastogi@stericsson.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: User Name <linux-bluetooth@vger.kernel.org>
-Date: Tue, 12 Jun 2012 09:31:14 +0200
-Subject: RE: [PATCH] Sets the information attribute for the service
-Message-ID: <3176460F0F455A44B2E93431E34FC86C2225CE6FE6@EXDCVYMBSTM005.EQ1STM.local>
-References: <1338273973-28767-1-git-send-email-joohi.rastogi@stericsson.com>
- <20120530074813.GG6539@x220>
-Content-Type: text/plain; charset="us-ascii"
+Date: Tue, 12 Jun 2012 03:04:47 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: vishal agarwal <vishal.bluez@gmail.com>
+Cc: Vishal Agarwal <vishal.agarwal@stericsson.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix sending HCI_Disconnect only after
+ connection
+Message-ID: <20120612060447.GG24440@joana>
+References: <1339395584-3223-1-git-send-email-vishal.agarwal@stericsson.com>
+ <20120612030522.GD24440@joana>
+ <CA+_sZW8S9ZKtT6itUSXENovADEYoR8GUydpVg044CAEWEx2MTw@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CA+_sZW8S9ZKtT6itUSXENovADEYoR8GUydpVg044CAEWEx2MTw@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Vishal,
 
-> -----Original Message-----
-> From: Joohi RASTOGI
-> Sent: Friday, June 01, 2012 11:32 AM
-> To: 'Johan Hedberg'
-> Cc: User Name
-> Subject: RE: [PATCH] Sets the information attribute for the service
-> 
-> Hi Johan,
-> 
-> > -----Original Message-----
-> > From: Johan Hedberg [mailto:johan.hedberg@gmail.com]
-> > Sent: Wednesday, May 30, 2012 1:18 PM
-> > To: Joohi RASTOGI
-> > Cc: User Name
-> > Subject: Re: [PATCH] Sets the information attribute for the service
-> >
-> > Hi Joohi,
-> >
-> > On Tue, May 29, 2012, joohi.rastogi@stericsson.com wrote:
-> > > From: Joohi Rastogi <joohi.rastogi@stericsson.com>
-> > >
-> > > This patch adds the service name for
-> > > Device Identification Profile
-> > > ---
-> > >  src/sdpd-service.c |    2 ++
-> > >  1 files changed, 2 insertions(+), 0 deletions(-)
-> > >
-> > > diff --git a/src/sdpd-service.c b/src/sdpd-service.c
-> > > index 39e05ab..1fa82a6 100644
-> > > --- a/src/sdpd-service.c
-> > > +++ b/src/sdpd-service.c
-> > > @@ -228,6 +228,8 @@ void register_device_id(void)
-> > >  	source_data = sdp_data_alloc(SDP_UINT16, &main_opts.did_source);
-> > >  	sdp_attr_add(record, 0x0205, source_data);
-> > >
-> > > +	sdp_set_info_attr(record, "Device Identification", 0, 0);
-> > > +
-> > >  	update_db_timestamp();
-> >
-> > 0 is an integer, NULL is a pointer. The function call you're adding
-> > doesn't take any integer arguments so you should be passing NULL and not
-> > 0.
-> >
-> I will do the required change and re-push the patch.
-> 
-> > That said, I can't find any mention of the service name attribute in the
-> > Device ID specification (version 1.3). In fact the table (8.1 on page
-> > 17) that lists all mandatory and optional attributes doesn't even have
-> > this attribute mentioned as an optional one. So why do you need to have
-> > it added? Is there some client that breaks if it's not present?
-> >
-> I added the "Service Name" because while doing sdptool browse, every
-> profile displays its Service Name along with other attributes like Service
-> Class ID List, Protocol Descriptor List and Service RecHandle. But, Device
-> ID Profile does not display its Service Name. So, I had added the Service
-> Name attribute as well to the profile.
+* vishal agarwal <vishal.bluez@gmail.com> [2012-06-12 11:20:44 +0530]:
 
-It is not mandatory nor optional but other profiles have this information, so it is good to have for Device ID profile as well. For AVRCP also Service Name is not mandatory, but sdptool browse has this information. So, we have added it for Device ID and it is not breaking any other client.
+> Hi Gustavo,
+> 
+> On 6/12/12, Gustavo Padovan <gustavo@padovan.org> wrote:
+> > Hi Vishal,
+> >
+> > * Vishal Agarwal <vishal.agarwal@stericsson.com> [2012-06-11 11:49:44
+> > +0530]:
+> >
+> >> HCI_Disconnet should only be sent after connection is established.
+> >
+> > minor: it's HCI_Disconnect here.
+> Thanks for mentioning. I will correct it in the next patch.
+> >
+> >> If connection is not yet established and hci_disconnect is called
+> >> then disconnection complete will be received with a handle which
+> >> does not exist and hence this event will be ignored.
+> >> But as mgmt.c will not receive this event, its variable for pending
+> >> command is not cleared.This will result in future Disconnect commands
+> >> for that BD Address to be blocked with error busy.
+> >>
+> >> Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
+> >> ---
+> >>  net/bluetooth/mgmt.c |    2 +-
+> >>  1 files changed, 1 insertions(+), 1 deletions(-)
+> >>
+> >> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> >> index 958f764..3a857bf 100644
+> >> --- a/net/bluetooth/mgmt.c
+> >> +++ b/net/bluetooth/mgmt.c
+> >> @@ -1598,7 +1598,7 @@ static int disconnect(struct sock *sk, struct
+> >> hci_dev *hdev, void *data,
+> >>  	else
+> >>  		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->addr.bdaddr);
+> >>
+> >> -	if (!conn) {
+> >> +	if (!conn || conn->state == BT_OPEN || conn->state == BT_CLOSED) {
+> >
+> > You might also want to check for BT_BOUND here, as this is also a pre
+> > connect() state.
+> >
+> I did not see any place where BT_BOUND is used for conn->state. Should I still
+> check for BT_BOUND state?
 
-> For example: For AVRCP TG the sdptool browse response is:
-> Service Name: AVRCP TG
-> Service RecHandle: 0x10005
-> Service Class ID List:
->   "AV Remote Target" (0x110c)
-> Protocol Descriptor List:
->   "L2CAP" (0x0100)
->     PSM: 23
->   "AVCTP" (0x0017)
->     uint16: 0x103
-> Profile Descriptor List:
->   "AV Remote" (0x110e)
->     Version: 0x0103
-> 
-> And for Device ID Profile sdptool browse response is:
-> Service RecHandle: 0x10000
-> Service Class ID List:
->   "PnP Information" (0x1200)
-> Profile Descriptor List:
->   "PnP Information" (0x1200)
->     Version: 0x0103
-> 
-> Please let me know your view on this.
-> 
-> 
-> > Johan
-> 
-> Thanks,
-> Joohi Rastogi
+You are totally right, I just get confused. Check for BT_OPEN and BT_CLOSED is
+enough.
+
+	Gustavo
