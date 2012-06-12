@@ -1,68 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120612030522.GD24440@joana>
-References: <1339395584-3223-1-git-send-email-vishal.agarwal@stericsson.com>
-	<20120612030522.GD24440@joana>
-Date: Tue, 12 Jun 2012 11:20:44 +0530
-Message-ID: <CA+_sZW8S9ZKtT6itUSXENovADEYoR8GUydpVg044CAEWEx2MTw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Fix sending HCI_Disconnect only after connection
-From: vishal agarwal <vishal.bluez@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	Vishal Agarwal <vishal.agarwal@stericsson.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Tue, 12 Jun 2012 03:59:07 -0300 (BRT)
+Message-Id: <20120612.035907.1947511592259870809.pcacjr@zytor.com>
+To: paulo.alcantara@openbossa.org
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Report correct error codes on disconnect
+From: pcacjr@zytor.com
+In-Reply-To: <1339127713-19325-1-git-send-email-paulo.alcantara@openbossa.org>
+References: <1339127713-19325-1-git-send-email-paulo.alcantara@openbossa.org>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+From: Paulo Alcantara <paulo.alcantara@openbossa.org>
+Date: Fri,  8 Jun 2012 00:55:13 -0300
 
-On 6/12/12, Gustavo Padovan <gustavo@padovan.org> wrote:
-> Hi Vishal,
->
-> * Vishal Agarwal <vishal.agarwal@stericsson.com> [2012-06-11 11:49:44
-> +0530]:
->
->> HCI_Disconnet should only be sent after connection is established.
->
-> minor: it's HCI_Disconnect here.
-Thanks for mentioning. I will correct it in the next patch.
->
->> If connection is not yet established and hci_disconnect is called
->> then disconnection complete will be received with a handle which
->> does not exist and hence this event will be ignored.
->> But as mgmt.c will not receive this event, its variable for pending
->> command is not cleared.This will result in future Disconnect commands
->> for that BD Address to be blocked with error busy.
->>
->> Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
->> ---
->>  net/bluetooth/mgmt.c |    2 +-
->>  1 files changed, 1 insertions(+), 1 deletions(-)
->>
->> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->> index 958f764..3a857bf 100644
->> --- a/net/bluetooth/mgmt.c
->> +++ b/net/bluetooth/mgmt.c
->> @@ -1598,7 +1598,7 @@ static int disconnect(struct sock *sk, struct
->> hci_dev *hdev, void *data,
->>  	else
->>  		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->addr.bdaddr);
->>
->> -	if (!conn) {
->> +	if (!conn || conn->state == BT_OPEN || conn->state == BT_CLOSED) {
->
-> You might also want to check for BT_BOUND here, as this is also a pre
-> connect() state.
->
-I did not see any place where BT_BOUND is used for conn->state. Should I still
-check for BT_BOUND state?
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 47656be..2c7e4a7 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -1915,9 +1915,17 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>  	}
+>  
+>  	if (ev->status == 0) {
+> +		__u8 reason;
+> +
+>  		if (conn->type == ACL_LINK && conn->flush_key)
+>  			hci_remove_link_key(hdev, &conn->dst);
+> -		hci_proto_disconn_cfm(conn, ev->reason);
+> +
+> +		reason = hci_proto_disconn_ind(conn);
+> +		if (reason)
+> +			hci_proto_disconn_cfm(conn, reason);
+> +		else
+> +			hci_proto_disconn_cfm(conn, ev->reason);
+> +
 
-> 	Gustavo
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-Thanks
-Vishal
+This is check is wrong since disc_reason is _always_ set to
+HCI_ERROR_REMOTE_USER_TERM by default and it can be set to
+HCI_ERROR_AUTH_FAILURE as well in l2cap_connect_req(), but it is _never_ set to
+0 in anywhere else. I still do not know the reason why is always set to
+HCI_ERROR_REMOTE_USER_TERM by default, but I've got two "solutions" for handling
+this specific issue so far.
+
+Primarily, it's worth to note that what I'm doing here is to avoid overwriting
+error codes returned by LE encryption change event and exposing wrong error ones
+to user space. BlueZ should handle specific error codes (e.g.: 0x06 "PIN or key
+missing") that are returned by LE encrpytion change event, and not enabling auto
+connection when there is "PIN or key missing" error code set in this event, for
+example.
+
+Well, the "solutions" that I've got are:
+
+1) We can set the disconnect reason to 0 by default and set it accordingly.
+
+2) Or change this check in hci_disconn_complete_evt() function to:
+
+/* If reason was previously set in hci_encrypt_change_evt(), then we need to use
+ * the reason set in disc_reason instead of the event one.
+ */
+if (reason != HCI_ERROR_REMOTE_USER_TERM && reason != HCI_ERROR_AUTH_FAILURE)
+	hci_proto_disconn_cfm(conn, reason);
+else
+	hci_proto_disconn_cfm(conn, ev->reason);
+
+(Although, the 2nd solution looks better and probably correct to me, IMO)
+
+Do you guys have any other solution or comment that I could take into account,
+or even any improvement in one of my solutions given above ?
+
+       	    Paulo
