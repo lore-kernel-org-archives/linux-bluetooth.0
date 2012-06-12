@@ -1,41 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vishal Agarwal <vishal.agarwal@stericsson.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: <vishal.agarwal@stericsson.com>
-Subject: [PATCH v1] Bluetooth: Fix sending HCI_Disconnect only after connection
-Date: Wed, 13 Jun 2012 05:32:43 +0530
-Message-ID: <1339545763-23251-1-git-send-email-vishal.agarwal@stericsson.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Szymon Janc <szymon@janc.net.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 1/2] mgmtops: Rename pending_uuid to cod_busy
+Date: Tue, 12 Jun 2012 21:35:49 +0200
+Message-Id: <1339529750-14642-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HCI_Disconnect should only be sent after connection is established.
-If connection is not yet established and HCI_Disconnect is called
-then disconnection complete will be received with a handle which
-does not exist and hence this event will be ignored.
-But as mgmt.c will not receive this event, its variable for pending
-command is not cleared.This will result in future Disconnect commands
-for that BD Address to be blocked with error busy.
+From: Szymon Janc <szymon.janc@tieto.com>
 
-Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
+This boolean will be used for any ongoing mgmt command that might cause
+a CoD update (e.g. set_dev_class) so rename it appropriately.
 ---
- net/bluetooth/mgmt.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ plugins/mgmtops.c |   17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 958f764..3a857bf 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1598,7 +1598,7 @@ static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
- 	else
- 		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->addr.bdaddr);
+diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+index a196b1f..8229da1 100644
+--- a/plugins/mgmtops.c
++++ b/plugins/mgmtops.c
+@@ -70,7 +70,7 @@ static struct controller_info {
+ 	GSList *connections;
+ 	uint8_t discov_type;
  
--	if (!conn) {
-+	if (!conn || conn->state == BT_OPEN || conn->state == BT_CLOSED) {
- 		err = cmd_status(sk, hdev->id, MGMT_OP_DISCONNECT,
- 				 MGMT_STATUS_NOT_CONNECTED);
- 		goto failed;
+-	gboolean pending_uuid;
++	gboolean cod_busy;
+ 	GSList *pending_uuids;
+ 
+ 	gboolean pending_class;
+@@ -347,7 +347,7 @@ static int mgmt_update_powered(struct btd_adapter *adapter,
+ 		btd_adapter_stop(adapter);
+ 		g_slist_free_full(info->pending_uuids, g_free);
+ 		info->pending_uuids = NULL;
+-		info->pending_uuid = FALSE;
++		info->cod_busy = FALSE;
+ 		info->pending_class = FALSE;
+ 		return 0;
+ 	}
+@@ -836,7 +836,7 @@ static int mgmt_add_uuid(int index, uuid_t *uuid, uint8_t svc_hint)
+ 
+ 	DBG("index %d", index);
+ 
+-	if (info->pending_uuid) {
++	if (info->cod_busy) {
+ 		struct pending_uuid *pending = g_new0(struct pending_uuid, 1);
+ 
+ 		memcpy(&pending->uuid, uuid, sizeof(*uuid));
+@@ -862,7 +862,7 @@ static int mgmt_add_uuid(int index, uuid_t *uuid, uint8_t svc_hint)
+ 	if (write(mgmt_sock, buf, sizeof(buf)) < 0)
+ 		return -errno;
+ 
+-	info->pending_uuid = TRUE;
++	info->cod_busy = TRUE;
+ 
+ 	return 0;
+ }
+@@ -935,11 +935,10 @@ static int mgmt_set_powered(int index, gboolean powered)
+ {
+ 	struct controller_info *info = &controllers[index];
+ 
+-	DBG("index %d powered %d pending_uuid %u", index, powered,
+-							info->pending_uuid);
++	DBG("index %d powered %d cod_busy %u", index, powered, info->cod_busy);
+ 
+ 	if (powered) {
+-		if (info->pending_uuid) {
++		if (info->cod_busy) {
+ 			info->pending_powered = TRUE;
+ 			return 0;
+ 		}
+@@ -980,7 +979,7 @@ static int mgmt_set_dev_class(int index, uint8_t major, uint8_t minor)
+ 
+ 	DBG("index %d major %u minor %u", index, major, minor);
+ 
+-	if (info->pending_uuid) {
++	if (info->cod_busy) {
+ 		info->major = major;
+ 		info->minor = minor;
+ 		info->pending_class = TRUE;
+@@ -1287,7 +1286,7 @@ static void mgmt_add_uuid_complete(int sk, uint16_t index, void *buf,
+ 
+ 	info = &controllers[index];
+ 
+-	info->pending_uuid = FALSE;
++	info->cod_busy = FALSE;
+ 
+ 	if (g_slist_length(info->pending_uuids) == 0) {
+ 		if (info->pending_class) {
 -- 
-1.7.0.4
+1.7.10.4
+
 
