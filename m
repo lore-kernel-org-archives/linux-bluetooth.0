@@ -1,31 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1339465057-1562-1-git-send-email-dmp0x7c5@gmail.com>
-References: <1339465057-1562-1-git-send-email-dmp0x7c5@gmail.com>
-Date: Tue, 12 Jun 2012 17:25:12 +0300
-Message-ID: <CABBYNZKr5UVtuPWW8grNBcgm58tK9JhNT8foa0xrRfNSkT80QA@mail.gmail.com>
-Subject: Re: [PATCH obexd] tools: Fix test-client error message put/get typo
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?ISO-8859-2?Q?Micha=B3_Poczwardowski?= <dmp0x7c5@gmail.com>
+Date: Tue, 12 Jun 2012 16:39:14 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH BlueZ v2] audio: Separate profile specific fields from
+ media_transport
+Message-ID: <20120612133914.GA11788@x220>
+References: <1339503046-8374-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1339503046-8374-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGksCgpPbiBUdWUsIEp1biAxMiwgMjAxMiBhdCA0OjM3IEFNLCBNaWNoYcWCIFBvY3p3YXJkb3dz
-a2kKPGRtcDB4N2M1QGdtYWlsLmNvbT4gd3JvdGU6Cj4gLS0tCj4gwqB0b29scy90ZXN0LWNsaWVu
-dC5jIHwgwqAgwqAyICstCj4gwqAxIGZpbGVzIGNoYW5nZWQsIDEgaW5zZXJ0aW9ucygrKSwgMSBk
-ZWxldGlvbnMoLSkKPgo+IGRpZmYgLS1naXQgYS90b29scy90ZXN0LWNsaWVudC5jIGIvdG9vbHMv
-dGVzdC1jbGllbnQuYwo+IGluZGV4IGEyOGQ0M2MuLjgxYTJiZTAgMTAwNjQ0Cj4gLS0tIGEvdG9v
-bHMvdGVzdC1jbGllbnQuYwo+ICsrKyBiL3Rvb2xzL3Rlc3QtY2xpZW50LmMKPiBAQCAtMTgxLDcg
-KzE4MSw3IEBAIHN0YXRpYyB2b2lkIGNtZF9nZXQoaW50IGFyZ2MsIGNoYXIgKiphcmd2KQo+IMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgR19PQkVYX0hEUl9OQU1FLCBhcmd2WzFdLAo+IMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgR19P
-QkVYX0hEUl9JTlZBTElEKTsKPiDCoCDCoCDCoCDCoGlmIChlcnIgIT0gTlVMTCkgewo+IC0gwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgZ19wcmludGVycigicHV0IGZhaWxlZDogJXNcbiIsIGVyci0+bWVz
-c2FnZSk7Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBnX3ByaW50ZXJyKCJnZXQgZmFpbGVkOiAl
-c1xuIiwgZXJyLT5tZXNzYWdlKTsKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGdfZXJyb3JfZnJl
-ZShlcnIpOwo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgY2xvc2UoZGF0YS0+ZmQpOwo+IMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgZ19mcmVlKGRhdGEpOwo+IC0tCj4gMS43LjguNAoKUGF0Y2ggaGFz
-IGJlZW4gYXBwbGllZCwgdGhhbmtzLgoKCi0tIApMdWl6IEF1Z3VzdG8gdm9uIERlbnR6Cg==
+Hi Luiz,
+
+On Tue, Jun 12, 2012, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> ---
+> v2: Pass data pointer directly instead of transport pointer
+> 
+>  audio/transport.c |  116 +++++++++++++++++++++++++++++++++++++----------------
+>  1 file changed, 82 insertions(+), 34 deletions(-)
+
+Applied. Thanks.
+
+Johan
