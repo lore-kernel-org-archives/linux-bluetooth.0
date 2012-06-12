@@ -1,33 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 12 Jun 2012 00:15:06 -0300
+Date: Tue, 12 Jun 2012 00:05:22 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Vishal Agarwal <vishal.agarwal@stericsson.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 5/5] Bluetooth: Fix not setting HCI_RESET flag for AMP
-Message-ID: <20120612031506.GE24440@joana>
-References: <1339143166-6523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1339402390-32320-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1339402390-32320-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix sending HCI_Disconnect only after
+ connection
+Message-ID: <20120612030522.GD24440@joana>
+References: <1339395584-3223-1-git-send-email-vishal.agarwal@stericsson.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1339402390-32320-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1339395584-3223-1-git-send-email-vishal.agarwal@stericsson.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Vishal,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-06-11 11:13:10 +0300]:
+* Vishal Agarwal <vishal.agarwal@stericsson.com> [2012-06-11 11:49:44 +0530]:
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> HCI_Disconnet should only be sent after connection is established.
+
+minor: it's HCI_Disconnect here.
+
+> If connection is not yet established and hci_disconnect is called
+> then disconnection complete will be received with a handle which
+> does not exist and hence this event will be ignored.
+> But as mgmt.c will not receive this event, its variable for pending
+> command is not cleared.This will result in future Disconnect commands
+> for that BD Address to be blocked with error busy.
 > 
-> Move reset function to common initialization section fixing
-> not setting HCI_RESET flag for amp_init.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
 > ---
->  net/bluetooth/hci_core.c |   13 ++++---------
->  1 file changed, 4 insertions(+), 9 deletions(-)
+>  net/bluetooth/mgmt.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 958f764..3a857bf 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -1598,7 +1598,7 @@ static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
+>  	else
+>  		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->addr.bdaddr);
+>  
+> -	if (!conn) {
+> +	if (!conn || conn->state == BT_OPEN || conn->state == BT_CLOSED) {
 
-All 5 patches were applied to bluetooth-next. Thanks.
+You might also want to check for BT_BOUND here, as this is also a pre
+connect() state.
 
 	Gustavo
