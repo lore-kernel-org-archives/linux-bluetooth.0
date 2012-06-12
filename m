@@ -1,34 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 Jun 2012 22:20:42 -0300 (BRT)
-Message-Id: <20120611.222042.1513738698665636019.pcacjr@zytor.com>
-To: paulo.alcantara@openbossa.org
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Remove magic value in disconnect mgmt
- handler
-From: pcacjr@zytor.com
-In-Reply-To: <1339463618-5862-1-git-send-email-paulo.alcantara@openbossa.org>
-References: <1339463618-5862-1-git-send-email-paulo.alcantara@openbossa.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+From: Paulo Alcantara <paulo.alcantara@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
+Subject: [PATCH v2] Bluetooth: Remove magic value in unpair_device handler
+Date: Mon, 11 Jun 2012 22:17:51 -0300
+Message-Id: <1339463871-5962-1-git-send-email-paulo.alcantara@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Date: Mon, 11 Jun 2012 22:13:38 -0300
+This patch replaces the magic value of variable 'reason' by the
+proper macro.
 
-> This patch replaces the magic value of variable 'reason' by the
-> proper macro.
-> 
-> Signed-off-by: Paulo Alcantara <paulo.alcantara@openbossa.org>
-> ---
->  net/bluetooth/mgmt.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Signed-off-by: Paulo Alcantara <paulo.alcantara@openbossa.org>
+---
+ net/bluetooth/mgmt.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Ignore this patch. The commit message is wrong.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 5903d3b..00c9ec1 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1557,7 +1557,7 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	}
+ 
+ 	dc.handle = cpu_to_le16(conn->handle);
+-	dc.reason = 0x13; /* Remote User Terminated Connection */
++	dc.reason = HCI_ERROR_REMOTE_USER_TERM;
+ 	err = hci_send_cmd(hdev, HCI_OP_DISCONNECT, sizeof(dc), &dc);
+ 	if (err < 0)
+ 		mgmt_pending_remove(cmd);
+-- 
+1.7.10.2
 
-The correct one is: "[PATCH v2] Bluetooth: Remove magic value in unpair_device
-handler".
-
-Thanks,
-
-Paulo
