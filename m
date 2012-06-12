@@ -1,74 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 Jun 2012 23:56:00 -0300
+Date: Mon, 11 Jun 2012 23:51:44 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Giancarlo Formicuccia <giancarlo.formicuccia@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: [PATCH] [RESEND] btusb,ath3k: add support for 0930:0219
-Message-ID: <20120612025600.GC24440@joana>
-References: <1379642.mNRPMjYO4c@ilstop>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Andre Guedes <andre.guedes@openbossa.org>
+Subject: Re: [RFC] Bluetooth: Fix using uninitialized option in RFCMode
+Message-ID: <20120612025144.GB24440@joana>
+References: <1339148013-4956-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1379642.mNRPMjYO4c@ilstop>
+In-Reply-To: <1339148013-4956-1-git-send-email-szymon.janc@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Giancarlo,
+Hi Szymon,
 
-* Giancarlo Formicuccia <giancarlo.formicuccia@gmail.com> [2012-06-10 08:33:11 +0200]:
+* Szymon Janc <szymon.janc@tieto.com> [2012-06-08 11:33:33 +0200]:
 
-> Hi,
+> If remote device sends bogus RFC option with invalid length,
+> undefined options values are used. Fix this by using defaults when
+> remote misbehaves.
 > 
-> this patch adds support for the AR3012 chip found on the Toshiba Sallite M840-1000-XQ.
+> This also fixes the following warning reported by gcc 4.7.0:
 > 
-> usb-devices shows:
+> net/bluetooth/l2cap_core.c: In function 'l2cap_config_rsp':
+> net/bluetooth/l2cap_core.c:3302:13: warning: 'rfc.max_pdu_size' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.max_pdu_size' was declared here
+> net/bluetooth/l2cap_core.c:3298:25: warning: 'rfc.monitor_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.monitor_timeout' was declared here
+> net/bluetooth/l2cap_core.c:3297:25: warning: 'rfc.retrans_timeout' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.retrans_timeout' was declared here
+> net/bluetooth/l2cap_core.c:3295:2: warning: 'rfc.mode' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> net/bluetooth/l2cap_core.c:3266:24: note: 'rfc.mode' was declared here
 > 
-> T:  Bus=01 Lev=02 Prnt=02 Port=02 Cnt=01 Dev#=  5 Spd=12  MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0930 ProdID=0219 Rev=00.02
-> S:  Manufacturer=Atheros Communications
-> S:  Product=Bluetooth USB Host Controller
-> S:  SerialNumber=Alaska Day 2006
-> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> 
-> Thanks,
-> 
-> Giancarlo
-> 
-> Signed-off-by: Giancarlo Formicuccia <giancarlo.formicuccia@gmail.com>
+> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
 > ---
-> diff -urpN -X linux-3.5-rc1/Documentation/dontdiff linux-3.5-rc1.org/drivers/bluetooth/ath3k.c linux-3.5-rc1/drivers/bluetooth/ath3k.c
-> --- linux-3.5-rc1.org/drivers/bluetooth/ath3k.c	2012-06-03 03:29:26.000000000 +0200
-> +++ linux-3.5-rc1/drivers/bluetooth/ath3k.c	2012-06-06 10:29:11.325484026 +0200
-> @@ -77,6 +77,7 @@ static struct usb_device_id ath3k_table[
->  	{ USB_DEVICE(0x04CA, 0x3005) },
->  	{ USB_DEVICE(0x13d3, 0x3362) },
->  	{ USB_DEVICE(0x0CF3, 0xE004) },
-> +	{ USB_DEVICE(0x0930, 0x0219) },
->  
->  	/* Atheros AR5BBU12 with sflash firmware */
->  	{ USB_DEVICE(0x0489, 0xE02C) },
-> @@ -101,6 +102,7 @@ static struct usb_device_id ath3k_blist_
->  	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
->  	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
->  	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
-> +	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
->  
->  	/* Atheros AR5BBU22 with sflash firmware */
->  	{ USB_DEVICE(0x0489, 0xE03C), .driver_info = BTUSB_ATH3012 },
-> diff -urpN -X linux-3.5-rc1/Documentation/dontdiff linux-3.5-rc1.org/drivers/bluetooth/btusb.c linux-3.5-rc1/drivers/bluetooth/btusb.c
-> --- linux-3.5-rc1.org/drivers/bluetooth/btusb.c	2012-06-03 03:29:26.000000000 +0200
-> +++ linux-3.5-rc1/drivers/bluetooth/btusb.c	2012-06-06 10:29:35.616401307 +0200
-> @@ -139,6 +139,7 @@ static struct usb_device_id blacklist_ta
->  	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
->  	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
->  	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
-> +	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
->  
->  	/* Atheros AR5BBU12 with sflash firmware */
->  	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+>  net/bluetooth/l2cap_core.c |   14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
 
-Patch has been applied to bluetooth.git. Thanks.
+Patch has been applied to the bluetooth.git tree. Thanks.
 
 	Gustavo
