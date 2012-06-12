@@ -1,67 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH obexd v0 2/3] client: Remove obc_transfer_abort
-Date: Tue, 12 Jun 2012 14:10:25 +0200
-Message-Id: <1339503026-17276-2-git-send-email-mikel.astiz.oss@gmail.com>
-In-Reply-To: <1339503026-17276-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1339503026-17276-1-git-send-email-mikel.astiz.oss@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAMOw1v4ASw0AepxgAC7Mw1LANdA24MrSpmLxy7znpuw3C_mS1w@mail.gmail.com>
+References: <1339419310-4777-1-git-send-email-luiz.dentz@gmail.com>
+	<CAMOw1v4ASw0AepxgAC7Mw1LANdA24MrSpmLxy7znpuw3C_mS1w@mail.gmail.com>
+Date: Tue, 12 Jun 2012 14:59:07 +0300
+Message-ID: <CABBYNZJyEsx63G_A6nPTF+ot58S9TTQCMR05oS4i2=0m5V73Kg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] audio: Separate profile specific fields from media_transport
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Lucas,
 
-Refactor the code to remove function obc_transfer_abort, which is used
-only once and is anyway coupled to the D-Bus API.
----
- client/transfer.c |   26 +++++++++++---------------
- 1 files changed, 11 insertions(+), 15 deletions(-)
+On Mon, Jun 11, 2012 at 6:16 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+>> +       if (transport->destroy != NULL)
+>> +               transport->destroy(transport);
+>
+> IMO it would be better to pass transport->data here and eliminate
+> "transport->data" assignment above in the destroy functions.
 
-diff --git a/client/transfer.c b/client/transfer.c
-index 0686afe..f296638 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -187,20 +187,6 @@ static void abort_complete(GObex *obex, GError *err, gpointer user_data)
- 	}
- }
- 
--static gboolean obc_transfer_abort(struct obc_transfer *transfer)
--{
--	if (transfer->xfer == 0)
--		return FALSE;
--
--	if (transfer->progress_id != 0) {
--		g_source_remove(transfer->progress_id);
--		transfer->progress_id = 0;
--	}
--
--	return g_obex_cancel_transfer(transfer->xfer, abort_complete,
--								transfer);
--}
--
- static DBusMessage *obc_transfer_cancel(DBusConnection *connection,
- 					DBusMessage *message, void *user_data)
- {
-@@ -218,7 +204,17 @@ static DBusMessage *obc_transfer_cancel(DBusConnection *connection,
- 				ERROR_INTERFACE ".InProgress",
- 				"Cancellation already in progress");
- 
--	if (!obc_transfer_abort(transfer))
-+	if (transfer->xfer == 0)
-+		return g_dbus_create_error(message,
-+				ERROR_INTERFACE ".Failed",
-+				"Failed");
-+
-+	if (transfer->progress_id != 0) {
-+		g_source_remove(transfer->progress_id);
-+		transfer->progress_id = 0;
-+	}
-+
-+	if (!g_obex_cancel_transfer(transfer->xfer, abort_complete, transfer))
- 		return g_dbus_create_error(message,
- 				ERROR_INTERFACE ".Failed",
- 				"Failed");
+That was my idea, but since destroy_headset need access to the device
+it was just simpler to just pass the transport itself. Not a big deal
+IMO since this in the same file, but I guess I will just store the
+device inside the headset_transport.
+
 -- 
-1.7.7.6
-
+Luiz Augusto von Dentz
