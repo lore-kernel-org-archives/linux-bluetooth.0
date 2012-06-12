@@ -1,138 +1,302 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2] Bluetooth: mgmt: Fix managing AMP device
-Date: Tue, 12 Jun 2012 16:31:13 +0300
-Message-Id: <1339507874-6342-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1339142997-6387-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1339142997-6387-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH BlueZ v2] audio: Separate profile specific fields from media_transport
+Date: Tue, 12 Jun 2012 15:10:46 +0300
+Message-Id: <1339503046-8374-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-AMP device shall not be managed by user space for now.
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    2 +-
- net/bluetooth/hci_core.c         |    6 ++++--
- net/bluetooth/mgmt.c             |   23 +++++++++++++++++++++--
- 3 files changed, 26 insertions(+), 5 deletions(-)
+v2: Pass data pointer directly instead of transport pointer
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 05d3340..40ce2fa 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1074,7 +1074,7 @@ int mgmt_discovering(struct hci_dev *hdev, u8 discovering);
- int mgmt_interleaved_discovery(struct hci_dev *hdev);
- int mgmt_device_blocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
- int mgmt_device_unblocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
--
-+bool mgmt_valid_hdev(struct hci_dev *hdev);
- int mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, u8 persistent);
- 
- /* HCI info for socket */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index f02325d..43ca889 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -698,7 +698,8 @@ int hci_dev_open(__u16 dev)
- 		hci_dev_hold(hdev);
- 		set_bit(HCI_UP, &hdev->flags);
- 		hci_notify(hdev, HCI_DEV_UP);
--		if (!test_bit(HCI_SETUP, &hdev->dev_flags)) {
-+		if (!test_bit(HCI_SETUP, &hdev->dev_flags) &&
-+		    mgmt_valid_hdev(hdev)) {
- 			hci_dev_lock(hdev);
- 			mgmt_powered(hdev, 1);
- 			hci_dev_unlock(hdev);
-@@ -799,7 +800,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	 * and no tasks are scheduled. */
- 	hdev->close(hdev);
- 
--	if (!test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags)) {
-+	if (!test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags) &&
-+	    mgmt_valid_hdev(hdev)) {
- 		hci_dev_lock(hdev);
- 		mgmt_powered(hdev, 0);
- 		hci_dev_unlock(hdev);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index c72307c..68cc079 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -193,6 +193,11 @@ static u8 mgmt_status_table[] = {
- 	MGMT_STATUS_CONNECT_FAILED,	/* MAC Connection Failed */
+ audio/transport.c |  116 +++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 82 insertions(+), 34 deletions(-)
+
+diff --git a/audio/transport.c b/audio/transport.c
+index 1fccff8..b015625 100644
+--- a/audio/transport.c
++++ b/audio/transport.c
+@@ -62,11 +62,21 @@ struct media_owner {
+ 	guint			watch;
  };
  
-+bool mgmt_valid_hdev(struct hci_dev *hdev)
-+{
-+	return hdev->amp_type == HCI_BREDR;
-+}
++struct a2dp_transport {
++	struct avdtp		*session;
++	uint16_t		delay;
++	uint16_t		volume;
++};
 +
- static u8 mgmt_status(u8 hci_status)
- {
- 	if (hci_status < ARRAY_SIZE(mgmt_status_table))
-@@ -317,7 +322,6 @@ static int read_index_list(struct sock *sk, struct hci_dev *hdev, void *data,
- 			   u16 data_len)
- {
- 	struct mgmt_rp_read_index_list *rp;
--	struct list_head *p;
- 	struct hci_dev *d;
- 	size_t rp_len;
- 	u16 count;
-@@ -328,7 +332,10 @@ static int read_index_list(struct sock *sk, struct hci_dev *hdev, void *data,
- 	read_lock(&hci_dev_list_lock);
++struct headset_transport {
++	struct audio_device	*device;
++	unsigned int		nrec_id;
++};
++
+ struct media_transport {
+ 	DBusConnection		*conn;
+ 	char			*path;		/* Transport object path */
+ 	struct audio_device	*device;	/* Transport device */
+-	struct avdtp		*session;	/* Signalling session (a2dp only) */
+ 	struct media_endpoint	*endpoint;	/* Transport endpoint */
+ 	GSList			*owners;	/* Transport owners */
+ 	uint8_t			*configuration; /* Transport configuration */
+@@ -74,9 +84,6 @@ struct media_transport {
+ 	int			fd;		/* Transport file descriptor */
+ 	uint16_t		imtu;		/* Transport input mtu */
+ 	uint16_t		omtu;		/* Transport output mtu */
+-	uint16_t		delay;		/* Transport delay (a2dp only) */
+-	unsigned int		nrec_id;	/* Transport nrec watch (headset only) */
+-	uint16_t		volume;		/* Transport volume */
+ 	gboolean		read_lock;
+ 	gboolean		write_lock;
+ 	gboolean		in_use;
+@@ -93,6 +100,8 @@ struct media_transport {
+ 					struct media_transport *transport,
+ 					const char *property,
+ 					DBusMessageIter *value);
++	GDestroyNotify		destroy;
++	void			*data;
+ };
  
- 	count = 0;
--	list_for_each(p, &hci_dev_list) {
-+	list_for_each_entry(d, &hci_dev_list, list) {
-+		if (!mgmt_valid_hdev(d))
-+			continue;
-+
- 		count++;
+ void media_transport_destroy(struct media_transport *transport)
+@@ -276,26 +285,26 @@ fail:
+ static guint resume_a2dp(struct media_transport *transport,
+ 				struct media_owner *owner)
+ {
++	struct a2dp_transport *a2dp = transport->data;
+ 	struct media_endpoint *endpoint = transport->endpoint;
+ 	struct audio_device *device = transport->device;
+ 	struct a2dp_sep *sep = media_endpoint_get_sep(endpoint);
+ 
+-	if (transport->session == NULL) {
+-		transport->session = avdtp_get(&device->src, &device->dst);
+-		if (transport->session == NULL)
++	if (a2dp->session == NULL) {
++		a2dp->session = avdtp_get(&device->src, &device->dst);
++		if (a2dp->session == NULL)
+ 			return 0;
  	}
  
-@@ -346,6 +353,9 @@ static int read_index_list(struct sock *sk, struct hci_dev *hdev, void *data,
- 		if (test_bit(HCI_SETUP, &d->dev_flags))
- 			continue;
+ 	if (transport->in_use == TRUE)
+ 		goto done;
  
-+		if (!mgmt_valid_hdev(d))
-+			continue;
-+
- 		rp->index[i++] = cpu_to_le16(d->id);
- 		BT_DBG("Added hci%u", d->id);
- 	}
-@@ -2153,6 +2163,9 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
+-	transport->in_use = a2dp_sep_lock(sep, transport->session);
++	transport->in_use = a2dp_sep_lock(sep, a2dp->session);
+ 	if (transport->in_use == FALSE)
+ 		return 0;
  
- 	BT_DBG("");
- 
-+	if (hdev->amp_type != HCI_BREDR)
-+		return -ENOTSUPP;
-+
- 	hci_dev_lock(hdev);
- 
- 	memcpy(hdev->short_name, cp->short_name, sizeof(hdev->short_name));
-@@ -2831,6 +2844,9 @@ static void cmd_status_rsp(struct pending_cmd *cmd, void *data)
- 
- int mgmt_index_added(struct hci_dev *hdev)
- {
-+	if (!mgmt_valid_hdev(hdev))
-+		return -ENOTSUPP;
-+
- 	return mgmt_event(MGMT_EV_INDEX_ADDED, hdev, NULL, 0, NULL);
+ done:
+-	return a2dp_resume(transport->session, sep, a2dp_resume_complete,
+-				owner);
++	return a2dp_resume(a2dp->session, sep, a2dp_resume_complete, owner);
  }
  
-@@ -2838,6 +2854,9 @@ int mgmt_index_removed(struct hci_dev *hdev)
+ static void a2dp_suspend_complete(struct avdtp *session,
+@@ -303,6 +312,7 @@ static void a2dp_suspend_complete(struct avdtp *session,
  {
- 	u8 status = MGMT_STATUS_INVALID_INDEX;
+ 	struct media_owner *owner = user_data;
+ 	struct media_transport *transport = owner->transport;
++	struct a2dp_transport *a2dp = transport->data;
+ 	struct a2dp_sep *sep = media_endpoint_get_sep(transport->endpoint);
  
-+	if (!mgmt_valid_hdev(hdev))
-+		return -ENOTSUPP;
+ 	/* Release always succeeds */
+@@ -312,7 +322,7 @@ static void a2dp_suspend_complete(struct avdtp *session,
+ 		media_owner_remove(owner);
+ 	}
+ 
+-	a2dp_sep_unlock(sep, transport->session);
++	a2dp_sep_unlock(sep, a2dp->session);
+ 	transport->in_use = FALSE;
+ 	media_transport_remove(transport, owner);
+ }
+@@ -320,17 +330,17 @@ static void a2dp_suspend_complete(struct avdtp *session,
+ static guint suspend_a2dp(struct media_transport *transport,
+ 						struct media_owner *owner)
+ {
++	struct a2dp_transport *a2dp = transport->data;
+ 	struct media_endpoint *endpoint = transport->endpoint;
+ 	struct a2dp_sep *sep = media_endpoint_get_sep(endpoint);
+ 
+ 	if (!owner) {
+-		a2dp_sep_unlock(sep, transport->session);
++		a2dp_sep_unlock(sep, a2dp->session);
+ 		transport->in_use = FALSE;
+ 		return 0;
+ 	}
+ 
+-	return a2dp_suspend(transport->session, sep, a2dp_suspend_complete,
+-				owner);
++	return a2dp_suspend(a2dp->session, sep, a2dp_suspend_complete, owner);
+ }
+ 
+ static void cancel_a2dp(struct media_transport *transport, guint id)
+@@ -745,10 +755,12 @@ static int set_property_a2dp(struct media_transport *transport,
+ 						const char *property,
+ 						DBusMessageIter *value)
+ {
++	struct a2dp_transport *a2dp = transport->data;
 +
- 	mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
+ 	if (g_strcmp0(property, "Delay") == 0) {
+ 		if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_UINT16)
+ 			return -EINVAL;
+-		dbus_message_iter_get_basic(value, &transport->delay);
++		dbus_message_iter_get_basic(value, &a2dp->delay);
  
- 	return mgmt_event(MGMT_EV_INDEX_REMOVED, hdev, NULL, 0, NULL);
+ 		/* FIXME: send new delay */
+ 		return 0;
+@@ -763,7 +775,7 @@ static int set_property_a2dp(struct media_transport *transport,
+ 		if (volume > 127)
+ 			return -EINVAL;
+ 
+-		if (transport->volume == volume)
++		if (a2dp->volume == volume)
+ 			return 0;
+ 
+ 		return avrcp_set_volume(transport->device, volume);
+@@ -855,11 +867,13 @@ static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
+ static void get_properties_a2dp(struct media_transport *transport,
+ 						DBusMessageIter *dict)
+ {
+-	dict_append_entry(dict, "Delay", DBUS_TYPE_UINT16, &transport->delay);
++	struct a2dp_transport *a2dp = transport->data;
++
++	dict_append_entry(dict, "Delay", DBUS_TYPE_UINT16, &a2dp->delay);
+ 
+-	if (transport->volume <= 127)
++	if (a2dp->volume <= 127)
+ 		dict_append_entry(dict, "Volume", DBUS_TYPE_UINT16,
+-							&transport->volume);
++							&a2dp->volume);
+ }
+ 
+ static void get_properties_headset(struct media_transport *transport,
+@@ -957,6 +971,26 @@ static const GDBusSignalTable transport_signals[] = {
+ 	{ }
+ };
+ 
++static void destroy_a2dp(void *data)
++{
++	struct a2dp_transport *a2dp = data;
++
++	if (a2dp->session)
++		avdtp_unref(a2dp->session);
++
++	g_free(a2dp);
++}
++
++static void destroy_headset(void *data)
++{
++	struct headset_transport *headset = data;
++
++	if (headset->nrec_id > 0)
++		headset_remove_nrec_cb(headset->device, headset->nrec_id);
++
++	g_free(headset);
++}
++
+ static void media_transport_free(void *data)
+ {
+ 	struct media_transport *transport = data;
+@@ -970,11 +1004,8 @@ static void media_transport_free(void *data)
+ 
+ 	g_slist_free(transport->owners);
+ 
+-	if (transport->session)
+-		avdtp_unref(transport->session);
+-
+-	if (transport->nrec_id)
+-		headset_remove_nrec_cb(transport->device, transport->nrec_id);
++	if (transport->destroy != NULL)
++		transport->destroy(transport->data);
+ 
+ 	if (transport->conn)
+ 		dbus_connection_unref(transport->conn);
+@@ -1015,26 +1046,39 @@ struct media_transport *media_transport_create(DBusConnection *conn,
+ 	transport->size = size;
+ 	transport->path = g_strdup_printf("%s/fd%d", device->path, fd++);
+ 	transport->fd = -1;
+-	transport->volume = -1;
+ 
+ 	uuid = media_endpoint_get_uuid(endpoint);
+ 	if (strcasecmp(uuid, A2DP_SOURCE_UUID) == 0 ||
+ 			strcasecmp(uuid, A2DP_SINK_UUID) == 0) {
++		struct a2dp_transport *a2dp;
++
++		a2dp = g_new0(struct a2dp_transport, 1);
++		a2dp->volume = -1;
++
+ 		transport->resume = resume_a2dp;
+ 		transport->suspend = suspend_a2dp;
+ 		transport->cancel = cancel_a2dp;
+ 		transport->get_properties = get_properties_a2dp;
+ 		transport->set_property = set_property_a2dp;
++		transport->data = a2dp;
++		transport->destroy = destroy_a2dp;
+ 	} else if (strcasecmp(uuid, HFP_AG_UUID) == 0 ||
+ 			strcasecmp(uuid, HSP_AG_UUID) == 0) {
++		struct headset_transport *headset;
++
++		headset = g_new0(struct headset_transport, 1);
++		headset->device = device;
++		headset->nrec_id = headset_add_nrec_cb(device,
++							headset_nrec_changed,
++							transport);
++
+ 		transport->resume = resume_headset;
+ 		transport->suspend = suspend_headset;
+ 		transport->cancel = cancel_headset;
+ 		transport->get_properties = get_properties_headset;
+ 		transport->set_property = set_property_headset;
+-		transport->nrec_id = headset_add_nrec_cb(device,
+-							headset_nrec_changed,
+-							transport);
++		transport->data = headset;
++		transport->destroy = destroy_headset;
+ 	} else if (strcasecmp(uuid, HFP_HS_UUID) == 0 ||
+ 			strcasecmp(uuid, HSP_HS_UUID) == 0) {
+ 		transport->resume = resume_gateway;
+@@ -1068,15 +1112,17 @@ const char *media_transport_get_path(struct media_transport *transport)
+ void media_transport_update_delay(struct media_transport *transport,
+ 							uint16_t delay)
+ {
++	struct a2dp_transport *a2dp = transport->data;
++
+ 	/* Check if delay really changed */
+-	if (transport->delay == delay)
++	if (a2dp->delay == delay)
+ 		return;
+ 
+-	transport->delay = delay;
++	a2dp->delay = delay;
+ 
+ 	emit_property_changed(transport->conn, transport->path,
+ 				MEDIA_TRANSPORT_INTERFACE, "Delay",
+-				DBUS_TYPE_UINT16, &transport->delay);
++				DBUS_TYPE_UINT16, &a2dp->delay);
+ }
+ 
+ struct audio_device *media_transport_get_dev(struct media_transport *transport)
+@@ -1087,13 +1133,15 @@ struct audio_device *media_transport_get_dev(struct media_transport *transport)
+ void media_transport_update_volume(struct media_transport *transport,
+ 								uint8_t volume)
+ {
++	struct a2dp_transport *a2dp = transport->data;
++
+ 	/* Check if volume really changed */
+-	if (transport->volume == volume)
++	if (a2dp->volume == volume)
+ 		return;
+ 
+-	transport->volume = volume;
++	a2dp->volume = volume;
+ 
+ 	emit_property_changed(transport->conn, transport->path,
+ 				MEDIA_TRANSPORT_INTERFACE, "Volume",
+-				DBUS_TYPE_UINT16, &transport->volume);
++				DBUS_TYPE_UINT16, &a2dp->volume);
+ }
 -- 
-1.7.9.5
+1.7.10.2
 
