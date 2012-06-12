@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Paulo Alcantara <paulo.alcantara@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH v2] Bluetooth: Remove magic value in unpair_device handler
-Date: Mon, 11 Jun 2012 22:17:51 -0300
-Message-Id: <1339463871-5962-1-git-send-email-paulo.alcantara@openbossa.org>
+Subject: [PATCH] Bluetooth: Remove magic value in disconnect mgmt handler
+Date: Mon, 11 Jun 2012 22:13:38 -0300
+Message-Id: <1339463618-5862-1-git-send-email-paulo.alcantara@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
