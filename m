@@ -1,93 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/2] mgmtops: Rename pending_uuid to cod_busy
-Date: Tue, 12 Jun 2012 12:00:08 +0200
-Message-ID: <1339495209-17701-1-git-send-email-szymon.janc@tieto.com>
+From: Joohi RASTOGI <joohi.rastogi@stericsson.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: User Name <linux-bluetooth@vger.kernel.org>
+Date: Tue, 12 Jun 2012 09:31:14 +0200
+Subject: RE: [PATCH] Sets the information attribute for the service
+Message-ID: <3176460F0F455A44B2E93431E34FC86C2225CE6FE6@EXDCVYMBSTM005.EQ1STM.local>
+References: <1338273973-28767-1-git-send-email-joohi.rastogi@stericsson.com>
+ <20120530074813.GG6539@x220>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This boolean will be used for any ongoing mgmt command that might cause
-a CoD update (e.g. set_dev_class) so rename it appropriately.
----
- plugins/mgmtops.c |   17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+Hi Johan,
 
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index a196b1f..8229da1 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -70,7 +70,7 @@ static struct controller_info {
- 	GSList *connections;
- 	uint8_t discov_type;
- 
--	gboolean pending_uuid;
-+	gboolean cod_busy;
- 	GSList *pending_uuids;
- 
- 	gboolean pending_class;
-@@ -347,7 +347,7 @@ static int mgmt_update_powered(struct btd_adapter *adapter,
- 		btd_adapter_stop(adapter);
- 		g_slist_free_full(info->pending_uuids, g_free);
- 		info->pending_uuids = NULL;
--		info->pending_uuid = FALSE;
-+		info->cod_busy = FALSE;
- 		info->pending_class = FALSE;
- 		return 0;
- 	}
-@@ -836,7 +836,7 @@ static int mgmt_add_uuid(int index, uuid_t *uuid, uint8_t svc_hint)
- 
- 	DBG("index %d", index);
- 
--	if (info->pending_uuid) {
-+	if (info->cod_busy) {
- 		struct pending_uuid *pending = g_new0(struct pending_uuid, 1);
- 
- 		memcpy(&pending->uuid, uuid, sizeof(*uuid));
-@@ -862,7 +862,7 @@ static int mgmt_add_uuid(int index, uuid_t *uuid, uint8_t svc_hint)
- 	if (write(mgmt_sock, buf, sizeof(buf)) < 0)
- 		return -errno;
- 
--	info->pending_uuid = TRUE;
-+	info->cod_busy = TRUE;
- 
- 	return 0;
- }
-@@ -935,11 +935,10 @@ static int mgmt_set_powered(int index, gboolean powered)
- {
- 	struct controller_info *info = &controllers[index];
- 
--	DBG("index %d powered %d pending_uuid %u", index, powered,
--							info->pending_uuid);
-+	DBG("index %d powered %d cod_busy %u", index, powered, info->cod_busy);
- 
- 	if (powered) {
--		if (info->pending_uuid) {
-+		if (info->cod_busy) {
- 			info->pending_powered = TRUE;
- 			return 0;
- 		}
-@@ -980,7 +979,7 @@ static int mgmt_set_dev_class(int index, uint8_t major, uint8_t minor)
- 
- 	DBG("index %d major %u minor %u", index, major, minor);
- 
--	if (info->pending_uuid) {
-+	if (info->cod_busy) {
- 		info->major = major;
- 		info->minor = minor;
- 		info->pending_class = TRUE;
-@@ -1287,7 +1286,7 @@ static void mgmt_add_uuid_complete(int sk, uint16_t index, void *buf,
- 
- 	info = &controllers[index];
- 
--	info->pending_uuid = FALSE;
-+	info->cod_busy = FALSE;
- 
- 	if (g_slist_length(info->pending_uuids) == 0) {
- 		if (info->pending_class) {
--- 
-on behalf of ST-Ericsson
+> -----Original Message-----
+> From: Joohi RASTOGI
+> Sent: Friday, June 01, 2012 11:32 AM
+> To: 'Johan Hedberg'
+> Cc: User Name
+> Subject: RE: [PATCH] Sets the information attribute for the service
+> 
+> Hi Johan,
+> 
+> > -----Original Message-----
+> > From: Johan Hedberg [mailto:johan.hedberg@gmail.com]
+> > Sent: Wednesday, May 30, 2012 1:18 PM
+> > To: Joohi RASTOGI
+> > Cc: User Name
+> > Subject: Re: [PATCH] Sets the information attribute for the service
+> >
+> > Hi Joohi,
+> >
+> > On Tue, May 29, 2012, joohi.rastogi@stericsson.com wrote:
+> > > From: Joohi Rastogi <joohi.rastogi@stericsson.com>
+> > >
+> > > This patch adds the service name for
+> > > Device Identification Profile
+> > > ---
+> > >  src/sdpd-service.c |    2 ++
+> > >  1 files changed, 2 insertions(+), 0 deletions(-)
+> > >
+> > > diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+> > > index 39e05ab..1fa82a6 100644
+> > > --- a/src/sdpd-service.c
+> > > +++ b/src/sdpd-service.c
+> > > @@ -228,6 +228,8 @@ void register_device_id(void)
+> > >  	source_data = sdp_data_alloc(SDP_UINT16, &main_opts.did_source);
+> > >  	sdp_attr_add(record, 0x0205, source_data);
+> > >
+> > > +	sdp_set_info_attr(record, "Device Identification", 0, 0);
+> > > +
+> > >  	update_db_timestamp();
+> >
+> > 0 is an integer, NULL is a pointer. The function call you're adding
+> > doesn't take any integer arguments so you should be passing NULL and not
+> > 0.
+> >
+> I will do the required change and re-push the patch.
+> 
+> > That said, I can't find any mention of the service name attribute in the
+> > Device ID specification (version 1.3). In fact the table (8.1 on page
+> > 17) that lists all mandatory and optional attributes doesn't even have
+> > this attribute mentioned as an optional one. So why do you need to have
+> > it added? Is there some client that breaks if it's not present?
+> >
+> I added the "Service Name" because while doing sdptool browse, every
+> profile displays its Service Name along with other attributes like Service
+> Class ID List, Protocol Descriptor List and Service RecHandle. But, Device
+> ID Profile does not display its Service Name. So, I had added the Service
+> Name attribute as well to the profile.
 
+It is not mandatory nor optional but other profiles have this information, so it is good to have for Device ID profile as well. For AVRCP also Service Name is not mandatory, but sdptool browse has this information. So, we have added it for Device ID and it is not breaking any other client.
+
+> For example: For AVRCP TG the sdptool browse response is:
+> Service Name: AVRCP TG
+> Service RecHandle: 0x10005
+> Service Class ID List:
+>   "AV Remote Target" (0x110c)
+> Protocol Descriptor List:
+>   "L2CAP" (0x0100)
+>     PSM: 23
+>   "AVCTP" (0x0017)
+>     uint16: 0x103
+> Profile Descriptor List:
+>   "AV Remote" (0x110e)
+>     Version: 0x0103
+> 
+> And for Device ID Profile sdptool browse response is:
+> Service RecHandle: 0x10000
+> Service Class ID List:
+>   "PnP Information" (0x1200)
+> Profile Descriptor List:
+>   "PnP Information" (0x1200)
+>     Version: 0x0103
+> 
+> Please let me know your view on this.
+> 
+> 
+> > Johan
+> 
+> Thanks,
+> Joohi Rastogi
