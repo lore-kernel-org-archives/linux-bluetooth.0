@@ -1,72 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
-To: "'Johan Hedberg'" <johan.hedberg@gmail.com>
-CC: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Bluetooth LE scan/pair using MGMT_OPS on Ubuntu 12.04 fails.
-Date: Wed, 13 Jun 2012 11:58:51 +0000
-Message-ID: <F82830D409D80E4881C83250E051B74B4A152D95@banasiexm01.ASIA.ROOT.PRI>
-References: <F82830D409D80E4881C83250E051B74B4784BC9E@banasiexm01.ASIA.ROOT.PRI>
- <F82830D409D80E4881C83250E051B74B4A040CBD@banasiexm01.ASIA.ROOT.PRI>
- <F82830D409D80E4881C83250E051B74B4A151824@banasiexm01.ASIA.ROOT.PRI>
- <20120613093544.GA3842@x220.ger.corp.intel.com>
- <F82830D409D80E4881C83250E051B74B4A151884@banasiexm01.ASIA.ROOT.PRI>
- <20120613100450.GA4803@x220.ger.corp.intel.com>
-In-Reply-To: <20120613100450.GA4803@x220.ger.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org, bzhao@marvell.com
+Subject: [RFC] Bluetooth: btmrvl: Do not send vendor events to bluetooth stack
+Date: Wed, 13 Jun 2012 13:35:44 +0300
+Message-Id: <1339583744-2849-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Vendor-specific events shall be processed in driver and not sent
+to bluetooth stack where they screw up HCI command countings.
 
------Original Message-----
-From: Johan Hedberg [mailto:johan.hedberg@gmail.com] 
-Sent: Wednesday, June 13, 2012 3:35 PM
-To: Vijaykumar Dadmode
-Cc: 'linux-bluetooth@vger.kernel.org'
-Subject: Re: Bluetooth LE scan/pair using MGMT_OPS on Ubuntu 12.04 fails.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ drivers/bluetooth/btmrvl_drv.h  |    2 +-
+ drivers/bluetooth/btmrvl_main.c |   14 ++++++++++++--
+ drivers/bluetooth/btmrvl_sdio.c |    8 +++++---
+ 3 files changed, 18 insertions(+), 6 deletions(-)
 
-Hi Vijay,
+diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
+index 94f2d65..27068d1 100644
+--- a/drivers/bluetooth/btmrvl_drv.h
++++ b/drivers/bluetooth/btmrvl_drv.h
+@@ -136,7 +136,7 @@ int btmrvl_remove_card(struct btmrvl_private *priv);
+ 
+ void btmrvl_interrupt(struct btmrvl_private *priv);
+ 
+-void btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb);
++bool btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb);
+ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb);
+ 
+ int btmrvl_send_module_cfg_cmd(struct btmrvl_private *priv, int subcmd);
+diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+index 681ca9d..dc304de 100644
+--- a/drivers/bluetooth/btmrvl_main.c
++++ b/drivers/bluetooth/btmrvl_main.c
+@@ -44,23 +44,33 @@ void btmrvl_interrupt(struct btmrvl_private *priv)
+ }
+ EXPORT_SYMBOL_GPL(btmrvl_interrupt);
+ 
+-void btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb)
++bool btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb)
+ {
+ 	struct hci_event_hdr *hdr = (void *) skb->data;
+ 	struct hci_ev_cmd_complete *ec;
+-	u16 opcode, ocf;
++	u16 opcode, ocf, ogf;
+ 
+ 	if (hdr->evt == HCI_EV_CMD_COMPLETE) {
+ 		ec = (void *) (skb->data + HCI_EVENT_HDR_SIZE);
+ 		opcode = __le16_to_cpu(ec->opcode);
+ 		ocf = hci_opcode_ocf(opcode);
++		ogf = hci_opcode_ogf(opcode);
++
+ 		if (ocf == BT_CMD_MODULE_CFG_REQ &&
+ 					priv->btmrvl_dev.sendcmdflag) {
+ 			priv->btmrvl_dev.sendcmdflag = false;
+ 			priv->adapter->cmd_complete = true;
+ 			wake_up_interruptible(&priv->adapter->cmd_wait_q);
+ 		}
++
++		if (ogf == OGF) {
++			BT_DBG("vendor event skipped: ogf 0x%4.4x", ogf);
++			kfree_skb(skb);
++			return false;
++		}
+ 	}
++
++	return true;
+ }
+ EXPORT_SYMBOL_GPL(btmrvl_check_evtpkt);
+ 
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 3b9a8a3..8255a5e 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -565,10 +565,12 @@ static int btmrvl_sdio_card_to_host(struct btmrvl_private *priv)
+ 		skb_put(skb, buf_len);
+ 		skb_pull(skb, SDIO_HEADER_LEN);
+ 
+-		if (type == HCI_EVENT_PKT)
+-			btmrvl_check_evtpkt(priv, skb);
++		if (type == HCI_EVENT_PKT) {
++			if (btmrvl_check_evtpkt(priv, skb))
++				hci_recv_frame(skb);
++		} else
++			hci_recv_frame(skb);
+ 
+-		hci_recv_frame(skb);
+ 		hdev->stat.byte_rx += buf_len;
+ 		break;
+ 
+-- 
+1.7.9.5
 
-On Wed, Jun 13, 2012, Vijaykumar Dadmode wrote:
-> On Wed, Jun 13, 2012, Vijaykumar Dadmode wrote:
-> > Hi,
-> > 
-> > On Ubuntu 12.04 using Management OPS , when I launch the "Bluetooth New Device Setup" wizard, it does not show any device, but on console it will find LE Devices. Works good on Ubuntu 10.04. 
-> > 
-> > $ hcitool lescan
-> > Scanning ...
-> >         00:12:03:19:xx:yy       Keyboard
-> > 
-> > mgmt_start_discovery() returns write error "Unknown error 524"
-> > 
-> > if (write(mgmt_sock, buf, sizeof(buf)) < 0)
-> > 		return -errno; 
-> 
-> >> You'd need to be more specific of exactly what kernel version and what
-> >> user space version of BlueZ you have. The management interface is only
-> >> expected to work properly with latest user space bluez.git and kernel
-> >> version 3.4 or later. And for LE you'll want to use the latest
-> >> bluetooth.git or bluetooth-next.git or wait until the 3.5 kernel gets
-> >> released.
-> 
-> Sorry about that. Yes I am using latest from bluez.git and kernel from bluetooth-next.
-> 
-> BlueZ userspace version: latest clone from "git://git.kernel.org/pub/scm/bluetooth/bluez.git".
-> Kernel version: 3.4.0-rc5
-
->>>> bluetooth-next is currently based on top of 3.5-rc1 so it seems you have
->>>> an old kernel. Please do a fresh pull from the user space and kernel
->>>>  trees and try again.
-
->From git I see not many changes being committed after 3.4.0-rc5. Which Ubuntu version is it tested/works using "Bluetooth New Device Setup" wizard and MGMT_OPS? 
-
-
-Johan
-
-
- To report this email as spam click https://www.mailcontrol.com/sr/wQw0zmjPoHdJTZGyOCrrhg== .
-
-
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
-More information can be found at www.csr.com. Follow CSR on Twitter at http://twitter.com/CSR_PLC and read our blog at www.csr.com/blog
