@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 08/21] adapter_ops: remove disable_cod_cache
-Date: Wed, 13 Jun 2012 17:43:30 -0300
-Message-Id: <1339620223-6639-9-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 07/21] adapter: remove btd_adapter_encrypt_link()
+Date: Wed, 13 Jun 2012 17:43:29 -0300
+Message-Id: <1339620223-6639-8-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1339620223-6639-1-git-send-email-gustavo@padovan.org>
 References: <1339620223-6639-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,65 +12,143 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-mgmt handles the cache automatically.
+After the removal of hciops this function is not necessary anymore, we now
+use setsockopt to accomplish the encryption of the link.
 ---
- plugins/mgmtops.c |    9 ---------
- src/adapter.c     |    2 --
- src/adapter.h     |    1 -
- 3 files changed, 12 deletions(-)
+ input/device.c    |   38 ++++++++++----------------------------
+ plugins/mgmtops.c |   12 ------------
+ src/adapter.c     |    6 ------
+ src/adapter.h     |    5 -----
+ 4 files changed, 10 insertions(+), 51 deletions(-)
 
+diff --git a/input/device.c b/input/device.c
+index 0e3f4a9..8ed722b 100644
+--- a/input/device.c
++++ b/input/device.c
+@@ -643,22 +643,18 @@ static int hidp_add_connection(const struct input_device *idev,
+ 
+ 	/* Encryption is mandatory for keyboards */
+ 	if (req->subclass & 0x40) {
+-		struct btd_adapter *adapter = device_get_adapter(idev->device);
+-
+-		err = btd_adapter_encrypt_link(adapter, (bdaddr_t *) &idev->dst,
+-						encrypt_completed, req);
+-		if (err == 0) {
+-			/* Waiting async encryption */
+-			return 0;
+-		}
+-
+-		if (err == -ENOSYS)
+-			goto nosys;
+-
+-		if (err != -EALREADY) {
+-			error("encrypt_link: %s (%d)", strerror(-err), -err);
++		if (!bt_io_set(iconn->intr_io, BT_IO_L2CAP, &gerr,
++					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
++					BT_IO_OPT_INVALID)) {
++			error("btio: %s", gerr->message);
++			g_error_free(gerr);
++			err = -EFAULT;
+ 			goto cleanup;
+ 		}
++
++		iconn->req = req;
++		iconn->sec_watch = g_io_add_watch(iconn->intr_io, G_IO_OUT,
++							encrypt_notify, iconn);
+ 	}
+ 
+ 	err = ioctl_connadd(req);
+@@ -668,20 +664,6 @@ cleanup:
+ 	g_free(req);
+ 
+ 	return err;
+-
+-nosys:
+-	if (!bt_io_set(iconn->intr_io, BT_IO_L2CAP, &gerr,
+-				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+-				BT_IO_OPT_INVALID)) {
+-		error("btio: %s", gerr->message);
+-		g_error_free(gerr);
+-		goto cleanup;
+-	}
+-
+-	iconn->req = req;
+-	iconn->sec_watch = g_io_add_watch(iconn->intr_io, G_IO_OUT,
+-							encrypt_notify, iconn);
+-	return 0;
+ }
+ 
+ static int is_connected(struct input_conn *iconn)
 diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index f734edc..7c77be8 100644
+index 16a97c9..f734edc 100644
 --- a/plugins/mgmtops.c
 +++ b/plugins/mgmtops.c
-@@ -2183,14 +2183,6 @@ static int mgmt_set_did(int index, uint16_t vendor, uint16_t product,
+@@ -2157,17 +2157,6 @@ static int mgmt_unpair_device(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type)
  	return 0;
  }
  
--static int mgmt_disable_cod_cache(int index)
+-static int mgmt_encrypt_link(int index, bdaddr_t *dst, bt_hci_result_t cb,
+-							gpointer user_data)
 -{
--	DBG("index %d", index);
+-	char addr[18];
 -
--	/* The cache control is handled automatically for mgmt */
--	return 0;
+-	ba2str(dst, addr);
+-	DBG("index %d addr %s", index, addr);
+-
+-	return -ENOSYS;
 -}
 -
- static int mgmt_restore_powered(int index)
+ static int mgmt_set_did(int index, uint16_t vendor, uint16_t product,
+ 					uint16_t version, uint16_t source)
  {
- 	DBG("index %d", index);
-@@ -2484,7 +2476,6 @@ static struct btd_adapter_ops mgmt_ops = {
+@@ -2492,7 +2481,6 @@ static struct btd_adapter_ops mgmt_ops = {
+ 	.pincode_reply = mgmt_pincode_reply,
+ 	.confirm_reply = mgmt_confirm_reply,
+ 	.passkey_reply = mgmt_passkey_reply,
+-	.encrypt_link = mgmt_encrypt_link,
  	.set_did = mgmt_set_did,
  	.add_uuid = mgmt_add_uuid,
  	.remove_uuid = mgmt_remove_uuid,
--	.disable_cod_cache = mgmt_disable_cod_cache,
- 	.restore_powered = mgmt_restore_powered,
- 	.load_keys = mgmt_load_link_keys,
- 	.set_io_capability = mgmt_set_io_capability,
 diff --git a/src/adapter.c b/src/adapter.c
-index 16070a8..a82029a 100644
+index 3535cc4..16070a8 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -2188,8 +2188,6 @@ void btd_adapter_start(struct btd_adapter *adapter)
- 
- 	call_adapter_powered_callbacks(adapter, TRUE);
- 
--	adapter_ops->disable_cod_cache(adapter->dev_id);
--
- 	info("Adapter %s has been enabled", adapter->path);
+@@ -3478,12 +3478,6 @@ int btd_adapter_passkey_reply(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ 								passkey);
  }
  
+-int btd_adapter_encrypt_link(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+-					bt_hci_result_t cb, gpointer user_data)
+-{
+-	return adapter_ops->encrypt_link(adapter->dev_id, bdaddr, cb, user_data);
+-}
+-
+ int btd_adapter_set_did(struct btd_adapter *adapter, uint16_t vendor,
+ 					uint16_t product, uint16_t version,
+ 					uint16_t source)
 diff --git a/src/adapter.h b/src/adapter.h
-index 77d79c1..4c39a7b 100644
+index b7ea62b..77d79c1 100644
 --- a/src/adapter.h
 +++ b/src/adapter.h
-@@ -204,7 +204,6 @@ struct btd_adapter_ops {
+@@ -200,8 +200,6 @@ struct btd_adapter_ops {
+ 							gboolean success);
+ 	int (*passkey_reply) (int index, bdaddr_t *bdaddr, uint8_t bdaddr_type,
+ 							uint32_t passkey);
+-	int (*encrypt_link) (int index, bdaddr_t *bdaddr, bt_hci_result_t cb,
+-							gpointer user_data);
+ 	int (*set_did) (int index, uint16_t vendor, uint16_t product,
  					uint16_t version, uint16_t source);
  	int (*add_uuid) (int index, uuid_t *uuid, uint8_t svc_hint);
- 	int (*remove_uuid) (int index, uuid_t *uuid);
--	int (*disable_cod_cache) (int index);
- 	int (*restore_powered) (int index);
- 	int (*load_keys) (int index, GSList *keys, gboolean debug_keys);
- 	int (*set_io_capability) (int index, uint8_t io_capability);
+@@ -261,9 +259,6 @@ int btd_adapter_confirm_reply(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ int btd_adapter_passkey_reply(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ 					uint8_t bdaddr_type, uint32_t passkey);
+ 
+-int btd_adapter_encrypt_link(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+-				bt_hci_result_t cb, gpointer user_data);
+-
+ int btd_adapter_set_did(struct btd_adapter *adapter, uint16_t vendor,
+ 					uint16_t product, uint16_t version,
+ 					uint16_t source);
 -- 
 1.7.10.2
 
