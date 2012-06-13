@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 15/21] emulator: move it to the tools folder
-Date: Wed, 13 Jun 2012 17:43:37 -0300
-Message-Id: <1339620223-6639-16-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 11/21] serial: remove SerialProxy interface
+Date: Wed, 13 Jun 2012 17:43:33 -0300
+Message-Id: <1339620223-6639-12-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1339620223-6639-1-git-send-email-gustavo@padovan.org>
 References: <1339620223-6639-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,92 +13,199 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
 ---
- .gitignore              |    2 +-
- Makefile.tools          |   12 +-
- emulator/btdev.c        | 1076 -----------------------------------------------
- emulator/btdev.h        |   38 --
- emulator/main.c         |   73 ----
- emulator/server.c       |  288 -------------
- emulator/server.h       |   30 --
- emulator/vhci.c         |  133 ------
- emulator/vhci.h         |   35 --
- tools/emulator/btdev.c  | 1076 +++++++++++++++++++++++++++++++++++++++++++++++
- tools/emulator/btdev.h  |   38 ++
- tools/emulator/main.c   |   73 ++++
- tools/emulator/server.c |  288 +++++++++++++
- tools/emulator/server.h |   30 ++
- tools/emulator/vhci.c   |  133 ++++++
- tools/emulator/vhci.h   |   35 ++
- 16 files changed, 1680 insertions(+), 1680 deletions(-)
- delete mode 100644 emulator/btdev.c
- delete mode 100644 emulator/btdev.h
- delete mode 100644 emulator/main.c
- delete mode 100644 emulator/server.c
- delete mode 100644 emulator/server.h
- delete mode 100644 emulator/vhci.c
- delete mode 100644 emulator/vhci.h
- create mode 100644 tools/emulator/btdev.c
- create mode 100644 tools/emulator/btdev.h
- create mode 100644 tools/emulator/main.c
- create mode 100644 tools/emulator/server.c
- create mode 100644 tools/emulator/server.h
- create mode 100644 tools/emulator/vhci.c
- create mode 100644 tools/emulator/vhci.h
+ Makefile.am        |    1 -
+ doc/serial-api.txt |  106 -----
+ serial/manager.c   |   26 --
+ serial/proxy.c     | 1269 ----------------------------------------------------
+ serial/proxy.h     |   25 --
+ 5 files changed, 1427 deletions(-)
+ delete mode 100644 serial/proxy.c
+ delete mode 100644 serial/proxy.h
 
-diff --git a/.gitignore b/.gitignore
-index 137d2e5..7bbefc9 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -86,7 +86,7 @@ compat/pand
- unit/test-eir
- mgmt/btmgmt
- monitor/btmon
--emulator/btvirt
-+tools/emulator/btvirt
+diff --git a/Makefile.am b/Makefile.am
+index 8c9ff3a..6dc1415 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -192,7 +192,6 @@ if SERIALPLUGIN
+ builtin_modules += serial
+ builtin_sources += serial/main.c \
+ 			serial/manager.h serial/manager.c \
+-			serial/proxy.h serial/proxy.c \
+ 			serial/port.h serial/port.c
+ endif
  
- doc/*.bak
- doc/*.stamp
-diff --git a/Makefile.tools b/Makefile.tools
-index 533ad9b..f7c6f9f 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -50,7 +50,7 @@ tools_ppporc_LDADD = lib/libbluetooth-private.la
+diff --git a/doc/serial-api.txt b/doc/serial-api.txt
+index 0bdbdcd..42afe3d 100644
+--- a/doc/serial-api.txt
++++ b/doc/serial-api.txt
+@@ -55,109 +55,3 @@ Methods		fd ConnectFD(string pattern) [experimental]
  
- tools_hcieventmask_LDADD = lib/libbluetooth-private.la
+ 			Possible errors: org.bluez.Error.InvalidArguments
+ 					 org.bluez.Error.DoesNotExist
+-
+-Serial Proxy Manager hierarchy [experimental]
+-=============================================
+-
+-Service		org.bluez
+-Interface	org.bluez.SerialProxyManager
+-Object path	[variable prefix]/{hci0,hci1,...}
+-
+-Methods		array{string} ListProxies()
+-
+-			Returns an array of the object path strings of
+-			all the proxies created for the adapter.
+-
+-		string CreateProxy(string pattern, string address)
+-
+-			Possible patterns: UUID 128 bit as string
+-					   Profile short names, e.g: spp, dun
+-					   RFCOMM channel as string, 1-30
+-
+-			Address is the path to the TTY or Unix socket to be used.
+-			Only one proxy per address (TTY or Unix socket)
+-			is allowed.
+-
+-			The object path of created proxy is returned.
+-			On success this will emit a ProxyCreated signal.
+-
+-			Possible Errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.AlreadyExists
+-					 org.bluez.Error.Failed
+-
+-		void RemoveProxy(string path)
+-
+-			This removes the proxy object at the given path.
+-			On success this will emit a ProxyRemoved signal.
+-
+-			Possible Errors: org.bluez.Error.DoesNotExist
+-					 org.bluez.Error.NotAuthorized
+-
+-Signals		ProxyCreated(string path)
+-
+-			This signal indicates a proxy was created.
+-			Parameter is object path of created proxy.
+-
+-		ProxyRemoved(string path)
+-
+-			This signal indicates a proxy was removed.
+-			Parameter is object path of removed proxy.
+-
+-Serial Proxy hierarchy [experimental]
+-=====================================
+-
+-Service		org.bluez
+-Interface	org.bluez.SerialProxy
+-Object path	[variable prefix]/{hci0,hci1,...}/{proxy0,proxy1,...}
+-
+-Methods		void Enable()
+-
+-			Starts to listen to the TTY or Unix socket, allocates
+-			a RFCOMM channel and add record to the server.
+-
+-			Possible errors: org.bluez.Error.Failed
+-
+-		void Disable()
+-
+-			Stops to listen to the TTY or Unix socket, shutdown
+-			the RFCOMM channel allocated for the proxy, and remove
+-			record from the server.
+-
+-			Possible errors: org.bluez.Error.Failed
+-
+-		dict GetInfo()
+-
+-			Returns all properties for the proxy. See the
+-			properties section for available properties.
+-
+-		void SetSerialParameters(string rate, uint8 data, uint8 stop,
+-			string parity)
+-
+-			Configures serial communication setting baud rate,
+-			data bits, stop bits and parity.
+-
+-			Doesn't allow change TTY settings if it is open.
+-
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.NotAuthorized
+-
+-Properties	string uuid [readonly]
+-
+-			128-bit UUID that represents the available remote service.
+-
+-		string address [readonly]
+-
+-			Address is the path to the TTY or Unix socket name used,
+-			set when the proxy was created.
+-
+-		uint8 channel [readonly]
+-
+-			RFCOMM channel.
+-
+-		boolean enabled [readonly]
+-
+-			Indicates if the proxy is currently enabled.
+-
+-		boolean connected [readonly]
+-
+-			Indicates if the proxy is currently connected.
+diff --git a/serial/manager.c b/serial/manager.c
+index 438ba6c..a84ce03 100644
+--- a/serial/manager.c
++++ b/serial/manager.c
+@@ -58,7 +58,6 @@
  
--noinst_PROGRAMS += mgmt/btmgmt monitor/btmon emulator/btvirt
-+noinst_PROGRAMS += mgmt/btmgmt monitor/btmon tools/emulator/btvirt
+ #include "error.h"
+ #include "port.h"
+-#include "proxy.h"
+ #include "storage.h"
+ #include "manager.h"
+ #include "sdpd.h"
+@@ -131,35 +130,10 @@ static struct btd_device_driver serial_port_driver = {
+ 	.remove	= port_remove,
+ };
  
- mgmt_btmgmt_SOURCES = mgmt/main.c src/glib-helper.c
- mgmt_btmgmt_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@
-@@ -63,11 +63,11 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
- 					monitor/packet.h monitor/packet.c
- monitor_btmon_LDADD = lib/libbluetooth-private.la
+-static int proxy_probe(struct btd_adapter *adapter)
+-{
+-	const char *path = adapter_get_path(adapter);
+-
+-	DBG("path %s", path);
+-
+-	return proxy_register(connection, adapter);
+-}
+-
+-static void proxy_remove(struct btd_adapter *adapter)
+-{
+-	const char *path = adapter_get_path(adapter);
+-
+-	DBG("path %s", path);
+-
+-	proxy_unregister(adapter);
+-}
+-
+-static struct btd_adapter_driver serial_proxy_driver = {
+-	.name	= "serial-proxy",
+-	.probe	= proxy_probe,
+-	.remove	= proxy_remove,
+-};
+-
+ int serial_manager_init(DBusConnection *conn)
+ {
+ 	connection = dbus_connection_ref(conn);
  
--emulator_btvirt_SOURCES = emulator/main.c monitor/bt.h \
--					monitor/mainloop.h monitor/mainloop.c \
--					emulator/server.h emulator/server.c \
--					emulator/vhci.h emulator/vhci.c \
--					emulator/btdev.h emulator/btdev.c
-+emulator_btvirt_SOURCES = tools/emulator/main.c monitor/bt.h \
-+			monitor/mainloop.h monitor/mainloop.c \
-+			tools/emulator/server.h tools/emulator/server.c \
-+			tools/emulator/vhci.h tools/emulator/vhci.c \
-+			tools/emulator/btdev.h tools/emulator/btdev.c
+-	btd_register_adapter_driver(&serial_proxy_driver);
+ 	btd_register_device_driver(&serial_port_driver);
  
- if READLINE
- bin_PROGRAMS += attrib/gatttool
-diff --git a/emulator/btdev.c b/emulator/btdev.c
+ 	return 0;
+diff --git a/serial/proxy.c b/serial/proxy.c
 deleted file mode 100644
-index 7d4517a..0000000
---- a/emulator/btdev.c
+index dd38317..0000000
+--- a/serial/proxy.c
 +++ /dev/null
-@@ -1,1076 +0,0 @@
+@@ -1,1269 +0,0 @@
 -/*
 - *
 - *  BlueZ - Bluetooth protocol stack for Linux
 - *
-- *  Copyright (C) 2011-2012  Intel Corporation
 - *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
 - *
 - *
@@ -122,1482 +229,1258 @@ index 7d4517a..0000000
 -#include <config.h>
 -#endif
 -
--#include <stdio.h>
 -#include <ctype.h>
+-#include <dirent.h>
+-#include <errno.h>
+-#include <fcntl.h>
+-#include <stdio.h>
 -#include <stdlib.h>
 -#include <string.h>
+-#include <termios.h>
+-#include <unistd.h>
+-#include <arpa/inet.h>
+-#include <sys/param.h>
+-#include <sys/ioctl.h>
+-#include <sys/stat.h>
+-#include <sys/types.h>
+-#include <sys/un.h>
 -
--#include "bt.h"
--#include "btdev.h"
+-#include <bluetooth/bluetooth.h>
+-#include <bluetooth/sdp.h>
+-#include <bluetooth/sdp_lib.h>
+-#include <bluetooth/rfcomm.h>
 -
--#define le16_to_cpu(val) (val)
--#define cpu_to_le16(val) (val)
+-#include <glib.h>
+-#include <gdbus.h>
 -
--struct btdev {
--	struct btdev *conn;
+-#include "../src/dbus-common.h"
+-#include "../src/adapter.h"
 -
--	btdev_send_func send_handler;
--	void *send_data;
+-#include "log.h"
 -
--        uint16_t manufacturer;
--        uint8_t  version;
--	uint16_t revision;
--	uint8_t  commands[64];
--	uint8_t  features[8];
--	uint16_t acl_mtu;
--	uint16_t acl_max_pkt;
--	uint8_t  country_code;
--	uint8_t  bdaddr[6];
--	uint8_t  le_features[8];
--	uint8_t  le_states[8];
+-#include "error.h"
+-#include "sdpd.h"
+-#include "glib-helper.h"
+-#include "btio.h"
+-#include "proxy.h"
 -
--	uint16_t default_link_policy;
--	uint8_t  event_mask[8];
--	uint8_t  event_filter;
--	uint8_t  name[248];
--	uint8_t  dev_class[3];
--	uint16_t voice_setting;
--	uint16_t conn_accept_timeout;
--	uint16_t page_timeout;
--	uint8_t  scan_enable;
--	uint8_t  auth_enable;
--	uint8_t  inquiry_mode;
--	uint8_t  afh_assess_mode;
--	uint8_t  ext_inquiry_fec;
--	uint8_t  ext_inquiry_rsp[240];
--	uint8_t  simple_pairing_mode;
--	uint8_t  le_supported;
--	uint8_t  le_simultaneous;
--	uint8_t  le_event_mask[8];
+-#define SERIAL_PROXY_INTERFACE	"org.bluez.SerialProxy"
+-#define SERIAL_MANAGER_INTERFACE "org.bluez.SerialProxyManager"
+-#define BUF_SIZE		1024
+-
+-typedef enum {
+-	TTY_PROXY,
+-	UNIX_SOCKET_PROXY,
+-	TCP_SOCKET_PROXY,
+-	UNKNOWN_PROXY_TYPE = 0xFF
+-} proxy_type_t;
+-
+-struct serial_adapter {
+-	struct btd_adapter	*btd_adapter;	/* Adapter pointer */
+-	DBusConnection		*conn;		/* Adapter connection */
+-	GSList			*proxies;	/* Proxies list */
 -};
 -
--#define MAX_BTDEV_ENTRIES 16
+-struct serial_proxy {
+-	bdaddr_t	src;		/* Local address */
+-	bdaddr_t	dst;		/* Remote address */
+-	char		*path;		/* Proxy path */
+-	char		*uuid128;	/* UUID 128 */
+-	char		*address;	/* TTY or Unix socket name */
+-	char		*owner;		/* Application bus name */
+-	guint		watch;		/* Application watch */
+-	short int	port;		/* TCP port */
+-	proxy_type_t	type;		/* TTY or Unix socket */
+-	struct termios  sys_ti;		/* Default TTY setting */
+-	struct termios  proxy_ti;	/* Proxy TTY settings */
+-	uint8_t		channel;	/* RFCOMM channel */
+-	uint32_t	record_id;	/* Service record id */
+-	GIOChannel	*io;		/* Server listen */
+-	GIOChannel	*rfcomm;	/* Remote RFCOMM channel*/
+-	GIOChannel	*local;		/* Local channel: TTY or Unix socket */
+-	struct serial_adapter *adapter;	/* Adapter pointer */
+-};
 -
--static struct btdev *btdev_list[MAX_BTDEV_ENTRIES] = { };
+-static GSList *adapters = NULL;
+-static int sk_counter = 0;
 -
--static inline int add_btdev(struct btdev *btdev)
+-static void disable_proxy(struct serial_proxy *prx)
 -{
--	int i, index = -1;
--
--	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
--		if (btdev_list[i] == NULL) {
--			index = i;
--			btdev_list[index] = btdev;
--			break;
--		}
+-	if (prx->rfcomm) {
+-		g_io_channel_shutdown(prx->rfcomm, TRUE, NULL);
+-		g_io_channel_unref(prx->rfcomm);
+-		prx->rfcomm = NULL;
 -	}
 -
--	return index;
--}
--
--static inline int del_btdev(struct btdev *btdev)
--{
--	int i, index = -1;
--
--	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
--		if (btdev_list[i] == btdev) {
--			index = i;
--			btdev_list[index] = NULL;
--			break;
--		}
+-	if (prx->local) {
+-		g_io_channel_shutdown(prx->local, TRUE, NULL);
+-		g_io_channel_unref(prx->local);
+-		prx->local = NULL;
 -	}
 -
--	return index;
+-	remove_record_from_server(prx->record_id);
+-	prx->record_id = 0;
+-
+-	g_io_channel_unref(prx->io);
+-	prx->io = NULL;
 -}
 -
--static inline struct btdev *find_btdev_by_bdaddr(const uint8_t *bdaddr)
+-static void proxy_free(struct serial_proxy *prx)
+-{
+-	g_free(prx->owner);
+-	g_free(prx->path);
+-	g_free(prx->address);
+-	g_free(prx->uuid128);
+-	g_free(prx);
+-}
+-
+-static sdp_record_t *proxy_record_new(const char *uuid128, uint8_t channel)
+-{
+-	sdp_list_t *apseq, *aproto, *profiles, *proto[2], *root, *svclass_id;
+-	uuid_t uuid, root_uuid, l2cap, rfcomm;
+-	sdp_profile_desc_t profile;
+-	sdp_record_t *record;
+-	sdp_data_t *ch;
+-
+-	record = sdp_record_alloc();
+-	if (!record)
+-		return NULL;
+-
+-	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
+-	root = sdp_list_append(NULL, &root_uuid);
+-	sdp_set_browse_groups(record, root);
+-	sdp_list_free(root, NULL);
+-
+-	bt_string2uuid(&uuid, uuid128);
+-	sdp_uuid128_to_uuid(&uuid);
+-	svclass_id = sdp_list_append(NULL, &uuid);
+-	sdp_set_service_classes(record, svclass_id);
+-	sdp_list_free(svclass_id, NULL);
+-
+-	sdp_uuid16_create(&profile.uuid, SERIAL_PORT_PROFILE_ID);
+-	profile.version = 0x0100;
+-	profiles = sdp_list_append(NULL, &profile);
+-	sdp_set_profile_descs(record, profiles);
+-	sdp_list_free(profiles, NULL);
+-
+-	sdp_uuid16_create(&l2cap, L2CAP_UUID);
+-	proto[0] = sdp_list_append(NULL, &l2cap);
+-	apseq = sdp_list_append(NULL, proto[0]);
+-
+-	sdp_uuid16_create(&rfcomm, RFCOMM_UUID);
+-	proto[1] = sdp_list_append(NULL, &rfcomm);
+-	ch = sdp_data_alloc(SDP_UINT8, &channel);
+-	proto[1] = sdp_list_append(proto[1], ch);
+-	apseq = sdp_list_append(apseq, proto[1]);
+-
+-	aproto = sdp_list_append(NULL, apseq);
+-	sdp_set_access_protos(record, aproto);
+-
+-	sdp_add_lang_attr(record);
+-
+-	sdp_set_info_attr(record, "Serial Proxy", NULL, "Serial Proxy");
+-
+-	sdp_data_free(ch);
+-	sdp_list_free(proto[0], NULL);
+-	sdp_list_free(proto[1], NULL);
+-	sdp_list_free(apseq, NULL);
+-	sdp_list_free(aproto, NULL);
+-
+-	return record;
+-}
+-
+-static int channel_write(GIOChannel *chan, char *buf, size_t size)
+-{
+-	size_t wbytes;
+-	ssize_t written;
+-	int fd;
+-
+-	fd = g_io_channel_unix_get_fd(chan);
+-
+-	wbytes = 0;
+-	while (wbytes < size) {
+-		written = write(fd, buf + wbytes, size - wbytes);
+-		if (written < 0)
+-			return -errno;
+-
+-		wbytes += written;
+-	}
+-
+-	return 0;
+-}
+-
+-static gboolean forward_data(GIOChannel *chan, GIOCondition cond, gpointer data)
+-{
+-	char buf[BUF_SIZE];
+-	struct serial_proxy *prx = data;
+-	GIOChannel *dest;
+-	ssize_t rbytes;
+-	int fd, err;
+-
+-	if (cond & G_IO_NVAL)
+-		return FALSE;
+-
+-	dest = (chan == prx->rfcomm) ? prx->local : prx->rfcomm;
+-
+-	fd = g_io_channel_unix_get_fd(chan);
+-
+-	if (cond & (G_IO_HUP | G_IO_ERR)) {
+-		/* Try forward remaining data */
+-		do {
+-			rbytes = read(fd, buf, sizeof(buf));
+-			if (rbytes <= 0)
+-				break;
+-
+-			err = channel_write(dest, buf, rbytes);
+-		} while (err == 0);
+-
+-		g_io_channel_shutdown(prx->local, TRUE, NULL);
+-		g_io_channel_unref(prx->local);
+-		prx->local = NULL;
+-
+-		g_io_channel_shutdown(prx->rfcomm, TRUE, NULL);
+-		g_io_channel_unref(prx->rfcomm);
+-		prx->rfcomm = NULL;
+-
+-		return FALSE;
+-	}
+-
+-	rbytes = read(fd, buf, sizeof(buf));
+-	if (rbytes < 0)
+-		return FALSE;
+-
+-	err = channel_write(dest, buf, rbytes);
+-	if (err != 0)
+-		return FALSE;
+-
+-	return TRUE;
+-}
+-
+-static inline int unix_socket_connect(const char *address)
+-{
+-	struct sockaddr_un addr;
+-	int err, sk;
+-
+-	memset(&addr, 0, sizeof(addr));
+-	addr.sun_family = PF_UNIX;
+-
+-	if (strncmp("x00", address, 3) == 0) {
+-		/*
+-		 * Abstract namespace: first byte NULL, x00
+-		 * must be removed from the original address.
+-		 */
+-		strncpy(addr.sun_path + 1, address + 3,
+-						sizeof(addr.sun_path) - 2);
+-	} else {
+-		/* Filesystem address */
+-		strncpy(addr.sun_path, address, sizeof(addr.sun_path) - 1);
+-	}
+-
+-	/* Unix socket */
+-	sk = socket(AF_UNIX, SOCK_STREAM, 0);
+-	if (sk < 0) {
+-		err = -errno;
+-		error("Unix socket(%s) create failed: %s(%d)",
+-				address, strerror(-err), -err);
+-		return err;
+-	}
+-
+-	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+-		err = -errno;
+-		error("Unix socket(%s) connect failed: %s(%d)",
+-				address, strerror(-err), -err);
+-		close(sk);
+-		return err;
+-	}
+-
+-	return sk;
+-}
+-
+-static int tcp_socket_connect(const char *address)
+-{
+-	struct sockaddr_in addr;
+-	int err, sk, port;
+-
+-	memset(&addr, 0, sizeof(addr));
+-
+-	if (strncmp(address, "localhost", 9) != 0) {
+-		error("Address should have the form localhost:port.");
+-		return -1;
+-	}
+-	port = atoi(strchr(address, ':') + 1);
+-	if (port <= 0) {
+-		error("Invalid port '%d'.", port);
+-		return -1;
+-	}
+-	addr.sin_family = AF_INET;
+-	addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+-	addr.sin_port = htons(port);
+-
+-	sk = socket(PF_INET, SOCK_STREAM, 0);
+-	if (sk < 0) {
+-		err = -errno;
+-		error("TCP socket(%s) create failed %s(%d)", address,
+-							strerror(-err), -err);
+-		return err;
+-	}
+-	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+-		err = -errno;
+-		error("TCP socket(%s) connect failed: %s(%d)",
+-						address, strerror(-err), -err);
+-		close(sk);
+-		return err;
+-	}
+-	return sk;
+-}
+-
+-static inline int tty_open(const char *tty, struct termios *ti)
+-{
+-	int err, sk;
+-
+-	sk = open(tty, O_RDWR | O_NOCTTY);
+-	if (sk < 0) {
+-		err = -errno;
+-		error("Can't open TTY %s: %s(%d)", tty, strerror(-err), -err);
+-		return err;
+-	}
+-
+-	if (ti && tcsetattr(sk, TCSANOW, ti) < 0) {
+-		err = -errno;
+-		error("Can't change serial settings: %s(%d)",
+-				strerror(-err), -err);
+-		close(sk);
+-		return err;
+-	}
+-
+-	return sk;
+-}
+-
+-static void connect_event_cb(GIOChannel *chan, GError *conn_err, gpointer data)
+-{
+-	struct serial_proxy *prx = data;
+-	int sk;
+-
+-	if (conn_err) {
+-		error("%s", conn_err->message);
+-		goto drop;
+-	}
+-
+-	/* Connect local */
+-	switch (prx->type) {
+-	case UNIX_SOCKET_PROXY:
+-		sk = unix_socket_connect(prx->address);
+-		break;
+-	case TTY_PROXY:
+-		sk = tty_open(prx->address, &prx->proxy_ti);
+-		break;
+-	case TCP_SOCKET_PROXY:
+-		sk = tcp_socket_connect(prx->address);
+-		break;
+-	default:
+-		sk = -1;
+-	}
+-
+-	if (sk < 0)
+-		goto drop;
+-
+-	prx->local = g_io_channel_unix_new(sk);
+-
+-	g_io_add_watch(prx->rfcomm,
+-			G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+-			forward_data, prx);
+-
+-	g_io_add_watch(prx->local,
+-			G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+-			forward_data, prx);
+-
+-	return;
+-
+-drop:
+-	g_io_channel_shutdown(prx->rfcomm, TRUE, NULL);
+-	g_io_channel_unref(prx->rfcomm);
+-	prx->rfcomm = NULL;
+-}
+-
+-static void auth_cb(DBusError *derr, void *user_data)
+-{
+-	struct serial_proxy *prx = user_data;
+-	GError *err = NULL;
+-
+-	if (derr) {
+-		error("Access denied: %s", derr->message);
+-		goto reject;
+-	}
+-
+-	if (!bt_io_accept(prx->rfcomm, connect_event_cb, prx, NULL,
+-							&err)) {
+-		error("bt_io_accept: %s", err->message);
+-		g_error_free(err);
+-		goto reject;
+-	}
+-
+-	return;
+-
+-reject:
+-	g_io_channel_shutdown(prx->rfcomm, TRUE, NULL);
+-	g_io_channel_unref(prx->rfcomm);
+-	prx->rfcomm = NULL;
+-}
+-
+-static void confirm_event_cb(GIOChannel *chan, gpointer user_data)
+-{
+-	struct serial_proxy *prx = user_data;
+-	int perr;
+-	char address[18];
+-	GError *err = NULL;
+-
+-	bt_io_get(chan, BT_IO_RFCOMM, &err,
+-			BT_IO_OPT_DEST_BDADDR, &prx->dst,
+-			BT_IO_OPT_DEST, address,
+-			BT_IO_OPT_INVALID);
+-	if (err) {
+-		error("%s", err->message);
+-		g_error_free(err);
+-		goto drop;
+-	}
+-
+-	if (prx->rfcomm) {
+-		error("Refusing connect from %s: Proxy already in use",
+-				address);
+-		goto drop;
+-	}
+-
+-	DBG("Serial Proxy: incoming connect from %s", address);
+-
+-	prx->rfcomm = g_io_channel_ref(chan);
+-
+-	perr = btd_request_authorization(&prx->src, &prx->dst,
+-					prx->uuid128, auth_cb, prx);
+-	if (perr < 0) {
+-		error("Refusing connect from %s: %s (%d)", address,
+-				strerror(-perr), -perr);
+-		g_io_channel_unref(prx->rfcomm);
+-		prx->rfcomm = NULL;
+-		goto drop;
+-	}
+-
+-	return;
+-
+-drop:
+-	g_io_channel_shutdown(chan, TRUE, NULL);
+-}
+-
+-static int enable_proxy(struct serial_proxy *prx)
+-{
+-	sdp_record_t *record;
+-	GError *gerr = NULL;
+-	int err;
+-
+-	if (prx->io)
+-		return -EALREADY;
+-
+-	/* Listen */
+-	prx->io = bt_io_listen(BT_IO_RFCOMM, NULL, confirm_event_cb, prx,
+-				NULL, &gerr,
+-				BT_IO_OPT_SOURCE_BDADDR, &prx->src,
+-				BT_IO_OPT_INVALID);
+-	if (!prx->io)
+-		goto failed;
+-
+-	bt_io_get(prx->io, BT_IO_RFCOMM, &gerr,
+-			BT_IO_OPT_CHANNEL, &prx->channel,
+-			BT_IO_OPT_INVALID);
+-	if (gerr) {
+-		g_io_channel_unref(prx->io);
+-		prx->io = NULL;
+-		goto failed;
+-	}
+-
+-	DBG("Allocated channel %d", prx->channel);
+-
+-	g_io_channel_set_close_on_unref(prx->io, TRUE);
+-
+-	record = proxy_record_new(prx->uuid128, prx->channel);
+-	if (!record) {
+-		g_io_channel_unref(prx->io);
+-		return -ENOMEM;
+-	}
+-
+-	err = add_record_to_server(&prx->src, record);
+-	if (err < 0) {
+-		sdp_record_free(record);
+-		g_io_channel_unref(prx->io);
+-		return err;
+-	}
+-
+-	prx->record_id = record->handle;
+-
+-	return 0;
+-
+-failed:
+-	error("%s", gerr->message);
+-	g_error_free(gerr);
+-	return -EIO;
+-
+-}
+-static DBusMessage *proxy_enable(DBusConnection *conn,
+-				DBusMessage *msg, void *data)
+-{
+-	struct serial_proxy *prx = data;
+-	int err;
+-
+-	err = enable_proxy(prx);
+-	if (err < 0)
+-		return btd_error_failed(msg, strerror(-err));
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static DBusMessage *proxy_disable(DBusConnection *conn,
+-				DBusMessage *msg, void *data)
+-{
+-	struct serial_proxy *prx = data;
+-
+-	if (!prx->io)
+-		return btd_error_failed(msg, "Not enabled");
+-
+-	/* Remove the watches and unregister the record */
+-	disable_proxy(prx);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static DBusMessage *proxy_get_info(DBusConnection *conn,
+-				DBusMessage *msg, void *data)
+-{
+-	struct serial_proxy *prx = data;
+-	DBusMessage *reply;
+-	DBusMessageIter iter, dict;
+-	dbus_bool_t boolean;
+-
+-	reply = dbus_message_new_method_return(msg);
+-	if (!reply)
+-		return NULL;
+-
+-	dbus_message_iter_init_append(reply, &iter);
+-
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+-
+-	dict_append_entry(&dict, "uuid", DBUS_TYPE_STRING, &prx->uuid128);
+-
+-	dict_append_entry(&dict, "address", DBUS_TYPE_STRING, &prx->address);
+-
+-	if (prx->channel)
+-		dict_append_entry(&dict, "channel",
+-					DBUS_TYPE_BYTE, &prx->channel);
+-
+-	boolean = (prx->io ? TRUE : FALSE);
+-	dict_append_entry(&dict, "enabled", DBUS_TYPE_BOOLEAN, &boolean);
+-
+-	boolean = (prx->rfcomm ? TRUE : FALSE);
+-	dict_append_entry(&dict, "connected", DBUS_TYPE_BOOLEAN, &boolean);
+-
+-	/* If connected: append the remote address */
+-	if (boolean) {
+-		char bda[18];
+-		const char *pstr = bda;
+-
+-		ba2str(&prx->dst, bda);
+-		dict_append_entry(&dict, "address", DBUS_TYPE_STRING, &pstr);
+-	}
+-
+-	dbus_message_iter_close_container(&iter, &dict);
+-
+-	return reply;
+-}
+-
+-static struct {
+-	const char	*str;
+-	speed_t		speed;
+-} supported_speed[]  = {
+-	{"50",		B50	},
+-	{"300",		B300	},
+-	{"600",		B600	},
+-	{"1200",	B1200	},
+-	{"1800",	B1800	},
+-	{"2400",	B2400	},
+-	{"4800",	B4800	},
+-	{"9600",	B9600	},
+-	{"19200",	B19200	},
+-	{"38400",	B38400	},
+-	{"57600",	B57600	},
+-	{"115200",	B115200	},
+-	{ NULL,		B0	}
+-};
+-
+-static speed_t str2speed(const char *str, speed_t *speed)
 -{
 -	int i;
 -
--	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
--		if (btdev_list[i] && !memcmp(btdev_list[i]->bdaddr, bdaddr, 6))
--			return btdev_list[i];
+-	for (i = 0; supported_speed[i].str; i++) {
+-		if (strcmp(supported_speed[i].str, str) != 0)
+-			continue;
+-
+-		if (speed)
+-			*speed = supported_speed[i].speed;
+-
+-		return supported_speed[i].speed;
+-	}
+-
+-	return B0;
+-}
+-
+-static int set_parity(const char *str, tcflag_t *ctrl)
+-{
+-	if (strcasecmp("even", str) == 0) {
+-		*ctrl |= PARENB;
+-		*ctrl &= ~PARODD;
+-	} else if (strcasecmp("odd", str) == 0) {
+-		*ctrl |= PARENB;
+-		*ctrl |= PARODD;
+-	} else if (strcasecmp("mark", str) == 0)
+-		*ctrl |= PARENB;
+-	else if ((strcasecmp("none", str) == 0) ||
+-			(strcasecmp("space", str) == 0))
+-		*ctrl &= ~PARENB;
+-	else
+-		return -1;
+-
+-	return 0;
+-}
+-
+-static int set_databits(uint8_t databits, tcflag_t *ctrl)
+-{
+-	if (databits < 5 || databits > 8)
+-		return -EINVAL;
+-
+-	*ctrl &= ~CSIZE;
+-	switch (databits) {
+-	case 5:
+-		*ctrl |= CS5;
+-		break;
+-	case 6:
+-		*ctrl |= CS6;
+-		break;
+-	case 7:
+-		*ctrl |= CS7;
+-		break;
+-	case 8:
+-		*ctrl |= CS8;
+-		break;
+-	}
+-
+-	return 0;
+-}
+-
+-static int set_stopbits(uint8_t stopbits, tcflag_t *ctrl)
+-{
+-	/* 1.5 will not be allowed */
+-	switch (stopbits) {
+-	case 1:
+-		*ctrl &= ~CSTOPB;
+-		return 0;
+-	case 2:
+-		*ctrl |= CSTOPB;
+-		return 0;
+-	}
+-
+-	return -EINVAL;
+-}
+-
+-static DBusMessage *proxy_set_serial_params(DBusConnection *conn,
+-						DBusMessage *msg, void *data)
+-{
+-	struct serial_proxy *prx = data;
+-	const char *ratestr, *paritystr;
+-	uint8_t databits, stopbits;
+-	tcflag_t ctrl;		/* Control mode flags */
+-	speed_t speed = B0;	/* In/Out speed */
+-
+-	/* Don't allow change TTY settings if it is open */
+-	if (prx->local)
+-		return btd_error_not_authorized(msg);
+-
+-	if (!dbus_message_get_args(msg, NULL,
+-				DBUS_TYPE_STRING, &ratestr,
+-				DBUS_TYPE_BYTE, &databits,
+-				DBUS_TYPE_BYTE, &stopbits,
+-				DBUS_TYPE_STRING, &paritystr,
+-				DBUS_TYPE_INVALID))
+-		return NULL;
+-
+-	if (str2speed(ratestr, &speed)  == B0)
+-		return btd_error_invalid_args(msg);
+-
+-	ctrl = prx->proxy_ti.c_cflag;
+-	if (set_databits(databits, &ctrl) < 0)
+-		return btd_error_invalid_args(msg);
+-
+-	if (set_stopbits(stopbits, &ctrl) < 0)
+-		return btd_error_invalid_args(msg);
+-
+-	if (set_parity(paritystr, &ctrl) < 0)
+-		return btd_error_invalid_args(msg);
+-
+-	prx->proxy_ti.c_cflag = ctrl;
+-	prx->proxy_ti.c_cflag |= (CLOCAL | CREAD);
+-	cfsetispeed(&prx->proxy_ti, speed);
+-	cfsetospeed(&prx->proxy_ti, speed);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static const GDBusMethodTable proxy_methods[] = {
+-	{ GDBUS_METHOD("Enable", NULL, NULL, proxy_enable) },
+-	{ GDBUS_METHOD("Disable", NULL, NULL, proxy_disable) },
+-	{ GDBUS_METHOD("GetInfo",
+-			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
+-			proxy_get_info) },
+-	{ GDBUS_METHOD("SetSerialParameters",
+-			GDBUS_ARGS({ "rate", "s" }, { "data", "y" },
+-					{ "stop", "y" }, { "parity", "s" }),
+-			NULL, proxy_set_serial_params) },
+-	{ },
+-};
+-
+-static void proxy_path_unregister(gpointer data)
+-{
+-	struct serial_proxy *prx = data;
+-	int sk;
+-
+-	DBG("Unregistered proxy: %s", prx->address);
+-
+-	if (prx->type != TTY_PROXY)
+-		goto done;
+-
+-	/* Restore the initial TTY configuration */
+-	sk = open(prx->address, O_RDWR | O_NOCTTY);
+-	if (sk >= 0) {
+-		tcsetattr(sk, TCSAFLUSH, &prx->sys_ti);
+-		close(sk);
+-	}
+-done:
+-
+-	proxy_free(prx);
+-}
+-
+-static int register_proxy_object(struct serial_proxy *prx)
+-{
+-	struct serial_adapter *adapter = prx->adapter;
+-	char path[MAX_PATH_LENGTH + 1];
+-
+-	snprintf(path, MAX_PATH_LENGTH, "%s/proxy%d",
+-			adapter_get_path(adapter->btd_adapter), sk_counter++);
+-
+-	if (!g_dbus_register_interface(adapter->conn, path,
+-					SERIAL_PROXY_INTERFACE,
+-					proxy_methods, NULL, NULL,
+-					prx, proxy_path_unregister)) {
+-		error("D-Bus failed to register %s path", path);
+-		return -1;
+-	}
+-
+-	prx->path = g_strdup(path);
+-	adapter->proxies = g_slist_append(adapter->proxies, prx);
+-
+-	DBG("Registered proxy: %s", path);
+-
+-	return 0;
+-}
+-
+-static int proxy_tty_register(struct serial_adapter *adapter,
+-				const char *uuid128, const char *address,
+-				struct termios *ti,
+-				struct serial_proxy **proxy)
+-{
+-	struct termios sys_ti;
+-	struct serial_proxy *prx;
+-	int sk, ret;
+-
+-	sk = open(address, O_RDONLY | O_NOCTTY);
+-	if (sk < 0) {
+-		error("Can't open TTY: %s(%d)", strerror(errno), errno);
+-		return -EINVAL;
+-	}
+-
+-	prx = g_new0(struct serial_proxy, 1);
+-	prx->address = g_strdup(address);
+-	prx->uuid128 = g_strdup(uuid128);
+-	prx->type = TTY_PROXY;
+-	adapter_get_address(adapter->btd_adapter, &prx->src);
+-	prx->adapter = adapter;
+-
+-	/* Current TTY settings */
+-	memset(&sys_ti, 0, sizeof(sys_ti));
+-	tcgetattr(sk, &sys_ti);
+-	memcpy(&prx->sys_ti, &sys_ti, sizeof(sys_ti));
+-	close(sk);
+-
+-	if (!ti) {
+-		/* Use current settings */
+-		memcpy(&prx->proxy_ti, &sys_ti, sizeof(sys_ti));
+-	} else {
+-		/* New TTY settings: user provided */
+-		memcpy(&prx->proxy_ti, ti, sizeof(*ti));
+-	}
+-
+-	ret = register_proxy_object(prx);
+-	if (ret < 0) {
+-		proxy_free(prx);
+-		return ret;
+-	}
+-
+-	*proxy = prx;
+-
+-	return ret;
+-}
+-
+-static int proxy_socket_register(struct serial_adapter *adapter,
+-				const char *uuid128, const char *address,
+-				struct serial_proxy **proxy)
+-{
+-	struct serial_proxy *prx;
+-	int ret;
+-
+-	prx = g_new0(struct serial_proxy, 1);
+-	prx->address = g_strdup(address);
+-	prx->uuid128 = g_strdup(uuid128);
+-	prx->type = UNIX_SOCKET_PROXY;
+-	adapter_get_address(adapter->btd_adapter, &prx->src);
+-	prx->adapter = adapter;
+-
+-	ret = register_proxy_object(prx);
+-	if (ret < 0) {
+-		proxy_free(prx);
+-		return ret;
+-	}
+-
+-	*proxy = prx;
+-
+-	return ret;
+-}
+-
+-static int proxy_tcp_register(struct serial_adapter *adapter,
+-				const char *uuid128, const char *address,
+-				struct serial_proxy **proxy)
+-{
+-	struct serial_proxy *prx;
+-	int ret;
+-
+-	prx = g_new0(struct serial_proxy, 1);
+-	prx->address = g_strdup(address);
+-	prx->uuid128 = g_strdup(uuid128);
+-	prx->type = TCP_SOCKET_PROXY;
+-	adapter_get_address(adapter->btd_adapter, &prx->src);
+-	prx->adapter = adapter;
+-
+-	ret = register_proxy_object(prx);
+-	if (ret < 0) {
+-		proxy_free(prx);
+-		return ret;
+-	}
+-
+-	*proxy = prx;
+-
+-	return ret;
+-}
+-
+-static proxy_type_t addr2type(const char *address)
+-{
+-	struct stat st;
+-
+-	if (stat(address, &st) < 0) {
+-		/*
+-		 * Unix socket: if the sun_path starts with null byte
+-		 * it refers to abstract namespace. 'x00' will be used
+-		 * to represent the null byte.
+-		 */
+-		if (strncmp("localhost:", address, 10) == 0)
+-			return TCP_SOCKET_PROXY;
+-		if (strncmp("x00", address, 3) != 0)
+-			return UNKNOWN_PROXY_TYPE;
+-		else
+-			return UNIX_SOCKET_PROXY;
+-	} else {
+-		/* Filesystem: char device or unix socket */
+-		if (S_ISCHR(st.st_mode) && strncmp("/dev/", address, 4) == 0)
+-			return TTY_PROXY;
+-		else if (S_ISSOCK(st.st_mode))
+-			return UNIX_SOCKET_PROXY;
+-		else
+-			return UNKNOWN_PROXY_TYPE;
+-	}
+-}
+-
+-static int proxy_addrcmp(gconstpointer proxy, gconstpointer addr)
+-{
+-	const struct serial_proxy *prx = proxy;
+-	const char *address = addr;
+-
+-	return strcmp(prx->address, address);
+-}
+-
+-static int proxy_pathcmp(gconstpointer proxy, gconstpointer p)
+-{
+-	const struct serial_proxy *prx = proxy;
+-	const char *path = p;
+-
+-	return strcmp(prx->path, path);
+-}
+-
+-static int register_proxy(struct serial_adapter *adapter,
+-				const char *uuid_str, const char *address,
+-				struct serial_proxy **proxy)
+-{
+-	proxy_type_t type;
+-	int err;
+-
+-	type = addr2type(address);
+-	if (type == UNKNOWN_PROXY_TYPE)
+-		return -EINVAL;
+-
+-	/* Only one proxy per address(TTY or unix socket) is allowed */
+-	if (g_slist_find_custom(adapter->proxies, address, proxy_addrcmp))
+-		return -EALREADY;
+-
+-	switch (type) {
+-	case UNIX_SOCKET_PROXY:
+-		err = proxy_socket_register(adapter, uuid_str, address, proxy);
+-		break;
+-	case TTY_PROXY:
+-		err = proxy_tty_register(adapter, uuid_str, address, NULL,
+-					proxy);
+-		break;
+-	case TCP_SOCKET_PROXY:
+-		err = proxy_tcp_register(adapter, uuid_str, address, proxy);
+-		break;
+-	default:
+-		err = -EINVAL;
+-	}
+-
+-	if (err < 0)
+-		return err;
+-
+-	g_dbus_emit_signal(adapter->conn,
+-				adapter_get_path(adapter->btd_adapter),
+-				SERIAL_MANAGER_INTERFACE, "ProxyCreated",
+-				DBUS_TYPE_STRING, &(*proxy)->path,
+-				DBUS_TYPE_INVALID);
+-
+-	return 0;
+-}
+-
+-static void unregister_proxy(struct serial_proxy *proxy)
+-{
+-	struct serial_adapter *adapter = proxy->adapter;
+-	char *path = g_strdup(proxy->path);
+-
+-	if (proxy->watch > 0)
+-		g_dbus_remove_watch(adapter->conn, proxy->watch);
+-
+-	g_dbus_emit_signal(adapter->conn,
+-			adapter_get_path(adapter->btd_adapter),
+-			SERIAL_MANAGER_INTERFACE, "ProxyRemoved",
+-			DBUS_TYPE_STRING, &path,
+-			DBUS_TYPE_INVALID);
+-
+-	adapter->proxies = g_slist_remove(adapter->proxies, proxy);
+-
+-	g_dbus_unregister_interface(adapter->conn, path,
+-					SERIAL_PROXY_INTERFACE);
+-
+-	g_free(path);
+-}
+-
+-static void watch_proxy(DBusConnection *connection, void *user_data)
+-{
+-	struct serial_proxy *proxy = user_data;
+-
+-	proxy->watch = 0;
+-	unregister_proxy(proxy);
+-}
+-
+-static DBusMessage *create_proxy(DBusConnection *conn,
+-				DBusMessage *msg, void *data)
+-{
+-	struct serial_adapter *adapter = data;
+-	struct serial_proxy *proxy;
+-	const char *pattern, *address;
+-	char *uuid_str;
+-	int err;
+-
+-	if (!dbus_message_get_args(msg, NULL,
+-				DBUS_TYPE_STRING, &pattern,
+-				DBUS_TYPE_STRING, &address,
+-				DBUS_TYPE_INVALID))
+-		return NULL;
+-
+-	uuid_str = bt_name2string(pattern);
+-	if (!uuid_str)
+-		return btd_error_invalid_args(msg);
+-
+-	err = register_proxy(adapter, uuid_str, address, &proxy);
+-	g_free(uuid_str);
+-
+-	if (err == -EINVAL)
+-		return btd_error_invalid_args(msg);
+-	else if (err == -EALREADY)
+-		return btd_error_already_exists(msg);
+-	else if (err < 0)
+-		return btd_error_failed(msg, strerror(-err));
+-
+-	proxy->owner = g_strdup(dbus_message_get_sender(msg));
+-	proxy->watch = g_dbus_add_disconnect_watch(conn, proxy->owner,
+-						watch_proxy,
+-						proxy, NULL);
+-
+-	return g_dbus_create_reply(msg, DBUS_TYPE_STRING, &proxy->path,
+-					DBUS_TYPE_INVALID);
+-}
+-
+-static DBusMessage *list_proxies(DBusConnection *conn,
+-				DBusMessage *msg, void *data)
+-{
+-	struct serial_adapter *adapter = data;
+-	const GSList *l;
+-	DBusMessage *reply;
+-	DBusMessageIter iter, iter_array;
+-
+-	reply = dbus_message_new_method_return(msg);
+-	if (!reply)
+-		return NULL;
+-
+-	dbus_message_iter_init_append(reply, &iter);
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-			DBUS_TYPE_STRING_AS_STRING, &iter_array);
+-
+-	for (l = adapter->proxies; l; l = l->next) {
+-		struct serial_proxy *prx = l->data;
+-
+-		dbus_message_iter_append_basic(&iter_array,
+-				DBUS_TYPE_STRING, &prx->path);
+-	}
+-
+-	dbus_message_iter_close_container(&iter, &iter_array);
+-
+-	return reply;
+-}
+-
+-static DBusMessage *remove_proxy(DBusConnection *conn,
+-				DBusMessage *msg, void *data)
+-{
+-	struct serial_adapter *adapter = data;
+-	struct serial_proxy *prx;
+-	const char *path, *sender;
+-	GSList *l;
+-
+-	if (!dbus_message_get_args(msg, NULL,
+-				DBUS_TYPE_STRING, &path,
+-				DBUS_TYPE_INVALID))
+-		return NULL;
+-
+-	l = g_slist_find_custom(adapter->proxies, path, proxy_pathcmp);
+-	if (!l)
+-		return btd_error_does_not_exist(msg);
+-
+-	prx = l->data;
+-
+-	sender = dbus_message_get_sender(msg);
+-	if (g_strcmp0(prx->owner, sender) != 0)
+-		return btd_error_not_authorized(msg);
+-
+-	unregister_proxy(prx);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static void manager_path_unregister(void *data)
+-{
+-	struct serial_adapter *adapter = data;
+-	GSList *l;
+-
+-	/* Remove proxy objects */
+-	for (l = adapter->proxies; l; l = l->next) {
+-		struct serial_proxy *prx = l->data;
+-		char *path = g_strdup(prx->path);
+-
+-		g_dbus_unregister_interface(adapter->conn, path,
+-					SERIAL_PROXY_INTERFACE);
+-		g_free(path);
+-	}
+-
+-	if (adapter->conn)
+-		dbus_connection_unref(adapter->conn);
+-
+-	adapters = g_slist_remove(adapters, adapter);
+-	g_slist_free(adapter->proxies);
+-	btd_adapter_unref(adapter->btd_adapter);
+-	g_free(adapter);
+-}
+-
+-static const GDBusMethodTable manager_methods[] = {
+-	{ GDBUS_METHOD("CreateProxy",
+-			GDBUS_ARGS({ "pattern", "s" },
+-					{ "address", "s" }),
+-			GDBUS_ARGS({ "path", "s" }),
+-			create_proxy) },
+-	{ GDBUS_METHOD("ListProxies",
+-			NULL, GDBUS_ARGS({ "paths", "as" }),
+-			list_proxies) },
+-	{ GDBUS_METHOD("RemoveProxy",
+-			GDBUS_ARGS({ "path", "s" }), NULL,
+-			remove_proxy) },
+-	{ },
+-};
+-
+-static const GDBusSignalTable manager_signals[] = {
+-	{ GDBUS_SIGNAL("ProxyCreated", GDBUS_ARGS({ "path", "s" })) },
+-	{ GDBUS_SIGNAL("ProxyRemoved", GDBUS_ARGS({ "path", "s" })) },
+-	{ }
+-};
+-
+-static struct serial_adapter *find_adapter(GSList *list,
+-					struct btd_adapter *btd_adapter)
+-{
+-	for (; list; list = list->next) {
+-		struct serial_adapter *adapter = list->data;
+-
+-		if (adapter->btd_adapter == btd_adapter)
+-			return adapter;
 -	}
 -
 -	return NULL;
 -}
 -
--static void hexdump(const unsigned char *buf, uint16_t len)
+-static void serial_proxy_init(struct serial_adapter *adapter)
 -{
--	static const char hexdigits[] = "0123456789abcdef";
--	char str[68];
--	uint16_t i;
--
--	if (!len)
--		return;
--
--	for (i = 0; i < len; i++) {
--		str[((i % 16) * 3) + 0] = hexdigits[buf[i] >> 4];
--		str[((i % 16) * 3) + 1] = hexdigits[buf[i] & 0xf];
--		str[((i % 16) * 3) + 2] = ' ';
--		str[(i % 16) + 49] = isprint(buf[i]) ? buf[i] : '.';
--
--		if ((i + 1) % 16 == 0) {
--			str[47] = ' ';
--			str[48] = ' ';
--			str[65] = '\0';
--			printf("%-12c%s\n", ' ', str);
--			str[0] = ' ';
--		}
--	}
--
--	if (i % 16 > 0) {
--		uint16_t j;
--		for (j = (i % 16); j < 16; j++) {
--			str[(j * 3) + 0] = ' ';
--			str[(j * 3) + 1] = ' ';
--			str[(j * 3) + 2] = ' ';
--			str[j + 49] = ' ';
--		}
--		str[47] = ' ';
--		str[48] = ' ';
--		str[65] = '\0';
--		printf("%-12c%s\n", ' ', str);
--	}
--}
--
--static void get_bdaddr(uint16_t id, uint8_t *bdaddr)
--{
--	bdaddr[0] = id & 0xff;
--	bdaddr[1] = id >> 8;
--	bdaddr[2] = 0x00;
--	bdaddr[3] = 0x01;
--	bdaddr[4] = 0xaa;
--	bdaddr[5] = 0x00;
--}
--
--struct btdev *btdev_create(uint16_t id)
--{
--	struct btdev *btdev;
--
--	btdev = malloc(sizeof(*btdev));
--	if (!btdev)
--		return NULL;
--
--	memset(btdev, 0, sizeof(*btdev));
--
--	btdev->manufacturer = 63;
--	btdev->version = 0x06;
--	btdev->revision = 0x0000;
--
--	btdev->features[0] |= 0x04;	/* Encryption */
--	btdev->features[0] |= 0x20;	/* Role switch */
--	btdev->features[0] |= 0x80;	/* Sniff mode */
--	btdev->features[1] |= 0x08;	/* SCO link */
--	btdev->features[3] |= 0x40;	/* RSSI with inquiry results */
--	btdev->features[3] |= 0x80;	/* Extended SCO link */
--	btdev->features[4] |= 0x08;	/* AFH capable slave */
--	btdev->features[4] |= 0x10;	/* AFH classification slave */
--	btdev->features[4] |= 0x40;	/* LE Supported */
--	btdev->features[5] |= 0x02;	/* Sniff subrating */
--	btdev->features[5] |= 0x04;	/* Pause encryption */
--	btdev->features[5] |= 0x08;	/* AFH capable master */
--	btdev->features[5] |= 0x10;	/* AFH classification master */
--	btdev->features[6] |= 0x01;	/* Extended Inquiry Response */
--	btdev->features[6] |= 0x02;	/* Simultaneous LE and BR/EDR */
--	btdev->features[6] |= 0x08;	/* Secure Simple Pairing */
--	btdev->features[6] |= 0x10;	/* Encapsulated PDU */
--	btdev->features[6] |= 0x20;	/* Erroneous Data Reporting */
--	btdev->features[6] |= 0x40;	/* Non-flushable Packet Boundary Flag */
--	btdev->features[7] |= 0x01;	/* Link Supervision Timeout Event */
--	btdev->features[7] |= 0x02;	/* Inquiry TX Power Level */
--	btdev->features[7] |= 0x80;	/* Extended features */
--
--	btdev->acl_mtu = 192;
--	btdev->acl_max_pkt = 1;
--
--	btdev->country_code = 0x00;
--
--	get_bdaddr(id, btdev->bdaddr);
--
--	add_btdev(btdev);
--
--	return btdev;
--}
--
--void btdev_destroy(struct btdev *btdev)
--{
--	if (!btdev)
--		return;
--
--	del_btdev(btdev);
--
--	free(btdev);
--}
--
--void btdev_set_send_handler(struct btdev *btdev, btdev_send_func handler,
--							void *user_data)
--{
--	if (!btdev)
--		return;
--
--	btdev->send_handler = handler;
--	btdev->send_data = user_data;
--}
--
--static void send_packet(struct btdev *btdev, const void *data, uint16_t len)
--{
--	if (!btdev->send_handler)
--		return;
--
--	btdev->send_handler(data, len, btdev->send_data);
--}
--
--static void send_event(struct btdev *btdev, uint8_t event,
--						const void *data, uint8_t len)
--{
--	struct bt_hci_evt_hdr *hdr;
--	uint16_t pkt_len;
--	void *pkt_data;
--
--	pkt_len = 1 + sizeof(*hdr) + len;
--
--	pkt_data = malloc(pkt_len);
--	if (!pkt_data)
--		return;
--
--	((uint8_t *) pkt_data)[0] = BT_H4_EVT_PKT;
--
--	hdr = pkt_data + 1;
--	hdr->evt = event;
--	hdr->plen = len;
--
--	if (len > 0)
--		memcpy(pkt_data + 1 + sizeof(*hdr), data, len);
--
--	send_packet(btdev, pkt_data, pkt_len);
--
--	free(pkt_data);
--}
--
--static void cmd_complete(struct btdev *btdev, uint16_t opcode,
--						const void *data, uint8_t len)
--{
--	struct bt_hci_evt_hdr *hdr;
--	struct bt_hci_evt_cmd_complete *cc;
--	uint16_t pkt_len;
--	void *pkt_data;
--
--	pkt_len = 1 + sizeof(*hdr) + sizeof(*cc) + len;
--
--	pkt_data = malloc(pkt_len);
--	if (!pkt_data)
--		return;
--
--	((uint8_t *) pkt_data)[0] = BT_H4_EVT_PKT;
--
--	hdr = pkt_data + 1;
--	hdr->evt = BT_HCI_EVT_CMD_COMPLETE;
--	hdr->plen = sizeof(*cc) + len;
--
--	cc = pkt_data + 1 + sizeof(*hdr);
--	cc->ncmd = 0x01;
--	cc->opcode = cpu_to_le16(opcode);
--
--	if (len > 0)
--		memcpy(pkt_data + 1 + sizeof(*hdr) + sizeof(*cc), data, len);
--
--	send_packet(btdev, pkt_data, pkt_len);
--
--	free(pkt_data);
--}
--
--static void cmd_status(struct btdev *btdev, uint8_t status, uint16_t opcode)
--{
--	struct bt_hci_evt_cmd_status cs;
--
--	cs.status = status;
--	cs.ncmd = 0x01;
--	cs.opcode = cpu_to_le16(opcode);
--
--	send_event(btdev, BT_HCI_EVT_CMD_STATUS, &cs, sizeof(cs));
--}
--
--static void num_completed_packets(struct btdev *btdev)
--{
--	if (btdev->conn) {
--		struct bt_hci_evt_num_completed_packets ncp;
--
--		ncp.num_handles = 1;
--		ncp.handle = cpu_to_le16(42);
--		ncp.count = cpu_to_le16(1);
--
--		send_event(btdev, BT_HCI_EVT_NUM_COMPLETED_PACKETS,
--							&ncp, sizeof(ncp));
--	}
--}
--
--static void inquiry_complete(struct btdev *btdev, uint8_t status)
--{
--	struct bt_hci_evt_inquiry_complete ic;
+-	GKeyFile *config;
+-	GError *gerr = NULL;
+-	const char *file = CONFIGDIR "/serial.conf";
+-	char **group_list;
 -	int i;
 -
--	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
--		if (!btdev_list[i] || btdev_list[i] == btdev)
+-	config = g_key_file_new();
+-
+-	if (!g_key_file_load_from_file(config, file, 0, &gerr)) {
+-		error("Parsing %s failed: %s", file, gerr->message);
+-		g_error_free(gerr);
+-		g_key_file_free(config);
+-		return;
+-	}
+-
+-	group_list = g_key_file_get_groups(config, NULL);
+-
+-	for (i = 0; group_list[i] != NULL; i++) {
+-		char *group_str = group_list[i], *uuid_str, *address;
+-		int err;
+-		struct serial_proxy *prx;
+-
+-		/* string length of "Proxy" is 5 */
+-		if (strlen(group_str) < 5 || strncmp(group_str, "Proxy", 5))
 -			continue;
 -
--		if (!(btdev_list[i]->scan_enable & 0x02))
--			continue;
--
--		if (btdev->inquiry_mode == 0x02 &&
--					btdev_list[i]->ext_inquiry_rsp[0]) {
--			struct bt_hci_evt_ext_inquiry_result ir;
--
--			ir.num_resp = 0x01;
--			memcpy(ir.bdaddr, btdev_list[i]->bdaddr, 6);
--			memcpy(ir.dev_class, btdev_list[i]->dev_class, 3);
--			ir.rssi = -60;
--			memcpy(ir.data, btdev_list[i]->ext_inquiry_rsp, 240);
--
--			send_event(btdev, BT_HCI_EVT_EXT_INQUIRY_RESULT,
--							&ir, sizeof(ir));
--			continue;
+-		uuid_str = g_key_file_get_string(config, group_str, "UUID",
+-									&gerr);
+-		if (gerr) {
+-			DBG("%s: %s", file, gerr->message);
+-			g_error_free(gerr);
+-			g_key_file_free(config);
+-			g_strfreev(group_list);
+-			return;
 -		}
 -
--		if (btdev->inquiry_mode > 0x00) {
--			struct bt_hci_evt_inquiry_result_with_rssi ir;
--
--			ir.num_resp = 0x01;
--			memcpy(ir.bdaddr, btdev_list[i]->bdaddr, 6);
--			memcpy(ir.dev_class, btdev_list[i]->dev_class, 3);
--			ir.rssi = -60;
--
--			send_event(btdev, BT_HCI_EVT_INQUIRY_RESULT_WITH_RSSI,
--							&ir, sizeof(ir));
--		} else {
--			struct bt_hci_evt_inquiry_result ir;
--
--			ir.num_resp = 0x01;
--			memcpy(ir.bdaddr, btdev_list[i]->bdaddr, 6);
--			memcpy(ir.dev_class, btdev_list[i]->dev_class, 3);
--
--			send_event(btdev, BT_HCI_EVT_INQUIRY_RESULT,
--							&ir, sizeof(ir));
--		}
--        }
--
--	ic.status = status;
--
--	send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
--}
--
--static void conn_complete(struct btdev *btdev,
--					const uint8_t *bdaddr, uint8_t status)
--{
--	struct bt_hci_evt_conn_complete cc;
--
--	if (!status) {
--		struct btdev *remote = find_btdev_by_bdaddr(bdaddr);
--
--		btdev->conn = remote;
--		remote->conn = btdev;
--
--		cc.status = status;
--		memcpy(cc.bdaddr, btdev->bdaddr, 6);
--		cc.encr_mode = 0x00;
--
--		cc.handle = cpu_to_le16(42);
--		cc.link_type = 0x01;
--
--		send_event(remote, BT_HCI_EVT_CONN_COMPLETE, &cc, sizeof(cc));
--
--		cc.handle = cpu_to_le16(42);
--		cc.link_type = 0x01;
--	} else {
--		cc.handle = cpu_to_le16(0x0000);
--		cc.link_type = 0x01;
--	}
--
--	cc.status = status;
--	memcpy(cc.bdaddr, bdaddr, 6);
--	cc.encr_mode = 0x00;
--
--	send_event(btdev, BT_HCI_EVT_CONN_COMPLETE, &cc, sizeof(cc));
--}
--
--static void conn_request(struct btdev *btdev, const uint8_t *bdaddr)
--{
--	struct btdev *remote = find_btdev_by_bdaddr(bdaddr);
--
--	if (remote) {
--		if (remote->scan_enable & 0x01) {
--			struct bt_hci_evt_conn_request cr;
--
--			memcpy(cr.bdaddr, btdev->bdaddr, 6);
--			memcpy(cr.dev_class, btdev->dev_class, 3);
--			cr.link_type = 0x01;
--
--			send_event(remote, BT_HCI_EVT_CONN_REQUEST,
--							&cr, sizeof(cr));
--		} else
--			conn_complete(btdev, bdaddr, BT_HCI_ERR_PAGE_TIMEOUT);
--	} else
--		conn_complete(btdev, bdaddr, BT_HCI_ERR_UNKNOWN_CONN_ID);
--}
--
--static void disconnect_complete(struct btdev *btdev, uint16_t handle,
--							uint8_t reason)
--{
--	struct bt_hci_evt_disconnect_complete dc;
--	struct btdev *remote;
--
--	if (!btdev) {
--		dc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
--		dc.handle = cpu_to_le16(handle);
--		dc.reason = 0x00;
--
--		send_event(btdev, BT_HCI_EVT_DISCONNECT_COMPLETE,
--							&dc, sizeof(dc));
--		return;
--	}
--
--	dc.status = BT_HCI_ERR_SUCCESS;
--	dc.handle = cpu_to_le16(handle);
--	dc.reason = reason;
--
--	remote = btdev->conn;
--
--	btdev->conn = NULL;
--	remote->conn = NULL;
--
--	send_event(btdev, BT_HCI_EVT_DISCONNECT_COMPLETE, &dc, sizeof(dc));
--	send_event(remote, BT_HCI_EVT_DISCONNECT_COMPLETE, &dc, sizeof(dc));
--}
--
--static void name_request_complete(struct btdev *btdev,
--					const uint8_t *bdaddr, uint8_t status)
--{
--        struct bt_hci_evt_remote_name_req_complete nc;
--
--	nc.status = status;
--	memcpy(nc.bdaddr, bdaddr, 6);
--	memset(nc.name, 0, 248);
--
--	if (!status) {
--		struct btdev *remote = find_btdev_by_bdaddr(bdaddr);
--
--		if (remote)
--			memcpy(nc.name, remote->name, 248);
--		else
--			nc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
--	}
--
--	send_event(btdev, BT_HCI_EVT_REMOTE_NAME_REQUEST_COMPLETE,
--							&nc, sizeof(nc));
--}
--
--static void remote_features_complete(struct btdev *btdev, uint16_t handle)
--{
--	struct bt_hci_evt_remote_features_complete rfc;
--
--	if (btdev->conn) {
--		rfc.status = BT_HCI_ERR_SUCCESS;
--		rfc.handle = cpu_to_le16(handle);
--		memcpy(rfc.features, btdev->conn->features, 8);
--	} else {
--		rfc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
--		rfc.handle = cpu_to_le16(handle);
--		memset(rfc.features, 0, 8);
--	}
--
--	send_event(btdev, BT_HCI_EVT_REMOTE_FEATURES_COMPLETE,
--							&rfc, sizeof(rfc));
--}
--
--static void remote_ext_features_complete(struct btdev *btdev, uint16_t handle,
--								uint8_t page)
--{
--	struct bt_hci_evt_remote_ext_features_complete refc;
--
--	if (btdev->conn && page < 0x02) {
--		refc.handle = cpu_to_le16(handle);
--		refc.page = page;
--		refc.max_page = 0x01;
--
--		switch (page) {
--		case 0x00:
--			refc.status = BT_HCI_ERR_SUCCESS;
--			memcpy(refc.features, btdev->conn->features, 8);
--			break;
--		case 0x01:
--			refc.status = BT_HCI_ERR_SUCCESS;
--			memset(refc.features, 0, 8);
--			break;
--		default:
--			refc.status = BT_HCI_ERR_INVALID_PARAMETERS;
--			memset(refc.features, 0, 8);
--			break;
--		}
--	} else {
--		refc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
--		refc.handle = cpu_to_le16(handle);
--		refc.page = page;
--		refc.max_page = 0x01;
--		memset(refc.features, 0, 8);
--	}
--
--	send_event(btdev, BT_HCI_EVT_REMOTE_EXT_FEATURES_COMPLETE,
--							&refc, sizeof(refc));
--}
--
--static void remote_version_complete(struct btdev *btdev, uint16_t handle)
--{
--	struct bt_hci_evt_remote_version_complete rvc;
--
--	if (btdev->conn) {
--		rvc.status = BT_HCI_ERR_SUCCESS;
--		rvc.handle = cpu_to_le16(handle);
--		rvc.lmp_ver = btdev->conn->version;
--		rvc.manufacturer = cpu_to_le16(btdev->conn->manufacturer);
--		rvc.lmp_subver = cpu_to_le16(btdev->conn->revision);
--	} else {
--		rvc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
--		rvc.handle = cpu_to_le16(handle);
--		rvc.lmp_ver = 0x00;
--		rvc.manufacturer = cpu_to_le16(0);
--		rvc.lmp_subver = cpu_to_le16(0);
--	}
--
--	send_event(btdev, BT_HCI_EVT_REMOTE_VERSION_COMPLETE,
--							&rvc, sizeof(rvc));
--}
--
--static void process_cmd(struct btdev *btdev, const void *data, uint16_t len)
--{
--	const struct bt_hci_cmd_hdr *hdr = data;
--	const struct bt_hci_cmd_create_conn *cc;
--	const struct bt_hci_cmd_disconnect *dc;
--	const struct bt_hci_cmd_create_conn_cancel *ccc;
--	const struct bt_hci_cmd_accept_conn_request *acr;
--	const struct bt_hci_cmd_reject_conn_request *rcr;
--	const struct bt_hci_cmd_remote_name_request *rnr;
--	const struct bt_hci_cmd_remote_name_request_cancel *rnrc;
--	const struct bt_hci_cmd_read_remote_features *rrf;
--	const struct bt_hci_cmd_read_remote_ext_features *rref;
--	const struct bt_hci_cmd_read_remote_version *rrv;
--	const struct bt_hci_cmd_write_default_link_policy *wdlp;
--	const struct bt_hci_cmd_set_event_mask *sem;
--	const struct bt_hci_cmd_set_event_filter *sef;
--	const struct bt_hci_cmd_write_local_name *wln;
--	const struct bt_hci_cmd_write_conn_accept_timeout *wcat;
--	const struct bt_hci_cmd_write_page_timeout *wpt;
--	const struct bt_hci_cmd_write_scan_enable *wse;
--	const struct bt_hci_cmd_write_auth_enable *wae;
--	const struct bt_hci_cmd_write_class_of_dev *wcod;
--	const struct bt_hci_cmd_write_voice_setting *wvs;
--	const struct bt_hci_cmd_write_inquiry_mode *wim;
--	const struct bt_hci_cmd_write_afh_assess_mode *waam;
--	const struct bt_hci_cmd_write_ext_inquiry_rsp *weir;
--	const struct bt_hci_cmd_write_simple_pairing_mode *wspm;
--	const struct bt_hci_cmd_write_le_host_supported *wlhs;
--	const struct bt_hci_cmd_le_set_event_mask *lsem;
--	struct bt_hci_rsp_read_default_link_policy rdlp;
--	struct bt_hci_rsp_read_stored_link_key rslk;
--	struct bt_hci_rsp_write_stored_link_key wslk;
--	struct bt_hci_rsp_delete_stored_link_key dslk;
--	struct bt_hci_rsp_read_local_name rln;
--	struct bt_hci_rsp_read_conn_accept_timeout rcat;
--	struct bt_hci_rsp_read_page_timeout rpt;
--	struct bt_hci_rsp_read_scan_enable rse;
--	struct bt_hci_rsp_read_auth_enable rae;
--	struct bt_hci_rsp_read_class_of_dev rcod;
--	struct bt_hci_rsp_read_voice_setting rvs;
--	struct bt_hci_rsp_read_inquiry_mode rim;
--	struct bt_hci_rsp_read_afh_assess_mode raam;
--	struct bt_hci_rsp_read_ext_inquiry_rsp reir;
--	struct bt_hci_rsp_read_simple_pairing_mode rspm;
--	struct bt_hci_rsp_read_inquiry_rsp_tx_power rirtp;
--	struct bt_hci_rsp_read_le_host_supported rlhs;
--	struct bt_hci_rsp_read_local_version rlv;
--	struct bt_hci_rsp_read_local_commands rlc;
--	struct bt_hci_rsp_read_local_features rlf;
--	struct bt_hci_rsp_read_local_ext_features rlef;
--	struct bt_hci_rsp_read_buffer_size rbs;
--	struct bt_hci_rsp_read_country_code rcc;
--	struct bt_hci_rsp_read_bd_addr rba;
--	struct bt_hci_rsp_read_data_block_size rdbs;
--	struct bt_hci_rsp_le_read_buffer_size lrbs;
--	struct bt_hci_rsp_le_read_local_features lrlf;
--	struct bt_hci_rsp_le_read_supported_states lrss;
--	uint16_t opcode;
--	uint8_t status, page;
--
--	if (len < sizeof(*hdr))
--		return;
--
--	opcode = le16_to_cpu(hdr->opcode);
--
--	switch (opcode) {
--	case BT_HCI_CMD_INQUIRY:
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		inquiry_complete(btdev, BT_HCI_ERR_SUCCESS);
--		break;
--
--	case BT_HCI_CMD_INQUIRY_CANCEL:
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_CREATE_CONN:
--		cc = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		conn_request(btdev, cc->bdaddr);
--		break;
--
--	case BT_HCI_CMD_DISCONNECT:
--		dc = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		disconnect_complete(btdev, le16_to_cpu(dc->handle), dc->reason);
--		break;
--
--	case BT_HCI_CMD_CREATE_CONN_CANCEL:
--		ccc = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		conn_complete(btdev, ccc->bdaddr, BT_HCI_ERR_UNKNOWN_CONN_ID);
--		break;
--
--	case BT_HCI_CMD_ACCEPT_CONN_REQUEST:
--		acr = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		conn_complete(btdev, acr->bdaddr, BT_HCI_ERR_SUCCESS);
--		break;
--
--	case BT_HCI_CMD_REJECT_CONN_REQUEST:
--		rcr = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		conn_complete(btdev, rcr->bdaddr, BT_HCI_ERR_UNKNOWN_CONN_ID);
--		break;
--
--	case BT_HCI_CMD_REMOTE_NAME_REQUEST:
--		rnr = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		name_request_complete(btdev, rnr->bdaddr, BT_HCI_ERR_SUCCESS);
--		break;
--
--	case BT_HCI_CMD_REMOTE_NAME_REQUEST_CANCEL:
--		rnrc = data + sizeof(*hdr);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		name_request_complete(btdev, rnrc->bdaddr,
--						BT_HCI_ERR_UNKNOWN_CONN_ID);
--		break;
--
--	case BT_HCI_CMD_READ_REMOTE_FEATURES:
--		rrf = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		remote_features_complete(btdev, le16_to_cpu(rrf->handle));
--		break;
--
--	case BT_HCI_CMD_READ_REMOTE_EXT_FEATURES:
--		rref = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		remote_ext_features_complete(btdev, le16_to_cpu(rref->handle),
--								rref->page);
--		break;
--
--	case BT_HCI_CMD_READ_REMOTE_VERSION:
--		rrv = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		remote_version_complete(btdev, le16_to_cpu(rrv->handle));
--		break;
--
--	case BT_HCI_CMD_READ_DEFAULT_LINK_POLICY:
--		rdlp.status = BT_HCI_ERR_SUCCESS;
--		rdlp.policy = cpu_to_le16(btdev->default_link_policy);
--		cmd_complete(btdev, opcode, &rdlp, sizeof(rdlp));
--		break;
--
--	case BT_HCI_CMD_WRITE_DEFAULT_LINK_POLICY:
--		wdlp = data + sizeof(*hdr);
--		btdev->default_link_policy = le16_to_cpu(wdlp->policy);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_SET_EVENT_MASK:
--		sem = data + sizeof(*hdr);
--		memcpy(btdev->event_mask, sem->mask, 8);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_RESET:
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_SET_EVENT_FILTER:
--		sef = data + sizeof(*hdr);
--		btdev->event_filter = sef->type;
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_STORED_LINK_KEY:
--		rslk.status = BT_HCI_ERR_SUCCESS;
--		rslk.max_num_keys = cpu_to_le16(0);
--		rslk.num_keys = cpu_to_le16(0);
--		cmd_complete(btdev, opcode, &rslk, sizeof(rslk));
--		break;
--
--	case BT_HCI_CMD_WRITE_STORED_LINK_KEY:
--		wslk.status = BT_HCI_ERR_SUCCESS;
--		wslk.num_keys = 0;
--		cmd_complete(btdev, opcode, &wslk, sizeof(wslk));
--		break;
--
--	case BT_HCI_CMD_DELETE_STORED_LINK_KEY:
--		dslk.status = BT_HCI_ERR_SUCCESS;
--		dslk.num_keys = cpu_to_le16(0);
--		cmd_complete(btdev, opcode, &dslk, sizeof(dslk));
--		break;
--
--	case BT_HCI_CMD_WRITE_LOCAL_NAME:
--		wln = data + sizeof(*hdr);
--		memcpy(btdev->name, wln->name, 248);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_LOCAL_NAME:
--		rln.status = BT_HCI_ERR_SUCCESS;
--		memcpy(rln.name, btdev->name, 248);
--		cmd_complete(btdev, opcode, &rln, sizeof(rln));
--		break;
--
--	case BT_HCI_CMD_READ_CONN_ACCEPT_TIMEOUT:
--		rcat.status = BT_HCI_ERR_SUCCESS;
--		rcat.timeout = cpu_to_le16(btdev->conn_accept_timeout);
--		cmd_complete(btdev, opcode, &rcat, sizeof(rcat));
--		break;
--
--	case BT_HCI_CMD_WRITE_CONN_ACCEPT_TIMEOUT:
--		wcat = data + sizeof(*hdr);
--		btdev->conn_accept_timeout = le16_to_cpu(wcat->timeout);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_PAGE_TIMEOUT:
--		rpt.status = BT_HCI_ERR_SUCCESS;
--		rpt.timeout = cpu_to_le16(btdev->page_timeout);
--		cmd_complete(btdev, opcode, &rpt, sizeof(rpt));
--		break;
--
--	case BT_HCI_CMD_WRITE_PAGE_TIMEOUT:
--		wpt = data + sizeof(*hdr);
--		btdev->page_timeout = le16_to_cpu(wpt->timeout);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_SCAN_ENABLE:
--		rse.status = BT_HCI_ERR_SUCCESS;
--		rse.enable = btdev->scan_enable;
--		cmd_complete(btdev, opcode, &rse, sizeof(rse));
--		break;
--
--	case BT_HCI_CMD_WRITE_SCAN_ENABLE:
--		wse = data + sizeof(*hdr);
--		btdev->scan_enable = wse->enable;
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_AUTH_ENABLE:
--		rae.status = BT_HCI_ERR_SUCCESS;
--		rae.enable = btdev->auth_enable;
--		cmd_complete(btdev, opcode, &rae, sizeof(rae));
--		break;
--
--	case BT_HCI_CMD_WRITE_AUTH_ENABLE:
--		wae = data + sizeof(*hdr);
--		btdev->auth_enable = wae->enable;
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_CLASS_OF_DEV:
--		rcod.status = BT_HCI_ERR_SUCCESS;
--		memcpy(rcod.dev_class, btdev->dev_class, 3);
--		cmd_complete(btdev, opcode, &rcod, sizeof(rcod));
--		break;
--
--	case BT_HCI_CMD_WRITE_CLASS_OF_DEV:
--		wcod = data + sizeof(*hdr);
--		memcpy(btdev->dev_class, wcod->dev_class, 3);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_VOICE_SETTING:
--		rvs.status = BT_HCI_ERR_SUCCESS;
--		rvs.setting = cpu_to_le16(btdev->voice_setting);
--		cmd_complete(btdev, opcode, &rvs, sizeof(rvs));
--		break;
--
--	case BT_HCI_CMD_WRITE_VOICE_SETTING:
--		wvs = data + sizeof(*hdr);
--		btdev->voice_setting = le16_to_cpu(wvs->setting);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_INQUIRY_MODE:
--		rim.status = BT_HCI_ERR_SUCCESS;
--		rim.mode = btdev->inquiry_mode;
--		cmd_complete(btdev, opcode, &rim, sizeof(rim));
--		break;
--
--	case BT_HCI_CMD_WRITE_INQUIRY_MODE:
--		wim = data + sizeof(*hdr);
--		btdev->inquiry_mode = wim->mode;
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_AFH_ASSESS_MODE:
--		raam.status = BT_HCI_ERR_SUCCESS;
--		raam.mode = btdev->afh_assess_mode;
--		cmd_complete(btdev, opcode, &raam, sizeof(raam));
--		break;
--
--	case BT_HCI_CMD_WRITE_AFH_ASSESS_MODE:
--		waam = data + sizeof(*hdr);
--		btdev->afh_assess_mode = waam->mode;
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_EXT_INQUIRY_RSP:
--		reir.status = BT_HCI_ERR_SUCCESS;
--		reir.fec = btdev->ext_inquiry_fec;
--		memcpy(reir.data, btdev->ext_inquiry_rsp, 240);
--		cmd_complete(btdev, opcode, &reir, sizeof(reir));
--		break;
--
--	case BT_HCI_CMD_WRITE_EXT_INQUIRY_RSP:
--		weir = data + sizeof(*hdr);
--		btdev->ext_inquiry_fec = weir->fec;
--		memcpy(btdev->ext_inquiry_rsp, weir->data, 240);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_SIMPLE_PAIRING_MODE:
--		rspm.status = BT_HCI_ERR_SUCCESS;
--		rspm.mode = btdev->simple_pairing_mode;
--		cmd_complete(btdev, opcode, &rspm, sizeof(rspm));
--		break;
--
--	case BT_HCI_CMD_WRITE_SIMPLE_PAIRING_MODE:
--		wspm = data + sizeof(*hdr);
--		btdev->simple_pairing_mode = wspm->mode;
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_INQUIRY_RSP_TX_POWER:
--		rirtp.status = BT_HCI_ERR_SUCCESS;
--		rirtp.level = 0;
--		cmd_complete(btdev, opcode, &rirtp, sizeof(rirtp));
--		break;
--
--	case BT_HCI_CMD_READ_LE_HOST_SUPPORTED:
--		rlhs.status = BT_HCI_ERR_SUCCESS;
--		rlhs.supported = btdev->le_supported;
--		rlhs.simultaneous = btdev->le_simultaneous;
--		cmd_complete(btdev, opcode, &rlhs, sizeof(rlhs));
--		break;
--
--	case BT_HCI_CMD_WRITE_LE_HOST_SUPPORTED:
--		wlhs = data + sizeof(*hdr);
--		btdev->le_supported = wlhs->supported;
--		btdev->le_simultaneous = wlhs->simultaneous;
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_LOCAL_VERSION:
--		rlv.status = BT_HCI_ERR_SUCCESS;
--		rlv.hci_ver = btdev->version;
--		rlv.hci_rev = cpu_to_le16(btdev->revision);
--		rlv.lmp_ver = btdev->version;
--		rlv.manufacturer = cpu_to_le16(btdev->manufacturer);
--		rlv.lmp_subver = cpu_to_le16(btdev->revision);
--		cmd_complete(btdev, opcode, &rlv, sizeof(rlv));
--		break;
--
--	case BT_HCI_CMD_READ_LOCAL_COMMANDS:
--		rlc.status = BT_HCI_ERR_SUCCESS;
--		memcpy(rlc.commands, btdev->commands, 64);
--		cmd_complete(btdev, opcode, &rlc, sizeof(rlc));
--		break;
--
--	case BT_HCI_CMD_READ_LOCAL_FEATURES:
--		rlf.status = BT_HCI_ERR_SUCCESS;
--		memcpy(rlf.features, btdev->features, 8);
--		cmd_complete(btdev, opcode, &rlf, sizeof(rlf));
--		break;
--
--	case BT_HCI_CMD_READ_LOCAL_EXT_FEATURES:
--		page = ((const uint8_t *) data)[sizeof(*hdr)];
--		switch (page) {
--		case 0x00:
--			rlef.status = BT_HCI_ERR_SUCCESS;
--			rlef.page = 0x00;
--			rlef.max_page = 0x01;
--			memcpy(rlef.features, btdev->features, 8);
--			break;
--		case 0x01:
--			rlef.status = BT_HCI_ERR_SUCCESS;
--			rlef.page = 0x01;
--			rlef.max_page = 0x01;
--			memset(rlef.features, 0, 8);
--			if (btdev->simple_pairing_mode)
--				rlef.features[0] |= 0x01;
--			if (btdev->le_supported)
--				rlef.features[0] |= 0x02;
--			if (btdev->le_simultaneous)
--				rlef.features[0] |= 0x04;
--			break;
--		default:
--			rlef.status = BT_HCI_ERR_INVALID_PARAMETERS;
--			rlef.page = page;
--			rlef.max_page = 0x01;
--			memset(rlef.features, 0, 8);
--			break;
--		}
--		cmd_complete(btdev, opcode, &rlef, sizeof(rlef));
--		break;
--
--	case BT_HCI_CMD_READ_BUFFER_SIZE:
--		rbs.status = BT_HCI_ERR_SUCCESS;
--		rbs.acl_mtu = cpu_to_le16(btdev->acl_mtu);
--		rbs.sco_mtu = 0;
--		rbs.acl_max_pkt = cpu_to_le16(btdev->acl_max_pkt);
--		rbs.sco_max_pkt = cpu_to_le16(0);
--		cmd_complete(btdev, opcode, &rbs, sizeof(rbs));
--		break;
--
--	case BT_HCI_CMD_READ_COUNTRY_CODE:
--		rcc.status = BT_HCI_ERR_SUCCESS;
--		rcc.code = btdev->country_code;
--		cmd_complete(btdev, opcode, &rcc, sizeof(rcc));
--		break;
--
--	case BT_HCI_CMD_READ_BD_ADDR:
--		rba.status = BT_HCI_ERR_SUCCESS;
--		memcpy(rba.bdaddr, btdev->bdaddr, 6);
--		cmd_complete(btdev, opcode, &rba, sizeof(rba));
--		break;
--
--	case BT_HCI_CMD_READ_DATA_BLOCK_SIZE:
--		rdbs.status = BT_HCI_ERR_SUCCESS;
--		rdbs.max_acl_len = cpu_to_le16(btdev->acl_mtu);
--		rdbs.block_len = cpu_to_le16(btdev->acl_mtu);
--		rdbs.num_blocks = cpu_to_le16(btdev->acl_max_pkt);
--		cmd_complete(btdev, opcode, &rdbs, sizeof(rdbs));
--		break;
--
--	case BT_HCI_CMD_LE_SET_EVENT_MASK:
--		lsem = data + sizeof(*hdr);
--		memcpy(btdev->le_event_mask, lsem->mask, 8);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_LE_READ_BUFFER_SIZE:
--		lrbs.status = BT_HCI_ERR_SUCCESS;
--		lrbs.le_mtu = cpu_to_le16(btdev->acl_mtu);
--		lrbs.le_max_pkt = btdev->acl_max_pkt;
--		cmd_complete(btdev, opcode, &lrbs, sizeof(lrbs));
--		break;
--
--	case BT_HCI_CMD_LE_READ_LOCAL_FEATURES:
--		lrlf.status = BT_HCI_ERR_SUCCESS;
--		memcpy(lrlf.features, btdev->le_features, 8);
--		cmd_complete(btdev, opcode, &lrlf, sizeof(lrlf));
--		break;
--
--	case BT_HCI_CMD_LE_SET_SCAN_PARAMETERS:
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_LE_SET_SCAN_ENABLE:
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_LE_READ_SUPPORTED_STATES:
--		lrss.status = BT_HCI_ERR_SUCCESS;
--		memcpy(lrss.states, btdev->le_states, 8);
--		cmd_complete(btdev, opcode, &lrss, sizeof(lrss));
--		break;
--
--	default:
--		printf("Unsupported command 0x%4.4x\n", opcode);
--		hexdump(data, len);
--		cmd_status(btdev, BT_HCI_ERR_UNKNOWN_COMMAND, opcode);
--		break;
--	}
--}
--
--void btdev_receive_h4(struct btdev *btdev, const void *data, uint16_t len)
--{
--	uint8_t pkt_type;
--
--	if (!btdev)
--		return;
--
--	if (len < 1)
--		return;
--
--	pkt_type = ((const uint8_t *) data)[0];
--
--	switch (pkt_type) {
--	case BT_H4_CMD_PKT:
--		process_cmd(btdev, data + 1, len - 1);
--		break;
--	case BT_H4_ACL_PKT:
--		if (btdev->conn)
--			send_packet(btdev->conn, data, len);
--		num_completed_packets(btdev);
--		break;
--	default:
--		printf("Unsupported packet 0x%2.2x\n", pkt_type);
--		break;
--	}
--}
-diff --git a/emulator/btdev.h b/emulator/btdev.h
-deleted file mode 100644
-index 7b211a2..0000000
---- a/emulator/btdev.h
-+++ /dev/null
-@@ -1,38 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011-2012  Intel Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#include <stdint.h>
--
--typedef void (*btdev_send_func) (const void *data, uint16_t len,
--							void *user_data);
--
--struct btdev;
--
--struct btdev *btdev_create(uint16_t id);
--void btdev_destroy(struct btdev *btdev);
--
--void btdev_set_send_handler(struct btdev *btdev, btdev_send_func handler,
--							void *user_data);
--
--void btdev_receive_h4(struct btdev *btdev, const void *data, uint16_t len);
-diff --git a/emulator/main.c b/emulator/main.c
-deleted file mode 100644
-index 125460d..0000000
---- a/emulator/main.c
-+++ /dev/null
-@@ -1,73 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011-2012  Intel Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stdio.h>
--
--#include "mainloop.h"
--#include "server.h"
--#include "vhci.h"
--
--static void signal_callback(int signum, void *user_data)
--{
--	switch (signum) {
--	case SIGINT:
--	case SIGTERM:
--		mainloop_quit();
--		break;
--	}
--}
--
--int main(int argc, char *argv[])
--{
--	struct vhci *vhci;
--	struct server *server;
--	sigset_t mask;
--
--	mainloop_init();
--
--	sigemptyset(&mask);
--	sigaddset(&mask, SIGINT);
--	sigaddset(&mask, SIGTERM);
--
--	mainloop_set_signal(&mask, signal_callback, NULL, NULL);
--
--	vhci = vhci_open(VHCI_TYPE_BREDR, 0x23);
--	if (!vhci) {
--		fprintf(stderr, "Failed to open Virtual HCI device\n");
--		return 1;
--	}
--
--	server = server_open_unix("/tmp/bt-server-bredr", 0x42);
--	if (!server) {
--		fprintf(stderr, "Failed to open server channel\n");
--		vhci_close(vhci);
--		return 1;
--	}
--
--	return mainloop_run();
--}
-diff --git a/emulator/server.c b/emulator/server.c
-deleted file mode 100644
-index 1ff9904..0000000
---- a/emulator/server.c
-+++ /dev/null
-@@ -1,288 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011-2012  Intel Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stdio.h>
--#include <errno.h>
--#include <ctype.h>
--#include <unistd.h>
--#include <stdlib.h>
--#include <string.h>
--#include <sys/epoll.h>
--#include <sys/ioctl.h>
--#include <sys/socket.h>
--#include <sys/un.h>
--
--#include <bluetooth/bluetooth.h>
--#include <bluetooth/hci.h>
--
--#include "mainloop.h"
--#include "btdev.h"
--#include "server.h"
--
--struct server {
--	uint16_t id;
--	int fd;
--};
--
--struct client {
--	int fd;
--	struct btdev *btdev;
--	uint8_t *pkt_data;
--	uint8_t pkt_type;
--	uint16_t pkt_expect;
--	uint16_t pkt_len;
--	uint16_t pkt_offset;
--};
--
--static void server_destroy(void *user_data)
--{
--	struct server *server = user_data;
--
--	close(server->fd);
--
--	free(server);
--}
--
--static void client_destroy(void *user_data)
--{
--	struct client *client = user_data;
--
--	btdev_destroy(client->btdev);
--
--	close(client->fd);
--
--	free(client);
--}
--
--static void client_write_callback(const void *data, uint16_t len,
--							void *user_data)
--{
--	struct client *client = user_data;
--	ssize_t written;
--
--	written = send(client->fd, data, len, MSG_DONTWAIT);
--	if (written < 0)
--		return;
--}
--
--static void client_read_callback(int fd, uint32_t events, void *user_data)
--{
--	struct client *client = user_data;
--	static uint8_t buf[4096];
--	uint8_t *ptr = buf;
--	ssize_t len;
--	uint16_t count;
--
--	if (events & (EPOLLERR | EPOLLHUP))
--		return;
--
--again:
--	len = recv(fd, buf + client->pkt_offset,
--			sizeof(buf) - client->pkt_offset, MSG_DONTWAIT);
--	if (len < 0) {
--		if (errno == EAGAIN)
--			goto again;
--		return;
--	}
--
--	count = client->pkt_offset + len;
--
--	while (count > 0) {
--		hci_command_hdr *cmd_hdr;
--
--		if (!client->pkt_data) {
--			client->pkt_type = ptr[0];
--
--			switch (client->pkt_type) {
--			case HCI_COMMAND_PKT:
--				if (count < HCI_COMMAND_HDR_SIZE + 1) {
--					client->pkt_offset += len;
--					return;
--				}
--				cmd_hdr = (hci_command_hdr *) (ptr + 1);
--				client->pkt_expect = HCI_COMMAND_HDR_SIZE +
--							cmd_hdr->plen + 1;
--				client->pkt_data = malloc(client->pkt_expect);
--				client->pkt_len = 0;
--				break;
--			default:
--				printf("packet error\n");
--				return;
--			}
--
--			client->pkt_offset = 0;
+-		address = g_key_file_get_string(config, group_str, "Address",
+-									&gerr);
+-		if (gerr) {
+-			DBG("%s: %s", file, gerr->message);
+-			g_error_free(gerr);
+-			g_key_file_free(config);
+-			g_free(uuid_str);
+-			g_strfreev(group_list);
+-			return;
 -		}
 -
--		if (count >= client->pkt_expect) {
--			memcpy(client->pkt_data + client->pkt_len,
--						ptr, client->pkt_expect);
--			ptr += client->pkt_expect;
--			count -= client->pkt_expect;
--
--			btdev_receive_h4(client->btdev, client->pkt_data,
--					client->pkt_len + client->pkt_expect);
--
--			free(client->pkt_data);
--			client->pkt_data = NULL;
--		} else {
--			memcpy(client->pkt_data + client->pkt_len, ptr, count);
--			client->pkt_len += count;
--			client->pkt_expect -= count;
--			count = 0;
+-		err = register_proxy(adapter, uuid_str, address, &prx);
+-		if (err == -EINVAL)
+-			error("Invalid address.");
+-		else if (err == -EALREADY)
+-			DBG("Proxy already exists.");
+-		else if (err < 0)
+-			error("Proxy creation failed (%s)", strerror(-err));
+-		else {
+-			err = enable_proxy(prx);
+-			if (err < 0)
+-				error("Proxy enable failed (%s)",
+-						strerror(-err));
 -		}
+-
+-		g_free(uuid_str);
+-		g_free(address);
 -	}
+-
+-	g_strfreev(group_list);
+-	g_key_file_free(config);
 -}
 -
--static int accept_client(int fd)
+-int proxy_register(DBusConnection *conn, struct btd_adapter *btd_adapter)
 -{
--	struct sockaddr_un addr;
--	socklen_t len;
--	int nfd;
+-	struct serial_adapter *adapter;
+-	const char *path;
 -
--	memset(&addr, 0, sizeof(addr));
--	len = sizeof(addr);
+-	adapter = find_adapter(adapters, btd_adapter);
+-	if (adapter)
+-		return -EINVAL;
 -
--	if (getsockname(fd, (struct sockaddr *) &addr, &len) < 0) {
--		perror("Failed to get socket name");
+-	adapter = g_new0(struct serial_adapter, 1);
+-	adapter->conn = dbus_connection_ref(conn);
+-	adapter->btd_adapter = btd_adapter_ref(btd_adapter);
+-
+-	path = adapter_get_path(btd_adapter);
+-
+-	if (!g_dbus_register_interface(conn, path,
+-					SERIAL_MANAGER_INTERFACE,
+-					manager_methods, manager_signals, NULL,
+-					adapter, manager_path_unregister)) {
+-		error("Failed to register %s interface to %s",
+-				SERIAL_MANAGER_INTERFACE, path);
 -		return -1;
 -	}
 -
--	printf("Request for %s\n", addr.sun_path);
+-	adapters = g_slist_append(adapters, adapter);
 -
--	nfd = accept(fd, (struct sockaddr *) &addr, &len);
--	if (nfd < 0) {
--		perror("Failed to accept client socket");
--		return -1;
--	}
+-	DBG("Registered interface %s on path %s",
+-		SERIAL_MANAGER_INTERFACE, path);
 -
--	return nfd;
+-	serial_proxy_init(adapter);
+-
+-	return 0;
 -}
 -
--static void server_accept_callback(int fd, uint32_t events, void *user_data)
+-void proxy_unregister(struct btd_adapter *btd_adapter)
 -{
--	struct server *server = user_data;
--	struct client *client;
+-	struct serial_adapter *adapter;
 -
--	if (events & (EPOLLERR | EPOLLHUP))
+-	adapter = find_adapter(adapters, btd_adapter);
+-	if (!adapter)
 -		return;
 -
--	client = malloc(sizeof(*client));
--	if (!client)
--		return;
--
--	memset(client, 0, sizeof(*client));
--
--	client->fd = accept_client(server->fd);
--	if (client->fd < 0) {
--		free(client);
--		return;
--	}
--
--	client->btdev = btdev_create(server->id);
--	if (!client->btdev) {
--		close(client->fd);
--		free(client);
--		return;
--	}
--
--	btdev_set_send_handler(client->btdev, client_write_callback, client);
--
--	if (mainloop_add_fd(client->fd, EPOLLIN, client_read_callback,
--						client, client_destroy) < 0) {
--		btdev_destroy(client->btdev);
--		close(client->fd);
--		free(client);
--	}
+-	g_dbus_unregister_interface(adapter->conn,
+-			adapter_get_path(btd_adapter),
+-			SERIAL_MANAGER_INTERFACE);
 -}
--
--static int open_server(const char *path)
--{
--	struct sockaddr_un addr;
--	int fd;
--
--	unlink(path);
--
--	fd = socket(PF_UNIX, SOCK_STREAM, 0);
--	if (fd < 0) {
--		perror("Failed to open server socket");
--		return -1;
--	}
--
--	memset(&addr, 0, sizeof(addr));
--	addr.sun_family = AF_UNIX;
--	strcpy(addr.sun_path, path);
--
--	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		perror("Failed to bind server socket");
--		close(fd);
--		return -1;
--	}
--
--	if (listen(fd, 5) < 0) {
--		perror("Failed to listen server socket");
--		close(fd);
--		return -1;
--	}
--
--	return fd;
--}
--
--struct server *server_open_unix(const char *path, uint16_t id)
--{
--	struct server *server;
--
--	server = malloc(sizeof(*server));
--	if (!server)
--		return NULL;
--
--	memset(server, 0, sizeof(*server));
--	server->id = id;
--
--	server->fd = open_server(path);
--	if (server->fd < 0) {
--		free(server);
--		return NULL;
--	}
--
--	if (mainloop_add_fd(server->fd, EPOLLIN, server_accept_callback,
--						server, server_destroy) < 0) {
--		close(server->fd);
--		free(server);
--		return NULL;
--	}
--
--	return server;
--}
--
--void server_close(struct server *server)
--{
--	if (!server)
--		return;
--
--	mainloop_remove_fd(server->fd);
--}
-diff --git a/emulator/server.h b/emulator/server.h
+diff --git a/serial/proxy.h b/serial/proxy.h
 deleted file mode 100644
-index 836db5f..0000000
---- a/emulator/server.h
+index 7871665..0000000
+--- a/serial/proxy.h
 +++ /dev/null
-@@ -1,30 +0,0 @@
+@@ -1,25 +0,0 @@
 -/*
 - *
 - *  BlueZ - Bluetooth protocol stack for Linux
 - *
-- *  Copyright (C) 2011-2012  Intel Corporation
 - *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
 - *
 - *
@@ -1617,1907 +1500,8 @@ index 836db5f..0000000
 - *
 - */
 -
--#include <stdint.h>
--
--struct server;
--
--struct server *server_open_unix(const char *path, uint16_t id);
--void server_close(struct server *server);
-diff --git a/emulator/vhci.c b/emulator/vhci.c
-deleted file mode 100644
-index 940e562..0000000
---- a/emulator/vhci.c
-+++ /dev/null
-@@ -1,133 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011-2012  Intel Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stdio.h>
--#include <errno.h>
--#include <fcntl.h>
--#include <unistd.h>
--#include <stdlib.h>
--#include <string.h>
--
--#include "mainloop.h"
--#include "btdev.h"
--#include "vhci.h"
--
--struct vhci {
--	enum vhci_type type;
--	int fd;
--	struct btdev *btdev;
--};
--
--static void vhci_destroy(void *user_data)
--{
--	struct vhci *vhci = user_data;
--
--	btdev_destroy(vhci->btdev);
--
--	close(vhci->fd);
--
--	free(vhci);
--}
--
--static void vhci_write_callback(const void *data, uint16_t len, void *user_data)
--{
--	struct vhci *vhci = user_data;
--	ssize_t written;
--
--	written = write(vhci->fd, data, len);
--	if (written < 0)
--		return;
--}
--
--static void vhci_read_callback(int fd, uint32_t events, void *user_data)
--{
--	struct vhci *vhci = user_data;
--	unsigned char buf[4096];
--	ssize_t len;
--
--	if (events & (EPOLLERR | EPOLLHUP))
--		return;
--
--	len = read(vhci->fd, buf, sizeof(buf));
--	if (len < 0)
--		return;
--
--	btdev_receive_h4(vhci->btdev, buf, len);
--}
--
--struct vhci *vhci_open(enum vhci_type type, uint16_t id)
--{
--	struct vhci *vhci;
--
--	switch (type) {
--	case VHCI_TYPE_BREDR:
--		break;
--	case VHCI_TYPE_AMP:
--		return NULL;
--	}
--
--	vhci = malloc(sizeof(*vhci));
--	if (!vhci)
--		return NULL;
--
--	memset(vhci, 0, sizeof(*vhci));
--	vhci->type = type;
--
--	vhci->fd = open("/dev/vhci", O_RDWR | O_NONBLOCK);
--	if (vhci->fd < 0) {
--		free(vhci);
--		return NULL;
--	}
--
--	vhci->btdev = btdev_create(id);
--	if (!vhci->btdev) {
--		close(vhci->fd);
--		free(vhci);
--		return NULL;
--	}
--
--	btdev_set_send_handler(vhci->btdev, vhci_write_callback, vhci);
--
--	if (mainloop_add_fd(vhci->fd, EPOLLIN, vhci_read_callback,
--						vhci, vhci_destroy) < 0) {
--		btdev_destroy(vhci->btdev);
--		close(vhci->fd);
--		free(vhci);
--		return NULL;
--	}
--
--	return vhci;
--}
--
--void vhci_close(struct vhci *vhci)
--{
--	if (!vhci)
--		return;
--
--	mainloop_remove_fd(vhci->fd);
--}
-diff --git a/emulator/vhci.h b/emulator/vhci.h
-deleted file mode 100644
-index 4abb183..0000000
---- a/emulator/vhci.h
-+++ /dev/null
-@@ -1,35 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011-2012  Intel Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#include <stdint.h>
--
--enum vhci_type {
--	VHCI_TYPE_BREDR	= 0,
--	VHCI_TYPE_AMP	= 1,
--};
--
--struct vhci;
--
--struct vhci *vhci_open(enum vhci_type type, uint16_t id);
--void vhci_close(struct vhci *vhci);
-diff --git a/tools/emulator/btdev.c b/tools/emulator/btdev.c
-new file mode 100644
-index 0000000..7d4517a
---- /dev/null
-+++ b/tools/emulator/btdev.c
-@@ -0,0 +1,1076 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011-2012  Intel Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <ctype.h>
-+#include <stdlib.h>
-+#include <string.h>
-+
-+#include "bt.h"
-+#include "btdev.h"
-+
-+#define le16_to_cpu(val) (val)
-+#define cpu_to_le16(val) (val)
-+
-+struct btdev {
-+	struct btdev *conn;
-+
-+	btdev_send_func send_handler;
-+	void *send_data;
-+
-+        uint16_t manufacturer;
-+        uint8_t  version;
-+	uint16_t revision;
-+	uint8_t  commands[64];
-+	uint8_t  features[8];
-+	uint16_t acl_mtu;
-+	uint16_t acl_max_pkt;
-+	uint8_t  country_code;
-+	uint8_t  bdaddr[6];
-+	uint8_t  le_features[8];
-+	uint8_t  le_states[8];
-+
-+	uint16_t default_link_policy;
-+	uint8_t  event_mask[8];
-+	uint8_t  event_filter;
-+	uint8_t  name[248];
-+	uint8_t  dev_class[3];
-+	uint16_t voice_setting;
-+	uint16_t conn_accept_timeout;
-+	uint16_t page_timeout;
-+	uint8_t  scan_enable;
-+	uint8_t  auth_enable;
-+	uint8_t  inquiry_mode;
-+	uint8_t  afh_assess_mode;
-+	uint8_t  ext_inquiry_fec;
-+	uint8_t  ext_inquiry_rsp[240];
-+	uint8_t  simple_pairing_mode;
-+	uint8_t  le_supported;
-+	uint8_t  le_simultaneous;
-+	uint8_t  le_event_mask[8];
-+};
-+
-+#define MAX_BTDEV_ENTRIES 16
-+
-+static struct btdev *btdev_list[MAX_BTDEV_ENTRIES] = { };
-+
-+static inline int add_btdev(struct btdev *btdev)
-+{
-+	int i, index = -1;
-+
-+	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
-+		if (btdev_list[i] == NULL) {
-+			index = i;
-+			btdev_list[index] = btdev;
-+			break;
-+		}
-+	}
-+
-+	return index;
-+}
-+
-+static inline int del_btdev(struct btdev *btdev)
-+{
-+	int i, index = -1;
-+
-+	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
-+		if (btdev_list[i] == btdev) {
-+			index = i;
-+			btdev_list[index] = NULL;
-+			break;
-+		}
-+	}
-+
-+	return index;
-+}
-+
-+static inline struct btdev *find_btdev_by_bdaddr(const uint8_t *bdaddr)
-+{
-+	int i;
-+
-+	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
-+		if (btdev_list[i] && !memcmp(btdev_list[i]->bdaddr, bdaddr, 6))
-+			return btdev_list[i];
-+	}
-+
-+	return NULL;
-+}
-+
-+static void hexdump(const unsigned char *buf, uint16_t len)
-+{
-+	static const char hexdigits[] = "0123456789abcdef";
-+	char str[68];
-+	uint16_t i;
-+
-+	if (!len)
-+		return;
-+
-+	for (i = 0; i < len; i++) {
-+		str[((i % 16) * 3) + 0] = hexdigits[buf[i] >> 4];
-+		str[((i % 16) * 3) + 1] = hexdigits[buf[i] & 0xf];
-+		str[((i % 16) * 3) + 2] = ' ';
-+		str[(i % 16) + 49] = isprint(buf[i]) ? buf[i] : '.';
-+
-+		if ((i + 1) % 16 == 0) {
-+			str[47] = ' ';
-+			str[48] = ' ';
-+			str[65] = '\0';
-+			printf("%-12c%s\n", ' ', str);
-+			str[0] = ' ';
-+		}
-+	}
-+
-+	if (i % 16 > 0) {
-+		uint16_t j;
-+		for (j = (i % 16); j < 16; j++) {
-+			str[(j * 3) + 0] = ' ';
-+			str[(j * 3) + 1] = ' ';
-+			str[(j * 3) + 2] = ' ';
-+			str[j + 49] = ' ';
-+		}
-+		str[47] = ' ';
-+		str[48] = ' ';
-+		str[65] = '\0';
-+		printf("%-12c%s\n", ' ', str);
-+	}
-+}
-+
-+static void get_bdaddr(uint16_t id, uint8_t *bdaddr)
-+{
-+	bdaddr[0] = id & 0xff;
-+	bdaddr[1] = id >> 8;
-+	bdaddr[2] = 0x00;
-+	bdaddr[3] = 0x01;
-+	bdaddr[4] = 0xaa;
-+	bdaddr[5] = 0x00;
-+}
-+
-+struct btdev *btdev_create(uint16_t id)
-+{
-+	struct btdev *btdev;
-+
-+	btdev = malloc(sizeof(*btdev));
-+	if (!btdev)
-+		return NULL;
-+
-+	memset(btdev, 0, sizeof(*btdev));
-+
-+	btdev->manufacturer = 63;
-+	btdev->version = 0x06;
-+	btdev->revision = 0x0000;
-+
-+	btdev->features[0] |= 0x04;	/* Encryption */
-+	btdev->features[0] |= 0x20;	/* Role switch */
-+	btdev->features[0] |= 0x80;	/* Sniff mode */
-+	btdev->features[1] |= 0x08;	/* SCO link */
-+	btdev->features[3] |= 0x40;	/* RSSI with inquiry results */
-+	btdev->features[3] |= 0x80;	/* Extended SCO link */
-+	btdev->features[4] |= 0x08;	/* AFH capable slave */
-+	btdev->features[4] |= 0x10;	/* AFH classification slave */
-+	btdev->features[4] |= 0x40;	/* LE Supported */
-+	btdev->features[5] |= 0x02;	/* Sniff subrating */
-+	btdev->features[5] |= 0x04;	/* Pause encryption */
-+	btdev->features[5] |= 0x08;	/* AFH capable master */
-+	btdev->features[5] |= 0x10;	/* AFH classification master */
-+	btdev->features[6] |= 0x01;	/* Extended Inquiry Response */
-+	btdev->features[6] |= 0x02;	/* Simultaneous LE and BR/EDR */
-+	btdev->features[6] |= 0x08;	/* Secure Simple Pairing */
-+	btdev->features[6] |= 0x10;	/* Encapsulated PDU */
-+	btdev->features[6] |= 0x20;	/* Erroneous Data Reporting */
-+	btdev->features[6] |= 0x40;	/* Non-flushable Packet Boundary Flag */
-+	btdev->features[7] |= 0x01;	/* Link Supervision Timeout Event */
-+	btdev->features[7] |= 0x02;	/* Inquiry TX Power Level */
-+	btdev->features[7] |= 0x80;	/* Extended features */
-+
-+	btdev->acl_mtu = 192;
-+	btdev->acl_max_pkt = 1;
-+
-+	btdev->country_code = 0x00;
-+
-+	get_bdaddr(id, btdev->bdaddr);
-+
-+	add_btdev(btdev);
-+
-+	return btdev;
-+}
-+
-+void btdev_destroy(struct btdev *btdev)
-+{
-+	if (!btdev)
-+		return;
-+
-+	del_btdev(btdev);
-+
-+	free(btdev);
-+}
-+
-+void btdev_set_send_handler(struct btdev *btdev, btdev_send_func handler,
-+							void *user_data)
-+{
-+	if (!btdev)
-+		return;
-+
-+	btdev->send_handler = handler;
-+	btdev->send_data = user_data;
-+}
-+
-+static void send_packet(struct btdev *btdev, const void *data, uint16_t len)
-+{
-+	if (!btdev->send_handler)
-+		return;
-+
-+	btdev->send_handler(data, len, btdev->send_data);
-+}
-+
-+static void send_event(struct btdev *btdev, uint8_t event,
-+						const void *data, uint8_t len)
-+{
-+	struct bt_hci_evt_hdr *hdr;
-+	uint16_t pkt_len;
-+	void *pkt_data;
-+
-+	pkt_len = 1 + sizeof(*hdr) + len;
-+
-+	pkt_data = malloc(pkt_len);
-+	if (!pkt_data)
-+		return;
-+
-+	((uint8_t *) pkt_data)[0] = BT_H4_EVT_PKT;
-+
-+	hdr = pkt_data + 1;
-+	hdr->evt = event;
-+	hdr->plen = len;
-+
-+	if (len > 0)
-+		memcpy(pkt_data + 1 + sizeof(*hdr), data, len);
-+
-+	send_packet(btdev, pkt_data, pkt_len);
-+
-+	free(pkt_data);
-+}
-+
-+static void cmd_complete(struct btdev *btdev, uint16_t opcode,
-+						const void *data, uint8_t len)
-+{
-+	struct bt_hci_evt_hdr *hdr;
-+	struct bt_hci_evt_cmd_complete *cc;
-+	uint16_t pkt_len;
-+	void *pkt_data;
-+
-+	pkt_len = 1 + sizeof(*hdr) + sizeof(*cc) + len;
-+
-+	pkt_data = malloc(pkt_len);
-+	if (!pkt_data)
-+		return;
-+
-+	((uint8_t *) pkt_data)[0] = BT_H4_EVT_PKT;
-+
-+	hdr = pkt_data + 1;
-+	hdr->evt = BT_HCI_EVT_CMD_COMPLETE;
-+	hdr->plen = sizeof(*cc) + len;
-+
-+	cc = pkt_data + 1 + sizeof(*hdr);
-+	cc->ncmd = 0x01;
-+	cc->opcode = cpu_to_le16(opcode);
-+
-+	if (len > 0)
-+		memcpy(pkt_data + 1 + sizeof(*hdr) + sizeof(*cc), data, len);
-+
-+	send_packet(btdev, pkt_data, pkt_len);
-+
-+	free(pkt_data);
-+}
-+
-+static void cmd_status(struct btdev *btdev, uint8_t status, uint16_t opcode)
-+{
-+	struct bt_hci_evt_cmd_status cs;
-+
-+	cs.status = status;
-+	cs.ncmd = 0x01;
-+	cs.opcode = cpu_to_le16(opcode);
-+
-+	send_event(btdev, BT_HCI_EVT_CMD_STATUS, &cs, sizeof(cs));
-+}
-+
-+static void num_completed_packets(struct btdev *btdev)
-+{
-+	if (btdev->conn) {
-+		struct bt_hci_evt_num_completed_packets ncp;
-+
-+		ncp.num_handles = 1;
-+		ncp.handle = cpu_to_le16(42);
-+		ncp.count = cpu_to_le16(1);
-+
-+		send_event(btdev, BT_HCI_EVT_NUM_COMPLETED_PACKETS,
-+							&ncp, sizeof(ncp));
-+	}
-+}
-+
-+static void inquiry_complete(struct btdev *btdev, uint8_t status)
-+{
-+	struct bt_hci_evt_inquiry_complete ic;
-+	int i;
-+
-+	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
-+		if (!btdev_list[i] || btdev_list[i] == btdev)
-+			continue;
-+
-+		if (!(btdev_list[i]->scan_enable & 0x02))
-+			continue;
-+
-+		if (btdev->inquiry_mode == 0x02 &&
-+					btdev_list[i]->ext_inquiry_rsp[0]) {
-+			struct bt_hci_evt_ext_inquiry_result ir;
-+
-+			ir.num_resp = 0x01;
-+			memcpy(ir.bdaddr, btdev_list[i]->bdaddr, 6);
-+			memcpy(ir.dev_class, btdev_list[i]->dev_class, 3);
-+			ir.rssi = -60;
-+			memcpy(ir.data, btdev_list[i]->ext_inquiry_rsp, 240);
-+
-+			send_event(btdev, BT_HCI_EVT_EXT_INQUIRY_RESULT,
-+							&ir, sizeof(ir));
-+			continue;
-+		}
-+
-+		if (btdev->inquiry_mode > 0x00) {
-+			struct bt_hci_evt_inquiry_result_with_rssi ir;
-+
-+			ir.num_resp = 0x01;
-+			memcpy(ir.bdaddr, btdev_list[i]->bdaddr, 6);
-+			memcpy(ir.dev_class, btdev_list[i]->dev_class, 3);
-+			ir.rssi = -60;
-+
-+			send_event(btdev, BT_HCI_EVT_INQUIRY_RESULT_WITH_RSSI,
-+							&ir, sizeof(ir));
-+		} else {
-+			struct bt_hci_evt_inquiry_result ir;
-+
-+			ir.num_resp = 0x01;
-+			memcpy(ir.bdaddr, btdev_list[i]->bdaddr, 6);
-+			memcpy(ir.dev_class, btdev_list[i]->dev_class, 3);
-+
-+			send_event(btdev, BT_HCI_EVT_INQUIRY_RESULT,
-+							&ir, sizeof(ir));
-+		}
-+        }
-+
-+	ic.status = status;
-+
-+	send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
-+}
-+
-+static void conn_complete(struct btdev *btdev,
-+					const uint8_t *bdaddr, uint8_t status)
-+{
-+	struct bt_hci_evt_conn_complete cc;
-+
-+	if (!status) {
-+		struct btdev *remote = find_btdev_by_bdaddr(bdaddr);
-+
-+		btdev->conn = remote;
-+		remote->conn = btdev;
-+
-+		cc.status = status;
-+		memcpy(cc.bdaddr, btdev->bdaddr, 6);
-+		cc.encr_mode = 0x00;
-+
-+		cc.handle = cpu_to_le16(42);
-+		cc.link_type = 0x01;
-+
-+		send_event(remote, BT_HCI_EVT_CONN_COMPLETE, &cc, sizeof(cc));
-+
-+		cc.handle = cpu_to_le16(42);
-+		cc.link_type = 0x01;
-+	} else {
-+		cc.handle = cpu_to_le16(0x0000);
-+		cc.link_type = 0x01;
-+	}
-+
-+	cc.status = status;
-+	memcpy(cc.bdaddr, bdaddr, 6);
-+	cc.encr_mode = 0x00;
-+
-+	send_event(btdev, BT_HCI_EVT_CONN_COMPLETE, &cc, sizeof(cc));
-+}
-+
-+static void conn_request(struct btdev *btdev, const uint8_t *bdaddr)
-+{
-+	struct btdev *remote = find_btdev_by_bdaddr(bdaddr);
-+
-+	if (remote) {
-+		if (remote->scan_enable & 0x01) {
-+			struct bt_hci_evt_conn_request cr;
-+
-+			memcpy(cr.bdaddr, btdev->bdaddr, 6);
-+			memcpy(cr.dev_class, btdev->dev_class, 3);
-+			cr.link_type = 0x01;
-+
-+			send_event(remote, BT_HCI_EVT_CONN_REQUEST,
-+							&cr, sizeof(cr));
-+		} else
-+			conn_complete(btdev, bdaddr, BT_HCI_ERR_PAGE_TIMEOUT);
-+	} else
-+		conn_complete(btdev, bdaddr, BT_HCI_ERR_UNKNOWN_CONN_ID);
-+}
-+
-+static void disconnect_complete(struct btdev *btdev, uint16_t handle,
-+							uint8_t reason)
-+{
-+	struct bt_hci_evt_disconnect_complete dc;
-+	struct btdev *remote;
-+
-+	if (!btdev) {
-+		dc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
-+		dc.handle = cpu_to_le16(handle);
-+		dc.reason = 0x00;
-+
-+		send_event(btdev, BT_HCI_EVT_DISCONNECT_COMPLETE,
-+							&dc, sizeof(dc));
-+		return;
-+	}
-+
-+	dc.status = BT_HCI_ERR_SUCCESS;
-+	dc.handle = cpu_to_le16(handle);
-+	dc.reason = reason;
-+
-+	remote = btdev->conn;
-+
-+	btdev->conn = NULL;
-+	remote->conn = NULL;
-+
-+	send_event(btdev, BT_HCI_EVT_DISCONNECT_COMPLETE, &dc, sizeof(dc));
-+	send_event(remote, BT_HCI_EVT_DISCONNECT_COMPLETE, &dc, sizeof(dc));
-+}
-+
-+static void name_request_complete(struct btdev *btdev,
-+					const uint8_t *bdaddr, uint8_t status)
-+{
-+        struct bt_hci_evt_remote_name_req_complete nc;
-+
-+	nc.status = status;
-+	memcpy(nc.bdaddr, bdaddr, 6);
-+	memset(nc.name, 0, 248);
-+
-+	if (!status) {
-+		struct btdev *remote = find_btdev_by_bdaddr(bdaddr);
-+
-+		if (remote)
-+			memcpy(nc.name, remote->name, 248);
-+		else
-+			nc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
-+	}
-+
-+	send_event(btdev, BT_HCI_EVT_REMOTE_NAME_REQUEST_COMPLETE,
-+							&nc, sizeof(nc));
-+}
-+
-+static void remote_features_complete(struct btdev *btdev, uint16_t handle)
-+{
-+	struct bt_hci_evt_remote_features_complete rfc;
-+
-+	if (btdev->conn) {
-+		rfc.status = BT_HCI_ERR_SUCCESS;
-+		rfc.handle = cpu_to_le16(handle);
-+		memcpy(rfc.features, btdev->conn->features, 8);
-+	} else {
-+		rfc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
-+		rfc.handle = cpu_to_le16(handle);
-+		memset(rfc.features, 0, 8);
-+	}
-+
-+	send_event(btdev, BT_HCI_EVT_REMOTE_FEATURES_COMPLETE,
-+							&rfc, sizeof(rfc));
-+}
-+
-+static void remote_ext_features_complete(struct btdev *btdev, uint16_t handle,
-+								uint8_t page)
-+{
-+	struct bt_hci_evt_remote_ext_features_complete refc;
-+
-+	if (btdev->conn && page < 0x02) {
-+		refc.handle = cpu_to_le16(handle);
-+		refc.page = page;
-+		refc.max_page = 0x01;
-+
-+		switch (page) {
-+		case 0x00:
-+			refc.status = BT_HCI_ERR_SUCCESS;
-+			memcpy(refc.features, btdev->conn->features, 8);
-+			break;
-+		case 0x01:
-+			refc.status = BT_HCI_ERR_SUCCESS;
-+			memset(refc.features, 0, 8);
-+			break;
-+		default:
-+			refc.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+			memset(refc.features, 0, 8);
-+			break;
-+		}
-+	} else {
-+		refc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
-+		refc.handle = cpu_to_le16(handle);
-+		refc.page = page;
-+		refc.max_page = 0x01;
-+		memset(refc.features, 0, 8);
-+	}
-+
-+	send_event(btdev, BT_HCI_EVT_REMOTE_EXT_FEATURES_COMPLETE,
-+							&refc, sizeof(refc));
-+}
-+
-+static void remote_version_complete(struct btdev *btdev, uint16_t handle)
-+{
-+	struct bt_hci_evt_remote_version_complete rvc;
-+
-+	if (btdev->conn) {
-+		rvc.status = BT_HCI_ERR_SUCCESS;
-+		rvc.handle = cpu_to_le16(handle);
-+		rvc.lmp_ver = btdev->conn->version;
-+		rvc.manufacturer = cpu_to_le16(btdev->conn->manufacturer);
-+		rvc.lmp_subver = cpu_to_le16(btdev->conn->revision);
-+	} else {
-+		rvc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
-+		rvc.handle = cpu_to_le16(handle);
-+		rvc.lmp_ver = 0x00;
-+		rvc.manufacturer = cpu_to_le16(0);
-+		rvc.lmp_subver = cpu_to_le16(0);
-+	}
-+
-+	send_event(btdev, BT_HCI_EVT_REMOTE_VERSION_COMPLETE,
-+							&rvc, sizeof(rvc));
-+}
-+
-+static void process_cmd(struct btdev *btdev, const void *data, uint16_t len)
-+{
-+	const struct bt_hci_cmd_hdr *hdr = data;
-+	const struct bt_hci_cmd_create_conn *cc;
-+	const struct bt_hci_cmd_disconnect *dc;
-+	const struct bt_hci_cmd_create_conn_cancel *ccc;
-+	const struct bt_hci_cmd_accept_conn_request *acr;
-+	const struct bt_hci_cmd_reject_conn_request *rcr;
-+	const struct bt_hci_cmd_remote_name_request *rnr;
-+	const struct bt_hci_cmd_remote_name_request_cancel *rnrc;
-+	const struct bt_hci_cmd_read_remote_features *rrf;
-+	const struct bt_hci_cmd_read_remote_ext_features *rref;
-+	const struct bt_hci_cmd_read_remote_version *rrv;
-+	const struct bt_hci_cmd_write_default_link_policy *wdlp;
-+	const struct bt_hci_cmd_set_event_mask *sem;
-+	const struct bt_hci_cmd_set_event_filter *sef;
-+	const struct bt_hci_cmd_write_local_name *wln;
-+	const struct bt_hci_cmd_write_conn_accept_timeout *wcat;
-+	const struct bt_hci_cmd_write_page_timeout *wpt;
-+	const struct bt_hci_cmd_write_scan_enable *wse;
-+	const struct bt_hci_cmd_write_auth_enable *wae;
-+	const struct bt_hci_cmd_write_class_of_dev *wcod;
-+	const struct bt_hci_cmd_write_voice_setting *wvs;
-+	const struct bt_hci_cmd_write_inquiry_mode *wim;
-+	const struct bt_hci_cmd_write_afh_assess_mode *waam;
-+	const struct bt_hci_cmd_write_ext_inquiry_rsp *weir;
-+	const struct bt_hci_cmd_write_simple_pairing_mode *wspm;
-+	const struct bt_hci_cmd_write_le_host_supported *wlhs;
-+	const struct bt_hci_cmd_le_set_event_mask *lsem;
-+	struct bt_hci_rsp_read_default_link_policy rdlp;
-+	struct bt_hci_rsp_read_stored_link_key rslk;
-+	struct bt_hci_rsp_write_stored_link_key wslk;
-+	struct bt_hci_rsp_delete_stored_link_key dslk;
-+	struct bt_hci_rsp_read_local_name rln;
-+	struct bt_hci_rsp_read_conn_accept_timeout rcat;
-+	struct bt_hci_rsp_read_page_timeout rpt;
-+	struct bt_hci_rsp_read_scan_enable rse;
-+	struct bt_hci_rsp_read_auth_enable rae;
-+	struct bt_hci_rsp_read_class_of_dev rcod;
-+	struct bt_hci_rsp_read_voice_setting rvs;
-+	struct bt_hci_rsp_read_inquiry_mode rim;
-+	struct bt_hci_rsp_read_afh_assess_mode raam;
-+	struct bt_hci_rsp_read_ext_inquiry_rsp reir;
-+	struct bt_hci_rsp_read_simple_pairing_mode rspm;
-+	struct bt_hci_rsp_read_inquiry_rsp_tx_power rirtp;
-+	struct bt_hci_rsp_read_le_host_supported rlhs;
-+	struct bt_hci_rsp_read_local_version rlv;
-+	struct bt_hci_rsp_read_local_commands rlc;
-+	struct bt_hci_rsp_read_local_features rlf;
-+	struct bt_hci_rsp_read_local_ext_features rlef;
-+	struct bt_hci_rsp_read_buffer_size rbs;
-+	struct bt_hci_rsp_read_country_code rcc;
-+	struct bt_hci_rsp_read_bd_addr rba;
-+	struct bt_hci_rsp_read_data_block_size rdbs;
-+	struct bt_hci_rsp_le_read_buffer_size lrbs;
-+	struct bt_hci_rsp_le_read_local_features lrlf;
-+	struct bt_hci_rsp_le_read_supported_states lrss;
-+	uint16_t opcode;
-+	uint8_t status, page;
-+
-+	if (len < sizeof(*hdr))
-+		return;
-+
-+	opcode = le16_to_cpu(hdr->opcode);
-+
-+	switch (opcode) {
-+	case BT_HCI_CMD_INQUIRY:
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		inquiry_complete(btdev, BT_HCI_ERR_SUCCESS);
-+		break;
-+
-+	case BT_HCI_CMD_INQUIRY_CANCEL:
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_CREATE_CONN:
-+		cc = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		conn_request(btdev, cc->bdaddr);
-+		break;
-+
-+	case BT_HCI_CMD_DISCONNECT:
-+		dc = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		disconnect_complete(btdev, le16_to_cpu(dc->handle), dc->reason);
-+		break;
-+
-+	case BT_HCI_CMD_CREATE_CONN_CANCEL:
-+		ccc = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		conn_complete(btdev, ccc->bdaddr, BT_HCI_ERR_UNKNOWN_CONN_ID);
-+		break;
-+
-+	case BT_HCI_CMD_ACCEPT_CONN_REQUEST:
-+		acr = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		conn_complete(btdev, acr->bdaddr, BT_HCI_ERR_SUCCESS);
-+		break;
-+
-+	case BT_HCI_CMD_REJECT_CONN_REQUEST:
-+		rcr = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		conn_complete(btdev, rcr->bdaddr, BT_HCI_ERR_UNKNOWN_CONN_ID);
-+		break;
-+
-+	case BT_HCI_CMD_REMOTE_NAME_REQUEST:
-+		rnr = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		name_request_complete(btdev, rnr->bdaddr, BT_HCI_ERR_SUCCESS);
-+		break;
-+
-+	case BT_HCI_CMD_REMOTE_NAME_REQUEST_CANCEL:
-+		rnrc = data + sizeof(*hdr);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		name_request_complete(btdev, rnrc->bdaddr,
-+						BT_HCI_ERR_UNKNOWN_CONN_ID);
-+		break;
-+
-+	case BT_HCI_CMD_READ_REMOTE_FEATURES:
-+		rrf = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		remote_features_complete(btdev, le16_to_cpu(rrf->handle));
-+		break;
-+
-+	case BT_HCI_CMD_READ_REMOTE_EXT_FEATURES:
-+		rref = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		remote_ext_features_complete(btdev, le16_to_cpu(rref->handle),
-+								rref->page);
-+		break;
-+
-+	case BT_HCI_CMD_READ_REMOTE_VERSION:
-+		rrv = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		remote_version_complete(btdev, le16_to_cpu(rrv->handle));
-+		break;
-+
-+	case BT_HCI_CMD_READ_DEFAULT_LINK_POLICY:
-+		rdlp.status = BT_HCI_ERR_SUCCESS;
-+		rdlp.policy = cpu_to_le16(btdev->default_link_policy);
-+		cmd_complete(btdev, opcode, &rdlp, sizeof(rdlp));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_DEFAULT_LINK_POLICY:
-+		wdlp = data + sizeof(*hdr);
-+		btdev->default_link_policy = le16_to_cpu(wdlp->policy);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_SET_EVENT_MASK:
-+		sem = data + sizeof(*hdr);
-+		memcpy(btdev->event_mask, sem->mask, 8);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_RESET:
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_SET_EVENT_FILTER:
-+		sef = data + sizeof(*hdr);
-+		btdev->event_filter = sef->type;
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_STORED_LINK_KEY:
-+		rslk.status = BT_HCI_ERR_SUCCESS;
-+		rslk.max_num_keys = cpu_to_le16(0);
-+		rslk.num_keys = cpu_to_le16(0);
-+		cmd_complete(btdev, opcode, &rslk, sizeof(rslk));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_STORED_LINK_KEY:
-+		wslk.status = BT_HCI_ERR_SUCCESS;
-+		wslk.num_keys = 0;
-+		cmd_complete(btdev, opcode, &wslk, sizeof(wslk));
-+		break;
-+
-+	case BT_HCI_CMD_DELETE_STORED_LINK_KEY:
-+		dslk.status = BT_HCI_ERR_SUCCESS;
-+		dslk.num_keys = cpu_to_le16(0);
-+		cmd_complete(btdev, opcode, &dslk, sizeof(dslk));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_LOCAL_NAME:
-+		wln = data + sizeof(*hdr);
-+		memcpy(btdev->name, wln->name, 248);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_LOCAL_NAME:
-+		rln.status = BT_HCI_ERR_SUCCESS;
-+		memcpy(rln.name, btdev->name, 248);
-+		cmd_complete(btdev, opcode, &rln, sizeof(rln));
-+		break;
-+
-+	case BT_HCI_CMD_READ_CONN_ACCEPT_TIMEOUT:
-+		rcat.status = BT_HCI_ERR_SUCCESS;
-+		rcat.timeout = cpu_to_le16(btdev->conn_accept_timeout);
-+		cmd_complete(btdev, opcode, &rcat, sizeof(rcat));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_CONN_ACCEPT_TIMEOUT:
-+		wcat = data + sizeof(*hdr);
-+		btdev->conn_accept_timeout = le16_to_cpu(wcat->timeout);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_PAGE_TIMEOUT:
-+		rpt.status = BT_HCI_ERR_SUCCESS;
-+		rpt.timeout = cpu_to_le16(btdev->page_timeout);
-+		cmd_complete(btdev, opcode, &rpt, sizeof(rpt));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_PAGE_TIMEOUT:
-+		wpt = data + sizeof(*hdr);
-+		btdev->page_timeout = le16_to_cpu(wpt->timeout);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_SCAN_ENABLE:
-+		rse.status = BT_HCI_ERR_SUCCESS;
-+		rse.enable = btdev->scan_enable;
-+		cmd_complete(btdev, opcode, &rse, sizeof(rse));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_SCAN_ENABLE:
-+		wse = data + sizeof(*hdr);
-+		btdev->scan_enable = wse->enable;
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_AUTH_ENABLE:
-+		rae.status = BT_HCI_ERR_SUCCESS;
-+		rae.enable = btdev->auth_enable;
-+		cmd_complete(btdev, opcode, &rae, sizeof(rae));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_AUTH_ENABLE:
-+		wae = data + sizeof(*hdr);
-+		btdev->auth_enable = wae->enable;
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_CLASS_OF_DEV:
-+		rcod.status = BT_HCI_ERR_SUCCESS;
-+		memcpy(rcod.dev_class, btdev->dev_class, 3);
-+		cmd_complete(btdev, opcode, &rcod, sizeof(rcod));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_CLASS_OF_DEV:
-+		wcod = data + sizeof(*hdr);
-+		memcpy(btdev->dev_class, wcod->dev_class, 3);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_VOICE_SETTING:
-+		rvs.status = BT_HCI_ERR_SUCCESS;
-+		rvs.setting = cpu_to_le16(btdev->voice_setting);
-+		cmd_complete(btdev, opcode, &rvs, sizeof(rvs));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_VOICE_SETTING:
-+		wvs = data + sizeof(*hdr);
-+		btdev->voice_setting = le16_to_cpu(wvs->setting);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_INQUIRY_MODE:
-+		rim.status = BT_HCI_ERR_SUCCESS;
-+		rim.mode = btdev->inquiry_mode;
-+		cmd_complete(btdev, opcode, &rim, sizeof(rim));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_INQUIRY_MODE:
-+		wim = data + sizeof(*hdr);
-+		btdev->inquiry_mode = wim->mode;
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_AFH_ASSESS_MODE:
-+		raam.status = BT_HCI_ERR_SUCCESS;
-+		raam.mode = btdev->afh_assess_mode;
-+		cmd_complete(btdev, opcode, &raam, sizeof(raam));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_AFH_ASSESS_MODE:
-+		waam = data + sizeof(*hdr);
-+		btdev->afh_assess_mode = waam->mode;
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_EXT_INQUIRY_RSP:
-+		reir.status = BT_HCI_ERR_SUCCESS;
-+		reir.fec = btdev->ext_inquiry_fec;
-+		memcpy(reir.data, btdev->ext_inquiry_rsp, 240);
-+		cmd_complete(btdev, opcode, &reir, sizeof(reir));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_EXT_INQUIRY_RSP:
-+		weir = data + sizeof(*hdr);
-+		btdev->ext_inquiry_fec = weir->fec;
-+		memcpy(btdev->ext_inquiry_rsp, weir->data, 240);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_SIMPLE_PAIRING_MODE:
-+		rspm.status = BT_HCI_ERR_SUCCESS;
-+		rspm.mode = btdev->simple_pairing_mode;
-+		cmd_complete(btdev, opcode, &rspm, sizeof(rspm));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_SIMPLE_PAIRING_MODE:
-+		wspm = data + sizeof(*hdr);
-+		btdev->simple_pairing_mode = wspm->mode;
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_INQUIRY_RSP_TX_POWER:
-+		rirtp.status = BT_HCI_ERR_SUCCESS;
-+		rirtp.level = 0;
-+		cmd_complete(btdev, opcode, &rirtp, sizeof(rirtp));
-+		break;
-+
-+	case BT_HCI_CMD_READ_LE_HOST_SUPPORTED:
-+		rlhs.status = BT_HCI_ERR_SUCCESS;
-+		rlhs.supported = btdev->le_supported;
-+		rlhs.simultaneous = btdev->le_simultaneous;
-+		cmd_complete(btdev, opcode, &rlhs, sizeof(rlhs));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_LE_HOST_SUPPORTED:
-+		wlhs = data + sizeof(*hdr);
-+		btdev->le_supported = wlhs->supported;
-+		btdev->le_simultaneous = wlhs->simultaneous;
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_LOCAL_VERSION:
-+		rlv.status = BT_HCI_ERR_SUCCESS;
-+		rlv.hci_ver = btdev->version;
-+		rlv.hci_rev = cpu_to_le16(btdev->revision);
-+		rlv.lmp_ver = btdev->version;
-+		rlv.manufacturer = cpu_to_le16(btdev->manufacturer);
-+		rlv.lmp_subver = cpu_to_le16(btdev->revision);
-+		cmd_complete(btdev, opcode, &rlv, sizeof(rlv));
-+		break;
-+
-+	case BT_HCI_CMD_READ_LOCAL_COMMANDS:
-+		rlc.status = BT_HCI_ERR_SUCCESS;
-+		memcpy(rlc.commands, btdev->commands, 64);
-+		cmd_complete(btdev, opcode, &rlc, sizeof(rlc));
-+		break;
-+
-+	case BT_HCI_CMD_READ_LOCAL_FEATURES:
-+		rlf.status = BT_HCI_ERR_SUCCESS;
-+		memcpy(rlf.features, btdev->features, 8);
-+		cmd_complete(btdev, opcode, &rlf, sizeof(rlf));
-+		break;
-+
-+	case BT_HCI_CMD_READ_LOCAL_EXT_FEATURES:
-+		page = ((const uint8_t *) data)[sizeof(*hdr)];
-+		switch (page) {
-+		case 0x00:
-+			rlef.status = BT_HCI_ERR_SUCCESS;
-+			rlef.page = 0x00;
-+			rlef.max_page = 0x01;
-+			memcpy(rlef.features, btdev->features, 8);
-+			break;
-+		case 0x01:
-+			rlef.status = BT_HCI_ERR_SUCCESS;
-+			rlef.page = 0x01;
-+			rlef.max_page = 0x01;
-+			memset(rlef.features, 0, 8);
-+			if (btdev->simple_pairing_mode)
-+				rlef.features[0] |= 0x01;
-+			if (btdev->le_supported)
-+				rlef.features[0] |= 0x02;
-+			if (btdev->le_simultaneous)
-+				rlef.features[0] |= 0x04;
-+			break;
-+		default:
-+			rlef.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+			rlef.page = page;
-+			rlef.max_page = 0x01;
-+			memset(rlef.features, 0, 8);
-+			break;
-+		}
-+		cmd_complete(btdev, opcode, &rlef, sizeof(rlef));
-+		break;
-+
-+	case BT_HCI_CMD_READ_BUFFER_SIZE:
-+		rbs.status = BT_HCI_ERR_SUCCESS;
-+		rbs.acl_mtu = cpu_to_le16(btdev->acl_mtu);
-+		rbs.sco_mtu = 0;
-+		rbs.acl_max_pkt = cpu_to_le16(btdev->acl_max_pkt);
-+		rbs.sco_max_pkt = cpu_to_le16(0);
-+		cmd_complete(btdev, opcode, &rbs, sizeof(rbs));
-+		break;
-+
-+	case BT_HCI_CMD_READ_COUNTRY_CODE:
-+		rcc.status = BT_HCI_ERR_SUCCESS;
-+		rcc.code = btdev->country_code;
-+		cmd_complete(btdev, opcode, &rcc, sizeof(rcc));
-+		break;
-+
-+	case BT_HCI_CMD_READ_BD_ADDR:
-+		rba.status = BT_HCI_ERR_SUCCESS;
-+		memcpy(rba.bdaddr, btdev->bdaddr, 6);
-+		cmd_complete(btdev, opcode, &rba, sizeof(rba));
-+		break;
-+
-+	case BT_HCI_CMD_READ_DATA_BLOCK_SIZE:
-+		rdbs.status = BT_HCI_ERR_SUCCESS;
-+		rdbs.max_acl_len = cpu_to_le16(btdev->acl_mtu);
-+		rdbs.block_len = cpu_to_le16(btdev->acl_mtu);
-+		rdbs.num_blocks = cpu_to_le16(btdev->acl_max_pkt);
-+		cmd_complete(btdev, opcode, &rdbs, sizeof(rdbs));
-+		break;
-+
-+	case BT_HCI_CMD_LE_SET_EVENT_MASK:
-+		lsem = data + sizeof(*hdr);
-+		memcpy(btdev->le_event_mask, lsem->mask, 8);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_LE_READ_BUFFER_SIZE:
-+		lrbs.status = BT_HCI_ERR_SUCCESS;
-+		lrbs.le_mtu = cpu_to_le16(btdev->acl_mtu);
-+		lrbs.le_max_pkt = btdev->acl_max_pkt;
-+		cmd_complete(btdev, opcode, &lrbs, sizeof(lrbs));
-+		break;
-+
-+	case BT_HCI_CMD_LE_READ_LOCAL_FEATURES:
-+		lrlf.status = BT_HCI_ERR_SUCCESS;
-+		memcpy(lrlf.features, btdev->le_features, 8);
-+		cmd_complete(btdev, opcode, &lrlf, sizeof(lrlf));
-+		break;
-+
-+	case BT_HCI_CMD_LE_SET_SCAN_PARAMETERS:
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_LE_SET_SCAN_ENABLE:
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_LE_READ_SUPPORTED_STATES:
-+		lrss.status = BT_HCI_ERR_SUCCESS;
-+		memcpy(lrss.states, btdev->le_states, 8);
-+		cmd_complete(btdev, opcode, &lrss, sizeof(lrss));
-+		break;
-+
-+	default:
-+		printf("Unsupported command 0x%4.4x\n", opcode);
-+		hexdump(data, len);
-+		cmd_status(btdev, BT_HCI_ERR_UNKNOWN_COMMAND, opcode);
-+		break;
-+	}
-+}
-+
-+void btdev_receive_h4(struct btdev *btdev, const void *data, uint16_t len)
-+{
-+	uint8_t pkt_type;
-+
-+	if (!btdev)
-+		return;
-+
-+	if (len < 1)
-+		return;
-+
-+	pkt_type = ((const uint8_t *) data)[0];
-+
-+	switch (pkt_type) {
-+	case BT_H4_CMD_PKT:
-+		process_cmd(btdev, data + 1, len - 1);
-+		break;
-+	case BT_H4_ACL_PKT:
-+		if (btdev->conn)
-+			send_packet(btdev->conn, data, len);
-+		num_completed_packets(btdev);
-+		break;
-+	default:
-+		printf("Unsupported packet 0x%2.2x\n", pkt_type);
-+		break;
-+	}
-+}
-diff --git a/tools/emulator/btdev.h b/tools/emulator/btdev.h
-new file mode 100644
-index 0000000..7b211a2
---- /dev/null
-+++ b/tools/emulator/btdev.h
-@@ -0,0 +1,38 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011-2012  Intel Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <stdint.h>
-+
-+typedef void (*btdev_send_func) (const void *data, uint16_t len,
-+							void *user_data);
-+
-+struct btdev;
-+
-+struct btdev *btdev_create(uint16_t id);
-+void btdev_destroy(struct btdev *btdev);
-+
-+void btdev_set_send_handler(struct btdev *btdev, btdev_send_func handler,
-+							void *user_data);
-+
-+void btdev_receive_h4(struct btdev *btdev, const void *data, uint16_t len);
-diff --git a/tools/emulator/main.c b/tools/emulator/main.c
-new file mode 100644
-index 0000000..125460d
---- /dev/null
-+++ b/tools/emulator/main.c
-@@ -0,0 +1,73 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011-2012  Intel Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+
-+#include "mainloop.h"
-+#include "server.h"
-+#include "vhci.h"
-+
-+static void signal_callback(int signum, void *user_data)
-+{
-+	switch (signum) {
-+	case SIGINT:
-+	case SIGTERM:
-+		mainloop_quit();
-+		break;
-+	}
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct vhci *vhci;
-+	struct server *server;
-+	sigset_t mask;
-+
-+	mainloop_init();
-+
-+	sigemptyset(&mask);
-+	sigaddset(&mask, SIGINT);
-+	sigaddset(&mask, SIGTERM);
-+
-+	mainloop_set_signal(&mask, signal_callback, NULL, NULL);
-+
-+	vhci = vhci_open(VHCI_TYPE_BREDR, 0x23);
-+	if (!vhci) {
-+		fprintf(stderr, "Failed to open Virtual HCI device\n");
-+		return 1;
-+	}
-+
-+	server = server_open_unix("/tmp/bt-server-bredr", 0x42);
-+	if (!server) {
-+		fprintf(stderr, "Failed to open server channel\n");
-+		vhci_close(vhci);
-+		return 1;
-+	}
-+
-+	return mainloop_run();
-+}
-diff --git a/tools/emulator/server.c b/tools/emulator/server.c
-new file mode 100644
-index 0000000..1ff9904
---- /dev/null
-+++ b/tools/emulator/server.c
-@@ -0,0 +1,288 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011-2012  Intel Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <errno.h>
-+#include <ctype.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/epoll.h>
-+#include <sys/ioctl.h>
-+#include <sys/socket.h>
-+#include <sys/un.h>
-+
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/hci.h>
-+
-+#include "mainloop.h"
-+#include "btdev.h"
-+#include "server.h"
-+
-+struct server {
-+	uint16_t id;
-+	int fd;
-+};
-+
-+struct client {
-+	int fd;
-+	struct btdev *btdev;
-+	uint8_t *pkt_data;
-+	uint8_t pkt_type;
-+	uint16_t pkt_expect;
-+	uint16_t pkt_len;
-+	uint16_t pkt_offset;
-+};
-+
-+static void server_destroy(void *user_data)
-+{
-+	struct server *server = user_data;
-+
-+	close(server->fd);
-+
-+	free(server);
-+}
-+
-+static void client_destroy(void *user_data)
-+{
-+	struct client *client = user_data;
-+
-+	btdev_destroy(client->btdev);
-+
-+	close(client->fd);
-+
-+	free(client);
-+}
-+
-+static void client_write_callback(const void *data, uint16_t len,
-+							void *user_data)
-+{
-+	struct client *client = user_data;
-+	ssize_t written;
-+
-+	written = send(client->fd, data, len, MSG_DONTWAIT);
-+	if (written < 0)
-+		return;
-+}
-+
-+static void client_read_callback(int fd, uint32_t events, void *user_data)
-+{
-+	struct client *client = user_data;
-+	static uint8_t buf[4096];
-+	uint8_t *ptr = buf;
-+	ssize_t len;
-+	uint16_t count;
-+
-+	if (events & (EPOLLERR | EPOLLHUP))
-+		return;
-+
-+again:
-+	len = recv(fd, buf + client->pkt_offset,
-+			sizeof(buf) - client->pkt_offset, MSG_DONTWAIT);
-+	if (len < 0) {
-+		if (errno == EAGAIN)
-+			goto again;
-+		return;
-+	}
-+
-+	count = client->pkt_offset + len;
-+
-+	while (count > 0) {
-+		hci_command_hdr *cmd_hdr;
-+
-+		if (!client->pkt_data) {
-+			client->pkt_type = ptr[0];
-+
-+			switch (client->pkt_type) {
-+			case HCI_COMMAND_PKT:
-+				if (count < HCI_COMMAND_HDR_SIZE + 1) {
-+					client->pkt_offset += len;
-+					return;
-+				}
-+				cmd_hdr = (hci_command_hdr *) (ptr + 1);
-+				client->pkt_expect = HCI_COMMAND_HDR_SIZE +
-+							cmd_hdr->plen + 1;
-+				client->pkt_data = malloc(client->pkt_expect);
-+				client->pkt_len = 0;
-+				break;
-+			default:
-+				printf("packet error\n");
-+				return;
-+			}
-+
-+			client->pkt_offset = 0;
-+		}
-+
-+		if (count >= client->pkt_expect) {
-+			memcpy(client->pkt_data + client->pkt_len,
-+						ptr, client->pkt_expect);
-+			ptr += client->pkt_expect;
-+			count -= client->pkt_expect;
-+
-+			btdev_receive_h4(client->btdev, client->pkt_data,
-+					client->pkt_len + client->pkt_expect);
-+
-+			free(client->pkt_data);
-+			client->pkt_data = NULL;
-+		} else {
-+			memcpy(client->pkt_data + client->pkt_len, ptr, count);
-+			client->pkt_len += count;
-+			client->pkt_expect -= count;
-+			count = 0;
-+		}
-+	}
-+}
-+
-+static int accept_client(int fd)
-+{
-+	struct sockaddr_un addr;
-+	socklen_t len;
-+	int nfd;
-+
-+	memset(&addr, 0, sizeof(addr));
-+	len = sizeof(addr);
-+
-+	if (getsockname(fd, (struct sockaddr *) &addr, &len) < 0) {
-+		perror("Failed to get socket name");
-+		return -1;
-+	}
-+
-+	printf("Request for %s\n", addr.sun_path);
-+
-+	nfd = accept(fd, (struct sockaddr *) &addr, &len);
-+	if (nfd < 0) {
-+		perror("Failed to accept client socket");
-+		return -1;
-+	}
-+
-+	return nfd;
-+}
-+
-+static void server_accept_callback(int fd, uint32_t events, void *user_data)
-+{
-+	struct server *server = user_data;
-+	struct client *client;
-+
-+	if (events & (EPOLLERR | EPOLLHUP))
-+		return;
-+
-+	client = malloc(sizeof(*client));
-+	if (!client)
-+		return;
-+
-+	memset(client, 0, sizeof(*client));
-+
-+	client->fd = accept_client(server->fd);
-+	if (client->fd < 0) {
-+		free(client);
-+		return;
-+	}
-+
-+	client->btdev = btdev_create(server->id);
-+	if (!client->btdev) {
-+		close(client->fd);
-+		free(client);
-+		return;
-+	}
-+
-+	btdev_set_send_handler(client->btdev, client_write_callback, client);
-+
-+	if (mainloop_add_fd(client->fd, EPOLLIN, client_read_callback,
-+						client, client_destroy) < 0) {
-+		btdev_destroy(client->btdev);
-+		close(client->fd);
-+		free(client);
-+	}
-+}
-+
-+static int open_server(const char *path)
-+{
-+	struct sockaddr_un addr;
-+	int fd;
-+
-+	unlink(path);
-+
-+	fd = socket(PF_UNIX, SOCK_STREAM, 0);
-+	if (fd < 0) {
-+		perror("Failed to open server socket");
-+		return -1;
-+	}
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.sun_family = AF_UNIX;
-+	strcpy(addr.sun_path, path);
-+
-+	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-+		perror("Failed to bind server socket");
-+		close(fd);
-+		return -1;
-+	}
-+
-+	if (listen(fd, 5) < 0) {
-+		perror("Failed to listen server socket");
-+		close(fd);
-+		return -1;
-+	}
-+
-+	return fd;
-+}
-+
-+struct server *server_open_unix(const char *path, uint16_t id)
-+{
-+	struct server *server;
-+
-+	server = malloc(sizeof(*server));
-+	if (!server)
-+		return NULL;
-+
-+	memset(server, 0, sizeof(*server));
-+	server->id = id;
-+
-+	server->fd = open_server(path);
-+	if (server->fd < 0) {
-+		free(server);
-+		return NULL;
-+	}
-+
-+	if (mainloop_add_fd(server->fd, EPOLLIN, server_accept_callback,
-+						server, server_destroy) < 0) {
-+		close(server->fd);
-+		free(server);
-+		return NULL;
-+	}
-+
-+	return server;
-+}
-+
-+void server_close(struct server *server)
-+{
-+	if (!server)
-+		return;
-+
-+	mainloop_remove_fd(server->fd);
-+}
-diff --git a/tools/emulator/server.h b/tools/emulator/server.h
-new file mode 100644
-index 0000000..836db5f
---- /dev/null
-+++ b/tools/emulator/server.h
-@@ -0,0 +1,30 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011-2012  Intel Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <stdint.h>
-+
-+struct server;
-+
-+struct server *server_open_unix(const char *path, uint16_t id);
-+void server_close(struct server *server);
-diff --git a/tools/emulator/vhci.c b/tools/emulator/vhci.c
-new file mode 100644
-index 0000000..940e562
---- /dev/null
-+++ b/tools/emulator/vhci.c
-@@ -0,0 +1,133 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011-2012  Intel Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <string.h>
-+
-+#include "mainloop.h"
-+#include "btdev.h"
-+#include "vhci.h"
-+
-+struct vhci {
-+	enum vhci_type type;
-+	int fd;
-+	struct btdev *btdev;
-+};
-+
-+static void vhci_destroy(void *user_data)
-+{
-+	struct vhci *vhci = user_data;
-+
-+	btdev_destroy(vhci->btdev);
-+
-+	close(vhci->fd);
-+
-+	free(vhci);
-+}
-+
-+static void vhci_write_callback(const void *data, uint16_t len, void *user_data)
-+{
-+	struct vhci *vhci = user_data;
-+	ssize_t written;
-+
-+	written = write(vhci->fd, data, len);
-+	if (written < 0)
-+		return;
-+}
-+
-+static void vhci_read_callback(int fd, uint32_t events, void *user_data)
-+{
-+	struct vhci *vhci = user_data;
-+	unsigned char buf[4096];
-+	ssize_t len;
-+
-+	if (events & (EPOLLERR | EPOLLHUP))
-+		return;
-+
-+	len = read(vhci->fd, buf, sizeof(buf));
-+	if (len < 0)
-+		return;
-+
-+	btdev_receive_h4(vhci->btdev, buf, len);
-+}
-+
-+struct vhci *vhci_open(enum vhci_type type, uint16_t id)
-+{
-+	struct vhci *vhci;
-+
-+	switch (type) {
-+	case VHCI_TYPE_BREDR:
-+		break;
-+	case VHCI_TYPE_AMP:
-+		return NULL;
-+	}
-+
-+	vhci = malloc(sizeof(*vhci));
-+	if (!vhci)
-+		return NULL;
-+
-+	memset(vhci, 0, sizeof(*vhci));
-+	vhci->type = type;
-+
-+	vhci->fd = open("/dev/vhci", O_RDWR | O_NONBLOCK);
-+	if (vhci->fd < 0) {
-+		free(vhci);
-+		return NULL;
-+	}
-+
-+	vhci->btdev = btdev_create(id);
-+	if (!vhci->btdev) {
-+		close(vhci->fd);
-+		free(vhci);
-+		return NULL;
-+	}
-+
-+	btdev_set_send_handler(vhci->btdev, vhci_write_callback, vhci);
-+
-+	if (mainloop_add_fd(vhci->fd, EPOLLIN, vhci_read_callback,
-+						vhci, vhci_destroy) < 0) {
-+		btdev_destroy(vhci->btdev);
-+		close(vhci->fd);
-+		free(vhci);
-+		return NULL;
-+	}
-+
-+	return vhci;
-+}
-+
-+void vhci_close(struct vhci *vhci)
-+{
-+	if (!vhci)
-+		return;
-+
-+	mainloop_remove_fd(vhci->fd);
-+}
-diff --git a/tools/emulator/vhci.h b/tools/emulator/vhci.h
-new file mode 100644
-index 0000000..4abb183
---- /dev/null
-+++ b/tools/emulator/vhci.h
-@@ -0,0 +1,35 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011-2012  Intel Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <stdint.h>
-+
-+enum vhci_type {
-+	VHCI_TYPE_BREDR	= 0,
-+	VHCI_TYPE_AMP	= 1,
-+};
-+
-+struct vhci;
-+
-+struct vhci *vhci_open(enum vhci_type type, uint16_t id);
-+void vhci_close(struct vhci *vhci);
+-int proxy_register(DBusConnection *conn, struct btd_adapter *btd_adapter);
+-void proxy_unregister(struct btd_adapter *btd_adapter);
 -- 
 1.7.10.2
 
