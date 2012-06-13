@@ -1,31 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 12 Jun 2012 23:24:41 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix flags of mgmt_device_found event
-Message-ID: <20120613022441.GA3016@joana>
-References: <1338577525-9182-1-git-send-email-jefferson.delfes@openbossa.org>
- <1339420731-27485-1-git-send-email-jefferson.delfes@openbossa.org>
+From: Vishal Agarwal <vishal.agarwal@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: <vishal.agarwal@stericsson.com>
+Subject: [PATCH v1] Bluetooth: Fix sending HCI_Disconnect only after connection
+Date: Wed, 13 Jun 2012 05:32:43 +0530
+Message-ID: <1339545763-23251-1-git-send-email-vishal.agarwal@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1339420731-27485-1-git-send-email-jefferson.delfes@openbossa.org>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jefferson,
+HCI_Disconnect should only be sent after connection is established.
+If connection is not yet established and HCI_Disconnect is called
+then disconnection complete will be received with a handle which
+does not exist and hence this event will be ignored.
+But as mgmt.c will not receive this event, its variable for pending
+command is not cleared.This will result in future Disconnect commands
+for that BD Address to be blocked with error busy.
 
-* Jefferson Delfes <jefferson.delfes@openbossa.org> [2012-06-11 09:18:51 -0400]:
+Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
+---
+ net/bluetooth/mgmt.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-> Change flags field to matches userspace structure.
-> This field needs to be converted to little endian before forward it.
-> 
-> Signed-off-by: Jefferson Delfes <jefferson.delfes@openbossa.org>
-> ---
->  include/net/bluetooth/mgmt.h |    2 +-
->  net/bluetooth/mgmt.c         |    5 +++--
->  2 files changed, 4 insertions(+), 3 deletions(-)
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 958f764..3a857bf 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1598,7 +1598,7 @@ static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	else
+ 		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->addr.bdaddr);
+ 
+-	if (!conn) {
++	if (!conn || conn->state == BT_OPEN || conn->state == BT_CLOSED) {
+ 		err = cmd_status(sk, hdev->id, MGMT_OP_DISCONNECT,
+ 				 MGMT_STATUS_NOT_CONNECTED);
+ 		goto failed;
+-- 
+1.7.0.4
 
-Patch has been applied to bluetooth-next.git. Thanks
-
-	Gustavo
