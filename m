@@ -1,138 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/2] mgmtops: Handle EBUSY status from MGMT_OP_ADD_UUID commands
-Date: Wed, 13 Jun 2012 16:03:52 +0200
-Message-ID: <1339596233-16643-1-git-send-email-szymon.janc@tieto.com>
+From: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
+To: "'Johan Hedberg'" <johan.hedberg@gmail.com>
+CC: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
+Subject: RE: Bluetooth LE scan/pair using MGMT_OPS on Ubuntu 12.04 fails.
+Date: Wed, 13 Jun 2012 11:58:51 +0000
+Message-ID: <F82830D409D80E4881C83250E051B74B4A152D95@banasiexm01.ASIA.ROOT.PRI>
+References: <F82830D409D80E4881C83250E051B74B4784BC9E@banasiexm01.ASIA.ROOT.PRI>
+ <F82830D409D80E4881C83250E051B74B4A040CBD@banasiexm01.ASIA.ROOT.PRI>
+ <F82830D409D80E4881C83250E051B74B4A151824@banasiexm01.ASIA.ROOT.PRI>
+ <20120613093544.GA3842@x220.ger.corp.intel.com>
+ <F82830D409D80E4881C83250E051B74B4A151884@banasiexm01.ASIA.ROOT.PRI>
+ <20120613100450.GA4803@x220.ger.corp.intel.com>
+In-Reply-To: <20120613100450.GA4803@x220.ger.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-MGMT_OP_ADD_UUID may fail with EBUSY due to ongoing CoD update. In case
-of EBUSY error wait for Class Of Device changed event before adding
-more UUIDs.
----
- plugins/mgmtops.c |   59 +++++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 50 insertions(+), 9 deletions(-)
 
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index a196b1f..4ce3ee4 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -78,6 +78,7 @@ static struct controller_info {
- 	uint8_t minor;
- 
- 	gboolean pending_powered;
-+	gboolean pending_cod_change;
- } *controllers = NULL;
- 
- static int mgmt_sock = -1;
-@@ -1272,18 +1273,12 @@ static void read_local_oob_data_failed(int sk, uint16_t index)
- 		oob_read_local_data_complete(adapter, NULL, NULL);
- }
- 
--static void mgmt_add_uuid_complete(int sk, uint16_t index, void *buf,
--								size_t len)
-+static void handle_pending_uuids(uint16_t index)
- {
- 	struct controller_info *info;
- 	struct pending_uuid *pending;
- 
--	DBG("add_uuid complete");
--
--	if (index > max_index) {
--		error("Unexpected index %u in add_uuid_complete event", index);
--		return;
--	}
-+	DBG("index %d", index);
- 
- 	info = &controllers[index];
- 
-@@ -1311,6 +1306,19 @@ static void mgmt_add_uuid_complete(int sk, uint16_t index, void *buf,
- 	g_free(pending);
- }
- 
-+static void mgmt_add_uuid_complete(int sk, uint16_t index, void *buf,
-+								size_t len)
-+{
-+	DBG("index %d", index);
-+
-+	if (index > max_index) {
-+		error("Unexpected index %u in add_uuid_complete event", index);
-+		return;
-+	}
-+
-+	handle_pending_uuids(index);
-+}
-+
- static void mgmt_cmd_complete(int sk, uint16_t index, void *buf, size_t len)
- {
- 	struct mgmt_ev_cmd_complete *ev = buf;
-@@ -1434,6 +1442,16 @@ static void mgmt_cmd_complete(int sk, uint16_t index, void *buf, size_t len)
- 	}
- }
- 
-+static void mgmt_add_uuid_busy(int sk, uint16_t index)
-+{
-+	struct controller_info *info;
-+
-+	DBG("index %d", index);
-+
-+	info = &controllers[index];
-+	info->pending_cod_change = TRUE;
-+}
-+
- static void mgmt_cmd_status(int sk, uint16_t index, void *buf, size_t len)
- {
- 	struct mgmt_ev_cmd_status *ev = buf;
-@@ -1460,6 +1478,10 @@ static void mgmt_cmd_status(int sk, uint16_t index, void *buf, size_t len)
- 	case MGMT_OP_READ_LOCAL_OOB_DATA:
- 		read_local_oob_data_failed(sk, index);
- 		break;
-+	case MGMT_OP_ADD_UUID:
-+		if (ev->status == MGMT_STATUS_BUSY)
-+			mgmt_add_uuid_busy(sk, index);
-+		break;
- 	}
- }
- 
-@@ -1709,6 +1731,25 @@ static void mgmt_new_ltk(int sk, uint16_t index, void *buf, size_t len)
- 		bonding_complete(info, &ev->key.addr.bdaddr, 0);
- }
- 
-+static void mgmt_cod_changed(int sk, uint16_t index)
-+{
-+	struct controller_info *info;
-+
-+	DBG("index %d", index);
-+
-+	if (index > max_index) {
-+		error("Unexpected index %u in mgmt_cod_changed event", index);
-+		return;
-+	}
-+
-+	info = &controllers[index];
-+
-+	if (info->pending_cod_change) {
-+		info->pending_cod_change = FALSE;
-+		handle_pending_uuids(index);
-+	}
-+}
-+
- static gboolean mgmt_event(GIOChannel *io, GIOCondition cond, gpointer user_data)
- {
- 	char buf[MGMT_BUF_SIZE];
-@@ -1772,7 +1813,7 @@ static gboolean mgmt_event(GIOChannel *io, GIOCondition cond, gpointer user_data
- 		mgmt_new_settings(sk, index, buf + MGMT_HDR_SIZE, len);
- 		break;
- 	case MGMT_EV_CLASS_OF_DEV_CHANGED:
--		DBG("hci%u Class of Device changed", index);
-+		mgmt_cod_changed(sk, index);
- 		break;
- 	case MGMT_EV_NEW_LINK_KEY:
- 		mgmt_new_link_key(sk, index, buf + MGMT_HDR_SIZE, len);
--- 
-on behalf of ST-Ericsson
 
+-----Original Message-----
+From: Johan Hedberg [mailto:johan.hedberg@gmail.com] 
+Sent: Wednesday, June 13, 2012 3:35 PM
+To: Vijaykumar Dadmode
+Cc: 'linux-bluetooth@vger.kernel.org'
+Subject: Re: Bluetooth LE scan/pair using MGMT_OPS on Ubuntu 12.04 fails.
+
+Hi Vijay,
+
+On Wed, Jun 13, 2012, Vijaykumar Dadmode wrote:
+> On Wed, Jun 13, 2012, Vijaykumar Dadmode wrote:
+> > Hi,
+> > 
+> > On Ubuntu 12.04 using Management OPS , when I launch the "Bluetooth New Device Setup" wizard, it does not show any device, but on console it will find LE Devices. Works good on Ubuntu 10.04. 
+> > 
+> > $ hcitool lescan
+> > Scanning ...
+> >         00:12:03:19:xx:yy       Keyboard
+> > 
+> > mgmt_start_discovery() returns write error "Unknown error 524"
+> > 
+> > if (write(mgmt_sock, buf, sizeof(buf)) < 0)
+> > 		return -errno; 
+> 
+> >> You'd need to be more specific of exactly what kernel version and what
+> >> user space version of BlueZ you have. The management interface is only
+> >> expected to work properly with latest user space bluez.git and kernel
+> >> version 3.4 or later. And for LE you'll want to use the latest
+> >> bluetooth.git or bluetooth-next.git or wait until the 3.5 kernel gets
+> >> released.
+> 
+> Sorry about that. Yes I am using latest from bluez.git and kernel from bluetooth-next.
+> 
+> BlueZ userspace version: latest clone from "git://git.kernel.org/pub/scm/bluetooth/bluez.git".
+> Kernel version: 3.4.0-rc5
+
+>>>> bluetooth-next is currently based on top of 3.5-rc1 so it seems you have
+>>>> an old kernel. Please do a fresh pull from the user space and kernel
+>>>>  trees and try again.
+
+>From git I see not many changes being committed after 3.4.0-rc5. Which Ubuntu version is it tested/works using "Bluetooth New Device Setup" wizard and MGMT_OPS? 
+
+
+Johan
+
+
+ To report this email as spam click https://www.mailcontrol.com/sr/wQw0zmjPoHdJTZGyOCrrhg== .
+
+
+Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
+More information can be found at www.csr.com. Follow CSR on Twitter at http://twitter.com/CSR_PLC and read our blog at www.csr.com/blog
