@@ -1,59 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: <doronkeren@ti.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Doron Keren <doronkeren@ti.com>
-Subject: [PATCH] Bluetooth: Fix kernel crash on rfcomm disconnects.
-Date: Wed, 13 Jun 2012 10:32:18 +0300
-Message-ID: <1339572738-24345-1-git-send-email-doronkeren@ti.com>
+Date: Wed, 13 Jun 2012 08:19:41 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vishal Agarwal <vishal.agarwal@stericsson.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v1] Bluetooth: Fix sending HCI_Disconnect only after
+ connection
+Message-ID: <20120613051941.GA30286@x220.P-661HNU-F1>
+References: <1339545763-23251-1-git-send-email-vishal.agarwal@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1339545763-23251-1-git-send-email-vishal.agarwal@stericsson.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Doron Keren <doronkeren@ti.com>
+On Wed, Jun 13, 2012, Vishal Agarwal wrote:
+> HCI_Disconnect should only be sent after connection is established.
+> If connection is not yet established and HCI_Disconnect is called
+> then disconnection complete will be received with a handle which
+> does not exist and hence this event will be ignored.
+> But as mgmt.c will not receive this event, its variable for pending
+> command is not cleared.This will result in future Disconnect commands
+> for that BD Address to be blocked with error busy.
+> 
+> Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
+> ---
+>  net/bluetooth/mgmt.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-When receiving rfcomm-disconnect-request, and right after receiving
-l2cap-disconnect-request. The rfcomm disconnect function calls
-rfcomm_session_close() function. The l2cap-disconnect-request closed
-the socket. The rfcomm_process_rx funcion at the end, checks
-if the socket is closed and calls again to rfcomm_session_close()
-function, that lead to kernel crash, because the rfcomm session list
-is already deleted on the first call. The bug is fixed by adding
-to the socket state check, test that the session state is
-not already closed.
+Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 
-The bug can be reproduced by turning on the Bluetooth and push
-some file from another Bluetooth device (PC/Phone).
-The kernel crash log-
-rfcomm_process_rx: session c5d37340 state 1 qlen 1
-rfcomm_recv_disc: session c5d37340 state 1 dlci 0
-rfcomm_session_close: session c5d37340 state 9 err 104
-l2cap_disconnect_req: scid 0x0041 dcid 0x0040
-__l2cap_state_change: chan c6703000 BT_CONNECTED -> BT_CLOSED
-rfcomm_l2state_change: c675f800 state 9
-rfcomm_session_del: session c5d37340 state 9 list next=c7321a80, prev=bf05b838
-rfcomm_session_close: session c5d37340 state 9 err 104
-rfcomm_session_del: session c5d37340 state 9 list next=c5d376c0, prev=00200200
-Unable to handle kernel paging request at virtual address 00200200
-PC is at rfcomm_session_del+0x58/0x94 [rfcomm]
+Btw, the summary line might be a bit more understandable if you change
+"only after connection" to "only when connected".
 
----
- net/bluetooth/rfcomm/core.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index c75107e..077890f 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -1861,7 +1861,7 @@ static void rfcomm_process_rx(struct rfcomm_session *s)
- 			kfree_skb(skb);
- 	}
- 
--	if (sk->sk_state == BT_CLOSED) {
-+	if ((sk->sk_state == BT_CLOSED) && (s->state != BT_CLOSED)) {
- 		if (!s->initiator)
- 			rfcomm_session_put(s);
- 
--- 
-1.7.5.4
-
+Johan
