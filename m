@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 07/21] adapter: remove btd_adapter_encrypt_link()
-Date: Wed, 13 Jun 2012 17:43:29 -0300
-Message-Id: <1339620223-6639-8-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 05/21] adapter: remove deprecated ListDevices() method
+Date: Wed, 13 Jun 2012 17:43:27 -0300
+Message-Id: <1339620223-6639-6-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1339620223-6639-1-git-send-email-gustavo@padovan.org>
 References: <1339620223-6639-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,143 +12,85 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-After the removal of hciops this function is not necessary anymore, we now
-use setsockopt to accomplish the encryption of the link.
 ---
- input/device.c    |   38 ++++++++++----------------------------
- plugins/mgmtops.c |   12 ------------
- src/adapter.c     |    6 ------
- src/adapter.h     |    5 -----
- 4 files changed, 10 insertions(+), 51 deletions(-)
+ doc/adapter-api.txt |   10 ----------
+ src/adapter.c       |   35 -----------------------------------
+ 2 files changed, 45 deletions(-)
 
-diff --git a/input/device.c b/input/device.c
-index 0e3f4a9..8ed722b 100644
---- a/input/device.c
-+++ b/input/device.c
-@@ -643,22 +643,18 @@ static int hidp_add_connection(const struct input_device *idev,
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index dccb6bf..3eea23d 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -88,16 +88,6 @@ Methods		dict GetProperties()
+ 			Possible Errors: org.bluez.Error.DoesNotExist
+ 					 org.bluez.Error.InvalidArguments
  
- 	/* Encryption is mandatory for keyboards */
- 	if (req->subclass & 0x40) {
--		struct btd_adapter *adapter = device_get_adapter(idev->device);
+-		array{object} ListDevices() {deprecated}
 -
--		err = btd_adapter_encrypt_link(adapter, (bdaddr_t *) &idev->dst,
--						encrypt_completed, req);
--		if (err == 0) {
--			/* Waiting async encryption */
--			return 0;
--		}
+-			Returns list of device object paths.
+-			This method is deprecated, instead use the Devices
+-			Property to get the list of devices object paths.
 -
--		if (err == -ENOSYS)
--			goto nosys;
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.Failed
+-					 org.bluez.Error.OutOfMemory
 -
--		if (err != -EALREADY) {
--			error("encrypt_link: %s (%d)", strerror(-err), -err);
-+		if (!bt_io_set(iconn->intr_io, BT_IO_L2CAP, &gerr,
-+					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-+					BT_IO_OPT_INVALID)) {
-+			error("btio: %s", gerr->message);
-+			g_error_free(gerr);
-+			err = -EFAULT;
- 			goto cleanup;
- 		}
-+
-+		iconn->req = req;
-+		iconn->sec_watch = g_io_add_watch(iconn->intr_io, G_IO_OUT,
-+							encrypt_notify, iconn);
- 	}
+ 		object CreateDevice(string address)
  
- 	err = ioctl_connadd(req);
-@@ -668,20 +664,6 @@ cleanup:
- 	g_free(req);
- 
- 	return err;
--
--nosys:
--	if (!bt_io_set(iconn->intr_io, BT_IO_L2CAP, &gerr,
--				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
--				BT_IO_OPT_INVALID)) {
--		error("btio: %s", gerr->message);
--		g_error_free(gerr);
--		goto cleanup;
--	}
--
--	iconn->req = req;
--	iconn->sec_watch = g_io_add_watch(iconn->intr_io, G_IO_OUT,
--							encrypt_notify, iconn);
--	return 0;
- }
- 
- static int is_connected(struct input_conn *iconn)
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index 16a97c9..f734edc 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -2157,17 +2157,6 @@ static int mgmt_unpair_device(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type)
- 	return 0;
- }
- 
--static int mgmt_encrypt_link(int index, bdaddr_t *dst, bt_hci_result_t cb,
--							gpointer user_data)
--{
--	char addr[18];
--
--	ba2str(dst, addr);
--	DBG("index %d addr %s", index, addr);
--
--	return -ENOSYS;
--}
--
- static int mgmt_set_did(int index, uint16_t vendor, uint16_t product,
- 					uint16_t version, uint16_t source)
- {
-@@ -2492,7 +2481,6 @@ static struct btd_adapter_ops mgmt_ops = {
- 	.pincode_reply = mgmt_pincode_reply,
- 	.confirm_reply = mgmt_confirm_reply,
- 	.passkey_reply = mgmt_passkey_reply,
--	.encrypt_link = mgmt_encrypt_link,
- 	.set_did = mgmt_set_did,
- 	.add_uuid = mgmt_add_uuid,
- 	.remove_uuid = mgmt_remove_uuid,
+ 			Creates a new object path for a remote device. This
 diff --git a/src/adapter.c b/src/adapter.c
-index 3535cc4..16070a8 100644
+index 6e04faf..3535cc4 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -3478,12 +3478,6 @@ int btd_adapter_passkey_reply(struct btd_adapter *adapter, bdaddr_t *bdaddr,
- 								passkey);
+@@ -1307,38 +1307,6 @@ static DBusMessage *release_session(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
  }
  
--int btd_adapter_encrypt_link(struct btd_adapter *adapter, bdaddr_t *bdaddr,
--					bt_hci_result_t cb, gpointer user_data)
+-static DBusMessage *list_devices(DBusConnection *conn,
+-						DBusMessage *msg, void *data)
 -{
--	return adapter_ops->encrypt_link(adapter->dev_id, bdaddr, cb, user_data);
+-	struct btd_adapter *adapter = data;
+-	DBusMessage *reply;
+-	GSList *l;
+-	DBusMessageIter iter;
+-	DBusMessageIter array_iter;
+-	const gchar *dev_path;
+-
+-	reply = dbus_message_new_method_return(msg);
+-	if (!reply)
+-		return NULL;
+-
+-	dbus_message_iter_init_append(reply, &iter);
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-				DBUS_TYPE_OBJECT_PATH_AS_STRING, &array_iter);
+-
+-	for (l = adapter->devices; l; l = l->next) {
+-		struct btd_device *device = l->data;
+-
+-		dev_path = device_get_path(device);
+-
+-		dbus_message_iter_append_basic(&array_iter,
+-				DBUS_TYPE_OBJECT_PATH, &dev_path);
+-	}
+-
+-	dbus_message_iter_close_container(&iter, &array_iter);
+-
+-	return reply;
 -}
 -
- int btd_adapter_set_did(struct btd_adapter *adapter, uint16_t vendor,
- 					uint16_t product, uint16_t version,
- 					uint16_t source)
-diff --git a/src/adapter.h b/src/adapter.h
-index b7ea62b..77d79c1 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -200,8 +200,6 @@ struct btd_adapter_ops {
- 							gboolean success);
- 	int (*passkey_reply) (int index, bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 							uint32_t passkey);
--	int (*encrypt_link) (int index, bdaddr_t *bdaddr, bt_hci_result_t cb,
--							gpointer user_data);
- 	int (*set_did) (int index, uint16_t vendor, uint16_t product,
- 					uint16_t version, uint16_t source);
- 	int (*add_uuid) (int index, uuid_t *uuid, uint8_t svc_hint);
-@@ -261,9 +259,6 @@ int btd_adapter_confirm_reply(struct btd_adapter *adapter, bdaddr_t *bdaddr,
- int btd_adapter_passkey_reply(struct btd_adapter *adapter, bdaddr_t *bdaddr,
- 					uint8_t bdaddr_type, uint32_t passkey);
- 
--int btd_adapter_encrypt_link(struct btd_adapter *adapter, bdaddr_t *bdaddr,
--				bt_hci_result_t cb, gpointer user_data);
--
- int btd_adapter_set_did(struct btd_adapter *adapter, uint16_t vendor,
- 					uint16_t product, uint16_t version,
- 					uint16_t source);
+ static DBusMessage *cancel_device_creation(DBusConnection *conn,
+ 						DBusMessage *msg, void *data)
+ {
+@@ -1662,9 +1630,6 @@ static const GDBusMethodTable adapter_methods[] = {
+ 			adapter_start_discovery) },
+ 	{ GDBUS_ASYNC_METHOD("StopDiscovery", NULL, NULL,
+ 			adapter_stop_discovery) },
+-	{ GDBUS_DEPRECATED_METHOD("ListDevices",
+-			NULL, GDBUS_ARGS({ "devices", "ao" }),
+-			list_devices) },
+ 	{ GDBUS_ASYNC_METHOD("CreateDevice",
+ 			GDBUS_ARGS({ "address", "s" }),
+ 			GDBUS_ARGS({ "device", "o" }),
 -- 
 1.7.10.2
 
