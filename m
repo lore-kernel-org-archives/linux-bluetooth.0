@@ -1,33 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
-To: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
-Subject: Bluetooth LE scan/pair using MGMT_OPS on Ubuntu 12.04 fails.
-Date: Wed, 13 Jun 2012 09:18:31 +0000
-Message-ID: <F82830D409D80E4881C83250E051B74B4A151824@banasiexm01.ASIA.ROOT.PRI>
-References: <F82830D409D80E4881C83250E051B74B4784BC9E@banasiexm01.ASIA.ROOT.PRI>
- <F82830D409D80E4881C83250E051B74B4A040CBD@banasiexm01.ASIA.ROOT.PRI>
-In-Reply-To: <F82830D409D80E4881C83250E051B74B4A040CBD@banasiexm01.ASIA.ROOT.PRI>
-Content-Type: text/plain; charset="us-ascii"
+From: <doronkeren@ti.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Doron Keren <doronkeren@ti.com>
+Subject: [PATCH] Bluetooth: Fix kernel crash on rfcomm disconnects.
+Date: Wed, 13 Jun 2012 10:32:18 +0300
+Message-ID: <1339572738-24345-1-git-send-email-doronkeren@ti.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Doron Keren <doronkeren@ti.com>
 
-On Ubuntu 12.04 using Management OPS , when I launch the "Bluetooth New Device Setup" wizard, it does not show any device, but on console it will find LE Devices. Works good on Ubuntu 10.04. 
+When receiving rfcomm-disconnect-request, and right after receiving
+l2cap-disconnect-request. The rfcomm disconnect function calls
+rfcomm_session_close() function. The l2cap-disconnect-request closed
+the socket. The rfcomm_process_rx funcion at the end, checks
+if the socket is closed and calls again to rfcomm_session_close()
+function, that lead to kernel crash, because the rfcomm session list
+is already deleted on the first call. The bug is fixed by adding
+to the socket state check, test that the session state is
+not already closed.
 
-$ hcitool lescan
-Scanning ...
-        00:12:03:19:xx:yy       Keyboard
+The bug can be reproduced by turning on the Bluetooth and push
+some file from another Bluetooth device (PC/Phone).
+The kernel crash log-
+rfcomm_process_rx: session c5d37340 state 1 qlen 1
+rfcomm_recv_disc: session c5d37340 state 1 dlci 0
+rfcomm_session_close: session c5d37340 state 9 err 104
+l2cap_disconnect_req: scid 0x0041 dcid 0x0040
+__l2cap_state_change: chan c6703000 BT_CONNECTED -> BT_CLOSED
+rfcomm_l2state_change: c675f800 state 9
+rfcomm_session_del: session c5d37340 state 9 list next=c7321a80, prev=bf05b838
+rfcomm_session_close: session c5d37340 state 9 err 104
+rfcomm_session_del: session c5d37340 state 9 list next=c5d376c0, prev=00200200
+Unable to handle kernel paging request at virtual address 00200200
+PC is at rfcomm_session_del+0x58/0x94 [rfcomm]
 
-mgmt_start_discovery() returns write error "Unknown error 524"
+---
+ net/bluetooth/rfcomm/core.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-if (write(mgmt_sock, buf, sizeof(buf)) < 0)
-		return -errno; 
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index c75107e..077890f 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -1861,7 +1861,7 @@ static void rfcomm_process_rx(struct rfcomm_session *s)
+ 			kfree_skb(skb);
+ 	}
+ 
+-	if (sk->sk_state == BT_CLOSED) {
++	if ((sk->sk_state == BT_CLOSED) && (s->state != BT_CLOSED)) {
+ 		if (!s->initiator)
+ 			rfcomm_session_put(s);
+ 
+-- 
+1.7.5.4
 
-Thanks,
-Vijay
-
-
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
-More information can be found at www.csr.com. Follow CSR on Twitter at http://twitter.com/CSR_PLC and read our blog at www.csr.com/blog
