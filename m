@@ -1,18 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 13 Jun 2012 23:37:00 +0530
-Message-ID: <CAHdPZaPcCAt_TacNzggpG1P4LEh4WHAm9GMDQbsScgwW4A7CRw@mail.gmail.com>
-Subject: bfusb: No statements under write_lock_irq_save and restore at 459
-From: "devendra.aaru" <devendra.aaru@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Szymon Janc <szymon@janc.net.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon@janc.net.pl>
+Subject: [PATCH] mgmtops: Fix clearing of pending_cod_change after adapter powered off
+Date: Wed, 13 Jun 2012 18:05:13 +0200
+Message-Id: <1339603513-15512-1-git-send-email-szymon@janc.net.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+---
+ plugins/mgmtops.c |    1 +
+ 1 file changed, 1 insertion(+)
 
-The write_lock_irq_save and restore are not required at bfusb_close,
-does we need to do a clear_bit on hdev->flags?
+diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+index ea1552d..16a97c9 100644
+--- a/plugins/mgmtops.c
++++ b/plugins/mgmtops.c
+@@ -350,6 +350,7 @@ static int mgmt_update_powered(struct btd_adapter *adapter,
+ 		info->pending_uuids = NULL;
+ 		info->pending_uuid = FALSE;
+ 		info->pending_class = FALSE;
++		info->pending_cod_change = FALSE;
+ 		return 0;
+ 	}
+ 
+-- 
+1.7.10.4
 
-Thanks,
-Devendra.
+
