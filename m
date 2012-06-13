@@ -1,52 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 13 Jun 2012 13:04:50 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
-Cc: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Bluetooth LE scan/pair using MGMT_OPS on Ubuntu 12.04 fails.
-Message-ID: <20120613100450.GA4803@x220.ger.corp.intel.com>
-References: <F82830D409D80E4881C83250E051B74B4784BC9E@banasiexm01.ASIA.ROOT.PRI>
- <F82830D409D80E4881C83250E051B74B4A040CBD@banasiexm01.ASIA.ROOT.PRI>
- <F82830D409D80E4881C83250E051B74B4A151824@banasiexm01.ASIA.ROOT.PRI>
- <20120613093544.GA3842@x220.ger.corp.intel.com>
- <F82830D409D80E4881C83250E051B74B4A151884@banasiexm01.ASIA.ROOT.PRI>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <F82830D409D80E4881C83250E051B74B4A151884@banasiexm01.ASIA.ROOT.PRI>
+In-Reply-To: <1339503026-17276-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1339503026-17276-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Wed, 13 Jun 2012 13:01:54 +0300
+Message-ID: <CABBYNZJ=mxcqbJUm_43cGT8G317uixrN56XNLj76CtQHGNtfWA@mail.gmail.com>
+Subject: Re: [PATCH obexd v0 1/3] client: Fix possible unreplied D-Bus message
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vijay,
+Hi Mikel,
 
-On Wed, Jun 13, 2012, Vijaykumar Dadmode wrote:
-> On Wed, Jun 13, 2012, Vijaykumar Dadmode wrote:
-> > Hi,
-> > 
-> > On Ubuntu 12.04 using Management OPS , when I launch the "Bluetooth New Device Setup" wizard, it does not show any device, but on console it will find LE Devices. Works good on Ubuntu 10.04. 
-> > 
-> > $ hcitool lescan
-> > Scanning ...
-> >         00:12:03:19:xx:yy       Keyboard
-> > 
-> > mgmt_start_discovery() returns write error "Unknown error 524"
-> > 
-> > if (write(mgmt_sock, buf, sizeof(buf)) < 0)
-> > 		return -errno; 
-> 
-> >> You'd need to be more specific of exactly what kernel version and what
-> >> user space version of BlueZ you have. The management interface is only
-> >> expected to work properly with latest user space bluez.git and kernel
-> >> version 3.4 or later. And for LE you'll want to use the latest
-> >> bluetooth.git or bluetooth-next.git or wait until the 3.5 kernel gets
-> >> released.
-> 
-> Sorry about that. Yes I am using latest from bluez.git and kernel from bluetooth-next.
-> 
-> BlueZ userspace version: latest clone from "git://git.kernel.org/pub/scm/bluetooth/bluez.git".
-> Kernel version: 3.4.0-rc5
+On Tue, Jun 12, 2012 at 3:10 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>
+> If a previous cancel request is in progress, a second cancel request
+> should fail.
+>
+> This by the way fixes unreplied D-Bus messages.
+> ---
+>  client/transfer.c |    5 +++++
+>  1 files changed, 5 insertions(+), 0 deletions(-)
+>
+> diff --git a/client/transfer.c b/client/transfer.c
+> index 242d989..0686afe 100644
+> --- a/client/transfer.c
+> +++ b/client/transfer.c
+> @@ -213,6 +213,11 @@ static DBusMessage *obc_transfer_cancel(DBusConnection *connection,
+>                                ERROR_INTERFACE ".NotAuthorized",
+>                                "Not Authorized");
+>
+> +       if (transfer->msg != NULL)
+> +               return g_dbus_create_error(message,
+> +                               ERROR_INTERFACE ".InProgress",
+> +                               "Cancellation already in progress");
+> +
+>        if (!obc_transfer_abort(transfer))
+>                return g_dbus_create_error(message,
+>                                ERROR_INTERFACE ".Failed",
+> --
+> 1.7.7.6
 
-bluetooth-next is currently based on top of 3.5-rc1 so it seems you have
-an old kernel. Please do a fresh pull from the user space and kernel
-trees and try again.
+All 3 patches are now upstream, thanks.
 
-Johan
+
+-- 
+Luiz Augusto von Dentz
