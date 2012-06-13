@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 03/21] headset: remove deprecated DBus methods
-Date: Wed, 13 Jun 2012 17:43:25 -0300
-Message-Id: <1339620223-6639-4-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 10/21] adapter: make restore powered work again
+Date: Wed, 13 Jun 2012 17:43:32 -0300
+Message-Id: <1339620223-6639-11-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1339620223-6639-1-git-send-email-gustavo@padovan.org>
 References: <1339620223-6639-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,241 +12,81 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
+differently from hciops mgmtops had no support to restore the powered of a
+adapter. We now do this directly inside adapter_remove()
 ---
- audio/headset.c   |  151 -----------------------------------------------------
- doc/audio-api.txt |   28 ----------
- 2 files changed, 179 deletions(-)
+ plugins/mgmtops.c |    7 -------
+ src/adapter.c     |    5 ++++-
+ src/adapter.h     |    1 -
+ 3 files changed, 4 insertions(+), 9 deletions(-)
 
-diff --git a/audio/headset.c b/audio/headset.c
-index 729e4dc..3ce7eb9 100644
---- a/audio/headset.c
-+++ b/audio/headset.c
-@@ -1673,26 +1673,6 @@ static DBusMessage *hs_stop(DBusConnection *conn, DBusMessage *msg,
- 	return reply;
+diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+index 7c77be8..c060ada 100644
+--- a/plugins/mgmtops.c
++++ b/plugins/mgmtops.c
+@@ -2183,12 +2183,6 @@ static int mgmt_set_did(int index, uint16_t vendor, uint16_t product,
+ 	return 0;
  }
  
--static DBusMessage *hs_is_playing(DBusConnection *conn, DBusMessage *msg,
--					void *data)
+-static int mgmt_restore_powered(int index)
 -{
--	struct audio_device *device = data;
--	struct headset *hs = device->headset;
--	DBusMessage *reply;
--	dbus_bool_t playing;
--
--	reply = dbus_message_new_method_return(msg);
--	if (!reply)
--		return NULL;
--
--	playing = (hs->state == HEADSET_STATE_PLAYING);
--
--	dbus_message_append_args(reply, DBUS_TYPE_BOOLEAN, &playing,
--					DBUS_TYPE_INVALID);
--
--	return reply;
+-	DBG("index %d", index);
+-	return -ENOSYS;
 -}
 -
- static DBusMessage *hs_disconnect(DBusConnection *conn, DBusMessage *msg,
- 					void *data)
+ static int mgmt_load_link_keys(int index, GSList *keys, gboolean debug_keys)
  {
-@@ -1816,95 +1796,6 @@ static DBusMessage *hs_cancel_call(DBusConnection *conn,
- 	return reply;
- }
- 
--static DBusMessage *hs_play(DBusConnection *conn, DBusMessage *msg,
--				void *data)
--{
--	struct audio_device *device = data;
--	struct headset *hs = device->headset;
--	int err;
--
--	if (sco_hci) {
--		error("Refusing Headset.Play() because SCO HCI routing "
--				"is enabled");
--		return btd_error_not_available(msg);
--	}
--
--	switch (hs->state) {
--	case HEADSET_STATE_DISCONNECTED:
--	case HEADSET_STATE_CONNECTING:
--		return btd_error_not_connected(msg);
--	case HEADSET_STATE_PLAY_IN_PROGRESS:
--		if (hs->pending && hs->pending->msg == NULL) {
--			hs->pending->msg = dbus_message_ref(msg);
--			return NULL;
--		}
--		return btd_error_busy(msg);
--	case HEADSET_STATE_PLAYING:
--		return btd_error_already_connected(msg);
--	case HEADSET_STATE_CONNECTED:
--	default:
--		break;
--	}
--
--	err = sco_connect(device, NULL, NULL, NULL);
--	if (err < 0)
--		return btd_error_failed(msg, strerror(-err));
--
--	hs->pending->msg = dbus_message_ref(msg);
--
--	return NULL;
--}
--
--static DBusMessage *hs_get_speaker_gain(DBusConnection *conn,
--					DBusMessage *msg,
--					void *data)
--{
--	struct audio_device *device = data;
--	struct headset *hs = device->headset;
--	struct headset_slc *slc = hs->slc;
--	DBusMessage *reply;
--	dbus_uint16_t gain;
--
--	if (hs->state < HEADSET_STATE_CONNECTED)
--		return btd_error_not_available(msg);
--
--	reply = dbus_message_new_method_return(msg);
--	if (!reply)
--		return NULL;
--
--	gain = (dbus_uint16_t) slc->sp_gain;
--
--	dbus_message_append_args(reply, DBUS_TYPE_UINT16, &gain,
--					DBUS_TYPE_INVALID);
--
--	return reply;
--}
--
--static DBusMessage *hs_get_mic_gain(DBusConnection *conn,
--					DBusMessage *msg,
--					void *data)
--{
--	struct audio_device *device = data;
--	struct headset *hs = device->headset;
--	struct headset_slc *slc = hs->slc;
--	DBusMessage *reply;
--	dbus_uint16_t gain;
--
--	if (hs->state < HEADSET_STATE_CONNECTED || slc == NULL)
--		return btd_error_not_available(msg);
--
--	reply = dbus_message_new_method_return(msg);
--	if (!reply)
--		return NULL;
--
--	gain = (dbus_uint16_t) slc->mic_gain;
--
--	dbus_message_append_args(reply, DBUS_TYPE_UINT16, &gain,
--					DBUS_TYPE_INVALID);
--
--	return reply;
--}
--
- static DBusMessage *hs_set_gain(DBusConnection *conn,
- 				DBusMessage *msg,
- 				void *data, uint16_t gain,
-@@ -1937,32 +1828,6 @@ static DBusMessage *hs_set_gain(DBusConnection *conn,
- 	return reply;
- }
- 
--static DBusMessage *hs_set_speaker_gain(DBusConnection *conn,
--					DBusMessage *msg,
--					void *data)
--{
--	uint16_t gain;
--
--	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT16, &gain,
--				DBUS_TYPE_INVALID))
--		return NULL;
--
--	return hs_set_gain(conn, msg, data, gain, HEADSET_GAIN_SPEAKER);
--}
--
--static DBusMessage *hs_set_mic_gain(DBusConnection *conn,
--					DBusMessage *msg,
--					void *data)
--{
--	uint16_t gain;
--
--	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT16, &gain,
--				DBUS_TYPE_INVALID))
--		return NULL;
--
--	return hs_set_gain(conn, msg, data, gain, HEADSET_GAIN_MICROPHONE);
--}
--
- static DBusMessage *hs_get_properties(DBusConnection *conn,
- 					DBusMessage *msg, void *data)
+ 	char *buf;
+@@ -2476,7 +2470,6 @@ static struct btd_adapter_ops mgmt_ops = {
+ 	.set_did = mgmt_set_did,
+ 	.add_uuid = mgmt_add_uuid,
+ 	.remove_uuid = mgmt_remove_uuid,
+-	.restore_powered = mgmt_restore_powered,
+ 	.load_keys = mgmt_load_link_keys,
+ 	.set_io_capability = mgmt_set_io_capability,
+ 	.create_bonding = mgmt_create_bonding,
+diff --git a/src/adapter.c b/src/adapter.c
+index a82029a..af6c003 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -109,6 +109,7 @@ struct service_auth {
+ struct btd_adapter {
+ 	uint16_t dev_id;
+ 	gboolean up;
++	gboolean already_up;
+ 	char *path;			/* adapter object path */
+ 	bdaddr_t bdaddr;		/* adapter Bluetooth Address */
+ 	uint32_t dev_class;		/* Class of Device */
+@@ -2389,6 +2390,7 @@ void btd_adapter_unref(struct btd_adapter *adapter)
+ gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
  {
-@@ -2065,23 +1930,7 @@ static const GDBusMethodTable headset_methods[] = {
- 			hs_is_connected) },
- 	{ GDBUS_METHOD("IndicateCall", NULL, NULL, hs_ring) },
- 	{ GDBUS_METHOD("CancelCall", NULL, NULL, hs_cancel_call) },
--	{ GDBUS_DEPRECATED_ASYNC_METHOD("Play", NULL, NULL, hs_play) },
- 	{ GDBUS_METHOD("Stop", NULL, NULL, hs_stop) },
--	{ GDBUS_DEPRECATED_METHOD("IsPlaying",
--					NULL, GDBUS_ARGS({ "playing", "b" }),
--					hs_is_playing) },
--	{ GDBUS_DEPRECATED_METHOD("GetSpeakerGain",
--					NULL, GDBUS_ARGS({ "gain", "q" }),
--					hs_get_speaker_gain) },
--	{ GDBUS_DEPRECATED_METHOD("GetMicrophoneGain",
--					NULL, GDBUS_ARGS({ "gain", "q" }),
--					hs_get_mic_gain) },
--	{ GDBUS_DEPRECATED_METHOD("SetSpeakerGain",
--					GDBUS_ARGS({ "gain", "q" }), NULL,
--					hs_set_speaker_gain) },
--	{ GDBUS_DEPRECATED_METHOD("SetMicrophoneGain",
--					GDBUS_ARGS({ "gain", "q" }), NULL,
--					hs_set_mic_gain) },
- 	{ GDBUS_METHOD("GetProperties",
- 			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
- 			hs_get_properties) },
-diff --git a/doc/audio-api.txt b/doc/audio-api.txt
-index 02291fd..dc5c811 100644
---- a/doc/audio-api.txt
-+++ b/doc/audio-api.txt
-@@ -66,11 +66,6 @@ Methods		void Connect()
- 			Disconnect from the HSP/HFP service on the remote
- 			device.
+ 	adapter->up = up;
++	adapter->already_up = up;
  
--		boolean IsConnected() {deprecated}
--
--			Returns TRUE if there is a active connection to the
--			HSP/HFP connection on the remote device.
--
- 		void IndicateCall()
+ 	adapter->allow_name_changes = TRUE;
  
- 			Indicate an incoming call on the headset
-@@ -89,29 +84,6 @@ Methods		void Connect()
+@@ -2469,7 +2471,8 @@ void adapter_remove(struct btd_adapter *adapter)
+ 	g_slist_free(adapter->pin_callbacks);
  
- 			Close the audio connection.
+ 	/* Return adapter to down state if it was not up on init */
+-	adapter_ops->restore_powered(adapter->dev_id);
++	if (!adapter->already_up && adapter->up)
++		adapter_ops->set_powered(adapter->dev_id, FALSE);
+ }
  
--		boolean IsPlaying() {deprecated}
--
--			Returns true if an audio connection to the headset
--			is active.
--
--		uint16 GetSpeakerGain() {deprecated}
--
--			Returns the current speaker gain if available,
--			otherwise returns the error NotAvailable.
--
--		uint16 GetMicrophoneGain() {deprecated}
--
--			Returns the current microphone gain if available,
--			otherwise returns the error NotAvailable.
--
--		void SetSpeakerGain(uint16 gain) {deprecated}
--
--			Changes the current speaker gain if possible.
--
--		void SetMicrophoneGain(uint16 gain) {deprecated}
--
--			Changes the current speaker gain if possible.
--
- 		dict GetProperties()
- 
- 			Returns all properties for the interface. See the
+ uint16_t adapter_get_dev_id(struct btd_adapter *adapter)
+diff --git a/src/adapter.h b/src/adapter.h
+index 4c39a7b..73cd770 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -204,7 +204,6 @@ struct btd_adapter_ops {
+ 					uint16_t version, uint16_t source);
+ 	int (*add_uuid) (int index, uuid_t *uuid, uint8_t svc_hint);
+ 	int (*remove_uuid) (int index, uuid_t *uuid);
+-	int (*restore_powered) (int index);
+ 	int (*load_keys) (int index, GSList *keys, gboolean debug_keys);
+ 	int (*set_io_capability) (int index, uint8_t io_capability);
+ 	int (*create_bonding) (int index, bdaddr_t *bdaddr,
 -- 
 1.7.10.2
 
