@@ -1,31 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 12 Jun 2012 23:26:59 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 1/4] monitor: add include <stdint.h>
-Date: Tue, 12 Jun 2012 23:59:48 -0300
-Message-Id: <1339556391-14637-1-git-send-email-gustavo@padovan.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Remove magic value in disconnect mgmt handler
+Message-ID: <20120613022658.GB3016@joana>
+References: <1339450872-28438-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1339450872-28438-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Hi Andre,
 
----
- monitor/packet.h |    1 +
- 1 file changed, 1 insertion(+)
+* Andre Guedes <andre.guedes@openbossa.org> [2012-06-11 18:41:12 -0300]:
 
-diff --git a/monitor/packet.h b/monitor/packet.h
-index 90fc7ec..4c8b698 100644
---- a/monitor/packet.h
-+++ b/monitor/packet.h
-@@ -23,6 +23,7 @@
-  */
- 
- #include <stdbool.h>
-+#include <stdint.h>
- #include <sys/time.h>
- 
- #define PACKET_FILTER_SHOW_INDEX	(1 << 0)
--- 
-1.7.10.2
+> This patch replaces the magic value of variable 'reason' by the
+> proper macro.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  net/bluetooth/mgmt.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
+Patch has been applied to bluetooth-next. Thanks.
+
+	Gustavo
