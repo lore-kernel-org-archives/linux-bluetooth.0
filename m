@@ -1,263 +1,261 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8; format=flowed
-Message-id: <4FD99618.6030100@samsung.com>
-Date: Thu, 14 Jun 2012 16:43:20 +0900
-From: Chanyeol Park <chanyeol.park@samsung.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [PATCH 03/21] headset: remove deprecated DBus methods
-References: <1339620223-6639-1-git-send-email-gustavo@padovan.org>
- <1339620223-6639-4-git-send-email-gustavo@padovan.org>
-In-reply-to: <1339620223-6639-4-git-send-email-gustavo@padovan.org>
+Date: Thu, 14 Jun 2012 10:25:14 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 hcidump 1/4] Headers for AMP ASSOC dump functions
+Message-ID: <20120614072512.GB24061@aemeltch-MOBL1>
+References: <1338887361-11585-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1338887361-11585-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
-On 2012년 06월 14일 05:43, Gustavo Padovan wrote:
-> From: Gustavo Padovan<gustavo.padovan@collabora.co.uk>
->
+On Tue, Jun 05, 2012 at 12:09:18PM +0300, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+
+ping
+
+> 
 > ---
->   audio/headset.c   |  151 -----------------------------------------------------
->   doc/audio-api.txt |   28 ----------
->   2 files changed, 179 deletions(-)
->
-> diff --git a/audio/headset.c b/audio/headset.c
-> index 729e4dc..3ce7eb9 100644
-> --- a/audio/headset.c
-> +++ b/audio/headset.c
-> @@ -1673,26 +1673,6 @@ static DBusMessage *hs_stop(DBusConnection *conn, DBusMessage *msg,
->   	return reply;
->   }
->
-> -static DBusMessage *hs_is_playing(DBusConnection *conn, DBusMessage *msg,
-> -					void *data)
-> -{
-> -	struct audio_device *device = data;
-> -	struct headset *hs = device->headset;
-> -	DBusMessage *reply;
-> -	dbus_bool_t playing;
+>  lib/a2mp.h |   38 -------------
+>  lib/amp.h  |  174 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 174 insertions(+), 38 deletions(-)
+>  create mode 100644 lib/amp.h
+> 
+> diff --git a/lib/a2mp.h b/lib/a2mp.h
+> index 61f1c1e..da937d1 100644
+> --- a/lib/a2mp.h
+> +++ b/lib/a2mp.h
+> @@ -142,44 +142,6 @@ struct a2mp_disconn_rsp {
+>  #define A2MP_STATUS_PHYS_LINK_EXISTS			0x05
+>  #define A2MP_STATUS_SECURITY_VIOLATION			0x06
+>  
+> -#define A2MP_MAC_ADDR_TYPE		1
+> -#define A2MP_PREF_CHANLIST_TYPE		2
+> -#define A2MP_CONNECTED_CHAN		3
+> -#define A2MP_PAL_CAP_TYPE		4
+> -#define A2MP_PAL_VER_INFO		5
 > -
-> -	reply = dbus_message_new_method_return(msg);
-> -	if (!reply)
-> -		return NULL;
+> -struct a2mp_tlv {
+> -	uint8_t type;
+> -	uint16_t len;
+> -	uint8_t val[0];
+> -} __attribute__ ((packed));
 > -
-> -	playing = (hs->state == HEADSET_STATE_PLAYING);
+> -struct a2mp_pal_ver {
+> -	uint8_t ver;
+> -	uint16_t company_id;
+> -	uint16_t sub_ver;
+> -} __attribute__ ((packed));
 > -
-> -	dbus_message_append_args(reply, DBUS_TYPE_BOOLEAN,&playing,
-> -					DBUS_TYPE_INVALID);
+> -struct a2mp_country_triplet {
+> -	union {
+> -		struct {
+> -			uint8_t first_channel;
+> -			uint8_t num_channels;
+> -			int8_t max_power;
+> -		} __attribute__ ((packed)) chans;
+> -		struct {
+> -			uint8_t reg_extension_id;
+> -			uint8_t reg_class;
+> -			uint8_t coverage_class;
+> -		} __attribute__ ((packed)) ext;
+> -	};
+> -} __attribute__ ((packed));
 > -
-> -	return reply;
-> -}
+> -struct a2mp_chan_list {
+> -	uint8_t country_code[3];
+> -	struct a2mp_country_triplet triplets[0];
+> -} __attribute__ ((packed));
 > -
->   static DBusMessage *hs_disconnect(DBusConnection *conn, DBusMessage *msg,
->   					void *data)
->   {
-> @@ -1816,95 +1796,6 @@ static DBusMessage *hs_cancel_call(DBusConnection *conn,
->   	return reply;
->   }
->
-> -static DBusMessage *hs_play(DBusConnection *conn, DBusMessage *msg,
-> -				void *data)
-> -{
-> -	struct audio_device *device = data;
-> -	struct headset *hs = device->headset;
-> -	int err;
-> -
-> -	if (sco_hci) {
-> -		error("Refusing Headset.Play() because SCO HCI routing "
-> -				"is enabled");
-> -		return btd_error_not_available(msg);
-> -	}
-> -
-> -	switch (hs->state) {
-> -	case HEADSET_STATE_DISCONNECTED:
-> -	case HEADSET_STATE_CONNECTING:
-> -		return btd_error_not_connected(msg);
-> -	case HEADSET_STATE_PLAY_IN_PROGRESS:
-> -		if (hs->pending&&  hs->pending->msg == NULL) {
-> -			hs->pending->msg = dbus_message_ref(msg);
-> -			return NULL;
-> -		}
-> -		return btd_error_busy(msg);
-> -	case HEADSET_STATE_PLAYING:
-> -		return btd_error_already_connected(msg);
-> -	case HEADSET_STATE_CONNECTED:
-> -	default:
-> -		break;
-> -	}
-> -
-> -	err = sco_connect(device, NULL, NULL, NULL);
-> -	if (err<  0)
-> -		return btd_error_failed(msg, strerror(-err));
-> -
-> -	hs->pending->msg = dbus_message_ref(msg);
-> -
-> -	return NULL;
-> -}
-> -
-> -static DBusMessage *hs_get_speaker_gain(DBusConnection *conn,
-> -					DBusMessage *msg,
-> -					void *data)
-> -{
-> -	struct audio_device *device = data;
-> -	struct headset *hs = device->headset;
-> -	struct headset_slc *slc = hs->slc;
-> -	DBusMessage *reply;
-> -	dbus_uint16_t gain;
-> -
-> -	if (hs->state<  HEADSET_STATE_CONNECTED)
-> -		return btd_error_not_available(msg);
-> -
-> -	reply = dbus_message_new_method_return(msg);
-> -	if (!reply)
-> -		return NULL;
-> -
-> -	gain = (dbus_uint16_t) slc->sp_gain;
-> -
-> -	dbus_message_append_args(reply, DBUS_TYPE_UINT16,&gain,
-> -					DBUS_TYPE_INVALID);
-> -
-> -	return reply;
-> -}
-> -
-> -static DBusMessage *hs_get_mic_gain(DBusConnection *conn,
-> -					DBusMessage *msg,
-> -					void *data)
-> -{
-> -	struct audio_device *device = data;
-> -	struct headset *hs = device->headset;
-> -	struct headset_slc *slc = hs->slc;
-> -	DBusMessage *reply;
-> -	dbus_uint16_t gain;
-> -
-> -	if (hs->state<  HEADSET_STATE_CONNECTED || slc == NULL)
-> -		return btd_error_not_available(msg);
-> -
-> -	reply = dbus_message_new_method_return(msg);
-> -	if (!reply)
-> -		return NULL;
-> -
-> -	gain = (dbus_uint16_t) slc->mic_gain;
-> -
-> -	dbus_message_append_args(reply, DBUS_TYPE_UINT16,&gain,
-> -					DBUS_TYPE_INVALID);
-> -
-> -	return reply;
-> -}
-> -
->   static DBusMessage *hs_set_gain(DBusConnection *conn,
->   				DBusMessage *msg,
->   				void *data, uint16_t gain,
-> @@ -1937,32 +1828,6 @@ static DBusMessage *hs_set_gain(DBusConnection *conn,
->   	return reply;
->   }
->
-> -static DBusMessage *hs_set_speaker_gain(DBusConnection *conn,
-> -					DBusMessage *msg,
-> -					void *data)
-> -{
-> -	uint16_t gain;
-> -
-> -	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT16,&gain,
-> -				DBUS_TYPE_INVALID))
-> -		return NULL;
-> -
-> -	return hs_set_gain(conn, msg, data, gain, HEADSET_GAIN_SPEAKER);
-> -}
-> -
-> -static DBusMessage *hs_set_mic_gain(DBusConnection *conn,
-> -					DBusMessage *msg,
-> -					void *data)
-> -{
-> -	uint16_t gain;
-> -
-> -	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT16,&gain,
-> -				DBUS_TYPE_INVALID))
-> -		return NULL;
-> -
-> -	return hs_set_gain(conn, msg, data, gain, HEADSET_GAIN_MICROPHONE);
-> -}
-> -
->   static DBusMessage *hs_get_properties(DBusConnection *conn,
->   					DBusMessage *msg, void *data)
->   {
-> @@ -2065,23 +1930,7 @@ static const GDBusMethodTable headset_methods[] = {
->   			hs_is_connected) },
->   	{ GDBUS_METHOD("IndicateCall", NULL, NULL, hs_ring) },
->   	{ GDBUS_METHOD("CancelCall", NULL, NULL, hs_cancel_call) },
-> -	{ GDBUS_DEPRECATED_ASYNC_METHOD("Play", NULL, NULL, hs_play) },
->   	{ GDBUS_METHOD("Stop", NULL, NULL, hs_stop) },
-> -	{ GDBUS_DEPRECATED_METHOD("IsPlaying",
-> -					NULL, GDBUS_ARGS({ "playing", "b" }),
-> -					hs_is_playing) },
-> -	{ GDBUS_DEPRECATED_METHOD("GetSpeakerGain",
-> -					NULL, GDBUS_ARGS({ "gain", "q" }),
-> -					hs_get_speaker_gain) },
-> -	{ GDBUS_DEPRECATED_METHOD("GetMicrophoneGain",
-> -					NULL, GDBUS_ARGS({ "gain", "q" }),
-> -					hs_get_mic_gain) },
-> -	{ GDBUS_DEPRECATED_METHOD("SetSpeakerGain",
-> -					GDBUS_ARGS({ "gain", "q" }), NULL,
-> -					hs_set_speaker_gain) },
-> -	{ GDBUS_DEPRECATED_METHOD("SetMicrophoneGain",
-> -					GDBUS_ARGS({ "gain", "q" }), NULL,
-> -					hs_set_mic_gain) },
->   	{ GDBUS_METHOD("GetProperties",
->   			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
->   			hs_get_properties) },
-> diff --git a/doc/audio-api.txt b/doc/audio-api.txt
-> index 02291fd..dc5c811 100644
-> --- a/doc/audio-api.txt
-> +++ b/doc/audio-api.txt
-> @@ -66,11 +66,6 @@ Methods		void Connect()
->   			Disconnect from the HSP/HFP service on the remote
->   			device.
->
-> -		boolean IsConnected() {deprecated}
-> -
-> -			Returns TRUE if there is a active connection to the
-> -			HSP/HFP connection on the remote device.
-> -
->   		void IndicateCall()
->
->   			Indicate an incoming call on the headset
-> @@ -89,29 +84,6 @@ Methods		void Connect()
->
->   			Close the audio connection.
->
-> -		boolean IsPlaying() {deprecated}
-> -
-> -			Returns true if an audio connection to the headset
-> -			is active.
-> -
-> -		uint16 GetSpeakerGain() {deprecated}
-> -
-> -			Returns the current speaker gain if available,
-> -			otherwise returns the error NotAvailable.
-> -
-> -		uint16 GetMicrophoneGain() {deprecated}
-> -
-> -			Returns the current microphone gain if available,
-> -			otherwise returns the error NotAvailable.
-> -
-> -		void SetSpeakerGain(uint16 gain) {deprecated}
-> -
-> -			Changes the current speaker gain if possible.
-> -
-> -		void SetMicrophoneGain(uint16 gain) {deprecated}
-> -
-> -			Changes the current speaker gain if possible.
-> -
->   		dict GetProperties()
->
->   			Returns all properties for the interface. See the
-If you remove these APIs, could you guide me how to use SCO open officially?
-Currently we don't use PulseAudio HFP modules.
-
-BR
-Chanyeol Park.
-
-
-
+>  #ifdef __cplusplus
+>  }
+>  #endif
+> diff --git a/lib/amp.h b/lib/amp.h
+> new file mode 100644
+> index 0000000..f364f85
+> --- /dev/null
+> +++ b/lib/amp.h
+> @@ -0,0 +1,174 @@
+> +/*
+> + *
+> + *	BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *	Copyright (C) 2010-2011 Code Aurora Forum.  All rights reserved.
+> + *	Copyright (C) 2012 Intel Corp.
+> + *
+> + *	This program is free software; you can redistribute it and/or modify
+> + *	it under the terms of the GNU General Public License version 2 and
+> + *	only version 2 as published by the Free Software Foundation.
+> + *
+> + *	This program is distributed in the hope that it will be useful,
+> + *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *	GNU General Public License for more details.
+> + *
+> + */
+> +
+> +#ifndef __AMP_H
+> +#define __AMP_H
+> +
+> +#ifdef __cplusplus
+> +extern "C" {
+> +#endif
+> +
+> +#define AMP_MGR_CID 0x03
+> +
+> +/* AMP manager codes */
+> +#define AMP_COMMAND_REJ		0x01
+> +#define AMP_DISCOVER_REQ	0x02
+> +#define AMP_DISCOVER_RSP	0x03
+> +#define AMP_CHANGE_NOTIFY	0x04
+> +#define AMP_CHANGE_RSP		0x05
+> +#define AMP_INFO_REQ		0x06
+> +#define AMP_INFO_RSP		0x07
+> +#define AMP_ASSOC_REQ		0x08
+> +#define AMP_ASSOC_RSP		0x09
+> +#define AMP_LINK_REQ		0x0a
+> +#define AMP_LINK_RSP		0x0b
+> +#define AMP_DISCONN_REQ		0x0c
+> +#define AMP_DISCONN_RSP		0x0d
+> +
+> +typedef struct {
+> +	uint8_t		code;
+> +	uint8_t		ident;
+> +	uint16_t	len;
+> +} __attribute__ ((packed)) amp_mgr_hdr;
+> +#define AMP_MGR_HDR_SIZE 4
+> +
+> +/* AMP ASSOC structure */
+> +typedef struct {
+> +	uint8_t		type_id;
+> +	uint16_t	len;
+> +	uint8_t		data[0];
+> +} __attribute__ ((packed)) amp_assoc_tlv;
+> +
+> +typedef struct {
+> +	uint16_t	reason;
+> +} __attribute__ ((packed)) amp_cmd_rej_parms;
+> +
+> +typedef struct {
+> +	uint16_t	mtu;
+> +	uint16_t	mask;
+> +} __attribute__ ((packed)) amp_discover_req_parms;
+> +
+> +typedef struct {
+> +	uint16_t	mtu;
+> +	uint16_t	mask;
+> +	uint8_t		controller_list[0];
+> +} __attribute__ ((packed)) amp_discover_rsp_parms;
+> +
+> +typedef struct {
+> +	uint8_t		id;
+> +} __attribute__ ((packed)) amp_info_req_parms;
+> +
+> +typedef struct {
+> +	uint8_t		id;
+> +	uint8_t		status;
+> +	uint32_t	total_bandwidth;
+> +	uint32_t	max_bandwidth;
+> +	uint32_t	min_latency;
+> +	uint16_t	pal_caps;
+> +	uint16_t	assoc_size;
+> +} __attribute__ ((packed)) amp_info_rsp_parms;
+> +
+> +typedef struct {
+> +	uint8_t		id;
+> +	uint8_t		status;
+> +	amp_assoc_tlv	assoc;
+> +} __attribute__ ((packed)) amp_assoc_rsp_parms;
+> +
+> +typedef struct {
+> +	uint8_t		local_id;
+> +	uint8_t		remote_id;
+> +	amp_assoc_tlv	assoc;
+> +} __attribute__ ((packed)) amp_link_req_parms;
+> +
+> +typedef struct {
+> +	uint8_t		local_id;
+> +	uint8_t		remote_id;
+> +	uint8_t		status;
+> +} __attribute__ ((packed)) amp_link_rsp_parms;
+> +
+> +typedef struct {
+> +	uint8_t		local_id;
+> +	uint8_t		remote_id;
+> +} __attribute__ ((packed)) amp_disconn_req_parms;
+> +
+> +#define A2MP_MAC_ADDR_TYPE		1
+> +#define A2MP_PREF_CHANLIST_TYPE		2
+> +#define A2MP_CONNECTED_CHAN		3
+> +#define A2MP_PAL_CAP_TYPE		4
+> +#define A2MP_PAL_VER_INFO		5
+> +
+> +struct amp_tlv {
+> +	uint8_t type;
+> +	uint16_t len;
+> +	uint8_t val[0];
+> +} __attribute__ ((packed));
+> +
+> +struct amp_pal_ver {
+> +	uint8_t ver;
+> +	uint16_t company_id;
+> +	uint16_t sub_ver;
+> +} __attribute__ ((packed));
+> +
+> +struct amp_country_triplet {
+> +	union {
+> +		struct {
+> +			uint8_t first_channel;
+> +			uint8_t num_channels;
+> +			int8_t max_power;
+> +		} __attribute__ ((packed)) chans;
+> +		struct {
+> +			uint8_t reg_extension_id;
+> +			uint8_t reg_class;
+> +			uint8_t coverage_class;
+> +		} __attribute__ ((packed)) ext;
+> +	};
+> +} __attribute__ ((packed));
+> +
+> +struct amp_chan_list {
+> +	uint8_t country_code[3];
+> +	struct amp_country_triplet triplets[0];
+> +} __attribute__ ((packed));
+> +
+> +#define AMP_COMMAND_NOT_RECOGNIZED 0x0000
+> +
+> +/* AMP controller status */
+> +#define AMP_CT_POWERED_DOWN		0x00
+> +#define AMP_CT_BLUETOOTH_ONLY		0x01
+> +#define AMP_CT_NO_CAPACITY		0x02
+> +#define AMP_CT_LOW_CAPACITY		0x03
+> +#define AMP_CT_MEDIUM_CAPACITY		0x04
+> +#define AMP_CT_HIGH_CAPACITY		0x05
+> +#define AMP_CT_FULL_CAPACITY		0x06
+> +
+> +/* AMP response status */
+> +#define AMP_STATUS_SUCCESS				0x00
+> +#define AMP_STATUS_INVALID_CTRL_ID			0x01
+> +#define AMP_STATUS_UNABLE_START_LINK_CREATION		0x02
+> +#define AMP_STATUS_NO_PHYSICAL_LINK_EXISTS		0x02
+> +#define AMP_STATUS_COLLISION_OCCURED			0x03
+> +#define AMP_STATUS_DISCONN_REQ_RECVD			0x04
+> +#define AMP_STATUS_PHYS_LINK_EXISTS			0x05
+> +#define AMP_STATUS_SECURITY_VIOLATION			0x06
+> +
+> +void amp_assoc_dump(int level, uint8_t *assoc, uint16_t len);
+> +
+> +#ifdef __cplusplus
+> +}
+> +#endif
+> +
+> +#endif /* __AMP_H */
+> -- 
+> 1.7.9.5
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
