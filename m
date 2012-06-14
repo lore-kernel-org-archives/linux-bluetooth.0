@@ -1,187 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-From: Paulo Alcantara <paulo.alcantara@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ 01/12] storage: Store address type in "names" file
-Date: Thu, 14 Jun 2012 20:03:53 -0300
-Message-Id: <1339715044-13737-2-git-send-email-paulo.alcantara@openbossa.org>
-In-Reply-To: <1339715044-13737-1-git-send-email-paulo.alcantara@openbossa.org>
-References: <1339715044-13737-1-git-send-email-paulo.alcantara@openbossa.org>
+From: Bing Zhao <bzhao@marvell.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 14 Jun 2012 11:11:29 -0700
+Subject: RE: [RFC] Bluetooth: btmrvl: Do not send vendor events to bluetooth
+ stack
+Message-ID: <477F20668A386D41ADCC57781B1F7043083A8A6E5F@SC-VEXCH1.marvell.com>
+References: <1339583744-2849-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1339583744-2849-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-"names" file is shared between BR/EDR and BLE. Addressing types can be
-either BR/EDR, BLE public or BLE random so the entries in the "names"
-file did not contain enough information to distinguish which addressing
-type it's supposed to be. Entries will now contain both address number,
-and address type as a single key in every entry in the file.
----
- input/device.c |    6 ++++--
- src/adapter.c  |    3 ++-
- src/device.c   |    3 ++-
- src/event.c    |    7 +++++--
- src/storage.c  |   30 ++++++++++++++++++++++--------
- src/storage.h  |    6 ++++--
- 6 files changed, 39 insertions(+), 16 deletions(-)
+Hi Andrei,
 
-diff --git a/input/device.c b/input/device.c
-index 0e3f4a9..62d44f7 100644
---- a/input/device.c
-+++ b/input/device.c
-@@ -1085,10 +1085,11 @@ static struct input_device *input_device_new(DBusConnection *conn,
- 	struct btd_adapter *adapter = device_get_adapter(device);
- 	struct input_device *idev;
- 	char name[249], src_addr[18], dst_addr[18];
-+	uint8_t bdaddr_type;
- 
- 	idev = g_new0(struct input_device, 1);
- 	adapter_get_address(adapter, &idev->src);
--	device_get_address(device, &idev->dst, NULL);
-+	device_get_address(device, &idev->dst, &bdaddr_type);
- 	idev->device = btd_device_ref(device);
- 	idev->path = g_strdup(path);
- 	idev->conn = dbus_connection_ref(conn);
-@@ -1097,7 +1098,8 @@ static struct input_device *input_device_new(DBusConnection *conn,
- 
- 	ba2str(&idev->src, src_addr);
- 	ba2str(&idev->dst, dst_addr);
--	if (read_device_name(src_addr, dst_addr, name) == 0)
-+
-+	if (read_device_name(src_addr, dst_addr, bdaddr_type, name) == 0)
- 		idev->name = g_strdup(name);
- 
- 	if (g_dbus_register_interface(conn, idev->path, INPUT_DEVICE_INTERFACE,
-diff --git a/src/adapter.c b/src/adapter.c
-index 6e04faf..baa28e8 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2880,7 +2880,8 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 							eir_data.appearance);
- 
- 	if (eir_data.name != NULL && eir_data.name_complete)
--		write_device_name(&adapter->bdaddr, bdaddr, eir_data.name);
-+		write_device_name(&adapter->bdaddr, bdaddr, bdaddr_type,
-+								eir_data.name);
- 
- 	dev = adapter_search_found_devices(adapter, bdaddr);
- 	if (dev) {
-diff --git a/src/device.c b/src/device.c
-index c210bcb..09518f3 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1073,7 +1073,8 @@ struct btd_device *device_create(DBusConnection *conn,
- 	device->bdaddr_type = bdaddr_type;
- 	adapter_get_address(adapter, &src);
- 	ba2str(&src, srcaddr);
--	read_device_name(srcaddr, address, device->name);
-+
-+	read_device_name(srcaddr, address, bdaddr_type, device->name);
- 	if (read_device_alias(srcaddr, address, alias, sizeof(alias)) == 0)
- 		device->alias = g_strdup(alias);
- 	device->trusted = read_trust(&src, address, GLOBAL_TRUST);
-diff --git a/src/event.c b/src/event.c
-index ec5926f..327625d 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -319,6 +319,7 @@ void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name)
- {
- 	struct btd_adapter *adapter;
- 	struct btd_device *device;
-+	uint8_t bdaddr_type;
- 	struct remote_dev_info *dev_info;
- 
- 	if (!g_utf8_validate(name, -1, NULL)) {
-@@ -333,11 +334,13 @@ void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name)
- 		g_strstrip(name);
- 	}
- 
--	write_device_name(local, peer, name);
--
- 	if (!get_adapter_and_device(local, peer, &adapter, &device, FALSE))
- 		return;
- 
-+	bdaddr_type = device_get_addr_type(device);
-+
-+	write_device_name(local, peer, bdaddr_type, name);
-+
- 	dev_info = adapter_search_found_devices(adapter, peer);
- 	if (dev_info) {
- 		g_free(dev_info->name);
-diff --git a/src/storage.c b/src/storage.c
-index 17e8001..efdc5b0 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -359,9 +359,10 @@ int read_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t *class)
- 	return 0;
- }
- 
--int write_device_name(bdaddr_t *local, bdaddr_t *peer, char *name)
-+int write_device_name(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
-+								char *name)
- {
--	char filename[PATH_MAX + 1], addr[18], str[HCI_MAX_NAME_LENGTH + 1];
-+	char filename[PATH_MAX + 1], key[20], str[HCI_MAX_NAME_LENGTH + 1];
- 	int i;
- 
- 	memset(str, 0, sizeof(str));
-@@ -375,21 +376,34 @@ int write_device_name(bdaddr_t *local, bdaddr_t *peer, char *name)
- 
- 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- 
--	ba2str(peer, addr);
--	return textfile_put(filename, addr, str);
-+	ba2str(peer, key);
-+	sprintf(&key[17], "#%hhu", bdaddr_type);
-+
-+	return textfile_put(filename, key, str);
- }
- 
--int read_device_name(const char *src, const char *dst, char *name)
-+int read_device_name(const char *src, const char *dst, uint8_t bdaddr_type,
-+								char *name)
- {
--	char filename[PATH_MAX + 1], *str;
-+	char filename[PATH_MAX + 1], *str, key[20];
- 	int len;
- 
- 	create_name(filename, PATH_MAX, STORAGEDIR, src, "names");
- 
--	str = textfile_get(filename, dst);
--	if (!str)
-+	snprintf(key, sizeof(key), "%17s#%hhu", dst, bdaddr_type);
-+
-+	str = textfile_get(filename, key);
-+	if (str != NULL)
-+		goto done;
-+
-+	/* Try old format (address only) */
-+	key[17] = '\0';
-+
-+	str = textfile_get(filename, key);
-+	if (str == NULL)
- 		return -ENOENT;
- 
-+done:
- 	len = strlen(str);
- 	if (len > HCI_MAX_NAME_LENGTH)
- 		str[HCI_MAX_NAME_LENGTH] = '\0';
-diff --git a/src/storage.h b/src/storage.h
-index cc00e97..015a2a6 100644
---- a/src/storage.h
-+++ b/src/storage.h
-@@ -42,8 +42,10 @@ int read_remote_appearance(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
- 							uint16_t *appearance);
- int write_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class);
- int read_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t *class);
--int write_device_name(bdaddr_t *local, bdaddr_t *peer, char *name);
--int read_device_name(const char *src, const char *dst, char *name);
-+int write_device_name(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
-+								char *name);
-+int read_device_name(const char *src, const char *dst, uint8_t bdaddr_type,
-+								char *name);
- int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data,
- 							uint8_t data_len);
- int read_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data);
--- 
-1.7.10.2
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Vendor-specific events shall be processed in driver and not sent
+> to bluetooth stack where they screw up HCI command countings.
+
+I tested this patch and it actually fixed the "hci0 command tx timeout" issue for me.
+
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+
+Tested-by: Bing Zhao <bzhao@marvell.com>
+
+Thanks,
+Bing
+
+> ---
+>  drivers/bluetooth/btmrvl_drv.h  |    2 +-
+>  drivers/bluetooth/btmrvl_main.c |   14 ++++++++++++--
+>  drivers/bluetooth/btmrvl_sdio.c |    8 +++++---
+>  3 files changed, 18 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
+> index 94f2d65..27068d1 100644
+> --- a/drivers/bluetooth/btmrvl_drv.h
+> +++ b/drivers/bluetooth/btmrvl_drv.h
+> @@ -136,7 +136,7 @@ int btmrvl_remove_card(struct btmrvl_private *priv);
+> 
+>  void btmrvl_interrupt(struct btmrvl_private *priv);
+> 
+> -void btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb);
+> +bool btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb);
+>  int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb);
+> 
+>  int btmrvl_send_module_cfg_cmd(struct btmrvl_private *priv, int subcmd);
+> diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+> index 681ca9d..dc304de 100644
+> --- a/drivers/bluetooth/btmrvl_main.c
+> +++ b/drivers/bluetooth/btmrvl_main.c
+> @@ -44,23 +44,33 @@ void btmrvl_interrupt(struct btmrvl_private *priv)
+>  }
+>  EXPORT_SYMBOL_GPL(btmrvl_interrupt);
+> 
+> -void btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb)
+> +bool btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb)
+>  {
+>  	struct hci_event_hdr *hdr = (void *) skb->data;
+>  	struct hci_ev_cmd_complete *ec;
+> -	u16 opcode, ocf;
+> +	u16 opcode, ocf, ogf;
+> 
+>  	if (hdr->evt == HCI_EV_CMD_COMPLETE) {
+>  		ec = (void *) (skb->data + HCI_EVENT_HDR_SIZE);
+>  		opcode = __le16_to_cpu(ec->opcode);
+>  		ocf = hci_opcode_ocf(opcode);
+> +		ogf = hci_opcode_ogf(opcode);
+> +
+>  		if (ocf == BT_CMD_MODULE_CFG_REQ &&
+>  					priv->btmrvl_dev.sendcmdflag) {
+>  			priv->btmrvl_dev.sendcmdflag = false;
+>  			priv->adapter->cmd_complete = true;
+>  			wake_up_interruptible(&priv->adapter->cmd_wait_q);
+>  		}
+> +
+> +		if (ogf == OGF) {
+> +			BT_DBG("vendor event skipped: ogf 0x%4.4x", ogf);
+> +			kfree_skb(skb);
+> +			return false;
+> +		}
+>  	}
+> +
+> +	return true;
+>  }
+>  EXPORT_SYMBOL_GPL(btmrvl_check_evtpkt);
+> 
+> diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+> index 3b9a8a3..8255a5e 100644
+> --- a/drivers/bluetooth/btmrvl_sdio.c
+> +++ b/drivers/bluetooth/btmrvl_sdio.c
+> @@ -565,10 +565,12 @@ static int btmrvl_sdio_card_to_host(struct btmrvl_private *priv)
+>  		skb_put(skb, buf_len);
+>  		skb_pull(skb, SDIO_HEADER_LEN);
+> 
+> -		if (type == HCI_EVENT_PKT)
+> -			btmrvl_check_evtpkt(priv, skb);
+> +		if (type == HCI_EVENT_PKT) {
+> +			if (btmrvl_check_evtpkt(priv, skb))
+> +				hci_recv_frame(skb);
+> +		} else
+> +			hci_recv_frame(skb);
+> 
+> -		hci_recv_frame(skb);
+>  		hdev->stat.byte_rx += buf_len;
+>  		break;
+> 
+> --
+> 1.7.9.5
 
