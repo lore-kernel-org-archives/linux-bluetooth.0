@@ -1,52 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1339659945-28094-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1339659945-28094-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Thu, 14 Jun 2012 08:07:40 -0400
-Message-ID: <CAJdJm_MtZYC9=nFzchcCR+yZiyGVNCMpXnmPf7D-dKut1UT8BA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Use AUTO_OFF constant in jiffies
+In-Reply-To: <1339665747.3987.73.camel@novo.hadess.net>
+References: <1339620223-6639-1-git-send-email-gustavo@padovan.org>
+	<1339665747.3987.73.camel@novo.hadess.net>
+Date: Thu, 14 Jun 2012 08:03:56 -0400
+Message-ID: <CAJdJm_PKmrWD9OuBxoRYEcHiWtCb28jRPmarmWhenyBUpXT_vw@mail.gmail.com>
+Subject: Re: [PATCH 00/21] BlueZ 5.0 patches
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi,
 
-On Thu, Jun 14, 2012 at 3:45 AM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Thu, Jun 14, 2012 at 5:22 AM, Bastien Nocera <hadess@hadess.net> wrote:
+> On Wed, 2012-06-13 at 17:43 -0300, Gustavo Padovan wrote:
+>>
+>>   remove compat daemons
 >
-> Move AUTO_OFF_TIMEOUT to other constants changing name to
-> HCI_AUTO_OFF_TIMEOUT and convert to jiffies.
->
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  include/net/bluetooth/hci.h |    3 ++-
->  net/bluetooth/hci_core.c    |    5 +----
->  2 files changed, 3 insertions(+), 5 deletions(-)
->
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 3d1ad2c..a7b334e 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -153,8 +153,9 @@ enum {
->  #define HCI_DISCONN_TIMEOUT    msecs_to_jiffies(4000)  /* 2 seconds */
+> Seeing as I can't find 01/21 on the mailing-list (too big?).
 
-There is a typo in the comment above. It should be "4 seconds". Maybe
-you can fix it in a separate patch together with the "seconds" ->
-"second" fix you did below?
-
->  #define HCI_PAIRING_TIMEOUT    msecs_to_jiffies(60000) /* 60 seconds */
->  #define HCI_INIT_TIMEOUT       msecs_to_jiffies(10000) /* 10 seconds */
-> -#define HCI_CMD_TIMEOUT                msecs_to_jiffies(1000)  /* 1 seconds */
-> +#define HCI_CMD_TIMEOUT                msecs_to_jiffies(1000)  /* 1 second */
->  #define HCI_ACL_TX_TIMEOUT     msecs_to_jiffies(45000) /* 45 seconds */
-> +#define HCI_AUTO_OFF_TIMEOUT   msecs_to_jiffies(2000)  /* 2 seconds */
->
->  /* HCI data types */
->  #define HCI_COMMAND_PKT                0x01
+19/21 also seems to be missing.
 
 Regards,
 -- 
