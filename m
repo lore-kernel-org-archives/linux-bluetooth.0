@@ -1,33 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1339665747.3987.73.camel@novo.hadess.net>
-References: <1339620223-6639-1-git-send-email-gustavo@padovan.org>
-	<1339665747.3987.73.camel@novo.hadess.net>
-Date: Thu, 14 Jun 2012 08:03:56 -0400
-Message-ID: <CAJdJm_PKmrWD9OuBxoRYEcHiWtCb28jRPmarmWhenyBUpXT_vw@mail.gmail.com>
-Subject: Re: [PATCH 00/21] BlueZ 5.0 patches
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+In-Reply-To: <1339620563-25161-1-git-send-email-szymon@janc.net.pl>
+References: <1339620563-25161-1-git-send-email-szymon@janc.net.pl>
+Date: Thu, 14 Jun 2012 14:34:56 +0300
+Message-ID: <CABBYNZ+-0Q0WJB5b42f_=XTKmS5H+V-ZmyFNFqgMovGs7s+a_Q@mail.gmail.com>
+Subject: Re: [PATCH obexd 1/7] phonebook-dummy: Fix use of uninitialized count variable
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon@janc.net.pl>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Szymon,
 
-On Thu, Jun 14, 2012 at 5:22 AM, Bastien Nocera <hadess@hadess.net> wrote:
-> On Wed, 2012-06-13 at 17:43 -0300, Gustavo Padovan wrote:
->>
->>   remove compat daemons
+On Wed, Jun 13, 2012 at 11:49 PM, Szymon Janc <szymon@janc.net.pl> wrote:
+> If opendir() call fails count would be passed to callback
+> uninitialized.
+> ---
+>  plugins/phonebook-dummy.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> Seeing as I can't find 01/21 on the mailing-list (too big?).
+> diff --git a/plugins/phonebook-dummy.c b/plugins/phonebook-dummy.c
+> index 035ec35..6b9d040 100644
+> --- a/plugins/phonebook-dummy.c
+> +++ b/plugins/phonebook-dummy.c
+> @@ -218,7 +218,7 @@ static gboolean read_dir(void *user_data)
+>        struct dummy_data *dummy = user_data;
+>        GString *buffer;
+>        DIR *dp;
+> -       uint16_t count, max, offset;
+> +       uint16_t count = 0, max, offset;
+>
+>        buffer = g_string_new("");
+>
+> --
+> 1.7.10.4
 
-19/21 also seems to be missing.
+I went ahead and applied patches with exception of the one I commented.
 
-Regards,
+
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Luiz Augusto von Dentz
