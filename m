@@ -1,36 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 14 Jun 2012 12:27:48 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Vishal Agarwal <vishal.agarwal@stericsson.com>
+Date: Thu, 14 Jun 2012 17:22:16 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v1] Bluetooth: Fix sending HCI_Disconnect only after
- connection
-Message-ID: <20120614152748.GD3846@joana>
-References: <1339545763-23251-1-git-send-email-vishal.agarwal@stericsson.com>
+Subject: Re: [PATCH] Bluetooth: Use AUTO_OFF constant in jiffies
+Message-ID: <20120614142214.GA2585@aemeltch-MOBL1>
+References: <1339659945-28094-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CAJdJm_MtZYC9=nFzchcCR+yZiyGVNCMpXnmPf7D-dKut1UT8BA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1339545763-23251-1-git-send-email-vishal.agarwal@stericsson.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CAJdJm_MtZYC9=nFzchcCR+yZiyGVNCMpXnmPf7D-dKut1UT8BA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vishal,
+Hi Anderson,
 
-* Vishal Agarwal <vishal.agarwal@stericsson.com> [2012-06-13 05:32:43 +0530]:
-
-> HCI_Disconnect should only be sent after connection is established.
-> If connection is not yet established and HCI_Disconnect is called
-> then disconnection complete will be received with a handle which
-> does not exist and hence this event will be ignored.
-> But as mgmt.c will not receive this event, its variable for pending
-> command is not cleared.This will result in future Disconnect commands
-> for that BD Address to be blocked with error busy.
+On Thu, Jun 14, 2012 at 08:07:40AM -0400, Anderson Lizardo wrote:
+> > Move AUTO_OFF_TIMEOUT to other constants changing name to
+> > HCI_AUTO_OFF_TIMEOUT and convert to jiffies.
+> >
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  include/net/bluetooth/hci.h |    3 ++-
+> >  net/bluetooth/hci_core.c    |    5 +----
+> >  2 files changed, 3 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> > index 3d1ad2c..a7b334e 100644
+> > --- a/include/net/bluetooth/hci.h
+> > +++ b/include/net/bluetooth/hci.h
+> > @@ -153,8 +153,9 @@ enum {
+> >  #define HCI_DISCONN_TIMEOUT    msecs_to_jiffies(4000)  /* 2 seconds */
 > 
-> Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
-> ---
->  net/bluetooth/mgmt.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+> There is a typo in the comment above. It should be "4 seconds". Maybe
+> you can fix it in a separate patch together with the "seconds" ->
+> "second" fix you did below?
 
-Patch has been applied to the bluetooth.git tree (with the fix proposed by
-Johan), thanks.
+Sorry, the patch applied against my tree where I use this hack for
+"slow" device. I will rebase the patch against bluetooth-next.
 
-	Gustavo
+Best regards 
+Andrei Emeltchenko 
+
