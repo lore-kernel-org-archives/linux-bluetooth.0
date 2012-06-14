@@ -1,40 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 14 Jun 2012 15:18:14 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [PATCH 00/21] BlueZ 5.0 patches
-Message-ID: <20120614121814.GA3850@x220>
-References: <1339620223-6639-1-git-send-email-gustavo@padovan.org>
- <1339665747.3987.73.camel@novo.hadess.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1339665747.3987.73.camel@novo.hadess.net>
+In-Reply-To: <1339659945-28094-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1339659945-28094-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 14 Jun 2012 08:07:40 -0400
+Message-ID: <CAJdJm_MtZYC9=nFzchcCR+yZiyGVNCMpXnmPf7D-dKut1UT8BA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Use AUTO_OFF constant in jiffies
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Andrei,
 
-On Thu, Jun 14, 2012, Bastien Nocera wrote:
-> > compat/hidd.1                      |   41 -
-> > compat/hidd.c                      |  848 --------
-> 
-> We need something to replace hidd --show, for debugging purposes.
+On Thu, Jun 14, 2012 at 3:45 AM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> Move AUTO_OFF_TIMEOUT to other constants changing name to
+> HCI_AUTO_OFF_TIMEOUT and convert to jiffies.
+>
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  include/net/bluetooth/hci.h |    3 ++-
+>  net/bluetooth/hci_core.c    |    5 +----
+>  2 files changed, 3 insertions(+), 5 deletions(-)
+>
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 3d1ad2c..a7b334e 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -153,8 +153,9 @@ enum {
+>  #define HCI_DISCONN_TIMEOUT    msecs_to_jiffies(4000)  /* 2 seconds */
 
-All that does is call a simple ioctl and print its result, requiring
-maybe 10 lines of code or so. What we could do is add a small tool under
-tools/ that can do the same task.
+There is a typo in the comment above. It should be "4 seconds". Maybe
+you can fix it in a separate patch together with the "seconds" ->
+"second" fix you did below?
 
-> > compat/fakehid.c                   |  669 ------
-> 
-> Is there something to replace the support for those devices? Nobody
-> seems to have added the support to input/fakehid.c which would be the
-> logical place.
+>  #define HCI_PAIRING_TIMEOUT    msecs_to_jiffies(60000) /* 60 seconds */
+>  #define HCI_INIT_TIMEOUT       msecs_to_jiffies(10000) /* 10 seconds */
+> -#define HCI_CMD_TIMEOUT                msecs_to_jiffies(1000)  /* 1 seconds */
+> +#define HCI_CMD_TIMEOUT                msecs_to_jiffies(1000)  /* 1 second */
+>  #define HCI_ACL_TX_TIMEOUT     msecs_to_jiffies(45000) /* 45 seconds */
+> +#define HCI_AUTO_OFF_TIMEOUT   msecs_to_jiffies(2000)  /* 2 seconds */
+>
+>  /* HCI data types */
+>  #define HCI_COMMAND_PKT                0x01
 
-Yep, seems like the logical place to me too. Do we have any actual
-users/developers of this device that would be willing to step up to do
-this code merge and test that everything still works?
-
-Johan
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
