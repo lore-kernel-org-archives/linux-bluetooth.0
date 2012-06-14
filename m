@@ -1,33 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1339665747.3987.73.camel@novo.hadess.net>
-Subject: Re: [PATCH 00/21] BlueZ 5.0 patches
-From: Bastien Nocera <hadess@hadess.net>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Date: Thu, 14 Jun 2012 10:22:27 +0100
-In-Reply-To: <1339620223-6639-1-git-send-email-gustavo@padovan.org>
+MIME-Version: 1.0
+In-Reply-To: <4FD99618.6030100@samsung.com>
 References: <1339620223-6639-1-git-send-email-gustavo@padovan.org>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
+	<1339620223-6639-4-git-send-email-gustavo@padovan.org>
+	<4FD99618.6030100@samsung.com>
+Date: Thu, 14 Jun 2012 11:14:58 +0300
+Message-ID: <CABBYNZ+x4WM56g_kTKPaotMjkQv3bEz1itkXRA6VqC5+nuiV7w@mail.gmail.com>
+Subject: Re: [PATCH 03/21] headset: remove deprecated DBus methods
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Chanyeol Park <chanyeol.park@samsung.com>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2012-06-13 at 17:43 -0300, Gustavo Padovan wrote:
-> 
->   remove compat daemons 
+Hi Chanyel,
 
-Seeing as I can't find 01/21 on the mailing-list (too big?).
+On Thu, Jun 14, 2012 at 10:43 AM, Chanyeol Park
+<chanyeol.park@samsung.com> wrote:
+> If you remove these APIs, could you guide me how to use SCO open officially?
+> Currently we don't use PulseAudio HFP modules.
+
+Via org.bluez.MediaTransport.Acquire, see doc/media-api.txt for more details.
 
 
-> compat/hidd.1                      |   41 -
-> compat/hidd.c                      |  848 --------
-
-We need something to replace hidd --show, for debugging purposes.
-
-> compat/fakehid.c                   |  669 ------
-
-Is there something to replace the support for those devices? Nobody
-seems to have added the support to input/fakehid.c which would be the
-logical place.
-
+-- 
+Luiz Augusto von Dentz
