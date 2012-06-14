@@ -2,72 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Paulo Alcantara <paulo.alcantara@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ 03/12] core: Fix reading from "aliases" and "names" file
-Date: Thu, 14 Jun 2012 20:03:55 -0300
-Message-Id: <1339715044-13737-4-git-send-email-paulo.alcantara@openbossa.org>
-In-Reply-To: <1339715044-13737-1-git-send-email-paulo.alcantara@openbossa.org>
-References: <1339715044-13737-1-git-send-email-paulo.alcantara@openbossa.org>
+Subject: [PATCH BlueZ 00/12] Store address type in BR/EDR and shared files
+Date: Thu, 14 Jun 2012 20:03:52 -0300
+Message-Id: <1339715044-13737-1-git-send-email-paulo.alcantara@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/adapter.c |   23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
+This patchset proposes new storage format (used currently in LE-only
+files) in BR/EDR and shared files.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index baa28e8..266142f 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2839,16 +2839,26 @@ static gboolean pairing_is_legacy(bdaddr_t *local, bdaddr_t *peer,
- 		return TRUE;
- }
- 
--static char *read_stored_data(bdaddr_t *local, bdaddr_t *peer, const char *file)
-+static char *read_stored_data(bdaddr_t *local, bdaddr_t *peer,
-+			      uint8_t bdaddr_type, const char *file)
- {
--	char local_addr[18], peer_addr[18], filename[PATH_MAX + 1];
-+	char local_addr[18], key[20], filename[PATH_MAX + 1], *str;
- 
- 	ba2str(local, local_addr);
--	ba2str(peer, peer_addr);
- 
- 	create_name(filename, PATH_MAX, STORAGEDIR, local_addr, file);
- 
--	return textfile_get(filename, peer_addr);
-+	ba2str(peer, key);
-+	sprintf(&key[17], "#%hhu", bdaddr_type);
-+
-+	str = textfile_get(filename, key);
-+	if (str != NULL)
-+		return str;
-+
-+	/* Try old format (address only) */
-+	key[17] = '\0';
-+
-+	return textfile_get(filename, key);
- }
- 
- void adapter_update_found_devices(struct btd_adapter *adapter,
-@@ -2906,7 +2916,7 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 
- 	/* New device in the discovery session */
- 
--	name = read_stored_data(&adapter->bdaddr, bdaddr, "names");
-+	name = read_stored_data(&adapter->bdaddr, bdaddr, bdaddr_type, "names");
- 
- 	if (bdaddr_type == BDADDR_BREDR) {
- 		legacy = pairing_is_legacy(&adapter->bdaddr, bdaddr, data,
-@@ -2926,7 +2936,8 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 		adapter_ops->confirm_name(adapter->dev_id, bdaddr, bdaddr_type,
- 								name_known);
- 
--	alias = read_stored_data(&adapter->bdaddr, bdaddr, "aliases");
-+	alias = read_stored_data(&adapter->bdaddr, bdaddr, bdaddr_type,
-+								"aliases");
- 
- 	dev = found_device_new(bdaddr, bdaddr_type, name, alias, dev_class,
- 						legacy, eir_data.flags);
+As the LE-only file changes _only_ occurred in the BlueZ 4.100 release,
+the BlueZ 5.x release should contain the new storage format in BR/EDR and
+shared files as well.
+
+Do we also need to change BR/EDR-only files like profiles, sdp, linkkeys
+and eir ?
+
+
+Claudio Takahasi (1):
+  storage: Store address type in blocked file
+
+Paulo Alcantara (11):
+  storage: Store address type in "names" file
+  storage: Store address type in aliases file
+  core: Fix reading from "aliases" and "names" file
+  storage: Store address type in "lastseen" file
+  storage: Store address type in "lastused" file
+  storage: Store address type in "profiles" file
+  storage: Store address type in "did" file
+  storage: Store address type in "linkkeys" file
+  storage: Store address type in "trusts" file
+  storage: Store address type in "eir" file
+  storage: Store address type in "sdp" file
+
+ input/device.c |   11 +-
+ src/adapter.c  |   44 ++++++--
+ src/device.c   |   54 +++++-----
+ src/event.c    |   27 +++--
+ src/storage.c  |  308 ++++++++++++++++++++++++++++++++++++++++----------------
+ src/storage.h  |   61 +++++++----
+ 6 files changed, 352 insertions(+), 153 deletions(-)
+
 -- 
 1.7.10.2
 
