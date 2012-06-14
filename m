@@ -2,150 +2,95 @@ Return-Path: <cyrus@holtmann.org>
 From: Paulo Alcantara <paulo.alcantara@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ 08/12] storage: Store address type in "did" file
-Date: Thu, 14 Jun 2012 20:04:00 -0300
-Message-Id: <1339715044-13737-9-git-send-email-paulo.alcantara@openbossa.org>
+Subject: [PATCH BlueZ 05/12] storage: Store address type in "lastseen" file
+Date: Thu, 14 Jun 2012 20:03:57 -0300
+Message-Id: <1339715044-13737-6-git-send-email-paulo.alcantara@openbossa.org>
 In-Reply-To: <1339715044-13737-1-git-send-email-paulo.alcantara@openbossa.org>
 References: <1339715044-13737-1-git-send-email-paulo.alcantara@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/device.c  |    7 ++++---
- src/storage.c |   33 +++++++++++++++++++++++----------
- src/storage.h |    4 ++--
- 3 files changed, 29 insertions(+), 15 deletions(-)
+ src/event.c   |    6 +++---
+ src/storage.c |   11 +++++++----
+ src/storage.h |    3 ++-
+ 3 files changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 685db89..b606a0d 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1094,8 +1094,8 @@ struct btd_device *device_create(DBusConnection *conn,
- 		device_set_bonded(device, TRUE);
- 	}
- 
--	if (read_device_id(srcaddr, address, NULL, &vendor, &product, &version)
--									== 0) {
-+	if (read_device_id(srcaddr, address, bdaddr_type, NULL, &vendor,
-+						&product, &version) == 0) {
- 		device_set_vendor(device, vendor);
- 		device_set_product(device, product);
- 		device_set_version(device, version);
-@@ -1496,7 +1496,8 @@ static void update_services(struct browse_req *req, sdp_list_t *recs)
- 			device_set_version(device, version);
- 
- 			if (source || vendor || product || version)
--				store_device_id(srcaddr, dstaddr, source,
-+				store_device_id(srcaddr, dstaddr,
-+						device->bdaddr_type, source,
- 						vendor, product, version);
- 		}
- 
-diff --git a/src/storage.c b/src/storage.c
-index c475a40..f8d527a 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -1021,35 +1021,46 @@ sdp_record_t *find_record_in_list(sdp_list_t *recs, const char *uuid)
- 	return NULL;
+diff --git a/src/event.c b/src/event.c
+index 327625d..2c3c966 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -233,7 +233,7 @@ void btd_event_simple_pairing_complete(bdaddr_t *local, bdaddr_t *peer,
+ 	device_simple_pairing_complete(device, status);
  }
  
--int store_device_id(const gchar *src, const gchar *dst,
-+int store_device_id(const gchar *src, const gchar *dst, uint8_t bdaddr_type,
- 				const uint16_t source, const uint16_t vendor,
- 				const uint16_t product, const uint16_t version)
+-static void update_lastseen(bdaddr_t *sba, bdaddr_t *dba)
++static void update_lastseen(bdaddr_t *sba, bdaddr_t *dba, uint8_t bdaddr_type)
  {
--	char filename[PATH_MAX + 1], str[20];
-+	char filename[PATH_MAX + 1], key[20], str[20];
+ 	time_t t;
+ 	struct tm *tm;
+@@ -241,7 +241,7 @@ static void update_lastseen(bdaddr_t *sba, bdaddr_t *dba)
+ 	t = time(NULL);
+ 	tm = gmtime(&t);
  
- 	create_name(filename, PATH_MAX, STORAGEDIR, src, "did");
+-	write_lastseen_info(sba, dba, tm);
++	write_lastseen_info(sba, dba, bdaddr_type, tm);
+ }
+ 
+ static void update_lastused(bdaddr_t *sba, bdaddr_t *dba)
+@@ -267,7 +267,7 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type
+ 		return;
+ 	}
+ 
+-	update_lastseen(local, peer);
++	update_lastseen(local, peer, bdaddr_type);
+ 
+ 	if (data)
+ 		write_remote_eir(local, peer, data, data_len);
+diff --git a/src/storage.c b/src/storage.c
+index fe863ef..21f7333 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -572,9 +572,10 @@ int read_remote_features(bdaddr_t *local, bdaddr_t *peer,
+ 	return err;
+ }
+ 
+-int write_lastseen_info(bdaddr_t *local, bdaddr_t *peer, struct tm *tm)
++int write_lastseen_info(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
++								struct tm *tm)
+ {
+-	char filename[PATH_MAX + 1], addr[18], str[24];
++	char filename[PATH_MAX + 1], key[20], str[24];
+ 
+ 	memset(str, 0, sizeof(str));
+ 	strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S %Z", tm);
+@@ -583,8 +584,10 @@ int write_lastseen_info(bdaddr_t *local, bdaddr_t *peer, struct tm *tm)
  
  	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
  
-+	snprintf(key, sizeof(key), "%17s#%hhu", dst, bdaddr_type);
+-	ba2str(peer, addr);
+-	return textfile_put(filename, addr, str);
++	ba2str(peer, key);
++	sprintf(&key[17], "#%hhu", bdaddr_type);
 +
- 	snprintf(str, sizeof(str), "%04X %04X %04X %04X", source,
- 						vendor, product, version);
- 
--	return textfile_put(filename, dst, str);
 +	return textfile_put(filename, key, str);
  }
  
- static int read_device_id_from_did(const gchar *src, const gchar *dst,
--					uint16_t *source, uint16_t *vendor,
--					uint16_t *product, uint16_t *version)
-+				   uint8_t bdaddr_type, uint16_t *source,
-+				   uint16_t *vendor, uint16_t *product,
-+							uint16_t *version)
- {
- 	char filename[PATH_MAX + 1];
--	char *str, *vendor_str, *product_str, *version_str;
-+	char key[20], *str, *vendor_str, *product_str, *version_str;
- 
- 	create_name(filename, PATH_MAX, STORAGEDIR, src, "did");
- 
-+	snprintf(key, sizeof(key), "%17s#%hhu", dst, bdaddr_type);
-+
-+	str = textfile_get(filename, key);
-+	if (str != NULL)
-+		goto done;
-+
-+	/* Try old format (address only) */
- 	str = textfile_get(filename, dst);
- 	if (!str)
- 		return -ENOENT;
- 
-+done:
- 	vendor_str = strchr(str, ' ');
- 	if (!vendor_str) {
- 		free(str);
-@@ -1086,7 +1097,7 @@ static int read_device_id_from_did(const gchar *src, const gchar *dst,
- }
- 
- int read_device_id(const gchar *srcaddr, const gchar *dstaddr,
--					uint16_t *source, uint16_t *vendor,
-+		   uint8_t bdaddr_type, uint16_t *source, uint16_t *vendor,
- 					uint16_t *product, uint16_t *version)
- {
- 	uint16_t lsource, lvendor, lproduct, lversion;
-@@ -1095,8 +1106,9 @@ int read_device_id(const gchar *srcaddr, const gchar *dstaddr,
- 	bdaddr_t src, dst;
- 	int err;
- 
--	err = read_device_id_from_did(srcaddr, dstaddr, &lsource,
--						vendor, product, version);
-+	err = read_device_id_from_did(srcaddr, dstaddr, bdaddr_type, &lsource,
-+								vendor, product,
-+								version);
- 	if (!err) {
- 		if (lsource == 0xffff)
- 			err = -ENOENT;
-@@ -1141,7 +1153,8 @@ int read_device_id(const gchar *srcaddr, const gchar *dstaddr,
- 		lversion = 0x0000;
- 	}
- 
--	store_device_id(srcaddr, dstaddr, lsource, lvendor, lproduct, lversion);
-+	store_device_id(srcaddr, dstaddr, lsource, bdaddr_type, lvendor,
-+							lproduct, lversion);
- 
- 	if (err)
- 		return err;
+ int write_lastused_info(bdaddr_t *local, bdaddr_t *peer, struct tm *tm)
 diff --git a/src/storage.h b/src/storage.h
-index 0ac7c03..c7750ac 100644
+index 6d022c8..68ddac9 100644
 --- a/src/storage.h
 +++ b/src/storage.h
-@@ -73,10 +73,10 @@ int delete_record(const gchar *src, const gchar *dst, const uint32_t handle);
- void delete_all_records(const bdaddr_t *src, const bdaddr_t *dst);
- sdp_list_t *read_records(const bdaddr_t *src, const bdaddr_t *dst);
- sdp_record_t *find_record_in_list(sdp_list_t *recs, const char *uuid);
--int store_device_id(const gchar *src, const gchar *dst,
-+int store_device_id(const gchar *src, const gchar *dst, uint8_t bdaddr_type,
- 				const uint16_t source, const uint16_t vendor,
- 				const uint16_t product, const uint16_t version);
--int read_device_id(const gchar *src, const gchar *dst,
-+int read_device_id(const gchar *src, const gchar *dst, uint8_t bdaddr_type,
- 					uint16_t *source, uint16_t *vendor,
- 					uint16_t *product, uint16_t *version);
- int write_device_pairable(bdaddr_t *local, gboolean mode);
+@@ -54,7 +54,8 @@ int read_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data);
+ int write_version_info(bdaddr_t *local, bdaddr_t *peer, uint16_t manufacturer, uint8_t lmp_ver, uint16_t lmp_subver);
+ int write_features_info(bdaddr_t *local, bdaddr_t *peer, unsigned char *page1, unsigned char *page2);
+ int read_remote_features(bdaddr_t *local, bdaddr_t *peer, unsigned char *page1, unsigned char *page2);
+-int write_lastseen_info(bdaddr_t *local, bdaddr_t *peer, struct tm *tm);
++int write_lastseen_info(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
++								struct tm *tm);
+ int write_lastused_info(bdaddr_t *local, bdaddr_t *peer, struct tm *tm);
+ int write_link_key(bdaddr_t *local, bdaddr_t *peer, unsigned char *key, uint8_t type, int length);
+ int read_link_key(bdaddr_t *local, bdaddr_t *peer, unsigned char *key, uint8_t *type);
 -- 
 1.7.10.2
 
