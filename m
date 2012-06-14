@@ -1,56 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1339681903-24764-1-git-send-email-luiz.dentz@gmail.com>
-References: <1339681903-24764-1-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 15 Jun 2012 00:58:08 +0900
-Message-ID: <CAJx1FMNQGqwg+rn7pQ50JSBTS2sPjfemLMqVU6bpjVH=PkYXTA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/5] audio: Remove internal audio IPC
-From: "Chanyeol,Park" <chanyeol.park@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 14 Jun 2012 12:27:48 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Vishal Agarwal <vishal.agarwal@stericsson.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH v1] Bluetooth: Fix sending HCI_Disconnect only after
+ connection
+Message-ID: <20120614152748.GD3846@joana>
+References: <1339545763-23251-1-git-send-email-vishal.agarwal@stericsson.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1339545763-23251-1-git-send-email-vishal.agarwal@stericsson.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+Hi Vishal,
 
-2012/6/14 Luiz Augusto von Dentz <luiz.dentz@gmail.com>
->
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> With unix socket and ALSA removed there is no longer any use for the
-> internal IPC.
+* Vishal Agarwal <vishal.agarwal@stericsson.com> [2012-06-13 05:32:43 +0530]:
+
+> HCI_Disconnect should only be sent after connection is established.
+> If connection is not yet established and HCI_Disconnect is called
+> then disconnection complete will be received with a handle which
+> does not exist and hence this event will be ignored.
+> But as mgmt.c will not receive this event, its variable for pending
+> command is not cleared.This will result in future Disconnect commands
+> for that BD Address to be blocked with error busy.
+> 
+> Signed-off-by: Vishal Agarwal <vishal.agarwal@stericsson.com>
 > ---
->  Makefile.am                        |    4 +-
->  Makefile.tools                     |    5 +-
->  audio/device.c                     |    1 -
->  audio/gstavdtpsink.c               | 1107
-> ++++-------------------------------
->  audio/gstavdtpsink.h               |    1 -
->  audio/ipc.c                        |  134 -----
->  audio/ipc.h                        |  361 ------------
->  audio/manager.c                    |    1 -
->  test/ipctest-a2dp-easy.test        |    8 -
->  test/ipctest-a2dp-resume-fast.test |   82 ---
->  test/ipctest-hsp-a2dp-switch.test  |   50 --
->  test/ipctest-hsp-easy.test         |    7 -
->  test/ipctest-init-shutdown.test    |   59 --
->  test/ipctest.c                     | 1133
-> ------------------------------------
->  14 files changed, 112 insertions(+), 2841 deletions(-)
->  delete mode 100644 audio/ipc.c
->  delete mode 100644 audio/ipc.h
->  delete mode 100644 test/ipctest-a2dp-easy.test
->  delete mode 100644 test/ipctest-a2dp-resume-fast.test
->  delete mode 100644 test/ipctest-hsp-a2dp-switch.test
->  delete mode 100644 test/ipctest-hsp-easy.test
->  delete mode 100644 test/ipctest-init-shutdown.test
->  delete mode 100644 test/ipctest.c
->
-I think if you remove audio legacy IPC,
-GST, ALSA audio client have no meaning in the bluez.
+>  net/bluetooth/mgmt.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-If so, is it better to remove the related whole files?
+Patch has been applied to the bluetooth.git tree (with the fix proposed by
+Johan), thanks.
 
-BR
-Chanyeol Park
+	Gustavo
