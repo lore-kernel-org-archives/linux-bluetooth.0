@@ -2,214 +2,111 @@ Return-Path: <cyrus@holtmann.org>
 From: Paulo Alcantara <paulo.alcantara@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ 12/12] storage: Store address type in "sdp" file
-Date: Thu, 14 Jun 2012 20:04:04 -0300
-Message-Id: <1339715044-13737-13-git-send-email-paulo.alcantara@openbossa.org>
+Subject: [PATCH BlueZ 11/12] storage: Store address type in "eir" file
+Date: Thu, 14 Jun 2012 20:04:03 -0300
+Message-Id: <1339715044-13737-12-git-send-email-paulo.alcantara@openbossa.org>
 In-Reply-To: <1339715044-13737-1-git-send-email-paulo.alcantara@openbossa.org>
 References: <1339715044-13737-1-git-send-email-paulo.alcantara@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- input/device.c |    5 ++++-
- src/device.c   |   10 +++++++---
- src/storage.c  |   44 +++++++++++++++++++++++++++++++-------------
- src/storage.h  |   12 ++++++++----
- 4 files changed, 50 insertions(+), 21 deletions(-)
+ src/event.c   |    2 +-
+ src/storage.c |   30 +++++++++++++++++++++---------
+ src/storage.h |    7 ++++---
+ 3 files changed, 26 insertions(+), 13 deletions(-)
 
-diff --git a/input/device.c b/input/device.c
-index 62d44f7..b5b9d8a 100644
---- a/input/device.c
-+++ b/input/device.c
-@@ -594,6 +594,7 @@ static int hidp_add_connection(const struct input_device *idev,
- 	struct hidp_connadd_req *req;
- 	struct fake_hid *fake_hid;
- 	struct fake_input *fake;
-+	uint8_t bdaddr_type;
- 	sdp_record_t *rec;
- 	char src_addr[18], dst_addr[18];
- 	GError *gerr = NULL;
-@@ -608,7 +609,9 @@ static int hidp_add_connection(const struct input_device *idev,
- 	ba2str(&idev->src, src_addr);
- 	ba2str(&idev->dst, dst_addr);
+diff --git a/src/event.c b/src/event.c
+index cf3a989..90c57e6 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -270,7 +270,7 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type
+ 	update_lastseen(local, peer, bdaddr_type);
  
--	rec = fetch_record(src_addr, dst_addr, idev->handle);
-+	bdaddr_type = device_get_addr_type(idev->device);
-+
-+	rec = fetch_record(src_addr, dst_addr, bdaddr_type, idev->handle);
- 	if (!rec) {
- 		error("Rejected connection from unknown device %s", dst_addr);
- 		err = -EPERM;
-diff --git a/src/device.c b/src/device.c
-index 6d8e786..8bf5927 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1178,7 +1178,7 @@ static void device_remove_stored(struct btd_device *device)
- 							device->bdaddr_type);
- 	}
+ 	if (data)
+-		write_remote_eir(local, peer, data, data_len);
++		write_remote_eir(local, peer, bdaddr_type, data, data_len);
  
--	delete_all_records(&src, &device->bdaddr);
-+	delete_all_records(&src, &device->bdaddr, device->bdaddr_type);
- 	delete_device_service(&src, &device->bdaddr, device->bdaddr_type);
- 
- 	if (device->blocked)
-@@ -1403,7 +1403,8 @@ static void device_remove_drivers(struct btd_device *device, GSList *uuids)
- 		if (!rec)
- 			continue;
- 
--		delete_record(srcaddr, dstaddr, rec->handle);
-+		delete_record(srcaddr, dstaddr, device->bdaddr_type,
-+							rec->handle);
- 
- 		records = sdp_list_remove(records, rec);
- 		sdp_record_free(rec);
-@@ -1445,6 +1446,7 @@ static void update_services(struct browse_req *req, sdp_list_t *recs)
- 	struct btd_adapter *adapter = device_get_adapter(device);
- 	sdp_list_t *seq;
- 	char srcaddr[18], dstaddr[18];
-+	uint8_t bdaddr_type;
- 	bdaddr_t src;
- 
- 	adapter_get_address(adapter, &src);
-@@ -1511,7 +1513,9 @@ static void update_services(struct browse_req *req, sdp_list_t *recs)
- 			continue;
- 		}
- 
--		store_record(srcaddr, dstaddr, rec);
-+		bdaddr_type = device_get_addr_type(device);
-+
-+		store_record(srcaddr, dstaddr, bdaddr_type, rec);
- 
- 		/* Copy record */
- 		req->records = sdp_list_append(req->records,
+ 	adapter_update_found_devices(adapter, peer, bdaddr_type, rssi,
+ 						confirm_name, data, data_len);
 diff --git a/src/storage.c b/src/storage.c
-index 5148e58..ecc6559 100644
+index 58c94e2..5148e58 100644
 --- a/src/storage.c
 +++ b/src/storage.c
-@@ -894,9 +894,10 @@ int delete_entry(bdaddr_t *src, const char *storage, const char *key)
- 	return err;
+@@ -430,10 +430,10 @@ done:
+ 	return 0;
  }
  
--int store_record(const gchar *src, const gchar *dst, sdp_record_t *rec)
-+int store_record(const gchar *src, const gchar *dst, uint8_t bdaddr_type,
-+							sdp_record_t *rec)
+-int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data,
+-							uint8_t data_len)
++int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
++						uint8_t *data, uint8_t data_len)
  {
--	char filename[PATH_MAX + 1], key[28];
-+	char filename[PATH_MAX + 1], key[30];
- 	sdp_buf_t buf;
- 	int err, size, i;
- 	char *str;
-@@ -905,7 +906,8 @@ int store_record(const gchar *src, const gchar *dst, sdp_record_t *rec)
+-	char filename[PATH_MAX + 1], addr[18], str[481];
++	char filename[PATH_MAX + 1], key[20], str[481];
+ 	int i;
+ 
+ 	memset(str, 0, sizeof(str));
+@@ -444,23 +444,35 @@ int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data,
  
  	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
  
--	snprintf(key, sizeof(key), "%17s#%08X", dst, rec->handle);
-+	snprintf(key, sizeof(key), "%17s#%hhu#%08X", dst, bdaddr_type,
-+								rec->handle);
+-	ba2str(peer, addr);
+-	return textfile_put(filename, addr, str);
++	ba2str(peer, key);
++	sprintf(&key[17], "#%hhu", bdaddr_type);
++
++	return textfile_put(filename, key, str);
+ }
  
- 	if (sdp_gen_record_pdu(rec, &buf) < 0)
- 		return -1;
-@@ -949,34 +951,49 @@ sdp_record_t *record_from_string(const gchar *str)
- 
- 
- sdp_record_t *fetch_record(const gchar *src, const gchar *dst,
--						const uint32_t handle)
-+			   uint8_t bdaddr_type, const uint32_t handle)
+-int read_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data)
++int read_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
++								uint8_t *data)
  {
--	char filename[PATH_MAX + 1], key[28], *str;
-+	char filename[PATH_MAX + 1], old_key[28], key[30], *str;
- 	sdp_record_t *rec;
+-	char filename[PATH_MAX + 1], addr[18], *str;
++	char filename[PATH_MAX + 1], key[18], *str;
+ 	int i;
  
- 	create_name(filename, PATH_MAX, STORAGEDIR, src, "sdp");
+ 	create_filename(filename, PATH_MAX, local, "eir");
  
--	snprintf(key, sizeof(key), "%17s#%08X", dst, handle);
-+	snprintf(key, sizeof(key), "%17s#%hhu#%08X", dst, bdaddr_type, handle);
-+	snprintf(old_key, sizeof(old_key), "%17s#%08X", dst, handle);
+-	ba2str(peer, addr);
++	ba2str(peer, key);
++	sprintf(&key[17], "#%hhu", bdaddr_type);
  
- 	str = textfile_get(filename, key);
--	if (!str)
+-	str = textfile_get(filename, addr);
++	str = textfile_get(filename, key);
 +	if (str != NULL)
 +		goto done;
 +
-+	/* Try old format (address#handle) */
-+	str = textfile_get(filename, old_key);
-+	if (str == NULL)
- 		return NULL;
++	/* Try old format (address only) */
++	key[17] = '\0';
++
++	str = textfile_get(filename, key);
+ 	if (!str)
+ 		return -ENOENT;
  
 +done:
- 	rec = record_from_string(str);
- 	free(str);
- 
- 	return rec;
- }
- 
--int delete_record(const gchar *src, const gchar *dst, const uint32_t handle)
-+int delete_record(const gchar *src, const gchar *dst, uint8_t bdaddr_type,
-+							const uint32_t handle)
- {
--	char filename[PATH_MAX + 1], key[28];
-+	char filename[PATH_MAX + 1], old_key[28], key[30];
-+	int err;
- 
- 	create_name(filename, PATH_MAX, STORAGEDIR, src, "sdp");
- 
--	snprintf(key, sizeof(key), "%17s#%08X", dst, handle);
-+	snprintf(key, sizeof(key), "%17s#%hhu#%08X", dst, bdaddr_type, handle);
-+	snprintf(old_key, sizeof(old_key), "%17s#%08X", dst, handle);
- 
--	return textfile_del(filename, key);
-+	err = textfile_del(filename, key);
-+	if (err < 0)
-+		/* Try old format (address#handle) */
-+		err = textfile_del(filename, key);
-+
-+	return err;
- }
- 
- struct record_list {
-@@ -999,7 +1016,8 @@ static void create_stored_records_from_keys(char *key, char *value,
- 	rec_list->recs = sdp_list_append(rec_list->recs, rec);
- }
- 
--void delete_all_records(const bdaddr_t *src, const bdaddr_t *dst)
-+void delete_all_records(const bdaddr_t *src, const bdaddr_t *dst,
-+						uint8_t bdaddr_type)
- {
- 	sdp_list_t *records, *seq;
- 	char srcaddr[18], dstaddr[18];
-@@ -1011,7 +1029,7 @@ void delete_all_records(const bdaddr_t *src, const bdaddr_t *dst)
- 
- 	for (seq = records; seq; seq = seq->next) {
- 		sdp_record_t *rec = seq->data;
--		delete_record(srcaddr, dstaddr, rec->handle);
-+		delete_record(srcaddr, dstaddr, bdaddr_type, rec->handle);
- 	}
- 
- 	if (records)
+ 	if (!data) {
+ 		free(str);
+ 		return 0;
 diff --git a/src/storage.h b/src/storage.h
-index 34cd662..f4e8c67 100644
+index e540e1b..34cd662 100644
 --- a/src/storage.h
 +++ b/src/storage.h
-@@ -71,11 +71,15 @@ int write_trust(const char *src, const char *addr, uint8_t bdaddr_type,
- int write_device_profiles(bdaddr_t *src, bdaddr_t *dst, uint8_t bdaddr_type,
- 							const char *profiles);
- int delete_entry(bdaddr_t *src, const char *storage, const char *key);
--int store_record(const gchar *src, const gchar *dst, sdp_record_t *rec);
-+int store_record(const gchar *src, const gchar *dst, uint8_t bdaddr_type,
-+							sdp_record_t *rec);
- sdp_record_t *record_from_string(const gchar *str);
--sdp_record_t *fetch_record(const gchar *src, const gchar *dst, const uint32_t handle);
--int delete_record(const gchar *src, const gchar *dst, const uint32_t handle);
--void delete_all_records(const bdaddr_t *src, const bdaddr_t *dst);
-+sdp_record_t *fetch_record(const gchar *src, const gchar *dst,
-+			   uint8_t bdaddr_type, const uint32_t handle);
-+int delete_record(const gchar *src, const gchar *dst, uint8_t bdaddr_type,
-+							const uint32_t handle);
-+void delete_all_records(const bdaddr_t *src, const bdaddr_t *dst,
-+						uint8_t bdaddr_type);
- sdp_list_t *read_records(const bdaddr_t *src, const bdaddr_t *dst);
- sdp_record_t *find_record_in_list(sdp_list_t *recs, const char *uuid);
- int store_device_id(const gchar *src, const gchar *dst, uint8_t bdaddr_type,
+@@ -48,9 +48,10 @@ int write_device_name(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
+ 								char *name);
+ int read_device_name(const char *src, const char *dst, uint8_t bdaddr_type,
+ 								char *name);
+-int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data,
+-							uint8_t data_len);
+-int read_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data);
++int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
++					uint8_t *data, uint8_t data_len);
++int read_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
++								uint8_t *data);
+ int write_version_info(bdaddr_t *local, bdaddr_t *peer, uint16_t manufacturer, uint8_t lmp_ver, uint16_t lmp_subver);
+ int write_features_info(bdaddr_t *local, bdaddr_t *peer, unsigned char *page1, unsigned char *page2);
+ int read_remote_features(bdaddr_t *local, bdaddr_t *peer, unsigned char *page1, unsigned char *page2);
 -- 
 1.7.10.2
 
