@@ -1,46 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4FDB4583.5070902@shapeseeker.com>
-Date: Fri, 15 Jun 2012 15:24:03 +0100
-From: Brian Smith <door@shapeseeker.com>
 MIME-Version: 1.0
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Bluez patches for Multiple SCO Links
-References: <4FDB2059.7000307@shapeseeker.com> <CANT-zCXOzBBaYvXRj3Z7xb=2oz7mSNTWLPUFeZi5ghHs6KzBwA@mail.gmail.com>
-In-Reply-To: <CANT-zCXOzBBaYvXRj3Z7xb=2oz7mSNTWLPUFeZi5ghHs6KzBwA@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <1339742339-15816-1-git-send-email-gustavo@padovan.org>
+References: <1339742339-15816-1-git-send-email-gustavo@padovan.org>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Fri, 15 Jun 2012 10:30:13 -0300
+Message-ID: <CAMOw1v4-fXUj6CFrjeQ2PeiY+O2JvfMHfiQqt0asxYstH8QPyg@mail.gmail.com>
+Subject: Re: [PATCH] TODO: add BlueZ 5 tasks
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Mikel Astiz wrote:
+On Fri, Jun 15, 2012 at 3:38 AM, Gustavo Padovan <gustavo@padovan.org> wrote:
+> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 >
-> Assuming your Kernel includes the patches, and you're using the latest
-> upstream version of BlueZ, most probably the problems you are having
-> are related to the MTU size.
+> ---
+>  TODO |   33 +++++++++++++++++++++++++++++++++
+>  1 file changed, 33 insertions(+)
 >
-> These issues are a bit obscure to me and I don't have a full
-> explanation, but the MTU used during double-SCO needs to be twice as
-> big. My patches regarding this problem were (reasonably) rejected so
-> you will have to find a workaround.
+> diff --git a/TODO b/TODO
+> index 17e9848..355a344 100644
+> --- a/TODO
+> +++ b/TODO
+> @@ -30,6 +30,39 @@ General
+>   Priority: Low
+>   Complexity: C1
 >
-> First make sure the adapter is configured with at least 128 bytes,
-> using hciconfig hci0 scomtu 128:1. Once you have this, you should
-> probably be able to receive/record audio properly. If you want to
-> send/play audio, you might face some additional problems. However I
-> must admit I haven't tested it with hstest.
->
->   
-Thanks for your reply Mikel. I tested your suggestion of changing the 
-MTU and it worked!  It started as 64:8, changing to 128:1 didn't work 
-but changing to 128:8 solved the problem. (I am using kernel 3.5rc1, 
-BlueZ 4.100,  'Sitecom' branded CSR dongle, 'hstest.c' player). Also 
-I've tested both playback and recording on 2 headsets in parallel, both 
-are working well.
+> +
+> +BlueZ 5
+> +==========
+> +
+> +- Make mgmtops part of bluetooth core. mgmt will be the only way to communicate
+> +  with the kernel in BlueZ so a plugin is not needed anymore.
+> +
+> +  Priority: High
+> +  Complexity: C2
+> +
+> +- Move BlueZ to use standard DBus properties and object manager
+> +
+> +  Priority: High
+> +  Complexity: C2
+> +
+> +- Reorganize source tree according to RFC sent to linux-bluetooth (Subject:
+> +  [RFC] Reorganizing the BlueZ source tree)
+> +
+> +  Priority: High
+> +  Complexity: C1
+> +
+> +- Remove deprecated DBus signal from audio code. New ones need to be added to
+> +  replace the deprecated ones.
+> +
+> +  Priority: High
+> +  Complexity: C2
+> +
+> +- Remove deprecated code/DBus methods.
+> +
+> +  Priority: High
+> +  Complexity: C2
 
-Cheers,
-Brian.
+Besides the complexity being inverted from my POV, ack.
 
--- 
-Brian Smith.
-"The bells of clocktowers stitch the sleeper's dreams together." - Memory Palace
+The move to OM and DBus.Properties are much more complex the removing
+deprecated methods/code.
 
+
+Lucas De Marchi
