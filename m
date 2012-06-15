@@ -1,40 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20120615101359.GA6586@x220.ger.corp.intel.com>
-References: <20120525054425.GA10062@virgil.dodds.net> <20120530075503.GI6539@x220>
- <20120615101359.GA6586@x220.ger.corp.intel.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Fri, 15 Jun 2012 10:14:45 -0300
-Message-ID: <CAMOw1v5TEXo8FV54m8Efpk8z9YOE4BJaui_ppU192vT=4dQTKg@mail.gmail.com>
-Subject: Re: [PATCH 1/1] Update tests to be compatible with gi and python3
-To: Steve Langasek <steve.langasek@canonical.com>,
-	linux-bluetooth@vger.kernel.org
+In-Reply-To: <CAFAvTnNJp0Q1JAt+HUy4X5mBG_xO+fQgUYoYiy+90uHJNtx9Mw@mail.gmail.com>
+References: <1339761848-7472-1-git-send-email-hdante@profusion.mobi>
+	<CAJdJm_OrV7Xua91zUcyATHCWtHHAZUsOYJbVL8Vn_194O8_=Hw@mail.gmail.com>
+	<CAFAvTnNJp0Q1JAt+HUy4X5mBG_xO+fQgUYoYiy+90uHJNtx9Mw@mail.gmail.com>
+Date: Fri, 15 Jun 2012 09:45:11 -0300
+Message-ID: <CAFAvTnNcj8ODBqbKJpZzHmFE0Hy_oVtng9Lc-5Ess353Dv2LuQ@mail.gmail.com>
+Subject: Re: [PATCH RFC] gdbus: Rename variables named "signal" (so that it
+ can be compiled with -Wshadow)
+From: Henrique Dante <hdante@profusion.mobi>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jun 15, 2012 at 7:13 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Steve,
->
->> On Thu, May 24, 2012, Steve Langasek wrote:
->> > From: Steve Langasek <steve.langasek@canonical.com>
->> >
->> > This patch makes the python tests source-compatible with python 3, while
->> > leaving the interpreter at python 2 for now.
->> >
->> > The tradeoff is that this source is no longer compatible with python
->> > versions < 2.6, and requires gobject-introspection for the glib-based tests.
->> >
->> > Signed-off-by: Steve Langasek <steve.langasek@canonical.com>
+On Fri, Jun 15, 2012 at 9:43 AM, Henrique Dante <hdante@profusion.mobi> wrote:
+> On Fri, Jun 15, 2012 at 9:29 AM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+>> Hi Henrique,
 >>
->> We don't use signed-off-by for user space patches so please leave it out
->> from the commit message.
+>> On Fri, Jun 15, 2012 at 8:04 AM, Henrique Dante de Almeida
+>> <hdante@profusion.mobi> wrote:
+>>> ---
+>>>  gdbus/object.c |   39 +++++++++++++++++++++------------------
+>>>  gdbus/watch.c  |    4 ++--
+>>>  2 files changed, 23 insertions(+), 20 deletions(-)
+>>
+>> Would it be interesting to add this option to acinclude.m4? Or does it
+>> generate too much noise?
+>
+>  It generates few warnings. Depending on the acceptance of this patch,
+> I could fix bluez as a whole and add -Wshadow to acinclude.m4.
 
-Woww... very nice.
+ Actually, I had a partial build here. Ignore the previous answer, it
+generates a lot of warnings.
 
-Now I can stop having to manually call python2 binary in Archlinux
-(since they decided python3 to be the default interpreter for python)
-:-)
-
-
-Lucas De Marchi
+>
+>>
+>> Regards,
+>> --
+>> Anderson Lizardo
+>> Instituto Nokia de Tecnologia - INdT
+>> Manaus - Brazil
