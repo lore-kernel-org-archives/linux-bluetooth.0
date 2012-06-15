@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 8/9 v3] AVDTP: Fix responding to ABORT with reject
-Date: Fri, 15 Jun 2012 17:41:40 +0300
-Message-Id: <1339771301-24032-8-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 6/9 v3] audio: Wait remote side to send AVDTP_START when acting as acceptor
+Date: Fri, 15 Jun 2012 17:41:38 +0300
+Message-Id: <1339771301-24032-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1339771301-24032-1-git-send-email-luiz.dentz@gmail.com>
 References: <1339771301-24032-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,85 +11,61 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-ABORT command cannot be rejected
----
- audio/a2dp.c  |    6 +++---
- audio/avdtp.c |   12 +++---------
- audio/avdtp.h |    2 +-
- 3 files changed, 7 insertions(+), 13 deletions(-)
+Some devices like Sony Ericsson MW600 reject AVDTP_START if it was the
+initiator of the connection, apparently it follows recommendation 12 of
+simultaneous use of HFP, A2DP and AVRCP profiles white paper which says:
 
-diff --git a/audio/a2dp.c b/audio/a2dp.c
-index d9dcead..fafff87 100644
---- a/audio/a2dp.c
-+++ b/audio/a2dp.c
-@@ -1177,7 +1177,7 @@ static void close_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 		g_timeout_add(RECONFIGURE_TIMEOUT, a2dp_reconfigure, setup);
- }
- 
--static gboolean abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
-+static void abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
- 				struct avdtp_stream *stream, uint8_t *err,
- 				void *user_data)
- {
-@@ -1193,13 +1193,13 @@ static gboolean abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
- 
- 	setup = find_setup_by_session(session);
- 	if (!setup)
--		return TRUE;
-+		return;
- 
- 	finalize_setup_errno(setup, -ECONNRESET, finalize_suspend,
- 							finalize_resume,
- 							finalize_config);
- 
--	return TRUE;
-+	return;
- }
- 
- static void abort_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+  "If the RD has configured and opened a stream it is also responsible to
+  start the streaming via GAVDP_START."
+
+If the client is fast enough and try to acquire the transport this cause
+an error, so instead of sending AVDTP_START the code now checks if it is
+the acceptor of the stream and wait the remote side to send the command.
+---
+ audio/avdtp.c |   18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
 diff --git a/audio/avdtp.c b/audio/avdtp.c
-index e9dea6c..3ba2366 100644
+index 1287698..736eed7 100644
 --- a/audio/avdtp.c
 +++ b/audio/avdtp.c
-@@ -1951,11 +1951,9 @@ static gboolean avdtp_abort_cmd(struct avdtp *session, uint8_t transaction,
- 	if (!sep || !sep->stream)
- 		return TRUE;
+@@ -1068,12 +1068,19 @@ static void avdtp_sep_set_state(struct avdtp *session,
+ 		break;
+ 	case AVDTP_STATE_OPEN:
+ 		stream->starting = FALSE;
+-		if (old_state > AVDTP_STATE_OPEN && session->auto_dc)
++		if ((old_state > AVDTP_STATE_OPEN && session->auto_dc) ||
++							stream->open_acp)
+ 			stream->idle_timer = g_timeout_add_seconds(STREAM_TIMEOUT,
+ 								stream_timeout,
+ 								stream);
+ 		break;
+ 	case AVDTP_STATE_STREAMING:
++		if (stream->idle_timer) {
++			g_source_remove(stream->idle_timer);
++			stream->idle_timer = 0;
++		}
++		stream->open_acp = FALSE;
++		break;
+ 	case AVDTP_STATE_CLOSING:
+ 	case AVDTP_STATE_ABORTING:
+ 		if (stream->idle_timer) {
+@@ -3660,6 +3667,15 @@ int avdtp_start(struct avdtp *session, struct avdtp_stream *stream)
+ 	if (stream->lsep->state != AVDTP_STATE_OPEN)
+ 		return -EINVAL;
  
--	if (sep->ind && sep->ind->abort) {
--		if (!sep->ind->abort(session, sep, sep->stream, &err,
--					sep->user_data))
--			goto failed;
--	}
-+	if (sep->ind && sep->ind->abort)
-+		sep->ind->abort(session, sep, sep->stream, &err,
-+							sep->user_data);
- 
- 	avdtp_check_collision(session, AVDTP_ABORT, sep->stream);
- 
-@@ -1965,10 +1963,6 @@ static gboolean avdtp_abort_cmd(struct avdtp *session, uint8_t transaction,
- 		avdtp_sep_set_state(session, sep, AVDTP_STATE_ABORTING);
- 
- 	return ret;
--
--failed:
--	return avdtp_send(session, transaction, AVDTP_MSG_TYPE_REJECT,
--					AVDTP_ABORT, &err, sizeof(err));
- }
- 
- static gboolean avdtp_secctl_cmd(struct avdtp *session, uint8_t transaction,
-diff --git a/audio/avdtp.h b/audio/avdtp.h
-index 5f37dc3..dac093b 100644
---- a/audio/avdtp.h
-+++ b/audio/avdtp.h
-@@ -198,7 +198,7 @@ struct avdtp_sep_ind {
- 	gboolean (*close) (struct avdtp *session, struct avdtp_local_sep *sep,
- 				struct avdtp_stream *stream, uint8_t *err,
- 				void *user_data);
--	gboolean (*abort) (struct avdtp *session, struct avdtp_local_sep *sep,
-+	void (*abort) (struct avdtp *session, struct avdtp_local_sep *sep,
- 				struct avdtp_stream *stream, uint8_t *err,
- 				void *user_data);
- 	gboolean (*reconfigure) (struct avdtp *session,
++	/* Recommendation 12:
++	 *  If the RD has configured and opened a stream it is also responsible
++	 *  to start the streaming via GAVDP_START.
++	 */
++	if (stream->open_acp) {
++		stream->starting = TRUE;
++		return 0;
++	}
++
+ 	if (stream->close_int == TRUE) {
+ 		error("avdtp_start: rejecting start since close is initiated");
+ 		return -EINVAL;
 -- 
 1.7.10.2
 
