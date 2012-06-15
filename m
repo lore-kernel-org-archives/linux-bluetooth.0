@@ -1,63 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2] Bluetooth: Use AUTO_OFF constant in jiffies
-Date: Fri, 15 Jun 2012 10:36:42 +0300
-Message-Id: <1339745802-8382-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <CAJdJm_MtZYC9=nFzchcCR+yZiyGVNCMpXnmPf7D-dKut1UT8BA@mail.gmail.com>
-References: <CAJdJm_MtZYC9=nFzchcCR+yZiyGVNCMpXnmPf7D-dKut1UT8BA@mail.gmail.com>
+Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: [PATCH] TODO: add BlueZ 5 tasks
+Date: Fri, 15 Jun 2012 03:38:59 -0300
+Message-Id: <1339742339-15816-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-Move AUTO_OFF_TIMEOUT to other constants changing name to
-HCI_AUTO_OFF_TIMEOUT and convert to jiffies.
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci.h |    3 ++-
- net/bluetooth/hci_core.c    |    5 +----
- 2 files changed, 3 insertions(+), 5 deletions(-)
+ TODO |   33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 7dcd349..ccd723e 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -142,8 +142,9 @@ enum {
- #define HCI_DISCONN_TIMEOUT	msecs_to_jiffies(2000)	/* 2 seconds */
- #define HCI_PAIRING_TIMEOUT	msecs_to_jiffies(60000)	/* 60 seconds */
- #define HCI_INIT_TIMEOUT	msecs_to_jiffies(10000)	/* 10 seconds */
--#define HCI_CMD_TIMEOUT		msecs_to_jiffies(1000)	/* 1 seconds */
-+#define HCI_CMD_TIMEOUT		msecs_to_jiffies(1000)	/* 1 second */
- #define HCI_ACL_TX_TIMEOUT	msecs_to_jiffies(45000)	/* 45 seconds */
-+#define HCI_AUTO_OFF_TIMEOUT	msecs_to_jiffies(2000)	/* 2 seconds */
+diff --git a/TODO b/TODO
+index 17e9848..355a344 100644
+--- a/TODO
++++ b/TODO
+@@ -30,6 +30,39 @@ General
+   Priority: Low
+   Complexity: C1
  
- /* HCI data types */
- #define HCI_COMMAND_PKT		0x01
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5979452..8b93491 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -33,8 +33,6 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
++
++BlueZ 5
++==========
++
++- Make mgmtops part of bluetooth core. mgmt will be the only way to communicate
++  with the kernel in BlueZ so a plugin is not needed anymore.
++
++  Priority: High
++  Complexity: C2
++
++- Move BlueZ to use standard DBus properties and object manager
++
++  Priority: High
++  Complexity: C2
++
++- Reorganize source tree according to RFC sent to linux-bluetooth (Subject:
++  [RFC] Reorganizing the BlueZ source tree)
++
++  Priority: High
++  Complexity: C1
++
++- Remove deprecated DBus signal from audio code. New ones need to be added to
++  replace the deprecated ones.
++
++  Priority: High
++  Complexity: C2
++
++- Remove deprecated code/DBus methods.
++
++  Priority: High
++  Complexity: C2
++
++
+ Low Energy
+ ==========
  
--#define AUTO_OFF_TIMEOUT 2000
--
- static void hci_rx_work(struct work_struct *work);
- static void hci_cmd_work(struct work_struct *work);
- static void hci_tx_work(struct work_struct *work);
-@@ -1083,8 +1081,7 @@ static void hci_power_on(struct work_struct *work)
- 		return;
- 
- 	if (test_bit(HCI_AUTO_OFF, &hdev->dev_flags))
--		schedule_delayed_work(&hdev->power_off,
--				      msecs_to_jiffies(AUTO_OFF_TIMEOUT));
-+		schedule_delayed_work(&hdev->power_off, HCI_AUTO_OFF_TIMEOUT);
- 
- 	if (test_and_clear_bit(HCI_SETUP, &hdev->dev_flags))
- 		mgmt_index_added(hdev);
 -- 
-1.7.9.5
+1.7.10.2
 
