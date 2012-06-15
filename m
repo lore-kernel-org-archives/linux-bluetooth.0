@@ -2,82 +2,129 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH] test: add test-audiosource
-Date: Fri, 15 Jun 2012 02:52:37 -0300
-Message-Id: <1339739557-6992-1-git-send-email-gustavo@padovan.org>
+Subject: [PATCH] Bluetooth: Fix possible deadlock in SCO code
+Date: Fri, 15 Jun 2012 02:41:03 -0300
+Message-Id: <1339738863-6407-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
----
- Makefile.tools        |    2 +-
- test/test-audiosource |   46 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 47 insertions(+), 1 deletion(-)
- create mode 100644 test/test-audiosource
+sco_chan_del() only has conn != NULL when called from sco_conn_del() so
+just move the code from it that deal with conn to sco_conn_del().
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 36b7178..b30c999 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -225,4 +225,4 @@ EXTRA_DIST += test/apitest test/sap-client test/hsplay test/hsmicro \
- 		test/test-serial-proxy test/test-health test/test-health-sink \
- 		test/service-record.dtd test/service-did.xml \
- 		test/service-spp.xml test/service-opp.xml test/service-ftp.xml \
--		test/simple-player test/test-nap
-+		test/simple-player test/test-nap test/test-audiosource
-diff --git a/test/test-audiosource b/test/test-audiosource
-new file mode 100644
-index 0000000..c89ff7c
---- /dev/null
-+++ b/test/test-audiosource
-@@ -0,0 +1,46 @@
-+#!/usr/bin/python
+[  120.765529]
+[  120.765529] ======================================================
+[  120.766529] [ INFO: possible circular locking dependency detected ]
+[  120.766529] 3.5.0-rc1-10292-g3701f94-dirty #70 Tainted: G        W
+[  120.766529] -------------------------------------------------------
+[  120.766529] kworker/u:3/1497 is trying to acquire lock:
+[  120.766529]  (&(&conn->lock)->rlock#2){+.+...}, at:
+[<ffffffffa00b7ecc>] sco_chan_del+0x4c/0x170 [bluetooth]
+[  120.766529]
+[  120.766529] but task is already holding lock:
+[  120.766529]  (slock-AF_BLUETOOTH-BTPROTO_SCO){+.+...}, at:
+[<ffffffffa00b8401>] sco_conn_del+0x61/0xe0 [bluetooth]
+[  120.766529]
+[  120.766529] which lock already depends on the new lock.
+[  120.766529]
+[  120.766529]
+[  120.766529] the existing dependency chain (in reverse order) is:
+[  120.766529]
+[  120.766529] -> #1 (slock-AF_BLUETOOTH-BTPROTO_SCO){+.+...}:
+[  120.766529]        [<ffffffff8107980e>] lock_acquire+0x8e/0xb0
+[  120.766529]        [<ffffffff813c19e0>] _raw_spin_lock+0x40/0x80
+[  120.766529]        [<ffffffffa00b85e9>] sco_connect_cfm+0x79/0x300
+[bluetooth]
+[  120.766529]        [<ffffffffa0094b13>]
+hci_sync_conn_complete_evt.isra.90+0x343/0x400 [bluetooth]
+[  120.766529]        [<ffffffffa009d447>] hci_event_packet+0x317/0xfb0
+[bluetooth]
+[  120.766529]        [<ffffffffa008aa68>] hci_rx_work+0x2c8/0x890
+[bluetooth]
+[  120.766529]        [<ffffffff81047db7>] process_one_work+0x197/0x460
+[  120.766529]        [<ffffffff810489d6>] worker_thread+0x126/0x2d0
+[  120.766529]        [<ffffffff8104ee4d>] kthread+0x9d/0xb0
+[  120.766529]        [<ffffffff813c4294>] kernel_thread_helper+0x4/0x10
+[  120.766529]
+[  120.766529] -> #0 (&(&conn->lock)->rlock#2){+.+...}:
+[  120.766529]        [<ffffffff81078a8a>] __lock_acquire+0x154a/0x1d30
+[  120.766529]        [<ffffffff8107980e>] lock_acquire+0x8e/0xb0
+[  120.766529]        [<ffffffff813c19e0>] _raw_spin_lock+0x40/0x80
+[  120.766529]        [<ffffffffa00b7ecc>] sco_chan_del+0x4c/0x170
+[bluetooth]
+[  120.766529]        [<ffffffffa00b8414>] sco_conn_del+0x74/0xe0
+[bluetooth]
+[  120.766529]        [<ffffffffa00b88a2>] sco_disconn_cfm+0x32/0x60
+[bluetooth]
+[  120.766529]        [<ffffffffa0093a82>]
+hci_disconn_complete_evt.isra.53+0x242/0x390 [bluetooth]
+[  120.766529]        [<ffffffffa009d747>] hci_event_packet+0x617/0xfb0
+[bluetooth]
+[  120.766529]        [<ffffffffa008aa68>] hci_rx_work+0x2c8/0x890
+[bluetooth]
+[  120.766529]        [<ffffffff81047db7>] process_one_work+0x197/0x460
+[  120.766529]        [<ffffffff810489d6>] worker_thread+0x126/0x2d0
+[  120.766529]        [<ffffffff8104ee4d>] kthread+0x9d/0xb0
+[  120.766529]        [<ffffffff813c4294>] kernel_thread_helper+0x4/0x10
+[  120.766529]
+[  120.766529] other info that might help us debug this:
+[  120.766529]
+[  120.766529]  Possible unsafe locking scenario:
+[  120.766529]
+[  120.766529]        CPU0                    CPU1
+[  120.766529]        ----                    ----
+[  120.766529]   lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
+[  120.766529]
+lock(&(&conn->lock)->rlock#2);
+[  120.766529]
+lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
+[  120.766529]   lock(&(&conn->lock)->rlock#2);
+[  120.766529]
+[  120.766529]  *** DEADLOCK ***
+
+Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+---
+ net/bluetooth/sco.c |   19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
+
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index cbdd313..596fdc8 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -149,6 +149,15 @@ static int sco_conn_del(struct hci_conn *hcon, int err)
+ 		sco_sock_clear_timer(sk);
+ 		sco_chan_del(sk, err);
+ 		bh_unlock_sock(sk);
 +
-+import sys
-+import dbus
-+from optparse import OptionParser, make_option
++		sco_conn_lock(conn);
++		conn->sk = NULL;
++		sco_pi(sk)->conn = NULL;
++		sco_conn_unlock(conn);
 +
-+bus = dbus.SystemBus()
++		if (conn->hcon)
++			hci_conn_put(conn->hcon);
 +
-+manager = dbus.Interface(bus.get_object("org.bluez", "/"), "org.bluez.Manager")
-+
-+option_list = [
-+		make_option("-i", "--device", action="store",
-+				type="string", dest="dev_id"),
-+		]
-+parser = OptionParser(option_list=option_list)
-+
-+(options, args) = parser.parse_args()
-+
-+if options.dev_id:
-+	adapter_path = manager.FindAdapter(options.dev_id)
-+else:
-+	adapter_path = manager.DefaultAdapter()
-+
-+adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
-+							"org.bluez.Adapter")
-+
-+if len(args) < 2:
-+	print """Usage: %s <command>
-+
-+	connect <bdaddr>
-+	disconnect <bdaddr>
-+	""" % sys.argv[0]
-+	sys.exit(1)
-+
-+device = adapter.FindDevice(args[1])
-+audio = dbus.Interface(bus.get_object("org.bluez", device),
-+				"org.bluez.AudioSource")
-+
-+if args[0] == "connect":
-+	audio.Connect()
-+elif args[0] == "disconnect":
-+	audio.Disconnect()
-+else:
-+	print "Unknown command"
-+	sys.exit(1)
-+
+ 		sco_sock_kill(sk);
+ 	}
+ 
+@@ -838,16 +847,6 @@ static void sco_chan_del(struct sock *sk, int err)
+ 
+ 	BT_DBG("sk %p, conn %p, err %d", sk, conn, err);
+ 
+-	if (conn) {
+-		sco_conn_lock(conn);
+-		conn->sk = NULL;
+-		sco_pi(sk)->conn = NULL;
+-		sco_conn_unlock(conn);
+-
+-		if (conn->hcon)
+-			hci_conn_put(conn->hcon);
+-	}
+-
+ 	sk->sk_state = BT_CLOSED;
+ 	sk->sk_err   = err;
+ 	sk->sk_state_change(sk);
 -- 
 1.7.10.2
 
