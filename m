@@ -1,79 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 15 Jun 2012 13:13:59 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Steve Langasek <steve.langasek@canonical.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/1] Update tests to be compatible with gi and python3
-Message-ID: <20120615101359.GA6586@x220.ger.corp.intel.com>
-References: <20120525054425.GA10062@virgil.dodds.net>
- <20120530075503.GI6539@x220>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120530075503.GI6539@x220>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 8/8 v2] AVDTP: Fix responding to ABORT with reject
+Date: Fri, 15 Jun 2012 13:02:03 +0300
+Message-Id: <1339754523-620-8-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1339754523-620-1-git-send-email-luiz.dentz@gmail.com>
+References: <1339754523-620-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Steve,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> On Thu, May 24, 2012, Steve Langasek wrote:
-> > From: Steve Langasek <steve.langasek@canonical.com>
-> > 
-> > This patch makes the python tests source-compatible with python 3, while
-> > leaving the interpreter at python 2 for now.
-> > 
-> > The tradeoff is that this source is no longer compatible with python
-> > versions < 2.6, and requires gobject-introspection for the glib-based tests.
-> > 
-> > Signed-off-by: Steve Langasek <steve.langasek@canonical.com>
-> 
-> We don't use signed-off-by for user space patches so please leave it out
-> from the commit message.
-> 
-> > ---
-> >  test/list-devices      |   30 ++++++++++---------
-> >  test/monitor-bluetooth |    6 ++--
-> >  test/simple-agent      |   41 +++++++++++++------------
-> >  test/simple-endpoint   |   12 ++++----
-> >  test/simple-service    |    8 +++--
-> >  test/test-adapter      |   52 ++++++++++++++++----------------
-> >  test/test-attrib       |   52 ++++++++++++++++----------------
-> >  test/test-audio        |    8 +++--
-> >  test/test-device       |   78 +++++++++++++++++++++++++-----------------------
-> >  test/test-discovery    |   16 +++++-----
-> >  test/test-health       |   62 +++++++++++++++++++-------------------
-> >  test/test-health-sink  |   24 ++++++++-------
-> >  test/test-input        |    8 +++--
-> >  test/test-manager      |   12 ++++----
-> >  test/test-nap          |    8 +++--
-> >  test/test-network      |   10 ++++---
-> >  test/test-oob          |   34 +++++++++++----------
-> >  test/test-proximity    |   14 +++++----
-> >  test/test-sap-server   |   64 ++++++++++++++++++++-------------------
-> >  test/test-serial       |   10 ++++---
-> >  test/test-serial-proxy |    6 ++--
-> >  test/test-service      |   14 +++++----
-> >  test/test-telephony    |   38 ++++++++++++-----------
-> >  test/test-thermometer  |   28 +++++++++--------
-> >  24 files changed, 342 insertions(+), 293 deletions(-)
-> 
-> In general the patch looks ok, but unfortunately it doesn't apply
-> cleanly:
-> 
-> Applying: Update tests to be compatible with gi and python3
-> /home/jh/src/bluez/.git/rebase-apply/patch:838: trailing whitespace.
->  
-> /home/jh/src/bluez/.git/rebase-apply/patch:840: trailing whitespace.
->  
-> fatal: 2 lines add whitespace errors.
-> Patch failed at 0001 Update tests to be compatible with gi and python3
-> 
-> Please fix this and resend. For the future you might want to add the
-> following to your gitconfig:
-> 
-> [apply]
->         whitespace = error
+ABORT command cannot be rejected
+---
+ audio/a2dp.c  |    6 +++---
+ audio/avdtp.c |   12 +++---------
+ audio/avdtp.h |    2 +-
+ 3 files changed, 7 insertions(+), 13 deletions(-)
 
-Since I haven't heard anything from you I went a head and fixed these
-issues for you and applied the patch.
+diff --git a/audio/a2dp.c b/audio/a2dp.c
+index 094476e..5b1b424 100644
+--- a/audio/a2dp.c
++++ b/audio/a2dp.c
+@@ -1174,7 +1174,7 @@ static void close_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 		g_timeout_add(RECONFIGURE_TIMEOUT, a2dp_reconfigure, setup);
+ }
+ 
+-static gboolean abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
++static void abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+ 				struct avdtp_stream *stream, uint8_t *err,
+ 				void *user_data)
+ {
+@@ -1190,13 +1190,13 @@ static gboolean abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+ 
+ 	setup = find_setup_by_session(session);
+ 	if (!setup)
+-		return TRUE;
++		return;
+ 
+ 	finalize_setup_errno(setup, -ECONNRESET, finalize_suspend,
+ 							finalize_resume,
+ 							finalize_config);
+ 
+-	return TRUE;
++	return;
+ }
+ 
+ static void abort_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+diff --git a/audio/avdtp.c b/audio/avdtp.c
+index 61f5f94..1366bf1 100644
+--- a/audio/avdtp.c
++++ b/audio/avdtp.c
+@@ -1954,11 +1954,9 @@ static gboolean avdtp_abort_cmd(struct avdtp *session, uint8_t transaction,
+ 	if (!sep || !sep->stream)
+ 		return TRUE;
+ 
+-	if (sep->ind && sep->ind->abort) {
+-		if (!sep->ind->abort(session, sep, sep->stream, &err,
+-					sep->user_data))
+-			goto failed;
+-	}
++	if (sep->ind && sep->ind->abort)
++		sep->ind->abort(session, sep, sep->stream, &err,
++							sep->user_data);
+ 
+ 	avdtp_check_collision(session, AVDTP_ABORT, sep->stream);
+ 
+@@ -1968,10 +1966,6 @@ static gboolean avdtp_abort_cmd(struct avdtp *session, uint8_t transaction,
+ 		avdtp_sep_set_state(session, sep, AVDTP_STATE_ABORTING);
+ 
+ 	return ret;
+-
+-failed:
+-	return avdtp_send(session, transaction, AVDTP_MSG_TYPE_REJECT,
+-					AVDTP_ABORT, &err, sizeof(err));
+ }
+ 
+ static gboolean avdtp_secctl_cmd(struct avdtp *session, uint8_t transaction,
+diff --git a/audio/avdtp.h b/audio/avdtp.h
+index 1979694..8acf302 100644
+--- a/audio/avdtp.h
++++ b/audio/avdtp.h
+@@ -199,7 +199,7 @@ struct avdtp_sep_ind {
+ 	gboolean (*close) (struct avdtp *session, struct avdtp_local_sep *sep,
+ 				struct avdtp_stream *stream, uint8_t *err,
+ 				void *user_data);
+-	gboolean (*abort) (struct avdtp *session, struct avdtp_local_sep *sep,
++	void (*abort) (struct avdtp *session, struct avdtp_local_sep *sep,
+ 				struct avdtp_stream *stream, uint8_t *err,
+ 				void *user_data);
+ 	gboolean (*reconfigure) (struct avdtp *session,
+-- 
+1.7.10.2
 
-Johan
