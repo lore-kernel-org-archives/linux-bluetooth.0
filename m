@@ -1,48 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 15 Jun 2012 11:30:34 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: Use %pMR BT addr print spec instead of batostr
-Message-ID: <20120615083033.GF7205@aemeltch-MOBL1>
-References: <1339419200-581-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20120612031846.GF24440@joana>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120612031846.GF24440@joana>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 8/8] AVDTP: Fix responding to ABORT with reject
+Date: Fri, 15 Jun 2012 11:04:28 +0300
+Message-Id: <1339747468-31639-8-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1339747468-31639-1-git-send-email-luiz.dentz@gmail.com>
+References: <1339747468-31639-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Jun 12, 2012 at 12:20:15AM -0300, Gustavo Padovan wrote:
-> Hi Andrei,
-> 
-> * Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-06-11 15:53:20 +0300]:
-> 
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > 
-> > Clean up old unsafe batostr function and use %pMR print specifier
-> > for printing Bluetooth addresses.
-> > 
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > ---
-> > 	* Note that the patch shall be only applied when the tree is rebased against
-> > 	very latest linux-next where specifier patch is added.
-> > <------8<-----------------------------------------------------
-> > |
-> > |  The patch titled
-> > |       Subject: vsprintf: add %pMR for Bluetooth MAC address
-> > |  has been added to the -mm tree.  Its filename is
-> > |       vsprintf-add-%pmr-for-bluetooth-mac-address.patch
-> > |
-> > <------8<-----------------------------------------------------
-> 
-> The patch looks good to me. So please carry this patch on your tree until we
-> are able to apply it in bluetooth-next.
+ABORT command cannot be rejected
+---
+ audio/a2dp.c  |    6 +++---
+ audio/avdtp.c |   12 +++---------
+ audio/avdtp.h |    2 +-
+ 3 files changed, 7 insertions(+), 13 deletions(-)
 
-OK, Please consider version 2 which I will send in a minute.
-
-Best regards 
-Andrei Emeltchenko 
+diff --git a/audio/a2dp.c b/audio/a2dp.c
+index 094476e..5b1b424 100644
+--- a/audio/a2dp.c
++++ b/audio/a2dp.c
+@@ -1174,7 +1174,7 @@ static void close_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 		g_timeout_add(RECONFIGURE_TIMEOUT, a2dp_reconfigure, setup);
+ }
+ 
+-static gboolean abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
++static void abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+ 				struct avdtp_stream *stream, uint8_t *err,
+ 				void *user_data)
+ {
+@@ -1190,13 +1190,13 @@ static gboolean abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+ 
+ 	setup = find_setup_by_session(session);
+ 	if (!setup)
+-		return TRUE;
++		return;
+ 
+ 	finalize_setup_errno(setup, -ECONNRESET, finalize_suspend,
+ 							finalize_resume,
+ 							finalize_config);
+ 
+-	return TRUE;
++	return;
+ }
+ 
+ static void abort_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+diff --git a/audio/avdtp.c b/audio/avdtp.c
+index 61f5f94..1366bf1 100644
+--- a/audio/avdtp.c
++++ b/audio/avdtp.c
+@@ -1954,11 +1954,9 @@ static gboolean avdtp_abort_cmd(struct avdtp *session, uint8_t transaction,
+ 	if (!sep || !sep->stream)
+ 		return TRUE;
+ 
+-	if (sep->ind && sep->ind->abort) {
+-		if (!sep->ind->abort(session, sep, sep->stream, &err,
+-					sep->user_data))
+-			goto failed;
+-	}
++	if (sep->ind && sep->ind->abort)
++		sep->ind->abort(session, sep, sep->stream, &err,
++							sep->user_data);
+ 
+ 	avdtp_check_collision(session, AVDTP_ABORT, sep->stream);
+ 
+@@ -1968,10 +1966,6 @@ static gboolean avdtp_abort_cmd(struct avdtp *session, uint8_t transaction,
+ 		avdtp_sep_set_state(session, sep, AVDTP_STATE_ABORTING);
+ 
+ 	return ret;
+-
+-failed:
+-	return avdtp_send(session, transaction, AVDTP_MSG_TYPE_REJECT,
+-					AVDTP_ABORT, &err, sizeof(err));
+ }
+ 
+ static gboolean avdtp_secctl_cmd(struct avdtp *session, uint8_t transaction,
+diff --git a/audio/avdtp.h b/audio/avdtp.h
+index 1979694..8acf302 100644
+--- a/audio/avdtp.h
++++ b/audio/avdtp.h
+@@ -199,7 +199,7 @@ struct avdtp_sep_ind {
+ 	gboolean (*close) (struct avdtp *session, struct avdtp_local_sep *sep,
+ 				struct avdtp_stream *stream, uint8_t *err,
+ 				void *user_data);
+-	gboolean (*abort) (struct avdtp *session, struct avdtp_local_sep *sep,
++	void (*abort) (struct avdtp *session, struct avdtp_local_sep *sep,
+ 				struct avdtp_stream *stream, uint8_t *err,
+ 				void *user_data);
+ 	gboolean (*reconfigure) (struct avdtp *session,
+-- 
+1.7.10.2
 
