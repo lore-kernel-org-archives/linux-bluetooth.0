@@ -1,59 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <4FDB2059.7000307@shapeseeker.com>
-References: <4FDB2059.7000307@shapeseeker.com>
-Date: Fri, 15 Jun 2012 15:17:22 +0200
-Message-ID: <CANT-zCXOzBBaYvXRj3Z7xb=2oz7mSNTWLPUFeZi5ghHs6KzBwA@mail.gmail.com>
-Subject: Re: Bluez patches for Multiple SCO Links
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: Brian Smith <door@shapeseeker.com>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20120615101359.GA6586@x220.ger.corp.intel.com>
+References: <20120525054425.GA10062@virgil.dodds.net> <20120530075503.GI6539@x220>
+ <20120615101359.GA6586@x220.ger.corp.intel.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Fri, 15 Jun 2012 10:14:45 -0300
+Message-ID: <CAMOw1v5TEXo8FV54m8Efpk8z9YOE4BJaui_ppU192vT=4dQTKg@mail.gmail.com>
+Subject: Re: [PATCH 1/1] Update tests to be compatible with gi and python3
+To: Steve Langasek <steve.langasek@canonical.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
-
-On Fri, Jun 15, 2012 at 1:45 PM, Brian Smith <door@shapeseeker.com> wrote:
-> Hi Mikel.
-> Thanks for your patches to allow multiple SCO links. I'm trying to get it
-> working. Can I ask you a couple of questions please?
-
-Please provide some context information including what you're trying
-to do, and which version of Kernel and userspace BlueZ you are using.
-
+On Fri, Jun 15, 2012 at 7:13 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Steve,
 >
-> 1) Can you recommend a specific USB bluetooth dongle that is known to work
-> with this?
+>> On Thu, May 24, 2012, Steve Langasek wrote:
+>> > From: Steve Langasek <steve.langasek@canonical.com>
+>> >
+>> > This patch makes the python tests source-compatible with python 3, while
+>> > leaving the interpreter at python 2 for now.
+>> >
+>> > The tradeoff is that this source is no longer compatible with python
+>> > versions < 2.6, and requires gobject-introspection for the glib-based tests.
+>> >
+>> > Signed-off-by: Steve Langasek <steve.langasek@canonical.com>
+>>
+>> We don't use signed-off-by for user space patches so please leave it out
+>> from the commit message.
 
-I cannot suggest any specific dongle but most of my testing was with
-CSR chips and they all worked. Also Broadcom chips seemed to work.
+Woww... very nice.
 
-You can use hciconfig -a to see information about your adapter.
+Now I can stop having to manually call python2 binary in Archlinux
+(since they decided python3 to be the default interpreter for python)
+:-)
 
-> 2) Ideally i'd like to avoid pulseaudio and test this directly using the
-> hstest.c code that comes with Bluez (this works OK with a single headset at
-> least, but I'm having problems with multiple headsets and don't know if it
-> is the bluetooth dongle I use that is the problem). Do you know if the patch
-> allows hstest.c to play audio to 2 headsets at once? (or do I need to use
-> pulseaudio).
 
-Assuming your Kernel includes the patches, and you're using the latest
-upstream version of BlueZ, most probably the problems you are having
-are related to the MTU size.
-
-These issues are a bit obscure to me and I don't have a full
-explanation, but the MTU used during double-SCO needs to be twice as
-big. My patches regarding this problem were (reasonably) rejected so
-you will have to find a workaround.
-
-First make sure the adapter is configured with at least 128 bytes,
-using hciconfig hci0 scomtu 128:1. Once you have this, you should
-probably be able to receive/record audio properly. If you want to
-send/play audio, you might face some additional problems. However I
-must admit I haven't tested it with hstest.
-
-It would also be helpful If you could provide hcidump logs.
-
-Cheers,
-Mikel
+Lucas De Marchi
