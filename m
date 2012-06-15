@@ -1,31 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4FDB2059.7000307@shapeseeker.com>
-Date: Fri, 15 Jun 2012 12:45:29 +0100
-From: Brian Smith <door@shapeseeker.com>
-MIME-Version: 1.0
+From: Anton Weber <ant@antweb.me>
 To: linux-bluetooth@vger.kernel.org
-Subject: Bluez patches for Multiple SCO Links
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Cc: Anton Weber <ant@antweb.me>
+Subject: [PATCH] monitor: Fix optstring to parse -b parameter
+Date: Fri, 15 Jun 2012 13:43:00 +0200
+Message-Id: <1339760580-8219-1-git-send-email-ant@antweb.me>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel.
-Thanks for your patches to allow multiple SCO links. I'm trying to get 
-it working. Can I ask you a couple of questions please?
+Without the colon getopt ignores the parameter and optarg is always NULL.
+---
+ monitor/main.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-1) Can you recommend a specific USB bluetooth dongle that is known to 
-work with this?
-2) Ideally i'd like to avoid pulseaudio and test this directly using the 
-hstest.c code that comes with Bluez (this works OK with a single headset 
-at least, but I'm having problems with multiple headsets and don't know 
-if it is the bluetooth dongle I use that is the problem). Do you know if 
-the patch allows hstest.c to play audio to 2 headsets at once? (or do I 
-need to use pulseaudio).
-
-Thanks,
-Brian.
-
+diff --git a/monitor/main.c b/monitor/main.c
+index 90e32c5..0b8ae30 100644
+--- a/monitor/main.c
++++ b/monitor/main.c
+@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
+ 
+-		opt = getopt_long(argc, argv, "bvh", main_options, NULL);
++		opt = getopt_long(argc, argv, "b:vh", main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+ 
 -- 
-Brian Smith.
-"The bells of clocktowers stitch the sleeper's dreams together." - Memory Palace
+1.7.5.4
 
