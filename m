@@ -1,168 +1,255 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/8] audio: Add handling of avdtp command collision
-Date: Fri, 15 Jun 2012 11:04:21 +0300
-Message-Id: <1339747468-31639-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 15 Jun 2012 11:00:09 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Masatake YAMATO <yamato@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/8] /proc/net/ entries for bluetooth protocols
+Message-ID: <20120615080007.GD7205@aemeltch-MOBL1>
+References: <20120615.021553.2062569361246467656.yamato@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120615.021553.2062569361246467656.yamato@redhat.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Masatake,
 
-Check collision for avdtp open, close, start, suspend and abort
-commands and if they collided remove the pending request if sep
-has accepted the indication.
----
- audio/avdtp.c |   80 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 80 insertions(+)
+small nitpicks
 
-diff --git a/audio/avdtp.c b/audio/avdtp.c
-index bbdae10..08fd2a7 100644
---- a/audio/avdtp.c
-+++ b/audio/avdtp.c
-@@ -314,6 +314,7 @@ struct pending_req {
- 	size_t data_size;
- 	struct avdtp_stream *stream; /* Set if the request targeted a stream */
- 	guint timeout;
-+	gboolean collided;
- };
- 
- struct avdtp_remote_sep {
-@@ -1646,6 +1647,69 @@ static gboolean avdtp_reconf_cmd(struct avdtp *session, uint8_t transaction,
- 					AVDTP_RECONFIGURE, &rej, sizeof(rej));
- }
- 
-+static void check_seid_collision(struct pending_req *req, uint8_t id)
-+{
-+	struct seid_req *seid = req->data;
-+
-+	if (seid->acp_seid == id)
-+		req->collided = TRUE;
-+}
-+
-+static void check_start_collision(struct pending_req *req, uint8_t id)
-+{
-+	struct start_req *start = req->data;
-+	struct seid *seid = &start->first_seid;
-+	int count = 1 + req->data_size - sizeof(struct start_req);
-+	int i;
-+
-+	for (i = 0; i < count; i++, seid++) {
-+		if (seid->seid == id) {
-+			req->collided = TRUE;
-+			return;
-+		}
-+	}
-+}
-+
-+static void check_suspend_collision(struct pending_req *req, uint8_t id)
-+{
-+	struct suspend_req *suspend = req->data;
-+	struct seid *seid = &suspend->first_seid;
-+	int count = 1 + req->data_size - sizeof(struct suspend_req);
-+	int i;
-+
-+	for (i = 0; i < count; i++, seid++) {
-+		if (seid->seid == id) {
-+			req->collided = TRUE;
-+			return;
-+		}
-+	}
-+}
-+
-+static void avdtp_check_collision(struct avdtp *session, uint8_t cmd,
-+					struct avdtp_stream *stream)
-+{
-+	struct pending_req *req = session->req;
-+
-+	if (req == NULL || (req->signal_id != cmd && cmd != AVDTP_ABORT))
-+		return;
-+
-+	if (cmd == AVDTP_ABORT)
-+		cmd = req->signal_id;
-+
-+	switch (cmd) {
-+	case AVDTP_OPEN:
-+	case AVDTP_CLOSE:
-+		check_seid_collision(req, stream->rseid);
-+		break;
-+	case AVDTP_START:
-+		check_start_collision(req, stream->rseid);
-+		break;
-+	case AVDTP_SUSPEND:
-+		check_suspend_collision(req, stream->rseid);
-+		break;
-+	}
-+}
-+
- static gboolean avdtp_open_cmd(struct avdtp *session, uint8_t transaction,
- 				struct seid_req *req, unsigned int size)
- {
-@@ -1677,6 +1741,8 @@ static gboolean avdtp_open_cmd(struct avdtp *session, uint8_t transaction,
- 			goto failed;
- 	}
- 
-+	avdtp_check_collision(session, AVDTP_OPEN, stream);
-+
- 	if (!avdtp_send(session, transaction, AVDTP_MSG_TYPE_ACCEPT,
- 						AVDTP_OPEN, NULL, 0))
- 		return FALSE;
-@@ -1738,6 +1804,8 @@ static gboolean avdtp_start_cmd(struct avdtp *session, uint8_t transaction,
- 				goto failed;
- 		}
- 
-+		avdtp_check_collision(session, AVDTP_START, stream);
-+
- 		avdtp_sep_set_state(session, sep, AVDTP_STATE_STREAMING);
- 	}
- 
-@@ -1786,6 +1854,8 @@ static gboolean avdtp_close_cmd(struct avdtp *session, uint8_t transaction,
- 			goto failed;
- 	}
- 
-+	avdtp_check_collision(session, AVDTP_CLOSE, stream);
-+
- 	avdtp_sep_set_state(session, sep, AVDTP_STATE_CLOSING);
- 
- 	if (!avdtp_send(session, transaction, AVDTP_MSG_TYPE_ACCEPT,
-@@ -1845,6 +1915,8 @@ static gboolean avdtp_suspend_cmd(struct avdtp *session, uint8_t transaction,
- 				goto failed;
- 		}
- 
-+		avdtp_check_collision(session, AVDTP_SUSPEND, stream);
-+
- 		avdtp_sep_set_state(session, sep, AVDTP_STATE_OPEN);
- 	}
- 
-@@ -1883,6 +1955,8 @@ static gboolean avdtp_abort_cmd(struct avdtp *session, uint8_t transaction,
- 			goto failed;
- 	}
- 
-+	avdtp_check_collision(session, AVDTP_ABORT, sep->stream);
-+
- 	ret = avdtp_send(session, transaction, AVDTP_MSG_TYPE_ACCEPT,
- 						AVDTP_ABORT, NULL, 0);
- 	if (ret)
-@@ -2175,6 +2249,11 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
- 		if (session->streams && session->dc_timer)
- 			remove_disconnect_timer(session);
- 
-+		if (session->req && session->req->collided) {
-+			DBG("Collision detected");
-+			goto next;
-+		}
-+
- 		return TRUE;
- 	}
- 
-@@ -2225,6 +2304,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
- 		break;
- 	}
- 
-+next:
- 	pending_req_free(session->req);
- 	session->req = NULL;
- 
--- 
-1.7.10.2
+On Fri, Jun 15, 2012 at 02:15:53AM +0900, Masatake YAMATO wrote:
+> lsof command can tell the type of socket processes are using. Internally
+> lsof uses inode numbers on socket fs as key to resolve the type of
+> sockets. Files under /proc/net/, such as tcp, udp, unix, etc provides
+> such inode information.
+> 
+> Unfortunately bluetooth related protocols don't provide such inode
+> information. This patch series introduces /proc/net/* files for the protocols.
+> 
+> 
+> This patch against af_bluetooth.c provides facility to the implementation
+> of protocols. This patch extends bt_sock_list and introduces two exported
+> function bt_procfs_init, bt_procfs_cleanup.
+> 
+> The type bt_sock_list is already used in some implementations of
+> protocols. bt_procfs_init prepares seq_operations which converts
+> protocol own bt_sock_list data to /proc/net proc entry for the
+> protocol when the entry is accessed by cat or something process.
+> 
+> What I, lsof user, need is just inode number of bluetooth
+> socket. Therefore default show handler of seq_operations
+> prints bluetooth socket common informations including inode
+> number.
+> 
+> However, people may want more information. The bt_procfs_init
+> takes a function pointer for customizing the show handler of
+> seq_operations.
+> 
+> Signed-off-by: Masatake YAMATO <yamato@redhat.com>
+> ---
+>  include/net/bluetooth/bluetooth.h |   12 ++++
+>  net/bluetooth/af_bluetooth.c      |  136 +++++++++++++++++++++++++++++++++++++
+>  2 files changed, 148 insertions(+)
+> 
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index 961669b..83a1d1a 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -30,6 +30,9 @@
+>  #include <linux/list.h>
+>  #include <linux/poll.h>
+>  #include <net/sock.h>
+> +#include <linux/seq_file.h>
+> +
+> +
+>  
 
+Too much spaces here!
+
+>  #ifndef AF_BLUETOOTH
+>  #define AF_BLUETOOTH	31
+> @@ -205,6 +208,10 @@ enum {
+>  struct bt_sock_list {
+>  	struct hlist_head head;
+>  	rwlock_t          lock;
+> +#ifdef CONFIG_PROC_FS
+> +        struct file_operations   fops;
+> +        int (* custom_seq_show)(struct seq_file *, void *);
+> +#endif
+>  };
+>  
+>  int  bt_sock_register(int proto, const struct net_proto_family *ops);
+> @@ -293,6 +300,11 @@ extern void hci_sock_cleanup(void);
+>  extern int bt_sysfs_init(void);
+>  extern void bt_sysfs_cleanup(void);
+>  
+> +extern int  bt_procfs_init(struct module* module, struct net *net, const char *name, 
+> +			   struct bt_sock_list* sk_list,
+> +			   int (* seq_show)(struct seq_file *, void *));
+> +extern void bt_procfs_cleanup(struct net *net, const char *name);
+> +
+>  extern struct dentry *bt_debugfs;
+>  
+>  int l2cap_init(void);
+> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+> index 46e7f86..81a2094 100644
+> --- a/net/bluetooth/af_bluetooth.c
+> +++ b/net/bluetooth/af_bluetooth.c
+> @@ -542,6 +543,141 @@ int bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo)
+>  }
+>  EXPORT_SYMBOL(bt_sock_wait_state);
+>  
+> +#ifdef CONFIG_PROC_FS
+> +struct bt_seq_state {
+> +	struct bt_sock_list *l;
+> +};
+> +
+> +static void *bt_seq_start(struct seq_file *seq, loff_t *pos)
+> +{
+> +	struct bt_seq_state *s = seq->private;
+> +	
+> +	read_lock(&s->l->lock);
+> +	return seq_hlist_start_head(&s->l->head, *pos);
+
+maybe define s->l as a local variable?
+
+> +}
+> +
+> +static void *bt_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+> +{
+> +	struct bt_seq_state *s = seq->private;
+> +	
+> +	return seq_hlist_next(v, &s->l->head, pos);
+> +}
+> +
+> +static void bt_seq_stop(struct seq_file *seq, void *v)
+> +{
+> +	struct bt_seq_state *s = seq->private;
+> +
+> +	read_unlock(&s->l->lock);
+> +}
+> +
+> +static int bt_seq_show(struct seq_file *seq, void *v)
+> +{
+> +	struct sock *sk;
+> +	struct bt_sock *bt;
+> +	struct bt_seq_state *s = seq->private;
+> +
+> +
+> +	if (v == SEQ_START_TOKEN) {
+> +		seq_puts(seq ,"sk              RefCnt Rmem   Wmem   User   Inode Src Dst Parent");
+> +
+> +		if (s->l->custom_seq_show) {
+> +			seq_putc(seq, ' ');
+> +			s->l->custom_seq_show(seq, v);
+> +		}
+> +
+> +		seq_putc(seq, '\n');
+> +	}
+> +	else {
+
+shall be "} else {"
+
+> +		sk = sk_entry(v);
+> +		bt = bt_sk(sk);
+> +		seq_printf(seq, "%pK %-6d %-6u %-6u %-6u %-6lu",
+> +			   sk,
+> +			   atomic_read(&sk->sk_refcnt),
+> +			   sk_rmem_alloc_get(sk),
+> +			   sk_wmem_alloc_get(sk),
+> +			   sock_i_uid(sk),
+> +			   sock_i_ino(sk)
+> +			);
+> +		seq_puts(seq, batostr(&bt->src));
+
+batostr looks OK now but this will be outdated soon by %pMR.
+
+> +		seq_putc(seq, ' ');
+> +		seq_puts(seq, batostr(&bt->dst));
+> +		seq_putc(seq, ' ');
+> +		seq_printf(seq, "%-6lu", bt->parent? sock_i_ino(bt->parent): 0LU);
+> +
+> +		if (s->l->custom_seq_show) {
+> +			seq_putc(seq, ' ');
+> +			s->l->custom_seq_show(seq, v);
+> +		}
+> +
+> +		seq_putc(seq, '\n');
+> +	}
+> +	return 0;
+> +}
+> +
+> +static struct seq_operations bt_seq_ops = {
+> +	.start = bt_seq_start,
+> +	.next  = bt_seq_next,
+> +	.stop  = bt_seq_stop,
+> +	.show  = bt_seq_show,
+> +};
+> +
+> +static int bt_seq_open(struct inode *inode, struct file *file)
+> +{
+> +	struct bt_sock_list *sk_list;
+> +	struct bt_seq_state *s;
+> +
+> +	sk_list = PDE(inode)->data;
+> +	s = __seq_open_private(file, &bt_seq_ops,
+> +			       sizeof(struct bt_seq_state));
+> +	if (s == NULL)
+> +		return -ENOMEM;
+> +	 
+> +	s->l = sk_list;
+> +	return 0;
+> +}
+> +
+> +int bt_procfs_init(struct module* module, struct net *net, const char *name, struct bt_sock_list* sk_list,
+> +		   int (* seq_show)(struct seq_file *, void *))
+> +{
+> +	struct proc_dir_entry * pde;
+> +
+> +	sk_list->custom_seq_show = seq_show;
+> +
+> +	sk_list->fops.owner     = module;
+> +	sk_list->fops.open      = bt_seq_open;
+> +	sk_list->fops.read      = seq_read;
+> +	sk_list->fops.llseek    = seq_lseek;
+> +	sk_list->fops.release   = seq_release_private;
+> +	
+> +	pde = proc_net_fops_create(net, name, 0, &sk_list->fops);
+> +	if (pde == NULL)
+> +		return -ENOMEM;
+> +
+> +	pde->data = sk_list;
+> +	
+> +	return 0;
+> +}
+> +
+> +void bt_procfs_cleanup(struct net *net, const char *name)
+> +{
+> +	proc_net_remove(net, name);
+> +}
+> +#else
+> +int bt_procfs_init(struct module* module, struct net *net, const char *name, struct bt_sock_list* sk_list,
+> +		   int (* seq_show)(struct seq_file *, void *))
+> +{
+> +	return 0;
+> +}
+> +
+> +void bt_procfs_cleanup(struct net *net, const char *name)
+> +{
+> +}
+> +#endif
+> +
+> +EXPORT_SYMBOL(bt_procfs_init);
+> +EXPORT_SYMBOL(bt_procfs_cleanup);
+> +
+> +
+
+too much spaces
+
+>  static struct net_proto_family bt_sock_family_ops = {
+>  	.owner	= THIS_MODULE,
+>  	.family	= PF_BLUETOOTH,
+> -- 
+> 1.7.10.2
+
+Best regards 
+Andrei Emeltchenko 
