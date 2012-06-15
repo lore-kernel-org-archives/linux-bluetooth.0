@@ -1,32 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 15 Jun 2012 12:27:44 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Henrique Dante de Almeida <hdante@profusion.mobi>
+Date: Fri, 15 Jun 2012 17:52:35 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH RFC] gdbus: Rename variables named "signal" (so that it
- can be compiled with -Wshadow)
-Message-ID: <20120615152744.GA3158@joana>
-References: <1339761848-7472-1-git-send-email-hdante@profusion.mobi>
+Subject: Re: [PATCH BlueZ 1/9 v3] audio: Add handling of AVDTP command
+ collision
+Message-ID: <20120615145235.GA12490@x220>
+References: <1339771301-24032-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1339761848-7472-1-git-send-email-hdante@profusion.mobi>
+In-Reply-To: <1339771301-24032-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Henrique,
+Hi Luiz,
 
-* Henrique Dante de Almeida <hdante@profusion.mobi> [2012-06-15 09:04:08 -0300]:
-
+On Fri, Jun 15, 2012, Luiz Augusto von Dentz wrote:
+> Check collision for AVDTP OPEN, CLOSE, START, SUSPEND and ABORT
+> commands and if they collided remove the pending request if sep
+> has accepted the indication.
 > ---
->  gdbus/object.c |   39 +++++++++++++++++++++------------------
->  gdbus/watch.c  |    4 ++--
->  2 files changed, 23 insertions(+), 20 deletions(-)
+> v2: Fix capitalizing some acronyms
+> v3: Rebase and fix not using avdtp_start return in case of error
+> 
+>  audio/avdtp.c |   80 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 80 insertions(+)
 
-Please keep the subject line of your patch with less than 72 chars. You could
-split it like:
+All patches in this set have been applied. Thanks.
 
-gdbus: Rename variables named "signal"
-
-so that it can be compiled with -Wshadow
-
-	Gustavo
+Johan
