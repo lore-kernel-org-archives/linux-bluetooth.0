@@ -1,44 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1339889563.20079.6.camel@sirocco.config>
-Subject: [PATCH 1/3] input: Add helper function to request disconnect
+Message-ID: <1339886587.20079.2.camel@sirocco.config>
+Subject: Broken bluez master
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Date: Sun, 17 Jun 2012 01:32:43 +0200
+Date: Sun, 17 Jun 2012 00:43:07 +0200
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- input/device.c |    7 +++++++
- input/device.h |    1 +
- 2 files changed, 8 insertions(+)
+Don't think I'm using a too weird development environment, trying to fix
+PS3 BD Remote bugs.
 
-diff --git a/input/device.c b/input/device.c
-index 0e3f4a9..8fdd4e0 100644
---- a/input/device.c
-+++ b/input/device.c
-@@ -1306,3 +1306,10 @@ int input_device_close_channels(const bdaddr_t *src, const bdaddr_t *dst)
- 
- 	return 0;
- }
-+
-+void input_device_request_disconnect(struct fake_input *fake)
-+{
-+	if (fake == NULL || fake->idev == NULL)
-+		return;
-+	device_request_disconnect(fake->idev->device, NULL);
-+}
-diff --git a/input/device.h b/input/device.h
-index 509a353..ff52967 100644
---- a/input/device.h
-+++ b/input/device.h
-@@ -49,3 +49,4 @@ int input_device_unregister(const char *path, const char *uuid);
- int input_device_set_channel(const bdaddr_t *src, const bdaddr_t *dst, int psm,
- 							GIOChannel *io);
- int input_device_close_channels(const bdaddr_t *src, const bdaddr_t *dst);
-+void input_device_request_disconnect(struct fake_input *fake);
--- 
-1.7.10
+Fedora 17 with kernel 3.4.0 and bluez master. Turns out it's unusable
+because of this commit:
+commit d22d083d6dd681f8d25eb806d4ec91853475ee06
+Author: Gustavo Padovan <gustavo@padovan.org>
+Date:   Thu Apr 5 16:22:55 2012 -0300
 
+    mgmt: update mgmt control channel id
+    
+    kernel side has updated its control channel id from 1 to 3.
+
+Do we really need a devel kernel to work on user-space? Reverting this
+patch makes it work, I just wish I didn't spend my development time
+trying to find what was wrong with my system...
+
+Cheers
 
