@@ -1,56 +1,125 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 17 Jun 2012 09:26:37 +0900 (JST)
-Message-Id: <20120617.092637.2171077367789127221.yamato@redhat.com>
-To: andrei.emeltchenko.news@gmail.com
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/8] /proc/net/ entries for bluetooth protocols
-From: Masatake YAMATO <yamato@redhat.com>
-In-Reply-To: <20120615080007.GD7205@aemeltch-MOBL1>
-References: <20120615.021553.2062569361246467656.yamato@redhat.com>
-	<20120615080007.GD7205@aemeltch-MOBL1>
+Message-ID: <1339889570.20079.7.camel@sirocco.config>
+Subject: [PATCH 2/3] fakehid: Disconnect from PS3 remote after 10 mins
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Date: Sun, 17 Jun 2012 01:32:50 +0200
+Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+After 10 minutes, disconnect the PS3 BD Remote to avoid draining its
+battery. This is consistent with its behaviour on the PS3.
 
-Thank you for reviewing.
-I have a question.
+Original patch by Ruslan N. Marchenko <rufferson@gmail.com>
+---
+ input/device.h  |    1 +
+ input/fakehid.c |   36 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 37 insertions(+)
 
->> +		sk = sk_entry(v);
->> +		bt = bt_sk(sk);
->> +		seq_printf(seq, "%pK %-6d %-6u %-6u %-6u %-6lu",
->> +			   sk,
->> +			   atomic_read(&sk->sk_refcnt),
->> +			   sk_rmem_alloc_get(sk),
->> +			   sk_wmem_alloc_get(sk),
->> +			   sock_i_uid(sk),
->> +			   sock_i_ino(sk)
->> +			);
->> +		seq_puts(seq, batostr(&bt->src));
-> 
-> batostr looks OK now but this will be outdated soon by %pMR.
+diff --git a/input/device.h b/input/device.h
+index ff52967..d8baa2c 100644
+--- a/input/device.h
++++ b/input/device.h
+@@ -33,6 +33,7 @@ struct fake_input {
+ 	int		uinput;		/* uinput socket */
+ 	int		rfcomm;		/* RFCOMM socket */
+ 	uint8_t		ch;		/* RFCOMM channel number */
++	guint           timeout_id;	/* Disconnect timeout ID */
+ 	gboolean	(*connect) (struct input_conn *iconn, GError **err);
+ 	int		(*disconnect) (struct input_conn *iconn);
+ 	void		*priv;
+diff --git a/input/fakehid.c b/input/fakehid.c
+index 3181538..a125356 100644
+--- a/input/fakehid.c
++++ b/input/fakehid.c
+@@ -44,6 +44,9 @@
+ #include "fakehid.h"
+ #include "uinput.h"
+ 
++/* Timeout to get the PS3 remote disconnected, in seconds */
++#define PS3_REMOTE_TIMEOUT 10 * 60
++
+ enum ps3remote_special_keys {
+ 	PS3R_BIT_PS = 0,
+ 	PS3R_BIT_ENTER = 3,
+@@ -141,6 +144,20 @@ static unsigned int ps3remote_keymap[] = {
+ 	[0xff] = KEY_MAX,
+ };
+ 
++static gboolean ps3_remote_timeout_cb(gpointer user_data);
++
++static void ps3remote_set_timeout(struct fake_input *fake, gboolean enable)
++{
++	if (enable) {
++		fake->timeout_id = g_timeout_add_seconds(PS3_REMOTE_TIMEOUT, ps3_remote_timeout_cb, fake);
++	} else {
++		if (fake->timeout_id > 0) {
++			g_source_remove(fake->timeout_id);
++			fake->timeout_id = 0;
++		}
++	}
++}
++
+ static int ps3remote_decode(char *buff, int size, unsigned int *value)
+ {
+ 	static unsigned int lastkey = 0;
+@@ -203,6 +220,16 @@ error:
+ 	return -1;
+ }
+ 
++static gboolean
++ps3_remote_timeout_cb(gpointer user_data)
++{
++	struct fake_input *fake = (struct fake_input *) user_data;
++	input_device_request_disconnect(fake);
++	DBG("Disconnected PS3 BD Remote after timeout");
++	fake->timeout_id = 0;
++	return FALSE;
++}
++
+ static gboolean ps3remote_event(GIOChannel *chan, GIOCondition cond,
+ 				gpointer data)
+ {
+@@ -221,6 +248,9 @@ static gboolean ps3remote_event(GIOChannel *chan, GIOCondition cond,
+ 		goto failed;
+ 	}
+ 
++	/* Remove the old timeout */
++	ps3remote_set_timeout(fake, FALSE);
++
+ 	fd = g_io_channel_unix_get_fd(chan);
+ 
+ 	memset(buff, 0, sizeof(buff));
+@@ -256,6 +286,8 @@ static gboolean ps3remote_event(GIOChannel *chan, GIOCondition cond,
+ 		goto failed;
+ 	}
+ 
++	ps3remote_set_timeout(fake, TRUE);
++
+ 	return TRUE;
+ 
+ failed:
+@@ -318,6 +350,8 @@ static int ps3remote_setup_uinput(struct fake_input *fake,
+ 		goto err;
+ 	}
+ 
++	ps3remote_set_timeout(fake, TRUE);
++
+ 	return 0;
+ 
+ err:
+@@ -378,6 +412,8 @@ struct fake_input *fake_hid_connadd(struct fake_input *fake,
+ 	for (l = fake_hid->devices; l != NULL; l = l->next) {
+ 		old = l->data;
+ 		if (old->idev == fake->idev) {
++			if (fake->timeout_id > 0)
++				g_source_remove(fake->timeout_id);
+ 			g_free(fake);
+ 			fake = old;
+ 			fake_hid->connect(fake, NULL);
+-- 
+1.7.10
 
-As far as reading Documentation/printk-formats.txt and 
-pointer() in lib/vsprintf.c, %pMR is not defined.
-I guess you mean %pM, don't you?
 
-I've tried following code, and it works as expected.
-
-		baswap(&src_baswapped, &bt->src);
-		baswap(&dst_baswapped, &bt->dst);
-
-		seq_printf(seq, "%pK %-6d %-6u %-6u %-6u %-6lu %pM %pM %-6lu",
-			   sk,
-			   atomic_read(&sk->sk_refcnt),
-			   sk_rmem_alloc_get(sk),
-			   sk_wmem_alloc_get(sk),
-			   sock_i_uid(sk),
-			   sock_i_ino(sk),
-			   &src_baswapped,
-			   &dst_baswapped,
-			   bt->parent? sock_i_ino(bt->parent): 0LU);
-
-
-Masatake YAMATO
