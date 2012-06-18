@@ -1,38 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 18 Jun 2012 17:34:17 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] gdbus: add macro for methods marked as NOREPLY
-Message-ID: <20120618143417.GA12325@x220.P-661HNU-F1>
-References: <1337612075-2697-1-git-send-email-lucas.demarchi@profusion.mobi>
- <CAMOw1v4bP74N9ugbQ5RuFbnw_k8JUp7fRkQ+79TvQa0qpRN-ZA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CAMOw1v4bP74N9ugbQ5RuFbnw_k8JUp7fRkQ+79TvQa0qpRN-ZA@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH hcidump 2/2] AVRCP: Add support for Addressed Player Changed event
+Date: Mon, 18 Jun 2012 17:09:23 +0300
+Message-Id: <1340028563-8089-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1340028563-8089-1-git-send-email-luiz.dentz@gmail.com>
+References: <1340028563-8089-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, May 23, 2012, Lucas De Marchi wrote:
-> On Mon, May 21, 2012 at 11:54 AM, Lucas De Marchi
-> <lucas.demarchi@profusion.mobi> wrote:
-> > ---
-> >
-> > This one is not used in BlueZ, but it was necessary for other projects using
-> > gdbus. It's better to keep them in sync.
-> >
-> >  gdbus/gdbus.h |    7 +++++++
-> >  1 file changed, 7 insertions(+)
-> >
-> > diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-> > index e2e160d..0a8a27c 100644
-> > --- a/gdbus/gdbus.h
-> > +++ b/gdbus/gdbus.h
-> 
-> This one is still missing in BlueZ, neard and ConnMan.
+---
+ parser/avrcp.c |   10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Applied to bluez.git and obexd.git.
+diff --git a/parser/avrcp.c b/parser/avrcp.c
+index 0f2f1e6..6fa3742 100644
+--- a/parser/avrcp.c
++++ b/parser/avrcp.c
+@@ -1107,6 +1107,7 @@ static void avrcp_register_notification_dump(int level, struct frame *frm,
+ 						uint8_t ctype, uint16_t len)
+ {
+ 	uint8_t event, status;
++	uint16_t uid;
+ 	uint32_t interval;
+ 	uint64_t id;
+ 
+@@ -1202,6 +1203,15 @@ response:
+ 		status = get_u8(frm) & 0x7F;
+ 		printf("Volume: %.2f%% (%d/127)\n", status/1.27, status);
+ 		break;
++	case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
++		uid = get_u16(frm);
++		printf("PlayerID: 0x%04x", uid);
++
++		p_indent(level, frm);
++
++		uid = get_u16(frm);
++		printf("UID: 0x%04x", uid);
++		break;
+ 	}
+ }
+ 
+-- 
+1.7.10.2
 
-Johan
