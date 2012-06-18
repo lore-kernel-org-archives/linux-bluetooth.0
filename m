@@ -1,88 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 18 Jun 2012 19:03:36 +0900 (JST)
-Message-Id: <20120618.190336.2038782472992211666.yamato@redhat.com>
-In-Reply-To: <20120615080007.GD7205@aemeltch-MOBL1>
-References: <20120615080007.GD7205@aemeltch-MOBL1>
-From: Masatake YAMATO <yamato@redhat.com>
-Subject: [PATCH v2 5/8] Added /proc/net/hidp via bt_procfs_init()
-To: linux-kernel@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: linux-kernel-owner@vger.kernel.org
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix compile warnings in mgmt
+Date: Mon, 18 Jun 2012 13:03:46 +0300
+Message-Id: <1340013826-13432-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Signed-off-by: Masatake YAMATO <yamato@redhat.com>
----
- net/bluetooth/hidp/sock.c |   23 +++++++++++++++++++++--
- 1 file changed, 21 insertions(+), 2 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/net/bluetooth/hidp/sock.c b/net/bluetooth/hidp/sock.c
-index 73a32d7..3bd5d63 100644
---- a/net/bluetooth/hidp/sock.c
-+++ b/net/bluetooth/hidp/sock.c
-@@ -39,6 +39,10 @@
+Commit af7985bf85840e3dc90ba108a679db044f91f00e introduced regression
+resulting in complie warnings:
+
+...
+net/bluetooth/mgmt.c:3568:27: warning: invalid assignment: |=
+net/bluetooth/mgmt.c:3568:27:    left side has type restricted __le32
+net/bluetooth/mgmt.c:3568:27:    right side has type int
+net/bluetooth/mgmt.c:3570:27: warning: invalid assignment: |=
+net/bluetooth/mgmt.c:3570:27:    left side has type restricted __le32
+net/bluetooth/mgmt.c:3570:27:    right side has type int
+net/bluetooth/mgmt.c:3580:21: warning: cast from restricted __le32
+...
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/mgmt.c |    6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 461e16d..0238af3 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3565,9 +3565,9 @@ int mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	ev->addr.type = link_to_bdaddr(link_type, addr_type);
+ 	ev->rssi = rssi;
+ 	if (cfm_name)
+-		ev->flags |= MGMT_DEV_FOUND_CONFIRM_NAME;
++		ev->flags |= cpu_to_le32(MGMT_DEV_FOUND_CONFIRM_NAME);
+ 	if (!ssp)
+-		ev->flags |= MGMT_DEV_FOUND_LEGACY_PAIRING;
++		ev->flags |= cpu_to_le32(MGMT_DEV_FOUND_LEGACY_PAIRING);
  
- #include "hidp.h"
+ 	if (eir_len > 0)
+ 		memcpy(ev->eir, eir, eir_len);
+@@ -3577,8 +3577,6 @@ int mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 					  dev_class, 3);
  
-+static struct bt_sock_list hidp_sk_list = {
-+	.lock = __RW_LOCK_UNLOCKED(hidp_sk_list.lock)
-+};
-+
- static int hidp_sock_release(struct socket *sock)
- {
- 	struct sock *sk = sock->sk;
-@@ -48,6 +52,8 @@ static int hidp_sock_release(struct socket *sock)
- 	if (!sk)
- 		return 0;
+ 	ev->eir_len = cpu_to_le16(eir_len);
+-	ev->flags = cpu_to_le32(ev->flags);
+-
+ 	ev_size = sizeof(*ev) + eir_len;
  
-+	bt_sock_unlink(&hidp_sk_list, sk);
-+
- 	sock_orphan(sk);
- 	sock_put(sk);
- 
-@@ -267,6 +273,8 @@ static int hidp_sock_create(struct net *net, struct socket *sock, int protocol,
- 	sk->sk_protocol = protocol;
- 	sk->sk_state	= BT_OPEN;
- 
-+	bt_sock_link(&hidp_sk_list, sk);
-+
- 	return 0;
- }
- 
-@@ -285,19 +293,30 @@ int __init hidp_init_sockets(void)
- 		return err;
- 
- 	err = bt_sock_register(BTPROTO_HIDP, &hidp_sock_family_ops);
--	if (err < 0)
-+	if (err < 0) {
-+	  	BT_ERR("Can't register HIDP socket");
- 		goto error;
-+	}
-+
-+	err = bt_procfs_init(THIS_MODULE, &init_net, "hidp", &hidp_sk_list, NULL);
-+	if (err < 0) {
-+		BT_ERR("Failed to create HIDP proc file");
-+		bt_sock_unregister(BTPROTO_HIDP);
-+		goto error;		
-+	}
-+
-+	BT_INFO("HIDP socket layer initialized");
- 
- 	return 0;
- 
- error:
--	BT_ERR("Can't register HIDP socket");
- 	proto_unregister(&hidp_proto);
- 	return err;
- }
- 
- void __exit hidp_cleanup_sockets(void)
- {
-+	bt_procfs_cleanup(&init_net, "hidp");
- 	if (bt_sock_unregister(BTPROTO_HIDP) < 0)
- 		BT_ERR("Can't unregister HIDP socket");
- 
+ 	return mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, ev, ev_size, NULL);
 -- 
-1.7.10.2
+1.7.9.5
 
