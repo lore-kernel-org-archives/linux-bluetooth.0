@@ -1,57 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix compile warnings in mgmt
-Date: Mon, 18 Jun 2012 13:03:46 +0300
-Message-Id: <1340013826-13432-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 18 Jun 2012 19:01:57 +0900 (JST)
+Message-Id: <20120618.190157.1593459276468551202.yamato@redhat.com>
+In-Reply-To: <20120615080007.GD7205@aemeltch-MOBL1>
+References: <20120615080007.GD7205@aemeltch-MOBL1>
+From: Masatake YAMATO <yamato@redhat.com>
+Subject: [PATCH v2 4/8] Added /proc/net/hci via bt_procfs_init()
+To: linux-kernel@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-Commit af7985bf85840e3dc90ba108a679db044f91f00e introduced regression
-resulting in complie warnings:
-
-...
-net/bluetooth/mgmt.c:3568:27: warning: invalid assignment: |=
-net/bluetooth/mgmt.c:3568:27:    left side has type restricted __le32
-net/bluetooth/mgmt.c:3568:27:    right side has type int
-net/bluetooth/mgmt.c:3570:27: warning: invalid assignment: |=
-net/bluetooth/mgmt.c:3570:27:    left side has type restricted __le32
-net/bluetooth/mgmt.c:3570:27:    right side has type int
-net/bluetooth/mgmt.c:3580:21: warning: cast from restricted __le32
-...
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Signed-off-by: Masatake YAMATO <yamato@redhat.com>
 ---
- net/bluetooth/mgmt.c |    6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ net/bluetooth/hci_sock.c |   14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 461e16d..0238af3 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3565,9 +3565,9 @@ int mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	ev->addr.type = link_to_bdaddr(link_type, addr_type);
- 	ev->rssi = rssi;
- 	if (cfm_name)
--		ev->flags |= MGMT_DEV_FOUND_CONFIRM_NAME;
-+		ev->flags |= cpu_to_le32(MGMT_DEV_FOUND_CONFIRM_NAME);
- 	if (!ssp)
--		ev->flags |= MGMT_DEV_FOUND_LEGACY_PAIRING;
-+		ev->flags |= cpu_to_le32(MGMT_DEV_FOUND_LEGACY_PAIRING);
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 5914623..63bedec 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -1107,21 +1107,31 @@ int __init hci_sock_init(void)
+ 		return err;
  
- 	if (eir_len > 0)
- 		memcpy(ev->eir, eir, eir_len);
-@@ -3577,8 +3577,6 @@ int mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 					  dev_class, 3);
+ 	err = bt_sock_register(BTPROTO_HCI, &hci_sock_family_ops);
+-	if (err < 0)
++	if (err < 0) {
++	  	BT_ERR("HCI socket registration failed");
++		goto error;
++	}
++
++	err = bt_procfs_init(THIS_MODULE, &init_net, "hci", &hci_sk_list, NULL);
++	if (err < 0) {
++		BT_ERR("Failed to create HCI proc file");
++		bt_sock_unregister(BTPROTO_HCI);
+ 		goto error;
++	}
  
- 	ev->eir_len = cpu_to_le16(eir_len);
--	ev->flags = cpu_to_le32(ev->flags);
--
- 	ev_size = sizeof(*ev) + eir_len;
+ 	BT_INFO("HCI socket layer initialized");
  
- 	return mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, ev, ev_size, NULL);
+ 	return 0;
+ 
+ error:
+-	BT_ERR("HCI socket registration failed");
+ 	proto_unregister(&hci_sk_proto);
+ 	return err;
+ }
+ 
+ void hci_sock_cleanup(void)
+ {
++        bt_procfs_cleanup(&init_net, "hci");
++
+ 	if (bt_sock_unregister(BTPROTO_HCI) < 0)
+ 		BT_ERR("HCI socket unregistration failed");
+ 
 -- 
-1.7.9.5
+1.7.10.2
 
