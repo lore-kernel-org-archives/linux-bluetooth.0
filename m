@@ -1,90 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1340027876.3987.117.camel@novo.hadess.net>
-Subject: Re: [PATCH 2/3] fakehid: Disconnect from PS3 remote after 10 mins
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <E50901D4F2CF69428D43141B7C85867929DD8AD28C@EXMB03.eu.tieto.com>
+References: <1338998771-18683-1-git-send-email-michal.labedzki@tieto.com>
+	<1338998771-18683-4-git-send-email-michal.labedzki@tieto.com>
+	<CABBYNZ+Jd9WNftEsrxj93oLgPt8GNAd2eFdoQVWj3g0favoiTA@mail.gmail.com>
+	<E50901D4F2CF69428D43141B7C85867929DD8AD28C@EXMB03.eu.tieto.com>
+Date: Mon, 18 Jun 2012 14:07:02 +0300
+Message-ID: <CABBYNZ+T8K8jP+B1_N=mLzxtZGL-TKcWyxU0GjvErzXoZ2ptRw@mail.gmail.com>
+Subject: Re: [PATCH 04/13] AVRCP: Keep AVRCP version of connected device in server
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Michal.Labedzki@tieto.com
 Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 18 Jun 2012 14:57:56 +0100
-In-Reply-To: <CABBYNZJ0-CDhC6WQJ-k20yCeJRiHR7c__tV6xg9-xphcDdEg_Q@mail.gmail.com>
-References: <1339889570.20079.7.camel@sirocco.config>
-	 <CABBYNZJ0-CDhC6WQJ-k20yCeJRiHR7c__tV6xg9-xphcDdEg_Q@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2012-06-18 at 11:44 +0300, Luiz Augusto von Dentz wrote:
-> Hi Bastien,
-> 
-> On Sun, Jun 17, 2012 at 2:32 AM, Bastien Nocera <hadess@hadess.net> wrote:
-> > After 10 minutes, disconnect the PS3 BD Remote to avoid draining its
-> > battery. This is consistent with its behaviour on the PS3.
-> >
-> > Original patch by Ruslan N. Marchenko <rufferson@gmail.com>
-> > ---
-> >  input/device.h  |    1 +
-> >  input/fakehid.c |   36 ++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 37 insertions(+)
-> >
-> > diff --git a/input/device.h b/input/device.h
-> > index ff52967..d8baa2c 100644
-> > --- a/input/device.h
-> > +++ b/input/device.h
-> > @@ -33,6 +33,7 @@ struct fake_input {
-> >        int             uinput;         /* uinput socket */
-> >        int             rfcomm;         /* RFCOMM socket */
-> >        uint8_t         ch;             /* RFCOMM channel number */
-> > +       guint           timeout_id;     /* Disconnect timeout ID */
-> >        gboolean        (*connect) (struct input_conn *iconn, GError **err);
-> >        int             (*disconnect) (struct input_conn *iconn);
-> >        void            *priv;
-> > diff --git a/input/fakehid.c b/input/fakehid.c
-> > index 3181538..a125356 100644
-> > --- a/input/fakehid.c
-> > +++ b/input/fakehid.c
-> > @@ -44,6 +44,9 @@
-> >  #include "fakehid.h"
-> >  #include "uinput.h"
-> >
-> > +/* Timeout to get the PS3 remote disconnected, in seconds */
-> > +#define PS3_REMOTE_TIMEOUT 10 * 60
-> > +
-> >  enum ps3remote_special_keys {
-> >        PS3R_BIT_PS = 0,
-> >        PS3R_BIT_ENTER = 3,
-> > @@ -141,6 +144,20 @@ static unsigned int ps3remote_keymap[] = {
-> >        [0xff] = KEY_MAX,
-> >  };
-> >
-> > +static gboolean ps3_remote_timeout_cb(gpointer user_data);
-> > +
-> > +static void ps3remote_set_timeout(struct fake_input *fake, gboolean enable)
-> > +{
-> > +       if (enable) {
-> > +               fake->timeout_id = g_timeout_add_seconds(PS3_REMOTE_TIMEOUT, ps3_remote_timeout_cb, fake);
-> > +       } else {
-> > +               if (fake->timeout_id > 0) {
-> > +                       g_source_remove(fake->timeout_id);
-> > +                       fake->timeout_id = 0;
-> > +               }
-> > +       }
-> > +}
-> 
-> It doesn't really need to remove/add the timeout separately, upon
-> event just reset the idle timeout.
+Hi Michal,
 
-I don't understand what you're saying here.
+On Mon, Jun 18, 2012 at 1:30 PM,  <Michal.Labedzki@tieto.com> wrote:
+> Hi Luiz,
+>
+>> The idea is fine, but this is not the server version, it is the
+>> version used in the connection so it probably need to be stored in
+>> avrcp_player. If there remote doesn't support AVRCP 1.3 or latter we
+>> don't need to assign a player.
+>
+> Ok. This is "remote_version" - remote controller version of AVRCP.Therefore on (new) connection this version will be updated.
+> avrcp_player is not good place for that, because connection is only one, so version is the same for all players, but players may be for example 67.
+> So maybe only fix the name will be ok. What do you think?
 
-Are you saying I should call g_source_remove, and then g_timeout_add()?
-There's no functionality to change the interval for g_timeout_add*
-functions.
+Then perhaps have another structure e.g. avrcp_session that represents
+the connection where this information can be stored.
 
-The call is separate because it is used multiple times in the code (and
-handling getting/setting in one place is cleaner).
-
-By the way, the reason why it's handled this way is because the rest of
-the input code relies on the kernel switching off the connection using
-hidp_connadd_req->idle_to. fakehid doesn't use hidp.
-
-Cheers
-
+-- 
+Luiz Augusto von Dentz
