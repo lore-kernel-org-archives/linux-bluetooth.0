@@ -1,87 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 18 Jun 2012 19:01:40 +0900 (JST)
-Message-Id: <20120618.190140.1065000539334810754.yamato@redhat.com>
+Date: Mon, 18 Jun 2012 19:00:49 +0900 (JST)
+Message-Id: <20120618.190049.1291417432266224200.yamato@redhat.com>
 In-Reply-To: <20120615080007.GD7205@aemeltch-MOBL1>
 References: <20120615080007.GD7205@aemeltch-MOBL1>
 From: Masatake YAMATO <yamato@redhat.com>
-Subject: [PATCH v2 3/8] Added /proc/net/cmtp via bt_procfs_init()
+Subject: [PATCH v2 2/8] Added /proc/net/bnep via bt_procfs_init()
 To: linux-kernel@vger.kernel.org
 Cc: linux-bluetooth@vger.kernel.org
 Mime-Version: 1.0
 Content-Type: Text/Plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Signed-off-by: Masatake YAMATO <yamato@redhat.com>
 ---
- net/bluetooth/cmtp/sock.c |   23 +++++++++++++++++++++--
- 1 file changed, 21 insertions(+), 2 deletions(-)
+ net/bluetooth/bnep/sock.c |   22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/cmtp/sock.c b/net/bluetooth/cmtp/sock.c
-index 311668d..880ba45 100644
---- a/net/bluetooth/cmtp/sock.c
-+++ b/net/bluetooth/cmtp/sock.c
-@@ -42,6 +42,10 @@
+diff --git a/net/bluetooth/bnep/sock.c b/net/bluetooth/bnep/sock.c
+index 180bfc4..b5bccd2 100644
+--- a/net/bluetooth/bnep/sock.c
++++ b/net/bluetooth/bnep/sock.c
+@@ -45,6 +45,10 @@
  
- #include "cmtp.h"
+ #include "bnep.h"
  
-+static struct bt_sock_list cmtp_sk_list = {
-+	.lock = __RW_LOCK_UNLOCKED(cmtp_sk_list.lock)
++static struct bt_sock_list bnep_sk_list = {
++	.lock = __RW_LOCK_UNLOCKED(bnep_sk_list.lock)
 +};
 +
- static int cmtp_sock_release(struct socket *sock)
+ static int bnep_sock_release(struct socket *sock)
  {
  	struct sock *sk = sock->sk;
-@@ -51,6 +55,8 @@ static int cmtp_sock_release(struct socket *sock)
+@@ -54,6 +58,8 @@ static int bnep_sock_release(struct socket *sock)
  	if (!sk)
  		return 0;
  
-+	bt_sock_unlink(&cmtp_sk_list, sk);
-+	
++	bt_sock_unlink(&bnep_sk_list, sk);
++
  	sock_orphan(sk);
  	sock_put(sk);
- 
-@@ -214,6 +220,8 @@ static int cmtp_sock_create(struct net *net, struct socket *sock, int protocol,
+ 	return 0;
+@@ -220,6 +226,7 @@ static int bnep_sock_create(struct net *net, struct socket *sock, int protocol,
  	sk->sk_protocol = protocol;
- 	sk->sk_state    = BT_OPEN;
+ 	sk->sk_state	= BT_OPEN;
  
-+	bt_sock_link(&cmtp_sk_list, sk);
-+	
++	bt_sock_link(&bnep_sk_list, sk);
  	return 0;
  }
  
-@@ -232,19 +240,30 @@ int cmtp_init_sockets(void)
+@@ -238,19 +245,30 @@ int __init bnep_sock_init(void)
  		return err;
  
- 	err = bt_sock_register(BTPROTO_CMTP, &cmtp_sock_family_ops);
+ 	err = bt_sock_register(BTPROTO_BNEP, &bnep_sock_family_ops);
 -	if (err < 0)
 +	if (err < 0) {
-+		BT_ERR("Can't register CMTP socket");
++	  	BT_ERR("Can't register BNEP socket");
  		goto error;
 +	}
 +
-+	err = bt_procfs_init(THIS_MODULE, &init_net, "cmtp", &cmtp_sk_list, NULL);
++	err = bt_procfs_init(THIS_MODULE, &init_net, "bnep", &bnep_sk_list, NULL);
 +	if (err < 0) {
-+		BT_ERR("Failed to create CMTP proc file");
-+		bt_sock_unregister(BTPROTO_HIDP);
++		BT_ERR("Failed to create BNEP proc file");
++		bt_sock_unregister(BTPROTO_BNEP);
 +		goto error;		
 +	}
-+	
-+	BT_INFO("CMTP socket layer initialized");
++
++	BT_INFO("BNEP socket layer initialized");
  
  	return 0;
  
  error:
--	BT_ERR("Can't register CMTP socket");
- 	proto_unregister(&cmtp_proto);
+-	BT_ERR("Can't register BNEP socket");
+ 	proto_unregister(&bnep_proto);
  	return err;
  }
  
- void cmtp_cleanup_sockets(void)
+ void __exit bnep_sock_cleanup(void)
  {
-+	bt_procfs_cleanup(&init_net, "cmtp");
- 	if (bt_sock_unregister(BTPROTO_CMTP) < 0)
- 		BT_ERR("Can't unregister CMTP socket");
++	bt_procfs_cleanup(&init_net, "bnep");
+ 	if (bt_sock_unregister(BTPROTO_BNEP) < 0)
+ 		BT_ERR("Can't unregister BNEP socket");
  
 -- 
 1.7.10.2
