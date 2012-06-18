@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 18 Jun 2012 19:04:47 +0900 (JST)
-Message-Id: <20120618.190447.1140868673998101856.yamato@redhat.com>
+Date: Mon, 18 Jun 2012 19:04:19 +0900 (JST)
+Message-Id: <20120618.190419.94822483439520199.yamato@redhat.com>
 In-Reply-To: <20120615080007.GD7205@aemeltch-MOBL1>
 References: <20120615080007.GD7205@aemeltch-MOBL1>
 From: Masatake YAMATO <yamato@redhat.com>
-Subject: [PATCH v2 8/8] Added /proc/net/sco via bt_procfs_init()
+Subject: [PATCH v2 7/8] Added /proc/net/rfcomm via bt_procfs_init()
 To: linux-kernel@vger.kernel.org
 Cc: linux-bluetooth@vger.kernel.org
 Mime-Version: 1.0
@@ -14,36 +14,48 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Signed-off-by: Masatake YAMATO <yamato@redhat.com>
 ---
- net/bluetooth/sco.c |    9 +++++++++
- 1 file changed, 9 insertions(+)
+ net/bluetooth/rfcomm/sock.c |   14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index cbdd313..4f55867 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -1043,6 +1043,13 @@ int __init sco_init(void)
- 		goto error;
- 	}
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index e8707de..feded05 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -1052,8 +1052,17 @@ int __init rfcomm_init_sockets(void)
+ 		return err;
  
-+	err = bt_procfs_init(THIS_MODULE, &init_net, "sco", &sco_sk_list, NULL);
+ 	err = bt_sock_register(BTPROTO_RFCOMM, &rfcomm_sock_family_ops);
+-	if (err < 0)
 +	if (err < 0) {
-+		BT_ERR("Failed to create SCO proc file");
-+		bt_sock_unregister(BTPROTO_SCO);
++	  	BT_ERR("RFCOMM socket layer registration failed");
 +		goto error;
 +	}
 +
++	err = bt_procfs_init(THIS_MODULE, &init_net, "rfcomm", &rfcomm_sk_list, NULL);
++	if (err < 0) {
++		BT_ERR("Failed to create RFCOMM proc file");
++		bt_sock_unregister(BTPROTO_RFCOMM);
+ 		goto error;
++	}
+ 
  	if (bt_debugfs) {
- 		sco_debugfs = debugfs_create_file("sco", 0444,
- 					bt_debugfs, NULL, &sco_debugfs_fops);
-@@ -1061,6 +1068,8 @@ error:
+ 		rfcomm_sock_debugfs = debugfs_create_file("rfcomm", 0444,
+@@ -1067,13 +1076,14 @@ int __init rfcomm_init_sockets(void)
+ 	return 0;
  
- void __exit sco_exit(void)
+ error:
+-	BT_ERR("RFCOMM socket layer registration failed");
+ 	proto_unregister(&rfcomm_proto);
+ 	return err;
+ }
+ 
+ void __exit rfcomm_cleanup_sockets(void)
  {
-+	bt_procfs_cleanup(&init_net, "sco");
++  	bt_procfs_cleanup(&init_net, "rfcomm");
 +
- 	debugfs_remove(sco_debugfs);
+ 	debugfs_remove(rfcomm_sock_debugfs);
  
- 	if (bt_sock_unregister(BTPROTO_SCO) < 0)
+ 	if (bt_sock_unregister(BTPROTO_RFCOMM) < 0)
 -- 
 1.7.10.2
 
