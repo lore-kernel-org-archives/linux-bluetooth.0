@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1338998771-18683-4-git-send-email-michal.labedzki@tieto.com>
+In-Reply-To: <1338998771-18683-5-git-send-email-michal.labedzki@tieto.com>
 References: <1338998771-18683-1-git-send-email-michal.labedzki@tieto.com>
-	<1338998771-18683-4-git-send-email-michal.labedzki@tieto.com>
-Date: Mon, 18 Jun 2012 12:59:33 +0300
-Message-ID: <CABBYNZ+Jd9WNftEsrxj93oLgPt8GNAd2eFdoQVWj3g0favoiTA@mail.gmail.com>
-Subject: Re: [PATCH 04/13] AVRCP: Keep AVRCP version of connected device in server
+	<1338998771-18683-5-git-send-email-michal.labedzki@tieto.com>
+Date: Mon, 18 Jun 2012 12:48:27 +0300
+Message-ID: <CABBYNZLsQuOj1eJcX6hKGA0moVPR71-rBJQWevm-f-DwfJ3jHQ@mail.gmail.com>
+Subject: Re: [PATCH 05/13] AVRCP: Register AVRCP before MEDIA interface
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Michal Labedzki <michal.labedzki@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -17,54 +17,40 @@ Hi Michal,
 
 On Wed, Jun 6, 2012 at 7:06 PM, Michal Labedzki
 <michal.labedzki@tieto.com> wrote:
-> This can be used to improve compatibility between
-> AVRCP 1.3 vs AVRCP 1.4 devices and implementation in stack.
+> Register AVRCP before MEDIA interface to avoid searching for or
+> accessing non-existent AVRCP server.
 > ---
->  audio/avrcp.c |    9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
+>  audio/manager.c |    6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >
-> diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index 7576e19..9ff0700 100644
-> --- a/audio/avrcp.c
-> +++ b/audio/avrcp.c
-> @@ -200,6 +200,7 @@ struct avrcp_server {
->        uint32_t ct_record_id;
->        GSList *players;
->        struct avrcp_player *addressed_player;
-> +       uint16_t version;
->  };
+> diff --git a/audio/manager.c b/audio/manager.c
+> index d442d1d..076346a 100644
+> --- a/audio/manager.c
+> +++ b/audio/manager.c
+> @@ -1238,6 +1238,9 @@ proceed:
+>        if (enabled.socket)
+>                unix_init();
 >
->  struct pending_pdu {
-> @@ -1288,8 +1289,12 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
->                        return;
->
->                desc = list->data;
-> +               if (desc)
-> +                       server->version = desc->version;
-> +               else
-> +                       server->version = AVRCP_VERSION_UNKNOWN;
->
-> -               if (desc && desc->version >= AVRCP_VERSION_1_4)
-> +               if (server->version >= AVRCP_VERSION_1_4)
->                        register_volume_notification(player);
->
->                sdp_list_free(list, free);
-> @@ -1380,6 +1385,8 @@ int avrcp_register(DBusConnection *conn, const bdaddr_t *src, GKeyFile *config)
->
->        bacpy(&server->src, src);
->
-> +       server->version = AVRCP_VERSION_UNKNOWN;
+> +       if (enabled.control)
+> +               btd_register_adapter_driver(&avrcp_server_driver);
 > +
->        servers = g_slist_append(servers, server);
+>        if (enabled.media)
+>                btd_register_adapter_driver(&media_server_driver);
 >
->        return 0;
+> @@ -1250,9 +1253,6 @@ proceed:
+>        if (enabled.source || enabled.sink)
+>                btd_register_adapter_driver(&a2dp_server_driver);
+>
+> -       if (enabled.control)
+> -               btd_register_adapter_driver(&avrcp_server_driver);
+> -
+>        btd_register_device_driver(&audio_driver);
+>
+>        *enable_sco = (enabled.gateway || enabled.headset);
 > --
 > on behalf of ST-Ericsson
 
-The idea is fine, but this is not the server version, it is the
-version used in the connection so it probably need to be stored in
-avrcp_player. If there remote doesn't support AVRCP 1.3 or latter we
-don't need to assign a player.
+Ack
 
 
 -- 
