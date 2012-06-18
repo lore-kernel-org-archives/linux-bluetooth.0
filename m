@@ -1,43 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 18 Jun 2012 11:28:32 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Masatake YAMATO <yamato@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/8] /proc/net/ entries for bluetooth protocols
+Message-ID: <20120618082826.GA2898@aemeltch-MOBL1>
+References: <20120615.021553.2062569361246467656.yamato@redhat.com>
+ <20120615080007.GD7205@aemeltch-MOBL1>
+ <20120617.092637.2171077367789127221.yamato@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1339886587.20079.2.camel@sirocco.config>
-References: <1339886587.20079.2.camel@sirocco.config>
-Date: Mon, 18 Jun 2012 11:30:08 +0300
-Message-ID: <CABBYNZ+AkCc_1+dvi6HEKVA_5hhvVUB0wydbGgDdiKS5Yr+3Ag@mail.gmail.com>
-Subject: Re: Broken bluez master
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120617.092637.2171077367789127221.yamato@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Masatake,
 
-On Sun, Jun 17, 2012 at 1:43 AM, Bastien Nocera <hadess@hadess.net> wrote:
-> Don't think I'm using a too weird development environment, trying to fix
-> PS3 BD Remote bugs.
->
-> Fedora 17 with kernel 3.4.0 and bluez master. Turns out it's unusable
-> because of this commit:
-> commit d22d083d6dd681f8d25eb806d4ec91853475ee06
-> Author: Gustavo Padovan <gustavo@padovan.org>
-> Date:   Thu Apr 5 16:22:55 2012 -0300
->
->    mgmt: update mgmt control channel id
->
->    kernel side has updated its control channel id from 1 to 3.
->
-> Do we really need a devel kernel to work on user-space? Reverting this
-> patch makes it work, I just wish I didn't spend my development time
-> trying to find what was wrong with my system...
+On Sun, Jun 17, 2012 at 09:26:37AM +0900, Masatake YAMATO wrote:
+> Hi,
+> 
+> Thank you for reviewing.
+> I have a question.
+> 
+> >> +		sk = sk_entry(v);
+> >> +		bt = bt_sk(sk);
+> >> +		seq_printf(seq, "%pK %-6d %-6u %-6u %-6u %-6lu",
+> >> +			   sk,
+> >> +			   atomic_read(&sk->sk_refcnt),
+> >> +			   sk_rmem_alloc_get(sk),
+> >> +			   sk_wmem_alloc_get(sk),
+> >> +			   sock_i_uid(sk),
+> >> +			   sock_i_ino(sk)
+> >> +			);
+> >> +		seq_puts(seq, batostr(&bt->src));
+> > 
+> > batostr looks OK now but this will be outdated soon by %pMR.
+> 
+> As far as reading Documentation/printk-formats.txt and 
+> pointer() in lib/vsprintf.c, %pMR is not defined.
+> I guess you mean %pM, don't you?
 
-What exactly is broken, afaik it worked for me except with a headset
-MW600 I got security block.
+Sorry for confusion, I meant my patch adding new printf specifier which
+is not yet in the tree. I think it will take longer time to be accepted 
+then your patch.
 
-I guess we should have made clear in the ChangeLog since afaik we
-broke compatibility with early version of mgmt thats why the channel
-was changed.
+> I've tried following code, and it works as expected.
+> 
+> 		baswap(&src_baswapped, &bt->src);
+> 		baswap(&dst_baswapped, &bt->dst);
+> 
+> 		seq_printf(seq, "%pK %-6d %-6u %-6u %-6u %-6lu %pM %pM %-6lu",
+> 			   sk,
+> 			   atomic_read(&sk->sk_refcnt),
+> 			   sk_rmem_alloc_get(sk),
+> 			   sk_wmem_alloc_get(sk),
+> 			   sock_i_uid(sk),
+> 			   sock_i_ino(sk),
+> 			   &src_baswapped,
+> 			   &dst_baswapped,
+> 			   bt->parent? sock_i_ino(bt->parent): 0LU);
+>
 
--- 
-Luiz Augusto von Dentz
+Please use whatever method best suits for you although I prefer second
+solution since it is easier to change to %pMR later.
+
+Best regards 
+Andrei Emeltchenko 
+
