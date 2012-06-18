@@ -1,28 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 18 Jun 2012 11:41:55 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] AVDTP: Fix rejecting AVDTP_START if starting flag
- is set
-Message-ID: <20120618084155.GA23069@x220>
-References: <1339836447-3100-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1339836447-3100-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 18 Jun 2012 16:42:03 +0800
+Message-ID: <CABM3H8CqhH_qFmpSdm5rKpRPS9P-dHGpq39zUXdWkv7syOxfRQ@mail.gmail.com>
+Subject: LE Start Encryption connection timeout
+From: ye janboe <janboe.ye@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+hi, All
 
-On Sat, Jun 16, 2012, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This is now handled by checking if the command collided.
-> ---
->  audio/avdtp.c |    5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+I am developing BLE for our production, but a issue blocks me:
 
-Applied. Thanks.
+< HCI Command: LE Start Encryption (0x08|0x0019) plen 28
+> HCI Event: Command Status (0x0f) plen 4
+    LE Start Encryption (0x08|0x0019) status 0x00 ncmd 1
+> HCI Event: Encrypt Change (0x08) plen 4
+    status 0x08 handle 64 encrypt 0x00
+    Error: Connection Timeout
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 64 reason 0x08
+    Reason: Connection Timeout
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 64 packets 1
 
-Johan
+Does anyone have some clue why this happen?
+
+Thanks a lot!
+
+Yuanbo
+
+-- 
+Janboe Ye
