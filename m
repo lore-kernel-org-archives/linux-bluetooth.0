@@ -1,37 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Route traffic only through BR/EDR controller
-Date: Tue, 19 Jun 2012 15:21:21 +0300
-Message-Id: <1340108482-16071-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH hcidump 2/2 v2] AVRCP: Add support for Addressed Player Changed event
+Date: Tue, 19 Jun 2012 14:40:30 +0300
+Message-Id: <1340106030-30782-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1340106030-30782-1-git-send-email-luiz.dentz@gmail.com>
+References: <1340106030-30782-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If AMP controller is first in the list then Bluetooth traffic might
-be routed through it (if source is not specified). The patch
-prevents this case and also checks that source is BR/EDR.
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/hci_conn.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+v2: Fix UIDCounter string
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 9aac198..3ec5fc2 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -442,7 +442,8 @@ struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src)
+ parser/avrcp.c |   10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/parser/avrcp.c b/parser/avrcp.c
+index 5587da7..dfa9ee7 100644
+--- a/parser/avrcp.c
++++ b/parser/avrcp.c
+@@ -1107,6 +1107,7 @@ static void avrcp_register_notification_dump(int level, struct frame *frm,
+ 						uint8_t ctype, uint16_t len)
+ {
+ 	uint8_t event, status;
++	uint16_t uid;
+ 	uint32_t interval;
+ 	uint64_t id;
  
- 	list_for_each_entry(d, &hci_dev_list, list) {
- 		if (!test_bit(HCI_UP, &d->flags) ||
--		    test_bit(HCI_RAW, &d->flags))
-+		    test_bit(HCI_RAW, &d->flags) ||
-+		    d->dev_type != HCI_BREDR)
- 			continue;
+@@ -1202,6 +1203,15 @@ response:
+ 		status = get_u8(frm) & 0x7F;
+ 		printf("Volume: %.2f%% (%d/127)\n", status/1.27, status);
+ 		break;
++	case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
++		uid = get_u16(frm);
++		printf("PlayerID: 0x%04x (%u)", uid, uid);
++
++		p_indent(level, frm);
++
++		uid = get_u16(frm);
++		printf("UIDCounter: 0x%04x (%u)", uid, uid);
++		break;
+ 	}
+ }
  
- 		/* Simple routing:
 -- 
-1.7.9.5
+1.7.10.2
 
