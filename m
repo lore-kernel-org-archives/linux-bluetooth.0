@@ -1,61 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 Jun 2012 00:55:20 -0300
+Date: Tue, 19 Jun 2012 00:37:06 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andre Guedes <aguedespe@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, andre.guedes@openbossa.org
-Subject: Re: [PATCH 3/3] Bluetooth: Use GFP_KERNEL in mgmt events functions
-Message-ID: <20120619035520.GG1679@joana>
-References: <1339106746-22886-1-git-send-email-aguedespe@gmail.com>
- <1339106746-22886-3-git-send-email-aguedespe@gmail.com>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth 2012-06-19
+Message-ID: <20120619033706.GF1679@joana>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="hHWLQfXTYDoKhP50"
-In-Reply-To: <1339106746-22886-3-git-send-email-aguedespe@gmail.com>
+	protocol="application/pgp-signature"; boundary="MGYHOYXEY6WxJCY8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---hHWLQfXTYDoKhP50
+--MGYHOYXEY6WxJCY8
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andre,
+Hi John,=20
 
-* Andre Guedes <aguedespe@gmail.com> [2012-06-07 19:05:46 -0300]:
+Five fixed to 3.5. There 2 new usb devices id commits, one driver fix and t=
+wo
+other fixes for the core, one for L2CAP and other in MGMT interface.
 
-> cmd_status, cmd_complete and mgmt_event functions are executed in
-> process context and they are not called inside atomic sections. Thus,
-> they should use GFP_KERNEL for memory allocation instead of GFP_ATOMIC.
->=20
-> Signed-off-by: Andre Guedes <aguedespe@gmail.com>
-> ---
->  net/bluetooth/mgmt.c |    6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-
-All 3 patches have been applied to bluetooth-next. Thanks.
+Please pull, or let me know of any problems. Thanks :)
 
 	Gustavo
 
---hHWLQfXTYDoKhP50
+---
+The following changes since commit 1c2e004183178e1947882cd2e74f37826f45230e:
+
+  Bluetooth: Add support for encryption key refresh (2012-06-08 21:00:40 -0=
+300)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth for-ups=
+tream
+
+for you to fetch changes up to ea1e76a3f92f8565d395c549b9ca836c7eaa44b9:
+
+  Bluetooth: btmrvl: Do not send vendor events to bluetooth stack (2012-06-=
+19 00:19:11 -0300)
+
+----------------------------------------------------------------
+Andrei Emeltchenko (1):
+      Bluetooth: btmrvl: Do not send vendor events to bluetooth stack
+
+Giancarlo Formicuccia (1):
+      Bluetooth: add support for atheros 0930:0219
+
+Marek Vasut (1):
+      Bluetooth: Support AR3011 in Acer Iconia Tab W500
+
+Szymon Janc (1):
+      Bluetooth: Fix using uninitialized option in RFCMode
+
+Vishal Agarwal (1):
+      Bluetooth: Fix sending HCI_Disconnect only when connected
+
+ drivers/bluetooth/ath3k.c       |    3 +++
+ drivers/bluetooth/btmrvl_drv.h  |    2 +-
+ drivers/bluetooth/btmrvl_main.c |   14 ++++++++++++--
+ drivers/bluetooth/btmrvl_sdio.c |    8 +++++---
+ drivers/bluetooth/btusb.c       |    2 ++
+ net/bluetooth/l2cap_core.c      |   14 ++++++++------
+ net/bluetooth/mgmt.c            |    2 +-
+ 7 files changed, 32 insertions(+), 13 deletions(-)
+
+
+--MGYHOYXEY6WxJCY8
 Content-Type: application/pgp-signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQIcBAEBAgAGBQJP3/goAAoJEPs3PUX4s20oz2YP/Rdc3Tm+KqB5yGG9B+KXfm7F
-ZvU6rtEaB1AI2rNMphp3ftM1SGasLtzyQQk2cPd1eZVCo7FnlTcN7VDZNjCLwuQP
-EcoBWoEUFtPwhJW3nR43W2QUQr3lxLMzVHkf+F9U4e7XtjEaZFj9Q/YSoPDKT3nf
-TTOYVUvFZCvY0wfi3DMs54vPnGcBe3qSLxalpkw6YvsSAI0KaWYXV3HYO2rVtfwE
-5U3CL4h/8HGYMLnH9KZfS7zZhd1QoQpyDFU37pqmqHqiTHXsIb/71fG/MHuKpMjW
-WlaGVZb320jfIPSbQ32ykobX2oVMnti5ksH67CD6gnXTqum7kyHwkohtBGuu8FEP
-MGGMycz6DgtBDQ5XFadnuk5nB7FHA2TYKxjng0s5KsMcM9vcUIwHTqHk1iyvn+Z4
-LmGjYHY66fUZFqx9SfZ2HnM4yFwUIYH8ISvA/HqHI1CtZZEiHCTN9V9TaLBOf5zi
-p6pyJyFm9gC3UUNh/QuPtLJ71lI2/MzwFOLYA+preBJQxvdrvMj7/VP9B0AQkdZG
-ojy5vTBi9TNwjt8o42Oo9m+HNRDeKZyRdbfDW0GN4U+x1vCWv0Y/ulSIheQTflp7
-N9EKoT81SoMm4iNqfbdBeCp04yhj3nutP4vtabTtW3CGW58GBfhN+qmkcjojkG33
-VfsXGkEXehcZTQR4DnjN
-=g21U
+iQIcBAEBAgAGBQJP3/PiAAoJEPs3PUX4s20oLNkQAJyLAnJ/C/I7SEuNLxzRTudi
+xaG80sTMxGJuR22wqJ9heyClUh+ND1uQjL6Pn2tfIla7SccyCsihtQqMtiSlwvli
+VgGY0i/qPquURdIbLDNQbEr519ddOfp5LpVFK4Rn2s+55RE23z5eF80b17Gn2Q1c
+XlRSXDyn5WvX2xa86cXcvqbLPbVkgFxU+Q4/jUFIILL56geOOZxuM71quL4NHBw2
+7GtzYZBB3cKElr9Y7L1kPrRhCUHMBHIa0Am1DfjoHC4mmtJfnvcBryaMWYBRQIMH
+XOaL2luAysRbxXP2N31RjLQoYCK25z5W3m+ZcqbpZdxpvR8l2BDya8EGzAYl0+nP
+QMGoMGdT35BR8mMSoJBlL3p480TDqH/AmM03qAAfIlDO2kxd6rF+heI+LZFJhSfW
+oUzXfmAakUxaHGh5O2y1+4ABbxU3okTK2vpm4D1q7BVpkf56gUVFMgWSMxSmPu7i
+OxifqGhIiwBKRURwPjb0N5eCxpql2KfdO9ztOfBd9HWv8YciX/WK3wYwEueEeVM1
+OXFNDW3VFH6mJICwMy8jQoKHV8PQ9Ka3i+htruTBtMz5srT6BZcLYtvEYQWDdHQU
+AAygNHOlr1sRq0nZBEh6TJcPGV9epnr513S/Oc7osJ4NfSxnh5jTU5C88wWv1jvV
+OJbk33m3afJCEf/vLwsr
+=2+u+
 -----END PGP SIGNATURE-----
 
---hHWLQfXTYDoKhP50--
+--MGYHOYXEY6WxJCY8--
