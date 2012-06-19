@@ -1,73 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <4FE05A21.9060406@linux.intel.com>
+References: <8C91AD8ED4077A4786B341540858992510269B2E@SHSMSX102.ccr.corp.intel.com>
+	<4FE05A21.9060406@linux.intel.com>
+Date: Tue, 19 Jun 2012 13:57:18 +0300
+Message-ID: <CABBYNZJqvZqBJ_R74UoBoRhXsUSzH0vOmExXSrM2mb0YAEpJFQ@mail.gmail.com>
+Subject: Re: BT DUN Server fails to work (seems blocked in RFCOMM)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH hcidump 1/2 v2] AVRCP: Add parsing for SetAddressedPlayer PDU
-Date: Tue, 19 Jun 2012 14:40:29 +0300
-Message-Id: <1340106030-30782-1-git-send-email-luiz.dentz@gmail.com>
+To: Frederic Danis <frederic.danis@linux.intel.com>
+Cc: "Zhang, Jingke" <jingke.zhang@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Frederic,
 
----
-v2: Also prints PlayerID in decimal
+On Tue, Jun 19, 2012 at 1:53 PM, Frederic Danis
+<frederic.danis@linux.intel.com> wrote:
+> Your hcidump shows 2 SDP records for DUN profile.
+>
+> Guillaume Zajac and I found the same problem yesterday, and reply about it
+> on oFono mailing list (see "Re: oFono DUN server issue" mails).
+>
+> It seems that BlueZ was compiled with embedded DUN server (configure option
+> --enable-pnat).
+> When both BlueZ and oFono are started, they both listen for incoming
+> connection on RFCOMM port 1 (try "sdptool browse local" to check), and
+> embedded BlueZ DUN server reply preventing oFono to manage this connection.
+>
+> If you remove the embedded DUN server by removing --enable-pnat from build
+> configuration, it should work.
 
- parser/avrcp.c |   35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+We should probably try to prevent this duplicate records to even
+happen, specially if they use the same channel.
 
-diff --git a/parser/avrcp.c b/parser/avrcp.c
-index 850741b..5587da7 100644
---- a/parser/avrcp.c
-+++ b/parser/avrcp.c
-@@ -1222,6 +1222,38 @@ static void avrcp_set_absolute_volume_dump(int level, struct frame *frm,
- 	printf("Volume: %.2f%% (%d/127)\n", value/1.27, value);
- }
- 
-+static void avrcp_set_addressed_player(int level, struct frame *frm,
-+						uint8_t ctype, uint16_t len)
-+{
-+	uint16_t id;
-+	uint8_t status;
-+
-+	p_indent(level, frm);
-+
-+	if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
-+		goto response;
-+
-+	if (len < 2) {
-+		printf("PDU Malformed\n");
-+		raw_dump(level, frm);
-+		return;
-+	}
-+
-+	id = get_u16(frm);
-+	printf("PlayerID: 0x%04x (%u)", id, id);
-+	return;
-+
-+response:
-+	if (len < 1) {
-+		printf("PDU Malformed\n");
-+		raw_dump(level, frm);
-+		return;
-+	}
-+
-+	status = get_u8(frm);
-+	printf("Status: 0x%02x (%s)\n", status, error2str(status));
-+}
-+
- static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
- {
- 	uint8_t pduid, pt;
-@@ -1291,6 +1323,9 @@ static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
- 	case AVRCP_SET_ABSOLUTE_VOLUME:
- 		avrcp_set_absolute_volume_dump(level + 1, frm, ctype, len);
- 		break;
-+	case AVRCP_SET_ADDRESSED_PLAYER:
-+		avrcp_set_addressed_player(level + 1, frm, ctype, len);
-+		break;
- 	default:
- 		raw_dump(level, frm);
- 	}
 -- 
-1.7.10.2
-
+Luiz Augusto von Dentz
