@@ -1,43 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v0] Bluetooth: Fix lost socket error code
-Date: Tue, 19 Jun 2012 16:20:37 +0200
-Message-Id: <1340115637-2595-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH] Bluetooth: Route traffic only through BR/EDR controller
+Date: Tue, 19 Jun 2012 15:21:21 +0300
+Message-Id: <1340108482-16071-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Using sock_error() here to check the status of the socket is wrong
-because it resets sk->sk_err to zero. For RFCOMM sockets, this means the
-disconnect reason is not exposed to userland in the socket options.
+If AMP controller is first in the list then Bluetooth traffic might
+be routed through it (if source is not specified). The patch
+prevents this case and also checks that source is BR/EDR.
 
-Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
-This a second attempt to expose ACL disconnect reason to userland, as proposed first in "[RFC v0] Bluetooth: mgmt: Add device disconnect reason".
+ net/bluetooth/hci_conn.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-The motivation behind was explained in the userspace patchset "[RFC BlueZ v0 0/5] ACL disconnect reason".
-
-This second approach focuses on RFCOMM sockets given that L2CAP is already exposing such information.
-
- net/bluetooth/af_bluetooth.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index f7db579..4799338 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -313,7 +313,7 @@ int bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
- 			if (copied >= target)
- 				break;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 9aac198..3ec5fc2 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -442,7 +442,8 @@ struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src)
  
--			err = sock_error(sk);
-+			err = sk->sk_err;
- 			if (err)
- 				break;
- 			if (sk->sk_shutdown & RCV_SHUTDOWN)
+ 	list_for_each_entry(d, &hci_dev_list, list) {
+ 		if (!test_bit(HCI_UP, &d->flags) ||
+-		    test_bit(HCI_RAW, &d->flags))
++		    test_bit(HCI_RAW, &d->flags) ||
++		    d->dev_type != HCI_BREDR)
+ 			continue;
+ 
+ 		/* Simple routing:
 -- 
-1.7.7.6
+1.7.9.5
 
