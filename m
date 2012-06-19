@@ -1,109 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Michal.Labedzki@tieto.com>
-To: <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>
-Date: Tue, 19 Jun 2012 09:39:42 +0300
-Subject: RE: [PATCH hcidump 1/2] AVRCP: Add parsing for SetAddressedPlayer
- PDU
-Message-ID: <E50901D4F2CF69428D43141B7C85867929DD8AD28D@EXMB03.eu.tieto.com>
-References: <1340028563-8089-1-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1340028563-8089-1-git-send-email-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="iso-8859-2"
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20120619030935.GC1679@joana>
+References: <1339612935-2851-1-git-send-email-devendra.aaru@gmail.com>
+	<20120619030935.GC1679@joana>
+Date: Tue, 19 Jun 2012 09:56:46 +0530
+Message-ID: <CAHdPZaMn79msYugB+XbjiGJE-7xr0uKTpG=6mmPwMAVKmRU1tA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Cleanup dtl1_config
+From: "devendra.aaru" <devendra.aaru@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>, Devendra Naga <devendra.aaru@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Gustavo,
 
-Some cosmetic comments.
+Thanks for reviewing the patch.
 
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> ---
->  parser/avrcp.c |   35 +++++++++++++++++++++++++++++++++++
->  1 file changed, 35 insertions(+)
-> 
-> diff --git a/parser/avrcp.c b/parser/avrcp.c
-> index 850741b..0f2f1e6 100644
-> --- a/parser/avrcp.c
-> +++ b/parser/avrcp.c
-> @@ -1222,6 +1222,38 @@ static void avrcp_set_absolute_volume_dump(int level, struct frame *frm,
->         printf("Volume: %.2f%% (%d/127)\n", value/1.27, value);
->  }
-> 
-> +static void avrcp_set_addressed_player(int level, struct frame *frm,
-> +                                               uint8_t ctype, uint16_t len)
-> +{
-> +       uint16_t id;
-> +       uint8_t status;
-> +
-> +       p_indent(level, frm);
-> +
-> +       if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
-> +               goto response;
+On Tue, Jun 19, 2012 at 8:39 AM, Gustavo Padovan <gustavo@padovan.org> wrot=
+e:
+> Hi Devendra,
+>
+> * Devendra Naga <devendra.aaru@gmail.com> [2012-06-14 00:12:15 +0530]:
+>
+>> the functions always return 0 on sucess and -ve error on failure.
+>>
+>> This also removes variable i.
+>>
+>> Signed-off-by: Devendra Naga <devendra.aaru@gmail.com>
+>> ---
+>> =A0drivers/bluetooth/dtl1_cs.c | =A0 =A09 +++------
+>> =A01 file changed, 3 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
+>> index 6e8d961..f532ce2 100644
+>> --- a/drivers/bluetooth/dtl1_cs.c
+>> +++ b/drivers/bluetooth/dtl1_cs.c
+>> @@ -586,22 +586,19 @@ static int dtl1_confcheck(struct pcmcia_device *p_=
+dev, void *priv_data)
+>> =A0static int dtl1_config(struct pcmcia_device *link)
+>> =A0{
+>> =A0 =A0 =A0 dtl1_info_t *info =3D link->priv;
+>> - =A0 =A0 int i;
+>>
+>> =A0 =A0 =A0 /* Look for a generic full-sized window */
+>> =A0 =A0 =A0 link->resource[0]->end =3D 8;
+>> =A0 =A0 =A0 if (pcmcia_loop_config(link, dtl1_confcheck, NULL) < 0)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto failed;
+>>
+>> - =A0 =A0 i =3D pcmcia_request_irq(link, dtl1_interrupt);
+>> - =A0 =A0 if (i !=3D 0)
+>> + =A0 =A0 if (pcmcia_request_irq(link, dtl1_interrupt))
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto failed;
+>
+> I think this change is wrong, instead you might return i (that should be
+> renamed to 'err') when the failed label is accessed. This way you improve=
+ the
+> error report of this function.
+>
+You are correct.
 
-This command type is only AVC_CTYPE_CONTROL with AVC_CTYPE_NOT_IMPLEMENTED, AVC_CTYPE_ACCEPTED, AVC_CTYPE_REJECTED responses, so maybe all other should be tread as malformed.
+You can expect a V2 of this with your comments mentioned.
+> =A0 =A0 =A0 =A0Gustavo
 
-> +
-> +       if (len < 2) {
-
-What do you think about replace "<" by "!="? Large packet probably is not correct. But this can be what it is.
-
-> +               printf("PDU Malformed\n");
-> +               raw_dump(level, frm);
-> +               return;
-> +       }
-> +
-> +       id = get_u16(frm);
-> +       printf("PlayerID: 0x%04x", id);
-> +       return;
-
-ID in hex? Decimal seems to be more natural.
-
-> +
-> +response:
-> +       if (len < 1) {
-
-The same. What do you think about replace "<" by "!="?
-
-> +               printf("PDU Malformed\n");
-> +               raw_dump(level, frm);
-> +               return;
-> +       }
-> +
-> +       status = get_u8(frm);
-> +       printf("Status: 0x%02x (%s)\n", status, error2str(status));
-> +}
-> +
->  static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
->  {
->         uint8_t pduid, pt;
-> @@ -1291,6 +1323,9 @@ static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
->         case AVRCP_SET_ABSOLUTE_VOLUME:
->                 avrcp_set_absolute_volume_dump(level + 1, frm, ctype, len);
->                 break;
-> +       case AVRCP_SET_ADDRESSED_PLAYER:
-> +               avrcp_set_addressed_player(level + 1, frm, ctype, len);
-> +               break;
->         default:
->                 raw_dump(level, frm);
->         }
-> --
-> 1.7.10.2
-> 
-
-
-
-Regards / Pozdrawiam
--------------------------------------------------------------------------------------------------------------
-Micha³ £abêdzki
-ASCII: Michal Labedzki
-e-mail: michal.labedzki@tieto.com
-office communicator: michal.labedzki@tieto.com
-location: Poland, Wroc³aw, Legnicka 55F
-room: 315
-phone: +48 717 740 340
----
-Tieto Corporation / Tieto Poland
-http://www.tieto.com / http://www.tieto.pl
----
-Tieto Poland spó³ka z ograniczon± odpowiedzialno¶ci± z siedzib± w Szczecinie, ul. Malczewskiego 26. Zarejestrowana w S±dzie Rejonowym Szczecin-Centrum w Szczecinie, XIII Wydzia³ Gospodarczy Krajowego Rejestru S±dowego pod numerem 0000124858. NIP: 8542085557. REGON: 812023656. Kapita³ zak³adowy: 4 271500 PLN
+Thanks,
+Devendra.
