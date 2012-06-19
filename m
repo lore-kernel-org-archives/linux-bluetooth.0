@@ -1,67 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 19 Jun 2012 00:55:20 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andre Guedes <aguedespe@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, andre.guedes@openbossa.org
+Subject: Re: [PATCH 3/3] Bluetooth: Use GFP_KERNEL in mgmt events functions
+Message-ID: <20120619035520.GG1679@joana>
+References: <1339106746-22886-1-git-send-email-aguedespe@gmail.com>
+ <1339106746-22886-3-git-send-email-aguedespe@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20120619030935.GC1679@joana>
-References: <1339612935-2851-1-git-send-email-devendra.aaru@gmail.com>
-	<20120619030935.GC1679@joana>
-Date: Tue, 19 Jun 2012 09:56:46 +0530
-Message-ID: <CAHdPZaMn79msYugB+XbjiGJE-7xr0uKTpG=6mmPwMAVKmRU1tA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Cleanup dtl1_config
-From: "devendra.aaru" <devendra.aaru@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>, Devendra Naga <devendra.aaru@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="hHWLQfXTYDoKhP50"
+In-Reply-To: <1339106746-22886-3-git-send-email-aguedespe@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
 
-Thanks for reviewing the patch.
+--hHWLQfXTYDoKhP50
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 19, 2012 at 8:39 AM, Gustavo Padovan <gustavo@padovan.org> wrot=
-e:
-> Hi Devendra,
->
-> * Devendra Naga <devendra.aaru@gmail.com> [2012-06-14 00:12:15 +0530]:
->
->> the functions always return 0 on sucess and -ve error on failure.
->>
->> This also removes variable i.
->>
->> Signed-off-by: Devendra Naga <devendra.aaru@gmail.com>
->> ---
->> =A0drivers/bluetooth/dtl1_cs.c | =A0 =A09 +++------
->> =A01 file changed, 3 insertions(+), 6 deletions(-)
->>
->> diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
->> index 6e8d961..f532ce2 100644
->> --- a/drivers/bluetooth/dtl1_cs.c
->> +++ b/drivers/bluetooth/dtl1_cs.c
->> @@ -586,22 +586,19 @@ static int dtl1_confcheck(struct pcmcia_device *p_=
-dev, void *priv_data)
->> =A0static int dtl1_config(struct pcmcia_device *link)
->> =A0{
->> =A0 =A0 =A0 dtl1_info_t *info =3D link->priv;
->> - =A0 =A0 int i;
->>
->> =A0 =A0 =A0 /* Look for a generic full-sized window */
->> =A0 =A0 =A0 link->resource[0]->end =3D 8;
->> =A0 =A0 =A0 if (pcmcia_loop_config(link, dtl1_confcheck, NULL) < 0)
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto failed;
->>
->> - =A0 =A0 i =3D pcmcia_request_irq(link, dtl1_interrupt);
->> - =A0 =A0 if (i !=3D 0)
->> + =A0 =A0 if (pcmcia_request_irq(link, dtl1_interrupt))
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto failed;
->
-> I think this change is wrong, instead you might return i (that should be
-> renamed to 'err') when the failed label is accessed. This way you improve=
- the
-> error report of this function.
->
-You are correct.
+Hi Andre,
 
-You can expect a V2 of this with your comments mentioned.
-> =A0 =A0 =A0 =A0Gustavo
+* Andre Guedes <aguedespe@gmail.com> [2012-06-07 19:05:46 -0300]:
 
-Thanks,
-Devendra.
+> cmd_status, cmd_complete and mgmt_event functions are executed in
+> process context and they are not called inside atomic sections. Thus,
+> they should use GFP_KERNEL for memory allocation instead of GFP_ATOMIC.
+>=20
+> Signed-off-by: Andre Guedes <aguedespe@gmail.com>
+> ---
+>  net/bluetooth/mgmt.c |    6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+
+All 3 patches have been applied to bluetooth-next. Thanks.
+
+	Gustavo
+
+--hHWLQfXTYDoKhP50
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBAgAGBQJP3/goAAoJEPs3PUX4s20oz2YP/Rdc3Tm+KqB5yGG9B+KXfm7F
+ZvU6rtEaB1AI2rNMphp3ftM1SGasLtzyQQk2cPd1eZVCo7FnlTcN7VDZNjCLwuQP
+EcoBWoEUFtPwhJW3nR43W2QUQr3lxLMzVHkf+F9U4e7XtjEaZFj9Q/YSoPDKT3nf
+TTOYVUvFZCvY0wfi3DMs54vPnGcBe3qSLxalpkw6YvsSAI0KaWYXV3HYO2rVtfwE
+5U3CL4h/8HGYMLnH9KZfS7zZhd1QoQpyDFU37pqmqHqiTHXsIb/71fG/MHuKpMjW
+WlaGVZb320jfIPSbQ32ykobX2oVMnti5ksH67CD6gnXTqum7kyHwkohtBGuu8FEP
+MGGMycz6DgtBDQ5XFadnuk5nB7FHA2TYKxjng0s5KsMcM9vcUIwHTqHk1iyvn+Z4
+LmGjYHY66fUZFqx9SfZ2HnM4yFwUIYH8ISvA/HqHI1CtZZEiHCTN9V9TaLBOf5zi
+p6pyJyFm9gC3UUNh/QuPtLJ71lI2/MzwFOLYA+preBJQxvdrvMj7/VP9B0AQkdZG
+ojy5vTBi9TNwjt8o42Oo9m+HNRDeKZyRdbfDW0GN4U+x1vCWv0Y/ulSIheQTflp7
+N9EKoT81SoMm4iNqfbdBeCp04yhj3nutP4vtabTtW3CGW58GBfhN+qmkcjojkG33
+VfsXGkEXehcZTQR4DnjN
+=g21U
+-----END PGP SIGNATURE-----
+
+--hHWLQfXTYDoKhP50--
