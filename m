@@ -1,66 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Devendra Naga <devendra.aaru@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	Devendra Naga <devendra.aaru@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: cleanup dtl1_config
-Date: Tue, 19 Jun 2012 21:51:31 +0530
-Message-Id: <1340122891-8611-1-git-send-email-devendra.aaru@gmail.com>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [RFC v0] Bluetooth: Fix lost socket error code
+Date: Tue, 19 Jun 2012 16:20:37 +0200
+Message-Id: <1340115637-2595-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Signed-off-by: Devendra Naga <devendra.aaru@gmail.com>
+Using sock_error() here to check the status of the socket is wrong
+because it resets sk->sk_err to zero. For RFCOMM sockets, this means the
+disconnect reason is not exposed to userland in the socket options.
+
+Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
 ---
- drivers/bluetooth/dtl1_cs.c |   18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+This a second attempt to expose ACL disconnect reason to userland, as proposed first in "[RFC v0] Bluetooth: mgmt: Add device disconnect reason".
 
-diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
-index 6e8d961..aedcf4a 100644
---- a/drivers/bluetooth/dtl1_cs.c
-+++ b/drivers/bluetooth/dtl1_cs.c
-@@ -586,29 +586,31 @@ static int dtl1_confcheck(struct pcmcia_device *p_dev, void *priv_data)
- static int dtl1_config(struct pcmcia_device *link)
- {
- 	dtl1_info_t *info = link->priv;
--	int i;
-+	int ret;
+The motivation behind was explained in the userspace patchset "[RFC BlueZ v0 0/5] ACL disconnect reason".
+
+This second approach focuses on RFCOMM sockets given that L2CAP is already exposing such information.
+
+ net/bluetooth/af_bluetooth.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index f7db579..4799338 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -313,7 +313,7 @@ int bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
+ 			if (copied >= target)
+ 				break;
  
- 	/* Look for a generic full-sized window */
- 	link->resource[0]->end = 8;
--	if (pcmcia_loop_config(link, dtl1_confcheck, NULL) < 0)
-+	ret = pcmcia_loop_config(link, dtl1_confcheck, NULL);
-+	if (ret)
- 		goto failed;
- 
--	i = pcmcia_request_irq(link, dtl1_interrupt);
--	if (i != 0)
-+	ret = pcmcia_request_irq(link, dtl1_interrupt);
-+	if (ret)
- 		goto failed;
- 
--	i = pcmcia_enable_device(link);
--	if (i != 0)
-+	ret = pcmcia_enable_device(link);
-+	if (ret)
- 		goto failed;
- 
--	if (dtl1_open(info) != 0)
-+	ret = dtl1_open(info);
-+	if (ret)
- 		goto failed;
- 
- 	return 0;
- 
- failed:
- 	dtl1_detach(link);
--	return -ENODEV;
-+	return ret;
- }
- 
- static const struct pcmcia_device_id dtl1_ids[] = {
+-			err = sock_error(sk);
++			err = sk->sk_err;
+ 			if (err)
+ 				break;
+ 			if (sk->sk_shutdown & RCV_SHUTDOWN)
 -- 
-1.7.9.5
+1.7.7.6
 
