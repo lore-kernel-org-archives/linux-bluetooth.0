@@ -1,43 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <8C91AD8ED4077A4786B341540858992510269B87@SHSMSX102.ccr.corp.intel.com>
-References: <8C91AD8ED4077A4786B341540858992510269B2E@SHSMSX102.ccr.corp.intel.com>
-	<CAJ2qBzax4SvTfS-tykhh7UAYzqxKuXfhpfYS97n4=w2BcutkVw@mail.gmail.com>
-	<8C91AD8ED4077A4786B341540858992510269B87@SHSMSX102.ccr.corp.intel.com>
-Date: Tue, 19 Jun 2012 11:12:31 +0100
-Message-ID: <CAJ2qBzaEwdEFxFuUkysN62ago8SELxg8v_FMZkmwoYuNF+Kfsg@mail.gmail.com>
-Subject: Re: BT DUN Server fails to work (seems blocked in RFCOMM)
-From: Dean Jenkins <djenkins@mvista.com>
-To: "Zhang, Jingke" <jingke.zhang@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] input: Fix not adding watches when io channel is connected
+Date: Tue, 19 Jun 2012 13:02:36 +0300
+Message-Id: <1340100156-19124-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 19 June 2012 10:48, Zhang, Jingke <jingke.zhang@intel.com> wrote:
-> Hi Jenkins,
-> I saw first SABM interaction seems ok in the hcidump log. Do not know why it has problem in second arrival SABM.
->
-> 2012-06-20 17:52:13.037312 > ACL data: handle 12 flags 0x02 dlen 8
->    L2CAP(d): cid 0x0041 len 4 [psm 3]
->      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
-> 2012-06-20 17:52:13.037473 < ACL data: handle 12 flags 0x00 dlen 8
->    L2CAP(d): cid 0x0041 len 4 [psm 3]
->      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-> 2012-06-20 17:52:13.064287 > ACL data: handle 12 flags 0x02 dlen 18
->    L2CAP(d): cid 0x0041 len 14 [psm 3]
->      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
->
-This is establishment of the rfcomm control channel. Each rfcomm
-session needs a control channel (channel number zero). The DUN
-connection will use a rfcomm data channel (channel number not zero).
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-You can ask question on IRC chat on irc.freenode.net chat room #bluez.
+This can leave dangling pointers in case one of the channel is never
+connected which cause -EALREADY to be returned by
+input_device_set_channel next time the device attempts to connect.
+---
+ input/device.c |   23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
 
-Dean
-
+diff --git a/input/device.c b/input/device.c
+index 0e3f4a9..ba27c6a 100644
+--- a/input/device.c
++++ b/input/device.c
+@@ -387,6 +387,11 @@ static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data
+ 	struct input_conn *iconn = data;
+ 	struct input_device *idev = iconn->idev;
+ 	gboolean connected = FALSE;
++	char address[18];
++
++	ba2str(&iconn->idev->dst, address);
++
++	DBG("Device %s disconnected", address);
+ 
+ 	/* Checking for ctrl_watch avoids a double g_io_channel_shutdown since
+ 	 * it's likely that ctrl_watch_cb has been queued for dispatching in
+@@ -415,6 +420,11 @@ static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data
+ static gboolean ctrl_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
+ {
+ 	struct input_conn *iconn = data;
++	char address[18];
++
++	ba2str(&iconn->idev->dst, address);
++
++	DBG("Device %s disconnected", address);
+ 
+ 	/* Checking for intr_watch avoids a double g_io_channel_shutdown since
+ 	 * it's likely that intr_watch_cb has been queued for dispatching in
+@@ -811,13 +821,6 @@ static int input_device_connected(struct input_device *idev,
+ 	if (err < 0)
+ 		return err;
+ 
+-	iconn->intr_watch = g_io_add_watch(iconn->intr_io,
+-					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+-					intr_watch_cb, iconn);
+-	iconn->ctrl_watch = g_io_add_watch(iconn->ctrl_io,
+-					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+-					ctrl_watch_cb, iconn);
+-
+ 	connected = TRUE;
+ 	emit_property_changed(idev->conn, idev->path, INPUT_DEVICE_INTERFACE,
+ 				"Connected", DBUS_TYPE_BOOLEAN, &connected);
+@@ -1272,11 +1275,17 @@ int input_device_set_channel(const bdaddr_t *src, const bdaddr_t *dst, int psm,
+ 		if (iconn->ctrl_io)
+ 			return -EALREADY;
+ 		iconn->ctrl_io = g_io_channel_ref(io);
++		iconn->ctrl_watch = g_io_add_watch(iconn->ctrl_io,
++					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++					ctrl_watch_cb, iconn);
+ 		break;
+ 	case L2CAP_PSM_HIDP_INTR:
+ 		if (iconn->intr_io)
+ 			return -EALREADY;
+ 		iconn->intr_io = g_io_channel_ref(io);
++		iconn->intr_watch = g_io_add_watch(iconn->intr_io,
++					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++					intr_watch_cb, iconn);
+ 		break;
+ 	}
+ 
 -- 
-Dean Jenkins
-Embedded Software Engineer
-Professional Services UK/EMEA
-MontaVista Software, LLC
+1.7.10.2
+
