@@ -1,53 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 Jun 2012 00:09:35 -0300
+Date: Mon, 18 Jun 2012 23:57:22 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Devendra Naga <devendra.aaru@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Cleanup dtl1_config
-Message-ID: <20120619030935.GC1679@joana>
-References: <1339612935-2851-1-git-send-email-devendra.aaru@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix compile warnings in mgmt
+Message-ID: <20120619025722.GA1679@joana>
+References: <1340013826-13432-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1339612935-2851-1-git-send-email-devendra.aaru@gmail.com>
+In-Reply-To: <1340013826-13432-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Devendra,
+Hi Andrei,
 
-* Devendra Naga <devendra.aaru@gmail.com> [2012-06-14 00:12:15 +0530]:
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-06-18 13:03:46 +0300]:
 
-> the functions always return 0 on sucess and -ve error on failure.
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> This also removes variable i.
+> Commit af7985bf85840e3dc90ba108a679db044f91f00e introduced regression
+> resulting in complie warnings:
 > 
-> Signed-off-by: Devendra Naga <devendra.aaru@gmail.com>
+> ...
+> net/bluetooth/mgmt.c:3568:27: warning: invalid assignment: |=
+> net/bluetooth/mgmt.c:3568:27:    left side has type restricted __le32
+> net/bluetooth/mgmt.c:3568:27:    right side has type int
+> net/bluetooth/mgmt.c:3570:27: warning: invalid assignment: |=
+> net/bluetooth/mgmt.c:3570:27:    left side has type restricted __le32
+> net/bluetooth/mgmt.c:3570:27:    right side has type int
+> net/bluetooth/mgmt.c:3580:21: warning: cast from restricted __le32
+> ...
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  drivers/bluetooth/dtl1_cs.c |    9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
-> index 6e8d961..f532ce2 100644
-> --- a/drivers/bluetooth/dtl1_cs.c
-> +++ b/drivers/bluetooth/dtl1_cs.c
-> @@ -586,22 +586,19 @@ static int dtl1_confcheck(struct pcmcia_device *p_dev, void *priv_data)
->  static int dtl1_config(struct pcmcia_device *link)
->  {
->  	dtl1_info_t *info = link->priv;
-> -	int i;
->  
->  	/* Look for a generic full-sized window */
->  	link->resource[0]->end = 8;
->  	if (pcmcia_loop_config(link, dtl1_confcheck, NULL) < 0)
->  		goto failed;
->  
-> -	i = pcmcia_request_irq(link, dtl1_interrupt);
-> -	if (i != 0)
-> +	if (pcmcia_request_irq(link, dtl1_interrupt))
->  		goto failed;
+>  net/bluetooth/mgmt.c |    6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
 
-I think this change is wrong, instead you might return i (that should be
-renamed to 'err') when the failed label is accessed. This way you improve the
-error report of this function.
+Patch has been applied to bluetooth-next. Thanks.
 
 	Gustavo
