@@ -1,51 +1,22 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Zhang, Jingke" <jingke.zhang@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: BT DUN Server fails to work (seems blocked in RFCOMM)
+Date: Tue, 19 Jun 2012 09:11:46 +0000
+Message-ID: <8C91AD8ED4077A4786B341540858992510269B2E@SHSMSX102.ccr.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <8C91AD8ED4077A4786B341540858992510269B2E@SHSMSX102.ccr.corp.intel.com>
-References: <8C91AD8ED4077A4786B341540858992510269B2E@SHSMSX102.ccr.corp.intel.com>
-Date: Tue, 19 Jun 2012 10:39:12 +0100
-Message-ID: <CAJ2qBzax4SvTfS-tykhh7UAYzqxKuXfhpfYS97n4=w2BcutkVw@mail.gmail.com>
-Subject: Re: BT DUN Server fails to work (seems blocked in RFCOMM)
-From: Dean Jenkins <djenkins@mvista.com>
-To: "Zhang, Jingke" <jingke.zhang@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 19 June 2012 10:11, Zhang, Jingke <jingke.zhang@intel.com> wrote:
-> Hi all,
-> Does any guys try DUN server with bluez?
->
-> My telephone stack is ofono and its DUN server code should be ready in its commit. However, the problem is my DUN activation request almost did not come to ofono side (only to bluez RFCOMM). On the DUN Client, I can use same validation step to active a mobile phone (Sony-Ericson C905) to connect to 2G/3G network.
->
-> I filed a bug https://bugs.meego.com/show_bug.cgi?id=25303 to track all logs.
->
-> Could you help to see what's the problem?
->
-Your hcidump shows:
+Hi all,
+Does any guys try DUN server with bluez? 
 
-2012-06-20 17:52:13.092287 > ACL data: handle 12 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0041 len 4 [psm 3]
-      RFCOMM(s): SABM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x59
-2012-06-20 17:52:15.033302 > ACL data: handle 12 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+My telephone stack is ofono and its DUN server code should be ready in its commit. However, the problem is my DUN activation request almost did not come to ofono side (only to bluez RFCOMM). On the DUN Client, I can use same validation step to active a mobile phone (Sony-Ericson C905) to connect to 2G/3G network. 
 
-rfcomm host side is sending is sending a SABM on DLCI 2. I guess this
-for the DUN rfcomm channel.
+I filed a bug https://bugs.meego.com/show_bug.cgi?id=25303 to track all logs. 
 
-However it can be seen that a L2CAP disconnect request comes from the
-remote device so requests termination of the L2CAP link. I guess the
-remote device disconnected the connection for some reason.
+Could you help to see what's the problem? 
 
-> Thanks
-> Jingke
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
--- 
-Dean Jenkins
-Embedded Software Engineer
-Professional Services UK/EMEA
-MontaVista Software, LLC
+Thanks 
+Jingke
