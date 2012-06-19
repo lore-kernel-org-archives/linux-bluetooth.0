@@ -1,75 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
+From: <Michal.Labedzki@tieto.com>
+To: <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>
+Date: Tue, 19 Jun 2012 09:52:51 +0300
+Subject: RE: [PATCH hcidump 2/2] AVRCP: Add support for Addressed Player
+ Changed event
+Message-ID: <E50901D4F2CF69428D43141B7C85867929DD8AD28E@EXMB03.eu.tieto.com>
+References: <1340028563-8089-1-git-send-email-luiz.dentz@gmail.com>,<1340028563-8089-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1340028563-8089-2-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="iso-8859-2"
 MIME-Version: 1.0
-In-Reply-To: <E50901D4F2CF69428D43141B7C85867929DD8AD28D@EXMB03.eu.tieto.com>
-References: <1340028563-8089-1-git-send-email-luiz.dentz@gmail.com>
-	<E50901D4F2CF69428D43141B7C85867929DD8AD28D@EXMB03.eu.tieto.com>
-Date: Tue, 19 Jun 2012 10:04:21 +0300
-Message-ID: <CABBYNZLHJ=eAxxhgNgE=TmKU_yODDEotQvBDOYzFB99kQ=t_6w@mail.gmail.com>
-Subject: Re: [PATCH hcidump 1/2] AVRCP: Add parsing for SetAddressedPlayer PDU
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Michal.Labedzki@tieto.com
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+Hi Luiz, 
 
-On Tue, Jun 19, 2012 at 9:39 AM,  <Michal.Labedzki@tieto.com> wrote:
-> Hi Luiz,
->
-> Some cosmetic comments.
->
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> ---
->>  parser/avrcp.c |   35 +++++++++++++++++++++++++++++++++++
->>  1 file changed, 35 insertions(+)
->>
->> diff --git a/parser/avrcp.c b/parser/avrcp.c
->> index 850741b..0f2f1e6 100644
->> --- a/parser/avrcp.c
->> +++ b/parser/avrcp.c
->> @@ -1222,6 +1222,38 @@ static void avrcp_set_absolute_volume_dump(int level, struct frame *frm,
->>         printf("Volume: %.2f%% (%d/127)\n", value/1.27, value);
->>  }
->>
->> +static void avrcp_set_addressed_player(int level, struct frame *frm,
->> +                                               uint8_t ctype, uint16_t len)
->> +{
->> +       uint16_t id;
->> +       uint8_t status;
->> +
->> +       p_indent(level, frm);
->> +
->> +       if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
->> +               goto response;
->
-> This command type is only AVC_CTYPE_CONTROL with AVC_CTYPE_NOT_IMPLEMENTED, AVC_CTYPE_ACCEPTED, AVC_CTYPE_REJECTED responses, so maybe all other should be tread as malformed.
+One important comment and one cosmetic.
 
-This is a dumping tool, so the purpose to print as much as possible.
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> ---
+>  parser/avrcp.c |   10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/parser/avrcp.c b/parser/avrcp.c
+> index 0f2f1e6..6fa3742 100644
+> --- a/parser/avrcp.c
+> +++ b/parser/avrcp.c
+> @@ -1107,6 +1107,7 @@ static void avrcp_register_notification_dump(int level, struct frame *frm,
+>                                                  uint8_t ctype, uint16_t len)
+>  {
+>          uint8_t event, status;
+> +       uint16_t uid;
+>          uint32_t interval;
+>          uint64_t id;
+> 
+> @@ -1202,6 +1203,15 @@ response:
+>                  status = get_u8(frm) & 0x7F;
+>                  printf("Volume: %.2f%% (%d/127)\n", status/1.27, status);
+>                  break;
+> +       case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
+> +               uid = get_u16(frm);
+> +               printf("PlayerID: 0x%04x", uid);
 
->
->> +
->> +       if (len < 2) {
->
-> What do you think about replace "<" by "!="? Large packet probably is not correct. But this can be what it is.
+uid? You can use "id" to replace "uid" in this place.
+ID can be decimal.
 
-Again the purpose is to print as much as possible.
+> +
+> +               p_indent(level, frm);
+> +
+> +               uid = get_u16(frm);
+> +               printf("UID: 0x%04x", uid);
+> +               break;
 
->
->> +               printf("PDU Malformed\n");
->> +               raw_dump(level, frm);
->> +               return;
->> +       }
->> +
->> +       id = get_u16(frm);
->> +       printf("PlayerID: 0x%04x", id);
->> +       return;
->
-> ID in hex? Decimal seems to be more natural.
+This is not "UID". This is "UID Counter".
 
-This was taken from the spec, but either way is fine.
+>          }
+>  }
+> 
+> --
+> 1.7.10.2
 
--- 
-Luiz Augusto von Dentz
+Regards / Pozdrawiam
+-------------------------------------------------------------------------------------------------------------
+Micha³ £abêdzki
+ASCII: Michal Labedzki
+e-mail: michal.labedzki@tieto.com
+office communicator: michal.labedzki@tieto.com
+location: Poland, Wroc³aw, Legnicka 55F
+room: 315
+phone: +48 717 740 340
+---
+Tieto Corporation / Tieto Poland
+http://www.tieto.com / http://www.tieto.pl
+---
+Tieto Poland spó³ka z ograniczon± odpowiedzialno¶ci± z siedzib± w Szczecinie, ul. Malczewskiego 26. Zarejestrowana w S±dzie Rejonowym Szczecin-Centrum w Szczecinie, XIII Wydzia³ Gospodarczy Krajowego Rejestru S±dowego pod numerem 0000124858. NIP: 8542085557. REGON: 812023656. Kapita³ zak³adowy: 4 271500 PLN
