@@ -1,54 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4FE05A21.9060406@linux.intel.com>
-Date: Tue, 19 Jun 2012 12:53:21 +0200
-From: Frederic Danis <frederic.danis@linux.intel.com>
-MIME-Version: 1.0
-To: "Zhang, Jingke" <jingke.zhang@intel.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: BT DUN Server fails to work (seems blocked in RFCOMM)
-References: <8C91AD8ED4077A4786B341540858992510269B2E@SHSMSX102.ccr.corp.intel.com>
-In-Reply-To: <8C91AD8ED4077A4786B341540858992510269B2E@SHSMSX102.ccr.corp.intel.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2] input: Fix not adding watches when io channel is connected
+Date: Tue, 19 Jun 2012 13:50:07 +0300
+Message-Id: <1340103007-20590-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On 19/06/2012 11:11, Zhang, Jingke wrote:
-> Hi all,
-> Does any guys try DUN server with bluez?
->
-> My telephone stack is ofono and its DUN server code should be ready in its commit. However, the problem is my DUN activation request almost did not come to ofono side (only to bluez RFCOMM). On the DUN Client, I can use same validation step to active a mobile phone (Sony-Ericson C905) to connect to 2G/3G network.
->
-> I filed a bug https://bugs.meego.com/show_bug.cgi?id=25303 to track all logs.
->
-> Could you help to see what's the problem?
->
-> Thanks
-> Jingke
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+This can leave dangling pointers in case one of the channel is never
+connected which cause -EALREADY to be returned by
+input_device_set_channel next time the device attempts to connect.
 
-Your hcidump shows 2 SDP records for DUN profile.
+For the same reason the code path when acting as client now add the
+watch as soon as the connection completes instead when both channels
+are connected.
+---
+v2: Fix client to register the watch as soon as the connection completes
 
-Guillaume Zajac and I found the same problem yesterday, and reply about 
-it on oFono mailing list (see "Re: oFono DUN server issue" mails).
+ input/device.c |   31 ++++++++++++++++++++++++-------
+ 1 file changed, 24 insertions(+), 7 deletions(-)
 
-It seems that BlueZ was compiled with embedded DUN server (configure 
-option --enable-pnat).
-When both BlueZ and oFono are started, they both listen for incoming 
-connection on RFCOMM port 1 (try "sdptool browse local" to check), and 
-embedded BlueZ DUN server reply preventing oFono to manage this connection.
-
-If you remove the embedded DUN server by removing --enable-pnat from 
-build configuration, it should work.
-
-Fred
-
+diff --git a/input/device.c b/input/device.c
+index 0e3f4a9..09a9a39 100644
+--- a/input/device.c
++++ b/input/device.c
+@@ -387,6 +387,11 @@ static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data
+ 	struct input_conn *iconn = data;
+ 	struct input_device *idev = iconn->idev;
+ 	gboolean connected = FALSE;
++	char address[18];
++
++	ba2str(&iconn->idev->dst, address);
++
++	DBG("Device %s disconnected", address);
+ 
+ 	/* Checking for ctrl_watch avoids a double g_io_channel_shutdown since
+ 	 * it's likely that ctrl_watch_cb has been queued for dispatching in
+@@ -415,6 +420,11 @@ static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data
+ static gboolean ctrl_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
+ {
+ 	struct input_conn *iconn = data;
++	char address[18];
++
++	ba2str(&iconn->idev->dst, address);
++
++	DBG("Device %s disconnected", address);
+ 
+ 	/* Checking for intr_watch avoids a double g_io_channel_shutdown since
+ 	 * it's likely that intr_watch_cb has been queued for dispatching in
+@@ -811,13 +821,6 @@ static int input_device_connected(struct input_device *idev,
+ 	if (err < 0)
+ 		return err;
+ 
+-	iconn->intr_watch = g_io_add_watch(iconn->intr_io,
+-					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+-					intr_watch_cb, iconn);
+-	iconn->ctrl_watch = g_io_add_watch(iconn->ctrl_io,
+-					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+-					ctrl_watch_cb, iconn);
+-
+ 	connected = TRUE;
+ 	emit_property_changed(idev->conn, idev->path, INPUT_DEVICE_INTERFACE,
+ 				"Connected", DBUS_TYPE_BOOLEAN, &connected);
+@@ -854,6 +857,10 @@ static void interrupt_connect_cb(GIOChannel *chan, GError *conn_err,
+ 	dbus_message_unref(iconn->pending_connect);
+ 	iconn->pending_connect = NULL;
+ 
++	iconn->intr_watch = g_io_add_watch(iconn->intr_io,
++					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++					intr_watch_cb, iconn);
++
+ 	return;
+ 
+ failed:
+@@ -913,6 +920,10 @@ static void control_connect_cb(GIOChannel *chan, GError *conn_err,
+ 
+ 	iconn->intr_io = io;
+ 
++	iconn->ctrl_watch = g_io_add_watch(iconn->ctrl_io,
++					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++					ctrl_watch_cb, iconn);
++
+ 	return;
+ 
+ failed:
+@@ -1272,11 +1283,17 @@ int input_device_set_channel(const bdaddr_t *src, const bdaddr_t *dst, int psm,
+ 		if (iconn->ctrl_io)
+ 			return -EALREADY;
+ 		iconn->ctrl_io = g_io_channel_ref(io);
++		iconn->ctrl_watch = g_io_add_watch(iconn->ctrl_io,
++					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++					ctrl_watch_cb, iconn);
+ 		break;
+ 	case L2CAP_PSM_HIDP_INTR:
+ 		if (iconn->intr_io)
+ 			return -EALREADY;
+ 		iconn->intr_io = g_io_channel_ref(io);
++		iconn->intr_watch = g_io_add_watch(iconn->intr_io,
++					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++					intr_watch_cb, iconn);
+ 		break;
+ 	}
+ 
 -- 
-Frederic Danis                            Open Source Technology Center
-frederic.danis@intel.com                              Intel Corporation
+1.7.10.2
 
