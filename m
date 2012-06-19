@@ -1,33 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 Jun 2012 00:11:51 -0300
+Date: Tue, 19 Jun 2012 00:09:35 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2] Bluetooth: Use AUTO_OFF constant in jiffies
-Message-ID: <20120619031151.GD1679@joana>
-References: <CAJdJm_MtZYC9=nFzchcCR+yZiyGVNCMpXnmPf7D-dKut1UT8BA@mail.gmail.com>
- <1339745802-8382-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Devendra Naga <devendra.aaru@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Cleanup dtl1_config
+Message-ID: <20120619030935.GC1679@joana>
+References: <1339612935-2851-1-git-send-email-devendra.aaru@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1339745802-8382-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1339612935-2851-1-git-send-email-devendra.aaru@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Devendra,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-06-15 10:36:42 +0300]:
+* Devendra Naga <devendra.aaru@gmail.com> [2012-06-14 00:12:15 +0530]:
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> the functions always return 0 on sucess and -ve error on failure.
 > 
-> Move AUTO_OFF_TIMEOUT to other constants changing name to
-> HCI_AUTO_OFF_TIMEOUT and convert to jiffies.
+> This also removes variable i.
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Signed-off-by: Devendra Naga <devendra.aaru@gmail.com>
 > ---
->  include/net/bluetooth/hci.h |    3 ++-
->  net/bluetooth/hci_core.c    |    5 +----
->  2 files changed, 3 insertions(+), 5 deletions(-)
+>  drivers/bluetooth/dtl1_cs.c |    9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
+> index 6e8d961..f532ce2 100644
+> --- a/drivers/bluetooth/dtl1_cs.c
+> +++ b/drivers/bluetooth/dtl1_cs.c
+> @@ -586,22 +586,19 @@ static int dtl1_confcheck(struct pcmcia_device *p_dev, void *priv_data)
+>  static int dtl1_config(struct pcmcia_device *link)
+>  {
+>  	dtl1_info_t *info = link->priv;
+> -	int i;
+>  
+>  	/* Look for a generic full-sized window */
+>  	link->resource[0]->end = 8;
+>  	if (pcmcia_loop_config(link, dtl1_confcheck, NULL) < 0)
+>  		goto failed;
+>  
+> -	i = pcmcia_request_irq(link, dtl1_interrupt);
+> -	if (i != 0)
+> +	if (pcmcia_request_irq(link, dtl1_interrupt))
+>  		goto failed;
 
-Patch has been applied to bluetooth-next. Thanks.
+I think this change is wrong, instead you might return i (that should be
+renamed to 'err') when the failed label is accessed. This way you improve the
+error report of this function.
 
 	Gustavo
