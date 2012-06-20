@@ -2,36 +2,46 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 10/10] attrib-server: Fix MTU for GATT
-Date: Wed, 20 Jun 2012 14:27:52 -0300
-Message-Id: <1340213272-2853-11-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 09/10] generic attribute: Use GAttrib buffer
+Date: Wed, 20 Jun 2012 14:27:51 -0300
+Message-Id: <1340213272-2853-10-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1340213272-2853-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1340213272-2853-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch changes the size of the input and output buffers to the same size of
-the channel MTU. The channel MTU, in turn, is the L2CAP MTU for BR/EDR
-channels, and the ATT MTU for LE channels. This value can change between calls
-to channel_handler if a GATT MTU exchange procedure is performed, which is only
-supported by LE channels.
+This patch replaces the static local buffer by the GAttrib internal
+buffer to temporarily store the output ATT PDU.
 ---
- src/attrib-server.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ attrib/client.c |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 5adbf92..9064d15 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -910,7 +910,7 @@ static void channel_handler(const uint8_t *ipdu, uint16_t len,
- 							gpointer user_data)
- {
- 	struct gatt_channel *channel = user_data;
--	uint8_t opdu[ATT_MAX_MTU], value[ATT_MAX_MTU];
-+	uint8_t opdu[channel->mtu], value[ATT_MAX_MTU];
- 	uint16_t length, start, end, mtu, offset;
- 	bt_uuid_t uuid;
- 	uint8_t status = 0;
+diff --git a/attrib/client.c b/attrib/client.c
+index 8d119df..a90f22b 100644
+--- a/attrib/client.c
++++ b/attrib/client.c
+@@ -269,9 +269,10 @@ static void events_handler(const uint8_t *pdu, uint16_t len,
+ 	struct gatt_service *gatt = user_data;
+ 	struct characteristic *chr;
+ 	GSList *l;
+-	uint8_t opdu[ATT_MAX_MTU];
++	uint8_t *opdu;
+ 	guint handle;
+ 	uint16_t olen;
++	int plen;
+ 
+ 	if (len < 3) {
+ 		DBG("Malformed notification/indication packet (opcode 0x%02x)",
+@@ -295,7 +296,8 @@ static void events_handler(const uint8_t *pdu, uint16_t len,
+ 
+ 	switch (pdu[0]) {
+ 	case ATT_OP_HANDLE_IND:
+-		olen = enc_confirmation(opdu, sizeof(opdu));
++		opdu = g_attrib_get_buffer(gatt->attrib, &plen);
++		olen = enc_confirmation(opdu, plen);
+ 		g_attrib_send(gatt->attrib, 0, opdu[0], opdu, olen,
+ 						NULL, NULL, NULL);
+ 	case ATT_OP_HANDLE_NOTIFY:
 -- 
 1.7.8.6
 
