@@ -2,46 +2,42 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 03/10] thermometer: Use GAttrib buffer
-Date: Wed, 20 Jun 2012 14:27:45 -0300
-Message-Id: <1340213272-2853-4-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 02/10] dis: Reduce array size for PnP ID
+Date: Wed, 20 Jun 2012 14:27:44 -0300
+Message-Id: <1340213272-2853-3-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1340213272-2853-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1340213272-2853-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch replaces the static local buffer by the GAttrib internal
-buffer to temporarily store the output ATT PDU.
+PnP_ID characteristic is a 7 octets value which includes Vendor ID
+source, a Vendor ID, Product ID, and Product Version.
 ---
- thermometer/thermometer.c |    6 ++++--
- 1 files changed, 4 insertions(+), 2 deletions(-)
+ deviceinfo/deviceinfo.c |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
 
-diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
-index 4a44177..c2256b6 100644
---- a/thermometer/thermometer.c
-+++ b/thermometer/thermometer.c
-@@ -1135,9 +1135,10 @@ static void ind_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
+diff --git a/deviceinfo/deviceinfo.c b/deviceinfo/deviceinfo.c
+index 41fc3fc..4548553 100644
+--- a/deviceinfo/deviceinfo.c
++++ b/deviceinfo/deviceinfo.c
+@@ -37,6 +37,8 @@
+ #include "log.h"
+ #include "deviceinfo.h"
+ 
++#define PNP_ID_SIZE	7
++
+ struct deviceinfo {
+ 	struct btd_device	*dev;		/* Device reference */
+ 	GAttrib			*attrib;	/* GATT connection */
+@@ -84,7 +86,7 @@ static void read_pnpid_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 							gpointer user_data)
  {
- 	struct thermometer *t = user_data;
- 	const struct characteristic *ch;
--	uint8_t opdu[ATT_MAX_MTU];
-+	uint8_t *opdu;
- 	uint16_t handle, olen;
- 	GSList *l;
-+	int plen;
+ 	struct characteristic *ch = user_data;
+-	uint8_t value[ATT_MAX_MTU];
++	uint8_t value[PNP_ID_SIZE];
+ 	ssize_t vlen;
  
- 	if (len < 3) {
- 		DBG("Bad pdu received");
-@@ -1158,7 +1159,8 @@ static void ind_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
- 	else if (g_strcmp0(ch->attr.uuid, MEASUREMENT_INTERVAL_UUID) == 0)
- 		proc_measurement_interval(t, pdu, len);
- 
--	olen = enc_confirmation(opdu, sizeof(opdu));
-+	opdu = g_attrib_get_buffer(t->attrib, &plen);
-+	olen = enc_confirmation(opdu, plen);
- 
- 	if (olen > 0)
- 		g_attrib_send(t->attrib, 0, opdu[0], opdu, olen, NULL, NULL,
+ 	if (status != 0) {
 -- 
 1.7.8.6
 
