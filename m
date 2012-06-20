@@ -2,156 +2,145 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 2/3] time: Register GATT services per adapter
-Date: Wed, 20 Jun 2012 14:14:20 -0400
-Message-Id: <1340216061-24778-2-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1340216061-24778-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1340216061-24778-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 1/3] time: Introduce manager abstraction layer
+Date: Wed, 20 Jun 2012 14:14:19 -0400
+Message-Id: <1340216061-24778-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Following changes to the GATT service registration API, services should
-now be registered per adapter.
+This abstraction layer makes the GATT Time profile implementation
+consistent with other profiles. It is the first step before implementing
+the adapter driver for the Time server implementation.
 ---
- time/manager.c |   13 +++++++++++--
- time/server.c  |   33 +++++++++++++++++++++------------
- time/server.h  |    4 ++--
- 3 files changed, 34 insertions(+), 16 deletions(-)
+ Makefile.am    |    1 +
+ time/main.c    |    6 +++---
+ time/manager.c |   40 ++++++++++++++++++++++++++++++++++++++++
+ time/manager.h |   26 ++++++++++++++++++++++++++
+ 4 files changed, 70 insertions(+), 3 deletions(-)
+ create mode 100644 time/manager.c
+ create mode 100644 time/manager.h
 
-diff --git a/time/manager.c b/time/manager.c
-index 5bda1a3..285c7b1 100644
---- a/time/manager.c
-+++ b/time/manager.c
-@@ -26,15 +26,24 @@
- #include <config.h>
- #endif
+diff --git a/Makefile.am b/Makefile.am
+index 1c214c6..b606b9c 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -226,6 +226,7 @@ builtin_sources += thermometer/main.c \
+ 			thermometer/thermometer.h thermometer/thermometer.c \
+ 			alert/main.c alert/server.h alert/server.c \
+ 			time/main.c time/server.h time/server.c \
++			time/manager.h time/manager.c \
+ 			plugins/gatt-example.c \
+ 			proximity/main.c proximity/manager.h proximity/manager.c \
+ 			proximity/monitor.h proximity/monitor.c \
+diff --git a/time/main.c b/time/main.c
+index d876725..9ef5bf1 100644
+--- a/time/main.c
++++ b/time/main.c
+@@ -33,7 +33,7 @@
+ #include "plugin.h"
+ #include "hcid.h"
+ #include "log.h"
+-#include "server.h"
++#include "manager.h"
  
-+#include "adapter.h"
- #include "manager.h"
- #include "server.h"
- 
-+struct btd_adapter_driver time_server_driver = {
-+	.name = "gatt-time-server",
-+	.probe = time_server_init,
-+	.remove = time_server_exit,
-+};
-+
- int time_manager_init(void)
+ static int time_init(void)
  {
+@@ -42,7 +42,7 @@ static int time_init(void)
+ 		return -ENOTSUP;
+ 	}
+ 
 -	return time_server_init();
-+	btd_register_adapter_driver(&time_server_driver);
-+
-+	return 0;
++	return time_manager_init();
  }
  
- void time_manager_exit(void)
- {
+ static void time_exit(void)
+@@ -50,7 +50,7 @@ static void time_exit(void)
+ 	if (!main_opts.gatt_enabled)
+ 		return;
+ 
 -	time_server_exit();
-+	btd_unregister_adapter_driver(&time_server_driver);
- }
-diff --git a/time/server.c b/time/server.c
-index 13a7bbe..52bd778 100644
---- a/time/server.c
-+++ b/time/server.c
-@@ -83,13 +83,13 @@ static int encode_current_time(uint8_t value[10])
- static uint8_t current_time_read(struct attribute *a,
- 				 struct btd_device *device, gpointer user_data)
- {
-+	struct btd_adapter *adapter = user_data;
- 	uint8_t value[10];
- 
- 	if (encode_current_time(value) < 0)
- 		return ATT_ECODE_IO;
- 
--	/* FIXME: Provide the adapter in next function */
--	attrib_db_update(NULL, a->handle, NULL, value, sizeof(value), NULL);
-+	attrib_db_update(adapter, a->handle, NULL, value, sizeof(value), NULL);
- 
- 	return 0;
- }
-@@ -97,6 +97,7 @@ static uint8_t current_time_read(struct attribute *a,
- static uint8_t local_time_info_read(struct attribute *a,
- 				struct btd_device *device, gpointer user_data)
- {
-+	struct btd_adapter *adapter = user_data;
- 	uint8_t value[2];
- 
- 	DBG("a=%p", a);
-@@ -111,44 +112,52 @@ static uint8_t local_time_info_read(struct attribute *a,
- 	 * format (offset from UTC in number of 15 minutes increments). */
- 	value[1] = (uint8_t) (-1 * timezone / (60 * 15));
- 
--	/* FIXME: Provide the adapter in next function */
--	attrib_db_update(NULL, a->handle, NULL, value, sizeof(value), NULL);
-+	attrib_db_update(adapter, a->handle, NULL, value, sizeof(value), NULL);
- 
- 	return 0;
++	time_manager_exit();
  }
  
--static void register_current_time_service(void)
-+static gboolean register_current_time_service(struct btd_adapter *adapter)
- {
- 	bt_uuid_t uuid;
- 
- 	bt_uuid16_create(&uuid, CURRENT_TIME_SVC_UUID);
- 
- 	/* Current Time service */
--	/* FIXME: Provide the adapter in next function */
--	gatt_service_add(NULL, GATT_PRIM_SVC_UUID, &uuid,
-+	return gatt_service_add(adapter, GATT_PRIM_SVC_UUID, &uuid,
- 				/* CT Time characteristic */
- 				GATT_OPT_CHR_UUID, CT_TIME_CHR_UUID,
- 				GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ |
- 							ATT_CHAR_PROPER_NOTIFY,
- 				GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
--						current_time_read, NULL,
-+						current_time_read, adapter,
- 
- 				/* Local Time Information characteristic */
- 				GATT_OPT_CHR_UUID, LOCAL_TIME_INFO_CHR_UUID,
- 				GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ,
- 				GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
--						local_time_info_read, NULL,
-+						local_time_info_read, adapter,
- 
- 				GATT_OPT_INVALID);
- }
- 
--int time_server_init(void)
-+int time_server_init(struct btd_adapter *adapter)
- {
--	register_current_time_service();
-+	const char *path = adapter_get_path(adapter);
+ BLUETOOTH_PLUGIN_DEFINE(time, VERSION,
+diff --git a/time/manager.c b/time/manager.c
+new file mode 100644
+index 0000000..5bda1a3
+--- /dev/null
++++ b/time/manager.c
+@@ -0,0 +1,40 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012  Nokia Corporation
++ *  Copyright (C) 2012  Marcel Holtmann <marcel@holtmann.org>
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+	DBG("path %s", path);
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
 +
-+	if (!register_current_time_service(adapter)) {
-+		error("Current Time Service could not be registered");
-+		return -EIO;
-+	}
- 
- 	return 0;
- }
- 
--void time_server_exit(void)
-+void time_server_exit(struct btd_adapter *adapter)
- {
-+	const char *path = adapter_get_path(adapter);
++#include "manager.h"
++#include "server.h"
 +
-+	DBG("path %s", path);
- }
-diff --git a/time/server.h b/time/server.h
-index 621bf2b..69cf114 100644
---- a/time/server.h
-+++ b/time/server.h
-@@ -22,5 +22,5 @@
-  *
-  */
- 
--int time_server_init(void);
--void time_server_exit(void);
-+int time_server_init(struct btd_adapter *adapter);
-+void time_server_exit(struct btd_adapter *adapter);
++int time_manager_init(void)
++{
++	return time_server_init();
++}
++
++void time_manager_exit(void)
++{
++	time_server_exit();
++}
+diff --git a/time/manager.h b/time/manager.h
+new file mode 100644
+index 0000000..74641d6
+--- /dev/null
++++ b/time/manager.h
+@@ -0,0 +1,26 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012  Nokia Corporation
++ *  Copyright (C) 2012  Marcel Holtmann <marcel@holtmann.org>
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++int time_manager_init(void);
++void time_manager_exit(void);
 -- 
 1.7.9.5
 
