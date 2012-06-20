@@ -1,133 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [PATCH BlueZ 4/5] adapter: Add DBus API for Broadcaster GAP Role
-Date: Wed, 20 Jun 2012 14:05:17 -0400
-Message-Id: <1340215518-6694-5-git-send-email-jefferson.delfes@openbossa.org>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH BlueZ 3/5] observer: Add python test script
+Date: Wed, 20 Jun 2012 14:05:16 -0400
+Message-Id: <1340215518-6694-4-git-send-email-jefferson.delfes@openbossa.org>
 In-Reply-To: <1340215518-6694-1-git-send-email-jefferson.delfes@openbossa.org>
 References: <1340215518-6694-1-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implement dummy calls for register or unregister Broadcaster.
----
- src/adapter.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- src/adapter.h |  2 ++
- 2 files changed, 50 insertions(+)
+From: Bruna Moreira <bruna.moreira@openbossa.org>
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 0df8790..324765b 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -138,6 +138,7 @@ struct btd_adapter {
- 	gboolean discovering;		/* Discovery active */
- 	gboolean discov_suspended;	/* Discovery suspended */
- 	gboolean observing;		/* Observer active */
-+	gboolean broadcasting;		/* Broadcaster active */
- 	guint auto_timeout_id;		/* Automatic connections timeout */
- 	sdp_list_t *services;		/* Services associated to adapter */
- 
-@@ -1145,6 +1146,10 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 	dict_append_entry(&dict, "Observing", DBUS_TYPE_BOOLEAN,
- 							&adapter->observing);
- 
-+	/* Broadcasting */
-+	dict_append_entry(&dict, "Broadcasting", DBUS_TYPE_BOOLEAN,
-+							&adapter->broadcasting);
+---
+ test/test-observer | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 86 insertions(+)
+ create mode 100755 test/test-observer
+
+diff --git a/test/test-observer b/test/test-observer
+new file mode 100755
+index 0000000..450306d
+--- /dev/null
++++ b/test/test-observer
+@@ -0,0 +1,86 @@
++#!/usr/bin/python
 +
- 	/* Devices */
- 	devices = g_new0(char *, g_slist_length(adapter->devices) + 1);
- 	for (i = 0, l = adapter->devices; l; l = l->next, i++) {
-@@ -1664,6 +1669,24 @@ static DBusMessage *unregister_observer(DBusConnection *conn, DBusMessage *msg,
- 	return dbus_message_new_method_return(msg);
- }
- 
-+static DBusMessage *register_broadcaster(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
-+{
-+	return dbus_message_new_method_return(msg);
-+}
++'''Observer test script
++'''
 +
-+static DBusMessage *update_broadcast_data(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
-+{
-+	return dbus_message_new_method_return(msg);
-+}
++from __future__ import absolute_import, print_function, unicode_literals
 +
-+static DBusMessage *unregister_broadcaster(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
-+{
-+	return dbus_message_new_method_return(msg);
-+}
++from gi.repository import GObject
 +
- static const GDBusMethodTable adapter_methods[] = {
- 	{ GDBUS_METHOD("GetProperties",
- 			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
-@@ -1715,6 +1738,14 @@ static const GDBusMethodTable adapter_methods[] = {
- 	{ GDBUS_METHOD("UnregisterObserver",
- 			GDBUS_ARGS({ "agent", "o" }), NULL,
- 			unregister_observer) },
-+	{ GDBUS_METHOD("RegisterBroadcaster", GDBUS_ARGS({ "field_name", "s" },
-+					{ "values", "a{sv}" }), NULL,
-+			register_broadcaster) },
-+	{ GDBUS_METHOD("UpdateBroadcastData", GDBUS_ARGS({ "field_name", "s" },
-+					{ "values", "a{sv}" }), NULL,
-+			update_broadcast_data) },
-+	{ GDBUS_METHOD("UnregisterBroadcaster", NULL, NULL,
-+			unregister_broadcaster) },
- 	{ }
- };
- 
-@@ -2376,11 +2407,17 @@ int btd_adapter_stop(struct btd_adapter *adapter)
- 					ADAPTER_INTERFACE, "Observing",
- 					DBUS_TYPE_BOOLEAN, &prop_false);
- 
-+	if (adapter->broadcasting)
-+		emit_property_changed(connection, adapter->path,
-+					ADAPTER_INTERFACE, "Broadcasting",
-+					DBUS_TYPE_BOOLEAN, &prop_false);
++import sys
++import dbus
++import dbus.service
++import dbus.mainloop.glib
++from optparse import OptionParser, make_option
 +
- 	emit_property_changed(connection, adapter->path, ADAPTER_INTERFACE,
- 				"Powered", DBUS_TYPE_BOOLEAN, &prop_false);
- 
- 	adapter->discovering = FALSE;
- 	adapter->observing = FALSE;
-+	adapter->broadcasting = FALSE;
- 	adapter->scan_mode = SCAN_DISABLED;
- 	adapter->mode = MODE_OFF;
- 	adapter->off_requested = FALSE;
-@@ -2621,6 +2658,17 @@ void adapter_set_observing(struct btd_adapter *adapter, gboolean observing)
- 						DBUS_TYPE_BOOLEAN, &observing);
- }
- 
-+void adapter_set_broadcasting(struct btd_adapter *adapter,
-+							gboolean broadcasting)
-+{
-+	const char *path = adapter->path;
++properties = {'CompanyIdentifierCode': "ManufacturerData", 'ServiceUUID': "ServiceData"}
 +
-+	adapter->broadcasting = broadcasting;
++class Observer(dbus.service.Object):
++	def __init__(self, bus, object_path, data_type):
++		dbus.service.Object.__init__(self, bus, object_path)
++		self.data_type = data_type
 +
-+	emit_property_changed(connection, path, ADAPTER_INTERFACE,
-+			"Broadcasting", DBUS_TYPE_BOOLEAN, &broadcasting);
-+}
++	@dbus.service.method("org.bluez.Observer",
++					in_signature="sv", out_signature="")
++	def BroadcastReceived(self, address, value):
++		print("[ " + address + " ]")
 +
- static int found_device_cmp(gconstpointer a, gconstpointer b)
- {
- 	const struct remote_dev_info *d = a;
-diff --git a/src/adapter.h b/src/adapter.h
-index 9e2dd08..e0317d3 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -104,6 +104,8 @@ void adapter_set_allow_name_changes(struct btd_adapter *adapter,
- void adapter_set_discovering(struct btd_adapter *adapter,
- 						gboolean discovering);
- void adapter_set_observing(struct btd_adapter *adapter, gboolean observing);
-+void adapter_set_broadcasting(struct btd_adapter *adapter,
-+							gboolean broadcasting);
- uint16_t adapter_get_dev_id(struct btd_adapter *adapter);
- const gchar *adapter_get_path(struct btd_adapter *adapter);
- void adapter_get_address(struct btd_adapter *adapter, bdaddr_t *bdaddr);
++		if type(value) is dbus.String:
++			value = unicode(value).encode('ascii', 'replace')
++
++		print("    %s = %s" % (properties[self.data_type], value))
++		print()
++
++def property_changed(name, value):
++	print("PropertyChanged('%s', '%s')" % (name, value))
++
++if __name__ == "__main__":
++	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++
++	bus = dbus.SystemBus()
++
++	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
++					"org.bluez.Manager")
++
++	option_list = [
++		make_option("-i", "--adapter", action="store",
++			type="string", dest="adapter"),
++		make_option("-s", "--service", action="store",
++			type="int", dest="service_uuid",
++			help="Service UUID (e.g. \"0x0001\")"),
++		make_option("-c", "--company", action="store",
++			type="int", dest="company_id",
++			help="Company Identifier Code (e.g. \"0x0002\")"),
++		]
++
++	parser = OptionParser(option_list=option_list)
++
++	(options, args) = parser.parse_args()
++
++	if not options.service_uuid and not options.company_id:
++		parser.error("At least one option is required: -c or -s")
++
++	if options.adapter:
++		adapter_path = manager.FindAdapter(options.adapter)
++	else:
++		adapter_path = manager.DefaultAdapter()
++
++	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
++							"org.bluez.Adapter")
++
++	bus.add_signal_receiver(property_changed, bus_name="org.bluez",
++				dbus_interface="org.bluez.Adapter",
++				signal_name="PropertyChanged")
++
++	if options.service_uuid:
++		path = "/test/observer/service"
++		service_observer = Observer(bus, path, "ServiceUUID")
++		adapter.RegisterObserver(path, "ServiceUUID", options.service_uuid)
++
++	if options.company_id:
++		path = "/test/observer/company"
++		company_observer = Observer(bus, path, "CompanyIdentifierCode")
++		adapter.RegisterObserver(path, "CompanyIdentifierCode", options.company_id)
++
++	mainloop = GObject.MainLoop()
++	mainloop.run()
 -- 
 1.7.11
 
