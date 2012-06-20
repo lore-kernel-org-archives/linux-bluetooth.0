@@ -1,81 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
+Message-ID: <4FE1CB70.3050801@linux.intel.com>
+Date: Wed, 20 Jun 2012 15:09:04 +0200
+From: Frederic Danis <frederic.danis@linux.intel.com>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] sdp: Prevent duplicate records registration
-Date: Wed, 20 Jun 2012 15:18:51 +0200
-Message-Id: <1340198331-20807-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+Subject: Re: [PATCH] sdp: Prevent duplicate records registration
+References: <1340182921-12448-1-git-send-email-frederic.danis@linux.intel.com> <20120620093513.GA17683@x220>
+In-Reply-To: <20120620093513.GA17683@x220>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Check if a record with same UUID and protocol descriptor already exists
-before adding new record to server
----
- src/sdpd-service.c |   43 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+Hello Johan,
 
-diff --git a/src/sdpd-service.c b/src/sdpd-service.c
-index 39e05ab..a76f8b4 100644
---- a/src/sdpd-service.c
-+++ b/src/sdpd-service.c
-@@ -231,6 +231,46 @@ void register_device_id(void)
- 	update_db_timestamp();
- }
- 
-+static int sdpd_check_duplicate(sdp_record_t *rec)
-+{
-+	sdp_list_t *protos, *p;
-+	int port = -1, psm = -1;
-+
-+	if (sdp_get_access_protos(rec, &protos) == 0) {
-+		psm = sdp_get_proto_port(protos, L2CAP_UUID);
-+		port = sdp_get_proto_port(protos, RFCOMM_UUID);
-+
-+		sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free, NULL);
-+		sdp_list_free(protos, NULL);
-+	}
-+
-+	for (p = sdp_get_record_list(); p; p = p->next) {
-+		sdp_record_t *tmp = p->data;
-+		int tmp_port = -1, tmp_psm = -1;
-+
-+		if (sdp_uuid_cmp(&tmp->svclass, &rec->svclass) != 0)
-+			continue;
-+
-+		if (sdp_get_access_protos(tmp, &protos) == 0) {
-+			tmp_psm = sdp_get_proto_port(protos, L2CAP_UUID);
-+			tmp_port = sdp_get_proto_port(protos, RFCOMM_UUID);
-+
-+			sdp_list_foreach(protos,
-+					 (sdp_list_func_t) sdp_list_free, NULL);
-+			sdp_list_free(protos, NULL);
-+		}
-+
-+		if (psm != tmp_psm || port != tmp_port)
-+			continue;
-+
-+		DBG("Record duplicate: handle 0x%05x already exists with "
-+				"same uuid and protos", tmp->handle);
-+		return 1;
-+	}
-+
-+	return 0;
-+}
-+
- int add_record_to_server(const bdaddr_t *src, sdp_record_t *rec)
- {
- 	sdp_data_t *data;
-@@ -245,6 +285,9 @@ int add_record_to_server(const bdaddr_t *src, sdp_record_t *rec)
- 			return -EEXIST;
- 	}
- 
-+	if (sdpd_check_duplicate(rec))
-+		return -EEXIST;
-+
- 	DBG("Adding record with handle 0x%05x", rec->handle);
- 
- 	sdp_record_add(src, rec);
+On 20/06/2012 11:35, Johan Hedberg wrote:
+> Hi Frédéric,
+>
+> On Wed, Jun 20, 2012, Frédéric Danis wrote:
+>> Check if a record with same UUID and protocol descriptor already exists
+>> before adding new record to server
+>> ---
+>>
+>> When BlueZ is built with --enable-pnat option, it provides DUN support on RFComm
+>> port 1.
+>> When current version of oFono is started, it also provides DUN support on same
+>> port.
+>> So, we get to 2 SDP records for same UUID and RFComm port.
+>> This patch prevents this.
+>>
+>
+> My initial reaction is that I don't think this is something that needs
+> to be part of the SDP server. The admin of the system should be smart
+> enough to not try to configure to identical&  conflicting services.
+>
+> Also, the RFCOMM server socket code in the kernel should already give an
+> error if binding to the same channel is attempted twice, so this would
+> look like a bug in one of the DUN implementations that they do not
+> unregister their service record when binding the server socket fails. So
+> simply fixing this bug would also make sure that two service records
+> aren't present (though it would remove the existence of the clueless
+> admin ;)
+>
+I took a look to oFono code, which used a copy of btio.c to create a 
+listening socket.
+But call to bt_io_listen() (which calls bind to rfcomm port 1) did not 
+fail. So, oFono continue and register the sdp record.
+
+I use upstream BlueZ and oFono, with kernel 3.2.0-25-generic.
+
+> However, even if this was introduced it should be in its own function
+> (e.g. sdpd_check_duplicate() called from within add_record_to_server)
+> and not unnecessarily bloat the size of add_record_to_server.
+>
+I will send an updated version of the patch.
+
+Regards
+
+Fred
+
+
 -- 
-1.7.9.5
+Frederic Danis                            Open Source Technology Center
+frederic.danis@intel.com                              Intel Corporation
 
