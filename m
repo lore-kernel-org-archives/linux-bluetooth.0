@@ -1,32 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Michal.Labedzki@tieto.com>
-To: <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>
-Date: Wed, 20 Jun 2012 14:08:08 +0300
-Subject: RE: [PATCH hcidump 1/2 v2] AVRCP: Add parsing for
- SetAddressedPlayer PDU
-Message-ID: <E50901D4F2CF69428D43141B7C85867929DD8AD291@EXMB03.eu.tieto.com>
-References: <1340106030-30782-1-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1340106030-30782-1-git-send-email-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="iso-8859-2"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org, akpm@linux-foundation.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Docs: printk-formats: add description for %pMR
+Date: Wed, 20 Jun 2012 13:44:49 +0300
+Message-Id: <1340189089-20257-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1338210316-12299-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1338210316-12299-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Ack, but I think that you should indicate that PDU with incorrect parameter length is malformed too - add printf on the end of parsed PDU.
+Add information about new specifier %pMR for Bluetooth addresses.
 
-Regards / Pozdrawiam
--------------------------------------------------------------------------------------------------------------
-Micha³ £abêdzki
-ASCII: Michal Labedzki
-e-mail: michal.labedzki@tieto.com
-office communicator: michal.labedzki@tieto.com
-location: Poland, Wroc³aw, Legnicka 55F
-room: 315
-phone: +48 717 740 340
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
-Tieto Corporation / Tieto Poland
-http://www.tieto.com / http://www.tieto.pl
----
-Tieto Poland spó³ka z ograniczon± odpowiedzialno¶ci± z siedzib± w Szczecinie, ul. Malczewskiego 26. Zarejestrowana w S±dzie Rejonowym Szczecin-Centrum w Szczecinie, XIII Wydzia³ Gospodarczy Krajowego Rejestru S±dowego pod numerem 0000124858. NIP: 8542085557. REGON: 812023656. Kapita³ zak³adowy: 4 271500 PLN
+ Documentation/printk-formats.txt |    5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/Documentation/printk-formats.txt b/Documentation/printk-formats.txt
+index 5df176e..d8d168f 100644
+--- a/Documentation/printk-formats.txt
++++ b/Documentation/printk-formats.txt
+@@ -56,6 +56,7 @@ Struct Resources:
+ MAC/FDDI addresses:
+ 
+ 	%pM	00:01:02:03:04:05
++	%pMR	05:04:03:02:01:00
+ 	%pMF	00-01-02-03-04-05
+ 	%pm	000102030405
+ 
+@@ -67,6 +68,10 @@ MAC/FDDI addresses:
+ 	the 'M' specifier to use dash ('-') separators instead of the default
+ 	separator.
+ 
++	For Bluetooth addresses the 'R' specifier shall be used after the 'M'
++	specifier to use reversed byte order suitable for visual interpretation
++	of Bluetooth addresses which are in the little endian order.
++
+ IPv4 addresses:
+ 
+ 	%pI4	1.2.3.4
+-- 
+1.7.9.5
+
