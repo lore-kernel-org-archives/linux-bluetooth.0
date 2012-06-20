@@ -1,47 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org, akpm@linux-foundation.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Docs: printk-formats: add description for %pMR
-Date: Wed, 20 Jun 2012 13:44:49 +0300
-Message-Id: <1340189089-20257-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1338210316-12299-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1338210316-12299-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Date: Wed, 20 Jun 2012 12:41:04 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: Joao Paulo Rechi Vita <jprvita@openbossa.org>,
+	Henrique Dante <hdante@profusion.mobi>,
+	Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH RFC] gdbus: Rename variables named "signal" (so that it
+ can be compiled with -Wshadow)
+Message-ID: <20120620094104.GA17914@x220>
+References: <1339761848-7472-1-git-send-email-hdante@profusion.mobi>
+ <CAJdJm_OrV7Xua91zUcyATHCWtHHAZUsOYJbVL8Vn_194O8_=Hw@mail.gmail.com>
+ <CAFAvTnNJp0Q1JAt+HUy4X5mBG_xO+fQgUYoYiy+90uHJNtx9Mw@mail.gmail.com>
+ <CAFAvTnNcj8ODBqbKJpZzHmFE0Hy_oVtng9Lc-5Ess353Dv2LuQ@mail.gmail.com>
+ <CAAngNMaxPad3h8hXpCg4hN_gunjAjesQTeSv45a34X6+mG5+sw@mail.gmail.com>
+ <CAMOw1v7ZfiuMxXhXRo2RcB7-WK21gbfip3hXTuRYy=WCj2iaAQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CAMOw1v7ZfiuMxXhXRo2RcB7-WK21gbfip3hXTuRYy=WCj2iaAQ@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Lucas,
 
-Add information about new specifier %pMR for Bluetooth addresses.
+On Tue, Jun 19, 2012, Lucas De Marchi wrote:
+> >>>> Would it be interesting to add this option to acinclude.m4? Or does it
+> >>>> generate too much noise?
+> >>>
+> >>>  It generates few warnings. Depending on the acceptance of this patch,
+> >>> I could fix bluez as a whole and add -Wshadow to acinclude.m4.
+> >>
+> >>  Actually, I had a partial build here. Ignore the previous answer, it
+> >> generates a lot of warnings.
+> >>
+> >
+> > If we're not going to enable -Wshadow by default, does it make sense
+> > to apply this patch? Who is going to check if no new shadow warnings
+> > are being inserted in new commits?
+> 
+> I'm all for doing the following:
+> 
+> 1) Fix all the places with shadow variables
+> 2) Add -Wshadow to the warning flags
+> 
+> There are lots of them.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- Documentation/printk-formats.txt |    5 +++++
- 1 file changed, 5 insertions(+)
+Agreed. This could be one of the targets before releasing BlueZ 5.0.
 
-diff --git a/Documentation/printk-formats.txt b/Documentation/printk-formats.txt
-index 5df176e..d8d168f 100644
---- a/Documentation/printk-formats.txt
-+++ b/Documentation/printk-formats.txt
-@@ -56,6 +56,7 @@ Struct Resources:
- MAC/FDDI addresses:
- 
- 	%pM	00:01:02:03:04:05
-+	%pMR	05:04:03:02:01:00
- 	%pMF	00-01-02-03-04-05
- 	%pm	000102030405
- 
-@@ -67,6 +68,10 @@ MAC/FDDI addresses:
- 	the 'M' specifier to use dash ('-') separators instead of the default
- 	separator.
- 
-+	For Bluetooth addresses the 'R' specifier shall be used after the 'M'
-+	specifier to use reversed byte order suitable for visual interpretation
-+	of Bluetooth addresses which are in the little endian order.
-+
- IPv4 addresses:
- 
- 	%pI4	1.2.3.4
--- 
-1.7.9.5
-
+Johan
