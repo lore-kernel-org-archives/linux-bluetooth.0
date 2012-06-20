@@ -1,72 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 21 Jun 2012 10:08:37 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Andrew Morton <akpm@linux-foundation.org>
+Date: Wed, 20 Jun 2012 14:19:57 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Randy Dunlap <rdunlap@xenotime.net>
 Subject: Re: [PATCH] Docs: printk-formats: add description for %pMR
-Message-ID: <20120621070827.GA9341@aemeltch-MOBL1>
+Message-Id: <20120620141957.d865133a.akpm@linux-foundation.org>
+In-Reply-To: <1340189089-20257-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1338210316-12299-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1340189089-20257-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20120620141957.d865133a.akpm@linux-foundation.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120620141957.d865133a.akpm@linux-foundation.org>
+	<1340189089-20257-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Wed, 20 Jun 2012 13:44:49 +0300
+Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> wrote:
 
-On Wed, Jun 20, 2012 at 02:19:57PM -0700, Andrew Morton wrote:
-> > --- a/Documentation/printk-formats.txt
-> > +++ b/Documentation/printk-formats.txt
-> > @@ -56,6 +56,7 @@ Struct Resources:
-> >  MAC/FDDI addresses:
-> >  
-> >  	%pM	00:01:02:03:04:05
-> > +	%pMR	05:04:03:02:01:00
-> >  	%pMF	00-01-02-03-04-05
-> >  	%pm	000102030405
-> >  
-> > @@ -67,6 +68,10 @@ MAC/FDDI addresses:
-> >  	the 'M' specifier to use dash ('-') separators instead of the default
-> >  	separator.
-> >  
-> > +	For Bluetooth addresses the 'R' specifier shall be used after the 'M'
-> > +	specifier to use reversed byte order suitable for visual interpretation
-> > +	of Bluetooth addresses which are in the little endian order.
-> > +
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> huh, I didn't know about that file, or I forgot about it.
-
-This happens also to me.
-
-> I wonder if it is otherwise up to date.
-> Do we really need it?  
-
-I feel that the document is very good.
-
-> If we can sufficiently document the printk
-> formats in lib/vsprintf.c then let's remove
-> Documentation/printk-formats.txt.  
-
-Until I read that vsprintf.c I did not know where to find printk format
-specifiers. It does make sense to keep it.
-
-> Otherwise, I shall do this:
+> Add information about new specifier %pMR for Bluetooth addresses.
 > 
-> 
-> --- a/lib/vsprintf.c
-> +++ a/lib/vsprintf.c
-> @@ -1297,6 +1297,8 @@ qualifier:
->   *   case.
->   * %n is ignored
->   *
-> + * ** Please update Documentation/printk-formats.txt when making changes **
-> + *
+> ...
+>
+> --- a/Documentation/printk-formats.txt
+> +++ b/Documentation/printk-formats.txt
+> @@ -56,6 +56,7 @@ Struct Resources:
+>  MAC/FDDI addresses:
+>  
+>  	%pM	00:01:02:03:04:05
+> +	%pMR	05:04:03:02:01:00
+>  	%pMF	00-01-02-03-04-05
+>  	%pm	000102030405
+>  
+> @@ -67,6 +68,10 @@ MAC/FDDI addresses:
+>  	the 'M' specifier to use dash ('-') separators instead of the default
+>  	separator.
+>  
+> +	For Bluetooth addresses the 'R' specifier shall be used after the 'M'
+> +	specifier to use reversed byte order suitable for visual interpretation
+> +	of Bluetooth addresses which are in the little endian order.
+> +
 
-Looks good.
+huh, I didn't know about that file, or I forgot about it.  I wonder if
+it is otherwise up to date.
 
-Best regards 
-Andrei Emeltchenko 
+Do we really need it?  If we can sufficiently document the printk
+formats in lib/vsprintf.c then let's remove
+Documentation/printk-formats.txt.  Otherwise, I shall do this:
+
+
+--- a/lib/vsprintf.c
++++ a/lib/vsprintf.c
+@@ -1297,6 +1297,8 @@ qualifier:
+  *   case.
+  * %n is ignored
+  *
++ * ** Please update Documentation/printk-formats.txt when making changes **
++ *
+  * The return value is the number of characters which would
+  * be generated for the given input, excluding the trailing
+  * '\0', as per ISO C99. If you want to have the exact
+_
 
