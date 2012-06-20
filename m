@@ -1,65 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4FE1CB70.3050801@linux.intel.com>
-Date: Wed, 20 Jun 2012 15:09:04 +0200
-From: Frederic Danis <frederic.danis@linux.intel.com>
-MIME-Version: 1.0
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] sdp: Prevent duplicate records registration
-References: <1340182921-12448-1-git-send-email-frederic.danis@linux.intel.com> <20120620093513.GA17683@x220>
-In-Reply-To: <20120620093513.GA17683@x220>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [PATCH] Bluetooth: Fix warning: using int as NULL pointer
+Date: Wed, 20 Jun 2012 14:40:12 +0300
+Message-Id: <1340192412-30161-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Johan,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On 20/06/2012 11:35, Johan Hedberg wrote:
-> Hi Frédéric,
->
-> On Wed, Jun 20, 2012, Frédéric Danis wrote:
->> Check if a record with same UUID and protocol descriptor already exists
->> before adding new record to server
->> ---
->>
->> When BlueZ is built with --enable-pnat option, it provides DUN support on RFComm
->> port 1.
->> When current version of oFono is started, it also provides DUN support on same
->> port.
->> So, we get to 2 SDP records for same UUID and RFComm port.
->> This patch prevents this.
->>
->
-> My initial reaction is that I don't think this is something that needs
-> to be part of the SDP server. The admin of the system should be smart
-> enough to not try to configure to identical&  conflicting services.
->
-> Also, the RFCOMM server socket code in the kernel should already give an
-> error if binding to the same channel is attempted twice, so this would
-> look like a bug in one of the DUN implementations that they do not
-> unregister their service record when binding the server socket fails. So
-> simply fixing this bug would also make sure that two service records
-> aren't present (though it would remove the existence of the clueless
-> admin ;)
->
-I took a look to oFono code, which used a copy of btio.c to create a 
-listening socket.
-But call to bt_io_listen() (which calls bind to rfcomm port 1) did not 
-fail. So, oFono continue and register the sdp record.
+Fix for warnings below:
 
-I use upstream BlueZ and oFono, with kernel 3.2.0-25-generic.
+...
+drivers/bluetooth/bt3c_cs.c:667:20: warning: Using plain integer
+	as NULL pointer
+drivers/bluetooth/btuart_cs.c:596:20: warning: Using plain integer
+	as NULL pointer
+...
 
-> However, even if this was introduced it should be in its own function
-> (e.g. sdpd_check_duplicate() called from within add_record_to_server)
-> and not unnecessarily bloat the size of add_record_to_server.
->
-I will send an updated version of the patch.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ drivers/bluetooth/bt3c_cs.c   |    2 +-
+ drivers/bluetooth/btuart_cs.c |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Regards
-
-Fred
-
-
+diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
+index b2b0fbb..8925b6d 100644
+--- a/drivers/bluetooth/bt3c_cs.c
++++ b/drivers/bluetooth/bt3c_cs.c
+@@ -664,7 +664,7 @@ static int bt3c_check_config(struct pcmcia_device *p_dev, void *priv_data)
+ {
+ 	int *try = priv_data;
+ 
+-	if (try == 0)
++	if (!try)
+ 		p_dev->io_lines = 16;
+ 
+ 	if ((p_dev->resource[0]->end != 8) || (p_dev->resource[0]->start == 0))
+diff --git a/drivers/bluetooth/btuart_cs.c b/drivers/bluetooth/btuart_cs.c
+index 65b8d99..21e803a 100644
+--- a/drivers/bluetooth/btuart_cs.c
++++ b/drivers/bluetooth/btuart_cs.c
+@@ -593,7 +593,7 @@ static int btuart_check_config(struct pcmcia_device *p_dev, void *priv_data)
+ {
+ 	int *try = priv_data;
+ 
+-	if (try == 0)
++	if (!try)
+ 		p_dev->io_lines = 16;
+ 
+ 	if ((p_dev->resource[0]->end != 8) || (p_dev->resource[0]->start == 0))
 -- 
-Frederic Danis                            Open Source Technology Center
-frederic.danis@intel.com                              Intel Corporation
+1.7.9.5
 
