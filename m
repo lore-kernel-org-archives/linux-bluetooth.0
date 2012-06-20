@@ -1,82 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] sdp: Prevent duplicate records registration
-Date: Wed, 20 Jun 2012 11:02:01 +0200
-Message-Id: <1340182921-12448-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+From: "Zheng, Wu" <wu.zheng@intel.com>
+To: "Zhang, Jingke" <jingke.zhang@intel.com>,
+	Frederic Danis <frederic.danis@linux.intel.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: BT DUN Server fails to work (seems blocked in RFCOMM)
+Date: Wed, 20 Jun 2012 06:49:49 +0000
+Message-ID: <2CF57A644018A745B8FE029C7223E16E0FD778F2@SHSMSX102.ccr.corp.intel.com>
+References: <8C91AD8ED4077A4786B341540858992510269B2E@SHSMSX102.ccr.corp.intel.com>
+ <4FE05A21.9060406@linux.intel.com>
+ <8C91AD8ED4077A4786B34154085899251026A19B@SHSMSX102.ccr.corp.intel.com>
+In-Reply-To: <8C91AD8ED4077A4786B34154085899251026A19B@SHSMSX102.ccr.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Check if a record with same UUID and protocol descriptor already exists
-before adding new record to server
----
+Hi,
 
-When BlueZ is built with --enable-pnat option, it provides DUN support on RFComm
-port 1.
-When current version of oFono is started, it also provides DUN support on same
-port.
-So, we get to 2 SDP records for same UUID and RFComm port.
-This patch prevents this.
+I check the issue of DUN response "security block". 
 
+If we set ssp mode to 0, the issue does not exist (hci_conn_check_link_mode return 1 in hci_conn.c).
 
- src/sdpd-service.c |   35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+However, why DUN connect cannot pass hci_conn_check_link_mode and FTP connect can pass hci_conn_check_link_mode?
 
-diff --git a/src/sdpd-service.c b/src/sdpd-service.c
-index 39e05ab..9e8b90c 100644
---- a/src/sdpd-service.c
-+++ b/src/sdpd-service.c
-@@ -235,6 +235,9 @@ int add_record_to_server(const bdaddr_t *src, sdp_record_t *rec)
- {
- 	sdp_data_t *data;
- 	sdp_list_t *pattern;
-+	sdp_list_t *record;
-+	sdp_list_t *protos;
-+	int port = -1, psm = -1;
- 
- 	if (rec->handle == 0xffffffff) {
- 		rec->handle = sdp_next_handle();
-@@ -245,6 +248,38 @@ int add_record_to_server(const bdaddr_t *src, sdp_record_t *rec)
- 			return -EEXIST;
- 	}
- 
-+	if (sdp_get_access_protos(rec, &protos) == 0) {
-+		psm = sdp_get_proto_port(protos, L2CAP_UUID);
-+		port = sdp_get_proto_port(protos, RFCOMM_UUID);
-+
-+		sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free, NULL);
-+		sdp_list_free(protos, NULL);
-+	}
-+
-+	for (record = sdp_get_record_list(); record; record = record->next) {
-+		sdp_record_t *tmp = record->data;
-+		int tmp_port = -1, tmp_psm = -1;
-+
-+		if (sdp_uuid_cmp(&tmp->svclass, &rec->svclass) != 0)
-+			continue;
-+
-+		if (sdp_get_access_protos(tmp, &protos) == 0) {
-+			tmp_psm = sdp_get_proto_port(protos, L2CAP_UUID);
-+			tmp_port = sdp_get_proto_port(protos, RFCOMM_UUID);
-+
-+			sdp_list_foreach(protos,
-+					 (sdp_list_func_t) sdp_list_free, NULL);
-+			sdp_list_free(protos, NULL);
-+		}
-+
-+		if (psm != tmp_psm || port != tmp_port)
-+			continue;
-+
-+		DBG("Record not added as handle 0x%05x already exists with "
-+				"same uuid and protos", tmp->handle);
-+		return -EEXIST;
-+	}
-+
- 	DBG("Adding record with handle 0x%05x", rec->handle);
- 
- 	sdp_record_add(src, rec);
--- 
-1.7.9.5
+Best regards
+Zheng wu
 
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org
+> [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Zhang, Jingke
+> Sent: Wednesday, June 20, 2012 1:24 PM
+> To: Frederic Danis
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: RE: BT DUN Server fails to work (seems blocked in RFCOMM)
+> 
+> Hi Danis,
+> I rebuild my bluez again without "--enable-pnat" in bootstrap-configure. Now,
+> my sdp result shows ONLY ONE "Dial-up Networking" service. It is from ofonod.
+> 
+> Retest this case. It reports "Security block" after DUN server gets "Dial-up
+> Networking" record. The hcidump will be attached in bug ---
+> https://bugs.meego.com/show_bug.cgi?id=25303 .
+> At this time, I tried a FTP case (to prove pairing is OK), FTP passed.
+> 
+> So, I suspect DUN response "security block" may be due to DUN service itself,
+> which is provided by ofonod. Please help to check it. Thanks!
+> 
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org
+> [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Frederic Danis
+> Sent: Tuesday, June 19, 2012 6:53 PM
+> To: Zhang, Jingke
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: BT DUN Server fails to work (seems blocked in RFCOMM)
+> 
+> Hello
+> 
+> On 19/06/2012 11:11, Zhang, Jingke wrote:
+> > Hi all,
+> > Does any guys try DUN server with bluez?
+> >
+> > My telephone stack is ofono and its DUN server code should be ready in its
+> commit. However, the problem is my DUN activation request almost did not
+> come to ofono side (only to bluez RFCOMM). On the DUN Client, I can use same
+> validation step to active a mobile phone (Sony-Ericson C905) to connect to
+> 2G/3G network.
+> >
+> > I filed a bug https://bugs.meego.com/show_bug.cgi?id=25303 to track all
+> logs.
+> >
+> > Could you help to see what's the problem?
+> >
+> > Thanks
+> > Jingke
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe
+> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> >
+> 
+> Your hcidump shows 2 SDP records for DUN profile.
+> 
+> Guillaume Zajac and I found the same problem yesterday, and reply about it on
+> oFono mailing list (see "Re: oFono DUN server issue" mails).
+> 
+> It seems that BlueZ was compiled with embedded DUN server (configure
+> option --enable-pnat).
+> When both BlueZ and oFono are started, they both listen for incoming
+> connection on RFCOMM port 1 (try "sdptool browse local" to check), and
+> embedded BlueZ DUN server reply preventing oFono to manage this
+> connection.
+> 
+> If you remove the embedded DUN server by removing --enable-pnat from build
+> configuration, it should work.
+> 
+> Fred
+> 
+> --
+> Frederic Danis                            Open Source Technology
+> Center
+> frederic.danis@intel.com                              Intel
+> Corporation
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in the
+> body of a message to majordomo@vger.kernel.org More majordomo info at
+> http://vger.kernel.org/majordomo-info.html
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in the
+> body of a message to majordomo@vger.kernel.org More majordomo info at
+> http://vger.kernel.org/majordomo-info.html
