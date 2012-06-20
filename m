@@ -1,146 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 1/3] time: Introduce manager abstraction layer
-Date: Wed, 20 Jun 2012 14:14:19 -0400
-Message-Id: <1340216061-24778-1-git-send-email-anderson.lizardo@openbossa.org>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH BlueZ 5/5] broadcaster: Add python test script
+Date: Wed, 20 Jun 2012 14:05:18 -0400
+Message-Id: <1340215518-6694-6-git-send-email-jefferson.delfes@openbossa.org>
+In-Reply-To: <1340215518-6694-1-git-send-email-jefferson.delfes@openbossa.org>
+References: <1340215518-6694-1-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This abstraction layer makes the GATT Time profile implementation
-consistent with other profiles. It is the first step before implementing
-the adapter driver for the Time server implementation.
----
- Makefile.am    |    1 +
- time/main.c    |    6 +++---
- time/manager.c |   40 ++++++++++++++++++++++++++++++++++++++++
- time/manager.h |   26 ++++++++++++++++++++++++++
- 4 files changed, 70 insertions(+), 3 deletions(-)
- create mode 100644 time/manager.c
- create mode 100644 time/manager.h
+From: Bruna Moreira <bruna.moreira@openbossa.org>
 
-diff --git a/Makefile.am b/Makefile.am
-index 1c214c6..b606b9c 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -226,6 +226,7 @@ builtin_sources += thermometer/main.c \
- 			thermometer/thermometer.h thermometer/thermometer.c \
- 			alert/main.c alert/server.h alert/server.c \
- 			time/main.c time/server.h time/server.c \
-+			time/manager.h time/manager.c \
- 			plugins/gatt-example.c \
- 			proximity/main.c proximity/manager.h proximity/manager.c \
- 			proximity/monitor.h proximity/monitor.c \
-diff --git a/time/main.c b/time/main.c
-index d876725..9ef5bf1 100644
---- a/time/main.c
-+++ b/time/main.c
-@@ -33,7 +33,7 @@
- #include "plugin.h"
- #include "hcid.h"
- #include "log.h"
--#include "server.h"
-+#include "manager.h"
- 
- static int time_init(void)
- {
-@@ -42,7 +42,7 @@ static int time_init(void)
- 		return -ENOTSUP;
- 	}
- 
--	return time_server_init();
-+	return time_manager_init();
- }
- 
- static void time_exit(void)
-@@ -50,7 +50,7 @@ static void time_exit(void)
- 	if (!main_opts.gatt_enabled)
- 		return;
- 
--	time_server_exit();
-+	time_manager_exit();
- }
- 
- BLUETOOTH_PLUGIN_DEFINE(time, VERSION,
-diff --git a/time/manager.c b/time/manager.c
-new file mode 100644
-index 0000000..5bda1a3
+---
+ test/test-broadcaster | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 84 insertions(+)
+ create mode 100755 test/test-broadcaster
+
+diff --git a/test/test-broadcaster b/test/test-broadcaster
+new file mode 100755
+index 0000000..96489a4
 --- /dev/null
-+++ b/time/manager.c
-@@ -0,0 +1,40 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012  Nokia Corporation
-+ *  Copyright (C) 2012  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
++++ b/test/test-broadcaster
+@@ -0,0 +1,84 @@
++#!/usr/bin/python
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
++'''Broadcaster test script
++'''
 +
-+#include "manager.h"
-+#include "server.h"
++from __future__ import absolute_import, print_function, unicode_literals
 +
-+int time_manager_init(void)
-+{
-+	return time_server_init();
-+}
++from gi.repository import GObject
 +
-+void time_manager_exit(void)
-+{
-+	time_server_exit();
-+}
-diff --git a/time/manager.h b/time/manager.h
-new file mode 100644
-index 0000000..74641d6
---- /dev/null
-+++ b/time/manager.h
-@@ -0,0 +1,26 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012  Nokia Corporation
-+ *  Copyright (C) 2012  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
++import sys
++import dbus
++import dbus.service
++import dbus.mainloop.glib
++from optparse import OptionParser, make_option
 +
-+int time_manager_init(void);
-+void time_manager_exit(void);
++def property_changed(name, value):
++	print("PropertyChanged('%s', '%s')" % (name, value))
++
++if __name__ == "__main__":
++	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++
++	bus = dbus.SystemBus()
++
++	option_list = [
++		make_option("-i", "--adapter", action="store",
++			type="string", dest="adapter"),
++		make_option("-s", "--service", action="store_true",
++			dest="service",
++			help="Type of the data: Service Data"),
++		make_option("-m", "--manufacturer", action="store_true",
++			dest="manufacturer",
++			help="Type of the data: Manufacturer Specific Data"),
++		make_option("-u", "--uuid", action="store",
++			type="int", dest="uuid",
++			help="An uint16 of Service UUID or Company" + 
++			" Identifier Code following by hex encoded bytes" +
++			" (e.g. \"0x1002 08 5f 9a\")"),
++		]
++
++	parser = OptionParser(option_list=option_list,
++			usage="Usage: %prog <-s|-m> -u <uuid> <data bytes in hex>")
++
++	(options, args) = parser.parse_args()
++	if not args:
++		parser.error("Hex encoded data is required.")
++
++	if options.service and options.manufacturer:
++		parser.error("options -m and -s are mutually exclusive")
++
++	if options.service or options.manufacturer:
++		if not options.uuid:
++			parser.error("option -u is required")
++	try:
++		data = dbus.Array(map(lambda i: dbus.Byte(int(i, 16)), args))
++	except ValueError:
++		parser.error("Invalid data. Should be hex encoded bytes" +
++		" separated by whitespace.")
++
++	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
++					"org.bluez.Manager")
++
++	if options.adapter:
++		adapter_path = manager.FindAdapter(options.adapter)
++	else:
++		adapter_path = manager.DefaultAdapter()
++
++	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
++							"org.bluez.Adapter")
++
++	bus.add_signal_receiver(property_changed, bus_name="org.bluez",
++				dbus_interface="org.bluez.Adapter",
++				signal_name="PropertyChanged")
++
++	if options.service:
++		properties = dbus.Dictionary({ "ServiceUUID" : options.uuid,
++						"Data" : data }) 
++		adapter.RegisterBroadcaster("ServiceData", properties)
++	else:
++		properties = dbus.Dictionary({ "CompanyIdentifierCode" : options.uuid,
++						"Data" : data }) 
++		adapter.RegisterBroadcaster("ManufacturerSpecificData", properties)
++
++	mainloop = GObject.MainLoop()
++	mainloop.run()
 -- 
-1.7.9.5
+1.7.11
 
