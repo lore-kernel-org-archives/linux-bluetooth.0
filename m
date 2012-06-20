@@ -1,55 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix warning: using int as NULL pointer
-Date: Wed, 20 Jun 2012 14:40:12 +0300
-Message-Id: <1340192412-30161-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: <Michal.Labedzki@tieto.com>
+To: <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>
+Date: Wed, 20 Jun 2012 14:08:08 +0300
+Subject: RE: [PATCH hcidump 1/2 v2] AVRCP: Add parsing for
+ SetAddressedPlayer PDU
+Message-ID: <E50901D4F2CF69428D43141B7C85867929DD8AD291@EXMB03.eu.tieto.com>
+References: <1340106030-30782-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1340106030-30782-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="iso-8859-2"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi,
 
-Fix for warnings below:
+Ack, but I think that you should indicate that PDU with incorrect parameter length is malformed too - add printf on the end of parsed PDU.
 
-...
-drivers/bluetooth/bt3c_cs.c:667:20: warning: Using plain integer
-	as NULL pointer
-drivers/bluetooth/btuart_cs.c:596:20: warning: Using plain integer
-	as NULL pointer
-...
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Regards / Pozdrawiam
+-------------------------------------------------------------------------------------------------------------
+Micha³ £abêdzki
+ASCII: Michal Labedzki
+e-mail: michal.labedzki@tieto.com
+office communicator: michal.labedzki@tieto.com
+location: Poland, Wroc³aw, Legnicka 55F
+room: 315
+phone: +48 717 740 340
 ---
- drivers/bluetooth/bt3c_cs.c   |    2 +-
- drivers/bluetooth/btuart_cs.c |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
-index b2b0fbb..8925b6d 100644
---- a/drivers/bluetooth/bt3c_cs.c
-+++ b/drivers/bluetooth/bt3c_cs.c
-@@ -664,7 +664,7 @@ static int bt3c_check_config(struct pcmcia_device *p_dev, void *priv_data)
- {
- 	int *try = priv_data;
- 
--	if (try == 0)
-+	if (!try)
- 		p_dev->io_lines = 16;
- 
- 	if ((p_dev->resource[0]->end != 8) || (p_dev->resource[0]->start == 0))
-diff --git a/drivers/bluetooth/btuart_cs.c b/drivers/bluetooth/btuart_cs.c
-index 65b8d99..21e803a 100644
---- a/drivers/bluetooth/btuart_cs.c
-+++ b/drivers/bluetooth/btuart_cs.c
-@@ -593,7 +593,7 @@ static int btuart_check_config(struct pcmcia_device *p_dev, void *priv_data)
- {
- 	int *try = priv_data;
- 
--	if (try == 0)
-+	if (!try)
- 		p_dev->io_lines = 16;
- 
- 	if ((p_dev->resource[0]->end != 8) || (p_dev->resource[0]->start == 0))
--- 
-1.7.9.5
-
+Tieto Corporation / Tieto Poland
+http://www.tieto.com / http://www.tieto.pl
+---
+Tieto Poland spó³ka z ograniczon± odpowiedzialno¶ci± z siedzib± w Szczecinie, ul. Malczewskiego 26. Zarejestrowana w S±dzie Rejonowym Szczecin-Centrum w Szczecinie, XIII Wydzia³ Gospodarczy Krajowego Rejestru S±dowego pod numerem 0000124858. NIP: 8542085557. REGON: 812023656. Kapita³ zak³adowy: 4 271500 PLN
