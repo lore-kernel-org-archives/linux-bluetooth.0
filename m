@@ -1,66 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAMOw1v7ZfiuMxXhXRo2RcB7-WK21gbfip3hXTuRYy=WCj2iaAQ@mail.gmail.com>
-References: <1339761848-7472-1-git-send-email-hdante@profusion.mobi>
-	<CAJdJm_OrV7Xua91zUcyATHCWtHHAZUsOYJbVL8Vn_194O8_=Hw@mail.gmail.com>
-	<CAFAvTnNJp0Q1JAt+HUy4X5mBG_xO+fQgUYoYiy+90uHJNtx9Mw@mail.gmail.com>
-	<CAFAvTnNcj8ODBqbKJpZzHmFE0Hy_oVtng9Lc-5Ess353Dv2LuQ@mail.gmail.com>
-	<CAAngNMaxPad3h8hXpCg4hN_gunjAjesQTeSv45a34X6+mG5+sw@mail.gmail.com>
-	<CAMOw1v7ZfiuMxXhXRo2RcB7-WK21gbfip3hXTuRYy=WCj2iaAQ@mail.gmail.com>
-Date: Wed, 20 Jun 2012 10:20:42 -0300
-Message-ID: <CAAngNMausNpp4oUvNLp3wiUe7xagbDekQ44ytuVUqz_h3swfBQ@mail.gmail.com>
-Subject: Re: [PATCH RFC] gdbus: Rename variables named "signal" (so that it
- can be compiled with -Wshadow)
-From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: Henrique Dante <hdante@profusion.mobi>,
-	Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
+	<frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] sdp: Prevent duplicate records registration
+Date: Wed, 20 Jun 2012 15:18:51 +0200
+Message-Id: <1340198331-20807-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jun 19, 2012 at 6:41 PM, Lucas De Marchi
-<lucas.demarchi@profusion.mobi> wrote:
-> On Tue, Jun 19, 2012 at 3:29 PM, Joao Paulo Rechi Vita
-> <jprvita@openbossa.org> wrote:
->> On Fri, Jun 15, 2012 at 9:45 AM, Henrique Dante <hdante@profusion.mobi> wrote:
->>> On Fri, Jun 15, 2012 at 9:43 AM, Henrique Dante <hdante@profusion.mobi> wrote:
->>>> On Fri, Jun 15, 2012 at 9:29 AM, Anderson Lizardo
->>>> <anderson.lizardo@openbossa.org> wrote:
->>>>> Hi Henrique,
->>>>>
->>>>> On Fri, Jun 15, 2012 at 8:04 AM, Henrique Dante de Almeida
->>>>> <hdante@profusion.mobi> wrote:
->>>>>> ---
->>>>>>  gdbus/object.c |   39 +++++++++++++++++++++------------------
->>>>>>  gdbus/watch.c  |    4 ++--
->>>>>>  2 files changed, 23 insertions(+), 20 deletions(-)
->>>>>
->>>>> Would it be interesting to add this option to acinclude.m4? Or does it
->>>>> generate too much noise?
->>>>
->>>>  It generates few warnings. Depending on the acceptance of this patch,
->>>> I could fix bluez as a whole and add -Wshadow to acinclude.m4.
->>>
->>>  Actually, I had a partial build here. Ignore the previous answer, it
->>> generates a lot of warnings.
->>>
->>
->> If we're not going to enable -Wshadow by default, does it make sense
->> to apply this patch? Who is going to check if no new shadow warnings
->> are being inserted in new commits?
->
-> I'm all for doing the following:
->
-> 1) Fix all the places with shadow variables
-> 2) Add -Wshadow to the warning flags
->
-> There are lots of them.
->
+Check if a record with same UUID and protocol descriptor already exists
+before adding new record to server
+---
+ src/sdpd-service.c |   43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-Yes, that makes sense.
-
+diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+index 39e05ab..a76f8b4 100644
+--- a/src/sdpd-service.c
++++ b/src/sdpd-service.c
+@@ -231,6 +231,46 @@ void register_device_id(void)
+ 	update_db_timestamp();
+ }
+ 
++static int sdpd_check_duplicate(sdp_record_t *rec)
++{
++	sdp_list_t *protos, *p;
++	int port = -1, psm = -1;
++
++	if (sdp_get_access_protos(rec, &protos) == 0) {
++		psm = sdp_get_proto_port(protos, L2CAP_UUID);
++		port = sdp_get_proto_port(protos, RFCOMM_UUID);
++
++		sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free, NULL);
++		sdp_list_free(protos, NULL);
++	}
++
++	for (p = sdp_get_record_list(); p; p = p->next) {
++		sdp_record_t *tmp = p->data;
++		int tmp_port = -1, tmp_psm = -1;
++
++		if (sdp_uuid_cmp(&tmp->svclass, &rec->svclass) != 0)
++			continue;
++
++		if (sdp_get_access_protos(tmp, &protos) == 0) {
++			tmp_psm = sdp_get_proto_port(protos, L2CAP_UUID);
++			tmp_port = sdp_get_proto_port(protos, RFCOMM_UUID);
++
++			sdp_list_foreach(protos,
++					 (sdp_list_func_t) sdp_list_free, NULL);
++			sdp_list_free(protos, NULL);
++		}
++
++		if (psm != tmp_psm || port != tmp_port)
++			continue;
++
++		DBG("Record duplicate: handle 0x%05x already exists with "
++				"same uuid and protos", tmp->handle);
++		return 1;
++	}
++
++	return 0;
++}
++
+ int add_record_to_server(const bdaddr_t *src, sdp_record_t *rec)
+ {
+ 	sdp_data_t *data;
+@@ -245,6 +285,9 @@ int add_record_to_server(const bdaddr_t *src, sdp_record_t *rec)
+ 			return -EEXIST;
+ 	}
+ 
++	if (sdpd_check_duplicate(rec))
++		return -EEXIST;
++
+ 	DBG("Adding record with handle 0x%05x", rec->handle);
+ 
+ 	sdp_record_add(src, rec);
 -- 
-João Paulo Rechi Vita
-Openbossa Labs - INdT
+1.7.9.5
+
