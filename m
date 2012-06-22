@@ -3,9 +3,9 @@ From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 19/19] hog: Use hardware country code
-Date: Fri, 22 Jun 2012 12:08:07 -0300
-Message-Id: <1340377687-4711-20-git-send-email-jprvita@openbossa.org>
+Subject: [PATCH BlueZ 18/19] hog: Add HID Information Characteristic read
+Date: Fri, 22 Jun 2012 12:08:06 -0300
+Message-Id: <1340377687-4711-19-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1340377687-4711-1-git-send-email-jprvita@openbossa.org>
 References: <1340377687-4711-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,59 +13,99 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
-bCountryCode is a 8-bits integer identifying hardware target country.
-
-The order of the characteristic declarations may be different on each
-implementation. Since GATT/ATT requests need to be serialized, HID
-information will be returned before report map characteristic value.
+This patch adds the characteristic value read for HID Information
+Characteristic. It's information contains HID Device's HID Attributes.
 ---
- input/hog_device.c |   17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ input/hog_device.c |   38 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 37 insertions(+), 1 deletion(-)
 
 diff --git a/input/hog_device.c b/input/hog_device.c
-index 2472806..dbbea10 100644
+index 3876d98..2472806 100644
 --- a/input/hog_device.c
 +++ b/input/hog_device.c
-@@ -296,7 +296,7 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 	ev.u.create.vendor = vendor;
- 	ev.u.create.product = product;
- 	ev.u.create.version = version;
--	ev.u.create.country = 0; /* get this info from the right place */
-+	ev.u.create.country = hogdev->bcountrycode;
- 	ev.u.create.bus = BUS_BLUETOOTH;
- 	ev.u.create.rd_data = value;
- 	ev.u.create.rd_size = vlen;
-@@ -338,6 +338,7 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
- 	bt_uuid_t report_uuid, report_map_uuid, info_uuid;
- 	struct report *report;
- 	GSList *l;
-+	uint16_t map_handle = 0, info_handle = 0;
+@@ -51,6 +51,7 @@
+ #include "attio.h"
+ #include "gatt.h"
  
- 	if (status != 0) {
- 		const char *str = att_ecode2str(status);
-@@ -369,12 +370,18 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
- 								report);
- 			discover_descriptor(hogdev->attrib, chr, next, report);
- 		} else if (bt_uuid_cmp(&uuid, &report_map_uuid) == 0)
--			gatt_read_char(hogdev->attrib, chr->value_handle, 0,
--						report_map_read_cb, hogdev);
-+			map_handle = chr->value_handle;
- 		else if (bt_uuid_cmp(&uuid, &info_uuid) == 0)
--			gatt_read_char(hogdev->attrib, chr->value_handle, 0,
--						info_read_cb, hogdev);
-+			info_handle = chr->value_handle;
- 	}
-+
-+	if (info_handle)
-+		gatt_read_char(hogdev->attrib, info_handle, 0,
-+							info_read_cb, hogdev);
-+
-+	if (map_handle)
-+		gatt_read_char(hogdev->attrib, map_handle, 0,
-+						report_map_read_cb, hogdev);
++#define HOG_INFO_UUID		0x2A4A
+ #define HOG_REPORT_MAP_UUID	0x2A4B
+ #define HOG_REPORT_UUID		0x2A4D
+ 
+@@ -61,6 +62,7 @@
+ #define UHID_DEVICE_FILE	"/dev/uhid"
+ 
+ #define HOG_REPORT_MAP_MAX_SIZE        512
++#define HID_INFO_SIZE			4
+ 
+ #ifndef MIN
+ #define MIN(x, y) ((x) < (y) ? (x) : (y))
+@@ -77,6 +79,9 @@ struct hog_device {
+ 	int			uhid_fd;
+ 	gboolean		prepend_id;
+ 	guint			uhid_watch_id;
++	uint16_t		bcdhid;
++	uint8_t			bcountrycode;
++	uint8_t			flags;
+ };
+ 
+ struct report {
+@@ -300,10 +305,37 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 		error("Failed to create uHID device: %s", strerror(errno));
  }
  
- static void output_written_cb(guint8 status, const guint8 *pdu,
++static void info_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
++							gpointer user_data)
++{
++	struct hog_device *hogdev = user_data;
++	uint8_t value[HID_INFO_SIZE];
++	ssize_t vlen;
++
++	if (status != 0) {
++		error("HID Information read failed: %s",
++						att_ecode2str(status));
++		return;
++	}
++
++	vlen = dec_read_resp(pdu, plen, value, sizeof(value));
++	if (vlen != 4) {
++		error("ATT protocol error");
++		return;
++	}
++
++	hogdev->bcdhid = att_get_u16(&value[0]);
++	hogdev->bcountrycode = value[2];
++	hogdev->flags = value[3];
++
++	DBG("bcdHID: 0x%04X bCountryCode: 0x%02X Flags: 0x%02X",
++			hogdev->bcdhid, hogdev->bcountrycode, hogdev->flags);
++}
++
+ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ {
+ 	struct hog_device *hogdev = user_data;
+-	bt_uuid_t report_uuid, report_map_uuid;
++	bt_uuid_t report_uuid, report_map_uuid, info_uuid;
+ 	struct report *report;
+ 	GSList *l;
+ 
+@@ -315,6 +347,7 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ 
+ 	bt_uuid16_create(&report_uuid, HOG_REPORT_UUID);
+ 	bt_uuid16_create(&report_map_uuid, HOG_REPORT_MAP_UUID);
++	bt_uuid16_create(&info_uuid, HOG_INFO_UUID);
+ 
+ 	for (l = chars; l; l = g_slist_next(l)) {
+ 		struct gatt_char *chr, *next;
+@@ -338,6 +371,9 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ 		} else if (bt_uuid_cmp(&uuid, &report_map_uuid) == 0)
+ 			gatt_read_char(hogdev->attrib, chr->value_handle, 0,
+ 						report_map_read_cb, hogdev);
++		else if (bt_uuid_cmp(&uuid, &info_uuid) == 0)
++			gatt_read_char(hogdev->attrib, chr->value_handle, 0,
++						info_read_cb, hogdev);
+ 	}
+ }
+ 
 -- 
 1.7.10.2
 
