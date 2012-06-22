@@ -1,69 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ 00/19] HID over GATT plugin
-Date: Fri, 22 Jun 2012 12:07:48 -0300
-Message-Id: <1340377687-4711-1-git-send-email-jprvita@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Subject: [PATCH] audio: permit concurrent use of AG and HF roles
+Date: Fri, 22 Jun 2012 16:11:25 +0200
+Message-Id: <1340374285-29720-1-git-send-email-frederic.dalleau@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is the plugin to support HID over GATT. It has the uHID module as a
-dependency, which is now integrated on the HID maintainer's tree [1]. A merge
-of the 'for-next' branch of this tree witht the master branch of bluetooth-next
-is necessary to test this plugin, with the uhid module compiled and loaded.
+If a device supports both HF and AG roles, then if a SCO connection related
+to AG profile happens, the connection is rejected because HF is not connected.
+One consequence is pulseaudio failing to load bluetooth module.
+---
+ audio/main.c |    9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-[1] git://git.kernel.org/pub/scm/linux/kernel/git/jikos/hid.git
-
-Known limitations:
-
-- No characteristics / descriptors handle storage, we discover everything on
-  every re-connection;
-
-- Discovery doesn't work when there is a bonded non-connected HoG device. We're
-  working to improve LE connection and discovery management in general, so this
-  will be addressed soon.
-
-Claudio Takahasi (7):
-  hog: Register HID over GATT device driver
-  hog: Add checking for 'EnableGatt'
-  hog: Discover descriptors for all characteristics
-  hog: Use real values for vendor and product IDs
-  hog: Add read Report Reference descriptor
-  hog: Add HID Information Characteristic read
-  hog: Use hardware country code
-
-João Paulo Rechi Vita (12):
-  hog: Register ATTIO callbacks
-  hog: Load primary service handle
-  hog: Discover all characteristics declaration
-  hog: Discover the "Report Map" characteristic
-  hog: Enable "Report" characteristic notifications
-  hog: Add report notification handler
-  hog: HID I/O driver
-  hog: Prepend Report ID to the HID report
-  hog: Add support for uHID events
-  hog: Handle output reports
-  hog: Handle output events
-  hog: Handle feature reports
-
- Makefile.am        |    5 +
- acinclude.m4       |    8 +
- attrib/gatt.h      |    1 +
- configure.ac       |    2 +
- input/hog_device.c |  650 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- input/hog_device.h |   28 +++
- input/main.c       |   24 ++
- input/manager.c    |   38 +++
- input/manager.h    |    3 +
- 9 files changed, 759 insertions(+)
- create mode 100644 input/hog_device.c
- create mode 100644 input/hog_device.h
-
+diff --git a/audio/main.c b/audio/main.c
+index 5c751af..a48c8b8 100644
+--- a/audio/main.c
++++ b/audio/main.c
+@@ -102,7 +102,7 @@ static void sco_server_cb(GIOChannel *chan, GError *err, gpointer data)
+ 	if (device->headset) {
+ 		if (headset_get_state(device) < HEADSET_STATE_CONNECTED) {
+ 			DBG("Refusing SCO from non-connected headset");
+-			goto drop;
++			goto gateway;
+ 		}
+ 
+ 		if (!headset_get_hfp_active(device)) {
+@@ -115,7 +115,11 @@ static void sco_server_cb(GIOChannel *chan, GError *err, gpointer data)
+ 			goto drop;
+ 
+ 		headset_set_state(device, HEADSET_STATE_PLAYING);
+-	} else if (device->gateway) {
++		goto connect;
++	}
++
++gateway:
++	if (device->gateway) {
+ 		if (!gateway_is_connected(device)) {
+ 			DBG("Refusing SCO from non-connected AG");
+ 			goto drop;
+@@ -126,6 +130,7 @@ static void sco_server_cb(GIOChannel *chan, GError *err, gpointer data)
+ 	} else
+ 		goto drop;
+ 
++connect:
+ 	sk = g_io_channel_unix_get_fd(chan);
+ 	fcntl(sk, F_SETFL, 0);
+ 
 -- 
-1.7.10.2
+1.7.9.5
 
