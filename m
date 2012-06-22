@@ -2,55 +2,68 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 02/19] hog: Add checking for 'EnableGatt'
-Date: Fri, 22 Jun 2012 12:07:50 -0300
-Message-Id: <1340377687-4711-3-git-send-email-jprvita@openbossa.org>
-In-Reply-To: <1340377687-4711-1-git-send-email-jprvita@openbossa.org>
-References: <1340377687-4711-1-git-send-email-jprvita@openbossa.org>
+Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+Subject: [PATCH BlueZ 00/19] HID over GATT plugin
+Date: Fri, 22 Jun 2012 12:07:48 -0300
+Message-Id: <1340377687-4711-1-git-send-email-jprvita@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+This is the plugin to support HID over GATT. It has the uHID module as a
+dependency, which is now integrated on the HID maintainer's tree [1]. A merge
+of the 'for-next' branch of this tree witht the master branch of bluetooth-next
+is necessary to test this plugin, with the uhid module compiled and loaded.
 
-This patch adds the verification for 'EnableGatt' config option on HoG
-plugin. HoG should not be enabled if EnableGatt is disabled.
----
- input/main.c |    9 +++++++++
- 1 file changed, 9 insertions(+)
+[1] git://git.kernel.org/pub/scm/linux/kernel/git/jikos/hid.git
 
-diff --git a/input/main.c b/input/main.c
-index 2aac3db..722bc49 100644
---- a/input/main.c
-+++ b/input/main.c
-@@ -32,6 +32,7 @@
- #include <gdbus.h>
- 
- #include "plugin.h"
-+#include "hcid.h"
- #include "log.h"
- #include "manager.h"
- 
-@@ -87,11 +88,19 @@ BLUETOOTH_PLUGIN_DEFINE(input, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
- 
- static int hog_init(void)
- {
-+	if (!main_opts.gatt_enabled) {
-+		DBG("GATT is disabled");
-+		return -ENOTSUP;
-+	}
-+
- 	return hog_manager_init();
- }
- 
- static void hog_exit(void)
- {
-+	if (!main_opts.gatt_enabled)
-+		return;
-+
- 	hog_manager_exit();
- }
- 
+Known limitations:
+
+- No characteristics / descriptors handle storage, we discover everything on
+  every re-connection;
+
+- Discovery doesn't work when there is a bonded non-connected HoG device. We're
+  working to improve LE connection and discovery management in general, so this
+  will be addressed soon.
+
+Claudio Takahasi (7):
+  hog: Register HID over GATT device driver
+  hog: Add checking for 'EnableGatt'
+  hog: Discover descriptors for all characteristics
+  hog: Use real values for vendor and product IDs
+  hog: Add read Report Reference descriptor
+  hog: Add HID Information Characteristic read
+  hog: Use hardware country code
+
+João Paulo Rechi Vita (12):
+  hog: Register ATTIO callbacks
+  hog: Load primary service handle
+  hog: Discover all characteristics declaration
+  hog: Discover the "Report Map" characteristic
+  hog: Enable "Report" characteristic notifications
+  hog: Add report notification handler
+  hog: HID I/O driver
+  hog: Prepend Report ID to the HID report
+  hog: Add support for uHID events
+  hog: Handle output reports
+  hog: Handle output events
+  hog: Handle feature reports
+
+ Makefile.am        |    5 +
+ acinclude.m4       |    8 +
+ attrib/gatt.h      |    1 +
+ configure.ac       |    2 +
+ input/hog_device.c |  650 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ input/hog_device.h |   28 +++
+ input/main.c       |   24 ++
+ input/manager.c    |   38 +++
+ input/manager.h    |    3 +
+ 9 files changed, 759 insertions(+)
+ create mode 100644 input/hog_device.c
+ create mode 100644 input/hog_device.h
+
 -- 
 1.7.10.2
 
