@@ -1,73 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 22 Jun 2012 18:36:47 -0300 (BRT)
-Message-Id: <20120622.183647.436747592564051847.pcacjr@zytor.com>
-To: jprvita@openbossa.org
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 14/19] hog: Add support for uHID events
-From: Paulo Alcantara <pcacjr@zytor.com>
-In-Reply-To: <1340377687-4711-15-git-send-email-jprvita@openbossa.org>
+From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 19/19] hog: Use hardware country code
+Date: Fri, 22 Jun 2012 12:08:07 -0300
+Message-Id: <1340377687-4711-20-git-send-email-jprvita@openbossa.org>
+In-Reply-To: <1340377687-4711-1-git-send-email-jprvita@openbossa.org>
 References: <1340377687-4711-1-git-send-email-jprvita@openbossa.org>
-	<1340377687-4711-15-git-send-email-jprvita@openbossa.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=iso-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: João Paulo Rechi Vita <jprvita@openbossa.org>
-Date: Fri, 22 Jun 2012 12:08:02 -0300
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
-> This patch adds the GLib GIOChannel watcher to monitor uhid events.
-> ---
->  input/hog_device.c |   44 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 44 insertions(+)
-> 
-> diff --git a/input/hog_device.c b/input/hog_device.c
-> index f58b16f..cd5d1bf 100644
-> --- a/input/hog_device.c
-> +++ b/input/hog_device.c
-> @@ -53,6 +53,7 @@
->  
->  #define HOG_REPORT_MAP_UUID	0x2A4B
->  #define HOG_REPORT_UUID		0x2A4D
-> +
->  #define UHID_DEVICE_FILE	"/dev/uhid"
->  
->  #define HOG_REPORT_MAP_MAX_SIZE        512
-> @@ -71,6 +72,7 @@ struct hog_device {
->  	GSList			*reports;
->  	int			uhid_fd;
->  	gboolean		prepend_id;
-> +	guint			uhid_watch_id;
->  };
->  
->  struct report {
-> @@ -335,6 +337,36 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
->  	}
->  }
->  
-> +static gboolean uhid_event_cb(GIOChannel *io, GIOCondition cond,
-> +							gpointer user_data)
-> +{
-> +	struct hog_device *hogdev = user_data;
-> +	struct uhid_event ev;
-> +	ssize_t bread;
-> +	int fd;
-> +
-> +	if (cond & (G_IO_ERR | G_IO_NVAL))
-> +		goto failed;
-> +
-> +	fd = g_io_channel_unix_get_fd(io);
-> +	memset(&ev, 0, sizeof(ev));
-> +
-> +	bread = read(fd, &ev, sizeof(ev));
-> +	if (bread < 0) {
-> +		int err = errno;
-> +		DBG("uhid-dev read: %s(%d)", strerror(err), err);
+bCountryCode is a 8-bits integer identifying hardware target country.
 
-Since this does not seem to be a debug message but instead an error one,
-shouldn't you use error() function here ?
+The order of the characteristic declarations may be different on each
+implementation. Since GATT/ATT requests need to be serialized, HID
+information will be returned before report map characteristic value.
+---
+ input/hog_device.c |   17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-Other than that the patch looks good to me.
+diff --git a/input/hog_device.c b/input/hog_device.c
+index 2472806..dbbea10 100644
+--- a/input/hog_device.c
++++ b/input/hog_device.c
+@@ -296,7 +296,7 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	ev.u.create.vendor = vendor;
+ 	ev.u.create.product = product;
+ 	ev.u.create.version = version;
+-	ev.u.create.country = 0; /* get this info from the right place */
++	ev.u.create.country = hogdev->bcountrycode;
+ 	ev.u.create.bus = BUS_BLUETOOTH;
+ 	ev.u.create.rd_data = value;
+ 	ev.u.create.rd_size = vlen;
+@@ -338,6 +338,7 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ 	bt_uuid_t report_uuid, report_map_uuid, info_uuid;
+ 	struct report *report;
+ 	GSList *l;
++	uint16_t map_handle = 0, info_handle = 0;
+ 
+ 	if (status != 0) {
+ 		const char *str = att_ecode2str(status);
+@@ -369,12 +370,18 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ 								report);
+ 			discover_descriptor(hogdev->attrib, chr, next, report);
+ 		} else if (bt_uuid_cmp(&uuid, &report_map_uuid) == 0)
+-			gatt_read_char(hogdev->attrib, chr->value_handle, 0,
+-						report_map_read_cb, hogdev);
++			map_handle = chr->value_handle;
+ 		else if (bt_uuid_cmp(&uuid, &info_uuid) == 0)
+-			gatt_read_char(hogdev->attrib, chr->value_handle, 0,
+-						info_read_cb, hogdev);
++			info_handle = chr->value_handle;
+ 	}
++
++	if (info_handle)
++		gatt_read_char(hogdev->attrib, info_handle, 0,
++							info_read_cb, hogdev);
++
++	if (map_handle)
++		gatt_read_char(hogdev->attrib, map_handle, 0,
++						report_map_read_cb, hogdev);
+ }
+ 
+ static void output_written_cb(guint8 status, const guint8 *pdu,
+-- 
+1.7.10.2
 
-
-		Paulo
