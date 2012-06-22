@@ -4,108 +4,101 @@ From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ 05/19] hog: Discover all characteristics declaration
-Date: Fri, 22 Jun 2012 12:07:53 -0300
-Message-Id: <1340377687-4711-6-git-send-email-jprvita@openbossa.org>
+Subject: [PATCH BlueZ 04/19] hog: Load primary service handle
+Date: Fri, 22 Jun 2012 12:07:52 -0300
+Message-Id: <1340377687-4711-5-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1340377687-4711-1-git-send-email-jprvita@openbossa.org>
 References: <1340377687-4711-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HID service supports multiple report characteristic. Each report
-characteristic has a reference descriptor containing ID and type.
 ---
- input/hog_device.c |   52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+ input/hog_device.c |   31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
 diff --git a/input/hog_device.c b/input/hog_device.c
-index 6ce05a9..791550a 100644
+index 687dc95..6ce05a9 100644
 --- a/input/hog_device.c
 +++ b/input/hog_device.c
-@@ -47,21 +47,65 @@
- #include "attio.h"
- #include "gatt.h"
+@@ -31,6 +31,7 @@
+ #include <unistd.h>
  
-+#define HOG_REPORT_UUID		0x2A4D
-+
-+struct report {
-+	struct gatt_char *decl;
-+};
-+
+ #include <bluetooth/bluetooth.h>
++#include <bluetooth/uuid.h>
+ 
+ #include <glib.h>
+ 
+@@ -41,14 +42,17 @@
+ 
+ #include "hog_device.h"
+ 
++#include "att.h"
+ #include "gattrib.h"
+ #include "attio.h"
++#include "gatt.h"
+ 
  struct hog_device {
  	char			*path;
  	struct btd_device	*device;
  	GAttrib			*attrib;
  	guint			attioid;
- 	struct gatt_primary	*hog_primary;
-+	GSList			*reports;
++	struct gatt_primary	*hog_primary;
  };
  
  static GSList *devices = NULL;
+@@ -95,18 +99,44 @@ static struct hog_device *hog_device_new(struct btd_device *device,
+ 	return hogdev;
+ }
  
-+static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
++static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
 +{
-+	struct hog_device *hogdev = user_data;
-+	bt_uuid_t report_uuid;
-+	struct report *report;
-+	GSList *l;
++	const struct gatt_primary *prim = a;
++	const char *uuid = b;
 +
-+	if (status != 0) {
-+		const char *str = att_ecode2str(status);
-+		DBG("Discover all characteristics failed: %s", str);
-+		return;
-+	}
-+
-+	bt_uuid16_create(&report_uuid, HOG_REPORT_UUID);
-+
-+	for (l = chars; l; l = g_slist_next(l)) {
-+		struct gatt_char *chr = l->data;
-+		bt_uuid_t uuid;
-+
-+		DBG("0x%04x UUID: %s properties: %02x",
-+				chr->handle, chr->uuid, chr->properties);
-+
-+		bt_string_to_uuid(&uuid, chr->uuid);
-+
-+		if (bt_uuid_cmp(&uuid, &report_uuid) != 0)
-+			continue;
-+
-+		report = g_new0(struct report, 1);
-+		report->decl = g_memdup(chr, sizeof(*chr));
-+		hogdev->reports = g_slist_append(hogdev->reports, report);
-+	}
++	return g_strcmp0(prim->uuid, uuid);
 +}
 +
- static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
++static struct gatt_primary *load_hog_primary(struct btd_device *device)
++{
++	GSList *primaries, *l;
++
++	primaries = btd_device_get_primaries(device);
++
++	l = g_slist_find_custom(primaries, HOG_UUID, primary_uuid_cmp);
++
++	return (l ? l->data : NULL);
++}
++
+ int hog_device_register(struct btd_device *device, const char *path)
  {
- 	struct hog_device *hogdev = user_data;
-+	struct gatt_primary *prim = hogdev->hog_primary;
+ 	struct hog_device *hogdev;
++	struct gatt_primary *prim;
  
- 	hogdev->attrib = g_attrib_ref(attrib);
+ 	hogdev = find_device_by_path(devices, path);
+ 	if (hogdev)
+ 		return -EALREADY;
+ 
++	prim = load_hog_primary(device);
++	if (!prim)
++		return -EINVAL;
 +
-+	gatt_discover_char(hogdev->attrib, prim->range.start, prim->range.end,
-+					NULL, char_discovered_cb, hogdev);
- }
+ 	hogdev = hog_device_new(device, path);
+ 	if (!hogdev)
+ 		return -ENOMEM;
  
- static void attio_disconnected_cb(gpointer user_data)
-@@ -148,9 +192,17 @@ int hog_device_register(struct btd_device *device, const char *path)
- 	return 0;
- }
- 
-+static void report_free(void *data)
-+{
-+	struct report *report = data;
-+	g_free(report->decl);
-+	g_free(report);
-+}
++	hogdev->hog_primary = g_memdup(prim, sizeof(*prim));
 +
- static void hog_device_free(struct hog_device *hogdev)
+ 	hogdev->attioid = btd_device_add_attio_callback(device,
+ 							attio_connected_cb,
+ 							attio_disconnected_cb,
+@@ -122,6 +152,7 @@ static void hog_device_free(struct hog_device *hogdev)
  {
  	btd_device_unref(hogdev->device);
-+	g_slist_free_full(hogdev->reports, report_free);
  	g_free(hogdev->path);
- 	g_free(hogdev->hog_primary);
++	g_free(hogdev->hog_primary);
  	g_free(hogdev);
+ }
+ 
 -- 
 1.7.10.2
 
