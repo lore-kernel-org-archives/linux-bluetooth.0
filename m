@@ -1,50 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4FE5D57B.7090603@ruff.mobi>
-Date: Sat, 23 Jun 2012 16:40:59 +0200
-From: "Ruslan N. Marchenko" <me@ruff.mobi>
-MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	BlueZ <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] pcm_bluetooth: accept BT_A2DP_SBC_SOURCE codec
-References: <4FE44DAD.90004@ruff.mobi> <CABBYNZLKfMYfuk=N2qwh4skzffM5PT5hu5HXCPiZOZiAgdj=Eg@mail.gmail.com>
-In-Reply-To: <CABBYNZLKfMYfuk=N2qwh4skzffM5PT5hu5HXCPiZOZiAgdj=Eg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ] gdbus: Fix removal of filter after last filter_data
+Date: Sat, 23 Jun 2012 11:02:17 -0300
+Message-Id: <1340460137-4279-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz Augusto,
+If there's a signal watch that's also watching for name
+(data->name_watch) currently we are trying to remove the message_filter
+twice since we may have the following call chain:
 
-Am 22.06.2012 22:34, schrieb Luiz Augusto von Dentz:
-> Hi Ruslan,
->
-> On Fri, Jun 22, 2012 at 1:49 PM, Ruslan N. Marchenko <me@ruff.mobi> wrote:
->> Current implementation of the PCM code is considering capture (source) mode
->> however it ignores codecs of the SBC_SOURCE type while parsing capabilities.
->> With these two lines source codec is accepted, although proper capture mode
->> might require additional changes.
->>
->> Signed-off-by: Ruslan N. Marchenko <me@ruff.mobi>
->> ---
->>   audio/pcm_bluetooth.c |    4 +++-
->>   1 file changed, 3 insertions(+), 1 deletion(-)
-> We are about to remove alsa support from BlueZ as it doesn't support
-> the Media API, so this is a nak
-I see even trunk PA, mentioned [1] to be using Media API is using same 
-calls in the same ipc.c(bt_audio_service_open) - is it something still 
-to be cleaned up?
-Anyway - does it make sense to port pcm_bluetooth to Media API 
-(media.c)? Or BlueZ team is going to abandon it in favour of PA in any 
-case? I mean if someone submit patches for pcm on Media API is there 
-chance for patches to be accepted?
+filter_data_remove_callback()
+  filter_data_free()
+    g_dbus_remove_watch()
+      filter_data_remove_callback()
+	filter_data_free()
+        dbus_connection_remove_filter()
+  dbus_connection_remove_filter()
 
-1. - 
-http://lists.freedesktop.org/archives/pulseaudio-discuss/2011-November/012222.html
-> Please next time use git format-patch + git send-email so it is easier
-> to us to apply the patch using git am, also there is no need for the
-> signed-off-by for userspace patches.
-Thanks for tips, will follow.
+Because of this we can't currently watch for signals passing the bus
+name. After this patch we don't have this issue anymore.
 
+We fix this by checking if we are the last filter_data before calling
+filter_data_free and thus not calling dbus_connection_remove_filter()
+twice.
+---
+ gdbus/watch.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/gdbus/watch.c b/gdbus/watch.c
+index 9a716b0..6fed264 100644
+--- a/gdbus/watch.c
++++ b/gdbus/watch.c
+@@ -350,6 +350,7 @@ static gboolean filter_data_remove_callback(struct filter_data *data,
+ 						struct filter_callback *cb)
+ {
+ 	DBusConnection *connection;
++	struct filter_data *data_next;
+ 
+ 	data->callbacks = g_slist_remove(data->callbacks, cb);
+ 	data->processed = g_slist_remove(data->processed, cb);
+@@ -376,12 +377,17 @@ static gboolean filter_data_remove_callback(struct filter_data *data,
+ 
+ 	connection = dbus_connection_ref(data->connection);
+ 	listeners = g_slist_remove(listeners, data);
++
++	/*
++	 * filter_data_free() may remove the latest data - we need to check
++	 * before it runs if it's our duty to remove the filter
++	 */
++	data_next = filter_data_find(connection, NULL, NULL, NULL, NULL, NULL,
++									NULL);
+ 	filter_data_free(data);
+ 
+ 	/* Remove filter if there are no listeners left for the connection */
+-	data = filter_data_find(connection, NULL, NULL, NULL, NULL, NULL,
+-					NULL);
+-	if (data == NULL)
++	if (data_next == NULL)
+ 		dbus_connection_remove_filter(connection, message_filter,
+ 						NULL);
+ 
 -- 
-Looking forward to reading yours...
-      Ruslan N. Marchenko
+1.7.11
 
