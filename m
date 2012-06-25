@@ -2,32 +2,79 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ 2/3] telephony-ofono: Fix listening for signals
-Date: Mon, 25 Jun 2012 12:44:41 -0300
-Message-Id: <1340639082-10347-2-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1340639082-10347-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ 1/3] gdbus: Fix removal of filter after last filter_data
+Date: Mon, 25 Jun 2012 12:44:40 -0300
+Message-Id: <1340639082-10347-1-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <CABBYNZ+oS3tGhYVY01uE6gfuzmA94TqV3YybgHdG83pCMzW8vA@mail.gmail.com>
 References: <CABBYNZ+oS3tGhYVY01uE6gfuzmA94TqV3YybgHdG83pCMzW8vA@mail.gmail.com>
- <1340639082-10347-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We should listen for signals only on oFono bus name.
----
- audio/telephony-ofono.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+If there's a signal watch that's also watching for name
+(data->name_watch) currently we are trying to remove the message_filter
+twice since we may have the following call chain:
 
-diff --git a/audio/telephony-ofono.c b/audio/telephony-ofono.c
-index 961fedd..67eb87b 100644
---- a/audio/telephony-ofono.c
-+++ b/audio/telephony-ofono.c
-@@ -742,7 +742,7 @@ static struct voice_call *call_new(const char *path, DBusMessageIter *properties
+filter_data_remove_callback()
+  filter_data_free()
+    g_dbus_remove_watch()
+      filter_data_remove_callback()
+	filter_data_free()
+        dbus_connection_remove_filter()
+  dbus_connection_remove_filter()
+
+Because of this we can't currently watch for signals passing the bus
+name. After this patch we don't have this issue anymore.
+
+We fix it by removing the filter before calling filter_data_free() if we
+are the last filter_data and thus avoid calling
+dbus_connection_remove_filter() twice.
+---
+ gdbus/watch.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/gdbus/watch.c b/gdbus/watch.c
+index 9a716b0..d749176 100644
+--- a/gdbus/watch.c
++++ b/gdbus/watch.c
+@@ -376,15 +376,14 @@ static gboolean filter_data_remove_callback(struct filter_data *data,
  
- 	vc = g_new0(struct voice_call, 1);
- 	vc->obj_path = g_strdup(path);
--	vc->watch = g_dbus_add_signal_watch(connection, NULL, path,
-+	vc->watch = g_dbus_add_signal_watch(connection, OFONO_BUS_NAME, path,
- 					OFONO_VC_INTERFACE, "PropertyChanged",
- 					handle_vc_property_changed, vc, NULL);
+ 	connection = dbus_connection_ref(data->connection);
+ 	listeners = g_slist_remove(listeners, data);
+-	filter_data_free(data);
+ 
+ 	/* Remove filter if there are no listeners left for the connection */
+-	data = filter_data_find(connection, NULL, NULL, NULL, NULL, NULL,
+-					NULL);
+-	if (data == NULL)
++	if (filter_data_find(connection, NULL, NULL, NULL, NULL, NULL,
++								NULL) == NULL)
+ 		dbus_connection_remove_filter(connection, message_filter,
+ 						NULL);
+ 
++	filter_data_free(data);
+ 	dbus_connection_unref(connection);
+ 
+ 	return TRUE;
+@@ -537,15 +536,15 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
+ 	remove_match(data);
+ 
+ 	listeners = g_slist_remove(listeners, data);
+-	filter_data_free(data);
+ 
+-	/* Remove filter if there no listener left for the connection */
+-	data = filter_data_find(connection, NULL, NULL, NULL, NULL, NULL,
+-					NULL);
+-	if (data == NULL)
++	/* Remove filter if there are no listeners left for the connection */
++	if (filter_data_find(connection, NULL, NULL, NULL, NULL, NULL,
++								NULL) == NULL)
+ 		dbus_connection_remove_filter(connection, message_filter,
+ 						NULL);
+ 
++	filter_data_free(data);
++
+ 	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+ }
  
 -- 
 1.7.11
