@@ -1,29 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
+From: Oliver Neukum <oneukum@suse.de>
+To: James <theholyettlz@gmail.com>
+Subject: Re: Bluetooth dongle (13d3:3304) not responding after reboot until suspend/resume
+Date: Mon, 25 Jun 2012 14:29:44 +0200
+Cc: Al Cho <acho@suse.com>, linux-bluetooth@vger.kernel.org
+References: <1340312488.2203.16.camel@iseult> <201206220826.36147.oneukum@suse.de> <1340441172.2390.9.camel@iseult>
+In-Reply-To: <1340441172.2390.9.camel@iseult>
 MIME-Version: 1.0
-In-Reply-To: <1339760580-8219-1-git-send-email-ant@antweb.me>
-References: <1339760580-8219-1-git-send-email-ant@antweb.me>
-Date: Mon, 25 Jun 2012 09:04:07 -0400
-Message-ID: <CAJdJm_Ngu1MW3wQ1E19_oC1oRzSa3-2kyT_cm2U5rwK7DB1oZg@mail.gmail.com>
-Subject: Re: [PATCH] monitor: Fix optstring to parse -b parameter
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Anton Weber <ant@antweb.me>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Message-Id: <201206251429.44637.oneukum@suse.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anton,
+Am Samstag, 23. Juni 2012, 10:46:12 schrieb James:
+> On Fri, 2012-06-22 at 08:26 +0200, Oliver Neukum wrote:
+> 
+> > Basically the device is semi-reset and ath3k cannot deal with a device
+> > in that state. But that doesn't tell us what can be done. Please post "lsusb -v"
+> > of your device _before_ ath3k is loaded (you should disable ath3k and btusb
+> > for that test) in both states, after cold boot and warm reboot from Windows.
+> 
+> I blacklisted ath3k and btusb and captured the following lsusb -v
+> outputs for the device, which are attached with names as follows:
+> 
+> 1. lsusb-cold_linux.log
+>    Taken from a cold boot straight into Linux. [Manually loaded ath3k
+>    and btusb afterwards, and everything worked properly.]
+> 
+> 2. lsusb-after_win7.log
+>    Taken after warm reboot into Linux from Windows 7. Here, lsusb -v
+>    worked without the strange delay.
 
-On Fri, Jun 15, 2012 at 7:43 AM, Anton Weber <ant@antweb.me> wrote:
-> Without the colon getopt ignores the parameter and optarg is always NULL.
-> ---
->  monitor/main.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+Hm. This is a bit problematic as we already do a reset in the enumeration
+process. And we cannot tell the states apart based on the descriptors.
+Al, any idea?
 
-I tested your patch and it fixed -b option for me.
-
-Best Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+	Regards
+		Oliver
