@@ -1,92 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
+From: <Michal.Labedzki@tieto.com>
+To: <lucas.demarchi@profusion.mobi>, <wu.zheng@intel.com>
+CC: <linux-bluetooth@vger.kernel.org>
+Date: Tue, 26 Jun 2012 10:07:29 +0300
+Subject: RE: using simple-player for testing avrcp
+Message-ID: <E50901D4F2CF69428D43141B7C85867929E12C715F@EXMB03.eu.tieto.com>
+References: <2CF57A644018A745B8FE029C7223E16E0FD7924A@SHSMSX102.ccr.corp.intel.com>,<CAMOw1v61pPwKq+3AG9wZpEYrBHxqtM4ZB2sWiFJnyKigd1W=rA@mail.gmail.com>
+In-Reply-To: <CAMOw1v61pPwKq+3AG9wZpEYrBHxqtM4ZB2sWiFJnyKigd1W=rA@mail.gmail.com>
+Content-Type: text/plain; charset="iso-8859-2"
 MIME-Version: 1.0
-In-Reply-To: <1340639082-10347-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <CABBYNZ+oS3tGhYVY01uE6gfuzmA94TqV3YybgHdG83pCMzW8vA@mail.gmail.com>
-	<1340639082-10347-1-git-send-email-lucas.demarchi@profusion.mobi>
-Date: Tue, 26 Jun 2012 10:45:39 +0300
-Message-ID: <CABBYNZJk3d3CPLD8TVSnrve_yE9rbn1Ec9OdxPF2eXnGFz1EdA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] gdbus: Fix removal of filter after last filter_data
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi, 
 
-On Mon, Jun 25, 2012 at 6:44 PM, Lucas De Marchi
-<lucas.demarchi@profusion.mobi> wrote:
-> If there's a signal watch that's also watching for name
-> (data->name_watch) currently we are trying to remove the message_filter
-> twice since we may have the following call chain:
->
-> filter_data_remove_callback()
->  filter_data_free()
->    g_dbus_remove_watch()
->      filter_data_remove_callback()
->        filter_data_free()
->        dbus_connection_remove_filter()
->  dbus_connection_remove_filter()
->
-> Because of this we can't currently watch for signals passing the bus
-> name. After this patch we don't have this issue anymore.
->
-> We fix it by removing the filter before calling filter_data_free() if we
-> are the last filter_data and thus avoid calling
-> dbus_connection_remove_filter() twice.
-> ---
->  gdbus/watch.c | 17 ++++++++---------
->  1 file changed, 8 insertions(+), 9 deletions(-)
->
-> diff --git a/gdbus/watch.c b/gdbus/watch.c
-> index 9a716b0..d749176 100644
-> --- a/gdbus/watch.c
-> +++ b/gdbus/watch.c
-> @@ -376,15 +376,14 @@ static gboolean filter_data_remove_callback(struct filter_data *data,
->
->        connection = dbus_connection_ref(data->connection);
->        listeners = g_slist_remove(listeners, data);
-> -       filter_data_free(data);
->
->        /* Remove filter if there are no listeners left for the connection */
-> -       data = filter_data_find(connection, NULL, NULL, NULL, NULL, NULL,
-> -                                       NULL);
-> -       if (data == NULL)
-> +       if (filter_data_find(connection, NULL, NULL, NULL, NULL, NULL,
-> +                                                               NULL) == NULL)
->                dbus_connection_remove_filter(connection, message_filter,
->                                                NULL);
->
-> +       filter_data_free(data);
->        dbus_connection_unref(connection);
->
->        return TRUE;
-> @@ -537,15 +536,15 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
->        remove_match(data);
->
->        listeners = g_slist_remove(listeners, data);
-> -       filter_data_free(data);
->
-> -       /* Remove filter if there no listener left for the connection */
-> -       data = filter_data_find(connection, NULL, NULL, NULL, NULL, NULL,
-> -                                       NULL);
-> -       if (data == NULL)
-> +       /* Remove filter if there are no listeners left for the connection */
-> +       if (filter_data_find(connection, NULL, NULL, NULL, NULL, NULL,
-> +                                                               NULL) == NULL)
->                dbus_connection_remove_filter(connection, message_filter,
->                                                NULL);
->
-> +       filter_data_free(data);
-> +
->        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
->  }
->
-> --
-> 1.7.11
+> Call "Connect" on Control interface (you need to enable it in your
+> /etc/bluetooth/audio.conf file)
 
-Ack.
+"Control" interface seems to be enabled by default (for a long time). Depending on BlueZ version 
+"Media" interface are enabled (latest) or not, so to be sure I recommend to enable both in audio.conf.
 
--- 
-Luiz Augusto von Dentz
+Does your remote controller not try to connect to AVRCP on device with BlueZ? 
+Some remote controller can autoconnect AVRCP by triggering A2DP.
+
+Regards / Pozdrawiam
+-------------------------------------------------------------------------------------------------------------
+Micha³ £abêdzki
+ASCII: Michal Labedzki
+e-mail: michal.labedzki@tieto.com
+office communicator: michal.labedzki@tieto.com
+location: Poland, Wroc³aw, Legnicka 55F
+room: 315
+phone: +48 717 740 340
+---
+Tieto Corporation / Tieto Poland
+http://www.tieto.com / http://www.tieto.pl
+---
+Tieto Poland spó³ka z ograniczon± odpowiedzialno¶ci± z siedzib± w Szczecinie, ul. Malczewskiego 26. Zarejestrowana w S±dzie Rejonowym Szczecin-Centrum w Szczecinie, XIII Wydzia³ Gospodarczy Krajowego Rejestru S±dowego pod numerem 0000124858. NIP: 8542085557. REGON: 812023656. Kapita³ zak³adowy: 4 271500 PLN
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
