@@ -1,89 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ] Fix GDBus flags after conversion to macros
-Date: Tue, 26 Jun 2012 18:11:25 -0300
-Message-Id: <1340745085-31244-1-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Tue, 26 Jun 2012 08:33:19 -0700
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Anton Weber <ant@antweb.me>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] monitor: Fix optstring to parse -b parameter
+Message-ID: <20120626153319.GB4206@joana>
+References: <1339760580-8219-1-git-send-email-ant@antweb.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1339760580-8219-1-git-send-email-ant@antweb.me>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Commit "aa3b9016bf444b60e1b7e1804dfc323a23a93c5a Convert GDBus methods
-to use macro helpers" converted the previous tables to use the new
-macros but some flags were lost.
----
- attrib/client.c   | 2 +-
- audio/control.c   | 2 +-
- audio/headset.c   | 2 +-
- audio/transport.c | 2 +-
- src/manager.c     | 2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
+Hi Anton,
 
-diff --git a/attrib/client.c b/attrib/client.c
-index 8d119df..b3e3abe 100644
---- a/attrib/client.c
-+++ b/attrib/client.c
-@@ -519,7 +519,7 @@ static const GDBusMethodTable char_methods[] = {
- 	{ GDBUS_METHOD("GetProperties",
- 			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
- 			get_properties) },
--	{ GDBUS_METHOD("SetProperty",
-+	{ GDBUS_ASYNC_METHOD("SetProperty",
- 			GDBUS_ARGS({ "name", "s" }, { "value", "v" }), NULL,
- 			set_property) },
- 	{ }
-diff --git a/audio/control.c b/audio/control.c
-index c5a6a58..187f838 100644
---- a/audio/control.c
-+++ b/audio/control.c
-@@ -198,7 +198,7 @@ static DBusMessage *control_get_properties(DBusConnection *conn,
- }
- 
- static const GDBusMethodTable control_methods[] = {
--	{ GDBUS_ASYNC_METHOD("IsConnected",
-+	{ GDBUS_DEPRECATED_METHOD("IsConnected",
- 				NULL, GDBUS_ARGS({ "connected", "b" }),
- 				control_is_connected) },
- 	{ GDBUS_METHOD("GetProperties",
-diff --git a/audio/headset.c b/audio/headset.c
-index 729e4dc..b9c6265 100644
---- a/audio/headset.c
-+++ b/audio/headset.c
-@@ -2094,7 +2094,7 @@ static const GDBusMethodTable headset_methods[] = {
- static const GDBusSignalTable headset_signals[] = {
- 	{ GDBUS_DEPRECATED_SIGNAL("Connected", NULL) },
- 	{ GDBUS_DEPRECATED_SIGNAL("Disconnected", NULL) },
--	{ GDBUS_DEPRECATED_SIGNAL("AnswerRequested", NULL) },
-+	{ GDBUS_SIGNAL("AnswerRequested", NULL) },
- 	{ GDBUS_DEPRECATED_SIGNAL("Stopped", NULL) },
- 	{ GDBUS_DEPRECATED_SIGNAL("Playing", NULL) },
- 	{ GDBUS_DEPRECATED_SIGNAL("SpeakerGainChanged",
-diff --git a/audio/transport.c b/audio/transport.c
-index b015625..832ad2a 100644
---- a/audio/transport.c
-+++ b/audio/transport.c
-@@ -959,7 +959,7 @@ static const GDBusMethodTable transport_methods[] = {
- 	{ GDBUS_ASYNC_METHOD("Release",
- 			GDBUS_ARGS({ "access_type", "s" }), NULL,
- 			release ) },
--	{ GDBUS_ASYNC_METHOD("SetProperty",
-+	{ GDBUS_METHOD("SetProperty",
- 			GDBUS_ARGS({ "name", "s" }, { "value", "v" }),
- 			NULL, set_property) },
- 	{ },
-diff --git a/src/manager.c b/src/manager.c
-index 385354d..7061f64 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -207,7 +207,7 @@ static const GDBusMethodTable manager_methods[] = {
- 			GDBUS_ARGS({ "pattern", "s" }),
- 			GDBUS_ARGS({ "adapter", "o" }),
- 			find_adapter) },
--	{ GDBUS_ASYNC_METHOD("ListAdapters",
-+	{ GDBUS_DEPRECATED_METHOD("ListAdapters",
- 			NULL, GDBUS_ARGS({ "adapters", "ao" }),
- 			list_adapters) },
- 	{ }
--- 
-1.7.11.1
+* Anton Weber <ant@antweb.me> [2012-06-15 13:43:00 +0200]:
 
+> Without the colon getopt ignores the parameter and optarg is always NULL.
+> ---
+>  monitor/main.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/monitor/main.c b/monitor/main.c
+> index 90e32c5..0b8ae30 100644
+> --- a/monitor/main.c
+> +++ b/monitor/main.c
+> @@ -73,7 +73,7 @@ int main(int argc, char *argv[])
+>  	for (;;) {
+>  		int opt;
+>  
+> -		opt = getopt_long(argc, argv, "bvh", main_options, NULL);
+> +		opt = getopt_long(argc, argv, "b:vh", main_options, NULL);
+>  		if (opt < 0)
+>  			break;
+
+Ack.
+
+	Gustavo
