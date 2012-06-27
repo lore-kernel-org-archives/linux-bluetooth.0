@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 02/17] Bluetooth: Add basic state tracking to Three-wire UART driver
-Date: Wed, 27 Jun 2012 14:25:52 +0300
-Message-Id: <1340796367-10321-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 01/17] Bluetooth: Initial skeleton for Three-wire UART (H5) support
+Date: Wed, 27 Jun 2012 14:25:51 +0300
+Message-Id: <1340796367-10321-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1340796367-10321-1-git-send-email-johan.hedberg@gmail.com>
 References: <1340796367-10321-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,145 +11,183 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds basic state tracking and socket buffer handling to the
-Three-wire UART (H5) HCI driver.
+This patch adds the initial skeleton for Three-wire UART (H5) support
+and hooks it up to the HCI UART framework.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- drivers/bluetooth/hci_h5.c |   98 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 94 insertions(+), 4 deletions(-)
+ drivers/bluetooth/Kconfig     |   12 ++++++
+ drivers/bluetooth/Makefile    |    1 +
+ drivers/bluetooth/hci_h5.c    |   88 +++++++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/hci_ldisc.c |    6 +++
+ drivers/bluetooth/hci_uart.h  |    5 +++
+ 5 files changed, 112 insertions(+)
+ create mode 100644 drivers/bluetooth/hci_h5.c
 
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 5ccf142..e9f203e 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -81,6 +81,18 @@ config BT_HCIUART_LL
+ 
+ 	  Say Y here to compile support for HCILL protocol.
+ 
++config BT_HCIUART_3WIRE
++	bool "Three-wire UART (H5) protocol support"
++	depends on BT_HCIUART
++	help
++	  The HCI Three-wire UART Transport Layer makes it possible to
++	  user the Bluetooth HCI over a serial port interface. The HCI
++	  Three-wire UART Transport Layer assumes that the UART
++	  communication may have bit errors, overrun errors or burst
++	  errors and thereby making CTS/RTS lines unnecessary.
++
++	  Say Y here to compile support for Three-wire UART protocol.
++
+ config BT_HCIBCM203X
+ 	tristate "HCI BCM203x USB driver"
+ 	depends on USB
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index f4460f4..4afae20 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -28,4 +28,5 @@ hci_uart-$(CONFIG_BT_HCIUART_H4)	+= hci_h4.o
+ hci_uart-$(CONFIG_BT_HCIUART_BCSP)	+= hci_bcsp.o
+ hci_uart-$(CONFIG_BT_HCIUART_LL)	+= hci_ll.o
+ hci_uart-$(CONFIG_BT_HCIUART_ATH3K)	+= hci_ath.o
++hci_uart-$(CONFIG_BT_HCIUART_3WIRE)	+= hci_h5.o
+ hci_uart-objs				:= $(hci_uart-y)
 diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 6353d00..c610ba3 100644
---- a/drivers/bluetooth/hci_h5.c
+new file mode 100644
+index 0000000..6353d00
+--- /dev/null
 +++ b/drivers/bluetooth/hci_h5.c
-@@ -30,14 +30,50 @@
- 
- #include "hci_uart.h"
- 
-+#define H5_TXWINSIZE 4
+@@ -0,0 +1,88 @@
++/*
++ *
++ *  Bluetooth HCI Three-wire UART driver
++ *
++ *  Copyright (C) 2012  Intel Corporation
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ */
 +
-+struct h5 {
-+	struct sk_buff_head unack;	/* Unack'ed packets queue */
-+	struct sk_buff_head rel;	/* Reliable packets queue */
-+	struct sk_buff_head unrel;	/* Unreliable packets queue */
++#include <linux/kernel.h>
++#include <linux/errno.h>
++#include <linux/skbuff.h>
 +
-+	struct sk_buff *rx_skb;
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
 +
-+	bool txack_req;
++#include "hci_uart.h"
 +
-+	u8 msgq_txseq;
++static int h5_open(struct hci_uart *hu)
++{
++	return -ENOSYS;
++}
++
++static int h5_close(struct hci_uart *hu)
++{
++	return -ENOSYS;
++}
++
++static int h5_recv(struct hci_uart *hu, void *data, int count)
++{
++	return -ENOSYS;
++}
++
++static int h5_enqueue(struct hci_uart *hu, struct sk_buff *skb)
++{
++	return -ENOSYS;
++}
++
++static struct sk_buff *h5_dequeue(struct hci_uart *hu)
++{
++	return NULL;
++}
++
++static int h5_flush(struct hci_uart *hu)
++{
++	return -ENOSYS;
++}
++
++static struct hci_uart_proto h5p = {
++	.id		= HCI_UART_3WIRE,
++	.open		= h5_open,
++	.close		= h5_close,
++	.recv		= h5_recv,
++	.enqueue	= h5_enqueue,
++	.dequeue	= h5_dequeue,
++	.flush		= h5_flush,
 +};
 +
- static int h5_open(struct hci_uart *hu)
- {
--	return -ENOSYS;
-+	struct h5 *h5;
++int __init h5_init(void)
++{
++	int err = hci_uart_register_proto(&h5p);
 +
-+	BT_DBG("hu %p", hu);
++	if (!err)
++		BT_INFO("HCI Three-wire UART (H5) protocol initialized");
++	else
++		BT_ERR("HCI Three-wire UART (H5) protocol init failed");
 +
-+	h5 = kzalloc(sizeof(*h5), GFP_KERNEL);
-+	if (!h5)
-+		return -ENOMEM;
-+
-+	hu->priv = h5;
-+
-+	skb_queue_head_init(&h5->unack);
-+	skb_queue_head_init(&h5->rel);
-+	skb_queue_head_init(&h5->unrel);
-+
-+	return 0;
- }
- 
- static int h5_close(struct hci_uart *hu)
- {
--	return -ENOSYS;
-+	struct h5 *h5 = hu->priv;
-+
-+	skb_queue_purge(&h5->unack);
-+	skb_queue_purge(&h5->rel);
-+	skb_queue_purge(&h5->unrel);
-+
-+	kfree(h5);
-+
-+	return 0;
- }
- 
- static int h5_recv(struct hci_uart *hu, void *data, int count)
-@@ -47,17 +83,71 @@ static int h5_recv(struct hci_uart *hu, void *data, int count)
- 
- static int h5_enqueue(struct hci_uart *hu, struct sk_buff *skb)
- {
--	return -ENOSYS;
-+	struct h5 *h5 = hu->priv;
-+
-+	if (skb->len > 0xfff) {
-+		BT_ERR("Packet too long (%u bytes)", skb->len);
-+		kfree_skb(skb);
-+		return 0;
-+	}
-+
-+	switch (bt_cb(skb)->pkt_type) {
-+	case HCI_ACLDATA_PKT:
-+	case HCI_COMMAND_PKT:
-+		skb_queue_tail(&h5->rel, skb);
-+		break;
-+
-+	case HCI_SCODATA_PKT:
-+		skb_queue_tail(&h5->unrel, skb);
-+		break;
-+
-+	default:
-+		BT_ERR("Unknown packet type %u", bt_cb(skb)->pkt_type);
-+		kfree_skb(skb);
-+		break;
-+	}
-+
-+	return 0;
++	return err;
 +}
 +
-+static struct sk_buff *h5_prepare_pkt(struct h5 *h5, struct sk_buff *skb)
++int __exit h5_deinit(void)
 +{
-+	h5->txack_req = false;
-+	return NULL;
++	return hci_uart_unregister_proto(&h5p);
 +}
-+
-+static struct sk_buff *h5_prepare_ack(struct h5 *h5)
-+{
-+	h5->txack_req = false;
-+	return NULL;
- }
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 2f9b796..142f49c 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -558,6 +558,9 @@ static int __init hci_uart_init(void)
+ #ifdef CONFIG_BT_HCIUART_ATH3K
+ 	ath_init();
+ #endif
++#ifdef CONFIG_BT_HCIUART_3WIRE
++	h5_init();
++#endif
  
- static struct sk_buff *h5_dequeue(struct hci_uart *hu)
- {
-+	struct h5 *h5 = hu->priv;
-+	struct sk_buff *skb, *nskb;
-+
-+	if ((skb = skb_dequeue(&h5->unrel)) != NULL) {
-+		nskb = h5_prepare_pkt(h5, skb);
-+		if (nskb) {
-+			kfree_skb(skb);
-+			return nskb;
-+		}
-+
-+		skb_queue_head(&h5->unrel, skb);
-+		BT_ERR("Could not dequeue pkt because alloc_skb failed");
-+	}
-+
-+	if (h5->txack_req)
-+		return h5_prepare_ack(h5);
-+
- 	return NULL;
+ 	return 0;
  }
+@@ -578,6 +581,9 @@ static void __exit hci_uart_exit(void)
+ #ifdef CONFIG_BT_HCIUART_ATH3K
+ 	ath_deinit();
+ #endif
++#ifdef CONFIG_BT_HCIUART_3WIRE
++	h5_deinit();
++#endif
  
- static int h5_flush(struct hci_uart *hu)
- {
--	return -ENOSYS;
-+	BT_DBG("hu %p", hu);
-+	return 0;
- }
- 
- static struct hci_uart_proto h5p = {
+ 	/* Release tty registration of line discipline */
+ 	if ((err = tty_unregister_ldisc(N_HCI)))
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 6cf6ab22..aaf9d7d 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -104,3 +104,8 @@ int ll_deinit(void);
+ int ath_init(void);
+ int ath_deinit(void);
+ #endif
++
++#ifdef CONFIG_BT_HCIUART_3WIRE
++int h5_init(void);
++int h5_deinit(void);
++#endif
 -- 
 1.7.10.4
 
