@@ -4,9 +4,9 @@ To: <linux-bluetooth@vger.kernel.org>
 CC: <luiz.dentz@gmail.com>, <lucas.demarchi@profusion.mob>,
 	<johan.hedberg@gmail.com>,
 	Michal Labedzki <michal.labedzki@tieto.com>
-Subject: [PATCH v2 05/14] AVRCP: Convert spaces to tabs
-Date: Wed, 27 Jun 2012 15:27:39 +0200
-Message-ID: <1340803668-31686-5-git-send-email-michal.labedzki@tieto.com>
+Subject: [PATCH v2 04/14] AVRCP: Use name "addressed" instead of "active"
+Date: Wed, 27 Jun 2012 15:27:38 +0200
+Message-ID: <1340803668-31686-4-git-send-email-michal.labedzki@tieto.com>
 In-Reply-To: <1340803668-31686-1-git-send-email-michal.labedzki@tieto.com>
 References: <1340803668-31686-1-git-send-email-michal.labedzki@tieto.com>
 MIME-Version: 1.0
@@ -14,41 +14,64 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix coding style issue.
+AVRCP 1.4 named currently controlled player as "addressed", so use
+this name instead of "active". In future there where be more "browsing"
+player that will be active, but not addressed.
 ---
- audio/avrcp.c |   16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ audio/avrcp.c |   12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/audio/avrcp.c b/audio/avrcp.c
-index adcf30d..64f6086 100644
+index da102b2..adcf30d 100644
 --- a/audio/avrcp.c
 +++ b/audio/avrcp.c
-@@ -1134,17 +1134,17 @@ err_metadata:
+@@ -163,7 +163,7 @@ struct avrcp_server {
+ 	uint32_t tg_record_id;
+ 	uint32_t ct_record_id;
+ 	GSList *players;
+-	struct avrcp_player *active_player;
++	struct avrcp_player *addressed_player;
+ };
  
- size_t avrcp_handle_vendor_reject(uint8_t *code, uint8_t *operands)
- {
--    struct avrcp_header *pdu = (void *) operands;
--    uint32_t company_id = get_company_id(pdu->company_id);
-+	struct avrcp_header *pdu = (void *) operands;
-+	uint32_t company_id = get_company_id(pdu->company_id);
+ struct pending_pdu {
+@@ -1217,7 +1217,7 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
+ 	if (!server)
+ 		return;
  
--    *code = AVC_CTYPE_REJECTED;
--    pdu->params_len = htons(1);
--    pdu->params[0] = STATUS_INTERNAL_ERROR;
-+	*code = AVC_CTYPE_REJECTED;
-+	pdu->params_len = htons(1);
-+	pdu->params[0] = STATUS_INTERNAL_ERROR;
+-	player = server->active_player;
++	player = server->addressed_player;
+ 	if (!player)
+ 		return;
  
--    DBG("rejecting AVRCP PDU 0x%02X, company 0x%06X len 0x%04X",
--            pdu->pdu_id, company_id, pdu->params_len);
-+	DBG("rejecting AVRCP PDU 0x%02X, company 0x%06X len 0x%04X",
-+		pdu->pdu_id, company_id, pdu->params_len);
+@@ -1410,7 +1410,7 @@ struct avrcp_player *avrcp_register_player(const bdaddr_t *src,
+ 	player->destroy = destroy;
  
--    return AVRCP_HEADER_LENGTH + 1;
-+	return AVRCP_HEADER_LENGTH + 1;
+ 	if (!server->players)
+-		server->active_player = player;
++		server->addressed_player = player;
+ 
+ 	if (!avctp_id)
+ 		avctp_id = avctp_add_state_cb(state_changed, NULL);
+@@ -1426,8 +1426,8 @@ void avrcp_unregister_player(struct avrcp_player *player)
+ 
+ 	server->players = g_slist_remove(server->players, player);
+ 
+-	if (server->active_player == player)
+-		server->active_player = g_slist_nth_data(server->players, 0);
++	if (server->addressed_player == player)
++		server->addressed_player = g_slist_nth_data(server->players, 0);
+ 
+ 	player_destroy(player);
  }
+@@ -1462,7 +1462,7 @@ int avrcp_set_volume(struct audio_device *dev, uint8_t volume)
+ 	if (server == NULL)
+ 		return -EINVAL;
  
- static struct avrcp_server *find_server(GSList *list, const bdaddr_t *src)
+-	player = server->active_player;
++	player = server->addressed_player;
+ 	if (player == NULL)
+ 		return -ENOTSUP;
+ 
 -- 
 on behalf of ST-Ericsson
 
