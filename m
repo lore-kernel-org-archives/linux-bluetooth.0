@@ -4,9 +4,9 @@ To: <linux-bluetooth@vger.kernel.org>
 CC: <luiz.dentz@gmail.com>, <lucas.demarchi@profusion.mob>,
 	<johan.hedberg@gmail.com>,
 	Michal Labedzki <michal.labedzki@tieto.com>
-Subject: [PATCH v2 11/14] AVRCP: Implement setting AddressedPlayer with notifications completion
-Date: Wed, 27 Jun 2012 15:27:45 +0200
-Message-ID: <1340803668-31686-11-git-send-email-michal.labedzki@tieto.com>
+Subject: [PATCH v2 10/14] media: Add support for changing addressed player
+Date: Wed, 27 Jun 2012 15:27:44 +0200
+Message-ID: <1340803668-31686-10-git-send-email-michal.labedzki@tieto.com>
 In-Reply-To: <1340803668-31686-1-git-send-email-michal.labedzki@tieto.com>
 References: <1340803668-31686-1-git-send-email-michal.labedzki@tieto.com>
 MIME-Version: 1.0
@@ -14,173 +14,229 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For AVRCP 1.4 complete notifications according to the specification
-by rejecting all registered notifications with coresponding
-transaction id.
-
-For AVRCP 1.3 complete events by reusing already registered events.
-This allows to change media player and notify remote controller
-about metadata changed.
+There is possibility to register more than one player. This patch
+allows to change currently selected player to one the list of
+previously registered players. If there are no any registered players
+add Dummy Player for compatibility with AVRCP 1.3 device or
+AVRCP 1.4 without MultiplePlayer feature.
 ---
- audio/avrcp.c |   99 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- audio/avrcp.h |    1 +
- audio/media.c |    5 +++
- 3 files changed, 105 insertions(+)
+ audio/media.c |  109 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 107 insertions(+), 2 deletions(-)
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index d011b2e..baf9de5 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -58,6 +58,8 @@
- #include "sdpd.h"
- #include "dbus-common.h"
- 
-+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
-+
- #define AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH 5
- 
- enum company_id {
-@@ -191,6 +193,21 @@ struct avrcp_player {
- 	GDestroyNotify destroy;
- };
- 
-+struct status_reply {
-+	struct avrcp_header pdu;
-+	uint8_t status;
-+} __attribute__ ((packed));
-+
-+static const uint8_t events_to_complete[] = {
-+	AVRCP_EVENT_PLAYBACK_STATUS_CHANGED,
-+	AVRCP_EVENT_TRACK_CHANGED,
-+	AVRCP_EVENT_TRACK_REACHED_END,
-+	AVRCP_EVENT_TRACK_REACHED_START,
-+	AVRCP_EVENT_PLAYBACK_POS_CHANGED,
-+	AVRCP_EVENT_PLAYER_APPLICATION_SETTING_CHANGED,
-+	AVRCP_EVENT_NOW_PLAYING_CONTENT_CHANGED
-+};
-+
- static GSList *servers = NULL;
- static unsigned int avctp_id = 0;
- 
-@@ -1519,3 +1536,85 @@ int avrcp_set_volume(struct audio_device *dev, uint8_t volume)
- 					AVC_SUBUNIT_PANEL, buf, sizeof(buf),
- 					avrcp_handle_set_volume, player);
- }
-+
-+static void avrcp_events_completion(struct avrcp_session *session)
-+{
-+	struct status_reply event;
-+	unsigned int i;
-+	uint8_t id;
-+	int err;
-+
-+	memset(&event, 0, sizeof(event));
-+	set_company_id(event.pdu.company_id, IEEEID_BTSIG);
-+	event.pdu.pdu_id = AVRCP_REGISTER_NOTIFICATION;
-+	event.pdu.params_len = htons(1);
-+	event.status = STATUS_ADDRESSED_PLAYER_CHANGED;
-+
-+	for (i = 0; i < ARRAY_SIZE(events_to_complete); i++) {
-+		id = 1 << events_to_complete[i];
-+
-+		if (!(session->registered_events & id))
-+			continue;
-+
-+		err = avctp_send_vendordep(session->avctp_session,
-+						session->transaction[events_to_complete[i]],
-+						AVC_CTYPE_REJECTED, AVC_SUBUNIT_PANEL,
-+						(uint8_t *) &event, sizeof(event));
-+		if (err < 0)
-+			DBG("Cannot complete event %u: %s (%d)",
-+				events_to_complete[i], strerror(-err), err);
-+
-+		session->registered_events ^= id;
-+	}
-+}
-+
-+static void avrcp_events_reusing(struct avrcp_player *player)
-+{
-+	struct avrcp_player *addressed = player->server->addressed_player;
-+	struct avrcp_session *session = &player->server->session;
-+	uint8_t play_status;
-+	uint64_t uid;
-+
-+	/* Reusing previously registered events for AVRCP 1.3 devices */
-+
-+	play_status = player->cb->get_status(player->user_data);
-+	uid = player->cb->get_uid(player->user_data);
-+
-+	if (play_status != addressed->cb->get_status(addressed->user_data))
-+		avrcp_event(session, AVRCP_EVENT_PLAYBACK_STATUS_CHANGED,
-+				&play_status);
-+
-+	avrcp_event(session, AVRCP_EVENT_TRACK_CHANGED, &uid);
-+}
-+
-+gboolean avrcp_set_addressed_player(struct avrcp_player *player, gboolean local)
-+{
-+	struct avrcp_server *server = player->server;
-+	struct avrcp_session *session = &server->session;
-+
-+	if (player == server->addressed_player)
-+		return TRUE;
-+
-+	/* if triggered from remote, try to complete events */
-+	if (local) {
-+		if (session->version_ct == AVRCP_VERSION_1_3)
-+			avrcp_events_reusing(player);
-+		else
-+			avrcp_events_completion(session);
-+	}
-+
-+	pending_pdu_abort(session);
-+
-+	player->dev = server->addressed_player->dev;
-+
-+	if (server->addressed_player->handler) {
-+		avctp_unregister_pdu_handler(server->addressed_player->handler);
-+		server->addressed_player->handler = 0;
-+	}
-+	player->handler = avctp_register_pdu_handler(AVC_OP_VENDORDEP,
-+							handle_vendordep_pdu, player);
-+
-+	server->addressed_player = player;
-+
-+	return TRUE;
-+}
-diff --git a/audio/avrcp.h b/audio/avrcp.h
-index 1b4a887..68e3098 100644
---- a/audio/avrcp.h
-+++ b/audio/avrcp.h
-@@ -121,5 +121,6 @@ void avrcp_unregister_player(struct avrcp_player *player);
- 
- int avrcp_event(struct avrcp_session *session, uint8_t id, void *data);
- 
-+gboolean avrcp_set_addressed_player(struct avrcp_player *player, gboolean local);
- 
- size_t avrcp_handle_vendor_reject(uint8_t *code, uint8_t *operands);
 diff --git a/audio/media.c b/audio/media.c
-index ce5822a..97bf7df 100644
+index f3cca25..ce5822a 100644
 --- a/audio/media.c
 +++ b/audio/media.c
-@@ -1803,12 +1803,17 @@ static gboolean media_set_addressed_player(struct media_adapter *adapter,
- 	if (!mp)
- 		return FALSE;
+@@ -54,6 +54,8 @@
+ #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint"
+ #define MEDIA_PLAYER_INTERFACE "org.bluez.MediaPlayer"
  
-+	if (!avrcp_set_addressed_player(mp->player, local))
-+		return FALSE;
++#define DUMMY_PLAYER "/dummy"
 +
- 	if (adapter->addressed &&
- 		g_strcmp0(adapter->addressed->path, DUMMY_PLAYER) == 0)
- 		media_player_remove(adapter->addressed);
+ #define REQUEST_TIMEOUT (3 * 1000)		/* 3 seconds */
  
- 	adapter->addressed = mp;
+ struct media_adapter {
+@@ -62,6 +64,7 @@ struct media_adapter {
+ 	DBusConnection		*conn;		/* Adapter connection */
+ 	GSList			*endpoints;	/* Endpoints list */
+ 	GSList			*players;	/* Players list */
++	struct media_player	*addressed;	/* Addressed Player */
+ };
  
-+	DBG("Set addressed player id=%u to %s", mp->id, path);
+ struct endpoint_request {
+@@ -102,6 +105,7 @@ struct media_player {
+ 	uint8_t			status;
+ 	uint32_t		position;
+ 	uint8_t			volume;
++	uint16_t		id;
+ 	GTimer			*timer;
+ };
+ 
+@@ -961,6 +965,25 @@ static struct media_player *media_adapter_find_player(
+ 	return NULL;
+ }
+ 
++static struct media_player *media_adapter_find_player_by_id(
++						struct media_adapter *adapter,
++						const char *sender,
++						uint16_t player_id) {
++	GSList *l;
 +
++	for (l = adapter->players; l; l = l->next) {
++		struct media_player *mp = l->data;
++
++		if (sender && g_strcmp0(mp->sender, sender) != 0)
++			continue;
++
++		if (player_id == mp->id)
++			return mp;
++	}
++
++	return NULL;
++}
++
+ static void release_player(struct media_player *mp)
+ {
+ 	DBusMessage *msg;
+@@ -1673,6 +1696,17 @@ static gboolean track_changed(DBusConnection *connection, DBusMessage *msg,
  	return TRUE;
  }
  
++/* Need at least one free id to avoid infinite loop */
++static uint16_t get_free_player_id(struct media_adapter *adapter,
++						const char *sender)
++{
++	static uint16_t last_id = 0;
++
++	while (media_adapter_find_player_by_id(adapter, sender, last_id++));
++
++	return last_id - 1;
++}
++
+ static struct media_player *media_player_create(struct media_adapter *adapter,
+ 						const char *sender,
+ 						const char *path,
+@@ -1680,6 +1714,12 @@ static struct media_player *media_player_create(struct media_adapter *adapter,
+ {
+ 	struct media_player *mp;
+ 
++	if (g_slist_length(adapter->players) >= UINT16_MAX) {
++		if (err)
++			*err = -EINVAL;
++		return NULL;
++	}
++
+ 	mp = g_new0(struct media_player, 1);
+ 	mp->adapter = adapter;
+ 	mp->sender = g_strdup(sender);
+@@ -1709,10 +1749,11 @@ static struct media_player *media_player_create(struct media_adapter *adapter,
+ 	}
+ 
+ 	mp->settings = g_hash_table_new(g_direct_hash, g_direct_equal);
++	mp->id = get_free_player_id(adapter, sender);
+ 
+ 	adapter->players = g_slist_append(adapter->players, mp);
+ 
+-	info("Player registered: sender=%s path=%s", sender, path);
++	info("Player registered: sender=%s path=%s id=%d", sender, path, mp->id);
+ 
+ 	if (err)
+ 		*err = 0;
+@@ -1720,6 +1761,57 @@ static struct media_player *media_player_create(struct media_adapter *adapter,
+ 	return mp;
+ }
+ 
++static gboolean media_set_addressed_player(struct media_adapter *adapter,
++					    const char *sender, const char *path,
++					    gboolean local)
++{
++	struct media_player *mp;
++	struct metadata_value *value;
++
++	if (adapter->addressed &&
++		g_strcmp0(path, adapter->addressed->path) == 0)
++		return FALSE;
++
++	mp = media_adapter_find_player(adapter, NULL, path);
++	if (!mp && g_strcmp0(path, DUMMY_PLAYER) == 0) {
++		mp = media_player_create(adapter, NULL, DUMMY_PLAYER, NULL);
++		if (!mp)
++			return FALSE;
++
++		mp->position = 0;
++		mp->track = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL,
++							metadata_value_free);
++		value = g_new0(struct metadata_value, 1);
++		value->type = DBUS_TYPE_STRING;
++		value->value.str = g_strdup("no player");
++		g_hash_table_replace(mp->track, GUINT_TO_POINTER(AVRCP_MEDIA_ATTRIBUTE_TITLE), value);
++
++		g_hash_table_replace(mp->settings,
++					GUINT_TO_POINTER(AVRCP_ATTRIBUTE_EQUALIZER),
++					GUINT_TO_POINTER(AVRCP_EQUALIZER_OFF));
++		g_hash_table_replace(mp->settings,
++					GUINT_TO_POINTER(AVRCP_ATTRIBUTE_REPEAT_MODE),
++					GUINT_TO_POINTER(AVRCP_REPEAT_MODE_OFF));
++		g_hash_table_replace(mp->settings,
++					GUINT_TO_POINTER(AVRCP_ATTRIBUTE_SHUFFLE),
++					GUINT_TO_POINTER(AVRCP_SHUFFLE_OFF));
++		g_hash_table_replace(mp->settings,
++					GUINT_TO_POINTER(AVRCP_ATTRIBUTE_SCAN),
++					GUINT_TO_POINTER(AVRCP_SCAN_OFF));
++	}
++
++	if (!mp)
++		return FALSE;
++
++	if (adapter->addressed &&
++		g_strcmp0(adapter->addressed->path, DUMMY_PLAYER) == 0)
++		media_player_remove(adapter->addressed);
++
++	adapter->addressed = mp;
++
++	return TRUE;
++}
++
+ static gboolean parse_player_properties(struct media_player *mp,
+ 							DBusMessageIter *iter)
+ {
+@@ -1762,7 +1854,8 @@ static DBusMessage *register_player(DBusConnection *conn, DBusMessage *msg,
+ 	struct media_adapter *adapter = data;
+ 	struct media_player *mp;
+ 	DBusMessageIter args;
+-	const char *sender, *path;
++	const char *sender;
++	char *path;
+ 	int err;
+ 
+ 	sender = dbus_message_get_sender(msg);
+@@ -1772,6 +1865,8 @@ static DBusMessage *register_player(DBusConnection *conn, DBusMessage *msg,
+ 	dbus_message_iter_get_basic(&args, &path);
+ 	dbus_message_iter_next(&args);
+ 
++	DBG("Registering player sender=%s path=%s", sender, path);
++
+ 	if (media_adapter_find_player(adapter, sender, path) != NULL)
+ 		return btd_error_already_exists(msg);
+ 
+@@ -1797,6 +1892,9 @@ static DBusMessage *register_player(DBusConnection *conn, DBusMessage *msg,
+ 
+ 	avrcp_event(avrcp_get_session(mp->player), AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED, NULL);
+ 
++	if (g_strcmp0(adapter->addressed->path, DUMMY_PLAYER) == 0)
++		media_set_addressed_player(adapter, sender, path, TRUE);
++
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
+ 
+@@ -1814,6 +1912,8 @@ static DBusMessage *unregister_player(DBusConnection *conn, DBusMessage *msg,
+ 
+ 	sender = dbus_message_get_sender(msg);
+ 
++	DBG("Unregistering player sender=%s path=%s", sender, path);
++
+ 	player = media_adapter_find_player(adapter, sender, path);
+ 	if (player == NULL)
+ 		return btd_error_does_not_exist(msg);
+@@ -1821,6 +1921,9 @@ static DBusMessage *unregister_player(DBusConnection *conn, DBusMessage *msg,
+ 	avrcp_event(avrcp_get_session(player->player), AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED, NULL);
+ 	media_player_remove(player);
+ 
++	if (g_strcmp0(adapter->addressed->path, path) == 0)
++		media_set_addressed_player(adapter, sender, DUMMY_PLAYER, TRUE);
++
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
+ 
+@@ -1862,6 +1965,8 @@ int media_register(DBusConnection *conn, const char *path, const bdaddr_t *src)
+ 	adapter->conn = dbus_connection_ref(conn);
+ 	bacpy(&adapter->src, src);
+ 	adapter->path = g_strdup(path);
++	adapter->addressed = NULL;
++	media_set_addressed_player(adapter, NULL, DUMMY_PLAYER, TRUE);
+ 
+ 	if (!g_dbus_register_interface(conn, path, MEDIA_INTERFACE,
+ 					media_methods, NULL, NULL,
 -- 
 on behalf of ST-Ericsson
 
