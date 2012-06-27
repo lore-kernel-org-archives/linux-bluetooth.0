@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 07/17] Bluetooth: Fix/implement Three-wire reliable packet sending
-Date: Wed, 27 Jun 2012 14:25:57 +0300
-Message-Id: <1340796367-10321-8-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 06/17] Bluetooth: Add Three-wire header value convenience macros
+Date: Wed, 27 Jun 2012 14:25:56 +0300
+Message-Id: <1340796367-10321-7-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1340796367-10321-1-git-send-email-johan.hedberg@gmail.com>
 References: <1340796367-10321-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,184 +11,33 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch should complete the necessary code for sending reliable
-Three-wire packets.
+This patch adds convenience macros for reading Three-wire header values.
+This will help make the code more readable.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- drivers/bluetooth/hci_h5.c |   87 +++++++++++++++++++++++++++++++++++---------
- 1 file changed, 70 insertions(+), 17 deletions(-)
+ drivers/bluetooth/hci_h5.c |    8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 0d608f3..e27dce7 100644
+index 6b02ccc..0d608f3 100644
 --- a/drivers/bluetooth/hci_h5.c
 +++ b/drivers/bluetooth/hci_h5.c
-@@ -62,15 +62,15 @@ struct h5 {
- 	struct sk_buff		*rx_skb;	/* Receive buffer */
- 	size_t			rx_pending;	/* Expecting more bytes */
- 	bool			rx_esc;		/* SLIP escape mode */
-+	u8			rx_ack;		/* Last ack number received */
-+	u8			rx_seq;		/* Last seq number received */
+@@ -41,6 +41,14 @@
+  */
+ #define H5_MAX_LEN (4 + 0xfff + 2)
  
- 	int			(*rx_func) (struct hci_uart *hu, u8 c);
- 
- 	struct timer_list	timer;		/* Retransmission timer */
- 
--	bool			txack_req;
--
--	u8			next_ack;
--	u8			next_seq;
-+	bool			tx_ack_req;	/* Pending ack to send */
-+	u8			tx_seq;		/* Next seq number to send */
- };
- 
- static void h5_reset_rx(struct h5 *h5);
-@@ -87,7 +87,7 @@ static void h5_timed_event(unsigned long arg)
- 	spin_lock_irqsave_nested(&h5->unack.lock, flags, SINGLE_DEPTH_NESTING);
- 
- 	while ((skb = __skb_dequeue_tail(&h5->unack)) != NULL) {
--		h5->next_seq = (h5->next_seq - 1) & 0x07;
-+		h5->tx_seq = (h5->tx_seq - 1) & 0x07;
- 		skb_queue_head(&h5->rel, skb);
- 	}
- 
-@@ -136,6 +136,45 @@ static int h5_close(struct hci_uart *hu)
- 	return 0;
- }
- 
-+static void h5_pkt_cull(struct h5 *h5)
-+{
-+	struct sk_buff *skb, *tmp;
-+	unsigned long flags;
-+	int i, to_remove;
-+	u8 seq;
++/* Convenience macros for reading Three-wire header values */
++#define H5_HDR_SEQ(hdr)		((hdr)[0] & 0x07)
++#define H5_HDR_ACK(hdr)		(((hdr)[0] >> 3) & 0x07)
++#define H5_HDR_CRC(hdr)		(((hdr)[0] >> 6) & 0x01)
++#define H5_HDR_RELIABLE(hdr)	(((hdr)[0] >> 7) & 0x01)
++#define H5_HDR_PKT_TYPE(hdr)	((hdr)[1] & 0x0f)
++#define H5_HDR_LEN(hdr)		((((hdr)[1] >> 4) & 0xff) + ((hdr)[2] << 4))
 +
-+	spin_lock_irqsave(&h5->unack.lock, flags);
-+
-+	to_remove = skb_queue_len(&h5->unack);
-+
-+	seq = h5->tx_seq;
-+
-+	while (to_remove > 0) {
-+		if (h5->rx_ack == seq)
-+			break;
-+
-+		to_remove--;
-+		seq = (seq - 1) % 8;
-+	}
-+
-+	if (seq != h5->rx_ack)
-+		BT_ERR("Controller acked invalid packet");
-+
-+	i = 0;
-+	skb_queue_walk_safe(&h5->unack, skb, tmp) {
-+		if (i++ >= to_remove)
-+			break;
-+
-+		__skb_unlink(skb, &h5->unack);
-+		kfree_skb(skb);
-+	}
-+
-+	if (skb_queue_empty(&h5->unack))
-+		del_timer(&h5->timer);
-+
-+	spin_unlock_irqrestore(&h5->unack.lock, flags);
-+}
-+
- static void h5_handle_internal_rx(struct hci_uart *hu)
- {
- 	BT_DBG("%s", hu->hdev->name);
-@@ -144,17 +183,24 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
- static void h5_complete_rx_pkt(struct hci_uart *hu)
- {
- 	struct h5 *h5 = hu->priv;
--	u8 pkt_type;
-+	const unsigned char *hdr = h5->rx_skb->data;
- 
- 	BT_DBG("%s", hu->hdev->name);
- 
--	pkt_type = h5->rx_skb->data[1] & 0x0f;
-+	if (H5_HDR_RELIABLE(hdr)) {
-+		h5->tx_seq = (h5->tx_seq + 1) % 8;
-+		h5->tx_ack_req = true;
-+	}
- 
--	switch (pkt_type) {
-+	h5->rx_ack = H5_HDR_ACK(hdr);
-+
-+	h5_pkt_cull(h5);
-+
-+	switch (H5_HDR_PKT_TYPE(hdr)) {
- 	case HCI_EVENT_PKT:
- 	case HCI_ACLDATA_PKT:
- 	case HCI_SCODATA_PKT:
--		bt_cb(h5->rx_skb)->pkt_type = pkt_type;
-+		bt_cb(h5->rx_skb)->pkt_type = H5_HDR_PKT_TYPE(hdr);
- 
- 		/* Remove Three-wire header */
- 		skb_pull(h5->rx_skb, 4);
-@@ -191,7 +237,7 @@ static int h5_rx_payload(struct hci_uart *hu, unsigned char c)
- 
- 	BT_DBG("%s 0x%02hhx", hu->hdev->name, c);
- 
--	if ((hdr[0] >> 4) & 0x01) {
-+	if (H5_HDR_CRC(hdr)) {
- 		h5->rx_func = h5_rx_crc;
- 		h5->rx_pending = 2;
- 	} else {
-@@ -215,8 +261,15 @@ static int h5_rx_3wire_hdr(struct hci_uart *hu, unsigned char c)
- 		return 0;
- 	}
- 
-+	if (H5_HDR_RELIABLE(hdr) && H5_HDR_SEQ(hdr) != h5->tx_seq) {
-+		BT_ERR("Out-of-order packet arrived (%u != %u)",
-+		       H5_HDR_SEQ(hdr), h5->tx_ack);
-+		h5_reset_rx(h5);
-+		return 0;
-+	}
-+
- 	h5->rx_func = h5_rx_payload;
--	h5->rx_pending = ((hdr[1] >> 4) & 0xff) + (hdr[2] << 4);
-+	h5->rx_pending = H5_HDR_LEN(hdr);
- 
- 	return 0;
- }
-@@ -410,13 +463,13 @@ static struct sk_buff *h5_build_pkt(struct h5 *h5, bool rel, u8 pkt_type,
- 
- 	h5_slip_delim(nskb);
- 
--	hdr[0] = h5->next_ack << 3;
--	h5->txack_req = false;
-+	hdr[0] = h5->rx_seq << 3;
-+	h5->tx_ack_req = false;
- 
- 	if (rel) {
- 		hdr[0] |= 1 << 7;
--		hdr[0] |= h5->next_seq;
--		h5->next_seq = (h5->next_seq + 1) % 8;
-+		hdr[0] |= h5->tx_seq;
-+		h5->tx_seq = (h5->tx_seq + 1) % 8;
- 	}
- 
- 	hdr[1] = pkt_type | ((len & 0x0f) << 4);
-@@ -459,7 +512,7 @@ static struct sk_buff *h5_prepare_pkt(struct h5 *h5, u8 pkt_type,
- 
- static struct sk_buff *h5_prepare_ack(struct h5 *h5)
- {
--	h5->txack_req = false;
-+	h5->tx_ack_req = false;
- 	return NULL;
- }
- 
-@@ -503,7 +556,7 @@ static struct sk_buff *h5_dequeue(struct hci_uart *hu)
- unlock:
- 	spin_unlock_irqrestore(&h5->unack.lock, flags);
- 
--	if (h5->txack_req)
-+	if (h5->tx_ack_req)
- 		return h5_prepare_ack(h5);
- 
- 	return NULL;
+ #define SLIP_DELIMITER	0xc0
+ #define SLIP_ESC	0xdb
+ #define SLIP_ESC_DELIM	0xdc
 -- 
 1.7.10.4
 
