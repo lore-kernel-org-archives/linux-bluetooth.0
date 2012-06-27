@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 10/10] test: Add support for MessageAccess.GetMessage to map-client
-Date: Wed, 27 Jun 2012 15:04:55 +0300
-Message-Id: <1340798695-6785-10-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 09/10] client: Add MessageAccess.GetMessage implementation
+Date: Wed, 27 Jun 2012 15:04:54 +0300
+Message-Id: <1340798695-6785-9-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1340798695-6785-1-git-send-email-luiz.dentz@gmail.com>
 References: <1340798695-6785-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,146 +11,65 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds -g/--get <handle> option to map-client so it downloads and
-prints the contents of the message.
-
-In addition add MapClient class to handle transfer signals similar to
-what other scripts do.
 ---
- test/map-client |   93 +++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 83 insertions(+), 10 deletions(-)
+ client/map.c |   37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-diff --git a/test/map-client b/test/map-client
-index 986fcad..2850900 100755
---- a/test/map-client
-+++ b/test/map-client
-@@ -2,6 +2,8 @@
+diff --git a/client/map.c b/client/map.c
+index b8c0cb8..e5236d0 100644
+--- a/client/map.c
++++ b/client/map.c
+@@ -378,6 +378,38 @@ fail:
+ 	return reply;
+ }
  
- import gobject
- 
-+import sys
-+import os
- import dbus
- import dbus.mainloop.glib
- from optparse import OptionParser
-@@ -16,12 +18,85 @@ def parse_options():
- 	parser.add_option("-v", "--verbose", action="store_true", dest="verbose")
- 	parser.add_option("-L", "--lsmsg", action="store", dest="ls_msg",
- 			help="List messages in supplied CWD subdir")
-+	parser.add_option("-g", "--get", action="store", dest="get_msg",
-+			help="List messages in supplied CWD subdir")
- 
- 	return parser.parse_args()
- 
- def set_folder(session, new_dir):
- 	session.SetFolder(new_dir)
- 
-+class MapClient:
-+	def __init__(self, session_path, verbose=False):
-+		self.progress = 0
-+		self.transfer_path = None
-+		self.props = dict()
-+		self.verbose = verbose
-+		bus = dbus.SessionBus()
-+		obj = bus.get_object("org.bluez.obex.client", session_path)
-+		self.session = dbus.Interface(obj, "org.bluez.obex.Session")
-+		self.map = dbus.Interface(obj, "org.bluez.obex.MessageAccess")
-+		bus.add_signal_receiver(self.transfer_complete,
-+				dbus_interface="org.bluez.obex.Transfer",
-+				signal_name="Complete",
-+				path_keyword="path")
-+		bus.add_signal_receiver(self.transfer_error,
-+				dbus_interface="org.bluez.obex.Transfer",
-+				signal_name="Error",
-+				path_keyword="path")
++static DBusMessage *map_get_message(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
++{
++	struct map_data *map = user_data;
++	struct obc_transfer *transfer;
++	const char *handle, *target_file;
++	GError *err = NULL;
++	DBusMessage *reply;
 +
-+	def create_transfer_reply(self, reply):
-+		(path, properties) = reply
-+		self.transfer_path = path
-+		self.props[path] = properties
-+		if self.verbose:
-+			print "Transfer created: %s (file %s)" % (path,
-+							properties["Filename"])
++	if (dbus_message_get_args(message, NULL,
++				DBUS_TYPE_STRING, &handle,
++				DBUS_TYPE_STRING, &target_file,
++				DBUS_TYPE_INVALID) == FALSE)
++		return g_dbus_create_error(message,
++				ERROR_INTERFACE ".InvalidArguments", NULL);
 +
-+	def generic_reply(self):
-+		if self.verbose:
-+			print "Operation succeeded"
++	transfer = obc_transfer_get("x-bt/message", handle, target_file, &err);
++	if (transfer == NULL)
++		goto fail;
 +
-+	def error(self, err):
-+		print err
-+		mainloop.quit()
++	if (!obc_session_queue(map->session, transfer, NULL, NULL, &err))
++		goto fail;
 +
-+	def transfer_complete(self, path):
-+		if path != self.transfer_path:
-+			return
-+		if self.verbose:
-+			print "Transfer finished"
-+		properties = self.props.get(path)
-+		if properties == None:
-+			return
-+		f = open(properties["Filename"], "r")
-+		os.remove(properties["Filename"])
-+		print f.readlines()
++	return obc_transfer_create_dbus_reply(transfer, message);
 +
-+	def transfer_error(self, code, message, path):
-+		if path != self.transfer_path:
-+			return
-+		print "Transfer finished with error %s: %s" % (code, message)
-+		mainloop.quit()
++fail:
++	reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed", "%s",
++								err->message);
++	g_error_free(err);
++	return reply;
++}
 +
-+	def set_folder(self, new_dir):
-+		self.map.SetFolder(new_dir)
-+
-+	def list_folders(self):
-+		for i in self.map.GetFolderListing(dict()):
-+			print "%s/" % (i["Name"])
-+
-+	def list_messages(self, folder):
-+		for i in self.map.GetMessageListing(folder, dict()):
-+			for (key, value) in i.items():
-+				print("%s = %s" % (key, value))
-+			print "\n"
-+
-+	def get_message(self, handle):
-+		self.map.GetMessage(handle, "",
-+				reply_handler=self.create_transfer_reply,
-+				error_handler=self.error)
-+
- if  __name__ == '__main__':
+ static const GDBusMethodTable map_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("SetFolder",
+ 				GDBUS_ARGS({ "name", "s" }), NULL,
+@@ -390,6 +422,11 @@ static const GDBusMethodTable map_methods[] = {
+ 			GDBUS_ARGS({ "folder", "s" }, { "filter", "a{ss}" }),
+ 			GDBUS_ARGS({ "messages", "aa{sv}" }),
+ 			map_get_message_listing) },
++	{ GDBUS_METHOD("GetMessage",
++			GDBUS_ARGS({ "handle", "s" }, { "file", "s" }),
++			GDBUS_ARGS({ "transfer", "o" },
++						{ "properties", "a{sv}" }),
++			map_get_message) },
+ 	{ }
+ };
  
- 	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-@@ -40,23 +115,21 @@ if  __name__ == '__main__':
- 	client = dbus.Interface(bus.get_object("org.bluez.obex.client", "/"),
- 				"org.bluez.obex.Client")
- 
-+	print "Creating Session"
- 	path = client.CreateSession(options.device, { "Target": "map" })
- 
--	obj = bus.get_object("org.bluez.obex.client", path)
--	session = dbus.Interface(obj, "org.bluez.obex.Session")
--	map = dbus.Interface(obj, "org.bluez.obex.MessageAccess")
-+	map_client = MapClient(path, options.verbose)
- 
- 	if options.new_dir:
--		set_folder(map, options.new_dir)
-+		map_client.set_folder(options.new_dir)
- 
- 	if options.ls_dir:
--		for i in map.GetFolderListing(dict()):
--			print "%s/" % (i["Name"])
-+		map_client.list_folders()
- 
- 	if options.ls_msg is not None:
--		for i in map.GetMessageListing(options.ls_msg, dict()):
--			for (key, value) in i.items():
--				print("%s = %s" % (key, value))
--			print "\n"
-+		map_client.list_messages(options.ls_msg)
-+
-+	if options.get_msg is not None:
-+		map_client.get_message(options.get_msg)
- 
- 	mainloop.run()
 -- 
 1.7.10.2
 
