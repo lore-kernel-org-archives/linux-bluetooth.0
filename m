@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 14/17] Bluetooth: Add initialization tracking to HCI Three-wire driver
-Date: Wed, 27 Jun 2012 14:26:04 +0300
-Message-Id: <1340796367-10321-15-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 13/17] Bluetooth: Add initial sleep support to Three-wire UART
+Date: Wed, 27 Jun 2012 14:26:03 +0300
+Message-Id: <1340796367-10321-14-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1340796367-10321-1-git-send-email-johan.hedberg@gmail.com>
 References: <1340796367-10321-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,146 +11,54 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds tracking for the uninitialized, initialized and active
-states for Three-wire UART. This is needed so we can handle periodic
-sending of the Link Establishment messages before reaching active state
-and so that we do not try to do any higher level HCI data transmission
-before reaching active state.
+This patch adds very basic support for the sleep related messages. The
+only thing the code does right now is send a wakeup message as soon as
+receiving a sleep one, essentially preventing the controller from going
+to sleep.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- drivers/bluetooth/hci_h5.c |   70 ++++++++++++++++++++++++++++++++------------
- 1 file changed, 52 insertions(+), 18 deletions(-)
+ drivers/bluetooth/hci_h5.c |   13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index d26f801..1e83118 100644
+index 31b8d57..d26f801 100644
 --- a/drivers/bluetooth/hci_h5.c
 +++ b/drivers/bluetooth/hci_h5.c
-@@ -72,18 +72,53 @@ struct h5 {
+@@ -71,6 +71,8 @@ struct h5 {
+ 	bool			tx_ack_req;	/* Pending ack to send */
  	u8			tx_seq;		/* Next seq number to send */
  	u8			tx_ack;		/* Next ack number to send */
- 
-+	enum {
-+		H5_UNINITIALIZED,
-+		H5_INITIALIZED,
-+		H5_ACTIVE,
-+	} state;
 +
- 	bool			sleeping;
++	bool			sleeping;
  };
  
  static void h5_reset_rx(struct h5 *h5);
+@@ -208,6 +210,9 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
+ 	const unsigned char sync_rsp[] = { 0x02, 0x7d };
+ 	const unsigned char conf_req[] = { 0x03, 0xfc, 0x01 };
+ 	const unsigned char conf_rsp[] = { 0x04, 0x7b, 0x01 };
++	const unsigned char wakeup_req[] = { 0x05, 0xfa };
++	const unsigned char woken_req[] = { 0x06, 0xf9 };
++	const unsigned char sleep_req[] = { 0x07, 0x78 };
+ 	const unsigned char *hdr = h5->rx_skb->data;
+ 	const unsigned char *data = &h5->rx_skb->data[4];
  
-+static void h5_link_control(struct hci_uart *hu, const void *data, size_t len)
-+{
-+	struct h5 *h5 = hu->priv;
-+	struct sk_buff *nskb;
-+
-+	nskb = alloc_skb(3, GFP_ATOMIC);
-+	if (!nskb)
-+		return;
-+
-+	bt_cb(nskb)->pkt_type = HCI_3WIRE_LINK_PKT;
-+
-+	memcpy(skb_put(nskb, len), data, len);
-+
-+	skb_queue_tail(&h5->unrel, nskb);
-+}
-+
- static void h5_timed_event(unsigned long arg)
- {
-+	const unsigned char sync_req[] = { 0x01, 0x7e };
-+	const unsigned char conf_req[] = { 0x03, 0xfc, 0x01 };
- 	struct hci_uart *hu = (struct hci_uart *) arg;
- 	struct h5 *h5 = hu->priv;
- 	struct sk_buff *skb;
- 	unsigned long flags;
- 
-+	if (h5->state == H5_UNINITIALIZED)
-+		h5_link_control(hu, sync_req, sizeof(sync_req));
-+
-+	if (h5->state == H5_INITIALIZED)
-+		h5_link_control(hu, conf_req, sizeof(conf_req));
-+
-+	if (h5->state != H5_ACTIVE) {
-+		mod_timer(&h5->timer, jiffies + HZ / 10);
-+		goto wakeup;
-+	}
-+
- 	BT_DBG("hu %p retransmitting %u pkts", hu, h5->unack.qlen);
- 
- 	spin_lock_irqsave_nested(&h5->unack.lock, flags, SINGLE_DEPTH_NESTING);
-@@ -95,25 +130,10 @@ static void h5_timed_event(unsigned long arg)
- 
- 	spin_unlock_irqrestore(&h5->unack.lock, flags);
- 
-+wakeup:
- 	hci_uart_tx_wakeup(hu);
- }
- 
--static void h5_link_control(struct hci_uart *hu, const void *data, size_t len)
--{
--	struct h5 *h5 = hu->priv;
--	struct sk_buff *nskb;
--
--	nskb = alloc_skb(3, GFP_ATOMIC);
--	if (!nskb)
--		return;
--
--	bt_cb(nskb)->pkt_type = HCI_3WIRE_LINK_PKT;
--
--	memcpy(skb_put(nskb, len), data, len);
--
--	skb_queue_tail(&h5->unrel, nskb);
--}
--
- static int h5_open(struct hci_uart *hu)
- {
- 	struct h5 *h5;
-@@ -226,13 +246,15 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
- 
- 	if (memcmp(data, sync_req, 2) == 0)
- 		h5_link_control(hu, sync_rsp, 2);
--	else if (memcmp(data, sync_rsp, 2) == 0)
-+	else if (memcmp(data, sync_rsp, 2) == 0) {
-+		h5->state = H5_INITIALIZED;
- 		h5_link_control(hu, conf_req, 3);
--	else if (memcmp(data, conf_req, 2) == 0) {
-+	} else if (memcmp(data, conf_req, 2) == 0) {
- 		h5_link_control(hu, conf_rsp, 2);
- 		h5_link_control(hu, conf_req, 3);
- 	} else if (memcmp(data, conf_rsp, 2) == 0) {
+@@ -230,6 +235,14 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
  		BT_DBG("Three-wire init sequence complete");
-+		h5->state = H5_ACTIVE;
  		hci_uart_init_ready(hu);
  		return;
- 	} else if (memcmp(data, sleep_req, 2) == 0) {
-@@ -337,6 +359,12 @@ static int h5_rx_3wire_hdr(struct hci_uart *hu, unsigned char c)
- 		return 0;
- 	}
- 
-+	if (h5->state != H5_ACTIVE &&
-+	    H5_HDR_PKT_TYPE(hdr) != HCI_3WIRE_LINK_PKT) {
-+		BT_ERR("Non-link packet received in non-active state");
-+		h5_reset_rx(h5);
-+	}
-+
- 	h5->rx_func = h5_rx_payload;
- 	h5->rx_pending = H5_HDR_LEN(hdr);
- 
-@@ -465,6 +493,12 @@ static int h5_enqueue(struct hci_uart *hu, struct sk_buff *skb)
- 		return 0;
- 	}
- 
-+	if (h5->state != H5_ACTIVE) {
-+		BT_ERR("Ignoring HCI data in non-active state");
-+		kfree_skb(skb);
-+		return 0;
-+	}
-+
- 	switch (bt_cb(skb)->pkt_type) {
- 	case HCI_ACLDATA_PKT:
- 	case HCI_COMMAND_PKT:
++	} else if (memcmp(data, sleep_req, 2) == 0) {
++		BT_DBG("Peer went to sleep");
++		h5->sleeping = true;
++		h5_link_control(hu, wakeup_req, 2);
++	} else if (memcmp(data, woken_req, 2) == 0) {
++		BT_DBG("Peer woke up");
++		h5->sleeping = false;
++		return;
+ 	} else {
+ 		BT_DBG("Link Control: 0x%02hhx 0x%02hhx", data[0], data[1]);
+ 		return;
 -- 
 1.7.10.4
 
