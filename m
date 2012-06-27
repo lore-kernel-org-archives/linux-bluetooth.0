@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 17/17] Bluetooth: Improve Three-wire UART configuration handling
-Date: Wed, 27 Jun 2012 14:26:07 +0300
-Message-Id: <1340796367-10321-18-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 16/17] Bluetooth: Remove unnecessary h5_build_pkt function
+Date: Wed, 27 Jun 2012 14:26:06 +0300
+Message-Id: <1340796367-10321-17-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1340796367-10321-1-git-send-email-johan.hedberg@gmail.com>
 References: <1340796367-10321-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,122 +11,95 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The configuration request/response messages contain a configuration
-field which contains the sliding window size (amount of unacked reliable
-packets that can be pending). This patch makes sure that we configure
-the correct size (minimum of local and remote values) and use it when
-determining whether to send new packets or not.
+The implementation of h5_build_packet can be moved into
+h5_prepare_pkt since all h5_prepare_pkt does is determine whether the
+packet is reliable and then call h5_build_packet.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- drivers/bluetooth/hci_h5.c |   34 +++++++++++++++++++++++++++-------
- 1 file changed, 27 insertions(+), 7 deletions(-)
+ drivers/bluetooth/hci_h5.c |   49 +++++++++++++++++++++-----------------------
+ 1 file changed, 23 insertions(+), 26 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index e036278..bc7bcb5 100644
+index 630ed70..e036278 100644
 --- a/drivers/bluetooth/hci_h5.c
 +++ b/drivers/bluetooth/hci_h5.c
-@@ -33,7 +33,8 @@
- #define HCI_3WIRE_ACK_PKT	0
- #define HCI_3WIRE_LINK_PKT	15
- 
--#define H5_TXWINSIZE 4
-+/* Sliding window size */
-+#define H5_TX_WIN_MAX		4
- 
- /*
-  * Maximum Three-wire packet:
-@@ -71,6 +72,7 @@ struct h5 {
- 	bool			tx_ack_req;	/* Pending ack to send */
- 	u8			tx_seq;		/* Next seq number to send */
- 	u8			tx_ack;		/* Next ack number to send */
-+	u8			tx_win;		/* Sliding window size */
- 
- 	enum {
- 		H5_UNINITIALIZED,
-@@ -103,10 +105,20 @@ static void h5_link_control(struct hci_uart *hu, const void *data, size_t len)
- 	skb_queue_tail(&h5->unrel, nskb);
+@@ -556,14 +556,33 @@ static void h5_slip_one_byte(struct sk_buff *skb, u8 c)
+ 	}
  }
  
-+static u8 h5_cfg_field(struct h5 *h5)
+-static struct sk_buff *h5_build_pkt(struct hci_uart *hu, bool rel, u8 pkt_type,
+-				    const u8 *data, size_t len)
++static bool valid_packet_type(u8 type)
 +{
-+	u8 field = 0;
-+
-+	/* Sliding window size (first 3 bits) */
-+	field |= (h5->tx_win & 7);
-+
-+	return field;
++	switch (type) {
++	case HCI_ACLDATA_PKT:
++	case HCI_COMMAND_PKT:
++	case HCI_SCODATA_PKT:
++	case HCI_3WIRE_LINK_PKT:
++	case HCI_3WIRE_ACK_PKT:
++		return true;
++	default:
++		return false;
++	}
 +}
 +
- static void h5_timed_event(unsigned long arg)
++static struct sk_buff *h5_prepare_pkt(struct hci_uart *hu, u8 pkt_type,
++				      const u8 *data, size_t len)
  {
- 	const unsigned char sync_req[] = { 0x01, 0x7e };
--	const unsigned char conf_req[] = { 0x03, 0xfc, 0x01 };
-+	unsigned char conf_req[] = { 0x03, 0xfc, 0x01 };
- 	struct hci_uart *hu = (struct hci_uart *) arg;
  	struct h5 *h5 = hu->priv;
- 	struct sk_buff *skb;
-@@ -117,8 +129,10 @@ static void h5_timed_event(unsigned long arg)
- 	if (h5->state == H5_UNINITIALIZED)
- 		h5_link_control(hu, sync_req, sizeof(sync_req));
+ 	struct sk_buff *nskb;
+ 	u8 hdr[4];
+ 	int i;
  
--	if (h5->state == H5_INITIALIZED)
-+	if (h5->state == H5_INITIALIZED) {
-+		conf_req[2] = h5_cfg_field(h5);
- 		h5_link_control(hu, conf_req, sizeof(conf_req));
++	if (!valid_packet_type(pkt_type)) {
++		BT_ERR("Unknown packet type %u", pkt_type);
++		return NULL;
 +	}
- 
- 	if (h5->state != H5_ACTIVE) {
- 		mod_timer(&h5->timer, jiffies + HZ / 10);
-@@ -168,6 +182,8 @@ static int h5_open(struct hci_uart *hu)
- 	h5->timer.function = h5_timed_event;
- 	h5->timer.data = (unsigned long) hu;
- 
-+	h5->tx_win = H5_TX_WIN_MAX;
 +
- 	set_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags);
+ 	/*
+ 	 * Max len of packet: (original len + 4 (H5 hdr) + 2 (crc)) * 2
+ 	 * (because bytes 0xc0 and 0xdb are escaped, worst case is when
+@@ -581,7 +600,8 @@ static struct sk_buff *h5_build_pkt(struct hci_uart *hu, bool rel, u8 pkt_type,
+ 	hdr[0] = h5->tx_ack << 3;
+ 	h5->tx_ack_req = false;
  
- 	/* Send initial sync request */
-@@ -239,8 +255,8 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
+-	if (rel) {
++	/* Reliable packet? */
++	if (pkt_type == HCI_ACLDATA_PKT || pkt_type == HCI_COMMAND_PKT) {
+ 		hdr[0] |= 1 << 7;
+ 		hdr[0] |= h5->tx_seq;
+ 		h5->tx_seq = (h5->tx_seq + 1) % 8;
+@@ -607,29 +627,6 @@ static struct sk_buff *h5_build_pkt(struct hci_uart *hu, bool rel, u8 pkt_type,
+ 	return nskb;
+ }
+ 
+-static struct sk_buff *h5_prepare_pkt(struct hci_uart *hu, u8 pkt_type,
+-				      const u8 *data, size_t len)
+-{
+-	bool rel;
+-
+-	switch (pkt_type) {
+-	case HCI_ACLDATA_PKT:
+-	case HCI_COMMAND_PKT:
+-		rel = true;
+-		break;
+-	case HCI_SCODATA_PKT:
+-	case HCI_3WIRE_LINK_PKT:
+-	case HCI_3WIRE_ACK_PKT:
+-		rel = false;
+-		break;
+-	default:
+-		BT_ERR("Unknown packet type %u", pkt_type);
+-		return NULL;
+-	}
+-
+-	return h5_build_pkt(hu, rel, pkt_type, data, len);
+-}
+-
+ static struct sk_buff *h5_dequeue(struct hci_uart *hu)
+ {
  	struct h5 *h5 = hu->priv;
- 	const unsigned char sync_req[] = { 0x01, 0x7e };
- 	const unsigned char sync_rsp[] = { 0x02, 0x7d };
--	const unsigned char conf_req[] = { 0x03, 0xfc, 0x01 };
--	const unsigned char conf_rsp[] = { 0x04, 0x7b, 0x01 };
-+	unsigned char conf_req[] = { 0x03, 0xfc, 0x01 };
-+	const unsigned char conf_rsp[] = { 0x04, 0x7b };
- 	const unsigned char wakeup_req[] = { 0x05, 0xfa };
- 	const unsigned char woken_req[] = { 0x06, 0xf9 };
- 	const unsigned char sleep_req[] = { 0x07, 0x78 };
-@@ -255,6 +271,8 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
- 	if (H5_HDR_LEN(hdr) < 2)
- 		return;
- 
-+	conf_req[2] = h5_cfg_field(h5);
-+
- 	if (memcmp(data, sync_req, 2) == 0)
- 		h5_link_control(hu, sync_rsp, 2);
- 	else if (memcmp(data, sync_rsp, 2) == 0) {
-@@ -264,7 +282,9 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
- 		h5_link_control(hu, conf_rsp, 2);
- 		h5_link_control(hu, conf_req, 3);
- 	} else if (memcmp(data, conf_rsp, 2) == 0) {
--		BT_DBG("Three-wire init sequence complete");
-+		if (H5_HDR_LEN(hdr) > 2)
-+			h5->tx_win = (data[2] & 7);
-+		BT_DBG("Three-wire init complete. tx_win %u", h5->tx_win);
- 		h5->state = H5_ACTIVE;
- 		hci_uart_init_ready(hu);
- 		return;
-@@ -660,7 +680,7 @@ static struct sk_buff *h5_dequeue(struct hci_uart *hu)
- 
- 	spin_lock_irqsave_nested(&h5->unack.lock, flags, SINGLE_DEPTH_NESTING);
- 
--	if (h5->unack.qlen >= H5_TXWINSIZE)
-+	if (h5->unack.qlen >= h5->tx_win)
- 	       goto unlock;
- 
- 	if ((skb = skb_dequeue(&h5->rel)) != NULL) {
 -- 
 1.7.10.4
 
