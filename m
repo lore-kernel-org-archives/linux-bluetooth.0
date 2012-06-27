@@ -1,17 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Zhang, Jingke" <jingke.zhang@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
 CC: "Li, XiaX" <xiax.li@intel.com>
 Subject: Bluez/Obexd upstream test result_20120626 (bluez-4.100 + obexd-0.46)
-Date: Wed, 27 Jun 2012 01:43:44 +0000
-Message-ID: <8C91AD8ED4077A4786B341540858992510270CF6@SHSMSX102.ccr.corp.intel.com>
+Date: Wed, 27 Jun 2012 01:31:38 +0000
+Message-ID: <8C91AD8ED4077A4786B341540858992510270CA4@SHSMSX102.ccr.corp.intel.com>
 Content-Type: multipart/mixed;
-	boundary="_002_8C91AD8ED4077A4786B341540858992510270CF6SHSMSX102ccrcor_"
+	boundary="_002_8C91AD8ED4077A4786B341540858992510270CA4SHSMSX102ccrcor_"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---_002_8C91AD8ED4077A4786B341540858992510270CF6SHSMSX102ccrcor_
+--_002_8C91AD8ED4077A4786B341540858992510270CA4SHSMSX102ccrcor_
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 
@@ -34,17 +34,17 @@ s *** no regression ***.=20
 New bugs (3):
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-https://bugs.meego.com/show_bug.cgi?id=3D25303
-[DUN] Server side always reports "security block" with SSP enabled Who has =
-air sniffer device to help investigate this bug? Thanks!
+https://bugs.meego.com/show_bug.cgi?id=3D25303=20
+[DUN] Server side always reports "security block" with SSP enabled
+Who has air sniffer device to help investigate this bug? Thanks!
 
-https://bugs.meego.com/show_bug.cgi?id=3D25319
-[AVRCP-CT] not find dbus interface for AVRCP media player controlling (Afte=
-r bug scrub, this is tracked for developing process)
+https://bugs.meego.com/show_bug.cgi?id=3D25319=20
+[AVRCP-CT] not find dbus interface for AVRCP media player controlling
+(After bug scrub, this is tracked for developing process)
 
-https://bugs.meego.com/show_bug.cgi?id=3D25318
-[MAP-client] get "Not found" when map client GetMessageListing (This is inv=
-alid, for test execution command is wrong)
+https://bugs.meego.com/show_bug.cgi?id=3D25318=20
+[MAP-client] get "Not found" when map client GetMessageListing
+(This is invalid, for test execution command is wrong)
 
 Re-open bugs:
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
@@ -54,10 +54,10 @@ N/A
 Verified bugs (2):
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-https://bugs.meego.com/show_bug.cgi?id=3D25236
+https://bugs.meego.com/show_bug.cgi?id=3D25236=20
  [UPF42] OBEXD MAP client is unable to list subfolders
 
-https://bugs.meego.com/show_bug.cgi?id=3D25158
+https://bugs.meego.com/show_bug.cgi?id=3D25158=20
  [Regression] obex-0.46 client is unable to request pb.vcf file
 
 
@@ -79,7 +79,7 @@ Thanks
 Jingke
 
 
---_002_8C91AD8ED4077A4786B341540858992510270CF6SHSMSX102ccrcor_
+--_002_8C91AD8ED4077A4786B341540858992510270CA4SHSMSX102ccrcor_
 Content-Type: text/plain; name="Bluetooth_upstream_quality_20120626.txt"
 Content-Description: Bluetooth_upstream_quality_20120626.txt
 Content-Disposition: attachment;
@@ -206,4 +206,4 @@ ICANCiAgW1BBU1NdIEJUQ01EXzAwNDogaGNpdG9vbCBzY2FuDQogIFtQQVNTXSBCVENNRF8wMDU6
 IHNkcHRvb2wgYnJvd3NlIGxvY2FsDQogIFtQQVNTXSBCVENNRF8wMDY6IHNkcHRvb2wgYnJvd3Nl
 IDxlcm1vdGUgTUFDPg0KICBbUEFTU10gQlRDTURfMDA3OiBzZHB0b29sIGFkZC9kZWw=
 
---_002_8C91AD8ED4077A4786B341540858992510270CF6SHSMSX102ccrcor_--
+--_002_8C91AD8ED4077A4786B341540858992510270CA4SHSMSX102ccrcor_--
