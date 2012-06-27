@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 08/17] Bluetooth: Add support for Three-wire Link Control packets
-Date: Wed, 27 Jun 2012 14:25:58 +0300
-Message-Id: <1340796367-10321-9-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 07/17] Bluetooth: Fix/implement Three-wire reliable packet sending
+Date: Wed, 27 Jun 2012 14:25:57 +0300
+Message-Id: <1340796367-10321-8-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1340796367-10321-1-git-send-email-johan.hedberg@gmail.com>
 References: <1340796367-10321-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,241 +11,184 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds basic support for parsing and sending Three-wire UART
-Link Controll packets.
+This patch should complete the necessary code for sending reliable
+Three-wire packets.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- drivers/bluetooth/hci_h5.c |   93 ++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 77 insertions(+), 16 deletions(-)
+ drivers/bluetooth/hci_h5.c |   87 +++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 70 insertions(+), 17 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index e27dce7..d602cc4 100644
+index 0d608f3..e27dce7 100644
 --- a/drivers/bluetooth/hci_h5.c
 +++ b/drivers/bluetooth/hci_h5.c
-@@ -63,7 +63,6 @@ struct h5 {
+@@ -62,15 +62,15 @@ struct h5 {
+ 	struct sk_buff		*rx_skb;	/* Receive buffer */
  	size_t			rx_pending;	/* Expecting more bytes */
  	bool			rx_esc;		/* SLIP escape mode */
- 	u8			rx_ack;		/* Last ack number received */
--	u8			rx_seq;		/* Last seq number received */
++	u8			rx_ack;		/* Last ack number received */
++	u8			rx_seq;		/* Last seq number received */
  
  	int			(*rx_func) (struct hci_uart *hu, u8 c);
  
-@@ -71,6 +70,7 @@ struct h5 {
+ 	struct timer_list	timer;		/* Retransmission timer */
  
- 	bool			tx_ack_req;	/* Pending ack to send */
- 	u8			tx_seq;		/* Next seq number to send */
-+	u8			tx_ack;		/* Next ack number to send */
+-	bool			txack_req;
+-
+-	u8			next_ack;
+-	u8			next_seq;
++	bool			tx_ack_req;	/* Pending ack to send */
++	u8			tx_seq;		/* Next seq number to send */
  };
  
  static void h5_reset_rx(struct h5 *h5);
-@@ -96,9 +96,26 @@ static void h5_timed_event(unsigned long arg)
- 	hci_uart_tx_wakeup(hu);
- }
+@@ -87,7 +87,7 @@ static void h5_timed_event(unsigned long arg)
+ 	spin_lock_irqsave_nested(&h5->unack.lock, flags, SINGLE_DEPTH_NESTING);
  
-+static void h5_link_control(struct hci_uart *hu, const void *data, size_t len)
-+{
-+	struct h5 *h5 = hu->priv;
-+	struct sk_buff *nskb;
-+
-+	nskb = alloc_skb(3, GFP_ATOMIC);
-+	if (!nskb)
-+		return;
-+
-+	bt_cb(nskb)->pkt_type = HCI_3WIRE_LINK_PKT;
-+
-+	memcpy(skb_put(nskb, len), data, len);
-+
-+	skb_queue_tail(&h5->unrel, nskb);
-+}
-+
- static int h5_open(struct hci_uart *hu)
- {
- 	struct h5 *h5;
-+	const unsigned char sync[] = { 0x01, 0x7e };
+ 	while ((skb = __skb_dequeue_tail(&h5->unack)) != NULL) {
+-		h5->next_seq = (h5->next_seq - 1) & 0x07;
++		h5->tx_seq = (h5->tx_seq - 1) & 0x07;
+ 		skb_queue_head(&h5->rel, skb);
+ 	}
  
- 	BT_DBG("hu %p", hu);
- 
-@@ -118,6 +135,10 @@ static int h5_open(struct hci_uart *hu)
- 	h5->timer.function = h5_timed_event;
- 	h5->timer.data = (unsigned long) hu;
- 
-+	/* Send initial sync request */
-+	h5_link_control(hu, sync, sizeof(sync));
-+	mod_timer(&h5->timer, jiffies + HZ / 10);
-+
+@@ -136,6 +136,45 @@ static int h5_close(struct hci_uart *hu)
  	return 0;
  }
  
-@@ -146,6 +167,8 @@ static void h5_pkt_cull(struct h5 *h5)
- 	spin_lock_irqsave(&h5->unack.lock, flags);
- 
- 	to_remove = skb_queue_len(&h5->unack);
-+	if (to_remove == 0)
-+		goto unlock;
- 
- 	seq = h5->tx_seq;
- 
-@@ -172,12 +195,44 @@ static void h5_pkt_cull(struct h5 *h5)
- 	if (skb_queue_empty(&h5->unack))
- 		del_timer(&h5->timer);
- 
-+unlock:
- 	spin_unlock_irqrestore(&h5->unack.lock, flags);
- }
- 
- static void h5_handle_internal_rx(struct hci_uart *hu)
- {
-+	struct h5 *h5 = hu->priv;
-+	const unsigned char sync_req[] = { 0x01, 0x7e };
-+	const unsigned char sync_rsp[] = { 0x02, 0x7d };
-+	const unsigned char conf_req[] = { 0x03, 0xfc, 0x01 };
-+	const unsigned char conf_rsp[] = { 0x04, 0x7b, 0x01 };
-+	const unsigned char *hdr = h5->rx_skb->data;
-+	const unsigned char *data = &h5->rx_skb->data[4];
++static void h5_pkt_cull(struct h5 *h5)
++{
++	struct sk_buff *skb, *tmp;
++	unsigned long flags;
++	int i, to_remove;
++	u8 seq;
 +
- 	BT_DBG("%s", hu->hdev->name);
++	spin_lock_irqsave(&h5->unack.lock, flags);
 +
-+	if (H5_HDR_PKT_TYPE(hdr) != HCI_3WIRE_LINK_PKT)
-+		return;
++	to_remove = skb_queue_len(&h5->unack);
 +
-+	if (H5_HDR_LEN(hdr) < 2)
-+		return;
++	seq = h5->tx_seq;
 +
-+	if (memcmp(data, sync_req, 2) == 0)
-+		h5_link_control(hu, sync_rsp, 2);
-+	else if (memcmp(data, sync_rsp, 2) == 0)
-+		h5_link_control(hu, conf_req, 3);
-+	else if (memcmp(data, conf_req, 2) == 0) {
-+		h5_link_control(hu, conf_rsp, 2);
-+		h5_link_control(hu, conf_req, 3);
-+	} else if (memcmp(data, conf_rsp, 2) == 0) {
-+		BT_DBG("Three-wire init sequence complete");
-+		return;
-+	} else {
-+		BT_DBG("Link Control: 0x%02hhx 0x%02hhx", data[0], data[1]);
-+		return;
++	while (to_remove > 0) {
++		if (h5->rx_ack == seq)
++			break;
++
++		to_remove--;
++		seq = (seq - 1) % 8;
 +	}
 +
-+	hci_uart_tx_wakeup(hu);
- }
- 
++	if (seq != h5->rx_ack)
++		BT_ERR("Controller acked invalid packet");
++
++	i = 0;
++	skb_queue_walk_safe(&h5->unack, skb, tmp) {
++		if (i++ >= to_remove)
++			break;
++
++		__skb_unlink(skb, &h5->unack);
++		kfree_skb(skb);
++	}
++
++	if (skb_queue_empty(&h5->unack))
++		del_timer(&h5->timer);
++
++	spin_unlock_irqrestore(&h5->unack.lock, flags);
++}
++
+ static void h5_handle_internal_rx(struct hci_uart *hu)
+ {
+ 	BT_DBG("%s", hu->hdev->name);
+@@ -144,17 +183,24 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
  static void h5_complete_rx_pkt(struct hci_uart *hu)
-@@ -188,8 +243,9 @@ static void h5_complete_rx_pkt(struct hci_uart *hu)
+ {
+ 	struct h5 *h5 = hu->priv;
+-	u8 pkt_type;
++	const unsigned char *hdr = h5->rx_skb->data;
+ 
  	BT_DBG("%s", hu->hdev->name);
  
- 	if (H5_HDR_RELIABLE(hdr)) {
--		h5->tx_seq = (h5->tx_seq + 1) % 8;
-+		h5->tx_ack = (h5->tx_ack + 1) % 8;
- 		h5->tx_ack_req = true;
-+		hci_uart_tx_wakeup(hu);
- 	}
+-	pkt_type = h5->rx_skb->data[1] & 0x0f;
++	if (H5_HDR_RELIABLE(hdr)) {
++		h5->tx_seq = (h5->tx_seq + 1) % 8;
++		h5->tx_ack_req = true;
++	}
  
- 	h5->rx_ack = H5_HDR_ACK(hdr);
-@@ -255,13 +311,18 @@ static int h5_rx_3wire_hdr(struct hci_uart *hu, unsigned char c)
+-	switch (pkt_type) {
++	h5->rx_ack = H5_HDR_ACK(hdr);
++
++	h5_pkt_cull(h5);
++
++	switch (H5_HDR_PKT_TYPE(hdr)) {
+ 	case HCI_EVENT_PKT:
+ 	case HCI_ACLDATA_PKT:
+ 	case HCI_SCODATA_PKT:
+-		bt_cb(h5->rx_skb)->pkt_type = pkt_type;
++		bt_cb(h5->rx_skb)->pkt_type = H5_HDR_PKT_TYPE(hdr);
+ 
+ 		/* Remove Three-wire header */
+ 		skb_pull(h5->rx_skb, 4);
+@@ -191,7 +237,7 @@ static int h5_rx_payload(struct hci_uart *hu, unsigned char c)
  
  	BT_DBG("%s 0x%02hhx", hu->hdev->name, c);
  
-+	BT_DBG("%s rx: seq %u ack %u crc %u rel %u type %u len %u",
-+	       hu->hdev->name, H5_HDR_SEQ(hdr), H5_HDR_ACK(hdr),
-+	       H5_HDR_CRC(hdr), H5_HDR_RELIABLE(hdr), H5_HDR_PKT_TYPE(hdr),
-+	       H5_HDR_LEN(hdr));
-+
- 	if (((hdr[0] + hdr[1] + hdr[2] + hdr[3]) & 0xff) != 0xff) {
- 		BT_ERR("Invalid header checksum");
- 		h5_reset_rx(h5);
+-	if ((hdr[0] >> 4) & 0x01) {
++	if (H5_HDR_CRC(hdr)) {
+ 		h5->rx_func = h5_rx_crc;
+ 		h5->rx_pending = 2;
+ 	} else {
+@@ -215,8 +261,15 @@ static int h5_rx_3wire_hdr(struct hci_uart *hu, unsigned char c)
  		return 0;
  	}
  
--	if (H5_HDR_RELIABLE(hdr) && H5_HDR_SEQ(hdr) != h5->tx_seq) {
-+	if (H5_HDR_RELIABLE(hdr) && H5_HDR_SEQ(hdr) != h5->tx_ack) {
- 		BT_ERR("Out-of-order packet arrived (%u != %u)",
- 		       H5_HDR_SEQ(hdr), h5->tx_ack);
- 		h5_reset_rx(h5);
-@@ -442,9 +503,10 @@ static void h5_slip_one_byte(struct sk_buff *skb, u8 c)
- 	}
- }
++	if (H5_HDR_RELIABLE(hdr) && H5_HDR_SEQ(hdr) != h5->tx_seq) {
++		BT_ERR("Out-of-order packet arrived (%u != %u)",
++		       H5_HDR_SEQ(hdr), h5->tx_ack);
++		h5_reset_rx(h5);
++		return 0;
++	}
++
+ 	h5->rx_func = h5_rx_payload;
+-	h5->rx_pending = ((hdr[1] >> 4) & 0xff) + (hdr[2] << 4);
++	h5->rx_pending = H5_HDR_LEN(hdr);
  
--static struct sk_buff *h5_build_pkt(struct h5 *h5, bool rel, u8 pkt_type,
-+static struct sk_buff *h5_build_pkt(struct hci_uart *hu, bool rel, u8 pkt_type,
- 				    const u8 *data, size_t len)
- {
-+	struct h5 *h5 = hu->priv;
- 	struct sk_buff *nskb;
- 	u8 hdr[4];
- 	int i;
-@@ -463,7 +525,7 @@ static struct sk_buff *h5_build_pkt(struct h5 *h5, bool rel, u8 pkt_type,
+ 	return 0;
+ }
+@@ -410,13 +463,13 @@ static struct sk_buff *h5_build_pkt(struct h5 *h5, bool rel, u8 pkt_type,
  
  	h5_slip_delim(nskb);
  
--	hdr[0] = h5->rx_seq << 3;
-+	hdr[0] = h5->tx_ack << 3;
- 	h5->tx_ack_req = false;
+-	hdr[0] = h5->next_ack << 3;
+-	h5->txack_req = false;
++	hdr[0] = h5->rx_seq << 3;
++	h5->tx_ack_req = false;
  
  	if (rel) {
-@@ -476,6 +538,11 @@ static struct sk_buff *h5_build_pkt(struct h5 *h5, bool rel, u8 pkt_type,
- 	hdr[2] = len >> 4;
- 	hdr[3] = ~((hdr[0] + hdr[1] + hdr[2]) & 0xff);
- 
-+	BT_DBG("%s tx: seq %u ack %u crc %u rel %u type %u len %u",
-+	       hu->hdev->name, H5_HDR_SEQ(hdr), H5_HDR_ACK(hdr),
-+	       H5_HDR_CRC(hdr), H5_HDR_RELIABLE(hdr), H5_HDR_PKT_TYPE(hdr),
-+	       H5_HDR_LEN(hdr));
-+
- 	for (i = 0; i < 4; i++)
- 		h5_slip_one_byte(nskb, hdr[i]);
- 
-@@ -487,7 +554,7 @@ static struct sk_buff *h5_build_pkt(struct h5 *h5, bool rel, u8 pkt_type,
- 	return nskb;
- }
- 
--static struct sk_buff *h5_prepare_pkt(struct h5 *h5, u8 pkt_type,
-+static struct sk_buff *h5_prepare_pkt(struct hci_uart *hu, u8 pkt_type,
- 				      const u8 *data, size_t len)
- {
- 	bool rel;
-@@ -507,13 +574,7 @@ static struct sk_buff *h5_prepare_pkt(struct h5 *h5, u8 pkt_type,
- 		return NULL;
+ 		hdr[0] |= 1 << 7;
+-		hdr[0] |= h5->next_seq;
+-		h5->next_seq = (h5->next_seq + 1) % 8;
++		hdr[0] |= h5->tx_seq;
++		h5->tx_seq = (h5->tx_seq + 1) % 8;
  	}
  
--	return h5_build_pkt(h5, rel, pkt_type, data, len);
--}
--
--static struct sk_buff *h5_prepare_ack(struct h5 *h5)
--{
--	h5->tx_ack_req = false;
--	return NULL;
-+	return h5_build_pkt(hu, rel, pkt_type, data, len);
- }
+ 	hdr[1] = pkt_type | ((len & 0x0f) << 4);
+@@ -459,7 +512,7 @@ static struct sk_buff *h5_prepare_pkt(struct h5 *h5, u8 pkt_type,
  
- static struct sk_buff *h5_dequeue(struct hci_uart *hu)
-@@ -523,7 +584,7 @@ static struct sk_buff *h5_dequeue(struct hci_uart *hu)
- 	struct sk_buff *skb, *nskb;
- 
- 	if ((skb = skb_dequeue(&h5->unrel)) != NULL) {
--		nskb = h5_prepare_pkt(h5, bt_cb(skb)->pkt_type,
-+		nskb = h5_prepare_pkt(hu, bt_cb(skb)->pkt_type,
- 				      skb->data, skb->len);
- 		if (nskb) {
- 			kfree_skb(skb);
-@@ -540,7 +601,7 @@ static struct sk_buff *h5_dequeue(struct hci_uart *hu)
- 	       goto unlock;
- 
- 	if ((skb = skb_dequeue(&h5->rel)) != NULL) {
--		nskb = h5_prepare_pkt(h5, bt_cb(skb)->pkt_type,
-+		nskb = h5_prepare_pkt(hu, bt_cb(skb)->pkt_type,
- 				      skb->data, skb->len);
- 		if (nskb) {
- 			__skb_queue_tail(&h5->unack, skb);
-@@ -557,7 +618,7 @@ unlock:
- 	spin_unlock_irqrestore(&h5->unack.lock, flags);
- 
- 	if (h5->tx_ack_req)
--		return h5_prepare_ack(h5);
-+		return h5_prepare_pkt(hu, HCI_3WIRE_ACK_PKT, NULL, 0);
- 
+ static struct sk_buff *h5_prepare_ack(struct h5 *h5)
+ {
+-	h5->txack_req = false;
++	h5->tx_ack_req = false;
  	return NULL;
  }
+ 
+@@ -503,7 +556,7 @@ static struct sk_buff *h5_dequeue(struct hci_uart *hu)
+ unlock:
+ 	spin_unlock_irqrestore(&h5->unack.lock, flags);
+ 
+-	if (h5->txack_req)
++	if (h5->tx_ack_req)
+ 		return h5_prepare_ack(h5);
+ 
+ 	return NULL;
 -- 
 1.7.10.4
 
