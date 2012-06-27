@@ -1,93 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michal Labedzki <michal.labedzki@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <luiz.dentz@gmail.com>, <lucas.demarchi@profusion.mob>,
-	<johan.hedberg@gmail.com>,
-	Michal Labedzki <michal.labedzki@tieto.com>
-Subject: [PATCH v2 02/14] doc: Fix typo
-Date: Wed, 27 Jun 2012 15:27:36 +0200
-Message-ID: <1340803668-31686-2-git-send-email-michal.labedzki@tieto.com>
-In-Reply-To: <1340803668-31686-1-git-send-email-michal.labedzki@tieto.com>
-References: <1340803668-31686-1-git-send-email-michal.labedzki@tieto.com>
+Date: Wed, 27 Jun 2012 15:51:07 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 00/10] ATT MTU: cosmetic changes
+Message-ID: <20120627125107.GA12889@x220>
+References: <1340213272-2853-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1340213272-2853-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fix simple typo in documentation of API.
----
- doc/adapter-api.txt   |    2 +-
- doc/audio-api.txt     |    2 +-
- doc/device-api.txt    |    2 +-
- doc/media-api.txt     |    2 +-
- doc/proximity-api.txt |    2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
+Hi Claudio,
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index dccb6bf..916e941 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -24,7 +24,7 @@ Methods		dict GetProperties()
- 		void SetProperty(string name, variant value)
- 
- 			Changes the value of the specified property. Only
--			properties that are listed a read-write are changeable.
-+			properties that are listed as read-write are changeable.
- 			On success this will emit a PropertyChanged signal.
- 
- 			Possible Errors: org.bluez.Error.InvalidArguments
-diff --git a/doc/audio-api.txt b/doc/audio-api.txt
-index 02291fd..9b1737d 100644
---- a/doc/audio-api.txt
-+++ b/doc/audio-api.txt
-@@ -122,7 +122,7 @@ Methods		void Connect()
- 		void SetProperty(string name, variant value)
- 
- 			Changes the value of the specified property. Only
--			properties that are listed a read-write are changeable.
-+			properties that are listed as read-write are changeable.
- 			On success this will emit a PropertyChanged signal.
- 
- 			Possible Errors: org.bluez.Error.DoesNotExist
-diff --git a/doc/device-api.txt b/doc/device-api.txt
-index 4a170e4..0f34210 100644
---- a/doc/device-api.txt
-+++ b/doc/device-api.txt
-@@ -25,7 +25,7 @@ Methods		dict GetProperties()
- 		void SetProperty(string name, variant value)
- 
- 			Changes the value of the specified property. Only
--			properties that are listed a read-write are changeable.
-+			properties that are listed as read-write are changeable.
- 			On success this will emit a PropertyChanged signal.
- 
- 			Possible Errors: org.bluez.Error.DoesNotExist
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index 4446439..e5eeaa0 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -289,7 +289,7 @@ Methods		dict GetProperties()
- 		void SetProperty(string name, variant value)
- 
- 			Changes the value of the specified property. Only
--			properties that are listed a read-write can be changed.
-+			properties that are listed as read-write can be changed.
- 
- 			On success this will emit a PropertyChanged signal.
- 
-diff --git a/doc/proximity-api.txt b/doc/proximity-api.txt
-index 0c60d47..c8eae50 100644
---- a/doc/proximity-api.txt
-+++ b/doc/proximity-api.txt
-@@ -19,7 +19,7 @@ Methods		dict GetProperties()
- 		void SetProperty(string name, variant value)
- 
- 			Changes the value of the specified property. Only
--			properties that are listed a read-write are changeable.
-+			properties that are listed as read-write are changeable.
- 			On success this will emit a PropertyChanged signal.
- 
- 			Possible Errors: org.bluez.Error.InvalidArguments
--- 
-on behalf of ST-Ericsson
+On Wed, Jun 20, 2012, Claudio Takahasi wrote:
+> This patch series contains minor improvements related to ATT MTU and
+> GAttrib buffer usage.
+> 
+> Claudio Takahasi (10):
+>   ATT: Avoid invalid memory access for large PDU
+>   dis: Reduce array size for PnP ID
+>   thermometer: Use GAttrib buffer
+>   gatttool: Use GAttrib buffer
+>   thermometer: Reduce the array for Valid Range
+>   thermometer: Reduce the array for temperature type
+>   thermometer: Reduce array size for Measurement Interval
+>   proximity: Reduce array size for Tx Power Level
+>   generic attribute: Use GAttrib buffer
+>   attrib-server: Fix MTU for GATT
+> 
+>  attrib/att.c              |   17 +++++++++--------
+>  attrib/att.h              |    2 +-
+>  attrib/client.c           |    6 ++++--
+>  attrib/gatttool.c         |   13 +++++++++----
+>  attrib/interactive.c      |   12 ++++++++----
+>  deviceinfo/deviceinfo.c   |    9 ++++++---
+>  proximity/monitor.c       |   10 ++++++----
+>  src/attrib-server.c       |    2 +-
+>  thermometer/thermometer.c |   31 ++++++++++++++++++++-----------
+>  9 files changed, 64 insertions(+), 38 deletions(-)
 
+All patches in this set have been applied. Thanks.
+
+Be careful with the commit message width in the future, it should be max
+72 (I had to fix this at least in one patch).
+
+Johan
