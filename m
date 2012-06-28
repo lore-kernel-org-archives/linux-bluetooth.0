@@ -2,253 +2,332 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v10 10/12] audio: Replace headset and gateway by telephony
-Date: Thu, 28 Jun 2012 10:03:34 +0200
-Message-Id: <1340870617-13532-11-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v10 11/12] audio: Add DUN GW to org.bluez.Telephony
+Date: Thu, 28 Jun 2012 10:03:35 +0200
+Message-Id: <1340870617-13532-12-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1340870617-13532-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1340870617-13532-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Replace Headset and Gateway configuration options by new
-Telephony option.
-Remove HFP option  in Headset section as it is no more
-relevant.
 ---
- audio/audio.conf |    6 +---
- audio/manager.c  |   90 ++++++++++++------------------------------------------
- audio/manager.h  |    4 +--
- 3 files changed, 22 insertions(+), 78 deletions(-)
+ audio/telephony.c |  252 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 249 insertions(+), 3 deletions(-)
 
-diff --git a/audio/audio.conf b/audio/audio.conf
-index fd6092a..d3e6447 100644
---- a/audio/audio.conf
-+++ b/audio/audio.conf
-@@ -9,7 +9,7 @@
+diff --git a/audio/telephony.c b/audio/telephony.c
+index 65eca41..1bcad6d 100644
+--- a/audio/telephony.c
++++ b/audio/telephony.c
+@@ -49,12 +49,14 @@
+ #include "telephony.h"
+ #include "dbus-common.h"
+ #include "../src/adapter.h"
++#include "../src/manager.h"
+ #include "../src/device.h"
+ #include "sdpd.h"
  
- # If we want to disable support for specific services
- # Defaults to supporting all implemented services
--#Disable=Gateway,Source,Socket
-+#Disable=Source,Socket
+ #define AUDIO_TELEPHONY_INTERFACE "org.bluez.Telephony"
+ #define AUDIO_TELEPHONY_AGENT_INTERFACE "org.bluez.TelephonyAgent"
  
- # SCO routing. Either PCM or HCI (in which case audio is routed to/from ALSA)
- # Defaults to HCI
-@@ -25,10 +25,6 @@
- # service interacts with remote headset devices)
- [Headset]
- 
--# Set to true to support HFP, false means only HSP is supported
--# Defaults to true
--HFP=true
--
- # Maximum number of connected HSP/HFP devices per adapter. Defaults to 1
- MaxConnected=1
- 
-diff --git a/audio/manager.c b/audio/manager.c
-index 359a0cf..15db2f3 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -102,9 +102,7 @@ static GSList *adapters = NULL;
- static GSList *devices = NULL;
- 
- static struct enabled_interfaces enabled = {
--	.hfp		= TRUE,
--	.headset	= TRUE,
--	.gateway	= FALSE,
-+	.telephony	= TRUE,
- 	.sink		= TRUE,
- 	.source		= FALSE,
- 	.control	= TRUE,
-@@ -129,13 +127,13 @@ gboolean server_is_enabled(bdaddr_t *src, uint16_t svc)
- {
- 	switch (svc) {
- 	case HEADSET_SVCLASS_ID:
--		return enabled.headset;
-+		return enabled.telephony;
- 	case HEADSET_AGW_SVCLASS_ID:
- 		return FALSE;
- 	case HANDSFREE_SVCLASS_ID:
--		return enabled.headset && enabled.hfp;
-+		return enabled.telephony;
- 	case HANDSFREE_AGW_SVCLASS_ID:
--		return enabled.gateway;
-+		return enabled.telephony;
- 	case AUDIO_SINK_SVCLASS_ID:
- 		return enabled.sink;
- 	case AUDIO_SOURCE_SVCLASS_ID:
-@@ -192,7 +190,7 @@ static void handle_uuid(const char *uuidstr, struct audio_device *device)
- 		break;
- 	case HANDSFREE_AGW_SVCLASS_ID:
- 		DBG("Found Handsfree AG record");
--		if (enabled.gateway && (device->gateway == NULL))
-+		if (enabled.telephony && (device->gateway == NULL))
- 			device->gateway = gateway_init(device);
- 		break;
- 	case AUDIO_SINK_SVCLASS_ID:
-@@ -352,7 +350,7 @@ static void state_changed(struct btd_adapter *adapter, gboolean powered)
- 	telephony = FALSE;
- }
- 
--static int headset_server_probe(struct btd_adapter *adapter)
-+static int telephony_server_probe(struct btd_adapter *adapter)
- {
- 	struct audio_adapter *adp;
- 	const gchar *path = adapter_get_path(adapter);
-@@ -370,7 +368,7 @@ static int headset_server_probe(struct btd_adapter *adapter)
- 	return 0;
- }
- 
--static void headset_server_remove(struct btd_adapter *adapter)
-+static void telephony_server_remove(struct btd_adapter *adapter)
- {
- 	struct audio_adapter *adp;
- 	const gchar *path = adapter_get_path(adapter);
-@@ -386,31 +384,6 @@ static void headset_server_remove(struct btd_adapter *adapter)
- 	audio_adapter_unref(adp);
- }
- 
--static int gateway_server_probe(struct btd_adapter *adapter)
--{
--	struct audio_adapter *adp;
--
--	adp = audio_adapter_get(adapter);
--	if (!adp)
--		return -EINVAL;
--
--	return 0;
--}
--
--static void gateway_server_remove(struct btd_adapter *adapter)
--{
--	struct audio_adapter *adp;
--	const gchar *path = adapter_get_path(adapter);
--
--	DBG("path %s", path);
--
--	adp = find_adapter(adapters, adapter);
--	if (!adp)
--		return;
--
--	audio_adapter_unref(adp);
--}
--
- static int a2dp_server_probe(struct btd_adapter *adapter)
- {
- 	struct audio_adapter *adp;
-@@ -535,16 +508,10 @@ static struct btd_device_driver audio_driver = {
- 	.remove	= audio_remove,
++#define DEFAULT_DUN_GW_CHANNEL 1
+ #define DEFAULT_HS_HS_CHANNEL 6
+ #define DEFAULT_HS_AG_CHANNEL 12
+ #define DEFAULT_HF_HS_CHANNEL 7
+@@ -97,6 +99,13 @@ struct tel_agent {
+ 	uint32_t		record_id;
  };
  
--static struct btd_adapter_driver headset_server_driver = {
--	.name	= "audio-headset",
--	.probe	= headset_server_probe,
--	.remove	= headset_server_remove,
--};
--
--static struct btd_adapter_driver gateway_server_driver = {
--	.name	= "audio-gateway",
--	.probe	= gateway_server_probe,
--	.remove	= gateway_server_remove,
-+static struct btd_adapter_driver telephony_server_driver = {
-+	.name	= "telephony",
-+	.probe	= telephony_server_probe,
-+	.remove	= telephony_server_remove,
- };
++struct dun_client {
++	struct btd_device *btd_dev;
++	bdaddr_t src, dst;
++	GIOChannel *rfcomm;
++	int preauth_id;
++};
++
+ static DBusConnection *connection = NULL;
  
- static struct btd_adapter_driver a2dp_server_driver = {
-@@ -583,10 +550,8 @@ int audio_manager_init(DBusConnection *conn, GKeyFile *conf,
- 	list = g_key_file_get_string_list(config, "General", "Enable",
- 						NULL, NULL);
- 	for (i = 0; list && list[i] != NULL; i++) {
--		if (g_str_equal(list[i], "Headset"))
--			enabled.headset = TRUE;
--		else if (g_str_equal(list[i], "Gateway"))
--			enabled.gateway = TRUE;
-+		if (g_str_equal(list[i], "Telephony"))
-+			enabled.telephony = TRUE;
- 		else if (g_str_equal(list[i], "Sink"))
- 			enabled.sink = TRUE;
- 		else if (g_str_equal(list[i], "Source"))
-@@ -604,10 +569,8 @@ int audio_manager_init(DBusConnection *conn, GKeyFile *conf,
- 	list = g_key_file_get_string_list(config, "General", "Disable",
- 						NULL, NULL);
- 	for (i = 0; list && list[i] != NULL; i++) {
--		if (g_str_equal(list[i], "Headset"))
--			enabled.headset = FALSE;
--		else if (g_str_equal(list[i], "Gateway"))
--			enabled.gateway = FALSE;
-+		if (g_str_equal(list[i], "Telephony"))
-+			enabled.telephony = FALSE;
- 		else if (g_str_equal(list[i], "Sink"))
- 			enabled.sink = FALSE;
- 		else if (g_str_equal(list[i], "Source"))
-@@ -628,13 +591,6 @@ int audio_manager_init(DBusConnection *conn, GKeyFile *conf,
- 	} else
- 		auto_connect = b;
- 
--	b = g_key_file_get_boolean(config, "Headset", "HFP",
--					&err);
--	if (err)
--		g_clear_error(&err);
--	else
--		enabled.hfp = b;
--
- 	err = NULL;
- 	i = g_key_file_get_integer(config, "Headset", "MaxConnected",
- 					&err);
-@@ -651,11 +607,8 @@ proceed:
- 	if (enabled.media)
- 		btd_register_adapter_driver(&media_server_driver);
- 
--	if (enabled.headset)
--		btd_register_adapter_driver(&headset_server_driver);
--
--	if (enabled.gateway)
--		btd_register_adapter_driver(&gateway_server_driver);
-+	if (enabled.telephony)
-+		btd_register_adapter_driver(&telephony_server_driver);
- 
- 	if (enabled.source || enabled.sink)
- 		btd_register_adapter_driver(&a2dp_server_driver);
-@@ -665,7 +618,7 @@ proceed:
- 
- 	btd_register_device_driver(&audio_driver);
- 
--	*enable_sco = (enabled.gateway || enabled.headset);
-+	*enable_sco = (enabled.telephony);
- 
- 	return 0;
+ static GSList *agents = NULL;	/* server list */
+@@ -259,6 +268,168 @@ static gboolean agent_sendfd(struct tel_device *dev, int fd,
+ 	return TRUE;
  }
-@@ -690,11 +643,8 @@ void audio_manager_exit(void)
- 	if (enabled.media)
- 		btd_unregister_adapter_driver(&media_server_driver);
  
--	if (enabled.headset)
--		btd_unregister_adapter_driver(&headset_server_driver);
--
--	if (enabled.gateway)
--		btd_unregister_adapter_driver(&gateway_server_driver);
-+	if (enabled.telephony)
-+		btd_unregister_adapter_driver(&telephony_server_driver);
++static gboolean dun_dev_disconnect_cb(GIOChannel *chan, GIOCondition cond,
++						struct tel_device *dev)
++{
++	if (cond & G_IO_NVAL)
++		return FALSE;
++
++	telephony_device_disconnect(dev);
++
++	return FALSE;
++}
++
++static void dun_newconnection_reply(DBusPendingCall *call, void *user_data)
++{
++	struct tel_device *dev = user_data;
++	DBusMessage *reply = dbus_pending_call_steal_reply(call);
++	DBusError derr;
++
++	if (!dev->rfcomm) {
++		DBG("RFCOMM disconnected from server before agent reply");
++		goto done;
++	}
++
++	dbus_error_init(&derr);
++	if (!dbus_set_error_from_message(&derr, reply)) {
++		DBG("Agent reply: file descriptor passed successfully");
++		g_io_add_watch(dev->rfcomm, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++					(GIOFunc) dun_dev_disconnect_cb, dev);
++		goto done;
++	}
++
++	DBG("Agent reply: %s", derr.message);
++
++	dbus_error_free(&derr);
++
++done:
++	dbus_message_unref(reply);
++}
++
++static void dun_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
++{
++	struct dun_client *dun = user_data;
++	char hs_address[18];
++	void *agent;
++
++	if (err) {
++		error("%s", err->message);
++		goto done;
++	}
++
++	ba2str(&dun->dst, hs_address);
++
++	agent = telephony_agent_by_uuid(device_get_adapter(dun->btd_dev),
++								DUN_GW_UUID);
++	telephony_device_connecting(chan, dun->btd_dev, dun, agent);
++
++	DBG("%s: Connected to %s", device_get_path(dun->btd_dev), hs_address);
++
++done:
++	g_free(dun);
++
++	return;
++}
++
++static void dun_auth_cb(DBusError *derr, void *user_data)
++{
++	struct dun_client *dun = user_data;
++	GError *err = NULL;
++
++	if (dun->preauth_id) {
++		g_source_remove(dun->preauth_id);
++		dun->preauth_id = 0;
++	}
++
++	if (derr && dbus_error_is_set(derr)) {
++		error("Access denied: %s", derr->message);
++		g_free(dun);
++		return;
++	}
++
++	if (!bt_io_accept(dun->rfcomm, dun_connect_cb, dun, NULL, &err)) {
++		error("bt_io_accept: %s", err->message);
++		g_error_free(err);
++		g_free(dun);
++		return;
++	}
++}
++
++static gboolean dun_preauth_cb(GIOChannel *chan, GIOCondition cond,
++							gpointer user_data)
++{
++	struct dun_client *dun = user_data;
++
++	DBG("DUN Gateway disconnected during authorization");
++
++	btd_cancel_authorization(&dun->src, &dun->dst);
++
++	g_free(dun);
++
++	return FALSE;
++}
++
++static void dun_confirm(GIOChannel *chan, gpointer data)
++{
++	struct tel_agent *agent = data;
++	struct dun_client *dun;
++	struct btd_adapter *adapter;
++	struct btd_device *device;
++	char addr[18];
++	int perr;
++	GError *err = NULL;
++	uint8_t ch;
++
++	dun = g_new0(struct dun_client, 1);
++
++	bt_io_get(chan, BT_IO_RFCOMM, &err,
++			BT_IO_OPT_SOURCE_BDADDR, &dun->src,
++			BT_IO_OPT_DEST_BDADDR, &dun->dst,
++			BT_IO_OPT_CHANNEL, &ch,
++			BT_IO_OPT_INVALID);
++	if (err) {
++		error("%s", err->message);
++		g_error_free(err);
++		goto drop;
++	}
++
++	ba2str(&dun->src, addr);
++
++	adapter = manager_find_adapter(&dun->src);
++	if (!adapter) {
++		error("Unable to get a btd_adapter object for %s", addr);
++		goto drop;
++	}
++
++	ba2str(&dun->dst, addr);
++
++	device = adapter_get_device(connection, adapter, addr);
++	if (!device) {
++		error("Unable to get btd_device object for %s", addr);
++		goto drop;
++	}
++
++	dun->btd_dev = device;
++	dun->rfcomm = g_io_channel_ref(chan);
++
++	perr = btd_request_authorization(&dun->src, &dun->dst,
++						agent->properties->uuid,
++						dun_auth_cb, dun);
++	if (perr < 0) {
++		DBG("Authorization denied: %s", strerror(-perr));
++		return;
++	}
++
++	dun->preauth_id = g_io_add_watch(chan,
++					G_IO_NVAL | G_IO_HUP | G_IO_ERR,
++					dun_preauth_cb, dun);
++
++	return;
++
++drop:
++	g_io_channel_shutdown(chan, TRUE, NULL);
++}
++
+ static gboolean hs_dev_disconnect_cb(GIOChannel *chan, GIOCondition cond,
+ 						struct tel_device *dev)
+ {
+@@ -401,7 +572,8 @@ void *telephony_device_connecting(GIOChannel *io, struct btd_device *btd_dev,
+ 	struct tel_device *dev;
+ 	struct tel_agent *ag = agent;
+ 	uuid_t uuid;
+-	int err;
++	int sk;
++	int err = 0;
  
- 	if (enabled.source || enabled.sink)
- 		btd_unregister_adapter_driver(&a2dp_server_driver);
-diff --git a/audio/manager.h b/audio/manager.h
-index f1d3021..645134c 100644
---- a/audio/manager.h
-+++ b/audio/manager.h
-@@ -23,9 +23,7 @@
-  */
+ 	dev = g_new0(struct tel_device, 1);
+ 	dev->btd_dev = btd_dev;
+@@ -412,10 +584,22 @@ void *telephony_device_connecting(GIOChannel *io, struct btd_device *btd_dev,
+ 	dev->rfcomm = io;
+ 	dev->features = 0xFFFF;
  
- struct enabled_interfaces {
--	gboolean hfp;
--	gboolean headset;
--	gboolean gateway;
-+	gboolean telephony;
- 	gboolean sink;
- 	gboolean source;
- 	gboolean control;
+-	sdp_uuid16_create(&uuid, dev->properties->r_class);
++	if (dev->properties->r_class == 0) {
++		sk = g_io_channel_unix_get_fd(dev->rfcomm);
+ 
+-	err = bt_search_service(&device->src, &device->dst, &uuid,
++		if (agent_sendfd(dev, sk, dev->properties->connection_reply)
++								== FALSE) {
++			error("Failed to send RFComm socket to agent %s,"
++					" path %s", dev->name, dev->path);
++			err = -1;
++		}
++	} else {
++		sdp_uuid16_create(&uuid, dev->properties->r_class);
++
++		err = bt_search_service(&device->src, &device->dst, &uuid,
+ 						get_record_cb, dev, NULL);
++	}
++
+ 	if (err < 0) {
+ 		g_free(dev->name);
+ 		g_free(dev->path);
+@@ -461,6 +645,60 @@ const char *telephony_get_agent_name(void *slc)
+ 	return dev->name;
+ }
+ 
++static sdp_record_t *dun_gw_record(struct tel_agent * agent)
++{
++	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
++	uuid_t root_uuid, svclass_uuid;
++	uuid_t l2cap_uuid, rfcomm_uuid;
++	sdp_profile_desc_t profile;
++	sdp_list_t *aproto, *proto[2];
++	sdp_record_t *record;
++	sdp_data_t *channel;
++
++	record = sdp_record_alloc();
++	if (!record)
++		return NULL;
++
++	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
++	root = sdp_list_append(0, &root_uuid);
++	sdp_set_browse_groups(record, root);
++
++	sdp_uuid16_create(&svclass_uuid, DIALUP_NET_SVCLASS_ID);
++	svclass_id = sdp_list_append(0, &svclass_uuid);
++	sdp_set_service_classes(record, svclass_id);
++
++	sdp_uuid16_create(&profile.uuid, DIALUP_NET_PROFILE_ID);
++	profile.version = agent->version;
++	pfseq = sdp_list_append(0, &profile);
++	sdp_set_profile_descs(record, pfseq);
++
++	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
++	proto[0] = sdp_list_append(0, &l2cap_uuid);
++	apseq = sdp_list_append(0, proto[0]);
++
++	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
++	proto[1] = sdp_list_append(0, &rfcomm_uuid);
++	channel = sdp_data_alloc(SDP_UINT8, &agent->properties->channel);
++	proto[1] = sdp_list_append(proto[1], channel);
++	apseq = sdp_list_append(apseq, proto[1]);
++
++	aproto = sdp_list_append(0, apseq);
++	sdp_set_access_protos(record, aproto);
++
++	sdp_set_info_attr(record, "Dial-up Networking", 0, 0);
++
++	sdp_data_free(channel);
++	sdp_list_free(proto[0], 0);
++	sdp_list_free(proto[1], 0);
++	sdp_list_free(apseq, 0);
++	sdp_list_free(pfseq, 0);
++	sdp_list_free(aproto, 0);
++	sdp_list_free(root, 0);
++	sdp_list_free(svclass_id, 0);
++
++	return record;
++}
++
+ #if 0
+ static sdp_record_t *hsp_hs_record(struct tel_agent * agent)
+ {
+@@ -940,6 +1178,14 @@ drop:
+ }
+ 
+ static struct default_agent default_properties[] = {
++	{ DUN_GW_UUID,
++		DEFAULT_DUN_GW_CHANNEL,
++		NULL,
++		0,
++		0,
++		dun_gw_record,
++		dun_confirm,
++		dun_newconnection_reply },
+ 	{ HSP_AG_UUID,
+ 		DEFAULT_HS_AG_CHANNEL,
+ 		HSP_HS_UUID,
 -- 
 1.7.9.5
 
