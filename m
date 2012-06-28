@@ -1,43 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 28 Jun 2012 16:48:06 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2] Bluetooth: btmrvl: Do not send vendor events to
- bluetooth stack
-Message-ID: <20120628134803.GC14705@aemeltch-MOBL1>
-References: <477F20668A386D41ADCC57781B1F7043083A8A6E5F@SC-VEXCH1.marvell.com>
- <1339740654-5930-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20120619032630.GE1679@joana>
+Date: Thu, 28 Jun 2012 16:19:34 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv3 hcidump 1/4] lib: Add headers for AMP ASSOC data
+Message-ID: <20120628131934.GA26158@x220>
+References: <1338887361-11585-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1340888962-18959-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120619032630.GE1679@joana>
+In-Reply-To: <1340888962-18959-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Andrei,
 
-On Tue, Jun 19, 2012 at 12:26:30AM -0300, Gustavo Padovan wrote:
-> Hi Andrei,
+On Thu, Jun 28, 2012, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> * Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-06-15 09:10:54 +0300]:
-> 
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > 
-> > Vendor-specific events shall be processed in driver and not sent
-> > to bluetooth stack where they screw up HCI command countings.
-> > 
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > Tested-by: Bing Zhao <bzhao@marvell.com>
-> > ---
-> >  drivers/bluetooth/btmrvl_drv.h  |    2 +-
-> >  drivers/bluetooth/btmrvl_main.c |   18 +++++++++++++++---
-> >  drivers/bluetooth/btmrvl_sdio.c |    9 ++++++---
-> >  3 files changed, 22 insertions(+), 7 deletions(-)
-> 
-> Patch has been applied to the bluetooth tree. Thanks.
+> ---
+>  lib/a2mp.h |   38 --------------
+>  lib/amp.h  |  172 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 172 insertions(+), 38 deletions(-)
+>  create mode 100644 lib/amp.h
 
-Which version have you applied? Old one?
+All patches in this set have been applied (and the lib one went to
+bluez.git too).
 
-Best regards 
-Andrei Emeltchenko 
+Johan
