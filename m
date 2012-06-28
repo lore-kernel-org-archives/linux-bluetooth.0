@@ -1,102 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1340878959-1343-2-git-send-email-michal.labedzki@tieto.com>
+From: Michal Labedzki <michal.labedzki@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <luiz.dentz@gmail.com>, <lucas.demarchi@profusion.mobi>,
+	<johan.hedberg@gmail.com>,
+	Michal Labedzki <michal.labedzki@tieto.com>
+Subject: [PATCH v3 14/14] AVRCP: Handle SetAddressedPlayer command from remote controller
+Date: Thu, 28 Jun 2012 12:22:39 +0200
+Message-ID: <1340878959-1343-14-git-send-email-michal.labedzki@tieto.com>
+In-Reply-To: <1340878959-1343-1-git-send-email-michal.labedzki@tieto.com>
 References: <1340878959-1343-1-git-send-email-michal.labedzki@tieto.com>
-	<1340878959-1343-2-git-send-email-michal.labedzki@tieto.com>
-Date: Thu, 28 Jun 2012 13:41:38 +0300
-Message-ID: <CABBYNZKcPfDv1aymKhVyJ3sprSfFLAdZEdyXENi4rRDWipNkqA@mail.gmail.com>
-Subject: Re: [PATCH v3 02/14] doc: Fix typo
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Michal Labedzki <michal.labedzki@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, lucas.demarchi@profusion.mobi,
-	johan.hedberg@gmail.com
-Content-Type: text/plain; charset=ISO-8859-1
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+Set player selected by controller as addressed player.
+---
+ audio/avrcp.c |   33 +++++++++++++++++++++++++++++++++
+ audio/avrcp.h |    1 +
+ audio/media.c |   19 ++++++++++++++++++-
+ 3 files changed, 52 insertions(+), 1 deletion(-)
 
-On Thu, Jun 28, 2012 at 1:22 PM, Michal Labedzki
-<michal.labedzki@tieto.com> wrote:
-> This patch fix simple typo in documentation of API.
-> ---
->  doc/adapter-api.txt   |    2 +-
->  doc/audio-api.txt     |    2 +-
->  doc/device-api.txt    |    2 +-
->  doc/media-api.txt     |    2 +-
->  doc/proximity-api.txt |    2 +-
->  5 files changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> index dccb6bf..916e941 100644
-> --- a/doc/adapter-api.txt
-> +++ b/doc/adapter-api.txt
-> @@ -24,7 +24,7 @@ Methods               dict GetProperties()
->                void SetProperty(string name, variant value)
->
->                        Changes the value of the specified property. Only
-> -                       properties that are listed a read-write are changeable.
-> +                       properties that are listed as read-write are changeable.
->                        On success this will emit a PropertyChanged signal.
->
->                        Possible Errors: org.bluez.Error.InvalidArguments
-> diff --git a/doc/audio-api.txt b/doc/audio-api.txt
-> index 02291fd..9b1737d 100644
-> --- a/doc/audio-api.txt
-> +++ b/doc/audio-api.txt
-> @@ -122,7 +122,7 @@ Methods             void Connect()
->                void SetProperty(string name, variant value)
->
->                        Changes the value of the specified property. Only
-> -                       properties that are listed a read-write are changeable.
-> +                       properties that are listed as read-write are changeable.
->                        On success this will emit a PropertyChanged signal.
->
->                        Possible Errors: org.bluez.Error.DoesNotExist
-> diff --git a/doc/device-api.txt b/doc/device-api.txt
-> index 4a170e4..0f34210 100644
-> --- a/doc/device-api.txt
-> +++ b/doc/device-api.txt
-> @@ -25,7 +25,7 @@ Methods               dict GetProperties()
->                void SetProperty(string name, variant value)
->
->                        Changes the value of the specified property. Only
-> -                       properties that are listed a read-write are changeable.
-> +                       properties that are listed as read-write are changeable.
->                        On success this will emit a PropertyChanged signal.
->
->                        Possible Errors: org.bluez.Error.DoesNotExist
-> diff --git a/doc/media-api.txt b/doc/media-api.txt
-> index 4446439..e5eeaa0 100644
-> --- a/doc/media-api.txt
-> +++ b/doc/media-api.txt
-> @@ -289,7 +289,7 @@ Methods             dict GetProperties()
->                void SetProperty(string name, variant value)
->
->                        Changes the value of the specified property. Only
-> -                       properties that are listed a read-write can be changed.
-> +                       properties that are listed as read-write can be changed.
->
->                        On success this will emit a PropertyChanged signal.
->
-> diff --git a/doc/proximity-api.txt b/doc/proximity-api.txt
-> index 0c60d47..c8eae50 100644
-> --- a/doc/proximity-api.txt
-> +++ b/doc/proximity-api.txt
-> @@ -19,7 +19,7 @@ Methods               dict GetProperties()
->                void SetProperty(string name, variant value)
->
->                        Changes the value of the specified property. Only
-> -                       properties that are listed a read-write are changeable.
-> +                       properties that are listed as read-write are changeable.
->                        On success this will emit a PropertyChanged signal.
->
->                        Possible Errors: org.bluez.Error.InvalidArguments
-> --
-> on behalf of ST-Ericsson
-
-This has been applied.
-
-
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index fae04c0..07f4d22 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -1079,6 +1079,37 @@ err:
+ 	return AVC_CTYPE_REJECTED;
+ }
+ 
++static uint8_t avrcp_handle_set_addressed_player(struct avrcp_player *player,
++							struct avrcp_header *pdu,
++							uint8_t transaction)
++{
++	uint16_t len = ntohs(pdu->params_len);
++	uint16_t player_id;
++
++	if (len != sizeof(player_id)) {
++		pdu->params[0] = STATUS_INVALID_PARAMETER;
++		return AVC_CTYPE_REJECTED;
++	}
++
++	player_id = bt_get_be16(pdu->params);
++
++	DBG("Remote controller set addressed player id=%u", player_id);
++
++	pdu->params_len = htons(1);
++
++	if (!player->cb->set_addressed_player(player_id, player->user_data)) {
++		if (g_slist_length(player->server->players) == 0)
++			pdu->params[0] = STATUS_NO_AVAILABLE_PLAYERS;
++		else
++			pdu->params[0] = STATUS_INVALID_PLAYER_ID;
++
++		return AVC_CTYPE_REJECTED;
++	}
++
++	pdu->params[0] = STATUS_OK;
++	return AVC_CTYPE_ACCEPTED;
++}
++
+ static struct pdu_handler {
+ 	uint8_t pdu_id;
+ 	uint8_t code;
+@@ -1114,6 +1145,8 @@ static struct pdu_handler {
+ 					avrcp_handle_request_continuing },
+ 		{ PDU_ABORT_CONTINUING, AVC_CTYPE_CONTROL,
+ 					avrcp_handle_abort_continuing },
++		{ PDU_SET_ADDRESSED_PLAYER, AVC_CTYPE_CONTROL,
++					avrcp_handle_set_addressed_player },
+ 		{ },
+ };
+ 
+diff --git a/audio/avrcp.h b/audio/avrcp.h
+index 510dfde..4f7b9e1 100644
+--- a/audio/avrcp.h
++++ b/audio/avrcp.h
+@@ -94,6 +94,7 @@ struct avrcp_player_cb {
+ 	gboolean (*is_dummy_player) (void *user_data);
+ 	uint16_t (*get_player_id) (void *user_data);
+ 	uint16_t (*get_uid_counter) (void *user_data);
++	gboolean (*set_addressed_player) (uint16_t player_id, void *user_data);
+ };
+ 
+ struct avrcp_player *player;
+diff --git a/audio/media.c b/audio/media.c
+index c99cde6..ee55a6b 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -120,6 +120,10 @@ struct metadata_value {
+ 
+ static GSList *adapters = NULL;
+ 
++static gboolean media_set_addressed_player(struct media_adapter *adapter,
++					   const char *sender, const char *path,
++					   gboolean local);
++
+ static void endpoint_request_free(struct endpoint_request *request)
+ {
+ 	if (request->call)
+@@ -1418,6 +1422,18 @@ static uint16_t get_uid_counter(void *user_data)
+ 	return mp->uid_counter;
+ }
+ 
++static gboolean set_addressed_player(uint16_t player_id, void *user_data)
++{
++	struct media_player *player = user_data;
++	struct media_player *mp;
++
++	mp = media_adapter_find_player_by_id(player->adapter, NULL, player_id);
++	if (!mp)
++		return FALSE;
++
++	return media_set_addressed_player(player->adapter, player->sender, mp->path, FALSE);
++}
++
+ static struct avrcp_player_cb player_cb = {
+ 	.get_setting = get_setting,
+ 	.set_setting = set_setting,
+@@ -1429,7 +1445,8 @@ static struct avrcp_player_cb player_cb = {
+ 	.set_volume = set_volume,
+ 	.is_dummy_player = is_dummy_player,
+ 	.get_player_id = get_player_id,
+-	.get_uid_counter = get_uid_counter
++	.get_uid_counter = get_uid_counter,
++	.set_addressed_player = set_addressed_player
+ };
+ 
+ static void media_player_exit(DBusConnection *connection, void *user_data)
 -- 
-Luiz Augusto von Dentz
+on behalf of ST-Ericsson
+
