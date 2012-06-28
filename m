@@ -1,87 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 29 Jun 2012 13:56:53 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 1/2] Bluetooth: Fix legacy pairing with some devices
-Message-ID: <20120629105653.GA17737@x220>
-References: <1338198440-15077-1-git-send-email-szymon.janc@tieto.com>
- <20120529173703.GA18069@joana>
- <201205300941.34495.szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <201205300941.34495.szymon.janc@tieto.com>
+In-Reply-To: <1340872326-20627-1-git-send-email-luiz.dentz@gmail.com>
+References: <1340872326-20627-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 28 Jun 2012 18:18:39 -0300
+Message-ID: <CAFAvTnN=jGXXVb7XtOnAXE2CgHq=n48HCJMtkeiBYKdp05SPeQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v0] AVDTP: Fix disconnecting when acting as sink
+From: Henrique Dante <hdante@profusion.mobi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon & Gustavo,
+ This fixed disconnection with iPhone, thanks
 
-On Wed, May 30, 2012, Szymon Janc wrote:
-> > > Some devices e.g. SonyEricsson Xperia ray and arc S don't do SDP search
-> > > before pairing. No L2CAP is connected so default HCI_DISCONN_TIMEOUT
-> > > (2 seconds) timeout value is being used. This results in problems with
-> > > legacy pairing as remote user has only few seconds to enter PIN before
-> > > ACL is disconnected.
-> > > 
-> > > Increase disconnect timeout to HCI_PAIRING_TIMEOUT if SSP is disabled
-> > > and no linkey exists.
-> > 
-> > does this only happen with SSP disabled?
-> 
-> Yes, I've seen this only with SSP disabled.
-> After name request remote devices ask user to enter PIN and before user is
-> able to do so (4 sec only) link is disconnected (cause we didn't get pin
-> request event yet).
-> 
-> For SSP hci_conn_hold is called in hci_io_capa_request_evt so link is not
-> disconnected.
-> 
-> > 
-> > Also add the hcidump output to the commit message would be helpful.
-> 
-> hcidump for ssp disabled [1] and ssp enabled [2] below.
-> 
-> > > 
-> > > Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
-> > > ---
-> > >  net/bluetooth/hci_event.c |    7 ++++++-
-> > >  1 file changed, 6 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > > index ac86b65..98e8020 100644
-> > > --- a/net/bluetooth/hci_event.c
-> > > +++ b/net/bluetooth/hci_event.c
-> > > @@ -1762,7 +1762,12 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> > >  		if (conn->type == ACL_LINK) {
-> > >  			conn->state = BT_CONFIG;
-> > >  			hci_conn_hold(conn);
-> > > -			conn->disc_timeout = HCI_DISCONN_TIMEOUT;
-> > > +
-> > > +			if (!hci_conn_ssp_enabled(conn) &&
-> > > +			    !hci_find_link_key(hdev, &ev->bdaddr))
-> 
-> I could add also checking if connection is incoming to narrow case a bit further...
-> 
-> > > +				conn->disc_timeout = HCI_PAIRING_TIMEOUT;
-> > > +			else
-> > > +				conn->disc_timeout = HCI_DISCONN_TIMEOUT;
-> > 
-> > You are also changing the timeout for a SDP search, for example, to
-> > HCI_PAIRING_TIMEOUT and this is not good. I think we need to be smarter here,
-> > we can't change the behaviour of things like SDP search here.
-> 
-> Maybe we could set timeout back to HCI_DICONN_TIMEOUT when l2cap is
-> connected (or disconnected)?  That should cover SDP search case..
-
-What happened to getting this patch upstream? To me it looks like a
-definitely needed fix. After adding the fix to restore a sensible value
-for disc_timeout after an L2CAP connect request either way and adding a
-better explanation to the commit message (that we only get the PIN
-request after user has entered one on the remote side, including a
-hcidump of this) I think this should go upstream. If this had been
-processed in a timely manner it could have made it to 3.5 but now it
-seems too late for that (as it's not strictly speaking a regression from
-3.4).
-
-Johan
+On Thu, Jun 28, 2012 at 5:32 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Usually after pairing the source will attempt to connect and create a
+> stream, but it may never send AVDTP_START command as it is not
+> playing anything. In the meantime the local endpoint may attempt to
+> acquire the transport, but since it was the remote side that opened the
+> stream instead of sending AVDTP_START the code now wait and eventually
+> timeout.
+>
+> To fix this now instead of just waiting the remote to send AVDTP_START
+> the code will attempt to send the command if nothing is received after
+> a small timeout (1s).
+> ---
+> v0: Only tested against MW600 which was the original cause of
+> introducing wait logic.
+>
+>
+>  audio/avdtp.c |   25 ++++++++++++++++++++++---
+>  1 file changed, 22 insertions(+), 3 deletions(-)
+>
+> diff --git a/audio/avdtp.c b/audio/avdtp.c
+> index 041abc3..d6f9682 100644
+> --- a/audio/avdtp.c
+> +++ b/audio/avdtp.c
+> @@ -93,6 +93,7 @@
+>  #define ABORT_TIMEOUT 2
+>  #define DISCONNECT_TIMEOUT 1
+>  #define STREAM_TIMEOUT 20
+> +#define WAIT_TIMEOUT 1
+>
+>  #if __BYTE_ORDER == __LITTLE_ENDIAN
+>
+> @@ -1068,8 +1069,7 @@ static void avdtp_sep_set_state(struct avdtp *session,
+>                break;
+>        case AVDTP_STATE_OPEN:
+>                stream->starting = FALSE;
+> -               if ((old_state > AVDTP_STATE_OPEN && session->auto_dc) ||
+> -                                                       stream->open_acp)
+> +               if ((old_state > AVDTP_STATE_OPEN && session->auto_dc))
+>                        stream->idle_timer = g_timeout_add_seconds(STREAM_TIMEOUT,
+>                                                                stream_timeout,
+>                                                                stream);
+> @@ -3647,6 +3647,19 @@ int avdtp_open(struct avdtp *session, struct avdtp_stream *stream)
+>                                                        &req, sizeof(req));
+>  }
+>
+> +static gboolean wait_timeout(gpointer user_data)
+> +{
+> +       struct avdtp_stream *stream = user_data;
+> +       struct avdtp *session = stream->session;
+> +
+> +       if (avdtp_start(session, stream) < 0)
+> +               error("wait_timeout: avdtp_start failed");
+> +
+> +       stream->idle_timer = 0;
+> +
+> +       return FALSE;
+> +}
+> +
+>  int avdtp_start(struct avdtp *session, struct avdtp_stream *stream)
+>  {
+>        struct start_req req;
+> @@ -3663,7 +3676,13 @@ int avdtp_start(struct avdtp *session, struct avdtp_stream *stream)
+>         *  to start the streaming via GAVDP_START.
+>         */
+>        if (stream->open_acp) {
+> -               stream->starting = TRUE;
+> +               /* If timer already active wait it */
+> +               if (stream->idle_timer)
+> +                       return 0;
+> +
+> +               stream->idle_timer = g_timeout_add_seconds(WAIT_TIMEOUT,
+> +                                                               wait_timeout,
+> +                                                               stream);
+>                return 0;
+>        }
+>
+> --
+> 1.7.10.2
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
