@@ -1,29 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 29 Jun 2012 16:15:01 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH hcidump 1/2 v2] AVRCP: Add parsing for SetAddressedPlayer
- PDU
-Message-ID: <20120629131501.GA27007@x220>
-References: <1340106030-30782-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 29 Jun 2012 14:54:02 +0200
+From: "Dalleau, Frederic" <frederic.dalleau@intel.com>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
+	<frederic.dalleau@linux.intel.com>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] network: Reply to extensions at connection setup
+Message-ID: <20120629125402.GB12649@intel.com>
+References: <1338470470-6874-1-git-send-email-frederic.dalleau@linux.intel.com>
+ <20120629111454.GB19540@x220>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1340106030-30782-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20120629111454.GB19540@x220>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Johan,
 
-On Tue, Jun 19, 2012, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> ---
-> v2: Also prints PlayerID in decimal
-> 
->  parser/avrcp.c |   35 +++++++++++++++++++++++++++++++++++
->  1 file changed, 35 insertions(+)
+O Fri, Jun 29, 2012 at 1:14 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> What was the conclusion for this patch? Should it be applied to user
+> space upstream or was there some decision to only handle this on the
+> kernel side?
+>
+> Johan
 
-Both patches have been applied. Thanks.
+>From my understanding, Marcel said it could be a first step, because it will
+be necessary for compatibility anyway if we want to add the Net filter and
+multicast filter. I have sent a patch for review to add ioctl to handle these
+features in kernel, but a change in userspace will still be necessary to use
+them.
 
-Johan
+However, I suggest you wait until next week, I should get confirmation whether
+this is ok for qualification or not.
+
+BR,
+Frédéric
