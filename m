@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 18/19] Bluetooth: AMP: Create phy link after A2MP Assoc rsp
-Date: Fri, 29 Jun 2012 17:46:51 +0300
-Message-Id: <1340981212-21709-19-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv0 11/19] Bluetooth: AMP: Remote AMP ctrl definitions
+Date: Fri, 29 Jun 2012 17:46:44 +0300
+Message-Id: <1340981212-21709-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,262 +11,182 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Create AMP Physical Link when receiving A2MP Get AMP Assoc Response.
+Create remote AMP controllers handling functions.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h     |    1 +
- include/net/bluetooth/amp.h      |    4 ++
- include/net/bluetooth/hci_core.h |    2 +
- include/net/bluetooth/pal.h      |    1 -
- net/bluetooth/a2mp.c             |   12 +++++
- net/bluetooth/amp.c              |   94 +++++++++++++++++++++++++++++++++++++-
- net/bluetooth/hci_event.c        |   11 +++++
- net/bluetooth/pal.c              |    2 +
- 8 files changed, 125 insertions(+), 2 deletions(-)
+ include/net/bluetooth/a2mp.h |    3 ++
+ include/net/bluetooth/pal.h  |   14 +++++++
+ net/bluetooth/a2mp.c         |    5 +++
+ net/bluetooth/pal.c          |   93 ++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 115 insertions(+)
 
 diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 68866f4..98438a4 100644
+index 012f573..8ba236c 100644
 --- a/include/net/bluetooth/a2mp.h
 +++ b/include/net/bluetooth/a2mp.h
-@@ -130,5 +130,6 @@ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
- 				       struct sk_buff *skb);
- void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data);
- void l2cap_discover_amp(struct l2cap_conn *conn);
-+u8 __next_handle(struct amp_mgr *mgr);
+@@ -29,6 +29,9 @@ struct amp_mgr {
  
- #endif /* __A2MP_H */
-diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
-index e861675..b376cc3 100644
---- a/include/net/bluetooth/amp.h
-+++ b/include/net/bluetooth/amp.h
-@@ -14,8 +14,12 @@
- #ifndef __AMP_H
- #define __AMP_H
- 
-+#include <net/bluetooth/pal.h>
+ 	struct list_head	phy_links;
+ 	struct mutex		phy_links_lock;
 +
- void amp_read_loc_info(struct hci_dev *hdev, struct amp_mgr *mgr);
- void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle);
- void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr);
-+void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
-+			struct phy_link *plink);
- 
- #endif /* __AMP_H */
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index fb0b4e4..cb26d61 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -144,6 +144,8 @@ struct hci_cb_cmd {
- struct amp_assoc {
- 	__u16	len;
- 	__u16	offset;
-+	__u16	rem_len;
-+	__u16	len_so_far;
- 	__u8	data[HCI_MAX_AMP_ASSOC_SIZE];
++	struct list_head	amp_ctrls;
++	struct mutex		amp_ctrls_lock;
  };
  
+ struct a2mp_cmd {
 diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
-index 8bac38b..0245dc8 100644
+index 28bfc7e..8bac38b 100644
 --- a/include/net/bluetooth/pal.h
 +++ b/include/net/bluetooth/pal.h
-@@ -18,7 +18,6 @@
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/a2mp.h>
--#include <net/bluetooth/amp.h>
+@@ -32,6 +32,20 @@ struct phy_link {
+ 	struct kref		kref;
+ };
  
- struct phy_link {
- 	struct list_head	list;
++struct amp_ctrl {
++	struct list_head	list;
++	struct kref		kref;
++	__u8			id;
++	__u16			assoc_len_so_far;
++	__u16			assoc_rem_len;
++	__u16			assoc_len;
++	__u8			*assoc;
++};
++
++int amp_ctrl_put(struct amp_ctrl *ctrl);
++struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr);
++struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id);
++void amp_ctrl_list_flush(struct amp_mgr *mgr);
+ struct phy_link *hci_phylink_add(struct amp_mgr *mgr, u8 local_id,
+ 				 u8 remote_id, u8 *rem_assoc, u16 assoc_size);
+ struct phy_link *hci_phylink_lookup(struct amp_mgr *mgr, u8 local_id,
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index a4df006..64bdad6 100644
+index efc4af8..d52a843 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -72,6 +72,14 @@ static u8 __next_ident(struct amp_mgr *mgr)
- 	return mgr->ident;
+@@ -595,6 +595,7 @@ static void amp_mgr_destroy(struct kref *kref)
+ 
+ 	BT_DBG("mgr %p", mgr);
+ 
++	amp_ctrl_list_flush(mgr);
+ 	hci_phylink_list_flush(mgr);
+ 	kfree(mgr);
  }
+@@ -634,6 +635,10 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
+ 	INIT_LIST_HEAD(&mgr->phy_links);
+ 	mutex_init(&mgr->phy_links_lock);
  
-+u8 __next_handle(struct amp_mgr *mgr)
-+{
-+	if (++mgr->handle == 0)
-+		mgr->handle = 1;
++	/* Remote AMP ctrl list initialization */
++	INIT_LIST_HEAD(&mgr->amp_ctrls);
++	mutex_init(&mgr->amp_ctrls_lock);
 +
-+	return mgr->handle;
-+}
-+
- static inline void __a2mp_cl_bredr(struct a2mp_cl *cl)
- {
- 	cl->id = 0;
-@@ -379,6 +387,10 @@ static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	kref_init(&mgr->kref);
  
- 	plink = hci_phylink_add(mgr, hdev->id, rsp->id, ctrl->assoc,
- 				ctrl->assoc_len);
-+	if (!plink)
-+		goto done;
-+
-+	amp_create_phylink(hdev, mgr, plink);
- 
- done:
- 	skb_pull(skb, len - sizeof(*rsp));
-diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index ebe1fd7..0e54b98 100644
---- a/net/bluetooth/amp.c
-+++ b/net/bluetooth/amp.c
-@@ -17,6 +17,7 @@
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/a2mp.h>
- #include <net/bluetooth/amp.h>
-+#include <net/bluetooth/pal.h>
- 
- static void amp_read_loc_info_complete(struct hci_dev *hdev,
- 				       struct hci_cb_cmd *cmd)
-@@ -118,5 +119,96 @@ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
- 	amp_mgr_get(mgr);
- 
- 	hci_cmd_cb(hdev, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp,
--		amp_read_loc_assoc_complete, mgr, cb_destructor, GFP_KERNEL);
-+		   amp_read_loc_assoc_complete, mgr, cb_destructor,
-+		   GFP_KERNEL);
-+}
-+
-+static void amp_write_rem_assoc_frag(struct hci_dev *hdev, struct amp_mgr *mgr,
-+				     struct phy_link *plink);
-+
-+static void amp_write_rem_assoc_cs(struct hci_dev *hdev,
-+				   struct hci_cb_cmd *cmd)
-+{
-+	struct amp_mgr *mgr = cmd->opt;
-+	struct phy_link *plink;
-+	u16 frag_len;
-+
-+	BT_DBG("mgr %p", mgr);
-+
-+	if (!cmd->status)
-+		return;
-+
-+	plink = hci_phylink_lookup(mgr, hdev->id, 0);
-+	if (!plink)
-+		return;
-+
-+	frag_len = min_t(u16, 248, plink->rem_assoc.rem_len);
-+	plink->rem_assoc.len_so_far += frag_len;
-+	plink->rem_assoc.rem_len -= frag_len;
-+
-+	if (plink->rem_assoc.rem_len > 0)
-+		/* Send another fragment */
-+		amp_write_rem_assoc_frag(hdev, mgr, plink);
-+
-+	phylink_put(plink);
-+}
-+
-+static void amp_write_rem_assoc_frag(struct hci_dev *hdev, struct amp_mgr *mgr,
-+				     struct phy_link *plink)
-+{
-+	struct hci_cp_write_remote_amp_assoc *cp;
-+	u16 frag_len, len;
-+
-+	frag_len = min_t(u16, 248, plink->rem_assoc.rem_len);
-+	len = frag_len + sizeof(*cp);
-+
-+	cp = kzalloc(len, GFP_KERNEL);
-+	if (!cp)
-+		return;
-+
-+	cp->phy_handle = plink->handle;
-+	cp->len_so_far = cpu_to_le16(plink->rem_assoc.len_so_far);
-+	cp->rem_len = cpu_to_le16(plink->rem_assoc.rem_len);
-+
-+	amp_mgr_get(mgr);
-+
-+	hci_cmd_cb(hdev, HCI_OP_WRITE_REMOTE_AMP_ASSOC, len, &cp,
-+		   amp_write_rem_assoc_cs, mgr, cb_destructor, GFP_KERNEL);
-+
-+	kfree(cp);
-+}
-+
-+static void amp_create_phylink_cs(struct hci_dev *hdev,
-+				  struct hci_cb_cmd *cmd)
-+{
-+	struct amp_mgr *mgr = cmd->opt;
-+	struct phy_link *plink;
-+
-+	BT_DBG("mgr %p", mgr);
-+
-+	/* Write Remote AMP Assoc */
-+	plink = hci_phylink_lookup(mgr, hdev->id, 0);
-+	if (plink) {
-+		amp_write_rem_assoc_frag(hdev, mgr, plink);
-+		phylink_put(plink);
-+	}
-+}
-+
-+void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
-+			struct phy_link *plink)
-+{
-+	struct hci_cp_create_phy_link cp;
-+
-+	cp.phy_handle = plink->handle;
-+
-+	if (phylink_security(mgr->l2cap_conn->hcon, cp.key, &cp.key_len,
-+			     &cp.key_type)) {
-+		BT_DBG("Cannot create link key");
-+		return;
-+	}
-+
-+	amp_mgr_get(mgr);
-+
-+	hci_cmd_cb(hdev, HCI_OP_CREATE_PHY_LINK, sizeof(cp), &cp,
-+		   amp_create_phylink_cs, mgr, cb_destructor, GFP_KERNEL);
- }
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index cbf4983..e20f26e 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1698,6 +1698,13 @@ static void hci_cs_le_start_enc(struct hci_dev *hdev, u8 status)
- 	BT_DBG("%s status 0x%x", hdev->name, status);
- }
- 
-+static void hci_cs_create_phylink(struct hci_dev *hdev, u8 status)
-+{
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+
-+	hci_process_cb(hdev, HCI_OP_CREATE_PHY_LINK, status);
-+}
-+
- static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -2488,6 +2495,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cs_le_start_enc(hdev, ev->status);
- 		break;
- 
-+	case HCI_OP_CREATE_PHY_LINK:
-+		hci_cs_create_phylink(hdev, ev->status);
-+		break;
-+
- 	default:
- 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
- 		break;
+ 	return mgr;
 diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
-index a020f97..899574e 100644
+index 5dcc448..35c9934 100644
 --- a/net/bluetooth/pal.c
 +++ b/net/bluetooth/pal.c
-@@ -12,6 +12,7 @@
- */
+@@ -22,6 +22,99 @@ enum pal_states {
+ 	DISCONNECTING
+ };
  
- #include <net/bluetooth/pal.h>
-+#include <crypto/hash.h>
- 
- enum pal_states {
- 	DISCONNECTED,
-@@ -155,6 +156,7 @@ struct phy_link *hci_phylink_add(struct amp_mgr *mgr, u8 local_id,
- 	plink->local_id = local_id;
- 	plink->remote_id = remote_id;
- 	plink->mgr = mgr;
-+	plink->handle = __next_handle(mgr);
- 
- 	plink->rem_assoc.len = min_t(u16, assoc_size, HCI_MAX_AMP_ASSOC_SIZE);
- 	memcpy(plink->rem_assoc.data, rem_assoc, plink->rem_assoc.len);
++/* Remote AMP Controllers handling */
++static void amp_ctrl_get(struct amp_ctrl *ctrl)
++{
++	BT_DBG("ctrl %p refcnt %d -> %d", ctrl,
++	       atomic_read(&ctrl->kref.refcount),
++	       atomic_read(&ctrl->kref.refcount) + 1);
++
++	kref_get(&ctrl->kref);
++}
++
++static void amp_ctrl_destroy(struct kref *kref)
++{
++	struct amp_ctrl *ctrl = container_of(kref, struct amp_ctrl, kref);
++
++	BT_DBG("ctrl %p", ctrl);
++
++	if (ctrl->assoc)
++		kfree(ctrl->assoc);
++	kfree(ctrl);
++}
++
++int amp_ctrl_put(struct amp_ctrl *ctrl)
++{
++	BT_DBG("ctrl %p refcnt %d -> %d", ctrl,
++	       atomic_read(&ctrl->kref.refcount),
++	       atomic_read(&ctrl->kref.refcount) - 1);
++
++	return kref_put(&ctrl->kref, &amp_ctrl_destroy);
++}
++
++struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr)
++{
++	struct amp_ctrl *ctrl;
++
++	ctrl = kzalloc(sizeof(*ctrl), GFP_KERNEL);
++	if (!ctrl)
++		return NULL;
++
++	mutex_lock(&mgr->amp_ctrls_lock);
++	list_add(&ctrl->list, &mgr->amp_ctrls);
++	mutex_unlock(&mgr->amp_ctrls_lock);
++
++	kref_init(&ctrl->kref);
++
++	BT_DBG("mgr %p: ctrl %p", mgr, ctrl);
++
++	return ctrl;
++}
++
++static void amp_ctrl_del(struct amp_mgr *mgr, struct amp_ctrl *ctrl)
++{
++	BT_DBG("ctrl %p", ctrl);
++
++	mutex_lock(&mgr->amp_ctrls_lock);
++	list_del(&ctrl->list);
++	mutex_unlock(&mgr->amp_ctrls_lock);
++
++	amp_ctrl_put(ctrl);
++}
++
++void amp_ctrl_list_flush(struct amp_mgr *mgr)
++{
++	struct amp_ctrl *ctrl, *n;
++
++	BT_DBG("mgr %p", mgr);
++
++	mutex_lock(&mgr->amp_ctrls_lock);
++	list_for_each_entry_safe(ctrl, n, &mgr->amp_ctrls, list) {
++		list_del(&ctrl->list);
++		amp_ctrl_put(ctrl);
++	}
++	mutex_unlock(&mgr->amp_ctrls_lock);
++}
++
++struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id)
++{
++	struct amp_ctrl *ctrl = NULL;
++
++	mutex_lock(&mgr->amp_ctrls_lock);
++	list_for_each_entry(ctrl, &mgr->amp_ctrls, list) {
++		if (ctrl->id == id)
++			break;
++	}
++	mutex_unlock(&mgr->amp_ctrls_lock);
++
++	BT_DBG("mgr %p: id %d ctrl %p", mgr, id, ctrl);
++
++	if (ctrl)
++		amp_ctrl_get(ctrl);
++
++	return ctrl;
++}
++
+ /* Physical Link interface */
+ void phylink_get(struct phy_link *plink)
+ {
 -- 
 1.7.9.5
 
