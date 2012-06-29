@@ -1,44 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 29 Jun 2012 17:23:32 +0300
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 01/19] Bluetooth: Define AMP controller statuses
-Date: Fri, 29 Jun 2012 17:46:34 +0300
-Message-Id: <1340981212-21709-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2] Bluetooth: btmrvl: Do not send vendor events to
+ bluetooth stack
+Message-ID: <20120629142330.GB8718@aemeltch-MOBL1>
+References: <477F20668A386D41ADCC57781B1F7043083A8A6E5F@SC-VEXCH1.marvell.com>
+ <1339740654-5930-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20120619032630.GE1679@joana>
+ <20120628134803.GC14705@aemeltch-MOBL1>
+ <20120629140635.GB29045@x220>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120629140635.GB29045@x220>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Johan,
 
-AMP status codes copied from Bluez patch sent by Peter Krystad
-<pkrystad@codeaurora.org>.
+On Fri, Jun 29, 2012 at 05:06:35PM +0300, Johan Hedberg wrote:
+> Hi Andrei,
+> 
+> On Thu, Jun 28, 2012, Andrei Emeltchenko wrote:
+> > On Tue, Jun 19, 2012 at 12:26:30AM -0300, Gustavo Padovan wrote:
+> > > Hi Andrei,
+> > > 
+> > > * Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-06-15 09:10:54 +0300]:
+> > > 
+> > > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > > 
+> > > > Vendor-specific events shall be processed in driver and not sent
+> > > > to bluetooth stack where they screw up HCI command countings.
+> > > > 
+> > > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > > Tested-by: Bing Zhao <bzhao@marvell.com>
+> > > > ---
+> > > >  drivers/bluetooth/btmrvl_drv.h  |    2 +-
+> > > >  drivers/bluetooth/btmrvl_main.c |   18 +++++++++++++++---
+> > > >  drivers/bluetooth/btmrvl_sdio.c |    9 ++++++---
+> > > >  3 files changed, 22 insertions(+), 7 deletions(-)
+> > > 
+> > > Patch has been applied to the bluetooth tree. Thanks.
+> > 
+> > Which version have you applied? Old one?
+> 
+> The patch that's upstream doesn't have the Tested-by tag so it seems
+> Gustavo might have applied the old version of the patch instead of v2.
+> Could you confirm?
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- include/net/bluetooth/hci.h |    9 +++++++++
- 1 file changed, 9 insertions(+)
+Yes, there is old version. Apart from missing Tested-by tag there is one
+style issue, debug issue and variable scope change which do not affect
+functionality though.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ccd723e..7f19556 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -62,6 +62,15 @@
- /* First BR/EDR Controller shall have ID = 0 */
- #define HCI_BREDR_ID	0
- 
-+/* AMP controller status */
-+#define AMP_CTRL_POWERED_DOWN			0x00
-+#define AMP_CTRL_BLUETOOTH_ONLY			0x01
-+#define AMP_CTRL_NO_CAPACITY			0x02
-+#define AMP_CTRL_LOW_CAPACITY			0x03
-+#define AMP_CTRL_MEDIUM_CAPACITY		0x04
-+#define AMP_CTRL_HIGH_CAPACITY			0x05
-+#define AMP_CTRL_FULL_CAPACITY			0x06
-+
- /* HCI device quirks */
- enum {
- 	HCI_QUIRK_RESET_ON_CLOSE,
--- 
-1.7.9.5
+If that patch would applied to bluetooth-next first I would notice that
+much earlier...
 
+Best regards 
+Andrei Emeltchenko 
