@@ -1,35 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 29 Jun 2012 14:54:02 +0200
-From: "Dalleau, Frederic" <frederic.dalleau@intel.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
-	<frederic.dalleau@linux.intel.com>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] network: Reply to extensions at connection setup
-Message-ID: <20120629125402.GB12649@intel.com>
-References: <1338470470-6874-1-git-send-email-frederic.dalleau@linux.intel.com>
- <20120629111454.GB19540@x220>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20120629111454.GB19540@x220>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 0/3] Fixes managing AMP controller
+Date: Fri, 29 Jun 2012 15:06:59 +0300
+Message-Id: <1340971622-16318-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-O Fri, Jun 29, 2012 at 1:14 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> What was the conclusion for this patch? Should it be applied to user
-> space upstream or was there some decision to only handle this on the
-> kernel side?
->
-> Johan
+Those fixes make sure that AMP controller is not shut down by
+management interface and is not used as normal BR/EDR controller.
+The idea is that there is no need to expose AMP controller to user
+space.
 
->From my understanding, Marcel said it could be a first step, because it will
-be necessary for compatibility anyway if we want to add the Net filter and
-multicast filter. I have sent a patch for review to add ioctl to handle these
-features in kernel, but a change in userspace will still be necessary to use
-them.
+Andrei Emeltchenko (3):
+  Bluetooth: Do not auto off AMP controller
+  Bluetooth: mgmt: Fix managing AMP device
+  Bluetooth: Route traffic only through BR/EDR controller
 
-However, I suggest you wait until next week, I should get confirmation whether
-this is ok for qualification or not.
+ include/net/bluetooth/hci_core.h |    2 +-
+ net/bluetooth/hci_conn.c         |    3 ++-
+ net/bluetooth/hci_core.c         |   11 ++++++++---
+ net/bluetooth/mgmt.c             |   20 ++++++++++++++++++--
+ 4 files changed, 29 insertions(+), 7 deletions(-)
 
-BR,
-Frédéric
+-- 
+1.7.9.5
+
