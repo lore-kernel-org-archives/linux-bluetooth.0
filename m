@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: Route traffic only through BR/EDR controller
-Date: Fri, 29 Jun 2012 15:07:02 +0300
-Message-Id: <1340971622-16318-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 1/3] Bluetooth: Do not auto off AMP controller
+Date: Fri, 29 Jun 2012 15:07:00 +0300
+Message-Id: <1340971622-16318-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1340971622-16318-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340971622-16318-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,29 +11,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-If AMP controller is first in the list then Bluetooth traffic might
-be routed through it (if source is not specified). The patch
-prevents this case and also checks that source is BR/EDR.
+Since AMP controller is not managed by user space do not shut it down.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/hci_conn.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_core.c |    5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 858907f..743572e 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -442,7 +442,8 @@ struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 8b93491..37712d3 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1743,8 +1743,11 @@ int hci_register_dev(struct hci_dev *hdev)
+ 		}
+ 	}
  
- 	list_for_each_entry(d, &hci_dev_list, list) {
- 		if (!test_bit(HCI_UP, &d->flags) ||
--		    test_bit(HCI_RAW, &d->flags))
-+		    test_bit(HCI_RAW, &d->flags) ||
-+		    d->dev_type != HCI_BREDR)
- 			continue;
+-	set_bit(HCI_AUTO_OFF, &hdev->dev_flags);
+ 	set_bit(HCI_SETUP, &hdev->dev_flags);
++
++	if (hdev->dev_type != HCI_AMP)
++		set_bit(HCI_AUTO_OFF, &hdev->dev_flags);
++
+ 	schedule_work(&hdev->power_on);
  
- 		/* Simple routing:
+ 	hci_notify(hdev, HCI_DEV_REG);
 -- 
 1.7.9.5
 
