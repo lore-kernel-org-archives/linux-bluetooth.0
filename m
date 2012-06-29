@@ -1,118 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] AVDTP: Fix disconnecting when acting as sink
-Date: Fri, 29 Jun 2012 14:02:25 +0300
-Message-Id: <1340967745-17458-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1340967745-17458-1-git-send-email-luiz.dentz@gmail.com>
-References: <1340967745-17458-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] AVDTP: Remove auto_dc flag
+Date: Fri, 29 Jun 2012 14:02:24 +0300
+Message-Id: <1340967745-17458-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Usually after pairing the source will attempt to connect and create a
-stream, but it may never send AVDTP_START command as it is not
-playing anything. In the meantime the local endpoint may attempt to
-acquire the transport, but since it was the remote side that opened the
-stream instead of sending AVDTP_START the code now wait and eventually
-timeout.
-
-To fix this now instead of just waiting the remote to send AVDTP_START
-the code will attempt to send the command if nothing is received after
-a small timeout (1s).
+auto_dc flag is no longer useful as all the users of it just reset it
+to FALSE, also this was first introduced to maintain the stream for
+some time as the clients disconnected frequently, but this is not the
+case anymore.
 ---
- audio/avdtp.c |   42 +++++++++++++++++++++++++++++++-----------
- 1 file changed, 31 insertions(+), 11 deletions(-)
+ audio/avdtp.c  |   33 +--------------------------------
+ audio/avdtp.h  |    1 -
+ audio/sink.c   |    2 --
+ audio/source.c |    2 --
+ 4 files changed, 1 insertion(+), 37 deletions(-)
 
 diff --git a/audio/avdtp.c b/audio/avdtp.c
-index ffc3f70..e9d0567 100644
+index 041abc3..ffc3f70 100644
 --- a/audio/avdtp.c
 +++ b/audio/avdtp.c
-@@ -93,6 +93,7 @@
- #define ABORT_TIMEOUT 2
- #define DISCONNECT_TIMEOUT 1
- #define STREAM_TIMEOUT 20
-+#define START_TIMEOUT 1
+@@ -395,9 +395,6 @@ struct avdtp {
  
- #if __BYTE_ORDER == __LITTLE_ENDIAN
+ 	avdtp_session_state_t state;
  
-@@ -376,7 +377,7 @@ struct avdtp_stream {
- 	gboolean open_acp;	/* If we are in ACT role for Open */
- 	gboolean close_int;	/* If we are in INT role for Close */
- 	gboolean abort_int;	/* If we are in INT role for Abort */
--	guint idle_timer;
-+	guint start_timer;	/* Wait START command timer */
- 	gboolean delay_reporting;
- 	uint16_t delay;		/* AVDTP 1.3 Delay Reporting feature */
- 	gboolean starting;	/* only valid while sep state == OPEN */
-@@ -1054,23 +1055,23 @@ static void avdtp_sep_set_state(struct avdtp *session,
- 		stream->starting = FALSE;
- 		break;
- 	case AVDTP_STATE_STREAMING:
--		if (stream->idle_timer) {
--			g_source_remove(stream->idle_timer);
--			stream->idle_timer = 0;
-+		if (stream->start_timer) {
-+			g_source_remove(stream->start_timer);
-+			stream->start_timer = 0;
- 		}
- 		stream->open_acp = FALSE;
- 		break;
- 	case AVDTP_STATE_CLOSING:
- 	case AVDTP_STATE_ABORTING:
--		if (stream->idle_timer) {
--			g_source_remove(stream->idle_timer);
--			stream->idle_timer = 0;
-+		if (stream->start_timer) {
-+			g_source_remove(stream->start_timer);
-+			stream->start_timer = 0;
- 		}
- 		break;
- 	case AVDTP_STATE_IDLE:
--		if (stream->idle_timer) {
--			g_source_remove(stream->idle_timer);
--			stream->idle_timer = 0;
-+		if (stream->start_timer) {
-+			g_source_remove(stream->start_timer);
-+			stream->start_timer = 0;
- 		}
- 		if (session->pending_open == stream)
- 			handle_transport_connect(session, NULL, 0, 0);
-@@ -3621,6 +3622,19 @@ int avdtp_open(struct avdtp *session, struct avdtp_stream *stream)
- 							&req, sizeof(req));
+-	/* True if the session should be automatically disconnected */
+-	gboolean auto_dc;
+-
+ 	/* True if the entire device is being disconnected */
+ 	gboolean device_disconnect;
+ 
+@@ -805,19 +802,6 @@ static void stream_free(struct avdtp_stream *stream)
+ 	g_free(stream);
  }
  
-+static gboolean start_timeout(gpointer user_data)
-+{
-+	struct avdtp_stream *stream = user_data;
-+	struct avdtp *session = stream->session;
-+
-+	if (avdtp_start(session, stream) < 0)
-+		error("wait_timeout: avdtp_start failed");
-+
-+	stream->start_timer = 0;
-+
-+	return FALSE;
-+}
-+
- int avdtp_start(struct avdtp *session, struct avdtp_stream *stream)
+-static gboolean stream_timeout(gpointer user_data)
+-{
+-	struct avdtp_stream *stream = user_data;
+-	struct avdtp *session = stream->session;
+-
+-	if (avdtp_close(session, stream, FALSE) < 0)
+-		error("stream_timeout: closing AVDTP stream failed");
+-
+-	stream->idle_timer = 0;
+-
+-	return FALSE;
+-}
+-
+ static gboolean transport_cb(GIOChannel *chan, GIOCondition cond,
+ 				gpointer data)
  {
- 	struct start_req req;
-@@ -3637,7 +3651,13 @@ int avdtp_start(struct avdtp *session, struct avdtp_stream *stream)
- 	 *  to start the streaming via GAVDP_START.
- 	 */
- 	if (stream->open_acp) {
--		stream->starting = TRUE;
-+		/* If timer already active wait it */
-+		if (stream->start_timer)
-+			return 0;
-+
-+		stream->start_timer = g_timeout_add_seconds(START_TIMEOUT,
-+								start_timeout,
-+								stream);
- 		return 0;
- 	}
+@@ -1068,11 +1052,6 @@ static void avdtp_sep_set_state(struct avdtp *session,
+ 		break;
+ 	case AVDTP_STATE_OPEN:
+ 		stream->starting = FALSE;
+-		if ((old_state > AVDTP_STATE_OPEN && session->auto_dc) ||
+-							stream->open_acp)
+-			stream->idle_timer = g_timeout_add_seconds(STREAM_TIMEOUT,
+-								stream_timeout,
+-								stream);
+ 		break;
+ 	case AVDTP_STATE_STREAMING:
+ 		if (stream->idle_timer) {
+@@ -1196,8 +1175,6 @@ static void connection_lost(struct avdtp *session, int err)
+ 	if (session->dc_timer)
+ 		remove_disconnect_timer(session);
+ 
+-	session->auto_dc = TRUE;
+-
+ 	if (session->ref != 1)
+ 		error("connection_lost: ref count not 1 after all callbacks");
+ 	else
+@@ -2394,7 +2371,6 @@ static struct avdtp *avdtp_get_internal(const bdaddr_t *src, const bdaddr_t *dst
+ 	/* We don't use avdtp_set_state() here since this isn't a state change
+ 	 * but just setting of the initial state */
+ 	session->state = AVDTP_SESSION_STATE_DISCONNECTED;
+-	session->auto_dc = TRUE;
+ 
+ 	session->version = get_version(session);
+ 
+@@ -2467,10 +2443,8 @@ static void avdtp_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 						(GIOFunc) session_cb, session,
+ 						NULL);
+ 
+-		if (session->stream_setup) {
++		if (session->stream_setup)
+ 			set_disconnect_timer(session);
+-			avdtp_set_auto_disconnect(session, FALSE);
+-		}
+ 	} else if (session->pending_open)
+ 		handle_transport_connect(session, chan, session->imtu,
+ 								session->omtu);
+@@ -4008,11 +3982,6 @@ gboolean avdtp_has_stream(struct avdtp *session, struct avdtp_stream *stream)
+ 	return g_slist_find(session->streams, stream) ? TRUE : FALSE;
+ }
+ 
+-void avdtp_set_auto_disconnect(struct avdtp *session, gboolean auto_dc)
+-{
+-	session->auto_dc = auto_dc;
+-}
+-
+ gboolean avdtp_stream_setup_active(struct avdtp *session)
+ {
+ 	return session->stream_setup;
+diff --git a/audio/avdtp.h b/audio/avdtp.h
+index dac093b..e294ded 100644
+--- a/audio/avdtp.h
++++ b/audio/avdtp.h
+@@ -308,7 +308,6 @@ int avdtp_error_posix_errno(struct avdtp_error *err);
+ 
+ void avdtp_get_peers(struct avdtp *session, bdaddr_t *src, bdaddr_t *dst);
+ 
+-void avdtp_set_auto_disconnect(struct avdtp *session, gboolean auto_dc);
+ gboolean avdtp_stream_setup_active(struct avdtp *session);
+ void avdtp_set_device_disconnect(struct avdtp *session, gboolean dev_dc);
+ 
+diff --git a/audio/sink.c b/audio/sink.c
+index 6b21e47..8ba4e2a 100644
+--- a/audio/sink.c
++++ b/audio/sink.c
+@@ -415,8 +415,6 @@ gboolean sink_setup_stream(struct sink *sink, struct avdtp *session)
+ 	if (!sink->session)
+ 		return FALSE;
+ 
+-	avdtp_set_auto_disconnect(sink->session, FALSE);
+-
+ 	if (avdtp_discover(sink->session, discovery_complete, sink) < 0)
+ 		return FALSE;
+ 
+diff --git a/audio/source.c b/audio/source.c
+index dbba5b9..a5fa859 100644
+--- a/audio/source.c
++++ b/audio/source.c
+@@ -366,8 +366,6 @@ gboolean source_setup_stream(struct source *source, struct avdtp *session)
+ 	if (!source->session)
+ 		return FALSE;
+ 
+-	avdtp_set_auto_disconnect(source->session, FALSE);
+-
+ 	if (avdtp_discover(source->session, discovery_complete, source) < 0)
+ 		return FALSE;
  
 -- 
 1.7.10.2
