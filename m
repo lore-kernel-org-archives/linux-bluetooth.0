@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 04/19] Bluetooth: General HCI callback implementation
-Date: Fri, 29 Jun 2012 17:46:37 +0300
-Message-Id: <1340981212-21709-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv0 19/19] Bluetooth: A2MP: Add fallback to normal l2cap init sequence
+Date: Fri, 29 Jun 2012 17:46:52 +0300
+Message-Id: <1340981212-21709-20-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,187 +11,93 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add general HCI callback implementation. Can be used for executing
-HCI commands from A2MP protocol.
+When there is no remote AMP controller found fallback to normal
+L2CAP sequence.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci_core.h |   21 +++++++++
- net/bluetooth/hci_core.c         |   88 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 109 insertions(+)
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/a2mp.c          |   28 ++++++++++++++++++++++++++++
+ net/bluetooth/l2cap_core.c    |    2 +-
+ 3 files changed, 30 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 4f7c866..55b89d1 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -130,6 +130,17 @@ struct le_scan_params {
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 6b85b00..dc6a9a3 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -783,5 +783,6 @@ void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
+ 			  long timeout);
+ bool l2cap_conn_clear_timer(struct l2cap_conn *conn,
+ 			    struct delayed_work *work);
++void l2cap_send_conn_req(struct l2cap_chan *chan);
  
- #define HCI_MAX_SHORT_NAME_LENGTH	10
+ #endif /* __L2CAP_H */
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 64bdad6..b8a496e 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -185,6 +185,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	u16 len = le16_to_cpu(hdr->len);
+ 	struct a2mp_cl *cl;
+ 	u16 ext_feat;
++	bool found = false;
  
-+struct hci_dev;
+ 	if (len < sizeof(*rsp))
+ 		return -EINVAL;
+@@ -215,6 +216,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
+ 			struct a2mp_info_req req;
+ 
++			found = true;
+ 			req.id = cl->id;
+ 			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
+ 				  sizeof(req), &req);
+@@ -224,6 +226,32 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 		cl = (void *) skb_pull(skb, sizeof(*cl));
+ 	}
+ 
++	/* Fall back to L2CAP init sequence */
++	if (!found) {
++		struct l2cap_conn *conn = mgr->l2cap_conn;
++		struct l2cap_chan *chan;
 +
-+struct hci_cb_cmd {
-+	struct list_head list;
-+	u16 opcode;
-+	u8 status;
-+	void *opt;
-+	void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
-+	void (*destructor)(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
-+};
++		mutex_lock(&conn->chan_lock);
 +
- #define NUM_REASSEMBLY 4
- struct hci_dev {
- 	struct list_head list;
-@@ -242,6 +253,9 @@ struct hci_dev {
- 
- 	struct list_head	mgmt_pending;
- 
-+	struct mutex		cb_list_lock;
-+	struct list_head	cb_list;
++		list_for_each_entry(chan, &conn->chan_l, list) {
 +
- 	struct discovery_state	discovery;
- 	struct hci_conn_hash	conn_hash;
- 	struct list_head	blacklist;
-@@ -1094,5 +1108,12 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
- int hci_cancel_le_scan(struct hci_dev *hdev);
- 
- u8 bdaddr_to_le(u8 bdaddr_type);
-+struct hci_cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode);
-+int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
-+	       void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
-+	       void *opt,
-+	       void (*destructor)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
-+	       gfp_t flags);
-+void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
- 
- #endif /* __HCI_CORE_H */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5ad508e..e3cca20 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -36,6 +36,7 @@
- static void hci_rx_work(struct work_struct *work);
- static void hci_cmd_work(struct work_struct *work);
- static void hci_tx_work(struct work_struct *work);
-+static void hci_cb_clear(struct hci_dev *hdev);
- 
- /* HCI device list */
- LIST_HEAD(hci_dev_list);
-@@ -1645,6 +1646,7 @@ struct hci_dev *hci_alloc_dev(void)
- 
- 	mutex_init(&hdev->lock);
- 	mutex_init(&hdev->req_lock);
-+	mutex_init(&hdev->cb_list_lock);
- 
- 	INIT_LIST_HEAD(&hdev->mgmt_pending);
- 	INIT_LIST_HEAD(&hdev->blacklist);
-@@ -1652,6 +1654,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_LIST_HEAD(&hdev->link_keys);
- 	INIT_LIST_HEAD(&hdev->long_term_keys);
- 	INIT_LIST_HEAD(&hdev->remote_oob_data);
-+	INIT_LIST_HEAD(&hdev->cb_list);
- 
- 	INIT_WORK(&hdev->rx_work, hci_rx_work);
- 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
-@@ -1817,6 +1820,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	hci_link_keys_clear(hdev);
- 	hci_smp_ltks_clear(hdev);
- 	hci_remote_oob_data_clear(hdev);
-+	hci_cb_clear(hdev);
- 	hci_dev_unlock(hdev);
- 
- 	hci_dev_put(hdev);
-@@ -2118,6 +2122,90 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
++			BT_DBG("chan %p state %s", chan,
++			       state_to_string(chan->state));
++
++			if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
++				continue;
++
++			l2cap_chan_lock(chan);
++
++			if (chan->state == BT_CONNECT)
++				l2cap_send_conn_req(chan);
++
++			l2cap_chan_unlock(chan);
++		}
++
++		mutex_unlock(&conn->chan_lock);
++	}
++
  	return 0;
  }
  
-+static int hci_add_cb(struct hci_dev *hdev, __u16 opcode,
-+		      void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
-+		      void *opt,
-+		      void (*destructor)(struct hci_dev *hdev,
-+					 struct hci_cb_cmd *cmd),
-+		      gfp_t flags)
-+{
-+	struct hci_cb_cmd *cmd;
-+
-+	cmd = kmalloc(sizeof(*cmd), flags);
-+	if (!cmd)
-+		return -ENOMEM;
-+
-+	cmd->cb = cb;
-+	cmd->opcode = opcode;
-+	cmd->opt = opt;
-+	cmd->status = 0;
-+	cmd->destructor = destructor;
-+
-+	mutex_lock(&hdev->cb_list_lock);
-+	list_add(&cmd->list, &hdev->cb_list);
-+	mutex_unlock(&hdev->cb_list_lock);
-+
-+	return 0;
-+}
-+
-+struct hci_cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode)
-+{
-+	struct hci_cb_cmd *cmd;
-+
-+	mutex_lock(&hdev->cb_list_lock);
-+	list_for_each_entry(cmd, &hdev->cb_list, list)
-+		if (cmd->opcode == opcode) {
-+			mutex_unlock(&hdev->cb_list_lock);
-+			return cmd;
-+		}
-+	mutex_unlock(&hdev->cb_list_lock);
-+
-+	return NULL;
-+}
-+
-+void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd)
-+{
-+	BT_DBG("%s: remove cmd %p", hdev->name, cmd);
-+
-+	mutex_lock(&hdev->cb_list_lock);
-+	list_del(&cmd->list);
-+	mutex_unlock(&hdev->cb_list_lock);
-+
-+	if (cmd->destructor) {
-+		cmd->destructor(hdev, cmd);
-+	} else {
-+		kfree(cmd->opt);
-+		kfree(cmd);
-+	}
-+}
-+
-+static void hci_cb_clear(struct hci_dev *hdev)
-+{
-+	struct hci_cb_cmd *cmd, *tmp;
-+
-+	list_for_each_entry_safe(cmd, tmp, &hdev->cb_list, list)
-+		hci_remove_cb(hdev, cmd);
-+}
-+
-+/* Send HCI command with callback */
-+int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
-+	       void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
-+	       void *opt,
-+	       void (*destructor)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
-+	       gfp_t flags)
-+{
-+	int ret;
-+
-+	if (!cb)
-+		return -EINVAL;
-+
-+	ret = hci_add_cb(hdev, opcode, cb, opt, destructor, flags);
-+	if (ret)
-+		return ret;
-+
-+	return hci_send_cmd(hdev, opcode, plen, param);
-+}
-+
- /* Get data from the previously sent command */
- void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index a5256e7..0a04f96 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1001,7 +1001,7 @@ static bool __amp_capable(struct l2cap_chan *chan)
+ 		return false;
+ }
+ 
+-static void l2cap_send_conn_req(struct l2cap_chan *chan)
++void l2cap_send_conn_req(struct l2cap_chan *chan)
  {
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct l2cap_conn_req req;
 -- 
 1.7.9.5
 
