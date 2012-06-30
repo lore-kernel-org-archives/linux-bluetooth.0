@@ -1,33 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 30 Jun 2012 11:42:10 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Date: Sat, 30 Jun 2012 14:53:12 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Neal Peacock <neal@coinfree.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: Improve debugging messages for hci_conn
-Message-ID: <20120630144210.GA1920@joana>
-References: <1339750229-10370-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: UTF8 to UTF-8  name patch for obexd
+Message-ID: <20120630115312.GA9121@x220.P-661HNU-F1>
+References: <4FEE2CDF.7030806@coinfree.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1339750229-10370-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <4FEE2CDF.7030806@coinfree.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Neal,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-06-15 11:50:28 +0300]:
-
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Fri, Jun 29, 2012, Neal Peacock wrote:
+> Subject: [PATCH] Changed UTF name to standard
 > 
-> Improve debugging of hci_conn objects by: adding print to hci_conn
-> refcounting, adding object spcifier when missing, change conn to hcon
-> since conn is heavily used for l2cap_conn objects and this is misleading.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  include/net/bluetooth/hci_core.h |    6 ++++++
->  net/bluetooth/hci_conn.c         |   44 +++++++++++++++++++-------------------
->  2 files changed, 28 insertions(+), 22 deletions(-)
+>  gobex/gobex-header.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/gobex/gobex-header.c b/gobex/gobex-header.c
+> index 77dcc6e..56dd9b2 100644
+> --- a/gobex/gobex-header.c
+> +++ b/gobex/gobex-header.c
+> @@ -187,7 +187,7 @@ GObexHeader *g_obex_header_decode(const void *data, gsize len,
+>  		}
+>  
+>  		header->v.string = g_convert((const char *) ptr, hdr_len - 5,
+> -						"UTF8", "UTF16BE",
+> +						"UTF-8", "UTF-16BE",
+>  						NULL, &str_len, &conv_err);
+>  		if (header->v.string == NULL) {
+>  			g_set_error(err, G_OBEX_ERROR,
 
-Patch has been applied to bluetooth-next, thanks.
+The patch looks good and has been applied to obexd.git. Thanks.
 
-	Gustavo
+Johan
