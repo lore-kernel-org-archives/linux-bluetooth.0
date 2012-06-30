@@ -1,40 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 30 Jun 2012 14:53:12 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Neal Peacock <neal@coinfree.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: UTF8 to UTF-8  name patch for obexd
-Message-ID: <20120630115312.GA9121@x220.P-661HNU-F1>
-References: <4FEE2CDF.7030806@coinfree.com>
+Message-ID: <4FEE80B4.6060609@gmail.com>
+Date: Sat, 30 Jun 2012 12:29:40 +0800
+From: Vic Lee <llyzs.vic@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4FEE2CDF.7030806@coinfree.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] audio: returns error if poll_revents failed.
+Content-Type: multipart/mixed;
+ boundary="------------050301090003010709040802"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Neal,
+This is a multi-part message in MIME format.
+--------------050301090003010709040802
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 29, 2012, Neal Peacock wrote:
-> Subject: [PATCH] Changed UTF name to standard
-> 
-> ---
->  gobex/gobex-header.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/gobex/gobex-header.c b/gobex/gobex-header.c
-> index 77dcc6e..56dd9b2 100644
-> --- a/gobex/gobex-header.c
-> +++ b/gobex/gobex-header.c
-> @@ -187,7 +187,7 @@ GObexHeader *g_obex_header_decode(const void *data, gsize len,
->  		}
->  
->  		header->v.string = g_convert((const char *) ptr, hdr_len - 5,
-> -						"UTF8", "UTF16BE",
-> +						"UTF-8", "UTF-16BE",
->  						NULL, &str_len, &conv_err);
->  		if (header->v.string == NULL) {
->  			g_set_error(err, G_OBEX_ERROR,
 
-The patch looks good and has been applied to obexd.git. Thanks.
+--------------050301090003010709040802
+Content-Type: text/x-patch;
+ name="0001-audio-returns-error-if-poll_revents-failed.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename*0="0001-audio-returns-error-if-poll_revents-failed.patch"
 
-Johan
+>From a79537c26867fd92f32e77a6fe59bf0e1dd61c11 Mon Sep 17 00:00:00 2001
+From: Vic Lee <llyzs@163.com>
+Date: Sat, 30 Jun 2012 20:16:18 +0800
+Subject: [PATCH] audio: returns error if poll_revents failed.
+
+Error must be reported back to ALSA if poll_revents failed. Otherwise,
+when the bluetooth audio device is disconnected during playback, ALSA
+will enter in an infinite loop, bluez will keep printing "read error",
+and application freezes.
+
+Signed-off-by: Vic Lee <llyzs@163.com>
+---
+ audio/pcm_bluetooth.c |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/audio/pcm_bluetooth.c b/audio/pcm_bluetooth.c
+index b9da805..ca5ff11 100644
+--- a/audio/pcm_bluetooth.c
++++ b/audio/pcm_bluetooth.c
+@@ -821,6 +821,7 @@ static int bluetooth_playback_poll_revents(snd_pcm_ioplug_t *io,
+ 					unsigned short *revents)
+ {
+ 	static char buf[1];
++	int err = 0;
+ 
+ 	DBG("");
+ 
+@@ -832,14 +833,17 @@ static int bluetooth_playback_poll_revents(snd_pcm_ioplug_t *io,
+ 
+ 	if (io->state != SND_PCM_STATE_PREPARED)
+ 		if (read(pfds[0].fd, buf, 1) < 0)
++		{
+ 			SYSERR("read error: %s (%d)", strerror(errno), errno);
++			err = -1;
++		}
+ 
+ 	if (pfds[1].revents & (POLLERR | POLLHUP | POLLNVAL))
+ 		io->state = SND_PCM_STATE_DISCONNECTED;
+ 
+ 	*revents = (pfds[0].revents & POLLIN) ? POLLOUT : 0;
+ 
+-	return 0;
++	return err;
+ }
+ 
+ 
+-- 
+1.7.10
+
+
+--------------050301090003010709040802--
