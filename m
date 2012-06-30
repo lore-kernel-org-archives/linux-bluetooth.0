@@ -1,67 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 30 Jun 2012 12:28:56 -0300
+Date: Sat, 30 Jun 2012 12:16:27 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2] Bluetooth: btmrvl: Do not send vendor events to
- bluetooth stack
-Message-ID: <20120630152856.GE1920@joana>
-References: <477F20668A386D41ADCC57781B1F7043083A8A6E5F@SC-VEXCH1.marvell.com>
- <1339740654-5930-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20120619032630.GE1679@joana>
- <20120628134803.GC14705@aemeltch-MOBL1>
- <20120629140635.GB29045@x220>
- <20120629142330.GB8718@aemeltch-MOBL1>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Route traffic only through BR/EDR controller
+Message-ID: <20120630151627.GD1920@joana>
+References: <1340108482-16071-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120629142330.GB8718@aemeltch-MOBL1>
+In-Reply-To: <1340108482-16071-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-06-29 17:23:32 +0300]:
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-06-19 15:21:21 +0300]:
 
-> Hi Johan,
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> On Fri, Jun 29, 2012 at 05:06:35PM +0300, Johan Hedberg wrote:
-> > Hi Andrei,
-> > 
-> > On Thu, Jun 28, 2012, Andrei Emeltchenko wrote:
-> > > On Tue, Jun 19, 2012 at 12:26:30AM -0300, Gustavo Padovan wrote:
-> > > > Hi Andrei,
-> > > > 
-> > > > * Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-06-15 09:10:54 +0300]:
-> > > > 
-> > > > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > > > 
-> > > > > Vendor-specific events shall be processed in driver and not sent
-> > > > > to bluetooth stack where they screw up HCI command countings.
-> > > > > 
-> > > > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > > > Tested-by: Bing Zhao <bzhao@marvell.com>
-> > > > > ---
-> > > > >  drivers/bluetooth/btmrvl_drv.h  |    2 +-
-> > > > >  drivers/bluetooth/btmrvl_main.c |   18 +++++++++++++++---
-> > > > >  drivers/bluetooth/btmrvl_sdio.c |    9 ++++++---
-> > > > >  3 files changed, 22 insertions(+), 7 deletions(-)
-> > > > 
-> > > > Patch has been applied to the bluetooth tree. Thanks.
-> > > 
-> > > Which version have you applied? Old one?
-> > 
-> > The patch that's upstream doesn't have the Tested-by tag so it seems
-> > Gustavo might have applied the old version of the patch instead of v2.
-> > Could you confirm?
+> If AMP controller is first in the list then Bluetooth traffic might
+> be routed through it (if source is not specified). The patch
+> prevents this case and also checks that source is BR/EDR.
 > 
-> Yes, there is old version. Apart from missing Tested-by tag there is one
-> style issue, debug issue and variable scope change which do not affect
-> functionality though.
-> 
-> If that patch would applied to bluetooth-next first I would notice that
-> much earlier...
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/hci_conn.c |    3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-This patch already went to wireless, so I can't change it anymore, can you
-send a delta patch with the fixes that are in v2?
+Patch has been applied to bluetooth-next, thanks.
 
 	Gustavo
