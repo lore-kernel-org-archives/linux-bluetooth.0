@@ -1,31 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 30 Jun 2012 12:36:44 -0300
+Date: Sat, 30 Jun 2012 12:33:49 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Bluetooth: Do not auto off AMP controller
-Message-ID: <20120630153644.GG1920@joana>
-References: <1340971622-16318-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1340971622-16318-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH trivial 1/2] Bluetooth: bluecard_cs: Shorten scope for
+ iobase
+Message-ID: <20120630153349.GF1920@joana>
+References: <1340971088-16059-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1340971088-16059-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1340971622-16318-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1340971088-16059-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-06-29 15:07:00 +0300]:
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-06-29 14:58:07 +0300]:
 
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Since AMP controller is not managed by user space do not shut it down.
+> Shortening scope shall silence some warnings reported by Geert
+> Uytterhoeven:
+> 
+> ...
+> drivers/bluetooth/bluecard_cs.c: warning: unused variable 'iobase'
+> 	[-Wunused-variable]
+> ...
 > 
 > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  net/bluetooth/hci_core.c |    5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>  drivers/bluetooth/bluecard_cs.c |    6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 
-applied to bluetooth-next. Thanks.
+Patch has been applied, thanks.
 
 	Gustavo
