@@ -1,27 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 2 Jul 2012 11:09:51 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [PATCH] network: fix network Connect() method parameters
-Message-ID: <20120702080951.GA15725@x220.P-661HNU-F1>
-References: <1341027545-27439-1-git-send-email-gustavo@padovan.org>
+Message-ID: <4FF06B06.9060104@shapeseeker.com>
+Date: Sun, 01 Jul 2012 16:21:42 +0100
+From: Brian Smith <door@shapeseeker.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1341027545-27439-1-git-send-email-gustavo@padovan.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: Bluez patches for Multiple SCO Links
+References: <4FDB2059.7000307@shapeseeker.com> <CANT-zCXOzBBaYvXRj3Z7xb=2oz7mSNTWLPUFeZi5ghHs6KzBwA@mail.gmail.com> <4FDB4583.5070902@shapeseeker.com>
+In-Reply-To: <4FDB4583.5070902@shapeseeker.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Just for fun, here is a little spare-time project I'm doing that uses 
+the multiple-SCO patches. It is a translator.
 
-On Sat, Jun 30, 2012, Gustavo Padovan wrote:
-> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> 
-> ---
->  network/connection.c |    4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+http://babeltooth.com
 
-Applied. Thanks.
+-- 
 
-Johan
+Brian Smith.
+"The bells of clocktowers stitch the sleeper's dreams together." - Memory Palace
+
