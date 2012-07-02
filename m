@@ -1,30 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 2 Jul 2012 14:25:50 +0300
+Date: Mon, 2 Jul 2012 14:19:23 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Paulo Alcantara <paulo.alcantara@openbossa.org>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 01/12] storage: Store address type in "names" file
-Message-ID: <20120702112550.GB30370@x220.P-661HNU-F1>
-References: <1339715044-13737-1-git-send-email-paulo.alcantara@openbossa.org>
- <1339715044-13737-2-git-send-email-paulo.alcantara@openbossa.org>
+Subject: Re: [PATCH 01/17] sap-dummy: Use switch insted of if-else where
+ applicable
+Message-ID: <20120702111923.GA30370@x220.P-661HNU-F1>
+References: <1338988767-19467-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1339715044-13737-2-git-send-email-paulo.alcantara@openbossa.org>
+In-Reply-To: <1338988767-19467-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Paulo,
+Hi Szymon,
 
-On Thu, Jun 14, 2012, Paulo Alcantara wrote:
-> +	uint8_t bdaddr_type;
->  
->  	idev = g_new0(struct input_device, 1);
->  	adapter_get_address(adapter, &idev->src);
-> -	device_get_address(device, &idev->dst, NULL);
-> +	device_get_address(device, &idev->dst, &bdaddr_type);
+On Wed, Jun 06, 2012, Szymon Janc wrote:
+> This improves readiblity of what actions are performed on each state.
+> ---
+>  sap/sap-dummy.c |   80 ++++++++++++++++++++++++++++++++++++-------------------
+>  1 file changed, 52 insertions(+), 28 deletions(-)
 
-I think it'd be clearer to call this dst_type (since it matches dst_addr
-and not src_addr). Could you also change this in all other places the
-variable naming occurs in your patches.
+All patches in this set have been applied. Thanks.
 
 Johan
