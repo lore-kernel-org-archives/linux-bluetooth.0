@@ -1,62 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: "tedd.an" <tedd.an@intel.com>
-Subject: hicattach: fix return length after reading the patch file
-Date: Mon, 02 Jul 2012 09:52:17 -0700
-Message-ID: <1898220.KzhPWWYfm0@tedd-ubuntu>
+Message-ID: <4FF1D148.4030009@gmail.com>
+Date: Mon, 02 Jul 2012 17:50:16 +0100
+From: James <theholyettlz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+To: Al Cho <acho@suse.com>
+CC: Oliver Neukum <oneukum@suse.de>, linux-bluetooth@vger.kernel.org
+Subject: Re: Bluetooth dongle (13d3:3304) not responding after reboot until
+ suspend/resume
+References: <1340312488.2203.16.camel@iseult> <201206220826.36147.oneukum@suse.de> <1340441172.2390.9.camel@iseult> <201206251429.44637.oneukum@suse.de> <CAKzePaoOQoXjx5QeRJPCcfOdfULF+EZ9BXf8ihM84YL9rb3D6Q@mail.gmail.com>
+In-Reply-To: <CAKzePaoOQoXjx5QeRJPCcfOdfULF+EZ9BXf8ihM84YL9rb3D6Q@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Tedd Ho-Jeong AN <tedd.an@intel.com>
+On 02/07/12 11:22, Al Cho wrote:
+>>
+> 
+> Yes,
+> James,would you please help us to get these log from test with unplug
+> and plug-in,
+> after warm reboot into Linux from Windows 7 ?
+> 
+> Sincerely,
+>                   AL
+> 
 
-This patch fixes the issue that returns alwasy 0 after reading the patch line.
 
----
- tools/hciattach_intel.c |    7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+Hello,
 
-diff --git a/tools/hciattach_intel.c b/tools/hciattach_intel.c
-index 9129993..749098e 100644
---- a/tools/hciattach_intel.c
-+++ b/tools/hciattach_intel.c
-@@ -148,14 +148,13 @@ static int validate_events(struct patch_entry *event,
-  */
- static int get_next_patch_entry(int fd, struct patch_entry *entry)
- {
--	int len, size;
-+	int size;
- 	char rb;
- 
- 	if (read(fd, &rb, 1) <= 0)
- 		return 0;
- 
- 	entry->type = rb;
--	len = 0;
- 
- 	switch (entry->type) {
- 	case PATCH_TYPE_CMD:
-@@ -176,7 +175,7 @@ static int get_next_patch_entry(int fd, struct patch_entry *entry)
- 	case PATCH_TYPE_EVT:
- 		entry->data[0] = HCI_EVENT_PKT;
- 
--		if (read(fd, &entry->data[len], 2) < 0)
-+		if (read(fd, &entry->data[1], 2) < 0)
- 			return -1;
- 
- 		size = (int)entry->data[2];
-@@ -193,7 +192,7 @@ static int get_next_patch_entry(int fd, struct patch_entry *entry)
- 		return -1;
- 	}
- 
--	return len;
-+	return entry->len;
- }
- 
- /**
--- 
-1.7.9.5
+I think the device is built into the notebook on a dual USB/mini PCI
+Express card, so I can't hotplug it. As far as I can tell, there's no
+special keyboard combination to toggle it either. Closest I believe I
+can get is a suspend/resume (unless you know of a USB trick to power
+down the internal hub).
+
+Thanks,
+James.
 
 
