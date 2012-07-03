@@ -1,141 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 01/10] client: Change MessageAccess.GetFolderListing to not return raw xml
-Date: Tue,  3 Jul 2012 21:28:05 +0300
-Message-Id: <1341340094-32522-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAB7rCTjwGwamcp83f=NH2WgM63iOt20uGi1YoF0B5kMA18yqnQ@mail.gmail.com>
+References: <1340115637-2595-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<20120629132435.GB27007@x220>
+	<CANT-zCUmB96Yu=Lij-wb+wOxjkhUP_X=RYeC5XjLio10q0Rbuw@mail.gmail.com>
+	<CAB7rCTjwGwamcp83f=NH2WgM63iOt20uGi1YoF0B5kMA18yqnQ@mail.gmail.com>
+Date: Tue, 3 Jul 2012 17:46:48 +0200
+Message-ID: <CANT-zCXp7dzf6giAVRznsoLb0yDBt06NfGVPcn-vjzgp5vbQhA@mail.gmail.com>
+Subject: Re: [RFC v0] Bluetooth: Fix lost socket error code
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Mike <puffy.taco@gmail.com>
+Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Mike,
 
-This parses the response and return as a list of dictionary where each
-entry is a folder and its properties, similar to what
-FileTransfer.ListFolder does.
----
- client/map.c |   88 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 86 insertions(+), 2 deletions(-)
+On Tue, Jul 3, 2012 at 3:42 PM, Mike <puffy.taco@gmail.com> wrote:
+> Hi Mikel,
+>
+> On Tue, Jul 3, 2012 at 2:44 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>> Hi Johan,
+>>
+>> On Fri, Jun 29, 2012 at 3:24 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>>> Hi Mikel,
+>>>
+>>> On Tue, Jun 19, 2012, Mikel Astiz wrote:
+>>>> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>>>>
+>>>> Using sock_error() here to check the status of the socket is wrong
+>>>> because it resets sk->sk_err to zero. For RFCOMM sockets, this means the
+>>>> disconnect reason is not exposed to userland in the socket options.
+>>>>
+>>>> Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>>>> ---
+>>>> This a second attempt to expose ACL disconnect reason to userland, as proposed first in "[RFC v0] Bluetooth: mgmt: Add device disconnect reason".
+>>>>
+>>>> The motivation behind was explained in the userspace patchset "[RFC BlueZ v0 0/5] ACL disconnect reason".
+>>>>
+>>>> This second approach focuses on RFCOMM sockets given that L2CAP is already exposing such information.
+>>>>
+>>>>  net/bluetooth/af_bluetooth.c |    2 +-
+>>>>  1 files changed, 1 insertions(+), 1 deletions(-)
+>>>>
+>>>> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+>>>> index f7db579..4799338 100644
+>>>> --- a/net/bluetooth/af_bluetooth.c
+>>>> +++ b/net/bluetooth/af_bluetooth.c
+>>>> @@ -313,7 +313,7 @@ int bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
+>>>>                       if (copied >= target)
+>>>>                               break;
+>>>>
+>>>> -                     err = sock_error(sk);
+>>>> +                     err = sk->sk_err;
+>>>>                       if (err)
+>>>>                               break;
+>>>>                       if (sk->sk_shutdown & RCV_SHUTDOWN)
+>>>
+>>> Looking at the implementation of sock_error (include/net/sock.h) This
+>>> should be:
+>>>
+>>>         err = -sk->sk_err;
+>>
+>> Right.
+>>
+>>> However, is this really needed if the error is returned for the write()
+>>> or read() that triggers it (through errno). And in the case of
+>>> POLLHUP/POLLERR there wont be any write/read that could clear the error
+>>> so you should be able to read it with getsockopt just fine. Am I missing
+>>> something?
+>>
+>> I don't actually get why rfcomm_sock_recvmsg() is being called, but
+>> that's what I experimentally see:
+>>
+>> [18985.546436] [73] rfcomm_l2data_ready:197: ffff880205613800 bytes 4
+>> [18985.546535] [21592] rfcomm_process_rx:1853: session
+>> ffff880230ccc9c0 state 1 qlen 1
+>> [18985.546546] [21592] rfcomm_recv_disc:1205: session ffff880230ccc9c0
+>> state 1 dlci 26
+>> [18985.546552] [21592] rfcomm_send_ua:773: ffff880230ccc9c0 dlci 26
+>> [18985.546558] [21592] rfcomm_send_cmd:750: ffff880230ccc9c0 cmd 115
+>> [18985.546563] [21592] rfcomm_send_frame:741: session ffff880230ccc9c0 len 4
+>> [18985.546591] [21592] __rfcomm_dlc_close:447: dlc ffff88016fe16500
+>> state 9 dlci 26 err 104 session ffff880230ccc9c0
+>> [18985.546597] [21592] rfcomm_dlc_clear_timer:286: dlc ffff88016fe16500 state 9
+>> [18985.546603] [21592] rfcomm_sk_state_change:71: dlc ffff88016fe16500
+>> state 9 err 104
+>>
+>> Here the error has been set.
+>>
+>> [18985.546628] [21592] rfcomm_dlc_unlink:351: dlc ffff88016fe16500
+>> refcnt 2 session ffff880230ccc9c0
+>> [18985.546635] [21592] rfcomm_session_set_timer:250: session
+>> ffff880230ccc9c0 state 1 timeout 2000
+>> [18985.546646] [21592] rfcomm_process_dlcs:1792: session
+>> ffff880230ccc9c0 state 1
+>> [18985.546701] [32724] bt_sock_stream_recvmsg:300: sk ffff880205615800 size 7768
+>>
+>> And here the error has been cleared.
+>>
+>> [18985.546780] [32724] rfcomm_sock_getsockopt:806: sk ffff880205615800
+>> [18985.546788] [32724] rfcomm_sock_getsockopt_old:742: sk ffff880205615800
+>> [18985.546791] [21576] rfcomm_sock_shutdown:882: sock
+>> ffff880136965180, sk ffff880205615800
+>> [18985.546799] [21576] __rfcomm_sock_close:209: sk ffff880205615800
+>> state 9 socket ffff880136965180
+>>
+>> My best guess would be that we don't shutdown the socket immediately
+>> after the error, and that's the reason why packets are still flowing
+>> around, but I can't really tell.
+>>
+>> In any case, using sock_error() to exit from bt_sock_stream_recvmsg()
+>> seems a bad idea. I would say it's buggy due to race conditions, since
+>> the socket option is temporarily set and then later cleared, don't you
+>> think?
+>
+> Are you seeing this in reference to ofono?  I noticed that
+> gatchat/gatio.c, function received_data would try to do a read before
+> checking the condition that caused it to be called.  In this case, the
+> socket error would be correct at the beginning of the function, but
+> would no longer be correct by the time the function reaches the
+> condition check for G_IO_HUP as a read attempt occurs.
 
-diff --git a/client/map.c b/client/map.c
-index 5242cb3..4475ad5 100644
---- a/client/map.c
-+++ b/client/map.c
-@@ -29,6 +29,7 @@
- #include <glib.h>
- #include <gdbus.h>
- 
-+#include "dbus.h"
- #include "log.h"
- 
- #include "map.h"
-@@ -132,6 +133,88 @@ done:
- 	dbus_message_unref(map->msg);
- }
- 
-+static void folder_element(GMarkupParseContext *ctxt, const gchar *element,
-+				const gchar **names, const gchar **values,
-+				gpointer user_data, GError **gerr)
-+{
-+	DBusMessageIter dict, *iter = user_data;
-+	const gchar *key;
-+	gint i;
-+
-+	if (strcasecmp("folder", element) != 0)
-+		return;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
-+			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
-+
-+	for (i = 0, key = names[i]; key; key = names[++i]) {
-+		if (strcasecmp("name", key) == 0)
-+			obex_dbus_dict_append(&dict, "Name", DBUS_TYPE_STRING,
-+								&values[i]);
-+	}
-+
-+	dbus_message_iter_close_container(iter, &dict);
-+}
-+
-+static const GMarkupParser folder_parser = {
-+	folder_element,
-+	NULL,
-+	NULL,
-+	NULL,
-+	NULL
-+};
-+
-+static void folder_listing_cb(struct obc_session *session,
-+						struct obc_transfer *transfer,
-+						GError *err, void *user_data)
-+{
-+	struct map_data *map = user_data;
-+	GMarkupParseContext *ctxt;
-+	DBusMessage *reply;
-+	DBusMessageIter iter, array;
-+	char *contents;
-+	size_t size;
-+	int perr;
-+
-+	if (err != NULL) {
-+		reply = g_dbus_create_error(map->msg,
-+						ERROR_INTERFACE ".Failed",
-+						"%s", err->message);
-+		goto done;
-+	}
-+
-+	perr = obc_transfer_get_contents(transfer, &contents, &size);
-+	if (perr < 0) {
-+		reply = g_dbus_create_error(map->msg,
-+						ERROR_INTERFACE ".Failed",
-+						"Error reading contents: %s",
-+						strerror(-perr));
-+		goto done;
-+	}
-+
-+	reply = dbus_message_new_method_return(map->msg);
-+	if (reply == NULL)
-+		return;
-+
-+	dbus_message_iter_init_append(reply, &iter);
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
-+			DBUS_TYPE_ARRAY_AS_STRING
-+			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
-+			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &array);
-+	ctxt = g_markup_parse_context_new(&folder_parser, 0, &array, NULL);
-+	g_markup_parse_context_parse(ctxt, contents, size, NULL);
-+	g_markup_parse_context_free(ctxt);
-+	dbus_message_iter_close_container(&iter, &array);
-+	g_free(contents);
-+
-+done:
-+	g_dbus_send_message(conn, reply);
-+	dbus_message_unref(map->msg);
-+}
-+
- static DBusMessage *map_get_folder_listing(DBusConnection *connection,
- 					DBusMessage *message, void *user_data)
- {
-@@ -144,7 +227,8 @@ static DBusMessage *map_get_folder_listing(DBusConnection *connection,
- 	if (transfer == NULL)
- 		goto fail;
- 
--	if (obc_session_queue(map->session, transfer, buffer_cb, map, &err)) {
-+	if (obc_session_queue(map->session, transfer, folder_listing_cb, map,
-+								&err)) {
- 		map->msg = dbus_message_ref(message);
- 		return NULL;
- 	}
-@@ -196,7 +280,7 @@ static const GDBusMethodTable map_methods[] = {
- 				map_setpath) },
- 	{ GDBUS_ASYNC_METHOD("GetFolderListing",
- 					GDBUS_ARGS({ "dummy", "a{ss}" }),
--					GDBUS_ARGS({ "content", "s" }),
-+					GDBUS_ARGS({ "content", "aa{sv}" }),
- 					map_get_folder_listing) },
- 	{ GDBUS_ASYNC_METHOD("GetMessageListing",
- 			GDBUS_ARGS({ "folder", "s" }, { "dummy", "a{ss}" }),
--- 
-1.7.10.4
+Yes, you're right. The socket option does exist at the beginning of
+received_data(), and it's cleared during the body.
 
+However, I'm still not sure what the general Kernel policy is
+regarding socket error reporting, so my question would be: is it a
+desired behaviour that the SO_ERROR would be cleared after a read
+attempt?
+
+If so, the Kernel would need no patch, and it would become a userland
+problem to propagate the disconnect reason as appropriate.
+
+Cheers,
+Mikel
