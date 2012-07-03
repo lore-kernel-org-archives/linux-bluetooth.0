@@ -1,54 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 3 Jul 2012 10:28:20 +0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Anton Weber <ant@antweb.me>
+Date: Tue, 3 Jul 2012 10:45:27 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: bubba junk <junkbubba2@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: GSoC: Bluetooth Replayer update
-Message-ID: <20120703082820.GA14566@joana>
-References: <CA+6PnXxc8CQ7q6LGkDWbP_-2P+4U_MX3rTt237PHhN2nGXeYag@mail.gmail.com>
- <20120522020004.GG16942@joana>
- <CA+6PnXwKzOBBG61dDSpHEdXTd-GsURcHOq7y+tVGoEKSpiQTFg@mail.gmail.com>
+Subject: Re: Question For Devs: Is Headset Connection Automatic?
+Message-ID: <20120703074527.GA23089@x220>
+References: <CAMk70DBgaYSK5bMLPUR1c7Gf1xFO8px4fgtqqnQ1-qMXUOq3PA@mail.gmail.com>
+ <CAFsbExJZd6w4-o4YZ82oeVLdRDr-tWhrNwN+zQv2WbJb6cKqUg@mail.gmail.com>
+ <CAMk70DBXqUnXNkOSx9Cct7ATbCWWwXzbV1jFWNyBkULzNZ6dHA@mail.gmail.com>
+ <CAMk70DCvRsuq7SN4dxY4Qo+saSzY8vsK1=5nDtuWA3cLGkcJWw@mail.gmail.com>
+ <CAMk70DD7-wN9AdgoBsAcuQtCOGDL_wBa2YbYDOFaW0Xtgu8TYA@mail.gmail.com>
+ <CAMk70DD3+26Q885KPbnim1Rj04=y9APOUOQM7teUNq95q7EPCw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CA+6PnXwKzOBBG61dDSpHEdXTd-GsURcHOq7y+tVGoEKSpiQTFg@mail.gmail.com>
+In-Reply-To: <CAMk70DD3+26Q885KPbnim1Rj04=y9APOUOQM7teUNq95q7EPCw@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anton,
+Hi,
 
-* Anton Weber <ant@antweb.me> [2012-07-02 16:32:23 +0100]:
+First of all, please don't top-post on this list.
 
-> Hi everyone,
-> 
-> it's been a while since my last update but I wanted to wait until I
-> have something to show and solve a few issues before I post here
-> again.
-> I made quite some progress during the past weeks and managed to get a
-> running version of my "hcireplay" tool.
-> 
-> Here's an overview of what it can do so far:
-> - replay of HCI commands, events and ACL data using VHCI
-> - dump file parser for BTSnoop format (taken from hcidump)
-> - timing functionality (delays using timestamps in the dump, modifier)
-> - packet dump output (using monitor code)
-> 
-> What I've also done in the meantime:
-> - set up a github repository for my work [1]
-> - set up a project page on my website [2]
-> - recorded a few dumps with btmon (thanks for the hint Gustavo)
-> - more background reading
-> 
-> Right now the tool does most of the things I planned. A good demo is
-> the "mouse-move" dump [3]
-> which replays the sequence of bringing the interface up, connecting a
-> Bluetooth mouse and moving it around.
-> 
-> If you want to give it a try, just grab the test dump and latest
-> source from github [1] and build it with "make hcireplay/hcireplay".
-> It would be great to get some feedback from the BlueZ community, since
-> you will be the one using this tool most!
+On Mon, Jul 02, 2012, bubba junk wrote:
+> I was wondering if you've had a chance to review the output of the
+> hcidump and list-devices that you requested me to provide. I noticed
+> the text "Connection refused - security block" in the output. Prior to
+> the following patch, I was not able to connect my headset using the
+> panel applet: [PATCH] Bluetooth: Fix l2cap connfailures for ssp
+> devices. Since that patch, I am now able to connect the headset using
+> the panel applet, but the headset does not connect automatically.
+> Based on the output, is this another bug related to SSP?
 
-I didn't test your tool yet (once I do I'll have more feedback), but please
-fold this tool under the tools/ folder.
+I'll copy-paste it below:
 
-	Gustavo
+> >> ACL data: handle 11 flags 0x02 dlen 12
+> >     L2CAP(s): Connect req: psm 3 scid 0x0041
+> > < ACL data: handle 11 flags 0x00 dlen 16
+> >     L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0041 result 3 status 0
+> >       Connection refused - security block
+> >> HCI Event: Encrypt Change (0x08) plen 4
+> >     status 0x00 handle 11 encrypt 0x01
+
+This looks like a well known hardware bug where the controller doesn't
+send HCI events and ACL data packets in the right order. If you had an
+air sniffer you'd probably see that the link is encrypted *before* the
+L2CAP Connect request is sent (as opposed to after it as the log above
+indicates). For connect requests to non-SDP PSMs coming before an
+encrypted link a security block response is the correct behavior for
+BlueZ.
+
+Johan
