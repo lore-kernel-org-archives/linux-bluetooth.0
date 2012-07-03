@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Paulo Alcantara <paulo.alcantara@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ v2 11/12] storage: Store address type in "eir" file
-Date: Tue,  3 Jul 2012 17:32:14 -0300
-Message-Id: <1341347535-15343-12-git-send-email-paulo.alcantara@openbossa.org>
+Subject: [PATCH BlueZ v2 10/12] storage: Store address type in "trusts" file
+Date: Tue,  3 Jul 2012 17:32:13 -0300
+Message-Id: <1341347535-15343-11-git-send-email-paulo.alcantara@openbossa.org>
 In-Reply-To: <1341347535-15343-1-git-send-email-paulo.alcantara@openbossa.org>
 References: <1339715044-13737-1-git-send-email-paulo.alcantara@openbossa.org>
  <1341347535-15343-1-git-send-email-paulo.alcantara@openbossa.org>
@@ -12,102 +12,137 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/event.c   |    2 +-
- src/storage.c |   30 +++++++++++++++++++++---------
- src/storage.h |    7 ++++---
- 3 files changed, 26 insertions(+), 13 deletions(-)
+ src/device.c  |    6 ++++--
+ src/storage.c |   41 ++++++++++++++++++++++++++++++-----------
+ src/storage.h |    6 ++++--
+ 3 files changed, 38 insertions(+), 15 deletions(-)
 
-diff --git a/src/event.c b/src/event.c
-index 002639f..1586293 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -270,7 +270,7 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type
- 	update_lastseen(local, peer, bdaddr_type);
+diff --git a/src/device.c b/src/device.c
+index d879aa2..6d8e786 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -487,7 +487,8 @@ static DBusMessage *set_trust(DBusConnection *conn, DBusMessage *msg,
+ 	ba2str(&src, srcaddr);
+ 	ba2str(&device->bdaddr, dstaddr);
  
- 	if (data)
--		write_remote_eir(local, peer, data, data_len);
-+		write_remote_eir(local, peer, bdaddr_type, data, data_len);
+-	err = write_trust(srcaddr, dstaddr, GLOBAL_TRUST, value);
++	err = write_trust(srcaddr, dstaddr, device->bdaddr_type, GLOBAL_TRUST,
++									value);
+ 	if (err < 0)
+ 		return btd_error_failed(msg, strerror(-err));
  
- 	adapter_update_found_devices(adapter, peer, bdaddr_type, rssi,
- 						confirm_name, data, data_len);
+@@ -1078,7 +1079,8 @@ struct btd_device *device_create(DBusConnection *conn,
+ 	if (read_device_alias(srcaddr, address, bdaddr_type, alias,
+ 							sizeof(alias)) == 0)
+ 		device->alias = g_strdup(alias);
+-	device->trusted = read_trust(&src, address, GLOBAL_TRUST);
++	device->trusted = read_trust(&src, address, device->bdaddr_type,
++								GLOBAL_TRUST);
+ 
+ 	if (read_blocked(&src, &device->bdaddr, device->bdaddr_type))
+ 		device_block(conn, device, FALSE);
 diff --git a/src/storage.c b/src/storage.c
-index 96af0e4..0cd6c42 100644
+index 0be071d..96af0e4 100644
 --- a/src/storage.c
 +++ b/src/storage.c
-@@ -430,10 +430,10 @@ done:
- 	return 0;
+@@ -748,10 +748,10 @@ static char *service_list_to_string(GSList *services)
+ 	return g_strdup(str);
  }
  
--int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data,
--							uint8_t data_len)
-+int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
-+						uint8_t *data, uint8_t data_len)
+-int write_trust(const char *src, const char *addr, const char *service,
+-		gboolean trust)
++int write_trust(const char *src, const char *addr, uint8_t addr_type,
++					const char *service, gboolean trust)
  {
--	char filename[PATH_MAX + 1], addr[18], str[481];
-+	char filename[PATH_MAX + 1], key[20], str[481];
- 	int i;
- 
- 	memset(str, 0, sizeof(str));
-@@ -444,23 +444,35 @@ int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data,
+-	char filename[PATH_MAX + 1], *str;
++	char filename[PATH_MAX + 1], key[20], *str;
+ 	GSList *services = NULL, *match;
+ 	gboolean trusted;
+ 	int ret;
+@@ -760,8 +760,15 @@ int write_trust(const char *src, const char *addr, const char *service,
  
  	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
  
--	ba2str(peer, addr);
--	return textfile_put(filename, addr, str);
-+	ba2str(peer, key);
-+	sprintf(&key[17], "#%hhu", peer_type);
+-	str = textfile_caseget(filename, addr);
+-	if (str)
++	snprintf(key, sizeof(key), "%17s#%hhu", addr, addr_type);
 +
-+	return textfile_put(filename, key, str);
++	str = textfile_caseget(filename, key);
++	if (str == NULL) {
++		/* Try old format (address only) */
++		str = textfile_caseget(filename, addr);
++		if (str)
++			services = service_string_to_list(str);
++	} else
+ 		services = service_string_to_list(str);
+ 
+ 	match = g_slist_find_custom(services, service, (GCompareFunc) strcmp);
+@@ -780,11 +787,14 @@ int write_trust(const char *src, const char *addr, const char *service,
+ 		services = g_slist_remove(services, match->data);
+ 
+ 	/* Remove the entry if the last trusted service was removed */
+-	if (!trust && !services)
+-		ret = textfile_casedel(filename, addr);
+-	else {
++	if (!trust && !services) {
++		ret = textfile_casedel(filename, key);
++		if (ret < 0)
++			/* Try old format (address only) */
++			ret = textfile_casedel(filename, addr);
++	} else {
+ 		char *new_str = service_list_to_string(services);
+-		ret = textfile_caseput(filename, addr, new_str);
++		ret = textfile_caseput(filename, key, new_str);
+ 		g_free(new_str);
+ 	}
+ 
+@@ -795,18 +805,27 @@ int write_trust(const char *src, const char *addr, const char *service,
+ 	return ret;
  }
  
--int read_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data)
-+int read_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
-+								uint8_t *data)
+-gboolean read_trust(const bdaddr_t *local, const char *addr, const char *service)
++gboolean read_trust(const bdaddr_t *local, const char *addr, uint8_t addr_type,
++							const char *service)
  {
--	char filename[PATH_MAX + 1], addr[18], *str;
-+	char filename[PATH_MAX + 1], key[18], *str;
- 	int i;
+-	char filename[PATH_MAX + 1], *str;
++	char filename[PATH_MAX + 1], key[20], *str;
+ 	GSList *services;
+ 	gboolean ret;
  
- 	create_filename(filename, PATH_MAX, local, "eir");
+ 	create_filename(filename, PATH_MAX, local, "trusts");
  
--	ba2str(peer, addr);
-+	ba2str(peer, key);
-+	sprintf(&key[17], "#%hhu", peer_type);
- 
--	str = textfile_get(filename, addr);
-+	str = textfile_get(filename, key);
++	snprintf(key, sizeof(key), "%17s#%hhu", addr, addr_type);
++
++	str = textfile_caseget(filename, key);
 +	if (str != NULL)
 +		goto done;
 +
 +	/* Try old format (address only) */
-+	key[17] = '\0';
-+
-+	str = textfile_get(filename, key);
+ 	str = textfile_caseget(filename, addr);
  	if (!str)
- 		return -ENOENT;
+ 		return FALSE;
  
 +done:
- 	if (!data) {
- 		free(str);
- 		return 0;
+ 	services = service_string_to_list(str);
+ 
+ 	if (g_slist_find_custom(services, service, (GCompareFunc) strcmp))
 diff --git a/src/storage.h b/src/storage.h
-index 72c752f..f982818 100644
+index 6fb9a2f..72c752f 100644
 --- a/src/storage.h
 +++ b/src/storage.h
-@@ -48,9 +48,10 @@ int write_device_name(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
- 								char *name);
- int read_device_name(const char *src, const char *dst, uint8_t dst_type,
- 								char *name);
--int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data,
--							uint8_t data_len);
--int read_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data);
-+int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
-+					uint8_t *data, uint8_t data_len);
-+int read_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
-+								uint8_t *data);
- int write_version_info(bdaddr_t *local, bdaddr_t *peer, uint16_t manufacturer, uint8_t lmp_ver, uint16_t lmp_subver);
- int write_features_info(bdaddr_t *local, bdaddr_t *peer, unsigned char *page1, unsigned char *page2);
- int read_remote_features(bdaddr_t *local, bdaddr_t *peer, unsigned char *page1, unsigned char *page2);
+@@ -63,8 +63,10 @@ int write_link_key(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
+ int read_link_key(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
+ 					unsigned char *key, uint8_t *type);
+ ssize_t read_pin_code(bdaddr_t *local, bdaddr_t *peer, char *pin);
+-gboolean read_trust(const bdaddr_t *local, const char *addr, const char *service);
+-int write_trust(const char *src, const char *addr, const char *service, gboolean trust);
++gboolean read_trust(const bdaddr_t *local, const char *addr, uint8_t addr_type,
++							const char *service);
++int write_trust(const char *src, const char *addr, uint8_t addr_type,
++					const char *service, gboolean trust);
+ int write_device_profiles(bdaddr_t *src, bdaddr_t *dst, uint8_t dst_type,
+ 							const char *profiles);
+ int delete_entry(bdaddr_t *src, const char *storage, const char *key);
 -- 
 1.7.9.5
 
