@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 06/10] client-doc: Add documentation of MessageAccess.GetMessageListing
-Date: Tue,  3 Jul 2012 21:28:10 +0300
-Message-Id: <1341340094-32522-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 05/10] test: Update map-client to the changes in GetMessageListing
+Date: Tue,  3 Jul 2012 21:28:09 +0300
+Message-Id: <1341340094-32522-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1341340094-32522-1-git-send-email-luiz.dentz@gmail.com>
 References: <1341340094-32522-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,97 +11,53 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This makes map-client to print the object path and properties of each
+message found.
 ---
- doc/client-api.txt |   76 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 76 insertions(+)
+ test/map-client |   24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 5a960e1..6f7d13f 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -361,6 +361,82 @@ Methods		void SetFolder(string name)
+diff --git a/test/map-client b/test/map-client
+index da357a9..be3c307 100755
+--- a/test/map-client
++++ b/test/map-client
+@@ -6,6 +6,27 @@ import dbus
+ import dbus.mainloop.glib
+ from optparse import OptionParser
  
- 				string Name : Folder name
++from pprint import pformat
++
++def unwrap(x):
++    """Hack to unwrap D-Bus values, so that they're easier to read when
++    printed. Taken from d-feet """
++
++    if isinstance(x, list):
++        return map(unwrap, x)
++
++    if isinstance(x, tuple):
++        return tuple(map(unwrap, x))
++
++    if isinstance(x, dict):
++        return dict([(unwrap(k), unwrap(v)) for k, v in x.iteritems()])
++
++    for t in [unicode, str, long, int, float, bool]:
++        if isinstance(x, t):
++            return t(x)
++
++    return x
++
+ def parse_options():
+ 	parser.add_option("-d", "--device", dest="device",
+ 			help="Device to connect", metavar="DEVICE")
+@@ -54,6 +75,7 @@ if  __name__ == '__main__':
+ 			print "%s/" % (i["Name"])
  
-+		array{object, dict} GetMessageListing(string folder, dict filter)
-+
-+			Returns an array containing the messages found in the
-+			given folder.
-+
-+			Each message is represented by an object path followed
-+			by a dictionary of the properties.
-+
-+			Properties:
-+
-+				string Handle:
-+
-+					Message handle
-+
-+				string Subject:
-+
-+					Message subject
-+
-+				string Timestamp:
-+
-+					Message timestamp
-+
-+				string Sender:
-+
-+					Message sender name
-+
-+				string SenderAddress:
-+
-+					Message sender address
-+
-+				string ReplyTo:
-+
-+					Message Reply-To address
-+
-+				string Recipient:
-+
-+					Message recipient name
-+
-+				string RecipientAddress:
-+
-+					Message recipient address
-+
-+				string Type:
-+
-+					Message type
-+
-+					Possible values: "EMAIL", "SMS_GSM",
-+					"SMS_CDMA" and "MMS"
-+
-+				uint64 Size:
-+
-+					Message size in bytes
-+
-+				string Status:
-+
-+					Message reception status
-+
-+					Possible values: "complete",
-+					"fractioned" and "notification"
-+
-+				boolean Priority:
-+
-+					Message priority flag
-+
-+				boolean Read:
-+
-+					Message read flag
-+
-+				boolean Sent:
-+
-+					Message sent flag
-+
-+				boolean Protected:
-+
-+					Message protected flag
-+
- Transfer hierarchy
- ==================
+ 	if options.ls_msg is not None:
+-		print map.GetMessageListing(options.ls_msg, dict())
++		ret = map.GetMessageListing(options.ls_msg, dict())
++		print pformat(unwrap(ret))
  
+ 	mainloop.run()
 -- 
 1.7.10.4
 
