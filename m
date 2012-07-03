@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 03/10] client-doc: Add documentation of MessageAccess.GetFolderListing
-Date: Tue,  3 Jul 2012 21:28:07 +0300
-Message-Id: <1341340094-32522-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 02/10] test: Update map-client to the changes in GetFolderListing
+Date: Tue,  3 Jul 2012 21:28:06 +0300
+Message-Id: <1341340094-32522-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1341340094-32522-1-git-send-email-luiz.dentz@gmail.com>
 References: <1341340094-32522-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,30 +11,26 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This makes map-client to print only the name of the folders similar
+to what ftp-client does.
 ---
- doc/client-api.txt |    9 +++++++++
- 1 file changed, 9 insertions(+)
+ test/map-client |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 58a824d..5a960e1 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -352,6 +352,15 @@ Methods		void SetFolder(string name)
- 			Set working directory for current session, *name* may
- 			be the directory name or '..[/dir]'.
+diff --git a/test/map-client b/test/map-client
+index bf843f3..da357a9 100755
+--- a/test/map-client
++++ b/test/map-client
+@@ -50,7 +50,8 @@ if  __name__ == '__main__':
+ 		set_folder(map, options.new_dir)
  
-+		array{dict} GetFolderListing(dict filter)
-+
-+			Returns a dictionary containing information about
-+			the current folder content.
-+
-+			The following keys are defined:
-+
-+				string Name : Folder name
-+
- Transfer hierarchy
- ==================
+ 	if options.ls_dir:
+-		print map.GetFolderListing(dict())
++		for i in map.GetFolderListing(dict()):
++			print "%s/" % (i["Name"])
  
+ 	if options.ls_msg is not None:
+ 		print map.GetMessageListing(options.ls_msg, dict())
 -- 
 1.7.10.4
 
