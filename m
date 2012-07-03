@@ -2,168 +2,187 @@ Return-Path: <cyrus@holtmann.org>
 From: Paulo Alcantara <paulo.alcantara@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ v2 02/12] storage: Store address type in "aliases" file
-Date: Tue,  3 Jul 2012 17:32:05 -0300
-Message-Id: <1341347535-15343-3-git-send-email-paulo.alcantara@openbossa.org>
+Subject: [PATCH BlueZ v2 01/12] storage: Store address type in "names" file
+Date: Tue,  3 Jul 2012 17:32:04 -0300
+Message-Id: <1341347535-15343-2-git-send-email-paulo.alcantara@openbossa.org>
 In-Reply-To: <1341347535-15343-1-git-send-email-paulo.alcantara@openbossa.org>
 References: <1339715044-13737-1-git-send-email-paulo.alcantara@openbossa.org>
  <1341347535-15343-1-git-send-email-paulo.alcantara@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+"names" file is shared between BR/EDR and BLE. Addressing types can be
+either BR/EDR, BLE public or BLE random so the entries in the "names"
+file did not contain enough information to distinguish which addressing
+type it's supposed to be. Entries will now contain both address number,
+and address type as a single key in every entry in the file.
 ---
- src/device.c  |   14 ++++++--------
- src/storage.c |   40 +++++++++++++++++++++++++++++++++-------
- src/storage.h |    6 ++++--
- 3 files changed, 43 insertions(+), 17 deletions(-)
+ input/device.c |    6 ++++--
+ src/adapter.c  |    3 ++-
+ src/device.c   |    3 ++-
+ src/event.c    |    7 +++++--
+ src/storage.c  |   30 ++++++++++++++++++++++--------
+ src/storage.h  |    6 ++++--
+ 6 files changed, 39 insertions(+), 16 deletions(-)
 
+diff --git a/input/device.c b/input/device.c
+index 09a9a39..cf4bfc4 100644
+--- a/input/device.c
++++ b/input/device.c
+@@ -1096,10 +1096,11 @@ static struct input_device *input_device_new(DBusConnection *conn,
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+ 	struct input_device *idev;
+ 	char name[249], src_addr[18], dst_addr[18];
++	uint8_t dst_type;
+ 
+ 	idev = g_new0(struct input_device, 1);
+ 	adapter_get_address(adapter, &idev->src);
+-	device_get_address(device, &idev->dst, NULL);
++	device_get_address(device, &idev->dst, &dst_type);
+ 	idev->device = btd_device_ref(device);
+ 	idev->path = g_strdup(path);
+ 	idev->conn = dbus_connection_ref(conn);
+@@ -1108,7 +1109,8 @@ static struct input_device *input_device_new(DBusConnection *conn,
+ 
+ 	ba2str(&idev->src, src_addr);
+ 	ba2str(&idev->dst, dst_addr);
+-	if (read_device_name(src_addr, dst_addr, name) == 0)
++
++	if (read_device_name(src_addr, dst_addr, dst_type, name) == 0)
+ 		idev->name = g_strdup(name);
+ 
+ 	if (g_dbus_register_interface(conn, idev->path, INPUT_DEVICE_INTERFACE,
+diff --git a/src/adapter.c b/src/adapter.c
+index f922876..800515d 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2880,7 +2880,8 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
+ 							eir_data.appearance);
+ 
+ 	if (eir_data.name != NULL && eir_data.name_complete)
+-		write_device_name(&adapter->bdaddr, bdaddr, eir_data.name);
++		write_device_name(&adapter->bdaddr, bdaddr, bdaddr_type,
++								eir_data.name);
+ 
+ 	dev = adapter_search_found_devices(adapter, bdaddr);
+ 	if (dev) {
 diff --git a/src/device.c b/src/device.c
-index 09518f3..9a22b21 100644
+index c210bcb..09518f3 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -456,8 +456,8 @@ static DBusMessage *set_alias(DBusConnection *conn, DBusMessage *msg,
- 	ba2str(&device->bdaddr, dstaddr);
- 
- 	/* Remove alias if empty string */
--	err = write_device_alias(srcaddr, dstaddr,
--			g_str_equal(alias, "") ? NULL : alias);
-+	err = write_device_alias(srcaddr, dstaddr, device->bdaddr_type,
-+					g_str_equal(alias, "") ? NULL : alias);
- 	if (err < 0)
- 		return btd_error_failed(msg, strerror(-err));
- 
-@@ -1075,7 +1075,8 @@ struct btd_device *device_create(DBusConnection *conn,
+@@ -1073,7 +1073,8 @@ struct btd_device *device_create(DBusConnection *conn,
+ 	device->bdaddr_type = bdaddr_type;
+ 	adapter_get_address(adapter, &src);
  	ba2str(&src, srcaddr);
- 
- 	read_device_name(srcaddr, address, bdaddr_type, device->name);
--	if (read_device_alias(srcaddr, address, alias, sizeof(alias)) == 0)
-+	if (read_device_alias(srcaddr, address, bdaddr_type, alias,
-+							sizeof(alias)) == 0)
+-	read_device_name(srcaddr, address, device->name);
++
++	read_device_name(srcaddr, address, bdaddr_type, device->name);
+ 	if (read_device_alias(srcaddr, address, alias, sizeof(alias)) == 0)
  		device->alias = g_strdup(alias);
  	device->trusted = read_trust(&src, address, GLOBAL_TRUST);
+diff --git a/src/event.c b/src/event.c
+index ec5926f..17fc250 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -319,6 +319,7 @@ void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name)
+ {
+ 	struct btd_adapter *adapter;
+ 	struct btd_device *device;
++	uint8_t peer_type;
+ 	struct remote_dev_info *dev_info;
  
-@@ -1156,19 +1157,16 @@ static void device_remove_stored(struct btd_device *device)
- 	DBusConnection *conn = get_dbus_connection();
+ 	if (!g_utf8_validate(name, -1, NULL)) {
+@@ -333,11 +334,13 @@ void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name)
+ 		g_strstrip(name);
+ 	}
  
- 	adapter_get_address(device->adapter, &src);
+-	write_device_name(local, peer, name);
+-
+ 	if (!get_adapter_and_device(local, peer, &adapter, &device, FALSE))
+ 		return;
+ 
++	peer_type = device_get_addr_type(device);
 +
- 	ba2str(&device->bdaddr, key);
-+	sprintf(&key[17], "#%hhu", device->bdaddr_type);
- 
--	/* key: address only */
- 	delete_entry(&src, "profiles", key);
- 	delete_entry(&src, "trusts", key);
- 
- 	if (device_is_bonded(device)) {
- 		delete_entry(&src, "linkkeys", key);
- 		delete_entry(&src, "aliases", key);
--
--		/* key: address#type */
--		sprintf(&key[17], "#%hhu", device->bdaddr_type);
--
- 		delete_entry(&src, "longtermkeys", key);
- 
- 		device_set_bonded(device, FALSE);
++	write_device_name(local, peer, peer_type, name);
++
+ 	dev_info = adapter_search_found_devices(adapter, peer);
+ 	if (dev_info) {
+ 		g_free(dev_info->name);
 diff --git a/src/storage.c b/src/storage.c
-index 9289e07..a57326b 100644
+index 17e8001..9289e07 100644
 --- a/src/storage.c
 +++ b/src/storage.c
-@@ -62,17 +62,29 @@ static inline int create_filename(char *buf, size_t size,
- 	return create_name(buf, size, STORAGEDIR, addr, name);
+@@ -359,9 +359,10 @@ int read_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t *class)
+ 	return 0;
  }
  
--int read_device_alias(const char *src, const char *dst, char *alias, size_t size)
-+int read_device_alias(const char *src, const char *dst, uint8_t dst_type,
-+						char *alias, size_t size)
+-int write_device_name(bdaddr_t *local, bdaddr_t *peer, char *name)
++int write_device_name(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
++								char *name)
  {
- 	char filename[PATH_MAX + 1], *tmp;
-+	char key[20];
- 	int err;
+-	char filename[PATH_MAX + 1], addr[18], str[HCI_MAX_NAME_LENGTH + 1];
++	char filename[PATH_MAX + 1], key[20], str[HCI_MAX_NAME_LENGTH + 1];
+ 	int i;
  
- 	create_name(filename, PATH_MAX, STORAGEDIR, src, "aliases");
+ 	memset(str, 0, sizeof(str));
+@@ -375,21 +376,34 @@ int write_device_name(bdaddr_t *local, bdaddr_t *peer, char *name)
  
--	tmp = textfile_get(filename, dst);
--	if (!tmp)
+ 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+ 
+-	ba2str(peer, addr);
+-	return textfile_put(filename, addr, str);
++	ba2str(peer, key);
++	sprintf(&key[17], "#%hhu", peer_type);
++
++	return textfile_put(filename, key, str);
+ }
+ 
+-int read_device_name(const char *src, const char *dst, char *name)
++int read_device_name(const char *src, const char *dst, uint8_t dst_type,
++								char *name)
+ {
+-	char filename[PATH_MAX + 1], *str;
++	char filename[PATH_MAX + 1], *str, key[20];
+ 	int len;
+ 
+ 	create_name(filename, PATH_MAX, STORAGEDIR, src, "names");
+ 
+-	str = textfile_get(filename, dst);
+-	if (!str)
 +	snprintf(key, sizeof(key), "%17s#%hhu", dst, dst_type);
 +
-+	tmp = textfile_get(filename, key);
-+	if (tmp != NULL)
++	str = textfile_get(filename, key);
++	if (str != NULL)
 +		goto done;
 +
 +	/* Try old format (address only) */
 +	key[17] = '\0';
 +
-+	tmp = textfile_get(filename, key);
-+	if (tmp == NULL)
- 		return -ENXIO;
++	str = textfile_get(filename, key);
++	if (str == NULL)
+ 		return -ENOENT;
  
 +done:
- 	err = snprintf(alias, size, "%s", tmp);
- 
- 	free(tmp);
-@@ -80,15 +92,19 @@ int read_device_alias(const char *src, const char *dst, char *alias, size_t size
- 	return err < 0 ? -EIO : 0;
- }
- 
--int write_device_alias(const char *src, const char *dst, const char *alias)
-+int write_device_alias(const char *src, const char *dst, uint8_t dst_type,
-+							const char *alias)
- {
- 	char filename[PATH_MAX + 1];
-+	char key[20];
- 
- 	create_name(filename, PATH_MAX, STORAGEDIR, src, "aliases");
- 
- 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- 
--	return textfile_put(filename, dst, alias);
-+	snprintf(key, sizeof(key), "%17s#%hhu", dst, dst_type);
-+
-+	return textfile_put(filename, key, alias);
- }
- 
- int write_discoverable_timeout(bdaddr_t *bdaddr, int timeout)
-@@ -802,11 +818,21 @@ int write_device_profiles(bdaddr_t *src, bdaddr_t *dst, const char *profiles)
- 
- int delete_entry(bdaddr_t *src, const char *storage, const char *key)
- {
--	char filename[PATH_MAX + 1];
-+	char filename[PATH_MAX + 1], old_key[18];
-+	int err;
-+
-+	memset(old_key, 0, sizeof(old_key));
-+	memcpy(old_key, key, sizeof(old_key) - 1);
- 
- 	create_filename(filename, PATH_MAX, src, storage);
- 
--	return textfile_del(filename, key);
-+	/* key: address#type */
-+	err = textfile_del(filename, key);
-+	if (err < 0)
-+		/* old_key: address only */
-+		err = textfile_del(filename, old_key);
-+
-+	return err;
- }
- 
- int store_record(const gchar *src, const gchar *dst, sdp_record_t *rec)
+ 	len = strlen(str);
+ 	if (len > HCI_MAX_NAME_LENGTH)
+ 		str[HCI_MAX_NAME_LENGTH] = '\0';
 diff --git a/src/storage.h b/src/storage.h
-index 07de39f..4ca3058 100644
+index cc00e97..07de39f 100644
 --- a/src/storage.h
 +++ b/src/storage.h
-@@ -23,8 +23,10 @@
- 
- #include "textfile.h"
- 
--int read_device_alias(const char *src, const char *dst, char *alias, size_t size);
--int write_device_alias(const char *src, const char *dst, const char *alias);
-+int read_device_alias(const char *src, const char *dst, uint8_t dst_type,
-+						char *alias, size_t size);
-+int write_device_alias(const char *src, const char *dst, uint8_t dst_type,
-+							const char *alias);
- int write_discoverable_timeout(bdaddr_t *bdaddr, int timeout);
- int read_discoverable_timeout(const char *src, int *timeout);
- int write_pairable_timeout(bdaddr_t *bdaddr, int timeout);
+@@ -42,8 +42,10 @@ int read_remote_appearance(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
+ 							uint16_t *appearance);
+ int write_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class);
+ int read_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t *class);
+-int write_device_name(bdaddr_t *local, bdaddr_t *peer, char *name);
+-int read_device_name(const char *src, const char *dst, char *name);
++int write_device_name(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
++								char *name);
++int read_device_name(const char *src, const char *dst, uint8_t dst_type,
++								char *name);
+ int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data,
+ 							uint8_t data_len);
+ int read_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data);
 -- 
 1.7.9.5
 
