@@ -4,62 +4,36 @@ From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
-Subject: [PATCH 18/21] hog: Handle feature reports
-Date: Tue,  3 Jul 2012 15:43:10 -0300
-Message-Id: <1341340993-7480-19-git-send-email-jprvita@openbossa.org>
+Subject: [PATCH 17/21] hog: Handle output events
+Date: Tue,  3 Jul 2012 15:43:09 -0300
+Message-Id: <1341340993-7480-18-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1341340993-7480-1-git-send-email-jprvita@openbossa.org>
 References: <1341340993-7480-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch writes the feature reports coming from the HID host on the
-device's Feature Report characteristic.
+This patch prints the output events coming from the HID host for debug
+purposes.
 ---
- input/hog_device.c |   14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ input/hog_device.c |    5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/input/hog_device.c b/input/hog_device.c
-index 236745a..00127c3 100644
+index d8d67ae..236745a 100644
 --- a/input/hog_device.c
 +++ b/input/hog_device.c
-@@ -56,6 +56,7 @@
- 
- #define HOG_REPORT_TYPE_INPUT	1
- #define HOG_REPORT_TYPE_OUTPUT	2
-+#define HOG_REPORT_TYPE_FEATURE	3
- 
- #define UHID_DEVICE_FILE	"/dev/uhid"
- 
-@@ -362,10 +363,20 @@ static void forward_report(struct hog_device *hogdev,
- 	int size;
- 	guint type;
- 
--	type = HOG_REPORT_TYPE_OUTPUT;
- 	data = ev->u.output.data;
- 	size = ev->u.output.size;
- 
-+	switch (ev->type) {
-+	case UHID_OUTPUT:
-+		type = HOG_REPORT_TYPE_OUTPUT;
-+		break;
-+	case UHID_FEATURE:
-+		type = HOG_REPORT_TYPE_FEATURE;
-+		break;
-+	default:
-+		return;
-+	}
-+
- 	l = g_slist_find_custom(hogdev->reports, GUINT_TO_POINTER(type),
- 							report_type_cmp);
- 	if (!l)
-@@ -409,6 +420,7 @@ static gboolean uhid_event_cb(GIOChannel *io, GIOCondition cond,
- 
- 	switch (ev.type) {
+@@ -411,6 +411,11 @@ static gboolean uhid_event_cb(GIOChannel *io, GIOCondition cond,
  	case UHID_OUTPUT:
-+	case UHID_FEATURE:
  		forward_report(hogdev, &ev);
  		break;
- 	case UHID_OUTPUT_EV:
++	case UHID_OUTPUT_EV:
++		DBG("uHID output event: type %d code %d value %d",
++			ev.u.output_ev.type, ev.u.output_ev.code,
++			ev.u.output_ev.value);
++		break;
+ 	default:
+ 		warn("unexpected uHID event");
+ 		break;
 -- 
 1.7.10.4
 
