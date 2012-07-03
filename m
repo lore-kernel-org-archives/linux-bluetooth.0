@@ -1,52 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 3 Jul 2012 10:45:27 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: bubba junk <junkbubba2@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Question For Devs: Is Headset Connection Automatic?
-Message-ID: <20120703074527.GA23089@x220>
-References: <CAMk70DBgaYSK5bMLPUR1c7Gf1xFO8px4fgtqqnQ1-qMXUOq3PA@mail.gmail.com>
- <CAFsbExJZd6w4-o4YZ82oeVLdRDr-tWhrNwN+zQv2WbJb6cKqUg@mail.gmail.com>
- <CAMk70DBXqUnXNkOSx9Cct7ATbCWWwXzbV1jFWNyBkULzNZ6dHA@mail.gmail.com>
- <CAMk70DCvRsuq7SN4dxY4Qo+saSzY8vsK1=5nDtuWA3cLGkcJWw@mail.gmail.com>
- <CAMk70DD7-wN9AdgoBsAcuQtCOGDL_wBa2YbYDOFaW0Xtgu8TYA@mail.gmail.com>
- <CAMk70DD3+26Q885KPbnim1Rj04=y9APOUOQM7teUNq95q7EPCw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAMk70DD3+26Q885KPbnim1Rj04=y9APOUOQM7teUNq95q7EPCw@mail.gmail.com>
+In-Reply-To: <20120629132435.GB27007@x220>
+References: <1340115637-2595-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<20120629132435.GB27007@x220>
+Date: Tue, 3 Jul 2012 09:44:56 +0200
+Message-ID: <CANT-zCUmB96Yu=Lij-wb+wOxjkhUP_X=RYeC5XjLio10q0Rbuw@mail.gmail.com>
+Subject: Re: [RFC v0] Bluetooth: Fix lost socket error code
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan,
 
-First of all, please don't top-post on this list.
+On Fri, Jun 29, 2012 at 3:24 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Mikel,
+>
+> On Tue, Jun 19, 2012, Mikel Astiz wrote:
+>> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>>
+>> Using sock_error() here to check the status of the socket is wrong
+>> because it resets sk->sk_err to zero. For RFCOMM sockets, this means the
+>> disconnect reason is not exposed to userland in the socket options.
+>>
+>> Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>> ---
+>> This a second attempt to expose ACL disconnect reason to userland, as proposed first in "[RFC v0] Bluetooth: mgmt: Add device disconnect reason".
+>>
+>> The motivation behind was explained in the userspace patchset "[RFC BlueZ v0 0/5] ACL disconnect reason".
+>>
+>> This second approach focuses on RFCOMM sockets given that L2CAP is already exposing such information.
+>>
+>>  net/bluetooth/af_bluetooth.c |    2 +-
+>>  1 files changed, 1 insertions(+), 1 deletions(-)
+>>
+>> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+>> index f7db579..4799338 100644
+>> --- a/net/bluetooth/af_bluetooth.c
+>> +++ b/net/bluetooth/af_bluetooth.c
+>> @@ -313,7 +313,7 @@ int bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
+>>                       if (copied >= target)
+>>                               break;
+>>
+>> -                     err = sock_error(sk);
+>> +                     err = sk->sk_err;
+>>                       if (err)
+>>                               break;
+>>                       if (sk->sk_shutdown & RCV_SHUTDOWN)
+>
+> Looking at the implementation of sock_error (include/net/sock.h) This
+> should be:
+>
+>         err = -sk->sk_err;
 
-On Mon, Jul 02, 2012, bubba junk wrote:
-> I was wondering if you've had a chance to review the output of the
-> hcidump and list-devices that you requested me to provide. I noticed
-> the text "Connection refused - security block" in the output. Prior to
-> the following patch, I was not able to connect my headset using the
-> panel applet: [PATCH] Bluetooth: Fix l2cap connfailures for ssp
-> devices. Since that patch, I am now able to connect the headset using
-> the panel applet, but the headset does not connect automatically.
-> Based on the output, is this another bug related to SSP?
+Right.
 
-I'll copy-paste it below:
+> However, is this really needed if the error is returned for the write()
+> or read() that triggers it (through errno). And in the case of
+> POLLHUP/POLLERR there wont be any write/read that could clear the error
+> so you should be able to read it with getsockopt just fine. Am I missing
+> something?
 
-> >> ACL data: handle 11 flags 0x02 dlen 12
-> >     L2CAP(s): Connect req: psm 3 scid 0x0041
-> > < ACL data: handle 11 flags 0x00 dlen 16
-> >     L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0041 result 3 status 0
-> >       Connection refused - security block
-> >> HCI Event: Encrypt Change (0x08) plen 4
-> >     status 0x00 handle 11 encrypt 0x01
+I don't actually get why rfcomm_sock_recvmsg() is being called, but
+that's what I experimentally see:
 
-This looks like a well known hardware bug where the controller doesn't
-send HCI events and ACL data packets in the right order. If you had an
-air sniffer you'd probably see that the link is encrypted *before* the
-L2CAP Connect request is sent (as opposed to after it as the log above
-indicates). For connect requests to non-SDP PSMs coming before an
-encrypted link a security block response is the correct behavior for
-BlueZ.
+[18985.546436] [73] rfcomm_l2data_ready:197: ffff880205613800 bytes 4
+[18985.546535] [21592] rfcomm_process_rx:1853: session
+ffff880230ccc9c0 state 1 qlen 1
+[18985.546546] [21592] rfcomm_recv_disc:1205: session ffff880230ccc9c0
+state 1 dlci 26
+[18985.546552] [21592] rfcomm_send_ua:773: ffff880230ccc9c0 dlci 26
+[18985.546558] [21592] rfcomm_send_cmd:750: ffff880230ccc9c0 cmd 115
+[18985.546563] [21592] rfcomm_send_frame:741: session ffff880230ccc9c0 len 4
+[18985.546591] [21592] __rfcomm_dlc_close:447: dlc ffff88016fe16500
+state 9 dlci 26 err 104 session ffff880230ccc9c0
+[18985.546597] [21592] rfcomm_dlc_clear_timer:286: dlc ffff88016fe16500 state 9
+[18985.546603] [21592] rfcomm_sk_state_change:71: dlc ffff88016fe16500
+state 9 err 104
 
-Johan
+Here the error has been set.
+
+[18985.546628] [21592] rfcomm_dlc_unlink:351: dlc ffff88016fe16500
+refcnt 2 session ffff880230ccc9c0
+[18985.546635] [21592] rfcomm_session_set_timer:250: session
+ffff880230ccc9c0 state 1 timeout 2000
+[18985.546646] [21592] rfcomm_process_dlcs:1792: session
+ffff880230ccc9c0 state 1
+[18985.546701] [32724] bt_sock_stream_recvmsg:300: sk ffff880205615800 size 7768
+
+And here the error has been cleared.
+
+[18985.546780] [32724] rfcomm_sock_getsockopt:806: sk ffff880205615800
+[18985.546788] [32724] rfcomm_sock_getsockopt_old:742: sk ffff880205615800
+[18985.546791] [21576] rfcomm_sock_shutdown:882: sock
+ffff880136965180, sk ffff880205615800
+[18985.546799] [21576] __rfcomm_sock_close:209: sk ffff880205615800
+state 9 socket ffff880136965180
+
+My best guess would be that we don't shutdown the socket immediately
+after the error, and that's the reason why packets are still flowing
+around, but I can't really tell.
+
+In any case, using sock_error() to exit from bt_sock_stream_recvmsg()
+seems a bad idea. I would say it's buggy due to race conditions, since
+the socket option is temporarily set and then later cleared, don't you
+think?
+
+Cheers,
+Mikel
