@@ -1,129 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ] core: Fix not waiting for discovery to stop before attempting to pair
-Date: Wed,  4 Jul 2012 15:09:28 +0300
-Message-Id: <1341403768-16709-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 3 Jul 2012 11:18:21 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v0] Bluetooth: Fix lost socket error code
+Message-ID: <20120703081821.GA23286@x220>
+References: <1340115637-2595-1-git-send-email-mikel.astiz.oss@gmail.com>
+ <20120629132435.GB27007@x220>
+ <CANT-zCUmB96Yu=Lij-wb+wOxjkhUP_X=RYeC5XjLio10q0Rbuw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CANT-zCUmB96Yu=Lij-wb+wOxjkhUP_X=RYeC5XjLio10q0Rbuw@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Mikel,
 
-In some cases, LE controllers, this can cause errors due to scan/inquiry
-being active.
+On Tue, Jul 03, 2012, Mikel Astiz wrote:
+> I don't actually get why rfcomm_sock_recvmsg() is being called, but
+> that's what I experimentally see:
+> 
+> [18985.546436] [73] rfcomm_l2data_ready:197: ffff880205613800 bytes 4
+> [18985.546535] [21592] rfcomm_process_rx:1853: session
+> ffff880230ccc9c0 state 1 qlen 1
+> [18985.546546] [21592] rfcomm_recv_disc:1205: session ffff880230ccc9c0
+> state 1 dlci 26
+> [18985.546552] [21592] rfcomm_send_ua:773: ffff880230ccc9c0 dlci 26
+> [18985.546558] [21592] rfcomm_send_cmd:750: ffff880230ccc9c0 cmd 115
+> [18985.546563] [21592] rfcomm_send_frame:741: session ffff880230ccc9c0 len 4
+> [18985.546591] [21592] __rfcomm_dlc_close:447: dlc ffff88016fe16500
+> state 9 dlci 26 err 104 session ffff880230ccc9c0
+> [18985.546597] [21592] rfcomm_dlc_clear_timer:286: dlc ffff88016fe16500 state 9
+> [18985.546603] [21592] rfcomm_sk_state_change:71: dlc ffff88016fe16500
+> state 9 err 104
+> 
+> Here the error has been set.
+> 
+> [18985.546628] [21592] rfcomm_dlc_unlink:351: dlc ffff88016fe16500
+> refcnt 2 session ffff880230ccc9c0
+> [18985.546635] [21592] rfcomm_session_set_timer:250: session
+> ffff880230ccc9c0 state 1 timeout 2000
+> [18985.546646] [21592] rfcomm_process_dlcs:1792: session
+> ffff880230ccc9c0 state 1
+> [18985.546701] [32724] bt_sock_stream_recvmsg:300: sk ffff880205615800 size 7768
+> 
+> And here the error has been cleared.
 
-To fix this instead of immediately attempting to pair wait until
-discovery is properly stopped and only then proceed with bonding.
----
-Still RFC because I could only test against controllers that used to
-work without this patch.
+recvmsg is the function that gets triggered when user space does a
+read() system call. So it seems somewhere in user space the error from
+read() is being ignored.
 
- src/adapter.c |   48 ++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 42 insertions(+), 6 deletions(-)
-
-diff --git a/src/adapter.c b/src/adapter.c
-index f922876..043ca02 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -106,6 +106,12 @@ struct service_auth {
- 	struct btd_adapter *adapter;
- };
- 
-+struct pending_bonding {
-+	bdaddr_t bdaddr;
-+	uint8_t addr_type;
-+	uint8_t io_cap;
-+};
-+
- struct btd_adapter {
- 	uint16_t dev_id;
- 	gboolean up;
-@@ -137,6 +143,7 @@ struct btd_adapter {
- 	guint discov_id;		/* Discovery timer */
- 	gboolean discovering;		/* Discovery active */
- 	gboolean discov_suspended;	/* Discovery suspended */
-+	struct pending_bonding *bonding;/* Pending device bonding */
- 	guint auto_timeout_id;		/* Automatic connections timeout */
- 	sdp_list_t *services;		/* Services associated to adapter */
- 
-@@ -498,6 +505,10 @@ static void stop_discovery(struct btd_adapter *adapter)
- 	/* Reset if suspended, otherwise remove timer (software scheduler)
- 	 * or request inquiry to stop */
- 	if (adapter->discov_suspended) {
-+		if (adapter->bonding != NULL) {
-+			g_free(adapter->bonding);
-+			adapter->bonding = NULL;
-+		}
- 		adapter->discov_suspended = FALSE;
- 		return;
- 	}
-@@ -2551,7 +2562,20 @@ void adapter_set_discovering(struct btd_adapter *adapter,
- 	g_slist_free_full(adapter->oor_devices, dev_info_free);
- 	adapter->oor_devices = g_slist_copy(adapter->found_devices);
- 
--	if (!adapter_has_discov_sessions(adapter) || adapter->discov_suspended)
-+	if (adapter->discov_suspended) {
-+		if (adapter->bonding != NULL) {
-+			adapter_ops->create_bonding(adapter->dev_id,
-+						&adapter->bonding->bdaddr,
-+						adapter->bonding->addr_type,
-+						adapter->bonding->io_cap);
-+			g_free(adapter->bonding);
-+			adapter->bonding = NULL;
-+			return;
-+		} else
-+			adapter->discov_suspended = FALSE;
-+	}
-+
-+	if (!adapter_has_discov_sessions(adapter))
- 		return;
- 
- 	DBG("hci%u restarting discovery, disc_sessions %u", adapter->dev_id,
-@@ -2560,10 +2584,10 @@ void adapter_set_discovering(struct btd_adapter *adapter,
- 	adapter->discov_id = g_idle_add(discovery_cb, adapter);
- }
- 
--static void suspend_discovery(struct btd_adapter *adapter)
-+static int suspend_discovery(struct btd_adapter *adapter)
- {
- 	if (adapter->disc_sessions == NULL || adapter->discov_suspended)
--		return;
-+		return -EALREADY;
- 
- 	DBG("Suspending discovery");
- 
-@@ -2579,6 +2603,8 @@ static void suspend_discovery(struct btd_adapter *adapter)
- 		adapter->discov_id = 0;
- 	} else
- 		adapter_ops->stop_discovery(adapter->dev_id);
-+
-+	return 0;
- }
- 
- static int found_device_cmp(gconstpointer a, gconstpointer b)
-@@ -3530,9 +3556,19 @@ int btd_adapter_set_did(struct btd_adapter *adapter, uint16_t vendor,
- int adapter_create_bonding(struct btd_adapter *adapter, bdaddr_t *bdaddr,
- 					uint8_t addr_type, uint8_t io_cap)
- {
--	suspend_discovery(adapter);
--	return adapter_ops->create_bonding(adapter->dev_id, bdaddr,
--						addr_type, io_cap);
-+	if (suspend_discovery(adapter) == -EALREADY)
-+		return adapter_ops->create_bonding(adapter->dev_id, bdaddr,
-+							addr_type, io_cap);
-+
-+	if (adapter->bonding != NULL)
-+		return -EBUSY;
-+
-+	adapter->bonding = g_new0(struct pending_bonding, 1);
-+	bacpy(&adapter->bonding->bdaddr, bdaddr);
-+	adapter->bonding->addr_type = addr_type;
-+	adapter->bonding->io_cap = io_cap;
-+
-+	return 0;
- }
- 
- int adapter_cancel_bonding(struct btd_adapter *adapter, bdaddr_t *bdaddr)
--- 
-1.7.10.4
-
+Johan
