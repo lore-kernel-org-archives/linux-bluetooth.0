@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v2 05/28] adapter: remove deprecated ListDevices() method
-Date: Wed,  4 Jul 2012 10:17:24 +0200
-Message-Id: <1341389867-30749-6-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v2 04/28] sink: remove deprecated DBus method
+Date: Wed,  4 Jul 2012 10:17:23 +0200
+Message-Id: <1341389867-30749-5-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1341389867-30749-1-git-send-email-gustavo@padovan.org>
 References: <1341389867-30749-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,84 +13,68 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
 ---
- doc/adapter-api.txt |   10 ----------
- src/adapter.c       |   35 -----------------------------------
- 2 files changed, 45 deletions(-)
+ audio/sink.c      |   24 ------------------------
+ doc/audio-api.txt |    5 -----
+ 2 files changed, 29 deletions(-)
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 916e941..176843b 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -88,16 +88,6 @@ Methods		dict GetProperties()
- 			Possible Errors: org.bluez.Error.DoesNotExist
- 					 org.bluez.Error.InvalidArguments
- 
--		array{object} ListDevices() {deprecated}
--
--			Returns list of device object paths.
--			This method is deprecated, instead use the Devices
--			Property to get the list of devices object paths.
--
--			Possible errors: org.bluez.Error.InvalidArguments
--					 org.bluez.Error.Failed
--					 org.bluez.Error.OutOfMemory
--
- 		object CreateDevice(string address)
- 
- 			Creates a new object path for a remote device. This
-diff --git a/src/adapter.c b/src/adapter.c
-index f922876..9315922 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1307,38 +1307,6 @@ static DBusMessage *release_session(DBusConnection *conn,
- 	return dbus_message_new_method_return(msg);
+diff --git a/audio/sink.c b/audio/sink.c
+index 8ba4e2a..64e38f4 100644
+--- a/audio/sink.c
++++ b/audio/sink.c
+@@ -492,27 +492,6 @@ static DBusMessage *sink_disconnect(DBusConnection *conn,
+ 	return NULL;
  }
  
--static DBusMessage *list_devices(DBusConnection *conn,
--						DBusMessage *msg, void *data)
+-static DBusMessage *sink_is_connected(DBusConnection *conn,
+-					DBusMessage *msg,
+-					void *data)
 -{
--	struct btd_adapter *adapter = data;
+-	struct audio_device *device = data;
+-	struct sink *sink = device->sink;
 -	DBusMessage *reply;
--	GSList *l;
--	DBusMessageIter iter;
--	DBusMessageIter array_iter;
--	const gchar *dev_path;
+-	dbus_bool_t connected;
 -
 -	reply = dbus_message_new_method_return(msg);
 -	if (!reply)
 -		return NULL;
 -
--	dbus_message_iter_init_append(reply, &iter);
--	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
--				DBUS_TYPE_OBJECT_PATH_AS_STRING, &array_iter);
+-	connected = (sink->stream_state >= AVDTP_STATE_CONFIGURED);
 -
--	for (l = adapter->devices; l; l = l->next) {
--		struct btd_device *device = l->data;
--
--		dev_path = device_get_path(device);
--
--		dbus_message_iter_append_basic(&array_iter,
--				DBUS_TYPE_OBJECT_PATH, &dev_path);
--	}
--
--	dbus_message_iter_close_container(&iter, &array_iter);
+-	dbus_message_append_args(reply, DBUS_TYPE_BOOLEAN, &connected,
+-					DBUS_TYPE_INVALID);
 -
 -	return reply;
 -}
 -
- static DBusMessage *cancel_device_creation(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
+ static DBusMessage *sink_get_properties(DBusConnection *conn,
+ 					DBusMessage *msg, void *data)
  {
-@@ -1662,9 +1630,6 @@ static const GDBusMethodTable adapter_methods[] = {
- 			adapter_start_discovery) },
- 	{ GDBUS_ASYNC_METHOD("StopDiscovery", NULL, NULL,
- 			adapter_stop_discovery) },
--	{ GDBUS_DEPRECATED_METHOD("ListDevices",
--			NULL, GDBUS_ARGS({ "devices", "ao" }),
--			list_devices) },
- 	{ GDBUS_ASYNC_METHOD("CreateDevice",
- 			GDBUS_ARGS({ "address", "s" }),
- 			GDBUS_ARGS({ "device", "o" }),
+@@ -556,9 +535,6 @@ static DBusMessage *sink_get_properties(DBusConnection *conn,
+ static const GDBusMethodTable sink_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, sink_connect) },
+ 	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL, sink_disconnect) },
+-	{ GDBUS_DEPRECATED_METHOD("IsConnected",
+-			NULL, GDBUS_ARGS({ "connected", "b" }),
+-			sink_is_connected) },
+ 	{ GDBUS_METHOD("GetProperties",
+ 				NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
+ 				sink_get_properties) },
+diff --git a/doc/audio-api.txt b/doc/audio-api.txt
+index 2419531..ca430fc 100644
+--- a/doc/audio-api.txt
++++ b/doc/audio-api.txt
+@@ -193,11 +193,6 @@ Methods		void Connect()
+ 
+ 			Disconnect from the remote device.
+ 
+-		boolean IsConnected() {deprecated}
+-
+-			Returns TRUE if a stream is setup to a A2DP sink on
+-			the remote device.
+-
+ 		dict GetProperties()
+ 
+ 			Returns all properties for the interface. See the
 -- 
 1.7.10.2
 
