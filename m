@@ -1,28 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1340216061-24778-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1340216061-24778-1-git-send-email-anderson.lizardo@openbossa.org>
-Date: Wed, 4 Jul 2012 15:12:50 -0300
-Message-ID: <CAJdJm_Mtppu=cjc1UUmwfW_PeoNisgiBi8yb96hugz3JZx3tNg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] time: Introduce manager abstraction layer
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+In-Reply-To: <CAAngNMaLQUem5vmgjCOWyUUdW+iFuACXxtJ=4oBO1u0ZXcUCxQ@mail.gmail.com>
+References: <1341403768-16709-1-git-send-email-luiz.dentz@gmail.com>
+	<CAAngNMaLQUem5vmgjCOWyUUdW+iFuACXxtJ=4oBO1u0ZXcUCxQ@mail.gmail.com>
+Date: Wed, 4 Jul 2012 17:35:20 +0300
+Message-ID: <CABBYNZ+vNjKwrTz2Ck4x0hYRyeBzJsRiQLqZWX7YjOba-EYgQA@mail.gmail.com>
+Subject: Re: [RFC BlueZ] core: Fix not waiting for discovery to stop before
+ attempting to pair
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Joao Paulo Rechi Vita <jprvita@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Jun 20, 2012 at 3:14 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> This abstraction layer makes the GATT Time profile implementation
-> consistent with other profiles. It is the first step before implementing
-> the adapter driver for the Time server implementation.
-> ---
+Hi Joao,
 
-ping.
+On Wed, Jul 4, 2012 at 5:16 PM, Joao Paulo Rechi Vita
+<jprvita@openbossa.org> wrote:
+> Hello Luiz,
+>
+> On Wed, Jul 4, 2012 at 9:09 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> In some cases, LE controllers, this can cause errors due to scan/inquiry
+>> being active.
+>>
+>> To fix this instead of immediately attempting to pair wait until
+>> discovery is properly stopped and only then proceed with bonding.
+>> ---
+>> Still RFC because I could only test against controllers that used to
+>> work without this patch.
+>>
+>
+> Claudio and I are currently working to support the General Connection
+> Procedure for LE connections, which will serialize the discovery and
+> LE connect commands. In other words, only one connect or discovery
+> command will be sent to the kernel at a given time. We'll probably
+> send an RFC on this code this week.
 
-Regards,
+Sounds like a better idea.
+
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Luiz Augusto von Dentz
