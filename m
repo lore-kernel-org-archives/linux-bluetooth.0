@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v3 07/19] emulator: move it to the tools folder
-Date: Wed,  4 Jul 2012 14:51:23 +0200
-Message-Id: <1341406295-7669-7-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v3 08/19] btmgmt: move to tools folder
+Date: Wed,  4 Jul 2012 14:51:24 +0200
+Message-Id: <1341406295-7669-8-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1341406295-7669-1-git-send-email-gustavo@padovan.org>
 References: <1341406295-7669-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,94 +13,64 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
 ---
- .gitignore              |    2 +-
- Makefile.tools          |   12 +-
- emulator/btdev.c        | 1076 -----------------------------------------------
- emulator/btdev.h        |   38 --
- emulator/main.c         |   73 ----
- emulator/server.c       |  288 -------------
- emulator/server.h       |   30 --
- emulator/vhci.c         |  133 ------
- emulator/vhci.h         |   35 --
- tools/emulator/btdev.c  | 1076 +++++++++++++++++++++++++++++++++++++++++++++++
- tools/emulator/btdev.h  |   38 ++
- tools/emulator/main.c   |   73 ++++
- tools/emulator/server.c |  288 +++++++++++++
- tools/emulator/server.h |   30 ++
- tools/emulator/vhci.c   |  133 ++++++
- tools/emulator/vhci.h   |   35 ++
- 16 files changed, 1680 insertions(+), 1680 deletions(-)
- delete mode 100644 emulator/btdev.c
- delete mode 100644 emulator/btdev.h
- delete mode 100644 emulator/main.c
- delete mode 100644 emulator/server.c
- delete mode 100644 emulator/server.h
- delete mode 100644 emulator/vhci.c
- delete mode 100644 emulator/vhci.h
- create mode 100644 tools/emulator/btdev.c
- create mode 100644 tools/emulator/btdev.h
- create mode 100644 tools/emulator/main.c
- create mode 100644 tools/emulator/server.c
- create mode 100644 tools/emulator/server.h
- create mode 100644 tools/emulator/vhci.c
- create mode 100644 tools/emulator/vhci.h
+ .gitignore        |    2 +-
+ Makefile.tools    |    8 +-
+ mgmt/main.c       | 1933 -----------------------------------------------------
+ tools/mgmt/main.c | 1933 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 1938 insertions(+), 1938 deletions(-)
+ delete mode 100644 mgmt/main.c
+ create mode 100644 tools/mgmt/main.c
 
 diff --git a/.gitignore b/.gitignore
-index c7d079e..aaf52c3 100644
+index aaf52c3..63f6ae0 100644
 --- a/.gitignore
 +++ b/.gitignore
-@@ -88,7 +88,7 @@ compat/pand
+@@ -86,7 +86,7 @@ compat/dund
+ compat/hidd
+ compat/pand
  unit/test-eir
- mgmt/btmgmt
+-mgmt/btmgmt
++tools/mgmt/btmgmt
  monitor/btmon
--emulator/btvirt
-+tools/emulator/btvirt
+ tools/emulator/btvirt
  
- doc/*.bak
- doc/*.stamp
 diff --git a/Makefile.tools b/Makefile.tools
-index 1626a4b..e1be0fa 100644
+index e1be0fa..e4cf238 100644
 --- a/Makefile.tools
 +++ b/Makefile.tools
-@@ -50,7 +50,7 @@ tools_ppporc_LDADD = lib/libbluetooth-private.la
+@@ -50,10 +50,10 @@ tools_ppporc_LDADD = lib/libbluetooth-private.la
  
  tools_hcieventmask_LDADD = lib/libbluetooth-private.la
  
--noinst_PROGRAMS += mgmt/btmgmt monitor/btmon emulator/btvirt
-+noinst_PROGRAMS += mgmt/btmgmt monitor/btmon tools/emulator/btvirt
+-noinst_PROGRAMS += mgmt/btmgmt monitor/btmon tools/emulator/btvirt
++noinst_PROGRAMS += tools/mgmt/btmgmt monitor/btmon tools/emulator/btvirt
  
- mgmt_btmgmt_SOURCES = mgmt/main.c src/glib-helper.c
- mgmt_btmgmt_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@
-@@ -63,11 +63,11 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
+-mgmt_btmgmt_SOURCES = mgmt/main.c src/glib-helper.c
+-mgmt_btmgmt_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@
++tools_mgmt_btmgmt_SOURCES = tools/mgmt/main.c src/glib-helper.c
++tools_mgmt_btmgmt_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@
+ 
+ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
+ 					monitor/mainloop.h monitor/mainloop.c \
+@@ -63,7 +63,7 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
  					monitor/packet.h monitor/packet.c
  monitor_btmon_LDADD = lib/libbluetooth-private.la
  
--emulator_btvirt_SOURCES = emulator/main.c monitor/bt.h \
--					monitor/mainloop.h monitor/mainloop.c \
--					emulator/server.h emulator/server.c \
--					emulator/vhci.h emulator/vhci.c \
--					emulator/btdev.h emulator/btdev.c
-+emulator_btvirt_SOURCES = tools/emulator/main.c monitor/bt.h \
-+			monitor/mainloop.h monitor/mainloop.c \
-+			tools/emulator/server.h tools/emulator/server.c \
-+			tools/emulator/vhci.h tools/emulator/vhci.c \
-+			tools/emulator/btdev.h tools/emulator/btdev.c
- 
- if READLINE
- bin_PROGRAMS += attrib/gatttool
-diff --git a/emulator/btdev.c b/emulator/btdev.c
+-emulator_btvirt_SOURCES = tools/emulator/main.c monitor/bt.h \
++tools_emulator_btvirt_SOURCES = tools/emulator/main.c monitor/bt.h \
+ 			monitor/mainloop.h monitor/mainloop.c \
+ 			tools/emulator/server.h tools/emulator/server.c \
+ 			tools/emulator/vhci.h tools/emulator/vhci.c \
+diff --git a/mgmt/main.c b/mgmt/main.c
 deleted file mode 100644
-index 7d4517a..0000000
---- a/emulator/btdev.c
+index b2d6c3c..0000000
+--- a/mgmt/main.c
 +++ /dev/null
-@@ -1,1076 +0,0 @@
+@@ -1,1933 +0,0 @@
 -/*
-- *
 - *  BlueZ - Bluetooth protocol stack for Linux
 - *
-- *  Copyright (C) 2011-2012  Intel Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
+- *  Copyright (C) 2011  Intel Corporation. All rights reserved.
 - *
 - *  This program is free software; you can redistribute it and/or modify
 - *  it under the terms of the GNU General Public License as published by
@@ -122,1700 +92,1924 @@ index 7d4517a..0000000
 -#include <config.h>
 -#endif
 -
--#include <stdio.h>
--#include <ctype.h>
 -#include <stdlib.h>
--#include <string.h>
--
--#include "bt.h"
--#include "btdev.h"
--
--#define le16_to_cpu(val) (val)
--#define cpu_to_le16(val) (val)
--
--struct btdev {
--	struct btdev *conn;
--
--	btdev_send_func send_handler;
--	void *send_data;
--
--        uint16_t manufacturer;
--        uint8_t  version;
--	uint16_t revision;
--	uint8_t  commands[64];
--	uint8_t  features[8];
--	uint16_t acl_mtu;
--	uint16_t acl_max_pkt;
--	uint8_t  country_code;
--	uint8_t  bdaddr[6];
--	uint8_t  le_features[8];
--	uint8_t  le_states[8];
--
--	uint16_t default_link_policy;
--	uint8_t  event_mask[8];
--	uint8_t  event_filter;
--	uint8_t  name[248];
--	uint8_t  dev_class[3];
--	uint16_t voice_setting;
--	uint16_t conn_accept_timeout;
--	uint16_t page_timeout;
--	uint8_t  scan_enable;
--	uint8_t  auth_enable;
--	uint8_t  inquiry_mode;
--	uint8_t  afh_assess_mode;
--	uint8_t  ext_inquiry_fec;
--	uint8_t  ext_inquiry_rsp[240];
--	uint8_t  simple_pairing_mode;
--	uint8_t  le_supported;
--	uint8_t  le_simultaneous;
--	uint8_t  le_event_mask[8];
--};
--
--#define MAX_BTDEV_ENTRIES 16
--
--static struct btdev *btdev_list[MAX_BTDEV_ENTRIES] = { };
--
--static inline int add_btdev(struct btdev *btdev)
--{
--	int i, index = -1;
--
--	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
--		if (btdev_list[i] == NULL) {
--			index = i;
--			btdev_list[index] = btdev;
--			break;
--		}
--	}
--
--	return index;
--}
--
--static inline int del_btdev(struct btdev *btdev)
--{
--	int i, index = -1;
--
--	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
--		if (btdev_list[i] == btdev) {
--			index = i;
--			btdev_list[index] = NULL;
--			break;
--		}
--	}
--
--	return index;
--}
--
--static inline struct btdev *find_btdev_by_bdaddr(const uint8_t *bdaddr)
--{
--	int i;
--
--	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
--		if (btdev_list[i] && !memcmp(btdev_list[i]->bdaddr, bdaddr, 6))
--			return btdev_list[i];
--	}
--
--	return NULL;
--}
--
--static void hexdump(const unsigned char *buf, uint16_t len)
--{
--	static const char hexdigits[] = "0123456789abcdef";
--	char str[68];
--	uint16_t i;
--
--	if (!len)
--		return;
--
--	for (i = 0; i < len; i++) {
--		str[((i % 16) * 3) + 0] = hexdigits[buf[i] >> 4];
--		str[((i % 16) * 3) + 1] = hexdigits[buf[i] & 0xf];
--		str[((i % 16) * 3) + 2] = ' ';
--		str[(i % 16) + 49] = isprint(buf[i]) ? buf[i] : '.';
--
--		if ((i + 1) % 16 == 0) {
--			str[47] = ' ';
--			str[48] = ' ';
--			str[65] = '\0';
--			printf("%-12c%s\n", ' ', str);
--			str[0] = ' ';
--		}
--	}
--
--	if (i % 16 > 0) {
--		uint16_t j;
--		for (j = (i % 16); j < 16; j++) {
--			str[(j * 3) + 0] = ' ';
--			str[(j * 3) + 1] = ' ';
--			str[(j * 3) + 2] = ' ';
--			str[j + 49] = ' ';
--		}
--		str[47] = ' ';
--		str[48] = ' ';
--		str[65] = '\0';
--		printf("%-12c%s\n", ' ', str);
--	}
--}
--
--static void get_bdaddr(uint16_t id, uint8_t *bdaddr)
--{
--	bdaddr[0] = id & 0xff;
--	bdaddr[1] = id >> 8;
--	bdaddr[2] = 0x00;
--	bdaddr[3] = 0x01;
--	bdaddr[4] = 0xaa;
--	bdaddr[5] = 0x00;
--}
--
--struct btdev *btdev_create(uint16_t id)
--{
--	struct btdev *btdev;
--
--	btdev = malloc(sizeof(*btdev));
--	if (!btdev)
--		return NULL;
--
--	memset(btdev, 0, sizeof(*btdev));
--
--	btdev->manufacturer = 63;
--	btdev->version = 0x06;
--	btdev->revision = 0x0000;
--
--	btdev->features[0] |= 0x04;	/* Encryption */
--	btdev->features[0] |= 0x20;	/* Role switch */
--	btdev->features[0] |= 0x80;	/* Sniff mode */
--	btdev->features[1] |= 0x08;	/* SCO link */
--	btdev->features[3] |= 0x40;	/* RSSI with inquiry results */
--	btdev->features[3] |= 0x80;	/* Extended SCO link */
--	btdev->features[4] |= 0x08;	/* AFH capable slave */
--	btdev->features[4] |= 0x10;	/* AFH classification slave */
--	btdev->features[4] |= 0x40;	/* LE Supported */
--	btdev->features[5] |= 0x02;	/* Sniff subrating */
--	btdev->features[5] |= 0x04;	/* Pause encryption */
--	btdev->features[5] |= 0x08;	/* AFH capable master */
--	btdev->features[5] |= 0x10;	/* AFH classification master */
--	btdev->features[6] |= 0x01;	/* Extended Inquiry Response */
--	btdev->features[6] |= 0x02;	/* Simultaneous LE and BR/EDR */
--	btdev->features[6] |= 0x08;	/* Secure Simple Pairing */
--	btdev->features[6] |= 0x10;	/* Encapsulated PDU */
--	btdev->features[6] |= 0x20;	/* Erroneous Data Reporting */
--	btdev->features[6] |= 0x40;	/* Non-flushable Packet Boundary Flag */
--	btdev->features[7] |= 0x01;	/* Link Supervision Timeout Event */
--	btdev->features[7] |= 0x02;	/* Inquiry TX Power Level */
--	btdev->features[7] |= 0x80;	/* Extended features */
--
--	btdev->acl_mtu = 192;
--	btdev->acl_max_pkt = 1;
--
--	btdev->country_code = 0x00;
--
--	get_bdaddr(id, btdev->bdaddr);
--
--	add_btdev(btdev);
--
--	return btdev;
--}
--
--void btdev_destroy(struct btdev *btdev)
--{
--	if (!btdev)
--		return;
--
--	del_btdev(btdev);
--
--	free(btdev);
--}
--
--void btdev_set_send_handler(struct btdev *btdev, btdev_send_func handler,
--							void *user_data)
--{
--	if (!btdev)
--		return;
--
--	btdev->send_handler = handler;
--	btdev->send_data = user_data;
--}
--
--static void send_packet(struct btdev *btdev, const void *data, uint16_t len)
--{
--	if (!btdev->send_handler)
--		return;
--
--	btdev->send_handler(data, len, btdev->send_data);
--}
--
--static void send_event(struct btdev *btdev, uint8_t event,
--						const void *data, uint8_t len)
--{
--	struct bt_hci_evt_hdr *hdr;
--	uint16_t pkt_len;
--	void *pkt_data;
--
--	pkt_len = 1 + sizeof(*hdr) + len;
--
--	pkt_data = malloc(pkt_len);
--	if (!pkt_data)
--		return;
--
--	((uint8_t *) pkt_data)[0] = BT_H4_EVT_PKT;
--
--	hdr = pkt_data + 1;
--	hdr->evt = event;
--	hdr->plen = len;
--
--	if (len > 0)
--		memcpy(pkt_data + 1 + sizeof(*hdr), data, len);
--
--	send_packet(btdev, pkt_data, pkt_len);
--
--	free(pkt_data);
--}
--
--static void cmd_complete(struct btdev *btdev, uint16_t opcode,
--						const void *data, uint8_t len)
--{
--	struct bt_hci_evt_hdr *hdr;
--	struct bt_hci_evt_cmd_complete *cc;
--	uint16_t pkt_len;
--	void *pkt_data;
--
--	pkt_len = 1 + sizeof(*hdr) + sizeof(*cc) + len;
--
--	pkt_data = malloc(pkt_len);
--	if (!pkt_data)
--		return;
--
--	((uint8_t *) pkt_data)[0] = BT_H4_EVT_PKT;
--
--	hdr = pkt_data + 1;
--	hdr->evt = BT_HCI_EVT_CMD_COMPLETE;
--	hdr->plen = sizeof(*cc) + len;
--
--	cc = pkt_data + 1 + sizeof(*hdr);
--	cc->ncmd = 0x01;
--	cc->opcode = cpu_to_le16(opcode);
--
--	if (len > 0)
--		memcpy(pkt_data + 1 + sizeof(*hdr) + sizeof(*cc), data, len);
--
--	send_packet(btdev, pkt_data, pkt_len);
--
--	free(pkt_data);
--}
--
--static void cmd_status(struct btdev *btdev, uint8_t status, uint16_t opcode)
--{
--	struct bt_hci_evt_cmd_status cs;
--
--	cs.status = status;
--	cs.ncmd = 0x01;
--	cs.opcode = cpu_to_le16(opcode);
--
--	send_event(btdev, BT_HCI_EVT_CMD_STATUS, &cs, sizeof(cs));
--}
--
--static void num_completed_packets(struct btdev *btdev)
--{
--	if (btdev->conn) {
--		struct bt_hci_evt_num_completed_packets ncp;
--
--		ncp.num_handles = 1;
--		ncp.handle = cpu_to_le16(42);
--		ncp.count = cpu_to_le16(1);
--
--		send_event(btdev, BT_HCI_EVT_NUM_COMPLETED_PACKETS,
--							&ncp, sizeof(ncp));
--	}
--}
--
--static void inquiry_complete(struct btdev *btdev, uint8_t status)
--{
--	struct bt_hci_evt_inquiry_complete ic;
--	int i;
--
--	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
--		if (!btdev_list[i] || btdev_list[i] == btdev)
--			continue;
--
--		if (!(btdev_list[i]->scan_enable & 0x02))
--			continue;
--
--		if (btdev->inquiry_mode == 0x02 &&
--					btdev_list[i]->ext_inquiry_rsp[0]) {
--			struct bt_hci_evt_ext_inquiry_result ir;
--
--			ir.num_resp = 0x01;
--			memcpy(ir.bdaddr, btdev_list[i]->bdaddr, 6);
--			memcpy(ir.dev_class, btdev_list[i]->dev_class, 3);
--			ir.rssi = -60;
--			memcpy(ir.data, btdev_list[i]->ext_inquiry_rsp, 240);
--
--			send_event(btdev, BT_HCI_EVT_EXT_INQUIRY_RESULT,
--							&ir, sizeof(ir));
--			continue;
--		}
--
--		if (btdev->inquiry_mode > 0x00) {
--			struct bt_hci_evt_inquiry_result_with_rssi ir;
--
--			ir.num_resp = 0x01;
--			memcpy(ir.bdaddr, btdev_list[i]->bdaddr, 6);
--			memcpy(ir.dev_class, btdev_list[i]->dev_class, 3);
--			ir.rssi = -60;
--
--			send_event(btdev, BT_HCI_EVT_INQUIRY_RESULT_WITH_RSSI,
--							&ir, sizeof(ir));
--		} else {
--			struct bt_hci_evt_inquiry_result ir;
--
--			ir.num_resp = 0x01;
--			memcpy(ir.bdaddr, btdev_list[i]->bdaddr, 6);
--			memcpy(ir.dev_class, btdev_list[i]->dev_class, 3);
--
--			send_event(btdev, BT_HCI_EVT_INQUIRY_RESULT,
--							&ir, sizeof(ir));
--		}
--        }
--
--	ic.status = status;
--
--	send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
--}
--
--static void conn_complete(struct btdev *btdev,
--					const uint8_t *bdaddr, uint8_t status)
--{
--	struct bt_hci_evt_conn_complete cc;
--
--	if (!status) {
--		struct btdev *remote = find_btdev_by_bdaddr(bdaddr);
--
--		btdev->conn = remote;
--		remote->conn = btdev;
--
--		cc.status = status;
--		memcpy(cc.bdaddr, btdev->bdaddr, 6);
--		cc.encr_mode = 0x00;
--
--		cc.handle = cpu_to_le16(42);
--		cc.link_type = 0x01;
--
--		send_event(remote, BT_HCI_EVT_CONN_COMPLETE, &cc, sizeof(cc));
--
--		cc.handle = cpu_to_le16(42);
--		cc.link_type = 0x01;
--	} else {
--		cc.handle = cpu_to_le16(0x0000);
--		cc.link_type = 0x01;
--	}
--
--	cc.status = status;
--	memcpy(cc.bdaddr, bdaddr, 6);
--	cc.encr_mode = 0x00;
--
--	send_event(btdev, BT_HCI_EVT_CONN_COMPLETE, &cc, sizeof(cc));
--}
--
--static void conn_request(struct btdev *btdev, const uint8_t *bdaddr)
--{
--	struct btdev *remote = find_btdev_by_bdaddr(bdaddr);
--
--	if (remote) {
--		if (remote->scan_enable & 0x01) {
--			struct bt_hci_evt_conn_request cr;
--
--			memcpy(cr.bdaddr, btdev->bdaddr, 6);
--			memcpy(cr.dev_class, btdev->dev_class, 3);
--			cr.link_type = 0x01;
--
--			send_event(remote, BT_HCI_EVT_CONN_REQUEST,
--							&cr, sizeof(cr));
--		} else
--			conn_complete(btdev, bdaddr, BT_HCI_ERR_PAGE_TIMEOUT);
--	} else
--		conn_complete(btdev, bdaddr, BT_HCI_ERR_UNKNOWN_CONN_ID);
--}
--
--static void disconnect_complete(struct btdev *btdev, uint16_t handle,
--							uint8_t reason)
--{
--	struct bt_hci_evt_disconnect_complete dc;
--	struct btdev *remote;
--
--	if (!btdev) {
--		dc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
--		dc.handle = cpu_to_le16(handle);
--		dc.reason = 0x00;
--
--		send_event(btdev, BT_HCI_EVT_DISCONNECT_COMPLETE,
--							&dc, sizeof(dc));
--		return;
--	}
--
--	dc.status = BT_HCI_ERR_SUCCESS;
--	dc.handle = cpu_to_le16(handle);
--	dc.reason = reason;
--
--	remote = btdev->conn;
--
--	btdev->conn = NULL;
--	remote->conn = NULL;
--
--	send_event(btdev, BT_HCI_EVT_DISCONNECT_COMPLETE, &dc, sizeof(dc));
--	send_event(remote, BT_HCI_EVT_DISCONNECT_COMPLETE, &dc, sizeof(dc));
--}
--
--static void name_request_complete(struct btdev *btdev,
--					const uint8_t *bdaddr, uint8_t status)
--{
--        struct bt_hci_evt_remote_name_req_complete nc;
--
--	nc.status = status;
--	memcpy(nc.bdaddr, bdaddr, 6);
--	memset(nc.name, 0, 248);
--
--	if (!status) {
--		struct btdev *remote = find_btdev_by_bdaddr(bdaddr);
--
--		if (remote)
--			memcpy(nc.name, remote->name, 248);
--		else
--			nc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
--	}
--
--	send_event(btdev, BT_HCI_EVT_REMOTE_NAME_REQUEST_COMPLETE,
--							&nc, sizeof(nc));
--}
--
--static void remote_features_complete(struct btdev *btdev, uint16_t handle)
--{
--	struct bt_hci_evt_remote_features_complete rfc;
--
--	if (btdev->conn) {
--		rfc.status = BT_HCI_ERR_SUCCESS;
--		rfc.handle = cpu_to_le16(handle);
--		memcpy(rfc.features, btdev->conn->features, 8);
--	} else {
--		rfc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
--		rfc.handle = cpu_to_le16(handle);
--		memset(rfc.features, 0, 8);
--	}
--
--	send_event(btdev, BT_HCI_EVT_REMOTE_FEATURES_COMPLETE,
--							&rfc, sizeof(rfc));
--}
--
--static void remote_ext_features_complete(struct btdev *btdev, uint16_t handle,
--								uint8_t page)
--{
--	struct bt_hci_evt_remote_ext_features_complete refc;
--
--	if (btdev->conn && page < 0x02) {
--		refc.handle = cpu_to_le16(handle);
--		refc.page = page;
--		refc.max_page = 0x01;
--
--		switch (page) {
--		case 0x00:
--			refc.status = BT_HCI_ERR_SUCCESS;
--			memcpy(refc.features, btdev->conn->features, 8);
--			break;
--		case 0x01:
--			refc.status = BT_HCI_ERR_SUCCESS;
--			memset(refc.features, 0, 8);
--			break;
--		default:
--			refc.status = BT_HCI_ERR_INVALID_PARAMETERS;
--			memset(refc.features, 0, 8);
--			break;
--		}
--	} else {
--		refc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
--		refc.handle = cpu_to_le16(handle);
--		refc.page = page;
--		refc.max_page = 0x01;
--		memset(refc.features, 0, 8);
--	}
--
--	send_event(btdev, BT_HCI_EVT_REMOTE_EXT_FEATURES_COMPLETE,
--							&refc, sizeof(refc));
--}
--
--static void remote_version_complete(struct btdev *btdev, uint16_t handle)
--{
--	struct bt_hci_evt_remote_version_complete rvc;
--
--	if (btdev->conn) {
--		rvc.status = BT_HCI_ERR_SUCCESS;
--		rvc.handle = cpu_to_le16(handle);
--		rvc.lmp_ver = btdev->conn->version;
--		rvc.manufacturer = cpu_to_le16(btdev->conn->manufacturer);
--		rvc.lmp_subver = cpu_to_le16(btdev->conn->revision);
--	} else {
--		rvc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
--		rvc.handle = cpu_to_le16(handle);
--		rvc.lmp_ver = 0x00;
--		rvc.manufacturer = cpu_to_le16(0);
--		rvc.lmp_subver = cpu_to_le16(0);
--	}
--
--	send_event(btdev, BT_HCI_EVT_REMOTE_VERSION_COMPLETE,
--							&rvc, sizeof(rvc));
--}
--
--static void process_cmd(struct btdev *btdev, const void *data, uint16_t len)
--{
--	const struct bt_hci_cmd_hdr *hdr = data;
--	const struct bt_hci_cmd_create_conn *cc;
--	const struct bt_hci_cmd_disconnect *dc;
--	const struct bt_hci_cmd_create_conn_cancel *ccc;
--	const struct bt_hci_cmd_accept_conn_request *acr;
--	const struct bt_hci_cmd_reject_conn_request *rcr;
--	const struct bt_hci_cmd_remote_name_request *rnr;
--	const struct bt_hci_cmd_remote_name_request_cancel *rnrc;
--	const struct bt_hci_cmd_read_remote_features *rrf;
--	const struct bt_hci_cmd_read_remote_ext_features *rref;
--	const struct bt_hci_cmd_read_remote_version *rrv;
--	const struct bt_hci_cmd_write_default_link_policy *wdlp;
--	const struct bt_hci_cmd_set_event_mask *sem;
--	const struct bt_hci_cmd_set_event_filter *sef;
--	const struct bt_hci_cmd_write_local_name *wln;
--	const struct bt_hci_cmd_write_conn_accept_timeout *wcat;
--	const struct bt_hci_cmd_write_page_timeout *wpt;
--	const struct bt_hci_cmd_write_scan_enable *wse;
--	const struct bt_hci_cmd_write_auth_enable *wae;
--	const struct bt_hci_cmd_write_class_of_dev *wcod;
--	const struct bt_hci_cmd_write_voice_setting *wvs;
--	const struct bt_hci_cmd_write_inquiry_mode *wim;
--	const struct bt_hci_cmd_write_afh_assess_mode *waam;
--	const struct bt_hci_cmd_write_ext_inquiry_rsp *weir;
--	const struct bt_hci_cmd_write_simple_pairing_mode *wspm;
--	const struct bt_hci_cmd_write_le_host_supported *wlhs;
--	const struct bt_hci_cmd_le_set_event_mask *lsem;
--	struct bt_hci_rsp_read_default_link_policy rdlp;
--	struct bt_hci_rsp_read_stored_link_key rslk;
--	struct bt_hci_rsp_write_stored_link_key wslk;
--	struct bt_hci_rsp_delete_stored_link_key dslk;
--	struct bt_hci_rsp_read_local_name rln;
--	struct bt_hci_rsp_read_conn_accept_timeout rcat;
--	struct bt_hci_rsp_read_page_timeout rpt;
--	struct bt_hci_rsp_read_scan_enable rse;
--	struct bt_hci_rsp_read_auth_enable rae;
--	struct bt_hci_rsp_read_class_of_dev rcod;
--	struct bt_hci_rsp_read_voice_setting rvs;
--	struct bt_hci_rsp_read_inquiry_mode rim;
--	struct bt_hci_rsp_read_afh_assess_mode raam;
--	struct bt_hci_rsp_read_ext_inquiry_rsp reir;
--	struct bt_hci_rsp_read_simple_pairing_mode rspm;
--	struct bt_hci_rsp_read_inquiry_rsp_tx_power rirtp;
--	struct bt_hci_rsp_read_le_host_supported rlhs;
--	struct bt_hci_rsp_read_local_version rlv;
--	struct bt_hci_rsp_read_local_commands rlc;
--	struct bt_hci_rsp_read_local_features rlf;
--	struct bt_hci_rsp_read_local_ext_features rlef;
--	struct bt_hci_rsp_read_buffer_size rbs;
--	struct bt_hci_rsp_read_country_code rcc;
--	struct bt_hci_rsp_read_bd_addr rba;
--	struct bt_hci_rsp_read_data_block_size rdbs;
--	struct bt_hci_rsp_le_read_buffer_size lrbs;
--	struct bt_hci_rsp_le_read_local_features lrlf;
--	struct bt_hci_rsp_le_read_supported_states lrss;
--	uint16_t opcode;
--	uint8_t status, page;
--
--	if (len < sizeof(*hdr))
--		return;
--
--	opcode = le16_to_cpu(hdr->opcode);
--
--	switch (opcode) {
--	case BT_HCI_CMD_INQUIRY:
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		inquiry_complete(btdev, BT_HCI_ERR_SUCCESS);
--		break;
--
--	case BT_HCI_CMD_INQUIRY_CANCEL:
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_CREATE_CONN:
--		cc = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		conn_request(btdev, cc->bdaddr);
--		break;
--
--	case BT_HCI_CMD_DISCONNECT:
--		dc = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		disconnect_complete(btdev, le16_to_cpu(dc->handle), dc->reason);
--		break;
--
--	case BT_HCI_CMD_CREATE_CONN_CANCEL:
--		ccc = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		conn_complete(btdev, ccc->bdaddr, BT_HCI_ERR_UNKNOWN_CONN_ID);
--		break;
--
--	case BT_HCI_CMD_ACCEPT_CONN_REQUEST:
--		acr = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		conn_complete(btdev, acr->bdaddr, BT_HCI_ERR_SUCCESS);
--		break;
--
--	case BT_HCI_CMD_REJECT_CONN_REQUEST:
--		rcr = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		conn_complete(btdev, rcr->bdaddr, BT_HCI_ERR_UNKNOWN_CONN_ID);
--		break;
--
--	case BT_HCI_CMD_REMOTE_NAME_REQUEST:
--		rnr = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		name_request_complete(btdev, rnr->bdaddr, BT_HCI_ERR_SUCCESS);
--		break;
--
--	case BT_HCI_CMD_REMOTE_NAME_REQUEST_CANCEL:
--		rnrc = data + sizeof(*hdr);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		name_request_complete(btdev, rnrc->bdaddr,
--						BT_HCI_ERR_UNKNOWN_CONN_ID);
--		break;
--
--	case BT_HCI_CMD_READ_REMOTE_FEATURES:
--		rrf = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		remote_features_complete(btdev, le16_to_cpu(rrf->handle));
--		break;
--
--	case BT_HCI_CMD_READ_REMOTE_EXT_FEATURES:
--		rref = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		remote_ext_features_complete(btdev, le16_to_cpu(rref->handle),
--								rref->page);
--		break;
--
--	case BT_HCI_CMD_READ_REMOTE_VERSION:
--		rrv = data + sizeof(*hdr);
--		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
--		remote_version_complete(btdev, le16_to_cpu(rrv->handle));
--		break;
--
--	case BT_HCI_CMD_READ_DEFAULT_LINK_POLICY:
--		rdlp.status = BT_HCI_ERR_SUCCESS;
--		rdlp.policy = cpu_to_le16(btdev->default_link_policy);
--		cmd_complete(btdev, opcode, &rdlp, sizeof(rdlp));
--		break;
--
--	case BT_HCI_CMD_WRITE_DEFAULT_LINK_POLICY:
--		wdlp = data + sizeof(*hdr);
--		btdev->default_link_policy = le16_to_cpu(wdlp->policy);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_SET_EVENT_MASK:
--		sem = data + sizeof(*hdr);
--		memcpy(btdev->event_mask, sem->mask, 8);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_RESET:
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_SET_EVENT_FILTER:
--		sef = data + sizeof(*hdr);
--		btdev->event_filter = sef->type;
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_STORED_LINK_KEY:
--		rslk.status = BT_HCI_ERR_SUCCESS;
--		rslk.max_num_keys = cpu_to_le16(0);
--		rslk.num_keys = cpu_to_le16(0);
--		cmd_complete(btdev, opcode, &rslk, sizeof(rslk));
--		break;
--
--	case BT_HCI_CMD_WRITE_STORED_LINK_KEY:
--		wslk.status = BT_HCI_ERR_SUCCESS;
--		wslk.num_keys = 0;
--		cmd_complete(btdev, opcode, &wslk, sizeof(wslk));
--		break;
--
--	case BT_HCI_CMD_DELETE_STORED_LINK_KEY:
--		dslk.status = BT_HCI_ERR_SUCCESS;
--		dslk.num_keys = cpu_to_le16(0);
--		cmd_complete(btdev, opcode, &dslk, sizeof(dslk));
--		break;
--
--	case BT_HCI_CMD_WRITE_LOCAL_NAME:
--		wln = data + sizeof(*hdr);
--		memcpy(btdev->name, wln->name, 248);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_LOCAL_NAME:
--		rln.status = BT_HCI_ERR_SUCCESS;
--		memcpy(rln.name, btdev->name, 248);
--		cmd_complete(btdev, opcode, &rln, sizeof(rln));
--		break;
--
--	case BT_HCI_CMD_READ_CONN_ACCEPT_TIMEOUT:
--		rcat.status = BT_HCI_ERR_SUCCESS;
--		rcat.timeout = cpu_to_le16(btdev->conn_accept_timeout);
--		cmd_complete(btdev, opcode, &rcat, sizeof(rcat));
--		break;
--
--	case BT_HCI_CMD_WRITE_CONN_ACCEPT_TIMEOUT:
--		wcat = data + sizeof(*hdr);
--		btdev->conn_accept_timeout = le16_to_cpu(wcat->timeout);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_PAGE_TIMEOUT:
--		rpt.status = BT_HCI_ERR_SUCCESS;
--		rpt.timeout = cpu_to_le16(btdev->page_timeout);
--		cmd_complete(btdev, opcode, &rpt, sizeof(rpt));
--		break;
--
--	case BT_HCI_CMD_WRITE_PAGE_TIMEOUT:
--		wpt = data + sizeof(*hdr);
--		btdev->page_timeout = le16_to_cpu(wpt->timeout);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_SCAN_ENABLE:
--		rse.status = BT_HCI_ERR_SUCCESS;
--		rse.enable = btdev->scan_enable;
--		cmd_complete(btdev, opcode, &rse, sizeof(rse));
--		break;
--
--	case BT_HCI_CMD_WRITE_SCAN_ENABLE:
--		wse = data + sizeof(*hdr);
--		btdev->scan_enable = wse->enable;
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_AUTH_ENABLE:
--		rae.status = BT_HCI_ERR_SUCCESS;
--		rae.enable = btdev->auth_enable;
--		cmd_complete(btdev, opcode, &rae, sizeof(rae));
--		break;
--
--	case BT_HCI_CMD_WRITE_AUTH_ENABLE:
--		wae = data + sizeof(*hdr);
--		btdev->auth_enable = wae->enable;
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_CLASS_OF_DEV:
--		rcod.status = BT_HCI_ERR_SUCCESS;
--		memcpy(rcod.dev_class, btdev->dev_class, 3);
--		cmd_complete(btdev, opcode, &rcod, sizeof(rcod));
--		break;
--
--	case BT_HCI_CMD_WRITE_CLASS_OF_DEV:
--		wcod = data + sizeof(*hdr);
--		memcpy(btdev->dev_class, wcod->dev_class, 3);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_VOICE_SETTING:
--		rvs.status = BT_HCI_ERR_SUCCESS;
--		rvs.setting = cpu_to_le16(btdev->voice_setting);
--		cmd_complete(btdev, opcode, &rvs, sizeof(rvs));
--		break;
--
--	case BT_HCI_CMD_WRITE_VOICE_SETTING:
--		wvs = data + sizeof(*hdr);
--		btdev->voice_setting = le16_to_cpu(wvs->setting);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_INQUIRY_MODE:
--		rim.status = BT_HCI_ERR_SUCCESS;
--		rim.mode = btdev->inquiry_mode;
--		cmd_complete(btdev, opcode, &rim, sizeof(rim));
--		break;
--
--	case BT_HCI_CMD_WRITE_INQUIRY_MODE:
--		wim = data + sizeof(*hdr);
--		btdev->inquiry_mode = wim->mode;
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_AFH_ASSESS_MODE:
--		raam.status = BT_HCI_ERR_SUCCESS;
--		raam.mode = btdev->afh_assess_mode;
--		cmd_complete(btdev, opcode, &raam, sizeof(raam));
--		break;
--
--	case BT_HCI_CMD_WRITE_AFH_ASSESS_MODE:
--		waam = data + sizeof(*hdr);
--		btdev->afh_assess_mode = waam->mode;
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_EXT_INQUIRY_RSP:
--		reir.status = BT_HCI_ERR_SUCCESS;
--		reir.fec = btdev->ext_inquiry_fec;
--		memcpy(reir.data, btdev->ext_inquiry_rsp, 240);
--		cmd_complete(btdev, opcode, &reir, sizeof(reir));
--		break;
--
--	case BT_HCI_CMD_WRITE_EXT_INQUIRY_RSP:
--		weir = data + sizeof(*hdr);
--		btdev->ext_inquiry_fec = weir->fec;
--		memcpy(btdev->ext_inquiry_rsp, weir->data, 240);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_SIMPLE_PAIRING_MODE:
--		rspm.status = BT_HCI_ERR_SUCCESS;
--		rspm.mode = btdev->simple_pairing_mode;
--		cmd_complete(btdev, opcode, &rspm, sizeof(rspm));
--		break;
--
--	case BT_HCI_CMD_WRITE_SIMPLE_PAIRING_MODE:
--		wspm = data + sizeof(*hdr);
--		btdev->simple_pairing_mode = wspm->mode;
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_INQUIRY_RSP_TX_POWER:
--		rirtp.status = BT_HCI_ERR_SUCCESS;
--		rirtp.level = 0;
--		cmd_complete(btdev, opcode, &rirtp, sizeof(rirtp));
--		break;
--
--	case BT_HCI_CMD_READ_LE_HOST_SUPPORTED:
--		rlhs.status = BT_HCI_ERR_SUCCESS;
--		rlhs.supported = btdev->le_supported;
--		rlhs.simultaneous = btdev->le_simultaneous;
--		cmd_complete(btdev, opcode, &rlhs, sizeof(rlhs));
--		break;
--
--	case BT_HCI_CMD_WRITE_LE_HOST_SUPPORTED:
--		wlhs = data + sizeof(*hdr);
--		btdev->le_supported = wlhs->supported;
--		btdev->le_simultaneous = wlhs->simultaneous;
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_READ_LOCAL_VERSION:
--		rlv.status = BT_HCI_ERR_SUCCESS;
--		rlv.hci_ver = btdev->version;
--		rlv.hci_rev = cpu_to_le16(btdev->revision);
--		rlv.lmp_ver = btdev->version;
--		rlv.manufacturer = cpu_to_le16(btdev->manufacturer);
--		rlv.lmp_subver = cpu_to_le16(btdev->revision);
--		cmd_complete(btdev, opcode, &rlv, sizeof(rlv));
--		break;
--
--	case BT_HCI_CMD_READ_LOCAL_COMMANDS:
--		rlc.status = BT_HCI_ERR_SUCCESS;
--		memcpy(rlc.commands, btdev->commands, 64);
--		cmd_complete(btdev, opcode, &rlc, sizeof(rlc));
--		break;
--
--	case BT_HCI_CMD_READ_LOCAL_FEATURES:
--		rlf.status = BT_HCI_ERR_SUCCESS;
--		memcpy(rlf.features, btdev->features, 8);
--		cmd_complete(btdev, opcode, &rlf, sizeof(rlf));
--		break;
--
--	case BT_HCI_CMD_READ_LOCAL_EXT_FEATURES:
--		page = ((const uint8_t *) data)[sizeof(*hdr)];
--		switch (page) {
--		case 0x00:
--			rlef.status = BT_HCI_ERR_SUCCESS;
--			rlef.page = 0x00;
--			rlef.max_page = 0x01;
--			memcpy(rlef.features, btdev->features, 8);
--			break;
--		case 0x01:
--			rlef.status = BT_HCI_ERR_SUCCESS;
--			rlef.page = 0x01;
--			rlef.max_page = 0x01;
--			memset(rlef.features, 0, 8);
--			if (btdev->simple_pairing_mode)
--				rlef.features[0] |= 0x01;
--			if (btdev->le_supported)
--				rlef.features[0] |= 0x02;
--			if (btdev->le_simultaneous)
--				rlef.features[0] |= 0x04;
--			break;
--		default:
--			rlef.status = BT_HCI_ERR_INVALID_PARAMETERS;
--			rlef.page = page;
--			rlef.max_page = 0x01;
--			memset(rlef.features, 0, 8);
--			break;
--		}
--		cmd_complete(btdev, opcode, &rlef, sizeof(rlef));
--		break;
--
--	case BT_HCI_CMD_READ_BUFFER_SIZE:
--		rbs.status = BT_HCI_ERR_SUCCESS;
--		rbs.acl_mtu = cpu_to_le16(btdev->acl_mtu);
--		rbs.sco_mtu = 0;
--		rbs.acl_max_pkt = cpu_to_le16(btdev->acl_max_pkt);
--		rbs.sco_max_pkt = cpu_to_le16(0);
--		cmd_complete(btdev, opcode, &rbs, sizeof(rbs));
--		break;
--
--	case BT_HCI_CMD_READ_COUNTRY_CODE:
--		rcc.status = BT_HCI_ERR_SUCCESS;
--		rcc.code = btdev->country_code;
--		cmd_complete(btdev, opcode, &rcc, sizeof(rcc));
--		break;
--
--	case BT_HCI_CMD_READ_BD_ADDR:
--		rba.status = BT_HCI_ERR_SUCCESS;
--		memcpy(rba.bdaddr, btdev->bdaddr, 6);
--		cmd_complete(btdev, opcode, &rba, sizeof(rba));
--		break;
--
--	case BT_HCI_CMD_READ_DATA_BLOCK_SIZE:
--		rdbs.status = BT_HCI_ERR_SUCCESS;
--		rdbs.max_acl_len = cpu_to_le16(btdev->acl_mtu);
--		rdbs.block_len = cpu_to_le16(btdev->acl_mtu);
--		rdbs.num_blocks = cpu_to_le16(btdev->acl_max_pkt);
--		cmd_complete(btdev, opcode, &rdbs, sizeof(rdbs));
--		break;
--
--	case BT_HCI_CMD_LE_SET_EVENT_MASK:
--		lsem = data + sizeof(*hdr);
--		memcpy(btdev->le_event_mask, lsem->mask, 8);
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_LE_READ_BUFFER_SIZE:
--		lrbs.status = BT_HCI_ERR_SUCCESS;
--		lrbs.le_mtu = cpu_to_le16(btdev->acl_mtu);
--		lrbs.le_max_pkt = btdev->acl_max_pkt;
--		cmd_complete(btdev, opcode, &lrbs, sizeof(lrbs));
--		break;
--
--	case BT_HCI_CMD_LE_READ_LOCAL_FEATURES:
--		lrlf.status = BT_HCI_ERR_SUCCESS;
--		memcpy(lrlf.features, btdev->le_features, 8);
--		cmd_complete(btdev, opcode, &lrlf, sizeof(lrlf));
--		break;
--
--	case BT_HCI_CMD_LE_SET_SCAN_PARAMETERS:
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_LE_SET_SCAN_ENABLE:
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
--		break;
--
--	case BT_HCI_CMD_LE_READ_SUPPORTED_STATES:
--		lrss.status = BT_HCI_ERR_SUCCESS;
--		memcpy(lrss.states, btdev->le_states, 8);
--		cmd_complete(btdev, opcode, &lrss, sizeof(lrss));
--		break;
--
--	default:
--		printf("Unsupported command 0x%4.4x\n", opcode);
--		hexdump(data, len);
--		cmd_status(btdev, BT_HCI_ERR_UNKNOWN_COMMAND, opcode);
--		break;
--	}
--}
--
--void btdev_receive_h4(struct btdev *btdev, const void *data, uint16_t len)
--{
--	uint8_t pkt_type;
--
--	if (!btdev)
--		return;
--
--	if (len < 1)
--		return;
--
--	pkt_type = ((const uint8_t *) data)[0];
--
--	switch (pkt_type) {
--	case BT_H4_CMD_PKT:
--		process_cmd(btdev, data + 1, len - 1);
--		break;
--	case BT_H4_ACL_PKT:
--		if (btdev->conn)
--			send_packet(btdev->conn, data, len);
--		num_completed_packets(btdev);
--		break;
--	default:
--		printf("Unsupported packet 0x%2.2x\n", pkt_type);
--		break;
--	}
--}
-diff --git a/emulator/btdev.h b/emulator/btdev.h
-deleted file mode 100644
-index 7b211a2..0000000
---- a/emulator/btdev.h
-+++ /dev/null
-@@ -1,38 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011-2012  Intel Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#include <stdint.h>
--
--typedef void (*btdev_send_func) (const void *data, uint16_t len,
--							void *user_data);
--
--struct btdev;
--
--struct btdev *btdev_create(uint16_t id);
--void btdev_destroy(struct btdev *btdev);
--
--void btdev_set_send_handler(struct btdev *btdev, btdev_send_func handler,
--							void *user_data);
--
--void btdev_receive_h4(struct btdev *btdev, const void *data, uint16_t len);
-diff --git a/emulator/main.c b/emulator/main.c
-deleted file mode 100644
-index 125460d..0000000
---- a/emulator/main.c
-+++ /dev/null
-@@ -1,73 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011-2012  Intel Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
 -#include <stdio.h>
--
--#include "mainloop.h"
--#include "server.h"
--#include "vhci.h"
--
--static void signal_callback(int signum, void *user_data)
--{
--	switch (signum) {
--	case SIGINT:
--	case SIGTERM:
--		mainloop_quit();
--		break;
--	}
--}
--
--int main(int argc, char *argv[])
--{
--	struct vhci *vhci;
--	struct server *server;
--	sigset_t mask;
--
--	mainloop_init();
--
--	sigemptyset(&mask);
--	sigaddset(&mask, SIGINT);
--	sigaddset(&mask, SIGTERM);
--
--	mainloop_set_signal(&mask, signal_callback, NULL, NULL);
--
--	vhci = vhci_open(VHCI_TYPE_BREDR, 0x23);
--	if (!vhci) {
--		fprintf(stderr, "Failed to open Virtual HCI device\n");
--		return 1;
--	}
--
--	server = server_open_unix("/tmp/bt-server-bredr", 0x42);
--	if (!server) {
--		fprintf(stderr, "Failed to open server channel\n");
--		vhci_close(vhci);
--		return 1;
--	}
--
--	return mainloop_run();
--}
-diff --git a/emulator/server.c b/emulator/server.c
-deleted file mode 100644
-index 1ff9904..0000000
---- a/emulator/server.c
-+++ /dev/null
-@@ -1,288 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011-2012  Intel Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stdio.h>
--#include <errno.h>
--#include <ctype.h>
 -#include <unistd.h>
--#include <stdlib.h>
+-#include <errno.h>
 -#include <string.h>
--#include <sys/epoll.h>
--#include <sys/ioctl.h>
+-#include <sys/types.h>
 -#include <sys/socket.h>
--#include <sys/un.h>
+-#include <poll.h>
+-#include <getopt.h>
+-#include <stdbool.h>
 -
 -#include <bluetooth/bluetooth.h>
 -#include <bluetooth/hci.h>
+-#include <bluetooth/hci_lib.h>
+-#include <bluetooth/sdp.h>
+-#include <bluetooth/sdp_lib.h>
+-#include <bluetooth/mgmt.h>
 -
--#include "mainloop.h"
--#include "btdev.h"
--#include "server.h"
+-#include <glib.h>
+-#include "glib-helper.h"
 -
--struct server {
+-static bool monitor = false;
+-static bool discovery = false;
+-static bool resolve_names = true;
+-
+-typedef void (*cmd_cb)(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data);
+-
+-static struct pending_cmd {
+-	uint16_t op;
 -	uint16_t id;
--	int fd;
--};
+-	cmd_cb cb;
+-	void *user_data;
+-	struct pending_cmd *next;
+-} *pending = NULL;
 -
--struct client {
--	int fd;
--	struct btdev *btdev;
--	uint8_t *pkt_data;
--	uint8_t pkt_type;
--	uint16_t pkt_expect;
--	uint16_t pkt_len;
--	uint16_t pkt_offset;
--};
--
--static void server_destroy(void *user_data)
+-static int mgmt_send_cmd(int mgmt_sk, uint16_t op, uint16_t id, void *data,
+-				size_t len, cmd_cb func, void *user_data)
 -{
--	struct server *server = user_data;
+-	char buf[1024];
+-	struct pending_cmd *cmd;
+-	struct mgmt_hdr *hdr = (void *) buf;
 -
--	close(server->fd);
+-	if (len + MGMT_HDR_SIZE > sizeof(buf))
+-		return -EINVAL;
 -
--	free(server);
--}
+-	cmd = calloc(1, sizeof(struct pending_cmd));
+-	if (cmd == NULL)
+-		return -errno;
 -
--static void client_destroy(void *user_data)
--{
--	struct client *client = user_data;
+-	cmd->op = op;
+-	cmd->id = id;
+-	cmd->cb = func;
+-	cmd->user_data = user_data;
 -
--	btdev_destroy(client->btdev);
+-	memset(buf, 0, sizeof(buf));
+-	hdr->opcode = htobs(op);
+-	hdr->index = htobs(id);
+-	hdr->len = htobs(len);
+-	memcpy(buf + MGMT_HDR_SIZE, data, len);
 -
--	close(client->fd);
--
--	free(client);
--}
--
--static void client_write_callback(const void *data, uint16_t len,
--							void *user_data)
--{
--	struct client *client = user_data;
--	ssize_t written;
--
--	written = send(client->fd, data, len, MSG_DONTWAIT);
--	if (written < 0)
--		return;
--}
--
--static void client_read_callback(int fd, uint32_t events, void *user_data)
--{
--	struct client *client = user_data;
--	static uint8_t buf[4096];
--	uint8_t *ptr = buf;
--	ssize_t len;
--	uint16_t count;
--
--	if (events & (EPOLLERR | EPOLLHUP))
--		return;
--
--again:
--	len = recv(fd, buf + client->pkt_offset,
--			sizeof(buf) - client->pkt_offset, MSG_DONTWAIT);
--	if (len < 0) {
--		if (errno == EAGAIN)
--			goto again;
--		return;
--	}
--
--	count = client->pkt_offset + len;
--
--	while (count > 0) {
--		hci_command_hdr *cmd_hdr;
--
--		if (!client->pkt_data) {
--			client->pkt_type = ptr[0];
--
--			switch (client->pkt_type) {
--			case HCI_COMMAND_PKT:
--				if (count < HCI_COMMAND_HDR_SIZE + 1) {
--					client->pkt_offset += len;
--					return;
--				}
--				cmd_hdr = (hci_command_hdr *) (ptr + 1);
--				client->pkt_expect = HCI_COMMAND_HDR_SIZE +
--							cmd_hdr->plen + 1;
--				client->pkt_data = malloc(client->pkt_expect);
--				client->pkt_len = 0;
--				break;
--			default:
--				printf("packet error\n");
--				return;
--			}
--
--			client->pkt_offset = 0;
--		}
--
--		if (count >= client->pkt_expect) {
--			memcpy(client->pkt_data + client->pkt_len,
--						ptr, client->pkt_expect);
--			ptr += client->pkt_expect;
--			count -= client->pkt_expect;
--
--			btdev_receive_h4(client->btdev, client->pkt_data,
--					client->pkt_len + client->pkt_expect);
--
--			free(client->pkt_data);
--			client->pkt_data = NULL;
--		} else {
--			memcpy(client->pkt_data + client->pkt_len, ptr, count);
--			client->pkt_len += count;
--			client->pkt_expect -= count;
--			count = 0;
--		}
--	}
--}
--
--static int accept_client(int fd)
--{
--	struct sockaddr_un addr;
--	socklen_t len;
--	int nfd;
--
--	memset(&addr, 0, sizeof(addr));
--	len = sizeof(addr);
--
--	if (getsockname(fd, (struct sockaddr *) &addr, &len) < 0) {
--		perror("Failed to get socket name");
+-	if (write(mgmt_sk, buf, MGMT_HDR_SIZE + len) < 0) {
+-		fprintf(stderr, "Unable to write to socket: %s\n",
+-							strerror(errno));
+-		free(cmd);
 -		return -1;
 -	}
 -
--	printf("Request for %s\n", addr.sun_path);
+-	cmd->next = pending;
+-	pending = cmd;
 -
--	nfd = accept(fd, (struct sockaddr *) &addr, &len);
--	if (nfd < 0) {
--		perror("Failed to accept client socket");
--		return -1;
--	}
--
--	return nfd;
+-	return 0;
 -}
 -
--static void server_accept_callback(int fd, uint32_t events, void *user_data)
+-static int mgmt_open(void)
 -{
--	struct server *server = user_data;
--	struct client *client;
+-	struct sockaddr_hci addr;
+-	int sk;
 -
--	if (events & (EPOLLERR | EPOLLHUP))
--		return;
--
--	client = malloc(sizeof(*client));
--	if (!client)
--		return;
--
--	memset(client, 0, sizeof(*client));
--
--	client->fd = accept_client(server->fd);
--	if (client->fd < 0) {
--		free(client);
--		return;
--	}
--
--	client->btdev = btdev_create(server->id);
--	if (!client->btdev) {
--		close(client->fd);
--		free(client);
--		return;
--	}
--
--	btdev_set_send_handler(client->btdev, client_write_callback, client);
--
--	if (mainloop_add_fd(client->fd, EPOLLIN, client_read_callback,
--						client, client_destroy) < 0) {
--		btdev_destroy(client->btdev);
--		close(client->fd);
--		free(client);
--	}
--}
--
--static int open_server(const char *path)
--{
--	struct sockaddr_un addr;
--	int fd;
--
--	unlink(path);
--
--	fd = socket(PF_UNIX, SOCK_STREAM, 0);
--	if (fd < 0) {
--		perror("Failed to open server socket");
--		return -1;
+-	sk = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+-	if (sk < 0) {
+-		fprintf(stderr, "socket: %s\n", strerror(errno));
+-		return sk;
 -	}
 -
 -	memset(&addr, 0, sizeof(addr));
--	addr.sun_family = AF_UNIX;
--	strcpy(addr.sun_path, path);
+-	addr.hci_family = AF_BLUETOOTH;
+-	addr.hci_dev = HCI_DEV_NONE;
+-	addr.hci_channel = HCI_CHANNEL_CONTROL;
 -
--	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		perror("Failed to bind server socket");
--		close(fd);
+-	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+-		fprintf(stderr, "bind: %s\n", strerror(errno));
+-		close(sk);
 -		return -1;
 -	}
 -
--	if (listen(fd, 5) < 0) {
--		perror("Failed to listen server socket");
--		close(fd);
--		return -1;
--	}
--
--	return fd;
+-	return sk;
 -}
 -
--struct server *server_open_unix(const char *path, uint16_t id)
+-static void mgmt_check_pending(int mgmt_sk, uint16_t op, uint16_t index,
+-				uint16_t status, void *data, uint16_t len)
 -{
--	struct server *server;
+-	struct pending_cmd *c, *prev;
 -
--	server = malloc(sizeof(*server));
--	if (!server)
--		return NULL;
+-	for (c = pending, prev = NULL; c != NULL; prev = c, c = c->next) {
+-		if (c->op != op)
+-			continue;
+-		if (c->id != index)
+-			continue;
 -
--	memset(server, 0, sizeof(*server));
--	server->id = id;
+-		if (c == pending)
+-			pending = c->next;
+-		else
+-			prev->next = c->next;
 -
--	server->fd = open_server(path);
--	if (server->fd < 0) {
--		free(server);
--		return NULL;
--	}
+-		c->cb(mgmt_sk, op, index, status, data, len, c->user_data);
 -
--	if (mainloop_add_fd(server->fd, EPOLLIN, server_accept_callback,
--						server, server_destroy) < 0) {
--		close(server->fd);
--		free(server);
--		return NULL;
--	}
--
--	return server;
--}
--
--void server_close(struct server *server)
--{
--	if (!server)
--		return;
--
--	mainloop_remove_fd(server->fd);
--}
-diff --git a/emulator/server.h b/emulator/server.h
-deleted file mode 100644
-index 836db5f..0000000
---- a/emulator/server.h
-+++ /dev/null
-@@ -1,30 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011-2012  Intel Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#include <stdint.h>
--
--struct server;
--
--struct server *server_open_unix(const char *path, uint16_t id);
--void server_close(struct server *server);
-diff --git a/emulator/vhci.c b/emulator/vhci.c
-deleted file mode 100644
-index 940e562..0000000
---- a/emulator/vhci.c
-+++ /dev/null
-@@ -1,133 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011-2012  Intel Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stdio.h>
--#include <errno.h>
--#include <fcntl.h>
--#include <unistd.h>
--#include <stdlib.h>
--#include <string.h>
--
--#include "mainloop.h"
--#include "btdev.h"
--#include "vhci.h"
--
--struct vhci {
--	enum vhci_type type;
--	int fd;
--	struct btdev *btdev;
--};
--
--static void vhci_destroy(void *user_data)
--{
--	struct vhci *vhci = user_data;
--
--	btdev_destroy(vhci->btdev);
--
--	close(vhci->fd);
--
--	free(vhci);
--}
--
--static void vhci_write_callback(const void *data, uint16_t len, void *user_data)
--{
--	struct vhci *vhci = user_data;
--	ssize_t written;
--
--	written = write(vhci->fd, data, len);
--	if (written < 0)
--		return;
--}
--
--static void vhci_read_callback(int fd, uint32_t events, void *user_data)
--{
--	struct vhci *vhci = user_data;
--	unsigned char buf[4096];
--	ssize_t len;
--
--	if (events & (EPOLLERR | EPOLLHUP))
--		return;
--
--	len = read(vhci->fd, buf, sizeof(buf));
--	if (len < 0)
--		return;
--
--	btdev_receive_h4(vhci->btdev, buf, len);
--}
--
--struct vhci *vhci_open(enum vhci_type type, uint16_t id)
--{
--	struct vhci *vhci;
--
--	switch (type) {
--	case VHCI_TYPE_BREDR:
+-		free(c);
 -		break;
--	case VHCI_TYPE_AMP:
--		return NULL;
 -	}
--
--	vhci = malloc(sizeof(*vhci));
--	if (!vhci)
--		return NULL;
--
--	memset(vhci, 0, sizeof(*vhci));
--	vhci->type = type;
--
--	vhci->fd = open("/dev/vhci", O_RDWR | O_NONBLOCK);
--	if (vhci->fd < 0) {
--		free(vhci);
--		return NULL;
--	}
--
--	vhci->btdev = btdev_create(id);
--	if (!vhci->btdev) {
--		close(vhci->fd);
--		free(vhci);
--		return NULL;
--	}
--
--	btdev_set_send_handler(vhci->btdev, vhci_write_callback, vhci);
--
--	if (mainloop_add_fd(vhci->fd, EPOLLIN, vhci_read_callback,
--						vhci, vhci_destroy) < 0) {
--		btdev_destroy(vhci->btdev);
--		close(vhci->fd);
--		free(vhci);
--		return NULL;
--	}
--
--	return vhci;
 -}
 -
--void vhci_close(struct vhci *vhci)
+-static int mgmt_cmd_complete(int mgmt_sk, uint16_t index,
+-				struct mgmt_ev_cmd_complete *ev, uint16_t len)
 -{
--	if (!vhci)
--		return;
+-	uint16_t op;
 -
--	mainloop_remove_fd(vhci->fd);
+-	if (len < sizeof(*ev)) {
+-		fprintf(stderr, "Too short (%u bytes) cmd complete event\n",
+-									len);
+-		return -EINVAL;
+-	}
+-
+-	op = bt_get_le16(&ev->opcode);
+-
+-	len -= sizeof(*ev);
+-
+-	if (monitor)
+-		printf("%s complete, opcode 0x%04x len %u\n", mgmt_opstr(op),
+-								op, len);
+-
+-	mgmt_check_pending(mgmt_sk, op, index, ev->status, ev->data, len);
+-
+-	return 0;
 -}
-diff --git a/emulator/vhci.h b/emulator/vhci.h
-deleted file mode 100644
-index 4abb183..0000000
---- a/emulator/vhci.h
-+++ /dev/null
-@@ -1,35 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011-2012  Intel Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
 -
--#include <stdint.h>
+-static int mgmt_cmd_status(int mgmt_sk, uint16_t index,
+-				struct mgmt_ev_cmd_status *ev, uint16_t len)
+-{
+-	uint16_t opcode;
 -
--enum vhci_type {
--	VHCI_TYPE_BREDR	= 0,
--	VHCI_TYPE_AMP	= 1,
+-	if (len < sizeof(*ev)) {
+-		fprintf(stderr, "Too short (%u bytes) cmd status event\n",
+-									len);
+-		return -EINVAL;
+-	}
+-
+-	opcode = bt_get_le16(&ev->opcode);
+-
+-	if (monitor)
+-		printf("cmd status, opcode 0x%04x status 0x%02x (%s)\n",
+-				opcode, ev->status, mgmt_errstr(ev->status));
+-
+-	if (ev->status != 0)
+-		mgmt_check_pending(mgmt_sk, opcode, index, ev->status,
+-								NULL, 0);
+-
+-	return 0;
+-}
+-
+-static int mgmt_controller_error(uint16_t index,
+-					struct mgmt_ev_controller_error *ev,
+-					uint16_t len)
+-{
+-	if (len < sizeof(*ev)) {
+-		fprintf(stderr,
+-			"Too short (%u bytes) controller error event\n", len);
+-		return -EINVAL;
+-	}
+-
+-	if (monitor)
+-		printf("hci%u error 0x%02x\n", index, ev->error_code);
+-
+-	return 0;
+-}
+-
+-static int mgmt_index_added(int mgmt_sk, uint16_t index)
+-{
+-	if (monitor)
+-		printf("hci%u added\n", index);
+-	return 0;
+-}
+-
+-static int mgmt_index_removed(int mgmt_sk, uint16_t index)
+-{
+-	if (monitor)
+-		printf("hci%u removed\n", index);
+-	return 0;
+-}
+-
+-static const char *settings_str[] = {
+-				"powered",
+-				"connectable",
+-				"fast-connectable",
+-				"discoverable",
+-				"pairable",
+-				"link-security",
+-				"ssp",
+-				"br/edr",
+-				"hs",
+-				"le" ,
 -};
 -
--struct vhci;
+-static void print_settings(uint32_t settings)
+-{
+-	unsigned i;
 -
--struct vhci *vhci_open(enum vhci_type type, uint16_t id);
--void vhci_close(struct vhci *vhci);
-diff --git a/tools/emulator/btdev.c b/tools/emulator/btdev.c
+-	for (i = 0; i < NELEM(settings_str); i++) {
+-		if ((settings & (1 << i)) != 0)
+-			printf("%s ", settings_str[i]);
+-	}
+-}
+-
+-static int mgmt_new_settings(int mgmt_sk, uint16_t index,
+-					uint32_t *ev, uint16_t len)
+-{
+-	if (len < sizeof(*ev)) {
+-		fprintf(stderr, "Too short new_settings event (%u)\n", len);
+-		return -EINVAL;
+-	}
+-
+-	if (monitor) {
+-		printf("hci%u new_settings: ", index);
+-		print_settings(bt_get_le32(ev));
+-		printf("\n");
+-	}
+-
+-	return 0;
+-}
+-
+-static int mgmt_discovering(int mgmt_sk, uint16_t index,
+-				struct mgmt_ev_discovering *ev, uint16_t len)
+-{
+-	if (len < sizeof(*ev)) {
+-		fprintf(stderr, "Too short (%u bytes) discovering event\n",
+-									len);
+-		return -EINVAL;
+-	}
+-
+-	if (ev->discovering == 0 && discovery)
+-		exit(EXIT_SUCCESS);
+-
+-	if (monitor)
+-		printf("hci%u type %u discovering %s\n", index,
+-				ev->type, ev->discovering ? "on" : "off");
+-
+-	return 0;
+-}
+-
+-static int mgmt_new_link_key(int mgmt_sk, uint16_t index,
+-				struct mgmt_ev_new_link_key *ev, uint16_t len)
+-{
+-
+-	if (len != sizeof(*ev)) {
+-		fprintf(stderr, "Invalid new_link_key length (%u bytes)\n",
+-									len);
+-		return -EINVAL;
+-	}
+-
+-	if (monitor) {
+-		char addr[18];
+-		ba2str(&ev->key.addr.bdaddr, addr);
+-		printf("hci%u new_link_key %s type 0x%02x pin_len %d "
+-				"store_hint %u\n", index, addr, ev->key.type,
+-				ev->key.pin_len, ev->store_hint);
+-	}
+-
+-	return 0;
+-}
+-
+-static const char *typestr(uint8_t type)
+-{
+-	const char *str[] = { "BR/EDR", "LE Public", "LE Random" };
+-
+-	if (type <= BDADDR_LE_RANDOM)
+-		return str[type];
+-
+-	return "(unknown)";
+-}
+-
+-static int mgmt_connected(int mgmt_sk, uint16_t index,
+-					struct mgmt_ev_device_connected *ev,
+-					uint16_t len)
+-{
+-	uint16_t eir_len;
+-
+-	if (len < sizeof(*ev)) {
+-		fprintf(stderr,
+-			"Invalid connected event length (%u bytes)\n", len);
+-		return -EINVAL;
+-	}
+-
+-	eir_len = bt_get_le16(&ev->eir_len);
+-	if (len != sizeof(*ev) + eir_len) {
+-		fprintf(stderr, "Invalid connected event length "
+-			"(%u bytes, eir_len %u bytes)\n", len, eir_len);
+-		return -EINVAL;
+-	}
+-
+-	if (monitor) {
+-		char addr[18];
+-		ba2str(&ev->addr.bdaddr, addr);
+-		printf("hci%u %s type %s connected eir_len %u\n", index, addr,
+-					typestr(ev->addr.type), eir_len);
+-	}
+-
+-	return 0;
+-}
+-
+-static int mgmt_disconnected(int mgmt_sk, uint16_t index,
+-				struct mgmt_addr_info *ev, uint16_t len)
+-{
+-	if (len != sizeof(*ev)) {
+-		fprintf(stderr,
+-			"Invalid disconnected event length (%u bytes)\n", len);
+-		return -EINVAL;
+-	}
+-
+-	if (monitor) {
+-		char addr[18];
+-		ba2str(&ev->bdaddr, addr);
+-		printf("hci%u %s type %s disconnected\n", index, addr,
+-							typestr(ev->type));
+-	}
+-
+-	return 0;
+-}
+-
+-static int mgmt_conn_failed(int mgmt_sk, uint16_t index,
+-				struct mgmt_ev_connect_failed *ev,
+-				uint16_t len)
+-{
+-	if (len != sizeof(*ev)) {
+-		fprintf(stderr,
+-			"Invalid connect_failed event length (%u bytes)\n", len);
+-		return -EINVAL;
+-	}
+-
+-	if (monitor) {
+-		char addr[18];
+-		ba2str(&ev->addr.bdaddr, addr);
+-		printf("hci%u %s type %s connect failed (status 0x%02x, %s)\n",
+-				index, addr, typestr(ev->addr.type), ev->status,
+-				mgmt_errstr(ev->status));
+-	}
+-
+-	return 0;
+-}
+-
+-static int mgmt_auth_failed(int mgmt_sk, uint16_t index,
+-				struct mgmt_ev_auth_failed *ev,
+-				uint16_t len)
+-{
+-	if (len != sizeof(*ev)) {
+-		fprintf(stderr,
+-			"Invalid auth_failed event length (%u bytes)\n", len);
+-		return -EINVAL;
+-	}
+-
+-	if (monitor) {
+-		char addr[18];
+-		ba2str(&ev->addr.bdaddr, addr);
+-		printf("hci%u %s auth failed with status 0x%02x (%s)\n",
+-			index, addr, ev->status, mgmt_errstr(ev->status));
+-	}
+-
+-	return 0;
+-}
+-
+-static int mgmt_name_changed(int mgmt_sk, uint16_t index,
+-				struct mgmt_ev_local_name_changed *ev,
+-				uint16_t len)
+-{
+-	if (len != sizeof(*ev)) {
+-		fprintf(stderr,
+-			"Invalid local_name_changed length (%u bytes)\n", len);
+-		return -EINVAL;
+-	}
+-
+-	if (monitor)
+-		printf("hci%u name changed: %s\n", index, ev->name);
+-
+-	return 0;
+-}
+-
+-static void confirm_name_rsp(int mgmt_sk, uint16_t op, uint16_t id,
+-				uint8_t status, void *rsp, uint16_t len,
+-				void *user_data)
+-{
+-	struct mgmt_rp_confirm_name *rp = rsp;
+-	char addr[18];
+-
+-	if (len == 0 && status != 0) {
+-		fprintf(stderr,
+-			"hci%u confirm_name failed with status 0x%02x (%s)\n",
+-					id, status, mgmt_errstr(status));
+-		return;
+-	}
+-
+-	if (len != sizeof(*rp)) {
+-		fprintf(stderr,
+-			"hci%u confirm_name rsp length %u instead of %zu\n",
+-			id, len, sizeof(*rp));
+-		return;
+-	}
+-
+-	ba2str(&rp->addr.bdaddr, addr);
+-
+-	if (status != 0)
+-		fprintf(stderr,
+-			"hci%u confirm_name for %s failed: 0x%02x (%s)\n",
+-			id, addr, status, mgmt_errstr(status));
+-	else
+-		printf("hci%u confirm_name succeeded for %s\n", id, addr);
+-}
+-
+-static int mgmt_device_found(int mgmt_sk, uint16_t index,
+-				struct mgmt_ev_device_found *ev, uint16_t len)
+-{
+-	uint32_t flags;
+-	uint16_t eir_len;
+-
+-	if (len < sizeof(*ev)) {
+-		fprintf(stderr,
+-			"Too short device_found length (%u bytes)\n", len);
+-		return -EINVAL;
+-	}
+-
+-	flags = btohs(ev->flags);
+-
+-	eir_len = bt_get_le16(&ev->eir_len);
+-	if (len != sizeof(*ev) + eir_len) {
+-		fprintf(stderr, "dev_found: expected %zu bytes, got %u bytes",
+-						sizeof(*ev) + eir_len, len);
+-		return -EINVAL;
+-	}
+-
+-	if (monitor || discovery) {
+-		char addr[18];
+-		ba2str(&ev->addr.bdaddr, addr);
+-		printf("hci%u dev_found: %s type %s rssi %d "
+-			"flags 0x%04x eir_len %u\n", index, addr,
+-			typestr(ev->addr.type), ev->rssi, flags, eir_len);
+-	}
+-
+-	if (discovery && (flags & MGMT_DEV_FOUND_CONFIRM_NAME)) {
+-		struct mgmt_cp_confirm_name cp;
+-
+-		memset(&cp, 0, sizeof(cp));
+-		memcpy(&cp.addr, &ev->addr, sizeof(cp.addr));
+-		if (resolve_names)
+-			cp.name_known = 0;
+-		else
+-			cp.name_known = 1;
+-
+-		mgmt_send_cmd(mgmt_sk, MGMT_OP_CONFIRM_NAME, index,
+-					&cp, sizeof(cp), confirm_name_rsp,
+-					NULL);
+-	}
+-
+-	return 0;
+-}
+-
+-static void pin_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data)
+-{
+-	if (status != 0) {
+-		fprintf(stderr,
+-			"hci%u PIN Code reply failed with status 0x%02x (%s)",
+-					id, status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	printf("hci%u PIN Reply successful\n", id);
+-}
+-
+-static int mgmt_pin_reply(int mgmt_sk, uint16_t index,
+-						struct mgmt_addr_info *addr,
+-						const char *pin, size_t len)
+-{
+-	struct mgmt_cp_pin_code_reply cp;
+-
+-	memset(&cp, 0, sizeof(cp));
+-	memcpy(&cp.addr, addr, sizeof(cp.addr));
+-	cp.pin_len = len;
+-	memcpy(cp.pin_code, pin, len);
+-
+-	return mgmt_send_cmd(mgmt_sk, MGMT_OP_PIN_CODE_REPLY, index,
+-					&cp, sizeof(cp), pin_rsp, NULL);
+-}
+-
+-static void pin_neg_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data)
+-{
+-	if (status != 0) {
+-		fprintf(stderr,
+-			"hci%u PIN Neg reply failed with status 0x%02x (%s)",
+-					id, status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	printf("hci%u PIN Negative Reply successful\n", id);
+-}
+-
+-static int mgmt_pin_neg_reply(int mgmt_sk, uint16_t index,
+-						struct mgmt_addr_info *addr)
+-{
+-	struct mgmt_cp_pin_code_neg_reply cp;
+-
+-	memset(&cp, 0, sizeof(cp));
+-	memcpy(&cp.addr, addr, sizeof(cp.addr));
+-
+-	return mgmt_send_cmd(mgmt_sk, MGMT_OP_PIN_CODE_NEG_REPLY, index,
+-					&cp, sizeof(cp), pin_neg_rsp, NULL);
+-}
+-
+-static int mgmt_request_pin(int mgmt_sk, uint16_t index,
+-				struct mgmt_ev_pin_code_request *ev,
+-				uint16_t len)
+-{
+-	char pin[18];
+-	size_t pin_len;
+-
+-	if (len != sizeof(*ev)) {
+-		fprintf(stderr,
+-			"Invalid pin_code request length (%u bytes)\n", len);
+-		return -EINVAL;
+-	}
+-
+-	if (monitor) {
+-		char addr[18];
+-		ba2str(&ev->addr.bdaddr, addr);
+-		printf("hci%u %s request PIN\n", index, addr);
+-	}
+-
+-	printf("PIN Request (press enter to reject) >> ");
+-	fflush(stdout);
+-
+-	memset(pin, 0, sizeof(pin));
+-
+-	if (fgets(pin, sizeof(pin), stdin) == NULL || pin[0] == '\n')
+-		return mgmt_pin_neg_reply(mgmt_sk, index, &ev->addr);
+-
+-	pin_len = strlen(pin);
+-	if (pin[pin_len - 1] == '\n') {
+-		pin[pin_len - 1] = '\0';
+-		pin_len--;
+-	}
+-
+-	return mgmt_pin_reply(mgmt_sk, index, &ev->addr, pin, pin_len);
+-}
+-
+-static void confirm_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data)
+-{
+-	if (status != 0) {
+-		fprintf(stderr,
+-			"hci%u User Confirm reply failed. status 0x%02x (%s)",
+-					id, status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	printf("hci%u User Confirm Reply successful\n", id);
+-}
+-
+-static int mgmt_confirm_reply(int mgmt_sk, uint16_t index, bdaddr_t *bdaddr)
+-{
+-	struct mgmt_cp_user_confirm_reply cp;
+-
+-	memset(&cp, 0, sizeof(cp));
+-	bacpy(&cp.addr.bdaddr, bdaddr);
+-
+-	return mgmt_send_cmd(mgmt_sk, MGMT_OP_USER_CONFIRM_REPLY, index,
+-					&cp, sizeof(cp), confirm_rsp, NULL);
+-}
+-
+-static void confirm_neg_rsp(int mgmt_sk, uint16_t op, uint16_t id,
+-				uint8_t status, void *rsp, uint16_t len,
+-				void *user_data)
+-{
+-	if (status != 0) {
+-		fprintf(stderr,
+-			"hci%u Confirm Neg reply failed. status 0x%02x (%s)",
+-					id, status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	printf("hci%u User Confirm Negative Reply successful\n", id);
+-}
+-
+-static int mgmt_confirm_neg_reply(int mgmt_sk, uint16_t index,
+-							bdaddr_t *bdaddr)
+-{
+-	struct mgmt_cp_user_confirm_reply cp;
+-
+-	memset(&cp, 0, sizeof(cp));
+-	bacpy(&cp.addr.bdaddr, bdaddr);
+-
+-	return mgmt_send_cmd(mgmt_sk, MGMT_OP_USER_CONFIRM_NEG_REPLY, index,
+-				&cp, sizeof(cp), confirm_neg_rsp, NULL);
+-}
+-
+-
+-static int mgmt_user_confirm(int mgmt_sk, uint16_t index,
+-				struct mgmt_ev_user_confirm_request *ev,
+-				uint16_t len)
+-{
+-	char rsp[5];
+-	size_t rsp_len;
+-	uint32_t val;
+-	char addr[18];
+-
+-	if (len != sizeof(*ev)) {
+-		fprintf(stderr,
+-			"Invalid user_confirm request length (%u)\n", len);
+-		return -EINVAL;
+-	}
+-
+-	ba2str(&ev->addr.bdaddr, addr);
+-	val = bt_get_le32(&ev->value);
+-
+-	if (monitor)
+-		printf("hci%u %s User Confirm %06u hint %u\n", index, addr,
+-							val, ev->confirm_hint);
+-
+-	if (ev->confirm_hint)
+-		printf("Accept pairing with %s (yes/no) >> ", addr);
+-	else
+-		printf("Confirm value %06u for %s (yes/no) >> ", val, addr);
+-
+-	fflush(stdout);
+-
+-	memset(rsp, 0, sizeof(rsp));
+-
+-	if (fgets(rsp, sizeof(rsp), stdin) == NULL || rsp[0] == '\n')
+-		return mgmt_confirm_neg_reply(mgmt_sk, index, &ev->addr.bdaddr);
+-
+-	rsp_len = strlen(rsp);
+-	if (rsp[rsp_len - 1] == '\n') {
+-		rsp[rsp_len - 1] = '\0';
+-		rsp_len--;
+-	}
+-
+-	if (rsp[0] == 'y' || rsp[0] == 'Y')
+-		return mgmt_confirm_reply(mgmt_sk, index, &ev->addr.bdaddr);
+-	else
+-		return mgmt_confirm_neg_reply(mgmt_sk, index, &ev->addr.bdaddr);
+-}
+-
+-static int mgmt_handle_event(int mgmt_sk, uint16_t ev, uint16_t index,
+-						void *data, uint16_t len)
+-{
+-	if (monitor)
+-		printf("event: %s\n", mgmt_evstr(ev));
+-
+-	switch (ev) {
+-	case MGMT_EV_CMD_COMPLETE:
+-		return mgmt_cmd_complete(mgmt_sk, index, data, len);
+-	case MGMT_EV_CMD_STATUS:
+-		return mgmt_cmd_status(mgmt_sk, index, data, len);
+-	case MGMT_EV_CONTROLLER_ERROR:
+-		return mgmt_controller_error(index, data, len);
+-	case MGMT_EV_INDEX_ADDED:
+-		return mgmt_index_added(mgmt_sk, index);
+-	case MGMT_EV_INDEX_REMOVED:
+-		return mgmt_index_removed(mgmt_sk, index);
+-	case MGMT_EV_NEW_SETTINGS:
+-		return mgmt_new_settings(mgmt_sk, index, data, len);
+-	case MGMT_EV_DISCOVERING:
+-		return mgmt_discovering(mgmt_sk, index, data, len);
+-	case MGMT_EV_NEW_LINK_KEY:
+-		return mgmt_new_link_key(mgmt_sk, index, data, len);
+-	case MGMT_EV_DEVICE_CONNECTED:
+-		return mgmt_connected(mgmt_sk, index, data, len);
+-	case MGMT_EV_DEVICE_DISCONNECTED:
+-		return mgmt_disconnected(mgmt_sk, index, data, len);
+-	case MGMT_EV_CONNECT_FAILED:
+-		return mgmt_conn_failed(mgmt_sk, index, data, len);
+-	case MGMT_EV_AUTH_FAILED:
+-		return mgmt_auth_failed(mgmt_sk, index, data, len);
+-	case MGMT_EV_LOCAL_NAME_CHANGED:
+-		return mgmt_name_changed(mgmt_sk, index, data, len);
+-	case MGMT_EV_DEVICE_FOUND:
+-		return mgmt_device_found(mgmt_sk, index, data, len);
+-	case MGMT_EV_PIN_CODE_REQUEST:
+-		return mgmt_request_pin(mgmt_sk, index, data, len);
+-	case MGMT_EV_USER_CONFIRM_REQUEST:
+-		return mgmt_user_confirm(mgmt_sk, index, data, len);
+-	default:
+-		if (monitor)
+-			printf("Unhandled event 0x%04x (%s)\n", ev, mgmt_evstr(ev));
+-		return 0;
+-	}
+-}
+-
+-static int mgmt_process_data(int mgmt_sk)
+-{
+-	char buf[1024];
+-	struct mgmt_hdr *hdr = (void *) buf;
+-	uint16_t len, ev, index;
+-	ssize_t ret;
+-
+-	ret = read(mgmt_sk, buf, sizeof(buf));
+-	if (ret < 0) {
+-		fprintf(stderr, "read: %s\n", strerror(errno));
+-		return ret;
+-	}
+-
+-	if (ret < MGMT_HDR_SIZE) {
+-		fprintf(stderr, "Too small mgmt packet (%zd bytes)\n", ret);
+-		return 0;
+-	}
+-
+-	ev = bt_get_le16(&hdr->opcode);
+-	index = bt_get_le16(&hdr->index);
+-	len = bt_get_le16(&hdr->len);
+-
+-	if (monitor)
+-		printf("event 0x%04x len 0x%04x index 0x%04x\n", ev, len, index);
+-
+-	if (ret != MGMT_HDR_SIZE + len) {
+-		fprintf(stderr, "Packet length mismatch. ret %zd len %u",
+-								ret, len);
+-		return 0;
+-	}
+-
+-	mgmt_handle_event(mgmt_sk, ev, index, buf + MGMT_HDR_SIZE, len);
+-
+-	return 0;
+-}
+-
+-static void cmd_monitor(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	printf("Monitoring mgmt events...\n");
+-	monitor = true;
+-}
+-
+-static void version_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data)
+-{
+-	struct mgmt_rp_read_version *rp = rsp;
+-
+-	if (status != 0) {
+-		fprintf(stderr, "Reading mgmt version failed with status"
+-			" 0x%02x (%s)\n", status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (len < sizeof(*rp)) {
+-		fprintf(stderr, "Too small version reply (%u bytes)\n", len);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	printf("MGMT Version %u, revision %u\n", rp->version,
+-						bt_get_le16(&rp->revision));
+-
+-	exit(EXIT_SUCCESS);
+-}
+-
+-static void cmd_version(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_READ_VERSION, MGMT_INDEX_NONE,
+-					NULL, 0, version_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send read_version cmd\n");
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void commands_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data)
+-{
+-	struct mgmt_rp_read_commands *rp = rsp;
+-	uint16_t num_commands, num_events, *opcode;
+-	size_t expected_len;
+-	int i;
+-
+-	if (status != 0) {
+-		fprintf(stderr, "Reading supported commands failed with status"
+-			" 0x%02x (%s)\n", status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (len < sizeof(*rp)) {
+-		fprintf(stderr, "Too small commands reply (%u bytes)\n", len);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	num_commands = bt_get_le16(&rp->num_commands);
+-	num_events = bt_get_le16(&rp->num_events);
+-
+-	expected_len = sizeof(*rp) + num_commands * sizeof(uint16_t) +
+-						num_events * sizeof(uint16_t);
+-
+-	if (len < expected_len) {
+-		fprintf(stderr, "Too small commands reply (%u != %zu)\n",
+-							len, expected_len);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	opcode = rp->opcodes;
+-
+-	printf("%u commands:\n", num_commands);
+-	for (i = 0; i < num_commands; i++) {
+-		uint16_t op = bt_get_le16(opcode++);
+-		printf("\t%s (0x%04x)\n", mgmt_opstr(op), op);
+-	}
+-
+-	printf("%u events:\n", num_events);
+-	for (i = 0; i < num_events; i++) {
+-		uint16_t ev = bt_get_le16(opcode++);
+-		printf("\t%s (0x%04x)\n", mgmt_evstr(ev), ev);
+-	}
+-
+-	exit(EXIT_SUCCESS);
+-}
+-
+-static void cmd_commands(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_READ_COMMANDS, MGMT_INDEX_NONE,
+-					NULL, 0, commands_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send read_commands cmd\n");
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void info_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data)
+-{
+-	struct mgmt_rp_read_info *rp = rsp;
+-	char addr[18];
+-
+-	if (status != 0) {
+-		fprintf(stderr,
+-			"Reading hci%u info failed with status 0x%02x (%s)\n",
+-					id, status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (len < sizeof(*rp)) {
+-		fprintf(stderr, "Too small info reply (%u bytes)\n", len);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	ba2str(&rp->bdaddr, addr);
+-	printf("hci%u:\taddr %s version %u manufacturer %u"
+-			" class 0x%02x%02x%02x\n",
+-			id, addr, rp->version, bt_get_le16(&rp->manufacturer),
+-			rp->dev_class[2], rp->dev_class[1], rp->dev_class[0]);
+-
+-	printf("\tsupported settings: ");
+-	print_settings(bt_get_le32(&rp->supported_settings));
+-
+-	printf("\n\tcurrent settings: ");
+-	print_settings(bt_get_le32(&rp->current_settings));
+-
+-	printf("\n\tname %s\n", rp->name);
+-	printf("\tshort name %s\n", rp->short_name);
+-
+-	if (pending == NULL)
+-		exit(EXIT_SUCCESS);
+-}
+-
+-static void index_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data)
+-{
+-	struct mgmt_rp_read_index_list *rp = rsp;
+-	uint16_t count;
+-	unsigned int i;
+-
+-	if (status != 0) {
+-		fprintf(stderr,
+-			"Reading index list failed with status 0x%02x (%s)\n",
+-						status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (len < sizeof(*rp)) {
+-		fprintf(stderr, "Too small index list reply (%u bytes)\n",
+-									len);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	count = bt_get_le16(&rp->num_controllers);
+-
+-	if (len < sizeof(*rp) + count * sizeof(uint16_t)) {
+-		fprintf(stderr,
+-			"Index count (%u) doesn't match reply length (%u)\n",
+-								count, len);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (monitor)
+-		printf("Index list with %u item%s\n",
+-						count, count > 1 ? "s" : "");
+-
+-	if (count == 0)
+-		exit(EXIT_SUCCESS);
+-
+-	if (monitor && count > 0)
+-		printf("\t");
+-
+-	for (i = 0; i < count; i++) {
+-		uint16_t index;
+-
+-		index = bt_get_le16(&rp->index[i]);
+-
+-		if (monitor)
+-			printf("hci%u ", index);
+-
+-		if (mgmt_send_cmd(mgmt_sk, MGMT_OP_READ_INFO, index, NULL,
+-					0, info_rsp, NULL) < 0) {
+-			fprintf(stderr, "Unable to send read_info cmd\n");
+-			exit(EXIT_FAILURE);
+-		}
+-	}
+-
+-	if (monitor && count > 0)
+-		printf("\n");
+-}
+-
+-static void cmd_info(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	if (index == MGMT_INDEX_NONE) {
+-		if (mgmt_send_cmd(mgmt_sk, MGMT_OP_READ_INDEX_LIST,
+-					MGMT_INDEX_NONE, NULL, 0,
+-					index_rsp, NULL) < 0) {
+-			fprintf(stderr, "Unable to send index_list cmd\n");
+-			exit(EXIT_FAILURE);
+-		}
+-
+-		return;
+-	}
+-
+-	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_READ_INFO, index, NULL,
+-						0, info_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send read_info cmd\n");
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void setting_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data)
+-{
+-	uint32_t *rp = rsp;
+-
+-	if (status != 0) {
+-		fprintf(stderr,
+-			"%s for hci%u failed with status 0x%02x (%s)\n",
+-			mgmt_opstr(op), id, status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (len < sizeof(*rp)) {
+-		fprintf(stderr, "Too small %s response (%u bytes)\n",
+-							mgmt_opstr(op), len);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	printf("hci%u %s complete, settings: ", id, mgmt_opstr(op));
+-	print_settings(bt_get_le32(rp));
+-	printf("\n");
+-
+-	exit(EXIT_SUCCESS);
+-}
+-
+-static void cmd_setting(int mgmt_sk, uint16_t index, uint16_t op,
+-							int argc, char **argv)
+-{
+-	uint8_t val;
+-
+-	if (argc < 2) {
+-		printf("Specify \"on\" or \"off\"\n");
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (strcasecmp(argv[1], "on") == 0 || strcasecmp(argv[1], "yes") == 0)
+-		val = 1;
+-	else if (strcasecmp(argv[1], "off") == 0)
+-		val = 0;
+-	else
+-		val = atoi(argv[1]);
+-
+-	if (index == MGMT_INDEX_NONE)
+-		index = 0;
+-
+-	if (mgmt_send_cmd(mgmt_sk, op, index, &val, sizeof(val),
+-						setting_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send %s cmd\n", mgmt_opstr(op));
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void cmd_power(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	cmd_setting(mgmt_sk, index, MGMT_OP_SET_POWERED, argc, argv);
+-}
+-
+-static void cmd_discov(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	struct mgmt_cp_set_discoverable cp;
+-
+-	if (argc < 2) {
+-		printf("Usage: btmgmt %s <yes/no> [timeout]\n", argv[0]);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	memset(&cp, 0, sizeof(cp));
+-
+-	if (strcasecmp(argv[1], "on") == 0 || strcasecmp(argv[1], "yes") == 0)
+-		cp.val = 1;
+-	else if (strcasecmp(argv[1], "off") == 0)
+-		cp.val = 0;
+-	else
+-		cp.val = atoi(argv[1]);
+-
+-	if (argc > 2)
+-		cp.timeout = htobs(atoi(argv[2]));
+-
+-	if (index == MGMT_INDEX_NONE)
+-		index = 0;
+-
+-	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_SET_DISCOVERABLE, index,
+-				&cp, sizeof(cp), setting_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send set_discoverable cmd\n");
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void cmd_connectable(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	cmd_setting(mgmt_sk, index, MGMT_OP_SET_CONNECTABLE, argc, argv);
+-}
+-
+-static void cmd_pairable(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	cmd_setting(mgmt_sk, index, MGMT_OP_SET_PAIRABLE, argc, argv);
+-}
+-
+-static void cmd_linksec(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	cmd_setting(mgmt_sk, index, MGMT_OP_SET_LINK_SECURITY, argc, argv);
+-}
+-
+-static void cmd_ssp(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	cmd_setting(mgmt_sk, index, MGMT_OP_SET_SSP, argc, argv);
+-}
+-
+-static void cmd_hs(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	cmd_setting(mgmt_sk, index, MGMT_OP_SET_HS, argc, argv);
+-}
+-
+-static void cmd_le(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	cmd_setting(mgmt_sk, index, MGMT_OP_SET_LE, argc, argv);
+-}
+-
+-static void class_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data)
+-{
+-	struct mgmt_ev_class_of_dev_changed *rp = rsp;
+-
+-	if (len == 0 && status != 0) {
+-		fprintf(stderr, "%s failed, status 0x%02x (%s)\n",
+-				mgmt_opstr(op), status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (len != sizeof(*rp)) {
+-		fprintf(stderr, "Unexpected %s len %u\n", mgmt_opstr(op), len);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	printf("%s succeeded. Class 0x%02x%02x%02x\n", mgmt_opstr(op),
+-		rp->class_of_dev[2], rp->class_of_dev[1], rp->class_of_dev[0]);
+-
+-	exit(EXIT_SUCCESS);
+-}
+-
+-static void cmd_class(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	uint8_t class[2];
+-
+-	if (argc < 3) {
+-		printf("Usage: btmgmt %s <major> <minor>\n", argv[0]);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	class[0] = atoi(argv[1]);
+-	class[1] = atoi(argv[2]);
+-
+-	if (index == MGMT_INDEX_NONE)
+-		index = 0;
+-
+-	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_SET_DEV_CLASS, index,
+-				class, sizeof(class), class_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send set_dev_class cmd\n");
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void disconnect_rsp(int mgmt_sk, uint16_t op, uint16_t id,
+-				uint8_t status, void *rsp, uint16_t len,
+-				void *user_data)
+-{
+-	struct mgmt_rp_disconnect *rp = rsp;
+-	char addr[18];
+-
+-	if (len == 0 && status != 0) {
+-		fprintf(stderr, "Disconnect failed with status 0x%02x (%s)\n",
+-						status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (len != sizeof(*rp)) {
+-		fprintf(stderr, "Invalid disconnect response length (%u)\n",
+-									len);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	ba2str(&rp->addr.bdaddr, addr);
+-
+-	if (status == 0) {
+-		printf("%s disconnected\n", addr);
+-		exit(EXIT_SUCCESS);
+-	} else {
+-		fprintf(stderr,
+-			"Disconnecting %s failed with status 0x%02x (%s)\n",
+-				addr, status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void cmd_disconnect(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	struct mgmt_cp_disconnect cp;
+-
+-	if (argc < 2) {
+-		printf("Usage: btmgmt %s <address>\n", argv[0]);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	str2ba(argv[1], &cp.addr.bdaddr);
+-
+-	if (index == MGMT_INDEX_NONE)
+-		index = 0;
+-
+-	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_DISCONNECT, index,
+-				&cp, sizeof(cp), disconnect_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send disconnect cmd\n");
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void con_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data)
+-{
+-	struct mgmt_rp_get_connections *rp = rsp;
+-	uint16_t count, i;
+-
+-	if (len < sizeof(*rp)) {
+-		fprintf(stderr, "Too small (%u bytes) get_connections rsp\n",
+-									len);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	count = bt_get_le16(&rp->conn_count);
+-	if (len != sizeof(*rp) + count * sizeof(struct mgmt_addr_info)) {
+-		fprintf(stderr, "Invalid get_connections length "
+-					" (count=%u, len=%u)\n", count, len);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	for (i = 0; i < count; i++) {
+-		char addr[18];
+-
+-		ba2str(&rp->addr[i].bdaddr, addr);
+-
+-		printf("%s type %s\n", addr, typestr(rp->addr[i].type));
+-	}
+-
+-	exit(EXIT_SUCCESS);
+-}
+-
+-static void cmd_con(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	if (index == MGMT_INDEX_NONE)
+-		index = 0;
+-
+-	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_GET_CONNECTIONS, index, NULL, 0,
+-							con_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send get_connections cmd\n");
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void find_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data)
+-{
+-	if (status != 0) {
+-		fprintf(stderr,
+-			"Unable to start discovery. status 0x%02x (%s)\n",
+-						status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	printf("Discovery started\n");
+-	discovery = true;
+-}
+-
+-static void find_usage(void)
+-{
+-	printf("Usage: btmgmt find [-l|-b]>\n");
+-}
+-
+-static struct option find_options[] = {
+-	{ "help",	0, 0, 'h' },
+-	{ "le-only",	1, 0, 'l' },
+-	{ "bredr-only",	1, 0, 'b' },
+-	{ 0, 0, 0, 0 }
+-};
+-
+-static void cmd_find(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	struct mgmt_cp_start_discovery cp;
+-	uint8_t type;
+-	int opt;
+-
+-	if (index == MGMT_INDEX_NONE)
+-		index = 0;
+-
+-	type = 0;
+-	hci_set_bit(BDADDR_BREDR, &type);
+-	hci_set_bit(BDADDR_LE_PUBLIC, &type);
+-	hci_set_bit(BDADDR_LE_RANDOM, &type);
+-
+-	while ((opt = getopt_long(argc, argv, "+lbh", find_options,
+-								NULL)) != -1) {
+-		switch (opt) {
+-		case 'l':
+-			hci_clear_bit(BDADDR_BREDR, &type);
+-			hci_set_bit(BDADDR_LE_PUBLIC, &type);
+-			hci_set_bit(BDADDR_LE_RANDOM, &type);
+-			break;
+-		case 'b':
+-			hci_set_bit(BDADDR_BREDR, &type);
+-			hci_clear_bit(BDADDR_LE_PUBLIC, &type);
+-			hci_clear_bit(BDADDR_LE_RANDOM, &type);
+-			break;
+-		case 'h':
+-		default:
+-			find_usage();
+-			exit(EXIT_SUCCESS);
+-		}
+-	}
+-
+-	argc -= optind;
+-	argv += optind;
+-	optind = 0;
+-
+-	memset(&cp, 0, sizeof(cp));
+-	cp.type = type;
+-
+-	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_START_DISCOVERY, index,
+-				&cp, sizeof(cp), find_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send start_discovery cmd\n");
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void name_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data)
+-{
+-	if (status != 0) {
+-		fprintf(stderr, "Unable to set local name. status 0x%02x (%s)",
+-						status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	exit(EXIT_SUCCESS);
+-}
+-
+-static void cmd_name(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	struct mgmt_cp_set_local_name cp;
+-
+-	if (argc < 2) {
+-		printf("Usage: btmgmt %s <name> [shortname]\n", argv[0]);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (index == MGMT_INDEX_NONE)
+-		index = 0;
+-
+-	memset(&cp, 0, sizeof(cp));
+-	strncpy((char *) cp.name, argv[1], HCI_MAX_NAME_LENGTH);
+-	if (argc > 2)
+-		strncpy((char *) cp.short_name, argv[2],
+-					MGMT_MAX_SHORT_NAME_LENGTH);
+-
+-	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_SET_LOCAL_NAME, index,
+-					&cp, sizeof(cp), name_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send set_name cmd\n");
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void pair_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data)
+-{
+-	struct mgmt_rp_pair_device *rp = rsp;
+-	char addr[18];
+-
+-	if (len == 0 && status != 0) {
+-		fprintf(stderr, "Pairing failed with status 0x%02x (%s)\n",
+-						status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (len != sizeof(*rp)) {
+-		fprintf(stderr, "Unexpected pair_rsp len %u\n", len);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	ba2str(&rp->addr.bdaddr, addr);
+-
+-	if (status != 0) {
+-		fprintf(stderr,
+-			"Pairing with %s (%s) failed. status 0x%02x (%s)\n",
+-			addr, typestr(rp->addr.type), status,
+-			mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	printf("Paired with %s\n", addr);
+-
+-	exit(EXIT_SUCCESS);
+-}
+-
+-static void pair_usage(void)
+-{
+-	printf("Usage: btmgmt pair [-c cap] [-t type] <remote address>\n");
+-}
+-
+-static struct option pair_options[] = {
+-	{ "help",	0, 0, 'h' },
+-	{ "capability",	1, 0, 'c' },
+-	{ "type",	1, 0, 't' },
+-	{ 0, 0, 0, 0 }
+-};
+-
+-static void cmd_pair(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	struct mgmt_cp_pair_device cp;
+-	uint8_t cap = 0x01;
+-	uint8_t type = BDADDR_BREDR;
+-	int opt;
+-
+-	while ((opt = getopt_long(argc, argv, "+c:t:h", pair_options,
+-								NULL)) != -1) {
+-		switch (opt) {
+-		case 'c':
+-			cap = strtol(optarg, NULL, 0);
+-			break;
+-		case 't':
+-			type = strtol(optarg, NULL, 0);
+-			break;
+-		case 'h':
+-		default:
+-			pair_usage();
+-			exit(EXIT_SUCCESS);
+-		}
+-	}
+-
+-	argc -= optind;
+-	argv += optind;
+-	optind = 0;
+-
+-	if (argc < 1) {
+-		pair_usage();
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (index == MGMT_INDEX_NONE)
+-		index = 0;
+-
+-	memset(&cp, 0, sizeof(cp));
+-	str2ba(argv[0], &cp.addr.bdaddr);
+-	cp.addr.type = type;
+-	cp.io_cap = cap;
+-
+-	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_PAIR_DEVICE, index, &cp, sizeof(cp),
+-							pair_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send pair_device cmd\n");
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void unpair_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data)
+-{
+-	struct mgmt_rp_unpair_device *rp = rsp;
+-	char addr[18];
+-
+-	if (len == 0 && status != 0) {
+-		fprintf(stderr, "Unpair device failed. status 0x%02x (%s)\n",
+-						status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (len != sizeof(*rp)) {
+-		fprintf(stderr, "Unexpected unpair_device_rsp len %u\n", len);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	ba2str(&rp->addr.bdaddr, addr);
+-
+-	if (status != 0) {
+-		fprintf(stderr,
+-			"Unpairing %s failed. status 0x%02x (%s)\n",
+-				addr, status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	printf("%s unpaired\n", addr);
+-
+-	exit(EXIT_SUCCESS);
+-}
+-
+-static void cmd_unpair(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	struct mgmt_cp_unpair_device cp;
+-
+-	if (argc < 2) {
+-		printf("Usage: btmgmt %s <remote address>\n", argv[0]);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (index == MGMT_INDEX_NONE)
+-		index = 0;
+-
+-	memset(&cp, 0, sizeof(cp));
+-	str2ba(argv[1], &cp.addr.bdaddr);
+-	cp.disconnect = 1;
+-
+-	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_UNPAIR_DEVICE, index, &cp,
+-					sizeof(cp), unpair_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send unpair_device cmd\n");
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void keys_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data)
+-{
+-	if (status != 0) {
+-		fprintf(stderr, "Load keys failed with status 0x%02x (%s)\n",
+-						status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	printf("Keys successfully loaded\n");
+-
+-	exit(EXIT_SUCCESS);
+-}
+-
+-static void cmd_keys(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	struct mgmt_cp_load_link_keys cp;
+-
+-	if (index == MGMT_INDEX_NONE)
+-		index = 0;
+-
+-	memset(&cp, 0, sizeof(cp));
+-
+-	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_LOAD_LINK_KEYS, index,
+-				&cp, sizeof(cp), keys_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send load_keys cmd\n");
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void block_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data)
+-{
+-	struct mgmt_addr_info *rp = rsp;
+-	char addr[18];
+-
+-	if (len == 0 && status != 0) {
+-		fprintf(stderr, "%s failed, status 0x%02x (%s)\n",
+-				mgmt_opstr(op), status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (len != sizeof(*rp)) {
+-		fprintf(stderr, "Unexpected %s len %u\n", mgmt_opstr(op), len);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	ba2str(&rp->bdaddr, addr);
+-
+-	if (status != 0) {
+-		fprintf(stderr, "%s %s (%s) failed. status 0x%02x (%s)\n",
+-				mgmt_opstr(op), addr, typestr(rp->type),
+-				status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	printf("%s %s succeeded\n", mgmt_opstr(op), addr);
+-
+-	exit(EXIT_SUCCESS);
+-}
+-
+-static void block_usage(void)
+-{
+-	printf("Usage: btmgmt block [-t type] <remote address>\n");
+-}
+-
+-static struct option block_options[] = {
+-	{ "help",	0, 0, 'h' },
+-	{ "type",	1, 0, 't' },
+-	{ 0, 0, 0, 0 }
+-};
+-
+-static void cmd_block(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	struct mgmt_cp_block_device cp;
+-	uint8_t type = BDADDR_BREDR;
+-	int opt;
+-
+-	while ((opt = getopt_long(argc, argv, "+t:h", block_options,
+-							NULL)) != -1) {
+-		switch (opt) {
+-		case 't':
+-			type = strtol(optarg, NULL, 0);
+-			break;
+-		case 'h':
+-		default:
+-			block_usage();
+-			exit(EXIT_SUCCESS);
+-		}
+-	}
+-
+-	argc -= optind;
+-	argv += optind;
+-	optind = 0;
+-
+-	if (argc < 1) {
+-		block_usage();
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (index == MGMT_INDEX_NONE)
+-		index = 0;
+-
+-	memset(&cp, 0, sizeof(cp));
+-	str2ba(argv[0], &cp.addr.bdaddr);
+-	cp.addr.type = type;
+-
+-	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_BLOCK_DEVICE, index,
+-				&cp, sizeof(cp), block_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send block_device cmd\n");
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void unblock_usage(void)
+-{
+-	printf("Usage: btmgmt unblock [-t type] <remote address>\n");
+-}
+-
+-static void cmd_unblock(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	struct mgmt_cp_unblock_device cp;
+-	uint8_t type = BDADDR_BREDR;
+-	int opt;
+-
+-	while ((opt = getopt_long(argc, argv, "+t:h", block_options,
+-							NULL)) != -1) {
+-		switch (opt) {
+-		case 't':
+-			type = strtol(optarg, NULL, 0);
+-			break;
+-		case 'h':
+-		default:
+-			unblock_usage();
+-			exit(EXIT_SUCCESS);
+-		}
+-	}
+-
+-	argc -= optind;
+-	argv += optind;
+-	optind = 0;
+-
+-	if (argc < 1) {
+-		unblock_usage();
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (index == MGMT_INDEX_NONE)
+-		index = 0;
+-
+-	memset(&cp, 0, sizeof(cp));
+-	str2ba(argv[0], &cp.addr.bdaddr);
+-	cp.addr.type = type;
+-
+-	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_UNBLOCK_DEVICE, index,
+-				&cp, sizeof(cp), block_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send unblock_device cmd\n");
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void uuid_to_uuid128(uuid_t *uuid128, const uuid_t *uuid)
+-{
+-	if (uuid->type == SDP_UUID16)
+-		sdp_uuid16_to_uuid128(uuid128, uuid);
+-	else if (uuid->type == SDP_UUID32)
+-		sdp_uuid32_to_uuid128(uuid128, uuid);
+-	else
+-		memcpy(uuid128, uuid, sizeof(*uuid));
+-}
+-
+-static void cmd_add_uuid(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	struct mgmt_cp_add_uuid cp;
+-	uint128_t uint128;
+-	uuid_t uuid, uuid128;
+-
+-	if (argc < 3) {
+-		printf("UUID and service hint needed\n");
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (index == MGMT_INDEX_NONE)
+-		index = 0;
+-
+-	if (bt_string2uuid(&uuid, argv[1]) < 0) {
+-		printf("Invalid UUID: %s\n", argv[1]);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	memset(&cp, 0, sizeof(cp));
+-
+-	uuid_to_uuid128(&uuid128, &uuid);
+-	ntoh128((uint128_t *) uuid128.value.uuid128.data, &uint128);
+-	htob128(&uint128, (uint128_t *) cp.uuid);
+-
+-	cp.svc_hint = atoi(argv[2]);
+-
+-	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_ADD_UUID, index,
+-				&cp, sizeof(cp), class_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send add_uuid cmd\n");
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void cmd_remove_uuid(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	struct mgmt_cp_remove_uuid cp;
+-	uint128_t uint128;
+-	uuid_t uuid, uuid128;
+-
+-	if (argc < 2) {
+-		printf("UUID needed\n");
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (index == MGMT_INDEX_NONE)
+-		index = 0;
+-
+-	if (bt_string2uuid(&uuid, argv[1]) < 0) {
+-		printf("Invalid UUID: %s\n", argv[1]);
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	memset(&cp, 0, sizeof(cp));
+-
+-	uuid_to_uuid128(&uuid128, &uuid);
+-	ntoh128((uint128_t *) uuid128.value.uuid128.data, &uint128);
+-	htob128(&uint128, (uint128_t *) cp.uuid);
+-
+-	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_REMOVE_UUID, index,
+-				&cp, sizeof(cp), class_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send remove_uuid cmd\n");
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static void cmd_clr_uuids(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	char *uuid_any = "00000000-0000-0000-0000-000000000000";
+-	char *rm_argv[] = { "rm-uuid", uuid_any, NULL };
+-
+-	cmd_remove_uuid(mgmt_sk, index, 2, rm_argv);
+-}
+-
+-static void did_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
+-				void *rsp, uint16_t len, void *user_data)
+-{
+-	if (status != 0) {
+-		fprintf(stderr, "Set Device ID failed with status 0x%02x (%s)\n",
+-						status, mgmt_errstr(status));
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	printf("Device ID successfully set\n");
+-
+-	exit(EXIT_SUCCESS);
+-}
+-
+-static void did_usage(void)
+-{
+-	printf("Usage: btmgmt did <source>:<vendor>:<product>:<version>\n");
+-	printf("       possible source values: bluetooth, usb\n");
+-}
+-
+-static void cmd_did(int mgmt_sk, uint16_t index, int argc, char **argv)
+-{
+-	struct mgmt_cp_set_device_id cp;
+-	uint16_t vendor, product, version , source;
+-	int result;
+-
+-	if (argc < 2) {
+-		did_usage();
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	result = sscanf(argv[1], "bluetooth:%4hx:%4hx:%4hx", &vendor, &product,
+-								&version);
+-	if (result == 3) {
+-		source = 0x0001;
+-		goto done;
+-	}
+-
+-	result = sscanf(argv[1], "usb:%4hx:%4hx:%4hx", &vendor, &product,
+-								&version);
+-	if (result == 3) {
+-		source = 0x0002;
+-		goto done;
+-	}
+-
+-	did_usage();
+-	exit(EXIT_FAILURE);
+-
+-done:
+-	if (index == MGMT_INDEX_NONE)
+-		index = 0;
+-
+-	cp.source = htobs(source);
+-	cp.vendor = htobs(vendor);
+-	cp.product = htobs(product);
+-	cp.version = htobs(version);
+-
+-	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_SET_DEVICE_ID, index,
+-				&cp, sizeof(cp), did_rsp, NULL) < 0) {
+-		fprintf(stderr, "Unable to send set_dev_class cmd\n");
+-		exit(EXIT_FAILURE);
+-	}
+-}
+-
+-static struct {
+-	char *cmd;
+-	void (*func)(int mgmt_sk, uint16_t index, int argc, char **argv);
+-	char *doc;
+-} command[] = {
+-	{ "monitor",	cmd_monitor,	"Monitor events"		},
+-	{ "version",	cmd_version,	"Get the MGMT Version"		},
+-	{ "commands",	cmd_commands,	"List supported commands"	},
+-	{ "info",	cmd_info,	"Show controller info"		},
+-	{ "power",	cmd_power,	"Toggle powered state"		},
+-	{ "discov",	cmd_discov,	"Toggle discoverable state"	},
+-	{ "connectable",cmd_connectable,"Toggle connectable state"	},
+-	{ "pairable",	cmd_pairable,	"Toggle pairable state"		},
+-	{ "linksec",	cmd_linksec,	"Toggle link level security"	},
+-	{ "ssp",	cmd_ssp,	"Toggle SSP mode"		},
+-	{ "hs",		cmd_hs,		"Toggle HS Support"		},
+-	{ "le",		cmd_le,		"Toggle LE Support"		},
+-	{ "class",	cmd_class,	"Set device major/minor class"	},
+-	{ "disconnect", cmd_disconnect, "Disconnect device"		},
+-	{ "con",	cmd_con,	"List connections"		},
+-	{ "find",	cmd_find,	"Discover nearby devices"	},
+-	{ "name",	cmd_name,	"Set local name"		},
+-	{ "pair",	cmd_pair,	"Pair with a remote device"	},
+-	{ "unpair",	cmd_unpair,	"Unpair device"			},
+-	{ "keys",	cmd_keys,	"Load Keys"			},
+-	{ "block",	cmd_block,	"Block Device"			},
+-	{ "unblock",	cmd_unblock,	"Unblock Device"		},
+-	{ "add-uuid",	cmd_add_uuid,	"Add UUID"			},
+-	{ "rm-uuid",	cmd_add_uuid,	"Remove UUID"			},
+-	{ "clr-uuids",	cmd_clr_uuids,	"Clear UUIDs",			},
+-	{ "did",	cmd_did,	"Set Device ID",		},
+-	{ NULL, NULL, 0 }
+-};
+-
+-static void usage(void)
+-{
+-	int i;
+-
+-	printf("btmgmt ver %s\n", VERSION);
+-	printf("Usage:\n"
+-		"\tbtmgmt [options] <command> [command parameters]\n");
+-
+-	printf("Options:\n"
+-		"\t--index <id>\tSpecify adapter index\n"
+-		"\t--verbose\tEnable extra logging\n"
+-		"\t--help\tDisplay help\n");
+-
+-	printf("Commands:\n");
+-	for (i = 0; command[i].cmd; i++)
+-		printf("\t%-15s\t%s\n", command[i].cmd, command[i].doc);
+-
+-	printf("\n"
+-		"For more information on the usage of each command use:\n"
+-		"\tbtmgmt <command> --help\n" );
+-}
+-
+-static struct option main_options[] = {
+-	{ "index",	1, 0, 'i' },
+-	{ "verbose",	0, 0, 'v' },
+-	{ "help",	0, 0, 'h' },
+-	{ 0, 0, 0, 0 }
+-};
+-
+-int main(int argc, char *argv[])
+-{
+-	int opt, i, mgmt_sk;
+-	uint16_t index = MGMT_INDEX_NONE;
+-	struct pollfd pollfd;
+-
+-	while ((opt = getopt_long(argc, argv, "+hvi:",
+-						main_options, NULL)) != -1) {
+-		switch (opt) {
+-		case 'i':
+-			if (strlen(optarg) > 3 &&
+-					strncasecmp(optarg, "hci", 3) == 0)
+-				index = atoi(&optarg[4]);
+-			else
+-				index = atoi(optarg);
+-			break;
+-		case 'v':
+-			monitor = true;
+-			break;
+-		case 'h':
+-		default:
+-			usage();
+-			return 0;
+-		}
+-	}
+-
+-	argc -= optind;
+-	argv += optind;
+-	optind = 0;
+-
+-	if (argc < 1) {
+-		usage();
+-		return 0;
+-	}
+-
+-	mgmt_sk = mgmt_open();
+-	if (mgmt_sk < 0) {
+-		fprintf(stderr, "Unable to open mgmt socket\n");
+-		return -1;
+-	}
+-
+-	for (i = 0; command[i].cmd; i++) {
+-		if (strcmp(command[i].cmd, argv[0]) != 0)
+-			continue;
+-
+-		command[i].func(mgmt_sk, index, argc, argv);
+-		break;
+-	}
+-
+-	if (command[i].cmd == NULL) {
+-		fprintf(stderr, "Unknown command: %s\n", argv[0]);
+-		close(mgmt_sk);
+-		return -1;
+-	}
+-
+-	pollfd.fd = mgmt_sk;
+-	pollfd.events = POLLIN;
+-	pollfd.revents = 0;
+-
+-	while (poll(&pollfd, 1, -1) >= 0) {
+-		if (pollfd.revents & (POLLHUP | POLLERR | POLLNVAL))
+-			break;
+-
+-		if (pollfd.revents & POLLIN)
+-			mgmt_process_data(mgmt_sk);
+-
+-		pollfd.revents = 0;
+-	}
+-
+-	close(mgmt_sk);
+-
+-	return 0;
+-}
+diff --git a/tools/mgmt/main.c b/tools/mgmt/main.c
 new file mode 100644
-index 0000000..7d4517a
+index 0000000..b2d6c3c
 --- /dev/null
-+++ b/tools/emulator/btdev.c
-@@ -0,0 +1,1076 @@
++++ b/tools/mgmt/main.c
+@@ -0,0 +1,1933 @@
 +/*
-+ *
 + *  BlueZ - Bluetooth protocol stack for Linux
 + *
-+ *  Copyright (C) 2011-2012  Intel Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
++ *  Copyright (C) 2011  Intel Corporation. All rights reserved.
 + *
 + *  This program is free software; you can redistribute it and/or modify
 + *  it under the terms of the GNU General Public License as published by
@@ -1837,1687 +2031,1914 @@ index 0000000..7d4517a
 +#include <config.h>
 +#endif
 +
-+#include <stdio.h>
-+#include <ctype.h>
 +#include <stdlib.h>
-+#include <string.h>
-+
-+#include "bt.h"
-+#include "btdev.h"
-+
-+#define le16_to_cpu(val) (val)
-+#define cpu_to_le16(val) (val)
-+
-+struct btdev {
-+	struct btdev *conn;
-+
-+	btdev_send_func send_handler;
-+	void *send_data;
-+
-+        uint16_t manufacturer;
-+        uint8_t  version;
-+	uint16_t revision;
-+	uint8_t  commands[64];
-+	uint8_t  features[8];
-+	uint16_t acl_mtu;
-+	uint16_t acl_max_pkt;
-+	uint8_t  country_code;
-+	uint8_t  bdaddr[6];
-+	uint8_t  le_features[8];
-+	uint8_t  le_states[8];
-+
-+	uint16_t default_link_policy;
-+	uint8_t  event_mask[8];
-+	uint8_t  event_filter;
-+	uint8_t  name[248];
-+	uint8_t  dev_class[3];
-+	uint16_t voice_setting;
-+	uint16_t conn_accept_timeout;
-+	uint16_t page_timeout;
-+	uint8_t  scan_enable;
-+	uint8_t  auth_enable;
-+	uint8_t  inquiry_mode;
-+	uint8_t  afh_assess_mode;
-+	uint8_t  ext_inquiry_fec;
-+	uint8_t  ext_inquiry_rsp[240];
-+	uint8_t  simple_pairing_mode;
-+	uint8_t  le_supported;
-+	uint8_t  le_simultaneous;
-+	uint8_t  le_event_mask[8];
-+};
-+
-+#define MAX_BTDEV_ENTRIES 16
-+
-+static struct btdev *btdev_list[MAX_BTDEV_ENTRIES] = { };
-+
-+static inline int add_btdev(struct btdev *btdev)
-+{
-+	int i, index = -1;
-+
-+	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
-+		if (btdev_list[i] == NULL) {
-+			index = i;
-+			btdev_list[index] = btdev;
-+			break;
-+		}
-+	}
-+
-+	return index;
-+}
-+
-+static inline int del_btdev(struct btdev *btdev)
-+{
-+	int i, index = -1;
-+
-+	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
-+		if (btdev_list[i] == btdev) {
-+			index = i;
-+			btdev_list[index] = NULL;
-+			break;
-+		}
-+	}
-+
-+	return index;
-+}
-+
-+static inline struct btdev *find_btdev_by_bdaddr(const uint8_t *bdaddr)
-+{
-+	int i;
-+
-+	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
-+		if (btdev_list[i] && !memcmp(btdev_list[i]->bdaddr, bdaddr, 6))
-+			return btdev_list[i];
-+	}
-+
-+	return NULL;
-+}
-+
-+static void hexdump(const unsigned char *buf, uint16_t len)
-+{
-+	static const char hexdigits[] = "0123456789abcdef";
-+	char str[68];
-+	uint16_t i;
-+
-+	if (!len)
-+		return;
-+
-+	for (i = 0; i < len; i++) {
-+		str[((i % 16) * 3) + 0] = hexdigits[buf[i] >> 4];
-+		str[((i % 16) * 3) + 1] = hexdigits[buf[i] & 0xf];
-+		str[((i % 16) * 3) + 2] = ' ';
-+		str[(i % 16) + 49] = isprint(buf[i]) ? buf[i] : '.';
-+
-+		if ((i + 1) % 16 == 0) {
-+			str[47] = ' ';
-+			str[48] = ' ';
-+			str[65] = '\0';
-+			printf("%-12c%s\n", ' ', str);
-+			str[0] = ' ';
-+		}
-+	}
-+
-+	if (i % 16 > 0) {
-+		uint16_t j;
-+		for (j = (i % 16); j < 16; j++) {
-+			str[(j * 3) + 0] = ' ';
-+			str[(j * 3) + 1] = ' ';
-+			str[(j * 3) + 2] = ' ';
-+			str[j + 49] = ' ';
-+		}
-+		str[47] = ' ';
-+		str[48] = ' ';
-+		str[65] = '\0';
-+		printf("%-12c%s\n", ' ', str);
-+	}
-+}
-+
-+static void get_bdaddr(uint16_t id, uint8_t *bdaddr)
-+{
-+	bdaddr[0] = id & 0xff;
-+	bdaddr[1] = id >> 8;
-+	bdaddr[2] = 0x00;
-+	bdaddr[3] = 0x01;
-+	bdaddr[4] = 0xaa;
-+	bdaddr[5] = 0x00;
-+}
-+
-+struct btdev *btdev_create(uint16_t id)
-+{
-+	struct btdev *btdev;
-+
-+	btdev = malloc(sizeof(*btdev));
-+	if (!btdev)
-+		return NULL;
-+
-+	memset(btdev, 0, sizeof(*btdev));
-+
-+	btdev->manufacturer = 63;
-+	btdev->version = 0x06;
-+	btdev->revision = 0x0000;
-+
-+	btdev->features[0] |= 0x04;	/* Encryption */
-+	btdev->features[0] |= 0x20;	/* Role switch */
-+	btdev->features[0] |= 0x80;	/* Sniff mode */
-+	btdev->features[1] |= 0x08;	/* SCO link */
-+	btdev->features[3] |= 0x40;	/* RSSI with inquiry results */
-+	btdev->features[3] |= 0x80;	/* Extended SCO link */
-+	btdev->features[4] |= 0x08;	/* AFH capable slave */
-+	btdev->features[4] |= 0x10;	/* AFH classification slave */
-+	btdev->features[4] |= 0x40;	/* LE Supported */
-+	btdev->features[5] |= 0x02;	/* Sniff subrating */
-+	btdev->features[5] |= 0x04;	/* Pause encryption */
-+	btdev->features[5] |= 0x08;	/* AFH capable master */
-+	btdev->features[5] |= 0x10;	/* AFH classification master */
-+	btdev->features[6] |= 0x01;	/* Extended Inquiry Response */
-+	btdev->features[6] |= 0x02;	/* Simultaneous LE and BR/EDR */
-+	btdev->features[6] |= 0x08;	/* Secure Simple Pairing */
-+	btdev->features[6] |= 0x10;	/* Encapsulated PDU */
-+	btdev->features[6] |= 0x20;	/* Erroneous Data Reporting */
-+	btdev->features[6] |= 0x40;	/* Non-flushable Packet Boundary Flag */
-+	btdev->features[7] |= 0x01;	/* Link Supervision Timeout Event */
-+	btdev->features[7] |= 0x02;	/* Inquiry TX Power Level */
-+	btdev->features[7] |= 0x80;	/* Extended features */
-+
-+	btdev->acl_mtu = 192;
-+	btdev->acl_max_pkt = 1;
-+
-+	btdev->country_code = 0x00;
-+
-+	get_bdaddr(id, btdev->bdaddr);
-+
-+	add_btdev(btdev);
-+
-+	return btdev;
-+}
-+
-+void btdev_destroy(struct btdev *btdev)
-+{
-+	if (!btdev)
-+		return;
-+
-+	del_btdev(btdev);
-+
-+	free(btdev);
-+}
-+
-+void btdev_set_send_handler(struct btdev *btdev, btdev_send_func handler,
-+							void *user_data)
-+{
-+	if (!btdev)
-+		return;
-+
-+	btdev->send_handler = handler;
-+	btdev->send_data = user_data;
-+}
-+
-+static void send_packet(struct btdev *btdev, const void *data, uint16_t len)
-+{
-+	if (!btdev->send_handler)
-+		return;
-+
-+	btdev->send_handler(data, len, btdev->send_data);
-+}
-+
-+static void send_event(struct btdev *btdev, uint8_t event,
-+						const void *data, uint8_t len)
-+{
-+	struct bt_hci_evt_hdr *hdr;
-+	uint16_t pkt_len;
-+	void *pkt_data;
-+
-+	pkt_len = 1 + sizeof(*hdr) + len;
-+
-+	pkt_data = malloc(pkt_len);
-+	if (!pkt_data)
-+		return;
-+
-+	((uint8_t *) pkt_data)[0] = BT_H4_EVT_PKT;
-+
-+	hdr = pkt_data + 1;
-+	hdr->evt = event;
-+	hdr->plen = len;
-+
-+	if (len > 0)
-+		memcpy(pkt_data + 1 + sizeof(*hdr), data, len);
-+
-+	send_packet(btdev, pkt_data, pkt_len);
-+
-+	free(pkt_data);
-+}
-+
-+static void cmd_complete(struct btdev *btdev, uint16_t opcode,
-+						const void *data, uint8_t len)
-+{
-+	struct bt_hci_evt_hdr *hdr;
-+	struct bt_hci_evt_cmd_complete *cc;
-+	uint16_t pkt_len;
-+	void *pkt_data;
-+
-+	pkt_len = 1 + sizeof(*hdr) + sizeof(*cc) + len;
-+
-+	pkt_data = malloc(pkt_len);
-+	if (!pkt_data)
-+		return;
-+
-+	((uint8_t *) pkt_data)[0] = BT_H4_EVT_PKT;
-+
-+	hdr = pkt_data + 1;
-+	hdr->evt = BT_HCI_EVT_CMD_COMPLETE;
-+	hdr->plen = sizeof(*cc) + len;
-+
-+	cc = pkt_data + 1 + sizeof(*hdr);
-+	cc->ncmd = 0x01;
-+	cc->opcode = cpu_to_le16(opcode);
-+
-+	if (len > 0)
-+		memcpy(pkt_data + 1 + sizeof(*hdr) + sizeof(*cc), data, len);
-+
-+	send_packet(btdev, pkt_data, pkt_len);
-+
-+	free(pkt_data);
-+}
-+
-+static void cmd_status(struct btdev *btdev, uint8_t status, uint16_t opcode)
-+{
-+	struct bt_hci_evt_cmd_status cs;
-+
-+	cs.status = status;
-+	cs.ncmd = 0x01;
-+	cs.opcode = cpu_to_le16(opcode);
-+
-+	send_event(btdev, BT_HCI_EVT_CMD_STATUS, &cs, sizeof(cs));
-+}
-+
-+static void num_completed_packets(struct btdev *btdev)
-+{
-+	if (btdev->conn) {
-+		struct bt_hci_evt_num_completed_packets ncp;
-+
-+		ncp.num_handles = 1;
-+		ncp.handle = cpu_to_le16(42);
-+		ncp.count = cpu_to_le16(1);
-+
-+		send_event(btdev, BT_HCI_EVT_NUM_COMPLETED_PACKETS,
-+							&ncp, sizeof(ncp));
-+	}
-+}
-+
-+static void inquiry_complete(struct btdev *btdev, uint8_t status)
-+{
-+	struct bt_hci_evt_inquiry_complete ic;
-+	int i;
-+
-+	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
-+		if (!btdev_list[i] || btdev_list[i] == btdev)
-+			continue;
-+
-+		if (!(btdev_list[i]->scan_enable & 0x02))
-+			continue;
-+
-+		if (btdev->inquiry_mode == 0x02 &&
-+					btdev_list[i]->ext_inquiry_rsp[0]) {
-+			struct bt_hci_evt_ext_inquiry_result ir;
-+
-+			ir.num_resp = 0x01;
-+			memcpy(ir.bdaddr, btdev_list[i]->bdaddr, 6);
-+			memcpy(ir.dev_class, btdev_list[i]->dev_class, 3);
-+			ir.rssi = -60;
-+			memcpy(ir.data, btdev_list[i]->ext_inquiry_rsp, 240);
-+
-+			send_event(btdev, BT_HCI_EVT_EXT_INQUIRY_RESULT,
-+							&ir, sizeof(ir));
-+			continue;
-+		}
-+
-+		if (btdev->inquiry_mode > 0x00) {
-+			struct bt_hci_evt_inquiry_result_with_rssi ir;
-+
-+			ir.num_resp = 0x01;
-+			memcpy(ir.bdaddr, btdev_list[i]->bdaddr, 6);
-+			memcpy(ir.dev_class, btdev_list[i]->dev_class, 3);
-+			ir.rssi = -60;
-+
-+			send_event(btdev, BT_HCI_EVT_INQUIRY_RESULT_WITH_RSSI,
-+							&ir, sizeof(ir));
-+		} else {
-+			struct bt_hci_evt_inquiry_result ir;
-+
-+			ir.num_resp = 0x01;
-+			memcpy(ir.bdaddr, btdev_list[i]->bdaddr, 6);
-+			memcpy(ir.dev_class, btdev_list[i]->dev_class, 3);
-+
-+			send_event(btdev, BT_HCI_EVT_INQUIRY_RESULT,
-+							&ir, sizeof(ir));
-+		}
-+        }
-+
-+	ic.status = status;
-+
-+	send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
-+}
-+
-+static void conn_complete(struct btdev *btdev,
-+					const uint8_t *bdaddr, uint8_t status)
-+{
-+	struct bt_hci_evt_conn_complete cc;
-+
-+	if (!status) {
-+		struct btdev *remote = find_btdev_by_bdaddr(bdaddr);
-+
-+		btdev->conn = remote;
-+		remote->conn = btdev;
-+
-+		cc.status = status;
-+		memcpy(cc.bdaddr, btdev->bdaddr, 6);
-+		cc.encr_mode = 0x00;
-+
-+		cc.handle = cpu_to_le16(42);
-+		cc.link_type = 0x01;
-+
-+		send_event(remote, BT_HCI_EVT_CONN_COMPLETE, &cc, sizeof(cc));
-+
-+		cc.handle = cpu_to_le16(42);
-+		cc.link_type = 0x01;
-+	} else {
-+		cc.handle = cpu_to_le16(0x0000);
-+		cc.link_type = 0x01;
-+	}
-+
-+	cc.status = status;
-+	memcpy(cc.bdaddr, bdaddr, 6);
-+	cc.encr_mode = 0x00;
-+
-+	send_event(btdev, BT_HCI_EVT_CONN_COMPLETE, &cc, sizeof(cc));
-+}
-+
-+static void conn_request(struct btdev *btdev, const uint8_t *bdaddr)
-+{
-+	struct btdev *remote = find_btdev_by_bdaddr(bdaddr);
-+
-+	if (remote) {
-+		if (remote->scan_enable & 0x01) {
-+			struct bt_hci_evt_conn_request cr;
-+
-+			memcpy(cr.bdaddr, btdev->bdaddr, 6);
-+			memcpy(cr.dev_class, btdev->dev_class, 3);
-+			cr.link_type = 0x01;
-+
-+			send_event(remote, BT_HCI_EVT_CONN_REQUEST,
-+							&cr, sizeof(cr));
-+		} else
-+			conn_complete(btdev, bdaddr, BT_HCI_ERR_PAGE_TIMEOUT);
-+	} else
-+		conn_complete(btdev, bdaddr, BT_HCI_ERR_UNKNOWN_CONN_ID);
-+}
-+
-+static void disconnect_complete(struct btdev *btdev, uint16_t handle,
-+							uint8_t reason)
-+{
-+	struct bt_hci_evt_disconnect_complete dc;
-+	struct btdev *remote;
-+
-+	if (!btdev) {
-+		dc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
-+		dc.handle = cpu_to_le16(handle);
-+		dc.reason = 0x00;
-+
-+		send_event(btdev, BT_HCI_EVT_DISCONNECT_COMPLETE,
-+							&dc, sizeof(dc));
-+		return;
-+	}
-+
-+	dc.status = BT_HCI_ERR_SUCCESS;
-+	dc.handle = cpu_to_le16(handle);
-+	dc.reason = reason;
-+
-+	remote = btdev->conn;
-+
-+	btdev->conn = NULL;
-+	remote->conn = NULL;
-+
-+	send_event(btdev, BT_HCI_EVT_DISCONNECT_COMPLETE, &dc, sizeof(dc));
-+	send_event(remote, BT_HCI_EVT_DISCONNECT_COMPLETE, &dc, sizeof(dc));
-+}
-+
-+static void name_request_complete(struct btdev *btdev,
-+					const uint8_t *bdaddr, uint8_t status)
-+{
-+        struct bt_hci_evt_remote_name_req_complete nc;
-+
-+	nc.status = status;
-+	memcpy(nc.bdaddr, bdaddr, 6);
-+	memset(nc.name, 0, 248);
-+
-+	if (!status) {
-+		struct btdev *remote = find_btdev_by_bdaddr(bdaddr);
-+
-+		if (remote)
-+			memcpy(nc.name, remote->name, 248);
-+		else
-+			nc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
-+	}
-+
-+	send_event(btdev, BT_HCI_EVT_REMOTE_NAME_REQUEST_COMPLETE,
-+							&nc, sizeof(nc));
-+}
-+
-+static void remote_features_complete(struct btdev *btdev, uint16_t handle)
-+{
-+	struct bt_hci_evt_remote_features_complete rfc;
-+
-+	if (btdev->conn) {
-+		rfc.status = BT_HCI_ERR_SUCCESS;
-+		rfc.handle = cpu_to_le16(handle);
-+		memcpy(rfc.features, btdev->conn->features, 8);
-+	} else {
-+		rfc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
-+		rfc.handle = cpu_to_le16(handle);
-+		memset(rfc.features, 0, 8);
-+	}
-+
-+	send_event(btdev, BT_HCI_EVT_REMOTE_FEATURES_COMPLETE,
-+							&rfc, sizeof(rfc));
-+}
-+
-+static void remote_ext_features_complete(struct btdev *btdev, uint16_t handle,
-+								uint8_t page)
-+{
-+	struct bt_hci_evt_remote_ext_features_complete refc;
-+
-+	if (btdev->conn && page < 0x02) {
-+		refc.handle = cpu_to_le16(handle);
-+		refc.page = page;
-+		refc.max_page = 0x01;
-+
-+		switch (page) {
-+		case 0x00:
-+			refc.status = BT_HCI_ERR_SUCCESS;
-+			memcpy(refc.features, btdev->conn->features, 8);
-+			break;
-+		case 0x01:
-+			refc.status = BT_HCI_ERR_SUCCESS;
-+			memset(refc.features, 0, 8);
-+			break;
-+		default:
-+			refc.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+			memset(refc.features, 0, 8);
-+			break;
-+		}
-+	} else {
-+		refc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
-+		refc.handle = cpu_to_le16(handle);
-+		refc.page = page;
-+		refc.max_page = 0x01;
-+		memset(refc.features, 0, 8);
-+	}
-+
-+	send_event(btdev, BT_HCI_EVT_REMOTE_EXT_FEATURES_COMPLETE,
-+							&refc, sizeof(refc));
-+}
-+
-+static void remote_version_complete(struct btdev *btdev, uint16_t handle)
-+{
-+	struct bt_hci_evt_remote_version_complete rvc;
-+
-+	if (btdev->conn) {
-+		rvc.status = BT_HCI_ERR_SUCCESS;
-+		rvc.handle = cpu_to_le16(handle);
-+		rvc.lmp_ver = btdev->conn->version;
-+		rvc.manufacturer = cpu_to_le16(btdev->conn->manufacturer);
-+		rvc.lmp_subver = cpu_to_le16(btdev->conn->revision);
-+	} else {
-+		rvc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
-+		rvc.handle = cpu_to_le16(handle);
-+		rvc.lmp_ver = 0x00;
-+		rvc.manufacturer = cpu_to_le16(0);
-+		rvc.lmp_subver = cpu_to_le16(0);
-+	}
-+
-+	send_event(btdev, BT_HCI_EVT_REMOTE_VERSION_COMPLETE,
-+							&rvc, sizeof(rvc));
-+}
-+
-+static void process_cmd(struct btdev *btdev, const void *data, uint16_t len)
-+{
-+	const struct bt_hci_cmd_hdr *hdr = data;
-+	const struct bt_hci_cmd_create_conn *cc;
-+	const struct bt_hci_cmd_disconnect *dc;
-+	const struct bt_hci_cmd_create_conn_cancel *ccc;
-+	const struct bt_hci_cmd_accept_conn_request *acr;
-+	const struct bt_hci_cmd_reject_conn_request *rcr;
-+	const struct bt_hci_cmd_remote_name_request *rnr;
-+	const struct bt_hci_cmd_remote_name_request_cancel *rnrc;
-+	const struct bt_hci_cmd_read_remote_features *rrf;
-+	const struct bt_hci_cmd_read_remote_ext_features *rref;
-+	const struct bt_hci_cmd_read_remote_version *rrv;
-+	const struct bt_hci_cmd_write_default_link_policy *wdlp;
-+	const struct bt_hci_cmd_set_event_mask *sem;
-+	const struct bt_hci_cmd_set_event_filter *sef;
-+	const struct bt_hci_cmd_write_local_name *wln;
-+	const struct bt_hci_cmd_write_conn_accept_timeout *wcat;
-+	const struct bt_hci_cmd_write_page_timeout *wpt;
-+	const struct bt_hci_cmd_write_scan_enable *wse;
-+	const struct bt_hci_cmd_write_auth_enable *wae;
-+	const struct bt_hci_cmd_write_class_of_dev *wcod;
-+	const struct bt_hci_cmd_write_voice_setting *wvs;
-+	const struct bt_hci_cmd_write_inquiry_mode *wim;
-+	const struct bt_hci_cmd_write_afh_assess_mode *waam;
-+	const struct bt_hci_cmd_write_ext_inquiry_rsp *weir;
-+	const struct bt_hci_cmd_write_simple_pairing_mode *wspm;
-+	const struct bt_hci_cmd_write_le_host_supported *wlhs;
-+	const struct bt_hci_cmd_le_set_event_mask *lsem;
-+	struct bt_hci_rsp_read_default_link_policy rdlp;
-+	struct bt_hci_rsp_read_stored_link_key rslk;
-+	struct bt_hci_rsp_write_stored_link_key wslk;
-+	struct bt_hci_rsp_delete_stored_link_key dslk;
-+	struct bt_hci_rsp_read_local_name rln;
-+	struct bt_hci_rsp_read_conn_accept_timeout rcat;
-+	struct bt_hci_rsp_read_page_timeout rpt;
-+	struct bt_hci_rsp_read_scan_enable rse;
-+	struct bt_hci_rsp_read_auth_enable rae;
-+	struct bt_hci_rsp_read_class_of_dev rcod;
-+	struct bt_hci_rsp_read_voice_setting rvs;
-+	struct bt_hci_rsp_read_inquiry_mode rim;
-+	struct bt_hci_rsp_read_afh_assess_mode raam;
-+	struct bt_hci_rsp_read_ext_inquiry_rsp reir;
-+	struct bt_hci_rsp_read_simple_pairing_mode rspm;
-+	struct bt_hci_rsp_read_inquiry_rsp_tx_power rirtp;
-+	struct bt_hci_rsp_read_le_host_supported rlhs;
-+	struct bt_hci_rsp_read_local_version rlv;
-+	struct bt_hci_rsp_read_local_commands rlc;
-+	struct bt_hci_rsp_read_local_features rlf;
-+	struct bt_hci_rsp_read_local_ext_features rlef;
-+	struct bt_hci_rsp_read_buffer_size rbs;
-+	struct bt_hci_rsp_read_country_code rcc;
-+	struct bt_hci_rsp_read_bd_addr rba;
-+	struct bt_hci_rsp_read_data_block_size rdbs;
-+	struct bt_hci_rsp_le_read_buffer_size lrbs;
-+	struct bt_hci_rsp_le_read_local_features lrlf;
-+	struct bt_hci_rsp_le_read_supported_states lrss;
-+	uint16_t opcode;
-+	uint8_t status, page;
-+
-+	if (len < sizeof(*hdr))
-+		return;
-+
-+	opcode = le16_to_cpu(hdr->opcode);
-+
-+	switch (opcode) {
-+	case BT_HCI_CMD_INQUIRY:
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		inquiry_complete(btdev, BT_HCI_ERR_SUCCESS);
-+		break;
-+
-+	case BT_HCI_CMD_INQUIRY_CANCEL:
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_CREATE_CONN:
-+		cc = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		conn_request(btdev, cc->bdaddr);
-+		break;
-+
-+	case BT_HCI_CMD_DISCONNECT:
-+		dc = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		disconnect_complete(btdev, le16_to_cpu(dc->handle), dc->reason);
-+		break;
-+
-+	case BT_HCI_CMD_CREATE_CONN_CANCEL:
-+		ccc = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		conn_complete(btdev, ccc->bdaddr, BT_HCI_ERR_UNKNOWN_CONN_ID);
-+		break;
-+
-+	case BT_HCI_CMD_ACCEPT_CONN_REQUEST:
-+		acr = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		conn_complete(btdev, acr->bdaddr, BT_HCI_ERR_SUCCESS);
-+		break;
-+
-+	case BT_HCI_CMD_REJECT_CONN_REQUEST:
-+		rcr = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		conn_complete(btdev, rcr->bdaddr, BT_HCI_ERR_UNKNOWN_CONN_ID);
-+		break;
-+
-+	case BT_HCI_CMD_REMOTE_NAME_REQUEST:
-+		rnr = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		name_request_complete(btdev, rnr->bdaddr, BT_HCI_ERR_SUCCESS);
-+		break;
-+
-+	case BT_HCI_CMD_REMOTE_NAME_REQUEST_CANCEL:
-+		rnrc = data + sizeof(*hdr);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		name_request_complete(btdev, rnrc->bdaddr,
-+						BT_HCI_ERR_UNKNOWN_CONN_ID);
-+		break;
-+
-+	case BT_HCI_CMD_READ_REMOTE_FEATURES:
-+		rrf = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		remote_features_complete(btdev, le16_to_cpu(rrf->handle));
-+		break;
-+
-+	case BT_HCI_CMD_READ_REMOTE_EXT_FEATURES:
-+		rref = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		remote_ext_features_complete(btdev, le16_to_cpu(rref->handle),
-+								rref->page);
-+		break;
-+
-+	case BT_HCI_CMD_READ_REMOTE_VERSION:
-+		rrv = data + sizeof(*hdr);
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		remote_version_complete(btdev, le16_to_cpu(rrv->handle));
-+		break;
-+
-+	case BT_HCI_CMD_READ_DEFAULT_LINK_POLICY:
-+		rdlp.status = BT_HCI_ERR_SUCCESS;
-+		rdlp.policy = cpu_to_le16(btdev->default_link_policy);
-+		cmd_complete(btdev, opcode, &rdlp, sizeof(rdlp));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_DEFAULT_LINK_POLICY:
-+		wdlp = data + sizeof(*hdr);
-+		btdev->default_link_policy = le16_to_cpu(wdlp->policy);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_SET_EVENT_MASK:
-+		sem = data + sizeof(*hdr);
-+		memcpy(btdev->event_mask, sem->mask, 8);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_RESET:
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_SET_EVENT_FILTER:
-+		sef = data + sizeof(*hdr);
-+		btdev->event_filter = sef->type;
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_STORED_LINK_KEY:
-+		rslk.status = BT_HCI_ERR_SUCCESS;
-+		rslk.max_num_keys = cpu_to_le16(0);
-+		rslk.num_keys = cpu_to_le16(0);
-+		cmd_complete(btdev, opcode, &rslk, sizeof(rslk));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_STORED_LINK_KEY:
-+		wslk.status = BT_HCI_ERR_SUCCESS;
-+		wslk.num_keys = 0;
-+		cmd_complete(btdev, opcode, &wslk, sizeof(wslk));
-+		break;
-+
-+	case BT_HCI_CMD_DELETE_STORED_LINK_KEY:
-+		dslk.status = BT_HCI_ERR_SUCCESS;
-+		dslk.num_keys = cpu_to_le16(0);
-+		cmd_complete(btdev, opcode, &dslk, sizeof(dslk));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_LOCAL_NAME:
-+		wln = data + sizeof(*hdr);
-+		memcpy(btdev->name, wln->name, 248);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_LOCAL_NAME:
-+		rln.status = BT_HCI_ERR_SUCCESS;
-+		memcpy(rln.name, btdev->name, 248);
-+		cmd_complete(btdev, opcode, &rln, sizeof(rln));
-+		break;
-+
-+	case BT_HCI_CMD_READ_CONN_ACCEPT_TIMEOUT:
-+		rcat.status = BT_HCI_ERR_SUCCESS;
-+		rcat.timeout = cpu_to_le16(btdev->conn_accept_timeout);
-+		cmd_complete(btdev, opcode, &rcat, sizeof(rcat));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_CONN_ACCEPT_TIMEOUT:
-+		wcat = data + sizeof(*hdr);
-+		btdev->conn_accept_timeout = le16_to_cpu(wcat->timeout);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_PAGE_TIMEOUT:
-+		rpt.status = BT_HCI_ERR_SUCCESS;
-+		rpt.timeout = cpu_to_le16(btdev->page_timeout);
-+		cmd_complete(btdev, opcode, &rpt, sizeof(rpt));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_PAGE_TIMEOUT:
-+		wpt = data + sizeof(*hdr);
-+		btdev->page_timeout = le16_to_cpu(wpt->timeout);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_SCAN_ENABLE:
-+		rse.status = BT_HCI_ERR_SUCCESS;
-+		rse.enable = btdev->scan_enable;
-+		cmd_complete(btdev, opcode, &rse, sizeof(rse));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_SCAN_ENABLE:
-+		wse = data + sizeof(*hdr);
-+		btdev->scan_enable = wse->enable;
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_AUTH_ENABLE:
-+		rae.status = BT_HCI_ERR_SUCCESS;
-+		rae.enable = btdev->auth_enable;
-+		cmd_complete(btdev, opcode, &rae, sizeof(rae));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_AUTH_ENABLE:
-+		wae = data + sizeof(*hdr);
-+		btdev->auth_enable = wae->enable;
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_CLASS_OF_DEV:
-+		rcod.status = BT_HCI_ERR_SUCCESS;
-+		memcpy(rcod.dev_class, btdev->dev_class, 3);
-+		cmd_complete(btdev, opcode, &rcod, sizeof(rcod));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_CLASS_OF_DEV:
-+		wcod = data + sizeof(*hdr);
-+		memcpy(btdev->dev_class, wcod->dev_class, 3);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_VOICE_SETTING:
-+		rvs.status = BT_HCI_ERR_SUCCESS;
-+		rvs.setting = cpu_to_le16(btdev->voice_setting);
-+		cmd_complete(btdev, opcode, &rvs, sizeof(rvs));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_VOICE_SETTING:
-+		wvs = data + sizeof(*hdr);
-+		btdev->voice_setting = le16_to_cpu(wvs->setting);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_INQUIRY_MODE:
-+		rim.status = BT_HCI_ERR_SUCCESS;
-+		rim.mode = btdev->inquiry_mode;
-+		cmd_complete(btdev, opcode, &rim, sizeof(rim));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_INQUIRY_MODE:
-+		wim = data + sizeof(*hdr);
-+		btdev->inquiry_mode = wim->mode;
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_AFH_ASSESS_MODE:
-+		raam.status = BT_HCI_ERR_SUCCESS;
-+		raam.mode = btdev->afh_assess_mode;
-+		cmd_complete(btdev, opcode, &raam, sizeof(raam));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_AFH_ASSESS_MODE:
-+		waam = data + sizeof(*hdr);
-+		btdev->afh_assess_mode = waam->mode;
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_EXT_INQUIRY_RSP:
-+		reir.status = BT_HCI_ERR_SUCCESS;
-+		reir.fec = btdev->ext_inquiry_fec;
-+		memcpy(reir.data, btdev->ext_inquiry_rsp, 240);
-+		cmd_complete(btdev, opcode, &reir, sizeof(reir));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_EXT_INQUIRY_RSP:
-+		weir = data + sizeof(*hdr);
-+		btdev->ext_inquiry_fec = weir->fec;
-+		memcpy(btdev->ext_inquiry_rsp, weir->data, 240);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_SIMPLE_PAIRING_MODE:
-+		rspm.status = BT_HCI_ERR_SUCCESS;
-+		rspm.mode = btdev->simple_pairing_mode;
-+		cmd_complete(btdev, opcode, &rspm, sizeof(rspm));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_SIMPLE_PAIRING_MODE:
-+		wspm = data + sizeof(*hdr);
-+		btdev->simple_pairing_mode = wspm->mode;
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_INQUIRY_RSP_TX_POWER:
-+		rirtp.status = BT_HCI_ERR_SUCCESS;
-+		rirtp.level = 0;
-+		cmd_complete(btdev, opcode, &rirtp, sizeof(rirtp));
-+		break;
-+
-+	case BT_HCI_CMD_READ_LE_HOST_SUPPORTED:
-+		rlhs.status = BT_HCI_ERR_SUCCESS;
-+		rlhs.supported = btdev->le_supported;
-+		rlhs.simultaneous = btdev->le_simultaneous;
-+		cmd_complete(btdev, opcode, &rlhs, sizeof(rlhs));
-+		break;
-+
-+	case BT_HCI_CMD_WRITE_LE_HOST_SUPPORTED:
-+		wlhs = data + sizeof(*hdr);
-+		btdev->le_supported = wlhs->supported;
-+		btdev->le_simultaneous = wlhs->simultaneous;
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_READ_LOCAL_VERSION:
-+		rlv.status = BT_HCI_ERR_SUCCESS;
-+		rlv.hci_ver = btdev->version;
-+		rlv.hci_rev = cpu_to_le16(btdev->revision);
-+		rlv.lmp_ver = btdev->version;
-+		rlv.manufacturer = cpu_to_le16(btdev->manufacturer);
-+		rlv.lmp_subver = cpu_to_le16(btdev->revision);
-+		cmd_complete(btdev, opcode, &rlv, sizeof(rlv));
-+		break;
-+
-+	case BT_HCI_CMD_READ_LOCAL_COMMANDS:
-+		rlc.status = BT_HCI_ERR_SUCCESS;
-+		memcpy(rlc.commands, btdev->commands, 64);
-+		cmd_complete(btdev, opcode, &rlc, sizeof(rlc));
-+		break;
-+
-+	case BT_HCI_CMD_READ_LOCAL_FEATURES:
-+		rlf.status = BT_HCI_ERR_SUCCESS;
-+		memcpy(rlf.features, btdev->features, 8);
-+		cmd_complete(btdev, opcode, &rlf, sizeof(rlf));
-+		break;
-+
-+	case BT_HCI_CMD_READ_LOCAL_EXT_FEATURES:
-+		page = ((const uint8_t *) data)[sizeof(*hdr)];
-+		switch (page) {
-+		case 0x00:
-+			rlef.status = BT_HCI_ERR_SUCCESS;
-+			rlef.page = 0x00;
-+			rlef.max_page = 0x01;
-+			memcpy(rlef.features, btdev->features, 8);
-+			break;
-+		case 0x01:
-+			rlef.status = BT_HCI_ERR_SUCCESS;
-+			rlef.page = 0x01;
-+			rlef.max_page = 0x01;
-+			memset(rlef.features, 0, 8);
-+			if (btdev->simple_pairing_mode)
-+				rlef.features[0] |= 0x01;
-+			if (btdev->le_supported)
-+				rlef.features[0] |= 0x02;
-+			if (btdev->le_simultaneous)
-+				rlef.features[0] |= 0x04;
-+			break;
-+		default:
-+			rlef.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+			rlef.page = page;
-+			rlef.max_page = 0x01;
-+			memset(rlef.features, 0, 8);
-+			break;
-+		}
-+		cmd_complete(btdev, opcode, &rlef, sizeof(rlef));
-+		break;
-+
-+	case BT_HCI_CMD_READ_BUFFER_SIZE:
-+		rbs.status = BT_HCI_ERR_SUCCESS;
-+		rbs.acl_mtu = cpu_to_le16(btdev->acl_mtu);
-+		rbs.sco_mtu = 0;
-+		rbs.acl_max_pkt = cpu_to_le16(btdev->acl_max_pkt);
-+		rbs.sco_max_pkt = cpu_to_le16(0);
-+		cmd_complete(btdev, opcode, &rbs, sizeof(rbs));
-+		break;
-+
-+	case BT_HCI_CMD_READ_COUNTRY_CODE:
-+		rcc.status = BT_HCI_ERR_SUCCESS;
-+		rcc.code = btdev->country_code;
-+		cmd_complete(btdev, opcode, &rcc, sizeof(rcc));
-+		break;
-+
-+	case BT_HCI_CMD_READ_BD_ADDR:
-+		rba.status = BT_HCI_ERR_SUCCESS;
-+		memcpy(rba.bdaddr, btdev->bdaddr, 6);
-+		cmd_complete(btdev, opcode, &rba, sizeof(rba));
-+		break;
-+
-+	case BT_HCI_CMD_READ_DATA_BLOCK_SIZE:
-+		rdbs.status = BT_HCI_ERR_SUCCESS;
-+		rdbs.max_acl_len = cpu_to_le16(btdev->acl_mtu);
-+		rdbs.block_len = cpu_to_le16(btdev->acl_mtu);
-+		rdbs.num_blocks = cpu_to_le16(btdev->acl_max_pkt);
-+		cmd_complete(btdev, opcode, &rdbs, sizeof(rdbs));
-+		break;
-+
-+	case BT_HCI_CMD_LE_SET_EVENT_MASK:
-+		lsem = data + sizeof(*hdr);
-+		memcpy(btdev->le_event_mask, lsem->mask, 8);
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_LE_READ_BUFFER_SIZE:
-+		lrbs.status = BT_HCI_ERR_SUCCESS;
-+		lrbs.le_mtu = cpu_to_le16(btdev->acl_mtu);
-+		lrbs.le_max_pkt = btdev->acl_max_pkt;
-+		cmd_complete(btdev, opcode, &lrbs, sizeof(lrbs));
-+		break;
-+
-+	case BT_HCI_CMD_LE_READ_LOCAL_FEATURES:
-+		lrlf.status = BT_HCI_ERR_SUCCESS;
-+		memcpy(lrlf.features, btdev->le_features, 8);
-+		cmd_complete(btdev, opcode, &lrlf, sizeof(lrlf));
-+		break;
-+
-+	case BT_HCI_CMD_LE_SET_SCAN_PARAMETERS:
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_LE_SET_SCAN_ENABLE:
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_LE_READ_SUPPORTED_STATES:
-+		lrss.status = BT_HCI_ERR_SUCCESS;
-+		memcpy(lrss.states, btdev->le_states, 8);
-+		cmd_complete(btdev, opcode, &lrss, sizeof(lrss));
-+		break;
-+
-+	default:
-+		printf("Unsupported command 0x%4.4x\n", opcode);
-+		hexdump(data, len);
-+		cmd_status(btdev, BT_HCI_ERR_UNKNOWN_COMMAND, opcode);
-+		break;
-+	}
-+}
-+
-+void btdev_receive_h4(struct btdev *btdev, const void *data, uint16_t len)
-+{
-+	uint8_t pkt_type;
-+
-+	if (!btdev)
-+		return;
-+
-+	if (len < 1)
-+		return;
-+
-+	pkt_type = ((const uint8_t *) data)[0];
-+
-+	switch (pkt_type) {
-+	case BT_H4_CMD_PKT:
-+		process_cmd(btdev, data + 1, len - 1);
-+		break;
-+	case BT_H4_ACL_PKT:
-+		if (btdev->conn)
-+			send_packet(btdev->conn, data, len);
-+		num_completed_packets(btdev);
-+		break;
-+	default:
-+		printf("Unsupported packet 0x%2.2x\n", pkt_type);
-+		break;
-+	}
-+}
-diff --git a/tools/emulator/btdev.h b/tools/emulator/btdev.h
-new file mode 100644
-index 0000000..7b211a2
---- /dev/null
-+++ b/tools/emulator/btdev.h
-@@ -0,0 +1,38 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011-2012  Intel Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <stdint.h>
-+
-+typedef void (*btdev_send_func) (const void *data, uint16_t len,
-+							void *user_data);
-+
-+struct btdev;
-+
-+struct btdev *btdev_create(uint16_t id);
-+void btdev_destroy(struct btdev *btdev);
-+
-+void btdev_set_send_handler(struct btdev *btdev, btdev_send_func handler,
-+							void *user_data);
-+
-+void btdev_receive_h4(struct btdev *btdev, const void *data, uint16_t len);
-diff --git a/tools/emulator/main.c b/tools/emulator/main.c
-new file mode 100644
-index 0000000..125460d
---- /dev/null
-+++ b/tools/emulator/main.c
-@@ -0,0 +1,73 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011-2012  Intel Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
 +#include <stdio.h>
-+
-+#include "mainloop.h"
-+#include "server.h"
-+#include "vhci.h"
-+
-+static void signal_callback(int signum, void *user_data)
-+{
-+	switch (signum) {
-+	case SIGINT:
-+	case SIGTERM:
-+		mainloop_quit();
-+		break;
-+	}
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct vhci *vhci;
-+	struct server *server;
-+	sigset_t mask;
-+
-+	mainloop_init();
-+
-+	sigemptyset(&mask);
-+	sigaddset(&mask, SIGINT);
-+	sigaddset(&mask, SIGTERM);
-+
-+	mainloop_set_signal(&mask, signal_callback, NULL, NULL);
-+
-+	vhci = vhci_open(VHCI_TYPE_BREDR, 0x23);
-+	if (!vhci) {
-+		fprintf(stderr, "Failed to open Virtual HCI device\n");
-+		return 1;
-+	}
-+
-+	server = server_open_unix("/tmp/bt-server-bredr", 0x42);
-+	if (!server) {
-+		fprintf(stderr, "Failed to open server channel\n");
-+		vhci_close(vhci);
-+		return 1;
-+	}
-+
-+	return mainloop_run();
-+}
-diff --git a/tools/emulator/server.c b/tools/emulator/server.c
-new file mode 100644
-index 0000000..1ff9904
---- /dev/null
-+++ b/tools/emulator/server.c
-@@ -0,0 +1,288 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011-2012  Intel Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <errno.h>
-+#include <ctype.h>
 +#include <unistd.h>
-+#include <stdlib.h>
++#include <errno.h>
 +#include <string.h>
-+#include <sys/epoll.h>
-+#include <sys/ioctl.h>
++#include <sys/types.h>
 +#include <sys/socket.h>
-+#include <sys/un.h>
++#include <poll.h>
++#include <getopt.h>
++#include <stdbool.h>
 +
 +#include <bluetooth/bluetooth.h>
 +#include <bluetooth/hci.h>
++#include <bluetooth/hci_lib.h>
++#include <bluetooth/sdp.h>
++#include <bluetooth/sdp_lib.h>
++#include <bluetooth/mgmt.h>
 +
-+#include "mainloop.h"
-+#include "btdev.h"
-+#include "server.h"
++#include <glib.h>
++#include "glib-helper.h"
 +
-+struct server {
++static bool monitor = false;
++static bool discovery = false;
++static bool resolve_names = true;
++
++typedef void (*cmd_cb)(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data);
++
++static struct pending_cmd {
++	uint16_t op;
 +	uint16_t id;
-+	int fd;
-+};
++	cmd_cb cb;
++	void *user_data;
++	struct pending_cmd *next;
++} *pending = NULL;
 +
-+struct client {
-+	int fd;
-+	struct btdev *btdev;
-+	uint8_t *pkt_data;
-+	uint8_t pkt_type;
-+	uint16_t pkt_expect;
-+	uint16_t pkt_len;
-+	uint16_t pkt_offset;
-+};
-+
-+static void server_destroy(void *user_data)
++static int mgmt_send_cmd(int mgmt_sk, uint16_t op, uint16_t id, void *data,
++				size_t len, cmd_cb func, void *user_data)
 +{
-+	struct server *server = user_data;
++	char buf[1024];
++	struct pending_cmd *cmd;
++	struct mgmt_hdr *hdr = (void *) buf;
 +
-+	close(server->fd);
++	if (len + MGMT_HDR_SIZE > sizeof(buf))
++		return -EINVAL;
 +
-+	free(server);
-+}
++	cmd = calloc(1, sizeof(struct pending_cmd));
++	if (cmd == NULL)
++		return -errno;
 +
-+static void client_destroy(void *user_data)
-+{
-+	struct client *client = user_data;
++	cmd->op = op;
++	cmd->id = id;
++	cmd->cb = func;
++	cmd->user_data = user_data;
 +
-+	btdev_destroy(client->btdev);
++	memset(buf, 0, sizeof(buf));
++	hdr->opcode = htobs(op);
++	hdr->index = htobs(id);
++	hdr->len = htobs(len);
++	memcpy(buf + MGMT_HDR_SIZE, data, len);
 +
-+	close(client->fd);
-+
-+	free(client);
-+}
-+
-+static void client_write_callback(const void *data, uint16_t len,
-+							void *user_data)
-+{
-+	struct client *client = user_data;
-+	ssize_t written;
-+
-+	written = send(client->fd, data, len, MSG_DONTWAIT);
-+	if (written < 0)
-+		return;
-+}
-+
-+static void client_read_callback(int fd, uint32_t events, void *user_data)
-+{
-+	struct client *client = user_data;
-+	static uint8_t buf[4096];
-+	uint8_t *ptr = buf;
-+	ssize_t len;
-+	uint16_t count;
-+
-+	if (events & (EPOLLERR | EPOLLHUP))
-+		return;
-+
-+again:
-+	len = recv(fd, buf + client->pkt_offset,
-+			sizeof(buf) - client->pkt_offset, MSG_DONTWAIT);
-+	if (len < 0) {
-+		if (errno == EAGAIN)
-+			goto again;
-+		return;
-+	}
-+
-+	count = client->pkt_offset + len;
-+
-+	while (count > 0) {
-+		hci_command_hdr *cmd_hdr;
-+
-+		if (!client->pkt_data) {
-+			client->pkt_type = ptr[0];
-+
-+			switch (client->pkt_type) {
-+			case HCI_COMMAND_PKT:
-+				if (count < HCI_COMMAND_HDR_SIZE + 1) {
-+					client->pkt_offset += len;
-+					return;
-+				}
-+				cmd_hdr = (hci_command_hdr *) (ptr + 1);
-+				client->pkt_expect = HCI_COMMAND_HDR_SIZE +
-+							cmd_hdr->plen + 1;
-+				client->pkt_data = malloc(client->pkt_expect);
-+				client->pkt_len = 0;
-+				break;
-+			default:
-+				printf("packet error\n");
-+				return;
-+			}
-+
-+			client->pkt_offset = 0;
-+		}
-+
-+		if (count >= client->pkt_expect) {
-+			memcpy(client->pkt_data + client->pkt_len,
-+						ptr, client->pkt_expect);
-+			ptr += client->pkt_expect;
-+			count -= client->pkt_expect;
-+
-+			btdev_receive_h4(client->btdev, client->pkt_data,
-+					client->pkt_len + client->pkt_expect);
-+
-+			free(client->pkt_data);
-+			client->pkt_data = NULL;
-+		} else {
-+			memcpy(client->pkt_data + client->pkt_len, ptr, count);
-+			client->pkt_len += count;
-+			client->pkt_expect -= count;
-+			count = 0;
-+		}
-+	}
-+}
-+
-+static int accept_client(int fd)
-+{
-+	struct sockaddr_un addr;
-+	socklen_t len;
-+	int nfd;
-+
-+	memset(&addr, 0, sizeof(addr));
-+	len = sizeof(addr);
-+
-+	if (getsockname(fd, (struct sockaddr *) &addr, &len) < 0) {
-+		perror("Failed to get socket name");
++	if (write(mgmt_sk, buf, MGMT_HDR_SIZE + len) < 0) {
++		fprintf(stderr, "Unable to write to socket: %s\n",
++							strerror(errno));
++		free(cmd);
 +		return -1;
 +	}
 +
-+	printf("Request for %s\n", addr.sun_path);
++	cmd->next = pending;
++	pending = cmd;
 +
-+	nfd = accept(fd, (struct sockaddr *) &addr, &len);
-+	if (nfd < 0) {
-+		perror("Failed to accept client socket");
-+		return -1;
-+	}
-+
-+	return nfd;
++	return 0;
 +}
 +
-+static void server_accept_callback(int fd, uint32_t events, void *user_data)
++static int mgmt_open(void)
 +{
-+	struct server *server = user_data;
-+	struct client *client;
++	struct sockaddr_hci addr;
++	int sk;
 +
-+	if (events & (EPOLLERR | EPOLLHUP))
-+		return;
-+
-+	client = malloc(sizeof(*client));
-+	if (!client)
-+		return;
-+
-+	memset(client, 0, sizeof(*client));
-+
-+	client->fd = accept_client(server->fd);
-+	if (client->fd < 0) {
-+		free(client);
-+		return;
-+	}
-+
-+	client->btdev = btdev_create(server->id);
-+	if (!client->btdev) {
-+		close(client->fd);
-+		free(client);
-+		return;
-+	}
-+
-+	btdev_set_send_handler(client->btdev, client_write_callback, client);
-+
-+	if (mainloop_add_fd(client->fd, EPOLLIN, client_read_callback,
-+						client, client_destroy) < 0) {
-+		btdev_destroy(client->btdev);
-+		close(client->fd);
-+		free(client);
-+	}
-+}
-+
-+static int open_server(const char *path)
-+{
-+	struct sockaddr_un addr;
-+	int fd;
-+
-+	unlink(path);
-+
-+	fd = socket(PF_UNIX, SOCK_STREAM, 0);
-+	if (fd < 0) {
-+		perror("Failed to open server socket");
-+		return -1;
++	sk = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
++	if (sk < 0) {
++		fprintf(stderr, "socket: %s\n", strerror(errno));
++		return sk;
 +	}
 +
 +	memset(&addr, 0, sizeof(addr));
-+	addr.sun_family = AF_UNIX;
-+	strcpy(addr.sun_path, path);
++	addr.hci_family = AF_BLUETOOTH;
++	addr.hci_dev = HCI_DEV_NONE;
++	addr.hci_channel = HCI_CHANNEL_CONTROL;
 +
-+	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-+		perror("Failed to bind server socket");
-+		close(fd);
++	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
++		fprintf(stderr, "bind: %s\n", strerror(errno));
++		close(sk);
 +		return -1;
 +	}
 +
-+	if (listen(fd, 5) < 0) {
-+		perror("Failed to listen server socket");
-+		close(fd);
-+		return -1;
-+	}
-+
-+	return fd;
++	return sk;
 +}
 +
-+struct server *server_open_unix(const char *path, uint16_t id)
++static void mgmt_check_pending(int mgmt_sk, uint16_t op, uint16_t index,
++				uint16_t status, void *data, uint16_t len)
 +{
-+	struct server *server;
++	struct pending_cmd *c, *prev;
 +
-+	server = malloc(sizeof(*server));
-+	if (!server)
-+		return NULL;
++	for (c = pending, prev = NULL; c != NULL; prev = c, c = c->next) {
++		if (c->op != op)
++			continue;
++		if (c->id != index)
++			continue;
 +
-+	memset(server, 0, sizeof(*server));
-+	server->id = id;
++		if (c == pending)
++			pending = c->next;
++		else
++			prev->next = c->next;
 +
-+	server->fd = open_server(path);
-+	if (server->fd < 0) {
-+		free(server);
-+		return NULL;
-+	}
++		c->cb(mgmt_sk, op, index, status, data, len, c->user_data);
 +
-+	if (mainloop_add_fd(server->fd, EPOLLIN, server_accept_callback,
-+						server, server_destroy) < 0) {
-+		close(server->fd);
-+		free(server);
-+		return NULL;
-+	}
-+
-+	return server;
-+}
-+
-+void server_close(struct server *server)
-+{
-+	if (!server)
-+		return;
-+
-+	mainloop_remove_fd(server->fd);
-+}
-diff --git a/tools/emulator/server.h b/tools/emulator/server.h
-new file mode 100644
-index 0000000..836db5f
---- /dev/null
-+++ b/tools/emulator/server.h
-@@ -0,0 +1,30 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011-2012  Intel Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <stdint.h>
-+
-+struct server;
-+
-+struct server *server_open_unix(const char *path, uint16_t id);
-+void server_close(struct server *server);
-diff --git a/tools/emulator/vhci.c b/tools/emulator/vhci.c
-new file mode 100644
-index 0000000..940e562
---- /dev/null
-+++ b/tools/emulator/vhci.c
-@@ -0,0 +1,133 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011-2012  Intel Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <string.h>
-+
-+#include "mainloop.h"
-+#include "btdev.h"
-+#include "vhci.h"
-+
-+struct vhci {
-+	enum vhci_type type;
-+	int fd;
-+	struct btdev *btdev;
-+};
-+
-+static void vhci_destroy(void *user_data)
-+{
-+	struct vhci *vhci = user_data;
-+
-+	btdev_destroy(vhci->btdev);
-+
-+	close(vhci->fd);
-+
-+	free(vhci);
-+}
-+
-+static void vhci_write_callback(const void *data, uint16_t len, void *user_data)
-+{
-+	struct vhci *vhci = user_data;
-+	ssize_t written;
-+
-+	written = write(vhci->fd, data, len);
-+	if (written < 0)
-+		return;
-+}
-+
-+static void vhci_read_callback(int fd, uint32_t events, void *user_data)
-+{
-+	struct vhci *vhci = user_data;
-+	unsigned char buf[4096];
-+	ssize_t len;
-+
-+	if (events & (EPOLLERR | EPOLLHUP))
-+		return;
-+
-+	len = read(vhci->fd, buf, sizeof(buf));
-+	if (len < 0)
-+		return;
-+
-+	btdev_receive_h4(vhci->btdev, buf, len);
-+}
-+
-+struct vhci *vhci_open(enum vhci_type type, uint16_t id)
-+{
-+	struct vhci *vhci;
-+
-+	switch (type) {
-+	case VHCI_TYPE_BREDR:
++		free(c);
 +		break;
-+	case VHCI_TYPE_AMP:
-+		return NULL;
 +	}
-+
-+	vhci = malloc(sizeof(*vhci));
-+	if (!vhci)
-+		return NULL;
-+
-+	memset(vhci, 0, sizeof(*vhci));
-+	vhci->type = type;
-+
-+	vhci->fd = open("/dev/vhci", O_RDWR | O_NONBLOCK);
-+	if (vhci->fd < 0) {
-+		free(vhci);
-+		return NULL;
-+	}
-+
-+	vhci->btdev = btdev_create(id);
-+	if (!vhci->btdev) {
-+		close(vhci->fd);
-+		free(vhci);
-+		return NULL;
-+	}
-+
-+	btdev_set_send_handler(vhci->btdev, vhci_write_callback, vhci);
-+
-+	if (mainloop_add_fd(vhci->fd, EPOLLIN, vhci_read_callback,
-+						vhci, vhci_destroy) < 0) {
-+		btdev_destroy(vhci->btdev);
-+		close(vhci->fd);
-+		free(vhci);
-+		return NULL;
-+	}
-+
-+	return vhci;
 +}
 +
-+void vhci_close(struct vhci *vhci)
++static int mgmt_cmd_complete(int mgmt_sk, uint16_t index,
++				struct mgmt_ev_cmd_complete *ev, uint16_t len)
 +{
-+	if (!vhci)
-+		return;
++	uint16_t op;
 +
-+	mainloop_remove_fd(vhci->fd);
++	if (len < sizeof(*ev)) {
++		fprintf(stderr, "Too short (%u bytes) cmd complete event\n",
++									len);
++		return -EINVAL;
++	}
++
++	op = bt_get_le16(&ev->opcode);
++
++	len -= sizeof(*ev);
++
++	if (monitor)
++		printf("%s complete, opcode 0x%04x len %u\n", mgmt_opstr(op),
++								op, len);
++
++	mgmt_check_pending(mgmt_sk, op, index, ev->status, ev->data, len);
++
++	return 0;
 +}
-diff --git a/tools/emulator/vhci.h b/tools/emulator/vhci.h
-new file mode 100644
-index 0000000..4abb183
---- /dev/null
-+++ b/tools/emulator/vhci.h
-@@ -0,0 +1,35 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011-2012  Intel Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
 +
-+#include <stdint.h>
++static int mgmt_cmd_status(int mgmt_sk, uint16_t index,
++				struct mgmt_ev_cmd_status *ev, uint16_t len)
++{
++	uint16_t opcode;
 +
-+enum vhci_type {
-+	VHCI_TYPE_BREDR	= 0,
-+	VHCI_TYPE_AMP	= 1,
++	if (len < sizeof(*ev)) {
++		fprintf(stderr, "Too short (%u bytes) cmd status event\n",
++									len);
++		return -EINVAL;
++	}
++
++	opcode = bt_get_le16(&ev->opcode);
++
++	if (monitor)
++		printf("cmd status, opcode 0x%04x status 0x%02x (%s)\n",
++				opcode, ev->status, mgmt_errstr(ev->status));
++
++	if (ev->status != 0)
++		mgmt_check_pending(mgmt_sk, opcode, index, ev->status,
++								NULL, 0);
++
++	return 0;
++}
++
++static int mgmt_controller_error(uint16_t index,
++					struct mgmt_ev_controller_error *ev,
++					uint16_t len)
++{
++	if (len < sizeof(*ev)) {
++		fprintf(stderr,
++			"Too short (%u bytes) controller error event\n", len);
++		return -EINVAL;
++	}
++
++	if (monitor)
++		printf("hci%u error 0x%02x\n", index, ev->error_code);
++
++	return 0;
++}
++
++static int mgmt_index_added(int mgmt_sk, uint16_t index)
++{
++	if (monitor)
++		printf("hci%u added\n", index);
++	return 0;
++}
++
++static int mgmt_index_removed(int mgmt_sk, uint16_t index)
++{
++	if (monitor)
++		printf("hci%u removed\n", index);
++	return 0;
++}
++
++static const char *settings_str[] = {
++				"powered",
++				"connectable",
++				"fast-connectable",
++				"discoverable",
++				"pairable",
++				"link-security",
++				"ssp",
++				"br/edr",
++				"hs",
++				"le" ,
 +};
 +
-+struct vhci;
++static void print_settings(uint32_t settings)
++{
++	unsigned i;
 +
-+struct vhci *vhci_open(enum vhci_type type, uint16_t id);
-+void vhci_close(struct vhci *vhci);
++	for (i = 0; i < NELEM(settings_str); i++) {
++		if ((settings & (1 << i)) != 0)
++			printf("%s ", settings_str[i]);
++	}
++}
++
++static int mgmt_new_settings(int mgmt_sk, uint16_t index,
++					uint32_t *ev, uint16_t len)
++{
++	if (len < sizeof(*ev)) {
++		fprintf(stderr, "Too short new_settings event (%u)\n", len);
++		return -EINVAL;
++	}
++
++	if (monitor) {
++		printf("hci%u new_settings: ", index);
++		print_settings(bt_get_le32(ev));
++		printf("\n");
++	}
++
++	return 0;
++}
++
++static int mgmt_discovering(int mgmt_sk, uint16_t index,
++				struct mgmt_ev_discovering *ev, uint16_t len)
++{
++	if (len < sizeof(*ev)) {
++		fprintf(stderr, "Too short (%u bytes) discovering event\n",
++									len);
++		return -EINVAL;
++	}
++
++	if (ev->discovering == 0 && discovery)
++		exit(EXIT_SUCCESS);
++
++	if (monitor)
++		printf("hci%u type %u discovering %s\n", index,
++				ev->type, ev->discovering ? "on" : "off");
++
++	return 0;
++}
++
++static int mgmt_new_link_key(int mgmt_sk, uint16_t index,
++				struct mgmt_ev_new_link_key *ev, uint16_t len)
++{
++
++	if (len != sizeof(*ev)) {
++		fprintf(stderr, "Invalid new_link_key length (%u bytes)\n",
++									len);
++		return -EINVAL;
++	}
++
++	if (monitor) {
++		char addr[18];
++		ba2str(&ev->key.addr.bdaddr, addr);
++		printf("hci%u new_link_key %s type 0x%02x pin_len %d "
++				"store_hint %u\n", index, addr, ev->key.type,
++				ev->key.pin_len, ev->store_hint);
++	}
++
++	return 0;
++}
++
++static const char *typestr(uint8_t type)
++{
++	const char *str[] = { "BR/EDR", "LE Public", "LE Random" };
++
++	if (type <= BDADDR_LE_RANDOM)
++		return str[type];
++
++	return "(unknown)";
++}
++
++static int mgmt_connected(int mgmt_sk, uint16_t index,
++					struct mgmt_ev_device_connected *ev,
++					uint16_t len)
++{
++	uint16_t eir_len;
++
++	if (len < sizeof(*ev)) {
++		fprintf(stderr,
++			"Invalid connected event length (%u bytes)\n", len);
++		return -EINVAL;
++	}
++
++	eir_len = bt_get_le16(&ev->eir_len);
++	if (len != sizeof(*ev) + eir_len) {
++		fprintf(stderr, "Invalid connected event length "
++			"(%u bytes, eir_len %u bytes)\n", len, eir_len);
++		return -EINVAL;
++	}
++
++	if (monitor) {
++		char addr[18];
++		ba2str(&ev->addr.bdaddr, addr);
++		printf("hci%u %s type %s connected eir_len %u\n", index, addr,
++					typestr(ev->addr.type), eir_len);
++	}
++
++	return 0;
++}
++
++static int mgmt_disconnected(int mgmt_sk, uint16_t index,
++				struct mgmt_addr_info *ev, uint16_t len)
++{
++	if (len != sizeof(*ev)) {
++		fprintf(stderr,
++			"Invalid disconnected event length (%u bytes)\n", len);
++		return -EINVAL;
++	}
++
++	if (monitor) {
++		char addr[18];
++		ba2str(&ev->bdaddr, addr);
++		printf("hci%u %s type %s disconnected\n", index, addr,
++							typestr(ev->type));
++	}
++
++	return 0;
++}
++
++static int mgmt_conn_failed(int mgmt_sk, uint16_t index,
++				struct mgmt_ev_connect_failed *ev,
++				uint16_t len)
++{
++	if (len != sizeof(*ev)) {
++		fprintf(stderr,
++			"Invalid connect_failed event length (%u bytes)\n", len);
++		return -EINVAL;
++	}
++
++	if (monitor) {
++		char addr[18];
++		ba2str(&ev->addr.bdaddr, addr);
++		printf("hci%u %s type %s connect failed (status 0x%02x, %s)\n",
++				index, addr, typestr(ev->addr.type), ev->status,
++				mgmt_errstr(ev->status));
++	}
++
++	return 0;
++}
++
++static int mgmt_auth_failed(int mgmt_sk, uint16_t index,
++				struct mgmt_ev_auth_failed *ev,
++				uint16_t len)
++{
++	if (len != sizeof(*ev)) {
++		fprintf(stderr,
++			"Invalid auth_failed event length (%u bytes)\n", len);
++		return -EINVAL;
++	}
++
++	if (monitor) {
++		char addr[18];
++		ba2str(&ev->addr.bdaddr, addr);
++		printf("hci%u %s auth failed with status 0x%02x (%s)\n",
++			index, addr, ev->status, mgmt_errstr(ev->status));
++	}
++
++	return 0;
++}
++
++static int mgmt_name_changed(int mgmt_sk, uint16_t index,
++				struct mgmt_ev_local_name_changed *ev,
++				uint16_t len)
++{
++	if (len != sizeof(*ev)) {
++		fprintf(stderr,
++			"Invalid local_name_changed length (%u bytes)\n", len);
++		return -EINVAL;
++	}
++
++	if (monitor)
++		printf("hci%u name changed: %s\n", index, ev->name);
++
++	return 0;
++}
++
++static void confirm_name_rsp(int mgmt_sk, uint16_t op, uint16_t id,
++				uint8_t status, void *rsp, uint16_t len,
++				void *user_data)
++{
++	struct mgmt_rp_confirm_name *rp = rsp;
++	char addr[18];
++
++	if (len == 0 && status != 0) {
++		fprintf(stderr,
++			"hci%u confirm_name failed with status 0x%02x (%s)\n",
++					id, status, mgmt_errstr(status));
++		return;
++	}
++
++	if (len != sizeof(*rp)) {
++		fprintf(stderr,
++			"hci%u confirm_name rsp length %u instead of %zu\n",
++			id, len, sizeof(*rp));
++		return;
++	}
++
++	ba2str(&rp->addr.bdaddr, addr);
++
++	if (status != 0)
++		fprintf(stderr,
++			"hci%u confirm_name for %s failed: 0x%02x (%s)\n",
++			id, addr, status, mgmt_errstr(status));
++	else
++		printf("hci%u confirm_name succeeded for %s\n", id, addr);
++}
++
++static int mgmt_device_found(int mgmt_sk, uint16_t index,
++				struct mgmt_ev_device_found *ev, uint16_t len)
++{
++	uint32_t flags;
++	uint16_t eir_len;
++
++	if (len < sizeof(*ev)) {
++		fprintf(stderr,
++			"Too short device_found length (%u bytes)\n", len);
++		return -EINVAL;
++	}
++
++	flags = btohs(ev->flags);
++
++	eir_len = bt_get_le16(&ev->eir_len);
++	if (len != sizeof(*ev) + eir_len) {
++		fprintf(stderr, "dev_found: expected %zu bytes, got %u bytes",
++						sizeof(*ev) + eir_len, len);
++		return -EINVAL;
++	}
++
++	if (monitor || discovery) {
++		char addr[18];
++		ba2str(&ev->addr.bdaddr, addr);
++		printf("hci%u dev_found: %s type %s rssi %d "
++			"flags 0x%04x eir_len %u\n", index, addr,
++			typestr(ev->addr.type), ev->rssi, flags, eir_len);
++	}
++
++	if (discovery && (flags & MGMT_DEV_FOUND_CONFIRM_NAME)) {
++		struct mgmt_cp_confirm_name cp;
++
++		memset(&cp, 0, sizeof(cp));
++		memcpy(&cp.addr, &ev->addr, sizeof(cp.addr));
++		if (resolve_names)
++			cp.name_known = 0;
++		else
++			cp.name_known = 1;
++
++		mgmt_send_cmd(mgmt_sk, MGMT_OP_CONFIRM_NAME, index,
++					&cp, sizeof(cp), confirm_name_rsp,
++					NULL);
++	}
++
++	return 0;
++}
++
++static void pin_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	if (status != 0) {
++		fprintf(stderr,
++			"hci%u PIN Code reply failed with status 0x%02x (%s)",
++					id, status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	printf("hci%u PIN Reply successful\n", id);
++}
++
++static int mgmt_pin_reply(int mgmt_sk, uint16_t index,
++						struct mgmt_addr_info *addr,
++						const char *pin, size_t len)
++{
++	struct mgmt_cp_pin_code_reply cp;
++
++	memset(&cp, 0, sizeof(cp));
++	memcpy(&cp.addr, addr, sizeof(cp.addr));
++	cp.pin_len = len;
++	memcpy(cp.pin_code, pin, len);
++
++	return mgmt_send_cmd(mgmt_sk, MGMT_OP_PIN_CODE_REPLY, index,
++					&cp, sizeof(cp), pin_rsp, NULL);
++}
++
++static void pin_neg_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	if (status != 0) {
++		fprintf(stderr,
++			"hci%u PIN Neg reply failed with status 0x%02x (%s)",
++					id, status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	printf("hci%u PIN Negative Reply successful\n", id);
++}
++
++static int mgmt_pin_neg_reply(int mgmt_sk, uint16_t index,
++						struct mgmt_addr_info *addr)
++{
++	struct mgmt_cp_pin_code_neg_reply cp;
++
++	memset(&cp, 0, sizeof(cp));
++	memcpy(&cp.addr, addr, sizeof(cp.addr));
++
++	return mgmt_send_cmd(mgmt_sk, MGMT_OP_PIN_CODE_NEG_REPLY, index,
++					&cp, sizeof(cp), pin_neg_rsp, NULL);
++}
++
++static int mgmt_request_pin(int mgmt_sk, uint16_t index,
++				struct mgmt_ev_pin_code_request *ev,
++				uint16_t len)
++{
++	char pin[18];
++	size_t pin_len;
++
++	if (len != sizeof(*ev)) {
++		fprintf(stderr,
++			"Invalid pin_code request length (%u bytes)\n", len);
++		return -EINVAL;
++	}
++
++	if (monitor) {
++		char addr[18];
++		ba2str(&ev->addr.bdaddr, addr);
++		printf("hci%u %s request PIN\n", index, addr);
++	}
++
++	printf("PIN Request (press enter to reject) >> ");
++	fflush(stdout);
++
++	memset(pin, 0, sizeof(pin));
++
++	if (fgets(pin, sizeof(pin), stdin) == NULL || pin[0] == '\n')
++		return mgmt_pin_neg_reply(mgmt_sk, index, &ev->addr);
++
++	pin_len = strlen(pin);
++	if (pin[pin_len - 1] == '\n') {
++		pin[pin_len - 1] = '\0';
++		pin_len--;
++	}
++
++	return mgmt_pin_reply(mgmt_sk, index, &ev->addr, pin, pin_len);
++}
++
++static void confirm_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	if (status != 0) {
++		fprintf(stderr,
++			"hci%u User Confirm reply failed. status 0x%02x (%s)",
++					id, status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	printf("hci%u User Confirm Reply successful\n", id);
++}
++
++static int mgmt_confirm_reply(int mgmt_sk, uint16_t index, bdaddr_t *bdaddr)
++{
++	struct mgmt_cp_user_confirm_reply cp;
++
++	memset(&cp, 0, sizeof(cp));
++	bacpy(&cp.addr.bdaddr, bdaddr);
++
++	return mgmt_send_cmd(mgmt_sk, MGMT_OP_USER_CONFIRM_REPLY, index,
++					&cp, sizeof(cp), confirm_rsp, NULL);
++}
++
++static void confirm_neg_rsp(int mgmt_sk, uint16_t op, uint16_t id,
++				uint8_t status, void *rsp, uint16_t len,
++				void *user_data)
++{
++	if (status != 0) {
++		fprintf(stderr,
++			"hci%u Confirm Neg reply failed. status 0x%02x (%s)",
++					id, status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	printf("hci%u User Confirm Negative Reply successful\n", id);
++}
++
++static int mgmt_confirm_neg_reply(int mgmt_sk, uint16_t index,
++							bdaddr_t *bdaddr)
++{
++	struct mgmt_cp_user_confirm_reply cp;
++
++	memset(&cp, 0, sizeof(cp));
++	bacpy(&cp.addr.bdaddr, bdaddr);
++
++	return mgmt_send_cmd(mgmt_sk, MGMT_OP_USER_CONFIRM_NEG_REPLY, index,
++				&cp, sizeof(cp), confirm_neg_rsp, NULL);
++}
++
++
++static int mgmt_user_confirm(int mgmt_sk, uint16_t index,
++				struct mgmt_ev_user_confirm_request *ev,
++				uint16_t len)
++{
++	char rsp[5];
++	size_t rsp_len;
++	uint32_t val;
++	char addr[18];
++
++	if (len != sizeof(*ev)) {
++		fprintf(stderr,
++			"Invalid user_confirm request length (%u)\n", len);
++		return -EINVAL;
++	}
++
++	ba2str(&ev->addr.bdaddr, addr);
++	val = bt_get_le32(&ev->value);
++
++	if (monitor)
++		printf("hci%u %s User Confirm %06u hint %u\n", index, addr,
++							val, ev->confirm_hint);
++
++	if (ev->confirm_hint)
++		printf("Accept pairing with %s (yes/no) >> ", addr);
++	else
++		printf("Confirm value %06u for %s (yes/no) >> ", val, addr);
++
++	fflush(stdout);
++
++	memset(rsp, 0, sizeof(rsp));
++
++	if (fgets(rsp, sizeof(rsp), stdin) == NULL || rsp[0] == '\n')
++		return mgmt_confirm_neg_reply(mgmt_sk, index, &ev->addr.bdaddr);
++
++	rsp_len = strlen(rsp);
++	if (rsp[rsp_len - 1] == '\n') {
++		rsp[rsp_len - 1] = '\0';
++		rsp_len--;
++	}
++
++	if (rsp[0] == 'y' || rsp[0] == 'Y')
++		return mgmt_confirm_reply(mgmt_sk, index, &ev->addr.bdaddr);
++	else
++		return mgmt_confirm_neg_reply(mgmt_sk, index, &ev->addr.bdaddr);
++}
++
++static int mgmt_handle_event(int mgmt_sk, uint16_t ev, uint16_t index,
++						void *data, uint16_t len)
++{
++	if (monitor)
++		printf("event: %s\n", mgmt_evstr(ev));
++
++	switch (ev) {
++	case MGMT_EV_CMD_COMPLETE:
++		return mgmt_cmd_complete(mgmt_sk, index, data, len);
++	case MGMT_EV_CMD_STATUS:
++		return mgmt_cmd_status(mgmt_sk, index, data, len);
++	case MGMT_EV_CONTROLLER_ERROR:
++		return mgmt_controller_error(index, data, len);
++	case MGMT_EV_INDEX_ADDED:
++		return mgmt_index_added(mgmt_sk, index);
++	case MGMT_EV_INDEX_REMOVED:
++		return mgmt_index_removed(mgmt_sk, index);
++	case MGMT_EV_NEW_SETTINGS:
++		return mgmt_new_settings(mgmt_sk, index, data, len);
++	case MGMT_EV_DISCOVERING:
++		return mgmt_discovering(mgmt_sk, index, data, len);
++	case MGMT_EV_NEW_LINK_KEY:
++		return mgmt_new_link_key(mgmt_sk, index, data, len);
++	case MGMT_EV_DEVICE_CONNECTED:
++		return mgmt_connected(mgmt_sk, index, data, len);
++	case MGMT_EV_DEVICE_DISCONNECTED:
++		return mgmt_disconnected(mgmt_sk, index, data, len);
++	case MGMT_EV_CONNECT_FAILED:
++		return mgmt_conn_failed(mgmt_sk, index, data, len);
++	case MGMT_EV_AUTH_FAILED:
++		return mgmt_auth_failed(mgmt_sk, index, data, len);
++	case MGMT_EV_LOCAL_NAME_CHANGED:
++		return mgmt_name_changed(mgmt_sk, index, data, len);
++	case MGMT_EV_DEVICE_FOUND:
++		return mgmt_device_found(mgmt_sk, index, data, len);
++	case MGMT_EV_PIN_CODE_REQUEST:
++		return mgmt_request_pin(mgmt_sk, index, data, len);
++	case MGMT_EV_USER_CONFIRM_REQUEST:
++		return mgmt_user_confirm(mgmt_sk, index, data, len);
++	default:
++		if (monitor)
++			printf("Unhandled event 0x%04x (%s)\n", ev, mgmt_evstr(ev));
++		return 0;
++	}
++}
++
++static int mgmt_process_data(int mgmt_sk)
++{
++	char buf[1024];
++	struct mgmt_hdr *hdr = (void *) buf;
++	uint16_t len, ev, index;
++	ssize_t ret;
++
++	ret = read(mgmt_sk, buf, sizeof(buf));
++	if (ret < 0) {
++		fprintf(stderr, "read: %s\n", strerror(errno));
++		return ret;
++	}
++
++	if (ret < MGMT_HDR_SIZE) {
++		fprintf(stderr, "Too small mgmt packet (%zd bytes)\n", ret);
++		return 0;
++	}
++
++	ev = bt_get_le16(&hdr->opcode);
++	index = bt_get_le16(&hdr->index);
++	len = bt_get_le16(&hdr->len);
++
++	if (monitor)
++		printf("event 0x%04x len 0x%04x index 0x%04x\n", ev, len, index);
++
++	if (ret != MGMT_HDR_SIZE + len) {
++		fprintf(stderr, "Packet length mismatch. ret %zd len %u",
++								ret, len);
++		return 0;
++	}
++
++	mgmt_handle_event(mgmt_sk, ev, index, buf + MGMT_HDR_SIZE, len);
++
++	return 0;
++}
++
++static void cmd_monitor(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	printf("Monitoring mgmt events...\n");
++	monitor = true;
++}
++
++static void version_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	struct mgmt_rp_read_version *rp = rsp;
++
++	if (status != 0) {
++		fprintf(stderr, "Reading mgmt version failed with status"
++			" 0x%02x (%s)\n", status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	if (len < sizeof(*rp)) {
++		fprintf(stderr, "Too small version reply (%u bytes)\n", len);
++		exit(EXIT_FAILURE);
++	}
++
++	printf("MGMT Version %u, revision %u\n", rp->version,
++						bt_get_le16(&rp->revision));
++
++	exit(EXIT_SUCCESS);
++}
++
++static void cmd_version(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_READ_VERSION, MGMT_INDEX_NONE,
++					NULL, 0, version_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send read_version cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void commands_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	struct mgmt_rp_read_commands *rp = rsp;
++	uint16_t num_commands, num_events, *opcode;
++	size_t expected_len;
++	int i;
++
++	if (status != 0) {
++		fprintf(stderr, "Reading supported commands failed with status"
++			" 0x%02x (%s)\n", status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	if (len < sizeof(*rp)) {
++		fprintf(stderr, "Too small commands reply (%u bytes)\n", len);
++		exit(EXIT_FAILURE);
++	}
++
++	num_commands = bt_get_le16(&rp->num_commands);
++	num_events = bt_get_le16(&rp->num_events);
++
++	expected_len = sizeof(*rp) + num_commands * sizeof(uint16_t) +
++						num_events * sizeof(uint16_t);
++
++	if (len < expected_len) {
++		fprintf(stderr, "Too small commands reply (%u != %zu)\n",
++							len, expected_len);
++		exit(EXIT_FAILURE);
++	}
++
++	opcode = rp->opcodes;
++
++	printf("%u commands:\n", num_commands);
++	for (i = 0; i < num_commands; i++) {
++		uint16_t op = bt_get_le16(opcode++);
++		printf("\t%s (0x%04x)\n", mgmt_opstr(op), op);
++	}
++
++	printf("%u events:\n", num_events);
++	for (i = 0; i < num_events; i++) {
++		uint16_t ev = bt_get_le16(opcode++);
++		printf("\t%s (0x%04x)\n", mgmt_evstr(ev), ev);
++	}
++
++	exit(EXIT_SUCCESS);
++}
++
++static void cmd_commands(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_READ_COMMANDS, MGMT_INDEX_NONE,
++					NULL, 0, commands_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send read_commands cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void info_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	struct mgmt_rp_read_info *rp = rsp;
++	char addr[18];
++
++	if (status != 0) {
++		fprintf(stderr,
++			"Reading hci%u info failed with status 0x%02x (%s)\n",
++					id, status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	if (len < sizeof(*rp)) {
++		fprintf(stderr, "Too small info reply (%u bytes)\n", len);
++		exit(EXIT_FAILURE);
++	}
++
++	ba2str(&rp->bdaddr, addr);
++	printf("hci%u:\taddr %s version %u manufacturer %u"
++			" class 0x%02x%02x%02x\n",
++			id, addr, rp->version, bt_get_le16(&rp->manufacturer),
++			rp->dev_class[2], rp->dev_class[1], rp->dev_class[0]);
++
++	printf("\tsupported settings: ");
++	print_settings(bt_get_le32(&rp->supported_settings));
++
++	printf("\n\tcurrent settings: ");
++	print_settings(bt_get_le32(&rp->current_settings));
++
++	printf("\n\tname %s\n", rp->name);
++	printf("\tshort name %s\n", rp->short_name);
++
++	if (pending == NULL)
++		exit(EXIT_SUCCESS);
++}
++
++static void index_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	struct mgmt_rp_read_index_list *rp = rsp;
++	uint16_t count;
++	unsigned int i;
++
++	if (status != 0) {
++		fprintf(stderr,
++			"Reading index list failed with status 0x%02x (%s)\n",
++						status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	if (len < sizeof(*rp)) {
++		fprintf(stderr, "Too small index list reply (%u bytes)\n",
++									len);
++		exit(EXIT_FAILURE);
++	}
++
++	count = bt_get_le16(&rp->num_controllers);
++
++	if (len < sizeof(*rp) + count * sizeof(uint16_t)) {
++		fprintf(stderr,
++			"Index count (%u) doesn't match reply length (%u)\n",
++								count, len);
++		exit(EXIT_FAILURE);
++	}
++
++	if (monitor)
++		printf("Index list with %u item%s\n",
++						count, count > 1 ? "s" : "");
++
++	if (count == 0)
++		exit(EXIT_SUCCESS);
++
++	if (monitor && count > 0)
++		printf("\t");
++
++	for (i = 0; i < count; i++) {
++		uint16_t index;
++
++		index = bt_get_le16(&rp->index[i]);
++
++		if (monitor)
++			printf("hci%u ", index);
++
++		if (mgmt_send_cmd(mgmt_sk, MGMT_OP_READ_INFO, index, NULL,
++					0, info_rsp, NULL) < 0) {
++			fprintf(stderr, "Unable to send read_info cmd\n");
++			exit(EXIT_FAILURE);
++		}
++	}
++
++	if (monitor && count > 0)
++		printf("\n");
++}
++
++static void cmd_info(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	if (index == MGMT_INDEX_NONE) {
++		if (mgmt_send_cmd(mgmt_sk, MGMT_OP_READ_INDEX_LIST,
++					MGMT_INDEX_NONE, NULL, 0,
++					index_rsp, NULL) < 0) {
++			fprintf(stderr, "Unable to send index_list cmd\n");
++			exit(EXIT_FAILURE);
++		}
++
++		return;
++	}
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_READ_INFO, index, NULL,
++						0, info_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send read_info cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void setting_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	uint32_t *rp = rsp;
++
++	if (status != 0) {
++		fprintf(stderr,
++			"%s for hci%u failed with status 0x%02x (%s)\n",
++			mgmt_opstr(op), id, status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	if (len < sizeof(*rp)) {
++		fprintf(stderr, "Too small %s response (%u bytes)\n",
++							mgmt_opstr(op), len);
++		exit(EXIT_FAILURE);
++	}
++
++	printf("hci%u %s complete, settings: ", id, mgmt_opstr(op));
++	print_settings(bt_get_le32(rp));
++	printf("\n");
++
++	exit(EXIT_SUCCESS);
++}
++
++static void cmd_setting(int mgmt_sk, uint16_t index, uint16_t op,
++							int argc, char **argv)
++{
++	uint8_t val;
++
++	if (argc < 2) {
++		printf("Specify \"on\" or \"off\"\n");
++		exit(EXIT_FAILURE);
++	}
++
++	if (strcasecmp(argv[1], "on") == 0 || strcasecmp(argv[1], "yes") == 0)
++		val = 1;
++	else if (strcasecmp(argv[1], "off") == 0)
++		val = 0;
++	else
++		val = atoi(argv[1]);
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	if (mgmt_send_cmd(mgmt_sk, op, index, &val, sizeof(val),
++						setting_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send %s cmd\n", mgmt_opstr(op));
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void cmd_power(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	cmd_setting(mgmt_sk, index, MGMT_OP_SET_POWERED, argc, argv);
++}
++
++static void cmd_discov(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	struct mgmt_cp_set_discoverable cp;
++
++	if (argc < 2) {
++		printf("Usage: btmgmt %s <yes/no> [timeout]\n", argv[0]);
++		exit(EXIT_FAILURE);
++	}
++
++	memset(&cp, 0, sizeof(cp));
++
++	if (strcasecmp(argv[1], "on") == 0 || strcasecmp(argv[1], "yes") == 0)
++		cp.val = 1;
++	else if (strcasecmp(argv[1], "off") == 0)
++		cp.val = 0;
++	else
++		cp.val = atoi(argv[1]);
++
++	if (argc > 2)
++		cp.timeout = htobs(atoi(argv[2]));
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_SET_DISCOVERABLE, index,
++				&cp, sizeof(cp), setting_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send set_discoverable cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void cmd_connectable(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	cmd_setting(mgmt_sk, index, MGMT_OP_SET_CONNECTABLE, argc, argv);
++}
++
++static void cmd_pairable(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	cmd_setting(mgmt_sk, index, MGMT_OP_SET_PAIRABLE, argc, argv);
++}
++
++static void cmd_linksec(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	cmd_setting(mgmt_sk, index, MGMT_OP_SET_LINK_SECURITY, argc, argv);
++}
++
++static void cmd_ssp(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	cmd_setting(mgmt_sk, index, MGMT_OP_SET_SSP, argc, argv);
++}
++
++static void cmd_hs(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	cmd_setting(mgmt_sk, index, MGMT_OP_SET_HS, argc, argv);
++}
++
++static void cmd_le(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	cmd_setting(mgmt_sk, index, MGMT_OP_SET_LE, argc, argv);
++}
++
++static void class_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	struct mgmt_ev_class_of_dev_changed *rp = rsp;
++
++	if (len == 0 && status != 0) {
++		fprintf(stderr, "%s failed, status 0x%02x (%s)\n",
++				mgmt_opstr(op), status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	if (len != sizeof(*rp)) {
++		fprintf(stderr, "Unexpected %s len %u\n", mgmt_opstr(op), len);
++		exit(EXIT_FAILURE);
++	}
++
++	printf("%s succeeded. Class 0x%02x%02x%02x\n", mgmt_opstr(op),
++		rp->class_of_dev[2], rp->class_of_dev[1], rp->class_of_dev[0]);
++
++	exit(EXIT_SUCCESS);
++}
++
++static void cmd_class(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	uint8_t class[2];
++
++	if (argc < 3) {
++		printf("Usage: btmgmt %s <major> <minor>\n", argv[0]);
++		exit(EXIT_FAILURE);
++	}
++
++	class[0] = atoi(argv[1]);
++	class[1] = atoi(argv[2]);
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_SET_DEV_CLASS, index,
++				class, sizeof(class), class_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send set_dev_class cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void disconnect_rsp(int mgmt_sk, uint16_t op, uint16_t id,
++				uint8_t status, void *rsp, uint16_t len,
++				void *user_data)
++{
++	struct mgmt_rp_disconnect *rp = rsp;
++	char addr[18];
++
++	if (len == 0 && status != 0) {
++		fprintf(stderr, "Disconnect failed with status 0x%02x (%s)\n",
++						status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	if (len != sizeof(*rp)) {
++		fprintf(stderr, "Invalid disconnect response length (%u)\n",
++									len);
++		exit(EXIT_FAILURE);
++	}
++
++	ba2str(&rp->addr.bdaddr, addr);
++
++	if (status == 0) {
++		printf("%s disconnected\n", addr);
++		exit(EXIT_SUCCESS);
++	} else {
++		fprintf(stderr,
++			"Disconnecting %s failed with status 0x%02x (%s)\n",
++				addr, status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void cmd_disconnect(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	struct mgmt_cp_disconnect cp;
++
++	if (argc < 2) {
++		printf("Usage: btmgmt %s <address>\n", argv[0]);
++		exit(EXIT_FAILURE);
++	}
++
++	str2ba(argv[1], &cp.addr.bdaddr);
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_DISCONNECT, index,
++				&cp, sizeof(cp), disconnect_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send disconnect cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void con_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	struct mgmt_rp_get_connections *rp = rsp;
++	uint16_t count, i;
++
++	if (len < sizeof(*rp)) {
++		fprintf(stderr, "Too small (%u bytes) get_connections rsp\n",
++									len);
++		exit(EXIT_FAILURE);
++	}
++
++	count = bt_get_le16(&rp->conn_count);
++	if (len != sizeof(*rp) + count * sizeof(struct mgmt_addr_info)) {
++		fprintf(stderr, "Invalid get_connections length "
++					" (count=%u, len=%u)\n", count, len);
++		exit(EXIT_FAILURE);
++	}
++
++	for (i = 0; i < count; i++) {
++		char addr[18];
++
++		ba2str(&rp->addr[i].bdaddr, addr);
++
++		printf("%s type %s\n", addr, typestr(rp->addr[i].type));
++	}
++
++	exit(EXIT_SUCCESS);
++}
++
++static void cmd_con(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_GET_CONNECTIONS, index, NULL, 0,
++							con_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send get_connections cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void find_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	if (status != 0) {
++		fprintf(stderr,
++			"Unable to start discovery. status 0x%02x (%s)\n",
++						status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	printf("Discovery started\n");
++	discovery = true;
++}
++
++static void find_usage(void)
++{
++	printf("Usage: btmgmt find [-l|-b]>\n");
++}
++
++static struct option find_options[] = {
++	{ "help",	0, 0, 'h' },
++	{ "le-only",	1, 0, 'l' },
++	{ "bredr-only",	1, 0, 'b' },
++	{ 0, 0, 0, 0 }
++};
++
++static void cmd_find(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	struct mgmt_cp_start_discovery cp;
++	uint8_t type;
++	int opt;
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	type = 0;
++	hci_set_bit(BDADDR_BREDR, &type);
++	hci_set_bit(BDADDR_LE_PUBLIC, &type);
++	hci_set_bit(BDADDR_LE_RANDOM, &type);
++
++	while ((opt = getopt_long(argc, argv, "+lbh", find_options,
++								NULL)) != -1) {
++		switch (opt) {
++		case 'l':
++			hci_clear_bit(BDADDR_BREDR, &type);
++			hci_set_bit(BDADDR_LE_PUBLIC, &type);
++			hci_set_bit(BDADDR_LE_RANDOM, &type);
++			break;
++		case 'b':
++			hci_set_bit(BDADDR_BREDR, &type);
++			hci_clear_bit(BDADDR_LE_PUBLIC, &type);
++			hci_clear_bit(BDADDR_LE_RANDOM, &type);
++			break;
++		case 'h':
++		default:
++			find_usage();
++			exit(EXIT_SUCCESS);
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++	optind = 0;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.type = type;
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_START_DISCOVERY, index,
++				&cp, sizeof(cp), find_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send start_discovery cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void name_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	if (status != 0) {
++		fprintf(stderr, "Unable to set local name. status 0x%02x (%s)",
++						status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	exit(EXIT_SUCCESS);
++}
++
++static void cmd_name(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	struct mgmt_cp_set_local_name cp;
++
++	if (argc < 2) {
++		printf("Usage: btmgmt %s <name> [shortname]\n", argv[0]);
++		exit(EXIT_FAILURE);
++	}
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	memset(&cp, 0, sizeof(cp));
++	strncpy((char *) cp.name, argv[1], HCI_MAX_NAME_LENGTH);
++	if (argc > 2)
++		strncpy((char *) cp.short_name, argv[2],
++					MGMT_MAX_SHORT_NAME_LENGTH);
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_SET_LOCAL_NAME, index,
++					&cp, sizeof(cp), name_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send set_name cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void pair_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	struct mgmt_rp_pair_device *rp = rsp;
++	char addr[18];
++
++	if (len == 0 && status != 0) {
++		fprintf(stderr, "Pairing failed with status 0x%02x (%s)\n",
++						status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	if (len != sizeof(*rp)) {
++		fprintf(stderr, "Unexpected pair_rsp len %u\n", len);
++		exit(EXIT_FAILURE);
++	}
++
++	ba2str(&rp->addr.bdaddr, addr);
++
++	if (status != 0) {
++		fprintf(stderr,
++			"Pairing with %s (%s) failed. status 0x%02x (%s)\n",
++			addr, typestr(rp->addr.type), status,
++			mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	printf("Paired with %s\n", addr);
++
++	exit(EXIT_SUCCESS);
++}
++
++static void pair_usage(void)
++{
++	printf("Usage: btmgmt pair [-c cap] [-t type] <remote address>\n");
++}
++
++static struct option pair_options[] = {
++	{ "help",	0, 0, 'h' },
++	{ "capability",	1, 0, 'c' },
++	{ "type",	1, 0, 't' },
++	{ 0, 0, 0, 0 }
++};
++
++static void cmd_pair(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	struct mgmt_cp_pair_device cp;
++	uint8_t cap = 0x01;
++	uint8_t type = BDADDR_BREDR;
++	int opt;
++
++	while ((opt = getopt_long(argc, argv, "+c:t:h", pair_options,
++								NULL)) != -1) {
++		switch (opt) {
++		case 'c':
++			cap = strtol(optarg, NULL, 0);
++			break;
++		case 't':
++			type = strtol(optarg, NULL, 0);
++			break;
++		case 'h':
++		default:
++			pair_usage();
++			exit(EXIT_SUCCESS);
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++	optind = 0;
++
++	if (argc < 1) {
++		pair_usage();
++		exit(EXIT_FAILURE);
++	}
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	memset(&cp, 0, sizeof(cp));
++	str2ba(argv[0], &cp.addr.bdaddr);
++	cp.addr.type = type;
++	cp.io_cap = cap;
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_PAIR_DEVICE, index, &cp, sizeof(cp),
++							pair_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send pair_device cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void unpair_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	struct mgmt_rp_unpair_device *rp = rsp;
++	char addr[18];
++
++	if (len == 0 && status != 0) {
++		fprintf(stderr, "Unpair device failed. status 0x%02x (%s)\n",
++						status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	if (len != sizeof(*rp)) {
++		fprintf(stderr, "Unexpected unpair_device_rsp len %u\n", len);
++		exit(EXIT_FAILURE);
++	}
++
++	ba2str(&rp->addr.bdaddr, addr);
++
++	if (status != 0) {
++		fprintf(stderr,
++			"Unpairing %s failed. status 0x%02x (%s)\n",
++				addr, status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	printf("%s unpaired\n", addr);
++
++	exit(EXIT_SUCCESS);
++}
++
++static void cmd_unpair(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	struct mgmt_cp_unpair_device cp;
++
++	if (argc < 2) {
++		printf("Usage: btmgmt %s <remote address>\n", argv[0]);
++		exit(EXIT_FAILURE);
++	}
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	memset(&cp, 0, sizeof(cp));
++	str2ba(argv[1], &cp.addr.bdaddr);
++	cp.disconnect = 1;
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_UNPAIR_DEVICE, index, &cp,
++					sizeof(cp), unpair_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send unpair_device cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void keys_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	if (status != 0) {
++		fprintf(stderr, "Load keys failed with status 0x%02x (%s)\n",
++						status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	printf("Keys successfully loaded\n");
++
++	exit(EXIT_SUCCESS);
++}
++
++static void cmd_keys(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	struct mgmt_cp_load_link_keys cp;
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	memset(&cp, 0, sizeof(cp));
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_LOAD_LINK_KEYS, index,
++				&cp, sizeof(cp), keys_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send load_keys cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void block_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	struct mgmt_addr_info *rp = rsp;
++	char addr[18];
++
++	if (len == 0 && status != 0) {
++		fprintf(stderr, "%s failed, status 0x%02x (%s)\n",
++				mgmt_opstr(op), status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	if (len != sizeof(*rp)) {
++		fprintf(stderr, "Unexpected %s len %u\n", mgmt_opstr(op), len);
++		exit(EXIT_FAILURE);
++	}
++
++	ba2str(&rp->bdaddr, addr);
++
++	if (status != 0) {
++		fprintf(stderr, "%s %s (%s) failed. status 0x%02x (%s)\n",
++				mgmt_opstr(op), addr, typestr(rp->type),
++				status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	printf("%s %s succeeded\n", mgmt_opstr(op), addr);
++
++	exit(EXIT_SUCCESS);
++}
++
++static void block_usage(void)
++{
++	printf("Usage: btmgmt block [-t type] <remote address>\n");
++}
++
++static struct option block_options[] = {
++	{ "help",	0, 0, 'h' },
++	{ "type",	1, 0, 't' },
++	{ 0, 0, 0, 0 }
++};
++
++static void cmd_block(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	struct mgmt_cp_block_device cp;
++	uint8_t type = BDADDR_BREDR;
++	int opt;
++
++	while ((opt = getopt_long(argc, argv, "+t:h", block_options,
++							NULL)) != -1) {
++		switch (opt) {
++		case 't':
++			type = strtol(optarg, NULL, 0);
++			break;
++		case 'h':
++		default:
++			block_usage();
++			exit(EXIT_SUCCESS);
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++	optind = 0;
++
++	if (argc < 1) {
++		block_usage();
++		exit(EXIT_FAILURE);
++	}
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	memset(&cp, 0, sizeof(cp));
++	str2ba(argv[0], &cp.addr.bdaddr);
++	cp.addr.type = type;
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_BLOCK_DEVICE, index,
++				&cp, sizeof(cp), block_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send block_device cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void unblock_usage(void)
++{
++	printf("Usage: btmgmt unblock [-t type] <remote address>\n");
++}
++
++static void cmd_unblock(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	struct mgmt_cp_unblock_device cp;
++	uint8_t type = BDADDR_BREDR;
++	int opt;
++
++	while ((opt = getopt_long(argc, argv, "+t:h", block_options,
++							NULL)) != -1) {
++		switch (opt) {
++		case 't':
++			type = strtol(optarg, NULL, 0);
++			break;
++		case 'h':
++		default:
++			unblock_usage();
++			exit(EXIT_SUCCESS);
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++	optind = 0;
++
++	if (argc < 1) {
++		unblock_usage();
++		exit(EXIT_FAILURE);
++	}
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	memset(&cp, 0, sizeof(cp));
++	str2ba(argv[0], &cp.addr.bdaddr);
++	cp.addr.type = type;
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_UNBLOCK_DEVICE, index,
++				&cp, sizeof(cp), block_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send unblock_device cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void uuid_to_uuid128(uuid_t *uuid128, const uuid_t *uuid)
++{
++	if (uuid->type == SDP_UUID16)
++		sdp_uuid16_to_uuid128(uuid128, uuid);
++	else if (uuid->type == SDP_UUID32)
++		sdp_uuid32_to_uuid128(uuid128, uuid);
++	else
++		memcpy(uuid128, uuid, sizeof(*uuid));
++}
++
++static void cmd_add_uuid(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	struct mgmt_cp_add_uuid cp;
++	uint128_t uint128;
++	uuid_t uuid, uuid128;
++
++	if (argc < 3) {
++		printf("UUID and service hint needed\n");
++		exit(EXIT_FAILURE);
++	}
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	if (bt_string2uuid(&uuid, argv[1]) < 0) {
++		printf("Invalid UUID: %s\n", argv[1]);
++		exit(EXIT_FAILURE);
++	}
++
++	memset(&cp, 0, sizeof(cp));
++
++	uuid_to_uuid128(&uuid128, &uuid);
++	ntoh128((uint128_t *) uuid128.value.uuid128.data, &uint128);
++	htob128(&uint128, (uint128_t *) cp.uuid);
++
++	cp.svc_hint = atoi(argv[2]);
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_ADD_UUID, index,
++				&cp, sizeof(cp), class_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send add_uuid cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void cmd_remove_uuid(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	struct mgmt_cp_remove_uuid cp;
++	uint128_t uint128;
++	uuid_t uuid, uuid128;
++
++	if (argc < 2) {
++		printf("UUID needed\n");
++		exit(EXIT_FAILURE);
++	}
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	if (bt_string2uuid(&uuid, argv[1]) < 0) {
++		printf("Invalid UUID: %s\n", argv[1]);
++		exit(EXIT_FAILURE);
++	}
++
++	memset(&cp, 0, sizeof(cp));
++
++	uuid_to_uuid128(&uuid128, &uuid);
++	ntoh128((uint128_t *) uuid128.value.uuid128.data, &uint128);
++	htob128(&uint128, (uint128_t *) cp.uuid);
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_REMOVE_UUID, index,
++				&cp, sizeof(cp), class_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send remove_uuid cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void cmd_clr_uuids(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	char *uuid_any = "00000000-0000-0000-0000-000000000000";
++	char *rm_argv[] = { "rm-uuid", uuid_any, NULL };
++
++	cmd_remove_uuid(mgmt_sk, index, 2, rm_argv);
++}
++
++static void did_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
++{
++	if (status != 0) {
++		fprintf(stderr, "Set Device ID failed with status 0x%02x (%s)\n",
++						status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	printf("Device ID successfully set\n");
++
++	exit(EXIT_SUCCESS);
++}
++
++static void did_usage(void)
++{
++	printf("Usage: btmgmt did <source>:<vendor>:<product>:<version>\n");
++	printf("       possible source values: bluetooth, usb\n");
++}
++
++static void cmd_did(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	struct mgmt_cp_set_device_id cp;
++	uint16_t vendor, product, version , source;
++	int result;
++
++	if (argc < 2) {
++		did_usage();
++		exit(EXIT_FAILURE);
++	}
++
++	result = sscanf(argv[1], "bluetooth:%4hx:%4hx:%4hx", &vendor, &product,
++								&version);
++	if (result == 3) {
++		source = 0x0001;
++		goto done;
++	}
++
++	result = sscanf(argv[1], "usb:%4hx:%4hx:%4hx", &vendor, &product,
++								&version);
++	if (result == 3) {
++		source = 0x0002;
++		goto done;
++	}
++
++	did_usage();
++	exit(EXIT_FAILURE);
++
++done:
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	cp.source = htobs(source);
++	cp.vendor = htobs(vendor);
++	cp.product = htobs(product);
++	cp.version = htobs(version);
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_SET_DEVICE_ID, index,
++				&cp, sizeof(cp), did_rsp, NULL) < 0) {
++		fprintf(stderr, "Unable to send set_dev_class cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static struct {
++	char *cmd;
++	void (*func)(int mgmt_sk, uint16_t index, int argc, char **argv);
++	char *doc;
++} command[] = {
++	{ "monitor",	cmd_monitor,	"Monitor events"		},
++	{ "version",	cmd_version,	"Get the MGMT Version"		},
++	{ "commands",	cmd_commands,	"List supported commands"	},
++	{ "info",	cmd_info,	"Show controller info"		},
++	{ "power",	cmd_power,	"Toggle powered state"		},
++	{ "discov",	cmd_discov,	"Toggle discoverable state"	},
++	{ "connectable",cmd_connectable,"Toggle connectable state"	},
++	{ "pairable",	cmd_pairable,	"Toggle pairable state"		},
++	{ "linksec",	cmd_linksec,	"Toggle link level security"	},
++	{ "ssp",	cmd_ssp,	"Toggle SSP mode"		},
++	{ "hs",		cmd_hs,		"Toggle HS Support"		},
++	{ "le",		cmd_le,		"Toggle LE Support"		},
++	{ "class",	cmd_class,	"Set device major/minor class"	},
++	{ "disconnect", cmd_disconnect, "Disconnect device"		},
++	{ "con",	cmd_con,	"List connections"		},
++	{ "find",	cmd_find,	"Discover nearby devices"	},
++	{ "name",	cmd_name,	"Set local name"		},
++	{ "pair",	cmd_pair,	"Pair with a remote device"	},
++	{ "unpair",	cmd_unpair,	"Unpair device"			},
++	{ "keys",	cmd_keys,	"Load Keys"			},
++	{ "block",	cmd_block,	"Block Device"			},
++	{ "unblock",	cmd_unblock,	"Unblock Device"		},
++	{ "add-uuid",	cmd_add_uuid,	"Add UUID"			},
++	{ "rm-uuid",	cmd_add_uuid,	"Remove UUID"			},
++	{ "clr-uuids",	cmd_clr_uuids,	"Clear UUIDs",			},
++	{ "did",	cmd_did,	"Set Device ID",		},
++	{ NULL, NULL, 0 }
++};
++
++static void usage(void)
++{
++	int i;
++
++	printf("btmgmt ver %s\n", VERSION);
++	printf("Usage:\n"
++		"\tbtmgmt [options] <command> [command parameters]\n");
++
++	printf("Options:\n"
++		"\t--index <id>\tSpecify adapter index\n"
++		"\t--verbose\tEnable extra logging\n"
++		"\t--help\tDisplay help\n");
++
++	printf("Commands:\n");
++	for (i = 0; command[i].cmd; i++)
++		printf("\t%-15s\t%s\n", command[i].cmd, command[i].doc);
++
++	printf("\n"
++		"For more information on the usage of each command use:\n"
++		"\tbtmgmt <command> --help\n" );
++}
++
++static struct option main_options[] = {
++	{ "index",	1, 0, 'i' },
++	{ "verbose",	0, 0, 'v' },
++	{ "help",	0, 0, 'h' },
++	{ 0, 0, 0, 0 }
++};
++
++int main(int argc, char *argv[])
++{
++	int opt, i, mgmt_sk;
++	uint16_t index = MGMT_INDEX_NONE;
++	struct pollfd pollfd;
++
++	while ((opt = getopt_long(argc, argv, "+hvi:",
++						main_options, NULL)) != -1) {
++		switch (opt) {
++		case 'i':
++			if (strlen(optarg) > 3 &&
++					strncasecmp(optarg, "hci", 3) == 0)
++				index = atoi(&optarg[4]);
++			else
++				index = atoi(optarg);
++			break;
++		case 'v':
++			monitor = true;
++			break;
++		case 'h':
++		default:
++			usage();
++			return 0;
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++	optind = 0;
++
++	if (argc < 1) {
++		usage();
++		return 0;
++	}
++
++	mgmt_sk = mgmt_open();
++	if (mgmt_sk < 0) {
++		fprintf(stderr, "Unable to open mgmt socket\n");
++		return -1;
++	}
++
++	for (i = 0; command[i].cmd; i++) {
++		if (strcmp(command[i].cmd, argv[0]) != 0)
++			continue;
++
++		command[i].func(mgmt_sk, index, argc, argv);
++		break;
++	}
++
++	if (command[i].cmd == NULL) {
++		fprintf(stderr, "Unknown command: %s\n", argv[0]);
++		close(mgmt_sk);
++		return -1;
++	}
++
++	pollfd.fd = mgmt_sk;
++	pollfd.events = POLLIN;
++	pollfd.revents = 0;
++
++	while (poll(&pollfd, 1, -1) >= 0) {
++		if (pollfd.revents & (POLLHUP | POLLERR | POLLNVAL))
++			break;
++
++		if (pollfd.revents & POLLIN)
++			mgmt_process_data(mgmt_sk);
++
++		pollfd.revents = 0;
++	}
++
++	close(mgmt_sk);
++
++	return 0;
++}
 -- 
 1.7.10.2
 
