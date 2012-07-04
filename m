@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v2 18/28] deviceinfo: move to profiles folder
-Date: Wed,  4 Jul 2012 10:17:37 +0200
-Message-Id: <1341389867-30749-19-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v2 21/28] time: move to the profiles folder
+Date: Wed,  4 Jul 2012 10:17:40 +0200
+Message-Id: <1341389867-30749-22-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1341389867-30749-1-git-send-email-gustavo@padovan.org>
 References: <1341389867-30749-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,474 +13,48 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
 ---
- Makefile.am                      |   11 ++-
- deviceinfo/deviceinfo.c          |  195 --------------------------------------
- deviceinfo/deviceinfo.h          |   24 -----
- deviceinfo/main.c                |   52 ----------
- deviceinfo/manager.c             |   80 ----------------
- deviceinfo/manager.h             |   24 -----
- profiles/deviceinfo/deviceinfo.c |  195 ++++++++++++++++++++++++++++++++++++++
- profiles/deviceinfo/deviceinfo.h |   24 +++++
- profiles/deviceinfo/main.c       |   52 ++++++++++
- profiles/deviceinfo/manager.c    |   80 ++++++++++++++++
- profiles/deviceinfo/manager.h    |   24 +++++
- 11 files changed, 381 insertions(+), 380 deletions(-)
- delete mode 100644 deviceinfo/deviceinfo.c
- delete mode 100644 deviceinfo/deviceinfo.h
- delete mode 100644 deviceinfo/main.c
- delete mode 100644 deviceinfo/manager.c
- delete mode 100644 deviceinfo/manager.h
- create mode 100644 profiles/deviceinfo/deviceinfo.c
- create mode 100644 profiles/deviceinfo/deviceinfo.h
- create mode 100644 profiles/deviceinfo/main.c
- create mode 100644 profiles/deviceinfo/manager.c
- create mode 100644 profiles/deviceinfo/manager.h
+ Makefile.am            |    3 +-
+ profiles/time/main.c   |   58 ++++++++++++++++++
+ profiles/time/server.c |  154 ++++++++++++++++++++++++++++++++++++++++++++++++
+ profiles/time/server.h |   26 ++++++++
+ time/main.c            |   58 ------------------
+ time/server.c          |  154 ------------------------------------------------
+ time/server.h          |   26 --------
+ 7 files changed, 240 insertions(+), 239 deletions(-)
+ create mode 100644 profiles/time/main.c
+ create mode 100644 profiles/time/server.c
+ create mode 100644 profiles/time/server.h
+ delete mode 100644 time/main.c
+ delete mode 100644 time/server.c
+ delete mode 100644 time/server.h
 
 diff --git a/Makefile.am b/Makefile.am
-index e4874ac..d1bc65f 100644
+index b816e20..3a5f616 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -216,8 +216,7 @@ builtin_sources += health/hdp_main.c health/hdp_types.h \
- endif
- 
- if GATTMODULES
--builtin_modules += thermometer alert time gatt_example proximity \
--			deviceinfo
-+builtin_modules += thermometer alert time gatt_example proximity deviceinfo
- builtin_sources += thermometer/main.c \
- 			thermometer/manager.h thermometer/manager.c \
- 			thermometer/thermometer.h thermometer/thermometer.c \
-@@ -230,9 +229,11 @@ builtin_sources += thermometer/main.c \
- 			proximity/reporter.h proximity/reporter.c \
- 			proximity/linkloss.h proximity/linkloss.c \
- 			proximity/immalert.h proximity/immalert.c \
--			deviceinfo/main.c \
--			deviceinfo/manager.h deviceinfo/manager.c \
--			deviceinfo/deviceinfo.h deviceinfo/deviceinfo.c
-+			profiles/deviceinfo/main.c \
-+			profiles/deviceinfo/manager.h \
-+			profiles/deviceinfo/manager.c \
-+			profiles/deviceinfo/deviceinfo.h \
-+			profiles/deviceinfo/deviceinfo.c
- endif
- 
- 
-diff --git a/deviceinfo/deviceinfo.c b/deviceinfo/deviceinfo.c
-deleted file mode 100644
-index 4548553..0000000
---- a/deviceinfo/deviceinfo.c
-+++ /dev/null
-@@ -1,195 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2012 Texas Instruments, Inc.
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <glib.h>
--#include <bluetooth/uuid.h>
--
--#include "adapter.h"
--#include "device.h"
--#include "gattrib.h"
--#include "attio.h"
--#include "att.h"
--#include "gattrib.h"
--#include "gatt.h"
--#include "log.h"
--#include "deviceinfo.h"
--
--#define PNP_ID_SIZE	7
--
--struct deviceinfo {
--	struct btd_device	*dev;		/* Device reference */
--	GAttrib			*attrib;	/* GATT connection */
--	guint			attioid;	/* Att watcher id */
--	struct att_range	*svc_range;	/* DeviceInfo range */
--	GSList			*chars;		/* Characteristics */
--};
--
--static GSList *servers = NULL;
--
--struct characteristic {
--	struct gatt_char	attr;	/* Characteristic */
--	struct deviceinfo	*d;	/* deviceinfo where the char belongs */
--};
--
--static void deviceinfo_free(gpointer user_data)
--{
--	struct deviceinfo *d = user_data;
--
--	if (d->attioid > 0)
--		btd_device_remove_attio_callback(d->dev, d->attioid);
--
--	if (d->attrib != NULL)
--		g_attrib_unref(d->attrib);
--
--	g_slist_free_full(d->chars, g_free);
--
--	btd_device_unref(d->dev);
--	g_free(d->svc_range);
--	g_free(d);
--}
--
--static gint cmp_device(gconstpointer a, gconstpointer b)
--{
--	const struct deviceinfo *d = a;
--	const struct btd_device *dev = b;
--
--	if (dev == d->dev)
--		return 0;
--
--	return -1;
--}
--
--static void read_pnpid_cb(guint8 status, const guint8 *pdu, guint16 len,
--							gpointer user_data)
--{
--	struct characteristic *ch = user_data;
--	uint8_t value[PNP_ID_SIZE];
--	ssize_t vlen;
--
--	if (status != 0) {
--		error("Error reading PNP_ID value: %s", att_ecode2str(status));
--		return;
--	}
--
--	vlen = dec_read_resp(pdu, len, value, sizeof(value));
--	if (vlen < 0) {
--		error("Error reading PNP_ID: Protocol error");
--		return;
--	}
--
--	if (vlen < 7) {
--		error("Error reading PNP_ID: Invalid pdu length received");
--		return;
--	}
--
--	device_set_pnpid(ch->d->dev, value[0], att_get_u16(&value[1]),
--				att_get_u16(&value[3]), att_get_u16(&value[5]));
--}
--
--static void process_deviceinfo_char(struct characteristic *ch)
--{
--	if (g_strcmp0(ch->attr.uuid, PNPID_UUID) == 0)
--		gatt_read_char(ch->d->attrib, ch->attr.value_handle, 0,
--							read_pnpid_cb, ch);
--}
--
--static void configure_deviceinfo_cb(GSList *characteristics, guint8 status,
--							gpointer user_data)
--{
--	struct deviceinfo *d = user_data;
--	GSList *l;
--
--	if (status != 0) {
--		error("Discover deviceinfo characteristics: %s",
--							att_ecode2str(status));
--		return;
--	}
--
--	for (l = characteristics; l; l = l->next) {
--		struct gatt_char *c = l->data;
--		struct characteristic *ch;
--
--		ch = g_new0(struct characteristic, 1);
--		ch->attr.handle = c->handle;
--		ch->attr.properties = c->properties;
--		ch->attr.value_handle = c->value_handle;
--		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
--		ch->d = d;
--
--		d->chars = g_slist_append(d->chars, ch);
--
--		process_deviceinfo_char(ch);
--	}
--}
--static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
--{
--	struct deviceinfo *d = user_data;
--
--	d->attrib = g_attrib_ref(attrib);
--
--	gatt_discover_char(d->attrib, d->svc_range->start, d->svc_range->end,
--					NULL, configure_deviceinfo_cb, d);
--}
--
--static void attio_disconnected_cb(gpointer user_data)
--{
--	struct deviceinfo *d = user_data;
--
--	g_attrib_unref(d->attrib);
--	d->attrib = NULL;
--}
--
--int deviceinfo_register(struct btd_device *device, struct gatt_primary *prim)
--{
--	struct deviceinfo *d;
--
--	d = g_new0(struct deviceinfo, 1);
--	d->dev = btd_device_ref(device);
--	d->svc_range = g_new0(struct att_range, 1);
--	d->svc_range->start = prim->range.start;
--	d->svc_range->end = prim->range.end;
--
--	servers = g_slist_prepend(servers, d);
--
--	d->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
--						attio_disconnected_cb, d);
--	return 0;
--}
--
--void deviceinfo_unregister(struct btd_device *device)
--{
--	struct deviceinfo *d;
--	GSList *l;
--
--	l = g_slist_find_custom(servers, device, cmp_device);
--	if (l == NULL)
--		return;
--
--	d = l->data;
--	servers = g_slist_remove(servers, d);
--
--	deviceinfo_free(d);
--}
-diff --git a/deviceinfo/deviceinfo.h b/deviceinfo/deviceinfo.h
-deleted file mode 100644
-index 7a804a5..0000000
---- a/deviceinfo/deviceinfo.h
-+++ /dev/null
-@@ -1,24 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2012 Texas Instruments, Inc.
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--int deviceinfo_register(struct btd_device *device, struct gatt_primary *prim);
--void deviceinfo_unregister(struct btd_device *device);
-diff --git a/deviceinfo/main.c b/deviceinfo/main.c
-deleted file mode 100644
-index 82ecc82..0000000
---- a/deviceinfo/main.c
-+++ /dev/null
-@@ -1,52 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2012 Texas Instruments, Inc.
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <glib.h>
--#include <errno.h>
--#include <stdint.h>
--
--#include "plugin.h"
--#include "manager.h"
--#include "hcid.h"
--#include "log.h"
--
--static int deviceinfo_init(void)
--{
--	if (!main_opts.gatt_enabled) {
--		error("DIS cannot start: GATT is disabled");
--		return -ENOTSUP;
--	}
--
--	return deviceinfo_manager_init();
--}
--
--static void deviceinfo_exit(void)
--{
--	deviceinfo_manager_exit();
--}
--
--BLUETOOTH_PLUGIN_DEFINE(deviceinfo, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
--					deviceinfo_init, deviceinfo_exit)
-diff --git a/deviceinfo/manager.c b/deviceinfo/manager.c
-deleted file mode 100644
-index 1d59918..0000000
---- a/deviceinfo/manager.c
-+++ /dev/null
-@@ -1,80 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2012 Texas Instruments, Inc.
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#include <glib.h>
--#include <errno.h>
--#include <bluetooth/uuid.h>
--
--#include "adapter.h"
--#include "device.h"
--#include "att.h"
--#include "gattrib.h"
--#include "gatt.h"
--#include "deviceinfo.h"
--#include "manager.h"
--
--static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
--{
--	const struct gatt_primary *prim = a;
--	const char *uuid = b;
--
--	return g_strcmp0(prim->uuid, uuid);
--}
--
--static int deviceinfo_driver_probe(struct btd_device *device, GSList *uuids)
--{
--	struct gatt_primary *prim;
--	GSList *primaries, *l;
--
--	primaries = btd_device_get_primaries(device);
--
--	l = g_slist_find_custom(primaries, DEVICE_INFORMATION_UUID,
--							primary_uuid_cmp);
--	if (l == NULL)
--		return -EINVAL;
--
--	prim = l->data;
--
--	return deviceinfo_register(device, prim);
--}
--
--static void deviceinfo_driver_remove(struct btd_device *device)
--{
--	deviceinfo_unregister(device);
--}
--
--static struct btd_device_driver deviceinfo_device_driver = {
--	.name	= "deviceinfo-driver",
--	.uuids	= BTD_UUIDS(DEVICE_INFORMATION_UUID),
--	.probe	= deviceinfo_driver_probe,
--	.remove	= deviceinfo_driver_remove
--};
--
--int deviceinfo_manager_init(void)
--{
--	return btd_register_device_driver(&deviceinfo_device_driver);
--}
--
--void deviceinfo_manager_exit(void)
--{
--	btd_unregister_device_driver(&deviceinfo_device_driver);
--}
-diff --git a/deviceinfo/manager.h b/deviceinfo/manager.h
-deleted file mode 100644
-index 0f742ca..0000000
---- a/deviceinfo/manager.h
-+++ /dev/null
-@@ -1,24 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2012 Texas Instruments, Inc.
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--int deviceinfo_manager_init(void);
--void deviceinfo_manager_exit(void);
-diff --git a/profiles/deviceinfo/deviceinfo.c b/profiles/deviceinfo/deviceinfo.c
+@@ -224,7 +224,8 @@ builtin_sources += profiles/thermometer/main.c \
+ 		       	profiles/thermometer/thermometer.c \
+ 			profiles/alert/main.c profiles/alert/server.h \
+ 			profiles/alert/server.c \
+-			time/main.c time/server.h time/server.c \
++			profiles/time/main.c profiles/time/server.h \
++			profiles/time/server.c \
+ 			plugins/gatt-example.c \
+ 			profiles/proximity/main.c profiles/proximity/manager.h \
+ 		       	profiles/proximity/manager.c \
+diff --git a/profiles/time/main.c b/profiles/time/main.c
 new file mode 100644
-index 0000000..4548553
+index 0000000..d876725
 --- /dev/null
-+++ b/profiles/deviceinfo/deviceinfo.c
-@@ -0,0 +1,195 @@
++++ b/profiles/time/main.c
+@@ -0,0 +1,58 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
 + *
-+ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *  Copyright (C) 2011  Nokia Corporation
++ *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
++ *
 + *
 + *  This program is free software; you can redistribute it and/or modify
 + *  it under the terms of the GNU General Public License as published by
@@ -502,274 +76,49 @@ index 0000000..4548553
 +#include <config.h>
 +#endif
 +
-+#include <glib.h>
-+#include <bluetooth/uuid.h>
-+
-+#include "adapter.h"
-+#include "device.h"
-+#include "gattrib.h"
-+#include "attio.h"
-+#include "att.h"
-+#include "gattrib.h"
-+#include "gatt.h"
-+#include "log.h"
-+#include "deviceinfo.h"
-+
-+#define PNP_ID_SIZE	7
-+
-+struct deviceinfo {
-+	struct btd_device	*dev;		/* Device reference */
-+	GAttrib			*attrib;	/* GATT connection */
-+	guint			attioid;	/* Att watcher id */
-+	struct att_range	*svc_range;	/* DeviceInfo range */
-+	GSList			*chars;		/* Characteristics */
-+};
-+
-+static GSList *servers = NULL;
-+
-+struct characteristic {
-+	struct gatt_char	attr;	/* Characteristic */
-+	struct deviceinfo	*d;	/* deviceinfo where the char belongs */
-+};
-+
-+static void deviceinfo_free(gpointer user_data)
-+{
-+	struct deviceinfo *d = user_data;
-+
-+	if (d->attioid > 0)
-+		btd_device_remove_attio_callback(d->dev, d->attioid);
-+
-+	if (d->attrib != NULL)
-+		g_attrib_unref(d->attrib);
-+
-+	g_slist_free_full(d->chars, g_free);
-+
-+	btd_device_unref(d->dev);
-+	g_free(d->svc_range);
-+	g_free(d);
-+}
-+
-+static gint cmp_device(gconstpointer a, gconstpointer b)
-+{
-+	const struct deviceinfo *d = a;
-+	const struct btd_device *dev = b;
-+
-+	if (dev == d->dev)
-+		return 0;
-+
-+	return -1;
-+}
-+
-+static void read_pnpid_cb(guint8 status, const guint8 *pdu, guint16 len,
-+							gpointer user_data)
-+{
-+	struct characteristic *ch = user_data;
-+	uint8_t value[PNP_ID_SIZE];
-+	ssize_t vlen;
-+
-+	if (status != 0) {
-+		error("Error reading PNP_ID value: %s", att_ecode2str(status));
-+		return;
-+	}
-+
-+	vlen = dec_read_resp(pdu, len, value, sizeof(value));
-+	if (vlen < 0) {
-+		error("Error reading PNP_ID: Protocol error");
-+		return;
-+	}
-+
-+	if (vlen < 7) {
-+		error("Error reading PNP_ID: Invalid pdu length received");
-+		return;
-+	}
-+
-+	device_set_pnpid(ch->d->dev, value[0], att_get_u16(&value[1]),
-+				att_get_u16(&value[3]), att_get_u16(&value[5]));
-+}
-+
-+static void process_deviceinfo_char(struct characteristic *ch)
-+{
-+	if (g_strcmp0(ch->attr.uuid, PNPID_UUID) == 0)
-+		gatt_read_char(ch->d->attrib, ch->attr.value_handle, 0,
-+							read_pnpid_cb, ch);
-+}
-+
-+static void configure_deviceinfo_cb(GSList *characteristics, guint8 status,
-+							gpointer user_data)
-+{
-+	struct deviceinfo *d = user_data;
-+	GSList *l;
-+
-+	if (status != 0) {
-+		error("Discover deviceinfo characteristics: %s",
-+							att_ecode2str(status));
-+		return;
-+	}
-+
-+	for (l = characteristics; l; l = l->next) {
-+		struct gatt_char *c = l->data;
-+		struct characteristic *ch;
-+
-+		ch = g_new0(struct characteristic, 1);
-+		ch->attr.handle = c->handle;
-+		ch->attr.properties = c->properties;
-+		ch->attr.value_handle = c->value_handle;
-+		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
-+		ch->d = d;
-+
-+		d->chars = g_slist_append(d->chars, ch);
-+
-+		process_deviceinfo_char(ch);
-+	}
-+}
-+static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
-+{
-+	struct deviceinfo *d = user_data;
-+
-+	d->attrib = g_attrib_ref(attrib);
-+
-+	gatt_discover_char(d->attrib, d->svc_range->start, d->svc_range->end,
-+					NULL, configure_deviceinfo_cb, d);
-+}
-+
-+static void attio_disconnected_cb(gpointer user_data)
-+{
-+	struct deviceinfo *d = user_data;
-+
-+	g_attrib_unref(d->attrib);
-+	d->attrib = NULL;
-+}
-+
-+int deviceinfo_register(struct btd_device *device, struct gatt_primary *prim)
-+{
-+	struct deviceinfo *d;
-+
-+	d = g_new0(struct deviceinfo, 1);
-+	d->dev = btd_device_ref(device);
-+	d->svc_range = g_new0(struct att_range, 1);
-+	d->svc_range->start = prim->range.start;
-+	d->svc_range->end = prim->range.end;
-+
-+	servers = g_slist_prepend(servers, d);
-+
-+	d->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
-+						attio_disconnected_cb, d);
-+	return 0;
-+}
-+
-+void deviceinfo_unregister(struct btd_device *device)
-+{
-+	struct deviceinfo *d;
-+	GSList *l;
-+
-+	l = g_slist_find_custom(servers, device, cmp_device);
-+	if (l == NULL)
-+		return;
-+
-+	d = l->data;
-+	servers = g_slist_remove(servers, d);
-+
-+	deviceinfo_free(d);
-+}
-diff --git a/profiles/deviceinfo/deviceinfo.h b/profiles/deviceinfo/deviceinfo.h
-new file mode 100644
-index 0000000..7a804a5
---- /dev/null
-+++ b/profiles/deviceinfo/deviceinfo.h
-@@ -0,0 +1,24 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012 Texas Instruments, Inc.
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+int deviceinfo_register(struct btd_device *device, struct gatt_primary *prim);
-+void deviceinfo_unregister(struct btd_device *device);
-diff --git a/profiles/deviceinfo/main.c b/profiles/deviceinfo/main.c
-new file mode 100644
-index 0000000..82ecc82
---- /dev/null
-+++ b/profiles/deviceinfo/main.c
-@@ -0,0 +1,52 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012 Texas Instruments, Inc.
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
++#include <stdint.h>
 +#include <glib.h>
 +#include <errno.h>
-+#include <stdint.h>
 +
 +#include "plugin.h"
-+#include "manager.h"
 +#include "hcid.h"
 +#include "log.h"
++#include "server.h"
 +
-+static int deviceinfo_init(void)
++static int time_init(void)
 +{
 +	if (!main_opts.gatt_enabled) {
-+		error("DIS cannot start: GATT is disabled");
++		DBG("GATT is disabled");
 +		return -ENOTSUP;
 +	}
 +
-+	return deviceinfo_manager_init();
++	return time_server_init();
 +}
 +
-+static void deviceinfo_exit(void)
++static void time_exit(void)
 +{
-+	deviceinfo_manager_exit();
++	if (!main_opts.gatt_enabled)
++		return;
++
++	time_server_exit();
 +}
 +
-+BLUETOOTH_PLUGIN_DEFINE(deviceinfo, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-+					deviceinfo_init, deviceinfo_exit)
-diff --git a/profiles/deviceinfo/manager.c b/profiles/deviceinfo/manager.c
++BLUETOOTH_PLUGIN_DEFINE(time, VERSION,
++			BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++			time_init, time_exit)
+diff --git a/profiles/time/server.c b/profiles/time/server.c
 new file mode 100644
-index 0000000..1d59918
+index 0000000..13a7bbe
 --- /dev/null
-+++ b/profiles/deviceinfo/manager.c
-@@ -0,0 +1,80 @@
++++ b/profiles/time/server.c
+@@ -0,0 +1,154 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
 + *
-+ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *  Copyright (C) 2011  Nokia Corporation
++ *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
++ *
 + *
 + *  This program is free software; you can redistribute it and/or modify
 + *  it under the terms of the GNU General Public License as published by
@@ -786,76 +135,150 @@ index 0000000..1d59918
 + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 + *
 + */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
 +
 +#include <glib.h>
++#include <time.h>
 +#include <errno.h>
 +#include <bluetooth/uuid.h>
++#include <adapter.h>
 +
-+#include "adapter.h"
-+#include "device.h"
-+#include "att.h"
 +#include "gattrib.h"
++#include "att.h"
 +#include "gatt.h"
-+#include "deviceinfo.h"
-+#include "manager.h"
++#include "att-database.h"
++#include "attrib-server.h"
++#include "gatt-service.h"
++#include "log.h"
++#include "server.h"
 +
-+static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
++#define CURRENT_TIME_SVC_UUID		0x1805
++
++#define LOCAL_TIME_INFO_CHR_UUID	0x2A0F
++#define CT_TIME_CHR_UUID		0x2A2B
++
++static int encode_current_time(uint8_t value[10])
 +{
-+	const struct gatt_primary *prim = a;
-+	const char *uuid = b;
++	struct timespec tp;
++	struct tm tm;
 +
-+	return g_strcmp0(prim->uuid, uuid);
-+}
++	if (clock_gettime(CLOCK_REALTIME, &tp) == -1) {
++		int err = -errno;
 +
-+static int deviceinfo_driver_probe(struct btd_device *device, GSList *uuids)
-+{
-+	struct gatt_primary *prim;
-+	GSList *primaries, *l;
++		error("clock_gettime: %s", strerror(-err));
++		return err;
++	}
 +
-+	primaries = btd_device_get_primaries(device);
-+
-+	l = g_slist_find_custom(primaries, DEVICE_INFORMATION_UUID,
-+							primary_uuid_cmp);
-+	if (l == NULL)
++	if (localtime_r(&tp.tv_sec, &tm) == NULL) {
++		error("localtime_r() failed");
++		/* localtime_r() does not set errno */
 +		return -EINVAL;
++	}
 +
-+	prim = l->data;
++	att_put_u16(1900 + tm.tm_year, &value[0]); /* Year */
++	value[2] = tm.tm_mon + 1; /* Month */
++	value[3] = tm.tm_mday; /* Day */
++	value[4] = tm.tm_hour; /* Hours */
++	value[5] = tm.tm_min; /* Minutes */
++	value[6] = tm.tm_sec; /* Seconds */
++	value[7] = tm.tm_wday == 0 ? 7 : tm.tm_wday; /* Day of Week */
++	/* From Time Profile spec: "The number of 1/256 fractions of a second."
++	 * In 1s there are 256 fractions, in 1ns there are 256/10^9 fractions.
++	 * To avoid integer overflow, we use the equivalent 1/3906250 ratio. */
++	value[8] = tp.tv_nsec / 3906250; /* Fractions256 */
++	value[9] = 0x00; /* Adjust Reason */
 +
-+	return deviceinfo_register(device, prim);
++	return 0;
 +}
 +
-+static void deviceinfo_driver_remove(struct btd_device *device)
++static uint8_t current_time_read(struct attribute *a,
++				 struct btd_device *device, gpointer user_data)
 +{
-+	deviceinfo_unregister(device);
++	uint8_t value[10];
++
++	if (encode_current_time(value) < 0)
++		return ATT_ECODE_IO;
++
++	/* FIXME: Provide the adapter in next function */
++	attrib_db_update(NULL, a->handle, NULL, value, sizeof(value), NULL);
++
++	return 0;
 +}
 +
-+static struct btd_device_driver deviceinfo_device_driver = {
-+	.name	= "deviceinfo-driver",
-+	.uuids	= BTD_UUIDS(DEVICE_INFORMATION_UUID),
-+	.probe	= deviceinfo_driver_probe,
-+	.remove	= deviceinfo_driver_remove
-+};
-+
-+int deviceinfo_manager_init(void)
++static uint8_t local_time_info_read(struct attribute *a,
++				struct btd_device *device, gpointer user_data)
 +{
-+	return btd_register_device_driver(&deviceinfo_device_driver);
++	uint8_t value[2];
++
++	DBG("a=%p", a);
++
++	tzset();
++
++	/* FIXME: POSIX "daylight" variable only indicates whether there is DST
++	 * for the local time or not. The offset is unknown. */
++	value[0] = daylight ? 0xff : 0x00;
++
++	/* Convert POSIX "timezone" (seconds West of GMT) to Time Profile
++	 * format (offset from UTC in number of 15 minutes increments). */
++	value[1] = (uint8_t) (-1 * timezone / (60 * 15));
++
++	/* FIXME: Provide the adapter in next function */
++	attrib_db_update(NULL, a->handle, NULL, value, sizeof(value), NULL);
++
++	return 0;
 +}
 +
-+void deviceinfo_manager_exit(void)
++static void register_current_time_service(void)
 +{
-+	btd_unregister_device_driver(&deviceinfo_device_driver);
++	bt_uuid_t uuid;
++
++	bt_uuid16_create(&uuid, CURRENT_TIME_SVC_UUID);
++
++	/* Current Time service */
++	/* FIXME: Provide the adapter in next function */
++	gatt_service_add(NULL, GATT_PRIM_SVC_UUID, &uuid,
++				/* CT Time characteristic */
++				GATT_OPT_CHR_UUID, CT_TIME_CHR_UUID,
++				GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ |
++							ATT_CHAR_PROPER_NOTIFY,
++				GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
++						current_time_read, NULL,
++
++				/* Local Time Information characteristic */
++				GATT_OPT_CHR_UUID, LOCAL_TIME_INFO_CHR_UUID,
++				GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ,
++				GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
++						local_time_info_read, NULL,
++
++				GATT_OPT_INVALID);
 +}
-diff --git a/profiles/deviceinfo/manager.h b/profiles/deviceinfo/manager.h
++
++int time_server_init(void)
++{
++	register_current_time_service();
++
++	return 0;
++}
++
++void time_server_exit(void)
++{
++}
+diff --git a/profiles/time/server.h b/profiles/time/server.h
 new file mode 100644
-index 0000000..0f742ca
+index 0000000..621bf2b
 --- /dev/null
-+++ b/profiles/deviceinfo/manager.h
-@@ -0,0 +1,24 @@
++++ b/profiles/time/server.h
+@@ -0,0 +1,26 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
 + *
-+ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *  Copyright (C) 2011  Nokia Corporation
++ *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
++ *
 + *
 + *  This program is free software; you can redistribute it and/or modify
 + *  it under the terms of the GNU General Public License as published by
@@ -873,8 +296,264 @@ index 0000000..0f742ca
 + *
 + */
 +
-+int deviceinfo_manager_init(void);
-+void deviceinfo_manager_exit(void);
++int time_server_init(void);
++void time_server_exit(void);
+diff --git a/time/main.c b/time/main.c
+deleted file mode 100644
+index d876725..0000000
+--- a/time/main.c
++++ /dev/null
+@@ -1,58 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2011  Nokia Corporation
+- *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <stdint.h>
+-#include <glib.h>
+-#include <errno.h>
+-
+-#include "plugin.h"
+-#include "hcid.h"
+-#include "log.h"
+-#include "server.h"
+-
+-static int time_init(void)
+-{
+-	if (!main_opts.gatt_enabled) {
+-		DBG("GATT is disabled");
+-		return -ENOTSUP;
+-	}
+-
+-	return time_server_init();
+-}
+-
+-static void time_exit(void)
+-{
+-	if (!main_opts.gatt_enabled)
+-		return;
+-
+-	time_server_exit();
+-}
+-
+-BLUETOOTH_PLUGIN_DEFINE(time, VERSION,
+-			BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
+-			time_init, time_exit)
+diff --git a/time/server.c b/time/server.c
+deleted file mode 100644
+index 13a7bbe..0000000
+--- a/time/server.c
++++ /dev/null
+@@ -1,154 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2011  Nokia Corporation
+- *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <glib.h>
+-#include <time.h>
+-#include <errno.h>
+-#include <bluetooth/uuid.h>
+-#include <adapter.h>
+-
+-#include "gattrib.h"
+-#include "att.h"
+-#include "gatt.h"
+-#include "att-database.h"
+-#include "attrib-server.h"
+-#include "gatt-service.h"
+-#include "log.h"
+-#include "server.h"
+-
+-#define CURRENT_TIME_SVC_UUID		0x1805
+-
+-#define LOCAL_TIME_INFO_CHR_UUID	0x2A0F
+-#define CT_TIME_CHR_UUID		0x2A2B
+-
+-static int encode_current_time(uint8_t value[10])
+-{
+-	struct timespec tp;
+-	struct tm tm;
+-
+-	if (clock_gettime(CLOCK_REALTIME, &tp) == -1) {
+-		int err = -errno;
+-
+-		error("clock_gettime: %s", strerror(-err));
+-		return err;
+-	}
+-
+-	if (localtime_r(&tp.tv_sec, &tm) == NULL) {
+-		error("localtime_r() failed");
+-		/* localtime_r() does not set errno */
+-		return -EINVAL;
+-	}
+-
+-	att_put_u16(1900 + tm.tm_year, &value[0]); /* Year */
+-	value[2] = tm.tm_mon + 1; /* Month */
+-	value[3] = tm.tm_mday; /* Day */
+-	value[4] = tm.tm_hour; /* Hours */
+-	value[5] = tm.tm_min; /* Minutes */
+-	value[6] = tm.tm_sec; /* Seconds */
+-	value[7] = tm.tm_wday == 0 ? 7 : tm.tm_wday; /* Day of Week */
+-	/* From Time Profile spec: "The number of 1/256 fractions of a second."
+-	 * In 1s there are 256 fractions, in 1ns there are 256/10^9 fractions.
+-	 * To avoid integer overflow, we use the equivalent 1/3906250 ratio. */
+-	value[8] = tp.tv_nsec / 3906250; /* Fractions256 */
+-	value[9] = 0x00; /* Adjust Reason */
+-
+-	return 0;
+-}
+-
+-static uint8_t current_time_read(struct attribute *a,
+-				 struct btd_device *device, gpointer user_data)
+-{
+-	uint8_t value[10];
+-
+-	if (encode_current_time(value) < 0)
+-		return ATT_ECODE_IO;
+-
+-	/* FIXME: Provide the adapter in next function */
+-	attrib_db_update(NULL, a->handle, NULL, value, sizeof(value), NULL);
+-
+-	return 0;
+-}
+-
+-static uint8_t local_time_info_read(struct attribute *a,
+-				struct btd_device *device, gpointer user_data)
+-{
+-	uint8_t value[2];
+-
+-	DBG("a=%p", a);
+-
+-	tzset();
+-
+-	/* FIXME: POSIX "daylight" variable only indicates whether there is DST
+-	 * for the local time or not. The offset is unknown. */
+-	value[0] = daylight ? 0xff : 0x00;
+-
+-	/* Convert POSIX "timezone" (seconds West of GMT) to Time Profile
+-	 * format (offset from UTC in number of 15 minutes increments). */
+-	value[1] = (uint8_t) (-1 * timezone / (60 * 15));
+-
+-	/* FIXME: Provide the adapter in next function */
+-	attrib_db_update(NULL, a->handle, NULL, value, sizeof(value), NULL);
+-
+-	return 0;
+-}
+-
+-static void register_current_time_service(void)
+-{
+-	bt_uuid_t uuid;
+-
+-	bt_uuid16_create(&uuid, CURRENT_TIME_SVC_UUID);
+-
+-	/* Current Time service */
+-	/* FIXME: Provide the adapter in next function */
+-	gatt_service_add(NULL, GATT_PRIM_SVC_UUID, &uuid,
+-				/* CT Time characteristic */
+-				GATT_OPT_CHR_UUID, CT_TIME_CHR_UUID,
+-				GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ |
+-							ATT_CHAR_PROPER_NOTIFY,
+-				GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
+-						current_time_read, NULL,
+-
+-				/* Local Time Information characteristic */
+-				GATT_OPT_CHR_UUID, LOCAL_TIME_INFO_CHR_UUID,
+-				GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ,
+-				GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
+-						local_time_info_read, NULL,
+-
+-				GATT_OPT_INVALID);
+-}
+-
+-int time_server_init(void)
+-{
+-	register_current_time_service();
+-
+-	return 0;
+-}
+-
+-void time_server_exit(void)
+-{
+-}
+diff --git a/time/server.h b/time/server.h
+deleted file mode 100644
+index 621bf2b..0000000
+--- a/time/server.h
++++ /dev/null
+@@ -1,26 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2011  Nokia Corporation
+- *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-int time_server_init(void);
+-void time_server_exit(void);
 -- 
 1.7.10.2
 
