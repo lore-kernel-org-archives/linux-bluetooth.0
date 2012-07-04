@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v2 10/28] adapter: make restore powered work again
-Date: Wed,  4 Jul 2012 10:17:29 +0200
-Message-Id: <1341389867-30749-11-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v2 13/28] input: remove unneeded header inclusions
+Date: Wed,  4 Jul 2012 10:17:32 +0200
+Message-Id: <1341389867-30749-14-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1341389867-30749-1-git-send-email-gustavo@padovan.org>
 References: <1341389867-30749-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,81 +12,70 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-differently from hciops mgmtops had no support to restore the powered of a
-adapter. We now do this directly inside adapter_remove()
 ---
- plugins/mgmtops.c |    7 -------
- src/adapter.c     |    5 ++++-
- src/adapter.h     |    1 -
- 3 files changed, 4 insertions(+), 9 deletions(-)
+ input/device.c  |    5 -----
+ input/fakehid.c |    4 ----
+ input/manager.c |    3 ---
+ 3 files changed, 12 deletions(-)
 
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index 7c77be8..c060ada 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -2183,12 +2183,6 @@ static int mgmt_set_did(int index, uint16_t vendor, uint16_t product,
- 	return 0;
- }
+diff --git a/input/device.c b/input/device.c
+index c08ba18..f3ceabb 100644
+--- a/input/device.c
++++ b/input/device.c
+@@ -29,9 +29,6 @@
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+-#include <sys/stat.h>
+-#include <sys/ioctl.h>
+-#include <sys/socket.h>
  
--static int mgmt_restore_powered(int index)
--{
--	DBG("index %d", index);
--	return -ENOSYS;
--}
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/hidp.h>
+@@ -39,8 +36,6 @@
+ #include <bluetooth/sdp_lib.h>
+ #include <bluetooth/uuid.h>
+ 
+-#include <glib.h>
+-#include <dbus/dbus.h>
+ #include <gdbus.h>
+ 
+ #include "log.h"
+diff --git a/input/fakehid.c b/input/fakehid.c
+index 3181538..3be1489 100644
+--- a/input/fakehid.c
++++ b/input/fakehid.c
+@@ -25,12 +25,8 @@
+ #include <config.h>
+ #endif
+ 
+-#include <stdio.h>
+-#include <errno.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+-#include <stdlib.h>
+-#include <sys/types.h>
+ 
+ #include <bluetooth/bluetooth.h>
+ 
+diff --git a/input/manager.c b/input/manager.c
+index 5cc552b..3572ea9 100644
+--- a/input/manager.c
++++ b/input/manager.c
+@@ -28,13 +28,10 @@
+ #include <errno.h>
+ 
+ #include <bluetooth/bluetooth.h>
+-#include <bluetooth/hci.h>
+ #include <bluetooth/sdp.h>
+ #include <bluetooth/sdp_lib.h>
+ #include <bluetooth/uuid.h>
+ 
+-#include <gdbus.h>
 -
- static int mgmt_load_link_keys(int index, GSList *keys, gboolean debug_keys)
- {
- 	char *buf;
-@@ -2476,7 +2470,6 @@ static struct btd_adapter_ops mgmt_ops = {
- 	.set_did = mgmt_set_did,
- 	.add_uuid = mgmt_add_uuid,
- 	.remove_uuid = mgmt_remove_uuid,
--	.restore_powered = mgmt_restore_powered,
- 	.load_keys = mgmt_load_link_keys,
- 	.set_io_capability = mgmt_set_io_capability,
- 	.create_bonding = mgmt_create_bonding,
-diff --git a/src/adapter.c b/src/adapter.c
-index a043366..1546aed 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -109,6 +109,7 @@ struct service_auth {
- struct btd_adapter {
- 	uint16_t dev_id;
- 	gboolean up;
-+	gboolean already_up;
- 	char *path;			/* adapter object path */
- 	bdaddr_t bdaddr;		/* adapter Bluetooth Address */
- 	uint32_t dev_class;		/* Class of Device */
-@@ -2389,6 +2390,7 @@ void btd_adapter_unref(struct btd_adapter *adapter)
- gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
- {
- 	adapter->up = up;
-+	adapter->already_up = up;
- 
- 	adapter->allow_name_changes = TRUE;
- 
-@@ -2469,7 +2471,8 @@ void adapter_remove(struct btd_adapter *adapter)
- 	g_slist_free(adapter->pin_callbacks);
- 
- 	/* Return adapter to down state if it was not up on init */
--	adapter_ops->restore_powered(adapter->dev_id);
-+	if (!adapter->already_up && adapter->up)
-+		adapter_ops->set_powered(adapter->dev_id, FALSE);
- }
- 
- uint16_t adapter_get_dev_id(struct btd_adapter *adapter)
-diff --git a/src/adapter.h b/src/adapter.h
-index 4c39a7b..73cd770 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -204,7 +204,6 @@ struct btd_adapter_ops {
- 					uint16_t version, uint16_t source);
- 	int (*add_uuid) (int index, uuid_t *uuid, uint8_t svc_hint);
- 	int (*remove_uuid) (int index, uuid_t *uuid);
--	int (*restore_powered) (int index);
- 	int (*load_keys) (int index, GSList *keys, gboolean debug_keys);
- 	int (*set_io_capability) (int index, uint8_t io_capability);
- 	int (*create_bonding) (int index, bdaddr_t *bdaddr,
+ #include "log.h"
+ #include "../src/adapter.h"
+ #include "../src/device.h"
 -- 
 1.7.10.2
 
