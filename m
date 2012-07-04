@@ -1,50 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1341408879.1963.25.camel@aeonflux>
-Subject: Re: [PATCH -v3 18/19] cups: move it to profiles folder
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Date: Wed, 04 Jul 2012 15:34:39 +0200
-In-Reply-To: <1341406295-7669-18-git-send-email-gustavo@padovan.org>
-References: <1341406295-7669-1-git-send-email-gustavo@padovan.org>
-	 <1341406295-7669-18-git-send-email-gustavo@padovan.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1341403768-16709-1-git-send-email-luiz.dentz@gmail.com>
+References: <1341403768-16709-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 4 Jul 2012 10:30:48 -0300
+Message-ID: <CAJdJm_MDfnOOdjqk-AOJnRoRu37VO_JrzKFUGzyBXveaMi8sdw@mail.gmail.com>
+Subject: Re: [RFC BlueZ] core: Fix not waiting for discovery to stop before
+ attempting to pair
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Luiz,
 
+On Wed, Jul 4, 2012 at 9:09 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> In some cases, LE controllers, this can cause errors due to scan/inquiry
+> being active.
+
+Can you provide more background on which controllers did you see this issue?
+
+Also, would it be appropriate to use the "LE Read Supported States"
+HCI command to check the supported controller states on kernel and
+make this check on kernel instead?
+
+I suppose this will cause pairing delays even for controllers which do
+not have this issue.
+
+>
+> To fix this instead of immediately attempting to pair wait until
+> discovery is properly stopped and only then proceed with bonding.
 > ---
->  Makefile.tools       |   12 +-
->  cups/cups.h          |   38 ---
->  cups/hcrp.c          |  368 ---------------------
->  cups/main.c          |  896 --------------------------------------------------
->  cups/sdp.c           |  119 -------
->  cups/spp.c           |  118 -------
->  profiles/cups/cups.h |   38 +++
->  profiles/cups/hcrp.c |  368 +++++++++++++++++++++
->  profiles/cups/main.c |  896 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  profiles/cups/sdp.c  |  119 +++++++
->  profiles/cups/spp.c  |  118 +++++++
->  11 files changed, 1547 insertions(+), 1543 deletions(-)
->  delete mode 100644 cups/cups.h
->  delete mode 100644 cups/hcrp.c
->  delete mode 100644 cups/main.c
->  delete mode 100644 cups/sdp.c
->  delete mode 100644 cups/spp.c
->  create mode 100644 profiles/cups/cups.h
->  create mode 100644 profiles/cups/hcrp.c
->  create mode 100644 profiles/cups/main.c
->  create mode 100644 profiles/cups/sdp.c
->  create mode 100644 profiles/cups/spp.c
+> Still RFC because I could only test against controllers that used to
+> work without this patch.
 
-please stop moving things around until I agreed with any new directory
-structure.
-
-Regards
-
-Marcel
-
-
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
