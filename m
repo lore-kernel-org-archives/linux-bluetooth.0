@@ -1,21 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Thu, 5 Jul 2012 14:00:54 +0800
-Message-ID: <CADX0rsZBM+2Sz564FrkVxe318dCFue_pea_OLpxvrk5bd9cHWQ@mail.gmail.com>
-Subject: BT LMP
-From: victor yeo <victoryeo1974@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <CAJdJm_Mtppu=cjc1UUmwfW_PeoNisgiBi8yb96hugz3JZx3tNg@mail.gmail.com>
+References: <1340216061-24778-1-git-send-email-anderson.lizardo@openbossa.org>
+	<CAJdJm_Mtppu=cjc1UUmwfW_PeoNisgiBi8yb96hugz3JZx3tNg@mail.gmail.com>
+Date: Wed, 4 Jul 2012 15:14:53 -0300
+Message-ID: <CAAngNMYPkM+5G73TeQb+Q7mBt0NCP5j_WaE1jgvHixffULyemg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/3] time: Introduce manager abstraction layer
+From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Wed, Jul 4, 2012 at 3:12 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> On Wed, Jun 20, 2012 at 3:14 PM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+>> This abstraction layer makes the GATT Time profile implementation
+>> consistent with other profiles. It is the first step before implementing
+>> the adapter driver for the Time server implementation.
+>> ---
+>
+> ping.
+>
 
-Anyone know which part of linux kernel processes the LMP au_rand and
-LMP not_accepted event?
+FWIW, this series fixes the Time Profile on the tests I've been making
+recently (its broken without it).
 
-I want to modify the Bluetooth kernel code so that when it receives
-LMP not_accepted event, it will do re-pairing.
+I also have another small fix to the timezone data to go on top of that.
 
-Thanks,
-Victor
+-- 
+João Paulo Rechi Vita
+Openbossa Labs - INdT
