@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v2 06/28] manager: remove deprecated ListAdapters() method
-Date: Wed,  4 Jul 2012 10:17:25 +0200
-Message-Id: <1341389867-30749-7-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v2 05/28] adapter: remove deprecated ListDevices() method
+Date: Wed,  4 Jul 2012 10:17:24 +0200
+Message-Id: <1341389867-30749-6-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1341389867-30749-1-git-send-email-gustavo@padovan.org>
 References: <1341389867-30749-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,40 +13,64 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
 ---
- src/manager.c |   33 ---------------------------------
- 1 file changed, 33 deletions(-)
+ doc/adapter-api.txt |   10 ----------
+ src/adapter.c       |   35 -----------------------------------
+ 2 files changed, 45 deletions(-)
 
-diff --git a/src/manager.c b/src/manager.c
-index 7061f64..d588995 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -130,36 +130,6 @@ done:
- 	return reply;
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 916e941..176843b 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -88,16 +88,6 @@ Methods		dict GetProperties()
+ 			Possible Errors: org.bluez.Error.DoesNotExist
+ 					 org.bluez.Error.InvalidArguments
+ 
+-		array{object} ListDevices() {deprecated}
+-
+-			Returns list of device object paths.
+-			This method is deprecated, instead use the Devices
+-			Property to get the list of devices object paths.
+-
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.Failed
+-					 org.bluez.Error.OutOfMemory
+-
+ 		object CreateDevice(string address)
+ 
+ 			Creates a new object path for a remote device. This
+diff --git a/src/adapter.c b/src/adapter.c
+index f922876..9315922 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1307,38 +1307,6 @@ static DBusMessage *release_session(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
  }
  
--static DBusMessage *list_adapters(DBusConnection *conn,
--					DBusMessage *msg, void *data)
+-static DBusMessage *list_devices(DBusConnection *conn,
+-						DBusMessage *msg, void *data)
 -{
--	DBusMessageIter iter;
--	DBusMessageIter array_iter;
+-	struct btd_adapter *adapter = data;
 -	DBusMessage *reply;
 -	GSList *l;
+-	DBusMessageIter iter;
+-	DBusMessageIter array_iter;
+-	const gchar *dev_path;
 -
 -	reply = dbus_message_new_method_return(msg);
 -	if (!reply)
 -		return NULL;
 -
 -	dbus_message_iter_init_append(reply, &iter);
--
 -	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
 -				DBUS_TYPE_OBJECT_PATH_AS_STRING, &array_iter);
 -
--	for (l = adapters; l; l = l->next) {
--		struct btd_adapter *adapter = l->data;
--		const gchar *path = adapter_get_path(adapter);
+-	for (l = adapter->devices; l; l = l->next) {
+-		struct btd_device *device = l->data;
+-
+-		dev_path = device_get_path(device);
 -
 -		dbus_message_iter_append_basic(&array_iter,
--					DBUS_TYPE_OBJECT_PATH, &path);
+-				DBUS_TYPE_OBJECT_PATH, &dev_path);
 -	}
 -
 -	dbus_message_iter_close_container(&iter, &array_iter);
@@ -54,19 +78,19 @@ index 7061f64..d588995 100644
 -	return reply;
 -}
 -
- static DBusMessage *get_properties(DBusConnection *conn,
- 					DBusMessage *msg, void *data)
+ static DBusMessage *cancel_device_creation(DBusConnection *conn,
+ 						DBusMessage *msg, void *data)
  {
-@@ -207,9 +177,6 @@ static const GDBusMethodTable manager_methods[] = {
- 			GDBUS_ARGS({ "pattern", "s" }),
- 			GDBUS_ARGS({ "adapter", "o" }),
- 			find_adapter) },
--	{ GDBUS_DEPRECATED_METHOD("ListAdapters",
--			NULL, GDBUS_ARGS({ "adapters", "ao" }),
--			list_adapters) },
- 	{ }
- };
- 
+@@ -1662,9 +1630,6 @@ static const GDBusMethodTable adapter_methods[] = {
+ 			adapter_start_discovery) },
+ 	{ GDBUS_ASYNC_METHOD("StopDiscovery", NULL, NULL,
+ 			adapter_stop_discovery) },
+-	{ GDBUS_DEPRECATED_METHOD("ListDevices",
+-			NULL, GDBUS_ARGS({ "devices", "ao" }),
+-			list_devices) },
+ 	{ GDBUS_ASYNC_METHOD("CreateDevice",
+ 			GDBUS_ARGS({ "address", "s" }),
+ 			GDBUS_ARGS({ "device", "o" }),
 -- 
 1.7.10.2
 
