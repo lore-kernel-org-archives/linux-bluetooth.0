@@ -2,54 +2,79 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v3 04/22] manager: remove deprecated ListAdapters() method
-Date: Wed,  4 Jul 2012 14:31:45 +0200
-Message-Id: <1341405105-5760-1-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1341389867-30749-5-git-send-email-gustavo@padovan.org>
-References: <1341389867-30749-5-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v3 03/22] adapter: remove deprecated ListDevices() method
+Date: Wed,  4 Jul 2012 14:31:00 +0200
+Message-Id: <1341405060-5717-1-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1341389867-30749-6-git-send-email-gustavo@padovan.org>
+References: <1341389867-30749-6-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
 ---
- src/manager.c         |   33 ---------------------------------
- test/list-devices     |    3 +--
+ doc/adapter-api.txt   |   10 ----------
+ src/adapter.c         |   35 -----------------------------------
+ test/test-attrib      |    2 +-
+ test/test-device      |    2 +-
  test/test-health      |    2 +-
- test/test-health-sink |    3 +--
- 4 files changed, 3 insertions(+), 38 deletions(-)
+ test/test-health-sink |    2 +-
+ 6 files changed, 4 insertions(+), 49 deletions(-)
 
-diff --git a/src/manager.c b/src/manager.c
-index 1637657..4a39461 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -130,36 +130,6 @@ done:
- 	return reply;
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 916e941..176843b 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -88,16 +88,6 @@ Methods		dict GetProperties()
+ 			Possible Errors: org.bluez.Error.DoesNotExist
+ 					 org.bluez.Error.InvalidArguments
+ 
+-		array{object} ListDevices() {deprecated}
+-
+-			Returns list of device object paths.
+-			This method is deprecated, instead use the Devices
+-			Property to get the list of devices object paths.
+-
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.Failed
+-					 org.bluez.Error.OutOfMemory
+-
+ 		object CreateDevice(string address)
+ 
+ 			Creates a new object path for a remote device. This
+diff --git a/src/adapter.c b/src/adapter.c
+index eeba44d..a043366 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1307,38 +1307,6 @@ static DBusMessage *release_session(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
  }
  
--static DBusMessage *list_adapters(DBusConnection *conn,
--					DBusMessage *msg, void *data)
+-static DBusMessage *list_devices(DBusConnection *conn,
+-						DBusMessage *msg, void *data)
 -{
--	DBusMessageIter iter;
--	DBusMessageIter array_iter;
+-	struct btd_adapter *adapter = data;
 -	DBusMessage *reply;
 -	GSList *l;
+-	DBusMessageIter iter;
+-	DBusMessageIter array_iter;
+-	const gchar *dev_path;
 -
 -	reply = dbus_message_new_method_return(msg);
 -	if (!reply)
 -		return NULL;
 -
 -	dbus_message_iter_init_append(reply, &iter);
--
 -	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
 -				DBUS_TYPE_OBJECT_PATH_AS_STRING, &array_iter);
 -
--	for (l = adapters; l; l = l->next) {
--		struct btd_adapter *adapter = l->data;
--		const gchar *path = adapter_get_path(adapter);
+-	for (l = adapter->devices; l; l = l->next) {
+-		struct btd_device *device = l->data;
+-
+-		dev_path = device_get_path(device);
 -
 -		dbus_message_iter_append_basic(&array_iter,
--					DBUS_TYPE_OBJECT_PATH, &path);
+-				DBUS_TYPE_OBJECT_PATH, &dev_path);
 -	}
 -
 -	dbus_message_iter_close_container(&iter, &array_iter);
@@ -57,60 +82,71 @@ index 1637657..4a39461 100644
 -	return reply;
 -}
 -
- static DBusMessage *get_properties(DBusConnection *conn,
- 					DBusMessage *msg, void *data)
+ static DBusMessage *cancel_device_creation(DBusConnection *conn,
+ 						DBusMessage *msg, void *data)
  {
-@@ -207,9 +177,6 @@ static const GDBusMethodTable manager_methods[] = {
- 			GDBUS_ARGS({ "pattern", "s" }),
- 			GDBUS_ARGS({ "adapter", "o" }),
- 			find_adapter) },
--	{ GDBUS_DEPRECATED_METHOD("ListAdapters",
--			NULL, GDBUS_ARGS({ "adapters", "ao" }),
--			list_adapters) },
- 	{ }
- };
+@@ -1662,9 +1630,6 @@ static const GDBusMethodTable adapter_methods[] = {
+ 			adapter_start_discovery) },
+ 	{ GDBUS_ASYNC_METHOD("StopDiscovery", NULL, NULL,
+ 			adapter_stop_discovery) },
+-	{ GDBUS_DEPRECATED_METHOD("ListDevices",
+-			NULL, GDBUS_ARGS({ "devices", "ao" }),
+-			list_devices) },
+ 	{ GDBUS_ASYNC_METHOD("CreateDevice",
+ 			GDBUS_ARGS({ "address", "s" }),
+ 			GDBUS_ARGS({ "device", "o" }),
+diff --git a/test/test-attrib b/test/test-attrib
+index 52b399c..f83859d 100755
+--- a/test/test-attrib
++++ b/test/test-attrib
+@@ -46,7 +46,7 @@ if (len(args) < 1):
+ 	sys.exit(1)
  
-diff --git a/test/list-devices b/test/list-devices
-index 7ef6511..1683142 100755
---- a/test/list-devices
-+++ b/test/list-devices
-@@ -29,8 +29,7 @@ def extract_uuids(uuid_list):
- 		list = list + val + " "
- 	return list
+ if (args[0] == "list"):
+-	for path in adapter.ListDevices():
++	for path in adapter.GetProperties()["Devices"]:
+ 		device = dbus.Interface(bus.get_object("org.bluez", path),
+ 							"org.bluez.Device")
+ 		devprop = device.GetProperties()
+diff --git a/test/test-device b/test/test-device
+index 81a44f8..63a96d3 100755
+--- a/test/test-device
++++ b/test/test-device
+@@ -49,7 +49,7 @@ if (len(args) < 1):
+ 	sys.exit(1)
  
--adapter_list = manager.ListAdapters()
--
-+adapter_list = manager.GetProperties()["Adapters"]
- for i in adapter_list:
- 	adapter = dbus.Interface(bus.get_object("org.bluez", i),
- 							"org.bluez.Adapter")
+ if (args[0] == "list"):
+-	for path in adapter.ListDevices():
++	for path in adapter.GetProperties()["Devices"]:
+ 		device = dbus.Interface(bus.get_object("org.bluez", path),
+ 							"org.bluez.Device")
+ 		properties = device.GetProperties()
 diff --git a/test/test-health b/test/test-health
-index 307e880..a7df679 100755
+index f7d4241..307e880 100755
 --- a/test/test-health
 +++ b/test/test-health
-@@ -134,7 +134,7 @@ if not con:
- manager = dbus.Interface(bus.get_object("org.bluez", "/"),
- 						"org.bluez.Manager")
+@@ -157,7 +157,7 @@ while select == None:
+ adapter =  dbus.Interface(bus.get_object("org.bluez", select),
+ 						"org.bluez.Adapter")
  
--adapters = manager.ListAdapters()
-+adapters = manager.GetProperties()["Adapters"]
+-devices = adapter.ListDevices()
++devices = adapter.GetProperties()["Devices"]
  
- i = 1
- for ad in adapters:
+ if len(devices) == 0:
+ 	print("No devices available")
 diff --git a/test/test-health-sink b/test/test-health-sink
-index 7ee5e1a..333b2fb 100755
+index ce7337a..7ee5e1a 100755
 --- a/test/test-health-sink
 +++ b/test/test-health-sink
-@@ -24,8 +24,7 @@ print(app_path)
- manager = dbus.Interface(bus.get_object("org.bluez", "/"),
- 						"org.bluez.Manager")
+@@ -47,7 +47,7 @@ while select == None:
+ adapter =  dbus.Interface(bus.get_object("org.bluez", select),
+ 						"org.bluez.Adapter")
  
--adapters = manager.ListAdapters()
--
-+adapters = manager.GetProperties()["Adapters"]
- i = 1
- for ad in adapters:
- 	print("%d. %s" % (i, ad))
+-devices = adapter.ListDevices()
++devices = adapter.GetProperties()["Devices"]
+ 
+ if len(devices) == 0:
+ 	print("No devices available")
 -- 
 1.7.10.2
 
