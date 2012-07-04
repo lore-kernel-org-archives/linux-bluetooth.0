@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v2 27/28] cups: move it to profiles folder
-Date: Wed,  4 Jul 2012 10:17:46 +0200
-Message-Id: <1341389867-30749-28-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v2 20/28] thermometer: move to the profiles folder
+Date: Wed,  4 Jul 2012 10:17:39 +0200
+Message-Id: <1341389867-30749-21-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1341389867-30749-1-git-send-email-gustavo@padovan.org>
 References: <1341389867-30749-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,1679 +13,59 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
 ---
- Makefile.tools       |   12 +-
- cups/cups.h          |   38 ---
- cups/hcrp.c          |  368 ---------------------
- cups/main.c          |  896 --------------------------------------------------
- cups/sdp.c           |  119 -------
- cups/spp.c           |  118 -------
- profiles/cups/cups.h |   38 +++
- profiles/cups/hcrp.c |  368 +++++++++++++++++++++
- profiles/cups/main.c |  896 ++++++++++++++++++++++++++++++++++++++++++++++++++
- profiles/cups/sdp.c  |  119 +++++++
- profiles/cups/spp.c  |  118 +++++++
- 11 files changed, 1547 insertions(+), 1543 deletions(-)
- delete mode 100644 cups/cups.h
- delete mode 100644 cups/hcrp.c
- delete mode 100644 cups/main.c
- delete mode 100644 cups/sdp.c
- delete mode 100644 cups/spp.c
- create mode 100644 profiles/cups/cups.h
- create mode 100644 profiles/cups/hcrp.c
- create mode 100644 profiles/cups/main.c
- create mode 100644 profiles/cups/sdp.c
- create mode 100644 profiles/cups/spp.c
+ Makefile.am                        |    8 +-
+ profiles/thermometer/main.c        |   70 ++
+ profiles/thermometer/manager.c     |   92 +++
+ profiles/thermometer/manager.h     |   24 +
+ profiles/thermometer/thermometer.c | 1274 ++++++++++++++++++++++++++++++++++++
+ profiles/thermometer/thermometer.h |   25 +
+ thermometer/main.c                 |   70 --
+ thermometer/manager.c              |   92 ---
+ thermometer/manager.h              |   24 -
+ thermometer/thermometer.c          | 1274 ------------------------------------
+ thermometer/thermometer.h          |   25 -
+ 11 files changed, 1490 insertions(+), 1488 deletions(-)
+ create mode 100644 profiles/thermometer/main.c
+ create mode 100644 profiles/thermometer/manager.c
+ create mode 100644 profiles/thermometer/manager.h
+ create mode 100644 profiles/thermometer/thermometer.c
+ create mode 100644 profiles/thermometer/thermometer.h
+ delete mode 100644 thermometer/main.c
+ delete mode 100644 thermometer/manager.c
+ delete mode 100644 thermometer/manager.h
+ delete mode 100644 thermometer/thermometer.c
+ delete mode 100644 thermometer/thermometer.h
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 3cfc6f3..35e2644 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -148,12 +148,16 @@ EXTRA_DIST += tools/dfubabel.1 tools/avctrl.8
- if CUPS
- cupsdir = $(libdir)/cups/backend
+diff --git a/Makefile.am b/Makefile.am
+index 6592c5c..b816e20 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -217,9 +217,11 @@ endif
  
--cups_PROGRAMS = cups/bluetooth
-+cups_PROGRAMS = profiles/cups/bluetooth
- 
--cups_bluetooth_SOURCES = $(gdbus_sources) cups/main.c cups/cups.h \
--					cups/sdp.c cups/spp.c cups/hcrp.c
-+profiles_cups_bluetooth_SOURCES = $(gdbus_sources) profiles/cups/main.c \
-+					profiles/cups/cups.h \
-+					profiles/cups/sdp.c \
-+					profiles/cups/spp.c \
-+					profiles/cups/hcrp.c
- 
--cups_bluetooth_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ lib/libbluetooth-private.la
-+profiles_cups_bluetooth_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ \
-+				lib/libbluetooth-private.la
- endif
- 
- 
-diff --git a/cups/cups.h b/cups/cups.h
-deleted file mode 100644
-index f4e0c01..0000000
---- a/cups/cups.h
-+++ /dev/null
-@@ -1,38 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2003-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--enum {					/**** Backend exit codes ****/
--	CUPS_BACKEND_OK = 0,		/* Job completed successfully */
--	CUPS_BACKEND_FAILED = 1,	/* Job failed, use error-policy */
--	CUPS_BACKEND_AUTH_REQUIRED = 2,	/* Job failed, authentication required */
--	CUPS_BACKEND_HOLD = 3,		/* Job failed, hold job */
--	CUPS_BACKEND_STOP = 4,		/* Job failed, stop queue */
--	CUPS_BACKEND_CANCEL = 5,	/* Job failed, cancel job */
--	CUPS_BACKEND_RETRY = 6,		/* Failure requires us to retry (BlueZ specific) */
--};
--
--int sdp_search_spp(sdp_session_t *sdp, uint8_t *channel);
--int sdp_search_hcrp(sdp_session_t *sdp, unsigned short *ctrl_psm, unsigned short *data_psm);
--
--int spp_print(bdaddr_t *src, bdaddr_t *dst, uint8_t channel, int fd, int copies, const char *cups_class);
--int hcrp_print(bdaddr_t *src, bdaddr_t *dst, unsigned short ctrl_psm, unsigned short data_psm, int fd, int copies, const char *cups_class);
-diff --git a/cups/hcrp.c b/cups/hcrp.c
-deleted file mode 100644
-index a93dda0..0000000
---- a/cups/hcrp.c
-+++ /dev/null
-@@ -1,368 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2003-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stdio.h>
--#include <errno.h>
--#include <unistd.h>
--#include <string.h>
--#include <signal.h>
--#include <sys/socket.h>
--
--#include <bluetooth/bluetooth.h>
--#include <bluetooth/l2cap.h>
--#include <bluetooth/sdp.h>
--#include <bluetooth/sdp_lib.h>
--
--#include <netinet/in.h>
--
--#include "cups.h"
--
--#define HCRP_PDU_CREDIT_GRANT		0x0001
--#define HCRP_PDU_CREDIT_REQUEST		0x0002
--#define HCRP_PDU_GET_LPT_STATUS		0x0005
--
--#define HCRP_STATUS_FEATURE_UNSUPPORTED	0x0000
--#define HCRP_STATUS_SUCCESS		0x0001
--#define HCRP_STATUS_CREDIT_SYNC_ERROR	0x0002
--#define HCRP_STATUS_GENERIC_FAILURE	0xffff
--
--struct hcrp_pdu_hdr {
--	uint16_t pid;
--	uint16_t tid;
--	uint16_t plen;
--} __attribute__ ((packed));
--#define HCRP_PDU_HDR_SIZE 6
--
--struct hcrp_credit_grant_cp {
--	uint32_t credit;
--} __attribute__ ((packed));
--#define HCRP_CREDIT_GRANT_CP_SIZE 4
--
--struct hcrp_credit_grant_rp {
--	uint16_t status;
--} __attribute__ ((packed));
--#define HCRP_CREDIT_GRANT_RP_SIZE 2
--
--struct hcrp_credit_request_rp {
--	uint16_t status;
--	uint32_t credit;
--} __attribute__ ((packed));
--#define HCRP_CREDIT_REQUEST_RP_SIZE 6
--
--struct hcrp_get_lpt_status_rp {
--	uint16_t status;
--	uint8_t  lpt_status;
--} __attribute__ ((packed));
--#define HCRP_GET_LPT_STATUS_RP_SIZE 3
--
--static int hcrp_credit_grant(int sk, uint16_t tid, uint32_t credit)
--{
--	struct hcrp_pdu_hdr hdr;
--	struct hcrp_credit_grant_cp cp;
--	struct hcrp_credit_grant_rp rp;
--	unsigned char buf[128];
--	int len;
--
--	hdr.pid = htons(HCRP_PDU_CREDIT_GRANT);
--	hdr.tid = htons(tid);
--	hdr.plen = htons(HCRP_CREDIT_GRANT_CP_SIZE);
--	cp.credit = credit;
--	memcpy(buf, &hdr, HCRP_PDU_HDR_SIZE);
--	memcpy(buf + HCRP_PDU_HDR_SIZE, &cp, HCRP_CREDIT_GRANT_CP_SIZE);
--	len = write(sk, buf, HCRP_PDU_HDR_SIZE + HCRP_CREDIT_GRANT_CP_SIZE);
--	if (len < 0)
--		return len;
--
--	len = read(sk, buf, sizeof(buf));
--	if (len < 0)
--		return len;
--
--	memcpy(&hdr, buf, HCRP_PDU_HDR_SIZE);
--	memcpy(&rp, buf + HCRP_PDU_HDR_SIZE, HCRP_CREDIT_GRANT_RP_SIZE);
--
--	if (ntohs(rp.status) != HCRP_STATUS_SUCCESS) {
--		errno = EIO;
--		return -1;
--	}
--
--	return 0;
--}
--
--static int hcrp_credit_request(int sk, uint16_t tid, uint32_t *credit)
--{
--	struct hcrp_pdu_hdr hdr;
--	struct hcrp_credit_request_rp rp;
--	unsigned char buf[128];
--	int len;
--
--	hdr.pid = htons(HCRP_PDU_CREDIT_REQUEST);
--	hdr.tid = htons(tid);
--	hdr.plen = htons(0);
--	memcpy(buf, &hdr, HCRP_PDU_HDR_SIZE);
--	len = write(sk, buf, HCRP_PDU_HDR_SIZE);
--	if (len < 0)
--		return len;
--
--	len = read(sk, buf, sizeof(buf));
--	if (len < 0)
--		return len;
--
--	memcpy(&hdr, buf, HCRP_PDU_HDR_SIZE);
--	memcpy(&rp, buf + HCRP_PDU_HDR_SIZE, HCRP_CREDIT_REQUEST_RP_SIZE);
--
--	if (ntohs(rp.status) != HCRP_STATUS_SUCCESS) {
--		errno = EIO;
--		return -1;
--	}
--
--	if (credit)
--		*credit = ntohl(rp.credit);
--
--	return 0;
--}
--
--static int hcrp_get_lpt_status(int sk, uint16_t tid, uint8_t *lpt_status)
--{
--	struct hcrp_pdu_hdr hdr;
--	struct hcrp_get_lpt_status_rp rp;
--	unsigned char buf[128];
--	int len;
--
--	hdr.pid = htons(HCRP_PDU_GET_LPT_STATUS);
--	hdr.tid = htons(tid);
--	hdr.plen = htons(0);
--	memcpy(buf, &hdr, HCRP_PDU_HDR_SIZE);
--	len = write(sk, buf, HCRP_PDU_HDR_SIZE);
--	if (len < 0)
--		return len;
--
--	len = read(sk, buf, sizeof(buf));
--	if (len < 0)
--		return len;
--
--	memcpy(&hdr, buf, HCRP_PDU_HDR_SIZE);
--	memcpy(&rp, buf + HCRP_PDU_HDR_SIZE, HCRP_GET_LPT_STATUS_RP_SIZE);
--
--	if (ntohs(rp.status) != HCRP_STATUS_SUCCESS) {
--		errno = EIO;
--		return -1;
--	}
--
--	if (lpt_status)
--		*lpt_status = rp.lpt_status;
--
--	return 0;
--}
--
--static inline int hcrp_get_next_tid(int tid)
--{
--	if (tid > 0xf000)
--		return 0;
--	else
--		return tid + 1;
--}
--
--int hcrp_print(bdaddr_t *src, bdaddr_t *dst, unsigned short ctrl_psm, unsigned short data_psm, int fd, int copies, const char *cups_class)
--{
--	struct sockaddr_l2 addr;
--	struct l2cap_options opts;
--	socklen_t size;
--	unsigned char buf[2048];
--	int i, ctrl_sk, data_sk, count, len, timeout = 0;
--	unsigned int mtu;
--	uint8_t status;
--	uint16_t tid = 0;
--	uint32_t tmp, credit = 0;
--
--	if ((ctrl_sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP)) < 0) {
--		perror("ERROR: Can't create socket");
--		if (cups_class)
--			return CUPS_BACKEND_FAILED;
--		else
--			return CUPS_BACKEND_RETRY;
--	}
--
--	memset(&addr, 0, sizeof(addr));
--	addr.l2_family = AF_BLUETOOTH;
--	bacpy(&addr.l2_bdaddr, src);
--
--	if (bind(ctrl_sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		perror("ERROR: Can't bind socket");
--		close(ctrl_sk);
--		if (cups_class)
--			return CUPS_BACKEND_FAILED;
--		else
--			return CUPS_BACKEND_RETRY;
--	}
--
--	memset(&addr, 0, sizeof(addr));
--	addr.l2_family = AF_BLUETOOTH;
--	bacpy(&addr.l2_bdaddr, dst);
--	addr.l2_psm = htobs(ctrl_psm);
--
--	if (connect(ctrl_sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		perror("ERROR: Can't connect to device");
--		close(ctrl_sk);
--		if (cups_class)
--			return CUPS_BACKEND_FAILED;
--		else
--			return CUPS_BACKEND_RETRY;
--	}
--
--	if ((data_sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP)) < 0) {
--		perror("ERROR: Can't create socket");
--		close(ctrl_sk);
--		if (cups_class)
--			return CUPS_BACKEND_FAILED;
--		else
--			return CUPS_BACKEND_RETRY;
--	}
--
--	memset(&addr, 0, sizeof(addr));
--	addr.l2_family = AF_BLUETOOTH;
--	bacpy(&addr.l2_bdaddr, src);
--
--	if (bind(data_sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		perror("ERROR: Can't bind socket");
--		close(data_sk);
--		close(ctrl_sk);
--		if (cups_class)
--			return CUPS_BACKEND_FAILED;
--		else
--			return CUPS_BACKEND_RETRY;
--	}
--
--	memset(&addr, 0, sizeof(addr));
--	addr.l2_family = AF_BLUETOOTH;
--	bacpy(&addr.l2_bdaddr, dst);
--	addr.l2_psm = htobs(data_psm);
--
--	if (connect(data_sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		perror("ERROR: Can't connect to device");
--		close(data_sk);
--		close(ctrl_sk);
--		if (cups_class)
--			return CUPS_BACKEND_FAILED;
--		else
--			return CUPS_BACKEND_RETRY;
--	}
--
--	fputs("STATE: -connecting-to-device\n", stderr);
--
--	memset(&opts, 0, sizeof(opts));
--	size = sizeof(opts);
--
--	if (getsockopt(data_sk, SOL_L2CAP, L2CAP_OPTIONS, &opts, &size) < 0) {
--		perror("ERROR: Can't get socket options");
--		close(data_sk);
--		close(ctrl_sk);
--		if (cups_class)
--			return CUPS_BACKEND_FAILED;
--		else
--			return CUPS_BACKEND_RETRY;
--	}
--
--	mtu = opts.omtu;
--
--	/* Ignore SIGTERM signals if printing from stdin */
--	if (fd == 0) {
--#ifdef HAVE_SIGSET
--		sigset(SIGTERM, SIG_IGN);
--#elif defined(HAVE_SIGACTION)
--		memset(&action, 0, sizeof(action));
--		sigemptyset(&action.sa_mask);
--		action.sa_handler = SIG_IGN;
--		sigaction(SIGTERM, &action, NULL);
--#else
--		signal(SIGTERM, SIG_IGN);
--#endif /* HAVE_SIGSET */
--	}
--
--	tid = hcrp_get_next_tid(tid);
--	if (hcrp_credit_grant(ctrl_sk, tid, 0) < 0) {
--		fprintf(stderr, "ERROR: Can't grant initial credits\n");
--		close(data_sk);
--		close(ctrl_sk);
--		if (cups_class)
--			return CUPS_BACKEND_FAILED;
--		else
--			return CUPS_BACKEND_RETRY;
--	}
--
--	for (i = 0; i < copies; i++) {
--
--		if (fd != 0) {
--			fprintf(stderr, "PAGE: 1 1\n");
--			lseek(fd, 0, SEEK_SET);
--		}
--
--		while (1) {
--			if (credit < mtu) {
--				tid = hcrp_get_next_tid(tid);
--				if (!hcrp_credit_request(ctrl_sk, tid, &tmp)) {
--					credit += tmp;
--					timeout = 0;
--				}
--			}
--
--			if (!credit) {
--				if (timeout++ > 300) {
--					tid = hcrp_get_next_tid(tid);
--					if (!hcrp_get_lpt_status(ctrl_sk, tid, &status))
--						fprintf(stderr, "ERROR: LPT status 0x%02x\n", status);
--					break;
--				}
--
--				sleep(1);
--				continue;
--			}
--
--			count = read(fd, buf, (credit > mtu) ? mtu : credit);
--			if (count <= 0)
--				break;
--
--			len = write(data_sk, buf, count);
--			if (len < 0) {
--				perror("ERROR: Error writing to device");
--				close(data_sk);
--				close(ctrl_sk);
--				return CUPS_BACKEND_FAILED;
--			}
--
--			if (len != count)
--				fprintf(stderr, "ERROR: Can't send complete data\n");
--
--			credit -= len;
--		}
--
--	}
--
--	close(data_sk);
--	close(ctrl_sk);
--
--	return CUPS_BACKEND_OK;
--}
-diff --git a/cups/main.c b/cups/main.c
-deleted file mode 100644
-index a884c6e..0000000
---- a/cups/main.c
-+++ /dev/null
-@@ -1,896 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2003-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stdio.h>
--#include <errno.h>
--#include <fcntl.h>
--#include <unistd.h>
--#include <stdlib.h>
--#include <string.h>
--#include <signal.h>
--#include <sys/socket.h>
--#include <glib.h>
--
--#include <bluetooth/bluetooth.h>
--#include <bluetooth/sdp.h>
--#include <bluetooth/sdp_lib.h>
--
--#include <gdbus.h>
--
--#include "cups.h"
--
--struct cups_device {
--	char *bdaddr;
--	char *name;
--	char *id;
--};
--
--static GSList *device_list = NULL;
--static GMainLoop *loop = NULL;
--static DBusConnection *conn = NULL;
--static gboolean doing_disco = FALSE;
--
--#define ATTRID_1284ID 0x0300
--
--struct context_data {
--	gboolean found;
--	char *id;
--};
--
--static void element_start(GMarkupParseContext *context,
--				const gchar *element_name,
--				const gchar **attribute_names,
--				const gchar **attribute_values,
--				gpointer user_data, GError **err)
--{
--	struct context_data *ctx_data = user_data;
--
--	if (!strcmp(element_name, "record"))
--		return;
--
--	if (!strcmp(element_name, "attribute")) {
--		int i;
--		for (i = 0; attribute_names[i]; i++) {
--			if (strcmp(attribute_names[i], "id") != 0)
--				continue;
--			if (strtol(attribute_values[i], 0, 0) == ATTRID_1284ID)
--				ctx_data->found = TRUE;
--			break;
--		}
--		return;
--	}
--
--	if (ctx_data->found  && !strcmp(element_name, "text")) {
--		int i;
--		for (i = 0; attribute_names[i]; i++) {
--			if (!strcmp(attribute_names[i], "value")) {
--				ctx_data->id = g_strdup(attribute_values[i] + 2);
--				ctx_data->found = FALSE;
--			}
--		}
--	}
--}
--
--static GMarkupParser parser = {
--	element_start, NULL, NULL, NULL, NULL
--};
--
--static char *sdp_xml_parse_record(const char *data)
--{
--	GMarkupParseContext *ctx;
--	struct context_data ctx_data;
--	int size;
--
--	size = strlen(data);
--	ctx_data.found = FALSE;
--	ctx_data.id = NULL;
--	ctx = g_markup_parse_context_new(&parser, 0, &ctx_data, NULL);
--
--	if (g_markup_parse_context_parse(ctx, data, size, NULL) == FALSE) {
--		g_markup_parse_context_free(ctx);
--		g_free(ctx_data.id);
--		return NULL;
--	}
--
--	g_markup_parse_context_free(ctx);
--
--	return ctx_data.id;
--}
--
--static char *device_get_ieee1284_id(const char *adapter, const char *device)
--{
--	DBusMessage *message, *reply;
--	DBusMessageIter iter, reply_iter;
--	DBusMessageIter reply_iter_entry;
--	const char *hcr_print = "00001126-0000-1000-8000-00805f9b34fb";
--	const char *xml;
--	char *id = NULL;
--
--	/* Look for the service handle of the HCRP service */
--	message = dbus_message_new_method_call("org.bluez", device,
--						"org.bluez.Device",
--						"DiscoverServices");
--	dbus_message_iter_init_append(message, &iter);
--	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &hcr_print);
--
--	reply = dbus_connection_send_with_reply_and_block(conn,
--							message, -1, NULL);
--
--	dbus_message_unref(message);
--
--	if (!reply)
--		return NULL;
--
--	dbus_message_iter_init(reply, &reply_iter);
--
--	if (dbus_message_iter_get_arg_type(&reply_iter) != DBUS_TYPE_ARRAY) {
--		dbus_message_unref(reply);
--		return NULL;
--	}
--
--	dbus_message_iter_recurse(&reply_iter, &reply_iter_entry);
--
--	/* Hopefully we only get one handle, or take a punt */
--	while (dbus_message_iter_get_arg_type(&reply_iter_entry) ==
--							DBUS_TYPE_DICT_ENTRY) {
--		guint32 key;
--		DBusMessageIter dict_entry;
--
--		dbus_message_iter_recurse(&reply_iter_entry, &dict_entry);
--
--		/* Key ? */
--		dbus_message_iter_get_basic(&dict_entry, &key);
--		if (!key) {
--			dbus_message_iter_next(&reply_iter_entry);
--			continue;
--		}
--
--		/* Try to get the value */
--		if (!dbus_message_iter_next(&dict_entry)) {
--			dbus_message_iter_next(&reply_iter_entry);
--			continue;
--		}
--
--		dbus_message_iter_get_basic(&dict_entry, &xml);
--
--		id = sdp_xml_parse_record(xml);
--		if (id != NULL)
--			break;
--		dbus_message_iter_next(&reply_iter_entry);
--	}
--
--	dbus_message_unref(reply);
--
--	return id;
--}
--
--static void print_printer_details(const char *name, const char *bdaddr,
--								const char *id)
--{
--	char *uri, *escaped;
--
--	escaped = g_strdelimit(g_strdup(name), "\"", '\'');
--	uri = g_strdup_printf("bluetooth://%c%c%c%c%c%c%c%c%c%c%c%c",
--				bdaddr[0], bdaddr[1],
--				bdaddr[3], bdaddr[4],
--				bdaddr[6], bdaddr[7],
--				bdaddr[9], bdaddr[10],
--				bdaddr[12], bdaddr[13],
--				bdaddr[15], bdaddr[16]);
--	printf("direct %s \"%s\" \"%s (Bluetooth)\"", uri, escaped, escaped);
--	if (id != NULL)
--		printf(" \"%s\"\n", id);
--	else
--		printf("\n");
--	g_free(escaped);
--	g_free(uri);
--}
--
--static void add_device_to_list(const char *name, const char *bdaddr,
--								const char *id)
--{
--	struct cups_device *device;
--	GSList *l;
--
--	/* Look for the device in the list */
--	for (l = device_list; l != NULL; l = l->next) {
--		device = (struct cups_device *) l->data;
--
--		if (strcmp(device->bdaddr, bdaddr) == 0) {
--			if (device->name != name) {
--				g_free(device->name);
--				device->name = g_strdup(name);
--			}
--			g_free(device->id);
--			device->id = g_strdup(id);
--			return;
--		}
--	}
--
--	/* Or add it to the list if it's not there */
--	device = g_new0(struct cups_device, 1);
--	device->bdaddr = g_strdup(bdaddr);
--	device->name = g_strdup(name);
--	device->id = g_strdup(id);
--
--	device_list = g_slist_prepend(device_list, device);
--	print_printer_details(device->name, device->bdaddr, device->id);
--}
--
--static gboolean parse_device_properties(DBusMessageIter *reply_iter,
--						char **name, char **bdaddr)
--{
--	guint32 class = 0;
--	DBusMessageIter reply_iter_entry;
--
--	if (dbus_message_iter_get_arg_type(reply_iter) != DBUS_TYPE_ARRAY)
--		return FALSE;
--
--	dbus_message_iter_recurse(reply_iter, &reply_iter_entry);
--
--	while (dbus_message_iter_get_arg_type(&reply_iter_entry) ==
--							DBUS_TYPE_DICT_ENTRY) {
--		const char *key;
--		DBusMessageIter dict_entry, iter_dict_val;
--
--		dbus_message_iter_recurse(&reply_iter_entry, &dict_entry);
--
--		/* Key == Class ? */
--		dbus_message_iter_get_basic(&dict_entry, &key);
--		if (!key) {
--			dbus_message_iter_next(&reply_iter_entry);
--			continue;
--		}
--
--		if (strcmp(key, "Class") != 0 &&
--				strcmp(key, "Alias") != 0 &&
--				strcmp(key, "Address") != 0) {
--			dbus_message_iter_next(&reply_iter_entry);
--			continue;
--		}
--
--		/* Try to get the value */
--		if (!dbus_message_iter_next(&dict_entry)) {
--			dbus_message_iter_next(&reply_iter_entry);
--			continue;
--		}
--		dbus_message_iter_recurse(&dict_entry, &iter_dict_val);
--		if (strcmp(key, "Class") == 0) {
--			dbus_message_iter_get_basic(&iter_dict_val, &class);
--		} else {
--			const char *value;
--			dbus_message_iter_get_basic(&iter_dict_val, &value);
--			if (strcmp(key, "Alias") == 0) {
--				*name = g_strdup(value);
--			} else if (bdaddr) {
--				*bdaddr = g_strdup(value);
--			}
--		}
--		dbus_message_iter_next(&reply_iter_entry);
--	}
--
--	if (class == 0)
--		return FALSE;
--	if (((class & 0x1f00) >> 8) == 0x06 && (class & 0x80))
--		return TRUE;
--
--	return FALSE;
--}
--
--static gboolean device_is_printer(const char *adapter, const char *device_path, char **name, char **bdaddr)
--{
--	DBusMessage *message, *reply;
--	DBusMessageIter reply_iter;
--	gboolean retval;
--
--	message = dbus_message_new_method_call("org.bluez", device_path,
--							"org.bluez.Device",
--							"GetProperties");
--
--	reply = dbus_connection_send_with_reply_and_block(conn,
--							message, -1, NULL);
--
--	dbus_message_unref(message);
--
--	if (!reply)
--		return FALSE;
--
--	dbus_message_iter_init(reply, &reply_iter);
--
--	retval = parse_device_properties(&reply_iter, name, bdaddr);
--
--	dbus_message_unref(reply);
--
--	return retval;
--}
--
--static void remote_device_found(const char *adapter, const char *bdaddr,
--							const char *name)
--{
--	DBusMessage *message, *reply, *adapter_reply;
--	DBusMessageIter iter;
--	char *object_path = NULL;
--	char *id;
--
--	adapter_reply = NULL;
--
--	if (adapter == NULL) {
--		message = dbus_message_new_method_call("org.bluez", "/",
--							"org.bluez.Manager",
--							"DefaultAdapter");
--
--		adapter_reply = dbus_connection_send_with_reply_and_block(conn,
--							message, -1, NULL);
--
--		dbus_message_unref(message);
--
--		if (!adapter_reply)
--			return;
--
--		if (dbus_message_get_args(adapter_reply, NULL,
--					DBUS_TYPE_OBJECT_PATH, &adapter,
--					DBUS_TYPE_INVALID) == FALSE) {
--			dbus_message_unref(adapter_reply);
--			return;
--		}
--	}
--
--	message = dbus_message_new_method_call("org.bluez", adapter,
--							"org.bluez.Adapter",
--							"FindDevice");
--	dbus_message_iter_init_append(message, &iter);
--	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
--
--	if (adapter_reply != NULL)
--		dbus_message_unref(adapter_reply);
--
--	reply = dbus_connection_send_with_reply_and_block(conn,
--							message, -1, NULL);
--
--	dbus_message_unref(message);
--
--	if (!reply) {
--		message = dbus_message_new_method_call("org.bluez", adapter,
--							"org.bluez.Adapter",
--							"CreateDevice");
--		dbus_message_iter_init_append(message, &iter);
--		dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
--
--		reply = dbus_connection_send_with_reply_and_block(conn,
--							message, -1, NULL);
--
--		dbus_message_unref(message);
--
--		if (!reply)
--			return;
--	}
--
--	if (dbus_message_get_args(reply, NULL,
--					DBUS_TYPE_OBJECT_PATH, &object_path,
--					DBUS_TYPE_INVALID) == FALSE) {
--		dbus_message_unref(reply);
--		return;
--	}
--
--	id = device_get_ieee1284_id(adapter, object_path);
--	add_device_to_list(name, bdaddr, id);
--	g_free(id);
--
--	dbus_message_unref(reply);
--}
--
--static void discovery_completed(void)
--{
--	g_slist_free(device_list);
--	device_list = NULL;
--
--	g_main_loop_quit(loop);
--}
--
--static void remote_device_disappeared(const char *bdaddr)
--{
--	GSList *l;
--
--	for (l = device_list; l != NULL; l = l->next) {
--		struct cups_device *device = l->data;
--
--		if (strcmp(device->bdaddr, bdaddr) == 0) {
--			g_free(device->name);
--			g_free(device->bdaddr);
--			g_free(device);
--			device_list = g_slist_delete_link(device_list, l);
--			return;
--		}
--	}
--}
--
--static gboolean list_known_printers(const char *adapter)
--{
--	DBusMessageIter reply_iter, iter_array;
--	DBusError error;
--	DBusMessage *message, *reply;
--
--	message = dbus_message_new_method_call("org.bluez", adapter,
--						"org.bluez.Adapter",
--						"ListDevices");
--	if (message == NULL)
--		return FALSE;
--
--	dbus_error_init(&error);
--	reply = dbus_connection_send_with_reply_and_block(conn, message,
--								-1, &error);
--
--	dbus_message_unref(message);
--
--	if (dbus_error_is_set(&error))
--		return FALSE;
--
--	dbus_message_iter_init(reply, &reply_iter);
--	if (dbus_message_iter_get_arg_type(&reply_iter) != DBUS_TYPE_ARRAY) {
--		dbus_message_unref(reply);
--		return FALSE;
--	}
--
--	dbus_message_iter_recurse(&reply_iter, &iter_array);
--	while (dbus_message_iter_get_arg_type(&iter_array) ==
--						DBUS_TYPE_OBJECT_PATH) {
--		const char *object_path;
--		char *name = NULL;
--		char *bdaddr = NULL;
--
--		dbus_message_iter_get_basic(&iter_array, &object_path);
--		if (device_is_printer(adapter, object_path, &name, &bdaddr)) {
--			char *id;
--
--			id = device_get_ieee1284_id(adapter, object_path);
--			add_device_to_list(name, bdaddr, id);
--			g_free(id);
--		}
--		g_free(name);
--		g_free(bdaddr);
--		dbus_message_iter_next(&iter_array);
--	}
--
--	dbus_message_unref(reply);
--
--	return FALSE;
--}
--
--static DBusHandlerResult filter_func(DBusConnection *connection,
--					DBusMessage *message, void *user_data)
--{
--	if (dbus_message_is_signal(message, "org.bluez.Adapter",
--						"DeviceFound")) {
--		const char *adapter, *bdaddr;
--		char *name;
--		DBusMessageIter iter;
--
--		dbus_message_iter_init(message, &iter);
--		dbus_message_iter_get_basic(&iter, &bdaddr);
--		dbus_message_iter_next(&iter);
--
--		adapter = dbus_message_get_path(message);
--		if (parse_device_properties(&iter, &name, NULL))
--			remote_device_found(adapter, bdaddr, name);
--		g_free (name);
--	} else if (dbus_message_is_signal(message, "org.bluez.Adapter",
--						"DeviceDisappeared")) {
--		const char *bdaddr;
--
--		dbus_message_get_args(message, NULL,
--					DBUS_TYPE_STRING, &bdaddr,
--					DBUS_TYPE_INVALID);
--		remote_device_disappeared(bdaddr);
--	} else if (dbus_message_is_signal(message, "org.bluez.Adapter",
--						"PropertyChanged")) {
--		DBusMessageIter iter, value_iter;
--		const char *name;
--		gboolean discovering;
--
--		dbus_message_iter_init(message, &iter);
--		dbus_message_iter_get_basic(&iter, &name);
--		if (name == NULL || strcmp(name, "Discovering") != 0)
--			return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
--		dbus_message_iter_next(&iter);
--		dbus_message_iter_recurse(&iter, &value_iter);
--		dbus_message_iter_get_basic(&value_iter, &discovering);
--
--		if (discovering == FALSE && doing_disco) {
--			doing_disco = FALSE;
--			discovery_completed();
--		}
--	}
--
--	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
--}
--
--static gboolean list_printers(void)
--{
--	/* 1. Connect to the bus
--	 * 2. Get the manager
--	 * 3. Get the default adapter
--	 * 4. Get a list of devices
--	 * 5. Get the class of each device
--	 * 6. Print the details from each printer device
--	 */
--	DBusError error;
--	dbus_bool_t hcid_exists;
--	DBusMessage *reply, *message;
--	DBusMessageIter reply_iter;
--	char *adapter, *match;
--
--	conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
--	if (conn == NULL)
--		return TRUE;
--
--	dbus_error_init(&error);
--	hcid_exists = dbus_bus_name_has_owner(conn, "org.bluez", &error);
--	if (dbus_error_is_set(&error))
--		return TRUE;
--
--	if (!hcid_exists)
--		return TRUE;
--
--	/* Get the default adapter */
--	message = dbus_message_new_method_call("org.bluez", "/",
--						"org.bluez.Manager",
--						"DefaultAdapter");
--	if (message == NULL) {
--		dbus_connection_unref(conn);
--		return FALSE;
--	}
--
--	reply = dbus_connection_send_with_reply_and_block(conn,
--							message, -1, &error);
--
--	dbus_message_unref(message);
--
--	if (dbus_error_is_set(&error)) {
--		dbus_connection_unref(conn);
--		/* No adapter */
--		return TRUE;
--	}
--
--	dbus_message_iter_init(reply, &reply_iter);
--	if (dbus_message_iter_get_arg_type(&reply_iter) !=
--						DBUS_TYPE_OBJECT_PATH) {
--		dbus_message_unref(reply);
--		dbus_connection_unref(conn);
--		return FALSE;
--	}
--
--	dbus_message_iter_get_basic(&reply_iter, &adapter);
--	adapter = g_strdup(adapter);
--	dbus_message_unref(reply);
--
--	if (!dbus_connection_add_filter(conn, filter_func, adapter, g_free)) {
--		g_free(adapter);
--		dbus_connection_unref(conn);
--		return FALSE;
--	}
--
--#define MATCH_FORMAT				\
--	"type='signal',"			\
--	"interface='org.bluez.Adapter',"	\
--	"sender='org.bluez',"			\
--	"path='%s'"
--
--	match = g_strdup_printf(MATCH_FORMAT, adapter);
--	dbus_bus_add_match(conn, match, &error);
--	g_free(match);
--
--	/* Add the the recent devices */
--	list_known_printers(adapter);
--
--	doing_disco = TRUE;
--	message = dbus_message_new_method_call("org.bluez", adapter,
--					"org.bluez.Adapter",
--					"StartDiscovery");
--
--	if (!dbus_connection_send_with_reply(conn, message, NULL, -1)) {
--		dbus_message_unref(message);
--		dbus_connection_unref(conn);
--		g_free(adapter);
--		return FALSE;
--	}
--	dbus_message_unref(message);
--
--	loop = g_main_loop_new(NULL, TRUE);
--	g_main_loop_run(loop);
--
--	g_free(adapter);
--	dbus_connection_unref(conn);
--
--	return TRUE;
--}
--
--static gboolean print_ieee1284(const char *bdaddr)
--{
--	DBusMessage *message, *reply, *adapter_reply;
--	DBusMessageIter iter;
--	char *object_path = NULL;
--	char *adapter;
--	char *id;
--
--	adapter_reply = NULL;
--
--	conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
--	if (conn == NULL)
--		return FALSE;
--
--	message = dbus_message_new_method_call("org.bluez", "/",
--			"org.bluez.Manager",
--			"DefaultAdapter");
--
--	adapter_reply = dbus_connection_send_with_reply_and_block(conn,
--			message, -1, NULL);
--
--	dbus_message_unref(message);
--
--	if (!adapter_reply)
--		return FALSE;
--
--	if (dbus_message_get_args(adapter_reply, NULL,
--			DBUS_TYPE_OBJECT_PATH, &adapter,
--			DBUS_TYPE_INVALID) == FALSE) {
--		dbus_message_unref(adapter_reply);
--		return FALSE;
--	}
--
--	message = dbus_message_new_method_call("org.bluez", adapter,
--			"org.bluez.Adapter",
--			"FindDevice");
--	dbus_message_iter_init_append(message, &iter);
--	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
--
--	if (adapter_reply != NULL)
--		dbus_message_unref(adapter_reply);
--
--	reply = dbus_connection_send_with_reply_and_block(conn,
--			message, -1, NULL);
--
--	dbus_message_unref(message);
--
--	if (!reply) {
--		message = dbus_message_new_method_call("org.bluez", adapter,
--				"org.bluez.Adapter",
--				"CreateDevice");
--		dbus_message_iter_init_append(message, &iter);
--		dbus_message_iter_append_basic(&iter,
--				DBUS_TYPE_STRING, &bdaddr);
--
--		reply = dbus_connection_send_with_reply_and_block(conn,
--				message, -1, NULL);
--
--		dbus_message_unref(message);
--
--		if (!reply)
--			return FALSE;
--	}
--
--	if (dbus_message_get_args(reply, NULL,
--					DBUS_TYPE_OBJECT_PATH, &object_path,
--					DBUS_TYPE_INVALID) == FALSE) {
--		dbus_message_unref(reply);
--		return FALSE;
--	}
--
--	id = device_get_ieee1284_id(adapter, object_path);
--	if (id == NULL) {
--		dbus_message_unref(reply);
--		return FALSE;
--	}
--	printf("%s", id);
--	g_free(id);
--
--	dbus_message_unref(reply);
--
--	return TRUE;
--}
--
--/*
-- *  Usage: printer-uri job-id user title copies options [file]
-- *
-- */
--
--int main(int argc, char *argv[])
--{
--	sdp_session_t *sdp;
--	bdaddr_t bdaddr;
--	unsigned short ctrl_psm, data_psm;
--	uint8_t channel, b[6];
--	char *ptr, str[3], device[18], service[12];
--	const char *uri, *cups_class;
--	int i, err, fd, copies, proto;
--
--	/* Make sure status messages are not buffered */
--	setbuf(stderr, NULL);
--
--	/* Make sure output is not buffered */
--	setbuf(stdout, NULL);
--
--	/* Ignore SIGPIPE signals */
--#ifdef HAVE_SIGSET
--	sigset(SIGPIPE, SIG_IGN);
--#elif defined(HAVE_SIGACTION)
--	memset(&action, 0, sizeof(action));
--	action.sa_handler = SIG_IGN;
--	sigaction(SIGPIPE, &action, NULL);
--#else
--	signal(SIGPIPE, SIG_IGN);
--#endif /* HAVE_SIGSET */
--
--	if (argc == 1) {
--		if (list_printers() == TRUE)
--			return CUPS_BACKEND_OK;
--		else
--			return CUPS_BACKEND_FAILED;
--	} else if (argc == 3 && strcmp(argv[1], "--get-deviceid") == 0) {
--		if (bachk(argv[2]) < 0) {
--			fprintf(stderr, "Invalid Bluetooth address '%s'\n",
--					argv[2]);
--			return CUPS_BACKEND_FAILED;
--		}
--		if (print_ieee1284(argv[2]) == FALSE)
--			return CUPS_BACKEND_FAILED;
--		return CUPS_BACKEND_OK;
--	}
--
--	if (argc < 6 || argc > 7) {
--		fprintf(stderr, "Usage: bluetooth job-id user title copies"
--				" options [file]\n");
--		fprintf(stderr, "       bluetooth --get-deviceid [bdaddr]\n");
--		return CUPS_BACKEND_FAILED;
--	}
--
--	if (argc == 6) {
--		fd = 0;
--		copies = 1;
--	} else {
--		if ((fd = open(argv[6], O_RDONLY)) < 0) {
--			perror("ERROR: Unable to open print file");
--			return CUPS_BACKEND_FAILED;
--		}
--		copies = atoi(argv[4]);
--	}
--
--	uri = getenv("DEVICE_URI");
--	if (!uri)
--		uri = argv[0];
--
--	if (strncasecmp(uri, "bluetooth://", 12)) {
--		fprintf(stderr, "ERROR: No device URI found\n");
--		return CUPS_BACKEND_FAILED;
--	}
--
--	ptr = argv[0] + 12;
--	for (i = 0; i < 6; i++) {
--		strncpy(str, ptr, 2);
--		b[i] = (uint8_t) strtol(str, NULL, 16);
--		ptr += 2;
--	}
--	sprintf(device, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
--			b[0], b[1], b[2], b[3], b[4], b[5]);
--
--	str2ba(device, &bdaddr);
--
--	ptr = strchr(ptr, '/');
--	if (ptr) {
--		strncpy(service, ptr + 1, 12);
--
--		if (!strncasecmp(ptr + 1, "spp", 3))
--			proto = 1;
--		else if (!strncasecmp(ptr + 1, "hcrp", 4))
--			proto = 2;
--		else
--			proto = 0;
--	} else {
--		strcpy(service, "auto");
--		proto = 0;
--	}
--
--	cups_class = getenv("CLASS");
--
--	fprintf(stderr,
--		"DEBUG: %s device %s service %s fd %d copies %d class %s\n",
--			argv[0], device, service, fd, copies,
--			cups_class ? cups_class : "(none)");
--
--	fputs("STATE: +connecting-to-device\n", stderr);
--
--service_search:
--	sdp = sdp_connect(BDADDR_ANY, &bdaddr, SDP_RETRY_IF_BUSY);
--	if (!sdp) {
--		fprintf(stderr, "ERROR: Can't open Bluetooth connection\n");
--		return CUPS_BACKEND_FAILED;
--	}
--
--	switch (proto) {
--	case 1:
--		err = sdp_search_spp(sdp, &channel);
--		break;
--	case 2:
--		err = sdp_search_hcrp(sdp, &ctrl_psm, &data_psm);
--		break;
--	default:
--		proto = 2;
--		err = sdp_search_hcrp(sdp, &ctrl_psm, &data_psm);
--		if (err) {
--			proto = 1;
--			err = sdp_search_spp(sdp, &channel);
--		}
--		break;
--	}
--
--	sdp_close(sdp);
--
--	if (err) {
--		if (cups_class) {
--			fputs("INFO: Unable to contact printer, queuing on "
--					"next printer in class...\n", stderr);
--			sleep(5);
--			return CUPS_BACKEND_FAILED;
--		}
--		sleep(20);
--		fprintf(stderr, "ERROR: Can't get service information\n");
--		goto service_search;
--	}
--
--connect:
--	switch (proto) {
--	case 1:
--		err = spp_print(BDADDR_ANY, &bdaddr, channel,
--						fd, copies, cups_class);
--		break;
--	case 2:
--		err = hcrp_print(BDADDR_ANY, &bdaddr, ctrl_psm, data_psm,
--						fd, copies, cups_class);
--		break;
--	default:
--		err = CUPS_BACKEND_FAILED;
--		fprintf(stderr, "ERROR: Unsupported protocol\n");
--		break;
--	}
--
--	if (err == CUPS_BACKEND_FAILED && cups_class) {
--		fputs("INFO: Unable to contact printer, queuing on "
--					"next printer in class...\n", stderr);
--		sleep(5);
--		return CUPS_BACKEND_FAILED;
--	} else if (err == CUPS_BACKEND_RETRY) {
--		sleep(20);
--		goto connect;
--	}
--
--	if (fd != 0)
--		close(fd);
--
--	if (!err)
--		fprintf(stderr, "INFO: Ready to print\n");
--
--	return err;
--}
-diff --git a/cups/sdp.c b/cups/sdp.c
-deleted file mode 100644
-index c7f17a4..0000000
---- a/cups/sdp.c
-+++ /dev/null
-@@ -1,119 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2003-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stdio.h>
--#include <errno.h>
--#include <unistd.h>
--#include <signal.h>
--#include <sys/socket.h>
--
--#include <bluetooth/bluetooth.h>
--#include <bluetooth/sdp.h>
--#include <bluetooth/sdp_lib.h>
--
--#include "cups.h"
--
--int sdp_search_hcrp(sdp_session_t *sdp, unsigned short *ctrl_psm, unsigned short *data_psm)
--{
--	sdp_list_t *srch, *attrs, *rsp;
--	uuid_t svclass;
--	uint16_t attr1, attr2;
--	int err;
--
--	if (!sdp)
--		return -1;
--
--	sdp_uuid16_create(&svclass, HCR_PRINT_SVCLASS_ID);
--	srch = sdp_list_append(NULL, &svclass);
--
--	attr1 = SDP_ATTR_PROTO_DESC_LIST;
--	attrs = sdp_list_append(NULL, &attr1);
--	attr2 = SDP_ATTR_ADD_PROTO_DESC_LIST;
--	attrs = sdp_list_append(attrs, &attr2);
--
--	err = sdp_service_search_attr_req(sdp, srch, SDP_ATTR_REQ_INDIVIDUAL, attrs, &rsp);
--	if (err)
--		return -1;
--
--	for (; rsp; rsp = rsp->next) {
--		sdp_record_t *rec = (sdp_record_t *) rsp->data;
--		sdp_list_t *protos;
--
--		if (!sdp_get_access_protos(rec, &protos)) {
--			unsigned short psm = sdp_get_proto_port(protos, L2CAP_UUID);
--			if (psm > 0) {
--				*ctrl_psm = psm;
--			}
--		}
--
--		if (!sdp_get_add_access_protos(rec, &protos)) {
--			unsigned short psm = sdp_get_proto_port(protos, L2CAP_UUID);
--			if (psm > 0 && *ctrl_psm > 0) {
--				*data_psm = psm;
--				return 0;
--			}
--		}
--	}
--
--	return -1;
--}
--
--int sdp_search_spp(sdp_session_t *sdp, uint8_t *channel)
--{
--	sdp_list_t *srch, *attrs, *rsp;
--	uuid_t svclass;
--	uint16_t attr;
--	int err;
--
--	if (!sdp)
--		return -1;
--
--	sdp_uuid16_create(&svclass, SERIAL_PORT_SVCLASS_ID);
--	srch = sdp_list_append(NULL, &svclass);
--
--	attr = SDP_ATTR_PROTO_DESC_LIST;
--	attrs = sdp_list_append(NULL, &attr);
--
--	err = sdp_service_search_attr_req(sdp, srch, SDP_ATTR_REQ_INDIVIDUAL, attrs, &rsp);
--	if (err)
--		return -1;
--
--	for (; rsp; rsp = rsp->next) {
--		sdp_record_t *rec = (sdp_record_t *) rsp->data;
--		sdp_list_t *protos;
--
--		if (!sdp_get_access_protos(rec, &protos)) {
--			uint8_t ch = sdp_get_proto_port(protos, RFCOMM_UUID);
--			if (ch > 0) {
--				*channel = ch;
--				return 0;
--			}
--		}
--	}
--
--	return -1;
--}
-diff --git a/cups/spp.c b/cups/spp.c
-deleted file mode 100644
-index d906ed2..0000000
---- a/cups/spp.c
-+++ /dev/null
-@@ -1,118 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2003-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stdio.h>
--#include <errno.h>
--#include <unistd.h>
--#include <signal.h>
--#include <sys/socket.h>
--
--#include <bluetooth/bluetooth.h>
--#include <bluetooth/rfcomm.h>
--#include <bluetooth/sdp.h>
--#include <bluetooth/sdp_lib.h>
--
--#include "cups.h"
--
--int spp_print(bdaddr_t *src, bdaddr_t *dst, uint8_t channel, int fd, int copies, const char *cups_class)
--{
--	struct sockaddr_rc addr;
--	unsigned char buf[2048];
--	int i, sk, err, len;
--
--	if ((sk = socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)) < 0) {
--		perror("ERROR: Can't create socket");
--		if (cups_class)
--			return CUPS_BACKEND_FAILED;
--		else
--			return CUPS_BACKEND_RETRY;
--	}
--
--	addr.rc_family = AF_BLUETOOTH;
--	bacpy(&addr.rc_bdaddr, src);
--	addr.rc_channel = 0;
--
--	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		perror("ERROR: Can't bind socket");
--		close(sk);
--		if (cups_class)
--			return CUPS_BACKEND_FAILED;
--		else
--			return CUPS_BACKEND_RETRY;
--	}
--
--	addr.rc_family = AF_BLUETOOTH;
--	bacpy(&addr.rc_bdaddr, dst);
--	addr.rc_channel = channel;
--
--	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		perror("ERROR: Can't connect to device");
--		close(sk);
--		if (cups_class)
--			return CUPS_BACKEND_FAILED;
--		else
--			return CUPS_BACKEND_RETRY;
--	}
--
--	fputs("STATE: -connecting-to-device\n", stderr);
--
--	/* Ignore SIGTERM signals if printing from stdin */
--	if (fd == 0) {
--#ifdef HAVE_SIGSET
--		sigset(SIGTERM, SIG_IGN);
--#elif defined(HAVE_SIGACTION)
--		memset(&action, 0, sizeof(action));
--		sigemptyset(&action.sa_mask);
--		action.sa_handler = SIG_IGN;
--		sigaction(SIGTERM, &action, NULL);
--#else
--		signal(SIGTERM, SIG_IGN);
--#endif /* HAVE_SIGSET */
--	}
--
--	for (i = 0; i < copies; i++) {
--
--		if (fd != 0) {
--			fprintf(stderr, "PAGE: 1 1\n");
--			lseek(fd, 0, SEEK_SET);
--		}
--
--		while ((len = read(fd, buf, sizeof(buf))) > 0) {
--			err = write(sk, buf, len);
--			if (err < 0) {
--				perror("ERROR: Error writing to device");
--				close(sk);
--				return CUPS_BACKEND_FAILED;
--			}
--		}
--
--	}
--
--	close(sk);
--
--	return CUPS_BACKEND_OK;
--}
-diff --git a/profiles/cups/cups.h b/profiles/cups/cups.h
+ if GATTMODULES
+ builtin_modules += thermometer alert time gatt_example proximity deviceinfo
+-builtin_sources += thermometer/main.c \
+-			thermometer/manager.h thermometer/manager.c \
+-			thermometer/thermometer.h thermometer/thermometer.c \
++builtin_sources += profiles/thermometer/main.c \
++			profiles/thermometer/manager.h \
++			profiles/thermometer/manager.c \
++			profiles/thermometer/thermometer.h \
++		       	profiles/thermometer/thermometer.c \
+ 			profiles/alert/main.c profiles/alert/server.h \
+ 			profiles/alert/server.c \
+ 			time/main.c time/server.h time/server.c \
+diff --git a/profiles/thermometer/main.c b/profiles/thermometer/main.c
 new file mode 100644
-index 0000000..f4e0c01
+index 0000000..4447b52
 --- /dev/null
-+++ b/profiles/cups/cups.h
-@@ -0,0 +1,38 @@
++++ b/profiles/thermometer/main.c
+@@ -0,0 +1,70 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
 + *
-+ *  Copyright (C) 2003-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+enum {					/**** Backend exit codes ****/
-+	CUPS_BACKEND_OK = 0,		/* Job completed successfully */
-+	CUPS_BACKEND_FAILED = 1,	/* Job failed, use error-policy */
-+	CUPS_BACKEND_AUTH_REQUIRED = 2,	/* Job failed, authentication required */
-+	CUPS_BACKEND_HOLD = 3,		/* Job failed, hold job */
-+	CUPS_BACKEND_STOP = 4,		/* Job failed, stop queue */
-+	CUPS_BACKEND_CANCEL = 5,	/* Job failed, cancel job */
-+	CUPS_BACKEND_RETRY = 6,		/* Failure requires us to retry (BlueZ specific) */
-+};
-+
-+int sdp_search_spp(sdp_session_t *sdp, uint8_t *channel);
-+int sdp_search_hcrp(sdp_session_t *sdp, unsigned short *ctrl_psm, unsigned short *data_psm);
-+
-+int spp_print(bdaddr_t *src, bdaddr_t *dst, uint8_t channel, int fd, int copies, const char *cups_class);
-+int hcrp_print(bdaddr_t *src, bdaddr_t *dst, unsigned short ctrl_psm, unsigned short data_psm, int fd, int copies, const char *cups_class);
-diff --git a/profiles/cups/hcrp.c b/profiles/cups/hcrp.c
-new file mode 100644
-index 0000000..a93dda0
---- /dev/null
-+++ b/profiles/cups/hcrp.c
-@@ -0,0 +1,368 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2003-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
++ *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
 + *
 + *  This program is free software; you can redistribute it and/or modify
 + *  it under the terms of the GNU General Public License as published by
@@ -1707,1261 +87,1469 @@ index 0000000..a93dda0
 +#include <config.h>
 +#endif
 +
-+#include <stdio.h>
-+#include <errno.h>
-+#include <unistd.h>
-+#include <string.h>
-+#include <signal.h>
-+#include <sys/socket.h>
-+
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/l2cap.h>
-+#include <bluetooth/sdp.h>
-+#include <bluetooth/sdp_lib.h>
-+
-+#include <netinet/in.h>
-+
-+#include "cups.h"
-+
-+#define HCRP_PDU_CREDIT_GRANT		0x0001
-+#define HCRP_PDU_CREDIT_REQUEST		0x0002
-+#define HCRP_PDU_GET_LPT_STATUS		0x0005
-+
-+#define HCRP_STATUS_FEATURE_UNSUPPORTED	0x0000
-+#define HCRP_STATUS_SUCCESS		0x0001
-+#define HCRP_STATUS_CREDIT_SYNC_ERROR	0x0002
-+#define HCRP_STATUS_GENERIC_FAILURE	0xffff
-+
-+struct hcrp_pdu_hdr {
-+	uint16_t pid;
-+	uint16_t tid;
-+	uint16_t plen;
-+} __attribute__ ((packed));
-+#define HCRP_PDU_HDR_SIZE 6
-+
-+struct hcrp_credit_grant_cp {
-+	uint32_t credit;
-+} __attribute__ ((packed));
-+#define HCRP_CREDIT_GRANT_CP_SIZE 4
-+
-+struct hcrp_credit_grant_rp {
-+	uint16_t status;
-+} __attribute__ ((packed));
-+#define HCRP_CREDIT_GRANT_RP_SIZE 2
-+
-+struct hcrp_credit_request_rp {
-+	uint16_t status;
-+	uint32_t credit;
-+} __attribute__ ((packed));
-+#define HCRP_CREDIT_REQUEST_RP_SIZE 6
-+
-+struct hcrp_get_lpt_status_rp {
-+	uint16_t status;
-+	uint8_t  lpt_status;
-+} __attribute__ ((packed));
-+#define HCRP_GET_LPT_STATUS_RP_SIZE 3
-+
-+static int hcrp_credit_grant(int sk, uint16_t tid, uint32_t credit)
-+{
-+	struct hcrp_pdu_hdr hdr;
-+	struct hcrp_credit_grant_cp cp;
-+	struct hcrp_credit_grant_rp rp;
-+	unsigned char buf[128];
-+	int len;
-+
-+	hdr.pid = htons(HCRP_PDU_CREDIT_GRANT);
-+	hdr.tid = htons(tid);
-+	hdr.plen = htons(HCRP_CREDIT_GRANT_CP_SIZE);
-+	cp.credit = credit;
-+	memcpy(buf, &hdr, HCRP_PDU_HDR_SIZE);
-+	memcpy(buf + HCRP_PDU_HDR_SIZE, &cp, HCRP_CREDIT_GRANT_CP_SIZE);
-+	len = write(sk, buf, HCRP_PDU_HDR_SIZE + HCRP_CREDIT_GRANT_CP_SIZE);
-+	if (len < 0)
-+		return len;
-+
-+	len = read(sk, buf, sizeof(buf));
-+	if (len < 0)
-+		return len;
-+
-+	memcpy(&hdr, buf, HCRP_PDU_HDR_SIZE);
-+	memcpy(&rp, buf + HCRP_PDU_HDR_SIZE, HCRP_CREDIT_GRANT_RP_SIZE);
-+
-+	if (ntohs(rp.status) != HCRP_STATUS_SUCCESS) {
-+		errno = EIO;
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+static int hcrp_credit_request(int sk, uint16_t tid, uint32_t *credit)
-+{
-+	struct hcrp_pdu_hdr hdr;
-+	struct hcrp_credit_request_rp rp;
-+	unsigned char buf[128];
-+	int len;
-+
-+	hdr.pid = htons(HCRP_PDU_CREDIT_REQUEST);
-+	hdr.tid = htons(tid);
-+	hdr.plen = htons(0);
-+	memcpy(buf, &hdr, HCRP_PDU_HDR_SIZE);
-+	len = write(sk, buf, HCRP_PDU_HDR_SIZE);
-+	if (len < 0)
-+		return len;
-+
-+	len = read(sk, buf, sizeof(buf));
-+	if (len < 0)
-+		return len;
-+
-+	memcpy(&hdr, buf, HCRP_PDU_HDR_SIZE);
-+	memcpy(&rp, buf + HCRP_PDU_HDR_SIZE, HCRP_CREDIT_REQUEST_RP_SIZE);
-+
-+	if (ntohs(rp.status) != HCRP_STATUS_SUCCESS) {
-+		errno = EIO;
-+		return -1;
-+	}
-+
-+	if (credit)
-+		*credit = ntohl(rp.credit);
-+
-+	return 0;
-+}
-+
-+static int hcrp_get_lpt_status(int sk, uint16_t tid, uint8_t *lpt_status)
-+{
-+	struct hcrp_pdu_hdr hdr;
-+	struct hcrp_get_lpt_status_rp rp;
-+	unsigned char buf[128];
-+	int len;
-+
-+	hdr.pid = htons(HCRP_PDU_GET_LPT_STATUS);
-+	hdr.tid = htons(tid);
-+	hdr.plen = htons(0);
-+	memcpy(buf, &hdr, HCRP_PDU_HDR_SIZE);
-+	len = write(sk, buf, HCRP_PDU_HDR_SIZE);
-+	if (len < 0)
-+		return len;
-+
-+	len = read(sk, buf, sizeof(buf));
-+	if (len < 0)
-+		return len;
-+
-+	memcpy(&hdr, buf, HCRP_PDU_HDR_SIZE);
-+	memcpy(&rp, buf + HCRP_PDU_HDR_SIZE, HCRP_GET_LPT_STATUS_RP_SIZE);
-+
-+	if (ntohs(rp.status) != HCRP_STATUS_SUCCESS) {
-+		errno = EIO;
-+		return -1;
-+	}
-+
-+	if (lpt_status)
-+		*lpt_status = rp.lpt_status;
-+
-+	return 0;
-+}
-+
-+static inline int hcrp_get_next_tid(int tid)
-+{
-+	if (tid > 0xf000)
-+		return 0;
-+	else
-+		return tid + 1;
-+}
-+
-+int hcrp_print(bdaddr_t *src, bdaddr_t *dst, unsigned short ctrl_psm, unsigned short data_psm, int fd, int copies, const char *cups_class)
-+{
-+	struct sockaddr_l2 addr;
-+	struct l2cap_options opts;
-+	socklen_t size;
-+	unsigned char buf[2048];
-+	int i, ctrl_sk, data_sk, count, len, timeout = 0;
-+	unsigned int mtu;
-+	uint8_t status;
-+	uint16_t tid = 0;
-+	uint32_t tmp, credit = 0;
-+
-+	if ((ctrl_sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP)) < 0) {
-+		perror("ERROR: Can't create socket");
-+		if (cups_class)
-+			return CUPS_BACKEND_FAILED;
-+		else
-+			return CUPS_BACKEND_RETRY;
-+	}
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.l2_family = AF_BLUETOOTH;
-+	bacpy(&addr.l2_bdaddr, src);
-+
-+	if (bind(ctrl_sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-+		perror("ERROR: Can't bind socket");
-+		close(ctrl_sk);
-+		if (cups_class)
-+			return CUPS_BACKEND_FAILED;
-+		else
-+			return CUPS_BACKEND_RETRY;
-+	}
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.l2_family = AF_BLUETOOTH;
-+	bacpy(&addr.l2_bdaddr, dst);
-+	addr.l2_psm = htobs(ctrl_psm);
-+
-+	if (connect(ctrl_sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-+		perror("ERROR: Can't connect to device");
-+		close(ctrl_sk);
-+		if (cups_class)
-+			return CUPS_BACKEND_FAILED;
-+		else
-+			return CUPS_BACKEND_RETRY;
-+	}
-+
-+	if ((data_sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP)) < 0) {
-+		perror("ERROR: Can't create socket");
-+		close(ctrl_sk);
-+		if (cups_class)
-+			return CUPS_BACKEND_FAILED;
-+		else
-+			return CUPS_BACKEND_RETRY;
-+	}
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.l2_family = AF_BLUETOOTH;
-+	bacpy(&addr.l2_bdaddr, src);
-+
-+	if (bind(data_sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-+		perror("ERROR: Can't bind socket");
-+		close(data_sk);
-+		close(ctrl_sk);
-+		if (cups_class)
-+			return CUPS_BACKEND_FAILED;
-+		else
-+			return CUPS_BACKEND_RETRY;
-+	}
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.l2_family = AF_BLUETOOTH;
-+	bacpy(&addr.l2_bdaddr, dst);
-+	addr.l2_psm = htobs(data_psm);
-+
-+	if (connect(data_sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-+		perror("ERROR: Can't connect to device");
-+		close(data_sk);
-+		close(ctrl_sk);
-+		if (cups_class)
-+			return CUPS_BACKEND_FAILED;
-+		else
-+			return CUPS_BACKEND_RETRY;
-+	}
-+
-+	fputs("STATE: -connecting-to-device\n", stderr);
-+
-+	memset(&opts, 0, sizeof(opts));
-+	size = sizeof(opts);
-+
-+	if (getsockopt(data_sk, SOL_L2CAP, L2CAP_OPTIONS, &opts, &size) < 0) {
-+		perror("ERROR: Can't get socket options");
-+		close(data_sk);
-+		close(ctrl_sk);
-+		if (cups_class)
-+			return CUPS_BACKEND_FAILED;
-+		else
-+			return CUPS_BACKEND_RETRY;
-+	}
-+
-+	mtu = opts.omtu;
-+
-+	/* Ignore SIGTERM signals if printing from stdin */
-+	if (fd == 0) {
-+#ifdef HAVE_SIGSET
-+		sigset(SIGTERM, SIG_IGN);
-+#elif defined(HAVE_SIGACTION)
-+		memset(&action, 0, sizeof(action));
-+		sigemptyset(&action.sa_mask);
-+		action.sa_handler = SIG_IGN;
-+		sigaction(SIGTERM, &action, NULL);
-+#else
-+		signal(SIGTERM, SIG_IGN);
-+#endif /* HAVE_SIGSET */
-+	}
-+
-+	tid = hcrp_get_next_tid(tid);
-+	if (hcrp_credit_grant(ctrl_sk, tid, 0) < 0) {
-+		fprintf(stderr, "ERROR: Can't grant initial credits\n");
-+		close(data_sk);
-+		close(ctrl_sk);
-+		if (cups_class)
-+			return CUPS_BACKEND_FAILED;
-+		else
-+			return CUPS_BACKEND_RETRY;
-+	}
-+
-+	for (i = 0; i < copies; i++) {
-+
-+		if (fd != 0) {
-+			fprintf(stderr, "PAGE: 1 1\n");
-+			lseek(fd, 0, SEEK_SET);
-+		}
-+
-+		while (1) {
-+			if (credit < mtu) {
-+				tid = hcrp_get_next_tid(tid);
-+				if (!hcrp_credit_request(ctrl_sk, tid, &tmp)) {
-+					credit += tmp;
-+					timeout = 0;
-+				}
-+			}
-+
-+			if (!credit) {
-+				if (timeout++ > 300) {
-+					tid = hcrp_get_next_tid(tid);
-+					if (!hcrp_get_lpt_status(ctrl_sk, tid, &status))
-+						fprintf(stderr, "ERROR: LPT status 0x%02x\n", status);
-+					break;
-+				}
-+
-+				sleep(1);
-+				continue;
-+			}
-+
-+			count = read(fd, buf, (credit > mtu) ? mtu : credit);
-+			if (count <= 0)
-+				break;
-+
-+			len = write(data_sk, buf, count);
-+			if (len < 0) {
-+				perror("ERROR: Error writing to device");
-+				close(data_sk);
-+				close(ctrl_sk);
-+				return CUPS_BACKEND_FAILED;
-+			}
-+
-+			if (len != count)
-+				fprintf(stderr, "ERROR: Can't send complete data\n");
-+
-+			credit -= len;
-+		}
-+
-+	}
-+
-+	close(data_sk);
-+	close(ctrl_sk);
-+
-+	return CUPS_BACKEND_OK;
-+}
-diff --git a/profiles/cups/main.c b/profiles/cups/main.c
-new file mode 100644
-index 0000000..a884c6e
---- /dev/null
-+++ b/profiles/cups/main.c
-@@ -0,0 +1,896 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2003-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <signal.h>
-+#include <sys/socket.h>
++#include <stdint.h>
 +#include <glib.h>
-+
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/sdp.h>
-+#include <bluetooth/sdp_lib.h>
-+
++#include <errno.h>
 +#include <gdbus.h>
 +
-+#include "cups.h"
++#include "plugin.h"
++#include "manager.h"
++#include "hcid.h"
++#include "log.h"
 +
-+struct cups_device {
-+	char *bdaddr;
-+	char *name;
-+	char *id;
-+};
++static DBusConnection *connection = NULL;
 +
-+static GSList *device_list = NULL;
-+static GMainLoop *loop = NULL;
-+static DBusConnection *conn = NULL;
-+static gboolean doing_disco = FALSE;
-+
-+#define ATTRID_1284ID 0x0300
-+
-+struct context_data {
-+	gboolean found;
-+	char *id;
-+};
-+
-+static void element_start(GMarkupParseContext *context,
-+				const gchar *element_name,
-+				const gchar **attribute_names,
-+				const gchar **attribute_values,
-+				gpointer user_data, GError **err)
++static int thermometer_init(void)
 +{
-+	struct context_data *ctx_data = user_data;
++	if (!main_opts.gatt_enabled) {
++		DBG("GATT is disabled");
++		return -ENOTSUP;
++	}
 +
-+	if (!strcmp(element_name, "record"))
++	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
++	if (connection == NULL)
++		return -EIO;
++
++	if (thermometer_manager_init(connection) < 0) {
++		dbus_connection_unref(connection);
++		return -EIO;
++	}
++
++	return 0;
++}
++
++static void thermometer_exit(void)
++{
++	if (!main_opts.gatt_enabled)
 +		return;
 +
-+	if (!strcmp(element_name, "attribute")) {
-+		int i;
-+		for (i = 0; attribute_names[i]; i++) {
-+			if (strcmp(attribute_names[i], "id") != 0)
++	thermometer_manager_exit();
++
++	dbus_connection_unref(connection);
++	connection = NULL;
++}
++
++BLUETOOTH_PLUGIN_DEFINE(thermometer, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++					thermometer_init, thermometer_exit)
+diff --git a/profiles/thermometer/manager.c b/profiles/thermometer/manager.c
+new file mode 100644
+index 0000000..3d5452b
+--- /dev/null
++++ b/profiles/thermometer/manager.c
+@@ -0,0 +1,92 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#include <gdbus.h>
++#include <errno.h>
++#include <bluetooth/uuid.h>
++
++#include "adapter.h"
++#include "device.h"
++#include "att.h"
++#include "gattrib.h"
++#include "gatt.h"
++#include "thermometer.h"
++#include "manager.h"
++
++static DBusConnection *connection = NULL;
++
++static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
++{
++	const struct gatt_primary *prim = a;
++	const char *uuid = b;
++
++	return g_strcmp0(prim->uuid, uuid);
++}
++
++static int thermometer_driver_probe(struct btd_device *device, GSList *uuids)
++{
++	struct gatt_primary *tattr;
++	GSList *primaries, *l;
++
++	primaries = btd_device_get_primaries(device);
++
++	l = g_slist_find_custom(primaries, HEALTH_THERMOMETER_UUID,
++							primary_uuid_cmp);
++	if (l == NULL)
++		return -EINVAL;
++
++	tattr = l->data;
++
++	return thermometer_register(connection, device, tattr);
++}
++
++static void thermometer_driver_remove(struct btd_device *device)
++{
++	thermometer_unregister(device);
++}
++
++static struct btd_device_driver thermometer_device_driver = {
++	.name	= "thermometer-device-driver",
++	.uuids	= BTD_UUIDS(HEALTH_THERMOMETER_UUID),
++	.probe	= thermometer_driver_probe,
++	.remove	= thermometer_driver_remove
++};
++
++int thermometer_manager_init(DBusConnection *conn)
++{
++	int ret;
++
++	ret = btd_register_device_driver(&thermometer_device_driver);
++	if (ret < 0)
++                return ret;
++
++	connection = dbus_connection_ref(conn);
++	return 0;
++}
++
++void thermometer_manager_exit(void)
++{
++	btd_unregister_device_driver(&thermometer_device_driver);
++
++	dbus_connection_unref(connection);
++	connection = NULL;
++}
+diff --git a/profiles/thermometer/manager.h b/profiles/thermometer/manager.h
+new file mode 100644
+index 0000000..ed928ad
+--- /dev/null
++++ b/profiles/thermometer/manager.h
+@@ -0,0 +1,24 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++int thermometer_manager_init(DBusConnection *conn);
++void thermometer_manager_exit(void);
+diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
+new file mode 100644
+index 0000000..087662e
+--- /dev/null
++++ b/profiles/thermometer/thermometer.c
+@@ -0,0 +1,1274 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <gdbus.h>
++#include <errno.h>
++#include <bluetooth/uuid.h>
++
++#include "dbus-common.h"
++#include "adapter.h"
++#include "device.h"
++#include "error.h"
++#include "log.h"
++#include "gattrib.h"
++#include "attio.h"
++#include "att.h"
++#include "gatt.h"
++#include "thermometer.h"
++
++#define THERMOMETER_INTERFACE "org.bluez.Thermometer"
++
++/* Temperature measurement flag fields */
++#define TEMP_UNITS		0x01
++#define TEMP_TIME_STAMP		0x02
++#define TEMP_TYPE		0x04
++
++#define FLOAT_MAX_MANTISSA	16777216 /* 2^24 */
++
++#define VALID_RANGE_DESC_SIZE	4
++#define TEMPERATURE_TYPE_SIZE	1
++#define MEASUREMENT_INTERVAL_SIZE	2
++
++struct thermometer {
++	DBusConnection		*conn;		/* The connection to the bus */
++	struct btd_device	*dev;		/* Device reference */
++	GAttrib			*attrib;	/* GATT connection */
++	struct att_range	*svc_range;	/* Thermometer range */
++	guint			attioid;	/* Att watcher id */
++	guint			attindid;	/* Att incications id */
++	guint			attnotid;	/* Att notifications id */
++	GSList			*chars;		/* Characteristics */
++	GSList			*fwatchers;     /* Final measurements */
++	GSList			*iwatchers;     /* Intermediate measurements */
++	gboolean		intermediate;
++	uint8_t			type;
++	uint16_t		interval;
++	uint16_t		max;
++	uint16_t		min;
++	gboolean		has_type;
++	gboolean		has_interval;
++};
++
++struct characteristic {
++	struct gatt_char		attr;	/* Characteristic */
++	GSList			*desc;	/* Descriptors */
++	struct thermometer	*t;	/* Thermometer where the char belongs */
++};
++
++struct descriptor {
++	struct characteristic	*ch;
++	uint16_t		handle;
++	bt_uuid_t		uuid;
++};
++
++struct watcher {
++	struct thermometer	*t;
++	guint			id;
++	char			*srv;
++	char			*path;
++};
++
++struct measurement {
++	int16_t		exp;
++	int32_t		mant;
++	uint64_t	time;
++	gboolean	suptime;
++	char		*unit;
++	char		*type;
++	char		*value;
++};
++
++struct tmp_interval_data {
++	struct thermometer	*thermometer;
++	uint16_t		interval;
++};
++
++static GSList *thermometers = NULL;
++
++const char *temp_type[] = {
++	"<reserved>",
++	"Armpit",
++	"Body",
++	"Ear",
++	"Finger",
++	"Intestines",
++	"Mouth",
++	"Rectum",
++	"Toe",
++	"Tympanum"
++};
++
++static const gchar *temptype2str(uint8_t value)
++{
++	 if (value > 0 && value < G_N_ELEMENTS(temp_type))
++		return temp_type[value];
++
++	error("Temperature type %d reserved for future use", value);
++	return NULL;
++}
++
++static void destroy_watcher(gpointer user_data)
++{
++	struct watcher *watcher = user_data;
++
++	g_free(watcher->path);
++	g_free(watcher->srv);
++	g_free(watcher);
++}
++
++static void remove_watcher(gpointer user_data)
++{
++	struct watcher *watcher = user_data;
++
++	g_dbus_remove_watch(watcher->t->conn, watcher->id);
++}
++
++static void destroy_char(gpointer user_data)
++{
++	struct characteristic *c = user_data;
++
++	g_slist_free_full(c->desc, g_free);
++	g_free(c);
++}
++
++static void destroy_thermometer(gpointer user_data)
++{
++	struct thermometer *t = user_data;
++
++	if (t->attioid > 0)
++		btd_device_remove_attio_callback(t->dev, t->attioid);
++
++	if (t->attindid > 0)
++		g_attrib_unregister(t->attrib, t->attindid);
++
++	if (t->attnotid > 0)
++		g_attrib_unregister(t->attrib, t->attnotid);
++
++	if (t->attrib != NULL)
++		g_attrib_unref(t->attrib);
++
++	if (t->chars != NULL)
++		g_slist_free_full(t->chars, destroy_char);
++
++	if (t->fwatchers != NULL)
++		g_slist_free_full(t->fwatchers, remove_watcher);
++
++	dbus_connection_unref(t->conn);
++	btd_device_unref(t->dev);
++	g_free(t->svc_range);
++	g_free(t);
++}
++
++static gint cmp_device(gconstpointer a, gconstpointer b)
++{
++	const struct thermometer *t = a;
++	const struct btd_device *dev = b;
++
++	if (dev == t->dev)
++		return 0;
++
++	return -1;
++}
++
++static gint cmp_watcher(gconstpointer a, gconstpointer b)
++{
++	const struct watcher *watcher = a;
++	const struct watcher *match = b;
++	int ret;
++
++	ret = g_strcmp0(watcher->srv, match->srv);
++	if (ret != 0)
++		return ret;
++
++	return g_strcmp0(watcher->path, match->path);
++}
++
++static gint cmp_char_uuid(gconstpointer a, gconstpointer b)
++{
++	const struct characteristic *ch = a;
++	const char *uuid = b;
++
++	return g_strcmp0(ch->attr.uuid, uuid);
++}
++
++static gint cmp_char_val_handle(gconstpointer a, gconstpointer b)
++{
++	const struct characteristic *ch = a;
++	const uint16_t *handle = b;
++
++	return ch->attr.value_handle - *handle;
++}
++
++static gint cmp_descriptor(gconstpointer a, gconstpointer b)
++{
++	const struct descriptor *desc = a;
++	const bt_uuid_t *uuid = b;
++
++	return bt_uuid_cmp(&desc->uuid, uuid);
++}
++
++static struct characteristic *get_characteristic(struct thermometer *t,
++							const char *uuid)
++{
++	GSList *l;
++
++	l = g_slist_find_custom(t->chars, uuid, cmp_char_uuid);
++	if (l == NULL)
++		return NULL;
++
++	return l->data;
++}
++
++static struct descriptor *get_descriptor(struct characteristic *ch,
++							const bt_uuid_t *uuid)
++{
++	GSList *l;
++
++	l = g_slist_find_custom(ch->desc, uuid, cmp_descriptor);
++	if (l == NULL)
++		return NULL;
++
++	return l->data;
++}
++
++static void change_property(struct thermometer *t, const char *name,
++							gpointer value) {
++	if (g_strcmp0(name, "Intermediate") == 0) {
++		gboolean *intermediate = value;
++		if (t->intermediate == *intermediate)
++			return;
++
++		t->intermediate = *intermediate;
++		emit_property_changed(t->conn, device_get_path(t->dev),
++					THERMOMETER_INTERFACE, name,
++					DBUS_TYPE_BOOLEAN, &t->intermediate);
++	} else if (g_strcmp0(name, "Interval") == 0) {
++		uint16_t *interval = value;
++		if (t->has_interval && t->interval == *interval)
++			return;
++
++		t->has_interval = TRUE;
++		t->interval = *interval;
++		emit_property_changed(t->conn, device_get_path(t->dev),
++					THERMOMETER_INTERFACE, name,
++					DBUS_TYPE_UINT16, &t->interval);
++	} else if (g_strcmp0(name, "Maximum") == 0) {
++		uint16_t *max = value;
++		if (t->max == *max)
++			return;
++
++		t->max = *max;
++		emit_property_changed(t->conn, device_get_path(t->dev),
++					THERMOMETER_INTERFACE, name,
++					DBUS_TYPE_UINT16, &t->max);
++	} else if (g_strcmp0(name, "Minimum") == 0) {
++		uint16_t *min = value;
++		if (t->min == *min)
++			return;
++
++		t->min = *min;
++		emit_property_changed(t->conn, device_get_path(t->dev),
++					THERMOMETER_INTERFACE, name,
++					DBUS_TYPE_UINT16, &t->min);
++	} else
++		DBG("%s is not a thermometer property", name);
++}
++
++static void valid_range_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
++							gpointer user_data)
++{
++	struct descriptor *desc = user_data;
++	uint8_t value[VALID_RANGE_DESC_SIZE];
++	uint16_t max, min;
++	ssize_t vlen;
++
++	if (status != 0) {
++		DBG("Valid Range descriptor read failed: %s",
++							att_ecode2str(status));
++		return;
++	}
++
++	vlen = dec_read_resp(pdu, len, value, sizeof(value));
++	if (vlen < 0) {
++		DBG("Protocol error\n");
++		return;
++	}
++
++	if (vlen < 4) {
++		DBG("Invalid range received");
++		return;
++	}
++
++	min = att_get_u16(&value[0]);
++	max = att_get_u16(&value[2]);
++
++	if (min == 0 || min > max) {
++		DBG("Invalid range");
++		return;
++	}
++
++	change_property(desc->ch->t, "Maximum", &max);
++	change_property(desc->ch->t, "Minimum", &min);
++}
++
++static void measurement_cb(guint8 status, const guint8 *pdu,
++						guint16 len, gpointer user_data)
++{
++	char *msg = user_data;
++
++	if (status != 0)
++		error("%s failed", msg);
++
++	g_free(msg);
++}
++
++static void process_thermometer_desc(struct descriptor *desc)
++{
++	struct characteristic *ch = desc->ch;
++	char uuidstr[MAX_LEN_UUID_STR];
++	bt_uuid_t btuuid;
++
++	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
++
++	if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0) {
++		uint8_t atval[2];
++		uint16_t val;
++		char *msg;
++
++		if (g_strcmp0(ch->attr.uuid,
++					TEMPERATURE_MEASUREMENT_UUID) == 0) {
++			if (g_slist_length(ch->t->fwatchers) == 0)
++				return;
++
++			val = GATT_CLIENT_CHARAC_CFG_IND_BIT;
++			msg = g_strdup("Enable Temperature Measurement "
++								"indication");
++		} else if (g_strcmp0(ch->attr.uuid,
++					INTERMEDIATE_TEMPERATURE_UUID) == 0) {
++			if (g_slist_length(ch->t->iwatchers) == 0)
++				return;
++
++			val = GATT_CLIENT_CHARAC_CFG_NOTIF_BIT;
++			msg = g_strdup("Enable Intermediate Temperature "
++								"notification");
++		} else if (g_strcmp0(ch->attr.uuid,
++					MEASUREMENT_INTERVAL_UUID) == 0) {
++			val = GATT_CLIENT_CHARAC_CFG_IND_BIT;
++			msg = g_strdup("Enable Measurement Interval "
++								"indication");
++		} else
++			goto done;
++
++		att_put_u16(val, atval);
++		gatt_write_char(ch->t->attrib, desc->handle, atval, 2,
++							measurement_cb, msg);
++		return;
++	}
++
++	bt_uuid16_create(&btuuid, GATT_CHARAC_VALID_RANGE_UUID);
++
++	if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0 && g_strcmp0(ch->attr.uuid,
++					MEASUREMENT_INTERVAL_UUID) == 0) {
++		gatt_read_char(ch->t->attrib, desc->handle, 0,
++						valid_range_desc_cb, desc);
++		return;
++	}
++
++done:
++	bt_uuid_to_string(&desc->uuid, uuidstr, MAX_LEN_UUID_STR);
++	DBG("Ignored descriptor %s in characteristic %s", uuidstr,
++								ch->attr.uuid);
++}
++
++static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
++							gpointer user_data)
++{
++	struct characteristic *ch = user_data;
++	struct att_data_list *list;
++	uint8_t format;
++	int i;
++
++	if (status != 0) {
++		error("Discover all characteristic descriptors failed [%s]: %s",
++					ch->attr.uuid, att_ecode2str(status));
++		return;
++	}
++
++	list = dec_find_info_resp(pdu, len, &format);
++	if (list == NULL)
++		return;
++
++	for (i = 0; i < list->num; i++) {
++		struct descriptor *desc;
++		uint8_t *value;
++
++		value = list->data[i];
++		desc = g_new0(struct descriptor, 1);
++		desc->handle = att_get_u16(value);
++		desc->ch = ch;
++
++		if (format == 0x01)
++			desc->uuid = att_get_uuid16(&value[2]);
++		else
++			desc->uuid = att_get_uuid128(&value[2]);
++
++		ch->desc = g_slist_append(ch->desc, desc);
++		process_thermometer_desc(desc);
++	}
++
++	att_data_list_free(list);
++}
++
++static void read_temp_type_cb(guint8 status, const guint8 *pdu, guint16 len,
++							gpointer user_data)
++{
++	struct characteristic *ch = user_data;
++	struct thermometer *t = ch->t;
++	uint8_t value[TEMPERATURE_TYPE_SIZE];
++	ssize_t vlen;
++
++	if (status != 0) {
++		DBG("Temperature Type value read failed: %s",
++							att_ecode2str(status));
++		return;
++	}
++
++	vlen = dec_read_resp(pdu, len, value, sizeof(value));
++	if (vlen < 0) {
++		DBG("Protocol error.");
++		return;
++	}
++
++	if (vlen != 1) {
++		DBG("Invalid length for Temperature type");
++		return;
++	}
++
++	t->has_type = TRUE;
++	t->type = value[0];
++}
++
++static void read_interval_cb(guint8 status, const guint8 *pdu, guint16 len,
++							gpointer user_data)
++{
++	struct characteristic *ch = user_data;
++	uint8_t value[MEASUREMENT_INTERVAL_SIZE];
++	uint16_t interval;
++	ssize_t vlen;
++
++	if (status != 0) {
++		DBG("Measurement Interval value read failed: %s",
++							att_ecode2str(status));
++		return;
++	}
++
++	vlen = dec_read_resp(pdu, len, value, sizeof(value));
++	if (vlen < 0) {
++		DBG("Protocol error\n");
++		return;
++	}
++
++	if (vlen < 2) {
++		DBG("Invalid Interval received");
++		return;
++	}
++
++	interval = att_get_u16(&value[0]);
++	change_property(ch->t, "Interval", &interval);
++}
++
++static void process_thermometer_char(struct characteristic *ch)
++{
++	if (g_strcmp0(ch->attr.uuid, INTERMEDIATE_TEMPERATURE_UUID) == 0) {
++		gboolean intermediate = TRUE;
++		change_property(ch->t, "Intermediate", &intermediate);
++		return;
++	} else if (g_strcmp0(ch->attr.uuid, TEMPERATURE_TYPE_UUID) == 0)
++		gatt_read_char(ch->t->attrib, ch->attr.value_handle, 0,
++							read_temp_type_cb, ch);
++	else if (g_strcmp0(ch->attr.uuid, MEASUREMENT_INTERVAL_UUID) == 0)
++		gatt_read_char(ch->t->attrib, ch->attr.value_handle, 0,
++							read_interval_cb, ch);
++}
++
++static void configure_thermometer_cb(GSList *characteristics, guint8 status,
++							gpointer user_data)
++{
++	struct thermometer *t = user_data;
++	GSList *l;
++
++	if (status != 0) {
++		error("Discover thermometer characteristics: %s",
++							att_ecode2str(status));
++		return;
++	}
++
++	for (l = characteristics; l; l = l->next) {
++		struct gatt_char *c = l->data;
++		struct characteristic *ch;
++		uint16_t start, end;
++
++		ch = g_new0(struct characteristic, 1);
++		ch->attr.handle = c->handle;
++		ch->attr.properties = c->properties;
++		ch->attr.value_handle = c->value_handle;
++		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
++		ch->t = t;
++
++		t->chars = g_slist_append(t->chars, ch);
++
++		process_thermometer_char(ch);
++
++		start = c->value_handle + 1;
++
++		if (l->next != NULL) {
++			struct gatt_char *c = l->next->data;
++			if (start == c->handle)
 +				continue;
-+			if (strtol(attribute_values[i], 0, 0) == ATTRID_1284ID)
-+				ctx_data->found = TRUE;
-+			break;
-+		}
-+		return;
-+	}
++			end = c->handle - 1;
++		} else if (c->value_handle != t->svc_range->end)
++			end = t->svc_range->end;
++		else
++			continue;
 +
-+	if (ctx_data->found  && !strcmp(element_name, "text")) {
-+		int i;
-+		for (i = 0; attribute_names[i]; i++) {
-+			if (!strcmp(attribute_names[i], "value")) {
-+				ctx_data->id = g_strdup(attribute_values[i] + 2);
-+				ctx_data->found = FALSE;
-+			}
-+		}
++		gatt_find_info(t->attrib, start, end, discover_desc_cb, ch);
 +	}
 +}
 +
-+static GMarkupParser parser = {
-+	element_start, NULL, NULL, NULL, NULL
++static DBusMessage *get_properties(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	struct thermometer *t = data;
++	DBusMessageIter iter;
++	DBusMessageIter dict;
++	DBusMessage *reply;
++
++	reply = dbus_message_new_method_return(msg);
++	if (reply == NULL)
++		return NULL;
++
++	dbus_message_iter_init_append(reply, &iter);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	dict_append_entry(&dict, "Intermediate", DBUS_TYPE_BOOLEAN,
++							&t->intermediate);
++
++	if (t->has_interval) {
++		dict_append_entry(&dict, "Interval", DBUS_TYPE_UINT16,
++								&t->interval);
++		dict_append_entry(&dict, "Maximum", DBUS_TYPE_UINT16, &t->max);
++		dict_append_entry(&dict, "Minimum", DBUS_TYPE_UINT16, &t->min);
++	}
++
++	dbus_message_iter_close_container(&iter, &dict);
++
++	return reply;
++}
++
++static void write_interval_cb (guint8 status, const guint8 *pdu, guint16 len,
++							gpointer user_data)
++{
++	struct tmp_interval_data *data = user_data;
++
++	if (status != 0) {
++		error("Interval Write Request failed %s",
++							att_ecode2str(status));
++		goto done;
++	}
++
++	if (!dec_write_resp(pdu, len)) {
++		error("Interval Write Request: protocol error");
++		goto done;
++	}
++
++	change_property(data->thermometer, "Interval", &data->interval);
++
++done:
++	g_free(user_data);
++}
++
++static DBusMessage *write_attr_interval(struct thermometer *t, DBusMessage *msg,
++								uint16_t value)
++{
++	struct tmp_interval_data *data;
++	struct characteristic *ch;
++	uint8_t atval[2];
++
++	if (t->attrib == NULL)
++		return btd_error_not_connected(msg);
++
++	ch = get_characteristic(t, MEASUREMENT_INTERVAL_UUID);
++	if (ch == NULL)
++		return btd_error_not_available(msg);
++
++	if (value < t->min || value > t->max)
++		return btd_error_invalid_args(msg);
++
++	att_put_u16(value, &atval[0]);
++
++	data = g_new0(struct tmp_interval_data, 1);
++	data->thermometer = t;
++	data->interval = value;
++	gatt_write_char(t->attrib, ch->attr.value_handle, atval, 2,
++						write_interval_cb, data);
++
++	return dbus_message_new_method_return(msg);
++}
++
++static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	struct thermometer *t = data;
++	const char *property;
++	DBusMessageIter iter;
++	DBusMessageIter sub;
++	uint16_t value;
++
++	if (!dbus_message_iter_init(msg, &iter))
++		return btd_error_invalid_args(msg);
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(&iter, &property);
++	if (g_strcmp0("Interval", property) != 0)
++		return btd_error_invalid_args(msg);
++
++	if (!t->has_interval)
++		return btd_error_not_available(msg);
++
++	dbus_message_iter_next(&iter);
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_VARIANT)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_recurse(&iter, &sub);
++
++	if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_UINT16)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(&sub, &value);
++
++	return write_attr_interval(t, msg, value);
++}
++
++static void enable_final_measurement(struct thermometer *t)
++{
++	struct characteristic *ch;
++	struct descriptor *desc;
++	bt_uuid_t btuuid;
++	uint8_t atval[2];
++	char *msg;
++
++	if (t->attrib == NULL)
++		return;
++
++	ch = get_characteristic(t, TEMPERATURE_MEASUREMENT_UUID);
++	if (ch == NULL) {
++		DBG("Temperature measurement characteristic not found");
++		return;
++	}
++
++	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
++	desc = get_descriptor(ch, &btuuid);
++	if (desc == NULL) {
++		DBG("Client characteristic configuration descriptor not found");
++		return;
++	}
++
++	atval[0] = 0x02;
++	atval[1] = 0x00;
++	msg = g_strdup("Enable final measurement");
++	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
++}
++
++static void enable_intermediate_measurement(struct thermometer *t)
++{
++	struct characteristic *ch;
++	struct descriptor *desc;
++	bt_uuid_t btuuid;
++	uint8_t atval[2];
++	char *msg;
++
++	if (t->attrib == NULL)
++		return;
++
++	ch = get_characteristic(t, INTERMEDIATE_TEMPERATURE_UUID);
++	if (ch == NULL) {
++		DBG("Intermediate measurement characteristic not found");
++		return;
++	}
++
++	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
++	desc = get_descriptor(ch, &btuuid);
++	if (desc == NULL) {
++		DBG("Client characteristic configuration descriptor not found");
++		return;
++	}
++
++	atval[0] = 0x01;
++	atval[1] = 0x00;
++	msg = g_strdup("Enable intermediate measurement");
++	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
++}
++
++static void disable_final_measurement(struct thermometer *t)
++{
++	struct characteristic *ch;
++	struct descriptor *desc;
++	bt_uuid_t btuuid;
++	uint8_t atval[2];
++	char *msg;
++
++	if (t->attrib == NULL)
++		return;
++
++	ch = get_characteristic(t, TEMPERATURE_MEASUREMENT_UUID);
++	if (ch == NULL) {
++		DBG("Temperature measurement characteristic not found");
++		return;
++	}
++
++	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
++	desc = get_descriptor(ch, &btuuid);
++	if (desc == NULL) {
++		DBG("Client characteristic configuration descriptor not found");
++		return;
++	}
++
++	atval[0] = 0x00;
++	atval[1] = 0x00;
++	msg = g_strdup("Disable final measurement");
++	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
++}
++
++static void disable_intermediate_measurement(struct thermometer *t)
++{
++	struct characteristic *ch;
++	struct descriptor *desc;
++	bt_uuid_t btuuid;
++	uint8_t atval[2];
++	char *msg;
++
++	if (t->attrib == NULL)
++		return;
++
++	ch = get_characteristic(t, INTERMEDIATE_TEMPERATURE_UUID);
++	if (ch == NULL) {
++		DBG("Intermediate measurement characteristic not found");
++		return;
++	}
++
++	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
++	desc = get_descriptor(ch, &btuuid);
++	if (desc == NULL) {
++		DBG("Client characteristic configuration descriptor not found");
++		return;
++	}
++
++	atval[0] = 0x00;
++	atval[1] = 0x00;
++	msg = g_strdup("Disable intermediate measurement");
++	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
++}
++
++static void remove_int_watcher(struct thermometer *t, struct watcher *w)
++{
++	if (!g_slist_find(t->iwatchers, w))
++		return;
++
++	t->iwatchers = g_slist_remove(t->iwatchers, w);
++
++	if (g_slist_length(t->iwatchers) == 0)
++		disable_intermediate_measurement(t);
++}
++
++static void watcher_exit(DBusConnection *conn, void *user_data)
++{
++	struct watcher *watcher = user_data;
++	struct thermometer *t = watcher->t;
++
++	DBG("Thermometer watcher %s disconnected", watcher->path);
++
++	remove_int_watcher(t, watcher);
++
++	t->fwatchers = g_slist_remove(t->fwatchers, watcher);
++	g_dbus_remove_watch(watcher->t->conn, watcher->id);
++
++	if (g_slist_length(t->fwatchers) == 0)
++		disable_final_measurement(t);
++}
++
++static struct watcher *find_watcher(GSList *list, const char *sender,
++							const char *path)
++{
++	struct watcher *match;
++	GSList *l;
++
++	match = g_new0(struct watcher, 1);
++	match->srv = g_strdup(sender);
++	match->path = g_strdup(path);
++
++	l = g_slist_find_custom(list, match, cmp_watcher);
++	destroy_watcher(match);
++
++	if (l != NULL)
++		return l->data;
++
++	return NULL;
++}
++
++static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	const char *sender = dbus_message_get_sender(msg);
++	struct thermometer *t = data;
++	struct watcher *watcher;
++	char *path;
++
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
++							DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
++
++	watcher = find_watcher(t->fwatchers, sender, path);
++	if (watcher != NULL)
++		return btd_error_already_exists(msg);
++
++	DBG("Thermometer watcher %s registered", path);
++
++	watcher = g_new0(struct watcher, 1);
++	watcher->srv = g_strdup(sender);
++	watcher->path = g_strdup(path);
++	watcher->t = t;
++	watcher->id = g_dbus_add_disconnect_watch(conn, sender, watcher_exit,
++						watcher, destroy_watcher);
++
++	if (g_slist_length(t->fwatchers) == 0)
++		enable_final_measurement(t);
++
++	t->fwatchers = g_slist_prepend(t->fwatchers, watcher);
++
++	return dbus_message_new_method_return(msg);
++}
++
++static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	const char *sender = dbus_message_get_sender(msg);
++	struct thermometer *t = data;
++	struct watcher *watcher;
++	char *path;
++
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
++							DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
++
++	watcher = find_watcher(t->fwatchers, sender, path);
++	if (watcher == NULL)
++		return btd_error_does_not_exist(msg);
++
++	DBG("Thermometer watcher %s unregistered", path);
++
++	remove_int_watcher(t, watcher);
++
++	t->fwatchers = g_slist_remove(t->fwatchers, watcher);
++	g_dbus_remove_watch(watcher->t->conn, watcher->id);
++
++	if (g_slist_length(t->fwatchers) == 0)
++		disable_final_measurement(t);
++
++	return dbus_message_new_method_return(msg);
++}
++
++static DBusMessage *enable_intermediate(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	const char *sender = dbus_message_get_sender(msg);
++	struct thermometer *t = data;
++	struct watcher *watcher;
++	char *path;
++
++	if (!t->intermediate)
++		return btd_error_not_supported(msg);
++
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
++							DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
++
++	watcher = find_watcher(t->fwatchers, sender, path);
++	if (watcher == NULL)
++		return btd_error_does_not_exist(msg);
++
++	if (find_watcher(t->iwatchers, sender, path))
++		return btd_error_already_exists(msg);
++
++	DBG("Intermediate measurement watcher %s registered", path);
++
++	if (g_slist_length(t->iwatchers) == 0)
++		enable_intermediate_measurement(t);
++
++	t->iwatchers = g_slist_prepend(t->iwatchers, watcher);
++
++	return dbus_message_new_method_return(msg);
++}
++
++static DBusMessage *disable_intermediate(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	const char *sender = dbus_message_get_sender(msg);
++	struct thermometer *t = data;
++	struct watcher *watcher;
++	char *path;
++
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
++							DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
++
++	watcher = find_watcher(t->iwatchers, sender, path);
++	if (watcher == NULL)
++		return btd_error_does_not_exist(msg);
++
++	DBG("Intermediate measurement %s unregistered", path);
++
++	remove_int_watcher(t, watcher);
++
++	return dbus_message_new_method_return(msg);
++}
++
++static const GDBusMethodTable thermometer_methods[] = {
++	{ GDBUS_METHOD("GetProperties",
++			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
++			get_properties) },
++	{ GDBUS_ASYNC_METHOD("SetProperty",
++			GDBUS_ARGS({ "name", "s" }, { "value", "v" }), NULL,
++			set_property) },
++	{ GDBUS_METHOD("RegisterWatcher",
++			GDBUS_ARGS({ "agent", "o" }), NULL,
++			register_watcher) },
++	{ GDBUS_METHOD("UnregisterWatcher",
++			GDBUS_ARGS({ "agent", "o" }), NULL,
++			unregister_watcher) },
++	{ GDBUS_METHOD("EnableIntermediateMeasurement",
++			GDBUS_ARGS({ "agent", "o" }), NULL,
++			enable_intermediate) },
++	{ GDBUS_METHOD("DisableIntermediateMeasurement",
++			GDBUS_ARGS({ "agent", "o" }), NULL,
++			disable_intermediate) },
++	{ }
 +};
 +
-+static char *sdp_xml_parse_record(const char *data)
++static const GDBusSignalTable thermometer_signals[] = {
++	{ GDBUS_SIGNAL("PropertyChanged",
++			GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
++	{ }
++};
++
++static void update_watcher(gpointer data, gpointer user_data)
 +{
-+	GMarkupParseContext *ctx;
-+	struct context_data ctx_data;
-+	int size;
-+
-+	size = strlen(data);
-+	ctx_data.found = FALSE;
-+	ctx_data.id = NULL;
-+	ctx = g_markup_parse_context_new(&parser, 0, &ctx_data, NULL);
-+
-+	if (g_markup_parse_context_parse(ctx, data, size, NULL) == FALSE) {
-+		g_markup_parse_context_free(ctx);
-+		g_free(ctx_data.id);
-+		return NULL;
-+	}
-+
-+	g_markup_parse_context_free(ctx);
-+
-+	return ctx_data.id;
-+}
-+
-+static char *device_get_ieee1284_id(const char *adapter, const char *device)
-+{
-+	DBusMessage *message, *reply;
-+	DBusMessageIter iter, reply_iter;
-+	DBusMessageIter reply_iter_entry;
-+	const char *hcr_print = "00001126-0000-1000-8000-00805f9b34fb";
-+	const char *xml;
-+	char *id = NULL;
-+
-+	/* Look for the service handle of the HCRP service */
-+	message = dbus_message_new_method_call("org.bluez", device,
-+						"org.bluez.Device",
-+						"DiscoverServices");
-+	dbus_message_iter_init_append(message, &iter);
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &hcr_print);
-+
-+	reply = dbus_connection_send_with_reply_and_block(conn,
-+							message, -1, NULL);
-+
-+	dbus_message_unref(message);
-+
-+	if (!reply)
-+		return NULL;
-+
-+	dbus_message_iter_init(reply, &reply_iter);
-+
-+	if (dbus_message_iter_get_arg_type(&reply_iter) != DBUS_TYPE_ARRAY) {
-+		dbus_message_unref(reply);
-+		return NULL;
-+	}
-+
-+	dbus_message_iter_recurse(&reply_iter, &reply_iter_entry);
-+
-+	/* Hopefully we only get one handle, or take a punt */
-+	while (dbus_message_iter_get_arg_type(&reply_iter_entry) ==
-+							DBUS_TYPE_DICT_ENTRY) {
-+		guint32 key;
-+		DBusMessageIter dict_entry;
-+
-+		dbus_message_iter_recurse(&reply_iter_entry, &dict_entry);
-+
-+		/* Key ? */
-+		dbus_message_iter_get_basic(&dict_entry, &key);
-+		if (!key) {
-+			dbus_message_iter_next(&reply_iter_entry);
-+			continue;
-+		}
-+
-+		/* Try to get the value */
-+		if (!dbus_message_iter_next(&dict_entry)) {
-+			dbus_message_iter_next(&reply_iter_entry);
-+			continue;
-+		}
-+
-+		dbus_message_iter_get_basic(&dict_entry, &xml);
-+
-+		id = sdp_xml_parse_record(xml);
-+		if (id != NULL)
-+			break;
-+		dbus_message_iter_next(&reply_iter_entry);
-+	}
-+
-+	dbus_message_unref(reply);
-+
-+	return id;
-+}
-+
-+static void print_printer_details(const char *name, const char *bdaddr,
-+								const char *id)
-+{
-+	char *uri, *escaped;
-+
-+	escaped = g_strdelimit(g_strdup(name), "\"", '\'');
-+	uri = g_strdup_printf("bluetooth://%c%c%c%c%c%c%c%c%c%c%c%c",
-+				bdaddr[0], bdaddr[1],
-+				bdaddr[3], bdaddr[4],
-+				bdaddr[6], bdaddr[7],
-+				bdaddr[9], bdaddr[10],
-+				bdaddr[12], bdaddr[13],
-+				bdaddr[15], bdaddr[16]);
-+	printf("direct %s \"%s\" \"%s (Bluetooth)\"", uri, escaped, escaped);
-+	if (id != NULL)
-+		printf(" \"%s\"\n", id);
-+	else
-+		printf("\n");
-+	g_free(escaped);
-+	g_free(uri);
-+}
-+
-+static void add_device_to_list(const char *name, const char *bdaddr,
-+								const char *id)
-+{
-+	struct cups_device *device;
-+	GSList *l;
-+
-+	/* Look for the device in the list */
-+	for (l = device_list; l != NULL; l = l->next) {
-+		device = (struct cups_device *) l->data;
-+
-+		if (strcmp(device->bdaddr, bdaddr) == 0) {
-+			if (device->name != name) {
-+				g_free(device->name);
-+				device->name = g_strdup(name);
-+			}
-+			g_free(device->id);
-+			device->id = g_strdup(id);
-+			return;
-+		}
-+	}
-+
-+	/* Or add it to the list if it's not there */
-+	device = g_new0(struct cups_device, 1);
-+	device->bdaddr = g_strdup(bdaddr);
-+	device->name = g_strdup(name);
-+	device->id = g_strdup(id);
-+
-+	device_list = g_slist_prepend(device_list, device);
-+	print_printer_details(device->name, device->bdaddr, device->id);
-+}
-+
-+static gboolean parse_device_properties(DBusMessageIter *reply_iter,
-+						char **name, char **bdaddr)
-+{
-+	guint32 class = 0;
-+	DBusMessageIter reply_iter_entry;
-+
-+	if (dbus_message_iter_get_arg_type(reply_iter) != DBUS_TYPE_ARRAY)
-+		return FALSE;
-+
-+	dbus_message_iter_recurse(reply_iter, &reply_iter_entry);
-+
-+	while (dbus_message_iter_get_arg_type(&reply_iter_entry) ==
-+							DBUS_TYPE_DICT_ENTRY) {
-+		const char *key;
-+		DBusMessageIter dict_entry, iter_dict_val;
-+
-+		dbus_message_iter_recurse(&reply_iter_entry, &dict_entry);
-+
-+		/* Key == Class ? */
-+		dbus_message_iter_get_basic(&dict_entry, &key);
-+		if (!key) {
-+			dbus_message_iter_next(&reply_iter_entry);
-+			continue;
-+		}
-+
-+		if (strcmp(key, "Class") != 0 &&
-+				strcmp(key, "Alias") != 0 &&
-+				strcmp(key, "Address") != 0) {
-+			dbus_message_iter_next(&reply_iter_entry);
-+			continue;
-+		}
-+
-+		/* Try to get the value */
-+		if (!dbus_message_iter_next(&dict_entry)) {
-+			dbus_message_iter_next(&reply_iter_entry);
-+			continue;
-+		}
-+		dbus_message_iter_recurse(&dict_entry, &iter_dict_val);
-+		if (strcmp(key, "Class") == 0) {
-+			dbus_message_iter_get_basic(&iter_dict_val, &class);
-+		} else {
-+			const char *value;
-+			dbus_message_iter_get_basic(&iter_dict_val, &value);
-+			if (strcmp(key, "Alias") == 0) {
-+				*name = g_strdup(value);
-+			} else if (bdaddr) {
-+				*bdaddr = g_strdup(value);
-+			}
-+		}
-+		dbus_message_iter_next(&reply_iter_entry);
-+	}
-+
-+	if (class == 0)
-+		return FALSE;
-+	if (((class & 0x1f00) >> 8) == 0x06 && (class & 0x80))
-+		return TRUE;
-+
-+	return FALSE;
-+}
-+
-+static gboolean device_is_printer(const char *adapter, const char *device_path, char **name, char **bdaddr)
-+{
-+	DBusMessage *message, *reply;
-+	DBusMessageIter reply_iter;
-+	gboolean retval;
-+
-+	message = dbus_message_new_method_call("org.bluez", device_path,
-+							"org.bluez.Device",
-+							"GetProperties");
-+
-+	reply = dbus_connection_send_with_reply_and_block(conn,
-+							message, -1, NULL);
-+
-+	dbus_message_unref(message);
-+
-+	if (!reply)
-+		return FALSE;
-+
-+	dbus_message_iter_init(reply, &reply_iter);
-+
-+	retval = parse_device_properties(&reply_iter, name, bdaddr);
-+
-+	dbus_message_unref(reply);
-+
-+	return retval;
-+}
-+
-+static void remote_device_found(const char *adapter, const char *bdaddr,
-+							const char *name)
-+{
-+	DBusMessage *message, *reply, *adapter_reply;
++	struct watcher *w = data;
++	struct measurement *m = user_data;
++	DBusConnection *conn = w->t->conn;
 +	DBusMessageIter iter;
-+	char *object_path = NULL;
-+	char *id;
++	DBusMessageIter dict;
++	DBusMessage *msg;
 +
-+	adapter_reply = NULL;
++	msg = dbus_message_new_method_call(w->srv, w->path,
++				"org.bluez.ThermometerWatcher",
++				"MeasurementReceived");
++	if (msg == NULL)
++		return;
 +
-+	if (adapter == NULL) {
-+		message = dbus_message_new_method_call("org.bluez", "/",
-+							"org.bluez.Manager",
-+							"DefaultAdapter");
++	dbus_message_iter_init_append(msg, &iter);
 +
-+		adapter_reply = dbus_connection_send_with_reply_and_block(conn,
-+							message, -1, NULL);
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
 +
-+		dbus_message_unref(message);
++	dict_append_entry(&dict, "Exponent", DBUS_TYPE_INT16, &m->exp);
++	dict_append_entry(&dict, "Mantissa", DBUS_TYPE_INT32, &m->mant);
++	dict_append_entry(&dict, "Unit", DBUS_TYPE_STRING, &m->unit);
 +
-+		if (!adapter_reply)
-+			return;
++	if (m->suptime)
++		dict_append_entry(&dict, "Time", DBUS_TYPE_UINT64, &m->time);
 +
-+		if (dbus_message_get_args(adapter_reply, NULL,
-+					DBUS_TYPE_OBJECT_PATH, &adapter,
-+					DBUS_TYPE_INVALID) == FALSE) {
-+			dbus_message_unref(adapter_reply);
-+			return;
-+		}
-+	}
++	dict_append_entry(&dict, "Type", DBUS_TYPE_STRING, &m->type);
++	dict_append_entry(&dict, "Measurement", DBUS_TYPE_STRING, &m->value);
 +
-+	message = dbus_message_new_method_call("org.bluez", adapter,
-+							"org.bluez.Adapter",
-+							"FindDevice");
-+	dbus_message_iter_init_append(message, &iter);
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
++	dbus_message_iter_close_container(&iter, &dict);
 +
-+	if (adapter_reply != NULL)
-+		dbus_message_unref(adapter_reply);
++	dbus_message_set_no_reply(msg, TRUE);
++	g_dbus_send_message(conn, msg);
++}
 +
-+	reply = dbus_connection_send_with_reply_and_block(conn,
-+							message, -1, NULL);
++static void recv_measurement(struct thermometer *t, struct measurement *m)
++{
++	GSList *wlist;
 +
-+	dbus_message_unref(message);
++	if (g_strcmp0(m->value, "Intermediate") == 0)
++		wlist = t->iwatchers;
++	else
++		wlist = t->fwatchers;
 +
-+	if (!reply) {
-+		message = dbus_message_new_method_call("org.bluez", adapter,
-+							"org.bluez.Adapter",
-+							"CreateDevice");
-+		dbus_message_iter_init_append(message, &iter);
-+		dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
++	g_slist_foreach(wlist, update_watcher, m);
++}
 +
-+		reply = dbus_connection_send_with_reply_and_block(conn,
-+							message, -1, NULL);
++static void proc_measurement(struct thermometer *t, const uint8_t *pdu,
++						uint16_t len, gboolean final)
++{
++	struct measurement m;
++	const char *type;
++	uint8_t flags;
++	uint32_t raw;
 +
-+		dbus_message_unref(message);
-+
-+		if (!reply)
-+			return;
-+	}
-+
-+	if (dbus_message_get_args(reply, NULL,
-+					DBUS_TYPE_OBJECT_PATH, &object_path,
-+					DBUS_TYPE_INVALID) == FALSE) {
-+		dbus_message_unref(reply);
++	if (len < 4) {
++		DBG("Mandatory flags are not provided");
 +		return;
 +	}
 +
-+	id = device_get_ieee1284_id(adapter, object_path);
-+	add_device_to_list(name, bdaddr, id);
-+	g_free(id);
++	flags = pdu[3];
++	if (flags & TEMP_UNITS)
++		m.unit = "Fahrenheit";
++	else
++		m.unit = "Celsius";
 +
-+	dbus_message_unref(reply);
-+}
++	if (len < 8) {
++		DBG("Temperature measurement value is not provided");
++		return;
++	}
 +
-+static void discovery_completed(void)
-+{
-+	g_slist_free(device_list);
-+	device_list = NULL;
++	raw = att_get_u32(&pdu[4]);
++	m.mant = raw & 0x00FFFFFF;
++	m.exp = ((int32_t) raw) >> 24;
 +
-+	g_main_loop_quit(loop);
-+}
++	if (m.mant & 0x00800000) {
++		/* convert to C2 negative value */
++		m.mant = m.mant - FLOAT_MAX_MANTISSA;
++	}
 +
-+static void remote_device_disappeared(const char *bdaddr)
-+{
-+	GSList *l;
++	if (flags & TEMP_TIME_STAMP) {
++		struct tm ts;
++		time_t time;
 +
-+	for (l = device_list; l != NULL; l = l->next) {
-+		struct cups_device *device = l->data;
-+
-+		if (strcmp(device->bdaddr, bdaddr) == 0) {
-+			g_free(device->name);
-+			g_free(device->bdaddr);
-+			g_free(device);
-+			device_list = g_slist_delete_link(device_list, l);
++		if (len < 15) {
++			DBG("Can't get time stamp value");
 +			return;
 +		}
-+	}
++
++		ts.tm_year = att_get_u16(&pdu[8]) - 1900;
++		ts.tm_mon = pdu[10] - 1;
++		ts.tm_mday = pdu[11];
++		ts.tm_hour = pdu[12];
++		ts.tm_min = pdu[13];
++		ts.tm_sec = pdu[14];
++		ts.tm_isdst = -1;
++
++		time = mktime(&ts);
++		m.time = (uint64_t) time;
++		m.suptime = TRUE;
++	} else
++		m.suptime = FALSE;
++
++	if (flags & TEMP_TYPE) {
++		uint8_t index;
++
++		if (m.suptime && len >= 16)
++			index = 15;
++		else if (!m.suptime && len >= 9)
++			index = 9;
++		else {
++			DBG("Can't get temperature type");
++			return;
++		}
++
++		type = temptype2str(pdu[index]);
++	} else if (t->has_type)
++		type = temptype2str(t->type);
++	else
++		type = NULL;
++
++	m.type = type ? g_strdup(type) : NULL;
++	m.value = final ? "Final" : "Intermediate";
++
++	recv_measurement(t, &m);
++	g_free(m.type);
 +}
 +
-+static gboolean list_known_printers(const char *adapter)
++static void proc_measurement_interval(struct thermometer *t, const uint8_t *pdu,
++								uint16_t len)
 +{
-+	DBusMessageIter reply_iter, iter_array;
-+	DBusError error;
-+	DBusMessage *message, *reply;
++	uint16_t interval;
 +
-+	message = dbus_message_new_method_call("org.bluez", adapter,
-+						"org.bluez.Adapter",
-+						"ListDevices");
-+	if (message == NULL)
-+		return FALSE;
-+
-+	dbus_error_init(&error);
-+	reply = dbus_connection_send_with_reply_and_block(conn, message,
-+								-1, &error);
-+
-+	dbus_message_unref(message);
-+
-+	if (dbus_error_is_set(&error))
-+		return FALSE;
-+
-+	dbus_message_iter_init(reply, &reply_iter);
-+	if (dbus_message_iter_get_arg_type(&reply_iter) != DBUS_TYPE_ARRAY) {
-+		dbus_message_unref(reply);
-+		return FALSE;
++	if (len < 5) {
++		DBG("Measurement interval value is not provided");
++		return;
 +	}
 +
-+	dbus_message_iter_recurse(&reply_iter, &iter_array);
-+	while (dbus_message_iter_get_arg_type(&iter_array) ==
-+						DBUS_TYPE_OBJECT_PATH) {
-+		const char *object_path;
-+		char *name = NULL;
-+		char *bdaddr = NULL;
++	interval = att_get_u16(&pdu[3]);
 +
-+		dbus_message_iter_get_basic(&iter_array, &object_path);
-+		if (device_is_printer(adapter, object_path, &name, &bdaddr)) {
-+			char *id;
-+
-+			id = device_get_ieee1284_id(adapter, object_path);
-+			add_device_to_list(name, bdaddr, id);
-+			g_free(id);
-+		}
-+		g_free(name);
-+		g_free(bdaddr);
-+		dbus_message_iter_next(&iter_array);
-+	}
-+
-+	dbus_message_unref(reply);
-+
-+	return FALSE;
++	change_property(t, "Interval", &interval);
 +}
 +
-+static DBusHandlerResult filter_func(DBusConnection *connection,
-+					DBusMessage *message, void *user_data)
++static void ind_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
 +{
-+	if (dbus_message_is_signal(message, "org.bluez.Adapter",
-+						"DeviceFound")) {
-+		const char *adapter, *bdaddr;
-+		char *name;
-+		DBusMessageIter iter;
++	struct thermometer *t = user_data;
++	const struct characteristic *ch;
++	uint8_t *opdu;
++	uint16_t handle, olen;
++	GSList *l;
++	int plen;
 +
-+		dbus_message_iter_init(message, &iter);
-+		dbus_message_iter_get_basic(&iter, &bdaddr);
-+		dbus_message_iter_next(&iter);
-+
-+		adapter = dbus_message_get_path(message);
-+		if (parse_device_properties(&iter, &name, NULL))
-+			remote_device_found(adapter, bdaddr, name);
-+		g_free (name);
-+	} else if (dbus_message_is_signal(message, "org.bluez.Adapter",
-+						"DeviceDisappeared")) {
-+		const char *bdaddr;
-+
-+		dbus_message_get_args(message, NULL,
-+					DBUS_TYPE_STRING, &bdaddr,
-+					DBUS_TYPE_INVALID);
-+		remote_device_disappeared(bdaddr);
-+	} else if (dbus_message_is_signal(message, "org.bluez.Adapter",
-+						"PropertyChanged")) {
-+		DBusMessageIter iter, value_iter;
-+		const char *name;
-+		gboolean discovering;
-+
-+		dbus_message_iter_init(message, &iter);
-+		dbus_message_iter_get_basic(&iter, &name);
-+		if (name == NULL || strcmp(name, "Discovering") != 0)
-+			return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-+		dbus_message_iter_next(&iter);
-+		dbus_message_iter_recurse(&iter, &value_iter);
-+		dbus_message_iter_get_basic(&value_iter, &discovering);
-+
-+		if (discovering == FALSE && doing_disco) {
-+			doing_disco = FALSE;
-+			discovery_completed();
-+		}
++	if (len < 3) {
++		DBG("Bad pdu received");
++		return;
 +	}
 +
-+	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
++	handle = att_get_u16(&pdu[1]);
++	l = g_slist_find_custom(t->chars, &handle, cmp_char_val_handle);
++	if (l == NULL) {
++		DBG("Unexpected handle: 0x%04x", handle);
++		return;
++	}
++
++	ch = l->data;
++
++	if (g_strcmp0(ch->attr.uuid, TEMPERATURE_MEASUREMENT_UUID) == 0)
++		proc_measurement(t, pdu, len, TRUE);
++	else if (g_strcmp0(ch->attr.uuid, MEASUREMENT_INTERVAL_UUID) == 0)
++		proc_measurement_interval(t, pdu, len);
++
++	opdu = g_attrib_get_buffer(t->attrib, &plen);
++	olen = enc_confirmation(opdu, plen);
++
++	if (olen > 0)
++		g_attrib_send(t->attrib, 0, opdu[0], opdu, olen, NULL, NULL,
++									NULL);
 +}
 +
-+static gboolean list_printers(void)
++static void notif_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
 +{
-+	/* 1. Connect to the bus
-+	 * 2. Get the manager
-+	 * 3. Get the default adapter
-+	 * 4. Get a list of devices
-+	 * 5. Get the class of each device
-+	 * 6. Print the details from each printer device
-+	 */
-+	DBusError error;
-+	dbus_bool_t hcid_exists;
-+	DBusMessage *reply, *message;
-+	DBusMessageIter reply_iter;
-+	char *adapter, *match;
++	struct thermometer *t = user_data;
++	const struct characteristic *ch;
++	uint16_t handle;
++	GSList *l;
 +
-+	conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
-+	if (conn == NULL)
-+		return TRUE;
-+
-+	dbus_error_init(&error);
-+	hcid_exists = dbus_bus_name_has_owner(conn, "org.bluez", &error);
-+	if (dbus_error_is_set(&error))
-+		return TRUE;
-+
-+	if (!hcid_exists)
-+		return TRUE;
-+
-+	/* Get the default adapter */
-+	message = dbus_message_new_method_call("org.bluez", "/",
-+						"org.bluez.Manager",
-+						"DefaultAdapter");
-+	if (message == NULL) {
-+		dbus_connection_unref(conn);
-+		return FALSE;
++	if (len < 3) {
++		DBG("Bad pdu received");
++		return;
 +	}
 +
-+	reply = dbus_connection_send_with_reply_and_block(conn,
-+							message, -1, &error);
-+
-+	dbus_message_unref(message);
-+
-+	if (dbus_error_is_set(&error)) {
-+		dbus_connection_unref(conn);
-+		/* No adapter */
-+		return TRUE;
++	handle = att_get_u16(&pdu[1]);
++	l = g_slist_find_custom(t->chars, &handle, cmp_char_val_handle);
++	if (l == NULL) {
++		DBG("Unexpected handle: 0x%04x", handle);
++		return;
 +	}
 +
-+	dbus_message_iter_init(reply, &reply_iter);
-+	if (dbus_message_iter_get_arg_type(&reply_iter) !=
-+						DBUS_TYPE_OBJECT_PATH) {
-+		dbus_message_unref(reply);
-+		dbus_connection_unref(conn);
-+		return FALSE;
-+	}
-+
-+	dbus_message_iter_get_basic(&reply_iter, &adapter);
-+	adapter = g_strdup(adapter);
-+	dbus_message_unref(reply);
-+
-+	if (!dbus_connection_add_filter(conn, filter_func, adapter, g_free)) {
-+		g_free(adapter);
-+		dbus_connection_unref(conn);
-+		return FALSE;
-+	}
-+
-+#define MATCH_FORMAT				\
-+	"type='signal',"			\
-+	"interface='org.bluez.Adapter',"	\
-+	"sender='org.bluez',"			\
-+	"path='%s'"
-+
-+	match = g_strdup_printf(MATCH_FORMAT, adapter);
-+	dbus_bus_add_match(conn, match, &error);
-+	g_free(match);
-+
-+	/* Add the the recent devices */
-+	list_known_printers(adapter);
-+
-+	doing_disco = TRUE;
-+	message = dbus_message_new_method_call("org.bluez", adapter,
-+					"org.bluez.Adapter",
-+					"StartDiscovery");
-+
-+	if (!dbus_connection_send_with_reply(conn, message, NULL, -1)) {
-+		dbus_message_unref(message);
-+		dbus_connection_unref(conn);
-+		g_free(adapter);
-+		return FALSE;
-+	}
-+	dbus_message_unref(message);
-+
-+	loop = g_main_loop_new(NULL, TRUE);
-+	g_main_loop_run(loop);
-+
-+	g_free(adapter);
-+	dbus_connection_unref(conn);
-+
-+	return TRUE;
++	ch = l->data;
++	if (g_strcmp0(ch->attr.uuid, INTERMEDIATE_TEMPERATURE_UUID) == 0)
++		proc_measurement(t, pdu, len, FALSE);
 +}
 +
-+static gboolean print_ieee1284(const char *bdaddr)
++static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
 +{
-+	DBusMessage *message, *reply, *adapter_reply;
-+	DBusMessageIter iter;
-+	char *object_path = NULL;
-+	char *adapter;
-+	char *id;
++	struct thermometer *t = user_data;
 +
-+	adapter_reply = NULL;
++	t->attrib = g_attrib_ref(attrib);
 +
-+	conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
-+	if (conn == NULL)
-+		return FALSE;
-+
-+	message = dbus_message_new_method_call("org.bluez", "/",
-+			"org.bluez.Manager",
-+			"DefaultAdapter");
-+
-+	adapter_reply = dbus_connection_send_with_reply_and_block(conn,
-+			message, -1, NULL);
-+
-+	dbus_message_unref(message);
-+
-+	if (!adapter_reply)
-+		return FALSE;
-+
-+	if (dbus_message_get_args(adapter_reply, NULL,
-+			DBUS_TYPE_OBJECT_PATH, &adapter,
-+			DBUS_TYPE_INVALID) == FALSE) {
-+		dbus_message_unref(adapter_reply);
-+		return FALSE;
-+	}
-+
-+	message = dbus_message_new_method_call("org.bluez", adapter,
-+			"org.bluez.Adapter",
-+			"FindDevice");
-+	dbus_message_iter_init_append(message, &iter);
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
-+
-+	if (adapter_reply != NULL)
-+		dbus_message_unref(adapter_reply);
-+
-+	reply = dbus_connection_send_with_reply_and_block(conn,
-+			message, -1, NULL);
-+
-+	dbus_message_unref(message);
-+
-+	if (!reply) {
-+		message = dbus_message_new_method_call("org.bluez", adapter,
-+				"org.bluez.Adapter",
-+				"CreateDevice");
-+		dbus_message_iter_init_append(message, &iter);
-+		dbus_message_iter_append_basic(&iter,
-+				DBUS_TYPE_STRING, &bdaddr);
-+
-+		reply = dbus_connection_send_with_reply_and_block(conn,
-+				message, -1, NULL);
-+
-+		dbus_message_unref(message);
-+
-+		if (!reply)
-+			return FALSE;
-+	}
-+
-+	if (dbus_message_get_args(reply, NULL,
-+					DBUS_TYPE_OBJECT_PATH, &object_path,
-+					DBUS_TYPE_INVALID) == FALSE) {
-+		dbus_message_unref(reply);
-+		return FALSE;
-+	}
-+
-+	id = device_get_ieee1284_id(adapter, object_path);
-+	if (id == NULL) {
-+		dbus_message_unref(reply);
-+		return FALSE;
-+	}
-+	printf("%s", id);
-+	g_free(id);
-+
-+	dbus_message_unref(reply);
-+
-+	return TRUE;
++	t->attindid = g_attrib_register(t->attrib, ATT_OP_HANDLE_IND,
++							ind_handler, t, NULL);
++	t->attnotid = g_attrib_register(t->attrib, ATT_OP_HANDLE_NOTIFY,
++							notif_handler, t, NULL);
++	gatt_discover_char(t->attrib, t->svc_range->start, t->svc_range->end,
++					NULL, configure_thermometer_cb, t);
 +}
 +
-+/*
-+ *  Usage: printer-uri job-id user title copies options [file]
-+ *
-+ */
-+
-+int main(int argc, char *argv[])
++static void attio_disconnected_cb(gpointer user_data)
 +{
-+	sdp_session_t *sdp;
-+	bdaddr_t bdaddr;
-+	unsigned short ctrl_psm, data_psm;
-+	uint8_t channel, b[6];
-+	char *ptr, str[3], device[18], service[12];
-+	const char *uri, *cups_class;
-+	int i, err, fd, copies, proto;
++	struct thermometer *t = user_data;
 +
-+	/* Make sure status messages are not buffered */
-+	setbuf(stderr, NULL);
++	DBG("GATT Disconnected");
 +
-+	/* Make sure output is not buffered */
-+	setbuf(stdout, NULL);
-+
-+	/* Ignore SIGPIPE signals */
-+#ifdef HAVE_SIGSET
-+	sigset(SIGPIPE, SIG_IGN);
-+#elif defined(HAVE_SIGACTION)
-+	memset(&action, 0, sizeof(action));
-+	action.sa_handler = SIG_IGN;
-+	sigaction(SIGPIPE, &action, NULL);
-+#else
-+	signal(SIGPIPE, SIG_IGN);
-+#endif /* HAVE_SIGSET */
-+
-+	if (argc == 1) {
-+		if (list_printers() == TRUE)
-+			return CUPS_BACKEND_OK;
-+		else
-+			return CUPS_BACKEND_FAILED;
-+	} else if (argc == 3 && strcmp(argv[1], "--get-deviceid") == 0) {
-+		if (bachk(argv[2]) < 0) {
-+			fprintf(stderr, "Invalid Bluetooth address '%s'\n",
-+					argv[2]);
-+			return CUPS_BACKEND_FAILED;
-+		}
-+		if (print_ieee1284(argv[2]) == FALSE)
-+			return CUPS_BACKEND_FAILED;
-+		return CUPS_BACKEND_OK;
++	if (t->attindid > 0) {
++		g_attrib_unregister(t->attrib, t->attindid);
++		t->attindid = 0;
 +	}
 +
-+	if (argc < 6 || argc > 7) {
-+		fprintf(stderr, "Usage: bluetooth job-id user title copies"
-+				" options [file]\n");
-+		fprintf(stderr, "       bluetooth --get-deviceid [bdaddr]\n");
-+		return CUPS_BACKEND_FAILED;
++	if (t->attnotid > 0) {
++		g_attrib_unregister(t->attrib, t->attnotid);
++		t->attnotid = 0;
 +	}
 +
-+	if (argc == 6) {
-+		fd = 0;
-+		copies = 1;
-+	} else {
-+		if ((fd = open(argv[6], O_RDONLY)) < 0) {
-+			perror("ERROR: Unable to open print file");
-+			return CUPS_BACKEND_FAILED;
-+		}
-+		copies = atoi(argv[4]);
-+	}
-+
-+	uri = getenv("DEVICE_URI");
-+	if (!uri)
-+		uri = argv[0];
-+
-+	if (strncasecmp(uri, "bluetooth://", 12)) {
-+		fprintf(stderr, "ERROR: No device URI found\n");
-+		return CUPS_BACKEND_FAILED;
-+	}
-+
-+	ptr = argv[0] + 12;
-+	for (i = 0; i < 6; i++) {
-+		strncpy(str, ptr, 2);
-+		b[i] = (uint8_t) strtol(str, NULL, 16);
-+		ptr += 2;
-+	}
-+	sprintf(device, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
-+			b[0], b[1], b[2], b[3], b[4], b[5]);
-+
-+	str2ba(device, &bdaddr);
-+
-+	ptr = strchr(ptr, '/');
-+	if (ptr) {
-+		strncpy(service, ptr + 1, 12);
-+
-+		if (!strncasecmp(ptr + 1, "spp", 3))
-+			proto = 1;
-+		else if (!strncasecmp(ptr + 1, "hcrp", 4))
-+			proto = 2;
-+		else
-+			proto = 0;
-+	} else {
-+		strcpy(service, "auto");
-+		proto = 0;
-+	}
-+
-+	cups_class = getenv("CLASS");
-+
-+	fprintf(stderr,
-+		"DEBUG: %s device %s service %s fd %d copies %d class %s\n",
-+			argv[0], device, service, fd, copies,
-+			cups_class ? cups_class : "(none)");
-+
-+	fputs("STATE: +connecting-to-device\n", stderr);
-+
-+service_search:
-+	sdp = sdp_connect(BDADDR_ANY, &bdaddr, SDP_RETRY_IF_BUSY);
-+	if (!sdp) {
-+		fprintf(stderr, "ERROR: Can't open Bluetooth connection\n");
-+		return CUPS_BACKEND_FAILED;
-+	}
-+
-+	switch (proto) {
-+	case 1:
-+		err = sdp_search_spp(sdp, &channel);
-+		break;
-+	case 2:
-+		err = sdp_search_hcrp(sdp, &ctrl_psm, &data_psm);
-+		break;
-+	default:
-+		proto = 2;
-+		err = sdp_search_hcrp(sdp, &ctrl_psm, &data_psm);
-+		if (err) {
-+			proto = 1;
-+			err = sdp_search_spp(sdp, &channel);
-+		}
-+		break;
-+	}
-+
-+	sdp_close(sdp);
-+
-+	if (err) {
-+		if (cups_class) {
-+			fputs("INFO: Unable to contact printer, queuing on "
-+					"next printer in class...\n", stderr);
-+			sleep(5);
-+			return CUPS_BACKEND_FAILED;
-+		}
-+		sleep(20);
-+		fprintf(stderr, "ERROR: Can't get service information\n");
-+		goto service_search;
-+	}
-+
-+connect:
-+	switch (proto) {
-+	case 1:
-+		err = spp_print(BDADDR_ANY, &bdaddr, channel,
-+						fd, copies, cups_class);
-+		break;
-+	case 2:
-+		err = hcrp_print(BDADDR_ANY, &bdaddr, ctrl_psm, data_psm,
-+						fd, copies, cups_class);
-+		break;
-+	default:
-+		err = CUPS_BACKEND_FAILED;
-+		fprintf(stderr, "ERROR: Unsupported protocol\n");
-+		break;
-+	}
-+
-+	if (err == CUPS_BACKEND_FAILED && cups_class) {
-+		fputs("INFO: Unable to contact printer, queuing on "
-+					"next printer in class...\n", stderr);
-+		sleep(5);
-+		return CUPS_BACKEND_FAILED;
-+	} else if (err == CUPS_BACKEND_RETRY) {
-+		sleep(20);
-+		goto connect;
-+	}
-+
-+	if (fd != 0)
-+		close(fd);
-+
-+	if (!err)
-+		fprintf(stderr, "INFO: Ready to print\n");
-+
-+	return err;
++	g_attrib_unref(t->attrib);
++	t->attrib = NULL;
 +}
-diff --git a/profiles/cups/sdp.c b/profiles/cups/sdp.c
++
++int thermometer_register(DBusConnection *connection, struct btd_device *device,
++						struct gatt_primary *tattr)
++{
++	const gchar *path = device_get_path(device);
++	struct thermometer *t;
++
++	t = g_new0(struct thermometer, 1);
++	t->conn = dbus_connection_ref(connection);
++	t->dev = btd_device_ref(device);
++	t->svc_range = g_new0(struct att_range, 1);
++	t->svc_range->start = tattr->range.start;
++	t->svc_range->end = tattr->range.end;
++
++	if (!g_dbus_register_interface(t->conn, path, THERMOMETER_INTERFACE,
++				thermometer_methods, thermometer_signals,
++				NULL, t, destroy_thermometer)) {
++		error("D-Bus failed to register %s interface",
++							THERMOMETER_INTERFACE);
++		destroy_thermometer(t);
++		return -EIO;
++	}
++
++	thermometers = g_slist_prepend(thermometers, t);
++
++	t->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
++						attio_disconnected_cb, t);
++	return 0;
++}
++
++void thermometer_unregister(struct btd_device *device)
++{
++	struct thermometer *t;
++	GSList *l;
++
++	l = g_slist_find_custom(thermometers, device, cmp_device);
++	if (l == NULL)
++		return;
++
++	t = l->data;
++	thermometers = g_slist_remove(thermometers, t);
++	g_dbus_unregister_interface(t->conn, device_get_path(t->dev),
++							THERMOMETER_INTERFACE);
++}
+diff --git a/profiles/thermometer/thermometer.h b/profiles/thermometer/thermometer.h
 new file mode 100644
-index 0000000..c7f17a4
+index 0000000..330503c
 --- /dev/null
-+++ b/profiles/cups/sdp.c
-@@ -0,0 +1,119 @@
++++ b/profiles/thermometer/thermometer.h
+@@ -0,0 +1,25 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
 + *
-+ *  Copyright (C) 2003-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
++ *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
 + *
 + *  This program is free software; you can redistribute it and/or modify
 + *  it under the terms of the GNU General Public License as published by
@@ -2979,226 +1567,1524 @@ index 0000000..c7f17a4
 + *
 + */
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <errno.h>
-+#include <unistd.h>
-+#include <signal.h>
-+#include <sys/socket.h>
-+
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/sdp.h>
-+#include <bluetooth/sdp_lib.h>
-+
-+#include "cups.h"
-+
-+int sdp_search_hcrp(sdp_session_t *sdp, unsigned short *ctrl_psm, unsigned short *data_psm)
-+{
-+	sdp_list_t *srch, *attrs, *rsp;
-+	uuid_t svclass;
-+	uint16_t attr1, attr2;
-+	int err;
-+
-+	if (!sdp)
-+		return -1;
-+
-+	sdp_uuid16_create(&svclass, HCR_PRINT_SVCLASS_ID);
-+	srch = sdp_list_append(NULL, &svclass);
-+
-+	attr1 = SDP_ATTR_PROTO_DESC_LIST;
-+	attrs = sdp_list_append(NULL, &attr1);
-+	attr2 = SDP_ATTR_ADD_PROTO_DESC_LIST;
-+	attrs = sdp_list_append(attrs, &attr2);
-+
-+	err = sdp_service_search_attr_req(sdp, srch, SDP_ATTR_REQ_INDIVIDUAL, attrs, &rsp);
-+	if (err)
-+		return -1;
-+
-+	for (; rsp; rsp = rsp->next) {
-+		sdp_record_t *rec = (sdp_record_t *) rsp->data;
-+		sdp_list_t *protos;
-+
-+		if (!sdp_get_access_protos(rec, &protos)) {
-+			unsigned short psm = sdp_get_proto_port(protos, L2CAP_UUID);
-+			if (psm > 0) {
-+				*ctrl_psm = psm;
-+			}
-+		}
-+
-+		if (!sdp_get_add_access_protos(rec, &protos)) {
-+			unsigned short psm = sdp_get_proto_port(protos, L2CAP_UUID);
-+			if (psm > 0 && *ctrl_psm > 0) {
-+				*data_psm = psm;
-+				return 0;
-+			}
-+		}
-+	}
-+
-+	return -1;
-+}
-+
-+int sdp_search_spp(sdp_session_t *sdp, uint8_t *channel)
-+{
-+	sdp_list_t *srch, *attrs, *rsp;
-+	uuid_t svclass;
-+	uint16_t attr;
-+	int err;
-+
-+	if (!sdp)
-+		return -1;
-+
-+	sdp_uuid16_create(&svclass, SERIAL_PORT_SVCLASS_ID);
-+	srch = sdp_list_append(NULL, &svclass);
-+
-+	attr = SDP_ATTR_PROTO_DESC_LIST;
-+	attrs = sdp_list_append(NULL, &attr);
-+
-+	err = sdp_service_search_attr_req(sdp, srch, SDP_ATTR_REQ_INDIVIDUAL, attrs, &rsp);
-+	if (err)
-+		return -1;
-+
-+	for (; rsp; rsp = rsp->next) {
-+		sdp_record_t *rec = (sdp_record_t *) rsp->data;
-+		sdp_list_t *protos;
-+
-+		if (!sdp_get_access_protos(rec, &protos)) {
-+			uint8_t ch = sdp_get_proto_port(protos, RFCOMM_UUID);
-+			if (ch > 0) {
-+				*channel = ch;
-+				return 0;
-+			}
-+		}
-+	}
-+
-+	return -1;
-+}
-diff --git a/profiles/cups/spp.c b/profiles/cups/spp.c
-new file mode 100644
-index 0000000..d906ed2
---- /dev/null
-+++ b/profiles/cups/spp.c
-@@ -0,0 +1,118 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2003-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <errno.h>
-+#include <unistd.h>
-+#include <signal.h>
-+#include <sys/socket.h>
-+
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/rfcomm.h>
-+#include <bluetooth/sdp.h>
-+#include <bluetooth/sdp_lib.h>
-+
-+#include "cups.h"
-+
-+int spp_print(bdaddr_t *src, bdaddr_t *dst, uint8_t channel, int fd, int copies, const char *cups_class)
-+{
-+	struct sockaddr_rc addr;
-+	unsigned char buf[2048];
-+	int i, sk, err, len;
-+
-+	if ((sk = socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)) < 0) {
-+		perror("ERROR: Can't create socket");
-+		if (cups_class)
-+			return CUPS_BACKEND_FAILED;
-+		else
-+			return CUPS_BACKEND_RETRY;
-+	}
-+
-+	addr.rc_family = AF_BLUETOOTH;
-+	bacpy(&addr.rc_bdaddr, src);
-+	addr.rc_channel = 0;
-+
-+	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-+		perror("ERROR: Can't bind socket");
-+		close(sk);
-+		if (cups_class)
-+			return CUPS_BACKEND_FAILED;
-+		else
-+			return CUPS_BACKEND_RETRY;
-+	}
-+
-+	addr.rc_family = AF_BLUETOOTH;
-+	bacpy(&addr.rc_bdaddr, dst);
-+	addr.rc_channel = channel;
-+
-+	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-+		perror("ERROR: Can't connect to device");
-+		close(sk);
-+		if (cups_class)
-+			return CUPS_BACKEND_FAILED;
-+		else
-+			return CUPS_BACKEND_RETRY;
-+	}
-+
-+	fputs("STATE: -connecting-to-device\n", stderr);
-+
-+	/* Ignore SIGTERM signals if printing from stdin */
-+	if (fd == 0) {
-+#ifdef HAVE_SIGSET
-+		sigset(SIGTERM, SIG_IGN);
-+#elif defined(HAVE_SIGACTION)
-+		memset(&action, 0, sizeof(action));
-+		sigemptyset(&action.sa_mask);
-+		action.sa_handler = SIG_IGN;
-+		sigaction(SIGTERM, &action, NULL);
-+#else
-+		signal(SIGTERM, SIG_IGN);
-+#endif /* HAVE_SIGSET */
-+	}
-+
-+	for (i = 0; i < copies; i++) {
-+
-+		if (fd != 0) {
-+			fprintf(stderr, "PAGE: 1 1\n");
-+			lseek(fd, 0, SEEK_SET);
-+		}
-+
-+		while ((len = read(fd, buf, sizeof(buf))) > 0) {
-+			err = write(sk, buf, len);
-+			if (err < 0) {
-+				perror("ERROR: Error writing to device");
-+				close(sk);
-+				return CUPS_BACKEND_FAILED;
-+			}
-+		}
-+
-+	}
-+
-+	close(sk);
-+
-+	return CUPS_BACKEND_OK;
-+}
++int thermometer_register(DBusConnection *connection, struct btd_device *device,
++						struct gatt_primary *tattr);
++void thermometer_unregister(struct btd_device *device);
+diff --git a/thermometer/main.c b/thermometer/main.c
+deleted file mode 100644
+index 4447b52..0000000
+--- a/thermometer/main.c
++++ /dev/null
+@@ -1,70 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <stdint.h>
+-#include <glib.h>
+-#include <errno.h>
+-#include <gdbus.h>
+-
+-#include "plugin.h"
+-#include "manager.h"
+-#include "hcid.h"
+-#include "log.h"
+-
+-static DBusConnection *connection = NULL;
+-
+-static int thermometer_init(void)
+-{
+-	if (!main_opts.gatt_enabled) {
+-		DBG("GATT is disabled");
+-		return -ENOTSUP;
+-	}
+-
+-	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
+-	if (connection == NULL)
+-		return -EIO;
+-
+-	if (thermometer_manager_init(connection) < 0) {
+-		dbus_connection_unref(connection);
+-		return -EIO;
+-	}
+-
+-	return 0;
+-}
+-
+-static void thermometer_exit(void)
+-{
+-	if (!main_opts.gatt_enabled)
+-		return;
+-
+-	thermometer_manager_exit();
+-
+-	dbus_connection_unref(connection);
+-	connection = NULL;
+-}
+-
+-BLUETOOTH_PLUGIN_DEFINE(thermometer, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
+-					thermometer_init, thermometer_exit)
+diff --git a/thermometer/manager.c b/thermometer/manager.c
+deleted file mode 100644
+index 3d5452b..0000000
+--- a/thermometer/manager.c
++++ /dev/null
+@@ -1,92 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#include <gdbus.h>
+-#include <errno.h>
+-#include <bluetooth/uuid.h>
+-
+-#include "adapter.h"
+-#include "device.h"
+-#include "att.h"
+-#include "gattrib.h"
+-#include "gatt.h"
+-#include "thermometer.h"
+-#include "manager.h"
+-
+-static DBusConnection *connection = NULL;
+-
+-static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
+-{
+-	const struct gatt_primary *prim = a;
+-	const char *uuid = b;
+-
+-	return g_strcmp0(prim->uuid, uuid);
+-}
+-
+-static int thermometer_driver_probe(struct btd_device *device, GSList *uuids)
+-{
+-	struct gatt_primary *tattr;
+-	GSList *primaries, *l;
+-
+-	primaries = btd_device_get_primaries(device);
+-
+-	l = g_slist_find_custom(primaries, HEALTH_THERMOMETER_UUID,
+-							primary_uuid_cmp);
+-	if (l == NULL)
+-		return -EINVAL;
+-
+-	tattr = l->data;
+-
+-	return thermometer_register(connection, device, tattr);
+-}
+-
+-static void thermometer_driver_remove(struct btd_device *device)
+-{
+-	thermometer_unregister(device);
+-}
+-
+-static struct btd_device_driver thermometer_device_driver = {
+-	.name	= "thermometer-device-driver",
+-	.uuids	= BTD_UUIDS(HEALTH_THERMOMETER_UUID),
+-	.probe	= thermometer_driver_probe,
+-	.remove	= thermometer_driver_remove
+-};
+-
+-int thermometer_manager_init(DBusConnection *conn)
+-{
+-	int ret;
+-
+-	ret = btd_register_device_driver(&thermometer_device_driver);
+-	if (ret < 0)
+-                return ret;
+-
+-	connection = dbus_connection_ref(conn);
+-	return 0;
+-}
+-
+-void thermometer_manager_exit(void)
+-{
+-	btd_unregister_device_driver(&thermometer_device_driver);
+-
+-	dbus_connection_unref(connection);
+-	connection = NULL;
+-}
+diff --git a/thermometer/manager.h b/thermometer/manager.h
+deleted file mode 100644
+index ed928ad..0000000
+--- a/thermometer/manager.h
++++ /dev/null
+@@ -1,24 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-int thermometer_manager_init(DBusConnection *conn);
+-void thermometer_manager_exit(void);
+diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
+deleted file mode 100644
+index 087662e..0000000
+--- a/thermometer/thermometer.c
++++ /dev/null
+@@ -1,1274 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <gdbus.h>
+-#include <errno.h>
+-#include <bluetooth/uuid.h>
+-
+-#include "dbus-common.h"
+-#include "adapter.h"
+-#include "device.h"
+-#include "error.h"
+-#include "log.h"
+-#include "gattrib.h"
+-#include "attio.h"
+-#include "att.h"
+-#include "gatt.h"
+-#include "thermometer.h"
+-
+-#define THERMOMETER_INTERFACE "org.bluez.Thermometer"
+-
+-/* Temperature measurement flag fields */
+-#define TEMP_UNITS		0x01
+-#define TEMP_TIME_STAMP		0x02
+-#define TEMP_TYPE		0x04
+-
+-#define FLOAT_MAX_MANTISSA	16777216 /* 2^24 */
+-
+-#define VALID_RANGE_DESC_SIZE	4
+-#define TEMPERATURE_TYPE_SIZE	1
+-#define MEASUREMENT_INTERVAL_SIZE	2
+-
+-struct thermometer {
+-	DBusConnection		*conn;		/* The connection to the bus */
+-	struct btd_device	*dev;		/* Device reference */
+-	GAttrib			*attrib;	/* GATT connection */
+-	struct att_range	*svc_range;	/* Thermometer range */
+-	guint			attioid;	/* Att watcher id */
+-	guint			attindid;	/* Att incications id */
+-	guint			attnotid;	/* Att notifications id */
+-	GSList			*chars;		/* Characteristics */
+-	GSList			*fwatchers;     /* Final measurements */
+-	GSList			*iwatchers;     /* Intermediate measurements */
+-	gboolean		intermediate;
+-	uint8_t			type;
+-	uint16_t		interval;
+-	uint16_t		max;
+-	uint16_t		min;
+-	gboolean		has_type;
+-	gboolean		has_interval;
+-};
+-
+-struct characteristic {
+-	struct gatt_char		attr;	/* Characteristic */
+-	GSList			*desc;	/* Descriptors */
+-	struct thermometer	*t;	/* Thermometer where the char belongs */
+-};
+-
+-struct descriptor {
+-	struct characteristic	*ch;
+-	uint16_t		handle;
+-	bt_uuid_t		uuid;
+-};
+-
+-struct watcher {
+-	struct thermometer	*t;
+-	guint			id;
+-	char			*srv;
+-	char			*path;
+-};
+-
+-struct measurement {
+-	int16_t		exp;
+-	int32_t		mant;
+-	uint64_t	time;
+-	gboolean	suptime;
+-	char		*unit;
+-	char		*type;
+-	char		*value;
+-};
+-
+-struct tmp_interval_data {
+-	struct thermometer	*thermometer;
+-	uint16_t		interval;
+-};
+-
+-static GSList *thermometers = NULL;
+-
+-const char *temp_type[] = {
+-	"<reserved>",
+-	"Armpit",
+-	"Body",
+-	"Ear",
+-	"Finger",
+-	"Intestines",
+-	"Mouth",
+-	"Rectum",
+-	"Toe",
+-	"Tympanum"
+-};
+-
+-static const gchar *temptype2str(uint8_t value)
+-{
+-	 if (value > 0 && value < G_N_ELEMENTS(temp_type))
+-		return temp_type[value];
+-
+-	error("Temperature type %d reserved for future use", value);
+-	return NULL;
+-}
+-
+-static void destroy_watcher(gpointer user_data)
+-{
+-	struct watcher *watcher = user_data;
+-
+-	g_free(watcher->path);
+-	g_free(watcher->srv);
+-	g_free(watcher);
+-}
+-
+-static void remove_watcher(gpointer user_data)
+-{
+-	struct watcher *watcher = user_data;
+-
+-	g_dbus_remove_watch(watcher->t->conn, watcher->id);
+-}
+-
+-static void destroy_char(gpointer user_data)
+-{
+-	struct characteristic *c = user_data;
+-
+-	g_slist_free_full(c->desc, g_free);
+-	g_free(c);
+-}
+-
+-static void destroy_thermometer(gpointer user_data)
+-{
+-	struct thermometer *t = user_data;
+-
+-	if (t->attioid > 0)
+-		btd_device_remove_attio_callback(t->dev, t->attioid);
+-
+-	if (t->attindid > 0)
+-		g_attrib_unregister(t->attrib, t->attindid);
+-
+-	if (t->attnotid > 0)
+-		g_attrib_unregister(t->attrib, t->attnotid);
+-
+-	if (t->attrib != NULL)
+-		g_attrib_unref(t->attrib);
+-
+-	if (t->chars != NULL)
+-		g_slist_free_full(t->chars, destroy_char);
+-
+-	if (t->fwatchers != NULL)
+-		g_slist_free_full(t->fwatchers, remove_watcher);
+-
+-	dbus_connection_unref(t->conn);
+-	btd_device_unref(t->dev);
+-	g_free(t->svc_range);
+-	g_free(t);
+-}
+-
+-static gint cmp_device(gconstpointer a, gconstpointer b)
+-{
+-	const struct thermometer *t = a;
+-	const struct btd_device *dev = b;
+-
+-	if (dev == t->dev)
+-		return 0;
+-
+-	return -1;
+-}
+-
+-static gint cmp_watcher(gconstpointer a, gconstpointer b)
+-{
+-	const struct watcher *watcher = a;
+-	const struct watcher *match = b;
+-	int ret;
+-
+-	ret = g_strcmp0(watcher->srv, match->srv);
+-	if (ret != 0)
+-		return ret;
+-
+-	return g_strcmp0(watcher->path, match->path);
+-}
+-
+-static gint cmp_char_uuid(gconstpointer a, gconstpointer b)
+-{
+-	const struct characteristic *ch = a;
+-	const char *uuid = b;
+-
+-	return g_strcmp0(ch->attr.uuid, uuid);
+-}
+-
+-static gint cmp_char_val_handle(gconstpointer a, gconstpointer b)
+-{
+-	const struct characteristic *ch = a;
+-	const uint16_t *handle = b;
+-
+-	return ch->attr.value_handle - *handle;
+-}
+-
+-static gint cmp_descriptor(gconstpointer a, gconstpointer b)
+-{
+-	const struct descriptor *desc = a;
+-	const bt_uuid_t *uuid = b;
+-
+-	return bt_uuid_cmp(&desc->uuid, uuid);
+-}
+-
+-static struct characteristic *get_characteristic(struct thermometer *t,
+-							const char *uuid)
+-{
+-	GSList *l;
+-
+-	l = g_slist_find_custom(t->chars, uuid, cmp_char_uuid);
+-	if (l == NULL)
+-		return NULL;
+-
+-	return l->data;
+-}
+-
+-static struct descriptor *get_descriptor(struct characteristic *ch,
+-							const bt_uuid_t *uuid)
+-{
+-	GSList *l;
+-
+-	l = g_slist_find_custom(ch->desc, uuid, cmp_descriptor);
+-	if (l == NULL)
+-		return NULL;
+-
+-	return l->data;
+-}
+-
+-static void change_property(struct thermometer *t, const char *name,
+-							gpointer value) {
+-	if (g_strcmp0(name, "Intermediate") == 0) {
+-		gboolean *intermediate = value;
+-		if (t->intermediate == *intermediate)
+-			return;
+-
+-		t->intermediate = *intermediate;
+-		emit_property_changed(t->conn, device_get_path(t->dev),
+-					THERMOMETER_INTERFACE, name,
+-					DBUS_TYPE_BOOLEAN, &t->intermediate);
+-	} else if (g_strcmp0(name, "Interval") == 0) {
+-		uint16_t *interval = value;
+-		if (t->has_interval && t->interval == *interval)
+-			return;
+-
+-		t->has_interval = TRUE;
+-		t->interval = *interval;
+-		emit_property_changed(t->conn, device_get_path(t->dev),
+-					THERMOMETER_INTERFACE, name,
+-					DBUS_TYPE_UINT16, &t->interval);
+-	} else if (g_strcmp0(name, "Maximum") == 0) {
+-		uint16_t *max = value;
+-		if (t->max == *max)
+-			return;
+-
+-		t->max = *max;
+-		emit_property_changed(t->conn, device_get_path(t->dev),
+-					THERMOMETER_INTERFACE, name,
+-					DBUS_TYPE_UINT16, &t->max);
+-	} else if (g_strcmp0(name, "Minimum") == 0) {
+-		uint16_t *min = value;
+-		if (t->min == *min)
+-			return;
+-
+-		t->min = *min;
+-		emit_property_changed(t->conn, device_get_path(t->dev),
+-					THERMOMETER_INTERFACE, name,
+-					DBUS_TYPE_UINT16, &t->min);
+-	} else
+-		DBG("%s is not a thermometer property", name);
+-}
+-
+-static void valid_range_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+-							gpointer user_data)
+-{
+-	struct descriptor *desc = user_data;
+-	uint8_t value[VALID_RANGE_DESC_SIZE];
+-	uint16_t max, min;
+-	ssize_t vlen;
+-
+-	if (status != 0) {
+-		DBG("Valid Range descriptor read failed: %s",
+-							att_ecode2str(status));
+-		return;
+-	}
+-
+-	vlen = dec_read_resp(pdu, len, value, sizeof(value));
+-	if (vlen < 0) {
+-		DBG("Protocol error\n");
+-		return;
+-	}
+-
+-	if (vlen < 4) {
+-		DBG("Invalid range received");
+-		return;
+-	}
+-
+-	min = att_get_u16(&value[0]);
+-	max = att_get_u16(&value[2]);
+-
+-	if (min == 0 || min > max) {
+-		DBG("Invalid range");
+-		return;
+-	}
+-
+-	change_property(desc->ch->t, "Maximum", &max);
+-	change_property(desc->ch->t, "Minimum", &min);
+-}
+-
+-static void measurement_cb(guint8 status, const guint8 *pdu,
+-						guint16 len, gpointer user_data)
+-{
+-	char *msg = user_data;
+-
+-	if (status != 0)
+-		error("%s failed", msg);
+-
+-	g_free(msg);
+-}
+-
+-static void process_thermometer_desc(struct descriptor *desc)
+-{
+-	struct characteristic *ch = desc->ch;
+-	char uuidstr[MAX_LEN_UUID_STR];
+-	bt_uuid_t btuuid;
+-
+-	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
+-
+-	if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0) {
+-		uint8_t atval[2];
+-		uint16_t val;
+-		char *msg;
+-
+-		if (g_strcmp0(ch->attr.uuid,
+-					TEMPERATURE_MEASUREMENT_UUID) == 0) {
+-			if (g_slist_length(ch->t->fwatchers) == 0)
+-				return;
+-
+-			val = GATT_CLIENT_CHARAC_CFG_IND_BIT;
+-			msg = g_strdup("Enable Temperature Measurement "
+-								"indication");
+-		} else if (g_strcmp0(ch->attr.uuid,
+-					INTERMEDIATE_TEMPERATURE_UUID) == 0) {
+-			if (g_slist_length(ch->t->iwatchers) == 0)
+-				return;
+-
+-			val = GATT_CLIENT_CHARAC_CFG_NOTIF_BIT;
+-			msg = g_strdup("Enable Intermediate Temperature "
+-								"notification");
+-		} else if (g_strcmp0(ch->attr.uuid,
+-					MEASUREMENT_INTERVAL_UUID) == 0) {
+-			val = GATT_CLIENT_CHARAC_CFG_IND_BIT;
+-			msg = g_strdup("Enable Measurement Interval "
+-								"indication");
+-		} else
+-			goto done;
+-
+-		att_put_u16(val, atval);
+-		gatt_write_char(ch->t->attrib, desc->handle, atval, 2,
+-							measurement_cb, msg);
+-		return;
+-	}
+-
+-	bt_uuid16_create(&btuuid, GATT_CHARAC_VALID_RANGE_UUID);
+-
+-	if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0 && g_strcmp0(ch->attr.uuid,
+-					MEASUREMENT_INTERVAL_UUID) == 0) {
+-		gatt_read_char(ch->t->attrib, desc->handle, 0,
+-						valid_range_desc_cb, desc);
+-		return;
+-	}
+-
+-done:
+-	bt_uuid_to_string(&desc->uuid, uuidstr, MAX_LEN_UUID_STR);
+-	DBG("Ignored descriptor %s in characteristic %s", uuidstr,
+-								ch->attr.uuid);
+-}
+-
+-static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+-							gpointer user_data)
+-{
+-	struct characteristic *ch = user_data;
+-	struct att_data_list *list;
+-	uint8_t format;
+-	int i;
+-
+-	if (status != 0) {
+-		error("Discover all characteristic descriptors failed [%s]: %s",
+-					ch->attr.uuid, att_ecode2str(status));
+-		return;
+-	}
+-
+-	list = dec_find_info_resp(pdu, len, &format);
+-	if (list == NULL)
+-		return;
+-
+-	for (i = 0; i < list->num; i++) {
+-		struct descriptor *desc;
+-		uint8_t *value;
+-
+-		value = list->data[i];
+-		desc = g_new0(struct descriptor, 1);
+-		desc->handle = att_get_u16(value);
+-		desc->ch = ch;
+-
+-		if (format == 0x01)
+-			desc->uuid = att_get_uuid16(&value[2]);
+-		else
+-			desc->uuid = att_get_uuid128(&value[2]);
+-
+-		ch->desc = g_slist_append(ch->desc, desc);
+-		process_thermometer_desc(desc);
+-	}
+-
+-	att_data_list_free(list);
+-}
+-
+-static void read_temp_type_cb(guint8 status, const guint8 *pdu, guint16 len,
+-							gpointer user_data)
+-{
+-	struct characteristic *ch = user_data;
+-	struct thermometer *t = ch->t;
+-	uint8_t value[TEMPERATURE_TYPE_SIZE];
+-	ssize_t vlen;
+-
+-	if (status != 0) {
+-		DBG("Temperature Type value read failed: %s",
+-							att_ecode2str(status));
+-		return;
+-	}
+-
+-	vlen = dec_read_resp(pdu, len, value, sizeof(value));
+-	if (vlen < 0) {
+-		DBG("Protocol error.");
+-		return;
+-	}
+-
+-	if (vlen != 1) {
+-		DBG("Invalid length for Temperature type");
+-		return;
+-	}
+-
+-	t->has_type = TRUE;
+-	t->type = value[0];
+-}
+-
+-static void read_interval_cb(guint8 status, const guint8 *pdu, guint16 len,
+-							gpointer user_data)
+-{
+-	struct characteristic *ch = user_data;
+-	uint8_t value[MEASUREMENT_INTERVAL_SIZE];
+-	uint16_t interval;
+-	ssize_t vlen;
+-
+-	if (status != 0) {
+-		DBG("Measurement Interval value read failed: %s",
+-							att_ecode2str(status));
+-		return;
+-	}
+-
+-	vlen = dec_read_resp(pdu, len, value, sizeof(value));
+-	if (vlen < 0) {
+-		DBG("Protocol error\n");
+-		return;
+-	}
+-
+-	if (vlen < 2) {
+-		DBG("Invalid Interval received");
+-		return;
+-	}
+-
+-	interval = att_get_u16(&value[0]);
+-	change_property(ch->t, "Interval", &interval);
+-}
+-
+-static void process_thermometer_char(struct characteristic *ch)
+-{
+-	if (g_strcmp0(ch->attr.uuid, INTERMEDIATE_TEMPERATURE_UUID) == 0) {
+-		gboolean intermediate = TRUE;
+-		change_property(ch->t, "Intermediate", &intermediate);
+-		return;
+-	} else if (g_strcmp0(ch->attr.uuid, TEMPERATURE_TYPE_UUID) == 0)
+-		gatt_read_char(ch->t->attrib, ch->attr.value_handle, 0,
+-							read_temp_type_cb, ch);
+-	else if (g_strcmp0(ch->attr.uuid, MEASUREMENT_INTERVAL_UUID) == 0)
+-		gatt_read_char(ch->t->attrib, ch->attr.value_handle, 0,
+-							read_interval_cb, ch);
+-}
+-
+-static void configure_thermometer_cb(GSList *characteristics, guint8 status,
+-							gpointer user_data)
+-{
+-	struct thermometer *t = user_data;
+-	GSList *l;
+-
+-	if (status != 0) {
+-		error("Discover thermometer characteristics: %s",
+-							att_ecode2str(status));
+-		return;
+-	}
+-
+-	for (l = characteristics; l; l = l->next) {
+-		struct gatt_char *c = l->data;
+-		struct characteristic *ch;
+-		uint16_t start, end;
+-
+-		ch = g_new0(struct characteristic, 1);
+-		ch->attr.handle = c->handle;
+-		ch->attr.properties = c->properties;
+-		ch->attr.value_handle = c->value_handle;
+-		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
+-		ch->t = t;
+-
+-		t->chars = g_slist_append(t->chars, ch);
+-
+-		process_thermometer_char(ch);
+-
+-		start = c->value_handle + 1;
+-
+-		if (l->next != NULL) {
+-			struct gatt_char *c = l->next->data;
+-			if (start == c->handle)
+-				continue;
+-			end = c->handle - 1;
+-		} else if (c->value_handle != t->svc_range->end)
+-			end = t->svc_range->end;
+-		else
+-			continue;
+-
+-		gatt_find_info(t->attrib, start, end, discover_desc_cb, ch);
+-	}
+-}
+-
+-static DBusMessage *get_properties(DBusConnection *conn, DBusMessage *msg,
+-								void *data)
+-{
+-	struct thermometer *t = data;
+-	DBusMessageIter iter;
+-	DBusMessageIter dict;
+-	DBusMessage *reply;
+-
+-	reply = dbus_message_new_method_return(msg);
+-	if (reply == NULL)
+-		return NULL;
+-
+-	dbus_message_iter_init_append(reply, &iter);
+-
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+-
+-	dict_append_entry(&dict, "Intermediate", DBUS_TYPE_BOOLEAN,
+-							&t->intermediate);
+-
+-	if (t->has_interval) {
+-		dict_append_entry(&dict, "Interval", DBUS_TYPE_UINT16,
+-								&t->interval);
+-		dict_append_entry(&dict, "Maximum", DBUS_TYPE_UINT16, &t->max);
+-		dict_append_entry(&dict, "Minimum", DBUS_TYPE_UINT16, &t->min);
+-	}
+-
+-	dbus_message_iter_close_container(&iter, &dict);
+-
+-	return reply;
+-}
+-
+-static void write_interval_cb (guint8 status, const guint8 *pdu, guint16 len,
+-							gpointer user_data)
+-{
+-	struct tmp_interval_data *data = user_data;
+-
+-	if (status != 0) {
+-		error("Interval Write Request failed %s",
+-							att_ecode2str(status));
+-		goto done;
+-	}
+-
+-	if (!dec_write_resp(pdu, len)) {
+-		error("Interval Write Request: protocol error");
+-		goto done;
+-	}
+-
+-	change_property(data->thermometer, "Interval", &data->interval);
+-
+-done:
+-	g_free(user_data);
+-}
+-
+-static DBusMessage *write_attr_interval(struct thermometer *t, DBusMessage *msg,
+-								uint16_t value)
+-{
+-	struct tmp_interval_data *data;
+-	struct characteristic *ch;
+-	uint8_t atval[2];
+-
+-	if (t->attrib == NULL)
+-		return btd_error_not_connected(msg);
+-
+-	ch = get_characteristic(t, MEASUREMENT_INTERVAL_UUID);
+-	if (ch == NULL)
+-		return btd_error_not_available(msg);
+-
+-	if (value < t->min || value > t->max)
+-		return btd_error_invalid_args(msg);
+-
+-	att_put_u16(value, &atval[0]);
+-
+-	data = g_new0(struct tmp_interval_data, 1);
+-	data->thermometer = t;
+-	data->interval = value;
+-	gatt_write_char(t->attrib, ch->attr.value_handle, atval, 2,
+-						write_interval_cb, data);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
+-								void *data)
+-{
+-	struct thermometer *t = data;
+-	const char *property;
+-	DBusMessageIter iter;
+-	DBusMessageIter sub;
+-	uint16_t value;
+-
+-	if (!dbus_message_iter_init(msg, &iter))
+-		return btd_error_invalid_args(msg);
+-
+-	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
+-		return btd_error_invalid_args(msg);
+-
+-	dbus_message_iter_get_basic(&iter, &property);
+-	if (g_strcmp0("Interval", property) != 0)
+-		return btd_error_invalid_args(msg);
+-
+-	if (!t->has_interval)
+-		return btd_error_not_available(msg);
+-
+-	dbus_message_iter_next(&iter);
+-	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_VARIANT)
+-		return btd_error_invalid_args(msg);
+-
+-	dbus_message_iter_recurse(&iter, &sub);
+-
+-	if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_UINT16)
+-		return btd_error_invalid_args(msg);
+-
+-	dbus_message_iter_get_basic(&sub, &value);
+-
+-	return write_attr_interval(t, msg, value);
+-}
+-
+-static void enable_final_measurement(struct thermometer *t)
+-{
+-	struct characteristic *ch;
+-	struct descriptor *desc;
+-	bt_uuid_t btuuid;
+-	uint8_t atval[2];
+-	char *msg;
+-
+-	if (t->attrib == NULL)
+-		return;
+-
+-	ch = get_characteristic(t, TEMPERATURE_MEASUREMENT_UUID);
+-	if (ch == NULL) {
+-		DBG("Temperature measurement characteristic not found");
+-		return;
+-	}
+-
+-	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
+-	desc = get_descriptor(ch, &btuuid);
+-	if (desc == NULL) {
+-		DBG("Client characteristic configuration descriptor not found");
+-		return;
+-	}
+-
+-	atval[0] = 0x02;
+-	atval[1] = 0x00;
+-	msg = g_strdup("Enable final measurement");
+-	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
+-}
+-
+-static void enable_intermediate_measurement(struct thermometer *t)
+-{
+-	struct characteristic *ch;
+-	struct descriptor *desc;
+-	bt_uuid_t btuuid;
+-	uint8_t atval[2];
+-	char *msg;
+-
+-	if (t->attrib == NULL)
+-		return;
+-
+-	ch = get_characteristic(t, INTERMEDIATE_TEMPERATURE_UUID);
+-	if (ch == NULL) {
+-		DBG("Intermediate measurement characteristic not found");
+-		return;
+-	}
+-
+-	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
+-	desc = get_descriptor(ch, &btuuid);
+-	if (desc == NULL) {
+-		DBG("Client characteristic configuration descriptor not found");
+-		return;
+-	}
+-
+-	atval[0] = 0x01;
+-	atval[1] = 0x00;
+-	msg = g_strdup("Enable intermediate measurement");
+-	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
+-}
+-
+-static void disable_final_measurement(struct thermometer *t)
+-{
+-	struct characteristic *ch;
+-	struct descriptor *desc;
+-	bt_uuid_t btuuid;
+-	uint8_t atval[2];
+-	char *msg;
+-
+-	if (t->attrib == NULL)
+-		return;
+-
+-	ch = get_characteristic(t, TEMPERATURE_MEASUREMENT_UUID);
+-	if (ch == NULL) {
+-		DBG("Temperature measurement characteristic not found");
+-		return;
+-	}
+-
+-	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
+-	desc = get_descriptor(ch, &btuuid);
+-	if (desc == NULL) {
+-		DBG("Client characteristic configuration descriptor not found");
+-		return;
+-	}
+-
+-	atval[0] = 0x00;
+-	atval[1] = 0x00;
+-	msg = g_strdup("Disable final measurement");
+-	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
+-}
+-
+-static void disable_intermediate_measurement(struct thermometer *t)
+-{
+-	struct characteristic *ch;
+-	struct descriptor *desc;
+-	bt_uuid_t btuuid;
+-	uint8_t atval[2];
+-	char *msg;
+-
+-	if (t->attrib == NULL)
+-		return;
+-
+-	ch = get_characteristic(t, INTERMEDIATE_TEMPERATURE_UUID);
+-	if (ch == NULL) {
+-		DBG("Intermediate measurement characteristic not found");
+-		return;
+-	}
+-
+-	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
+-	desc = get_descriptor(ch, &btuuid);
+-	if (desc == NULL) {
+-		DBG("Client characteristic configuration descriptor not found");
+-		return;
+-	}
+-
+-	atval[0] = 0x00;
+-	atval[1] = 0x00;
+-	msg = g_strdup("Disable intermediate measurement");
+-	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
+-}
+-
+-static void remove_int_watcher(struct thermometer *t, struct watcher *w)
+-{
+-	if (!g_slist_find(t->iwatchers, w))
+-		return;
+-
+-	t->iwatchers = g_slist_remove(t->iwatchers, w);
+-
+-	if (g_slist_length(t->iwatchers) == 0)
+-		disable_intermediate_measurement(t);
+-}
+-
+-static void watcher_exit(DBusConnection *conn, void *user_data)
+-{
+-	struct watcher *watcher = user_data;
+-	struct thermometer *t = watcher->t;
+-
+-	DBG("Thermometer watcher %s disconnected", watcher->path);
+-
+-	remove_int_watcher(t, watcher);
+-
+-	t->fwatchers = g_slist_remove(t->fwatchers, watcher);
+-	g_dbus_remove_watch(watcher->t->conn, watcher->id);
+-
+-	if (g_slist_length(t->fwatchers) == 0)
+-		disable_final_measurement(t);
+-}
+-
+-static struct watcher *find_watcher(GSList *list, const char *sender,
+-							const char *path)
+-{
+-	struct watcher *match;
+-	GSList *l;
+-
+-	match = g_new0(struct watcher, 1);
+-	match->srv = g_strdup(sender);
+-	match->path = g_strdup(path);
+-
+-	l = g_slist_find_custom(list, match, cmp_watcher);
+-	destroy_watcher(match);
+-
+-	if (l != NULL)
+-		return l->data;
+-
+-	return NULL;
+-}
+-
+-static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
+-								void *data)
+-{
+-	const char *sender = dbus_message_get_sender(msg);
+-	struct thermometer *t = data;
+-	struct watcher *watcher;
+-	char *path;
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
+-							DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	watcher = find_watcher(t->fwatchers, sender, path);
+-	if (watcher != NULL)
+-		return btd_error_already_exists(msg);
+-
+-	DBG("Thermometer watcher %s registered", path);
+-
+-	watcher = g_new0(struct watcher, 1);
+-	watcher->srv = g_strdup(sender);
+-	watcher->path = g_strdup(path);
+-	watcher->t = t;
+-	watcher->id = g_dbus_add_disconnect_watch(conn, sender, watcher_exit,
+-						watcher, destroy_watcher);
+-
+-	if (g_slist_length(t->fwatchers) == 0)
+-		enable_final_measurement(t);
+-
+-	t->fwatchers = g_slist_prepend(t->fwatchers, watcher);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
+-								void *data)
+-{
+-	const char *sender = dbus_message_get_sender(msg);
+-	struct thermometer *t = data;
+-	struct watcher *watcher;
+-	char *path;
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
+-							DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	watcher = find_watcher(t->fwatchers, sender, path);
+-	if (watcher == NULL)
+-		return btd_error_does_not_exist(msg);
+-
+-	DBG("Thermometer watcher %s unregistered", path);
+-
+-	remove_int_watcher(t, watcher);
+-
+-	t->fwatchers = g_slist_remove(t->fwatchers, watcher);
+-	g_dbus_remove_watch(watcher->t->conn, watcher->id);
+-
+-	if (g_slist_length(t->fwatchers) == 0)
+-		disable_final_measurement(t);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static DBusMessage *enable_intermediate(DBusConnection *conn, DBusMessage *msg,
+-								void *data)
+-{
+-	const char *sender = dbus_message_get_sender(msg);
+-	struct thermometer *t = data;
+-	struct watcher *watcher;
+-	char *path;
+-
+-	if (!t->intermediate)
+-		return btd_error_not_supported(msg);
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
+-							DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	watcher = find_watcher(t->fwatchers, sender, path);
+-	if (watcher == NULL)
+-		return btd_error_does_not_exist(msg);
+-
+-	if (find_watcher(t->iwatchers, sender, path))
+-		return btd_error_already_exists(msg);
+-
+-	DBG("Intermediate measurement watcher %s registered", path);
+-
+-	if (g_slist_length(t->iwatchers) == 0)
+-		enable_intermediate_measurement(t);
+-
+-	t->iwatchers = g_slist_prepend(t->iwatchers, watcher);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static DBusMessage *disable_intermediate(DBusConnection *conn, DBusMessage *msg,
+-								void *data)
+-{
+-	const char *sender = dbus_message_get_sender(msg);
+-	struct thermometer *t = data;
+-	struct watcher *watcher;
+-	char *path;
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
+-							DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	watcher = find_watcher(t->iwatchers, sender, path);
+-	if (watcher == NULL)
+-		return btd_error_does_not_exist(msg);
+-
+-	DBG("Intermediate measurement %s unregistered", path);
+-
+-	remove_int_watcher(t, watcher);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static const GDBusMethodTable thermometer_methods[] = {
+-	{ GDBUS_METHOD("GetProperties",
+-			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
+-			get_properties) },
+-	{ GDBUS_ASYNC_METHOD("SetProperty",
+-			GDBUS_ARGS({ "name", "s" }, { "value", "v" }), NULL,
+-			set_property) },
+-	{ GDBUS_METHOD("RegisterWatcher",
+-			GDBUS_ARGS({ "agent", "o" }), NULL,
+-			register_watcher) },
+-	{ GDBUS_METHOD("UnregisterWatcher",
+-			GDBUS_ARGS({ "agent", "o" }), NULL,
+-			unregister_watcher) },
+-	{ GDBUS_METHOD("EnableIntermediateMeasurement",
+-			GDBUS_ARGS({ "agent", "o" }), NULL,
+-			enable_intermediate) },
+-	{ GDBUS_METHOD("DisableIntermediateMeasurement",
+-			GDBUS_ARGS({ "agent", "o" }), NULL,
+-			disable_intermediate) },
+-	{ }
+-};
+-
+-static const GDBusSignalTable thermometer_signals[] = {
+-	{ GDBUS_SIGNAL("PropertyChanged",
+-			GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
+-	{ }
+-};
+-
+-static void update_watcher(gpointer data, gpointer user_data)
+-{
+-	struct watcher *w = data;
+-	struct measurement *m = user_data;
+-	DBusConnection *conn = w->t->conn;
+-	DBusMessageIter iter;
+-	DBusMessageIter dict;
+-	DBusMessage *msg;
+-
+-	msg = dbus_message_new_method_call(w->srv, w->path,
+-				"org.bluez.ThermometerWatcher",
+-				"MeasurementReceived");
+-	if (msg == NULL)
+-		return;
+-
+-	dbus_message_iter_init_append(msg, &iter);
+-
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+-
+-	dict_append_entry(&dict, "Exponent", DBUS_TYPE_INT16, &m->exp);
+-	dict_append_entry(&dict, "Mantissa", DBUS_TYPE_INT32, &m->mant);
+-	dict_append_entry(&dict, "Unit", DBUS_TYPE_STRING, &m->unit);
+-
+-	if (m->suptime)
+-		dict_append_entry(&dict, "Time", DBUS_TYPE_UINT64, &m->time);
+-
+-	dict_append_entry(&dict, "Type", DBUS_TYPE_STRING, &m->type);
+-	dict_append_entry(&dict, "Measurement", DBUS_TYPE_STRING, &m->value);
+-
+-	dbus_message_iter_close_container(&iter, &dict);
+-
+-	dbus_message_set_no_reply(msg, TRUE);
+-	g_dbus_send_message(conn, msg);
+-}
+-
+-static void recv_measurement(struct thermometer *t, struct measurement *m)
+-{
+-	GSList *wlist;
+-
+-	if (g_strcmp0(m->value, "Intermediate") == 0)
+-		wlist = t->iwatchers;
+-	else
+-		wlist = t->fwatchers;
+-
+-	g_slist_foreach(wlist, update_watcher, m);
+-}
+-
+-static void proc_measurement(struct thermometer *t, const uint8_t *pdu,
+-						uint16_t len, gboolean final)
+-{
+-	struct measurement m;
+-	const char *type;
+-	uint8_t flags;
+-	uint32_t raw;
+-
+-	if (len < 4) {
+-		DBG("Mandatory flags are not provided");
+-		return;
+-	}
+-
+-	flags = pdu[3];
+-	if (flags & TEMP_UNITS)
+-		m.unit = "Fahrenheit";
+-	else
+-		m.unit = "Celsius";
+-
+-	if (len < 8) {
+-		DBG("Temperature measurement value is not provided");
+-		return;
+-	}
+-
+-	raw = att_get_u32(&pdu[4]);
+-	m.mant = raw & 0x00FFFFFF;
+-	m.exp = ((int32_t) raw) >> 24;
+-
+-	if (m.mant & 0x00800000) {
+-		/* convert to C2 negative value */
+-		m.mant = m.mant - FLOAT_MAX_MANTISSA;
+-	}
+-
+-	if (flags & TEMP_TIME_STAMP) {
+-		struct tm ts;
+-		time_t time;
+-
+-		if (len < 15) {
+-			DBG("Can't get time stamp value");
+-			return;
+-		}
+-
+-		ts.tm_year = att_get_u16(&pdu[8]) - 1900;
+-		ts.tm_mon = pdu[10] - 1;
+-		ts.tm_mday = pdu[11];
+-		ts.tm_hour = pdu[12];
+-		ts.tm_min = pdu[13];
+-		ts.tm_sec = pdu[14];
+-		ts.tm_isdst = -1;
+-
+-		time = mktime(&ts);
+-		m.time = (uint64_t) time;
+-		m.suptime = TRUE;
+-	} else
+-		m.suptime = FALSE;
+-
+-	if (flags & TEMP_TYPE) {
+-		uint8_t index;
+-
+-		if (m.suptime && len >= 16)
+-			index = 15;
+-		else if (!m.suptime && len >= 9)
+-			index = 9;
+-		else {
+-			DBG("Can't get temperature type");
+-			return;
+-		}
+-
+-		type = temptype2str(pdu[index]);
+-	} else if (t->has_type)
+-		type = temptype2str(t->type);
+-	else
+-		type = NULL;
+-
+-	m.type = type ? g_strdup(type) : NULL;
+-	m.value = final ? "Final" : "Intermediate";
+-
+-	recv_measurement(t, &m);
+-	g_free(m.type);
+-}
+-
+-static void proc_measurement_interval(struct thermometer *t, const uint8_t *pdu,
+-								uint16_t len)
+-{
+-	uint16_t interval;
+-
+-	if (len < 5) {
+-		DBG("Measurement interval value is not provided");
+-		return;
+-	}
+-
+-	interval = att_get_u16(&pdu[3]);
+-
+-	change_property(t, "Interval", &interval);
+-}
+-
+-static void ind_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
+-{
+-	struct thermometer *t = user_data;
+-	const struct characteristic *ch;
+-	uint8_t *opdu;
+-	uint16_t handle, olen;
+-	GSList *l;
+-	int plen;
+-
+-	if (len < 3) {
+-		DBG("Bad pdu received");
+-		return;
+-	}
+-
+-	handle = att_get_u16(&pdu[1]);
+-	l = g_slist_find_custom(t->chars, &handle, cmp_char_val_handle);
+-	if (l == NULL) {
+-		DBG("Unexpected handle: 0x%04x", handle);
+-		return;
+-	}
+-
+-	ch = l->data;
+-
+-	if (g_strcmp0(ch->attr.uuid, TEMPERATURE_MEASUREMENT_UUID) == 0)
+-		proc_measurement(t, pdu, len, TRUE);
+-	else if (g_strcmp0(ch->attr.uuid, MEASUREMENT_INTERVAL_UUID) == 0)
+-		proc_measurement_interval(t, pdu, len);
+-
+-	opdu = g_attrib_get_buffer(t->attrib, &plen);
+-	olen = enc_confirmation(opdu, plen);
+-
+-	if (olen > 0)
+-		g_attrib_send(t->attrib, 0, opdu[0], opdu, olen, NULL, NULL,
+-									NULL);
+-}
+-
+-static void notif_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
+-{
+-	struct thermometer *t = user_data;
+-	const struct characteristic *ch;
+-	uint16_t handle;
+-	GSList *l;
+-
+-	if (len < 3) {
+-		DBG("Bad pdu received");
+-		return;
+-	}
+-
+-	handle = att_get_u16(&pdu[1]);
+-	l = g_slist_find_custom(t->chars, &handle, cmp_char_val_handle);
+-	if (l == NULL) {
+-		DBG("Unexpected handle: 0x%04x", handle);
+-		return;
+-	}
+-
+-	ch = l->data;
+-	if (g_strcmp0(ch->attr.uuid, INTERMEDIATE_TEMPERATURE_UUID) == 0)
+-		proc_measurement(t, pdu, len, FALSE);
+-}
+-
+-static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+-{
+-	struct thermometer *t = user_data;
+-
+-	t->attrib = g_attrib_ref(attrib);
+-
+-	t->attindid = g_attrib_register(t->attrib, ATT_OP_HANDLE_IND,
+-							ind_handler, t, NULL);
+-	t->attnotid = g_attrib_register(t->attrib, ATT_OP_HANDLE_NOTIFY,
+-							notif_handler, t, NULL);
+-	gatt_discover_char(t->attrib, t->svc_range->start, t->svc_range->end,
+-					NULL, configure_thermometer_cb, t);
+-}
+-
+-static void attio_disconnected_cb(gpointer user_data)
+-{
+-	struct thermometer *t = user_data;
+-
+-	DBG("GATT Disconnected");
+-
+-	if (t->attindid > 0) {
+-		g_attrib_unregister(t->attrib, t->attindid);
+-		t->attindid = 0;
+-	}
+-
+-	if (t->attnotid > 0) {
+-		g_attrib_unregister(t->attrib, t->attnotid);
+-		t->attnotid = 0;
+-	}
+-
+-	g_attrib_unref(t->attrib);
+-	t->attrib = NULL;
+-}
+-
+-int thermometer_register(DBusConnection *connection, struct btd_device *device,
+-						struct gatt_primary *tattr)
+-{
+-	const gchar *path = device_get_path(device);
+-	struct thermometer *t;
+-
+-	t = g_new0(struct thermometer, 1);
+-	t->conn = dbus_connection_ref(connection);
+-	t->dev = btd_device_ref(device);
+-	t->svc_range = g_new0(struct att_range, 1);
+-	t->svc_range->start = tattr->range.start;
+-	t->svc_range->end = tattr->range.end;
+-
+-	if (!g_dbus_register_interface(t->conn, path, THERMOMETER_INTERFACE,
+-				thermometer_methods, thermometer_signals,
+-				NULL, t, destroy_thermometer)) {
+-		error("D-Bus failed to register %s interface",
+-							THERMOMETER_INTERFACE);
+-		destroy_thermometer(t);
+-		return -EIO;
+-	}
+-
+-	thermometers = g_slist_prepend(thermometers, t);
+-
+-	t->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
+-						attio_disconnected_cb, t);
+-	return 0;
+-}
+-
+-void thermometer_unregister(struct btd_device *device)
+-{
+-	struct thermometer *t;
+-	GSList *l;
+-
+-	l = g_slist_find_custom(thermometers, device, cmp_device);
+-	if (l == NULL)
+-		return;
+-
+-	t = l->data;
+-	thermometers = g_slist_remove(thermometers, t);
+-	g_dbus_unregister_interface(t->conn, device_get_path(t->dev),
+-							THERMOMETER_INTERFACE);
+-}
+diff --git a/thermometer/thermometer.h b/thermometer/thermometer.h
+deleted file mode 100644
+index 330503c..0000000
+--- a/thermometer/thermometer.h
++++ /dev/null
+@@ -1,25 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-int thermometer_register(DBusConnection *connection, struct btd_device *device,
+-						struct gatt_primary *tattr);
+-void thermometer_unregister(struct btd_device *device);
 -- 
 1.7.10.2
 
