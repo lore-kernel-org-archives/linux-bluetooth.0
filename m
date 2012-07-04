@@ -1,31 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 4 Jul 2012 15:42:04 +0300
-From: Johan Hedberg <johan.hedberg@intel.com>
-To: Tedd Ho-Jeong An <tedd.an@intel.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: hicattach: fix return length after reading the patch file
-Message-ID: <20120704124204.GC24179@x220.ger.corp.intel.com>
-References: <1898220.KzhPWWYfm0@tedd-ubuntu>
+Date: Wed, 4 Jul 2012 15:38:02 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
+	<frederic.dalleau@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] audio: Remove unimplemented declaration
+Message-ID: <20120704123802.GB24179@x220.ger.corp.intel.com>
+References: <1341329951-4498-1-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1898220.KzhPWWYfm0@tedd-ubuntu>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1341329951-4498-1-git-send-email-frederic.dalleau@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tedd,
+Hi Frédéric,
 
-On Mon, Jul 02, 2012, Tedd Ho-Jeong An wrote:
-> From: Tedd Ho-Jeong AN <tedd.an@intel.com>
-> 
-> This patch fixes the issue that returns alwasy 0 after reading the patch line.
-> 
+On Tue, Jul 03, 2012, Frédéric Dalleau wrote:
 > ---
->  tools/hciattach_intel.c |    7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
+>  audio/media.h |    2 --
+>  1 file changed, 2 deletions(-)
 
 Applied. Thanks.
-
-For the future, please pay attention to the correctness of your commit
-messages. I had to fix two typos in this one.
 
 Johan
