@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v3 01/19] headset: remove deprecated D-Bus methods
-Date: Wed,  4 Jul 2012 14:51:17 +0200
-Message-Id: <1341406295-7669-1-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 01/19] headset: remove deprecated D-Bus methods
+Date: Wed,  4 Jul 2012 14:50:41 +0200
+Message-Id: <1341406259-7618-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
