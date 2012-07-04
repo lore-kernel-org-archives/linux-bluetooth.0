@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v2 20/28] thermometer: move to the profiles folder
-Date: Wed,  4 Jul 2012 10:17:39 +0200
-Message-Id: <1341389867-30749-21-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v2 18/28] deviceinfo: move to profiles folder
+Date: Wed,  4 Jul 2012 10:17:37 +0200
+Message-Id: <1341389867-30749-19-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1341389867-30749-1-git-send-email-gustavo@padovan.org>
 References: <1341389867-30749-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,1574 +13,69 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
 ---
- Makefile.am                        |    8 +-
- profiles/thermometer/main.c        |   70 ++
- profiles/thermometer/manager.c     |   92 +++
- profiles/thermometer/manager.h     |   24 +
- profiles/thermometer/thermometer.c | 1274 ++++++++++++++++++++++++++++++++++++
- profiles/thermometer/thermometer.h |   25 +
- thermometer/main.c                 |   70 --
- thermometer/manager.c              |   92 ---
- thermometer/manager.h              |   24 -
- thermometer/thermometer.c          | 1274 ------------------------------------
- thermometer/thermometer.h          |   25 -
- 11 files changed, 1490 insertions(+), 1488 deletions(-)
- create mode 100644 profiles/thermometer/main.c
- create mode 100644 profiles/thermometer/manager.c
- create mode 100644 profiles/thermometer/manager.h
- create mode 100644 profiles/thermometer/thermometer.c
- create mode 100644 profiles/thermometer/thermometer.h
- delete mode 100644 thermometer/main.c
- delete mode 100644 thermometer/manager.c
- delete mode 100644 thermometer/manager.h
- delete mode 100644 thermometer/thermometer.c
- delete mode 100644 thermometer/thermometer.h
+ Makefile.am                      |   11 ++-
+ deviceinfo/deviceinfo.c          |  195 --------------------------------------
+ deviceinfo/deviceinfo.h          |   24 -----
+ deviceinfo/main.c                |   52 ----------
+ deviceinfo/manager.c             |   80 ----------------
+ deviceinfo/manager.h             |   24 -----
+ profiles/deviceinfo/deviceinfo.c |  195 ++++++++++++++++++++++++++++++++++++++
+ profiles/deviceinfo/deviceinfo.h |   24 +++++
+ profiles/deviceinfo/main.c       |   52 ++++++++++
+ profiles/deviceinfo/manager.c    |   80 ++++++++++++++++
+ profiles/deviceinfo/manager.h    |   24 +++++
+ 11 files changed, 381 insertions(+), 380 deletions(-)
+ delete mode 100644 deviceinfo/deviceinfo.c
+ delete mode 100644 deviceinfo/deviceinfo.h
+ delete mode 100644 deviceinfo/main.c
+ delete mode 100644 deviceinfo/manager.c
+ delete mode 100644 deviceinfo/manager.h
+ create mode 100644 profiles/deviceinfo/deviceinfo.c
+ create mode 100644 profiles/deviceinfo/deviceinfo.h
+ create mode 100644 profiles/deviceinfo/main.c
+ create mode 100644 profiles/deviceinfo/manager.c
+ create mode 100644 profiles/deviceinfo/manager.h
 
 diff --git a/Makefile.am b/Makefile.am
-index 6592c5c..b816e20 100644
+index e4874ac..d1bc65f 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -217,9 +217,11 @@ endif
+@@ -216,8 +216,7 @@ builtin_sources += health/hdp_main.c health/hdp_types.h \
+ endif
  
  if GATTMODULES
- builtin_modules += thermometer alert time gatt_example proximity deviceinfo
--builtin_sources += thermometer/main.c \
--			thermometer/manager.h thermometer/manager.c \
--			thermometer/thermometer.h thermometer/thermometer.c \
-+builtin_sources += profiles/thermometer/main.c \
-+			profiles/thermometer/manager.h \
-+			profiles/thermometer/manager.c \
-+			profiles/thermometer/thermometer.h \
-+		       	profiles/thermometer/thermometer.c \
- 			profiles/alert/main.c profiles/alert/server.h \
- 			profiles/alert/server.c \
- 			time/main.c time/server.h time/server.c \
-diff --git a/profiles/thermometer/main.c b/profiles/thermometer/main.c
-new file mode 100644
-index 0000000..4447b52
---- /dev/null
-+++ b/profiles/thermometer/main.c
-@@ -0,0 +1,70 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdint.h>
-+#include <glib.h>
-+#include <errno.h>
-+#include <gdbus.h>
-+
-+#include "plugin.h"
-+#include "manager.h"
-+#include "hcid.h"
-+#include "log.h"
-+
-+static DBusConnection *connection = NULL;
-+
-+static int thermometer_init(void)
-+{
-+	if (!main_opts.gatt_enabled) {
-+		DBG("GATT is disabled");
-+		return -ENOTSUP;
-+	}
-+
-+	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
-+	if (connection == NULL)
-+		return -EIO;
-+
-+	if (thermometer_manager_init(connection) < 0) {
-+		dbus_connection_unref(connection);
-+		return -EIO;
-+	}
-+
-+	return 0;
-+}
-+
-+static void thermometer_exit(void)
-+{
-+	if (!main_opts.gatt_enabled)
-+		return;
-+
-+	thermometer_manager_exit();
-+
-+	dbus_connection_unref(connection);
-+	connection = NULL;
-+}
-+
-+BLUETOOTH_PLUGIN_DEFINE(thermometer, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-+					thermometer_init, thermometer_exit)
-diff --git a/profiles/thermometer/manager.c b/profiles/thermometer/manager.c
-new file mode 100644
-index 0000000..3d5452b
---- /dev/null
-+++ b/profiles/thermometer/manager.c
-@@ -0,0 +1,92 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <gdbus.h>
-+#include <errno.h>
-+#include <bluetooth/uuid.h>
-+
-+#include "adapter.h"
-+#include "device.h"
-+#include "att.h"
-+#include "gattrib.h"
-+#include "gatt.h"
-+#include "thermometer.h"
-+#include "manager.h"
-+
-+static DBusConnection *connection = NULL;
-+
-+static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
-+{
-+	const struct gatt_primary *prim = a;
-+	const char *uuid = b;
-+
-+	return g_strcmp0(prim->uuid, uuid);
-+}
-+
-+static int thermometer_driver_probe(struct btd_device *device, GSList *uuids)
-+{
-+	struct gatt_primary *tattr;
-+	GSList *primaries, *l;
-+
-+	primaries = btd_device_get_primaries(device);
-+
-+	l = g_slist_find_custom(primaries, HEALTH_THERMOMETER_UUID,
-+							primary_uuid_cmp);
-+	if (l == NULL)
-+		return -EINVAL;
-+
-+	tattr = l->data;
-+
-+	return thermometer_register(connection, device, tattr);
-+}
-+
-+static void thermometer_driver_remove(struct btd_device *device)
-+{
-+	thermometer_unregister(device);
-+}
-+
-+static struct btd_device_driver thermometer_device_driver = {
-+	.name	= "thermometer-device-driver",
-+	.uuids	= BTD_UUIDS(HEALTH_THERMOMETER_UUID),
-+	.probe	= thermometer_driver_probe,
-+	.remove	= thermometer_driver_remove
-+};
-+
-+int thermometer_manager_init(DBusConnection *conn)
-+{
-+	int ret;
-+
-+	ret = btd_register_device_driver(&thermometer_device_driver);
-+	if (ret < 0)
-+                return ret;
-+
-+	connection = dbus_connection_ref(conn);
-+	return 0;
-+}
-+
-+void thermometer_manager_exit(void)
-+{
-+	btd_unregister_device_driver(&thermometer_device_driver);
-+
-+	dbus_connection_unref(connection);
-+	connection = NULL;
-+}
-diff --git a/profiles/thermometer/manager.h b/profiles/thermometer/manager.h
-new file mode 100644
-index 0000000..ed928ad
---- /dev/null
-+++ b/profiles/thermometer/manager.h
-@@ -0,0 +1,24 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+int thermometer_manager_init(DBusConnection *conn);
-+void thermometer_manager_exit(void);
-diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
-new file mode 100644
-index 0000000..087662e
---- /dev/null
-+++ b/profiles/thermometer/thermometer.c
-@@ -0,0 +1,1274 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <gdbus.h>
-+#include <errno.h>
-+#include <bluetooth/uuid.h>
-+
-+#include "dbus-common.h"
-+#include "adapter.h"
-+#include "device.h"
-+#include "error.h"
-+#include "log.h"
-+#include "gattrib.h"
-+#include "attio.h"
-+#include "att.h"
-+#include "gatt.h"
-+#include "thermometer.h"
-+
-+#define THERMOMETER_INTERFACE "org.bluez.Thermometer"
-+
-+/* Temperature measurement flag fields */
-+#define TEMP_UNITS		0x01
-+#define TEMP_TIME_STAMP		0x02
-+#define TEMP_TYPE		0x04
-+
-+#define FLOAT_MAX_MANTISSA	16777216 /* 2^24 */
-+
-+#define VALID_RANGE_DESC_SIZE	4
-+#define TEMPERATURE_TYPE_SIZE	1
-+#define MEASUREMENT_INTERVAL_SIZE	2
-+
-+struct thermometer {
-+	DBusConnection		*conn;		/* The connection to the bus */
-+	struct btd_device	*dev;		/* Device reference */
-+	GAttrib			*attrib;	/* GATT connection */
-+	struct att_range	*svc_range;	/* Thermometer range */
-+	guint			attioid;	/* Att watcher id */
-+	guint			attindid;	/* Att incications id */
-+	guint			attnotid;	/* Att notifications id */
-+	GSList			*chars;		/* Characteristics */
-+	GSList			*fwatchers;     /* Final measurements */
-+	GSList			*iwatchers;     /* Intermediate measurements */
-+	gboolean		intermediate;
-+	uint8_t			type;
-+	uint16_t		interval;
-+	uint16_t		max;
-+	uint16_t		min;
-+	gboolean		has_type;
-+	gboolean		has_interval;
-+};
-+
-+struct characteristic {
-+	struct gatt_char		attr;	/* Characteristic */
-+	GSList			*desc;	/* Descriptors */
-+	struct thermometer	*t;	/* Thermometer where the char belongs */
-+};
-+
-+struct descriptor {
-+	struct characteristic	*ch;
-+	uint16_t		handle;
-+	bt_uuid_t		uuid;
-+};
-+
-+struct watcher {
-+	struct thermometer	*t;
-+	guint			id;
-+	char			*srv;
-+	char			*path;
-+};
-+
-+struct measurement {
-+	int16_t		exp;
-+	int32_t		mant;
-+	uint64_t	time;
-+	gboolean	suptime;
-+	char		*unit;
-+	char		*type;
-+	char		*value;
-+};
-+
-+struct tmp_interval_data {
-+	struct thermometer	*thermometer;
-+	uint16_t		interval;
-+};
-+
-+static GSList *thermometers = NULL;
-+
-+const char *temp_type[] = {
-+	"<reserved>",
-+	"Armpit",
-+	"Body",
-+	"Ear",
-+	"Finger",
-+	"Intestines",
-+	"Mouth",
-+	"Rectum",
-+	"Toe",
-+	"Tympanum"
-+};
-+
-+static const gchar *temptype2str(uint8_t value)
-+{
-+	 if (value > 0 && value < G_N_ELEMENTS(temp_type))
-+		return temp_type[value];
-+
-+	error("Temperature type %d reserved for future use", value);
-+	return NULL;
-+}
-+
-+static void destroy_watcher(gpointer user_data)
-+{
-+	struct watcher *watcher = user_data;
-+
-+	g_free(watcher->path);
-+	g_free(watcher->srv);
-+	g_free(watcher);
-+}
-+
-+static void remove_watcher(gpointer user_data)
-+{
-+	struct watcher *watcher = user_data;
-+
-+	g_dbus_remove_watch(watcher->t->conn, watcher->id);
-+}
-+
-+static void destroy_char(gpointer user_data)
-+{
-+	struct characteristic *c = user_data;
-+
-+	g_slist_free_full(c->desc, g_free);
-+	g_free(c);
-+}
-+
-+static void destroy_thermometer(gpointer user_data)
-+{
-+	struct thermometer *t = user_data;
-+
-+	if (t->attioid > 0)
-+		btd_device_remove_attio_callback(t->dev, t->attioid);
-+
-+	if (t->attindid > 0)
-+		g_attrib_unregister(t->attrib, t->attindid);
-+
-+	if (t->attnotid > 0)
-+		g_attrib_unregister(t->attrib, t->attnotid);
-+
-+	if (t->attrib != NULL)
-+		g_attrib_unref(t->attrib);
-+
-+	if (t->chars != NULL)
-+		g_slist_free_full(t->chars, destroy_char);
-+
-+	if (t->fwatchers != NULL)
-+		g_slist_free_full(t->fwatchers, remove_watcher);
-+
-+	dbus_connection_unref(t->conn);
-+	btd_device_unref(t->dev);
-+	g_free(t->svc_range);
-+	g_free(t);
-+}
-+
-+static gint cmp_device(gconstpointer a, gconstpointer b)
-+{
-+	const struct thermometer *t = a;
-+	const struct btd_device *dev = b;
-+
-+	if (dev == t->dev)
-+		return 0;
-+
-+	return -1;
-+}
-+
-+static gint cmp_watcher(gconstpointer a, gconstpointer b)
-+{
-+	const struct watcher *watcher = a;
-+	const struct watcher *match = b;
-+	int ret;
-+
-+	ret = g_strcmp0(watcher->srv, match->srv);
-+	if (ret != 0)
-+		return ret;
-+
-+	return g_strcmp0(watcher->path, match->path);
-+}
-+
-+static gint cmp_char_uuid(gconstpointer a, gconstpointer b)
-+{
-+	const struct characteristic *ch = a;
-+	const char *uuid = b;
-+
-+	return g_strcmp0(ch->attr.uuid, uuid);
-+}
-+
-+static gint cmp_char_val_handle(gconstpointer a, gconstpointer b)
-+{
-+	const struct characteristic *ch = a;
-+	const uint16_t *handle = b;
-+
-+	return ch->attr.value_handle - *handle;
-+}
-+
-+static gint cmp_descriptor(gconstpointer a, gconstpointer b)
-+{
-+	const struct descriptor *desc = a;
-+	const bt_uuid_t *uuid = b;
-+
-+	return bt_uuid_cmp(&desc->uuid, uuid);
-+}
-+
-+static struct characteristic *get_characteristic(struct thermometer *t,
-+							const char *uuid)
-+{
-+	GSList *l;
-+
-+	l = g_slist_find_custom(t->chars, uuid, cmp_char_uuid);
-+	if (l == NULL)
-+		return NULL;
-+
-+	return l->data;
-+}
-+
-+static struct descriptor *get_descriptor(struct characteristic *ch,
-+							const bt_uuid_t *uuid)
-+{
-+	GSList *l;
-+
-+	l = g_slist_find_custom(ch->desc, uuid, cmp_descriptor);
-+	if (l == NULL)
-+		return NULL;
-+
-+	return l->data;
-+}
-+
-+static void change_property(struct thermometer *t, const char *name,
-+							gpointer value) {
-+	if (g_strcmp0(name, "Intermediate") == 0) {
-+		gboolean *intermediate = value;
-+		if (t->intermediate == *intermediate)
-+			return;
-+
-+		t->intermediate = *intermediate;
-+		emit_property_changed(t->conn, device_get_path(t->dev),
-+					THERMOMETER_INTERFACE, name,
-+					DBUS_TYPE_BOOLEAN, &t->intermediate);
-+	} else if (g_strcmp0(name, "Interval") == 0) {
-+		uint16_t *interval = value;
-+		if (t->has_interval && t->interval == *interval)
-+			return;
-+
-+		t->has_interval = TRUE;
-+		t->interval = *interval;
-+		emit_property_changed(t->conn, device_get_path(t->dev),
-+					THERMOMETER_INTERFACE, name,
-+					DBUS_TYPE_UINT16, &t->interval);
-+	} else if (g_strcmp0(name, "Maximum") == 0) {
-+		uint16_t *max = value;
-+		if (t->max == *max)
-+			return;
-+
-+		t->max = *max;
-+		emit_property_changed(t->conn, device_get_path(t->dev),
-+					THERMOMETER_INTERFACE, name,
-+					DBUS_TYPE_UINT16, &t->max);
-+	} else if (g_strcmp0(name, "Minimum") == 0) {
-+		uint16_t *min = value;
-+		if (t->min == *min)
-+			return;
-+
-+		t->min = *min;
-+		emit_property_changed(t->conn, device_get_path(t->dev),
-+					THERMOMETER_INTERFACE, name,
-+					DBUS_TYPE_UINT16, &t->min);
-+	} else
-+		DBG("%s is not a thermometer property", name);
-+}
-+
-+static void valid_range_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
-+							gpointer user_data)
-+{
-+	struct descriptor *desc = user_data;
-+	uint8_t value[VALID_RANGE_DESC_SIZE];
-+	uint16_t max, min;
-+	ssize_t vlen;
-+
-+	if (status != 0) {
-+		DBG("Valid Range descriptor read failed: %s",
-+							att_ecode2str(status));
-+		return;
-+	}
-+
-+	vlen = dec_read_resp(pdu, len, value, sizeof(value));
-+	if (vlen < 0) {
-+		DBG("Protocol error\n");
-+		return;
-+	}
-+
-+	if (vlen < 4) {
-+		DBG("Invalid range received");
-+		return;
-+	}
-+
-+	min = att_get_u16(&value[0]);
-+	max = att_get_u16(&value[2]);
-+
-+	if (min == 0 || min > max) {
-+		DBG("Invalid range");
-+		return;
-+	}
-+
-+	change_property(desc->ch->t, "Maximum", &max);
-+	change_property(desc->ch->t, "Minimum", &min);
-+}
-+
-+static void measurement_cb(guint8 status, const guint8 *pdu,
-+						guint16 len, gpointer user_data)
-+{
-+	char *msg = user_data;
-+
-+	if (status != 0)
-+		error("%s failed", msg);
-+
-+	g_free(msg);
-+}
-+
-+static void process_thermometer_desc(struct descriptor *desc)
-+{
-+	struct characteristic *ch = desc->ch;
-+	char uuidstr[MAX_LEN_UUID_STR];
-+	bt_uuid_t btuuid;
-+
-+	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
-+
-+	if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0) {
-+		uint8_t atval[2];
-+		uint16_t val;
-+		char *msg;
-+
-+		if (g_strcmp0(ch->attr.uuid,
-+					TEMPERATURE_MEASUREMENT_UUID) == 0) {
-+			if (g_slist_length(ch->t->fwatchers) == 0)
-+				return;
-+
-+			val = GATT_CLIENT_CHARAC_CFG_IND_BIT;
-+			msg = g_strdup("Enable Temperature Measurement "
-+								"indication");
-+		} else if (g_strcmp0(ch->attr.uuid,
-+					INTERMEDIATE_TEMPERATURE_UUID) == 0) {
-+			if (g_slist_length(ch->t->iwatchers) == 0)
-+				return;
-+
-+			val = GATT_CLIENT_CHARAC_CFG_NOTIF_BIT;
-+			msg = g_strdup("Enable Intermediate Temperature "
-+								"notification");
-+		} else if (g_strcmp0(ch->attr.uuid,
-+					MEASUREMENT_INTERVAL_UUID) == 0) {
-+			val = GATT_CLIENT_CHARAC_CFG_IND_BIT;
-+			msg = g_strdup("Enable Measurement Interval "
-+								"indication");
-+		} else
-+			goto done;
-+
-+		att_put_u16(val, atval);
-+		gatt_write_char(ch->t->attrib, desc->handle, atval, 2,
-+							measurement_cb, msg);
-+		return;
-+	}
-+
-+	bt_uuid16_create(&btuuid, GATT_CHARAC_VALID_RANGE_UUID);
-+
-+	if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0 && g_strcmp0(ch->attr.uuid,
-+					MEASUREMENT_INTERVAL_UUID) == 0) {
-+		gatt_read_char(ch->t->attrib, desc->handle, 0,
-+						valid_range_desc_cb, desc);
-+		return;
-+	}
-+
-+done:
-+	bt_uuid_to_string(&desc->uuid, uuidstr, MAX_LEN_UUID_STR);
-+	DBG("Ignored descriptor %s in characteristic %s", uuidstr,
-+								ch->attr.uuid);
-+}
-+
-+static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
-+							gpointer user_data)
-+{
-+	struct characteristic *ch = user_data;
-+	struct att_data_list *list;
-+	uint8_t format;
-+	int i;
-+
-+	if (status != 0) {
-+		error("Discover all characteristic descriptors failed [%s]: %s",
-+					ch->attr.uuid, att_ecode2str(status));
-+		return;
-+	}
-+
-+	list = dec_find_info_resp(pdu, len, &format);
-+	if (list == NULL)
-+		return;
-+
-+	for (i = 0; i < list->num; i++) {
-+		struct descriptor *desc;
-+		uint8_t *value;
-+
-+		value = list->data[i];
-+		desc = g_new0(struct descriptor, 1);
-+		desc->handle = att_get_u16(value);
-+		desc->ch = ch;
-+
-+		if (format == 0x01)
-+			desc->uuid = att_get_uuid16(&value[2]);
-+		else
-+			desc->uuid = att_get_uuid128(&value[2]);
-+
-+		ch->desc = g_slist_append(ch->desc, desc);
-+		process_thermometer_desc(desc);
-+	}
-+
-+	att_data_list_free(list);
-+}
-+
-+static void read_temp_type_cb(guint8 status, const guint8 *pdu, guint16 len,
-+							gpointer user_data)
-+{
-+	struct characteristic *ch = user_data;
-+	struct thermometer *t = ch->t;
-+	uint8_t value[TEMPERATURE_TYPE_SIZE];
-+	ssize_t vlen;
-+
-+	if (status != 0) {
-+		DBG("Temperature Type value read failed: %s",
-+							att_ecode2str(status));
-+		return;
-+	}
-+
-+	vlen = dec_read_resp(pdu, len, value, sizeof(value));
-+	if (vlen < 0) {
-+		DBG("Protocol error.");
-+		return;
-+	}
-+
-+	if (vlen != 1) {
-+		DBG("Invalid length for Temperature type");
-+		return;
-+	}
-+
-+	t->has_type = TRUE;
-+	t->type = value[0];
-+}
-+
-+static void read_interval_cb(guint8 status, const guint8 *pdu, guint16 len,
-+							gpointer user_data)
-+{
-+	struct characteristic *ch = user_data;
-+	uint8_t value[MEASUREMENT_INTERVAL_SIZE];
-+	uint16_t interval;
-+	ssize_t vlen;
-+
-+	if (status != 0) {
-+		DBG("Measurement Interval value read failed: %s",
-+							att_ecode2str(status));
-+		return;
-+	}
-+
-+	vlen = dec_read_resp(pdu, len, value, sizeof(value));
-+	if (vlen < 0) {
-+		DBG("Protocol error\n");
-+		return;
-+	}
-+
-+	if (vlen < 2) {
-+		DBG("Invalid Interval received");
-+		return;
-+	}
-+
-+	interval = att_get_u16(&value[0]);
-+	change_property(ch->t, "Interval", &interval);
-+}
-+
-+static void process_thermometer_char(struct characteristic *ch)
-+{
-+	if (g_strcmp0(ch->attr.uuid, INTERMEDIATE_TEMPERATURE_UUID) == 0) {
-+		gboolean intermediate = TRUE;
-+		change_property(ch->t, "Intermediate", &intermediate);
-+		return;
-+	} else if (g_strcmp0(ch->attr.uuid, TEMPERATURE_TYPE_UUID) == 0)
-+		gatt_read_char(ch->t->attrib, ch->attr.value_handle, 0,
-+							read_temp_type_cb, ch);
-+	else if (g_strcmp0(ch->attr.uuid, MEASUREMENT_INTERVAL_UUID) == 0)
-+		gatt_read_char(ch->t->attrib, ch->attr.value_handle, 0,
-+							read_interval_cb, ch);
-+}
-+
-+static void configure_thermometer_cb(GSList *characteristics, guint8 status,
-+							gpointer user_data)
-+{
-+	struct thermometer *t = user_data;
-+	GSList *l;
-+
-+	if (status != 0) {
-+		error("Discover thermometer characteristics: %s",
-+							att_ecode2str(status));
-+		return;
-+	}
-+
-+	for (l = characteristics; l; l = l->next) {
-+		struct gatt_char *c = l->data;
-+		struct characteristic *ch;
-+		uint16_t start, end;
-+
-+		ch = g_new0(struct characteristic, 1);
-+		ch->attr.handle = c->handle;
-+		ch->attr.properties = c->properties;
-+		ch->attr.value_handle = c->value_handle;
-+		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
-+		ch->t = t;
-+
-+		t->chars = g_slist_append(t->chars, ch);
-+
-+		process_thermometer_char(ch);
-+
-+		start = c->value_handle + 1;
-+
-+		if (l->next != NULL) {
-+			struct gatt_char *c = l->next->data;
-+			if (start == c->handle)
-+				continue;
-+			end = c->handle - 1;
-+		} else if (c->value_handle != t->svc_range->end)
-+			end = t->svc_range->end;
-+		else
-+			continue;
-+
-+		gatt_find_info(t->attrib, start, end, discover_desc_cb, ch);
-+	}
-+}
-+
-+static DBusMessage *get_properties(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	struct thermometer *t = data;
-+	DBusMessageIter iter;
-+	DBusMessageIter dict;
-+	DBusMessage *reply;
-+
-+	reply = dbus_message_new_method_return(msg);
-+	if (reply == NULL)
-+		return NULL;
-+
-+	dbus_message_iter_init_append(reply, &iter);
-+
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
-+			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
-+			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
-+
-+	dict_append_entry(&dict, "Intermediate", DBUS_TYPE_BOOLEAN,
-+							&t->intermediate);
-+
-+	if (t->has_interval) {
-+		dict_append_entry(&dict, "Interval", DBUS_TYPE_UINT16,
-+								&t->interval);
-+		dict_append_entry(&dict, "Maximum", DBUS_TYPE_UINT16, &t->max);
-+		dict_append_entry(&dict, "Minimum", DBUS_TYPE_UINT16, &t->min);
-+	}
-+
-+	dbus_message_iter_close_container(&iter, &dict);
-+
-+	return reply;
-+}
-+
-+static void write_interval_cb (guint8 status, const guint8 *pdu, guint16 len,
-+							gpointer user_data)
-+{
-+	struct tmp_interval_data *data = user_data;
-+
-+	if (status != 0) {
-+		error("Interval Write Request failed %s",
-+							att_ecode2str(status));
-+		goto done;
-+	}
-+
-+	if (!dec_write_resp(pdu, len)) {
-+		error("Interval Write Request: protocol error");
-+		goto done;
-+	}
-+
-+	change_property(data->thermometer, "Interval", &data->interval);
-+
-+done:
-+	g_free(user_data);
-+}
-+
-+static DBusMessage *write_attr_interval(struct thermometer *t, DBusMessage *msg,
-+								uint16_t value)
-+{
-+	struct tmp_interval_data *data;
-+	struct characteristic *ch;
-+	uint8_t atval[2];
-+
-+	if (t->attrib == NULL)
-+		return btd_error_not_connected(msg);
-+
-+	ch = get_characteristic(t, MEASUREMENT_INTERVAL_UUID);
-+	if (ch == NULL)
-+		return btd_error_not_available(msg);
-+
-+	if (value < t->min || value > t->max)
-+		return btd_error_invalid_args(msg);
-+
-+	att_put_u16(value, &atval[0]);
-+
-+	data = g_new0(struct tmp_interval_data, 1);
-+	data->thermometer = t;
-+	data->interval = value;
-+	gatt_write_char(t->attrib, ch->attr.value_handle, atval, 2,
-+						write_interval_cb, data);
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	struct thermometer *t = data;
-+	const char *property;
-+	DBusMessageIter iter;
-+	DBusMessageIter sub;
-+	uint16_t value;
-+
-+	if (!dbus_message_iter_init(msg, &iter))
-+		return btd_error_invalid_args(msg);
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
-+		return btd_error_invalid_args(msg);
-+
-+	dbus_message_iter_get_basic(&iter, &property);
-+	if (g_strcmp0("Interval", property) != 0)
-+		return btd_error_invalid_args(msg);
-+
-+	if (!t->has_interval)
-+		return btd_error_not_available(msg);
-+
-+	dbus_message_iter_next(&iter);
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_VARIANT)
-+		return btd_error_invalid_args(msg);
-+
-+	dbus_message_iter_recurse(&iter, &sub);
-+
-+	if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_UINT16)
-+		return btd_error_invalid_args(msg);
-+
-+	dbus_message_iter_get_basic(&sub, &value);
-+
-+	return write_attr_interval(t, msg, value);
-+}
-+
-+static void enable_final_measurement(struct thermometer *t)
-+{
-+	struct characteristic *ch;
-+	struct descriptor *desc;
-+	bt_uuid_t btuuid;
-+	uint8_t atval[2];
-+	char *msg;
-+
-+	if (t->attrib == NULL)
-+		return;
-+
-+	ch = get_characteristic(t, TEMPERATURE_MEASUREMENT_UUID);
-+	if (ch == NULL) {
-+		DBG("Temperature measurement characteristic not found");
-+		return;
-+	}
-+
-+	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
-+	desc = get_descriptor(ch, &btuuid);
-+	if (desc == NULL) {
-+		DBG("Client characteristic configuration descriptor not found");
-+		return;
-+	}
-+
-+	atval[0] = 0x02;
-+	atval[1] = 0x00;
-+	msg = g_strdup("Enable final measurement");
-+	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
-+}
-+
-+static void enable_intermediate_measurement(struct thermometer *t)
-+{
-+	struct characteristic *ch;
-+	struct descriptor *desc;
-+	bt_uuid_t btuuid;
-+	uint8_t atval[2];
-+	char *msg;
-+
-+	if (t->attrib == NULL)
-+		return;
-+
-+	ch = get_characteristic(t, INTERMEDIATE_TEMPERATURE_UUID);
-+	if (ch == NULL) {
-+		DBG("Intermediate measurement characteristic not found");
-+		return;
-+	}
-+
-+	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
-+	desc = get_descriptor(ch, &btuuid);
-+	if (desc == NULL) {
-+		DBG("Client characteristic configuration descriptor not found");
-+		return;
-+	}
-+
-+	atval[0] = 0x01;
-+	atval[1] = 0x00;
-+	msg = g_strdup("Enable intermediate measurement");
-+	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
-+}
-+
-+static void disable_final_measurement(struct thermometer *t)
-+{
-+	struct characteristic *ch;
-+	struct descriptor *desc;
-+	bt_uuid_t btuuid;
-+	uint8_t atval[2];
-+	char *msg;
-+
-+	if (t->attrib == NULL)
-+		return;
-+
-+	ch = get_characteristic(t, TEMPERATURE_MEASUREMENT_UUID);
-+	if (ch == NULL) {
-+		DBG("Temperature measurement characteristic not found");
-+		return;
-+	}
-+
-+	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
-+	desc = get_descriptor(ch, &btuuid);
-+	if (desc == NULL) {
-+		DBG("Client characteristic configuration descriptor not found");
-+		return;
-+	}
-+
-+	atval[0] = 0x00;
-+	atval[1] = 0x00;
-+	msg = g_strdup("Disable final measurement");
-+	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
-+}
-+
-+static void disable_intermediate_measurement(struct thermometer *t)
-+{
-+	struct characteristic *ch;
-+	struct descriptor *desc;
-+	bt_uuid_t btuuid;
-+	uint8_t atval[2];
-+	char *msg;
-+
-+	if (t->attrib == NULL)
-+		return;
-+
-+	ch = get_characteristic(t, INTERMEDIATE_TEMPERATURE_UUID);
-+	if (ch == NULL) {
-+		DBG("Intermediate measurement characteristic not found");
-+		return;
-+	}
-+
-+	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
-+	desc = get_descriptor(ch, &btuuid);
-+	if (desc == NULL) {
-+		DBG("Client characteristic configuration descriptor not found");
-+		return;
-+	}
-+
-+	atval[0] = 0x00;
-+	atval[1] = 0x00;
-+	msg = g_strdup("Disable intermediate measurement");
-+	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
-+}
-+
-+static void remove_int_watcher(struct thermometer *t, struct watcher *w)
-+{
-+	if (!g_slist_find(t->iwatchers, w))
-+		return;
-+
-+	t->iwatchers = g_slist_remove(t->iwatchers, w);
-+
-+	if (g_slist_length(t->iwatchers) == 0)
-+		disable_intermediate_measurement(t);
-+}
-+
-+static void watcher_exit(DBusConnection *conn, void *user_data)
-+{
-+	struct watcher *watcher = user_data;
-+	struct thermometer *t = watcher->t;
-+
-+	DBG("Thermometer watcher %s disconnected", watcher->path);
-+
-+	remove_int_watcher(t, watcher);
-+
-+	t->fwatchers = g_slist_remove(t->fwatchers, watcher);
-+	g_dbus_remove_watch(watcher->t->conn, watcher->id);
-+
-+	if (g_slist_length(t->fwatchers) == 0)
-+		disable_final_measurement(t);
-+}
-+
-+static struct watcher *find_watcher(GSList *list, const char *sender,
-+							const char *path)
-+{
-+	struct watcher *match;
-+	GSList *l;
-+
-+	match = g_new0(struct watcher, 1);
-+	match->srv = g_strdup(sender);
-+	match->path = g_strdup(path);
-+
-+	l = g_slist_find_custom(list, match, cmp_watcher);
-+	destroy_watcher(match);
-+
-+	if (l != NULL)
-+		return l->data;
-+
-+	return NULL;
-+}
-+
-+static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	const char *sender = dbus_message_get_sender(msg);
-+	struct thermometer *t = data;
-+	struct watcher *watcher;
-+	char *path;
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+							DBUS_TYPE_INVALID))
-+		return btd_error_invalid_args(msg);
-+
-+	watcher = find_watcher(t->fwatchers, sender, path);
-+	if (watcher != NULL)
-+		return btd_error_already_exists(msg);
-+
-+	DBG("Thermometer watcher %s registered", path);
-+
-+	watcher = g_new0(struct watcher, 1);
-+	watcher->srv = g_strdup(sender);
-+	watcher->path = g_strdup(path);
-+	watcher->t = t;
-+	watcher->id = g_dbus_add_disconnect_watch(conn, sender, watcher_exit,
-+						watcher, destroy_watcher);
-+
-+	if (g_slist_length(t->fwatchers) == 0)
-+		enable_final_measurement(t);
-+
-+	t->fwatchers = g_slist_prepend(t->fwatchers, watcher);
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	const char *sender = dbus_message_get_sender(msg);
-+	struct thermometer *t = data;
-+	struct watcher *watcher;
-+	char *path;
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+							DBUS_TYPE_INVALID))
-+		return btd_error_invalid_args(msg);
-+
-+	watcher = find_watcher(t->fwatchers, sender, path);
-+	if (watcher == NULL)
-+		return btd_error_does_not_exist(msg);
-+
-+	DBG("Thermometer watcher %s unregistered", path);
-+
-+	remove_int_watcher(t, watcher);
-+
-+	t->fwatchers = g_slist_remove(t->fwatchers, watcher);
-+	g_dbus_remove_watch(watcher->t->conn, watcher->id);
-+
-+	if (g_slist_length(t->fwatchers) == 0)
-+		disable_final_measurement(t);
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static DBusMessage *enable_intermediate(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	const char *sender = dbus_message_get_sender(msg);
-+	struct thermometer *t = data;
-+	struct watcher *watcher;
-+	char *path;
-+
-+	if (!t->intermediate)
-+		return btd_error_not_supported(msg);
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+							DBUS_TYPE_INVALID))
-+		return btd_error_invalid_args(msg);
-+
-+	watcher = find_watcher(t->fwatchers, sender, path);
-+	if (watcher == NULL)
-+		return btd_error_does_not_exist(msg);
-+
-+	if (find_watcher(t->iwatchers, sender, path))
-+		return btd_error_already_exists(msg);
-+
-+	DBG("Intermediate measurement watcher %s registered", path);
-+
-+	if (g_slist_length(t->iwatchers) == 0)
-+		enable_intermediate_measurement(t);
-+
-+	t->iwatchers = g_slist_prepend(t->iwatchers, watcher);
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static DBusMessage *disable_intermediate(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	const char *sender = dbus_message_get_sender(msg);
-+	struct thermometer *t = data;
-+	struct watcher *watcher;
-+	char *path;
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+							DBUS_TYPE_INVALID))
-+		return btd_error_invalid_args(msg);
-+
-+	watcher = find_watcher(t->iwatchers, sender, path);
-+	if (watcher == NULL)
-+		return btd_error_does_not_exist(msg);
-+
-+	DBG("Intermediate measurement %s unregistered", path);
-+
-+	remove_int_watcher(t, watcher);
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static const GDBusMethodTable thermometer_methods[] = {
-+	{ GDBUS_METHOD("GetProperties",
-+			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
-+			get_properties) },
-+	{ GDBUS_ASYNC_METHOD("SetProperty",
-+			GDBUS_ARGS({ "name", "s" }, { "value", "v" }), NULL,
-+			set_property) },
-+	{ GDBUS_METHOD("RegisterWatcher",
-+			GDBUS_ARGS({ "agent", "o" }), NULL,
-+			register_watcher) },
-+	{ GDBUS_METHOD("UnregisterWatcher",
-+			GDBUS_ARGS({ "agent", "o" }), NULL,
-+			unregister_watcher) },
-+	{ GDBUS_METHOD("EnableIntermediateMeasurement",
-+			GDBUS_ARGS({ "agent", "o" }), NULL,
-+			enable_intermediate) },
-+	{ GDBUS_METHOD("DisableIntermediateMeasurement",
-+			GDBUS_ARGS({ "agent", "o" }), NULL,
-+			disable_intermediate) },
-+	{ }
-+};
-+
-+static const GDBusSignalTable thermometer_signals[] = {
-+	{ GDBUS_SIGNAL("PropertyChanged",
-+			GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
-+	{ }
-+};
-+
-+static void update_watcher(gpointer data, gpointer user_data)
-+{
-+	struct watcher *w = data;
-+	struct measurement *m = user_data;
-+	DBusConnection *conn = w->t->conn;
-+	DBusMessageIter iter;
-+	DBusMessageIter dict;
-+	DBusMessage *msg;
-+
-+	msg = dbus_message_new_method_call(w->srv, w->path,
-+				"org.bluez.ThermometerWatcher",
-+				"MeasurementReceived");
-+	if (msg == NULL)
-+		return;
-+
-+	dbus_message_iter_init_append(msg, &iter);
-+
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
-+			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
-+			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
-+
-+	dict_append_entry(&dict, "Exponent", DBUS_TYPE_INT16, &m->exp);
-+	dict_append_entry(&dict, "Mantissa", DBUS_TYPE_INT32, &m->mant);
-+	dict_append_entry(&dict, "Unit", DBUS_TYPE_STRING, &m->unit);
-+
-+	if (m->suptime)
-+		dict_append_entry(&dict, "Time", DBUS_TYPE_UINT64, &m->time);
-+
-+	dict_append_entry(&dict, "Type", DBUS_TYPE_STRING, &m->type);
-+	dict_append_entry(&dict, "Measurement", DBUS_TYPE_STRING, &m->value);
-+
-+	dbus_message_iter_close_container(&iter, &dict);
-+
-+	dbus_message_set_no_reply(msg, TRUE);
-+	g_dbus_send_message(conn, msg);
-+}
-+
-+static void recv_measurement(struct thermometer *t, struct measurement *m)
-+{
-+	GSList *wlist;
-+
-+	if (g_strcmp0(m->value, "Intermediate") == 0)
-+		wlist = t->iwatchers;
-+	else
-+		wlist = t->fwatchers;
-+
-+	g_slist_foreach(wlist, update_watcher, m);
-+}
-+
-+static void proc_measurement(struct thermometer *t, const uint8_t *pdu,
-+						uint16_t len, gboolean final)
-+{
-+	struct measurement m;
-+	const char *type;
-+	uint8_t flags;
-+	uint32_t raw;
-+
-+	if (len < 4) {
-+		DBG("Mandatory flags are not provided");
-+		return;
-+	}
-+
-+	flags = pdu[3];
-+	if (flags & TEMP_UNITS)
-+		m.unit = "Fahrenheit";
-+	else
-+		m.unit = "Celsius";
-+
-+	if (len < 8) {
-+		DBG("Temperature measurement value is not provided");
-+		return;
-+	}
-+
-+	raw = att_get_u32(&pdu[4]);
-+	m.mant = raw & 0x00FFFFFF;
-+	m.exp = ((int32_t) raw) >> 24;
-+
-+	if (m.mant & 0x00800000) {
-+		/* convert to C2 negative value */
-+		m.mant = m.mant - FLOAT_MAX_MANTISSA;
-+	}
-+
-+	if (flags & TEMP_TIME_STAMP) {
-+		struct tm ts;
-+		time_t time;
-+
-+		if (len < 15) {
-+			DBG("Can't get time stamp value");
-+			return;
-+		}
-+
-+		ts.tm_year = att_get_u16(&pdu[8]) - 1900;
-+		ts.tm_mon = pdu[10] - 1;
-+		ts.tm_mday = pdu[11];
-+		ts.tm_hour = pdu[12];
-+		ts.tm_min = pdu[13];
-+		ts.tm_sec = pdu[14];
-+		ts.tm_isdst = -1;
-+
-+		time = mktime(&ts);
-+		m.time = (uint64_t) time;
-+		m.suptime = TRUE;
-+	} else
-+		m.suptime = FALSE;
-+
-+	if (flags & TEMP_TYPE) {
-+		uint8_t index;
-+
-+		if (m.suptime && len >= 16)
-+			index = 15;
-+		else if (!m.suptime && len >= 9)
-+			index = 9;
-+		else {
-+			DBG("Can't get temperature type");
-+			return;
-+		}
-+
-+		type = temptype2str(pdu[index]);
-+	} else if (t->has_type)
-+		type = temptype2str(t->type);
-+	else
-+		type = NULL;
-+
-+	m.type = type ? g_strdup(type) : NULL;
-+	m.value = final ? "Final" : "Intermediate";
-+
-+	recv_measurement(t, &m);
-+	g_free(m.type);
-+}
-+
-+static void proc_measurement_interval(struct thermometer *t, const uint8_t *pdu,
-+								uint16_t len)
-+{
-+	uint16_t interval;
-+
-+	if (len < 5) {
-+		DBG("Measurement interval value is not provided");
-+		return;
-+	}
-+
-+	interval = att_get_u16(&pdu[3]);
-+
-+	change_property(t, "Interval", &interval);
-+}
-+
-+static void ind_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
-+{
-+	struct thermometer *t = user_data;
-+	const struct characteristic *ch;
-+	uint8_t *opdu;
-+	uint16_t handle, olen;
-+	GSList *l;
-+	int plen;
-+
-+	if (len < 3) {
-+		DBG("Bad pdu received");
-+		return;
-+	}
-+
-+	handle = att_get_u16(&pdu[1]);
-+	l = g_slist_find_custom(t->chars, &handle, cmp_char_val_handle);
-+	if (l == NULL) {
-+		DBG("Unexpected handle: 0x%04x", handle);
-+		return;
-+	}
-+
-+	ch = l->data;
-+
-+	if (g_strcmp0(ch->attr.uuid, TEMPERATURE_MEASUREMENT_UUID) == 0)
-+		proc_measurement(t, pdu, len, TRUE);
-+	else if (g_strcmp0(ch->attr.uuid, MEASUREMENT_INTERVAL_UUID) == 0)
-+		proc_measurement_interval(t, pdu, len);
-+
-+	opdu = g_attrib_get_buffer(t->attrib, &plen);
-+	olen = enc_confirmation(opdu, plen);
-+
-+	if (olen > 0)
-+		g_attrib_send(t->attrib, 0, opdu[0], opdu, olen, NULL, NULL,
-+									NULL);
-+}
-+
-+static void notif_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
-+{
-+	struct thermometer *t = user_data;
-+	const struct characteristic *ch;
-+	uint16_t handle;
-+	GSList *l;
-+
-+	if (len < 3) {
-+		DBG("Bad pdu received");
-+		return;
-+	}
-+
-+	handle = att_get_u16(&pdu[1]);
-+	l = g_slist_find_custom(t->chars, &handle, cmp_char_val_handle);
-+	if (l == NULL) {
-+		DBG("Unexpected handle: 0x%04x", handle);
-+		return;
-+	}
-+
-+	ch = l->data;
-+	if (g_strcmp0(ch->attr.uuid, INTERMEDIATE_TEMPERATURE_UUID) == 0)
-+		proc_measurement(t, pdu, len, FALSE);
-+}
-+
-+static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
-+{
-+	struct thermometer *t = user_data;
-+
-+	t->attrib = g_attrib_ref(attrib);
-+
-+	t->attindid = g_attrib_register(t->attrib, ATT_OP_HANDLE_IND,
-+							ind_handler, t, NULL);
-+	t->attnotid = g_attrib_register(t->attrib, ATT_OP_HANDLE_NOTIFY,
-+							notif_handler, t, NULL);
-+	gatt_discover_char(t->attrib, t->svc_range->start, t->svc_range->end,
-+					NULL, configure_thermometer_cb, t);
-+}
-+
-+static void attio_disconnected_cb(gpointer user_data)
-+{
-+	struct thermometer *t = user_data;
-+
-+	DBG("GATT Disconnected");
-+
-+	if (t->attindid > 0) {
-+		g_attrib_unregister(t->attrib, t->attindid);
-+		t->attindid = 0;
-+	}
-+
-+	if (t->attnotid > 0) {
-+		g_attrib_unregister(t->attrib, t->attnotid);
-+		t->attnotid = 0;
-+	}
-+
-+	g_attrib_unref(t->attrib);
-+	t->attrib = NULL;
-+}
-+
-+int thermometer_register(DBusConnection *connection, struct btd_device *device,
-+						struct gatt_primary *tattr)
-+{
-+	const gchar *path = device_get_path(device);
-+	struct thermometer *t;
-+
-+	t = g_new0(struct thermometer, 1);
-+	t->conn = dbus_connection_ref(connection);
-+	t->dev = btd_device_ref(device);
-+	t->svc_range = g_new0(struct att_range, 1);
-+	t->svc_range->start = tattr->range.start;
-+	t->svc_range->end = tattr->range.end;
-+
-+	if (!g_dbus_register_interface(t->conn, path, THERMOMETER_INTERFACE,
-+				thermometer_methods, thermometer_signals,
-+				NULL, t, destroy_thermometer)) {
-+		error("D-Bus failed to register %s interface",
-+							THERMOMETER_INTERFACE);
-+		destroy_thermometer(t);
-+		return -EIO;
-+	}
-+
-+	thermometers = g_slist_prepend(thermometers, t);
-+
-+	t->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
-+						attio_disconnected_cb, t);
-+	return 0;
-+}
-+
-+void thermometer_unregister(struct btd_device *device)
-+{
-+	struct thermometer *t;
-+	GSList *l;
-+
-+	l = g_slist_find_custom(thermometers, device, cmp_device);
-+	if (l == NULL)
-+		return;
-+
-+	t = l->data;
-+	thermometers = g_slist_remove(thermometers, t);
-+	g_dbus_unregister_interface(t->conn, device_get_path(t->dev),
-+							THERMOMETER_INTERFACE);
-+}
-diff --git a/profiles/thermometer/thermometer.h b/profiles/thermometer/thermometer.h
-new file mode 100644
-index 0000000..330503c
---- /dev/null
-+++ b/profiles/thermometer/thermometer.h
-@@ -0,0 +1,25 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+int thermometer_register(DBusConnection *connection, struct btd_device *device,
-+						struct gatt_primary *tattr);
-+void thermometer_unregister(struct btd_device *device);
-diff --git a/thermometer/main.c b/thermometer/main.c
+-builtin_modules += thermometer alert time gatt_example proximity \
+-			deviceinfo
++builtin_modules += thermometer alert time gatt_example proximity deviceinfo
+ builtin_sources += thermometer/main.c \
+ 			thermometer/manager.h thermometer/manager.c \
+ 			thermometer/thermometer.h thermometer/thermometer.c \
+@@ -230,9 +229,11 @@ builtin_sources += thermometer/main.c \
+ 			proximity/reporter.h proximity/reporter.c \
+ 			proximity/linkloss.h proximity/linkloss.c \
+ 			proximity/immalert.h proximity/immalert.c \
+-			deviceinfo/main.c \
+-			deviceinfo/manager.h deviceinfo/manager.c \
+-			deviceinfo/deviceinfo.h deviceinfo/deviceinfo.c
++			profiles/deviceinfo/main.c \
++			profiles/deviceinfo/manager.h \
++			profiles/deviceinfo/manager.c \
++			profiles/deviceinfo/deviceinfo.h \
++			profiles/deviceinfo/deviceinfo.c
+ endif
+ 
+ 
+diff --git a/deviceinfo/deviceinfo.c b/deviceinfo/deviceinfo.c
 deleted file mode 100644
-index 4447b52..0000000
---- a/thermometer/main.c
+index 4548553..0000000
+--- a/deviceinfo/deviceinfo.c
 +++ /dev/null
-@@ -1,70 +0,0 @@
+@@ -1,195 +0,0 @@
 -/*
 - *
 - *  BlueZ - Bluetooth protocol stack for Linux
 - *
-- *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
+- *  Copyright (C) 2012 Texas Instruments, Inc.
 - *
 - *  This program is free software; you can redistribute it and/or modify
 - *  it under the terms of the GNU General Public License as published by
@@ -1602,61 +97,186 @@ index 4447b52..0000000
 -#include <config.h>
 -#endif
 -
--#include <stdint.h>
 -#include <glib.h>
--#include <errno.h>
--#include <gdbus.h>
+-#include <bluetooth/uuid.h>
 -
--#include "plugin.h"
--#include "manager.h"
--#include "hcid.h"
+-#include "adapter.h"
+-#include "device.h"
+-#include "gattrib.h"
+-#include "attio.h"
+-#include "att.h"
+-#include "gattrib.h"
+-#include "gatt.h"
 -#include "log.h"
+-#include "deviceinfo.h"
 -
--static DBusConnection *connection = NULL;
+-#define PNP_ID_SIZE	7
 -
--static int thermometer_init(void)
+-struct deviceinfo {
+-	struct btd_device	*dev;		/* Device reference */
+-	GAttrib			*attrib;	/* GATT connection */
+-	guint			attioid;	/* Att watcher id */
+-	struct att_range	*svc_range;	/* DeviceInfo range */
+-	GSList			*chars;		/* Characteristics */
+-};
+-
+-static GSList *servers = NULL;
+-
+-struct characteristic {
+-	struct gatt_char	attr;	/* Characteristic */
+-	struct deviceinfo	*d;	/* deviceinfo where the char belongs */
+-};
+-
+-static void deviceinfo_free(gpointer user_data)
 -{
--	if (!main_opts.gatt_enabled) {
--		DBG("GATT is disabled");
--		return -ENOTSUP;
+-	struct deviceinfo *d = user_data;
+-
+-	if (d->attioid > 0)
+-		btd_device_remove_attio_callback(d->dev, d->attioid);
+-
+-	if (d->attrib != NULL)
+-		g_attrib_unref(d->attrib);
+-
+-	g_slist_free_full(d->chars, g_free);
+-
+-	btd_device_unref(d->dev);
+-	g_free(d->svc_range);
+-	g_free(d);
+-}
+-
+-static gint cmp_device(gconstpointer a, gconstpointer b)
+-{
+-	const struct deviceinfo *d = a;
+-	const struct btd_device *dev = b;
+-
+-	if (dev == d->dev)
+-		return 0;
+-
+-	return -1;
+-}
+-
+-static void read_pnpid_cb(guint8 status, const guint8 *pdu, guint16 len,
+-							gpointer user_data)
+-{
+-	struct characteristic *ch = user_data;
+-	uint8_t value[PNP_ID_SIZE];
+-	ssize_t vlen;
+-
+-	if (status != 0) {
+-		error("Error reading PNP_ID value: %s", att_ecode2str(status));
+-		return;
 -	}
 -
--	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
--	if (connection == NULL)
--		return -EIO;
--
--	if (thermometer_manager_init(connection) < 0) {
--		dbus_connection_unref(connection);
--		return -EIO;
+-	vlen = dec_read_resp(pdu, len, value, sizeof(value));
+-	if (vlen < 0) {
+-		error("Error reading PNP_ID: Protocol error");
+-		return;
 -	}
 -
+-	if (vlen < 7) {
+-		error("Error reading PNP_ID: Invalid pdu length received");
+-		return;
+-	}
+-
+-	device_set_pnpid(ch->d->dev, value[0], att_get_u16(&value[1]),
+-				att_get_u16(&value[3]), att_get_u16(&value[5]));
+-}
+-
+-static void process_deviceinfo_char(struct characteristic *ch)
+-{
+-	if (g_strcmp0(ch->attr.uuid, PNPID_UUID) == 0)
+-		gatt_read_char(ch->d->attrib, ch->attr.value_handle, 0,
+-							read_pnpid_cb, ch);
+-}
+-
+-static void configure_deviceinfo_cb(GSList *characteristics, guint8 status,
+-							gpointer user_data)
+-{
+-	struct deviceinfo *d = user_data;
+-	GSList *l;
+-
+-	if (status != 0) {
+-		error("Discover deviceinfo characteristics: %s",
+-							att_ecode2str(status));
+-		return;
+-	}
+-
+-	for (l = characteristics; l; l = l->next) {
+-		struct gatt_char *c = l->data;
+-		struct characteristic *ch;
+-
+-		ch = g_new0(struct characteristic, 1);
+-		ch->attr.handle = c->handle;
+-		ch->attr.properties = c->properties;
+-		ch->attr.value_handle = c->value_handle;
+-		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
+-		ch->d = d;
+-
+-		d->chars = g_slist_append(d->chars, ch);
+-
+-		process_deviceinfo_char(ch);
+-	}
+-}
+-static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+-{
+-	struct deviceinfo *d = user_data;
+-
+-	d->attrib = g_attrib_ref(attrib);
+-
+-	gatt_discover_char(d->attrib, d->svc_range->start, d->svc_range->end,
+-					NULL, configure_deviceinfo_cb, d);
+-}
+-
+-static void attio_disconnected_cb(gpointer user_data)
+-{
+-	struct deviceinfo *d = user_data;
+-
+-	g_attrib_unref(d->attrib);
+-	d->attrib = NULL;
+-}
+-
+-int deviceinfo_register(struct btd_device *device, struct gatt_primary *prim)
+-{
+-	struct deviceinfo *d;
+-
+-	d = g_new0(struct deviceinfo, 1);
+-	d->dev = btd_device_ref(device);
+-	d->svc_range = g_new0(struct att_range, 1);
+-	d->svc_range->start = prim->range.start;
+-	d->svc_range->end = prim->range.end;
+-
+-	servers = g_slist_prepend(servers, d);
+-
+-	d->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
+-						attio_disconnected_cb, d);
 -	return 0;
 -}
 -
--static void thermometer_exit(void)
+-void deviceinfo_unregister(struct btd_device *device)
 -{
--	if (!main_opts.gatt_enabled)
+-	struct deviceinfo *d;
+-	GSList *l;
+-
+-	l = g_slist_find_custom(servers, device, cmp_device);
+-	if (l == NULL)
 -		return;
 -
--	thermometer_manager_exit();
+-	d = l->data;
+-	servers = g_slist_remove(servers, d);
 -
--	dbus_connection_unref(connection);
--	connection = NULL;
+-	deviceinfo_free(d);
 -}
--
--BLUETOOTH_PLUGIN_DEFINE(thermometer, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
--					thermometer_init, thermometer_exit)
-diff --git a/thermometer/manager.c b/thermometer/manager.c
+diff --git a/deviceinfo/deviceinfo.h b/deviceinfo/deviceinfo.h
 deleted file mode 100644
-index 3d5452b..0000000
---- a/thermometer/manager.c
+index 7a804a5..0000000
+--- a/deviceinfo/deviceinfo.h
 +++ /dev/null
-@@ -1,92 +0,0 @@
+@@ -1,24 +0,0 @@
 -/*
 - *
 - *  BlueZ - Bluetooth protocol stack for Linux
 - *
-- *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
+- *  Copyright (C) 2012 Texas Instruments, Inc.
 - *
 - *  This program is free software; you can redistribute it and/or modify
 - *  it under the terms of the GNU General Public License as published by
@@ -1674,7 +294,95 @@ index 3d5452b..0000000
 - *
 - */
 -
--#include <gdbus.h>
+-int deviceinfo_register(struct btd_device *device, struct gatt_primary *prim);
+-void deviceinfo_unregister(struct btd_device *device);
+diff --git a/deviceinfo/main.c b/deviceinfo/main.c
+deleted file mode 100644
+index 82ecc82..0000000
+--- a/deviceinfo/main.c
++++ /dev/null
+@@ -1,52 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2012 Texas Instruments, Inc.
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <glib.h>
+-#include <errno.h>
+-#include <stdint.h>
+-
+-#include "plugin.h"
+-#include "manager.h"
+-#include "hcid.h"
+-#include "log.h"
+-
+-static int deviceinfo_init(void)
+-{
+-	if (!main_opts.gatt_enabled) {
+-		error("DIS cannot start: GATT is disabled");
+-		return -ENOTSUP;
+-	}
+-
+-	return deviceinfo_manager_init();
+-}
+-
+-static void deviceinfo_exit(void)
+-{
+-	deviceinfo_manager_exit();
+-}
+-
+-BLUETOOTH_PLUGIN_DEFINE(deviceinfo, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
+-					deviceinfo_init, deviceinfo_exit)
+diff --git a/deviceinfo/manager.c b/deviceinfo/manager.c
+deleted file mode 100644
+index 1d59918..0000000
+--- a/deviceinfo/manager.c
++++ /dev/null
+@@ -1,80 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2012 Texas Instruments, Inc.
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#include <glib.h>
 -#include <errno.h>
 -#include <bluetooth/uuid.h>
 -
@@ -1683,10 +391,8 @@ index 3d5452b..0000000
 -#include "att.h"
 -#include "gattrib.h"
 -#include "gatt.h"
--#include "thermometer.h"
+-#include "deviceinfo.h"
 -#include "manager.h"
--
--static DBusConnection *connection = NULL;
 -
 -static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
 -{
@@ -1696,65 +402,55 @@ index 3d5452b..0000000
 -	return g_strcmp0(prim->uuid, uuid);
 -}
 -
--static int thermometer_driver_probe(struct btd_device *device, GSList *uuids)
+-static int deviceinfo_driver_probe(struct btd_device *device, GSList *uuids)
 -{
--	struct gatt_primary *tattr;
+-	struct gatt_primary *prim;
 -	GSList *primaries, *l;
 -
 -	primaries = btd_device_get_primaries(device);
 -
--	l = g_slist_find_custom(primaries, HEALTH_THERMOMETER_UUID,
+-	l = g_slist_find_custom(primaries, DEVICE_INFORMATION_UUID,
 -							primary_uuid_cmp);
 -	if (l == NULL)
 -		return -EINVAL;
 -
--	tattr = l->data;
+-	prim = l->data;
 -
--	return thermometer_register(connection, device, tattr);
+-	return deviceinfo_register(device, prim);
 -}
 -
--static void thermometer_driver_remove(struct btd_device *device)
+-static void deviceinfo_driver_remove(struct btd_device *device)
 -{
--	thermometer_unregister(device);
+-	deviceinfo_unregister(device);
 -}
 -
--static struct btd_device_driver thermometer_device_driver = {
--	.name	= "thermometer-device-driver",
--	.uuids	= BTD_UUIDS(HEALTH_THERMOMETER_UUID),
--	.probe	= thermometer_driver_probe,
--	.remove	= thermometer_driver_remove
+-static struct btd_device_driver deviceinfo_device_driver = {
+-	.name	= "deviceinfo-driver",
+-	.uuids	= BTD_UUIDS(DEVICE_INFORMATION_UUID),
+-	.probe	= deviceinfo_driver_probe,
+-	.remove	= deviceinfo_driver_remove
 -};
 -
--int thermometer_manager_init(DBusConnection *conn)
+-int deviceinfo_manager_init(void)
 -{
--	int ret;
--
--	ret = btd_register_device_driver(&thermometer_device_driver);
--	if (ret < 0)
--                return ret;
--
--	connection = dbus_connection_ref(conn);
--	return 0;
+-	return btd_register_device_driver(&deviceinfo_device_driver);
 -}
 -
--void thermometer_manager_exit(void)
+-void deviceinfo_manager_exit(void)
 -{
--	btd_unregister_device_driver(&thermometer_device_driver);
--
--	dbus_connection_unref(connection);
--	connection = NULL;
+-	btd_unregister_device_driver(&deviceinfo_device_driver);
 -}
-diff --git a/thermometer/manager.h b/thermometer/manager.h
+diff --git a/deviceinfo/manager.h b/deviceinfo/manager.h
 deleted file mode 100644
-index ed928ad..0000000
---- a/thermometer/manager.h
+index 0f742ca..0000000
+--- a/deviceinfo/manager.h
 +++ /dev/null
 @@ -1,24 +0,0 @@
 -/*
 - *
 - *  BlueZ - Bluetooth protocol stack for Linux
 - *
-- *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
+- *  Copyright (C) 2012 Texas Instruments, Inc.
 - *
 - *  This program is free software; you can redistribute it and/or modify
 - *  it under the terms of the GNU General Public License as published by
@@ -1772,1319 +468,413 @@ index ed928ad..0000000
 - *
 - */
 -
--int thermometer_manager_init(DBusConnection *conn);
--void thermometer_manager_exit(void);
-diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
-deleted file mode 100644
-index 087662e..0000000
---- a/thermometer/thermometer.c
-+++ /dev/null
-@@ -1,1274 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <gdbus.h>
--#include <errno.h>
--#include <bluetooth/uuid.h>
--
--#include "dbus-common.h"
--#include "adapter.h"
--#include "device.h"
--#include "error.h"
--#include "log.h"
--#include "gattrib.h"
--#include "attio.h"
--#include "att.h"
--#include "gatt.h"
--#include "thermometer.h"
--
--#define THERMOMETER_INTERFACE "org.bluez.Thermometer"
--
--/* Temperature measurement flag fields */
--#define TEMP_UNITS		0x01
--#define TEMP_TIME_STAMP		0x02
--#define TEMP_TYPE		0x04
--
--#define FLOAT_MAX_MANTISSA	16777216 /* 2^24 */
--
--#define VALID_RANGE_DESC_SIZE	4
--#define TEMPERATURE_TYPE_SIZE	1
--#define MEASUREMENT_INTERVAL_SIZE	2
--
--struct thermometer {
--	DBusConnection		*conn;		/* The connection to the bus */
--	struct btd_device	*dev;		/* Device reference */
--	GAttrib			*attrib;	/* GATT connection */
--	struct att_range	*svc_range;	/* Thermometer range */
--	guint			attioid;	/* Att watcher id */
--	guint			attindid;	/* Att incications id */
--	guint			attnotid;	/* Att notifications id */
--	GSList			*chars;		/* Characteristics */
--	GSList			*fwatchers;     /* Final measurements */
--	GSList			*iwatchers;     /* Intermediate measurements */
--	gboolean		intermediate;
--	uint8_t			type;
--	uint16_t		interval;
--	uint16_t		max;
--	uint16_t		min;
--	gboolean		has_type;
--	gboolean		has_interval;
--};
--
--struct characteristic {
--	struct gatt_char		attr;	/* Characteristic */
--	GSList			*desc;	/* Descriptors */
--	struct thermometer	*t;	/* Thermometer where the char belongs */
--};
--
--struct descriptor {
--	struct characteristic	*ch;
--	uint16_t		handle;
--	bt_uuid_t		uuid;
--};
--
--struct watcher {
--	struct thermometer	*t;
--	guint			id;
--	char			*srv;
--	char			*path;
--};
--
--struct measurement {
--	int16_t		exp;
--	int32_t		mant;
--	uint64_t	time;
--	gboolean	suptime;
--	char		*unit;
--	char		*type;
--	char		*value;
--};
--
--struct tmp_interval_data {
--	struct thermometer	*thermometer;
--	uint16_t		interval;
--};
--
--static GSList *thermometers = NULL;
--
--const char *temp_type[] = {
--	"<reserved>",
--	"Armpit",
--	"Body",
--	"Ear",
--	"Finger",
--	"Intestines",
--	"Mouth",
--	"Rectum",
--	"Toe",
--	"Tympanum"
--};
--
--static const gchar *temptype2str(uint8_t value)
--{
--	 if (value > 0 && value < G_N_ELEMENTS(temp_type))
--		return temp_type[value];
--
--	error("Temperature type %d reserved for future use", value);
--	return NULL;
--}
--
--static void destroy_watcher(gpointer user_data)
--{
--	struct watcher *watcher = user_data;
--
--	g_free(watcher->path);
--	g_free(watcher->srv);
--	g_free(watcher);
--}
--
--static void remove_watcher(gpointer user_data)
--{
--	struct watcher *watcher = user_data;
--
--	g_dbus_remove_watch(watcher->t->conn, watcher->id);
--}
--
--static void destroy_char(gpointer user_data)
--{
--	struct characteristic *c = user_data;
--
--	g_slist_free_full(c->desc, g_free);
--	g_free(c);
--}
--
--static void destroy_thermometer(gpointer user_data)
--{
--	struct thermometer *t = user_data;
--
--	if (t->attioid > 0)
--		btd_device_remove_attio_callback(t->dev, t->attioid);
--
--	if (t->attindid > 0)
--		g_attrib_unregister(t->attrib, t->attindid);
--
--	if (t->attnotid > 0)
--		g_attrib_unregister(t->attrib, t->attnotid);
--
--	if (t->attrib != NULL)
--		g_attrib_unref(t->attrib);
--
--	if (t->chars != NULL)
--		g_slist_free_full(t->chars, destroy_char);
--
--	if (t->fwatchers != NULL)
--		g_slist_free_full(t->fwatchers, remove_watcher);
--
--	dbus_connection_unref(t->conn);
--	btd_device_unref(t->dev);
--	g_free(t->svc_range);
--	g_free(t);
--}
--
--static gint cmp_device(gconstpointer a, gconstpointer b)
--{
--	const struct thermometer *t = a;
--	const struct btd_device *dev = b;
--
--	if (dev == t->dev)
--		return 0;
--
--	return -1;
--}
--
--static gint cmp_watcher(gconstpointer a, gconstpointer b)
--{
--	const struct watcher *watcher = a;
--	const struct watcher *match = b;
--	int ret;
--
--	ret = g_strcmp0(watcher->srv, match->srv);
--	if (ret != 0)
--		return ret;
--
--	return g_strcmp0(watcher->path, match->path);
--}
--
--static gint cmp_char_uuid(gconstpointer a, gconstpointer b)
--{
--	const struct characteristic *ch = a;
--	const char *uuid = b;
--
--	return g_strcmp0(ch->attr.uuid, uuid);
--}
--
--static gint cmp_char_val_handle(gconstpointer a, gconstpointer b)
--{
--	const struct characteristic *ch = a;
--	const uint16_t *handle = b;
--
--	return ch->attr.value_handle - *handle;
--}
--
--static gint cmp_descriptor(gconstpointer a, gconstpointer b)
--{
--	const struct descriptor *desc = a;
--	const bt_uuid_t *uuid = b;
--
--	return bt_uuid_cmp(&desc->uuid, uuid);
--}
--
--static struct characteristic *get_characteristic(struct thermometer *t,
--							const char *uuid)
--{
--	GSList *l;
--
--	l = g_slist_find_custom(t->chars, uuid, cmp_char_uuid);
--	if (l == NULL)
--		return NULL;
--
--	return l->data;
--}
--
--static struct descriptor *get_descriptor(struct characteristic *ch,
--							const bt_uuid_t *uuid)
--{
--	GSList *l;
--
--	l = g_slist_find_custom(ch->desc, uuid, cmp_descriptor);
--	if (l == NULL)
--		return NULL;
--
--	return l->data;
--}
--
--static void change_property(struct thermometer *t, const char *name,
--							gpointer value) {
--	if (g_strcmp0(name, "Intermediate") == 0) {
--		gboolean *intermediate = value;
--		if (t->intermediate == *intermediate)
--			return;
--
--		t->intermediate = *intermediate;
--		emit_property_changed(t->conn, device_get_path(t->dev),
--					THERMOMETER_INTERFACE, name,
--					DBUS_TYPE_BOOLEAN, &t->intermediate);
--	} else if (g_strcmp0(name, "Interval") == 0) {
--		uint16_t *interval = value;
--		if (t->has_interval && t->interval == *interval)
--			return;
--
--		t->has_interval = TRUE;
--		t->interval = *interval;
--		emit_property_changed(t->conn, device_get_path(t->dev),
--					THERMOMETER_INTERFACE, name,
--					DBUS_TYPE_UINT16, &t->interval);
--	} else if (g_strcmp0(name, "Maximum") == 0) {
--		uint16_t *max = value;
--		if (t->max == *max)
--			return;
--
--		t->max = *max;
--		emit_property_changed(t->conn, device_get_path(t->dev),
--					THERMOMETER_INTERFACE, name,
--					DBUS_TYPE_UINT16, &t->max);
--	} else if (g_strcmp0(name, "Minimum") == 0) {
--		uint16_t *min = value;
--		if (t->min == *min)
--			return;
--
--		t->min = *min;
--		emit_property_changed(t->conn, device_get_path(t->dev),
--					THERMOMETER_INTERFACE, name,
--					DBUS_TYPE_UINT16, &t->min);
--	} else
--		DBG("%s is not a thermometer property", name);
--}
--
--static void valid_range_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
--							gpointer user_data)
--{
--	struct descriptor *desc = user_data;
--	uint8_t value[VALID_RANGE_DESC_SIZE];
--	uint16_t max, min;
--	ssize_t vlen;
--
--	if (status != 0) {
--		DBG("Valid Range descriptor read failed: %s",
--							att_ecode2str(status));
--		return;
--	}
--
--	vlen = dec_read_resp(pdu, len, value, sizeof(value));
--	if (vlen < 0) {
--		DBG("Protocol error\n");
--		return;
--	}
--
--	if (vlen < 4) {
--		DBG("Invalid range received");
--		return;
--	}
--
--	min = att_get_u16(&value[0]);
--	max = att_get_u16(&value[2]);
--
--	if (min == 0 || min > max) {
--		DBG("Invalid range");
--		return;
--	}
--
--	change_property(desc->ch->t, "Maximum", &max);
--	change_property(desc->ch->t, "Minimum", &min);
--}
--
--static void measurement_cb(guint8 status, const guint8 *pdu,
--						guint16 len, gpointer user_data)
--{
--	char *msg = user_data;
--
--	if (status != 0)
--		error("%s failed", msg);
--
--	g_free(msg);
--}
--
--static void process_thermometer_desc(struct descriptor *desc)
--{
--	struct characteristic *ch = desc->ch;
--	char uuidstr[MAX_LEN_UUID_STR];
--	bt_uuid_t btuuid;
--
--	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
--
--	if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0) {
--		uint8_t atval[2];
--		uint16_t val;
--		char *msg;
--
--		if (g_strcmp0(ch->attr.uuid,
--					TEMPERATURE_MEASUREMENT_UUID) == 0) {
--			if (g_slist_length(ch->t->fwatchers) == 0)
--				return;
--
--			val = GATT_CLIENT_CHARAC_CFG_IND_BIT;
--			msg = g_strdup("Enable Temperature Measurement "
--								"indication");
--		} else if (g_strcmp0(ch->attr.uuid,
--					INTERMEDIATE_TEMPERATURE_UUID) == 0) {
--			if (g_slist_length(ch->t->iwatchers) == 0)
--				return;
--
--			val = GATT_CLIENT_CHARAC_CFG_NOTIF_BIT;
--			msg = g_strdup("Enable Intermediate Temperature "
--								"notification");
--		} else if (g_strcmp0(ch->attr.uuid,
--					MEASUREMENT_INTERVAL_UUID) == 0) {
--			val = GATT_CLIENT_CHARAC_CFG_IND_BIT;
--			msg = g_strdup("Enable Measurement Interval "
--								"indication");
--		} else
--			goto done;
--
--		att_put_u16(val, atval);
--		gatt_write_char(ch->t->attrib, desc->handle, atval, 2,
--							measurement_cb, msg);
--		return;
--	}
--
--	bt_uuid16_create(&btuuid, GATT_CHARAC_VALID_RANGE_UUID);
--
--	if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0 && g_strcmp0(ch->attr.uuid,
--					MEASUREMENT_INTERVAL_UUID) == 0) {
--		gatt_read_char(ch->t->attrib, desc->handle, 0,
--						valid_range_desc_cb, desc);
--		return;
--	}
--
--done:
--	bt_uuid_to_string(&desc->uuid, uuidstr, MAX_LEN_UUID_STR);
--	DBG("Ignored descriptor %s in characteristic %s", uuidstr,
--								ch->attr.uuid);
--}
--
--static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
--							gpointer user_data)
--{
--	struct characteristic *ch = user_data;
--	struct att_data_list *list;
--	uint8_t format;
--	int i;
--
--	if (status != 0) {
--		error("Discover all characteristic descriptors failed [%s]: %s",
--					ch->attr.uuid, att_ecode2str(status));
--		return;
--	}
--
--	list = dec_find_info_resp(pdu, len, &format);
--	if (list == NULL)
--		return;
--
--	for (i = 0; i < list->num; i++) {
--		struct descriptor *desc;
--		uint8_t *value;
--
--		value = list->data[i];
--		desc = g_new0(struct descriptor, 1);
--		desc->handle = att_get_u16(value);
--		desc->ch = ch;
--
--		if (format == 0x01)
--			desc->uuid = att_get_uuid16(&value[2]);
--		else
--			desc->uuid = att_get_uuid128(&value[2]);
--
--		ch->desc = g_slist_append(ch->desc, desc);
--		process_thermometer_desc(desc);
--	}
--
--	att_data_list_free(list);
--}
--
--static void read_temp_type_cb(guint8 status, const guint8 *pdu, guint16 len,
--							gpointer user_data)
--{
--	struct characteristic *ch = user_data;
--	struct thermometer *t = ch->t;
--	uint8_t value[TEMPERATURE_TYPE_SIZE];
--	ssize_t vlen;
--
--	if (status != 0) {
--		DBG("Temperature Type value read failed: %s",
--							att_ecode2str(status));
--		return;
--	}
--
--	vlen = dec_read_resp(pdu, len, value, sizeof(value));
--	if (vlen < 0) {
--		DBG("Protocol error.");
--		return;
--	}
--
--	if (vlen != 1) {
--		DBG("Invalid length for Temperature type");
--		return;
--	}
--
--	t->has_type = TRUE;
--	t->type = value[0];
--}
--
--static void read_interval_cb(guint8 status, const guint8 *pdu, guint16 len,
--							gpointer user_data)
--{
--	struct characteristic *ch = user_data;
--	uint8_t value[MEASUREMENT_INTERVAL_SIZE];
--	uint16_t interval;
--	ssize_t vlen;
--
--	if (status != 0) {
--		DBG("Measurement Interval value read failed: %s",
--							att_ecode2str(status));
--		return;
--	}
--
--	vlen = dec_read_resp(pdu, len, value, sizeof(value));
--	if (vlen < 0) {
--		DBG("Protocol error\n");
--		return;
--	}
--
--	if (vlen < 2) {
--		DBG("Invalid Interval received");
--		return;
--	}
--
--	interval = att_get_u16(&value[0]);
--	change_property(ch->t, "Interval", &interval);
--}
--
--static void process_thermometer_char(struct characteristic *ch)
--{
--	if (g_strcmp0(ch->attr.uuid, INTERMEDIATE_TEMPERATURE_UUID) == 0) {
--		gboolean intermediate = TRUE;
--		change_property(ch->t, "Intermediate", &intermediate);
--		return;
--	} else if (g_strcmp0(ch->attr.uuid, TEMPERATURE_TYPE_UUID) == 0)
--		gatt_read_char(ch->t->attrib, ch->attr.value_handle, 0,
--							read_temp_type_cb, ch);
--	else if (g_strcmp0(ch->attr.uuid, MEASUREMENT_INTERVAL_UUID) == 0)
--		gatt_read_char(ch->t->attrib, ch->attr.value_handle, 0,
--							read_interval_cb, ch);
--}
--
--static void configure_thermometer_cb(GSList *characteristics, guint8 status,
--							gpointer user_data)
--{
--	struct thermometer *t = user_data;
--	GSList *l;
--
--	if (status != 0) {
--		error("Discover thermometer characteristics: %s",
--							att_ecode2str(status));
--		return;
--	}
--
--	for (l = characteristics; l; l = l->next) {
--		struct gatt_char *c = l->data;
--		struct characteristic *ch;
--		uint16_t start, end;
--
--		ch = g_new0(struct characteristic, 1);
--		ch->attr.handle = c->handle;
--		ch->attr.properties = c->properties;
--		ch->attr.value_handle = c->value_handle;
--		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
--		ch->t = t;
--
--		t->chars = g_slist_append(t->chars, ch);
--
--		process_thermometer_char(ch);
--
--		start = c->value_handle + 1;
--
--		if (l->next != NULL) {
--			struct gatt_char *c = l->next->data;
--			if (start == c->handle)
--				continue;
--			end = c->handle - 1;
--		} else if (c->value_handle != t->svc_range->end)
--			end = t->svc_range->end;
--		else
--			continue;
--
--		gatt_find_info(t->attrib, start, end, discover_desc_cb, ch);
--	}
--}
--
--static DBusMessage *get_properties(DBusConnection *conn, DBusMessage *msg,
--								void *data)
--{
--	struct thermometer *t = data;
--	DBusMessageIter iter;
--	DBusMessageIter dict;
--	DBusMessage *reply;
--
--	reply = dbus_message_new_method_return(msg);
--	if (reply == NULL)
--		return NULL;
--
--	dbus_message_iter_init_append(reply, &iter);
--
--	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
--			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
--			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
--			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
--
--	dict_append_entry(&dict, "Intermediate", DBUS_TYPE_BOOLEAN,
--							&t->intermediate);
--
--	if (t->has_interval) {
--		dict_append_entry(&dict, "Interval", DBUS_TYPE_UINT16,
--								&t->interval);
--		dict_append_entry(&dict, "Maximum", DBUS_TYPE_UINT16, &t->max);
--		dict_append_entry(&dict, "Minimum", DBUS_TYPE_UINT16, &t->min);
--	}
--
--	dbus_message_iter_close_container(&iter, &dict);
--
--	return reply;
--}
--
--static void write_interval_cb (guint8 status, const guint8 *pdu, guint16 len,
--							gpointer user_data)
--{
--	struct tmp_interval_data *data = user_data;
--
--	if (status != 0) {
--		error("Interval Write Request failed %s",
--							att_ecode2str(status));
--		goto done;
--	}
--
--	if (!dec_write_resp(pdu, len)) {
--		error("Interval Write Request: protocol error");
--		goto done;
--	}
--
--	change_property(data->thermometer, "Interval", &data->interval);
--
--done:
--	g_free(user_data);
--}
--
--static DBusMessage *write_attr_interval(struct thermometer *t, DBusMessage *msg,
--								uint16_t value)
--{
--	struct tmp_interval_data *data;
--	struct characteristic *ch;
--	uint8_t atval[2];
--
--	if (t->attrib == NULL)
--		return btd_error_not_connected(msg);
--
--	ch = get_characteristic(t, MEASUREMENT_INTERVAL_UUID);
--	if (ch == NULL)
--		return btd_error_not_available(msg);
--
--	if (value < t->min || value > t->max)
--		return btd_error_invalid_args(msg);
--
--	att_put_u16(value, &atval[0]);
--
--	data = g_new0(struct tmp_interval_data, 1);
--	data->thermometer = t;
--	data->interval = value;
--	gatt_write_char(t->attrib, ch->attr.value_handle, atval, 2,
--						write_interval_cb, data);
--
--	return dbus_message_new_method_return(msg);
--}
--
--static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
--								void *data)
--{
--	struct thermometer *t = data;
--	const char *property;
--	DBusMessageIter iter;
--	DBusMessageIter sub;
--	uint16_t value;
--
--	if (!dbus_message_iter_init(msg, &iter))
--		return btd_error_invalid_args(msg);
--
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
--		return btd_error_invalid_args(msg);
--
--	dbus_message_iter_get_basic(&iter, &property);
--	if (g_strcmp0("Interval", property) != 0)
--		return btd_error_invalid_args(msg);
--
--	if (!t->has_interval)
--		return btd_error_not_available(msg);
--
--	dbus_message_iter_next(&iter);
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_VARIANT)
--		return btd_error_invalid_args(msg);
--
--	dbus_message_iter_recurse(&iter, &sub);
--
--	if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_UINT16)
--		return btd_error_invalid_args(msg);
--
--	dbus_message_iter_get_basic(&sub, &value);
--
--	return write_attr_interval(t, msg, value);
--}
--
--static void enable_final_measurement(struct thermometer *t)
--{
--	struct characteristic *ch;
--	struct descriptor *desc;
--	bt_uuid_t btuuid;
--	uint8_t atval[2];
--	char *msg;
--
--	if (t->attrib == NULL)
--		return;
--
--	ch = get_characteristic(t, TEMPERATURE_MEASUREMENT_UUID);
--	if (ch == NULL) {
--		DBG("Temperature measurement characteristic not found");
--		return;
--	}
--
--	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
--	desc = get_descriptor(ch, &btuuid);
--	if (desc == NULL) {
--		DBG("Client characteristic configuration descriptor not found");
--		return;
--	}
--
--	atval[0] = 0x02;
--	atval[1] = 0x00;
--	msg = g_strdup("Enable final measurement");
--	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
--}
--
--static void enable_intermediate_measurement(struct thermometer *t)
--{
--	struct characteristic *ch;
--	struct descriptor *desc;
--	bt_uuid_t btuuid;
--	uint8_t atval[2];
--	char *msg;
--
--	if (t->attrib == NULL)
--		return;
--
--	ch = get_characteristic(t, INTERMEDIATE_TEMPERATURE_UUID);
--	if (ch == NULL) {
--		DBG("Intermediate measurement characteristic not found");
--		return;
--	}
--
--	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
--	desc = get_descriptor(ch, &btuuid);
--	if (desc == NULL) {
--		DBG("Client characteristic configuration descriptor not found");
--		return;
--	}
--
--	atval[0] = 0x01;
--	atval[1] = 0x00;
--	msg = g_strdup("Enable intermediate measurement");
--	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
--}
--
--static void disable_final_measurement(struct thermometer *t)
--{
--	struct characteristic *ch;
--	struct descriptor *desc;
--	bt_uuid_t btuuid;
--	uint8_t atval[2];
--	char *msg;
--
--	if (t->attrib == NULL)
--		return;
--
--	ch = get_characteristic(t, TEMPERATURE_MEASUREMENT_UUID);
--	if (ch == NULL) {
--		DBG("Temperature measurement characteristic not found");
--		return;
--	}
--
--	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
--	desc = get_descriptor(ch, &btuuid);
--	if (desc == NULL) {
--		DBG("Client characteristic configuration descriptor not found");
--		return;
--	}
--
--	atval[0] = 0x00;
--	atval[1] = 0x00;
--	msg = g_strdup("Disable final measurement");
--	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
--}
--
--static void disable_intermediate_measurement(struct thermometer *t)
--{
--	struct characteristic *ch;
--	struct descriptor *desc;
--	bt_uuid_t btuuid;
--	uint8_t atval[2];
--	char *msg;
--
--	if (t->attrib == NULL)
--		return;
--
--	ch = get_characteristic(t, INTERMEDIATE_TEMPERATURE_UUID);
--	if (ch == NULL) {
--		DBG("Intermediate measurement characteristic not found");
--		return;
--	}
--
--	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
--	desc = get_descriptor(ch, &btuuid);
--	if (desc == NULL) {
--		DBG("Client characteristic configuration descriptor not found");
--		return;
--	}
--
--	atval[0] = 0x00;
--	atval[1] = 0x00;
--	msg = g_strdup("Disable intermediate measurement");
--	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
--}
--
--static void remove_int_watcher(struct thermometer *t, struct watcher *w)
--{
--	if (!g_slist_find(t->iwatchers, w))
--		return;
--
--	t->iwatchers = g_slist_remove(t->iwatchers, w);
--
--	if (g_slist_length(t->iwatchers) == 0)
--		disable_intermediate_measurement(t);
--}
--
--static void watcher_exit(DBusConnection *conn, void *user_data)
--{
--	struct watcher *watcher = user_data;
--	struct thermometer *t = watcher->t;
--
--	DBG("Thermometer watcher %s disconnected", watcher->path);
--
--	remove_int_watcher(t, watcher);
--
--	t->fwatchers = g_slist_remove(t->fwatchers, watcher);
--	g_dbus_remove_watch(watcher->t->conn, watcher->id);
--
--	if (g_slist_length(t->fwatchers) == 0)
--		disable_final_measurement(t);
--}
--
--static struct watcher *find_watcher(GSList *list, const char *sender,
--							const char *path)
--{
--	struct watcher *match;
--	GSList *l;
--
--	match = g_new0(struct watcher, 1);
--	match->srv = g_strdup(sender);
--	match->path = g_strdup(path);
--
--	l = g_slist_find_custom(list, match, cmp_watcher);
--	destroy_watcher(match);
--
--	if (l != NULL)
--		return l->data;
--
--	return NULL;
--}
--
--static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
--								void *data)
--{
--	const char *sender = dbus_message_get_sender(msg);
--	struct thermometer *t = data;
--	struct watcher *watcher;
--	char *path;
--
--	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
--							DBUS_TYPE_INVALID))
--		return btd_error_invalid_args(msg);
--
--	watcher = find_watcher(t->fwatchers, sender, path);
--	if (watcher != NULL)
--		return btd_error_already_exists(msg);
--
--	DBG("Thermometer watcher %s registered", path);
--
--	watcher = g_new0(struct watcher, 1);
--	watcher->srv = g_strdup(sender);
--	watcher->path = g_strdup(path);
--	watcher->t = t;
--	watcher->id = g_dbus_add_disconnect_watch(conn, sender, watcher_exit,
--						watcher, destroy_watcher);
--
--	if (g_slist_length(t->fwatchers) == 0)
--		enable_final_measurement(t);
--
--	t->fwatchers = g_slist_prepend(t->fwatchers, watcher);
--
--	return dbus_message_new_method_return(msg);
--}
--
--static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
--								void *data)
--{
--	const char *sender = dbus_message_get_sender(msg);
--	struct thermometer *t = data;
--	struct watcher *watcher;
--	char *path;
--
--	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
--							DBUS_TYPE_INVALID))
--		return btd_error_invalid_args(msg);
--
--	watcher = find_watcher(t->fwatchers, sender, path);
--	if (watcher == NULL)
--		return btd_error_does_not_exist(msg);
--
--	DBG("Thermometer watcher %s unregistered", path);
--
--	remove_int_watcher(t, watcher);
--
--	t->fwatchers = g_slist_remove(t->fwatchers, watcher);
--	g_dbus_remove_watch(watcher->t->conn, watcher->id);
--
--	if (g_slist_length(t->fwatchers) == 0)
--		disable_final_measurement(t);
--
--	return dbus_message_new_method_return(msg);
--}
--
--static DBusMessage *enable_intermediate(DBusConnection *conn, DBusMessage *msg,
--								void *data)
--{
--	const char *sender = dbus_message_get_sender(msg);
--	struct thermometer *t = data;
--	struct watcher *watcher;
--	char *path;
--
--	if (!t->intermediate)
--		return btd_error_not_supported(msg);
--
--	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
--							DBUS_TYPE_INVALID))
--		return btd_error_invalid_args(msg);
--
--	watcher = find_watcher(t->fwatchers, sender, path);
--	if (watcher == NULL)
--		return btd_error_does_not_exist(msg);
--
--	if (find_watcher(t->iwatchers, sender, path))
--		return btd_error_already_exists(msg);
--
--	DBG("Intermediate measurement watcher %s registered", path);
--
--	if (g_slist_length(t->iwatchers) == 0)
--		enable_intermediate_measurement(t);
--
--	t->iwatchers = g_slist_prepend(t->iwatchers, watcher);
--
--	return dbus_message_new_method_return(msg);
--}
--
--static DBusMessage *disable_intermediate(DBusConnection *conn, DBusMessage *msg,
--								void *data)
--{
--	const char *sender = dbus_message_get_sender(msg);
--	struct thermometer *t = data;
--	struct watcher *watcher;
--	char *path;
--
--	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
--							DBUS_TYPE_INVALID))
--		return btd_error_invalid_args(msg);
--
--	watcher = find_watcher(t->iwatchers, sender, path);
--	if (watcher == NULL)
--		return btd_error_does_not_exist(msg);
--
--	DBG("Intermediate measurement %s unregistered", path);
--
--	remove_int_watcher(t, watcher);
--
--	return dbus_message_new_method_return(msg);
--}
--
--static const GDBusMethodTable thermometer_methods[] = {
--	{ GDBUS_METHOD("GetProperties",
--			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
--			get_properties) },
--	{ GDBUS_ASYNC_METHOD("SetProperty",
--			GDBUS_ARGS({ "name", "s" }, { "value", "v" }), NULL,
--			set_property) },
--	{ GDBUS_METHOD("RegisterWatcher",
--			GDBUS_ARGS({ "agent", "o" }), NULL,
--			register_watcher) },
--	{ GDBUS_METHOD("UnregisterWatcher",
--			GDBUS_ARGS({ "agent", "o" }), NULL,
--			unregister_watcher) },
--	{ GDBUS_METHOD("EnableIntermediateMeasurement",
--			GDBUS_ARGS({ "agent", "o" }), NULL,
--			enable_intermediate) },
--	{ GDBUS_METHOD("DisableIntermediateMeasurement",
--			GDBUS_ARGS({ "agent", "o" }), NULL,
--			disable_intermediate) },
--	{ }
--};
--
--static const GDBusSignalTable thermometer_signals[] = {
--	{ GDBUS_SIGNAL("PropertyChanged",
--			GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
--	{ }
--};
--
--static void update_watcher(gpointer data, gpointer user_data)
--{
--	struct watcher *w = data;
--	struct measurement *m = user_data;
--	DBusConnection *conn = w->t->conn;
--	DBusMessageIter iter;
--	DBusMessageIter dict;
--	DBusMessage *msg;
--
--	msg = dbus_message_new_method_call(w->srv, w->path,
--				"org.bluez.ThermometerWatcher",
--				"MeasurementReceived");
--	if (msg == NULL)
--		return;
--
--	dbus_message_iter_init_append(msg, &iter);
--
--	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
--			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
--			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
--			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
--
--	dict_append_entry(&dict, "Exponent", DBUS_TYPE_INT16, &m->exp);
--	dict_append_entry(&dict, "Mantissa", DBUS_TYPE_INT32, &m->mant);
--	dict_append_entry(&dict, "Unit", DBUS_TYPE_STRING, &m->unit);
--
--	if (m->suptime)
--		dict_append_entry(&dict, "Time", DBUS_TYPE_UINT64, &m->time);
--
--	dict_append_entry(&dict, "Type", DBUS_TYPE_STRING, &m->type);
--	dict_append_entry(&dict, "Measurement", DBUS_TYPE_STRING, &m->value);
--
--	dbus_message_iter_close_container(&iter, &dict);
--
--	dbus_message_set_no_reply(msg, TRUE);
--	g_dbus_send_message(conn, msg);
--}
--
--static void recv_measurement(struct thermometer *t, struct measurement *m)
--{
--	GSList *wlist;
--
--	if (g_strcmp0(m->value, "Intermediate") == 0)
--		wlist = t->iwatchers;
--	else
--		wlist = t->fwatchers;
--
--	g_slist_foreach(wlist, update_watcher, m);
--}
--
--static void proc_measurement(struct thermometer *t, const uint8_t *pdu,
--						uint16_t len, gboolean final)
--{
--	struct measurement m;
--	const char *type;
--	uint8_t flags;
--	uint32_t raw;
--
--	if (len < 4) {
--		DBG("Mandatory flags are not provided");
--		return;
--	}
--
--	flags = pdu[3];
--	if (flags & TEMP_UNITS)
--		m.unit = "Fahrenheit";
--	else
--		m.unit = "Celsius";
--
--	if (len < 8) {
--		DBG("Temperature measurement value is not provided");
--		return;
--	}
--
--	raw = att_get_u32(&pdu[4]);
--	m.mant = raw & 0x00FFFFFF;
--	m.exp = ((int32_t) raw) >> 24;
--
--	if (m.mant & 0x00800000) {
--		/* convert to C2 negative value */
--		m.mant = m.mant - FLOAT_MAX_MANTISSA;
--	}
--
--	if (flags & TEMP_TIME_STAMP) {
--		struct tm ts;
--		time_t time;
--
--		if (len < 15) {
--			DBG("Can't get time stamp value");
--			return;
--		}
--
--		ts.tm_year = att_get_u16(&pdu[8]) - 1900;
--		ts.tm_mon = pdu[10] - 1;
--		ts.tm_mday = pdu[11];
--		ts.tm_hour = pdu[12];
--		ts.tm_min = pdu[13];
--		ts.tm_sec = pdu[14];
--		ts.tm_isdst = -1;
--
--		time = mktime(&ts);
--		m.time = (uint64_t) time;
--		m.suptime = TRUE;
--	} else
--		m.suptime = FALSE;
--
--	if (flags & TEMP_TYPE) {
--		uint8_t index;
--
--		if (m.suptime && len >= 16)
--			index = 15;
--		else if (!m.suptime && len >= 9)
--			index = 9;
--		else {
--			DBG("Can't get temperature type");
--			return;
--		}
--
--		type = temptype2str(pdu[index]);
--	} else if (t->has_type)
--		type = temptype2str(t->type);
--	else
--		type = NULL;
--
--	m.type = type ? g_strdup(type) : NULL;
--	m.value = final ? "Final" : "Intermediate";
--
--	recv_measurement(t, &m);
--	g_free(m.type);
--}
--
--static void proc_measurement_interval(struct thermometer *t, const uint8_t *pdu,
--								uint16_t len)
--{
--	uint16_t interval;
--
--	if (len < 5) {
--		DBG("Measurement interval value is not provided");
--		return;
--	}
--
--	interval = att_get_u16(&pdu[3]);
--
--	change_property(t, "Interval", &interval);
--}
--
--static void ind_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
--{
--	struct thermometer *t = user_data;
--	const struct characteristic *ch;
--	uint8_t *opdu;
--	uint16_t handle, olen;
--	GSList *l;
--	int plen;
--
--	if (len < 3) {
--		DBG("Bad pdu received");
--		return;
--	}
--
--	handle = att_get_u16(&pdu[1]);
--	l = g_slist_find_custom(t->chars, &handle, cmp_char_val_handle);
--	if (l == NULL) {
--		DBG("Unexpected handle: 0x%04x", handle);
--		return;
--	}
--
--	ch = l->data;
--
--	if (g_strcmp0(ch->attr.uuid, TEMPERATURE_MEASUREMENT_UUID) == 0)
--		proc_measurement(t, pdu, len, TRUE);
--	else if (g_strcmp0(ch->attr.uuid, MEASUREMENT_INTERVAL_UUID) == 0)
--		proc_measurement_interval(t, pdu, len);
--
--	opdu = g_attrib_get_buffer(t->attrib, &plen);
--	olen = enc_confirmation(opdu, plen);
--
--	if (olen > 0)
--		g_attrib_send(t->attrib, 0, opdu[0], opdu, olen, NULL, NULL,
--									NULL);
--}
--
--static void notif_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
--{
--	struct thermometer *t = user_data;
--	const struct characteristic *ch;
--	uint16_t handle;
--	GSList *l;
--
--	if (len < 3) {
--		DBG("Bad pdu received");
--		return;
--	}
--
--	handle = att_get_u16(&pdu[1]);
--	l = g_slist_find_custom(t->chars, &handle, cmp_char_val_handle);
--	if (l == NULL) {
--		DBG("Unexpected handle: 0x%04x", handle);
--		return;
--	}
--
--	ch = l->data;
--	if (g_strcmp0(ch->attr.uuid, INTERMEDIATE_TEMPERATURE_UUID) == 0)
--		proc_measurement(t, pdu, len, FALSE);
--}
--
--static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
--{
--	struct thermometer *t = user_data;
--
--	t->attrib = g_attrib_ref(attrib);
--
--	t->attindid = g_attrib_register(t->attrib, ATT_OP_HANDLE_IND,
--							ind_handler, t, NULL);
--	t->attnotid = g_attrib_register(t->attrib, ATT_OP_HANDLE_NOTIFY,
--							notif_handler, t, NULL);
--	gatt_discover_char(t->attrib, t->svc_range->start, t->svc_range->end,
--					NULL, configure_thermometer_cb, t);
--}
--
--static void attio_disconnected_cb(gpointer user_data)
--{
--	struct thermometer *t = user_data;
--
--	DBG("GATT Disconnected");
--
--	if (t->attindid > 0) {
--		g_attrib_unregister(t->attrib, t->attindid);
--		t->attindid = 0;
--	}
--
--	if (t->attnotid > 0) {
--		g_attrib_unregister(t->attrib, t->attnotid);
--		t->attnotid = 0;
--	}
--
--	g_attrib_unref(t->attrib);
--	t->attrib = NULL;
--}
--
--int thermometer_register(DBusConnection *connection, struct btd_device *device,
--						struct gatt_primary *tattr)
--{
--	const gchar *path = device_get_path(device);
--	struct thermometer *t;
--
--	t = g_new0(struct thermometer, 1);
--	t->conn = dbus_connection_ref(connection);
--	t->dev = btd_device_ref(device);
--	t->svc_range = g_new0(struct att_range, 1);
--	t->svc_range->start = tattr->range.start;
--	t->svc_range->end = tattr->range.end;
--
--	if (!g_dbus_register_interface(t->conn, path, THERMOMETER_INTERFACE,
--				thermometer_methods, thermometer_signals,
--				NULL, t, destroy_thermometer)) {
--		error("D-Bus failed to register %s interface",
--							THERMOMETER_INTERFACE);
--		destroy_thermometer(t);
--		return -EIO;
--	}
--
--	thermometers = g_slist_prepend(thermometers, t);
--
--	t->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
--						attio_disconnected_cb, t);
--	return 0;
--}
--
--void thermometer_unregister(struct btd_device *device)
--{
--	struct thermometer *t;
--	GSList *l;
--
--	l = g_slist_find_custom(thermometers, device, cmp_device);
--	if (l == NULL)
--		return;
--
--	t = l->data;
--	thermometers = g_slist_remove(thermometers, t);
--	g_dbus_unregister_interface(t->conn, device_get_path(t->dev),
--							THERMOMETER_INTERFACE);
--}
-diff --git a/thermometer/thermometer.h b/thermometer/thermometer.h
-deleted file mode 100644
-index 330503c..0000000
---- a/thermometer/thermometer.h
-+++ /dev/null
-@@ -1,25 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--int thermometer_register(DBusConnection *connection, struct btd_device *device,
--						struct gatt_primary *tattr);
--void thermometer_unregister(struct btd_device *device);
+-int deviceinfo_manager_init(void);
+-void deviceinfo_manager_exit(void);
+diff --git a/profiles/deviceinfo/deviceinfo.c b/profiles/deviceinfo/deviceinfo.c
+new file mode 100644
+index 0000000..4548553
+--- /dev/null
++++ b/profiles/deviceinfo/deviceinfo.c
+@@ -0,0 +1,195 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <glib.h>
++#include <bluetooth/uuid.h>
++
++#include "adapter.h"
++#include "device.h"
++#include "gattrib.h"
++#include "attio.h"
++#include "att.h"
++#include "gattrib.h"
++#include "gatt.h"
++#include "log.h"
++#include "deviceinfo.h"
++
++#define PNP_ID_SIZE	7
++
++struct deviceinfo {
++	struct btd_device	*dev;		/* Device reference */
++	GAttrib			*attrib;	/* GATT connection */
++	guint			attioid;	/* Att watcher id */
++	struct att_range	*svc_range;	/* DeviceInfo range */
++	GSList			*chars;		/* Characteristics */
++};
++
++static GSList *servers = NULL;
++
++struct characteristic {
++	struct gatt_char	attr;	/* Characteristic */
++	struct deviceinfo	*d;	/* deviceinfo where the char belongs */
++};
++
++static void deviceinfo_free(gpointer user_data)
++{
++	struct deviceinfo *d = user_data;
++
++	if (d->attioid > 0)
++		btd_device_remove_attio_callback(d->dev, d->attioid);
++
++	if (d->attrib != NULL)
++		g_attrib_unref(d->attrib);
++
++	g_slist_free_full(d->chars, g_free);
++
++	btd_device_unref(d->dev);
++	g_free(d->svc_range);
++	g_free(d);
++}
++
++static gint cmp_device(gconstpointer a, gconstpointer b)
++{
++	const struct deviceinfo *d = a;
++	const struct btd_device *dev = b;
++
++	if (dev == d->dev)
++		return 0;
++
++	return -1;
++}
++
++static void read_pnpid_cb(guint8 status, const guint8 *pdu, guint16 len,
++							gpointer user_data)
++{
++	struct characteristic *ch = user_data;
++	uint8_t value[PNP_ID_SIZE];
++	ssize_t vlen;
++
++	if (status != 0) {
++		error("Error reading PNP_ID value: %s", att_ecode2str(status));
++		return;
++	}
++
++	vlen = dec_read_resp(pdu, len, value, sizeof(value));
++	if (vlen < 0) {
++		error("Error reading PNP_ID: Protocol error");
++		return;
++	}
++
++	if (vlen < 7) {
++		error("Error reading PNP_ID: Invalid pdu length received");
++		return;
++	}
++
++	device_set_pnpid(ch->d->dev, value[0], att_get_u16(&value[1]),
++				att_get_u16(&value[3]), att_get_u16(&value[5]));
++}
++
++static void process_deviceinfo_char(struct characteristic *ch)
++{
++	if (g_strcmp0(ch->attr.uuid, PNPID_UUID) == 0)
++		gatt_read_char(ch->d->attrib, ch->attr.value_handle, 0,
++							read_pnpid_cb, ch);
++}
++
++static void configure_deviceinfo_cb(GSList *characteristics, guint8 status,
++							gpointer user_data)
++{
++	struct deviceinfo *d = user_data;
++	GSList *l;
++
++	if (status != 0) {
++		error("Discover deviceinfo characteristics: %s",
++							att_ecode2str(status));
++		return;
++	}
++
++	for (l = characteristics; l; l = l->next) {
++		struct gatt_char *c = l->data;
++		struct characteristic *ch;
++
++		ch = g_new0(struct characteristic, 1);
++		ch->attr.handle = c->handle;
++		ch->attr.properties = c->properties;
++		ch->attr.value_handle = c->value_handle;
++		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
++		ch->d = d;
++
++		d->chars = g_slist_append(d->chars, ch);
++
++		process_deviceinfo_char(ch);
++	}
++}
++static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
++{
++	struct deviceinfo *d = user_data;
++
++	d->attrib = g_attrib_ref(attrib);
++
++	gatt_discover_char(d->attrib, d->svc_range->start, d->svc_range->end,
++					NULL, configure_deviceinfo_cb, d);
++}
++
++static void attio_disconnected_cb(gpointer user_data)
++{
++	struct deviceinfo *d = user_data;
++
++	g_attrib_unref(d->attrib);
++	d->attrib = NULL;
++}
++
++int deviceinfo_register(struct btd_device *device, struct gatt_primary *prim)
++{
++	struct deviceinfo *d;
++
++	d = g_new0(struct deviceinfo, 1);
++	d->dev = btd_device_ref(device);
++	d->svc_range = g_new0(struct att_range, 1);
++	d->svc_range->start = prim->range.start;
++	d->svc_range->end = prim->range.end;
++
++	servers = g_slist_prepend(servers, d);
++
++	d->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
++						attio_disconnected_cb, d);
++	return 0;
++}
++
++void deviceinfo_unregister(struct btd_device *device)
++{
++	struct deviceinfo *d;
++	GSList *l;
++
++	l = g_slist_find_custom(servers, device, cmp_device);
++	if (l == NULL)
++		return;
++
++	d = l->data;
++	servers = g_slist_remove(servers, d);
++
++	deviceinfo_free(d);
++}
+diff --git a/profiles/deviceinfo/deviceinfo.h b/profiles/deviceinfo/deviceinfo.h
+new file mode 100644
+index 0000000..7a804a5
+--- /dev/null
++++ b/profiles/deviceinfo/deviceinfo.h
+@@ -0,0 +1,24 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++int deviceinfo_register(struct btd_device *device, struct gatt_primary *prim);
++void deviceinfo_unregister(struct btd_device *device);
+diff --git a/profiles/deviceinfo/main.c b/profiles/deviceinfo/main.c
+new file mode 100644
+index 0000000..82ecc82
+--- /dev/null
++++ b/profiles/deviceinfo/main.c
+@@ -0,0 +1,52 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <glib.h>
++#include <errno.h>
++#include <stdint.h>
++
++#include "plugin.h"
++#include "manager.h"
++#include "hcid.h"
++#include "log.h"
++
++static int deviceinfo_init(void)
++{
++	if (!main_opts.gatt_enabled) {
++		error("DIS cannot start: GATT is disabled");
++		return -ENOTSUP;
++	}
++
++	return deviceinfo_manager_init();
++}
++
++static void deviceinfo_exit(void)
++{
++	deviceinfo_manager_exit();
++}
++
++BLUETOOTH_PLUGIN_DEFINE(deviceinfo, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++					deviceinfo_init, deviceinfo_exit)
+diff --git a/profiles/deviceinfo/manager.c b/profiles/deviceinfo/manager.c
+new file mode 100644
+index 0000000..1d59918
+--- /dev/null
++++ b/profiles/deviceinfo/manager.c
+@@ -0,0 +1,80 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#include <glib.h>
++#include <errno.h>
++#include <bluetooth/uuid.h>
++
++#include "adapter.h"
++#include "device.h"
++#include "att.h"
++#include "gattrib.h"
++#include "gatt.h"
++#include "deviceinfo.h"
++#include "manager.h"
++
++static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
++{
++	const struct gatt_primary *prim = a;
++	const char *uuid = b;
++
++	return g_strcmp0(prim->uuid, uuid);
++}
++
++static int deviceinfo_driver_probe(struct btd_device *device, GSList *uuids)
++{
++	struct gatt_primary *prim;
++	GSList *primaries, *l;
++
++	primaries = btd_device_get_primaries(device);
++
++	l = g_slist_find_custom(primaries, DEVICE_INFORMATION_UUID,
++							primary_uuid_cmp);
++	if (l == NULL)
++		return -EINVAL;
++
++	prim = l->data;
++
++	return deviceinfo_register(device, prim);
++}
++
++static void deviceinfo_driver_remove(struct btd_device *device)
++{
++	deviceinfo_unregister(device);
++}
++
++static struct btd_device_driver deviceinfo_device_driver = {
++	.name	= "deviceinfo-driver",
++	.uuids	= BTD_UUIDS(DEVICE_INFORMATION_UUID),
++	.probe	= deviceinfo_driver_probe,
++	.remove	= deviceinfo_driver_remove
++};
++
++int deviceinfo_manager_init(void)
++{
++	return btd_register_device_driver(&deviceinfo_device_driver);
++}
++
++void deviceinfo_manager_exit(void)
++{
++	btd_unregister_device_driver(&deviceinfo_device_driver);
++}
+diff --git a/profiles/deviceinfo/manager.h b/profiles/deviceinfo/manager.h
+new file mode 100644
+index 0000000..0f742ca
+--- /dev/null
++++ b/profiles/deviceinfo/manager.h
+@@ -0,0 +1,24 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++int deviceinfo_manager_init(void);
++void deviceinfo_manager_exit(void);
 -- 
 1.7.10.2
 
