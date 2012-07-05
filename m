@@ -1,194 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH v2 1/2] Bluetooth: Refactor PIN code rejection to use
- user_pairing_resp()
-Date: Fri, 06 Jul 2012 10:43:21 +0530
-Message-id: <1341551602-1493-1-git-send-email-jaganath.k@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <1341509854-9875-1-git-send-email-jprvita@openbossa.org>
+References: <1341509854-9875-1-git-send-email-jprvita@openbossa.org>
+Date: Thu, 5 Jul 2012 18:39:27 -0300
+Message-ID: <CAJdJm_NjTgwanMe-eSZ6RYQLV1-4V5tetpidr1Qd4aS2P7=XFA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] time: fix byte position
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: =?ISO-8859-1?Q?Jo=E3o_Paulo_Rechi_Vita?= <jprvita@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Reuse user_pairing_resp() to send PIN code negative reply.
+Hi Joao,
 
-Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
----
- net/bluetooth/mgmt.c |  155 +++++++++++++++++++++++---------------------------
- 1 files changed, 72 insertions(+), 83 deletions(-)
+On Thu, Jul 5, 2012 at 2:37 PM, João Paulo Rechi Vita
+<jprvita@openbossa.org> wrote:
+> The position of the "Time Zone" and "Daylight Saving Time" fields on
+> the Local Time Information characteristic was inverted. This commit
+> fix their position.
+> ---
+>  time/server.c |   10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index e83368f..5a442b9 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1718,89 +1718,6 @@ static int send_pin_code_neg_reply(struct sock *sk, struct hci_dev *hdev,
- 	return err;
- }
- 
--static int pin_code_reply(struct sock *sk, struct hci_dev *hdev, void *data,
--			  u16 len)
--{
--	struct hci_conn *conn;
--	struct mgmt_cp_pin_code_reply *cp = data;
--	struct hci_cp_pin_code_reply reply;
--	struct pending_cmd *cmd;
--	int err;
--
--	BT_DBG("");
--
--	hci_dev_lock(hdev);
--
--	if (!hdev_is_powered(hdev)) {
--		err = cmd_status(sk, hdev->id, MGMT_OP_PIN_CODE_REPLY,
--				 MGMT_STATUS_NOT_POWERED);
--		goto failed;
--	}
--
--	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->addr.bdaddr);
--	if (!conn) {
--		err = cmd_status(sk, hdev->id, MGMT_OP_PIN_CODE_REPLY,
--				 MGMT_STATUS_NOT_CONNECTED);
--		goto failed;
--	}
--
--	if (conn->pending_sec_level == BT_SECURITY_HIGH && cp->pin_len != 16) {
--		struct mgmt_cp_pin_code_neg_reply ncp;
--
--		memcpy(&ncp.addr, &cp->addr, sizeof(ncp.addr));
--
--		BT_ERR("PIN code is not 16 bytes long");
--
--		err = send_pin_code_neg_reply(sk, hdev, &ncp);
--		if (err >= 0)
--			err = cmd_status(sk, hdev->id, MGMT_OP_PIN_CODE_REPLY,
--					 MGMT_STATUS_INVALID_PARAMS);
--
--		goto failed;
--	}
--
--	cmd = mgmt_pending_add(sk, MGMT_OP_PIN_CODE_REPLY, hdev, data, len);
--	if (!cmd) {
--		err = -ENOMEM;
--		goto failed;
--	}
--
--	bacpy(&reply.bdaddr, &cp->addr.bdaddr);
--	reply.pin_len = cp->pin_len;
--	memcpy(reply.pin_code, cp->pin_code, sizeof(reply.pin_code));
--
--	err = hci_send_cmd(hdev, HCI_OP_PIN_CODE_REPLY, sizeof(reply), &reply);
--	if (err < 0)
--		mgmt_pending_remove(cmd);
--
--failed:
--	hci_dev_unlock(hdev);
--	return err;
--}
--
--static int pin_code_neg_reply(struct sock *sk, struct hci_dev *hdev,
--			      void *data, u16 len)
--{
--	struct mgmt_cp_pin_code_neg_reply *cp = data;
--	int err;
--
--	BT_DBG("");
--
--	hci_dev_lock(hdev);
--
--	if (!hdev_is_powered(hdev)) {
--		err = cmd_status(sk, hdev->id, MGMT_OP_PIN_CODE_NEG_REPLY,
--				 MGMT_STATUS_NOT_POWERED);
--		goto failed;
--	}
--
--	err = send_pin_code_neg_reply(sk, hdev, cp);
--
--failed:
--	hci_dev_unlock(hdev);
--	return err;
--}
--
- static int set_io_capability(struct sock *sk, struct hci_dev *hdev, void *data,
- 			     u16 len)
- {
-@@ -2083,6 +2000,78 @@ done:
- 	return err;
- }
- 
-+static int pin_code_reply(struct sock *sk, struct hci_dev *hdev, void *data,
-+			  u16 len)
-+{
-+	struct hci_conn *conn;
-+	struct mgmt_cp_pin_code_reply *cp = data;
-+	struct hci_cp_pin_code_reply reply;
-+	struct pending_cmd *cmd;
-+	int err;
-+
-+	BT_DBG("");
-+
-+	hci_dev_lock(hdev);
-+
-+	if (!hdev_is_powered(hdev)) {
-+		err = cmd_status(sk, hdev->id, MGMT_OP_PIN_CODE_REPLY,
-+				 MGMT_STATUS_NOT_POWERED);
-+		goto failed;
-+	}
-+
-+	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->addr.bdaddr);
-+	if (!conn) {
-+		err = cmd_status(sk, hdev->id, MGMT_OP_PIN_CODE_REPLY,
-+				 MGMT_STATUS_NOT_CONNECTED);
-+		goto failed;
-+	}
-+
-+	if (conn->pending_sec_level == BT_SECURITY_HIGH && cp->pin_len != 16) {
-+		struct mgmt_cp_pin_code_neg_reply ncp;
-+
-+		memcpy(&ncp.addr, &cp->addr, sizeof(ncp.addr));
-+
-+		BT_ERR("PIN code is not 16 bytes long");
-+
-+		err = send_pin_code_neg_reply(sk, hdev, &ncp);
-+		if (err >= 0)
-+			err = cmd_status(sk, hdev->id, MGMT_OP_PIN_CODE_REPLY,
-+					 MGMT_STATUS_INVALID_PARAMS);
-+
-+		goto failed;
-+	}
-+
-+	cmd = mgmt_pending_add(sk, MGMT_OP_PIN_CODE_REPLY, hdev, data, len);
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto failed;
-+	}
-+
-+	bacpy(&reply.bdaddr, &cp->addr.bdaddr);
-+	reply.pin_len = cp->pin_len;
-+	memcpy(reply.pin_code, cp->pin_code, sizeof(reply.pin_code));
-+
-+	err = hci_send_cmd(hdev, HCI_OP_PIN_CODE_REPLY, sizeof(reply), &reply);
-+	if (err < 0)
-+		mgmt_pending_remove(cmd);
-+
-+failed:
-+	hci_dev_unlock(hdev);
-+	return err;
-+}
-+
-+static int pin_code_neg_reply(struct sock *sk, struct hci_dev *hdev,
-+			      void *data, u16 len)
-+{
-+	struct mgmt_cp_pin_code_neg_reply *cp = data;
-+
-+	BT_DBG("");
-+
-+	return user_pairing_resp(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
-+				MGMT_OP_PIN_CODE_NEG_REPLY,
-+				HCI_OP_PIN_CODE_NEG_REPLY, 0);
-+}
-+
- static int user_confirm_reply(struct sock *sk, struct hci_dev *hdev, void *data,
- 			      u16 len)
- {
+Patch looks good.
+
+Regards,
 -- 
-1.7.1
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
