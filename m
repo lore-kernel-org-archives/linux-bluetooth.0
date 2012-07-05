@@ -1,51 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 05 Jul 2012 18:15:29 -0300 (BRT)
-Message-Id: <20120705.181529.1972884390629333855.pcacjr@zytor.com>
-To: johan.hedberg@gmail.com
-Cc: paulo.alcantara@openbossa.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v2 02/12] storage: Store address type in
- "aliases" file
-From: Paulo Alcantara <pcacjr@zytor.com>
-In-Reply-To: <20120705104141.GA27842@x220.ger.corp.intel.com>
-References: <1341347535-15343-1-git-send-email-paulo.alcantara@openbossa.org>
-	<1341347535-15343-3-git-send-email-paulo.alcantara@openbossa.org>
-	<20120705104141.GA27842@x220.ger.corp.intel.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+MIME-Version: 1.0
+In-Reply-To: <1341509854-9875-2-git-send-email-jprvita@openbossa.org>
+References: <1341509854-9875-1-git-send-email-jprvita@openbossa.org>
+	<1341509854-9875-2-git-send-email-jprvita@openbossa.org>
+Date: Thu, 5 Jul 2012 14:50:01 -0300
+Message-ID: <CAJdJm_Po4UXnVWWEy0cBEtPWHOs3pS_6Rd1uJ6O2xxvO2WVXew@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] time: fix daylight variable description
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: =?ISO-8859-1?Q?Jo=E3o_Paulo_Rechi_Vita?= <jprvita@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Joao,
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Thu, 5 Jul 2012 13:41:42 +0300
+On Thu, Jul 5, 2012 at 2:37 PM, João Paulo Rechi Vita
+<jprvita@openbossa.org> wrote:
+> -       /* FIXME: POSIX "daylight" variable only indicates whether there is DST
+> -        * for the local time or not. The offset is unknown. */
+> +       /* FIXME: POSIX "daylight" variable only indicates if DST is used for
+> +        * the local time or not. Both the offset and wheter it's currently
 
-> This looks dangerous to me. Even though the only users of delete_entry()
-> use addresses as the key values there's nothing about the naming of this
-> function that suggests that it's only usable for key values with a very
-> specific format compared to what the rest of storage.c is designed to
-> support (arbitrary key values).
+small typo: wheter -> whether
 
-Agreed.
+> +        * active is unknown. */
+>         value[1] = daylight ? 0xff : 0x00;
 
-> Either the function name and/or the "key" parameter name needs to be
-> changed to make this restricted use clear or then the error handling of
-> old keys should be pushed to the caller side (device.c).
-
-Ok. I think we can do something like this too:
-
-int delete_entry(bdaddr_t *src, const char *storage, bdaddr_t *dst,
-    			  	      	   	     uint8_t dst_type)
-{
-	...
-	...
-}
-
-So, we're going to remove an entry from a given destinate address rather than
-from a very specific key format, then we can treat old and new key formats
-within it.
-
-What do you think about this ?
-
-
-		Paulo
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
