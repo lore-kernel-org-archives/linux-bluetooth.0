@@ -1,32 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1341509854-9875-1-git-send-email-jprvita@openbossa.org>
-References: <1341509854-9875-1-git-send-email-jprvita@openbossa.org>
-Date: Thu, 5 Jul 2012 18:39:27 -0300
-Message-ID: <CAJdJm_NjTgwanMe-eSZ6RYQLV1-4V5tetpidr1Qd4aS2P7=XFA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] time: fix byte position
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: =?ISO-8859-1?Q?Jo=E3o_Paulo_Rechi_Vita?= <jprvita@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Thu, 05 Jul 2012 18:15:29 -0300 (BRT)
+Message-Id: <20120705.181529.1972884390629333855.pcacjr@zytor.com>
+To: johan.hedberg@gmail.com
+Cc: paulo.alcantara@openbossa.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v2 02/12] storage: Store address type in
+ "aliases" file
+From: Paulo Alcantara <pcacjr@zytor.com>
+In-Reply-To: <20120705104141.GA27842@x220.ger.corp.intel.com>
+References: <1341347535-15343-1-git-send-email-paulo.alcantara@openbossa.org>
+	<1341347535-15343-3-git-send-email-paulo.alcantara@openbossa.org>
+	<20120705104141.GA27842@x220.ger.corp.intel.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joao,
+Hi Johan,
 
-On Thu, Jul 5, 2012 at 2:37 PM, João Paulo Rechi Vita
-<jprvita@openbossa.org> wrote:
-> The position of the "Time Zone" and "Daylight Saving Time" fields on
-> the Local Time Information characteristic was inverted. This commit
-> fix their position.
-> ---
->  time/server.c |   10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Thu, 5 Jul 2012 13:41:42 +0300
 
-Patch looks good.
+> This looks dangerous to me. Even though the only users of delete_entry()
+> use addresses as the key values there's nothing about the naming of this
+> function that suggests that it's only usable for key values with a very
+> specific format compared to what the rest of storage.c is designed to
+> support (arbitrary key values).
 
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Agreed.
+
+> Either the function name and/or the "key" parameter name needs to be
+> changed to make this restricted use clear or then the error handling of
+> old keys should be pushed to the caller side (device.c).
+
+Ok. I think we can do something like this too:
+
+int delete_entry(bdaddr_t *src, const char *storage, bdaddr_t *dst,
+    			  	      	   	     uint8_t dst_type)
+{
+	...
+	...
+}
+
+So, we're going to remove an entry from a given destinate address rather than
+from a very specific key format, then we can treat old and new key formats
+within it.
+
+What do you think about this ?
+
+
+		Paulo
