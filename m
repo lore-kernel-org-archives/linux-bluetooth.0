@@ -1,31 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 5 Jul 2012 11:08:34 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/3] time: Introduce manager abstraction layer
-Message-ID: <20120705080834.GA19811@x220>
-References: <1340216061-24778-1-git-send-email-anderson.lizardo@openbossa.org>
- <CAJdJm_Mtppu=cjc1UUmwfW_PeoNisgiBi8yb96hugz3JZx3tNg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAJdJm_Mtppu=cjc1UUmwfW_PeoNisgiBi8yb96hugz3JZx3tNg@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1341472848.1963.34.camel@aeonflux>
+References: <CADX0rsZBM+2Sz564FrkVxe318dCFue_pea_OLpxvrk5bd9cHWQ@mail.gmail.com>
+	<1341472848.1963.34.camel@aeonflux>
+Date: Thu, 5 Jul 2012 15:42:45 +0800
+Message-ID: <CADX0rsYksswwWK-4-UYXt_k7squWeCFhwK18=mDAZ=P6L1-zVw@mail.gmail.com>
+Subject: Re: BT LMP
+From: victor yeo <victoryeo1974@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Marcel,
 
-On Wed, Jul 04, 2012, Anderson Lizardo wrote:
-> On Wed, Jun 20, 2012 at 3:14 PM, Anderson Lizardo
-> <anderson.lizardo@openbossa.org> wrote:
-> > This abstraction layer makes the GATT Time profile implementation
-> > consistent with other profiles. It is the first step before implementing
-> > the adapter driver for the Time server implementation.
-> > ---
-> 
-> ping.
+When LMP_not_accepted is received by Bluetooth Chip's firmware, it
+will send a HCI event to the linux kernel bluetooth portion. Do i
+understand correctly? What is the HCI event name?
 
-Sorry, I must have missed these. All three patches have now been
-applied.
+Thanks,
+Victor
 
-Johan
+On Thu, Jul 5, 2012 at 3:20 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Victor,
+>
+>> Anyone know which part of linux kernel processes the LMP au_rand and
+>> LMP not_accepted event?
+>>
+>> I want to modify the Bluetooth kernel code so that when it receives
+>> LMP not_accepted event, it will do re-pairing.
+>
+> LMP is implemented in the Bluetooth chip's firmware and not the kernel.
+>
+> Regards
+>
+> Marcel
+>
+>
