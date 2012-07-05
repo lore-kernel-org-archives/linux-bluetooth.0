@@ -1,58 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1340878959-1343-8-git-send-email-michal.labedzki@tieto.com>
-References: <1340878959-1343-1-git-send-email-michal.labedzki@tieto.com>
-	<1340878959-1343-8-git-send-email-michal.labedzki@tieto.com>
-Date: Thu, 5 Jul 2012 12:52:44 +0300
-Message-ID: <CABBYNZJ9oaVhUY+1TNYpBORvkT96rhpwZm16XUJu2QKnvALWzw@mail.gmail.com>
-Subject: Re: [PATCH v3 08/14] AVRCP: Register AVRCP before MEDIA interface
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Michal Labedzki <michal.labedzki@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, lucas.demarchi@profusion.mobi,
-	johan.hedberg@gmail.com
+In-Reply-To: <2DC28D85CE3B364AB56B408582B25C8E18E38E2A@DNCE04.ent.ti.com>
+References: <CADX0rsZBM+2Sz564FrkVxe318dCFue_pea_OLpxvrk5bd9cHWQ@mail.gmail.com>
+	<1341472848.1963.34.camel@aeonflux>
+	<CADX0rsYksswwWK-4-UYXt_k7squWeCFhwK18=mDAZ=P6L1-zVw@mail.gmail.com>
+	<2DC28D85CE3B364AB56B408582B25C8E18E38E2A@DNCE04.ent.ti.com>
+Date: Thu, 5 Jul 2012 17:10:00 +0800
+Message-ID: <CADX0rsaGRYTE2hMLbmjDrQWBVXKraGww=rxsvzEmefXC9EZvXw@mail.gmail.com>
+Subject: Re: BT LMP
+From: victor yeo <victoryeo1974@gmail.com>
+To: "Keren, Doron" <doronkeren@ti.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+On Thu, Jul 5, 2012 at 4:25 PM, Keren, Doron <doronkeren@ti.com> wrote:
+> Hi Victor,
+>
+> The LMP not_accepted event will lead to Authentication failure.
+> Some devices will then initiate disconnection with error code :
+> Authentication Failure error code (0x05).
+>
+> Thanks,
+> Doron Keren
+> Texas Instruments
+>
+>> -----Original Message-----
+>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> owner@vger.kernel.org] On Behalf Of victor yeo
+>> Sent: Thursday, July 05, 2012 10:43 AM
+>> To: Marcel Holtmann
+>> Cc: linux-bluetooth@vger.kernel.org
+>> Subject: Re: BT LMP
+>>
+>> Hi Marcel,
+>>
+>> When LMP_not_accepted is received by Bluetooth Chip's firmware, it
+>> will send a HCI event to the linux kernel bluetooth portion. Do i
+>> understand correctly? What is the HCI event name?
+>>
+>> Thanks,
+>> Victor
+>>
+>> On Thu, Jul 5, 2012 at 3:20 PM, Marcel Holtmann <marcel@holtmann.org>
+>> wrote:
+>> > Hi Victor,
+>> >
+>> >> Anyone know which part of linux kernel processes the LMP au_rand and
+>> >> LMP not_accepted event?
+>> >>
+>> >> I want to modify the Bluetooth kernel code so that when it receives
+>> >> LMP not_accepted event, it will do re-pairing.
+>> >
+>> > LMP is implemented in the Bluetooth chip's firmware and not the kernel.
+>> >
+>> > Regards
+>> >
+>> > Marcel
+>> >
+>> >
+>> --
 
-On Thu, Jun 28, 2012 at 1:22 PM, Michal Labedzki
-<michal.labedzki@tieto.com> wrote:
-> Register AVRCP before MEDIA interface to avoid searching for or
-> accessing non-existent AVRCP server.
-> ---
->  audio/manager.c |    6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/audio/manager.c b/audio/manager.c
-> index d442d1d..076346a 100644
-> --- a/audio/manager.c
-> +++ b/audio/manager.c
-> @@ -1238,6 +1238,9 @@ proceed:
->         if (enabled.socket)
->                 unix_init();
->
-> +       if (enabled.control)
-> +               btd_register_adapter_driver(&avrcp_server_driver);
-> +
->         if (enabled.media)
->                 btd_register_adapter_driver(&media_server_driver);
->
-> @@ -1250,9 +1253,6 @@ proceed:
->         if (enabled.source || enabled.sink)
->                 btd_register_adapter_driver(&a2dp_server_driver);
->
-> -       if (enabled.control)
-> -               btd_register_adapter_driver(&avrcp_server_driver);
-> -
->         btd_register_device_driver(&audio_driver);
->
->         *enable_sco = (enabled.gateway || enabled.headset);
-> --
-> on behalf of ST-Ericsson
+Hi Doron,
 
-Applied thanks, please rebase the rest.
+Will the hci_auth_complete_evt() function in net/bluetooth/hci_event.c
+handle the hci error code?
 
-
--- 
-Luiz Augusto von Dentz
+Thanks,
+Victor
