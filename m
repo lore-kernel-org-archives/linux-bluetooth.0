@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1340878959-1343-12-git-send-email-michal.labedzki@tieto.com>
+In-Reply-To: <1340878959-1343-8-git-send-email-michal.labedzki@tieto.com>
 References: <1340878959-1343-1-git-send-email-michal.labedzki@tieto.com>
-	<1340878959-1343-12-git-send-email-michal.labedzki@tieto.com>
-Date: Thu, 5 Jul 2012 13:05:09 +0300
-Message-ID: <CABBYNZKEMguHRQ8RDfKaABouS5ZLW+3DoMeXcLKmxREr9yg41w@mail.gmail.com>
-Subject: Re: [PATCH v3 12/14] AVRCP: Use NoAvailablePlayers status code for
- AVRCP 1.4 devices
+	<1340878959-1343-8-git-send-email-michal.labedzki@tieto.com>
+Date: Thu, 5 Jul 2012 12:52:44 +0300
+Message-ID: <CABBYNZJ9oaVhUY+1TNYpBORvkT96rhpwZm16XUJu2QKnvALWzw@mail.gmail.com>
+Subject: Re: [PATCH v3 08/14] AVRCP: Register AVRCP before MEDIA interface
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Michal Labedzki <michal.labedzki@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org, lucas.demarchi@profusion.mobi,
@@ -19,17 +18,41 @@ Hi Michal,
 
 On Thu, Jun 28, 2012 at 1:22 PM, Michal Labedzki
 <michal.labedzki@tieto.com> wrote:
-> DummyPlayer indicate there is no available players. For AVRCP 1.4
-> devices use NoAvailblePlayers status code, on the other side, for
-> AVRCP 1.3 devices use InternalError.
+> Register AVRCP before MEDIA interface to avoid searching for or
+> accessing non-existent AVRCP server.
+> ---
+>  audio/manager.c |    6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/audio/manager.c b/audio/manager.c
+> index d442d1d..076346a 100644
+> --- a/audio/manager.c
+> +++ b/audio/manager.c
+> @@ -1238,6 +1238,9 @@ proceed:
+>         if (enabled.socket)
+>                 unix_init();
+>
+> +       if (enabled.control)
+> +               btd_register_adapter_driver(&avrcp_server_driver);
+> +
+>         if (enabled.media)
+>                 btd_register_adapter_driver(&media_server_driver);
+>
+> @@ -1250,9 +1253,6 @@ proceed:
+>         if (enabled.source || enabled.sink)
+>                 btd_register_adapter_driver(&a2dp_server_driver);
+>
+> -       if (enabled.control)
+> -               btd_register_adapter_driver(&avrcp_server_driver);
+> -
+>         btd_register_device_driver(&audio_driver);
+>
+>         *enable_sco = (enabled.gateway || enabled.headset);
+> --
+> on behalf of ST-Ericsson
 
-For reporting errors alone I don't think we really need a dummy
-player, in the other hand it seems that some device (MW600) will just
-stop doing anything regarding player events if it gets an error, in
-that case dummy can be useful because it serves as a place holder than
-once a player is registered it automatically takes place of the dummy
-one so we don't need the player to be registered during boot or
-anything like.
+Applied thanks, please rebase the rest.
+
 
 -- 
 Luiz Augusto von Dentz
