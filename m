@@ -1,65 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: About udev rule removal
-From: Pacho Ramos <pacho@gentoo.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <CAMOw1v6hMcHqWAhHHyJAsQhjo=nrp62bYm9+TCeOehV_ktoKbw@mail.gmail.com>
-References: <1341001405.2852.4.camel@belkin4>
-	 <1341080127.3770.6.camel@belkin4>
-	 <CAMOw1v6hMcHqWAhHHyJAsQhjo=nrp62bYm9+TCeOehV_ktoKbw@mail.gmail.com>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-O51x/tReKosXwTF55gwp"
-Date: Fri, 06 Jul 2012 20:36:59 +0200
-Message-ID: <1341599820.4531.0.camel@belkin4>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 6 Jul 2012 12:14:22 -0500 (CDT)
+From: Manoj Iyer <manoj.iyer@canonical.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+cc: Manoj Iyer <manoj.iyer@canonical.com>, linux-kernel@vger.kernel.org,
+    linux-bluetooth@vger.kernel.org, Johan Hedberg <johan.hedberg@intel.com>,
+    Marcel Holtmann <marcel@holtmann.org>,
+    Chris Gagnon <chris.gagnon@canonical.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Add vendor specific ID (0a5c:21f4)
+ BCM20702A0
+In-Reply-To: <20120413214817.GB1680@joana>
+Message-ID: <alpine.DEB.2.02.1207061211420.2959@lazy>
+References: <1334169563-2948-1-git-send-email-manoj.iyer@canonical.com> <1334169563-2948-2-git-send-email-manoj.iyer@canonical.com> <20120413214817.GB1680@joana>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Fri, 13 Apr 2012, Gustavo Padovan wrote:
 
---=-O51x/tReKosXwTF55gwp
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Gustavo,
 
-El mar, 03-07-2012 a las 10:21 -0300, Lucas De Marchi escribi=C3=B3:
-> On Sat, Jun 30, 2012 at 3:15 PM, Pacho Ramos <pacho@gentoo.org> wrote:
-> > El vie, 29-06-2012 a las 22:23 +0200, Pacho Ramos escribi=C3=B3:
-> >> I would like to know what distributions not relying on systemd are
-> >> supposed to get bluetoothd autostarted now that udev rule was dropped:
-> >> http://git.kernel.org/?p=3Dbluetooth/bluez.git;a=3Dcommit;h=3D2ea98a6a=
-043710ad4958355b62c682b4767f292e
-> >>
-> >> Looks like we go back from udev rule to manually starting bluetoothd a=
-ll
-> >> the time, even if bluetooth device is not connected? Why are we going
-> >> back to old behavior?
-> >>
-> >> Thanks for the info
-> >
-> > Should we revert that change downstream if we are not going to rely on
-> > systemd and until udev is changed to break that setup (forcing us to go
-> > to old "always running" behavior)?
->=20
-> Udev rules are not supposed to spawn daemons. It never was. And now if
-> you do that udev will kill your daemon after a certain timeout. You'd
-> need to a) maintain that rule by yourself and b) patch udev to not do
-> that.
->=20
->=20
-> Lucas De Marchi
->=20
+Sorry it took a long time to locate the hardware to get this info, I got 
+this info from one our QA engg cced here. Do you want me to resubmit the 
+patch ?
 
-Will go with the old way of starting it with an init.d script then.
-Thanks for the info.
+Before the patch
+=================
+T: Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 2 Spd=12 MxCh= 0
+D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+P: Vendor=0a5c ProdID=21f4 Rev=01.12
+S: Manufacturer=Broadcom Corp
+S: Product=BCM20702A0
+S: SerialNumber=E4D53DF154D6
+C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 
---=-O51x/tReKosXwTF55gwp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+After the patch
+================
+T: Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 2 Spd=12 MxCh= 0
+D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+P: Vendor=0a5c ProdID=21f4 Rev=01.12
+S: Manufacturer=Broadcom Corp
+S: Product=BCM20702A0
+S: SerialNumber=E4D53DF154D6
+C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.19 (GNU/Linux)
+> Hi Manoj,
+>
+> * Manoj Iyer <manoj.iyer@canonical.com> [2012-04-11 13:39:23 -0500]:
+>
+>> usb-devices:
+>> T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=02 Dev#=  4 Spd=12  MxCh= 0
+>> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+>> P:  Vendor=0a5c ProdID=21f4 Rev=01.12
+>> S:  Manufacturer=Broadcom Corp
+>> S:  Product=BCM20702A0
+>> S:  SerialNumber=E4D53DF15584
+>> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+>> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+>> I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+>> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+>> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+>
+> You need to give the usb-devices for the non-working case. I know it
+> works but we need to document this right in the commit message.
+>
+> 	Gustavo
+>
+>
 
-iEYEABECAAYFAk/3MEsACgkQCaWpQKGI+9QlGwCeO/6uk35VNnX63Ri8tqsgdPsz
-IjoAn08wtHQA2RsTYvss+YsFg2FSc1Tk
-=Me4O
------END PGP SIGNATURE-----
 
---=-O51x/tReKosXwTF55gwp--
 
+
+--
+====================
+Manoj Iyer
+Ubuntu/Canonical
+Hardware Enablement
+====================
