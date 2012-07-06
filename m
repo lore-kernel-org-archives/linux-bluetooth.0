@@ -1,86 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 6 Jul 2012 12:14:22 -0500 (CDT)
-From: Manoj Iyer <manoj.iyer@canonical.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-cc: Manoj Iyer <manoj.iyer@canonical.com>, linux-kernel@vger.kernel.org,
-    linux-bluetooth@vger.kernel.org, Johan Hedberg <johan.hedberg@intel.com>,
-    Marcel Holtmann <marcel@holtmann.org>,
-    Chris Gagnon <chris.gagnon@canonical.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Add vendor specific ID (0a5c:21f4)
- BCM20702A0
-In-Reply-To: <20120413214817.GB1680@joana>
-Message-ID: <alpine.DEB.2.02.1207061211420.2959@lazy>
-References: <1334169563-2948-1-git-send-email-manoj.iyer@canonical.com> <1334169563-2948-2-git-send-email-manoj.iyer@canonical.com> <20120413214817.GB1680@joana>
+Message-ID: <4FF6E31E.70507@linux.intel.com>
+Date: Fri, 06 Jul 2012 15:07:42 +0200
+From: Frederic Danis <frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v11 01/12] audio: Move telephony drivers to D-Bus interface
+References: <1340900155-26311-1-git-send-email-frederic.danis@linux.intel.com> <1340900155-26311-2-git-send-email-frederic.danis@linux.intel.com> <CANT-zCVZx5QcPkh4Zeru1GvZrOyt2twqB9sy2Zz4KCRZWq_+YQ@mail.gmail.com>
+In-Reply-To: <CANT-zCVZx5QcPkh4Zeru1GvZrOyt2twqB9sy2Zz4KCRZWq_+YQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 13 Apr 2012, Gustavo Padovan wrote:
+Hello Mikel,
 
-Gustavo,
+On 05/07/2012 16:21, Mikel Astiz wrote:
+<snip>
 
-Sorry it took a long time to locate the hardware to get this info, I got 
-this info from one our QA engg cced here. Do you want me to resubmit the 
-patch ?
-
-Before the patch
-=================
-T: Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 2 Spd=12 MxCh= 0
-D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-P: Vendor=0a5c ProdID=21f4 Rev=01.12
-S: Manufacturer=Broadcom Corp
-S: Product=BCM20702A0
-S: SerialNumber=E4D53DF154D6
-C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-
-After the patch
-================
-T: Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 2 Spd=12 MxCh= 0
-D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-P: Vendor=0a5c ProdID=21f4 Rev=01.12
-S: Manufacturer=Broadcom Corp
-S: Product=BCM20702A0
-S: SerialNumber=E4D53DF154D6
-C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-
-> Hi Manoj,
+>> +Interaction with the audio component (i.e. PulseAudio) will be done through the
+>> +MediaTransport object (passed to telephony agent during NewConnection call).
 >
-> * Manoj Iyer <manoj.iyer@canonical.com> [2012-04-11 13:39:23 -0500]:
+> This is where the interesting part begins: how exactly are you
+> planning to do this?
 >
->> usb-devices:
->> T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=02 Dev#=  4 Spd=12  MxCh= 0
->> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
->> P:  Vendor=0a5c ProdID=21f4 Rev=01.12
->> S:  Manufacturer=Broadcom Corp
->> S:  Product=BCM20702A0
->> S:  SerialNumber=E4D53DF15584
->> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
->> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
->> I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
->> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
->> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
->
-> You need to give the usb-devices for the non-working case. I know it
-> works but we need to document this right in the commit message.
->
-> 	Gustavo
->
->
+> Perhaps I'm missing something but I see no relation between Media
+> transport and telephony agent in your patchset. It seems this part of
+> the documentation is inconsistent with the code.
+
+The Bluez MediaTransport will act as central point for messages related 
+to audio.
+e.g. for volume management, PulseAudio or oFono will call SetProperty 
+method of MediaTransport which will send a property changed signal.
+
+This behavior is implemented through existing MediaTransport signals and 
+patch 8.
+
+> I don't understand your original motivation to do this, but from my
+> point of view, something similar would actually be interesting to
+> propagate call-states (HFP) from oFono to PulseAudio. This information
+> can later be useful for audio routing policies in PulseAudio.
+
+IMO, component implementing audio routing policy should listen oFono 
+state changes directly.
+On call, it may have to stop current audio playback then route audio:
+- from telephony chipset to speaker if there is no HFP connection
+- or from telephony chipset to bluetooth device if a HFP endpoint exists
+I do not think this needs to pass through BlueZ.
+
+> That being said, I'm not sure if the Telephony API is the proper way
+> to address this.
+
+Regards
+
+Fred
+
+
+-- 
+Frederic Danis                            Open Source Technology Center
+frederic.danis@intel.com                              Intel Corporation
 
 
 
-
---
-====================
-Manoj Iyer
-Ubuntu/Canonical
-Hardware Enablement
-====================
