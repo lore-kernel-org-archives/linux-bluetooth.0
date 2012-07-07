@@ -1,47 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <55F9050C8BBB49778701FA33482309E7@sisodomain.com>
-From: Jaganath <jaganath.k@samsung.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Sat, 7 Jul 2012 10:16:24 +0100
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-References: <1341551602-1493-1-git-send-email-jaganath.k@samsung.com>
- <20120706091827.GA10494@x220.ger.corp.intel.com>
-In-reply-to: <20120706091827.GA10494@x220.ger.corp.intel.com>
-Subject: Re: [PATCH v2 1/2] Bluetooth: Refactor PIN code rejection to use
- user_pairing_resp()
-Date: Sat, 07 Jul 2012 18:37:02 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
+Subject: Re: [PATCH BlueZ v2] mgmtops: Fix calling btd_adapter_start() for an
+ off adapter
+Message-ID: <20120707091624.GA23372@x220.vexbr.com.br>
+References: <1341606418-12257-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1341606418-12257-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Vinicius,
 
---------------------------------------------------
-From: "Johan Hedberg" <johan.hedberg@gmail.com>
-Sent: Friday, July 06, 2012 2:48 PM
-To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v2 1/2] Bluetooth: Refactor PIN code rejection to use 
-user_pairing_resp()
+On Fri, Jul 06, 2012, Vinicius Costa Gomes wrote:
+> When the adapter mode is off and the controller is down, we should
+> not consider that the adapter is powered up.
+> ---
+>  plugins/mgmtops.c |   11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
 
-> Hi Jaganath,
->
-> On Fri, Jul 06, 2012, Jaganath Kanakkassery wrote:
->> Reuse user_pairing_resp() to send PIN code negative reply.
->>
->> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
->> ---
->>  net/bluetooth/mgmt.c |  155 
->> +++++++++++++++++++++++---------------------------
->>  1 files changed, 72 insertions(+), 83 deletions(-)
->
-> Would it be possible for you to do this patch without moving around the
-> functions? It'd make it easier to see that only the relevant bits are
-> changed.
+Applied. Thanks.
 
-Ok, I will the revert movement of the function pin_code_reply() and raise 
-v3.
-
-Thanks,
-Jaganath 
-
+Johan
