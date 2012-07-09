@@ -1,79 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 01/14] input: remove unneeded header inclusions
-Date: Mon,  9 Jul 2012 18:10:23 -0300
-Message-Id: <1341868236-9704-1-git-send-email-gustavo@padovan.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Henrik Rydberg" <rydberg@bitmath.se>
+Date: Mon, 9 Jul 2012 22:24:10 +0200
+To: Gustavo Padovan <gustavo@padovan.org>,
+	Henrik Rydberg <rydberg@bitmath.se>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Add MacBookPro10,1 support
+Message-ID: <20120709202410.GA817@polaris.bitmath.org>
+References: <1341856347-257-1-git-send-email-rydberg@euromail.se>
+ <20120709184824.GA21411@x220>
+ <20120709192529.GA712@polaris.bitmath.org>
+ <20120709194947.GA17281@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120709194947.GA17281@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Hi Gustavo,
 
----
- input/device.c  |    5 -----
- input/fakehid.c |    4 ----
- input/manager.c |    3 ---
- 3 files changed, 12 deletions(-)
+> > > I believe the requirement is to always include a usb-devices output in
+> > > the commit message (to let maintainers confirm that no typo has occurred
+> > > in the patch itself).
+> 
+> If you don't have access to the device I can take it without usb-devices,
+> otherwise just add it to the patch and then resend.
 
-diff --git a/input/device.c b/input/device.c
-index 7eac71e..829ca03 100644
---- a/input/device.c
-+++ b/input/device.c
-@@ -29,9 +29,6 @@
- #include <errno.h>
- #include <fcntl.h>
- #include <unistd.h>
--#include <sys/stat.h>
--#include <sys/ioctl.h>
--#include <sys/socket.h>
- 
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/hidp.h>
-@@ -39,8 +36,6 @@
- #include <bluetooth/sdp_lib.h>
- #include <bluetooth/uuid.h>
- 
--#include <glib.h>
--#include <dbus/dbus.h>
- #include <gdbus.h>
- 
- #include "log.h"
-diff --git a/input/fakehid.c b/input/fakehid.c
-index 3181538..3be1489 100644
---- a/input/fakehid.c
-+++ b/input/fakehid.c
-@@ -25,12 +25,8 @@
- #include <config.h>
- #endif
- 
--#include <stdio.h>
--#include <errno.h>
- #include <fcntl.h>
- #include <unistd.h>
--#include <stdlib.h>
--#include <sys/types.h>
- 
- #include <bluetooth/bluetooth.h>
- 
-diff --git a/input/manager.c b/input/manager.c
-index 01f83ce..928a2f5 100644
---- a/input/manager.c
-+++ b/input/manager.c
-@@ -28,13 +28,10 @@
- #include <errno.h>
- 
- #include <bluetooth/bluetooth.h>
--#include <bluetooth/hci.h>
- #include <bluetooth/sdp.h>
- #include <bluetooth/sdp_lib.h>
- #include <bluetooth/uuid.h>
- 
--#include <gdbus.h>
--
- #include "log.h"
- #include "../src/adapter.h"
- #include "../src/device.h"
--- 
-1.7.10.2
+I don't, but I trust that this patch is authentic.
 
+Thanks,
+Henrik
