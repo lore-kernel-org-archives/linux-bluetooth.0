@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 03/14] btmgmt: move to tools folder
-Date: Mon,  9 Jul 2012 18:10:25 -0300
-Message-Id: <1341868236-9704-3-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 02/14] serial: remove the whole serial code
+Date: Mon,  9 Jul 2012 18:10:24 -0300
+Message-Id: <1341868236-9704-2-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1341868236-9704-1-git-send-email-gustavo@padovan.org>
 References: <1341868236-9704-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,53 +13,270 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
 ---
- .gitignore     |    2 +-
- Makefile.tools |    6 +-
- mgmt/main.c    | 1933 --------------------------------------------------------
- 3 files changed, 4 insertions(+), 1937 deletions(-)
- delete mode 100644 mgmt/main.c
+ Makefile.am        |   20 +-
+ acinclude.m4       |    6 -
+ doc/serial-api.txt |  138 +-----
+ serial/main.c      |   59 ---
+ serial/manager.c   |  174 -------
+ serial/manager.h   |   25 --
+ serial/port.c      |  646 --------------------------
+ serial/port.h      |   29 --
+ serial/proxy.c     | 1269 ----------------------------------------------------
+ serial/proxy.h     |   25 --
+ serial/serial.conf |   10 -
+ 11 files changed, 6 insertions(+), 2395 deletions(-)
+ delete mode 100644 serial/main.c
+ delete mode 100644 serial/manager.c
+ delete mode 100644 serial/manager.h
+ delete mode 100644 serial/port.c
+ delete mode 100644 serial/port.h
+ delete mode 100644 serial/proxy.c
+ delete mode 100644 serial/proxy.h
+ delete mode 100644 serial/serial.conf
 
-diff --git a/.gitignore b/.gitignore
-index c7d079e..bc65dcf 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -86,7 +86,7 @@ compat/dund
- compat/hidd
- compat/pand
- unit/test-eir
--mgmt/btmgmt
-+tools/mgmt/btmgmt
- monitor/btmon
- emulator/btvirt
+diff --git a/Makefile.am b/Makefile.am
+index 97146c9..a2c85e2 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -191,14 +191,6 @@ builtin_modules += hog
+ builtin_sources += input/hog_device.h input/hog_device.c
+ endif
  
-diff --git a/Makefile.tools b/Makefile.tools
-index 3cb105c..56839b7 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -50,10 +50,10 @@ tools_ppporc_LDADD = lib/libbluetooth-private.la
+-if SERIALPLUGIN
+-builtin_modules += serial
+-builtin_sources += serial/main.c \
+-			serial/manager.h serial/manager.c \
+-			serial/proxy.h serial/proxy.c \
+-			serial/port.h serial/port.c
+-endif
+-
+ if NETWORKPLUGIN
+ builtin_modules += network
+ builtin_sources += network/main.c \
+@@ -334,11 +326,10 @@ endif
  
- tools_hcieventmask_LDADD = lib/libbluetooth-private.la
+ EXTRA_DIST += src/genbuiltin src/bluetooth.conf src/org.bluez.service \
+ 			src/main.conf network/network.conf \
+-			input/input.conf serial/serial.conf \
++			input/input.conf proximity/proximity.conf \
+ 			audio/audio.conf audio/telephony-dummy.c \
+ 			audio/telephony-maemo5.c audio/telephony-ofono.c \
+-			audio/telephony-maemo6.c sap/sap-dummy.c sap/sap-u8500.c \
+-			proximity/proximity.conf
++			audio/telephony-maemo6.c sap/sap-dummy.c sap/sap-u8500.c
  
--noinst_PROGRAMS += mgmt/btmgmt monitor/btmon emulator/btvirt
-+noinst_PROGRAMS += tools/btmgmt monitor/btmon emulator/btvirt
+ if AUDIOPLUGIN
+ if GSTREAMER
+@@ -392,10 +383,9 @@ EXTRA_DIST += scripts/bluetooth-hid2hci.rules scripts/bluetooth-serial.rules
+ EXTRA_DIST += doc/manager-api.txt \
+ 		doc/adapter-api.txt doc/device-api.txt \
+ 		doc/service-api.txt doc/agent-api.txt doc/attribute-api.txt \
+-		doc/serial-api.txt doc/network-api.txt \
+-		doc/input-api.txt doc/audio-api.txt doc/control-api.txt \
+-		doc/hfp-api.txt doc/health-api.txt doc/sap-api.txt \
+-		doc/media-api.txt doc/assigned-numbers.txt
++		doc/network-api.txt doc/input-api.txt doc/audio-api.txt \
++		doc/control-api.txt doc/hfp-api.txt doc/health-api.txt \
++		doc/sap-api.txt doc/media-api.txt doc/assigned-numbers.txt
  
--mgmt_btmgmt_SOURCES = mgmt/main.c src/glib-helper.c
--mgmt_btmgmt_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@
-+tools_btmgmt_SOURCES = tools/btmgmt.c src/glib-helper.c
-+tools_btmgmt_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@
+ AM_YFLAGS = -d
  
- monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
- 					monitor/mainloop.h monitor/mainloop.c \
-diff --git a/mgmt/main.c b/mgmt/main.c
+diff --git a/acinclude.m4 b/acinclude.m4
+index 3a2a50a..842eea3 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -172,7 +172,6 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	gstreamer_enable=${gstreamer_found}
+ 	audio_enable=yes
+ 	input_enable=yes
+-	serial_enable=yes
+ 	network_enable=yes
+ 	sap_enable=no
+ 	service_enable=yes
+@@ -218,10 +217,6 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	])
+ 	AC_SUBST([SAP_DRIVER], [sap-${sap_driver}.c])
+ 
+-	AC_ARG_ENABLE(serial, AC_HELP_STRING([--disable-serial], [disable serial plugin]), [
+-		serial_enable=${enableval}
+-	])
+-
+ 	AC_ARG_ENABLE(input, AC_HELP_STRING([--disable-input], [disable input plugin]), [
+ 		input_enable=${enableval}
+ 	])
+@@ -345,7 +340,6 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	AM_CONDITIONAL(GSTREAMER, test "${gstreamer_enable}" = "yes" && test "${gstreamer_found}" = "yes")
+ 	AM_CONDITIONAL(AUDIOPLUGIN, test "${audio_enable}" = "yes")
+ 	AM_CONDITIONAL(INPUTPLUGIN, test "${input_enable}" = "yes")
+-	AM_CONDITIONAL(SERIALPLUGIN, test "${serial_enable}" = "yes")
+ 	AM_CONDITIONAL(NETWORKPLUGIN, test "${network_enable}" = "yes")
+ 	AM_CONDITIONAL(SAPPLUGIN, test "${sap_enable}" = "yes")
+ 	AM_CONDITIONAL(SERVICEPLUGIN, test "${service_enable}" = "yes")
+diff --git a/doc/serial-api.txt b/doc/serial-api.txt
+index 0bdbdcd..9bb0054 100644
+--- a/doc/serial-api.txt
++++ b/doc/serial-api.txt
+@@ -11,22 +11,7 @@ Service		org.bluez
+ Interface	org.bluez.Serial
+ Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+ 
+-Methods		string Connect(string pattern)
+-
+-			Connects to a specific RFCOMM based service on a
+-			remote device and then creates a RFCOMM TTY
+-			device for it. The RFCOMM TTY device is returned.
+-
+-			Possible patterns: UUID 128 bit as string
+-					   Profile short names, e.g: spp, dun
+-					   RFCOMM channel as string, 1-30
+-
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.InProgress
+-					 org.bluez.Error.ConnectionAttemptFailed
+-					 org.bluez.Error.NotSupported
+-
+-Methods		fd ConnectFD(string pattern) [experimental]
++Methods		fd Connect(string pattern)
+ 
+ 			Connects to a specific RFCOMM based service on a
+ 			remote device and returns a file descriptor to talk
+@@ -40,124 +25,3 @@ Methods		fd ConnectFD(string pattern) [experimental]
+ 					 org.bluez.Error.InProgress
+ 					 org.bluez.Error.ConnectionAttemptFailed
+ 					 org.bluez.Error.NotSupported
+-
+-
+-		void Disconnect(string device)
+-
+-			Disconnect a RFCOMM TTY device that has been
+-			created by Connect method.
+-
+-			To abort a connection attempt in case of errors or
+-			timeouts in the client it is fine to call this method.
+-
+-			In that case one of patterns of the Connect method should
+-			be supplied instead of the TTY device.
+-
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.DoesNotExist
+-
+-Serial Proxy Manager hierarchy [experimental]
+-=============================================
+-
+-Service		org.bluez
+-Interface	org.bluez.SerialProxyManager
+-Object path	[variable prefix]/{hci0,hci1,...}
+-
+-Methods		array{string} ListProxies()
+-
+-			Returns an array of the object path strings of
+-			all the proxies created for the adapter.
+-
+-		string CreateProxy(string pattern, string address)
+-
+-			Possible patterns: UUID 128 bit as string
+-					   Profile short names, e.g: spp, dun
+-					   RFCOMM channel as string, 1-30
+-
+-			Address is the path to the TTY or Unix socket to be used.
+-			Only one proxy per address (TTY or Unix socket)
+-			is allowed.
+-
+-			The object path of created proxy is returned.
+-			On success this will emit a ProxyCreated signal.
+-
+-			Possible Errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.AlreadyExists
+-					 org.bluez.Error.Failed
+-
+-		void RemoveProxy(string path)
+-
+-			This removes the proxy object at the given path.
+-			On success this will emit a ProxyRemoved signal.
+-
+-			Possible Errors: org.bluez.Error.DoesNotExist
+-					 org.bluez.Error.NotAuthorized
+-
+-Signals		ProxyCreated(string path)
+-
+-			This signal indicates a proxy was created.
+-			Parameter is object path of created proxy.
+-
+-		ProxyRemoved(string path)
+-
+-			This signal indicates a proxy was removed.
+-			Parameter is object path of removed proxy.
+-
+-Serial Proxy hierarchy [experimental]
+-=====================================
+-
+-Service		org.bluez
+-Interface	org.bluez.SerialProxy
+-Object path	[variable prefix]/{hci0,hci1,...}/{proxy0,proxy1,...}
+-
+-Methods		void Enable()
+-
+-			Starts to listen to the TTY or Unix socket, allocates
+-			a RFCOMM channel and add record to the server.
+-
+-			Possible errors: org.bluez.Error.Failed
+-
+-		void Disable()
+-
+-			Stops to listen to the TTY or Unix socket, shutdown
+-			the RFCOMM channel allocated for the proxy, and remove
+-			record from the server.
+-
+-			Possible errors: org.bluez.Error.Failed
+-
+-		dict GetInfo()
+-
+-			Returns all properties for the proxy. See the
+-			properties section for available properties.
+-
+-		void SetSerialParameters(string rate, uint8 data, uint8 stop,
+-			string parity)
+-
+-			Configures serial communication setting baud rate,
+-			data bits, stop bits and parity.
+-
+-			Doesn't allow change TTY settings if it is open.
+-
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.NotAuthorized
+-
+-Properties	string uuid [readonly]
+-
+-			128-bit UUID that represents the available remote service.
+-
+-		string address [readonly]
+-
+-			Address is the path to the TTY or Unix socket name used,
+-			set when the proxy was created.
+-
+-		uint8 channel [readonly]
+-
+-			RFCOMM channel.
+-
+-		boolean enabled [readonly]
+-
+-			Indicates if the proxy is currently enabled.
+-
+-		boolean connected [readonly]
+-
+-			Indicates if the proxy is currently connected.
+diff --git a/serial/main.c b/serial/main.c
 deleted file mode 100644
-index b2d6c3c..0000000
---- a/mgmt/main.c
+index 38ded03..0000000
+--- a/serial/main.c
 +++ /dev/null
-@@ -1,1933 +0,0 @@
+@@ -1,59 +0,0 @@
 -/*
+- *
 - *  BlueZ - Bluetooth protocol stack for Linux
 - *
-- *  Copyright (C) 2011  Intel Corporation. All rights reserved.
+- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+- *
 - *
 - *  This program is free software; you can redistribute it and/or modify
 - *  it under the terms of the GNU General Public License as published by
@@ -81,1914 +298,2258 @@ index b2d6c3c..0000000
 -#include <config.h>
 -#endif
 -
--#include <stdlib.h>
--#include <stdio.h>
--#include <unistd.h>
 -#include <errno.h>
--#include <string.h>
--#include <sys/types.h>
--#include <sys/socket.h>
--#include <poll.h>
--#include <getopt.h>
--#include <stdbool.h>
 -
--#include <bluetooth/bluetooth.h>
--#include <bluetooth/hci.h>
--#include <bluetooth/hci_lib.h>
--#include <bluetooth/sdp.h>
--#include <bluetooth/sdp_lib.h>
--#include <bluetooth/mgmt.h>
+-#include <gdbus.h>
 -
--#include <glib.h>
--#include "glib-helper.h"
+-#include "plugin.h"
+-#include "manager.h"
 -
--static bool monitor = false;
--static bool discovery = false;
--static bool resolve_names = true;
+-static DBusConnection *connection;
 -
--typedef void (*cmd_cb)(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data);
--
--static struct pending_cmd {
--	uint16_t op;
--	uint16_t id;
--	cmd_cb cb;
--	void *user_data;
--	struct pending_cmd *next;
--} *pending = NULL;
--
--static int mgmt_send_cmd(int mgmt_sk, uint16_t op, uint16_t id, void *data,
--				size_t len, cmd_cb func, void *user_data)
+-static int serial_init(void)
 -{
--	char buf[1024];
--	struct pending_cmd *cmd;
--	struct mgmt_hdr *hdr = (void *) buf;
+-	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
+-	if (connection == NULL)
+-		return -EIO;
 -
--	if (len + MGMT_HDR_SIZE > sizeof(buf))
--		return -EINVAL;
--
--	cmd = calloc(1, sizeof(struct pending_cmd));
--	if (cmd == NULL)
--		return -errno;
--
--	cmd->op = op;
--	cmd->id = id;
--	cmd->cb = func;
--	cmd->user_data = user_data;
--
--	memset(buf, 0, sizeof(buf));
--	hdr->opcode = htobs(op);
--	hdr->index = htobs(id);
--	hdr->len = htobs(len);
--	memcpy(buf + MGMT_HDR_SIZE, data, len);
--
--	if (write(mgmt_sk, buf, MGMT_HDR_SIZE + len) < 0) {
--		fprintf(stderr, "Unable to write to socket: %s\n",
--							strerror(errno));
--		free(cmd);
--		return -1;
+-	if (serial_manager_init(connection) < 0) {
+-		dbus_connection_unref(connection);
+-		return -EIO;
 -	}
--
--	cmd->next = pending;
--	pending = cmd;
 -
 -	return 0;
 -}
 -
--static int mgmt_open(void)
+-static void serial_exit(void)
 -{
--	struct sockaddr_hci addr;
--	int sk;
+-	serial_manager_exit();
 -
--	sk = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
--	if (sk < 0) {
--		fprintf(stderr, "socket: %s\n", strerror(errno));
--		return sk;
+-	dbus_connection_unref(connection);
+-}
+-
+-BLUETOOTH_PLUGIN_DEFINE(serial, VERSION,
+-			BLUETOOTH_PLUGIN_PRIORITY_DEFAULT, serial_init, serial_exit)
+diff --git a/serial/manager.c b/serial/manager.c
+deleted file mode 100644
+index 438ba6c..0000000
+--- a/serial/manager.c
++++ /dev/null
+@@ -1,174 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <ctype.h>
+-#include <dirent.h>
+-#include <errno.h>
+-#include <fcntl.h>
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <string.h>
+-#include <termios.h>
+-#include <unistd.h>
+-#include <arpa/inet.h>
+-#include <sys/param.h>
+-#include <sys/ioctl.h>
+-#include <sys/stat.h>
+-#include <sys/types.h>
+-#include <sys/un.h>
+-
+-#include <bluetooth/bluetooth.h>
+-#include <bluetooth/sdp.h>
+-#include <bluetooth/sdp_lib.h>
+-#include <bluetooth/rfcomm.h>
+-#include <bluetooth/uuid.h>
+-
+-#include <glib.h>
+-#include <gdbus.h>
+-
+-#include "../src/dbus-common.h"
+-#include "adapter.h"
+-#include "device.h"
+-
+-#include "log.h"
+-
+-#include "error.h"
+-#include "port.h"
+-#include "proxy.h"
+-#include "storage.h"
+-#include "manager.h"
+-#include "sdpd.h"
+-#include "glib-helper.h"
+-
+-static DBusConnection *connection = NULL;
+-
+-static int serial_probe(struct btd_device *device, const char *uuid)
+-{
+-	struct btd_adapter *adapter = device_get_adapter(device);
+-	const gchar *path = device_get_path(device);
+-	sdp_list_t *protos;
+-	int ch;
+-	bdaddr_t src, dst;
+-	const sdp_record_t *rec;
+-
+-	DBG("path %s: %s", path, uuid);
+-
+-	rec = btd_device_get_record(device, uuid);
+-	if (!rec)
+-		return -EINVAL;
+-
+-	if (sdp_get_access_protos(rec, &protos) < 0)
+-		return -EINVAL;
+-
+-	ch = sdp_get_proto_port(protos, RFCOMM_UUID);
+-	sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free, NULL);
+-	sdp_list_free(protos, NULL);
+-
+-	if (ch < 1 || ch > 30) {
+-		error("Channel out of range: %d", ch);
+-		return -EINVAL;
 -	}
 -
--	memset(&addr, 0, sizeof(addr));
--	addr.hci_family = AF_BLUETOOTH;
--	addr.hci_dev = HCI_DEV_NONE;
--	addr.hci_channel = HCI_CHANNEL_CONTROL;
+-	adapter_get_address(adapter, &src);
+-	device_get_address(device, &dst, NULL);
 -
--	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		fprintf(stderr, "bind: %s\n", strerror(errno));
+-	return port_register(connection, path, &src, &dst, uuid, ch);
+-}
+-
+-static void serial_remove(struct btd_device *device)
+-{
+-	const gchar *path = device_get_path(device);
+-
+-	DBG("path %s", path);
+-
+-	port_unregister(path);
+-}
+-
+-
+-static int port_probe(struct btd_device *device, GSList *uuids)
+-{
+-	while (uuids) {
+-		serial_probe(device, uuids->data);
+-		uuids = uuids->next;
+-	}
+-
+-	return 0;
+-}
+-
+-static void port_remove(struct btd_device *device)
+-{
+-	return serial_remove(device);
+-}
+-
+-static struct btd_device_driver serial_port_driver = {
+-	.name	= "serial-port",
+-	.uuids	= BTD_UUIDS(RFCOMM_UUID_STR),
+-	.probe	= port_probe,
+-	.remove	= port_remove,
+-};
+-
+-static int proxy_probe(struct btd_adapter *adapter)
+-{
+-	const char *path = adapter_get_path(adapter);
+-
+-	DBG("path %s", path);
+-
+-	return proxy_register(connection, adapter);
+-}
+-
+-static void proxy_remove(struct btd_adapter *adapter)
+-{
+-	const char *path = adapter_get_path(adapter);
+-
+-	DBG("path %s", path);
+-
+-	proxy_unregister(adapter);
+-}
+-
+-static struct btd_adapter_driver serial_proxy_driver = {
+-	.name	= "serial-proxy",
+-	.probe	= proxy_probe,
+-	.remove	= proxy_remove,
+-};
+-
+-int serial_manager_init(DBusConnection *conn)
+-{
+-	connection = dbus_connection_ref(conn);
+-
+-	btd_register_adapter_driver(&serial_proxy_driver);
+-	btd_register_device_driver(&serial_port_driver);
+-
+-	return 0;
+-}
+-
+-void serial_manager_exit(void)
+-{
+-	btd_unregister_device_driver(&serial_port_driver);
+-
+-	dbus_connection_unref(connection);
+-	connection = NULL;
+-}
+diff --git a/serial/manager.h b/serial/manager.h
+deleted file mode 100644
+index c8b96e8..0000000
+--- a/serial/manager.h
++++ /dev/null
+@@ -1,25 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-int serial_manager_init(DBusConnection *conn);
+-void serial_manager_exit(void);
+diff --git a/serial/port.c b/serial/port.c
+deleted file mode 100644
+index f90bb6a..0000000
+--- a/serial/port.c
++++ /dev/null
+@@ -1,646 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <errno.h>
+-#include <stdio.h>
+-#include <stdint.h>
+-#include <stdlib.h>
+-#include <string.h>
+-#include <termios.h>
+-#include <unistd.h>
+-#include <sys/ioctl.h>
+-#include <sys/types.h>
+-#include <sys/stat.h>
+-#include <fcntl.h>
+-
+-#include <bluetooth/bluetooth.h>
+-#include <bluetooth/rfcomm.h>
+-#include <bluetooth/sdp.h>
+-#include <bluetooth/sdp_lib.h>
+-
+-#include <glib.h>
+-#include <gdbus.h>
+-
+-#include "../src/dbus-common.h"
+-
+-#include "log.h"
+-#include "glib-helper.h"
+-#include "sdp-client.h"
+-#include "btio.h"
+-
+-#include "error.h"
+-#include "manager.h"
+-#include "adapter.h"
+-#include "device.h"
+-#include "storage.h"
+-#include "port.h"
+-
+-#define SERIAL_PORT_INTERFACE	"org.bluez.Serial"
+-
+-#define MAX_OPEN_TRIES		5
+-#define OPEN_WAIT		300	/* ms. udev node creation retry wait */
+-
+-struct serial_device {
+-	DBusConnection	*conn;		/* for name listener handling */
+-	bdaddr_t	src;		/* Source (local) address */
+-	bdaddr_t	dst;		/* Destination address */
+-	char		*path;		/* Device path */
+-	GSList		*ports;		/* Available ports */
+-};
+-
+-struct serial_port {
+-	DBusMessage	*msg;		/* for name listener handling */
+-	int16_t		id;		/* RFCOMM device id */
+-	uint8_t		channel;	/* RFCOMM channel */
+-	char		*uuid;		/* service identification */
+-	char		*dev;		/* RFCOMM device name */
+-	int		fd;		/* Opened file descriptor */
+-	GIOChannel	*io;		/* BtIO channel */
+-	guint		listener_id;
+-	struct serial_device *device;
+-};
+-
+-static GSList *devices = NULL;
+-
+-static struct serial_device *find_device(GSList *devices, const char *path)
+-{
+-	GSList *l;
+-
+-	for (l = devices; l != NULL; l = l->next) {
+-		struct serial_device *device = l->data;
+-
+-		if (!strcmp(device->path, path))
+-			return device;
+-	}
+-
+-	return NULL;
+-}
+-
+-static struct serial_port *find_port(GSList *ports, const char *pattern)
+-{
+-	GSList *l;
+-	int channel;
+-	char *endptr = NULL;
+-
+-	channel = strtol(pattern, &endptr, 10);
+-
+-	for (l = ports; l != NULL; l = l->next) {
+-		struct serial_port *port = l->data;
+-		char *uuid_str;
+-		int ret;
+-
+-		if (port->uuid && !strcasecmp(port->uuid, pattern))
+-			return port;
+-
+-		if (endptr && *endptr == '\0' && port->channel == channel)
+-			return port;
+-
+-		if (port->dev && !strcmp(port->dev, pattern))
+-			return port;
+-
+-		if (!port->uuid)
+-			continue;
+-
+-		uuid_str = bt_name2string(pattern);
+-		if (!uuid_str)
+-			continue;
+-
+-		ret = strcasecmp(port->uuid, uuid_str);
+-		g_free(uuid_str);
+-		if (ret == 0)
+-			return port;
+-	}
+-
+-	return NULL;
+-}
+-
+-static int port_release(struct serial_port *port)
+-{
+-	struct rfcomm_dev_req req;
+-	int rfcomm_ctl;
+-	int err = 0;
+-
+-	if (port->id < 0) {
+-		if (port->io) {
+-			g_io_channel_shutdown(port->io, TRUE, NULL);
+-			g_io_channel_unref(port->io);
+-			port->io = NULL;
+-		} else
+-			bt_cancel_discovery(&port->device->src,
+-						&port->device->dst);
+-
+-		return 0;
+-	}
+-
+-	DBG("Serial port %s released", port->dev);
+-
+-	rfcomm_ctl = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_RFCOMM);
+-	if (rfcomm_ctl < 0)
+-		return -errno;
+-
+-	if (port->fd >= 0) {
+-		close(port->fd);
+-		port->fd = -1;
+-	}
+-
+-	memset(&req, 0, sizeof(req));
+-	req.dev_id = port->id;
+-
+-	/*
+-	 * We are hitting a kernel bug inside RFCOMM code when
+-	 * RFCOMM_HANGUP_NOW bit is set on request's flags passed to
+-	 * ioctl(RFCOMMRELEASEDEV)!
+-	 */
+-	req.flags = (1 << RFCOMM_HANGUP_NOW);
+-
+-	if (ioctl(rfcomm_ctl, RFCOMMRELEASEDEV, &req) < 0) {
+-		err = -errno;
+-		error("Can't release device %s: %s (%d)",
+-				port->dev, strerror(-err), -err);
+-	}
+-
+-	g_free(port->dev);
+-	port->dev = NULL;
+-	port->id = -1;
+-	close(rfcomm_ctl);
+-	return err;
+-}
+-
+-static void serial_port_free(void *data)
+-{
+-	struct serial_port *port = data;
+-	struct serial_device *device = port->device;
+-
+-	if (device && port->listener_id > 0)
+-		g_dbus_remove_watch(device->conn, port->listener_id);
+-
+-	port_release(port);
+-
+-	g_free(port->uuid);
+-	g_free(port);
+-}
+-
+-static void serial_device_free(void *data)
+-{
+-	struct serial_device *device = data;
+-
+-	g_free(device->path);
+-	if (device->conn)
+-		dbus_connection_unref(device->conn);
+-	g_free(device);
+-}
+-
+-static void port_owner_exited(DBusConnection *conn, void *user_data)
+-{
+-	struct serial_port *port = user_data;
+-
+-	port_release(port);
+-
+-	port->listener_id = 0;
+-}
+-
+-static void path_unregister(void *data)
+-{
+-	struct serial_device *device = data;
+-
+-	DBG("Unregistered interface %s on path %s", SERIAL_PORT_INTERFACE,
+-		device->path);
+-
+-	devices = g_slist_remove(devices, device);
+-	serial_device_free(device);
+-}
+-
+-void port_release_all(void)
+-{
+-	g_slist_free_full(devices, serial_device_free);
+-}
+-
+-static void open_notify(int fd, int err, struct serial_port *port)
+-{
+-	struct serial_device *device = port->device;
+-	DBusMessage *reply;
+-
+-	if (err < 0) {
+-		/* Max tries exceeded */
+-		port_release(port);
+-		reply = btd_error_failed(port->msg, strerror(-err));
+-	} else {
+-		port->fd = fd;
+-		reply = g_dbus_create_reply(port->msg,
+-				DBUS_TYPE_STRING, &port->dev,
+-				DBUS_TYPE_INVALID);
+-	}
+-
+-	/* Reply to the requestor */
+-	g_dbus_send_message(device->conn, reply);
+-}
+-
+-static gboolean open_continue(gpointer user_data)
+-{
+-	struct serial_port *port = user_data;
+-	int fd;
+-	static int ntries = MAX_OPEN_TRIES;
+-
+-	if (!port->listener_id)
+-		return FALSE; /* Owner exited */
+-
+-	fd = open(port->dev, O_RDONLY | O_NOCTTY);
+-	if (fd < 0) {
+-		int err = -errno;
+-		error("Could not open %s: %s (%d)",
+-				port->dev, strerror(-err), -err);
+-		if (!--ntries) {
+-			/* Reporting error */
+-			open_notify(fd, err, port);
+-			ntries = MAX_OPEN_TRIES;
+-			return FALSE;
+-		}
+-		return TRUE;
+-	}
+-
+-	/* Connection succeeded */
+-	open_notify(fd, 0, port);
+-	return FALSE;
+-}
+-
+-static int port_open(struct serial_port *port)
+-{
+-	int fd;
+-
+-	fd = open(port->dev, O_RDONLY | O_NOCTTY);
+-	if (fd < 0) {
+-		g_timeout_add(OPEN_WAIT, open_continue, port);
+-		return -EINPROGRESS;
+-	}
+-
+-	return fd;
+-}
+-
+-static void rfcomm_connect_cb(GIOChannel *chan, GError *conn_err,
+-							gpointer user_data)
+-{
+-	struct serial_port *port = user_data;
+-	struct serial_device *device = port->device;
+-	struct rfcomm_dev_req req;
+-	int sk, fd;
+-	DBusMessage *reply;
+-
+-	/* Owner exited? */
+-	if (!port->listener_id)
+-		return;
+-
+-	if (conn_err) {
+-		error("%s", conn_err->message);
+-		reply = btd_error_failed(port->msg, conn_err->message);
+-		goto fail;
+-	}
+-
+-	sk = g_io_channel_unix_get_fd(chan);
+-
+-	if (dbus_message_has_member(port->msg, "ConnectFD")) {
+-		reply = g_dbus_create_reply(port->msg, DBUS_TYPE_UNIX_FD, &sk,
+-							DBUS_TYPE_INVALID);
+-		g_dbus_send_message(device->conn, reply);
+-
 -		close(sk);
--		return -1;
+-
+-		g_dbus_remove_watch(device->conn, port->listener_id);
+-		port->listener_id = 0;
+-
+-		return;
+-	}
+-
+-	memset(&req, 0, sizeof(req));
+-	req.dev_id = -1;
+-	req.flags = (1 << RFCOMM_REUSE_DLC);
+-	bacpy(&req.src, &device->src);
+-	bacpy(&req.dst, &device->dst);
+-	req.channel = port->channel;
+-
+-	g_io_channel_unref(port->io);
+-	port->io = NULL;
+-
+-	port->id = ioctl(sk, RFCOMMCREATEDEV, &req);
+-	if (port->id < 0) {
+-		int err = -errno;
+-		error("ioctl(RFCOMMCREATEDEV): %s (%d)", strerror(-err), -err);
+-		reply = btd_error_failed(port->msg, strerror(-err));
+-		g_io_channel_shutdown(chan, TRUE, NULL);
+-		goto fail;
+-	}
+-
+-	port->dev = g_strdup_printf("/dev/rfcomm%d", port->id);
+-
+-	DBG("Serial port %s created", port->dev);
+-
+-	g_io_channel_shutdown(chan, TRUE, NULL);
+-
+-	/* Addressing connect port */
+-	fd = port_open(port);
+-	if (fd < 0)
+-		/* Open in progress: Wait the callback */
+-		return;
+-
+-	open_notify(fd, 0, port);
+-	return;
+-
+-fail:
+-	g_dbus_send_message(device->conn, reply);
+-	g_dbus_remove_watch(device->conn, port->listener_id);
+-	port->listener_id = 0;
+-}
+-
+-static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
+-{
+-	struct serial_port *port = user_data;
+-	struct serial_device *device = port->device;
+-	sdp_record_t *record = NULL;
+-	sdp_list_t *protos;
+-	DBusMessage *reply;
+-	GError *gerr = NULL;
+-
+-	if (!port->listener_id)
+-		return;
+-
+-	if (err < 0) {
+-		error("Unable to get service record: %s (%d)", strerror(-err),
+-			-err);
+-		reply = btd_error_failed(port->msg, strerror(-err));
+-		goto failed;
+-	}
+-
+-	if (!recs || !recs->data) {
+-		error("No record found");
+-		reply = btd_error_failed(port->msg, "No record found");
+-		goto failed;
+-	}
+-
+-	record = recs->data;
+-
+-	if (sdp_get_access_protos(record, &protos) < 0) {
+-		error("Unable to get access protos from port record");
+-		reply = btd_error_failed(port->msg, "Invalid channel");
+-		goto failed;
+-	}
+-
+-	port->channel = sdp_get_proto_port(protos, RFCOMM_UUID);
+-
+-	sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free, NULL);
+-	sdp_list_free(protos, NULL);
+-
+-	port->io = bt_io_connect(BT_IO_RFCOMM, rfcomm_connect_cb, port,
+-				NULL, &gerr,
+-				BT_IO_OPT_SOURCE_BDADDR, &device->src,
+-				BT_IO_OPT_DEST_BDADDR, &device->dst,
+-				BT_IO_OPT_CHANNEL, port->channel,
+-				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+-				BT_IO_OPT_INVALID);
+-	if (!port->io) {
+-		error("%s", gerr->message);
+-		reply = btd_error_failed(port->msg, gerr->message);
+-		g_error_free(gerr);
+-		goto failed;
+-	}
+-
+-	return;
+-
+-failed:
+-	g_dbus_remove_watch(device->conn, port->listener_id);
+-	port->listener_id = 0;
+-	g_dbus_send_message(device->conn, reply);
+-}
+-
+-static int connect_port(struct serial_port *port)
+-{
+-	struct serial_device *device = port->device;
+-	uuid_t uuid;
+-	int err;
+-
+-	if (!port->uuid)
+-		goto connect;
+-
+-	err = bt_string2uuid(&uuid, port->uuid);
+-	if (err < 0)
+-		return err;
+-
+-	sdp_uuid128_to_uuid(&uuid);
+-
+-	return bt_search_service(&device->src, &device->dst, &uuid,
+-				get_record_cb, port, NULL);
+-
+-connect:
+-	port->io = bt_io_connect(BT_IO_RFCOMM, rfcomm_connect_cb, port,
+-				NULL, NULL,
+-				BT_IO_OPT_SOURCE_BDADDR, &device->src,
+-				BT_IO_OPT_DEST_BDADDR, &device->dst,
+-				BT_IO_OPT_CHANNEL, port->channel,
+-				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+-				BT_IO_OPT_INVALID);
+-	if (port->io == NULL)
+-		return -EIO;
+-
+-	return 0;
+-}
+-
+-static struct serial_port *create_port(struct serial_device *device,
+-					const char *uuid, uint8_t channel)
+-{
+-	struct serial_port *port;
+-
+-	port = g_new0(struct serial_port, 1);
+-	port->uuid = g_strdup(uuid);
+-	port->channel = channel;
+-	port->device = device;
+-	port->id = -1;
+-	port->fd = -1;
+-
+-	device->ports = g_slist_append(device->ports, port);
+-
+-	return port;
+-}
+-
+-static DBusMessage *port_connect(DBusConnection *conn,
+-					DBusMessage *msg, void *user_data)
+-{
+-	struct serial_device *device = user_data;
+-	struct serial_port *port;
+-	const char *pattern;
+-	int err;
+-
+-	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &pattern,
+-						DBUS_TYPE_INVALID) == FALSE)
+-		return NULL;
+-
+-	port = find_port(device->ports, pattern);
+-	if (!port) {
+-		char *endptr = NULL;
+-		int channel;
+-
+-		channel = strtol(pattern, &endptr, 10);
+-		if ((endptr && *endptr != '\0') || channel < 1 || channel > 30)
+-			return btd_error_does_not_exist(msg);
+-
+-		port = create_port(device, NULL, channel);
+-	}
+-
+-	if (port->listener_id)
+-		return btd_error_failed(msg, "Port already in use");
+-
+-	port->listener_id = g_dbus_add_disconnect_watch(conn,
+-						dbus_message_get_sender(msg),
+-						port_owner_exited, port,
+-						NULL);
+-
+-	port->msg = dbus_message_ref(msg);
+-
+-	err = connect_port(port);
+-	if (err < 0) {
+-		error("%s", strerror(-err));
+-		g_dbus_remove_watch(conn, port->listener_id);
+-		port->listener_id = 0;
+-
+-		return btd_error_failed(msg, strerror(-err));
+-	}
+-
+-	return NULL;
+-}
+-
+-static DBusMessage *port_disconnect(DBusConnection *conn,
+-					DBusMessage *msg, void *user_data)
+-{
+-	struct serial_device *device = user_data;
+-	struct serial_port *port;
+-	const char *dev, *owner, *caller;
+-
+-	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &dev,
+-						DBUS_TYPE_INVALID) == FALSE)
+-		return NULL;
+-
+-	port = find_port(device->ports, dev);
+-	if (!port)
+-		return btd_error_does_not_exist(msg);
+-
+-	if (!port->listener_id)
+-		return btd_error_not_connected(msg);
+-
+-	owner = dbus_message_get_sender(port->msg);
+-	caller = dbus_message_get_sender(msg);
+-	if (!g_str_equal(owner, caller))
+-		return btd_error_not_authorized(msg);
+-
+-	port_release(port);
+-
+-	g_dbus_remove_watch(conn, port->listener_id);
+-	port->listener_id = 0;
+-
+-	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+-}
+-
+-static const GDBusMethodTable port_methods[] = {
+-	{ GDBUS_ASYNC_METHOD("Connect",
+-		GDBUS_ARGS({ "pattern", "s" }),	GDBUS_ARGS({ "tty", "s" }),
+-		port_connect) },
+-	{ GDBUS_ASYNC_METHOD("ConnectFD",
+-		GDBUS_ARGS({ "pattern", "s" }), GDBUS_ARGS({ "fd", "s" }),
+-		port_connect) },
+-	{ GDBUS_METHOD("Disconnect",
+-		GDBUS_ARGS({ "device", "s" }), NULL,
+-		port_disconnect) },
+-	{ }
+-};
+-
+-static struct serial_device *create_serial_device(DBusConnection *conn,
+-					const char *path, bdaddr_t *src,
+-					bdaddr_t *dst)
+-{
+-	struct serial_device *device;
+-
+-	device = g_new0(struct serial_device, 1);
+-	device->conn = dbus_connection_ref(conn);
+-	bacpy(&device->dst, dst);
+-	bacpy(&device->src, src);
+-	device->path = g_strdup(path);
+-
+-	if (!g_dbus_register_interface(conn, path,
+-				SERIAL_PORT_INTERFACE,
+-				port_methods, NULL, NULL,
+-				device, path_unregister)) {
+-		error("D-Bus failed to register %s interface",
+-				SERIAL_PORT_INTERFACE);
+-		serial_device_free(device);
+-		return NULL;
+-	}
+-
+-	DBG("Registered interface %s on path %s",
+-		SERIAL_PORT_INTERFACE, path);
+-
+-	return device;
+-}
+-
+-int port_register(DBusConnection *conn, const char *path, bdaddr_t *src,
+-			bdaddr_t *dst, const char *uuid, uint8_t channel)
+-{
+-	struct serial_device *device;
+-	struct serial_port *port;
+-
+-	device = find_device(devices, path);
+-	if (!device) {
+-		device = create_serial_device(conn, path, src, dst);
+-		if (!device)
+-			return -1;
+-		devices = g_slist_append(devices, device);
+-	}
+-
+-	if (find_port(device->ports, uuid))
+-		return 0;
+-
+-	port = g_new0(struct serial_port, 1);
+-	port->uuid = g_strdup(uuid);
+-	port->channel = channel;
+-	port->device = device;
+-	port->id = -1;
+-	port->fd = -1;
+-
+-	device->ports = g_slist_append(device->ports, port);
+-
+-	return 0;
+-}
+-
+-int port_unregister(const char *path)
+-{
+-	struct serial_device *device;
+-
+-	device = find_device(devices, path);
+-	if (!device)
+-		return -ENOENT;
+-
+-	g_slist_free_full(device->ports, serial_port_free);
+-
+-	g_dbus_unregister_interface(device->conn, path, SERIAL_PORT_INTERFACE);
+-
+-	return 0;
+-}
+diff --git a/serial/port.h b/serial/port.h
+deleted file mode 100644
+index 74ac9f0..0000000
+--- a/serial/port.h
++++ /dev/null
+@@ -1,29 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-void port_release_all(void);
+-
+-int port_register(DBusConnection *conn, const char *path, bdaddr_t *src,
+-		  bdaddr_t *dst, const char *name, uint8_t channel);
+-
+-int port_unregister(const char *path);
+diff --git a/serial/proxy.c b/serial/proxy.c
+deleted file mode 100644
+index dd38317..0000000
+--- a/serial/proxy.c
++++ /dev/null
+@@ -1,1269 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <ctype.h>
+-#include <dirent.h>
+-#include <errno.h>
+-#include <fcntl.h>
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <string.h>
+-#include <termios.h>
+-#include <unistd.h>
+-#include <arpa/inet.h>
+-#include <sys/param.h>
+-#include <sys/ioctl.h>
+-#include <sys/stat.h>
+-#include <sys/types.h>
+-#include <sys/un.h>
+-
+-#include <bluetooth/bluetooth.h>
+-#include <bluetooth/sdp.h>
+-#include <bluetooth/sdp_lib.h>
+-#include <bluetooth/rfcomm.h>
+-
+-#include <glib.h>
+-#include <gdbus.h>
+-
+-#include "../src/dbus-common.h"
+-#include "../src/adapter.h"
+-
+-#include "log.h"
+-
+-#include "error.h"
+-#include "sdpd.h"
+-#include "glib-helper.h"
+-#include "btio.h"
+-#include "proxy.h"
+-
+-#define SERIAL_PROXY_INTERFACE	"org.bluez.SerialProxy"
+-#define SERIAL_MANAGER_INTERFACE "org.bluez.SerialProxyManager"
+-#define BUF_SIZE		1024
+-
+-typedef enum {
+-	TTY_PROXY,
+-	UNIX_SOCKET_PROXY,
+-	TCP_SOCKET_PROXY,
+-	UNKNOWN_PROXY_TYPE = 0xFF
+-} proxy_type_t;
+-
+-struct serial_adapter {
+-	struct btd_adapter	*btd_adapter;	/* Adapter pointer */
+-	DBusConnection		*conn;		/* Adapter connection */
+-	GSList			*proxies;	/* Proxies list */
+-};
+-
+-struct serial_proxy {
+-	bdaddr_t	src;		/* Local address */
+-	bdaddr_t	dst;		/* Remote address */
+-	char		*path;		/* Proxy path */
+-	char		*uuid128;	/* UUID 128 */
+-	char		*address;	/* TTY or Unix socket name */
+-	char		*owner;		/* Application bus name */
+-	guint		watch;		/* Application watch */
+-	short int	port;		/* TCP port */
+-	proxy_type_t	type;		/* TTY or Unix socket */
+-	struct termios  sys_ti;		/* Default TTY setting */
+-	struct termios  proxy_ti;	/* Proxy TTY settings */
+-	uint8_t		channel;	/* RFCOMM channel */
+-	uint32_t	record_id;	/* Service record id */
+-	GIOChannel	*io;		/* Server listen */
+-	GIOChannel	*rfcomm;	/* Remote RFCOMM channel*/
+-	GIOChannel	*local;		/* Local channel: TTY or Unix socket */
+-	struct serial_adapter *adapter;	/* Adapter pointer */
+-};
+-
+-static GSList *adapters = NULL;
+-static int sk_counter = 0;
+-
+-static void disable_proxy(struct serial_proxy *prx)
+-{
+-	if (prx->rfcomm) {
+-		g_io_channel_shutdown(prx->rfcomm, TRUE, NULL);
+-		g_io_channel_unref(prx->rfcomm);
+-		prx->rfcomm = NULL;
+-	}
+-
+-	if (prx->local) {
+-		g_io_channel_shutdown(prx->local, TRUE, NULL);
+-		g_io_channel_unref(prx->local);
+-		prx->local = NULL;
+-	}
+-
+-	remove_record_from_server(prx->record_id);
+-	prx->record_id = 0;
+-
+-	g_io_channel_unref(prx->io);
+-	prx->io = NULL;
+-}
+-
+-static void proxy_free(struct serial_proxy *prx)
+-{
+-	g_free(prx->owner);
+-	g_free(prx->path);
+-	g_free(prx->address);
+-	g_free(prx->uuid128);
+-	g_free(prx);
+-}
+-
+-static sdp_record_t *proxy_record_new(const char *uuid128, uint8_t channel)
+-{
+-	sdp_list_t *apseq, *aproto, *profiles, *proto[2], *root, *svclass_id;
+-	uuid_t uuid, root_uuid, l2cap, rfcomm;
+-	sdp_profile_desc_t profile;
+-	sdp_record_t *record;
+-	sdp_data_t *ch;
+-
+-	record = sdp_record_alloc();
+-	if (!record)
+-		return NULL;
+-
+-	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
+-	root = sdp_list_append(NULL, &root_uuid);
+-	sdp_set_browse_groups(record, root);
+-	sdp_list_free(root, NULL);
+-
+-	bt_string2uuid(&uuid, uuid128);
+-	sdp_uuid128_to_uuid(&uuid);
+-	svclass_id = sdp_list_append(NULL, &uuid);
+-	sdp_set_service_classes(record, svclass_id);
+-	sdp_list_free(svclass_id, NULL);
+-
+-	sdp_uuid16_create(&profile.uuid, SERIAL_PORT_PROFILE_ID);
+-	profile.version = 0x0100;
+-	profiles = sdp_list_append(NULL, &profile);
+-	sdp_set_profile_descs(record, profiles);
+-	sdp_list_free(profiles, NULL);
+-
+-	sdp_uuid16_create(&l2cap, L2CAP_UUID);
+-	proto[0] = sdp_list_append(NULL, &l2cap);
+-	apseq = sdp_list_append(NULL, proto[0]);
+-
+-	sdp_uuid16_create(&rfcomm, RFCOMM_UUID);
+-	proto[1] = sdp_list_append(NULL, &rfcomm);
+-	ch = sdp_data_alloc(SDP_UINT8, &channel);
+-	proto[1] = sdp_list_append(proto[1], ch);
+-	apseq = sdp_list_append(apseq, proto[1]);
+-
+-	aproto = sdp_list_append(NULL, apseq);
+-	sdp_set_access_protos(record, aproto);
+-
+-	sdp_add_lang_attr(record);
+-
+-	sdp_set_info_attr(record, "Serial Proxy", NULL, "Serial Proxy");
+-
+-	sdp_data_free(ch);
+-	sdp_list_free(proto[0], NULL);
+-	sdp_list_free(proto[1], NULL);
+-	sdp_list_free(apseq, NULL);
+-	sdp_list_free(aproto, NULL);
+-
+-	return record;
+-}
+-
+-static int channel_write(GIOChannel *chan, char *buf, size_t size)
+-{
+-	size_t wbytes;
+-	ssize_t written;
+-	int fd;
+-
+-	fd = g_io_channel_unix_get_fd(chan);
+-
+-	wbytes = 0;
+-	while (wbytes < size) {
+-		written = write(fd, buf + wbytes, size - wbytes);
+-		if (written < 0)
+-			return -errno;
+-
+-		wbytes += written;
+-	}
+-
+-	return 0;
+-}
+-
+-static gboolean forward_data(GIOChannel *chan, GIOCondition cond, gpointer data)
+-{
+-	char buf[BUF_SIZE];
+-	struct serial_proxy *prx = data;
+-	GIOChannel *dest;
+-	ssize_t rbytes;
+-	int fd, err;
+-
+-	if (cond & G_IO_NVAL)
+-		return FALSE;
+-
+-	dest = (chan == prx->rfcomm) ? prx->local : prx->rfcomm;
+-
+-	fd = g_io_channel_unix_get_fd(chan);
+-
+-	if (cond & (G_IO_HUP | G_IO_ERR)) {
+-		/* Try forward remaining data */
+-		do {
+-			rbytes = read(fd, buf, sizeof(buf));
+-			if (rbytes <= 0)
+-				break;
+-
+-			err = channel_write(dest, buf, rbytes);
+-		} while (err == 0);
+-
+-		g_io_channel_shutdown(prx->local, TRUE, NULL);
+-		g_io_channel_unref(prx->local);
+-		prx->local = NULL;
+-
+-		g_io_channel_shutdown(prx->rfcomm, TRUE, NULL);
+-		g_io_channel_unref(prx->rfcomm);
+-		prx->rfcomm = NULL;
+-
+-		return FALSE;
+-	}
+-
+-	rbytes = read(fd, buf, sizeof(buf));
+-	if (rbytes < 0)
+-		return FALSE;
+-
+-	err = channel_write(dest, buf, rbytes);
+-	if (err != 0)
+-		return FALSE;
+-
+-	return TRUE;
+-}
+-
+-static inline int unix_socket_connect(const char *address)
+-{
+-	struct sockaddr_un addr;
+-	int err, sk;
+-
+-	memset(&addr, 0, sizeof(addr));
+-	addr.sun_family = PF_UNIX;
+-
+-	if (strncmp("x00", address, 3) == 0) {
+-		/*
+-		 * Abstract namespace: first byte NULL, x00
+-		 * must be removed from the original address.
+-		 */
+-		strncpy(addr.sun_path + 1, address + 3,
+-						sizeof(addr.sun_path) - 2);
+-	} else {
+-		/* Filesystem address */
+-		strncpy(addr.sun_path, address, sizeof(addr.sun_path) - 1);
+-	}
+-
+-	/* Unix socket */
+-	sk = socket(AF_UNIX, SOCK_STREAM, 0);
+-	if (sk < 0) {
+-		err = -errno;
+-		error("Unix socket(%s) create failed: %s(%d)",
+-				address, strerror(-err), -err);
+-		return err;
+-	}
+-
+-	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+-		err = -errno;
+-		error("Unix socket(%s) connect failed: %s(%d)",
+-				address, strerror(-err), -err);
+-		close(sk);
+-		return err;
 -	}
 -
 -	return sk;
 -}
 -
--static void mgmt_check_pending(int mgmt_sk, uint16_t op, uint16_t index,
--				uint16_t status, void *data, uint16_t len)
+-static int tcp_socket_connect(const char *address)
 -{
--	struct pending_cmd *c, *prev;
+-	struct sockaddr_in addr;
+-	int err, sk, port;
 -
--	for (c = pending, prev = NULL; c != NULL; prev = c, c = c->next) {
--		if (c->op != op)
--			continue;
--		if (c->id != index)
--			continue;
+-	memset(&addr, 0, sizeof(addr));
 -
--		if (c == pending)
--			pending = c->next;
--		else
--			prev->next = c->next;
+-	if (strncmp(address, "localhost", 9) != 0) {
+-		error("Address should have the form localhost:port.");
+-		return -1;
+-	}
+-	port = atoi(strchr(address, ':') + 1);
+-	if (port <= 0) {
+-		error("Invalid port '%d'.", port);
+-		return -1;
+-	}
+-	addr.sin_family = AF_INET;
+-	addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+-	addr.sin_port = htons(port);
 -
--		c->cb(mgmt_sk, op, index, status, data, len, c->user_data);
+-	sk = socket(PF_INET, SOCK_STREAM, 0);
+-	if (sk < 0) {
+-		err = -errno;
+-		error("TCP socket(%s) create failed %s(%d)", address,
+-							strerror(-err), -err);
+-		return err;
+-	}
+-	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+-		err = -errno;
+-		error("TCP socket(%s) connect failed: %s(%d)",
+-						address, strerror(-err), -err);
+-		close(sk);
+-		return err;
+-	}
+-	return sk;
+-}
 -
--		free(c);
+-static inline int tty_open(const char *tty, struct termios *ti)
+-{
+-	int err, sk;
+-
+-	sk = open(tty, O_RDWR | O_NOCTTY);
+-	if (sk < 0) {
+-		err = -errno;
+-		error("Can't open TTY %s: %s(%d)", tty, strerror(-err), -err);
+-		return err;
+-	}
+-
+-	if (ti && tcsetattr(sk, TCSANOW, ti) < 0) {
+-		err = -errno;
+-		error("Can't change serial settings: %s(%d)",
+-				strerror(-err), -err);
+-		close(sk);
+-		return err;
+-	}
+-
+-	return sk;
+-}
+-
+-static void connect_event_cb(GIOChannel *chan, GError *conn_err, gpointer data)
+-{
+-	struct serial_proxy *prx = data;
+-	int sk;
+-
+-	if (conn_err) {
+-		error("%s", conn_err->message);
+-		goto drop;
+-	}
+-
+-	/* Connect local */
+-	switch (prx->type) {
+-	case UNIX_SOCKET_PROXY:
+-		sk = unix_socket_connect(prx->address);
 -		break;
--	}
--}
--
--static int mgmt_cmd_complete(int mgmt_sk, uint16_t index,
--				struct mgmt_ev_cmd_complete *ev, uint16_t len)
--{
--	uint16_t op;
--
--	if (len < sizeof(*ev)) {
--		fprintf(stderr, "Too short (%u bytes) cmd complete event\n",
--									len);
--		return -EINVAL;
--	}
--
--	op = bt_get_le16(&ev->opcode);
--
--	len -= sizeof(*ev);
--
--	if (monitor)
--		printf("%s complete, opcode 0x%04x len %u\n", mgmt_opstr(op),
--								op, len);
--
--	mgmt_check_pending(mgmt_sk, op, index, ev->status, ev->data, len);
--
--	return 0;
--}
--
--static int mgmt_cmd_status(int mgmt_sk, uint16_t index,
--				struct mgmt_ev_cmd_status *ev, uint16_t len)
--{
--	uint16_t opcode;
--
--	if (len < sizeof(*ev)) {
--		fprintf(stderr, "Too short (%u bytes) cmd status event\n",
--									len);
--		return -EINVAL;
--	}
--
--	opcode = bt_get_le16(&ev->opcode);
--
--	if (monitor)
--		printf("cmd status, opcode 0x%04x status 0x%02x (%s)\n",
--				opcode, ev->status, mgmt_errstr(ev->status));
--
--	if (ev->status != 0)
--		mgmt_check_pending(mgmt_sk, opcode, index, ev->status,
--								NULL, 0);
--
--	return 0;
--}
--
--static int mgmt_controller_error(uint16_t index,
--					struct mgmt_ev_controller_error *ev,
--					uint16_t len)
--{
--	if (len < sizeof(*ev)) {
--		fprintf(stderr,
--			"Too short (%u bytes) controller error event\n", len);
--		return -EINVAL;
--	}
--
--	if (monitor)
--		printf("hci%u error 0x%02x\n", index, ev->error_code);
--
--	return 0;
--}
--
--static int mgmt_index_added(int mgmt_sk, uint16_t index)
--{
--	if (monitor)
--		printf("hci%u added\n", index);
--	return 0;
--}
--
--static int mgmt_index_removed(int mgmt_sk, uint16_t index)
--{
--	if (monitor)
--		printf("hci%u removed\n", index);
--	return 0;
--}
--
--static const char *settings_str[] = {
--				"powered",
--				"connectable",
--				"fast-connectable",
--				"discoverable",
--				"pairable",
--				"link-security",
--				"ssp",
--				"br/edr",
--				"hs",
--				"le" ,
--};
--
--static void print_settings(uint32_t settings)
--{
--	unsigned i;
--
--	for (i = 0; i < NELEM(settings_str); i++) {
--		if ((settings & (1 << i)) != 0)
--			printf("%s ", settings_str[i]);
--	}
--}
--
--static int mgmt_new_settings(int mgmt_sk, uint16_t index,
--					uint32_t *ev, uint16_t len)
--{
--	if (len < sizeof(*ev)) {
--		fprintf(stderr, "Too short new_settings event (%u)\n", len);
--		return -EINVAL;
--	}
--
--	if (monitor) {
--		printf("hci%u new_settings: ", index);
--		print_settings(bt_get_le32(ev));
--		printf("\n");
--	}
--
--	return 0;
--}
--
--static int mgmt_discovering(int mgmt_sk, uint16_t index,
--				struct mgmt_ev_discovering *ev, uint16_t len)
--{
--	if (len < sizeof(*ev)) {
--		fprintf(stderr, "Too short (%u bytes) discovering event\n",
--									len);
--		return -EINVAL;
--	}
--
--	if (ev->discovering == 0 && discovery)
--		exit(EXIT_SUCCESS);
--
--	if (monitor)
--		printf("hci%u type %u discovering %s\n", index,
--				ev->type, ev->discovering ? "on" : "off");
--
--	return 0;
--}
--
--static int mgmt_new_link_key(int mgmt_sk, uint16_t index,
--				struct mgmt_ev_new_link_key *ev, uint16_t len)
--{
--
--	if (len != sizeof(*ev)) {
--		fprintf(stderr, "Invalid new_link_key length (%u bytes)\n",
--									len);
--		return -EINVAL;
--	}
--
--	if (monitor) {
--		char addr[18];
--		ba2str(&ev->key.addr.bdaddr, addr);
--		printf("hci%u new_link_key %s type 0x%02x pin_len %d "
--				"store_hint %u\n", index, addr, ev->key.type,
--				ev->key.pin_len, ev->store_hint);
--	}
--
--	return 0;
--}
--
--static const char *typestr(uint8_t type)
--{
--	const char *str[] = { "BR/EDR", "LE Public", "LE Random" };
--
--	if (type <= BDADDR_LE_RANDOM)
--		return str[type];
--
--	return "(unknown)";
--}
--
--static int mgmt_connected(int mgmt_sk, uint16_t index,
--					struct mgmt_ev_device_connected *ev,
--					uint16_t len)
--{
--	uint16_t eir_len;
--
--	if (len < sizeof(*ev)) {
--		fprintf(stderr,
--			"Invalid connected event length (%u bytes)\n", len);
--		return -EINVAL;
--	}
--
--	eir_len = bt_get_le16(&ev->eir_len);
--	if (len != sizeof(*ev) + eir_len) {
--		fprintf(stderr, "Invalid connected event length "
--			"(%u bytes, eir_len %u bytes)\n", len, eir_len);
--		return -EINVAL;
--	}
--
--	if (monitor) {
--		char addr[18];
--		ba2str(&ev->addr.bdaddr, addr);
--		printf("hci%u %s type %s connected eir_len %u\n", index, addr,
--					typestr(ev->addr.type), eir_len);
--	}
--
--	return 0;
--}
--
--static int mgmt_disconnected(int mgmt_sk, uint16_t index,
--				struct mgmt_addr_info *ev, uint16_t len)
--{
--	if (len != sizeof(*ev)) {
--		fprintf(stderr,
--			"Invalid disconnected event length (%u bytes)\n", len);
--		return -EINVAL;
--	}
--
--	if (monitor) {
--		char addr[18];
--		ba2str(&ev->bdaddr, addr);
--		printf("hci%u %s type %s disconnected\n", index, addr,
--							typestr(ev->type));
--	}
--
--	return 0;
--}
--
--static int mgmt_conn_failed(int mgmt_sk, uint16_t index,
--				struct mgmt_ev_connect_failed *ev,
--				uint16_t len)
--{
--	if (len != sizeof(*ev)) {
--		fprintf(stderr,
--			"Invalid connect_failed event length (%u bytes)\n", len);
--		return -EINVAL;
--	}
--
--	if (monitor) {
--		char addr[18];
--		ba2str(&ev->addr.bdaddr, addr);
--		printf("hci%u %s type %s connect failed (status 0x%02x, %s)\n",
--				index, addr, typestr(ev->addr.type), ev->status,
--				mgmt_errstr(ev->status));
--	}
--
--	return 0;
--}
--
--static int mgmt_auth_failed(int mgmt_sk, uint16_t index,
--				struct mgmt_ev_auth_failed *ev,
--				uint16_t len)
--{
--	if (len != sizeof(*ev)) {
--		fprintf(stderr,
--			"Invalid auth_failed event length (%u bytes)\n", len);
--		return -EINVAL;
--	}
--
--	if (monitor) {
--		char addr[18];
--		ba2str(&ev->addr.bdaddr, addr);
--		printf("hci%u %s auth failed with status 0x%02x (%s)\n",
--			index, addr, ev->status, mgmt_errstr(ev->status));
--	}
--
--	return 0;
--}
--
--static int mgmt_name_changed(int mgmt_sk, uint16_t index,
--				struct mgmt_ev_local_name_changed *ev,
--				uint16_t len)
--{
--	if (len != sizeof(*ev)) {
--		fprintf(stderr,
--			"Invalid local_name_changed length (%u bytes)\n", len);
--		return -EINVAL;
--	}
--
--	if (monitor)
--		printf("hci%u name changed: %s\n", index, ev->name);
--
--	return 0;
--}
--
--static void confirm_name_rsp(int mgmt_sk, uint16_t op, uint16_t id,
--				uint8_t status, void *rsp, uint16_t len,
--				void *user_data)
--{
--	struct mgmt_rp_confirm_name *rp = rsp;
--	char addr[18];
--
--	if (len == 0 && status != 0) {
--		fprintf(stderr,
--			"hci%u confirm_name failed with status 0x%02x (%s)\n",
--					id, status, mgmt_errstr(status));
--		return;
--	}
--
--	if (len != sizeof(*rp)) {
--		fprintf(stderr,
--			"hci%u confirm_name rsp length %u instead of %zu\n",
--			id, len, sizeof(*rp));
--		return;
--	}
--
--	ba2str(&rp->addr.bdaddr, addr);
--
--	if (status != 0)
--		fprintf(stderr,
--			"hci%u confirm_name for %s failed: 0x%02x (%s)\n",
--			id, addr, status, mgmt_errstr(status));
--	else
--		printf("hci%u confirm_name succeeded for %s\n", id, addr);
--}
--
--static int mgmt_device_found(int mgmt_sk, uint16_t index,
--				struct mgmt_ev_device_found *ev, uint16_t len)
--{
--	uint32_t flags;
--	uint16_t eir_len;
--
--	if (len < sizeof(*ev)) {
--		fprintf(stderr,
--			"Too short device_found length (%u bytes)\n", len);
--		return -EINVAL;
--	}
--
--	flags = btohs(ev->flags);
--
--	eir_len = bt_get_le16(&ev->eir_len);
--	if (len != sizeof(*ev) + eir_len) {
--		fprintf(stderr, "dev_found: expected %zu bytes, got %u bytes",
--						sizeof(*ev) + eir_len, len);
--		return -EINVAL;
--	}
--
--	if (monitor || discovery) {
--		char addr[18];
--		ba2str(&ev->addr.bdaddr, addr);
--		printf("hci%u dev_found: %s type %s rssi %d "
--			"flags 0x%04x eir_len %u\n", index, addr,
--			typestr(ev->addr.type), ev->rssi, flags, eir_len);
--	}
--
--	if (discovery && (flags & MGMT_DEV_FOUND_CONFIRM_NAME)) {
--		struct mgmt_cp_confirm_name cp;
--
--		memset(&cp, 0, sizeof(cp));
--		memcpy(&cp.addr, &ev->addr, sizeof(cp.addr));
--		if (resolve_names)
--			cp.name_known = 0;
--		else
--			cp.name_known = 1;
--
--		mgmt_send_cmd(mgmt_sk, MGMT_OP_CONFIRM_NAME, index,
--					&cp, sizeof(cp), confirm_name_rsp,
--					NULL);
--	}
--
--	return 0;
--}
--
--static void pin_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data)
--{
--	if (status != 0) {
--		fprintf(stderr,
--			"hci%u PIN Code reply failed with status 0x%02x (%s)",
--					id, status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	printf("hci%u PIN Reply successful\n", id);
--}
--
--static int mgmt_pin_reply(int mgmt_sk, uint16_t index,
--						struct mgmt_addr_info *addr,
--						const char *pin, size_t len)
--{
--	struct mgmt_cp_pin_code_reply cp;
--
--	memset(&cp, 0, sizeof(cp));
--	memcpy(&cp.addr, addr, sizeof(cp.addr));
--	cp.pin_len = len;
--	memcpy(cp.pin_code, pin, len);
--
--	return mgmt_send_cmd(mgmt_sk, MGMT_OP_PIN_CODE_REPLY, index,
--					&cp, sizeof(cp), pin_rsp, NULL);
--}
--
--static void pin_neg_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data)
--{
--	if (status != 0) {
--		fprintf(stderr,
--			"hci%u PIN Neg reply failed with status 0x%02x (%s)",
--					id, status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	printf("hci%u PIN Negative Reply successful\n", id);
--}
--
--static int mgmt_pin_neg_reply(int mgmt_sk, uint16_t index,
--						struct mgmt_addr_info *addr)
--{
--	struct mgmt_cp_pin_code_neg_reply cp;
--
--	memset(&cp, 0, sizeof(cp));
--	memcpy(&cp.addr, addr, sizeof(cp.addr));
--
--	return mgmt_send_cmd(mgmt_sk, MGMT_OP_PIN_CODE_NEG_REPLY, index,
--					&cp, sizeof(cp), pin_neg_rsp, NULL);
--}
--
--static int mgmt_request_pin(int mgmt_sk, uint16_t index,
--				struct mgmt_ev_pin_code_request *ev,
--				uint16_t len)
--{
--	char pin[18];
--	size_t pin_len;
--
--	if (len != sizeof(*ev)) {
--		fprintf(stderr,
--			"Invalid pin_code request length (%u bytes)\n", len);
--		return -EINVAL;
--	}
--
--	if (monitor) {
--		char addr[18];
--		ba2str(&ev->addr.bdaddr, addr);
--		printf("hci%u %s request PIN\n", index, addr);
--	}
--
--	printf("PIN Request (press enter to reject) >> ");
--	fflush(stdout);
--
--	memset(pin, 0, sizeof(pin));
--
--	if (fgets(pin, sizeof(pin), stdin) == NULL || pin[0] == '\n')
--		return mgmt_pin_neg_reply(mgmt_sk, index, &ev->addr);
--
--	pin_len = strlen(pin);
--	if (pin[pin_len - 1] == '\n') {
--		pin[pin_len - 1] = '\0';
--		pin_len--;
--	}
--
--	return mgmt_pin_reply(mgmt_sk, index, &ev->addr, pin, pin_len);
--}
--
--static void confirm_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data)
--{
--	if (status != 0) {
--		fprintf(stderr,
--			"hci%u User Confirm reply failed. status 0x%02x (%s)",
--					id, status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	printf("hci%u User Confirm Reply successful\n", id);
--}
--
--static int mgmt_confirm_reply(int mgmt_sk, uint16_t index, bdaddr_t *bdaddr)
--{
--	struct mgmt_cp_user_confirm_reply cp;
--
--	memset(&cp, 0, sizeof(cp));
--	bacpy(&cp.addr.bdaddr, bdaddr);
--
--	return mgmt_send_cmd(mgmt_sk, MGMT_OP_USER_CONFIRM_REPLY, index,
--					&cp, sizeof(cp), confirm_rsp, NULL);
--}
--
--static void confirm_neg_rsp(int mgmt_sk, uint16_t op, uint16_t id,
--				uint8_t status, void *rsp, uint16_t len,
--				void *user_data)
--{
--	if (status != 0) {
--		fprintf(stderr,
--			"hci%u Confirm Neg reply failed. status 0x%02x (%s)",
--					id, status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	printf("hci%u User Confirm Negative Reply successful\n", id);
--}
--
--static int mgmt_confirm_neg_reply(int mgmt_sk, uint16_t index,
--							bdaddr_t *bdaddr)
--{
--	struct mgmt_cp_user_confirm_reply cp;
--
--	memset(&cp, 0, sizeof(cp));
--	bacpy(&cp.addr.bdaddr, bdaddr);
--
--	return mgmt_send_cmd(mgmt_sk, MGMT_OP_USER_CONFIRM_NEG_REPLY, index,
--				&cp, sizeof(cp), confirm_neg_rsp, NULL);
--}
--
--
--static int mgmt_user_confirm(int mgmt_sk, uint16_t index,
--				struct mgmt_ev_user_confirm_request *ev,
--				uint16_t len)
--{
--	char rsp[5];
--	size_t rsp_len;
--	uint32_t val;
--	char addr[18];
--
--	if (len != sizeof(*ev)) {
--		fprintf(stderr,
--			"Invalid user_confirm request length (%u)\n", len);
--		return -EINVAL;
--	}
--
--	ba2str(&ev->addr.bdaddr, addr);
--	val = bt_get_le32(&ev->value);
--
--	if (monitor)
--		printf("hci%u %s User Confirm %06u hint %u\n", index, addr,
--							val, ev->confirm_hint);
--
--	if (ev->confirm_hint)
--		printf("Accept pairing with %s (yes/no) >> ", addr);
--	else
--		printf("Confirm value %06u for %s (yes/no) >> ", val, addr);
--
--	fflush(stdout);
--
--	memset(rsp, 0, sizeof(rsp));
--
--	if (fgets(rsp, sizeof(rsp), stdin) == NULL || rsp[0] == '\n')
--		return mgmt_confirm_neg_reply(mgmt_sk, index, &ev->addr.bdaddr);
--
--	rsp_len = strlen(rsp);
--	if (rsp[rsp_len - 1] == '\n') {
--		rsp[rsp_len - 1] = '\0';
--		rsp_len--;
--	}
--
--	if (rsp[0] == 'y' || rsp[0] == 'Y')
--		return mgmt_confirm_reply(mgmt_sk, index, &ev->addr.bdaddr);
--	else
--		return mgmt_confirm_neg_reply(mgmt_sk, index, &ev->addr.bdaddr);
--}
--
--static int mgmt_handle_event(int mgmt_sk, uint16_t ev, uint16_t index,
--						void *data, uint16_t len)
--{
--	if (monitor)
--		printf("event: %s\n", mgmt_evstr(ev));
--
--	switch (ev) {
--	case MGMT_EV_CMD_COMPLETE:
--		return mgmt_cmd_complete(mgmt_sk, index, data, len);
--	case MGMT_EV_CMD_STATUS:
--		return mgmt_cmd_status(mgmt_sk, index, data, len);
--	case MGMT_EV_CONTROLLER_ERROR:
--		return mgmt_controller_error(index, data, len);
--	case MGMT_EV_INDEX_ADDED:
--		return mgmt_index_added(mgmt_sk, index);
--	case MGMT_EV_INDEX_REMOVED:
--		return mgmt_index_removed(mgmt_sk, index);
--	case MGMT_EV_NEW_SETTINGS:
--		return mgmt_new_settings(mgmt_sk, index, data, len);
--	case MGMT_EV_DISCOVERING:
--		return mgmt_discovering(mgmt_sk, index, data, len);
--	case MGMT_EV_NEW_LINK_KEY:
--		return mgmt_new_link_key(mgmt_sk, index, data, len);
--	case MGMT_EV_DEVICE_CONNECTED:
--		return mgmt_connected(mgmt_sk, index, data, len);
--	case MGMT_EV_DEVICE_DISCONNECTED:
--		return mgmt_disconnected(mgmt_sk, index, data, len);
--	case MGMT_EV_CONNECT_FAILED:
--		return mgmt_conn_failed(mgmt_sk, index, data, len);
--	case MGMT_EV_AUTH_FAILED:
--		return mgmt_auth_failed(mgmt_sk, index, data, len);
--	case MGMT_EV_LOCAL_NAME_CHANGED:
--		return mgmt_name_changed(mgmt_sk, index, data, len);
--	case MGMT_EV_DEVICE_FOUND:
--		return mgmt_device_found(mgmt_sk, index, data, len);
--	case MGMT_EV_PIN_CODE_REQUEST:
--		return mgmt_request_pin(mgmt_sk, index, data, len);
--	case MGMT_EV_USER_CONFIRM_REQUEST:
--		return mgmt_user_confirm(mgmt_sk, index, data, len);
+-	case TTY_PROXY:
+-		sk = tty_open(prx->address, &prx->proxy_ti);
+-		break;
+-	case TCP_SOCKET_PROXY:
+-		sk = tcp_socket_connect(prx->address);
+-		break;
 -	default:
--		if (monitor)
--			printf("Unhandled event 0x%04x (%s)\n", ev, mgmt_evstr(ev));
--		return 0;
+-		sk = -1;
 -	}
+-
+-	if (sk < 0)
+-		goto drop;
+-
+-	prx->local = g_io_channel_unix_new(sk);
+-
+-	g_io_add_watch(prx->rfcomm,
+-			G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+-			forward_data, prx);
+-
+-	g_io_add_watch(prx->local,
+-			G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+-			forward_data, prx);
+-
+-	return;
+-
+-drop:
+-	g_io_channel_shutdown(prx->rfcomm, TRUE, NULL);
+-	g_io_channel_unref(prx->rfcomm);
+-	prx->rfcomm = NULL;
 -}
 -
--static int mgmt_process_data(int mgmt_sk)
+-static void auth_cb(DBusError *derr, void *user_data)
 -{
--	char buf[1024];
--	struct mgmt_hdr *hdr = (void *) buf;
--	uint16_t len, ev, index;
--	ssize_t ret;
+-	struct serial_proxy *prx = user_data;
+-	GError *err = NULL;
 -
--	ret = read(mgmt_sk, buf, sizeof(buf));
--	if (ret < 0) {
--		fprintf(stderr, "read: %s\n", strerror(errno));
--		return ret;
+-	if (derr) {
+-		error("Access denied: %s", derr->message);
+-		goto reject;
 -	}
 -
--	if (ret < MGMT_HDR_SIZE) {
--		fprintf(stderr, "Too small mgmt packet (%zd bytes)\n", ret);
--		return 0;
+-	if (!bt_io_accept(prx->rfcomm, connect_event_cb, prx, NULL,
+-							&err)) {
+-		error("bt_io_accept: %s", err->message);
+-		g_error_free(err);
+-		goto reject;
 -	}
 -
--	ev = bt_get_le16(&hdr->opcode);
--	index = bt_get_le16(&hdr->index);
--	len = bt_get_le16(&hdr->len);
+-	return;
 -
--	if (monitor)
--		printf("event 0x%04x len 0x%04x index 0x%04x\n", ev, len, index);
+-reject:
+-	g_io_channel_shutdown(prx->rfcomm, TRUE, NULL);
+-	g_io_channel_unref(prx->rfcomm);
+-	prx->rfcomm = NULL;
+-}
 -
--	if (ret != MGMT_HDR_SIZE + len) {
--		fprintf(stderr, "Packet length mismatch. ret %zd len %u",
--								ret, len);
--		return 0;
+-static void confirm_event_cb(GIOChannel *chan, gpointer user_data)
+-{
+-	struct serial_proxy *prx = user_data;
+-	int perr;
+-	char address[18];
+-	GError *err = NULL;
+-
+-	bt_io_get(chan, BT_IO_RFCOMM, &err,
+-			BT_IO_OPT_DEST_BDADDR, &prx->dst,
+-			BT_IO_OPT_DEST, address,
+-			BT_IO_OPT_INVALID);
+-	if (err) {
+-		error("%s", err->message);
+-		g_error_free(err);
+-		goto drop;
 -	}
 -
--	mgmt_handle_event(mgmt_sk, ev, index, buf + MGMT_HDR_SIZE, len);
+-	if (prx->rfcomm) {
+-		error("Refusing connect from %s: Proxy already in use",
+-				address);
+-		goto drop;
+-	}
+-
+-	DBG("Serial Proxy: incoming connect from %s", address);
+-
+-	prx->rfcomm = g_io_channel_ref(chan);
+-
+-	perr = btd_request_authorization(&prx->src, &prx->dst,
+-					prx->uuid128, auth_cb, prx);
+-	if (perr < 0) {
+-		error("Refusing connect from %s: %s (%d)", address,
+-				strerror(-perr), -perr);
+-		g_io_channel_unref(prx->rfcomm);
+-		prx->rfcomm = NULL;
+-		goto drop;
+-	}
+-
+-	return;
+-
+-drop:
+-	g_io_channel_shutdown(chan, TRUE, NULL);
+-}
+-
+-static int enable_proxy(struct serial_proxy *prx)
+-{
+-	sdp_record_t *record;
+-	GError *gerr = NULL;
+-	int err;
+-
+-	if (prx->io)
+-		return -EALREADY;
+-
+-	/* Listen */
+-	prx->io = bt_io_listen(BT_IO_RFCOMM, NULL, confirm_event_cb, prx,
+-				NULL, &gerr,
+-				BT_IO_OPT_SOURCE_BDADDR, &prx->src,
+-				BT_IO_OPT_INVALID);
+-	if (!prx->io)
+-		goto failed;
+-
+-	bt_io_get(prx->io, BT_IO_RFCOMM, &gerr,
+-			BT_IO_OPT_CHANNEL, &prx->channel,
+-			BT_IO_OPT_INVALID);
+-	if (gerr) {
+-		g_io_channel_unref(prx->io);
+-		prx->io = NULL;
+-		goto failed;
+-	}
+-
+-	DBG("Allocated channel %d", prx->channel);
+-
+-	g_io_channel_set_close_on_unref(prx->io, TRUE);
+-
+-	record = proxy_record_new(prx->uuid128, prx->channel);
+-	if (!record) {
+-		g_io_channel_unref(prx->io);
+-		return -ENOMEM;
+-	}
+-
+-	err = add_record_to_server(&prx->src, record);
+-	if (err < 0) {
+-		sdp_record_free(record);
+-		g_io_channel_unref(prx->io);
+-		return err;
+-	}
+-
+-	prx->record_id = record->handle;
 -
 -	return 0;
+-
+-failed:
+-	error("%s", gerr->message);
+-	g_error_free(gerr);
+-	return -EIO;
+-
+-}
+-static DBusMessage *proxy_enable(DBusConnection *conn,
+-				DBusMessage *msg, void *data)
+-{
+-	struct serial_proxy *prx = data;
+-	int err;
+-
+-	err = enable_proxy(prx);
+-	if (err < 0)
+-		return btd_error_failed(msg, strerror(-err));
+-
+-	return dbus_message_new_method_return(msg);
 -}
 -
--static void cmd_monitor(int mgmt_sk, uint16_t index, int argc, char **argv)
+-static DBusMessage *proxy_disable(DBusConnection *conn,
+-				DBusMessage *msg, void *data)
 -{
--	printf("Monitoring mgmt events...\n");
--	monitor = true;
+-	struct serial_proxy *prx = data;
+-
+-	if (!prx->io)
+-		return btd_error_failed(msg, "Not enabled");
+-
+-	/* Remove the watches and unregister the record */
+-	disable_proxy(prx);
+-
+-	return dbus_message_new_method_return(msg);
 -}
 -
--static void version_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data)
+-static DBusMessage *proxy_get_info(DBusConnection *conn,
+-				DBusMessage *msg, void *data)
 -{
--	struct mgmt_rp_read_version *rp = rsp;
+-	struct serial_proxy *prx = data;
+-	DBusMessage *reply;
+-	DBusMessageIter iter, dict;
+-	dbus_bool_t boolean;
 -
--	if (status != 0) {
--		fprintf(stderr, "Reading mgmt version failed with status"
--			" 0x%02x (%s)\n", status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	if (len < sizeof(*rp)) {
--		fprintf(stderr, "Too small version reply (%u bytes)\n", len);
--		exit(EXIT_FAILURE);
--	}
--
--	printf("MGMT Version %u, revision %u\n", rp->version,
--						bt_get_le16(&rp->revision));
--
--	exit(EXIT_SUCCESS);
--}
--
--static void cmd_version(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_READ_VERSION, MGMT_INDEX_NONE,
--					NULL, 0, version_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send read_version cmd\n");
--		exit(EXIT_FAILURE);
--	}
--}
--
--static void commands_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data)
--{
--	struct mgmt_rp_read_commands *rp = rsp;
--	uint16_t num_commands, num_events, *opcode;
--	size_t expected_len;
--	int i;
--
--	if (status != 0) {
--		fprintf(stderr, "Reading supported commands failed with status"
--			" 0x%02x (%s)\n", status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	if (len < sizeof(*rp)) {
--		fprintf(stderr, "Too small commands reply (%u bytes)\n", len);
--		exit(EXIT_FAILURE);
--	}
--
--	num_commands = bt_get_le16(&rp->num_commands);
--	num_events = bt_get_le16(&rp->num_events);
--
--	expected_len = sizeof(*rp) + num_commands * sizeof(uint16_t) +
--						num_events * sizeof(uint16_t);
--
--	if (len < expected_len) {
--		fprintf(stderr, "Too small commands reply (%u != %zu)\n",
--							len, expected_len);
--		exit(EXIT_FAILURE);
--	}
--
--	opcode = rp->opcodes;
--
--	printf("%u commands:\n", num_commands);
--	for (i = 0; i < num_commands; i++) {
--		uint16_t op = bt_get_le16(opcode++);
--		printf("\t%s (0x%04x)\n", mgmt_opstr(op), op);
--	}
--
--	printf("%u events:\n", num_events);
--	for (i = 0; i < num_events; i++) {
--		uint16_t ev = bt_get_le16(opcode++);
--		printf("\t%s (0x%04x)\n", mgmt_evstr(ev), ev);
--	}
--
--	exit(EXIT_SUCCESS);
--}
--
--static void cmd_commands(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_READ_COMMANDS, MGMT_INDEX_NONE,
--					NULL, 0, commands_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send read_commands cmd\n");
--		exit(EXIT_FAILURE);
--	}
--}
--
--static void info_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data)
--{
--	struct mgmt_rp_read_info *rp = rsp;
--	char addr[18];
--
--	if (status != 0) {
--		fprintf(stderr,
--			"Reading hci%u info failed with status 0x%02x (%s)\n",
--					id, status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	if (len < sizeof(*rp)) {
--		fprintf(stderr, "Too small info reply (%u bytes)\n", len);
--		exit(EXIT_FAILURE);
--	}
--
--	ba2str(&rp->bdaddr, addr);
--	printf("hci%u:\taddr %s version %u manufacturer %u"
--			" class 0x%02x%02x%02x\n",
--			id, addr, rp->version, bt_get_le16(&rp->manufacturer),
--			rp->dev_class[2], rp->dev_class[1], rp->dev_class[0]);
--
--	printf("\tsupported settings: ");
--	print_settings(bt_get_le32(&rp->supported_settings));
--
--	printf("\n\tcurrent settings: ");
--	print_settings(bt_get_le32(&rp->current_settings));
--
--	printf("\n\tname %s\n", rp->name);
--	printf("\tshort name %s\n", rp->short_name);
--
--	if (pending == NULL)
--		exit(EXIT_SUCCESS);
--}
--
--static void index_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data)
--{
--	struct mgmt_rp_read_index_list *rp = rsp;
--	uint16_t count;
--	unsigned int i;
--
--	if (status != 0) {
--		fprintf(stderr,
--			"Reading index list failed with status 0x%02x (%s)\n",
--						status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	if (len < sizeof(*rp)) {
--		fprintf(stderr, "Too small index list reply (%u bytes)\n",
--									len);
--		exit(EXIT_FAILURE);
--	}
--
--	count = bt_get_le16(&rp->num_controllers);
--
--	if (len < sizeof(*rp) + count * sizeof(uint16_t)) {
--		fprintf(stderr,
--			"Index count (%u) doesn't match reply length (%u)\n",
--								count, len);
--		exit(EXIT_FAILURE);
--	}
--
--	if (monitor)
--		printf("Index list with %u item%s\n",
--						count, count > 1 ? "s" : "");
--
--	if (count == 0)
--		exit(EXIT_SUCCESS);
--
--	if (monitor && count > 0)
--		printf("\t");
--
--	for (i = 0; i < count; i++) {
--		uint16_t index;
--
--		index = bt_get_le16(&rp->index[i]);
--
--		if (monitor)
--			printf("hci%u ", index);
--
--		if (mgmt_send_cmd(mgmt_sk, MGMT_OP_READ_INFO, index, NULL,
--					0, info_rsp, NULL) < 0) {
--			fprintf(stderr, "Unable to send read_info cmd\n");
--			exit(EXIT_FAILURE);
--		}
--	}
--
--	if (monitor && count > 0)
--		printf("\n");
--}
--
--static void cmd_info(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	if (index == MGMT_INDEX_NONE) {
--		if (mgmt_send_cmd(mgmt_sk, MGMT_OP_READ_INDEX_LIST,
--					MGMT_INDEX_NONE, NULL, 0,
--					index_rsp, NULL) < 0) {
--			fprintf(stderr, "Unable to send index_list cmd\n");
--			exit(EXIT_FAILURE);
--		}
--
--		return;
--	}
--
--	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_READ_INFO, index, NULL,
--						0, info_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send read_info cmd\n");
--		exit(EXIT_FAILURE);
--	}
--}
--
--static void setting_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data)
--{
--	uint32_t *rp = rsp;
--
--	if (status != 0) {
--		fprintf(stderr,
--			"%s for hci%u failed with status 0x%02x (%s)\n",
--			mgmt_opstr(op), id, status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	if (len < sizeof(*rp)) {
--		fprintf(stderr, "Too small %s response (%u bytes)\n",
--							mgmt_opstr(op), len);
--		exit(EXIT_FAILURE);
--	}
--
--	printf("hci%u %s complete, settings: ", id, mgmt_opstr(op));
--	print_settings(bt_get_le32(rp));
--	printf("\n");
--
--	exit(EXIT_SUCCESS);
--}
--
--static void cmd_setting(int mgmt_sk, uint16_t index, uint16_t op,
--							int argc, char **argv)
--{
--	uint8_t val;
--
--	if (argc < 2) {
--		printf("Specify \"on\" or \"off\"\n");
--		exit(EXIT_FAILURE);
--	}
--
--	if (strcasecmp(argv[1], "on") == 0 || strcasecmp(argv[1], "yes") == 0)
--		val = 1;
--	else if (strcasecmp(argv[1], "off") == 0)
--		val = 0;
--	else
--		val = atoi(argv[1]);
--
--	if (index == MGMT_INDEX_NONE)
--		index = 0;
--
--	if (mgmt_send_cmd(mgmt_sk, op, index, &val, sizeof(val),
--						setting_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send %s cmd\n", mgmt_opstr(op));
--		exit(EXIT_FAILURE);
--	}
--}
--
--static void cmd_power(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	cmd_setting(mgmt_sk, index, MGMT_OP_SET_POWERED, argc, argv);
--}
--
--static void cmd_discov(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	struct mgmt_cp_set_discoverable cp;
--
--	if (argc < 2) {
--		printf("Usage: btmgmt %s <yes/no> [timeout]\n", argv[0]);
--		exit(EXIT_FAILURE);
--	}
--
--	memset(&cp, 0, sizeof(cp));
--
--	if (strcasecmp(argv[1], "on") == 0 || strcasecmp(argv[1], "yes") == 0)
--		cp.val = 1;
--	else if (strcasecmp(argv[1], "off") == 0)
--		cp.val = 0;
--	else
--		cp.val = atoi(argv[1]);
--
--	if (argc > 2)
--		cp.timeout = htobs(atoi(argv[2]));
--
--	if (index == MGMT_INDEX_NONE)
--		index = 0;
--
--	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_SET_DISCOVERABLE, index,
--				&cp, sizeof(cp), setting_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send set_discoverable cmd\n");
--		exit(EXIT_FAILURE);
--	}
--}
--
--static void cmd_connectable(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	cmd_setting(mgmt_sk, index, MGMT_OP_SET_CONNECTABLE, argc, argv);
--}
--
--static void cmd_pairable(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	cmd_setting(mgmt_sk, index, MGMT_OP_SET_PAIRABLE, argc, argv);
--}
--
--static void cmd_linksec(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	cmd_setting(mgmt_sk, index, MGMT_OP_SET_LINK_SECURITY, argc, argv);
--}
--
--static void cmd_ssp(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	cmd_setting(mgmt_sk, index, MGMT_OP_SET_SSP, argc, argv);
--}
--
--static void cmd_hs(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	cmd_setting(mgmt_sk, index, MGMT_OP_SET_HS, argc, argv);
--}
--
--static void cmd_le(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	cmd_setting(mgmt_sk, index, MGMT_OP_SET_LE, argc, argv);
--}
--
--static void class_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data)
--{
--	struct mgmt_ev_class_of_dev_changed *rp = rsp;
--
--	if (len == 0 && status != 0) {
--		fprintf(stderr, "%s failed, status 0x%02x (%s)\n",
--				mgmt_opstr(op), status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	if (len != sizeof(*rp)) {
--		fprintf(stderr, "Unexpected %s len %u\n", mgmt_opstr(op), len);
--		exit(EXIT_FAILURE);
--	}
--
--	printf("%s succeeded. Class 0x%02x%02x%02x\n", mgmt_opstr(op),
--		rp->class_of_dev[2], rp->class_of_dev[1], rp->class_of_dev[0]);
--
--	exit(EXIT_SUCCESS);
--}
--
--static void cmd_class(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	uint8_t class[2];
--
--	if (argc < 3) {
--		printf("Usage: btmgmt %s <major> <minor>\n", argv[0]);
--		exit(EXIT_FAILURE);
--	}
--
--	class[0] = atoi(argv[1]);
--	class[1] = atoi(argv[2]);
--
--	if (index == MGMT_INDEX_NONE)
--		index = 0;
--
--	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_SET_DEV_CLASS, index,
--				class, sizeof(class), class_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send set_dev_class cmd\n");
--		exit(EXIT_FAILURE);
--	}
--}
--
--static void disconnect_rsp(int mgmt_sk, uint16_t op, uint16_t id,
--				uint8_t status, void *rsp, uint16_t len,
--				void *user_data)
--{
--	struct mgmt_rp_disconnect *rp = rsp;
--	char addr[18];
--
--	if (len == 0 && status != 0) {
--		fprintf(stderr, "Disconnect failed with status 0x%02x (%s)\n",
--						status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	if (len != sizeof(*rp)) {
--		fprintf(stderr, "Invalid disconnect response length (%u)\n",
--									len);
--		exit(EXIT_FAILURE);
--	}
--
--	ba2str(&rp->addr.bdaddr, addr);
--
--	if (status == 0) {
--		printf("%s disconnected\n", addr);
--		exit(EXIT_SUCCESS);
--	} else {
--		fprintf(stderr,
--			"Disconnecting %s failed with status 0x%02x (%s)\n",
--				addr, status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--}
--
--static void cmd_disconnect(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	struct mgmt_cp_disconnect cp;
--
--	if (argc < 2) {
--		printf("Usage: btmgmt %s <address>\n", argv[0]);
--		exit(EXIT_FAILURE);
--	}
--
--	str2ba(argv[1], &cp.addr.bdaddr);
--
--	if (index == MGMT_INDEX_NONE)
--		index = 0;
--
--	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_DISCONNECT, index,
--				&cp, sizeof(cp), disconnect_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send disconnect cmd\n");
--		exit(EXIT_FAILURE);
--	}
--}
--
--static void con_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data)
--{
--	struct mgmt_rp_get_connections *rp = rsp;
--	uint16_t count, i;
--
--	if (len < sizeof(*rp)) {
--		fprintf(stderr, "Too small (%u bytes) get_connections rsp\n",
--									len);
--		exit(EXIT_FAILURE);
--	}
--
--	count = bt_get_le16(&rp->conn_count);
--	if (len != sizeof(*rp) + count * sizeof(struct mgmt_addr_info)) {
--		fprintf(stderr, "Invalid get_connections length "
--					" (count=%u, len=%u)\n", count, len);
--		exit(EXIT_FAILURE);
--	}
--
--	for (i = 0; i < count; i++) {
--		char addr[18];
--
--		ba2str(&rp->addr[i].bdaddr, addr);
--
--		printf("%s type %s\n", addr, typestr(rp->addr[i].type));
--	}
--
--	exit(EXIT_SUCCESS);
--}
--
--static void cmd_con(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	if (index == MGMT_INDEX_NONE)
--		index = 0;
--
--	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_GET_CONNECTIONS, index, NULL, 0,
--							con_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send get_connections cmd\n");
--		exit(EXIT_FAILURE);
--	}
--}
--
--static void find_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data)
--{
--	if (status != 0) {
--		fprintf(stderr,
--			"Unable to start discovery. status 0x%02x (%s)\n",
--						status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	printf("Discovery started\n");
--	discovery = true;
--}
+-	reply = dbus_message_new_method_return(msg);
+-	if (!reply)
+-		return NULL;
 -
--static void find_usage(void)
--{
--	printf("Usage: btmgmt find [-l|-b]>\n");
--}
+-	dbus_message_iter_init_append(reply, &iter);
 -
--static struct option find_options[] = {
--	{ "help",	0, 0, 'h' },
--	{ "le-only",	1, 0, 'l' },
--	{ "bredr-only",	1, 0, 'b' },
--	{ 0, 0, 0, 0 }
--};
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
 -
--static void cmd_find(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	struct mgmt_cp_start_discovery cp;
--	uint8_t type;
--	int opt;
+-	dict_append_entry(&dict, "uuid", DBUS_TYPE_STRING, &prx->uuid128);
 -
--	if (index == MGMT_INDEX_NONE)
--		index = 0;
+-	dict_append_entry(&dict, "address", DBUS_TYPE_STRING, &prx->address);
 -
--	type = 0;
--	hci_set_bit(BDADDR_BREDR, &type);
--	hci_set_bit(BDADDR_LE_PUBLIC, &type);
--	hci_set_bit(BDADDR_LE_RANDOM, &type);
+-	if (prx->channel)
+-		dict_append_entry(&dict, "channel",
+-					DBUS_TYPE_BYTE, &prx->channel);
 -
--	while ((opt = getopt_long(argc, argv, "+lbh", find_options,
--								NULL)) != -1) {
--		switch (opt) {
--		case 'l':
--			hci_clear_bit(BDADDR_BREDR, &type);
--			hci_set_bit(BDADDR_LE_PUBLIC, &type);
--			hci_set_bit(BDADDR_LE_RANDOM, &type);
--			break;
--		case 'b':
--			hci_set_bit(BDADDR_BREDR, &type);
--			hci_clear_bit(BDADDR_LE_PUBLIC, &type);
--			hci_clear_bit(BDADDR_LE_RANDOM, &type);
--			break;
--		case 'h':
--		default:
--			find_usage();
--			exit(EXIT_SUCCESS);
--		}
--	}
--
--	argc -= optind;
--	argv += optind;
--	optind = 0;
--
--	memset(&cp, 0, sizeof(cp));
--	cp.type = type;
--
--	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_START_DISCOVERY, index,
--				&cp, sizeof(cp), find_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send start_discovery cmd\n");
--		exit(EXIT_FAILURE);
--	}
--}
--
--static void name_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data)
--{
--	if (status != 0) {
--		fprintf(stderr, "Unable to set local name. status 0x%02x (%s)",
--						status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	exit(EXIT_SUCCESS);
--}
--
--static void cmd_name(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	struct mgmt_cp_set_local_name cp;
--
--	if (argc < 2) {
--		printf("Usage: btmgmt %s <name> [shortname]\n", argv[0]);
--		exit(EXIT_FAILURE);
--	}
--
--	if (index == MGMT_INDEX_NONE)
--		index = 0;
--
--	memset(&cp, 0, sizeof(cp));
--	strncpy((char *) cp.name, argv[1], HCI_MAX_NAME_LENGTH);
--	if (argc > 2)
--		strncpy((char *) cp.short_name, argv[2],
--					MGMT_MAX_SHORT_NAME_LENGTH);
--
--	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_SET_LOCAL_NAME, index,
--					&cp, sizeof(cp), name_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send set_name cmd\n");
--		exit(EXIT_FAILURE);
--	}
--}
--
--static void pair_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data)
--{
--	struct mgmt_rp_pair_device *rp = rsp;
--	char addr[18];
--
--	if (len == 0 && status != 0) {
--		fprintf(stderr, "Pairing failed with status 0x%02x (%s)\n",
--						status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	if (len != sizeof(*rp)) {
--		fprintf(stderr, "Unexpected pair_rsp len %u\n", len);
--		exit(EXIT_FAILURE);
--	}
--
--	ba2str(&rp->addr.bdaddr, addr);
--
--	if (status != 0) {
--		fprintf(stderr,
--			"Pairing with %s (%s) failed. status 0x%02x (%s)\n",
--			addr, typestr(rp->addr.type), status,
--			mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	printf("Paired with %s\n", addr);
--
--	exit(EXIT_SUCCESS);
--}
--
--static void pair_usage(void)
--{
--	printf("Usage: btmgmt pair [-c cap] [-t type] <remote address>\n");
--}
--
--static struct option pair_options[] = {
--	{ "help",	0, 0, 'h' },
--	{ "capability",	1, 0, 'c' },
--	{ "type",	1, 0, 't' },
--	{ 0, 0, 0, 0 }
--};
--
--static void cmd_pair(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	struct mgmt_cp_pair_device cp;
--	uint8_t cap = 0x01;
--	uint8_t type = BDADDR_BREDR;
--	int opt;
--
--	while ((opt = getopt_long(argc, argv, "+c:t:h", pair_options,
--								NULL)) != -1) {
--		switch (opt) {
--		case 'c':
--			cap = strtol(optarg, NULL, 0);
--			break;
--		case 't':
--			type = strtol(optarg, NULL, 0);
--			break;
--		case 'h':
--		default:
--			pair_usage();
--			exit(EXIT_SUCCESS);
--		}
--	}
--
--	argc -= optind;
--	argv += optind;
--	optind = 0;
--
--	if (argc < 1) {
--		pair_usage();
--		exit(EXIT_FAILURE);
--	}
--
--	if (index == MGMT_INDEX_NONE)
--		index = 0;
--
--	memset(&cp, 0, sizeof(cp));
--	str2ba(argv[0], &cp.addr.bdaddr);
--	cp.addr.type = type;
--	cp.io_cap = cap;
--
--	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_PAIR_DEVICE, index, &cp, sizeof(cp),
--							pair_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send pair_device cmd\n");
--		exit(EXIT_FAILURE);
--	}
--}
--
--static void unpair_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data)
--{
--	struct mgmt_rp_unpair_device *rp = rsp;
--	char addr[18];
--
--	if (len == 0 && status != 0) {
--		fprintf(stderr, "Unpair device failed. status 0x%02x (%s)\n",
--						status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	if (len != sizeof(*rp)) {
--		fprintf(stderr, "Unexpected unpair_device_rsp len %u\n", len);
--		exit(EXIT_FAILURE);
--	}
--
--	ba2str(&rp->addr.bdaddr, addr);
--
--	if (status != 0) {
--		fprintf(stderr,
--			"Unpairing %s failed. status 0x%02x (%s)\n",
--				addr, status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	printf("%s unpaired\n", addr);
--
--	exit(EXIT_SUCCESS);
--}
--
--static void cmd_unpair(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	struct mgmt_cp_unpair_device cp;
--
--	if (argc < 2) {
--		printf("Usage: btmgmt %s <remote address>\n", argv[0]);
--		exit(EXIT_FAILURE);
--	}
--
--	if (index == MGMT_INDEX_NONE)
--		index = 0;
--
--	memset(&cp, 0, sizeof(cp));
--	str2ba(argv[1], &cp.addr.bdaddr);
--	cp.disconnect = 1;
--
--	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_UNPAIR_DEVICE, index, &cp,
--					sizeof(cp), unpair_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send unpair_device cmd\n");
--		exit(EXIT_FAILURE);
--	}
--}
--
--static void keys_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data)
--{
--	if (status != 0) {
--		fprintf(stderr, "Load keys failed with status 0x%02x (%s)\n",
--						status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	printf("Keys successfully loaded\n");
--
--	exit(EXIT_SUCCESS);
--}
--
--static void cmd_keys(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	struct mgmt_cp_load_link_keys cp;
--
--	if (index == MGMT_INDEX_NONE)
--		index = 0;
--
--	memset(&cp, 0, sizeof(cp));
--
--	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_LOAD_LINK_KEYS, index,
--				&cp, sizeof(cp), keys_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send load_keys cmd\n");
--		exit(EXIT_FAILURE);
--	}
--}
--
--static void block_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data)
--{
--	struct mgmt_addr_info *rp = rsp;
--	char addr[18];
--
--	if (len == 0 && status != 0) {
--		fprintf(stderr, "%s failed, status 0x%02x (%s)\n",
--				mgmt_opstr(op), status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	if (len != sizeof(*rp)) {
--		fprintf(stderr, "Unexpected %s len %u\n", mgmt_opstr(op), len);
--		exit(EXIT_FAILURE);
--	}
--
--	ba2str(&rp->bdaddr, addr);
--
--	if (status != 0) {
--		fprintf(stderr, "%s %s (%s) failed. status 0x%02x (%s)\n",
--				mgmt_opstr(op), addr, typestr(rp->type),
--				status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	printf("%s %s succeeded\n", mgmt_opstr(op), addr);
--
--	exit(EXIT_SUCCESS);
--}
--
--static void block_usage(void)
--{
--	printf("Usage: btmgmt block [-t type] <remote address>\n");
--}
--
--static struct option block_options[] = {
--	{ "help",	0, 0, 'h' },
--	{ "type",	1, 0, 't' },
--	{ 0, 0, 0, 0 }
--};
--
--static void cmd_block(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	struct mgmt_cp_block_device cp;
--	uint8_t type = BDADDR_BREDR;
--	int opt;
--
--	while ((opt = getopt_long(argc, argv, "+t:h", block_options,
--							NULL)) != -1) {
--		switch (opt) {
--		case 't':
--			type = strtol(optarg, NULL, 0);
--			break;
--		case 'h':
--		default:
--			block_usage();
--			exit(EXIT_SUCCESS);
--		}
--	}
--
--	argc -= optind;
--	argv += optind;
--	optind = 0;
--
--	if (argc < 1) {
--		block_usage();
--		exit(EXIT_FAILURE);
--	}
--
--	if (index == MGMT_INDEX_NONE)
--		index = 0;
--
--	memset(&cp, 0, sizeof(cp));
--	str2ba(argv[0], &cp.addr.bdaddr);
--	cp.addr.type = type;
--
--	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_BLOCK_DEVICE, index,
--				&cp, sizeof(cp), block_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send block_device cmd\n");
--		exit(EXIT_FAILURE);
--	}
--}
--
--static void unblock_usage(void)
--{
--	printf("Usage: btmgmt unblock [-t type] <remote address>\n");
--}
--
--static void cmd_unblock(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	struct mgmt_cp_unblock_device cp;
--	uint8_t type = BDADDR_BREDR;
--	int opt;
--
--	while ((opt = getopt_long(argc, argv, "+t:h", block_options,
--							NULL)) != -1) {
--		switch (opt) {
--		case 't':
--			type = strtol(optarg, NULL, 0);
--			break;
--		case 'h':
--		default:
--			unblock_usage();
--			exit(EXIT_SUCCESS);
--		}
--	}
--
--	argc -= optind;
--	argv += optind;
--	optind = 0;
--
--	if (argc < 1) {
--		unblock_usage();
--		exit(EXIT_FAILURE);
--	}
--
--	if (index == MGMT_INDEX_NONE)
--		index = 0;
--
--	memset(&cp, 0, sizeof(cp));
--	str2ba(argv[0], &cp.addr.bdaddr);
--	cp.addr.type = type;
--
--	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_UNBLOCK_DEVICE, index,
--				&cp, sizeof(cp), block_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send unblock_device cmd\n");
--		exit(EXIT_FAILURE);
--	}
--}
--
--static void uuid_to_uuid128(uuid_t *uuid128, const uuid_t *uuid)
--{
--	if (uuid->type == SDP_UUID16)
--		sdp_uuid16_to_uuid128(uuid128, uuid);
--	else if (uuid->type == SDP_UUID32)
--		sdp_uuid32_to_uuid128(uuid128, uuid);
--	else
--		memcpy(uuid128, uuid, sizeof(*uuid));
--}
--
--static void cmd_add_uuid(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	struct mgmt_cp_add_uuid cp;
--	uint128_t uint128;
--	uuid_t uuid, uuid128;
+-	boolean = (prx->io ? TRUE : FALSE);
+-	dict_append_entry(&dict, "enabled", DBUS_TYPE_BOOLEAN, &boolean);
 -
--	if (argc < 3) {
--		printf("UUID and service hint needed\n");
--		exit(EXIT_FAILURE);
--	}
--
--	if (index == MGMT_INDEX_NONE)
--		index = 0;
--
--	if (bt_string2uuid(&uuid, argv[1]) < 0) {
--		printf("Invalid UUID: %s\n", argv[1]);
--		exit(EXIT_FAILURE);
--	}
--
--	memset(&cp, 0, sizeof(cp));
--
--	uuid_to_uuid128(&uuid128, &uuid);
--	ntoh128((uint128_t *) uuid128.value.uuid128.data, &uint128);
--	htob128(&uint128, (uint128_t *) cp.uuid);
--
--	cp.svc_hint = atoi(argv[2]);
--
--	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_ADD_UUID, index,
--				&cp, sizeof(cp), class_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send add_uuid cmd\n");
--		exit(EXIT_FAILURE);
--	}
--}
--
--static void cmd_remove_uuid(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	struct mgmt_cp_remove_uuid cp;
--	uint128_t uint128;
--	uuid_t uuid, uuid128;
--
--	if (argc < 2) {
--		printf("UUID needed\n");
--		exit(EXIT_FAILURE);
--	}
--
--	if (index == MGMT_INDEX_NONE)
--		index = 0;
--
--	if (bt_string2uuid(&uuid, argv[1]) < 0) {
--		printf("Invalid UUID: %s\n", argv[1]);
--		exit(EXIT_FAILURE);
--	}
--
--	memset(&cp, 0, sizeof(cp));
+-	boolean = (prx->rfcomm ? TRUE : FALSE);
+-	dict_append_entry(&dict, "connected", DBUS_TYPE_BOOLEAN, &boolean);
 -
--	uuid_to_uuid128(&uuid128, &uuid);
--	ntoh128((uint128_t *) uuid128.value.uuid128.data, &uint128);
--	htob128(&uint128, (uint128_t *) cp.uuid);
+-	/* If connected: append the remote address */
+-	if (boolean) {
+-		char bda[18];
+-		const char *pstr = bda;
 -
--	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_REMOVE_UUID, index,
--				&cp, sizeof(cp), class_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send remove_uuid cmd\n");
--		exit(EXIT_FAILURE);
+-		ba2str(&prx->dst, bda);
+-		dict_append_entry(&dict, "address", DBUS_TYPE_STRING, &pstr);
 -	}
--}
 -
--static void cmd_clr_uuids(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	char *uuid_any = "00000000-0000-0000-0000-000000000000";
--	char *rm_argv[] = { "rm-uuid", uuid_any, NULL };
+-	dbus_message_iter_close_container(&iter, &dict);
 -
--	cmd_remove_uuid(mgmt_sk, index, 2, rm_argv);
--}
--
--static void did_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
--				void *rsp, uint16_t len, void *user_data)
--{
--	if (status != 0) {
--		fprintf(stderr, "Set Device ID failed with status 0x%02x (%s)\n",
--						status, mgmt_errstr(status));
--		exit(EXIT_FAILURE);
--	}
--
--	printf("Device ID successfully set\n");
--
--	exit(EXIT_SUCCESS);
--}
--
--static void did_usage(void)
--{
--	printf("Usage: btmgmt did <source>:<vendor>:<product>:<version>\n");
--	printf("       possible source values: bluetooth, usb\n");
--}
--
--static void cmd_did(int mgmt_sk, uint16_t index, int argc, char **argv)
--{
--	struct mgmt_cp_set_device_id cp;
--	uint16_t vendor, product, version , source;
--	int result;
--
--	if (argc < 2) {
--		did_usage();
--		exit(EXIT_FAILURE);
--	}
--
--	result = sscanf(argv[1], "bluetooth:%4hx:%4hx:%4hx", &vendor, &product,
--								&version);
--	if (result == 3) {
--		source = 0x0001;
--		goto done;
--	}
--
--	result = sscanf(argv[1], "usb:%4hx:%4hx:%4hx", &vendor, &product,
--								&version);
--	if (result == 3) {
--		source = 0x0002;
--		goto done;
--	}
--
--	did_usage();
--	exit(EXIT_FAILURE);
--
--done:
--	if (index == MGMT_INDEX_NONE)
--		index = 0;
--
--	cp.source = htobs(source);
--	cp.vendor = htobs(vendor);
--	cp.product = htobs(product);
--	cp.version = htobs(version);
--
--	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_SET_DEVICE_ID, index,
--				&cp, sizeof(cp), did_rsp, NULL) < 0) {
--		fprintf(stderr, "Unable to send set_dev_class cmd\n");
--		exit(EXIT_FAILURE);
--	}
+-	return reply;
 -}
 -
 -static struct {
--	char *cmd;
--	void (*func)(int mgmt_sk, uint16_t index, int argc, char **argv);
--	char *doc;
--} command[] = {
--	{ "monitor",	cmd_monitor,	"Monitor events"		},
--	{ "version",	cmd_version,	"Get the MGMT Version"		},
--	{ "commands",	cmd_commands,	"List supported commands"	},
--	{ "info",	cmd_info,	"Show controller info"		},
--	{ "power",	cmd_power,	"Toggle powered state"		},
--	{ "discov",	cmd_discov,	"Toggle discoverable state"	},
--	{ "connectable",cmd_connectable,"Toggle connectable state"	},
--	{ "pairable",	cmd_pairable,	"Toggle pairable state"		},
--	{ "linksec",	cmd_linksec,	"Toggle link level security"	},
--	{ "ssp",	cmd_ssp,	"Toggle SSP mode"		},
--	{ "hs",		cmd_hs,		"Toggle HS Support"		},
--	{ "le",		cmd_le,		"Toggle LE Support"		},
--	{ "class",	cmd_class,	"Set device major/minor class"	},
--	{ "disconnect", cmd_disconnect, "Disconnect device"		},
--	{ "con",	cmd_con,	"List connections"		},
--	{ "find",	cmd_find,	"Discover nearby devices"	},
--	{ "name",	cmd_name,	"Set local name"		},
--	{ "pair",	cmd_pair,	"Pair with a remote device"	},
--	{ "unpair",	cmd_unpair,	"Unpair device"			},
--	{ "keys",	cmd_keys,	"Load Keys"			},
--	{ "block",	cmd_block,	"Block Device"			},
--	{ "unblock",	cmd_unblock,	"Unblock Device"		},
--	{ "add-uuid",	cmd_add_uuid,	"Add UUID"			},
--	{ "rm-uuid",	cmd_add_uuid,	"Remove UUID"			},
--	{ "clr-uuids",	cmd_clr_uuids,	"Clear UUIDs",			},
--	{ "did",	cmd_did,	"Set Device ID",		},
--	{ NULL, NULL, 0 }
+-	const char	*str;
+-	speed_t		speed;
+-} supported_speed[]  = {
+-	{"50",		B50	},
+-	{"300",		B300	},
+-	{"600",		B600	},
+-	{"1200",	B1200	},
+-	{"1800",	B1800	},
+-	{"2400",	B2400	},
+-	{"4800",	B4800	},
+-	{"9600",	B9600	},
+-	{"19200",	B19200	},
+-	{"38400",	B38400	},
+-	{"57600",	B57600	},
+-	{"115200",	B115200	},
+-	{ NULL,		B0	}
 -};
 -
--static void usage(void)
+-static speed_t str2speed(const char *str, speed_t *speed)
 -{
 -	int i;
 -
--	printf("btmgmt ver %s\n", VERSION);
--	printf("Usage:\n"
--		"\tbtmgmt [options] <command> [command parameters]\n");
--
--	printf("Options:\n"
--		"\t--index <id>\tSpecify adapter index\n"
--		"\t--verbose\tEnable extra logging\n"
--		"\t--help\tDisplay help\n");
--
--	printf("Commands:\n");
--	for (i = 0; command[i].cmd; i++)
--		printf("\t%-15s\t%s\n", command[i].cmd, command[i].doc);
--
--	printf("\n"
--		"For more information on the usage of each command use:\n"
--		"\tbtmgmt <command> --help\n" );
--}
--
--static struct option main_options[] = {
--	{ "index",	1, 0, 'i' },
--	{ "verbose",	0, 0, 'v' },
--	{ "help",	0, 0, 'h' },
--	{ 0, 0, 0, 0 }
--};
--
--int main(int argc, char *argv[])
--{
--	int opt, i, mgmt_sk;
--	uint16_t index = MGMT_INDEX_NONE;
--	struct pollfd pollfd;
--
--	while ((opt = getopt_long(argc, argv, "+hvi:",
--						main_options, NULL)) != -1) {
--		switch (opt) {
--		case 'i':
--			if (strlen(optarg) > 3 &&
--					strncasecmp(optarg, "hci", 3) == 0)
--				index = atoi(&optarg[4]);
--			else
--				index = atoi(optarg);
--			break;
--		case 'v':
--			monitor = true;
--			break;
--		case 'h':
--		default:
--			usage();
--			return 0;
--		}
--	}
--
--	argc -= optind;
--	argv += optind;
--	optind = 0;
--
--	if (argc < 1) {
--		usage();
--		return 0;
--	}
--
--	mgmt_sk = mgmt_open();
--	if (mgmt_sk < 0) {
--		fprintf(stderr, "Unable to open mgmt socket\n");
--		return -1;
--	}
--
--	for (i = 0; command[i].cmd; i++) {
--		if (strcmp(command[i].cmd, argv[0]) != 0)
+-	for (i = 0; supported_speed[i].str; i++) {
+-		if (strcmp(supported_speed[i].str, str) != 0)
 -			continue;
 -
--		command[i].func(mgmt_sk, index, argc, argv);
--		break;
+-		if (speed)
+-			*speed = supported_speed[i].speed;
+-
+-		return supported_speed[i].speed;
 -	}
 -
--	if (command[i].cmd == NULL) {
--		fprintf(stderr, "Unknown command: %s\n", argv[0]);
--		close(mgmt_sk);
+-	return B0;
+-}
+-
+-static int set_parity(const char *str, tcflag_t *ctrl)
+-{
+-	if (strcasecmp("even", str) == 0) {
+-		*ctrl |= PARENB;
+-		*ctrl &= ~PARODD;
+-	} else if (strcasecmp("odd", str) == 0) {
+-		*ctrl |= PARENB;
+-		*ctrl |= PARODD;
+-	} else if (strcasecmp("mark", str) == 0)
+-		*ctrl |= PARENB;
+-	else if ((strcasecmp("none", str) == 0) ||
+-			(strcasecmp("space", str) == 0))
+-		*ctrl &= ~PARENB;
+-	else
 -		return -1;
--	}
--
--	pollfd.fd = mgmt_sk;
--	pollfd.events = POLLIN;
--	pollfd.revents = 0;
--
--	while (poll(&pollfd, 1, -1) >= 0) {
--		if (pollfd.revents & (POLLHUP | POLLERR | POLLNVAL))
--			break;
--
--		if (pollfd.revents & POLLIN)
--			mgmt_process_data(mgmt_sk);
--
--		pollfd.revents = 0;
--	}
--
--	close(mgmt_sk);
 -
 -	return 0;
 -}
+-
+-static int set_databits(uint8_t databits, tcflag_t *ctrl)
+-{
+-	if (databits < 5 || databits > 8)
+-		return -EINVAL;
+-
+-	*ctrl &= ~CSIZE;
+-	switch (databits) {
+-	case 5:
+-		*ctrl |= CS5;
+-		break;
+-	case 6:
+-		*ctrl |= CS6;
+-		break;
+-	case 7:
+-		*ctrl |= CS7;
+-		break;
+-	case 8:
+-		*ctrl |= CS8;
+-		break;
+-	}
+-
+-	return 0;
+-}
+-
+-static int set_stopbits(uint8_t stopbits, tcflag_t *ctrl)
+-{
+-	/* 1.5 will not be allowed */
+-	switch (stopbits) {
+-	case 1:
+-		*ctrl &= ~CSTOPB;
+-		return 0;
+-	case 2:
+-		*ctrl |= CSTOPB;
+-		return 0;
+-	}
+-
+-	return -EINVAL;
+-}
+-
+-static DBusMessage *proxy_set_serial_params(DBusConnection *conn,
+-						DBusMessage *msg, void *data)
+-{
+-	struct serial_proxy *prx = data;
+-	const char *ratestr, *paritystr;
+-	uint8_t databits, stopbits;
+-	tcflag_t ctrl;		/* Control mode flags */
+-	speed_t speed = B0;	/* In/Out speed */
+-
+-	/* Don't allow change TTY settings if it is open */
+-	if (prx->local)
+-		return btd_error_not_authorized(msg);
+-
+-	if (!dbus_message_get_args(msg, NULL,
+-				DBUS_TYPE_STRING, &ratestr,
+-				DBUS_TYPE_BYTE, &databits,
+-				DBUS_TYPE_BYTE, &stopbits,
+-				DBUS_TYPE_STRING, &paritystr,
+-				DBUS_TYPE_INVALID))
+-		return NULL;
+-
+-	if (str2speed(ratestr, &speed)  == B0)
+-		return btd_error_invalid_args(msg);
+-
+-	ctrl = prx->proxy_ti.c_cflag;
+-	if (set_databits(databits, &ctrl) < 0)
+-		return btd_error_invalid_args(msg);
+-
+-	if (set_stopbits(stopbits, &ctrl) < 0)
+-		return btd_error_invalid_args(msg);
+-
+-	if (set_parity(paritystr, &ctrl) < 0)
+-		return btd_error_invalid_args(msg);
+-
+-	prx->proxy_ti.c_cflag = ctrl;
+-	prx->proxy_ti.c_cflag |= (CLOCAL | CREAD);
+-	cfsetispeed(&prx->proxy_ti, speed);
+-	cfsetospeed(&prx->proxy_ti, speed);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static const GDBusMethodTable proxy_methods[] = {
+-	{ GDBUS_METHOD("Enable", NULL, NULL, proxy_enable) },
+-	{ GDBUS_METHOD("Disable", NULL, NULL, proxy_disable) },
+-	{ GDBUS_METHOD("GetInfo",
+-			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
+-			proxy_get_info) },
+-	{ GDBUS_METHOD("SetSerialParameters",
+-			GDBUS_ARGS({ "rate", "s" }, { "data", "y" },
+-					{ "stop", "y" }, { "parity", "s" }),
+-			NULL, proxy_set_serial_params) },
+-	{ },
+-};
+-
+-static void proxy_path_unregister(gpointer data)
+-{
+-	struct serial_proxy *prx = data;
+-	int sk;
+-
+-	DBG("Unregistered proxy: %s", prx->address);
+-
+-	if (prx->type != TTY_PROXY)
+-		goto done;
+-
+-	/* Restore the initial TTY configuration */
+-	sk = open(prx->address, O_RDWR | O_NOCTTY);
+-	if (sk >= 0) {
+-		tcsetattr(sk, TCSAFLUSH, &prx->sys_ti);
+-		close(sk);
+-	}
+-done:
+-
+-	proxy_free(prx);
+-}
+-
+-static int register_proxy_object(struct serial_proxy *prx)
+-{
+-	struct serial_adapter *adapter = prx->adapter;
+-	char path[MAX_PATH_LENGTH + 1];
+-
+-	snprintf(path, MAX_PATH_LENGTH, "%s/proxy%d",
+-			adapter_get_path(adapter->btd_adapter), sk_counter++);
+-
+-	if (!g_dbus_register_interface(adapter->conn, path,
+-					SERIAL_PROXY_INTERFACE,
+-					proxy_methods, NULL, NULL,
+-					prx, proxy_path_unregister)) {
+-		error("D-Bus failed to register %s path", path);
+-		return -1;
+-	}
+-
+-	prx->path = g_strdup(path);
+-	adapter->proxies = g_slist_append(adapter->proxies, prx);
+-
+-	DBG("Registered proxy: %s", path);
+-
+-	return 0;
+-}
+-
+-static int proxy_tty_register(struct serial_adapter *adapter,
+-				const char *uuid128, const char *address,
+-				struct termios *ti,
+-				struct serial_proxy **proxy)
+-{
+-	struct termios sys_ti;
+-	struct serial_proxy *prx;
+-	int sk, ret;
+-
+-	sk = open(address, O_RDONLY | O_NOCTTY);
+-	if (sk < 0) {
+-		error("Can't open TTY: %s(%d)", strerror(errno), errno);
+-		return -EINVAL;
+-	}
+-
+-	prx = g_new0(struct serial_proxy, 1);
+-	prx->address = g_strdup(address);
+-	prx->uuid128 = g_strdup(uuid128);
+-	prx->type = TTY_PROXY;
+-	adapter_get_address(adapter->btd_adapter, &prx->src);
+-	prx->adapter = adapter;
+-
+-	/* Current TTY settings */
+-	memset(&sys_ti, 0, sizeof(sys_ti));
+-	tcgetattr(sk, &sys_ti);
+-	memcpy(&prx->sys_ti, &sys_ti, sizeof(sys_ti));
+-	close(sk);
+-
+-	if (!ti) {
+-		/* Use current settings */
+-		memcpy(&prx->proxy_ti, &sys_ti, sizeof(sys_ti));
+-	} else {
+-		/* New TTY settings: user provided */
+-		memcpy(&prx->proxy_ti, ti, sizeof(*ti));
+-	}
+-
+-	ret = register_proxy_object(prx);
+-	if (ret < 0) {
+-		proxy_free(prx);
+-		return ret;
+-	}
+-
+-	*proxy = prx;
+-
+-	return ret;
+-}
+-
+-static int proxy_socket_register(struct serial_adapter *adapter,
+-				const char *uuid128, const char *address,
+-				struct serial_proxy **proxy)
+-{
+-	struct serial_proxy *prx;
+-	int ret;
+-
+-	prx = g_new0(struct serial_proxy, 1);
+-	prx->address = g_strdup(address);
+-	prx->uuid128 = g_strdup(uuid128);
+-	prx->type = UNIX_SOCKET_PROXY;
+-	adapter_get_address(adapter->btd_adapter, &prx->src);
+-	prx->adapter = adapter;
+-
+-	ret = register_proxy_object(prx);
+-	if (ret < 0) {
+-		proxy_free(prx);
+-		return ret;
+-	}
+-
+-	*proxy = prx;
+-
+-	return ret;
+-}
+-
+-static int proxy_tcp_register(struct serial_adapter *adapter,
+-				const char *uuid128, const char *address,
+-				struct serial_proxy **proxy)
+-{
+-	struct serial_proxy *prx;
+-	int ret;
+-
+-	prx = g_new0(struct serial_proxy, 1);
+-	prx->address = g_strdup(address);
+-	prx->uuid128 = g_strdup(uuid128);
+-	prx->type = TCP_SOCKET_PROXY;
+-	adapter_get_address(adapter->btd_adapter, &prx->src);
+-	prx->adapter = adapter;
+-
+-	ret = register_proxy_object(prx);
+-	if (ret < 0) {
+-		proxy_free(prx);
+-		return ret;
+-	}
+-
+-	*proxy = prx;
+-
+-	return ret;
+-}
+-
+-static proxy_type_t addr2type(const char *address)
+-{
+-	struct stat st;
+-
+-	if (stat(address, &st) < 0) {
+-		/*
+-		 * Unix socket: if the sun_path starts with null byte
+-		 * it refers to abstract namespace. 'x00' will be used
+-		 * to represent the null byte.
+-		 */
+-		if (strncmp("localhost:", address, 10) == 0)
+-			return TCP_SOCKET_PROXY;
+-		if (strncmp("x00", address, 3) != 0)
+-			return UNKNOWN_PROXY_TYPE;
+-		else
+-			return UNIX_SOCKET_PROXY;
+-	} else {
+-		/* Filesystem: char device or unix socket */
+-		if (S_ISCHR(st.st_mode) && strncmp("/dev/", address, 4) == 0)
+-			return TTY_PROXY;
+-		else if (S_ISSOCK(st.st_mode))
+-			return UNIX_SOCKET_PROXY;
+-		else
+-			return UNKNOWN_PROXY_TYPE;
+-	}
+-}
+-
+-static int proxy_addrcmp(gconstpointer proxy, gconstpointer addr)
+-{
+-	const struct serial_proxy *prx = proxy;
+-	const char *address = addr;
+-
+-	return strcmp(prx->address, address);
+-}
+-
+-static int proxy_pathcmp(gconstpointer proxy, gconstpointer p)
+-{
+-	const struct serial_proxy *prx = proxy;
+-	const char *path = p;
+-
+-	return strcmp(prx->path, path);
+-}
+-
+-static int register_proxy(struct serial_adapter *adapter,
+-				const char *uuid_str, const char *address,
+-				struct serial_proxy **proxy)
+-{
+-	proxy_type_t type;
+-	int err;
+-
+-	type = addr2type(address);
+-	if (type == UNKNOWN_PROXY_TYPE)
+-		return -EINVAL;
+-
+-	/* Only one proxy per address(TTY or unix socket) is allowed */
+-	if (g_slist_find_custom(adapter->proxies, address, proxy_addrcmp))
+-		return -EALREADY;
+-
+-	switch (type) {
+-	case UNIX_SOCKET_PROXY:
+-		err = proxy_socket_register(adapter, uuid_str, address, proxy);
+-		break;
+-	case TTY_PROXY:
+-		err = proxy_tty_register(adapter, uuid_str, address, NULL,
+-					proxy);
+-		break;
+-	case TCP_SOCKET_PROXY:
+-		err = proxy_tcp_register(adapter, uuid_str, address, proxy);
+-		break;
+-	default:
+-		err = -EINVAL;
+-	}
+-
+-	if (err < 0)
+-		return err;
+-
+-	g_dbus_emit_signal(adapter->conn,
+-				adapter_get_path(adapter->btd_adapter),
+-				SERIAL_MANAGER_INTERFACE, "ProxyCreated",
+-				DBUS_TYPE_STRING, &(*proxy)->path,
+-				DBUS_TYPE_INVALID);
+-
+-	return 0;
+-}
+-
+-static void unregister_proxy(struct serial_proxy *proxy)
+-{
+-	struct serial_adapter *adapter = proxy->adapter;
+-	char *path = g_strdup(proxy->path);
+-
+-	if (proxy->watch > 0)
+-		g_dbus_remove_watch(adapter->conn, proxy->watch);
+-
+-	g_dbus_emit_signal(adapter->conn,
+-			adapter_get_path(adapter->btd_adapter),
+-			SERIAL_MANAGER_INTERFACE, "ProxyRemoved",
+-			DBUS_TYPE_STRING, &path,
+-			DBUS_TYPE_INVALID);
+-
+-	adapter->proxies = g_slist_remove(adapter->proxies, proxy);
+-
+-	g_dbus_unregister_interface(adapter->conn, path,
+-					SERIAL_PROXY_INTERFACE);
+-
+-	g_free(path);
+-}
+-
+-static void watch_proxy(DBusConnection *connection, void *user_data)
+-{
+-	struct serial_proxy *proxy = user_data;
+-
+-	proxy->watch = 0;
+-	unregister_proxy(proxy);
+-}
+-
+-static DBusMessage *create_proxy(DBusConnection *conn,
+-				DBusMessage *msg, void *data)
+-{
+-	struct serial_adapter *adapter = data;
+-	struct serial_proxy *proxy;
+-	const char *pattern, *address;
+-	char *uuid_str;
+-	int err;
+-
+-	if (!dbus_message_get_args(msg, NULL,
+-				DBUS_TYPE_STRING, &pattern,
+-				DBUS_TYPE_STRING, &address,
+-				DBUS_TYPE_INVALID))
+-		return NULL;
+-
+-	uuid_str = bt_name2string(pattern);
+-	if (!uuid_str)
+-		return btd_error_invalid_args(msg);
+-
+-	err = register_proxy(adapter, uuid_str, address, &proxy);
+-	g_free(uuid_str);
+-
+-	if (err == -EINVAL)
+-		return btd_error_invalid_args(msg);
+-	else if (err == -EALREADY)
+-		return btd_error_already_exists(msg);
+-	else if (err < 0)
+-		return btd_error_failed(msg, strerror(-err));
+-
+-	proxy->owner = g_strdup(dbus_message_get_sender(msg));
+-	proxy->watch = g_dbus_add_disconnect_watch(conn, proxy->owner,
+-						watch_proxy,
+-						proxy, NULL);
+-
+-	return g_dbus_create_reply(msg, DBUS_TYPE_STRING, &proxy->path,
+-					DBUS_TYPE_INVALID);
+-}
+-
+-static DBusMessage *list_proxies(DBusConnection *conn,
+-				DBusMessage *msg, void *data)
+-{
+-	struct serial_adapter *adapter = data;
+-	const GSList *l;
+-	DBusMessage *reply;
+-	DBusMessageIter iter, iter_array;
+-
+-	reply = dbus_message_new_method_return(msg);
+-	if (!reply)
+-		return NULL;
+-
+-	dbus_message_iter_init_append(reply, &iter);
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-			DBUS_TYPE_STRING_AS_STRING, &iter_array);
+-
+-	for (l = adapter->proxies; l; l = l->next) {
+-		struct serial_proxy *prx = l->data;
+-
+-		dbus_message_iter_append_basic(&iter_array,
+-				DBUS_TYPE_STRING, &prx->path);
+-	}
+-
+-	dbus_message_iter_close_container(&iter, &iter_array);
+-
+-	return reply;
+-}
+-
+-static DBusMessage *remove_proxy(DBusConnection *conn,
+-				DBusMessage *msg, void *data)
+-{
+-	struct serial_adapter *adapter = data;
+-	struct serial_proxy *prx;
+-	const char *path, *sender;
+-	GSList *l;
+-
+-	if (!dbus_message_get_args(msg, NULL,
+-				DBUS_TYPE_STRING, &path,
+-				DBUS_TYPE_INVALID))
+-		return NULL;
+-
+-	l = g_slist_find_custom(adapter->proxies, path, proxy_pathcmp);
+-	if (!l)
+-		return btd_error_does_not_exist(msg);
+-
+-	prx = l->data;
+-
+-	sender = dbus_message_get_sender(msg);
+-	if (g_strcmp0(prx->owner, sender) != 0)
+-		return btd_error_not_authorized(msg);
+-
+-	unregister_proxy(prx);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static void manager_path_unregister(void *data)
+-{
+-	struct serial_adapter *adapter = data;
+-	GSList *l;
+-
+-	/* Remove proxy objects */
+-	for (l = adapter->proxies; l; l = l->next) {
+-		struct serial_proxy *prx = l->data;
+-		char *path = g_strdup(prx->path);
+-
+-		g_dbus_unregister_interface(adapter->conn, path,
+-					SERIAL_PROXY_INTERFACE);
+-		g_free(path);
+-	}
+-
+-	if (adapter->conn)
+-		dbus_connection_unref(adapter->conn);
+-
+-	adapters = g_slist_remove(adapters, adapter);
+-	g_slist_free(adapter->proxies);
+-	btd_adapter_unref(adapter->btd_adapter);
+-	g_free(adapter);
+-}
+-
+-static const GDBusMethodTable manager_methods[] = {
+-	{ GDBUS_METHOD("CreateProxy",
+-			GDBUS_ARGS({ "pattern", "s" },
+-					{ "address", "s" }),
+-			GDBUS_ARGS({ "path", "s" }),
+-			create_proxy) },
+-	{ GDBUS_METHOD("ListProxies",
+-			NULL, GDBUS_ARGS({ "paths", "as" }),
+-			list_proxies) },
+-	{ GDBUS_METHOD("RemoveProxy",
+-			GDBUS_ARGS({ "path", "s" }), NULL,
+-			remove_proxy) },
+-	{ },
+-};
+-
+-static const GDBusSignalTable manager_signals[] = {
+-	{ GDBUS_SIGNAL("ProxyCreated", GDBUS_ARGS({ "path", "s" })) },
+-	{ GDBUS_SIGNAL("ProxyRemoved", GDBUS_ARGS({ "path", "s" })) },
+-	{ }
+-};
+-
+-static struct serial_adapter *find_adapter(GSList *list,
+-					struct btd_adapter *btd_adapter)
+-{
+-	for (; list; list = list->next) {
+-		struct serial_adapter *adapter = list->data;
+-
+-		if (adapter->btd_adapter == btd_adapter)
+-			return adapter;
+-	}
+-
+-	return NULL;
+-}
+-
+-static void serial_proxy_init(struct serial_adapter *adapter)
+-{
+-	GKeyFile *config;
+-	GError *gerr = NULL;
+-	const char *file = CONFIGDIR "/serial.conf";
+-	char **group_list;
+-	int i;
+-
+-	config = g_key_file_new();
+-
+-	if (!g_key_file_load_from_file(config, file, 0, &gerr)) {
+-		error("Parsing %s failed: %s", file, gerr->message);
+-		g_error_free(gerr);
+-		g_key_file_free(config);
+-		return;
+-	}
+-
+-	group_list = g_key_file_get_groups(config, NULL);
+-
+-	for (i = 0; group_list[i] != NULL; i++) {
+-		char *group_str = group_list[i], *uuid_str, *address;
+-		int err;
+-		struct serial_proxy *prx;
+-
+-		/* string length of "Proxy" is 5 */
+-		if (strlen(group_str) < 5 || strncmp(group_str, "Proxy", 5))
+-			continue;
+-
+-		uuid_str = g_key_file_get_string(config, group_str, "UUID",
+-									&gerr);
+-		if (gerr) {
+-			DBG("%s: %s", file, gerr->message);
+-			g_error_free(gerr);
+-			g_key_file_free(config);
+-			g_strfreev(group_list);
+-			return;
+-		}
+-
+-		address = g_key_file_get_string(config, group_str, "Address",
+-									&gerr);
+-		if (gerr) {
+-			DBG("%s: %s", file, gerr->message);
+-			g_error_free(gerr);
+-			g_key_file_free(config);
+-			g_free(uuid_str);
+-			g_strfreev(group_list);
+-			return;
+-		}
+-
+-		err = register_proxy(adapter, uuid_str, address, &prx);
+-		if (err == -EINVAL)
+-			error("Invalid address.");
+-		else if (err == -EALREADY)
+-			DBG("Proxy already exists.");
+-		else if (err < 0)
+-			error("Proxy creation failed (%s)", strerror(-err));
+-		else {
+-			err = enable_proxy(prx);
+-			if (err < 0)
+-				error("Proxy enable failed (%s)",
+-						strerror(-err));
+-		}
+-
+-		g_free(uuid_str);
+-		g_free(address);
+-	}
+-
+-	g_strfreev(group_list);
+-	g_key_file_free(config);
+-}
+-
+-int proxy_register(DBusConnection *conn, struct btd_adapter *btd_adapter)
+-{
+-	struct serial_adapter *adapter;
+-	const char *path;
+-
+-	adapter = find_adapter(adapters, btd_adapter);
+-	if (adapter)
+-		return -EINVAL;
+-
+-	adapter = g_new0(struct serial_adapter, 1);
+-	adapter->conn = dbus_connection_ref(conn);
+-	adapter->btd_adapter = btd_adapter_ref(btd_adapter);
+-
+-	path = adapter_get_path(btd_adapter);
+-
+-	if (!g_dbus_register_interface(conn, path,
+-					SERIAL_MANAGER_INTERFACE,
+-					manager_methods, manager_signals, NULL,
+-					adapter, manager_path_unregister)) {
+-		error("Failed to register %s interface to %s",
+-				SERIAL_MANAGER_INTERFACE, path);
+-		return -1;
+-	}
+-
+-	adapters = g_slist_append(adapters, adapter);
+-
+-	DBG("Registered interface %s on path %s",
+-		SERIAL_MANAGER_INTERFACE, path);
+-
+-	serial_proxy_init(adapter);
+-
+-	return 0;
+-}
+-
+-void proxy_unregister(struct btd_adapter *btd_adapter)
+-{
+-	struct serial_adapter *adapter;
+-
+-	adapter = find_adapter(adapters, btd_adapter);
+-	if (!adapter)
+-		return;
+-
+-	g_dbus_unregister_interface(adapter->conn,
+-			adapter_get_path(btd_adapter),
+-			SERIAL_MANAGER_INTERFACE);
+-}
+diff --git a/serial/proxy.h b/serial/proxy.h
+deleted file mode 100644
+index 7871665..0000000
+--- a/serial/proxy.h
++++ /dev/null
+@@ -1,25 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-int proxy_register(DBusConnection *conn, struct btd_adapter *btd_adapter);
+-void proxy_unregister(struct btd_adapter *btd_adapter);
+diff --git a/serial/serial.conf b/serial/serial.conf
+deleted file mode 100644
+index 43ee6af..0000000
+--- a/serial/serial.conf
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# Configuration file for serial
+-
+-# There could be multiple proxy sections, the format is [Proxy <user chosen name>]
+-#[Proxy DUN]
+-
+-# UUID for DUN proxy service
+-#UUID=00001103-0000-1000-8000-00805F9B34FB
+-
+-# Address for device node
+-#Address=/dev/ttyx
 -- 
 1.7.10.2
 
