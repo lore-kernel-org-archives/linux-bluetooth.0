@@ -1,63 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: manoj.iyer@canonical.com
-To: linux-kernel@vger.kernel.org
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org,
-	Manoj Iyer <manoj.iyer@canonical.com>
-Subject: [PATCH] Bluetooth: btusb: Add vendor specific ID (0a5c:21f4) BCM20702A0
-Date: Tue, 10 Jul 2012 14:07:38 -0500
-Message-Id: <1341947258-3929-1-git-send-email-manoj.iyer@canonical.com>
+Date: Tue, 10 Jul 2012 15:58:44 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 14/17] Bluetooth: Add initialization tracking to HCI
+ Three-wire driver
+Message-ID: <20120710185844.GI13847@joana>
+References: <1340796367-10321-1-git-send-email-johan.hedberg@gmail.com>
+ <1340796367-10321-15-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1340796367-10321-15-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Manoj Iyer <manoj.iyer@canonical.com>
+Hi Johan,
 
-Patch adds support for BCM20702A0 device id (0a5c:21f4).
+* Johan Hedberg <johan.hedberg@gmail.com> [2012-06-27 14:26:04 +0300]:
 
-usb-devices after patch was applied:
-T: Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 2 Spd=12 MxCh= 0
-D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-P: Vendor=0a5c ProdID=21f4 Rev=01.12
-S: Manufacturer=Broadcom Corp
-S: Product=BCM20702A0
-S: SerialNumber=E4D53DF154D6
-C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+> From: Johan Hedberg <johan.hedberg@intel.com>
+> 
+> This patch adds tracking for the uninitialized, initialized and active
+> states for Three-wire UART. This is needed so we can handle periodic
+> sending of the Link Establishment messages before reaching active state
+> and so that we do not try to do any higher level HCI data transmission
+> before reaching active state.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  drivers/bluetooth/hci_h5.c |   70 ++++++++++++++++++++++++++++++++------------
+>  1 file changed, 52 insertions(+), 18 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+> index d26f801..1e83118 100644
+> --- a/drivers/bluetooth/hci_h5.c
+> +++ b/drivers/bluetooth/hci_h5.c
+> @@ -72,18 +72,53 @@ struct h5 {
+>  	u8			tx_seq;		/* Next seq number to send */
+>  	u8			tx_ack;		/* Next ack number to send */
+>  
+> +	enum {
+> +		H5_UNINITIALIZED,
+> +		H5_INITIALIZED,
+> +		H5_ACTIVE,
+> +	} state;
+> +
+>  	bool			sleeping;
+>  };
+>  
+>  static void h5_reset_rx(struct h5 *h5);
+>  
+> +static void h5_link_control(struct hci_uart *hu, const void *data, size_t len)
+> +{
+> +	struct h5 *h5 = hu->priv;
+> +	struct sk_buff *nskb;
+> +
+> +	nskb = alloc_skb(3, GFP_ATOMIC);
+> +	if (!nskb)
+> +		return;
+> +
+> +	bt_cb(nskb)->pkt_type = HCI_3WIRE_LINK_PKT;
+> +
+> +	memcpy(skb_put(nskb, len), data, len);
+> +
+> +	skb_queue_tail(&h5->unrel, nskb);
+> +}
+> +
+>  static void h5_timed_event(unsigned long arg)
+>  {
+> +	const unsigned char sync_req[] = { 0x01, 0x7e };
+> +	const unsigned char conf_req[] = { 0x03, 0xfc, 0x01 };
+>  	struct hci_uart *hu = (struct hci_uart *) arg;
+>  	struct h5 *h5 = hu->priv;
+>  	struct sk_buff *skb;
+>  	unsigned long flags;
+>  
+> +	if (h5->state == H5_UNINITIALIZED)
+> +		h5_link_control(hu, sync_req, sizeof(sync_req));
+> +
+> +	if (h5->state == H5_INITIALIZED)
+> +		h5_link_control(hu, conf_req, sizeof(conf_req));
+> +
+> +	if (h5->state != H5_ACTIVE) {
+> +		mod_timer(&h5->timer, jiffies + HZ / 10);
+> +		goto wakeup;
 
-usb-devices before patch was applied:
-T: Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 2 Spd=12 MxCh= 0
-D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-P: Vendor=0a5c ProdID=21f4 Rev=01.12
-S: Manufacturer=Broadcom Corp
-S: Product=BCM20702A0
-S: SerialNumber=E4D53DF154D6
-C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+Another HZ usage.
 
-Signed-off-by: Manoj Iyer <manoj.iyer@canonical.com>
-Tested-by: Chris Gagnon <chris.gagnon@canonical.com>
----
- drivers/bluetooth/btusb.c |    1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 83ebb24..1ecb8e5 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -106,6 +106,7 @@ static struct usb_device_id btusb_table[] = {
- 	{ USB_DEVICE(0x0a5c, 0x21e6) },
- 	{ USB_DEVICE(0x0a5c, 0x21e8) },
- 	{ USB_DEVICE(0x0a5c, 0x21f3) },
-+	{ USB_DEVICE(0x0a5c, 0x21f4) },
- 	{ USB_DEVICE(0x413c, 0x8197) },
- 
- 	/* Foxconn - Hon Hai */
--- 
-1.7.9.5
-
+	Gustavo
