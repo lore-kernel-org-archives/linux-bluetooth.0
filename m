@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v3 7/9] sap: move it to profiles folder
-Date: Tue, 10 Jul 2012 11:03:06 -0300
-Message-Id: <1341928988-5116-7-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v3 6/9] proximity: move to the profiles folder
+Date: Tue, 10 Jul 2012 11:03:05 -0300
+Message-Id: <1341928988-5116-6-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1341928988-5116-1-git-send-email-gustavo@padovan.org>
 References: <1341928988-5116-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,104 +13,107 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
 ---
- Makefile.am                       |   19 ++++++++++---------
- {sap => profiles/sap}/main.c      |    0
- {sap => profiles/sap}/manager.c   |    0
- {sap => profiles/sap}/manager.h   |    0
- {sap => profiles/sap}/sap-dummy.c |    0
- {sap => profiles/sap}/sap-u8500.c |    0
- {sap => profiles/sap}/sap.h       |    0
- {sap => profiles/sap}/server.c    |    0
- {sap => profiles/sap}/server.h    |    0
- 9 files changed, 10 insertions(+), 9 deletions(-)
- rename {sap => profiles/sap}/main.c (100%)
- rename {sap => profiles/sap}/manager.c (100%)
- rename {sap => profiles/sap}/manager.h (100%)
- rename {sap => profiles/sap}/sap-dummy.c (100%)
- rename {sap => profiles/sap}/sap-u8500.c (100%)
- rename {sap => profiles/sap}/sap.h (100%)
- rename {sap => profiles/sap}/server.c (100%)
- rename {sap => profiles/sap}/server.h (100%)
+ Makefile.am                                      |   15 ++++++++++-----
+ {proximity => profiles/proximity}/immalert.c     |    0
+ {proximity => profiles/proximity}/immalert.h     |    0
+ {proximity => profiles/proximity}/linkloss.c     |    0
+ {proximity => profiles/proximity}/linkloss.h     |    0
+ {proximity => profiles/proximity}/main.c         |    0
+ {proximity => profiles/proximity}/manager.c      |    0
+ {proximity => profiles/proximity}/manager.h      |    0
+ {proximity => profiles/proximity}/monitor.c      |    0
+ {proximity => profiles/proximity}/monitor.h      |    0
+ {proximity => profiles/proximity}/proximity.conf |    0
+ {proximity => profiles/proximity}/reporter.c     |    0
+ {proximity => profiles/proximity}/reporter.h     |    0
+ 13 files changed, 10 insertions(+), 5 deletions(-)
+ rename {proximity => profiles/proximity}/immalert.c (100%)
+ rename {proximity => profiles/proximity}/immalert.h (100%)
+ rename {proximity => profiles/proximity}/linkloss.c (100%)
+ rename {proximity => profiles/proximity}/linkloss.h (100%)
+ rename {proximity => profiles/proximity}/main.c (100%)
+ rename {proximity => profiles/proximity}/manager.c (100%)
+ rename {proximity => profiles/proximity}/manager.h (100%)
+ rename {proximity => profiles/proximity}/monitor.c (100%)
+ rename {proximity => profiles/proximity}/monitor.h (100%)
+ rename {proximity => profiles/proximity}/proximity.conf (100%)
+ rename {proximity => profiles/proximity}/reporter.c (100%)
+ rename {proximity => profiles/proximity}/reporter.h (100%)
 
 diff --git a/Makefile.am b/Makefile.am
-index 87208cc..b445160 100644
+index 037ded5..87208cc 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -165,16 +165,16 @@ endif
- 
- if SAPPLUGIN
- builtin_modules += sap
--builtin_sources += sap/main.c \
--			sap/manager.h sap/manager.c \
--			sap/server.h sap/server.c \
--			sap/sap.h
-+builtin_sources += profiles/sap/main.c profiles/sap/manager.h \
-+			profiles/sap/manager.c profiles/sap/server.h \
-+			profiles/sap/server.c profiles/sap/sap.h
- 
--builtin_nodist += sap/sap.c
-+builtin_nodist += profiles/sap/sap.c
- 
--noinst_LIBRARIES += sap/libsap.a
-+noinst_LIBRARIES += profiles/sap/libsap.a
- 
--sap_libsap_a_SOURCES = sap/sap.h sap/sap-dummy.c sap/sap-u8500.c
-+profiles_sap_libsap_a_SOURCES = profiles_sap/sap.h profiles/sap/sap-dummy.c \
-+				profiles/sap/sap-u8500.c
- endif
- 
- if INPUTPLUGIN
-@@ -337,7 +337,8 @@ EXTRA_DIST += src/genbuiltin src/bluetooth.conf src/org.bluez.service \
- 			profiles/input/input.conf proximity/proximity.conf \ \
- 			audio/audio.conf audio/telephony-dummy.c \
- 			audio/telephony-maemo5.c audio/telephony-ofono.c \
--			audio/telephony-maemo6.c sap/sap-dummy.c sap/sap-u8500.c
-+			audio/telephony-maemo6.c profiles/sap/sap-dummy.c \
-+			profiles/sap/sap-u8500.c
- 
- if AUDIOPLUGIN
- if GSTREAMER
-@@ -443,7 +444,7 @@ src/builtin.h: src/genbuiltin $(builtin_sources)
- audio/telephony.c: audio/@TELEPHONY_DRIVER@
- 	$(AM_V_GEN)$(LN_S) $(abs_top_builddir)/$< $@
- 
--sap/sap.c: sap/@SAP_DRIVER@
-+profiles/sap/sap.c: profiles/sap/@SAP_DRIVER@
- 	$(AM_V_GEN)$(LN_S) $(abs_top_srcdir)/$< $@
- 
- scripts/%.rules:
-diff --git a/sap/main.c b/profiles/sap/main.c
+@@ -227,11 +227,16 @@ builtin_sources += profiles/thermometer/main.c \
+ 			profiles/time/server.c profiles/time/manager.c \
+ 			profiles/time/manager.h \
+ 			plugins/gatt-example.c \
+-			proximity/main.c proximity/manager.h proximity/manager.c \
+-			proximity/monitor.h proximity/monitor.c \
+-			proximity/reporter.h proximity/reporter.c \
+-			proximity/linkloss.h proximity/linkloss.c \
+-			proximity/immalert.h proximity/immalert.c \
++			profiles/proximity/main.c profiles/proximity/manager.h \
++		       	profiles/proximity/manager.c \
++			profiles/proximity/monitor.h \
++			profiles/proximity/monitor.c \
++			profiles/proximity/reporter.h \
++			profiles/proximity/reporter.c \
++			profiles/proximity/linkloss.h \
++			profiles/proximity/linkloss.c \
++			profiles/proximity/immalert.h \
++			profiles/proximity/immalert.c \
+ 			profiles/deviceinfo/main.c \
+ 			profiles/deviceinfo/manager.h \
+ 			profiles/deviceinfo/manager.c \
+diff --git a/proximity/immalert.c b/profiles/proximity/immalert.c
 similarity index 100%
-rename from sap/main.c
-rename to profiles/sap/main.c
-diff --git a/sap/manager.c b/profiles/sap/manager.c
+rename from proximity/immalert.c
+rename to profiles/proximity/immalert.c
+diff --git a/proximity/immalert.h b/profiles/proximity/immalert.h
 similarity index 100%
-rename from sap/manager.c
-rename to profiles/sap/manager.c
-diff --git a/sap/manager.h b/profiles/sap/manager.h
+rename from proximity/immalert.h
+rename to profiles/proximity/immalert.h
+diff --git a/proximity/linkloss.c b/profiles/proximity/linkloss.c
 similarity index 100%
-rename from sap/manager.h
-rename to profiles/sap/manager.h
-diff --git a/sap/sap-dummy.c b/profiles/sap/sap-dummy.c
+rename from proximity/linkloss.c
+rename to profiles/proximity/linkloss.c
+diff --git a/proximity/linkloss.h b/profiles/proximity/linkloss.h
 similarity index 100%
-rename from sap/sap-dummy.c
-rename to profiles/sap/sap-dummy.c
-diff --git a/sap/sap-u8500.c b/profiles/sap/sap-u8500.c
+rename from proximity/linkloss.h
+rename to profiles/proximity/linkloss.h
+diff --git a/proximity/main.c b/profiles/proximity/main.c
 similarity index 100%
-rename from sap/sap-u8500.c
-rename to profiles/sap/sap-u8500.c
-diff --git a/sap/sap.h b/profiles/sap/sap.h
+rename from proximity/main.c
+rename to profiles/proximity/main.c
+diff --git a/proximity/manager.c b/profiles/proximity/manager.c
 similarity index 100%
-rename from sap/sap.h
-rename to profiles/sap/sap.h
-diff --git a/sap/server.c b/profiles/sap/server.c
+rename from proximity/manager.c
+rename to profiles/proximity/manager.c
+diff --git a/proximity/manager.h b/profiles/proximity/manager.h
 similarity index 100%
-rename from sap/server.c
-rename to profiles/sap/server.c
-diff --git a/sap/server.h b/profiles/sap/server.h
+rename from proximity/manager.h
+rename to profiles/proximity/manager.h
+diff --git a/proximity/monitor.c b/profiles/proximity/monitor.c
 similarity index 100%
-rename from sap/server.h
-rename to profiles/sap/server.h
+rename from proximity/monitor.c
+rename to profiles/proximity/monitor.c
+diff --git a/proximity/monitor.h b/profiles/proximity/monitor.h
+similarity index 100%
+rename from proximity/monitor.h
+rename to profiles/proximity/monitor.h
+diff --git a/proximity/proximity.conf b/profiles/proximity/proximity.conf
+similarity index 100%
+rename from proximity/proximity.conf
+rename to profiles/proximity/proximity.conf
+diff --git a/proximity/reporter.c b/profiles/proximity/reporter.c
+similarity index 100%
+rename from proximity/reporter.c
+rename to profiles/proximity/reporter.c
+diff --git a/proximity/reporter.h b/profiles/proximity/reporter.h
+similarity index 100%
+rename from proximity/reporter.h
+rename to profiles/proximity/reporter.h
 -- 
 1.7.10.2
 
