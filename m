@@ -1,44 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 10 Jul 2012 11:22:47 -0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [PATCH -v3 1/9] serial: remove the whole serial code
-Message-ID: <20120710142247.GA728@x220>
-References: <1341928988-5116-1-git-send-email-gustavo@padovan.org>
+Date: Tue, 10 Jul 2012 17:06:58 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Masatake YAMATO <yamato@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 1/8] /proc/net/ entries for bluetooth protocols
+Message-ID: <20120710140656.GB15795@aemeltch-MOBL1>
+References: <20120615080007.GD7205@aemeltch-MOBL1>
+ <20120618.190014.158443124058398316.yamato@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1341928988-5116-1-git-send-email-gustavo@padovan.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20120618.190014.158443124058398316.yamato@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Masatake,
 
-On Tue, Jul 10, 2012, Gustavo Padovan wrote:
-> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+On Mon, Jun 18, 2012 at 07:00:14PM +0900, Masatake YAMATO wrote:
+> (I reflected the result of reviewing by Andrei.)
 > 
+> lsof command can tell the type of socket processes are using.
+> Internal lsof uses inode numbers on socket fs to resolve the type of
+> sockets. Files under /proc/net/, such as tcp, udp, unix, etc provides
+> such inode information.
+> 
+> Unfortunately bluetooth related protocols don't provide such inode
+> information. This patch series introduces /proc/net files for the protocols.
+> 
+> This patch against af_bluetooth.c provides facility to the implementation
+> of protocols. This patch extends bt_sock_list and introduces two exported
+> function bt_procfs_init, bt_procfs_cleanup.
+> 
+> The type bt_sock_list is already used in some of implementation of
+> protocols. bt_procfs_init prepare seq_operations which converts
+> protocol own bt_sock_list data to protocol own proc entry when the
+> entry is accessed.
+> 
+> What I, lsof user, need is just inode number of bluetooth
+> socket. However, people may want more information. The bt_procfs_init
+> takes a function pointer for customizing the show handler of
+> seq_operations.
+> 
+> Signed-off-by: Masatake YAMATO <yamato@redhat.com>
 > ---
->  Makefile.am        |   19 +-
->  acinclude.m4       |    6 -
->  doc/serial-api.txt |   57 -----
->  serial/main.c      |   59 -----
->  serial/manager.c   |  127 -----------
->  serial/manager.h   |   25 --
->  serial/port.c      |  638 ----------------------------------------------------
->  serial/port.h      |   29 ---
->  serial/serial.conf |   10 -
->  9 files changed, 5 insertions(+), 965 deletions(-)
->  delete mode 100644 doc/serial-api.txt
->  delete mode 100644 serial/main.c
->  delete mode 100644 serial/manager.c
->  delete mode 100644 serial/manager.h
->  delete mode 100644 serial/port.c
->  delete mode 100644 serial/port.h
->  delete mode 100644 serial/serial.conf
+>  include/net/bluetooth/bluetooth.h |   10 +++
+>  net/bluetooth/af_bluetooth.c      |  136 +++++++++++++++++++++++++++++++++++++
+>  2 files changed, 146 insertions(+)
+> 
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index 961669b..9c44977 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -30,6 +30,7 @@
+>  #include <linux/list.h>
 
-All patches in this set have been applied. Thanks.
+The line above was removed by commit
 
-Seems that audio is still missing though.
+commit 8c520a59927a5600973782505dbb750d985057c4
+Author: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Date:   Wed May 23 04:04:22 2012 -0300
 
-Johan
+    Bluetooth: Remove unnecessary headers include
+
+Best regards 
+Andrei Emeltchenko 
+
