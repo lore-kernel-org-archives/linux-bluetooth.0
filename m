@@ -1,25 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 10 Jul 2012 15:23:42 -0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/5] build: Fix typo
-Message-ID: <20120710182342.GA23754@x220>
-References: <1341943704-23633-1-git-send-email-vinicius.gomes@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1341943704-23633-1-git-send-email-vinicius.gomes@openbossa.org>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ] gitignore: Move entries to the right place
+Date: Tue, 10 Jul 2012 15:17:15 -0300
+Message-Id: <1341944235-6029-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+---
+ .gitignore | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-On Tue, Jul 10, 2012, Vinicius Costa Gomes wrote:
-> "profiles_sap" should be "profiles/sap".
-> ---
->  Makefile.am |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+diff --git a/.gitignore b/.gitignore
+index 3ff750e..38318cd 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -36,11 +36,13 @@ lib/bluetooth
+ src/builtin.h
+ src/bluetoothd
+ audio/telephony.c
+-sap/sap.c
+ scripts/bluetooth.rules
+ scripts/97-bluetooth.rules
+ scripts/97-bluetooth-hid2hci.rules
+ 
++profiles/sap/sap.c
++profiles/cups/bluetooth
++
+ sbc/sbcdec
+ sbc/sbcenc
+ sbc/sbcinfo
+@@ -63,7 +65,6 @@ tools/rfcomm
+ tools/l2ping
+ tools/ppporc
+ tools/sdptool
+-cups/bluetooth
+ test/agent
+ test/bdaddr
+ test/hciemu
+-- 
+1.7.11.1
 
-All patches have been applied. Thanks.
-
-Johan
