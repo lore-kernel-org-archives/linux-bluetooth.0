@@ -1,43 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 10 Jul 2012 15:33:33 -0300
+Date: Tue, 10 Jul 2012 15:30:32 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/7] Bluetooth: debug: Print l2cap refcount
-Message-ID: <20120710183333.GC13847@joana>
-References: <1341923271-14222-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1341923271-14222-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Manoj Iyer <manoj.iyer@canonical.com>
+Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Chris Gagnon <chris.gagnon@canonical.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Add vendor specific ID (0a5c:21f4)
+ BCM20702A0
+Message-ID: <20120710183032.GB13847@joana>
+References: <1334169563-2948-1-git-send-email-manoj.iyer@canonical.com>
+ <1334169563-2948-2-git-send-email-manoj.iyer@canonical.com>
+ <20120413214817.GB1680@joana>
+ <alpine.DEB.2.02.1207061211420.2959@lazy>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1341923271-14222-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <alpine.DEB.2.02.1207061211420.2959@lazy>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Manoj,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-07-10 15:27:45 +0300]:
+* Manoj Iyer <manoj.iyer@canonical.com> [2012-07-06 12:14:22 -0500]:
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> On Fri, 13 Apr 2012, Gustavo Padovan wrote:
 > 
+> Gustavo,
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  include/net/bluetooth/l2cap.h |    6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index d80e3f0..dfe9374 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -672,11 +672,17 @@ enum {
->  
->  static inline void l2cap_chan_hold(struct l2cap_chan *c)
->  {
-> +	BT_DBG("chan %p refcnt %d -> %d", c, atomic_read(&c->refcnt),
-> +	       atomic_read(&c->refcnt) + 1);
-> +
+> Sorry it took a long time to locate the hardware to get this info, I
+> got this info from one our QA engg cced here. Do you want me to
+> resubmit the patch ?
 
-We don't really need to call atomic_read() twice read. Just print the new
-value and the log reader has to figure it out.
+Yes, please resend the patch with proper git format. Thanks.
 
 	Gustavo
