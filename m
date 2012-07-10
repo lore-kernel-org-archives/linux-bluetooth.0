@@ -1,66 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 10 Jul 2012 17:06:58 +0300
+Date: Tue, 10 Jul 2012 17:04:02 +0300
 From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 To: Masatake YAMATO <yamato@redhat.com>
 Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/8] /proc/net/ entries for bluetooth protocols
-Message-ID: <20120710140656.GB15795@aemeltch-MOBL1>
+Subject: Re: [PATCH 1/8] /proc/net/ entries for bluetooth protocols
+Message-ID: <20120710140400.GA15795@aemeltch-MOBL1>
 References: <20120615080007.GD7205@aemeltch-MOBL1>
- <20120618.190014.158443124058398316.yamato@redhat.com>
+ <20120617.092637.2171077367789127221.yamato@redhat.com>
+ <20120618082826.GA2898@aemeltch-MOBL1>
+ <20120629.020253.963694178693689545.yamato@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120618.190014.158443124058398316.yamato@redhat.com>
+In-Reply-To: <20120629.020253.963694178693689545.yamato@redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Masatake,
 
-On Mon, Jun 18, 2012 at 07:00:14PM +0900, Masatake YAMATO wrote:
-> (I reflected the result of reviewing by Andrei.)
+On Fri, Jun 29, 2012 at 02:02:53AM +0900, Masatake YAMATO wrote:
+> Hi, Andrei
 > 
-> lsof command can tell the type of socket processes are using.
-> Internal lsof uses inode numbers on socket fs to resolve the type of
-> sockets. Files under /proc/net/, such as tcp, udp, unix, etc provides
-> such inode information.
-> 
-> Unfortunately bluetooth related protocols don't provide such inode
-> information. This patch series introduces /proc/net files for the protocols.
-> 
-> This patch against af_bluetooth.c provides facility to the implementation
-> of protocols. This patch extends bt_sock_list and introduces two exported
-> function bt_procfs_init, bt_procfs_cleanup.
-> 
-> The type bt_sock_list is already used in some of implementation of
-> protocols. bt_procfs_init prepare seq_operations which converts
-> protocol own bt_sock_list data to protocol own proc entry when the
-> entry is accessed.
-> 
-> What I, lsof user, need is just inode number of bluetooth
-> socket. However, people may want more information. The bt_procfs_init
-> takes a function pointer for customizing the show handler of
-> seq_operations.
-> 
-> Signed-off-by: Masatake YAMATO <yamato@redhat.com>
-> ---
->  include/net/bluetooth/bluetooth.h |   10 +++
->  net/bluetooth/af_bluetooth.c      |  136 +++++++++++++++++++++++++++++++++++++
->  2 files changed, 146 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 961669b..9c44977 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -30,6 +30,7 @@
->  #include <linux/list.h>
+> Could you review my v2 patch set I submitted?
 
-The line above was removed by commit
+It does not apply, trailing white spaces and it also seems that they are
+based on different repository. Please rebase against bluetooth-next. 
 
-commit 8c520a59927a5600973782505dbb750d985057c4
-Author: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Date:   Wed May 23 04:04:22 2012 -0300
+Applying: /proc/net/ entries for bluetooth protocols
+bluetooth-next-orig.git/.git/rebase-apply/patch:33:
+trailing whitespace.
+extern int  bt_procfs_init(struct module* module, struct net *net, const
+char *name, 
+bluetooth-next-orig.git/.git/rebase-apply/patch:140:
+trailing whitespace.
+	 
+bluetooth-next-orig.git/.git/rebase-apply/patch:157:
+trailing whitespace.
+	
+bluetooth-next-orig.git/.git/rebase-apply/patch:163:
+trailing whitespace.
+	
+error: patch failed: include/net/bluetooth/bluetooth.h:30
+error: include/net/bluetooth/bluetooth.h: patch does not apply
+Patch failed at 0001 /proc/net/ entries for bluetooth protocols
+When you have resolved this problem run "git am --resolved".
+If you would prefer to skip this patch, instead run "git am --skip".
+To restore the original branch and stop patching run "git am --abort".
 
-    Bluetooth: Remove unnecessary headers include
+> 
+>       https://lkml.org/lkml/2012/6/18/170
+> 
+> Masatake YAMATO
 
 Best regards 
 Andrei Emeltchenko 
-
