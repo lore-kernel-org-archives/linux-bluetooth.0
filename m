@@ -1,50 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ 00/13] Rebased remaining HoG patches
-Date: Tue, 10 Jul 2012 16:16:52 -0300
-Message-Id: <1341947825-14789-1-git-send-email-jprvita@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+From: manoj.iyer@canonical.com
+To: linux-kernel@vger.kernel.org
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org,
+	Manoj Iyer <manoj.iyer@canonical.com>
+Subject: [PATCH] Bluetooth: btusb: Add vendor specific ID (0a5c:21f4) BCM20702A0
+Date: Tue, 10 Jul 2012 14:07:38 -0500
+Message-Id: <1341947258-3929-1-git-send-email-manoj.iyer@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Rebasing against upstream after the input directory move.
+From: Manoj Iyer <manoj.iyer@canonical.com>
 
-Additionally there are two patches from Vinicius to improve re-connection time,
-only discovering characteristics when probing the HoG device.
+Patch adds support for BCM20702A0 device id (0a5c:21f4).
 
-Claudio Takahasi (4):
-  hog: Use real values for vendor and product IDs
-  hog: Add read Report Reference descriptor
-  hog: Add HID Information Characteristic read
-  hog: Use hardware country code
+usb-devices after patch was applied:
+T: Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 2 Spd=12 MxCh= 0
+D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+P: Vendor=0a5c ProdID=21f4 Rev=01.12
+S: Manufacturer=Broadcom Corp
+S: Product=BCM20702A0
+S: SerialNumber=E4D53DF154D6
+C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 
-João Paulo Rechi Vita (6):
-  hog: HID I/O driver
-  hog: Prepend Report ID to the HID report
-  hog: Add support for uHID events
-  hog: Handle output reports
-  hog: Handle output events
-  hog: Handle feature reports
+usb-devices before patch was applied:
+T: Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 2 Spd=12 MxCh= 0
+D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+P: Vendor=0a5c ProdID=21f4 Rev=01.12
+S: Manufacturer=Broadcom Corp
+S: Product=BCM20702A0
+S: SerialNumber=E4D53DF154D6
+C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 
-Paulo Alcantara (1):
-  hog: Handle HID devices operating in Boot Protocol Mode
+Signed-off-by: Manoj Iyer <manoj.iyer@canonical.com>
+Tested-by: Chris Gagnon <chris.gagnon@canonical.com>
+---
+ drivers/bluetooth/btusb.c |    1 +
+ 1 file changed, 1 insertion(+)
 
-Vinicius Costa Gomes (2):
-  hog: Fix re-discovering HoG characteristics when reconnecting
-  hog: Fix destroying the uhid device when disconnecting
-
- acinclude.m4                |    9 +-
- configure.ac                |    2 +
- profiles/input/hog_device.c |  416 +++++++++++++++++++++++++++++++++++++++----
- profiles/input/main.c       |    2 +
- profiles/input/manager.c    |    2 +
- 5 files changed, 393 insertions(+), 38 deletions(-)
-
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 83ebb24..1ecb8e5 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -106,6 +106,7 @@ static struct usb_device_id btusb_table[] = {
+ 	{ USB_DEVICE(0x0a5c, 0x21e6) },
+ 	{ USB_DEVICE(0x0a5c, 0x21e8) },
+ 	{ USB_DEVICE(0x0a5c, 0x21f3) },
++	{ USB_DEVICE(0x0a5c, 0x21f4) },
+ 	{ USB_DEVICE(0x413c, 0x8197) },
+ 
+ 	/* Foxconn - Hon Hai */
 -- 
-1.7.10.4
+1.7.9.5
 
