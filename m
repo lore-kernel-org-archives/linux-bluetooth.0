@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v3 4/9] network: move it to profiles folder
-Date: Tue, 10 Jul 2012 11:03:03 -0300
-Message-Id: <1341928988-5116-4-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v3 2/9] health: move it to profiles
+Date: Tue, 10 Jul 2012 11:03:01 -0300
+Message-Id: <1341928988-5116-2-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1341928988-5116-1-git-send-email-gustavo@padovan.org>
 References: <1341928988-5116-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,100 +13,119 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
 ---
- Makefile.am                                |   13 +++++++------
- {network => profiles/network}/common.c     |    0
- {network => profiles/network}/common.h     |    0
- {network => profiles/network}/connection.c |    0
- {network => profiles/network}/connection.h |    0
- {network => profiles/network}/main.c       |    0
- {network => profiles/network}/manager.c    |    0
- {network => profiles/network}/manager.h    |    0
- {network => profiles/network}/network.conf |    0
- {network => profiles/network}/server.c     |    0
- {network => profiles/network}/server.h     |    0
- 11 files changed, 7 insertions(+), 6 deletions(-)
- rename {network => profiles/network}/common.c (100%)
- rename {network => profiles/network}/common.h (100%)
- rename {network => profiles/network}/connection.c (100%)
- rename {network => profiles/network}/connection.h (100%)
- rename {network => profiles/network}/main.c (100%)
- rename {network => profiles/network}/manager.c (100%)
- rename {network => profiles/network}/manager.h (100%)
- rename {network => profiles/network}/network.conf (100%)
- rename {network => profiles/network}/server.c (100%)
- rename {network => profiles/network}/server.h (100%)
+ Makefile.am                                 |   14 +++++++-------
+ {health => profiles/health}/hdp.c           |    0
+ {health => profiles/health}/hdp.h           |    0
+ {health => profiles/health}/hdp_main.c      |    0
+ {health => profiles/health}/hdp_manager.c   |    0
+ {health => profiles/health}/hdp_manager.h   |    0
+ {health => profiles/health}/hdp_types.h     |    0
+ {health => profiles/health}/hdp_util.c      |    0
+ {health => profiles/health}/hdp_util.h      |    0
+ {health => profiles/health}/mcap.c          |    0
+ {health => profiles/health}/mcap.h          |    0
+ {health => profiles/health}/mcap_internal.h |    0
+ {health => profiles/health}/mcap_lib.h      |    0
+ {health => profiles/health}/mcap_sync.c     |    0
+ 14 files changed, 7 insertions(+), 7 deletions(-)
+ rename {health => profiles/health}/hdp.c (100%)
+ rename {health => profiles/health}/hdp.h (100%)
+ rename {health => profiles/health}/hdp_main.c (100%)
+ rename {health => profiles/health}/hdp_manager.c (100%)
+ rename {health => profiles/health}/hdp_manager.h (100%)
+ rename {health => profiles/health}/hdp_types.h (100%)
+ rename {health => profiles/health}/hdp_util.c (100%)
+ rename {health => profiles/health}/hdp_util.h (100%)
+ rename {health => profiles/health}/mcap.c (100%)
+ rename {health => profiles/health}/mcap.h (100%)
+ rename {health => profiles/health}/mcap_internal.h (100%)
+ rename {health => profiles/health}/mcap_lib.h (100%)
+ rename {health => profiles/health}/mcap_sync.c (100%)
 
 diff --git a/Makefile.am b/Makefile.am
-index a696173..9f0d343 100644
+index bd36248..d6e93dd 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -193,11 +193,12 @@ endif
+@@ -127,9 +127,9 @@ builtin_nodist =
+ mcap_sources =
  
- if NETWORKPLUGIN
- builtin_modules += network
--builtin_sources += network/main.c \
--			network/manager.h network/manager.c \
--			network/common.h network/common.c \
--			network/server.h network/server.c \
--			network/connection.h network/connection.c
-+builtin_sources += profiles/network/main.c \
-+			profiles/network/manager.h profiles/network/manager.c \
-+			profiles/network/common.h profiles/network/common.c \
-+			profiles/network/server.h profiles/network/server.c \
-+			profiles/network/connection.h \
-+			profiles/network/connection.c
+ if MCAP
+-mcap_sources += health/mcap_lib.h health/mcap_internal.h \
+-		health/mcap.h health/mcap.c \
+-		health/mcap_sync.c
++mcap_sources += profiles/health/mcap_lib.h profiles/health/mcap_internal.h \
++		ptofiles/health/mcap.h profiles/health/mcap.c \
++		profiles/health/mcap_sync.c
  endif
  
- if SERVICEPLUGIN
-@@ -326,7 +327,7 @@ conf_DATA += src/main.conf
+ if PNATPLUGIN
+@@ -207,10 +207,10 @@ endif
+ 
+ if HEALTHPLUGIN
+ builtin_modules += health
+-builtin_sources += health/hdp_main.c health/hdp_types.h \
+-			health/hdp_manager.h health/hdp_manager.c \
+-			health/hdp.h health/hdp.c \
+-			health/hdp_util.h health/hdp_util.c
++builtin_sources += profiles/health/hdp_main.c profiles/health/hdp_types.h \
++		profiles/health/hdp_manager.h profiles/health/hdp_manager.c \
++		profiles/health/hdp.h profiles/health/hdp.c \
++		profiles/health/hdp_util.h profiles/health/hdp_util.c
  endif
  
- EXTRA_DIST += src/genbuiltin src/bluetooth.conf src/org.bluez.service \
--			src/main.conf network/network.conf \
-+			src/main.conf profiles/network/network.conf \
- 			profiles/input/input.conf proximity/proximity.conf \ \
- 			audio/audio.conf audio/telephony-dummy.c \
- 			audio/telephony-maemo5.c audio/telephony-ofono.c \
-diff --git a/network/common.c b/profiles/network/common.c
+ if GATTMODULES
+diff --git a/health/hdp.c b/profiles/health/hdp.c
 similarity index 100%
-rename from network/common.c
-rename to profiles/network/common.c
-diff --git a/network/common.h b/profiles/network/common.h
+rename from health/hdp.c
+rename to profiles/health/hdp.c
+diff --git a/health/hdp.h b/profiles/health/hdp.h
 similarity index 100%
-rename from network/common.h
-rename to profiles/network/common.h
-diff --git a/network/connection.c b/profiles/network/connection.c
+rename from health/hdp.h
+rename to profiles/health/hdp.h
+diff --git a/health/hdp_main.c b/profiles/health/hdp_main.c
 similarity index 100%
-rename from network/connection.c
-rename to profiles/network/connection.c
-diff --git a/network/connection.h b/profiles/network/connection.h
+rename from health/hdp_main.c
+rename to profiles/health/hdp_main.c
+diff --git a/health/hdp_manager.c b/profiles/health/hdp_manager.c
 similarity index 100%
-rename from network/connection.h
-rename to profiles/network/connection.h
-diff --git a/network/main.c b/profiles/network/main.c
+rename from health/hdp_manager.c
+rename to profiles/health/hdp_manager.c
+diff --git a/health/hdp_manager.h b/profiles/health/hdp_manager.h
 similarity index 100%
-rename from network/main.c
-rename to profiles/network/main.c
-diff --git a/network/manager.c b/profiles/network/manager.c
+rename from health/hdp_manager.h
+rename to profiles/health/hdp_manager.h
+diff --git a/health/hdp_types.h b/profiles/health/hdp_types.h
 similarity index 100%
-rename from network/manager.c
-rename to profiles/network/manager.c
-diff --git a/network/manager.h b/profiles/network/manager.h
+rename from health/hdp_types.h
+rename to profiles/health/hdp_types.h
+diff --git a/health/hdp_util.c b/profiles/health/hdp_util.c
 similarity index 100%
-rename from network/manager.h
-rename to profiles/network/manager.h
-diff --git a/network/network.conf b/profiles/network/network.conf
+rename from health/hdp_util.c
+rename to profiles/health/hdp_util.c
+diff --git a/health/hdp_util.h b/profiles/health/hdp_util.h
 similarity index 100%
-rename from network/network.conf
-rename to profiles/network/network.conf
-diff --git a/network/server.c b/profiles/network/server.c
+rename from health/hdp_util.h
+rename to profiles/health/hdp_util.h
+diff --git a/health/mcap.c b/profiles/health/mcap.c
 similarity index 100%
-rename from network/server.c
-rename to profiles/network/server.c
-diff --git a/network/server.h b/profiles/network/server.h
+rename from health/mcap.c
+rename to profiles/health/mcap.c
+diff --git a/health/mcap.h b/profiles/health/mcap.h
 similarity index 100%
-rename from network/server.h
-rename to profiles/network/server.h
+rename from health/mcap.h
+rename to profiles/health/mcap.h
+diff --git a/health/mcap_internal.h b/profiles/health/mcap_internal.h
+similarity index 100%
+rename from health/mcap_internal.h
+rename to profiles/health/mcap_internal.h
+diff --git a/health/mcap_lib.h b/profiles/health/mcap_lib.h
+similarity index 100%
+rename from health/mcap_lib.h
+rename to profiles/health/mcap_lib.h
+diff --git a/health/mcap_sync.c b/profiles/health/mcap_sync.c
+similarity index 100%
+rename from health/mcap_sync.c
+rename to profiles/health/mcap_sync.c
 -- 
 1.7.10.2
 
