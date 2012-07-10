@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 6/7] Bluetooth: debug: Print CID and PSM in hex format
-Date: Tue, 10 Jul 2012 15:27:50 +0300
-Message-Id: <1341923271-14222-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/7] Bluetooth: debug: Print amp_mgr refcnt
+Date: Tue, 10 Jul 2012 15:27:46 +0300
+Message-Id: <1341923271-14222-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1341923271-14222-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1341923271-14222-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,145 +11,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Correct places where CID and PSM were printed as int. For CID: 0x%4.4x
-is used and for PSM: 0x%2.2x.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |   35 ++++++++++++++++++++---------------
- 1 file changed, 20 insertions(+), 15 deletions(-)
+ net/bluetooth/a2mp.c |    8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 9fbac57..41905de9 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3947,7 +3947,7 @@ static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
- 	psm = le16_to_cpu(req->psm);
- 	scid = le16_to_cpu(req->scid);
- 
--	BT_DBG("psm %d, scid %d, amp_id %d", psm, scid, req->amp_id);
-+	BT_DBG("psm 0x%2.2x, scid 0x%4.4x, amp_id %d", psm, scid, req->amp_id);
- 
- 	/* Placeholder: Always reject */
- 	rsp.dcid = 0;
-@@ -3970,11 +3970,11 @@ static inline int l2cap_create_channel_rsp(struct l2cap_conn *conn,
- }
- 
- static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
--							u16 icid, u16 result)
-+				     u16 icid, u16 result)
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index ec1ef2e..c4e7412 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -503,7 +503,9 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
+ /* AMP Manager functions */
+ void amp_mgr_get(struct amp_mgr *mgr)
  {
- 	struct l2cap_move_chan_rsp rsp;
+-	BT_DBG("mgr %p", mgr);
++	BT_DBG("mgr %p refcnt %d -> %d", mgr,
++	       atomic_read(&mgr->kref.refcount),
++	       atomic_read(&mgr->kref.refcount) + 1);
  
--	BT_DBG("icid %d, result %d", icid, result);
-+	BT_DBG("icid 0x%4.4x, result 0x%4.4x", icid, result);
- 
- 	rsp.icid = cpu_to_le16(icid);
- 	rsp.result = cpu_to_le16(result);
-@@ -3983,12 +3983,13 @@ static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
+ 	kref_get(&mgr->kref);
  }
+@@ -519,7 +521,9 @@ static void amp_mgr_destroy(struct kref *kref)
  
- static void l2cap_send_move_chan_cfm(struct l2cap_conn *conn,
--				struct l2cap_chan *chan, u16 icid, u16 result)
-+				     struct l2cap_chan *chan,
-+				     u16 icid, u16 result)
+ int amp_mgr_put(struct amp_mgr *mgr)
  {
- 	struct l2cap_move_chan_cfm cfm;
- 	u8 ident;
+-	BT_DBG("mgr %p", mgr);
++	BT_DBG("mgr %p refcnt %d -> %d", mgr,
++	       atomic_read(&mgr->kref.refcount),
++	       atomic_read(&mgr->kref.refcount) - 1);
  
--	BT_DBG("icid %d, result %d", icid, result);
-+	BT_DBG("icid 0x%4.4x, result 0x%4.4x", icid, result);
- 
- 	ident = l2cap_get_ident(conn);
- 	if (chan)
-@@ -4001,18 +4002,19 @@ static void l2cap_send_move_chan_cfm(struct l2cap_conn *conn,
- }
- 
- static void l2cap_send_move_chan_cfm_rsp(struct l2cap_conn *conn, u8 ident,
--								u16 icid)
-+					 u16 icid)
- {
- 	struct l2cap_move_chan_cfm_rsp rsp;
- 
--	BT_DBG("icid %d", icid);
-+	BT_DBG("icid 0x%4.4x", icid);
- 
- 	rsp.icid = cpu_to_le16(icid);
- 	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM_RSP, sizeof(rsp), &rsp);
- }
- 
- static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
--			struct l2cap_cmd_hdr *cmd, u16 cmd_len, void *data)
-+					 struct l2cap_cmd_hdr *cmd,
-+					 u16 cmd_len, void *data)
- {
- 	struct l2cap_move_chan_req *req = data;
- 	u16 icid = 0;
-@@ -4023,7 +4025,7 @@ static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
- 
- 	icid = le16_to_cpu(req->icid);
- 
--	BT_DBG("icid %d, dest_amp_id %d", icid, req->dest_amp_id);
-+	BT_DBG("icid 0x%4.4x, dest_amp_id %d", icid, req->dest_amp_id);
- 
- 	if (!enable_hs)
- 		return -EINVAL;
-@@ -4035,7 +4037,8 @@ static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
- }
- 
- static inline int l2cap_move_channel_rsp(struct l2cap_conn *conn,
--			struct l2cap_cmd_hdr *cmd, u16 cmd_len, void *data)
-+					 struct l2cap_cmd_hdr *cmd,
-+					 u16 cmd_len, void *data)
- {
- 	struct l2cap_move_chan_rsp *rsp = data;
- 	u16 icid, result;
-@@ -4046,7 +4049,7 @@ static inline int l2cap_move_channel_rsp(struct l2cap_conn *conn,
- 	icid = le16_to_cpu(rsp->icid);
- 	result = le16_to_cpu(rsp->result);
- 
--	BT_DBG("icid %d, result %d", icid, result);
-+	BT_DBG("icid 0x%4.4x, result 0x%4.4x", icid, result);
- 
- 	/* Placeholder: Always unconfirmed */
- 	l2cap_send_move_chan_cfm(conn, NULL, icid, L2CAP_MC_UNCONFIRMED);
-@@ -4055,7 +4058,8 @@ static inline int l2cap_move_channel_rsp(struct l2cap_conn *conn,
- }
- 
- static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
--			struct l2cap_cmd_hdr *cmd, u16 cmd_len, void *data)
-+					     struct l2cap_cmd_hdr *cmd,
-+					     u16 cmd_len, void *data)
- {
- 	struct l2cap_move_chan_cfm *cfm = data;
- 	u16 icid, result;
-@@ -4066,7 +4070,7 @@ static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
- 	icid = le16_to_cpu(cfm->icid);
- 	result = le16_to_cpu(cfm->result);
- 
--	BT_DBG("icid %d, result %d", icid, result);
-+	BT_DBG("icid 0x%4.4x, result 0x%4.4x", icid, result);
- 
- 	l2cap_send_move_chan_cfm_rsp(conn, cmd->ident, icid);
- 
-@@ -4074,7 +4078,8 @@ static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
- }
- 
- static inline int l2cap_move_channel_confirm_rsp(struct l2cap_conn *conn,
--			struct l2cap_cmd_hdr *cmd, u16 cmd_len, void *data)
-+						 struct l2cap_cmd_hdr *cmd,
-+						 u16 cmd_len, void *data)
- {
- 	struct l2cap_move_chan_cfm_rsp *rsp = data;
- 	u16 icid;
-@@ -4084,7 +4089,7 @@ static inline int l2cap_move_channel_confirm_rsp(struct l2cap_conn *conn,
- 
- 	icid = le16_to_cpu(rsp->icid);
- 
--	BT_DBG("icid %d", icid);
-+	BT_DBG("icid 0x%4.4x", icid);
- 
- 	return 0;
+ 	return kref_put(&mgr->kref, &amp_mgr_destroy);
  }
 -- 
 1.7.9.5
