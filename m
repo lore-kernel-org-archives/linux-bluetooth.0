@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v3 2/9] health: move it to profiles
-Date: Tue, 10 Jul 2012 11:03:01 -0300
-Message-Id: <1341928988-5116-2-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v3 3/9] input: move it to profiles folder
+Date: Tue, 10 Jul 2012 11:03:02 -0300
+Message-Id: <1341928988-5116-3-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1341928988-5116-1-git-send-email-gustavo@padovan.org>
 References: <1341928988-5116-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,119 +13,123 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
 ---
- Makefile.am                                 |   14 +++++++-------
- {health => profiles/health}/hdp.c           |    0
- {health => profiles/health}/hdp.h           |    0
- {health => profiles/health}/hdp_main.c      |    0
- {health => profiles/health}/hdp_manager.c   |    0
- {health => profiles/health}/hdp_manager.h   |    0
- {health => profiles/health}/hdp_types.h     |    0
- {health => profiles/health}/hdp_util.c      |    0
- {health => profiles/health}/hdp_util.h      |    0
- {health => profiles/health}/mcap.c          |    0
- {health => profiles/health}/mcap.h          |    0
- {health => profiles/health}/mcap_internal.h |    0
- {health => profiles/health}/mcap_lib.h      |    0
- {health => profiles/health}/mcap_sync.c     |    0
+ Makefile.am                            |   14 +++++++-------
+ {input => profiles/input}/device.c     |    0
+ {input => profiles/input}/device.h     |    0
+ {input => profiles/input}/fakehid.c    |    0
+ {input => profiles/input}/fakehid.h    |    0
+ {input => profiles/input}/hog_device.c |    0
+ {input => profiles/input}/hog_device.h |    0
+ {input => profiles/input}/input.conf   |    0
+ {input => profiles/input}/main.c       |    0
+ {input => profiles/input}/manager.c    |    0
+ {input => profiles/input}/manager.h    |    0
+ {input => profiles/input}/server.c     |    0
+ {input => profiles/input}/server.h     |    0
+ {input => profiles/input}/sixpair.c    |    0
  14 files changed, 7 insertions(+), 7 deletions(-)
- rename {health => profiles/health}/hdp.c (100%)
- rename {health => profiles/health}/hdp.h (100%)
- rename {health => profiles/health}/hdp_main.c (100%)
- rename {health => profiles/health}/hdp_manager.c (100%)
- rename {health => profiles/health}/hdp_manager.h (100%)
- rename {health => profiles/health}/hdp_types.h (100%)
- rename {health => profiles/health}/hdp_util.c (100%)
- rename {health => profiles/health}/hdp_util.h (100%)
- rename {health => profiles/health}/mcap.c (100%)
- rename {health => profiles/health}/mcap.h (100%)
- rename {health => profiles/health}/mcap_internal.h (100%)
- rename {health => profiles/health}/mcap_lib.h (100%)
- rename {health => profiles/health}/mcap_sync.c (100%)
+ rename {input => profiles/input}/device.c (100%)
+ rename {input => profiles/input}/device.h (100%)
+ rename {input => profiles/input}/fakehid.c (100%)
+ rename {input => profiles/input}/fakehid.h (100%)
+ rename {input => profiles/input}/hog_device.c (100%)
+ rename {input => profiles/input}/hog_device.h (100%)
+ rename {input => profiles/input}/input.conf (100%)
+ rename {input => profiles/input}/main.c (100%)
+ rename {input => profiles/input}/manager.c (100%)
+ rename {input => profiles/input}/manager.h (100%)
+ rename {input => profiles/input}/server.c (100%)
+ rename {input => profiles/input}/server.h (100%)
+ rename {input => profiles/input}/sixpair.c (100%)
 
 diff --git a/Makefile.am b/Makefile.am
-index bd36248..d6e93dd 100644
+index d6e93dd..a696173 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -127,9 +127,9 @@ builtin_nodist =
- mcap_sources =
+@@ -179,16 +179,16 @@ endif
  
- if MCAP
--mcap_sources += health/mcap_lib.h health/mcap_internal.h \
--		health/mcap.h health/mcap.c \
--		health/mcap_sync.c
-+mcap_sources += profiles/health/mcap_lib.h profiles/health/mcap_internal.h \
-+		ptofiles/health/mcap.h profiles/health/mcap.c \
-+		profiles/health/mcap_sync.c
+ if INPUTPLUGIN
+ builtin_modules += input
+-builtin_sources += input/main.c \
+-			input/manager.h input/manager.c \
+-			input/server.h input/server.c \
+-			input/device.h input/device.c \
+-			input/fakehid.c input/fakehid.h
++builtin_sources += profiles/input/main.c \
++			profiles/input/manager.h profiles/input/manager.c \
++			profiles/input/server.h profiles/input/server.c \
++			profiles/input/device.h profiles/input/device.c \
++			profiles/input/fakehid.c profiles/input/fakehid.h
  endif
  
- if PNATPLUGIN
-@@ -207,10 +207,10 @@ endif
- 
- if HEALTHPLUGIN
- builtin_modules += health
--builtin_sources += health/hdp_main.c health/hdp_types.h \
--			health/hdp_manager.h health/hdp_manager.c \
--			health/hdp.h health/hdp.c \
--			health/hdp_util.h health/hdp_util.c
-+builtin_sources += profiles/health/hdp_main.c profiles/health/hdp_types.h \
-+		profiles/health/hdp_manager.h profiles/health/hdp_manager.c \
-+		profiles/health/hdp.h profiles/health/hdp.c \
-+		profiles/health/hdp_util.h profiles/health/hdp_util.c
+ if HOGPLUGIN
+ builtin_modules += hog
+-builtin_sources += input/hog_device.h input/hog_device.c
++builtin_sources += profiles/input/hog_device.h profiles/input/hog_device.c
  endif
  
- if GATTMODULES
-diff --git a/health/hdp.c b/profiles/health/hdp.c
+ if NETWORKPLUGIN
+@@ -327,7 +327,7 @@ endif
+ 
+ EXTRA_DIST += src/genbuiltin src/bluetooth.conf src/org.bluez.service \
+ 			src/main.conf network/network.conf \
+-			input/input.conf proximity/proximity.conf \
++			profiles/input/input.conf proximity/proximity.conf \ \
+ 			audio/audio.conf audio/telephony-dummy.c \
+ 			audio/telephony-maemo5.c audio/telephony-ofono.c \
+ 			audio/telephony-maemo6.c sap/sap-dummy.c sap/sap-u8500.c
+diff --git a/input/device.c b/profiles/input/device.c
 similarity index 100%
-rename from health/hdp.c
-rename to profiles/health/hdp.c
-diff --git a/health/hdp.h b/profiles/health/hdp.h
+rename from input/device.c
+rename to profiles/input/device.c
+diff --git a/input/device.h b/profiles/input/device.h
 similarity index 100%
-rename from health/hdp.h
-rename to profiles/health/hdp.h
-diff --git a/health/hdp_main.c b/profiles/health/hdp_main.c
+rename from input/device.h
+rename to profiles/input/device.h
+diff --git a/input/fakehid.c b/profiles/input/fakehid.c
 similarity index 100%
-rename from health/hdp_main.c
-rename to profiles/health/hdp_main.c
-diff --git a/health/hdp_manager.c b/profiles/health/hdp_manager.c
+rename from input/fakehid.c
+rename to profiles/input/fakehid.c
+diff --git a/input/fakehid.h b/profiles/input/fakehid.h
 similarity index 100%
-rename from health/hdp_manager.c
-rename to profiles/health/hdp_manager.c
-diff --git a/health/hdp_manager.h b/profiles/health/hdp_manager.h
+rename from input/fakehid.h
+rename to profiles/input/fakehid.h
+diff --git a/input/hog_device.c b/profiles/input/hog_device.c
 similarity index 100%
-rename from health/hdp_manager.h
-rename to profiles/health/hdp_manager.h
-diff --git a/health/hdp_types.h b/profiles/health/hdp_types.h
+rename from input/hog_device.c
+rename to profiles/input/hog_device.c
+diff --git a/input/hog_device.h b/profiles/input/hog_device.h
 similarity index 100%
-rename from health/hdp_types.h
-rename to profiles/health/hdp_types.h
-diff --git a/health/hdp_util.c b/profiles/health/hdp_util.c
+rename from input/hog_device.h
+rename to profiles/input/hog_device.h
+diff --git a/input/input.conf b/profiles/input/input.conf
 similarity index 100%
-rename from health/hdp_util.c
-rename to profiles/health/hdp_util.c
-diff --git a/health/hdp_util.h b/profiles/health/hdp_util.h
+rename from input/input.conf
+rename to profiles/input/input.conf
+diff --git a/input/main.c b/profiles/input/main.c
 similarity index 100%
-rename from health/hdp_util.h
-rename to profiles/health/hdp_util.h
-diff --git a/health/mcap.c b/profiles/health/mcap.c
+rename from input/main.c
+rename to profiles/input/main.c
+diff --git a/input/manager.c b/profiles/input/manager.c
 similarity index 100%
-rename from health/mcap.c
-rename to profiles/health/mcap.c
-diff --git a/health/mcap.h b/profiles/health/mcap.h
+rename from input/manager.c
+rename to profiles/input/manager.c
+diff --git a/input/manager.h b/profiles/input/manager.h
 similarity index 100%
-rename from health/mcap.h
-rename to profiles/health/mcap.h
-diff --git a/health/mcap_internal.h b/profiles/health/mcap_internal.h
+rename from input/manager.h
+rename to profiles/input/manager.h
+diff --git a/input/server.c b/profiles/input/server.c
 similarity index 100%
-rename from health/mcap_internal.h
-rename to profiles/health/mcap_internal.h
-diff --git a/health/mcap_lib.h b/profiles/health/mcap_lib.h
+rename from input/server.c
+rename to profiles/input/server.c
+diff --git a/input/server.h b/profiles/input/server.h
 similarity index 100%
-rename from health/mcap_lib.h
-rename to profiles/health/mcap_lib.h
-diff --git a/health/mcap_sync.c b/profiles/health/mcap_sync.c
+rename from input/server.h
+rename to profiles/input/server.h
+diff --git a/input/sixpair.c b/profiles/input/sixpair.c
 similarity index 100%
-rename from health/mcap_sync.c
-rename to profiles/health/mcap_sync.c
+rename from input/sixpair.c
+rename to profiles/input/sixpair.c
 -- 
 1.7.10.2
 
