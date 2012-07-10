@@ -1,36 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/7] Bluetooth: Correct debug code
-Date: Tue, 10 Jul 2012 15:27:44 +0300
-Message-Id: <1341923271-14222-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <4FFC10AE.1040605@globaledgesoft.com>
+Date: Tue, 10 Jul 2012 16:53:26 +0530
+From: Deepthi <deepthi.pv@globaledgesoft.com>
+MIME-Version: 1.0
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: HCI rccvmsg() not receiving any data.
+References: <1341403768-16709-1-git-send-email-luiz.dentz@gmail.com>	<CAAngNMaLQUem5vmgjCOWyUUdW+iFuACXxtJ=4oBO1u0ZXcUCxQ@mail.gmail.com> <CABBYNZ+vNjKwrTz2Ck4x0hYRyeBzJsRiQLqZWX7YjOba-EYgQA@mail.gmail.com>
+In-Reply-To: <CABBYNZ+vNjKwrTz2Ck4x0hYRyeBzJsRiQLqZWX7YjOba-EYgQA@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hello,
 
-This set of patches helps to parse debug in Bluetooth:
-- Add printing refcount for l2cap_chan and amp_mgr
-- Correct CID output %d -> 0x%4.4x for chan move functions
-- Remove unneded type conversion by using for example types: %u and %zu
-- and some other fixes
+    hci sendmsg() system call is able to execute properly .However hci 
+recvmsg()  will be in blocked state not able to receive any data in the 
+other end . How to send & receive the message using HCI RAW socket. 
+Please help,
 
-Andrei Emeltchenko (7):
-  Bluetooth: debug: Print l2cap refcount
-  Bluetooth: debug: Print amp_mgr refcnt
-  Bluetooth: debug: Add printing num of cmds queued
-  Bluetooth: debug: Use standard hex object specifier
-  Bluetooth: debug: Correct types specifiers for L2CAP
-  Bluetooth: debug: Print CID and PSM in hex format
-  Bluetooth: debug: Add debug to l2cap_security_cfm
+    Thanks & Regards ,
+Deepthi Elizabeth P V
 
- include/net/bluetooth/l2cap.h |    6 ++
- net/bluetooth/a2mp.c          |    8 +-
- net/bluetooth/hci_core.c      |    3 +-
- net/bluetooth/hci_event.c     |  170 ++++++++++++++++++++---------------------
- net/bluetooth/l2cap_core.c    |   92 +++++++++++-----------
- 5 files changed, 148 insertions(+), 131 deletions(-)
-
--- 
-1.7.9.5
+>   
 
