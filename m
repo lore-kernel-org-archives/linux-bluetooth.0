@@ -4,105 +4,117 @@ From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ 06/13] hog: Handle output reports
-Date: Tue, 10 Jul 2012 16:16:58 -0300
-Message-Id: <1341947825-14789-7-git-send-email-jprvita@openbossa.org>
+Subject: [PATCH BlueZ 05/13] hog: Add support for uHID events
+Date: Tue, 10 Jul 2012 16:16:57 -0300
+Message-Id: <1341947825-14789-6-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1341947825-14789-1-git-send-email-jprvita@openbossa.org>
 References: <1341947825-14789-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch writes the output reports coming from the HID host on the
-device's Output Report characteristic.
+This patch adds the GLib GIOChannel watcher to monitor uhid events.
 ---
- profiles/input/hog_device.c |   60 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+ profiles/input/hog_device.c |   46 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
 diff --git a/profiles/input/hog_device.c b/profiles/input/hog_device.c
-index b812ed5..d8d67ae 100644
+index 53b4746..b812ed5 100644
 --- a/profiles/input/hog_device.c
 +++ b/profiles/input/hog_device.c
-@@ -54,6 +54,9 @@
+@@ -53,6 +53,7 @@
+ 
  #define HOG_REPORT_MAP_UUID	0x2A4B
  #define HOG_REPORT_UUID		0x2A4D
- 
-+#define HOG_REPORT_TYPE_INPUT	1
-+#define HOG_REPORT_TYPE_OUTPUT	2
 +
  #define UHID_DEVICE_FILE	"/dev/uhid"
  
  #define HOG_REPORT_MAP_MAX_SIZE        512
-@@ -333,6 +336,54 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+@@ -67,6 +68,7 @@ struct hog_device {
+ 	GSList			*reports;
+ 	int			uhid_fd;
+ 	gboolean		prepend_id;
++	guint			uhid_watch_id;
+ };
+ 
+ struct report {
+@@ -331,6 +333,36 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
  	}
  }
  
-+static void output_written_cb(guint8 status, const guint8 *pdu,
-+					guint16 plen, gpointer user_data)
++static gboolean uhid_event_cb(GIOChannel *io, GIOCondition cond,
++							gpointer user_data)
 +{
-+	if (status != 0) {
-+		error("Write output report failed: %s", att_ecode2str(status));
-+		return;
++	struct hog_device *hogdev = user_data;
++	struct uhid_event ev;
++	ssize_t bread;
++	int fd;
++
++	if (cond & (G_IO_ERR | G_IO_NVAL))
++		goto failed;
++
++	fd = g_io_channel_unix_get_fd(io);
++	memset(&ev, 0, sizeof(ev));
++
++	bread = read(fd, &ev, sizeof(ev));
++	if (bread < 0) {
++		int err = -errno;
++		DBG("uhid-dev read: %s(%d)", strerror(err), err);
++		goto failed;
 +	}
++
++	DBG("uHID event type %d received", ev.type);
++
++	return TRUE;
++
++failed:
++	hogdev->uhid_watch_id = 0;
++	return FALSE;
 +}
 +
-+static gint report_type_cmp(gconstpointer a, gconstpointer b)
-+{
-+	const struct report *report = a;
-+	uint8_t type = GPOINTER_TO_UINT(b);
-+
-+	return report->type - type;
-+}
-+
-+static void forward_report(struct hog_device *hogdev,
-+						struct uhid_event *ev)
-+{
-+	struct report *report;
-+	GSList *l;
-+	void *data;
-+	int size;
-+	guint type;
-+
-+	type = HOG_REPORT_TYPE_OUTPUT;
-+	data = ev->u.output.data;
-+	size = ev->u.output.size;
-+
-+	l = g_slist_find_custom(hogdev->reports, GUINT_TO_POINTER(type),
-+							report_type_cmp);
-+	if (!l)
-+		return;
-+
-+	report = l->data;
-+
-+	DBG("Sending report type %d to device %s handle 0x%X", type,
-+				hogdev->path, report->decl->value_handle);
-+
-+	if (report->decl->properties & ATT_CHAR_PROPER_WRITE)
-+		gatt_write_char(hogdev->attrib, report->decl->value_handle,
-+				data, size, output_written_cb, hogdev);
-+	else if (report->decl->properties & ATT_CHAR_PROPER_WRITE_WITHOUT_RESP)
-+		gatt_write_char(hogdev->attrib, report->decl->value_handle,
-+						data, size, NULL, NULL);
-+}
-+
- static gboolean uhid_event_cb(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
+ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
  {
-@@ -356,6 +407,15 @@ static gboolean uhid_event_cb(GIOChannel *io, GIOCondition cond,
+ 	struct hog_device *hogdev = user_data;
+@@ -429,6 +461,8 @@ int hog_device_register(struct btd_device *device, const char *path)
+ {
+ 	struct hog_device *hogdev;
+ 	struct gatt_primary *prim;
++	GIOCondition cond = G_IO_IN | G_IO_ERR | G_IO_NVAL;
++	GIOChannel *io;
  
- 	DBG("uHID event type %d received", ev.type);
+ 	hogdev = find_device_by_path(devices, path);
+ 	if (hogdev)
+@@ -449,12 +483,19 @@ int hog_device_register(struct btd_device *device, const char *path)
+ 		return -errno;
+ 	}
  
-+	switch (ev.type) {
-+	case UHID_OUTPUT:
-+		forward_report(hogdev, &ev);
-+		break;
-+	default:
-+		warn("unexpected uHID event");
-+		break;
++	io = g_io_channel_unix_new(hogdev->uhid_fd);
++	g_io_channel_set_encoding(io, NULL, NULL);
++	hogdev->uhid_watch_id = g_io_add_watch(io, cond, uhid_event_cb,
++								hogdev);
++	g_io_channel_unref(io);
++
+ 	hogdev->hog_primary = g_memdup(prim, sizeof(*prim));
+ 
+ 	hogdev->attioid = btd_device_add_attio_callback(device,
+ 							attio_connected_cb,
+ 							attio_disconnected_cb,
+ 							hogdev);
++
+ 	device_set_auto_connect(device, TRUE);
+ 
+ 	devices = g_slist_append(devices, hogdev);
+@@ -472,6 +513,11 @@ int hog_device_unregister(const char *path)
+ 
+ 	btd_device_remove_attio_callback(hogdev->device, hogdev->attioid);
+ 
++	if (hogdev->uhid_watch_id) {
++		g_source_remove(hogdev->uhid_watch_id);
++		hogdev->uhid_watch_id = 0;
 +	}
 +
- 	return TRUE;
+ 	close(hogdev->uhid_fd);
+ 	hogdev->uhid_fd = -1;
  
- failed:
 -- 
 1.7.10.4
 
