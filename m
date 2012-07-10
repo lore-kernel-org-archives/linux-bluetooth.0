@@ -1,58 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 10 Jul 2012 16:43:25 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: manoj.iyer@canonical.com
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: btusb: Add vendor specific ID (0a5c:21f4)
- BCM20702A0
-Message-ID: <20120710194325.GA31426@joana>
-References: <1341947258-3929-1-git-send-email-manoj.iyer@canonical.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1341947258-3929-1-git-send-email-manoj.iyer@canonical.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ 13/13] hog: Fix destroying the uhid device when disconnecting
+Date: Tue, 10 Jul 2012 16:17:05 -0300
+Message-Id: <1341947825-14789-14-git-send-email-jprvita@openbossa.org>
+In-Reply-To: <1341947825-14789-1-git-send-email-jprvita@openbossa.org>
+References: <1341947825-14789-1-git-send-email-jprvita@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Manoj,
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 
-* manoj.iyer@canonical.com <manoj.iyer@canonical.com> [2012-07-10 14:07:38 -0500]:
+The uhid device should have the lifetime of the hog_device structure.
+So, only destroy the uhid device when hog_device is destroyed.
+---
+ profiles/input/hog_device.c |   12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-> From: Manoj Iyer <manoj.iyer@canonical.com>
-> 
-> Patch adds support for BCM20702A0 device id (0a5c:21f4).
-> 
-> usb-devices after patch was applied:
-> T: Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 2 Spd=12 MxCh= 0
-> D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-> P: Vendor=0a5c ProdID=21f4 Rev=01.12
-> S: Manufacturer=Broadcom Corp
-> S: Product=BCM20702A0
-> S: SerialNumber=E4D53DF154D6
-> C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-> I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-> 
-> usb-devices before patch was applied:
-> T: Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 2 Spd=12 MxCh= 0
-> D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-> P: Vendor=0a5c ProdID=21f4 Rev=01.12
-> S: Manufacturer=Broadcom Corp
-> S: Product=BCM20702A0
-> S: SerialNumber=E4D53DF154D6
-> C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-> I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-> 
-> Signed-off-by: Manoj Iyer <manoj.iyer@canonical.com>
-> Tested-by: Chris Gagnon <chris.gagnon@canonical.com>
-> ---
->  drivers/bluetooth/btusb.c |    1 +
->  1 file changed, 1 insertion(+)
+diff --git a/profiles/input/hog_device.c b/profiles/input/hog_device.c
+index 7f4cf2d..10bc622 100644
+--- a/profiles/input/hog_device.c
++++ b/profiles/input/hog_device.c
+@@ -550,12 +550,6 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ static void attio_disconnected_cb(gpointer user_data)
+ {
+ 	struct hog_device *hogdev = user_data;
+-	struct uhid_event ev;
+-
+-	memset(&ev, 0, sizeof(ev));
+-	ev.type = UHID_DESTROY;
+-	if (write(hogdev->uhid_fd, &ev, sizeof(ev)) < 0)
+-		error("Failed to destroy uHID device: %s", strerror(errno));
+ 
+ 	g_attrib_unregister(hogdev->attrib, hogdev->report_cb_id);
+ 	hogdev->report_cb_id = 0;
+@@ -675,6 +669,7 @@ int hog_device_register(struct btd_device *device, const char *path)
+ int hog_device_unregister(const char *path)
+ {
+ 	struct hog_device *hogdev;
++	struct uhid_event ev;
+ 
+ 	hogdev = find_device_by_path(devices, path);
+ 	if (hogdev == NULL)
+@@ -687,6 +682,11 @@ int hog_device_unregister(const char *path)
+ 		hogdev->uhid_watch_id = 0;
+ 	}
+ 
++	memset(&ev, 0, sizeof(ev));
++	ev.type = UHID_DESTROY;
++	if (write(hogdev->uhid_fd, &ev, sizeof(ev)) < 0)
++		error("Failed to destroy uHID device: %s", strerror(errno));
++
+ 	close(hogdev->uhid_fd);
+ 	hogdev->uhid_fd = -1;
+ 
+-- 
+1.7.10.4
 
-Patch has been applied to the bluetooth tree. Thanks.
-
-	Gustavo
