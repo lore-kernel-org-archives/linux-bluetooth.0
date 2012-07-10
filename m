@@ -1,44 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ] gitignore: Move entries to the right place
-Date: Tue, 10 Jul 2012 15:17:15 -0300
-Message-Id: <1341944235-6029-1-git-send-email-lucas.demarchi@profusion.mobi>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ 5/5] build: Fix make distcheck
+Date: Tue, 10 Jul 2012 15:08:24 -0300
+Message-Id: <1341943704-23633-5-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1341943704-23633-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1341943704-23633-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+The gstreamer module needs audio/rtp.h to exist in the distribution.
 ---
- .gitignore | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ Makefile.am |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/.gitignore b/.gitignore
-index 3ff750e..38318cd 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -36,11 +36,13 @@ lib/bluetooth
- src/builtin.h
- src/bluetoothd
- audio/telephony.c
--sap/sap.c
- scripts/bluetooth.rules
- scripts/97-bluetooth.rules
- scripts/97-bluetooth-hid2hci.rules
- 
-+profiles/sap/sap.c
-+profiles/cups/bluetooth
-+
- sbc/sbcdec
- sbc/sbcenc
- sbc/sbcinfo
-@@ -63,7 +65,6 @@ tools/rfcomm
- tools/l2ping
- tools/ppporc
- tools/sdptool
--cups/bluetooth
- test/agent
- test/bdaddr
- test/hciemu
+diff --git a/Makefile.am b/Makefile.am
+index 84bf695..ffb57e8 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -337,7 +337,7 @@ audio_libgstbluetooth_la_SOURCES = audio/gstbluetooth.c audio/gstpragma.h \
+ 				audio/gstsbcparse.h audio/gstsbcparse.c \
+ 				audio/gstavdtpsink.h audio/gstavdtpsink.c \
+ 				audio/gsta2dpsink.h audio/gsta2dpsink.c \
+-				audio/gstsbcutil.h audio/gstsbcutil.c \
++				audio/gstsbcutil.h audio/gstsbcutil.c audio/rtp.h \
+ 				audio/gstrtpsbcpay.h audio/gstrtpsbcpay.c
+ audio_libgstbluetooth_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version
+ audio_libgstbluetooth_la_LIBADD = sbc/libsbc.la lib/libbluetooth-private.la \
 -- 
-1.7.11.1
+1.7.10.4
 
