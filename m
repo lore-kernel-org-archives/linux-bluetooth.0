@@ -1,26 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4FFC10AE.1040605@globaledgesoft.com>
-Date: Tue, 10 Jul 2012 16:53:26 +0530
-From: Deepthi <deepthi.pv@globaledgesoft.com>
-MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: HCI rccvmsg() not receiving any data.
-References: <1341403768-16709-1-git-send-email-luiz.dentz@gmail.com>	<CAAngNMaLQUem5vmgjCOWyUUdW+iFuACXxtJ=4oBO1u0ZXcUCxQ@mail.gmail.com> <CABBYNZ+vNjKwrTz2Ck4x0hYRyeBzJsRiQLqZWX7YjOba-EYgQA@mail.gmail.com>
-In-Reply-To: <CABBYNZ+vNjKwrTz2Ck4x0hYRyeBzJsRiQLqZWX7YjOba-EYgQA@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Henrik Rydberg" <rydberg@bitmath.se>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Henrik Rydberg <rydberg@euromail.se>
+Subject: [PATCH v2] Bluetooth: Add MacBookPro10,1 support
+Date: Tue, 10 Jul 2012 12:46:41 +0200
+Message-Id: <1341917201-4705-1-git-send-email-rydberg@euromail.se>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Add support for the 2012 15'' MacBook Pro Retina, also known as
+MacBookPro10,1. The bluetooth device presents itself as
 
-    hci sendmsg() system call is able to execute properly .However hci 
-recvmsg()  will be in blocked state not able to receive any data in the 
-other end . How to send & receive the message using HCI RAW socket. 
-Please help,
+Bus 002 Device 008: ID 05ac:8286 Apple, Inc.
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               2.00
+  bDeviceClass          255 Vendor Specific Class
+  bDeviceSubClass         1
+  bDeviceProtocol         1
+  bMaxPacketSize0        64
+  idVendor           0x05ac Apple, Inc.
+  idProduct          0x8286
+  bcdDevice            0.74
+  iManufacturer           1 Apple Inc.
+  iProduct                2 Bluetooth USB Host Controller
+  iSerial                 0
+  bNumConfigurations      1
 
-    Thanks & Regards ,
-Deepthi Elizabeth P V
+Patch originally written and tested by clipcarl (forums.opensuse.org).
 
->   
+Signed-off-by: Henrik Rydberg <rydberg@euromail.se>
+---
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 83ebb24..6cc54da 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -84,6 +84,9 @@ static struct usb_device_id btusb_table[] = {
+ 	/* Apple MacMini5,1 */
+ 	{ USB_DEVICE(0x05ac, 0x8281) },
+ 
++	/* Apple MacBookPro10,1 */
++	{ USB_DEVICE(0x05ac, 0x8286) },
++
+ 	/* AVM BlueFRITZ! USB v2.0 */
+ 	{ USB_DEVICE(0x057c, 0x3800) },
+ 
+-- 
+1.7.11.1
 
