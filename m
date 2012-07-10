@@ -1,35 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 10 Jul 2012 15:30:32 -0300
+Date: Tue, 10 Jul 2012 15:28:09 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Manoj Iyer <manoj.iyer@canonical.com>
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@intel.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Chris Gagnon <chris.gagnon@canonical.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Add vendor specific ID (0a5c:21f4)
- BCM20702A0
-Message-ID: <20120710183032.GB13847@joana>
-References: <1334169563-2948-1-git-send-email-manoj.iyer@canonical.com>
- <1334169563-2948-2-git-send-email-manoj.iyer@canonical.com>
- <20120413214817.GB1680@joana>
- <alpine.DEB.2.02.1207061211420.2959@lazy>
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] Bluetooth: Refactor PIN code rejection to use
+ user_pairing_resp()
+Message-ID: <20120710182809.GA13847@joana>
+References: <1341830512-10865-1-git-send-email-jaganath.k@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.DEB.2.02.1207061211420.2959@lazy>
+In-Reply-To: <1341830512-10865-1-git-send-email-jaganath.k@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Manoj,
+Hi Jaganath,
 
-* Manoj Iyer <manoj.iyer@canonical.com> [2012-07-06 12:14:22 -0500]:
+* Jaganath Kanakkassery <jaganath.k@samsung.com> [2012-07-09 16:11:51 +0530]:
 
-> On Fri, 13 Apr 2012, Gustavo Padovan wrote:
+> Reuse user_pairing_resp() to send PIN code negative reply
 > 
-> Gustavo,
-> 
-> Sorry it took a long time to locate the hardware to get this info, I
-> got this info from one our QA engg cced here. Do you want me to
-> resubmit the patch ?
+> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
+> ---
+>  net/bluetooth/mgmt.c |   35 ++++++++++++-----------------------
+>  1 files changed, 12 insertions(+), 23 deletions(-)
 
-Yes, please resend the patch with proper git format. Thanks.
+Patch has been applied to bluetooth-next. Thanks.
 
 	Gustavo
