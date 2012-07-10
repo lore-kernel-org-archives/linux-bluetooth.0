@@ -1,14 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1341924202.31958.12.camel@aeonflux>
-Subject: Re: [PATCH v2] Bluetooth: Add MacBookPro10,1 support
+Message-ID: <1341924051.31958.10.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Add MacBookPro10,1 support
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Henrik Rydberg <rydberg@bitmath.se>
 Cc: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Henrik Rydberg <rydberg@euromail.se>
-Date: Tue, 10 Jul 2012 09:43:22 -0300
-In-Reply-To: <1341917201-4705-1-git-send-email-rydberg@euromail.se>
-References: <1341917201-4705-1-git-send-email-rydberg@euromail.se>
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Tue, 10 Jul 2012 09:40:51 -0300
+In-Reply-To: <20120709202410.GA817@polaris.bitmath.org>
+References: <1341856347-257-1-git-send-email-rydberg@euromail.se>
+	 <20120709184824.GA21411@x220> <20120709192529.GA712@polaris.bitmath.org>
+	 <20120709194947.GA17281@joana> <20120709202410.GA817@polaris.bitmath.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-kernel-owner@vger.kernel.org
@@ -16,30 +17,18 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Henrik,
 
-> Add support for the 2012 15'' MacBook Pro Retina, also known as
-> MacBookPro10,1. The bluetooth device presents itself as
+> > > > I believe the requirement is to always include a usb-devices output in
+> > > > the commit message (to let maintainers confirm that no typo has occurred
+> > > > in the patch itself).
+> > 
+> > If you don't have access to the device I can take it without usb-devices,
+> > otherwise just add it to the patch and then resend.
 > 
-> Bus 002 Device 008: ID 05ac:8286 Apple, Inc.
-> Device Descriptor:
->   bLength                18
->   bDescriptorType         1
->   bcdUSB               2.00
->   bDeviceClass          255 Vendor Specific Class
->   bDeviceSubClass         1
->   bDeviceProtocol         1
->   bMaxPacketSize0        64
->   idVendor           0x05ac Apple, Inc.
->   idProduct          0x8286
->   bcdDevice            0.74
->   iManufacturer           1 Apple Inc.
->   iProduct                2 Bluetooth USB Host Controller
->   iSerial                 0
->   bNumConfigurations      1
+> I don't, but I trust that this patch is authentic.
 
-please use /sys/kernel/debug/usb/devices or usb-devices script so that
-we get a compact representation of all endpoints and their descriptors.
-I know that lsusb will contain the same information, but it just spams
-the commit message for no real reason.
+the requirement is to have either /sys/kernel/debug/usb/devices section
+or usb-devices output included in the commit message. No exceptions. I
+want to have this documented in case any questions about it ever arises.
 
 Regards
 
