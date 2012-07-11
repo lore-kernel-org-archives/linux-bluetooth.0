@@ -1,38 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Henrik Rydberg" <rydberg@bitmath.se>
-Date: Wed, 11 Jul 2012 17:03:36 +0200
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"open list:USB SUBSYSTEM" <linux-usb@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH -v2] USB: add USB_VENDOR_AND_INTERFACE_INFO() macro
-Message-ID: <20120711150336.GA1340@polaris.bitmath.org>
-References: <1341958206-15610-1-git-send-email-gustavo@padovan.org>
+Date: Wed, 11 Jul 2012 10:10:35 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: debug: Print amp_mgr refcnt
+Message-ID: <20120711131035.GB20103@joana>
+References: <20120710183333.GC13847@joana>
+ <1342007015-9265-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1342007015-9265-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1341958206-15610-1-git-send-email-gustavo@padovan.org>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1342007015-9265-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jul 10, 2012 at 07:10:06PM -0300, Gustavo Padovan wrote:
-> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Hi Andrei,
+
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-07-11 14:43:35 +0300]:
+
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> A lot of Broadcom Bluetooth devices provides vendor specific interface
-> class and we are getting flooded by patches adding new device support.
-> This change will help us enable support for any other Broadcom with vendor
-> specific device that arrives in the future.
-> 
-> Only the product id changes for those devices, so this macro would be
-> perfect for us:
-> 
-> { USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01) }
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
+>  net/bluetooth/a2mp.c |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thank you, Gustavo, this patch made me happy.
+Both patches have been applied to bluetooth-next. Thanks.
 
-Henrik
+	Gustavo
