@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 Jul 2012 14:04:01 +0900 (JST)
-Message-Id: <20120711.140401.1493578767541672738.yamato@redhat.com>
+Date: Wed, 11 Jul 2012 14:03:37 +0900 (JST)
+Message-Id: <20120711.140337.6492431783697495.yamato@redhat.com>
 To: andrei.emeltchenko.news@gmail.com
 Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 7/8] bluetooth: Added /proc/net/rfcomm via
+Subject: [PATCH v3 6/8] bluetooth: Added /proc/net/l2cap via
  bt_procfs_init()
 From: Masatake YAMATO <yamato@redhat.com>
 In-Reply-To: <20120711.135831.1712662939552441872.yamato@redhat.com>
@@ -17,48 +17,74 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Signed-off-by: Masatake YAMATO <yamato@redhat.com>
 ---
- net/bluetooth/rfcomm/sock.c |   14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ net/bluetooth/l2cap_sock.c |   20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index 7e1e596..260821a 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -1033,8 +1033,17 @@ int __init rfcomm_init_sockets(void)
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index a4bb27e..c9a9f1c 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -34,6 +34,10 @@
+ #include <net/bluetooth/l2cap.h>
+ #include <net/bluetooth/smp.h>
+ 
++static struct bt_sock_list l2cap_sk_list = {
++	.lock = __RW_LOCK_UNLOCKED(l2cap_sk_list.lock)
++};
++
+ static const struct proto_ops l2cap_sock_ops;
+ static void l2cap_sock_init(struct sock *sk, struct sock *parent);
+ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock, int proto, gfp_t prio);
+@@ -886,6 +890,8 @@ static int l2cap_sock_release(struct socket *sock)
+ 	if (!sk)
+ 		return 0;
+ 
++	bt_sock_unlink(&l2cap_sk_list, sk);
++
+ 	err = l2cap_sock_shutdown(sock, 2);
+ 
+ 	sock_orphan(sk);
+@@ -1210,6 +1216,7 @@ static int l2cap_sock_create(struct net *net, struct socket *sock, int protocol,
+ 		return -ENOMEM;
+ 
+ 	l2cap_sock_init(sk, NULL);
++	bt_sock_link(&l2cap_sk_list, sk);
+ 	return 0;
+ }
+ 
+@@ -1248,22 +1255,30 @@ int __init l2cap_init_sockets(void)
  		return err;
  
- 	err = bt_sock_register(BTPROTO_RFCOMM, &rfcomm_sock_family_ops);
+ 	err = bt_sock_register(BTPROTO_L2CAP, &l2cap_sock_family_ops);
 -	if (err < 0)
 +	if (err < 0) {
-+		BT_ERR("RFCOMM socket layer registration failed");
-+		goto error;
-+	}
-+
-+	err = bt_procfs_init(THIS_MODULE, &init_net, "rfcomm", &rfcomm_sk_list, NULL);
-+	if (err < 0) {
-+		BT_ERR("Failed to create RFCOMM proc file");
-+		bt_sock_unregister(BTPROTO_RFCOMM);
++		BT_ERR("L2CAP socket registration failed");
  		goto error;
 +	}
++
++	err = bt_procfs_init(THIS_MODULE, &init_net, "l2cap", &l2cap_sk_list, NULL);
++	if (err < 0) {
++		BT_ERR("Failed to create L2CAP proc file");
++		bt_sock_unregister(BTPROTO_L2CAP);
++		goto error;
++	}
  
- 	if (bt_debugfs) {
- 		rfcomm_sock_debugfs = debugfs_create_file("rfcomm", 0444,
-@@ -1048,13 +1057,14 @@ int __init rfcomm_init_sockets(void)
+ 	BT_INFO("L2CAP socket layer initialized");
+ 
  	return 0;
  
  error:
--	BT_ERR("RFCOMM socket layer registration failed");
- 	proto_unregister(&rfcomm_proto);
+-	BT_ERR("L2CAP socket registration failed");
+ 	proto_unregister(&l2cap_proto);
  	return err;
  }
  
- void __exit rfcomm_cleanup_sockets(void)
+ void l2cap_cleanup_sockets(void)
  {
-+	bt_procfs_cleanup(&init_net, "rfcomm");
-+
- 	debugfs_remove(rfcomm_sock_debugfs);
++	bt_procfs_cleanup(&init_net, "l2cap");
+ 	if (bt_sock_unregister(BTPROTO_L2CAP) < 0)
+ 		BT_ERR("L2CAP socket unregistration failed");
  
- 	if (bt_sock_unregister(BTPROTO_RFCOMM) < 0)
 -- 
 1.7.10.4
 
