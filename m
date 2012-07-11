@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: debug: Print amp_mgr refcnt
-Date: Wed, 11 Jul 2012 14:43:35 +0300
-Message-Id: <1342007015-9265-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1342007015-9265-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: debug: Print l2cap_chan refcount
+Date: Wed, 11 Jul 2012 14:43:34 +0300
+Message-Id: <1342007015-9265-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <20120710183333.GC13847@joana>
 References: <20120710183333.GC13847@joana>
- <1342007015-9265-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -14,30 +13,28 @@ From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/net/bluetooth/l2cap.h |    4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index fb93250..4ff0bf3 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -501,7 +501,7 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
- /* AMP Manager functions */
- void amp_mgr_get(struct amp_mgr *mgr)
- {
--	BT_DBG("mgr %p", mgr);
-+	BT_DBG("mgr %p orig refcnt %d", mgr, atomic_read(&mgr->kref.refcount));
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index d80e3f0..e5164ff 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -672,11 +672,15 @@ enum {
  
- 	kref_get(&mgr->kref);
+ static inline void l2cap_chan_hold(struct l2cap_chan *c)
+ {
++	BT_DBG("chan %p orig refcnt %d", c, atomic_read(&c->refcnt));
++
+ 	atomic_inc(&c->refcnt);
  }
-@@ -517,7 +517,7 @@ static void amp_mgr_destroy(struct kref *kref)
  
- int amp_mgr_put(struct amp_mgr *mgr)
+ static inline void l2cap_chan_put(struct l2cap_chan *c)
  {
--	BT_DBG("mgr %p", mgr);
-+	BT_DBG("mgr %p orig refcnt %d", mgr, atomic_read(&mgr->kref.refcount));
- 
- 	return kref_put(&mgr->kref, &amp_mgr_destroy);
++	BT_DBG("chan %p orig refcnt %d", c, atomic_read(&c->refcnt));
++
+ 	if (atomic_dec_and_test(&c->refcnt))
+ 		kfree(c);
  }
 -- 
 1.7.9.5
