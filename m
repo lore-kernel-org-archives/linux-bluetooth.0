@@ -1,43 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CANq1E4RS3SzmSVF10u-+D0XXRU4jKC62fMAYcR91tPTk345M+g@mail.gmail.com>
-References: <1341340993-7480-1-git-send-email-jprvita@openbossa.org>
-	<20120709140005.GA3293@x220>
-	<CABUK1agL-wTZE1cTmO3=eBcApt0_emHcFMg9kQJ19pbo-dH5sA@mail.gmail.com>
-	<CANq1E4RS3SzmSVF10u-+D0XXRU4jKC62fMAYcR91tPTk345M+g@mail.gmail.com>
-Date: Wed, 11 Jul 2012 20:49:05 -0500
-Message-ID: <CABUK1agGLFYbo47XOQ6jE8P5b2n3xBGgQgHbpd1EBLTTN1hgug@mail.gmail.com>
-Subject: Re: [PATCH 00/21] HID over GATT plugin
-From: Pavan Savoy <pavan_savoy@sify.com>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [RFC BlueZ] mgmt-api: Broadcaster/Observer management API
+Date: Wed, 11 Jul 2012 17:34:48 -0300
+Message-Id: <1342038888-10102-2-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1342038888-10102-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1342038888-10102-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jul 10, 2012 at 12:57 AM, David Herrmann
-<dh.herrmann@googlemail.com> wrote:
-> Hi Pavan
->
-> On Tue, Jul 10, 2012 at 12:08 AM, Pavan Savoy <pavan_savoy@sify.com> wrote:
->> Johan, Joao,
->>
->> Why wasn't uinput sub-system used ?
->> May be there was a discussion regarding this on list & I missed it ?
->
-> Yes, there was a discussion on linux-bluetooth and linux-input. If we
-> use uinput then we need a user-space HID parser. That would mean
-> duplicating a lot of kernel HID code.
->
->> why invent uHID ? or the project previously existed ?
->
-> What project do you mean here? I don't know any predecessor of uHID.
-> Btw. uhid is already in Jiri's tree and scheduled for 3.6.
+Add new management commands for enabling or disabling broadcasting and
+observation modes, as defined by the Observer and Broadcaster GAP roles
+on the Core specification 4.0.
 
-Thanks David, I've realized that now..
-No, I was just wondering if uHID was done for hoG only ?
+The commands can also be used for adding information to EIR on BR/EDR
+controllers. For a list of all available AD/EIR types, see the Core
+Specification Suplement (CSS) document.
 
+Note that some AD/EIR types are managed internally by the kernel and are
+not available thhrough these new commands.
+---
+ doc/mgmt-api.txt |   70 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 70 insertions(+)
 
-> Regards
-> David
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 51c9b46..1841434 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -139,6 +139,8 @@ Read Controller Information Command
+ 		8	Basic Rate/Enhanced Data Rate
+ 		9	High Speed
+ 		10	Low Energy
++		11	Broadcaster
++		12	Observer
+ 
+ 	This command generates a Command Complete event on success or
+ 	a Command Status event on failure.
+@@ -845,6 +847,74 @@ Set Device ID Command
+ 	a Command Status event on failure.
+ 
+ 
++Set Broadcaster Command
++=======================
++
++	Command Code:		0x0029
++	Controller Index:	<controller id>
++	Command Parameters:	Broadcaster (1 Octet)
++	Return Parameters:	Current_Settings (4 Octets)
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++
++Set Observer Command
++====================
++
++	Command Code:		0x002A
++	Controller Index:	<controller id>
++	Command Parameters:	Observer (1 Octet)
++	Return Parameters:	Current_Settings (4 Octets)
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++
++Set Controller Data Command
++===========================
++
++	Command Code:		0x002B
++	Controller Index:	<controller id>
++	Command Parameters:	Flags (1 Octet)
++				Data_Type (1 Octet)
++				Data_Length (1 Octet)
++				Data (0-255 Octets)
++	Return Parameters:
++
++	This command can be used to set AD for LE capable controllers or EIR
++	for BR/EDR controllers. Multiple AD/EIR types can be configured by
++	calling this command multiple times. If the data does not fit on a
++	single AD/EIR on the controller, it will be rotated based on the "High
++	priority" flag, so data with this flag set will stay longer over the
++	air than those with this flag cleared.
++
++	Data_Type is the AD Type or EIR data type related to the provided data.
++
++	The following bits are defined for the Flags parameter:
++		0	High priority
++		1	Add to LE advertising data
++		2	Add to BR/EDR EIR
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++
++Remove Controller Data Command
++==============================
++
++	Command Code:		0x002C
++	Controller Index:	<controller id>
++	Command Parameters:	Data_Type (1 Octet)
++	Return Parameters:
++
++	Remove the AD/EIR information identified by Data_Type, so it will not
++	be broadcasted anymore.
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++
+ Command Complete Event
+ ======================
+ 
+-- 
+1.7.9.5
+
