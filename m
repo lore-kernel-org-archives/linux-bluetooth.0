@@ -1,42 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+Date: Wed, 11 Jul 2012 13:43:01 -0400
+Message-ID: <CACEkAT6ci30WTSFX8CsiNPJhH1Y6VCE+dmXKCNJ7CfjsNnocRQ@mail.gmail.com>
+Subject: How to force EDR l2cap connections
+From: Andy Pyles <andy.pyles@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ] doc: Mention GATT when creating devices
-Date: Wed, 11 Jul 2012 15:03:43 -0300
-Message-Id: <1342029823-2854-1-git-send-email-claudio.takahasi@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-CreatePairedDevice and CreateDevice trigger GATT discover all primary
-services procedure if the device is Bluetooth Low Energy.
----
- doc/adapter-api.txt |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+I have two bluetooth devices (Linux PC and  Android Phone). Both support BR/EDR.
+I have written an application that transmits data over an l2cap connection.
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 9d7f284..fb8c2e8 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -92,7 +92,7 @@ Methods		dict GetProperties()
- 
- 			Creates a new object path for a remote device. This
- 			method will connect to the remote device and retrieve
--			all SDP records.
-+			all SDP records (or GATT primary services).
- 
- 			If the object for the remote device already exists
- 			this method will fail.
-@@ -105,7 +105,8 @@ Methods		dict GetProperties()
- 
- 			Creates a new object path for a remote device. This
- 			method will connect to the remote device and retrieve
--			all SDP records and then initiate the pairing.
-+			all SDP records (or GATT primary services) and then
-+			initiate the pairing.
- 
- 			If previously CreateDevice was used successfully,
- 			this method will only initiate the pairing.
--- 
-1.7.8.6
+1.) How do I force the connection to use EDR only?
 
+According to the spec I need to set "Packet_Type" with the appropriate bits.
+I'm using the BSD socket API. I don't see an option in setsockopt() to
+set the Packet_Type parameter.
+Is there another approach to accomplish this?
+
+2.) Is there a tool I can use to verify that EDR is used?
+
+Here is some additional information about the devices.
+Both show support for DH3. Am I reading this correctly to mean that
+3-DH3 is not supported on either device?
+My understanding is the max speed for 3-DH3 is 3Mbit /sec, while DH3
+is limited to 2.1Mbit/sec.
+
+
+Device one (PC)
+hci0:	Type: BR/EDR  Bus: USB
+	BD Address: 9C:B7:0D:29:7C:39  ACL MTU: 1022:8  SCO MTU: 183:5
+	UP RUNNING PSCAN ISCAN
+	RX bytes:2230051 acl:3683 sco:0 events:4390 errors:0
+	TX bytes:2287298 acl:4179 sco:0 commands:62 errors:0
+	Features: 0xff 0xfe 0x0d 0xfe 0xd8 0x7f 0x7b 0x87
+	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+	Link policy: RSWITCH HOLD SNIFF
+	Link mode: SLAVE ACCEPT
+	Name: 'wifi2-0'
+	Class: 0x6e0100
+	Service Classes: Networking, Rendering, Capturing, Audio, Telephony
+	Device Class: Computer, Uncategorized
+	HCI Version: 4.0 (0x6)  Revision: 0x102
+	LMP Version: 4.0 (0x6)  Subversion: 0x1
+	Manufacturer: Atheros Communications, Inc. (69)
+
+Device two (Phone)
+
+hci0:	Type: BR/EDR  Bus: UART
+	BD Address: 04:E4:51:7C:DA:F8  ACL MTU: 1021:4  SCO MTU: 180:4
+	UP RUNNING PSCAN
+	RX bytes:2306566 acl:5350 sco:0 events:2154 errors:0
+	TX bytes:2202596 acl:3683 sco:0 commands:43 errors:0
+	Features: 0xff 0xfe 0x2d 0xfe 0xdb 0xff 0x7b 0x87
+	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+	Link policy: RSWITCH HOLD SNIFF
+	Link mode: SLAVE ACCEPT
+	Name: 'XT910'
+	Class: 0x5a020c
+	Service Classes: Networking, Capturing, Object Transfer, Telephony
+	Device Class: Phone, Smart phone
+	HCI Version: 4.0 (0x6)  Revision: 0x0
+	LMP Version: 4.0 (0x6)  Subversion: 0x2b2a
+	Manufacturer: Texas Instruments Inc. (13)
