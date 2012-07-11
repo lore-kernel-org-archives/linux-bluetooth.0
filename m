@@ -1,64 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 Jul 2012 21:19:06 +0900 (JST)
-Message-Id: <20120711.211906.1087916687452547370.yamato@redhat.com>
-To: andrei.emeltchenko.news@gmail.com
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 1/8] bluetooth: /proc/net/ entries for bluetooth
- protocols
-From: Masatake YAMATO <yamato@redhat.com>
-In-Reply-To: <20120711112308.GA3044@aemeltch-MOBL1>
-References: <20120710140400.GA15795@aemeltch-MOBL1>
-	<20120711.135831.1712662939552441872.yamato@redhat.com>
-	<20120711112308.GA3044@aemeltch-MOBL1>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: linux-kernel-owner@vger.kernel.org
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: debug: Print amp_mgr refcnt
+Date: Wed, 11 Jul 2012 14:43:35 +0300
+Message-Id: <1342007015-9265-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1342007015-9265-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <20120710183333.GC13847@joana>
+ <1342007015-9265-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> Hi Masatake,
-> 
-> On Wed, Jul 11, 2012 at 01:58:31PM +0900, Masatake YAMATO wrote:
->> (The patch sets are rebased to bluetooth-next. Unnecessary white
->> spaces are trimmed.)
->> 
->> lsof command can tell the type of socket processes are using.
->> Internal lsof uses inode numbers on socket fs to resolve the type of
->> sockets. Files under /proc/net/, such as tcp, udp, unix, etc provides
->> such inode information.
->> 
->> Unfortunately bluetooth related protocols don't provide such inode
->> information. This patch series introduces /proc/net files for the protocols.
->> 
->> This patch against af_bluetooth.c provides facility to the implementation
->> of protocols. This patch extends bt_sock_list and introduces two exported
->> function bt_procfs_init, bt_procfs_cleanup.
->> 
->> The type bt_sock_list is already used in some of implementation of
->> protocols. bt_procfs_init prepare seq_operations which converts
->> protocol own bt_sock_list data to protocol own proc entry when the
->> entry is accessed.
->> 
->> What I, lsof user, need is just inode number of bluetooth
->> socket. However, people may want more information. The bt_procfs_init
->> takes a function pointer for customizing the show handler of
->> seq_operations.
-> 
-> I've tested the patch and it creates entries in /proc/net
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/a2mp.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks.
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index fb93250..4ff0bf3 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -501,7 +501,7 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
+ /* AMP Manager functions */
+ void amp_mgr_get(struct amp_mgr *mgr)
+ {
+-	BT_DBG("mgr %p", mgr);
++	BT_DBG("mgr %p orig refcnt %d", mgr, atomic_read(&mgr->kref.refcount));
  
-> BTW: Shall lsof be able to identify l2cap protocol?
-> 
-> for l2test it prints: "can't identify protocol"
+ 	kref_get(&mgr->kref);
+ }
+@@ -517,7 +517,7 @@ static void amp_mgr_destroy(struct kref *kref)
+ 
+ int amp_mgr_put(struct amp_mgr *mgr)
+ {
+-	BT_DBG("mgr %p", mgr);
++	BT_DBG("mgr %p orig refcnt %d", mgr, atomic_read(&mgr->kref.refcount));
+ 
+ 	return kref_put(&mgr->kref, &amp_mgr_destroy);
+ }
+-- 
+1.7.9.5
 
-No. I'll work on lsof side after the kernel side
-patches are merged to the main line.
-
-
-Masatake YAMATO
-
-> Best regards 
-> Andrei Emeltchenko  
-> 
