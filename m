@@ -1,35 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
-	"open list\:USB SUBSYSTEM" <linux-usb@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] USB: add USB_VENDOR_AND_INTERFACE_INFO() macro
-References: <1341957063-11989-1-git-send-email-gustavo@padovan.org>
-	<20120710220108.GA28387@kroah.com>
-Date: Wed, 11 Jul 2012 10:36:46 +0200
-In-Reply-To: <20120710220108.GA28387@kroah.com> (Greg Kroah-Hartman's message
-	of "Tue, 10 Jul 2012 15:01:08 -0700")
-Message-ID: <877guahext.fsf@nemi.mork.no>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Date: Wed, 11 Jul 2012 14:04:23 +0900 (JST)
+Message-Id: <20120711.140423.1598510269265721139.yamato@redhat.com>
+To: andrei.emeltchenko.news@gmail.com
+Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 8/8] bluetooth: Added /proc/net/sco via bt_procfs_init()
+From: Masatake YAMATO <yamato@redhat.com>
+In-Reply-To: <20120711.135831.1712662939552441872.yamato@redhat.com>
+References: <20120629.020253.963694178693689545.yamato@redhat.com>
+	<20120710140400.GA15795@aemeltch-MOBL1>
+	<20120711.135831.1712662939552441872.yamato@redhat.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Greg Kroah-Hartman <gregkh@linuxfoundation.org> writes:
-> On Tue, Jul 10, 2012 at 06:51:03PM -0300, Gustavo Padovan wrote:
->
->> { USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01) }
->
-> Two entries in the cdc_wdm driver can also be converted to use this
-> interface.  Do you want to send a patch doing that, or do you want me to
-> do it?
+Signed-off-by: Masatake YAMATO <yamato@redhat.com>
+---
+ net/bluetooth/sco.c |    9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Only if you decide to take this change in 3.4 and 3.5.  Those entries
-are gone in 3.6.
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 40bbe25..85efd9f 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -1026,6 +1026,13 @@ int __init sco_init(void)
+ 		goto error;
+ 	}
+ 
++	err = bt_procfs_init(THIS_MODULE, &init_net, "sco", &sco_sk_list, NULL);
++	if (err < 0) {
++		BT_ERR("Failed to create SCO proc file");
++		bt_sock_unregister(BTPROTO_SCO);
++		goto error;
++	}
++
+ 	if (bt_debugfs) {
+ 		sco_debugfs = debugfs_create_file("sco", 0444, bt_debugfs,
+ 						  NULL, &sco_debugfs_fops);
+@@ -1044,6 +1051,8 @@ error:
+ 
+ void __exit sco_exit(void)
+ {
++	bt_procfs_cleanup(&init_net, "sco");
++
+ 	debugfs_remove(sco_debugfs);
+ 
+ 	if (bt_sock_unregister(BTPROTO_SCO) < 0)
+-- 
+1.7.10.4
 
-
-
-Bjørn
