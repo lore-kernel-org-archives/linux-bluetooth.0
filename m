@@ -1,10 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 Jul 2012 14:03:37 +0900 (JST)
-Message-Id: <20120711.140337.6492431783697495.yamato@redhat.com>
+Date: Wed, 11 Jul 2012 14:03:10 +0900 (JST)
+Message-Id: <20120711.140310.150561481084375373.yamato@redhat.com>
 To: andrei.emeltchenko.news@gmail.com
 Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 6/8] bluetooth: Added /proc/net/l2cap via
- bt_procfs_init()
+Subject: [PATCH v3 5/8] bluetooth: Added /proc/net/hidp via bt_procfs_init()
 From: Masatake YAMATO <yamato@redhat.com>
 In-Reply-To: <20120711.135831.1712662939552441872.yamato@redhat.com>
 References: <20120629.020253.963694178693689545.yamato@redhat.com>
@@ -17,73 +16,71 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Signed-off-by: Masatake YAMATO <yamato@redhat.com>
 ---
- net/bluetooth/l2cap_sock.c |   20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
+ net/bluetooth/hidp/sock.c |   22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index a4bb27e..c9a9f1c 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -34,6 +34,10 @@
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/smp.h>
+diff --git a/net/bluetooth/hidp/sock.c b/net/bluetooth/hidp/sock.c
+index 18b3f68..a481f8d 100644
+--- a/net/bluetooth/hidp/sock.c
++++ b/net/bluetooth/hidp/sock.c
+@@ -25,6 +25,10 @@
  
-+static struct bt_sock_list l2cap_sk_list = {
-+	.lock = __RW_LOCK_UNLOCKED(l2cap_sk_list.lock)
+ #include "hidp.h"
+ 
++static struct bt_sock_list hidp_sk_list = {
++	.lock = __RW_LOCK_UNLOCKED(hidp_sk_list.lock)
 +};
 +
- static const struct proto_ops l2cap_sock_ops;
- static void l2cap_sock_init(struct sock *sk, struct sock *parent);
- static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock, int proto, gfp_t prio);
-@@ -886,6 +890,8 @@ static int l2cap_sock_release(struct socket *sock)
+ static int hidp_sock_release(struct socket *sock)
+ {
+ 	struct sock *sk = sock->sk;
+@@ -34,6 +38,8 @@ static int hidp_sock_release(struct socket *sock)
  	if (!sk)
  		return 0;
  
-+	bt_sock_unlink(&l2cap_sk_list, sk);
++	bt_sock_unlink(&hidp_sk_list, sk);
 +
- 	err = l2cap_sock_shutdown(sock, 2);
- 
  	sock_orphan(sk);
-@@ -1210,6 +1216,7 @@ static int l2cap_sock_create(struct net *net, struct socket *sock, int protocol,
- 		return -ENOMEM;
+ 	sock_put(sk);
  
- 	l2cap_sock_init(sk, NULL);
-+	bt_sock_link(&l2cap_sk_list, sk);
+@@ -253,6 +259,8 @@ static int hidp_sock_create(struct net *net, struct socket *sock, int protocol,
+ 	sk->sk_protocol = protocol;
+ 	sk->sk_state	= BT_OPEN;
+ 
++	bt_sock_link(&hidp_sk_list, sk);
++
  	return 0;
  }
  
-@@ -1248,22 +1255,30 @@ int __init l2cap_init_sockets(void)
+@@ -271,9 +279,20 @@ int __init hidp_init_sockets(void)
  		return err;
  
- 	err = bt_sock_register(BTPROTO_L2CAP, &l2cap_sock_family_ops);
+ 	err = bt_sock_register(BTPROTO_HIDP, &hidp_sock_family_ops);
 -	if (err < 0)
 +	if (err < 0) {
-+		BT_ERR("L2CAP socket registration failed");
++		BT_ERR("Can't register HIDP socket");
  		goto error;
 +	}
 +
-+	err = bt_procfs_init(THIS_MODULE, &init_net, "l2cap", &l2cap_sk_list, NULL);
++	err = bt_procfs_init(THIS_MODULE, &init_net, "hidp", &hidp_sk_list, NULL);
 +	if (err < 0) {
-+		BT_ERR("Failed to create L2CAP proc file");
-+		bt_sock_unregister(BTPROTO_L2CAP);
++		BT_ERR("Failed to create HIDP proc file");
++		bt_sock_unregister(BTPROTO_HIDP);
 +		goto error;
 +	}
  
- 	BT_INFO("L2CAP socket layer initialized");
- 
++	BT_INFO("HIDP socket layer initialized");
++
  	return 0;
  
  error:
--	BT_ERR("L2CAP socket registration failed");
- 	proto_unregister(&l2cap_proto);
- 	return err;
- }
+@@ -284,6 +303,7 @@ error:
  
- void l2cap_cleanup_sockets(void)
+ void __exit hidp_cleanup_sockets(void)
  {
-+	bt_procfs_cleanup(&init_net, "l2cap");
- 	if (bt_sock_unregister(BTPROTO_L2CAP) < 0)
- 		BT_ERR("L2CAP socket unregistration failed");
++	bt_procfs_cleanup(&init_net, "hidp");
+ 	if (bt_sock_unregister(BTPROTO_HIDP) < 0)
+ 		BT_ERR("Can't unregister HIDP socket");
  
 -- 
 1.7.10.4
