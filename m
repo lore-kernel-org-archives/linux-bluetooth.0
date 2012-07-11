@@ -1,38 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 Jul 2012 06:04:20 -0700
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
-	"open list:USB SUBSYSTEM" <linux-usb@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] USB: add USB_VENDOR_AND_INTERFACE_INFO() macro
-Message-ID: <20120711130420.GA6892@kroah.com>
-References: <1341957063-11989-1-git-send-email-gustavo@padovan.org>
- <20120710220108.GA28387@kroah.com>
- <877guahext.fsf@nemi.mork.no>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <877guahext.fsf@nemi.mork.no>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 11 Jul 2012 21:19:06 +0900 (JST)
+Message-Id: <20120711.211906.1087916687452547370.yamato@redhat.com>
+To: andrei.emeltchenko.news@gmail.com
+Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 1/8] bluetooth: /proc/net/ entries for bluetooth
+ protocols
+From: Masatake YAMATO <yamato@redhat.com>
+In-Reply-To: <20120711112308.GA3044@aemeltch-MOBL1>
+References: <20120710140400.GA15795@aemeltch-MOBL1>
+	<20120711.135831.1712662939552441872.yamato@redhat.com>
+	<20120711112308.GA3044@aemeltch-MOBL1>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Jul 11, 2012 at 10:36:46AM +0200, Bjørn Mork wrote:
-> Greg Kroah-Hartman <gregkh@linuxfoundation.org> writes:
-> > On Tue, Jul 10, 2012 at 06:51:03PM -0300, Gustavo Padovan wrote:
-> >
-> >> { USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01) }
-> >
-> > Two entries in the cdc_wdm driver can also be converted to use this
-> > interface.  Do you want to send a patch doing that, or do you want me to
-> > do it?
+Hi,
+
+> Hi Masatake,
 > 
-> Only if you decide to take this change in 3.4 and 3.5.  Those entries
-> are gone in 3.6.
+> On Wed, Jul 11, 2012 at 01:58:31PM +0900, Masatake YAMATO wrote:
+>> (The patch sets are rebased to bluetooth-next. Unnecessary white
+>> spaces are trimmed.)
+>> 
+>> lsof command can tell the type of socket processes are using.
+>> Internal lsof uses inode numbers on socket fs to resolve the type of
+>> sockets. Files under /proc/net/, such as tcp, udp, unix, etc provides
+>> such inode information.
+>> 
+>> Unfortunately bluetooth related protocols don't provide such inode
+>> information. This patch series introduces /proc/net files for the protocols.
+>> 
+>> This patch against af_bluetooth.c provides facility to the implementation
+>> of protocols. This patch extends bt_sock_list and introduces two exported
+>> function bt_procfs_init, bt_procfs_cleanup.
+>> 
+>> The type bt_sock_list is already used in some of implementation of
+>> protocols. bt_procfs_init prepare seq_operations which converts
+>> protocol own bt_sock_list data to protocol own proc entry when the
+>> entry is accessed.
+>> 
+>> What I, lsof user, need is just inode number of bluetooth
+>> socket. However, people may want more information. The bt_procfs_init
+>> takes a function pointer for customizing the show handler of
+>> seq_operations.
+> 
+> I've tested the patch and it creates entries in /proc/net
 
-Ah, the joys of looking at the wrong branch in git :)
+Thanks.
+ 
+> BTW: Shall lsof be able to identify l2cap protocol?
+> 
+> for l2test it prints: "can't identify protocol"
 
-Nevermind...
+No. I'll work on lsof side after the kernel side
+patches are merged to the main line.
 
-greg k-h
+
+Masatake YAMATO
+
+> Best regards 
+> Andrei Emeltchenko  
+> 
