@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 10/20] Bluetooth: AMP: Physical link struct definitions
-Date: Fri, 13 Jul 2012 16:39:12 +0300
-Message-Id: <1342186762-32329-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 11/20] Bluetooth: AMP: Remote AMP ctrl definitions
+Date: Fri, 13 Jul 2012 16:39:13 +0300
+Message-Id: <1342186762-32329-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1342186762-32329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1342186762-32329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,270 +12,171 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Define physical link structure. Physical links are managed by AMP
-manager inside amp_mgr structure and represent AMP physical links.
+Create remote AMP controllers structure. It is used to keep information
+about discovered remote AMP controllers by A2MP protocol.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |    3 +
- include/net/bluetooth/pal.h  |   42 +++++++++++++
- net/bluetooth/Makefile       |    2 +-
- net/bluetooth/a2mp.c         |    6 ++
- net/bluetooth/pal.c          |  141 ++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 193 insertions(+), 1 deletion(-)
- create mode 100644 include/net/bluetooth/pal.h
- create mode 100644 net/bluetooth/pal.c
+ include/net/bluetooth/a2mp.h |    3 ++
+ include/net/bluetooth/pal.h  |   14 ++++++++
+ net/bluetooth/a2mp.c         |    5 +++
+ net/bluetooth/pal.c          |   81 ++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 103 insertions(+)
 
 diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index ec77ddc..012f573 100644
+index 012f573..8ba236c 100644
 --- a/include/net/bluetooth/a2mp.h
 +++ b/include/net/bluetooth/a2mp.h
-@@ -26,6 +26,9 @@ struct amp_mgr {
- 	__u8			ident;
- 	__u8			handle;
- 	unsigned long		flags;
+@@ -29,6 +29,9 @@ struct amp_mgr {
+ 
+ 	struct list_head	phy_links;
+ 	struct mutex		phy_links_lock;
 +
-+	struct list_head	phy_links;
-+	struct mutex		phy_links_lock;
++	struct list_head	amp_ctrls;
++	struct mutex		amp_ctrls_lock;
  };
  
  struct a2mp_cmd {
 diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
-new file mode 100644
-index 0000000..201c501
---- /dev/null
+index 201c501..3223ec2 100644
+--- a/include/net/bluetooth/pal.h
 +++ b/include/net/bluetooth/pal.h
-@@ -0,0 +1,42 @@
-+/*
-+   Copyright (c) 2011,2012 Intel Corp.
-+
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License version 2 and
-+   only version 2 as published by the Free Software Foundation.
-+
-+   This program is distributed in the hope that it will be useful,
-+   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+   GNU General Public License for more details.
-+*/
-+
-+#ifndef __PAL_H
-+#define __PAL_H
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/l2cap.h>
-+#include <net/bluetooth/a2mp.h>
-+#include <net/bluetooth/amp.h>
-+
-+struct phy_link {
+@@ -32,6 +32,20 @@ struct phy_link {
+ 	struct kref		kref;
+ };
+ 
++struct amp_ctrl {
 +	struct list_head	list;
-+	__u8			local_id;
-+	__u8			remote_id;
-+	__u8			state;
-+	__u8			amp_role;
-+	__u8			handle;
-+	struct amp_mgr		*mgr;
-+	struct amp_assoc	rem_assoc;
 +	struct kref		kref;
++	__u8			id;
++	__u16			assoc_len_so_far;
++	__u16			assoc_rem_len;
++	__u16			assoc_len;
++	__u8			*assoc;
 +};
 +
-+struct phy_link *phylink_add(struct amp_mgr *mgr, u8 local_id, u8 remote_id,
-+			     u8 *rem_assoc, u16 assoc_size);
-+struct phy_link *phylink_lookup(struct amp_mgr *mgr, u8 local_id, u8 remote_id);
-+int phylink_put(struct phy_link *plink);
-+void phylink_get(struct phy_link *plink);
-+void phylink_list_flush(struct amp_mgr *mgr);
-+
-+#endif /* __PAL_H */
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index dea6a28..3f76fc2 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -10,4 +10,4 @@ obj-$(CONFIG_BT_HIDP)	+= hidp/
- 
- bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
- 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
--	a2mp.o amp.o
-+	a2mp.o amp.o pal.o
++int amp_ctrl_put(struct amp_ctrl *ctrl);
++struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr);
++struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id);
++void amp_ctrl_list_flush(struct amp_mgr *mgr);
+ struct phy_link *phylink_add(struct amp_mgr *mgr, u8 local_id, u8 remote_id,
+ 			     u8 *rem_assoc, u16 assoc_size);
+ struct phy_link *phylink_lookup(struct amp_mgr *mgr, u8 local_id, u8 remote_id);
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 4f5cd5d..e62099a 100644
+index e62099a..f991fbe 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -17,6 +17,7 @@
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/a2mp.h>
- #include <net/bluetooth/amp.h>
-+#include <net/bluetooth/pal.h>
- 
- /* A2MP build & send command helper functions */
- static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
-@@ -594,6 +595,7 @@ static void amp_mgr_destroy(struct kref *kref)
+@@ -595,6 +595,7 @@ static void amp_mgr_destroy(struct kref *kref)
  
  	BT_DBG("mgr %p", mgr);
  
-+	phylink_list_flush(mgr);
++	amp_ctrl_list_flush(mgr);
+ 	phylink_list_flush(mgr);
  	kfree(mgr);
  }
+@@ -634,6 +635,10 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
+ 	INIT_LIST_HEAD(&mgr->phy_links);
+ 	mutex_init(&mgr->phy_links_lock);
  
-@@ -628,6 +630,10 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
- 
- 	conn->hcon->amp_mgr = mgr;
- 
-+	/* Phylink initialization */
-+	INIT_LIST_HEAD(&mgr->phy_links);
-+	mutex_init(&mgr->phy_links_lock);
++	/* Remote AMP ctrl list initialization */
++	INIT_LIST_HEAD(&mgr->amp_ctrls);
++	mutex_init(&mgr->amp_ctrls_lock);
 +
  	kref_init(&mgr->kref);
  
  	return mgr;
 diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
-new file mode 100644
-index 0000000..24fb3aa
---- /dev/null
+index 24fb3aa..440f5bf 100644
+--- a/net/bluetooth/pal.c
 +++ b/net/bluetooth/pal.c
-@@ -0,0 +1,141 @@
-+/*
-+   Copyright (c) 2011,2012 Intel Corp.
-+
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License version 2 and
-+   only version 2 as published by the Free Software Foundation.
-+
-+   This program is distributed in the hope that it will be useful,
-+   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+   GNU General Public License for more details.
-+*/
-+
-+#include <net/bluetooth/pal.h>
-+
-+enum pal_states {
-+	DISCONNECTED,
-+	STARTING,
-+	CONNECTING,
-+	AUTHENTICATING,
-+	CONNECTED,
-+	DISCONNECTING
-+};
-+
-+/* Physical Link interface */
-+void phylink_get(struct phy_link *plink)
+@@ -22,6 +22,87 @@ enum pal_states {
+ 	DISCONNECTING
+ };
+ 
++/* Remote AMP Controllers handling */
++static void amp_ctrl_get(struct amp_ctrl *ctrl)
 +{
-+	BT_DBG("plink %p orig refcnt %d", plink,
-+	       atomic_read(&plink->kref.refcount));
++	BT_DBG("ctrl %p orig refcnt %d", ctrl,
++	       atomic_read(&ctrl->kref.refcount));
 +
-+	kref_get(&plink->kref);
++	kref_get(&ctrl->kref);
 +}
 +
-+static void phylink_destroy(struct kref *kref)
++static void amp_ctrl_destroy(struct kref *kref)
 +{
-+	struct phy_link *plink = container_of(kref, struct phy_link, kref);
++	struct amp_ctrl *ctrl = container_of(kref, struct amp_ctrl, kref);
 +
-+	BT_DBG("plink %p", plink);
++	BT_DBG("ctrl %p", ctrl);
 +
-+	kfree(plink);
++	if (ctrl->assoc)
++		kfree(ctrl->assoc);
++
++	kfree(ctrl);
 +}
 +
-+int phylink_put(struct phy_link *plink)
++int amp_ctrl_put(struct amp_ctrl *ctrl)
 +{
-+	BT_DBG("plink %p orig refcnt %d", plink,
-+	       atomic_read(&plink->kref.refcount));
++	BT_DBG("ctrl %p orig refcnt %d", ctrl,
++	       atomic_read(&ctrl->kref.refcount));
 +
-+	return kref_put(&plink->kref, &phylink_destroy);
++	return kref_put(&ctrl->kref, &amp_ctrl_destroy);
 +}
 +
-+static u8 __next_handle(struct amp_mgr *mgr)
++struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr)
 +{
-+	if (++mgr->handle == 0)
-+		mgr->handle = 1;
++	struct amp_ctrl *ctrl;
 +
-+	return mgr->handle;
-+}
-+
-+struct phy_link *phylink_add(struct amp_mgr *mgr, u8 local_id, u8 remote_id,
-+			     u8 *rem_assoc, u16 assoc_size)
-+{
-+	struct phy_link *plink;
-+
-+	plink = kzalloc(sizeof(*plink), GFP_KERNEL);
-+	if (!plink)
++	ctrl = kzalloc(sizeof(*ctrl), GFP_KERNEL);
++	if (!ctrl)
 +		return NULL;
 +
-+	plink->local_id = local_id;
-+	plink->remote_id = remote_id;
-+	plink->mgr = mgr;
-+	plink->handle = __next_handle(mgr);
++	mutex_lock(&mgr->amp_ctrls_lock);
++	list_add(&ctrl->list, &mgr->amp_ctrls);
++	mutex_unlock(&mgr->amp_ctrls_lock);
 +
-+	plink->rem_assoc.len = min_t(u16, assoc_size, HCI_MAX_AMP_ASSOC_SIZE);
-+	memcpy(plink->rem_assoc.data, rem_assoc, plink->rem_assoc.len);
++	kref_init(&ctrl->kref);
 +
-+	plink->state = STARTING;
++	BT_DBG("mgr %p: ctrl %p", mgr, ctrl);
 +
-+	mutex_lock(&mgr->phy_links_lock);
-+	list_add(&plink->list, &mgr->phy_links);
-+	mutex_unlock(&mgr->phy_links_lock);
-+
-+	kref_init(&plink->kref);
-+
-+	BT_DBG("Physical link %p created", plink);
-+
-+	return plink;
++	return ctrl;
 +}
 +
-+void phylink_del(struct amp_mgr *mgr, struct phy_link *plink)
++void amp_ctrl_list_flush(struct amp_mgr *mgr)
 +{
-+	BT_DBG("phylink %p", plink);
-+
-+	mutex_lock(&mgr->phy_links_lock);
-+	list_del(&plink->list);
-+	mutex_unlock(&mgr->phy_links_lock);
-+
-+	phylink_put(plink);
-+}
-+
-+void phylink_list_flush(struct amp_mgr *mgr)
-+{
-+	struct phy_link *plink, *n;
++	struct amp_ctrl *ctrl, *n;
 +
 +	BT_DBG("mgr %p", mgr);
 +
-+	mutex_lock(&mgr->phy_links_lock);
-+	list_for_each_entry_safe(plink, n, &mgr->phy_links, list) {
-+		list_del(&plink->list);
-+		phylink_put(plink);
++	mutex_lock(&mgr->amp_ctrls_lock);
++	list_for_each_entry_safe(ctrl, n, &mgr->amp_ctrls, list) {
++		list_del(&ctrl->list);
++		amp_ctrl_put(ctrl);
 +	}
-+	mutex_unlock(&mgr->phy_links_lock);
++	mutex_unlock(&mgr->amp_ctrls_lock);
 +}
 +
-+struct phy_link *phylink_lookup(struct amp_mgr *mgr, u8 local_id, u8 remote_id)
++struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id)
 +{
-+	struct phy_link *plink, *found = NULL;
++	struct amp_ctrl *ctrl = NULL;
 +
-+	mutex_lock(&mgr->phy_links_lock);
-+	list_for_each_entry(plink, &mgr->phy_links, list) {
-+		/* Closest match */
-+		if (!remote_id && plink->local_id == local_id) {
-+			found = plink;
++	mutex_lock(&mgr->amp_ctrls_lock);
++	list_for_each_entry(ctrl, &mgr->amp_ctrls, list) {
++		if (ctrl->id == id)
 +			break;
-+		}
-+		/* Exact match */
-+		if (plink->local_id == local_id &&
-+		    plink->remote_id == remote_id) {
-+			found = plink;
-+			break;
-+		}
 +	}
-+	mutex_unlock(&mgr->phy_links_lock);
++	mutex_unlock(&mgr->amp_ctrls_lock);
 +
-+	BT_DBG("local_id %d remote_id %d plink %p", local_id, remote_id,
-+	       plink);
++	BT_DBG("mgr %p: id %d ctrl %p", mgr, id, ctrl);
 +
-+	if (found)
-+		phylink_get(plink);
++	if (ctrl)
++		amp_ctrl_get(ctrl);
 +
-+	return found;
++	return ctrl;
 +}
++
+ /* Physical Link interface */
+ void phylink_get(struct phy_link *plink)
+ {
 -- 
 1.7.9.5
 
