@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 12/20] Bluetooth: AMP: Use phylink in create/disc phylink req
-Date: Fri, 13 Jul 2012 16:39:14 +0300
-Message-Id: <1342186762-32329-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 01/20] Bluetooth: Define AMP controller statuses
+Date: Fri, 13 Jul 2012 16:39:03 +0300
+Message-Id: <1342186762-32329-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1342186762-32329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1342186762-32329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,78 +12,34 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Use phy_link structure to keep track about physical connections.
+AMP status codes copied from Bluez patch sent by Peter Krystad
+<pkrystad@codeaurora.org>.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/pal.h |    1 +
- net/bluetooth/a2mp.c        |   19 +++++++++++++++++++
- 2 files changed, 20 insertions(+)
+ include/net/bluetooth/hci.h |    9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
-index 3223ec2..6ce1dfb 100644
---- a/include/net/bluetooth/pal.h
-+++ b/include/net/bluetooth/pal.h
-@@ -52,5 +52,6 @@ struct phy_link *phylink_lookup(struct amp_mgr *mgr, u8 local_id, u8 remote_id);
- int phylink_put(struct phy_link *plink);
- void phylink_get(struct phy_link *plink);
- void phylink_list_flush(struct amp_mgr *mgr);
-+void phylink_del(struct amp_mgr *mgr, struct phy_link *plink);
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index ccd723e..7f19556 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -62,6 +62,15 @@
+ /* First BR/EDR Controller shall have ID = 0 */
+ #define HCI_BREDR_ID	0
  
- #endif /* __PAL_H */
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index f991fbe..c00fc65 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -309,6 +309,7 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 
- 	struct a2mp_physlink_rsp rsp;
- 	struct hci_dev *hdev;
-+	struct phy_link *plink;
- 
- 	if (le16_to_cpu(hdr->len) < sizeof(*req))
- 		return -EINVAL;
-@@ -326,6 +327,11 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 
- 	/* TODO process physlink create */
- 
-+	plink = phylink_add(mgr, rsp.local_id, rsp.remote_id, req->amp_assoc,
-+			    le16_to_cpu(hdr->len) - sizeof(*req));
++/* AMP controller status */
++#define AMP_CTRL_POWERED_DOWN			0x00
++#define AMP_CTRL_BLUETOOTH_ONLY			0x01
++#define AMP_CTRL_NO_CAPACITY			0x02
++#define AMP_CTRL_LOW_CAPACITY			0x03
++#define AMP_CTRL_MEDIUM_CAPACITY		0x04
++#define AMP_CTRL_HIGH_CAPACITY			0x05
++#define AMP_CTRL_FULL_CAPACITY			0x06
 +
-+	BT_DBG("plink %p", plink);
-+
- 	rsp.status = A2MP_STATUS_SUCCESS;
- 
- send_rsp:
-@@ -345,6 +351,7 @@ static int a2mp_discphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 	struct a2mp_physlink_req *req = (void *) skb->data;
- 	struct a2mp_physlink_rsp rsp;
- 	struct hci_dev *hdev;
-+	struct phy_link *plink;
- 
- 	if (le16_to_cpu(hdr->len) < sizeof(*req))
- 		return -EINVAL;
-@@ -361,8 +368,20 @@ static int a2mp_discphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 		goto send_rsp;
- 	}
- 
-+	plink = phylink_lookup(mgr, rsp.local_id, rsp.remote_id);
-+	if (!plink) {
-+		BT_ERR("No phys link exist");
-+		rsp.status = A2MP_STATUS_NO_PHYSICAL_LINK_EXISTS;
-+		goto clean;
-+	}
-+
- 	/* TODO Disconnect Phys Link here */
- 
-+	phylink_put(plink);
-+
-+	phylink_del(mgr, plink);
-+
-+clean:
- 	hci_dev_put(hdev);
- 
- send_rsp:
+ /* HCI device quirks */
+ enum {
+ 	HCI_QUIRK_RESET_ON_CLOSE,
 -- 
 1.7.9.5
 
