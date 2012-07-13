@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 04/20] Bluetooth: General HCI callback implementation
-Date: Fri, 13 Jul 2012 16:39:06 +0300
-Message-Id: <1342186762-32329-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 19/20] Bluetooth: AMP: Write remote AMP Assoc
+Date: Fri, 13 Jul 2012 16:39:21 +0300
+Message-Id: <1342186762-32329-20-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1342186762-32329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1342186762-32329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,187 +12,106 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add general HCI callback implementation. Can be used for executing
-HCI commands from A2MP protocol.
+When receiving HCI Command Status after HCI Create Physical Link
+execute HCI Write Remote AMP Assoc command to AMP controller.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci_core.h |   21 +++++++++
- net/bluetooth/hci_core.c         |   88 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 109 insertions(+)
+ include/net/bluetooth/hci_core.h |    2 ++
+ net/bluetooth/amp.c              |   60 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 62 insertions(+)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index cda6437..4a5b62d 100644
+index e333e70..7412085 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -130,6 +130,17 @@ struct le_scan_params {
+@@ -144,6 +144,8 @@ struct hci_cb_cmd {
+ struct amp_assoc {
+ 	__u16	len;
+ 	__u16	offset;
++	__u16	rem_len;
++	__u16	len_so_far;
+ 	__u8	data[HCI_MAX_AMP_ASSOC_SIZE];
+ };
  
- #define HCI_MAX_SHORT_NAME_LENGTH	10
- 
-+struct hci_dev;
-+
-+struct hci_cb_cmd {
-+	struct list_head list;
-+	u16 opcode;
-+	u8 status;
-+	void *opt;
-+	void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
-+	void (*destructor)(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
-+};
-+
- #define NUM_REASSEMBLY 4
- struct hci_dev {
- 	struct list_head list;
-@@ -242,6 +253,9 @@ struct hci_dev {
- 
- 	struct list_head	mgmt_pending;
- 
-+	struct mutex		cb_list_lock;
-+	struct list_head	cb_list;
-+
- 	struct discovery_state	discovery;
- 	struct hci_conn_hash	conn_hash;
- 	struct list_head	blacklist;
-@@ -1100,5 +1114,12 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
- int hci_cancel_le_scan(struct hci_dev *hdev);
- 
- u8 bdaddr_to_le(u8 bdaddr_type);
-+struct hci_cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode);
-+int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
-+	       void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
-+	       void *opt,
-+	       void (*destructor)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
-+	       gfp_t flags);
-+void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
- 
- #endif /* __HCI_CORE_H */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 28bab9d..0b63d82 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -36,6 +36,7 @@
- static void hci_rx_work(struct work_struct *work);
- static void hci_cmd_work(struct work_struct *work);
- static void hci_tx_work(struct work_struct *work);
-+static void hci_cb_clear(struct hci_dev *hdev);
- 
- /* HCI device list */
- LIST_HEAD(hci_dev_list);
-@@ -1645,6 +1646,7 @@ struct hci_dev *hci_alloc_dev(void)
- 
- 	mutex_init(&hdev->lock);
- 	mutex_init(&hdev->req_lock);
-+	mutex_init(&hdev->cb_list_lock);
- 
- 	INIT_LIST_HEAD(&hdev->mgmt_pending);
- 	INIT_LIST_HEAD(&hdev->blacklist);
-@@ -1652,6 +1654,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_LIST_HEAD(&hdev->link_keys);
- 	INIT_LIST_HEAD(&hdev->long_term_keys);
- 	INIT_LIST_HEAD(&hdev->remote_oob_data);
-+	INIT_LIST_HEAD(&hdev->cb_list);
- 
- 	INIT_WORK(&hdev->rx_work, hci_rx_work);
- 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
-@@ -1817,6 +1820,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	hci_link_keys_clear(hdev);
- 	hci_smp_ltks_clear(hdev);
- 	hci_remote_oob_data_clear(hdev);
-+	hci_cb_clear(hdev);
- 	hci_dev_unlock(hdev);
- 
- 	hci_dev_put(hdev);
-@@ -2118,6 +2122,90 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
- 	return 0;
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index 89a6604..9f2a875 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -123,6 +123,61 @@ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
+ 		   GFP_KERNEL);
  }
  
-+static int hci_add_cb(struct hci_dev *hdev, __u16 opcode,
-+		      void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
-+		      void *opt,
-+		      void (*destructor)(struct hci_dev *hdev,
-+					 struct hci_cb_cmd *cmd),
-+		      gfp_t flags)
++static void amp_write_rem_assoc_frag(struct hci_dev *hdev, struct amp_mgr *mgr,
++				     struct phy_link *plink);
++
++static void amp_write_rem_assoc_cs(struct hci_dev *hdev,
++				   struct hci_cb_cmd *cmd)
 +{
-+	struct hci_cb_cmd *cmd;
++	struct amp_mgr *mgr = cmd->opt;
++	struct phy_link *plink;
++	u16 frag_len;
 +
-+	cmd = kmalloc(sizeof(*cmd), flags);
-+	if (!cmd)
-+		return -ENOMEM;
++	BT_DBG("mgr %p", mgr);
 +
-+	cmd->cb = cb;
-+	cmd->opcode = opcode;
-+	cmd->opt = opt;
-+	cmd->status = 0;
-+	cmd->destructor = destructor;
++	if (!cmd->status)
++		return;
 +
-+	mutex_lock(&hdev->cb_list_lock);
-+	list_add(&cmd->list, &hdev->cb_list);
-+	mutex_unlock(&hdev->cb_list_lock);
++	plink = phylink_lookup(mgr, hdev->id, 0);
++	if (!plink)
++		return;
 +
-+	return 0;
++	frag_len = min_t(u16, 248, plink->rem_assoc.rem_len);
++	plink->rem_assoc.len_so_far += frag_len;
++	plink->rem_assoc.rem_len -= frag_len;
++
++	if (plink->rem_assoc.rem_len > 0)
++		/* Send another fragment */
++		amp_write_rem_assoc_frag(hdev, mgr, plink);
++
++	phylink_put(plink);
 +}
 +
-+struct hci_cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode)
++static void amp_write_rem_assoc_frag(struct hci_dev *hdev, struct amp_mgr *mgr,
++				     struct phy_link *plink)
 +{
-+	struct hci_cb_cmd *cmd;
++	struct hci_cp_write_remote_amp_assoc *cp;
++	u16 frag_len, len;
 +
-+	mutex_lock(&hdev->cb_list_lock);
-+	list_for_each_entry(cmd, &hdev->cb_list, list)
-+		if (cmd->opcode == opcode) {
-+			mutex_unlock(&hdev->cb_list_lock);
-+			return cmd;
-+		}
-+	mutex_unlock(&hdev->cb_list_lock);
++	frag_len = min_t(u16, 248, plink->rem_assoc.rem_len);
++	len = frag_len + sizeof(*cp);
 +
-+	return NULL;
++	cp = kzalloc(len, GFP_KERNEL);
++	if (!cp)
++		return;
++
++	cp->phy_handle = plink->handle;
++	cp->len_so_far = cpu_to_le16(plink->rem_assoc.len_so_far);
++	cp->rem_len = cpu_to_le16(plink->rem_assoc.rem_len);
++
++	amp_mgr_get(mgr);
++
++	hci_cmd_cb(hdev, HCI_OP_WRITE_REMOTE_AMP_ASSOC, len, &cp,
++		   amp_write_rem_assoc_cs, mgr, cb_destructor, GFP_KERNEL);
++
++	kfree(cp);
 +}
 +
-+void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd)
-+{
-+	BT_DBG("%s: remove cmd %p", hdev->name, cmd);
-+
-+	mutex_lock(&hdev->cb_list_lock);
-+	list_del(&cmd->list);
-+	mutex_unlock(&hdev->cb_list_lock);
-+
-+	if (cmd->destructor) {
-+		cmd->destructor(hdev, cmd);
-+	} else {
-+		kfree(cmd->opt);
-+		kfree(cmd);
-+	}
-+}
-+
-+static void hci_cb_clear(struct hci_dev *hdev)
-+{
-+	struct hci_cb_cmd *cmd, *tmp;
-+
-+	list_for_each_entry_safe(cmd, tmp, &hdev->cb_list, list)
-+		hci_remove_cb(hdev, cmd);
-+}
-+
-+/* Send HCI command with callback */
-+int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
-+	       void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
-+	       void *opt,
-+	       void (*destructor)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
-+	       gfp_t flags)
-+{
-+	int ret;
-+
-+	if (!cb)
-+		return -EINVAL;
-+
-+	ret = hci_add_cb(hdev, opcode, cb, opt, destructor, flags);
-+	if (ret)
-+		return ret;
-+
-+	return hci_send_cmd(hdev, opcode, plen, param);
-+}
-+
- /* Get data from the previously sent command */
- void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
+ static void amp_create_phylink_cs(struct hci_dev *hdev,
+ 				  struct hci_cb_cmd *cmd)
  {
+@@ -132,6 +187,11 @@ static void amp_create_phylink_cs(struct hci_dev *hdev,
+ 	BT_DBG("mgr %p", mgr);
+ 
+ 	/* Write Remote AMP Assoc */
++	plink = phylink_lookup(mgr, hdev->id, 0);
++	if (plink) {
++		amp_write_rem_assoc_frag(hdev, mgr, plink);
++		phylink_put(plink);
++	}
+ }
+ 
+ void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
 -- 
 1.7.9.5
 
