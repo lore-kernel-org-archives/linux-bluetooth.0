@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 17/20] Bluetooth: AMP: Add AMP key calculation
-Date: Fri, 13 Jul 2012 16:39:19 +0300
-Message-Id: <1342186762-32329-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 14/20] Bluetooth: A2MP: Process A2MP Get AMP Assoc Rsp
+Date: Fri, 13 Jul 2012 16:39:16 +0300
+Message-Id: <1342186762-32329-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1342186762-32329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1342186762-32329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,94 +12,91 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Function calculates AMP key using hmac_sha256 helper.
+When receiving A2MP Get AMP Assoc Response save assoc data to remote
+AMP controller list and prepare for creating physical link.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/pal.h |    1 +
- net/bluetooth/pal.c         |   61 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 62 insertions(+)
+ net/bluetooth/a2mp.c |   58 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 57 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
-index 6ce1dfb..8799285 100644
---- a/include/net/bluetooth/pal.h
-+++ b/include/net/bluetooth/pal.h
-@@ -53,5 +53,6 @@ int phylink_put(struct phy_link *plink);
- void phylink_get(struct phy_link *plink);
- void phylink_list_flush(struct amp_mgr *mgr);
- void phylink_del(struct amp_mgr *mgr, struct phy_link *plink);
-+int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type);
- 
- #endif /* __PAL_H */
-diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
-index e9bab6c..dbca318 100644
---- a/net/bluetooth/pal.c
-+++ b/net/bluetooth/pal.c
-@@ -255,3 +255,64 @@ int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
- 	crypto_free_shash(tfm);
- 	return ret;
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 99b6a74..b34cad6 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -331,6 +331,59 @@ done:
+ 	return 0;
  }
-+
-+static void hexdump(u8 *buf, size_t len)
+ 
++static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
++				struct a2mp_cmd *hdr)
 +{
-+	print_hex_dump(KERN_DEBUG, "", DUMP_PREFIX_OFFSET,
-+		       16, 1, buf, len, false);
-+}
++	struct a2mp_amp_assoc_rsp *rsp = (void *) skb->data;
++	u16 len = le16_to_cpu(hdr->len);
++	struct hci_dev *hdev;
++	struct amp_ctrl *ctrl;
++	struct phy_link *plink;
++	u8 *rem_assoc;
 +
-+int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type)
-+{
-+	struct hci_dev *hdev = conn->hdev;
-+	struct link_key *key;
-+	u8 keybuf[HCI_AMP_LINK_KEY_SIZE];
-+	u8 gamp_key[HCI_AMP_LINK_KEY_SIZE];
-+	u8 b802_key[HCI_AMP_LINK_KEY_SIZE];
-+	int result;
++	if (len < sizeof(*rsp))
++		return -EINVAL;
 +
-+	if (!hci_conn_check_link_mode(conn))
-+		return -EACCES;
++	BT_DBG("id %d status %d assoc len %d", rsp->id, rsp->status, len);
 +
-+	BT_DBG("key_type %d", conn->key_type);
++	if (rsp->status)
++		return -EINVAL;
 +
-+	/* Legacy key */
-+	if (conn->key_type < 3)
-+		return -EACCES;
++	rem_assoc = skb_pull(skb, sizeof(*rsp));
 +
-+	*type = conn->key_type;
-+	*len = HCI_AMP_LINK_KEY_SIZE;
++	/* Save remote ASSOC data */
++	ctrl = amp_ctrl_lookup(mgr, rsp->id);
++	if (ctrl) {
++		u8 *assoc, assoc_len = len - sizeof(*rsp);
 +
-+	hci_dev_lock(hdev);
-+	key = hci_find_link_key(hdev, &conn->dst);
-+	hci_dev_unlock(hdev);
++		assoc = kzalloc(assoc_len, GFP_KERNEL);
++		if (!assoc) {
++			amp_ctrl_put(ctrl);
++			goto done;
++		}
 +
-+	/* BR/EDR Link Key concatenated together with itself */
-+	memcpy(&keybuf[0], key->val, HCI_LINK_KEY_SIZE);
-+	memcpy(&keybuf[HCI_LINK_KEY_SIZE], key->val, HCI_LINK_KEY_SIZE);
++		memcpy(assoc, rsp->amp_assoc, assoc_len);
++		ctrl->assoc = assoc;
++		ctrl->assoc_len = assoc_len;
 +
-+	hexdump(keybuf, HCI_AMP_LINK_KEY_SIZE);
-+
-+	result = hmac_sha256(keybuf, HCI_AMP_LINK_KEY_SIZE, "gamp", 4,
-+			     gamp_key);
-+	hexdump(gamp_key, HCI_AMP_LINK_KEY_SIZE);
-+
-+	if (result)
-+		goto done;
-+
-+	if (conn->key_type == 3) {
-+		BT_DBG("gamp_key");
-+		hexdump(gamp_key, HCI_AMP_LINK_KEY_SIZE);
-+		memcpy(data, gamp_key, HCI_AMP_LINK_KEY_SIZE);
-+		goto done;
++		amp_ctrl_put(ctrl);
 +	}
 +
-+	result = hmac_sha256(gamp_key, HCI_AMP_LINK_KEY_SIZE, "802b", 4,
-+			     b802_key);
-+	hexdump(b802_key, HCI_AMP_LINK_KEY_SIZE);
++	/* Create Phys Link */
++	hdev = hci_dev_get(rsp->id);
++	if (!hdev)
++		goto done;
 +
-+	memcpy(data, b802_key, HCI_AMP_LINK_KEY_SIZE);
++	plink = phylink_add(mgr, hdev->id, rsp->id, ctrl->assoc,
++			    ctrl->assoc_len);
++
++	BT_DBG("Created plink %p: %d -> %d", plink, hdev->id, rsp->id);
 +
 +done:
-+	return result;
++	skb_pull(skb, len - sizeof(*rsp));
++	return 0;
 +}
++
+ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 				   struct a2mp_cmd *hdr)
+ {
+@@ -492,8 +545,11 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 			err = a2mp_getinfo_rsp(mgr, skb, hdr);
+ 			break;
+ 
+-		case A2MP_CHANGE_RSP:
+ 		case A2MP_GETAMPASSOC_RSP:
++			err = a2mp_getampassoc_rsp(mgr, skb, hdr);
++			break;
++
++		case A2MP_CHANGE_RSP:
+ 		case A2MP_CREATEPHYSLINK_RSP:
+ 		case A2MP_DISCONNPHYSLINK_RSP:
+ 			err = a2mp_cmd_rsp(mgr, skb, hdr);
 -- 
 1.7.9.5
 
