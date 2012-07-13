@@ -1,76 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: s.syam@samsung.com, Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH v1 1/2] Bluetooth: Move l2cap_chan_hold/put to l2cap_core.c
-Date: Fri, 13 Jul 2012 18:17:54 +0530
-Message-id: <1342183675-27612-1-git-send-email-jaganath.k@samsung.com>
+Subject: [PATCHv1 2/2] Bluetooth: Lock l2cap chan in sockopt
+Date: Fri, 13 Jul 2012 15:07:46 +0300
+Message-Id: <1342181266-26323-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1342181266-26323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1340978315-4700-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1342181266-26323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Refactor the code in order to use the l2cap_chan_destroy()
-from l2cap_chan_put() under the refcnt protection.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |   16 ++--------------
- net/bluetooth/l2cap_core.c    |   15 +++++++++++++++
- 2 files changed, 17 insertions(+), 14 deletions(-)
+ net/bluetooth/l2cap_sock.c |   12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index e5164ff..d8a6145 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -670,20 +670,8 @@ enum {
- 	L2CAP_EV_RECV_FRAME,
- };
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index a4bb27e..373ce9c 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -275,6 +275,7 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname, char __us
+ 	if (get_user(len, optlen))
+ 		return -EFAULT;
  
--static inline void l2cap_chan_hold(struct l2cap_chan *c)
--{
--	BT_DBG("chan %p orig refcnt %d", c, atomic_read(&c->refcnt));
--
--	atomic_inc(&c->refcnt);
--}
--
--static inline void l2cap_chan_put(struct l2cap_chan *c)
--{
--	BT_DBG("chan %p orig refcnt %d", c, atomic_read(&c->refcnt));
--
--	if (atomic_dec_and_test(&c->refcnt))
--		kfree(c);
--}
-+void l2cap_chan_hold(struct l2cap_chan *c);
-+void l2cap_chan_put(struct l2cap_chan *c);
++	l2cap_chan_lock(chan);
+ 	lock_sock(sk);
  
- static inline void l2cap_chan_lock(struct l2cap_chan *chan)
- {
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 9fd0599..552a8ce 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -425,6 +425,21 @@ void l2cap_chan_destroy(struct l2cap_chan *chan)
- 	l2cap_chan_put(chan);
+ 	switch (optname) {
+@@ -345,6 +346,8 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname, char __us
+ 	}
+ 
+ 	release_sock(sk);
++	l2cap_chan_unlock(chan);
++
+ 	return err;
  }
  
-+void l2cap_chan_hold(struct l2cap_chan *c)
-+{
-+	BT_DBG("chan %p orig refcnt %d", c, atomic_read(&c->refcnt));
+@@ -367,6 +370,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+ 	if (get_user(len, optlen))
+ 		return -EFAULT;
+ 
++	l2cap_chan_lock(chan);
+ 	lock_sock(sk);
+ 
+ 	switch (optname) {
+@@ -442,6 +446,8 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+ 	}
+ 
+ 	release_sock(sk);
++	l2cap_chan_unlock(chan);
 +
-+	atomic_inc(&c->refcnt);
-+}
+ 	return err;
+ }
+ 
+@@ -471,6 +477,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
+ 
+ 	BT_DBG("sk %p", sk);
+ 
++	l2cap_chan_lock(chan);
+ 	lock_sock(sk);
+ 
+ 	switch (optname) {
+@@ -556,6 +563,8 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
+ 	}
+ 
+ 	release_sock(sk);
++	l2cap_chan_unlock(chan);
 +
-+void l2cap_chan_put(struct l2cap_chan *c)
-+{
-+	BT_DBG("chan %p orig refcnt %d", c, atomic_read(&c->refcnt));
+ 	return err;
+ }
+ 
+@@ -577,6 +586,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+ 	if (level != SOL_BLUETOOTH)
+ 		return -ENOPROTOOPT;
+ 
++	l2cap_chan_lock(chan);
+ 	lock_sock(sk);
+ 
+ 	switch (optname) {
+@@ -729,6 +739,8 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+ 	}
+ 
+ 	release_sock(sk);
++	l2cap_chan_unlock(chan);
 +
-+	if (atomic_dec_and_test(&c->refcnt))
-+		kfree(c);
-+}
-+
- void l2cap_chan_set_defaults(struct l2cap_chan *chan)
- {
- 	chan->fcs  = L2CAP_FCS_CRC16;
+ 	return err;
+ }
+ 
 -- 
-1.7.1
+1.7.9.5
 
