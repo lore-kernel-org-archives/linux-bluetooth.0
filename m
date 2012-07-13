@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 06/20] Bluetooth: Add callback clear to ops->teardown
-Date: Fri, 13 Jul 2012 16:39:08 +0300
-Message-Id: <1342186762-32329-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 08/20] Bluetooth: AMP: Use HCI callback to Read Loc AMP Assoc
+Date: Fri, 13 Jul 2012 16:39:10 +0300
+Message-Id: <1342186762-32329-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1342186762-32329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1342186762-32329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,85 +12,233 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-ops->teardown takes care about deleting queued callbacks for all AMP
-controllers.
+When receiving A2MP Get AMP Assoc Request execute Read Local AMP Assoc
+HCI command to AMP controller. If the AMP Assoc data is larger then it
+can fit to HCI event only fragment is read. When all fragments are read
+A2MP Get AMP Assoc Response is run from HCI callback.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/a2mp.c             |   17 ++++++++++++++++-
- net/bluetooth/hci_core.c         |    3 +--
- 3 files changed, 18 insertions(+), 3 deletions(-)
+ include/net/bluetooth/amp.h      |    2 ++
+ include/net/bluetooth/hci.h      |    2 ++
+ include/net/bluetooth/hci_core.h |    8 +++++
+ net/bluetooth/a2mp.c             |   13 +++++----
+ net/bluetooth/amp.c              |   60 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |   41 ++++++++++++++++++++++++++
+ 6 files changed, 120 insertions(+), 6 deletions(-)
 
+diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
+index ec7bea7..e861675 100644
+--- a/include/net/bluetooth/amp.h
++++ b/include/net/bluetooth/amp.h
+@@ -15,5 +15,7 @@
+ #define __AMP_H
+ 
+ void amp_read_loc_info(struct hci_dev *hdev, struct amp_mgr *mgr);
++void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle);
++void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr);
+ 
+ #endif /* __AMP_H */
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 7f19556..2b19703 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -33,6 +33,8 @@
+ #define HCI_LINK_KEY_SIZE	16
+ #define HCI_AMP_LINK_KEY_SIZE	(2 * HCI_LINK_KEY_SIZE)
+ 
++#define HCI_MAX_AMP_ASSOC_SIZE	672
++
+ /* HCI dev events */
+ #define HCI_DEV_REG			1
+ #define HCI_DEV_UNREG			2
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index ee4cc06..81c001e 100644
+index 81c001e..e333e70 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1124,5 +1124,6 @@ void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
- void hci_queue_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd,
- 		  struct workqueue_struct *workqueue);
- void hci_process_cb(struct hci_dev *hdev, __u16 opcode, u8 status);
-+void hci_cb_clear(struct hci_dev *hdev);
- 
- #endif /* __HCI_CORE_H */
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 1133890..f4e83fc 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -444,16 +444,31 @@ static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
- 	return bt_skb_alloc(len, GFP_KERNEL);
- }
- 
-+static void a2mp_chan_teardown_cb(struct l2cap_chan *chan, int err)
-+{
-+	struct hci_dev *hdev, *tmp;
-+
-+	BT_DBG("chan %p", chan);
-+
-+	list_for_each_entry_safe(hdev, tmp, &hci_dev_list, list) {
-+		hci_dev_hold(hdev);
-+		/* Iterate through AMP controllers */
-+		if (hdev->amp_type == HCI_AMP)
-+			hci_cb_clear(hdev);
-+		hci_dev_put(hdev);
-+	}
-+}
-+
- static struct l2cap_ops a2mp_chan_ops = {
- 	.name = "L2CAP A2MP channel",
- 	.recv = a2mp_chan_recv_cb,
- 	.close = a2mp_chan_close_cb,
- 	.state_change = a2mp_chan_state_change_cb,
- 	.alloc_skb = a2mp_chan_alloc_skb_cb,
-+	.teardown = a2mp_chan_teardown_cb,
- 
- 	/* Not implemented for A2MP */
- 	.new_connection = l2cap_chan_no_new_connection,
--	.teardown = l2cap_chan_no_teardown,
- 	.ready = l2cap_chan_no_ready,
+@@ -141,6 +141,12 @@ struct hci_cb_cmd {
+ 	void (*destructor)(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
  };
  
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 7c50214..bee7bd4 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -36,7 +36,6 @@
- static void hci_rx_work(struct work_struct *work);
- static void hci_cmd_work(struct work_struct *work);
- static void hci_tx_work(struct work_struct *work);
--static void hci_cb_clear(struct hci_dev *hdev);
++struct amp_assoc {
++	__u16	len;
++	__u16	offset;
++	__u8	data[HCI_MAX_AMP_ASSOC_SIZE];
++};
++
+ #define NUM_REASSEMBLY 4
+ struct hci_dev {
+ 	struct list_head list;
+@@ -194,6 +200,8 @@ struct hci_dev {
+ 	__u32		amp_max_flush_to;
+ 	__u32		amp_be_flush_to;
  
- /* HCI device list */
- LIST_HEAD(hci_dev_list);
-@@ -2220,7 +2219,7 @@ void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd)
- 	}
++	struct amp_assoc	loc_assoc;
++
+ 	__u8		flow_ctl_mode;
+ 
+ 	unsigned int	auto_accept_delay;
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index fb6f734..b0efe6f 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -230,15 +230,16 @@ static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 
+ 		a2mp_send(mgr, A2MP_GETAMPASSOC_RSP, hdr->ident, sizeof(rsp),
+ 			  &rsp);
+-		goto clean;
+-	}
+ 
+-	/* Placeholder for HCI Read AMP Assoc */
++		if (hdev)
++			hci_dev_put(hdev);
+ 
+-clean:
+-	if (hdev)
+-		hci_dev_put(hdev);
++		goto done;
++	}
++
++	amp_read_loc_assoc(hdev, mgr);
+ 
++done:
+ 	skb_pull(skb, sizeof(*req));
+ 	return 0;
+ }
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index 4aea7be..ff6c95c 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -61,3 +61,63 @@ void amp_read_loc_info(struct hci_dev *hdev, struct amp_mgr *mgr)
+ 	hci_cmd_cb(hdev, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL,
+ 		   amp_read_loc_info_complete, mgr, cb_destructor, GFP_KERNEL);
+ }
++
++void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle)
++{
++	struct hci_cp_read_local_amp_assoc cp;
++	struct amp_assoc *loc_assoc = &hdev->loc_assoc;
++
++	BT_DBG("%s: handle %d", hdev->name, phy_handle);
++
++	cp.phy_handle = phy_handle;
++	cp.max_len = cpu_to_le16(hdev->amp_assoc_size);
++	cp.len_so_far = cpu_to_le16(loc_assoc->offset);
++
++	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp);
++}
++
++static void amp_read_loc_assoc_complete(struct hci_dev *hdev,
++					struct hci_cb_cmd *cmd)
++{
++	struct amp_mgr *mgr = cmd->opt;
++	struct amp_assoc *loc_assoc = &hdev->loc_assoc;
++	struct a2mp_amp_assoc_rsp *rsp;
++	size_t len;
++
++	BT_DBG("%s: cmd %p", hdev->name, cmd);
++
++	len = sizeof(struct a2mp_amp_assoc_rsp) + loc_assoc->len;
++	rsp = kzalloc(len, GFP_KERNEL);
++	if (!rsp)
++		return;
++
++	rsp->id = hdev->id;
++
++	if (cmd->status) {
++		rsp->status = A2MP_STATUS_INVALID_CTRL_ID;
++		goto send;
++	}
++
++	rsp->status = A2MP_STATUS_SUCCESS;
++	memcpy(rsp->amp_assoc, loc_assoc->data, loc_assoc->len);
++
++send:
++	a2mp_send(mgr, A2MP_GETAMPASSOC_RSP, mgr->ident, len, rsp);
++	kfree(rsp);
++}
++
++void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
++{
++	struct hci_cp_read_local_amp_assoc cp;
++
++	memset(&hdev->loc_assoc, 0, sizeof(struct amp_assoc));
++	memset(&cp, 0, sizeof(cp));
++
++	cp.max_len = cpu_to_le16(hdev->amp_assoc_size);
++
++	amp_mgr_get(mgr);
++
++	hci_cmd_cb(hdev, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp,
++		   amp_read_loc_assoc_complete, mgr, cb_destructor,
++		   GFP_KERNEL);
++}
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7222421..a1ad489 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -30,6 +30,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/a2mp.h>
++#include <net/bluetooth/amp.h>
+ 
+ /* Handle HCI Event packets */
+ 
+@@ -865,6 +866,42 @@ process_cb:
+ 	hci_process_cb(hdev, HCI_OP_READ_LOCAL_AMP_INFO, rp->status);
  }
  
--static void hci_cb_clear(struct hci_dev *hdev)
-+void hci_cb_clear(struct hci_dev *hdev)
++static void hci_cc_read_local_amp_assoc(struct hci_dev *hdev,
++					struct sk_buff *skb)
++{
++	struct hci_rp_read_local_amp_assoc *rp = (void *) skb->data;
++	struct amp_assoc *assoc = &hdev->loc_assoc;
++	size_t rem_len, frag_len;
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
++
++	if (rp->status)
++		goto process_cb;
++
++	frag_len = skb->len - sizeof(*rp);
++	rem_len = __le16_to_cpu(rp->rem_len);
++
++	if (rem_len > frag_len) {
++		BT_DBG("frag_len %d rem_len %d", frag_len, rem_len);
++
++		memcpy(assoc->data + assoc->offset, rp->frag, frag_len);
++		assoc->offset += frag_len;
++
++		/* Read other fragments */
++		amp_read_loc_assoc_frag(hdev, rp->phy_handle);
++
++		return;
++	}
++
++	memcpy(assoc->data + assoc->offset, rp->frag, rem_len);
++	assoc->len = assoc->offset + rem_len;
++	assoc->offset = 0;
++
++process_cb:
++	/* Run callback when all fragments received */
++	hci_process_cb(hdev, HCI_OP_READ_LOCAL_AMP_ASSOC, rp->status);
++}
++
+ static void hci_cc_delete_stored_link_key(struct hci_dev *hdev,
+ 					  struct sk_buff *skb)
  {
- 	struct hci_cb_cmd *cmd, *tmp;
+@@ -2294,6 +2331,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cc_read_local_amp_info(hdev, skb);
+ 		break;
  
++	case HCI_OP_READ_LOCAL_AMP_ASSOC:
++		hci_cc_read_local_amp_assoc(hdev, skb);
++		break;
++
+ 	case HCI_OP_DELETE_STORED_LINK_KEY:
+ 		hci_cc_delete_stored_link_key(hdev, skb);
+ 		break;
 -- 
 1.7.9.5
 
