@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 19/20] Bluetooth: AMP: Write remote AMP Assoc
-Date: Fri, 13 Jul 2012 16:39:21 +0300
-Message-Id: <1342186762-32329-20-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 06/20] Bluetooth: Add callback clear to ops->teardown
+Date: Fri, 13 Jul 2012 16:39:08 +0300
+Message-Id: <1342186762-32329-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1342186762-32329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1342186762-32329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,106 +12,85 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When receiving HCI Command Status after HCI Create Physical Link
-execute HCI Write Remote AMP Assoc command to AMP controller.
+ops->teardown takes care about deleting queued callbacks for all AMP
+controllers.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    2 ++
- net/bluetooth/amp.c              |   60 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 62 insertions(+)
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/a2mp.c             |   17 ++++++++++++++++-
+ net/bluetooth/hci_core.c         |    3 +--
+ 3 files changed, 18 insertions(+), 3 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index e333e70..7412085 100644
+index ee4cc06..81c001e 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -144,6 +144,8 @@ struct hci_cb_cmd {
- struct amp_assoc {
- 	__u16	len;
- 	__u16	offset;
-+	__u16	rem_len;
-+	__u16	len_so_far;
- 	__u8	data[HCI_MAX_AMP_ASSOC_SIZE];
+@@ -1124,5 +1124,6 @@ void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
+ void hci_queue_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd,
+ 		  struct workqueue_struct *workqueue);
+ void hci_process_cb(struct hci_dev *hdev, __u16 opcode, u8 status);
++void hci_cb_clear(struct hci_dev *hdev);
+ 
+ #endif /* __HCI_CORE_H */
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 1133890..f4e83fc 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -444,16 +444,31 @@ static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
+ 	return bt_skb_alloc(len, GFP_KERNEL);
+ }
+ 
++static void a2mp_chan_teardown_cb(struct l2cap_chan *chan, int err)
++{
++	struct hci_dev *hdev, *tmp;
++
++	BT_DBG("chan %p", chan);
++
++	list_for_each_entry_safe(hdev, tmp, &hci_dev_list, list) {
++		hci_dev_hold(hdev);
++		/* Iterate through AMP controllers */
++		if (hdev->amp_type == HCI_AMP)
++			hci_cb_clear(hdev);
++		hci_dev_put(hdev);
++	}
++}
++
+ static struct l2cap_ops a2mp_chan_ops = {
+ 	.name = "L2CAP A2MP channel",
+ 	.recv = a2mp_chan_recv_cb,
+ 	.close = a2mp_chan_close_cb,
+ 	.state_change = a2mp_chan_state_change_cb,
+ 	.alloc_skb = a2mp_chan_alloc_skb_cb,
++	.teardown = a2mp_chan_teardown_cb,
+ 
+ 	/* Not implemented for A2MP */
+ 	.new_connection = l2cap_chan_no_new_connection,
+-	.teardown = l2cap_chan_no_teardown,
+ 	.ready = l2cap_chan_no_ready,
  };
  
-diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index 89a6604..9f2a875 100644
---- a/net/bluetooth/amp.c
-+++ b/net/bluetooth/amp.c
-@@ -123,6 +123,61 @@ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
- 		   GFP_KERNEL);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 7c50214..bee7bd4 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -36,7 +36,6 @@
+ static void hci_rx_work(struct work_struct *work);
+ static void hci_cmd_work(struct work_struct *work);
+ static void hci_tx_work(struct work_struct *work);
+-static void hci_cb_clear(struct hci_dev *hdev);
+ 
+ /* HCI device list */
+ LIST_HEAD(hci_dev_list);
+@@ -2220,7 +2219,7 @@ void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd)
+ 	}
  }
  
-+static void amp_write_rem_assoc_frag(struct hci_dev *hdev, struct amp_mgr *mgr,
-+				     struct phy_link *plink);
-+
-+static void amp_write_rem_assoc_cs(struct hci_dev *hdev,
-+				   struct hci_cb_cmd *cmd)
-+{
-+	struct amp_mgr *mgr = cmd->opt;
-+	struct phy_link *plink;
-+	u16 frag_len;
-+
-+	BT_DBG("mgr %p", mgr);
-+
-+	if (!cmd->status)
-+		return;
-+
-+	plink = phylink_lookup(mgr, hdev->id, 0);
-+	if (!plink)
-+		return;
-+
-+	frag_len = min_t(u16, 248, plink->rem_assoc.rem_len);
-+	plink->rem_assoc.len_so_far += frag_len;
-+	plink->rem_assoc.rem_len -= frag_len;
-+
-+	if (plink->rem_assoc.rem_len > 0)
-+		/* Send another fragment */
-+		amp_write_rem_assoc_frag(hdev, mgr, plink);
-+
-+	phylink_put(plink);
-+}
-+
-+static void amp_write_rem_assoc_frag(struct hci_dev *hdev, struct amp_mgr *mgr,
-+				     struct phy_link *plink)
-+{
-+	struct hci_cp_write_remote_amp_assoc *cp;
-+	u16 frag_len, len;
-+
-+	frag_len = min_t(u16, 248, plink->rem_assoc.rem_len);
-+	len = frag_len + sizeof(*cp);
-+
-+	cp = kzalloc(len, GFP_KERNEL);
-+	if (!cp)
-+		return;
-+
-+	cp->phy_handle = plink->handle;
-+	cp->len_so_far = cpu_to_le16(plink->rem_assoc.len_so_far);
-+	cp->rem_len = cpu_to_le16(plink->rem_assoc.rem_len);
-+
-+	amp_mgr_get(mgr);
-+
-+	hci_cmd_cb(hdev, HCI_OP_WRITE_REMOTE_AMP_ASSOC, len, &cp,
-+		   amp_write_rem_assoc_cs, mgr, cb_destructor, GFP_KERNEL);
-+
-+	kfree(cp);
-+}
-+
- static void amp_create_phylink_cs(struct hci_dev *hdev,
- 				  struct hci_cb_cmd *cmd)
+-static void hci_cb_clear(struct hci_dev *hdev)
++void hci_cb_clear(struct hci_dev *hdev)
  {
-@@ -132,6 +187,11 @@ static void amp_create_phylink_cs(struct hci_dev *hdev,
- 	BT_DBG("mgr %p", mgr);
+ 	struct hci_cb_cmd *cmd, *tmp;
  
- 	/* Write Remote AMP Assoc */
-+	plink = phylink_lookup(mgr, hdev->id, 0);
-+	if (plink) {
-+		amp_write_rem_assoc_frag(hdev, mgr, plink);
-+		phylink_put(plink);
-+	}
- }
- 
- void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
 -- 
 1.7.9.5
 
