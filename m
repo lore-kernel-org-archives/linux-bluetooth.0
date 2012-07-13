@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 20/20] Bluetooth: A2MP: Add fallback to normal l2cap init sequence
-Date: Fri, 13 Jul 2012 16:39:22 +0300
-Message-Id: <1342186762-32329-21-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 17/20] Bluetooth: AMP: Add AMP key calculation
+Date: Fri, 13 Jul 2012 16:39:19 +0300
+Message-Id: <1342186762-32329-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1342186762-32329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1342186762-32329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,93 +12,94 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When there is no remote AMP controller found fallback to normal
-L2CAP sequence.
+Function calculates AMP key using hmac_sha256 helper.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |    1 +
- net/bluetooth/a2mp.c          |   28 ++++++++++++++++++++++++++++
- net/bluetooth/l2cap_core.c    |    2 +-
- 3 files changed, 30 insertions(+), 1 deletion(-)
+ include/net/bluetooth/pal.h |    1 +
+ net/bluetooth/pal.c         |   61 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 62 insertions(+)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index e8b65ae..0632ee3 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -787,5 +787,6 @@ void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
- 			  long timeout);
- bool l2cap_conn_clear_timer(struct l2cap_conn *conn,
- 			    struct delayed_work *work);
-+void l2cap_send_conn_req(struct l2cap_chan *chan);
+diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
+index 6ce1dfb..8799285 100644
+--- a/include/net/bluetooth/pal.h
++++ b/include/net/bluetooth/pal.h
+@@ -53,5 +53,6 @@ int phylink_put(struct phy_link *plink);
+ void phylink_get(struct phy_link *plink);
+ void phylink_list_flush(struct amp_mgr *mgr);
+ void phylink_del(struct amp_mgr *mgr, struct phy_link *plink);
++int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type);
  
- #endif /* __L2CAP_H */
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 0513f66..f18d381 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -177,6 +177,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 	u16 len = le16_to_cpu(hdr->len);
- 	struct a2mp_cl *cl;
- 	u16 ext_feat;
-+	bool found = false;
- 
- 	if (len < sizeof(*rsp))
- 		return -EINVAL;
-@@ -207,6 +208,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
- 			struct a2mp_info_req req;
- 
-+			found = true;
- 			req.id = cl->id;
- 			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
- 				  sizeof(req), &req);
-@@ -216,6 +218,32 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 		cl = (void *) skb_pull(skb, sizeof(*cl));
- 	}
- 
-+	/* Fall back to L2CAP init sequence */
-+	if (!found) {
-+		struct l2cap_conn *conn = mgr->l2cap_conn;
-+		struct l2cap_chan *chan;
+ #endif /* __PAL_H */
+diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
+index e9bab6c..dbca318 100644
+--- a/net/bluetooth/pal.c
++++ b/net/bluetooth/pal.c
+@@ -255,3 +255,64 @@ int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
+ 	crypto_free_shash(tfm);
+ 	return ret;
+ }
 +
-+		mutex_lock(&conn->chan_lock);
++static void hexdump(u8 *buf, size_t len)
++{
++	print_hex_dump(KERN_DEBUG, "", DUMP_PREFIX_OFFSET,
++		       16, 1, buf, len, false);
++}
 +
-+		list_for_each_entry(chan, &conn->chan_l, list) {
++int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type)
++{
++	struct hci_dev *hdev = conn->hdev;
++	struct link_key *key;
++	u8 keybuf[HCI_AMP_LINK_KEY_SIZE];
++	u8 gamp_key[HCI_AMP_LINK_KEY_SIZE];
++	u8 b802_key[HCI_AMP_LINK_KEY_SIZE];
++	int result;
 +
-+			BT_DBG("chan %p state %s", chan,
-+			       state_to_string(chan->state));
++	if (!hci_conn_check_link_mode(conn))
++		return -EACCES;
 +
-+			if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
-+				continue;
++	BT_DBG("key_type %d", conn->key_type);
 +
-+			l2cap_chan_lock(chan);
++	/* Legacy key */
++	if (conn->key_type < 3)
++		return -EACCES;
 +
-+			if (chan->state == BT_CONNECT)
-+				l2cap_send_conn_req(chan);
++	*type = conn->key_type;
++	*len = HCI_AMP_LINK_KEY_SIZE;
 +
-+			l2cap_chan_unlock(chan);
-+		}
++	hci_dev_lock(hdev);
++	key = hci_find_link_key(hdev, &conn->dst);
++	hci_dev_unlock(hdev);
 +
-+		mutex_unlock(&conn->chan_lock);
++	/* BR/EDR Link Key concatenated together with itself */
++	memcpy(&keybuf[0], key->val, HCI_LINK_KEY_SIZE);
++	memcpy(&keybuf[HCI_LINK_KEY_SIZE], key->val, HCI_LINK_KEY_SIZE);
++
++	hexdump(keybuf, HCI_AMP_LINK_KEY_SIZE);
++
++	result = hmac_sha256(keybuf, HCI_AMP_LINK_KEY_SIZE, "gamp", 4,
++			     gamp_key);
++	hexdump(gamp_key, HCI_AMP_LINK_KEY_SIZE);
++
++	if (result)
++		goto done;
++
++	if (conn->key_type == 3) {
++		BT_DBG("gamp_key");
++		hexdump(gamp_key, HCI_AMP_LINK_KEY_SIZE);
++		memcpy(data, gamp_key, HCI_AMP_LINK_KEY_SIZE);
++		goto done;
 +	}
 +
- 	return 0;
- }
- 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 8572737..39d1aa7 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -999,7 +999,7 @@ static bool __amp_capable(struct l2cap_chan *chan)
- 		return false;
- }
- 
--static void l2cap_send_conn_req(struct l2cap_chan *chan)
-+void l2cap_send_conn_req(struct l2cap_chan *chan)
- {
- 	struct l2cap_conn *conn = chan->conn;
- 	struct l2cap_conn_req req;
++	result = hmac_sha256(gamp_key, HCI_AMP_LINK_KEY_SIZE, "802b", 4,
++			     b802_key);
++	hexdump(b802_key, HCI_AMP_LINK_KEY_SIZE);
++
++	memcpy(data, b802_key, HCI_AMP_LINK_KEY_SIZE);
++
++done:
++	return result;
++}
 -- 
 1.7.9.5
 
