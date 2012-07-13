@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 2/2] Bluetooth: Lock l2cap chan in sockopt
-Date: Fri, 13 Jul 2012 15:07:46 +0300
-Message-Id: <1342181266-26323-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 1/2] Bluetooth: Add refcnt to l2cap_conn
+Date: Fri, 13 Jul 2012 15:07:45 +0300
+Message-Id: <1342181266-26323-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1342181266-26323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340978315-4700-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1342181266-26323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,83 +12,315 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Adding kref to l2cap_conn helps to better handle racing when deleting
+l2cap_conn. Races are created when deleting conn from timeout and from
+the other execution path.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_sock.c |   12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ include/net/bluetooth/l2cap.h |    6 ++
+ net/bluetooth/l2cap_core.c    |  126 +++++++++++++++++++++++++++++++++--------
+ net/bluetooth/smp.c           |    7 +--
+ 3 files changed, 111 insertions(+), 28 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index a4bb27e..373ce9c 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -275,6 +275,7 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname, char __us
- 	if (get_user(len, optlen))
- 		return -EFAULT;
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index e5164ff..e8b65ae 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -572,6 +572,8 @@ struct l2cap_conn {
  
-+	l2cap_chan_lock(chan);
- 	lock_sock(sk);
- 
- 	switch (optname) {
-@@ -345,6 +346,8 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname, char __us
- 	}
- 
- 	release_sock(sk);
-+	l2cap_chan_unlock(chan);
+ 	struct list_head	chan_l;
+ 	struct mutex		chan_lock;
 +
- 	return err;
++	struct kref		kref;
+ };
+ 
+ #define L2CAP_INFO_CL_MTU_REQ_SENT	0x01
+@@ -781,5 +783,9 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan);
+ int l2cap_ertm_init(struct l2cap_chan *chan);
+ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ void l2cap_chan_del(struct l2cap_chan *chan, int err);
++void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
++			  long timeout);
++bool l2cap_conn_clear_timer(struct l2cap_conn *conn,
++			    struct delayed_work *work);
+ 
+ #endif /* __L2CAP_H */
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 9fd0599..773500b 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -57,6 +57,68 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
+ 
+ static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+ 		    struct sk_buff_head *skbs, u8 event);
++static void l2cap_conn_del(struct hci_conn *hcon, int err);
++
++/* ---- L2CAP connections ---- */
++
++static void l2cap_conn_get(struct l2cap_conn *conn)
++{
++	BT_DBG("conn %p orig refcnt %d", conn,
++	       atomic_read(&conn->kref.refcount));
++
++	kref_get(&conn->kref);
++}
++
++static void l2cap_conn_destroy(struct kref *kref)
++{
++	struct l2cap_conn *conn = container_of(kref, struct l2cap_conn, kref);
++
++	BT_DBG("conn %p", conn);
++
++	l2cap_conn_del(conn->hcon, 0);
++}
++
++static int l2cap_conn_put(struct l2cap_conn *conn)
++{
++	/* conn might be NULL, was checked before in l2cap_conn_del */
++	if (!conn) {
++		BT_DBG("conn == NULL");
++		return 1;
++	}
++
++	BT_DBG("conn %p orig refcnt %d", conn,
++	       atomic_read(&conn->kref.refcount));
++
++	return kref_put(&conn->kref, &l2cap_conn_destroy);
++}
++
++void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
++			  long timeout)
++{
++	BT_DBG("conn %p timeout %ld", conn, timeout);
++
++	/* If delayed work cancelled do not hold(conn)
++	   since it is already done with previous set_timer */
++	if (!cancel_delayed_work(work))
++		l2cap_conn_get(conn);
++
++	schedule_delayed_work(work, timeout);
++}
++
++bool l2cap_conn_clear_timer(struct l2cap_conn *conn, struct delayed_work *work)
++{
++	bool ret;
++
++	BT_DBG("conn %p", conn);
++
++	/* put(conn) if delayed work cancelled otherwise it
++	   is done in delayed work function */
++	ret = cancel_delayed_work(work);
++	if (ret)
++		l2cap_conn_put(conn);
++
++	return ret;
++}
+ 
+ /* ---- L2CAP channels ---- */
+ 
+@@ -976,7 +1038,8 @@ static void l2cap_do_start(struct l2cap_chan *chan)
+ 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_SENT;
+ 		conn->info_ident = l2cap_get_ident(conn);
+ 
+-		schedule_delayed_work(&conn->info_timer, L2CAP_INFO_TIMEOUT);
++		l2cap_conn_set_timer(conn, &conn->info_timer,
++				     L2CAP_INFO_TIMEOUT);
+ 
+ 		l2cap_send_cmd(conn, conn->info_ident,
+ 					L2CAP_INFO_REQ, sizeof(req), &req);
+@@ -1258,12 +1321,14 @@ static void l2cap_conn_unreliable(struct l2cap_conn *conn, int err)
+ static void l2cap_info_timeout(struct work_struct *work)
+ {
+ 	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
+-							info_timer.work);
++					       info_timer.work);
+ 
+ 	conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
+ 	conn->info_ident = 0;
+ 
+ 	l2cap_conn_start(conn);
++
++	l2cap_conn_put(conn);
  }
  
-@@ -367,6 +370,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
- 	if (get_user(len, optlen))
- 		return -EFAULT;
+ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+@@ -1297,13 +1362,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
  
-+	l2cap_chan_lock(chan);
- 	lock_sock(sk);
+ 	hci_chan_del(conn->hchan);
  
- 	switch (optname) {
-@@ -442,6 +446,8 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
- 	}
+-	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+-		cancel_delayed_work_sync(&conn->info_timer);
+-
+-	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags)) {
+-		cancel_delayed_work_sync(&conn->security_timer);
++	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
+ 		smp_chan_destroy(conn);
+-	}
  
- 	release_sock(sk);
-+	l2cap_chan_unlock(chan);
-+
- 	return err;
+ 	hcon->l2cap_data = NULL;
+ 	kfree(conn);
+@@ -1312,14 +1372,11 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ static void security_timeout(struct work_struct *work)
+ {
+ 	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
+-						security_timer.work);
++					       security_timer.work);
+ 
+ 	BT_DBG("conn %p", conn);
+ 
+-	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags)) {
+-		smp_chan_destroy(conn);
+-		l2cap_conn_del(conn->hcon, ETIMEDOUT);
+-	}
++	l2cap_conn_put(conn);
  }
  
-@@ -471,6 +477,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
+ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+@@ -1361,6 +1418,8 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
  
- 	BT_DBG("sk %p", sk);
+ 	INIT_LIST_HEAD(&conn->chan_l);
  
-+	l2cap_chan_lock(chan);
- 	lock_sock(sk);
++	kref_init(&conn->kref);
++
+ 	if (hcon->type == LE_LINK)
+ 		INIT_DELAYED_WORK(&conn->security_timer, security_timeout);
+ 	else
+@@ -3318,8 +3377,8 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 		return 0;
  
- 	switch (optname) {
-@@ -556,6 +563,8 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
+ 	if ((conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT) &&
+-					cmd->ident == conn->info_ident) {
+-		cancel_delayed_work(&conn->info_timer);
++	    cmd->ident == conn->info_ident) {
++		l2cap_conn_clear_timer(conn, &conn->info_timer);
+ 
+ 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
+ 		conn->info_ident = 0;
+@@ -3433,10 +3492,11 @@ sendresp:
+ 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_SENT;
+ 		conn->info_ident = l2cap_get_ident(conn);
+ 
+-		schedule_delayed_work(&conn->info_timer, L2CAP_INFO_TIMEOUT);
++		l2cap_conn_set_timer(conn, &conn->info_timer,
++				     L2CAP_INFO_TIMEOUT);
+ 
+ 		l2cap_send_cmd(conn, conn->info_ident,
+-					L2CAP_INFO_REQ, sizeof(info), &info);
++			       L2CAP_INFO_REQ, sizeof(info), &info);
  	}
  
- 	release_sock(sk);
-+	l2cap_chan_unlock(chan);
+ 	if (chan && !test_bit(CONF_REQ_SENT, &chan->conf_state) &&
+@@ -3889,7 +3949,7 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
+ 			conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE)
+ 		return 0;
+ 
+-	cancel_delayed_work(&conn->info_timer);
++	l2cap_conn_clear_timer(conn, &conn->info_timer);
+ 
+ 	if (result != L2CAP_IR_SUCCESS) {
+ 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
+@@ -5277,8 +5337,10 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		break;
+ 
+ 	case L2CAP_CID_SMP:
+-		if (smp_sig_channel(conn, skb))
+-			l2cap_conn_del(conn->hcon, EACCES);
++		if (smp_sig_channel(conn, skb)) {
++			l2cap_conn_clear_timer(conn, &conn->security_timer);
++			l2cap_conn_put(conn);
++		}
+ 		break;
+ 
+ 	default:
+@@ -5330,8 +5392,14 @@ int l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 		conn = l2cap_conn_add(hcon, status);
+ 		if (conn)
+ 			l2cap_conn_ready(conn);
+-	} else
+-		l2cap_conn_del(hcon, bt_to_errno(status));
++	} else {
++		conn = hcon->l2cap_data;
 +
- 	return err;
++		if (hcon->type == LE_LINK)
++			l2cap_conn_clear_timer(conn, &conn->security_timer);
++
++		l2cap_conn_put(conn);
++	}
+ 
+ 	return 0;
+ }
+@@ -5349,9 +5417,14 @@ int l2cap_disconn_ind(struct hci_conn *hcon)
+ 
+ int l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason)
+ {
++	struct l2cap_conn *conn = hcon->l2cap_data;
+ 	BT_DBG("hcon %p reason %d", hcon, reason);
+ 
+-	l2cap_conn_del(hcon, bt_to_errno(reason));
++	if (hcon->type == LE_LINK)
++		l2cap_conn_clear_timer(conn, &conn->security_timer);
++
++	l2cap_conn_put(conn);
++
+ 	return 0;
  }
  
-@@ -577,6 +586,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
- 	if (level != SOL_BLUETOOTH)
- 		return -ENOPROTOOPT;
+@@ -5381,10 +5454,13 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
  
-+	l2cap_chan_lock(chan);
- 	lock_sock(sk);
+ 	BT_DBG("conn %p status 0x%2.2x encrypt %u", conn, status, encrypt);
  
- 	switch (optname) {
-@@ -729,6 +739,8 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
++	l2cap_conn_get(conn);
++
+ 	if (hcon->type == LE_LINK) {
+ 		if (!status && encrypt)
+ 			smp_distribute_keys(conn, 0);
+-		cancel_delayed_work(&conn->security_timer);
++
++		l2cap_conn_clear_timer(conn, &conn->security_timer);
  	}
  
- 	release_sock(sk);
-+	l2cap_chan_unlock(chan);
+ 	mutex_lock(&conn->chan_lock);
+@@ -5481,6 +5557,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 
+ 	mutex_unlock(&conn->chan_lock);
+ 
++	l2cap_conn_put(conn);
 +
- 	return err;
+ 	return 0;
  }
+ 
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 16ef0dc..5bb5b51 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -186,8 +186,7 @@ static void smp_send_cmd(struct l2cap_conn *conn, u8 code, u16 len, void *data)
+ 	skb->priority = HCI_PRIO_MAX;
+ 	hci_send_acl(conn->hchan, skb, 0);
+ 
+-	cancel_delayed_work_sync(&conn->security_timer);
+-	schedule_delayed_work(&conn->security_timer, SMP_TIMEOUT);
++	l2cap_conn_set_timer(conn, &conn->security_timer, SMP_TIMEOUT);
+ }
+ 
+ static __u8 authreq_to_seclevel(__u8 authreq)
+@@ -268,7 +267,7 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason, u8 send)
+ 			 hcon->dst_type, reason);
+ 
+ 	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags)) {
+-		cancel_delayed_work_sync(&conn->security_timer);
++		l2cap_conn_clear_timer(conn, &conn->security_timer);
+ 		smp_chan_destroy(conn);
+ 	}
+ }
+@@ -999,7 +998,7 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
+ 
+ 	if (conn->hcon->out || force) {
+ 		clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags);
+-		cancel_delayed_work_sync(&conn->security_timer);
++		l2cap_conn_clear_timer(conn, &conn->security_timer);
+ 		smp_chan_destroy(conn);
+ 	}
  
 -- 
 1.7.9.5
