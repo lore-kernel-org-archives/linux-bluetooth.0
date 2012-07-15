@@ -1,33 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: epx@signove.com
-Subject: [PATCH] Increase MTU for MCAP/HDP data channels
-Date: Mon, 16 Jul 2012 01:31:45 -0300
-Message-Id: <1342413105-27060-1-git-send-email-epx@signove.com>
+Date: Sun, 15 Jul 2012 12:22:26 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
+Subject: Re: [PATCHv2] Bluetooth: Use transmit window from config response
+ for ack timing
+Message-ID: <20120715152039.GA23903@joana>
+References: <1341924427-19401-1-git-send-email-mathewm@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1341924427-19401-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HDP may need to send or receive PDUs up to 64512 octets (the IEEE
-11073-20601 upper limit) depending on the role, so setting MTU to
-maximum possible value.
----
- profiles/health/mcap.h |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Mat,
 
-diff --git a/profiles/health/mcap.h b/profiles/health/mcap.h
-index 34a8382..1129e69 100644
---- a/profiles/health/mcap.h
-+++ b/profiles/health/mcap.h
-@@ -35,7 +35,7 @@ extern "C" {
- 
- /* maximum transmission unit for channels */
- #define MCAP_CC_MTU	48
--#define MCAP_DC_MTU	L2CAP_DEFAULT_MTU
-+#define MCAP_DC_MTU	65535
- 
- /* MCAP Standard Op Codes */
- #define MCAP_ERROR_RSP			0x00
--- 
-1.7.9.5
+* Mat Martineau <mathewm@codeaurora.org> [2012-07-10 05:47:07 -0700]:
 
+> This change addresses an L2CAP ERTM throughput problem when a remote
+> device does not fully utilize the available transmit window.
+> 
+> The L2CAP ERTM transmit window size determines the maximum number of
+> unacked frames that may be outstanding at any time. It is configured
+> separately for each direction of an ERTM connection. Each side sends a
+> configuration request with a tx_win field indicating how many unacked
+> frames it is capable of receiving before sending an ack. The
+> configuration response's tx_win field shows how many frames the
+> transmitter will actually send before waiting for an ack.
+> 
+> It's important to trace both the actual transmit window (to check for
+> validity of incoming frames) and the number of frames that the
+> transmitter will send before waiting (to send acks at the appropriate
+> time). Now there are separate tx_win and ack_win values. ack_win is
+> updated based on configuration responses, and is used to determine
+> when acks are sent.
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  include/net/bluetooth/l2cap.h |  1 +
+>  net/bluetooth/l2cap_core.c    | 59 +++++++++++++++++++++++++------------------
+>  2 files changed, 35 insertions(+), 25 deletions(-)
+
+Patch has been applied to bluetooth-next with a small title change, it is now
+"Bluetooth: Use tx window from config response for ack timing". Thanks.
+
+	Gustavo
