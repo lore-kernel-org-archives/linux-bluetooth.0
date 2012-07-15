@@ -1,47 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 15 Jul 2012 12:22:26 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
-Subject: Re: [PATCHv2] Bluetooth: Use transmit window from config response
- for ack timing
-Message-ID: <20120715152039.GA23903@joana>
-References: <1341924427-19401-1-git-send-email-mathewm@codeaurora.org>
+Date: Sun, 15 Jul 2012 18:02:31 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v4] Bluetooth: Override status if local user rejects
+ pairing
+Message-ID: <20120715150231.GA1932@x220.P-661HNU-F1>
+References: <1342188522-27623-1-git-send-email-jaganath.k@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1341924427-19401-1-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1342188522-27623-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi Jaganath,
 
-* Mat Martineau <mathewm@codeaurora.org> [2012-07-10 05:47:07 -0700]:
+On Fri, Jul 13, 2012, Jaganath Kanakkassery wrote:
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -42,6 +42,7 @@
+>  #define MGMT_STATUS_NOT_POWERED		0x0f
+>  #define MGMT_STATUS_CANCELLED		0x10
+>  #define MGMT_STATUS_INVALID_INDEX	0x11
+> +#define MGMT_STATUS_AUTH_REJECTED	0x12
 
-> This change addresses an L2CAP ERTM throughput problem when a remote
-> device does not fully utilize the available transmit window.
-> 
-> The L2CAP ERTM transmit window size determines the maximum number of
-> unacked frames that may be outstanding at any time. It is configured
-> separately for each direction of an ERTM connection. Each side sends a
-> configuration request with a tx_win field indicating how many unacked
-> frames it is capable of receiving before sending an ack. The
-> configuration response's tx_win field shows how many frames the
-> transmitter will actually send before waiting for an ack.
-> 
-> It's important to trace both the actual transmit window (to check for
-> validity of incoming frames) and the number of frames that the
-> transmitter will send before waiting (to send acks at the appropriate
-> time). Now there are separate tx_win and ack_win values. ack_win is
-> updated based on configuration responses, and is used to determine
-> when acks are sent.
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  include/net/bluetooth/l2cap.h |  1 +
->  net/bluetooth/l2cap_core.c    | 59 +++++++++++++++++++++++++------------------
->  2 files changed, 35 insertions(+), 25 deletions(-)
+Why this? You didn't have it in v3. The existing STATUS_REJECTED should
+be enough, right?
 
-Patch has been applied to bluetooth-next with a small title change, it is now
-"Bluetooth: Use tx window from config response for ack timing". Thanks.
+> @@ -2659,6 +2659,8 @@ static void hci_pin_code_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>  		else
+>  			secure = 0;
+>  
+> +		conn->auth_rejected = false;
+> +
+>  		mgmt_pin_code_request(hdev, &ev->bdaddr, secure);
+>  	}
+>  
 
-	Gustavo
+I think it would be cleaner to set this to false immediately after the
+conn lookup in this function. Also, when HCI_PAIRABLE is not set you
+should set auth_rejected to true since that's also a local rejection
+(even though it's an automatic one).
+
+> @@ -3139,6 +3141,8 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>  		else
+>  			cp.oob_data = 0x00;
+>  
+> +		conn->auth_rejected = false;
+> +
+>  		hci_send_cmd(hdev, HCI_OP_IO_CAPABILITY_REPLY,
+>  			     sizeof(cp), &cp);
+>  	} else {
+
+Same here.
+
+Johan
