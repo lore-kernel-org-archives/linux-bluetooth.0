@@ -1,28 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 16 Jul 2012 13:52:58 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org, s.syam@samsung.com
-Subject: Re: [PATCH v1 1/2] Bluetooth: Move l2cap_chan_hold/put to
- l2cap_core.c
-Message-ID: <20120716105256.GB5868@aemeltch-MOBL1>
-References: <1342183675-27612-1-git-send-email-jaganath.k@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1342183675-27612-1-git-send-email-jaganath.k@samsung.com>
+In-Reply-To: <1341865311-21266-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1341865311-21266-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Mon, 16 Jul 2012 06:17:09 -0300
+Message-ID: <CABBYNZLoJJfVMSstVMXicYpi126HfaxxNRLRsy9e9Os1F7=ocw@mail.gmail.com>
+Subject: Re: [RFC v0] media: Extend media API with optional acquire
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Hi Mikel,
 
-On Fri, Jul 13, 2012 at 06:17:54PM +0530, Jaganath Kanakkassery wrote:
-> Refactor the code in order to use the l2cap_chan_destroy()
-> from l2cap_chan_put() under the refcnt protection.
-> 
-> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
-> Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+On Mon, Jul 9, 2012 at 5:21 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>  unsigned int gateway_request_stream(struct audio_device *dev,
+> +                               gboolean try_only,
+>                                 gateway_stream_cb_t cb, void *user_data)
+>  {
+>         struct gateway *gw = dev->gateway;
+>         GError *err = NULL;
+>         GIOChannel *io;
+>
+> +       if (try_only && !gw->sco)
+> +               return 0;
 
-Both patches looks OK to me.
+Perhaps if we store the status of the transport we don't need to even
+call gateway_request_stream.
 
-Reviewed-by: Emeltchenko Andrei <andrei.emeltchenko@nokia.com>
 
+> @@ -88,6 +88,7 @@ struct media_transport {
+>         gboolean                write_lock;
+>         gboolean                in_use;
+>         guint                   (*resume) (struct media_transport *transport,
+> +                                       gboolean try_only,
+>                                         struct media_owner *owner);
+
+What about creating a new callback e.g. try_resume? Also I don't think
+we should restrict to just gateway, although it is probably the only
+one that has a real use case once we introduce "?" flag it should be
+supported by every transport or properly document which transport does
+support it.
+
+-- 
+Luiz Augusto von Dentz
