@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 04/18 v2] Bluetooth: Add basic packet parsing to Three-wire UART driver
-Date: Mon, 16 Jul 2012 16:12:05 +0300
-Message-Id: <1342444339-1627-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 03/18 v2] Bluetooth: Add initial reliable packet support for Three-wire UART
+Date: Mon, 16 Jul 2012 16:12:04 +0300
+Message-Id: <1342444339-1627-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1342444339-1627-1-git-send-email-johan.hedberg@gmail.com>
 References: <1342444339-1627-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,278 +11,121 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds basic packet parsing to the Three-wire UART HCI driver
-for packets received from the controller.
+This patch adds initial support for reliable packets along with the
+necessary retransmission timer for the Three-wire UART HCI driver.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- drivers/bluetooth/hci_h5.c |  230 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 222 insertions(+), 8 deletions(-)
+ drivers/bluetooth/hci_h5.c |   56 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
 diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index fe711bf..a76c927 100644
+index 6b7ec64..fe711bf 100644
 --- a/drivers/bluetooth/hci_h5.c
 +++ b/drivers/bluetooth/hci_h5.c
-@@ -34,20 +34,37 @@
+@@ -30,6 +30,10 @@
  
- #define H5_ACK_TIMEOUT	msecs_to_jiffies(250)
+ #include "hci_uart.h"
  
-+/*
-+ * Maximum Three-wire packet:
-+ *     4 byte header + max value for 12-bit length + 2 bytes for CRC
-+ */
-+#define H5_MAX_LEN (4 + 0xfff + 2)
++#define H5_TXWINSIZE	4
 +
-+#define SLIP_DELIMITER	0xc0
-+#define SLIP_ESC	0xdb
-+#define SLIP_ESC_DELIM	0xdc
-+#define SLIP_ESC_ESC	0xdd
++#define H5_ACK_TIMEOUT	msecs_to_jiffies(250)
 +
  struct h5 {
--	struct sk_buff_head unack;	/* Unack'ed packets queue */
--	struct sk_buff_head rel;	/* Reliable packets queue */
--	struct sk_buff_head unrel;	/* Unreliable packets queue */
-+	struct sk_buff_head	unack;		/* Unack'ed packets queue */
-+	struct sk_buff_head	rel;		/* Reliable packets queue */
-+	struct sk_buff_head	unrel;		/* Unreliable packets queue */
+ 	struct sk_buff_head unack;	/* Unack'ed packets queue */
+ 	struct sk_buff_head rel;	/* Reliable packets queue */
+@@ -37,11 +41,34 @@ struct h5 {
  
--	struct sk_buff *rx_skb;
-+	struct sk_buff		*rx_skb;	/* Receive buffer */
-+	size_t			rx_pending;	/* Expecting more bytes */
-+	bool			rx_esc;		/* SLIP escape mode */
+ 	struct sk_buff *rx_skb;
  
--	struct timer_list timer;	/* Retransmission timer */
-+	int			(*rx_func) (struct hci_uart *hu, u8 c);
- 
--	bool txack_req;
-+	struct timer_list	timer;		/* Retransmission timer */
- 
--	u8 msgq_txseq;
-+	bool			txack_req;
++	struct timer_list timer;	/* Retransmission timer */
 +
-+	u8			msgq_txseq;
+ 	bool txack_req;
+ 
+ 	u8 msgq_txseq;
  };
  
-+static void h5_reset_rx(struct h5 *h5);
++static void h5_timed_event(unsigned long arg)
++{
++	struct hci_uart *hu = (struct hci_uart *) arg;
++	struct h5 *h5 = hu->priv;
++	struct sk_buff *skb;
++	unsigned long flags;
 +
- static void h5_timed_event(unsigned long arg)
++	BT_DBG("hu %p retransmitting %u pkts", hu, h5->unack.qlen);
++
++	spin_lock_irqsave_nested(&h5->unack.lock, flags, SINGLE_DEPTH_NESTING);
++
++	while ((skb = __skb_dequeue_tail(&h5->unack)) != NULL) {
++		h5->msgq_txseq = (h5->msgq_txseq - 1) & 0x07;
++		skb_queue_head(&h5->rel, skb);
++	}
++
++	spin_unlock_irqrestore(&h5->unack.lock, flags);
++
++	hci_uart_tx_wakeup(hu);
++}
++
+ static int h5_open(struct hci_uart *hu)
  {
- 	struct hci_uart *hu = (struct hci_uart *) arg;
-@@ -85,6 +102,8 @@ static int h5_open(struct hci_uart *hu)
+ 	struct h5 *h5;
+@@ -58,6 +85,10 @@ static int h5_open(struct hci_uart *hu)
  	skb_queue_head_init(&h5->rel);
  	skb_queue_head_init(&h5->unrel);
  
-+	h5_reset_rx(h5);
++	init_timer(&h5->timer);
++	h5->timer.function = h5_timed_event;
++	h5->timer.data = (unsigned long) hu;
 +
- 	init_timer(&h5->timer);
- 	h5->timer.function = h5_timed_event;
- 	h5->timer.data = (unsigned long) hu;
-@@ -107,9 +126,204 @@ static int h5_close(struct hci_uart *hu)
  	return 0;
  }
  
-+static void h5_handle_internal_rx(struct hci_uart *hu)
-+{
-+	BT_DBG("%s", hu->hdev->name);
-+}
-+
-+static void h5_complete_rx_pkt(struct hci_uart *hu)
-+{
-+	struct h5 *h5 = hu->priv;
-+	u8 pkt_type;
-+
-+	BT_DBG("%s", hu->hdev->name);
-+
-+	pkt_type = h5->rx_skb->data[1] & 0x0f;
-+
-+	switch (pkt_type) {
-+	case HCI_EVENT_PKT:
-+	case HCI_ACLDATA_PKT:
-+	case HCI_SCODATA_PKT:
-+		bt_cb(h5->rx_skb)->pkt_type = pkt_type;
-+
-+		/* Remove Three-wire header */
-+		skb_pull(h5->rx_skb, 4);
-+
-+		hci_recv_frame(h5->rx_skb);
-+		h5->rx_skb = NULL;
-+
-+		break;
-+
-+	default:
-+		h5_handle_internal_rx(hu);
-+		break;
-+	}
-+
-+	h5_reset_rx(h5);
-+}
-+
-+static int h5_rx_crc(struct hci_uart *hu, unsigned char c)
-+{
-+	struct h5 *h5 = hu->priv;
-+
-+	BT_DBG("%s 0x%02hhx", hu->hdev->name, c);
-+
-+	h5_complete_rx_pkt(hu);
-+	h5_reset_rx(h5);
-+
-+	return 0;
-+}
-+
-+static int h5_rx_payload(struct hci_uart *hu, unsigned char c)
-+{
-+	struct h5 *h5 = hu->priv;
-+	const unsigned char *hdr = h5->rx_skb->data;
-+
-+	BT_DBG("%s 0x%02hhx", hu->hdev->name, c);
-+
-+	if ((hdr[0] >> 4) & 0x01) {
-+		h5->rx_func = h5_rx_crc;
-+		h5->rx_pending = 2;
-+	} else {
-+		h5_complete_rx_pkt(hu);
-+		h5_reset_rx(h5);
-+	}
-+
-+	return 0;
-+}
-+
-+static int h5_rx_3wire_hdr(struct hci_uart *hu, unsigned char c)
-+{
-+	struct h5 *h5 = hu->priv;
-+	const unsigned char *hdr = h5->rx_skb->data;
-+
-+	BT_DBG("%s 0x%02hhx", hu->hdev->name, c);
-+
-+	if (((hdr[0] + hdr[1] + hdr[2] + hdr[3]) & 0xff) != 0xff) {
-+		BT_ERR("Invalid header checksum");
-+		h5_reset_rx(h5);
-+		return 0;
-+	}
-+
-+	h5->rx_func = h5_rx_payload;
-+	h5->rx_pending = ((hdr[1] >> 4) & 0xff) + (hdr[2] << 4);
-+
-+	return 0;
-+}
-+
-+static int h5_rx_pkt_start(struct hci_uart *hu, unsigned char c)
-+{
-+	struct h5 *h5 = hu->priv;
-+
-+	BT_DBG("%s 0x%02hhx", hu->hdev->name, c);
-+
-+	if (c == SLIP_DELIMITER)
-+		return 1;
-+
-+	h5->rx_func = h5_rx_3wire_hdr;
-+	h5->rx_pending = 4;
-+
-+	h5->rx_skb = bt_skb_alloc(H5_MAX_LEN, GFP_ATOMIC);
-+	if (!h5->rx_skb) {
-+		BT_ERR("Can't allocate mem for new packet");
-+		h5_reset_rx(h5);
-+		return -ENOMEM;
-+	}
-+
-+	h5->rx_skb->dev = (void *) hu->hdev;
-+
-+	return 0;
-+}
-+
-+static int h5_rx_delimiter(struct hci_uart *hu, unsigned char c)
-+{
-+	struct h5 *h5 = hu->priv;
-+
-+	BT_DBG("%s 0x%02hhx", hu->hdev->name, c);
-+
-+	if (c == SLIP_DELIMITER)
-+		h5->rx_func = h5_rx_pkt_start;
-+
-+	return 1;
-+}
-+
-+static void h5_unslip_one_byte(struct h5 *h5, unsigned char c)
-+{
-+	const u8 delim = SLIP_DELIMITER, esc = SLIP_ESC;
-+	const u8 *byte = &c;
-+
-+	if (!h5->rx_esc && c == SLIP_ESC) {
-+		h5->rx_esc = true;
-+		return;
-+	}
-+
-+	if (h5->rx_esc) {
-+		switch (c) {
-+		case SLIP_ESC_DELIM:
-+			byte = &delim;
-+			break;
-+		case SLIP_ESC_ESC:
-+			byte = &esc;
-+			break;
-+		default:
-+			BT_ERR("Invalid esc byte 0x%02hhx", c);
-+			h5_reset_rx(h5);
-+			return;
-+		}
-+
-+		h5->rx_esc = false;
-+	}
-+
-+	memcpy(skb_put(h5->rx_skb, 1), byte, 1);
-+	h5->rx_pending--;
-+
-+	BT_DBG("unsliped 0x%02hhx", *byte);
-+}
-+
-+static void h5_reset_rx(struct h5 *h5)
-+{
-+	if (h5->rx_skb) {
-+		kfree_skb(h5->rx_skb);
-+		h5->rx_skb = NULL;
-+	}
-+
-+	h5->rx_func = h5_rx_delimiter;
-+	h5->rx_pending = 0;
-+	h5->rx_esc = false;
-+}
-+
- static int h5_recv(struct hci_uart *hu, void *data, int count)
- {
--	return -ENOSYS;
-+	struct h5 *h5 = hu->priv;
-+	unsigned char *ptr = data;
-+
-+	BT_DBG("%s count %d", hu->hdev->name, count);
-+
-+	while (count > 0) {
-+		int processed;
-+
-+		if (h5->rx_pending > 0) {
-+			if (*ptr == SLIP_DELIMITER) {
-+				BT_ERR("Too short H5 packet");
-+				h5_reset_rx(h5);
-+				continue;
-+			}
-+
-+			h5_unslip_one_byte(h5, *ptr);
-+
-+			ptr++; count--;
-+			continue;
-+		}
-+
-+		processed = h5->rx_func(hu, *ptr);
-+		if (processed < 0)
-+			return processed;
-+
-+		ptr += processed;
-+		count -= processed;
-+	}
-+
-+	return 0;
- }
+@@ -69,6 +100,8 @@ static int h5_close(struct hci_uart *hu)
+ 	skb_queue_purge(&h5->rel);
+ 	skb_queue_purge(&h5->unrel);
  
- static int h5_enqueue(struct hci_uart *hu, struct sk_buff *skb)
++	del_timer(&h5->timer);
++
+ 	kfree(h5);
+ 
+ 	return 0;
+@@ -123,6 +156,7 @@ static struct sk_buff *h5_prepare_ack(struct h5 *h5)
+ static struct sk_buff *h5_dequeue(struct hci_uart *hu)
+ {
+ 	struct h5 *h5 = hu->priv;
++	unsigned long flags;
+ 	struct sk_buff *skb, *nskb;
+ 
+ 	if ((skb = skb_dequeue(&h5->unrel)) != NULL) {
+@@ -136,6 +170,28 @@ static struct sk_buff *h5_dequeue(struct hci_uart *hu)
+ 		BT_ERR("Could not dequeue pkt because alloc_skb failed");
+ 	}
+ 
++	spin_lock_irqsave_nested(&h5->unack.lock, flags, SINGLE_DEPTH_NESTING);
++
++	if (h5->unack.qlen >= H5_TXWINSIZE)
++	       goto unlock;
++
++	if ((skb = skb_dequeue(&h5->rel)) != NULL) {
++		nskb = h5_prepare_pkt(h5, skb);
++
++		if (nskb) {
++			__skb_queue_tail(&h5->unack, skb);
++			mod_timer(&h5->timer, jiffies + H5_ACK_TIMEOUT);
++			spin_unlock_irqrestore(&h5->unack.lock, flags);
++			return nskb;
++		}
++
++		skb_queue_head(&h5->rel, skb);
++		BT_ERR("Could not dequeue pkt because alloc_skb failed");
++	}
++
++unlock:
++	spin_unlock_irqrestore(&h5->unack.lock, flags);
++
+ 	if (h5->txack_req)
+ 		return h5_prepare_ack(h5);
+ 
 -- 
 1.7.10.4
 
