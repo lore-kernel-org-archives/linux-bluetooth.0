@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 18/18 v2] Bluetooth: Introduce a flags variable to Three-wire UART state
-Date: Mon, 16 Jul 2012 16:12:19 +0300
-Message-Id: <1342444339-1627-18-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 17/18 v2] Bluetooth: Improve Three-wire UART configuration handling
+Date: Mon, 16 Jul 2012 16:12:18 +0300
+Message-Id: <1342444339-1627-17-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1342444339-1627-1-git-send-email-johan.hedberg@gmail.com>
 References: <1342444339-1627-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,109 +11,122 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch introduces a flags variable to the Three-wire UART state
-struct and converts the two existing bools in the struct into flags.
+The configuration request/response messages contain a configuration
+field which contains the sliding window size (amount of unacked reliable
+packets that can be pending). This patch makes sure that we configure
+the correct size (minimum of local and remote values) and use it when
+determining whether to send new packets or not.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- drivers/bluetooth/hci_h5.c |   26 +++++++++++++++-----------
- 1 file changed, 15 insertions(+), 11 deletions(-)
+ drivers/bluetooth/hci_h5.c |   34 +++++++++++++++++++++++++++-------
+ 1 file changed, 27 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 6f70da5..61d387a 100644
+index 7230c26..6f70da5 100644
 --- a/drivers/bluetooth/hci_h5.c
 +++ b/drivers/bluetooth/hci_h5.c
-@@ -58,21 +58,27 @@
- #define SLIP_ESC_DELIM	0xdc
- #define SLIP_ESC_ESC	0xdd
+@@ -33,7 +33,8 @@
+ #define HCI_3WIRE_ACK_PKT	0
+ #define HCI_3WIRE_LINK_PKT	15
  
-+/* H5 state flags */
-+enum {
-+	H5_RX_ESC,	/* SLIP escape mode */
-+	H5_TX_ACK_REQ,	/* Pending ack to send */
-+};
-+
- struct h5 {
- 	struct sk_buff_head	unack;		/* Unack'ed packets queue */
- 	struct sk_buff_head	rel;		/* Reliable packets queue */
- 	struct sk_buff_head	unrel;		/* Unreliable packets queue */
+-#define H5_TXWINSIZE	4
++/* Sliding window size */
++#define H5_TX_WIN_MAX		4
  
-+	unsigned long		flags;
-+
- 	struct sk_buff		*rx_skb;	/* Receive buffer */
- 	size_t			rx_pending;	/* Expecting more bytes */
--	bool			rx_esc;		/* SLIP escape mode */
- 	u8			rx_ack;		/* Last ack number received */
- 
- 	int			(*rx_func) (struct hci_uart *hu, u8 c);
- 
- 	struct timer_list	timer;		/* Retransmission timer */
- 
--	bool			tx_ack_req;	/* Pending ack to send */
+ #define H5_ACK_TIMEOUT	msecs_to_jiffies(250)
+ #define H5_SYNC_TIMEOUT	msecs_to_jiffies(100)
+@@ -74,6 +75,7 @@ struct h5 {
+ 	bool			tx_ack_req;	/* Pending ack to send */
  	u8			tx_seq;		/* Next seq number to send */
  	u8			tx_ack;		/* Next ack number to send */
- 	u8			tx_win;		/* Sliding window size */
-@@ -317,7 +323,7 @@ static void h5_complete_rx_pkt(struct hci_uart *hu)
++	u8			tx_win;		/* Sliding window size */
  
- 	if (H5_HDR_RELIABLE(hdr)) {
- 		h5->tx_ack = (h5->tx_ack + 1) % 8;
--		h5->tx_ack_req = true;
-+		set_bit(H5_TX_ACK_REQ, &h5->flags);
- 		hci_uart_tx_wakeup(hu);
- 	}
- 
-@@ -445,12 +451,12 @@ static void h5_unslip_one_byte(struct h5 *h5, unsigned char c)
- 	const u8 delim = SLIP_DELIMITER, esc = SLIP_ESC;
- 	const u8 *byte = &c;
- 
--	if (!h5->rx_esc && c == SLIP_ESC) {
--		h5->rx_esc = true;
-+	if (!test_bit(H5_RX_ESC, &h5->flags) && c == SLIP_ESC) {
-+		set_bit(H5_RX_ESC, &h5->flags);
- 		return;
- 	}
- 
--	if (h5->rx_esc) {
-+	if (test_and_clear_bit(H5_RX_ESC, &h5->flags)) {
- 		switch (c) {
- 		case SLIP_ESC_DELIM:
- 			byte = &delim;
-@@ -463,8 +469,6 @@ static void h5_unslip_one_byte(struct h5 *h5, unsigned char c)
- 			h5_reset_rx(h5);
- 			return;
- 		}
--
--		h5->rx_esc = false;
- 	}
- 
- 	memcpy(skb_put(h5->rx_skb, 1), byte, 1);
-@@ -482,7 +486,7 @@ static void h5_reset_rx(struct h5 *h5)
- 
- 	h5->rx_func = h5_rx_delimiter;
- 	h5->rx_pending = 0;
--	h5->rx_esc = false;
-+	clear_bit(H5_RX_ESC, &h5->flags);
+ 	enum {
+ 		H5_UNINITIALIZED,
+@@ -106,10 +108,20 @@ static void h5_link_control(struct hci_uart *hu, const void *data, size_t len)
+ 	skb_queue_tail(&h5->unrel, nskb);
  }
  
- static int h5_recv(struct hci_uart *hu, void *data, int count)
-@@ -621,7 +625,7 @@ static struct sk_buff *h5_prepare_pkt(struct hci_uart *hu, u8 pkt_type,
- 	h5_slip_delim(nskb);
++static u8 h5_cfg_field(struct h5 *h5)
++{
++	u8 field = 0;
++
++	/* Sliding window size (first 3 bits) */
++	field |= (h5->tx_win & 7);
++
++	return field;
++}
++
+ static void h5_timed_event(unsigned long arg)
+ {
+ 	const unsigned char sync_req[] = { 0x01, 0x7e };
+-	const unsigned char conf_req[] = { 0x03, 0xfc, 0x01 };
++	unsigned char conf_req[] = { 0x03, 0xfc, 0x01 };
+ 	struct hci_uart *hu = (struct hci_uart *) arg;
+ 	struct h5 *h5 = hu->priv;
+ 	struct sk_buff *skb;
+@@ -120,8 +132,10 @@ static void h5_timed_event(unsigned long arg)
+ 	if (h5->state == H5_UNINITIALIZED)
+ 		h5_link_control(hu, sync_req, sizeof(sync_req));
  
- 	hdr[0] = h5->tx_ack << 3;
--	h5->tx_ack_req = false;
-+	clear_bit(H5_TX_ACK_REQ, &h5->flags);
+-	if (h5->state == H5_INITIALIZED)
++	if (h5->state == H5_INITIALIZED) {
++		conf_req[2] = h5_cfg_field(h5);
+ 		h5_link_control(hu, conf_req, sizeof(conf_req));
++	}
  
- 	/* Reliable packet? */
- 	if (pkt_type == HCI_ACLDATA_PKT || pkt_type == HCI_COMMAND_PKT) {
-@@ -703,7 +707,7 @@ static struct sk_buff *h5_dequeue(struct hci_uart *hu)
- unlock:
- 	spin_unlock_irqrestore(&h5->unack.lock, flags);
+ 	if (h5->state != H5_ACTIVE) {
+ 		mod_timer(&h5->timer, jiffies + H5_SYNC_TIMEOUT);
+@@ -171,6 +185,8 @@ static int h5_open(struct hci_uart *hu)
+ 	h5->timer.function = h5_timed_event;
+ 	h5->timer.data = (unsigned long) hu;
  
--	if (h5->tx_ack_req)
-+	if (test_bit(H5_TX_ACK_REQ, &h5->flags))
- 		return h5_prepare_pkt(hu, HCI_3WIRE_ACK_PKT, NULL, 0);
++	h5->tx_win = H5_TX_WIN_MAX;
++
+ 	set_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags);
  
- 	return NULL;
+ 	/* Send initial sync request */
+@@ -242,8 +258,8 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
+ 	struct h5 *h5 = hu->priv;
+ 	const unsigned char sync_req[] = { 0x01, 0x7e };
+ 	const unsigned char sync_rsp[] = { 0x02, 0x7d };
+-	const unsigned char conf_req[] = { 0x03, 0xfc, 0x01 };
+-	const unsigned char conf_rsp[] = { 0x04, 0x7b, 0x01 };
++	unsigned char conf_req[] = { 0x03, 0xfc, 0x01 };
++	const unsigned char conf_rsp[] = { 0x04, 0x7b };
+ 	const unsigned char wakeup_req[] = { 0x05, 0xfa };
+ 	const unsigned char woken_req[] = { 0x06, 0xf9 };
+ 	const unsigned char sleep_req[] = { 0x07, 0x78 };
+@@ -258,6 +274,8 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
+ 	if (H5_HDR_LEN(hdr) < 2)
+ 		return;
+ 
++	conf_req[2] = h5_cfg_field(h5);
++
+ 	if (memcmp(data, sync_req, 2) == 0) {
+ 		h5_link_control(hu, sync_rsp, 2);
+ 	} else if (memcmp(data, sync_rsp, 2) == 0) {
+@@ -267,7 +285,9 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
+ 		h5_link_control(hu, conf_rsp, 2);
+ 		h5_link_control(hu, conf_req, 3);
+ 	} else if (memcmp(data, conf_rsp, 2) == 0) {
+-		BT_DBG("Three-wire init sequence complete");
++		if (H5_HDR_LEN(hdr) > 2)
++			h5->tx_win = (data[2] & 7);
++		BT_DBG("Three-wire init complete. tx_win %u", h5->tx_win);
+ 		h5->state = H5_ACTIVE;
+ 		hci_uart_init_ready(hu);
+ 		return;
+@@ -663,7 +683,7 @@ static struct sk_buff *h5_dequeue(struct hci_uart *hu)
+ 
+ 	spin_lock_irqsave_nested(&h5->unack.lock, flags, SINGLE_DEPTH_NESTING);
+ 
+-	if (h5->unack.qlen >= H5_TXWINSIZE)
++	if (h5->unack.qlen >= h5->tx_win)
+ 	       goto unlock;
+ 
+ 	if ((skb = skb_dequeue(&h5->rel)) != NULL) {
 -- 
 1.7.10.4
 
