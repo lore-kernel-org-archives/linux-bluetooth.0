@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 15/18 v2] Bluetooth: Implement proper low-power support for Three-wire UART
-Date: Mon, 16 Jul 2012 16:12:16 +0300
-Message-Id: <1342444339-1627-15-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 14/18 v2] Bluetooth: Add initialization tracking to HCI Three-wire driver
+Date: Mon, 16 Jul 2012 16:12:15 +0300
+Message-Id: <1342444339-1627-14-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1342444339-1627-1-git-send-email-johan.hedberg@gmail.com>
 References: <1342444339-1627-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,96 +11,143 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds on-demand wakeup request sending (and re-sendind) when
-we are in low-power state. When the controller enters this state it will
-send a sleep message after which the host is not allowed to send any
-other packets until a wakeup request has been sent and the woken message
-received as a response to it. The wakeup requests are re-sent
-periodically until a woken message is received.
+This patch adds tracking for the uninitialized, initialized and active
+states for Three-wire UART. This is needed so we can handle periodic
+sending of the Link Establishment messages before reaching active state
+and so that we do not try to do any higher level HCI data transmission
+before reaching active state.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- drivers/bluetooth/hci_h5.c |   37 ++++++++++++++++++++++++++++++++-----
- 1 file changed, 32 insertions(+), 5 deletions(-)
+ drivers/bluetooth/hci_h5.c |   66 +++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 50 insertions(+), 16 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 3139d8b..cdad0ef 100644
+index 282455d..3139d8b 100644
 --- a/drivers/bluetooth/hci_h5.c
 +++ b/drivers/bluetooth/hci_h5.c
-@@ -81,7 +81,11 @@ struct h5 {
- 		H5_ACTIVE,
- 	} state;
+@@ -75,18 +75,53 @@ struct h5 {
+ 	u8			tx_seq;		/* Next seq number to send */
+ 	u8			tx_ack;		/* Next ack number to send */
  
--	bool			sleeping;
 +	enum {
-+		H5_AWAKE,
-+		H5_SLEEPING,
-+		H5_WAKING_UP,
-+	} sleep;
++		H5_UNINITIALIZED,
++		H5_INITIALIZED,
++		H5_ACTIVE,
++	} state;
++
+ 	bool			sleeping;
  };
  
  static void h5_reset_rx(struct h5 *h5);
-@@ -111,6 +115,8 @@ static void h5_timed_event(unsigned long arg)
+ 
++static void h5_link_control(struct hci_uart *hu, const void *data, size_t len)
++{
++	struct h5 *h5 = hu->priv;
++	struct sk_buff *nskb;
++
++	nskb = alloc_skb(3, GFP_ATOMIC);
++	if (!nskb)
++		return;
++
++	bt_cb(nskb)->pkt_type = HCI_3WIRE_LINK_PKT;
++
++	memcpy(skb_put(nskb, len), data, len);
++
++	skb_queue_tail(&h5->unrel, nskb);
++}
++
+ static void h5_timed_event(unsigned long arg)
+ {
++	const unsigned char sync_req[] = { 0x01, 0x7e };
++	const unsigned char conf_req[] = { 0x03, 0xfc, 0x01 };
+ 	struct hci_uart *hu = (struct hci_uart *) arg;
+ 	struct h5 *h5 = hu->priv;
  	struct sk_buff *skb;
  	unsigned long flags;
  
-+	BT_DBG("%s", hu->hdev->name);
++	if (h5->state == H5_UNINITIALIZED)
++		h5_link_control(hu, sync_req, sizeof(sync_req));
 +
- 	if (h5->state == H5_UNINITIALIZED)
- 		h5_link_control(hu, sync_req, sizeof(sync_req));
- 
-@@ -122,6 +128,11 @@ static void h5_timed_event(unsigned long arg)
- 		goto wakeup;
- 	}
- 
-+	if (h5->sleep != H5_AWAKE) {
-+		h5->sleep = H5_SLEEPING;
++	if (h5->state == H5_INITIALIZED)
++		h5_link_control(hu, conf_req, sizeof(conf_req));
++
++	if (h5->state != H5_ACTIVE) {
++		mod_timer(&h5->timer, jiffies + H5_SYNC_TIMEOUT);
 +		goto wakeup;
 +	}
 +
  	BT_DBG("hu %p retransmitting %u pkts", hu, h5->unack.qlen);
  
  	spin_lock_irqsave_nested(&h5->unack.lock, flags, SINGLE_DEPTH_NESTING);
-@@ -262,12 +273,15 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
+@@ -98,25 +133,10 @@ static void h5_timed_event(unsigned long arg)
+ 
+ 	spin_unlock_irqrestore(&h5->unack.lock, flags);
+ 
++wakeup:
+ 	hci_uart_tx_wakeup(hu);
+ }
+ 
+-static void h5_link_control(struct hci_uart *hu, const void *data, size_t len)
+-{
+-	struct h5 *h5 = hu->priv;
+-	struct sk_buff *nskb;
+-
+-	nskb = alloc_skb(3, GFP_ATOMIC);
+-	if (!nskb)
+-		return;
+-
+-	bt_cb(nskb)->pkt_type = HCI_3WIRE_LINK_PKT;
+-
+-	memcpy(skb_put(nskb, len), data, len);
+-
+-	skb_queue_tail(&h5->unrel, nskb);
+-}
+-
+ static int h5_open(struct hci_uart *hu)
+ {
+ 	struct h5 *h5;
+@@ -230,12 +250,14 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
+ 	if (memcmp(data, sync_req, 2) == 0) {
+ 		h5_link_control(hu, sync_rsp, 2);
+ 	} else if (memcmp(data, sync_rsp, 2) == 0) {
++		h5->state = H5_INITIALIZED;
+ 		h5_link_control(hu, conf_req, 3);
+ 	} else if (memcmp(data, conf_req, 2) == 0) {
+ 		h5_link_control(hu, conf_rsp, 2);
+ 		h5_link_control(hu, conf_req, 3);
+ 	} else if (memcmp(data, conf_rsp, 2) == 0) {
+ 		BT_DBG("Three-wire init sequence complete");
++		h5->state = H5_ACTIVE;
+ 		hci_uart_init_ready(hu);
  		return;
  	} else if (memcmp(data, sleep_req, 2) == 0) {
- 		BT_DBG("Peer went to sleep");
--		h5->sleeping = true;
--		h5_link_control(hu, wakeup_req, 2);
-+		h5->sleep = H5_SLEEPING;
-+		return;
- 	} else if (memcmp(data, woken_req, 2) == 0) {
- 		BT_DBG("Peer woke up");
--		h5->sleeping = false;
--		return;
-+		h5->sleep = H5_AWAKE;
-+	} else if (memcmp(data, wakeup_req, 2) == 0) {
-+		BT_DBG("Peer requested wakeup");
-+		h5_link_control(hu, woken_req, 2);
-+		h5->sleep = H5_AWAKE;
- 	} else {
- 		BT_DBG("Link Control: 0x%02hhx 0x%02hhx", data[0], data[1]);
- 		return;
-@@ -625,6 +639,19 @@ static struct sk_buff *h5_dequeue(struct hci_uart *hu)
- 	unsigned long flags;
- 	struct sk_buff *skb, *nskb;
+@@ -340,6 +362,12 @@ static int h5_rx_3wire_hdr(struct hci_uart *hu, unsigned char c)
+ 		return 0;
+ 	}
  
-+	if (h5->sleep != H5_AWAKE) {
-+		const unsigned char wakeup_req[] = { 0x05, 0xfa };
-+
-+		if (h5->sleep == H5_WAKING_UP)
-+			return NULL;
-+
-+		h5->sleep = H5_WAKING_UP;
-+		BT_DBG("Sending wakeup request");
-+
-+		mod_timer(&h5->timer, jiffies + HZ / 100);
-+		return h5_prepare_pkt(hu, HCI_3WIRE_LINK_PKT, wakeup_req, 2);
++	if (h5->state != H5_ACTIVE &&
++	    H5_HDR_PKT_TYPE(hdr) != HCI_3WIRE_LINK_PKT) {
++		BT_ERR("Non-link packet received in non-active state");
++		h5_reset_rx(h5);
 +	}
 +
- 	if ((skb = skb_dequeue(&h5->unrel)) != NULL) {
- 		nskb = h5_prepare_pkt(hu, bt_cb(skb)->pkt_type,
- 				      skb->data, skb->len);
+ 	h5->rx_func = h5_rx_payload;
+ 	h5->rx_pending = H5_HDR_LEN(hdr);
+ 
+@@ -468,6 +496,12 @@ static int h5_enqueue(struct hci_uart *hu, struct sk_buff *skb)
+ 		return 0;
+ 	}
+ 
++	if (h5->state != H5_ACTIVE) {
++		BT_ERR("Ignoring HCI data in non-active state");
++		kfree_skb(skb);
++		return 0;
++	}
++
+ 	switch (bt_cb(skb)->pkt_type) {
+ 	case HCI_ACLDATA_PKT:
+ 	case HCI_COMMAND_PKT:
 -- 
 1.7.10.4
 
