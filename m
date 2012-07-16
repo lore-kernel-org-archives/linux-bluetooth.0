@@ -1,29 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ] doc: Add GATT to the supported features
-Date: Mon, 16 Jul 2012 18:26:38 -0300
-Message-Id: <1342473998-22998-1-git-send-email-vinicius.gomes@openbossa.org>
+Date: Mon, 16 Jul 2012 13:46:16 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+cc: linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
+Subject: Re: [RFCv0 16/19] Bluetooth: Add function to derive AMP key using
+ hmac
+In-Reply-To: <20120713071124.GA2729@aemeltch-MOBL1>
+Message-ID: <alpine.DEB.2.02.1207161339390.2846@mathewm-linux>
+References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1340981212-21709-17-git-send-email-Andrei.Emeltchenko.news@gmail.com> <20120712143029.GA1141@aemeltch-MOBL1> <alpine.DEB.2.02.1207121637410.28444@mathewm-linux>
+ <20120713071124.GA2729@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/supported-features.txt |    1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/doc/supported-features.txt b/doc/supported-features.txt
-index 0510860..91ddd42 100644
---- a/doc/supported-features.txt
-+++ b/doc/supported-features.txt
-@@ -10,6 +10,7 @@ Profile/protocol	Version		Role(s)
- GAP			4.0		(LE) Central, Observer, Broadcaster
- L2CAP			4.0		Server, Client
- SDP			4.0		Server, Client
-+GATT			4.0		Server, Client
- SDAP			1.1		Server, Client
- RFCOMM			1.1		Server, Client
- SPP			1.1		Server, Client
--- 
-1.7.10.4
+Andrei -
 
+On Fri, 13 Jul 2012, Andrei Emeltchenko wrote:
+
+> Hi Mat,
+>
+> On Thu, Jul 12, 2012 at 04:55:35PM -0700, Mat Martineau wrote:
+>>
+>> Andrei -
+>>
+>> On Thu, 12 Jul 2012, Andrei Emeltchenko wrote:
+>>
+>>> Hi Mat,
+>>>
+>>> On Fri, Jun 29, 2012 at 05:46:49PM +0300, Andrei Emeltchenko wrote:
+>>>> From: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+>>>>
+>>>> hmac(sha256) will be used for AMP key generation.
+>>>
+>>> What do you think about this approach for key generation?
+>>
+>> I think it makes a lot of sense to use the synchronous API for
+>> generating the key.  As long as it generates the right key, this
+>> code looks good to me.
+>
+> Thanks for looking at it. Dmitry told me that ahash uses shash internally
+> anyway so there is no change.
+>
+> BTW: Do you have some comment concerning the code?
+
+No comments beyond the sync/async one.  I'm not very familiar with 
+the crypto APIs or AMP key generation.
+
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
