@@ -1,240 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 16 Jul 2012 22:20:18 +0900 (JST)
-Message-Id: <20120716.222018.2029110835026223294.yamato@redhat.com>
-To: andrei.emeltchenko.news@gmail.com
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 1/8] bluetooth: /proc/net/ entries for bluetooth
- protocols
-From: Masatake YAMATO <yamato@redhat.com>
-In-Reply-To: <20120712074200.GA12931@aemeltch-MOBL1>
-References: <20120711112308.GA3044@aemeltch-MOBL1>
-	<20120711.211906.1087916687452547370.yamato@redhat.com>
-	<20120712074200.GA12931@aemeltch-MOBL1>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 18/18 v2] Bluetooth: Introduce a flags variable to Three-wire UART state
+Date: Mon, 16 Jul 2012 16:12:19 +0300
+Message-Id: <1342444339-1627-18-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1342444339-1627-1-git-send-email-johan.hedberg@gmail.com>
+References: <1342444339-1627-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-(I resend this mail becasue I got some troubles in mail sending.
- Andrei, [PATCH v4 [2-8]/8] are the same as [PATCH v3 [2-8]/8]. So
- I send [PATCH v4 1/8] only here. If I should the rest of v4 patches,
- please, let me know that.)
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-lsof command can tell the type of socket processes are using.
-Internal lsof uses inode numbers on socket fs to resolve the type of
-sockets. Files under /proc/net/, such as tcp, udp, unix, etc provides
-such inode information.
+This patch introduces a flags variable to the Three-wire UART state
+struct and converts the two existing bools in the struct into flags.
 
-Unfortunately bluetooth related protocols don't provide such inode
-information. This patch series introduces /proc/net files for the protocols.
-
-This patch against af_bluetooth.c provides facility to the implementation
-of protocols. This patch extends bt_sock_list and introduces two exported
-function bt_procfs_init, bt_procfs_cleanup.
-
-The type bt_sock_list is already used in some of implementation of
-protocols. bt_procfs_init prepare seq_operations which converts
-protocol own bt_sock_list data to protocol own proc entry when the
-entry is accessed.
-
-What I, lsof user, need is just inode number of bluetooth
-socket. However, people may want more information. The bt_procfs_init
-takes a function pointer for customizing the show handler of
-seq_operations.
-
-In v4 patch, __acquires and __releases attributes are added to suppress
-sparse warning. Suggested by Andrei Emeltchenko.
-
-Signed-off-by: Masatake YAMATO <yamato@redhat.com>
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/bluetooth.h |   10 +++
- net/bluetooth/af_bluetooth.c      |  138 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 148 insertions(+)
+ drivers/bluetooth/hci_h5.c |   26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 565d4be..ede0369 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -27,6 +27,7 @@
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index 6f70da5..61d387a 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -58,21 +58,27 @@
+ #define SLIP_ESC_DELIM	0xdc
+ #define SLIP_ESC_ESC	0xdd
  
- #include <linux/poll.h>
- #include <net/sock.h>
-+#include <linux/seq_file.h>
- 
- #ifndef AF_BLUETOOTH
- #define AF_BLUETOOTH	31
-@@ -202,6 +203,10 @@ enum {
- struct bt_sock_list {
- 	struct hlist_head head;
- 	rwlock_t          lock;
-+#ifdef CONFIG_PROC_FS
-+        struct file_operations   fops;
-+        int (* custom_seq_show)(struct seq_file *, void *);
-+#endif
- };
- 
- int  bt_sock_register(int proto, const struct net_proto_family *ops);
-@@ -292,6 +297,11 @@ extern void hci_sock_cleanup(void);
- extern int bt_sysfs_init(void);
- extern void bt_sysfs_cleanup(void);
- 
-+extern int  bt_procfs_init(struct module* module, struct net *net, const char *name,
-+			   struct bt_sock_list* sk_list,
-+			   int (* seq_show)(struct seq_file *, void *));
-+extern void bt_procfs_cleanup(struct net *net, const char *name);
++/* H5 state flags */
++enum {
++	H5_RX_ESC,	/* SLIP escape mode */
++	H5_TX_ACK_REQ,	/* Pending ack to send */
++};
 +
- extern struct dentry *bt_debugfs;
+ struct h5 {
+ 	struct sk_buff_head	unack;		/* Unack'ed packets queue */
+ 	struct sk_buff_head	rel;		/* Reliable packets queue */
+ 	struct sk_buff_head	unrel;		/* Unreliable packets queue */
  
- int l2cap_init(void);
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index f7db579..f76cf2f 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -532,6 +532,144 @@ int bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo)
++	unsigned long		flags;
++
+ 	struct sk_buff		*rx_skb;	/* Receive buffer */
+ 	size_t			rx_pending;	/* Expecting more bytes */
+-	bool			rx_esc;		/* SLIP escape mode */
+ 	u8			rx_ack;		/* Last ack number received */
+ 
+ 	int			(*rx_func) (struct hci_uart *hu, u8 c);
+ 
+ 	struct timer_list	timer;		/* Retransmission timer */
+ 
+-	bool			tx_ack_req;	/* Pending ack to send */
+ 	u8			tx_seq;		/* Next seq number to send */
+ 	u8			tx_ack;		/* Next ack number to send */
+ 	u8			tx_win;		/* Sliding window size */
+@@ -317,7 +323,7 @@ static void h5_complete_rx_pkt(struct hci_uart *hu)
+ 
+ 	if (H5_HDR_RELIABLE(hdr)) {
+ 		h5->tx_ack = (h5->tx_ack + 1) % 8;
+-		h5->tx_ack_req = true;
++		set_bit(H5_TX_ACK_REQ, &h5->flags);
+ 		hci_uart_tx_wakeup(hu);
+ 	}
+ 
+@@ -445,12 +451,12 @@ static void h5_unslip_one_byte(struct h5 *h5, unsigned char c)
+ 	const u8 delim = SLIP_DELIMITER, esc = SLIP_ESC;
+ 	const u8 *byte = &c;
+ 
+-	if (!h5->rx_esc && c == SLIP_ESC) {
+-		h5->rx_esc = true;
++	if (!test_bit(H5_RX_ESC, &h5->flags) && c == SLIP_ESC) {
++		set_bit(H5_RX_ESC, &h5->flags);
+ 		return;
+ 	}
+ 
+-	if (h5->rx_esc) {
++	if (test_and_clear_bit(H5_RX_ESC, &h5->flags)) {
+ 		switch (c) {
+ 		case SLIP_ESC_DELIM:
+ 			byte = &delim;
+@@ -463,8 +469,6 @@ static void h5_unslip_one_byte(struct h5 *h5, unsigned char c)
+ 			h5_reset_rx(h5);
+ 			return;
+ 		}
+-
+-		h5->rx_esc = false;
+ 	}
+ 
+ 	memcpy(skb_put(h5->rx_skb, 1), byte, 1);
+@@ -482,7 +486,7 @@ static void h5_reset_rx(struct h5 *h5)
+ 
+ 	h5->rx_func = h5_rx_delimiter;
+ 	h5->rx_pending = 0;
+-	h5->rx_esc = false;
++	clear_bit(H5_RX_ESC, &h5->flags);
  }
- EXPORT_SYMBOL(bt_sock_wait_state);
  
-+#ifdef CONFIG_PROC_FS
-+struct bt_seq_state {
-+	struct bt_sock_list *l;
-+};
-+
-+static void *bt_seq_start(struct seq_file *seq, loff_t *pos)
-+	__acquires(seq->private->l->lock)
-+{
-+	struct bt_seq_state *s = seq->private;
-+	struct bt_sock_list *l = s->l;
-+
-+	read_lock(&l->lock);
-+	return seq_hlist_start_head(&l->head, *pos);
-+}
-+
-+static void *bt_seq_next(struct seq_file *seq, void *v, loff_t *pos)
-+{
-+	struct bt_seq_state *s = seq->private;
-+	struct bt_sock_list *l = s->l;
-+
-+	return seq_hlist_next(v, &l->head, pos);
-+}
-+
-+static void bt_seq_stop(struct seq_file *seq, void *v)
-+	__releases(seq->private->l->lock)
-+{
-+	struct bt_seq_state *s = seq->private;
-+	struct bt_sock_list *l = s->l;
-+
-+	read_unlock(&l->lock);
-+}
-+
-+static int bt_seq_show(struct seq_file *seq, void *v)
-+{
-+	struct sock *sk;
-+	struct bt_sock *bt;
-+	struct bt_seq_state *s = seq->private;
-+	struct bt_sock_list *l = s->l;
-+	bdaddr_t src_baswapped, dst_baswapped;
-+
-+	if (v == SEQ_START_TOKEN) {
-+		seq_puts(seq ,"sk               RefCnt Rmem   Wmem   User   Inode  Src Dst Parent");
-+
-+		if (l->custom_seq_show) {
-+			seq_putc(seq, ' ');
-+			l->custom_seq_show(seq, v);
-+		}
-+
-+		seq_putc(seq, '\n');
-+	} else {
-+		sk = sk_entry(v);
-+		bt = bt_sk(sk);
-+		baswap(&src_baswapped, &bt->src);
-+		baswap(&dst_baswapped, &bt->dst);
-+
-+		seq_printf(seq, "%pK %-6d %-6u %-6u %-6u %-6lu %pM %pM %-6lu",
-+			   sk,
-+			   atomic_read(&sk->sk_refcnt),
-+			   sk_rmem_alloc_get(sk),
-+			   sk_wmem_alloc_get(sk),
-+			   sock_i_uid(sk),
-+			   sock_i_ino(sk),
-+			   &src_baswapped,
-+			   &dst_baswapped,
-+			   bt->parent? sock_i_ino(bt->parent): 0LU);
-+
-+		if (l->custom_seq_show) {
-+			seq_putc(seq, ' ');
-+			l->custom_seq_show(seq, v);
-+		}
-+
-+		seq_putc(seq, '\n');
-+	}
-+	return 0;
-+}
-+
-+static struct seq_operations bt_seq_ops = {
-+	.start = bt_seq_start,
-+	.next  = bt_seq_next,
-+	.stop  = bt_seq_stop,
-+	.show  = bt_seq_show,
-+};
-+
-+static int bt_seq_open(struct inode *inode, struct file *file)
-+{
-+	struct bt_sock_list *sk_list;
-+	struct bt_seq_state *s;
-+
-+	sk_list = PDE(inode)->data;
-+	s = __seq_open_private(file, &bt_seq_ops,
-+			       sizeof(struct bt_seq_state));
-+	if (s == NULL)
-+		return -ENOMEM;
-+
-+	s->l = sk_list;
-+	return 0;
-+}
-+
-+int bt_procfs_init(struct module* module, struct net *net, const char *name, struct bt_sock_list* sk_list,
-+		   int (* seq_show)(struct seq_file *, void *))
-+{
-+	struct proc_dir_entry * pde;
-+
-+	sk_list->custom_seq_show = seq_show;
-+
-+	sk_list->fops.owner     = module;
-+	sk_list->fops.open      = bt_seq_open;
-+	sk_list->fops.read      = seq_read;
-+	sk_list->fops.llseek    = seq_lseek;
-+	sk_list->fops.release   = seq_release_private;
-+
-+	pde = proc_net_fops_create(net, name, 0, &sk_list->fops);
-+	if (pde == NULL)
-+		return -ENOMEM;
-+
-+	pde->data = sk_list;
-+
-+	return 0;
-+}
-+
-+void bt_procfs_cleanup(struct net *net, const char *name)
-+{
-+	proc_net_remove(net, name);
-+}
-+#else
-+int bt_procfs_init(struct module* module, struct net *net, const char *name, struct bt_sock_list* sk_list,
-+		   int (* seq_show)(struct seq_file *, void *))
-+{
-+	return 0;
-+}
-+
-+void bt_procfs_cleanup(struct net *net, const char *name)
-+{
-+}
-+#endif
-+EXPORT_SYMBOL(bt_procfs_init);
-+EXPORT_SYMBOL(bt_procfs_cleanup);
-+
- static struct net_proto_family bt_sock_family_ops = {
- 	.owner	= THIS_MODULE,
- 	.family	= PF_BLUETOOTH,
+ static int h5_recv(struct hci_uart *hu, void *data, int count)
+@@ -621,7 +625,7 @@ static struct sk_buff *h5_prepare_pkt(struct hci_uart *hu, u8 pkt_type,
+ 	h5_slip_delim(nskb);
+ 
+ 	hdr[0] = h5->tx_ack << 3;
+-	h5->tx_ack_req = false;
++	clear_bit(H5_TX_ACK_REQ, &h5->flags);
+ 
+ 	/* Reliable packet? */
+ 	if (pkt_type == HCI_ACLDATA_PKT || pkt_type == HCI_COMMAND_PKT) {
+@@ -703,7 +707,7 @@ static struct sk_buff *h5_dequeue(struct hci_uart *hu)
+ unlock:
+ 	spin_unlock_irqrestore(&h5->unack.lock, flags);
+ 
+-	if (h5->tx_ack_req)
++	if (test_bit(H5_TX_ACK_REQ, &h5->flags))
+ 		return h5_prepare_pkt(hu, HCI_3WIRE_ACK_PKT, NULL, 0);
+ 
+ 	return NULL;
 -- 
 1.7.10.4
 
