@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 11/18 v2] Bluetooth: Use delayed init for Three-wire UART
-Date: Mon, 16 Jul 2012 16:12:12 +0300
-Message-Id: <1342444339-1627-11-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 10/18 v2] Bluetooth: Add delayed init sequence support for UART controllers
+Date: Mon, 16 Jul 2012 16:12:11 +0300
+Message-Id: <1342444339-1627-10-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1342444339-1627-1-git-send-email-johan.hedberg@gmail.com>
 References: <1342444339-1627-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,35 +11,131 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch takes into use the delayed initialization feature that the
-Bluetooth UART framework provides.
+This patch makes it possible to have UART drivers perform an internal
+initialization before calling hci_register_dev. This allows moving a lot
+of init code from user space (hciattach) to the kernel side, thereby
+creating a more controlled/robust initialization process.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- drivers/bluetooth/hci_h5.c |    3 +++
- 1 file changed, 3 insertions(+)
+ drivers/bluetooth/hci_ldisc.c |   39 ++++++++++++++++++++++++++++++++++++++-
+ drivers/bluetooth/hci_uart.h  |    5 +++++
+ 2 files changed, 43 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 252f364..a668b32 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -138,6 +138,8 @@ static int h5_open(struct hci_uart *hu)
- 	h5->timer.function = h5_timed_event;
- 	h5->timer.data = (unsigned long) hu;
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index b6d1f20..74e0966 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -156,6 +156,35 @@ restart:
+ 	return 0;
+ }
  
-+	set_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags);
++static void hci_uart_init_work(struct work_struct *work)
++{
++	struct hci_uart *hu = container_of(work, struct hci_uart, init_ready);
++	int err;
 +
- 	/* Send initial sync request */
- 	h5_link_control(hu, sync, sizeof(sync));
- 	mod_timer(&h5->timer, jiffies + H5_SYNC_TIMEOUT);
-@@ -229,6 +231,7 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
- 		h5_link_control(hu, conf_req, 3);
- 	} else if (memcmp(data, conf_rsp, 2) == 0) {
- 		BT_DBG("Three-wire init sequence complete");
-+		hci_uart_init_ready(hu);
- 		return;
- 	} else {
- 		BT_DBG("Link Control: 0x%02hhx 0x%02hhx", data[0], data[1]);
++	if (!test_and_clear_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags))
++		return;
++
++	err = hci_register_dev(hu->hdev);
++	if (err < 0) {
++		BT_ERR("Can't register HCI device");
++		hci_free_dev(hu->hdev);
++		hu->hdev = NULL;
++		hu->proto->close(hu);
++	}
++
++	set_bit(HCI_UART_REGISTERED, &hu->flags);
++}
++
++int hci_uart_init_ready(struct hci_uart *hu)
++{
++	if (!test_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags))
++		return -EALREADY;
++
++	schedule_work(&hu->init_ready);
++
++	return 0;
++}
++
+ /* ------- Interface to HCI layer ------ */
+ /* Initialize device */
+ static int hci_uart_open(struct hci_dev *hdev)
+@@ -264,6 +293,8 @@ static int hci_uart_tty_open(struct tty_struct *tty)
+ 	hu->tty = tty;
+ 	tty->receive_room = 65536;
+ 
++	INIT_WORK(&hu->init_ready, hci_uart_init_work);
++
+ 	spin_lock_init(&hu->rx_lock);
+ 
+ 	/* Flush any pending characters in the driver and line discipline. */
+@@ -302,7 +333,8 @@ static void hci_uart_tty_close(struct tty_struct *tty)
+ 
+ 	if (test_and_clear_bit(HCI_UART_PROTO_SET, &hu->flags)) {
+ 		if (hdev) {
+-			hci_unregister_dev(hdev);
++			if (test_bit(HCI_UART_REGISTERED, &hu->flags))
++				hci_unregister_dev(hdev);
+ 			hci_free_dev(hdev);
+ 		}
+ 		hu->proto->close(hu);
+@@ -402,12 +434,17 @@ static int hci_uart_register_dev(struct hci_uart *hu)
+ 	else
+ 		hdev->dev_type = HCI_BREDR;
+ 
++	if (test_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags))
++		return 0;
++
+ 	if (hci_register_dev(hdev) < 0) {
+ 		BT_ERR("Can't register HCI device");
+ 		hci_free_dev(hdev);
+ 		return -ENODEV;
+ 	}
+ 
++	set_bit(HCI_UART_REGISTERED, &hu->flags);
++
+ 	return 0;
+ }
+ 
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index aaf9d7d..fffa61f 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -47,6 +47,7 @@
+ #define HCI_UART_RAW_DEVICE	0
+ #define HCI_UART_RESET_ON_INIT	1
+ #define HCI_UART_CREATE_AMP	2
++#define HCI_UART_INIT_PENDING	3
+ 
+ struct hci_uart;
+ 
+@@ -66,6 +67,8 @@ struct hci_uart {
+ 	unsigned long		flags;
+ 	unsigned long		hdev_flags;
+ 
++	struct work_struct	init_ready;
++
+ 	struct hci_uart_proto	*proto;
+ 	void			*priv;
+ 
+@@ -76,6 +79,7 @@ struct hci_uart {
+ 
+ /* HCI_UART proto flag bits */
+ #define HCI_UART_PROTO_SET	0
++#define HCI_UART_REGISTERED	1
+ 
+ /* TX states  */
+ #define HCI_UART_SENDING	1
+@@ -84,6 +88,7 @@ struct hci_uart {
+ int hci_uart_register_proto(struct hci_uart_proto *p);
+ int hci_uart_unregister_proto(struct hci_uart_proto *p);
+ int hci_uart_tx_wakeup(struct hci_uart *hu);
++int hci_uart_init_ready(struct hci_uart *hu);
+ 
+ #ifdef CONFIG_BT_HCIUART_H4
+ int h4_init(void);
 -- 
 1.7.10.4
 
