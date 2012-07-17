@@ -1,90 +1,176 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v13 00/14] Add org.bluez.Telephony interface
-Date: Tue, 17 Jul 2012 15:40:26 +0200
-Message-Id: <1342532440-730-1-git-send-email-frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1341913055-19754-1-git-send-email-vani.patel@stericsson.com>
+References: <1341913055-19754-1-git-send-email-vani.patel@stericsson.com>
+Date: Tue, 17 Jul 2012 14:55:42 +0300
+Message-ID: <CABBYNZKAVFrZumVP+EyUR6=k9vAzp3T43-8u+Gevzg4d-5q64w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 5/5] AVRCP: Add handler for browsing pdu
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vani-dineshbhai PATEL <vani.patel@stericsson.com>
+Cc: User Name <linux-bluetooth@vger.kernel.org>,
+	Lucas De Marchi <lucas.demarchi@profusion.mobi>,
+	Joohi <Joohi.rastogi@stericsson.com>, Vani <vani273@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Vani,
 
-This set of patches replaces telephony drivers for HeadSet, HandsFree,
-DUN and SAP Profiles by a new DBus interface (org.bluez.Telephony).
+On Tue, Jul 10, 2012 at 12:37 PM, Vani-dineshbhai PATEL
+<vani.patel@stericsson.com> wrote:
+> +void avctp_send_browsing(struct avctp *session, uint8_t transaction,
+> +                                       uint8_t *operands, size_t operand_count)
+> +{
+> +       struct avctp_header *avctp_header;
+> +       uint8_t *buf;
+> +       uint16_t length = 0;
+> +       int sock;
+> +
+> +       length = AVCTP_HEADER_LENGTH + operand_count;
+> +       buf = g_malloc0(length);
+> +
+> +       avctp_header = (void *) buf;
+> +
+> +       avctp_header->cr = AVCTP_RESPONSE;
+> +       avctp_header->ipid = FALSE;
+> +       avctp_header->packet_type = AVCTP_PACKET_SINGLE;
+> +       avctp_header->pid = htons(AV_REMOTE_PROFILE_ID);
+> +       avctp_header->transaction = transaction;
+> +
+> +       memcpy(&buf[AVCTP_HEADER_LENGTH], operands,
+> +                                                       operand_count);
+> +
+> +       sock = g_io_channel_unix_get_fd(session->browsing_io);
+> +       if (write(sock, buf, length) < 0)
+> +               DBG("Write failed\n");
+> +}
 
-This will simplify BlueZ code by focusing on the Bluetooth
-communication part and by letting the external application (i.e. oFono)
-take charge of the Telephony tasks (AT parsing and modem specific code,
-which can be removed from BlueZ code). So, it becomes simpler, easier
-to maintain and debug.
+We can probably avoid using memcpy by using sendmsg, actually we
+should do this for avctp_send as well.
 
-External applications, which should implement AT parsing and telephony
-part of HeadSet or HandsFree Profiles, will have to register a telephony
-agent using this new interface.
+> +static struct pdu_browsing_handler {
+> +       uint8_t browsing_pdu;
+> +       void (*func) (struct avrcp_player *player,
+> +                                       struct avrcp_browsing_header *pdu);
+> +       } browsing_handlers[] = {
+> +               {},
+> +};
 
-Any comments appreciated.
+What is the reason to have an empty array here? Is this just a place
+holder for upcoming patches?
 
-Regards
+> +static void handle_browsing_pdu(struct avctp *session, uint8_t transaction,
+> +                                       uint8_t *operands, size_t operand_count,
+> +                                       void *user_data)
+> +{
+> +       struct avrcp_player *player = user_data;
+> +       struct pdu_browsing_handler *b_handler;
+> +       struct avrcp_browsing_header *avrcp_browsing = (void *) operands;
+> +       uint8_t status, length;
+> +
+> +       if ((avrcp_browsing->browsing_pdu != AVRCP_SET_BROWSED_PLAYER) &&
+> +                       (avrcp_browsing->browsing_pdu != AVRCP_GET_FOLDER_ITEMS) &&
+> +                       (avrcp_browsing->browsing_pdu != AVRCP_CHANGE_PATH) &&
+> +                       (avrcp_browsing->browsing_pdu != AVRCP_GET_ITEM_ATTRIBUTES)) {
+> +
+> +               avrcp_browsing->browsing_pdu = AVRCP_GENERAL_REJECT;
+> +               status = AVRCP_STATUS_INVALID_COMMAND;
+> +               goto err;
+> +       }
 
-PS: Since latest RFC:
-- Add new first patch introducing telephony interface documents
-- Patch 14:
-  - Remove FastConnectable option for Telephony in audio.conf
-  - Do not force fast connectable mode on adapter registration
-  - Reset adapter fast connectable mode to false if:
-    - there is no more agent for this adapter
-    - and it has been set to fast connectable mode
+This is over 80 columns and is inefficient since you are doing
+basically the same bellow.
 
-Frédéric Danis (14):
-  doc: Add telephony interface documents
-  audio: Move telephony drivers to D-Bus interface
-  audio: Simplify org.bluez.Headset
-  audio: Remove dummy telephony driver
-  audio: Remove maemo5 telephony driver
-  audio: Remove maemo6 telephony driver
-  audio: Remove oFono telephony driver
-  audio: Move HFP/HSP AG servers to telephony.c
-  audio: Send transport path to telephony agent
-  audio: Move HFP HF server to telephony.c
-  audio: Replace headset and gateway by telephony
-  audio: Add DUN GW to org.bluez.Telephony
-  audio: Add SAP GW to org.bluez.Telephony
-  audio: Add fast connectable to telephony interface
+> +       for (b_handler = browsing_handlers; b_handler; b_handler++) {
+> +               if (b_handler->browsing_pdu == avrcp_browsing->browsing_pdu)
+> +                       break;
+> +       }
+> +
 
- Makefile.am                    |   19 +-
- audio/audio.conf               |   15 +-
- audio/device.h                 |    1 +
- audio/gateway.c                |  403 ++------
- audio/gateway.h                |    8 +
- audio/headset.c                | 1813 ++++-----------------------------
- audio/headset.h                |   16 +-
- audio/manager.c                |  716 +------------
- audio/manager.h                |    8 +-
- audio/media.c                  |   34 +
- audio/telephony-dummy.c        |  447 --------
- audio/telephony-maemo5.c       | 2105 --------------------------------------
- audio/telephony-maemo6.c       | 2200 ----------------------------------------
- audio/telephony-ofono.c        | 1637 ------------------------------
- audio/telephony.c              | 1639 ++++++++++++++++++++++++++++++
- audio/telephony.h              |  196 +---
- audio/transport.c              |  117 ++-
- doc/assigned-numbers.txt       |    2 +
- doc/audio-api.txt              |  235 ++---
- doc/audio-telephony-design.txt |  106 ++
- doc/hfp-api.txt                |   46 -
- doc/media-api.txt              |   19 +-
- 22 files changed, 2346 insertions(+), 9436 deletions(-)
- delete mode 100644 audio/telephony-dummy.c
- delete mode 100644 audio/telephony-maemo5.c
- delete mode 100644 audio/telephony-maemo6.c
- delete mode 100644 audio/telephony-ofono.c
- create mode 100644 audio/telephony.c
- create mode 100644 doc/audio-telephony-design.txt
+Where you should do the check if an handler was found e.g:
+
+if (b_handler == NULL) {
+        avrcp_browsing->browsing_pdu = AVRCP_GENERAL_REJECT;
+        status = AVRCP_STATUS_INVALID_COMMAND;
+        goto err;
+}
+
+> +       if (!b_handler->func) {
+> +               status = AVRCP_STATUS_INVALID_PARAM;
+> +               goto err;
+> +       }
+> +
+> +       player->transaction = transaction;
+> +       b_handler->func(player, avrcp_browsing);
+> +       return;
+> +
+> +err:
+> +       avrcp_browsing->param_len = htons(sizeof(status));
+> +       length = AVRCP_BROWSING_HEADER_LENGTH + sizeof(status);
+> +       memcpy(&operands[AVRCP_BROWSING_HEADER_LENGTH], &status,
+> +                                               sizeof(status));
+> +       avctp_send_browsing(session, player->transaction, operands,
+> +                                                                       length);
+
+If you gonna response immediately it is better to return the packet
+size an write from the session_cb as done for control pdus, if nothing
+should be written because the response will be asynchronous we can
+just have it the handler return 0 and handle that in session_cb as no
+response.
+
+> +}
+> +
+>  size_t avrcp_handle_vendor_reject(uint8_t *code, uint8_t *operands)
+>  {
+>         struct avrcp_header *pdu = (void *) operands;
+> @@ -1233,6 +1299,11 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
+>                         avctp_unregister_pdu_handler(player->control_handler);
+>                         player->control_handler = 0;
+>                 }
+> +               if (player->browsing_handler) {
+> +                       avctp_unregister_browsing_pdu_handler(
+> +                                               player->browsing_handler);
+> +                       player->browsing_handler = 0;
+> +               }
+
+The indentation above looks wrong, add a empty line before the if
+statement, avctp_unregister_browsing_pdu_handler too long name.
+
+>                 break;
+>         case AVCTP_STATE_CONNECTING:
+> @@ -1244,6 +1315,12 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
+>                                                         AVC_OP_VENDORDEP,
+>                                                         handle_vendordep_pdu,
+>                                                         player);
+> +               if (!player->browsing_handler)
+> +                       player->browsing_handler =
+> +                                       avctp_register_browsing_pdu_handler(
+> +                                                       handle_browsing_pdu,
+> +                                                       player);
+> +
+
+avctp_register_browsing_pdu_handler is also too long, in fact this is
+another that we should probably just reuse avctp_register_pdu_handler
+and maybe create an opcode for browsing just so that it be can
+registered using avctp_register_pdu_handler.
+
+>                 break;
+>         case AVCTP_STATE_CONNECTED:
+>                 rec = btd_device_get_record(dev->btd_dev, AVRCP_TARGET_UUID);
+> diff --git a/audio/avrcp.h b/audio/avrcp.h
+> index bf11a6c..7e2f018 100644
+> --- a/audio/avrcp.h
+> +++ b/audio/avrcp.h
+> @@ -75,6 +75,8 @@
+>  #define AVRCP_EVENT_TRACK_REACHED_START        0x04
+>  #define AVRCP_EVENT_VOLUME_CHANGED     0x0d
+>  #define AVRCP_EVENT_LAST               AVRCP_EVENT_VOLUME_CHANGED
+> +struct avrcp_browsing_header;
+> +#define AVRCP_BROWSING_HEADER_LENGTH 3
+
+This is probably not necessary as the header should only be needed
+inside avrcp.c you don't need to make it public.
+
 
 -- 
-1.7.9.5
-
+Luiz Augusto von Dentz
