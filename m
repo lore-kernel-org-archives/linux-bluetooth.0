@@ -1,56 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: Chen Ganir <chen.ganir@ti.com>
+From: <ramm@ti.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH 0/9] Add GATT Client Battery Service
-Date: Tue, 17 Jul 2012 16:59:45 +0300
-Message-ID: <1342533594-10413-1-git-send-email-chen.ganir@ti.com>
+CC: Ram Malovany <ramm@ti.com>
+Subject: [PATCH] Bluetooth: Device Scan and connection collision fix
+Date: Tue, 17 Jul 2012 16:52:06 +0300
+Message-ID: <1342533126-23175-1-git-send-email-ramm@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add suupport for LE GATT Client Battery Service.
+From: Ram Malovany <ramm@ti.com>
 
-This plugin adds battery list to the btd_device, exposes DBUS API to list the
-device batteries, and allows querying for battery information. In addition this
-patch allows getting notifications for battery level changes.
+During search of devices, HCI Remote Name Request Command is sent for
+every device which name was not included in inquiry result. But the
+same command is also sent during incoming connection establishing
+procedure. Function hci_check_pending_name() was fixed in order to
+handle this situation which led to a kernel crash when initiating
+an incoming connection from a device that was not found in the
+inquiry while doing a search. There is no need to continue resolving
+the next name if we get the request from the incoming connection
+procedure as it will be done upon receiving another remote name
+request complete event
 
-Look at doc/device-api.txt and doc/battery-api.txt for more information.
+Signed-off-by: Ram Malovany <ramm@ti.com>
+---
+ net/bluetooth/hci_event.c |   16 ++++++++++++----
+ 1 files changed, 12 insertions(+), 4 deletions(-)
 
-This patch set is based on a patch set sent a few weeks ago, and it is now 
-rebased on top of the latest sources, and fixes some issues found during 
-testing.
-
-Chen Ganir (9):
-  Battery: Add Battery Service GATT Client
-  Battery: Add connection logic
-  Battery: Discover Characteristic Descriptors
-  Battery: Get Battery ID
-  Battery: Add Battery list to btd_device
-  Battery: Add Battery D-BUS API
-  Battery: Read Battery level characteristic
-  Battery: Add support for notifications
-  Battery: Emit property changed on first read
-
- Makefile.am                          |   10 +-
- doc/battery-api.txt                  |   38 +++
- doc/device-api.txt                   |    5 +
- profiles/batterystate/batterystate.c |  518 ++++++++++++++++++++++++++++++++++
- profiles/batterystate/batterystate.h |   24 ++
- profiles/batterystate/main.c         |   67 +++++
- profiles/batterystate/manager.c      |   93 ++++++
- profiles/batterystate/manager.h      |   24 ++
- src/device.c                         |   66 +++++
- src/device.h                         |    3 +
- 10 files changed, 846 insertions(+), 2 deletions(-)
- create mode 100644 doc/battery-api.txt
- create mode 100644 profiles/batterystate/batterystate.c
- create mode 100644 profiles/batterystate/batterystate.h
- create mode 100644 profiles/batterystate/main.c
- create mode 100644 profiles/batterystate/manager.c
- create mode 100644 profiles/batterystate/manager.h
-
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 41ff978..654b170 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1365,7 +1365,7 @@ static bool hci_resolve_next_name(struct hci_dev *hdev)
+ 		return false;
+ 
+ 	e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY, NAME_NEEDED);
+-	if (hci_resolve_name(hdev, e) == 0) {
++	if (e && hci_resolve_name(hdev, e) == 0) {
+ 		e->name_state = NAME_PENDING;
+ 		return true;
+ 	}
+@@ -1379,6 +1379,9 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
+ 	struct discovery_state *discov = &hdev->discovery;
+ 	struct inquiry_entry *e;
+ 
++	BT_DBG("name %p, name_len %d, discov->state %d",
++			name, name_len, discov->state);
++
+ 	if (conn && !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
+ 		mgmt_device_connected(hdev, bdaddr, ACL_LINK, 0x00, 0, name,
+ 				      name_len, conn->dev_class);
+@@ -1394,11 +1397,16 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
+ 
+ 	e = hci_inquiry_cache_lookup_resolve(hdev, bdaddr, NAME_PENDING);
+ 	if (e) {
+-		e->name_state = NAME_KNOWN;
+ 		list_del(&e->list);
+-		if (name)
++		if (name) {
++			e->name_state = NAME_KNOWN;
+ 			mgmt_remote_name(hdev, bdaddr, ACL_LINK, 0x00,
+ 					 e->data.rssi, name, name_len);
++		} else {
++			e->name_state = NAME_NOT_KNOWN;
++		}
++	} else {
++	     return;
+ 	}
+ 
+ 	if (hci_resolve_next_name(hdev))
+@@ -1996,7 +2004,7 @@ static void hci_remote_name_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	struct hci_ev_remote_name *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+ 
+-	BT_DBG("%s", hdev->name);
++	BT_DBG("%s, status %d", hdev->name, ev->status);
+ 
+ 	hci_conn_check_pending(hdev);
+ 
 -- 
-1.7.9.5
+1.7.4.1
 
