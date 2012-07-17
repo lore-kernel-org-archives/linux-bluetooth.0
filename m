@@ -1,35 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 17 Jul 2012 11:08:17 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
-	<frederic.danis@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v12 01/13] audio: Move telephony drivers to D-Bus
- interface
-Message-ID: <20120717080817.GA368@x220>
-References: <1342090438-20434-1-git-send-email-frederic.danis@linux.intel.com>
- <1342090438-20434-2-git-send-email-frederic.danis@linux.intel.com>
+From: <ramm@ti.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Ram Malovany <ramm@ti.com>
+Subject: [PATCH] Bluetooth: Fix for double free of st buffer.
+Date: Tue, 17 Jul 2012 10:49:30 +0300
+Message-ID: <1342511370-26470-1-git-send-email-ramm@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1342090438-20434-2-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+From: Ram Malovany <ramm@ti.com>
 
-On Thu, Jul 12, 2012, Frédéric Danis wrote:
->  Makefile.am                    |   16 +-
->  audio/headset.c                |  676 +++-------------------------------------
->  audio/headset.h                |    3 +
->  audio/manager.c                |   13 +-
->  audio/telephony.c              |  595 +++++++++++++++++++++++++++++++++++
->  audio/telephony.h              |   25 +-
->  doc/assigned-numbers.txt       |    1 +
->  doc/audio-api.txt              |   90 ++++++
->  doc/audio-telephony-design.txt |  106 +++++++
+When the Shared Transport line discipline driver (st_core) get data it
+pushes the skb received to the relevant protocol stacks , it then
+excepts that the relevant protocol stacks should handle the buffer ,
+and if it cannot then the stack should respond with an error.
+In our case the Bluetooth driver for shared transport (btwilink) should
+always be able to handle the buffer , in case of an error it will
+release it , thus we always should return 0.
 
-Could you split the doc changes into its own patch? You'll need to fix
-that part anyway due to the addition of doc/supported-features which
-conflicts with your Makefile.am changes.
+Signed-off-by: Ram Malovany <ramm@ti.com>
+---
+ drivers/bluetooth/btwilink.c |   12 ++++++++----
+ 1 files changed, 8 insertions(+), 4 deletions(-)
 
-Johan
+diff --git a/drivers/bluetooth/btwilink.c b/drivers/bluetooth/btwilink.c
+index 8869469..1f60d84 100644
+--- a/drivers/bluetooth/btwilink.c
++++ b/drivers/bluetooth/btwilink.c
+@@ -94,18 +94,22 @@ static void st_reg_completion_cb(void *priv_data, char data)
+ }
+ 
+ /* Called by Shared Transport layer when receive data is
+- * available */
++ * available
++ * Return:
++ * 0 if buffer handled (affectivly allways even if error found)
++ * if return !=0 the buffer will be freed by the st
++ */
+ static long st_receive(void *priv_data, struct sk_buff *skb)
+ {
+ 	struct ti_st *lhst = priv_data;
+ 	int err;
+ 
+ 	if (!skb)
+-		return -EFAULT;
++		return 0;
+ 
+ 	if (!lhst) {
+ 		kfree_skb(skb);
+-		return -EFAULT;
++		return 0;
+ 	}
+ 
+ 	skb->dev = (void *) lhst->hdev;
+@@ -114,7 +118,7 @@ static long st_receive(void *priv_data, struct sk_buff *skb)
+ 	err = hci_recv_frame(skb);
+ 	if (err < 0) {
+ 		BT_ERR("Unable to push skb to HCI core(%d)", err);
+-		return err;
++		return 0;
+ 	}
+ 
+ 	lhst->hdev->stat.byte_rx += skb->len;
+-- 
+1.7.4.1
+
