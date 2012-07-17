@@ -1,56 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 17 Jul 2012 11:44:17 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC BlueZ] mgmt-api: Broadcaster/Observer management API
-Message-ID: <20120717084417.GA1097@x220>
-References: <1342038888-10102-1-git-send-email-anderson.lizardo@openbossa.org>
- <1342038888-10102-2-git-send-email-anderson.lizardo@openbossa.org>
+Message-ID: <500520EA.3070804@linux.intel.com>
+Date: Tue, 17 Jul 2012 10:23:06 +0200
+From: Frederic Danis <frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1342038888-10102-2-git-send-email-anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v12 13/13] audio: Add fast connectable to telephony interface
+References: <1342090438-20434-1-git-send-email-frederic.danis@linux.intel.com> <1342090438-20434-14-git-send-email-frederic.danis@linux.intel.com> <20120717081021.GB368@x220>
+In-Reply-To: <20120717081021.GB368@x220>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hello Johan,
 
-On Wed, Jul 11, 2012, Anderson Lizardo wrote:
-> +Set Controller Data Command
-> +===========================
-> +
-> +	Command Code:		0x002B
-> +	Controller Index:	<controller id>
-> +	Command Parameters:	Flags (1 Octet)
-> +				Data_Type (1 Octet)
-> +				Data_Length (1 Octet)
-> +				Data (0-255 Octets)
-> +	Return Parameters:
-> +
+On 17/07/2012 10:10, Johan Hedberg wrote:
+> Hi Frédéric,
+>
+> On Thu, Jul 12, 2012, Frédéric Danis wrote:
+>> +# Telephony interface specific options (i.e. options which affect how the
+>> +# service interacts with remote devices)
+>> +[Telephony]
+>> +
+>> +# Set to true to enable agent to use of fast connectable mode (faster page
+>> +# scanning) when incoming call starts. Default settings should be restored
+>> +# after call is answered or rejected. Page scan interval is much shorter and
+>> +# page scan type changed to interlaced. Such allows faster connection
+>> +# initiated by a headset.
+>> +FastConnectable=false
+>
+> I don't really see the point of making this configurable and add extra
+> code complexity because of it. There should be no reason why it couldn't
+> always be available to the telephony agent. So unless you have a really
+> good reason for keeping it could you please remove it.
+>
+OK, I will remove it
 
-The return parameters should include the Flags and Data_Type so that
-user space can distinguish which Set Controller Data command completed
-or failed (in the case of multiple pending commands). Same goes for the
-Remove Controller Data command.
+Fred
 
-> +	This command can be used to set AD for LE capable controllers or EIR
-> +	for BR/EDR controllers. Multiple AD/EIR types can be configured by
-> +	calling this command multiple times. If the data does not fit on a
-> +	single AD/EIR on the controller, it will be rotated based on the "High
-> +	priority" flag, so data with this flag set will stay longer over the
-> +	air than those with this flag cleared.
 
-I'm still struggling to see the usefulness or even the feasibility of a
-meaningful rotation of data. Is there actually some place in the core
-spec that implies or recommends that this be done? More importantly, is
-there some place that states that the content of multiple different AD
-packets from the same remote device should be considered in an
-aggregated manner instead of considering each of them as a
-unique/complete state of the remote device? If there's no such mention
-there's nothing stopping devices from using the latter interpretation
-and in such a case any kind of rotation could mess things up. Also the
-fact that there exists short/incomplete variants of many AD types
-(UUIDs, device name) seems to indicate that if any kind of compromising
-mechanism should be used when trying to fit data, this is it.
+-- 
+Frederic Danis                            Open Source Technology Center
+frederic.danis@intel.com                              Intel Corporation
 
-Johan
+
+
