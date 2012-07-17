@@ -1,44 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 17 Jul 2012 11:44:17 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC BlueZ] mgmt-api: Broadcaster/Observer management API
+Message-ID: <20120717084417.GA1097@x220>
+References: <1342038888-10102-1-git-send-email-anderson.lizardo@openbossa.org>
+ <1342038888-10102-2-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
-In-Reply-To: <1341912856-27192-1-git-send-email-vani.patel@stericsson.com>
-References: <1341912856-27192-1-git-send-email-vani.patel@stericsson.com>
-Date: Tue, 17 Jul 2012 11:44:39 +0300
-Message-ID: <CABBYNZ+n91nT8tZ1ceBsAc_i76T0iT6bfLWp00n25Scrumptdg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/5] AVRCP: Rename variables used for control
- channel to improve redability
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Vani-dineshbhai PATEL <vani.patel@stericsson.com>
-Cc: User Name <linux-bluetooth@vger.kernel.org>,
-	Lucas De Marchi <lucas.demarchi@profusion.mobi>,
-	Joohi <Joohi.rastogi@stericsson.com>, Vani <vani273@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1342038888-10102-2-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vani,
+Hi Lizardo,
 
-On Tue, Jul 10, 2012 at 12:34 PM, Vani-dineshbhai PATEL
-<vani.patel@stericsson.com> wrote:
-> -typedef size_t (*avctp_pdu_cb) (struct avctp *session, uint8_t transaction,
-> +typedef size_t (*avctp_control_pdu_cb) (struct avctp *session,
-> +                                       uint8_t transaction,
->                                         uint8_t *code, uint8_t *subunit,
->                                         uint8_t *operands, size_t operand_count,
->                                         void *user_data);
+On Wed, Jul 11, 2012, Anderson Lizardo wrote:
+> +Set Controller Data Command
+> +===========================
+> +
+> +	Command Code:		0x002B
+> +	Controller Index:	<controller id>
+> +	Command Parameters:	Flags (1 Octet)
+> +				Data_Type (1 Octet)
+> +				Data_Length (1 Octet)
+> +				Data (0-255 Octets)
+> +	Return Parameters:
+> +
 
-Do you really need to change this, does the callback need to be
-different for browsing?
+The return parameters should include the Flags and Data_Type so that
+user space can distinguish which Set Controller Data command completed
+or failed (in the case of multiple pending commands). Same goes for the
+Remove Controller Data command.
 
-> @@ -93,7 +94,7 @@ struct avctp *avctp_connect(const bdaddr_t *src, const bdaddr_t *dst);
->  struct avctp *avctp_get(const bdaddr_t *src, const bdaddr_t *dst);
->  void avctp_disconnect(struct avctp *session);
->
-> -unsigned int avctp_register_pdu_handler(uint8_t opcode, avctp_pdu_cb cb,
-> +unsigned int avctp_register_pdu_handler(uint8_t opcode, avctp_control_pdu_cb cb,
->                                                         void *user_data);
+> +	This command can be used to set AD for LE capable controllers or EIR
+> +	for BR/EDR controllers. Multiple AD/EIR types can be configured by
+> +	calling this command multiple times. If the data does not fit on a
+> +	single AD/EIR on the controller, it will be rotated based on the "High
+> +	priority" flag, so data with this flag set will stay longer over the
+> +	air than those with this flag cleared.
 
-Same here, if we can keep the callback then we just need a single
-function to register, internally we can add to different list.
+I'm still struggling to see the usefulness or even the feasibility of a
+meaningful rotation of data. Is there actually some place in the core
+spec that implies or recommends that this be done? More importantly, is
+there some place that states that the content of multiple different AD
+packets from the same remote device should be considered in an
+aggregated manner instead of considering each of them as a
+unique/complete state of the remote device? If there's no such mention
+there's nothing stopping devices from using the latter interpretation
+and in such a case any kind of rotation could mess things up. Also the
+fact that there exists short/incomplete variants of many AD types
+(UUIDs, device name) seems to indicate that if any kind of compromising
+mechanism should be used when trying to fit data, this is it.
 
--- 
-Luiz Augusto von Dentz
+Johan
