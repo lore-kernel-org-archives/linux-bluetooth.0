@@ -1,44 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50052093.4080009@linux.intel.com>
-Date: Tue, 17 Jul 2012 10:21:39 +0200
-From: Frederic Danis <frederic.danis@linux.intel.com>
+Date: Tue, 17 Jul 2012 11:10:21 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
+	<frederic.danis@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v12 13/13] audio: Add fast connectable to telephony
+ interface
+Message-ID: <20120717081021.GB368@x220>
+References: <1342090438-20434-1-git-send-email-frederic.danis@linux.intel.com>
+ <1342090438-20434-14-git-send-email-frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v12 01/13] audio: Move telephony drivers to D-Bus interface
-References: <1342090438-20434-1-git-send-email-frederic.danis@linux.intel.com> <1342090438-20434-2-git-send-email-frederic.danis@linux.intel.com> <20120717080817.GA368@x220>
-In-Reply-To: <20120717080817.GA368@x220>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1342090438-20434-14-git-send-email-frederic.danis@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Johan,
+Hi Frédéric,
 
-On 17/07/2012 10:08, Johan Hedberg wrote:
-> Hi Frédéric,
->
-> On Thu, Jul 12, 2012, Frédéric Danis wrote:
->>   Makefile.am                    |   16 +-
->>   audio/headset.c                |  676 +++-------------------------------------
->>   audio/headset.h                |    3 +
->>   audio/manager.c                |   13 +-
->>   audio/telephony.c              |  595 +++++++++++++++++++++++++++++++++++
->>   audio/telephony.h              |   25 +-
->>   doc/assigned-numbers.txt       |    1 +
->>   doc/audio-api.txt              |   90 ++++++
->>   doc/audio-telephony-design.txt |  106 +++++++
->
-> Could you split the doc changes into its own patch? You'll need to fix
-> that part anyway due to the addition of doc/supported-features which
-> conflicts with your Makefile.am changes.
->
-I will do this
+On Thu, Jul 12, 2012, Frédéric Danis wrote:
+> +# Telephony interface specific options (i.e. options which affect how the
+> +# service interacts with remote devices)
+> +[Telephony]
+> +
+> +# Set to true to enable agent to use of fast connectable mode (faster page
+> +# scanning) when incoming call starts. Default settings should be restored
+> +# after call is answered or rejected. Page scan interval is much shorter and
+> +# page scan type changed to interlaced. Such allows faster connection
+> +# initiated by a headset.
+> +FastConnectable=false
 
-Fred
+I don't really see the point of making this configurable and add extra
+code complexity because of it. There should be no reason why it couldn't
+always be available to the telephony agent. So unless you have a really
+good reason for keeping it could you please remove it.
 
-
--- 
-Frederic Danis                            Open Source Technology Center
-frederic.danis@intel.com                              Intel Corporation
-
-
-
+Johan
