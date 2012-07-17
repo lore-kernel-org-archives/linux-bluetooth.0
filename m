@@ -1,53 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 17 Jul 2012 15:06:58 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: victor yeo <victoryeo1974@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: HCI Remote Name Request error "Page Timeout"
-Message-ID: <20120717180556.GB19582@joana>
-References: <CADX0rsZBLixOvNLhpoSH6PuP3m8LWP6w6CkDKB+cvhBAnwyT0g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CADX0rsZBLixOvNLhpoSH6PuP3m8LWP6w6CkDKB+cvhBAnwyT0g@mail.gmail.com>
+In-Reply-To: <20120717084417.GA1097@x220>
+References: <1342038888-10102-1-git-send-email-anderson.lizardo@openbossa.org>
+	<1342038888-10102-2-git-send-email-anderson.lizardo@openbossa.org>
+	<20120717084417.GA1097@x220>
+Date: Tue, 17 Jul 2012 13:58:45 -0400
+Message-ID: <CAJdJm_Mu364Y_xKL-nnDDnsaj6n3pvxf4APFAgDNtP5Zfqyq2A@mail.gmail.com>
+Subject: Re: [RFC BlueZ] mgmt-api: Broadcaster/Observer management API
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Victor,
+Hi Johan,
 
-* victor yeo <victoryeo1974@gmail.com> [2012-07-17 17:34:32 +0800]:
+On Tue, Jul 17, 2012 at 4:44 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Lizardo,
+>
+> On Wed, Jul 11, 2012, Anderson Lizardo wrote:
+>> +Set Controller Data Command
+>> +===========================
+>> +
+>> +     Command Code:           0x002B
+>> +     Controller Index:       <controller id>
+>> +     Command Parameters:     Flags (1 Octet)
+>> +                             Data_Type (1 Octet)
+>> +                             Data_Length (1 Octet)
+>> +                             Data (0-255 Octets)
+>> +     Return Parameters:
+>> +
+>
+> The return parameters should include the Flags and Data_Type so that
+> user space can distinguish which Set Controller Data command completed
+> or failed (in the case of multiple pending commands). Same goes for the
+> Remove Controller Data command.
 
-> Hi,
-> 
-> The hcidump program shows a remote name request "Page Timeout" error.
-> I do not understand the reason. The Bluez stack requests for remote
-> name, the device replied with 'Nonin_Medical_Inc._359443' twice, Then
-> Bluez stack requests again, got "Page Timeout" error, and connection
-> stops. What is the reason of this behavior?
-> 
-> Thanks,
-> Victor
-> 
-> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
->     bdaddr 00:1C:05:00:70:44 mode 2 clkoffset 0x0000
-> > HCI Event: Command Status (0x0f) plen 4
->     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> > HCI Event: Remote Name Req Complete (0x07) plen 255
->     status 0x00 bdaddr 00:1C:05:00:70:44 name 'Nonin_Medical_Inc._359443'
-> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
->     bdaddr 00:1C:05:00:70:44 mode 2 clkoffset 0x0000
-> > HCI Event: Command Status (0x0f) plen 4
->     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> > HCI Event: Remote Name Req Complete (0x07) plen 255
->     status 0x00 bdaddr 00:1C:05:00:70:44 name 'Nonin_Medical_Inc._359443'
-> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
->     bdaddr 00:1C:05:00:70:44 mode 2 clkoffset 0x0000
-> > HCI Event: Command Status (0x0f) plen 4
->     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> > HCI Event: Remote Name Req Complete (0x07) plen 255
->     status 0x04 bdaddr 00:1C:05:00:70:44 name ''
->     Error: Page Timeout
+Ok, will add on next revision.
 
-Can you enable dynamic_debug on your kernel for the bluetooth module and post
-those logs to us? I wanna see what HCI is doing here.
+>
+>> +     This command can be used to set AD for LE capable controllers or EIR
+>> +     for BR/EDR controllers. Multiple AD/EIR types can be configured by
+>> +     calling this command multiple times. If the data does not fit on a
+>> +     single AD/EIR on the controller, it will be rotated based on the "High
+>> +     priority" flag, so data with this flag set will stay longer over the
+>> +     air than those with this flag cleared.
+>
+> I'm still struggling to see the usefulness or even the feasibility of a
+> meaningful rotation of data. Is there actually some place in the core
+> spec that implies or recommends that this be done? More importantly, is
+> there some place that states that the content of multiple different AD
+> packets from the same remote device should be considered in an
+> aggregated manner instead of considering each of them as a
+> unique/complete state of the remote device? If there's no such mention
+> there's nothing stopping devices from using the latter interpretation
+> and in such a case any kind of rotation could mess things up. Also the
+> fact that there exists short/incomplete variants of many AD types
+> (UUIDs, device name) seems to indicate that if any kind of compromising
+> mechanism should be used when trying to fit data, this is it.
 
-	Gustavo
+Rotation gives the ability to broadcast multiple sets of information
+easily (when the information sets are known beforehand), without
+requiring to have a timer on userspace and multiple mgmt API calls.
+Given that LE advertising is inherently unreliable, it is up to the
+application to add some sort of checksum or account for data that may
+never arrive. In other words, it is a best effort communication
+channel (IMHO).
+
+Remember that this API is only useful for AD Types which are not
+managed by BlueZ or kernel internally, i.e. service data and
+manufaturer specific data currently (more may come on future Core
+Specification Supplement document revisions). These information are
+not necessarily device state, and applications have the freedom do
+manage the information as they find necessary. E.g. some sort of
+sequence numbering, CRC, or even Message Authentication (although
+tricky to fit into <31 bytes adv. packets, it is still possible).
+
+That said, I believe that even if the kernel does not rotate the
+information as described above, it is still possible to broadcast the
+same sets of information, but with performance penalty because of
+multiple set/remove controller data commands.
+
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
