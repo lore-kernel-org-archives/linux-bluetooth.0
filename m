@@ -1,33 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 17 Jul 2012 14:51:57 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 18/18 v2] Bluetooth: Introduce a flags variable to
- Three-wire UART state
-Message-ID: <20120717175157.GA19582@joana>
-References: <1342444339-1627-1-git-send-email-johan.hedberg@gmail.com>
- <1342444339-1627-18-git-send-email-johan.hedberg@gmail.com>
+From: <ramm@ti.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Ram Malovany <ramm@ti.com>
+Subject: [PATCH v3] Bluetooth: Device Scan and connection collision fix
+Date: Tue, 17 Jul 2012 19:21:34 +0300
+Message-ID: <1342542094-13486-1-git-send-email-ramm@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1342444339-1627-18-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Ram Malovany <ramm@ti.com>
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2012-07-16 16:12:19 +0300]:
+During search of devices, HCI Remote Name Request Command is sent for
+every device which name was not included in inquiry result. But the
+same command is also sent during incoming connection establishing
+procedure. Function hci_check_pending_name() was fixed in order to
+handle this situation which led to a kernel crash when initiating
+an incoming connection from a device that was not found in the
+inquiry while doing a search. There is no need to continue resolving
+the next name if we get the request from the incoming connection
+procedure as it will be done upon receiving another remote name
+request complete event
 
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> This patch introduces a flags variable to the Three-wire UART state
-> struct and converts the two existing bools in the struct into flags.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  drivers/bluetooth/hci_h5.c |   26 +++++++++++++++-----------
->  1 file changed, 15 insertions(+), 11 deletions(-)
+Signed-off-by: Ram Malovany <ramm@ti.com>
+---
+ net/bluetooth/hci_event.c |   23 +++++++++++++++--------
+ 1 files changed, 15 insertions(+), 8 deletions(-)
 
-All patches have been applied to bluetooth-next. Thanks.
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 41ff978..7a4f9e8 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1365,7 +1365,7 @@ static bool hci_resolve_next_name(struct hci_dev *hdev)
+ 		return false;
+ 
+ 	e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY, NAME_NEEDED);
+-	if (hci_resolve_name(hdev, e) == 0) {
++	if (e && hci_resolve_name(hdev, e) == 0) {
+ 		e->name_state = NAME_PENDING;
+ 		return true;
+ 	}
+@@ -1379,6 +1379,9 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
+ 	struct discovery_state *discov = &hdev->discovery;
+ 	struct inquiry_entry *e;
+ 
++	BT_DBG("name %p, name_len %d, discov->state %d",
++		name, name_len, discov->state);
++
+ 	if (conn && !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
+ 		mgmt_device_connected(hdev, bdaddr, ACL_LINK, 0x00, 0, name,
+ 				      name_len, conn->dev_class);
+@@ -1393,13 +1396,17 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
+ 		return;
+ 
+ 	e = hci_inquiry_cache_lookup_resolve(hdev, bdaddr, NAME_PENDING);
+-	if (e) {
++
++	if (!e)
++		return;
++
++	list_del(&e->list);
++	if (name) {
+ 		e->name_state = NAME_KNOWN;
+-		list_del(&e->list);
+-		if (name)
+-			mgmt_remote_name(hdev, bdaddr, ACL_LINK, 0x00,
+-					 e->data.rssi, name, name_len);
+-	}
++		mgmt_remote_name(hdev, bdaddr, ACL_LINK, 0x00,
++				 e->data.rssi, name, name_len);
++	} else
++		e->name_state = NAME_NOT_KNOWN;
+ 
+ 	if (hci_resolve_next_name(hdev))
+ 		return;
+@@ -1996,7 +2003,7 @@ static void hci_remote_name_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	struct hci_ev_remote_name *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+ 
+-	BT_DBG("%s", hdev->name);
++	BT_DBG("%s, status 0x%2.2x", hdev->name, ev->status);
+ 
+ 	hci_conn_check_pending(hdev);
+ 
+-- 
+1.7.4.1
 
-	Gustavo
