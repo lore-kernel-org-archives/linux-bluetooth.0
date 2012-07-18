@@ -1,39 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: <ramm@ti.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Ram Malovany <ramm@ti.com>
-Subject: [PATCH 1/3] Bluetooth: Do not resolve name if entry was not found.
-Date: Wed, 18 Jul 2012 15:06:04 +0300
-Message-ID: <1342613166-23651-1-git-send-email-ramm@ti.com>
+Date: Wed, 18 Jul 2012 15:02:30 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
+	<frederic.danis@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v13 03/14] audio: Simplify org.bluez.Headset
+Message-ID: <20120718120230.GE15775@x220.ger.corp.intel.com>
+References: <1342532440-730-1-git-send-email-frederic.danis@linux.intel.com>
+ <1342532440-730-4-git-send-email-frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1342532440-730-4-git-send-email-frederic.danis@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Ram Malovany <ramm@ti.com>
+Hi Frédéric,
 
-If entry wasn't found in the hci_inquiry_cache_lookup_resolve do not
-resolve the name.
+On Tue, Jul 17, 2012, Frédéric Danis wrote:
+> +properties	string State [readonly]
+>  
+> +			Possible values: "disconnected", "connecting",
+> +			"connected", "playing"
+>  
+> +		boolean Connected [readonly]
+>  
+> +			Indicates if there is an active connection to the
+> +			AG service on the remote device.
+>  
+> +		boolean Playing  [readonly]
+> +			Indicates if an audio connection to the headset
+> +			is active.
 
-Signed-off-by: Ram Malovany <ramm@ti.com>
----
- net/bluetooth/hci_event.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+I guess we don't really need the Connected and Playing properties
+anymore since these are covered by the State property. Right?
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 41ff978..2de521f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1365,6 +1365,9 @@ static bool hci_resolve_next_name(struct hci_dev *hdev)
- 		return false;
- 
- 	e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY, NAME_NEEDED);
-+	if (!e)
-+		return false;
-+
- 	if (hci_resolve_name(hdev, e) == 0) {
- 		e->name_state = NAME_PENDING;
- 		return true;
--- 
-1.7.4.1
-
+Johan
