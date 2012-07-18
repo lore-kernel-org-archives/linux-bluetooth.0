@@ -1,178 +1,235 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 Jul 2012 12:23:07 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next 2012-07-18
-Message-ID: <20120718152307.GC19582@joana>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="mP3DRpeJDSE+ciuQ"
+From: Harald Schmitt <linux@hschmitt.de>
+To: linux-bluetooth@vger.kernel.org
+Cc: Harald Schmitt <linux@hschmitt.de>
+Subject: [PATCH 2/2] phonebook: Replace magic strings for phonebook names and folders
+Date: Wed, 18 Jul 2012 16:53:08 +0200
+Message-Id: <1342623188-10796-3-git-send-email-linux@hschmitt.de>
+In-Reply-To: <1342623188-10796-1-git-send-email-linux@hschmitt.de>
+References: <1342623188-10796-1-git-send-email-linux@hschmitt.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
---mP3DRpeJDSE+ciuQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Hi John,
-
-This is my last pull towards 3.6, the biggest thing here is the new 3-wire UART
-Bluetooth driver by Johan Hedberg. The rest is just fixes and clean ups.
-
-Please pull or let me know of any problems. Thanks!
-
-	Gustavo
-
 ---
-The following changes since commit ea1e76a3f92f8565d395c549b9ca836c7eaa44b9:
+ plugins/irmc.c              |    4 ++--
+ plugins/phonebook-ebook.c   |   14 ++++++-------
+ plugins/phonebook-tracker.c |   48 +++++++++++++++++++++----------------------
+ plugins/phonebook.h         |   13 ++++++++++++
+ 4 files changed, 46 insertions(+), 33 deletions(-)
 
-  Bluetooth: btmrvl: Do not send vendor events to bluetooth stack (2012-06-19 00:19:11 -0300)
+diff --git a/plugins/irmc.c b/plugins/irmc.c
+index 2283fe6..2574b22 100644
+--- a/plugins/irmc.c
++++ b/plugins/irmc.c
+@@ -226,7 +226,7 @@ static void *irmc_connect(struct obex_session *os, int *err)
+ 	param->maxlistcount = 0; /* to count the number of vcards... */
+ 	param->filter = 0x200085; /* UID TEL N VERSION */
+ 	irmc->params = param;
+-	irmc->request = phonebook_pull("/telecom/pb.vcf", irmc->params,
++	irmc->request = phonebook_pull(PB_CONTACTS, irmc->params,
+ 					phonebook_size_result, irmc, err);
+ 	ret = phonebook_pull_read(irmc->request);
+ 	if (err)
+@@ -312,7 +312,7 @@ static void *irmc_open_pb(const char *name, struct irmc_session *irmc,
+ 
+ 	if (!g_strcmp0(name, ".vcf")) {
+ 		/* how can we tell if the vcard count call already finished? */
+-		irmc->request = phonebook_pull("/telecom/pb.vcf", irmc->params,
++		irmc->request = phonebook_pull(PB_CONTACTS, irmc->params,
+ 						query_result, irmc, &ret);
+ 		if (ret < 0) {
+ 			DBG("phonebook_pull failed...");
+diff --git a/plugins/phonebook-ebook.c b/plugins/phonebook-ebook.c
+index a1f06b5..59a4eac 100644
+--- a/plugins/phonebook-ebook.c
++++ b/plugins/phonebook-ebook.c
+@@ -459,7 +459,7 @@ char *phonebook_set_folder(const char *current_folder,
+ 	root = (g_strcmp0("/", current_folder) == 0);
+ 	child = (new_folder && strlen(new_folder) != 0);
+ 
+-	/* Evolution back-end will support telecom/pb folder only */
++	/* Evolution back-end will support /telecom/pb folder only */
+ 
+ 	switch (flags) {
+ 	case 0x02:
+@@ -471,8 +471,8 @@ char *phonebook_set_folder(const char *current_folder,
+ 
+ 		/* Go down 1 level */
+ 		fullname = g_build_filename(current_folder, new_folder, NULL);
+-		if (strcmp("/telecom", fullname) != 0 &&
+-				strcmp("/telecom/pb", fullname) != 0) {
++		if (strcmp(PB_TELECOM_FOLDER, fullname) != 0 &&
++				strcmp(PB_CONTACTS_FOLDER, fullname) != 0) {
+ 			g_free(fullname);
+ 			fullname = NULL;
+ 			ret = -ENOENT;
+@@ -511,8 +511,8 @@ char *phonebook_set_folder(const char *current_folder,
+ 		}
+ 
+ 		fullname = g_build_filename(base, new_folder, NULL);
+-		if (strcmp(fullname, "/telecom") != 0 &&
+-				strcmp(fullname, "/telecom/pb") != 0) {
++		if (strcmp(fullname, PB_TELECOM_FOLDER) != 0 &&
++				strcmp(fullname, PB_CONTACTS_FOLDER) != 0) {
+ 			g_free(fullname);
+ 			fullname = NULL;
+ 			ret = -ENOENT;
+@@ -548,7 +548,7 @@ void *phonebook_pull(const char *name, const struct apparam_field *params,
+ {
+ 	struct query_context *data;
+ 
+-	if (g_strcmp0("/telecom/pb.vcf", name) != 0) {
++	if (g_strcmp0(PB_CONTACTS, name) != 0) {
+ 		if (err)
+ 			*err = -ENOENT;
+ 
+@@ -638,7 +638,7 @@ void *phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
+ 	EVCardAttribute *attrib;
+ 	char *uid, *tel, *cname;
+ 
+-	if (g_strcmp0("/telecom/pb", name) != 0) {
++	if (g_strcmp0(PB_CONTACTS_FOLDER, name) != 0) {
+ 		if (err)
+ 			*err = -ENOENT;
+ 
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index 96635c4..2fd7ba1 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -513,15 +513,15 @@ static TrackerSparqlConnection *connection = NULL;
+ 
+ static const char *name2query(const char *name)
+ {
+-	if (g_str_equal(name, "/telecom/pb.vcf"))
++	if (g_str_equal(name, PB_CONTACTS))
+ 		return CONTACTS_QUERY_ALL;
+-	else if (g_str_equal(name, "/telecom/ich.vcf"))
++	else if (g_str_equal(name, PB_CALLS_INCOMING))
+ 		return INCOMING_CALLS_QUERY;
+-	else if (g_str_equal(name, "/telecom/och.vcf"))
++	else if (g_str_equal(name, PB_CALLS_OUTGOING))
+ 		return OUTGOING_CALLS_QUERY;
+-	else if (g_str_equal(name, "/telecom/mch.vcf"))
++	else if (g_str_equal(name, PB_CALLS_MISSED))
+ 		return MISSED_CALLS_QUERY;
+-	else if (g_str_equal(name, "/telecom/cch.vcf"))
++	else if (g_str_equal(name, PB_CALLS_COMBINED))
+ 		return COMBINED_CALLS_QUERY;
+ 
+ 	return NULL;
+@@ -529,15 +529,15 @@ static const char *name2query(const char *name)
+ 
+ static const char *name2count_query(const char *name)
+ {
+-	if (g_str_equal(name, "/telecom/pb.vcf"))
++	if (g_str_equal(name, PB_CONTACTS))
+ 		return CONTACTS_COUNT_QUERY;
+-	else if (g_str_equal(name, "/telecom/ich.vcf"))
++	else if (g_str_equal(name, PB_CALLS_INCOMING))
+ 		return INCOMING_CALLS_COUNT_QUERY;
+-	else if (g_str_equal(name, "/telecom/och.vcf"))
++	else if (g_str_equal(name, PB_CALLS_OUTGOING))
+ 		return OUTGOING_CALLS_COUNT_QUERY;
+-	else if (g_str_equal(name, "/telecom/mch.vcf"))
++	else if (g_str_equal(name, PB_CALLS_MISSED))
+ 		return MISSED_CALLS_COUNT_QUERY;
+-	else if (g_str_equal(name, "/telecom/cch.vcf"))
++	else if (g_str_equal(name, PB_CALLS_COMBINED))
+ 		return COMBINED_CALLS_COUNT_QUERY;
+ 
+ 	return NULL;
+@@ -550,17 +550,17 @@ static gboolean folder_is_valid(const char *folder)
+ 
+ 	if (g_str_equal(folder, "/"))
+ 		return TRUE;
+-	else if (g_str_equal(folder, "/telecom"))
++	else if (g_str_equal(folder, PB_TELECOM_FOLDER))
+ 		return TRUE;
+-	else if (g_str_equal(folder, "/telecom/pb"))
++	else if (g_str_equal(folder, PB_CONTACTS_FOLDER))
+ 		return TRUE;
+-	else if (g_str_equal(folder, "/telecom/ich"))
++	else if (g_str_equal(folder, PB_CALLS_INCOMING_FOLDER))
+ 		return TRUE;
+-	else if (g_str_equal(folder, "/telecom/och"))
++	else if (g_str_equal(folder, PB_CALLS_OUTGOING_FOLDER))
+ 		return TRUE;
+-	else if (g_str_equal(folder, "/telecom/mch"))
++	else if (g_str_equal(folder, PB_CALLS_MISSED_FOLDER))
+ 		return TRUE;
+-	else if (g_str_equal(folder, "/telecom/cch"))
++	else if (g_str_equal(folder, PB_CALLS_COMBINED_FOLDER))
+ 		return TRUE;
+ 
+ 	return FALSE;
+@@ -568,15 +568,15 @@ static gboolean folder_is_valid(const char *folder)
+ 
+ static const char *folder2query(const char *folder)
+ {
+-	if (g_str_equal(folder, "/telecom/pb"))
++	if (g_str_equal(folder, PB_CONTACTS_FOLDER))
+ 		return CONTACTS_QUERY_ALL_LIST;
+-	else if (g_str_equal(folder, "/telecom/ich"))
++	else if (g_str_equal(folder, PB_CALLS_INCOMING_FOLDER))
+ 		return INCOMING_CALLS_LIST;
+-	else if (g_str_equal(folder, "/telecom/och"))
++	else if (g_str_equal(folder, PB_CALLS_OUTGOING_FOLDER))
+ 		return OUTGOING_CALLS_LIST;
+-	else if (g_str_equal(folder, "/telecom/mch"))
++	else if (g_str_equal(folder, PB_CALLS_MISSED_FOLDER))
+ 		return MISSED_CALLS_LIST;
+-	else if (g_str_equal(folder, "/telecom/cch"))
++	else if (g_str_equal(folder, PB_CALLS_COMBINED_FOLDER))
+ 		return COMBINED_CALLS_LIST;
+ 
+ 	return NULL;
+@@ -1541,11 +1541,11 @@ static int pull_newmissedcalls(const char **reply, int num_fields,
+ 	}
+ 
+ 	if (data->params->maxlistcount == 0) {
+-		query = name2count_query("/telecom/mch.vcf");
++		query = name2count_query(PB_CALLS_MISSED);
+ 		col_amount = COUNT_QUERY_COL_AMOUNT;
+ 		pull_cb = pull_contacts_size;
+ 	} else {
+-		query = name2query("/telecom/mch.vcf");
++		query = name2query(PB_CALLS_MISSED);
+ 		col_amount = PULL_QUERY_COL_AMOUNT;
+ 		pull_cb = pull_contacts;
+ 	}
+@@ -1613,7 +1613,7 @@ int phonebook_pull_read(void *request)
+ 
+ 	data->newmissedcalls = 0;
+ 
+-	if (g_strcmp0(data->req_name, "/telecom/mch.vcf") == 0 &&
++	if (g_strcmp0(data->req_name, PB_CALLS_MISSED) == 0 &&
+ 						data->tracker_index == 0) {
+ 		/* new missed calls amount should be counted only once - it
+ 		 * will be done during generating first part of results of
+diff --git a/plugins/phonebook.h b/plugins/phonebook.h
+index 00abc08..740557c 100644
+--- a/plugins/phonebook.h
++++ b/plugins/phonebook.h
+@@ -29,6 +29,19 @@
+ #define VCARD_LISTING_ELEMENT "<card handle = \"%d.vcf\" name = \"%s\"/>" EOL
+ #define VCARD_LISTING_END "</vCard-listing>"
+ 
++#define PB_TELECOM_FOLDER "/telecom"
++#define PB_CONTACTS_FOLDER "/telecom/pb"
++#define PB_CALLS_COMBINED_FOLDER "/telecom/cch"
++#define PB_CALLS_INCOMING_FOLDER "/telecom/ich"
++#define PB_CALLS_MISSED_FOLDER "/telecom/mch"
++#define PB_CALLS_OUTGOING_FOLDER "/telecom/och"
++
++#define PB_CONTACTS "/telecom/pb.vcf"
++#define PB_CALLS_COMBINED "/telecom/cch.vcf"
++#define PB_CALLS_INCOMING "/telecom/ich.vcf"
++#define PB_CALLS_MISSED "/telecom/mch.vcf"
++#define PB_CALLS_OUTGOING "/telecom/och.vcf"
++
+ struct apparam_field {
+ 	/* list and pull attributes */
+ 	uint16_t maxlistcount;
+-- 
+1.7.9.5
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next master
-
-for you to fetch changes up to e0482103c22957b413db4c4ba35eca3b1e99751d:
-
-  Bluetooth: Introduce a flags variable to Three-wire UART state (2012-07-17 14:49:24 -0300)
-
-----------------------------------------------------------------
-Andre Guedes (4):
-      Bluetooth: Remove magic value in disconnect mgmt handler
-      Bluetooth: Use GFP_KERNEL in mgmt_handlers
-      Bluetooth: Use GFP_KERNEL in mgmt_pending_add
-      Bluetooth: Use GFP_KERNEL in mgmt events functions
-
-Andrei Emeltchenko (20):
-      Bluetooth: Use standard HCI cmd timeout for RESET
-      Bluetooth: Update HCI timeouts constants to use msecs_to_jiffies
-      Bluetooth: Add opcode to error message
-      Bluetooth: Correct debug print specifier for u16 objects
-      Bluetooth: Fix not setting HCI_RESET flag for AMP
-      Bluetooth: Fix compile warnings in mgmt
-      Bluetooth: Use AUTO_OFF constant in jiffies
-      Bluetooth: Improve debugging messages for hci_conn
-      Bluetooth: Fix warning: using int as NULL pointer
-      Bluetooth: Route traffic only through BR/EDR controller
-      Bluetooth: bluecard_cs: Shorten scope for iobase
-      Bluetooth: Do not auto off AMP controller
-      Bluetooth: btmrvl: trivial style fixes
-      Bluetooth: debug: Add printing num of cmds queued
-      Bluetooth: debug: Correct types specifiers for L2CAP
-      Bluetooth: debug: Print CID and PSM in hex format
-      Bluetooth: debug: Add debug to l2cap_security_cfm
-      Bluetooth: debug: Use standard hex object specifiers in hci_event
-      Bluetooth: debug: Print l2cap_chan refcount
-      Bluetooth: debug: Print amp_mgr refcnt
-
-Devendra Naga (1):
-      Bluetooth: cleanup dtl1_config
-
-Gustavo Padovan (2):
-      Merge branch 'for-upstream' of git://git.kernel.org/.../bluetooth/bluetooth
-      Merge branch 'for-upstream' of git://git.kernel.org/.../bluetooth/bluetooth
-
-Jaganath Kanakkassery (1):
-      Bluetooth: Refactor PIN code rejection to use user_pairing_resp()
-
-Jefferson Delfes (1):
-      Bluetooth: Fix flags of mgmt_device_found event
-
-Johan Hedberg (19):
-      Bluetooth: Change page scan interval in fast connectable mode
-      Bluetooth: Initial skeleton for Three-wire UART (H5) support
-      Bluetooth: Add basic state tracking to Three-wire UART driver
-      Bluetooth: Add initial reliable packet support for Three-wire UART
-      Bluetooth: Add basic packet parsing to Three-wire UART driver
-      Bluetooth: Add initial packet sending support to Three-wire UART
-      Bluetooth: Add Three-wire header value convenience macros
-      Bluetooth: Fix/implement Three-wire reliable packet sending
-      Bluetooth: Add support for Three-wire Link Control packets
-      Bluetooth: Simplify hci_uart_tty_close logic
-      Bluetooth: Add delayed init sequence support for UART controllers
-      Bluetooth: Use delayed init for Three-wire UART
-      Bluetooth: Improve rx debug logs for Three-wire UART
-      Bluetooth: Add initial sleep support to Three-wire UART
-      Bluetooth: Add initialization tracking to HCI Three-wire driver
-      Bluetooth: Implement proper low-power support for Three-wire UART
-      Bluetooth: Remove unnecessary h5_build_pkt function
-      Bluetooth: Improve Three-wire UART configuration handling
-      Bluetooth: Introduce a flags variable to Three-wire UART state
-
-Mat Martineau (1):
-      Bluetooth: Use tx window from config response for ack timing
-
- drivers/bluetooth/Kconfig         |   12 +
- drivers/bluetooth/Makefile        |    1 +
- drivers/bluetooth/bluecard_cs.c   |   16 +-
- drivers/bluetooth/bpa10x.c        |    2 +-
- drivers/bluetooth/bt3c_cs.c       |    6 +-
- drivers/bluetooth/btmrvl_main.c   |    8 +-
- drivers/bluetooth/btmrvl_sdio.c   |    6 +-
- drivers/bluetooth/btuart_cs.c     |    6 +-
- drivers/bluetooth/btusb.c         |   14 +-
- drivers/bluetooth/dtl1_cs.c       |   22 +-
- drivers/bluetooth/hci_bcsp.c      |    2 +-
- drivers/bluetooth/hci_h4.c        |    2 +-
- drivers/bluetooth/hci_h5.c        |  747 +++++++++++++
- drivers/bluetooth/hci_ldisc.c     |   68 +-
- drivers/bluetooth/hci_ll.c        |    6 +-
- drivers/bluetooth/hci_uart.h      |   10 +
- include/net/bluetooth/a2mp.h      |  126 +++
- include/net/bluetooth/bluetooth.h |   39 +-
- include/net/bluetooth/hci.h       |  110 +-
- include/net/bluetooth/hci_core.h  |   37 +-
- include/net/bluetooth/l2cap.h     |  210 +---
- include/net/bluetooth/mgmt.h      |    2 +-
- net/bluetooth/Makefile            |    3 +-
- net/bluetooth/a2mp.c              |  568 ++++++++++
- net/bluetooth/af_bluetooth.c      |   14 +-
- net/bluetooth/bnep/core.c         |   21 +-
- net/bluetooth/bnep/netdev.c       |   16 +-
- net/bluetooth/bnep/sock.c         |   18 +-
- net/bluetooth/hci_conn.c          |  143 ++-
- net/bluetooth/hci_core.c          |  265 +++--
- net/bluetooth/hci_event.c         |  479 ++++-----
- net/bluetooth/hci_sock.c          |   59 +-
- net/bluetooth/hci_sysfs.c         |   99 +-
- net/bluetooth/hidp/core.c         |   26 +-
- net/bluetooth/hidp/sock.c         |   16 +-
- net/bluetooth/l2cap_core.c        | 2248 ++++++++++++++++++++++++---------------
- net/bluetooth/l2cap_sock.c        |  130 ++-
- net/bluetooth/lib.c               |    7 +-
- net/bluetooth/mgmt.c              |  131 ++-
- net/bluetooth/rfcomm/core.c       |   32 +-
- net/bluetooth/rfcomm/sock.c       |   21 +-
- net/bluetooth/rfcomm/tty.c        |    9 +-
- net/bluetooth/sco.c               |   43 +-
- net/bluetooth/smp.c               |    7 +-
- 44 files changed, 3868 insertions(+), 1939 deletions(-)
- create mode 100644 drivers/bluetooth/hci_h5.c
- create mode 100644 include/net/bluetooth/a2mp.h
- create mode 100644 net/bluetooth/a2mp.c
-
---mP3DRpeJDSE+ciuQ
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIcBAEBAgAGBQJQBtTbAAoJEPs3PUX4s20om0QP/irr8kduPL2zhC4bC4fe4vJy
-HJu+hjPazfwQGOmwRSjjp5BlXq33NFo+43PgTeq+E4uWVdL7G9fNWU2s5Eeqcy6P
-Dp+LxIhyQSyXYWF4WbN0KSNPzkk0VmzHnrTjgwheQtP3OPTd8/hh/InHTQhaexF5
-EPkz+l/baCw1J9jjjjgD5JdRdXYWkYFXAbD4W5qCYk0CHjeJK2YfvzgD6Se4criI
-7oLSup/81D4xB2B657hPzY3xEmz4QjFOwXo291MJnOE/PbYS7j9rdS1vn57egUDH
-TeGCZJj735FZ1kwxoK0I18a5nnBG40fWnd3Vqj41fe/hpsSnKcam5wOS82jqYABB
-OvPzUbHG7gYJwbC227wSoPkChVTGJZZa2UEaJV3iJ4Nr5xIO4kGr0AwswGTR00pp
-yMlWEqi72mZEFRyoTuufC+4EU/50/oJ4rIqAT/msWmGnwPu19+KyICFwos/uglXn
-9vWCx5NSeBQPAGmtrX1yVPyILhvnTxMUGCX89KaO7lpeEsBPvgLM3dOz2VFxHsL4
-p/9sdFgV7ojAzT8Bdwcore8LctQESlEb/H6gYQieFYHGILlRrcfnsycJIQTzSYM9
-cVyi6GO6p5Mr5a9tTj1PnEFqK4W4a3fNkp0RK1amXW3xpGmaZqgxXZuQC893HJDk
-3DAvpRyFxWwwP6IpDUmH
-=516v
------END PGP SIGNATURE-----
-
---mP3DRpeJDSE+ciuQ--
