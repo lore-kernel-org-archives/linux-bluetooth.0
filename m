@@ -1,70 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vani-dineshbhai PATEL X <vani.patel@stericsson.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: User Name <linux-bluetooth@vger.kernel.org>,
-	Lucas De Marchi <lucas.demarchi@profusion.mobi>,
-	Joohi RASTOGI <joohi.rastogi@stericsson.com>,
-	Vani <vani273@gmail.com>
-Date: Wed, 18 Jul 2012 12:29:46 +0200
-Subject: RE: [PATCH BlueZ 2/5] AVRCP: Rename variables used for control
- channel to improve redability
-Message-ID: <747C1E83C744F44E9ACFB89FAEEC2C7B234AABDE5C@EXDCVYMBSTM005.EQ1STM.local>
-References: <1341912856-27192-1-git-send-email-vani.patel@stericsson.com>
- <CABBYNZ+n91nT8tZ1ceBsAc_i76T0iT6bfLWp00n25Scrumptdg@mail.gmail.com>
-In-Reply-To: <CABBYNZ+n91nT8tZ1ceBsAc_i76T0iT6bfLWp00n25Scrumptdg@mail.gmail.com>
+From: "Malovany, Ram" <ramm@ti.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH v4] Bluetooth: Fix Device Scan and connection collision
+Date: Wed, 18 Jul 2012 10:27:55 +0000
+Message-ID: <2683478DEE33CD4DAF508ABCF391F6A40B4AF385@DNCE05.ent.ti.com>
+References: <1342596961-3446-1-git-send-email-ramm@ti.com>
+ <20120718082410.GA10318@x220.ger.corp.intel.com>
+ <2683478DEE33CD4DAF508ABCF391F6A40B4AF312@DNCE05.ent.ti.com>
+ <20120718102027.GA14515@x220.ger.corp.intel.com>
+In-Reply-To: <20120718102027.GA14515@x220.ger.corp.intel.com>
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Johan,
 
 > -----Original Message-----
-> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
-> Sent: Tuesday, July 17, 2012 2:15 PM
-> To: Vani-dineshbhai PATEL X
-> Cc: User Name; Lucas De Marchi; Joohi RASTOGI; Vani
-> Subject: Re: [PATCH BlueZ 2/5] AVRCP: Rename variables used for control
-> channel to improve redability
+> From: Johan Hedberg [mailto:johan.hedberg@gmail.com]
+> Sent: Wednesday, July 18, 2012 1:20 PM
+> To: Malovany, Ram
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: [PATCH v4] Bluetooth: Fix Device Scan and connection collision
 > 
-> Hi Vani,
+> Hi Ram,
 > 
-> On Tue, Jul 10, 2012 at 12:34 PM, Vani-dineshbhai PATEL
-> <vani.patel@stericsson.com> wrote:
-> > -typedef size_t (*avctp_pdu_cb) (struct avctp *session, uint8_t
-> > transaction,
-> > +typedef size_t (*avctp_control_pdu_cb) (struct avctp *session,
-> > +                                       uint8_t transaction,
-> >                                         uint8_t *code, uint8_t *subunit,
-> >                                         uint8_t *operands, size_t operand_count,
-> >                                         void *user_data);
-> 
-> Do you really need to change this, does the callback need to be different for
-> browsing?
-> 
-I used different for browsing as browsing would not require parameters like code, subunit.
-But you are right, I can combine and use one. I shall make this change.
-
-> > @@ -93,7 +94,7 @@ struct avctp *avctp_connect(const bdaddr_t *src,
-> > const bdaddr_t *dst);  struct avctp *avctp_get(const bdaddr_t *src,
-> > const bdaddr_t *dst);  void avctp_disconnect(struct avctp *session);
+> On Wed, Jul 18, 2012, Malovany, Ram wrote:
+> > > >  	e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY,
+> NAME_NEEDED);
+> > > > -	if (hci_resolve_name(hdev, e) == 0) {
+> > > > +	if (e && hci_resolve_name(hdev, e) == 0) {
+> > > >  		e->name_state = NAME_PENDING;
+> > > >  		return true;
+> > > >  	}
+> > >
+> > > This missing NULL check is the first fix. You might actually consider
+> > > doing:
+> > >
+> > > 	if (!e)
+> > > 		return false;
+> > >
 > >
-> > -unsigned int avctp_register_pdu_handler(uint8_t opcode, avctp_pdu_cb
-> > cb,
-> > +unsigned int avctp_register_pdu_handler(uint8_t opcode,
-> > +avctp_control_pdu_cb cb,
-> >                                                         void
-> > *user_data);
+> > I didn't want to change the coding in this specific file , as you can
+> > see in the function:
+> >
+> > hci_inquiry_complete_evt() , calling it the same way.
+> > But I can changed them both if needed. Do you want me to ?
 > 
-> Same here, if we can keep the callback then we just need a single function
-> to register, internally we can add to different list.
+> The code in hci_inquiry_complete_evt() is a bit different though. There
+> you have something else instead of a simple return statement if e is
+> NULL (set the discovery state and unlock hdev) so changing that part
+> wouldn't really simplify the code much. In your case the code does
+> however get a bit simpler since all you need to do is return false.
 > 
-Yes, you are correct, we can reuse the same function. I was not using list for storing browsing 
-handler (a list is used for control, where there are unit, subunit, passthrough and vendordep). If I reuse
-the same, we need to formulate an opcode for browsing. 
-But, you are right. I shall merge two functions and avoid duplication of code.
-> --
-> Luiz Augusto von Dentz
 
-Thanks & Regards,
-Vani Patel
+
+OK  - will update it according to your comments. Thanks
+
+> Johan
+
+
+Regards,
+
+Ram
