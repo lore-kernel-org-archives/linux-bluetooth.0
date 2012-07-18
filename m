@@ -1,28 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Harald Schmitt <linux@hschmitt.de>
-To: linux-bluetooth@vger.kernel.org
-Cc: Harald Schmitt <linux@hschmitt.de>
-Subject: [PATCH 0/2] obexd: Fix bug in irmc phonebook and prevent to reintroduce it
-Date: Wed, 18 Jul 2012 16:53:06 +0200
-Message-Id: <1342623188-10796-1-git-send-email-linux@hschmitt.de>
+From: "Malovany, Ram" <ramm@ti.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH 1/3] Bluetooth: Do not resolve name if entry was not
+ found.
+Date: Wed, 18 Jul 2012 12:43:52 +0000
+Message-ID: <2683478DEE33CD4DAF508ABCF391F6A40B4AF824@DNCE05.ent.ti.com>
+References: <1342613166-23651-1-git-send-email-ramm@ti.com>
+ <20120718123956.GA2562@x220.ger.corp.intel.com>
+In-Reply-To: <20120718123956.GA2562@x220.ger.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchset fixes a bug in irmc plugin the same way as it was sent
-today, but with a commit message. The second patch defines macros in
-phonebook.h for the well known phonbook folders and names and replaces
-those magic values.
+Hi Johan,
 
-Harald Schmitt (2):
-  irmc: Fix phonebook contacts query
-  phonebook: Replace magic strings for phonebook names and folders
+> -----Original Message-----
+> From: Johan Hedberg [mailto:johan.hedberg@gmail.com]
+> Sent: Wednesday, July 18, 2012 3:40 PM
+> To: Malovany, Ram
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: [PATCH 1/3] Bluetooth: Do not resolve name if entry was not
+> found.
+> 
+> Hi Ram,
+> 
+> On Wed, Jul 18, 2012, ramm@ti.com wrote:
+> > From: Ram Malovany <ramm@ti.com>
+> >
+> > If entry wasn't found in the hci_inquiry_cache_lookup_resolve do not
+> > resolve the name.
+> >
+> > Signed-off-by: Ram Malovany <ramm@ti.com>
+> > ---
+> >  net/bluetooth/hci_event.c |    3 +++
+> >  1 files changed, 3 insertions(+), 0 deletions(-)
+> 
+> I'm fine with all of these three patches but you might consider
+> improving the commit messages a bit. Especially with kernel patches it
+> doesn't hurt to have a bit more verbosity.
+> 
+> Also, formulating the summary line as "Fix ..." would be good since they
+> *are* all fixes (this can help fast-tracking them upstream). It's
+> particularly important for this first one to be clearly identifiable as
+> a fix since it's fixing a NULL pointer dereference (something that
+> should also have been mentioned in the commit message imo).
+> 
+> Another smaller cosmetic issue with the messages: usually the summary
+> lines do not end with a period.
+> 
 
- plugins/irmc.c              |    4 ++--
- plugins/phonebook-ebook.c   |   14 ++++++-------
- plugins/phonebook-tracker.c |   48 +++++++++++++++++++++----------------------
- plugins/phonebook.h         |   13 ++++++++++++
- 4 files changed, 46 insertions(+), 33 deletions(-)
+Thanks for the remarks ,I will send an updates regarding the commit messages according to your comments.
 
--- 
-1.7.9.5
-
+> Johan
