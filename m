@@ -1,31 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1337009584-17181-3-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1337009584-17181-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1337009584-17181-3-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Wed, 18 Jul 2012 13:49:47 +0200
-Message-ID: <CANT-zCVAm80TqiVy=mnW0j4jMYDaitFR6GZ7qBWLAvuH+BQ2PQ@mail.gmail.com>
-Subject: Re: [RFC BlueZ v0 2/5] Use defines instead of magic numbers
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1342610820.24426.4.camel@aeonflux>
+Subject: Re: [patch]Add Vendor/Device ID for AR3012
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Chen, Peng" <pengchen@qca.qualcomm.com>
+Cc: "gustavo@padovan.org" <gustavo@padovan.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Waller, Carolyn" <carolyn@qca.qualcomm.com>,
+	"Jeang, Daniel" <dyjeong@qca.qualcomm.com>,
+	"Shanmugam Kamatchi, Bala" <bkamatch@qca.qualcomm.com>,
+	"Yao, Costa" <cqyao@qca.qualcomm.com>,
+	"Fan, Hong" <hongfan@qca.qualcomm.com>,
+	"Balasubramanian, Senthil Kumar" <senthilb@qca.qualcomm.com>,
+	"Wu, Frank" <fanwu@qca.qualcomm.com>
+Date: Wed, 18 Jul 2012 13:27:00 +0200
+In-Reply-To: <0EC13EFF38B7C84DB595405A8233E35B099AE930@nasanexd01b.na.qualcomm.com>
+References: <0EC13EFF38B7C84DB595405A8233E35B099AE930@nasanexd01b.na.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Peng,
 
-On Mon, May 14, 2012 at 5:33 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> The error-handling code should use the defines instead of magic numbers.
-> ---
->  src/device.c |   42 +++++++++++++++++++++---------------------
->  1 files changed, 21 insertions(+), 21 deletions(-)
+> From 7340f148e72f2bee78563c0ca9a37d82a5b99d64 Mon Sep 17 00:00:00 2001
+> From: Peng Chen <pengchen@qca.qualcomm.com>
+> Date: Wed, 18 Jul 2012 16:58:28 +0800
+> Subject: [PATCH] [patch]Add Vendor/Device ID for AR3012
 
-Ping.
+ever considered to just use git send-email.
 
-This was included inside a RFC series but has actually no dependency.
+> Add Vendor/Device ID for Qualcomm Atheros AR3012.
 
-Cheers,
-Mikel
+and please include the device parts from /sys/kernel/debug/usb/devices
+here.
+
+Regards
+
+Marcel
+
+
