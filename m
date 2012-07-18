@@ -5,12 +5,12 @@ Cc: User Name <linux-bluetooth@vger.kernel.org>,
 	Lucas De Marchi <lucas.demarchi@profusion.mobi>,
 	Joohi RASTOGI <joohi.rastogi@stericsson.com>,
 	Vani <vani273@gmail.com>
-Date: Wed, 18 Jul 2012 12:49:06 +0200
-Subject: RE: [PATCH BlueZ 5/5] AVRCP: Add handler for browsing pdu
-Message-ID: <747C1E83C744F44E9ACFB89FAEEC2C7B234AABDE6D@EXDCVYMBSTM005.EQ1STM.local>
-References: <1341913055-19754-1-git-send-email-vani.patel@stericsson.com>
- <CABBYNZKAVFrZumVP+EyUR6=k9vAzp3T43-8u+Gevzg4d-5q64w@mail.gmail.com>
-In-Reply-To: <CABBYNZKAVFrZumVP+EyUR6=k9vAzp3T43-8u+Gevzg4d-5q64w@mail.gmail.com>
+Date: Wed, 18 Jul 2012 12:30:33 +0200
+Subject: RE: [PATCH BlueZ 3/5] AVRCP: Add browsing channel support
+Message-ID: <747C1E83C744F44E9ACFB89FAEEC2C7B234AABDE5F@EXDCVYMBSTM005.EQ1STM.local>
+References: <1341912961-24600-1-git-send-email-vani.patel@stericsson.com>
+ <CABBYNZLBc2Jq8wMhxYB9G3GZu9xbE8WnKWSGk88K9kx_7cedzQ@mail.gmail.com>
+In-Reply-To: <CABBYNZLBc2Jq8wMhxYB9G3GZu9xbE8WnKWSGk88K9kx_7cedzQ@mail.gmail.com>
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -20,195 +20,158 @@ Hi Luiz,
 
 > -----Original Message-----
 > From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
-> Sent: Tuesday, July 17, 2012 5:26 PM
+> Sent: Tuesday, July 17, 2012 3:39 PM
 > To: Vani-dineshbhai PATEL X
 > Cc: User Name; Lucas De Marchi; Joohi RASTOGI; Vani
-> Subject: Re: [PATCH BlueZ 5/5] AVRCP: Add handler for browsing pdu
+> Subject: Re: [PATCH BlueZ 3/5] AVRCP: Add browsing channel support
 > 
 > Hi Vani,
 > 
-> On Tue, Jul 10, 2012 at 12:37 PM, Vani-dineshbhai PATEL
+> On Tue, Jul 10, 2012 at 12:36 PM, Vani-dineshbhai PATEL
 > <vani.patel@stericsson.com> wrote:
-> > +void avctp_send_browsing(struct avctp *session, uint8_t transaction,
-> > +                                       uint8_t *operands, size_t
-> > +operand_count) {
-> > +       struct avctp_header *avctp_header;
-> > +       uint8_t *buf;
-> > +       uint16_t length = 0;
-> > +       int sock;
+> > +static gboolean session_browsing_cb(GIOChannel *chan, GIOCondition
+> cond,
+> > +                               gpointer data) {
+> > +       struct avctp *session = data;
+> > +       uint8_t  *buf;
+> > +       struct avctp_header *avctp;
+> > +       int ret, sock;
 > > +
-> > +       length = AVCTP_HEADER_LENGTH + operand_count;
-> > +       buf = g_malloc0(length);
-> > +
-> > +       avctp_header = (void *) buf;
-> > +
-> > +       avctp_header->cr = AVCTP_RESPONSE;
-> > +       avctp_header->ipid = FALSE;
-> > +       avctp_header->packet_type = AVCTP_PACKET_SINGLE;
-> > +       avctp_header->pid = htons(AV_REMOTE_PROFILE_ID);
-> > +       avctp_header->transaction = transaction;
-> > +
-> > +       memcpy(&buf[AVCTP_HEADER_LENGTH], operands,
-> > +
-> > + operand_count);
+> > +       buf = (uint8_t *)malloc(session->browsing_mtu);
+> > +       if (!(cond & G_IO_IN))
+> > +               return FALSE;
 > > +
 > > +       sock = g_io_channel_unix_get_fd(session->browsing_io);
-> > +       if (write(sock, buf, length) < 0)
-> > +               DBG("Write failed\n"); }
-> 
-> We can probably avoid using memcpy by using sendmsg, actually we should
-> do this for avctp_send as well.
-> 
-Okay, I will make this change. 
-
-> > +static struct pdu_browsing_handler {
-> > +       uint8_t browsing_pdu;
-> > +       void (*func) (struct avrcp_player *player,
-> > +                                       struct avrcp_browsing_header *pdu);
-> > +       } browsing_handlers[] = {
-> > +               {},
-> > +};
-> 
-> What is the reason to have an empty array here? Is this just a place holder
-> for upcoming patches?
-> Yes Luiz, This is a place holder for upcoming APIs. As and when we implement,
-We can put those APIs here.
-
-> > +static void handle_browsing_pdu(struct avctp *session, uint8_t
-> transaction,
-> > +                                       uint8_t *operands, size_t operand_count,
-> > +                                       void *user_data) {
-> > +       struct avrcp_player *player = user_data;
-> > +       struct pdu_browsing_handler *b_handler;
-> > +       struct avrcp_browsing_header *avrcp_browsing = (void *) operands;
-> > +       uint8_t status, length;
+> > +       ret = read(sock, buf, session->browsing_mtu);
 > > +
-> > +       if ((avrcp_browsing->browsing_pdu !=
-> AVRCP_SET_BROWSED_PLAYER) &&
-> > +                       (avrcp_browsing->browsing_pdu !=
-> AVRCP_GET_FOLDER_ITEMS) &&
-> > +                       (avrcp_browsing->browsing_pdu != AVRCP_CHANGE_PATH)
-> &&
-> > +                       (avrcp_browsing->browsing_pdu !=
-> > + AVRCP_GET_ITEM_ATTRIBUTES)) {
+> > +       if (ret <= 0)
+> > +               return FALSE;
 > > +
-> > +               avrcp_browsing->browsing_pdu = AVRCP_GENERAL_REJECT;
-> > +               status = AVRCP_STATUS_INVALID_COMMAND;
-> > +               goto err;
-> > +       }
-> 
-> This is over 80 columns and is inefficient since you are doing basically the
-> same bellow.
- Yes, you are correct. I will remove this.
-
-> > +       for (b_handler = browsing_handlers; b_handler; b_handler++) {
-> > +               if (b_handler->browsing_pdu == avrcp_browsing->browsing_pdu)
-> > +                       break;
+> > +       if ((unsigned int) ret < sizeof(struct avctp_header)) {
+> > +               error("Too small AVRCP packet on browsing channel");
+> > +               return FALSE;
 > > +       }
 > > +
+> > +       avctp = (struct avctp_header *) buf;
+> > +
+> > +       if (avctp->packet_type != AVCTP_PACKET_SINGLE)
+> > +               return FALSE;
+> > +
+> > +
+> > +       return TRUE;
+> > +}
 > 
-> Where you should do the check if an handler was found e.g:
+> buf is probably leaking here, besides I don't think we really need to have
+> browsing channel being handled in a separated function, most of the code
+> should actually be similar the only difference is that the handler list is
+> different.
 > 
-> if (b_handler == NULL) {
->         avrcp_browsing->browsing_pdu = AVRCP_GENERAL_REJECT;
->         status = AVRCP_STATUS_INVALID_COMMAND;
->         goto err;
-> }
-> 
-Yes, this is more correct. I will rectify my code according to this.
+I will rectify this. Also, buf is actually used in patch 5/5. 
 
-> > +       if (!b_handler->func) {
-> > +               status = AVRCP_STATUS_INVALID_PARAM;
-> > +               goto err;
+> >  static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+> >                                 gpointer data)  { @@ -613,6 +663,47 @@
+> > static void init_uinput(struct avctp *session)
+> >                 DBG("AVRCP: uinput initialized for %s", address);  }
+> >
+> > +static void avctp_connect_browsing_cb(GIOChannel *chan,
+> > +                                       GError *err,
+> > +                                       gpointer data) {
+> > +       struct avctp *session = data;
+> > +       char address[18];
+> > +       uint16_t imtu;
+> > +       GError *gerr = NULL;
+> > +
+> > +       if (err) {
+> > +               error("Browsing: %s", err->message);
+> > +               g_io_channel_shutdown(chan, TRUE, NULL);
+> > +               g_io_channel_unref(chan);
+> > +               session->browsing_io = NULL;
+> > +               return;
 > > +       }
 > > +
-> > +       player->transaction = transaction;
-> > +       b_handler->func(player, avrcp_browsing);
+> > +       bt_io_get(chan, BT_IO_L2CAP, &gerr,
+> > +                       BT_IO_OPT_DEST, &address,
+> > +                       BT_IO_OPT_IMTU, &imtu,
+> > +                       BT_IO_OPT_INVALID);
+> > +       if (gerr) {
+> > +               error("%s", err->message);
+> 
+> Why you are printing err if the check is about gerr? Please fix this.
+Honest mistake. I will correct this.
+> 
+> > +static void avctp_confirm_browsing_cb(GIOChannel *chan, gpointer
+> > +data) {
+> > +       struct avctp *session;
+> > +       struct audio_device *dev;
+> > +       char address[18];
+> > +       bdaddr_t src, dst;
+> > +       GError *err = NULL;
+> > +
+> > +       bt_io_get(chan, BT_IO_L2CAP, &err,
+> > +                       BT_IO_OPT_SOURCE_BDADDR, &src,
+> > +                       BT_IO_OPT_DEST_BDADDR, &dst,
+> > +                       BT_IO_OPT_DEST, address,
+> > +                       BT_IO_OPT_INVALID);
+> > +       if (err) {
+> > +               g_error_free(err);
+> > +               g_io_channel_shutdown(chan, TRUE, NULL);
+> > +               return;
+> > +       }
+> > +
+> > +       session = avctp_get_internal(&src, &dst);
+> > +       if (!session)
+> > +               goto drop;
+> > +
+> > +       dev = manager_get_device(&src, &dst, FALSE);
+> > +       if (!dev) {
+> > +               dev = manager_get_device(&src, &dst, TRUE);
+> > +               if (!dev) {
+> > +                       error("Browsing: Unable to get audio dev object for %s",
+> > +                                                                address);
+> > +                       goto drop;
+> > +               }
+> > +       }
+> > +
+> > +       if (dev->control == NULL) {
+> > +               btd_device_add_uuid(dev->btd_dev, AVRCP_REMOTE_UUID);
+> > +               if (dev->control == NULL)
+> > +                       goto drop;
+> > +       }
+> > +
+> > +       if (!session->control_io) {
+> > +               error("Browsing: Refusing unexpected connect from %s",
+> address);
+> > +               goto drop;
+> > +       }
+> > +
+> > +       if (session->browsing_io) {
+> > +               error("Browsing channel already exist %s", address);
+> > +               goto drop;
+> > +       }
+> > +
+> > +       session->browsing_io = g_io_channel_ref(chan);
+> > +
+> > +       if (audio_device_request_authorization(dev, AVRCP_TARGET_UUID,
+> > +                                               auth_browsing_cb, session) < 0)
+> > +               goto drop;
 > > +       return;
 > > +
-> > +err:
-> > +       avrcp_browsing->param_len = htons(sizeof(status));
-> > +       length = AVRCP_BROWSING_HEADER_LENGTH + sizeof(status);
-> > +       memcpy(&operands[AVRCP_BROWSING_HEADER_LENGTH], &status,
-> > +                                               sizeof(status));
-> > +       avctp_send_browsing(session, player->transaction, operands,
+> > +drop:
+> > +       if (!session || !session->control_io || !session->browsing_io)
+> > +               g_io_channel_shutdown(chan, TRUE, NULL);
 > > +
-> > +length);
-> 
-> If you gonna response immediately it is better to return the packet size an
-> write from the session_cb as done for control pdus, if nothing should be
-> written because the response will be asynchronous we can just have it the
-> handler return 0 and handle that in session_cb as no response.
-> 
-Yes Luiz, you are right. I had thought about this. But all the success scenarios 
-& few error scenarios for browsing related APIs shall have to be written 
-using avct_send_browsing (as Dbus calls shall be used in every API and returning 
-to session_browsing_cb would not be possible, in which case 0 shall be returned). 
-So I chose this way.
-I will make the change as you suggested.
-
+> > +       if (session && session->browsing_io)
+> > +               g_io_channel_unref(session->browsing_io);
 > > +}
 > > +
-> >  size_t avrcp_handle_vendor_reject(uint8_t *code, uint8_t *operands)
-> > {
-> >         struct avrcp_header *pdu = (void *) operands; @@ -1233,6
-> > +1299,11 @@ static void state_changed(struct audio_device *dev,
-> avctp_state_t old_state,
-> >                         avctp_unregister_pdu_handler(player->control_handler);
-> >                         player->control_handler = 0;
-> >                 }
-> > +               if (player->browsing_handler) {
-> > +                       avctp_unregister_browsing_pdu_handler(
-> > +                                               player->browsing_handler);
-> > +                       player->browsing_handler = 0;
-> > +               }
 > 
-> The indentation above looks wrong, add a empty line before the if
-> statement, avctp_unregister_browsing_pdu_handler too long name.
+> Again here the code is very similar to control, perhaps we can have different
+> functions after we are done with common checks to avoid duplicating too
+> much code.
 > 
-I will rectify this.
-
-> >                 break;
-> >         case AVCTP_STATE_CONNECTING:
-> > @@ -1244,6 +1315,12 @@ static void state_changed(struct audio_device
-> *dev, avctp_state_t old_state,
-> >                                                         AVC_OP_VENDORDEP,
-> >                                                         handle_vendordep_pdu,
-> >                                                         player);
-> > +               if (!player->browsing_handler)
-> > +                       player->browsing_handler =
-> > +                                       avctp_register_browsing_pdu_handler(
-> > +                                                       handle_browsing_pdu,
-> > +                                                       player);
-> > +
-> 
-> avctp_register_browsing_pdu_handler is also too long, in fact this is another
-> that we should probably just reuse avctp_register_pdu_handler and maybe
-> create an opcode for browsing just so that it be can registered using
-> avctp_register_pdu_handler.
-I agree with you Luiz. I will make necessary changes.
-> 
-> >                 break;
-> >         case AVCTP_STATE_CONNECTED:
-> >                 rec = btd_device_get_record(dev->btd_dev,
-> > AVRCP_TARGET_UUID); diff --git a/audio/avrcp.h b/audio/avrcp.h index
-> > bf11a6c..7e2f018 100644
-> > --- a/audio/avrcp.h
-> > +++ b/audio/avrcp.h
-> > @@ -75,6 +75,8 @@
-> >  #define AVRCP_EVENT_TRACK_REACHED_START        0x04
-> >  #define AVRCP_EVENT_VOLUME_CHANGED     0x0d
-> >  #define AVRCP_EVENT_LAST               AVRCP_EVENT_VOLUME_CHANGED
-> > +struct avrcp_browsing_header;
-> > +#define AVRCP_BROWSING_HEADER_LENGTH 3
-> 
-> This is probably not necessary as the header should only be needed inside
-> avrcp.c you don't need to make it public.
-> 
-AVRCP_BROWSING_HEADER_LENGTH is being used in session_browsing_cb function.
-Avrcp_browsing_header is not used. I will remove it from here.
-
-> 
+I was thinking of keeping control channel and browsing channel separate. But
+you are right, we should avoid duplication. I shall modify the functions to reuse
+the code as much as possible.
 > --
 > Luiz Augusto von Dentz
 
