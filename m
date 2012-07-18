@@ -1,87 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: <ramm@ti.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Ram Malovany <ramm@ti.com>
-Subject: [PATCH v4] Bluetooth: Fix Device Scan and connection collision
-Date: Wed, 18 Jul 2012 10:36:01 +0300
-Message-ID: <1342596961-3446-1-git-send-email-ramm@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20120718070412.GB18697@aemeltch-MOBL1>
+References: <CADX0rsZBLixOvNLhpoSH6PuP3m8LWP6w6CkDKB+cvhBAnwyT0g@mail.gmail.com>
+	<20120717180556.GB19582@joana>
+	<CADX0rsbXe8Sv8cu_Q_3BYLWCC=N3TCQdKVCC1Tay_gSfrAQWpQ@mail.gmail.com>
+	<20120718070412.GB18697@aemeltch-MOBL1>
+Date: Wed, 18 Jul 2012 15:39:28 +0800
+Message-ID: <CADX0rsZAV=c0Pj456RWUEKj+4XRuk=cv44aYuxUW1WMvvpuZxg@mail.gmail.com>
+Subject: Re: HCI Remote Name Request error "Page Timeout"
+From: victor yeo <victoryeo1974@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	victor yeo <victoryeo1974@gmail.com>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Ram Malovany <ramm@ti.com>
+On Wed, Jul 18, 2012 at 3:04 PM, Andrei Emeltchenko
+<andrei.emeltchenko.news@gmail.com> wrote:
+> Hi Victor,
+>
+> On Wed, Jul 18, 2012 at 02:26:47PM +0800, victor yeo wrote:
+>> > Hi Victor,
+>> >
+>> > * victor yeo <victoryeo1974@gmail.com> [2012-07-17 17:34:32 +0800]:
+>> >
+>> >> Hi,
+>> >>
+>> >> The hcidump program shows a remote name request "Page Timeout" error.
+>> >> I do not understand the reason. The Bluez stack requests for remote
+>> >> name, the device replied with 'Nonin_Medical_Inc._359443' twice, Then
+>> >> Bluez stack requests again, got "Page Timeout" error, and connection
+>> >> stops. What is the reason of this behavior?
+>> >>
+>> >> Thanks,
+>> >> Victor
+>> >>
+>> >> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
+>> >>     bdaddr 00:1C:05:00:70:44 mode 2 clkoffset 0x0000
+>> >> > HCI Event: Command Status (0x0f) plen 4
+>> >>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+>> >> > HCI Event: Remote Name Req Complete (0x07) plen 255
+>> >>     status 0x00 bdaddr 00:1C:05:00:70:44 name 'Nonin_Medical_Inc._359443'
+>> >> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
+>> >>     bdaddr 00:1C:05:00:70:44 mode 2 clkoffset 0x0000
+>> >> > HCI Event: Command Status (0x0f) plen 4
+>> >>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+>> >> > HCI Event: Remote Name Req Complete (0x07) plen 255
+>> >>     status 0x00 bdaddr 00:1C:05:00:70:44 name 'Nonin_Medical_Inc._359443'
+>> >> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
+>> >>     bdaddr 00:1C:05:00:70:44 mode 2 clkoffset 0x0000
+>> >> > HCI Event: Command Status (0x0f) plen 4
+>> >>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+>> >> > HCI Event: Remote Name Req Complete (0x07) plen 255
+>> >>     status 0x04 bdaddr 00:1C:05:00:70:44 name ''
+>> >>     Error: Page Timeout
+>
+> BTW: What about adding timestamp, just wondering are those requests sent
+> immediately one after one.
+>
+>> > Can you enable dynamic_debug on your kernel for the bluetooth module and post
+>> > those logs to us? I wanna see what HCI is doing here.
+>> >
+>> >         Gustavo
+>>
+>> So i re-build the kernel with CONFIG_DYNAMIC_DEBUG, use the newly
+>> built kernel, then run?
+>>
+>> echo -n 'module bluetoothd +p' >    <debugfs>/dynamic_debug/control
+>
+> something like this is enough:
+>
+>         echo 'file l2cap_core.c +fpt' > /debugfs/dynamic_debug/control; \
+>         echo 'file hci_conn.c +fpt' > /debugfs/dynamic_debug/control; \
+>         echo 'file hci_event.c +fpt' > /debugfs/dynamic_debug/control; \
+>         echo 'file hci_core.c +fpt' > /debugfs/dynamic_debug/control"
+>
+> Best regards
+> Andrei Emeltchenko
+>
 
-During search of devices, HCI Remote Name Request Command is sent for
-every device which name was not included in inquiry result. But the
-same command is also sent during incoming connection establishing
-procedure. Function hci_check_pending_name() was fixed in order to
-handle this situation which led to a kernel crash when initiating
-an incoming connection from a device that was not found in the
-inquiry while doing a search. There is no need to continue resolving
-the next name if we get the request from the incoming connection
-procedure as it will be done upon receiving another remote name
-request complete event
+Hi,
 
-Signed-off-by: Ram Malovany <ramm@ti.com>
----
- net/bluetooth/hci_event.c |   21 ++++++++++++++-------
- 1 files changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 41ff978..2814ea4 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1365,7 +1365,7 @@ static bool hci_resolve_next_name(struct hci_dev *hdev)
- 		return false;
- 
- 	e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY, NAME_NEEDED);
--	if (hci_resolve_name(hdev, e) == 0) {
-+	if (e && hci_resolve_name(hdev, e) == 0) {
- 		e->name_state = NAME_PENDING;
- 		return true;
- 	}
-@@ -1379,6 +1379,9 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
- 	struct discovery_state *discov = &hdev->discovery;
- 	struct inquiry_entry *e;
- 
-+	BT_DBG("name %p, name_len %d, discov->state %d",
-+		name, name_len, discov->state);
-+
- 	if (conn && !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
- 		mgmt_device_connected(hdev, bdaddr, ACL_LINK, 0x00, 0, name,
- 				      name_len, conn->dev_class);
-@@ -1393,12 +1396,16 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
- 		return;
- 
- 	e = hci_inquiry_cache_lookup_resolve(hdev, bdaddr, NAME_PENDING);
--	if (e) {
-+	if (!e)
-+		return;
-+
-+	list_del(&e->list);
-+	if (name) {
- 		e->name_state = NAME_KNOWN;
--		list_del(&e->list);
--		if (name)
--			mgmt_remote_name(hdev, bdaddr, ACL_LINK, 0x00,
--					 e->data.rssi, name, name_len);
-+		mgmt_remote_name(hdev, bdaddr, ACL_LINK, 0x00,
-+				 e->data.rssi, name, name_len);
-+	} else {
-+		e->name_state = NAME_NOT_KNOWN;
- 	}
- 
- 	if (hci_resolve_next_name(hdev))
-@@ -1996,7 +2003,7 @@ static void hci_remote_name_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	struct hci_ev_remote_name *ev = (void *) skb->data;
- 	struct hci_conn *conn;
- 
--	BT_DBG("%s", hdev->name);
-+	BT_DBG("%s, status 0x%2.2x", hdev->name, ev->status);
- 
- 	hci_conn_check_pending(hdev);
- 
--- 
-1.7.4.1
-
+I found out the root cause of the "Page Timeout" error. I swap in
+another bluetooth module. The device data is received by Bluez.
