@@ -2,11 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: <ramm@ti.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Ram Malovany <ramm@ti.com>
-Subject: [PATCH 2/3] Bluetooth: Do not resolve next name if the entry was not found.
-Date: Wed, 18 Jul 2012 15:06:05 +0300
-Message-ID: <1342613166-23651-2-git-send-email-ramm@ti.com>
-In-Reply-To: <1342613166-23651-1-git-send-email-ramm@ti.com>
-References: <1342613166-23651-1-git-send-email-ramm@ti.com>
+Subject: [PATCH 1/3] Bluetooth: Do not resolve name if entry was not found.
+Date: Wed, 18 Jul 2012 15:06:04 +0300
+Message-ID: <1342613166-23651-1-git-send-email-ramm@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,46 +12,28 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Ram Malovany <ramm@ti.com>
 
-If the device was not found in a list of found devices names
-of which are pending.This may happen in a case when HCI Remote
-Name Request was sent as a part of incoming connection
-establishment procedure.Hence there is no need to continue resolving
-a next name as it will be done upon receiving another Remote
-Name Request Complete Event.
+If entry wasn't found in the hci_inquiry_cache_lookup_resolve do not
+resolve the name.
 
 Signed-off-by: Ram Malovany <ramm@ti.com>
 ---
- net/bluetooth/hci_event.c |   16 +++++++++++-----
- 1 files changed, 11 insertions(+), 5 deletions(-)
+ net/bluetooth/hci_event.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 2de521f..3224dcc 100644
+index 41ff978..2de521f 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -1396,12 +1396,18 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
- 		return;
+@@ -1365,6 +1365,9 @@ static bool hci_resolve_next_name(struct hci_dev *hdev)
+ 		return false;
  
- 	e = hci_inquiry_cache_lookup_resolve(hdev, bdaddr, NAME_PENDING);
--	if (e) {
-+	/* If the device was not found in a list of found devices names of which
-+	 * are pending. there is no need to continue resolving a next name as it
-+	 * will be done upon receiving another Remote Name Request Complete
-+	 * Event */
+ 	e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY, NAME_NEEDED);
 +	if (!e)
-+		return;
++		return false;
 +
-+	list_del(&e->list);
-+	if (name) {
- 		e->name_state = NAME_KNOWN;
--		list_del(&e->list);
--		if (name)
--			mgmt_remote_name(hdev, bdaddr, ACL_LINK, 0x00,
--					 e->data.rssi, name, name_len);
-+		mgmt_remote_name(hdev, bdaddr, ACL_LINK, 0x00,
-+				 e->data.rssi, name, name_len);
- 	}
- 
- 	if (hci_resolve_next_name(hdev))
+ 	if (hci_resolve_name(hdev, e) == 0) {
+ 		e->name_state = NAME_PENDING;
+ 		return true;
 -- 
 1.7.4.1
 
