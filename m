@@ -1,113 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1342685013.24426.7.camel@aeonflux>
-Subject: Re: [PATCH BlueZ 1/5] gdbus: Add skeleton of DBus.Properties
- interface
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 19 Jul 2012 10:03:33 +0200
-In-Reply-To: <1342668008-5522-2-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1342668008-5522-1-git-send-email-lucas.demarchi@profusion.mobi>
-	 <1342668008-5522-2-git-send-email-lucas.demarchi@profusion.mobi>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Thu, 19 Jul 2012 10:56:40 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/3] Bluetooth: mgmt: Fix managing AMP device
+Message-ID: <20120719075639.GD26057@aemeltch-MOBL1>
+References: <1340971622-16318-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1340971622-16318-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20120719073945.GA7612@x220>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120719073945.GA7612@x220>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Johan,
 
-> This interface is responsible for handling properties of all objects in
-> a given path. Right now it only registers itself, doing nothing useful.
-> A conversion to this new layout will be done by subsequent patches.
+On Thu, Jul 19, 2012 at 10:39:45AM +0300, Johan Hedberg wrote:
+> Hi Andrei,
 > 
-> org.freedesktop.org.DBus.Properties spec can be found at
-> http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-properties
-> ---
->  gdbus/object.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 48 insertions(+)
+> On Fri, Jun 29, 2012, Andrei Emeltchenko wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > AMP device shall not be managed by user space for now.
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  include/net/bluetooth/hci_core.h |    2 +-
+> >  net/bluetooth/hci_core.c         |    6 ++++--
+> >  net/bluetooth/mgmt.c             |   20 ++++++++++++++++++--
+> >  3 files changed, 23 insertions(+), 5 deletions(-)
 > 
-> diff --git a/gdbus/object.c b/gdbus/object.c
-> index 900e7ab..72f77d4 100644
-> --- a/gdbus/object.c
-> +++ b/gdbus/object.c
-> @@ -491,6 +491,50 @@ static const GDBusMethodTable introspect_methods[] = {
->  	{ }
->  };
->  
-> +static DBusMessage *properties_get(DBusConnection *connection,
-> +					DBusMessage *message, void *user_data)
-> +{
-> +	return NULL;
-> +}
-> +
-> +static DBusMessage *properties_get_all(DBusConnection *connection,
-> +					DBusMessage *message, void *user_data)
-> +{
-> +	return NULL;
-> +}
-> +
-> +static DBusMessage *properties_set(DBusConnection *connection,
-> +					DBusMessage *message, void *user_data)
-> +{
-> +	return NULL;
-> +}
-> +
-> +static const GDBusMethodTable properties_methods[] = {
-> +	{ GDBUS_METHOD("Get",
-> +			GDBUS_ARGS({ "interface_name", "s" },
-> +						{ "property_name", "s" }),
+> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+> 
+> Though you could have made a bit more descriptive commit message.
 
-this should be "interface" and "name". Why are we so verbose here?
+I will write more and this patch together with other patches.
 
-> +			GDBUS_ARGS({ "value", "v" }),
-> +			properties_get) },
-> +	{ GDBUS_METHOD("Set", NULL,
-> +			GDBUS_ARGS({ "interface_name", "s" },
-> +					{ "property_name", "s" },
-> +					{ "value", "v" }),
-> +			properties_set) },
-> +	{ GDBUS_METHOD("GetAll",
-> +			GDBUS_ARGS({ "interface_name", "s" }),
-> +			GDBUS_ARGS({ "props", "a{sv}" }),
-
-And this should be "properties". Here you are trying to be super short.
-
-> +			properties_get_all) },
-> +	{ }
-> +};
-> +
-> +static const GDBusSignalTable properties_signals[] = {
-> +	{ GDBUS_SIGNAL("PropertiesChanged",
-> +			GDBUS_ARGS({ "interface_name", "s" },
-> +					{ "changed_properties", "a{sv}" },
-> +					{ "invalidated_properties", "as"})) },
-> +	{ }
-> +};
-> +
->  static void add_interface(struct generic_data *data, const char *name,
->  				const GDBusMethodTable *methods,
->  				const GDBusSignalTable *signals,
-> @@ -541,6 +585,9 @@ static struct generic_data *object_path_ref(DBusConnection *connection,
->  	add_interface(data, DBUS_INTERFACE_INTROSPECTABLE,
->  			introspect_methods, NULL, NULL, data, NULL);
->  
-> +	add_interface(data, DBUS_INTERFACE_PROPERTIES, properties_methods,
-> +					properties_signals, NULL, data, NULL);
-> +
->  	return data;
->  }
->  
-> @@ -580,6 +627,7 @@ static void object_path_unref(DBusConnection *connection, const char *path)
->  		return;
->  
->  	remove_interface(data, DBUS_INTERFACE_INTROSPECTABLE);
-> +	remove_interface(data, DBUS_INTERFACE_PROPERTIES);
->  
->  	invalidate_parent_data(connection, path);
->  
-
-Regards
-
-Marcel
-
+Best regards 
+Andrei Emeltchenko 
 
