@@ -1,29 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5008F67F.5030604@globaledgesoft.com>
-Date: Fri, 20 Jul 2012 02:11:11 -0400
-From: Ajay KV <ajay.kv@globaledgesoft.com>
-MIME-Version: 1.0
+From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: BLE - multiple connections
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+Subject: [PATCH BlueZ 1/2] time: fix byte position
+Date: Thu, 19 Jul 2012 14:46:32 -0300
+Message-Id: <1342719992-3816-1-git-send-email-jprvita@openbossa.org>
+In-Reply-To: <20120719145519.GA3879@x220.P-661HNU-F1>
+References: <20120719145519.GA3879@x220.P-661HNU-F1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+The position of the "Time Zone" and "Daylight Saving Time" fields on
+the Local Time Information characteristic was inverted. This commit
+fix their position.
+---
+ profiles/time/server.c |   10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Hi all,
-
-Since im new to bluetooth low energy technology , i need some guidance 
-from you . Following are the issues that im searching for a solution
-
-
-1 : Is it possible to establish mutiple LE connection at a time . Im 
-using fedora 13 , linux 2.6.39 version with 4.0 LE supported dongles
-
-2: now im not concentrating on user profiles like GATT and ATT . i 
-wanted to do it using HCI and L2cap connections
-
-
-Thanks and Regards
-
-
+diff --git a/profiles/time/server.c b/profiles/time/server.c
+index be6e196..ddf88ae 100644
+--- a/profiles/time/server.c
++++ b/profiles/time/server.c
+@@ -107,13 +107,13 @@ static uint8_t local_time_info_read(struct attribute *a,
+ 
+ 	tzset();
+ 
+-	/* FIXME: POSIX "daylight" variable only indicates whether there is DST
+-	 * for the local time or not. The offset is unknown. */
+-	value[0] = daylight ? 0xff : 0x00;
+-
+ 	/* Convert POSIX "timezone" (seconds West of GMT) to Time Profile
+ 	 * format (offset from UTC in number of 15 minutes increments). */
+-	value[1] = (uint8_t) (-1 * timezone / (60 * 15));
++	value[0] = (uint8_t) (-1 * timezone / (60 * 15));
++
++	/* FIXME: POSIX "daylight" variable only indicates whether there is DST
++	 * for the local time or not. The offset is unknown. */
++	value[1] = daylight ? 0xff : 0x00;
+ 
+ 	attrib_db_update(adapter, a->handle, NULL, value, sizeof(value), NULL);
+ 
+-- 
+1.7.10.4
 
