@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/8] Bluetooth: mgmt: Managing only BR/EDR HCI controllers
-Date: Thu, 19 Jul 2012 17:03:40 +0300
-Message-Id: <1342706627-19129-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 4/8] Bluetooth: smp: Fix possible NULL dereference
+Date: Thu, 19 Jul 2012 17:03:43 +0300
+Message-Id: <1342706627-19129-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1342706627-19129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1342706627-19129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,120 +11,31 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add check that HCI controller is BR/EDR. AMP controller shall not be
-managed by mgmt interface and consequently user space.
+smp_chan_create might return NULL so we need to check before
+dereferencing smp.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    2 +-
- net/bluetooth/hci_core.c         |    6 ++++--
- net/bluetooth/mgmt.c             |   20 ++++++++++++++++++--
- 3 files changed, 23 insertions(+), 5 deletions(-)
+ net/bluetooth/smp.c |    5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 475b8c0..cda6437 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1056,7 +1056,7 @@ int mgmt_discovering(struct hci_dev *hdev, u8 discovering);
- int mgmt_interleaved_discovery(struct hci_dev *hdev);
- int mgmt_device_blocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
- int mgmt_device_unblocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
--
-+bool mgmt_valid_hdev(struct hci_dev *hdev);
- int mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, u8 persistent);
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 5bb5b51..1104c5a 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -578,8 +578,11 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
  
- /* HCI info for socket */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 1d28d81..28bab9d 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -696,7 +696,8 @@ int hci_dev_open(__u16 dev)
- 		hci_dev_hold(hdev);
- 		set_bit(HCI_UP, &hdev->flags);
- 		hci_notify(hdev, HCI_DEV_UP);
--		if (!test_bit(HCI_SETUP, &hdev->dev_flags)) {
-+		if (!test_bit(HCI_SETUP, &hdev->dev_flags) &&
-+		    mgmt_valid_hdev(hdev)) {
- 			hci_dev_lock(hdev);
- 			mgmt_powered(hdev, 1);
- 			hci_dev_unlock(hdev);
-@@ -797,7 +798,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	 * and no tasks are scheduled. */
- 	hdev->close(hdev);
+ 	if (!test_and_set_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags))
+ 		smp = smp_chan_create(conn);
++	else
++		smp = conn->smp_chan;
  
--	if (!test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags)) {
-+	if (!test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags) &&
-+	    mgmt_valid_hdev(hdev)) {
- 		hci_dev_lock(hdev);
- 		mgmt_powered(hdev, 0);
- 		hci_dev_unlock(hdev);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ad6613d..2a0f695 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -193,6 +193,11 @@ static u8 mgmt_status_table[] = {
- 	MGMT_STATUS_CONNECT_FAILED,	/* MAC Connection Failed */
- };
+-	smp = conn->smp_chan;
++	if (!smp)
++		return SMP_UNSPECIFIED;
  
-+bool mgmt_valid_hdev(struct hci_dev *hdev)
-+{
-+	return hdev->dev_type == HCI_BREDR;
-+}
-+
- static u8 mgmt_status(u8 hci_status)
- {
- 	if (hci_status < ARRAY_SIZE(mgmt_status_table))
-@@ -317,7 +322,6 @@ static int read_index_list(struct sock *sk, struct hci_dev *hdev, void *data,
- 			   u16 data_len)
- {
- 	struct mgmt_rp_read_index_list *rp;
--	struct list_head *p;
- 	struct hci_dev *d;
- 	size_t rp_len;
- 	u16 count;
-@@ -328,7 +332,10 @@ static int read_index_list(struct sock *sk, struct hci_dev *hdev, void *data,
- 	read_lock(&hci_dev_list_lock);
- 
- 	count = 0;
--	list_for_each(p, &hci_dev_list) {
-+	list_for_each_entry(d, &hci_dev_list, list) {
-+		if (!mgmt_valid_hdev(d))
-+			continue;
-+
- 		count++;
- 	}
- 
-@@ -346,6 +353,9 @@ static int read_index_list(struct sock *sk, struct hci_dev *hdev, void *data,
- 		if (test_bit(HCI_SETUP, &d->dev_flags))
- 			continue;
- 
-+		if (!mgmt_valid_hdev(d))
-+			continue;
-+
- 		rp->index[i++] = cpu_to_le16(d->id);
- 		BT_DBG("Added hci%u", d->id);
- 	}
-@@ -2820,6 +2830,9 @@ static void cmd_status_rsp(struct pending_cmd *cmd, void *data)
- 
- int mgmt_index_added(struct hci_dev *hdev)
- {
-+	if (!mgmt_valid_hdev(hdev))
-+		return -ENOTSUPP;
-+
- 	return mgmt_event(MGMT_EV_INDEX_ADDED, hdev, NULL, 0, NULL);
- }
- 
-@@ -2827,6 +2840,9 @@ int mgmt_index_removed(struct hci_dev *hdev)
- {
- 	u8 status = MGMT_STATUS_INVALID_INDEX;
- 
-+	if (!mgmt_valid_hdev(hdev))
-+		return -ENOTSUPP;
-+
- 	mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
- 
- 	return mgmt_event(MGMT_EV_INDEX_REMOVED, hdev, NULL, 0, NULL);
+ 	smp->preq[0] = SMP_CMD_PAIRING_REQ;
+ 	memcpy(&smp->preq[1], req, sizeof(*req));
 -- 
 1.7.9.5
 
