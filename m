@@ -1,41 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Jul 2012 10:56:40 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/3] Bluetooth: mgmt: Fix managing AMP device
-Message-ID: <20120719075639.GD26057@aemeltch-MOBL1>
-References: <1340971622-16318-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1340971622-16318-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20120719073945.GA7612@x220>
+Date: Thu, 19 Jul 2012 10:52:46 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix socket not getting freed if l2cap channel
+ create fails
+Message-ID: <20120719075239.GC26057@aemeltch-MOBL1>
+References: <1342682644-24964-1-git-send-email-jaganath.k@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120719073945.GA7612@x220>
+In-Reply-To: <1342682644-24964-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Jaganath,
 
-On Thu, Jul 19, 2012 at 10:39:45AM +0300, Johan Hedberg wrote:
-> Hi Andrei,
+On Thu, Jul 19, 2012 at 12:54:04PM +0530, Jaganath Kanakkassery wrote:
+> If l2cap_chan_create() fails then it will return from l2cap_sock_kill
+> since zapped flag of sk is reset.
 > 
-> On Fri, Jun 29, 2012, Andrei Emeltchenko wrote:
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > 
-> > AMP device shall not be managed by user space for now.
-> > 
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > ---
-> >  include/net/bluetooth/hci_core.h |    2 +-
-> >  net/bluetooth/hci_core.c         |    6 ++++--
-> >  net/bluetooth/mgmt.c             |   20 ++++++++++++++++++--
-> >  3 files changed, 23 insertions(+), 5 deletions(-)
+> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
+> ---
+>  net/bluetooth/l2cap_sock.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 > 
-> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> Though you could have made a bit more descriptive commit message.
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 79350d1..419857d 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -1174,7 +1174,7 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock, int p
+>  
+>  	chan = l2cap_chan_create();
+>  	if (!chan) {
+> -		l2cap_sock_kill(sk);
+> +		sk_free(sk);
 
-I will write more and this patch together with other patches.
+Could you consider using sock_put which will call sk_free,
+maybe we need to add also sock_orphan?
 
 Best regards 
 Andrei Emeltchenko 
 
+>  		return NULL;
+>  	}
+>  
+> -- 
+> 1.7.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
