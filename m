@@ -1,40 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: <ramm@ti.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Ram Malovany <ramm@ti.com>
-Subject: [PATCH v2 1/3] Bluetooth: Fix using NULL inquiry entry .
-Date: Thu, 19 Jul 2012 10:26:09 +0300
-Message-ID: <1342682771-28584-1-git-send-email-ramm@ti.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Subject: [PATCH] Bluetooth: Fix socket not getting freed if l2cap channel
+ create fails
+Date: Thu, 19 Jul 2012 12:54:04 +0530
+Message-id: <1342682644-24964-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Ram Malovany <ramm@ti.com>
+If l2cap_chan_create() fails then it will return from l2cap_sock_kill
+since zapped flag of sk is reset.
 
-If entry wasn't found in the hci_inquiry_cache_lookup_resolve do not
-resolve the name.This will fix a kernel crash when trying to use NULL
-pointer.
-
-Signed-off-by: Ram Malovany <ramm@ti.com>
+Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
 ---
- net/bluetooth/hci_event.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ net/bluetooth/l2cap_sock.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 41ff978..2de521f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1365,6 +1365,9 @@ static bool hci_resolve_next_name(struct hci_dev *hdev)
- 		return false;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 79350d1..419857d 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1174,7 +1174,7 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock, int p
  
- 	e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY, NAME_NEEDED);
-+	if (!e)
-+		return false;
-+
- 	if (hci_resolve_name(hdev, e) == 0) {
- 		e->name_state = NAME_PENDING;
- 		return true;
+ 	chan = l2cap_chan_create();
+ 	if (!chan) {
+-		l2cap_sock_kill(sk);
++		sk_free(sk);
+ 		return NULL;
+ 	}
+ 
 -- 
-1.7.4.1
+1.7.1
 
