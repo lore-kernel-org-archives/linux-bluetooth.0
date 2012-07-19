@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/8] Bluetooth: smp: Fix possible NULL dereference
-Date: Thu, 19 Jul 2012 17:03:43 +0300
-Message-Id: <1342706627-19129-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/8] Bluetooth: debug: Fix printing A2MP cmd code format
+Date: Thu, 19 Jul 2012 17:03:41 +0300
+Message-Id: <1342706627-19129-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1342706627-19129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1342706627-19129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,31 +11,35 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-smp_chan_create might return NULL so we need to check before
-dereferencing smp.
+Print A2MP code format according to Bluetooth style.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/smp.c |    5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ net/bluetooth/a2mp.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 5bb5b51..1104c5a 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -578,8 +578,11 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index bc28c21..179a6b6 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -316,7 +316,7 @@ send_rsp:
+ static inline int a2mp_cmd_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 			       struct a2mp_cmd *hdr)
+ {
+-	BT_DBG("ident %d code %d", hdr->ident, hdr->code);
++	BT_DBG("ident %d code 0x%2.2x", hdr->ident, hdr->code);
  
- 	if (!test_and_set_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags))
- 		smp = smp_chan_create(conn);
-+	else
-+		smp = conn->smp_chan;
+ 	skb_pull(skb, le16_to_cpu(hdr->len));
+ 	return 0;
+@@ -335,7 +335,7 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 		struct a2mp_cmd *hdr = (void *) skb->data;
+ 		u16 len = le16_to_cpu(hdr->len);
  
--	smp = conn->smp_chan;
-+	if (!smp)
-+		return SMP_UNSPECIFIED;
+-		BT_DBG("code 0x%02x id %d len %d", hdr->code, hdr->ident, len);
++		BT_DBG("code 0x%2.2x id %d len %u", hdr->code, hdr->ident, len);
  
- 	smp->preq[0] = SMP_CMD_PAIRING_REQ;
- 	memcpy(&smp->preq[1], req, sizeof(*req));
+ 		skb_pull(skb, sizeof(*hdr));
+ 
 -- 
 1.7.9.5
 
