@@ -1,100 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Jul 2012 15:26:48 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix legacy pairing with some devices
-Message-ID: <20120719122648.GA23541@x220>
-References: <1342699590-2549-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1342699590-2549-1-git-send-email-szymon.janc@tieto.com>
+Message-id: <20A8FECC49724666809C77E2A7A3FD32@sisodomain.com>
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@intel.com>,
+	Gustavo Padovan <gustavo@padovan.org>
+References: <1342682644-24964-1-git-send-email-jaganath.k@samsung.com>
+ <20120719075239.GC26057@aemeltch-MOBL1>
+ <760B2557394A4432BAFD74479AD7711B@sisodomain.com>
+ <20120719114037.GF26057@aemeltch-MOBL1>
+In-reply-to: <20120719114037.GF26057@aemeltch-MOBL1>
+Subject: Re: [PATCH] Bluetooth: Fix socket not getting freed if l2cap channel
+ create fails
+Date: Thu, 19 Jul 2012 17:47:07 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Andrei,
 
-On Thu, Jul 19, 2012, Szymon Janc wrote:
-> Some devices e.g. some Android based phones don't do SDP search before
-> pairing and cancel legacy pairing when ACL is disconnected.
-> 
-> PIN Code Request event which changes ACL timeout to HCI_PAIRING_TIMEOUT
-> is only received after remote user entered PIN.
-> 
-> In that case no L2CAP is connected so default HCI_DISCONN_TIMEOUT
-> (2 seconds) is being used to timeout ACL connection. This results in
-> problems with legacy pairing as remote user has only few seconds to
-> enter PIN before ACL is disconnected.
-> 
-> Increase disconnect timeout for incomming connection to
-> HCI_PAIRING_TIMEOUT if SSP is disabled and no linkey exists.
-> 
-> To avoid keeping ACL alive for too long after SDP search set ACL
-> timeout back to HCI_DISCONN_TIMEOUT when L2CAP is connected.
-> 
-> 2012-07-19 13:24:43.413521 < HCI Command: Create Connection (0x01|0x0005) plen 13
->     bdaddr 00:02:72:D6:6A:3F ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
->     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> 2012-07-19 13:24:43.425224 > HCI Event: Command Status (0x0f) plen 4
->     Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> 2012-07-19 13:24:43.885222 > HCI Event: Role Change (0x12) plen 8
->     status 0x00 bdaddr 00:02:72:D6:6A:3F role 0x01
->     Role: Slave
-> 2012-07-19 13:24:44.054221 > HCI Event: Connect Complete (0x03) plen 11
->     status 0x00 handle 42 bdaddr 00:02:72:D6:6A:3F type ACL encrypt 0x00
-> 2012-07-19 13:24:44.054313 < HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
->     handle 42
-> 2012-07-19 13:24:44.055176 > HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
->     bdaddr 00:02:72:D6:6A:3F mode 0
-> 2012-07-19 13:24:44.056217 > HCI Event: Max Slots Change (0x1b) plen 3
->     handle 42 slots 5
-> 2012-07-19 13:24:44.059218 > HCI Event: Command Status (0x0f) plen 4
->     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 0
-> 2012-07-19 13:24:44.062192 > HCI Event: Command Status (0x0f) plen 4
->     Unknown (0x00|0x0000) status 0x00 ncmd 1
-> 2012-07-19 13:24:44.067219 > HCI Event: Read Remote Supported Features (0x0b) plen 11
->     status 0x00 handle 42
->     Features: 0xbf 0xfe 0xcf 0xfe 0xdb 0xff 0x7b 0x87
-> 2012-07-19 13:24:44.067248 < HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
->     handle 42 page 1
-> 2012-07-19 13:24:44.071217 > HCI Event: Command Status (0x0f) plen 4
->     Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
-> 2012-07-19 13:24:44.076218 > HCI Event: Read Remote Extended Features (0x23) plen 13
->     status 0x00 handle 42 page 1 max 1
->     Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> 2012-07-19 13:24:44.076249 < HCI Command: Remote Name Request (0x01|0x0019) plen 10
->     bdaddr 00:02:72:D6:6A:3F mode 2 clkoffset 0x0000
-> 2012-07-19 13:24:44.081218 > HCI Event: Command Status (0x0f) plen 4
->     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> 2012-07-19 13:24:44.105214 > HCI Event: Remote Name Req Complete (0x07) plen 255
->     status 0x00 bdaddr 00:02:72:D6:6A:3F name 'uw000951-0'
-> 2012-07-19 13:24:44.105284 < HCI Command: Authentication Requested (0x01|0x0011) plen 2
->     handle 42
-> 2012-07-19 13:24:44.111207 > HCI Event: Command Status (0x0f) plen 4
->     Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
-> 2012-07-19 13:24:44.112220 > HCI Event: Link Key Request (0x17) plen 6
->     bdaddr 00:02:72:D6:6A:3F
-> 2012-07-19 13:24:44.112249 < HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
->     bdaddr 00:02:72:D6:6A:3F
-> 2012-07-19 13:24:44.115215 > HCI Event: Command Complete (0x0e) plen 10
->     Link Key Request Negative Reply (0x01|0x000c) ncmd 1
->     status 0x00 bdaddr 00:02:72:D6:6A:3F
-> 2012-07-19 13:24:44.116215 > HCI Event: PIN Code Request (0x16) plen 6
->     bdaddr 00:02:72:D6:6A:3F
-> 2012-07-19 13:24:48.099184 > HCI Event: Auth Complete (0x06) plen 3
->     status 0x13 handle 42
->     Error: Remote User Terminated Connection
-> 2012-07-19 13:24:48.179182 > HCI Event: Disconn Complete (0x05) plen 4
->     status 0x00 handle 42 reason 0x13
->     Reason: Remote User Terminated Connection
-> 
-> Cc: stable@kernel.org
-> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
-> ---
->  net/bluetooth/hci_event.c  |    7 ++++++-
->  net/bluetooth/l2cap_core.c |    1 +
->  2 files changed, 7 insertions(+), 1 deletion(-)
+--------------------------------------------------
+From: "Andrei Emeltchenko" <andrei.emeltchenko.news@gmail.com>
+Sent: Thursday, July 19, 2012 5:10 PM
+To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
+Cc: <linux-bluetooth@vger.kernel.org>; "Johan Hedberg" 
+<johan.hedberg@intel.com>; "Gustavo Padovan" <gustavo@padovan.org>
+Subject: Re: [PATCH] Bluetooth: Fix socket not getting freed if l2cap 
+channel create fails
 
-Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+> Hi Jaganath,
+>
+> On Thu, Jul 19, 2012 at 04:50:16PM +0530, Jaganath Kanakkassery wrote:
+>> Hi Andrei,
+>>
+>> --------------------------------------------------
+>> From: "Andrei Emeltchenko" <andrei.emeltchenko.news@gmail.com>
+>> Sent: Thursday, July 19, 2012 1:22 PM
+>> To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
+>> Cc: <linux-bluetooth@vger.kernel.org>
+>> Subject: Re: [PATCH] Bluetooth: Fix socket not getting freed if
+>> l2cap channel create fails
+>>
+>> >Hi Jaganath,
+>> >
+>> >On Thu, Jul 19, 2012 at 12:54:04PM +0530, Jaganath Kanakkassery wrote:
+>> >>If l2cap_chan_create() fails then it will return from l2cap_sock_kill
+>> >>since zapped flag of sk is reset.
+>> >>
+>> >>Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
+>> >>---
+>> >> net/bluetooth/l2cap_sock.c |    2 +-
+>> >> 1 files changed, 1 insertions(+), 1 deletions(-)
+>> >>
+>> >>diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+>> >>index 79350d1..419857d 100644
+>> >>--- a/net/bluetooth/l2cap_sock.c
+>> >>+++ b/net/bluetooth/l2cap_sock.c
+>> >>@@ -1174,7 +1174,7 @@ static struct sock
+>> >>*l2cap_sock_alloc(struct net *net, struct socket *sock, int p
+>> >>
+>> >> chan = l2cap_chan_create();
+>> >> if (!chan) {
+>> >>- l2cap_sock_kill(sk);
+>> >>+ sk_free(sk);
+>> >
+>> >Could you consider using sock_put which will call sk_free,
+>> >maybe we need to add also sock_orphan?
+>>
+>> Ok, Actually I used sk_free since there is not refcount increase at
+>> this point
+>
+> Have you tested it? It shall be 1, set by sock_init_data.
 
-Johan
+Yes it is 1. So even if we use sock_put() , it will decrement the refcount
+and call sk_free().
+
+>> and also I found the same code in rfcomm_sock_alloc().
+>> So should I fix it in RFCOMM also?
+>
+> I think using sock_put would be the right approach. Maybe maintainers
+> could comment here?
+
+Ok, I will wait for maintainers comments.
+
+Thanks,
+Jaganath 
+
