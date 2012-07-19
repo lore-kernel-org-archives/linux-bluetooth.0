@@ -1,53 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH hcidump 2/2] Add decoding AMP Assoc data in write_remote_amp_assoc
-Date: Thu, 19 Jul 2012 12:08:25 +0300
-Message-Id: <1342688905-31924-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1342688905-31924-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1342688905-31924-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH hcidump 1/2] lib: Correct length name in write assoc struct
+Date: Thu, 19 Jul 2012 12:08:24 +0300
+Message-Id: <1342688905-31924-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Use amp_assoc_dump in write_remote_amp_assoc HCI command
+Correct name from assoc_length to remaining_length.
 ---
- parser/hci.c |   14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ lib/hci.h |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/parser/hci.c b/parser/hci.c
-index 5b837e9..6ff30e3 100644
---- a/parser/hci.c
-+++ b/parser/hci.c
-@@ -1657,6 +1657,17 @@ static inline void le_set_scan_enable_dump(int level, struct frame *frm)
- 		(cp->filter_dup == 0x00 ? "disabled" : "enabled"));
- }
- 
-+static inline void write_remote_amp_assoc_cmd_dump(int level, struct frame *frm)
-+{
-+	write_remote_amp_assoc_cp *cp = frm->ptr;
-+
-+	p_indent(level, frm);
-+	printf("handle 0x%2.2x len_so_far %d remaining_len %d\n", cp->handle,
-+				cp->length_so_far, cp->remaining_length);
-+
-+	amp_assoc_dump(level + 1, cp->fragment, frm->len - 5);
-+}
-+
- static inline void command_dump(int level, struct frame *frm)
- {
- 	hci_command_hdr *hdr = frm->ptr;
-@@ -1934,6 +1945,9 @@ static inline void command_dump(int level, struct frame *frm)
- 		case OCF_READ_CLOCK:
- 			request_clock_dump(level + 1, frm);
- 			return;
-+		case OCF_WRITE_REMOTE_AMP_ASSOC:
-+			write_remote_amp_assoc_cmd_dump(level + 1, frm);
-+			return;
- 		}
- 		break;
- 
+diff --git a/lib/hci.h b/lib/hci.h
+index b68dbc2..3dbb221 100644
+--- a/lib/hci.h
++++ b/lib/hci.h
+@@ -1408,7 +1408,7 @@ typedef struct {
+ typedef struct {
+ 	uint8_t		handle;
+ 	uint16_t	length_so_far;
+-	uint16_t	assoc_length;
++	uint16_t	remaining_length;
+ 	uint8_t		fragment[HCI_MAX_NAME_LENGTH];
+ } __attribute__ ((packed)) write_remote_amp_assoc_cp;
+ #define WRITE_REMOTE_AMP_ASSOC_CP_SIZE 253
 -- 
 1.7.9.5
 
