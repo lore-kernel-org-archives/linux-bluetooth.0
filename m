@@ -1,102 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Jul 2012 10:35:58 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH V2] Bluetooth: Fix legacy pairing with some devices
-Message-ID: <20120719133558.GA5141@joana>
-References: <1342701968-3969-1-git-send-email-szymon.janc@tieto.com>
+Date: Thu, 19 Jul 2012 16:17:09 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [PATCH] doc: remove ListAdapters()
+Message-ID: <20120719131709.GA10975@x220>
+References: <1342703121-19128-1-git-send-email-gustavo@padovan.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1342701968-3969-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1342703121-19128-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Gustavo,
 
-* Szymon Janc <szymon.janc@tieto.com> [2012-07-19 14:46:08 +0200]:
-
-> Some devices e.g. some Android based phones don't do SDP search before
-> pairing and cancel legacy pairing when ACL is disconnected.
-> 
-> PIN Code Request event which changes ACL timeout to HCI_PAIRING_TIMEOUT
-> is only received after remote user entered PIN.
-> 
-> In that case no L2CAP is connected so default HCI_DISCONN_TIMEOUT
-> (2 seconds) is being used to timeout ACL connection. This results in
-> problems with legacy pairing as remote user has only few seconds to
-> enter PIN before ACL is disconnected.
-> 
-> Increase disconnect timeout for incomming connection to
-> HCI_PAIRING_TIMEOUT if SSP is disabled and no linkey exists.
-> 
-> To avoid keeping ACL alive for too long after SDP search set ACL
-> timeout back to HCI_DISCONN_TIMEOUT when L2CAP is connected.
-> 
-> 2012-07-19 13:24:43.413521 < HCI Command: Create Connection (0x01|0x0005) plen 13
->     bdaddr 00:02:72:D6:6A:3F ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
->     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> 2012-07-19 13:24:43.425224 > HCI Event: Command Status (0x0f) plen 4
->     Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> 2012-07-19 13:24:43.885222 > HCI Event: Role Change (0x12) plen 8
->     status 0x00 bdaddr 00:02:72:D6:6A:3F role 0x01
->     Role: Slave
-> 2012-07-19 13:24:44.054221 > HCI Event: Connect Complete (0x03) plen 11
->     status 0x00 handle 42 bdaddr 00:02:72:D6:6A:3F type ACL encrypt 0x00
-> 2012-07-19 13:24:44.054313 < HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
->     handle 42
-> 2012-07-19 13:24:44.055176 > HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
->     bdaddr 00:02:72:D6:6A:3F mode 0
-> 2012-07-19 13:24:44.056217 > HCI Event: Max Slots Change (0x1b) plen 3
->     handle 42 slots 5
-> 2012-07-19 13:24:44.059218 > HCI Event: Command Status (0x0f) plen 4
->     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 0
-> 2012-07-19 13:24:44.062192 > HCI Event: Command Status (0x0f) plen 4
->     Unknown (0x00|0x0000) status 0x00 ncmd 1
-> 2012-07-19 13:24:44.067219 > HCI Event: Read Remote Supported Features (0x0b) plen 11
->     status 0x00 handle 42
->     Features: 0xbf 0xfe 0xcf 0xfe 0xdb 0xff 0x7b 0x87
-> 2012-07-19 13:24:44.067248 < HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
->     handle 42 page 1
-> 2012-07-19 13:24:44.071217 > HCI Event: Command Status (0x0f) plen 4
->     Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
-> 2012-07-19 13:24:44.076218 > HCI Event: Read Remote Extended Features (0x23) plen 13
->     status 0x00 handle 42 page 1 max 1
->     Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> 2012-07-19 13:24:44.076249 < HCI Command: Remote Name Request (0x01|0x0019) plen 10
->     bdaddr 00:02:72:D6:6A:3F mode 2 clkoffset 0x0000
-> 2012-07-19 13:24:44.081218 > HCI Event: Command Status (0x0f) plen 4
->     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> 2012-07-19 13:24:44.105214 > HCI Event: Remote Name Req Complete (0x07) plen 255
->     status 0x00 bdaddr 00:02:72:D6:6A:3F name 'uw000951-0'
-> 2012-07-19 13:24:44.105284 < HCI Command: Authentication Requested (0x01|0x0011) plen 2
->     handle 42
-> 2012-07-19 13:24:44.111207 > HCI Event: Command Status (0x0f) plen 4
->     Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
-> 2012-07-19 13:24:44.112220 > HCI Event: Link Key Request (0x17) plen 6
->     bdaddr 00:02:72:D6:6A:3F
-> 2012-07-19 13:24:44.112249 < HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
->     bdaddr 00:02:72:D6:6A:3F
-> 2012-07-19 13:24:44.115215 > HCI Event: Command Complete (0x0e) plen 10
->     Link Key Request Negative Reply (0x01|0x000c) ncmd 1
->     status 0x00 bdaddr 00:02:72:D6:6A:3F
-> 2012-07-19 13:24:44.116215 > HCI Event: PIN Code Request (0x16) plen 6
->     bdaddr 00:02:72:D6:6A:3F
-> 2012-07-19 13:24:48.099184 > HCI Event: Auth Complete (0x06) plen 3
->     status 0x13 handle 42
->     Error: Remote User Terminated Connection
-> 2012-07-19 13:24:48.179182 > HCI Event: Disconn Complete (0x05) plen 4
->     status 0x00 handle 42 reason 0x13
->     Reason: Remote User Terminated Connection
-> 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
-> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+On Thu, Jul 19, 2012, Gustavo Padovan wrote:
 > ---
->  net/bluetooth/hci_event.c  |    7 ++++++-
->  net/bluetooth/l2cap_core.c |    1 +
->  2 files changed, 7 insertions(+), 1 deletion(-)
+>  doc/manager-api.txt |   10 ----------
+>  1 file changed, 10 deletions(-)
 
-Patch has been applied to bluetooth.git. Thanks.
+Applied. Thanks. (though I did add the answer to the question "why?" to
+the commit message in case someone not familar with the cleanup process
+looks at the history, or even one of us looks at it two years from now).
+Don't be afraid to use kernel-level verbosity in the commit messages ;)
 
-	Gustavo
+Johan
