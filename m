@@ -1,67 +1,409 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Jul 2012 13:23:06 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: mgmt: Fix possible NULL dereference
-Message-ID: <20120719102306.GA15933@x220>
-References: <1342691392-4006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <5007FB1D.1040604@gmail.com>
+Date: Thu, 19 Jul 2012 14:18:37 +0200
+From: NetJackBlog <netjackblog@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1342691392-4006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: HFP microphone implementation
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Good Morning,
 
-On Thu, Jul 19, 2012, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> hdev might be dereferenced in handler->func functions.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/mgmt.c |   11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 2a0f695..48a83c9 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -2801,14 +2801,15 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
->  		goto done;
->  	}
->  
-> -	if (hdev)
-> +	if (hdev) {
->  		mgmt_init_hdev(sk, hdev);
->  
-> -	cp = buf + sizeof(*hdr);
-> +		cp = buf + sizeof(*hdr);
->  
-> -	err = handler->func(sk, hdev, cp, len);
-> -	if (err < 0)
-> -		goto done;
-> +		err = handler->func(sk, hdev, cp, len);
-> +		if (err < 0)
-> +			goto done;
-> +	}
->  
->  	err = msglen;
+I'm Jack and I'm trying to develop a custom HFP (hand free side) for 
+using my PC as a microphone during phone calls.
+Please excuse my typing errors but English is not my native language.
+Well, I searched the web and I found that a lot of work was done with 
+ofono.
+My intent is to use more standard software as possible, so I rearranged 
+some code found on the internet that implement HFP speakers through 
+bluez and alsa
 
-Nack.
+This is the code:
 
-hdev is supposed to be NULL for some of the commands/handlers
-(read_version, read_index_list, etc). With your change these mgmt
-commands couldn't be called anymore. There's also a check for this
-higher up in the mgmt_control function to ensure that hdev is not NULL
-for other handlers:
+****************************************************************************
+#include "btinclude.h"
 
-        if ((hdev && opcode < MGMT_OP_READ_INFO) ||
-                        (!hdev && opcode >= MGMT_OP_READ_INFO)) {
-                err = cmd_status(sk, index, opcode,
-                                 MGMT_STATUS_INVALID_INDEX);
-                goto done;
-        }
+#include <alsa/asoundlib.h>
 
-Johan
+int set_class(unsigned int cls, int timeout)
+{
+     int id;
+     int fh;
+     bdaddr_t btaddr;
+     char pszaddr[18];
+
+     // get the device ID
+     // passing in NULL instead of a bdaddr_t will
+     // give the ID of the first bluetooth device
+     if ((id = hci_get_route(NULL)) < 0)
+         return -1;
+
+     // convert the device ID into a 6 byte bluetooth address
+     if (hci_devba(id, &btaddr) < 0)
+         return -1;
+
+     // convert the address into a zero terminated string
+     if (ba2str(&btaddr, pszaddr) < 0)
+         return -1;
+
+     // open a file handle to the HCI
+     if ((fh = hci_open_dev(id)) < 0)
+         return -1;
+
+     // set the class
+     if (hci_write_class_of_dev(fh, cls, timeout) != 0)
+     {
+         perror("hci_write_class ");
+         return -1;
+     }
+
+     // close the file handle
+     hci_close_dev(fh);
+
+     printf("set device %s to class: 0x%06x\n", pszaddr, cls);
+
+     return 0;
+}
+
+/***********************************************************************/
+
+// source adapted from:
+// http://people.csail.mit.edu/albert/bluez-intro/x604.html and
+// http://nohands.sourceforge.net/source.html (libhfp/hfp.cpp: SdpRegister)
+
+int register_sdp(uint8_t channel)
+{
+     const char *service_name = "HSP service";
+     const char *service_dsc = "HSP";
+     const char *service_prov = "working times";
+
+     uuid_t hs_uuid, ga_uuid;
+
+     sdp_profile_desc_t desc;
+
+     uuid_t root_uuid, l2cap_uuid, rfcomm_uuid;
+     sdp_list_t *l2cap_list = 0,
+                *rfcomm_list = 0,
+                *root_list = 0,
+                *proto_list = 0,
+                *access_proto_list = 0;
+
+     sdp_data_t *channel_d = 0;
+
+     int err = 0;
+     sdp_session_t *session = 0;
+
+     sdp_record_t *record = sdp_record_alloc();
+
+     // set the name, provider, and description
+     sdp_set_info_attr(record, service_name, service_prov, service_dsc);
+
+     // service class ID (HEADSET)
+     sdp_uuid16_create(&hs_uuid, HEADSET_SVCLASS_ID);
+
+     if (!(root_list = sdp_list_append(0, &hs_uuid)))
+         return -1;
+
+     sdp_uuid16_create(&ga_uuid, GENERIC_AUDIO_SVCLASS_ID);
+
+     if (!(root_list = sdp_list_append(root_list, &ga_uuid)))
+         return -1;
+
+     if (sdp_set_service_classes(record, root_list) < 0)
+         return -1;
+
+     sdp_list_free(root_list, 0);
+     root_list = 0;
+
+     // make the service record publicly browsable
+     sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
+
+     root_list = sdp_list_append(0, &root_uuid);
+     sdp_set_browse_groups( record, root_list );
+
+     // set l2cap information
+     sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
+     l2cap_list = sdp_list_append( 0, &l2cap_uuid );
+     proto_list = sdp_list_append( 0, l2cap_list );
+
+     // set rfcomm information
+     sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
+     channel_d = sdp_data_alloc(SDP_UINT8, &channel);
+     rfcomm_list = sdp_list_append( 0, &rfcomm_uuid );
+
+     sdp_list_append( rfcomm_list, channel_d );
+     sdp_list_append( proto_list, rfcomm_list );
+
+     // attach protocol information to service record
+     access_proto_list = sdp_list_append( 0, proto_list );
+     sdp_set_access_protos( record, access_proto_list );
+
+     sdp_uuid16_create(&desc.uuid, HEADSET_PROFILE_ID);
+
+     // set the version to 1.0
+     desc.version = 0x0100;
+
+     if (!(root_list = sdp_list_append(NULL, &desc)))
+         return -1;
+
+     if (sdp_set_profile_descs(record, root_list) < 0)
+         return -1;
+
+     // connect to the local SDP server and register the service record
+     session = sdp_connect( BDADDR_ANY, BDADDR_LOCAL, SDP_RETRY_IF_BUSY );
+     err = sdp_record_register(session, record, 0);
+
+     // cleanup
+     sdp_data_free( channel_d );
+     sdp_list_free( l2cap_list, 0 );
+     sdp_list_free( rfcomm_list, 0 );
+     sdp_list_free( root_list, 0 );
+     sdp_list_free( access_proto_list, 0 );
+
+     return err;
+}
+
+/***********************************************************************/
+
+int rfcomm_listen(uint8_t channel)
+{
+     int sock;                        // socket descriptor for local 
+listener
+     int client;                        // socket descriptor for remote 
+client
+     unsigned int len = sizeof(struct sockaddr_rc);
+
+     struct sockaddr_rc remote;        // local rfcomm socket address
+     struct sockaddr_rc local;        // remote rfcomm socket address
+     char pszremote[18];
+
+     // initialize a bluetooth socket
+     sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+
+     local.rc_family = AF_BLUETOOTH;
+
+     // TODO: change this to a local address if you know what
+     // address to use
+     local.rc_bdaddr = *BDADDR_ANY;
+     local.rc_channel = channel;
+
+     // bind the socket to a bluetooth device
+     if (bind(sock, (struct sockaddr *)&local, sizeof(struct 
+sockaddr_rc)) < 0)
+         return -1;
+
+     // set the listening queue length
+     if (listen(sock, 1) < 0)
+         return -1;
+
+     printf("accepting connections on channel: %d\n", channel);
+
+     // accept incoming connections; this is a blocking call
+     client = accept(sock, (struct sockaddr *)&remote, &len);
+
+     ba2str(&remote.rc_bdaddr, pszremote);
+
+     printf("received connection from: %s\n", pszremote);
+
+     // turn off blocking
+     if (fcntl(client, F_SETFL, O_NONBLOCK) < 0)
+         return -1;
+
+     // return the client socket descriptor
+     return client;
+}
+
+/***********************************************************************/
+
+int sco_listen()
+{
+     int sock;
+     int client;
+     unsigned int len = sizeof(struct sockaddr_sco);
+     char pszremote[18];
+
+     struct sockaddr_sco local;
+     struct sockaddr_sco remote;
+
+     sock = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO);
+
+     local.sco_family = AF_BLUETOOTH;
+
+     local.sco_bdaddr = *BDADDR_ANY;
+
+     if (bind(sock, (struct sockaddr*)&local, sizeof(struct 
+sockaddr_sco)) < 0)
+         return -1;
+
+     if (listen(sock, 1) < 0)
+         return -1;
+
+     client = accept(sock, (struct sockaddr*)&remote, &len);
+
+     ba2str(&remote.sco_bdaddr, pszremote);
+
+     printf("sco received connection from: %s\n", pszremote);
+
+     // close the listener
+     close(sock);
+
+     return client;
+}
+
+/***********************************************************************/
+
+int handle_connection(int rfcommsock, int scosock)
+{
+     char scobuffer[256];
+     char rfcommbuffer[256];
+     int len;
+
+     struct snd_pcm_t *sndhandle;
+
+     // open the default sound device
+     if (snd_pcm_open((snd_pcm_t **)&sndhandle, "default", 
+SND_PCM_STREAM_CAPTURE, 0) < 0)
+     {
+         perror("snd_pcm_open ");
+         return -1;
+     }
+
+     // initialize the device to handle an 8khz, single channel,
+     // little endian audio data stream
+     if (snd_pcm_set_params((snd_pcm_t *)sndhandle, 
+SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED, 1,
+             8000, 0, 0) < 0)
+     {
+         perror("set_params ");
+         return -1;
+     }
+
+
+
+
+//    while (1)
+//    {
+    int soundread = snd_pcm_readi((snd_pcm_t *)sndhandle, scobuffer, 128 
+/ 2);
+    printf("frame letti %d\n", soundread);
+         // read from the SCO socket
+         // it should constantly stream data
+     len = send(scosock, scobuffer, 128, 0);
+      printf ("postsend %d\n", scosock);
+             fprintf (stdout, "sent %d len %d\n", len, 256);
+             perror ("send ");
+
+     if (len <= 0)
+     {
+
+       printf("brekkasend");
+//      break;
+     }
+
+         // send the sound data to the sound
+         // the sound device expects "frames".  since we have 16 bit, single
+         // channel data, each 2 bytes is one "frame"
+//        snd_pcm_readi((snd_pcm_t *)sndhandle, scobuffer, len / 2);
+
+         // read from the RFCOMM socket
+         // this socket has blocking turned off so it will never block,
+         // even if no data is available
+         len = recv(rfcommsock, rfcommbuffer, 256, 0);
+
+         // EWOULDBLOCK indicates the socket would block if we had a
+         // blocking socket.  we'll safely continue if we receive that
+         // error.  treat all other errors as fatal
+         if (len < 0 && errno != EWOULDBLOCK)
+         {
+             perror("rfcomm recv ");
+       printf("mark");
+//            break;
+         }
+         else if (len > 0)
+         {
+             // received a message; print it to the screen and
+             // return ATOK to the remote device
+             rfcommbuffer[len] = '\0';
+
+             printf("rfcomm received: %s\n", rfcommbuffer);
+             send(rfcommsock, "ATOK\r\n", 6, 0);
+
+//        }
+
+         // printf("loop\n");
+     }
+
+
+
+     // close the sound device
+     snd_pcm_close((snd_pcm_t *)sndhandle);
+
+     close(scosock);
+     close(rfcommsock);
+
+     printf("client disconnected\n");
+
+     return 0;
+}
+
+/***********************************************************************/
+
+unsigned int cls = 0x280404;
+int timeout = 1000;
+uint8_t channel = 3;
+
+int main()
+{
+     int rfcommsock;
+     int scosock;
+
+     if (set_class(cls, timeout) < 0)
+     {
+         perror("set_class ");
+     }
+
+     if (register_sdp(channel) < 0)
+     {
+         perror("register_sdp ");
+         return -1;
+     }
+
+     if ((rfcommsock = rfcomm_listen(channel)) < 0)
+     {
+         perror("set_class ");
+         return -1;
+     }
+
+     if ((scosock = sco_listen()) < 0)
+     {
+         perror("sco_listen ");
+         return -1;
+     }
+
+     handle_connection(rfcommsock, scosock);
+
+     return 0;
+}
+
+************************************************************
+
+
+As you can see I had to comment the "while" statement in the 
+"handle_connection" function to get things done.
+It' s very strange to my unexpert eye, because that "while" must be 
+uncommented to get the audio stream flow to the socket, but with the 
+"while" the software doesn't works and tells me "send: Resource 
+temporarily unavaible". With the "while" If I start the software, answer 
+a call and quit with "ctrl-c" the connection start working and I can use 
+my pc mic as phone mic. When I saw this I decided to comment the "while" 
+so that the software can quit itself.
+Can someone explain this? I would like to figure out what is going wrong 
+so I can correct the code.
+
+I tested the software on ubuntu 12.04; kernel 3.2.0-26; bluez 4.98;
+
+Thanks for your patience and time, have a nice day,
+
+Jack
