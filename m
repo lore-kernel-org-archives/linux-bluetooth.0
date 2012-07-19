@@ -1,60 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <760B2557394A4432BAFD74479AD7711B@sisodomain.com>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-References: <1342682644-24964-1-git-send-email-jaganath.k@samsung.com>
- <20120719075239.GC26057@aemeltch-MOBL1>
-In-reply-to: <20120719075239.GC26057@aemeltch-MOBL1>
-Subject: Re: [PATCH] Bluetooth: Fix socket not getting freed if l2cap channel
- create fails
-Date: Thu, 19 Jul 2012 16:50:16 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
+Date: Thu, 19 Jul 2012 14:15:27 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: mgmt: Fix possible NULL dereference
+Message-ID: <20120719111527.GA17483@x220>
+References: <1342691392-4006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20120719102306.GA15933@x220>
+ <20120719103819.GE26057@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120719103819.GE26057@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
---------------------------------------------------
-From: "Andrei Emeltchenko" <andrei.emeltchenko.news@gmail.com>
-Sent: Thursday, July 19, 2012 1:22 PM
-To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: Fix socket not getting freed if l2cap 
-channel create fails
+On Thu, Jul 19, 2012, Andrei Emeltchenko wrote:
+> On Thu, Jul 19, 2012 at 01:23:06PM +0300, Johan Hedberg wrote:
+> > Hi Andrei,
+> > 
+> > On Thu, Jul 19, 2012, Andrei Emeltchenko wrote:
+> > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > 
+> > > hdev might be dereferenced in handler->func functions.
+> > > 
+> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > ---
+> > >  net/bluetooth/mgmt.c |   11 ++++++-----
+> > >  1 file changed, 6 insertions(+), 5 deletions(-)
+> > > 
+> > > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> > > index 2a0f695..48a83c9 100644
+> > > --- a/net/bluetooth/mgmt.c
+> > > +++ b/net/bluetooth/mgmt.c
+> > > @@ -2801,14 +2801,15 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+> > >  		goto done;
+> > >  	}
+> > >  
+> > > -	if (hdev)
+> > > +	if (hdev) {
+> > >  		mgmt_init_hdev(sk, hdev);
+> > >  
+> > > -	cp = buf + sizeof(*hdr);
+> > > +		cp = buf + sizeof(*hdr);
+> > >  
+> > > -	err = handler->func(sk, hdev, cp, len);
+> > > -	if (err < 0)
+> > > -		goto done;
+> > > +		err = handler->func(sk, hdev, cp, len);
+> > > +		if (err < 0)
+> > > +			goto done;
+> > > +	}
+> > >  
+> > >  	err = msglen;
+> > 
+> > Nack.
+> > 
+> > hdev is supposed to be NULL for some of the commands/handlers
+> > (read_version, read_index_list, etc). With your change these mgmt
+> > commands couldn't be called anymore. There's also a check for this
+> > higher up in the mgmt_control function to ensure that hdev is not NULL
+> > for other handlers:
+> 
+> OK, though I do not like that division by command name.
 
-> Hi Jaganath,
->
-> On Thu, Jul 19, 2012 at 12:54:04PM +0530, Jaganath Kanakkassery wrote:
->> If l2cap_chan_create() fails then it will return from l2cap_sock_kill
->> since zapped flag of sk is reset.
->>
->> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
->> ---
->>  net/bluetooth/l2cap_sock.c |    2 +-
->>  1 files changed, 1 insertions(+), 1 deletions(-)
->>
->> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
->> index 79350d1..419857d 100644
->> --- a/net/bluetooth/l2cap_sock.c
->> +++ b/net/bluetooth/l2cap_sock.c
->> @@ -1174,7 +1174,7 @@ static struct sock *l2cap_sock_alloc(struct net 
->> *net, struct socket *sock, int p
->>
->>  chan = l2cap_chan_create();
->>  if (!chan) {
->> - l2cap_sock_kill(sk);
->> + sk_free(sk);
->
-> Could you consider using sock_put which will call sk_free,
-> maybe we need to add also sock_orphan?
+I was originally thinking of having a boolean flag for that in the
+look-up table but concluded that it's a bit overkill (not to mention
+that it breaks the clean formatting) since only the first few commands
+are the ones that don't take a valid controller index.
 
-Ok, Actually I used sk_free since there is not refcount increase at this 
-point
-and also I found the same code in rfcomm_sock_alloc().
-So should I fix it in RFCOMM also?
-
-Thanks,
-Jaganath 
-
+Johan
