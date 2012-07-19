@@ -1,82 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ] serial: Remove serial test script
-Date: Thu, 19 Jul 2012 13:36:05 -0300
-Message-Id: <1342715766-22943-1-git-send-email-claudio.takahasi@openbossa.org>
+Date: Thu, 19 Jul 2012 13:21:17 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 8/8] Bluetooth: Fix processing A2MP chan in security_cfm
+Message-ID: <20120719162117.GF5141@joana>
+References: <1342706627-19129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1342706627-19129-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1342706627-19129-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- test/test-serial |   58 ------------------------------------------------------
- 1 files changed, 0 insertions(+), 58 deletions(-)
- delete mode 100755 test/test-serial
+Hi Andrei,
 
-diff --git a/test/test-serial b/test/test-serial
-deleted file mode 100755
-index 8858dbd..0000000
---- a/test/test-serial
-+++ /dev/null
-@@ -1,58 +0,0 @@
--#!/usr/bin/python
--
--from __future__ import absolute_import, print_function, unicode_literals
--
--import sys
--import time
--import dbus
--from optparse import OptionParser, make_option
--
--bus = dbus.SystemBus()
--
--manager = dbus.Interface(bus.get_object("org.bluez", "/"),
--						"org.bluez.Manager")
--option_list = [
--		make_option("-i", "--device", action="store",
--				type="string", dest="dev_id"),
--		]
--parser = OptionParser(option_list=option_list)
--
--(options, args) = parser.parse_args()
--
--if options.dev_id:
--	adapter_path = manager.FindAdapter(options.dev_id)
--else:
--	adapter_path = manager.DefaultAdapter()
--
--adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
--							"org.bluez.Adapter")
--
--if (len(args) < 1):
--	print("Usage: %s <address> [service]" % (sys.argv[0]))
--	sys.exit(1)
--
--address = args[0]
--
--if (len(args) < 2):
--	service = "spp"
--else:
--	service = args[1]
--
--path = adapter.FindDevice(address)
--
--serial = dbus.Interface(bus.get_object("org.bluez", path),
--						"org.bluez.Serial")
--
--node = serial.Connect(service)
--
--print("Connected %s to %s" % (node, address))
--
--print("Press CTRL-C to disconnect")
--
--try:
--	time.sleep(1000)
--	print("Terminating connection")
--except:
--	pass
--
--serial.Disconnect(node)
--- 
-1.7.8.6
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-07-19 17:03:47 +0300]:
 
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Do not process A2MP channel in l2cap_security_cfm
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/l2cap_core.c |    5 +++++
+>  1 file changed, 5 insertions(+)
+
+All patches have been applied to bluetooth-next.git, but patch 4 that went to
+bluetooth.git, thanks.
+
+	Gustavo
