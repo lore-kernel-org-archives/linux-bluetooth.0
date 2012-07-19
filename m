@@ -1,76 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Jul 2012 13:38:21 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: mgmt: Fix possible NULL dereference
-Message-ID: <20120719103819.GE26057@aemeltch-MOBL1>
-References: <1342691392-4006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20120719102306.GA15933@x220>
+Date: Thu, 19 Jul 2012 13:25:36 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/2] Bluetooth: Fix legacy pairing with some devices
+Message-ID: <20120719102536.GB15933@x220>
+References: <1338198440-15077-1-git-send-email-szymon.janc@tieto.com>
+ <8577078.KmiEQoH2Vq@uw000953>
+ <20120719093452.GC7612@x220>
+ <1709298.ayJY9Nu1WY@uw000953>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120719102306.GA15933@x220>
+In-Reply-To: <1709298.ayJY9Nu1WY@uw000953>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Szymon,
 
-On Thu, Jul 19, 2012 at 01:23:06PM +0300, Johan Hedberg wrote:
-> Hi Andrei,
+On Thu, Jul 19, 2012, Szymon Janc wrote:
+> On Thursday 19 of July 2012 12:34:52 Johan Hedberg wrote:
 > 
-> On Thu, Jul 19, 2012, Andrei Emeltchenko wrote:
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > > > > Maybe we could set timeout back to HCI_DICONN_TIMEOUT when l2cap is
+> > > > > > connected (or disconnected)? That should cover SDP search case..
+> > > > >
+> > > > > What happened to getting this patch upstream? To me it looks like a
+> > > > > definitely needed fix. After adding the fix to restore a sensible value
+> > > > > for disc_timeout after an L2CAP connect request either way and adding a
+> > > > > better explanation to the commit message (that we only get the PIN
+> > > > > request after user has entered one on the remote side, including a
+> > > > > hcidump of this) I think this should go upstream. If this had been
+> > > > > processed in a timely manner it could have made it to 3.5 but now it
+> > > > > seems too late for that (as it's not strictly speaking a regression from
+> > > > > 3.4).
+> > > >
+> > > > Could you re-do this patch as Johan says so we can try push it to 3.5?
+> > > 
+> > > Sorry for late reply, been on rather long holiday..
+> > > 
+> > > I now feel that this is a bug in bluez not in kernel - bluez should not cancel
+> > > PIN request for agent if acl is disconnected but just reconnect when PIN is
+> > > provided.
+> > > 
+> > > So, if you still like to have this workaround in kernel for devices which are
+> > > highly unlikely to have this fixed I can send new version.
 > > 
-> > hdev might be dereferenced in handler->func functions.
-> > 
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > ---
-> >  net/bluetooth/mgmt.c |   11 ++++++-----
-> >  1 file changed, 6 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> > index 2a0f695..48a83c9 100644
-> > --- a/net/bluetooth/mgmt.c
-> > +++ b/net/bluetooth/mgmt.c
-> > @@ -2801,14 +2801,15 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
-> >  		goto done;
-> >  	}
-> >  
-> > -	if (hdev)
-> > +	if (hdev) {
-> >  		mgmt_init_hdev(sk, hdev);
-> >  
-> > -	cp = buf + sizeof(*hdr);
-> > +		cp = buf + sizeof(*hdr);
-> >  
-> > -	err = handler->func(sk, hdev, cp, len);
-> > -	if (err < 0)
-> > -		goto done;
-> > +		err = handler->func(sk, hdev, cp, len);
-> > +		if (err < 0)
-> > +			goto done;
-> > +	}
-> >  
-> >  	err = msglen;
+> > I don't agree with your categorization of the kernel change as a
+> > workaround. Since it was the remote side the initiated the initial ACL I
+> > don't think it's right for us to have any kind of automation of creating
+> > a second ACL in the opposite direction. So please do the improvements to
+> > your patch as discussed and resend. Thanks.
 > 
-> Nack.
+> I guess I wasn't clear enough.. I meant that the bug is in bluez which is also
+> running on remote device and is unlikely to get updated. No connection in 
+> opposite direction is taking place. It is bluez on initiator side that should
+> reconnect when it received PIN from user if acl was disconnected. Most agents
+> do service search in the meantime so l2cap exists and acl is not disconnected.
 > 
-> hdev is supposed to be NULL for some of the commands/handlers
-> (read_version, read_index_list, etc). With your change these mgmt
-> commands couldn't be called anymore. There's also a check for this
-> higher up in the mgmt_control function to ensure that hdev is not NULL
-> for other handlers:
+> This can be easily reproduced with simple-agent which is not doing service
+> search.
 
-OK, though I do not like that division by command name.
+Understood. I still think that we should do the necessary changes to the
+disconnect timer. I've actually seen this kind of behavior quite often
+at UnplugFests and I doubt all of the other parties have been running
+BlueZ.
 
-> 
->         if ((hdev && opcode < MGMT_OP_READ_INFO) ||
->                         (!hdev && opcode >= MGMT_OP_READ_INFO)) {
->                 err = cmd_status(sk, index, opcode,
->                                  MGMT_STATUS_INVALID_INDEX);
->                 goto done;
->         }
-> 
-
-
-Best regards 
-Andrei Emeltchenko 
+Johan
