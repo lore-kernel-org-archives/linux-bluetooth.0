@@ -2,131 +2,97 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ 2/5] gdbus: Implement DBus.Properties.Get method
-Date: Thu, 19 Jul 2012 00:20:05 -0300
-Message-Id: <1342668008-5522-3-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ 1/5] gdbus: Add skeleton of DBus.Properties interface
+Date: Thu, 19 Jul 2012 00:20:04 -0300
+Message-Id: <1342668008-5522-2-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1342668008-5522-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1342668008-5522-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- gdbus/gdbus.h  | 13 ++++++++++--
- gdbus/object.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 74 insertions(+), 3 deletions(-)
+This interface is responsible for handling properties of all objects in
+a given path. Right now it only registers itself, doing nothing useful.
+A conversion to this new layout will be done by subsequent patches.
 
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index 0a8a27c..e2a8460 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -55,6 +55,13 @@ typedef void (* GDBusDestroyFunction) (void *user_data);
- typedef DBusMessage * (* GDBusMethodFunction) (DBusConnection *connection,
- 					DBusMessage *message, void *user_data);
- 
-+typedef struct GDBusPropertyTable GDBusPropertyTable;
-+typedef gboolean (*GDBusPropertyGetter)(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data);
-+
-+typedef gboolean (*GDBusPropertyExists)(const GDBusPropertyTable *property,
-+								void *data);
-+
- typedef guint32 GDBusPendingReply;
- 
- typedef void (* GDBusSecurityFunction) (DBusConnection *connection,
-@@ -102,11 +109,13 @@ typedef struct {
- 	const GDBusArgInfo *args;
- } GDBusSignalTable;
- 
--typedef struct {
-+struct GDBusPropertyTable {
- 	const char *name;
- 	const char *type;
-+	GDBusPropertyGetter get;
-+	GDBusPropertyExists exists;
- 	GDBusPropertyFlags flags;
--} GDBusPropertyTable;
-+};
- 
- typedef struct {
- 	unsigned int privilege;
+org.freedesktop.org.DBus.Properties spec can be found at
+http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-properties
+---
+ gdbus/object.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
+
 diff --git a/gdbus/object.c b/gdbus/object.c
-index 72f77d4..543e61c 100644
+index 900e7ab..72f77d4 100644
 --- a/gdbus/object.c
 +++ b/gdbus/object.c
-@@ -491,10 +491,72 @@ static const GDBusMethodTable introspect_methods[] = {
+@@ -491,6 +491,50 @@ static const GDBusMethodTable introspect_methods[] = {
  	{ }
  };
  
-+static inline const GDBusPropertyTable *find_property(const GDBusPropertyTable *properties,
-+							const char *property_name)
++static DBusMessage *properties_get(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
 +{
-+	const GDBusPropertyTable *p;
-+
-+	for (p = properties; p && p->name; p++) {
-+		if (strcmp(property_name, p->name) == 0)
-+			return p;
-+	}
-+
 +	return NULL;
 +}
 +
- static DBusMessage *properties_get(DBusConnection *connection,
- 					DBusMessage *message, void *user_data)
- {
--	return NULL;
-+	struct generic_data *data = user_data;
-+	struct interface_data *iface;
-+	const GDBusPropertyTable *property;
-+	const char *interface_name, *property_name;
-+	DBusMessageIter iter, value;
-+	DBusMessage *reply;
++static DBusMessage *properties_get_all(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
++{
++	return NULL;
++}
 +
-+	if (!dbus_message_get_args(message, NULL,
-+					DBUS_TYPE_STRING, &interface_name,
-+					DBUS_TYPE_STRING, &property_name,
-+					DBUS_TYPE_INVALID))
-+		return NULL;
++static DBusMessage *properties_set(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
++{
++	return NULL;
++}
 +
-+	iface = find_interface(data->interfaces, interface_name);
-+	if (iface == NULL)
-+		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
-+				"No such interface '%s'", interface_name);
++static const GDBusMethodTable properties_methods[] = {
++	{ GDBUS_METHOD("Get",
++			GDBUS_ARGS({ "interface_name", "s" },
++						{ "property_name", "s" }),
++			GDBUS_ARGS({ "value", "v" }),
++			properties_get) },
++	{ GDBUS_METHOD("Set", NULL,
++			GDBUS_ARGS({ "interface_name", "s" },
++					{ "property_name", "s" },
++					{ "value", "v" }),
++			properties_set) },
++	{ GDBUS_METHOD("GetAll",
++			GDBUS_ARGS({ "interface_name", "s" }),
++			GDBUS_ARGS({ "props", "a{sv}" }),
++			properties_get_all) },
++	{ }
++};
 +
-+	property = find_property(iface->properties, property_name);
-+	if (property == NULL)
-+		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
-+				"No such property '%s'", property_name);
++static const GDBusSignalTable properties_signals[] = {
++	{ GDBUS_SIGNAL("PropertiesChanged",
++			GDBUS_ARGS({ "interface_name", "s" },
++					{ "changed_properties", "a{sv}" },
++					{ "invalidated_properties", "as"})) },
++	{ }
++};
 +
-+	if (property->exists != NULL &&
-+			!property->exists(property, iface->user_data))
-+		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
-+						"No such property '%s'",
-+						property_name);
+ static void add_interface(struct generic_data *data, const char *name,
+ 				const GDBusMethodTable *methods,
+ 				const GDBusSignalTable *signals,
+@@ -541,6 +585,9 @@ static struct generic_data *object_path_ref(DBusConnection *connection,
+ 	add_interface(data, DBUS_INTERFACE_INTROSPECTABLE,
+ 			introspect_methods, NULL, NULL, data, NULL);
+ 
++	add_interface(data, DBUS_INTERFACE_PROPERTIES, properties_methods,
++					properties_signals, NULL, data, NULL);
 +
-+	if (property->get == NULL)
-+		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
-+					"Property '%s' is not readable",
-+					property_name);
-+
-+	reply = dbus_message_new_method_return(message);
-+	if (reply == NULL)
-+		return NULL;
-+
-+	dbus_message_iter_init_append(reply, &iter);
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_VARIANT,
-+						property->type, &value);
-+
-+	if (!property->get(property, &value, iface->user_data)) {
-+		dbus_message_unref(reply);
-+		return NULL;
-+	}
-+
-+	dbus_message_iter_close_container(&iter, &value);
-+
-+	return reply;
+ 	return data;
  }
  
- static DBusMessage *properties_get_all(DBusConnection *connection,
+@@ -580,6 +627,7 @@ static void object_path_unref(DBusConnection *connection, const char *path)
+ 		return;
+ 
+ 	remove_interface(data, DBUS_INTERFACE_INTROSPECTABLE);
++	remove_interface(data, DBUS_INTERFACE_PROPERTIES);
+ 
+ 	invalidate_parent_data(connection, path);
+ 
 -- 
 1.7.11.2
 
