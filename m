@@ -1,73 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 19 Jul 2012 13:38:21 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] AVCTP: Make use of sendmsg to avoid copying data
-Date: Thu, 19 Jul 2012 13:49:35 +0300
-Message-Id: <1342694975-9184-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH] Bluetooth: mgmt: Fix possible NULL dereference
+Message-ID: <20120719103819.GE26057@aemeltch-MOBL1>
+References: <1342691392-4006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20120719102306.GA15933@x220>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120719102306.GA15933@x220>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Johan,
 
-This use sendmsg to send headers and operands in separated buffers
-avoiding memcpy.
----
- audio/avctp.c |   21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+On Thu, Jul 19, 2012 at 01:23:06PM +0300, Johan Hedberg wrote:
+> Hi Andrei,
+> 
+> On Thu, Jul 19, 2012, Andrei Emeltchenko wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > hdev might be dereferenced in handler->func functions.
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  net/bluetooth/mgmt.c |   11 ++++++-----
+> >  1 file changed, 6 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> > index 2a0f695..48a83c9 100644
+> > --- a/net/bluetooth/mgmt.c
+> > +++ b/net/bluetooth/mgmt.c
+> > @@ -2801,14 +2801,15 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+> >  		goto done;
+> >  	}
+> >  
+> > -	if (hdev)
+> > +	if (hdev) {
+> >  		mgmt_init_hdev(sk, hdev);
+> >  
+> > -	cp = buf + sizeof(*hdr);
+> > +		cp = buf + sizeof(*hdr);
+> >  
+> > -	err = handler->func(sk, hdev, cp, len);
+> > -	if (err < 0)
+> > -		goto done;
+> > +		err = handler->func(sk, hdev, cp, len);
+> > +		if (err < 0)
+> > +			goto done;
+> > +	}
+> >  
+> >  	err = msglen;
+> 
+> Nack.
+> 
+> hdev is supposed to be NULL for some of the commands/handlers
+> (read_version, read_index_list, etc). With your change these mgmt
+> commands couldn't be called anymore. There's also a check for this
+> higher up in the mgmt_control function to ensure that hdev is not NULL
+> for other handlers:
 
-diff --git a/audio/avctp.c b/audio/avctp.c
-index e3e5275..9ef6161 100644
---- a/audio/avctp.c
-+++ b/audio/avctp.c
-@@ -929,23 +929,20 @@ static int avctp_send(struct avctp *session, uint8_t transaction, uint8_t cr,
- 				uint8_t code, uint8_t subunit, uint8_t opcode,
- 				uint8_t *operands, size_t operand_count)
- {
--	uint8_t *buf;
-+	uint8_t buf[AVCTP_HEADER_LENGTH + AVC_HEADER_LENGTH];
- 	struct avctp_header *avctp;
- 	struct avc_header *avc;
--	uint8_t *pdu;
-+	struct msghdr msg;
-+	struct iovec iov[2];
- 	int sk, err = 0;
--	uint16_t size;
- 
- 	if (session->state != AVCTP_STATE_CONNECTED)
- 		return -ENOTCONN;
- 
- 	sk = g_io_channel_unix_get_fd(session->io);
--	size = AVCTP_HEADER_LENGTH + AVC_HEADER_LENGTH + operand_count;
--	buf = g_malloc0(size);
- 
- 	avctp = (void *) buf;
- 	avc = (void *) &buf[AVCTP_HEADER_LENGTH];
--	pdu = (void *) &buf[AVCTP_HEADER_LENGTH + AVC_HEADER_LENGTH];
- 
- 	avctp->transaction = transaction;
- 	avctp->packet_type = AVCTP_PACKET_SINGLE;
-@@ -956,12 +953,18 @@ static int avctp_send(struct avctp *session, uint8_t transaction, uint8_t cr,
- 	avc->subunit_type = subunit;
- 	avc->opcode = opcode;
- 
--	memcpy(pdu, operands, operand_count);
-+	iov[0].iov_base = buf;
-+	iov[0].iov_len  = sizeof(buf);
-+	iov[1].iov_base = operands;
-+	iov[1].iov_len  = operand_count;
- 
--	if (write(sk, buf, size) < 0)
-+	memset(&msg, 0, sizeof(msg));
-+	msg.msg_iov = iov;
-+	msg.msg_iovlen = 2;
-+
-+	if (sendmsg(sk, &msg, 0) < 0)
- 		err = -errno;
- 
--	g_free(buf);
- 	return err;
- }
- 
--- 
-1.7.10.4
+OK, though I do not like that division by command name.
 
+> 
+>         if ((hdev && opcode < MGMT_OP_READ_INFO) ||
+>                         (!hdev && opcode >= MGMT_OP_READ_INFO)) {
+>                 err = cmd_status(sk, index, opcode,
+>                                  MGMT_STATUS_INVALID_INDEX);
+>                 goto done;
+>         }
+> 
+
+
+Best regards 
+Andrei Emeltchenko 
