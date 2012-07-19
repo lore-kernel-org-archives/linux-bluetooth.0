@@ -1,36 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/8] Bluetooth patches
-Date: Thu, 19 Jul 2012 17:03:39 +0300
-Message-Id: <1342706627-19129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 6/8] Bluetooth: Define AMP controller statuses
+Date: Thu, 19 Jul 2012 17:03:45 +0300
+Message-Id: <1342706627-19129-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1342706627-19129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1342706627-19129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Set of patches from my RFCs which are ready to be applied (IMO :)
+AMP status codes copied from Bluez patch sent by Peter Krystad
+<pkrystad@codeaurora.org>.
 
-Andrei Emeltchenko (8):
-  Bluetooth: mgmt: Managing only BR/EDR HCI controllers
-  Bluetooth: debug: Fix printing A2MP cmd code format
-  Bluetooth: debug: Fix printing refcnt for hci_conn
-  Bluetooth: smp: Fix possible NULL dereference
-  Bluetooth: trivial: Fix mixing spaces and tabs in smp
-  Bluetooth: Define AMP controller statuses
-  Bluetooth: Do not shadow hdr variable
-  Bluetooth: Fix processing A2MP chan in security_cfm
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/hci.h |    9 +++++++++
+ 1 file changed, 9 insertions(+)
 
- include/net/bluetooth/hci.h      |    9 +++++++++
- include/net/bluetooth/hci_core.h |    8 +++-----
- include/net/bluetooth/smp.h      |    8 ++++----
- net/bluetooth/a2mp.c             |   14 +++++++++-----
- net/bluetooth/hci_core.c         |    6 ++++--
- net/bluetooth/l2cap_core.c       |    5 +++++
- net/bluetooth/mgmt.c             |   20 ++++++++++++++++++--
- net/bluetooth/smp.c              |    5 ++++-
- 8 files changed, 56 insertions(+), 19 deletions(-)
-
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index ccd723e..7f19556 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -62,6 +62,15 @@
+ /* First BR/EDR Controller shall have ID = 0 */
+ #define HCI_BREDR_ID	0
+ 
++/* AMP controller status */
++#define AMP_CTRL_POWERED_DOWN			0x00
++#define AMP_CTRL_BLUETOOTH_ONLY			0x01
++#define AMP_CTRL_NO_CAPACITY			0x02
++#define AMP_CTRL_LOW_CAPACITY			0x03
++#define AMP_CTRL_MEDIUM_CAPACITY		0x04
++#define AMP_CTRL_HIGH_CAPACITY			0x05
++#define AMP_CTRL_FULL_CAPACITY			0x06
++
+ /* HCI device quirks */
+ enum {
+ 	HCI_QUIRK_RESET_ON_CLOSE,
 -- 
 1.7.9.5
 
