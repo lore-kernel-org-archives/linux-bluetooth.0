@@ -1,126 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v1] Bluetooth: mgmt: Add device disconnect reason
-Date: Thu, 19 Jul 2012 08:34:21 +0200
-Message-Id: <1342679661-2444-1-git-send-email-mikel.astiz.oss@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <50079C49.2060207@qca.qualcomm.com>
+Date: Thu, 19 Jul 2012 11:04:01 +0530
+From: Bala Shanmugam <bkamatch@qca.qualcomm.com>
+MIME-Version: 1.0
+To: "Chen, Peng" <pengchen@qca.qualcomm.com>
+CC: "gustavo@padovan.org" <gustavo@padovan.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"marcel@holtmann.org" <marcel@holtmann.org>, "Waller, Carolyn"
+	<carolyn@qca.qualcomm.com>, "Jeang, Daniel" <dyjeong@qca.qualcomm.com>,
+	"Yao, Costa" <cqyao@qca.qualcomm.com>, "Fan, Hong"
+	<hongfan@qca.qualcomm.com>, "Balasubramanian, Senthil Kumar"
+	<senthilb@qca.qualcomm.com>, "Wu, Frank" <fanwu@qca.qualcomm.com>
+Subject: Re: [patch]Add Vendor/Device ID for AR3012
+References: <0EC13EFF38B7C84DB595405A8233E35B099AE930@nasanexd01b.na.qualcomm.com>
+In-Reply-To: <0EC13EFF38B7C84DB595405A8233E35B099AE930@nasanexd01b.na.qualcomm.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+On 07/18/2012 02:35 PM, Chen, Peng wrote:
+>  From 7340f148e72f2bee78563c0ca9a37d82a5b99d64 Mon Sep 17 00:00:00 2001
+> From: Peng Chen<pengchen@qca.qualcomm.com>
+> Date: Wed, 18 Jul 2012 16:58:28 +0800
+> Subject: [PATCH] [patch]Add Vendor/Device ID for AR3012
+>
+> Add Vendor/Device ID for Qualcomm Atheros AR3012.
+>
+> Signed-off-by: Peng Chen<pengchen@qca.qualcomm.com>
+> ---
+>   drivers/bluetooth/ath3k.c |    1 +
+>   1 file changed, 1 insertion(+)
+>
+> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> index 10308cd..7ce0aa2 100644
+> --- a/drivers/bluetooth/ath3k.c
+> +++ b/drivers/bluetooth/ath3k.c
+> @@ -79,6 +79,7 @@ static struct usb_device_id ath3k_table[] = {
+>   	{ USB_DEVICE(0x13d3, 0x3362) },
+>   	{ USB_DEVICE(0x0CF3, 0xE004) },
+>   	{ USB_DEVICE(0x0930, 0x0219) },
+> +	{ USB_DEVICE(0x0489, 0xE057) },
+>
+>   	/* Atheros AR5BBU12 with sflash firmware */
+>   	{ USB_DEVICE(0x0489, 0xE02C) },
+Hi Chen,
 
-MGMT_EV_DEVICE_DISCONNECTED will now expose the disconnection reason to
-userland, providing the following possible values:
+I think you also need to add these ids to ath3k blacklist table 
+[ath3k_blist_tbl] to load patch,
+syscfg files and in btusb blacklist table [blacklist_table] in btusb.c 
+to give the control to ath3k
+driver to load firmware.
 
-	0x00	Reason unspecified
-	0x01	Connection timeout
-
-Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
----
-This second proposal replaces the original HCI disconnect reason with a new enum type, to be used in the management socket. Currently just "Connection timeout" is being distinguished.
-
-During the BlueZ meeting in Brazil it was proposed to add two more values to this enum: "Connection terminated by local host" and "Connection terminated by remote host". However, after some testing, it seems the result can be quite misleading. Therefore and given that there are no known use-cases that need this information (local vs remote disconnection), these two values have been dropped.
-
-Useland patches to be used for testing will be submitted soon.
-
- include/net/bluetooth/hci.h      |    1 +
- include/net/bluetooth/hci_core.h |    2 +-
- include/net/bluetooth/mgmt.h     |    4 ++++
- net/bluetooth/hci_event.c        |   12 ++++++++++--
- net/bluetooth/mgmt.c             |    9 +++++----
- 5 files changed, 21 insertions(+), 7 deletions(-)
-
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ccd723e..9fed9d4 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -293,6 +293,7 @@ enum {
- 
- /* ---- HCI Error Codes ---- */
- #define HCI_ERROR_AUTH_FAILURE		0x05
-+#define HCI_ERROR_CONNECTION_TIMEOUT	0x08
- #define HCI_ERROR_REJ_BAD_ADDR		0x0f
- #define HCI_ERROR_REMOTE_USER_TERM	0x13
- #define HCI_ERROR_LOCAL_HOST_TERM	0x16
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 475b8c0..5a35912 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1012,7 +1012,7 @@ int mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 			  u8 addr_type, u32 flags, u8 *name, u8 name_len,
- 			  u8 *dev_class);
- int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
--			     u8 link_type, u8 addr_type);
-+			     u8 link_type, u8 addr_type, u8 reason);
- int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			   u8 link_type, u8 addr_type, u8 status);
- int mgmt_connect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 4348ee8..30c06d1 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -406,6 +406,10 @@ struct mgmt_ev_device_connected {
- } __packed;
- 
- #define MGMT_EV_DEVICE_DISCONNECTED	0x000C
-+struct mgmt_ev_device_disconnected {
-+	struct mgmt_addr_info addr;
-+	__u8	reason;
-+} __packed;
- 
- #define MGMT_EV_CONNECT_FAILED		0x000D
- struct mgmt_ev_connect_failed {
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 41ff978..f53dbd2 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1909,9 +1909,17 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		if (ev->status != 0)
- 			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
- 					       conn->dst_type, ev->status);
--		else
-+		else {
-+			u8 reason;
-+
-+			if (ev->reason ==  HCI_ERROR_CONNECTION_TIMEOUT)
-+				reason = 0x01;
-+			else
-+				reason = 0x00;
-+
- 			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
--						 conn->dst_type);
-+						 conn->dst_type, reason);
-+		}
- 	}
- 
- 	if (ev->status == 0) {
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ad6613d..f9a1db8 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3061,16 +3061,17 @@ static void unpair_device_rsp(struct pending_cmd *cmd, void *data)
- }
- 
- int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
--			     u8 link_type, u8 addr_type)
-+			     u8 link_type, u8 addr_type, u8 reason)
- {
--	struct mgmt_addr_info ev;
-+	struct mgmt_ev_device_disconnected ev;
- 	struct sock *sk = NULL;
- 	int err;
- 
- 	mgmt_pending_foreach(MGMT_OP_DISCONNECT, hdev, disconnect_rsp, &sk);
- 
--	bacpy(&ev.bdaddr, bdaddr);
--	ev.type = link_to_bdaddr(link_type, addr_type);
-+	bacpy(&ev.addr.bdaddr, bdaddr);
-+	ev.addr.type = link_to_bdaddr(link_type, addr_type);
-+	ev.reason = reason;
- 
- 	err = mgmt_event(MGMT_EV_DEVICE_DISCONNECTED, hdev, &ev, sizeof(ev),
- 			 sk);
--- 
-1.7.7.6
-
+Regards,
+Bala.
