@@ -1,54 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50079C49.2060207@qca.qualcomm.com>
-Date: Thu, 19 Jul 2012 11:04:01 +0530
-From: Bala Shanmugam <bkamatch@qca.qualcomm.com>
-MIME-Version: 1.0
-To: "Chen, Peng" <pengchen@qca.qualcomm.com>
-CC: "gustavo@padovan.org" <gustavo@padovan.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"marcel@holtmann.org" <marcel@holtmann.org>, "Waller, Carolyn"
-	<carolyn@qca.qualcomm.com>, "Jeang, Daniel" <dyjeong@qca.qualcomm.com>,
-	"Yao, Costa" <cqyao@qca.qualcomm.com>, "Fan, Hong"
-	<hongfan@qca.qualcomm.com>, "Balasubramanian, Senthil Kumar"
-	<senthilb@qca.qualcomm.com>, "Wu, Frank" <fanwu@qca.qualcomm.com>
-Subject: Re: [patch]Add Vendor/Device ID for AR3012
-References: <0EC13EFF38B7C84DB595405A8233E35B099AE930@nasanexd01b.na.qualcomm.com>
-In-Reply-To: <0EC13EFF38B7C84DB595405A8233E35B099AE930@nasanexd01b.na.qualcomm.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ 5/5] gdbus: Add properties into Introspectable interface
+Date: Thu, 19 Jul 2012 00:20:08 -0300
+Message-Id: <1342668008-5522-6-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1342668008-5522-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1342668008-5522-1-git-send-email-lucas.demarchi@profusion.mobi>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 07/18/2012 02:35 PM, Chen, Peng wrote:
->  From 7340f148e72f2bee78563c0ca9a37d82a5b99d64 Mon Sep 17 00:00:00 2001
-> From: Peng Chen<pengchen@qca.qualcomm.com>
-> Date: Wed, 18 Jul 2012 16:58:28 +0800
-> Subject: [PATCH] [patch]Add Vendor/Device ID for AR3012
->
-> Add Vendor/Device ID for Qualcomm Atheros AR3012.
->
-> Signed-off-by: Peng Chen<pengchen@qca.qualcomm.com>
-> ---
->   drivers/bluetooth/ath3k.c |    1 +
->   1 file changed, 1 insertion(+)
->
-> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-> index 10308cd..7ce0aa2 100644
-> --- a/drivers/bluetooth/ath3k.c
-> +++ b/drivers/bluetooth/ath3k.c
-> @@ -79,6 +79,7 @@ static struct usb_device_id ath3k_table[] = {
->   	{ USB_DEVICE(0x13d3, 0x3362) },
->   	{ USB_DEVICE(0x0CF3, 0xE004) },
->   	{ USB_DEVICE(0x0930, 0x0219) },
-> +	{ USB_DEVICE(0x0489, 0xE057) },
->
->   	/* Atheros AR5BBU12 with sflash firmware */
->   	{ USB_DEVICE(0x0489, 0xE02C) },
-Hi Chen,
+---
+ gdbus/object.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-I think you also need to add these ids to ath3k blacklist table 
-[ath3k_blist_tbl] to load patch,
-syscfg files and in btusb blacklist table [blacklist_table] in btusb.c 
-to give the control to ath3k
-driver to load firmware.
+diff --git a/gdbus/object.c b/gdbus/object.c
+index c19f1d7..e2e8b12 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -80,6 +80,7 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
+ {
+ 	const GDBusMethodTable *method;
+ 	const GDBusSignalTable *signal;
++	const GDBusPropertyTable *property;
+ 
+ 	for (method = iface->methods; method && method->name; method++) {
+ 		gboolean deprecated = method->flags &
+@@ -126,6 +127,26 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
+ 			g_string_append_printf(gstr, "\t\t</signal>\n");
+ 		}
+ 	}
++
++	for (property = iface->properties; property && property->name;
++								property++) {
++		gboolean deprecated = property->flags &
++					G_DBUS_PROPERTY_FLAG_DEPRECATED;
++
++		g_string_append_printf(gstr, "\t\t<property name=\"%s\""
++					"type=\"%s\" access=\"%s%s\"",
++					property->name,	property->type,
++					property->get ? "read" : "",
++					property->set ? "write" : "");
++
++		if (!deprecated)
++			g_string_append_printf(gstr, "/>\n");
++		else
++			g_string_append_printf(gstr,
++				">\n\t\t\t<annotation"
++				" name=\"org.freedesktop.DBus.Deprecated\""
++				" value=\"true\"/>\n\t\t</property>\n");
++	}
+ }
+ 
+ static void generate_introspection_xml(DBusConnection *conn,
+-- 
+1.7.11.2
 
-Regards,
-Bala.
