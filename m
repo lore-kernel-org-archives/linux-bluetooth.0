@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 6/8] Bluetooth: Define AMP controller statuses
-Date: Thu, 19 Jul 2012 17:03:45 +0300
-Message-Id: <1342706627-19129-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 8/8] Bluetooth: Fix processing A2MP chan in security_cfm
+Date: Thu, 19 Jul 2012 17:03:47 +0300
+Message-Id: <1342706627-19129-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1342706627-19129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1342706627-19129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,34 +11,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-AMP status codes copied from Bluez patch sent by Peter Krystad
-<pkrystad@codeaurora.org>.
+Do not process A2MP channel in l2cap_security_cfm
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci.h |    9 +++++++++
- 1 file changed, 9 insertions(+)
+ net/bluetooth/l2cap_core.c |    5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ccd723e..7f19556 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -62,6 +62,15 @@
- /* First BR/EDR Controller shall have ID = 0 */
- #define HCI_BREDR_ID	0
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index f2a8c75..ca7d5b2 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5478,6 +5478,11 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 		BT_DBG("chan %p scid 0x%4.4x state %s", chan, chan->scid,
+ 		       state_to_string(chan->state));
  
-+/* AMP controller status */
-+#define AMP_CTRL_POWERED_DOWN			0x00
-+#define AMP_CTRL_BLUETOOTH_ONLY			0x01
-+#define AMP_CTRL_NO_CAPACITY			0x02
-+#define AMP_CTRL_LOW_CAPACITY			0x03
-+#define AMP_CTRL_MEDIUM_CAPACITY		0x04
-+#define AMP_CTRL_HIGH_CAPACITY			0x05
-+#define AMP_CTRL_FULL_CAPACITY			0x06
++		if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP) {
++			l2cap_chan_unlock(chan);
++			continue;
++		}
 +
- /* HCI device quirks */
- enum {
- 	HCI_QUIRK_RESET_ON_CLOSE,
+ 		if (chan->scid == L2CAP_CID_LE_DATA) {
+ 			if (!status && encrypt) {
+ 				chan->sec_level = hcon->sec_level;
 -- 
 1.7.9.5
 
