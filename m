@@ -1,35 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Jul 2012 11:12:05 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: ramm@ti.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] Bluetooth: Set name_state to unknown when entry
- name is empty
-Message-ID: <20120719141205.GB5141@joana>
-References: <1342682771-28584-1-git-send-email-ramm@ti.com>
- <1342682771-28584-3-git-send-email-ramm@ti.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1342682771-28584-3-git-send-email-ramm@ti.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 5/8] Bluetooth: trivial: Fix mixing spaces and tabs in smp
+Date: Thu, 19 Jul 2012 17:03:44 +0300
+Message-Id: <1342706627-19129-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1342706627-19129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1342706627-19129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ram,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-* ramm@ti.com <ramm@ti.com> [2012-07-19 10:26:11 +0300]:
+Change spaces to tabs in smp code
 
-> From: Ram Malovany <ramm@ti.com>
-> 
-> When the name of the given entry is empty , the state needs to be
-> updated accordingly.
-> 
-> Signed-off-by: Ram Malovany <ramm@ti.com>
-> ---
->  net/bluetooth/hci_event.c |    2 ++
->  1 files changed, 2 insertions(+), 0 deletions(-)
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/smp.h |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-All 3 patches have been applied to bluetooth.git. But please keep in mind that
-we put periods at the end of the summary lines, I fixed that for you this
-time.
+diff --git a/include/net/bluetooth/smp.h b/include/net/bluetooth/smp.h
+index ca356a7..50993a5 100644
+--- a/include/net/bluetooth/smp.h
++++ b/include/net/bluetooth/smp.h
+@@ -108,8 +108,8 @@ struct smp_cmd_security_req {
+ #define SMP_CONFIRM_FAILED		0x04
+ #define SMP_PAIRING_NOTSUPP		0x05
+ #define SMP_ENC_KEY_SIZE		0x06
+-#define SMP_CMD_NOTSUPP		0x07
+-#define SMP_UNSPECIFIED		0x08
++#define SMP_CMD_NOTSUPP			0x07
++#define SMP_UNSPECIFIED			0x08
+ #define SMP_REPEATED_ATTEMPTS		0x09
+ 
+ #define SMP_MIN_ENC_KEY_SIZE		7
+@@ -123,8 +123,8 @@ struct smp_chan {
+ 	struct l2cap_conn *conn;
+ 	u8		preq[7]; /* SMP Pairing Request */
+ 	u8		prsp[7]; /* SMP Pairing Response */
+-	u8              prnd[16]; /* SMP Pairing Random (local) */
+-	u8              rrnd[16]; /* SMP Pairing Random (remote) */
++	u8		prnd[16]; /* SMP Pairing Random (local) */
++	u8		rrnd[16]; /* SMP Pairing Random (remote) */
+ 	u8		pcnf[16]; /* SMP Pairing Confirm */
+ 	u8		tk[16]; /* SMP Temporary Key */
+ 	u8		enc_key_size;
+-- 
+1.7.9.5
 
-	Gustavo
