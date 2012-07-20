@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v14 13/14] audio: Add SAP GW to org.bluez.Telephony
-Date: Fri, 20 Jul 2012 10:57:36 +0200
-Message-Id: <1342774657-29392-14-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v14 14/14] audio: Add fast connectable to telephony interface
+Date: Fri, 20 Jul 2012 10:57:37 +0200
+Message-Id: <1342774657-29392-15-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1342774657-29392-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1342774657-29392-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -12,161 +12,314 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- audio/telephony.c        |   73 +++++++++++++++++++++++++++++++++++++++++++++-
- doc/assigned-numbers.txt |    1 +
- 2 files changed, 73 insertions(+), 1 deletion(-)
+ audio/telephony.c |  146 ++++++++++++++++++++++++++++++++++++++++++++++++-----
+ doc/audio-api.txt |   26 ++++++++++
+ 2 files changed, 160 insertions(+), 12 deletions(-)
 
 diff --git a/audio/telephony.c b/audio/telephony.c
-index 2c7bc2e..eb9faeb 100644
+index eb9faeb..605b09a 100644
 --- a/audio/telephony.c
 +++ b/audio/telephony.c
-@@ -62,6 +62,7 @@
- #define DEFAULT_HS_AG_CHANNEL 12
- #define DEFAULT_HF_HS_CHANNEL 7
+@@ -64,6 +64,11 @@
  #define DEFAULT_HF_AG_CHANNEL 13
-+#define DEFAULT_SAP_GW_CHANNEL 8
+ #define DEFAULT_SAP_GW_CHANNEL 8
  
++struct tel_adapter {
++	struct btd_adapter *btd_adapter;
++	gboolean fast_connectable;
++};
++
  struct tel_device {
  	void			*device;
-@@ -80,6 +81,7 @@ struct tel_device {
- struct default_agent {
- 	const char		*uuid;		/* agent property UUID */
- 	uint8_t			channel;
-+	BtIOSecLevel		sec_level;
- 	const char		*r_uuid;
- 	uint16_t		r_class;
- 	uint16_t		r_profile;
-@@ -760,6 +762,61 @@ static sdp_record_t *hfp_hs_record(struct tel_agent *agent)
- 	return record;
- }
- 
-+static sdp_record_t *sap_gw_record(struct tel_agent *agent)
-+{
-+	sdp_list_t *apseq, *aproto, *profiles, *proto[2], *root, *svclass_id;
-+	uuid_t sap_uuid, gt_uuid, root_uuid, l2cap, rfcomm;
-+	sdp_profile_desc_t profile;
-+	sdp_record_t *record;
-+	sdp_data_t *ch;
-+
-+	record = sdp_record_alloc();
-+	if (!record)
-+		return NULL;
-+
-+	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-+	root = sdp_list_append(NULL, &root_uuid);
-+	sdp_set_browse_groups(record, root);
-+	sdp_list_free(root, NULL);
-+
-+	sdp_uuid16_create(&sap_uuid, SAP_SVCLASS_ID);
-+	svclass_id = sdp_list_append(NULL, &sap_uuid);
-+	sdp_uuid16_create(&gt_uuid, GENERIC_TELEPHONY_SVCLASS_ID);
-+	svclass_id = sdp_list_append(svclass_id, &gt_uuid);
-+
-+	sdp_set_service_classes(record, svclass_id);
-+	sdp_list_free(svclass_id, NULL);
-+
-+	sdp_uuid16_create(&profile.uuid, SAP_PROFILE_ID);
-+	profile.version = agent->version;
-+	profiles = sdp_list_append(NULL, &profile);
-+	sdp_set_profile_descs(record, profiles);
-+	sdp_list_free(profiles, NULL);
-+
-+	sdp_uuid16_create(&l2cap, L2CAP_UUID);
-+	proto[0] = sdp_list_append(NULL, &l2cap);
-+	apseq = sdp_list_append(NULL, proto[0]);
-+
-+	sdp_uuid16_create(&rfcomm, RFCOMM_UUID);
-+	proto[1] = sdp_list_append(NULL, &rfcomm);
-+	ch = sdp_data_alloc(SDP_UINT8, &agent->properties->channel);
-+	proto[1] = sdp_list_append(proto[1], ch);
-+	apseq = sdp_list_append(apseq, proto[1]);
-+
-+	aproto = sdp_list_append(NULL, apseq);
-+	sdp_set_access_protos(record, aproto);
-+
-+	sdp_set_info_attr(record, "SIM Access Server", NULL, NULL);
-+
-+	sdp_data_free(ch);
-+	sdp_list_free(proto[0], NULL);
-+	sdp_list_free(proto[1], NULL);
-+	sdp_list_free(apseq, NULL);
-+	sdp_list_free(aproto, NULL);
-+
-+	return record;
-+}
-+
- static void gateway_auth_cb(DBusError *derr, void *user_data)
- {
- 	struct audio_device *device = user_data;
-@@ -1119,6 +1176,7 @@ drop:
- static struct default_agent default_properties[] = {
- 	{ DUN_GW_UUID,
- 		DEFAULT_DUN_GW_CHANNEL,
-+		BT_IO_SEC_MEDIUM,
- 		NULL,
- 		0,
- 		0,
-@@ -1127,6 +1185,7 @@ static struct default_agent default_properties[] = {
- 		client_newconnection_reply },
- 	{ HSP_AG_UUID,
- 		DEFAULT_HS_AG_CHANNEL,
-+		BT_IO_SEC_MEDIUM,
- 		HSP_HS_UUID,
- 		HEADSET_SVCLASS_ID,
- 		HEADSET_PROFILE_ID,
-@@ -1135,6 +1194,7 @@ static struct default_agent default_properties[] = {
- 		hs_newconnection_reply },
- 	{ HFP_HS_UUID,
- 		DEFAULT_HF_HS_CHANNEL,
-+		BT_IO_SEC_MEDIUM,
- 		HFP_AG_UUID,
- 		HANDSFREE_AGW_SVCLASS_ID,
- 		HANDSFREE_PROFILE_ID,
-@@ -1143,12 +1203,22 @@ static struct default_agent default_properties[] = {
- 		ag_newconnection_reply },
- 	{ HFP_AG_UUID,
- 		DEFAULT_HF_AG_CHANNEL,
-+		BT_IO_SEC_MEDIUM,
- 		HFP_HS_UUID,
- 		HANDSFREE_SVCLASS_ID,
- 		HANDSFREE_PROFILE_ID,
- 		hfp_ag_record,
- 		ag_confirm,
- 		hs_newconnection_reply },
-+	{ SAP_UUID,
-+		DEFAULT_SAP_GW_CHANNEL,
-+		BT_IO_SEC_HIGH,
-+		NULL,
-+		0,
-+		0,
-+		sap_gw_record,
-+		client_confirm,
-+		client_newconnection_reply },
+ 	struct btd_device	*btd_dev;
+@@ -91,7 +96,7 @@ struct default_agent {
  };
  
- static void agent_disconnect_cb(DBusConnection *conn, void *user_data)
-@@ -1247,7 +1317,8 @@ static DBusMessage *register_agent(DBusConnection *conn,
- 				agent, NULL, &err,
- 				BT_IO_OPT_SOURCE_BDADDR, &src,
- 				BT_IO_OPT_CHANNEL, agent->properties->channel,
--				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-+				BT_IO_OPT_SEC_LEVEL,
-+				agent->properties->sec_level,
- 				BT_IO_OPT_MASTER, master,
- 				BT_IO_OPT_INVALID);
- 	if (agent->io == NULL) {
-diff --git a/doc/assigned-numbers.txt b/doc/assigned-numbers.txt
-index 120d7ea..bc85cf6 100644
---- a/doc/assigned-numbers.txt
-+++ b/doc/assigned-numbers.txt
-@@ -10,6 +10,7 @@ Profile		Channel
- DUN		1
- HSP HS		6
- HFP HF		7
-+SAP		8
- OPP		9
- FTP		10
- BIP		11
+ struct tel_agent {
+-	struct btd_adapter	*adapter;
++	struct tel_adapter	*adapter;
+ 	char			*name;		/* agent DBus bus id */
+ 	char			*path;		/* agent object path */
+ 	guint			watch;		/* agent disconnect watcher */
+@@ -123,7 +128,7 @@ static struct tel_agent *find_agent(struct btd_adapter *adapter,
+ 	for (l = agents; l; l = l->next) {
+ 		struct tel_agent *agent = l->data;
+ 
+-		if (agent->adapter != adapter)
++		if (agent->adapter->btd_adapter != adapter)
+ 			continue;
+ 
+ 		if (sender && g_strcmp0(agent->name, sender) != 0)
+@@ -143,8 +148,19 @@ static struct tel_agent *find_agent(struct btd_adapter *adapter,
+ 
+ static void free_agent(struct tel_agent *agent)
+ {
++	struct btd_adapter *adapter = agent->adapter->btd_adapter;
+ 	DBusMessage *msg;
+ 
++	/* if there is no more agent for this adapter and it has been set to
++	 * fast connectable mode, reset it to FALSE
++	 */
++	if (find_agent(adapter, NULL, NULL, NULL) == NULL &&
++			agent->adapter->fast_connectable) {
++		if (btd_adapter_set_fast_connectable(adapter, FALSE))
++			error("Changing fast connectable for hci%d failed",
++				adapter_get_dev_id(adapter));
++	}
++
+ 	if (agent->record_id)
+ 		remove_record_from_server(agent->record_id);
+ 
+@@ -163,7 +179,6 @@ static void free_agent(struct tel_agent *agent)
+ 		agent->watch = 0;
+ 	}
+ 
+-	btd_adapter_unref(agent->adapter);
+ 	g_free(agent->name);
+ 	g_free(agent->path);
+ 	g_free(agent);
+@@ -1232,7 +1247,7 @@ static void agent_disconnect_cb(DBusConnection *conn, void *user_data)
+ 	free_agent(agent);
+ }
+ 
+-static struct tel_agent *agent_new(struct btd_adapter *adapter,
++static struct tel_agent *agent_new(struct tel_adapter *adapter,
+ 					const char *sender, const char *path,
+ 					const char *uuid, uint16_t version,
+ 					uint16_t features)
+@@ -1244,7 +1259,7 @@ static struct tel_agent *agent_new(struct btd_adapter *adapter,
+ 				sizeof(struct default_agent) ; i++) {
+ 		if (strcasecmp(uuid, default_properties[i].uuid) == 0) {
+ 			agent = g_new0(struct tel_agent, 1);
+-			agent->adapter = btd_adapter_ref(adapter);
++			agent->adapter = adapter;
+ 			agent->properties = &default_properties[i];
+ 			agent->name = g_strdup(sender);
+ 			agent->path = g_strdup(path);
+@@ -1260,7 +1275,8 @@ static struct tel_agent *agent_new(struct btd_adapter *adapter,
+ static DBusMessage *register_agent(DBusConnection *conn,
+ 					DBusMessage *msg, void *data)
+ {
+-	struct btd_adapter *adapter = data;
++	struct tel_adapter *tel_adapter = data;
++	struct btd_adapter *adapter = tel_adapter->btd_adapter;
+ 	DBusMessageIter args, props;
+ 	const char *sender, *path, *uuid;
+ 	uint16_t version = 0;
+@@ -1292,7 +1308,7 @@ static DBusMessage *register_agent(DBusConnection *conn,
+ 		return btd_error_already_exists(msg);
+ 
+ 	/* initialize agent properties */
+-	agent = agent_new(adapter, sender, path, uuid, version, features);
++	agent = agent_new(tel_adapter, sender, path, uuid, version, features);
+ 	if (agent == NULL)
+ 		return btd_error_invalid_args(msg);
+ 
+@@ -1346,7 +1362,8 @@ static DBusMessage *register_agent(DBusConnection *conn,
+ static DBusMessage *unregister_agent(DBusConnection *conn,
+ 				DBusMessage *msg, void *data)
+ {
+-	struct btd_adapter *adapter = data;
++	struct tel_adapter *tel_adapter = data;
++	struct btd_adapter *adapter = tel_adapter->btd_adapter;
+ 	const char *sender, *path;
+ 	struct tel_agent *agent;
+ 
+@@ -1370,35 +1387,140 @@ static DBusMessage *unregister_agent(DBusConnection *conn,
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
+ 
++static DBusMessage *telephony_get_properties(DBusConnection *conn,
++					DBusMessage *msg, void *data)
++{
++	struct tel_adapter *tel_adapter = data;
++	DBusMessage *reply;
++	DBusMessageIter iter;
++	DBusMessageIter dict;
++
++	reply = dbus_message_new_method_return(msg);
++	if (!reply)
++		return NULL;
++
++	dbus_message_iter_init_append(reply, &iter);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	/* FastConnectable */
++	dict_append_entry(&dict, "FastConnectable", DBUS_TYPE_BOOLEAN,
++			  &tel_adapter->fast_connectable);
++
++	dbus_message_iter_close_container(&iter, &dict);
++
++	return reply;
++}
++
++static DBusMessage *telephony_set_property(DBusConnection *conn,
++					DBusMessage *msg, void *data)
++{
++	struct tel_adapter *tel_adapter = data;
++	struct btd_adapter *adapter = tel_adapter->btd_adapter;
++	const char *property;
++	DBusMessageIter iter;
++	DBusMessageIter sub;
++	gboolean enable;
++	DBusMessage *reply;
++
++	if (!dbus_message_iter_init(msg, &iter))
++		return btd_error_invalid_args(msg);
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(&iter, &property);
++	dbus_message_iter_next(&iter);
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_VARIANT)
++		return btd_error_invalid_args(msg);
++	dbus_message_iter_recurse(&iter, &sub);
++
++	if (g_str_equal("FastConnectable", property)) {
++		if (dbus_message_iter_get_arg_type(&sub) !=
++				DBUS_TYPE_BOOLEAN)
++			return btd_error_invalid_args(msg);
++
++		dbus_message_iter_get_basic(&sub, &enable);
++
++		reply = dbus_message_new_method_return(msg);
++		if (!reply)
++			return NULL;
++
++		if (btd_adapter_set_fast_connectable(adapter, enable)) {
++			error("Changing fast connectable for hci%d failed",
++				adapter_get_dev_id(adapter));
++			dbus_message_unref(reply);
++			return btd_error_failed(msg,
++					"Changing to fast connectable failed");
++		}
++
++		tel_adapter->fast_connectable = enable;
++		emit_property_changed(conn, adapter_get_path(adapter),
++					AUDIO_TELEPHONY_INTERFACE,
++					"FastConnectable",
++					DBUS_TYPE_BOOLEAN, &enable);
++		return reply;
++	}
++
++	return btd_error_invalid_args(msg);
++}
++
+ static const GDBusMethodTable telsrv_methods[] = {
+ 	{ GDBUS_METHOD("RegisterAgent",
+ 			GDBUS_ARGS({ "agent", "o" }, { "properties", "a{sv}" }),
+ 			NULL, register_agent) },
+ 	{ GDBUS_METHOD("UnregisterAgent",
+ 			GDBUS_ARGS({ "agent", "o" }), NULL, unregister_agent) },
++	{ GDBUS_METHOD("GetProperties",
++			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
++			telephony_get_properties) },
++	{ GDBUS_METHOD("SetProperty",
++			GDBUS_ARGS({ "name", "s" }, { "value", "v" }), NULL,
++			telephony_set_property) },
++	{ }
++};
++
++static const GDBusSignalTable telsrv_signals[] = {
++	{ GDBUS_SIGNAL("PropertyChanged",
++			GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
+ 	{ }
+ };
+ 
+ static void path_unregister(void *data)
+ {
++	struct tel_adapter *tel_adapter = data;
++
++	btd_adapter_unref(tel_adapter->btd_adapter);
++	g_free(tel_adapter);
++
+ 	DBG("Unregistered interface %s", AUDIO_TELEPHONY_INTERFACE);
+ }
+ 
+ static int register_interface(struct btd_adapter *adapter)
+ {
+ 	const char *path;
++	struct tel_adapter *tel_adapter;
+ 
+ 	if (DBUS_TYPE_UNIX_FD < 0)
+ 		return -1;
+ 
+ 	path = adapter_get_path(adapter);
+ 
++	tel_adapter = g_new0(struct tel_adapter, 1);
++	tel_adapter->btd_adapter = btd_adapter_ref(adapter);
++
+ 	if (!g_dbus_register_interface(connection, path,
+ 					AUDIO_TELEPHONY_INTERFACE,
+-					telsrv_methods, NULL,
+-					NULL, adapter, path_unregister)) {
++					telsrv_methods, telsrv_signals,
++					NULL, tel_adapter, path_unregister)) {
+ 		error("D-Bus failed to register %s interface",
+ 				AUDIO_TELEPHONY_INTERFACE);
++		btd_adapter_unref(tel_adapter->btd_adapter);
++		g_free(tel_adapter);
+ 		return -1;
+ 	}
+ 
+@@ -1426,12 +1548,12 @@ void telephony_adapter_exit(struct btd_adapter *adapter)
+ 
+ 	DBG("adapter: %p", adapter);
+ 
+-	unregister_interface(adapter);
+-
+ 	while ((agent = find_agent(adapter, NULL, NULL, NULL)) != NULL) {
+ 		agents = g_slist_remove(agents, agent);
+ 		free_agent(agent);
+ 	}
++
++	unregister_interface(adapter);
+ }
+ 
+ int telephony_init(void)
+diff --git a/doc/audio-api.txt b/doc/audio-api.txt
+index 8f4dcb2..abbd680 100644
+--- a/doc/audio-api.txt
++++ b/doc/audio-api.txt
+@@ -334,6 +334,32 @@ Methods		void RegisterAgent(object path, dict properties)
+ 
+ 			Unregister sender agent.
+ 
++		dict GetProperties()
++
++			Returns all properties for the interface. See the
++			properties section for available properties.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++		void SetProperty(string name, variant value)
++
++			Changes the value of the specified property. Only
++			properties that are listed as read-write are changeable.
++			On success this will emit a PropertyChanged signal.
++
++			Possible Errors: org.bluez.Error.DoesNotExist
++					 org.bluez.Error.InvalidArguments
++
++Signals		void PropertyChanged(string name, variant value)
++
++			This signal indicates a changed value of the given
++			property.
++
++Properties	boolean FastConnectable  [readwrite]
++
++			Indicates if there is adapter is in fast connectable
++			mode.
++
+ TelephonyAgent hierarchy
+ ========================
+ 
 -- 
 1.7.9.5
 
