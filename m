@@ -1,227 +1,503 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Fri, 20 Jul 2012 10:30:15 -0600
-Message-ID: <CAAbnaHZVo-zW=QCvjEjd98rvN7RBwL8+ZS1Fi6E=LBmtKhCr9Q@mail.gmail.com>
-Subject: [RFC generichid 2/5]
+Date: Fri, 20 Jul 2012 10:30:08 -0600
+Message-ID: <CAAbnaHY0S65EHh9338EEiRgQkqpuneR+=pWXRnCHxYnKBgO7TA@mail.gmail.com>
+Subject: [RFC generichid 1/5]
 From: Nathaniel Haggard <natester@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds the sdp record.
+Includes the build instructions as well as the plugin setup.
 
- input/generichid.c |  199 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 197 insertions(+), 2 deletions(-)
+ Makefile.am         |   10 ++
+ Makefile.tools      |    1 +
+ acinclude.m4        |    6 +
+ bootstrap-configure |    1 +
+ input/generichid.c  |  394 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 412 insertions(+), 0 deletions(-)
+diff --git a/Makefile.am b/Makefile.am
+index 45a811c..a033de1 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -185,8 +185,18 @@ if HOGPLUGIN
+ builtin_modules += hog
+ builtin_sources += profiles/input/hog_manager.c profiles/input/hog_device.h \
+ 			profiles/input/hog_device.c profiles/input/uhid_copy.h
++
+ endif
 
++
++
++if GENERICHIDPLUGIN
++builtin_modules += generichid
++builtin_sources += input/generichid.c
++
++endif
++
++
+ if NETWORKPLUGIN
+ builtin_modules += network
+ builtin_sources += profiles/network/main.c \
+diff --git a/Makefile.tools b/Makefile.tools
+index fccac2d..f29c23d 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -16,6 +16,7 @@ tools/kword.c: tools/parser.h
+
+ tools_rfcomm_SOURCES = tools/rfcomm.c tools/parser.y tools/lexer.l \
+ 					tools/kword.h tools/kword.c
++
+ EXTRA_tools_rfcomm_SOURCES = tools/parser.h tools/parser.c \
+ 							tools/lexer.c
+ tools_rfcomm_LDADD = lib/libbluetooth-private.la
+diff --git a/acinclude.m4 b/acinclude.m4
+index 39b0a18..4115084 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -167,6 +167,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	fortify_enable=yes
+ 	pie_enable=yes
+ 	sndfile_enable=${sndfile_found}
++	generichid_enable=yes
+ 	usb_enable=${usb_found}
+ 	gstreamer_enable=${gstreamer_found}
+ 	audio_enable=yes
+@@ -226,6 +227,10 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 		service_enable=${enableval}
+ 	])
+
++	AC_ARG_ENABLE(generichid, AC_HELP_STRING([--enable-generichid],
+[enable generichid plugin]), [
++		generichid_enable=${enableval}
++	])
++
+ 	AC_ARG_ENABLE(health, AC_HELP_STRING([--enable-health], [enable
+health plugin]), [
+ 		health_enable=${enableval}
+ 	])
+@@ -320,6 +325,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	fi
+
+ 	AM_CONDITIONAL(SNDFILE, test "${sndfile_enable}" = "yes" && test
+"${sndfile_found}" = "yes")
++	AM_CONDITIONAL(GENERICHIDPLUGIN, test "${generichid_enable}" = "yes")
+ 	AM_CONDITIONAL(USB, test "${usb_enable}" = "yes" && test
+"${usb_found}" = "yes")
+ 	AM_CONDITIONAL(SBC, test "${gstreamer_enable}" = "yes" || test
+"${test_enable}" = "yes")
+ 	AM_CONDITIONAL(GSTREAMER, test "${gstreamer_enable}" = "yes" && test
+"${gstreamer_found}" = "yes")
+diff --git a/bootstrap-configure b/bootstrap-configure
+index 7177c65..9cde36b 100755
+--- a/bootstrap-configure
++++ b/bootstrap-configure
+@@ -21,6 +21,7 @@ fi
+ 		--enable-bccmd \
+ 		--enable-dfutool \
+ 		--enable-hid2hci \
++		--enable-generichid \
+ 		--enable-test \
+ 		--enable-cups \
+ 		--enable-dbusoob \
 diff --git a/input/generichid.c b/input/generichid.c
-index 926d8ec..ec8283d 100644
---- a/input/generichid.c
+new file mode 100644
+index 0000000..926d8ec
+--- /dev/null
 +++ b/input/generichid.c
-@@ -148,9 +148,204 @@ static void add_lang_attr(sdp_record_t *r)
-
- static int sdp_keyboard_service(struct adapter_data *adapt)
- {
--    return -1;
--}
-+	bdaddr_t src;
-+	sdp_record_t *record;
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-+	uuid_t root_uuid, hidkb_uuid, l2cap_uuid, hidp_uuid;
-+	sdp_profile_desc_t profile[1];
-+	sdp_list_t *aproto, *proto[3];
-+	sdp_data_t *psm, *lang_lst, *lang_lst2, *hid_spec_lst, *hid_spec_lst2;
-+	unsigned int i;
-+	uint8_t dtd = SDP_UINT16;
-+	uint8_t dtd2 = SDP_UINT8;
-+	uint8_t dtd_data = SDP_TEXT_STR8;
-+	void *dtds[2];
-+	void *values[2];
-+	void *dtds2[2];
-+	void *values2[2];
-+	int leng[2];
-+	uint8_t hid_spec_type = 0x22;
-+	uint16_t hid_attr_lang[] = { 0x409, 0x100 };
-+	static const uint16_t ctrl = 0x11;
-+	static const uint16_t intr = 0x13;
-+	static const uint16_t hid_attr[] = { 0x100, 0x111, 0x40,
-+						0x0d, 0x01, 0x01 };
-+	static const uint16_t hid_attr2[] = { 0x0, 0x01, 0x100,
-+						0x1f40, 0x01, 0x01 };
-+	const uint8_t hid_spec[] = {
-+		0x05, 0x01, /*	Usage Page (Generic Desktop)		*/
-+		0x09, 0x06, /*	Usage (Keyboard)			*/
-+		0xA1, 0x01, /*	Collection (Application)		*/
-+		0x85, 0x01, /*	Report ID				*/
-+		0x05, 0x07, /*	Usage (Key codes)			*/
-+		0x19, 0xE0, /*	Usage Minimum (224)			*/
-+		0x29, 0xE7, /*	Usage Maximum (231)			*/
-+		0x15, 0x00, /*	Logical Minimum (0)			*/
-+		0x25, 0x01, /*	Logical Maximum (1)			*/
-+		0x75, 0x01, /*	Report Size (1)				*/
-+		0x95, 0x08, /*	Report Count (8)			*/
-+		0x81, 0x02, /*	Input (Data, Variable, Absolute)	*/
-+		0x95, 0x01, /*	Report Count (1)			*/
-+		0x75, 0x08, /*	Report Size (8)				*/
-+		0x81, 0x01, /*	Input (Constant)    ;5 bit padding	*/
-+		0x95, 0x05, /*	Report Count (5)			*/
-+		0x75, 0x01, /*	Report Size (1)				*/
-+		0x05, 0x08, /*	Usage Page (Page# for LEDs)		*/
-+		0x19, 0x01, /*	Usage Minimum (01)			*/
-+		0x29, 0x05, /*	Usage Maximum (05)			*/
-+		0x91, 0x02, /*	Output (Data, Variable, Absolute)	*/
-+		0x95, 0x01, /*	Report Count (1)			*/
-+		0x75, 0x03, /*	Report Size (3)				*/
-+		0x91, 0x01, /*	Output (Constant)			*/
-+		0x95, 0x06, /*	Report Count (1)			*/
-+		0x75, 0x08, /*	Report Size (3)				*/
-+		0x15, 0x00, /*	Logical Minimum (0)			*/
-+		0x25, 0x65, /*	Logical Maximum (101)			*/
-+		0x05, 0x07, /*	Usage (Key codes)			*/
-+		0x19, 0x00, /*	Usage Minimum (00)			*/
-+		0x29, 0x65, /*	Usage Maximum (101)			*/
-+		0x81, 0x00, /*	Input (Data, Array)			*/
-+		0xC0,
-+		0x09, 0x02, /* mouse part starts here */
-+		0xa1, 0x01,
-+		0x09, 0x01,
-+		0xa1, 0x00,
-+		0x85, 0x02,
-+		0x05, 0x09,
-+		0x19, 0x01,
-+		0x29, 0x05,
-+		0x15, 0x00,
-+		0x25, 0x01,
-+		0x95, 0x05,
-+		0x75, 0x01,
-+		0x81, 0x02,
-+		0x95, 0x01,
-+		0x75, 0x03,
-+		0x81, 0x01,
-+		0x05, 0x01,
-+		0x09, 0x30,
-+		0x09, 0x31,
-+		0x09, 0x38,
-+		0x15, 0x81,
-+		0x25, 0x7f,
-+		0x75, 0x08,
-+		0x95, 0x03,
-+		0x81, 0x06,
-+		0x05, 0x0c,
-+		0x0a, 0x38, 0x02,
-+		0x15, 0x81,
-+		0x25, 0x7f,
-+		0x75, 0x08,
-+		0x95, 0x01,
-+		0x81, 0x06,
-+		0xc0,
-+		0xc0
-+	};
+@@ -0,0 +1,394 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2006-2007  Nokia Corporation
++ *  Copyright (C) 2004-2009  Marcel Holtmann <marcel@holtmann.org>
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+	record = sdp_record_alloc();
-+	memset(record, 0, sizeof(sdp_record_t));
-+	record->handle = 0xffffffff;
-+	bacpy(&src, BDADDR_ANY);
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
 +
-+	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-+	root = sdp_list_append(0, &root_uuid);
-+	sdp_set_browse_groups(record, root);
++#include <errno.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <uinput.h>
++#include <fcntl.h>
 +
-+	add_lang_attr(record);
++#include <bluetooth/bluetooth.h>
++#include <bluetooth/hci.h>
++#include <bluetooth/hci_lib.h>
++#include <bluetooth/sdp.h>
++#include <bluetooth/sdp_lib.h>
 +
-+	sdp_uuid16_create(&hidkb_uuid, HID_SVCLASS_ID);
-+	svclass_id = sdp_list_append(0, &hidkb_uuid);
-+	sdp_set_service_classes(record, svclass_id);
++#include <gdbus.h>
++#include <glib.h>
++#include <dbus/dbus.h>
 +
-+	sdp_uuid16_create(&profile[0].uuid, HID_PROFILE_ID);
-+	profile[0].version = 0x0100;
-+	pfseq = sdp_list_append(0, profile);
-+	sdp_set_profile_descs(record, pfseq);
++#include "dbus-common.h"
++#include "plugin.h"
++#include "adapter.h"
++#include "error.h"
++#include "log.h"
++#include "glib-helper.h"
++#include "btio.h"
++#include "../profiles/input/device.h"
++#include "sdpd.h"
 +
-+	/* protocols */
-+	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
-+	proto[1] = sdp_list_append(0, &l2cap_uuid);
-+	psm = sdp_data_alloc(SDP_UINT16, &ctrl);
-+	proto[1] = sdp_list_append(proto[1], psm);
-+	apseq = sdp_list_append(0, proto[1]);
++#include "../src/device.h"
 +
-+	sdp_uuid16_create(&hidp_uuid, HIDP_UUID);
-+	proto[2] = sdp_list_append(0, &hidp_uuid);
-+	apseq = sdp_list_append(apseq, proto[2]);
++#define GENERIC_HID_INTERFACE "org.bluez.GenericHID"
++#define GENERIC_HID_DEVICE    "org.bluez.GenericHIDDevice"
++#define GENERIC_INPUT_DEVICE  "org.bluez.GenericHIDInput"
 +
-+	aproto = sdp_list_append(0, apseq);
-+	sdp_set_access_protos(record, aproto);
++#define L2CAP_UUID_STR	"00000100-0000-1000-8000-00805f9b34fb"
 +
-+	sdp_list_free(root, 0);
-+	sdp_list_free(aproto, 0);
-+	sdp_list_free(apseq, 0);
-+	sdp_list_free(proto[1], 0);
-+	sdp_list_free(proto[2], 0);
-+	sdp_data_free(psm);
++#define KEYB_MAJOR	0x25
++#define KEYB_MINOR	0x40
 +
-+	/* additional protocols */
-+	proto[1] = sdp_list_append(0, &l2cap_uuid);
-+	psm = sdp_data_alloc(SDP_UINT16, &intr);
-+	proto[1] = sdp_list_append(proto[1], psm);
-+	apseq = sdp_list_append(0, proto[1]);
++#define HIDP_KEYB_SIZE	10
 +
-+	sdp_uuid16_create(&hidp_uuid, HIDP_UUID);
-+	proto[2] = sdp_list_append(0, &hidp_uuid);
-+	apseq = sdp_list_append(apseq, proto[2]);
++typedef int (*func_ptr)();
 +
-+	aproto = sdp_list_append(0, apseq);
-+	sdp_set_add_access_protos(record, aproto);
++static GSList *adapters = NULL;
 +
-+	sdp_list_free(svclass_id, 0);
-+	sdp_list_free(proto[1], 0);
-+	sdp_list_free(proto[2], 0);
-+	sdp_list_free(pfseq, 0);
-+	sdp_list_free(apseq, 0);
-+	sdp_list_free(aproto, 0);
-+	sdp_data_free(psm);
++static DBusConnection *connection;
 +
-+	sdp_set_info_attr(record, "HID Keyboard", NULL, NULL);
++static const unsigned char keycode2hidp[256] = {
++		0, 41, 30, 31, 32, 33, 34, 35, 36,
++		37, 38, 39, 45, 46, 42, 43, 20,
++		26, 8, 21, 23, 28, 24, 12, 18, 19,
++		47, 48, 40, 224, 4, 22, 7, 9, 10, 11,
++		13, 14, 15, 51, 52, 53, 225, 49, 29,
++		27, 6, 25, 5, 17, 16, 54, 55, 56, 229,
++		85, 226, 44, 57, 58, 59, 60, 61, 62,
++		63, 64, 65, 66, 67, 83, 71, 95, 96, 97,
++		86, 92, 93, 94, 87, 89, 90, 91, 98, 99,
++		0, 148, 100, 68, 69, 135, 146, 147, 138,
++		136, 139, 140, 88, 228, 84, 70, 230, 0,
++		74, 82, 75, 80, 79, 77, 81, 78, 73, 76,
++		0, 127, 129, 128, 102, 103, 0, 72, 0,
++		133, 144, 145, 137, 227, 231, 101, 120,
++		121, 118, 122, 119, 124, 116, 125, 126,
++		123, 117, 0, 251, 0, 248, 0, 0, 0, 0, 0,
++		0, 0, 240, 0, 249, 0, 0, 0, 0, 0, 241,
++		242, 0, 236, 0, 235, 232, 234, 233, 0, 0,
++		0, 0, 0, 0, 250, 0, 0, 247, 245, 246, 0,
++		0, 0, 0, 104, 105, 106, 107, 108, 109,
++		110, 111, 112, 113, 114, 115, 0, 0, 0, 0,
++		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
++		};
 +
-+	for (i = 0; i < sizeof(hid_attr) / 2; i++)
-+		sdp_attr_add_new(record,
-+					SDP_ATTR_HID_DEVICE_RELEASE_NUMBER + i,
-+					SDP_UINT16, &hid_attr[i]);
++struct keyboard_state {
++	unsigned char value[HIDP_KEYB_SIZE];
++	unsigned char last_value;
++};
 +
-+	dtds[0] = &dtd2;
-+	values[0] = &hid_spec_type;
-+	dtds[1] = &dtd_data;
-+	values[1] = (uint8_t *) hid_spec;
-+	leng[0] = 0;
-+	leng[1] = sizeof(hid_spec);
-+	hid_spec_lst = sdp_seq_alloc_with_length(dtds, values, leng, 2);
-+	hid_spec_lst2 = sdp_data_alloc(SDP_SEQ8, hid_spec_lst);
-+	sdp_attr_add(record, SDP_ATTR_HID_DESCRIPTOR_LIST, hid_spec_lst2);
++struct device_data {
++	GIOChannel *ctrl;
++	GIOChannel *intr;
++	bdaddr_t dst;
++	unsigned int intr_watch;
++	char *input_path;
++	struct keyboard_state keyboard;
++};
 +
-+	for (i = 0; i < sizeof(hid_attr_lang) / 2; i++) {
-+		dtds2[i] = &dtd;
-+		values2[i] = &hid_attr_lang[i];
++struct adapter_data {
++	struct btd_adapter *adapter;
++	struct device_data *dev;
++	uint32_t sdp_record_handle;
++	GIOChannel *listen_ctrl;
++	GIOChannel *listen_intr;
++	int pending;
++	char active;
++	uint32_t original_cod;
++};
++
++struct user_data {
++	struct adapter_data *adapt;
++	func_ptr func;
++};
++
++
++static void add_lang_attr(sdp_record_t *r)
++{
++	sdp_lang_attr_t base_lang;
++	sdp_list_t *langs = 0;
++
++	/* UTF-8 MIBenum (http://www.iana.org/assignments/character-sets) */
++	base_lang.code_ISO639 = (0x65 << 8) | 0x6e;
++	base_lang.encoding = 106;
++	base_lang.base_offset = SDP_PRIMARY_LANG_BASE;
++	langs = sdp_list_append(0, &base_lang);
++	sdp_set_lang_attr(r, langs);
++	sdp_list_free(langs, 0);
++}
++
++
++static int sdp_keyboard_service(struct adapter_data *adapt)
++{
++    return -1;
++}
++
++
++
++static DBusMessage *send_event(DBusConnection *conn,
++		DBusMessage *msg, void *data)
++{
++	return btd_error_failed(msg, "Invalid profile mode");
++}
++
++
++
++static DBusMessage *connect_device(DBusConnection *conn, DBusMessage *msg,
++					gpointer data)
++{
++	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++}
++
++
++static const GDBusSignalTable ghid_adapter_signals[] = {
++	{ GDBUS_SIGNAL("IncomingConnection", NULL) },
++	{ GDBUS_SIGNAL("DeviceReleased", NULL) },
++	{ }
++};
++
++
++static const GDBusMethodTable ghid_adapter_methods[] = {
++	{ GDBUS_METHOD("Connect", GDBUS_ARGS({"path", "s"}), NULL, connect_device) },
++	{ }
++};
++
++
++static void register_interface(const char *path, struct adapter_data *adapt)
++{
++	if (g_dbus_register_interface(connection, path, GENERIC_HID_INTERFACE,
++					ghid_adapter_methods, ghid_adapter_signals,
++					NULL, adapt, NULL) == FALSE) {
++		error("D-Bus failed to register %s interface",
++				GENERIC_HID_INTERFACE);
++		return;
 +	}
 +
-+	lang_lst = sdp_seq_alloc(dtds2, values2, sizeof(hid_attr_lang) / 2);
-+	lang_lst2 = sdp_data_alloc(SDP_SEQ8, lang_lst);
-+	sdp_attr_add(record, SDP_ATTR_HID_LANG_ID_BASE_LIST, lang_lst2);
++	btd_debug("Registered interface %s path %s", GENERIC_HID_INTERFACE, path);
 +
-+	sdp_attr_add_new(record, SDP_ATTR_HID_SDP_DISABLE,
-+				SDP_UINT16, &hid_attr2[0]);
++}
 +
-+	for (i = 0; i < sizeof(hid_attr2) / 2 - 1; i++)
-+		sdp_attr_add_new(record, SDP_ATTR_HID_REMOTE_WAKEUP + i,
-+						SDP_UINT16, &hid_attr2[i + 1]);
-
-+	if (add_record_to_server(&src, record) < 0)
-+		return -1;
 +
-+	adapt->sdp_record_handle = record->handle;
++static void unregister_interface(const char *path)
++{
++	btd_debug("path %s", path);
 +
-+	btd_debug("HID service registered with record handle %x", record->handle);
++	g_dbus_unregister_interface(connection, path, GENERIC_HID_INTERFACE);
++}
++
++static void confirm_event_cb(GIOChannel *chan, GError *err, gpointer data)
++{
++}
++
++static int adapt_start(struct adapter_data *adapt)
++{
++	GError *err = NULL;
++	bdaddr_t src;
++	struct device_data *dev = adapt->dev;
++
++	adapter_get_address(adapt->adapter, &src);
++
++	adapt->listen_ctrl = bt_io_listen(BT_IO_L2CAP, confirm_event_cb,
++						NULL, adapt, NULL, &err,
++						BT_IO_OPT_SOURCE_BDADDR, &src,
++						BT_IO_OPT_PSM, L2CAP_PSM_HIDP_CTRL,
++						BT_IO_OPT_INVALID);
++	if (!adapt->listen_ctrl) {
++		error("Failed to listen on control channel");
++		g_error_free(err);
++		g_free(adapt);
++		return -ENOTCONN;
++	}
++
++	adapt->listen_intr = bt_io_listen(BT_IO_L2CAP, confirm_event_cb,
++						NULL, adapt, NULL, &err,
++						BT_IO_OPT_SOURCE_BDADDR, &src,
++						BT_IO_OPT_PSM, L2CAP_PSM_HIDP_INTR,
++						BT_IO_OPT_INVALID);
++	if (!adapt->listen_intr) {
++		error("Failed to listen on interrupt channel");
++		/* TODO: fix this */
++		g_io_channel_unref(dev->ctrl);
++		dev->ctrl = NULL;
++		g_error_free(err);
++		g_free(adapt);
++		return -ENOTCONN;
++	}
 +
 +	return 0;
 +}
-
-
- static DBusMessage *send_event(DBusConnection *conn,
++
++static void adapt_stop(struct adapter_data *adapt)
++{
++	struct device_data *dev = adapt->dev;
++
++	if (adapt->listen_intr != NULL) {
++		g_io_channel_shutdown(adapt->listen_intr, TRUE, NULL);
++		g_io_channel_unref(adapt->listen_intr);
++	}
++
++	if (adapt->listen_intr != NULL) {
++		g_io_channel_shutdown(adapt->listen_ctrl, TRUE, NULL);
++		g_io_channel_unref(adapt->listen_ctrl);
++	}
++
++	if (dev->intr != NULL) {
++		g_io_channel_shutdown(dev->intr, TRUE, NULL);
++		g_io_channel_unref(dev->intr);
++
++		g_source_remove(dev->intr_watch);
++	}
++
++	if (dev->ctrl != NULL) {
++		g_io_channel_shutdown(dev->ctrl, TRUE, NULL);
++		g_io_channel_unref(dev->ctrl);
++	}
++}
++
++static void cleanup(struct adapter_data *adapt)
++{
++	adapt_stop(adapt);
++
++	if (adapt->dev != NULL)
++		g_free(adapt->dev);
++
++	if (adapt != NULL)
++		g_free(adapt);
++}
++
++static gint adapter_cmp(gconstpointer con, gconstpointer user_data)
++{
++	const struct adapter_data *adapt = con;
++	const struct btd_adapter *adapter = user_data;
++
++    return (adapter == adapt->adapter);
++}
++
++static int ghid_probe(struct btd_adapter *adapter)
++{
++	struct adapter_data *adapt;
++
++	adapt = g_try_new0(struct adapter_data, 1);
++	if (adapt == NULL)
++		return -ENOMEM;
++
++	adapt->dev = g_try_new0(struct device_data, 1);
++	if (adapt->dev == NULL) {
++		g_free(adapt);
++		return -ENOMEM;
++	}
++
++	adapt->pending = 0;
++	adapt->adapter = adapter;
++	adapt->active = 0;
++
++	if (sdp_keyboard_service(adapt) < 0) {
++		btd_debug("Adding HID SDP service failed");
++		g_free(adapt);
++		return -1;
++	}
++
++	if (adapt_start(adapt) < 0)
++		return -ENOTCONN;
++
++	register_interface(adapter_get_path(adapter), adapt);
++
++	adapters = g_slist_append(adapters, adapt);
++
++	return 0;
++}
++
++static void ghid_remove(struct btd_adapter *adapter)
++{
++	struct adapter_data *adapt;
++	struct device_data *dev;
++	GSList *l;
++
++	l = g_slist_find_custom(adapters, adapter, adapter_cmp);
++
++	if (l == NULL)
++		return;
++
++	adapt = l->data;
++	dev = adapt->dev;
++
++	adapters = g_slist_remove(adapters, adapt);
++
++	if (dev->input_path != NULL) {
++		g_dbus_unregister_interface(connection,
++						dev->input_path,
++						GENERIC_INPUT_DEVICE);
++
++		g_dbus_emit_signal(connection,  adapter_get_path(adapter),
++					GENERIC_HID_INTERFACE, "DeviceReleased",
++					DBUS_TYPE_INVALID);
++
++		g_free(dev->input_path);
++
++	}
++
++	remove_record_from_server(adapt->sdp_record_handle);
++	cleanup(adapt);
++
++	unregister_interface(adapter_get_path(adapter));
++}
++
++static struct btd_adapter_driver ghid_driver = {
++	.name	= "generic-hid",
++	.probe	= ghid_probe,
++	.remove	= ghid_remove,
++};
++
++static int generic_hid_init(void)
++{
++	int err;
++
++	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
++	if (connection == NULL)
++		return -EIO;
++
++	err = btd_register_adapter_driver(&ghid_driver);
++	if (err < 0) {
++		dbus_connection_unref(connection);
++		return err;
++	}
++
++	return 0;
++}
++
++static void generic_hid_exit(void)
++{
++	btd_unregister_adapter_driver(&ghid_driver);
++
++	dbus_connection_unref(connection);
++}
++
++BLUETOOTH_PLUGIN_DEFINE(generichid, VERSION,
++		BLUETOOTH_PLUGIN_PRIORITY_LOW, generic_hid_init, generic_hid_exit)
