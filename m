@@ -1,128 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v2] Bluetooth: mgmt: Add device disconnect reason
-Date: Fri, 20 Jul 2012 15:18:18 +0200
-Message-Id: <1342790298-12193-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH hcidump] Fix printing link handle
+Date: Fri, 20 Jul 2012 14:15:18 +0300
+Message-Id: <1342782918-4224-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-MGMT_EV_DEVICE_DISCONNECTED will now expose the disconnection reason to
-userland, providing the following possible values:
-
-	0x00	Reason unspecified
-	0x01	Connection timeout
-
-Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Print logical and physical link handles as hex 0x%2.2x
 ---
-v2: style fixes as pointed out by Andrei and Gustavo.
+ parser/hci.c |   17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
->From previous patch:
-
-During the BlueZ meeting in Brazil it was proposed to add two more values to this enum: "Connection terminated by local host" and "Connection terminated by remote host". However, after some testing, it seems the result can be quite misleading. Therefore and given that there are no known use-cases that need this information (local vs remote disconnection), these two values have been dropped.
-
- include/net/bluetooth/hci.h      |    1 +
- include/net/bluetooth/hci_core.h |    2 +-
- include/net/bluetooth/mgmt.h     |    4 ++++
- net/bluetooth/hci_event.c        |   12 +++++++++---
- net/bluetooth/mgmt.c             |    9 +++++----
- 5 files changed, 20 insertions(+), 8 deletions(-)
-
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ccd723e..9fed9d4 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -293,6 +293,7 @@ enum {
+diff --git a/parser/hci.c b/parser/hci.c
+index 742a1b5..364a06c 100644
+--- a/parser/hci.c
++++ b/parser/hci.c
+@@ -1125,7 +1125,7 @@ static inline void create_physical_link_dump(int level, struct frame *frm)
+ 	int i;
  
- /* ---- HCI Error Codes ---- */
- #define HCI_ERROR_AUTH_FAILURE		0x05
-+#define HCI_ERROR_CONNECTION_TIMEOUT	0x08
- #define HCI_ERROR_REJ_BAD_ADDR		0x0f
- #define HCI_ERROR_REMOTE_USER_TERM	0x13
- #define HCI_ERROR_LOCAL_HOST_TERM	0x16
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 475b8c0..5a35912 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1012,7 +1012,7 @@ int mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 			  u8 addr_type, u32 flags, u8 *name, u8 name_len,
- 			  u8 *dev_class);
- int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
--			     u8 link_type, u8 addr_type);
-+			     u8 link_type, u8 addr_type, u8 reason);
- int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			   u8 link_type, u8 addr_type, u8 status);
- int mgmt_connect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 4348ee8..30c06d1 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -406,6 +406,10 @@ struct mgmt_ev_device_connected {
- } __packed;
+ 	p_indent(level, frm);
+-	printf("handle %d key length %d key type %d\n",
++	printf("handle 0x%2.2x key length %d key type %d\n",
+ 		cp->handle, cp->key_length, cp->key_type);
+ 	p_indent(level, frm);
+ 	printf("key ");
+@@ -1140,7 +1140,7 @@ static inline void create_logical_link_dump(int level, struct frame *frm)
+ 	int i;
  
- #define MGMT_EV_DEVICE_DISCONNECTED	0x000C
-+struct mgmt_ev_device_disconnected {
-+	struct mgmt_addr_info addr;
-+	__u8	reason;
-+} __packed;
+ 	p_indent(level, frm);
+-	printf("handle %d\n", cp->handle);
++	printf("handle 0x%2.2x\n", cp->handle);
  
- #define MGMT_EV_CONNECT_FAILED		0x000D
- struct mgmt_ev_connect_failed {
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 41ff978..09f3872 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1906,12 +1906,18 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	p_indent(level, frm);
+ 	printf("tx_flow ");
+@@ -3647,7 +3647,7 @@ static inline void phys_link_complete_dump(int level, struct frame *frm)
+ 	evt_physical_link_complete *evt = frm->ptr;
  
- 	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags) &&
- 	    (conn->type == ACL_LINK || conn->type == LE_LINK)) {
--		if (ev->status != 0)
-+		if (ev->status != 0) {
- 			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
- 					       conn->dst_type, ev->status);
--		else
-+		} else {
-+			u8 reason = 0x00;
-+
-+			if (ev->reason == HCI_ERROR_CONNECTION_TIMEOUT)
-+				reason = 0x01;
-+
- 			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
--						 conn->dst_type);
-+						 conn->dst_type, reason);
-+		}
- 	}
+ 	p_indent(level, frm);
+-	printf("status 0x%2.2x handle %d\n", evt->status, evt->handle);
++	printf("status 0x%2.2x handle 0x%2.2x\n", evt->status, evt->handle);
  
- 	if (ev->status == 0) {
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ad6613d..f9a1db8 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3061,16 +3061,17 @@ static void unpair_device_rsp(struct pending_cmd *cmd, void *data)
+ 	if (evt->status > 0) {
+ 		p_indent(level, frm);
+@@ -3660,7 +3660,7 @@ static inline void disconn_phys_link_complete_dump(int level, struct frame *frm)
+ 	evt_disconn_physical_link_complete *evt = frm->ptr;
+ 
+ 	p_indent(level, frm);
+-	printf("status 0x%2.2x handle %d reason 0x%2.2x\n",
++	printf("status 0x%2.2x handle 0x%2.2x reason 0x%2.2x\n",
+ 				evt->status, evt->handle, evt->reason);
+ 
+ 	if (evt->status > 0) {
+@@ -3677,7 +3677,7 @@ static inline void phys_link_loss_warning_dump(int level, struct frame *frm)
+ 	evt_physical_link_loss_warning *evt = frm->ptr;
+ 
+ 	p_indent(level, frm);
+-	printf("handle %d reason 0x%2.2x\n", evt->handle, evt->reason);
++	printf("handle 0x%2.2x reason 0x%2.2x\n", evt->handle, evt->reason);
  }
  
- int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
--			     u8 link_type, u8 addr_type)
-+			     u8 link_type, u8 addr_type, u8 reason)
- {
--	struct mgmt_addr_info ev;
-+	struct mgmt_ev_device_disconnected ev;
- 	struct sock *sk = NULL;
- 	int err;
+ static inline void phys_link_handle_dump(int level, struct frame *frm)
+@@ -3685,7 +3685,7 @@ static inline void phys_link_handle_dump(int level, struct frame *frm)
+ 	evt_physical_link_recovery *evt = frm->ptr;
  
- 	mgmt_pending_foreach(MGMT_OP_DISCONNECT, hdev, disconnect_rsp, &sk);
+ 	p_indent(level, frm);
+-	printf("handle %d\n", evt->handle);
++	printf("handle 0x%2.2x\n", evt->handle);
+ }
  
--	bacpy(&ev.bdaddr, bdaddr);
--	ev.type = link_to_bdaddr(link_type, addr_type);
-+	bacpy(&ev.addr.bdaddr, bdaddr);
-+	ev.addr.type = link_to_bdaddr(link_type, addr_type);
-+	ev.reason = reason;
+ static inline void logical_link_complete_dump(int level, struct frame *frm)
+@@ -3693,7 +3693,7 @@ static inline void logical_link_complete_dump(int level, struct frame *frm)
+ 	evt_logical_link_complete *evt = frm->ptr;
  
- 	err = mgmt_event(MGMT_EV_DEVICE_DISCONNECTED, hdev, &ev, sizeof(ev),
- 			 sk);
+ 	p_indent(level, frm);
+-	printf("status 0x%2.2x log_handle %d handle %d tx_flow_id %d\n",
++	printf("status 0x%2.2x log_handle 0x%2.2x handle 0x%2.2x tx_flow_id %d\n",
+ 			evt->status, btohs(evt->log_handle), evt->handle,
+ 			evt->tx_flow_id);
+ 
+@@ -3708,7 +3708,8 @@ static inline void flow_spec_modify_dump(int level, struct frame *frm)
+ 	evt_flow_spec_modify_complete *evt = frm->ptr;
+ 
+ 	p_indent(level, frm);
+-	printf("status 0x%2.2x handle %d\n", evt->status, btohs(evt->handle));
++	printf("status 0x%2.2x handle 0x%2.2x\n",
++					evt->status, btohs(evt->handle));
+ 
+ 	if (evt->status > 0) {
+ 		p_indent(level, frm);
 -- 
-1.7.7.6
+1.7.9.5
 
