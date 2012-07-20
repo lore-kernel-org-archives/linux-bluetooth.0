@@ -1,236 +1,206 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Fri, 20 Jul 2012 10:30:45 -0600
-Message-ID: <CAAbnaHZwB4uSujXOWLnXnK+imioZVB4-yxOMCXcMkcyM0hdyNQ@mail.gmail.com>
-Subject: [RFC generichid 5/5]
+Date: Fri, 20 Jul 2012 10:30:32 -0600
+Message-ID: <CAAbnaHY8BAx=JZRQ-m6BKkW3by60zo3o=Qu6tJ_JJxVNa0x9KQ@mail.gmail.com>
+Subject: [RFC generichid 4/5]
 From: Nathaniel Haggard <natester@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Clean up newlines and adds the reconnect and disconnect device functions.
+Adds the rest of the keyboard functions.
 
- input/generichid.c |   92 +++++++++++++++++++++++++++++++++++++++++-----------
- 1 files changed, 73 insertions(+), 19 deletions(-)
+ input/generichid.c |  175 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 175 insertions(+), 0 deletions(-)
 
 diff --git a/input/generichid.c b/input/generichid.c
-index 42d6a29..7957774 100644
+index 3a5f073..42d6a29 100644
 --- a/input/generichid.c
 +++ b/input/generichid.c
-@@ -130,7 +130,6 @@ struct user_data {
- 	func_ptr func;
- };
-
--
- static void add_lang_attr(sdp_record_t *r)
- {
- 	sdp_lang_attr_t base_lang;
-@@ -145,7 +144,6 @@ static void add_lang_attr(sdp_record_t *r)
- 	sdp_list_free(langs, 0);
+@@ -363,10 +363,185 @@ static void initiate_keyboard(struct
+keyboard_state *keyboard)
+ 	keyboard->last_value = 3;
  }
 
--
- static int sdp_keyboard_service(struct adapter_data *adapt)
- {
- 	bdaddr_t src;
-@@ -347,7 +345,6 @@ static int sdp_keyboard_service(struct adapter_data *adapt)
- 	return 0;
- }
++static char is_control(unsigned char code)
++{
++	unsigned char hidcode = keycode2hidp[code];
++
++	if (hidcode >= 224 && hidcode <= 231)
++		return 1;
++
++	return 0;
++}
++
++static unsigned char mask(unsigned char code)
++{
++	unsigned char hidcode = keycode2hidp[code];
++
++	return 1 << (hidcode - 224);
++}
++
++static int key_up(struct keyboard_state *keyboard, unsigned char code)
++{
++    unsigned char i;
++
++    for (i = 4; i <= keyboard->last_value &&
++            keyboard->value[i] != keycode2hidp[code]; i++)
++        ;
++
++    if (i > keyboard->last_value)
++        return -EINVAL;
++
++    keyboard->value[i] = keyboard->value[keyboard->last_value];
++    keyboard->value[keyboard->last_value] = 0;
++    keyboard->last_value--;
++
++    return 0;
++}
++
++static int key_down(struct keyboard_state *keyboard, unsigned char code)
++{
++	int i;
++	unsigned char keycode;
++
++	keycode = keycode2hidp[code];
++	for (i = 4; i <= keyboard->last_value; i++)
++		if (keyboard->value[i] == keycode)
++			return 0;
++
++	if (keyboard->last_value == HIDP_KEYB_SIZE - 1)
++		return -EPERM;
++
++	keyboard->last_value++;
++	keyboard->value[keyboard->last_value] = keycode;
++
++	return 0;
++}
++
++static DBusMessage *phantom_state(GIOChannel *chan,
++		struct keyboard_state *keyboard, DBusMessage *msg)
++{
++	int fd, err;
++	unsigned char value[10];
++
++	value[0] = 0xa1;
++	value[1] = 0x01;
++	value[2] = value[3] = 0;
++
++	/* phantom state */
++	memset(&value[4], 1, 6);
++
++	if (chan == NULL)
++		return btd_error_not_connected(msg);
++
++	fd = g_io_channel_unix_get_fd(chan);
++
++	err = write(fd, value, HIDP_KEYB_SIZE);
++	if (err < 0)
++		return btd_error_not_connected(msg);
++
++	return NULL;
++}
++
++static DBusMessage *send_report(GIOChannel *chan,
++		struct keyboard_state *keyboard, DBusMessage *msg)
++{
++	int fd, err;
++
++	if (chan == NULL)
++		return btd_error_not_connected(msg);;
++
++	fd = g_io_channel_unix_get_fd(chan);
++
++	err = write(fd, keyboard->value, HIDP_KEYB_SIZE);
++	if (err < 0)
++		return btd_error_not_connected(msg);
++
++	return NULL;
++}
++
++
++
++static DBusMessage *keyboard_event(GIOChannel *chan, DBusMessage *msg,
++					struct keyboard_state *keyboard,
++					unsigned char code,
++					char value)
++{
++	DBusMessage *ret_msg;
++	int err = 0;
++
++	if (is_control(code)) {
++
++		if (value)
++			keyboard->value[2] |= mask(code);
++		else
++			keyboard->value[2] &= ~mask(code);
++
++	} else {
++
++		if (value)
++			err = key_down(keyboard, code);
++		else
++			err = key_up(keyboard, code);
++	}
++
++	if (err < 0) {
++
++		ret_msg = phantom_state(chan, keyboard, msg);
++
++		if (ret_msg)
++			return ret_msg;
++
++		return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++	}
++
++	ret_msg = send_report(chan, keyboard, msg);
++
++	if (ret_msg)
++		return ret_msg;
++
++	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++}
++
++
 
--
- static void initiate_keyboard(struct keyboard_state *keyboard)
- {
- 	keyboard->value[0] = 0xa1;
-@@ -459,8 +456,6 @@ static DBusMessage *send_report(GIOChannel *chan,
- 	return NULL;
- }
-
--
--
- static DBusMessage *keyboard_event(GIOChannel *chan, DBusMessage *msg,
- 					struct keyboard_state *keyboard,
- 					unsigned char code,
-@@ -502,8 +497,6 @@ static DBusMessage *keyboard_event(GIOChannel
-*chan, DBusMessage *msg,
- 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
- }
-
--
--
  static DBusMessage *send_event(DBusConnection *conn,
  		DBusMessage *msg, void *data)
  {
-@@ -573,7 +566,6 @@ static gboolean set_protocol_listener(GIOChannel
-*chan, GIOCondition condition,
- 	return TRUE;
- }
-
--
- static gboolean channel_listener(GIOChannel *chan, GIOCondition condition,
- 					gpointer data)
- {
-@@ -596,7 +588,6 @@ static gboolean channel_listener(GIOChannel *chan,
-GIOCondition condition,
- 	return FALSE;
- }
-
--
- static void interrupt_connect_cb(GIOChannel *chan, GError *conn_err,
- 					void *data)
- {
-@@ -648,8 +639,6 @@ failed:
- 	}
- }
-
--
--
- static void control_connect_cb(GIOChannel *chan, GError *conn_err,
- 					void *data)
- {
-@@ -691,16 +680,88 @@ failed:
- 	dev->ctrl = NULL;
- }
-
--
- static DBusMessage *reconnect_device(DBusConnection *conn, DBusMessage *msg,
- 					gpointer data)
- {
-+	GError *err = NULL;
-+	GIOChannel *io;
-+	bdaddr_t src;
-+	struct adapter_data *adapt = data;
-+	struct device_data *dev = adapt->dev;
-+	struct user_data *info;
-+
-+	if (adapt->pending)
-+		return btd_error_in_progress(msg);
-+
-+	if (dev->intr != NULL)
-+		return btd_error_already_connected(msg);
-+
-+	info = g_try_new(struct user_data, 1);
-+	if (info == NULL)
-+		return btd_error_failed(msg, strerror(-ENOMEM));
-+
-+	info->adapt = adapt;
-+	info->func = NULL;
-+
-+	adapter_get_address(adapt->adapter, &src);
-+
-+	io = bt_io_connect(BT_IO_L2CAP, control_connect_cb, info,
-+				NULL, &err,
-+				BT_IO_OPT_SOURCE_BDADDR, &src,
-+				BT_IO_OPT_DEST_BDADDR, &(dev->dst),
-+				BT_IO_OPT_PSM, L2CAP_PSM_HIDP_CTRL,
-+				BT_IO_OPT_INVALID);
-+
-+	/* TODO: treat plug failed even with errors from cb */
-+	if (err != NULL)
-+		error("%s", err->message);
-+
-+	if (io == NULL) {
-+		if (info != NULL)
-+			g_free(info);
-+
-+		return btd_error_failed(msg, "Failed to plug the device");
-+	}
-+
-+	dev->ctrl = io;
-+	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
- }
-
-
- static DBusMessage *disconnect_device(DBusConnection *conn, DBusMessage *msg,
- 					gpointer data)
- {
++	DBusMessageIter iter;
++	char mode, value;
++	unsigned int code;
 +	struct adapter_data *adapt = data;
 +	struct device_data *dev = adapt->dev;
 +
-+	if (dev->intr != NULL) {
-+		g_io_channel_shutdown(dev->intr, TRUE, NULL);
-+		g_io_channel_unref(dev->intr);
-+		dev->intr = NULL;
++	if (!dbus_message_iter_init(msg, &iter))
++			return btd_error_invalid_args(msg);
 +
-+		g_source_remove(dev->intr_watch);
-+	}
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_BYTE)
++		return btd_error_invalid_args(msg);
 +
-+	if (dev->ctrl != NULL) {
-+		g_io_channel_shutdown(dev->ctrl, TRUE, NULL);
-+		g_io_channel_unref(dev->ctrl);
-+		dev->ctrl = NULL;
-+	}
++	dbus_message_iter_get_basic(&iter, &mode);
++	dbus_message_iter_next(&iter);
 +
-+	g_dbus_unregister_interface(conn, dev->input_path,
-+					GENERIC_INPUT_DEVICE);
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_UINT16)
++		return btd_error_invalid_args(msg);
 +
-+	if (dev->input_path != NULL) {
-+		g_free(dev->input_path);
-+		dev->input_path = NULL;
-+	}
++	dbus_message_iter_get_basic(&iter, &code);
++	dbus_message_iter_next(&iter);
 +
-+	g_dbus_emit_signal(connection, adapter_get_path(adapt->adapter),
-+				GENERIC_HID_INTERFACE, "DeviceReleased",
-+				DBUS_TYPE_INVALID);
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_BYTE)
++		return btd_error_invalid_args(msg);
 +
-+	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++	dbus_message_iter_get_basic(&iter, &value);
 +
++	if (dev->intr == NULL)
++		return btd_error_not_connected(msg);
++
++	if (mode == EV_KEY) /* keboard */
++		return keyboard_event(dev->intr, msg,
++					&(dev->keyboard),
++					(unsigned char) code, value);
++
++
+ 	return btd_error_failed(msg, "Invalid profile mode");
  }
-
- static const GDBusSignalTable ghid_input_device_signals[] = {
-@@ -716,7 +777,6 @@ static const GDBusMethodTable
-ghid_input_device_methods[] = {
- 	{}
- };
-
--
- static void generic_input_device_path(char *path, struct btd_adapter *adapter)
- {
- 	char *adapt;
-@@ -826,20 +886,17 @@ static DBusMessage
-*connect_device(DBusConnection *conn, DBusMessage *msg,
-
- }
-
--
- static const GDBusSignalTable ghid_adapter_signals[] = {
- 	{ GDBUS_SIGNAL("IncomingConnection", NULL) },
- 	{ GDBUS_SIGNAL("DeviceReleased", NULL) },
- 	{ }
- };
-
--
- static const GDBusMethodTable ghid_adapter_methods[] = {
- 	{ GDBUS_METHOD("Connect", GDBUS_ARGS({"path", "s"}), NULL, connect_device) },
- 	{ }
- };
-
--
- static void register_interface(const char *path, struct adapter_data *adapt)
- {
- 	if (g_dbus_register_interface(connection, path, GENERIC_HID_INTERFACE,
-@@ -854,7 +911,6 @@ static void register_interface(const char *path,
-struct adapter_data *adapt)
-
- }
-
--
- static void unregister_interface(const char *path)
- {
- 	btd_debug("path %s", path);
-@@ -862,7 +918,6 @@ static void unregister_interface(const char *path)
- 	g_dbus_unregister_interface(connection, path, GENERIC_HID_INTERFACE);
- }
-
--
- static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
- {
- 	uint16_t psm;
-@@ -935,7 +990,6 @@ failed:
- 	}
- }
-
--
- static void confirm_event_cb(GIOChannel *chan, GError *err, gpointer data)
- {
- 	uint16_t psm;
