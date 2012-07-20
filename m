@@ -1,96 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH hcidump] Fix printing link handle
-Date: Fri, 20 Jul 2012 14:15:18 +0300
-Message-Id: <1342782918-4224-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH obexd v0 3/4] client-doc: Rephrase ambiguities in PBAP interface
+Date: Fri, 20 Jul 2012 13:02:27 +0200
+Message-Id: <1342782148-10684-3-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1342782148-10684-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1342782148-10684-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Print logical and physical link handles as hex 0x%2.2x
+Rephrase method descriptions that can be misleading or are not clear
+enough.
 ---
- parser/hci.c |   17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ doc/client-api.txt |   22 ++++++++++++++--------
+ 1 files changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/parser/hci.c b/parser/hci.c
-index 742a1b5..364a06c 100644
---- a/parser/hci.c
-+++ b/parser/hci.c
-@@ -1125,7 +1125,7 @@ static inline void create_physical_link_dump(int level, struct frame *frm)
- 	int i;
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index 8202f39..8621df8 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -224,14 +224,15 @@ Methods		void Select(string location, string phonebook)
  
- 	p_indent(level, frm);
--	printf("handle %d key length %d key type %d\n",
-+	printf("handle 0x%2.2x key length %d key type %d\n",
- 		cp->handle, cp->key_length, cp->key_type);
- 	p_indent(level, frm);
- 	printf("key ");
-@@ -1140,7 +1140,7 @@ static inline void create_logical_link_dump(int level, struct frame *frm)
- 	int i;
+ 		array{string vcard, string name} List()
  
- 	p_indent(level, frm);
--	printf("handle %d\n", cp->handle);
-+	printf("handle 0x%2.2x\n", cp->handle);
+-			Return an array of vcard-listing data which contains the
+-			vcard : name paired string, for example "1.vcf" :
+-				"John".
++			Return an array of vcard-listing data where every entry
++			consists of a pair of strings containing the vcard
++			handle and the contact name. For example:
++				"1.vcf" : "John"
  
- 	p_indent(level, frm);
- 	printf("tx_flow ");
-@@ -3647,7 +3647,7 @@ static inline void phys_link_complete_dump(int level, struct frame *frm)
- 	evt_physical_link_complete *evt = frm->ptr;
+ 		object, dict Pull(string vcard, string targetfile)
  
- 	p_indent(level, frm);
--	printf("status 0x%2.2x handle %d\n", evt->status, evt->handle);
-+	printf("status 0x%2.2x handle 0x%2.2x\n", evt->status, evt->handle);
+-			Retrieve the vcard in the current phonebook object and
+-			store it in a local file.
++			Given a vcard handle, retrieve the vcard in the current
++			phonebook object and store it in a local file.
  
- 	if (evt->status > 0) {
- 		p_indent(level, frm);
-@@ -3660,7 +3660,7 @@ static inline void disconn_phys_link_complete_dump(int level, struct frame *frm)
- 	evt_disconn_physical_link_complete *evt = frm->ptr;
+ 			If an empty target file is given, a name will be
+ 			automatically calculated for the temporary file.
+@@ -246,7 +247,11 @@ Methods		void Select(string location, string phonebook)
+ 		array{string vcard, string name}
+ 		Search(string field, string value)
  
- 	p_indent(level, frm);
--	printf("status 0x%2.2x handle %d reason 0x%2.2x\n",
-+	printf("status 0x%2.2x handle 0x%2.2x reason 0x%2.2x\n",
- 				evt->status, evt->handle, evt->reason);
+-			Return an array of vcard-listing data which contains the
++			Search for entries matching the given condition and
++			return an array of vcard-listing data where every entry
++			consists of a pair of strings containing the vcard
++			handle and the contact name.
++
+ 			vcard : name paired string match the search condition.
  
- 	if (evt->status > 0) {
-@@ -3677,7 +3677,7 @@ static inline void phys_link_loss_warning_dump(int level, struct frame *frm)
- 	evt_physical_link_loss_warning *evt = frm->ptr;
+ 			field : the field in the vcard to search with
+@@ -255,8 +260,9 @@ Methods		void Select(string location, string phonebook)
  
- 	p_indent(level, frm);
--	printf("handle %d reason 0x%2.2x\n", evt->handle, evt->reason);
-+	printf("handle 0x%2.2x reason 0x%2.2x\n", evt->handle, evt->reason);
- }
+ 		uint16 GetSize()
  
- static inline void phys_link_handle_dump(int level, struct frame *frm)
-@@ -3685,7 +3685,7 @@ static inline void phys_link_handle_dump(int level, struct frame *frm)
- 	evt_physical_link_recovery *evt = frm->ptr;
+-			Return the number of the non-null entries in the
+-			selected phonebook object.
++			Return the number of entries in the selected phonebook
++			object that are actually used (i.e. indexes that
++			correspond to non-NULL entries).
  
- 	p_indent(level, frm);
--	printf("handle %d\n", evt->handle);
-+	printf("handle 0x%2.2x\n", evt->handle);
- }
+ 		void SetFormat(string format)
  
- static inline void logical_link_complete_dump(int level, struct frame *frm)
-@@ -3693,7 +3693,7 @@ static inline void logical_link_complete_dump(int level, struct frame *frm)
- 	evt_logical_link_complete *evt = frm->ptr;
- 
- 	p_indent(level, frm);
--	printf("status 0x%2.2x log_handle %d handle %d tx_flow_id %d\n",
-+	printf("status 0x%2.2x log_handle 0x%2.2x handle 0x%2.2x tx_flow_id %d\n",
- 			evt->status, btohs(evt->log_handle), evt->handle,
- 			evt->tx_flow_id);
- 
-@@ -3708,7 +3708,8 @@ static inline void flow_spec_modify_dump(int level, struct frame *frm)
- 	evt_flow_spec_modify_complete *evt = frm->ptr;
- 
- 	p_indent(level, frm);
--	printf("status 0x%2.2x handle %d\n", evt->status, btohs(evt->handle));
-+	printf("status 0x%2.2x handle 0x%2.2x\n",
-+					evt->status, btohs(evt->handle));
- 
- 	if (evt->status > 0) {
- 		p_indent(level, frm);
 -- 
-1.7.9.5
+1.7.7.6
 
