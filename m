@@ -1,60 +1,236 @@
 Return-Path: <cyrus@holtmann.org>
-From: John Frankish <j-frankish@slb.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Can no longer connect to audio stream with bluez > 0.96 and
- pulseaudio-2
-Date: Fri, 20 Jul 2012 17:19:32 +0000
-Message-ID: <654DF80AD31A344E93DBCC6280BD6DEF8598CFFC@NL0230MBX08N1.DIR.slb.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+Date: Fri, 20 Jul 2012 10:30:45 -0600
+Message-ID: <CAAbnaHZwB4uSujXOWLnXnK+imioZVB4-yxOMCXcMkcyM0hdyNQ@mail.gmail.com>
+Subject: [RFC generichid 5/5]
+From: Nathaniel Haggard <natester@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Using bluez-0.96 and pulseaudio-1.xx I could use bluetooth headphones without problems using blueman-1.23 to connect to an a2dp sink.
+Clean up newlines and adds the reconnect and disconnect device functions.
 
-With bluez-0.99/0.101 and pulseaudio-2 I can no longer connect and blueman gives the following error:
+ input/generichid.c |   92 +++++++++++++++++++++++++++++++++++++++++-----------
+ 1 files changed, 73 insertions(+), 19 deletions(-)
 
-Stream setup failed
+diff --git a/input/generichid.c b/input/generichid.c
+index 42d6a29..7957774 100644
+--- a/input/generichid.c
++++ b/input/generichid.c
+@@ -130,7 +130,6 @@ struct user_data {
+ 	func_ptr func;
+ };
 
-I see that bluez has moved to the MediaEndpoint format and that I need a /usr/local/etc/bluetooth/audio.conf for the first time, but things still don't work (details below), am I doing something wrong?
+-
+ static void add_lang_attr(sdp_record_t *r)
+ {
+ 	sdp_lang_attr_t base_lang;
+@@ -145,7 +144,6 @@ static void add_lang_attr(sdp_record_t *r)
+ 	sdp_list_free(langs, 0);
+ }
 
-Regards
-John
------------------------------
-audio.conf
+-
+ static int sdp_keyboard_service(struct adapter_data *adapt)
+ {
+ 	bdaddr_t src;
+@@ -347,7 +345,6 @@ static int sdp_keyboard_service(struct adapter_data *adapt)
+ 	return 0;
+ }
 
-[General]
-Enable=Source,Sink,Headset,Gateway,Control,Media
+-
+ static void initiate_keyboard(struct keyboard_state *keyboard)
+ {
+ 	keyboard->value[0] = 0xa1;
+@@ -459,8 +456,6 @@ static DBusMessage *send_report(GIOChannel *chan,
+ 	return NULL;
+ }
 
-$ echo "0000" | simple-agent hci0 00:1B:66:00:31:88
-Release
-New device (/org/bluez/8112/hci0/dev_00_1B_66_00_31_88)
+-
+-
+ static DBusMessage *keyboard_event(GIOChannel *chan, DBusMessage *msg,
+ 					struct keyboard_state *keyboard,
+ 					unsigned char code,
+@@ -502,8 +497,6 @@ static DBusMessage *keyboard_event(GIOChannel
+*chan, DBusMessage *msg,
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
 
-$ pulseaudio -vv
+-
+-
+ static DBusMessage *send_event(DBusConnection *conn,
+ 		DBusMessage *msg, void *data)
+ {
+@@ -573,7 +566,6 @@ static gboolean set_protocol_listener(GIOChannel
+*chan, GIOCondition condition,
+ 	return TRUE;
+ }
 
-D: [pulseaudio] dbus-util.c: Successfully connected to D-Bus system bus f0e34796d5401d46e695407a00000013 as :1.53
-D: [pulseaudio] bluetooth-util.c: dbus: interface=org.freedesktop.DBus, path=/org/freedesktop/DBus, member=NameAcquired
-D: [pulseaudio] bluetooth-util.c: Registering /MediaEndpoint/HFPAG on adapter /org/bluez/8112/hci0.
-D: [pulseaudio] bluetooth-util.c: Registering /MediaEndpoint/HFPHS on adapter /org/bluez/8112/hci0.
-D: [pulseaudio] bluetooth-util.c: Registering /MediaEndpoint/A2DPSource on adapter /org/bluez/8112/hci0.
-D: [pulseaudio] bluetooth-util.c: Registering /MediaEndpoint/A2DPSink on adapter /org/bluez/8112/hci0.
-I: [pulseaudio] module.c: Loaded "module-bluetooth-discover" (index: #6; argument: "").
+-
+ static gboolean channel_listener(GIOChannel *chan, GIOCondition condition,
+ 					gpointer data)
+ {
+@@ -596,7 +588,6 @@ static gboolean channel_listener(GIOChannel *chan,
+GIOCondition condition,
+ 	return FALSE;
+ }
 
-$ dbus-send --print-reply --system --dest=org.bluez /org/bluez/8112/hci0/dev_00_1B_66_00_31_88 org.bluez.AudioSink.Connect
-Error org.bluez.Error.Failed: Stream setup failed
+-
+ static void interrupt_connect_cb(GIOChannel *chan, GError *conn_err,
+ 					void *data)
+ {
+@@ -648,8 +639,6 @@ failed:
+ 	}
+ }
 
-D: [pulseaudio] bluetooth-util.c: dbus: interface=org.bluez.AudioSink, path=/org/bluez/8112/hci0/dev_00_1B_66_00_31_88, member=PropertyChanged
-D: [pulseaudio] bluetooth-util.c: dbus: property 'State' changed to value 'connecting'
-D: [pulseaudio] bluetooth-util.c: dbus: interface=org.bluez.Audio, path=/org/bluez/8112/hci0/dev_00_1B_66_00_31_88, member=PropertyChanged
-D: [pulseaudio] bluetooth-util.c: dbus: property 'State' changed to value 'connecting'
-D: [pulseaudio] bluetooth-util.c: dbus: interface=org.bluez.Device, path=/org/bluez/8112/hci0/dev_00_1B_66_00_31_88, member=PropertyChanged
-D: [pulseaudio] bluetooth-util.c: dbus: interface=org.bluez.AudioSink, path=/org/bluez/8112/hci0/dev_00_1B_66_00_31_88, member=PropertyChanged
-D: [pulseaudio] bluetooth-util.c: dbus: property 'State' changed to value 'disconnected'
-D: [pulseaudio] bluetooth-util.c: dbus: interface=org.bluez.Audio, path=/org/bluez/8112/hci0/dev_00_1B_66_00_31_88, member=PropertyChanged
-D: [pulseaudio] bluetooth-util.c: dbus: property 'State' changed to value 'disconnected'
-D: [pulseaudio] bluetooth-util.c: dbus: interface=org.bluez.AudioSink, path=/org/bluez/8112/hci0/dev_00_1B_66_00_31_88, member=PropertyChanged
-D: [pulseaudio] bluetooth-util.c: dbus: interface=org.bluez.AudioSink, path=/org/bluez/8112/hci0/dev_00_1B_66_00_31_88, member=PropertyChanged
-D: [pulseaudio] bluetooth-util.c: dbus: property 'State' changed to value 'disconnected'
-D: [pulseaudio] bluetooth-util.c: dbus: interface=org.bluez.Device, path=/org/bluez/8112/hci0/dev_00_1B_66_00_31_88, member=PropertyChanged
+-
+-
+ static void control_connect_cb(GIOChannel *chan, GError *conn_err,
+ 					void *data)
+ {
+@@ -691,16 +680,88 @@ failed:
+ 	dev->ctrl = NULL;
+ }
+
+-
+ static DBusMessage *reconnect_device(DBusConnection *conn, DBusMessage *msg,
+ 					gpointer data)
+ {
++	GError *err = NULL;
++	GIOChannel *io;
++	bdaddr_t src;
++	struct adapter_data *adapt = data;
++	struct device_data *dev = adapt->dev;
++	struct user_data *info;
++
++	if (adapt->pending)
++		return btd_error_in_progress(msg);
++
++	if (dev->intr != NULL)
++		return btd_error_already_connected(msg);
++
++	info = g_try_new(struct user_data, 1);
++	if (info == NULL)
++		return btd_error_failed(msg, strerror(-ENOMEM));
++
++	info->adapt = adapt;
++	info->func = NULL;
++
++	adapter_get_address(adapt->adapter, &src);
++
++	io = bt_io_connect(BT_IO_L2CAP, control_connect_cb, info,
++				NULL, &err,
++				BT_IO_OPT_SOURCE_BDADDR, &src,
++				BT_IO_OPT_DEST_BDADDR, &(dev->dst),
++				BT_IO_OPT_PSM, L2CAP_PSM_HIDP_CTRL,
++				BT_IO_OPT_INVALID);
++
++	/* TODO: treat plug failed even with errors from cb */
++	if (err != NULL)
++		error("%s", err->message);
++
++	if (io == NULL) {
++		if (info != NULL)
++			g_free(info);
++
++		return btd_error_failed(msg, "Failed to plug the device");
++	}
++
++	dev->ctrl = io;
++	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
 
 
+ static DBusMessage *disconnect_device(DBusConnection *conn, DBusMessage *msg,
+ 					gpointer data)
+ {
++	struct adapter_data *adapt = data;
++	struct device_data *dev = adapt->dev;
++
++	if (dev->intr != NULL) {
++		g_io_channel_shutdown(dev->intr, TRUE, NULL);
++		g_io_channel_unref(dev->intr);
++		dev->intr = NULL;
++
++		g_source_remove(dev->intr_watch);
++	}
++
++	if (dev->ctrl != NULL) {
++		g_io_channel_shutdown(dev->ctrl, TRUE, NULL);
++		g_io_channel_unref(dev->ctrl);
++		dev->ctrl = NULL;
++	}
++
++	g_dbus_unregister_interface(conn, dev->input_path,
++					GENERIC_INPUT_DEVICE);
++
++	if (dev->input_path != NULL) {
++		g_free(dev->input_path);
++		dev->input_path = NULL;
++	}
++
++	g_dbus_emit_signal(connection, adapter_get_path(adapt->adapter),
++				GENERIC_HID_INTERFACE, "DeviceReleased",
++				DBUS_TYPE_INVALID);
++
++	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++
+ }
+
+ static const GDBusSignalTable ghid_input_device_signals[] = {
+@@ -716,7 +777,6 @@ static const GDBusMethodTable
+ghid_input_device_methods[] = {
+ 	{}
+ };
+
+-
+ static void generic_input_device_path(char *path, struct btd_adapter *adapter)
+ {
+ 	char *adapt;
+@@ -826,20 +886,17 @@ static DBusMessage
+*connect_device(DBusConnection *conn, DBusMessage *msg,
+
+ }
+
+-
+ static const GDBusSignalTable ghid_adapter_signals[] = {
+ 	{ GDBUS_SIGNAL("IncomingConnection", NULL) },
+ 	{ GDBUS_SIGNAL("DeviceReleased", NULL) },
+ 	{ }
+ };
+
+-
+ static const GDBusMethodTable ghid_adapter_methods[] = {
+ 	{ GDBUS_METHOD("Connect", GDBUS_ARGS({"path", "s"}), NULL, connect_device) },
+ 	{ }
+ };
+
+-
+ static void register_interface(const char *path, struct adapter_data *adapt)
+ {
+ 	if (g_dbus_register_interface(connection, path, GENERIC_HID_INTERFACE,
+@@ -854,7 +911,6 @@ static void register_interface(const char *path,
+struct adapter_data *adapt)
+
+ }
+
+-
+ static void unregister_interface(const char *path)
+ {
+ 	btd_debug("path %s", path);
+@@ -862,7 +918,6 @@ static void unregister_interface(const char *path)
+ 	g_dbus_unregister_interface(connection, path, GENERIC_HID_INTERFACE);
+ }
+
+-
+ static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
+ {
+ 	uint16_t psm;
+@@ -935,7 +990,6 @@ failed:
+ 	}
+ }
+
+-
+ static void confirm_event_cb(GIOChannel *chan, GError *err, gpointer data)
+ {
+ 	uint16_t psm;
