@@ -1,45 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1342782148-10684-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1342782148-10684-1-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Fri, 20 Jul 2012 17:19:26 +0300
-Message-ID: <CABBYNZ+GeJXvZvTnOOT6FrxxVoR-AnLL3C4Bs5yOVOm+oWJJ4Q@mail.gmail.com>
-Subject: Re: [PATCH obexd v0 1/4] client-doc: Fix typo
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [RFC v2] Bluetooth: mgmt: Add device disconnect reason
+Date: Fri, 20 Jul 2012 15:18:18 +0200
+Message-Id: <1342790298-12193-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-On Fri, Jul 20, 2012 at 2:02 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> ---
->  doc/client-api.txt |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/doc/client-api.txt b/doc/client-api.txt
-> index 1938a38..11b79be 100644
-> --- a/doc/client-api.txt
-> +++ b/doc/client-api.txt
-> @@ -288,7 +288,7 @@ Methods             void Select(string location, string phonebook)
->                 array{string} ListFilterFields()
->
->                         Return All Available fields that can be used in
-> -                       SefFilter method.
-> +                       SetFilter method.
->
->                 array{string} GetFilter()
->
-> --
-> 1.7.7.6
+MGMT_EV_DEVICE_DISCONNECTED will now expose the disconnection reason to
+userland, providing the following possible values:
 
-Patches 1-3 pushed, thanks.
+	0x00	Reason unspecified
+	0x01	Connection timeout
 
+Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
+---
+v2: style fixes as pointed out by Andrei and Gustavo.
 
+>From previous patch:
+
+During the BlueZ meeting in Brazil it was proposed to add two more values to this enum: "Connection terminated by local host" and "Connection terminated by remote host". However, after some testing, it seems the result can be quite misleading. Therefore and given that there are no known use-cases that need this information (local vs remote disconnection), these two values have been dropped.
+
+ include/net/bluetooth/hci.h      |    1 +
+ include/net/bluetooth/hci_core.h |    2 +-
+ include/net/bluetooth/mgmt.h     |    4 ++++
+ net/bluetooth/hci_event.c        |   12 +++++++++---
+ net/bluetooth/mgmt.c             |    9 +++++----
+ 5 files changed, 20 insertions(+), 8 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index ccd723e..9fed9d4 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -293,6 +293,7 @@ enum {
+ 
+ /* ---- HCI Error Codes ---- */
+ #define HCI_ERROR_AUTH_FAILURE		0x05
++#define HCI_ERROR_CONNECTION_TIMEOUT	0x08
+ #define HCI_ERROR_REJ_BAD_ADDR		0x0f
+ #define HCI_ERROR_REMOTE_USER_TERM	0x13
+ #define HCI_ERROR_LOCAL_HOST_TERM	0x16
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 475b8c0..5a35912 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1012,7 +1012,7 @@ int mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 			  u8 addr_type, u32 flags, u8 *name, u8 name_len,
+ 			  u8 *dev_class);
+ int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
+-			     u8 link_type, u8 addr_type);
++			     u8 link_type, u8 addr_type, u8 reason);
+ int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 			   u8 link_type, u8 addr_type, u8 status);
+ int mgmt_connect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 4348ee8..30c06d1 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -406,6 +406,10 @@ struct mgmt_ev_device_connected {
+ } __packed;
+ 
+ #define MGMT_EV_DEVICE_DISCONNECTED	0x000C
++struct mgmt_ev_device_disconnected {
++	struct mgmt_addr_info addr;
++	__u8	reason;
++} __packed;
+ 
+ #define MGMT_EV_CONNECT_FAILED		0x000D
+ struct mgmt_ev_connect_failed {
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 41ff978..09f3872 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1906,12 +1906,18 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags) &&
+ 	    (conn->type == ACL_LINK || conn->type == LE_LINK)) {
+-		if (ev->status != 0)
++		if (ev->status != 0) {
+ 			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
+ 					       conn->dst_type, ev->status);
+-		else
++		} else {
++			u8 reason = 0x00;
++
++			if (ev->reason == HCI_ERROR_CONNECTION_TIMEOUT)
++				reason = 0x01;
++
+ 			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
+-						 conn->dst_type);
++						 conn->dst_type, reason);
++		}
+ 	}
+ 
+ 	if (ev->status == 0) {
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index ad6613d..f9a1db8 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3061,16 +3061,17 @@ static void unpair_device_rsp(struct pending_cmd *cmd, void *data)
+ }
+ 
+ int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
+-			     u8 link_type, u8 addr_type)
++			     u8 link_type, u8 addr_type, u8 reason)
+ {
+-	struct mgmt_addr_info ev;
++	struct mgmt_ev_device_disconnected ev;
+ 	struct sock *sk = NULL;
+ 	int err;
+ 
+ 	mgmt_pending_foreach(MGMT_OP_DISCONNECT, hdev, disconnect_rsp, &sk);
+ 
+-	bacpy(&ev.bdaddr, bdaddr);
+-	ev.type = link_to_bdaddr(link_type, addr_type);
++	bacpy(&ev.addr.bdaddr, bdaddr);
++	ev.addr.type = link_to_bdaddr(link_type, addr_type);
++	ev.reason = reason;
+ 
+ 	err = mgmt_event(MGMT_EV_DEVICE_DISCONNECTED, hdev, &ev, sizeof(ev),
+ 			 sk);
 -- 
-Luiz Augusto von Dentz
+1.7.7.6
+
