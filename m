@@ -1,41 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <5008F67F.5030604@globaledgesoft.com>
-References: <5008F67F.5030604@globaledgesoft.com>
-Date: Fri, 20 Jul 2012 11:21:15 -0300
-Message-ID: <CACJA=fUW4a-B-1SGQmPbh+J5YKJ9bVEFbz8ZUezPOD3w0Hmsxw@mail.gmail.com>
-Subject: Re: BLE - multiple connections
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Ajay KV <ajay.kv@globaledgesoft.com>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1342782148-10684-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1342782148-10684-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Fri, 20 Jul 2012 17:19:26 +0300
+Message-ID: <CABBYNZ+GeJXvZvTnOOT6FrxxVoR-AnLL3C4Bs5yOVOm+oWJJ4Q@mail.gmail.com>
+Subject: Re: [PATCH obexd v0 1/4] client-doc: Fix typo
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ajay,
+Hi Mikel,
 
-On Fri, Jul 20, 2012 at 3:11 AM, Ajay KV <ajay.kv@globaledgesoft.com> wrote:
+On Fri, Jul 20, 2012 at 2:02 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 >
-> Hi all,
+> ---
+>  doc/client-api.txt |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 >
-> Since im new to bluetooth low energy technology , i need some guidance from
-> you . Following are the issues that im searching for a solution
+> diff --git a/doc/client-api.txt b/doc/client-api.txt
+> index 1938a38..11b79be 100644
+> --- a/doc/client-api.txt
+> +++ b/doc/client-api.txt
+> @@ -288,7 +288,7 @@ Methods             void Select(string location, string phonebook)
+>                 array{string} ListFilterFields()
 >
+>                         Return All Available fields that can be used in
+> -                       SefFilter method.
+> +                       SetFilter method.
 >
-> 1 : Is it possible to establish mutiple LE connection at a time . Im using
-> fedora 13 , linux 2.6.39 version with 4.0 LE supported dongles
+>                 array{string} GetFilter()
 >
-> 2: now im not concentrating on user profiles like GATT and ATT . i wanted to
-> do it using HCI and L2cap connections
+> --
+> 1.7.7.6
 
-You are able to establish one LE connection at a time. If you have
-more than one device you want to connect to, you can use whitelist.
-Add the devices to whitelist and issue the LE connection command. As
-soon as one of the devices starts advertising, the connection will be
-established.
+Patches 1-3 pushed, thanks.
 
-You can use hcitool to add devices to whitelist and issue LE connection command.
 
-BR,
-
-Andre
+-- 
+Luiz Augusto von Dentz
