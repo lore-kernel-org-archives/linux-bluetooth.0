@@ -1,61 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: John Frankish <JFrankish@saxonservices.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: agent versus simple-agent
-Date: Sun, 22 Jul 2012 12:33:15 +0000
-Message-ID: <381B9690B8F4374095EC4BC4B392C5AC68008F41@CALMBX02.SaxonServices.local>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <CABUK1aht5D2zW7wW22QaLLJWOkBpD9B+pK9aU_rcYkFByFYZyA@mail.gmail.com>
+References: <CABUK1ahRsy+JtP-pqTcHeVSD=OxQ=_Yb29gCKZCzxxa-httdmw@mail.gmail.com>
+	<CAMOw1v4U5t+_4hC4PSKy1H5d1dgBpieCXKBy+P7vH2yZ0dMJNg@mail.gmail.com>
+	<CABUK1aht5D2zW7wW22QaLLJWOkBpD9B+pK9aU_rcYkFByFYZyA@mail.gmail.com>
+Date: Sun, 22 Jul 2012 12:11:02 +0300
+Message-ID: <CACumGOJ==Ca2C9xRvYFMPio3ospNWf+0erO8MemgZrfcDTDCcA@mail.gmail.com>
+Subject: Re: AVRCPv1.3 NOTIFY from CT per notification from TG
+From: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
+To: Pavan Savoy <pavan_savoy@sify.com>
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I'm trying to find a way to pair without using simple-agent/python/pygtk/dbus-python.
+Hi Pavan
 
-I haven't been able to do this directly with dbus, so I thought I'd try tools/agent from bluez-4.101
+On Sun, Jul 22, 2012 at 5:07 AM, Pavan Savoy <pavan_savoy@sify.com> wrote:
+> Now, I am interested to know whether the "Playing" needs to be
+> displayed or something like "Paused" along with another bit of info,
+> which is My-Song.
+> So, say to begin with I register for track-changed notification, now
+> to read the attributes of song again, but If I have to display
+> "Paused" then I will have to register for "Play Status" & I can get
+> only 1 of them at a time ?
 
-Is the C applet tools/agent meant to be an equivalent of simple-agent (I don't know anything about C)?
+You can register multiple events simultaneously, the only problem is
+that you need to register again every time it changes. Apparently this
+idea of registration not being persistent came from AV/C spec, while
+doing support for VolumeChanged event I actually step in it see patch:
+AVRCP: Fix not registering to VolumeChanged event again when notified
 
-This works:
-
-$ echo "0000" | simple-agent hci0 00:21:3C:5B:E7:23
-$ dbus-send --print-reply --system --dest=org.bluez /org/bluez/11521/hci0/dev_00_21_3C_5B_E7_23  org.bluez.Headset.Connect
-
-Whereas this does not work:
-
-$ agent --adapter hci0 0000 00:21:3C:5B:E7:23
-Agent has been released
-$ dbus-send --print-reply --system --dest=org.bluez /org/bluez/11521/hci0/dev_00_21_3C_5B_E7_23  org.bluez.Headset.Connect
-
->From this:
-
-$ agent --help
-agent [--adapter adapter-path] [--path agent-path] <passkey> [<device>]
-
-I cannot figure out what "--path agent-path" refers to?
-
-
-
-
-CONFIDENTIAL &amp; PRIVILEGED COMMUNICATION 
-
-
-
-The information contained in this message is privileged, 
-
-confidential, and protected from disclosure. This message 
-
-is intended for the individual or entity addressed herein. 
-
-If you are not the intended recipient, please do not read, 
-
-copy, use or disclose this communication to others, also 
-
-please notify the sender by replying to this message, and 
-
-then delete it from your system. The sender totally disclaims, 
-
-and will not accept, any responsibility or liability for the 
-
-unauthorized use, or the consequences of any unauthorized use, 
-
-of this communication or message.
+Its pretty broken design if you ask me, but one that we have to live with...
