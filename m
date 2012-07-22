@@ -1,54 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <500CE1BE.2080107@globaledgesoft.com>
-Date: Mon, 23 Jul 2012 11:01:42 +0530
-From: Ajay KV <ajay.kv@globaledgesoft.com>
+From: John Frankish <JFrankish@saxonservices.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: agent versus simple-agent
+Date: Sun, 22 Jul 2012 12:33:15 +0000
+Message-ID: <381B9690B8F4374095EC4BC4B392C5AC68008F41@CALMBX02.SaxonServices.local>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-To: Andre Guedes <andre.guedes@openbossa.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: BLE - multiple connections
-References: <5008F67F.5030604@globaledgesoft.com> <CACJA=fUW4a-B-1SGQmPbh+J5YKJ9bVEFbz8ZUezPOD3w0Hmsxw@mail.gmail.com>
-In-Reply-To: <CACJA=fUW4a-B-1SGQmPbh+J5YKJ9bVEFbz8ZUezPOD3w0Hmsxw@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-       So that means at  a time i can not able to establish  two LE  
-active connections.   One more  task i wanna   try is  to send L2cap  
-data packets through L2cap signalling channel (cid 0x05) . But as per my 
-knowledge kernel has designed it to work only on cid 0x05
+I'm trying to find a way to pair without using simple-agent/python/pygtk/dbus-python.
+
+I haven't been able to do this directly with dbus, so I thought I'd try tools/agent from bluez-4.101
+
+Is the C applet tools/agent meant to be an equivalent of simple-agent (I don't know anything about C)?
+
+This works:
+
+$ echo "0000" | simple-agent hci0 00:21:3C:5B:E7:23
+$ dbus-send --print-reply --system --dest=org.bluez /org/bluez/11521/hci0/dev_00_21_3C_5B_E7_23  org.bluez.Headset.Connect
+
+Whereas this does not work:
+
+$ agent --adapter hci0 0000 00:21:3C:5B:E7:23
+Agent has been released
+$ dbus-send --print-reply --system --dest=org.bluez /org/bluez/11521/hci0/dev_00_21_3C_5B_E7_23  org.bluez.Headset.Connect
+
+>From this:
+
+$ agent --help
+agent [--adapter adapter-path] [--path agent-path] <passkey> [<device>]
+
+I cannot figure out what "--path agent-path" refers to?
 
 
 
-Andre Guedes wrote:
-> Hi Ajay,
->
-> On Fri, Jul 20, 2012 at 3:11 AM, Ajay KV <ajay.kv@globaledgesoft.com> wrote:
->   
->> Hi all,
->>
->> Since im new to bluetooth low energy technology , i need some guidance from
->> you . Following are the issues that im searching for a solution
->>
->>
->> 1 : Is it possible to establish mutiple LE connection at a time . Im using
->> fedora 13 , linux 2.6.39 version with 4.0 LE supported dongles
->>
->> 2: now im not concentrating on user profiles like GATT and ATT . i wanted to
->> do it using HCI and L2cap connections
->>     
->
-> You are able to establish one LE connection at a time. If you have
-> more than one device you want to connect to, you can use whitelist.
-> Add the devices to whitelist and issue the LE connection command. As
-> soon as one of the devices starts advertising, the connection will be
-> established.
->
-> You can use hcitool to add devices to whitelist and issue LE connection command.
->
-> BR,
->
-> Andre
->
->   
 
+CONFIDENTIAL &amp; PRIVILEGED COMMUNICATION 
+
+
+
+The information contained in this message is privileged, 
+
+confidential, and protected from disclosure. This message 
+
+is intended for the individual or entity addressed herein. 
+
+If you are not the intended recipient, please do not read, 
+
+copy, use or disclose this communication to others, also 
+
+please notify the sender by replying to this message, and 
+
+then delete it from your system. The sender totally disclaims, 
+
+and will not accept, any responsibility or liability for the 
+
+unauthorized use, or the consequences of any unauthorized use, 
+
+of this communication or message.
