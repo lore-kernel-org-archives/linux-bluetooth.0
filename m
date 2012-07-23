@@ -1,38 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Remove locking in hci_user_passkey_request_evt
-Date: Mon, 23 Jul 2012 18:19:04 -0300
-Message-Id: <1343078344-22759-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1342533594-10413-4-git-send-email-chen.ganir@ti.com>
+References: <1342533594-10413-1-git-send-email-chen.ganir@ti.com>
+	<1342533594-10413-4-git-send-email-chen.ganir@ti.com>
+Date: Mon, 23 Jul 2012 17:08:12 -0300
+Message-ID: <CAKT1EBfTdVRp8i+atCQOLTNvv8kbRutmK03MYXRUaOuwNcuiog@mail.gmail.com>
+Subject: Re: [PATCH 3/9] Battery: Discover Characteristic Descriptors
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Chen Ganir <chen.ganir@ti.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes hdev locking in hci_user_passkey_request_evt
-since it is not needed. mgmt_user_passkey_request simply calls
-mgmt_event which does not require hdev locking at all.
+Hi Chen Ganir:
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
----
- net/bluetooth/hci_event.c | 4 ----
- 1 file changed, 4 deletions(-)
+On Tue, Jul 17, 2012 at 10:59 AM, Chen Ganir <chen.ganir@ti.com> wrote:
+> Discover all characteristic descriptors, and build a descriptor
+> list
+> ---
+>  profiles/batterystate/batterystate.c |   70 ++++++++++++++++++++++++++++++++++
+>  1 file changed, 70 insertions(+)
+>
+> diff --git a/profiles/batterystate/batterystate.c b/profiles/batterystate/batterystate.c
+> index 40663f6..18045ed 100644
+> --- a/profiles/batterystate/batterystate.c
+> +++ b/profiles/batterystate/batterystate.c
+> @@ -50,8 +50,24 @@ static GSList *servers;
+>  struct characteristic {
+>         struct gatt_char        attr;   /* Characteristic */
+>         struct battery          *batt;  /* Parent Battery Service */
+> +       GSList                          *desc;  /* Descriptors */
+>  };
+>
+> +struct descriptor {
+> +       struct characteristic   *ch;    /* Parent Characteristic */
+> +       uint16_t                handle; /* Descriptor Handle */
+> +       bt_uuid_t               uuid;   /* UUID */
+> +};
+> +
+> +static void char_free(gpointer user_data)
+> +{
+> +       struct characteristic *c = user_data;
+> +
+> +       g_slist_free_full(c->desc, g_free);
+> +
+> +       g_free(c);
+> +}
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 41ff978..a6c509d 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3252,12 +3252,8 @@ static void hci_user_passkey_request_evt(struct hci_dev *hdev,
- 
- 	BT_DBG("%s", hdev->name);
- 
--	hci_dev_lock(hdev);
--
- 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
- 		mgmt_user_passkey_request(hdev, &ev->bdaddr, ACL_LINK, 0);
--
--	hci_dev_unlock(hdev);
- }
- 
- static void hci_simple_pair_complete_evt(struct hci_dev *hdev,
--- 
-1.7.11.2
+Please fix the following warning:
 
+profiles/batterystate/batterystate.c:62:13: error: 'char_free' defined
+but not used [-Werror=unused-function]
+cc1: all warnings being treated as errors
+
+BR,
+Claudio
