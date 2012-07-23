@@ -1,50 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1343054163-19119-2-git-send-email-claudio.takahasi@openbossa.org>
-References: <1343054163-19119-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1343054163-19119-2-git-send-email-claudio.takahasi@openbossa.org>
-Date: Mon, 23 Jul 2012 12:16:03 -0400
-Message-ID: <CAJdJm_N7Z4a2p7-Ur+_kEf2Q==aL5QTYpmnRomX+LXjy1Dd37Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] btio: Rescue lost errorneous numbers
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Paulo Alcantara <paulo.alcantara@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [RFC BlueZ 7/7] doc: Add Register/Unregister GATT based services
+Date: Mon, 23 Jul 2012 11:55:20 -0400
+Message-Id: <1343058920-18608-8-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1343058920-18608-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1343058920-18608-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
-On Mon, Jul 23, 2012 at 10:36 AM, Claudio Takahasi
-<claudio.takahasi@openbossa.org> wrote:
->  #define ERROR_FAILED(gerr, str, err) \
-> -               g_set_error(gerr, BT_IO_ERROR, BT_IO_ERROR_FAILED, \
-> +               g_set_error(gerr, BT_IO_ERROR, err, \
->                                 str ": %s (%d)", strerror(err), err)
-> [...]
->                 if (err < 0)
-> -                       g_set_error(&gerr, BT_IO_ERROR,
-> -                                       BT_IO_ERROR_CONNECT_FAILED, "%s (%d)",
-> -                                       strerror(-err), -err);
-> -       } else if (cond & (G_IO_HUP | G_IO_ERR))
-> -               g_set_error(&gerr, BT_IO_ERROR, BT_IO_ERROR_CONNECT_FAILED,
-> -                               "HUP or ERR on socket");
-> +                       g_set_error(&gerr, BT_IO_ERROR, -err, "%s (%d)",
-> +                                                       strerror(-err), -err);
+This patch extends the Service interface to allow applications to
+register and unregister GATT based services.
+---
+ doc/service-api.txt |   33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-why not use the ERROR_FAILED() macro here?
-
->         if (err < 0) {
-> -               g_set_error(gerr, BT_IO_ERROR, BT_IO_ERROR_CONNECT_FAILED,
-> -                               "connect: %s (%d)", strerror(-err), -err);
-> +               g_set_error(gerr, BT_IO_ERROR, -err, "connect: %s (%d)",
-> +                                                       strerror(-err), -err);
-
-and here?
-
-Regards,
+diff --git a/doc/service-api.txt b/doc/service-api.txt
+index 0139f5f..1380932 100644
+--- a/doc/service-api.txt
++++ b/doc/service-api.txt
+@@ -43,6 +43,39 @@ Methods		uint32 AddRecord(string record)
+ 					 org.bluez.Error.DoesNotExist
+ 					 org.bluez.Error.Failed
+ 
++		void Register(string uuid, dict settings,
++					array{object} characteristics)
++
++			Add a GATT based service. The uuid represents the
++			primary/secondary service UUID. The settings
++			dictionary has the following format:
++			{
++				"id": string (optional)
++			}
++
++			settings field is being added to allow API
++			flexibility. The "id" field allows the core to
++			manage handle allocation and internal GATT storage.
++
++			GATT included services is supported by providing the
++			same characteristic object path (restricted to same
++			provider/owner).
++
++			The characteristic objects implemented by the
++			caller shall follow the interface defined in the
++			attribute API.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.AlreadyExists
++
++		void Unregister(string uuid)
++
++			Removes a given GATT based service previously
++			registered by the caller.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.NotAuthorized
++
+ 		void RegisterWatcher(object agent, dict settings,
+ 						array{object} characteristics)
+ 
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.9.5
+
