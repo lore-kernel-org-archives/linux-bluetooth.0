@@ -1,58 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1342533594-10413-4-git-send-email-chen.ganir@ti.com>
-References: <1342533594-10413-1-git-send-email-chen.ganir@ti.com>
-	<1342533594-10413-4-git-send-email-chen.ganir@ti.com>
-Date: Mon, 23 Jul 2012 17:08:12 -0300
-Message-ID: <CAKT1EBfTdVRp8i+atCQOLTNvv8kbRutmK03MYXRUaOuwNcuiog@mail.gmail.com>
-Subject: Re: [PATCH 3/9] Battery: Discover Characteristic Descriptors
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Chen Ganir <chen.ganir@ti.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1343073870.4584.24.camel@jlt3.sipsolutions.net>
+Subject: Re: 2nd CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
+ 2012 (Barcelona!)
+From: Johannes Berg <johannes@sipsolutions.net>
+To: "John W. Linville" <linville@tuxdriver.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-wireless@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, alexander.smirnov@siemens.com,
+	Sergey.Sobolev@siemens.com
+Date: Mon, 23 Jul 2012 22:04:30 +0200
+In-Reply-To: <20120723192057.GE18589@tuxdriver.com> (sfid-20120723_213359_482339_245FF7E8)
+References: <20120322192406.GB2432@tuxdriver.com>
+	 <1332698585.1870.88.camel@aeonflux> <20120326145433.GE13806@tuxdriver.com>
+	 <1332774906.1870.98.camel@aeonflux> <20120326152541.GH13806@tuxdriver.com>
+	 <20120427174439.GC16207@tuxdriver.com>
+	 <20120723192057.GE18589@tuxdriver.com>
+	 (sfid-20120723_213359_482339_245FF7E8)
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen Ganir:
+On Mon, 2012-07-23 at 15:20 -0400, John W. Linville wrote:
 
-On Tue, Jul 17, 2012 at 10:59 AM, Chen Ganir <chen.ganir@ti.com> wrote:
-> Discover all characteristic descriptors, and build a descriptor
-> list
-> ---
->  profiles/batterystate/batterystate.c |   70 ++++++++++++++++++++++++++++++++++
->  1 file changed, 70 insertions(+)
->
-> diff --git a/profiles/batterystate/batterystate.c b/profiles/batterystate/batterystate.c
-> index 40663f6..18045ed 100644
-> --- a/profiles/batterystate/batterystate.c
-> +++ b/profiles/batterystate/batterystate.c
-> @@ -50,8 +50,24 @@ static GSList *servers;
->  struct characteristic {
->         struct gatt_char        attr;   /* Characteristic */
->         struct battery          *batt;  /* Parent Battery Service */
-> +       GSList                          *desc;  /* Descriptors */
->  };
->
-> +struct descriptor {
-> +       struct characteristic   *ch;    /* Parent Characteristic */
-> +       uint16_t                handle; /* Descriptor Handle */
-> +       bt_uuid_t               uuid;   /* UUID */
-> +};
-> +
-> +static void char_free(gpointer user_data)
-> +{
-> +       struct characteristic *c = user_data;
-> +
-> +       g_slist_free_full(c->desc, g_free);
-> +
-> +       g_free(c);
-> +}
+> Not bad, but I'd like to see some more!  Some ideas:
+> 
+> 	-- "state of the union" for bluetooth, nfc, 802.11
+> 	-- wireless mesh networking status updates
+> 	-- cfg80211/mac80211 feature previews (what's coming?)
+> 	-- standards bodies reports (802.11, 802.15.x)
+> 	-- important or unusual use cases (e.g. Freifunk, Internet of Things)
+> 	-- userland wireless management apps (NetworkManager, connman)
+> 	-- wireless-oriented (or wireless-specific) applications
+> 	-- issues with managing a wireless networking sub-tree
+> 	-- long-term support for legacy hardware (Intel?  Atheros?)
+> 	-- driver projects without hardware vendor support?
+> 	-- staging driver migration?  out-of-tree driver merging?
+> 	-- ???
 
-Please fix the following warning:
+I'd add
 
-profiles/batterystate/batterystate.c:62:13: error: 'char_free' defined
-but not used [-Werror=unused-function]
-cc1: all warnings being treated as errors
+	-- state of P2P/Wi-Fi Direct application stack
 
-BR,
-Claudio
+I'm not volunteering, though it could be pretty simple: "there's
+none" :-(
+
+Unless somebody knows more than I do?
+
+johannes
