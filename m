@@ -1,48 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1343073870.4584.24.camel@jlt3.sipsolutions.net>
-Subject: Re: 2nd CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
- 2012 (Barcelona!)
-From: Johannes Berg <johannes@sipsolutions.net>
-To: "John W. Linville" <linville@tuxdriver.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-wireless@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, alexander.smirnov@siemens.com,
-	Sergey.Sobolev@siemens.com
-Date: Mon, 23 Jul 2012 22:04:30 +0200
-In-Reply-To: <20120723192057.GE18589@tuxdriver.com> (sfid-20120723_213359_482339_245FF7E8)
+Date: Mon, 23 Jul 2012 15:20:57 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        alexander.smirnov@siemens.com, Sergey.Sobolev@siemens.com
+Subject: 2nd CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit 2012
+ (Barcelona!)
+Message-ID: <20120723192057.GE18589@tuxdriver.com>
 References: <20120322192406.GB2432@tuxdriver.com>
-	 <1332698585.1870.88.camel@aeonflux> <20120326145433.GE13806@tuxdriver.com>
-	 <1332774906.1870.98.camel@aeonflux> <20120326152541.GH13806@tuxdriver.com>
-	 <20120427174439.GC16207@tuxdriver.com>
-	 <20120723192057.GE18589@tuxdriver.com>
-	 (sfid-20120723_213359_482339_245FF7E8)
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ <1332698585.1870.88.camel@aeonflux>
+ <20120326145433.GE13806@tuxdriver.com>
+ <1332774906.1870.98.camel@aeonflux>
+ <20120326152541.GH13806@tuxdriver.com>
+ <20120427174439.GC16207@tuxdriver.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120427174439.GC16207@tuxdriver.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2012-07-23 at 15:20 -0400, John W. Linville wrote:
+On Fri, Apr 27, 2012 at 01:44:39PM -0400, John W. Linville wrote:
 
-> Not bad, but I'd like to see some more!  Some ideas:
+> Just to keep the ball rolling...
 > 
-> 	-- "state of the union" for bluetooth, nfc, 802.11
-> 	-- wireless mesh networking status updates
-> 	-- cfg80211/mac80211 feature previews (what's coming?)
-> 	-- standards bodies reports (802.11, 802.15.x)
-> 	-- important or unusual use cases (e.g. Freifunk, Internet of Things)
-> 	-- userland wireless management apps (NetworkManager, connman)
-> 	-- wireless-oriented (or wireless-specific) applications
-> 	-- issues with managing a wireless networking sub-tree
-> 	-- long-term support for legacy hardware (Intel?  Atheros?)
-> 	-- driver projects without hardware vendor support?
-> 	-- staging driver migration?  out-of-tree driver merging?
-> 	-- ???
+> Angela has reserved space for us at the Hotel Fira
+> Palace for the Wireless Summit on Thurs, Nov 8th and Fri, Nov 9th.
+> Please note that this will overlap Yocto Dev Days, oVirt Summit and
+> KVM Forum at the same venue.
+> 
+> Now, we need some talk proposals!  Please post in this thread (or
+> contact me or Marcel directly if necessary) to propose talks.  I would
+> love to see any topics on any relevant technologies, as well as topics
+> about how the projects are being managed, new sub-projects, etc.
+> It seems like a long time away right now, but it is a good time to
+> start thinking... :-)
 
-I'd add
+Still a while to go, but this event is getting closer.  I would love to
+see some more concrete topic proposals for talks, both presentations
+and discussions.
 
-	-- state of P2P/Wi-Fi Direct application stack
+Here is what I've seen so far:
 
-I'm not volunteering, though it could be pretty simple: "there's
-none" :-(
+Speaker				Topic
+-------				-----
+Joao Paulo Rechi Vita		status and roadmap of Bluetooth LE
+Andrei Emeltchenko		Virtual Bluetooth AMP Controller for mac80211
+Alexander Smirnov		802.15.4 stack, 6lowpan
 
-Unless somebody knows more than I do?
+Not bad, but I'd like to see some more!  Some ideas:
 
-johannes
+	-- "state of the union" for bluetooth, nfc, 802.11
+	-- wireless mesh networking status updates
+	-- cfg80211/mac80211 feature previews (what's coming?)
+	-- standards bodies reports (802.11, 802.15.x)
+	-- important or unusual use cases (e.g. Freifunk, Internet of Things)
+	-- userland wireless management apps (NetworkManager, connman)
+	-- wireless-oriented (or wireless-specific) applications
+	-- issues with managing a wireless networking sub-tree
+	-- long-term support for legacy hardware (Intel?  Atheros?)
+	-- driver projects without hardware vendor support?
+	-- staging driver migration?  out-of-tree driver merging?
+	-- ???
+
+I'm sure there are worthwhile topics that I didn't suggest yet --
+feel free to suggest your own!  And if you can address one of those
+topics or one of your own, please reply either to this thread or
+directly to me.
+
+Please note -- you do not necessarily to be a kernel developer (or a
+developer at all) to merit a speaking slot!  Anyone with a topic to
+propose will receive appropriate consideration.
+
+So, let's hear it! :-)
+
+John
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
