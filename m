@@ -1,78 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jul 2012 15:20:57 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        alexander.smirnov@siemens.com, Sergey.Sobolev@siemens.com
-Subject: 2nd CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit 2012
- (Barcelona!)
-Message-ID: <20120723192057.GE18589@tuxdriver.com>
-References: <20120322192406.GB2432@tuxdriver.com>
- <1332698585.1870.88.camel@aeonflux>
- <20120326145433.GE13806@tuxdriver.com>
- <1332774906.1870.98.camel@aeonflux>
- <20120326152541.GH13806@tuxdriver.com>
- <20120427174439.GC16207@tuxdriver.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120427174439.GC16207@tuxdriver.com>
+In-Reply-To: <1343054163-19119-2-git-send-email-claudio.takahasi@openbossa.org>
+References: <1343054163-19119-1-git-send-email-claudio.takahasi@openbossa.org>
+	<1343054163-19119-2-git-send-email-claudio.takahasi@openbossa.org>
+Date: Mon, 23 Jul 2012 12:16:03 -0400
+Message-ID: <CAJdJm_N7Z4a2p7-Ur+_kEf2Q==aL5QTYpmnRomX+LXjy1Dd37Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] btio: Rescue lost errorneous numbers
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Paulo Alcantara <paulo.alcantara@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Apr 27, 2012 at 01:44:39PM -0400, John W. Linville wrote:
+Hi Claudio,
 
-> Just to keep the ball rolling...
-> 
-> Angela has reserved space for us at the Hotel Fira
-> Palace for the Wireless Summit on Thurs, Nov 8th and Fri, Nov 9th.
-> Please note that this will overlap Yocto Dev Days, oVirt Summit and
-> KVM Forum at the same venue.
-> 
-> Now, we need some talk proposals!  Please post in this thread (or
-> contact me or Marcel directly if necessary) to propose talks.  I would
-> love to see any topics on any relevant technologies, as well as topics
-> about how the projects are being managed, new sub-projects, etc.
-> It seems like a long time away right now, but it is a good time to
-> start thinking... :-)
+On Mon, Jul 23, 2012 at 10:36 AM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
+>  #define ERROR_FAILED(gerr, str, err) \
+> -               g_set_error(gerr, BT_IO_ERROR, BT_IO_ERROR_FAILED, \
+> +               g_set_error(gerr, BT_IO_ERROR, err, \
+>                                 str ": %s (%d)", strerror(err), err)
+> [...]
+>                 if (err < 0)
+> -                       g_set_error(&gerr, BT_IO_ERROR,
+> -                                       BT_IO_ERROR_CONNECT_FAILED, "%s (%d)",
+> -                                       strerror(-err), -err);
+> -       } else if (cond & (G_IO_HUP | G_IO_ERR))
+> -               g_set_error(&gerr, BT_IO_ERROR, BT_IO_ERROR_CONNECT_FAILED,
+> -                               "HUP or ERR on socket");
+> +                       g_set_error(&gerr, BT_IO_ERROR, -err, "%s (%d)",
+> +                                                       strerror(-err), -err);
 
-Still a while to go, but this event is getting closer.  I would love to
-see some more concrete topic proposals for talks, both presentations
-and discussions.
+why not use the ERROR_FAILED() macro here?
 
-Here is what I've seen so far:
+>         if (err < 0) {
+> -               g_set_error(gerr, BT_IO_ERROR, BT_IO_ERROR_CONNECT_FAILED,
+> -                               "connect: %s (%d)", strerror(-err), -err);
+> +               g_set_error(gerr, BT_IO_ERROR, -err, "connect: %s (%d)",
+> +                                                       strerror(-err), -err);
 
-Speaker				Topic
--------				-----
-Joao Paulo Rechi Vita		status and roadmap of Bluetooth LE
-Andrei Emeltchenko		Virtual Bluetooth AMP Controller for mac80211
-Alexander Smirnov		802.15.4 stack, 6lowpan
+and here?
 
-Not bad, but I'd like to see some more!  Some ideas:
-
-	-- "state of the union" for bluetooth, nfc, 802.11
-	-- wireless mesh networking status updates
-	-- cfg80211/mac80211 feature previews (what's coming?)
-	-- standards bodies reports (802.11, 802.15.x)
-	-- important or unusual use cases (e.g. Freifunk, Internet of Things)
-	-- userland wireless management apps (NetworkManager, connman)
-	-- wireless-oriented (or wireless-specific) applications
-	-- issues with managing a wireless networking sub-tree
-	-- long-term support for legacy hardware (Intel?  Atheros?)
-	-- driver projects without hardware vendor support?
-	-- staging driver migration?  out-of-tree driver merging?
-	-- ???
-
-I'm sure there are worthwhile topics that I didn't suggest yet --
-feel free to suggest your own!  And if you can address one of those
-topics or one of your own, please reply either to this thread or
-directly to me.
-
-Please note -- you do not necessarily to be a kernel developer (or a
-developer at all) to merit a speaking slot!  Anyone with a topic to
-propose will receive appropriate consideration.
-
-So, let's hear it! :-)
-
-John
+Regards,
 -- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
