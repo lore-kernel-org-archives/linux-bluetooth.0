@@ -1,67 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [RFC BlueZ 7/7] doc: Add Register/Unregister GATT based services
-Date: Mon, 23 Jul 2012 11:55:20 -0400
-Message-Id: <1343058920-18608-8-git-send-email-anderson.lizardo@openbossa.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [RFC BlueZ 6/7] attrib-api: Add RegisterWatcher/UnregisterWatcher methods
+Date: Mon, 23 Jul 2012 11:55:19 -0400
+Message-Id: <1343058920-18608-7-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1343058920-18608-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1343058920-18608-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+These methods are used to register or unregister watchers for
+characteristics, so applications can be notified when the characteristic
+value changes.
 
-This patch extends the Service interface to allow applications to
-register and unregister GATT based services.
+The Release() method is added to the Watcher interface to notify the
+watcher object that it has been unregistered and is no longer valid.
 ---
- doc/service-api.txt |   33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ doc/attribute-api.txt |    7 +++++++
+ doc/service-api.txt   |   21 +++++++++++++++++++++
+ 2 files changed, 28 insertions(+)
 
+diff --git a/doc/attribute-api.txt b/doc/attribute-api.txt
+index 4b392b9..0805756 100644
+--- a/doc/attribute-api.txt
++++ b/doc/attribute-api.txt
+@@ -120,3 +120,10 @@ Methods		void ValueChanged(object characteristic, dict value)
+ 
+ 			This method is only called when the "raw" setting is
+ 			enabled on Adapter.RegisterCharacteristicsWatcher().
++
++		void Release()
++
++			This method is called when the service daemon
++			unregisters the watcher, which can then perform cleanup
++			tasks. There is no need to unregister the watcher if
++			this method is called.
 diff --git a/doc/service-api.txt b/doc/service-api.txt
-index 0139f5f..1380932 100644
+index 5c8c7f3..0139f5f 100644
 --- a/doc/service-api.txt
 +++ b/doc/service-api.txt
-@@ -43,6 +43,39 @@ Methods		uint32 AddRecord(string record)
+@@ -43,6 +43,27 @@ Methods		uint32 AddRecord(string record)
  					 org.bluez.Error.DoesNotExist
  					 org.bluez.Error.Failed
  
-+		void Register(string uuid, dict settings,
-+					array{object} characteristics)
++		void RegisterWatcher(object agent, dict settings,
++						array{object} characteristics)
 +
-+			Add a GATT based service. The uuid represents the
-+			primary/secondary service UUID. The settings
-+			dictionary has the following format:
++			Register a watcher to monitor characteristic changes.
++
++			A watcher will be registered for each specified
++			characteristic object. The settings dictionary has the
++			following format:
++
 +			{
-+				"id": string (optional)
++				"raw": boolean (optional)
 +			}
 +
-+			settings field is being added to allow API
-+			flexibility. The "id" field allows the core to
-+			manage handle allocation and internal GATT storage.
++			If the "raw" setting is enabled, the RawValueChanged()
++			watcher method is called when the characteristic value
++			changes, otherwise, ValueChanged() is called.
 +
-+			GATT included services is supported by providing the
-+			same characteristic object path (restricted to same
-+			provider/owner).
++		void UnregisterWatcher(object agent)
 +
-+			The characteristic objects implemented by the
-+			caller shall follow the interface defined in the
-+			attribute API.
++			Unregister a characteristic watcher.
 +
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.AlreadyExists
-+
-+		void Unregister(string uuid)
-+
-+			Removes a given GATT based service previously
-+			registered by the caller.
-+
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.NotAuthorized
-+
- 		void RegisterWatcher(object agent, dict settings,
- 						array{object} characteristics)
+ 		void RequestAuthorization(string address, uint32 handle)
  
+ 			Request an authorization for an incoming connection
 -- 
 1.7.9.5
 
