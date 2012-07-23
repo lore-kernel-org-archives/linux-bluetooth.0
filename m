@@ -1,28 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jul 2012 23:33:49 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] time: fix byte position
-Message-ID: <20120723213349.GA14491@x220>
-References: <20120719145519.GA3879@x220.P-661HNU-F1>
- <1342719992-3816-1-git-send-email-jprvita@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1342719992-3816-1-git-send-email-jprvita@openbossa.org>
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Remove locking in hci_user_passkey_request_evt
+Date: Mon, 23 Jul 2012 18:19:04 -0300
+Message-Id: <1343078344-22759-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi João Paulo,
+This patch removes hdev locking in hci_user_passkey_request_evt
+since it is not needed. mgmt_user_passkey_request simply calls
+mgmt_event which does not require hdev locking at all.
 
-On Thu, Jul 19, 2012, João Paulo Rechi Vita wrote:
-> The position of the "Time Zone" and "Daylight Saving Time" fields on
-> the Local Time Information characteristic was inverted. This commit
-> fix their position.
-> ---
->  profiles/time/server.c |   10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ net/bluetooth/hci_event.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-Applied. Thanks.
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 41ff978..a6c509d 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3252,12 +3252,8 @@ static void hci_user_passkey_request_evt(struct hci_dev *hdev,
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
+-	hci_dev_lock(hdev);
+-
+ 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
+ 		mgmt_user_passkey_request(hdev, &ev->bdaddr, ACL_LINK, 0);
+-
+-	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_simple_pair_complete_evt(struct hci_dev *hdev,
+-- 
+1.7.11.2
 
-Johan
