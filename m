@@ -2,43 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v2] serial: Remove serial proxy test script
-Date: Tue, 24 Jul 2012 10:11:00 -0300
-Message-Id: <1343135460-26176-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1342715766-22943-2-git-send-email-claudio.takahasi@openbossa.org>
-References: <1342715766-22943-2-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v2] serial: Remove serial test script
+Date: Tue, 24 Jul 2012 10:08:41 -0300
+Message-Id: <1343135321-26066-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <20120724093458.GA8836@x220.ice.intel.com>
+References: <20120724093458.GA8836@x220.ice.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- Makefile.tools         |    9 +++---
- test/test-serial-proxy |   66 ------------------------------------------------
- 2 files changed, 4 insertions(+), 71 deletions(-)
- delete mode 100755 test/test-serial-proxy
+ Makefile.tools   |   10 ++++----
+ test/test-serial |   58 ------------------------------------------------------
+ 2 files changed, 5 insertions(+), 63 deletions(-)
+ delete mode 100755 test/test-serial
 
 diff --git a/Makefile.tools b/Makefile.tools
-index 4c70db1..5579b86 100644
+index fccac2d..4c70db1 100644
 --- a/Makefile.tools
 +++ b/Makefile.tools
-@@ -222,8 +222,7 @@ EXTRA_DIST += test/sap_client.py test/hsplay test/hsmicro \
- 		test/test-network test/simple-agent test/simple-service \
- 		test/simple-endpoint test/test-audio test/test-input \
- 		test/test-sap-server test/test-oob test/test-attrib \
--		test/test-proximity test/test-thermometer \
--		test/test-serial-proxy test/test-health test/test-health-sink \
--		test/service-record.dtd test/service-did.xml \
--		test/service-spp.xml test/service-opp.xml test/service-ftp.xml \
--		test/simple-player test/test-nap
-+		test/test-proximity test/test-thermometer test/test-health \
-+		test/test-health-sink test/service-record.dtd \
-+		test/service-did.xml test/service-spp.xml test/service-opp.xml \
-+		test/service-ftp.xml test/simple-player test/test-nap
-diff --git a/test/test-serial-proxy b/test/test-serial-proxy
+@@ -218,11 +218,11 @@ endif
+ EXTRA_DIST += test/sap_client.py test/hsplay test/hsmicro \
+ 		test/dbusdef.py test/monitor-bluetooth test/list-devices \
+ 		test/test-discovery test/test-manager test/test-adapter \
+-		test/test-device test/test-service test/test-serial \
+-		test/test-telephony test/test-network test/simple-agent \
+-		test/simple-service test/simple-endpoint test/test-audio \
+-		test/test-input test/test-sap-server test/test-oob \
+-		test/test-attrib test/test-proximity test/test-thermometer \
++		test/test-device test/test-service test/test-telephony \
++		test/test-network test/simple-agent test/simple-service \
++		test/simple-endpoint test/test-audio test/test-input \
++		test/test-sap-server test/test-oob test/test-attrib \
++		test/test-proximity test/test-thermometer \
+ 		test/test-serial-proxy test/test-health test/test-health-sink \
+ 		test/service-record.dtd test/service-did.xml \
+ 		test/service-spp.xml test/service-opp.xml test/service-ftp.xml \
+diff --git a/test/test-serial b/test/test-serial
 deleted file mode 100755
-index 7963f23..0000000
---- a/test/test-serial-proxy
+index 8858dbd..0000000
+--- a/test/test-serial
 +++ /dev/null
-@@ -1,66 +0,0 @@
+@@ -1,58 +0,0 @@
 -#!/usr/bin/python
 -
 -from __future__ import absolute_import, print_function, unicode_literals
@@ -46,7 +50,6 @@ index 7963f23..0000000
 -import sys
 -import time
 -import dbus
--import socket
 -from optparse import OptionParser, make_option
 -
 -bus = dbus.SystemBus()
@@ -70,41 +73,34 @@ index 7963f23..0000000
 -							"org.bluez.Adapter")
 -
 -if (len(args) < 1):
--	print("Usage: %s <socket_name> [service]" % (sys.argv[0]))
+-	print("Usage: %s <address> [service]" % (sys.argv[0]))
 -	sys.exit(1)
 -
--socket_name = args[0]
+-address = args[0]
 -
 -if (len(args) < 2):
 -	service = "spp"
 -else:
 -	service = args[1]
 -
--sk = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
--sk.bind(socket_name)
--sk.listen(1)
+-path = adapter.FindDevice(address)
 -
--proxy_manager = dbus.Interface(bus.get_object("org.bluez", adapter_path),
--						"org.bluez.SerialProxyManager")
--proxy_path = proxy_manager.CreateProxy(service, socket_name)
+-serial = dbus.Interface(bus.get_object("org.bluez", path),
+-						"org.bluez.Serial")
 -
--proxy = dbus.Interface(bus.get_object("org.bluez", proxy_path),
--							"org.bluez.SerialProxy")
--proxy.Enable()
+-node = serial.Connect(service)
 -
--conn, addr = sk.accept()
+-print("Connected %s to %s" % (node, address))
 -
--print("Waiting for message")
+-print("Press CTRL-C to disconnect")
 -
--while 1:
--	data = conn.recv(1024)
--	if data:
--		print(data)
--		break
+-try:
+-	time.sleep(1000)
+-	print("Terminating connection")
+-except:
+-	pass
 -
--proxy.Disable()
--proxy_manager.RemoveProxy(proxy_path)
--conn.close()
+-serial.Disconnect(node)
 -- 
 1.7.8.6
 
