@@ -1,70 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 00/20] Bluetooth: Create AMP physical link
-Date: Tue, 24 Jul 2012 16:21:41 +0300
-Message-Id: <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 13/20] Bluetooth: Add function to derive AMP key using hmac
+Date: Tue, 24 Jul 2012 16:21:54 +0300
+Message-Id: <1343136121-22476-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
 
-This set of patches enhances A2MP protocol and creates physical
-link between AMP controllers. This is further iteration towards
-Bluetooth High Speed.
+hmac(sha256) will be used for AMP key generation.
 
-Changes:
-	* v2: Fix typos and bugs, add functionality: now physical connection
-	might be established.
-	* v1: Fix typos, change debug prints, refactor code for better
-	splitting functionality.
+Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/pal.c |   35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-Andrei Emeltchenko (19):
-  Bluetooth: General HCI callback implementation
-  Bluetooth: Process HCI callbacks in a workqueue
-  Bluetooth: Add callback clear to ops->teardown
-  Bluetooth: AMP: Use HCI callback for Read AMP Info
-  Bluetooth: AMP: Use HCI callback to Read Loc AMP Assoc
-  Bluetooth: A2MP: Process Discover Response
-  Bluetooth: AMP: Physical link struct definitions
-  Bluetooth: AMP: Remote AMP ctrl definitions
-  Bluetooth: AMP: Use phylink in create/disc phylink req
-  Bluetooth: A2MP: Process A2MP Getinfo Rsp
-  Bluetooth: A2MP: Process A2MP Get AMP Assoc Rsp
-  Bluetooth: Choose connection based on capabilities
-  Bluetooth: AMP: Add AMP key calculation
-  Bluetooth: AMP: Create Physical Link
-  Bluetooth: AMP: Write remote AMP Assoc
-  Bluetooth: A2MP: Add fallback to normal l2cap init sequence
-  Bluetooth: AMP: Process Chan Selected event
-  Bluetooth: AMP: Process physical link complete event
-  Bluetooth: AMP: Send Create Chan Req
-
-Dmitry Kasatkin (1):
-  Bluetooth: Add function to derive AMP key using hmac
-
- include/net/bluetooth/a2mp.h     |   10 ++
- include/net/bluetooth/amp.h      |   25 +++
- include/net/bluetooth/hci.h      |    3 +
- include/net/bluetooth/hci_core.h |   46 ++++++
- include/net/bluetooth/l2cap.h    |    1 +
- include/net/bluetooth/pal.h      |   57 +++++++
- net/bluetooth/Kconfig            |    1 +
- net/bluetooth/Makefile           |    2 +-
- net/bluetooth/a2mp.c             |  294 ++++++++++++++++++++++++++++++++---
- net/bluetooth/amp.c              |  308 ++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_core.c         |  144 +++++++++++++++++
- net/bluetooth/hci_event.c        |  120 +++++++++++++-
- net/bluetooth/l2cap_core.c       |   64 +++++++-
- net/bluetooth/pal.c              |  318 ++++++++++++++++++++++++++++++++++++++
- 14 files changed, 1364 insertions(+), 29 deletions(-)
- create mode 100644 include/net/bluetooth/amp.h
- create mode 100644 include/net/bluetooth/pal.h
- create mode 100644 net/bluetooth/amp.c
- create mode 100644 net/bluetooth/pal.c
-
+diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
+index 335cbc3..a405e88 100644
+--- a/net/bluetooth/pal.c
++++ b/net/bluetooth/pal.c
+@@ -12,6 +12,7 @@
+ */
+ 
+ #include <net/bluetooth/pal.h>
++#include <crypto/hash.h>
+ 
+ enum pal_states {
+ 	DISCONNECTED,
+@@ -220,3 +221,37 @@ struct phy_link *phylink_lookup(struct amp_mgr *mgr, u8 local_id, u8 remote_id)
+ 
+ 	return found;
+ }
++
++int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
++{
++	int ret = 0;
++	struct crypto_shash *tfm;
++
++	tfm = crypto_alloc_shash("hmac(sha256)", 0, 0);
++	if (IS_ERR(tfm)) {
++		BT_DBG("crypto_alloc_ahash failed");
++		return PTR_ERR(tfm);
++	}
++
++	if (ksize) {
++		ret = crypto_shash_setkey(tfm, key, ksize);
++		if (ret) {
++			BT_DBG("crypto_ahash_setkey failed");
++		} else {
++			struct {
++				struct shash_desc shash;
++				char ctx[crypto_shash_descsize(tfm)];
++			} desc;
++
++			desc.shash.tfm = tfm;
++			desc.shash.flags = CRYPTO_TFM_REQ_MAY_SLEEP;
++
++			ret = crypto_shash_digest(&desc.shash, plaintext, psize,
++						  output);
++		}
++	}
++
++	BT_DBG("ret 0x%x", ret);
++	crypto_free_shash(tfm);
++	return ret;
++}
 -- 
 1.7.9.5
 
