@@ -1,85 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/3] gstavdtpsink: Fix using deprecated glib api
-Date: Tue, 24 Jul 2012 14:04:40 +0200
-Message-ID: <1343131482-17629-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20120724083136.GA11981@aemeltch-MOBL1>
+References: <manojkr.sharma@stericsson.com>
+	<1343117537-31501-1-git-send-email-manojkr.sharma@stericsson.com>
+	<20120724083136.GA11981@aemeltch-MOBL1>
+Date: Tue, 24 Jul 2012 16:26:38 +0530
+Message-ID: <CAHH5__7ztyWrEo02BvS0CMoxHLq+Z4EeF4fbkT0NhX97QMJPdA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Usage of HCI channels in L2CAP
+From: Manoj Sharma <ursmanoj@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Manoj Kumar Sharma <manojkr.sharma@stericsson.com>,
+	linux-bluetooth@vger.kernel.org,
+	Anurag Gupta <anurag.gupta@stericsson.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-g_mutex_new() is deprecated in glib 2.33. GMutex can now be allocated
-as part of larger structure and initialized using g_mutex_init().
+Hi Andrei,
 
-This also fixes following build error:
+On 7/24/12, Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> wrote:
+> Hi Manoj,
+>
+> On Tue, Jul 24, 2012 at 01:42:16PM +0530, Manoj Kumar Sharma wrote:
+>> This patch enables L2CAP to use HCI channel feature. This can be
+>> used to reflect L2CAP socket properties onto HCI channel.
+>
+> the description is not good. This looks like
+> "Move HCI chan from l2cap_conn to l2cap_chan"
 
-  CC     audio/audio_libgstbluetooth_la-gstavdtpsink.lo
-audio/gstavdtpsink.c: In function 'gst_avdtp_sink_finalize':
-audio/gstavdtpsink.c:198:2: error: 'g_mutex_free' is deprecated
-  (declared at /usr/include/glib-2.0/glib/deprecated/gthread.h:273)
-  [-Werror=deprecated-declarations]
-audio/gstavdtpsink.c: In function 'gst_avdtp_sink_init':
-audio/gstavdtpsink.c:1044:2: error: 'g_mutex_new' is deprecated
-  (declared at /usr/include/glib-2.0/glib/deprecated/gthread.h:271)
-  [-Werror=deprecated-declarations]
-cc1: all warnings being treated as errors
-make[1]: *** [audio/audio_libgstbluetooth_la-gstavdtpsink.lo] Error 1
----
- audio/gstavdtpsink.c |    8 ++++----
- audio/gstavdtpsink.h |    2 +-
- 2 files changed, 5 insertions(+), 5 deletions(-)
+I have pushed new patch set with your comments incorporated. Please have a look.
 
-diff --git a/audio/gstavdtpsink.c b/audio/gstavdtpsink.c
-index ffaed7f..92c920f 100644
---- a/audio/gstavdtpsink.c
-+++ b/audio/gstavdtpsink.c
-@@ -56,11 +56,11 @@ GST_DEBUG_CATEGORY_STATIC(avdtp_sink_debug);
- #define DEFAULT_AUTOCONNECT TRUE
- 
- #define GST_AVDTP_SINK_MUTEX_LOCK(s) G_STMT_START {	\
--		g_mutex_lock(s->sink_lock);		\
-+		g_mutex_lock(&s->sink_lock);		\
- 	} G_STMT_END
- 
- #define GST_AVDTP_SINK_MUTEX_UNLOCK(s) G_STMT_START {	\
--		g_mutex_unlock(s->sink_lock);		\
-+		g_mutex_unlock(&s->sink_lock);		\
- 	} G_STMT_END
- 
- struct bluetooth_data {
-@@ -195,7 +195,7 @@ static void gst_avdtp_sink_finalize(GObject *object)
- 	if (self->transport)
- 		g_free(self->transport);
- 
--	g_mutex_free(self->sink_lock);
-+	g_mutex_clear(&self->sink_lock);
- 
- 	G_OBJECT_CLASS(parent_class)->finalize(object);
- }
-@@ -1041,7 +1041,7 @@ static void gst_avdtp_sink_init(GstAvdtpSink *self,
- 
- 	self->autoconnect = DEFAULT_AUTOCONNECT;
- 
--	self->sink_lock = g_mutex_new();
-+	g_mutex_init(&self->sink_lock);
- 
- 	/* FIXME this is for not synchronizing with clock, should be tested
- 	 * with devices to see the behaviour
-diff --git a/audio/gstavdtpsink.h b/audio/gstavdtpsink.h
-index eb998ac..393797e 100644
---- a/audio/gstavdtpsink.h
-+++ b/audio/gstavdtpsink.h
-@@ -66,7 +66,7 @@ struct _GstAvdtpSink {
- 
- 	GstCaps *dev_caps;
- 
--	GMutex *sink_lock;
-+	GMutex sink_lock;
- 
- 	guint watch_id;
- };
--- 
-1.7.9.5
+>
+>> Change-Id: Iac2b54a1b8204695162491d09161066d90495e06
+>> Signed-off-by: Manoj Kumar Sharma <manojkr.sharma@stericsson.com>
+>> ---
+>>  include/net/bluetooth/l2cap.h |    1 +
+>>  net/bluetooth/l2cap_core.c    |   10 +++++++++-
+>>  2 files changed, 10 insertions(+), 1 deletions(-)
+>>
+>> diff --git a/include/net/bluetooth/l2cap.h
+>> b/include/net/bluetooth/l2cap.h
+>> index 9b242c6..f26a468 100644
+>> --- a/include/net/bluetooth/l2cap.h
+>> +++ b/include/net/bluetooth/l2cap.h
+>> @@ -410,6 +410,7 @@ struct l2cap_chan {
+>>  	struct sock *sk;
+>>
+>>  	struct l2cap_conn	*conn;
+>> +	struct hci_chan	*hchan;
+>>
+>>  	__u8		state;
+>>
+>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>> index 6f9c25b..e487731 100644
+>> --- a/net/bluetooth/l2cap_core.c
+>> +++ b/net/bluetooth/l2cap_core.c
+>> @@ -300,6 +300,8 @@ void l2cap_chan_destroy(struct l2cap_chan *chan)
+>>
+>>  void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+>>  {
+>> +	struct hci_chan *hchan;
+>> +
+>>  	BT_DBG("conn %p, psm 0x%2.2x, dcid 0x%4.4x", conn,
+>>  			chan->psm, chan->dcid);
+>>
+>> @@ -342,6 +344,10 @@ void __l2cap_chan_add(struct l2cap_conn *conn, struct
+>> l2cap_chan *chan)
+>>  	chan->local_acc_lat	= L2CAP_DEFAULT_ACC_LAT;
+>>  	chan->local_flush_to	= L2CAP_DEFAULT_FLUSH_TO;
+>>
+>> +	hchan = hci_chan_create(conn->hcon);
+>> +	chan->hchan = hchan;
+>> +
+>> +
+>
+> extra new line
 
+Removed extra line in new patch set.
+
+>
+>>  	l2cap_chan_hold(chan);
+>>
+>>  	list_add(&chan->list, &conn->chan_l);
+>> @@ -396,6 +402,8 @@ static void l2cap_chan_del(struct l2cap_chan *chan,
+>> int err)
+>>
+>>  	skb_queue_purge(&chan->tx_q);
+>>
+>> +	hci_chan_del(chan->hchan);
+>> +
+>>  	if (chan->mode == L2CAP_MODE_ERTM) {
+>>  		struct srej_list *l, *tmp;
+>>
+>> @@ -596,7 +604,7 @@ static void l2cap_do_send(struct l2cap_chan *chan,
+>> struct sk_buff *skb)
+>>  		flags = ACL_START;
+>>
+>>  	bt_cb(skb)->force_active = test_bit(FLAG_FORCE_ACTIVE, &chan->flags);
+>> -	hci_send_acl(chan->conn->hchan, skb, flags);
+>> +	hci_send_acl(chan->hchan, skb, flags);
+>
+> So what about hchan in l2cap_conn structure?
+The hchan in l2cap_conn is used for sending L2CAP control signals.
+Thus there is one hchan per L2CAP channel created and one already
+available will be used only for control signals.
+>
+> Best regards
+> Andrei Emeltchenko
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+
+Best regards,
+Manoj Sharma
