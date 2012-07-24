@@ -1,71 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Jul 2012 11:27:02 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: Re: [RFC BlueZ 7/7] doc: Add Register/Unregister GATT based services
-Message-ID: <20120724092702.GA8706@x220.ice.intel.com>
-References: <1343058920-18608-1-git-send-email-anderson.lizardo@openbossa.org>
- <1343058920-18608-8-git-send-email-anderson.lizardo@openbossa.org>
+Message-ID: <500E68FD.60104@monom.org>
+Date: Tue, 24 Jul 2012 11:21:01 +0200
+From: Daniel Wagner <wagi@monom.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1343058920-18608-8-git-send-email-anderson.lizardo@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: "John W. Linville" <linville@tuxdriver.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+ linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ alexander.smirnov@siemens.com, Sergey.Sobolev@siemens.com
+Subject: Re: 2nd CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
+ 2012 (Barcelona!)
+References: <20120322192406.GB2432@tuxdriver.com> <1332698585.1870.88.camel@aeonflux> <20120326145433.GE13806@tuxdriver.com> <1332774906.1870.98.camel@aeonflux> <20120326152541.GH13806@tuxdriver.com> <20120427174439.GC16207@tuxdriver.com> <20120723192057.GE18589@tuxdriver.com>
+In-Reply-To: <20120723192057.GE18589@tuxdriver.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi John,
 
-On Mon, Jul 23, 2012, Anderson Lizardo wrote:
-> --- a/doc/service-api.txt
-> +++ b/doc/service-api.txt
-> @@ -43,6 +43,39 @@ Methods		uint32 AddRecord(string record)
->  					 org.bluez.Error.DoesNotExist
->  					 org.bluez.Error.Failed
->  
-> +		void Register(string uuid, dict settings,
-> +					array{object} characteristics)
-> +
-> +			Add a GATT based service. The uuid represents the
-> +			primary/secondary service UUID. The settings
-> +			dictionary has the following format:
-> +			{
-> +				"id": string (optional)
-> +			}
-> +
-> +			settings field is being added to allow API
-> +			flexibility. The "id" field allows the core to
-> +			manage handle allocation and internal GATT storage.
-> +
-> +			GATT included services is supported by providing the
-> +			same characteristic object path (restricted to same
-> +			provider/owner).
-> +
-> +			The characteristic objects implemented by the
-> +			caller shall follow the interface defined in the
-> +			attribute API.
-> +
-> +			Possible errors: org.bluez.Error.InvalidArguments
-> +					 org.bluez.Error.AlreadyExists
-> +
-> +		void Unregister(string uuid)
-> +
-> +			Removes a given GATT based service previously
-> +			registered by the caller.
-> +
-> +			Possible errors: org.bluez.Error.InvalidArguments
-> +					 org.bluez.Error.NotAuthorized
+On 23.07.2012 21:20, John W. Linville wrote:
+> On Fri, Apr 27, 2012 at 01:44:39PM -0400, John W. Linville wrote:
+>
+>> Just to keep the ball rolling...
+>>
+>> Angela has reserved space for us at the Hotel Fira
+>> Palace for the Wireless Summit on Thurs, Nov 8th and Fri, Nov 9th.
+>> Please note that this will overlap Yocto Dev Days, oVirt Summit and
+>> KVM Forum at the same venue.
+>>
+>> Now, we need some talk proposals!  Please post in this thread (or
+>> contact me or Marcel directly if necessary) to propose talks.  I would
+>> love to see any topics on any relevant technologies, as well as topics
+>> about how the projects are being managed, new sub-projects, etc.
+>> It seems like a long time away right now, but it is a good time to
+>> start thinking... :-)
+>
+> Still a while to go, but this event is getting closer.  I would love to
+> see some more concrete topic proposals for talks, both presentations
+> and discussions.
+>
+> Here is what I've seen so far:
+>
+> Speaker				Topic
+> -------				-----
+> Joao Paulo Rechi Vita		status and roadmap of Bluetooth LE
+> Andrei Emeltchenko		Virtual Bluetooth AMP Controller for mac80211
+> Alexander Smirnov		802.15.4 stack, 6lowpan
+>
+> Not bad, but I'd like to see some more!  Some ideas:
+>
+> 	-- "state of the union" for bluetooth, nfc, 802.11
+> 	-- wireless mesh networking status updates
+> 	-- cfg80211/mac80211 feature previews (what's coming?)
+> 	-- standards bodies reports (802.11, 802.15.x)
+> 	-- important or unusual use cases (e.g. Freifunk, Internet of Things)
+> 	-- userland wireless management apps (NetworkManager, connman)
 
-I don't think the Register/Unregister names are right since this is
-purely LE/GATT specific. Or do you foresee this being used for
-traditional (non-GATT) BR/EDR profiles? I'd either propose having a new
-interface for these or then rename them (e.g. RegisterGATT?).
+I could give a short overview what we do in ConnMan.
 
-FWIW I'm also not sure that the interface name org.bluez.Service is
-quite right. Interface names are supposed to describe something about
-the object which implements them, but the object this interface is used
-for (adapter) cannot be said to "be" a service. Instead, this interface
-abstracts a local database of services. What would you think of calling
-it ServiceManager or ServiceDatabase?
-
-Johan
+cheers,
+daniel
