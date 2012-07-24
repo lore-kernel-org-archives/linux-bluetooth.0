@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 12/20] Bluetooth: Choose connection based on capabilities
-Date: Tue, 24 Jul 2012 16:21:53 +0300
-Message-Id: <1343136121-22476-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 14/20] Bluetooth: AMP: Add AMP key calculation
+Date: Tue, 24 Jul 2012 16:21:55 +0300
+Message-Id: <1343136121-22476-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,137 +12,107 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Choose which L2CAP connection to establish by checking support
-for HS and remote side supported features.
+Function calculates AMP key using hmac_sha256 helper.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |    2 ++
- net/bluetooth/a2mp.c         |   21 +++++++++++++++++++++
- net/bluetooth/l2cap_core.c   |   34 ++++++++++++++++++++++++++++++----
- 3 files changed, 53 insertions(+), 4 deletions(-)
+ include/net/bluetooth/pal.h |    1 +
+ net/bluetooth/Kconfig       |    1 +
+ net/bluetooth/pal.c         |   61 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 63 insertions(+)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 8ba236c..bf18a37 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -22,6 +22,7 @@
- struct amp_mgr {
- 	struct l2cap_conn	*l2cap_conn;
- 	struct l2cap_chan	*a2mp_chan;
-+	struct l2cap_chan	*bredr_chan;
- 	struct kref		kref;
- 	__u8			ident;
- 	__u8			handle;
-@@ -129,5 +130,6 @@ int amp_mgr_put(struct amp_mgr *mgr);
- struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
- 				       struct sk_buff *skb);
- void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data);
-+void l2cap_discover_amp(struct l2cap_chan *chan);
+diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
+index 6ce1dfb..8799285 100644
+--- a/include/net/bluetooth/pal.h
++++ b/include/net/bluetooth/pal.h
+@@ -53,5 +53,6 @@ int phylink_put(struct phy_link *plink);
+ void phylink_get(struct phy_link *plink);
+ void phylink_list_flush(struct amp_mgr *mgr);
+ void phylink_del(struct amp_mgr *mgr, struct phy_link *plink);
++int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type);
  
- #endif /* __A2MP_H */
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 508cb79..e740bb0 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -769,3 +769,24 @@ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
- 
- 	return mgr->a2mp_chan;
+ #endif /* __PAL_H */
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index 3537d38..1c11d0d 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -11,6 +11,7 @@ menuconfig BT
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_AES
+ 	select CRYPTO_ECB
++	select CRYPTO_SHA256
+ 	help
+ 	  Bluetooth is low-cost, low-power, short-range wireless technology.
+ 	  It was designed as a replacement for cables and other short-range
+diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
+index a405e88..c47eeac 100644
+--- a/net/bluetooth/pal.c
++++ b/net/bluetooth/pal.c
+@@ -255,3 +255,64 @@ int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
+ 	crypto_free_shash(tfm);
+ 	return ret;
  }
 +
-+void l2cap_discover_amp(struct l2cap_chan *chan)
++static void hexdump(u8 *buf, size_t len)
 +{
-+	struct a2mp_discov_req req;
-+	struct l2cap_conn *conn = chan->conn;
-+	struct amp_mgr *mgr = conn->hcon->amp_mgr;
++	print_hex_dump(KERN_DEBUG, "", DUMP_PREFIX_OFFSET,
++		       16, 1, buf, len, false);
++}
 +
-+	BT_DBG("%p", conn);
++int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type)
++{
++	struct hci_dev *hdev = conn->hdev;
++	struct link_key *key;
++	u8 keybuf[HCI_AMP_LINK_KEY_SIZE];
++	u8 gamp_key[HCI_AMP_LINK_KEY_SIZE];
++	u8 b802_key[HCI_AMP_LINK_KEY_SIZE];
++	int result;
 +
-+	if (!mgr) {
-+		mgr = amp_mgr_create(conn);
-+		if (!mgr)
-+			return;
++	if (!hci_conn_check_link_mode(conn))
++		return -EACCES;
++
++	BT_DBG("key_type %d", conn->key_type);
++
++	/* Legacy key */
++	if (conn->key_type < 3)
++		return -EACCES;
++
++	*type = conn->key_type;
++	*len = HCI_AMP_LINK_KEY_SIZE;
++
++	hci_dev_lock(hdev);
++	key = hci_find_link_key(hdev, &conn->dst);
++	hci_dev_unlock(hdev);
++
++	/* BR/EDR Link Key concatenated together with itself */
++	memcpy(&keybuf[0], key->val, HCI_LINK_KEY_SIZE);
++	memcpy(&keybuf[HCI_LINK_KEY_SIZE], key->val, HCI_LINK_KEY_SIZE);
++
++	hexdump(keybuf, HCI_AMP_LINK_KEY_SIZE);
++
++	result = hmac_sha256(keybuf, HCI_AMP_LINK_KEY_SIZE, "gamp", 4,
++			     gamp_key);
++	hexdump(gamp_key, HCI_AMP_LINK_KEY_SIZE);
++
++	if (result)
++		goto done;
++
++	if (conn->key_type == 3) {
++		BT_DBG("gamp_key");
++		hexdump(gamp_key, HCI_AMP_LINK_KEY_SIZE);
++		memcpy(data, gamp_key, HCI_AMP_LINK_KEY_SIZE);
++		goto done;
 +	}
 +
-+	mgr->bredr_chan = chan;
++	result = hmac_sha256(gamp_key, HCI_AMP_LINK_KEY_SIZE, "802b", 4,
++			     b802_key);
++	hexdump(b802_key, HCI_AMP_LINK_KEY_SIZE);
 +
-+	req.mtu = cpu_to_le16(L2CAP_A2MP_DEFAULT_MTU);
-+	req.ext_feat = 0;
-+	a2mp_send(mgr, A2MP_DISCOVER_REQ, 1, sizeof(req), &req);
++	memcpy(data, b802_key, HCI_AMP_LINK_KEY_SIZE);
++
++done:
++	return result;
 +}
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index c81e182..7427e7b 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -988,6 +988,18 @@ static inline int __l2cap_no_conn_pending(struct l2cap_chan *chan)
- 	return !test_bit(CONF_CONNECT_PEND, &chan->conf_state);
- }
- 
-+static bool __amp_capable(struct l2cap_chan *chan)
-+{
-+	struct l2cap_conn *conn = chan->conn;
-+
-+	if (enable_hs &&
-+	    chan->chan_policy == BT_CHANNEL_POLICY_AMP_PREFERRED &&
-+	    conn->fixed_chan_mask & L2CAP_FC_A2MP)
-+		return true;
-+	else
-+		return false;
-+}
-+
- static void l2cap_send_conn_req(struct l2cap_chan *chan)
- {
- 	struct l2cap_conn *conn = chan->conn;
-@@ -1014,6 +1026,16 @@ static void l2cap_chan_ready(struct l2cap_chan *chan)
- 	chan->ops->ready(chan);
- }
- 
-+static void l2cap_choose_conn(struct l2cap_chan *chan)
-+{
-+	if (__amp_capable(chan)) {
-+		BT_DBG("chan %p AMP capable: discover AMPs", chan);
-+		l2cap_discover_amp(chan);
-+	} else {
-+		l2cap_send_conn_req(chan);
-+	}
-+}
-+
- static void l2cap_do_start(struct l2cap_chan *chan)
- {
- 	struct l2cap_conn *conn = chan->conn;
-@@ -1028,8 +1050,9 @@ static void l2cap_do_start(struct l2cap_chan *chan)
- 			return;
- 
- 		if (l2cap_chan_check_security(chan) &&
--				__l2cap_no_conn_pending(chan))
--			l2cap_send_conn_req(chan);
-+				__l2cap_no_conn_pending(chan)) {
-+			l2cap_choose_conn(chan);
-+		}
- 	} else {
- 		struct l2cap_info_req req;
- 		req.type = __constant_cpu_to_le16(L2CAP_IT_FEAT_MASK);
-@@ -1125,7 +1148,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 				continue;
- 			}
- 
--			l2cap_send_conn_req(chan);
-+			l2cap_choose_conn(chan);
- 
- 		} else if (chan->state == BT_CONNECT2) {
- 			struct l2cap_conn_rsp rsp;
-@@ -5509,7 +5532,10 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 
- 		if (chan->state == BT_CONNECT) {
- 			if (!status) {
--				l2cap_send_conn_req(chan);
-+				/* Unlock chan list since we add A2MP chan */
-+				mutex_unlock(&conn->chan_lock);
-+				l2cap_choose_conn(chan);
-+				mutex_lock(&conn->chan_lock);
- 			} else {
- 				__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
- 			}
 -- 
 1.7.9.5
 
