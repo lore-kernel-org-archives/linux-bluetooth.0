@@ -1,32 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1343137097.24426.52.camel@aeonflux>
-Subject: Re: [PATCH 3/3] build: Require GLib 2.32 or later when building
- with gstreamer support
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 24 Jul 2012 15:38:17 +0200
-In-Reply-To: <1343131482-17629-3-git-send-email-szymon.janc@tieto.com>
-References: <1343131482-17629-1-git-send-email-szymon.janc@tieto.com>
-	 <1343131482-17629-3-git-send-email-szymon.janc@tieto.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <20120724095449.GD9576@x220.ice.intel.com>
+References: <1343054163-19119-1-git-send-email-claudio.takahasi@openbossa.org>
+	<1343054163-19119-2-git-send-email-claudio.takahasi@openbossa.org>
+	<CAJdJm_N7Z4a2p7-Ur+_kEf2Q==aL5QTYpmnRomX+LXjy1Dd37Q@mail.gmail.com>
+	<20120724095449.GD9576@x220.ice.intel.com>
+Date: Tue, 24 Jul 2012 10:39:11 -0300
+Message-ID: <CAKT1EBdf90y_ko4MRZiTuo3F87Yxn49e0-2N5rHeNtJB+_omgg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] btio: Rescue lost errorneous numbers
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	linux-bluetooth@vger.kernel.org,
+	Paulo Alcantara <paulo.alcantara@openbossa.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Johan/Lizardo:
 
-> gstreamer code now uses g_mutex_init() and related functions only
-> available in GLib >= 2.32.
-> ---
->  acinclude.m4 |    2 ++
->  1 file changed, 2 insertions(+)
+On Tue, Jul 24, 2012 at 6:54 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Lizardo,
+>
+> On Mon, Jul 23, 2012, Anderson Lizardo wrote:
+>> On Mon, Jul 23, 2012 at 10:36 AM, Claudio Takahasi
+>> <claudio.takahasi@openbossa.org> wrote:
+>> >  #define ERROR_FAILED(gerr, str, err) \
+>> > -               g_set_error(gerr, BT_IO_ERROR, BT_IO_ERROR_FAILED, \
+>> > +               g_set_error(gerr, BT_IO_ERROR, err, \
+>> >                                 str ": %s (%d)", strerror(err), err)
+>> > [...]
+>> >                 if (err < 0)
+>> > -                       g_set_error(&gerr, BT_IO_ERROR,
+>> > -                                       BT_IO_ERROR_CONNECT_FAILED, "%s (%d)",
+>> > -                                       strerror(-err), -err);
+>> > -       } else if (cond & (G_IO_HUP | G_IO_ERR))
+>> > -               g_set_error(&gerr, BT_IO_ERROR, BT_IO_ERROR_CONNECT_FAILED,
+>> > -                               "HUP or ERR on socket");
+>> > +                       g_set_error(&gerr, BT_IO_ERROR, -err, "%s (%d)",
+>> > +                                                       strerror(-err), -err);
+>>
+>> why not use the ERROR_FAILED() macro here?
+>>
+>> >         if (err < 0) {
+>> > -               g_set_error(gerr, BT_IO_ERROR, BT_IO_ERROR_CONNECT_FAILED,
+>> > -                               "connect: %s (%d)", strerror(-err), -err);
+>> > +               g_set_error(gerr, BT_IO_ERROR, -err, "connect: %s (%d)",
+>> > +                                                       strerror(-err), -err);
+>>
+>> and here?
+>
+> Good point. Unfortunately I didn't notice this before applying so please
+> (Claudio) send a fix on top of your patch.
+>
+> Johan
 
-since we are planning to move SBC to a separate project and GStreamer
-Bluetooth support then into GStreamer upstream, this is a NACK.
+ok. I will send a patch to fix it.
 
-Regards
-
-Marcel
-
-
+BR,
+Claudio
