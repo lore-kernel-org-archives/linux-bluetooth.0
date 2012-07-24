@@ -1,77 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 10/20] Bluetooth: A2MP: Process A2MP Getinfo Rsp
-Date: Tue, 24 Jul 2012 16:21:51 +0300
-Message-Id: <1343136121-22476-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 24 Jul 2012 16:15:27 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Masatake YAMATO <yamato@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 1/8] bluetooth: /proc/net/ entries for bluetooth
+ protocols
+Message-ID: <20120724131520.GC11981@aemeltch-MOBL1>
+References: <20120629.020253.963694178693689545.yamato@redhat.com>
+ <20120710140400.GA15795@aemeltch-MOBL1>
+ <20120711.135831.1712662939552441872.yamato@redhat.com>
+ <20120724.220831.1797978247249215593.yamato@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120724.220831.1797978247249215593.yamato@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Masatake,
 
-Process A2MP Getinfo Response, send Get AMP Assoc Req.
+On Tue, Jul 24, 2012 at 10:08:31PM +0900, Masatake YAMATO wrote:
+> (I have got no reply since 11th Jul. So I resend this mail here.
+>  Please, review this patch and merge it if no problem.)
+> 
+> (The patch sets are rebased to bluetooth-next. Unnecessary white
+>  spaces are trimmed.)
+> 
+> lsof command can tell the type of socket processes are using.
+> Internal lsof uses inode numbers on socket fs to resolve the type of
+> sockets. Files under /proc/net/, such as tcp, udp, unix, etc provides
+> such inode information.
+> 
+> Unfortunately bluetooth related protocols don't provide such inode
+> information. This patch series introduces /proc/net files for the protocols.
+> 
+> This patch against af_bluetooth.c provides facility to the implementation
+> of protocols. This patch extends bt_sock_list and introduces two exported
+> function bt_procfs_init, bt_procfs_cleanup.
+> 
+> The type bt_sock_list is already used in some of implementation of
+> protocols. bt_procfs_init prepare seq_operations which converts
+> protocol own bt_sock_list data to protocol own proc entry when the
+> entry is accessed.
+> 
+> What I, lsof user, need is just inode number of bluetooth
+> socket. However, people may want more information. The bt_procfs_init
+> takes a function pointer for customizing the show handler of
+> seq_operations.
+>  
+> Signed-off-by: Masatake YAMATO <yamato@redhat.com>
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/a2mp.c |   34 +++++++++++++++++++++++++++++++++-
- 1 file changed, 33 insertions(+), 1 deletion(-)
+Tested-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com> 
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 112170b..74da39f 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -269,6 +269,35 @@ done:
- 	return 0;
- }
- 
-+static int a2mp_getinfo_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
-+			    struct a2mp_cmd *hdr)
-+{
-+	struct a2mp_info_rsp *rsp = (struct a2mp_info_rsp *) skb->data;
-+	struct a2mp_amp_assoc_req req;
-+	struct amp_ctrl *ctrl;
-+
-+	if (le16_to_cpu(hdr->len) < sizeof(*rsp))
-+		return -EINVAL;
-+
-+	BT_DBG("id %d status 0x%2.2x", rsp->id, rsp->status);
-+
-+	if (rsp->status)
-+		return -EINVAL;
-+
-+	ctrl = amp_ctrl_add(mgr);
-+	if (!ctrl)
-+		return -ENOMEM;
-+
-+	ctrl->id = rsp->id;
-+
-+	req.id = rsp->id;
-+	a2mp_send(mgr, A2MP_GETAMPASSOC_REQ, __next_ident(mgr), sizeof(req),
-+		  &req);
-+
-+	skb_pull(skb, sizeof(*rsp));
-+	return 0;
-+}
-+
- static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 				struct a2mp_cmd *hdr)
- {
-@@ -459,8 +488,11 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 			err = a2mp_discover_rsp(mgr, skb, hdr);
- 			break;
- 
--		case A2MP_CHANGE_RSP:
- 		case A2MP_GETINFO_RSP:
-+			err = a2mp_getinfo_rsp(mgr, skb, hdr);
-+			break;
-+
-+		case A2MP_CHANGE_RSP:
- 		case A2MP_GETAMPASSOC_RSP:
- 		case A2MP_CREATEPHYSLINK_RSP:
- 		case A2MP_DISCONNPHYSLINK_RSP:
--- 
-1.7.9.5
-
+Best regards 
+Andrei Emeltchenko 
