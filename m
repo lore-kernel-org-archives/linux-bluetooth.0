@@ -1,30 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <500EBBCB.5070905@gmail.com>
-Date: Tue, 24 Jul 2012 17:14:19 +0200
-From: Andre Naujoks <nautsch2@googlemail.com>
+Date: Tue, 24 Jul 2012 17:25:48 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Oliver Neukum <oneukum@suse.de>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv2 02/20] Bluetooth: Process HCI callbacks in a workqueue
+Message-ID: <20120724142546.GE11981@aemeltch-MOBL1>
+References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1947498.TVTnpXyGtm@linux-lqwf.site>
+ <20120724134639.GD11981@aemeltch-MOBL1>
+ <1419233.g706sEMuzE@linux-lqwf.site>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Secure Simple Pairing with old software
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1419233.g706sEMuzE@linux-lqwf.site>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all.
+On Tue, Jul 24, 2012 at 04:15:42PM +0200, Oliver Neukum wrote:
+> On Tuesday 24 July 2012 16:46:41 Andrei Emeltchenko wrote:
+> > Hi Oliver,
+> > 
+> > On Tue, Jul 24, 2012 at 03:31:37PM +0200, Oliver Neukum wrote:
+> > > On Tuesday 24 July 2012 16:21:43 Andrei Emeltchenko wrote:
+> > > > +void hci_queue_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd,
+> > > > +                 struct workqueue_struct *workqueue)
+> > > > +{
+> > > > +       struct hci_cb_work *work;
+> > > > +
+> > > > +       BT_DBG("%s queue cmd %p", hdev->name, cmd);
+> > > > +
+> > > > +       work = kmalloc(sizeof(*work), GFP_KERNEL);
+> > > 
+> > > This looks like prone to deadlocks. You can run networked file
+> > > systems over the link and allocating memory with GFP_KERNEL
+> > > could run into a recursion problem.
+> > 
+> > Sorry, how this might run into recursion problem?
+> 
+> Suppose you transfer something necessary for writing out a dirty
+> page over the HCI and you call hci_queue_cb() to do so. Then
+> GFP_KERNEL causes another page to be written out over the same path.
+> (eg. NFS over PAN)
 
-I am currently trying to evaluate the bluetooth capabilities of an
-embeded device I am currently using and I feel kind of stupid asking
-this here, because I am probably missing something.
+Still I do not get it. We use GFP_KERNEL quite a lot in Bluetooth, how
+this case is special?
 
-I have a 2.6.28.10 kernel and 3.32 bluez-utils and bluez-libs on a
-MPC5200 PowerPC. Is it possible to get this combination to do SSP? I
-found some old threads in the mailing lists, but there was no real solution.
+Best regards 
+Andrei Emeltchenko 
 
-Does anybody have a hint, where I have to look for further information
-on this? Or even some C-Code as an example? The auth-agent from the
-bluez-utils package looks like a good start, but it doesn't seem to do
-anything, if I just start it.
-
-I would be very thankful for any pointers.
-
-Regards
-  Andre Naujoks
