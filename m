@@ -1,63 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Jul 2012 20:01:24 -0300
+Date: Tue, 24 Jul 2012 19:17:28 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: ramm@ti.com
+To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix for double free of st buffer.
-Message-ID: <20120724230124.GL20029@joana>
-References: <1342511370-26470-1-git-send-email-ramm@ti.com>
+Subject: Re: [PATCH 8/8] Bluetooth: Use lmp_no_flush_capable where applicable
+Message-ID: <20120724221728.GK20029@joana>
+References: <1343153033-898-1-git-send-email-andre.guedes@openbossa.org>
+ <1343153033-898-8-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1342511370-26470-1-git-send-email-ramm@ti.com>
+In-Reply-To: <1343153033-898-8-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ram,
+Hi Andre,
 
-* ramm@ti.com <ramm@ti.com> [2012-07-17 10:49:30 +0300]:
+* Andre Guedes <andre.guedes@openbossa.org> [2012-07-24 15:03:53 -0300]:
 
-> From: Ram Malovany <ramm@ti.com>
+> This patch replaces all LMP_NO_FLUSH bit checking by the helper
+> macro lmp_no_flush_capable.
 > 
-> When the Shared Transport line discipline driver (st_core) get data it
-> pushes the skb received to the relevant protocol stacks , it then
-> excepts that the relevant protocol stacks should handle the buffer ,
-> and if it cannot then the stack should respond with an error.
-> In our case the Bluetooth driver for shared transport (btwilink) should
-> always be able to handle the buffer , in case of an error it will
-> release it , thus we always should return 0.
-> 
-> Signed-off-by: Ram Malovany <ramm@ti.com>
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
->  drivers/bluetooth/btwilink.c |   12 ++++++++----
->  1 files changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btwilink.c b/drivers/bluetooth/btwilink.c
-> index 8869469..1f60d84 100644
-> --- a/drivers/bluetooth/btwilink.c
-> +++ b/drivers/bluetooth/btwilink.c
-> @@ -94,18 +94,22 @@ static void st_reg_completion_cb(void *priv_data, char data)
->  }
->  
->  /* Called by Shared Transport layer when receive data is
-> - * available */
-> + * available
-> + * Return:
-> + * 0 if buffer handled (affectivly allways even if error found)
-> + * if return !=0 the buffer will be freed by the st
-> + */
->  static long st_receive(void *priv_data, struct sk_buff *skb)
->  {
->  	struct ti_st *lhst = priv_data;
->  	int err;
->  
->  	if (!skb)
-> -		return -EFAULT;
-> +		return 0;
->  
->  	if (!lhst) {
->  		kfree_skb(skb);
+>  net/bluetooth/hci_event.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-If you remove this call to kfree_skb() from here doesn't it fixes your
-problem?
+All 8 patches have been applied to bluetooth-next. Thanks.
 
 	Gustavo
