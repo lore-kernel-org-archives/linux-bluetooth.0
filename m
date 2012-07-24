@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 06/20] Bluetooth: A2MP: Process Discover Response
-Date: Tue, 24 Jul 2012 16:21:47 +0300
-Message-Id: <1343136121-22476-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 01/20] Bluetooth: General HCI callback implementation
+Date: Tue, 24 Jul 2012 16:21:42 +0300
+Message-Id: <1343136121-22476-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,102 +12,187 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When receiving A2MP Discover Response send A2MP Get Info Request
-for each AMP controller.
+Add general HCI callback implementation. Can be used for executing
+HCI commands from A2MP protocol.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   62 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 61 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci_core.h |   21 +++++++++
+ net/bluetooth/hci_core.c         |   88 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 109 insertions(+)
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 9803f74..99beb95 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -63,6 +63,14 @@ void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data)
- 	kfree(cmd);
- }
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 41d9439..479e4d1 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -124,6 +124,17 @@ struct le_scan_params {
  
-+static u8 __next_ident(struct amp_mgr *mgr)
-+{
-+	if (++mgr->ident == 0)
-+		mgr->ident = 1;
+ #define HCI_MAX_SHORT_NAME_LENGTH	10
+ 
++struct hci_dev;
 +
-+	return mgr->ident;
-+}
++struct hci_cb_cmd {
++	struct list_head list;
++	u16 opcode;
++	u8 status;
++	void *opt;
++	void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
++	void (*destructor)(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
++};
 +
- static inline void __a2mp_cl_bredr(struct a2mp_cl *cl)
- {
- 	cl->id = 0;
-@@ -161,6 +169,55 @@ static int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ #define NUM_REASSEMBLY 4
+ struct hci_dev {
+ 	struct list_head list;
+@@ -236,6 +247,9 @@ struct hci_dev {
+ 
+ 	struct list_head	mgmt_pending;
+ 
++	struct mutex		cb_list_lock;
++	struct list_head	cb_list;
++
+ 	struct discovery_state	discovery;
+ 	struct hci_conn_hash	conn_hash;
+ 	struct list_head	blacklist;
+@@ -1092,5 +1106,12 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
+ int hci_cancel_le_scan(struct hci_dev *hdev);
+ 
+ u8 bdaddr_to_le(u8 bdaddr_type);
++struct hci_cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode);
++int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
++	       void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
++	       void *opt,
++	       void (*destructor)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
++	       gfp_t flags);
++void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
+ 
+ #endif /* __HCI_CORE_H */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 28bab9d..165c235 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -36,6 +36,7 @@
+ static void hci_rx_work(struct work_struct *work);
+ static void hci_cmd_work(struct work_struct *work);
+ static void hci_tx_work(struct work_struct *work);
++static void hci_cb_clear(struct hci_dev *hdev);
+ 
+ /* HCI device list */
+ LIST_HEAD(hci_dev_list);
+@@ -1645,6 +1646,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 
+ 	mutex_init(&hdev->lock);
+ 	mutex_init(&hdev->req_lock);
++	mutex_init(&hdev->cb_list_lock);
+ 
+ 	INIT_LIST_HEAD(&hdev->mgmt_pending);
+ 	INIT_LIST_HEAD(&hdev->blacklist);
+@@ -1652,6 +1654,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_LIST_HEAD(&hdev->link_keys);
+ 	INIT_LIST_HEAD(&hdev->long_term_keys);
+ 	INIT_LIST_HEAD(&hdev->remote_oob_data);
++	INIT_LIST_HEAD(&hdev->cb_list);
+ 
+ 	INIT_WORK(&hdev->rx_work, hci_rx_work);
+ 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
+@@ -1817,6 +1820,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	hci_link_keys_clear(hdev);
+ 	hci_smp_ltks_clear(hdev);
+ 	hci_remote_oob_data_clear(hdev);
++	hci_cb_clear(hdev);
+ 	hci_dev_unlock(hdev);
+ 
+ 	hci_dev_put(hdev);
+@@ -2118,6 +2122,90 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
  	return 0;
  }
  
-+static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
-+			     struct a2mp_cmd *hdr)
++static int hci_add_cb(struct hci_dev *hdev, __u16 opcode,
++		      void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
++		      void *opt,
++		      void (*destructor)(struct hci_dev *hdev,
++					 struct hci_cb_cmd *cmd),
++		      gfp_t flags)
 +{
-+	struct a2mp_discov_rsp *rsp = (void *) skb->data;
-+	u16 len = le16_to_cpu(hdr->len);
-+	struct a2mp_cl *cl;
-+	u16 ext_feat;
++	struct hci_cb_cmd *cmd;
 +
-+	if (len < sizeof(*rsp))
-+		return -EINVAL;
++	cmd = kmalloc(sizeof(*cmd), flags);
++	if (!cmd)
++		return -ENOMEM;
 +
-+	len -= sizeof(*rsp);
-+	skb_pull(skb, sizeof(*rsp));
++	cmd->cb = cb;
++	cmd->opcode = opcode;
++	cmd->opt = opt;
++	cmd->status = 0;
++	cmd->destructor = destructor;
 +
-+	ext_feat = le16_to_cpu(rsp->ext_feat);
-+
-+	BT_DBG("mtu %d efm 0x%4.4x", le16_to_cpu(rsp->mtu), ext_feat);
-+
-+	/* check that packet is not broken for now */
-+	while (ext_feat & A2MP_FEAT_EXT) {
-+		if (len < sizeof(ext_feat))
-+			return -EINVAL;
-+
-+		ext_feat = get_unaligned_le16(skb->data);
-+		BT_DBG("efm 0x%4.4x", ext_feat);
-+		len -= sizeof(ext_feat);
-+		skb_pull(skb, sizeof(ext_feat));
-+	}
-+
-+	cl = (void *) skb->data;
-+	while (len >= sizeof(*cl)) {
-+		BT_DBG("Remote AMP id %d type %d status %d", cl->id, cl->type,
-+		       cl->status);
-+
-+		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
-+			struct a2mp_info_req req;
-+
-+			req.id = cl->id;
-+			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
-+				  sizeof(req), &req);
-+		}
-+
-+		len -= sizeof(*cl);
-+		cl = (void *) skb_pull(skb, sizeof(*cl));
-+	}
++	mutex_lock(&hdev->cb_list_lock);
++	list_add(&cmd->list, &hdev->cb_list);
++	mutex_unlock(&hdev->cb_list_lock);
 +
 +	return 0;
 +}
 +
- static int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
- 			      struct a2mp_cmd *hdr)
- {
-@@ -378,8 +435,11 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 			err = a2mp_discphyslink_req(mgr, skb, hdr);
- 			break;
- 
--		case A2MP_CHANGE_RSP:
- 		case A2MP_DISCOVER_RSP:
-+			err = a2mp_discover_rsp(mgr, skb, hdr);
-+			break;
++struct hci_cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode)
++{
++	struct hci_cb_cmd *cmd;
 +
-+		case A2MP_CHANGE_RSP:
- 		case A2MP_GETINFO_RSP:
- 		case A2MP_GETAMPASSOC_RSP:
- 		case A2MP_CREATEPHYSLINK_RSP:
++	mutex_lock(&hdev->cb_list_lock);
++	list_for_each_entry(cmd, &hdev->cb_list, list)
++		if (cmd->opcode == opcode) {
++			mutex_unlock(&hdev->cb_list_lock);
++			return cmd;
++		}
++	mutex_unlock(&hdev->cb_list_lock);
++
++	return NULL;
++}
++
++void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd)
++{
++	BT_DBG("%s remove cmd %p", hdev->name, cmd);
++
++	mutex_lock(&hdev->cb_list_lock);
++	list_del(&cmd->list);
++	mutex_unlock(&hdev->cb_list_lock);
++
++	if (cmd->destructor) {
++		cmd->destructor(hdev, cmd);
++	} else {
++		kfree(cmd->opt);
++		kfree(cmd);
++	}
++}
++
++static void hci_cb_clear(struct hci_dev *hdev)
++{
++	struct hci_cb_cmd *cmd, *tmp;
++
++	list_for_each_entry_safe(cmd, tmp, &hdev->cb_list, list)
++		hci_remove_cb(hdev, cmd);
++}
++
++/* Send HCI command with callback */
++int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
++	       void (*cb)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
++	       void *opt,
++	       void (*destructor)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
++	       gfp_t flags)
++{
++	int ret;
++
++	if (!cb)
++		return -EINVAL;
++
++	ret = hci_add_cb(hdev, opcode, cb, opt, destructor, flags);
++	if (ret)
++		return ret;
++
++	return hci_send_cmd(hdev, opcode, plen, param);
++}
++
+ /* Get data from the previously sent command */
+ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
+ {
 -- 
 1.7.9.5
 
