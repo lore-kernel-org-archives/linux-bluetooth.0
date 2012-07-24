@@ -1,65 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Jul 2012 18:16:31 -0300
+Date: Tue, 24 Jul 2012 18:13:42 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv2 13/20] Bluetooth: Add function to derive AMP key using
- hmac
-Message-ID: <20120724211631.GG20029@joana>
+Subject: Re: [RFCv2 08/20] Bluetooth: AMP: Remote AMP ctrl definitions
+Message-ID: <20120724211342.GF20029@joana>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1343136121-22476-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1343136121-22476-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1343136121-22476-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1343136121-22476-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitry,
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-07-24 16:21:49 +0300]:
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-07-24 16:21:54 +0300]:
-
-> From: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> hmac(sha256) will be used for AMP key generation.
+> Create remote AMP controllers structure. It is used to keep information
+> about discovered remote AMP controllers by A2MP protocol.
 > 
-> Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
 > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  net/bluetooth/pal.c |   35 +++++++++++++++++++++++++++++++++++
->  1 file changed, 35 insertions(+)
+>  include/net/bluetooth/a2mp.h |    3 ++
+>  include/net/bluetooth/pal.h  |   14 ++++++++
+>  net/bluetooth/a2mp.c         |    5 +++
+>  net/bluetooth/pal.c          |   81 ++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 103 insertions(+)
 > 
-> diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
-> index 335cbc3..a405e88 100644
-> --- a/net/bluetooth/pal.c
-> +++ b/net/bluetooth/pal.c
-> @@ -12,6 +12,7 @@
->  */
+> diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+> index 012f573..8ba236c 100644
+> --- a/include/net/bluetooth/a2mp.h
+> +++ b/include/net/bluetooth/a2mp.h
+> @@ -29,6 +29,9 @@ struct amp_mgr {
 >  
->  #include <net/bluetooth/pal.h>
-> +#include <crypto/hash.h>
->  
->  enum pal_states {
->  	DISCONNECTED,
-> @@ -220,3 +221,37 @@ struct phy_link *phylink_lookup(struct amp_mgr *mgr, u8 local_id, u8 remote_id)
->  
->  	return found;
->  }
+>  	struct list_head	phy_links;
+>  	struct mutex		phy_links_lock;
 > +
-> +int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
-> +{
-> +	int ret = 0;
-> +	struct crypto_shash *tfm;
-> +
-> +	tfm = crypto_alloc_shash("hmac(sha256)", 0, 0);
-> +	if (IS_ERR(tfm)) {
-> +		BT_DBG("crypto_alloc_ahash failed");
-> +		return PTR_ERR(tfm);
-> +	}
-> +
-> +	if (ksize) {
+> +	struct list_head	amp_ctrls;
+> +	struct mutex		amp_ctrls_lock;
 
-can you move the check for ksize to the beginning of the function? This avoid
-unnecessary calls to crypto_alloc_ahash() in case ksize is zero.
+Have you checked for RCU here, are they worthwhile? and why is it better than
+spinlocks?  This is for both locks above.
 
 	Gustavo
