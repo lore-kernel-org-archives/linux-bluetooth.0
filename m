@@ -2,95 +2,57 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ v2 1/5] gdbus: Add skeleton of DBus.Properties interface
-Date: Tue, 24 Jul 2012 07:46:22 -0300
-Message-Id: <1343126786-12628-2-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ v2 5/5] gdbus: Add properties into Introspectable interface
+Date: Tue, 24 Jul 2012 07:46:26 -0300
+Message-Id: <1343126786-12628-6-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1343126786-12628-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1343126786-12628-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This interface is responsible for handling properties of all objects in
-a given path. Right now it only registers itself, doing nothing useful.
-A conversion to this new layout will be done by subsequent patches.
-
-org.freedesktop.org.DBus.Properties spec can be found at
-http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-properties
 ---
- gdbus/object.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ gdbus/object.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/gdbus/object.c b/gdbus/object.c
-index 900e7ab..91f7e97 100644
+index 1053486..fc2b5e2 100644
 --- a/gdbus/object.c
 +++ b/gdbus/object.c
-@@ -491,6 +491,48 @@ static const GDBusMethodTable introspect_methods[] = {
- 	{ }
- };
+@@ -80,6 +80,7 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
+ {
+ 	const GDBusMethodTable *method;
+ 	const GDBusSignalTable *signal;
++	const GDBusPropertyTable *property;
  
-+static DBusMessage *properties_get(DBusConnection *connection,
-+					DBusMessage *message, void *user_data)
-+{
-+	return NULL;
-+}
+ 	for (method = iface->methods; method && method->name; method++) {
+ 		gboolean deprecated = method->flags &
+@@ -126,6 +127,26 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
+ 			g_string_append_printf(gstr, "\t\t</signal>\n");
+ 		}
+ 	}
 +
-+static DBusMessage *properties_get_all(DBusConnection *connection,
-+					DBusMessage *message, void *user_data)
-+{
-+	return NULL;
-+}
++	for (property = iface->properties; property && property->name;
++								property++) {
++		gboolean deprecated = property->flags &
++					G_DBUS_PROPERTY_FLAG_DEPRECATED;
 +
-+static DBusMessage *properties_set(DBusConnection *connection,
-+					DBusMessage *message, void *user_data)
-+{
-+	return NULL;
-+}
++		g_string_append_printf(gstr, "\t\t<property name=\"%s\""
++					"type=\"%s\" access=\"%s%s\"",
++					property->name,	property->type,
++					property->get ? "read" : "",
++					property->set ? "write" : "");
 +
-+static const GDBusMethodTable properties_methods[] = {
-+	{ GDBUS_METHOD("Get",
-+			GDBUS_ARGS({ "interface", "s" }, { "name", "s" }),
-+			GDBUS_ARGS({ "value", "v" }),
-+			properties_get) },
-+	{ GDBUS_METHOD("Set", NULL,
-+			GDBUS_ARGS({ "interface", "s" }, { "name", "s" },
-+							{ "value", "v" }),
-+			properties_set) },
-+	{ GDBUS_METHOD("GetAll",
-+			GDBUS_ARGS({ "interface", "s" }),
-+			GDBUS_ARGS({ "properties", "a{sv}" }),
-+			properties_get_all) },
-+	{ }
-+};
-+
-+static const GDBusSignalTable properties_signals[] = {
-+	{ GDBUS_SIGNAL("PropertiesChanged",
-+			GDBUS_ARGS({ "interface", "s" },
-+					{ "changed_properties", "a{sv}" },
-+					{ "invalidated_properties", "as"})) },
-+	{ }
-+};
-+
- static void add_interface(struct generic_data *data, const char *name,
- 				const GDBusMethodTable *methods,
- 				const GDBusSignalTable *signals,
-@@ -541,6 +583,9 @@ static struct generic_data *object_path_ref(DBusConnection *connection,
- 	add_interface(data, DBUS_INTERFACE_INTROSPECTABLE,
- 			introspect_methods, NULL, NULL, data, NULL);
- 
-+	add_interface(data, DBUS_INTERFACE_PROPERTIES, properties_methods,
-+					properties_signals, NULL, data, NULL);
-+
- 	return data;
++		if (!deprecated)
++			g_string_append_printf(gstr, "/>\n");
++		else
++			g_string_append_printf(gstr,
++				">\n\t\t\t<annotation"
++				" name=\"org.freedesktop.DBus.Deprecated\""
++				" value=\"true\"/>\n\t\t</property>\n");
++	}
  }
  
-@@ -580,6 +625,7 @@ static void object_path_unref(DBusConnection *connection, const char *path)
- 		return;
- 
- 	remove_interface(data, DBUS_INTERFACE_INTROSPECTABLE);
-+	remove_interface(data, DBUS_INTERFACE_PROPERTIES);
- 
- 	invalidate_parent_data(connection, path);
- 
+ static void generate_introspection_xml(DBusConnection *conn,
 -- 
 1.7.11.2
 
