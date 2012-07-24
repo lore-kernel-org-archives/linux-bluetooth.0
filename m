@@ -1,42 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Oliver Neukum <oneukum@suse.de>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv2 02/20] Bluetooth: Process HCI callbacks in a workqueue
-Date: Tue, 24 Jul 2012 16:15:42 +0200
-Message-ID: <1419233.g706sEMuzE@linux-lqwf.site>
-In-Reply-To: <20120724134639.GD11981@aemeltch-MOBL1>
-References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1947498.TVTnpXyGtm@linux-lqwf.site> <20120724134639.GD11981@aemeltch-MOBL1>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <1343138034.24426.55.camel@aeonflux>
+Subject: Re: [PATCH 0/2] Support for reserving bandwidth on L2CAP socket
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Manoj Kumar Sharma <manojkr.sharma@stericsson.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Anurag Gupta <anurag.gupta@stericsson.com>
+Date: Tue, 24 Jul 2012 15:53:54 +0200
+In-Reply-To: <1343123700-23375-1-git-send-email-manojkr.sharma@stericsson.com>
+References: <y>
+	 <1343123700-23375-1-git-send-email-manojkr.sharma@stericsson.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tuesday 24 July 2012 16:46:41 Andrei Emeltchenko wrote:
-> Hi Oliver,
-> 
-> On Tue, Jul 24, 2012 at 03:31:37PM +0200, Oliver Neukum wrote:
-> > On Tuesday 24 July 2012 16:21:43 Andrei Emeltchenko wrote:
-> > > +void hci_queue_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd,
-> > > +                 struct workqueue_struct *workqueue)
-> > > +{
-> > > +       struct hci_cb_work *work;
-> > > +
-> > > +       BT_DBG("%s queue cmd %p", hdev->name, cmd);
-> > > +
-> > > +       work = kmalloc(sizeof(*work), GFP_KERNEL);
-> > 
-> > This looks like prone to deadlocks. You can run networked file
-> > systems over the link and allocating memory with GFP_KERNEL
-> > could run into a recursion problem.
-> 
-> Sorry, how this might run into recursion problem?
+Hi Manoj,
 
-Suppose you transfer something necessary for writing out a dirty
-page over the HCI and you call hci_queue_cb() to do so. Then
-GFP_KERNEL causes another page to be written out over the same path.
-(eg. NFS over PAN)
+> These patches allows L2CAP socket user to reserve bandwidth in
+> percentage. Underlying socket reserves calculated number of
+> HCI credits for this L2CAP channel.
 
-	Regards
-		Oliver
+this description is by far not enough. Explain why you are doing this.
+And make it a detailed description. Preferable with hcidump traces
+showing why this makes a difference at all.
+
+Regards
+
+Marcel
+
 
