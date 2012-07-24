@@ -1,48 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Jul 2012 15:35:20 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jaganath Kanakkassery <jaganath.k@samsung.com>
+From: Oliver Neukum <oneukum@suse.de>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v5] Bluetooth: Override status if local user rejects
- pairing
-Message-ID: <20120724133520.GA19450@x220.ice.intel.com>
-References: <1342449675-2842-1-git-send-email-jaganath.k@samsung.com>
+Subject: Re: [RFCv2 02/20] Bluetooth: Process HCI callbacks in a workqueue
+Date: Tue, 24 Jul 2012 15:31:37 +0200
+Message-ID: <1947498.TVTnpXyGtm@linux-lqwf.site>
+In-Reply-To: <1343136121-22476-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1343136121-22476-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1342449675-2842-1-git-send-email-jaganath.k@samsung.com>
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+On Tuesday 24 July 2012 16:21:43 Andrei Emeltchenko wrote:
+> +void hci_queue_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd,
+> +                 struct workqueue_struct *workqueue)
+> +{
+> +       struct hci_cb_work *work;
+> +
+> +       BT_DBG("%s queue cmd %p", hdev->name, cmd);
+> +
+> +       work = kmalloc(sizeof(*work), GFP_KERNEL);
 
-On Mon, Jul 16, 2012, Jaganath Kanakkassery wrote:
-> In case if pairing is failed, user cannot differentiate from the status
-> whether failure is caused by local rejection or remote rejection
-> because authentication failure is coming in both the cases.
-> 
-> This patch overrides the status from controller with "Cancelled"
-> in case of local rejection.
-> 
-> This patch will be useful if user can take some action based on local
-> or remote rejection
-> 
-> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
-> ---
-> v5 -> 	Used STATUS_CANCELLED instead of STATUS_REJECTED
-> 	Added a new flag in hci conn for auth cancel instead of
-> 	a new member in struct	
-> 	
->  include/net/bluetooth/hci_core.h |    3 ++-
->  net/bluetooth/hci_event.c        |   19 +++++++++++++++----
->  net/bluetooth/mgmt.c             |   18 ++++++++++++++++--
->  net/bluetooth/smp.c              |    3 ++-
->  4 files changed, 35 insertions(+), 8 deletions(-)
+This looks like prone to deadlocks. You can run networked file
+systems over the link and allocating memory with GFP_KERNEL
+could run into a recursion problem.
 
-Technically the patch looks quite good now. Thanks for implementing the
-fix proposals. I had a chat with Marcel and we'd like to have a more
-detailed explanation of the exact use case where you need this (i.e.
-describe what your agents, etc. are doing and why they can't do what you
-want with the current behavior). Also a hcidump showing the local and
-remote rejection error codes would be good.
+> +       if (!work)
+> +               return;
+> +
+> +       INIT_WORK(&work->work, hci_cb_worker);
+> +       work->hdev = hdev;
+> +       work->cmd = cmd;
+> +       hci_dev_hold(hdev);
+> +
+> +       if (!queue_work(workqueue, &work->work)) {
+> +               kfree(work);
+> +               hci_dev_put(hdev);
+> +       }
+> +}
 
-Johan
+	Regards
+		Oliver
+
