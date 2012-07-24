@@ -1,60 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <500E68FD.60104@monom.org>
-Date: Tue, 24 Jul 2012 11:21:01 +0200
-From: Daniel Wagner <wagi@monom.org>
+Date: Tue, 24 Jul 2012 11:31:38 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Manoj Kumar Sharma <manojkr.sharma@stericsson.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Anurag Gupta <anurag.gupta@stericsson.com>
+Subject: Re: [PATCH] Bluetooth: Usage of HCI channels in L2CAP
+Message-ID: <20120724083136.GA11981@aemeltch-MOBL1>
+References: <manojkr.sharma@stericsson.com>
+ <1343117537-31501-1-git-send-email-manojkr.sharma@stericsson.com>
 MIME-Version: 1.0
-To: "John W. Linville" <linville@tuxdriver.com>
-CC: Marcel Holtmann <marcel@holtmann.org>,
- linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- alexander.smirnov@siemens.com, Sergey.Sobolev@siemens.com
-Subject: Re: 2nd CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
- 2012 (Barcelona!)
-References: <20120322192406.GB2432@tuxdriver.com> <1332698585.1870.88.camel@aeonflux> <20120326145433.GE13806@tuxdriver.com> <1332774906.1870.98.camel@aeonflux> <20120326152541.GH13806@tuxdriver.com> <20120427174439.GC16207@tuxdriver.com> <20120723192057.GE18589@tuxdriver.com>
-In-Reply-To: <20120723192057.GE18589@tuxdriver.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1343117537-31501-1-git-send-email-manojkr.sharma@stericsson.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Manoj,
 
-On 23.07.2012 21:20, John W. Linville wrote:
-> On Fri, Apr 27, 2012 at 01:44:39PM -0400, John W. Linville wrote:
->
->> Just to keep the ball rolling...
->>
->> Angela has reserved space for us at the Hotel Fira
->> Palace for the Wireless Summit on Thurs, Nov 8th and Fri, Nov 9th.
->> Please note that this will overlap Yocto Dev Days, oVirt Summit and
->> KVM Forum at the same venue.
->>
->> Now, we need some talk proposals!  Please post in this thread (or
->> contact me or Marcel directly if necessary) to propose talks.  I would
->> love to see any topics on any relevant technologies, as well as topics
->> about how the projects are being managed, new sub-projects, etc.
->> It seems like a long time away right now, but it is a good time to
->> start thinking... :-)
->
-> Still a while to go, but this event is getting closer.  I would love to
-> see some more concrete topic proposals for talks, both presentations
-> and discussions.
->
-> Here is what I've seen so far:
->
-> Speaker				Topic
-> -------				-----
-> Joao Paulo Rechi Vita		status and roadmap of Bluetooth LE
-> Andrei Emeltchenko		Virtual Bluetooth AMP Controller for mac80211
-> Alexander Smirnov		802.15.4 stack, 6lowpan
->
-> Not bad, but I'd like to see some more!  Some ideas:
->
-> 	-- "state of the union" for bluetooth, nfc, 802.11
-> 	-- wireless mesh networking status updates
-> 	-- cfg80211/mac80211 feature previews (what's coming?)
-> 	-- standards bodies reports (802.11, 802.15.x)
-> 	-- important or unusual use cases (e.g. Freifunk, Internet of Things)
-> 	-- userland wireless management apps (NetworkManager, connman)
+On Tue, Jul 24, 2012 at 01:42:16PM +0530, Manoj Kumar Sharma wrote:
+> This patch enables L2CAP to use HCI channel feature. This can be
+> used to reflect L2CAP socket properties onto HCI channel.
 
-I could give a short overview what we do in ConnMan.
+the description is not good. This looks like
+"Move HCI chan from l2cap_conn to l2cap_chan"
 
-cheers,
-daniel
+> Change-Id: Iac2b54a1b8204695162491d09161066d90495e06
+> Signed-off-by: Manoj Kumar Sharma <manojkr.sharma@stericsson.com>
+> ---
+>  include/net/bluetooth/l2cap.h |    1 +
+>  net/bluetooth/l2cap_core.c    |   10 +++++++++-
+>  2 files changed, 10 insertions(+), 1 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 9b242c6..f26a468 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -410,6 +410,7 @@ struct l2cap_chan {
+>  	struct sock *sk;
+>  
+>  	struct l2cap_conn	*conn;
+> +	struct hci_chan	*hchan;
+>  
+>  	__u8		state;
+>  
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 6f9c25b..e487731 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -300,6 +300,8 @@ void l2cap_chan_destroy(struct l2cap_chan *chan)
+>  
+>  void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+>  {
+> +	struct hci_chan *hchan;
+> +
+>  	BT_DBG("conn %p, psm 0x%2.2x, dcid 0x%4.4x", conn,
+>  			chan->psm, chan->dcid);
+>  
+> @@ -342,6 +344,10 @@ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+>  	chan->local_acc_lat	= L2CAP_DEFAULT_ACC_LAT;
+>  	chan->local_flush_to	= L2CAP_DEFAULT_FLUSH_TO;
+>  
+> +	hchan = hci_chan_create(conn->hcon);
+> +	chan->hchan = hchan;
+> +
+> +
+
+extra new line
+
+>  	l2cap_chan_hold(chan);
+>  
+>  	list_add(&chan->list, &conn->chan_l);
+> @@ -396,6 +402,8 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+>  
+>  	skb_queue_purge(&chan->tx_q);
+>  
+> +	hci_chan_del(chan->hchan);
+> +
+>  	if (chan->mode == L2CAP_MODE_ERTM) {
+>  		struct srej_list *l, *tmp;
+>  
+> @@ -596,7 +604,7 @@ static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
+>  		flags = ACL_START;
+>  
+>  	bt_cb(skb)->force_active = test_bit(FLAG_FORCE_ACTIVE, &chan->flags);
+> -	hci_send_acl(chan->conn->hchan, skb, flags);
+> +	hci_send_acl(chan->hchan, skb, flags);
+
+So what about hchan in l2cap_conn structure?
+
+Best regards 
+Andrei Emeltchenko 
+
