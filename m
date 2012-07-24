@@ -1,57 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Jul 2012 16:46:41 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Oliver Neukum <oneukum@suse.de>
+Message-ID: <1343137097.24426.52.camel@aeonflux>
+Subject: Re: [PATCH 3/3] build: Require GLib 2.32 or later when building
+ with gstreamer support
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv2 02/20] Bluetooth: Process HCI callbacks in a workqueue
-Message-ID: <20120724134639.GD11981@aemeltch-MOBL1>
-References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1343136121-22476-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1947498.TVTnpXyGtm@linux-lqwf.site>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1947498.TVTnpXyGtm@linux-lqwf.site>
+Date: Tue, 24 Jul 2012 15:38:17 +0200
+In-Reply-To: <1343131482-17629-3-git-send-email-szymon.janc@tieto.com>
+References: <1343131482-17629-1-git-send-email-szymon.janc@tieto.com>
+	 <1343131482-17629-3-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Oliver,
+Hi Szymon,
 
-On Tue, Jul 24, 2012 at 03:31:37PM +0200, Oliver Neukum wrote:
-> On Tuesday 24 July 2012 16:21:43 Andrei Emeltchenko wrote:
-> > +void hci_queue_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd,
-> > +                 struct workqueue_struct *workqueue)
-> > +{
-> > +       struct hci_cb_work *work;
-> > +
-> > +       BT_DBG("%s queue cmd %p", hdev->name, cmd);
-> > +
-> > +       work = kmalloc(sizeof(*work), GFP_KERNEL);
-> 
-> This looks like prone to deadlocks. You can run networked file
-> systems over the link and allocating memory with GFP_KERNEL
-> could run into a recursion problem.
+> gstreamer code now uses g_mutex_init() and related functions only
+> available in GLib >= 2.32.
+> ---
+>  acinclude.m4 |    2 ++
+>  1 file changed, 2 insertions(+)
 
-Sorry, how this might run into recursion problem?
+since we are planning to move SBC to a separate project and GStreamer
+Bluetooth support then into GStreamer upstream, this is a NACK.
 
-Best regards 
-Andrei Emeltchenko 
+Regards
 
-> 
-> > +       if (!work)
-> > +               return;
-> > +
-> > +       INIT_WORK(&work->work, hci_cb_worker);
-> > +       work->hdev = hdev;
-> > +       work->cmd = cmd;
-> > +       hci_dev_hold(hdev);
-> > +
-> > +       if (!queue_work(workqueue, &work->work)) {
-> > +               kfree(work);
-> > +               hci_dev_put(hdev);
-> > +       }
-> > +}
-> 
-> 	Regards
-> 		Oliver
-> 
+Marcel
+
+
