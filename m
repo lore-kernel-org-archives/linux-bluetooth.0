@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 17/20] Bluetooth: A2MP: Add fallback to normal l2cap init sequence
-Date: Tue, 24 Jul 2012 16:21:58 +0300
-Message-Id: <1343136121-22476-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 16/20] Bluetooth: AMP: Write remote AMP Assoc
+Date: Tue, 24 Jul 2012 16:21:57 +0300
+Message-Id: <1343136121-22476-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,93 +12,158 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When there is no remote AMP controller found fallback to normal
-L2CAP sequence.
+When receiving HCI Command Status after HCI Create Physical Link
+execute HCI Write Remote AMP Assoc command to AMP controller.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |    1 +
- net/bluetooth/a2mp.c          |   28 ++++++++++++++++++++++++++++
- net/bluetooth/l2cap_core.c    |    2 +-
- 3 files changed, 30 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci_core.h |    2 +
+ net/bluetooth/amp.c              |   78 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |   15 ++++++++
+ 3 files changed, 95 insertions(+)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 718dbb1..0ed0221 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -788,5 +788,6 @@ void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
- 			  long timeout);
- bool l2cap_conn_clear_timer(struct l2cap_conn *conn,
- 			    struct delayed_work *work);
-+void l2cap_send_conn_req(struct l2cap_chan *chan);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 5aea1cc..50b4613 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -138,6 +138,8 @@ struct hci_cb_cmd {
+ struct amp_assoc {
+ 	__u16	len;
+ 	__u16	offset;
++	__u16	rem_len;
++	__u16	len_so_far;
+ 	__u8	data[HCI_MAX_AMP_ASSOC_SIZE];
+ };
  
- #endif /* __L2CAP_H */
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 2271cb7..b29275a 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -177,6 +177,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 	u16 len = le16_to_cpu(hdr->len);
- 	struct a2mp_cl *cl;
- 	u16 ext_feat;
-+	bool found = false;
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index fcfdd0e..e8237fc 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -123,6 +123,79 @@ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
+ 		   GFP_KERNEL);
+ }
  
- 	if (len < sizeof(*rsp))
- 		return -EINVAL;
-@@ -207,6 +208,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
- 			struct a2mp_info_req req;
- 
-+			found = true;
- 			req.id = cl->id;
- 			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
- 				  sizeof(req), &req);
-@@ -216,6 +218,32 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 		cl = (void *) skb_pull(skb, sizeof(*cl));
- 	}
- 
-+	/* Fall back to L2CAP init sequence */
-+	if (!found) {
-+		struct l2cap_conn *conn = mgr->l2cap_conn;
-+		struct l2cap_chan *chan;
++static void amp_write_rem_assoc_frag(struct hci_dev *hdev, struct amp_mgr *mgr,
++				     struct phy_link *plink);
 +
-+		mutex_lock(&conn->chan_lock);
++static void amp_write_rem_assoc_cs(struct hci_dev *hdev,
++				   struct hci_cb_cmd *cmd)
++{
++	struct amp_mgr *mgr = cmd->opt;
++	struct phy_link *plink;
 +
-+		list_for_each_entry(chan, &conn->chan_l, list) {
++	BT_DBG("mgr %p status 0x%2.2x", mgr, cmd->status);
 +
-+			BT_DBG("chan %p state %s", chan,
-+			       state_to_string(chan->state));
++	if (cmd->status)
++		return;
 +
-+			if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
-+				continue;
++	plink = phylink_lookup(mgr, hdev->id, 0);
++	if (!plink)
++		return;
 +
-+			l2cap_chan_lock(chan);
++	amp_write_rem_assoc_frag(hdev, mgr, plink);
 +
-+			if (chan->state == BT_CONNECT)
-+				l2cap_send_conn_req(chan);
++	phylink_put(plink);
++}
 +
-+			l2cap_chan_unlock(chan);
-+		}
++static void amp_write_rem_assoc_frag(struct hci_dev *hdev, struct amp_mgr *mgr,
++				     struct phy_link *plink)
++{
++	struct hci_cp_write_remote_amp_assoc *cp;
++	struct amp_ctrl *ctrl;
++	u16 frag_len, len;
 +
-+		mutex_unlock(&conn->chan_lock);
++	ctrl = amp_ctrl_lookup(mgr, plink->remote_id);
++	if (!ctrl)
++		return;
++
++	if (!ctrl->assoc_rem_len) {
++		BT_DBG("all fragments are written");
++		ctrl->assoc_rem_len = ctrl->assoc_len;
++		ctrl->assoc_len_so_far = 0;
++
++		amp_ctrl_put(ctrl);
++		return;
 +	}
 +
- 	return 0;
- }
- 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 7427e7b..165b810 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1000,7 +1000,7 @@ static bool __amp_capable(struct l2cap_chan *chan)
- 		return false;
- }
- 
--static void l2cap_send_conn_req(struct l2cap_chan *chan)
-+void l2cap_send_conn_req(struct l2cap_chan *chan)
++	frag_len = min_t(u16, 248, ctrl->assoc_rem_len);
++	len = frag_len + sizeof(*cp);
++
++	cp = kzalloc(len, GFP_KERNEL);
++	if (!cp) {
++		amp_ctrl_put(ctrl);
++		return;
++	}
++
++	BT_DBG("plink %p ctrl %p frag_len %u assoc_len %u rem_len %u",
++	       plink, ctrl, frag_len, ctrl->assoc_len, ctrl->assoc_rem_len);
++
++	cp->phy_handle = plink->handle;
++	cp->len_so_far = cpu_to_le16(ctrl->assoc_len_so_far);
++	cp->rem_len = cpu_to_le16(ctrl->assoc_rem_len);
++	memcpy(cp->frag, ctrl->assoc, frag_len);
++
++	ctrl->assoc_len_so_far += frag_len;
++	ctrl->assoc_rem_len -= frag_len;
++
++	amp_ctrl_put(ctrl);
++
++	amp_mgr_get(mgr);
++
++	hci_cmd_cb(hdev, HCI_OP_WRITE_REMOTE_AMP_ASSOC, len, cp,
++		   amp_write_rem_assoc_cs, mgr, cb_destructor, GFP_KERNEL);
++
++	kfree(cp);
++}
++
+ static void amp_create_phylink_cs(struct hci_dev *hdev,
+ 				  struct hci_cb_cmd *cmd)
  {
- 	struct l2cap_conn *conn = chan->conn;
- 	struct l2cap_conn_req req;
+@@ -132,6 +205,11 @@ static void amp_create_phylink_cs(struct hci_dev *hdev,
+ 	BT_DBG("mgr %p", mgr);
+ 
+ 	/* Write Remote AMP Assoc */
++	plink = phylink_lookup(mgr, hdev->id, 0);
++	if (plink) {
++		amp_write_rem_assoc_frag(hdev, mgr, plink);
++		phylink_put(plink);
++	}
+ }
+ 
+ void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 2b91b55..3c00b79 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1214,6 +1214,17 @@ static void hci_cc_write_le_host_supported(struct hci_dev *hdev,
+ 	hci_req_complete(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED, status);
+ }
+ 
++static void hci_cc_write_remote_amp_assoc(struct hci_dev *hdev,
++					  struct sk_buff *skb)
++{
++	struct hci_rp_write_remote_amp_assoc *rp = (void *) skb->data;
++
++	BT_DBG("%s status 0x%2.2x phy_handle 0x%2.2x",
++	       hdev->name, rp->status, rp->phy_handle);
++
++	hci_process_cb(hdev, HCI_OP_WRITE_REMOTE_AMP_ASSOC, rp->status);
++}
++
+ static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+ {
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+@@ -2414,6 +2425,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cc_write_le_host_supported(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_WRITE_REMOTE_AMP_ASSOC:
++		hci_cc_write_remote_amp_assoc(hdev, skb);
++		break;
++
+ 	default:
+ 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
+ 		break;
 -- 
 1.7.9.5
 
