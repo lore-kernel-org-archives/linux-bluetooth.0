@@ -1,52 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Jul 2012 11:54:49 +0200
+Date: Tue, 24 Jul 2012 11:53:10 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	linux-bluetooth@vger.kernel.org,
-	Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: Re: [PATCH BlueZ] btio: Rescue lost errorneous numbers
-Message-ID: <20120724095449.GD9576@x220.ice.intel.com>
-References: <1343054163-19119-1-git-send-email-claudio.takahasi@openbossa.org>
- <1343054163-19119-2-git-send-email-claudio.takahasi@openbossa.org>
- <CAJdJm_N7Z4a2p7-Ur+_kEf2Q==aL5QTYpmnRomX+LXjy1Dd37Q@mail.gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC BlueZ 0/7] Generic GATT API changes
+Message-ID: <20120724095310.GC9576@x220.ice.intel.com>
+References: <1343058920-18608-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAJdJm_N7Z4a2p7-Ur+_kEf2Q==aL5QTYpmnRomX+LXjy1Dd37Q@mail.gmail.com>
+In-Reply-To: <1343058920-18608-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi,
 
 On Mon, Jul 23, 2012, Anderson Lizardo wrote:
-> On Mon, Jul 23, 2012 at 10:36 AM, Claudio Takahasi
-> <claudio.takahasi@openbossa.org> wrote:
-> >  #define ERROR_FAILED(gerr, str, err) \
-> > -               g_set_error(gerr, BT_IO_ERROR, BT_IO_ERROR_FAILED, \
-> > +               g_set_error(gerr, BT_IO_ERROR, err, \
-> >                                 str ": %s (%d)", strerror(err), err)
-> > [...]
-> >                 if (err < 0)
-> > -                       g_set_error(&gerr, BT_IO_ERROR,
-> > -                                       BT_IO_ERROR_CONNECT_FAILED, "%s (%d)",
-> > -                                       strerror(-err), -err);
-> > -       } else if (cond & (G_IO_HUP | G_IO_ERR))
-> > -               g_set_error(&gerr, BT_IO_ERROR, BT_IO_ERROR_CONNECT_FAILED,
-> > -                               "HUP or ERR on socket");
-> > +                       g_set_error(&gerr, BT_IO_ERROR, -err, "%s (%d)",
-> > +                                                       strerror(-err), -err);
+> This series contains the latest updates to the Generic GATT API planned for
+> the next major BlueZ release. It was based on the discussions on the last BlueZ
+> meeting, plus a few tweaks to the signature of some methods. For instance, the
+> Register() method of the Service interface contains an optional "id" setting,
+> which could allow to load the correct storage for registered GATT services when
+> BlueZ daemon is restarted.
 > 
-> why not use the ERROR_FAILED() macro here?
+> While reviewing these patches, please keep in mind that the plan is to allow to
+> use the same API (or, more likely, a subset) when implementing external GATT
+> services. This avoids creating another "asymmetric" API just for service
+> registration. This approach has been already successfully adopted by other
+> (audio related?) profiles in BlueZ.
 > 
-> >         if (err < 0) {
-> > -               g_set_error(gerr, BT_IO_ERROR, BT_IO_ERROR_CONNECT_FAILED,
-> > -                               "connect: %s (%d)", strerror(-err), -err);
-> > +               g_set_error(gerr, BT_IO_ERROR, -err, "connect: %s (%d)",
-> > +                                                       strerror(-err), -err);
+> Comments and suggestions are welcome.
 > 
-> and here?
+> Anderson Lizardo (6):
+>   attrib-api: Remove local service hierarchy
+>   attrib-api: Update introduction text
+>   attrib-api: Remove GATT service hierarchy
+>   attrib-api: Update Characteristic interface
+>   attrib-api: Update Watcher interface methods
+>   attrib-api: Add RegisterWatcher/UnregisterWatcher methods
+> 
+> Claudio Takahasi (1):
+>   doc: Add Register/Unregister GATT based services
 
-Good point. Unfortunately I didn't notice this before applying so please
-(Claudio) send a fix on top of your patch.
+Patches 1-6 have been applied. The last two may need some more thinking
+though.
 
 Johan
