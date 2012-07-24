@@ -1,40 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLoJJfVMSstVMXicYpi126HfaxxNRLRsy9e9Os1F7=ocw@mail.gmail.com>
+References: <1341865311-21266-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<CABBYNZLoJJfVMSstVMXicYpi126HfaxxNRLRsy9e9Os1F7=ocw@mail.gmail.com>
+Date: Tue, 24 Jul 2012 17:39:31 +0200
+Message-ID: <CANT-zCV5NiSP4Cfcv=FyYRaN_n06QPCeCbMtB1XQPkQUpiokCw@mail.gmail.com>
+Subject: Re: [RFC v0] media: Extend media API with optional acquire
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v1 0/4] Optional acquire in Media API
-Date: Tue, 24 Jul 2012 17:52:26 +0200
-Message-Id: <1343145150-6427-1-git-send-email-mikel.astiz.oss@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Luiz,
 
-This patch series adds a flag to the Acquire method in the Media API, in order to fix the race condition described in patch v1 3/4.
+On Mon, Jul 16, 2012 at 11:17 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Mikel,
+>
+> On Mon, Jul 9, 2012 at 5:21 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>>  unsigned int gateway_request_stream(struct audio_device *dev,
+>> +                               gboolean try_only,
+>>                                 gateway_stream_cb_t cb, void *user_data)
+>>  {
+>>         struct gateway *gw = dev->gateway;
+>>         GError *err = NULL;
+>>         GIOChannel *io;
+>>
+>> +       if (try_only && !gw->sco)
+>> +               return 0;
+>
+> Perhaps if we store the status of the transport we don't need to even
+> call gateway_request_stream.
 
-v1 tries to follow the proposal from Luiz by avoiding changes in the internal callbacks, and instead using the state information available in struct media_transport.
+I tried to follow this approach by adding a flag (gboolean playing)
+inside struct media_transport, avoiding changes in the transport
+callbacks.
 
-Patch v1 4/4 needs careful review since the replacement of the in_use flag is not trivial.
+Patches will be submitted soon.
 
->From original patch:
-
-This patch reopens the discussion started by the thread "when is acquire
-ok to call". The race condition seems to be real (even thought difficult
-to reproduce), and I couldn't think of any approach to solve this
-without altering the Media API.
-
-Mikel Astiz (4):
-  media: Watch A2DP sink-source state changes
-  media: Add boolean playing field to transport
-  media: Extend media API with optional acquire
-  media: Remove transport in_use flag
-
- audio/media.c     |   72 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- audio/transport.c |   38 ++++++++++++++--------------
- audio/transport.h |    2 +
- doc/media-api.txt |    7 +++++
- 4 files changed, 98 insertions(+), 21 deletions(-)
-
--- 
-1.7.7.6
-
+Cheers,
+Mikel
