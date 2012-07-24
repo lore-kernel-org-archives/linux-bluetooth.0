@@ -1,34 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Jul 2012 15:53:23 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Date: Tue, 24 Jul 2012 16:46:41 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Oliver Neukum <oneukum@suse.de>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] Add Paulo Alcantara to AUTHORS
-Message-ID: <20120724135323.GA20390@x220.ice.intel.com>
-References: <1343137063-27340-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [RFCv2 02/20] Bluetooth: Process HCI callbacks in a workqueue
+Message-ID: <20120724134639.GD11981@aemeltch-MOBL1>
+References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1343136121-22476-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1947498.TVTnpXyGtm@linux-lqwf.site>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1343137063-27340-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1947498.TVTnpXyGtm@linux-lqwf.site>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Oliver,
 
-On Tue, Jul 24, 2012, Claudio Takahasi wrote:
-> ---
->  AUTHORS |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
+On Tue, Jul 24, 2012 at 03:31:37PM +0200, Oliver Neukum wrote:
+> On Tuesday 24 July 2012 16:21:43 Andrei Emeltchenko wrote:
+> > +void hci_queue_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd,
+> > +                 struct workqueue_struct *workqueue)
+> > +{
+> > +       struct hci_cb_work *work;
+> > +
+> > +       BT_DBG("%s queue cmd %p", hdev->name, cmd);
+> > +
+> > +       work = kmalloc(sizeof(*work), GFP_KERNEL);
 > 
-> diff --git a/AUTHORS b/AUTHORS
-> index 2eaa329..59b91c3 100644
-> --- a/AUTHORS
-> +++ b/AUTHORS
-> @@ -59,3 +59,4 @@ Sheldon Demario <sheldon.demario@openbossa.org>
->  Lucas De Marchi <lucas.demarchi@profusion.mobi>
->  Szymon Janc <szymon.janc@tieto.com>
->  Syam Sidhardhan <s.syam@samsung.com>
-> +Paulo Alcantara <pcacjr@gmail.com>
+> This looks like prone to deadlocks. You can run networked file
+> systems over the link and allocating memory with GFP_KERNEL
+> could run into a recursion problem.
 
-Applied. Thanks.
+Sorry, how this might run into recursion problem?
 
-Johan
+Best regards 
+Andrei Emeltchenko 
+
+> 
+> > +       if (!work)
+> > +               return;
+> > +
+> > +       INIT_WORK(&work->work, hci_cb_worker);
+> > +       work->hdev = hdev;
+> > +       work->cmd = cmd;
+> > +       hci_dev_hold(hdev);
+> > +
+> > +       if (!queue_work(workqueue, &work->work)) {
+> > +               kfree(work);
+> > +               hci_dev_put(hdev);
+> > +       }
+> > +}
+> 
+> 	Regards
+> 		Oliver
+> 
