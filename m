@@ -1,27 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Jul 2012 11:49:10 +0200
+Date: Tue, 24 Jul 2012 11:34:58 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] attio: Rename att_cleanup to attio_cleanup
-Message-ID: <20120724094910.GA9576@x220.ice.intel.com>
-References: <1343054163-19119-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH BlueZ] serial: Remove serial test script
+Message-ID: <20120724093458.GA8836@x220.ice.intel.com>
+References: <1342715766-22943-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1343054163-19119-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1342715766-22943-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Claudio,
 
-On Mon, Jul 23, 2012, Claudio Takahasi wrote:
-> Cosmetic change renaming attio cleanup function. attio prefix is more
-> suitable since attio implements GIOChannel abstraction in the top of
-> the GAttrib.
+On Thu, Jul 19, 2012, Claudio Takahasi wrote:
 > ---
->  src/device.c |   14 +++++++-------
->  1 files changed, 7 insertions(+), 7 deletions(-)
+>  test/test-serial |   58 ------------------------------------------------------
+>  1 files changed, 0 insertions(+), 58 deletions(-)
+>  delete mode 100755 test/test-serial
 
-Applied. Thanks.
+Both of your test-* patches are missing the necessary updates to
+Makefile.tools. Please fix and resend.
 
 Johan
