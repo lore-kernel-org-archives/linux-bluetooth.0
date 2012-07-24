@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 11/20] Bluetooth: A2MP: Process A2MP Get AMP Assoc Rsp
-Date: Tue, 24 Jul 2012 16:21:52 +0300
-Message-Id: <1343136121-22476-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 10/20] Bluetooth: A2MP: Process A2MP Getinfo Rsp
+Date: Tue, 24 Jul 2012 16:21:51 +0300
+Message-Id: <1343136121-22476-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,94 +12,66 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When receiving A2MP Get AMP Assoc Response save assoc data to remote
-AMP controller list and prepare for creating physical link.
+Process A2MP Getinfo Response, send Get AMP Assoc Req.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   61 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 60 insertions(+), 1 deletion(-)
+ net/bluetooth/a2mp.c |   34 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 74da39f..508cb79 100644
+index 112170b..74da39f 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -331,6 +331,62 @@ done:
+@@ -269,6 +269,35 @@ done:
  	return 0;
  }
  
-+static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
-+				struct a2mp_cmd *hdr)
++static int a2mp_getinfo_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
++			    struct a2mp_cmd *hdr)
 +{
-+	struct a2mp_amp_assoc_rsp *rsp = (void *) skb->data;
-+	u16 len = le16_to_cpu(hdr->len);
-+	struct hci_dev *hdev;
++	struct a2mp_info_rsp *rsp = (struct a2mp_info_rsp *) skb->data;
++	struct a2mp_amp_assoc_req req;
 +	struct amp_ctrl *ctrl;
-+	struct phy_link *plink;
-+	u8 *rem_assoc;
 +
-+	if (len < sizeof(*rsp))
++	if (le16_to_cpu(hdr->len) < sizeof(*rsp))
 +		return -EINVAL;
 +
-+	BT_DBG("id %d status 0x%2.2x assoc len %u", rsp->id, rsp->status,
-+	       len - sizeof(*rsp));
++	BT_DBG("id %d status 0x%2.2x", rsp->id, rsp->status);
 +
 +	if (rsp->status)
 +		return -EINVAL;
 +
-+	rem_assoc = skb_pull(skb, sizeof(*rsp));
++	ctrl = amp_ctrl_add(mgr);
++	if (!ctrl)
++		return -ENOMEM;
 +
-+	/* Save remote ASSOC data */
-+	ctrl = amp_ctrl_lookup(mgr, rsp->id);
-+	if (ctrl) {
-+		u8 *assoc, assoc_len = len - sizeof(*rsp);
++	ctrl->id = rsp->id;
 +
-+		assoc = kzalloc(assoc_len, GFP_KERNEL);
-+		if (!assoc) {
-+			amp_ctrl_put(ctrl);
-+			goto done;
-+		}
++	req.id = rsp->id;
++	a2mp_send(mgr, A2MP_GETAMPASSOC_REQ, __next_ident(mgr), sizeof(req),
++		  &req);
 +
-+		memcpy(assoc, rsp->amp_assoc, assoc_len);
-+		ctrl->assoc = assoc;
-+		ctrl->assoc_len = assoc_len;
-+		ctrl->assoc_rem_len = assoc_len;
-+		ctrl->assoc_len_so_far = 0;
-+
-+		amp_ctrl_put(ctrl);
-+	}
-+
-+	/* Create Phys Link */
-+	hdev = hci_dev_get(rsp->id);
-+	if (!hdev)
-+		goto done;
-+
-+	plink = phylink_add(mgr, hdev->id, rsp->id, ctrl->assoc,
-+			    ctrl->assoc_len);
-+
-+	BT_DBG("Created plink %p: loc:%d -> rem:%d", plink, hdev->id, rsp->id);
-+
-+done:
-+	skb_pull(skb, len - sizeof(*rsp));
++	skb_pull(skb, sizeof(*rsp));
 +	return 0;
 +}
 +
- static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 				   struct a2mp_cmd *hdr)
+ static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 				struct a2mp_cmd *hdr)
  {
-@@ -492,8 +548,11 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 			err = a2mp_getinfo_rsp(mgr, skb, hdr);
+@@ -459,8 +488,11 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 			err = a2mp_discover_rsp(mgr, skb, hdr);
  			break;
  
 -		case A2MP_CHANGE_RSP:
- 		case A2MP_GETAMPASSOC_RSP:
-+			err = a2mp_getampassoc_rsp(mgr, skb, hdr);
+ 		case A2MP_GETINFO_RSP:
++			err = a2mp_getinfo_rsp(mgr, skb, hdr);
 +			break;
 +
 +		case A2MP_CHANGE_RSP:
+ 		case A2MP_GETAMPASSOC_RSP:
  		case A2MP_CREATEPHYSLINK_RSP:
  		case A2MP_DISCONNPHYSLINK_RSP:
- 			err = a2mp_cmd_rsp(mgr, skb, hdr);
 -- 
 1.7.9.5
 
