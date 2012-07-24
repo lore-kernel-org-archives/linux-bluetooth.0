@@ -2,116 +2,39 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v1 1/4] media: Watch A2DP sink-source state changes
-Date: Tue, 24 Jul 2012 17:52:27 +0200
-Message-Id: <1343145150-6427-2-git-send-email-mikel.astiz.oss@gmail.com>
-In-Reply-To: <1343145150-6427-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1343145150-6427-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v1 0/4] Optional acquire in Media API
+Date: Tue, 24 Jul 2012 17:52:26 +0200
+Message-Id: <1343145150-6427-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Add watches to know about the state changes affecting the A2DP sinks
-and sources. The callback functions are just skeletons to be used in
-following patches.
----
- audio/media.c |   46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 46 insertions(+), 0 deletions(-)
+This patch series adds a flag to the Acquire method in the Media API, in order to fix the race condition described in patch v1 3/4.
 
-diff --git a/audio/media.c b/audio/media.c
-index ea6d582..1a54f4a 100644
---- a/audio/media.c
-+++ b/audio/media.c
-@@ -48,6 +48,8 @@
- #include "avrcp.h"
- #include "headset.h"
- #include "gateway.h"
-+#include "sink.h"
-+#include "source.h"
- #include "manager.h"
- 
- #define MEDIA_INTERFACE "org.bluez.Media"
-@@ -83,6 +85,8 @@ struct media_endpoint {
- 	size_t			size;		/* Endpoint capabilities size */
- 	guint			hs_watch;
- 	guint			ag_watch;
-+	guint			sink_watch;
-+	guint			source_watch;
- 	guint			watch;
- 	GSList			*requests;
- 	struct media_adapter	*adapter;
-@@ -157,6 +161,12 @@ static void media_endpoint_destroy(struct media_endpoint *endpoint)
- 	if (endpoint->ag_watch)
- 		gateway_remove_state_cb(endpoint->ag_watch);
- 
-+	if (endpoint->sink_watch)
-+		sink_remove_state_cb(endpoint->sink_watch);
-+
-+	if (endpoint->source_watch)
-+		source_remove_state_cb(endpoint->source_watch);
-+
- 	media_endpoint_cancel_all(endpoint);
- 
- 	g_slist_free_full(endpoint->transports,
-@@ -664,10 +674,28 @@ static void gateway_state_changed(struct audio_device *dev,
- 	}
- }
- 
-+static void a2dp_source_state_changed(struct audio_device *dev,
-+					source_state_t old_state,
-+					source_state_t new_state,
-+					void *user_data)
-+{
-+	struct media_endpoint *endpoint = user_data;
-+	struct media_transport *transport;
-+
-+	DBG("");
-+
-+	transport = find_device_transport(endpoint, dev);
-+	if (transport == NULL)
-+		return;
-+}
-+
- static gboolean endpoint_init_a2dp_source(struct media_endpoint *endpoint,
- 						gboolean delay_reporting,
- 						int *err)
- {
-+	endpoint->source_watch = source_add_state_cb(a2dp_source_state_changed,
-+								endpoint);
-+
- 	endpoint->sep = a2dp_add_sep(&endpoint->adapter->src,
- 					AVDTP_SEP_TYPE_SOURCE, endpoint->codec,
- 					delay_reporting, &a2dp_endpoint,
-@@ -678,10 +706,28 @@ static gboolean endpoint_init_a2dp_source(struct media_endpoint *endpoint,
- 	return TRUE;
- }
- 
-+static void a2dp_sink_state_changed(struct audio_device *dev,
-+					sink_state_t old_state,
-+					sink_state_t new_state,
-+					void *user_data)
-+{
-+	struct media_endpoint *endpoint = user_data;
-+	struct media_transport *transport;
-+
-+	DBG("");
-+
-+	transport = find_device_transport(endpoint, dev);
-+	if (transport == NULL)
-+		return;
-+}
-+
- static gboolean endpoint_init_a2dp_sink(struct media_endpoint *endpoint,
- 						gboolean delay_reporting,
- 						int *err)
- {
-+	endpoint->sink_watch = sink_add_state_cb(a2dp_sink_state_changed,
-+								endpoint);
-+
- 	endpoint->sep = a2dp_add_sep(&endpoint->adapter->src,
- 					AVDTP_SEP_TYPE_SINK, endpoint->codec,
- 					delay_reporting, &a2dp_endpoint,
+v1 tries to follow the proposal from Luiz by avoiding changes in the internal callbacks, and instead using the state information available in struct media_transport.
+
+Patch v1 4/4 needs careful review since the replacement of the in_use flag is not trivial.
+
+>From original patch:
+
+This patch reopens the discussion started by the thread "when is acquire
+ok to call". The race condition seems to be real (even thought difficult
+to reproduce), and I couldn't think of any approach to solve this
+without altering the Media API.
+
+Mikel Astiz (4):
+  media: Watch A2DP sink-source state changes
+  media: Add boolean playing field to transport
+  media: Extend media API with optional acquire
+  media: Remove transport in_use flag
+
+ audio/media.c     |   72 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ audio/transport.c |   38 ++++++++++++++--------------
+ audio/transport.h |    2 +
+ doc/media-api.txt |    7 +++++
+ 4 files changed, 98 insertions(+), 21 deletions(-)
+
 -- 
 1.7.7.6
 
