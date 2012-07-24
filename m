@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 14/20] Bluetooth: AMP: Add AMP key calculation
-Date: Tue, 24 Jul 2012 16:21:55 +0300
-Message-Id: <1343136121-22476-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 05/20] Bluetooth: AMP: Use HCI callback to Read Loc AMP Assoc
+Date: Tue, 24 Jul 2012 16:21:46 +0300
+Message-Id: <1343136121-22476-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,107 +12,233 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Function calculates AMP key using hmac_sha256 helper.
+When receiving A2MP Get AMP Assoc Request execute Read Local AMP Assoc
+HCI command to AMP controller. If the AMP Assoc data is larger then it
+can fit to HCI event only fragment is read. When all fragments are read
+A2MP Get AMP Assoc Response is run from HCI callback.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/pal.h |    1 +
- net/bluetooth/Kconfig       |    1 +
- net/bluetooth/pal.c         |   61 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 63 insertions(+)
+ include/net/bluetooth/amp.h      |    2 ++
+ include/net/bluetooth/hci.h      |    2 ++
+ include/net/bluetooth/hci_core.h |    8 +++++
+ net/bluetooth/a2mp.c             |   13 +++++----
+ net/bluetooth/amp.c              |   60 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |   41 ++++++++++++++++++++++++++
+ 6 files changed, 120 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
-index 6ce1dfb..8799285 100644
---- a/include/net/bluetooth/pal.h
-+++ b/include/net/bluetooth/pal.h
-@@ -53,5 +53,6 @@ int phylink_put(struct phy_link *plink);
- void phylink_get(struct phy_link *plink);
- void phylink_list_flush(struct amp_mgr *mgr);
- void phylink_del(struct amp_mgr *mgr, struct phy_link *plink);
-+int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type);
+diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
+index ec7bea7..e861675 100644
+--- a/include/net/bluetooth/amp.h
++++ b/include/net/bluetooth/amp.h
+@@ -15,5 +15,7 @@
+ #define __AMP_H
  
- #endif /* __PAL_H */
-diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-index 3537d38..1c11d0d 100644
---- a/net/bluetooth/Kconfig
-+++ b/net/bluetooth/Kconfig
-@@ -11,6 +11,7 @@ menuconfig BT
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_AES
- 	select CRYPTO_ECB
-+	select CRYPTO_SHA256
- 	help
- 	  Bluetooth is low-cost, low-power, short-range wireless technology.
- 	  It was designed as a replacement for cables and other short-range
-diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
-index a405e88..c47eeac 100644
---- a/net/bluetooth/pal.c
-+++ b/net/bluetooth/pal.c
-@@ -255,3 +255,64 @@ int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
- 	crypto_free_shash(tfm);
- 	return ret;
- }
+ void amp_read_loc_info(struct hci_dev *hdev, struct amp_mgr *mgr);
++void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle);
++void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr);
+ 
+ #endif /* __AMP_H */
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 7f19556..2b19703 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -33,6 +33,8 @@
+ #define HCI_LINK_KEY_SIZE	16
+ #define HCI_AMP_LINK_KEY_SIZE	(2 * HCI_LINK_KEY_SIZE)
+ 
++#define HCI_MAX_AMP_ASSOC_SIZE	672
 +
-+static void hexdump(u8 *buf, size_t len)
-+{
-+	print_hex_dump(KERN_DEBUG, "", DUMP_PREFIX_OFFSET,
-+		       16, 1, buf, len, false);
-+}
+ /* HCI dev events */
+ #define HCI_DEV_REG			1
+ #define HCI_DEV_UNREG			2
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 9626b21..5aea1cc 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -135,6 +135,12 @@ struct hci_cb_cmd {
+ 	void (*destructor)(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
+ };
+ 
++struct amp_assoc {
++	__u16	len;
++	__u16	offset;
++	__u8	data[HCI_MAX_AMP_ASSOC_SIZE];
++};
 +
-+int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type)
-+{
-+	struct hci_dev *hdev = conn->hdev;
-+	struct link_key *key;
-+	u8 keybuf[HCI_AMP_LINK_KEY_SIZE];
-+	u8 gamp_key[HCI_AMP_LINK_KEY_SIZE];
-+	u8 b802_key[HCI_AMP_LINK_KEY_SIZE];
-+	int result;
+ #define NUM_REASSEMBLY 4
+ struct hci_dev {
+ 	struct list_head list;
+@@ -188,6 +194,8 @@ struct hci_dev {
+ 	__u32		amp_max_flush_to;
+ 	__u32		amp_be_flush_to;
+ 
++	struct amp_assoc	loc_assoc;
 +
-+	if (!hci_conn_check_link_mode(conn))
-+		return -EACCES;
-+
-+	BT_DBG("key_type %d", conn->key_type);
-+
-+	/* Legacy key */
-+	if (conn->key_type < 3)
-+		return -EACCES;
-+
-+	*type = conn->key_type;
-+	*len = HCI_AMP_LINK_KEY_SIZE;
-+
-+	hci_dev_lock(hdev);
-+	key = hci_find_link_key(hdev, &conn->dst);
-+	hci_dev_unlock(hdev);
-+
-+	/* BR/EDR Link Key concatenated together with itself */
-+	memcpy(&keybuf[0], key->val, HCI_LINK_KEY_SIZE);
-+	memcpy(&keybuf[HCI_LINK_KEY_SIZE], key->val, HCI_LINK_KEY_SIZE);
-+
-+	hexdump(keybuf, HCI_AMP_LINK_KEY_SIZE);
-+
-+	result = hmac_sha256(keybuf, HCI_AMP_LINK_KEY_SIZE, "gamp", 4,
-+			     gamp_key);
-+	hexdump(gamp_key, HCI_AMP_LINK_KEY_SIZE);
-+
-+	if (result)
-+		goto done;
-+
-+	if (conn->key_type == 3) {
-+		BT_DBG("gamp_key");
-+		hexdump(gamp_key, HCI_AMP_LINK_KEY_SIZE);
-+		memcpy(data, gamp_key, HCI_AMP_LINK_KEY_SIZE);
+ 	__u8		flow_ctl_mode;
+ 
+ 	unsigned int	auto_accept_delay;
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index df40683..9803f74 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -230,15 +230,16 @@ static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 
+ 		a2mp_send(mgr, A2MP_GETAMPASSOC_RSP, hdr->ident, sizeof(rsp),
+ 			  &rsp);
+-		goto clean;
+-	}
+ 
+-	/* Placeholder for HCI Read AMP Assoc */
++		if (hdev)
++			hci_dev_put(hdev);
+ 
+-clean:
+-	if (hdev)
+-		hci_dev_put(hdev);
 +		goto done;
 +	}
 +
-+	result = hmac_sha256(gamp_key, HCI_AMP_LINK_KEY_SIZE, "802b", 4,
-+			     b802_key);
-+	hexdump(b802_key, HCI_AMP_LINK_KEY_SIZE);
-+
-+	memcpy(data, b802_key, HCI_AMP_LINK_KEY_SIZE);
-+
++	amp_read_loc_assoc(hdev, mgr);
+ 
 +done:
-+	return result;
+ 	skb_pull(skb, sizeof(*req));
+ 	return 0;
+ }
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index 4aea7be..b76f369 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -61,3 +61,63 @@ void amp_read_loc_info(struct hci_dev *hdev, struct amp_mgr *mgr)
+ 	hci_cmd_cb(hdev, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL,
+ 		   amp_read_loc_info_complete, mgr, cb_destructor, GFP_KERNEL);
+ }
++
++void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle)
++{
++	struct hci_cp_read_local_amp_assoc cp;
++	struct amp_assoc *loc_assoc = &hdev->loc_assoc;
++
++	BT_DBG("%s handle %d", hdev->name, phy_handle);
++
++	cp.phy_handle = phy_handle;
++	cp.max_len = cpu_to_le16(hdev->amp_assoc_size);
++	cp.len_so_far = cpu_to_le16(loc_assoc->offset);
++
++	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp);
 +}
++
++static void amp_read_loc_assoc_complete(struct hci_dev *hdev,
++					struct hci_cb_cmd *cmd)
++{
++	struct amp_mgr *mgr = cmd->opt;
++	struct amp_assoc *loc_assoc = &hdev->loc_assoc;
++	struct a2mp_amp_assoc_rsp *rsp;
++	size_t len;
++
++	BT_DBG("%s cmd %p", hdev->name, cmd);
++
++	len = sizeof(struct a2mp_amp_assoc_rsp) + loc_assoc->len;
++	rsp = kzalloc(len, GFP_KERNEL);
++	if (!rsp)
++		return;
++
++	rsp->id = hdev->id;
++
++	if (cmd->status) {
++		rsp->status = A2MP_STATUS_INVALID_CTRL_ID;
++		goto send;
++	}
++
++	rsp->status = A2MP_STATUS_SUCCESS;
++	memcpy(rsp->amp_assoc, loc_assoc->data, loc_assoc->len);
++
++send:
++	a2mp_send(mgr, A2MP_GETAMPASSOC_RSP, mgr->ident, len, rsp);
++	kfree(rsp);
++}
++
++void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
++{
++	struct hci_cp_read_local_amp_assoc cp;
++
++	memset(&hdev->loc_assoc, 0, sizeof(struct amp_assoc));
++	memset(&cp, 0, sizeof(cp));
++
++	cp.max_len = cpu_to_le16(hdev->amp_assoc_size);
++
++	amp_mgr_get(mgr);
++
++	hci_cmd_cb(hdev, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp,
++		   amp_read_loc_assoc_complete, mgr, cb_destructor,
++		   GFP_KERNEL);
++}
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7222421..a1ad489 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -30,6 +30,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/a2mp.h>
++#include <net/bluetooth/amp.h>
+ 
+ /* Handle HCI Event packets */
+ 
+@@ -865,6 +866,42 @@ process_cb:
+ 	hci_process_cb(hdev, HCI_OP_READ_LOCAL_AMP_INFO, rp->status);
+ }
+ 
++static void hci_cc_read_local_amp_assoc(struct hci_dev *hdev,
++					struct sk_buff *skb)
++{
++	struct hci_rp_read_local_amp_assoc *rp = (void *) skb->data;
++	struct amp_assoc *assoc = &hdev->loc_assoc;
++	size_t rem_len, frag_len;
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
++
++	if (rp->status)
++		goto process_cb;
++
++	frag_len = skb->len - sizeof(*rp);
++	rem_len = __le16_to_cpu(rp->rem_len);
++
++	if (rem_len > frag_len) {
++		BT_DBG("frag_len %d rem_len %d", frag_len, rem_len);
++
++		memcpy(assoc->data + assoc->offset, rp->frag, frag_len);
++		assoc->offset += frag_len;
++
++		/* Read other fragments */
++		amp_read_loc_assoc_frag(hdev, rp->phy_handle);
++
++		return;
++	}
++
++	memcpy(assoc->data + assoc->offset, rp->frag, rem_len);
++	assoc->len = assoc->offset + rem_len;
++	assoc->offset = 0;
++
++process_cb:
++	/* Run callback when all fragments received */
++	hci_process_cb(hdev, HCI_OP_READ_LOCAL_AMP_ASSOC, rp->status);
++}
++
+ static void hci_cc_delete_stored_link_key(struct hci_dev *hdev,
+ 					  struct sk_buff *skb)
+ {
+@@ -2294,6 +2331,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cc_read_local_amp_info(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_READ_LOCAL_AMP_ASSOC:
++		hci_cc_read_local_amp_assoc(hdev, skb);
++		break;
++
+ 	case HCI_OP_DELETE_STORED_LINK_KEY:
+ 		hci_cc_delete_stored_link_key(hdev, skb);
+ 		break;
 -- 
 1.7.9.5
 
