@@ -2,35 +2,84 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 3/3] build: Require GLib 2.32 or later when building with gstreamer support
-Date: Tue, 24 Jul 2012 14:04:42 +0200
-Message-ID: <1343131482-17629-3-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1343131482-17629-1-git-send-email-szymon.janc@tieto.com>
-References: <1343131482-17629-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 1/3] gstavdtpsink: Fix using deprecated glib api
+Date: Tue, 24 Jul 2012 14:04:40 +0200
+Message-ID: <1343131482-17629-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-gstreamer code now uses g_mutex_init() and related functions only
-available in GLib >= 2.32.
----
- acinclude.m4 |    2 ++
- 1 file changed, 2 insertions(+)
+g_mutex_new() is deprecated in glib 2.33. GMutex can now be allocated
+as part of larger structure and initialized using g_mutex_init().
 
-diff --git a/acinclude.m4 b/acinclude.m4
-index 39b0a18..5e39aa7 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -108,6 +108,8 @@ AC_DEFUN([AC_PATH_GLIB], [
- AC_DEFUN([AC_PATH_GSTREAMER], [
- 	PKG_CHECK_MODULES(GSTREAMER, gstreamer-0.10 >= 0.10.30 gstreamer-plugins-base-0.10, gstreamer_found=yes,
- 				AC_MSG_WARN(GStreamer library version 0.10.30 or later is required);gstreamer_found=no)
-+	PKG_CHECK_MODULES(GLIB_FOR_GS, glib-2.0 >= 2.32, dummy=yes,
-+				AC_MSG_ERROR(GLib >= 2.32 is required for gstreamer support))
- 	AC_SUBST(GSTREAMER_CFLAGS)
- 	AC_SUBST(GSTREAMER_LIBS)
- 	GSTREAMER_PLUGINSDIR=`$PKG_CONFIG --variable=pluginsdir gstreamer-0.10`
+This also fixes following build error:
+
+  CC     audio/audio_libgstbluetooth_la-gstavdtpsink.lo
+audio/gstavdtpsink.c: In function 'gst_avdtp_sink_finalize':
+audio/gstavdtpsink.c:198:2: error: 'g_mutex_free' is deprecated
+  (declared at /usr/include/glib-2.0/glib/deprecated/gthread.h:273)
+  [-Werror=deprecated-declarations]
+audio/gstavdtpsink.c: In function 'gst_avdtp_sink_init':
+audio/gstavdtpsink.c:1044:2: error: 'g_mutex_new' is deprecated
+  (declared at /usr/include/glib-2.0/glib/deprecated/gthread.h:271)
+  [-Werror=deprecated-declarations]
+cc1: all warnings being treated as errors
+make[1]: *** [audio/audio_libgstbluetooth_la-gstavdtpsink.lo] Error 1
+---
+ audio/gstavdtpsink.c |    8 ++++----
+ audio/gstavdtpsink.h |    2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/audio/gstavdtpsink.c b/audio/gstavdtpsink.c
+index ffaed7f..92c920f 100644
+--- a/audio/gstavdtpsink.c
++++ b/audio/gstavdtpsink.c
+@@ -56,11 +56,11 @@ GST_DEBUG_CATEGORY_STATIC(avdtp_sink_debug);
+ #define DEFAULT_AUTOCONNECT TRUE
+ 
+ #define GST_AVDTP_SINK_MUTEX_LOCK(s) G_STMT_START {	\
+-		g_mutex_lock(s->sink_lock);		\
++		g_mutex_lock(&s->sink_lock);		\
+ 	} G_STMT_END
+ 
+ #define GST_AVDTP_SINK_MUTEX_UNLOCK(s) G_STMT_START {	\
+-		g_mutex_unlock(s->sink_lock);		\
++		g_mutex_unlock(&s->sink_lock);		\
+ 	} G_STMT_END
+ 
+ struct bluetooth_data {
+@@ -195,7 +195,7 @@ static void gst_avdtp_sink_finalize(GObject *object)
+ 	if (self->transport)
+ 		g_free(self->transport);
+ 
+-	g_mutex_free(self->sink_lock);
++	g_mutex_clear(&self->sink_lock);
+ 
+ 	G_OBJECT_CLASS(parent_class)->finalize(object);
+ }
+@@ -1041,7 +1041,7 @@ static void gst_avdtp_sink_init(GstAvdtpSink *self,
+ 
+ 	self->autoconnect = DEFAULT_AUTOCONNECT;
+ 
+-	self->sink_lock = g_mutex_new();
++	g_mutex_init(&self->sink_lock);
+ 
+ 	/* FIXME this is for not synchronizing with clock, should be tested
+ 	 * with devices to see the behaviour
+diff --git a/audio/gstavdtpsink.h b/audio/gstavdtpsink.h
+index eb998ac..393797e 100644
+--- a/audio/gstavdtpsink.h
++++ b/audio/gstavdtpsink.h
+@@ -66,7 +66,7 @@ struct _GstAvdtpSink {
+ 
+ 	GstCaps *dev_caps;
+ 
+-	GMutex *sink_lock;
++	GMutex sink_lock;
+ 
+ 	guint watch_id;
+ };
 -- 
 1.7.9.5
 
