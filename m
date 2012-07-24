@@ -2,124 +2,85 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ v2 4/5] gdbus: Implement DBus.Properties.Set method
-Date: Tue, 24 Jul 2012 07:46:25 -0300
-Message-Id: <1343126786-12628-5-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ v2 3/5] gdbus: Implement DBus.Properties.GetAll method
+Date: Tue, 24 Jul 2012 07:46:24 -0300
+Message-Id: <1343126786-12628-4-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1343126786-12628-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1343126786-12628-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- gdbus/gdbus.h  |  9 ++++++++
- gdbus/object.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 75 insertions(+), 1 deletion(-)
+ gdbus/object.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 55 insertions(+), 1 deletion(-)
 
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index e2a8460..3e0c643 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -59,6 +59,14 @@ typedef struct GDBusPropertyTable GDBusPropertyTable;
- typedef gboolean (*GDBusPropertyGetter)(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data);
- 
-+typedef enum {
-+	G_DBUS_PROPERTY_SET_SUCCESS = 0,
-+	G_DBUS_PROPERTY_SET_INVALID_ARGUMENTS,
-+} GDBusPropertySetReturn;
-+
-+typedef GDBusPropertySetReturn (*GDBusPropertySetter)(const GDBusPropertyTable *property,
-+					DBusMessageIter *value, void *data);
-+
- typedef gboolean (*GDBusPropertyExists)(const GDBusPropertyTable *property,
- 								void *data);
- 
-@@ -113,6 +121,7 @@ struct GDBusPropertyTable {
- 	const char *name;
- 	const char *type;
- 	GDBusPropertyGetter get;
-+	GDBusPropertySetter set;
- 	GDBusPropertyExists exists;
- 	GDBusPropertyFlags flags;
- };
 diff --git a/gdbus/object.c b/gdbus/object.c
-index a34039f..1053486 100644
+index 30b5712..a34039f 100644
 --- a/gdbus/object.c
 +++ b/gdbus/object.c
-@@ -620,7 +620,72 @@ static DBusMessage *properties_get_all(DBusConnection *connection,
- static DBusMessage *properties_set(DBusConnection *connection,
+@@ -560,7 +560,61 @@ static DBusMessage *properties_get(DBusConnection *connection,
+ static DBusMessage *properties_get_all(DBusConnection *connection,
  					DBusMessage *message, void *user_data)
  {
 -	return NULL;
-+	GDBusPropertySetReturn ret;
 +	struct generic_data *data = user_data;
-+	DBusMessageIter iter, sub;
 +	struct interface_data *iface;
-+	const GDBusPropertyTable *property;
-+	const char *name, *interface;
++	const GDBusPropertyTable *p;
++	const char *interface;
++	DBusMessageIter iter, dict;
++	DBusMessage *reply;
 +
-+	if (!dbus_message_iter_init(message, &iter))
++	if (!dbus_message_get_args(message, NULL,
++					DBUS_TYPE_STRING, &interface,
++					DBUS_TYPE_INVALID))
 +		return NULL;
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
-+		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
-+					"Invalid argument type: '%c'",
-+					dbus_message_iter_get_arg_type(&iter));
-+
-+	dbus_message_iter_get_basic(&iter, &name);
-+	dbus_message_iter_next(&iter);
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
-+		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
-+					"Invalid argument type: '%c'",
-+					dbus_message_iter_get_arg_type(&iter));
-+
-+	dbus_message_iter_get_basic(&iter, &interface);
-+	dbus_message_iter_next(&iter);
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_VARIANT)
-+		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
-+					"Invalid argument type: '%c'",
-+					dbus_message_iter_get_arg_type(&iter));
-+
-+	dbus_message_iter_recurse(&iter, &sub);
 +
 +	iface = find_interface(data->interfaces, interface);
 +	if (iface == NULL)
 +		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
 +					"No such interface '%s'", interface);
 +
-+	property = find_property(iface->properties, name);
-+	if (property == NULL)
-+		return g_dbus_create_error(message,
-+						DBUS_ERROR_UNKNOWN_PROPERTY,
-+						"No such property '%s'", name);
++	reply = dbus_message_new_method_return(message);
++	if (reply == NULL)
++		return NULL;
 +
-+	if (property->set == NULL)
-+		return g_dbus_create_error(message,
-+					DBUS_ERROR_PROPERTY_READ_ONLY,
-+					"Property '%s' is not writable", name);
++	dbus_message_iter_init_append(reply, &iter);
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
 +
-+	if (property->exists != NULL &&
-+			!property->exists(property, iface->user_data))
-+		return g_dbus_create_error(message,
-+						DBUS_ERROR_UNKNOWN_PROPERTY,
-+						"No such property '%s'", name);
++	for (p = iface->properties; p && p->name; p++) {
++		DBusMessageIter entry, value;
 +
-+	ret = property->set(property, &sub, iface->user_data);
++		if (p->get == NULL)
++			continue;
 +
-+	switch (ret) {
-+	case G_DBUS_PROPERTY_SET_SUCCESS:
-+		return dbus_message_new_method_return(message);
-+	case G_DBUS_PROPERTY_SET_INVALID_ARGUMENTS:
-+		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
-+						"Invalid arguments");
++		if (p->exists != NULL && !p->exists(p, iface->user_data))
++			continue;
++
++		dbus_message_iter_open_container(&dict, DBUS_TYPE_DICT_ENTRY,
++								NULL, &entry);
++		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
++								p->name);
++		dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
++							p->type, &value);
++
++		if (!p->get(p, &value, iface->user_data)) {
++			dbus_message_unref(reply);
++			return NULL;
++		}
++
++		dbus_message_iter_close_container(&entry, &value);
++		dbus_message_iter_close_container(&dict, &entry);
 +	}
 +
-+	return g_dbus_create_error(message, DBUS_ERROR_FAILED, "Failed");
++	dbus_message_iter_close_container(&iter, &dict);
++
++	return reply;
  }
  
- static const GDBusMethodTable properties_methods[] = {
+ static DBusMessage *properties_set(DBusConnection *connection,
 -- 
 1.7.11.2
 
