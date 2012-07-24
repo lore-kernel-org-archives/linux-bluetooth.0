@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 02/20] Bluetooth: Process HCI callbacks in a workqueue
-Date: Tue, 24 Jul 2012 16:21:43 +0300
-Message-Id: <1343136121-22476-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 06/20] Bluetooth: A2MP: Process Discover Response
+Date: Tue, 24 Jul 2012 16:21:47 +0300
+Message-Id: <1343136121-22476-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,102 +12,102 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Use workqueue to process HCI callbacks.
+When receiving A2MP Discover Response send A2MP Get Info Request
+for each AMP controller.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    3 ++
- net/bluetooth/hci_core.c         |   57 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 60 insertions(+)
+ net/bluetooth/a2mp.c |   62 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 61 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 479e4d1..c2506fa 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1113,5 +1113,8 @@ int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
- 	       void (*destructor)(struct hci_dev *hdev, struct hci_cb_cmd *cmd),
- 	       gfp_t flags);
- void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
-+void hci_queue_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd,
-+		  struct workqueue_struct *workqueue);
-+void hci_process_cb(struct hci_dev *hdev, __u16 opcode, u8 status);
- 
- #endif /* __HCI_CORE_H */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 165c235..4c13bed 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2163,6 +2163,47 @@ struct hci_cb_cmd *hci_find_cb(struct hci_dev *hdev, __u16 opcode)
- 	return NULL;
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 9803f74..99beb95 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -63,6 +63,14 @@ void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data)
+ 	kfree(cmd);
  }
  
-+struct hci_cb_work {
-+	struct work_struct work;
-+	struct hci_dev *hdev;
-+	struct hci_cb_cmd *cmd;
-+};
-+
-+static void hci_cb_worker(struct work_struct *w)
++static u8 __next_ident(struct amp_mgr *mgr)
 +{
-+	struct hci_cb_work *work = (struct hci_cb_work *) w;
-+	struct hci_cb_cmd *cmd = work->cmd;
-+	struct hci_dev *hdev = work->hdev;
++	if (++mgr->ident == 0)
++		mgr->ident = 1;
 +
-+	cmd->cb(hdev, cmd);
-+
-+	hci_remove_cb(hdev, cmd);
-+	kfree(w);
-+	hci_dev_put(hdev);
++	return mgr->ident;
 +}
 +
-+void hci_queue_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd,
-+		  struct workqueue_struct *workqueue)
+ static inline void __a2mp_cl_bredr(struct a2mp_cl *cl)
+ {
+ 	cl->id = 0;
+@@ -161,6 +169,55 @@ static int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
+ }
+ 
++static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
++			     struct a2mp_cmd *hdr)
 +{
-+	struct hci_cb_work *work;
++	struct a2mp_discov_rsp *rsp = (void *) skb->data;
++	u16 len = le16_to_cpu(hdr->len);
++	struct a2mp_cl *cl;
++	u16 ext_feat;
 +
-+	BT_DBG("%s queue cmd %p", hdev->name, cmd);
++	if (len < sizeof(*rsp))
++		return -EINVAL;
 +
-+	work = kmalloc(sizeof(*work), GFP_KERNEL);
-+	if (!work)
-+		return;
++	len -= sizeof(*rsp);
++	skb_pull(skb, sizeof(*rsp));
 +
-+	INIT_WORK(&work->work, hci_cb_worker);
-+	work->hdev = hdev;
-+	work->cmd = cmd;
-+	hci_dev_hold(hdev);
++	ext_feat = le16_to_cpu(rsp->ext_feat);
 +
-+	if (!queue_work(workqueue, &work->work)) {
-+		kfree(work);
-+		hci_dev_put(hdev);
++	BT_DBG("mtu %d efm 0x%4.4x", le16_to_cpu(rsp->mtu), ext_feat);
++
++	/* check that packet is not broken for now */
++	while (ext_feat & A2MP_FEAT_EXT) {
++		if (len < sizeof(ext_feat))
++			return -EINVAL;
++
++		ext_feat = get_unaligned_le16(skb->data);
++		BT_DBG("efm 0x%4.4x", ext_feat);
++		len -= sizeof(ext_feat);
++		skb_pull(skb, sizeof(ext_feat));
 +	}
++
++	cl = (void *) skb->data;
++	while (len >= sizeof(*cl)) {
++		BT_DBG("Remote AMP id %d type %d status %d", cl->id, cl->type,
++		       cl->status);
++
++		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
++			struct a2mp_info_req req;
++
++			req.id = cl->id;
++			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
++				  sizeof(req), &req);
++		}
++
++		len -= sizeof(*cl);
++		cl = (void *) skb_pull(skb, sizeof(*cl));
++	}
++
++	return 0;
 +}
 +
- void hci_remove_cb(struct hci_dev *hdev, struct hci_cb_cmd *cmd)
+ static int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
+ 			      struct a2mp_cmd *hdr)
  {
- 	BT_DBG("%s remove cmd %p", hdev->name, cmd);
-@@ -2206,6 +2247,22 @@ int hci_cmd_cb(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param,
- 	return hci_send_cmd(hdev, opcode, plen, param);
- }
+@@ -378,8 +435,11 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 			err = a2mp_discphyslink_req(mgr, skb, hdr);
+ 			break;
  
-+void hci_process_cb(struct hci_dev *hdev, __u16 opcode, u8 status)
-+{
-+	struct hci_cb_cmd *cmd;
+-		case A2MP_CHANGE_RSP:
+ 		case A2MP_DISCOVER_RSP:
++			err = a2mp_discover_rsp(mgr, skb, hdr);
++			break;
 +
-+	cmd = hci_find_cb(hdev, opcode);
-+	if (!cmd)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	cmd->status = status;
-+	hci_queue_cb(hdev, cmd, hdev->workqueue);
-+
-+	hci_dev_unlock(hdev);
-+}
-+
- /* Get data from the previously sent command */
- void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
- {
++		case A2MP_CHANGE_RSP:
+ 		case A2MP_GETINFO_RSP:
+ 		case A2MP_GETAMPASSOC_RSP:
+ 		case A2MP_CREATEPHYSLINK_RSP:
 -- 
 1.7.9.5
 
