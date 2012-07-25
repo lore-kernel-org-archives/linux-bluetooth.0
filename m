@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 26 Jul 2012 01:29:00 +0900 (JST)
-Message-Id: <20120726.012900.1562774684228699074.yamato@redhat.com>
+Date: Thu, 26 Jul 2012 01:28:36 +0900 (JST)
+Message-Id: <20120726.012836.1141834834685133754.yamato@redhat.com>
 To: gustavo@padovan.org
 Cc: andrei.emeltchenko.news@gmail.com, linux-kernel@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 5/8] Bluetooth: Added /proc/net/hidp via bt_procfs_init()
+Subject: [PATCH v5 4/8] Bluetooth: Added /proc/net/hci via bt_procfs_init()
 From: Masatake YAMATO <yamato@redhat.com>
 In-Reply-To: <20120725003507.GR20029@joana>
 References: <20120716.222018.2029110835026223294.yamato@redhat.com>
@@ -15,74 +15,49 @@ Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added /proc/net/hidp via bt_procfs_init().
+Added /proc/net/hci via bt_procfs_init().
 
 Signed-off-by: Masatake YAMATO <yamato@redhat.com>
 ---
- net/bluetooth/hidp/sock.c |   22 +++++++++++++++++++++-
- 1 file changed, 21 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_sock.c |   13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hidp/sock.c b/net/bluetooth/hidp/sock.c
-index 18b3f68..eca3889 100644
---- a/net/bluetooth/hidp/sock.c
-+++ b/net/bluetooth/hidp/sock.c
-@@ -25,6 +25,10 @@
- 
- #include "hidp.h"
- 
-+static struct bt_sock_list hidp_sk_list = {
-+	.lock = __RW_LOCK_UNLOCKED(hidp_sk_list.lock)
-+};
-+
- static int hidp_sock_release(struct socket *sock)
- {
- 	struct sock *sk = sock->sk;
-@@ -34,6 +38,8 @@ static int hidp_sock_release(struct socket *sock)
- 	if (!sk)
- 		return 0;
- 
-+	bt_sock_unlink(&hidp_sk_list, sk);
-+
- 	sock_orphan(sk);
- 	sock_put(sk);
- 
-@@ -253,6 +259,8 @@ static int hidp_sock_create(struct net *net, struct socket *sock, int protocol,
- 	sk->sk_protocol = protocol;
- 	sk->sk_state	= BT_OPEN;
- 
-+	bt_sock_link(&hidp_sk_list, sk);
-+
- 	return 0;
- }
- 
-@@ -271,8 +279,19 @@ int __init hidp_init_sockets(void)
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index a7f04de..7c3d6c7 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -1100,21 +1100,30 @@ int __init hci_sock_init(void)
  		return err;
  
- 	err = bt_sock_register(BTPROTO_HIDP, &hidp_sock_family_ops);
+ 	err = bt_sock_register(BTPROTO_HCI, &hci_sock_family_ops);
 -	if (err < 0)
 +	if (err < 0) {
-+		BT_ERR("Can't register HIDP socket");
++		BT_ERR("HCI socket registration failed");
  		goto error;
 +	}
 +
-+	err = bt_procfs_init(THIS_MODULE, &init_net, "hidp", &hidp_sk_list, NULL);
++	err = bt_procfs_init(THIS_MODULE, &init_net, "hci", &hci_sk_list, NULL);
 +	if (err < 0) {
-+		BT_ERR("Failed to create HIDP proc file");
-+		bt_sock_unregister(BTPROTO_HIDP);
++		BT_ERR("Failed to create HCI proc file");
++		bt_sock_unregister(BTPROTO_HCI);
 +		goto error;
 +	}
-+
-+	BT_INFO("HIDP socket layer initialized");
+ 
+ 	BT_INFO("HCI socket layer initialized");
  
  	return 0;
  
-@@ -284,6 +303,7 @@ error:
+ error:
+-	BT_ERR("HCI socket registration failed");
+ 	proto_unregister(&hci_sk_proto);
+ 	return err;
+ }
  
- void __exit hidp_cleanup_sockets(void)
+ void hci_sock_cleanup(void)
  {
-+	bt_procfs_cleanup(&init_net, "hidp");
- 	if (bt_sock_unregister(BTPROTO_HIDP) < 0)
- 		BT_ERR("Can't unregister HIDP socket");
++	bt_procfs_cleanup(&init_net, "hci");
+ 	if (bt_sock_unregister(BTPROTO_HCI) < 0)
+ 		BT_ERR("HCI socket unregistration failed");
  
 -- 
 1.7.10.4
