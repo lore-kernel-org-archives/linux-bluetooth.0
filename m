@@ -1,60 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50100AB5.8050203@hschmitt.de>
-Date: Wed, 25 Jul 2012 17:03:17 +0200
-From: Harald Schmitt <linux@hschmitt.de>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [RFC] dbusoob: Update API
+Date: Wed, 25 Jul 2012 16:25:08 +0200
+Message-ID: <1343226308-443-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1343226308-443-1-git-send-email-szymon.janc@tieto.com>
+References: <1343226308-443-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: Re: [PATCH 0/2] obexd: Fix bug in irmc phonebook and prevent to reintroduce
- it
-References: <1342623188-10796-1-git-send-email-linux@hschmitt.de> <CABBYNZ+SQoX45XuQN9mEPTTSyFAiJ_a3Y_hQvH4YvcJE+5Yorg@mail.gmail.com> <500F9DAC.8040509@hschmitt.de> <CABBYNZJymF8bn0qyPZCtvJsFVWX7KqELf7FjBpRwxnYXoP0Hbw@mail.gmail.com>
-In-Reply-To: <CABBYNZJymF8bn0qyPZCtvJsFVWX7KqELf7FjBpRwxnYXoP0Hbw@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-Am 25.07.2012 16:22, schrieb Luiz Augusto von Dentz:
-> Hi Harald,
-> 
-> On Wed, Jul 25, 2012 at 10:18 AM, Harald Schmitt <linux@hschmitt.de> wrote:
->> This one is related to that. But I think your proposal should be a
->> separate patch since it is about the incomming paths from an irmc
->> client. This one is more about to what irmc converts the incomming paths
->> to query phonebook-ebook and phonebook-tracker for contacts and call lists.
->> At the  moment these well known paths in phonebook-*.c are designed to
->> match 1:1 with pbap spec and they are very similar to irmc, but there
->> could be a third implementation to query phonebook where this could be
->> different.
-> 
-> While the backend indeed take an absolute path this doesnt mean we
-> have to send as absolute path, not to mention it is not compatible
-> with mimetypes which is what TYPE header describes, even in case of
-> PBAP it is wrong to send absolute path in SETPATH.
+---
+ doc/oob-api.txt |   57 +++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 51 insertions(+), 6 deletions(-)
 
-Patch 1/2 only changes the way phonebook_pull is called (with absolute
-path). It has nothing changed about the path resolution/interpretation
-that is asked from the client. Sorry for my bad explanations.
-> 
-> To avoid this problems we send relative although we do accept
-> absolute, but to avoid problems with stack interpreting absolute path
-> as not valid as OBEX spec state we always send relative paths.
-
-In fact irmc implementation at the moment only accepts relative paths
-and I did not change this.
-> 
->> The patch 1/2 fixes irmc to query phonebook implementation for the well
->> known absolute path. This was changed in pbap.c with the patch you
->> stated, but forgot to change in irmc.c.
->> Patch 2/2 just replaces the well-known phonebook paths which
->> phoenbook-ebook.c and phonebook-tracker.c support with constants.
-> 
-> Im fine with converting to constants, it is more the sending of
-> absolute path that Im not comfortable because of the potential
-> interoperability problems it could cause.
-
-I probably used the wrong term "well known" what I meant by well known
-are the paths that phonebook-tracker and phonebook-ebook knows that it
-should fetch the contacts, etc. and these are absolute paths. It is not
-about the "well known" paths from the pbap spec
+diff --git a/doc/oob-api.txt b/doc/oob-api.txt
+index d838712..8b7b633 100644
+--- a/doc/oob-api.txt
++++ b/doc/oob-api.txt
+@@ -7,26 +7,71 @@ Service		org.bluez
+ Interface	org.bluez.OutOfBand
+ Object path	[variable prefix]/{hci0,hci1,...}
+ 
+-Methods		array{byte} hash, array{byte} randomizer ReadLocalData()
++Methods		dict ReadLocalData()
+ 
+ 			This method reads local OOB data from adapter. Return
+-			value is pair of arrays 16 bytes each.
++			value is a dictionary with following keys:
+ 
+-			Note: This method will generate and return new local
+-			OOB data.
++			array{byte} Hash:
++
++					16 bytes hash blob.
++
++			array{byte} Randomizer:
++
++					16 bytes randomizer blob.
++
++			Other data that can be transmitted via OOB mechanism
++			can be obtained from org.bluez.Adapter interface.
++
++			Note: This method will generate and return new hash
++			and randomizer every time it is called. Data
++			received in previous calls is invalidated and cannot be
++			used for pairing.
+ 
+ 			Possible errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InProgress
+ 
+-		void AddRemoteData(string address, array{byte} hash,
+-							array{byte} randomizer)
++		void AddRemoteData(string address, dict data)
+ 
+ 			This method adds new Out Of Band data for
+ 			specified address. If data for specified address
+ 			already exists it will be overwritten with new one.
+ 
++			All data is optional.
++
++			On success DeviceFound signal will be emitted.
++
++			possible keys:
++
++				array{byte} Hash:
++
++					16 bytes hash blob, it is used as is
++					so the size and byte order must match.
++
++				array{byte} Randomizer:
++
++					16 bytes randomizer blob, it is used as
++					is so the size and byte order must
++					match. If Randomizer is provided Hash
++					also needs to be provided.
++
++				uint32 Class:
++
++					The Bluetooth class of device of the
++					remote device.
++
++				string Name:
++
++					Remote device name.
++
++				array{string} UUIDs
++
++					List of 128-bit UUIDs that represents
++					the available local services.
++
+ 			Possible errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InvalidArguments
++					 org.bluez.Error.AlreadyPaired
+ 
+ 		void RemoveRemoteData(string address)
+ 
+-- 
+1.7.9.5
 
