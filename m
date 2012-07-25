@@ -3,157 +3,91 @@ From: Mat Martineau <mathewm@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
 	Andrei.Emeltchenko.news@gmail.com
 Cc: pkrystad@codeaurora.org
-Subject: [RFCv0 03/21] Bluetooth: Add L2CAP create channel request handling.
-Date: Wed, 25 Jul 2012 16:50:55 -0700
-Message-Id: <1343260274-11953-4-git-send-email-mathewm@codeaurora.org>
+Subject: [RFCv0 17/21] Bluetooth: Configure appropriate timeouts for AMP controllers
+Date: Wed, 25 Jul 2012 16:51:09 -0700
+Message-Id: <1343260274-11953-18-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1343260274-11953-1-git-send-email-mathewm@codeaurora.org>
 References: <1343260274-11953-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The L2CAP create channel request is very similar to an L2CAP connect
-request, but it has an additional parameter for the controller ID.  If
-the controller id is 0, the channel is set up on the BR/EDR controller
-(just like a connect request).  Using a valid high speed controller ID
-will cause the channel to be initially created on that high speed
-controller.  While the L2CAP data will be initially routed over the
-AMP controller, the L2CAP fixed signaling channel only uses BR/EDR.
-
-When a create channel request is received for a high speed controller,
-a pending response is always sent first.  After the high speed
-physical and logical links are complete a success response will be
-sent.
-
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c | 69 +++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 53 insertions(+), 16 deletions(-)
+ net/bluetooth/l2cap_core.c | 47 ++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 41 insertions(+), 6 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 24000ad..131d0da 100644
+index 17b5bee..f430744 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -3362,8 +3362,9 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 	return 0;
+@@ -2917,6 +2917,44 @@ static inline bool __l2cap_efs_supported(struct l2cap_chan *chan)
+ 	return enable_hs && chan->conn->feat_mask & L2CAP_FEAT_EXT_FLOW;
  }
  
--static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
--			    u8 *data, u8 rsp_code, u8 amp_id)
-+static struct l2cap_chan *__l2cap_connect(struct l2cap_conn *conn,
-+					  struct l2cap_cmd_hdr *cmd,
-+					  u8 *data, u8 rsp_code, u8 chan_id)
- {
- 	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
- 	struct l2cap_conn_rsp rsp;
-@@ -3390,7 +3391,7 @@ static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
- 
- 	/* Check if the ACL is secure enough (if not SDP) */
- 	if (psm != __constant_cpu_to_le16(L2CAP_PSM_SDP) &&
--				!hci_conn_check_link_mode(conn->hcon)) {
-+	    !hci_conn_check_link_mode(conn->hcon)) {
- 		conn->disc_reason = HCI_ERROR_AUTH_FAILURE;
- 		result = L2CAP_CR_SEC_BLOCK;
- 		goto response;
-@@ -3414,6 +3415,7 @@ static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
- 	bacpy(&bt_sk(sk)->dst, conn->dst);
- 	chan->psm  = psm;
- 	chan->dcid = scid;
-+	chan->chan_id = chan_id;
- 
- 	bt_accept_enqueue(parent, sk);
- 
-@@ -3433,8 +3435,16 @@ static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
- 				status = L2CAP_CS_AUTHOR_PEND;
- 				parent->sk_data_ready(parent, 0);
- 			} else {
--				__l2cap_state_change(chan, BT_CONFIG);
--				result = L2CAP_CR_SUCCESS;
-+				/* Force pending result for AMP controllers.
-+				 * The connection will succeed after the
-+				 * physical link is up. */
-+				if (chan_id) {
-+					__l2cap_state_change(chan, BT_CONNECT2);
-+					result = L2CAP_CR_PEND;
-+				} else {
-+					__l2cap_state_change(chan, BT_CONFIG);
-+					result = L2CAP_CR_SUCCESS;
-+				}
- 				status = L2CAP_CS_NO_INFO;
- 			}
- 		} else {
-@@ -3480,6 +3490,8 @@ sendresp:
- 					l2cap_build_conf_req(chan, buf), buf);
- 		chan->num_conf_req++;
- 	}
++static void __l2cap_set_ertm_timeouts(struct l2cap_chan *chan,
++				      struct l2cap_conf_rfc *rfc)
++{
++	if (chan->chan_id && chan->hs_hcon) {
++		u64 ertm_to = chan->hs_hcon->hdev->amp_be_flush_to;
 +
-+	return chan;
- }
- 
- static int l2cap_connect_req(struct l2cap_conn *conn,
-@@ -3970,12 +3982,12 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
- 	return 0;
- }
- 
--static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
--					struct l2cap_cmd_hdr *cmd, u16 cmd_len,
--					void *data)
-+static int l2cap_create_channel_req(struct l2cap_conn *conn,
-+				    struct l2cap_cmd_hdr *cmd, u16 cmd_len,
-+				    void *data)
- {
- 	struct l2cap_create_chan_req *req = data;
--	struct l2cap_create_chan_rsp rsp;
-+	struct l2cap_chan *chan;
- 	u16 psm, scid;
- 
- 	if (cmd_len != sizeof(*req))
-@@ -3989,14 +4001,39 @@ static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
- 
- 	BT_DBG("psm 0x%2.2x, scid 0x%4.4x, amp_id %d", psm, scid, req->amp_id);
- 
--	/* Placeholder: Always reject */
--	rsp.dcid = 0;
--	rsp.scid = cpu_to_le16(scid);
--	rsp.result = __constant_cpu_to_le16(L2CAP_CR_NO_MEM);
--	rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
-+	if (req->amp_id) {
-+		struct hci_dev *hdev;
- 
--	l2cap_send_cmd(conn, cmd->ident, L2CAP_CREATE_CHAN_RSP,
--		       sizeof(rsp), &rsp);
-+		/* Validate AMP controller id */
-+		hdev = hci_dev_get(req->amp_id);
-+		if (!hdev || !test_bit(HCI_UP, &hdev->flags)) {
-+			struct l2cap_create_chan_rsp rsp;
++		/* Class 1 devices have must have ERTM timeouts
++		 * exceeding the Link Supervision Timeout.  The
++		 * default Link Supervision Timeout for AMP
++		 * controllers is 10 seconds.
++		 *
++		 * Class 1 devices use 0xffffffff for their
++		 * best-effort flush timeout, so the clamping logic
++		 * will result in a timeout that meets the above
++		 * requirement.  ERTM timeouts are 16-bit values, so
++		 * the maximum timeout is 65.535 seconds.
++		 */
 +
-+			rsp.dcid = 0;
-+			rsp.scid = cpu_to_le16(scid);
-+			rsp.result = L2CAP_CR_BAD_AMP;
-+			rsp.status = L2CAP_CS_NO_INFO;
++		/* Convert timeout to milliseconds and round */
++		ertm_to = div_u64(ertm_to + 999, 1000);
 +
-+			l2cap_send_cmd(conn, cmd->ident, L2CAP_CREATE_CHAN_RSP,
-+				       sizeof(rsp), &rsp);
++		/* This is the recommended formula for class 2 devices
++		 * that start ERTM timers when packets are sent to the
++		 * controller.
++		 */
++		ertm_to = 3 * ertm_to + 500;
 +
-+			if (hdev)
-+				hci_dev_put(hdev);
++		if (ertm_to > 0xffff)
++			ertm_to = 0xffff;
 +
-+			return 0;
-+		}
-+
-+		hci_dev_put(hdev);
++		rfc->retrans_timeout = cpu_to_le16((u16) ertm_to);
++		rfc->monitor_timeout = rfc->retrans_timeout;
++	} else {
++		rfc->retrans_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
++		rfc->monitor_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
 +	}
++}
 +
-+	chan = __l2cap_connect(conn, cmd, data, L2CAP_CREATE_CHAN_RSP,
-+			       req->amp_id);
+ static inline void l2cap_txwin_setup(struct l2cap_chan *chan)
+ {
+ 	if (chan->tx_win > L2CAP_DEFAULT_TX_WINDOW &&
+@@ -2983,8 +3021,8 @@ done:
+ 	case L2CAP_MODE_ERTM:
+ 		rfc.mode            = L2CAP_MODE_ERTM;
+ 		rfc.max_transmit    = chan->max_tx;
+-		rfc.retrans_timeout = 0;
+-		rfc.monitor_timeout = 0;
 +
-+	/* Placeholder - uncomment when amp functions are available
-+	if (chan && req->amp_id &&
-+	    (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
-+		amp_accept_physical(conn, req->amp_id, sk);
-+	*/
++		__l2cap_set_ertm_timeouts(chan, &rfc);
  
- 	return 0;
- }
+ 		size = min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->conn->mtu -
+ 						L2CAP_EXT_HDR_SIZE -
+@@ -3216,10 +3254,7 @@ done:
+ 			rfc.max_pdu_size = cpu_to_le16(size);
+ 			chan->remote_mps = size;
+ 
+-			rfc.retrans_timeout =
+-				__constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
+-			rfc.monitor_timeout =
+-				__constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
++			__l2cap_set_ertm_timeouts(chan, &rfc);
+ 
+ 			set_bit(CONF_MODE_DONE, &chan->conf_state);
+ 
 -- 
 1.7.11.2
 
