@@ -1,62 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 25 Jul 2012 08:37:33 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Samuel Ortiz <samuel@sortiz.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-wireless@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, alexander.smirnov@siemens.com,
-        Ilan Elias <ilane@ti.com>
-Subject: Re: 2nd CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
- 2012 (Barcelona!)
-Message-ID: <20120725123733.GA3272@tuxdriver.com>
-References: <20120322192406.GB2432@tuxdriver.com>
- <1332698585.1870.88.camel@aeonflux>
- <20120326145433.GE13806@tuxdriver.com>
- <1332774906.1870.98.camel@aeonflux>
- <20120326152541.GH13806@tuxdriver.com>
- <20120427174439.GC16207@tuxdriver.com>
- <20120723192057.GE18589@tuxdriver.com>
- <1343209019.11031.3.camel@sortiz-mobl>
+Date: Wed, 25 Jul 2012 14:26:18 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv2 08/20] Bluetooth: AMP: Remote AMP ctrl definitions
+Message-ID: <20120725112616.GE2056@aemeltch-MOBL1>
+References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1343136121-22476-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20120724211342.GF20029@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1343209019.11031.3.camel@sortiz-mobl>
+In-Reply-To: <20120724211342.GF20029@joana>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Jul 25, 2012 at 11:36:59AM +0200, Samuel Ortiz wrote:
-> Hi John,
+Hi Gustavo,
+
+On Tue, Jul 24, 2012 at 06:13:42PM -0300, Gustavo Padovan wrote:
+> > diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+> > index 012f573..8ba236c 100644
+> > --- a/include/net/bluetooth/a2mp.h
+> > +++ b/include/net/bluetooth/a2mp.h
+> > @@ -29,6 +29,9 @@ struct amp_mgr {
+> >  
+> >  	struct list_head	phy_links;
+> >  	struct mutex		phy_links_lock;
+> > +
+> > +	struct list_head	amp_ctrls;
+> > +	struct mutex		amp_ctrls_lock;
 > 
-> On Mon, 2012-07-23 at 15:20 -0400, John W. Linville wrote:
-> > On Fri, Apr 27, 2012 at 01:44:39PM -0400, John W. Linville wrote:
-> > 
-> > > Just to keep the ball rolling...
-> > > 
-> > > Angela has reserved space for us at the Hotel Fira
-> > > Palace for the Wireless Summit on Thurs, Nov 8th and Fri, Nov 9th.
-> > > Please note that this will overlap Yocto Dev Days, oVirt Summit and
-> > > KVM Forum at the same venue.
-> > > 
-> > > Now, we need some talk proposals!  Please post in this thread (or
-> > > contact me or Marcel directly if necessary) to propose talks.  I would
-> > > love to see any topics on any relevant technologies, as well as topics
-> > > about how the projects are being managed, new sub-projects, etc.
-> > > It seems like a long time away right now, but it is a good time to
-> > > start thinking... :-)
-> > 
-> > Still a while to go, but this event is getting closer.  I would love to
-> > see some more concrete topic proposals for talks, both presentations
-> > and discussions.
-> > 
-> > Here is what I've seen so far:
-> > 
-> > Speaker				Topic
-> > -------				-----
-> > Joao Paulo Rechi Vita		status and roadmap of Bluetooth LE
-> > Andrei Emeltchenko		Virtual Bluetooth AMP Controller for mac80211
-> > Alexander Smirnov		802.15.4 stack, 6lowpan
-> I think I proposed to do an NFC state of the union talk there. I'm still in if that's Ok with you.
-> Ilan Elias volunteered as a co-presenter. He will focus on the NCI status.
+> Have you checked for RCU here, are they worthwhile? and why is it better than
+> spinlocks?  This is for both locks above.
 
-Cool...that sounds great!
+I want to be able to sleep inside critical section and using RCU is
+overkill here.
 
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Best regards 
+Andrei Emeltchenko 
