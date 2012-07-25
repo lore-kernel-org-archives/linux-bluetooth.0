@@ -1,63 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <F01A0FD1DC634EA58767E05BC990B2BC@sisodomain.com>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-References: <1342449675-2842-1-git-send-email-jaganath.k@samsung.com>
- <20120724133520.GA19450@x220.ice.intel.com>
-In-reply-to: <20120724133520.GA19450@x220.ice.intel.com>
-Subject: Re: [PATCH v5] Bluetooth: Override status if local user rejects pairing
-Date: Wed, 25 Jul 2012 15:19:55 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1343209019.11031.3.camel@sortiz-mobl>
+Subject: Re: 2nd CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
+ 2012 (Barcelona!)
+From: Samuel Ortiz <samuel@sortiz.org>
+Reply-To: Samuel Ortiz <samuel@sortiz.org>
+To: "John W. Linville" <linville@tuxdriver.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-wireless@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, alexander.smirnov@siemens.com,
+	Sergey.Sobolev@siemens.com, Ilan Elias <ilane@ti.com>
+Date: Wed, 25 Jul 2012 11:36:59 +0200
+In-Reply-To: <20120723192057.GE18589@tuxdriver.com>
+References: <20120322192406.GB2432@tuxdriver.com>
+	 <1332698585.1870.88.camel@aeonflux> <20120326145433.GE13806@tuxdriver.com>
+	 <1332774906.1870.98.camel@aeonflux> <20120326152541.GH13806@tuxdriver.com>
+	 <20120427174439.GC16207@tuxdriver.com>
+	 <20120723192057.GE18589@tuxdriver.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi John,
 
---------------------------------------------------
-From: "Johan Hedberg" <johan.hedberg@gmail.com>
-Sent: Tuesday, July 24, 2012 7:05 PM
-To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v5] Bluetooth: Override status if local user rejects 
-pairing
+On Mon, 2012-07-23 at 15:20 -0400, John W. Linville wrote:
+> On Fri, Apr 27, 2012 at 01:44:39PM -0400, John W. Linville wrote:
+> 
+> > Just to keep the ball rolling...
+> > 
+> > Angela has reserved space for us at the Hotel Fira
+> > Palace for the Wireless Summit on Thurs, Nov 8th and Fri, Nov 9th.
+> > Please note that this will overlap Yocto Dev Days, oVirt Summit and
+> > KVM Forum at the same venue.
+> > 
+> > Now, we need some talk proposals!  Please post in this thread (or
+> > contact me or Marcel directly if necessary) to propose talks.  I would
+> > love to see any topics on any relevant technologies, as well as topics
+> > about how the projects are being managed, new sub-projects, etc.
+> > It seems like a long time away right now, but it is a good time to
+> > start thinking... :-)
+> 
+> Still a while to go, but this event is getting closer.  I would love to
+> see some more concrete topic proposals for talks, both presentations
+> and discussions.
+> 
+> Here is what I've seen so far:
+> 
+> Speaker				Topic
+> -------				-----
+> Joao Paulo Rechi Vita		status and roadmap of Bluetooth LE
+> Andrei Emeltchenko		Virtual Bluetooth AMP Controller for mac80211
+> Alexander Smirnov		802.15.4 stack, 6lowpan
+I think I proposed to do an NFC state of the union talk there. I'm still in if that's Ok with you.
+Ilan Elias volunteered as a co-presenter. He will focus on the NCI status.
 
-> Hi Jaganath,
->
-> On Mon, Jul 16, 2012, Jaganath Kanakkassery wrote:
->> In case if pairing is failed, user cannot differentiate from the status
->> whether failure is caused by local rejection or remote rejection
->> because authentication failure is coming in both the cases.
->>
->> This patch overrides the status from controller with "Cancelled"
->> in case of local rejection.
->>
->> This patch will be useful if user can take some action based on local
->> or remote rejection
->>
->> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
->> ---
->> v5 -> Used STATUS_CANCELLED instead of STATUS_REJECTED
->> Added a new flag in hci conn for auth cancel instead of
->> a new member in struct
->>
->>  include/net/bluetooth/hci_core.h |    3 ++-
->>  net/bluetooth/hci_event.c        |   19 +++++++++++++++----
->>  net/bluetooth/mgmt.c             |   18 ++++++++++++++++--
->>  net/bluetooth/smp.c              |    3 ++-
->>  4 files changed, 35 insertions(+), 8 deletions(-)
->
-> Technically the patch looks quite good now. Thanks for implementing the
-> fix proposals. I had a chat with Marcel and we'd like to have a more
-> detailed explanation of the exact use case where you need this (i.e.
-> describe what your agents, etc. are doing and why they can't do what you
-> want with the current behavior). Also a hcidump showing the local and
-> remote rejection error codes would be good.
-
-I will change the commit message and describe more about the exact
-use case of this patch.
-
-Thanks,
-Jaganath 
-
+Cheers,
+Samuel.
