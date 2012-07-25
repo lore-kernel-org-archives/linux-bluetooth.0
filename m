@@ -1,50 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 25 Jul 2012 08:37:33 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Samuel Ortiz <samuel@sortiz.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-wireless@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, alexander.smirnov@siemens.com,
+        Ilan Elias <ilane@ti.com>
+Subject: Re: 2nd CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
+ 2012 (Barcelona!)
+Message-ID: <20120725123733.GA3272@tuxdriver.com>
+References: <20120322192406.GB2432@tuxdriver.com>
+ <1332698585.1870.88.camel@aeonflux>
+ <20120326145433.GE13806@tuxdriver.com>
+ <1332774906.1870.98.camel@aeonflux>
+ <20120326152541.GH13806@tuxdriver.com>
+ <20120427174439.GC16207@tuxdriver.com>
+ <20120723192057.GE18589@tuxdriver.com>
+ <1343209019.11031.3.camel@sortiz-mobl>
 MIME-Version: 1.0
-In-Reply-To: <500F9DAC.8040509@hschmitt.de>
-References: <1342623188-10796-1-git-send-email-linux@hschmitt.de>
-	<CABBYNZ+SQoX45XuQN9mEPTTSyFAiJ_a3Y_hQvH4YvcJE+5Yorg@mail.gmail.com>
-	<500F9DAC.8040509@hschmitt.de>
-Date: Wed, 25 Jul 2012 17:22:37 +0300
-Message-ID: <CABBYNZJymF8bn0qyPZCtvJsFVWX7KqELf7FjBpRwxnYXoP0Hbw@mail.gmail.com>
-Subject: Re: [PATCH 0/2] obexd: Fix bug in irmc phonebook and prevent to
- reintroduce it
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Harald Schmitt <linux@hschmitt.de>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1343209019.11031.3.camel@sortiz-mobl>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Harald,
+On Wed, Jul 25, 2012 at 11:36:59AM +0200, Samuel Ortiz wrote:
+> Hi John,
+> 
+> On Mon, 2012-07-23 at 15:20 -0400, John W. Linville wrote:
+> > On Fri, Apr 27, 2012 at 01:44:39PM -0400, John W. Linville wrote:
+> > 
+> > > Just to keep the ball rolling...
+> > > 
+> > > Angela has reserved space for us at the Hotel Fira
+> > > Palace for the Wireless Summit on Thurs, Nov 8th and Fri, Nov 9th.
+> > > Please note that this will overlap Yocto Dev Days, oVirt Summit and
+> > > KVM Forum at the same venue.
+> > > 
+> > > Now, we need some talk proposals!  Please post in this thread (or
+> > > contact me or Marcel directly if necessary) to propose talks.  I would
+> > > love to see any topics on any relevant technologies, as well as topics
+> > > about how the projects are being managed, new sub-projects, etc.
+> > > It seems like a long time away right now, but it is a good time to
+> > > start thinking... :-)
+> > 
+> > Still a while to go, but this event is getting closer.  I would love to
+> > see some more concrete topic proposals for talks, both presentations
+> > and discussions.
+> > 
+> > Here is what I've seen so far:
+> > 
+> > Speaker				Topic
+> > -------				-----
+> > Joao Paulo Rechi Vita		status and roadmap of Bluetooth LE
+> > Andrei Emeltchenko		Virtual Bluetooth AMP Controller for mac80211
+> > Alexander Smirnov		802.15.4 stack, 6lowpan
+> I think I proposed to do an NFC state of the union talk there. I'm still in if that's Ok with you.
+> Ilan Elias volunteered as a co-presenter. He will focus on the NCI status.
 
-On Wed, Jul 25, 2012 at 10:18 AM, Harald Schmitt <linux@hschmitt.de> wrote:
-> This one is related to that. But I think your proposal should be a
-> separate patch since it is about the incomming paths from an irmc
-> client. This one is more about to what irmc converts the incomming paths
-> to query phonebook-ebook and phonebook-tracker for contacts and call lists.
-> At the  moment these well known paths in phonebook-*.c are designed to
-> match 1:1 with pbap spec and they are very similar to irmc, but there
-> could be a third implementation to query phonebook where this could be
-> different.
-
-While the backend indeed take an absolute path this doesnt mean we
-have to send as absolute path, not to mention it is not compatible
-with mimetypes which is what TYPE header describes, even in case of
-PBAP it is wrong to send absolute path in SETPATH.
-
-To avoid this problems we send relative although we do accept
-absolute, but to avoid problems with stack interpreting absolute path
-as not valid as OBEX spec state we always send relative paths.
-
-> The patch 1/2 fixes irmc to query phonebook implementation for the well
-> known absolute path. This was changed in pbap.c with the patch you
-> stated, but forgot to change in irmc.c.
-> Patch 2/2 just replaces the well-known phonebook paths which
-> phoenbook-ebook.c and phonebook-tracker.c support with constants.
-
-Im fine with converting to constants, it is more the sending of
-absolute path that Im not comfortable because of the potential
-interoperability problems it could cause.
+Cool...that sounds great!
 
 -- 
-Luiz Augusto von Dentz
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
