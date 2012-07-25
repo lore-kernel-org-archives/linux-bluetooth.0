@@ -1,180 +1,215 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] Fix not setting class of device in adapter
-Date: Wed, 25 Jul 2012 13:14:53 +0200
-Message-ID: <1343214893-28310-1-git-send-email-szymon.janc@tieto.com>
+Date: Wed, 25 Jul 2012 14:10:00 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv1 1/2] Bluetooth: Add refcnt to l2cap_conn
+Message-ID: <20120725110958.GD2056@aemeltch-MOBL1>
+References: <1340978315-4700-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1342181266-26323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1342181266-26323-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20120724232617.GM20029@joana>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120724232617.GM20029@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Set class of device in adapter when new class is received from kernel.
-This fix adapters property Class being always zero.
----
- lib/mgmt.h    |    4 ++++
- src/adapter.c |   23 ++++++++++++++---------
- src/adapter.h |    2 +-
- src/mgmt.c    |   33 +++++++++++++++++++++++++++++++--
- 4 files changed, 50 insertions(+), 12 deletions(-)
+Hi Gustavo,
 
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index a58915b..83dcd84 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -109,6 +109,10 @@ struct mgmt_mode {
- 	uint8_t val;
- } __packed;
- 
-+struct mgmt_cod {
-+	uint8_t val[3];
-+} __packed;
-+
- #define MGMT_OP_SET_POWERED		0x0005
- 
- #define MGMT_OP_SET_DISCOVERABLE	0x0006
-diff --git a/src/adapter.c b/src/adapter.c
-index 8820e27..ada11f3 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -684,27 +684,32 @@ static DBusMessage *set_pairable_timeout(DBusConnection *conn,
- 	return dbus_message_new_method_return(msg);
- }
- 
--void btd_adapter_class_changed(struct btd_adapter *adapter, uint32_t new_class)
-+void btd_adapter_class_changed(struct btd_adapter *adapter, uint8_t *new_class)
- {
--	uint8_t class[3];
-+	uint32_t class;
- 
--	class[2] = (new_class >> 16) & 0xff;
--	class[1] = (new_class >> 8) & 0xff;
--	class[0] = new_class & 0xff;
-+	class = new_class[0] | (new_class[1] << 8) | (new_class[2] << 16);
- 
--	write_local_class(&adapter->bdaddr, class);
-+	if (class == adapter->dev_class)
-+		return;
-+
-+	write_local_class(&adapter->bdaddr, new_class);
- 
- 	adapter->dev_class = new_class;
- 
- 	if (main_opts.gatt_enabled) {
-+		uint8_t cls[3];
-+
-+		memcpy(cls, new_class, sizeof(cls));
-+
- 		/* Removes service class */
--		class[1] = class[1] & 0x1f;
--		attrib_gap_set(adapter, GATT_CHARAC_APPEARANCE, class, 2);
-+		cls[1] = cls[1] & 0x1f;
-+		attrib_gap_set(adapter, GATT_CHARAC_APPEARANCE, cls, 2);
- 	}
- 
- 	emit_property_changed(connection, adapter->path,
- 				ADAPTER_INTERFACE, "Class",
--				DBUS_TYPE_UINT32, &new_class);
-+				DBUS_TYPE_UINT32, &class);
- }
- 
- void adapter_name_changed(struct btd_adapter *adapter, const char *name)
-diff --git a/src/adapter.h b/src/adapter.h
-index 602bb6f..d8a1bb1 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -120,7 +120,7 @@ void adapter_name_changed(struct btd_adapter *adapter, const char *name);
- void adapter_service_insert(struct btd_adapter *adapter, void *rec);
- void adapter_service_remove(struct btd_adapter *adapter, void *rec);
- void btd_adapter_class_changed(struct btd_adapter *adapter,
--							uint32_t new_class);
-+							uint8_t *new_class);
- void btd_adapter_pairable_changed(struct btd_adapter *adapter,
- 							gboolean pairable);
- 
-diff --git a/src/mgmt.c b/src/mgmt.c
-index c55b1a8..c893972 100644
---- a/src/mgmt.c
-+++ b/src/mgmt.c
-@@ -1308,6 +1308,30 @@ static void handle_pending_uuids(uint16_t index)
- 	g_free(pending);
- }
- 
-+static void mgmt_update_cod(uint16_t index, void *buf, size_t len)
-+{
-+	struct mgmt_cod *rp = buf;
-+	struct controller_info *info;
-+	struct btd_adapter *adapter;
-+
-+	DBG("index %d", index);
-+
-+	if (len < sizeof(*rp)) {
-+		error("Too small class of device reply");
-+		return;
-+	}
-+
-+	info = &controllers[index];
-+
-+	adapter = manager_find_adapter(&info->bdaddr);
-+	if (adapter == NULL) {
-+		DBG("Adapter not found");
-+		return;
-+	}
-+
-+	btd_adapter_class_changed(adapter, rp->val);
-+}
-+
- static void mgmt_add_uuid_complete(int sk, uint16_t index, void *buf,
- 								size_t len)
- {
-@@ -1318,6 +1342,7 @@ static void mgmt_add_uuid_complete(int sk, uint16_t index, void *buf,
- 		return;
- 	}
- 
-+	mgmt_update_cod(index, buf, len);
- 	handle_pending_uuids(index);
- }
- 
-@@ -1370,9 +1395,11 @@ static void mgmt_cmd_complete(int sk, uint16_t index, void *buf, size_t len)
- 		break;
- 	case MGMT_OP_REMOVE_UUID:
- 		DBG("remove_uuid complete");
-+		mgmt_update_cod(index, buf, len);
- 		break;
- 	case MGMT_OP_SET_DEV_CLASS:
- 		DBG("set_dev_class complete");
-+		mgmt_update_cod(index, buf, len);
- 		break;
- 	case MGMT_OP_LOAD_LINK_KEYS:
- 		DBG("load_link_keys complete");
-@@ -1735,7 +1762,7 @@ static void mgmt_new_ltk(int sk, uint16_t index, void *buf, size_t len)
- 		bonding_complete(info, &ev->key.addr.bdaddr, 0);
- }
- 
--static void mgmt_cod_changed(int sk, uint16_t index)
-+static void mgmt_cod_changed(int sk, uint16_t index, void *buf, size_t len)
- {
- 	struct controller_info *info;
- 
-@@ -1752,6 +1779,8 @@ static void mgmt_cod_changed(int sk, uint16_t index)
- 		info->pending_cod_change = FALSE;
- 		handle_pending_uuids(index);
- 	}
-+
-+	mgmt_update_cod(index, buf, len);
- }
- 
- static gboolean mgmt_event(GIOChannel *io, GIOCondition cond, gpointer user_data)
-@@ -1817,7 +1846,7 @@ static gboolean mgmt_event(GIOChannel *io, GIOCondition cond, gpointer user_data
- 		mgmt_new_settings(sk, index, buf + MGMT_HDR_SIZE, len);
- 		break;
- 	case MGMT_EV_CLASS_OF_DEV_CHANGED:
--		mgmt_cod_changed(sk, index);
-+		mgmt_cod_changed(sk, index, buf + MGMT_HDR_SIZE, len);
- 		break;
- 	case MGMT_EV_NEW_LINK_KEY:
- 		mgmt_new_link_key(sk, index, buf + MGMT_HDR_SIZE, len);
--- 
-1.7.9.5
+On Tue, Jul 24, 2012 at 08:26:18PM -0300, Gustavo Padovan wrote:
+...
+> > +static int l2cap_conn_put(struct l2cap_conn *conn)
+> > +{
+> > +	/* conn might be NULL, was checked before in l2cap_conn_del */
+> > +	if (!conn) {
+> > +		BT_DBG("conn == NULL");
+> > +		return 1;
+> 
+> 1? What does that mean?
 
+this would mean that conn == NULL but I will make this function void.
+
+> > +	}
+> > +
+> > +	BT_DBG("conn %p orig refcnt %d", conn,
+> > +	       atomic_read(&conn->kref.refcount));
+> > +
+> > +	return kref_put(&conn->kref, &l2cap_conn_destroy);
+> > +}
+> > +
+> > +void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
+> > +			  long timeout)
+> > +{
+> > +	BT_DBG("conn %p timeout %ld", conn, timeout);
+> > +
+> > +	/* If delayed work cancelled do not hold(conn)
+> > +	   since it is already done with previous set_timer */
+> > +	if (!cancel_delayed_work(work))
+> > +		l2cap_conn_get(conn);
+> > +
+> > +	schedule_delayed_work(work, timeout);
+> > +}
+> > +
+> > +bool l2cap_conn_clear_timer(struct l2cap_conn *conn, struct delayed_work *work)
+> > +{
+> > +	bool ret;
+> > +
+> > +	BT_DBG("conn %p", conn);
+> > +
+> > +	/* put(conn) if delayed work cancelled otherwise it
+> > +	   is done in delayed work function */
+> > +	ret = cancel_delayed_work(work);
+> > +	if (ret)
+> > +		l2cap_conn_put(conn);
+> > +
+> > +	return ret;
+> > +}
+> >  
+> >  /* ---- L2CAP channels ---- */
+> >  
+> > @@ -976,7 +1038,8 @@ static void l2cap_do_start(struct l2cap_chan *chan)
+> >  		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_SENT;
+> >  		conn->info_ident = l2cap_get_ident(conn);
+> >  
+> > -		schedule_delayed_work(&conn->info_timer, L2CAP_INFO_TIMEOUT);
+> > +		l2cap_conn_set_timer(conn, &conn->info_timer,
+> > +				     L2CAP_INFO_TIMEOUT);
+> >  
+> >  		l2cap_send_cmd(conn, conn->info_ident,
+> >  					L2CAP_INFO_REQ, sizeof(req), &req);
+> > @@ -1258,12 +1321,14 @@ static void l2cap_conn_unreliable(struct l2cap_conn *conn, int err)
+> >  static void l2cap_info_timeout(struct work_struct *work)
+> >  {
+> >  	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
+> > -							info_timer.work);
+> > +					       info_timer.work);
+> >  
+> >  	conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
+> >  	conn->info_ident = 0;
+> >  
+> >  	l2cap_conn_start(conn);
+> > +
+> > +	l2cap_conn_put(conn);
+> >  }
+> >  
+> >  static void l2cap_conn_del(struct hci_conn *hcon, int err)
+> > @@ -1297,13 +1362,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+> >  
+> >  	hci_chan_del(conn->hchan);
+> >  
+> > -	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+> > -		cancel_delayed_work_sync(&conn->info_timer);
+> > -
+> > -	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags)) {
+> > -		cancel_delayed_work_sync(&conn->security_timer);
+> > +	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
+> 
+> So where are you cleaning these timers? I don't see it. You are change the
+> code flow here.
+
+Yes this change code flow. Those would be handled gracefully with refcounting.
+
+> >  		smp_chan_destroy(conn);
+> > -	}
+> >  
+> >  	hcon->l2cap_data = NULL;
+> >  	kfree(conn);
+> > @@ -1312,14 +1372,11 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+> >  static void security_timeout(struct work_struct *work)
+> >  {
+> >  	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
+> > -						security_timer.work);
+> > +					       security_timer.work);
+> >  
+> >  	BT_DBG("conn %p", conn);
+> >  
+> > -	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags)) {
+> > -		smp_chan_destroy(conn);
+> > -		l2cap_conn_del(conn->hcon, ETIMEDOUT);
+> > -	}
+> > +	l2cap_conn_put(conn);
+> 
+> You are loosing the error code here (and in some other places in the this
+> patch). We need to carry the error code so we can do proper error report in
+> teardown()
+
+Maybe we need to set error code somewhere here.
+
+> >  }
+> >  
+> >  static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+> > @@ -1361,6 +1418,8 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+> >  
+> >  	INIT_LIST_HEAD(&conn->chan_l);
+> >  
+> > +	kref_init(&conn->kref);
+> > +`
+> >  	if (hcon->type == LE_LINK)
+> >  		INIT_DELAYED_WORK(&conn->security_timer, security_timeout);
+> >  	else
+> > @@ -3318,8 +3377,8 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn, struct l2cap_cmd_hd
+> >  		return 0;
+> >  
+> >  	if ((conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT) &&
+> > -					cmd->ident == conn->info_ident) {
+> > -		cancel_delayed_work(&conn->info_timer);
+> > +	    cmd->ident == conn->info_ident) {
+> > +		l2cap_conn_clear_timer(conn, &conn->info_timer);
+> >  
+> >  		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
+> >  		conn->info_ident = 0;
+> > @@ -3433,10 +3492,11 @@ sendresp:
+> >  		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_SENT;
+> >  		conn->info_ident = l2cap_get_ident(conn);
+> >  
+> > -		schedule_delayed_work(&conn->info_timer, L2CAP_INFO_TIMEOUT);
+> > +		l2cap_conn_set_timer(conn, &conn->info_timer,
+> > +				     L2CAP_INFO_TIMEOUT);
+> >  
+> >  		l2cap_send_cmd(conn, conn->info_ident,
+> > -					L2CAP_INFO_REQ, sizeof(info), &info);
+> > +			       L2CAP_INFO_REQ, sizeof(info), &info);
+> >  	}
+> >  
+> >  	if (chan && !test_bit(CONF_REQ_SENT, &chan->conf_state) &&
+> > @@ -3889,7 +3949,7 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
+> >  			conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE)
+> >  		return 0;
+> >  
+> > -	cancel_delayed_work(&conn->info_timer);
+> > +	l2cap_conn_clear_timer(conn, &conn->info_timer);
+> >  
+> >  	if (result != L2CAP_IR_SUCCESS) {
+> >  		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
+> > @@ -5277,8 +5337,10 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+> >  		break;
+> >  
+> >  	case L2CAP_CID_SMP:
+> > -		if (smp_sig_channel(conn, skb))
+> > -			l2cap_conn_del(conn->hcon, EACCES);
+> > +		if (smp_sig_channel(conn, skb)) {
+> > +			l2cap_conn_clear_timer(conn, &conn->security_timer);
+> > +			l2cap_conn_put(conn);
+> > +		}
+> >  		break;
+> >  
+> >  	default:
+> > @@ -5330,8 +5392,14 @@ int l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+> >  		conn = l2cap_conn_add(hcon, status);
+> >  		if (conn)
+> >  			l2cap_conn_ready(conn);
+> > -	} else
+> > -		l2cap_conn_del(hcon, bt_to_errno(status));
+> > +	} else {
+> > +		conn = hcon->l2cap_data;
+> > +
+> > +		if (hcon->type == LE_LINK)
+> > +			l2cap_conn_clear_timer(conn, &conn->security_timer);
+> 
+> Can you explain why this change is here?
+
+IIRC this the result of changing l2cap_conn_del -> l2cap_conn_put
+
+Best regards 
+Andrei Emeltchenko 
