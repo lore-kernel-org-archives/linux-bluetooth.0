@@ -1,247 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 26 Jul 2012 01:26:32 +0900 (JST)
-Message-Id: <20120726.012632.1236473140838656188.yamato@redhat.com>
-To: gustavo@padovan.org
-Cc: andrei.emeltchenko.news@gmail.com, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 1/8] Bluetooth: /proc/net/ entries for bluetooth
- protocols
-From: Masatake YAMATO <yamato@redhat.com>
-In-Reply-To: <20120725003507.GR20029@joana>
-References: <20120716.222018.2029110835026223294.yamato@redhat.com>
-	<20120725001214.GP20029@joana>
-	<20120725003507.GR20029@joana>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: linux-kernel-owner@vger.kernel.org
+Message-ID: <50100AB5.8050203@hschmitt.de>
+Date: Wed, 25 Jul 2012 17:03:17 +0200
+From: Harald Schmitt <linux@hschmitt.de>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: Re: [PATCH 0/2] obexd: Fix bug in irmc phonebook and prevent to reintroduce
+ it
+References: <1342623188-10796-1-git-send-email-linux@hschmitt.de> <CABBYNZ+SQoX45XuQN9mEPTTSyFAiJ_a3Y_hQvH4YvcJE+5Yorg@mail.gmail.com> <500F9DAC.8040509@hschmitt.de> <CABBYNZJymF8bn0qyPZCtvJsFVWX7KqELf7FjBpRwxnYXoP0Hbw@mail.gmail.com>
+In-Reply-To: <CABBYNZJymF8bn0qyPZCtvJsFVWX7KqELf7FjBpRwxnYXoP0Hbw@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-lsof command can tell the type of socket processes are using.
-Internal lsof uses inode numbers on socket fs to resolve the type of
-sockets. Files under /proc/net/, such as tcp, udp, unix, etc provides
-such inode information.
+Hi Luiz,
+Am 25.07.2012 16:22, schrieb Luiz Augusto von Dentz:
+> Hi Harald,
+> 
+> On Wed, Jul 25, 2012 at 10:18 AM, Harald Schmitt <linux@hschmitt.de> wrote:
+>> This one is related to that. But I think your proposal should be a
+>> separate patch since it is about the incomming paths from an irmc
+>> client. This one is more about to what irmc converts the incomming paths
+>> to query phonebook-ebook and phonebook-tracker for contacts and call lists.
+>> At the  moment these well known paths in phonebook-*.c are designed to
+>> match 1:1 with pbap spec and they are very similar to irmc, but there
+>> could be a third implementation to query phonebook where this could be
+>> different.
+> 
+> While the backend indeed take an absolute path this doesnt mean we
+> have to send as absolute path, not to mention it is not compatible
+> with mimetypes which is what TYPE header describes, even in case of
+> PBAP it is wrong to send absolute path in SETPATH.
 
-Unfortunately bluetooth related protocols don't provide such inode
-information. This patch series introduces /proc/net files for the protocols.
+Patch 1/2 only changes the way phonebook_pull is called (with absolute
+path). It has nothing changed about the path resolution/interpretation
+that is asked from the client. Sorry for my bad explanations.
+> 
+> To avoid this problems we send relative although we do accept
+> absolute, but to avoid problems with stack interpreting absolute path
+> as not valid as OBEX spec state we always send relative paths.
 
-This patch against af_bluetooth.c provides facility to the implementation
-of protocols. This patch extends bt_sock_list and introduces two exported
-function bt_procfs_init, bt_procfs_cleanup.
+In fact irmc implementation at the moment only accepts relative paths
+and I did not change this.
+> 
+>> The patch 1/2 fixes irmc to query phonebook implementation for the well
+>> known absolute path. This was changed in pbap.c with the patch you
+>> stated, but forgot to change in irmc.c.
+>> Patch 2/2 just replaces the well-known phonebook paths which
+>> phoenbook-ebook.c and phonebook-tracker.c support with constants.
+> 
+> Im fine with converting to constants, it is more the sending of
+> absolute path that Im not comfortable because of the potential
+> interoperability problems it could cause.
 
-The type bt_sock_list is already used in some of implementation of
-protocols. bt_procfs_init prepare seq_operations which converts
-protocol own bt_sock_list data to protocol own proc entry when the
-entry is accessed.
-
-What I, lsof user, need is just inode number of bluetooth
-socket. However, people may want more information. The bt_procfs_init
-takes a function pointer for customizing the show handler of
-seq_operations.
-
-In v4 patch, __acquires and __releases attributes are added to suppress
-sparse warning. Suggested by Andrei Emeltchenko.
-
-In v5 patch, linux/proc_fs.h is included to use PDE. Build error is
-reported by Fengguang Wu.
-
-Signed-off-by: Masatake YAMATO <yamato@redhat.com>
----
- include/net/bluetooth/bluetooth.h |   10 +++
- net/bluetooth/af_bluetooth.c      |  139 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 149 insertions(+)
-
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 565d4be..ede0369 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -27,6 +27,7 @@
- 
- #include <linux/poll.h>
- #include <net/sock.h>
-+#include <linux/seq_file.h>
- 
- #ifndef AF_BLUETOOTH
- #define AF_BLUETOOTH	31
-@@ -202,6 +203,10 @@ enum {
- struct bt_sock_list {
- 	struct hlist_head head;
- 	rwlock_t          lock;
-+#ifdef CONFIG_PROC_FS
-+        struct file_operations   fops;
-+        int (* custom_seq_show)(struct seq_file *, void *);
-+#endif
- };
- 
- int  bt_sock_register(int proto, const struct net_proto_family *ops);
-@@ -292,6 +297,11 @@ extern void hci_sock_cleanup(void);
- extern int bt_sysfs_init(void);
- extern void bt_sysfs_cleanup(void);
- 
-+extern int  bt_procfs_init(struct module* module, struct net *net, const char *name,
-+			   struct bt_sock_list* sk_list,
-+			   int (* seq_show)(struct seq_file *, void *));
-+extern void bt_procfs_cleanup(struct net *net, const char *name);
-+
- extern struct dentry *bt_debugfs;
- 
- int l2cap_init(void);
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index f7db579..1a03c81 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -28,6 +28,7 @@
- #include <asm/ioctls.h>
- 
- #include <net/bluetooth/bluetooth.h>
-+#include <linux/proc_fs.h>
- 
- #define VERSION "2.16"
- 
-@@ -532,6 +533,144 @@ int bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo)
- }
- EXPORT_SYMBOL(bt_sock_wait_state);
- 
-+#ifdef CONFIG_PROC_FS
-+struct bt_seq_state {
-+	struct bt_sock_list *l;
-+};
-+
-+static void *bt_seq_start(struct seq_file *seq, loff_t *pos)
-+	__acquires(seq->private->l->lock)
-+{
-+	struct bt_seq_state *s = seq->private;
-+	struct bt_sock_list *l = s->l;
-+
-+	read_lock(&l->lock);
-+	return seq_hlist_start_head(&l->head, *pos);
-+}
-+
-+static void *bt_seq_next(struct seq_file *seq, void *v, loff_t *pos)
-+{
-+	struct bt_seq_state *s = seq->private;
-+	struct bt_sock_list *l = s->l;
-+
-+	return seq_hlist_next(v, &l->head, pos);
-+}
-+
-+static void bt_seq_stop(struct seq_file *seq, void *v)
-+	__releases(seq->private->l->lock)
-+{
-+	struct bt_seq_state *s = seq->private;
-+	struct bt_sock_list *l = s->l;
-+
-+	read_unlock(&l->lock);
-+}
-+
-+static int bt_seq_show(struct seq_file *seq, void *v)
-+{
-+	struct sock *sk;
-+	struct bt_sock *bt;
-+	struct bt_seq_state *s = seq->private;
-+	struct bt_sock_list *l = s->l;
-+	bdaddr_t src_baswapped, dst_baswapped;
-+
-+	if (v == SEQ_START_TOKEN) {
-+		seq_puts(seq ,"sk               RefCnt Rmem   Wmem   User   Inode  Src Dst Parent");
-+
-+		if (l->custom_seq_show) {
-+			seq_putc(seq, ' ');
-+			l->custom_seq_show(seq, v);
-+		}
-+
-+		seq_putc(seq, '\n');
-+	} else {
-+		sk = sk_entry(v);
-+		bt = bt_sk(sk);
-+		baswap(&src_baswapped, &bt->src);
-+		baswap(&dst_baswapped, &bt->dst);
-+
-+		seq_printf(seq, "%pK %-6d %-6u %-6u %-6u %-6lu %pM %pM %-6lu",
-+			   sk,
-+			   atomic_read(&sk->sk_refcnt),
-+			   sk_rmem_alloc_get(sk),
-+			   sk_wmem_alloc_get(sk),
-+			   sock_i_uid(sk),
-+			   sock_i_ino(sk),
-+			   &src_baswapped,
-+			   &dst_baswapped,
-+			   bt->parent? sock_i_ino(bt->parent): 0LU);
-+
-+		if (l->custom_seq_show) {
-+			seq_putc(seq, ' ');
-+			l->custom_seq_show(seq, v);
-+		}
-+
-+		seq_putc(seq, '\n');
-+	}
-+	return 0;
-+}
-+
-+static struct seq_operations bt_seq_ops = {
-+	.start = bt_seq_start,
-+	.next  = bt_seq_next,
-+	.stop  = bt_seq_stop,
-+	.show  = bt_seq_show,
-+};
-+
-+static int bt_seq_open(struct inode *inode, struct file *file)
-+{
-+	struct bt_sock_list *sk_list;
-+	struct bt_seq_state *s;
-+
-+	sk_list = PDE(inode)->data;
-+	s = __seq_open_private(file, &bt_seq_ops,
-+			       sizeof(struct bt_seq_state));
-+	if (s == NULL)
-+		return -ENOMEM;
-+
-+	s->l = sk_list;
-+	return 0;
-+}
-+
-+int bt_procfs_init(struct module* module, struct net *net, const char *name, struct bt_sock_list* sk_list,
-+			int (* seq_show)(struct seq_file *, void *))
-+{
-+	struct proc_dir_entry * pde;
-+
-+	sk_list->custom_seq_show = seq_show;
-+
-+	sk_list->fops.owner     = module;
-+	sk_list->fops.open      = bt_seq_open;
-+	sk_list->fops.read      = seq_read;
-+	sk_list->fops.llseek    = seq_lseek;
-+	sk_list->fops.release   = seq_release_private;
-+
-+	pde = proc_net_fops_create(net, name, 0, &sk_list->fops);
-+	if (pde == NULL)
-+		return -ENOMEM;
-+
-+	pde->data = sk_list;
-+
-+	return 0;
-+}
-+
-+void bt_procfs_cleanup(struct net *net, const char *name)
-+{
-+	proc_net_remove(net, name);
-+}
-+#else
-+int bt_procfs_init(struct module* module, struct net *net, const char *name, struct bt_sock_list* sk_list,
-+			int (* seq_show)(struct seq_file *, void *))
-+{
-+	return 0;
-+}
-+
-+void bt_procfs_cleanup(struct net *net, const char *name)
-+{
-+}
-+#endif
-+EXPORT_SYMBOL(bt_procfs_init);
-+EXPORT_SYMBOL(bt_procfs_cleanup);
-+
- static struct net_proto_family bt_sock_family_ops = {
- 	.owner	= THIS_MODULE,
- 	.family	= PF_BLUETOOTH,
--- 
-1.7.10.4
+I probably used the wrong term "well known" what I meant by well known
+are the paths that phonebook-tracker and phonebook-ebook knows that it
+should fetch the contacts, etc. and these are absolute paths. It is not
+about the "well known" paths from the pbap spec
 
