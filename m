@@ -1,35 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 25 Jul 2012 04:43:24 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org, s.syam@samsung.com
-Subject: Re: [PATCH v1 2/2] Bluetooth: Free the l2cap channel list only when
- refcount is zero
-Message-ID: <20120725074324.GS20029@joana>
-References: <1342183675-27612-1-git-send-email-jaganath.k@samsung.com>
- <1342183675-27612-2-git-send-email-jaganath.k@samsung.com>
+Message-ID: <500F9DAC.8040509@hschmitt.de>
+Date: Wed, 25 Jul 2012 09:18:04 +0200
+From: Harald Schmitt <linux@hschmitt.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1342183675-27612-2-git-send-email-jaganath.k@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: Re: [PATCH 0/2] obexd: Fix bug in irmc phonebook and prevent to reintroduce
+ it
+References: <1342623188-10796-1-git-send-email-linux@hschmitt.de> <CABBYNZ+SQoX45XuQN9mEPTTSyFAiJ_a3Y_hQvH4YvcJE+5Yorg@mail.gmail.com>
+In-Reply-To: <CABBYNZ+SQoX45XuQN9mEPTTSyFAiJ_a3Y_hQvH4YvcJE+5Yorg@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Hi Luiz,
 
-* Jaganath Kanakkassery <jaganath.k@samsung.com> [2012-07-13 18:17:55 +0530]:
-
-> Move the l2cap channel list chan->global_l under the refcnt
-> protection and free it based on the refcnt.
+Am 24.07.2012 22:20, schrieb Luiz Augusto von Dentz:
+> Hi Harald,
 > 
-> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
-> Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
-> ---
->  include/net/bluetooth/l2cap.h |    1 -
->  net/bluetooth/a2mp.c          |    2 +-
->  net/bluetooth/l2cap_core.c    |    8 +++++---
->  net/bluetooth/l2cap_sock.c    |    2 +-
->  4 files changed, 7 insertions(+), 6 deletions(-)
-
-Both patches have been applied to bluetooth-next. Thanks.
-
-	Gustavo
+> On Wed, Jul 18, 2012 at 5:53 PM, Harald Schmitt <linux@hschmitt.de> wrote:
+>> This patchset fixes a bug in irmc plugin the same way as it was sent
+>> today, but with a commit message. The second patch defines macros in
+>> phonebook.h for the well known phonbook folders and names and replaces
+>> those magic values.
+>>
+>> Harald Schmitt (2):
+>>   irmc: Fix phonebook contacts query
+>>   phonebook: Replace magic strings for phonebook names and folders
+>>
+>>  plugins/irmc.c              |    4 ++--
+>>  plugins/phonebook-ebook.c   |   14 ++++++-------
+>>  plugins/phonebook-tracker.c |   48 +++++++++++++++++++++----------------------
+>>  plugins/phonebook.h         |   13 ++++++++++++
+>>  4 files changed, 46 insertions(+), 33 deletions(-)
+>>
+>> --
+>> 1.7.9.5
+> 
+> I guess you should take a look at patch
+> 4f48e26fa73217dde9916fe6e857b1de7fae33cc, not sure if is the same
+> issue though since this here it is used as type, but perhaps it is
+> worth making it similar so either pbap and sync does accept the path
+> in both absolute or relative format.
+> 
+> 
+This one is related to that. But I think your proposal should be a
+separate patch since it is about the incomming paths from an irmc
+client. This one is more about to what irmc converts the incomming paths
+to query phonebook-ebook and phonebook-tracker for contacts and call lists.
+At the  moment these well known paths in phonebook-*.c are designed to
+match 1:1 with pbap spec and they are very similar to irmc, but there
+could be a third implementation to query phonebook where this could be
+different.
+The patch 1/2 fixes irmc to query phonebook implementation for the well
+known absolute path. This was changed in pbap.c with the patch you
+stated, but forgot to change in irmc.c.
+Patch 2/2 just replaces the well-known phonebook paths which
+phoenbook-ebook.c and phonebook-tracker.c support with constants.
