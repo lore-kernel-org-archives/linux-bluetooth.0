@@ -1,25 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 25 Jul 2012 12:16:24 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv2 04/20] Bluetooth: AMP: Use HCI callback for Read AMP Info
+Message-ID: <20120725091622.GB2056@aemeltch-MOBL1>
+References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1343136121-22476-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20120724204605.GC20029@joana>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: RE: 2nd CFP -- Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit 2012 (Barcelona!)
-Date: Wed, 25 Jul 2012 13:20:29 +0400
-Message-ID: <3204CF3FCA639648945C6C8E1EBB2A5D436DC0@RUMOWD10119MSX.ww600.siemens.net>
-References: <20120322192406.GB2432@tuxdriver.com> <1332698585.1870.88.camel@aeonflux> <20120326145433.GE13806@tuxdriver.com> <1332774906.1870.98.camel@aeonflux> <20120326152541.GH13806@tuxdriver.com> <20120427174439.GC16207@tuxdriver.com> <20120723192057.GE18589@tuxdriver.com>
-From: "Smirnov, Alexander" <alexander.smirnov@siemens.com>
-To: "John W. Linville" <linville@tuxdriver.com>,
-        "Marcel Holtmann" <marcel@holtmann.org>
-Cc: <linux-wireless@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        "Sobolev, Sergey" <Sergey.Sobolev@siemens.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120724204605.GC20029@joana>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear colleagues,
+Hi Gustavo,
 
-could you please exclude Sergey Sobolev from this thread, I just wanted =
-to inform him about this event, but not to participate in these =
-discussions. That was my fault.
+On Tue, Jul 24, 2012 at 05:46:05PM -0300, Gustavo Padovan wrote:
+> > +process_cb:
+> > +	hci_process_cb(hdev, HCI_OP_READ_LOCAL_AMP_INFO, rp->status);
+> 
+> So do we really need an workqueue for the callback here?
 
-Sergey, sorry for that.
+Let's first decide are we going to use callbacks and then I will think can
+I remove workqueues. When I have created them it solved some locking
+issues with lockdep...
 
-With best regards,
-Alexander
+Best regards 
+Andrei Emeltchenko 
