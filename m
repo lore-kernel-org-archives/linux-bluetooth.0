@@ -3,9 +3,9 @@ From: Mat Martineau <mathewm@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
 	Andrei.Emeltchenko.news@gmail.com
 Cc: pkrystad@codeaurora.org
-Subject: [RFCv0 14/21] Bluetooth: Handle physical link completion
-Date: Wed, 25 Jul 2012 16:51:06 -0700
-Message-Id: <1343260274-11953-15-git-send-email-mathewm@codeaurora.org>
+Subject: [RFCv0 19/21] Bluetooth: Tie AMP link setup to connect/disconnect
+Date: Wed, 25 Jul 2012 16:51:11 -0700
+Message-Id: <1343260274-11953-20-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1343260274-11953-1-git-send-email-mathewm@codeaurora.org>
 References: <1343260274-11953-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,181 +13,154 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c | 147 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 147 insertions(+)
+ net/bluetooth/l2cap_core.c | 83 ++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 77 insertions(+), 6 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index d981d87..7e253ce 100644
+index e4df53d..d69b4b3 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -975,6 +975,19 @@ static void l2cap_send_conn_req(struct l2cap_chan *chan)
- 	l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_REQ, sizeof(req), &req);
- }
+@@ -56,7 +56,10 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
+ 				   struct l2cap_chan *chan, int err);
  
-+static void l2cap_send_create_chan_req(struct l2cap_chan *chan, u8 chan_id)
-+{
-+	struct l2cap_create_chan_req req;
-+	req.scid = cpu_to_le16(chan->scid);
-+	req.psm  = chan->psm;
-+	req.amp_id = chan_id;
+ static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+-		    struct sk_buff_head *skbs, u8 event);
++		     struct sk_buff_head *skbs, u8 event);
 +
-+	chan->ident = l2cap_get_ident(chan->conn);
-+
-+	l2cap_send_cmd(chan->conn, chan->ident, L2CAP_CREATE_CHAN_REQ,
-+		       sizeof(req), &req);
-+}
-+
- static void l2cap_move_setup(struct l2cap_chan *chan)
- {
- 	struct sk_buff *skb;
-@@ -4119,6 +4132,24 @@ static int l2cap_create_channel_req(struct l2cap_conn *conn,
- 	return 0;
- }
++static void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
++			      u8 status);
  
-+static void l2cap_send_move_chan_req(struct l2cap_chan *chan, u8 dest_amp_id)
-+{
-+	struct l2cap_move_chan_req req;
-+	u8 ident;
-+
-+	BT_DBG("chan %p, dest_amp_id %d", chan, dest_amp_id);
-+
-+	ident = l2cap_get_ident(chan->conn);
-+	if (chan)
-+		chan->ident = ident;
-+
-+	req.icid = cpu_to_le16(chan->scid);
-+	req.dest_amp_id = dest_amp_id;
-+
-+	l2cap_send_cmd(chan->conn, ident, L2CAP_MOVE_CHAN_REQ, sizeof(req),
-+		       &req);
-+}
-+
- static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
- 				     u16 icid, u16 result)
- {
-@@ -4284,6 +4315,122 @@ static void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
+ /* ---- L2CAP channels ---- */
+ 
+@@ -552,6 +555,13 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 			hci_conn_put(conn->hcon);
  	}
- }
  
-+void l2cap_physical_cfm(struct l2cap_chan *chan, int result, u8 local_id,
-+			u8 remote_id)
-+{
-+	BT_DBG("chan %p, result %d, local_id %d, remote_id %d", chan, result,
-+	       local_id, remote_id);
++	if (chan->hs_hchan) {
++		chan->hs_hchan = NULL;
++		chan->hs_hcon = NULL;
 +
-+	l2cap_chan_lock(chan);
-+
-+	if (chan->state == BT_DISCONN || chan->state == BT_CLOSED) {
-+		l2cap_chan_unlock(chan);
-+		return;
++		/* Placeholder - free logical link */
 +	}
 +
-+	if (chan->state != BT_CONNECTED) {
-+		if (!test_bit(CONF_CONNECT_PEND, &chan->conf_state)) {
-+			struct l2cap_conn_rsp rsp;
-+			char buf[128];
-+			rsp.scid = cpu_to_le16(chan->dcid);
-+			rsp.dcid = cpu_to_le16(chan->scid);
+ 	if (chan->ops->teardown)
+ 		chan->ops->teardown(chan, err);
+ 
+@@ -1092,8 +1102,19 @@ static void l2cap_do_start(struct l2cap_chan *chan)
+ 			return;
+ 
+ 		if (l2cap_chan_check_security(chan) &&
+-				__l2cap_no_conn_pending(chan))
+-			l2cap_send_conn_req(chan);
++		    __l2cap_no_conn_pending(chan)) {
++			if (enable_hs &&
++			    (conn->fixed_chan_mask & L2CAP_FC_A2MP) &&
++			    chan->chan_policy == BT_CHANNEL_POLICY_AMP_PREFERRED) {
++				set_bit(CONF_CONNECT_PEND, &chan->conf_state);
 +
-+			/* Incoming channel on AMP */
-+			if (result == L2CAP_CR_SUCCESS) {
-+				/* Send successful response */
-+				rsp.result = cpu_to_le16(L2CAP_CR_SUCCESS);
-+				rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
++				/* Placeholder
++				amp_create_phylink();
++				*/
 +			} else {
-+				/* Send negative response */
-+				rsp.result = cpu_to_le16(L2CAP_CR_NO_MEM);
-+				rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
-+			}
-+
-+			l2cap_send_cmd(chan->conn, chan->ident,
-+				       L2CAP_CREATE_CHAN_RSP,
-+				       sizeof(rsp), &rsp);
-+
-+			if (result == L2CAP_CR_SUCCESS) {
-+				__l2cap_state_change(chan, BT_CONFIG);
-+				set_bit(CONF_REQ_SENT, &chan->conf_state);
-+				l2cap_send_cmd(chan->conn,
-+					       l2cap_get_ident(chan->conn),
-+					       L2CAP_CONF_REQ,
-+					       l2cap_build_conf_req(chan, buf),
-+					       buf);
-+				chan->num_conf_req++;
-+			}
-+		} else {
-+			/* Outgoing channel on AMP */
-+			if (result == L2CAP_CR_SUCCESS) {
-+				chan->chan_id = local_id;
-+				l2cap_send_create_chan_req(chan, remote_id);
-+			} else {
-+				/* Revert to BR/EDR connect */
 +				l2cap_send_conn_req(chan);
 +			}
 +		}
-+	} else if (result == L2CAP_MR_SUCCESS &&
-+		   chan->move_role == L2CAP_MOVE_ROLE_INITIATOR) {
-+		l2cap_move_setup(chan);
-+		chan->move_id = local_id;
-+		chan->move_state = L2CAP_MOVE_WAIT_RSP;
+ 	} else {
+ 		struct l2cap_info_req req;
+ 		req.type = __constant_cpu_to_le16(L2CAP_IT_FEAT_MASK);
+@@ -1188,8 +1209,17 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 				continue;
+ 			}
+ 
+-			l2cap_send_conn_req(chan);
++			if (enable_hs &&
++			    (conn->fixed_chan_mask & L2CAP_FC_A2MP) &&
++			    chan->chan_policy == BT_CHANNEL_POLICY_AMP_PREFERRED) {
++				set_bit(CONF_CONNECT_PEND, &chan->conf_state);
+ 
++				/* Placeholder
++				amp_create_phylink();
++				*/
++			} else {
++				l2cap_send_conn_req(chan);
++			}
+ 		} else if (chan->state == BT_CONNECT2) {
+ 			struct l2cap_conn_rsp rsp;
+ 			char buf[128];
+@@ -1217,8 +1247,18 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 				rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHEN_PEND);
+ 			}
+ 
++			if (rsp.result == __constant_cpu_to_le16(L2CAP_CR_SUCCESS) &&
++			    chan->chan_id) {
++				/* Placeholder - uncomment when amp functions
++				 * are available
++				amp_accept_physical(chan, chan->chan_id);
++				 */
++				l2cap_chan_unlock(chan);
++				continue;
++			}
 +
-+		l2cap_send_move_chan_req(chan, remote_id);
-+		__set_chan_timer(chan, L2CAP_MOVE_TIMEOUT);
-+	} else if (result == L2CAP_MR_SUCCESS &&
-+		   chan->move_role == L2CAP_MOVE_ROLE_RESPONDER) {
-+		struct hci_chan *hchan = NULL;
+ 			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP,
+-							sizeof(rsp), &rsp);
++				       sizeof(rsp), &rsp);
+ 
+ 			if (test_bit(CONF_REQ_SENT, &chan->conf_state) ||
+ 					rsp.result != L2CAP_CR_SUCCESS) {
+@@ -3301,6 +3341,18 @@ done:
+ 			rfc.mode = chan->mode;
+ 		}
+ 
++		if (test_bit(CONF_LOC_CONF_PEND, &chan->conf_state) &&
++		    chan->chan_id) {
++			struct hci_chan *hchan = NULL;
 +
-+		/* Placeholder - get hci_chan for logical link */
++			/* Placeholder - get hci_chan for logical link */
 +
-+		if (hchan) {
-+			if (hchan->state == BT_CONNECTED) {
-+				/* Logical link is ready to go */
-+				chan->hs_hcon = hchan->conn;
-+				chan->hs_hcon->l2cap_data = chan->conn;
-+				chan->move_state = L2CAP_MOVE_WAIT_CONFIRM;
-+				l2cap_send_move_chan_rsp(chan->conn,
-+							 chan->move_cmd_ident,
-+							 chan->dcid,
-+							 L2CAP_MR_SUCCESS);
-+
++			if (hchan && hchan->state == BT_CONNECTED) {
 +				l2cap_logical_cfm(chan, hchan,
 +						  L2CAP_MR_SUCCESS);
-+			} else {
-+				/* Wait for logical link to be ready */
-+				chan->move_state = L2CAP_MOVE_WAIT_LOGICAL_CFM;
 +			}
-+		} else {
-+			/* Logical link not available */
-+			l2cap_send_move_chan_rsp(chan->conn,
-+						 chan->move_cmd_ident,
-+						 chan->dcid,
-+						 L2CAP_MR_NOT_ALLOWED);
-+		}
-+	} else {
-+		if (chan->move_role == L2CAP_MOVE_ROLE_RESPONDER) {
-+			u8 rsp_result;
-+			if (result == -EINVAL)
-+				rsp_result = L2CAP_MR_BAD_ID;
-+			else
-+				rsp_result = L2CAP_MR_NOT_ALLOWED;
-+
-+			l2cap_send_move_chan_rsp(chan->conn,
-+						 chan->move_cmd_ident,
-+						 chan->dcid, rsp_result);
 +		}
 +
-+		chan->move_role = L2CAP_MOVE_ROLE_NONE;
-+		chan->move_state = L2CAP_MOVE_STABLE;
+ 		if (result == L2CAP_CONF_SUCCESS)
+ 			set_bit(CONF_OUTPUT_DONE, &chan->conf_state);
+ 	}
+@@ -6262,7 +6314,18 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 
+ 		if (chan->state == BT_CONNECT) {
+ 			if (!status) {
+-				l2cap_send_conn_req(chan);
++				if (enable_hs &&
++				    (conn->fixed_chan_mask & L2CAP_FC_A2MP) &&
++				    chan->chan_policy == BT_CHANNEL_POLICY_AMP_PREFERRED) {
++					set_bit(CONF_CONNECT_PEND,
++						&chan->conf_state);
 +
-+		/* Restart data transmission */
-+		l2cap_ertm_send(chan);
-+	}
++					/* Placeholder
++					amp_create_phylink();
++					*/
++				} else {
++					l2cap_send_conn_req(chan);
++				}
+ 			} else {
+ 				__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
+ 			}
+@@ -6282,6 +6345,14 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 					if (parent)
+ 						parent->sk_data_ready(parent, 0);
+ 				} else {
++					if (chan->chan_id) {
++						/* Placeholder - accept physical
++						 * link
++						amp_accept_physical(chan, chan->chan_id);
++						*/
++						continue;
++					}
 +
-+	l2cap_chan_unlock(chan);
-+}
-+
- static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
- 					 struct l2cap_cmd_hdr *cmd,
- 					 u16 cmd_len, void *data)
+ 					__l2cap_state_change(chan, BT_CONFIG);
+ 					res = L2CAP_CR_SUCCESS;
+ 					stat = L2CAP_CS_NO_INFO;
 -- 
 1.7.11.2
 
