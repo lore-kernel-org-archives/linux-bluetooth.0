@@ -1,55 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Chen Ganir <chen.ganir@ti.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH v2 0/9] Add GATT Client Battery Service
-Date: Wed, 25 Jul 2012 08:42:18 +0300
-Message-ID: <1343194947-13659-1-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Date: Tue, 24 Jul 2012 22:57:28 -0400
+Message-ID: <CANM+e8yPJhe1anFTsTQYqmQf2k8BfRTgKrhsNkaWrRVdG=ybkA@mail.gmail.com>
+Subject: sdp.h correction and update
+From: Zoltan Csik <zicsik@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add suupport for LE GATT Client Battery Service.
+bluez-4.99\lib\sdp.h
+Line 98: #define VIDEO_CONF_SVCLASS_ID          0x110f
 
-This plugin adds battery list to the btd_device, exposes DBUS API to list the
-device batteries, and allows querying for battery information. In addition this
-patch allows getting notifications for battery level changes.
+doesn't match with the latest SIG assigned numbers list:
+"A/V_RemoteControlController    0x110F  Audio/Video Remote Control Profile
+(AVRCP) Service Class           NOTE: The AVRCP specification v1.3 and later
+require that 0x110E also be included in the ServiceClassIDList before
+0x110F for backwards compatibility.     "
 
-Look at doc/device-api.txt and doc/battery-api.txt for more information.
+Also according to above referenced list there are some service
+class_ID definitions missing from sdp.h:
+Headset - HS                 0x1131 Headset Profile (HSP)
+Message Access Server        0x1132 Message Access Profile (MAP)
+Message Notification Server  0x1133 Message Access Profile (MAP)
+Message Access Profile       0x1134 Message Access Profile (MAP)
+GNSS                         0x1135 Global Navigation Satellite System
+Profile (GNSS)
+GNSS_Server                  0x1136 Global Navigation Satellite System
+Profile (GNSS)
 
-This is version 2 of this patch set, rebased on top of the latest sources and 
-fixes some issues found during testing and in the ML comments.
-
-Chen Ganir (9):
-  Battery: Add Battery Service GATT Client
-  Battery: Add connection logic
-  Battery: Discover Characteristic Descriptors
-  Battery: Get Battery ID
-  Battery: Add Battery list to btd_device
-  Battery: Add Battery D-BUS API
-  Battery: Read Battery level characteristic
-  Battery: Add support for notifications
-  Battery: Emit property changed on first read
-
- Makefile.am                          |   10 +-
- doc/battery-api.txt                  |   38 +++
- doc/device-api.txt                   |    5 +
- profiles/batterystate/batterystate.c |  518 ++++++++++++++++++++++++++++++++++
- profiles/batterystate/batterystate.h |   24 ++
- profiles/batterystate/main.c         |   67 +++++
- profiles/batterystate/manager.c      |   93 ++++++
- profiles/batterystate/manager.h      |   24 ++
- src/device.c                         |   66 +++++
- src/device.h                         |    3 +
- 10 files changed, 846 insertions(+), 2 deletions(-)
- create mode 100644 doc/battery-api.txt
- create mode 100644 profiles/batterystate/batterystate.c
- create mode 100644 profiles/batterystate/batterystate.h
- create mode 100644 profiles/batterystate/main.c
- create mode 100644 profiles/batterystate/manager.c
- create mode 100644 profiles/batterystate/manager.h
-
--- 
-1.7.9.5
-
+Thank you,
+Zoltan
