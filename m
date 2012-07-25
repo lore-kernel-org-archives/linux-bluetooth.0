@@ -3,90 +3,113 @@ From: Mat Martineau <mathewm@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
 	Andrei.Emeltchenko.news@gmail.com
 Cc: pkrystad@codeaurora.org
-Subject: [RFCv0 17/21] Bluetooth: Configure appropriate timeouts for AMP controllers
-Date: Wed, 25 Jul 2012 16:51:09 -0700
-Message-Id: <1343260274-11953-18-git-send-email-mathewm@codeaurora.org>
+Subject: [RFCv0 01/21] Bluetooth: Add new l2cap_chan struct members for high speed channels
+Date: Wed, 25 Jul 2012 16:50:53 -0700
+Message-Id: <1343260274-11953-2-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1343260274-11953-1-git-send-email-mathewm@codeaurora.org>
 References: <1343260274-11953-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+An L2CAP channel using high speed continues to be associated with a
+BR/EDR l2cap_conn, while also tracking an additional hci_conn
+(representing a physical link on a high speed controller) and hci_chan
+(representing a logical link).  There may only be one physical link
+between two high speed controllers.  Each physical link may contain
+several logical links, with each logical link representing a channel
+with specific quality of service.
+
+During a channel move, the destination channel id, current move state,
+and role (initiator vs. responder) are tracked and used by the channel
+move state machine.  The ident value associated with a move request
+must also be stored in order to use it in later move responses.
+
+The active channel is stored in chan_id.
+
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c | 47 ++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 41 insertions(+), 6 deletions(-)
+ include/net/bluetooth/l2cap.h | 30 ++++++++++++++++++++++++++++++
+ net/bluetooth/l2cap_core.c    |  6 ++++++
+ 2 files changed, 36 insertions(+)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index d206296..c585def 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -433,6 +433,8 @@ struct l2cap_chan {
+ 	struct sock *sk;
+ 
+ 	struct l2cap_conn	*conn;
++	struct hci_conn		*hs_hcon;
++	struct hci_chan		*hs_hchan;
+ 
+ 	__u8		state;
+ 
+@@ -477,6 +479,12 @@ struct l2cap_chan {
+ 	unsigned long	conn_state;
+ 	unsigned long	flags;
+ 
++	__u8		chan_id;
++	__u8		move_id;
++	__u8		move_state;
++	__u8		move_role;
++	__u8		move_cmd_ident;
++
+ 	__u16		next_tx_seq;
+ 	__u16		expected_ack_seq;
+ 	__u16		expected_tx_seq;
+@@ -641,6 +649,9 @@ enum {
+ enum {
+ 	L2CAP_RX_STATE_RECV,
+ 	L2CAP_RX_STATE_SREJ_SENT,
++	L2CAP_RX_STATE_MOVE,
++	L2CAP_RX_STATE_WAIT_P,
++	L2CAP_RX_STATE_WAIT_F,
+ };
+ 
+ enum {
+@@ -671,6 +682,25 @@ enum {
+ 	L2CAP_EV_RECV_FRAME,
+ };
+ 
++enum {
++	L2CAP_MOVE_ROLE_NONE,
++	L2CAP_MOVE_ROLE_INITIATOR,
++	L2CAP_MOVE_ROLE_RESPONDER,
++};
++
++enum {
++	L2CAP_MOVE_STABLE,
++	L2CAP_MOVE_WAIT_REQ,
++	L2CAP_MOVE_WAIT_RSP,
++	L2CAP_MOVE_WAIT_RSP_SUCCESS,
++	L2CAP_MOVE_WAIT_CONFIRM,
++	L2CAP_MOVE_WAIT_CONFIRM_RSP,
++	L2CAP_MOVE_WAIT_LOGICAL_COMP,
++	L2CAP_MOVE_WAIT_LOGICAL_CFM,
++	L2CAP_MOVE_WAIT_LOCAL_BUSY,
++	L2CAP_MOVE_WAIT_PREPARE,
++};
++
+ void l2cap_chan_hold(struct l2cap_chan *c);
+ void l2cap_chan_put(struct l2cap_chan *c);
+ 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 17b5bee..f430744 100644
+index 9f8b29e..fd9a349 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -2917,6 +2917,44 @@ static inline bool __l2cap_efs_supported(struct l2cap_chan *chan)
- 	return enable_hs && chan->conn->feat_mask & L2CAP_FEAT_EXT_FLOW;
- }
+@@ -2746,6 +2746,12 @@ int l2cap_ertm_init(struct l2cap_chan *chan)
  
-+static void __l2cap_set_ertm_timeouts(struct l2cap_chan *chan,
-+				      struct l2cap_conf_rfc *rfc)
-+{
-+	if (chan->chan_id && chan->hs_hcon) {
-+		u64 ertm_to = chan->hs_hcon->hdev->amp_be_flush_to;
-+
-+		/* Class 1 devices have must have ERTM timeouts
-+		 * exceeding the Link Supervision Timeout.  The
-+		 * default Link Supervision Timeout for AMP
-+		 * controllers is 10 seconds.
-+		 *
-+		 * Class 1 devices use 0xffffffff for their
-+		 * best-effort flush timeout, so the clamping logic
-+		 * will result in a timeout that meets the above
-+		 * requirement.  ERTM timeouts are 16-bit values, so
-+		 * the maximum timeout is 65.535 seconds.
-+		 */
-+
-+		/* Convert timeout to milliseconds and round */
-+		ertm_to = div_u64(ertm_to + 999, 1000);
-+
-+		/* This is the recommended formula for class 2 devices
-+		 * that start ERTM timers when packets are sent to the
-+		 * controller.
-+		 */
-+		ertm_to = 3 * ertm_to + 500;
-+
-+		if (ertm_to > 0xffff)
-+			ertm_to = 0xffff;
-+
-+		rfc->retrans_timeout = cpu_to_le16((u16) ertm_to);
-+		rfc->monitor_timeout = rfc->retrans_timeout;
-+	} else {
-+		rfc->retrans_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
-+		rfc->monitor_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
-+	}
-+}
-+
- static inline void l2cap_txwin_setup(struct l2cap_chan *chan)
- {
- 	if (chan->tx_win > L2CAP_DEFAULT_TX_WINDOW &&
-@@ -2983,8 +3021,8 @@ done:
- 	case L2CAP_MODE_ERTM:
- 		rfc.mode            = L2CAP_MODE_ERTM;
- 		rfc.max_transmit    = chan->max_tx;
--		rfc.retrans_timeout = 0;
--		rfc.monitor_timeout = 0;
-+
-+		__l2cap_set_ertm_timeouts(chan, &rfc);
+ 	skb_queue_head_init(&chan->tx_q);
  
- 		size = min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->conn->mtu -
- 						L2CAP_EXT_HDR_SIZE -
-@@ -3216,10 +3254,7 @@ done:
- 			rfc.max_pdu_size = cpu_to_le16(size);
- 			chan->remote_mps = size;
- 
--			rfc.retrans_timeout =
--				__constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
--			rfc.monitor_timeout =
--				__constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
-+			__l2cap_set_ertm_timeouts(chan, &rfc);
- 
- 			set_bit(CONF_MODE_DONE, &chan->conf_state);
++	chan->chan_id = 0;
++	chan->move_id = 0;
++	chan->move_state = L2CAP_MOVE_STABLE;
++	chan->move_role = L2CAP_MOVE_ROLE_NONE;
++	chan->move_cmd_ident = 0;
++
+ 	if (chan->mode != L2CAP_MODE_ERTM)
+ 		return 0;
  
 -- 
 1.7.11.2
