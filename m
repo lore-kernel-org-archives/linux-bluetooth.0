@@ -1,96 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 26 Jul 2012 01:24:11 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Masatake YAMATO <yamato@redhat.com>
+Cc: andrei.emeltchenko.news@gmail.com, linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v5 8/8] Added /proc/net/sco via bt_procfs_init()
+Message-ID: <20120726042411.GA3226@joana>
+References: <20120716.222018.2029110835026223294.yamato@redhat.com>
+ <20120725001214.GP20029@joana>
+ <20120725003507.GR20029@joana>
+ <20120726.013012.2228722667223437938.yamato@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1343145150-6427-3-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1343145150-6427-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1343145150-6427-3-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Thu, 26 Jul 2012 10:37:32 +0300
-Message-ID: <CABBYNZ+nnCkUNqyXygEp_oHJw2k5dYL=HV_HAueTZ+4agSO86w@mail.gmail.com>
-Subject: Re: [RFC v1 2/4] media: Add boolean playing field to transport
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120726.013012.2228722667223437938.yamato@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Masatake,
 
-On Tue, Jul 24, 2012 at 6:52 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> This flag represents whether the transport is actually streaming, which
-> is mapped trivially after the state changes in gateway, headset and A2DP
-> sink or sources.
+* Masatake YAMATO <yamato@redhat.com> [2012-07-26 01:30:12 +0900]:
+
+> Added /proc/net/sco via bt_procfs_init().
+> 
+> Signed-off-by: Masatake YAMATO <yamato@redhat.com>
 > ---
->  audio/media.c     |   26 ++++++++++++++++++++++++--
->  audio/transport.c |    7 +++++++
->  audio/transport.h |    2 ++
->  3 files changed, 33 insertions(+), 2 deletions(-)
->
-> diff --git a/audio/media.c b/audio/media.c
-> index 1a54f4a..d12445f 100644
-> --- a/audio/media.c
-> +++ b/audio/media.c
-> @@ -494,21 +494,26 @@ static void headset_state_changed(struct audio_device *dev,
->         switch (new_state) {
->         case HEADSET_STATE_DISCONNECTED:
->                 transport = find_device_transport(endpoint, dev);
-> -
->                 if (transport != NULL) {
->                         DBG("Clear endpoint %p", endpoint);
-> +                       media_transport_set_playing(transport, FALSE);
->                         clear_configuration(endpoint, transport);
->                 }
->                 break;
->         case HEADSET_STATE_CONNECTING:
->                 set_configuration(endpoint, dev, NULL, 0, headset_setconf_cb,
->                                                                 dev, NULL);
-> +               transport = find_device_transport(endpoint, dev);
-> +               media_transport_set_playing(transport, FALSE);
->                 break;
->         case HEADSET_STATE_CONNECTED:
-> -               break;
->         case HEADSET_STATE_PLAY_IN_PROGRESS:
-> +               transport = find_device_transport(endpoint, dev);
-> +               media_transport_set_playing(transport, FALSE);
->                 break;
->         case HEADSET_STATE_PLAYING:
-> +               transport = find_device_transport(endpoint, dev);
-> +               media_transport_set_playing(transport, TRUE);
->                 break;
->         }
->  }
+>  net/bluetooth/sco.c |    9 +++++++++
+>  1 file changed, 9 insertions(+)
 
-Looks like we can move transport = find_device_transport(endpoint,
-dev); above so we don't have do it  in each case.
+All 8 patches have been applied to bluetooth-next. Thanks.
 
-> @@ -660,16 +665,23 @@ static void gateway_state_changed(struct audio_device *dev,
->                 transport = find_device_transport(endpoint, dev);
->                 if (transport != NULL) {
->                         DBG("Clear endpoint %p", endpoint);
-> +                       media_transport_set_playing(transport, FALSE);
->                         clear_configuration(endpoint, transport);
->                 }
->                 break;
->         case GATEWAY_STATE_CONNECTING:
->                 set_configuration(endpoint, dev, NULL, 0,
->                                         gateway_setconf_cb, dev, NULL);
-> +               transport = find_device_transport(endpoint, dev);
-> +               media_transport_set_playing(transport, FALSE);
->                 break;
->         case GATEWAY_STATE_CONNECTED:
-> +               transport = find_device_transport(endpoint, dev);
-> +               media_transport_set_playing(transport, FALSE);
->                 break;
->         case GATEWAY_STATE_PLAYING:
-> +               transport = find_device_transport(endpoint, dev);
-> +               media_transport_set_playing(transport, TRUE);
->                 break;
->         }
->  }
-
-Same here.
-
--- 
-Luiz Augusto von Dentz
+	Gustavo
