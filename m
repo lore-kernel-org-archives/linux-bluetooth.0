@@ -1,36 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 26 Jul 2012 13:54:04 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: victor yeo <victoryeo1974@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: After pairing, get "Link Key Request Negative Reply"
-Message-ID: <20120726115404.GA24623@x220.ice.intel.com>
-References: <CADX0rsbmzFwwPu4VteS+0m7oqow4-rY0P1O33GgaFrQZc4YTAg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CADX0rsbmzFwwPu4VteS+0m7oqow4-rY0P1O33GgaFrQZc4YTAg@mail.gmail.com>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [RFC v2 4/4] media: Remove transport in_use flag
+Date: Thu, 26 Jul 2012 12:13:29 +0200
+Message-Id: <1343297609-30225-5-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1343297609-30225-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1343297609-30225-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Victor,
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-On Thu, Jul 26, 2012, victor yeo wrote:
-> I have a device with address 00:09:1F:80:12:21, i can pair the device
-> to Bluez, the linkkeys file contains:
-> 
-> # cat /var/lib/bluetooth/00\:07\:80\:56\:F8\:70/linkkeys
-> 00:09:1F:80:12:21    41F80F349B12603669616D178B0F5974 4 0
-> 
-> from hcidump, the "Link Key Request Negative Reply" is received, then
-> "Unauthenticated Combination Key" is received, then  "Connection
-> refused - security block" is received.
-> 
-> Is this a Bluez or device problem?
+With the introduction of the playing flag, the previously existing
+in_use flag is somehow redundant. The playing flag along with the lock
+states implicitly represent the same information.
+---
+ audio/transport.c |   28 +++++++++-------------------
+ 1 files changed, 9 insertions(+), 19 deletions(-)
 
-It looks like a BlueZ (kernel) problem.
+diff --git a/audio/transport.c b/audio/transport.c
+index ffc637c..bef04e5 100644
+--- a/audio/transport.c
++++ b/audio/transport.c
+@@ -87,7 +87,6 @@ struct media_transport {
+ 	gboolean		read_lock;
+ 	gboolean		write_lock;
+ 	gboolean		playing;
+-	gboolean		in_use;
+ 	guint			(*resume) (struct media_transport *transport,
+ 					struct media_owner *owner);
+ 	guint			(*suspend) (struct media_transport *transport,
+@@ -215,7 +214,7 @@ static void media_transport_remove(struct media_transport *transport,
+ 	media_owner_free(owner);
+ 
+ 	/* Suspend if there is no longer any owner */
+-	if (transport->owners == NULL && transport->in_use)
++	if (transport->owners == NULL && transport->playing)
+ 		transport->suspend(transport, NULL);
+ }
+ 
+@@ -297,11 +296,10 @@ static guint resume_a2dp(struct media_transport *transport,
+ 			return 0;
+ 	}
+ 
+-	if (transport->in_use == TRUE)
++	if (transport->playing == TRUE)
+ 		goto done;
+ 
+-	transport->in_use = a2dp_sep_lock(sep, a2dp->session);
+-	if (transport->in_use == FALSE)
++	if (a2dp_sep_lock(sep, a2dp->session) == FALSE)
+ 		return 0;
+ 
+ done:
+@@ -324,7 +322,6 @@ static void a2dp_suspend_complete(struct avdtp *session,
+ 	}
+ 
+ 	a2dp_sep_unlock(sep, a2dp->session);
+-	transport->in_use = FALSE;
+ 	media_transport_remove(transport, owner);
+ }
+ 
+@@ -337,7 +334,6 @@ static guint suspend_a2dp(struct media_transport *transport,
+ 
+ 	if (!owner) {
+ 		a2dp_sep_unlock(sep, a2dp->session);
+-		transport->in_use = FALSE;
+ 		return 0;
+ 	}
+ 
+@@ -399,12 +395,11 @@ static guint resume_headset(struct media_transport *transport,
+ {
+ 	struct audio_device *device = transport->device;
+ 
+-	if (transport->in_use == TRUE)
++	if (transport->playing == TRUE)
+ 		goto done;
+ 
+-	transport->in_use = headset_lock(device, HEADSET_LOCK_READ |
+-						HEADSET_LOCK_WRITE);
+-	if (transport->in_use == FALSE)
++	if (headset_lock(device, HEADSET_LOCK_READ |
++						HEADSET_LOCK_WRITE) == FALSE)
+ 		return 0;
+ 
+ done:
+@@ -425,7 +420,6 @@ static void headset_suspend_complete(struct audio_device *dev, void *user_data)
+ 	}
+ 
+ 	headset_unlock(dev, HEADSET_LOCK_READ | HEADSET_LOCK_WRITE);
+-	transport->in_use = FALSE;
+ 	media_transport_remove(transport, owner);
+ }
+ 
+@@ -436,7 +430,6 @@ static guint suspend_headset(struct media_transport *transport,
+ 
+ 	if (!owner) {
+ 		headset_unlock(device, HEADSET_LOCK_READ | HEADSET_LOCK_WRITE);
+-		transport->in_use = FALSE;
+ 		return 0;
+ 	}
+ 
+@@ -504,12 +497,11 @@ static guint resume_gateway(struct media_transport *transport,
+ {
+ 	struct audio_device *device = transport->device;
+ 
+-	if (transport->in_use == TRUE)
++	if (transport->playing == TRUE)
+ 		goto done;
+ 
+-	transport->in_use = gateway_lock(device, GATEWAY_LOCK_READ |
+-						GATEWAY_LOCK_WRITE);
+-	if (transport->in_use == FALSE)
++	if (gateway_lock(device, GATEWAY_LOCK_READ |
++						GATEWAY_LOCK_WRITE) == FALSE)
+ 		return 0;
+ 
+ done:
+@@ -531,7 +523,6 @@ static gboolean gateway_suspend_complete(gpointer user_data)
+ 	}
+ 
+ 	gateway_unlock(device, GATEWAY_LOCK_READ | GATEWAY_LOCK_WRITE);
+-	transport->in_use = FALSE;
+ 	media_transport_remove(transport, owner);
+ 	return FALSE;
+ }
+@@ -544,7 +535,6 @@ static guint suspend_gateway(struct media_transport *transport,
+ 
+ 	if (!owner) {
+ 		gateway_unlock(device, GATEWAY_LOCK_READ | GATEWAY_LOCK_WRITE);
+-		transport->in_use = FALSE;
+ 		return 0;
+ 	}
+ 
+-- 
+1.7.7.6
 
-> There is a "Fix l2cap conn failures for ssp devices", is it related?
-
-Yes, I think that patch should fix the issue.
-
-Johan
