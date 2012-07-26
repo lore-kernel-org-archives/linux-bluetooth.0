@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v2 3/4] media: Extend media API with optional acquire
-Date: Thu, 26 Jul 2012 12:13:28 +0200
-Message-Id: <1343297609-30225-4-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v2 2/4] media: Add boolean playing field to transport
+Date: Thu, 26 Jul 2012 12:13:27 +0200
+Message-Id: <1343297609-30225-3-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1343297609-30225-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1343297609-30225-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,73 +12,133 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Acquiring a transport is needed in two different situations: either
-we are initiating the audio stream locally, or the remote side initiated
-it and thus we are just reacting. In the second case, we would expect
-the stream is already available, and otherwise the operation should
-fail. This means the media API needs to be extended in order to make
-this difference.
-
-This issue is specially relevant in the case of SCO, because the current
-approach is racy. With HFP, for example (say BlueZ has the HS role), the
-following race condition could be met:
-
-1. Phone has an incoming call and thus starts in-band ringing.
-2. SCO connection is accepted and stablished by BlueZ.
-3. Gateway interface state is changed to Playing.
-4. Exactly afterwards, the user routes the audio to the phone, to have
-   a private conversation. So the SCO link is closed.
-5. In parallel, PulseAudio sees the transition to Playing, and acquires
-   the transport.
-6. BlueZ receives an Acquire() request, but SCO is down. So it tries to
-   reconnect the SCO link.
-
-The last step is an undesired behavior (the audio is routed back to the
-car). BlueZ should be smart enough to know that the SCO connection
-shouldn't be reestablished, but this is only possible if the endpoint
-provides additional information in the media API.
-
-Note that the API change introduced by this patch is backward
-compatible, meaning that older versions of BlueZ will just ignore the
-flag. So clients are encouraged to use it without necessarily adding a
-dependency to newer versions of BlueZ.
+This flag represents whether the transport is actually streaming, which
+is mapped trivially after the state changes in gateway, headset and A2DP
+sink or sources.
 ---
- audio/transport.c |    3 +++
- doc/media-api.txt |    7 +++++++
- 2 files changed, 10 insertions(+), 0 deletions(-)
+ audio/media.c     |   29 ++++++++++++++++++++++++++---
+ audio/transport.c |    7 +++++++
+ audio/transport.h |    2 ++
+ 3 files changed, 35 insertions(+), 3 deletions(-)
 
+diff --git a/audio/media.c b/audio/media.c
+index 505a490..8eee149 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -494,12 +494,12 @@ static void headset_state_changed(struct audio_device *dev,
+ 	switch (new_state) {
+ 	case HEADSET_STATE_DISCONNECTED:
+ 		transport = find_device_transport(endpoint, dev);
+-
+ 		if (transport != NULL) {
+ 			DBG("Clear endpoint %p", endpoint);
++			media_transport_set_playing(transport, FALSE);
+ 			clear_configuration(endpoint, transport);
+ 		}
+-		break;
++		return;
+ 	case HEADSET_STATE_CONNECTING:
+ 		set_configuration(endpoint, dev, NULL, 0, headset_setconf_cb,
+ 								dev, NULL);
+@@ -511,6 +511,12 @@ static void headset_state_changed(struct audio_device *dev,
+ 	case HEADSET_STATE_PLAYING:
+ 		break;
+ 	}
++
++	transport = find_device_transport(endpoint, dev);
++	if (new_state == HEADSET_STATE_PLAYING)
++		media_transport_set_playing(transport, TRUE);
++	else
++		media_transport_set_playing(transport, FALSE);
+ }
+ 
+ static const char *get_name(struct a2dp_sep *sep, void *user_data)
+@@ -660,9 +666,10 @@ static void gateway_state_changed(struct audio_device *dev,
+ 		transport = find_device_transport(endpoint, dev);
+ 		if (transport != NULL) {
+ 			DBG("Clear endpoint %p", endpoint);
++			media_transport_set_playing(transport, FALSE);
+ 			clear_configuration(endpoint, transport);
+ 		}
+-		break;
++		return;
+ 	case GATEWAY_STATE_CONNECTING:
+ 		set_configuration(endpoint, dev, NULL, 0,
+ 					gateway_setconf_cb, dev, NULL);
+@@ -672,6 +679,12 @@ static void gateway_state_changed(struct audio_device *dev,
+ 	case GATEWAY_STATE_PLAYING:
+ 		break;
+ 	}
++
++	transport = find_device_transport(endpoint, dev);
++	if (new_state == GATEWAY_STATE_PLAYING)
++		media_transport_set_playing(transport, TRUE);
++	else
++		media_transport_set_playing(transport, FALSE);
+ }
+ 
+ static void a2dp_source_state_changed(struct audio_device *dev,
+@@ -687,6 +700,11 @@ static void a2dp_source_state_changed(struct audio_device *dev,
+ 	transport = find_device_transport(endpoint, dev);
+ 	if (transport == NULL)
+ 		return;
++
++	if (new_state == SOURCE_STATE_PLAYING)
++		media_transport_set_playing(transport, TRUE);
++	else
++		media_transport_set_playing(transport, FALSE);
+ }
+ 
+ static gboolean endpoint_init_a2dp_source(struct media_endpoint *endpoint,
+@@ -719,6 +737,11 @@ static void a2dp_sink_state_changed(struct audio_device *dev,
+ 	transport = find_device_transport(endpoint, dev);
+ 	if (transport == NULL)
+ 		return;
++
++	if (new_state == SINK_STATE_PLAYING)
++		media_transport_set_playing(transport, TRUE);
++	else
++		media_transport_set_playing(transport, FALSE);
+ }
+ 
+ static gboolean endpoint_init_a2dp_sink(struct media_endpoint *endpoint,
 diff --git a/audio/transport.c b/audio/transport.c
-index f988d48..ffc637c 100644
+index 832ad2a..f988d48 100644
 --- a/audio/transport.c
 +++ b/audio/transport.c
-@@ -679,6 +679,9 @@ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
- 	if (media_transport_acquire(transport, accesstype) == FALSE)
- 		return btd_error_not_authorized(msg);
+@@ -86,6 +86,7 @@ struct media_transport {
+ 	uint16_t		omtu;		/* Transport output mtu */
+ 	gboolean		read_lock;
+ 	gboolean		write_lock;
++	gboolean		playing;
+ 	gboolean		in_use;
+ 	guint			(*resume) (struct media_transport *transport,
+ 					struct media_owner *owner);
+@@ -898,6 +899,12 @@ static void get_properties_gateway(struct media_transport *transport,
+ 	/* None */
+ }
  
-+	if (!transport->playing && g_strstr_len(accesstype, -1, "?") != NULL)
-+		return btd_error_failed(msg, "Transport not playing");
++void media_transport_set_playing(struct media_transport *transport,
++							gboolean playing)
++{
++	transport->playing = playing;
++}
 +
- 	owner = media_owner_create(conn, msg, accesstype);
- 	id = transport->resume(transport, owner);
- 	if (id == 0) {
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index e5eeaa0..4853196 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -282,6 +282,13 @@ Methods		dict GetProperties()
- 
- 				"rw": Read and write access
- 
-+			The accesstype string can also be combined with a "?"
-+			suffix, which will make the request optional. This
-+			typically means the transport will only be acquired if
-+			it is already available (remote-initiated), but
-+			otherwise no request will be sent to the remote side.
-+			In this last case the function will fail.
-+
- 		void Release(string accesstype)
- 
- 			Releases file descriptor.
+ void transport_get_properties(struct media_transport *transport,
+ 							DBusMessageIter *iter)
+ {
+diff --git a/audio/transport.h b/audio/transport.h
+index d20c327..78323b2 100644
+--- a/audio/transport.h
++++ b/audio/transport.h
+@@ -37,5 +37,7 @@ void media_transport_update_delay(struct media_transport *transport,
+ 							uint16_t delay);
+ void media_transport_update_volume(struct media_transport *transport,
+ 								uint8_t volume);
++void media_transport_set_playing(struct media_transport *transport,
++							gboolean playing);
+ void transport_get_properties(struct media_transport *transport,
+ 							DBusMessageIter *iter);
 -- 
 1.7.7.6
 
