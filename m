@@ -1,201 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, XiaX" <xiax.li@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Bluez/Obexd upstream test result_20120626 (bluez-4.101.135 +
- obexd-0.46.117)
-Date: Thu, 26 Jul 2012 09:40:53 +0000
-Message-ID: <59D61FAED4CD054490460E73F56D5775096D20@SHSMSX101.ccr.corp.intel.com>
-Content-Type: multipart/mixed;
-	boundary="_002_59D61FAED4CD054490460E73F56D5775096D20SHSMSX101ccrcorpi_"
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Re: [RFC] dbusoob: Update API
+Date: Thu, 26 Jul 2012 11:24:18 +0200
+Message-ID: <1842864.hGRL10RuKd@uw000953>
+In-Reply-To: <20120725182201.GA4165@echo>
+References: <1343226308-443-1-git-send-email-szymon.janc@tieto.com> <1343226308-443-2-git-send-email-szymon.janc@tieto.com> <20120725182201.GA4165@echo>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---_002_59D61FAED4CD054490460E73F56D5775096D20SHSMSX101ccrcorpi_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+On Wednesday 25 of July 2012 21:22:01 Vinicius Costa Gomes wrote:
+> Hi Szymon,
 
-Hi all,
+Hi Vinicius,
 
-QA finished upstream testing. The test is for bluez-4.101.135 and obexd-0.4=
-6.117. Against last, BlueZ is changed from 4.101.69 to 4.101.135, Obexd is =
-changed from 0.46.107 to 0.46.117. Some dbus interface has been changed. We=
- found bug 25473: HFP: latest bluez cannot support pulseaudio to create blu=
-ez_sink and bluez_source also exist.
+> 
+> On 16:25 Wed 25 Jul, Szymon Janc wrote:
+> > ---
+> >  doc/oob-api.txt |   57 +++++++++++++++++++++++++++++++++++++++++++++++++------
+> >  1 file changed, 51 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/doc/oob-api.txt b/doc/oob-api.txt
+> > index d838712..8b7b633 100644
+> > --- a/doc/oob-api.txt
+> > +++ b/doc/oob-api.txt
+> > @@ -7,26 +7,71 @@ Service		org.bluez
+> >  Interface	org.bluez.OutOfBand
+> >  Object path	[variable prefix]/{hci0,hci1,...}
+> >  
+> > -Methods		array{byte} hash, array{byte} randomizer ReadLocalData()
+> > +Methods		dict ReadLocalData()
+> >  
+> >  			This method reads local OOB data from adapter. Return
+> > -			value is pair of arrays 16 bytes each.
+> > +			value is a dictionary with following keys:
+> >  
+> > -			Note: This method will generate and return new local
+> > -			OOB data.
+> > +			array{byte} Hash:
+> > +
+> > +					16 bytes hash blob.
+> > +
+> > +			array{byte} Randomizer:
+> > +
+> > +					16 bytes randomizer blob.
+> 
+> I would add a TK field (with 16 bytes) for Low Energy bonding.
 
-In this test, totally ran 100 case: 77 Pass, 4 Fail. Other 19 are blocked o=
-r unavailable (some cases validation method is still in investigating).=20
-The pass rate is still 95% (pass / <pass + fail>). Pulseaudio has not caugh=
-t up with the BlueZ interface changing in HFP profile.=20
+I must admit that I totally ignored LE case :) I'll add TK to dictionary,
+yet I'm not very familiar with LE, is TK a random number returned by 'LE Rand'
+command ? It doesn't seem to have same semantic as 'Read Local OOB Data' command.
+Hints?
 
-New bugs:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-No
+> 
+> > +
+> > +			Other data that can be transmitted via OOB mechanism
+> > +			can be obtained from org.bluez.Adapter interface.
+> > +
+> > +			Note: This method will generate and return new hash
+> > +			and randomizer every time it is called. Data
+> > +			received in previous calls is invalidated and cannot be
+> > +			used for pairing.
+> >  
+> >  			Possible errors: org.bluez.Error.Failed
+> >  					 org.bluez.Error.InProgress
+> >  
+> > -		void AddRemoteData(string address, array{byte} hash,
+> > -							array{byte} randomizer)
+> > +		void AddRemoteData(string address, dict data)
+> 
+> I am thinking if only the address is enough for the Low Energy case, i.e.
+> should we have an address type here?
 
-Re-open bugs:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-No
+In spec there are 'Flags' and 'Security Manager OOB Flags' EIR data types,
+is that needed/useful for LE case? Maybe pass them as blobs to bluez so that
+dbusoob user doesn't need to parse those bit fields to set address type?
 
-Verified bugs:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-No
+-- 
+BR
+Szymon Janc
 
-Testing Environment
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-Hardware:=A0 netbook Eeepc 1005HA | Acer AspireOne NAV50
-Image:=A0=A0=A0=A0 netbook-ia32-pinetrail-tizen_20120424.2
-Linux Kernel: v3.4-rc7
-bluez-4.101.135.g241bf60-13.1.i586=20
-obexd-0.46.117.g62eb824-1.1.i586
-obexd-server-0.46.117.g62eb824-1.1.i586=20
-connman-1.3.65.g13f39a7-5.1.i586
-ofono-1.8.34.g454a02a-1.1.i586=20
-Pulseaudio: d3cd82d411f9b574678870d8ccd836032a238684 (July, 9th)
-
-For detailed test results, please see attached file.
-
-Thanks
-Li Xia
-
---_002_59D61FAED4CD054490460E73F56D5775096D20SHSMSX101ccrcorpi_
-Content-Type: text/plain; name="Bluetooth_upstream_quality_20120726.txt"
-Content-Description: Bluetooth_upstream_quality_20120726.txt
-Content-Disposition: attachment;
-	filename="Bluetooth_upstream_quality_20120726.txt"; size=7195;
-	creation-date="Thu, 26 Jul 2012 09:01:37 GMT";
-	modification-date="Thu, 26 Jul 2012 09:09:32 GMT"
-Content-Transfer-Encoding: base64
-
-PT0gRGV0YWlsIFJlc3VsdCA9PQ0KW1BBU1NdOiBjYXNlIHBhc3NlZCA8YnI+DQpbRkFJTF06IGNh
-c2UgZmFpbGVkIDxicj4NCltCbG9ja106IGNhc2UgaXMgYmxvY2tlZCBieSBvbmUgYnVnIG9yIG5v
-IGltcGxlbWVudGF0aW9uIDxicj4NCltOL0FdOiBjYXNlIGlzIHN0aWxsIGluIGludmVzdGFnYXRp
-b24gYW5kIG5vdCBhdmFpbGFibGUgdG8gYmUgdGVzdGVkDQoNCj09PSBBdWRpby1BMkRQID09PQ0K
-ICBbUEFTU10gQTJEUF8wMDE6IGF1ZGlvIHNpbmsgY29ubmVjdC9yZS1jb25uZWN0IA0KICBbUEFT
-U10gQTJEUF8wMDI6IHN0ZXJlbyBoZWFkc2V0IHBsYXliYWNrIA0KICBbUEFTU10gQTJEUF8wMDM6
-IHN0ZXJlbyBoZWFkc2V0IHZvaWNlIHJlY29yZCANCiAgW1BBU1NdIEEyRFBfMDA0OiBDb2RlYyBz
-dXBwb3J0OiBTQkMgDQogIFtQQVNTXSBBMkRQXzAwNTogUGxheWJhY2sgbXVzaWMgb24gbGluZQ0K
-ICBbUEFTU10gQTJEUF8wMDY6IFNJTksgcm9sZSwgYXMgc3BlYWtlciBmb3Igb3RoZXIgZGV2aWNl
-IG11c2ljIHBsYXlpbmcNCiAgICBXaXRoIHNvbWUgQlQgaGVhZHNldCwgd2UgZXZlciBtZXQgaXNz
-dWUgW2h0dHBzOi8vYnVncy5tZWVnby5jb20vc2hvd19idWcuY2dpP2lkPTI1NDgwIEJ1ZyMyNTQ4
-MCBBMkRQLXNvdXJjZTogcHVsc2VhdWRpbyBmYWlscyB0byBjcmVhdGUgYmx1ZXpfc2luayBhbmQg
-Ymx1ZXpfc291cmNlXQ0KDQo9PT0gQXVkaW8tQVZSQ1AgPT09DQogIFtQQVNTXSBBVlJDUF8wMDE6
-IFZvbHVtZSBVcC9Eb3duDQogIFtCbG9ja10gQVZSQ1BfMDAyOiBQbGF5L1BhdXNlIChieSB1bmF2
-YWlsYWJsZSBtZWRpYS1wbGF5ZXIpDQogIFtCbG9ja10gQVZSQ1BfMDAzOiBOZXh0L1ByaXZpb3Vz
-IChieSB1bmF2YWlsYWJsZSBtZWRpYS1wbGF5ZXIpDQogIFtQQVNTXSBBVlJDUF8wMDQ6IENvbm5l
-Y3Rpb24gRXN0YWJsaXNoL1JlbGVhc2UNCiAgW04vQV0gQVZSQ1BfMDA1OiBBdWRpbyBtZXRhZGF0
-YSBnZXQuDQogICAgV2Ugc3RpbGwgdHJ5IHRvIGZpbmQgYXZhbGlhYmxlIG1lZGlhLXBsYXllciB0
-byBzdXBwb3J0IEFWUkNQLTEuNA0KDQo9PT0gQXVkaW8tSEZQID09PQ0KICBbUEFTU10gSEZQXzAw
-MTogUkZDT01NIGNvbm5lY3Rpb24gb24gQUcgDQogIFtQQVNTXSBIRlBfMDAyOiBsaXN0IChvZm9u
-bykgaGZwIG1vZGVtIA0KICBbUEFTU10gSEZQXzAwMzogSEZQIG1vZGVtIGVzdGFibGlzaG1lbnQg
-KE9mb25vKQ0KICBbRkFJTF0gSEZQXzAwNDogQXVkaW8gU05LIGFuZCBTUkMgZXN0YWJsaXNobWVu
-dCAgDQogIFtGQUlMXSBIRlBfMDA1OiB2b2ljZWNhbGwsIGF1ZGlvIGNyZWF0ZXMgQlQgU05LL1NS
-QyANCiAgW0ZBSUxdIEhGUF8wMDY6IHJlZGlyZWN0IEFHIFNOSy9TUkMgdG8gbG9jYWwgU1JDL1NO
-Sw0KICAgIEJsdWVaIGludGVyZmFjZSBoYXMgc29tZSByZWdyZXNzaW9uLCBidWcgaXMgcmVwb3J0
-ZWQgYXMgW2h0dHBzOi8vYnVncy5tZWVnby5jb20vc2hvd19idWcuY2dpP2lkPTI1NDczIEJ1ZyMy
-NTQ3MyBIRlA6IGxhdGVzdCBibHVleiBjYW5ub3Qgc3VwcG9ydCBwdWxzZWF1ZGlvIHRvIGNyZWF0
-ZSBibHVlel9zaW5rIGFuZCBibHVlel9zb3VyY2VdDQogIFtQQVNTXSBIRlBfMDA3OiBDaGVjayBB
-VC1jb21tYW5kcyBmcm9tIEhGIHBhcnQNCiAgW1BBU1NdIEhGUF8wMDg6IENvbm5lY3QgQlQgSGVh
-ZHNldCB0byBIRlAgcGhvbmUNCg0KPT09IEF1ZGlvLUhTUCA9PT0NCiAgW1BBU1NdIEhTUF8wMDE6
-IFVzZSBtb25vIGhlYWRzZXQgdG8gcGxheSBtdXNpYw0KICAqKiogRFVUIGlzIGEgTmV0Ym9vaywg
-dW5hYmxlIHRvIHRha2UgcGhvbmUgKioqDQogIFtOL0FdIEhTUF8wMDI6IFRha2UgaW5jb21pbmcg
-Y2FsbCBieSBidXR0b24tcHJlc3MNCiAgW04vQV0gSFNQXzAwMzogQXVkaW8gdHJhbnNmZXIgYmV0
-d2VlbiBBRyBhbmQgSFMNCiAgW1BBU1NdIEhTUF8wMDQ6IEFkanVzdCBWb2x1bWUgVXAvRG93bg0K
-DQo9PT0gT0JFWC1GVFAgPT09DQogIFtQQVNTXSBGVFBfMDAxOiBwdWxsL3B1c2ggZmlsZXMgZnJv
-bS90byBzZXJ2ZXIuDQogIFtQQVNTXSBGVFBfMDAyOiBicm93c2Ugc2VydmVyIGZpbGVzIA0KICBb
-UEFTU10gRlRQXzAwMzogQ2xpZW50ICJjcmVhdGUgZm9sZGVyIiwgImRlbGV0ZSBmaWxlIiwgInJl
-bmFtZSBmaWxlIg0KICBbUEFTU10gRlRQXzAwNDogU2VydmVyIGVuYWJsZXMgRlRQIHBhcmFtZXRl
-ciAgDQogIFtQQVNTXSBGVFBfMDA1OiBTZXJ2ZXIgc2V0cyBzaGFyaW5nIHJvb3QgcGF0aA0KICBb
-UEFTU10gRlRQXzAwNjogU2VydmVyIGhhbmRsZXMgYWxsIHJlcXVpcmVtZW50cw0KICBbUEFTU10g
-RlRQXzAwNzogU2VydmVyIGhhcyBhYmlsaXR5IHRvIHNldCBwZXJtaXNzaW9uIGZvciBGVFANCiAg
-W1BBU1NdIEZUUF8wMDg6IEZUUCBkYXRhLXJhdGUgYWJvdXQgMzBrL3N+MjMway9zDQogIFtQQVNT
-XSBGVFBfMDA5OiBCaWcgc2l6ZSBmaWxlIHRyYW5zZmVycmVkIHN0YWJsZQ0KDQo9PT0gT0JFWC1P
-UFAgPT09DQogIFtQQVNTXSBPUFBfMDAxOiBwdWxsIHVuLXBhdHRlcm5lZCBvYmplY3QgZnJvbSBz
-ZXJ2ZXIuIA0KICBbUEFTU10gT1BQXzAwMjogU2VydmVyIGVuYWJsZXMgT1BQIHBhcmFtZXRlcg0K
-ICBbUEFTU10gT1BQXzAwMzogRHVyaW5nIG9iamVjdCB0cmFuc2ZlcnJpbmcsIHRoZSBwcm9ncmVz
-cyBpcyBjbGVhcg0KDQo9PT0gT0JFWC1QQkFQID09PQ0KICBbUEFTU10gUEJBUF8wMDE6IENsaWVu
-dCBnZXRzIHBob25lIGJvb2sgZW50cmllcyBmcm9tIHNlcnZlcg0KICBbUEFTU10gUEJBUF8wMDI6
-IENsaWVudCBnZXRzIElDSCwgT0NILCBNQ0ggYW5kIENDSCBmcm9tIHNlcnZlcg0KICBbRkFJTF0g
-UEJBUF8wMDM6IFBTRSBjYW4gcHJvdmlkZSBQQkFQIGRhZW1vbiBieSBlbmFibGluZyBjb3JyZXNw
-b25kaW5nIHBhcmFtZXRlcg0KICBDYXNlIGZhaWxlZCBkdWUgdG8gW2h0dHBzOi8vYnVncy5tZWVn
-by5jb20vc2hvd19idWcuY2dpP2lkPTI1MTg5IEJ1ZyMyNTE4OSwgUEJBUCBTZXJ2ZXIgaGFzIHNl
-Z21lbnRhdGlvbiBmYXVsdCBkdXJpbmcgcmVzcG9uZGluZyB0byBjbGllbnQgUHVsbEFsbF0NCiAg
-W1BBU1NdIFBCQVBfMDA0OiBCb3RoIHNpZGVzIHN1cHBvcnQgdkNhcmQyLjEvdkNhcmQzLjANCg0K
-PT09IE9CRVgtU1lOQyA9PT0NCiAgW1BBU1NdIFNZTkNfMDAxOiBTZXJ2ZXIgZW5hYmxlcyBTWU5D
-IGRhZW1vbg0KICBbUEFTU10gU1lOQ18wMDI6IER1cmluZyBzeW5jLCBTZXJ2ZXIgY2FuIHNob3cg
-InN5bmNpbmcuLi4iDQogIFtQQVNTXSBTWU5DXzAwMzogY2xpZW50IGNhbiBzZXQgUElNIGZldGNo
-aW5nIGZyb20gSU5UDQogIFtQQVNTXSBTWU5DXzAwNDogU2VydmVyIGdldC9wdXQgZW50aXJlIHBo
-b25lYm9vayBmcm9tL3RvIGNsaWVudC4gDQogIFtQQVNTXSBTWU5DXzAwNTogQ2xpZW50IGNhbiBz
-dXBwb3J0IHZDYXJkMi4xLCB2Q2FyZDMuMA0KDQo9PT0gT0JFWC1NQVAgTUNFID09PQ0KICBbUEFT
-U10gTUFQXzAwMTogTUNFIGNhbiBicm93c2UgbWVzc2FnZS9mb2xkZXIgbGlzdCBvbiBNU0UgDQog
-IFtCTE9DS10gTUFQXzAwMjogTUNFIGNhbiB1cGxvYWQgbG9jYWwgbWVzc2FnZSB0byBNU0UNCiAg
-W0JMT0NLXSBNQVBfMDAzOiBNQ0UgY2FuIGRlbGV0ZSB0aGUgbWVzc2FnZSBvbiBNU0Ugc2lkZQ0K
-ICBbQkxPQ0tdIE1BUF8wMDQ6IE1DRSBjYW4gdGFrZSB1c2Ugb2YgTVNFIHRvIHNlbmQgbWVzc2Fn
-ZQ0KICAgIEJhc2ljIE1BUCBmdW5jdGlvbiAoTVNHTGlzdGluZykgcGFzc2VkLiBSZXN0IGZ1bmN0
-aW9ucyBhcmUgaW4gcHJvZ3Jlc3MgKG1hcmtlZCB0aGVtIGFzIEJMT0NLIGJ5IHVwc3RyZWFtIGlt
-cGxlbWVudGF0aW9uKS4NCg0KPT09IE5ldHdvcmstUEFOID09PQ0KICBbUEFTU10gUEFOXzAwMTog
-UEFOVSBjYW4gaW5pdCBuYXAwIGRldmljZSBjb25uZWN0IHRvIE5BUA0KICBbUEFTU10gUEFOXzAw
-MjogUEFOVSBjYW4gZ2V0IGlwIGFkZHJlc3Mgb3IgYXNzaWduZWQgc3RhdGljIGlwDQogIFtQQVNT
-XSBQQU5fMDAzOiBQQU5VIGNhbiBsb2dvbiBpbnRlcm5ldCB3ZWJzaXRlIA0KICBbTi9BXSBQQU5f
-MDA0OiBOQVAgY2FuIGluaXQgYnJpZGdlIGJuZXAgDQogIFtOL0FdIFBBTl8wMDU6IE5BUCBjYW4g
-c3VwcG9ydCBvbmUgb3IgbXVsdGlwbGUgUEFOVSBjb25uZWN0aW9uDQogIFtOL0FdIFBBTl8wMDY6
-IE5BUCBjYW4gaGF2ZSBESENQIHJlc3BvbmRpbmcgdG8gZWFjaCBQQU5VDQogIEN1cnJlbnQgY29u
-bm1hbiBkb2VzIG5vdCBzdXBwb3J0IERIQ1AgZnVuY3Rpb25zLg0KDQo9PT0gTmV0d29yay1CTkVQ
-ID09PQ0KICBbUEFTU10gQk5FUF8wMDE6IENoZWNrIEJORVAgc3VwcG9ydCBvbiBEVVQNCg0KPT09
-IE5ldHdvcmwtRFVOID09PQ0KICBbUEFTU10gRFVOXzAwMTogR1cgKERVVCkgY2FuIHBhcnNlIGEg
-c2VyaWVzIG9mIEFUIGNvbW1hbmRzIGZyb20gdGhlIGRhdGEgdGVybWluYWwuIA0KICBbUEFTU10g
-RFVOXzAwMjogRFQgY2FuIGJ1aWxkIHVwIHJmY29tbSBkZXZpY2UgYnkgYmx1ZXRvb3RoIGFuZCBE
-VU4gbW9kZW0gYnkgT2Zvbm8uDQogIFtQQVNTXSBEVU5fMDAzOiBEVCBjYW4gdXNlIE9mb25vIHRv
-IGRpYWwgdXAgc3BlY2lhbCBzZXJ2aWNlIG51bWJlciAoIio5OSMiKS4NCiAgW1BBU1NdIERVTl8w
-MDQ6IFdoZW4gbmV0d29yayBjb25uZWN0ZWQsIERUIGNhbiBsb2cgb24gd2Vic2l0ZSBpbiBpbnRl
-cm5ldC4NCg0KPT09IFNJTS1TQVAgPT09DQogIFRoZSBTQVAgdGVzdCBtZXRob2QgaXMgc3RpbGwg
-aW4gaW52ZXN0aWdhdGlvbi4gDQogIFtOL0FdIFNBUF8wMDE6IFNlcnZlciBjYW4gZW5hYmxlIGEg
-bW9kdWxlIHRvIHJlZ2lzdGVyIENsaWVudA0KICBbTi9BXSBTQVBfMDAyOiBTZXJ2ZXIgY2FuIHBv
-d2VyIG9uL29mZiBTSU0gQ2FyZCBvciByZXNldCBpdCANCiAgW04vQV0gU0FQXzAwMzogU2VydmVy
-IGNhbiBkaXNjb25uZWN0IENsaWVudCAgDQogIFtOL0FdIFNBUF8wMDQ6IFNlcnZlciBjYW4gZGlz
-Y29ubmVjdCBTSU0NCiAgW04vQV0gU0FQXzAwNTogQ2xpZW50IGNhbiBjb25uZWN0IHRvIFNlcnZl
-ciBTSU0NCiAgW04vQV0gU0FQXzAwNjogQ2xpZW50IGNhbiBwb3dlciBvbiBTZXJ2ZXIgU0lNDQog
-IFtOL0FdIFNBUF8wMDc6IENsaWVudCBjYW4gZGlzY29ubmVjdCBTZXJ2ZXINCg0KPT09IEdlbmVy
-aWMtR0FQID09PQ0KICBbUEFTU10gR0FQXzAwMTogUFNDQU4vSVNDQU4gbW9kZSBzZXR0aW5nLg0K
-ICBbUEFTU10gR0FQXzAwMjogQWN0aXZlIHBhaXJpbmcgdG8gYW5vdGhlciBibHVldG9vdGggZGV2
-aWNlLg0KICBbUEFTU10gR0FQXzAwMzogUGFzc2l2ZSBwYWlyaW5nLCBhY2NlcHRlIHBhaXIgbWFz
-dGVyIHJlcXVpcmVtZW50DQogIFtQQVNTXSBHQVBfMDA0OiBTU1Agc3VwcG9ydHMgDQogIFtQQVNT
-XSBHQVBfMDA1OiBJZiBsb3N0IGxpbmsta2V5LCBpdCBuZWVkcyByZS1wYWlyIA0KICBbUEFTU10g
-R0FQXzAwNjogcmVib290IERVVCB3aXRoIGxpbmsta2V5IHJlc3RvcmVkLCBubyBuZWVkIHRvIHJl
-LXBhaXIgDQogIFtQQVNTXSBHQVBfMDA3OiBQYWlyIGNhbiBiZSByZWxlYXNlZA0KDQo9PT0gR2Vu
-ZXJpYy1TRFAgPT09DQogIFtQQVNTXSBTRFBfMDAxOiBicm93c2UgYXZhaWxhYmxlIHNlcnZpY2Ug
-bGlzdCBpbiBsb2NhbA0KICBbUEFTU10gU0RQXzAwMjogYnJvd3NlIGF2YWlsYWJsZSBzZXJ2aWNl
-IGxpc3QgZnJvbSByZW1vdGUNCiAgW1BBU1NdIFNEUF8wMDM6IGJyb3dzZSBzZXJ2aWNlIGJ5IFJl
-Y0hhbmRsZSBmb3IgZGV0YWlsIGluZm8NCiAgW1BBU1NdIFNEUF8wMDQ6IFNlcnZlciBjYW4gYW5z
-d2VyIFNEUCBzZWFyY2hpbmcgcmVxdWVzdA0KICBbUEFTU10gU0RQXzAwNTogU2VydmVyIGNhbiBh
-ZGQvZGVsL3VwZGF0ZSBzZXJ2aWNlIHJlY29yZHMNCg0KPT09IE90aGVycy1ISUQgPT09DQogIFtQ
-QVNTXSBISURfMDAxOiBIb3N0IGNhbiBzZWFyY2ggbmVhcmJ5IEhJRCBkZXZpY2UuDQogIFtQQVNT
-XSBISURfMDAyOiBbQkFUXSBIb3N0IGNhbiBjb25uZWN0IHRvIEhJRCBkZXZpY2UuDQogIFtQQVNT
-XSBISURfMDAzOiBIb3N0IGNhbiBoYW5kbGUgbXVsdGlwbGUgaHVtYW4gaW5wdXQvb3V0cHV0IGRl
-dmljZXMuDQoNCj09PSBIQ0kgPT09DQogIFtQQVNTXSBIQ0lfMDAxOiBCdWlsZCBoY2kgY29ubmVj
-dGlvbiBiZXR3ZWVuIERldl9BIGFuZCBEZXZfQi4NCiAgW1BBU1NdIEhDSV8wMDI6IFJlY2VpdmUg
-QUNMIGRhdGEgd2l0aCBIQ0kuDQogIFtQQVNTXSBIQ0lfMDAzOiBTZW5kIEFDTCBkYXRhIHdpdGgg
-SENJLg0KICBbUEFTU10gSENJXzAwNDogQ2hhbmdlIG5hbWUgb2YgcmVtb3RlIERldiBieSBIQ0ku
-DQogIFtQQVNTXSBIQ0lfMDA1OiBDaGFuZ2UgY2xhc3Mgb2YgcmVtb3RlIERldiBieSBIQ0kuDQog
-IFtQQVNTXSBIQ0lfMDA2OiBSZWFkIGxvY2FsIEhDSSBjb250cm9sbGVyIGluZm9ybWF0aW9uLg0K
-ICBbUEFTU10gSENJXzAwNzogUmVhZCByZW1vdGUgSENJIGNvbnRyb2xsZXIgaW5mb3JtYXRpb24u
-DQoNCj09PSBMMkNBUCA9PT0NCiAgW1BBU1NdIEwyQ0FQXzAwMTogQnVpbGQgbDJjYXAgY29ubmVj
-dGlvbiBiZXR3ZWVuIERldl9BIGFuZCBEZXZfQi4gIA0KICBbUEFTU10gTDJDQVBfMDAyOiBEZXZf
-QSBhbmQgRGV2X0IgdGFrZSBsMmNhcCBwcm90b2NvbCB0byBkbyBwaW5ncG9uZy4NCg0KPT09IFJG
-Q09NTSA9PT0NCiAgW1BBU1NdIFJGQ09NTV8wMDE6IEJ1aWxkIHJmY29tbSBjb25uZWN0aW9uIGJl
-dHdlZW4gRGV2X0EgYW5kIERldl9CLiAgDQogIFtQQVNTXSBSRkNPTU1fMDAyOiBEZXZfQSBhbmQg
-RGV2X0IgdGFrZSByZmNvbW0gcHJvdG9jb2wgdG8gZG8gcGluZ3BvbmcuDQoNCj09PSBTZXR0aW5n
-cyA9PT0NCiAgW1BBU1NdIFNFVF8wMDE6IFtCQVRdIE5vIGVycm9yIG91dHB1dCBkdXJpbmcgYmx1
-ZXRvb3RoZCBzdGFydHVwIHByb2Nlc3MuDQoNCj09PSBCbHVldG9vdGggVXRpbHMgPT09DQpTb21l
-IGJhc2ljIGNoZWNraW5nIGZvciBoY2ljb25maWcsIGhjaXRvb2wsIHNkcHRvb2wgY29tbWFuZHMu
-IA0KICBbUEFTU10gQlRDTURfMDAxOiBoY2ljb25maWcgLWENCiAgW1BBU1NdIEJUQ01EXzAwMjog
-aGNpY29uZmlnIDxhZGFwdGVyPiBwaXNjYW4NCiAgW1BBU1NdIEJUQ01EXzAwMzogaGNpY29uZmln
-IDxhZGFwdGVyPiB1cC9kb3duICANCiAgW1BBU1NdIEJUQ01EXzAwNDogaGNpdG9vbCBzY2FuDQog
-IFtQQVNTXSBCVENNRF8wMDU6IHNkcHRvb2wgYnJvd3NlIGxvY2FsDQogIFtQQVNTXSBCVENNRF8w
-MDY6IHNkcHRvb2wgYnJvd3NlIDxlcm1vdGUgTUFDPg0KICBbUEFTU10gQlRDTURfMDA3OiBzZHB0
-b29sIGFkZC9kZWwNCg==
-
---_002_59D61FAED4CD054490460E73F56D5775096D20SHSMSX101ccrcorpi_--
