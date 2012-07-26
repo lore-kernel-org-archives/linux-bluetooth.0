@@ -1,111 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 26 Jul 2012 10:36:03 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Re: [RFC] dbusoob: Update API
-Message-ID: <20120726133603.GA28470@samus>
-References: <1343226308-443-1-git-send-email-szymon.janc@tieto.com>
- <1343226308-443-2-git-send-email-szymon.janc@tieto.com>
- <20120725182201.GA4165@echo>
- <1842864.hGRL10RuKd@uw000953>
+Date: Thu, 26 Jul 2012 16:30:38 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	pkrystad@codeaurora.org
+Subject: Re: [RFCv0 05/21] Bluetooth: Lookup channel id for channel move
+Message-ID: <20120726133036.GB2686@aemeltch-MOBL1>
+References: <1343260274-11953-1-git-send-email-mathewm@codeaurora.org>
+ <1343260274-11953-6-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1842864.hGRL10RuKd@uw000953>
+In-Reply-To: <1343260274-11953-6-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 11:24 Thu 26 Jul, Szymon Janc wrote:
-> On Wednesday 25 of July 2012 21:22:01 Vinicius Costa Gomes wrote:
-> > Hi Szymon,
+Hi Mat,
+
+On Wed, Jul 25, 2012 at 04:50:57PM -0700, Mat Martineau wrote:
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  net/bluetooth/l2cap_core.c | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
 > 
-> Hi Vinicius,
-> 
-> > 
-> > On 16:25 Wed 25 Jul, Szymon Janc wrote:
-> > > ---
-> > >  doc/oob-api.txt |   57 +++++++++++++++++++++++++++++++++++++++++++++++++------
-> > >  1 file changed, 51 insertions(+), 6 deletions(-)
-> > > 
-> > > diff --git a/doc/oob-api.txt b/doc/oob-api.txt
-> > > index d838712..8b7b633 100644
-> > > --- a/doc/oob-api.txt
-> > > +++ b/doc/oob-api.txt
-> > > @@ -7,26 +7,71 @@ Service		org.bluez
-> > >  Interface	org.bluez.OutOfBand
-> > >  Object path	[variable prefix]/{hci0,hci1,...}
-> > >  
-> > > -Methods		array{byte} hash, array{byte} randomizer ReadLocalData()
-> > > +Methods		dict ReadLocalData()
-> > >  
-> > >  			This method reads local OOB data from adapter. Return
-> > > -			value is pair of arrays 16 bytes each.
-> > > +			value is a dictionary with following keys:
-> > >  
-> > > -			Note: This method will generate and return new local
-> > > -			OOB data.
-> > > +			array{byte} Hash:
-> > > +
-> > > +					16 bytes hash blob.
-> > > +
-> > > +			array{byte} Randomizer:
-> > > +
-> > > +					16 bytes randomizer blob.
-> > 
-> > I would add a TK field (with 16 bytes) for Low Energy bonding.
-> 
-> I must admit that I totally ignored LE case :) I'll add TK to dictionary,
-> yet I'm not very familiar with LE, is TK a random number returned by 'LE Rand'
-> command ? It doesn't seem to have same semantic as 'Read Local OOB Data' command.
-> Hints?
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index d7a501e..176a81d 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -97,6 +97,21 @@ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn, u16 ci
+>  	return c;
+>  }
+>  
+> +/* Find channel with given DCID.
+> + * Returns locked channel. */
 
-The generation of the TK number is actually up to the host, it may want
-to use 'LE Rand' (which generates only 8 bytes) or it may want to use
-something else, which should be our case. More about TK in the page 1969
-of the spec (section 2.3.5.4).
+I believe the comment is not needed here.
 
-You are right that the semantics of 'LE Rand' are different from 'Read Local
-OOB'. That is because the security protocol of LE is implemented in the
-host side.
+> +static struct l2cap_chan *l2cap_get_chan_by_dcid(struct l2cap_conn *conn, u16 cid)
+> +{
+> +	struct l2cap_chan *c;
+> +
+> +	mutex_lock(&conn->chan_lock);
+> +	c = __l2cap_get_chan_by_dcid(conn, cid);
+> +	if (c)
+> +		l2cap_chan_lock(c);
+> +	mutex_unlock(&conn->chan_lock);
+> +
+> +	return c;
+> +}
+> +
+>  static struct l2cap_chan *__l2cap_get_chan_by_ident(struct l2cap_conn *conn, u8 ident)
+>  {
+>  	struct l2cap_chan *c;
+> @@ -4086,6 +4101,7 @@ static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
+>  					 u16 cmd_len, void *data)
+>  {
+>  	struct l2cap_move_chan_req *req = data;
+> +	struct l2cap_chan *chan;
+>  	u16 icid = 0;
+>  	u16 result = L2CAP_MR_NOT_ALLOWED;
+>  
+> @@ -4099,9 +4115,14 @@ static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
+>  	if (!enable_hs)
+>  		return -EINVAL;
+>  
+> +	chan = l2cap_get_chan_by_dcid(conn, icid);
+> +
+>  	/* Placeholder: Always refuse */
+>  	l2cap_send_move_chan_rsp(conn, cmd->ident, icid, result);
+>  
+> +	if (chan)
+> +		l2cap_chan_unlock(chan);
+> +
 
-What I mean is that it would be up to BlueZ to guarantee that each time
-ReadLocalData() is called a different TK is generated.
+this part does not change anything, might be merged with later patch which
+would add functionality.
 
-> 
-> > 
-> > > +
-> > > +			Other data that can be transmitted via OOB mechanism
-> > > +			can be obtained from org.bluez.Adapter interface.
-> > > +
-> > > +			Note: This method will generate and return new hash
-> > > +			and randomizer every time it is called. Data
-> > > +			received in previous calls is invalidated and cannot be
-> > > +			used for pairing.
-> > >  
-> > >  			Possible errors: org.bluez.Error.Failed
-> > >  					 org.bluez.Error.InProgress
-> > >  
-> > > -		void AddRemoteData(string address, array{byte} hash,
-> > > -							array{byte} randomizer)
-> > > +		void AddRemoteData(string address, dict data)
-> > 
-> > I am thinking if only the address is enough for the Low Energy case, i.e.
-> > should we have an address type here?
-> 
-> In spec there are 'Flags' and 'Security Manager OOB Flags' EIR data types,
-> is that needed/useful for LE case? Maybe pass them as blobs to bluez so that
-> dbusoob user doesn't need to parse those bit fields to set address type?
+Best regards 
+Andrei Emeltchenko 
 
-Yeah, that should be enough. BlueZ already has access to all the EIR/AD
-data.
-
-> 
-> -- 
-> BR
-> Szymon Janc
-> 
-
-
-Cheers,
--- 
-Vinicius
