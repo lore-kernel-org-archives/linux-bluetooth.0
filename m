@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v2 4/4] media: Remove transport in_use flag
-Date: Thu, 26 Jul 2012 12:13:29 +0200
-Message-Id: <1343297609-30225-5-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v2 1/4] media: Watch A2DP sink-source state changes
+Date: Thu, 26 Jul 2012 12:13:26 +0200
+Message-Id: <1343297609-30225-2-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1343297609-30225-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1343297609-30225-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,127 +12,107 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-With the introduction of the playing flag, the previously existing
-in_use flag is somehow redundant. The playing flag along with the lock
-states implicitly represent the same information.
+Add watches to know about the state changes affecting the A2DP sinks
+and sources. The callback functions are just skeletons to be used in
+following patches.
 ---
- audio/transport.c |   28 +++++++++-------------------
- 1 files changed, 9 insertions(+), 19 deletions(-)
+ audio/media.c |   46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 46 insertions(+), 0 deletions(-)
 
-diff --git a/audio/transport.c b/audio/transport.c
-index ffc637c..bef04e5 100644
---- a/audio/transport.c
-+++ b/audio/transport.c
-@@ -87,7 +87,6 @@ struct media_transport {
- 	gboolean		read_lock;
- 	gboolean		write_lock;
- 	gboolean		playing;
--	gboolean		in_use;
- 	guint			(*resume) (struct media_transport *transport,
- 					struct media_owner *owner);
- 	guint			(*suspend) (struct media_transport *transport,
-@@ -215,7 +214,7 @@ static void media_transport_remove(struct media_transport *transport,
- 	media_owner_free(owner);
+diff --git a/audio/media.c b/audio/media.c
+index ea6d582..505a490 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -48,6 +48,8 @@
+ #include "avrcp.h"
+ #include "headset.h"
+ #include "gateway.h"
++#include "sink.h"
++#include "source.h"
+ #include "manager.h"
  
- 	/* Suspend if there is no longer any owner */
--	if (transport->owners == NULL && transport->in_use)
-+	if (transport->owners == NULL && transport->playing)
- 		transport->suspend(transport, NULL);
+ #define MEDIA_INTERFACE "org.bluez.Media"
+@@ -83,6 +85,8 @@ struct media_endpoint {
+ 	size_t			size;		/* Endpoint capabilities size */
+ 	guint			hs_watch;
+ 	guint			ag_watch;
++	guint			sink_watch;
++	guint			source_watch;
+ 	guint			watch;
+ 	GSList			*requests;
+ 	struct media_adapter	*adapter;
+@@ -157,6 +161,12 @@ static void media_endpoint_destroy(struct media_endpoint *endpoint)
+ 	if (endpoint->ag_watch)
+ 		gateway_remove_state_cb(endpoint->ag_watch);
+ 
++	if (endpoint->sink_watch)
++		sink_remove_state_cb(endpoint->sink_watch);
++
++	if (endpoint->source_watch)
++		source_remove_state_cb(endpoint->source_watch);
++
+ 	media_endpoint_cancel_all(endpoint);
+ 
+ 	g_slist_free_full(endpoint->transports,
+@@ -664,6 +674,21 @@ static void gateway_state_changed(struct audio_device *dev,
+ 	}
  }
  
-@@ -297,11 +296,10 @@ static guint resume_a2dp(struct media_transport *transport,
- 			return 0;
- 	}
++static void a2dp_source_state_changed(struct audio_device *dev,
++					source_state_t old_state,
++					source_state_t new_state,
++					void *user_data)
++{
++	struct media_endpoint *endpoint = user_data;
++	struct media_transport *transport;
++
++	DBG("");
++
++	transport = find_device_transport(endpoint, dev);
++	if (transport == NULL)
++		return;
++}
++
+ static gboolean endpoint_init_a2dp_source(struct media_endpoint *endpoint,
+ 						gboolean delay_reporting,
+ 						int *err)
+@@ -675,9 +700,27 @@ static gboolean endpoint_init_a2dp_source(struct media_endpoint *endpoint,
+ 	if (endpoint->sep == NULL)
+ 		return FALSE;
  
--	if (transport->in_use == TRUE)
-+	if (transport->playing == TRUE)
- 		goto done;
- 
--	transport->in_use = a2dp_sep_lock(sep, a2dp->session);
--	if (transport->in_use == FALSE)
-+	if (a2dp_sep_lock(sep, a2dp->session) == FALSE)
- 		return 0;
- 
- done:
-@@ -324,7 +322,6 @@ static void a2dp_suspend_complete(struct avdtp *session,
- 	}
- 
- 	a2dp_sep_unlock(sep, a2dp->session);
--	transport->in_use = FALSE;
- 	media_transport_remove(transport, owner);
++	endpoint->source_watch = source_add_state_cb(a2dp_source_state_changed,
++								endpoint);
++
+ 	return TRUE;
  }
  
-@@ -337,7 +334,6 @@ static guint suspend_a2dp(struct media_transport *transport,
++static void a2dp_sink_state_changed(struct audio_device *dev,
++					sink_state_t old_state,
++					sink_state_t new_state,
++					void *user_data)
++{
++	struct media_endpoint *endpoint = user_data;
++	struct media_transport *transport;
++
++	DBG("");
++
++	transport = find_device_transport(endpoint, dev);
++	if (transport == NULL)
++		return;
++}
++
+ static gboolean endpoint_init_a2dp_sink(struct media_endpoint *endpoint,
+ 						gboolean delay_reporting,
+ 						int *err)
+@@ -689,6 +732,9 @@ static gboolean endpoint_init_a2dp_sink(struct media_endpoint *endpoint,
+ 	if (endpoint->sep == NULL)
+ 		return FALSE;
  
- 	if (!owner) {
- 		a2dp_sep_unlock(sep, a2dp->session);
--		transport->in_use = FALSE;
- 		return 0;
- 	}
- 
-@@ -399,12 +395,11 @@ static guint resume_headset(struct media_transport *transport,
- {
- 	struct audio_device *device = transport->device;
- 
--	if (transport->in_use == TRUE)
-+	if (transport->playing == TRUE)
- 		goto done;
- 
--	transport->in_use = headset_lock(device, HEADSET_LOCK_READ |
--						HEADSET_LOCK_WRITE);
--	if (transport->in_use == FALSE)
-+	if (headset_lock(device, HEADSET_LOCK_READ |
-+						HEADSET_LOCK_WRITE) == FALSE)
- 		return 0;
- 
- done:
-@@ -425,7 +420,6 @@ static void headset_suspend_complete(struct audio_device *dev, void *user_data)
- 	}
- 
- 	headset_unlock(dev, HEADSET_LOCK_READ | HEADSET_LOCK_WRITE);
--	transport->in_use = FALSE;
- 	media_transport_remove(transport, owner);
++	endpoint->sink_watch = sink_add_state_cb(a2dp_sink_state_changed,
++								endpoint);
++
+ 	return TRUE;
  }
- 
-@@ -436,7 +430,6 @@ static guint suspend_headset(struct media_transport *transport,
- 
- 	if (!owner) {
- 		headset_unlock(device, HEADSET_LOCK_READ | HEADSET_LOCK_WRITE);
--		transport->in_use = FALSE;
- 		return 0;
- 	}
- 
-@@ -504,12 +497,11 @@ static guint resume_gateway(struct media_transport *transport,
- {
- 	struct audio_device *device = transport->device;
- 
--	if (transport->in_use == TRUE)
-+	if (transport->playing == TRUE)
- 		goto done;
- 
--	transport->in_use = gateway_lock(device, GATEWAY_LOCK_READ |
--						GATEWAY_LOCK_WRITE);
--	if (transport->in_use == FALSE)
-+	if (gateway_lock(device, GATEWAY_LOCK_READ |
-+						GATEWAY_LOCK_WRITE) == FALSE)
- 		return 0;
- 
- done:
-@@ -531,7 +523,6 @@ static gboolean gateway_suspend_complete(gpointer user_data)
- 	}
- 
- 	gateway_unlock(device, GATEWAY_LOCK_READ | GATEWAY_LOCK_WRITE);
--	transport->in_use = FALSE;
- 	media_transport_remove(transport, owner);
- 	return FALSE;
- }
-@@ -544,7 +535,6 @@ static guint suspend_gateway(struct media_transport *transport,
- 
- 	if (!owner) {
- 		gateway_unlock(device, GATEWAY_LOCK_READ | GATEWAY_LOCK_WRITE);
--		transport->in_use = FALSE;
- 		return 0;
- 	}
  
 -- 
 1.7.7.6
