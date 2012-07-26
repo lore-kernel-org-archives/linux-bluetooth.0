@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v2 1/4] media: Watch A2DP sink-source state changes
-Date: Thu, 26 Jul 2012 12:13:26 +0200
-Message-Id: <1343297609-30225-2-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v2 3/4] media: Extend media API with optional acquire
+Date: Thu, 26 Jul 2012 12:13:28 +0200
+Message-Id: <1343297609-30225-4-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1343297609-30225-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1343297609-30225-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,108 +12,73 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Add watches to know about the state changes affecting the A2DP sinks
-and sources. The callback functions are just skeletons to be used in
-following patches.
----
- audio/media.c |   46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 46 insertions(+), 0 deletions(-)
+Acquiring a transport is needed in two different situations: either
+we are initiating the audio stream locally, or the remote side initiated
+it and thus we are just reacting. In the second case, we would expect
+the stream is already available, and otherwise the operation should
+fail. This means the media API needs to be extended in order to make
+this difference.
 
-diff --git a/audio/media.c b/audio/media.c
-index ea6d582..505a490 100644
---- a/audio/media.c
-+++ b/audio/media.c
-@@ -48,6 +48,8 @@
- #include "avrcp.h"
- #include "headset.h"
- #include "gateway.h"
-+#include "sink.h"
-+#include "source.h"
- #include "manager.h"
+This issue is specially relevant in the case of SCO, because the current
+approach is racy. With HFP, for example (say BlueZ has the HS role), the
+following race condition could be met:
+
+1. Phone has an incoming call and thus starts in-band ringing.
+2. SCO connection is accepted and stablished by BlueZ.
+3. Gateway interface state is changed to Playing.
+4. Exactly afterwards, the user routes the audio to the phone, to have
+   a private conversation. So the SCO link is closed.
+5. In parallel, PulseAudio sees the transition to Playing, and acquires
+   the transport.
+6. BlueZ receives an Acquire() request, but SCO is down. So it tries to
+   reconnect the SCO link.
+
+The last step is an undesired behavior (the audio is routed back to the
+car). BlueZ should be smart enough to know that the SCO connection
+shouldn't be reestablished, but this is only possible if the endpoint
+provides additional information in the media API.
+
+Note that the API change introduced by this patch is backward
+compatible, meaning that older versions of BlueZ will just ignore the
+flag. So clients are encouraged to use it without necessarily adding a
+dependency to newer versions of BlueZ.
+---
+ audio/transport.c |    3 +++
+ doc/media-api.txt |    7 +++++++
+ 2 files changed, 10 insertions(+), 0 deletions(-)
+
+diff --git a/audio/transport.c b/audio/transport.c
+index f988d48..ffc637c 100644
+--- a/audio/transport.c
++++ b/audio/transport.c
+@@ -679,6 +679,9 @@ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
+ 	if (media_transport_acquire(transport, accesstype) == FALSE)
+ 		return btd_error_not_authorized(msg);
  
- #define MEDIA_INTERFACE "org.bluez.Media"
-@@ -83,6 +85,8 @@ struct media_endpoint {
- 	size_t			size;		/* Endpoint capabilities size */
- 	guint			hs_watch;
- 	guint			ag_watch;
-+	guint			sink_watch;
-+	guint			source_watch;
- 	guint			watch;
- 	GSList			*requests;
- 	struct media_adapter	*adapter;
-@@ -157,6 +161,12 @@ static void media_endpoint_destroy(struct media_endpoint *endpoint)
- 	if (endpoint->ag_watch)
- 		gateway_remove_state_cb(endpoint->ag_watch);
++	if (!transport->playing && g_strstr_len(accesstype, -1, "?") != NULL)
++		return btd_error_failed(msg, "Transport not playing");
++
+ 	owner = media_owner_create(conn, msg, accesstype);
+ 	id = transport->resume(transport, owner);
+ 	if (id == 0) {
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index e5eeaa0..4853196 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -282,6 +282,13 @@ Methods		dict GetProperties()
  
-+	if (endpoint->sink_watch)
-+		sink_remove_state_cb(endpoint->sink_watch);
-+
-+	if (endpoint->source_watch)
-+		source_remove_state_cb(endpoint->source_watch);
-+
- 	media_endpoint_cancel_all(endpoint);
+ 				"rw": Read and write access
  
- 	g_slist_free_full(endpoint->transports,
-@@ -664,6 +674,21 @@ static void gateway_state_changed(struct audio_device *dev,
- 	}
- }
++			The accesstype string can also be combined with a "?"
++			suffix, which will make the request optional. This
++			typically means the transport will only be acquired if
++			it is already available (remote-initiated), but
++			otherwise no request will be sent to the remote side.
++			In this last case the function will fail.
++
+ 		void Release(string accesstype)
  
-+static void a2dp_source_state_changed(struct audio_device *dev,
-+					source_state_t old_state,
-+					source_state_t new_state,
-+					void *user_data)
-+{
-+	struct media_endpoint *endpoint = user_data;
-+	struct media_transport *transport;
-+
-+	DBG("");
-+
-+	transport = find_device_transport(endpoint, dev);
-+	if (transport == NULL)
-+		return;
-+}
-+
- static gboolean endpoint_init_a2dp_source(struct media_endpoint *endpoint,
- 						gboolean delay_reporting,
- 						int *err)
-@@ -675,9 +700,27 @@ static gboolean endpoint_init_a2dp_source(struct media_endpoint *endpoint,
- 	if (endpoint->sep == NULL)
- 		return FALSE;
- 
-+	endpoint->source_watch = source_add_state_cb(a2dp_source_state_changed,
-+								endpoint);
-+
- 	return TRUE;
- }
- 
-+static void a2dp_sink_state_changed(struct audio_device *dev,
-+					sink_state_t old_state,
-+					sink_state_t new_state,
-+					void *user_data)
-+{
-+	struct media_endpoint *endpoint = user_data;
-+	struct media_transport *transport;
-+
-+	DBG("");
-+
-+	transport = find_device_transport(endpoint, dev);
-+	if (transport == NULL)
-+		return;
-+}
-+
- static gboolean endpoint_init_a2dp_sink(struct media_endpoint *endpoint,
- 						gboolean delay_reporting,
- 						int *err)
-@@ -689,6 +732,9 @@ static gboolean endpoint_init_a2dp_sink(struct media_endpoint *endpoint,
- 	if (endpoint->sep == NULL)
- 		return FALSE;
- 
-+	endpoint->sink_watch = sink_add_state_cb(a2dp_sink_state_changed,
-+								endpoint);
-+
- 	return TRUE;
- }
- 
+ 			Releases file descriptor.
 -- 
 1.7.7.6
 
