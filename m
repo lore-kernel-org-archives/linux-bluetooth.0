@@ -1,16 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
 From: Sachin Kamat <sachin.kamat@linaro.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	sachin.kamat@linaro.org,
-	patches@linaro.org
-Subject: [PATCH 03/11] Bluetooth: Use devm_kzalloc in bluecard_cs.c file
-Date: Fri, 27 Jul 2012 12:38:33 +0530
-Message-Id: <1343372921-18780-4-git-send-email-sachin.kamat@linaro.org>
+Cc: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
+	sachin.kamat@linaro.org, patches@linaro.org
+Subject: [PATCH 02/11] Bluetooth: Use devm_kzalloc in bfusb.c file
+Date: Fri, 27 Jul 2012 12:38:32 +0530
+Message-Id: <1343372921-18780-3-git-send-email-sachin.kamat@linaro.org>
 In-Reply-To: <1343372921-18780-1-git-send-email-sachin.kamat@linaro.org>
 References: <1343372921-18780-1-git-send-email-sachin.kamat@linaro.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 devm_kzalloc() eliminates the need to free memory explicitly
@@ -18,32 +16,67 @@ thereby saving some cleanup code.
 
 Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
 ---
- drivers/bluetooth/bluecard_cs.c |    5 +----
- 1 files changed, 1 insertions(+), 4 deletions(-)
+ drivers/bluetooth/bfusb.c |   12 ++++--------
+ 1 files changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/bluetooth/bluecard_cs.c b/drivers/bluetooth/bluecard_cs.c
-index 66c3a67..0c0838d 100644
---- a/drivers/bluetooth/bluecard_cs.c
-+++ b/drivers/bluetooth/bluecard_cs.c
-@@ -849,7 +849,7 @@ static int bluecard_probe(struct pcmcia_device *link)
- 	bluecard_info_t *info;
+diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
+index 32e8251..995aee9 100644
+--- a/drivers/bluetooth/bfusb.c
++++ b/drivers/bluetooth/bfusb.c
+@@ -653,7 +653,7 @@ static int bfusb_probe(struct usb_interface *intf, const struct usb_device_id *i
+ 	}
  
- 	/* Create new info device */
--	info = kzalloc(sizeof(*info), GFP_KERNEL);
-+	info = devm_kzalloc(&link->dev, sizeof(*info), GFP_KERNEL);
- 	if (!info)
- 		return -ENOMEM;
+ 	/* Initialize control structure and load firmware */
+-	data = kzalloc(sizeof(struct bfusb_data), GFP_KERNEL);
++	data = devm_kzalloc(&intf->dev, sizeof(struct bfusb_data), GFP_KERNEL);
+ 	if (!data) {
+ 		BT_ERR("Can't allocate memory for control structure");
+ 		goto done;
+@@ -674,7 +674,7 @@ static int bfusb_probe(struct usb_interface *intf, const struct usb_device_id *i
  
-@@ -864,10 +864,7 @@ static int bluecard_probe(struct pcmcia_device *link)
+ 	if (request_firmware(&firmware, "bfubase.frm", &udev->dev) < 0) {
+ 		BT_ERR("Firmware request failed");
+-		goto error;
++		goto done;
+ 	}
  
- static void bluecard_detach(struct pcmcia_device *link)
- {
--	bluecard_info_t *info = link->priv;
+ 	BT_DBG("firmware data %p size %zu", firmware->data, firmware->size);
+@@ -690,7 +690,7 @@ static int bfusb_probe(struct usb_interface *intf, const struct usb_device_id *i
+ 	hdev = hci_alloc_dev();
+ 	if (!hdev) {
+ 		BT_ERR("Can't allocate HCI device");
+-		goto error;
++		goto done;
+ 	}
+ 
+ 	data->hdev = hdev;
+@@ -708,7 +708,7 @@ static int bfusb_probe(struct usb_interface *intf, const struct usb_device_id *i
+ 	if (hci_register_dev(hdev) < 0) {
+ 		BT_ERR("Can't register HCI device");
+ 		hci_free_dev(hdev);
+-		goto error;
++		goto done;
+ 	}
+ 
+ 	usb_set_intfdata(intf, data);
+@@ -718,9 +718,6 @@ static int bfusb_probe(struct usb_interface *intf, const struct usb_device_id *i
+ release:
+ 	release_firmware(firmware);
+ 
+-error:
+-	kfree(data);
 -
- 	bluecard_release(link);
--	kfree(info);
+ done:
+ 	return -EIO;
+ }
+@@ -741,7 +738,6 @@ static void bfusb_disconnect(struct usb_interface *intf)
+ 
+ 	hci_unregister_dev(hdev);
+ 	hci_free_dev(hdev);
+-	kfree(data);
  }
  
- 
+ static struct usb_driver bfusb_driver = {
 -- 
 1.7.4.1
+
