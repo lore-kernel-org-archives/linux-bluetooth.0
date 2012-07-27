@@ -1,124 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH v3 BlueZ 02/12] storage: Store address type in "aliases" file
-Date: Fri, 27 Jul 2012 16:43:13 -0300
-Message-Id: <1343418203-15335-3-git-send-email-vinicius.gomes@openbossa.org>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH v3 BlueZ 01/12] storage: Make it clear that delete_entry only works for addresses
+Date: Fri, 27 Jul 2012 16:43:12 -0300
+Message-Id: <1343418203-15335-2-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1343418203-15335-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1343418203-15335-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Paulo Alcantara <paulo.alcantara@openbossa.org>
-
+Also, delete_entry should try to erase both addresses styles, with and
+without address type, if not we may find some leftovers from deleted
+devices.
 ---
- src/device.c  |    7 ++++---
- src/storage.c |   26 +++++++++++++++++++++-----
- src/storage.h |    6 ++++--
- 3 files changed, 29 insertions(+), 10 deletions(-)
+ src/device.c  |   24 +++++++++---------------
+ src/storage.c |   22 +++++++++++++++++++---
+ src/storage.h |    3 ++-
+ 3 files changed, 30 insertions(+), 19 deletions(-)
 
 diff --git a/src/device.c b/src/device.c
-index 28d8a13..d4d4d90 100644
+index cd571f7..28d8a13 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -457,8 +457,8 @@ static DBusMessage *set_alias(DBusConnection *conn, DBusMessage *msg,
- 	ba2str(&device->bdaddr, dstaddr);
+@@ -1152,30 +1152,24 @@ uint16_t btd_device_get_version(struct btd_device *device)
  
- 	/* Remove alias if empty string */
--	err = write_device_alias(srcaddr, dstaddr,
--			g_str_equal(alias, "") ? NULL : alias);
-+	err = write_device_alias(srcaddr, dstaddr, device->bdaddr_type,
-+					g_str_equal(alias, "") ? NULL : alias);
- 	if (err < 0)
- 		return btd_error_failed(msg, strerror(-err));
+ static void device_remove_stored(struct btd_device *device)
+ {
+-	bdaddr_t src;
+-	char key[20];
++	bdaddr_t src, dst;
++	uint8_t dst_type;
+ 	DBusConnection *conn = get_dbus_connection();
  
-@@ -1076,7 +1076,8 @@ struct btd_device *device_create(DBusConnection *conn,
- 	ba2str(&src, srcaddr);
+ 	adapter_get_address(device->adapter, &src);
+-	ba2str(&device->bdaddr, key);
++	device_get_address(device, &dst, &dst_type);
  
- 	read_device_name(srcaddr, address, bdaddr_type, device->name);
--	if (read_device_alias(srcaddr, address, alias, sizeof(alias)) == 0)
-+	if (read_device_alias(srcaddr, address, bdaddr_type, alias,
-+							sizeof(alias)) == 0)
- 		device->alias = g_strdup(alias);
- 	device->trusted = read_trust(&src, address, GLOBAL_TRUST);
+-	/* key: address only */
+-	delete_entry(&src, "profiles", key);
+-	delete_entry(&src, "trusts", key);
++	delete_entry(&src, "profiles", &dst, dst_type);
++	delete_entry(&src, "trusts", &dst, dst_type);
  
+ 	if (device_is_bonded(device)) {
+-		delete_entry(&src, "linkkeys", key);
+-		delete_entry(&src, "aliases", key);
+-
+-		/* key: address#type */
+-		sprintf(&key[17], "#%hhu", device->bdaddr_type);
+-
+-		delete_entry(&src, "longtermkeys", key);
++		delete_entry(&src, "linkkeys", &dst, dst_type);
++		delete_entry(&src, "aliases", &dst, dst_type);
++		delete_entry(&src, "longtermkeys", &dst, dst_type);
+ 
+ 		device_set_bonded(device, FALSE);
+ 		device->paired = FALSE;
+-		btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
+-							device->bdaddr_type);
++		btd_adapter_remove_bonding(device->adapter, &dst, dst_type);
+ 	}
+ 
+ 	delete_all_records(&src, &device->bdaddr);
 diff --git a/src/storage.c b/src/storage.c
-index 7a3010d..df876b4 100644
+index 9289e07..7a3010d 100644
 --- a/src/storage.c
 +++ b/src/storage.c
-@@ -62,17 +62,29 @@ static inline int create_filename(char *buf, size_t size,
- 	return create_name(buf, size, STORAGEDIR, addr, name);
+@@ -800,13 +800,29 @@ int write_device_profiles(bdaddr_t *src, bdaddr_t *dst, const char *profiles)
+ 	return textfile_put(filename, addr, profiles);
  }
  
--int read_device_alias(const char *src, const char *dst, char *alias, size_t size)
-+int read_device_alias(const char *src, const char *dst, uint8_t dst_type,
-+						char *alias, size_t size)
+-int delete_entry(bdaddr_t *src, const char *storage, const char *key)
++int delete_entry(bdaddr_t *src, const char *storage, bdaddr_t *dst,
++							uint8_t dst_type)
  {
- 	char filename[PATH_MAX + 1], *tmp;
-+	char key[20];
- 	int err;
- 
- 	create_name(filename, PATH_MAX, STORAGEDIR, src, "aliases");
- 
--	tmp = textfile_get(filename, dst);
--	if (!tmp)
-+	snprintf(key, sizeof(key), "%17s#%hhu", dst, dst_type);
+-	char filename[PATH_MAX + 1];
++	char filename[PATH_MAX + 1], key[20];
++	int err, ret;
 +
-+	tmp = textfile_get(filename, key);
-+	if (tmp != NULL)
-+		goto done;
++	ba2str(dst, key);
++	sprintf(&key[17], "#%hhu", dst_type);
+ 
+ 	create_filename(filename, PATH_MAX, src, storage);
+ 
+-	return textfile_del(filename, key);
++	err = 0;
++	ret = textfile_del(filename, key);
++	if (ret)
++		err = ret;
 +
-+	/* Try old format (address only) */
++	/* Trying without address type */
 +	key[17] = '\0';
++	ret = textfile_del(filename, key);
++	if (ret)
++		err = ret;
 +
-+	tmp = textfile_get(filename, key);
-+	if (tmp == NULL)
- 		return -ENXIO;
- 
-+done:
- 	err = snprintf(alias, size, "%s", tmp);
- 
- 	free(tmp);
-@@ -80,15 +92,19 @@ int read_device_alias(const char *src, const char *dst, char *alias, size_t size
- 	return err < 0 ? -EIO : 0;
++	return err;
  }
  
--int write_device_alias(const char *src, const char *dst, const char *alias)
-+int write_device_alias(const char *src, const char *dst, uint8_t dst_type,
-+							const char *alias)
- {
- 	char filename[PATH_MAX + 1];
-+	char key[20];
- 
- 	create_name(filename, PATH_MAX, STORAGEDIR, src, "aliases");
- 
- 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- 
--	return textfile_put(filename, dst, alias);
-+	snprintf(key, sizeof(key), "%17s#%hhu", dst, dst_type);
-+
-+	return textfile_put(filename, key, alias);
- }
- 
- int write_discoverable_timeout(bdaddr_t *bdaddr, int timeout)
+ int store_record(const gchar *src, const gchar *dst, sdp_record_t *rec)
 diff --git a/src/storage.h b/src/storage.h
-index c5fabd1..2291390 100644
+index 07de39f..c5fabd1 100644
 --- a/src/storage.h
 +++ b/src/storage.h
-@@ -23,8 +23,10 @@
- 
- #include "textfile.h"
- 
--int read_device_alias(const char *src, const char *dst, char *alias, size_t size);
--int write_device_alias(const char *src, const char *dst, const char *alias);
-+int read_device_alias(const char *src, const char *dst, uint8_t dst_type,
-+						char *alias, size_t size);
-+int write_device_alias(const char *src, const char *dst, uint8_t dst_type,
-+							const char *alias);
- int write_discoverable_timeout(bdaddr_t *bdaddr, int timeout);
- int read_discoverable_timeout(const char *src, int *timeout);
- int write_pairable_timeout(bdaddr_t *bdaddr, int timeout);
+@@ -60,7 +60,8 @@ ssize_t read_pin_code(bdaddr_t *local, bdaddr_t *peer, char *pin);
+ gboolean read_trust(const bdaddr_t *local, const char *addr, const char *service);
+ int write_trust(const char *src, const char *addr, const char *service, gboolean trust);
+ int write_device_profiles(bdaddr_t *src, bdaddr_t *dst, const char *profiles);
+-int delete_entry(bdaddr_t *src, const char *storage, const char *key);
++int delete_entry(bdaddr_t *src, const char *storage, bdaddr_t *dst,
++							uint8_t dst_type);
+ int store_record(const gchar *src, const gchar *dst, sdp_record_t *rec);
+ sdp_record_t *record_from_string(const gchar *str);
+ sdp_record_t *fetch_record(const gchar *src, const gchar *dst, const uint32_t handle);
 -- 
 1.7.10.4
 
