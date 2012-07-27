@@ -1,36 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC v2] DBus OutOfBand API update
-Date: Fri, 27 Jul 2012 14:22:02 +0200
-Message-ID: <1343391723-32072-1-git-send-email-szymon.janc@tieto.com>
+Sender: Jiri Slaby <jirislaby@gmail.com>
+Message-ID: <50126FB8.5070200@suse.cz>
+Date: Fri, 27 Jul 2012 12:38:48 +0200
+From: Jiri Slaby <jslaby@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Alin M Elena <alinm.elena@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+ Gustavo Padovan <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ linux-bluetooth@vger.kernel.org,
+ Linux kernel mailing list <linux-kernel@vger.kernel.org>
+Subject: Re: bluetooth not working since kernel 3.4.4
+References: <10337447.lD117hnr9f@abbaton.ucd.ie>
+In-Reply-To: <10337447.lD117hnr9f@abbaton.ucd.ie>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changes in V2:
-Added TK and 'SM OOB Flags' fields for BLE as suggested by Vinicius.
+FWD to upstream. For him, bluetooth in 3.5 vanilla does not work:
 
-Some of V1 questions are still valid:
-- short name vs full name distinguish
-- emit DeviceDisappeared when removing oob data?
-- enable OOB interface only for BLE and/or SSP capable adapters?
+On 07/27/2012 12:02 AM, Alin M Elena wrote:
+> since updating to kernel 3.4.4 my bluetooth stopped working...
+> kde claims there is no adapter available and the same gnome...
+> 
+> 
+> the device is
+> Bus 004 Device 004: ID 0a5c:4500 Broadcom Corp. BCM2046B1 USB 2.0 Hub (part of 
+> BCM2046 Bluetooth)
+> [alin@abbaton:~]: dmesg | grep bt
+> [   15.862126] usbcore: registered new interface driver btusb
+> [alin@abbaton:~]: hcitool dev
+> Devices:
+> 
+> I have updated since to the new 3.5.0 kernel and the situation is the same.
+> 
+> 
+> [alin@abbaton:~]: uname -a
+> Linux abbaton.ucd.ie 3.5.0-1-desktop #1 SMP PREEMPT Tue Jul 24 13:38:05 UTC 
+> 2012 (fb9c50b) x86_64 x86_64 x86_64 GNU/Linux
+> 
+> Anyone else seeing the same? any advice?
 
-Comment are welcome.
 
+
+On 07/27/2012 11:33 AM, Alin M Elena wrote:
+>> What was the last working kernel?
+> 3.4.2 iirc
+>
+>> Does kernel-vanilla work? I suppose
+>> not, if you confirm that, we could discuss this with upstream...
+> just tried the last kernel-vanilla from Kerned:Head 3.5.0-2.1 and no
+bluetooth
+> adapter found..
+>
+> I forgot to mention earlier.
+>
+> rfkill list
+> 0: hci0: Bluetooth
+>         Soft blocked: no
+>         Hard blocked: no
+>
+> and I have tried the device in mac OSX and it works...
+> the machine is a mac book pro 7,1.
+
+regards,
 -- 
-BR
-Szymon Janc
-
-Szymon Janc (1):
-  dbusoob: Update API
-
- doc/oob-api.txt |   70 ++++++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 64 insertions(+), 6 deletions(-)
-
--- 
-1.7.9.5
-
+js
+suse labs
