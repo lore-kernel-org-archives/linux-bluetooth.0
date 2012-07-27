@@ -1,38 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+From: Sachin Kamat <sachin.kamat@linaro.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH BlueZ] audio: Remove redundant variable gerr
-Date: Fri, 27 Jul 2012 13:14:12 +0530
-Message-id: <1343375053-19193-1-git-send-email-jaganath.k@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	sachin.kamat@linaro.org,
+	patches@linaro.org
+Subject: [PATCH 11/11] Bluetooth: Use devm_kzalloc in dtl1_cs.c file
+Date: Fri, 27 Jul 2012 12:38:41 +0530
+Message-Id: <1343372921-18780-12-git-send-email-sachin.kamat@linaro.org>
+In-Reply-To: <1343372921-18780-1-git-send-email-sachin.kamat@linaro.org>
+References: <1343372921-18780-1-git-send-email-sachin.kamat@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+devm_kzalloc() eliminates the need to free memory explicitly
+thereby saving some cleanup code.
+
+Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
 ---
- audio/gateway.c |    3 +--
+ drivers/bluetooth/dtl1_cs.c |    3 +--
  1 files changed, 1 insertions(+), 2 deletions(-)
 
-diff --git a/audio/gateway.c b/audio/gateway.c
-index 6162948..1c45753 100644
---- a/audio/gateway.c
-+++ b/audio/gateway.c
-@@ -381,7 +381,6 @@ static void get_incoming_record_cb(sdp_list_t *recs, int err,
- {
- 	struct audio_device *dev = user_data;
- 	struct gateway *gw = dev->gateway;
--	GError *gerr = NULL;
+diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
+index 97a7784..036cb36 100644
+--- a/drivers/bluetooth/dtl1_cs.c
++++ b/drivers/bluetooth/dtl1_cs.c
+@@ -550,7 +550,7 @@ static int dtl1_probe(struct pcmcia_device *link)
+ 	dtl1_info_t *info;
  
- 	if (err < 0) {
- 		error("Unable to get service record: %s (%d)", strerror(-err),
-@@ -398,7 +397,7 @@ static void get_incoming_record_cb(sdp_list_t *recs, int err,
- 	if (gw->version == 0)
- 		goto fail;
+ 	/* Create new info device */
+-	info = kzalloc(sizeof(*info), GFP_KERNEL);
++	info = devm_kzalloc(&link->dev, sizeof(*info), GFP_KERNEL);
+ 	if (!info)
+ 		return -ENOMEM;
  
--	rfcomm_connect_cb(gw->incoming, gerr, dev);
-+	rfcomm_connect_cb(gw->incoming, NULL, dev);
- 	return;
+@@ -569,7 +569,6 @@ static void dtl1_detach(struct pcmcia_device *link)
  
- fail:
+ 	dtl1_close(info);
+ 	pcmcia_disable_device(link);
+-	kfree(info);
+ }
+ 
+ static int dtl1_confcheck(struct pcmcia_device *p_dev, void *priv_data)
 -- 
-1.7.1
-
+1.7.4.1
