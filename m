@@ -1,43 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAMBjcSsDp2RZxAQOqu3cbWyCv7sdnhfmGWi3Ux_NPJyqKWvoYw@mail.gmail.com>
-References: <CAMBjcSsDp2RZxAQOqu3cbWyCv7sdnhfmGWi3Ux_NPJyqKWvoYw@mail.gmail.com>
-Date: Sat, 28 Jul 2012 01:06:10 -0300
-Message-ID: <CAMBjcSu4uH9wSXhqj7mD9iGP4TF6-dsRpNRQ80SbJJx6pbLRMg@mail.gmail.com>
-Subject: Re: GSoC student introduction
-From: "Thiago S. A." <thiago.xth1@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1343431747.1803.12.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Another vendor specific ID for BCM20702A0
+ [0a5c:21f1]
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Fri, 27 Jul 2012 16:29:07 -0700
+In-Reply-To: <1343424081-2157-1-git-send-email-mmarek@suse.cz>
+References: <1343424081-2157-1-git-send-email-mmarek@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello again BlueZ community.
+Hi Michael,
 
-I'd like to show the status of project.
+> Bus 002 Device 003: ID 0a5c:21f1 Broadcom Corp.
+> Device Descriptor:
+>   bLength                18
+>   bDescriptorType         1
+>   bcdUSB               2.00
+>   bDeviceClass          255 Vendor Specific Class
+>   bDeviceSubClass         1
+>   bDeviceProtocol         1
+>   bMaxPacketSize0        64
+>   idVendor           0x0a5c Broadcom Corp.
+>   idProduct          0x21f1
+>   bcdDevice            1.12
+>   iManufacturer           1 Broadcom Corp
+>   iProduct                2 BCM20702A0
+>   iSerial                 3 9CB70DCFF833
+>   bNumConfigurations      1
 
-Currently it has this features:
+as usual include /sys/kernel/debug/usb/devices details for this device.
+I want the full set of endpoint descriptors in a simple compact format
+in the commit messages for reference.
 
-- Dump bluetooth traffic in real time.
+Regards
 
-- Parser of events.
+Marcel
 
-- Draw sequence diagram.
 
-- Show details of events.
-
-- Filter events by device.
-
-In my blog [1] there is a more detailed description of project status,
-including a video demonstration of tool execution.
-
-Source code of this project is available in a github repository [0].
-
-I appreciate any suggestions to improve the tool and any feedback
-
-Cheers,
-
-Thiago.
-
-[0] https://github.com/xth1/bluez-traffic
-
-[1] http://xth1.blogspot.com.br/search/label/GSOC
