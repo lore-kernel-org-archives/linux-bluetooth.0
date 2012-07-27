@@ -6,9 +6,9 @@ Cc: marcel@holtmann.org,
 	johan.hedberg@gmail.com,
 	sachin.kamat@linaro.org,
 	patches@linaro.org
-Subject: [PATCH 08/11] Bluetooth: Use devm_kzalloc in btuart_cs.c file
-Date: Fri, 27 Jul 2012 12:38:38 +0530
-Message-Id: <1343372921-18780-9-git-send-email-sachin.kamat@linaro.org>
+Subject: [PATCH 07/11] Bluetooth: Use devm_kzalloc in btsdio.c file
+Date: Fri, 27 Jul 2012 12:38:37 +0530
+Message-Id: <1343372921-18780-8-git-send-email-sachin.kamat@linaro.org>
 In-Reply-To: <1343372921-18780-1-git-send-email-sachin.kamat@linaro.org>
 References: <1343372921-18780-1-git-send-email-sachin.kamat@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -18,32 +18,49 @@ thereby saving some cleanup code.
 
 Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
 ---
- drivers/bluetooth/btuart_cs.c |    5 +----
- 1 files changed, 1 insertions(+), 4 deletions(-)
+ drivers/bluetooth/btsdio.c |    8 ++------
+ 1 files changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/bluetooth/btuart_cs.c b/drivers/bluetooth/btuart_cs.c
-index 21e803a..2f510a8 100644
---- a/drivers/bluetooth/btuart_cs.c
-+++ b/drivers/bluetooth/btuart_cs.c
-@@ -567,7 +567,7 @@ static int btuart_probe(struct pcmcia_device *link)
- 	btuart_info_t *info;
+diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
+index e10ea03..4a99097 100644
+--- a/drivers/bluetooth/btsdio.c
++++ b/drivers/bluetooth/btsdio.c
+@@ -304,7 +304,7 @@ static int btsdio_probe(struct sdio_func *func,
+ 		tuple = tuple->next;
+ 	}
  
- 	/* Create new info device */
--	info = kzalloc(sizeof(*info), GFP_KERNEL);
-+	info = devm_kzalloc(&link->dev, sizeof(*info), GFP_KERNEL);
- 	if (!info)
+-	data = kzalloc(sizeof(*data), GFP_KERNEL);
++	data = devm_kzalloc(&func->dev, sizeof(*data), GFP_KERNEL);
+ 	if (!data)
  		return -ENOMEM;
  
-@@ -583,10 +583,7 @@ static int btuart_probe(struct pcmcia_device *link)
+@@ -315,10 +315,8 @@ static int btsdio_probe(struct sdio_func *func,
+ 	skb_queue_head_init(&data->txq);
  
- static void btuart_detach(struct pcmcia_device *link)
- {
--	btuart_info_t *info = link->priv;
--
- 	btuart_release(link);
--	kfree(info);
+ 	hdev = hci_alloc_dev();
+-	if (!hdev) {
+-		kfree(data);
++	if (!hdev)
+ 		return -ENOMEM;
+-	}
+ 
+ 	hdev->bus = HCI_SDIO;
+ 	hci_set_drvdata(hdev, data);
+@@ -340,7 +338,6 @@ static int btsdio_probe(struct sdio_func *func,
+ 	err = hci_register_dev(hdev);
+ 	if (err < 0) {
+ 		hci_free_dev(hdev);
+-		kfree(data);
+ 		return err;
+ 	}
+ 
+@@ -366,7 +363,6 @@ static void btsdio_remove(struct sdio_func *func)
+ 	hci_unregister_dev(hdev);
+ 
+ 	hci_free_dev(hdev);
+-	kfree(data);
  }
  
- static int btuart_check_config(struct pcmcia_device *p_dev, void *priv_data)
+ static struct sdio_driver btsdio_driver = {
 -- 
 1.7.4.1
