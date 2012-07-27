@@ -1,246 +1,224 @@
 Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [RFC BlueZ] storage: Remove support for trusted services
-Date: Fri, 27 Jul 2012 17:19:09 -0300
-Message-Id: <1343420349-18877-1-git-send-email-vinicius.gomes@openbossa.org>
+Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
+Subject: [PATCH v3 BlueZ 12/12] storage: Store address type in "sdp" file
+Date: Fri, 27 Jul 2012 16:43:23 -0300
+Message-Id: <1343418203-15335-13-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1343418203-15335-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1343418203-15335-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since a long time, it is impossible to set individual services as
-trusted using our API, so there's no need to have support for storing
-this kind of information.
+From: Paulo Alcantara <paulo.alcantara@openbossa.org>
+
 ---
-Hi,
+ profiles/input/device.c |    5 ++++-
+ src/device.c            |   12 ++++++++----
+ src/storage.c           |   49 ++++++++++++++++++++++++++++++++++-------------
+ src/storage.h           |   12 ++++++++----
+ 4 files changed, 56 insertions(+), 22 deletions(-)
 
-Do you think it is useful to still maintain support for reading that kind of
-information? That "feature" was removed in the 3 -> 4 transition as deprecated.
-
-Cheers,
-
- src/device.c  |    9 +----
- src/storage.c |  119 +++++++--------------------------------------------------
- src/storage.h |    6 +--
- 3 files changed, 19 insertions(+), 115 deletions(-)
-
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index 829ca03..ed178b4 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -599,6 +599,7 @@ static int hidp_add_connection(const struct input_device *idev,
+ 	struct hidp_connadd_req *req;
+ 	struct fake_hid *fake_hid;
+ 	struct fake_input *fake;
++	uint8_t dst_type;
+ 	sdp_record_t *rec;
+ 	char src_addr[18], dst_addr[18];
+ 	GError *gerr = NULL;
+@@ -613,7 +614,9 @@ static int hidp_add_connection(const struct input_device *idev,
+ 	ba2str(&idev->src, src_addr);
+ 	ba2str(&idev->dst, dst_addr);
+ 
+-	rec = fetch_record(src_addr, dst_addr, idev->handle);
++	dst_type = device_get_addr_type(idev->device);
++
++	rec = fetch_record(src_addr, dst_addr, dst_type, idev->handle);
+ 	if (!rec) {
+ 		error("Rejected connection from unknown device %s", dst_addr);
+ 		err = -EPERM;
 diff --git a/src/device.c b/src/device.c
-index 1718726..73df561 100644
+index 4ff37e6..1718726 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -69,9 +69,6 @@
-
- #define AUTO_CONNECTION_INTERVAL	5 /* Next connection attempt */
-
--/* When all services should trust a remote device */
--#define GLOBAL_TRUST "[all]"
--
- #define APPEARANCE_CHR_UUID 0x2a01
-
- struct btd_disconnect_data {
-@@ -488,8 +485,7 @@ static DBusMessage *set_trust(DBusConnection *conn, DBusMessage *msg,
- 	ba2str(&src, srcaddr);
- 	ba2str(&device->bdaddr, dstaddr);
-
--	err = write_trust(srcaddr, dstaddr, device->bdaddr_type, GLOBAL_TRUST,
--									value);
-+	err = write_trust(srcaddr, dstaddr, device->bdaddr_type, value);
- 	if (err < 0)
- 		return btd_error_failed(msg, strerror(-err));
-
-@@ -1080,8 +1076,7 @@ struct btd_device *device_create(DBusConnection *conn,
- 	if (read_device_alias(srcaddr, address, bdaddr_type, alias,
- 							sizeof(alias)) == 0)
- 		device->alias = g_strdup(alias);
--	device->trusted = read_trust(&src, address, device->bdaddr_type,
--								GLOBAL_TRUST);
-+	device->trusted = read_trust(&src, address, device->bdaddr_type);
-
- 	if (read_blocked(&src, &device->bdaddr, device->bdaddr_type))
- 		device_block(conn, device, FALSE);
+@@ -1176,8 +1176,8 @@ static void device_remove_stored(struct btd_device *device)
+ 		btd_adapter_remove_bonding(device->adapter, &dst, dst_type);
+ 	}
+ 
+-	delete_all_records(&src, &device->bdaddr);
+-	delete_device_service(&src, &device->bdaddr, device->bdaddr_type);
++	delete_all_records(&src, &dst, dst_type);
++	delete_device_service(&src, &dst, dst_type);
+ 
+ 	if (device->blocked)
+ 		device_unblock(conn, device, TRUE, FALSE);
+@@ -1401,7 +1401,8 @@ static void device_remove_drivers(struct btd_device *device, GSList *uuids)
+ 		if (!rec)
+ 			continue;
+ 
+-		delete_record(srcaddr, dstaddr, rec->handle);
++		delete_record(srcaddr, dstaddr, device->bdaddr_type,
++							rec->handle);
+ 
+ 		records = sdp_list_remove(records, rec);
+ 		sdp_record_free(rec);
+@@ -1443,6 +1444,7 @@ static void update_services(struct browse_req *req, sdp_list_t *recs)
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+ 	sdp_list_t *seq;
+ 	char srcaddr[18], dstaddr[18];
++	uint8_t dst_type;
+ 	bdaddr_t src;
+ 
+ 	adapter_get_address(adapter, &src);
+@@ -1509,7 +1511,9 @@ static void update_services(struct browse_req *req, sdp_list_t *recs)
+ 			continue;
+ 		}
+ 
+-		store_record(srcaddr, dstaddr, rec);
++		dst_type = device_get_addr_type(device);
++
++		store_record(srcaddr, dstaddr, dst_type, rec);
+ 
+ 		/* Copy record */
+ 		req->records = sdp_list_append(req->records,
 diff --git a/src/storage.c b/src/storage.c
-index c50e920..3db1754 100644
+index 9e0ea12..c50e920 100644
 --- a/src/storage.c
 +++ b/src/storage.c
-@@ -47,6 +47,9 @@
- #include "glib-helper.h"
- #include "storage.h"
-
-+/* When all services should trust a remote device */
-+#define GLOBAL_TRUST "[all]"
-+
- struct match {
- 	GSList *keys;
- 	char *pattern;
-@@ -714,59 +717,10 @@ ssize_t read_pin_code(bdaddr_t *local, bdaddr_t *peer, char *pin)
- 	return len;
+@@ -894,9 +894,10 @@ int delete_entry(bdaddr_t *src, const char *storage, bdaddr_t *dst,
+ 	return err;
  }
-
--static GSList *service_string_to_list(char *services)
--{
--	GSList *l = NULL;
--	char *start = services;
--	int i, finished = 0;
--
--	for (i = 0; !finished; i++) {
--		if (services[i] == '\0')
--			finished = 1;
--
--		if (services[i] == ' ' || services[i] == '\0') {
--			services[i] = '\0';
--			l = g_slist_append(l, start);
--			start = services + i + 1;
--		}
--	}
--
--	return l;
--}
--
--static char *service_list_to_string(GSList *services)
--{
--	char str[1024];
--	int len = 0;
--
--	if (!services)
--		return g_strdup("");
--
--	memset(str, 0, sizeof(str));
--
--	while (services) {
--		int ret;
--		char *ident = services->data;
--
--		ret = snprintf(str + len, sizeof(str) - len - 1, "%s%s",
--				ident, services->next ? " " : "");
--
--		if (ret > 0)
--			len += ret;
--
--		services = services->next;
--	}
--
--	return g_strdup(str);
--}
--
- int write_trust(const char *src, const char *addr, uint8_t addr_type,
--					const char *service, gboolean trust)
-+							gboolean trust)
+ 
+-int store_record(const gchar *src, const gchar *dst, sdp_record_t *rec)
++int store_record(const gchar *src, const gchar *dst, uint8_t dst_type,
++							sdp_record_t *rec)
  {
--	char filename[PATH_MAX + 1], key[20], *str;
--	GSList *services = NULL, *match;
--	gboolean trusted;
--	int ret;
-+	char filename[PATH_MAX + 1], key[20];
-
- 	create_name(filename, PATH_MAX, STORAGEDIR, src, "trusts");
-
-@@ -774,54 +728,15 @@ int write_trust(const char *src, const char *addr, uint8_t addr_type,
-
- 	snprintf(key, sizeof(key), "%17s#%hhu", addr, addr_type);
-
--	str = textfile_caseget(filename, key);
--	if (str == NULL) {
--		/* Try old format (address only) */
--		str = textfile_caseget(filename, addr);
--		if (str)
--			services = service_string_to_list(str);
--	} else
--		services = service_string_to_list(str);
--
--	match = g_slist_find_custom(services, service, (GCompareFunc) strcmp);
--	trusted = match ? TRUE : FALSE;
--
--	/* If the old setting is the same as the requested one, we're done */
--	if (trusted == trust) {
--		g_slist_free(services);
--		free(str);
--		return 0;
--	}
--
--	if (trust)
--		services = g_slist_append(services, (void *) service);
--	else
--		services = g_slist_remove(services, match->data);
--
--	/* Remove the entry if the last trusted service was removed */
--	if (!trust && !services) {
--		ret = textfile_casedel(filename, key);
--		if (ret < 0)
--			/* Try old format (address only) */
--			ret = textfile_casedel(filename, addr);
--	} else {
--		char *new_str = service_list_to_string(services);
--		ret = textfile_caseput(filename, key, new_str);
--		g_free(new_str);
--	}
--
--	g_slist_free(services);
--
--	free(str);
-+	if (trust == FALSE)
-+		return textfile_casedel(filename, key);
-
--	return ret;
-+	return textfile_caseput(filename, key, GLOBAL_TRUST);
- }
-
--gboolean read_trust(const bdaddr_t *local, const char *addr, uint8_t addr_type,
--							const char *service)
-+gboolean read_trust(const bdaddr_t *local, const char *addr, uint8_t addr_type)
+-	char filename[PATH_MAX + 1], key[28];
++	char filename[PATH_MAX + 1], key[30];
+ 	sdp_buf_t buf;
+ 	int err, size, i;
+ 	char *str;
+@@ -905,7 +906,8 @@ int store_record(const gchar *src, const gchar *dst, sdp_record_t *rec)
+ 
+ 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+ 
+-	snprintf(key, sizeof(key), "%17s#%08X", dst, rec->handle);
++	snprintf(key, sizeof(key), "%17s#%hhu#%08X", dst, dst_type,
++								rec->handle);
+ 
+ 	if (sdp_gen_record_pdu(rec, &buf) < 0)
+ 		return -1;
+@@ -949,34 +951,54 @@ sdp_record_t *record_from_string(const gchar *str)
+ 
+ 
+ sdp_record_t *fetch_record(const gchar *src, const gchar *dst,
+-						const uint32_t handle)
++			   uint8_t dst_type, const uint32_t handle)
  {
- 	char filename[PATH_MAX + 1], key[20], *str;
--	GSList *services;
- 	gboolean ret;
-
- 	create_filename(filename, PATH_MAX, local, "trusts");
-@@ -829,25 +744,19 @@ gboolean read_trust(const bdaddr_t *local, const char *addr, uint8_t addr_type,
- 	snprintf(key, sizeof(key), "%17s#%hhu", addr, addr_type);
-
- 	str = textfile_caseget(filename, key);
--	if (str != NULL)
--		goto done;
-+	if (str == NULL)
-+		/* Try old format (address only) */
-+		str = textfile_caseget(filename, addr);
-
--	/* Try old format (address only) */
--	str = textfile_caseget(filename, addr);
+-	char filename[PATH_MAX + 1], key[28], *str;
++	char filename[PATH_MAX + 1], old_key[28], key[30], *str;
+ 	sdp_record_t *rec;
+ 
+ 	create_name(filename, PATH_MAX, STORAGEDIR, src, "sdp");
+ 
+-	snprintf(key, sizeof(key), "%17s#%08X", dst, handle);
++	snprintf(key, sizeof(key), "%17s#%hhu#%08X", dst, dst_type, handle);
++	snprintf(old_key, sizeof(old_key), "%17s#%08X", dst, handle);
+ 
+ 	str = textfile_get(filename, key);
 -	if (!str)
++	if (str != NULL)
++		goto done;
++
++	/* Try old format (address#handle) */
++	str = textfile_get(filename, old_key);
 +	if (str == NULL)
- 		return FALSE;
-
--done:
--	services = service_string_to_list(str);
--
--	if (g_slist_find_custom(services, service, (GCompareFunc) strcmp))
-+	if (strcmp(str, GLOBAL_TRUST) == 0)
- 		ret = TRUE;
- 	else
- 		ret = FALSE;
-
--	g_slist_free(services);
+ 		return NULL;
+ 
++done:
+ 	rec = record_from_string(str);
  	free(str);
--
- 	return ret;
+ 
+ 	return rec;
  }
-
+ 
+-int delete_record(const gchar *src, const gchar *dst, const uint32_t handle)
++int delete_record(const gchar *src, const gchar *dst, uint8_t dst_type,
++							const uint32_t handle)
+ {
+-	char filename[PATH_MAX + 1], key[28];
++	char filename[PATH_MAX + 1], old_key[28], key[30];
++	int err, ret;
+ 
+ 	create_name(filename, PATH_MAX, STORAGEDIR, src, "sdp");
+ 
+-	snprintf(key, sizeof(key), "%17s#%08X", dst, handle);
++	snprintf(key, sizeof(key), "%17s#%hhu#%08X", dst, dst_type, handle);
++	snprintf(old_key, sizeof(old_key), "%17s#%08X", dst, handle);
+ 
+-	return textfile_del(filename, key);
++	err = 0;
++	ret = textfile_del(filename, key);
++	if (ret)
++		err = ret;
++
++	/* Try old format (address#handle) */
++	ret = textfile_del(filename, old_key);
++	if (ret)
++		err = ret;
++
++	return err;
+ }
+ 
+ struct record_list {
+@@ -999,7 +1021,8 @@ static void create_stored_records_from_keys(char *key, char *value,
+ 	rec_list->recs = sdp_list_append(rec_list->recs, rec);
+ }
+ 
+-void delete_all_records(const bdaddr_t *src, const bdaddr_t *dst)
++void delete_all_records(const bdaddr_t *src, const bdaddr_t *dst,
++							uint8_t dst_type)
+ {
+ 	sdp_list_t *records, *seq;
+ 	char srcaddr[18], dstaddr[18];
+@@ -1011,7 +1034,7 @@ void delete_all_records(const bdaddr_t *src, const bdaddr_t *dst)
+ 
+ 	for (seq = records; seq; seq = seq->next) {
+ 		sdp_record_t *rec = seq->data;
+-		delete_record(srcaddr, dstaddr, rec->handle);
++		delete_record(srcaddr, dstaddr, dst_type, rec->handle);
+ 	}
+ 
+ 	if (records)
 diff --git a/src/storage.h b/src/storage.h
-index c4f13dd..6e2766d 100644
+index b8cdb3c..c4f13dd 100644
 --- a/src/storage.h
 +++ b/src/storage.h
-@@ -64,10 +64,10 @@ int write_link_key(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
- int read_link_key(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
- 					unsigned char *key, uint8_t *type);
- ssize_t read_pin_code(bdaddr_t *local, bdaddr_t *peer, char *pin);
--gboolean read_trust(const bdaddr_t *local, const char *addr, uint8_t addr_type,
--							const char *service);
-+gboolean read_trust(const bdaddr_t *local, const char *addr,
-+						uint8_t addr_type);
- int write_trust(const char *src, const char *addr, uint8_t addr_type,
--					const char *service, gboolean trust);
-+							gboolean trust);
- int write_device_profiles(bdaddr_t *src, bdaddr_t *dst, uint8_t dst_type,
+@@ -72,11 +72,15 @@ int write_device_profiles(bdaddr_t *src, bdaddr_t *dst, uint8_t dst_type,
  							const char *profiles);
  int delete_entry(bdaddr_t *src, const char *storage, bdaddr_t *dst,
---
+ 							uint8_t dst_type);
+-int store_record(const gchar *src, const gchar *dst, sdp_record_t *rec);
++int store_record(const gchar *src, const gchar *dst, uint8_t dst_type,
++							sdp_record_t *rec);
+ sdp_record_t *record_from_string(const gchar *str);
+-sdp_record_t *fetch_record(const gchar *src, const gchar *dst, const uint32_t handle);
+-int delete_record(const gchar *src, const gchar *dst, const uint32_t handle);
+-void delete_all_records(const bdaddr_t *src, const bdaddr_t *dst);
++sdp_record_t *fetch_record(const gchar *src, const gchar *dst,
++			   uint8_t dst_type, const uint32_t handle);
++int delete_record(const gchar *src, const gchar *dst, uint8_t dst_type,
++							const uint32_t handle);
++void delete_all_records(const bdaddr_t *src, const bdaddr_t *dst,
++							uint8_t dst_type);
+ sdp_list_t *read_records(const bdaddr_t *src, const bdaddr_t *dst);
+ sdp_record_t *find_record_in_list(sdp_list_t *recs, const char *uuid);
+ int store_device_id(const gchar *src, const gchar *dst, uint8_t dst_type,
+-- 
 1.7.10.4
+
