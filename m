@@ -6,9 +6,9 @@ Cc: marcel@holtmann.org,
 	johan.hedberg@gmail.com,
 	sachin.kamat@linaro.org,
 	patches@linaro.org
-Subject: [PATCH 07/11] Bluetooth: Use devm_kzalloc in btsdio.c file
-Date: Fri, 27 Jul 2012 12:38:37 +0530
-Message-Id: <1343372921-18780-8-git-send-email-sachin.kamat@linaro.org>
+Subject: [PATCH 06/11] Bluetooth: Use devm_kzalloc in btmrvl_sdio.c file
+Date: Fri, 27 Jul 2012 12:38:36 +0530
+Message-Id: <1343372921-18780-7-git-send-email-sachin.kamat@linaro.org>
 In-Reply-To: <1343372921-18780-1-git-send-email-sachin.kamat@linaro.org>
 References: <1343372921-18780-1-git-send-email-sachin.kamat@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -18,49 +18,55 @@ thereby saving some cleanup code.
 
 Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
 ---
- drivers/bluetooth/btsdio.c |    8 ++------
- 1 files changed, 2 insertions(+), 6 deletions(-)
+ drivers/bluetooth/btmrvl_sdio.c |   15 ++++-----------
+ 1 files changed, 4 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
-index e10ea03..4a99097 100644
---- a/drivers/bluetooth/btsdio.c
-+++ b/drivers/bluetooth/btsdio.c
-@@ -304,7 +304,7 @@ static int btsdio_probe(struct sdio_func *func,
- 		tuple = tuple->next;
- 	}
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 6a9e971..03b3acb 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -956,11 +956,9 @@ static int btmrvl_sdio_probe(struct sdio_func *func,
+ 	BT_INFO("vendor=0x%x, device=0x%x, class=%d, fn=%d",
+ 			id->vendor, id->device, id->class, func->num);
  
--	data = kzalloc(sizeof(*data), GFP_KERNEL);
-+	data = devm_kzalloc(&func->dev, sizeof(*data), GFP_KERNEL);
- 	if (!data)
- 		return -ENOMEM;
- 
-@@ -315,10 +315,8 @@ static int btsdio_probe(struct sdio_func *func,
- 	skb_queue_head_init(&data->txq);
- 
- 	hdev = hci_alloc_dev();
--	if (!hdev) {
--		kfree(data);
-+	if (!hdev)
- 		return -ENOMEM;
+-	card = kzalloc(sizeof(*card), GFP_KERNEL);
+-	if (!card) {
+-		ret = -ENOMEM;
+-		goto done;
 -	}
++	card = devm_kzalloc(&func->dev, sizeof(*card), GFP_KERNEL);
++	if (!card)
++		return -ENOMEM;
  
- 	hdev->bus = HCI_SDIO;
- 	hci_set_drvdata(hdev, data);
-@@ -340,7 +338,6 @@ static int btsdio_probe(struct sdio_func *func,
- 	err = hci_register_dev(hdev);
- 	if (err < 0) {
- 		hci_free_dev(hdev);
--		kfree(data);
- 		return err;
+ 	card->func = func;
+ 
+@@ -974,8 +972,7 @@ static int btmrvl_sdio_probe(struct sdio_func *func,
+ 
+ 	if (btmrvl_sdio_register_dev(card) < 0) {
+ 		BT_ERR("Failed to register BT device!");
+-		ret = -ENODEV;
+-		goto free_card;
++		return -ENODEV;
  	}
  
-@@ -366,7 +363,6 @@ static void btsdio_remove(struct sdio_func *func)
- 	hci_unregister_dev(hdev);
- 
- 	hci_free_dev(hdev);
--	kfree(data);
+ 	/* Disable the interrupts on the card */
+@@ -1023,9 +1020,6 @@ disable_host_int:
+ 	btmrvl_sdio_disable_host_int(card);
+ unreg_dev:
+ 	btmrvl_sdio_unregister_dev(card);
+-free_card:
+-	kfree(card);
+-done:
+ 	return ret;
  }
  
- static struct sdio_driver btsdio_driver = {
+@@ -1047,7 +1041,6 @@ static void btmrvl_sdio_remove(struct sdio_func *func)
+ 			BT_DBG("unregester dev");
+ 			btmrvl_sdio_unregister_dev(card);
+ 			btmrvl_remove_card(card->priv);
+-			kfree(card);
+ 		}
+ 	}
+ }
 -- 
 1.7.4.1
