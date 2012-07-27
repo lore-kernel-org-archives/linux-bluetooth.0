@@ -6,9 +6,9 @@ Cc: marcel@holtmann.org,
 	johan.hedberg@gmail.com,
 	sachin.kamat@linaro.org,
 	patches@linaro.org
-Subject: [PATCH 10/11] Bluetooth: Use devm_kzalloc in btwilink.c file
-Date: Fri, 27 Jul 2012 12:38:40 +0530
-Message-Id: <1343372921-18780-11-git-send-email-sachin.kamat@linaro.org>
+Subject: [PATCH 09/11] Bluetooth: Use devm_kzalloc in btusb.c file
+Date: Fri, 27 Jul 2012 12:38:39 +0530
+Message-Id: <1343372921-18780-10-git-send-email-sachin.kamat@linaro.org>
 In-Reply-To: <1343372921-18780-1-git-send-email-sachin.kamat@linaro.org>
 References: <1343372921-18780-1-git-send-email-sachin.kamat@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -18,47 +18,69 @@ thereby saving some cleanup code.
 
 Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
 ---
- drivers/bluetooth/btwilink.c |    8 ++------
- 1 files changed, 2 insertions(+), 6 deletions(-)
+ drivers/bluetooth/btusb.c |   13 +++----------
+ 1 files changed, 3 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/bluetooth/btwilink.c b/drivers/bluetooth/btwilink.c
-index 8869469..4ad7b35 100644
---- a/drivers/bluetooth/btwilink.c
-+++ b/drivers/bluetooth/btwilink.c
-@@ -297,16 +297,14 @@ static int bt_ti_probe(struct platform_device *pdev)
- 	struct hci_dev *hdev;
- 	int err;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index e272214..f637c25 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -952,7 +952,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 			return -ENODEV;
+ 	}
  
--	hst = kzalloc(sizeof(struct ti_st), GFP_KERNEL);
-+	hst = devm_kzalloc(&pdev->dev, sizeof(struct ti_st), GFP_KERNEL);
- 	if (!hst)
+-	data = kzalloc(sizeof(*data), GFP_KERNEL);
++	data = devm_kzalloc(&intf->dev, sizeof(*data), GFP_KERNEL);
+ 	if (!data)
  		return -ENOMEM;
  
- 	/* Expose "hciX" device to user space */
+@@ -975,10 +975,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 		}
+ 	}
+ 
+-	if (!data->intr_ep || !data->bulk_tx_ep || !data->bulk_rx_ep) {
+-		kfree(data);
++	if (!data->intr_ep || !data->bulk_tx_ep || !data->bulk_rx_ep)
+ 		return -ENODEV;
+-	}
+ 
+ 	data->cmdreq_type = USB_TYPE_CLASS;
+ 
+@@ -998,10 +996,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 	init_usb_anchor(&data->deferred);
+ 
  	hdev = hci_alloc_dev();
 -	if (!hdev) {
--		kfree(hst);
+-		kfree(data);
 +	if (!hdev)
  		return -ENOMEM;
 -	}
  
- 	BT_DBG("hdev %p", hdev);
- 
-@@ -321,7 +319,6 @@ static int bt_ti_probe(struct platform_device *pdev)
+ 	hdev->bus = HCI_USB;
+ 	hci_set_drvdata(hdev, data);
+@@ -1069,7 +1065,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 							data->isoc, data);
+ 		if (err < 0) {
+ 			hci_free_dev(hdev);
+-			kfree(data);
+ 			return err;
+ 		}
+ 	}
+@@ -1077,7 +1072,6 @@ static int btusb_probe(struct usb_interface *intf,
  	err = hci_register_dev(hdev);
  	if (err < 0) {
- 		BT_ERR("Can't register HCI device error %d", err);
--		kfree(hst);
  		hci_free_dev(hdev);
+-		kfree(data);
  		return err;
  	}
-@@ -347,7 +344,6 @@ static int bt_ti_remove(struct platform_device *pdev)
- 	hci_unregister_dev(hdev);
+ 
+@@ -1110,7 +1104,6 @@ static void btusb_disconnect(struct usb_interface *intf)
+ 		usb_driver_release_interface(&btusb_driver, data->isoc);
  
  	hci_free_dev(hdev);
--	kfree(hst);
+-	kfree(data);
+ }
  
- 	dev_set_drvdata(&pdev->dev, NULL);
- 	return 0;
+ #ifdef CONFIG_PM
 -- 
 1.7.4.1
