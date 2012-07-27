@@ -6,9 +6,9 @@ Cc: marcel@holtmann.org,
 	johan.hedberg@gmail.com,
 	sachin.kamat@linaro.org,
 	patches@linaro.org
-Subject: [PATCH 04/11] Bluetooth: Use devm_kzalloc in bpa10x.c file
-Date: Fri, 27 Jul 2012 12:38:34 +0530
-Message-Id: <1343372921-18780-5-git-send-email-sachin.kamat@linaro.org>
+Subject: [PATCH 03/11] Bluetooth: Use devm_kzalloc in bluecard_cs.c file
+Date: Fri, 27 Jul 2012 12:38:33 +0530
+Message-Id: <1343372921-18780-4-git-send-email-sachin.kamat@linaro.org>
 In-Reply-To: <1343372921-18780-1-git-send-email-sachin.kamat@linaro.org>
 References: <1343372921-18780-1-git-send-email-sachin.kamat@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -18,49 +18,32 @@ thereby saving some cleanup code.
 
 Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
 ---
- drivers/bluetooth/bpa10x.c |    8 ++------
- 1 files changed, 2 insertions(+), 6 deletions(-)
+ drivers/bluetooth/bluecard_cs.c |    5 +----
+ 1 files changed, 1 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/bpa10x.c b/drivers/bluetooth/bpa10x.c
-index 29caaed..2fe4a80 100644
---- a/drivers/bluetooth/bpa10x.c
-+++ b/drivers/bluetooth/bpa10x.c
-@@ -443,7 +443,7 @@ static int bpa10x_probe(struct usb_interface *intf, const struct usb_device_id *
- 	if (intf->cur_altsetting->desc.bInterfaceNumber != 0)
- 		return -ENODEV;
+diff --git a/drivers/bluetooth/bluecard_cs.c b/drivers/bluetooth/bluecard_cs.c
+index 66c3a67..0c0838d 100644
+--- a/drivers/bluetooth/bluecard_cs.c
++++ b/drivers/bluetooth/bluecard_cs.c
+@@ -849,7 +849,7 @@ static int bluecard_probe(struct pcmcia_device *link)
+ 	bluecard_info_t *info;
  
--	data = kzalloc(sizeof(*data), GFP_KERNEL);
-+	data = devm_kzalloc(&intf->dev, sizeof(*data), GFP_KERNEL);
- 	if (!data)
+ 	/* Create new info device */
+-	info = kzalloc(sizeof(*info), GFP_KERNEL);
++	info = devm_kzalloc(&link->dev, sizeof(*info), GFP_KERNEL);
+ 	if (!info)
  		return -ENOMEM;
  
-@@ -453,10 +453,8 @@ static int bpa10x_probe(struct usb_interface *intf, const struct usb_device_id *
- 	init_usb_anchor(&data->rx_anchor);
+@@ -864,10 +864,7 @@ static int bluecard_probe(struct pcmcia_device *link)
  
- 	hdev = hci_alloc_dev();
--	if (!hdev) {
--		kfree(data);
-+	if (!hdev)
- 		return -ENOMEM;
--	}
- 
- 	hdev->bus = HCI_USB;
- 	hci_set_drvdata(hdev, data);
-@@ -475,7 +473,6 @@ static int bpa10x_probe(struct usb_interface *intf, const struct usb_device_id *
- 	err = hci_register_dev(hdev);
- 	if (err < 0) {
- 		hci_free_dev(hdev);
--		kfree(data);
- 		return err;
- 	}
- 
-@@ -500,7 +497,6 @@ static void bpa10x_disconnect(struct usb_interface *intf)
- 	hci_free_dev(data->hdev);
- 	kfree_skb(data->rx_skb[0]);
- 	kfree_skb(data->rx_skb[1]);
--	kfree(data);
+ static void bluecard_detach(struct pcmcia_device *link)
+ {
+-	bluecard_info_t *info = link->priv;
+-
+ 	bluecard_release(link);
+-	kfree(info);
  }
  
- static struct usb_driver bpa10x_driver = {
+ 
 -- 
 1.7.4.1
