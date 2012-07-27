@@ -1,62 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50126072.3090801@linux.intel.com>
-Date: Fri, 27 Jul 2012 11:33:38 +0200
-From: Frederic Danis <frederic.danis@linux.intel.com>
+From: Par-Gunnar Hjalmdahl <par-gunnar.hjalmdahl@stericsson.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: Anurag Gupta <anurag.gupta@stericsson.com>,
+	Par-Gunnar Hjalmdahl <par-gunnar.hjalmdahl@stericsson.com>
+Subject: [PATCH] network: Check full BNEP UUID
+Date: Fri, 27 Jul 2012 11:06:40 +0200
+Message-ID: <1343380000-24935-1-git-send-email-par-gunnar.hjalmdahl@stericsson.com>
 MIME-Version: 1.0
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v15 02/14] audio: Move telephony drivers to D-Bus interface
-References: <1343292324-959-1-git-send-email-frederic.danis@linux.intel.com> <1343292324-959-3-git-send-email-frederic.danis@linux.intel.com> <CANT-zCXbpTQUd9RHJdADL7OWNwzgnn84Kyre2VvoO5eZxtrqjw@mail.gmail.com>
-In-Reply-To: <CANT-zCXbpTQUd9RHJdADL7OWNwzgnn84Kyre2VvoO5eZxtrqjw@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Mikel,
+This patch fixes an issue where only the 2 bytes containing
+the service ID was checked from the BNEP UUID.
+Fixes behavior for BT testcases TP/PAN/MISC/UUID/BV-01-C &
+TP/PAN/MISC/UUID/BV-02-C.
+---
+ profiles/network/server.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-On 27/07/2012 10:25, Mikel Astiz wrote:
->> -static void hfp_slc_complete(struct audio_device *dev)
->> +void headset_slc_complete(struct audio_device *dev)
->
-> Just to clarify: Is this a trivial rename being squashed in the same
-> patch? Or is there some reason behind?
-
-This is used by telephony.c to inform headset.c that connection has been 
-completed for HSP or HFP.
-
-It is no more specific to HFP.
-
->
->>   {
->>          struct headset *hs = dev->headset;
->>          struct pending_connect *p = hs->pending;
->>
->> -       DBG("HFP Service Level Connection established");
->> +       DBG("Service Level Connection established");
->
-> Same here.
-
-idem
-
-<snip>
-
->> +gboolean telephony_get_ready_state(struct btd_adapter *adapter);
->> +uint32_t telephony_get_ag_features(void);
->
-> Shouldn't we start using uint16_t everywhere?
->
-> If not, the D-Bus agent should also support uint32_t, right?
-
-Those 2 functions are removed in patch 8 "audio: Move HFP/HSP AG servers 
-to telephony.c".
-So to avoid too many changes in headset.c I kept the previously used types.
-
-Regards
-
-Fred
-
-
+diff --git a/profiles/network/server.c b/profiles/network/server.c
+index 480c7e2..15ea1cb 100644
+--- a/profiles/network/server.c
++++ b/profiles/network/server.c
+@@ -54,6 +54,11 @@
+ #define NETWORK_SERVER_INTERFACE "org.bluez.NetworkServer"
+ #define SETUP_TIMEOUT		1
+ 
++static uint128_t bluetooth_base_uuid = {
++	.data = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
++			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB}
++};
++
+ /* Pending Authorization */
+ struct network_session {
+ 	bdaddr_t	dst;		/* Remote Bluetooth Address */
+@@ -313,6 +318,22 @@ static uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req,
+ 		break;
+ 	case 4: /* UUID32 */
+ 	case 16: /* UUID128 */
++		/*
++		 * Check that the bytes in the UUID, except the service ID itself, are
++		 * correct. The service ID is checked in bnep_setup_chk().
++		 */
++		if (memcmp(dest, bluetooth_base_uuid.data, 2))
++			return BNEP_CONN_INVALID_DST;
++		if (memcmp(source, bluetooth_base_uuid.data, 2))
++			return BNEP_CONN_INVALID_SRC;
++
++		if (req->uuid_size == 16) {
++			if (memcmp(&dest[4], &bluetooth_base_uuid.data[4], 12))
++				return BNEP_CONN_INVALID_DST;
++			if (memcmp(&source[4], &bluetooth_base_uuid.data[4], 12))
++				return BNEP_CONN_INVALID_SRC;
++		}
++
+ 		*dst_role = bt_get_be32(dest);
+ 		*src_role = bt_get_be32(source);
+ 		break;
 -- 
-Frederic Danis                            Open Source Technology Center
-frederic.danis@intel.com                              Intel Corporation
+1.7.11.1
 
