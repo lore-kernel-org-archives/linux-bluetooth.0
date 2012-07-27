@@ -2,39 +2,159 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: [PATCH BlueZ 13/14] core: Disable unnecessary auto connections
-Date: Fri, 27 Jul 2012 19:29:57 -0300
-Message-Id: <1343428198-23621-14-git-send-email-jprvita@openbossa.org>
+Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+Subject: [PATCH BlueZ 05/14] core: use adapter connect list for LE connections
+Date: Fri, 27 Jul 2012 19:29:49 -0300
+Message-Id: <1343428198-23621-6-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1343428198-23621-1-git-send-email-jprvita@openbossa.org>
 References: <1343428198-23621-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Paulo Alcantara <paulo.alcantara@openbossa.org>
-
-BlueZ host disconnects the link when encryption fails. ECONNABORTED
-error is returned by the kernel when the connection is terminated by the
-local host. This scenario commonly happens when authentication fails due
-PIN or Key Missing.
+When a connection is needed for a LE device it is added to the adapter
+connect list instead of directly connecting the ATT io channel.
 ---
- src/device.c |    3 +++
- 1 file changed, 3 insertions(+)
+ src/adapter.c |    2 +-
+ src/device.c  |   43 +++++++++++--------------------------------
+ src/device.h  |    1 +
+ 3 files changed, 13 insertions(+), 33 deletions(-)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index d0f8d6b..b48dd0a 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2857,7 +2857,7 @@ static gboolean connect_pending_cb(gpointer user_data)
+ 	if (adapter->discovering)
+ 		return TRUE;
+ 
+-	/* TODO: call device connect callback */
++	device_att_connect(device);
+ 
+ 	return FALSE;
+ }
 diff --git a/src/device.c b/src/device.c
-index d81976e..d9c6708 100644
+index 7ec98dd..2cd694d 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -1954,6 +1954,9 @@ static void att_error_cb(const GError *gerr, gpointer user_data)
- 	struct att_callbacks *attcb = user_data;
- 	struct btd_device *device = attcb->user_data;
+@@ -1796,15 +1796,6 @@ static void attio_disconnected(gpointer data, gpointer user_data)
+ 		attio->dcfunc(attio->user_data);
+ }
  
-+	if (gerr->code == ECONNABORTED)
-+		return;
-+
+-static void att_connect_dispatched(gpointer user_data)
+-{
+-	struct btd_device *device = user_data;
+-
+-	device->auto_id = 0;
+-}
+-
+-static gboolean att_connect(gpointer user_data);
+-
+ static gboolean attrib_disconnected_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+@@ -1824,10 +1815,7 @@ static gboolean attrib_disconnected_cb(GIOChannel *io, GIOCondition cond,
+ 	if (device->auto_connect == FALSE || err != ETIMEDOUT)
+ 		goto done;
+ 
+-	device->auto_id = g_timeout_add_seconds_full(G_PRIORITY_DEFAULT_IDLE,
+-						AUTO_CONNECTION_INTERVAL,
+-						att_connect, device,
+-						att_connect_dispatched);
++	adapter_connect_list_add(device_get_adapter(device), device);
+ 
+ done:
+ 	attio_cleanup(device);
+@@ -1971,11 +1959,7 @@ static void att_error_cb(const GError *gerr, gpointer user_data)
  	if (device->auto_connect == FALSE)
  		return;
  
+-	device->auto_id = g_timeout_add_seconds_full(G_PRIORITY_DEFAULT_IDLE,
+-						AUTO_CONNECTION_INTERVAL,
+-						att_connect, device,
+-						att_connect_dispatched);
+-
++	adapter_connect_list_add(device_get_adapter(device), device);
+ 	DBG("Enabling automatic connections");
+ }
+ 
+@@ -1990,7 +1974,7 @@ static void att_success_cb(gpointer user_data)
+ 	g_slist_foreach(device->attios, attio_connected, device->attrib);
+ }
+ 
+-static gboolean att_connect(gpointer user_data)
++gboolean device_att_connect(gpointer user_data)
+ {
+ 	struct btd_device *device = user_data;
+ 	struct btd_adapter *adapter = device->adapter;
+@@ -2260,6 +2244,9 @@ void device_set_temporary(struct btd_device *device, gboolean temporary)
+ 
+ 	DBG("temporary %d", temporary);
+ 
++	if (temporary)
++		adapter_connect_list_remove(device_get_adapter(device), device);
++
+ 	device->temporary = temporary;
+ }
+ 
+@@ -2275,6 +2262,7 @@ void device_set_bonded(struct btd_device *device, gboolean bonded)
+ 
+ void device_set_auto_connect(struct btd_device *device, gboolean enable)
+ {
++	struct btd_adapter *adapter = device_get_adapter(device);
+ 	char addr[18];
+ 
+ 	if (!device)
+@@ -2288,15 +2276,10 @@ void device_set_auto_connect(struct btd_device *device, gboolean enable)
+ 
+ 	/* Disabling auto connect */
+ 	if (enable == FALSE) {
+-		if (device->auto_id)
+-			g_source_remove(device->auto_id);
++		adapter_connect_list_remove(adapter, device);
+ 		return;
+ 	}
+ 
+-	/* Enabling auto connect */
+-	if (device->auto_id != 0)
+-		return;
+-
+ 	if (device->attrib) {
+ 		DBG("Already connected");
+ 		return;
+@@ -2305,9 +2288,8 @@ void device_set_auto_connect(struct btd_device *device, gboolean enable)
+ 	if (device->attios == NULL && device->attios_offline == NULL)
+ 		return;
+ 
+-	device->auto_id = g_idle_add_full(G_PRIORITY_DEFAULT_IDLE,
+-						att_connect, device,
+-						att_connect_dispatched);
++	/* Enabling auto connect */
++	adapter_connect_list_add(adapter, device);
+ }
+ 
+ static gboolean start_discovery(gpointer user_data)
+@@ -3085,10 +3067,7 @@ guint btd_device_add_attio_callback(struct btd_device *device,
+ 
+ 	device->attios = g_slist_append(device->attios, attio);
+ 
+-	if (device->auto_id == 0)
+-		device->auto_id = g_idle_add_full(G_PRIORITY_DEFAULT_IDLE,
+-						att_connect, device,
+-						att_connect_dispatched);
++	adapter_connect_list_add(device_get_adapter(device), device);
+ 
+ 	return attio->id;
+ }
+diff --git a/src/device.h b/src/device.h
+index 2b2e6d8..9b7df1c 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -127,3 +127,4 @@ int device_unblock(DBusConnection *conn, struct btd_device *device,
+ void device_set_pnpid(struct btd_device *device, uint8_t vendor_id_src,
+ 			uint16_t vendor_id, uint16_t product_id,
+ 			uint16_t product_ver);
++gboolean device_att_connect(gpointer user_data);
 -- 
 1.7.10.4
 
