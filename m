@@ -4,59 +4,62 @@ From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ 02/14] mgmt: print error message when start_discovery fails
-Date: Fri, 27 Jul 2012 19:29:46 -0300
-Message-Id: <1343428198-23621-3-git-send-email-jprvita@openbossa.org>
-In-Reply-To: <1343428198-23621-1-git-send-email-jprvita@openbossa.org>
-References: <1343428198-23621-1-git-send-email-jprvita@openbossa.org>
+Subject: [PATCH BlueZ 00/14] LE General Connection Establishment procedure
+Date: Fri, 27 Jul 2012 19:29:44 -0300
+Message-Id: <1343428198-23621-1-git-send-email-jprvita@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If we fail to communicate with the MGMT socket is better to print the
-error message on the mgmtops plugin, where it really happened, instead
-of leaving this job to its users.
----
- src/adapter.c |    6 +-----
- src/mgmt.c    |    7 +++++--
- 2 files changed, 6 insertions(+), 7 deletions(-)
+This series implement the LE General Connection Establishment procedure
+for LE connections.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index c9c82e3..5dd9821 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -997,13 +997,9 @@ struct btd_device *adapter_get_device(DBusConnection *conn,
- static gboolean discovery_cb(gpointer user_data)
- {
- 	struct btd_adapter *adapter = user_data;
--	int err;
- 
- 	adapter->discov_id = 0;
--
--	err = mgmt_start_discovery(adapter->dev_id);
--	if (err < 0)
--		error("start_discovery: %s (%d)", strerror(-err), -err);
-+	mgmt_start_discovery(adapter->dev_id);
- 
- 	return FALSE;
- }
-diff --git a/src/mgmt.c b/src/mgmt.c
-index c55b1a8..d73cf2a 100644
---- a/src/mgmt.c
-+++ b/src/mgmt.c
-@@ -1961,8 +1961,11 @@ int mgmt_start_discovery(int index)
- 
- 	cp->type = info->discov_type;
- 
--	if (write(mgmt_sock, buf, sizeof(buf)) < 0)
--		return -errno;
-+	if (write(mgmt_sock, buf, sizeof(buf)) < 0) {
-+		int err = -errno;
-+		error("failed to write to MGMT socket: %s", strerror(err));
-+		return err;
-+	}
- 
- 	return 0;
- }
+If there are LE bonded devices marked for auto connection they are added
+to a connect_list on the adapter. When there is any device on this list
+scan is performed continuously. When a device is found the connect_list
+is checked. If that device is on the list scan is stopped and a
+connection attempt is made to that device.
+
+If any client tries to perform discovery and the scan for the General
+Connection Establishment procedure is active, the discovery request is
+queued and performed right after the GCEP scan session finishes.
+
+This series changes quite a lot the LE connection logic, but we've been
+testing and using this code at INdT for about 4 weeks. Any comments and
+more testing are appreciated.
+
+Claudio Takahasi (7):
+  core: Control connections based on adapter state
+  mgmt: Add LE scanning callback
+  core: Replace interleaved by LE scanning
+  core: Start LE scanning when a device requests
+  core: Remove leftover define
+  core: Queue discovery if scanning is active
+  core: Re-connect for ECONNRESET or ECONNABORTED
+
+João Paulo Rechi Vita (5):
+  mgmt: print error message when start_discovery fails
+  core: add compare function for bdaddr in a struct btd_device
+  core: Add a list of LE devices to connect
+  core: use adapter connect list for LE connections
+  core: mutually exclude concurrent connections
+
+Paulo Alcantara (1):
+  core: Disable unnecessary auto connections
+
+Vinicius Costa Gomes (1):
+  test: Fix exiting the bus when a discovery session ends
+
+ src/adapter.c       |  192 ++++++++++++++++++++++++++++++++++++++++++++-------
+ src/adapter.h       |    2 +
+ src/device.c        |   65 ++++++++---------
+ src/device.h        |    2 +
+ src/mgmt.c          |   39 ++++++++++-
+ src/mgmt.h          |    1 +
+ test/test-discovery |    8 ---
+ 7 files changed, 239 insertions(+), 70 deletions(-)
+
 -- 
 1.7.10.4
 
