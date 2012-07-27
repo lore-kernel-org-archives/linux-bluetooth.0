@@ -1,91 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Aj, SanthoshX" <santhoshx.aj@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: 0001-add-LE_create_conn_cancel
-Date: Fri, 27 Jul 2012 06:00:03 +0000
-Message-ID: <001F63875E1AF5428162B5A2D3ED1BDD15BDEAC4@BGSMSX101.gar.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1343138034.24426.55.camel@aeonflux>
+References: <1343123700-23375-1-git-send-email-manojkr.sharma@stericsson.com>
+	<1343138034.24426.55.camel@aeonflux>
+Date: Fri, 27 Jul 2012 10:44:24 +0530
+Message-ID: <CAHH5__6sQ2yyEpuDZYMd4mFmHJEJeRX4eKzVM47k9TQcSthywA@mail.gmail.com>
+Subject: Re: [PATCH 0/2] Support for reserving bandwidth on L2CAP socket
+From: Manoj Sharma <ursmanoj@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Anurag Gupta <anurag.gupta@stericsson.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->From 7013df7186248733da6b369b9b03211737b0222e Mon Sep 17 00:00:00 2001
-From: root <santhoshx.aj@intel.com>
-Date: Fri, 27 Jul 2012 11:17:13 +0530
-Subject: [PATCH 1/1] add LE_create_conn_cancel From hcitool when we call LE
- create connection, the controller is set to initiating
- state. But when we exit, the controller will remain in
- same state. To correct this we need to send LE create
- conn cancel.
+Hi Marcel,
 
----
- lib/hci.c       |   23 +++++++++++++++++++++++
- lib/hci.h       |    5 +++++
- tools/hcitool.c |    2 ++
- 3 files changed, 30 insertions(+)
+On 7/24/12, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Manoj,
+>
+>> These patches allows L2CAP socket user to reserve bandwidth in
+>> percentage. Underlying socket reserves calculated number of
+>> HCI credits for this L2CAP channel.
+>
+> this description is by far not enough. Explain why you are doing this.
+> And make it a detailed description. Preferable with hcidump traces
+> showing why this makes a difference at all.
+>
+This patch simply adds an additional L2CAP socket option for reserving
+bandwidth.
+The reserved bandwidth would result into reserving calculated number
+of ACL data credits. Thus the L2CAP channels without this option set
+would not be able to use all available ACL buffers in controller. This
+would ensure that whenever an L2CAP channel with this option set has
+data to send, it does not starve or wait because of other channels
+already using all controller buffers.
 
-diff --git a/lib/hci.c b/lib/hci.c
-index 66b2d5f..b0a8ed5 100644
---- a/lib/hci.c
-+++ b/lib/hci.c
-@@ -2875,6 +2875,29 @@ int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
- 	return 0;
- }
- 
-+int hci_le_create_conn_cancel(int dd, int to)
-+{
-+	struct hci_request rq;
-+	evt_le_connection_complete conn_complete_rp;
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LE_CTL;
-+	rq.ocf = OCF_LE_CREATE_CONN_CANCEL;
-+	rq.event = EVT_LE_CONN_COMPLETE;
-+	rq.clen = LE_CREATE_CONN_CANCEL_CP_SIZE;
-+	rq.rparam = &conn_complete_rp;
-+	rq.rlen = EVT_CONN_COMPLETE_SIZE;
-+
-+	if (hci_send_req(dd, &rq, to) < 0)
-+		return -1;
-+
-+	if (conn_complete_rp.status) {
-+		errno = EIO;
-+		return -1;
-+	}
-+	return 0;
-+}
-+
- int hci_le_conn_update(int dd, uint16_t handle, uint16_t min_interval,
- 			uint16_t max_interval, uint16_t latency,
- 			uint16_t supervision_timeout, int to)
-diff --git a/lib/hci.h b/lib/hci.h
-index f90ac26..ed450e8 100644
---- a/lib/hci.h
-+++ b/lib/hci.h
-@@ -1551,6 +1551,11 @@ typedef struct {
- #define LE_CREATE_CONN_CP_SIZE 25
- 
- #define OCF_LE_CREATE_CONN_CANCEL		0x000E
-+#define LE_CREATE_CONN_CANCEL_CP_SIZE 0
-+typedef struct {
-+	uint8_t		status;
-+} __attribute__ ((packed)) le_create_conn_cancel_rp;
-+#define LE_CREATE_CONN_CANCEL_RP_SIZE 1
- 
- #define OCF_LE_READ_WHITE_LIST_SIZE		0x000F
- typedef struct {
-diff --git a/tools/hcitool.c b/tools/hcitool.c
-index 66e5c20..a6c1ba8 100644
---- a/tools/hcitool.c
-+++ b/tools/hcitool.c
-@@ -2644,6 +2644,8 @@ static void cmd_lecc(int dev_id, int argc, char **argv)
- 			min_ce_length, max_ce_length, &handle, 25000);
- 	if (err < 0) {
- 		perror("Could not create connection");
-+		/* Before exit reset controller state to standby */
-+		err = hci_le_create_conn_cancel(dd,25000);
- 		exit(1);
- 	}
- 
--- 
-1.7.9.5
+Above explanation is most suitable in case when simultaneous AVDTP
+streaming channels and other channels (e.g. OPP, PBAP etc) are in
+action. Such an arrangement for reserving credits would allow AVDTP
+stream to flow to controller without any obstacle from simultaneous
+traffic and help removing glitches in music streaming over Bluetooth.
+Please suggest if this description is sufficient and if I should push
+patch-set again.
+> Regards
+>
+> Marcel
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+
+Regards,
+Manoj
