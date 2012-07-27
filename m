@@ -1,48 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/7] Bluetooth: Remove unneeded code
-Date: Fri, 27 Jul 2012 15:10:12 -0300
-Message-Id: <1343412616-25641-3-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 2/7] Bluetooth: Fix hci_le_conn_complete_evt
+Date: Fri, 27 Jul 2012 15:10:11 -0300
+Message-Id: <1343412616-25641-2-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1343412616-25641-1-git-send-email-andre.guedes@openbossa.org>
 References: <1343412616-25641-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes some unneeded code from hci_cs_le_create_conn.
-
-If the hci_conn is not found, it means this LE connection attempt
-was triggered by a thrid-party tool (e.g. hcitool). We should not
-create this new hci_conn in LE Create Connection command status
-event since it is already properly handled in LE Connection
-Complete event.
+We need to check the 'Role' parameter from the LE Connection
+Complete Event in order to properly set 'out' and 'link_mode'
+fields from hci_conn structure.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_event.c | 10 ----------
- 1 file changed, 10 deletions(-)
+ include/net/bluetooth/hci.h | 2 ++
+ net/bluetooth/hci_event.c   | 5 +++++
+ 2 files changed, 7 insertions(+)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 7f19556..23cf413 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1304,6 +1304,8 @@ struct hci_ev_num_comp_blocks {
+ } __packed;
+ 
+ /* Low energy meta events */
++#define LE_CONN_ROLE_MASTER	0x00
++
+ #define HCI_EV_LE_CONN_COMPLETE		0x01
+ struct hci_ev_le_conn_complete {
+ 	__u8     status;
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8b13ccc..27064be 100644
+index e89d7f2..8b13ccc 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -1638,16 +1638,6 @@ static void hci_cs_le_create_conn(struct hci_dev *hdev, __u8 status)
- 			hci_proto_connect_cfm(conn, status);
- 			hci_conn_del(conn);
+@@ -3368,6 +3368,11 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
  		}
--	} else {
--		if (!conn) {
--			conn = hci_conn_add(hdev, LE_LINK, &cp->peer_addr);
--			if (conn) {
--				conn->dst_type = cp->peer_addr_type;
--				conn->out = true;
--			} else {
--				BT_ERR("No memory for new connection");
--			}
--		}
+ 
+ 		conn->dst_type = ev->bdaddr_type;
++
++		if (ev->role == LE_CONN_ROLE_MASTER) {
++			conn->out = true;
++			conn->link_mode |= HCI_LM_MASTER;
++		}
  	}
  
- 	hci_dev_unlock(hdev);
+ 	if (!test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
 -- 
 1.7.11.2
 
