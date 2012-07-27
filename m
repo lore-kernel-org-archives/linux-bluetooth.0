@@ -1,66 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <50100AB5.8050203@hschmitt.de>
-References: <1342623188-10796-1-git-send-email-linux@hschmitt.de>
-	<CABBYNZ+SQoX45XuQN9mEPTTSyFAiJ_a3Y_hQvH4YvcJE+5Yorg@mail.gmail.com>
-	<500F9DAC.8040509@hschmitt.de>
-	<CABBYNZJymF8bn0qyPZCtvJsFVWX7KqELf7FjBpRwxnYXoP0Hbw@mail.gmail.com>
-	<50100AB5.8050203@hschmitt.de>
-Date: Fri, 27 Jul 2012 16:40:42 +0300
-Message-ID: <CABBYNZ+9qc4v3kW1gLVo4SHb924z+WXT8V8wTFAvW3hT6gZhYQ@mail.gmail.com>
-Subject: Re: [PATCH 0/2] obexd: Fix bug in irmc phonebook and prevent to
- reintroduce it
+In-Reply-To: <CAMOw1v6wwSLa-goWqZfcEtxMmBXpuQzZit-OgHSDYk+x5cPYTw@mail.gmail.com>
+References: <1343375053-19193-1-git-send-email-jaganath.k@samsung.com>
+	<1343375053-19193-2-git-send-email-jaganath.k@samsung.com>
+	<CAMOw1v6wwSLa-goWqZfcEtxMmBXpuQzZit-OgHSDYk+x5cPYTw@mail.gmail.com>
+Date: Fri, 27 Jul 2012 15:58:52 +0300
+Message-ID: <CABBYNZLUWKcpd_Had_4z_3ig30jhkQr_zFaE4rfDoRVbeg5D-Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gdbus: Fix compilation error if macro "error" is defined
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Harald Schmitt <linux@hschmitt.de>
-Cc: linux-bluetooth@vger.kernel.org
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Harald,
+Hi Jaganath,
 
-On Wed, Jul 25, 2012 at 6:03 PM, Harald Schmitt <linux@hschmitt.de> wrote:
-
->> While the backend indeed take an absolute path this doesnt mean we
->> have to send as absolute path, not to mention it is not compatible
->> with mimetypes which is what TYPE header describes, even in case of
->> PBAP it is wrong to send absolute path in SETPATH.
->
-> Patch 1/2 only changes the way phonebook_pull is called (with absolute
-> path). It has nothing changed about the path resolution/interpretation
-> that is asked from the client. Sorry for my bad explanations.
-
-Yep, only now I realized that this is not the client side, so it is
-probably fine.
-
+On Fri, Jul 27, 2012 at 3:25 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> On Fri, Jul 27, 2012 at 4:44 AM, Jaganath Kanakkassery
+> <jaganath.k@samsung.com> wrote:
+>> The variable "signature" used in error is not defined.
+>> ---
+>>  gdbus/object.c |    3 +--
+>>  1 files changed, 1 insertions(+), 2 deletions(-)
 >>
->> To avoid this problems we send relative although we do accept
->> absolute, but to avoid problems with stack interpreting absolute path
->> as not valid as OBEX spec state we always send relative paths.
->
-> In fact irmc implementation at the moment only accepts relative paths
-> and I did not change this.
-
-No problem, I will make it less strict to follow PBAP in another patch.
-
+>> diff --git a/gdbus/object.c b/gdbus/object.c
+>> index 900e7ab..0f05234 100644
+>> --- a/gdbus/object.c
+>> +++ b/gdbus/object.c
+>> @@ -645,8 +645,7 @@ static dbus_bool_t emit_signal_valist(DBusConnection *conn,
+>>                 goto fail;
 >>
->>> The patch 1/2 fixes irmc to query phonebook implementation for the well
->>> known absolute path. This was changed in pbap.c with the patch you
->>> stated, but forgot to change in irmc.c.
->>> Patch 2/2 just replaces the well-known phonebook paths which
->>> phoenbook-ebook.c and phonebook-tracker.c support with constants.
->>
->> Im fine with converting to constants, it is more the sending of
->> absolute path that Im not comfortable because of the potential
->> interoperability problems it could cause.
+>>         if (g_dbus_args_have_signature(args, signal) == FALSE) {
+>> -               error("%s.%s: expected signature'%s' but got '%s'",
+>> -                               interface, name, args, signature);
+>> +               error("signature does not match");
 >
-> I probably used the wrong term "well known" what I meant by well known
-> are the paths that phonebook-tracker and phonebook-ebook knows that it
-> should fetch the contacts, etc. and these are absolute paths. It is not
-> about the "well known" paths from the pbap spec
+> argh... indeed.
+>
+> However I'd rather fix it by letting a similar message (without args,
+> which have a different type):
+>
+> error("%s.%s: got unexpected signature '%s'",
+>                                interface, name,
+> dbus_message_get_signature(signal));
 
-No problem, I should have looked what the code was doing before
-drawing any conclusion, anyway I will apply this patches asap.
+Yep, the message itself can be keep, just fix what is broken.
 
 
 -- 
