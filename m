@@ -1,44 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <CAMBjcSsDp2RZxAQOqu3cbWyCv7sdnhfmGWi3Ux_NPJyqKWvoYw@mail.gmail.com>
+References: <CAMBjcSsDp2RZxAQOqu3cbWyCv7sdnhfmGWi3Ux_NPJyqKWvoYw@mail.gmail.com>
+Date: Sat, 28 Jul 2012 01:06:10 -0300
+Message-ID: <CAMBjcSu4uH9wSXhqj7mD9iGP4TF6-dsRpNRQ80SbJJx6pbLRMg@mail.gmail.com>
+Subject: Re: GSoC student introduction
+From: "Thiago S. A." <thiago.xth1@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH hcidump] hci: Fix EIR data parsing
-Date: Sun, 29 Jul 2012 00:20:13 +0200
-Message-Id: <1343514013-8942-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Data passed to ext_inquiry_data_dump are expected to start with length
-octet which was consumed by get_u8.
----
- parser/hci.c |    5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Hello again BlueZ community.
 
-diff --git a/parser/hci.c b/parser/hci.c
-index 742a1b5..adcdaf7 100644
---- a/parser/hci.c
-+++ b/parser/hci.c
-@@ -831,16 +831,19 @@ static inline void ext_inquiry_response_dump(int level, struct frame *frm)
- {
- 	void *ptr = frm->ptr;
- 	uint32_t len = frm->len;
-+	uint8_t *data_ptr;
- 	uint8_t length;
- 
-+	data_ptr = frm->ptr;
- 	length = get_u8(frm);
- 
- 	while (length > 0) {
--		ext_inquiry_data_dump(level, frm, frm->ptr);
-+		ext_inquiry_data_dump(level, frm, data_ptr);
- 
- 		frm->ptr += length;
- 		frm->len -= length;
- 
-+		data_ptr = frm->ptr;
- 		length = get_u8(frm);
- 	}
- 
--- 
-1.7.10
+I'd like to show the status of project.
 
+Currently it has this features:
+
+- Dump bluetooth traffic in real time.
+
+- Parser of events.
+
+- Draw sequence diagram.
+
+- Show details of events.
+
+- Filter events by device.
+
+In my blog [1] there is a more detailed description of project status,
+including a video demonstration of tool execution.
+
+Source code of this project is available in a github repository [0].
+
+I appreciate any suggestions to improve the tool and any feedback
+
+Cheers,
+
+Thiago.
+
+[0] https://github.com/xth1/bluez-traffic
+
+[1] http://xth1.blogspot.com.br/search/label/GSOC
