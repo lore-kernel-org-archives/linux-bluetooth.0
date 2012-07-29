@@ -1,35 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1343579514.1803.49.camel@aeonflux>
-Subject: Re: [PATCH BlueZ 1/2] tools: Fix workaround to build with recent
- flex
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Sun, 29 Jul 2012 17:04:49 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Sun, 29 Jul 2012 09:31:54 -0700
-In-Reply-To: <1343543435-8429-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1343543435-8429-1-git-send-email-lucas.demarchi@profusion.mobi>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: Re: [PATCH BlueZ v0 1/2] btio: Replace g_set_error by ERROR_FAILED
+ macro
+Message-ID: <20120729150448.GB19214@x220>
+References: <1343311869-5179-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1343311869-5179-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Claudio,
 
-> Flex 2.5.36 no longer defines isatty(), resulting in the following build
-> error:
-> 
-> 	tools/lexer.c:1402:9: error: implicit declaration of function
-> 	‘isatty’ [-Werror=implicit-function-declaration]
-> 
-> Include the header unistd.h so we get the definition of that function
-> and at the same time keep the fix for older versions of flex, since this
-> header defines _UNISTD_H.
+On Thu, Jul 26, 2012, Claudio Takahasi wrote:
+> This patch replaces the calls of g_set_error function by the local
+> defined macro "ERROR_FAILED".
+> ---
+>  btio/btio.c |   19 +++++++------------
+>  1 files changed, 7 insertions(+), 12 deletions(-)
 
-lets remove the rfcomm.conf support from rfcomm utility and then move it
-under tools/. So no more need for flex or bison.
+Both patches have been applied. Thanks.
 
-Regards
-
-Marcel
-
-
+Johan
