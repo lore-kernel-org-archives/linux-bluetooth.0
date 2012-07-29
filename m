@@ -1,34 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 29 Jul 2012 18:42:36 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+Message-ID: <1343579514.1803.49.camel@aeonflux>
+Subject: Re: [PATCH BlueZ 1/2] tools: Fix workaround to build with recent
+ flex
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix not setting class of device in adapter
-Message-ID: <20120729164236.GA27092@x220>
-References: <1343214893-28310-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1343214893-28310-1-git-send-email-szymon.janc@tieto.com>
+Date: Sun, 29 Jul 2012 09:31:54 -0700
+In-Reply-To: <1343543435-8429-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1343543435-8429-1-git-send-email-lucas.demarchi@profusion.mobi>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Lucas,
 
-On Wed, Jul 25, 2012, Szymon Janc wrote:
-> Set class of device in adapter when new class is received from kernel.
-> This fix adapters property Class being always zero.
-> ---
->  lib/mgmt.h    |    4 ++++
->  src/adapter.c |   23 ++++++++++++++---------
->  src/adapter.h |    2 +-
->  src/mgmt.c    |   33 +++++++++++++++++++++++++++++++--
->  4 files changed, 50 insertions(+), 12 deletions(-)
+> Flex 2.5.36 no longer defines isatty(), resulting in the following build
+> error:
+> 
+> 	tools/lexer.c:1402:9: error: implicit declaration of function
+> 	‘isatty’ [-Werror=implicit-function-declaration]
+> 
+> Include the header unistd.h so we get the definition of that function
+> and at the same time keep the fix for older versions of flex, since this
+> header defines _UNISTD_H.
 
-This patch doesn't compile:
+lets remove the rfcomm.conf support from rfcomm utility and then move it
+under tools/. So no more need for flex or bison.
 
-src/adapter.c: In function ‘btd_adapter_class_changed’:
-src/adapter.c:698:21: error: assignment makes integer from pointer without a cast [-Werror]
+Regards
 
-Please fix and resend.
+Marcel
 
-Johan
+
