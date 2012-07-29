@@ -1,102 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1343420976-19921-1-git-send-email-eder.ruiz@openbossa.org>
-References: <1343420976-19921-1-git-send-email-eder.ruiz@openbossa.org>
-From: Sergio Correia <lists@uece.net>
-Date: Sat, 28 Jul 2012 21:47:45 -0400
-Message-ID: <CAJyhjX1tPq0WCvZACf=sp6sCHoqwvOE2WZ3F8FwndJ5vmCRTQA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] att: Add prepare write support
-To: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH v4 4/7] Bluetooth: Refactor ACL connection into its own function
+Date: Sat, 28 Jul 2012 22:35:59 -0300
+Message-Id: <1343525759-10923-1-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1343428380-32705-5-git-send-email-vinicius.gomes@openbossa.org>
+References: <1343428380-32705-5-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eder,
+The hci_connect() function was starting to get too complicated to be
+quickly understood. We can separate the creation of a new ACL
+connection into its own function.
 
-On Fri, Jul 27, 2012 at 4:29 PM, Eder Ruiz Maria
-<eder.ruiz@openbossa.org> wrote:
-> Add functions for encoding/decoding Prepare Write Request and
-> Response PDUs.
-> ---
->  attrib/att.c |   55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  attrib/att.h |    5 +++++
->  2 files changed, 60 insertions(+)
->
-> diff --git a/attrib/att.c b/attrib/att.c
-> index 0550ac1..acfb4e0 100644
-> --- a/attrib/att.c
-> +++ b/attrib/att.c
-> @@ -974,3 +974,58 @@ uint16_t dec_mtu_resp(const uint8_t *pdu, int len, uint16_t *mtu)
->
->         return min_len;
->  }
-> +
-> +uint16_t enc_prep_write_req(uint16_t handle, uint16_t offset,
-> +                       const uint8_t *value, int vlen, uint8_t *pdu, int len)
-> +{
-> +       const uint16_t min_len = sizeof(pdu[0]) + sizeof(handle) +
-> +                                                               sizeof(offset);
-> +
-> +       if (pdu == NULL)
-> +               return 0;
-> +
-> +       if (len < min_len)
-> +               return 0;
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ net/bluetooth/hci_conn.c |   32 ++++++++++++++++++++++----------
+ 1 file changed, 22 insertions(+), 10 deletions(-)
 
-maybe it would be better to check the above conditions in a single if statement?
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 0a74399..1d70e9f 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -497,18 +497,10 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	return le;
+ }
+ 
+-/* Create SCO, ACL or LE connection.
+- * Device _must_ be locked */
+-struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+-			     __u8 dst_type, __u8 sec_level, __u8 auth_type)
++static struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
++						u8 sec_level, u8 auth_type)
+ {
+ 	struct hci_conn *acl;
+-	struct hci_conn *sco;
+-
+-	BT_DBG("%s dst %s", hdev->name, batostr(dst));
+-
+-	if (type == LE_LINK)
+-		return hci_connect_le(hdev, dst, dst_type, sec_level, auth_type);
+ 
+ 	acl = hci_conn_hash_lookup_ba(hdev, ACL_LINK, dst);
+ 	if (!acl) {
+@@ -526,6 +518,26 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 		hci_acl_create_connection(acl);
+ 	}
+ 
++	return acl;
++}
++
++/* Create SCO, ACL or LE connection.
++ * Device _must_ be locked */
++struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
++			     __u8 dst_type, __u8 sec_level, __u8 auth_type)
++{
++	struct hci_conn *acl;
++	struct hci_conn *sco;
++
++	BT_DBG("%s dst %s", hdev->name, batostr(dst));
++
++	if (type == LE_LINK)
++		return hci_connect_le(hdev, dst, dst_type, sec_level, auth_type);
++
++	acl = hci_connect_acl(hdev, dst, sec_level, auth_type);
++	if (IS_ERR(acl))
++		return acl;
++
+ 	if (type == ACL_LINK)
+ 		return acl;
+ 
+-- 
+1.7.10.4
 
-[...]
-
-> +uint16_t dec_prep_write_resp(const uint8_t *pdu, int len, uint16_t *handle,
-> +                               uint16_t *offset, uint8_t *value, int *vlen)
-> +{
-> +       const uint16_t min_len = sizeof(pdu[0]) + sizeof(*handle) +
-> +                                                               sizeof(*offset);
-> +
-> +       if (pdu == NULL)
-> +               return 0;
-> +
-> +       if (handle == NULL || offset == NULL || value == NULL || vlen == NULL)
-> +               return 0;
-> +
-> +       if (len < min_len)
-> +               return 0;
-> +
-> +       if (pdu[0] != ATT_OP_PREP_WRITE_REQ)
-> +               return 0;
-
-same with the above sanity checking.
-The other patches in this series could also do the same, assuming it's
-the preferred way.
-
-> +
-> +       *handle = att_get_u16(&pdu[1]);
-> +       *offset = att_get_u16(&pdu[3]);
-> +       *vlen = len - min_len;
-> +       if (*vlen > 0)
-> +               memcpy(value, pdu + min_len, *vlen);
-> +
-> +       return len;
-> +}
-> +
-> diff --git a/attrib/att.h b/attrib/att.h
-> index 1c1102a..ec03be9 100644
-> --- a/attrib/att.h
-> +++ b/attrib/att.h
-> @@ -256,3 +256,8 @@ uint16_t enc_mtu_req(uint16_t mtu, uint8_t *pdu, int len);
->  uint16_t dec_mtu_req(const uint8_t *pdu, int len, uint16_t *mtu);
->  uint16_t enc_mtu_resp(uint16_t mtu, uint8_t *pdu, int len);
->  uint16_t dec_mtu_resp(const uint8_t *pdu, int len, uint16_t *mtu);
-> +
-> +uint16_t enc_prep_write_req(uint16_t handle, uint16_t offset,
-> +                       const uint8_t *value, int vlen, uint8_t *pdu, int len);
-> +uint16_t dec_prep_write_resp(const uint8_t *pdu, int len, uint16_t *handle,
-> +                               uint16_t *offset, uint8_t *value, int *vlen);
-> --
-> 1.7.9.5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
