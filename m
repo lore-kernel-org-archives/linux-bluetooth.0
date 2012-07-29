@@ -1,27 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 29 Jul 2012 17:04:49 +0200
+Date: Sun, 29 Jul 2012 16:57:27 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: bruna.moreira@openbossa.org
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v0 1/2] btio: Replace g_set_error by ERROR_FAILED
- macro
-Message-ID: <20120729150448.GB19214@x220>
-References: <1343311869-5179-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH BlueZ 1/3] adapter: Remove unused Broadcaster property
+Message-ID: <20120729145727.GA19214@x220>
+References: <50117f05.0a4bec0a.04ec.ffffcfe2@mx.google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1343311869-5179-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <50117f05.0a4bec0a.04ec.ffffcfe2@mx.google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Bruna,
 
-On Thu, Jul 26, 2012, Claudio Takahasi wrote:
-> This patch replaces the calls of g_set_error function by the local
-> defined macro "ERROR_FAILED".
+On Thu, Jul 26, 2012, bruna.moreira@openbossa.org wrote:
+> Applications that want to be Observers of certain Advertising data type
+> (e.g. Manufacturer Specific Data or Service Data) will use new Observer
+> D-Bus API to monitor these AD types. Therefore, the old Broadcaster
+> device property is unnecessary.
 > ---
->  btio/btio.c |   19 +++++++------------
->  1 files changed, 7 insertions(+), 12 deletions(-)
+>  doc/adapter-api.txt |    3 +--
+>  src/adapter.c       |    7 -------
+>  2 files changed, 1 insertion(+), 9 deletions(-)
 
-Both patches have been applied. Thanks.
+All three patches have been applied. Thanks.
 
 Johan
