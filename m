@@ -1,29 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 Jul 2012 13:52:55 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Fix not setting class of device in adapter
-Message-ID: <20120730105255.GA11295@x220.ger.corp.intel.com>
-References: <1343638879-31253-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1343638879-31253-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <CAJyhjX1tPq0WCvZACf=sp6sCHoqwvOE2WZ3F8FwndJ5vmCRTQA@mail.gmail.com>
+References: <1343420976-19921-1-git-send-email-eder.ruiz@openbossa.org>
+	<CAJyhjX1tPq0WCvZACf=sp6sCHoqwvOE2WZ3F8FwndJ5vmCRTQA@mail.gmail.com>
+Date: Mon, 30 Jul 2012 06:35:23 -0400
+Message-ID: <CAJdJm_M_f2hEFqEcoW0SJrGbzPNNESSwXxDR=zZF_ruLo-x2RA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/3] att: Add prepare write support
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Sergio Correia <lists@uece.net>
+Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Sergio,
 
-On Mon, Jul 30, 2012, Szymon Janc wrote:
-> Set class of device in adapter when new class is received from kernel.
-> This fix adapters property Class being always zero.
-> ---
->  lib/mgmt.h    |    4 ++++
->  src/adapter.c |   25 +++++++++++++++----------
->  src/adapter.h |    2 +-
->  src/mgmt.c    |   33 +++++++++++++++++++++++++++++++--
->  4 files changed, 51 insertions(+), 13 deletions(-)
+On Sat, Jul 28, 2012 at 9:47 PM, Sergio Correia <lists@uece.net> wrote:
+>> +uint16_t enc_prep_write_req(uint16_t handle, uint16_t offset,
+>> +                       const uint8_t *value, int vlen, uint8_t *pdu, int len)
+>> +{
+>> +       const uint16_t min_len = sizeof(pdu[0]) + sizeof(handle) +
+>> +                                                               sizeof(offset);
+>> +
+>> +       if (pdu == NULL)
+>> +               return 0;
+>> +
+>> +       if (len < min_len)
+>> +               return 0;
+>
+> maybe it would be better to check the above conditions in a single if statement?
 
-Applied. Thanks.
+I think Eder is following the same style from the other similar
+functions in the same file. I would suggest leaving these patches as
+is and instead sending a separate patch changing this in all
+functions, as a refactoring patch.
 
-Johan
+My two cents,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
