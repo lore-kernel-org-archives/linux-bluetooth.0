@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1343665491-16362-3-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1343665491-16362-2-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1343665491-16362-1-git-send-email-lucas.demarchi@profusion.mobi>
-	<1343665491-16362-3-git-send-email-lucas.demarchi@profusion.mobi>
-Date: Mon, 30 Jul 2012 12:59:02 -0400
-Message-ID: <CAJdJm_Oony+DPWh7R9kbXvj3=bOc=LgAeCaPqpqi4AE_sCusZg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/3] rfcomm: Fix typo in man page
+	<1343665491-16362-2-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Mon, 30 Jul 2012 12:57:42 -0400
+Message-ID: <CAJdJm_OgYuaXuUa50he8u=FANPWXEYgJS81xOHcuU7KrOdeNdQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/3] rfcomm: Remove support for configuration file
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
@@ -17,29 +17,18 @@ Hi Lucas,
 
 On Mon, Jul 30, 2012 at 12:24 PM, Lucas De Marchi
 <lucas.demarchi@profusion.mobi> wrote:
-> ---
->  .gitignore     | 5 -----
->  tools/rfcomm.1 | 2 +-
->  2 files changed, 1 insertion(+), 6 deletions(-)
+> diff --git a/Makefile.tools b/Makefile.tools
+> index 5579b86..e05d588 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -1,7 +1,6 @@
 >
-> diff --git a/.gitignore b/.gitignore
-> index 38318cd..c9f293a 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -26,11 +26,6 @@ missing
->  stamp-h1
->  autom4te.cache
->
-> -ylwrap
-> -lexer.c
-> -parser.h
-> -parser.c
-> -
->  bluez.pc
->  lib/bluetooth
->  src/builtin.h
+>  if TOOLS
+>  if DATAFILES
+> -conf_DATA += tools/rfcomm.conf
+>  endif
 
-The diff above is more appropriate for the previous patch.
+Why not remove the whole "if DATAFILES ... endif" block?
 
 Regards,
 -- 
