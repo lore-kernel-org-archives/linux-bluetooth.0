@@ -1,35 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1343428198-23621-8-git-send-email-jprvita@openbossa.org>
-References: <1343428198-23621-1-git-send-email-jprvita@openbossa.org>
-	<1343428198-23621-8-git-send-email-jprvita@openbossa.org>
-Date: Mon, 30 Jul 2012 07:46:33 -0400
-Message-ID: <CAJdJm_PyZa_0K-5nZOo_D796x5cwiZ6GKMb7-Jey48CYPys88Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 07/14] mgmt: Add LE scanning callback
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: =?ISO-8859-1?Q?Jo=E3o_Paulo_Rechi_Vita?= <jprvita@openbossa.org>
+Date: Mon, 30 Jul 2012 14:00:50 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
-	Claudio Takahasi <claudio.takahasi@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [RFC v2] Bluetooth: mgmt: Add device disconnect reason
+Message-ID: <20120730110050.GA13789@x220.ger.corp.intel.com>
+References: <1342790298-12193-1-git-send-email-mikel.astiz.oss@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1342790298-12193-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Mikel,
 
-On Fri, Jul 27, 2012 at 6:29 PM, João Paulo Rechi Vita
-<jprvita@openbossa.org> wrote:
-> +       cp->type = info->discov_type;
+On Fri, Jul 20, 2012, Mikel Astiz wrote:
+> During the BlueZ meeting in Brazil it was proposed to add two more
+> values to this enum: "Connection terminated by local host" and
+> "Connection terminated by remote host". However, after some testing,
+> it seems the result can be quite misleading. Therefore and given that
+> there are no known use-cases that need this information (local vs
+> remote disconnection), these two values have been dropped.
+
+I still think that it wouldn't hurt to include which side triggers the
+HCI_Disconnect() command. We can always document that this identifies
+accurately the ACL disconnection initiator but not necessarily the
+higher-level profile(s) disconnection initiator.
+
+>  	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags) &&
+>  	    (conn->type == ACL_LINK || conn->type == LE_LINK)) {
+> -		if (ev->status != 0)
+> +		if (ev->status != 0) {
+>  			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
+>  					       conn->dst_type, ev->status);
+> -		else
+> +		} else {
+> +			u8 reason = 0x00;
 > +
-> +       if (write(mgmt_sock, buf, sizeof(buf)) < 0) {
-> +               int err = errno;
-> +               error("failed to write to MGMT socket: %s", strerror(err));
-> +               return -err;
+> +			if (ev->reason == HCI_ERROR_CONNECTION_TIMEOUT)
+> +				reason = 0x01;
+> +
+>  			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
+> -						 conn->dst_type);
+> +						 conn->dst_type, reason);
+> +		}
+>  	}
 
-For consistency, "err" should be a negative value, and use
-"strerror(-err)" and "return err" instead.
+Instead of using hard-coded 0x00 and 0x01 wouldn't it be better to have
+proper MGMT_* defines for these?
 
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
