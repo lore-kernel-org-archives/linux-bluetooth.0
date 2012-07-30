@@ -1,49 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJdJm_Oony+DPWh7R9kbXvj3=bOc=LgAeCaPqpqi4AE_sCusZg@mail.gmail.com>
-References: <1343665491-16362-1-git-send-email-lucas.demarchi@profusion.mobi>
- <1343665491-16362-3-git-send-email-lucas.demarchi@profusion.mobi> <CAJdJm_Oony+DPWh7R9kbXvj3=bOc=LgAeCaPqpqi4AE_sCusZg@mail.gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 30 Jul 2012 17:01:47 -0300
-Message-ID: <CAMOw1v6yx6REGPWU-+4TBUqvgvhQdYheYr3LGf4=1q2ba0f-kw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/3] rfcomm: Fix typo in man page
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Jefferson Delfes <jefferson.delfes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Subject: [PATCH BlueZ] lib: Add new company identifiers
+Date: Mon, 30 Jul 2012 14:41:20 -0400
+Message-Id: <1343673680-30775-1-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jul 30, 2012 at 1:59 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Lucas,
->
-> On Mon, Jul 30, 2012 at 12:24 PM, Lucas De Marchi
-> <lucas.demarchi@profusion.mobi> wrote:
->> ---
->>  .gitignore     | 5 -----
->>  tools/rfcomm.1 | 2 +-
->>  2 files changed, 1 insertion(+), 6 deletions(-)
->>
->> diff --git a/.gitignore b/.gitignore
->> index 38318cd..c9f293a 100644
->> --- a/.gitignore
->> +++ b/.gitignore
->> @@ -26,11 +26,6 @@ missing
->>  stamp-h1
->>  autom4te.cache
->>
->> -ylwrap
->> -lexer.c
->> -parser.h
->> -parser.c
->> -
->>  bluez.pc
->>  lib/bluetooth
->>  src/builtin.h
->
-> The diff above is more appropriate for the previous patch.
+---
+ lib/bluetooth.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-Oops, wrong amend.
+diff --git a/lib/bluetooth.c b/lib/bluetooth.c
+index a0be884..d092d01 100644
+--- a/lib/bluetooth.c
++++ b/lib/bluetooth.c
+@@ -522,6 +522,46 @@ char *bt_compidtostr(int compid)
+ 		return "Autonet Mobile";
+ 	case 128:
+ 		return "DeLorme Publishing Company, Inc.";
++	case 129:
++		return "WuXi Vimicro";
++	case 130:
++		return "Sennheiser Communications A/S";
++	case 131:
++		return "TimeKeeping Systems, Inc.";
++	case 132:
++		return "Ludus Helsinki Ltd.";
++	case 133:
++		return "BlueRadios, Inc.";
++	case 134:
++		return "equinux AG";
++	case 135:
++		return "Garmin International, Inc.";
++	case 136:
++		return "Ecotest";
++	case 137:
++		return "GN ReSound A/S";
++	case 138:
++		return "Jawbone";
++	case 139:
++		return "Topcon Positioning Systems, LLC";
++	case 140:
++		return "Qualcomm Labs, Inc.";
++	case 141:
++		return "Zscan Software";
++	case 142:
++		return "Quintic Corp.";
++	case 143:
++		return "Stollmann E+V GmbH";
++	case 144:
++		return "Funai Electric Co., Ltd.";
++	case 145:
++		return "Advanced PANMOBIL systems GmbH & Co. KG";
++	case 146:
++		return "ThinkOptics, Inc.";
++	case 147:
++		return "Universal Electronics, Inc.";
++	case 148:
++		return "Airoha Technology Corp.";
+ 	case 65535:
+ 		return "internal use";
+ 	default:
+-- 
+1.7.11.3
 
-Thanks
-Lucas De Marchi
