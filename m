@@ -1,97 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-Subject: [PATCH BlueZ v2 1/3] att: Add prepare write support
-Date: Mon, 30 Jul 2012 13:34:15 -0400
-Message-Id: <1343669655-12586-1-git-send-email-eder.ruiz@openbossa.org>
-In-Reply-To: <1343420976-19921-1-git-send-email-eder.ruiz@openbossa.org>
-References: <1343420976-19921-1-git-send-email-eder.ruiz@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1343665491-16362-3-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1343665491-16362-1-git-send-email-lucas.demarchi@profusion.mobi>
+	<1343665491-16362-3-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Mon, 30 Jul 2012 12:59:02 -0400
+Message-ID: <CAJdJm_Oony+DPWh7R9kbXvj3=bOc=LgAeCaPqpqi4AE_sCusZg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/3] rfcomm: Fix typo in man page
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add functions for encoding/decoding Prepare Write Request and
-Response PDUs.
----
- attrib/att.c |   54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- attrib/att.h |    5 +++++
- 2 files changed, 59 insertions(+)
+Hi Lucas,
 
-diff --git a/attrib/att.c b/attrib/att.c
-index 0550ac1..790ec3a 100644
---- a/attrib/att.c
-+++ b/attrib/att.c
-@@ -974,3 +974,57 @@ uint16_t dec_mtu_resp(const uint8_t *pdu, int len, uint16_t *mtu)
- 
- 	return min_len;
- }
-+
-+uint16_t enc_prep_write_req(uint16_t handle, uint16_t offset,
-+			const uint8_t *value, int vlen, uint8_t *pdu, int len)
-+{
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(handle) +
-+								sizeof(offset);
-+
-+	if (pdu == NULL)
-+		return 0;
-+
-+	if (len < min_len)
-+		return 0;
-+
-+	if (vlen > len - min_len)
-+		vlen = len - min_len;
-+
-+	pdu[0] = ATT_OP_PREP_WRITE_REQ;
-+	att_put_u16(handle, &pdu[1]);
-+	att_put_u16(offset, &pdu[3]);
-+
-+	if (vlen > 0) {
-+		memcpy(&pdu[5], value, vlen);
-+		return min_len + vlen;
-+	}
-+
-+	return min_len;
-+}
-+
-+uint16_t dec_prep_write_resp(const uint8_t *pdu, int len, uint16_t *handle,
-+				uint16_t *offset, uint8_t *value, int *vlen)
-+{
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(*handle) +
-+								sizeof(*offset);
-+
-+	if (pdu == NULL)
-+		return 0;
-+
-+	if (handle == NULL || offset == NULL || value == NULL || vlen == NULL)
-+		return 0;
-+
-+	if (len < min_len)
-+		return 0;
-+
-+	if (pdu[0] != ATT_OP_PREP_WRITE_REQ)
-+		return 0;
-+
-+	*handle = att_get_u16(&pdu[1]);
-+	*offset = att_get_u16(&pdu[3]);
-+	*vlen = len - min_len;
-+	if (*vlen > 0)
-+		memcpy(value, pdu + min_len, *vlen);
-+
-+	return len;
-+}
-diff --git a/attrib/att.h b/attrib/att.h
-index 1c1102a..ec03be9 100644
---- a/attrib/att.h
-+++ b/attrib/att.h
-@@ -256,3 +256,8 @@ uint16_t enc_mtu_req(uint16_t mtu, uint8_t *pdu, int len);
- uint16_t dec_mtu_req(const uint8_t *pdu, int len, uint16_t *mtu);
- uint16_t enc_mtu_resp(uint16_t mtu, uint8_t *pdu, int len);
- uint16_t dec_mtu_resp(const uint8_t *pdu, int len, uint16_t *mtu);
-+
-+uint16_t enc_prep_write_req(uint16_t handle, uint16_t offset,
-+			const uint8_t *value, int vlen, uint8_t *pdu, int len);
-+uint16_t dec_prep_write_resp(const uint8_t *pdu, int len, uint16_t *handle,
-+				uint16_t *offset, uint8_t *value, int *vlen);
+On Mon, Jul 30, 2012 at 12:24 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> ---
+>  .gitignore     | 5 -----
+>  tools/rfcomm.1 | 2 +-
+>  2 files changed, 1 insertion(+), 6 deletions(-)
+>
+> diff --git a/.gitignore b/.gitignore
+> index 38318cd..c9f293a 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -26,11 +26,6 @@ missing
+>  stamp-h1
+>  autom4te.cache
+>
+> -ylwrap
+> -lexer.c
+> -parser.h
+> -parser.c
+> -
+>  bluez.pc
+>  lib/bluetooth
+>  src/builtin.h
+
+The diff above is more appropriate for the previous patch.
+
+Regards,
 -- 
-1.7.9.5
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
