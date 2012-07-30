@@ -1,44 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CAJdJm_Oony+DPWh7R9kbXvj3=bOc=LgAeCaPqpqi4AE_sCusZg@mail.gmail.com>
+References: <1343665491-16362-1-git-send-email-lucas.demarchi@profusion.mobi>
+ <1343665491-16362-3-git-send-email-lucas.demarchi@profusion.mobi> <CAJdJm_Oony+DPWh7R9kbXvj3=bOc=LgAeCaPqpqi4AE_sCusZg@mail.gmail.com>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ v2 1/3] rfcomm: Fix checking return value instead of errno
-Date: Mon, 30 Jul 2012 17:06:11 -0300
-Message-Id: <1343678773-24050-1-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Mon, 30 Jul 2012 17:01:47 -0300
+Message-ID: <CAMOw1v6yx6REGPWU-+4TBUqvgvhQdYheYr3LGf4=1q2ba0f-kw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/3] rfcomm: Fix typo in man page
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We were checking by a positive return value instead of checking by -1
-and errno. However when there's no support for TTY kernel returns
-EOPNOTSUPP as usual, which in the end will have a return value of -1
-and errno will be set to EOPNOTSUPP.
----
- tools/rfcomm.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+On Mon, Jul 30, 2012 at 1:59 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Lucas,
+>
+> On Mon, Jul 30, 2012 at 12:24 PM, Lucas De Marchi
+> <lucas.demarchi@profusion.mobi> wrote:
+>> ---
+>>  .gitignore     | 5 -----
+>>  tools/rfcomm.1 | 2 +-
+>>  2 files changed, 1 insertion(+), 6 deletions(-)
+>>
+>> diff --git a/.gitignore b/.gitignore
+>> index 38318cd..c9f293a 100644
+>> --- a/.gitignore
+>> +++ b/.gitignore
+>> @@ -26,11 +26,6 @@ missing
+>>  stamp-h1
+>>  autom4te.cache
+>>
+>> -ylwrap
+>> -lexer.c
+>> -parser.h
+>> -parser.c
+>> -
+>>  bluez.pc
+>>  lib/bluetooth
+>>  src/builtin.h
+>
+> The diff above is more appropriate for the previous patch.
 
-diff --git a/tools/rfcomm.c b/tools/rfcomm.c
-index e73b0ba..0a80670 100644
---- a/tools/rfcomm.c
-+++ b/tools/rfcomm.c
-@@ -182,10 +182,14 @@ static int create_dev(int ctl, int dev, uint32_t flags, bdaddr_t *bdaddr, int ar
- 	}
- 
- 	err = ioctl(ctl, RFCOMMCREATEDEV, &req);
--	if (err == EOPNOTSUPP)
--		fprintf(stderr, "RFCOMM TTY support not available\n");
--	else if (err < 0)
--		perror("Can't create device");
-+	if (err == -1) {
-+		err = -errno;
-+
-+		if (err == -EOPNOTSUPP)
-+			fprintf(stderr, "RFCOMM TTY support not available\n");
-+		else
-+			perror("Can't create device");
-+	}
- 
- 	return err;
- }
--- 
-1.7.11.3
+Oops, wrong amend.
 
+Thanks
+Lucas De Marchi
