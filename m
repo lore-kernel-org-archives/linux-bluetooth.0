@@ -1,53 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 Jul 2012 14:00:50 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [RFC v2] Bluetooth: mgmt: Add device disconnect reason
-Message-ID: <20120730110050.GA13789@x220.ger.corp.intel.com>
-References: <1342790298-12193-1-git-send-email-mikel.astiz.oss@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1342790298-12193-1-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1343428198-23621-3-git-send-email-jprvita@openbossa.org>
+References: <1343428198-23621-1-git-send-email-jprvita@openbossa.org>
+	<1343428198-23621-3-git-send-email-jprvita@openbossa.org>
+Date: Mon, 30 Jul 2012 06:57:04 -0400
+Message-ID: <CAJdJm_N6R5C_EPpK985mYajc7i+R=5T44AvTF_C7-5giR1Z8XQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 02/14] mgmt: print error message when
+ start_discovery fails
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: =?ISO-8859-1?Q?Jo=E3o_Paulo_Rechi_Vita?= <jprvita@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Joao,
 
-On Fri, Jul 20, 2012, Mikel Astiz wrote:
-> During the BlueZ meeting in Brazil it was proposed to add two more
-> values to this enum: "Connection terminated by local host" and
-> "Connection terminated by remote host". However, after some testing,
-> it seems the result can be quite misleading. Therefore and given that
-> there are no known use-cases that need this information (local vs
-> remote disconnection), these two values have been dropped.
+On Fri, Jul 27, 2012 at 6:29 PM, João Paulo Rechi Vita
+<jprvita@openbossa.org> wrote:
+> If we fail to communicate with the MGMT socket is better to print the
+> error message on the mgmtops plugin, where it really happened, instead
+> of leaving this job to its users.
+> ---
+>  src/adapter.c |    6 +-----
+>  src/mgmt.c    |    7 +++++--
+>  2 files changed, 6 insertions(+), 7 deletions(-)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index c9c82e3..5dd9821 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -997,13 +997,9 @@ struct btd_device *adapter_get_device(DBusConnection *conn,
+>  static gboolean discovery_cb(gpointer user_data)
+>  {
+>         struct btd_adapter *adapter = user_data;
+> -       int err;
+>
+>         adapter->discov_id = 0;
+> -
+> -       err = mgmt_start_discovery(adapter->dev_id);
+> -       if (err < 0)
+> -               error("start_discovery: %s (%d)", strerror(-err), -err);
+> +       mgmt_start_discovery(adapter->dev_id);
+>
+>         return FALSE;
+>  }
+> diff --git a/src/mgmt.c b/src/mgmt.c
+> index c55b1a8..d73cf2a 100644
+> --- a/src/mgmt.c
+> +++ b/src/mgmt.c
+> @@ -1961,8 +1961,11 @@ int mgmt_start_discovery(int index)
+>
+>         cp->type = info->discov_type;
+>
+> -       if (write(mgmt_sock, buf, sizeof(buf)) < 0)
+> -               return -errno;
+> +       if (write(mgmt_sock, buf, sizeof(buf)) < 0) {
+> +               int err = -errno;
+> +               error("failed to write to MGMT socket: %s", strerror(err));
 
-I still think that it wouldn't hurt to include which side triggers the
-HCI_Disconnect() command. We can always document that this identifies
-accurately the ACL disconnection initiator but not necessarily the
-higher-level profile(s) disconnection initiator.
+I think this should be "strerror(-err)".
 
->  	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags) &&
->  	    (conn->type == ACL_LINK || conn->type == LE_LINK)) {
-> -		if (ev->status != 0)
-> +		if (ev->status != 0) {
->  			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
->  					       conn->dst_type, ev->status);
-> -		else
-> +		} else {
-> +			u8 reason = 0x00;
-> +
-> +			if (ev->reason == HCI_ERROR_CONNECTION_TIMEOUT)
-> +				reason = 0x01;
-> +
->  			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
-> -						 conn->dst_type);
-> +						 conn->dst_type, reason);
-> +		}
->  	}
+> +               return err;
+> +       }
+>
+>         return 0;
+>  }
 
-Instead of using hard-coded 0x00 and 0x01 wouldn't it be better to have
-proper MGMT_* defines for these?
-
-Johan
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
