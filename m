@@ -1,65 +1,181 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1343751179.1803.73.camel@aeonflux>
+Message-ID: <50180209.1090002@shealevy.com>
+Date: Tue, 31 Jul 2012 12:04:25 -0400
+From: Shea Levy <shea@shealevy.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Subject: Re: Unable to Detect Bluetooth Device on Macbook Pro 9,2 (Mid-2012
  13")
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Shea Levy <shea@shealevy.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Date: Tue, 31 Jul 2012 09:12:59 -0700
-In-Reply-To: <50180209.1090002@shealevy.com>
-References: <5017E234.2000207@shealevy.com>
-	 <1343749923.1803.68.camel@aeonflux> <50180209.1090002@shealevy.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+References: <5017E234.2000207@shealevy.com> <1343749923.1803.68.camel@aeonflux>
+In-Reply-To: <1343749923.1803.68.camel@aeonflux>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Shea,
+On 07/31/2012 11:52 AM, Marcel Holtmann wrote:
+> Hi Shea,
+>
+>> Please CC me on response, I am not subscribed to the list.
+>>
+>> hcitool is unable to detect my laptop's bluetooth device:
+>>
+>> $ lsusb
+>> Bus 004 Device 009: ID 05ac:821d Apple, Inc.
+>> Bus 004 Device 008: ID 05ac:820b Apple, Inc.
+>> Bus 004 Device 007: ID 05ac:820a Apple, Inc.
+>> Bus 004 Device 006: ID 05ac:0252 Apple, Inc.
+>> Bus 004 Device 005: ID 05ac:8242 Apple, Inc. IR Receiver [built-in]
+>> Bus 004 Device 004: ID 0a5c:4500 Broadcom Corp. BCM2046B1 USB 2.0 Hub
+>> (part of BCM2046 Bluetooth)
+>> Bus 004 Device 003: ID 0424:2513 Standard Microsystems Corp.
+>> Bus 004 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+>> Bus 004 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+>> Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+>> Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+>> Bus 003 Device 003: ID 05ac:8509 Apple, Inc.
+>> Bus 003 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+>> Bus 003 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+>>
+>> $ dmesg
+>> <snip>
+>> [    4.744248] usb 4-1.8.1.3: new full-speed USB device number 9 using
+>> ehci_hcd
+>> [    4.822041] usb 4-1.8.1.3: New USB device found, idVendor=05ac,
+>> idProduct=821d
+>> [    4.822830] usb 4-1.8.1.3: New USB device strings: Mfr=1, Product=2,
+>> SerialNumber=0
+>> [    4.823582] usb 4-1.8.1.3: Product: Bluetooth USB Host Controller
+>> [    4.824329] usb 4-1.8.1.3: Manufacturer: Apple Inc.
+>> <snip>
+>>
+>> $ hciconfig -a
+>>
+>> $ hcitool dev
+>> Devices:
+>>
+>> $ lsmod | grep bluetooth
+>> bluetooth             187731  0
+>> rfkill                 15546  2 bluetooth,cfg80211
+>> crc16                   1311  2 bluetooth,ext4
+>>
+>> Any ideas?
+> include /sys/kernel/debug/usb/devices details for this device.
 
-> > include /sys/kernel/debug/usb/devices details for this device.
-> 
-> Not sure, which device it is, so here's all of bus 4:
+Not sure, which device it is, so here's all of bus 4:
 
-<snip>
+T:  Bus=04 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=480  MxCh= 2
+B:  Alloc=  7/800 us ( 1%), #Int=  8, #Iso=  0
+D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=1d6b ProdID=0002 Rev= 3.05
+S:  Manufacturer=Linux 3.5.0 ehci_hcd
+S:  Product=EHCI Host Controller
+S:  SerialNumber=0000:00:1d.0
+C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
+I:* If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
+E:  Ad=81(I) Atr=03(Int.) MxPS=   4 Ivl=256ms
 
-> T:  Bus=04 Lev=04 Prnt=04 Port=02 Cnt=03 Dev#=  9 Spd=12   MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=05ac ProdID=821d Rev= 0.86
-> S:  Manufacturer=Apple Inc.
-> S:  Product=Bluetooth USB Host Controller
-> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 8
+D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=8087 ProdID=0024 Rev= 0.00
+C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
+I:* If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
+E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=256ms
 
-lets take the one that says Bluetooth USB Host Controller ;)
+T:  Bus=04 Lev=02 Prnt=02 Port=07 Cnt=01 Dev#=  3 Spd=480  MxCh= 3
+D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=02 MxPS=64 #Cfgs=  1
+P:  Vendor=0424 ProdID=2513 Rev= b.b3
+C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  2mA
+I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=01 Driver=hub
+E:  Ad=81(I) Atr=03(Int.) MxPS=   1 Ivl=256ms
+I:* If#= 0 Alt= 1 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=02 Driver=hub
+E:  Ad=81(I) Atr=03(Int.) MxPS=   1 Ivl=256ms
 
-Regards
+T:  Bus=04 Lev=03 Prnt=03 Port=00 Cnt=01 Dev#=  4 Spd=12   MxCh= 3
+D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+P:  Vendor=0a5c ProdID=4500 Rev= 1.00
+S:  Manufacturer=Apple Inc.
+S:  Product=BRCM20702 Hub
+C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr= 94mA
+I:* If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
+E:  Ad=81(I) Atr=03(Int.) MxPS=   1 Ivl=255ms
 
-Marcel
+T:  Bus=04 Lev=04 Prnt=04 Port=00 Cnt=01 Dev#=  7 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+P:  Vendor=05ac ProdID=820a Rev= 1.00
+C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
+I:* If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=01 Driver=usbhid
+E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl=10ms
+
+T:  Bus=04 Lev=04 Prnt=04 Port=01 Cnt=02 Dev#=  8 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+P:  Vendor=05ac ProdID=820b Rev= 1.00
+C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
+I:* If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=02 Driver=usbhid
+E:  Ad=81(I) Atr=03(Int.) MxPS=   4 Ivl=10ms
+
+T:  Bus=04 Lev=04 Prnt=04 Port=02 Cnt=03 Dev#=  9 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=05ac ProdID=821d Rev= 0.86
+S:  Manufacturer=Apple Inc.
+S:  Product=Bluetooth USB Host Controller
+C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+
+T:  Bus=04 Lev=03 Prnt=03 Port=01 Cnt=02 Dev#=  5 Spd=1.5  MxCh= 0
+D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+P:  Vendor=05ac ProdID=8242 Rev= 0.16
+S:  Manufacturer=Apple Computer, Inc.
+S:  Product=IR Receiver
+C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=00 Prot=00 Driver=usbhid
+E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=10ms
+
+T:  Bus=04 Lev=03 Prnt=03 Port=02 Cnt=03 Dev#=  6 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+P:  Vendor=05ac ProdID=0252 Rev= 2.19
+S:  Manufacturer=Apple Inc.
+S:  Product=Apple Internal Keyboard / Trackpad
+C:* #Ifs= 3 Cfg#= 1 Atr=a0 MxPwr= 40mA
+I:* If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=01 Driver=usbhid
+E:  Ad=83(I) Atr=03(Int.) MxPS=  10 Ivl=8ms
+I:* If#= 1 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=00 Prot=00 Driver=usbhid
+E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=2ms
+I:* If#= 2 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=02 Driver=bcm5974
+E:  Ad=84(I) Atr=03(Int.) MxPS=   8 Ivl=8ms
 
 
+
+> Regards
+>
+> Marcel
+>
+>
+
+Thanks,
+Shea
