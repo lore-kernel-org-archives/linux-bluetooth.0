@@ -1,177 +1,205 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 31 Jul 2012 09:58:58 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Manoj Sharma <ursmanoj@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+cc: Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org,
+	Anurag Gupta <anurag.gupta@stericsson.com>
+Subject: Re: [PATCH 0/2] Support for reserving bandwidth on L2CAP socket
+In-Reply-To: <CABBYNZ+zPxfKn--E6fSGF8gUj-jLN4MVbZqHcj=E4ZOgcft9tg@mail.gmail.com>
+Message-ID: <alpine.DEB.2.02.1207310813420.1055@mathewm-linux>
+References: <1343123700-23375-1-git-send-email-manojkr.sharma@stericsson.com> <1343138034.24426.55.camel@aeonflux> <CAHH5__6sQ2yyEpuDZYMd4mFmHJEJeRX4eKzVM47k9TQcSthywA@mail.gmail.com> <1343399863.1803.10.camel@aeonflux> <CAHH5__62w3gO6YMnyvEeo7Pug_C0FUVZTR6wGLDz9Tkn2cKeXA@mail.gmail.com>
+ <CABBYNZ+CEJby4JJRd_+A+OjAXO=n8ZZpFqehADSAk-Lgq9A0Eg@mail.gmail.com> <CAHH5__59tO=+hzz=4gQtx+Eq5Pz7dQ6j1ynO_7_3dQqCMkehWw@mail.gmail.com> <CABBYNZ+zPxfKn--E6fSGF8gUj-jLN4MVbZqHcj=E4ZOgcft9tg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1343750194.1803.70.camel@aeonflux>
-References: <CAJKEbdeVZA+WK8AMNCKCrVgpVchMHQ=XyAnZ7w7H0eX2y48evQ@mail.gmail.com>
-	<1343750194.1803.70.camel@aeonflux>
-Date: Tue, 31 Jul 2012 19:20:48 +0200
-Message-ID: <CAJKEbdegKt1Pcx=QBQWWxe3=KYVr3WbH0PkBmfmDse3rF71MSA@mail.gmail.com>
-Subject: Re: [PATCH] please add VID/PID to ath3k (AR3012)
-From: Yevgeniy Melnichuk <yevgeniy.melnichuk@googlemail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, shafi.ath9k@gmail.com,
-	gustavo@padovan.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
 
-thank you for the hint. i hope i get it right the second time.
+Manoj and Luiz -
 
-description:
-the patch adds 0489:E036 to the blacklist in btusb and to the support
-list in ath3k. The VID/PID belongs to AR3012 chips used by Sony Vaio
-T-Series.
-Signed-off-by: Yevgeniy Melnichuk <yevgeniy.melnichuk@googlemail.com>
+On Tue, 31 Jul 2012, Luiz Augusto von Dentz wrote:
+
+> Hi Manoj,
+>
+> On Tue, Jul 31, 2012 at 2:30 PM, Manoj Sharma <ursmanoj@gmail.com> wrote:
+>> Hi Luiz,
+>>
+>> On 7/30/12, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>>> Hi Manoj,
+>>>
+>>> On Mon, Jul 30, 2012 at 9:30 AM, Manoj Sharma <ursmanoj@gmail.com> wrote:
+>>>> One problem which I have faced using SO_PRIORITY is explained below.
+>>>>
+>>>> Suppose we have 2 links A & B and link A has higher priority than link
+>>>> B. And outgoing data transfer is active on both links. Now if device
+>>>> on link A goes far, there would be lot of failures and number of
+>>>> re-transmissions would increase for link A. Consequently at any time
+>>>> host would have significant number of packets for link A, getting
+>>>> accumulated due to poor quality of link.But since link A packets have
+>>>> higher priority, link B packets would suffer infinitely as long as
+>>>> link A packet queue in host is non-empty. Thus link B protocols may
+>>>> fail due to timers expiring and finally disconnection at upper layers.
+>>>
+>>> There is a mechanism to avoid starvation, also apparently you didn't
+>>> study the code since the priority is per L2CAP channel not per link so
+>>> we are able to prioritize per profile.
+>>>
+>> I would check how starvation is avoided. But for your information I
+>> did observe starvation practically. And I know that priority is per
+>> L2CAP. I mentioned links based on assumption that AVDTP and OBEX are
+>> connected with different devices. Hence priority would result into
+>> priority of connections in such case ;).
+>
+> There is no such thing of prioritize a connection, the algorithm used
+> always check every channel of each connection and prioritize the
+> channel. Maybe you are confusing what some controllers do, the
+> controller has no idea what L2CAP channel has been configured it only
+> knows about the ACL connections.
+
+The current starvation avoidance algorithm works well as long as there 
+is data queued for all of the L2CAP channels and the controller is 
+sending packets regularly.  It does seem to break down when the 
+controller queue gets stuck (see below).
+
+>>>> Second problem:
+>>>> We have two links similar to above scenario. Say link A is being used
+>>>> by AVDTP and link B is being used by OBEX. Host can come across a
+>>>> situation where all controller buffers are used by OBEX and AVDTP is
+>>>> waiting for a free buffer. Now due to some reason (e.g. distance) OBEX
+>>>> link B goes weak. This results into delay in transmission of OBEX
+>>>> packets already held by controller and consequently AVDTP packets also
+>>>> get delayed which causes glitches in music streaming and user
+>>>> experience goes bad.
+>>>
+>>> That is exactly what SO_PRIORITY has fixed, by setting SO_PRIORITY you
+>>> prioritize AVDTP stream over OBEX which means AVDTP can use a bigger
+>>> part of the bandwidth while OBEX uses the remaining.
+>>>
+>> I disagree. Please try to understand the situation I explained again.
+>> There can be a scenario when host has only OBEX packets and no AVDTP,
+>> here irrespective of which channel has what priority OBEX may consume
+>> all ACL credits. At the same moment OBEX link goes weak (e.g.due to
+>> distance), this would delay the transmission of all OBEX packets held
+>> by controller. In the mean time, AVDTP packets reach Bluez but since
+>> there are no credits left, host would have to delay transmission of
+>> AVDTP until a OBEX packet is transferred and an NOCP is received. This
+>> would definitely cause a glitch on AVDTP streaming and end user
+>> experience would go bad. By reserving credits for AVDTP channel, we
+>> ensure that OBEX packets doesnt eat up all credits while AVDTP packets
+>> were absent.
+>
+> Without the use of guaranteed channels you cannot really guarantee
+> anything, besides this would throttle OBEX transfer even when there is
+> nothing streaming on AVDTP which I don't thing is acceptable. Also Ive
+> never experience such a problem, you can start streaming while
+> transferring something and that never produced any artifacts in the
+> headsets I have, the only problem we have right now is paging another
+> device while AVDTP stream is active may cause some audio glitches and
+> even that could be avoided by tuning paging parameters while there is
+> a high priority channel active.
+>
+> Btw, there is some lack of connection to the code, an OBEX packet
+> could be quite big but that is not transmitted as it is, it is
+> actually fragmented into L2CAP and then HCI frames, the HCI frames is
+> the one being sent to the controller, the moment the AVDTP socket
+> start producing another socket may be using some/all of the controller
+> buffers e.g. 8:1021 that is at most 8K bytes of latency to startup the
+> stream, in fact it is pretty common to audio to have some latency.
+
+It's true that the amount of latency due to buffering in the 
+controller is minimal, and would not in itself cause streaming issues 
+*if* the controller is able to consume packets from the buffer.
+
+I do see where a bad situation arises when the OBEX connection is 
+stalled and only queued OBEX data is available to the host stack HCI 
+scheduler at that instant.  In that case, the controller queue could 
+be completely consumed by data for the stalled channel no matter what 
+the priorities are.  This could even happen when audio data is passed 
+to the socket at exactly the right time.
+
+If you're using OBEX-over-L2CAP, this could be partially addressed by 
+setting a flush timeout.  However, it would still be possible to fill 
+the buffers with OBEX packets because non-flushable ERTM s-frames 
+would accumulate in the controller buffer.
+
+For traditional OBEX-over-RFCOMM, an OBEX packet sizes that are 
+smaller than the controller buffer could help.  This is a tradeoff 
+against throughput.  It could work to send smaller OBEX packets when 
+an AVDTP stream is active, even if a larger OBEX MTU was negotiated.
+
+It would be a big help if Manoj could post kernel logs showing us how 
+the HCI scheduler is actually behaving in the problem case.
 
 
+While I'm convinced that a problem exists here, I think it can be 
+addressed using existing interfaces instead of adding a new one.  For 
+example, it may be reasonable to not fully utilize the controller 
+buffer with data for just one ACL, or to use priority when looking at 
+controller buffer utilization.  Maybe an ACL could use all but one 
+slot in the controller buffer, maybe it could only use half if there 
+are multiple ACLs open.  I don't think it would throttle throughput 
+unless the system was so heavily loaded that it couldn't respond to 
+number-of-completed-packets in time at BR/EDR data rates, and in that 
+case there are bigger problems.  It's pretty easy to test with 
+hdev->acl_pkts set to different values to see if using less of the 
+buffer impacts throughput.
 
-patch:
-diff -uprN linux-3.5-orig/drivers/bluetooth/ath3k.c
-linux-3.5/drivers/bluetooth/ath3k.c
---- linux-3.5-orig/drivers/bluetooth/ath3k.c	2012-07-21 22:58:29.000000000 +0200
-+++ linux-3.5/drivers/bluetooth/ath3k.c	2012-07-31 18:21:41.044493550 +0200
-@@ -79,6 +79,7 @@ static struct usb_device_id ath3k_table[
- 	{ USB_DEVICE(0x13d3, 0x3362) },
- 	{ USB_DEVICE(0x0CF3, 0xE004) },
- 	{ USB_DEVICE(0x0930, 0x0219) },
-+	{ USB_DEVICE(0x0489, 0xe036) },
-
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE02C) },
-@@ -107,6 +108,7 @@ static struct usb_device_id ath3k_blist_
-
- 	/* Atheros AR5BBU22 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE03C), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0489, 0xe036), .driver_info = BTUSB_ATH3012 },
-
- 	{ }	/* Terminating entry */
- };
-diff -uprN linux-3.5-orig/drivers/bluetooth/btusb.c
-linux-3.5/drivers/bluetooth/btusb.c
---- linux-3.5-orig/drivers/bluetooth/btusb.c	2012-07-21 22:58:29.000000000 +0200
-+++ linux-3.5/drivers/bluetooth/btusb.c	2012-07-31 18:22:58.572494201 +0200
-@@ -141,6 +141,7 @@ static struct usb_device_id blacklist_ta
- 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0489, 0xe036), .driver_info = BTUSB_ATH3012 },
-
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+Right now, one stalled ACL disrupts all data flow through the 
+controller.  And that seems like a problem worth solving.
 
 
+>>> The credit based algorithmic actually complicates more than solves the
+>>> problems here because it should actually fail if there is no enough
+>>> bandwidth as requested, so we would actually need to query how much
+>>> credits are available, also any type of bandwidth reservation might be
+>>> overkill with things like variable bit rate where you actually need to
+>>> know what is maximum possible bandwidth you need to reserve before
+>>> hand and that credits cannot be reserved by anyone else.
+>>>
+>> I agree, but we can provide a mechanism to allow only one channel to
+>> reserve bandwidth. In most cases it would be AVDTP streaming channel.
+>> Reserving at least one credit would allow preventing cases where
+>> non-AVDTP channel eats all credits due to unavailability of AVDTP
+>> packets. Please mind that since OBEX packets would be reaching bluez
+>> much faster than AVDTP, such situation may arise very easily.
+>
+> That raises my suspicious that you are not really testing against
+> PulseAudio and obexd, PA should be sending packets much faster than
+> obexd since its IO threads are realtime so it will most likely have
+> higher priority. Also the latency of OBEX packets are much greater as
+> each packet is normally 32k-64k compared to AVDTP stream which send
+> each packet individually (~700 bytes depending on the MTU).
+>
+>>>> These are the basic problems which I have faced and hence felt
+>>>> necessity of a similar but different mechanism and came up with this
+>>>> solution. This solution fixes both of the problems explained above.
+>>>> Based on the explanation above your suggestion is required further.
+>>>
+>>> Could you please show us what system did you find this problem? We
+>>> could possible help you trying to figure out what is going wrong,
+>>> please note that SO_PRIORITY support was introduced in 3.0 and some
+>>> system don't actually use it, in fact so far I think only PulseAudio
+>>> make use of it.
+>>>
+>> Yes, but we forced Bluez AVDTP to use SO_PRIORITY on our system and
+>> faced the starvation problem explained above. Though I am going to
+>> study the priority patch again.
+>
+> Im afraid the problem is not SO_PRIORITY but your audio subsystem
+> cannot keep up the socket buffer non-empty that would avoid OBEX
+> taking too much bandwidth, but again that is pretty strange as you
+> should be written much more frequently to the AVDTP socket to keep the
+> latency of the audio constant.
 
-content of /sys/kernel/debug/usb/devices:
-T:  Bus=04 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=5000 MxCh= 4
-B:  Alloc=  0/800 us ( 0%), #Int=  0, #Iso=  0
-D:  Ver= 3.00 Cls=09(hub  ) Sub=00 Prot=03 MxPS= 9 #Cfgs=  1
-P:  Vendor=1d6b ProdID=0003 Rev= 3.05
-S:  Manufacturer=Linux 3.5.0 xhci_hcd
-S:  Product=xHCI Host Controller
-S:  SerialNumber=0000:00:14.0
-C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:* If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   4 Ivl=256ms
+I agree that SO_PRIORITY is not the problem, but I don't think this 
+can be fixed at the audio subsystem level either.
 
-T:  Bus=03 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=480  MxCh= 4
-B:  Alloc=  0/800 us ( 0%), #Int=  0, #Iso=  0
-D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=1d6b ProdID=0002 Rev= 3.05
-S:  Manufacturer=Linux 3.5.0 xhci_hcd
-S:  Product=xHCI Host Controller
-S:  SerialNumber=0000:00:14.0
-C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:* If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   4 Ivl=256ms
+Regards,
 
-T:  Bus=02 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=480  MxCh= 2
-B:  Alloc=  0/800 us ( 0%), #Int=  0, #Iso=  0
-D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=1d6b ProdID=0002 Rev= 3.05
-S:  Manufacturer=Linux 3.5.0 ehci_hcd
-S:  Product=EHCI Host Controller
-S:  SerialNumber=0000:00:1d.0
-C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:* If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   4 Ivl=256ms
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
-T:  Bus=02 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 6
-D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=8087 ProdID=0024 Rev= 0.00
-C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:* If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   1 Ivl=256ms
-
-T:  Bus=01 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=480  MxCh= 2
-B:  Alloc=  0/800 us ( 0%), #Int=  0, #Iso=  0
-D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=1d6b ProdID=0002 Rev= 3.05
-S:  Manufacturer=Linux 3.5.0 ehci_hcd
-S:  Product=EHCI Host Controller
-S:  SerialNumber=0000:00:1a.0
-C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:* If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   4 Ivl=256ms
-
-T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 6
-D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=8087 ProdID=0024 Rev= 0.00
-C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:* If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   1 Ivl=256ms
-
-T:  Bus=01 Lev=02 Prnt=02 Port=01 Cnt=01 Dev#=  6 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e036 Rev= 0.02
-S:  Manufacturer=Atheros Communications
-S:  Product=Bluetooth USB Host Controller
-S:  SerialNumber=Alaska Day 2006
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-
-T:  Bus=01 Lev=02 Prnt=02 Port=02 Cnt=02 Dev#=  4 Spd=480  MxCh= 0
-D:  Ver= 2.00 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=04f2 ProdID=b328 Rev=29.17
-S:  Manufacturer=Chicony Electronics Co.,Ltd.
-S:  Product=USB 2.0 Camera
-S:  SerialNumber=0x0001
-C:* #Ifs= 2 Cfg#= 1 Atr=80 MxPwr=500mA
-A:  FirstIf#= 0 IfCount= 2 Cls=0e(video) Sub=03 Prot=00
-I:* If#= 0 Alt= 0 #EPs= 1 Cls=0e(video) Sub=01 Prot=00 Driver=uvcvideo
-E:  Ad=83(I) Atr=03(Int.) MxPS=  16 Ivl=4ms
-I:* If#= 1 Alt= 0 #EPs= 0 Cls=0e(video) Sub=02 Prot=00 Driver=uvcvideo
-I:  If#= 1 Alt= 1 #EPs= 1 Cls=0e(video) Sub=02 Prot=00 Driver=uvcvideo
-E:  Ad=81(I) Atr=05(Isoc) MxPS= 128 Ivl=125us
-I:  If#= 1 Alt= 2 #EPs= 1 Cls=0e(video) Sub=02 Prot=00 Driver=uvcvideo
-E:  Ad=81(I) Atr=05(Isoc) MxPS= 512 Ivl=125us
-I:  If#= 1 Alt= 3 #EPs= 1 Cls=0e(video) Sub=02 Prot=00 Driver=uvcvideo
-E:  Ad=81(I) Atr=05(Isoc) MxPS=1024 Ivl=125us
-I:  If#= 1 Alt= 4 #EPs= 1 Cls=0e(video) Sub=02 Prot=00 Driver=uvcvideo
-E:  Ad=81(I) Atr=05(Isoc) MxPS=1536 Ivl=125us
-I:  If#= 1 Alt= 5 #EPs= 1 Cls=0e(video) Sub=02 Prot=00 Driver=uvcvideo
-E:  Ad=81(I) Atr=05(Isoc) MxPS=2048 Ivl=125us
-I:  If#= 1 Alt= 6 #EPs= 1 Cls=0e(video) Sub=02 Prot=00 Driver=uvcvideo
-E:  Ad=81(I) Atr=05(Isoc) MxPS=2688 Ivl=125us
-I:  If#= 1 Alt= 7 #EPs= 1 Cls=0e(video) Sub=02 Prot=00 Driver=uvcvideo
-E:  Ad=81(I) Atr=05(Isoc) MxPS=3072 Ivl=125us
