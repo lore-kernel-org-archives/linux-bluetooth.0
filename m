@@ -1,37 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1343785928.1803.77.camel@aeonflux>
-Subject: Re: [patch]Add Vendor/Device ID for AR3012
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Chen, Peng" <pengchen@qca.qualcomm.com>
-Cc: "gustavo@padovan.org" <gustavo@padovan.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Waller, Carolyn" <carolyn@qca.qualcomm.com>,
-	"Jeang, Daniel" <dyjeong@qca.qualcomm.com>,
-	"Shanmugam Kamatchi, Bala" <bkamatch@qca.qualcomm.com>,
-	"Yao, Costa" <cqyao@qca.qualcomm.com>,
-	"Fan, Hong" <hongfan@qca.qualcomm.com>,
-	"Balasubramanian, Senthil Kumar" <senthilb@qca.qualcomm.com>,
-	"Wu, Frank" <fanwu@qca.qualcomm.com>
-Date: Tue, 31 Jul 2012 18:52:08 -0700
-In-Reply-To: <0EC13EFF38B7C84DB595405A8233E35B099B2EF2@nasanexd01b.na.qualcomm.com>
-References: <0EC13EFF38B7C84DB595405A8233E35B099AE930@nasanexd01b.na.qualcomm.com>
-	,<1342610820.24426.4.camel@aeonflux>
-	,<0EC13EFF38B7C84DB595405A8233E35B099B1C02@nasanexd01b.na.qualcomm.com>
-	 <0EC13EFF38B7C84DB595405A8233E35B099B2EF2@nasanexd01b.na.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Tue, 31 Jul 2012 19:33:14 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Charles Gordon <digigordo@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: l2ping Recv failed: Connection reset by peer
+Message-ID: <20120731223314.GA19846@samus>
+References: <CAGjArBcwtaRoecSivEaN9FiCbGfC3JhFRwXUVqq58SmQhN07sQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAGjArBcwtaRoecSivEaN9FiCbGfC3JhFRwXUVqq58SmQhN07sQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peng,
+Hi Charles,
 
-> How about this patch? Is there any problem?
+On 17:12 Tue 31 Jul, Charles Gordon wrote:
+> Hi,
+> 
+> I'm porting bluez 4.98 to an embedded system.  I have it up and running, but
+> I notice that when I run l2ping, I get the message "Recv failed: Connection
+> reset by peer" after l2ping runs for 5 seconds.  This is very consistent.
+> It doesn't matter whether I ping once a second, or do a flood ping.  After 5
+> seconds the l2ping program closes with the message saying the connection was
+> reset by the peer.
 
-please use git send-email so we can just use git am to apply them. You
-need to submit patches the right way.
+If I run l2ping without parameters, I get this:
 
-Regards
+l2ping - L2CAP ping
+Usage:
+	l2ping [-i device] [-s size] [-c count] [-t timeout] [-d delay] [-f] [-r] [-v] <bdaddr>
+	-f  Flood ping (delay = 0)
+	-r  Reverse ping
+	-v  Verify request and response payload
 
-Marcel
+The '-t' option sounds promising.
+
+But anyway, the default value for the timeout is 10 seconds. So I would like know
+how would it behave with other values. Perhaps the remote side is disconnecting.
+
+[snip]
 
 
+Cheers,
+-- 
+Vinicius
