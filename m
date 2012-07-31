@@ -1,32 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Message-ID: <5017E234.2000207@shealevy.com>
+Date: Tue, 31 Jul 2012 09:48:36 -0400
+From: Shea Levy <shea@shealevy.com>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] btmgmt: Fix endianness conversion
-Date: Tue, 31 Jul 2012 09:58:01 -0400
-Message-Id: <1343743081-25474-1-git-send-email-anderson.lizardo@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Unable to Detect Bluetooth Device on Macbook Pro 9,2 (Mid-2012 13")
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Flags field has 32-bit size. Same issue was fixed for mgmtops in
-1801a4d45d74c29cebacaab79a07e9961300be41.
----
- tools/btmgmt.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hello,
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index b2d6c3c..c6d48d3 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -461,7 +461,7 @@ static int mgmt_device_found(int mgmt_sk, uint16_t index,
- 		return -EINVAL;
- 	}
- 
--	flags = btohs(ev->flags);
-+	flags = btohl(ev->flags);
- 
- 	eir_len = bt_get_le16(&ev->eir_len);
- 	if (len != sizeof(*ev) + eir_len) {
--- 
-1.7.9.5
+Please CC me on response, I am not subscribed to the list.
 
+hcitool is unable to detect my laptop's bluetooth device:
+
+$ lsusb
+Bus 004 Device 009: ID 05ac:821d Apple, Inc.
+Bus 004 Device 008: ID 05ac:820b Apple, Inc.
+Bus 004 Device 007: ID 05ac:820a Apple, Inc.
+Bus 004 Device 006: ID 05ac:0252 Apple, Inc.
+Bus 004 Device 005: ID 05ac:8242 Apple, Inc. IR Receiver [built-in]
+Bus 004 Device 004: ID 0a5c:4500 Broadcom Corp. BCM2046B1 USB 2.0 Hub 
+(part of BCM2046 Bluetooth)
+Bus 004 Device 003: ID 0424:2513 Standard Microsystems Corp.
+Bus 004 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+Bus 004 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 003 Device 003: ID 05ac:8509 Apple, Inc.
+Bus 003 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 003 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+
+$ dmesg
+<snip>
+[    4.744248] usb 4-1.8.1.3: new full-speed USB device number 9 using 
+ehci_hcd
+[    4.822041] usb 4-1.8.1.3: New USB device found, idVendor=05ac, 
+idProduct=821d
+[    4.822830] usb 4-1.8.1.3: New USB device strings: Mfr=1, Product=2, 
+SerialNumber=0
+[    4.823582] usb 4-1.8.1.3: Product: Bluetooth USB Host Controller
+[    4.824329] usb 4-1.8.1.3: Manufacturer: Apple Inc.
+<snip>
+
+$ hciconfig -a
+
+$ hcitool dev
+Devices:
+
+$ lsmod | grep bluetooth
+bluetooth             187731  0
+rfkill                 15546  2 bluetooth,cfg80211
+crc16                   1311  2 bluetooth,ext4
+
+Any ideas?
+
+Cheers,
+Shea Levy
