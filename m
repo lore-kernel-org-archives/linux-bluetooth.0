@@ -2,255 +2,117 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v16 01/14] doc: Add telephony interface documents
-Date: Wed,  1 Aug 2012 11:08:37 +0200
-Message-Id: <1343812131-19395-2-git-send-email-frederic.danis@linux.intel.com>
-In-Reply-To: <1343812131-19395-1-git-send-email-frederic.danis@linux.intel.com>
-References: <1343812131-19395-1-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v16 00/14] Add org.bluez.Telephony interface
+Date: Wed,  1 Aug 2012 11:08:36 +0200
+Message-Id: <1343812131-19395-1-git-send-email-frederic.danis@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- Makefile.am                    |    2 +-
- doc/assigned-numbers.txt       |    1 +
- doc/audio-api.txt              |   87 +++++++++++++++++++++++++++++++++
- doc/audio-telephony-design.txt |  106 ++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 195 insertions(+), 1 deletion(-)
+Hello,
+
+This set of patches replaces telephony drivers for HeadSet, HandsFree,
+DUN and SAP Profiles by a new DBus interface (org.bluez.Telephony).
+
+This will simplify BlueZ code by focusing on the Bluetooth
+communication part and by letting the external application (i.e. oFono)
+take charge of the Telephony tasks (AT parsing and modem specific code,
+which can be removed from BlueZ code). So, it becomes simpler, easier
+to maintain and debug.
+
+External applications, which should implement AT parsing and telephony
+part of HeadSet or HandsFree Profiles, will have to register a telephony
+agent using this new interface.
+
+Any comments appreciated.
+
+Regards
+
+PS: Since latest Patch set:
+- patch 1 and 2: remove UUID property from NewConnection method of TelephonyAgent
+- patch 2:
+  - rename headset_slc_complete() to headset_profile_connection_complete()
+  - rename telephony_get_ready_state() to telephony_is_ready()
+  - change return type of parse_properties() to gboolean
+  - ref/unref GIOChannel used in telephony_device structure
+  - fix parameter type of hs_dev_disconnect_cb()
+  - manage dbus error first in hs_newconnection_reply()
+  - use sdp_uuid_cmp() instead of sdp_uuid16_cmp() in get_record_cb()
+  - if sdp service search is in progress, cancel it in telephony_device_disconnect()
+  - merge register_interface() into telephony_adapter_init()
+  - merge unregister_interface() into telephony_adapter_exit()
+  - set connecting_uuid to NULL when going to disconnected state in headset_set_state()
+- patch 3: remove rfcomm in headset structure as it is now managed in telephony.c
+    this imply to unref tmp_rfcomm after call of telephony_device_connecting()
+- patch 9:
+  - rename connecting_path to connecting_transport_path in headset structure
+  - set connecting_transport_path to NULL when going to disconnected state in
+    headset_set_state()
+- patch 10:
+  - rename rfcomm to tmp_rfcomm in gateway structure as it is now managed
+    in telephony.c
+    this imply to unref tmp_rfcomm after call of telephony_device_connecting()
+  - rename connecting_path to connecting_transport_path in gateway structure
+  - set connecting_uuid and connecting_transport_path to NULL when going to
+    disconnected state in gateway_close()
+  - fix parameter type of ag_dev_disconnect_cb()
+  - manage dbus error first in ag_newconnection_reply()
+- patch 11:
+  - rename rfcomm to tmp_rfcomm in connecting_device structure
+    this tmp_rfcomm should be unrefed after call of telephony_device_connecting()
+  - fix parameter type of client_dev_disconnect_cb()
+  - manage dbus error first in client_newconnection_reply()
+
+Frédéric Danis (14):
+  doc: Add telephony interface documents
+  audio: Move telephony drivers to D-Bus interface
+  audio: Simplify org.bluez.Headset
+  audio: Remove dummy telephony driver
+  audio: Remove maemo5 telephony driver
+  audio: Remove maemo6 telephony driver
+  audio: Remove oFono telephony driver
+  audio: Move HFP/HSP AG servers to telephony.c
+  audio: Send transport path to telephony agent
+  audio: Move HFP HF server to telephony.c
+  audio: Add DUN GW to org.bluez.Telephony
+  audio: Add SAP GW to org.bluez.Telephony
+  adapter: Add API to get fast connectable mode
+  audio: Add fast connectable to telephony interface
+
+ Makefile.am                    |   19 +-
+ audio/audio.conf               |    7 -
+ audio/device.h                 |    1 +
+ audio/gateway.c                |  436 +++-----
+ audio/gateway.h                |    8 +
+ audio/headset.c                | 1844 ++++-----------------------------
+ audio/headset.h                |   16 +-
+ audio/manager.c                |  628 +-----------
+ audio/manager.h                |    4 -
+ audio/media.c                  |   34 +
+ audio/telephony-dummy.c        |  447 --------
+ audio/telephony-maemo5.c       | 2105 --------------------------------------
+ audio/telephony-maemo6.c       | 2200 ----------------------------------------
+ audio/telephony-ofono.c        | 1637 ------------------------------
+ audio/telephony.c              | 1634 +++++++++++++++++++++++++++++
+ audio/telephony.h              |  205 +---
+ audio/transport.c              |  117 ++-
+ doc/assigned-numbers.txt       |    2 +
+ doc/audio-api.txt              |  232 ++---
+ doc/audio-telephony-design.txt |  106 ++
+ doc/hfp-api.txt                |   46 -
+ doc/media-api.txt              |   19 +-
+ src/adapter.c                  |   15 +-
+ src/adapter.h                  |    1 +
+ 24 files changed, 2349 insertions(+), 9414 deletions(-)
+ delete mode 100644 audio/telephony-dummy.c
+ delete mode 100644 audio/telephony-maemo5.c
+ delete mode 100644 audio/telephony-maemo6.c
+ delete mode 100644 audio/telephony-ofono.c
+ create mode 100644 audio/telephony.c
  create mode 100644 doc/audio-telephony-design.txt
 
-diff --git a/Makefile.am b/Makefile.am
-index 45a811c..1aa302c 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -381,7 +381,7 @@ EXTRA_DIST += doc/manager-api.txt \
- 		doc/network-api.txt doc/input-api.txt doc/audio-api.txt \
- 		doc/control-api.txt doc/hfp-api.txt doc/health-api.txt \
- 		doc/sap-api.txt doc/media-api.txt doc/assigned-numbers.txt \
--		doc/supported-features.txt
-+		doc/supported-features.txt doc/audio-telephony-design.txt
- 
- AM_YFLAGS = -d
- 
-diff --git a/doc/assigned-numbers.txt b/doc/assigned-numbers.txt
-index cda934c..120d7ea 100644
---- a/doc/assigned-numbers.txt
-+++ b/doc/assigned-numbers.txt
-@@ -8,6 +8,7 @@ avoid conflicts.
- Profile		Channel
- -----------------------
- DUN		1
-+HSP HS		6
- HFP HF		7
- OPP		9
- FTP		10
-diff --git a/doc/audio-api.txt b/doc/audio-api.txt
-index ca430fc..c620a7d 100644
---- a/doc/audio-api.txt
-+++ b/doc/audio-api.txt
-@@ -423,3 +423,90 @@ properties	boolean Connected [readonly]
- 		uint16 MicrophoneGain  [readonly]
- 
- 			The speaker gain when available.
-+
-+
-+Telephony hierarchy
-+===================
-+
-+Service		org.bluez
-+Interface	org.bluez.Telephony
-+Object path	[variable prefix]/{hci0,hci1,...}
-+
-+Methods		void RegisterAgent(object path, dict properties)
-+
-+			Register a TelephonyAgent to sender, the sender can
-+			register as many agents as it likes.
-+			Object path should be unique for an agent and a UUID.
-+
-+			Note: If the sender disconnects its agents are
-+			automatically unregistered.
-+
-+			possible properties:
-+
-+				string UUID:
-+
-+					UUID of the profile which the agent is
-+					for.
-+
-+				uint16 Version:
-+
-+					Version of the profile which the agent
-+					implements.
-+
-+				uint16 Features:
-+
-+					Agent supported features as defined in
-+					profile spec e.g. HFP.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		void UnregisterAgent(object path)
-+
-+			Unregister sender agent.
-+
-+TelephonyAgent hierarchy
-+========================
-+
-+Service		unique name
-+Interface	org.bluez.TelephonyAgent
-+Object path	freely definable
-+
-+Methods		void NewConnection(filedescriptor fd, dict properties)
-+
-+			This method gets called whenever a new connection
-+			has been established. This method assumes that D-Bus
-+			daemon with file descriptor passing capability is
-+			being used.
-+
-+			The agent should only return successfully once the
-+			establishment of the service level connection (SLC)
-+			has been completed.  In the case of Handsfree this
-+			means that BRSF exchange has been performed and
-+			necessary initialization has been done.
-+
-+			possible properties:
-+
-+				object Device:
-+
-+					BlueZ remote device object.
-+
-+				uint16 Version:
-+
-+					Remote profile version.
-+
-+				uint16 Features:
-+
-+					Remote profile features.
-+
-+				object Transport:
-+
-+					Optional. MediaTransport object path.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.Failed
-+
-+		void Release()
-+
-+			This method gets called whenever the service daemon
-+			unregisters the agent or whenever the Adapter where
-+			the TelephonyAgent registers itself is removed.
-diff --git a/doc/audio-telephony-design.txt b/doc/audio-telephony-design.txt
-new file mode 100644
-index 0000000..a5936f6
---- /dev/null
-+++ b/doc/audio-telephony-design.txt
-@@ -0,0 +1,106 @@
-+The org.bluez.Telephony interface will simplify BlueZ code by focusing on
-+the Bluetooth communication part and by letting the external application (i.e.
-+oFono) take charge of the Telephony tasks (AT parsing and modem specific code).
-+So, it becomes simpler, easier to maintain and debug.
-+
-+External applications, which should implement AT parsing and telephony
-+part of HeadSet or HandsFree Profiles, will have to register an
-+org.bluez.TelephonyAgent using this new interface. This will setup a SDP record
-+for the profile and a RFCOMM server listening for incoming connection.
-+
-+When a new device is connected, NewConnection method of TelephonyAgent is
-+called. The telephony agent should reply to it after proper communication
-+establishment (directly for HSP or after SLC setup completes for HFP).
-+
-+Interaction with the audio component (i.e. PulseAudio) will be done through the
-+MediaTransport object (passed to telephony agent during NewConnection call).
-+
-+Here is some flowcharts of interactions between BlueZ, telephony agent (oFono)
-+and audio component (PulseAudio):
-+
-+        .....>  Bluetooth communication between headset and phone
-+        ----->  Dbus messages and signals
-+
-+SCO connection - AG initiated
-+
-+	PulseAudio              BlueZ             HF
-+	|                         |               |
-+	|    transport acquire    |               |
-+	|------------------------>|               |
-+	|                         |  connect SCO  |
-+	|                         |<.............>|
-+	|      return SCO fd      |               |
-+	|<------------------------|               |
-+	|                         |               |
-+
-+SCO connection - HF initiated
-+
-+	PulseAudio              BlueZ             HF
-+	|                         |               |
-+	|                         |  connect SCO  |
-+	|                         |<.............>|
-+	|  state changed signal   |               |
-+	|<------------------------|               |
-+	|                         |               |
-+	|    transport acquire    |               |
-+	|------------------------>|               |
-+	|                         |               |
-+	|      return SCO fd      |               |
-+	|<------------------------|               |
-+	|                         |               |
-+
-+AT+NREC
-+
-+	HF              oFono           BlueZ           PulseAudio
-+	|     AT+NREC     |               |                  |
-+	|................>|               |                  |
-+	|                 |  SetProperty  |                  |
-+	|                 |-------------->|                  |
-+	|                 |               | property changed |
-+	|                 |               |      signal      |
-+	|                 |               |----------------->|
-+
-+
-++BSIR
-+
-+	HF          oFono         BlueZ        PulseAudio        app
-+	|             |             |               |             |
-+	|             |             |               |<------------|
-+	|             |             |  SetProperty  |             |
-+	|             |             |<--------------|             |
-+	|             |             |               |             |
-+	|             |   property changed signal   |             |
-+	|             |<------------*-------------->|             |
-+	|   +BSIR:x   |             |               |             |
-+	|<............|             |               |             |
-+	|             |             |               |             |
-+
-+
-+AT+VGS,AT+VGM
-+
-+	HF          oFono         BlueZ        PulseAudio        app
-+	|             |             |               |             |
-+	|  AT+VGS=xx  |             |               |             |
-+	|............>|             |               |             |
-+	|             | SetProperty |               |             |
-+	|             |------------>|               |             |
-+	|             |             |               |             |
-+	|             |   property changed signal   |             |
-+	|             |<------------*-------------->|             |
-+	|             |             |               |------------>|
-+	|             |             |               |             |
-+
-+
-++VGS,+VGM
-+
-+	HF          oFono         BlueZ        PulseAudio        app
-+	|             |             |               |             |
-+	|             |             |               |<------------|
-+	|             |             |  SetProperty  |             |
-+	|             |             |<--------------|             |
-+	|             |             |               |             |
-+	|             |   property changed signal   |             |
-+	|             |<------------*-------------->|             |
-+	|   +VGS:xx   |             |               |             |
-+	|<............|             |               |------------>|
-+	|             |             |               |             |
 -- 
 1.7.9.5
 
