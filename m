@@ -1,48 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: bluetooth.h: fix compile issue when using in C++
-From: Pacho Ramos <pacho@gentoo.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1343548354.25518.1.camel@belkin4>
-References: <1343548354.25518.1.camel@belkin4>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-ZTSYQjJ/LUyIXrmPP0Vz"
-Date: Wed, 01 Aug 2012 16:41:33 +0200
-Message-ID: <1343832093.2121.0.camel@belkin4>
-Mime-Version: 1.0
+Message-ID: <50191BCC.8000104@tu-ilmenau.de>
+Date: Wed, 01 Aug 2012 14:06:36 +0200
+From: Steffen Becker <steffen.becker@tu-ilmenau.de>
+MIME-Version: 1.0
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: no security block - but connection still gets refused
+References: <4FC35278.40903@tu-ilmenau.de> <20120528173938.GA4151@samus>
+In-Reply-To: <20120528173938.GA4151@samus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
---=-ZTSYQjJ/LUyIXrmPP0Vz
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+<snip>
 
-El dom, 29-07-2012 a las 09:52 +0200, Pacho Ramos escribi=C3=B3:
-> Hello
->=20
-> Today I got a report downstream showing that old problem:
-> http://permalink.gmane.org/gmane.linux.bluez.kernel/22306
->=20
-> is still not fixed.=20
->=20
-> Could you please commit debian patch to fix this?
-> http://patch-tracker.debian.org/patch/series/view/bluez/4.101-1/09_fix_ft=
-bfs_with_c99.patch
->=20
-> Thanks  a lot
+Am 28.05.2012 19:39, schrieb Vinicius Costa Gomes:
+> Hi Steffen,
+>
+> On 12:24 Mon 28 May, Steffen Becker wrote:
+>> I always got a "security block"-issue while tried to connect. I
+>> searched your mail-archive & you told me, this problem is solved in
+>> kernel 3.3 and later.
+>> I installed kernel 3.4 and - hooray - no "security block" anymore!
+>> *But* the connection still doesn't work. I connect them - they are
+>> connected for about 2 seconds - then connection is refused.
+>> So I really hope you can have a look at the following lines and tell
+>> me how to solve this problem.
+>>
+>> PS:
+>> I'm sorry for wasting your time, but this case isn't "just for fun
+>> for me"; it's important that it works. So I even would donate/pay
+>> something if you can help me solve this problem.
+>>
+>> Here is what I get when I use test-network:
+>>
+>> # bluez-test-network 00:02:72:AE:58:73 NAP
+>>
+>> Traceback (most recent call last):
+>>    File "/usr/bin/bluez-test-network", line 40, in <module>
+>>      device = adapter.FindDevice(address)
+>>    File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line
+>> 70, in __call__
+>>      return self._proxy_method(*args, **keywords)
+>>    File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line
+>> 145, in __call__
+>>      **keywords)
+>>    File "/usr/lib64/python2.7/site-packages/dbus/connection.py", line
+>> 651, in
+>> call_blocking
+>>      message, timeout)
+>> dbus.exceptions.DBusException: org.bluez.Error.DoesNotExist: Does Not Exist
+>  From this and the hcidump, the answer is that it could not find a
+> server running in the remote side (i.e. the SDP service search returned
+> nothing).
+>
+>
+> [snip]
+>
+>
+Hm, i don't really understand what you mean with "could not find a 
+server running": How can I start such a server on the remote side?
 
-Any news about this? Thanks
-
---=-ZTSYQjJ/LUyIXrmPP0Vz
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.19 (GNU/Linux)
-
-iEYEABECAAYFAlAZQB0ACgkQCaWpQKGI+9QIiACdGkVy+qjzEPrWbFUMJRX6A5JB
-7NoAnix85EvgEcxZsNqvg5YWer6gu/TH
-=3o+s
------END PGP SIGNATURE-----
-
---=-ZTSYQjJ/LUyIXrmPP0Vz--
-
+Regards,
+Steffen
