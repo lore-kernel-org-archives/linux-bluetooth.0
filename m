@@ -1,42 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8; format=flowed
-Message-id: <5018BB25.9040508@samsung.com>
-Date: Wed, 01 Aug 2012 14:14:13 +0900
-From: Chanyeol Park <chanyeol.park@samsung.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/1] build: Remove gstreamer pkg config warning
-References: <1343797204-1202-1-git-send-email-chanyeol.park@samsung.com>
- <1343797305.1803.80.camel@aeonflux>
-In-reply-to: <1343797305.1803.80.camel@aeonflux>
+From: chanyeol.park@samsung.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/1] build: Remove gstreamer pkg config warning
+Date: Wed, 01 Aug 2012 14:00:04 +0900
+Message-id: <1343797204-1202-1-git-send-email-chanyeol.park@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel
+From: Chan-yeol Park <chanyeol.park@samsung.com>
 
-On 2012년 08월 01일 14:01, Marcel Holtmann wrote:
->
-> as discussed during the BlueZ meeting, we will be removing GStreamer
-> support for BlueZ and submit it GStreamer. The prerequisite of the
-> standalone SBC library has been released yesterday.
->
-> So NAK on this patch since soon it will not be needed anymore.
->
-> Regards
->
-> Marcel
-Understood.
+GSTREAMER is not mandatory option when bluez build.
+---
+ acinclude.m4 |    5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Thanks for explanation.
+diff --git a/acinclude.m4 b/acinclude.m4
+index 6505ad3..6e3eb83 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -106,8 +106,9 @@ AC_DEFUN([AC_PATH_GLIB], [
+ ])
+ 
+ AC_DEFUN([AC_PATH_GSTREAMER], [
+-	PKG_CHECK_MODULES(GSTREAMER, gstreamer-0.10 >= 0.10.30 gstreamer-plugins-base-0.10, gstreamer_found=yes,
+-				AC_MSG_WARN(GStreamer library version 0.10.30 or later is required);gstreamer_found=no)
++	PKG_CHECK_MODULES(GSTREAMER,
++                        gstreamer-0.10 >= 0.10.30 gstreamer-plugins-base-0.10,
++                        gstreamer_found=yes, gstreamer_found=no)
+ 	AC_SUBST(GSTREAMER_CFLAGS)
+ 	AC_SUBST(GSTREAMER_LIBS)
+ 	GSTREAMER_PLUGINSDIR=`$PKG_CONFIG --variable=pluginsdir gstreamer-0.10`
+-- 
+1.7.9.5
 
-Yesterday I saw your SBC announce.
-
-If I want to send a patch about SBC,
-could we use the same account(linux-bluetooth account)?
-
-As far as I expect,
-it's not easy to recognize patches on the same account.
-
-
-Regards
-Chanyeol
