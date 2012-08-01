@@ -1,67 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50191BCC.8000104@tu-ilmenau.de>
-Date: Wed, 01 Aug 2012 14:06:36 +0200
+Message-ID: <50191AEC.1030604@tu-ilmenau.de>
+Date: Wed, 01 Aug 2012 14:02:52 +0200
 From: Steffen Becker <steffen.becker@tu-ilmenau.de>
 MIME-Version: 1.0
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: no security block - but connection still gets refused
-References: <4FC35278.40903@tu-ilmenau.de> <20120528173938.GA4151@samus>
-In-Reply-To: <20120528173938.GA4151@samus>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: problem with bluez-test
+References: <4FF35AC4.7010204@tu-ilmenau.de> <20120704075106.GA21012@joana>
+In-Reply-To: <20120704075106.GA21012@joana>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Gustavo,
 
-<snip>
-
-Am 28.05.2012 19:39, schrieb Vinicius Costa Gomes:
+Am 04.07.2012 09:51, schrieb Gustavo Padovan:
 > Hi Steffen,
 >
-> On 12:24 Mon 28 May, Steffen Becker wrote:
->> I always got a "security block"-issue while tried to connect. I
->> searched your mail-archive & you told me, this problem is solved in
->> kernel 3.3 and later.
->> I installed kernel 3.4 and - hooray - no "security block" anymore!
->> *But* the connection still doesn't work. I connect them - they are
->> connected for about 2 seconds - then connection is refused.
->> So I really hope you can have a look at the following lines and tell
->> me how to solve this problem.
->>
->> PS:
->> I'm sorry for wasting your time, but this case isn't "just for fun
->> for me"; it's important that it works. So I even would donate/pay
->> something if you can help me solve this problem.
->>
->> Here is what I get when I use test-network:
->>
->> # bluez-test-network 00:02:72:AE:58:73 NAP
->>
->> Traceback (most recent call last):
->>    File "/usr/bin/bluez-test-network", line 40, in <module>
->>      device = adapter.FindDevice(address)
->>    File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line
->> 70, in __call__
->>      return self._proxy_method(*args, **keywords)
->>    File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line
->> 145, in __call__
->>      **keywords)
->>    File "/usr/lib64/python2.7/site-packages/dbus/connection.py", line
->> 651, in
->> call_blocking
->>      message, timeout)
->> dbus.exceptions.DBusException: org.bluez.Error.DoesNotExist: Does Not Exist
->  From this and the hcidump, the answer is that it could not find a
-> server running in the remote side (i.e. the SDP service search returned
-> nothing).
+> * Steffen Becker <steffen.becker@tu-ilmenau.de> [2012-07-03 22:49:08 +0200]:
 >
+>> Hi,
+>> I just installed openSUSE12.1 and bluez and bluez-test on two PC's.
+>> But I can't create a connection between these two PC's even though I
+>> spend a long time searching the internet.
+>> That's my problem:
+>> I have a USB-Bluetooth3.0-dongle at each PC and I can create a
+>> connection via
+>>      PC1 # rfcomm listen 0 1
+>>      PC2 # rfcomm -r connect 0 <remote-address> 1
+>>
+>> But I can't create a bnep-connection via test-network even though
+>> NetworkManager runs in the background. What am I doing wrong?
+>>      PC1 # test-network <remote-address> NAP
+>>      Traceback (most recent call last): File "/usr/bin/test-network",
+>> line 45, in <module> iface = network.Connect(service) File
+>> "/usr/lib/python2.7/site-packages/dbus/proxies.py", line 68, in
+>> __call__ return self._proxy_method(*args, **keywords) File
+>> "/usr/lib/python2.7/site-packages/dbus/proxies.py", line 140, in
+>> __call__ **keywords) File
+>> "/usr/lib/python2.7/site-packages/dbus/connection.py", line 630, in
+>> call_blocking message, timeout) dbus.exceptions.DBusException:
+>> org.freedesktop.DBus.Error.UnknownMethod: Method "Connect" with
+>> signature "s" on interface "org.bluez.Network" doesn't exist
+>>
+>> I believe I use a wrong syntax, do I? There is probably missing some
+>> kind of "listen"-command at the remote site.
+>> But sadly I don't find any man-page for "test-network".
+> There was a bug in the D-Bus Network interface, try 57170b3 on latest git.
 >
-> [snip]
->
->
-Hm, i don't really understand what you mean with "could not find a 
-server running": How can I start such a server on the remote side?
+> 	Gustavo
+I just installed bluez-4.101 with these changes:
+http://gitorious.org/~jdelfes/bluez/jdelfes-bluez/commit/57170b311f1468330f4a9961dc0b3ac45f97bc13
+But i still get the same error.
+Any ideas?
 
 Regards,
 Steffen
