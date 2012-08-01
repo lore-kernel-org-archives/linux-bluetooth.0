@@ -1,26 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1343760927.1803.75.camel@aeonflux>
-References: <CAJKEbdeVZA+WK8AMNCKCrVgpVchMHQ=XyAnZ7w7H0eX2y48evQ@mail.gmail.com>
-	<1343750194.1803.70.camel@aeonflux>
-	<CAJKEbdegKt1Pcx=QBQWWxe3=KYVr3WbH0PkBmfmDse3rF71MSA@mail.gmail.com>
-	<1343760927.1803.75.camel@aeonflux>
-Date: Thu, 2 Aug 2012 16:41:53 +0530
-Message-ID: <CAJOga58UHDpd_2D4fSUqrZL+xyjN_VzKJn1B+-XJ84JPHnYHFw@mail.gmail.com>
-Subject: Re: [PATCH] please add VID/PID to ath3k (AR3012)
-From: Mohammed Shafi <shafi.ath9k@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Yevgeniy Melnichuk <yevgeniy.melnichuk@googlemail.com>, linux-bluetooth@vger.kernel.org,
-	gustavo@padovan.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix use-after-free bug in SMP
+Date: Wed,  1 Aug 2012 20:34:15 -0300
+Message-Id: <1343864055-23154-1-git-send-email-andre.guedes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel/Gustavo,
+If SMP fails, we should always cancel security_timer delayed work.
+Otherwise, security_timer function may run after l2cap_conn object
+has been freed.
 
-> please use git format-patch and create a proper patch. This is just a
-> random collection of information.
+This patch fixes the following warning reported by ODEBUG:
 
-I am sending the patch with proper format, with Yevgeniy as the author. thanks.
+WARNING: at lib/debugobjects.c:261 debug_print_object+0x7c/0x8d()
+Hardware name: Bochs
+ODEBUG: free active (active state 0) object type: timer_list hint: delayed_work_timer_fn+0x0/0x27
+Modules linked in: btusb bluetooth
+Pid: 440, comm: kworker/u:2 Not tainted 3.5.0-rc1+ #4
+Call Trace:
+ [<ffffffff81174600>] ? free_obj_work+0x4a/0x7f
+ [<ffffffff81023eb8>] warn_slowpath_common+0x7e/0x97
+ [<ffffffff81023f65>] warn_slowpath_fmt+0x41/0x43
+ [<ffffffff811746b1>] debug_print_object+0x7c/0x8d
+ [<ffffffff810394f0>] ? __queue_work+0x241/0x241
+ [<ffffffff81174fdd>] debug_check_no_obj_freed+0x92/0x159
+ [<ffffffff810ac08e>] slab_free_hook+0x6f/0x77
+ [<ffffffffa0019145>] ? l2cap_conn_del+0x148/0x157 [bluetooth]
+ [<ffffffff810ae408>] kfree+0x59/0xac
+ [<ffffffffa0019145>] l2cap_conn_del+0x148/0x157 [bluetooth]
+ [<ffffffffa001b9a2>] l2cap_recv_frame+0xa77/0xfa4 [bluetooth]
+ [<ffffffff810592f9>] ? trace_hardirqs_on_caller+0x112/0x1ad
+ [<ffffffffa001c86c>] l2cap_recv_acldata+0xe2/0x264 [bluetooth]
+ [<ffffffffa0002b2f>] hci_rx_work+0x235/0x33c [bluetooth]
+ [<ffffffff81038dc3>] ? process_one_work+0x126/0x2fe
+ [<ffffffff81038e22>] process_one_work+0x185/0x2fe
+ [<ffffffff81038dc3>] ? process_one_work+0x126/0x2fe
+ [<ffffffff81059f2e>] ? lock_acquired+0x1b5/0x1cf
+ [<ffffffffa00028fa>] ? le_scan_work+0x11d/0x11d [bluetooth]
+ [<ffffffff81036fb6>] ? spin_lock_irq+0x9/0xb
+ [<ffffffff81039209>] worker_thread+0xcf/0x175
+ [<ffffffff8103913a>] ? rescuer_thread+0x175/0x175
+ [<ffffffff8103cfe0>] kthread+0x95/0x9d
+ [<ffffffff812c5054>] kernel_threadi_helper+0x4/0x10
+ [<ffffffff812c36b0>] ? retint_restore_args+0x13/0x13
+ [<ffffffff8103cf4b>] ? flush_kthread_worker+0xdb/0xdb
+ [<ffffffff812c5050>] ? gs_change+0x13/0x13
 
-regards,
-shafi
+This bug can be reproduced using hctool lecc or l2test tools and
+bluetoothd not running.
+
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ net/bluetooth/smp.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 16ef0dc..db0b5eb 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -267,10 +267,10 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason, u8 send)
+ 	mgmt_auth_failed(conn->hcon->hdev, conn->dst, hcon->type,
+ 			 hcon->dst_type, reason);
+ 
+-	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags)) {
+-		cancel_delayed_work_sync(&conn->security_timer);
++	cancel_delayed_work_sync(&conn->security_timer);
++
++	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags))
+ 		smp_chan_destroy(conn);
+-	}
+ }
+ 
+ #define JUST_WORKS	0x00
+-- 
+1.7.11.2
+
