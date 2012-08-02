@@ -1,28 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1343934984.2083.3.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Add support for Sony Vaio T-Series
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mohammed Shafi Shajakhan <mohammed@qca.qualcomm.com>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	Yevgeniy Melnichuk <yevgeniy.melnichuk@googlemail.com>
-Date: Thu, 02 Aug 2012 12:16:24 -0700
-In-Reply-To: <1343906361-2747-1-git-send-email-mohammed@qca.qualcomm.com>
-References: <1343906361-2747-1-git-send-email-mohammed@qca.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: shea@shealevy.com
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shea Levy <shea@shealevy.com>
+Subject: [PATCH] Bluetooth: Add support for Apple MacBook Pro 9,2
+Date: Thu,  2 Aug 2012 09:47:49 -0400
+Message-Id: <1343915269-6129-1-git-send-email-shea@shealevy.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mohammed,
+From: Shea Levy <shea@shealevy.com>
 
-> Add Sony Vaio T-Series Bluetooth Module( 0x489:0xE036) to
-> the blacklist of btusb module and add it to the ath3k module.
+$ usb-devices
+<snip>
+T:  Bus=04 Lev=04 Prnt=04 Port=02 Cnt=01 Dev#=  9 Spd=12  MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=05ac ProdID=821d Rev=00.86
+S:  Manufacturer=Apple Inc.
+S:  Product=Bluetooth USB Host Controller
+C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+<snip>
 
-include part of /sys/kernel/debug/usb/devices in the commit message.
-This is nothing new to you guys. I requested it multiple times.
+Signed-off-by: Shea Levy <shea@shealevy.com>
+---
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Regards
-
-Marcel
-
-
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index e272214..e4ecd5e 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -73,6 +73,9 @@ static struct usb_device_id btusb_table[] = {
+ 	/* Apple MacBookPro8,2 */
+ 	{ USB_DEVICE(0x05ac, 0x821a) },
+ 
++	/* Apple MacBookPro9,2 */
++	{ USB_DEVICE(0x05ac, 0x821d) },
++
+ 	/* Apple MacMini5,1 */
+ 	{ USB_DEVICE(0x05ac, 0x8281) },
+ 
+-- 
+1.7.11
