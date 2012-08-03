@@ -1,88 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v17 00/15] Add org.bluez.Telephony interface
-Date: Fri,  3 Aug 2012 14:07:05 +0200
-Message-Id: <1343995640-19784-1-git-send-email-frederic.danis@linux.intel.com>
+From: "Malovany, Ram" <ramm@ti.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] Bluetooth: Fix for double free of st buffer.
+Date: Fri, 3 Aug 2012 11:40:22 +0000
+Message-ID: <2683478DEE33CD4DAF508ABCF391F6A40B4B8B1D@DNCE05.ent.ti.com>
+References: <1342511370-26470-1-git-send-email-ramm@ti.com>
+ <20120724230124.GL20029@joana>  
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Ping 
 
-This set of patches replaces telephony drivers for HeadSet, HandsFree,
-DUN and SAP Profiles by a new DBus interface (org.bluez.Telephony).
-
-This will simplify BlueZ code by focusing on the Bluetooth
-communication part and by letting the external application (i.e. oFono)
-take charge of the Telephony tasks (AT parsing and modem specific code,
-which can be removed from BlueZ code). So, it becomes simpler, easier
-to maintain and debug.
-
-External applications, which should implement AT parsing and telephony
-part of HeadSet or HandsFree Profiles, will have to register a telephony
-agent using this new interface.
-
-Any comments appreciated.
-
-Regards
-
-PS: Since latest Patch set:
-- split patch 1 between telephony interface documentations and update of
-  assigned numbers document
-
-Frédéric Danis (15):
-  doc: Add telephony interface documents
-  doc: Add HSP HS channel to assigned numbers
-  audio: Move telephony drivers to D-Bus interface
-  audio: Simplify org.bluez.Headset
-  audio: Remove dummy telephony driver
-  audio: Remove maemo5 telephony driver
-  audio: Remove maemo6 telephony driver
-  audio: Remove oFono telephony driver
-  audio: Move HFP/HSP AG servers to telephony.c
-  audio: Send transport path to telephony agent
-  audio: Move HFP HF server to telephony.c
-  audio: Add DUN GW to org.bluez.Telephony
-  audio: Add SAP GW to org.bluez.Telephony
-  adapter: Add API to get fast connectable mode
-  audio: Add fast connectable to telephony interface
-
- Makefile.am                    |   19 +-
- audio/audio.conf               |    7 -
- audio/device.h                 |    1 +
- audio/gateway.c                |  436 +++-----
- audio/gateway.h                |    8 +
- audio/headset.c                | 1844 ++++-----------------------------
- audio/headset.h                |   16 +-
- audio/manager.c                |  628 +-----------
- audio/manager.h                |    4 -
- audio/media.c                  |   34 +
- audio/telephony-dummy.c        |  447 --------
- audio/telephony-maemo5.c       | 2105 --------------------------------------
- audio/telephony-maemo6.c       | 2200 ----------------------------------------
- audio/telephony-ofono.c        | 1637 ------------------------------
- audio/telephony.c              | 1634 +++++++++++++++++++++++++++++
- audio/telephony.h              |  205 +---
- audio/transport.c              |  117 ++-
- doc/assigned-numbers.txt       |    2 +
- doc/audio-api.txt              |  232 ++---
- doc/audio-telephony-design.txt |  106 ++
- doc/hfp-api.txt                |   46 -
- doc/media-api.txt              |   19 +-
- src/adapter.c                  |   15 +-
- src/adapter.h                  |    1 +
- 24 files changed, 2349 insertions(+), 9414 deletions(-)
- delete mode 100644 audio/telephony-dummy.c
- delete mode 100644 audio/telephony-maemo5.c
- delete mode 100644 audio/telephony-maemo6.c
- delete mode 100644 audio/telephony-ofono.c
- create mode 100644 audio/telephony.c
- create mode 100644 doc/audio-telephony-design.txt
-
--- 
-1.7.9.5
-
+> -----Original Message-----
+> From: Malovany, Ram
+> Sent: Wednesday, July 25, 2012 11:31 AM
+> To: 'Gustavo Padovan'
+> Cc: 'linux-bluetooth@vger.kernel.org'
+> Subject: RE: [PATCH] Bluetooth: Fix for double free of st buffer.
+> 
+> HI Gustavo,
+> 
+> > -----Original Message-----
+> > From: Malovany, Ram
+> > Sent: Wednesday, July 25, 2012 11:01 AM
+> > To: 'Gustavo Padovan'
+> > Cc: linux-bluetooth@vger.kernel.org
+> > Subject: RE: [PATCH] Bluetooth: Fix for double free of st buffer.
+> >
+> > HI Gustavo,
+> >
+> > > -----Original Message-----
+> > > From: Gustavo Padovan [mailto:gustavo@padovan.org]
+> > > Sent: Wednesday, July 25, 2012 2:01 AM
+> > > To: Malovany, Ram
+> > > Cc: linux-bluetooth@vger.kernel.org
+> > > Subject: Re: [PATCH] Bluetooth: Fix for double free of st buffer.
+> > >
+> > > Hi Ram,
+> > >
+> > > * ramm@ti.com <ramm@ti.com> [2012-07-17 10:49:30 +0300]:
+> > >
+> > > > From: Ram Malovany <ramm@ti.com>
+> > > >
+> > > > When the Shared Transport line discipline driver (st_core) get
+> > > > data it pushes the skb received to the relevant protocol stacks ,
+> > > > it then excepts that the relevant protocol stacks should handle
+> > > > the buffer , and if it cannot then the stack should respond with an
+> error.
+> > > > In our case the Bluetooth driver for shared transport (btwilink)
+> > > > should always be able to handle the buffer , in case of an error
+> > > > it will release it , thus we always should return 0.
+> > > >
+> > > > Signed-off-by: Ram Malovany <ramm@ti.com>
+> > > > ---
+> > > >  drivers/bluetooth/btwilink.c |   12 ++++++++----
+> > > >  1 files changed, 8 insertions(+), 4 deletions(-)
+> > > >
+> > > > diff --git a/drivers/bluetooth/btwilink.c
+> > > > b/drivers/bluetooth/btwilink.c index 8869469..1f60d84 100644
+> > > > --- a/drivers/bluetooth/btwilink.c
+> > > > +++ b/drivers/bluetooth/btwilink.c
+> > > > @@ -94,18 +94,22 @@ static void st_reg_completion_cb(void
+> > > > *priv_data, char
+> > > data)
+> > > >  }
+> > > >
+> > > >  /* Called by Shared Transport layer when receive data is
+> > > > - * available */
+> > > > + * available
+> > > > + * Return:
+> > > > + * 0 if buffer handled (affectivly allways even if error found)
+> > > > + * if return !=0 the buffer will be freed by the st */
+> > > >  static long st_receive(void *priv_data, struct sk_buff *skb)  {
+> > > >  	struct ti_st *lhst = priv_data;
+> > > >  	int err;
+> > > >
+> > > >  	if (!skb)
+> > > > -		return -EFAULT;
+> > > > +		return 0;
+> > > >
+> > > >  	if (!lhst) {
+> > > >  		kfree_skb(skb);
+> > >
+> > > If you remove this call to kfree_skb() from here doesn't it fixes
+> > > your problem?
+> > >
+> > > 	Gustavo
+> 
+> I looked at the fix again , and I think we shouldn't change it since the main
+> problem that I am observing her is not the kfree_skb() at this point , The
+> problem is related to who is in charge of the buffer at this point , and in
+> our case the function hci_recv_frame() can use different transports and upon
+> an error it will free the buffer as well , in my fix I made sure that
+> st_receive() will always take care of the buffer.
+> >
+> > You are correct , I was going to send a new version for this patch.
+> >
+> > Thanks,
+> > Ram
