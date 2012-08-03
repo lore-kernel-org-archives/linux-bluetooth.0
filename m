@@ -1,103 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Malovany, Ram" <ramm@ti.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] Bluetooth: Fix for double free of st buffer.
-Date: Fri, 3 Aug 2012 11:40:22 +0000
-Message-ID: <2683478DEE33CD4DAF508ABCF391F6A40B4B8B1D@DNCE05.ent.ti.com>
-References: <1342511370-26470-1-git-send-email-ramm@ti.com>
- <20120724230124.GL20029@joana>  
-Content-Type: text/plain; charset="us-ascii"
+From: Vani-dineshbhai PATEL <vani.patel@stericsson.com>
+To: User Name <linux-bluetooth@vger.kernel.org>,
+	Luiz Augusto <luiz.dentz@gmail.com>,
+	Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: Vani <vani.patel@stericsson.com>,
+	Joohi <Joohi.rastogi@stericsson.com>, Vani <vani273@gmail.com>
+Subject: [PATCH BlueZ V2 4/5]AVRCP: Register/Unregister Browsing handler
+Date: Fri, 3 Aug 2012 15:13:23 +0530
+Message-ID: <1343987003-17309-1-git-send-email-vani.patel@stericsson.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ping 
+From: Vani Patel <vani.patel@stericsson.com>
 
-> -----Original Message-----
-> From: Malovany, Ram
-> Sent: Wednesday, July 25, 2012 11:31 AM
-> To: 'Gustavo Padovan'
-> Cc: 'linux-bluetooth@vger.kernel.org'
-> Subject: RE: [PATCH] Bluetooth: Fix for double free of st buffer.
-> 
-> HI Gustavo,
-> 
-> > -----Original Message-----
-> > From: Malovany, Ram
-> > Sent: Wednesday, July 25, 2012 11:01 AM
-> > To: 'Gustavo Padovan'
-> > Cc: linux-bluetooth@vger.kernel.org
-> > Subject: RE: [PATCH] Bluetooth: Fix for double free of st buffer.
-> >
-> > HI Gustavo,
-> >
-> > > -----Original Message-----
-> > > From: Gustavo Padovan [mailto:gustavo@padovan.org]
-> > > Sent: Wednesday, July 25, 2012 2:01 AM
-> > > To: Malovany, Ram
-> > > Cc: linux-bluetooth@vger.kernel.org
-> > > Subject: Re: [PATCH] Bluetooth: Fix for double free of st buffer.
-> > >
-> > > Hi Ram,
-> > >
-> > > * ramm@ti.com <ramm@ti.com> [2012-07-17 10:49:30 +0300]:
-> > >
-> > > > From: Ram Malovany <ramm@ti.com>
-> > > >
-> > > > When the Shared Transport line discipline driver (st_core) get
-> > > > data it pushes the skb received to the relevant protocol stacks ,
-> > > > it then excepts that the relevant protocol stacks should handle
-> > > > the buffer , and if it cannot then the stack should respond with an
-> error.
-> > > > In our case the Bluetooth driver for shared transport (btwilink)
-> > > > should always be able to handle the buffer , in case of an error
-> > > > it will release it , thus we always should return 0.
-> > > >
-> > > > Signed-off-by: Ram Malovany <ramm@ti.com>
-> > > > ---
-> > > >  drivers/bluetooth/btwilink.c |   12 ++++++++----
-> > > >  1 files changed, 8 insertions(+), 4 deletions(-)
-> > > >
-> > > > diff --git a/drivers/bluetooth/btwilink.c
-> > > > b/drivers/bluetooth/btwilink.c index 8869469..1f60d84 100644
-> > > > --- a/drivers/bluetooth/btwilink.c
-> > > > +++ b/drivers/bluetooth/btwilink.c
-> > > > @@ -94,18 +94,22 @@ static void st_reg_completion_cb(void
-> > > > *priv_data, char
-> > > data)
-> > > >  }
-> > > >
-> > > >  /* Called by Shared Transport layer when receive data is
-> > > > - * available */
-> > > > + * available
-> > > > + * Return:
-> > > > + * 0 if buffer handled (affectivly allways even if error found)
-> > > > + * if return !=0 the buffer will be freed by the st */
-> > > >  static long st_receive(void *priv_data, struct sk_buff *skb)  {
-> > > >  	struct ti_st *lhst = priv_data;
-> > > >  	int err;
-> > > >
-> > > >  	if (!skb)
-> > > > -		return -EFAULT;
-> > > > +		return 0;
-> > > >
-> > > >  	if (!lhst) {
-> > > >  		kfree_skb(skb);
-> > >
-> > > If you remove this call to kfree_skb() from here doesn't it fixes
-> > > your problem?
-> > >
-> > > 	Gustavo
-> 
-> I looked at the fix again , and I think we shouldn't change it since the main
-> problem that I am observing her is not the kfree_skb() at this point , The
-> problem is related to who is in charge of the buffer at this point , and in
-> our case the function hci_recv_frame() can use different transports and upon
-> an error it will free the buffer as well , in my fix I made sure that
-> st_receive() will always take care of the buffer.
-> >
-> > You are correct , I was going to send a new version for this patch.
-> >
-> > Thanks,
-> > Ram
+Add functions to register and unregister Browsing
+handler
+---
+ audio/avctp.c |   28 ++++++++++++++++++++++++++++
+ audio/avctp.h |    8 ++++++++
+ 2 files changed, 36 insertions(+), 0 deletions(-)
+
+diff --git a/audio/avctp.c b/audio/avctp.c
+index f4f5afa..0671f17 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -157,6 +157,12 @@ struct avctp_pdu_handler {
+ 	unsigned int id;
+ };
+ 
++struct avctp_browsing_pdu_handler {
++	avctp_browsing_pdu_cb cb;
++	void *user_data;
++	unsigned int id;
++};
++
+ static struct {
+ 	const char *name;
+ 	uint8_t avc;
+@@ -176,6 +182,7 @@ static GSList *callbacks = NULL;
+ static GSList *servers = NULL;
+ static GSList *control_handlers = NULL;
+ static uint8_t id = 0;
++static struct avctp_browsing_pdu_handler *browsing_handler = NULL;
+ 
+ static void auth_cb(DBusError *derr, void *user_data);
+ 
+@@ -1245,6 +1252,19 @@ unsigned int avctp_register_pdu_handler(uint8_t opcode, avctp_control_pdu_cb cb,
+ 	return handler->id;
+ }
+ 
++unsigned int avctp_register_browsing_pdu_handler(avctp_browsing_pdu_cb cb,
++							void *user_data)
++{
++	static unsigned int id = 0;
++
++	browsing_handler = g_new(struct avctp_browsing_pdu_handler, 1);
++	browsing_handler->cb = cb;
++	browsing_handler->user_data = user_data;
++	browsing_handler->id = ++id;
++
++	return browsing_handler->id;
++}
++
+ gboolean avctp_unregister_pdu_handler(unsigned int id)
+ {
+ 	GSList *l;
+@@ -1263,6 +1283,14 @@ gboolean avctp_unregister_pdu_handler(unsigned int id)
+ 	return FALSE;
+ }
+ 
++gboolean avctp_unregister_browsing_pdu_handler()
++{
++	if (browsing_handler)
++		g_free(browsing_handler);
++
++	return TRUE;
++}
++
+ struct avctp *avctp_connect(const bdaddr_t *src, const bdaddr_t *dst)
+ {
+ 	struct avctp *session;
+diff --git a/audio/avctp.h b/audio/avctp.h
+index b80e300..fa6eebf 100644
+--- a/audio/avctp.h
++++ b/audio/avctp.h
+@@ -83,6 +83,10 @@ typedef size_t (*avctp_control_pdu_cb) (struct avctp *session,
+ typedef gboolean (*avctp_rsp_cb) (struct avctp *session, uint8_t code,
+ 					uint8_t subunit, uint8_t *operands,
+ 					size_t operand_count, void *user_data);
++typedef void (*avctp_browsing_pdu_cb) (struct avctp *session,
++					uint8_t transaction,
++					uint8_t *operands, size_t operand_count,
++					void *user_data);
+ 
+ unsigned int avctp_add_state_cb(avctp_state_cb cb, void *user_data);
+ gboolean avctp_remove_state_cb(unsigned int id);
+@@ -98,6 +102,10 @@ unsigned int avctp_register_pdu_handler(uint8_t opcode, avctp_control_pdu_cb cb,
+ 							void *user_data);
+ gboolean avctp_unregister_pdu_handler(unsigned int id);
+ 
++unsigned int avctp_register_browsing_pdu_handler(avctp_browsing_pdu_cb cb,
++							void *user_data);
++
++gboolean avctp_unregister_browsing_pdu_handler();
+ int avctp_send_passthrough(struct avctp *session, uint8_t op);
+ int avctp_send_vendordep(struct avctp *session, uint8_t transaction,
+ 				uint8_t code, uint8_t subunit,
+-- 
+1.7.5.4
+
