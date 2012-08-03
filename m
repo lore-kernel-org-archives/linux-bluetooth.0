@@ -1,1273 +1,1328 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <501BC0D5.8080403@linux.intel.com>
-Date: Fri, 03 Aug 2012 14:15:17 +0200
-From: Frederic Danis <frederic.danis@linux.intel.com>
-MIME-Version: 1.0
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RFCOMM disconnection problem
-Content-Type: multipart/mixed;
- boundary="------------040309010103030207010803"
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
+	<frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v17 11/15] audio: Move HFP HF server to telephony.c
+Date: Fri,  3 Aug 2012 14:07:16 +0200
+Message-Id: <1343995640-19784-12-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1343995640-19784-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1343995640-19784-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------040309010103030207010803
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Move HandsFree HF RFComm server from audio/manager.c to
+audio/telephony.c.
+Update the HandsfreeGateway API to reflect this change (remove agent
+related methods).
+Doing this, RFComm server related to HandsfreeGateway is only started
+when an agent registers for this role of HandsFree Profile.
+---
+ audio/device.h    |    1 +
+ audio/gateway.c   |  436 +++++++++++++++--------------------------------------
+ audio/gateway.h   |    8 +
+ audio/manager.c   |  210 +-------------------------
+ audio/media.c     |   17 +++
+ audio/telephony.c |  217 +++++++++++++++++++++++++-
+ audio/transport.c |    4 +
+ doc/hfp-api.txt   |   46 ------
+ 8 files changed, 366 insertions(+), 573 deletions(-)
 
-Hello,
-
-When I try to disconnect Blue Stereo 200 headset (from mrhandsfree) from 
-my PC, if headset was the initiator of the connection, the low level 
-(ACL) is not disconnected.
-The device is still visible whith "hcitool con".
-
-This happens with BlueZ 4.98 or from git upstream, and kernel 3.4.6.
-There is no disconnection problem with kernel 3.2.
-
-I also try to revert change "Bluetooth: Fix RFCOMM session reference 
-counting issue" (commit cf33e7 in linux-stable.git) from Octavian 
-Purdila in kernel 3.4.6.
-With this kernel I do not get disconnection problem.
-
-You can find attached hcidump traces.
-
-Fred
-
+diff --git a/audio/device.h b/audio/device.h
+index 75f1da9..1e260e3 100644
+--- a/audio/device.h
++++ b/audio/device.h
+@@ -48,6 +48,7 @@ struct audio_device {
+ 	struct target *target;
+ 
+ 	guint hs_preauth_id;
++	guint gw_preauth_id;
+ 
+ 	struct dev_priv *priv;
+ };
+diff --git a/audio/gateway.c b/audio/gateway.c
+index 6162948..125cb02 100644
+--- a/audio/gateway.c
++++ b/audio/gateway.c
+@@ -41,21 +41,20 @@
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/sdp.h>
+ #include <bluetooth/sdp_lib.h>
++#include <bluetooth/uuid.h>
++
++#include "btio.h"
++#include "../src/adapter.h"
++#include "../src/device.h"
+ 
+ #include "sdp-client.h"
+ #include "device.h"
+ #include "gateway.h"
++#include "telephony.h"
+ #include "log.h"
+ #include "error.h"
+-#include "btio.h"
+ #include "dbus-common.h"
+ 
+-struct hf_agent {
+-	char *name;	/* Bus id */
+-	char *path;	/* D-Bus path */
+-	guint watch;	/* Disconnect watch */
+-};
+-
+ struct connect_cb {
+ 	unsigned int id;
+ 	gateway_stream_cb_t cb;
+@@ -64,14 +63,14 @@ struct connect_cb {
+ 
+ struct gateway {
+ 	gateway_state_t state;
+-	GIOChannel *rfcomm;
++	GIOChannel *tmp_rfcomm;
+ 	GIOChannel *sco;
+-	GIOChannel *incoming;
++	const char *connecting_uuid;
++	const char *connecting_transport_path;
+ 	GSList *callbacks;
+-	struct hf_agent *agent;
+ 	DBusMessage *msg;
+-	int version;
+ 	gateway_lock_t lock;
++	struct telephony_device *tel_dev;
+ };
+ 
+ struct gateway_state_callback {
+@@ -105,16 +104,6 @@ static const char *state2str(gateway_state_t state)
+ 	}
+ }
+ 
+-static void agent_free(struct hf_agent *agent)
+-{
+-	if (!agent)
+-		return;
+-
+-	g_free(agent->name);
+-	g_free(agent->path);
+-	g_free(agent);
+-}
+-
+ static void change_state(struct audio_device *dev, gateway_state_t new_state)
+ {
+ 	struct gateway *gw = dev->gateway;
+@@ -141,8 +130,19 @@ static void change_state(struct audio_device *dev, gateway_state_t new_state)
+ 
+ void gateway_set_state(struct audio_device *dev, gateway_state_t new_state)
+ {
++	struct gateway *gw = dev->gateway;
++
+ 	switch (new_state) {
+ 	case GATEWAY_STATE_DISCONNECTED:
++		if (gw->msg) {
++			DBusMessage *reply;
++
++			reply = btd_error_failed(gw->msg, "Connect failed");
++			g_dbus_send_message(dev->conn, reply);
++			dbus_message_unref(gw->msg);
++			gw->msg = NULL;
++		}
++
+ 		gateway_close(dev);
+ 		break;
+ 	case GATEWAY_STATE_CONNECTING:
+@@ -152,44 +152,6 @@ void gateway_set_state(struct audio_device *dev, gateway_state_t new_state)
+ 	}
+ }
+ 
+-static void agent_disconnect(struct audio_device *dev, struct hf_agent *agent)
+-{
+-	DBusMessage *msg;
+-
+-	msg = dbus_message_new_method_call(agent->name, agent->path,
+-			"org.bluez.HandsfreeAgent", "Release");
+-
+-	g_dbus_send_message(dev->conn, msg);
+-}
+-
+-static gboolean agent_sendfd(struct hf_agent *agent, int fd,
+-		DBusPendingCallNotifyFunction notify, void *data)
+-{
+-	struct audio_device *dev = data;
+-	struct gateway *gw = dev->gateway;
+-	DBusMessage *msg;
+-	DBusPendingCall *call;
+-
+-	msg = dbus_message_new_method_call(agent->name, agent->path,
+-			"org.bluez.HandsfreeAgent", "NewConnection");
+-
+-	dbus_message_append_args(msg, DBUS_TYPE_UNIX_FD, &fd,
+-					DBUS_TYPE_UINT16, &gw->version,
+-					DBUS_TYPE_INVALID);
+-
+-	if (dbus_connection_send_with_reply(dev->conn, msg,
+-							&call, -1) == FALSE) {
+-		dbus_message_unref(msg);
+-		return FALSE;
+-	}
+-
+-	dbus_pending_call_set_notify(call, notify, dev, NULL);
+-	dbus_pending_call_unref(call);
+-	dbus_message_unref(msg);
+-
+-	return TRUE;
+-}
+-
+ static unsigned int connect_cb_new(struct gateway *gw,
+ 					gateway_stream_cb_t func,
+ 					void *user_data)
+@@ -264,175 +226,59 @@ static void sco_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 	run_connect_cb(dev, NULL);
+ }
+ 
+-static gboolean rfcomm_disconnect_cb(GIOChannel *chan, GIOCondition cond,
+-			struct audio_device *dev)
++void gateway_slc_complete(struct audio_device *dev)
+ {
+-	if (cond & G_IO_NVAL)
+-		return FALSE;
+-
+-	gateway_close(dev);
+-
+-	return FALSE;
+-}
+-
+-static void newconnection_reply(DBusPendingCall *call, void *data)
+-{
+-	struct audio_device *dev = data;
+-	struct gateway *gw = dev->gateway;
+-	DBusMessage *reply = dbus_pending_call_steal_reply(call);
+-	DBusError derr;
+-
+-	if (!dev->gateway->rfcomm) {
+-		DBG("RFCOMM disconnected from server before agent reply");
+-		goto done;
+-	}
+-
+-	dbus_error_init(&derr);
+-	if (!dbus_set_error_from_message(&derr, reply)) {
+-		DBG("Agent reply: file descriptor passed successfully");
+-		g_io_add_watch(gw->rfcomm, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+-					(GIOFunc) rfcomm_disconnect_cb, dev);
+-		change_state(dev, GATEWAY_STATE_CONNECTED);
+-		goto done;
+-	}
+-
+-	DBG("Agent reply: %s", derr.message);
+-
+-	dbus_error_free(&derr);
+-	gateway_close(dev);
+-
+-done:
+-	dbus_message_unref(reply);
+-}
+-
+-static void rfcomm_connect_cb(GIOChannel *chan, GError *err,
+-				gpointer user_data)
+-{
+-	struct audio_device *dev = user_data;
+ 	struct gateway *gw = dev->gateway;
+ 	DBusMessage *reply;
+-	int sk, ret;
+ 
+-	if (err) {
+-		error("connect(): %s", err->message);
+-		goto fail;
+-	}
++	DBG("Service Level Connection established");
+ 
+-	if (!gw->agent) {
+-		error("Handsfree Agent not registered");
+-		goto fail;
+-	}
+-
+-	sk = g_io_channel_unix_get_fd(chan);
+-
+-	if (gw->rfcomm == NULL)
+-		gw->rfcomm = g_io_channel_ref(chan);
+-
+-	ret = agent_sendfd(gw->agent, sk, newconnection_reply, dev);
++	change_state(dev, GATEWAY_STATE_CONNECTED);
+ 
+ 	if (!gw->msg)
+ 		return;
+ 
+-	if (ret)
+-		reply = dbus_message_new_method_return(gw->msg);
+-	else
+-		reply = btd_error_failed(gw->msg, "Can't pass file descriptor");
+-
++	reply = dbus_message_new_method_return(gw->msg);
+ 	g_dbus_send_message(dev->conn, reply);
+-
+-	return;
+-
+-fail:
+-	if (gw->msg) {
+-		DBusMessage *reply;
+-		reply = btd_error_failed(gw->msg, "Connect failed");
+-		g_dbus_send_message(dev->conn, reply);
+-	}
+-
+-	gateway_close(dev);
+-}
+-
+-static int get_remote_profile_version(sdp_record_t *rec)
+-{
+-	uuid_t uuid;
+-	sdp_list_t *profiles;
+-	sdp_profile_desc_t *desc;
+-	int ver = 0;
+-
+-	sdp_uuid16_create(&uuid, HANDSFREE_PROFILE_ID);
+-
+-	sdp_get_profile_descs(rec, &profiles);
+-	if (profiles == NULL)
+-		goto done;
+-
+-	desc = profiles->data;
+-
+-	if (sdp_uuid16_cmp(&desc->uuid, &uuid) == 0)
+-		ver = desc->version;
+-
+-	sdp_list_free(profiles, free);
+-
+-done:
+-	return ver;
++	dbus_message_unref(gw->msg);
++	gw->msg = NULL;
+ }
+ 
+-static void get_incoming_record_cb(sdp_list_t *recs, int err,
+-					gpointer user_data)
++void gateway_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ {
+ 	struct audio_device *dev = user_data;
+ 	struct gateway *gw = dev->gateway;
+-	GError *gerr = NULL;
++	char hs_address[18];
+ 
+-	if (err < 0) {
+-		error("Unable to get service record: %s (%d)", strerror(-err),
+-					-err);
+-		goto fail;
++	if (err) {
++		error("%s", err->message);
++		goto failed;
+ 	}
+ 
+-	if (!recs || !recs->data) {
+-		error("No records found");
+-		goto fail;
+-	}
++	ba2str(&dev->dst, hs_address);
+ 
+-	gw->version = get_remote_profile_version(recs->data);
+-	if (gw->version == 0)
+-		goto fail;
++	if (!telephony_is_uuid_supported(device_get_adapter(dev->btd_dev),
++							gw->connecting_uuid))
++		goto failed;
+ 
+-	rfcomm_connect_cb(gw->incoming, gerr, dev);
+-	return;
++	gw->tel_dev = telephony_device_connecting(chan, dev->btd_dev, dev,
++							gw->connecting_uuid);
++	gw->connecting_uuid = NULL;
++	telephony_set_media_transport_path(gw->tel_dev,
++						gw->connecting_transport_path);
++	gw->connecting_transport_path = NULL;
+ 
+-fail:
+-	gateway_close(dev);
+-}
+-
+-static void unregister_incoming(gpointer user_data)
+-{
+-	struct audio_device *dev = user_data;
+-	struct gateway *gw = dev->gateway;
+-
+-	if (gw->incoming) {
+-		g_io_channel_unref(gw->incoming);
+-		gw->incoming = NULL;
++	if (gw->tmp_rfcomm) {
++		g_io_channel_unref(gw->tmp_rfcomm);
++		gw->tmp_rfcomm = NULL;
+ 	}
+-}
+ 
+-static void rfcomm_incoming_cb(GIOChannel *chan, GError *err,
+-				gpointer user_data)
+-{
+-	struct audio_device *dev = user_data;
+-	struct gateway *gw = dev->gateway;
+-	uuid_t uuid;
+-
+-	gw->incoming = g_io_channel_ref(chan);
++	DBG("%s: Connected to %s", dev->path, hs_address);
+ 
+-	sdp_uuid16_create(&uuid, HANDSFREE_AGW_SVCLASS_ID);
+-	if (bt_search_service(&dev->src, &dev->dst, &uuid,
+-						get_incoming_record_cb, dev,
+-						unregister_incoming) == 0)
+-		return;
++	return;
+ 
+-	unregister_incoming(dev);
+-	gateway_close(dev);
++failed:
++	gateway_set_state(dev, GATEWAY_STATE_DISCONNECTED);
+ }
+ 
+ static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
+@@ -469,13 +315,6 @@ static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
+ 		goto fail;
+ 	}
+ 
+-	gw->version = get_remote_profile_version(recs->data);
+-	if (gw->version == 0) {
+-		error("Unable to get profile version from record");
+-		err = -EINVAL;
+-		goto fail;
+-	}
+-
+ 	memcpy(&uuid, classes->data, sizeof(uuid));
+ 	sdp_list_free(classes, free);
+ 
+@@ -496,7 +335,7 @@ static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
+ 		goto fail;
+ 	}
+ 
+-	io = bt_io_connect(BT_IO_RFCOMM, rfcomm_connect_cb, dev, NULL, &gerr,
++	io = bt_io_connect(BT_IO_RFCOMM, gateway_connect_cb, dev, NULL, &gerr,
+ 				BT_IO_OPT_SOURCE_BDADDR, &dev->src,
+ 				BT_IO_OPT_DEST_BDADDR, &dev->dst,
+ 				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+@@ -515,6 +354,8 @@ fail:
+ 		DBusMessage *reply = btd_error_failed(gw->msg,
+ 					gerr ? gerr->message : strerror(-err));
+ 		g_dbus_send_message(dev->conn, reply);
++		dbus_message_unref(gw->msg);
++		gw->msg = NULL;
+ 	}
+ 
+ 	gateway_close(dev);
+@@ -540,12 +381,22 @@ static DBusMessage *ag_connect(DBusConnection *conn, DBusMessage *msg,
+ 	struct gateway *gw = au_dev->gateway;
+ 	int err;
+ 
+-	if (!gw->agent)
++	if (gw->state == GATEWAY_STATE_CONNECTING)
++		return btd_error_in_progress(msg);
++	else if (gw->state > GATEWAY_STATE_CONNECTING)
++		return btd_error_already_connected(msg);
++
++	if (!telephony_is_uuid_supported(device_get_adapter(au_dev->btd_dev),
++								HFP_HS_UUID))
+ 		return btd_error_agent_not_available(msg);
+ 
++	gw->connecting_uuid = HFP_HS_UUID;
++
+ 	err = get_records(au_dev);
+-	if (err < 0)
++	if (err < 0) {
++		gw->connecting_uuid = NULL;
+ 		return btd_error_failed(msg, strerror(-err));
++	}
+ 
+ 	gw->msg = dbus_message_ref(msg);
+ 
+@@ -558,13 +409,13 @@ int gateway_close(struct audio_device *device)
+ 	struct gateway *gw = device->gateway;
+ 	int sock;
+ 
+-	if (gw->rfcomm) {
+-		sock = g_io_channel_unix_get_fd(gw->rfcomm);
++	if (gw->tmp_rfcomm) {
++		sock = g_io_channel_unix_get_fd(gw->tmp_rfcomm);
+ 		shutdown(sock, SHUT_RDWR);
+ 
+-		g_io_channel_shutdown(gw->rfcomm, TRUE, NULL);
+-		g_io_channel_unref(gw->rfcomm);
+-		gw->rfcomm = NULL;
++		g_io_channel_shutdown(gw->tmp_rfcomm, TRUE, NULL);
++		g_io_channel_unref(gw->tmp_rfcomm);
++		gw->tmp_rfcomm = NULL;
+ 	}
+ 
+ 	if (gw->sco) {
+@@ -573,6 +424,14 @@ int gateway_close(struct audio_device *device)
+ 		gw->sco = NULL;
+ 	}
+ 
++	if (gw->tel_dev) {
++		telephony_device_disconnect(gw->tel_dev);
++		gw->tel_dev = NULL;
++	}
++
++	gw->connecting_uuid = NULL;
++	gw->connecting_transport_path = NULL;
++
+ 	change_state(device, GATEWAY_STATE_DISCONNECTED);
+ 	g_set_error(&gerr, GATEWAY_ERROR,
+ 			GATEWAY_ERROR_DISCONNECTED, "Disconnected");
+@@ -586,16 +445,12 @@ static DBusMessage *ag_disconnect(DBusConnection *conn, DBusMessage *msg,
+ 					void *data)
+ {
+ 	struct audio_device *device = data;
+-	struct gateway *gw = device->gateway;
+ 	DBusMessage *reply = NULL;
+ 	char gw_addr[18];
+ 
+ 	if (!device->conn)
+ 		return NULL;
+ 
+-	if (!gw->rfcomm)
+-		return btd_error_not_connected(msg);
+-
+ 	reply = dbus_message_new_method_return(msg);
+ 	if (!reply)
+ 		return NULL;
+@@ -607,17 +462,6 @@ static DBusMessage *ag_disconnect(DBusConnection *conn, DBusMessage *msg,
+ 	return reply;
+ }
+ 
+-static void agent_exited(DBusConnection *conn, void *data)
+-{
+-	struct gateway *gateway = data;
+-	struct hf_agent *agent = gateway->agent;
+-
+-	DBG("Agent %s exited", agent->name);
+-
+-	agent_free(agent);
+-	gateway->agent = NULL;
+-}
+-
+ static DBusMessage *ag_get_properties(DBusConnection *conn, DBusMessage *msg,
+ 					void *data)
+ {
+@@ -649,75 +493,12 @@ static DBusMessage *ag_get_properties(DBusConnection *conn, DBusMessage *msg,
+ 	return reply;
+ }
+ 
+-static DBusMessage *register_agent(DBusConnection *conn,
+-					DBusMessage *msg, void *data)
+-{
+-	struct audio_device *device = data;
+-	struct gateway *gw = device->gateway;
+-	struct hf_agent *agent;
+-	const char *path, *name;
+-
+-	if (gw->agent)
+-		return btd_error_already_exists(msg);
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
+-						DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	name = dbus_message_get_sender(msg);
+-	agent = g_new0(struct hf_agent, 1);
+-
+-	agent->name = g_strdup(name);
+-	agent->path = g_strdup(path);
+-
+-	agent->watch = g_dbus_add_disconnect_watch(conn, name,
+-						agent_exited, gw, NULL);
+-
+-	gw->agent = agent;
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static DBusMessage *unregister_agent(DBusConnection *conn,
+-				DBusMessage *msg, void *data)
+-{
+-	struct audio_device *device = data;
+-	struct gateway *gw = device->gateway;
+-	const char *path;
+-
+-	if (!gw->agent)
+-		goto done;
+-
+-	if (strcmp(gw->agent->name, dbus_message_get_sender(msg)) != 0)
+-		return btd_error_not_authorized(msg);
+-
+-	if (!dbus_message_get_args(msg, NULL,
+-				DBUS_TYPE_OBJECT_PATH, &path,
+-				DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	if (strcmp(gw->agent->path, path) != 0)
+-		return btd_error_does_not_exist(msg);
+-
+-	g_dbus_remove_watch(device->conn, gw->agent->watch);
+-
+-	agent_free(gw->agent);
+-	gw->agent = NULL;
+-
+-done:
+-	return dbus_message_new_method_return(msg);
+-}
+-
+ static const GDBusMethodTable gateway_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, ag_connect) },
+ 	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL, ag_disconnect) },
+ 	{ GDBUS_METHOD("GetProperties",
+ 			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
+ 			ag_get_properties) },
+-	{ GDBUS_METHOD("RegisterAgent",
+-			GDBUS_ARGS({ "agent", "o" }), NULL, register_agent) },
+-	{ GDBUS_METHOD("UnregisterAgent",
+-			GDBUS_ARGS({ "agent", "o" }), NULL, unregister_agent) },
+ 	{ }
+ };
+ 
+@@ -742,9 +523,6 @@ static void path_unregister(void *data)
+ 
+ void gateway_unregister(struct audio_device *dev)
+ {
+-	if (dev->gateway->agent)
+-		agent_disconnect(dev, dev->gateway->agent);
+-
+ 	g_dbus_unregister_interface(dev->conn, dev->path,
+ 						AUDIO_GATEWAY_INTERFACE);
+ }
+@@ -785,13 +563,52 @@ int gateway_connect_rfcomm(struct audio_device *dev, GIOChannel *io)
+ 	if (!io)
+ 		return -EINVAL;
+ 
+-	dev->gateway->rfcomm = g_io_channel_ref(io);
++	dev->gateway->tmp_rfcomm = g_io_channel_ref(io);
+ 
+ 	change_state(dev, GATEWAY_STATE_CONNECTING);
+ 
+ 	return 0;
+ }
+ 
++GIOChannel *gateway_get_rfcomm(struct audio_device *dev)
++{
++	struct gateway *gw = dev->gateway;
++
++	return gw->tmp_rfcomm;
++}
++
++void gateway_set_connecting_uuid(struct audio_device *dev, const char *uuid)
++{
++	struct gateway *gw = dev->gateway;
++
++	gw->connecting_uuid = uuid;
++}
++
++void gateway_set_media_transport_path(struct audio_device *dev,
++							const char *path)
++{
++	struct gateway *gw = dev->gateway;
++
++	DBG("MediaTransport path: %s", path);
++
++	if (gw->tel_dev == NULL) {
++		gw->connecting_transport_path = path;
++		return;
++	}
++
++	telephony_set_media_transport_path(gw->tel_dev, path);
++}
++
++const char *gateway_get_telephony_agent_name(struct audio_device *dev)
++{
++	struct gateway *gw = dev->gateway;
++
++	if (gw == NULL || gw->tel_dev == NULL)
++		return NULL;
++
++	return telephony_get_agent_name(gw->tel_dev);
++}
++
+ int gateway_connect_sco(struct audio_device *dev, GIOChannel *io)
+ {
+ 	struct gateway *gw = dev->gateway;
+@@ -809,21 +626,6 @@ int gateway_connect_sco(struct audio_device *dev, GIOChannel *io)
+ 	return 0;
+ }
+ 
+-void gateway_start_service(struct audio_device *dev)
+-{
+-	struct gateway *gw = dev->gateway;
+-	GError *err = NULL;
+-
+-	if (gw->rfcomm == NULL)
+-		return;
+-
+-	if (!bt_io_accept(gw->rfcomm, rfcomm_incoming_cb, dev, NULL, &err)) {
+-		error("bt_io_accept: %s", err->message);
+-		g_error_free(err);
+-		gateway_close(dev);
+-	}
+-}
+-
+ static gboolean request_stream_cb(gpointer data)
+ {
+ 	run_connect_cb(data, NULL);
+@@ -839,7 +641,7 @@ unsigned int gateway_request_stream(struct audio_device *dev,
+ 	GError *err = NULL;
+ 	GIOChannel *io;
+ 
+-	if (!gw->rfcomm)
++	if (!gw->tel_dev)
+ 		get_records(dev);
+ 	else if (!gw->sco) {
+ 		io = bt_io_connect(BT_IO_SCO, sco_connect_cb, dev, NULL, &err,
+@@ -866,7 +668,7 @@ int gateway_config_stream(struct audio_device *dev, gateway_stream_cb_t cb,
+ 
+ 	id = connect_cb_new(gw, cb, user_data);
+ 
+-	if (!gw->rfcomm)
++	if (!gw->tel_dev)
+ 		get_records(dev);
+ 	else if (cb)
+ 		g_idle_add(request_stream_cb, dev);
+diff --git a/audio/gateway.h b/audio/gateway.h
+index 77f5787..b42fdf1 100644
+--- a/audio/gateway.h
++++ b/audio/gateway.h
+@@ -74,3 +74,11 @@ gboolean gateway_remove_state_cb(unsigned int id);
+ gateway_lock_t gateway_get_lock(struct audio_device *dev);
+ gboolean gateway_lock(struct audio_device *dev, gateway_lock_t lock);
+ gboolean gateway_unlock(struct audio_device *dev, gateway_lock_t lock);
++
++void gateway_connect_cb(GIOChannel *chan, GError *err, gpointer user_data);
++void gateway_slc_complete(struct audio_device *dev);
++void gateway_set_connecting_uuid(struct audio_device *dev, const char *uuid);
++GIOChannel *gateway_get_rfcomm(struct audio_device *dev);
++void gateway_set_media_transport_path(struct audio_device *dev,
++							const char *path);
++const char *gateway_get_telephony_agent_name(struct audio_device *dev);
+diff --git a/audio/manager.c b/audio/manager.c
+index 4ab0186..5dcf52d 100644
+--- a/audio/manager.c
++++ b/audio/manager.c
+@@ -89,8 +89,6 @@ typedef enum {
+ struct audio_adapter {
+ 	struct btd_adapter *btd_adapter;
+ 	gboolean powered;
+-	uint32_t hfp_hs_record_id;
+-	GIOChannel *hfp_hs_server;
+ 	gint ref;
+ };
+ 
+@@ -222,196 +220,6 @@ static void handle_uuid(const char *uuidstr, struct audio_device *device)
+ 	}
+ }
+ 
+-static sdp_record_t *hfp_hs_record(uint8_t ch)
+-{
+-	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
+-	uuid_t root_uuid, svclass_uuid, ga_svclass_uuid;
+-	uuid_t l2cap_uuid, rfcomm_uuid;
+-	sdp_profile_desc_t profile;
+-	sdp_record_t *record;
+-	sdp_list_t *aproto, *proto[2];
+-	sdp_data_t *channel;
+-
+-	record = sdp_record_alloc();
+-	if (!record)
+-		return NULL;
+-
+-	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
+-	root = sdp_list_append(0, &root_uuid);
+-	sdp_set_browse_groups(record, root);
+-
+-	sdp_uuid16_create(&svclass_uuid, HANDSFREE_SVCLASS_ID);
+-	svclass_id = sdp_list_append(0, &svclass_uuid);
+-	sdp_uuid16_create(&ga_svclass_uuid, GENERIC_AUDIO_SVCLASS_ID);
+-	svclass_id = sdp_list_append(svclass_id, &ga_svclass_uuid);
+-	sdp_set_service_classes(record, svclass_id);
+-
+-	sdp_uuid16_create(&profile.uuid, HANDSFREE_PROFILE_ID);
+-	profile.version = 0x0105;
+-	pfseq = sdp_list_append(0, &profile);
+-	sdp_set_profile_descs(record, pfseq);
+-
+-	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
+-	proto[0] = sdp_list_append(0, &l2cap_uuid);
+-	apseq = sdp_list_append(0, proto[0]);
+-
+-	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
+-	proto[1] = sdp_list_append(0, &rfcomm_uuid);
+-	channel = sdp_data_alloc(SDP_UINT8, &ch);
+-	proto[1] = sdp_list_append(proto[1], channel);
+-	apseq = sdp_list_append(apseq, proto[1]);
+-
+-	aproto = sdp_list_append(0, apseq);
+-	sdp_set_access_protos(record, aproto);
+-
+-	sdp_set_info_attr(record, "Hands-Free", 0, 0);
+-
+-	sdp_data_free(channel);
+-	sdp_list_free(proto[0], 0);
+-	sdp_list_free(proto[1], 0);
+-	sdp_list_free(apseq, 0);
+-	sdp_list_free(pfseq, 0);
+-	sdp_list_free(aproto, 0);
+-	sdp_list_free(root, 0);
+-	sdp_list_free(svclass_id, 0);
+-
+-	return record;
+-}
+-
+-static void gateway_auth_cb(DBusError *derr, void *user_data)
+-{
+-	struct audio_device *device = user_data;
+-
+-	if (derr && dbus_error_is_set(derr)) {
+-		error("Access denied: %s", derr->message);
+-		gateway_set_state(device, GATEWAY_STATE_DISCONNECTED);
+-	} else {
+-		char ag_address[18];
+-
+-		ba2str(&device->dst, ag_address);
+-		DBG("Accepted AG connection from %s for %s",
+-			ag_address, device->path);
+-
+-		gateway_start_service(device);
+-	}
+-}
+-
+-static void hf_io_cb(GIOChannel *chan, gpointer data)
+-{
+-	bdaddr_t src, dst;
+-	GError *err = NULL;
+-	uint8_t ch;
+-	const char *server_uuid, *remote_uuid;
+-	struct audio_device *device;
+-	int perr;
+-
+-	bt_io_get(chan, BT_IO_RFCOMM, &err,
+-			BT_IO_OPT_SOURCE_BDADDR, &src,
+-			BT_IO_OPT_DEST_BDADDR, &dst,
+-			BT_IO_OPT_CHANNEL, &ch,
+-			BT_IO_OPT_INVALID);
+-
+-	if (err) {
+-		error("%s", err->message);
+-		g_error_free(err);
+-		return;
+-	}
+-
+-	server_uuid = HFP_HS_UUID;
+-	remote_uuid = HFP_AG_UUID;
+-
+-	device = manager_get_device(&src, &dst, TRUE);
+-	if (!device)
+-		goto drop;
+-
+-	if (!device->gateway) {
+-		btd_device_add_uuid(device->btd_dev, remote_uuid);
+-		if (!device->gateway)
+-			goto drop;
+-	}
+-
+-	if (gateway_is_active(device)) {
+-		DBG("Refusing new connection since one already exists");
+-		goto drop;
+-	}
+-
+-	if (gateway_connect_rfcomm(device, chan) < 0) {
+-		error("Allocating new GIOChannel failed!");
+-		goto drop;
+-	}
+-
+-	perr = audio_device_request_authorization(device, server_uuid,
+-						gateway_auth_cb, device);
+-	if (perr < 0) {
+-		DBG("Authorization denied: %s", strerror(-perr));
+-		gateway_set_state(device, GATEWAY_STATE_DISCONNECTED);
+-	}
+-
+-	return;
+-
+-drop:
+-	g_io_channel_shutdown(chan, TRUE, NULL);
+-}
+-
+-static int gateway_server_init(struct audio_adapter *adapter)
+-{
+-	uint8_t chan = DEFAULT_HFP_HS_CHANNEL;
+-	sdp_record_t *record;
+-	gboolean master = TRUE;
+-	GError *err = NULL;
+-	GIOChannel *io;
+-	bdaddr_t src;
+-
+-	if (config) {
+-		gboolean tmp;
+-
+-		tmp = g_key_file_get_boolean(config, "General", "Master",
+-						&err);
+-		if (err) {
+-			DBG("audio.conf: %s", err->message);
+-			g_clear_error(&err);
+-		} else
+-			master = tmp;
+-	}
+-
+-	adapter_get_address(adapter->btd_adapter, &src);
+-
+-	io = bt_io_listen(BT_IO_RFCOMM, NULL, hf_io_cb, adapter, NULL, &err,
+-				BT_IO_OPT_SOURCE_BDADDR, &src,
+-				BT_IO_OPT_CHANNEL, chan,
+-				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+-				BT_IO_OPT_MASTER, master,
+-				BT_IO_OPT_INVALID);
+-	if (!io) {
+-		error("%s", err->message);
+-		g_error_free(err);
+-		return -1;
+-	}
+-
+-	adapter->hfp_hs_server = io;
+-	record = hfp_hs_record(chan);
+-	if (!record) {
+-		error("Unable to allocate new service record");
+-		goto failed;
+-	}
+-
+-	if (add_record_to_server(&src, record) < 0) {
+-		error("Unable to register HFP HS service record");
+-		sdp_record_free(record);
+-		goto failed;
+-	}
+-
+-	adapter->hfp_hs_record_id = record->handle;
+-
+-	return 0;
+-
+-failed:
+-	g_io_channel_shutdown(adapter->hfp_hs_server, TRUE, NULL);
+-	g_io_channel_unref(adapter->hfp_hs_server);
+-	adapter->hfp_hs_server = NULL;
+-	return -1;
+-}
+-
+ static int audio_probe(struct btd_device *device, GSList *uuids)
+ {
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+@@ -579,17 +387,12 @@ static void headset_server_remove(struct btd_adapter *adapter)
+ static int gateway_server_probe(struct btd_adapter *adapter)
+ {
+ 	struct audio_adapter *adp;
+-	int err;
+ 
+ 	adp = audio_adapter_get(adapter);
+ 	if (!adp)
+ 		return -EINVAL;
+ 
+-	err = gateway_server_init(adp);
+-	if (err < 0)
+-		audio_adapter_unref(adp);
+-
+-	return err;
++	return 0;
+ }
+ 
+ static void gateway_server_remove(struct btd_adapter *adapter)
+@@ -603,17 +406,6 @@ static void gateway_server_remove(struct btd_adapter *adapter)
+ 	if (!adp)
+ 		return;
+ 
+-	if (adp->hfp_hs_record_id) {
+-		remove_record_from_server(adp->hfp_hs_record_id);
+-		adp->hfp_hs_record_id = 0;
+-	}
+-
+-	if (adp->hfp_hs_server) {
+-		g_io_channel_shutdown(adp->hfp_hs_server, TRUE, NULL);
+-		g_io_channel_unref(adp->hfp_hs_server);
+-		adp->hfp_hs_server = NULL;
+-	}
+-
+ 	audio_adapter_unref(adp);
+ }
+ 
+diff --git a/audio/media.c b/audio/media.c
+index c608c41..3e5d12d 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -647,6 +647,7 @@ static void gateway_state_changed(struct audio_device *dev,
+ {
+ 	struct media_endpoint *endpoint = user_data;
+ 	struct media_transport *transport;
++	const char *path;
+ 
+ 	DBG("");
+ 
+@@ -664,6 +665,13 @@ static void gateway_state_changed(struct audio_device *dev,
+ 	case GATEWAY_STATE_CONNECTING:
+ 		set_configuration(endpoint, dev, NULL, 0,
+ 					gateway_setconf_cb, dev, NULL);
++
++		transport = find_device_transport(endpoint, dev);
++		if (transport == NULL)
++			break;
++
++		path = media_transport_get_path(transport);
++		gateway_set_media_transport_path(dev, path);
+ 		break;
+ 	case GATEWAY_STATE_CONNECTED:
+ 		break;
+@@ -743,9 +751,18 @@ static gboolean endpoint_init_hs(struct media_endpoint *endpoint, int *err)
+ 
+ 	for (l = list; l != NULL; l = l->next) {
+ 		struct audio_device *dev = l->data;
++		struct media_transport *transport;
++		const char *path;
+ 
+ 		set_configuration(endpoint, dev, NULL, 0,
+ 						gateway_setconf_cb, dev, NULL);
++
++		transport = find_device_transport(endpoint, dev);
++		if (transport == NULL)
++			break;
++
++		path = media_transport_get_path(transport);
++		gateway_set_media_transport_path(dev, path);
+ 	}
+ 
+ 	g_slist_free(list);
+diff --git a/audio/telephony.c b/audio/telephony.c
+index da1797f..dc76d60 100644
+--- a/audio/telephony.c
++++ b/audio/telephony.c
+@@ -48,6 +48,7 @@
+ #include "glib-helper.h"
+ #include "sdp-client.h"
+ #include "headset.h"
++#include "gateway.h"
+ #include "telephony.h"
+ #include "dbus-common.h"
+ #include "sdpd.h"
+@@ -335,6 +336,44 @@ done:
+ 	dbus_message_unref(reply);
+ }
+ 
++static gboolean ag_dev_disconnect_cb(GIOChannel *chan, GIOCondition cond,
++					gpointer data)
++{
++	struct telephony_device *tel_dev = data;
++
++	if (cond & G_IO_NVAL)
++		return FALSE;
++
++	gateway_set_state(tel_dev->au_dev, GATEWAY_STATE_DISCONNECTED);
++
++	return FALSE;
++}
++
++static void ag_newconnection_reply(DBusPendingCall *call, void *user_data)
++{
++	struct telephony_device *tel_dev = user_data;
++	DBusMessage *reply = dbus_pending_call_steal_reply(call);
++	DBusError derr;
++
++	dbus_error_init(&derr);
++	if (dbus_set_error_from_message(&derr, reply)) {
++		DBG("Agent reply: %s", derr.message);
++		dbus_error_free(&derr);
++		gateway_set_state(tel_dev->au_dev, GATEWAY_STATE_DISCONNECTED);
++		goto done;
++	}
++
++	DBG("Agent reply: file descriptor passed successfully");
++	g_io_add_watch(tel_dev->rfcomm, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++			ag_dev_disconnect_cb, tel_dev);
++	gateway_slc_complete(tel_dev->au_dev);
++
++done:
++	dbus_pending_call_unref(tel_dev->call);
++	tel_dev->call = NULL;
++	dbus_message_unref(reply);
++}
++
+ static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
+ {
+ 	struct telephony_device *tel_dev = user_data;
+@@ -390,7 +429,11 @@ static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
+ 	return;
+ 
+ failed:
+-	headset_set_state(tel_dev->au_dev, HEADSET_STATE_DISCONNECTED);
++	if (g_strcmp0(tel_dev->config->uuid, HSP_AG_UUID) == 0 ||
++			g_strcmp0(tel_dev->config->uuid, HFP_AG_UUID) == 0)
++		headset_set_state(tel_dev->au_dev, HEADSET_STATE_DISCONNECTED);
++	else if (g_strcmp0(tel_dev->config->uuid, HFP_HS_UUID) == 0)
++		gateway_set_state(tel_dev->au_dev, GATEWAY_STATE_DISCONNECTED);
+ }
+ 
+ struct telephony_device *telephony_device_connecting(GIOChannel *io,
+@@ -468,6 +511,170 @@ const char *telephony_get_agent_name(struct telephony_device *device)
+ 	return device->name;
+ }
+ 
++static sdp_record_t *hfp_hs_record(struct telephony_agent *agent)
++{
++	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
++	uuid_t root_uuid, svclass_uuid, ga_svclass_uuid;
++	uuid_t l2cap_uuid, rfcomm_uuid;
++	sdp_profile_desc_t profile;
++	sdp_list_t *aproto, *proto[2];
++	sdp_record_t *record;
++	sdp_data_t *channel, *features;
++	uint16_t sdpfeat;
++
++	record = sdp_record_alloc();
++	if (!record)
++		return NULL;
++
++	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
++	root = sdp_list_append(0, &root_uuid);
++	sdp_set_browse_groups(record, root);
++
++	sdp_uuid16_create(&svclass_uuid, HANDSFREE_SVCLASS_ID);
++	svclass_id = sdp_list_append(0, &svclass_uuid);
++	sdp_uuid16_create(&ga_svclass_uuid, GENERIC_AUDIO_SVCLASS_ID);
++	svclass_id = sdp_list_append(svclass_id, &ga_svclass_uuid);
++	sdp_set_service_classes(record, svclass_id);
++
++	sdp_uuid16_create(&profile.uuid, HANDSFREE_PROFILE_ID);
++	profile.version = agent->version;
++	pfseq = sdp_list_append(0, &profile);
++	sdp_set_profile_descs(record, pfseq);
++
++	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
++	proto[0] = sdp_list_append(0, &l2cap_uuid);
++	apseq = sdp_list_append(0, proto[0]);
++
++	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
++	proto[1] = sdp_list_append(0, &rfcomm_uuid);
++	channel = sdp_data_alloc(SDP_UINT8, &agent->config->channel);
++	proto[1] = sdp_list_append(proto[1], channel);
++	apseq = sdp_list_append(apseq, proto[1]);
++
++	sdpfeat = agent->features & 0x1F;
++	features = sdp_data_alloc(SDP_UINT16, &sdpfeat);
++	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
++
++	aproto = sdp_list_append(0, apseq);
++	sdp_set_access_protos(record, aproto);
++
++	sdp_set_info_attr(record, "Hands-Free", 0, 0);
++
++	sdp_data_free(channel);
++	sdp_list_free(proto[0], 0);
++	sdp_list_free(proto[1], 0);
++	sdp_list_free(apseq, 0);
++	sdp_list_free(pfseq, 0);
++	sdp_list_free(aproto, 0);
++	sdp_list_free(root, 0);
++	sdp_list_free(svclass_id, 0);
++
++	return record;
++}
++
++static void gateway_auth_cb(DBusError *derr, void *user_data)
++{
++	struct audio_device *au_dev = user_data;
++	GError *err = NULL;
++	GIOChannel *io;
++
++	if (au_dev->gw_preauth_id) {
++		g_source_remove(au_dev->gw_preauth_id);
++		au_dev->gw_preauth_id = 0;
++	}
++
++	if (derr && dbus_error_is_set(derr)) {
++		error("Access denied: %s", derr->message);
++		gateway_set_state(au_dev, GATEWAY_STATE_DISCONNECTED);
++		return;
++	}
++
++	io = gateway_get_rfcomm(au_dev);
++
++	if (!bt_io_accept(io, gateway_connect_cb, au_dev, NULL, &err)) {
++		error("bt_io_accept: %s", err->message);
++		g_error_free(err);
++		gateway_set_state(au_dev, GATEWAY_STATE_DISCONNECTED);
++		return;
++	}
++}
++
++static gboolean gateway_preauth_cb(GIOChannel *chan, GIOCondition cond,
++							gpointer user_data)
++{
++	struct audio_device *au_dev = user_data;
++
++	DBG("Gateway disconnected during authorization");
++
++	audio_device_cancel_authorization(au_dev, gateway_auth_cb, au_dev);
++
++	gateway_set_state(au_dev, GATEWAY_STATE_DISCONNECTED);
++
++	au_dev->gw_preauth_id = 0;
++
++	return FALSE;
++}
++
++static void hf_confirm(GIOChannel *chan, gpointer data)
++{
++	struct telephony_agent *agent = data;
++	struct audio_device *au_dev;
++	bdaddr_t src, dst;
++	int perr;
++	GError *err = NULL;
++	uint8_t ch;
++
++	bt_io_get(chan, BT_IO_RFCOMM, &err,
++			BT_IO_OPT_SOURCE_BDADDR, &src,
++			BT_IO_OPT_DEST_BDADDR, &dst,
++			BT_IO_OPT_CHANNEL, &ch,
++			BT_IO_OPT_INVALID);
++	if (err) {
++		error("%s", err->message);
++		g_error_free(err);
++		goto drop;
++	}
++
++	au_dev = manager_get_device(&src, &dst, TRUE);
++	if (!au_dev)
++		goto drop;
++
++	if (!au_dev->gateway) {
++		btd_device_add_uuid(au_dev->btd_dev, agent->config->r_uuid);
++		if (!au_dev->gateway)
++			goto drop;
++	}
++
++	if (gateway_is_active(au_dev)) {
++		DBG("Refusing new connection since one already exists");
++		goto drop;
++	}
++
++	gateway_set_connecting_uuid(au_dev, agent->config->uuid);
++
++	if (gateway_connect_rfcomm(au_dev, chan) < 0) {
++		error("Allocating new GIOChannel failed!");
++		goto drop;
++	}
++
++	perr = audio_device_request_authorization(au_dev, agent->config->uuid,
++						gateway_auth_cb, au_dev);
++	if (perr < 0) {
++		DBG("Authorization denied: %s", strerror(-perr));
++		gateway_set_state(au_dev, GATEWAY_STATE_DISCONNECTED);
++		return;
++	}
++
++	au_dev->gw_preauth_id = g_io_add_watch(chan,
++					G_IO_NVAL | G_IO_HUP | G_IO_ERR,
++					gateway_preauth_cb, au_dev);
++
++	return;
++
++drop:
++	g_io_channel_shutdown(chan, TRUE, NULL);
++}
++
+ static sdp_record_t *hsp_ag_record(struct telephony_agent *agent)
+ {
+ 	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
+@@ -728,6 +935,14 @@ static struct profile_config default_configs[] = {
+ 		hsp_ag_record,
+ 		ag_confirm,
+ 		hs_newconnection_reply },
++	{ HFP_HS_UUID,
++		DEFAULT_HF_HS_CHANNEL,
++		HFP_AG_UUID,
++		HANDSFREE_AGW_SVCLASS_ID,
++		HANDSFREE_PROFILE_ID,
++		hfp_hs_record,
++		hf_confirm,
++		ag_newconnection_reply },
+ 	{ HFP_AG_UUID,
+ 		DEFAULT_HF_AG_CHANNEL,
+ 		HFP_HS_UUID,
+diff --git a/audio/transport.c b/audio/transport.c
+index 7236e43..7a9b5ea 100644
+--- a/audio/transport.c
++++ b/audio/transport.c
+@@ -866,6 +866,10 @@ static gboolean check_telephony_agent_name(struct media_transport *transport,
+ 	if (tel_agent != NULL && g_strcmp0(tel_agent, sender) == 0)
+ 		return TRUE;
+ 
++	tel_agent = gateway_get_telephony_agent_name(transport->device);
++	if (tel_agent != NULL && g_strcmp0(tel_agent, sender) == 0)
++		return TRUE;
++
+ 	return FALSE;
+ }
+ 
+diff --git a/doc/hfp-api.txt b/doc/hfp-api.txt
+index fad89ae..afc1277 100644
+--- a/doc/hfp-api.txt
++++ b/doc/hfp-api.txt
+@@ -22,24 +22,6 @@ Methods		void Connect()
+ 			Returns all properties for the interface. See the
+ 			properties section for available properties.
+ 
+-		void RegisterAgent(object path)
+-
+-			The object path defines the path the of the agent
+-			that will be called when a new Handsfree connection
+-			is established.
+-
+-			If an application disconnects from the bus all of its
+-			registered agents will be removed.
+-
+-		void UnregisterAgent(object path)
+-
+-			This unregisters the agent that has been previously
+-			registered. The object path parameter must match the
+-			same value that has been used on registration.
+-
+-			Possible Errors: org.bluez.Error.Failed
+-					 org.bluez.Error.InvalidArguments
+-
+ 
+ Signals		PropertyChanged(string name, variant value)
+ 
+@@ -54,31 +36,3 @@ Properties	string State [readonly]
+ 				"connecting"
+ 				"connected"
+ 				"playing"
+-
+-HandsfreeAgent hierarchy
+-===============
+-
+-Service         unique name
+-Interface       org.bluez.HandsfreeAgent
+-Object path     freely definable
+-
+-Methods		void NewConnection(filedescriptor fd, uint16 version)
+-
+-			This method gets called whenever a new handsfree
+-			connection has been established.  The objectpath
+-			contains the object path of the remote device.
+-
+-			The agent should only return successfully once the
+-			establishment of the service level connection (SLC)
+-			has been completed.  In the case of Handsfree this
+-			means that BRSF exchange has been performed and
+-			necessary initialization has been done.
+-
+-			Possible Errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.Failed
+-
+-		void Release()
+-
+-			This method gets called whenever the service daemon
+-			unregisters the agent or whenever the Adapter where
+-			the HandsfreeAgent registers itself is removed.
 -- 
-Frederic Danis                            Open Source Technology Center
-frederic.danis@intel.com                              Intel Corporation
+1.7.9.5
 
-
-
---------------040309010103030207010803
-Content-Type: text/plain; charset=UTF-8;
- name="hcidump.txt"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="hcidump.txt"
-
-QXVnICAzIDExOjAyOjM1IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Mi43ODM4MTNdIGwy
-Y2FwX2Nvbm5lY3RfaW5kOiBoZGV2IGhjaTAsIGJkYWRkciAxMDowNDoxNDpEMTo5NjoxQwpB
-dWcgIDMgMTE6MDI6MzUgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjE0NTgyOV0gbDJj
-YXBfY29ubmVjdF9jZm06IGhjb24gZmZmZjg4MDAwYzAwNjgwMCBiZGFkZHIgMTA6MDQ6MTQ6
-RDE6OTY6MUMgc3RhdHVzIDAKQXVnICAzIDExOjAyOjM1IGZkYW5pcy1saW51eCBrZXJuZWw6
-IFsgNjM0My4xNDU4NDBdIGwyY2FwX2Nvbm5fYWRkOiBoY29uIGZmZmY4ODAwMGMwMDY4MDAg
-Y29ubiBmZmZmODgwMDgxOTE0YTAwIGhjaGFuIGZmZmY4ODAxMTAwN2YzODAKQXVnICAzIDEx
-OjAyOjM1IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My4xNDU4NDVdIGwyY2FwX2Nvbm5f
-cmVhZHk6IGNvbm4gZmZmZjg4MDA4MTkxNGEwMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxp
-bnV4IGtlcm5lbDogWyA2MzQzLjYwNDY3Nl0gbDJjYXBfc2VjdXJpdHlfY2ZtOiBjb25uIGZm
-ZmY4ODAwODE5MTRhMDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsg
-NjM0My42MDQ2ODVdIHJmY29tbV9zZWN1cml0eV9jZm06IGNvbm4gZmZmZjg4MDAwYzAwNjgw
-MCBzdGF0dXMgMHgwMCBlbmNyeXB0IDB4MDEKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51
-eCBrZXJuZWw6IFsgNjM0My42MTA5OThdIGwyY2FwX3JlY3ZfYWNsZGF0YTogY29ubiBmZmZm
-ODgwMDgxOTE0YTAwIGxlbiAxMiBmbGFncyAweDIKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1s
-aW51eCBrZXJuZWw6IFsgNjM0My42MTEwMDRdIGwyY2FwX3JlY3ZfZnJhbWU6IGxlbiA4LCBj
-aWQgMHgwMDAxCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMu
-NjExMDA4XSBsMmNhcF9yYXdfcmVjdjogY29ubiBmZmZmODgwMDgxOTE0YTAwCkF1ZyAgMyAx
-MTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNjExMDExXSBsMmNhcF9zaWdf
-Y2hhbm5lbDogY29kZSAweDAyIGxlbiA0IGlkIDB4MDIKQXVnICAzIDExOjAyOjM2IGZkYW5p
-cy1saW51eCBrZXJuZWw6IFsgNjM0My42MTEwMTVdIGwyY2FwX2Nvbm5lY3RfcmVxOiBwc20g
-MHgwMSBzY2lkIDB4MDA0MApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzQzLjYxMTAyNl0gbDJjYXBfY2hhbl9jcmVhdGU6IHNrIGZmZmY4ODAxMGU3YWM0MDAg
-Y2hhbiBmZmZmODgwMTBlN2FlYzAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2Vy
-bmVsOiBbIDYzNDMuNjExMDMwXSBsMmNhcF9zb2NrX2luaXQ6IHNrIGZmZmY4ODAxMGU3YWM0
-MDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My42MTEwMzRd
-IF9fbDJjYXBfY2hhbl9hZGQ6IGNvbm4gZmZmZjg4MDA4MTkxNGEwMCwgcHNtIDB4MDEsIGRj
-aWQgMHgwMDQwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMu
-NjExMDQxXSBfX2wyY2FwX3N0YXRlX2NoYW5nZTogY2hhbiBmZmZmODgwMTBlN2FlYzAwIEJU
-X09QRU4gLT4gQlRfQ09OTkVDVDIKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJu
-ZWw6IFsgNjM0My42MTEwNDZdIGwyY2FwX2J1aWxkX2NtZDogY29ubiBmZmZmODgwMDgxOTE0
-YTAwLCBjb2RlIDB4MDMsIGlkZW50IDB4MDIsIGxlbiA4CkF1ZyAgMyAxMTowMjozNiBmZGFu
-aXMtbGludXgga2VybmVsOiBbIDYzNDMuNjExMDUwXSBsMmNhcF9zZW5kX2NtZDogY29kZSAw
-eDAzCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNjExMDU5
-XSBsMmNhcF9idWlsZF9jbWQ6IGNvbm4gZmZmZjg4MDA4MTkxNGEwMCwgY29kZSAweDBhLCBp
-ZGVudCAweDAxLCBsZW4gMgpBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzQzLjYxMTA2NF0gbDJjYXBfc2VuZF9jbWQ6IGNvZGUgMHgwYQpBdWcgIDMgMTE6MDI6
-MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjYxNzIxM10gbDJjYXBfcmVjdl9hY2xk
-YXRhOiBjb25uIGZmZmY4ODAwODE5MTRhMDAgbGVuIDEyIGZsYWdzIDB4MgpBdWcgIDMgMTE6
-MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjYxNzIxOF0gbDJjYXBfcmVjdl9m
-cmFtZTogbGVuIDgsIGNpZCAweDAwMDEKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBr
-ZXJuZWw6IFsgNjM0My42MTcyMjBdIGwyY2FwX3Jhd19yZWN2OiBjb25uIGZmZmY4ODAwODE5
-MTRhMDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My42MTcy
-MjNdIGwyY2FwX3NpZ19jaGFubmVsOiBjb2RlIDB4MGIgbGVuIDQgaWQgMHgwMQpBdWcgIDMg
-MTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjYxNzIyNl0gbDJjYXBfaW5m
-b3JtYXRpb25fcnNwOiB0eXBlIDB4MDAwMiByZXN1bHQgMHgwMQpBdWcgIDMgMTE6MDI6MzYg
-ZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjYxNzIyOV0gbDJjYXBfY29ubl9zdGFydDog
-Y29ubiBmZmZmODgwMDgxOTE0YTAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2Vy
-bmVsOiBbIDYzNDMuNjE3MjMzXSBfX2wyY2FwX3N0YXRlX2NoYW5nZTogY2hhbiBmZmZmODgw
-MTBlN2FlYzAwIEJUX0NPTk5FQ1QyIC0+IEJUX0NPTkZJRwpBdWcgIDMgMTE6MDI6MzYgZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjYxNzIzNl0gbDJjYXBfYnVpbGRfY21kOiBjb25u
-IGZmZmY4ODAwODE5MTRhMDAsIGNvZGUgMHgwMywgaWRlbnQgMHgwMiwgbGVuIDgKQXVnICAz
-IDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My42MTcyMzldIGwyY2FwX3Nl
-bmRfY21kOiBjb2RlIDB4MDMKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6
-IFsgNjM0My42MTcyNDRdIGwyY2FwX2J1aWxkX2NvbmZfcmVxOiBjaGFuIGZmZmY4ODAxMGU3
-YWVjMDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My42MTcy
-NDddIGwyY2FwX2J1aWxkX2NtZDogY29ubiBmZmZmODgwMDgxOTE0YTAwLCBjb2RlIDB4MDQs
-IGlkZW50IDB4MDIsIGxlbiA0CkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVs
-OiBbIDYzNDMuNjE3MjUwXSBsMmNhcF9zZW5kX2NtZDogY29kZSAweDA0CkF1ZyAgMyAxMTow
-MjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNjIzNDY1XSBsMmNhcF9yZWN2X2Fj
-bGRhdGE6IGNvbm4gZmZmZjg4MDA4MTkxNGEwMCBsZW4gMTYgZmxhZ3MgMHgyCkF1ZyAgMyAx
-MTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNjIzNDcxXSBsMmNhcF9yZWN2
-X2ZyYW1lOiBsZW4gMTIsIGNpZCAweDAwMDEKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51
-eCBrZXJuZWw6IFsgNjM0My42MjM0NzRdIGwyY2FwX3Jhd19yZWN2OiBjb25uIGZmZmY4ODAw
-ODE5MTRhMDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My42
-MjM0NzhdIGwyY2FwX3NpZ19jaGFubmVsOiBjb2RlIDB4MDQgbGVuIDggaWQgMHgwMwpBdWcg
-IDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjYyMzQ4M10gbDJjYXBf
-Y29uZmlnX3JlcTogZGNpZCAweDAwNDAgZmxhZ3MgMHgwMApBdWcgIDMgMTE6MDI6MzYgZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjYyMzQ4N10gbDJjYXBfcGFyc2VfY29uZl9yZXE6
-IGNoYW4gZmZmZjg4MDEwZTdhZWMwMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtl
-cm5lbDogWyA2MzQzLjYyMzQ5MF0gbDJjYXBfZ2V0X2NvbmZfb3B0OiB0eXBlIDB4MDEgbGVu
-IDIgdmFsIDB4MjAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYz
-NDMuNjIzNDk1XSBsMmNhcF9hZGRfY29uZl9vcHQ6IHR5cGUgMHgwMSBsZW4gMiB2YWwgMHgy
-MDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My42MjM0OThd
-IGwyY2FwX2J1aWxkX2NtZDogY29ubiBmZmZmODgwMDgxOTE0YTAwLCBjb2RlIDB4MDUsIGlk
-ZW50IDB4MDMsIGxlbiAxMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzQzLjYyMzUwMl0gbDJjYXBfc2VuZF9jbWQ6IGNvZGUgMHgwNQpBdWcgIDMgMTE6MDI6
-MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjYyNDc5Nl0gbDJjYXBfcmVjdl9hY2xk
-YXRhOiBjb25uIGZmZmY4ODAwODE5MTRhMDAgbGVuIDE0IGZsYWdzIDB4MgpBdWcgIDMgMTE6
-MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjYyNDgwMV0gbDJjYXBfcmVjdl9m
-cmFtZTogbGVuIDEwLCBjaWQgMHgwMDAxCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgg
-a2VybmVsOiBbIDYzNDMuNjI0ODA1XSBsMmNhcF9yYXdfcmVjdjogY29ubiBmZmZmODgwMDgx
-OTE0YTAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNjI0
-ODA5XSBsMmNhcF9zaWdfY2hhbm5lbDogY29kZSAweDA1IGxlbiA2IGlkIDB4MDIKQXVnICAz
-IDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My42MjQ4MTRdIGwyY2FwX2Nv
-bmZpZ19yc3A6IHNjaWQgMHgwMDQwIGZsYWdzIDB4MDAgcmVzdWx0IDB4MDAKQXVnICAzIDEx
-OjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My42MjQ4MTldIGwyY2FwX2NvbmZf
-cmZjX2dldDogY2hhbiBmZmZmODgwMTBlN2FlYzAwLCByc3AgZmZmZjg4MDAwYzAwNDAxYSwg
-bGVuIDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My42MjQ4
-MjVdIF9fbDJjYXBfc3RhdGVfY2hhbmdlOiBjaGFuIGZmZmY4ODAxMGU3YWVjMDAgQlRfQ09O
-RklHIC0+IEJUX0NPTk5FQ1RFRApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5l
-bDogWyA2MzQzLjYyNDgzMF0gbDJjYXBfY2hhbl9yZWFkeTogc2sgZmZmZjg4MDEwZTdhYzQw
-MCwgcGFyZW50IGZmZmY4ODAxMTAxMjEwMDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51
-eCBrZXJuZWw6IFsgNjM0My42MjQ4MzVdIF9fbDJjYXBfc3RhdGVfY2hhbmdlOiBjaGFuIGZm
-ZmY4ODAxMGU3YWVjMDAgQlRfQ09OTkVDVEVEIC0+IEJUX0NPTk5FQ1RFRApBdWcgIDMgMTE6
-MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjYyNDkxNl0gbDJjYXBfc29ja19h
-Y2NlcHQ6IHNrIGZmZmY4ODAxMTAxMjEwMDAgdGltZW8gOTIyMzM3MjAzNjg1NDc3NTgwNwpB
-dWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjYyNDkyMF0gbDJj
-YXBfc29ja19hY2NlcHQ6IG5ldyBzb2NrZXQgZmZmZjg4MDEwZTdhYzQwMApBdWcgIDMgMTE6
-MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjYyNDkyMV0gbDJjYXBfc29ja19n
-ZXRuYW1lOiBzb2NrIGZmZmY4ODAwYzFjZjA1MDAsIHNrIGZmZmY4ODAxMGU3YWM0MDAKQXVn
-ICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My42Mjk3ODhdIGwyY2Fw
-X3JlY3ZfYWNsZGF0YTogY29ubiBmZmZmODgwMDgxOTE0YTAwIGxlbiAxNyBmbGFncyAweDIK
-QXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My42Mjk3OTRdIGwy
-Y2FwX3JlY3ZfZnJhbWU6IGxlbiAxMywgY2lkIDB4MDA0MApBdWcgIDMgMTE6MDI6MzYgZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjYyOTc5OV0gbDJjYXBfZGF0YV9jaGFubmVsOiBj
-aGFuIGZmZmY4ODAxMGU3YWVjMDAsIGxlbiAxMwpBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxp
-bnV4IGtlcm5lbDogWyA2MzQzLjYyOTg0M10gbDJjYXBfc29ja19nZXRuYW1lOiBzb2NrIGZm
-ZmY4ODAwYzFjZjA1MDAsIHNrIGZmZmY4ODAxMGU3YWM0MDAKQXVnICAzIDExOjAyOjM2IGZk
-YW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My42Mjk4NTFdIGwyY2FwX3NvY2tfZ2V0c29ja29w
-dDogc2sgZmZmZjg4MDEwZTdhYzQwMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtl
-cm5lbDogWyA2MzQzLjYyOTg1NV0gbDJjYXBfc29ja19nZXRzb2Nrb3B0X29sZDogc2sgZmZm
-Zjg4MDEwZTdhYzQwMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2
-MzQzLjYyOTg2MF0gbDJjYXBfc29ja19nZXRuYW1lOiBzb2NrIGZmZmY4ODAwYzFjZjA1MDAs
-IHNrIGZmZmY4ODAxMGU3YWM0MDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJu
-ZWw6IFsgNjM0My42Mjk5MTZdIGwyY2FwX3NvY2tfc2VuZG1zZzogc29jayBmZmZmODgwMGMx
-Y2YwNTAwLCBzayBmZmZmODgwMTBlN2FjNDAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGlu
-dXgga2VybmVsOiBbIDYzNDMuNjI5OTIwXSBsMmNhcF9jcmVhdGVfYmFzaWNfcGR1OiBjaGFu
-IGZmZmY4ODAxMGU3YWVjMDAgbGVuIDE0CkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgg
-a2VybmVsOiBbIDYzNDMuNjI5OTI1XSBsMmNhcF9kb19zZW5kOiBjaGFuIGZmZmY4ODAxMGU3
-YWVjMDAsIHNrYiBmZmZmODgwMDNmOTBkNTAwIGxlbiAxOCBwcmlvcml0eSAwCkF1ZyAgMyAx
-MTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNjM1OTk0XSBsMmNhcF9yZWN2
-X2FjbGRhdGE6IGNvbm4gZmZmZjg4MDA4MTkxNGEwMCBsZW4gMjEgZmxhZ3MgMHgyCkF1ZyAg
-MyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNjM2MDAwXSBsMmNhcF9y
-ZWN2X2ZyYW1lOiBsZW4gMTcsIGNpZCAweDAwNDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1s
-aW51eCBrZXJuZWw6IFsgNjM0My42MzYwMDNdIGwyY2FwX2RhdGFfY2hhbm5lbDogY2hhbiBm
-ZmZmODgwMTBlN2FlYzAwLCBsZW4gMTcKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBr
-ZXJuZWw6IFsgNjM0My42MzYwNTFdIGwyY2FwX3NvY2tfZ2V0bmFtZTogc29jayBmZmZmODgw
-MGMxY2YwNTAwLCBzayBmZmZmODgwMTBlN2FjNDAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMt
-bGludXgga2VybmVsOiBbIDYzNDMuNjM2MDU2XSBsMmNhcF9zb2NrX2dldHNvY2tvcHQ6IHNr
-IGZmZmY4ODAxMGU3YWM0MDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6
-IFsgNjM0My42MzYwNThdIGwyY2FwX3NvY2tfZ2V0c29ja29wdF9vbGQ6IHNrIGZmZmY4ODAx
-MGU3YWM0MDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My42
-MzYwNjJdIGwyY2FwX3NvY2tfZ2V0bmFtZTogc29jayBmZmZmODgwMGMxY2YwNTAwLCBzayBm
-ZmZmODgwMTBlN2FjNDAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBb
-IDYzNDMuNjM2MDkzXSBsMmNhcF9zb2NrX3NlbmRtc2c6IHNvY2sgZmZmZjg4MDBjMWNmMDUw
-MCwgc2sgZmZmZjg4MDEwZTdhYzQwMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtl
-cm5lbDogWyA2MzQzLjYzNjA5N10gbDJjYXBfY3JlYXRlX2Jhc2ljX3BkdTogY2hhbiBmZmZm
-ODgwMTBlN2FlYzAwIGxlbiAyNwpBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5l
-bDogWyA2MzQzLjYzNjEwMl0gbDJjYXBfZG9fc2VuZDogY2hhbiBmZmZmODgwMTBlN2FlYzAw
-LCBza2IgZmZmZjg4MDA2MWM3MTcwMCBsZW4gMzEgcHJpb3JpdHkgMApBdWcgIDMgMTE6MDI6
-MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjY3MDg1N10gbDJjYXBfcmVjdl9hY2xk
-YXRhOiBjb25uIGZmZmY4ODAwODE5MTRhMDAgbGVuIDEyIGZsYWdzIDB4MgpBdWcgIDMgMTE6
-MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjY3MDg2M10gbDJjYXBfcmVjdl9m
-cmFtZTogbGVuIDgsIGNpZCAweDAwMDEKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBr
-ZXJuZWw6IFsgNjM0My42NzA4NjZdIGwyY2FwX3Jhd19yZWN2OiBjb25uIGZmZmY4ODAwODE5
-MTRhMDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My42NzA4
-NjhdIGwyY2FwX3NpZ19jaGFubmVsOiBjb2RlIDB4MDYgbGVuIDQgaWQgMHgwNApBdWcgIDMg
-MTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjY3MDg3MV0gbDJjYXBfZGlz
-Y29ubmVjdF9yZXE6IHNjaWQgMHgwMDQwIGRjaWQgMHgwMDQwCkF1ZyAgMyAxMTowMjozNiBm
-ZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNjcwODc0XSBsMmNhcF9idWlsZF9jbWQ6IGNv
-bm4gZmZmZjg4MDA4MTkxNGEwMCwgY29kZSAweDA3LCBpZGVudCAweDA0LCBsZW4gNApBdWcg
-IDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjY3MDg3N10gbDJjYXBf
-c2VuZF9jbWQ6IGNvZGUgMHgwNwpBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5l
-bDogWyA2MzQzLjY3MDg4Nl0gbDJjYXBfY2hhbl9kZWw6IGNoYW4gZmZmZjg4MDEwZTdhZWMw
-MCwgY29ubiBmZmZmODgwMDgxOTE0YTAwLCBlcnIgMTA0CkF1ZyAgMyAxMTowMjozNiBmZGFu
-aXMtbGludXgga2VybmVsOiBbIDYzNDMuNjcwODkyXSBfX2wyY2FwX3N0YXRlX2NoYW5nZTog
-Y2hhbiBmZmZmODgwMTBlN2FlYzAwIEJUX0NPTk5FQ1RFRCAtPiBCVF9DTE9TRUQKQXVnICAz
-IDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My42NzA5NjddIGwyY2FwX3Nv
-Y2tfcmVsZWFzZTogc29jayBmZmZmODgwMGMxY2YwNTAwLCBzayBmZmZmODgwMTBlN2FjNDAw
-CkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNjcwOTcwXSBs
-MmNhcF9zb2NrX3NodXRkb3duOiBzb2NrIGZmZmY4ODAwYzFjZjA1MDAsIHNrIGZmZmY4ODAx
-MGU3YWM0MDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My42
-NzA5NzNdIGwyY2FwX3NvY2tfa2lsbDogc2sgZmZmZjg4MDEwZTdhYzQwMCBzdGF0ZSBCVF9D
-TE9TRUQKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My42NzA5
-NzZdIGwyY2FwX3NvY2tfZGVzdHJ1Y3Q6IHNrIGZmZmY4ODAxMGU3YWM0MDAKQXVnICAzIDEx
-OjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43MTcwMDZdIGwyY2FwX3JlY3Zf
-YWNsZGF0YTogY29ubiBmZmZmODgwMDgxOTE0YTAwIGxlbiAxMiBmbGFncyAweDIKQXVnICAz
-IDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43MTcwMTNdIGwyY2FwX3Jl
-Y3ZfZnJhbWU6IGxlbiA4LCBjaWQgMHgwMDAxCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGlu
-dXgga2VybmVsOiBbIDYzNDMuNzE3MDE3XSBsMmNhcF9yYXdfcmVjdjogY29ubiBmZmZmODgw
-MDgxOTE0YTAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMu
-NzE3MDIxXSBsMmNhcF9zaWdfY2hhbm5lbDogY29kZSAweDAyIGxlbiA0IGlkIDB4MDUKQXVn
-ICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43MTcwMjVdIGwyY2Fw
-X2Nvbm5lY3RfcmVxOiBwc20gMHgwMyBzY2lkIDB4MDA0MQpBdWcgIDMgMTE6MDI6MzYgZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjcxNzAzNV0gbDJjYXBfY2hhbl9jcmVhdGU6IHNr
-IGZmZmY4ODAxMGU3YWVjMDAgY2hhbiBmZmZmODgwMTBlN2E5MDAwCkF1ZyAgMyAxMTowMjoz
-NiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNzE3MDM5XSBsMmNhcF9zb2NrX2luaXQ6
-IHNrIGZmZmY4ODAxMGU3YWVjMDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJu
-ZWw6IFsgNjM0My43MTcwNDRdIF9fbDJjYXBfY2hhbl9hZGQ6IGNvbm4gZmZmZjg4MDA4MTkx
-NGEwMCwgcHNtIDB4MDMsIGRjaWQgMHgwMDQxCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGlu
-dXgga2VybmVsOiBbIDYzNDMuNzE3MDUxXSBfX2wyY2FwX3N0YXRlX2NoYW5nZTogY2hhbiBm
-ZmZmODgwMTBlN2E5MDAwIEJUX09QRU4gLT4gQlRfQ09ORklHCkF1ZyAgMyAxMTowMjozNiBm
-ZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNzE3MDU2XSBsMmNhcF9idWlsZF9jbWQ6IGNv
-bm4gZmZmZjg4MDA4MTkxNGEwMCwgY29kZSAweDAzLCBpZGVudCAweDA1LCBsZW4gOApBdWcg
-IDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjcxNzA2MF0gbDJjYXBf
-c2VuZF9jbWQ6IGNvZGUgMHgwMwpBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5l
-bDogWyA2MzQzLjcxNzA2N10gbDJjYXBfYnVpbGRfY29uZl9yZXE6IGNoYW4gZmZmZjg4MDEw
-ZTdhOTAwMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjcx
-NzA3M10gbDJjYXBfYWRkX2NvbmZfb3B0OiB0eXBlIDB4MDEgbGVuIDIgdmFsIDB4M2Y1CkF1
-ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNzE3MDc4XSBsMmNh
-cF9idWlsZF9jbWQ6IGNvbm4gZmZmZjg4MDA4MTkxNGEwMCwgY29kZSAweDA0LCBpZGVudCAw
-eDAzLCBsZW4gOApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQz
-LjcxNzA4NF0gbDJjYXBfc2VuZF9jbWQ6IGNvZGUgMHgwNApBdWcgIDMgMTE6MDI6MzYgZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjcyMzIxN10gbDJjYXBfcmVjdl9hY2xkYXRhOiBj
-b25uIGZmZmY4ODAwODE5MTRhMDAgbGVuIDE2IGZsYWdzIDB4MgpBdWcgIDMgMTE6MDI6MzYg
-ZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjcyMzIyMl0gbDJjYXBfcmVjdl9mcmFtZTog
-bGVuIDEyLCBjaWQgMHgwMDAxCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVs
-OiBbIDYzNDMuNzIzMjI2XSBsMmNhcF9yYXdfcmVjdjogY29ubiBmZmZmODgwMDgxOTE0YTAw
-CkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNzIzMjI5XSBs
-MmNhcF9zaWdfY2hhbm5lbDogY29kZSAweDA0IGxlbiA4IGlkIDB4MDYKQXVnICAzIDExOjAy
-OjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43MjMyMzNdIGwyY2FwX2NvbmZpZ19y
-ZXE6IGRjaWQgMHgwMDQwIGZsYWdzIDB4MDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51
-eCBrZXJuZWw6IFsgNjM0My43MjMyMzddIGwyY2FwX3BhcnNlX2NvbmZfcmVxOiBjaGFuIGZm
-ZmY4ODAxMGU3YTkwMDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsg
-NjM0My43MjMyNDFdIGwyY2FwX2dldF9jb25mX29wdDogdHlwZSAweDAxIGxlbiAyIHZhbCAw
-eDIwMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjcyMzI0
-NF0gbDJjYXBfYWRkX2NvbmZfb3B0OiB0eXBlIDB4MDEgbGVuIDIgdmFsIDB4MjAwCkF1ZyAg
-MyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNzIzMjQ4XSBsMmNhcF9i
-dWlsZF9jbWQ6IGNvbm4gZmZmZjg4MDA4MTkxNGEwMCwgY29kZSAweDA1LCBpZGVudCAweDA2
-LCBsZW4gMTAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43
-MjMyNTJdIGwyY2FwX3NlbmRfY21kOiBjb2RlIDB4MDUKQXVnICAzIDExOjAyOjM2IGZkYW5p
-cy1saW51eCBrZXJuZWw6IFsgNjM0My43MjQ1NTFdIGwyY2FwX3JlY3ZfYWNsZGF0YTogY29u
-biBmZmZmODgwMDgxOTE0YTAwIGxlbiAxNCBmbGFncyAweDIKQXVnICAzIDExOjAyOjM2IGZk
-YW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43MjQ1NTddIGwyY2FwX3JlY3ZfZnJhbWU6IGxl
-biAxMCwgY2lkIDB4MDAwMQpBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzQzLjcyNDU2MF0gbDJjYXBfcmF3X3JlY3Y6IGNvbm4gZmZmZjg4MDA4MTkxNGEwMApB
-dWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjcyNDU2NF0gbDJj
-YXBfc2lnX2NoYW5uZWw6IGNvZGUgMHgwNSBsZW4gNiBpZCAweDAzCkF1ZyAgMyAxMTowMjoz
-NiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNzI0NTY5XSBsMmNhcF9jb25maWdfcnNw
-OiBzY2lkIDB4MDA0MCBmbGFncyAweDAwIHJlc3VsdCAweDAwCkF1ZyAgMyAxMTowMjozNiBm
-ZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNzI0NTc0XSBsMmNhcF9jb25mX3JmY19nZXQ6
-IGNoYW4gZmZmZjg4MDEwZTdhOTAwMCwgcnNwIGZmZmY4ODAwMGMwMDQ4MWEsIGxlbiAwCkF1
-ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNzI0NTc5XSBfX2wy
-Y2FwX3N0YXRlX2NoYW5nZTogY2hhbiBmZmZmODgwMTBlN2E5MDAwIEJUX0NPTkZJRyAtPiBC
-VF9DT05ORUNURUQKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0
-My43MjQ1ODVdIGwyY2FwX2NoYW5fcmVhZHk6IHNrIGZmZmY4ODAxMGU3YWVjMDAsIHBhcmVu
-dCBmZmZmODgwMTBlN2E4NDAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVs
-OiBbIDYzNDMuNzI0NTg5XSBfX2wyY2FwX3N0YXRlX2NoYW5nZTogY2hhbiBmZmZmODgwMTBl
-N2E5MDAwIEJUX0NPTk5FQ1RFRCAtPiBCVF9DT05ORUNURUQKQXVnICAzIDExOjAyOjM2IGZk
-YW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43MjQ1OTVdIHJmY29tbV9sMmRhdGFfcmVhZHk6
-IGZmZmY4ODAxMGU3YTg0MDAgYnl0ZXMgMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4
-IGtlcm5lbDogWyA2MzQzLjcyNDYxNl0gcmZjb21tX2FjY2VwdF9jb25uZWN0aW9uOiBzZXNz
-aW9uIGZmZmY4ODAxMTAxYzIxODAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJu
-ZWw6IFsgNjM0My43MjQ2MjhdIGwyY2FwX3NvY2tfYWNjZXB0OiBzayBmZmZmODgwMTBlN2E4
-NDAwIHRpbWVvIDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0
-My43MjQ2MzVdIGwyY2FwX3NvY2tfYWNjZXB0OiBuZXcgc29ja2V0IGZmZmY4ODAxMGU3YWVj
-MDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43MjQ2NDBd
-IHJmY29tbV9zZXNzaW9uX2FkZDogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIHNvY2sgZmZm
-Zjg4MDBjNzc5MjgwMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2
-MzQzLjcyNDY0OV0gcmZjb21tX3Byb2Nlc3Nfcng6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAw
-MCBzdGF0ZSAyIHFsZW4gMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzQzLjcyNDY1NF0gcmZjb21tX3Byb2Nlc3NfZGxjczogc2Vzc2lvbiBmZmZmODgwMTEw
-YjcyMDAwIHN0YXRlIDIKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsg
-NjM0My43Mjk1OTFdIGwyY2FwX3JlY3ZfYWNsZGF0YTogY29ubiBmZmZmODgwMDgxOTE0YTAw
-IGxlbiA4IGZsYWdzIDB4MgpBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzQzLjcyOTU5Nl0gbDJjYXBfcmVjdl9mcmFtZTogbGVuIDQsIGNpZCAweDAwNDAKQXVn
-ICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43Mjk1OTldIGwyY2Fw
-X2RhdGFfY2hhbm5lbDogY2hhbiBmZmZmODgwMTBlN2E5MDAwLCBsZW4gNApBdWcgIDMgMTE6
-MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjcyOTYwM10gcmZjb21tX2wyZGF0
-YV9yZWFkeTogZmZmZjg4MDEwZTdhZWMwMCBieXRlcyA0CkF1ZyAgMyAxMTowMjozNiBmZGFu
-aXMtbGludXgga2VybmVsOiBbIDYzNDMuNzI5NjM3XSByZmNvbW1fcHJvY2Vzc19yeDogc2Vz
-c2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDIgcWxlbiAxCkF1ZyAgMyAxMTowMjozNiBm
-ZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNzI5NjQxXSByZmNvbW1fcmVjdl9zYWJtOiBz
-ZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMiBkbGNpIDAKQXVnICAzIDExOjAyOjM2
-IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43Mjk2NDNdIHJmY29tbV9zZW5kX3VhOiBm
-ZmZmODgwMTEwYjcyMDAwIGRsY2kgMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtl
-cm5lbDogWyA2MzQzLjcyOTY0Nl0gcmZjb21tX3NlbmRfY21kOiBmZmZmODgwMTEwYjcyMDAw
-IGNtZCAxMTUKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43
-Mjk2NDhdIHJmY29tbV9zZW5kX2ZyYW1lOiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgbGVu
-IDQKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43Mjk2NTFd
-IGwyY2FwX3NvY2tfc2VuZG1zZzogc29jayBmZmZmODgwMGM3NzkyODAwLCBzayBmZmZmODgw
-MTBlN2FlYzAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMu
-NzI5NjU0XSBsMmNhcF9jcmVhdGVfYmFzaWNfcGR1OiBjaGFuIGZmZmY4ODAxMGU3YTkwMDAg
-bGVuIDQKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43Mjk2
-NThdIGwyY2FwX2RvX3NlbmQ6IGNoYW4gZmZmZjg4MDEwZTdhOTAwMCwgc2tiIGZmZmY4ODAw
-YzM5NTk2MDAgbGVuIDggcHJpb3JpdHkgMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4
-IGtlcm5lbDogWyA2MzQzLjcyOTY2M10gcmZjb21tX3Byb2Nlc3NfY29ubmVjdDogc2Vzc2lv
-biBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51
-eCBrZXJuZWw6IFsgNjM0My43Mjk2NjddIHJmY29tbV9wcm9jZXNzX2RsY3M6IHNlc3Npb24g
-ZmZmZjg4MDExMGI3MjAwMCBzdGF0ZSAxCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgg
-a2VybmVsOiBbIDYzNDMuNzM1Nzk2XSBsMmNhcF9yZWN2X2FjbGRhdGE6IGNvbm4gZmZmZjg4
-MDA4MTkxNGEwMCBsZW4gMTkgZmxhZ3MgMHgyCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGlu
-dXgga2VybmVsOiBbIDYzNDMuNzM1ODAzXSBsMmNhcF9yZWN2X2ZyYW1lOiBsZW4gMTUsIGNp
-ZCAweDAwNDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43
-MzU4MDZdIGwyY2FwX2RhdGFfY2hhbm5lbDogY2hhbiBmZmZmODgwMTBlN2E5MDAwLCBsZW4g
-MTUKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43MzU4MTFd
-IHJmY29tbV9sMmRhdGFfcmVhZHk6IGZmZmY4ODAxMGU3YWVjMDAgYnl0ZXMgMTUKQXVnICAz
-IDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43MzU4MjFdIHJmY29tbV9w
-cm9jZXNzX3J4OiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMSBxbGVuIDEKQXVn
-ICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43MzU4MjRdIHJmY29t
-bV9yZWN2X21jYzogZmZmZjg4MDExMGI3MjAwMCB0eXBlIDB4MjAgY3IgMgpBdWcgIDMgMTE6
-MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjczNTgyN10gcmZjb21tX3JlY3Zf
-cG46IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBzdGF0ZSAxIGRsY2kgMjYKQXVnICAzIDEx
-OjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43MzU4MzBdIHJmY29tbV9jb25u
-ZWN0X2luZDogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIGNoYW5uZWwgMTMKQXVnICAzIDEx
-OjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43MzU4MzhdIHJmY29tbV9kbGNf
-Y2xlYXJfc3RhdGU6IGZmZmY4ODAwYzM5NTlhMDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1s
-aW51eCBrZXJuZWw6IFsgNjM0My43MzU4NDFdIHJmY29tbV9kbGNfYWxsb2M6IGZmZmY4ODAw
-YzM5NTlhMDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43
-MzU4NDRdIHJmY29tbV9zb2NrX2FsbG9jOiBzayBmZmZmODgwMTBlN2FkNDAwCkF1ZyAgMyAx
-MTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNzM1ODQ2XSByZmNvbW1fc29j
-a19pbml0OiBzayBmZmZmODgwMTBlN2FkNDAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGlu
-dXgga2VybmVsOiBbIDYzNDMuNzM1ODU3XSByZmNvbW1fZGxjX2xpbms6IGRsYyBmZmZmODgw
-MGMzOTU5YTAwIHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMApBdWcgIDMgMTE6MDI6MzYgZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjczNTg1OV0gcmZjb21tX3Nlc3Npb25fY2xlYXJf
-dGltZXI6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBzdGF0ZSAxCkF1ZyAgMyAxMTowMjoz
-NiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNzM1ODYyXSByZmNvbW1fYXBwbHlfcG46
-IGRsYyBmZmZmODgwMGMzOTU5YTAwIHN0YXRlIDIgZGxjaSAyNiBtdHUgNDAwIGZjIDB4ZjAg
-Y3JlZGl0cyA3CkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMu
-NzM1ODY1XSByZmNvbW1fc2VuZF9wbjogZmZmZjg4MDExMGI3MjAwMCBjciAwIGRsY2kgMjYg
-bXR1IDQwMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjcz
-NTg2N10gcmZjb21tX3NlbmRfZnJhbWU6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBsZW4g
-MTQKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43MzU4NzFd
-IGwyY2FwX3NvY2tfc2VuZG1zZzogc29jayBmZmZmODgwMGM3NzkyODAwLCBzayBmZmZmODgw
-MTBlN2FlYzAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMu
-NzM1ODc0XSBsMmNhcF9jcmVhdGVfYmFzaWNfcGR1OiBjaGFuIGZmZmY4ODAxMGU3YTkwMDAg
-bGVuIDE0CkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNzM1
-ODgwXSBsMmNhcF9kb19zZW5kOiBjaGFuIGZmZmY4ODAxMGU3YTkwMDAsIHNrYiBmZmZmODgw
-MGMzOTU5YzAwIGxlbiAxOCBwcmlvcml0eSAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGlu
-dXgga2VybmVsOiBbIDYzNDMuNzM1ODg3XSByZmNvbW1fcHJvY2Vzc19kbGNzOiBzZXNzaW9u
-IGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMQpBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4
-IGtlcm5lbDogWyA2MzQzLjc0MzE3M10gbDJjYXBfcmVjdl9hY2xkYXRhOiBjb25uIGZmZmY4
-ODAwODE5MTRhMDAgbGVuIDggZmxhZ3MgMHgyCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGlu
-dXgga2VybmVsOiBbIDYzNDMuNzQzMTc4XSBsMmNhcF9yZWN2X2ZyYW1lOiBsZW4gNCwgY2lk
-IDB4MDA0MApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjc0
-MzE4Ml0gbDJjYXBfZGF0YV9jaGFubmVsOiBjaGFuIGZmZmY4ODAxMGU3YTkwMDAsIGxlbiA0
-CkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuNzQzMTg2XSBy
-ZmNvbW1fbDJkYXRhX3JlYWR5OiBmZmZmODgwMTBlN2FlYzAwIGJ5dGVzIDQKQXVnICAzIDEx
-OjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43NDMyMDBdIHJmY29tbV9wcm9j
-ZXNzX3J4OiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMSBxbGVuIDEKQXVnICAz
-IDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43NDMyMDddIHJmY29tbV9y
-ZWN2X3NhYm06IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBzdGF0ZSAxIGRsY2kgMjYKQXVn
-ICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My43NDMyMThdIHJmY29t
-bV9kbGNfc2V0X3RpbWVyOiBkbGMgZmZmZjg4MDBjMzk1OWEwMCBzdGF0ZSAyIHRpbWVvdXQg
-NjI1MApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjc0MzIy
-NV0gcmZjb21tX3Byb2Nlc3NfZGxjczogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRl
-IDEKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My45MTY4NTJd
-IGwyY2FwX3NlY3VyaXR5X2NmbTogY29ubiBmZmZmODgwMDgxOTE0YTAwCkF1ZyAgMyAxMTow
-MjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTE2ODU4XSBsMmNhcF9zZWN1cml0
-eV9jZm06IGNoYW4tPnNjaWQgNjQKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJu
-ZWw6IFsgNjM0My45MTY4NjRdIHJmY29tbV9sMnN0YXRlX2NoYW5nZTogZmZmZjg4MDEwZTdh
-ZWMwMCBzdGF0ZSAxCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYz
-NDMuOTE2ODcyXSByZmNvbW1fc2VjdXJpdHlfY2ZtOiBjb25uIGZmZmY4ODAwMGMwMDY4MDAg
-c3RhdHVzIDB4MDAgZW5jcnlwdCAweDAxCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgg
-a2VybmVsOiBbIDYzNDMuOTE2ODgxXSByZmNvbW1fcHJvY2Vzc19yeDogc2Vzc2lvbiBmZmZm
-ODgwMTEwYjcyMDAwIHN0YXRlIDEgcWxlbiAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGlu
-dXgga2VybmVsOiBbIDYzNDMuOTE2ODg3XSByZmNvbW1fcHJvY2Vzc19kbGNzOiBzZXNzaW9u
-IGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMQpBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4
-IGtlcm5lbDogWyA2MzQzLjkxNjg5M10gcmZjb21tX2RsY19jbGVhcl90aW1lcjogZGxjIGZm
-ZmY4ODAwYzM5NTlhMDAgc3RhdGUgMgpBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtl
-cm5lbDogWyA2MzQzLjkxNjg5N10gcmZjb21tX2RsY19zZXRfdGltZXI6IGRsYyBmZmZmODgw
-MGMzOTU5YTAwIHN0YXRlIDIgdGltZW91dCA2MjUwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMt
-bGludXgga2VybmVsOiBbIDYzNDMuOTE2OTAyXSByZmNvbW1fc2tfc3RhdGVfY2hhbmdlOiBk
-bGMgZmZmZjg4MDBjMzk1OWEwMCBzdGF0ZSA2IGVyciAwCkF1ZyAgMyAxMTowMjozNiBmZGFu
-aXMtbGludXgga2VybmVsOiBbIDYzNDMuOTE2OTE0XSByZmNvbW1fcHJvY2Vzc19yeDogc2Vz
-c2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEgcWxlbiAwCkF1ZyAgMyAxMTowMjozNiBm
-ZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTE2OTIwXSByZmNvbW1fcHJvY2Vzc19kbGNz
-OiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMQpBdWcgIDMgMTE6MDI6MzYgZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjkxNjk0NV0gcmZjb21tX3NvY2tfYWNjZXB0OiBz
-ayBmZmZmODgwMTBkYTVmYzAwIHRpbWVvIDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51
-eCBrZXJuZWw6IFsgNjM0My45MTY5NTJdIHJmY29tbV9zb2NrX2FjY2VwdDogbmV3IHNvY2tl
-dCBmZmZmODgwMTBlN2FkNDAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVs
-OiBbIDYzNDMuOTE2OTczXSByZmNvbW1fc29ja19nZXRuYW1lOiBzb2NrIGZmZmY4ODAwMGYy
-MDRhMDAsIHNrIGZmZmY4ODAxMGU3YWQ0MDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51
-eCBrZXJuZWw6IFsgNjM0My45MTY5NzZdIHJmY29tbV9zb2NrX2dldG5hbWU6IHNvY2sgZmZm
-Zjg4MDAwZjIwNGEwMCwgc2sgZmZmZjg4MDEwZTdhZDQwMApBdWcgIDMgMTE6MDI6MzYgZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjkxNzE0OF0gcmZjb21tX2RsY19hY2NlcHQ6IGRs
-YyBmZmZmODgwMGMzOTU5YTAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVs
-OiBbIDYzNDMuOTE3MTUxXSByZmNvbW1fc2VuZF91YTogZmZmZjg4MDExMGI3MjAwMCBkbGNp
-IDI2CkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTE3MTUz
-XSByZmNvbW1fc2VuZF9jbWQ6IGZmZmY4ODAxMTBiNzIwMDAgY21kIDExNQpBdWcgIDMgMTE6
-MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjkxNzE1NF0gcmZjb21tX3NlbmRf
-ZnJhbWU6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBsZW4gNApBdWcgIDMgMTE6MDI6MzYg
-ZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjkxNzE1N10gbDJjYXBfc29ja19zZW5kbXNn
-OiBzb2NrIGZmZmY4ODAwYzc3OTI4MDAsIHNrIGZmZmY4ODAxMGU3YWVjMDAKQXVnICAzIDEx
-OjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My45MTcxNjBdIGwyY2FwX2NyZWF0
-ZV9iYXNpY19wZHU6IGNoYW4gZmZmZjg4MDEwZTdhOTAwMCBsZW4gNApBdWcgIDMgMTE6MDI6
-MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjkxNzE2NF0gbDJjYXBfZG9fc2VuZDog
-Y2hhbiBmZmZmODgwMTBlN2E5MDAwLCBza2IgZmZmZjg4MDBjMzk1OTYwMCBsZW4gOCBwcmlv
-cml0eSAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTE3
-MTY5XSByZmNvbW1fZGxjX2NsZWFyX3RpbWVyOiBkbGMgZmZmZjg4MDBjMzk1OWEwMCBzdGF0
-ZSA2CkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTE3MTcx
-XSByZmNvbW1fc2tfc3RhdGVfY2hhbmdlOiBkbGMgZmZmZjg4MDBjMzk1OWEwMCBzdGF0ZSAx
-IGVyciAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTE3
-MTc1XSByZmNvbW1fc2VuZF9tc2M6IGZmZmY4ODAxMTBiNzIwMDAgY3IgMSB2MjQgMHg4YwpB
-dWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjkxNzE3N10gcmZj
-b21tX3NlbmRfZnJhbWU6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBsZW4gOApBdWcgIDMg
-MTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjkxNzE3OV0gbDJjYXBfc29j
-a19zZW5kbXNnOiBzb2NrIGZmZmY4ODAwYzc3OTI4MDAsIHNrIGZmZmY4ODAxMGU3YWVjMDAK
-QXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My45MTcxODFdIGwy
-Y2FwX2NyZWF0ZV9iYXNpY19wZHU6IGNoYW4gZmZmZjg4MDEwZTdhOTAwMCBsZW4gOApBdWcg
-IDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjkxNzE4NF0gbDJjYXBf
-ZG9fc2VuZDogY2hhbiBmZmZmODgwMTBlN2E5MDAwLCBza2IgZmZmZjg4MDBjMzk1OTIwMCBs
-ZW4gMTIgcHJpb3JpdHkgMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzQzLjkyMzk2N10gbDJjYXBfcmVjdl9hY2xkYXRhOiBjb25uIGZmZmY4ODAwODE5MTRh
-MDAgbGVuIDEzIGZsYWdzIDB4MgpBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5l
-bDogWyA2MzQzLjkyMzk3M10gbDJjYXBfcmVjdl9mcmFtZTogbGVuIDksIGNpZCAweDAwNDAK
-QXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My45MjM5NzddIGwy
-Y2FwX2RhdGFfY2hhbm5lbDogY2hhbiBmZmZmODgwMTBlN2E5MDAwLCBsZW4gOQpBdWcgIDMg
-MTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjkyMzk4Ml0gcmZjb21tX2wy
-ZGF0YV9yZWFkeTogZmZmZjg4MDEwZTdhZWMwMCBieXRlcyA5CkF1ZyAgMyAxMTowMjozNiBm
-ZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTIzOTk2XSByZmNvbW1fcHJvY2Vzc19yeDog
-c2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEgcWxlbiAxCkF1ZyAgMyAxMTowMjoz
-NiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTI0MDAzXSByZmNvbW1fcmVjdl9tY2M6
-IGZmZmY4ODAxMTBiNzIwMDAgdHlwZSAweDM4IGNyIDIKQXVnICAzIDExOjAyOjM2IGZkYW5p
-cy1saW51eCBrZXJuZWw6IFsgNjM0My45MjQwMDddIHJmY29tbV9yZWN2X21zYzogZGxjaSAy
-NiBjciAyIHYyNCAweDhkCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBb
-IDYzNDMuOTI0MDExXSByZmNvbW1fc2VuZF9tc2M6IGZmZmY4ODAxMTBiNzIwMDAgY3IgMCB2
-MjQgMHg4ZApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjky
-NDAxNF0gcmZjb21tX3NlbmRfZnJhbWU6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBsZW4g
-OApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjkyNDAxOF0g
-bDJjYXBfc29ja19zZW5kbXNnOiBzb2NrIGZmZmY4ODAwYzc3OTI4MDAsIHNrIGZmZmY4ODAx
-MGU3YWVjMDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My45
-MjQwMjJdIGwyY2FwX2NyZWF0ZV9iYXNpY19wZHU6IGNoYW4gZmZmZjg4MDEwZTdhOTAwMCBs
-ZW4gOApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjkyNDAy
-OF0gbDJjYXBfZG9fc2VuZDogY2hhbiBmZmZmODgwMTBlN2E5MDAwLCBza2IgZmZmZjg4MDAz
-ZjkwYzgwMCBsZW4gMTIgcHJpb3JpdHkgMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4
-IGtlcm5lbDogWyA2MzQzLjkyNDA0MF0gcmZjb21tX3Byb2Nlc3NfZGxjczogc2Vzc2lvbiBm
-ZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBr
-ZXJuZWw6IFsgNjM0My45MjUxOTRdIGwyY2FwX3JlY3ZfYWNsZGF0YTogY29ubiBmZmZmODgw
-MDgxOTE0YTAwIGxlbiAxMyBmbGFncyAweDIKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51
-eCBrZXJuZWw6IFsgNjM0My45MjUyMDFdIGwyY2FwX3JlY3ZfZnJhbWU6IGxlbiA5LCBjaWQg
-MHgwMDQwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTI1
-MjA3XSBsMmNhcF9kYXRhX2NoYW5uZWw6IGNoYW4gZmZmZjg4MDEwZTdhOTAwMCwgbGVuIDkK
-QXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My45MjUyMTVdIHJm
-Y29tbV9sMmRhdGFfcmVhZHk6IGZmZmY4ODAxMGU3YWVjMDAgYnl0ZXMgOQpBdWcgIDMgMTE6
-MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjkyNTI1OV0gcmZjb21tX3Byb2Nl
-c3Nfcng6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBzdGF0ZSAxIHFsZW4gMQpBdWcgIDMg
-MTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjkyNTI2Ml0gcmZjb21tX3Jl
-Y3ZfbWNjOiBmZmZmODgwMTEwYjcyMDAwIHR5cGUgMHgzOCBjciAwCkF1ZyAgMyAxMTowMjoz
-NiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTI1MjYzXSByZmNvbW1fcmVjdl9tc2M6
-IGRsY2kgMjYgY3IgMCB2MjQgMHg4ZApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtl
-cm5lbDogWyA2MzQzLjkyNTI2Nl0gcmZjb21tX3Byb2Nlc3NfZGxjczogc2Vzc2lvbiBmZmZm
-ODgwMTEwYjcyMDAwIHN0YXRlIDEKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJu
-ZWw6IFsgNjM0My45MjUyNjhdIHJmY29tbV9wcm9jZXNzX3R4OiBkbGMgZmZmZjg4MDBjMzk1
-OWEwMCBzdGF0ZSAxIGNmYyA0MCByeF9jcmVkaXRzIDcgdHhfY3JlZGl0cyA3CkF1ZyAgMyAx
-MTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTI1MjcwXSByZmNvbW1fc2Vu
-ZF9jcmVkaXRzOiBmZmZmODgwMTEwYjcyMDAwIGFkZHIgMTA1IGNyZWRpdHMgMzMKQXVnICAz
-IDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My45MjUyNzFdIHJmY29tbV9z
-ZW5kX2ZyYW1lOiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgbGVuIDUKQXVnICAzIDExOjAy
-OjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My45MjUyNzNdIGwyY2FwX3NvY2tfc2Vu
-ZG1zZzogc29jayBmZmZmODgwMGM3NzkyODAwLCBzayBmZmZmODgwMTBlN2FlYzAwCkF1ZyAg
-MyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTI1Mjc1XSBsMmNhcF9j
-cmVhdGVfYmFzaWNfcGR1OiBjaGFuIGZmZmY4ODAxMGU3YTkwMDAgbGVuIDUKQXVnICAzIDEx
-OjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My45MjUyNzhdIGwyY2FwX2RvX3Nl
-bmQ6IGNoYW4gZmZmZjg4MDEwZTdhOTAwMCwgc2tiIGZmZmY4ODAwM2Y5MGNlMDAgbGVuIDkg
-cHJpb3JpdHkgMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQz
-LjkzNDA3MF0gbDJjYXBfcmVjdl9hY2xkYXRhOiBjb25uIGZmZmY4ODAwODE5MTRhMDAgbGVu
-IDIxIGZsYWdzIDB4MgpBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2
-MzQzLjkzNDA3N10gbDJjYXBfcmVjdl9mcmFtZTogbGVuIDE3LCBjaWQgMHgwMDQwCkF1ZyAg
-MyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTM0MDgyXSBsMmNhcF9k
-YXRhX2NoYW5uZWw6IGNoYW4gZmZmZjg4MDEwZTdhOTAwMCwgbGVuIDE3CkF1ZyAgMyAxMTow
-MjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTM0MDg5XSByZmNvbW1fbDJkYXRh
-X3JlYWR5OiBmZmZmODgwMTBlN2FlYzAwIGJ5dGVzIDE3CkF1ZyAgMyAxMTowMjozNiBmZGFu
-aXMtbGludXgga2VybmVsOiBbIDYzNDMuOTM0MTA4XSByZmNvbW1fcHJvY2Vzc19yeDogc2Vz
-c2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEgcWxlbiAxCkF1ZyAgMyAxMTowMjozNiBm
-ZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTM0MTE2XSByZmNvbW1fcmVjdl9kYXRhOiBz
-ZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMSBkbGNpIDI2IHBmIDE2CkF1ZyAgMyAx
-MTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTM0MTMyXSByZmNvbW1fcHJv
-Y2Vzc19kbGNzOiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMQpBdWcgIDMgMTE6
-MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjkzNDEzOV0gcmZjb21tX3Byb2Nl
-c3NfdHg6IGRsYyBmZmZmODgwMGMzOTU5YTAwIHN0YXRlIDEgY2ZjIDQwIHJ4X2NyZWRpdHMg
-MzkgdHhfY3JlZGl0cyAxNQpBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzQzLjkzNDE5OF0gcmZjb21tX3NvY2tfc2VuZG1zZzogc29jayBmZmZmODgwMDBmMjA0
-YTAwLCBzayBmZmZmODgwMTBlN2FkNDAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgg
-a2VybmVsOiBbIDYzNDMuOTM0MjAxXSByZmNvbW1fZGxjX3NlbmQ6IGRsYyBmZmZmODgwMGMz
-OTU5YTAwIG10dSA0MDAgbGVuIDE0CkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2Vy
-bmVsOiBbIDYzNDMuOTM0MjA2XSByZmNvbW1fc29ja19zZW5kbXNnOiBzb2NrIGZmZmY4ODAw
-MGYyMDRhMDAsIHNrIGZmZmY4ODAxMGU3YWQ0MDAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1s
-aW51eCBrZXJuZWw6IFsgNjM0My45MzQyMDldIHJmY29tbV9wcm9jZXNzX3J4OiBzZXNzaW9u
-IGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMSBxbGVuIDAKQXVnICAzIDExOjAyOjM2IGZkYW5p
-cy1saW51eCBrZXJuZWw6IFsgNjM0My45MzQyMTFdIHJmY29tbV9kbGNfc2VuZDogZGxjIGZm
-ZmY4ODAwYzM5NTlhMDAgbXR1IDQwMCBsZW4gNgpBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxp
-bnV4IGtlcm5lbDogWyA2MzQzLjkzNDIxM10gcmZjb21tX3Byb2Nlc3NfZGxjczogc2Vzc2lv
-biBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51
-eCBrZXJuZWw6IFsgNjM0My45MzQyMTZdIHJmY29tbV9wcm9jZXNzX3R4OiBkbGMgZmZmZjg4
-MDBjMzk1OWEwMCBzdGF0ZSAxIGNmYyA0MCByeF9jcmVkaXRzIDM5IHR4X2NyZWRpdHMgMTUK
-QXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0My45MzQyMTldIHJm
-Y29tbV9zZW5kX2ZyYW1lOiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgbGVuIDE4CkF1ZyAg
-MyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTM0MjIyXSBsMmNhcF9z
-b2NrX3NlbmRtc2c6IHNvY2sgZmZmZjg4MDBjNzc5MjgwMCwgc2sgZmZmZjg4MDEwZTdhZWMw
-MApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjkzNDIyNV0g
-bDJjYXBfY3JlYXRlX2Jhc2ljX3BkdTogY2hhbiBmZmZmODgwMTBlN2E5MDAwIGxlbiAxOApB
-dWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjkzNDIzMF0gbDJj
-YXBfZG9fc2VuZDogY2hhbiBmZmZmODgwMTBlN2E5MDAwLCBza2IgZmZmZjg4MDAzZjkwY2Qw
-MCBsZW4gMjIgcHJpb3JpdHkgMApBdWcgIDMgMTE6MDI6MzYgZmRhbmlzLWxpbnV4IGtlcm5l
-bDogWyA2MzQzLjkzNDIzNV0gcmZjb21tX3NlbmRfZnJhbWU6IHNlc3Npb24gZmZmZjg4MDEx
-MGI3MjAwMCBsZW4gMTAKQXVnICAzIDExOjAyOjM2IGZkYW5pcy1saW51eCBrZXJuZWw6IFsg
-NjM0My45MzQyMzhdIGwyY2FwX3NvY2tfc2VuZG1zZzogc29jayBmZmZmODgwMGM3NzkyODAw
-LCBzayBmZmZmODgwMTBlN2FlYzAwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2Vy
-bmVsOiBbIDYzNDMuOTM0MjQwXSBsMmNhcF9jcmVhdGVfYmFzaWNfcGR1OiBjaGFuIGZmZmY4
-ODAxMGU3YTkwMDAgbGVuIDEwCkF1ZyAgMyAxMTowMjozNiBmZGFuaXMtbGludXgga2VybmVs
-OiBbIDYzNDMuOTM0MjQzXSBsMmNhcF9kb19zZW5kOiBjaGFuIGZmZmY4ODAxMGU3YTkwMDAs
-IHNrYiBmZmZmODgwMDNmOTBkMzAwIGxlbiAxNCBwcmlvcml0eSAwCkF1ZyAgMyAxMTowMjoz
-NiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTM0MjQ5XSByZmNvbW1fcHJvY2Vzc19y
-eDogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEgcWxlbiAwCkF1ZyAgMyAxMTow
-MjozNiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDMuOTM0MjUxXSByZmNvbW1fcHJvY2Vz
-c19kbGNzOiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMQpBdWcgIDMgMTE6MDI6
-MzYgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQzLjkzNDI1NF0gcmZjb21tX3Byb2Nlc3Nf
-dHg6IGRsYyBmZmZmODgwMGMzOTU5YTAwIHN0YXRlIDEgY2ZjIDQwIHJ4X2NyZWRpdHMgMzkg
-dHhfY3JlZGl0cyAxMwpBdWcgIDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2
-MzQ0LjMxOTI2NF0gbDJjYXBfcmVjdl9hY2xkYXRhOiBjb25uIGZmZmY4ODAwODE5MTRhMDAg
-bGVuIDIwIGZsYWdzIDB4MgpBdWcgIDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzQ0LjMxOTI3MV0gbDJjYXBfcmVjdl9mcmFtZTogbGVuIDE2LCBjaWQgMHgwMDQwCkF1
-ZyAgMyAxMTowMjozNyBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDQuMzE5Mjc1XSBsMmNh
-cF9kYXRhX2NoYW5uZWw6IGNoYW4gZmZmZjg4MDEwZTdhOTAwMCwgbGVuIDE2CkF1ZyAgMyAx
-MTowMjozNyBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDQuMzE5MjgxXSByZmNvbW1fbDJk
-YXRhX3JlYWR5OiBmZmZmODgwMTBlN2FlYzAwIGJ5dGVzIDE2CkF1ZyAgMyAxMTowMjozNyBm
-ZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDQuMzE5Mjk5XSByZmNvbW1fcHJvY2Vzc19yeDog
-c2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEgcWxlbiAxCkF1ZyAgMyAxMTowMjoz
-NyBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDQuMzE5MzA1XSByZmNvbW1fcmVjdl9kYXRh
-OiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMSBkbGNpIDI2IHBmIDE2CkF1ZyAg
-MyAxMTowMjozNyBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDQuMzE5MzE4XSByZmNvbW1f
-cHJvY2Vzc19kbGNzOiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMQpBdWcgIDMg
-MTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ0LjMxOTMyNF0gcmZjb21tX3By
-b2Nlc3NfdHg6IGRsYyBmZmZmODgwMGMzOTU5YTAwIHN0YXRlIDEgY2ZjIDQwIHJ4X2NyZWRp
-dHMgMzggdHhfY3JlZGl0cyAxNQpBdWcgIDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5l
-bDogWyA2MzQ0LjMxOTM5OF0gcmZjb21tX3NvY2tfc2VuZG1zZzogc29jayBmZmZmODgwMDBm
-MjA0YTAwLCBzayBmZmZmODgwMTBlN2FkNDAwCkF1ZyAgMyAxMTowMjozNyBmZGFuaXMtbGlu
-dXgga2VybmVsOiBbIDYzNDQuMzE5NDA1XSByZmNvbW1fZGxjX3NlbmQ6IGRsYyBmZmZmODgw
-MGMzOTU5YTAwIG10dSA0MDAgbGVuIDEzMgpBdWcgIDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4
-IGtlcm5lbDogWyA2MzQ0LjMxOTQxNV0gcmZjb21tX3NvY2tfc2VuZG1zZzogc29jayBmZmZm
-ODgwMDBmMjA0YTAwLCBzayBmZmZmODgwMTBlN2FkNDAwCkF1ZyAgMyAxMTowMjozNyBmZGFu
-aXMtbGludXgga2VybmVsOiBbIDYzNDQuMzE5NDE5XSByZmNvbW1fcHJvY2Vzc19yeDogc2Vz
-c2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEgcWxlbiAwCkF1ZyAgMyAxMTowMjozNyBm
-ZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDQuMzE5NDI0XSByZmNvbW1fcHJvY2Vzc19kbGNz
-OiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMQpBdWcgIDMgMTE6MDI6MzcgZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ0LjMxOTQyN10gcmZjb21tX2RsY19zZW5kOiBkbGMg
-ZmZmZjg4MDBjMzk1OWEwMCBtdHUgNDAwIGxlbiA2CkF1ZyAgMyAxMTowMjozNyBmZGFuaXMt
-bGludXgga2VybmVsOiBbIDYzNDQuMzE5NDM0XSByZmNvbW1fcHJvY2Vzc190eDogZGxjIGZm
-ZmY4ODAwYzM5NTlhMDAgc3RhdGUgMSBjZmMgNDAgcnhfY3JlZGl0cyAzOCB0eF9jcmVkaXRz
-IDE1CkF1ZyAgMyAxMTowMjozNyBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDQuMzE5NDQw
-XSByZmNvbW1fc2VuZF9mcmFtZTogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIGxlbiAxMzcK
-QXVnICAzIDExOjAyOjM3IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NC4zMTk0NDldIGwy
-Y2FwX3NvY2tfc2VuZG1zZzogc29jayBmZmZmODgwMGM3NzkyODAwLCBzayBmZmZmODgwMTBl
-N2FlYzAwCkF1ZyAgMyAxMTowMjozNyBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDQuMzE5
-NDUyXSBsMmNhcF9jcmVhdGVfYmFzaWNfcGR1OiBjaGFuIGZmZmY4ODAxMGU3YTkwMDAgbGVu
-IDEzNwpBdWcgIDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ0LjMxOTQ1
-N10gbDJjYXBfZG9fc2VuZDogY2hhbiBmZmZmODgwMTBlN2E5MDAwLCBza2IgZmZmZjg4MDAz
-ZjkwYzQwMCBsZW4gMTQxIHByaW9yaXR5IDAKQXVnICAzIDExOjAyOjM3IGZkYW5pcy1saW51
-eCBrZXJuZWw6IFsgNjM0NC4zMTk0NjNdIHJmY29tbV9zZW5kX2ZyYW1lOiBzZXNzaW9uIGZm
-ZmY4ODAxMTBiNzIwMDAgbGVuIDEwCkF1ZyAgMyAxMTowMjozNyBmZGFuaXMtbGludXgga2Vy
-bmVsOiBbIDYzNDQuMzE5NDY1XSBsMmNhcF9zb2NrX3NlbmRtc2c6IHNvY2sgZmZmZjg4MDBj
-Nzc5MjgwMCwgc2sgZmZmZjg4MDEwZTdhZWMwMApBdWcgIDMgMTE6MDI6MzcgZmRhbmlzLWxp
-bnV4IGtlcm5lbDogWyA2MzQ0LjMxOTQ2N10gbDJjYXBfY3JlYXRlX2Jhc2ljX3BkdTogY2hh
-biBmZmZmODgwMTBlN2E5MDAwIGxlbiAxMApBdWcgIDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4
-IGtlcm5lbDogWyA2MzQ0LjMxOTQ3MF0gbDJjYXBfZG9fc2VuZDogY2hhbiBmZmZmODgwMTBl
-N2E5MDAwLCBza2IgZmZmZjg4MDAzZjkwYzAwMCBsZW4gMTQgcHJpb3JpdHkgMApBdWcgIDMg
-MTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ0LjMxOTQ3N10gcmZjb21tX3By
-b2Nlc3Nfcng6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBzdGF0ZSAxIHFsZW4gMApBdWcg
-IDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ0LjMxOTQ3OV0gcmZjb21t
-X3Byb2Nlc3NfZGxjczogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEKQXVnICAz
-IDExOjAyOjM3IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NC4zMTk0ODJdIHJmY29tbV9w
-cm9jZXNzX3R4OiBkbGMgZmZmZjg4MDBjMzk1OWEwMCBzdGF0ZSAxIGNmYyA0MCByeF9jcmVk
-aXRzIDM4IHR4X2NyZWRpdHMgMTMKQXVnICAzIDExOjAyOjM3IGZkYW5pcy1saW51eCBrZXJu
-ZWw6IFsgNjM0NC43MTA4MDhdIGwyY2FwX3JlY3ZfYWNsZGF0YTogY29ubiBmZmZmODgwMDgx
-OTE0YTAwIGxlbiAxOSBmbGFncyAweDIKQXVnICAzIDExOjAyOjM3IGZkYW5pcy1saW51eCBr
-ZXJuZWw6IFsgNjM0NC43MTA4MTRdIGwyY2FwX3JlY3ZfZnJhbWU6IGxlbiAxNSwgY2lkIDB4
-MDA0MApBdWcgIDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ0LjcxMDgx
-OF0gbDJjYXBfZGF0YV9jaGFubmVsOiBjaGFuIGZmZmY4ODAxMGU3YTkwMDAsIGxlbiAxNQpB
-dWcgIDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ0LjcxMDgyNF0gcmZj
-b21tX2wyZGF0YV9yZWFkeTogZmZmZjg4MDEwZTdhZWMwMCBieXRlcyAxNQpBdWcgIDMgMTE6
-MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ0LjcxMDg0M10gcmZjb21tX3Byb2Nl
-c3Nfcng6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBzdGF0ZSAxIHFsZW4gMQpBdWcgIDMg
-MTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ0LjcxMDg1Ml0gcmZjb21tX3Jl
-Y3ZfZGF0YTogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEgZGxjaSAyNiBwZiAx
-NgpBdWcgIDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ0LjcxMDg2MF0g
-cmZjb21tX3Byb2Nlc3NfZGxjczogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEK
-QXVnICAzIDExOjAyOjM3IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NC43MTA4NjNdIHJm
-Y29tbV9wcm9jZXNzX3R4OiBkbGMgZmZmZjg4MDBjMzk1OWEwMCBzdGF0ZSAxIGNmYyA0MCBy
-eF9jcmVkaXRzIDM3IHR4X2NyZWRpdHMgMTUKQXVnICAzIDExOjAyOjM3IGZkYW5pcy1saW51
-eCBrZXJuZWw6IFsgNjM0NC43MTA5MzNdIHJmY29tbV9zb2NrX3NlbmRtc2c6IHNvY2sgZmZm
-Zjg4MDAwZjIwNGEwMCwgc2sgZmZmZjg4MDEwZTdhZDQwMApBdWcgIDMgMTE6MDI6MzcgZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ0LjcxMDk0MF0gcmZjb21tX2RsY19zZW5kOiBkbGMg
-ZmZmZjg4MDBjMzk1OWEwMCBtdHUgNDAwIGxlbiAyNApBdWcgIDMgMTE6MDI6MzcgZmRhbmlz
-LWxpbnV4IGtlcm5lbDogWyA2MzQ0LjcxMDk0OF0gcmZjb21tX3NvY2tfc2VuZG1zZzogc29j
-ayBmZmZmODgwMDBmMjA0YTAwLCBzayBmZmZmODgwMTBlN2FkNDAwCkF1ZyAgMyAxMTowMjoz
-NyBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDQuNzEwOTUyXSByZmNvbW1fcHJvY2Vzc19y
-eDogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEgcWxlbiAwCkF1ZyAgMyAxMTow
-MjozNyBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDQuNzEwOTU5XSByZmNvbW1fcHJvY2Vz
-c19kbGNzOiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMQpBdWcgIDMgMTE6MDI6
-MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ0LjcxMDk2MV0gcmZjb21tX2RsY19zZW5k
-OiBkbGMgZmZmZjg4MDBjMzk1OWEwMCBtdHUgNDAwIGxlbiA2CkF1ZyAgMyAxMTowMjozNyBm
-ZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDQuNzEwOTY0XSByZmNvbW1fcHJvY2Vzc190eDog
-ZGxjIGZmZmY4ODAwYzM5NTlhMDAgc3RhdGUgMSBjZmMgNDAgcnhfY3JlZGl0cyAzNyB0eF9j
-cmVkaXRzIDE1CkF1ZyAgMyAxMTowMjozNyBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDQu
-NzEwOTY3XSByZmNvbW1fc2VuZF9mcmFtZTogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIGxl
-biAyOApBdWcgIDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ0LjcxMDk3
-MF0gbDJjYXBfc29ja19zZW5kbXNnOiBzb2NrIGZmZmY4ODAwYzc3OTI4MDAsIHNrIGZmZmY4
-ODAxMGU3YWVjMDAKQXVnICAzIDExOjAyOjM3IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0
-NC43MTA5NzRdIGwyY2FwX2NyZWF0ZV9iYXNpY19wZHU6IGNoYW4gZmZmZjg4MDEwZTdhOTAw
-MCBsZW4gMjgKQXVnICAzIDExOjAyOjM3IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NC43
-MTA5NzldIGwyY2FwX2RvX3NlbmQ6IGNoYW4gZmZmZjg4MDEwZTdhOTAwMCwgc2tiIGZmZmY4
-ODAwM2Y5MGQ5MDAgbGVuIDMyIHByaW9yaXR5IDAKQXVnICAzIDExOjAyOjM3IGZkYW5pcy1s
-aW51eCBrZXJuZWw6IFsgNjM0NC43MTA5ODZdIHJmY29tbV9zZW5kX2ZyYW1lOiBzZXNzaW9u
-IGZmZmY4ODAxMTBiNzIwMDAgbGVuIDEwCkF1ZyAgMyAxMTowMjozNyBmZGFuaXMtbGludXgg
-a2VybmVsOiBbIDYzNDQuNzEwOTg4XSBsMmNhcF9zb2NrX3NlbmRtc2c6IHNvY2sgZmZmZjg4
-MDBjNzc5MjgwMCwgc2sgZmZmZjg4MDEwZTdhZWMwMApBdWcgIDMgMTE6MDI6MzcgZmRhbmlz
-LWxpbnV4IGtlcm5lbDogWyA2MzQ0LjcxMDk5MF0gbDJjYXBfY3JlYXRlX2Jhc2ljX3BkdTog
-Y2hhbiBmZmZmODgwMTBlN2E5MDAwIGxlbiAxMApBdWcgIDMgMTE6MDI6MzcgZmRhbmlzLWxp
-bnV4IGtlcm5lbDogWyA2MzQ0LjcxMDk5M10gbDJjYXBfZG9fc2VuZDogY2hhbiBmZmZmODgw
-MTBlN2E5MDAwLCBza2IgZmZmZjg4MDAzZjkwY2IwMCBsZW4gMTQgcHJpb3JpdHkgMApBdWcg
-IDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ0LjcxMTAwMF0gcmZjb21t
-X3Byb2Nlc3Nfcng6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBzdGF0ZSAxIHFsZW4gMApB
-dWcgIDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ0LjcxMTAwMl0gcmZj
-b21tX3Byb2Nlc3NfZGxjczogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEKQXVn
-ICAzIDExOjAyOjM3IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NC43MTEwMDRdIHJmY29t
-bV9wcm9jZXNzX3R4OiBkbGMgZmZmZjg4MDBjMzk1OWEwMCBzdGF0ZSAxIGNmYyA0MCByeF9j
-cmVkaXRzIDM3IHR4X2NyZWRpdHMgMTMKQXVnICAzIDExOjAyOjM3IGZkYW5pcy1saW51eCBr
-ZXJuZWw6IFsgNjM0NS4wOTczMDJdIGwyY2FwX3JlY3ZfYWNsZGF0YTogY29ubiBmZmZmODgw
-MDgxOTE0YTAwIGxlbiAyNiBmbGFncyAweDIKQXVnICAzIDExOjAyOjM3IGZkYW5pcy1saW51
-eCBrZXJuZWw6IFsgNjM0NS4wOTczMDldIGwyY2FwX3JlY3ZfZnJhbWU6IGxlbiAyMiwgY2lk
-IDB4MDA0MApBdWcgIDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1LjA5
-NzMxM10gbDJjYXBfZGF0YV9jaGFubmVsOiBjaGFuIGZmZmY4ODAxMGU3YTkwMDAsIGxlbiAy
-MgpBdWcgIDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1LjA5NzMxOV0g
-cmZjb21tX2wyZGF0YV9yZWFkeTogZmZmZjg4MDEwZTdhZWMwMCBieXRlcyAyMgpBdWcgIDMg
-MTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1LjA5NzMzN10gcmZjb21tX3By
-b2Nlc3Nfcng6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBzdGF0ZSAxIHFsZW4gMQpBdWcg
-IDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1LjA5NzM0NV0gcmZjb21t
-X3JlY3ZfZGF0YTogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEgZGxjaSAyNiBw
-ZiAxNgpBdWcgIDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1LjA5NzM1
-M10gcmZjb21tX3Byb2Nlc3NfZGxjczogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRl
-IDEKQXVnICAzIDExOjAyOjM3IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NS4wOTczNTVd
-IHJmY29tbV9wcm9jZXNzX3R4OiBkbGMgZmZmZjg4MDBjMzk1OWEwMCBzdGF0ZSAxIGNmYyA0
-MCByeF9jcmVkaXRzIDM2IHR4X2NyZWRpdHMgMTUKQXVnICAzIDExOjAyOjM3IGZkYW5pcy1s
-aW51eCBrZXJuZWw6IFsgNjM0NS4wOTc0MjJdIHJmY29tbV9zb2NrX3NlbmRtc2c6IHNvY2sg
-ZmZmZjg4MDAwZjIwNGEwMCwgc2sgZmZmZjg4MDEwZTdhZDQwMApBdWcgIDMgMTE6MDI6Mzcg
-ZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1LjA5NzQyOV0gcmZjb21tX2RsY19zZW5kOiBk
-bGMgZmZmZjg4MDBjMzk1OWEwMCBtdHUgNDAwIGxlbiA2CkF1ZyAgMyAxMTowMjozNyBmZGFu
-aXMtbGludXgga2VybmVsOiBbIDYzNDUuMDk3NDM5XSByZmNvbW1fcHJvY2Vzc19yeDogc2Vz
-c2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEgcWxlbiAwCkF1ZyAgMyAxMTowMjozNyBm
-ZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDUuMDk3NDQ0XSByZmNvbW1fcHJvY2Vzc19kbGNz
-OiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMQpBdWcgIDMgMTE6MDI6MzcgZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1LjA5NzQ0OF0gcmZjb21tX3Byb2Nlc3NfdHg6IGRs
-YyBmZmZmODgwMGMzOTU5YTAwIHN0YXRlIDEgY2ZjIDQwIHJ4X2NyZWRpdHMgMzYgdHhfY3Jl
-ZGl0cyAxNQpBdWcgIDMgMTE6MDI6MzcgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1LjA5
-NzQ1Nl0gcmZjb21tX3NlbmRfZnJhbWU6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBsZW4g
-MTAKQXVnICAzIDExOjAyOjM3IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NS4wOTc0NTld
-IGwyY2FwX3NvY2tfc2VuZG1zZzogc29jayBmZmZmODgwMGM3NzkyODAwLCBzayBmZmZmODgw
-MTBlN2FlYzAwCkF1ZyAgMyAxMTowMjozNyBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDUu
-MDk3NDYyXSBsMmNhcF9jcmVhdGVfYmFzaWNfcGR1OiBjaGFuIGZmZmY4ODAxMGU3YTkwMDAg
-bGVuIDEwCkF1ZyAgMyAxMTowMjozNyBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDUuMDk3
-NDY2XSBsMmNhcF9kb19zZW5kOiBjaGFuIGZmZmY4ODAxMGU3YTkwMDAsIHNrYiBmZmZmODgw
-MDNmOTBkYzAwIGxlbiAxNCBwcmlvcml0eSAwCkF1ZyAgMyAxMTowMjozOCBmZGFuaXMtbGlu
-dXgga2VybmVsOiBbIDYzNDUuNDg1MDU3XSBsMmNhcF9yZWN2X2FjbGRhdGE6IGNvbm4gZmZm
-Zjg4MDA4MTkxNGEwMCBsZW4gMjAgZmxhZ3MgMHgyCkF1ZyAgMyAxMTowMjozOCBmZGFuaXMt
-bGludXgga2VybmVsOiBbIDYzNDUuNDg1MDYxXSBsMmNhcF9yZWN2X2ZyYW1lOiBsZW4gMTYs
-IGNpZCAweDAwNDAKQXVnICAzIDExOjAyOjM4IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0
-NS40ODUwNjNdIGwyY2FwX2RhdGFfY2hhbm5lbDogY2hhbiBmZmZmODgwMTBlN2E5MDAwLCBs
-ZW4gMTYKQXVnICAzIDExOjAyOjM4IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NS40ODUw
-NjddIHJmY29tbV9sMmRhdGFfcmVhZHk6IGZmZmY4ODAxMGU3YWVjMDAgYnl0ZXMgMTYKQXVn
-ICAzIDExOjAyOjM4IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NS40ODUwODBdIHJmY29t
-bV9wcm9jZXNzX3J4OiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMSBxbGVuIDEK
-QXVnICAzIDExOjAyOjM4IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NS40ODUwODRdIHJm
-Y29tbV9yZWN2X2RhdGE6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBzdGF0ZSAxIGRsY2kg
-MjYgcGYgMTYKQXVnICAzIDExOjAyOjM4IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NS40
-ODUwOThdIHJmY29tbV9wcm9jZXNzX2RsY3M6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBz
-dGF0ZSAxCkF1ZyAgMyAxMTowMjozOCBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDUuNDg1
-MTA0XSByZmNvbW1fcHJvY2Vzc190eDogZGxjIGZmZmY4ODAwYzM5NTlhMDAgc3RhdGUgMSBj
-ZmMgNDAgcnhfY3JlZGl0cyAzNSB0eF9jcmVkaXRzIDE1CkF1ZyAgMyAxMTowMjozOCBmZGFu
-aXMtbGludXgga2VybmVsOiBbIDYzNDUuNDg1MTcwXSByZmNvbW1fc29ja19zZW5kbXNnOiBz
-b2NrIGZmZmY4ODAwMGYyMDRhMDAsIHNrIGZmZmY4ODAxMGU3YWQ0MDAKQXVnICAzIDExOjAy
-OjM4IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NS40ODUxNzddIHJmY29tbV9kbGNfc2Vu
-ZDogZGxjIGZmZmY4ODAwYzM5NTlhMDAgbXR1IDQwMCBsZW4gNgpBdWcgIDMgMTE6MDI6Mzgg
-ZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1LjQ4NTE5MV0gcmZjb21tX3Byb2Nlc3Nfcng6
-IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBzdGF0ZSAxIHFsZW4gMApBdWcgIDMgMTE6MDI6
-MzggZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1LjQ4NTE5M10gcmZjb21tX3Byb2Nlc3Nf
-ZGxjczogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEKQXVnICAzIDExOjAyOjM4
-IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NS40ODUxOTZdIHJmY29tbV9wcm9jZXNzX3R4
-OiBkbGMgZmZmZjg4MDBjMzk1OWEwMCBzdGF0ZSAxIGNmYyA0MCByeF9jcmVkaXRzIDM1IHR4
-X2NyZWRpdHMgMTUKQXVnICAzIDExOjAyOjM4IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0
-NS40ODUxOTldIHJmY29tbV9zZW5kX2ZyYW1lOiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAg
-bGVuIDEwCkF1ZyAgMyAxMTowMjozOCBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDUuNDg1
-MjAyXSBsMmNhcF9zb2NrX3NlbmRtc2c6IHNvY2sgZmZmZjg4MDBjNzc5MjgwMCwgc2sgZmZm
-Zjg4MDEwZTdhZWMwMApBdWcgIDMgMTE6MDI6MzggZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2
-MzQ1LjQ4NTIwNV0gbDJjYXBfY3JlYXRlX2Jhc2ljX3BkdTogY2hhbiBmZmZmODgwMTBlN2E5
-MDAwIGxlbiAxMApBdWcgIDMgMTE6MDI6MzggZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1
-LjQ4NTIxMF0gbDJjYXBfZG9fc2VuZDogY2hhbiBmZmZmODgwMTBlN2E5MDAwLCBza2IgZmZm
-Zjg4MDAzZjkwYzEwMCBsZW4gMTQgcHJpb3JpdHkgMApBdWcgIDMgMTE6MDI6MzggZmRhbmlz
-LWxpbnV4IGtlcm5lbDogWyA2MzQ1LjQ5NjI0OV0gbDJjYXBfcmVjdl9hY2xkYXRhOiBjb25u
-IGZmZmY4ODAwODE5MTRhMDAgbGVuIDE5IGZsYWdzIDB4MgpBdWcgIDMgMTE6MDI6MzggZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1LjQ5NjI1M10gbDJjYXBfcmVjdl9mcmFtZTogbGVu
-IDE1LCBjaWQgMHgwMDQwCkF1ZyAgMyAxMTowMjozOCBmZGFuaXMtbGludXgga2VybmVsOiBb
-IDYzNDUuNDk2MjU2XSBsMmNhcF9kYXRhX2NoYW5uZWw6IGNoYW4gZmZmZjg4MDEwZTdhOTAw
-MCwgbGVuIDE1CkF1ZyAgMyAxMTowMjozOCBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDUu
-NDk2MjYwXSByZmNvbW1fbDJkYXRhX3JlYWR5OiBmZmZmODgwMTBlN2FlYzAwIGJ5dGVzIDE1
-CkF1ZyAgMyAxMTowMjozOCBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDUuNDk2MzAzXSBy
-ZmNvbW1fcHJvY2Vzc19yeDogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEgcWxl
-biAxCkF1ZyAgMyAxMTowMjozOCBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDUuNDk2MzA2
-XSByZmNvbW1fcmVjdl9kYXRhOiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMSBk
-bGNpIDI2IHBmIDE2CkF1ZyAgMyAxMTowMjozOCBmZGFuaXMtbGludXgga2VybmVsOiBbIDYz
-NDUuNDk2MzEyXSByZmNvbW1fcHJvY2Vzc19kbGNzOiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIw
-MDAgc3RhdGUgMQpBdWcgIDMgMTE6MDI6MzggZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1
-LjQ5NjMxNV0gcmZjb21tX3Byb2Nlc3NfdHg6IGRsYyBmZmZmODgwMGMzOTU5YTAwIHN0YXRl
-IDEgY2ZjIDQwIHJ4X2NyZWRpdHMgMzQgdHhfY3JlZGl0cyAxNQpBdWcgIDMgMTE6MDI6Mzgg
-ZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1LjQ5NjQxOF0gcmZjb21tX3NvY2tfc2VuZG1z
-Zzogc29jayBmZmZmODgwMDBmMjA0YTAwLCBzayBmZmZmODgwMTBlN2FkNDAwCkF1ZyAgMyAx
-MTowMjozOCBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDUuNDk2NDIxXSByZmNvbW1fZGxj
-X3NlbmQ6IGRsYyBmZmZmODgwMGMzOTU5YTAwIG10dSA0MDAgbGVuIDYKQXVnICAzIDExOjAy
-OjM4IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NS40OTY0MjddIHJmY29tbV9wcm9jZXNz
-X3J4OiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMSBxbGVuIDAKQXVnICAzIDEx
-OjAyOjM4IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NS40OTY0MzBdIHJmY29tbV9wcm9j
-ZXNzX2RsY3M6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBzdGF0ZSAxCkF1ZyAgMyAxMTow
-MjozOCBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDUuNDk2NDMzXSByZmNvbW1fcHJvY2Vz
-c190eDogZGxjIGZmZmY4ODAwYzM5NTlhMDAgc3RhdGUgMSBjZmMgNDAgcnhfY3JlZGl0cyAz
-NCB0eF9jcmVkaXRzIDE1CkF1ZyAgMyAxMTowMjozOCBmZGFuaXMtbGludXgga2VybmVsOiBb
-IDYzNDUuNDk2NDM2XSByZmNvbW1fc2VuZF9mcmFtZTogc2Vzc2lvbiBmZmZmODgwMTEwYjcy
-MDAwIGxlbiAxMApBdWcgIDMgMTE6MDI6MzggZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1
-LjQ5NjQzOF0gbDJjYXBfc29ja19zZW5kbXNnOiBzb2NrIGZmZmY4ODAwYzc3OTI4MDAsIHNr
-IGZmZmY4ODAxMGU3YWVjMDAKQXVnICAzIDExOjAyOjM4IGZkYW5pcy1saW51eCBrZXJuZWw6
-IFsgNjM0NS40OTY0NDFdIGwyY2FwX2NyZWF0ZV9iYXNpY19wZHU6IGNoYW4gZmZmZjg4MDEw
-ZTdhOTAwMCBsZW4gMTAKQXVnICAzIDExOjAyOjM4IGZkYW5pcy1saW51eCBrZXJuZWw6IFsg
-NjM0NS40OTY0NDZdIGwyY2FwX2RvX3NlbmQ6IGNoYW4gZmZmZjg4MDEwZTdhOTAwMCwgc2ti
-IGZmZmY4ODAwM2Y5MGRmMDAgbGVuIDE0IHByaW9yaXR5IDAKQXVnICAzIDExOjAyOjM4IGZk
-YW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NS41MzExODJdIGwyY2FwX3JlY3ZfYWNsZGF0YTog
-Y29ubiBmZmZmODgwMDgxOTE0YTAwIGxlbiAyMCBmbGFncyAweDIKQXVnICAzIDExOjAyOjM4
-IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NS41MzExODhdIGwyY2FwX3JlY3ZfZnJhbWU6
-IGxlbiAxNiwgY2lkIDB4MDA0MApBdWcgIDMgMTE6MDI6MzggZmRhbmlzLWxpbnV4IGtlcm5l
-bDogWyA2MzQ1LjUzMTE5M10gbDJjYXBfZGF0YV9jaGFubmVsOiBjaGFuIGZmZmY4ODAxMGU3
-YTkwMDAsIGxlbiAxNgpBdWcgIDMgMTE6MDI6MzggZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2
-MzQ1LjUzMTE5OV0gcmZjb21tX2wyZGF0YV9yZWFkeTogZmZmZjg4MDEwZTdhZWMwMCBieXRl
-cyAxNgpBdWcgIDMgMTE6MDI6MzggZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1LjUzMTIx
-OF0gcmZjb21tX3Byb2Nlc3Nfcng6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBzdGF0ZSAx
-IHFsZW4gMQpBdWcgIDMgMTE6MDI6MzggZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1LjUz
-MTIyNV0gcmZjb21tX3JlY3ZfZGF0YTogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRl
-IDEgZGxjaSAyNiBwZiAxNgpBdWcgIDMgMTE6MDI6MzggZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzQ1LjUzMTIzNl0gcmZjb21tX3Byb2Nlc3NfZGxjczogc2Vzc2lvbiBmZmZmODgwMTEw
-YjcyMDAwIHN0YXRlIDEKQXVnICAzIDExOjAyOjM4IGZkYW5pcy1saW51eCBrZXJuZWw6IFsg
-NjM0NS41MzEyNDJdIHJmY29tbV9wcm9jZXNzX3R4OiBkbGMgZmZmZjg4MDBjMzk1OWEwMCBz
-dGF0ZSAxIGNmYyA0MCByeF9jcmVkaXRzIDMzIHR4X2NyZWRpdHMgMTUKQXVnICAzIDExOjAy
-OjM4IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0NS41MzEzNzldIHJmY29tbV9zb2NrX3Nl
-bmRtc2c6IHNvY2sgZmZmZjg4MDAwZjIwNGEwMCwgc2sgZmZmZjg4MDEwZTdhZDQwMApBdWcg
-IDMgMTE6MDI6MzggZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1LjUzMTM4M10gcmZjb21t
-X2RsY19zZW5kOiBkbGMgZmZmZjg4MDBjMzk1OWEwMCBtdHUgNDAwIGxlbiA2CkF1ZyAgMyAx
-MTowMjozOCBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDUuNTMxNjYwXSByZmNvbW1fcHJv
-Y2Vzc19yeDogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDEgcWxlbiAwCkF1ZyAg
-MyAxMTowMjozOCBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDUuNTMxNjYzXSByZmNvbW1f
-cHJvY2Vzc19kbGNzOiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgc3RhdGUgMQpBdWcgIDMg
-MTE6MDI6MzggZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ1LjUzMTY2Nl0gcmZjb21tX3By
-b2Nlc3NfdHg6IGRsYyBmZmZmODgwMGMzOTU5YTAwIHN0YXRlIDEgY2ZjIDQwIHJ4X2NyZWRp
-dHMgMzMgdHhfY3JlZGl0cyAxNQpBdWcgIDMgMTE6MDI6MzggZmRhbmlzLWxpbnV4IGtlcm5l
-bDogWyA2MzQ1LjUzMTY2OV0gcmZjb21tX3NlbmRfZnJhbWU6IHNlc3Npb24gZmZmZjg4MDEx
-MGI3MjAwMCBsZW4gMTAKQXVnICAzIDExOjAyOjM4IGZkYW5pcy1saW51eCBrZXJuZWw6IFsg
-NjM0NS41MzE2NzJdIGwyY2FwX3NvY2tfc2VuZG1zZzogc29jayBmZmZmODgwMGM3NzkyODAw
-LCBzayBmZmZmODgwMTBlN2FlYzAwCkF1ZyAgMyAxMTowMjozOCBmZGFuaXMtbGludXgga2Vy
-bmVsOiBbIDYzNDUuNTMxNjc2XSBsMmNhcF9jcmVhdGVfYmFzaWNfcGR1OiBjaGFuIGZmZmY4
-ODAxMGU3YTkwMDAgbGVuIDEwCkF1ZyAgMyAxMTowMjozOCBmZGFuaXMtbGludXgga2VybmVs
-OiBbIDYzNDUuNTMxNjc5XSBsMmNhcF9kb19zZW5kOiBjaGFuIGZmZmY4ODAxMGU3YTkwMDAs
-IHNrYiBmZmZmODgwMDNmOTBjNzAwIGxlbiAxNCBwcmlvcml0eSAwCkF1ZyAgMyAxMTowMjoz
-OSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMTU1MTMzXSBsMmNhcF9zb2NrX2NyZWF0
-ZTogc29jayBmZmZmODgwMDBmMjA3NDgwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgg
-a2VybmVsOiBbIDYzNDcuMTU1MTQzXSBsMmNhcF9jaGFuX2NyZWF0ZTogc2sgZmZmZjg4MDEw
-ZTdhOWMwMCBjaGFuIGZmZmY4ODAxMGU3YWRjMDAKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1s
-aW51eCBrZXJuZWw6IFsgNjM0Ny4xNTUxNDddIGwyY2FwX3NvY2tfaW5pdDogc2sgZmZmZjg4
-MDEwZTdhOWMwMApBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3
-LjE1NTE1N10gbDJjYXBfc29ja19iaW5kOiBzayBmZmZmODgwMTBlN2E5YzAwCkF1ZyAgMyAx
-MTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMTU1MTY1XSBsMmNhcF9zb2Nr
-X3NldHNvY2tvcHQ6IHNrIGZmZmY4ODAxMGU3YTljMDAKQXVnICAzIDExOjAyOjM5IGZkYW5p
-cy1saW51eCBrZXJuZWw6IFsgNjM0Ny4xNTUxODBdIGwyY2FwX3NvY2tfY29ubmVjdDogc2sg
-ZmZmZjg4MDEwZTdhOWMwMApBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzQ3LjE1NTE4NF0gbDJjYXBfY2hhbl9jb25uZWN0OiA1QzpBQzo0QzpGRjowQjpGRSAt
-PiAxMDowNDoxNDpEMTo5NjoxQyBwc20gMHgxMDAxCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMt
-bGludXgga2VybmVsOiBbIDYzNDcuMTU1MTkwXSBfX2wyY2FwX2NoYW5fYWRkOiBjb25uIGZm
-ZmY4ODAwODE5MTRhMDAsIHBzbSAweDE5LCBkY2lkIDB4MDAwMApBdWcgIDMgMTE6MDI6Mzkg
-ZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjE1NTE5M10gX19sMmNhcF9zdGF0ZV9jaGFu
-Z2U6IGNoYW4gZmZmZjg4MDEwZTdhZGMwMCBCVF9CT1VORCAtPiBCVF9DT05ORUNUCkF1ZyAg
-MyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMTU1MTk4XSBsMmNhcF9i
-dWlsZF9jbWQ6IGNvbm4gZmZmZjg4MDA4MTkxNGEwMCwgY29kZSAweDAyLCBpZGVudCAweDA0
-LCBsZW4gNApBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjE1
-NTIwMF0gbDJjYXBfc2VuZF9jbWQ6IGNvZGUgMHgwMgpBdWcgIDMgMTE6MDI6MzkgZmRhbmlz
-LWxpbnV4IGtlcm5lbDogWyA2MzQ3LjE4NDU0NF0gbDJjYXBfcmVjdl9hY2xkYXRhOiBjb25u
-IGZmZmY4ODAwODE5MTRhMDAgbGVuIDE2IGZsYWdzIDB4MgpBdWcgIDMgMTE6MDI6MzkgZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjE4NDU1MF0gbDJjYXBfcmVjdl9mcmFtZTogbGVu
-IDEyLCBjaWQgMHgwMDAxCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBb
-IDYzNDcuMTg0NTUzXSBsMmNhcF9yYXdfcmVjdjogY29ubiBmZmZmODgwMDgxOTE0YTAwCkF1
-ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMTg0NTU2XSBsMmNh
-cF9zaWdfY2hhbm5lbDogY29kZSAweDAzIGxlbiA4IGlkIDB4MDQKQXVnICAzIDExOjAyOjM5
-IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4xODQ1NTldIGwyY2FwX2Nvbm5lY3RfcnNw
-OiBkY2lkIDB4MDA0MiBzY2lkIDB4MDA0MSByZXN1bHQgMHgwMCBzdGF0dXMgMHgwMApBdWcg
-IDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjE4NDU2M10gX19sMmNh
-cF9zdGF0ZV9jaGFuZ2U6IGNoYW4gZmZmZjg4MDEwZTdhZGMwMCBCVF9DT05ORUNUIC0+IEJU
-X0NPTkZJRwpBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjE4
-NDU2Nl0gbDJjYXBfYnVpbGRfY29uZl9yZXE6IGNoYW4gZmZmZjg4MDEwZTdhZGMwMApBdWcg
-IDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjE4NDU2OV0gbDJjYXBf
-YnVpbGRfY21kOiBjb25uIGZmZmY4ODAwODE5MTRhMDAsIGNvZGUgMHgwNCwgaWRlbnQgMHgw
-NSwgbGVuIDQKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4x
-ODQ1NzJdIGwyY2FwX3NlbmRfY21kOiBjb2RlIDB4MDQKQXVnICAzIDExOjAyOjM5IGZkYW5p
-cy1saW51eCBrZXJuZWw6IFsgNjM0Ny4xODU3OTRdIGwyY2FwX3JlY3ZfYWNsZGF0YTogY29u
-biBmZmZmODgwMDgxOTE0YTAwIGxlbiAxNiBmbGFncyAweDIKQXVnICAzIDExOjAyOjM5IGZk
-YW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4xODU4MDBdIGwyY2FwX3JlY3ZfZnJhbWU6IGxl
-biAxMiwgY2lkIDB4MDAwMQpBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzQ3LjE4NTgwM10gbDJjYXBfcmF3X3JlY3Y6IGNvbm4gZmZmZjg4MDA4MTkxNGEwMApB
-dWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjE4NTgwNl0gbDJj
-YXBfc2lnX2NoYW5uZWw6IGNvZGUgMHgwNCBsZW4gOCBpZCAweDA3CkF1ZyAgMyAxMTowMjoz
-OSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMTg1ODA5XSBsMmNhcF9jb25maWdfcmVx
-OiBkY2lkIDB4MDA0MSBmbGFncyAweDAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgg
-a2VybmVsOiBbIDYzNDcuMTg1ODEyXSBsMmNhcF9wYXJzZV9jb25mX3JlcTogY2hhbiBmZmZm
-ODgwMTBlN2FkYzAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYz
-NDcuMTg1ODE1XSBsMmNhcF9nZXRfY29uZl9vcHQ6IHR5cGUgMHgwMSBsZW4gMiB2YWwgMHgy
-YTAKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4xODU4MThd
-IGwyY2FwX2FkZF9jb25mX29wdDogdHlwZSAweDAxIGxlbiAyIHZhbCAweDJhMApBdWcgIDMg
-MTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjE4NTgyMV0gbDJjYXBfYnVp
-bGRfY21kOiBjb25uIGZmZmY4ODAwODE5MTRhMDAsIGNvZGUgMHgwNSwgaWRlbnQgMHgwNywg
-bGVuIDEwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMTg1
-ODI0XSBsMmNhcF9zZW5kX2NtZDogY29kZSAweDA1CkF1ZyAgMyAxMTowMjozOSBmZGFuaXMt
-bGludXgga2VybmVsOiBbIDYzNDcuMTkwNzQ4XSBsMmNhcF9yZWN2X2FjbGRhdGE6IGNvbm4g
-ZmZmZjg4MDA4MTkxNGEwMCBsZW4gMTQgZmxhZ3MgMHgyCkF1ZyAgMyAxMTowMjozOSBmZGFu
-aXMtbGludXgga2VybmVsOiBbIDYzNDcuMTkwNzU0XSBsMmNhcF9yZWN2X2ZyYW1lOiBsZW4g
-MTAsIGNpZCAweDAwMDEKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsg
-NjM0Ny4xOTA3NTddIGwyY2FwX3Jhd19yZWN2OiBjb25uIGZmZmY4ODAwODE5MTRhMDAKQXVn
-ICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4xOTA3NjBdIGwyY2Fw
-X3NpZ19jaGFubmVsOiBjb2RlIDB4MDUgbGVuIDYgaWQgMHgwNQpBdWcgIDMgMTE6MDI6Mzkg
-ZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjE5MDc2NF0gbDJjYXBfY29uZmlnX3JzcDog
-c2NpZCAweDAwNDEgZmxhZ3MgMHgwMCByZXN1bHQgMHgwMApBdWcgIDMgMTE6MDI6MzkgZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjE5MDc2OF0gbDJjYXBfY29uZl9yZmNfZ2V0OiBj
-aGFuIGZmZmY4ODAxMGU3YWRjMDAsIHJzcCBmZmZmODgwMDBjMDA3ODFhLCBsZW4gMApBdWcg
-IDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjE5MDc3Ml0gX19sMmNh
-cF9zdGF0ZV9jaGFuZ2U6IGNoYW4gZmZmZjg4MDEwZTdhZGMwMCBCVF9DT05GSUcgLT4gQlRf
-Q09OTkVDVEVECkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcu
-MTkwNzc1XSBsMmNhcF9jaGFuX3JlYWR5OiBzayBmZmZmODgwMTBlN2E5YzAwLCBwYXJlbnQg
-ICAgICAgICAgIChudWxsKQpBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzQ3LjE5MDc3OV0gX19sMmNhcF9zdGF0ZV9jaGFuZ2U6IGNoYW4gZmZmZjg4MDEwZTdh
-ZGMwMCBCVF9DT05ORUNURUQgLT4gQlRfQ09OTkVDVEVECkF1ZyAgMyAxMTowMjozOSBmZGFu
-aXMtbGludXgga2VybmVsOiBbIDYzNDcuMTkwODMzXSBsMmNhcF9zb2NrX2dldHNvY2tvcHQ6
-IHNrIGZmZmY4ODAxMGU3YTljMDAKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJu
-ZWw6IFsgNjM0Ny4xOTA4MzZdIGwyY2FwX3NvY2tfZ2V0c29ja29wdF9vbGQ6IHNrIGZmZmY4
-ODAxMGU3YTljMDAKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0
-Ny4xOTA4NDBdIGwyY2FwX3NvY2tfZ2V0bmFtZTogc29jayBmZmZmODgwMDBmMjA3NDgwLCBz
-ayBmZmZmODgwMTBlN2E5YzAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVs
-OiBbIDYzNDcuMTkwODQyXSBsMmNhcF9zb2NrX2dldG5hbWU6IHNvY2sgZmZmZjg4MDAwZjIw
-NzQ4MCwgc2sgZmZmZjg4MDEwZTdhOWMwMApBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4
-IGtlcm5lbDogWyA2MzQ3LjE5MDg2N10gbDJjYXBfc29ja19jcmVhdGU6IHNvY2sgZmZmZjg4
-MDAwZjIwNGM4MApBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3
-LjE5MDg3Ml0gbDJjYXBfY2hhbl9jcmVhdGU6IHNrIGZmZmY4ODAxMGU3YWM0MDAgY2hhbiBm
-ZmZmODgwMTBlN2E5NDAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBb
-IDYzNDcuMTkwODc0XSBsMmNhcF9zb2NrX2luaXQ6IHNrIGZmZmY4ODAxMGU3YWM0MDAKQXVn
-ICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4xOTA4ODFdIGwyY2Fw
-X3NvY2tfYmluZDogc2sgZmZmZjg4MDEwZTdhYzQwMApBdWcgIDMgMTE6MDI6MzkgZmRhbmlz
-LWxpbnV4IGtlcm5lbDogWyA2MzQ3LjE5MDg4Nl0gbDJjYXBfc29ja19zZXRzb2Nrb3B0OiBz
-ayBmZmZmODgwMTBlN2FjNDAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVs
-OiBbIDYzNDcuMTkwODk1XSBsMmNhcF9zb2NrX2Nvbm5lY3Q6IHNrIGZmZmY4ODAxMGU3YWM0
-MDAKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4xOTA4OTld
-IGwyY2FwX2NoYW5fY29ubmVjdDogNUM6QUM6NEM6RkY6MEI6RkUgLT4gMTA6MDQ6MTQ6RDE6
-OTY6MUMgcHNtIDB4MTAwMwpBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzQ3LjE5MDkwNF0gX19sMmNhcF9jaGFuX2FkZDogY29ubiBmZmZmODgwMDgxOTE0YTAw
-LCBwc20gMHgxNywgZGNpZCAweDAwMDAKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBr
-ZXJuZWw6IFsgNjM0Ny4xOTA5MDZdIF9fbDJjYXBfc3RhdGVfY2hhbmdlOiBjaGFuIGZmZmY4
-ODAxMGU3YTk0MDAgQlRfQk9VTkQgLT4gQlRfQ09OTkVDVApBdWcgIDMgMTE6MDI6MzkgZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjE5MDkxMF0gbDJjYXBfYnVpbGRfY21kOiBjb25u
-IGZmZmY4ODAwODE5MTRhMDAsIGNvZGUgMHgwMiwgaWRlbnQgMHgwNiwgbGVuIDQKQXVnICAz
-IDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4xOTA5MTJdIGwyY2FwX3Nl
-bmRfY21kOiBjb2RlIDB4MDIKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6
-IFsgNjM0Ny4xOTA5MzJdIGwyY2FwX3NvY2tfc2VuZG1zZzogc29jayBmZmZmODgwMDBmMjA3
-NDgwLCBzayBmZmZmODgwMTBlN2E5YzAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgg
-a2VybmVsOiBbIDYzNDcuMTkwOTM1XSBsMmNhcF9jcmVhdGVfYmFzaWNfcGR1OiBjaGFuIGZm
-ZmY4ODAxMGU3YWRjMDAgbGVuIDIKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJu
-ZWw6IFsgNjM0Ny4xOTA5NDBdIGwyY2FwX2RvX3NlbmQ6IGNoYW4gZmZmZjg4MDEwZTdhZGMw
-MCwgc2tiIGZmZmY4ODAwOTY5ZmY5MDAgbGVuIDYgcHJpb3JpdHkgMApBdWcgIDMgMTE6MDI6
-MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjIwMDczNl0gbDJjYXBfcmVjdl9hY2xk
-YXRhOiBjb25uIGZmZmY4ODAwODE5MTRhMDAgbGVuIDE2IGZsYWdzIDB4MgpBdWcgIDMgMTE6
-MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjIwMDc0MV0gbDJjYXBfcmVjdl9m
-cmFtZTogbGVuIDEyLCBjaWQgMHgwMDAxCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgg
-a2VybmVsOiBbIDYzNDcuMjAwNzg2XSBsMmNhcF9yYXdfcmVjdjogY29ubiBmZmZmODgwMDgx
-OTE0YTAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMjAw
-NzkwXSBsMmNhcF9zaWdfY2hhbm5lbDogY29kZSAweDAzIGxlbiA4IGlkIDB4MDYKQXVnICAz
-IDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yMDA3OTRdIGwyY2FwX2Nv
-bm5lY3RfcnNwOiBkY2lkIDB4MDA0MyBzY2lkIDB4MDA0MiByZXN1bHQgMHgwMCBzdGF0dXMg
-MHgwMApBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjIwMDc5
-OV0gX19sMmNhcF9zdGF0ZV9jaGFuZ2U6IGNoYW4gZmZmZjg4MDEwZTdhOTQwMCBCVF9DT05O
-RUNUIC0+IEJUX0NPTkZJRwpBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzQ3LjIwMDgwM10gbDJjYXBfYnVpbGRfY29uZl9yZXE6IGNoYW4gZmZmZjg4MDEwZTdh
-OTQwMApBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjIwMDgw
-N10gbDJjYXBfYnVpbGRfY21kOiBjb25uIGZmZmY4ODAwODE5MTRhMDAsIGNvZGUgMHgwNCwg
-aWRlbnQgMHgwNywgbGVuIDQKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6
-IFsgNjM0Ny4yMDA4MTFdIGwyY2FwX3NlbmRfY21kOiBjb2RlIDB4MDQKQXVnICAzIDExOjAy
-OjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yMDMyMTVdIGwyY2FwX3JlY3ZfYWNs
-ZGF0YTogY29ubiBmZmZmODgwMDgxOTE0YTAwIGxlbiAxNiBmbGFncyAweDIKQXVnICAzIDEx
-OjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yMDMyMjJdIGwyY2FwX3JlY3Zf
-ZnJhbWU6IGxlbiAxMiwgY2lkIDB4MDAwMQpBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4
-IGtlcm5lbDogWyA2MzQ3LjIwMzIyNl0gbDJjYXBfcmF3X3JlY3Y6IGNvbm4gZmZmZjg4MDA4
-MTkxNGEwMApBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjIw
-MzIzMF0gbDJjYXBfc2lnX2NoYW5uZWw6IGNvZGUgMHgwNCBsZW4gOCBpZCAweDA4CkF1ZyAg
-MyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMjAzMjM1XSBsMmNhcF9j
-b25maWdfcmVxOiBkY2lkIDB4MDA0MiBmbGFncyAweDAwCkF1ZyAgMyAxMTowMjozOSBmZGFu
-aXMtbGludXgga2VybmVsOiBbIDYzNDcuMjAzMjM5XSBsMmNhcF9wYXJzZV9jb25mX3JlcTog
-Y2hhbiBmZmZmODgwMTBlN2E5NDAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2Vy
-bmVsOiBbIDYzNDcuMjAzMjQ0XSBsMmNhcF9nZXRfY29uZl9vcHQ6IHR5cGUgMHgwMSBsZW4g
-MiB2YWwgMHgyMDAKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0
-Ny4yMDMyNDhdIGwyY2FwX2FkZF9jb25mX29wdDogdHlwZSAweDAxIGxlbiAyIHZhbCAweDIw
-MApBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjIwMzI1M10g
-bDJjYXBfYnVpbGRfY21kOiBjb25uIGZmZmY4ODAwODE5MTRhMDAsIGNvZGUgMHgwNSwgaWRl
-bnQgMHgwOCwgbGVuIDEwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBb
-IDYzNDcuMjAzMjU3XSBsMmNhcF9zZW5kX2NtZDogY29kZSAweDA1CkF1ZyAgMyAxMTowMjoz
-OSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMjA0NDI2XSBsMmNhcF9yZWN2X2FjbGRh
-dGE6IGNvbm4gZmZmZjg4MDA4MTkxNGEwMCBsZW4gOCBmbGFncyAweDIKQXVnICAzIDExOjAy
-OjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yMDQ0NTFdIGwyY2FwX3JlY3ZfZnJh
-bWU6IGxlbiA0LCBjaWQgMHgwMDQxCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2Vy
-bmVsOiBbIDYzNDcuMjA0NDU4XSBsMmNhcF9kYXRhX2NoYW5uZWw6IGNoYW4gZmZmZjg4MDEw
-ZTdhZGMwMCwgbGVuIDQKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsg
-NjM0Ny4yMDQ1MTldIGwyY2FwX3NvY2tfc2VuZG1zZzogc29jayBmZmZmODgwMDBmMjA3NDgw
-LCBzayBmZmZmODgwMTBlN2E5YzAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2Vy
-bmVsOiBbIDYzNDcuMjA0NTI3XSBsMmNhcF9jcmVhdGVfYmFzaWNfcGR1OiBjaGFuIGZmZmY4
-ODAxMGU3YWRjMDAgbGVuIDMKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6
-IFsgNjM0Ny4yMDQ1MzZdIGwyY2FwX2RvX3NlbmQ6IGNoYW4gZmZmZjg4MDEwZTdhZGMwMCwg
-c2tiIGZmZmY4ODAwOTY5ZmZjMDAgbGVuIDcgcHJpb3JpdHkgMApBdWcgIDMgMTE6MDI6Mzkg
-ZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjIwOTQ2Ml0gbDJjYXBfcmVjdl9hY2xkYXRh
-OiBjb25uIGZmZmY4ODAwODE5MTRhMDAgbGVuIDE0IGZsYWdzIDB4MgpBdWcgIDMgMTE6MDI6
-MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjIwOTQ2OF0gbDJjYXBfcmVjdl9mcmFt
-ZTogbGVuIDEwLCBjaWQgMHgwMDAxCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2Vy
-bmVsOiBbIDYzNDcuMjA5NDczXSBsMmNhcF9yYXdfcmVjdjogY29ubiBmZmZmODgwMDgxOTE0
-YTAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMjA5NDc3
-XSBsMmNhcF9zaWdfY2hhbm5lbDogY29kZSAweDA1IGxlbiA2IGlkIDB4MDcKQXVnICAzIDEx
-OjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yMDk0ODJdIGwyY2FwX2NvbmZp
-Z19yc3A6IHNjaWQgMHgwMDQyIGZsYWdzIDB4MDAgcmVzdWx0IDB4MDAKQXVnICAzIDExOjAy
-OjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yMDk0ODhdIGwyY2FwX2NvbmZfcmZj
-X2dldDogY2hhbiBmZmZmODgwMTBlN2E5NDAwLCByc3AgZmZmZjg4MDAwYzAwNzgxYSwgbGVu
-IDAKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yMDk0OTNd
-IF9fbDJjYXBfc3RhdGVfY2hhbmdlOiBjaGFuIGZmZmY4ODAxMGU3YTk0MDAgQlRfQ09ORklH
-IC0+IEJUX0NPTk5FQ1RFRApBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzQ3LjIwOTQ5OF0gbDJjYXBfY2hhbl9yZWFkeTogc2sgZmZmZjg4MDEwZTdhYzQwMCwg
-cGFyZW50ICAgICAgICAgICAobnVsbCkKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBr
-ZXJuZWw6IFsgNjM0Ny4yMDk1MDNdIF9fbDJjYXBfc3RhdGVfY2hhbmdlOiBjaGFuIGZmZmY4
-ODAxMGU3YTk0MDAgQlRfQ09OTkVDVEVEIC0+IEJUX0NPTk5FQ1RFRApBdWcgIDMgMTE6MDI6
-MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjIwOTU1Nl0gbDJjYXBfc29ja19nZXRz
-b2Nrb3B0OiBzayBmZmZmODgwMTBlN2FjNDAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGlu
-dXgga2VybmVsOiBbIDYzNDcuMjA5NTYxXSBsMmNhcF9zb2NrX2dldHNvY2tvcHRfb2xkOiBz
-ayBmZmZmODgwMTBlN2FjNDAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVs
-OiBbIDYzNDcuMjA5NTY4XSBsMmNhcF9zb2NrX2dldG5hbWU6IHNvY2sgZmZmZjg4MDAwZjIw
-NGM4MCwgc2sgZmZmZjg4MDEwZTdhYzQwMApBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4
-IGtlcm5lbDogWyA2MzQ3LjIwOTU3Ml0gbDJjYXBfc29ja19nZXRuYW1lOiBzb2NrIGZmZmY4
-ODAwMGYyMDRjODAsIHNrIGZmZmY4ODAxMGU3YWM0MDAKQXVnICAzIDExOjAyOjM5IGZkYW5p
-cy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yMDk2ODVdIGlucHV0OiAxMDowNDoxNDpEMTo5Njox
-QyBhcyAvZGV2aWNlcy92aXJ0dWFsL2lucHV0L2lucHV0MjAKQXVnICAzIDExOjAyOjM5IGZk
-YW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yMTE4ODNdIGwyY2FwX3JlY3ZfYWNsZGF0YTog
-Y29ubiBmZmZmODgwMDgxOTE0YTAwIGxlbiAyMCBmbGFncyAweDIKQXVnICAzIDExOjAyOjM5
-IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yMTE4ODddIGwyY2FwX3JlY3ZfZnJhbWU6
-IGxlbiAxNiwgY2lkIDB4MDA0MQpBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5l
-bDogWyA2MzQ3LjIxMTg5MF0gbDJjYXBfZGF0YV9jaGFubmVsOiBjaGFuIGZmZmY4ODAxMGU3
-YWRjMDAsIGxlbiAxNgpBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2
-MzQ3LjIxMjAzMF0gbDJjYXBfc29ja19zZW5kbXNnOiBzb2NrIGZmZmY4ODAwMGYyMDc0ODAs
-IHNrIGZmZmY4ODAxMGU3YTljMDAKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJu
-ZWw6IFsgNjM0Ny4yMTIwMzRdIGwyY2FwX2NyZWF0ZV9iYXNpY19wZHU6IGNoYW4gZmZmZjg4
-MDEwZTdhZGMwMCBsZW4gMTQKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6
-IFsgNjM0Ny4yMTIwMzhdIGwyY2FwX2RvX3NlbmQ6IGNoYW4gZmZmZjg4MDEwZTdhZGMwMCwg
-c2tiIGZmZmY4ODAwM2Y5MGNkMDAgbGVuIDE4IHByaW9yaXR5IDAKQXVnICAzIDExOjAyOjM5
-IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yMTgxMzBdIGwyY2FwX3JlY3ZfYWNsZGF0
-YTogY29ubiBmZmZmODgwMDgxOTE0YTAwIGxlbiA2IGZsYWdzIDB4MgpBdWcgIDMgMTE6MDI6
-MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjIxODEzNl0gbDJjYXBfcmVjdl9mcmFt
-ZTogbGVuIDIsIGNpZCAweDAwNDEKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJu
-ZWw6IFsgNjM0Ny4yMTgxNDBdIGwyY2FwX2RhdGFfY2hhbm5lbDogY2hhbiBmZmZmODgwMTBl
-N2FkYzAwLCBsZW4gMgpBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2
-MzQ3LjIxODIyOF0gbDJjYXBfc29ja19zZW5kbXNnOiBzb2NrIGZmZmY4ODAwMGYyMDc0ODAs
-IHNrIGZmZmY4ODAxMGU3YTljMDAKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJu
-ZWw6IFsgNjM0Ny4yMTgyMzJdIGwyY2FwX2NyZWF0ZV9iYXNpY19wZHU6IGNoYW4gZmZmZjg4
-MDEwZTdhZGMwMCBsZW4gMwpBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzQ3LjIxODIzNl0gbDJjYXBfZG9fc2VuZDogY2hhbiBmZmZmODgwMTBlN2FkYzAwLCBz
-a2IgZmZmZjg4MDAzZjkwZDQwMCBsZW4gNyBwcmlvcml0eSAwCkF1ZyAgMyAxMTowMjozOSBm
-ZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMjU4MTA4XSBsMmNhcF9yZWN2X2FjbGRhdGE6
-IGNvbm4gZmZmZjg4MDA4MTkxNGEwMCBsZW4gNiBmbGFncyAweDIKQXVnICAzIDExOjAyOjM5
-IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yNTgxMTNdIGwyY2FwX3JlY3ZfZnJhbWU6
-IGxlbiAyLCBjaWQgMHgwMDQxCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVs
-OiBbIDYzNDcuMjU4MTE2XSBsMmNhcF9kYXRhX2NoYW5uZWw6IGNoYW4gZmZmZjg4MDEwZTdh
-ZGMwMCwgbGVuIDIKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0
-Ny4yNTgyMDFdIGwyY2FwX3NvY2tfY3JlYXRlOiBzb2NrIGZmZmY4ODAwMGYyMDY1ODAKQXVn
-ICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yNTgyMDddIGwyY2Fw
-X2NoYW5fY3JlYXRlOiBzayBmZmZmODgwMTBkMDA3MDAwIGNoYW4gZmZmZjg4MDEwZDAwNTQw
-MApBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjI1ODIwOV0g
-bDJjYXBfc29ja19pbml0OiBzayBmZmZmODgwMTBkMDA3MDAwCkF1ZyAgMyAxMTowMjozOSBm
-ZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMjU4MjE3XSBsMmNhcF9zb2NrX2JpbmQ6IHNr
-IGZmZmY4ODAxMGQwMDcwMDAKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6
-IFsgNjM0Ny4yNTgyMjRdIGwyY2FwX3NvY2tfc2V0c29ja29wdDogc2sgZmZmZjg4MDEwZDAw
-NzAwMApBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjI1ODIz
-Nl0gbDJjYXBfc29ja19jb25uZWN0OiBzayBmZmZmODgwMTBkMDA3MDAwCkF1ZyAgMyAxMTow
-MjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMjU4MjQxXSBsMmNhcF9jaGFuX2Nv
-bm5lY3Q6IDVDOkFDOjRDOkZGOjBCOkZFIC0+IDEwOjA0OjE0OkQxOjk2OjFDIHBzbSAweDEw
-MDUKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yNTgyNDdd
-IF9fbDJjYXBfY2hhbl9hZGQ6IGNvbm4gZmZmZjg4MDA4MTkxNGEwMCwgcHNtIDB4MTksIGRj
-aWQgMHgwMDAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcu
-MjU4MjUwXSBfX2wyY2FwX3N0YXRlX2NoYW5nZTogY2hhbiBmZmZmODgwMTBkMDA1NDAwIEJU
-X0JPVU5EIC0+IEJUX0NPTk5FQ1QKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJu
-ZWw6IFsgNjM0Ny4yNTgyNTVdIGwyY2FwX2J1aWxkX2NtZDogY29ubiBmZmZmODgwMDgxOTE0
-YTAwLCBjb2RlIDB4MDIsIGlkZW50IDB4MDgsIGxlbiA0CkF1ZyAgMyAxMTowMjozOSBmZGFu
-aXMtbGludXgga2VybmVsOiBbIDYzNDcuMjU4MjU4XSBsMmNhcF9zZW5kX2NtZDogY29kZSAw
-eDAyCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMjY1NTA1
-XSBsMmNhcF9yZWN2X2FjbGRhdGE6IGNvbm4gZmZmZjg4MDA4MTkxNGEwMCBsZW4gMTYgZmxh
-Z3MgMHgyCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMjY1
-NTEyXSBsMmNhcF9yZWN2X2ZyYW1lOiBsZW4gMTIsIGNpZCAweDAwMDEKQXVnICAzIDExOjAy
-OjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yNjU1MTVdIGwyY2FwX3Jhd19yZWN2
-OiBjb25uIGZmZmY4ODAwODE5MTRhMDAKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBr
-ZXJuZWw6IFsgNjM0Ny4yNjU1MTldIGwyY2FwX3NpZ19jaGFubmVsOiBjb2RlIDB4MDMgbGVu
-IDggaWQgMHgwOApBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3
-LjI2NTUyM10gbDJjYXBfY29ubmVjdF9yc3A6IGRjaWQgMHgwMDQ0IHNjaWQgMHgwMDQzIHJl
-c3VsdCAweDAwIHN0YXR1cyAweDAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2Vy
-bmVsOiBbIDYzNDcuMjY1NTI4XSBfX2wyY2FwX3N0YXRlX2NoYW5nZTogY2hhbiBmZmZmODgw
-MTBkMDA1NDAwIEJUX0NPTk5FQ1QgLT4gQlRfQ09ORklHCkF1ZyAgMyAxMTowMjozOSBmZGFu
-aXMtbGludXgga2VybmVsOiBbIDYzNDcuMjY1NTMyXSBsMmNhcF9idWlsZF9jb25mX3JlcTog
-Y2hhbiBmZmZmODgwMTBkMDA1NDAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2Vy
-bmVsOiBbIDYzNDcuMjY1NTM1XSBsMmNhcF9idWlsZF9jbWQ6IGNvbm4gZmZmZjg4MDA4MTkx
-NGEwMCwgY29kZSAweDA0LCBpZGVudCAweDA5LCBsZW4gNApBdWcgIDMgMTE6MDI6MzkgZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjI2NTUzOV0gbDJjYXBfc2VuZF9jbWQ6IGNvZGUg
-MHgwNApBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjI2Njc0
-MV0gbDJjYXBfcmVjdl9hY2xkYXRhOiBjb25uIGZmZmY4ODAwODE5MTRhMDAgbGVuIDE2IGZs
-YWdzIDB4MgpBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjI2
-Njc0NF0gbDJjYXBfcmVjdl9mcmFtZTogbGVuIDEyLCBjaWQgMHgwMDAxCkF1ZyAgMyAxMTow
-MjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMjY2NzQ2XSBsMmNhcF9yYXdfcmVj
-djogY29ubiBmZmZmODgwMDgxOTE0YTAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgg
-a2VybmVsOiBbIDYzNDcuMjY2NzQ4XSBsMmNhcF9zaWdfY2hhbm5lbDogY29kZSAweDA0IGxl
-biA4IGlkIDB4MDkKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0
-Ny4yNjY3NTFdIGwyY2FwX2NvbmZpZ19yZXE6IGRjaWQgMHgwMDQzIGZsYWdzIDB4MDAKQXVn
-ICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yNjY3NTRdIGwyY2Fw
-X3BhcnNlX2NvbmZfcmVxOiBjaGFuIGZmZmY4ODAxMGQwMDU0MDAKQXVnICAzIDExOjAyOjM5
-IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yNjY3NTddIGwyY2FwX2dldF9jb25mX29w
-dDogdHlwZSAweDAxIGxlbiAyIHZhbCAweDJhMApBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxp
-bnV4IGtlcm5lbDogWyA2MzQ3LjI2Njc2MF0gbDJjYXBfYWRkX2NvbmZfb3B0OiB0eXBlIDB4
-MDEgbGVuIDIgdmFsIDB4MmEwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVs
-OiBbIDYzNDcuMjY2NzYzXSBsMmNhcF9idWlsZF9jbWQ6IGNvbm4gZmZmZjg4MDA4MTkxNGEw
-MCwgY29kZSAweDA1LCBpZGVudCAweDA5LCBsZW4gMTAKQXVnICAzIDExOjAyOjM5IGZkYW5p
-cy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yNjY3NjZdIGwyY2FwX3NlbmRfY21kOiBjb2RlIDB4
-MDUKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yNzA0Njld
-IGwyY2FwX3JlY3ZfYWNsZGF0YTogY29ubiBmZmZmODgwMDgxOTE0YTAwIGxlbiAxNCBmbGFn
-cyAweDIKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yNzA0
-NzZdIGwyY2FwX3JlY3ZfZnJhbWU6IGxlbiAxMCwgY2lkIDB4MDAwMQpBdWcgIDMgMTE6MDI6
-MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjI3MDQ3OV0gbDJjYXBfcmF3X3JlY3Y6
-IGNvbm4gZmZmZjg4MDA4MTkxNGEwMApBdWcgIDMgMTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtl
-cm5lbDogWyA2MzQ3LjI3MDQ4Ml0gbDJjYXBfc2lnX2NoYW5uZWw6IGNvZGUgMHgwNSBsZW4g
-NiBpZCAweDA5CkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcu
-MjcwNDg1XSBsMmNhcF9jb25maWdfcnNwOiBzY2lkIDB4MDA0MyBmbGFncyAweDAwIHJlc3Vs
-dCAweDAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMjcw
-NDg5XSBsMmNhcF9jb25mX3JmY19nZXQ6IGNoYW4gZmZmZjg4MDEwZDAwNTQwMCwgcnNwIGZm
-ZmY4ODAwMGMwMDUwMWEsIGxlbiAwCkF1ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2Vy
-bmVsOiBbIDYzNDcuMjcwNDkyXSBfX2wyY2FwX3N0YXRlX2NoYW5nZTogY2hhbiBmZmZmODgw
-MTBkMDA1NDAwIEJUX0NPTkZJRyAtPiBCVF9DT05ORUNURUQKQXVnICAzIDExOjAyOjM5IGZk
-YW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yNzA0OTZdIGwyY2FwX2NoYW5fcmVhZHk6IHNr
-IGZmZmY4ODAxMGQwMDcwMDAsIHBhcmVudCAgICAgICAgICAgKG51bGwpCkF1ZyAgMyAxMTow
-MjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMjcwNDk4XSBfX2wyY2FwX3N0YXRl
-X2NoYW5nZTogY2hhbiBmZmZmODgwMTBkMDA1NDAwIEJUX0NPTk5FQ1RFRCAtPiBCVF9DT05O
-RUNURUQKQXVnICAzIDExOjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yNzA1
-NTVdIGwyY2FwX3NvY2tfZ2V0c29ja29wdDogc2sgZmZmZjg4MDEwZDAwNzAwMApBdWcgIDMg
-MTE6MDI6MzkgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjI3MDU1N10gbDJjYXBfc29j
-a19nZXRzb2Nrb3B0X29sZDogc2sgZmZmZjg4MDEwZDAwNzAwMApBdWcgIDMgMTE6MDI6Mzkg
-ZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzQ3LjI3MDU2MV0gbDJjYXBfc29ja19nZXRuYW1l
-OiBzb2NrIGZmZmY4ODAwMGYyMDY1ODAsIHNrIGZmZmY4ODAxMGQwMDcwMDAKQXVnICAzIDEx
-OjAyOjM5IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yNzA1NjNdIGwyY2FwX3NvY2tf
-Z2V0bmFtZTogc29jayBmZmZmODgwMDBmMjA2NTgwLCBzayBmZmZmODgwMTBkMDA3MDAwCkF1
-ZyAgMyAxMTowMjozOSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNDcuMjcwNTczXSBsMmNh
-cF9zb2NrX3NldHNvY2tvcHQ6IHNrIGZmZmY4ODAxMGQwMDcwMDAKQXVnICAzIDExOjAyOjM5
-IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM0Ny4yNzA1NzVdIGwyY2FwX3NvY2tfc2V0c29j
-a29wdDogc2sgZmZmZjg4MDEwZDAwNzAwMAoKCkF1ZyAgMyAxMTowMjo1MSBmZGFuaXMtbGlu
-dXgga2VybmVsOiBbIDYzNTguOTY2ODY5XSBsMmNhcF9zb2NrX3NlbmRtc2c6IHNvY2sgZmZm
-Zjg4MDAwZjIwNzQ4MCwgc2sgZmZmZjg4MDEwZTdhOWMwMApBdWcgIDMgMTE6MDI6NTEgZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzU4Ljk2Njk0MF0gbDJjYXBfY3JlYXRlX2Jhc2ljX3Bk
-dTogY2hhbiBmZmZmODgwMTBlN2FkYzAwIGxlbiAzCkF1ZyAgMyAxMTowMjo1MSBmZGFuaXMt
-bGludXgga2VybmVsOiBbIDYzNTguOTY2OTQ2XSBsMmNhcF9kb19zZW5kOiBjaGFuIGZmZmY4
-ODAxMGU3YWRjMDAsIHNrYiBmZmZmODgwMGQyYWNiYTAwIGxlbiA3IHByaW9yaXR5IDAKQXVn
-ICAzIDExOjAyOjUxIGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM1OC45OTU4OTRdIGwyY2Fw
-X3JlY3ZfYWNsZGF0YTogY29ubiBmZmZmODgwMDgxOTE0YTAwIGxlbiA2IGZsYWdzIDB4MgpB
-dWcgIDMgMTE6MDI6NTEgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzU4Ljk5NTg5OV0gbDJj
-YXBfcmVjdl9mcmFtZTogbGVuIDIsIGNpZCAweDAwNDEKQXVnICAzIDExOjAyOjUxIGZkYW5p
-cy1saW51eCBrZXJuZWw6IFsgNjM1OC45OTU5MDJdIGwyY2FwX2RhdGFfY2hhbm5lbDogY2hh
-biBmZmZmODgwMTBlN2FkYzAwLCBsZW4gMgpBdWcgIDMgMTE6MDI6NTEgZmRhbmlzLWxpbnV4
-IGtlcm5lbDogWyA2MzU4Ljk5NTk3N10gbDJjYXBfc29ja19zaHV0ZG93bjogc29jayBmZmZm
-ODgwMDBmMjA2NTgwLCBzayBmZmZmODgwMTBkMDA3MDAwCkF1ZyAgMyAxMTowMjo1MSBmZGFu
-aXMtbGludXgga2VybmVsOiBbIDYzNTguOTk1OTgyXSBsMmNhcF9jaGFuX2Nsb3NlOiBjaGFu
-IGZmZmY4ODAxMGQwMDU0MDAgc3RhdGUgQlRfQ09OTkVDVEVEIHNrIGZmZmY4ODAxMGQwMDcw
-MDAKQXVnICAzIDExOjAyOjUxIGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM1OC45OTU5ODhd
-IGwyY2FwX2J1aWxkX2NtZDogY29ubiBmZmZmODgwMDgxOTE0YTAwLCBjb2RlIDB4MDYsIGlk
-ZW50IDB4MGEsIGxlbiA0CkF1ZyAgMyAxMTowMjo1MSBmZGFuaXMtbGludXgga2VybmVsOiBb
-IDYzNTguOTk1OTkzXSBsMmNhcF9zZW5kX2NtZDogY29kZSAweDA2CkF1ZyAgMyAxMTowMjo1
-MSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNTguOTk1OTk5XSBfX2wyY2FwX3N0YXRlX2No
-YW5nZTogY2hhbiBmZmZmODgwMTBkMDA1NDAwIEJUX0NPTk5FQ1RFRCAtPiBCVF9ESVNDT05O
-CkF1ZyAgMyAxMTowMjo1MSBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNTguOTk2MDA2XSBs
-MmNhcF9zb2NrX3JlbGVhc2U6IHNvY2sgZmZmZjg4MDAwZjIwNjU4MCwgc2sgZmZmZjg4MDEw
-ZDAwNzAwMApBdWcgIDMgMTE6MDI6NTEgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzU4Ljk5
-NjAwOV0gbDJjYXBfc29ja19zaHV0ZG93bjogc29jayBmZmZmODgwMDBmMjA2NTgwLCBzayBm
-ZmZmODgwMTBkMDA3MDAwCkF1ZyAgMyAxMTowMjo1MSBmZGFuaXMtbGludXgga2VybmVsOiBb
-IDYzNTkuMDAxOTQ5XSBsMmNhcF9yZWN2X2FjbGRhdGE6IGNvbm4gZmZmZjg4MDA4MTkxNGEw
-MCBsZW4gMTIgZmxhZ3MgMHgyCkF1ZyAgMyAxMTowMjo1MSBmZGFuaXMtbGludXgga2VybmVs
-OiBbIDYzNTkuMDAxOTU2XSBsMmNhcF9yZWN2X2ZyYW1lOiBsZW4gOCwgY2lkIDB4MDAwMQpB
-dWcgIDMgMTE6MDI6NTEgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzU5LjAwMTk2MV0gbDJj
-YXBfcmF3X3JlY3Y6IGNvbm4gZmZmZjg4MDA4MTkxNGEwMApBdWcgIDMgMTE6MDI6NTEgZmRh
-bmlzLWxpbnV4IGtlcm5lbDogWyA2MzU5LjAwMTk2Nl0gbDJjYXBfc2lnX2NoYW5uZWw6IGNv
-ZGUgMHgwNyBsZW4gNCBpZCAweDBhCkF1ZyAgMyAxMTowMjo1MSBmZGFuaXMtbGludXgga2Vy
-bmVsOiBbIDYzNTkuMDAxOTcxXSBsMmNhcF9kaXNjb25uZWN0X3JzcDogZGNpZCAweDAwNDQg
-c2NpZCAweDAwNDMKQXVnICAzIDExOjAyOjUxIGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM1
-OS4wMDE5NzZdIGwyY2FwX2NoYW5fZGVsOiBjaGFuIGZmZmY4ODAxMGQwMDU0MDAsIGNvbm4g
-ZmZmZjg4MDA4MTkxNGEwMCwgZXJyIDAKQXVnICAzIDExOjAyOjUxIGZkYW5pcy1saW51eCBr
-ZXJuZWw6IFsgNjM1OS4wMDE5ODJdIF9fbDJjYXBfc3RhdGVfY2hhbmdlOiBjaGFuIGZmZmY4
-ODAxMGQwMDU0MDAgQlRfRElTQ09OTiAtPiBCVF9DTE9TRUQKQXVnICAzIDExOjAyOjUxIGZk
-YW5pcy1saW51eCBrZXJuZWw6IFsgNjM1OS4wMDE5ODhdIGwyY2FwX3NvY2tfa2lsbDogc2sg
-ZmZmZjg4MDEwZDAwNzAwMCBzdGF0ZSBCVF9DTE9TRUQKQXVnICAzIDExOjAyOjUxIGZkYW5p
-cy1saW51eCBrZXJuZWw6IFsgNjM1OS4wMDE5OTRdIGwyY2FwX3NvY2tfZGVzdHJ1Y3Q6IHNr
-IGZmZmY4ODAxMGQwMDcwMDAKQXVnICAzIDExOjAyOjUyIGZkYW5pcy1saW51eCBrZXJuZWw6
-IFsgNjM2MC4xMjE1MDVdIGwyY2FwX3NvY2tfcmVsZWFzZTogc29jayBmZmZmODgwMDBmMjA3
-NDgwLCBzayBmZmZmODgwMTBlN2E5YzAwCkF1ZyAgMyAxMTowMjo1MiBmZGFuaXMtbGludXgg
-a2VybmVsOiBbIDYzNjAuMTIxNTEyXSBsMmNhcF9zb2NrX3NodXRkb3duOiBzb2NrIGZmZmY4
-ODAwMGYyMDc0ODAsIHNrIGZmZmY4ODAxMGU3YTljMDAKQXVnICAzIDExOjAyOjUyIGZkYW5p
-cy1saW51eCBrZXJuZWw6IFsgNjM2MC4xMjE1MTldIGwyY2FwX2NoYW5fY2xvc2U6IGNoYW4g
-ZmZmZjg4MDEwZTdhZGMwMCBzdGF0ZSBCVF9DT05ORUNURUQgc2sgZmZmZjg4MDEwZTdhOWMw
-MApBdWcgIDMgMTE6MDI6NTIgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzYwLjEyMTUzMV0g
-bDJjYXBfYnVpbGRfY21kOiBjb25uIGZmZmY4ODAwODE5MTRhMDAsIGNvZGUgMHgwNiwgaWRl
-bnQgMHgwYiwgbGVuIDQKQXVnICAzIDExOjAyOjUyIGZkYW5pcy1saW51eCBrZXJuZWw6IFsg
-NjM2MC4xMjE1MzddIGwyY2FwX3NlbmRfY21kOiBjb2RlIDB4MDYKQXVnICAzIDExOjAyOjUy
-IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM2MC4xMjE1NTBdIF9fbDJjYXBfc3RhdGVfY2hh
-bmdlOiBjaGFuIGZmZmY4ODAxMGU3YWRjMDAgQlRfQ09OTkVDVEVEIC0+IEJUX0RJU0NPTk4K
-QXVnICAzIDExOjAyOjUyIGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM2MC4xMjE2OTldIGwy
-Y2FwX3NvY2tfcmVsZWFzZTogc29jayBmZmZmODgwMDBmMjA0YzgwLCBzayBmZmZmODgwMTBl
-N2FjNDAwCkF1ZyAgMyAxMTowMjo1MiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNjAuMTIx
-NzAyXSBsMmNhcF9zb2NrX3NodXRkb3duOiBzb2NrIGZmZmY4ODAwMGYyMDRjODAsIHNrIGZm
-ZmY4ODAxMGU3YWM0MDAKQXVnICAzIDExOjAyOjUyIGZkYW5pcy1saW51eCBrZXJuZWw6IFsg
-NjM2MC4xMjE3MDVdIGwyY2FwX2NoYW5fY2xvc2U6IGNoYW4gZmZmZjg4MDEwZTdhOTQwMCBz
-dGF0ZSBCVF9DT05ORUNURUQgc2sgZmZmZjg4MDEwZTdhYzQwMApBdWcgIDMgMTE6MDI6NTIg
-ZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzYwLjEyMTcxMF0gbDJjYXBfYnVpbGRfY21kOiBj
-b25uIGZmZmY4ODAwODE5MTRhMDAsIGNvZGUgMHgwNiwgaWRlbnQgMHgwYywgbGVuIDQKQXVn
-ICAzIDExOjAyOjUyIGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM2MC4xMjE3MTJdIGwyY2Fw
-X3NlbmRfY21kOiBjb2RlIDB4MDYKQXVnICAzIDExOjAyOjUyIGZkYW5pcy1saW51eCBrZXJu
-ZWw6IFsgNjM2MC4xMjE3MTZdIF9fbDJjYXBfc3RhdGVfY2hhbmdlOiBjaGFuIGZmZmY4ODAx
-MGU3YTk0MDAgQlRfQ09OTkVDVEVEIC0+IEJUX0RJU0NPTk4KQXVnICAzIDExOjAyOjUyIGZk
-YW5pcy1saW51eCBrZXJuZWw6IFsgNjM2MC4xNTE1NzhdIGwyY2FwX3JlY3ZfYWNsZGF0YTog
-Y29ubiBmZmZmODgwMDgxOTE0YTAwIGxlbiAxMiBmbGFncyAweDIKQXVnICAzIDExOjAyOjUy
-IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM2MC4xNTE1ODNdIGwyY2FwX3JlY3ZfZnJhbWU6
-IGxlbiA4LCBjaWQgMHgwMDAxCkF1ZyAgMyAxMTowMjo1MiBmZGFuaXMtbGludXgga2VybmVs
-OiBbIDYzNjAuMTUxNTg1XSBsMmNhcF9yYXdfcmVjdjogY29ubiBmZmZmODgwMDgxOTE0YTAw
-CkF1ZyAgMyAxMTowMjo1MiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNjAuMTUxNTg4XSBs
-MmNhcF9zaWdfY2hhbm5lbDogY29kZSAweDA3IGxlbiA0IGlkIDB4MGIKQXVnICAzIDExOjAy
-OjUyIGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM2MC4xNTE1OTFdIGwyY2FwX2Rpc2Nvbm5l
-Y3RfcnNwOiBkY2lkIDB4MDA0MiBzY2lkIDB4MDA0MQpBdWcgIDMgMTE6MDI6NTIgZmRhbmlz
-LWxpbnV4IGtlcm5lbDogWyA2MzYwLjE1MTU5NV0gbDJjYXBfY2hhbl9kZWw6IGNoYW4gZmZm
-Zjg4MDEwZTdhZGMwMCwgY29ubiBmZmZmODgwMDgxOTE0YTAwLCBlcnIgMApBdWcgIDMgMTE6
-MDI6NTIgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzYwLjE1MTU5OV0gX19sMmNhcF9zdGF0
-ZV9jaGFuZ2U6IGNoYW4gZmZmZjg4MDEwZTdhZGMwMCBCVF9ESVNDT05OIC0+IEJUX0NMT1NF
-RApBdWcgIDMgMTE6MDI6NTIgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzYwLjE1MTYwM10g
-bDJjYXBfc29ja19raWxsOiBzayBmZmZmODgwMTBlN2E5YzAwIHN0YXRlIEJUX0NMT1NFRApB
-dWcgIDMgMTE6MDI6NTIgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzYwLjE1MTYwN10gbDJj
-YXBfc29ja19kZXN0cnVjdDogc2sgZmZmZjg4MDEwZTdhOWMwMApBdWcgIDMgMTE6MDI6NTIg
-ZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzYwLjE1MjczMF0gbDJjYXBfcmVjdl9hY2xkYXRh
-OiBjb25uIGZmZmY4ODAwODE5MTRhMDAgbGVuIDEyIGZsYWdzIDB4MgpBdWcgIDMgMTE6MDI6
-NTIgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzYwLjE1MjczM10gbDJjYXBfcmVjdl9mcmFt
-ZTogbGVuIDgsIGNpZCAweDAwMDEKQXVnICAzIDExOjAyOjUyIGZkYW5pcy1saW51eCBrZXJu
-ZWw6IFsgNjM2MC4xNTI3MzVdIGwyY2FwX3Jhd19yZWN2OiBjb25uIGZmZmY4ODAwODE5MTRh
-MDAKQXVnICAzIDExOjAyOjUyIGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM2MC4xNTI3Mzdd
-IGwyY2FwX3NpZ19jaGFubmVsOiBjb2RlIDB4MDcgbGVuIDQgaWQgMHgwYwpBdWcgIDMgMTE6
-MDI6NTIgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzYwLjE1MjczOV0gbDJjYXBfZGlzY29u
-bmVjdF9yc3A6IGRjaWQgMHgwMDQzIHNjaWQgMHgwMDQyCkF1ZyAgMyAxMTowMjo1MiBmZGFu
-aXMtbGludXgga2VybmVsOiBbIDYzNjAuMTUyNzQyXSBsMmNhcF9jaGFuX2RlbDogY2hhbiBm
-ZmZmODgwMTBlN2E5NDAwLCBjb25uIGZmZmY4ODAwODE5MTRhMDAsIGVyciAwCkF1ZyAgMyAx
-MTowMjo1MiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNjAuMTUyNzQ1XSBfX2wyY2FwX3N0
-YXRlX2NoYW5nZTogY2hhbiBmZmZmODgwMTBlN2E5NDAwIEJUX0RJU0NPTk4gLT4gQlRfQ0xP
-U0VECkF1ZyAgMyAxMTowMjo1MiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNjAuMTUyNzQ5
-XSBsMmNhcF9zb2NrX2tpbGw6IHNrIGZmZmY4ODAxMGU3YWM0MDAgc3RhdGUgQlRfQ0xPU0VE
-CkF1ZyAgMyAxMTowMjo1MiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNjAuMTUyNzUxXSBs
-MmNhcF9zb2NrX2Rlc3RydWN0OiBzayBmZmZmODgwMTBlN2FjNDAwCgoKQXVnICAzIDExOjAz
-OjEyIGZkYW5pcy1saW51eCBibHVldG9vdGhkWzE0MzRdOiBEaXNjb25uZWN0ZWQgZnJvbSAx
-MDowNDoxNDpEMTo5NjoxQywgL29yZy9ibHVlei8xNDM0L2hjaTAvZGV2XzEwXzA0XzE0X0Qx
-Xzk2XzFDCkF1ZyAgMyAxMTowMzoxMiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNzkuNDc1
-MDM4XSByZmNvbW1fc29ja19yZWxlYXNlOiBzb2NrIGZmZmY4ODAwMGYyMDRhMDAsIHNrIGZm
-ZmY4ODAxMGU3YWQ0MDAKQXVnICAzIDExOjAzOjEyIGZkYW5pcy1saW51eCBrZXJuZWw6IFsg
-NjM3OS40NzUwNDFdIHJmY29tbV9zb2NrX3NodXRkb3duOiBzb2NrIGZmZmY4ODAwMGYyMDRh
-MDAsIHNrIGZmZmY4ODAxMGU3YWQ0MDAKQXVnICAzIDExOjAzOjEyIGZkYW5pcy1saW51eCBr
-ZXJuZWw6IFsgNjM3OS40NzUwNDRdIF9fcmZjb21tX3NvY2tfY2xvc2U6IHNrIGZmZmY4ODAx
-MGU3YWQ0MDAgc3RhdGUgMSBzb2NrZXQgZmZmZjg4MDAwZjIwNGEwMApBdWcgIDMgMTE6MDM6
-MTIgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2Mzc5LjQ3NTA0N10gX19yZmNvbW1fZGxjX2Ns
-b3NlOiBkbGMgZmZmZjg4MDBjMzk1OWEwMCBzdGF0ZSAxIGRsY2kgMjYgZXJyIDAgc2Vzc2lv
-biBmZmZmODgwMTEwYjcyMDAwCkF1ZyAgMyAxMTowMzoxMiBmZGFuaXMtbGludXgga2VybmVs
-OiBbIDYzNzkuNDc1MDUwXSByZmNvbW1fc2VuZF9kaXNjOiBmZmZmODgwMTEwYjcyMDAwIGRs
-Y2kgMjYKQXVnICAzIDExOjAzOjEyIGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM3OS40NzUw
-NTJdIHJmY29tbV9zZW5kX2NtZDogZmZmZjg4MDExMGI3MjAwMCBjbWQgODMKQXVnICAzIDEx
-OjAzOjEyIGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM3OS40NzUwNTRdIHJmY29tbV9zZW5k
-X2ZyYW1lOiBzZXNzaW9uIGZmZmY4ODAxMTBiNzIwMDAgbGVuIDQKQXVnICAzIDExOjAzOjEy
-IGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM3OS40NzUwNTddIGwyY2FwX3NvY2tfc2VuZG1z
-Zzogc29jayBmZmZmODgwMGM3NzkyODAwLCBzayBmZmZmODgwMTBlN2FlYzAwCkF1ZyAgMyAx
-MTowMzoxMiBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzNzkuNDc1MDU5XSBsMmNhcF9jcmVh
-dGVfYmFzaWNfcGR1OiBjaGFuIGZmZmY4ODAxMGU3YTkwMDAgbGVuIDQKQXVnICAzIDExOjAz
-OjEyIGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM3OS40NzUwNjRdIGwyY2FwX2RvX3NlbmQ6
-IGNoYW4gZmZmZjg4MDEwZTdhOTAwMCwgc2tiIGZmZmY4ODAwMGU3MjNjMDAgbGVuIDggcHJp
-b3JpdHkgMApBdWcgIDMgMTE6MDM6MTIgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2Mzc5LjQ3
-NTA3NV0gcmZjb21tX2RsY19zZXRfdGltZXI6IGRsYyBmZmZmODgwMGMzOTU5YTAwIHN0YXRl
-IDggdGltZW91dCA1MDAwCkF1ZyAgMyAxMTowMzoxMiBmZGFuaXMtbGludXgga2VybmVsOiBb
-IDYzNzkuNDc1MDc4XSByZmNvbW1fc29ja19raWxsOiBzayBmZmZmODgwMTBlN2FkNDAwIHN0
-YXRlIDEgcmVmY250IDIKQXVnICAzIDExOjAzOjEyIGZkYW5pcy1saW51eCBrZXJuZWw6IFsg
-NjM3OS40NzUwODFdIHJmY29tbV9zb2NrX2Rlc3RydWN0OiBzayBmZmZmODgwMTBlN2FkNDAw
-IGRsYyBmZmZmODgwMGMzOTU5YTAwCkF1ZyAgMyAxMTowMzoxMyBmZGFuaXMtbGludXgga2Vy
-bmVsOiBbIDYzODAuNTc0NzUxXSBsMmNhcF9yZWN2X2FjbGRhdGE6IGNvbm4gZmZmZjg4MDA4
-MTkxNGEwMCBsZW4gOCBmbGFncyAweDIKQXVnICAzIDExOjAzOjEzIGZkYW5pcy1saW51eCBr
-ZXJuZWw6IFsgNjM4MC41NzQ3NThdIGwyY2FwX3JlY3ZfZnJhbWU6IGxlbiA0LCBjaWQgMHgw
-MDQwCkF1ZyAgMyAxMTowMzoxMyBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzODAuNTc0NzYz
-XSBsMmNhcF9kYXRhX2NoYW5uZWw6IGNoYW4gZmZmZjg4MDEwZTdhOTAwMCwgbGVuIDQKQXVn
-ICAzIDExOjAzOjEzIGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM4MC41NzQ3NjldIHJmY29t
-bV9sMmRhdGFfcmVhZHk6IGZmZmY4ODAxMGU3YWVjMDAgYnl0ZXMgNApBdWcgIDMgMTE6MDM6
-MTMgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzgwLjU3NDc4N10gcmZjb21tX3Byb2Nlc3Nf
-cng6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBzdGF0ZSAxIHFsZW4gMQpBdWcgIDMgMTE6
-MDM6MTMgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzgwLjU3NDc5M10gcmZjb21tX3JlY3Zf
-dWE6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBzdGF0ZSAxIGRsY2kgMjYKQXVnICAzIDEx
-OjAzOjEzIGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM4MC41NzQ3OThdIF9fcmZjb21tX2Rs
-Y19jbG9zZTogZGxjIGZmZmY4ODAwYzM5NTlhMDAgc3RhdGUgOSBkbGNpIDI2IGVyciAwIHNl
-c3Npb24gZmZmZjg4MDExMGI3MjAwMApBdWcgIDMgMTE6MDM6MTMgZmRhbmlzLWxpbnV4IGtl
-cm5lbDogWyA2MzgwLjU3NDgwMl0gcmZjb21tX2RsY19jbGVhcl90aW1lcjogZGxjIGZmZmY4
-ODAwYzM5NTlhMDAgc3RhdGUgOQpBdWcgIDMgMTE6MDM6MTMgZmRhbmlzLWxpbnV4IGtlcm5l
-bDogWyA2MzgwLjU3NDgwNl0gcmZjb21tX2RsY191bmxpbms6IGRsYyBmZmZmODgwMGMzOTU5
-YTAwIHJlZmNudCAxIHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMApBdWcgIDMgMTE6MDM6MTMg
-ZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzgwLjU3NDgxMF0gcmZjb21tX2RsY19mcmVlOiBm
-ZmZmODgwMGMzOTU5YTAwCkF1ZyAgMyAxMTowMzoxMyBmZGFuaXMtbGludXgga2VybmVsOiBb
-IDYzODAuNTc0ODE1XSByZmNvbW1fc2Vzc2lvbl9zZXRfdGltZXI6IHNlc3Npb24gZmZmZjg4
-MDExMGI3MjAwMCBzdGF0ZSAxIHRpbWVvdXQgNTAwCkF1ZyAgMyAxMTowMzoxMyBmZGFuaXMt
-bGludXgga2VybmVsOiBbIDYzODAuNTc0ODE5XSByZmNvbW1fc2VuZF9kaXNjOiBmZmZmODgw
-MTEwYjcyMDAwIGRsY2kgMApBdWcgIDMgMTE6MDM6MTMgZmRhbmlzLWxpbnV4IGtlcm5lbDog
-WyA2MzgwLjU3NDgyMl0gcmZjb21tX3NlbmRfY21kOiBmZmZmODgwMTEwYjcyMDAwIGNtZCA4
-MwpBdWcgIDMgMTE6MDM6MTMgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzgwLjU3NDgyNl0g
-cmZjb21tX3NlbmRfZnJhbWU6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBsZW4gNApBdWcg
-IDMgMTE6MDM6MTMgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzgwLjU3NDgzMF0gbDJjYXBf
-c29ja19zZW5kbXNnOiBzb2NrIGZmZmY4ODAwYzc3OTI4MDAsIHNrIGZmZmY4ODAxMGU3YWVj
-MDAKQXVnICAzIDExOjAzOjEzIGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM4MC41NzQ4MzVd
-IGwyY2FwX2NyZWF0ZV9iYXNpY19wZHU6IGNoYW4gZmZmZjg4MDEwZTdhOTAwMCBsZW4gNApB
-dWcgIDMgMTE6MDM6MTMgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzgwLjU3NDg0MV0gbDJj
-YXBfZG9fc2VuZDogY2hhbiBmZmZmODgwMTBlN2E5MDAwLCBza2IgZmZmZjg4MDBjM2JiYzkw
-MCBsZW4gOCBwcmlvcml0eSAwCkF1ZyAgMyAxMTowMzoxMyBmZGFuaXMtbGludXgga2VybmVs
-OiBbIDYzODAuNTc0ODUwXSByZmNvbW1fc2Vzc2lvbl9jbGVhcl90aW1lcjogc2Vzc2lvbiBm
-ZmZmODgwMTEwYjcyMDAwIHN0YXRlIDgKQXVnICAzIDExOjAzOjEzIGZkYW5pcy1saW51eCBr
-ZXJuZWw6IFsgNjM4MC41NzQ4NTddIHJmY29tbV9wcm9jZXNzX2RsY3M6IHNlc3Npb24gZmZm
-Zjg4MDExMGI3MjAwMCBzdGF0ZSA4CkF1ZyAgMyAxMTowMzoxMyBmZGFuaXMtbGludXgga2Vy
-bmVsOiBbIDYzODAuNTgwOTc1XSBsMmNhcF9yZWN2X2FjbGRhdGE6IGNvbm4gZmZmZjg4MDA4
-MTkxNGEwMCBsZW4gOCBmbGFncyAweDIKQXVnICAzIDExOjAzOjEzIGZkYW5pcy1saW51eCBr
-ZXJuZWw6IFsgNjM4MC41ODA5ODRdIGwyY2FwX3JlY3ZfZnJhbWU6IGxlbiA0LCBjaWQgMHgw
-MDQwCkF1ZyAgMyAxMTowMzoxMyBmZGFuaXMtbGludXgga2VybmVsOiBbIDYzODAuNTgwOTkx
-XSBsMmNhcF9kYXRhX2NoYW5uZWw6IGNoYW4gZmZmZjg4MDEwZTdhOTAwMCwgbGVuIDQKQXVn
-ICAzIDExOjAzOjEzIGZkYW5pcy1saW51eCBrZXJuZWw6IFsgNjM4MC41ODA5OThdIHJmY29t
-bV9sMmRhdGFfcmVhZHk6IGZmZmY4ODAxMGU3YWVjMDAgYnl0ZXMgNApBdWcgIDMgMTE6MDM6
-MTMgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzgwLjU4MTAxNF0gcmZjb21tX3Byb2Nlc3Nf
-cng6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBzdGF0ZSA4IHFsZW4gMQpBdWcgIDMgMTE6
-MDM6MTMgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzgwLjU4MTAyMl0gcmZjb21tX3JlY3Zf
-dWE6IHNlc3Npb24gZmZmZjg4MDExMGI3MjAwMCBzdGF0ZSA4IGRsY2kgMApBdWcgIDMgMTE6
-MDM6MTMgZmRhbmlzLWxpbnV4IGtlcm5lbDogWyA2MzgwLjU4MTAzMF0gcmZjb21tX3Byb2Nl
-c3NfZGxjczogc2Vzc2lvbiBmZmZmODgwMTEwYjcyMDAwIHN0YXRlIDgKCgoK
---------------040309010103030207010803--
