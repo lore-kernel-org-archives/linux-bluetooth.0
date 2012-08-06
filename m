@@ -1,100 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 6 Aug 2012 16:04:16 -0300
+Date: Mon, 6 Aug 2012 15:40:47 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
 	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth 2012-08-06
-Message-ID: <20120806190416.GE3146@joana>
+Subject: Re: [PATCH v2] Bluetooth: Another vendor specific ID for BCM20702A0
+ [0a5c:21f1]
+Message-ID: <20120806184047.GD3146@joana>
+References: <1343431747.1803.12.camel@aeonflux>
+ <1343742454-28019-1-git-send-email-mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="M9NhX3UHpAaciwkO"
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1343742454-28019-1-git-send-email-mmarek@suse.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Michal,
 
---M9NhX3UHpAaciwkO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+* Michal Marek <mmarek@suse.cz> [2012-07-31 15:47:34 +0200]:
 
-Hi John,=20
+> T:  Bus=02 Lev=02 Prnt=02 Port=01 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0a5c ProdID=21f1 Rev= 1.12
+> S:  Manufacturer=Broadcom Corp
+> S:  Product=BCM20702A0
+> S:  SerialNumber=9CB70DCFF833
+> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+> 
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> ---
+>  drivers/bluetooth/btusb.c |    1 +
+>  1 file changed, 1 insertion(+)
 
-Here goes some fixes for 3.6-rc1, there are a few fix to thte inquiry code =
-by
-Ram Malovany, support for 2 new devices, and few others fixes for NULL
-dereference, possible deadlock and a memory leak.
-
-Please pull, or let me know of any problems with this! Thanks.
+Can you try the following patch on 3.6-rc1? It should fix this by matching
+vendor and inteface info.
 
 	Gustavo
 
 ---
 
-The following changes since commit d4e5979c0da95791aa717c18e162540c7a596360:
+Author: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Date:   Mon Aug 6 15:36:49 2012 -0300
 
-  ath9k: Add PID/VID support for AR1111 (2012-08-03 10:11:14 -0400)
+    Bluetooth: Use USB_VENDOR_AND_INTERFACE_INFO() for Broadcom devices
+    
+    Many Broadcom devices has a vendor specific devices class, with this rule
+    we match all existent and future controllers with this behavior.
+    
+    Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
-
-for you to fetch changes up to 2096ae6ca647302d50a68aa36cb66a00e7dfac70:
-
-  Bluetooth: add support for atheros 0489:e057 (2012-08-06 15:33:05 -0300)
-
-----------------------------------------------------------------
-Andrei Emeltchenko (1):
-      Bluetooth: smp: Fix possible NULL dereference
-
-Gustavo Padovan (1):
-      Bluetooth: Fix possible deadlock in SCO code
-
-Jaganath Kanakkassery (1):
-      Bluetooth: Fix socket not getting freed if l2cap channel create fails
-
-Manoj Iyer (1):
-      Bluetooth: btusb: Add vendor specific ID (0a5c:21f4) BCM20702A0
-
-Peng Chen (1):
-      Bluetooth: add support for atheros 0489:e057
-
-Ram Malovany (3):
-      Bluetooth: Fix using NULL inquiry entry
-      Bluetooth: Fix using a NULL inquiry cache entry
-      Bluetooth: Set name_state to unknown when entry name is empty
-
-Szymon Janc (1):
-      Bluetooth: Fix legacy pairing with some devices
-
- drivers/bluetooth/ath3k.c  |  2 ++
- drivers/bluetooth/btusb.c  |  2 ++
- net/bluetooth/hci_event.c  | 28 ++++++++++++++++++++++------
- net/bluetooth/l2cap_core.c |  1 +
- net/bluetooth/l2cap_sock.c |  2 +-
- net/bluetooth/sco.c        | 19 +++++++++----------
- net/bluetooth/smp.c        |  5 ++++-
- 7 files changed, 41 insertions(+), 18 deletions(-)
-
---M9NhX3UHpAaciwkO
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIcBAEBAgAGBQJQIBUwAAoJEPs3PUX4s20oV00P/jykZdeYqL6AD6relxw2B9Ew
-g2WqcfTjLZO7oQdufiRlKho7rD/WX2T5CHRFksQ+n1XUwcVve4ffFTKgeLrabEdN
-TK4xYw43ze+OcpT4nLn3gNxVu0QMGsr/TEIT6nQ6hQq9JNgPWTvKij+ysBbdsTpk
-3oiLdpXQjNNssIZdIQu0b87WjsFlDt1yeoLDT9gyHSZyBgUuj3H65jyC3jeXzHgt
-3bVlt7dizYEAghzJXxTokAFK6Ye+CflyKav2E82oe/qXOzuUHAjIKdOKWsdGi3IY
-k1PDhd7khGUROOQw/BZvl/mHBZWsks4+pWPeVApQuMiJfA5NufUt3lus+CxyZKGp
-f8jl3B6nsiEscXMuRr41XcLwoYDJ49u73uyLN8OiFbGFgbPXg903SPRLq352xIOB
-fvMB2dTO2T8ymAZ9KUGPlXWDg0S8OFQT4bY+FIhUtIqaWXNUqHtBqCVKk5kFbBIG
-X8HgZTxrv9KwVWclBCu9Iwh4MU1KpJJ09eaGx8/bOvPWuaiyJNMFvSFcohTlI0qN
-yzt/9qKERGj0FjBI0hFHz8Zo9byf2jxvjj3HtzHX/CM1wXZl1rc33SfJdCgltFTG
-tKpjwo6zZs25HOBR+MB8jVQHezBgsdF8GhZ7BEmR0t854K3KacxwbnCty4RdCvDq
-uhVj8qVsCGjk0tqYf6q+
-=3DRr
------END PGP SIGNATURE-----
-
---M9NhX3UHpAaciwkO--
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index cef3bac..504231e 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -104,6 +104,9 @@ static struct usb_device_id btusb_table[] = {
+        /* Foxconn - Hon Hai */
+        { USB_DEVICE(0x0489, 0xe033) },
+ 
++       /*Broadcom devices with vendor specific id */
++       { USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01) },
++
+        { }     /* Terminating entry */
+ };
