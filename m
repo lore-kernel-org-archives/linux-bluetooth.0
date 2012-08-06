@@ -1,65 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20120806173021.GA3146@joana>
-References: <1343372921-18780-1-git-send-email-sachin.kamat@linaro.org>
-	<20120806173021.GA3146@joana>
-Date: Tue, 7 Aug 2012 08:55:11 +0530
-Message-ID: <CAK9yfHzfxcB2rqGJzMuRL0_bkx+sLKdpzGmcEkqbViN5jtnubQ@mail.gmail.com>
-Subject: Re: [PATCH 00/11] Use devm_kzalloc in bluetooth drivers
-From: Sachin Kamat <sachin.kamat@linaro.org>
-To: Gustavo Padovan <gustavo@padovan.org>, Sachin Kamat <sachin.kamat@linaro.org>,
-	linux-bluetooth@vger.kernel.org, marcel@holtmann.org, johan.hedberg@gmail.com,
-	patches@linaro.org
+In-Reply-To: <1344141450.2083.30.camel@aeonflux>
+References: <1343995640-19784-1-git-send-email-frederic.danis@linux.intel.com>
+	<1343995640-19784-2-git-send-email-frederic.danis@linux.intel.com>
+	<1344141450.2083.30.camel@aeonflux>
+Date: Mon, 6 Aug 2012 23:30:31 +0300
+Message-ID: <CABBYNZ+95Zx32T_Soz8Nms3reNcGpa3FsiyZpxS5zNzdsXhVvA@mail.gmail.com>
+Subject: Re: [PATCH v17 01/15] doc: Add telephony interface documents
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: =?ISO-8859-1?Q?Fr=E9d=E9ric_Danis?= <frederic.danis@linux.intel.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks Marcel and Gustavo.
+Hi Marcel,
 
+On Sun, Aug 5, 2012 at 7:37 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> +org.bluez.TelephonyAgent using this new interface. This will setup a SDP record
+>> +for the profile and a RFCOMM server listening for incoming connection.
+>> +
+>> +When a new device is connected, NewConnection method of TelephonyAgent is
+>> +called. The telephony agent should reply to it after proper communication
+>> +establishment (directly for HSP or after SLC setup completes for HFP).
+>
+> We need to describe on how HFP 1.6 with wideband speech is handled as
+> well.
 
-On 6 August 2012 23:00, Gustavo Padovan <gustavo@padovan.org> wrote:
-> Hi Sachin,
->
-> * Sachin Kamat <sachin.kamat@linaro.org> [2012-07-27 12:38:30 +0530]:
->
->> devm_kzalloc() is a device managed function which eliminates the need
->> to free memory explicitly thereby saving some cleanup code and making
->> the exit code simpler.
->>
->> This series is based on the following tree and is compile tested.
->> git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
->>
->> Sachin Kamat (11):
->>   Bluetooth: Use devm_kzalloc in bcm203x.c file.
->>   Bluetooth: Use devm_kzalloc in bfusb.c file
->>   Bluetooth: Use devm_kzalloc in bluecard_cs.c file
->>   Bluetooth: Use devm_kzalloc in bpa10x.c file
->>   Bluetooth: Use devm_kzalloc in bt3c_cs.c file
->>   Bluetooth: Use devm_kzalloc in btmrvl_sdio.c file
->>   Bluetooth: Use devm_kzalloc in btsdio.c file
->>   Bluetooth: Use devm_kzalloc in btuart_cs.c file
->>   Bluetooth: Use devm_kzalloc in btusb.c file
->>   Bluetooth: Use devm_kzalloc in btwilink.c file
->>   Bluetooth: Use devm_kzalloc in dtl1_cs.c file
->>
->>  drivers/bluetooth/bcm203x.c     |    8 +-------
->>  drivers/bluetooth/bfusb.c       |   12 ++++--------
->>  drivers/bluetooth/bluecard_cs.c |    5 +----
->>  drivers/bluetooth/bpa10x.c      |    8 ++------
->>  drivers/bluetooth/bt3c_cs.c     |    5 +----
->>  drivers/bluetooth/btmrvl_sdio.c |   15 ++++-----------
->>  drivers/bluetooth/btsdio.c      |    8 ++------
->>  drivers/bluetooth/btuart_cs.c   |    5 +----
->>  drivers/bluetooth/btusb.c       |   13 +++----------
->>  drivers/bluetooth/btwilink.c    |    8 ++------
->>  drivers/bluetooth/dtl1_cs.c     |    3 +--
->>  11 files changed, 22 insertions(+), 68 deletions(-)
->
-> The whole series have been applied to bluetooth-next. Thanks.
->
->         Gustavo
+I need to look in detail when the audio configuration is done in HFP
+1.6, in any case a the transport object can be used to signal wideband
+speech which PulseAudio should be able to catch and setup sbc
+encoder/decoder, iirc the parameters are fixed so there is no need to
+negotiate parameters with the endpoint as in A2DP so oFono only need
+to know if the transport is capable of wideband speech or not.
 
+>> +Interaction with the audio component (i.e. PulseAudio) will be done through the
+>> +MediaTransport object (passed to telephony agent during NewConnection call).
+>
+> This is the one thing that is really unclear to me. How does this
+> actually help. The MediaTransport and TelephonyAgent should be
+> independent.
 
+They are mostly independent, oFono will never really acquire or
+anything like that, but there are some AT commands (+VGS,+VGM) that
+does notify PA about volume gain changes and as I said above it could
+be useful to notify about wideband speech in the same way.
 
 -- 
-With warm regards,
-Sachin
+Luiz Augusto von Dentz
