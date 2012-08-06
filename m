@@ -1,148 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 6 Aug 2012 16:58:22 -0300
+Date: Mon, 6 Aug 2012 16:04:16 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linville@tuxdriver.com
 Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next 2012-08-06
-Message-ID: <20120806195821.GF3146@joana>
+Subject: pull request: bluetooth 2012-08-06
+Message-ID: <20120806190416.GE3146@joana>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="CdrF4e02JqNVZeln"
+	protocol="application/pgp-signature"; boundary="M9NhX3UHpAaciwkO"
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---CdrF4e02JqNVZeln
+--M9NhX3UHpAaciwkO
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hi John,
+Hi John,=20
 
-These are the changes I queued for 3.7. There are a many small
-fixes/improvements by Andre Guedes. A l2cap channel refcounting refactor by
-Jaganath. Bluetooth sockets now appears in /proc/net, by Masatake Yamato and
-Sachin Kamat changes ours drivers to use devm_kzalloc().
+Here goes some fixes for 3.6-rc1, there are a few fix to thte inquiry code =
+by
+Ram Malovany, support for 2 new devices, and few others fixes for NULL
+dereference, possible deadlock and a memory leak.
 
-Please pull, or let me know any concerns you have. Thanks.
+Please pull, or let me know of any problems with this! Thanks.
 
 	Gustavo
 
 ---
-The following changes since commit 173f8654746c138a08f51a8a0db7747763a896a2:
 
-  Merge tag 'ext4_for_linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tytso/ext4 (2012-07-27 20:52:25 -0700)
+The following changes since commit d4e5979c0da95791aa717c18e162540c7a596360:
+
+  ath9k: Add PID/VID support for AR1111 (2012-08-03 10:11:14 -0400)
 
 are available in the git repository at:
 
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next master
+for you to fetch changes up to 2096ae6ca647302d50a68aa36cb66a00e7dfac70:
 
-for you to fetch changes up to cd17decbd9af41c9548bb108ccf156519f8253ec:
-
-  Bluetooth: Refactor in hci_le_conn_complete_evt (2012-08-06 15:08:41 -0300)
+  Bluetooth: add support for atheros 0489:e057 (2012-08-06 15:33:05 -0300)
 
 ----------------------------------------------------------------
-Andre Guedes (17):
-      Bluetooth: Remove missing code
-      Bluetooth: Use lmp_bredr_capable where applicable
-      Bluetooth: Use lmp_le_capable where applicable
-      Bluetooth: Use lmp_ssp_capable where applicable
-      Bluetooth: Use lmp_esco_capable where applicable
-      Bluetooth: Use lmp_rswitch_capable where applicable
-      Bluetooth: Use lmp_sniff_capable where applicable
-      Bluetooth: Use lmp_sniffsubr_capable where applicable
-      Bluetooth: Use lmp_no_flush_capable where applicable
-      Bluetooth: Remove locking in hci_user_passkey_request_evt
-      Bluetooth: Trivial refactoring
-      Bluetooth: Fix hci_le_conn_complete_evt
-      Bluetooth: Remove unneeded code
-      Bluetooth: Refactor hci_cs_le_create_conn
-      Bluetooth: Find hci_conn by BT_CONNECT state
-      Bluetooth: Lookup hci_conn in hci_le_conn_complete_evt
-      Bluetooth: Refactor in hci_le_conn_complete_evt
+Andrei Emeltchenko (1):
+      Bluetooth: smp: Fix possible NULL dereference
 
-      Bluetooth: Do not shadow hdr variable
-      Bluetooth: Fix processing A2MP chan in security_cfm
-      Bluetooth: Make connect / disconnect cfm functions return void
+Gustavo Padovan (1):
+      Bluetooth: Fix possible deadlock in SCO code
 
-Jaganath Kanakkassery (2):
-      Bluetooth: Move l2cap_chan_hold/put to l2cap_core.c
-      Bluetooth: Free the l2cap channel list only when refcount is zero
+Jaganath Kanakkassery (1):
+      Bluetooth: Fix socket not getting freed if l2cap channel create fails
 
-Masatake YAMATO (8):
-      Bluetooth: /proc/net/ entries for bluetooth protocols
-      Bluetooth: Added /proc/net/bnep via bt_procfs_init()
-      Bluetooth: Added /proc/net/cmtp via bt_procfs_init()
-      Bluetooth: Added /proc/net/hci via bt_procfs_init()
-      Bluetooth: Added /proc/net/hidp via bt_procfs_init()
-      Bluetooth: Added /proc/net/l2cap via bt_procfs_init()
-      Bluetooth: Added /proc/net/rfcomm via bt_procfs_init()
-      Bluetooth: Added /proc/net/sco via bt_procfs_init()
+Manoj Iyer (1):
+      Bluetooth: btusb: Add vendor specific ID (0a5c:21f4) BCM20702A0
 
-Sachin Kamat (11):
-      Bluetooth: Use devm_kzalloc in bcm203x.c file.
-      Bluetooth: Use devm_kzalloc in bfusb.c file
-      Bluetooth: Use devm_kzalloc in bluecard_cs.c file
-      Bluetooth: Use devm_kzalloc in bpa10x.c file
-      Bluetooth: Use devm_kzalloc in bt3c_cs.c file
-      Bluetooth: Use devm_kzalloc in btmrvl_sdio.c file
-      Bluetooth: Use devm_kzalloc in btsdio.c file
-      Bluetooth: Use devm_kzalloc in btuart_cs.c file
-      Bluetooth: Use devm_kzalloc in btusb.c file
-      Bluetooth: Use devm_kzalloc in btwilink.c file
-      Bluetooth: Use devm_kzalloc in dtl1_cs.c file
+Peng Chen (1):
+      Bluetooth: add support for atheros 0489:e057
 
- drivers/bluetooth/bcm203x.c       |   8 +--
- drivers/bluetooth/bfusb.c         |  12 ++--
- drivers/bluetooth/bluecard_cs.c   |   5 +-
- drivers/bluetooth/bpa10x.c        |   8 +--
- drivers/bluetooth/bt3c_cs.c       |   5 +-
- drivers/bluetooth/btmrvl_sdio.c   |  15 ++---
- drivers/bluetooth/btsdio.c        |   8 +--
- drivers/bluetooth/btuart_cs.c     |   5 +-
- drivers/bluetooth/btusb.c         |  13 +---
- drivers/bluetooth/btwilink.c      |   8 +--
- drivers/bluetooth/dtl1_cs.c       |   3 +-
- include/net/bluetooth/bluetooth.h |  10 +++
- include/net/bluetooth/hci.h       |  11 ++++
- include/net/bluetooth/hci_core.h  |  22 ++-----
- include/net/bluetooth/l2cap.h     |  17 +----
- include/net/bluetooth/smp.h       |   8 +--
- net/bluetooth/a2mp.c              |  16 +++--
- net/bluetooth/af_bluetooth.c      | 141 ++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/bnep/sock.c         |  22 ++++++-
- net/bluetooth/cmtp/sock.c         |  23 ++++++-
- net/bluetooth/hci_core.c          |   6 +-
- net/bluetooth/hci_event.c         |  93 +++++++++++---------------
- net/bluetooth/hci_sock.c          |  13 +++-
- net/bluetooth/hidp/sock.c         |  22 ++++++-
- net/bluetooth/l2cap_core.c        |  32 +++++++--
- net/bluetooth/l2cap_sock.c        |  22 ++++++-
- net/bluetooth/mgmt.c              |  34 +++++++---
- net/bluetooth/rfcomm/sock.c       |  14 +++-
- net/bluetooth/sco.c               |  16 +++--
- 29 files changed, 415 insertions(+), 197 deletions(-)
+Ram Malovany (3):
+      Bluetooth: Fix using NULL inquiry entry
+      Bluetooth: Fix using a NULL inquiry cache entry
+      Bluetooth: Set name_state to unknown when entry name is empty
 
---CdrF4e02JqNVZeln
+Szymon Janc (1):
+      Bluetooth: Fix legacy pairing with some devices
+
+ drivers/bluetooth/ath3k.c  |  2 ++
+ drivers/bluetooth/btusb.c  |  2 ++
+ net/bluetooth/hci_event.c  | 28 ++++++++++++++++++++++------
+ net/bluetooth/l2cap_core.c |  1 +
+ net/bluetooth/l2cap_sock.c |  2 +-
+ net/bluetooth/sco.c        | 19 +++++++++----------
+ net/bluetooth/smp.c        |  5 ++++-
+ 7 files changed, 41 insertions(+), 18 deletions(-)
+
+--M9NhX3UHpAaciwkO
 Content-Type: application/pgp-signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQIcBAEBAgAGBQJQICHdAAoJEPs3PUX4s20o4O0P/iNbNQ3pu0C5YdgxCzrswEry
-WfCF9YI/uVK4fyVIdBSoGxHMjPhk/DnrFU5x0zlFijjOC+f3GUUj4iXDKXWCAgf+
-QEvyO5P0DS7YndfB9XVr3UkmSsGghhxfxOvQzOezK7y+o9saOF455kW2pk421tX+
-CQg4lTTOxmNaZTeDte+RBJQ1ciBMrhC+Lbra3ruZEkQBRacsEIe2yJnvhHmsHNpg
-qnixzLTDBL1joTt4lGnqwqTNGD3LHMfv9S5Ooht6jh6+Q3eTQoc1Z6dCbFM5ISga
-JIxkaqw706LeLtMnIzncRnM0mcxTpyHFe6IedUfSQ+ayilTRKwm+rsBKRDv8gKql
-3YRjBHjUyIDk/XDyMCT+8kAcRtm3naxiAK+QMrfKbD+c6jA3L1ndi0GAbJ3RwVxY
-h7ycykLqfaGAEm3h02SIjN8N9rVTYSbr8s+0TdJxonDKyd5vuxwihWhxs1mv87XF
-89BpmyRI9Q5pf5NPqwtLUd6FwLN9pEoJ0ZbuZVtAH/OeFDA0jv9AHMYKzifxi+s3
-SFGeUQbqGzneqIzcBBTh6BeEzjdqaiJUxF4UVt6Mn2icEkC/9vxb2GqJ7p1bHpYT
-i55hx/v61ZIiw2ODOR1Xl9zZoQXXH2X34676ovQsLX6Myl51zMr7g+GkC7H7E77V
-/MTfkoc7+XbBhDDyU7JN
-=E2TO
+iQIcBAEBAgAGBQJQIBUwAAoJEPs3PUX4s20oV00P/jykZdeYqL6AD6relxw2B9Ew
+g2WqcfTjLZO7oQdufiRlKho7rD/WX2T5CHRFksQ+n1XUwcVve4ffFTKgeLrabEdN
+TK4xYw43ze+OcpT4nLn3gNxVu0QMGsr/TEIT6nQ6hQq9JNgPWTvKij+ysBbdsTpk
+3oiLdpXQjNNssIZdIQu0b87WjsFlDt1yeoLDT9gyHSZyBgUuj3H65jyC3jeXzHgt
+3bVlt7dizYEAghzJXxTokAFK6Ye+CflyKav2E82oe/qXOzuUHAjIKdOKWsdGi3IY
+k1PDhd7khGUROOQw/BZvl/mHBZWsks4+pWPeVApQuMiJfA5NufUt3lus+CxyZKGp
+f8jl3B6nsiEscXMuRr41XcLwoYDJ49u73uyLN8OiFbGFgbPXg903SPRLq352xIOB
+fvMB2dTO2T8ymAZ9KUGPlXWDg0S8OFQT4bY+FIhUtIqaWXNUqHtBqCVKk5kFbBIG
+X8HgZTxrv9KwVWclBCu9Iwh4MU1KpJJ09eaGx8/bOvPWuaiyJNMFvSFcohTlI0qN
+yzt/9qKERGj0FjBI0hFHz8Zo9byf2jxvjj3HtzHX/CM1wXZl1rc33SfJdCgltFTG
+tKpjwo6zZs25HOBR+MB8jVQHezBgsdF8GhZ7BEmR0t854K3KacxwbnCty4RdCvDq
+uhVj8qVsCGjk0tqYf6q+
+=3DRr
 -----END PGP SIGNATURE-----
 
---CdrF4e02JqNVZeln--
+--M9NhX3UHpAaciwkO--
