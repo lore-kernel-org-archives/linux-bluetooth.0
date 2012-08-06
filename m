@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1343987003-17309-1-git-send-email-vani.patel@stericsson.com>
-References: <1343987003-17309-1-git-send-email-vani.patel@stericsson.com>
-Date: Mon, 6 Aug 2012 11:42:30 +0300
-Message-ID: <CABBYNZLpkvViHPONCE=r_NOhfywAuEK_SGLak2VUFPXX9THh_g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ V2 4/5]AVRCP: Register/Unregister Browsing handler
+In-Reply-To: <1343976273-13448-1-git-send-email-vani.patel@stericsson.com>
+References: <1343976273-13448-1-git-send-email-vani.patel@stericsson.com>
+Date: Mon, 6 Aug 2012 11:20:32 +0300
+Message-ID: <CABBYNZLY4msobcmFXW+u1gzwrBC-7KgED0VDaJ_2gqF5PZE_kw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ V2 2/5] AVRCP: Rename variables used for control
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Vani-dineshbhai PATEL <vani.patel@stericsson.com>
 Cc: User Name <linux-bluetooth@vger.kernel.org>,
@@ -16,26 +16,32 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Vani,
 
-On Fri, Aug 3, 2012 at 12:43 PM, Vani-dineshbhai PATEL
+On Fri, Aug 3, 2012 at 9:44 AM, Vani-dineshbhai PATEL
 <vani.patel@stericsson.com> wrote:
-> +unsigned int avctp_register_browsing_pdu_handler(avctp_browsing_pdu_cb cb,
-> +                                                       void *user_data)
-> +{
-> +       static unsigned int id = 0;
-> +
-> +       browsing_handler = g_new(struct avctp_browsing_pdu_handler, 1);
-> +       browsing_handler->cb = cb;
-> +       browsing_handler->user_data = user_data;
-> +       browsing_handler->id = ++id;
-> +
-> +       return browsing_handler->id;
-> +}
+> -       err = avctp_send_vendordep(player->session, player->transaction_events[id],
+> +       err = avctp_send_vendordep(player->session,
+> +                                       player->transaction_events[id],
+>                                         AVC_CTYPE_CHANGED, AVC_SUBUNIT_PANEL,
+>                                         buf, size + AVRCP_HEADER_LENGTH);
 
-If we can only have a single pdu handler there is probably no need to
-have an id assigned, but I thought the idea was to reuse
-avctp_register_pdu_handler with something outside of the range of
-control opcodes e.g. > 0xFF.
+Git complain about this line, apparently you are leaving a whitespace:
 
+Applying: AVRCP: Rename variables used for control
+/home/vudentz/git/bluez/.git/rebase-apply/patch:390: trailing whitespace.
+	err = avctp_send_vendordep(player->session,
+fatal: 1 line adds whitespace errors.
+
+>         if (err < 0)
+> @@ -914,7 +915,7 @@ static uint8_t avrcp_handle_get_play_status(struct avrcp_player *player,
+>
+>         memcpy(&pdu->params[0], &duration, 4);
+>         memcpy(&pdu->params[4], &position, 4);
+> -       pdu->params[8] = player->cb->get_status(player->user_data);;
+> +       pdu->params[8] = player->cb->get_status(player->user_data);
+
+This one should be fixed in separate, it has nothing to do with other
+changes you are introducing and could probably be applied very
+quickly.
 
 -- 
 Luiz Augusto von Dentz
