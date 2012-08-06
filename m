@@ -1,46 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 6 Aug 2012 11:44:37 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	pkrystad@codeaurora.org
-Subject: Re: [RFCv0 06/21] Bluetooth: Channel move request handling
-Message-ID: <20120806084435.GA2819@aemeltch-MOBL1>
-References: <1343260274-11953-1-git-send-email-mathewm@codeaurora.org>
- <1343260274-11953-7-git-send-email-mathewm@codeaurora.org>
- <20120726135924.GC2686@aemeltch-MOBL1>
- <alpine.DEB.2.02.1207270758080.6052@mathewm-linux>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.DEB.2.02.1207270758080.6052@mathewm-linux>
+In-Reply-To: <1343987003-17309-1-git-send-email-vani.patel@stericsson.com>
+References: <1343987003-17309-1-git-send-email-vani.patel@stericsson.com>
+Date: Mon, 6 Aug 2012 11:42:30 +0300
+Message-ID: <CABBYNZLpkvViHPONCE=r_NOhfywAuEK_SGLak2VUFPXX9THh_g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ V2 4/5]AVRCP: Register/Unregister Browsing handler
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vani-dineshbhai PATEL <vani.patel@stericsson.com>
+Cc: User Name <linux-bluetooth@vger.kernel.org>,
+	Lucas De Marchi <lucas.demarchi@profusion.mobi>,
+	Joohi <Joohi.rastogi@stericsson.com>, Vani <vani273@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi Vani,
 
-On Fri, Jul 27, 2012 at 09:54:03AM -0700, Mat Martineau wrote:
+On Fri, Aug 3, 2012 at 12:43 PM, Vani-dineshbhai PATEL
+<vani.patel@stericsson.com> wrote:
+> +unsigned int avctp_register_browsing_pdu_handler(avctp_browsing_pdu_cb cb,
+> +                                                       void *user_data)
+> +{
+> +       static unsigned int id = 0;
+> +
+> +       browsing_handler = g_new(struct avctp_browsing_pdu_handler, 1);
+> +       browsing_handler->cb = cb;
+> +       browsing_handler->user_data = user_data;
+> +       browsing_handler->id = ++id;
+> +
+> +       return browsing_handler->id;
+> +}
 
-...
+If we can only have a single pdu handler there is probably no need to
+have an id assigned, but I thought the idea was to reuse
+avctp_register_pdu_handler with something outside of the range of
+control opcodes e.g. > 0xFF.
 
-> >>+	if (chan->chan_policy == BT_CHANNEL_POLICY_BREDR_ONLY) {
-> >>+		result = L2CAP_MR_NOT_ALLOWED;
-> >>+		goto send_move_response;
-> >>+	}
-> >>+
-> >>+	chan->move_cmd_ident = cmd->ident;
-> >
-> >BTW: Why do we handle ident in a special way for channel move?
-> 
-> At the time I wrote the code, I thought that chan->ident was only
-> used to store idents of sent requests, not received requests.  But
-> it does look like it is also used for storing received idents for
-> use in sending responses.  chan->ident could be used as long as move
-> collisions are handled correctly (where a move request is received
-> when a move response is expected).
 
-So can we use chan->ident instead of chan->move_cmd_ident? Is the channel
-move somehow different from other L2CAP request / response sequence?
-
-Best regards 
-Andrei Emeltchenko 
-
+-- 
+Luiz Augusto von Dentz
