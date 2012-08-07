@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1343194947-13659-5-git-send-email-chen.ganir@ti.com>
+In-Reply-To: <1343194947-13659-3-git-send-email-chen.ganir@ti.com>
 References: <1343194947-13659-1-git-send-email-chen.ganir@ti.com>
-	<1343194947-13659-5-git-send-email-chen.ganir@ti.com>
-Date: Tue, 7 Aug 2012 13:29:25 -0300
-Message-ID: <CAAngNMYTK27mHJ8JhT2=0zE4vJ_DFmY=f=XBXqJMFKKoXEC0uQ@mail.gmail.com>
-Subject: Re: [PATCH v2 4/9] Battery: Get Battery ID
+	<1343194947-13659-3-git-send-email-chen.ganir@ti.com>
+Date: Tue, 7 Aug 2012 13:29:18 -0300
+Message-ID: <CAAngNMaaZXDpX-voj+KLf+fmsJ-dQY_UCQY9OE8bOSi74BztjQ@mail.gmail.com>
+Subject: Re: [PATCH v2 2/9] Battery: Add connection logic
 From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
 To: Chen Ganir <chen.ganir@ti.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -14,175 +14,193 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 On Wed, Jul 25, 2012 at 2:42 AM, Chen Ganir <chen.ganir@ti.com> wrote:
-> Read the battery level format characteristic descriptor to get the
-> unique namespace and description values.
+> Add connection logic to the Battery Plugin. When the driver is
+> loaded, it will request a connection to the remote device and
+> release the connection request when destroyed.
 > ---
->  profiles/batterystate/batterystate.c |  113 ++++++++++++++++++++++++++--------
->  1 file changed, 86 insertions(+), 27 deletions(-)
+>  profiles/batterystate/batterystate.c |   78 +++++++++++++++++++++++++++++++++-
+>  profiles/batterystate/batterystate.h |    3 +-
+>  profiles/batterystate/manager.c      |   22 +++++++++-
+>  3 files changed, 99 insertions(+), 4 deletions(-)
 >
 > diff --git a/profiles/batterystate/batterystate.c b/profiles/batterystate/batterystate.c
-> index a7d2f6e..d3a1974 100644
+> index 04c2e5e..40663f6 100644
 > --- a/profiles/batterystate/batterystate.c
 > +++ b/profiles/batterystate/batterystate.c
-> @@ -37,6 +37,8 @@
->  #include "batterystate.h"
->  #include "log.h"
+> @@ -29,17 +29,29 @@
 >
-> +#define BATTERY_LEVEL_UUID     "00002a19-0000-1000-8000-00805f9b34fb"
-> +
+>  #include "adapter.h"
+>  #include "device.h"
+> +#include "gattrib.h"
+> +#include "attio.h"
+>  #include "att.h"
+>  #include "gattrib.h"
+>  #include "gatt.h"
+>  #include "batterystate.h"
+> +#include "log.h"
+>
 >  struct battery {
 >         struct btd_device       *dev;           /* Device reference */
->         GAttrib                 *attrib;        /* GATT connection */
-> @@ -48,15 +50,18 @@ struct battery {
+> +       GAttrib                 *attrib;        /* GATT connection */
+> +       guint                   attioid;        /* Att watcher id */
+> +       struct att_range        *svc_range;     /* Battery range */
+> +       GSList                  *chars;         /* Characteristics */
+>  };
+>
 >  static GSList *servers;
 >
->  struct characteristic {
-> -       struct gatt_char        attr;   /* Characteristic */
-> -       struct battery          *batt;  /* Parent Battery Service */
-> +       struct gatt_char        attr;           /* Characteristic */
-> +       struct battery          *batt;          /* Parent Battery Service */
->         GSList                          *desc;  /* Descriptors */
-> +       uint8_t                 ns;             /* Battery Namespace */
-> +       uint16_t                description;    /* Battery description */
-> +       uint8_t                 level;          /* Battery last known level */
-
-The 'level' field it's not being used here. It should be added by the
-same commit that uses it.
-
->  };
->
->  struct descriptor {
-> -       struct characteristic   *ch;    /* Parent Characteristic */
-> -       uint16_t                handle; /* Descriptor Handle */
-> -       bt_uuid_t               uuid;   /* UUID */
-> +       struct characteristic   *ch;            /* Parent Characteristic */
-> +       uint16_t                handle;         /* Descriptor Handle */
-> +       bt_uuid_t               uuid;           /* UUID */
->  };
->
+> +struct characteristic {
+> +       struct gatt_char        attr;   /* Characteristic */
+> +       struct battery          *batt;  /* Parent Battery Service */
+> +};
+> +
 >  static gint cmp_device(gconstpointer a, gconstpointer b)
-> @@ -87,6 +92,55 @@ static void batterystate_free(gpointer user_data)
+>  {
+>         const struct battery *batt = a;
+> @@ -55,20 +67,84 @@ static void batterystate_free(gpointer user_data)
+>  {
+>         struct battery *batt = user_data;
+>
+> +       if (batt->chars != NULL)
+> +               g_slist_free_full(batt->chars, g_free);
+> +
+> +       if (batt->attioid > 0)
+> +               btd_device_remove_attio_callback(batt->dev, batt->attioid);
+> +
+> +       if (batt->attrib != NULL)
+> +               g_attrib_unref(batt->attrib);
+> +
+>         btd_device_unref(batt->dev);
 >         g_free(batt);
 >  }
 >
-> +static void batterylevel_presentation_format_desc_cb(guint8 status,
-> +                                               const guint8 *pdu, guint16 len,
-> +                                               gpointer user_data)
+> +static void configure_batterystate_cb(GSList *characteristics, guint8 status,
+> +                                                       gpointer user_data)
 > +{
-> +       struct descriptor *desc = user_data;
-> +       uint8_t value[ATT_MAX_MTU];
-> +       int vlen;
+> +       struct battery *batt = user_data;
+> +       GSList *l;
 > +
 > +       if (status != 0) {
-> +               error("Presentation Format desc read failed: %s",
+> +               error("Discover batterystate characteristics: %s",
 > +                                                       att_ecode2str(status));
 > +               return;
 > +       }
+>
+> -int batterystate_register(struct btd_device *device)
+> +       for (l = characteristics; l; l = l->next) {
+> +               struct gatt_char *c = l->data;
+> +               struct characteristic *ch;
 > +
-> +       vlen = dec_read_resp(pdu, len, value, sizeof(value));
-> +       if (!vlen) {
-> +               error("Presentation Format desc read failed: Protocol error\n");
-> +               return;
+> +               ch = g_new0(struct characteristic, 1);
+> +               ch->attr.handle = c->handle;
+> +               ch->attr.properties = c->properties;
+> +               ch->attr.value_handle = c->value_handle;
+> +               memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
+> +               ch->batt = batt;
+> +
+> +               batt->chars = g_slist_append(batt->chars, ch);
 > +       }
-> +
-> +       if (vlen < 7) {
-> +               error("Presentation Format desc read failed: Invalid range");
-> +               return;
-> +       }
-> +
-> +       desc->ch->ns = value[4];
-> +       desc->ch->description = att_get_u16(&value[5]);
 > +}
 > +
-> +
-> +static void process_batterylevel_desc(struct descriptor *desc)
+> +static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
 > +{
-> +       struct characteristic *ch = desc->ch;
-> +       char uuidstr[MAX_LEN_UUID_STR];
-> +       bt_uuid_t btuuid;
+> +       struct battery *batt = user_data;
 > +
-> +       bt_uuid16_create(&btuuid, GATT_CHARAC_FMT_UUID);
+> +       batt->attrib = g_attrib_ref(attrib);
 > +
-> +       if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0) {
-> +               gatt_read_char(ch->batt->attrib, desc->handle, 0,
-> +                               batterylevel_presentation_format_desc_cb, desc);
-> +               return;
+> +       if (batt->chars == NULL) {
+> +               gatt_discover_char(batt->attrib, batt->svc_range->start,
+> +                                       batt->svc_range->end, NULL,
+> +                                       configure_batterystate_cb, batt);
 > +       }
-> +
-> +       bt_uuid_to_string(&desc->uuid, uuidstr, MAX_LEN_UUID_STR);
-> +       DBG("Ignored descriptor %s characteristic %s", uuidstr, ch->attr.uuid);
 > +}
 > +
+> +static void attio_disconnected_cb(gpointer user_data)
+> +{
+> +       struct battery *batt = user_data;
 > +
->  static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
->                                                         gpointer user_data)
+> +       g_attrib_unref(batt->attrib);
+> +       batt->attrib = NULL;
+> +}
+> +
+> +int batterystate_register(struct btd_device *device,
+> +                               struct gatt_primary *prim)
 >  {
-> @@ -120,6 +174,7 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
->                         desc->uuid = att_get_uuid128(&value[2]);
+>         struct battery *batt;
 >
->                 ch->desc = g_slist_append(ch->desc, desc);
-> +               process_batterylevel_desc(desc);
->         }
+>         batt = g_new0(struct battery, 1);
+>         batt->dev = btd_device_ref(device);
 >
->         att_data_list_free(list);
-> @@ -140,31 +195,35 @@ static void configure_batterystate_cb(GSList *characteristics, guint8 status,
->
->         for (l = characteristics; l; l = l->next) {
->                 struct gatt_char *c = l->data;
-> -               struct characteristic *ch;
-> -               uint16_t start, end;
-> -
-> -               ch = g_new0(struct characteristic, 1);
-> -               ch->attr.handle = c->handle;
-> -               ch->attr.properties = c->properties;
-> -               ch->attr.value_handle = c->value_handle;
-> -               memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
-> -               ch->batt = batt;
->
-> -               batt->chars = g_slist_append(batt->chars, ch);
-> -
-> -               start = c->value_handle + 1;
-> -
-> -               if (l->next != NULL) {
-> -                       struct gatt_char *c = l->next->data;
-> -                       if (start == c->handle)
-> +               if (g_strcmp0(c->uuid, BATTERY_LEVEL_UUID) == 0) {
-> +                       struct characteristic *ch;
-> +                       uint16_t start, end;
+> +       batt->svc_range = g_new0(struct att_range, 1);
+> +       batt->svc_range->start = prim->range.start;
+> +       batt->svc_range->end = prim->range.end;
 > +
-> +                       ch = g_new0(struct characteristic, 1);
-> +                       ch->attr.handle = c->handle;
-> +                       ch->attr.properties = c->properties;
-> +                       ch->attr.value_handle = c->value_handle;
-> +                       memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
-> +                       ch->batt = batt;
-> +
-> +                       batt->chars = g_slist_append(batt->chars, ch);
-> +
-> +                       start = c->value_handle + 1;
-> +
-> +                       if (l->next != NULL) {
-> +                               struct gatt_char *c = l->next->data;
-> +                               if (start == c->handle)
-> +                                       continue;
-> +                               end = c->handle - 1;
-> +                       } else if (c->value_handle != batt->svc_range->end)
-> +                               end = batt->svc_range->end;
-> +                       else
->                                 continue;
-> -                       end = c->handle - 1;
-> -               } else if (c->value_handle != batt->svc_range->end)
-> -                       end = batt->svc_range->end;
-> -               else
-> -                       continue;
+>         servers = g_slist_prepend(servers, batt);
 >
-> -               gatt_find_info(batt->attrib, start, end, discover_desc_cb, ch);
-> +                       gatt_find_info(batt->attrib, start, end,
-> +                                                       discover_desc_cb, ch);
-> +               }
->         }
+> +       batt->attioid = btd_device_add_attio_callback(device,
+> +                               attio_connected_cb, attio_disconnected_cb,
+> +                               batt);
+>         return 0;
 >  }
 >
+> diff --git a/profiles/batterystate/batterystate.h b/profiles/batterystate/batterystate.h
+> index 9aedae7..2d30028 100644
+> --- a/profiles/batterystate/batterystate.h
+> +++ b/profiles/batterystate/batterystate.h
+> @@ -19,6 +19,5 @@
+>   *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+>   *
+>   */
+> -
+> -int batterystate_register(struct btd_device *device);
+> +int batterystate_register(struct btd_device *device, struct gatt_primary *prim);
+>  void batterystate_unregister(struct btd_device *device);
+> diff --git a/profiles/batterystate/manager.c b/profiles/batterystate/manager.c
+> index 6718acf..62076ac 100644
+> --- a/profiles/batterystate/manager.c
+> +++ b/profiles/batterystate/manager.c
+> @@ -34,9 +34,29 @@
+>
+>  #define BATTERY_SERVICE_UUID           "0000180f-0000-1000-8000-00805f9b34fb"
+>
+> +static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
+> +{
+> +       const struct gatt_primary *prim = a;
+> +       const char *uuid = b;
+> +
+> +       return g_strcmp0(prim->uuid, uuid);
+> +}
+> +
+>  static int batterystate_driver_probe(struct btd_device *device, GSList *uuids)
+>  {
+> -       return batterystate_register(device);
+> +       struct gatt_primary *prim;
+> +       GSList *primaries, *l;
+> +
+> +       primaries = btd_device_get_primaries(device);
+> +
+> +       l = g_slist_find_custom(primaries, BATTERY_SERVICE_UUID,
+> +                                                       primary_uuid_cmp);
+
+No need to check for the BATTERY_SERVICE_UUID. If driver has been
+probed its because the remote implements this service, since it's
+declared on the .uuids field of the plugin struct.
+
+> +       if (l == NULL)
+> +               return -EINVAL;
+> +
+> +       prim = l->data;
+> +
+> +       return batterystate_register(device, prim);
+
+Getting the primary service pointer (manly used for handle range
+information could be done from inside batterystate_register() itself
+on batterystate.c instead of doing so on the manager code. This way
+the plugin keeps more self-contained.
+
+>  }
+>
+>  static void batterystate_driver_remove(struct btd_device *device)
 > --
 > 1.7.9.5
 >
