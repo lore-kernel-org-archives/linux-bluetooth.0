@@ -1,48 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Shea Levy <shea@shealevy.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Shea Levy <shea@shealevy.com>
-Subject: [PATCH RESEND] Bluetooth: Add support for Apple MacBook Pro 9,2
-Date: Tue,  7 Aug 2012 17:21:03 -0400
-Message-Id: <1344374463-21231-1-git-send-email-shea@shealevy.com>
+MIME-Version: 1.0
+In-Reply-To: <CAGjArBcwtaRoecSivEaN9FiCbGfC3JhFRwXUVqq58SmQhN07sQ@mail.gmail.com>
+References: <CAGjArBcwtaRoecSivEaN9FiCbGfC3JhFRwXUVqq58SmQhN07sQ@mail.gmail.com>
+Date: Tue, 7 Aug 2012 16:01:18 -0500
+Message-ID: <CAB7rCTietRP3RHu3MN-6OmVkah4EN8EPi_A319q5AEOUp+JcMA@mail.gmail.com>
+Subject: Re: l2ping Recv failed: Connection reset by peer
+From: Mike <puffy.taco@gmail.com>
+To: Charles Gordon <digigordo@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-$ usb-devices
-<snip>
-T:  Bus=04 Lev=04 Prnt=04 Port=02 Cnt=01 Dev#=  9 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=05ac ProdID=821d Rev=00.86
-S:  Manufacturer=Apple Inc.
-S:  Product=Bluetooth USB Host Controller
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-<snip>
+Hi Charles,
 
-Signed-off-by: Shea Levy <shea@shealevy.com>
----
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
+> I'm porting bluez 4.98 to an embedded system.  I have it up and running, but
+> I notice that when I run l2ping, I get the message "Recv failed: Connection
+> reset by peer" after l2ping runs for 5 seconds.  This is very consistent.
+> It doesn't matter whether I ping once a second, or do a flood ping.  After 5
+> seconds the l2ping program closes with the message saying the connection was
+> reset by the peer.
+>
+> This looks like some sort of timeout.  Perhaps the timeout is there for
+> security reasons.  I'd like to understand how to adjust the timeout, or at
+> least confirm that the system is working correctly.
+>
+> I'm running Linux 2.6.35 and Bluez 4.98 on my embedded system, and Ubuntu
+> 10.04 with Linux 2.6.32 and Bluez 4.60 on my PC.
+>
+> I've looked through the Bluez configuration files and I don't see anything
+> that sets up security for L2CAP or sets timeouts that are relevant.  I tried
+> increasing the PageTimeout in /etc/bluetooth/main.conf to 81920 (50 seconds)
+> on both systems, but that didn't make any difference.  I also looked in the
+> configuration program hciconfig for an option to set a timeout, but I didn't
+> find anything.
+>
+> Can anyone tell me what the relevant timeout for l2ping is and how to adjust
+> it, or at least why it is set for 5 seconds?
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f637c25..038acc7 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -73,6 +73,9 @@ static struct usb_device_id btusb_table[] = {
- 	/* Apple MacBookPro8,2 */
- 	{ USB_DEVICE(0x05ac, 0x821a) },
- 
-+	/* Apple MacBookPro9,2 */
-+	{ USB_DEVICE(0x05ac, 0x821d) },
-+
- 	/* Apple MacMini5,1 */
- 	{ USB_DEVICE(0x05ac, 0x8281) },
- 
--- 
-1.7.11
+I have a feeling you're actually hitting a timeout inside the kernel.
+This timer prevents devices from connecting and draining the battery
+of your device.  So, unless the device connects to something "useful",
+it gets disconnected.  It's been too long since I've looked at it, but
+the timeouts are specified in "include/net/bluetooth/hci.h".  I have
+seen the same l2ping issues you see, so I think your setup is working
+as designed.
+
+Mike
