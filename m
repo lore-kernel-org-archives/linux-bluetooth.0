@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 2/4] Bluetooth: trivial: Shorten variable scope
-Date: Tue,  7 Aug 2012 18:05:04 +0300
-Message-Id: <1344351906-27563-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 4/4] Bluetooth: trivial: Use preferred method for NULL check
+Date: Tue,  7 Aug 2012 18:05:06 +0300
+Message-Id: <1344351906-27563-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1344351906-27563-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1344351906-27563-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,38 +11,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Make code more clear by moving sk and bt vars to the place where
-they are actually used.
+Use standard bluetooth way to check NULL pointer !var instead of
+var == NULL.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/af_bluetooth.c |    6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ net/bluetooth/af_bluetooth.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 58f9762..1b88fe4 100644
+index a724f6c..a9ad589 100644
 --- a/net/bluetooth/af_bluetooth.c
 +++ b/net/bluetooth/af_bluetooth.c
-@@ -567,8 +567,6 @@ static void bt_seq_stop(struct seq_file *seq, void *v)
+@@ -620,7 +620,7 @@ static int bt_seq_open(struct inode *inode, struct file *file)
+ 	sk_list = PDE(inode)->data;
+ 	s = __seq_open_private(file, &bt_seq_ops,
+ 			       sizeof(struct bt_seq_state));
+-	if (s == NULL)
++	if (!s)
+ 		return -ENOMEM;
  
- static int bt_seq_show(struct seq_file *seq, void *v)
- {
--	struct sock *sk;
--	struct bt_sock *bt;
- 	struct bt_seq_state *s = seq->private;
- 	struct bt_sock_list *l = s->l;
- 	bdaddr_t src_baswapped, dst_baswapped;
-@@ -583,8 +581,8 @@ static int bt_seq_show(struct seq_file *seq, void *v)
+ 	s->l = sk_list;
+@@ -642,7 +642,7 @@ int bt_procfs_init(struct module* module, struct net *net, const char *name,
+ 	sk_list->fops.release   = seq_release_private;
  
- 		seq_putc(seq, '\n');
- 	} else {
--		sk = sk_entry(v);
--		bt = bt_sk(sk);
-+		struct sock *sk = sk_entry(v);
-+		struct bt_sock *bt = bt_sk(sk);
- 		baswap(&src_baswapped, &bt->src);
- 		baswap(&dst_baswapped, &bt->dst);
+ 	pde = proc_net_fops_create(net, name, 0, &sk_list->fops);
+-	if (pde == NULL)
++	if (!pde)
+ 		return -ENOMEM;
  
+ 	pde->data = sk_list;
 -- 
 1.7.9.5
 
