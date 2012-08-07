@@ -1,46 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1344354304.2083.47.camel@aeonflux>
-Subject: Re: [PATCHv1 0/4] Remove unsafe batostr
+Message-ID: <1344354231.2083.46.camel@aeonflux>
+Subject: Re: [PATCH v2] Bluetooth: Add support for Sony Vaio T-Series
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 07 Aug 2012 08:45:04 -0700
-In-Reply-To: <1344351906-27563-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1344351906-27563-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Mohammed Shafi Shajakhan <mohammed@qca.qualcomm.com>
+Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	yevgeniy.melnichuk@googlemail.com
+Date: Tue, 07 Aug 2012 08:43:51 -0700
+In-Reply-To: <1344349090-4397-1-git-send-email-mohammed@qca.qualcomm.com>
+References: <1344349090-4397-1-git-send-email-mohammed@qca.qualcomm.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Mohammed,
 
-> Since the patch "vsprintf: add %pMR for Bluetooth MAC address" in in linux-next and wireless-testing
-> remove batostr.
+> Add Sony Vaio T-Series Bluetooth Module( 0x489:0xE036) to
+> the blacklist of btusb module and add it to the ath3k module.
 > 
-> http://git.kernel.org/?p=linux/kernel/git/linville/wireless-testing.git;a=commitdiff;h=76597ff989a1fbaa9b9a1e54007cd759bf257ab7
+> output of cat /sys/kernel/debug/usb/devices
 > 
-> Andrei Emeltchenko (4):
->   Bluetooth: Use %pMR BT addr print spec instead of batostr
->   Bluetooth: trivial: Shorten variable scope
->   Bluetooth: Use %pMR instead of baswap in seq_show
->   Bluetooth: trivial: Use preferred method for NULL check
+> T:  Bus=01 Lev=02 Prnt=02 Port=01 Cnt=01 Dev#=  5 Spd=12   MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0489 ProdID=e036 Rev= 0.02
+> S:  Manufacturer=Atheros Communications
+> S:  Product=Bluetooth USB Host Controller
+> S:  SerialNumber=Alaska Day 2006
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 > 
->  include/net/bluetooth/bluetooth.h |    1 -
->  net/bluetooth/af_bluetooth.c      |   20 ++++++++------------
->  net/bluetooth/bnep/core.c         |    3 +--
->  net/bluetooth/cmtp/core.c         |    2 +-
->  net/bluetooth/hci_conn.c          |    6 +++---
->  net/bluetooth/hci_core.c          |   22 +++++++++++-----------
->  net/bluetooth/hci_event.c         |   15 +++++++--------
->  net/bluetooth/hci_sysfs.c         |   10 +++++-----
->  net/bluetooth/hidp/core.c         |    8 ++++++--
->  net/bluetooth/l2cap_core.c        |   11 +++++------
->  net/bluetooth/lib.c               |   14 --------------
->  net/bluetooth/rfcomm/core.c       |   15 +++++++--------
->  net/bluetooth/rfcomm/sock.c       |    9 ++++-----
->  net/bluetooth/rfcomm/tty.c        |    6 +++---
->  net/bluetooth/sco.c               |   12 ++++++------
->  15 files changed, 67 insertions(+), 87 deletions(-)
+> Signed-off-by: Yevgeniy Melnichuk <yevgeniy.melnichuk@googlemail.com>
+> Signed-off-by: Mohammed Shafi Shajakhan <mohammed@qca.qualcomm.com>
+> ---
+>  drivers/bluetooth/ath3k.c |    2 ++
+>  drivers/bluetooth/btusb.c |    1 +
+>  2 files changed, 3 insertions(+), 0 deletions(-)
 
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
