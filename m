@@ -1,42 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 0/4] Remove unsafe batostr
-Date: Tue,  7 Aug 2012 18:05:02 +0300
-Message-Id: <1344351906-27563-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Mohammed Shafi Shajakhan <mohammed@qca.qualcomm.com>
+To: <marcel@holtmann.org>
+CC: <linux-bluetooth@vger.kernel.org>, <gustavo@padovan.org>,
+	<yevgeniy.melnichuk@googlemail.com>, Mohammed Shafi Shajakhan
+	<mohammed@qca.qualcomm.com>
+Subject: [PATCH v2] Bluetooth: Add support for Sony Vaio T-Series
+Date: Tue, 7 Aug 2012 19:48:10 +0530
+Message-ID: <1344349090-4397-1-git-send-email-mohammed@qca.qualcomm.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Yevgeniy Melnichuk <yevgeniy.melnichuk@googlemail.com>
 
-Since the patch "vsprintf: add %pMR for Bluetooth MAC address" in in linux-next and wireless-testing
-remove batostr.
+Add Sony Vaio T-Series Bluetooth Module( 0x489:0xE036) to
+the blacklist of btusb module and add it to the ath3k module.
 
-http://git.kernel.org/?p=linux/kernel/git/linville/wireless-testing.git;a=commitdiff;h=76597ff989a1fbaa9b9a1e54007cd759bf257ab7
+output of cat /sys/kernel/debug/usb/devices
 
-Andrei Emeltchenko (4):
-  Bluetooth: Use %pMR BT addr print spec instead of batostr
-  Bluetooth: trivial: Shorten variable scope
-  Bluetooth: Use %pMR instead of baswap in seq_show
-  Bluetooth: trivial: Use preferred method for NULL check
+T:  Bus=01 Lev=02 Prnt=02 Port=01 Cnt=01 Dev#=  5 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0489 ProdID=e036 Rev= 0.02
+S:  Manufacturer=Atheros Communications
+S:  Product=Bluetooth USB Host Controller
+S:  SerialNumber=Alaska Day 2006
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
- include/net/bluetooth/bluetooth.h |    1 -
- net/bluetooth/af_bluetooth.c      |   20 ++++++++------------
- net/bluetooth/bnep/core.c         |    3 +--
- net/bluetooth/cmtp/core.c         |    2 +-
- net/bluetooth/hci_conn.c          |    6 +++---
- net/bluetooth/hci_core.c          |   22 +++++++++++-----------
- net/bluetooth/hci_event.c         |   15 +++++++--------
- net/bluetooth/hci_sysfs.c         |   10 +++++-----
- net/bluetooth/hidp/core.c         |    8 ++++++--
- net/bluetooth/l2cap_core.c        |   11 +++++------
- net/bluetooth/lib.c               |   14 --------------
- net/bluetooth/rfcomm/core.c       |   15 +++++++--------
- net/bluetooth/rfcomm/sock.c       |    9 ++++-----
- net/bluetooth/rfcomm/tty.c        |    6 +++---
- net/bluetooth/sco.c               |   12 ++++++------
- 15 files changed, 67 insertions(+), 87 deletions(-)
+Signed-off-by: Yevgeniy Melnichuk <yevgeniy.melnichuk@googlemail.com>
+Signed-off-by: Mohammed Shafi Shajakhan <mohammed@qca.qualcomm.com>
+---
+ drivers/bluetooth/ath3k.c |    2 ++
+ drivers/bluetooth/btusb.c |    1 +
+ 2 files changed, 3 insertions(+), 0 deletions(-)
 
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 10308cd..d1eecc3 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -85,6 +85,7 @@ static struct usb_device_id ath3k_table[] = {
+ 
+ 	/* Atheros AR5BBU22 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE03C) },
++	{ USB_DEVICE(0x0489, 0xE036) },
+ 
+ 	{ }	/* Terminating entry */
+ };
+@@ -107,6 +108,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+ 
+ 	/* Atheros AR5BBU22 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE03C), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0489, 0xE036), .driver_info = BTUSB_ATH3012 },
+ 
+ 	{ }	/* Terminating entry */
+ };
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index e272214..1c505ee 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -139,6 +139,7 @@ static struct usb_device_id blacklist_table[] = {
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xe03c), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0489, 0xe036), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Broadcom BCM2035 */
+ 	{ USB_DEVICE(0x0a5c, 0x2035), .driver_info = BTUSB_WRONG_SCO_MTU },
 -- 
-1.7.9.5
-
+1.7.0.4
