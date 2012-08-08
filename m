@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <502203CF.8070504@ti.com>
-Date: Wed, 8 Aug 2012 09:14:39 +0300
+Message-ID: <5022015D.1010307@ti.com>
+Date: Wed, 8 Aug 2012 09:04:13 +0300
 From: Chen Ganir <chen.ganir@ti.com>
 MIME-Version: 1.0
 To: Joao Paulo Rechi Vita <jprvita@openbossa.org>
 CC: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v2 5/9] Battery: Add Battery list to btd_device
-References: <1343194947-13659-1-git-send-email-chen.ganir@ti.com> <1343194947-13659-6-git-send-email-chen.ganir@ti.com> <CAAngNManvC8Q1Rt9qtni7txOPx24++wQqVPO+c3qmZu1oc7EMQ@mail.gmail.com>
-In-Reply-To: <CAAngNManvC8Q1Rt9qtni7txOPx24++wQqVPO+c3qmZu1oc7EMQ@mail.gmail.com>
+Subject: Re: [PATCH v2 9/9] Battery: Emit property changed on first read
+References: <1343194947-13659-1-git-send-email-chen.ganir@ti.com> <1343194947-13659-10-git-send-email-chen.ganir@ti.com> <CAAngNMaAM4zYqhGs+sD18DqwA8Hx8ysiy=6ksCVXo9ygb5V+bQ@mail.gmail.com>
+In-Reply-To: <CAAngNMaAM4zYqhGs+sD18DqwA8Hx8ysiy=6ksCVXo9ygb5V+bQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -16,34 +16,49 @@ Joao,
 
 On 08/07/2012 07:29 PM, Joao Paulo Rechi Vita wrote:
 > On Wed, Jul 25, 2012 at 2:42 AM, Chen Ganir <chen.ganir@ti.com> wrote:
->> Add peer battery list to the btd_device. New property added to Device
->> called Batteries.
+>> Emit battery level property changed upon connection, on first read.
 >> ---
->>   doc/device-api.txt                   |    5 +++
->>   profiles/batterystate/batterystate.c |    6 ++++
->>   src/device.c                         |   66 ++++++++++++++++++++++++++++++++++
->>   src/device.h                         |    3 ++
->>   4 files changed, 80 insertions(+)
+>>   profiles/batterystate/batterystate.c |    3 +++
+>>   1 file changed, 3 insertions(+)
 >>
->> diff --git a/doc/device-api.txt b/doc/device-api.txt
->> index 3b84033..3d19a53 100644
->> --- a/doc/device-api.txt
->> +++ b/doc/device-api.txt
->> @@ -175,3 +175,8 @@ Properties  string Address [readonly]
->>                          Note that this property can exhibit false-positives
->>                          in the case of Bluetooth 2.1 (or newer) devices that
->>                          have disabled Extended Inquiry Response support.
+>> diff --git a/profiles/batterystate/batterystate.c b/profiles/batterystate/batterystate.c
+>> index 718863b..4300f85 100644
+>> --- a/profiles/batterystate/batterystate.c
+>> +++ b/profiles/batterystate/batterystate.c
+>> @@ -72,6 +72,8 @@ struct descriptor {
+>>          bt_uuid_t               uuid;           /* UUID */
+>>   };
+>>
+>> +static void emit_battery_level_changed(struct characteristic *c);
 >> +
->> +               array{string} Batteries [readonly]
->> +
->> +                       List of device battery object paths that represents the available
->> +                       batteries on the remote device.
 >
-> This property should be deprecated by the introduction of the D-Bus
-> object manager (scheduled for the 5.0 release).
+> No need of this forward declaration, simply move the function
+> implementation before the first function that references it
+> (read_batterylevel_cb).
 >
-Can you please explain ? What do you mean deprecated ? What is the 
-proposed mechanism to replace this property ?
+I will move the function as suggested.
+
+>>   static void char_free(gpointer user_data)
+>>   {
+>>          struct characteristic *c = user_data;
+>> @@ -161,6 +163,7 @@ static void read_batterylevel_cb(guint8 status, const guint8 *pdu, guint16 len,
+>>          }
+>>
+>>          ch->level = value[0];
+>> +       emit_battery_level_changed(ch);
+>>   }
+>>
+>>   static void process_batteryservice_char(struct characteristic *ch)
+>> --
+>> 1.7.9.5
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
 
 Thanks,
 Chen Ganir.
