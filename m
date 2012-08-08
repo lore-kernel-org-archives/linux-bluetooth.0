@@ -1,224 +1,160 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5021FE25.7000100@ti.com>
-Date: Wed, 8 Aug 2012 08:50:29 +0300
+Message-ID: <5021FD13.5040607@ti.com>
+Date: Wed, 8 Aug 2012 08:45:55 +0300
 From: Chen Ganir <chen.ganir@ti.com>
 MIME-Version: 1.0
 To: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v2 2/9] Battery: Add connection logic
-References: <1343194947-13659-1-git-send-email-chen.ganir@ti.com> <1343194947-13659-3-git-send-email-chen.ganir@ti.com> <CAAngNMaaZXDpX-voj+KLf+fmsJ-dQY_UCQY9OE8bOSi74BztjQ@mail.gmail.com>
-In-Reply-To: <CAAngNMaaZXDpX-voj+KLf+fmsJ-dQY_UCQY9OE8bOSi74BztjQ@mail.gmail.com>
+CC: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	<linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v2 0/9] Add GATT Client Battery Service
+References: <1343194947-13659-1-git-send-email-chen.ganir@ti.com> <5018CF41.6020906@ti.com> <CAKT1EBdUCSLZm=_FodNeT1UuquYVQVx8oZTOJw9ei2ca8WCrqA@mail.gmail.com> <501F5BB9.30406@ti.com> <CAAngNMbXUskPXd-0AS2i_zp4mK6uH84LUmDr7bmMK68pppfqzw@mail.gmail.com>
+In-Reply-To: <CAAngNMbXUskPXd-0AS2i_zp4mK6uH84LUmDr7bmMK68pppfqzw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+
+Joao,
+
 On 08/07/2012 07:29 PM, Joao Paulo Rechi Vita wrote:
-> On Wed, Jul 25, 2012 at 2:42 AM, Chen Ganir <chen.ganir@ti.com> wrote:
->> Add connection logic to the Battery Plugin. When the driver is
->> loaded, it will request a connection to the remote device and
->> release the connection request when destroyed.
->> ---
->>   profiles/batterystate/batterystate.c |   78 +++++++++++++++++++++++++++++++++-
->>   profiles/batterystate/batterystate.h |    3 +-
->>   profiles/batterystate/manager.c      |   22 +++++++++-
->>   3 files changed, 99 insertions(+), 4 deletions(-)
->>
->> diff --git a/profiles/batterystate/batterystate.c b/profiles/batterystate/batterystate.c
->> index 04c2e5e..40663f6 100644
->> --- a/profiles/batterystate/batterystate.c
->> +++ b/profiles/batterystate/batterystate.c
->> @@ -29,17 +29,29 @@
->>
->>   #include "adapter.h"
->>   #include "device.h"
->> +#include "gattrib.h"
->> +#include "attio.h"
->>   #include "att.h"
->>   #include "gattrib.h"
->>   #include "gatt.h"
->>   #include "batterystate.h"
->> +#include "log.h"
->>
->>   struct battery {
->>          struct btd_device       *dev;           /* Device reference */
->> +       GAttrib                 *attrib;        /* GATT connection */
->> +       guint                   attioid;        /* Att watcher id */
->> +       struct att_range        *svc_range;     /* Battery range */
->> +       GSList                  *chars;         /* Characteristics */
->>   };
->>
->>   static GSList *servers;
->>
->> +struct characteristic {
->> +       struct gatt_char        attr;   /* Characteristic */
->> +       struct battery          *batt;  /* Parent Battery Service */
->> +};
->> +
->>   static gint cmp_device(gconstpointer a, gconstpointer b)
->>   {
->>          const struct battery *batt = a;
->> @@ -55,20 +67,84 @@ static void batterystate_free(gpointer user_data)
->>   {
->>          struct battery *batt = user_data;
->>
->> +       if (batt->chars != NULL)
->> +               g_slist_free_full(batt->chars, g_free);
->> +
->> +       if (batt->attioid > 0)
->> +               btd_device_remove_attio_callback(batt->dev, batt->attioid);
->> +
->> +       if (batt->attrib != NULL)
->> +               g_attrib_unref(batt->attrib);
->> +
->>          btd_device_unref(batt->dev);
->>          g_free(batt);
->>   }
->>
->> +static void configure_batterystate_cb(GSList *characteristics, guint8 status,
->> +                                                       gpointer user_data)
->> +{
->> +       struct battery *batt = user_data;
->> +       GSList *l;
->> +
->> +       if (status != 0) {
->> +               error("Discover batterystate characteristics: %s",
->> +                                                       att_ecode2str(status));
->> +               return;
->> +       }
->>
->> -int batterystate_register(struct btd_device *device)
->> +       for (l = characteristics; l; l = l->next) {
->> +               struct gatt_char *c = l->data;
->> +               struct characteristic *ch;
->> +
->> +               ch = g_new0(struct characteristic, 1);
->> +               ch->attr.handle = c->handle;
->> +               ch->attr.properties = c->properties;
->> +               ch->attr.value_handle = c->value_handle;
->> +               memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
->> +               ch->batt = batt;
->> +
->> +               batt->chars = g_slist_append(batt->chars, ch);
->> +       }
->> +}
->> +
->> +static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
->> +{
->> +       struct battery *batt = user_data;
->> +
->> +       batt->attrib = g_attrib_ref(attrib);
->> +
->> +       if (batt->chars == NULL) {
->> +               gatt_discover_char(batt->attrib, batt->svc_range->start,
->> +                                       batt->svc_range->end, NULL,
->> +                                       configure_batterystate_cb, batt);
->> +       }
->> +}
->> +
->> +static void attio_disconnected_cb(gpointer user_data)
->> +{
->> +       struct battery *batt = user_data;
->> +
->> +       g_attrib_unref(batt->attrib);
->> +       batt->attrib = NULL;
->> +}
->> +
->> +int batterystate_register(struct btd_device *device,
->> +                               struct gatt_primary *prim)
->>   {
->>          struct battery *batt;
->>
->>          batt = g_new0(struct battery, 1);
->>          batt->dev = btd_device_ref(device);
->>
->> +       batt->svc_range = g_new0(struct att_range, 1);
->> +       batt->svc_range->start = prim->range.start;
->> +       batt->svc_range->end = prim->range.end;
->> +
->>          servers = g_slist_prepend(servers, batt);
->>
->> +       batt->attioid = btd_device_add_attio_callback(device,
->> +                               attio_connected_cb, attio_disconnected_cb,
->> +                               batt);
->>          return 0;
->>   }
->>
->> diff --git a/profiles/batterystate/batterystate.h b/profiles/batterystate/batterystate.h
->> index 9aedae7..2d30028 100644
->> --- a/profiles/batterystate/batterystate.h
->> +++ b/profiles/batterystate/batterystate.h
->> @@ -19,6 +19,5 @@
->>    *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
->>    *
->>    */
->> -
->> -int batterystate_register(struct btd_device *device);
->> +int batterystate_register(struct btd_device *device, struct gatt_primary *prim);
->>   void batterystate_unregister(struct btd_device *device);
->> diff --git a/profiles/batterystate/manager.c b/profiles/batterystate/manager.c
->> index 6718acf..62076ac 100644
->> --- a/profiles/batterystate/manager.c
->> +++ b/profiles/batterystate/manager.c
->> @@ -34,9 +34,29 @@
->>
->>   #define BATTERY_SERVICE_UUID           "0000180f-0000-1000-8000-00805f9b34fb"
->>
->> +static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
->> +{
->> +       const struct gatt_primary *prim = a;
->> +       const char *uuid = b;
->> +
->> +       return g_strcmp0(prim->uuid, uuid);
->> +}
->> +
->>   static int batterystate_driver_probe(struct btd_device *device, GSList *uuids)
->>   {
->> -       return batterystate_register(device);
->> +       struct gatt_primary *prim;
->> +       GSList *primaries, *l;
->> +
->> +       primaries = btd_device_get_primaries(device);
->> +
->> +       l = g_slist_find_custom(primaries, BATTERY_SERVICE_UUID,
->> +                                                       primary_uuid_cmp);
+> Hello Chen,
 >
-> No need to check for the BATTERY_SERVICE_UUID. If driver has been
-> probed its because the remote implements this service, since it's
-> declared on the .uuids field of the plugin struct.
-I will remove the check.
+> On Mon, Aug 6, 2012 at 2:52 AM, Chen Ganir <chen.ganir@ti.com> wrote:
+>> Claudio,
+>>
+>>
+>> On 08/03/2012 03:57 PM, Claudio Takahasi wrote:
+>>>
+>>> Hi Chen Ganir:
+>>>
+>>> On Wed, Aug 1, 2012 at 3:40 AM, Chen Ganir <chen.ganir@ti.com> wrote:
+>>>>
+>>>> On 07/25/2012 08:42 AM, Chen Ganir wrote:
+>>>>>
+>>>>>
+>>>>> Add suupport for LE GATT Client Battery Service.
+>>>>>
+>>>>> This plugin adds battery list to the btd_device, exposes DBUS API to
+>>>>> list
+>>>>> the
+>>>>> device batteries, and allows querying for battery information. In
+>>>>> addition
+>>>>> this
+>>>>> patch allows getting notifications for battery level changes.
+>>>>>
+>>>>> Look at doc/device-api.txt and doc/battery-api.txt for more information.
+>>>>>
+>>>>> This is version 2 of this patch set, rebased on top of the latest
+>>>>> sources
+>>>>> and
+>>>>> fixes some issues found during testing and in the ML comments.
+>>>>>
+>>>>> Chen Ganir (9):
+>>>>>      Battery: Add Battery Service GATT Client
+>>>>>      Battery: Add connection logic
+>>>>>      Battery: Discover Characteristic Descriptors
+>>>>>      Battery: Get Battery ID
+>>>>>      Battery: Add Battery list to btd_device
+>>>>>      Battery: Add Battery D-BUS API
+>>>>>      Battery: Read Battery level characteristic
+>>>>>      Battery: Add support for notifications
+>>>>>      Battery: Emit property changed on first read
+>>>>>
+>>>>>     Makefile.am                          |   10 +-
+>>>>>     doc/battery-api.txt                  |   38 +++
+>>>>>     doc/device-api.txt                   |    5 +
+>>>>>     profiles/batterystate/batterystate.c |  518
+>>>>> ++++++++++++++++++++++++++++++++++
+>>>>>     profiles/batterystate/batterystate.h |   24 ++
+>>>>>     profiles/batterystate/main.c         |   67 +++++
+>>>>>     profiles/batterystate/manager.c      |   93 ++++++
+>>>>>     profiles/batterystate/manager.h      |   24 ++
+>>>>>     src/device.c                         |   66 +++++
+>>>>>     src/device.h                         |    3 +
+>>>>>     10 files changed, 846 insertions(+), 2 deletions(-)
+>>>>>     create mode 100644 doc/battery-api.txt
+>>>>>     create mode 100644 profiles/batterystate/batterystate.c
+>>>>>     create mode 100644 profiles/batterystate/batterystate.h
+>>>>>     create mode 100644 profiles/batterystate/main.c
+>>>>>     create mode 100644 profiles/batterystate/manager.c
+>>>>>     create mode 100644 profiles/batterystate/manager.h
+>>>>>
+>>>>
+>>>> Ping anyone ? Did anyone get to review this ?
+>>>>
+>>>> Thanks,
+>>>> Chen Ganir
+>>>
+>>>
+>>>
+>>> not yet.
+>>> We have an INTERNAL release in two weeks, next week we will send
+>>> comments in the ML.
+>>>
+>> Thanks. I'll be waiting.
+>>
+>>
+>
+> I've been reviewing and did some quick tests on your code. It's
+> working with some minor issues, and I'll comment them on each commit.
+> But first I have a few more general questions:
+>
+> 1. Any specific reason for calling the plugin directory and files
+> 'batterystate'? I don't see any reference to this name on the
+> documentation.
+No specific reason. I will rename it to Battery, to correspond with the 
+BAS spec.
 
 >
->> +       if (l == NULL)
->> +               return -EINVAL;
->> +
->> +       prim = l->data;
->> +
->> +       return batterystate_register(device, prim);
+> 2. The spec recommends reading the battery level value with very
+> little frequency. Quoting the section 3.1.1:
 >
-> Getting the primary service pointer (manly used for handle range
-> information could be done from inside batterystate_register() itself
-> on batterystate.c instead of doing so on the manager code. This way
-> the plugin keeps more self-contained.
-I'll move that into the manager code as you recommended. Most of this 
-code was taken from other plugins, just to make sure i conform with the 
-current convnetions.
+> "For example, if the expected battery life is in the order of years,
+> reading the battery level value more frequently than once a week is
+> not recommended."
+>
+> And on the same section:
+>
+> "The value of the Client Characteristic Configuration descriptor is
+> persistent for bonded devices when not in a connection."
+>
+> At the moment the plugin is reading it every time it is probed, which
+> is a lot more than recommended. What do you think about only enabling
+> notifications after paring, and not reading the value at all and just
+> wait for the notifications. If the device doesn't support
+> notifications (which I *think* should be uncommon) we can read the
+> value after pairing and refresh it every week or so. For this to work
+> well we'll need characteristics value storage support, but that will
+> improve other things as well. While we don't support that, I don't
+> have other ideas to improve this.
+I agree with you that we will need some storage to allow following the 
+specs correctly. I could just read the battery level on pairing only, 
+and then rely on notifications (if supported) or read battery level on 
+each connect. However, what happens if the device remains connected for 
+a long period of time (more than a week) ? I will need to add some kind 
+of mechanism to check how much time has passed since last reading, and 
+invoke battery level readout for each battery level characteristic. Do 
+you have any suggestions for improvement here ?
 
 >
->>   }
+>
+>>> BR,
+>>> Claudio
+>>>
 >>
->>   static void batterystate_driver_remove(struct btd_device *device)
->> --
->> 1.7.9.5
+>> Chen Ganir.
 >>
 >> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+>> in
 >> the body of a message to majordomo@vger.kernel.org
 >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
 >
 >
+Thanks for reviewing this patch set. I will try to send revised and 
+fixed set today or tomorrow with the fixes mentioned in your other patch 
+review.
 
-Thanks,
 Chen Ganir.
-
 
