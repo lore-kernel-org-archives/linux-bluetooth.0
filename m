@@ -1,160 +1,205 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5021FD13.5040607@ti.com>
-Date: Wed, 8 Aug 2012 08:45:55 +0300
-From: Chen Ganir <chen.ganir@ti.com>
+From: "Li, XiaX" <xiax.li@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Bluez/Obexd upstream test result_20120808 (bluez-4.101.178+
+ obexd-0.47)
+Date: Wed, 8 Aug 2012 05:32:26 +0000
+Message-ID: <59D61FAED4CD054490460E73F56D57750984A2@SHSMSX101.ccr.corp.intel.com>
+Content-Type: multipart/mixed;
+	boundary="_002_59D61FAED4CD054490460E73F56D57750984A2SHSMSX101ccrcorpi_"
 MIME-Version: 1.0
-To: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-CC: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v2 0/9] Add GATT Client Battery Service
-References: <1343194947-13659-1-git-send-email-chen.ganir@ti.com> <5018CF41.6020906@ti.com> <CAKT1EBdUCSLZm=_FodNeT1UuquYVQVx8oZTOJw9ei2ca8WCrqA@mail.gmail.com> <501F5BB9.30406@ti.com> <CAAngNMbXUskPXd-0AS2i_zp4mK6uH84LUmDr7bmMK68pppfqzw@mail.gmail.com>
-In-Reply-To: <CAAngNMbXUskPXd-0AS2i_zp4mK6uH84LUmDr7bmMK68pppfqzw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+--_002_59D61FAED4CD054490460E73F56D57750984A2SHSMSX101ccrcorpi_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-Joao,
+Hi all,
 
-On 08/07/2012 07:29 PM, Joao Paulo Rechi Vita wrote:
-> Hello Chen,
->
-> On Mon, Aug 6, 2012 at 2:52 AM, Chen Ganir <chen.ganir@ti.com> wrote:
->> Claudio,
->>
->>
->> On 08/03/2012 03:57 PM, Claudio Takahasi wrote:
->>>
->>> Hi Chen Ganir:
->>>
->>> On Wed, Aug 1, 2012 at 3:40 AM, Chen Ganir <chen.ganir@ti.com> wrote:
->>>>
->>>> On 07/25/2012 08:42 AM, Chen Ganir wrote:
->>>>>
->>>>>
->>>>> Add suupport for LE GATT Client Battery Service.
->>>>>
->>>>> This plugin adds battery list to the btd_device, exposes DBUS API to
->>>>> list
->>>>> the
->>>>> device batteries, and allows querying for battery information. In
->>>>> addition
->>>>> this
->>>>> patch allows getting notifications for battery level changes.
->>>>>
->>>>> Look at doc/device-api.txt and doc/battery-api.txt for more information.
->>>>>
->>>>> This is version 2 of this patch set, rebased on top of the latest
->>>>> sources
->>>>> and
->>>>> fixes some issues found during testing and in the ML comments.
->>>>>
->>>>> Chen Ganir (9):
->>>>>      Battery: Add Battery Service GATT Client
->>>>>      Battery: Add connection logic
->>>>>      Battery: Discover Characteristic Descriptors
->>>>>      Battery: Get Battery ID
->>>>>      Battery: Add Battery list to btd_device
->>>>>      Battery: Add Battery D-BUS API
->>>>>      Battery: Read Battery level characteristic
->>>>>      Battery: Add support for notifications
->>>>>      Battery: Emit property changed on first read
->>>>>
->>>>>     Makefile.am                          |   10 +-
->>>>>     doc/battery-api.txt                  |   38 +++
->>>>>     doc/device-api.txt                   |    5 +
->>>>>     profiles/batterystate/batterystate.c |  518
->>>>> ++++++++++++++++++++++++++++++++++
->>>>>     profiles/batterystate/batterystate.h |   24 ++
->>>>>     profiles/batterystate/main.c         |   67 +++++
->>>>>     profiles/batterystate/manager.c      |   93 ++++++
->>>>>     profiles/batterystate/manager.h      |   24 ++
->>>>>     src/device.c                         |   66 +++++
->>>>>     src/device.h                         |    3 +
->>>>>     10 files changed, 846 insertions(+), 2 deletions(-)
->>>>>     create mode 100644 doc/battery-api.txt
->>>>>     create mode 100644 profiles/batterystate/batterystate.c
->>>>>     create mode 100644 profiles/batterystate/batterystate.h
->>>>>     create mode 100644 profiles/batterystate/main.c
->>>>>     create mode 100644 profiles/batterystate/manager.c
->>>>>     create mode 100644 profiles/batterystate/manager.h
->>>>>
->>>>
->>>> Ping anyone ? Did anyone get to review this ?
->>>>
->>>> Thanks,
->>>> Chen Ganir
->>>
->>>
->>>
->>> not yet.
->>> We have an INTERNAL release in two weeks, next week we will send
->>> comments in the ML.
->>>
->> Thanks. I'll be waiting.
->>
->>
->
-> I've been reviewing and did some quick tests on your code. It's
-> working with some minor issues, and I'll comment them on each commit.
-> But first I have a few more general questions:
->
-> 1. Any specific reason for calling the plugin directory and files
-> 'batterystate'? I don't see any reference to this name on the
-> documentation.
-No specific reason. I will rename it to Battery, to correspond with the 
-BAS spec.
+QA finished upstream testing. The test is for bluez-4.101.178 and obexd-0.4=
+7. Against last, BlueZ is changed from 4.101.135 to 4.101.178, Obexd is cha=
+nged from 0.46 to 0.47. Some dbus interface has been changed.=20
+In this test, totally ran 100 case: 77 Pass, 5 Fail. Other 18 are blocked o=
+r unavailable (some cases validation method is still in investigating).=20
+The pass rate is from 95% to 94% (pass / <pass + fail>). Pulseaudio has not=
+ caught up with the BlueZ interface changing in HFP profile.=20
 
->
-> 2. The spec recommends reading the battery level value with very
-> little frequency. Quoting the section 3.1.1:
->
-> "For example, if the expected battery life is in the order of years,
-> reading the battery level value more frequently than once a week is
-> not recommended."
->
-> And on the same section:
->
-> "The value of the Client Characteristic Configuration descriptor is
-> persistent for bonded devices when not in a connection."
->
-> At the moment the plugin is reading it every time it is probed, which
-> is a lot more than recommended. What do you think about only enabling
-> notifications after paring, and not reading the value at all and just
-> wait for the notifications. If the device doesn't support
-> notifications (which I *think* should be uncommon) we can read the
-> value after pairing and refresh it every week or so. For this to work
-> well we'll need characteristics value storage support, but that will
-> improve other things as well. While we don't support that, I don't
-> have other ideas to improve this.
-I agree with you that we will need some storage to allow following the 
-specs correctly. I could just read the battery level on pairing only, 
-and then rely on notifications (if supported) or read battery level on 
-each connect. However, what happens if the device remains connected for 
-a long period of time (more than a week) ? I will need to add some kind 
-of mechanism to check how much time has passed since last reading, and 
-invoke battery level readout for each battery level characteristic. Do 
-you have any suggestions for improvement here ?
+New bugs:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+https://bugs.meego.com/show_bug.cgi?id=3D25593
+[regression] Pulseaudio crashes after connect BT sink to alsa source
 
->
->
->>> BR,
->>> Claudio
->>>
->>
->> Chen Ganir.
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
->> in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-Thanks for reviewing this patch set. I will try to send revised and 
-fixed set today or tomorrow with the fixes mentioned in your other patch 
-review.
+https://bugs.meego.com/show_bug.cgi?id=3D25595
+[regression] MAP client fail to get message list from Samsung GT-i9100
 
-Chen Ganir.
+Re-open bugs:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+N/A
 
+Verified bugs:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+N/A
+
+Testing Environment
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Hardware:=A0 netbook Eeepc 1005HA | Acer AspireOne NAV50
+Image:=A0=A0=A0=A0 netbook-ia32-pinetrail-tizen_20120424.2
+Linux Kernel: v3.4-rc7
+bluez-4.101.178.g1baf870-17.1.i586=20
+obexd-0.47.7.g73bb0a0-1.1.i586
+obexd-server-0.47.7.g73bb0a0-1.1.i586=20
+connman-1.4-1.1.i586
+ofono-1.9.8.g34b4e96-1.1.i586=20
+Pulseaudio: d3cd82d411f9b574678870d8ccd836032a238684 (July, 9th)
+
+For detailed test results, please see attached file.
+
+Thanks
+Li Xia
+
+
+--_002_59D61FAED4CD054490460E73F56D57750984A2SHSMSX101ccrcorpi_
+Content-Type: text/plain; name="Bluetooth_upstream_quality_20120808.txt"
+Content-Description: Bluetooth_upstream_quality_20120808.txt
+Content-Disposition: attachment;
+	filename="Bluetooth_upstream_quality_20120808.txt"; size=7323;
+	creation-date="Wed, 08 Aug 2012 05:22:23 GMT";
+	modification-date="Wed, 08 Aug 2012 05:24:41 GMT"
+Content-Transfer-Encoding: base64
+
+PT0gRGV0YWlsIFJlc3VsdCA9PQ0KW1BBU1NdOiBjYXNlIHBhc3NlZCA8YnI+DQpbRkFJTF06IGNh
+c2UgZmFpbGVkIDxicj4NCltCbG9ja106IGNhc2UgaXMgYmxvY2tlZCBieSBvbmUgYnVnIDxicj4N
+CltOL0FdOiBjYXNlIG5vdCBhdmFpbGFibGUgdG8gYmUgdGVzdGVkDQoNCj09PSBBdWRpby1BMkRQ
+ID09PQ0KICBbUEFTU10gQTJEUF8wMDE6IGF1ZGlvIHNpbmsgY29ubmVjdC9yZS1jb25uZWN0IA0K
+ICBbUEFTU10gQTJEUF8wMDI6IHN0ZXJlbyBoZWFkc2V0IHBsYXliYWNrIA0KICBbUEFTU10gQTJE
+UF8wMDM6IHN0ZXJlbyBoZWFkc2V0IHZvaWNlIHJlY29yZCANCiAgW1BBU1NdIEEyRFBfMDA0OiBD
+b2RlYyBzdXBwb3J0OiBTQkMgDQogIFtQQVNTXSBBMkRQXzAwNTogUGxheWJhY2sgbXVzaWMgb24g
+bGluZQ0KICBbUEFTU10gQTJEUF8wMDY6IFNJTksgcm9sZSwgYXMgc3BlYWtlciBmb3Igb3RoZXIg
+ZGV2aWNlIG11c2ljIHBsYXlpbmcNCiAgICBXaXRoIHNvbWUgQlQgaGVhZHNldCwgd2UgZXZlciBt
+ZXQgaXNzdWUgW2h0dHBzOi8vYnVncy5tZWVnby5jb20vc2hvd19idWcuY2dpP2lkPTI1NDgwIEJ1
+ZyMyNTQ4MCBBMkRQLXNvdXJjZTogcHVsc2VhdWRpbyBmYWlscyB0byBjcmVhdGUgYmx1ZXpfc2lu
+ayBhbmQgYmx1ZXpfc291cmNlXQ0KDQo9PT0gQXVkaW8tQVZSQ1AgPT09DQogIFtQQVNTXSBBVlJD
+UF8wMDE6IFZvbHVtZSBVcC9Eb3duDQogIFtCbG9ja10gQVZSQ1BfMDAyOiBQbGF5L1BhdXNlIChi
+eSB1bmF2YWlsYWJsZSBtZWRpYS1wbGF5ZXIpDQogIFtCbG9ja10gQVZSQ1BfMDAzOiBOZXh0L1By
+aXZpb3VzIChieSB1bmF2YWlsYWJsZSBtZWRpYS1wbGF5ZXIpDQogIFtQQVNTXSBBVlJDUF8wMDQ6
+IENvbm5lY3Rpb24gRXN0YWJsaXNoL1JlbGVhc2UNCiAgW04vQV0gQVZSQ1BfMDA1OiBBdWRpbyBt
+ZXRhZGF0YSBnZXQuDQogICAgV2Ugc3RpbGwgdHJ5IHRvIGZpbmQgYXZhbGlhYmxlIG1lZGlhLXBs
+YXllciB0byBzdXBwb3J0IEFWUkNQLTEuNA0KDQo9PT0gQXVkaW8tSEZQID09PQ0KICBbUEFTU10g
+SEZQXzAwMTogUkZDT01NIGNvbm5lY3Rpb24gb24gQUcgDQogIFtQQVNTXSBIRlBfMDAyOiBsaXN0
+IChvZm9ubykgaGZwIG1vZGVtIA0KICBbUEFTU10gSEZQXzAwMzogSEZQIG1vZGVtIGVzdGFibGlz
+aG1lbnQgKE9mb25vKQ0KICBbRkFJTF0gSEZQXzAwNDogQXVkaW8gU05LIGFuZCBTUkMgZXN0YWJs
+aXNobWVudCAgDQogIFtGQUlMXSBIRlBfMDA1OiB2b2ljZWNhbGwsIGF1ZGlvIGNyZWF0ZXMgQlQg
+U05LL1NSQyANCiAgW0ZBSUxdIEhGUF8wMDY6IHJlZGlyZWN0IEFHIFNOSy9TUkMgdG8gbG9jYWwg
+U1JDL1NOSw0KICAgIEJsdWVaIGludGVyZmFjZSBoYXMgc29tZSByZWdyZXNzaW9uLCBidWcgaXMg
+cmVwb3J0ZWQgYXMgW2h0dHBzOi8vYnVncy5tZWVnby5jb20vc2hvd19idWcuY2dpP2lkPTI1NDcz
+IEJ1ZyMyNTQ3MyBIRlA6IGxhdGVzdCBibHVleiBjYW5ub3Qgc3VwcG9ydCBwdWxzZWF1ZGlvIHRv
+IGNyZWF0ZSBibHVlel9zaW5rIGFuZCBibHVlel9zb3VyY2VdDQogICAgUHVsc2VhdWRpbyBoYXMg
+bmV3IGNyYXNoIGJ1ZzogW2h0dHBzOi8vYnVncy5tZWVnby5jb20vc2hvd19idWcuY2dpP2lkPTI1
+NTkzIEJ1ZyMyNTU5MyBQdWxzZWF1ZGlvIGNyYXNoZXMgYWZ0ZXIgY29ubmVjdCBCVCBzaW5rIHRv
+IGFsc2Egc291cmNlXQ0KICBbUEFTU10gSEZQXzAwNzogQ2hlY2sgQVQtY29tbWFuZHMgZnJvbSBI
+RiBwYXJ0DQogIFtQQVNTXSBIRlBfMDA4OiBDb25uZWN0IEJUIEhlYWRzZXQgdG8gSEZQIHBob25l
+DQoNCj09PSBBdWRpby1IU1AgPT09DQogIFtQQVNTXSBIU1BfMDAxOiBVc2UgbW9ubyBoZWFkc2V0
+IHRvIHBsYXkgbXVzaWMNCiAgKioqIERVVCBpcyBhIE5ldGJvb2ssIHVuYWJsZSB0byB0YWtlIHBo
+b25lICoqKg0KICBbTi9BXSBIU1BfMDAyOiBUYWtlIGluY29taW5nIGNhbGwgYnkgYnV0dG9uLXBy
+ZXNzDQogIFtOL0FdIEhTUF8wMDM6IEF1ZGlvIHRyYW5zZmVyIGJldHdlZW4gQUcgYW5kIEhTDQog
+IFtQQVNTXSBIU1BfMDA0OiBBZGp1c3QgVm9sdW1lIFVwL0Rvd24NCg0KPT09IE9CRVgtRlRQID09
+PQ0KICBbUEFTU10gRlRQXzAwMTogcHVsbC9wdXNoIGZpbGVzIGZyb20vdG8gc2VydmVyLg0KICBb
+UEFTU10gRlRQXzAwMjogYnJvd3NlIHNlcnZlciBmaWxlcyANCiAgW1BBU1NdIEZUUF8wMDM6IENs
+aWVudCAiZGVsZXRlIGZpbGUiLCAicmVuYW1lIGZpbGUiDQogIFtQQVNTXSBGVFBfMDA0OiBTZXJ2
+ZXIgZW5hYmxlcyBGVFAgcGFyYW1ldGVyICANCiAgW1BBU1NdIEZUUF8wMDU6IFNlcnZlciBzZXRz
+IHNoYXJpbmcgcm9vdCBwYXRoDQogIFtQQVNTXSBGVFBfMDA2OiBTZXJ2ZXIgaGFuZGxlcyBhbGwg
+cmVxdWlyZW1lbnRzDQogIFtQQVNTXSBGVFBfMDA3OiBTZXJ2ZXIgaGFzIGFiaWxpdHkgdG8gc2V0
+IHBlcm1pc3Npb24gZm9yIEZUUA0KICBbUEFTU10gRlRQXzAwODogRlRQIGRhdGEtcmF0ZSBhYm91
+dCAzMGsvc34yMzBrL3MNCiAgW1BBU1NdIEZUUF8wMDk6IEJpZyBzaXplIGZpbGUgdHJhbnNmZXJy
+ZWQgc3RhYmxlDQoNCj09PSBPQkVYLU9QUCA9PT0NCiAgW1BBU1NdIE9QUF8wMDE6IHB1bGwgdW4t
+cGF0dGVybmVkIG9iamVjdCBmcm9tIHNlcnZlci4gDQogIFtQQVNTXSBPUFBfMDAyOiBTZXJ2ZXIg
+ZW5hYmxlcyBPUFAgcGFyYW1ldGVyDQogIFtQQVNTXSBPUFBfMDAzOiBEdXJpbmcgb2JqZWN0IHRy
+YW5zZmVycmluZywgdGhlIHByb2dyZXNzIGlzIGNsZWFyDQoNCj09PSBPQkVYLVBCQVAgPT09DQog
+IFtQQVNTXSBQQkFQXzAwMTogQ2xpZW50IGdldHMgcGhvbmUgYm9vayBlbnRyaWVzIGZyb20gc2Vy
+dmVyDQogIFtQQVNTXSBQQkFQXzAwMjogQ2xpZW50IGdldHMgSUNILCBPQ0gsIE1DSCBhbmQgQ0NI
+IGZyb20gc2VydmVyDQogIFtGQUlMXSBQQkFQXzAwMzogUFNFIGNhbiBwcm92aWRlIFBCQVAgZGFl
+bW9uIGJ5IGVuYWJsaW5nIGNvcnJlc3BvbmRpbmcgcGFyYW1ldGVyDQogIENhc2UgZmFpbGVkIGR1
+ZSB0byBbaHR0cHM6Ly9idWdzLm1lZWdvLmNvbS9zaG93X2J1Zy5jZ2k/aWQ9MjUxODkgQnVnIzI1
+MTg5LCBQQkFQIFNlcnZlciBoYXMgc2VnbWVudGF0aW9uIGZhdWx0IGR1cmluZyByZXNwb25kaW5n
+IHRvIGNsaWVudCBQdWxsQWxsXQ0KICBbUEFTU10gUEJBUF8wMDQ6IEJvdGggc2lkZXMgc3VwcG9y
+dCB2Q2FyZDIuMS92Q2FyZDMuMA0KDQo9PT0gT0JFWC1TWU5DID09PQ0KICBbUEFTU10gU1lOQ18w
+MDE6IFNlcnZlciBlbmFibGVzIFNZTkMgZGFlbW9uDQogIFtQQVNTXSBTWU5DXzAwMjogRHVyaW5n
+IHN5bmMsIFNlcnZlciBjYW4gc2hvdyAic3luY2luZy4uLiINCiAgW1BBU1NdIFNZTkNfMDAzOiBj
+bGllbnQgY2FuIHNldCBQSU0gZmV0Y2hpbmcgZnJvbSBJTlQNCiAgW1BBU1NdIFNZTkNfMDA0OiBT
+ZXJ2ZXIgZ2V0L3B1dCBlbnRpcmUgcGhvbmVib29rIGZyb20vdG8gY2xpZW50LiANCiAgW1BBU1Nd
+IFNZTkNfMDA1OiBDbGllbnQgY2FuIHN1cHBvcnQgdkNhcmQyLjEsIHZDYXJkMy4wDQoNCj09PSBP
+QkVYLU1BUCBNQ0UgPT09DQogIFtGQUlMXSBNQVBfMDAxOiBNQ0UgY2FuIGJyb3dzZSBtZXNzYWdl
+L2ZvbGRlciBsaXN0IG9uIE1TRSANCiAgICBSZWdyZXNzaW9uIGhhcHBlbmVkIG9uIGNsaWVudCBz
+aWRlLCBidWcgaXMgcmVwb3J0ZWQgYXMgW2h0dHBzOi8vYnVncy5tZWVnby5jb20vc2hvd19idWcu
+Y2dpP2lkPTI1NTk1IEJ1ZyMyNTU5NSBNQVAgY2xpZW50IGZhaWwgdG8gZ2V0IG1lc3NhZ2UgbGlz
+dCBmcm9tIFNhbXN1bmcgR1QtaTkxMDBdDQogIFtCTE9DS10gTUFQXzAwMjogTUNFIGNhbiB1cGxv
+YWQgbG9jYWwgbWVzc2FnZSB0byBNU0UNCiAgW0JMT0NLXSBNQVBfMDAzOiBNQ0UgY2FuIGRlbGV0
+ZSB0aGUgbWVzc2FnZSBvbiBNU0Ugc2lkZQ0KICBbQkxPQ0tdIE1BUF8wMDQ6IE1DRSBjYW4gdGFr
+ZSB1c2Ugb2YgTVNFIHRvIHNlbmQgbWVzc2FnZQ0KDQo9PT0gTmV0d29yay1QQU4gPT09DQogIFtQ
+QVNTXSBQQU5fMDAxOiBQQU5VIGNhbiBpbml0IG5hcDAgZGV2aWNlIGNvbm5lY3QgdG8gTkFQDQog
+IFtQQVNTXSBQQU5fMDAyOiBQQU5VIGNhbiBnZXQgaXAgYWRkcmVzcyBvciBhc3NpZ25lZCBzdGF0
+aWMgaXANCiAgW1BBU1NdIFBBTl8wMDM6IFBBTlUgY2FuIGxvZ29uIGludGVybmV0IHdlYnNpdGUg
+DQogIFtOL0FdIFBBTl8wMDQ6IE5BUCBjYW4gaW5pdCBicmlkZ2UgYm5lcCANCiAgW04vQV0gUEFO
+XzAwNTogTkFQIGNhbiBzdXBwb3J0IG9uZSBvciBtdWx0aXBsZSBQQU5VIGNvbm5lY3Rpb24NCiAg
+W04vQV0gUEFOXzAwNjogTkFQIGNhbiBoYXZlIERIQ1AgcmVzcG9uZGluZyB0byBlYWNoIFBBTlUN
+CiAgQ3VycmVudCBjb25ubWFuIGRvZXMgbm90IHN1cHBvcnQgREhDUCBmdW5jdGlvbnMuDQoNCj09
+PSBOZXR3b3JrLUJORVAgPT09DQogIFtQQVNTXSBCTkVQXzAwMTogQ2hlY2sgQk5FUCBzdXBwb3J0
+IG9uIERVVA0KDQo9PT0gTmV0d29ybC1EVU4gPT09DQogIFtQQVNTXSBEVU5fMDAxOiBHVyAoRFVU
+KSBjYW4gcGFyc2UgYSBzZXJpZXMgb2YgQVQgY29tbWFuZHMgZnJvbSB0aGUgZGF0YSB0ZXJtaW5h
+bC4gDQogIFtQQVNTXSBEVU5fMDAyOiBEVCBjYW4gYnVpbGQgdXAgcmZjb21tIGRldmljZSBieSBi
+bHVldG9vdGggYW5kIERVTiBtb2RlbSBieSBPZm9uby4NCiAgW1BBU1NdIERVTl8wMDM6IERUIGNh
+biB1c2UgT2Zvbm8gdG8gZGlhbCB1cCBzcGVjaWFsIHNlcnZpY2UgbnVtYmVyICgiKjk5IyIpLg0K
+ICBbUEFTU10gRFVOXzAwNDogV2hlbiBuZXR3b3JrIGNvbm5lY3RlZCwgRFQgY2FuIGxvZyBvbiB3
+ZWJzaXRlIGluIGludGVybmV0Lg0KDQo9PT0gU0lNLVNBUCA9PT0NCiAgVGhlIFNBUCB0ZXN0IG1l
+dGhvZCBpcyBzdGlsbCBpbiBpbnZlc3RpZ2F0aW9uLiANCiAgW04vQV0gU0FQXzAwMTogU2VydmVy
+IGNhbiBlbmFibGUgYSBtb2R1bGUgdG8gcmVnaXN0ZXIgQ2xpZW50DQogIFtOL0FdIFNBUF8wMDI6
+IFNlcnZlciBjYW4gcG93ZXIgb24vb2ZmIFNJTSBDYXJkIG9yIHJlc2V0IGl0IA0KICBbTi9BXSBT
+QVBfMDAzOiBTZXJ2ZXIgY2FuIGRpc2Nvbm5lY3QgQ2xpZW50ICANCiAgW04vQV0gU0FQXzAwNDog
+U2VydmVyIGNhbiBkaXNjb25uZWN0IFNJTQ0KICBbTi9BXSBTQVBfMDA1OiBDbGllbnQgY2FuIGNv
+bm5lY3QgdG8gU2VydmVyIFNJTQ0KICBbTi9BXSBTQVBfMDA2OiBDbGllbnQgY2FuIHBvd2VyIG9u
+IFNlcnZlciBTSU0NCiAgW04vQV0gU0FQXzAwNzogQ2xpZW50IGNhbiBkaXNjb25uZWN0IFNlcnZl
+cg0KDQo9PT0gR2VuZXJpYy1HQVAgPT09DQogIFtQQVNTXSBHQVBfMDAxOiBQU0NBTi9JU0NBTiBt
+b2RlIHNldHRpbmcuDQogIFtQQVNTXSBHQVBfMDAyOiBBY3RpdmUgcGFpcmluZyB0byBhbm90aGVy
+IGJsdWV0b290aCBkZXZpY2UuDQogIFtQQVNTXSBHQVBfMDAzOiBQYXNzaXZlIHBhaXJpbmcsIGFj
+Y2VwdGUgcGFpciBtYXN0ZXIgcmVxdWlyZW1lbnQNCiAgW1BBU1NdIEdBUF8wMDQ6IFNTUCBzdXBw
+b3J0cyANCiAgW1BBU1NdIEdBUF8wMDU6IElmIGxvc3QgbGluay1rZXksIGl0IG5lZWRzIHJlLXBh
+aXIgDQogIFtQQVNTXSBHQVBfMDA2OiByZWJvb3QgRFVUIHdpdGggbGluay1rZXkgcmVzdG9yZWQs
+IG5vIG5lZWQgdG8gcmUtcGFpciANCiAgW1BBU1NdIEdBUF8wMDc6IFBhaXIgY2FuIGJlIHJlbGVh
+c2VkDQoNCj09PSBHZW5lcmljLVNEUCA9PT0NCiAgW1BBU1NdIFNEUF8wMDE6IGJyb3dzZSBhdmFp
+bGFibGUgc2VydmljZSBsaXN0IGluIGxvY2FsDQogIFtQQVNTXSBTRFBfMDAyOiBicm93c2UgYXZh
+aWxhYmxlIHNlcnZpY2UgbGlzdCBmcm9tIHJlbW90ZQ0KICBbUEFTU10gU0RQXzAwMzogYnJvd3Nl
+IHNlcnZpY2UgYnkgUmVjSGFuZGxlIGZvciBkZXRhaWwgaW5mbw0KICBbUEFTU10gU0RQXzAwNDog
+U2VydmVyIGNhbiBhbnN3ZXIgU0RQIHNlYXJjaGluZyByZXF1ZXN0DQogIFtQQVNTXSBTRFBfMDA1
+OiBTZXJ2ZXIgY2FuIGFkZC9kZWwvdXBkYXRlIHNlcnZpY2UgcmVjb3Jkcw0KDQo9PT0gT3RoZXJz
+LUhJRCA9PT0NCiAgW1BBU1NdIEhJRF8wMDE6IEhvc3QgY2FuIHNlYXJjaCBuZWFyYnkgSElEIGRl
+dmljZS4NCiAgW1BBU1NdIEhJRF8wMDI6IFtCQVRdIEhvc3QgY2FuIGNvbm5lY3QgdG8gSElEIGRl
+dmljZS4NCiAgW1BBU1NdIEhJRF8wMDM6IEhvc3QgY2FuIGhhbmRsZSBtdWx0aXBsZSBodW1hbiBp
+bnB1dC9vdXRwdXQgZGV2aWNlcy4NCg0KPT09IEhDSSA9PT0NCiAgW1BBU1NdIEhDSV8wMDE6IEJ1
+aWxkIGhjaSBjb25uZWN0aW9uIGJldHdlZW4gRGV2X0EgYW5kIERldl9CLg0KICBbUEFTU10gSENJ
+XzAwMjogUmVjZWl2ZSBBQ0wgZGF0YSB3aXRoIEhDSS4NCiAgW1BBU1NdIEhDSV8wMDM6IFNlbmQg
+QUNMIGRhdGEgd2l0aCBIQ0kuDQogIFtQQVNTXSBIQ0lfMDA0OiBDaGFuZ2UgbmFtZSBvZiByZW1v
+dGUgRGV2IGJ5IEhDSS4NCiAgW1BBU1NdIEhDSV8wMDU6IENoYW5nZSBjbGFzcyBvZiByZW1vdGUg
+RGV2IGJ5IEhDSS4NCiAgW1BBU1NdIEhDSV8wMDY6IFJlYWQgbG9jYWwgSENJIGNvbnRyb2xsZXIg
+aW5mb3JtYXRpb24uDQogIFtQQVNTXSBIQ0lfMDA3OiBSZWFkIHJlbW90ZSBIQ0kgY29udHJvbGxl
+ciBpbmZvcm1hdGlvbi4NCg0KPT09IEwyQ0FQID09PQ0KICBbUEFTU10gTDJDQVBfMDAxOiBCdWls
+ZCBsMmNhcCBjb25uZWN0aW9uIGJldHdlZW4gRGV2X0EgYW5kIERldl9CLiAgDQogIFtQQVNTXSBM
+MkNBUF8wMDI6IERldl9BIGFuZCBEZXZfQiB0YWtlIGwyY2FwIHByb3RvY29sIHRvIGRvIHBpbmdw
+b25nLg0KDQo9PT0gUkZDT01NID09PQ0KICBbUEFTU10gUkZDT01NXzAwMTogQnVpbGQgcmZjb21t
+IGNvbm5lY3Rpb24gYmV0d2VlbiBEZXZfQSBhbmQgRGV2X0IuICANCiAgW1BBU1NdIFJGQ09NTV8w
+MDI6IERldl9BIGFuZCBEZXZfQiB0YWtlIHJmY29tbSBwcm90b2NvbCB0byBkbyBwaW5ncG9uZy4N
+Cg0KPT09IFNldHRpbmdzID09PQ0KICBbUEFTU10gU0VUXzAwMTogW0JBVF0gTm8gZXJyb3Igb3V0
+cHV0IGR1cmluZyBibHVldG9vdGhkIHN0YXJ0dXAgcHJvY2Vzcy4NCg0KPT09IEJsdWV0b290aCBV
+dGlscyA9PT0NClNvbWUgYmFzaWMgY2hlY2tpbmcgZm9yIGhjaWNvbmZpZywgaGNpdG9vbCwgc2Rw
+dG9vbCBjb21tYW5kcy4gDQogIFtQQVNTXSBCVENNRF8wMDE6IGhjaWNvbmZpZyAtYQ0KICBbUEFT
+U10gQlRDTURfMDAyOiBoY2ljb25maWcgPGFkYXB0ZXI+IHBpc2Nhbg0KICBbUEFTU10gQlRDTURf
+MDAzOiBoY2ljb25maWcgPGFkYXB0ZXI+IHVwL2Rvd24gIA0KICBbUEFTU10gQlRDTURfMDA0OiBo
+Y2l0b29sIHNjYW4NCiAgW1BBU1NdIEJUQ01EXzAwNTogc2RwdG9vbCBicm93c2UgbG9jYWwNCiAg
+W1BBU1NdIEJUQ01EXzAwNjogc2RwdG9vbCBicm93c2UgPGVybW90ZSBNQUM+DQogIFtQQVNTXSBC
+VENNRF8wMDc6IHNkcHRvb2wgYWRkL2RlbA0K
+
+--_002_59D61FAED4CD054490460E73F56D57750984A2SHSMSX101ccrcorpi_--
