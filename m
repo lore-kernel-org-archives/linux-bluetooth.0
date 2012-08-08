@@ -1,121 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [RFC BlueZ] doc: Introduce Alert API
-Date: Wed,  8 Aug 2012 14:23:06 -0400
-Message-Id: <1344450186-14961-1-git-send-email-anderson.lizardo@openbossa.org>
+From: <chen.ganir@ti.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <jprvita@openbossa.org>, Chen Ganir <chen.ganir@ti.com>
+Subject: [PATCH v3 9/9] Battery: Emit property changed on first read
+Date: Wed, 8 Aug 2012 17:26:20 +0300
+Message-ID: <1344435980-9866-10-git-send-email-chen.ganir@ti.com>
+In-Reply-To: <1344435980-9866-1-git-send-email-chen.ganir@ti.com>
+References: <1344435980-9866-1-git-send-email-chen.ganir@ti.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This API will be implemented and initially used by Phone Alert Status
-and Alert Notification GATT profiles (server role).
----
- doc/alert-api.txt |   95 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 95 insertions(+)
- create mode 100644 doc/alert-api.txt
+From: Chen Ganir <chen.ganir@ti.com>
 
-diff --git a/doc/alert-api.txt b/doc/alert-api.txt
-new file mode 100644
-index 0000000..209c4da
---- /dev/null
-+++ b/doc/alert-api.txt
-@@ -0,0 +1,95 @@
-+BlueZ D-Bus Alert API description
-+*********************************
+Emit battery level property changed upon connection, on first read.
+---
+ profiles/battery/battery.c |   13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
+index c5274bb..2874fb2 100644
+--- a/profiles/battery/battery.c
++++ b/profiles/battery/battery.c
+@@ -138,6 +138,12 @@ static void battery_free(gpointer user_data)
+ 	g_free(batt);
+ }
+ 
++static void emit_battery_level_changed(struct characteristic *c)
++{
++	emit_property_changed(c->batt->conn, c->path, BATTERY_INTERFACE,
++					"Level", DBUS_TYPE_BYTE, &c->level);
++}
 +
-+Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
-+
-+Introduction
-+------------
-+
-+Currently, there are two different GATT server profiles that depend on
-+receiving alerts or notifications from the platform: Phone Alert Status (PASP)
-+and Alert Notification (ANP). Additionally, PASP is very specific to mobile
-+phones, and also allow limited control to alerts (i.e. mute once, or switch to
-+a silent mode).
-+
-+This document presents a unified API that allows to register, 
-+
-+Alert hierarchy
-+===============
-+
-+Service		org.bluez
-+Interface	org.bluez.Alert
-+Object path	/org/bluez
-+
-+Methods		void RegisterAlert(string category)
-+
-+			Register a new alert category. This means the
-+			application will be responsible for notifying BlueZ of
-+			any alerts of that category, using the Alert() method.
-+
-+			Supported categories: generic, email, news, call,
-+			missed_call, sms_mms, voice_mail, schedule,
-+			instant_message, ringer, vibrate, display.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		void RegisterAgent(string category, object agent)
-+
-+			Register a new agent for the alert category. The agent
-+			object methods to be called depend on the category. The
-+			currently supported category is "ringer", with methods
-+			MuteOnce() and SetRingerMode().
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		void NewAlert(string category, string description)
-+
-+			Notify BlueZ of a new alert for the given category. The
-+			description can be sender name, called ID, title, or
-+			other information specific to the alert. For ringer,
-+			vibrate and display categories, valid descriptions are
-+			"active" and "not active".
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		void UnreadAlertCount(string category, uint16 count)
-+
-+			Some services (like SMS and e-mail) keep track of
-+			number of unread items. This method allows to update
-+			this counter, so peer devices can read it using Alert
-+			Notification Profile.
-+
-+			Note that just calling NewAlert() will not implicitly
-+			increment the unread count for a category. The
-+			application must call this method to increase or
-+			decrease the unread counter.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+Alert Agent hierarchy
-+=====================
-+
-+Service		org.bluez
-+Interface	org.bluez.AlertAgent
-+Object path	freely definable
-+
-+Methods		void MuteOnce()
-+
-+			This method is only called if "ringer" alert category
-+			is specified when registering the agent.
-+
-+			Mute the ringer once (e.g. during a incoming call). If
-+			ringer is not active, does nothing.
-+
-+		void SetRingerMode(string mode)
-+
-+			This method is only called if "ringer" alert category
-+			is specified when registering the agent.
-+
-+			Set ringer to the specified mode. If mode is "normal",
-+			ringer is set to the default mode, as defined by the
-+			current active profile. If mode is "silent", ringer
-+			will not activate on incoming calls, until it is set
-+			back to "normal" mode.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
+ static void read_batterylevel_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 							gpointer user_data)
+ {
+@@ -162,6 +168,7 @@ static void read_batterylevel_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 	}
+ 
+ 	ch->level = value[0];
++	emit_battery_level_changed(ch);
+ }
+ 
+ static void process_batteryservice_char(struct characteristic *ch)
+@@ -349,12 +356,6 @@ update_char:
+ 	process_batteryservice_char(ch);
+ }
+ 
+-static void emit_battery_level_changed(struct characteristic *c)
+-{
+-	emit_property_changed(c->batt->conn, c->path, BATTERY_INTERFACE,
+-					"Level", DBUS_TYPE_BYTE, &c->level);
+-}
+-
+ static void configure_battery_cb(GSList *characteristics, guint8 status,
+ 
+ 							gpointer user_data)
 -- 
 1.7.9.5
 
