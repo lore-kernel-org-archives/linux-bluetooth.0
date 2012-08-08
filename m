@@ -2,39 +2,37 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v3 1/2] Bluetooth: Add more HCI error codes
-Date: Wed,  8 Aug 2012 09:42:32 +0200
-Message-Id: <1344411753-10124-2-git-send-email-mikel.astiz.oss@gmail.com>
-In-Reply-To: <1344411753-10124-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1344411753-10124-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v3 0/2] Disconnect reason in Kernel API
+Date: Wed,  8 Aug 2012 09:42:31 +0200
+Message-Id: <1344411753-10124-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Add more HCI error codes as defined in the specification.
+This patchset (split now in two patches) extends the management API to expose the disconnect reason in the device disconnection event.
 
-Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
----
- include/net/bluetooth/hci.h |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+The original motivation was to distinguish the timeout case from the rest, thus the first versions of the patch provided only this information.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 7f19556..7253bdd 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -302,8 +302,11 @@ enum {
- 
- /* ---- HCI Error Codes ---- */
- #define HCI_ERROR_AUTH_FAILURE		0x05
-+#define HCI_ERROR_CONNECTION_TIMEOUT	0x08
- #define HCI_ERROR_REJ_BAD_ADDR		0x0f
- #define HCI_ERROR_REMOTE_USER_TERM	0x13
-+#define HCI_ERROR_REMOTE_LOW_RESOURCES	0x14
-+#define HCI_ERROR_REMOTE_POWER_OFF	0x15
- #define HCI_ERROR_LOCAL_HOST_TERM	0x16
- #define HCI_ERROR_PAIRING_NOT_ALLOWED	0x18
- 
+v3 extends the original approach to also determine which side (local host or remote) initiated the ACL disconnection. This is IMO not very useful and misleading, but has still been considered interesting by the subsystem maintainers.
+
+In order to test these patches, the old userland patch ("[RFC BlueZ v1]: mgmt-api: Add reason to device disconnect event") can be used, in terms of log traces, even though it needs the corresponding update.
+
+>From original patch:
+
+During the BlueZ meeting in Brazil it was proposed to add two more values to this enum: "Connection terminated by local host" and "Connection terminated by remote host". However, after some testing, it seems the result can be quite misleading. Therefore and given that there are no known use-cases that need this information (local vs remote disconnection), these two values have been dropped.
+
+Mikel Astiz (2):
+  Bluetooth: Add more HCI error codes
+  Bluetooth: mgmt: Add device disconnect reason
+
+ include/net/bluetooth/hci.h      |    3 +++
+ include/net/bluetooth/hci_core.h |    2 +-
+ include/net/bluetooth/mgmt.h     |    8 ++++++++
+ net/bluetooth/hci_event.c        |   24 +++++++++++++++++++++---
+ net/bluetooth/mgmt.c             |    9 +++++----
+ 5 files changed, 38 insertions(+), 8 deletions(-)
+
 -- 
 1.7.7.6
 
