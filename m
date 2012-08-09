@@ -1,44 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+From: Ludek Finstrle <luf@pzkagis.cz>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ v3 1/3] rfcomm: Fix checking return value instead of errno
-Date: Thu,  9 Aug 2012 17:29:01 -0300
-Message-Id: <1344544143-12805-1-git-send-email-lucas.demarchi@profusion.mobi>
+Cc: Ludek Finstrle <luf@pzkagis.cz>
+Subject: [PATCH obexd] client: Fix pbap_select using absolute path with known locations
+Date: Thu,  9 Aug 2012 18:07:33 +0200
+Message-Id: <1344528453-27245-1-git-send-email-luf@pzkagis.cz>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We were checking by a positive return value instead of checking by -1
-and errno. However when there's no support for TTY kernel returns
-EOPNOTSUPP as usual, which in the end will have a return value of -1
-and errno will be set to EOPNOTSUPP.
+pbap_select has to use absolute path with known location to support
+repeatable pbap_select calls. In other way the second call fails.
 ---
- tools/rfcomm.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ client/pbap.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tools/rfcomm.c b/tools/rfcomm.c
-index e73b0ba..0a80670 100644
---- a/tools/rfcomm.c
-+++ b/tools/rfcomm.c
-@@ -182,10 +182,14 @@ static int create_dev(int ctl, int dev, uint32_t flags, bdaddr_t *bdaddr, int ar
- 	}
+diff --git a/client/pbap.c b/client/pbap.c
+index 48dbac1..d8c39e5 100644
+--- a/client/pbap.c
++++ b/client/pbap.c
+@@ -232,14 +232,14 @@ static gchar *build_phonebook_path(const char *location, const char *item)
  
- 	err = ioctl(ctl, RFCOMMCREATEDEV, &req);
--	if (err == EOPNOTSUPP)
--		fprintf(stderr, "RFCOMM TTY support not available\n");
--	else if (err < 0)
--		perror("Can't create device");
-+	if (err == -1) {
-+		err = -errno;
-+
-+		if (err == -EOPNOTSUPP)
-+			fprintf(stderr, "RFCOMM TTY support not available\n");
-+		else
-+			perror("Can't create device");
-+	}
+ 	if (!g_ascii_strcasecmp(location, "INT") ||
+ 			!g_ascii_strcasecmp(location, "INTERNAL"))
+-		path = g_strdup("telecom");
++		path = g_strdup("/telecom");
+ 	else if (!g_ascii_strncasecmp(location, "SIM", 3)) {
+ 		if (strlen(location) == 3)
+ 			tmp = g_strdup("SIM1");
+ 		else
+ 			tmp = g_ascii_strup(location, 4);
  
- 	return err;
- }
+-		path = g_build_filename(tmp, "telecom", NULL);
++		path = g_build_filename("/", tmp, "telecom", NULL);
+ 		g_free(tmp);
+ 	} else
+ 		return NULL;
 -- 
-1.7.11.4
+1.7.1
 
