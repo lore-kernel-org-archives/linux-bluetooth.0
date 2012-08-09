@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 9/9] core: Remove map_ap.c
-Date: Thu,  9 Aug 2012 13:32:33 +0300
-Message-Id: <1344508353-24647-10-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 8/9] MAP: Make use of GObexApparam API
+Date: Thu,  9 Aug 2012 13:32:32 +0300
+Message-Id: <1344508353-24647-9-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1344508353-24647-1-git-send-email-luiz.dentz@gmail.com>
 References: <1344508353-24647-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,586 +11,188 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-It is no longer needed as MAP plugin is now using GObexApparam API
 ---
- Makefile.am  |   4 +-
- src/map_ap.c | 466 -----------------------------------------------------------
- src/map_ap.h |  63 --------
- 3 files changed, 2 insertions(+), 531 deletions(-)
- delete mode 100644 src/map_ap.c
+ plugins/mas.c | 81 ++++++++++++++++++++++++++++-------------------------------
+ 1 file changed, 38 insertions(+), 43 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 4757f60..724dd5d 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -63,7 +63,7 @@ builtin_sources += plugins/pbap.c plugins/phonebook.h \
+diff --git a/plugins/mas.c b/plugins/mas.c
+index 576c206..30e529f 100644
+--- a/plugins/mas.c
++++ b/plugins/mas.c
+@@ -32,6 +32,7 @@
+ #include <inttypes.h>
  
- builtin_modules += mas
- builtin_sources += plugins/mas.c plugins/messages.h \
--			src/map_ap.c src/map_ap.h
-+			src/map_ap.h
+ #include <gobex/gobex.h>
++#include <gobex/gobex-apparam.h>
  
- builtin_modules += irmc
- builtin_sources += plugins/irmc.c
-@@ -127,7 +127,7 @@ client_obex_client_SOURCES = $(gdbus_sources) $(gobex_sources) \
- 				client/transport.h client/transport.c \
- 				client/dbus.h client/dbus.c \
- 				client/driver.h client/driver.c \
--				src/map_ap.h src/map_ap.c
-+				src/map_ap.h
- 
- client_obex_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ @BLUEZ_LIBS@
- endif
-diff --git a/src/map_ap.c b/src/map_ap.c
-deleted file mode 100644
-index 6efc484..0000000
---- a/src/map_ap.c
-+++ /dev/null
-@@ -1,466 +0,0 @@
--/*
-- *
-- *  OBEX Server
-- *
-- *  Copyright (C) 2010-2011  Nokia Corporation
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <string.h>
--
--#include "log.h"
--
--#include "map_ap.h"
--
--enum ap_type {
--	APT_UINT8,
--	APT_UINT16,
--	APT_UINT32,
--	APT_STR
--};
--
--/* NOTE: ap_defs array has to be kept in sync with map_ap_tag. */
--static const struct ap_def {
--	const char *name;
--	enum ap_type type;
--} ap_defs[] = {
--	{ "MAXLISTCOUNT",		APT_UINT16 },
--	{ "STARTOFFSET",		APT_UINT16 },
--	{ "FILTERMESSAGETYPE",		APT_UINT8  },
--	{ "FILTERPERIODBEGIN",		APT_STR    },
--	{ "FILTERPERIODEND",		APT_STR    },
--	{ "FILTERREADSTATUS",		APT_UINT8  },
--	{ "FILTERRECIPIENT",		APT_STR    },
--	{ "FILTERORIGINATOR",		APT_STR    },
--	{ "FILTERPRIORITY",		APT_UINT8  },
--	{ "ATTACHMENT",			APT_UINT8  },
--	{ "TRANSPARENT",		APT_UINT8  },
--	{ "RETRY",			APT_UINT8  },
--	{ "NEWMESSAGE",			APT_UINT8  },
--	{ "NOTIFICATIONSTATUS",		APT_UINT8  },
--	{ "MASINSTANCEID",		APT_UINT8  },
--	{ "PARAMETERMASK",		APT_UINT32 },
--	{ "FOLDERLISTINGSIZE",		APT_UINT16 },
--	{ "MESSAGESLISTINGSIZE",	APT_UINT16 },
--	{ "SUBJECTLENGTH",		APT_UINT8  },
--	{ "CHARSET",			APT_UINT8  },
--	{ "FRACTIONREQUEST",		APT_UINT8  },
--	{ "FRACTIONDELIVER",		APT_UINT8  },
--	{ "STATUSINDICATOR",		APT_UINT8  },
--	{ "STATUSVALUE",		APT_UINT8  },
--	{ "MSETIME",			APT_STR    },
--};
--
--struct ap_entry {
--	enum map_ap_tag tag;
--	union {
--		uint32_t u32;
--		uint16_t u16;
--		uint8_t u8;
--		char *str;
--	} val;
--};
--
--/* This comes from OBEX specs */
--struct obex_ap_header {
--	uint8_t tag;
--	uint8_t len;
--	uint8_t val[0];
--} __attribute__ ((packed));
--
--static int find_ap_def_offset(uint8_t tag)
--{
--	if (tag == 0 || tag > G_N_ELEMENTS(ap_defs))
--		return -1;
--
--	return tag - 1;
--}
--
--static void ap_entry_dump(gpointer tag, gpointer val, gpointer user_data)
--{
--	struct ap_entry *entry = val;
--	int offset;
--
--	offset = find_ap_def_offset(GPOINTER_TO_INT(tag));
--
--	switch (ap_defs[offset].type) {
--	case APT_UINT8:
--		DBG("%-30s %08x", ap_defs[offset].name, entry->val.u8);
--		break;
--	case APT_UINT16:
--		DBG("%-30s %08x", ap_defs[offset].name, entry->val.u16);
--		break;
--	case APT_UINT32:
--		DBG("%-30s %08x", ap_defs[offset].name, entry->val.u32);
--		break;
--	case APT_STR:
--		DBG("%-30s %s", ap_defs[offset].name, entry->val.str);
--		break;
--	}
--}
--
--static void ap_entry_free(gpointer val)
--{
--	struct ap_entry *entry = val;
--	int offset;
--
--	offset = find_ap_def_offset(entry->tag);
--
--	if (offset >= 0 && ap_defs[offset].type == APT_STR)
--		g_free(entry->val.str);
--
--	g_free(entry);
--}
--
--map_ap_t *map_ap_new(void)
--{
--	return g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL,
--								ap_entry_free);
--}
--
--void map_ap_free(map_ap_t *ap)
--{
--	if (!ap)
--		return;
--
--	g_hash_table_destroy(ap);
--}
--
--static void ap_decode_u8(map_ap_t *ap, const struct obex_ap_header *hdr)
--{
--	if (hdr->len != 1) {
--		DBG("Value of tag %u is %u byte(s) long instead of expected "
--				"1 byte - skipped!", hdr->tag, hdr->len);
--		return;
--	}
--
--	map_ap_set_u8(ap, hdr->tag, hdr->val[0]);
--}
--
--static void ap_decode_u16(map_ap_t *ap, const struct obex_ap_header *hdr)
--{
--	uint16_t val;
--
--	if (hdr->len != 2) {
--		DBG("Value of tag %u is %u byte(s) long instead of expected "
--				"2 bytes - skipped!", hdr->tag, hdr->len);
--		return;
--	}
--
--	memcpy(&val, hdr->val, sizeof(val));
--	map_ap_set_u16(ap, hdr->tag, GUINT16_FROM_BE(val));
--}
--
--static void ap_decode_u32(map_ap_t *ap, const struct obex_ap_header *hdr)
--{
--	uint32_t val;
--
--	if (hdr->len != 4) {
--		DBG("Value of tag %u is %u byte(s) long instead of expected "
--				"4 bytes - skipped!", hdr->tag, hdr->len);
--		return;
--	}
--
--	memcpy(&val, hdr->val, sizeof(val));
--	map_ap_set_u32(ap, hdr->tag, GUINT32_FROM_BE(val));
--}
--
--static void ap_decode_str(map_ap_t *ap, const struct obex_ap_header *hdr)
--{
--	char *val = g_malloc0(hdr->len + 1);
--
--	memcpy(val, hdr->val, hdr->len);
--	map_ap_set_string(ap, hdr->tag, val);
--
--	g_free(val);
--}
--
--map_ap_t *map_ap_decode(const uint8_t *buffer, size_t length)
--{
--	map_ap_t *ap;
--	struct obex_ap_header *hdr;
--	uint32_t done;
--	int offset;
--
--	ap = map_ap_new();
--	if (!ap)
--		return NULL;
--
--	for (done = 0;  done < length; done += hdr->len + sizeof(*hdr)) {
--		hdr = (struct obex_ap_header *)(buffer + done);
--
--		offset = find_ap_def_offset(hdr->tag);
--
--		if (offset < 0) {
--			DBG("Unknown tag %u (length %u) - skipped.",
--							hdr->tag, hdr->len);
--			continue;
--		}
--
--		switch (ap_defs[offset].type) {
--		case APT_UINT8:
--			ap_decode_u8(ap, hdr);
--			break;
--		case APT_UINT16:
--			ap_decode_u16(ap, hdr);
--			break;
--		case APT_UINT32:
--			ap_decode_u32(ap, hdr);
--			break;
--		case APT_STR:
--			ap_decode_str(ap, hdr);
--			break;
--		}
--	}
--
--	g_hash_table_foreach(ap, ap_entry_dump, NULL);
--
--	return ap;
--}
--
--static void ap_encode_u8(GByteArray *buf, struct ap_entry *entry)
--{
--	struct obex_ap_header *hdr;
--
--	hdr = (struct obex_ap_header *) buf->data + buf->len;
--	g_byte_array_set_size(buf, buf->len + sizeof(*hdr) + 1);
--
--	hdr->tag = entry->tag;
--	hdr->len = 1;
--	hdr->val[0] = entry->val.u8;
--}
--
--static void ap_encode_u16(GByteArray *buf, struct ap_entry *entry)
--{
--	struct obex_ap_header *hdr;
--	uint16_t val;
--
--	hdr = (struct obex_ap_header *) buf->data + buf->len;
--
--	g_byte_array_set_size(buf, buf->len + sizeof(*hdr) + 2);
--
--	hdr->tag = entry->tag;
--	hdr->len = 2;
--
--	val = GUINT16_TO_BE(entry->val.u16);
--	memcpy(hdr->val, &val, sizeof(val));
--}
--
--static void ap_encode_u32(GByteArray *buf, struct ap_entry *entry)
--{
--	uint32_t val;
--	struct obex_ap_header *hdr;
--
--	hdr = (struct obex_ap_header *) buf->data + buf->len;
--	g_byte_array_set_size(buf, buf->len + sizeof(*hdr) + 4);
--
--	hdr->tag = entry->tag;
--	hdr->len = 4;
--
--	val = GUINT32_TO_BE(entry->val.u16);
--	memcpy(hdr->val, &val, sizeof(val));
--}
--
--static void ap_encode_str(GByteArray *buf, struct ap_entry *entry)
--{
--	size_t len;
--	struct obex_ap_header *hdr;
--
--	hdr = (struct obex_ap_header *) buf->data + buf->len;
--	len = strlen(entry->val.str);
--	g_byte_array_set_size(buf, buf->len + sizeof(*hdr) + len);
--
--	hdr->tag = entry->tag;
--	hdr->len = len;
--
--	memcpy(hdr->val, entry->val.str, len);
--}
--
--uint8_t *map_ap_encode(map_ap_t *ap, size_t *length)
--{
--	GByteArray *buf;
--	GHashTableIter iter;
--	gpointer key, value;
--	struct ap_entry *entry;
--	int offset;
--
--	buf = g_byte_array_new();
--	g_hash_table_iter_init(&iter, ap);
--
--	while (g_hash_table_iter_next(&iter, &key, &value)) {
--		entry = (struct ap_entry *) value;
--		offset = find_ap_def_offset(entry->tag);
--
--		switch (ap_defs[offset].type) {
--		case APT_UINT8:
--			ap_encode_u8(buf, entry);
--			break;
--		case APT_UINT16:
--			ap_encode_u16(buf, entry);
--			break;
--		case APT_UINT32:
--			ap_encode_u32(buf, entry);
--			break;
--		case APT_STR:
--			ap_encode_str(buf, entry);
--			break;
--		}
--	}
--
--	*length = buf->len;
--
--	return g_byte_array_free(buf, FALSE);
--}
--
--gboolean map_ap_get_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t *val)
--{
--	struct ap_entry *entry;
--	int offset = find_ap_def_offset(tag);
--
--	if (offset < 0 || ap_defs[offset].type != APT_UINT8)
--		return FALSE;
--
--	entry = g_hash_table_lookup(ap, GINT_TO_POINTER(tag));
--	if (entry == NULL)
--		return FALSE;
--
--	*val = entry->val.u8;
--
--	return TRUE;
--}
--
--gboolean map_ap_get_u16(map_ap_t *ap, enum map_ap_tag tag, uint16_t *val)
--{
--	struct ap_entry *entry;
--	int offset = find_ap_def_offset(tag);
--
--	if (offset < 0 || ap_defs[offset].type != APT_UINT16)
--		return FALSE;
--
--	entry = g_hash_table_lookup(ap, GINT_TO_POINTER(tag));
--	if (entry == NULL)
--		return FALSE;
--
--	*val = entry->val.u16;
--
--	return TRUE;
--}
--
--gboolean map_ap_get_u32(map_ap_t *ap, enum map_ap_tag tag, uint32_t *val)
--{
--	struct ap_entry *entry;
--	int offset = find_ap_def_offset(tag);
--
--	if (offset < 0 || ap_defs[offset].type != APT_UINT32)
--		return FALSE;
--
--	entry = g_hash_table_lookup(ap, GINT_TO_POINTER(tag));
--	if (entry == NULL)
--		return FALSE;
--
--	*val = entry->val.u32;
--
--	return TRUE;
--}
--
--const char *map_ap_get_string(map_ap_t *ap, enum map_ap_tag tag)
--{
--	struct ap_entry *entry;
--	int offset = find_ap_def_offset(tag);
--
--	if (offset < 0 || ap_defs[offset].type != APT_STR)
--		return NULL;
--
--	entry = g_hash_table_lookup(ap, GINT_TO_POINTER(tag));
--	if (entry == NULL)
--		return NULL;
--
--	return entry->val.str;
--}
--
--gboolean map_ap_set_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t val)
--{
--	struct ap_entry *entry;
--	int offset = find_ap_def_offset(tag);
--
--	if (offset < 0 || ap_defs[offset].type != APT_UINT8)
--		return FALSE;
--
--	entry = g_new0(struct ap_entry, 1);
--	entry->tag = tag;
--	entry->val.u8 = val;
--
--	g_hash_table_insert(ap, GINT_TO_POINTER(tag), entry);
--
--	return TRUE;
--}
--
--gboolean map_ap_set_u16(map_ap_t *ap, enum map_ap_tag tag, uint16_t val)
--{
--	struct ap_entry *entry;
--	int offset = find_ap_def_offset(tag);
--
--	if (offset < 0 || ap_defs[offset].type != APT_UINT16)
--		return FALSE;
--
--	entry = g_new0(struct ap_entry, 1);
--	entry->tag = tag;
--	entry->val.u16 = val;
--
--	g_hash_table_insert(ap, GINT_TO_POINTER(tag), entry);
--
--	return TRUE;
--}
--
--gboolean map_ap_set_u32(map_ap_t *ap, enum map_ap_tag tag, uint32_t val)
--{
--	struct ap_entry *entry;
--	int offset = find_ap_def_offset(tag);
--
--	if (offset < 0 || ap_defs[offset].type != APT_UINT32)
--		return FALSE;
--
--	entry = g_new0(struct ap_entry, 1);
--	entry->tag = tag;
--	entry->val.u32 = val;
--
--	g_hash_table_insert(ap, GINT_TO_POINTER(tag), entry);
--
--	return TRUE;
--}
--
--gboolean map_ap_set_string(map_ap_t *ap, enum map_ap_tag tag, const char *val)
--{
--	struct ap_entry *entry;
--	int offset = find_ap_def_offset(tag);
--
--	if (offset < 0 || ap_defs[offset].type != APT_STR)
--		return FALSE;
--
--	entry = g_new0(struct ap_entry, 1);
--	entry->tag = tag;
--	entry->val.str = g_strdup(val);
--
--	g_hash_table_insert(ap, GINT_TO_POINTER(tag), entry);
--
--	return TRUE;
--}
-diff --git a/src/map_ap.h b/src/map_ap.h
-index 24254af..da108fe 100644
---- a/src/map_ap.h
-+++ b/src/map_ap.h
-@@ -21,9 +21,6 @@
-  *
-  */
- 
--#include <glib.h>
--#include <inttypes.h>
--
- /* List of OBEX application parameters tags as per MAP specification. */
- enum map_ap_tag {
- 	MAP_AP_MAXLISTCOUNT		= 0x01,		/* uint16_t	*/
-@@ -52,63 +49,3 @@ enum map_ap_tag {
- 	MAP_AP_STATUSVALUE		= 0x18,		/* uint8_t	*/
- 	MAP_AP_MSETIME			= 0x19,		/* char *	*/
+ #include "obexd.h"
+ #include "plugin.h"
+@@ -112,8 +113,8 @@ struct mas_session {
+ 	gboolean finished;
+ 	gboolean nth_call;
+ 	GString *buffer;
+-	map_ap_t *inparams;
+-	map_ap_t *outparams;
++	GObexApparam *inparams;
++	GObexApparam *outparams;
+ 	gboolean ap_sent;
  };
+ 
+@@ -130,14 +131,12 @@ static int get_params(struct obex_session *os, struct mas_session *mas)
+ 	if (size < 0)
+ 		size = 0;
+ 
+-	mas->inparams = map_ap_decode(buffer, size);
++	mas->inparams = g_obex_apparam_decode(buffer, size);
+ 	if (mas->inparams == NULL) {
+ 		DBG("Error when parsing parameters!");
+ 		return -EBADR;
+ 	}
+ 
+-	mas->outparams = map_ap_new();
 -
--/* Data type representing MAP application parameters. Consider opaque. */
--typedef GHashTable map_ap_t;
+ 	return 0;
+ }
+ 
+@@ -148,10 +147,15 @@ static void reset_request(struct mas_session *mas)
+ 		mas->buffer = NULL;
+ 	}
+ 
+-	map_ap_free(mas->inparams);
+-	mas->inparams = NULL;
+-	map_ap_free(mas->outparams);
+-	mas->outparams = NULL;
++	if (mas->inparams) {
++		g_obex_apparam_free(mas->inparams);
++		mas->inparams = NULL;
++	}
++
++	if (mas->outparams) {
++		g_obex_apparam_free(mas->outparams);
++		mas->outparams = NULL;
++	}
+ 
+ 	mas->nth_call = FALSE;
+ 	mas->finished = FALSE;
+@@ -289,7 +293,7 @@ static void get_messages_listing_cb(void *session, int err, uint16_t size,
+ 		return;
+ 	}
+ 
+-	map_ap_get_u16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
++	g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
+ 
+ 	if (max == 0) {
+ 		if (!entry)
+@@ -390,10 +394,12 @@ static void get_messages_listing_cb(void *session, int err, uint16_t size,
+ 
+ proceed:
+ 	if (!entry) {
+-		map_ap_set_u16(mas->outparams, MAP_AP_MESSAGESLISTINGSIZE,
+-							size);
+-		map_ap_set_u8(mas->outparams, MAP_AP_NEWMESSAGE,
+-							newmsg ? 1 : 0);
++		mas->outparams = g_obex_apparam_set_uint16(mas->outparams,
++						MAP_AP_MESSAGESLISTINGSIZE,
++						size);
++		mas->outparams = g_obex_apparam_set_uint8(mas->outparams,
++						MAP_AP_NEWMESSAGE,
++						newmsg ? 1 : 0);
+ 	}
+ 
+ 	if (err != -EAGAIN)
+@@ -435,12 +441,14 @@ static void get_folder_listing_cb(void *session, int err, uint16_t size,
+ 		return;
+ 	}
+ 
+-	map_ap_get_u16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
++	g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
+ 
+ 	if (max == 0) {
+ 		if (err != -EAGAIN)
+-			map_ap_set_u16(mas->outparams,
+-					MAP_AP_FOLDERLISTINGSIZE, size);
++			mas->outparams = g_obex_apparam_set_uint16(
++						mas->outparams,
++						MAP_AP_FOLDERLISTINGSIZE,
++						size);
+ 
+ 		if (!name)
+ 			mas->finished = TRUE;
+@@ -529,8 +537,8 @@ static void *folder_listing_open(const char *name, int oflag, mode_t mode,
+ 
+ 	DBG("name = %s", name);
+ 
+-	map_ap_get_u16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
+-	map_ap_get_u16(mas->inparams, MAP_AP_STARTOFFSET, &offset);
++	g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
++	g_obex_apparam_get_uint16(mas->inparams, MAP_AP_STARTOFFSET, &offset);
+ 
+ 	*err = messages_get_folder_listing(mas->backend_data, name, max,
+ 					offset, get_folder_listing_cb, mas);
+@@ -559,24 +567,24 @@ static void *msg_listing_open(const char *name, int oflag, mode_t mode,
+ 		return NULL;
+ 	}
+ 
+-	map_ap_get_u16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
+-	map_ap_get_u16(mas->inparams, MAP_AP_STARTOFFSET, &offset);
++	g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
++	g_obex_apparam_get_uint16(mas->inparams, MAP_AP_STARTOFFSET, &offset);
+ 
+-	map_ap_get_u32(mas->inparams, MAP_AP_PARAMETERMASK,
++	g_obex_apparam_get_uint32(mas->inparams, MAP_AP_PARAMETERMASK,
+ 						&filter.parameter_mask);
+-	map_ap_get_u8(mas->inparams, MAP_AP_FILTERMESSAGETYPE,
++	g_obex_apparam_get_uint8(mas->inparams, MAP_AP_FILTERMESSAGETYPE,
+ 						&filter.type);
+-	filter.period_begin = map_ap_get_string(mas->inparams,
++	filter.period_begin = g_obex_apparam_get_string(mas->inparams,
+ 						MAP_AP_FILTERPERIODBEGIN);
+-	filter.period_end = map_ap_get_string(mas->inparams,
++	filter.period_end = g_obex_apparam_get_string(mas->inparams,
+ 						MAP_AP_FILTERPERIODEND);
+-	map_ap_get_u8(mas->inparams, MAP_AP_FILTERREADSTATUS,
++	g_obex_apparam_get_uint8(mas->inparams, MAP_AP_FILTERREADSTATUS,
+ 						&filter.read_status);
+-	filter.recipient = map_ap_get_string(mas->inparams,
++	filter.recipient = g_obex_apparam_get_string(mas->inparams,
+ 						MAP_AP_FILTERRECIPIENT);
+-	filter.originator = map_ap_get_string(mas->inparams,
++	filter.originator = g_obex_apparam_get_string(mas->inparams,
+ 						MAP_AP_FILTERORIGINATOR);
+-	map_ap_get_u8(mas->inparams, MAP_AP_FILTERPRIORITY,
++	g_obex_apparam_get_uint8(mas->inparams, MAP_AP_FILTERPRIORITY,
+ 						&filter.priority);
+ 
+ 	*err = messages_get_messages_listing(mas->backend_data, name, max,
+@@ -640,8 +648,6 @@ static ssize_t any_get_next_header(void *object, void *buf, size_t mtu,
+ 								uint8_t *hi)
+ {
+ 	struct mas_session *mas = object;
+-	size_t len;
+-	uint8_t *apbuf;
+ 
+ 	DBG("");
+ 
+@@ -654,18 +660,7 @@ static ssize_t any_get_next_header(void *object, void *buf, size_t mtu,
+ 		return 0;
+ 
+ 	mas->ap_sent = TRUE;
+-	apbuf = map_ap_encode(mas->outparams, &len);
 -
--/* Creates a new empty MAP application parameters object. */
--map_ap_t *map_ap_new(void);
+-	if (len > mtu) {
+-		DBG("MTU is to small to fit application parameters header!");
+-		g_free(apbuf);
 -
--/* Frees all the memory used by MAP application parameters object. */
--void map_ap_free(map_ap_t *ap);
+-		return -EIO;
+-	}
 -
--/* Parses given buffer that is a payload of OBEX application parameter header
-- * with a given length. Returned value can be used in calls to map_ap_get_*()
-- * and map_ap_set_*(). It has to be freed using map_ap_free(). It also takes
-- * care of converting all the data to host byte order, so this is the byte
-- * order used in map_ap_get_*()/map_ap_set_*().
-- *
-- * Returns NULL in case of failure.
-- */
--map_ap_t *map_ap_decode(const uint8_t *buffer, size_t length);
+-	memcpy(buf, apbuf, len);
 -
--/* Takes all parameters currently set and packs them into a buffer with OBEX
-- * application parameters header payload format.
-- *
-- * Returns newly allocated buffer of size 'length'. Free with g_free().
-- */
--uint8_t *map_ap_encode(map_ap_t *ap, size_t *length);
--
--/* Following family of functions reads value of MAP parameter with given tag.
-- * Use the one with appropriate type for a given tag, as noted above in
-- * map_ap_tag declaration comments.
-- *
-- * Returns TRUE when value is present. FALSE if it is not or the function is
-- * used get a parameter of a different type. When FALSE is returned, variable
-- * pointed by 'val' is left intact.
-- */
--gboolean map_ap_get_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t *val);
--gboolean map_ap_get_u16(map_ap_t *ap, enum map_ap_tag tag, uint16_t *val);
--gboolean map_ap_get_u32(map_ap_t *ap, enum map_ap_tag tag, uint32_t *val);
--
--/* Reads value of MAP parameter with given tag that is of a string type.
-- *
-- * Returns NULL if parameter is not present in ap or given tag is not of a
-- * string type.
-- */
--const char *map_ap_get_string(map_ap_t *ap, enum map_ap_tag tag);
--
--/* Following family of functions sets the value of MAP parameter with given
-- * tag. Use the one with appropriate type for a given tag, as noted above in
-- * map_ap_tag declaration comments.
-- *
-- * If there is already a parameter with given tag present, it will be
-- * replaced. map_ap_set_string() makes its own copy of given string.
-- *
-- * Returns TRUE on success (the tag is known and the function chosen matches
-- * the type of tag).
-- */
--gboolean map_ap_set_u8(map_ap_t *ap, enum map_ap_tag tag, uint8_t val);
--gboolean map_ap_set_u16(map_ap_t *ap, enum map_ap_tag tag, uint16_t val);
--gboolean map_ap_set_u32(map_ap_t *ap, enum map_ap_tag tag, uint32_t val);
--gboolean map_ap_set_string(map_ap_t *ap, enum map_ap_tag tag, const char *val);
+-	return len;
++	return g_obex_apparam_encode(mas->outparams, buf, mtu);
+ }
+ 
+ static void *any_open(const char *name, int oflag, mode_t mode,
 -- 
 1.7.11.2
 
