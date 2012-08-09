@@ -1,62 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
+From: Rafal Garbat <rafal.garbat@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <rafal.garbat@tieto.com>
+Subject: [PATCH 13/13] heartrate: Add Heart Rate test script
+Date: Thu, 9 Aug 2012 09:20:16 +0200
+Message-ID: <1344496816-4641-14-git-send-email-rafal.garbat@tieto.com>
+In-Reply-To: <1344496816-4641-1-git-send-email-rafal.garbat@tieto.com>
+References: <1344496816-4641-1-git-send-email-rafal.garbat@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1344433958.2083.52.camel@aeonflux>
-References: <1344411753-10124-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1344411753-10124-3-git-send-email-mikel.astiz.oss@gmail.com>
-	<1344433958.2083.52.camel@aeonflux>
-Date: Thu, 9 Aug 2012 09:43:56 +0200
-Message-ID: <CANT-zCX2UTTjLL1hWNS4sutwvgAmbPtP_4fRZBg26a-eQMC0Lg@mail.gmail.com>
-Subject: Re: [RFC v3 2/2] Bluetooth: mgmt: Add device disconnect reason
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+---
+ Makefile.tools      |    4 +--
+ test/test-heartrate |   78 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 80 insertions(+), 2 deletions(-)
+ create mode 100755 test/test-heartrate
 
-On Wed, Aug 8, 2012 at 3:52 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Mikel,
->
->> MGMT_EV_DEVICE_DISCONNECTED will now expose the disconnection reason to
->> userland, distinguishing four possible values:
->>
->>       0x00    Reason not known or unspecified
->>       0x01    ACL connection timeout
->>       0x02    ACL connection terminated by local host
->>       0x03    ACL connection terminated by remote host
->
-> I think we need to leave ACL out here. Since that is not how we defined
-> what a connection is in mgmt terms.
->
->> Note that the local/remote distinction just determines which side
->> terminated the low-level ACL connection, regardless of the disconnection
->> of the higher-level profiles.
->>
->> This can sometimes be misleading and thus must be used with care. For
->> example, some hardware combinations would report a locally initiated
->> disconnection even if the user turned Bluetooth off in the remote side.
->
-> Please make sure that this comment makes it also into the API
-> description.
+diff --git a/Makefile.tools b/Makefile.tools
+index 5579b86..77b0a3f 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -222,7 +222,7 @@ EXTRA_DIST += test/sap_client.py test/hsplay test/hsmicro \
+ 		test/test-network test/simple-agent test/simple-service \
+ 		test/simple-endpoint test/test-audio test/test-input \
+ 		test/test-sap-server test/test-oob test/test-attrib \
+-		test/test-proximity test/test-thermometer test/test-health \
+-		test/test-health-sink test/service-record.dtd \
++		test/test-proximity test/test-thermometer test/test-heartrate \
++		test/test-health test/test-health-sink test/service-record.dtd \
+ 		test/service-did.xml test/service-spp.xml test/service-opp.xml \
+ 		test/service-ftp.xml test/simple-player test/test-nap
+diff --git a/test/test-heartrate b/test/test-heartrate
+new file mode 100755
+index 0000000..35c97a8
+--- /dev/null
++++ b/test/test-heartrate
+@@ -0,0 +1,78 @@
++#!/usr/bin/python
++
++from __future__ import absolute_import, print_function, unicode_literals
++
++'''
++Heart Rate Monitor test script
++'''
++
++import gobject
++
++import sys
++import dbus
++import dbus.service
++import dbus.mainloop.glib
++from optparse import OptionParser, make_option
++
++class Watcher(dbus.service.Object):
++	@dbus.service.method("org.bluez.HeartRateWatcher",
++					in_signature="a{sv}", out_signature="")
++	def MeasurementReceived(self, measure):
++		print("Measurement received")
++		print("Value", measure["Value"])
++		print("Energy", measure["Energy"])
++		print("Contact", measure["Contact"])
++		print("Location", measure["Location"])
++
++		for i in measure["Interval"]:
++			print("Interval", i)
++
++if __name__ == "__main__":
++	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++
++	bus = dbus.SystemBus()
++
++	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
++					"org.bluez.Manager")
++
++	option_list = [
++		make_option("-i", "--adapter", action="store",
++			type="string", dest="adapter"),
++		make_option("-b", "--device", action="store",
++			type="string", dest="address"),
++		]
++
++	parser = OptionParser(option_list=option_list)
++
++	(options, args) = parser.parse_args()
++
++	if not options.address:
++		print("Usage: %s [-i <adapter>] -b <bdaddr>" % (sys.argv[0]))
++		sys.exit(1)
++
++	if options.adapter:
++		adapter_path = manager.FindAdapter(options.adapter)
++	else:
++		adapter_path = manager.DefaultAdapter()
++
++	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
++							"org.bluez.Adapter")
++
++	device_path = adapter.FindDevice(options.address)
++
++	device = dbus.Interface(bus.get_object("org.bluez", device_path),
++							"org.bluez.Device")
++
++	heartrate = dbus.Interface(bus.get_object("org.bluez",
++					device_path), "org.bluez.HeartRate")
++
++	path = "/test/watcher"
++	watcher = Watcher(bus, path)
++
++	heartrate.RegisterWatcher(path)
++
++	properties = heartrate.GetProperties()
++	print("Reset Supported:", properties["ResetSupported"])
++
++	mainloop = gobject.MainLoop()
++	mainloop.run()
+\ No newline at end of file
+-- 
+1.7.9.5
 
-I will send an updated version soon, with all your suggestions, along
-with the updated userland patch where you can see the API
-documentation.
-
-<snip>
-
->> @@ -1906,12 +1907,29 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
->>
->>       if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags) &&
->>           (conn->type == ACL_LINK || conn->type == LE_LINK)) {
->> -             if (ev->status != 0)
->> +             if (ev->status != 0) {
->
-> While at it, turn this into if (ev->status).
-
-I will send a separate patch for this and other similar occurrences.
-Let me know if you prefer to squash the change.
-
-Cheers,
-Mikel
