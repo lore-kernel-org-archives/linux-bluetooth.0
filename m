@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v4 1/3] Bluetooth: Add more HCI error codes
-Date: Thu,  9 Aug 2012 09:52:28 +0200
-Message-Id: <1344498750-2698-2-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v4 3/3] Bluetooth: mgmt: Add device disconnect reason
+Date: Thu,  9 Aug 2012 09:52:30 +0200
+Message-Id: <1344498750-2698-4-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1344498750-2698-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1344498750-2698-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,30 +12,144 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Add more HCI error codes as defined in the specification.
+MGMT_EV_DEVICE_DISCONNECTED will now expose the disconnection reason to
+userland, distinguishing four possible values:
+
+	0x00	Reason not known or unspecified
+	0x01	Connection timeout
+	0x02	Connection terminated by local host
+	0x03	Connection terminated by remote host
+
+Note that the local/remote distinction just determines which side
+terminated the low-level connection, regardless of the disconnection of
+the higher-level profiles.
+
+This can sometimes be misleading and thus must be used with care. For
+example, some hardware combinations would report a locally initiated
+disconnection even if the user turned Bluetooth off in the remote side.
 
 Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 +-
+ include/net/bluetooth/mgmt.h     |    9 +++++++++
+ net/bluetooth/hci_event.c        |   26 +++++++++++++++++++++++---
+ net/bluetooth/mgmt.c             |    9 +++++----
+ 4 files changed, 38 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 7f19556..7253bdd 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -302,8 +302,11 @@ enum {
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 41d9439..4fb0323 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1004,7 +1004,7 @@ int mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 			  u8 addr_type, u32 flags, u8 *name, u8 name_len,
+ 			  u8 *dev_class);
+ int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
+-			     u8 link_type, u8 addr_type);
++			     u8 link_type, u8 addr_type, u8 reason);
+ int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 			   u8 link_type, u8 addr_type, u8 status);
+ int mgmt_connect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 4348ee8..1b48eff 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -405,7 +405,16 @@ struct mgmt_ev_device_connected {
+ 	__u8	eir[0];
+ } __packed;
  
- /* ---- HCI Error Codes ---- */
- #define HCI_ERROR_AUTH_FAILURE		0x05
-+#define HCI_ERROR_CONNECTION_TIMEOUT	0x08
- #define HCI_ERROR_REJ_BAD_ADDR		0x0f
- #define HCI_ERROR_REMOTE_USER_TERM	0x13
-+#define HCI_ERROR_REMOTE_LOW_RESOURCES	0x14
-+#define HCI_ERROR_REMOTE_POWER_OFF	0x15
- #define HCI_ERROR_LOCAL_HOST_TERM	0x16
- #define HCI_ERROR_PAIRING_NOT_ALLOWED	0x18
++#define MGMT_DEV_DISCONN_UNKNOWN	0x00
++#define MGMT_DEV_DISCONN_TIMEOUT	0x01
++#define MGMT_DEV_DISCONN_LOCAL_HOST	0x02
++#define MGMT_DEV_DISCONN_REMOTE		0x03
++
+ #define MGMT_EV_DEVICE_DISCONNECTED	0x000C
++struct mgmt_ev_device_disconnected {
++	struct mgmt_addr_info addr;
++	__u8	reason;
++} __packed;
  
+ #define MGMT_EV_CONNECT_FAILED		0x000D
+ struct mgmt_ev_connect_failed {
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 32fcc74..6e02c93 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -29,6 +29,7 @@
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/mgmt.h>
+ 
+ /* Handle HCI Event packets */
+ 
+@@ -1888,6 +1889,22 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	}
+ }
+ 
++static u8 hci_to_mgmt_reason(u8 err)
++{
++	switch (err) {
++	case HCI_ERROR_CONNECTION_TIMEOUT:
++		return MGMT_DEV_DISCONN_TIMEOUT;
++	case HCI_ERROR_REMOTE_USER_TERM:
++	case HCI_ERROR_REMOTE_LOW_RESOURCES:
++	case HCI_ERROR_REMOTE_POWER_OFF:
++		return MGMT_DEV_DISCONN_REMOTE;
++	case HCI_ERROR_LOCAL_HOST_TERM:
++		return MGMT_DEV_DISCONN_LOCAL_HOST;
++	default:
++		return MGMT_DEV_DISCONN_UNKNOWN;
++	}
++}
++
+ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_ev_disconn_complete *ev = (void *) skb->data;
+@@ -1906,12 +1923,15 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags) &&
+ 	    (conn->type == ACL_LINK || conn->type == LE_LINK)) {
+-		if (ev->status)
++		if (ev->status) {
+ 			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
+ 					       conn->dst_type, ev->status);
+-		else
++		} else {
++			u8 reason = hci_to_mgmt_reason(ev->reason);
++
+ 			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
+-						 conn->dst_type);
++						 conn->dst_type, reason);
++		}
+ 	}
+ 
+ 	if (ev->status == 0) {
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index a3329cb..05d4b83 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3077,16 +3077,17 @@ static void unpair_device_rsp(struct pending_cmd *cmd, void *data)
+ }
+ 
+ int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
+-			     u8 link_type, u8 addr_type)
++			     u8 link_type, u8 addr_type, u8 reason)
+ {
+-	struct mgmt_addr_info ev;
++	struct mgmt_ev_device_disconnected ev;
+ 	struct sock *sk = NULL;
+ 	int err;
+ 
+ 	mgmt_pending_foreach(MGMT_OP_DISCONNECT, hdev, disconnect_rsp, &sk);
+ 
+-	bacpy(&ev.bdaddr, bdaddr);
+-	ev.type = link_to_bdaddr(link_type, addr_type);
++	bacpy(&ev.addr.bdaddr, bdaddr);
++	ev.addr.type = link_to_bdaddr(link_type, addr_type);
++	ev.reason = reason;
+ 
+ 	err = mgmt_event(MGMT_EV_DEVICE_DISCONNECTED, hdev, &ev, sizeof(ev),
+ 			 sk);
 -- 
 1.7.7.6
 
