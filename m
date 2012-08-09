@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: chanyeol.park@samsung.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ V2 3/3] audio: Remove legacy MPEG endpoint
-Date: Thu, 09 Aug 2012 16:45:44 +0900
-Message-id: <1344498344-19268-4-git-send-email-chanyeol.park@samsung.com>
+Subject: [PATCH BlueZ V2 2/3] audio: Remove legacy SBC endpoint
+Date: Thu, 09 Aug 2012 16:45:43 +0900
+Message-id: <1344498344-19268-3-git-send-email-chanyeol.park@samsung.com>
 In-reply-to: <1344498344-19268-1-git-send-email-chanyeol.park@samsung.com>
 References: <1344498344-19268-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,19 +12,19 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Chan-yeol Park <chanyeol.park@samsung.com>
 
 ---
- audio/a2dp.c |  127 ----------------------------------------------------------
- audio/a2dp.h |   51 -----------------------
- 2 files changed, 178 deletions(-)
+ audio/a2dp.c |  283 ----------------------------------------------------------
+ audio/a2dp.h |   46 ----------
+ 2 files changed, 329 deletions(-)
 
 diff --git a/audio/a2dp.c b/audio/a2dp.c
-index 36fee09..a9546b7 100644
+index 4567ce0..36fee09 100644
 --- a/audio/a2dp.c
 +++ b/audio/a2dp.c
-@@ -411,105 +411,6 @@ done:
+@@ -411,134 +411,6 @@ done:
  	return FALSE;
  }
  
--static gboolean mpeg_setconf_ind(struct avdtp *session,
+-static gboolean sbc_setconf_ind(struct avdtp *session,
 -					struct avdtp_local_sep *sep,
 -					struct avdtp_stream *stream,
 -					GSList *caps,
@@ -48,13 +48,37 @@ index 36fee09..a9546b7 100644
 -	setup->stream = stream;
 -	setup->setconf_cb = cb;
 -
+-	/* Check valid settings */
 -	for (; caps != NULL; caps = g_slist_next(caps)) {
 -		struct avdtp_service_capability *cap = caps->data;
+-		struct avdtp_media_codec_capability *codec_cap;
+-		struct sbc_codec_cap *sbc_cap;
 -
 -		if (cap->category == AVDTP_DELAY_REPORTING &&
 -					!a2dp_sep->delay_reporting) {
 -			setup->err = g_new(struct avdtp_error, 1);
 -			avdtp_error_init(setup->err, AVDTP_DELAY_REPORTING,
+-						AVDTP_UNSUPPORTED_CONFIGURATION);
+-			goto done;
+-		}
+-
+-		if (cap->category != AVDTP_MEDIA_CODEC)
+-			continue;
+-
+-		if (cap->length < sizeof(struct sbc_codec_cap))
+-			continue;
+-
+-		codec_cap = (void *) cap->data;
+-
+-		if (codec_cap->media_codec_type != A2DP_CODEC_SBC)
+-			continue;
+-
+-		sbc_cap = (void *) codec_cap;
+-
+-		if (sbc_cap->min_bitpool < MIN_BITPOOL ||
+-					sbc_cap->max_bitpool > MAX_BITPOOL) {
+-			setup->err = g_new(struct avdtp_error, 1);
+-			avdtp_error_init(setup->err, AVDTP_MEDIA_CODEC,
 -					AVDTP_UNSUPPORTED_CONFIGURATION);
 -			goto done;
 -		}
@@ -65,14 +89,13 @@ index 36fee09..a9546b7 100644
 -	return TRUE;
 -}
 -
--static gboolean mpeg_getcap_ind(struct avdtp *session,
--				struct avdtp_local_sep *sep,
--				gboolean get_all,
--				GSList **caps, uint8_t *err, void *user_data)
+-static gboolean sbc_getcap_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+-				gboolean get_all, GSList **caps, uint8_t *err,
+-				void *user_data)
 -{
 -	struct a2dp_sep *a2dp_sep = user_data;
 -	struct avdtp_service_capability *media_transport, *media_codec;
--	struct mpeg_codec_cap mpeg_cap;
+-	struct sbc_codec_cap sbc_cap;
 -
 -	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
 -		DBG("Sink %p: Get_Capability_Ind", sep);
@@ -86,29 +109,36 @@ index 36fee09..a9546b7 100644
 -
 -	*caps = g_slist_append(*caps, media_transport);
 -
--	memset(&mpeg_cap, 0, sizeof(struct mpeg_codec_cap));
+-	memset(&sbc_cap, 0, sizeof(struct sbc_codec_cap));
 -
--	mpeg_cap.cap.media_type = AVDTP_MEDIA_TYPE_AUDIO;
--	mpeg_cap.cap.media_codec_type = A2DP_CODEC_MPEG12;
+-	sbc_cap.cap.media_type = AVDTP_MEDIA_TYPE_AUDIO;
+-	sbc_cap.cap.media_codec_type = A2DP_CODEC_SBC;
 -
--	mpeg_cap.frequency = ( MPEG_SAMPLING_FREQ_48000 |
--				MPEG_SAMPLING_FREQ_44100 |
--				MPEG_SAMPLING_FREQ_32000 |
--				MPEG_SAMPLING_FREQ_24000 |
--				MPEG_SAMPLING_FREQ_22050 |
--				MPEG_SAMPLING_FREQ_16000 );
+-	sbc_cap.frequency = ( SBC_SAMPLING_FREQ_48000 |
+-				SBC_SAMPLING_FREQ_44100 |
+-				SBC_SAMPLING_FREQ_32000 |
+-				SBC_SAMPLING_FREQ_16000 );
 -
--	mpeg_cap.channel_mode = ( MPEG_CHANNEL_MODE_JOINT_STEREO |
--					MPEG_CHANNEL_MODE_STEREO |
--					MPEG_CHANNEL_MODE_DUAL_CHANNEL |
--					MPEG_CHANNEL_MODE_MONO );
+-	sbc_cap.channel_mode = ( SBC_CHANNEL_MODE_JOINT_STEREO |
+-					SBC_CHANNEL_MODE_STEREO |
+-					SBC_CHANNEL_MODE_DUAL_CHANNEL |
+-					SBC_CHANNEL_MODE_MONO );
 -
--	mpeg_cap.layer = ( MPEG_LAYER_MP3 | MPEG_LAYER_MP2 | MPEG_LAYER_MP1 );
+-	sbc_cap.block_length = ( SBC_BLOCK_LENGTH_16 |
+-					SBC_BLOCK_LENGTH_12 |
+-					SBC_BLOCK_LENGTH_8 |
+-					SBC_BLOCK_LENGTH_4 );
 -
--	mpeg_cap.bitrate = 0xFFFF;
+-	sbc_cap.subbands = ( SBC_SUBBANDS_8 | SBC_SUBBANDS_4 );
 -
--	media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, &mpeg_cap,
--						sizeof(mpeg_cap));
+-	sbc_cap.allocation_method = ( SBC_ALLOCATION_LOUDNESS |
+-					SBC_ALLOCATION_SNR );
+-
+-	sbc_cap.min_bitpool = MIN_BITPOOL;
+-	sbc_cap.max_bitpool = MAX_BITPOOL;
+-
+-	media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, &sbc_cap,
+-						sizeof(sbc_cap));
 -
 -	*caps = g_slist_append(*caps, media_codec);
 -
@@ -122,39 +152,16 @@ index 36fee09..a9546b7 100644
 -	return TRUE;
 -}
 -
--
- static void endpoint_setconf_cb(struct a2dp_setup *setup, gboolean ret)
- {
- 	if (ret == FALSE) {
-@@ -1105,21 +1006,6 @@ static gboolean reconf_ind(struct avdtp *session, struct avdtp_local_sep *sep,
- 	return TRUE;
- }
- 
--static gboolean delayreport_ind(struct avdtp *session,
--				struct avdtp_local_sep *sep,
--				uint8_t rseid, uint16_t delay,
--				uint8_t *err, void *user_data)
--{
--	struct a2dp_sep *a2dp_sep = user_data;
--
--	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
--		DBG("Sink %p: DelayReport_Ind", sep);
--	else
--		DBG("Source %p: DelayReport_Ind", sep);
--
--	return TRUE;
--}
--
- static gboolean endpoint_delayreport_ind(struct avdtp *session,
- 						struct avdtp_local_sep *sep,
- 						uint8_t rseid, uint16_t delay,
-@@ -1189,19 +1075,6 @@ static struct avdtp_sep_cfm cfm = {
+ static gboolean mpeg_setconf_ind(struct avdtp *session,
+ 					struct avdtp_local_sep *sep,
+ 					struct avdtp_stream *stream,
+@@ -1317,19 +1189,6 @@ static struct avdtp_sep_cfm cfm = {
  	.delay_report		= delay_report_cfm,
  };
  
--static struct avdtp_sep_ind mpeg_ind = {
--	.get_capability		= mpeg_getcap_ind,
--	.set_configuration	= mpeg_setconf_ind,
+-static struct avdtp_sep_ind sbc_ind = {
+-	.get_capability		= sbc_getcap_ind,
+-	.set_configuration	= sbc_setconf_ind,
 -	.get_configuration	= getconf_ind,
 -	.open			= open_ind,
 -	.start			= start_ind,
@@ -165,71 +172,231 @@ index 36fee09..a9546b7 100644
 -	.delayreport		= delayreport_ind,
 -};
 -
- static struct avdtp_sep_ind endpoint_ind = {
- 	.get_capability		= endpoint_getcap_ind,
- 	.set_configuration	= endpoint_setconf_ind,
+ static struct avdtp_sep_ind mpeg_ind = {
+ 	.get_capability		= mpeg_getcap_ind,
+ 	.set_configuration	= mpeg_setconf_ind,
+@@ -1672,148 +1531,6 @@ void a2dp_remove_sep(struct a2dp_sep *sep)
+ 	a2dp_unregister_sep(sep);
+ }
+ 
+-static uint8_t default_bitpool(uint8_t freq, uint8_t mode)
+-{
+-	switch (freq) {
+-	case SBC_SAMPLING_FREQ_16000:
+-	case SBC_SAMPLING_FREQ_32000:
+-		return 53;
+-	case SBC_SAMPLING_FREQ_44100:
+-		switch (mode) {
+-		case SBC_CHANNEL_MODE_MONO:
+-		case SBC_CHANNEL_MODE_DUAL_CHANNEL:
+-			return 31;
+-		case SBC_CHANNEL_MODE_STEREO:
+-		case SBC_CHANNEL_MODE_JOINT_STEREO:
+-			return 53;
+-		default:
+-			error("Invalid channel mode %u", mode);
+-			return 53;
+-		}
+-	case SBC_SAMPLING_FREQ_48000:
+-		switch (mode) {
+-		case SBC_CHANNEL_MODE_MONO:
+-		case SBC_CHANNEL_MODE_DUAL_CHANNEL:
+-			return 29;
+-		case SBC_CHANNEL_MODE_STEREO:
+-		case SBC_CHANNEL_MODE_JOINT_STEREO:
+-			return 51;
+-		default:
+-			error("Invalid channel mode %u", mode);
+-			return 51;
+-		}
+-	default:
+-		error("Invalid sampling freq %u", freq);
+-		return 53;
+-	}
+-}
+-
+-static gboolean select_sbc_params(struct sbc_codec_cap *cap,
+-					struct sbc_codec_cap *supported)
+-{
+-	unsigned int max_bitpool, min_bitpool;
+-
+-	memset(cap, 0, sizeof(struct sbc_codec_cap));
+-
+-	cap->cap.media_type = AVDTP_MEDIA_TYPE_AUDIO;
+-	cap->cap.media_codec_type = A2DP_CODEC_SBC;
+-
+-	if (supported->frequency & SBC_SAMPLING_FREQ_44100)
+-		cap->frequency = SBC_SAMPLING_FREQ_44100;
+-	else if (supported->frequency & SBC_SAMPLING_FREQ_48000)
+-		cap->frequency = SBC_SAMPLING_FREQ_48000;
+-	else if (supported->frequency & SBC_SAMPLING_FREQ_32000)
+-		cap->frequency = SBC_SAMPLING_FREQ_32000;
+-	else if (supported->frequency & SBC_SAMPLING_FREQ_16000)
+-		cap->frequency = SBC_SAMPLING_FREQ_16000;
+-	else {
+-		error("No supported frequencies");
+-		return FALSE;
+-	}
+-
+-	if (supported->channel_mode & SBC_CHANNEL_MODE_JOINT_STEREO)
+-		cap->channel_mode = SBC_CHANNEL_MODE_JOINT_STEREO;
+-	else if (supported->channel_mode & SBC_CHANNEL_MODE_STEREO)
+-		cap->channel_mode = SBC_CHANNEL_MODE_STEREO;
+-	else if (supported->channel_mode & SBC_CHANNEL_MODE_DUAL_CHANNEL)
+-		cap->channel_mode = SBC_CHANNEL_MODE_DUAL_CHANNEL;
+-	else if (supported->channel_mode & SBC_CHANNEL_MODE_MONO)
+-		cap->channel_mode = SBC_CHANNEL_MODE_MONO;
+-	else {
+-		error("No supported channel modes");
+-		return FALSE;
+-	}
+-
+-	if (supported->block_length & SBC_BLOCK_LENGTH_16)
+-		cap->block_length = SBC_BLOCK_LENGTH_16;
+-	else if (supported->block_length & SBC_BLOCK_LENGTH_12)
+-		cap->block_length = SBC_BLOCK_LENGTH_12;
+-	else if (supported->block_length & SBC_BLOCK_LENGTH_8)
+-		cap->block_length = SBC_BLOCK_LENGTH_8;
+-	else if (supported->block_length & SBC_BLOCK_LENGTH_4)
+-		cap->block_length = SBC_BLOCK_LENGTH_4;
+-	else {
+-		error("No supported block lengths");
+-		return FALSE;
+-	}
+-
+-	if (supported->subbands & SBC_SUBBANDS_8)
+-		cap->subbands = SBC_SUBBANDS_8;
+-	else if (supported->subbands & SBC_SUBBANDS_4)
+-		cap->subbands = SBC_SUBBANDS_4;
+-	else {
+-		error("No supported subbands");
+-		return FALSE;
+-	}
+-
+-	if (supported->allocation_method & SBC_ALLOCATION_LOUDNESS)
+-		cap->allocation_method = SBC_ALLOCATION_LOUDNESS;
+-	else if (supported->allocation_method & SBC_ALLOCATION_SNR)
+-		cap->allocation_method = SBC_ALLOCATION_SNR;
+-
+-	min_bitpool = MAX(MIN_BITPOOL, supported->min_bitpool);
+-	max_bitpool = MIN(default_bitpool(cap->frequency, cap->channel_mode),
+-							supported->max_bitpool);
+-
+-	cap->min_bitpool = min_bitpool;
+-	cap->max_bitpool = max_bitpool;
+-
+-	return TRUE;
+-}
+-
+-static gboolean select_capabilities(struct avdtp *session,
+-					struct avdtp_remote_sep *rsep,
+-					GSList **caps)
+-{
+-	struct avdtp_service_capability *media_transport, *media_codec;
+-	struct sbc_codec_cap sbc_cap;
+-
+-	media_codec = avdtp_get_codec(rsep);
+-	if (!media_codec)
+-		return FALSE;
+-
+-	select_sbc_params(&sbc_cap, (struct sbc_codec_cap *) media_codec->data);
+-
+-	media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
+-						NULL, 0);
+-
+-	*caps = g_slist_append(*caps, media_transport);
+-
+-	media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, &sbc_cap,
+-						sizeof(sbc_cap));
+-
+-	*caps = g_slist_append(*caps, media_codec);
+-
+-	if (avdtp_get_delay_reporting(rsep)) {
+-		struct avdtp_service_capability *delay_reporting;
+-		delay_reporting = avdtp_service_cap_new(AVDTP_DELAY_REPORTING,
+-								NULL, 0);
+-		*caps = g_slist_append(*caps, delay_reporting);
+-	}
+-
+-	return TRUE;
+-}
+-
+ static void select_cb(struct a2dp_setup *setup, void *ret, int size)
+ {
+ 	struct avdtp_service_capability *media_transport, *media_codec;
 diff --git a/audio/a2dp.h b/audio/a2dp.h
-index c9feac8..27b4a57 100644
+index 3a677aa..c9feac8 100644
 --- a/audio/a2dp.h
 +++ b/audio/a2dp.h
-@@ -23,57 +23,6 @@
-  *
-  */
+@@ -28,27 +28,6 @@
+ #define A2DP_CODEC_MPEG24		0x02
+ #define A2DP_CODEC_ATRAC		0x03
  
--#define A2DP_CODEC_SBC			0x00
--#define A2DP_CODEC_MPEG12		0x01
--#define A2DP_CODEC_MPEG24		0x02
--#define A2DP_CODEC_ATRAC		0x03
+-#define SBC_SAMPLING_FREQ_16000		(1 << 3)
+-#define SBC_SAMPLING_FREQ_32000		(1 << 2)
+-#define SBC_SAMPLING_FREQ_44100		(1 << 1)
+-#define SBC_SAMPLING_FREQ_48000		1
 -
--#define MPEG_CHANNEL_MODE_MONO		(1 << 3)
--#define MPEG_CHANNEL_MODE_DUAL_CHANNEL	(1 << 2)
--#define MPEG_CHANNEL_MODE_STEREO	(1 << 1)
--#define MPEG_CHANNEL_MODE_JOINT_STEREO	1
+-#define SBC_CHANNEL_MODE_MONO		(1 << 3)
+-#define SBC_CHANNEL_MODE_DUAL_CHANNEL	(1 << 2)
+-#define SBC_CHANNEL_MODE_STEREO		(1 << 1)
+-#define SBC_CHANNEL_MODE_JOINT_STEREO	1
 -
--#define MPEG_LAYER_MP1			(1 << 2)
--#define MPEG_LAYER_MP2			(1 << 1)
--#define MPEG_LAYER_MP3			1
+-#define SBC_BLOCK_LENGTH_4		(1 << 3)
+-#define SBC_BLOCK_LENGTH_8		(1 << 2)
+-#define SBC_BLOCK_LENGTH_12		(1 << 1)
+-#define SBC_BLOCK_LENGTH_16		1
 -
--#define MPEG_SAMPLING_FREQ_16000	(1 << 5)
--#define MPEG_SAMPLING_FREQ_22050	(1 << 4)
--#define MPEG_SAMPLING_FREQ_24000	(1 << 3)
--#define MPEG_SAMPLING_FREQ_32000	(1 << 2)
--#define MPEG_SAMPLING_FREQ_44100	(1 << 1)
--#define MPEG_SAMPLING_FREQ_48000	1
+-#define SBC_SUBBANDS_4			(1 << 1)
+-#define SBC_SUBBANDS_8			1
 -
--#if __BYTE_ORDER == __LITTLE_ENDIAN
+-#define SBC_ALLOCATION_SNR		(1 << 1)
+-#define SBC_ALLOCATION_LOUDNESS		1
 -
--struct mpeg_codec_cap {
+ #define MPEG_CHANNEL_MODE_MONO		(1 << 3)
+ #define MPEG_CHANNEL_MODE_DUAL_CHANNEL	(1 << 2)
+ #define MPEG_CHANNEL_MODE_STEREO	(1 << 1)
+@@ -65,22 +44,8 @@
+ #define MPEG_SAMPLING_FREQ_44100	(1 << 1)
+ #define MPEG_SAMPLING_FREQ_48000	1
+ 
+-#define MAX_BITPOOL 64
+-#define MIN_BITPOOL 2
+-
+ #if __BYTE_ORDER == __LITTLE_ENDIAN
+ 
+-struct sbc_codec_cap {
 -	struct avdtp_media_codec_capability cap;
 -	uint8_t channel_mode:4;
--	uint8_t crc:1;
--	uint8_t layer:3;
--	uint8_t frequency:6;
--	uint8_t mpf:1;
--	uint8_t rfa:1;
--	uint16_t bitrate;
+-	uint8_t frequency:4;
+-	uint8_t allocation_method:2;
+-	uint8_t subbands:2;
+-	uint8_t block_length:4;
+-	uint8_t min_bitpool;
+-	uint8_t max_bitpool;
 -} __attribute__ ((packed));
 -
--#elif __BYTE_ORDER == __BIG_ENDIAN
--
--struct mpeg_codec_cap {
--	struct avdtp_media_codec_capability cap;
--	uint8_t layer:3;
--	uint8_t crc:1;
--	uint8_t channel_mode:4;
--	uint8_t rfa:1;
--	uint8_t mpf:1;
--	uint8_t frequency:6;
--	uint16_t bitrate;
--} __attribute__ ((packed));
--
--#else
--#error "Unknown byte order"
--#endif
--
- struct a2dp_sep;
- struct a2dp_setup;
+ struct mpeg_codec_cap {
+ 	struct avdtp_media_codec_capability cap;
+ 	uint8_t channel_mode:4;
+@@ -94,17 +59,6 @@ struct mpeg_codec_cap {
  
+ #elif __BYTE_ORDER == __BIG_ENDIAN
+ 
+-struct sbc_codec_cap {
+-	struct avdtp_media_codec_capability cap;
+-	uint8_t frequency:4;
+-	uint8_t channel_mode:4;
+-	uint8_t block_length:4;
+-	uint8_t subbands:2;
+-	uint8_t allocation_method:2;
+-	uint8_t min_bitpool;
+-	uint8_t max_bitpool;
+-} __attribute__ ((packed));
+-
+ struct mpeg_codec_cap {
+ 	struct avdtp_media_codec_capability cap;
+ 	uint8_t layer:3;
 -- 
 1.7.9.5
 
