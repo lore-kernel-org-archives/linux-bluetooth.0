@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Rafal Garbat <rafal.garbat@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <rafal.garbat@tieto.com>
-Subject: [PATCH 05/13] heartrate: Process Heart Rate Descriptors
-Date: Thu, 9 Aug 2012 09:20:08 +0200
-Message-ID: <1344496816-4641-6-git-send-email-rafal.garbat@tieto.com>
+Subject: [PATCH 04/13] heartrate: Discover Characteristic Descriptors
+Date: Thu, 9 Aug 2012 09:20:07 +0200
+Message-ID: <1344496816-4641-5-git-send-email-rafal.garbat@tieto.com>
 In-Reply-To: <1344496816-4641-1-git-send-email-rafal.garbat@tieto.com>
 References: <1344496816-4641-1-git-send-email-rafal.garbat@tieto.com>
 MIME-Version: 1.0
@@ -12,109 +12,109 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Process Heart Rate service descriptors and write
-client specific characteristic configuration.
+Discover and store each of the Heart Rate Service
+characteristic descriptors.
 
 ---
- lib/uuid.h                     |    1 +
- profiles/heartrate/heartrate.c |   53 +++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 53 insertions(+), 1 deletion(-)
+ profiles/heartrate/heartrate.c |   61 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 61 insertions(+)
 
-diff --git a/lib/uuid.h b/lib/uuid.h
-index 99b88cc..5d81856 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -64,6 +64,7 @@ extern "C" {
- #define SAP_UUID		"0000112D-0000-1000-8000-00805f9b34fb"
- 
- #define HEART_RATE_UUID		"0000180d-0000-1000-8000-00805f9b34fb"
-+#define HEART_RATE_MEASUREMENT_UUID	"00002a37-0000-1000-8000-00805f9b34fb"
- 
- #define HEALTH_THERMOMETER_UUID		"00001809-0000-1000-8000-00805f9b34fb"
- #define TEMPERATURE_MEASUREMENT_UUID	"00002a1c-0000-1000-8000-00805f9b34fb"
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index e917f27..f1668c7 100644
+index 1114cff..e917f27 100644
 --- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
-@@ -70,12 +70,21 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
- 	return -1;
- }
+@@ -47,9 +47,16 @@ struct heartrate {
  
-+static void char_destroy(gpointer user_data)
-+{
-+	struct characteristic *c = user_data;
-+
-+	g_slist_free_full(c->desc, g_free);
-+
-+	g_free(c);
-+}
-+
- static void heartrate_destroy(gpointer user_data)
- {
- 	struct heartrate *hr = user_data;
+ struct characteristic {
+ 	struct gatt_char	attr; /*Characteristic*/
++	GSList			*desc; /*Descriptors*/
+ 	struct heartrate	*hr; /*Parent Heart Rate Service*/
+ };
  
- 	if (hr->chars != NULL)
--		g_slist_free_full(hr->chars, g_free);
-+		g_slist_free_full(hr->chars, char_destroy);
++struct descriptor {
++	struct characteristic	*ch;
++	uint16_t		handle;
++	bt_uuid_t		uuid;
++};
++
+ static GSList *hr_servers = NULL;
  
- 	if (hr->attioid > 0)
- 		btd_device_remove_attio_callback(hr->dev, hr->attioid);
-@@ -89,6 +98,47 @@ static void heartrate_destroy(gpointer user_data)
+ static gint cmp_device(gconstpointer a, gconstpointer b)
+@@ -82,6 +89,44 @@ static void heartrate_destroy(gpointer user_data)
  
  }
  
-+static void measurement_cb(guint8 status, const guint8 *pdu,
-+						guint16 len, gpointer user_data)
++static void discover_desc_cb(guint8 status, const guint8 *pdu,
++					guint16 len, gpointer user_data)
 +{
-+	char *msg = user_data;
++	struct characteristic *ch = user_data;
++	struct att_data_list *list;
++	uint8_t format;
++	int i;
 +
-+	if (status != 0)
-+		error("%s failed", msg);
-+
-+	g_free(msg);
-+}
-+
-+static void process_heartrate_desc(struct descriptor *desc)
-+{
-+	struct characteristic *ch = desc->ch;
-+	char uuidstr[MAX_LEN_UUID_STR];
-+	bt_uuid_t btuuid;
-+
-+	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
-+
-+	if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0 &&
-+		g_strcmp0(ch->attr.uuid,
-+				HEART_RATE_MEASUREMENT_UUID) == 0) {
-+
-+		uint8_t atval[2];
-+		uint16_t val;
-+		char *msg;
-+
-+		val = GATT_CLIENT_CHARAC_CFG_NOTIF_BIT;
-+		msg = g_strdup("Enable Heart Rate Measurement " \
-+						"notification");
-+		att_put_u16(val, atval);
-+		gatt_write_char(ch->hr->attrib, desc->handle,
-+					atval, 2, measurement_cb, msg);
++	if (status != 0) {
++		error("Discover all characteristic descriptors failed [%s]: %s",
++					ch->attr.uuid, att_ecode2str(status));
 +		return;
 +	}
 +
-+	bt_uuid_to_string(&desc->uuid, uuidstr, MAX_LEN_UUID_STR);
-+	DBG("Ignored descriptor %s in characteristic %s", uuidstr,
-+							ch->attr.uuid);
++	list = dec_find_info_resp(pdu, len, &format);
++	if (list == NULL)
++		return;
++
++	for (i = 0; i < list->num; i++) {
++		struct descriptor *desc;
++		uint8_t *value;
++
++		value = list->data[i];
++		desc = g_new0(struct descriptor, 1);
++		desc->handle = att_get_u16(value);
++		desc->ch = ch;
++
++		if (format == 0x01)
++			desc->uuid = att_get_uuid16(&value[2]);
++		else
++			desc->uuid = att_get_uuid128(&value[2]);
++
++		ch->desc = g_slist_append(ch->desc, desc);
++	}
++
++	att_data_list_free(list);
 +}
 +
- static void discover_desc_cb(guint8 status, const guint8 *pdu,
- 					guint16 len, gpointer user_data)
+ static void configure_heartrate_cb(GSList *characteristics, guint8 status,
+ 							gpointer user_data)
  {
-@@ -122,6 +172,7 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu,
- 			desc->uuid = att_get_uuid128(&value[2]);
+@@ -97,6 +142,7 @@ static void configure_heartrate_cb(GSList *characteristics, guint8 status,
+ 	for (l = characteristics; l; l = l->next) {
+ 		struct gatt_char *c = l->data;
+ 		struct characteristic *ch;
++		uint16_t start, end;
  
- 		ch->desc = g_slist_append(ch->desc, desc);
-+		process_heartrate_desc(desc);
+ 		ch = g_new0(struct characteristic, 1);
+ 		ch->attr.handle = c->handle;
+@@ -106,6 +152,21 @@ static void configure_heartrate_cb(GSList *characteristics, guint8 status,
+ 		ch->hr = hr;
+ 
+ 		hr->chars = g_slist_append(hr->chars, ch);
++
++		start = c->value_handle + 1;
++
++		if (l->next != NULL) {
++			struct gatt_char *c = l->next->data;
++			if (start == c->handle)
++				continue;
++			end = c->handle - 1;
++		} else if (c->value_handle != hr->svc_range->end) {
++			end = hr->svc_range->end;
++		} else {
++			continue;
++		}
++
++		gatt_find_info(hr->attrib, start, end, discover_desc_cb, ch);
  	}
+ }
  
- 	att_data_list_free(list);
 -- 
 1.7.9.5
 
