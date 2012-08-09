@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 2/9] gobex: Add unit tests for GObexApparam API
-Date: Thu,  9 Aug 2012 13:32:26 +0300
-Message-Id: <1344508353-24647-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 1/9] gobex: Introduce GObexApparam API
+Date: Thu,  9 Aug 2012 13:32:25 +0300
+Message-Id: <1344508353-24647-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1344508353-24647-1-git-send-email-luiz.dentz@gmail.com>
 References: <1344508353-24647-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,49 +11,38 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+GObexApparam abstract the handling of application parameter tags, it
+can be used to read/parse application parameter header data using
+g_obex_apparam_get_* functions or to generate the data using
+g_obex_apparam_set_*.
 ---
- Makefile.am               |  11 +-
- unit/test-gobex-apparam.c | 422 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 430 insertions(+), 3 deletions(-)
- create mode 100644 unit/test-gobex-apparam.c
+ Makefile.am           |   3 +-
+ gobex/gobex-apparam.c | 314 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ gobex/gobex-apparam.h |  59 ++++++++++
+ 3 files changed, 375 insertions(+), 1 deletion(-)
+ create mode 100644 gobex/gobex-apparam.c
+ create mode 100644 gobex/gobex-apparam.h
 
 diff --git a/Makefile.am b/Makefile.am
-index a1b4da0..4757f60 100644
+index 97a1553..a1b4da0 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -166,11 +166,12 @@ plugins/phonebook.c: plugins/@PHONEBOOK_DRIVER@
- plugins/messages.c: plugins/@MESSAGES_DRIVER@
- 	$(AM_V_GEN)$(LN_S) @abs_top_srcdir@/$< $@
+@@ -20,7 +20,8 @@ gobex_sources = gobex/gobex.h gobex/gobex.c \
+ 			gobex/gobex-defs.h gobex/gobex-defs.c \
+ 			gobex/gobex-packet.c gobex/gobex-packet.h \
+ 			gobex/gobex-header.c gobex/gobex-header.h \
+-			gobex/gobex-transfer.c gobex/gobex-debug.h
++			gobex/gobex-transfer.c gobex/gobex-debug.h \
++			gobex/gobex-apparam.h gobex/gobex-apparam.c
  
--TESTS = unit/test-gobex-header unit/test-gobex-packet unit/test-gobex \
--						unit/test-gobex-transfer
-+TESTS = unit/test-gobex-apparam unit/test-gobex-header unit/test-gobex-packet \
-+				unit/test-gobex unit/test-gobex-transfer
- 
- noinst_PROGRAMS += unit/test-gobex-header unit/test-gobex-packet \
--				unit/test-gobex unit/test-gobex-transfer
-+			unit/test-gobex unit/test-gobex-transfer \
-+			unit/test-gobex-apparam
- 
- unit_test_gobex_SOURCES = $(gobex_sources) unit/test-gobex.c \
- 							unit/util.c unit/util.h
-@@ -188,6 +189,10 @@ unit_test_gobex_transfer_SOURCES = $(gobex_sources) unit/util.c unit/util.h \
- 						unit/test-gobex-transfer.c
- unit_test_gobex_transfer_LDADD = @GLIB_LIBS@
- 
-+unit_test_gobex_apparam_SOURCES = $(gobex_sources) unit/util.c unit/util.h \
-+						unit/test-gobex-apparam.c
-+unit_test_gobex_apparam_LDADD = @GLIB_LIBS@
-+
- if READLINE
- noinst_PROGRAMS += tools/test-client
- tools_test_client_SOURCES = $(gobex_sources) $(btio_sources) \
-diff --git a/unit/test-gobex-apparam.c b/unit/test-gobex-apparam.c
+ noinst_PROGRAMS =
+ libexec_PROGRAMS =
+diff --git a/gobex/gobex-apparam.c b/gobex/gobex-apparam.c
 new file mode 100644
-index 0000000..573de99
+index 0000000..09bf034
 --- /dev/null
-+++ b/unit/test-gobex-apparam.c
-@@ -0,0 +1,422 @@
++++ b/gobex/gobex-apparam.c
+@@ -0,0 +1,314 @@
 +/*
 + *
 + *  OBEX library with GLib integration
@@ -75,407 +64,364 @@ index 0000000..573de99
 + *
 + */
 +
-+#include <stdint.h>
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
 +#include <string.h>
++#include <unistd.h>
++#include <errno.h>
 +
-+#include <gobex/gobex-apparam.h>
++#include "gobex-apparam.h"
 +
-+#include "util.h"
++struct _GObexApparam {
++	GHashTable *tags;
++};
 +
-+#define TAG_U8 0x00
-+#define TAG_U16 0x01
-+#define TAG_U32 0x02
-+#define TAG_U64 0x03
-+#define TAG_STRING 0x04
-+#define TAG_BYTES 0x05
++struct apparam_tag {
++	guint8 id;
++	guint8 len;
++	union {
++		/* Data is stored in network order */
++		char string[0];
++		guint8 data[0];
++		guint8 u8;
++		guint16 u16;
++		guint32 u32;
++		guint64 u64;
++	} value;
++} __attribute__ ((packed));
 +
-+static uint8_t tag_nval_short[] = { TAG_U8 };
-+static uint8_t tag_nval_data[] = { TAG_U8, 0x01 };
-+static uint8_t tag_nval2_short[] = { TAG_U8, 0x01, 0x1, TAG_U16 };
-+static uint8_t tag_nval2_data[] = { TAG_U8, 0x01, 0x1, TAG_U16, 0x02 };
-+static uint8_t tag_uint8[] = { TAG_U8, 0x01, 0x01 };
-+static uint8_t tag_uint16[] = { TAG_U16, 0x02, 0x01, 0x02 };
-+static uint8_t tag_uint32[] = { TAG_U32, 0x04, 0x01, 0x02, 0x03, 0x04 };
-+static uint8_t tag_uint64[] = { TAG_U64, 0x08, 0x01, 0x02, 0x03, 0x04,
-+						0x05, 0x06, 0x07, 0x08 };
-+static uint8_t tag_string[] = { TAG_STRING, 0x04, 'A', 'B', 'C', '\0' };
-+static uint8_t tag_bytes[257] = { TAG_BYTES, 0xFF };
-+static uint8_t tag_multi[] = { TAG_U8, 0x01, 0x01,
-+				TAG_U16, 0x02, 0x01, 0x02,
-+				TAG_U32, 0x04, 0x01, 0x02, 0x03, 0x04,
-+				TAG_U64, 0x08, 0x01, 0x02, 0x03, 0x04,
-+						0x05, 0x06, 0x07, 0x08,
-+				TAG_STRING, 0x04, 'A', 'B', 'C', '\0' };
++static struct apparam_tag *tag_new(guint8 id, guint8 len, const void *data)
++{
++	struct apparam_tag *tag;
 +
++	tag = g_malloc0(2 + len);
++	tag->id = id;
++	tag->len = len;
++	memcpy(tag->value.data, data, len);
 +
-+static GObexApparam *parse_and_decode(const void *data, gsize size)
++	return tag;
++}
++
++static GObexApparam *g_obex_apparam_new(void)
 +{
 +	GObexApparam *apparam;
-+	guint8 encoded[1024];
-+	gsize len;
 +
-+	apparam = g_obex_apparam_decode(data, size);
-+
-+	g_assert(apparam != NULL);
-+
-+	len = g_obex_apparam_encode(apparam, encoded, sizeof(encoded));
-+
-+	assert_memequal(data, size, encoded, len);
++	apparam = g_new0(GObexApparam, 1);
++	apparam->tags = g_hash_table_new_full(g_direct_hash, g_direct_equal,
++							NULL, g_free);
 +
 +	return apparam;
 +}
 +
-+static void test_apparam_nval_short(void)
++static struct apparam_tag *apparam_tag_decode(const void *data, gsize size,
++							gsize *parsed)
 +{
-+	GObexApparam *apparam;
++	struct apparam_tag *tag;
++	const guint8 *ptr = data;
++	guint8 id;
++	guint8 len;
 +
-+	apparam = g_obex_apparam_decode(tag_nval_short,
-+						sizeof(tag_nval_short));
++	if (size < 2)
++		return NULL;
 +
-+	g_assert(apparam == NULL);
++	id = ptr[0];
++	len = ptr[1];
++
++	if (len > size - 2)
++		return NULL;
++
++	tag = tag_new(id, len, ptr + 2);
++	if (tag == NULL)
++		return NULL;
++
++	*parsed = 2 + tag->len;
++
++	return tag;
 +}
 +
-+static void test_apparam_nval_data(void)
++GObexApparam *g_obex_apparam_decode(const void *data, gsize size)
 +{
 +	GObexApparam *apparam;
++	GHashTable *tags;
++	gsize count = 0;
 +
-+	apparam = g_obex_apparam_decode(tag_nval_data,
-+						sizeof(tag_nval_data));
++	if (size < 2)
++		return NULL;
 +
-+	g_assert(apparam == NULL);
++	apparam = g_obex_apparam_new();
++
++	tags = apparam->tags;
++	while (count < size) {
++		struct apparam_tag *tag;
++		gsize parsed;
++
++		tag = apparam_tag_decode(data + count, size - count, &parsed);
++		if (tag == NULL)
++			break;
++
++		g_hash_table_insert(tags, GUINT_TO_POINTER(tag->id), tag);
++
++		count += parsed;
++	}
++
++	if (count != size) {
++		g_obex_apparam_free(apparam);
++		return NULL;
++	}
++
++	return apparam;
 +}
 +
-+static void test_apparam_nval2_short(void)
++static gssize tag_encode(struct apparam_tag *tag, void *buf, gsize len)
 +{
-+	GObexApparam *apparam;
++	gsize count = 2 + tag->len;
 +
-+	apparam = g_obex_apparam_decode(tag_nval2_short,
-+						sizeof(tag_nval2_short));
++	if (len < count)
++		return -ENOBUFS;
 +
-+	g_assert(apparam == NULL);
++	memcpy(buf, tag, count);
++
++	return count;
 +}
 +
-+static void test_apparam_nval2_data(void)
++gssize g_obex_apparam_encode(GObexApparam *apparam, void *buf, gsize len)
 +{
-+	GObexApparam *apparam;
++	gsize count = 0;
++	gssize ret;
++	GHashTableIter iter;
++	gpointer key, value;
 +
-+	apparam = g_obex_apparam_decode(tag_nval2_data,
-+						sizeof(tag_nval2_data));
++	g_hash_table_iter_init(&iter, apparam->tags);
++	while (g_hash_table_iter_next(&iter, &key, &value)) {
++		struct apparam_tag *tag = value;
 +
-+	g_assert(apparam == NULL);
++		ret = tag_encode(tag, buf + count, len - count);
++		if (ret < 0)
++			return ret;
++
++		count += ret;
++	}
++
++	return count;
 +}
 +
-+static void test_apparam_get_uint8(void)
++GObexApparam *g_obex_apparam_set_bytes(GObexApparam *apparam, guint8 id,
++						const void *value, gsize len)
 +{
-+	GObexApparam *apparam;
-+	guint8 data;
-+	gboolean ret;
++	struct apparam_tag *tag;
 +
-+	apparam = parse_and_decode(tag_uint8, sizeof(tag_uint8));
++	if (apparam == NULL)
++		apparam = g_obex_apparam_new();
 +
-+	ret = g_obex_apparam_get_uint8(apparam, TAG_U8, &data);
++	tag = tag_new(id, len, value);
++	g_hash_table_replace(apparam->tags, GUINT_TO_POINTER(id), tag);
 +
-+	g_assert(ret == TRUE);
-+	g_assert(data == 0x01);
-+
-+	g_obex_apparam_free(apparam);
++	return apparam;
 +}
 +
-+static void test_apparam_get_uint16(void)
++GObexApparam *g_obex_apparam_set_uint8(GObexApparam *apparam, guint8 id,
++							guint8 value)
 +{
-+	GObexApparam *apparam;
-+	uint16_t data;
-+	gboolean ret;
-+
-+	apparam = parse_and_decode(tag_uint16, sizeof(tag_uint16));
-+
-+	ret = g_obex_apparam_get_uint16(apparam, TAG_U16, &data);
-+
-+	g_assert(ret == TRUE);
-+	g_assert(data == 0x0102);
-+
-+	g_obex_apparam_free(apparam);
++	return g_obex_apparam_set_bytes(apparam, id, &value, 1);
 +}
 +
-+static void test_apparam_get_uint32(void)
++GObexApparam *g_obex_apparam_set_uint16(GObexApparam *apparam, guint8 id,
++							guint16 value)
 +{
-+	GObexApparam *apparam;
-+	uint32_t data;
-+	gboolean ret;
++	guint16 num = g_htons(value);
 +
-+	apparam = parse_and_decode(tag_uint32, sizeof(tag_uint32));
-+
-+	ret = g_obex_apparam_get_uint32(apparam, TAG_U32, &data);
-+
-+	g_assert(ret == TRUE);
-+	g_assert(data == 0x01020304);
-+
-+	g_obex_apparam_free(apparam);
++	return g_obex_apparam_set_bytes(apparam, id, &num, 2);
 +}
 +
-+static void test_apparam_get_uint64(void)
++GObexApparam *g_obex_apparam_set_uint32(GObexApparam *apparam, guint8 id,
++							guint32 value)
 +{
-+	GObexApparam *apparam;
-+	uint64_t data;
-+	gboolean ret;
++	guint32 num = g_htonl(value);
 +
-+	apparam = parse_and_decode(tag_uint64, sizeof(tag_uint64));
-+
-+	ret = g_obex_apparam_get_uint64(apparam, TAG_U64, &data);
-+
-+	g_assert(ret == TRUE);
-+	g_assert(data == 0x0102030405060708);
-+
-+	g_obex_apparam_free(apparam);
++	return g_obex_apparam_set_bytes(apparam, id, &num, 4);
 +}
 +
-+static void test_apparam_get_string(void)
++GObexApparam *g_obex_apparam_set_uint64(GObexApparam *apparam, guint8 id,
++							guint64 value)
 +{
-+	GObexApparam *apparam;
-+	char *string;
++	guint64 num = GUINT64_TO_BE(value);
 +
-+	apparam = parse_and_decode(tag_string, sizeof(tag_string));
-+
-+	string = g_obex_apparam_get_string(apparam, TAG_STRING);
-+
-+	g_assert(string != NULL);
-+	g_assert_cmpstr(string, ==, "ABC");
-+
-+	g_free(string);
-+	g_obex_apparam_free(apparam);
++	return g_obex_apparam_set_bytes(apparam, id, &num, 8);
 +}
 +
-+static void test_apparam_get_bytes(void)
++GObexApparam *g_obex_apparam_set_string(GObexApparam *apparam, guint8 id,
++							const char *value)
 +{
-+	GObexApparam *apparam;
-+	const uint8_t *data;
-+	gsize len;
-+	gboolean ret;
-+
-+	apparam = parse_and_decode(tag_bytes, sizeof(tag_bytes));
-+
-+	ret = g_obex_apparam_get_bytes(apparam, TAG_BYTES, &data, &len);
-+
-+	g_assert(ret == TRUE);
-+	assert_memequal(tag_bytes + 2, sizeof(tag_bytes) - 2, data, len);
-+
-+	g_obex_apparam_free(apparam);
-+}
-+
-+static void test_apparam_get_multi(void)
-+{
-+	GObexApparam *apparam;
-+	char *string;
-+	uint8_t data8;
-+	uint16_t data16;
-+	uint32_t data32;
-+	uint64_t data64;
-+	gboolean ret;
-+
-+	apparam = g_obex_apparam_decode(tag_multi, sizeof(tag_multi));
-+
-+	g_assert(apparam != NULL);
-+
-+	ret = g_obex_apparam_get_uint8(apparam, TAG_U8, &data8);
-+
-+	g_assert(ret == TRUE);
-+	g_assert(data8 == 0x01);
-+
-+	ret = g_obex_apparam_get_uint16(apparam, TAG_U16, &data16);
-+
-+	g_assert(ret == TRUE);
-+	g_assert(data16 == 0x0102);
-+
-+	ret = g_obex_apparam_get_uint32(apparam, TAG_U32, &data32);
-+
-+	g_assert(ret == TRUE);
-+	g_assert(data32 == 0x01020304);
-+
-+	ret = g_obex_apparam_get_uint64(apparam, TAG_U64, &data64);
-+
-+	g_assert(ret == TRUE);
-+	g_assert(data64 == 0x0102030405060708);
-+
-+	string = g_obex_apparam_get_string(apparam, TAG_STRING);
-+
-+	g_assert(string != NULL);
-+	g_assert_cmpstr(string, ==, "ABC");
-+
-+	g_obex_apparam_free(apparam);
-+}
-+
-+static void test_apparam_set_uint8(void)
-+{
-+	GObexApparam *apparam;
-+	guint8 buf[1024];
 +	gsize len;
 +
-+	apparam = g_obex_apparam_set_uint8(NULL, TAG_U8, 0x01);
-+	g_assert(apparam != NULL);
++	len = strlen(value) + 1;
++	if (len > G_MAXUINT8) {
++		((char *) value)[G_MAXUINT8 - 1] = '\0';
++		len = G_MAXUINT8;
++	}
 +
-+	len = g_obex_apparam_encode(apparam, buf, sizeof(buf));
-+	assert_memequal(tag_uint8, sizeof(tag_uint8), buf, len);
-+
-+	g_obex_apparam_free(apparam);
++	return g_obex_apparam_set_bytes(apparam, id, value, len);
 +}
 +
-+static void test_apparam_set_uint16(void)
++gboolean g_obex_apparam_get_uint8(GObexApparam *apparam, guint8 id,
++							guint8 *dest)
 +{
-+	GObexApparam *apparam;
-+	guint8 buf[1024];
-+	gsize len;
++	struct apparam_tag *tag;
 +
-+	apparam = g_obex_apparam_set_uint16(NULL, TAG_U16, 0x0102);
-+	g_assert(apparam != NULL);
++	tag = g_hash_table_lookup(apparam->tags, GUINT_TO_POINTER(id));
++	if (tag == NULL)
++		return FALSE;
 +
-+	len = g_obex_apparam_encode(apparam, buf, sizeof(buf));
-+	assert_memequal(tag_uint16, sizeof(tag_uint16), buf, len);
-+
-+	g_obex_apparam_free(apparam);
++	*dest = tag->value.u8;
++	return TRUE;
 +}
 +
-+static void test_apparam_set_uint32(void)
++gboolean g_obex_apparam_get_uint16(GObexApparam *apparam, guint8 id,
++							guint16 *dest)
 +{
-+	GObexApparam *apparam;
-+	guint8 buf[1024];
-+	gsize len;
++	struct apparam_tag *tag;
 +
-+	apparam = g_obex_apparam_set_uint32(NULL, TAG_U32, 0x01020304);
-+	g_assert(apparam != NULL);
++	tag = g_hash_table_lookup(apparam->tags, GUINT_TO_POINTER(id));
++	if (tag == NULL)
++		return FALSE;
 +
-+	len = g_obex_apparam_encode(apparam, buf, sizeof(buf));
-+	assert_memequal(tag_uint32, sizeof(tag_uint32), buf, len);
++	if (tag->len < sizeof(*dest))
++		return FALSE;
 +
-+	g_obex_apparam_free(apparam);
++	*dest = g_ntohs(tag->value.u16);
++	return TRUE;
 +}
 +
-+static void test_apparam_set_uint64(void)
++gboolean g_obex_apparam_get_uint32(GObexApparam *apparam, guint8 id,
++							guint32 *dest)
 +{
-+	GObexApparam *apparam;
-+	guint8 buf[1024];
-+	gsize len;
++	struct apparam_tag *tag;
 +
-+	apparam = g_obex_apparam_set_uint64(NULL, TAG_U64, 0x0102030405060708);
-+	g_assert(apparam != NULL);
++	tag = g_hash_table_lookup(apparam->tags, GUINT_TO_POINTER(id));
++	if (tag == NULL)
++		return FALSE;
 +
-+	len = g_obex_apparam_encode(apparam, buf, sizeof(buf));
-+	assert_memequal(tag_uint64, sizeof(tag_uint64), buf, len);
++	if (tag->len < sizeof(*dest))
++		return FALSE;
 +
-+	g_obex_apparam_free(apparam);
++	*dest = g_ntohl(tag->value.u32);
++	return TRUE;
 +}
 +
-+static void test_apparam_set_string(void)
++gboolean g_obex_apparam_get_uint64(GObexApparam *apparam, guint8 id,
++							guint64 *dest)
 +{
-+	GObexApparam *apparam;
-+	guint8 buf[1024];
-+	gsize len;
++	struct apparam_tag *tag;
 +
-+	apparam = g_obex_apparam_set_string(NULL, TAG_STRING, "ABC");
-+	g_assert(apparam != NULL);
++	tag = g_hash_table_lookup(apparam->tags, GUINT_TO_POINTER(id));
++	if (tag == NULL)
++		return FALSE;
 +
-+	len = g_obex_apparam_encode(apparam, buf, sizeof(buf));
-+	assert_memequal(tag_string, sizeof(tag_string), buf, len);
++	if (tag->len < sizeof(*dest))
++		return FALSE;
 +
-+	g_obex_apparam_free(apparam);
++	*dest = GUINT64_FROM_BE(tag->value.u64);
++	return TRUE;
 +}
 +
-+static void test_apparam_set_bytes(void)
++char *g_obex_apparam_get_string(GObexApparam *apparam, guint8 id)
 +{
-+	GObexApparam *apparam;
-+	guint8 buf[1024];
-+	gsize len;
++	struct apparam_tag *tag;
 +
-+	apparam = g_obex_apparam_set_bytes(NULL, TAG_BYTES, tag_bytes + 2, 255);
-+	g_assert(apparam != NULL);
++	tag = g_hash_table_lookup(apparam->tags, GUINT_TO_POINTER(id));
++	if (tag == NULL)
++		return NULL;
 +
-+	len = g_obex_apparam_encode(apparam, buf, sizeof(buf));
-+	assert_memequal(tag_bytes, sizeof(tag_bytes), buf, len);
-+
-+	g_obex_apparam_free(apparam);
++	return g_strndup(tag->value.string, tag->len);
 +}
 +
-+static void test_apparam_set_multi(void)
++gboolean g_obex_apparam_get_bytes(GObexApparam *apparam, guint8 id,
++					const guint8 **val, gsize *len)
 +{
-+	GObexApparam *apparam;
-+	guint8 buf[1024];
-+	gsize len;
++	struct apparam_tag *tag;
 +
-+	apparam = g_obex_apparam_set_uint8(NULL, TAG_U8, 0x01);
++	tag = g_hash_table_lookup(apparam->tags, GUINT_TO_POINTER(id));
++	if (tag == NULL)
++		return FALSE;
 +
-+	g_assert(apparam != NULL);
++	*len = tag->len;
++	*val = tag->value.data;
 +
-+	apparam = g_obex_apparam_set_uint16(apparam, TAG_U16, 0x0102);
-+
-+	g_assert(apparam != NULL);
-+
-+	apparam = g_obex_apparam_set_uint32(apparam, TAG_U32, 0x01020304);
-+
-+	g_assert(apparam != NULL);
-+
-+	apparam = g_obex_apparam_set_uint64(apparam, TAG_U64,
-+							0x0102030405060708);
-+
-+	g_assert(apparam != NULL);
-+
-+	apparam = g_obex_apparam_set_string(apparam, TAG_STRING, "ABC");
-+
-+	g_assert(apparam != NULL);
-+
-+	len = g_obex_apparam_encode(apparam, buf, sizeof(buf));
-+
-+	g_assert_cmpuint(len, ==, sizeof(tag_multi));
-+
-+	g_obex_apparam_free(apparam);
++	return TRUE;
 +}
 +
-+int main(int argc, char *argv[])
++void g_obex_apparam_free(GObexApparam *apparam)
 +{
-+	g_test_init(&argc, &argv, NULL);
-+
-+	g_test_add_func("/gobex/test_apparam_nval_short",
-+						test_apparam_nval_short);
-+	g_test_add_func("/gobex/test_apparam_nval_data",
-+						test_apparam_nval_data);
-+
-+	g_test_add_func("/gobex/test_apparam_nval2_short",
-+						test_apparam_nval2_short);
-+	g_test_add_func("/gobex/test_apparam_nval2_data",
-+						test_apparam_nval2_data);
-+
-+	g_test_add_func("/gobex/test_apparam_get_uint8",
-+						test_apparam_get_uint8);
-+	g_test_add_func("/gobex/test_apparam_get_uint16",
-+						test_apparam_get_uint16);
-+	g_test_add_func("/gobex/test_apparam_get_uint32",
-+						test_apparam_get_uint32);
-+	g_test_add_func("/gobex/test_apparam_get_uint64",
-+						test_apparam_get_uint64);
-+	g_test_add_func("/gobex/test_apparam_get_string",
-+						test_apparam_get_string);
-+	g_test_add_func("/gobex/test_apparam_get_bytes",
-+						test_apparam_get_bytes);
-+	g_test_add_func("/gobex/test_apparam_get_multi",
-+						test_apparam_get_multi);
-+
-+	g_test_add_func("/gobex/test_apparam_set_uint8",
-+						test_apparam_set_uint8);
-+	g_test_add_func("/gobex/test_apparam_set_uint16",
-+						test_apparam_set_uint16);
-+	g_test_add_func("/gobex/test_apparam_set_uint32",
-+						test_apparam_set_uint32);
-+	g_test_add_func("/gobex/test_apparam_set_uint64",
-+						test_apparam_set_uint64);
-+	g_test_add_func("/gobex/test_apparam_set_string",
-+						test_apparam_set_string);
-+	g_test_add_func("/gobex/test_apparam_set_bytes",
-+						test_apparam_set_bytes);
-+	g_test_add_func("/gobex/test_apparam_set_multi",
-+						test_apparam_set_multi);
-+
-+	g_test_run();
-+
-+	return 0;
++	g_hash_table_unref(apparam->tags);
++	g_free(apparam);
 +}
+diff --git a/gobex/gobex-apparam.h b/gobex/gobex-apparam.h
+new file mode 100644
+index 0000000..46e20d2
+--- /dev/null
++++ b/gobex/gobex-apparam.h
+@@ -0,0 +1,59 @@
++/*
++ *
++ *  OBEX library with GLib integration
++ *
++ *  Copyright (C) 2012  Intel Corporation.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License version 2 as
++ *  published by the Free Software Foundation.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifndef __GOBEX_APPARAM_H
++#define __GOBEX_APPARAM_H
++
++#include <glib.h>
++
++typedef struct _GObexApparam GObexApparam;
++
++GObexApparam *g_obex_apparam_decode(const void *data, gsize size);
++gssize g_obex_apparam_encode(GObexApparam *apparam, void *buf, gsize size);
++
++GObexApparam *g_obex_apparam_set_bytes(GObexApparam *apparam, guint8 id,
++						const void *value, gsize size);
++GObexApparam *g_obex_apparam_set_uint8(GObexApparam *apparam, guint8 id,
++							guint8 value);
++GObexApparam *g_obex_apparam_set_uint16(GObexApparam *apparam, guint8 id,
++							guint16 value);
++GObexApparam *g_obex_apparam_set_uint32(GObexApparam *apparam, guint8 id,
++							guint32 value);
++GObexApparam *g_obex_apparam_set_uint64(GObexApparam *apparam, guint8 id,
++							guint64 value);
++GObexApparam *g_obex_apparam_set_string(GObexApparam *apparam, guint8 id,
++							const char *value);
++
++gboolean g_obex_apparam_get_bytes(GObexApparam *apparam, guint8 id,
++					const guint8 **val, gsize *len);
++gboolean g_obex_apparam_get_uint8(GObexApparam *apparam, guint8 id,
++							guint8 *value);
++gboolean g_obex_apparam_get_uint16(GObexApparam *apparam, guint8 id,
++							guint16 *value);
++gboolean g_obex_apparam_get_uint32(GObexApparam *apparam, guint8 id,
++							guint32 *value);
++gboolean g_obex_apparam_get_uint64(GObexApparam *apparam, guint8 id,
++							guint64 *value);
++char *g_obex_apparam_get_string(GObexApparam *apparam, guint8 id);
++
++void g_obex_apparam_free(GObexApparam *apparam);
++
++#endif /* __GOBEX_APPARAM_H */
 -- 
 1.7.11.2
 
