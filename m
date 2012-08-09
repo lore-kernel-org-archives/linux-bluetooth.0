@@ -1,10 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 From: Rafal Garbat <rafal.garbat@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: <rafal.garbat@tieto.com>
-Subject: [PATCH 02/13] heartrate: Add Heart Rate Service GATT client skeleton
-Date: Thu, 9 Aug 2012 09:20:05 +0200
-Message-ID: <1344496816-4641-3-git-send-email-rafal.garbat@tieto.com>
+CC: <rafal.garbat@tieto.com>,
+	Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH 01/13] Heart Rate Profile API
+Date: Thu, 9 Aug 2012 09:20:04 +0200
+Message-ID: <1344496816-4641-2-git-send-email-rafal.garbat@tieto.com>
 In-Reply-To: <1344496816-4641-1-git-send-email-rafal.garbat@tieto.com>
 References: <1344496816-4641-1-git-send-email-rafal.garbat@tieto.com>
 MIME-Version: 1.0
@@ -12,339 +13,93 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add initial support for the Heart Rate Service GATT
-Client side.
+From: Santiago Carot-Nemesio <sancane@gmail.com>
 
 ---
- Makefile.am                    |   10 ++++-
- lib/uuid.h                     |    2 +
- profiles/heartrate/heartrate.c |   84 ++++++++++++++++++++++++++++++++++++++++
- profiles/heartrate/heartrate.h |   24 ++++++++++++
- profiles/heartrate/main.c      |   52 +++++++++++++++++++++++++
- profiles/heartrate/manager.c   |   60 ++++++++++++++++++++++++++++
- profiles/heartrate/manager.h   |   24 ++++++++++++
- 7 files changed, 254 insertions(+), 2 deletions(-)
- create mode 100644 profiles/heartrate/heartrate.c
- create mode 100644 profiles/heartrate/heartrate.h
- create mode 100644 profiles/heartrate/main.c
- create mode 100644 profiles/heartrate/manager.c
- create mode 100644 profiles/heartrate/manager.h
+ doc/heartrate-api.txt |   74 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
+ create mode 100644 doc/heartrate-api.txt
 
-diff --git a/Makefile.am b/Makefile.am
-index 45a811c..594ea56 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -211,7 +211,8 @@ builtin_sources += profiles/health/hdp_main.c profiles/health/hdp_types.h \
- endif
- 
- if GATTMODULES
--builtin_modules += thermometer alert time gatt_example proximity deviceinfo
-+builtin_modules += thermometer alert time gatt_example proximity deviceinfo \
-+	heartrate
- builtin_sources += profiles/thermometer/main.c \
- 			profiles/thermometer/manager.h \
- 			profiles/thermometer/manager.c \
-@@ -237,7 +238,12 @@ builtin_sources += profiles/thermometer/main.c \
- 			profiles/deviceinfo/manager.h \
- 			profiles/deviceinfo/manager.c \
- 			profiles/deviceinfo/deviceinfo.h \
--			profiles/deviceinfo/deviceinfo.c
-+			profiles/deviceinfo/deviceinfo.c \
-+			profiles/heartrate/main.c \
-+			profiles/heartrate/manager.c \
-+			profiles/heartrate/manager.h \
-+			profiles/heartrate/heartrate.c \
-+			profiles/heartrate/heartrate.h
- endif
- 
- builtin_modules += formfactor
-diff --git a/lib/uuid.h b/lib/uuid.h
-index 2c2b351..99b88cc 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -63,6 +63,8 @@ extern "C" {
- 
- #define SAP_UUID		"0000112D-0000-1000-8000-00805f9b34fb"
- 
-+#define HEART_RATE_UUID		"0000180d-0000-1000-8000-00805f9b34fb"
-+
- #define HEALTH_THERMOMETER_UUID		"00001809-0000-1000-8000-00805f9b34fb"
- #define TEMPERATURE_MEASUREMENT_UUID	"00002a1c-0000-1000-8000-00805f9b34fb"
- #define TEMPERATURE_TYPE_UUID		"00002a1d-0000-1000-8000-00805f9b34fb"
-diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
+diff --git a/doc/heartrate-api.txt b/doc/heartrate-api.txt
 new file mode 100644
-index 0000000..9bd93c5
+index 0000000..2738e20
 --- /dev/null
-+++ b/profiles/heartrate/heartrate.c
-@@ -0,0 +1,84 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012 Tieto Poland
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
++++ b/doc/heartrate-api.txt
+@@ -0,0 +1,74 @@
++BlueZ D-Bus Heart Rate API description
++****************************************
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
++Copyright (C) 2012	Santiago Carot-Nemesio <sancane@gmail.com>
 +
-+#include <errno.h>
-+#include <glib.h>
-+#include <bluetooth/uuid.h>
++Heart Rate Profile hierarchy
++============================
 +
-+#include "adapter.h"
-+#include "device.h"
-+#include "heartrate.h"
++Service		org.bluez
++Interface	org.bluez.HeartRate
++Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
 +
-+struct heartrate {
-+	struct btd_device	*dev;  /*Device reference*/
-+};
++Methods		dict GetProperties()
 +
-+static GSList *hr_servers = NULL;
++			Returns all properties for the interface. See the
++			Properties section for the available properties.
 +
-+static gint cmp_device(gconstpointer a, gconstpointer b)
-+{
-+	const struct heartrate *hr = a;
-+	const struct btd_device *dev = b;
++		RegisterWatcher(object agent)
 +
-+	if (dev == hr->dev)
-+		return 0;
++			Registers a watcher to monitor heart rate measurements.
 +
-+	return -1;
-+}
++			Possible Errors: org.bluez.Error.InvalidArguments
 +
-+static void heartrate_destroy(gpointer user_data)
-+{
-+	struct heartrate *hr = user_data;
++		UnregisterWatcher(object agent)
 +
-+	btd_device_unref(hr->dev);
-+	g_free(hr);
-+}
++			Unregisters a watcher.
 +
-+int heartrate_register(struct btd_device *device)
-+{
-+	struct heartrate *hr;
++			Possible Errors: org.bluez.Error.InvalidArguments
++					org.bluez.Error.NotFound
 +
-+	hr = g_new0(struct heartrate, 1);
-+	hr->dev = btd_device_ref(device);
++		Reset()
 +
-+	hr_servers = g_slist_prepend(hr_servers, hr);
++			Restart the accumulation of energy expended from zero.
 +
-+	return 0;
-+}
-+void heartrate_unregister(struct btd_device *device)
-+{
-+	struct heartrate *hr;
-+	GSList *l;
++			Possible Errors: org.bluez.Error.NotSupported
 +
-+	l = g_slist_find_custom(hr_servers, device, cmp_device);
-+	if (l == NULL)
-+		return;
++Properties	boolean ResetSupported [readonly]
 +
-+	hr = l->data;
-+	hr_servers = g_slist_remove(hr_servers, hr);
++			True if energy expended is supported.
 +
-+	heartrate_destroy(hr);
-+}
-diff --git a/profiles/heartrate/heartrate.h b/profiles/heartrate/heartrate.h
-new file mode 100644
-index 0000000..8d4271c
---- /dev/null
-+++ b/profiles/heartrate/heartrate.h
-@@ -0,0 +1,24 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012 Tieto Poland
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
++Heart Rate Watcher hierarchy
 +
-+int heartrate_register(struct btd_device *device);
-+void heartrate_unregister(struct btd_device *device);
-diff --git a/profiles/heartrate/main.c b/profiles/heartrate/main.c
-new file mode 100644
-index 0000000..40f34bc
---- /dev/null
-+++ b/profiles/heartrate/main.c
-@@ -0,0 +1,52 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012 Tieto Poland
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
++============================
++Service		unique name
++Interface	org.bluez.HeartRateWatcher
++Object path	freely definable
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
++Methods		void MeasurementReceived(dict measure)
 +
-+#include <stdint.h>
-+#include <glib.h>
-+#include <errno.h>
++			This callback is called whenever a heart rate
++			measurement is received from the heart rate device.
++			The unit for the Value is expressed in beats per
++			minute (bpm). The energy field is optional and
++			represents the accumulated energy expended in
++			kilo Joules since last time it was reset. Furthermore,
++			the device will be automatically reset when it
++			is needed.
++			The Contact field, if present, indicates
++			that the device supports contact sensor, besides it
++			will be true if skin contact is detected. The optional
++			interval field is an array containing RR-Interval
++			values which represent the time between two R-Wave
++			detections, where the RR-Interval value 0 is older
++			than the value 1 and so on.
 +
-+#include "plugin.h"
-+#include "manager.h"
-+#include "hcid.h"
-+#include "log.h"
-+
-+static int heartrate_init(void)
-+{
-+	if (!main_opts.gatt_enabled) {
-+		DBG("GATT is disabled");
-+		return -ENOTSUP;
-+	}
-+
-+	return heartrate_manager_init();
-+}
-+
-+static void heartrate_exit(void)
-+{
-+	heartrate_manager_exit();
-+}
-+
-+BLUETOOTH_PLUGIN_DEFINE(heartrate, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-+					heartrate_init, heartrate_exit)
-diff --git a/profiles/heartrate/manager.c b/profiles/heartrate/manager.c
-new file mode 100644
-index 0000000..da6c7ef
---- /dev/null
-+++ b/profiles/heartrate/manager.c
-@@ -0,0 +1,60 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012 Tieto Poland
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <gdbus.h>
-+#include <errno.h>
-+#include <bluetooth/uuid.h>
-+
-+#include "adapter.h"
-+#include "device.h"
-+#include "att.h"
-+#include "gattrib.h"
-+#include "gatt.h"
-+#include "heartrate.h"
-+#include "manager.h"
-+
-+static int heartrate_driver_probe(struct btd_device *device, GSList *uuids)
-+{
-+	return heartrate_register(device);
-+}
-+
-+static void heartrate_driver_remove(struct btd_device *device)
-+{
-+	heartrate_unregister(device);
-+}
-+
-+static struct btd_device_driver heartrate_device_driver = {
-+	.name	= "heart-rate-driver",
-+	.uuids	= BTD_UUIDS(HEART_RATE_UUID),
-+	.probe	= heartrate_driver_probe,
-+	.remove	= heartrate_driver_remove
-+};
-+
-+int heartrate_manager_init(void)
-+{
-+	return btd_register_device_driver(&heartrate_device_driver);
-+}
-+
-+void heartrate_manager_exit(void)
-+{
-+	btd_unregister_device_driver(&heartrate_device_driver);
-+}
-diff --git a/profiles/heartrate/manager.h b/profiles/heartrate/manager.h
-new file mode 100644
-index 0000000..de799f6
---- /dev/null
-+++ b/profiles/heartrate/manager.h
-@@ -0,0 +1,24 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012 Tieto Poland
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+int heartrate_manager_init(void);
-+void heartrate_manager_exit(void);
++			Dict is defined as below:
++			{
++				"Value" : uint16,
++				"Energy" : uint16,
++				"Contact" : boolean,
++				"Location" : ("Other", "Chest", "Wrist","Finger",
++					"Hand", "Earlobe", "Foot"),
++				"Interval" : array{uint16}
++			}
 -- 
 1.7.9.5
 
