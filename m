@@ -1,60 +1,176 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rafal Garbat <rafal.garbat@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <rafal.garbat@tieto.com>
-Subject: [PATCH 00/13] Add Heart Rate Service
-Date: Thu, 9 Aug 2012 09:20:03 +0200
-Message-ID: <1344496816-4641-1-git-send-email-rafal.garbat@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: chanyeol.park@samsung.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/3] audio: Remove legacy SBC endpoint
+Date: Thu, 09 Aug 2012 15:09:27 +0900
+Message-id: <1344492568-22777-3-git-send-email-chanyeol.park@samsung.com>
+In-reply-to: <1344492568-22777-1-git-send-email-chanyeol.park@samsung.com>
+References: <1344492568-22777-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add support for GATT Client Heart Rate Service.
+From: Chan-yeol Park <chanyeol.park@samsung.com>
 
-This patchset adds Heart Rate client service, exposed on Heart Rate 
-DBus API by Santiago Carot-Nemesio <sancane@gmail.com>. It allows 
-registering and unregistering watchers, handling measurement notifications
-and reseting Control Point. It bases on Thermometer service. Python 
-test script is included. Tested against Polar H7 1013EE Heart Rate Sensor.
 
-Rafal Garbat (12):
-  heartrate: Add Heart Rate Service GATT client skeleton
-  heartrate: Add conn logic and attio callbacks
-  heartrate: Discover Characteristic Descriptors
-  heartrate: Process Heart Rate Descriptors
-  heartrate: Add DBus connection logic
-  heartrate: Process Heart Rate Characteristics
-  heartrate: Add notification support
-  heartrate: Process measurements
-  heartrate: Add support for Control Point Reset
-  heartrate: Add GetProperties method handle
-  heartrate: Add org.bluez.HeartRateWatcher iface to default policy
-  heartrate: Add Heart Rate test script
-
-Santiago Carot-Nemesio (1):
-  Heart Rate Profile API
-
- Makefile.am                    |   10 +-
- Makefile.tools                 |    4 +-
- doc/heartrate-api.txt          |   74 ++++
- lib/uuid.h                     |    5 +
- profiles/heartrate/heartrate.c |  855 ++++++++++++++++++++++++++++++++++++++++
- profiles/heartrate/heartrate.h |   25 ++
- profiles/heartrate/main.c      |   68 ++++
- profiles/heartrate/manager.c   |   93 +++++
- profiles/heartrate/manager.h   |   24 ++
- src/bluetooth.conf             |    1 +
- test/test-heartrate            |   78 ++++
- 11 files changed, 1233 insertions(+), 4 deletions(-)
- create mode 100644 doc/heartrate-api.txt
- create mode 100644 profiles/heartrate/heartrate.c
- create mode 100644 profiles/heartrate/heartrate.h
- create mode 100644 profiles/heartrate/main.c
- create mode 100644 profiles/heartrate/manager.c
- create mode 100644 profiles/heartrate/manager.h
- create mode 100755 test/test-heartrate
-
+diff --git a/audio/a2dp.c b/audio/a2dp.c
+index a4369f5..fc8f1b7 100644
+--- a/audio/a2dp.c
++++ b/audio/a2dp.c
+@@ -411,134 +411,6 @@ done:
+ 	return FALSE;
+ }
+ 
+-static gboolean sbc_setconf_ind(struct avdtp *session,
+-					struct avdtp_local_sep *sep,
+-					struct avdtp_stream *stream,
+-					GSList *caps,
+-					avdtp_set_configuration_cb cb,
+-					void *user_data)
+-{
+-	struct a2dp_sep *a2dp_sep = user_data;
+-	struct a2dp_setup *setup;
+-
+-	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
+-		DBG("Sink %p: Set_Configuration_Ind", sep);
+-	else
+-		DBG("Source %p: Set_Configuration_Ind", sep);
+-
+-	setup = a2dp_setup_get(session);
+-	if (!setup)
+-		return FALSE;
+-
+-	a2dp_sep->stream = stream;
+-	setup->sep = a2dp_sep;
+-	setup->stream = stream;
+-	setup->setconf_cb = cb;
+-
+-	/* Check valid settings */
+-	for (; caps != NULL; caps = g_slist_next(caps)) {
+-		struct avdtp_service_capability *cap = caps->data;
+-		struct avdtp_media_codec_capability *codec_cap;
+-		struct sbc_codec_cap *sbc_cap;
+-
+-		if (cap->category == AVDTP_DELAY_REPORTING &&
+-					!a2dp_sep->delay_reporting) {
+-			setup->err = g_new(struct avdtp_error, 1);
+-			avdtp_error_init(setup->err, AVDTP_DELAY_REPORTING,
+-						AVDTP_UNSUPPORTED_CONFIGURATION);
+-			goto done;
+-		}
+-
+-		if (cap->category != AVDTP_MEDIA_CODEC)
+-			continue;
+-
+-		if (cap->length < sizeof(struct sbc_codec_cap))
+-			continue;
+-
+-		codec_cap = (void *) cap->data;
+-
+-		if (codec_cap->media_codec_type != A2DP_CODEC_SBC)
+-			continue;
+-
+-		sbc_cap = (void *) codec_cap;
+-
+-		if (sbc_cap->min_bitpool < MIN_BITPOOL ||
+-					sbc_cap->max_bitpool > MAX_BITPOOL) {
+-			setup->err = g_new(struct avdtp_error, 1);
+-			avdtp_error_init(setup->err, AVDTP_MEDIA_CODEC,
+-					AVDTP_UNSUPPORTED_CONFIGURATION);
+-			goto done;
+-		}
+-	}
+-
+-done:
+-	g_idle_add(auto_config, setup);
+-	return TRUE;
+-}
+-
+-static gboolean sbc_getcap_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+-				gboolean get_all, GSList **caps, uint8_t *err,
+-				void *user_data)
+-{
+-	struct a2dp_sep *a2dp_sep = user_data;
+-	struct avdtp_service_capability *media_transport, *media_codec;
+-	struct sbc_codec_cap sbc_cap;
+-
+-	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
+-		DBG("Sink %p: Get_Capability_Ind", sep);
+-	else
+-		DBG("Source %p: Get_Capability_Ind", sep);
+-
+-	*caps = NULL;
+-
+-	media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
+-						NULL, 0);
+-
+-	*caps = g_slist_append(*caps, media_transport);
+-
+-	memset(&sbc_cap, 0, sizeof(struct sbc_codec_cap));
+-
+-	sbc_cap.cap.media_type = AVDTP_MEDIA_TYPE_AUDIO;
+-	sbc_cap.cap.media_codec_type = A2DP_CODEC_SBC;
+-
+-	sbc_cap.frequency = ( SBC_SAMPLING_FREQ_48000 |
+-				SBC_SAMPLING_FREQ_44100 |
+-				SBC_SAMPLING_FREQ_32000 |
+-				SBC_SAMPLING_FREQ_16000 );
+-
+-	sbc_cap.channel_mode = ( SBC_CHANNEL_MODE_JOINT_STEREO |
+-					SBC_CHANNEL_MODE_STEREO |
+-					SBC_CHANNEL_MODE_DUAL_CHANNEL |
+-					SBC_CHANNEL_MODE_MONO );
+-
+-	sbc_cap.block_length = ( SBC_BLOCK_LENGTH_16 |
+-					SBC_BLOCK_LENGTH_12 |
+-					SBC_BLOCK_LENGTH_8 |
+-					SBC_BLOCK_LENGTH_4 );
+-
+-	sbc_cap.subbands = ( SBC_SUBBANDS_8 | SBC_SUBBANDS_4 );
+-
+-	sbc_cap.allocation_method = ( SBC_ALLOCATION_LOUDNESS |
+-					SBC_ALLOCATION_SNR );
+-
+-	sbc_cap.min_bitpool = MIN_BITPOOL;
+-	sbc_cap.max_bitpool = MAX_BITPOOL;
+-
+-	media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, &sbc_cap,
+-						sizeof(sbc_cap));
+-
+-	*caps = g_slist_append(*caps, media_codec);
+-
+-	if (get_all) {
+-		struct avdtp_service_capability *delay_reporting;
+-		delay_reporting = avdtp_service_cap_new(AVDTP_DELAY_REPORTING,
+-								NULL, 0);
+-		*caps = g_slist_append(*caps, delay_reporting);
+-	}
+-
+-	return TRUE;
+-}
+-
+ static gboolean mpeg_setconf_ind(struct avdtp *session,
+ 					struct avdtp_local_sep *sep,
+ 					struct avdtp_stream *stream,
+@@ -1317,19 +1189,6 @@ static struct avdtp_sep_cfm cfm = {
+ 	.delay_report		= delay_report_cfm,
+ };
+ 
+-static struct avdtp_sep_ind sbc_ind = {
+-	.get_capability		= sbc_getcap_ind,
+-	.set_configuration	= sbc_setconf_ind,
+-	.get_configuration	= getconf_ind,
+-	.open			= open_ind,
+-	.start			= start_ind,
+-	.suspend		= suspend_ind,
+-	.close			= close_ind,
+-	.abort			= abort_ind,
+-	.reconfigure		= reconf_ind,
+-	.delayreport		= delayreport_ind,
+-};
+-
+ static struct avdtp_sep_ind mpeg_ind = {
+ 	.get_capability		= mpeg_getcap_ind,
+ 	.set_configuration	= mpeg_setconf_ind,
 -- 
 1.7.9.5
 
