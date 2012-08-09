@@ -1,54 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Bluetooth: btusb: Set reset quirk for A-Link and Medialink devices
-Date: Thu,  9 Aug 2012 18:03:32 +0300
-Message-Id: <1344524613-15810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 9 Aug 2012 17:46:02 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Dean Jenkins <djenkins@mvista.com>
+Cc: Frederic Danis <frederic.danis@linux.intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: RFCOMM disconnection problem
+Message-ID: <20120809144555.GB2683@aemeltch-MOBL1>
+References: <501BC0D5.8080403@linux.intel.com>
+ <501BC282.9070509@linux.intel.com>
+ <CAJ2qBzaLyPiwEcd2n5Kdu_Y4KMpYjvjGo+Ddk3RC1Cf6_k=K9A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAJ2qBzaLyPiwEcd2n5Kdu_Y4KMpYjvjGo+Ddk3RC1Cf6_k=K9A@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Dean,
 
-Broadcom devices A-LINK (0a5c:2148) and Medialink (0a5c:2198) works more stable
-when setting HCI_QUIRK_RESET_ON_CLOSE. Without this patch they do not always
-come up after reset and down.
----
- drivers/bluetooth/btusb.c |    8 ++++++++
- 1 file changed, 8 insertions(+)
+On Thu, Aug 09, 2012 at 03:29:18PM +0100, Dean Jenkins wrote:
+> One obvious failure of the rfcomm session refcnt is that the refcnt
+> counter either starts with a value of 0 or 1 depending on which peer
+> initiated the connection request, that is wrong. The initiator
+> direction is not relevant for the session as connect and disconnect
+> are independent events. The refcnt should start with a value of 1 in
+> all cases.
+> 
+> I am using a 2-core ARM environment that is under high processor
+> loading. The rfcomm session refcnt caused kernel crashes. I used a
+> 2.6.34 kernel but the latest 3.5-RC1 still has the poor rfcomm code.
+> My solution was to remove the rfcomm session refcnt and to ensure that
+> the freeing of the rfcomm session pointer was propagated through-out
+> the rfcomm core code. Some kernel crashes were due to reuse of the
+> freed rfcomm session pointer.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f637c25..57ca6fd 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -47,6 +47,7 @@ static struct usb_driver btusb_driver;
- #define BTUSB_BROKEN_ISOC	0x20
- #define BTUSB_WRONG_SCO_MTU	0x40
- #define BTUSB_ATH3012		0x80
-+#define BTUSB_BCM_RESET_QUIRK	0x100
- 
- static struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-@@ -149,6 +150,10 @@ static struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0a5c, 0x2039), .driver_info = BTUSB_WRONG_SCO_MTU },
- 	{ USB_DEVICE(0x0a5c, 0x2101), .driver_info = BTUSB_WRONG_SCO_MTU },
- 
-+	/* Broadcom chips works better with reset quirk */
-+	{ USB_DEVICE(0x0a5c, 0x2148), .driver_info = BTUSB_BCM_RESET_QUIRK },
-+	{ USB_DEVICE(0x0a5c, 0x2198), .driver_info = BTUSB_BCM_RESET_QUIRK },
-+
- 	/* IBM/Lenovo ThinkPad with Broadcom chip */
- 	{ USB_DEVICE(0x0a5c, 0x201e), .driver_info = BTUSB_WRONG_SCO_MTU },
- 	{ USB_DEVICE(0x0a5c, 0x2110), .driver_info = BTUSB_WRONG_SCO_MTU },
-@@ -1023,6 +1028,9 @@ static int btusb_probe(struct usb_interface *intf,
- 			set_bit(HCI_QUIRK_FIXUP_BUFFER_SIZE, &hdev->quirks);
- 	}
- 
-+	if (id->driver_info & BTUSB_BCM_RESET_QUIRK)
-+		set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
-+
- 	if (id->driver_info & BTUSB_BROKEN_ISOC)
- 		data->isoc = NULL;
- 
--- 
-1.7.9.5
+Maybe it does make sense to fix refcounting instead of removing?
+
+Best regards 
+Andrei Emeltchenko 
+
+> 
+> I intend to release a patchset of rfcomm fixes.
+> 
+> Therefore, IMHO the fix "Bluetooth: Fix RFCOMM session reference
+> counting issue" (commit cf33e7 in linux-stable.git) from Octavian
+> Purdila in kernel 3.4.6 is in fact not fixing the root cause and
+> introduces a misbehaviour of the refcnt. In our project, we rejected
+> this commit because disconnections failed.
+> 
 
