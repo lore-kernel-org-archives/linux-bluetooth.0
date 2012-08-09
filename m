@@ -1,40 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ludek Finstrle <luf@pzkagis.cz>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ludek Finstrle <luf@pzkagis.cz>
-Subject: [PATCH obexd] client: Fix pbap_select using absolute path with known locations
-Date: Thu,  9 Aug 2012 18:07:33 +0200
-Message-Id: <1344528453-27245-1-git-send-email-luf@pzkagis.cz>
+Subject: [RFC] Bluetooth: btusb: Set reset quirk for A-Link and Medialink devices
+Date: Thu,  9 Aug 2012 18:03:32 +0300
+Message-Id: <1344524613-15810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-pbap_select has to use absolute path with known location to support
-repeatable pbap_select calls. In other way the second call fails.
----
- client/pbap.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/client/pbap.c b/client/pbap.c
-index 48dbac1..d8c39e5 100644
---- a/client/pbap.c
-+++ b/client/pbap.c
-@@ -232,14 +232,14 @@ static gchar *build_phonebook_path(const char *location, const char *item)
+Broadcom devices A-LINK (0a5c:2148) and Medialink (0a5c:2198) works more stable
+when setting HCI_QUIRK_RESET_ON_CLOSE. Without this patch they do not always
+come up after reset and down.
+---
+ drivers/bluetooth/btusb.c |    8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f637c25..57ca6fd 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -47,6 +47,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_BROKEN_ISOC	0x20
+ #define BTUSB_WRONG_SCO_MTU	0x40
+ #define BTUSB_ATH3012		0x80
++#define BTUSB_BCM_RESET_QUIRK	0x100
  
- 	if (!g_ascii_strcasecmp(location, "INT") ||
- 			!g_ascii_strcasecmp(location, "INTERNAL"))
--		path = g_strdup("telecom");
-+		path = g_strdup("/telecom");
- 	else if (!g_ascii_strncasecmp(location, "SIM", 3)) {
- 		if (strlen(location) == 3)
- 			tmp = g_strdup("SIM1");
- 		else
- 			tmp = g_ascii_strup(location, 4);
+ static struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -149,6 +150,10 @@ static struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0a5c, 0x2039), .driver_info = BTUSB_WRONG_SCO_MTU },
+ 	{ USB_DEVICE(0x0a5c, 0x2101), .driver_info = BTUSB_WRONG_SCO_MTU },
  
--		path = g_build_filename(tmp, "telecom", NULL);
-+		path = g_build_filename("/", tmp, "telecom", NULL);
- 		g_free(tmp);
- 	} else
- 		return NULL;
++	/* Broadcom chips works better with reset quirk */
++	{ USB_DEVICE(0x0a5c, 0x2148), .driver_info = BTUSB_BCM_RESET_QUIRK },
++	{ USB_DEVICE(0x0a5c, 0x2198), .driver_info = BTUSB_BCM_RESET_QUIRK },
++
+ 	/* IBM/Lenovo ThinkPad with Broadcom chip */
+ 	{ USB_DEVICE(0x0a5c, 0x201e), .driver_info = BTUSB_WRONG_SCO_MTU },
+ 	{ USB_DEVICE(0x0a5c, 0x2110), .driver_info = BTUSB_WRONG_SCO_MTU },
+@@ -1023,6 +1028,9 @@ static int btusb_probe(struct usb_interface *intf,
+ 			set_bit(HCI_QUIRK_FIXUP_BUFFER_SIZE, &hdev->quirks);
+ 	}
+ 
++	if (id->driver_info & BTUSB_BCM_RESET_QUIRK)
++		set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
++
+ 	if (id->driver_info & BTUSB_BROKEN_ISOC)
+ 		data->isoc = NULL;
+ 
 -- 
-1.7.1
+1.7.9.5
 
