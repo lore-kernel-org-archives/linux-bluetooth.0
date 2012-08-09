@@ -2,31 +2,43 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ v3 3/3] rfcomm: Fix typo in man page
-Date: Thu,  9 Aug 2012 17:29:03 -0300
-Message-Id: <1344544143-12805-3-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1344544143-12805-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1344544143-12805-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ v3 1/3] rfcomm: Fix checking return value instead of errno
+Date: Thu,  9 Aug 2012 17:29:01 -0300
+Message-Id: <1344544143-12805-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+We were checking by a positive return value instead of checking by -1
+and errno. However when there's no support for TTY kernel returns
+EOPNOTSUPP as usual, which in the end will have a return value of -1
+and errno will be set to EOPNOTSUPP.
 ---
- tools/rfcomm.1 | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/rfcomm.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/tools/rfcomm.1 b/tools/rfcomm.1
-index f880f52..51df284 100644
---- a/tools/rfcomm.1
-+++ b/tools/rfcomm.1
-@@ -108,7 +108,7 @@ parameters.
- .TP
- .BI bind " <dev> [bdaddr] [channel]"
- This binds the RFCOMM device to a remote Bluetooth device. The
--command did not establish a connection to the remote device, it
-+command does not establish a connection to the remote device, it
- only creates the binding. The connection will be established right
- after an application tries to open the RFCOMM device. If no channel
- number is specified, it uses the channel number 1.
+diff --git a/tools/rfcomm.c b/tools/rfcomm.c
+index e73b0ba..0a80670 100644
+--- a/tools/rfcomm.c
++++ b/tools/rfcomm.c
+@@ -182,10 +182,14 @@ static int create_dev(int ctl, int dev, uint32_t flags, bdaddr_t *bdaddr, int ar
+ 	}
+ 
+ 	err = ioctl(ctl, RFCOMMCREATEDEV, &req);
+-	if (err == EOPNOTSUPP)
+-		fprintf(stderr, "RFCOMM TTY support not available\n");
+-	else if (err < 0)
+-		perror("Can't create device");
++	if (err == -1) {
++		err = -errno;
++
++		if (err == -EOPNOTSUPP)
++			fprintf(stderr, "RFCOMM TTY support not available\n");
++		else
++			perror("Can't create device");
++	}
+ 
+ 	return err;
+ }
 -- 
 1.7.11.4
 
