@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 4/9] gobex: Add unit test for encoding/decoding apparam headers
-Date: Thu,  9 Aug 2012 13:32:28 +0300
-Message-Id: <1344508353-24647-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 3/9] gobex: Integrate GObexApparam with GObexHeader
+Date: Thu,  9 Aug 2012 13:32:27 +0300
+Message-Id: <1344508353-24647-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1344508353-24647-1-git-send-email-luiz.dentz@gmail.com>
 References: <1344508353-24647-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,95 +11,83 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This introduce 2 new convenient functions: g_obex_header_get_apparam
+which parses and decode an header into GObexApparam and
+gobex_header_new_apparam that encode GObexApparam into GObexHeader.
 ---
- unit/test-gobex-header.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ gobex/gobex-header.c | 25 +++++++++++++++++++++++++
+ gobex/gobex-header.h |  3 +++
+ 2 files changed, 28 insertions(+)
 
-diff --git a/unit/test-gobex-header.c b/unit/test-gobex-header.c
-index 86e69f3..feb7d17 100644
---- a/unit/test-gobex-header.c
-+++ b/unit/test-gobex-header.c
-@@ -47,6 +47,8 @@ static uint8_t hdr_bytes_nval_short[] = { G_OBEX_HDR_BODY, 0xab, 0xcd,
- 						0x01, 0x02, 0x03 };
- static uint8_t hdr_bytes_nval_data[] = { G_OBEX_HDR_BODY, 0xab };
- static uint8_t hdr_bytes_nval_len[] = { G_OBEX_HDR_BODY, 0x00, 0x00 };
-+static uint8_t hdr_apparam[] = { G_OBEX_HDR_APPARAM, 0x00, 0x09, 0x00, 0x04,
-+						0x01, 0x02, 0x03, 0x04 };
- 
- static void test_header_name_empty(void)
- {
-@@ -115,6 +117,27 @@ static void test_header_bytes(void)
- 	g_obex_header_free(header);
+diff --git a/gobex/gobex-header.c b/gobex/gobex-header.c
+index 56dd9b2..80e8e4e 100644
+--- a/gobex/gobex-header.c
++++ b/gobex/gobex-header.c
+@@ -337,6 +337,19 @@ gboolean g_obex_header_get_bytes(GObexHeader *header, const guint8 **val,
+ 	return TRUE;
  }
  
-+static void test_header_apparam(void)
++GObexApparam *g_obex_header_get_apparam(GObexHeader *header)
 +{
-+	GObexHeader *header;
-+	GObexApparam *apparam;
-+	uint8_t buf[1024];
-+	size_t len;
-+
-+	apparam = g_obex_apparam_set_uint32(NULL, 0, 0x01020304);
-+	g_assert(apparam != NULL);
-+
-+	header = g_obex_header_new_apparam(apparam);
-+	g_assert(header != NULL);
-+
-+	len = g_obex_header_encode(header, buf, sizeof(buf));
-+
-+	assert_memequal(hdr_apparam, sizeof(hdr_apparam), buf, len);
-+
-+	g_obex_apparam_free(apparam);
-+	g_obex_header_free(header);
-+}
-+
- static void test_header_uint8(void)
- {
- 	GObexHeader *header;
-@@ -247,6 +270,26 @@ static void test_header_encode_body(void)
- 	g_obex_header_free(header);
- }
- 
-+static void test_header_encode_apparam(void)
-+{
-+	GObexHeader *header;
-+	GObexApparam *apparam;
 +	gboolean ret;
-+	guint32 data;
++	const guint8 *val;
++	gsize len;
 +
-+	header = parse_and_encode(hdr_apparam, sizeof(hdr_apparam));
++	ret = g_obex_header_get_bytes(header, &val, &len);
++	if (!ret)
++		return NULL;
 +
-+	apparam = g_obex_header_get_apparam(header);
-+	g_assert(apparam != NULL);
-+
-+	ret = g_obex_apparam_get_uint32(apparam, 0x00, &data);
-+	g_assert(ret == TRUE);
-+	g_assert(data == 0x01020304);
-+
-+	g_obex_apparam_free(apparam);
-+	g_obex_header_free(header);
++	return g_obex_apparam_decode(val, len);
 +}
 +
- static void test_header_encode_actionid(void)
+ gboolean g_obex_header_get_uint8(GObexHeader *header, guint8 *val)
+ {
+ 	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x",
+@@ -411,6 +424,18 @@ GObexHeader *g_obex_header_new_bytes(guint8 id, const void *data, gsize len)
+ 	return header;
+ }
+ 
++GObexHeader *g_obex_header_new_apparam(GObexApparam *apparam)
++{
++	guint8 buf[1024];
++	gssize len;
++
++	len = g_obex_apparam_encode(apparam, buf, sizeof(buf));
++	if (len < 0)
++		return NULL;
++
++	return g_obex_header_new_bytes(G_OBEX_HDR_APPARAM, buf, len);
++}
++
+ GObexHeader *g_obex_header_new_uint8(guint8 id, guint8 val)
  {
  	GObexHeader *header;
-@@ -507,6 +550,8 @@ int main(int argc, char *argv[])
- 						test_header_encode_body);
- 	g_test_add_func("/gobex/test_header_encode_connid",
- 						test_header_encode_actionid);
-+	g_test_add_func("/gobex/test_header_encode_apparam",
-+						test_header_encode_apparam);
+diff --git a/gobex/gobex-header.h b/gobex/gobex-header.h
+index 2ee8364..196cb20 100644
+--- a/gobex/gobex-header.h
++++ b/gobex/gobex-header.h
+@@ -25,6 +25,7 @@
+ #include <glib.h>
  
- 	g_test_add_func("/gobex/test_header_name_empty",
- 						test_header_name_empty);
-@@ -517,6 +562,7 @@ int main(int argc, char *argv[])
- 	g_test_add_func("/gobex/test_header_bytes", test_header_bytes);
- 	g_test_add_func("/gobex/test_header_uint8", test_header_uint8);
- 	g_test_add_func("/gobex/test_header_uint32", test_header_uint32);
-+	g_test_add_func("/gobex/test_header_apparam", test_header_apparam);
+ #include <gobex/gobex-defs.h>
++#include <gobex/gobex-apparam.h>
  
- 	g_test_run();
+ /* Header ID's */
+ #define G_OBEX_HDR_INVALID	0x00
+@@ -77,11 +78,13 @@ gboolean g_obex_header_get_bytes(GObexHeader *header, const guint8 **val,
+ 								gsize *len);
+ gboolean g_obex_header_get_uint8(GObexHeader *header, guint8 *val);
+ gboolean g_obex_header_get_uint32(GObexHeader *header, guint32 *val);
++GObexApparam *g_obex_header_get_apparam(GObexHeader *header);
  
+ GObexHeader *g_obex_header_new_unicode(guint8 id, const char *str);
+ GObexHeader *g_obex_header_new_bytes(guint8 id, const void *data, gsize len);
+ GObexHeader *g_obex_header_new_uint8(guint8 id, guint8 val);
+ GObexHeader *g_obex_header_new_uint32(guint8 id, guint32 val);
++GObexHeader *g_obex_header_new_apparam(GObexApparam *apparam);
+ 
+ GSList *g_obex_header_create_list(guint8 first_hdr_id, va_list args,
+ 							gsize *total_len);
 -- 
 1.7.11.2
 
