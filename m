@@ -1,155 +1,235 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+From: chanyeol.park@samsung.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v4 3/3] Bluetooth: mgmt: Add device disconnect reason
-Date: Thu,  9 Aug 2012 09:52:30 +0200
-Message-Id: <1344498750-2698-4-git-send-email-mikel.astiz.oss@gmail.com>
-In-Reply-To: <1344498750-2698-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1344498750-2698-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH BlueZ V2 3/3] audio: Remove legacy MPEG endpoint
+Date: Thu, 09 Aug 2012 16:45:44 +0900
+Message-id: <1344498344-19268-4-git-send-email-chanyeol.park@samsung.com>
+In-reply-to: <1344498344-19268-1-git-send-email-chanyeol.park@samsung.com>
+References: <1344498344-19268-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+From: Chan-yeol Park <chanyeol.park@samsung.com>
 
-MGMT_EV_DEVICE_DISCONNECTED will now expose the disconnection reason to
-userland, distinguishing four possible values:
-
-	0x00	Reason not known or unspecified
-	0x01	Connection timeout
-	0x02	Connection terminated by local host
-	0x03	Connection terminated by remote host
-
-Note that the local/remote distinction just determines which side
-terminated the low-level connection, regardless of the disconnection of
-the higher-level profiles.
-
-This can sometimes be misleading and thus must be used with care. For
-example, some hardware combinations would report a locally initiated
-disconnection even if the user turned Bluetooth off in the remote side.
-
-Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
 ---
- include/net/bluetooth/hci_core.h |    2 +-
- include/net/bluetooth/mgmt.h     |    9 +++++++++
- net/bluetooth/hci_event.c        |   26 +++++++++++++++++++++++---
- net/bluetooth/mgmt.c             |    9 +++++----
- 4 files changed, 38 insertions(+), 8 deletions(-)
+ audio/a2dp.c |  127 ----------------------------------------------------------
+ audio/a2dp.h |   51 -----------------------
+ 2 files changed, 178 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 41d9439..4fb0323 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1004,7 +1004,7 @@ int mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 			  u8 addr_type, u32 flags, u8 *name, u8 name_len,
- 			  u8 *dev_class);
- int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
--			     u8 link_type, u8 addr_type);
-+			     u8 link_type, u8 addr_type, u8 reason);
- int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			   u8 link_type, u8 addr_type, u8 status);
- int mgmt_connect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 4348ee8..1b48eff 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -405,7 +405,16 @@ struct mgmt_ev_device_connected {
- 	__u8	eir[0];
- } __packed;
- 
-+#define MGMT_DEV_DISCONN_UNKNOWN	0x00
-+#define MGMT_DEV_DISCONN_TIMEOUT	0x01
-+#define MGMT_DEV_DISCONN_LOCAL_HOST	0x02
-+#define MGMT_DEV_DISCONN_REMOTE		0x03
-+
- #define MGMT_EV_DEVICE_DISCONNECTED	0x000C
-+struct mgmt_ev_device_disconnected {
-+	struct mgmt_addr_info addr;
-+	__u8	reason;
-+} __packed;
- 
- #define MGMT_EV_CONNECT_FAILED		0x000D
- struct mgmt_ev_connect_failed {
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 32fcc74..6e02c93 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -29,6 +29,7 @@
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/mgmt.h>
- 
- /* Handle HCI Event packets */
- 
-@@ -1888,6 +1889,22 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	}
+diff --git a/audio/a2dp.c b/audio/a2dp.c
+index 36fee09..a9546b7 100644
+--- a/audio/a2dp.c
++++ b/audio/a2dp.c
+@@ -411,105 +411,6 @@ done:
+ 	return FALSE;
  }
  
-+static u8 hci_to_mgmt_reason(u8 err)
-+{
-+	switch (err) {
-+	case HCI_ERROR_CONNECTION_TIMEOUT:
-+		return MGMT_DEV_DISCONN_TIMEOUT;
-+	case HCI_ERROR_REMOTE_USER_TERM:
-+	case HCI_ERROR_REMOTE_LOW_RESOURCES:
-+	case HCI_ERROR_REMOTE_POWER_OFF:
-+		return MGMT_DEV_DISCONN_REMOTE;
-+	case HCI_ERROR_LOCAL_HOST_TERM:
-+		return MGMT_DEV_DISCONN_LOCAL_HOST;
-+	default:
-+		return MGMT_DEV_DISCONN_UNKNOWN;
-+	}
-+}
-+
- static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+-static gboolean mpeg_setconf_ind(struct avdtp *session,
+-					struct avdtp_local_sep *sep,
+-					struct avdtp_stream *stream,
+-					GSList *caps,
+-					avdtp_set_configuration_cb cb,
+-					void *user_data)
+-{
+-	struct a2dp_sep *a2dp_sep = user_data;
+-	struct a2dp_setup *setup;
+-
+-	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
+-		DBG("Sink %p: Set_Configuration_Ind", sep);
+-	else
+-		DBG("Source %p: Set_Configuration_Ind", sep);
+-
+-	setup = a2dp_setup_get(session);
+-	if (!setup)
+-		return FALSE;
+-
+-	a2dp_sep->stream = stream;
+-	setup->sep = a2dp_sep;
+-	setup->stream = stream;
+-	setup->setconf_cb = cb;
+-
+-	for (; caps != NULL; caps = g_slist_next(caps)) {
+-		struct avdtp_service_capability *cap = caps->data;
+-
+-		if (cap->category == AVDTP_DELAY_REPORTING &&
+-					!a2dp_sep->delay_reporting) {
+-			setup->err = g_new(struct avdtp_error, 1);
+-			avdtp_error_init(setup->err, AVDTP_DELAY_REPORTING,
+-					AVDTP_UNSUPPORTED_CONFIGURATION);
+-			goto done;
+-		}
+-	}
+-
+-done:
+-	g_idle_add(auto_config, setup);
+-	return TRUE;
+-}
+-
+-static gboolean mpeg_getcap_ind(struct avdtp *session,
+-				struct avdtp_local_sep *sep,
+-				gboolean get_all,
+-				GSList **caps, uint8_t *err, void *user_data)
+-{
+-	struct a2dp_sep *a2dp_sep = user_data;
+-	struct avdtp_service_capability *media_transport, *media_codec;
+-	struct mpeg_codec_cap mpeg_cap;
+-
+-	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
+-		DBG("Sink %p: Get_Capability_Ind", sep);
+-	else
+-		DBG("Source %p: Get_Capability_Ind", sep);
+-
+-	*caps = NULL;
+-
+-	media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
+-						NULL, 0);
+-
+-	*caps = g_slist_append(*caps, media_transport);
+-
+-	memset(&mpeg_cap, 0, sizeof(struct mpeg_codec_cap));
+-
+-	mpeg_cap.cap.media_type = AVDTP_MEDIA_TYPE_AUDIO;
+-	mpeg_cap.cap.media_codec_type = A2DP_CODEC_MPEG12;
+-
+-	mpeg_cap.frequency = ( MPEG_SAMPLING_FREQ_48000 |
+-				MPEG_SAMPLING_FREQ_44100 |
+-				MPEG_SAMPLING_FREQ_32000 |
+-				MPEG_SAMPLING_FREQ_24000 |
+-				MPEG_SAMPLING_FREQ_22050 |
+-				MPEG_SAMPLING_FREQ_16000 );
+-
+-	mpeg_cap.channel_mode = ( MPEG_CHANNEL_MODE_JOINT_STEREO |
+-					MPEG_CHANNEL_MODE_STEREO |
+-					MPEG_CHANNEL_MODE_DUAL_CHANNEL |
+-					MPEG_CHANNEL_MODE_MONO );
+-
+-	mpeg_cap.layer = ( MPEG_LAYER_MP3 | MPEG_LAYER_MP2 | MPEG_LAYER_MP1 );
+-
+-	mpeg_cap.bitrate = 0xFFFF;
+-
+-	media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, &mpeg_cap,
+-						sizeof(mpeg_cap));
+-
+-	*caps = g_slist_append(*caps, media_codec);
+-
+-	if (get_all) {
+-		struct avdtp_service_capability *delay_reporting;
+-		delay_reporting = avdtp_service_cap_new(AVDTP_DELAY_REPORTING,
+-								NULL, 0);
+-		*caps = g_slist_append(*caps, delay_reporting);
+-	}
+-
+-	return TRUE;
+-}
+-
+-
+ static void endpoint_setconf_cb(struct a2dp_setup *setup, gboolean ret)
  {
- 	struct hci_ev_disconn_complete *ev = (void *) skb->data;
-@@ -1906,12 +1923,15 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags) &&
- 	    (conn->type == ACL_LINK || conn->type == LE_LINK)) {
--		if (ev->status)
-+		if (ev->status) {
- 			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
- 					       conn->dst_type, ev->status);
--		else
-+		} else {
-+			u8 reason = hci_to_mgmt_reason(ev->reason);
-+
- 			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
--						 conn->dst_type);
-+						 conn->dst_type, reason);
-+		}
- 	}
- 
- 	if (ev->status == 0) {
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a3329cb..05d4b83 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3077,16 +3077,17 @@ static void unpair_device_rsp(struct pending_cmd *cmd, void *data)
+ 	if (ret == FALSE) {
+@@ -1105,21 +1006,6 @@ static gboolean reconf_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+ 	return TRUE;
  }
  
- int mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
--			     u8 link_type, u8 addr_type)
-+			     u8 link_type, u8 addr_type, u8 reason)
- {
--	struct mgmt_addr_info ev;
-+	struct mgmt_ev_device_disconnected ev;
- 	struct sock *sk = NULL;
- 	int err;
+-static gboolean delayreport_ind(struct avdtp *session,
+-				struct avdtp_local_sep *sep,
+-				uint8_t rseid, uint16_t delay,
+-				uint8_t *err, void *user_data)
+-{
+-	struct a2dp_sep *a2dp_sep = user_data;
+-
+-	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
+-		DBG("Sink %p: DelayReport_Ind", sep);
+-	else
+-		DBG("Source %p: DelayReport_Ind", sep);
+-
+-	return TRUE;
+-}
+-
+ static gboolean endpoint_delayreport_ind(struct avdtp *session,
+ 						struct avdtp_local_sep *sep,
+ 						uint8_t rseid, uint16_t delay,
+@@ -1189,19 +1075,6 @@ static struct avdtp_sep_cfm cfm = {
+ 	.delay_report		= delay_report_cfm,
+ };
  
- 	mgmt_pending_foreach(MGMT_OP_DISCONNECT, hdev, disconnect_rsp, &sk);
+-static struct avdtp_sep_ind mpeg_ind = {
+-	.get_capability		= mpeg_getcap_ind,
+-	.set_configuration	= mpeg_setconf_ind,
+-	.get_configuration	= getconf_ind,
+-	.open			= open_ind,
+-	.start			= start_ind,
+-	.suspend		= suspend_ind,
+-	.close			= close_ind,
+-	.abort			= abort_ind,
+-	.reconfigure		= reconf_ind,
+-	.delayreport		= delayreport_ind,
+-};
+-
+ static struct avdtp_sep_ind endpoint_ind = {
+ 	.get_capability		= endpoint_getcap_ind,
+ 	.set_configuration	= endpoint_setconf_ind,
+diff --git a/audio/a2dp.h b/audio/a2dp.h
+index c9feac8..27b4a57 100644
+--- a/audio/a2dp.h
++++ b/audio/a2dp.h
+@@ -23,57 +23,6 @@
+  *
+  */
  
--	bacpy(&ev.bdaddr, bdaddr);
--	ev.type = link_to_bdaddr(link_type, addr_type);
-+	bacpy(&ev.addr.bdaddr, bdaddr);
-+	ev.addr.type = link_to_bdaddr(link_type, addr_type);
-+	ev.reason = reason;
+-#define A2DP_CODEC_SBC			0x00
+-#define A2DP_CODEC_MPEG12		0x01
+-#define A2DP_CODEC_MPEG24		0x02
+-#define A2DP_CODEC_ATRAC		0x03
+-
+-#define MPEG_CHANNEL_MODE_MONO		(1 << 3)
+-#define MPEG_CHANNEL_MODE_DUAL_CHANNEL	(1 << 2)
+-#define MPEG_CHANNEL_MODE_STEREO	(1 << 1)
+-#define MPEG_CHANNEL_MODE_JOINT_STEREO	1
+-
+-#define MPEG_LAYER_MP1			(1 << 2)
+-#define MPEG_LAYER_MP2			(1 << 1)
+-#define MPEG_LAYER_MP3			1
+-
+-#define MPEG_SAMPLING_FREQ_16000	(1 << 5)
+-#define MPEG_SAMPLING_FREQ_22050	(1 << 4)
+-#define MPEG_SAMPLING_FREQ_24000	(1 << 3)
+-#define MPEG_SAMPLING_FREQ_32000	(1 << 2)
+-#define MPEG_SAMPLING_FREQ_44100	(1 << 1)
+-#define MPEG_SAMPLING_FREQ_48000	1
+-
+-#if __BYTE_ORDER == __LITTLE_ENDIAN
+-
+-struct mpeg_codec_cap {
+-	struct avdtp_media_codec_capability cap;
+-	uint8_t channel_mode:4;
+-	uint8_t crc:1;
+-	uint8_t layer:3;
+-	uint8_t frequency:6;
+-	uint8_t mpf:1;
+-	uint8_t rfa:1;
+-	uint16_t bitrate;
+-} __attribute__ ((packed));
+-
+-#elif __BYTE_ORDER == __BIG_ENDIAN
+-
+-struct mpeg_codec_cap {
+-	struct avdtp_media_codec_capability cap;
+-	uint8_t layer:3;
+-	uint8_t crc:1;
+-	uint8_t channel_mode:4;
+-	uint8_t rfa:1;
+-	uint8_t mpf:1;
+-	uint8_t frequency:6;
+-	uint16_t bitrate;
+-} __attribute__ ((packed));
+-
+-#else
+-#error "Unknown byte order"
+-#endif
+-
+ struct a2dp_sep;
+ struct a2dp_setup;
  
- 	err = mgmt_event(MGMT_EV_DEVICE_DISCONNECTED, hdev, &ev, sizeof(ev),
- 			 sk);
 -- 
-1.7.7.6
+1.7.9.5
 
