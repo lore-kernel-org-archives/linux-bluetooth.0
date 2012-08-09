@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Rafal Garbat <rafal.garbat@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <rafal.garbat@tieto.com>
-Subject: [PATCH 08/13] heartrate: Add notification support
-Date: Thu, 9 Aug 2012 09:20:11 +0200
-Message-ID: <1344496816-4641-9-git-send-email-rafal.garbat@tieto.com>
+Subject: [PATCH 07/13] heartrate: Process Heart Rate Characteristics
+Date: Thu, 9 Aug 2012 09:20:10 +0200
+Message-ID: <1344496816-4641-8-git-send-email-rafal.garbat@tieto.com>
 In-Reply-To: <1344496816-4641-1-git-send-email-rafal.garbat@tieto.com>
 References: <1344496816-4641-1-git-send-email-rafal.garbat@tieto.com>
 MIME-Version: 1.0
@@ -12,79 +12,104 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add handling notification event.
+Read and store Sensor Location characteristic.
 
 ---
- profiles/heartrate/heartrate.c |   20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+ lib/uuid.h                     |    2 ++
+ profiles/heartrate/heartrate.c |   46 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 48 insertions(+)
 
+diff --git a/lib/uuid.h b/lib/uuid.h
+index 5d81856..5d1e091 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -65,6 +65,8 @@ extern "C" {
+ 
+ #define HEART_RATE_UUID		"0000180d-0000-1000-8000-00805f9b34fb"
+ #define HEART_RATE_MEASUREMENT_UUID	"00002a37-0000-1000-8000-00805f9b34fb"
++#define HEART_RATE_CONTROL_POINT_UUID	"00002a39-0000-1000-8000-00805f9b34fb"
++#define BODY_SENSOR_LOCATION_UUID	"00002a38-0000-1000-8000-00805f9b34fb"
+ 
+ #define HEALTH_THERMOMETER_UUID		"00001809-0000-1000-8000-00805f9b34fb"
+ #define TEMPERATURE_MEASUREMENT_UUID	"00002a1c-0000-1000-8000-00805f9b34fb"
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index 2521b6a..d5b3fb9 100644
+index b11f132..2521b6a 100644
 --- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
 @@ -42,6 +42,8 @@
  
  #define HEART_RATE_INTERFACE "org.bluez.HeartRate"
  
-+#define MIN_NOTIFICATION_LEN 3  /* 1-byte opcode + 2-byte handle */
++#define SENSOR_LOCATION_SIZE 1
 +
- #define SENSOR_LOCATION_SIZE 1
- 
  struct heartrate {
-@@ -49,6 +51,7 @@ struct heartrate {
+ 	struct btd_device	*dev;  /*Device reference*/
  	DBusConnection		*conn; /*DBus conn*/
- 	GAttrib			*attrib; /*GATT connection*/
- 	guint			attioid; /*ATT watcher id*/
-+	guint			attionotid; /*ATT notification watcher id*/
+@@ -50,6 +52,8 @@ struct heartrate {
  	struct att_range	*svc_range; /*Heart Rate range*/
  	GSList			*chars; /*Characteristics*/
  	GSList			*watchers; /*Watchers*/
-@@ -136,8 +139,10 @@ static void heartrate_destroy(gpointer user_data)
- 	if (hr->attioid > 0)
- 		btd_device_remove_attio_callback(hr->dev, hr->attioid);
++	gboolean		has_location;
++	uint8_t		location; /*Body Sensor location*/
+ };
  
--	if (hr->attrib != NULL)
-+	if (hr->attrib != NULL) {
-+		g_attrib_unregister(hr->attrib, hr->attionotid);
- 		g_attrib_unref(hr->attrib);
-+	}
+ struct characteristic {
+@@ -238,6 +242,46 @@ static const GDBusMethodTable heartrate_methods[] = {
+ 	{ }
+ };
  
- 	if (hr->watchers != NULL)
- 		g_slist_free_full(hr->watchers, watcher_remove);
-@@ -407,6 +412,14 @@ static void configure_heartrate_cb(GSList *characteristics, guint8 status,
- 	}
- }
- 
-+static void notify_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
++static void read_sensor_location_cb(guint8 status, const guint8 *pdu,
++						guint16 len, gpointer user_data)
 +{
-+	if (len < MIN_NOTIFICATION_LEN) {
-+		error("Bad pdu received");
++	struct characteristic *ch = user_data;
++	struct heartrate *hr = ch->hr;
++	uint8_t value[SENSOR_LOCATION_SIZE];
++	ssize_t vlen;
++
++	if (status != 0) {
++		error("Body Sensor Location value read failed: %s",
++							att_ecode2str(status));
 +		return;
 +	}
++
++	vlen = dec_read_resp(pdu, len, value, sizeof(value));
++	if (vlen < 0) {
++		error("Protocol error.");
++		return;
++	}
++
++	if (vlen != 1) {
++		error("Invalid length for Body Sensor Location");
++		return;
++	}
++
++	hr->has_location = TRUE;
++	hr->location = value[0];
 +}
 +
- static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
- {
- 	struct heartrate *hr = user_data;
-@@ -415,6 +428,9 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
- 
- 	hr->attrib = g_attrib_ref(attrib);
- 
-+	hr->attionotid = g_attrib_register(hr->attrib,
-+			ATT_OP_HANDLE_NOTIFY, notify_handler, hr , NULL);
++static void process_heartrate_char(struct characteristic *ch)
++{
++	if (g_strcmp0(ch->attr.uuid,
++				HEART_RATE_CONTROL_POINT_UUID) == 0)
++		DBG("Heart Rate Control Point reset not supported by client");
++	 else if (g_strcmp0(ch->attr.uuid,
++					BODY_SENSOR_LOCATION_UUID) == 0)
++		gatt_read_char(ch->hr->attrib, ch->attr.value_handle, 0,
++						read_sensor_location_cb, ch);
++}
 +
- 	if (hr->chars == NULL)
- 		gatt_discover_char(hr->attrib, hr->svc_range->start,
- 						hr->svc_range->end, NULL,
-@@ -427,6 +443,8 @@ static void attio_disconnected_cb(gpointer user_data)
+ static void measurement_cb(guint8 status, const guint8 *pdu,
+ 						guint16 len, gpointer user_data)
+ {
+@@ -344,6 +388,8 @@ static void configure_heartrate_cb(GSList *characteristics, guint8 status,
  
- 	DBG("GATT Disconnected");
+ 		hr->chars = g_slist_append(hr->chars, ch);
  
-+	g_attrib_unregister(hr->attrib, hr->attionotid);
-+	hr->attionotid = 0;
- 	g_attrib_unref(hr->attrib);
- 	hr->attrib = NULL;
- }
++		process_heartrate_char(ch);
++
+ 		start = c->value_handle + 1;
+ 
+ 		if (l->next != NULL) {
 -- 
 1.7.9.5
 
