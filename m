@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: chanyeol.park@samsung.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] audio: Remove legacy SBC endpoint
-Date: Thu, 09 Aug 2012 15:09:27 +0900
-Message-id: <1344492568-22777-3-git-send-email-chanyeol.park@samsung.com>
+Subject: [PATCH 3/3] audio: Remove legacy MPEG endpoint
+Date: Thu, 09 Aug 2012 15:09:28 +0900
+Message-id: <1344492568-22777-4-git-send-email-chanyeol.park@samsung.com>
 In-reply-to: <1344492568-22777-1-git-send-email-chanyeol.park@samsung.com>
 References: <1344492568-22777-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,14 +13,14 @@ From: Chan-yeol Park <chanyeol.park@samsung.com>
 
 
 diff --git a/audio/a2dp.c b/audio/a2dp.c
-index a4369f5..fc8f1b7 100644
+index fc8f1b7..05eb777 100644
 --- a/audio/a2dp.c
 +++ b/audio/a2dp.c
-@@ -411,134 +411,6 @@ done:
+@@ -411,105 +411,6 @@ done:
  	return FALSE;
  }
  
--static gboolean sbc_setconf_ind(struct avdtp *session,
+-static gboolean mpeg_setconf_ind(struct avdtp *session,
 -					struct avdtp_local_sep *sep,
 -					struct avdtp_stream *stream,
 -					GSList *caps,
@@ -44,37 +44,13 @@ index a4369f5..fc8f1b7 100644
 -	setup->stream = stream;
 -	setup->setconf_cb = cb;
 -
--	/* Check valid settings */
 -	for (; caps != NULL; caps = g_slist_next(caps)) {
 -		struct avdtp_service_capability *cap = caps->data;
--		struct avdtp_media_codec_capability *codec_cap;
--		struct sbc_codec_cap *sbc_cap;
 -
 -		if (cap->category == AVDTP_DELAY_REPORTING &&
 -					!a2dp_sep->delay_reporting) {
 -			setup->err = g_new(struct avdtp_error, 1);
 -			avdtp_error_init(setup->err, AVDTP_DELAY_REPORTING,
--						AVDTP_UNSUPPORTED_CONFIGURATION);
--			goto done;
--		}
--
--		if (cap->category != AVDTP_MEDIA_CODEC)
--			continue;
--
--		if (cap->length < sizeof(struct sbc_codec_cap))
--			continue;
--
--		codec_cap = (void *) cap->data;
--
--		if (codec_cap->media_codec_type != A2DP_CODEC_SBC)
--			continue;
--
--		sbc_cap = (void *) codec_cap;
--
--		if (sbc_cap->min_bitpool < MIN_BITPOOL ||
--					sbc_cap->max_bitpool > MAX_BITPOOL) {
--			setup->err = g_new(struct avdtp_error, 1);
--			avdtp_error_init(setup->err, AVDTP_MEDIA_CODEC,
 -					AVDTP_UNSUPPORTED_CONFIGURATION);
 -			goto done;
 -		}
@@ -85,13 +61,14 @@ index a4369f5..fc8f1b7 100644
 -	return TRUE;
 -}
 -
--static gboolean sbc_getcap_ind(struct avdtp *session, struct avdtp_local_sep *sep,
--				gboolean get_all, GSList **caps, uint8_t *err,
--				void *user_data)
+-static gboolean mpeg_getcap_ind(struct avdtp *session,
+-				struct avdtp_local_sep *sep,
+-				gboolean get_all,
+-				GSList **caps, uint8_t *err, void *user_data)
 -{
 -	struct a2dp_sep *a2dp_sep = user_data;
 -	struct avdtp_service_capability *media_transport, *media_codec;
--	struct sbc_codec_cap sbc_cap;
+-	struct mpeg_codec_cap mpeg_cap;
 -
 -	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
 -		DBG("Sink %p: Get_Capability_Ind", sep);
@@ -105,36 +82,29 @@ index a4369f5..fc8f1b7 100644
 -
 -	*caps = g_slist_append(*caps, media_transport);
 -
--	memset(&sbc_cap, 0, sizeof(struct sbc_codec_cap));
+-	memset(&mpeg_cap, 0, sizeof(struct mpeg_codec_cap));
 -
--	sbc_cap.cap.media_type = AVDTP_MEDIA_TYPE_AUDIO;
--	sbc_cap.cap.media_codec_type = A2DP_CODEC_SBC;
+-	mpeg_cap.cap.media_type = AVDTP_MEDIA_TYPE_AUDIO;
+-	mpeg_cap.cap.media_codec_type = A2DP_CODEC_MPEG12;
 -
--	sbc_cap.frequency = ( SBC_SAMPLING_FREQ_48000 |
--				SBC_SAMPLING_FREQ_44100 |
--				SBC_SAMPLING_FREQ_32000 |
--				SBC_SAMPLING_FREQ_16000 );
+-	mpeg_cap.frequency = ( MPEG_SAMPLING_FREQ_48000 |
+-				MPEG_SAMPLING_FREQ_44100 |
+-				MPEG_SAMPLING_FREQ_32000 |
+-				MPEG_SAMPLING_FREQ_24000 |
+-				MPEG_SAMPLING_FREQ_22050 |
+-				MPEG_SAMPLING_FREQ_16000 );
 -
--	sbc_cap.channel_mode = ( SBC_CHANNEL_MODE_JOINT_STEREO |
--					SBC_CHANNEL_MODE_STEREO |
--					SBC_CHANNEL_MODE_DUAL_CHANNEL |
--					SBC_CHANNEL_MODE_MONO );
+-	mpeg_cap.channel_mode = ( MPEG_CHANNEL_MODE_JOINT_STEREO |
+-					MPEG_CHANNEL_MODE_STEREO |
+-					MPEG_CHANNEL_MODE_DUAL_CHANNEL |
+-					MPEG_CHANNEL_MODE_MONO );
 -
--	sbc_cap.block_length = ( SBC_BLOCK_LENGTH_16 |
--					SBC_BLOCK_LENGTH_12 |
--					SBC_BLOCK_LENGTH_8 |
--					SBC_BLOCK_LENGTH_4 );
+-	mpeg_cap.layer = ( MPEG_LAYER_MP3 | MPEG_LAYER_MP2 | MPEG_LAYER_MP1 );
 -
--	sbc_cap.subbands = ( SBC_SUBBANDS_8 | SBC_SUBBANDS_4 );
+-	mpeg_cap.bitrate = 0xFFFF;
 -
--	sbc_cap.allocation_method = ( SBC_ALLOCATION_LOUDNESS |
--					SBC_ALLOCATION_SNR );
--
--	sbc_cap.min_bitpool = MIN_BITPOOL;
--	sbc_cap.max_bitpool = MAX_BITPOOL;
--
--	media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, &sbc_cap,
--						sizeof(sbc_cap));
+-	media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, &mpeg_cap,
+-						sizeof(mpeg_cap));
 -
 -	*caps = g_slist_append(*caps, media_codec);
 -
@@ -148,16 +118,39 @@ index a4369f5..fc8f1b7 100644
 -	return TRUE;
 -}
 -
- static gboolean mpeg_setconf_ind(struct avdtp *session,
- 					struct avdtp_local_sep *sep,
- 					struct avdtp_stream *stream,
-@@ -1317,19 +1189,6 @@ static struct avdtp_sep_cfm cfm = {
+-
+ static void endpoint_setconf_cb(struct a2dp_setup *setup, gboolean ret)
+ {
+ 	if (ret == FALSE) {
+@@ -1105,21 +1006,6 @@ static gboolean reconf_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+ 	return TRUE;
+ }
+ 
+-static gboolean delayreport_ind(struct avdtp *session,
+-				struct avdtp_local_sep *sep,
+-				uint8_t rseid, uint16_t delay,
+-				uint8_t *err, void *user_data)
+-{
+-	struct a2dp_sep *a2dp_sep = user_data;
+-
+-	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
+-		DBG("Sink %p: DelayReport_Ind", sep);
+-	else
+-		DBG("Source %p: DelayReport_Ind", sep);
+-
+-	return TRUE;
+-}
+-
+ static gboolean endpoint_delayreport_ind(struct avdtp *session,
+ 						struct avdtp_local_sep *sep,
+ 						uint8_t rseid, uint16_t delay,
+@@ -1189,19 +1075,6 @@ static struct avdtp_sep_cfm cfm = {
  	.delay_report		= delay_report_cfm,
  };
  
--static struct avdtp_sep_ind sbc_ind = {
--	.get_capability		= sbc_getcap_ind,
--	.set_configuration	= sbc_setconf_ind,
+-static struct avdtp_sep_ind mpeg_ind = {
+-	.get_capability		= mpeg_getcap_ind,
+-	.set_configuration	= mpeg_setconf_ind,
 -	.get_configuration	= getconf_ind,
 -	.open			= open_ind,
 -	.start			= start_ind,
@@ -168,9 +161,9 @@ index a4369f5..fc8f1b7 100644
 -	.delayreport		= delayreport_ind,
 -};
 -
- static struct avdtp_sep_ind mpeg_ind = {
- 	.get_capability		= mpeg_getcap_ind,
- 	.set_configuration	= mpeg_setconf_ind,
+ static struct avdtp_sep_ind endpoint_ind = {
+ 	.get_capability		= endpoint_getcap_ind,
+ 	.set_configuration	= endpoint_setconf_ind,
 -- 
 1.7.9.5
 
