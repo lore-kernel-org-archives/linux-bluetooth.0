@@ -1,105 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 From: Rafal Garbat <rafal.garbat@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: <rafal.garbat@tieto.com>,
-	Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 01/13] Heart Rate Profile API
-Date: Thu, 9 Aug 2012 09:20:04 +0200
-Message-ID: <1344496816-4641-2-git-send-email-rafal.garbat@tieto.com>
-In-Reply-To: <1344496816-4641-1-git-send-email-rafal.garbat@tieto.com>
-References: <1344496816-4641-1-git-send-email-rafal.garbat@tieto.com>
+CC: <rafal.garbat@tieto.com>
+Subject: [PATCH 00/13] Add Heart Rate Service
+Date: Thu, 9 Aug 2012 09:20:03 +0200
+Message-ID: <1344496816-4641-1-git-send-email-rafal.garbat@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Santiago Carot-Nemesio <sancane@gmail.com>
+Add support for GATT Client Heart Rate Service.
 
----
- doc/heartrate-api.txt |   74 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 74 insertions(+)
+This patchset adds Heart Rate client service, exposed on Heart Rate 
+DBus API by Santiago Carot-Nemesio <sancane@gmail.com>. It allows 
+registering and unregistering watchers, handling measurement notifications
+and reseting Control Point. It bases on Thermometer service. Python 
+test script is included. Tested against Polar H7 1013EE Heart Rate Sensor.
+
+Rafal Garbat (12):
+  heartrate: Add Heart Rate Service GATT client skeleton
+  heartrate: Add conn logic and attio callbacks
+  heartrate: Discover Characteristic Descriptors
+  heartrate: Process Heart Rate Descriptors
+  heartrate: Add DBus connection logic
+  heartrate: Process Heart Rate Characteristics
+  heartrate: Add notification support
+  heartrate: Process measurements
+  heartrate: Add support for Control Point Reset
+  heartrate: Add GetProperties method handle
+  heartrate: Add org.bluez.HeartRateWatcher iface to default policy
+  heartrate: Add Heart Rate test script
+
+Santiago Carot-Nemesio (1):
+  Heart Rate Profile API
+
+ Makefile.am                    |   10 +-
+ Makefile.tools                 |    4 +-
+ doc/heartrate-api.txt          |   74 ++++
+ lib/uuid.h                     |    5 +
+ profiles/heartrate/heartrate.c |  855 ++++++++++++++++++++++++++++++++++++++++
+ profiles/heartrate/heartrate.h |   25 ++
+ profiles/heartrate/main.c      |   68 ++++
+ profiles/heartrate/manager.c   |   93 +++++
+ profiles/heartrate/manager.h   |   24 ++
+ src/bluetooth.conf             |    1 +
+ test/test-heartrate            |   78 ++++
+ 11 files changed, 1233 insertions(+), 4 deletions(-)
  create mode 100644 doc/heartrate-api.txt
+ create mode 100644 profiles/heartrate/heartrate.c
+ create mode 100644 profiles/heartrate/heartrate.h
+ create mode 100644 profiles/heartrate/main.c
+ create mode 100644 profiles/heartrate/manager.c
+ create mode 100644 profiles/heartrate/manager.h
+ create mode 100755 test/test-heartrate
 
-diff --git a/doc/heartrate-api.txt b/doc/heartrate-api.txt
-new file mode 100644
-index 0000000..2738e20
---- /dev/null
-+++ b/doc/heartrate-api.txt
-@@ -0,0 +1,74 @@
-+BlueZ D-Bus Heart Rate API description
-+****************************************
-+
-+Copyright (C) 2012	Santiago Carot-Nemesio <sancane@gmail.com>
-+
-+Heart Rate Profile hierarchy
-+============================
-+
-+Service		org.bluez
-+Interface	org.bluez.HeartRate
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-+
-+Methods		dict GetProperties()
-+
-+			Returns all properties for the interface. See the
-+			Properties section for the available properties.
-+
-+		RegisterWatcher(object agent)
-+
-+			Registers a watcher to monitor heart rate measurements.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		UnregisterWatcher(object agent)
-+
-+			Unregisters a watcher.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+					org.bluez.Error.NotFound
-+
-+		Reset()
-+
-+			Restart the accumulation of energy expended from zero.
-+
-+			Possible Errors: org.bluez.Error.NotSupported
-+
-+Properties	boolean ResetSupported [readonly]
-+
-+			True if energy expended is supported.
-+
-+Heart Rate Watcher hierarchy
-+
-+============================
-+Service		unique name
-+Interface	org.bluez.HeartRateWatcher
-+Object path	freely definable
-+
-+Methods		void MeasurementReceived(dict measure)
-+
-+			This callback is called whenever a heart rate
-+			measurement is received from the heart rate device.
-+			The unit for the Value is expressed in beats per
-+			minute (bpm). The energy field is optional and
-+			represents the accumulated energy expended in
-+			kilo Joules since last time it was reset. Furthermore,
-+			the device will be automatically reset when it
-+			is needed.
-+			The Contact field, if present, indicates
-+			that the device supports contact sensor, besides it
-+			will be true if skin contact is detected. The optional
-+			interval field is an array containing RR-Interval
-+			values which represent the time between two R-Wave
-+			detections, where the RR-Interval value 0 is older
-+			than the value 1 and so on.
-+
-+			Dict is defined as below:
-+			{
-+				"Value" : uint16,
-+				"Energy" : uint16,
-+				"Contact" : boolean,
-+				"Location" : ("Other", "Chest", "Wrist","Finger",
-+					"Hand", "Earlobe", "Foot"),
-+				"Interval" : array{uint16}
-+			}
 -- 
 1.7.9.5
 
