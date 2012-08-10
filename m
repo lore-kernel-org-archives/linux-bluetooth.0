@@ -1,125 +1,152 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vani-dineshbhai PATEL <vani.patel@stericsson.com>
-To: User Name <linux-bluetooth@vger.kernel.org>,
-	Luiz Augusto <luiz.dentz@gmail.com>
-Cc: Vani <vani.patel@stericsson.com>,
-	Joohi <Joohi.rastogi@stericsson.com>, Vani <vani273@gmail.com>
-Subject: [PATCH BlueZ V5 1/5] AVRCP: Add TG Record to support AVRCP Browsing
-Date: Fri, 10 Aug 2012 15:05:00 +0530
-Message-ID: <1344591300-1003-1-git-send-email-vani.patel@stericsson.com>
-In-Reply-To: <yes>
-References: <yes>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20120809144555.GB2683@aemeltch-MOBL1>
+References: <501BC0D5.8080403@linux.intel.com>
+	<501BC282.9070509@linux.intel.com>
+	<CAJ2qBzaLyPiwEcd2n5Kdu_Y4KMpYjvjGo+Ddk3RC1Cf6_k=K9A@mail.gmail.com>
+	<20120809144555.GB2683@aemeltch-MOBL1>
+Date: Fri, 10 Aug 2012 10:02:53 +0100
+Message-ID: <CAJ2qBzZ3bYd-9ab41q1Xp3xt4m+evp5w5Yx9T1-ZkasP272sMQ@mail.gmail.com>
+Subject: Re: RFCOMM disconnection problem
+From: Dean Jenkins <djenkins@mvista.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Dean Jenkins <djenkins@mvista.com>,
+	Frederic Danis <frederic.danis@linux.intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Vani Patel <vani.patel@stericsson.com>
+On 9 August 2012 15:46, Andrei Emeltchenko
+<andrei.emeltchenko.news@gmail.com> wrote:
+> Hi Dean,
+>
+> On Thu, Aug 09, 2012 at 03:29:18PM +0100, Dean Jenkins wrote:
+>> One obvious failure of the rfcomm session refcnt is that the refcnt
+>> counter either starts with a value of 0 or 1 depending on which peer
+>> initiated the connection request, that is wrong. The initiator
+>> direction is not relevant for the session as connect and disconnect
+>> are independent events. The refcnt should start with a value of 1 in
+>> all cases.
+>>
+>> I am using a 2-core ARM environment that is under high processor
+>> loading. The rfcomm session refcnt caused kernel crashes. I used a
+>> 2.6.34 kernel but the latest 3.5-RC1 still has the poor rfcomm code.
+>> My solution was to remove the rfcomm session refcnt and to ensure that
+>> the freeing of the rfcomm session pointer was propagated through-out
+>> the rfcomm core code. Some kernel crashes were due to reuse of the
+>> freed rfcomm session pointer.
+>
+> Maybe it does make sense to fix refcounting instead of removing?
+>
+Hi Andrei,
 
-Adds SDP record to support browsing
----
- audio/avctp.c |    4 ++--
- audio/avctp.h |    3 ++-
- audio/avrcp.c |   25 +++++++++++++++++++++----
- 3 files changed, 25 insertions(+), 7 deletions(-)
+The existing rfcomm session state machine is capable of determining
+when to delete the rfcomm session structure. IMHO the refcnt is an
+unnecessary complication. I have fixed rfcomm for our project by
+removing the refcnt and ensuring no code can reuse a freed rfcomm
+session pointer. This code I have already sent to the mailing list.
 
-diff --git a/audio/avctp.c b/audio/avctp.c
-index 074eabd..a20dba9 100644
---- a/audio/avctp.c
-+++ b/audio/avctp.c
-@@ -802,7 +802,7 @@ static GIOChannel *avctp_server_socket(const bdaddr_t *src, gboolean master)
- 	io = bt_io_listen(BT_IO_L2CAP, NULL, avctp_confirm_cb, NULL,
- 				NULL, &err,
- 				BT_IO_OPT_SOURCE_BDADDR, src,
--				BT_IO_OPT_PSM, AVCTP_PSM,
-+				BT_IO_OPT_PSM, AVCTP_CONTROL_PSM,
- 				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
- 				BT_IO_OPT_MASTER, master,
- 				BT_IO_OPT_INVALID);
-@@ -1090,7 +1090,7 @@ struct avctp *avctp_connect(const bdaddr_t *src, const bdaddr_t *dst)
- 	io = bt_io_connect(BT_IO_L2CAP, avctp_connect_cb, session, NULL, &err,
- 				BT_IO_OPT_SOURCE_BDADDR, &session->server->src,
- 				BT_IO_OPT_DEST_BDADDR, &session->dst,
--				BT_IO_OPT_PSM, AVCTP_PSM,
-+				BT_IO_OPT_PSM, AVCTP_CONTROL_PSM,
- 				BT_IO_OPT_INVALID);
- 	if (err) {
- 		avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
-diff --git a/audio/avctp.h b/audio/avctp.h
-index d0cbd97..34b0c1c 100644
---- a/audio/avctp.h
-+++ b/audio/avctp.h
-@@ -22,7 +22,8 @@
-  *
-  */
- 
--#define AVCTP_PSM 23
-+#define AVCTP_CONTROL_PSM	23
-+#define AVCTP_BROWSING_PSM	27
- 
- #define AVC_MTU 512
- #define AVC_HEADER_LENGTH 3
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index d925365..ca40c1e 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -190,7 +190,7 @@ static sdp_record_t *avrcp_ct_record(void)
- 	sdp_list_t *aproto, *proto[2];
- 	sdp_record_t *record;
- 	sdp_data_t *psm, *version, *features;
--	uint16_t lp = AVCTP_PSM;
-+	uint16_t lp = AVCTP_CONTROL_PSM;
- 	uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103;
- 	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
- 						AVRCP_FEATURE_CATEGORY_2 |
-@@ -252,13 +252,15 @@ static sdp_record_t *avrcp_ct_record(void)
- 
- static sdp_record_t *avrcp_tg_record(void)
- {
--	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root, *apseq_browsing;
- 	uuid_t root_uuid, l2cap, avctp, avrtg;
- 	sdp_profile_desc_t profile[1];
- 	sdp_list_t *aproto, *proto[2];
- 	sdp_record_t *record;
--	sdp_data_t *psm, *version, *features;
--	uint16_t lp = AVCTP_PSM;
-+	sdp_data_t *psm, *version, *features, *psm_browsing;
-+	sdp_list_t *aproto_browsing, *proto_browsing[2] = {0};
-+	uint16_t lp = AVCTP_CONTROL_PSM;
-+	uint16_t lp_browsing = AVCTP_BROWSING_PSM;
- 	uint16_t avrcp_ver = 0x0104, avctp_ver = 0x0103;
- 	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
- 					AVRCP_FEATURE_CATEGORY_2 |
-@@ -294,6 +296,17 @@ static sdp_record_t *avrcp_tg_record(void)
- 
- 	aproto = sdp_list_append(0, apseq);
- 	sdp_set_access_protos(record, aproto);
-+	proto_browsing[0] = sdp_list_append(0, &l2cap);
-+	psm_browsing = sdp_data_alloc(SDP_UINT16, &lp_browsing);
-+	proto_browsing[0] = sdp_list_append(proto_browsing[0], psm_browsing);
-+	apseq_browsing = sdp_list_append(0, proto_browsing[0]);
-+
-+	proto_browsing[1] = sdp_list_append(0, &avctp);
-+	proto_browsing[1] = sdp_list_append(proto_browsing[1], version);
-+	apseq_browsing = sdp_list_append(apseq_browsing, proto_browsing[1]);
-+
-+	aproto_browsing = sdp_list_append(0, apseq_browsing);
-+	sdp_set_add_access_protos(record, aproto_browsing);
- 
- 	/* Bluetooth Profile Descriptor List */
- 	sdp_uuid16_create(&profile[0].uuid, AV_REMOTE_PROFILE_ID);
-@@ -306,6 +319,10 @@ static sdp_record_t *avrcp_tg_record(void)
- 
- 	sdp_set_info_attr(record, "AVRCP TG", 0, 0);
- 
-+	free(psm_browsing);
-+	sdp_list_free(proto_browsing[0], 0);
-+	sdp_list_free(proto_browsing[1], 0);
-+	sdp_list_free(aproto_browsing, 0);
- 	free(psm);
- 	free(version);
- 	sdp_list_free(proto[0], 0);
+In order to get rfcomm to fail, high processor load is necessary
+during disconnections to ensure that some of the loops in rfcomm
+process more than 1 thing. It is because there are multiple copies of
+the rfcomm session pointer s that failure occurs eg. double rfcomm
+session free.
+
+Here is an example in net/bluetooth/rfcomm/core.c:
+
+static inline void rfcomm_process_rx(struct rfcomm_session *s)
+{
+	struct socket *sock = s->sock;
+	struct sock *sk = sock->sk;
+	struct sk_buff *skb;
+
+	BT_DBG("session %p state %ld qlen %d", s, s->state,
+skb_queue_len(&sk->sk_receive_queue));
+
+	/* Get data directly from socket receive queue without copying it. */
+	while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
+		skb_orphan(skb);
+		if (!skb_linearize(skb))
+			rfcomm_recv_frame(s, skb);
+		else
+			kfree_skb(skb);
+	}
+
+	if (sk->sk_state == BT_CLOSED) {
+		if (!s->initiator)
+			rfcomm_session_put(s);
+
+		rfcomm_session_close(s, sk->sk_err);
+	}
+}
+
+In rfcomm_process_rx(), you can see there is a while loop that causes
+frames to be analysed and actioned in rfcomm_recv_frame(). This action
+may cause the rfcomm session pointer to be freed because the rfcomm
+session refcnt has reached zero. Therefore, the s pointer is now
+invalid in the scope of rfcomm_process_rx() because the underlying
+session structure was freed. Unfortunately,  if the socket state is
+also detected as BT_CLOSED then !s->initiator may cause a crash or at
+least accesses wrong data as the s pointer is invalid (pointing to
+freed memory or reallocated memory). The refcnt in
+rfcomm_session_put(s) is also invalid as s is invalid. In fact looking
+at the initiator value is wrong for the rfcomm session. I suspect this
+was a workaround that did not fix the root cause.
+
+In practice, this failure scenario is difficult to reproduce (we hit
+it in our embedded environment). It requires the socket to be in the
+BT_CLOSED at the same time as the rfcomm session has been freed in a
+single run of rfcomm_process_rx(). This is why high processor loading
+triggers the malfunction because rfcomm_process_rx() maybe pre-empted
+or time-sliced so rfcomm_process_rx() takes longer to complete than
+normal. This gives the opportunity for the socket state to change to
+BT_CLOSED during the run-time of rfcomm_process_rx().
+
+In other words, the refcnt going to zero does not prevent copies of
+the rfcomm session pointer s that now points to freed memory (or
+reallocated memory) from being erroneously reused.
+
+You can also see
+
+		if (!s->initiator)
+			rfcomm_session_put(s);
+
+		rfcomm_session_close(s, sk->sk_err);
+
+If rfcomm_session_put(s) succeeds in causing the refcnt to go to zero,
+the rfcomm session structure will be freed. s is now invalid.
+Unfortunately, rfcomm_session_close(s, sk->sk_err) reuses the s
+pointer with a potential for a crash.
+
+The refcnt could be fixed but fixing it will show it to be unnecessary
+code IMHO. One of the weaknesses in the code is not managing the s
+pointer after the session has been freed.
+
+I do intend to release a patchset of all our rfcomm changes.
+
+I welcome any comments.
+
+Regards,
+Dean
+
+> Best regards
+> Andrei Emeltchenko
+>
+>>
+>> I intend to release a patchset of rfcomm fixes.
+>>
+>> Therefore, IMHO the fix "Bluetooth: Fix RFCOMM session reference
+>> counting issue" (commit cf33e7 in linux-stable.git) from Octavian
+>> Purdila in kernel 3.4.6 is in fact not fixing the root cause and
+>> introduces a misbehaviour of the refcnt. In our project, we rejected
+>> this commit because disconnections failed.
+>>
+>
+
+
 -- 
-1.7.5.4
-
+Dean Jenkins
+Embedded Software Engineer
+Professional Services UK/EMEA
+MontaVista Software, LLC
