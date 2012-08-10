@@ -1,30 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 10 Aug 2012 15:50:37 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv2 12/20] Bluetooth: Choose connection based on capabilities
-Message-ID: <20120810125035.GE2683@aemeltch-MOBL1>
-References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1343136121-22476-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20120724211038.GE20029@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120724211038.GE20029@joana>
+In-Reply-To: <1344528453-27245-1-git-send-email-luf@pzkagis.cz>
+References: <1344528453-27245-1-git-send-email-luf@pzkagis.cz>
+Date: Fri, 10 Aug 2012 14:28:27 +0300
+Message-ID: <CABBYNZ+-a5csWYzZ4YdH1G9ZCrp1KUHB9ayNQYC5=8ks+SzEvQ@mail.gmail.com>
+Subject: Re: [PATCH obexd] client: Fix pbap_select using absolute path with
+ known locations
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ludek Finstrle <luf@pzkagis.cz>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Ludek,
 
-On Tue, Jul 24, 2012 at 06:10:38PM -0300, Gustavo Padovan wrote:
-> > +void l2cap_discover_amp(struct l2cap_chan *chan)
-> 
-> prefix a function with l2cap_ outside of the l2cap code is not really a good
-> idea, we need a better solution here..
+On Thu, Aug 9, 2012 at 7:07 PM, Ludek Finstrle <luf@pzkagis.cz> wrote:
+> pbap_select has to use absolute path with known location to support
+> repeatable pbap_select calls. In other way the second call fails.
+> ---
+>  client/pbap.c |    4 ++--
+>  1 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/client/pbap.c b/client/pbap.c
+> index 48dbac1..d8c39e5 100644
+> --- a/client/pbap.c
+> +++ b/client/pbap.c
+> @@ -232,14 +232,14 @@ static gchar *build_phonebook_path(const char *location, const char *item)
+>
+>         if (!g_ascii_strcasecmp(location, "INT") ||
+>                         !g_ascii_strcasecmp(location, "INTERNAL"))
+> -               path = g_strdup("telecom");
+> +               path = g_strdup("/telecom");
+>         else if (!g_ascii_strncasecmp(location, "SIM", 3)) {
+>                 if (strlen(location) == 3)
+>                         tmp = g_strdup("SIM1");
+>                 else
+>                         tmp = g_ascii_strup(location, 4);
+>
+> -               path = g_build_filename(tmp, "telecom", NULL);
+> +               path = g_build_filename("/", tmp, "telecom", NULL);
+>                 g_free(tmp);
+>         } else
+>                 return NULL;
+> --
+> 1.7.1
+>
 
-I will rename this to a2mp_discover_amp
+Applied, thanks.
 
-Best regards 
-Andrei Emeltchenko 
 
+-- 
+Luiz Augusto von Dentz
