@@ -1,45 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jefferson Delfes <jefferson.delfes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [RFC 0/5] Broadcaster/Observer MGMT API
-Date: Fri, 10 Aug 2012 17:01:42 -0400
-Message-Id: <1344632507-21381-1-git-send-email-jefferson.delfes@openbossa.org>
+Date: Fri, 10 Aug 2012 15:50:37 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv2 12/20] Bluetooth: Choose connection based on capabilities
+Message-ID: <20120810125035.GE2683@aemeltch-MOBL1>
+References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1343136121-22476-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20120724211038.GE20029@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120724211038.GE20029@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-After some discussions on BlueZ meeting, it was decided to have a MGMT API for
-Broadcaster and Observer roles.
+Hi Gustavo,
 
-The normal flow for Broadcaster is set controller data for any data needed and
-set broadcaster on. For now, kernel will try to pack as much data as possible
-for Adv. In future, we may implement a rotation logic to send all data set by
-userspace.
-Use unset controller data with respective data_type to remove any data that
-matches this data_type.
-After adding or removing controller data, to update Adv data, you need to set
-broadcaster off and after set broadcaster on, so adv. data can be updated on
-the controller.
+On Tue, Jul 24, 2012 at 06:10:38PM -0300, Gustavo Padovan wrote:
+> > +void l2cap_discover_amp(struct l2cap_chan *chan)
+> 
+> prefix a function with l2cap_ outside of the l2cap code is not really a good
+> idea, we need a better solution here..
 
-To start observer, just set observer to on. Any data will come from device
-found event.
+I will rename this to a2mp_discover_amp
 
-We have patches for userspace that will hit BlueZ ML next week.
-
-Jefferson Delfes (5):
-  Bluetooth: Add new commands HCI for LE and BR/EDR
-  Bluetooth: Add set controller data MGMT command
-  Bluetooth: Add unset controller data MGMT command
-  Bluetooth: Add set broadcaster MGMT command
-  Bluetooth: Add set observer MGMT command
-
- include/net/bluetooth/hci.h      |  30 +++++++
- include/net/bluetooth/hci_core.h |  15 ++++
- include/net/bluetooth/mgmt.h     |  23 ++++++
- net/bluetooth/hci_core.c         |  48 +++++++++++
- net/bluetooth/mgmt.c             | 167 +++++++++++++++++++++++++++++++++++++++
- 5 files changed, 283 insertions(+)
-
--- 
-1.7.11.4
+Best regards 
+Andrei Emeltchenko 
 
