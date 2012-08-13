@@ -1,29 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ 0/3] HoG: Add support for non-HID services encapsulated in the HID protocol
-Date: Mon, 13 Aug 2012 09:23:13 -0300
-Message-Id: <1344860596-30617-1-git-send-email-jprvita@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <5027DC19.8020505@ntlworld.com>
+References: <5027DC19.8020505@ntlworld.com>
+Date: Mon, 13 Aug 2012 15:23:00 +0300
+Message-ID: <CABBYNZJTkSf1BFZYge9R5WX7m79=hkDfaENh201EygSdck_yyQ@mail.gmail.com>
+Subject: Re: gstreamer a2dpSource plugin
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "alistair.rodger" <alistair.rodger@ntlworld.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The HID protocol support encapsulating non-HID service data as reports. This
-patches adds support for this feature for HoG devices.
+Hi,
 
-João Paulo Rechi Vita (3):
-  gatt: Add a new descriptor UUID
-  hog: discover External Report Reference descriptor
-  hog: discover the non-HID service characteristic
+On Sun, Aug 12, 2012 at 7:38 PM, alistair.rodger
+<alistair.rodger@ntlworld.com> wrote:
+> Hello,
+>
+> I am looking for some help getting audio out of the bluez stack using
+> gstreamer? Are we still using an alsa source or should we be using the
+> MediaTransport file descriptor.
+>
+> I am able to generate a sink file descriptor, using the simple-endpoint
+> script, but don't know which gstreamer plugin to use.
+>
+> I am able stream to a device using the a2dpsink.
 
- attrib/gatt.h               |  1 +
- profiles/input/hog_device.c | 96 ++++++++++++++++++++++++++++++++++++++-------
- 2 files changed, 83 insertions(+), 14 deletions(-)
+What do you mean by which plugin to use? You are using a2dpsink
+already, I don't think I got what you want.
+
+I normally test using the following pipeline:
+
+gst-launch -v audiotestsrc ! audio/x-raw-int,channels=2 ! audioconvert
+! sbcenc ! a2dpsink
+transport=/org/bluez/{PID}/hci0/dev_AA_BB_CC_DD_EE_FF/fd0
 
 -- 
-1.7.11.2
-
+Luiz Augusto von Dentz
