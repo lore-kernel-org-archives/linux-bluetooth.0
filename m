@@ -1,96 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 02/20] Bluetooth: Add callback clear to ops->teardown
-Date: Mon, 13 Aug 2012 16:50:20 +0300
-Message-Id: <1344865838-9165-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1344865838-9165-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1344865838-9165-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+Subject: [PATCH BlueZ 3/3] hog: discover the non-HID service characteristic
+Date: Mon, 13 Aug 2012 09:23:16 -0300
+Message-Id: <1344860596-30617-4-git-send-email-jprvita@openbossa.org>
+In-Reply-To: <1344860596-30617-1-git-send-email-jprvita@openbossa.org>
+References: <1344860596-30617-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-ops->teardown takes care about deleting queued callbacks for all AMP
-controllers.
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Find the characteristic by the UUID provided on the External Report
+Reference descriptor and enable notifications for it. The characteristic
+will be handled as a HID report and it's data processed through the uhid
+device.
 ---
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/a2mp.c             |   17 ++++++++++++++++-
- net/bluetooth/hci_core.c         |    3 +--
- 3 files changed, 18 insertions(+), 3 deletions(-)
+ profiles/input/hog_device.c | 76 +++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 59 insertions(+), 17 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 0985014..ccbf01d 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1117,5 +1117,6 @@ int hci_callback_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen,
- 			  gfp_t flags);
- void hci_callback_remove(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
- void hci_callback_process(struct hci_dev *hdev, __u16 opcode, u8 status);
-+void hci_callback_clear(struct hci_dev *hdev);
- 
- #endif /* __HCI_CORE_H */
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 44ef201..3d872db 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -444,16 +444,31 @@ static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
- 	return bt_skb_alloc(len, GFP_KERNEL);
+diff --git a/profiles/input/hog_device.c b/profiles/input/hog_device.c
+index f4cf596..5a1de12 100644
+--- a/profiles/input/hog_device.c
++++ b/profiles/input/hog_device.c
+@@ -170,23 +170,6 @@ static void write_ccc(uint16_t handle, gpointer user_data)
+ 					report_ccc_written_cb, hogdev);
  }
  
-+static void a2mp_chan_teardown_cb(struct l2cap_chan *chan, int err)
+-static void external_report_reference_cb(guint8 status, const guint8 *pdu,
+-					guint16 plen, gpointer user_data)
+-{
+-	if (status != 0) {
+-		error("Read External Report Reference descriptor failed: %s",
+-							att_ecode2str(status));
+-		return;
+-	}
+-
+-	if (plen != 3) {
+-		error("Malformed ATT read response");
+-		return;
+-	}
+-
+-	DBG("External Report Reference read: 0x%02x 0x%02x", pdu[1], pdu[2]);
+-}
+-
+ static void report_reference_cb(guint8 status, const guint8 *pdu,
+ 					guint16 plen, gpointer user_data)
+ {
+@@ -208,6 +191,9 @@ static void report_reference_cb(guint8 status, const guint8 *pdu,
+ 	DBG("Report ID: 0x%02x Report type: 0x%02x", pdu[1], pdu[2]);
+ }
+ 
++static void external_report_reference_cb(guint8 status, const guint8 *pdu,
++					guint16 plen, gpointer user_data);
++
+ static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
+ 					guint16 len, gpointer user_data)
+ {
+@@ -274,6 +260,62 @@ static void discover_descriptor(GAttrib *attrib, struct gatt_char *chr,
+ 	gatt_find_info(attrib, start, end, discover_descriptor_cb, user_data);
+ }
+ 
++static void external_service_char_cb(GSList *chars, guint8 status,
++							gpointer user_data)
 +{
-+	struct hci_dev *hdev, *tmp;
++	struct hog_device *hogdev = user_data;
++	struct report *report;
++	GSList *l;
 +
-+	BT_DBG("chan %p", chan);
++	if (status != 0) {
++		const char *str = att_ecode2str(status);
++		DBG("Discover external service characteristic failed: %s", str);
++		return;
++	}
 +
-+	list_for_each_entry_safe(hdev, tmp, &hci_dev_list, list) {
-+		hci_dev_hold(hdev);
-+		/* Iterate through AMP controllers */
-+		if (hdev->amp_type == HCI_AMP)
-+			hci_callback_clear(hdev);
-+		hci_dev_put(hdev);
++	for (l = chars; l; l = g_slist_next(l)) {
++		struct gatt_char *chr, *next;
++
++		chr = l->data;
++		next = l->next ? l->next->data : NULL;
++
++		DBG("0x%04x UUID: %s properties: %02x",
++				chr->handle, chr->uuid, chr->properties);
++
++		report = g_new0(struct report, 1);
++		report->hogdev = hogdev;
++		report->decl = g_memdup(chr, sizeof(*chr));
++		hogdev->reports = g_slist_append(hogdev->reports, report);
++		discover_descriptor(hogdev->attrib, chr, next, report);
 +	}
 +}
 +
- static struct l2cap_ops a2mp_chan_ops = {
- 	.name = "L2CAP A2MP channel",
- 	.recv = a2mp_chan_recv_cb,
- 	.close = a2mp_chan_close_cb,
- 	.state_change = a2mp_chan_state_change_cb,
- 	.alloc_skb = a2mp_chan_alloc_skb_cb,
-+	.teardown = a2mp_chan_teardown_cb,
- 
- 	/* Not implemented for A2MP */
- 	.new_connection = l2cap_chan_no_new_connection,
--	.teardown = l2cap_chan_no_teardown,
- 	.ready = l2cap_chan_no_ready,
- };
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ecc8644..60ba01f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -36,7 +36,6 @@
- static void hci_rx_work(struct work_struct *work);
- static void hci_cmd_work(struct work_struct *work);
- static void hci_tx_work(struct work_struct *work);
--static void hci_callback_clear(struct hci_dev *hdev);
- 
- /* HCI device list */
- LIST_HEAD(hci_dev_list);
-@@ -2180,7 +2179,7 @@ void hci_callback_remove(struct hci_dev *hdev, struct hci_cb_cmd *cmd)
- 	}
- }
- 
--static void hci_callback_clear(struct hci_dev *hdev)
-+void hci_callback_clear(struct hci_dev *hdev)
++static void external_report_reference_cb(guint8 status, const guint8 *pdu,
++					guint16 plen, gpointer user_data)
++{
++	struct hog_device *hogdev = user_data;
++	uint16_t uuid16;
++	bt_uuid_t uuid;
++
++	if (status != 0) {
++		error("Read External Report Reference descriptor failed: %s",
++							att_ecode2str(status));
++		return;
++	}
++
++	if (plen != 3) {
++		error("Malformed ATT read response");
++		return;
++	}
++
++	uuid16 = att_get_u16(&pdu[1]);
++	DBG("External report reference read, external report characteristic "
++						"UUID: 0x%04x", uuid16);
++	bt_uuid16_create(&uuid, uuid16);
++	gatt_discover_char(hogdev->attrib, 0x00, 0xff, &uuid,
++					external_service_char_cb, hogdev);
++}
++
+ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 							gpointer user_data)
  {
- 	struct hci_cb_cmd *cmd, *tmp;
- 
 -- 
-1.7.9.5
+1.7.11.2
 
