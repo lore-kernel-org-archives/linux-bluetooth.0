@@ -1,26 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 13 Aug 2012 13:29:07 +0300
+Date: Mon, 13 Aug 2012 13:27:24 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] input: Fix crash when connecting HID keyboard
-Message-ID: <20120813102907.GC22250@x220.ger.corp.intel.com>
-References: <1343738904-12556-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: Re: [PATCH BlueZ] btmgmt: Fix endianness conversion
+Message-ID: <20120813102724.GB22250@x220.ger.corp.intel.com>
+References: <1343743081-25474-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1343738904-12556-1-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1343743081-25474-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi Lizardo,
 
-On Tue, Jul 31, 2012, Andrzej Kaczmarek wrote:
-> hidp_add_connection should return after setting up security watch when
-> connecting HID keyboard, otherwise req will be freed and encrypt_notify
-> callback will receive invalid pointer.
+On Tue, Jul 31, 2012, Anderson Lizardo wrote:
+> Flags field has 32-bit size. Same issue was fixed for mgmtops in
+> 1801a4d45d74c29cebacaab79a07e9961300be41.
 > ---
->  profiles/input/device.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  tools/btmgmt.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Applied. Thanks.
 
