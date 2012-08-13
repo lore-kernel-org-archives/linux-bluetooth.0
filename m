@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 05/20] Bluetooth: A2MP: Process Discover Response
-Date: Mon, 13 Aug 2012 16:50:23 +0300
-Message-Id: <1344865838-9165-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 11/20] Bluetooth: A2MP: Create A2MP workqueue
+Date: Mon, 13 Aug 2012 16:50:29 +0300
+Message-Id: <1344865838-9165-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1344865838-9165-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1344865838-9165-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,102 +12,106 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When receiving A2MP Discover Response send A2MP Get Info Request
-for each AMP controller in the discovery list.
+Workqueue might be used for A2MP tasks which cannot be run from
+L2CAP of HCI code due to unsafe locking scenarios. For example in
+l2cap_security_cfm and l2cap_conn_start we need to discover and
+create amp manager from the code surrounded with &conn->chan_lock
+and &chan->lock.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   62 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 61 insertions(+), 1 deletion(-)
+ include/net/bluetooth/a2mp.h |    2 ++
+ net/bluetooth/a2mp.c         |   38 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/l2cap_core.c   |    6 ++++++
+ 3 files changed, 46 insertions(+)
 
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+index 8ba236c..345fbc6 100644
+--- a/include/net/bluetooth/a2mp.h
++++ b/include/net/bluetooth/a2mp.h
+@@ -129,5 +129,7 @@ int amp_mgr_put(struct amp_mgr *mgr);
+ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
+ 				       struct sk_buff *skb);
+ void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data);
++int a2mp_init(void);
++void a2mp_exit(void);
+ 
+ #endif /* __A2MP_H */
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 3468599..a264f22 100644
+index d582fc8..f331a81 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -63,6 +63,14 @@ void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data)
- 	kfree(cmd);
- }
+@@ -19,6 +19,8 @@
+ #include <net/bluetooth/amp.h>
+ #include <net/bluetooth/pal.h>
  
-+static u8 __next_ident(struct amp_mgr *mgr)
-+{
-+	if (++mgr->ident == 0)
-+		mgr->ident = 1;
++static struct workqueue_struct *amp_workqueue;
 +
-+	return mgr->ident;
+ /* A2MP build & send command helper functions */
+ static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
+ {
+@@ -766,3 +768,39 @@ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
+ 
+ 	return mgr->a2mp_chan;
+ }
++
++void l2cap_discover_amp(struct l2cap_chan *chan)
++{
++	struct a2mp_discov_req req;
++	struct l2cap_conn *conn = chan->conn;
++	struct amp_mgr *mgr = conn->hcon->amp_mgr;
++
++	BT_DBG("%p", conn);
++
++	if (!mgr) {
++		mgr = amp_mgr_create(conn);
++		if (!mgr)
++			return;
++	}
++
++	mgr->bredr_chan = chan;
++
++	req.mtu = cpu_to_le16(L2CAP_A2MP_DEFAULT_MTU);
++	req.ext_feat = 0;
++	a2mp_send(mgr, A2MP_DISCOVER_REQ, 1, sizeof(req), &req);
 +}
 +
- static inline void __a2mp_cl_bredr(struct a2mp_cl *cl)
- {
- 	cl->id = 0;
-@@ -161,6 +169,55 @@ static int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 	return 0;
- }
- 
-+static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
-+			     struct a2mp_cmd *hdr)
++int a2mp_init(void)
 +{
-+	struct a2mp_discov_rsp *rsp = (void *) skb->data;
-+	u16 len = le16_to_cpu(hdr->len);
-+	struct a2mp_cl *cl;
-+	u16 ext_feat;
-+
-+	if (len < sizeof(*rsp))
-+		return -EINVAL;
-+
-+	len -= sizeof(*rsp);
-+	skb_pull(skb, sizeof(*rsp));
-+
-+	ext_feat = le16_to_cpu(rsp->ext_feat);
-+
-+	BT_DBG("mtu %d efm 0x%4.4x", le16_to_cpu(rsp->mtu), ext_feat);
-+
-+	/* check that packet is not broken for now */
-+	while (ext_feat & A2MP_FEAT_EXT) {
-+		if (len < sizeof(ext_feat))
-+			return -EINVAL;
-+
-+		ext_feat = get_unaligned_le16(skb->data);
-+		BT_DBG("efm 0x%4.4x", ext_feat);
-+		len -= sizeof(ext_feat);
-+		skb_pull(skb, sizeof(ext_feat));
-+	}
-+
-+	cl = (void *) skb->data;
-+	while (len >= sizeof(*cl)) {
-+		BT_DBG("Remote AMP id %d type %d status %d", cl->id, cl->type,
-+		       cl->status);
-+
-+		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
-+			struct a2mp_info_req req;
-+
-+			req.id = cl->id;
-+			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
-+				  sizeof(req), &req);
-+		}
-+
-+		len -= sizeof(*cl);
-+		cl = (void *) skb_pull(skb, sizeof(*cl));
-+	}
++	amp_workqueue = create_singlethread_workqueue("a2mp");
++	if (!amp_workqueue)
++		return -EPERM;
 +
 +	return 0;
 +}
 +
- static int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
- 			      struct a2mp_cmd *hdr)
- {
-@@ -378,8 +435,11 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 			err = a2mp_discphyslink_req(mgr, skb, hdr);
- 			break;
++void a2mp_exit(void)
++{
++	flush_workqueue(amp_workqueue);
++	destroy_workqueue(amp_workqueue);
++}
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 4dbbb79..d4e99d6 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5730,11 +5730,17 @@ int __init l2cap_init(void)
+ 			BT_ERR("Failed to create L2CAP debug file");
+ 	}
  
--		case A2MP_CHANGE_RSP:
- 		case A2MP_DISCOVER_RSP:
-+			err = a2mp_discover_rsp(mgr, skb, hdr);
-+			break;
++	if (enable_hs)
++		return a2mp_init();
 +
-+		case A2MP_CHANGE_RSP:
- 		case A2MP_GETINFO_RSP:
- 		case A2MP_GETAMPASSOC_RSP:
- 		case A2MP_CREATEPHYSLINK_RSP:
+ 	return 0;
+ }
+ 
+ void l2cap_exit(void)
+ {
++	if (enable_hs)
++		a2mp_exit();
++
+ 	debugfs_remove(l2cap_debugfs);
+ 	l2cap_cleanup_sockets();
+ }
 -- 
 1.7.9.5
 
