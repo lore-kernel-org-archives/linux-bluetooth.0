@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 07/20] Bluetooth: AMP: Remote AMP ctrl definitions
-Date: Mon, 13 Aug 2012 16:50:25 +0300
-Message-Id: <1344865838-9165-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 05/20] Bluetooth: A2MP: Process Discover Response
+Date: Mon, 13 Aug 2012 16:50:23 +0300
+Message-Id: <1344865838-9165-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1344865838-9165-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1344865838-9165-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,171 +12,102 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Create remote AMP controllers structure. It is used to keep information
-about discovered remote AMP controllers by A2MP protocol.
+When receiving A2MP Discover Response send A2MP Get Info Request
+for each AMP controller in the discovery list.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |    3 ++
- include/net/bluetooth/pal.h  |   14 ++++++++
- net/bluetooth/a2mp.c         |    5 +++
- net/bluetooth/pal.c          |   81 ++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 103 insertions(+)
+ net/bluetooth/a2mp.c |   62 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 61 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 012f573..8ba236c 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -29,6 +29,9 @@ struct amp_mgr {
- 
- 	struct list_head	phy_links;
- 	struct mutex		phy_links_lock;
-+
-+	struct list_head	amp_ctrls;
-+	struct mutex		amp_ctrls_lock;
- };
- 
- struct a2mp_cmd {
-diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
-index 201c501..3223ec2 100644
---- a/include/net/bluetooth/pal.h
-+++ b/include/net/bluetooth/pal.h
-@@ -32,6 +32,20 @@ struct phy_link {
- 	struct kref		kref;
- };
- 
-+struct amp_ctrl {
-+	struct list_head	list;
-+	struct kref		kref;
-+	__u8			id;
-+	__u16			assoc_len_so_far;
-+	__u16			assoc_rem_len;
-+	__u16			assoc_len;
-+	__u8			*assoc;
-+};
-+
-+int amp_ctrl_put(struct amp_ctrl *ctrl);
-+struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr);
-+struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id);
-+void amp_ctrl_list_flush(struct amp_mgr *mgr);
- struct phy_link *phylink_add(struct amp_mgr *mgr, u8 local_id, u8 remote_id,
- 			     u8 *rem_assoc, u16 assoc_size);
- struct phy_link *phylink_lookup(struct amp_mgr *mgr, u8 local_id, u8 remote_id);
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 3df7cb5..f35d90f 100644
+index 3468599..a264f22 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -595,6 +595,7 @@ static void amp_mgr_destroy(struct kref *kref)
- 
- 	BT_DBG("mgr %p", mgr);
- 
-+	amp_ctrl_list_flush(mgr);
- 	phylink_list_flush(mgr);
- 	kfree(mgr);
+@@ -63,6 +63,14 @@ void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data)
+ 	kfree(cmd);
  }
-@@ -634,6 +635,10 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
- 	INIT_LIST_HEAD(&mgr->phy_links);
- 	mutex_init(&mgr->phy_links_lock);
  
-+	/* Remote AMP ctrl list initialization */
-+	INIT_LIST_HEAD(&mgr->amp_ctrls);
-+	mutex_init(&mgr->amp_ctrls_lock);
-+
- 	kref_init(&mgr->kref);
- 
- 	return mgr;
-diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
-index 24fb3aa..335cbc3 100644
---- a/net/bluetooth/pal.c
-+++ b/net/bluetooth/pal.c
-@@ -22,6 +22,87 @@ enum pal_states {
- 	DISCONNECTING
- };
- 
-+/* Remote AMP Controllers handling */
-+static void amp_ctrl_get(struct amp_ctrl *ctrl)
++static u8 __next_ident(struct amp_mgr *mgr)
 +{
-+	BT_DBG("ctrl %p orig refcnt %d", ctrl,
-+	       atomic_read(&ctrl->kref.refcount));
++	if (++mgr->ident == 0)
++		mgr->ident = 1;
 +
-+	kref_get(&ctrl->kref);
++	return mgr->ident;
 +}
 +
-+static void amp_ctrl_destroy(struct kref *kref)
-+{
-+	struct amp_ctrl *ctrl = container_of(kref, struct amp_ctrl, kref);
-+
-+	BT_DBG("ctrl %p", ctrl);
-+
-+	if (ctrl->assoc)
-+		kfree(ctrl->assoc);
-+
-+	kfree(ctrl);
-+}
-+
-+int amp_ctrl_put(struct amp_ctrl *ctrl)
-+{
-+	BT_DBG("ctrl %p orig refcnt %d", ctrl,
-+	       atomic_read(&ctrl->kref.refcount));
-+
-+	return kref_put(&ctrl->kref, &amp_ctrl_destroy);
-+}
-+
-+struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr)
-+{
-+	struct amp_ctrl *ctrl;
-+
-+	ctrl = kzalloc(sizeof(*ctrl), GFP_KERNEL);
-+	if (!ctrl)
-+		return NULL;
-+
-+	mutex_lock(&mgr->amp_ctrls_lock);
-+	list_add(&ctrl->list, &mgr->amp_ctrls);
-+	mutex_unlock(&mgr->amp_ctrls_lock);
-+
-+	kref_init(&ctrl->kref);
-+
-+	BT_DBG("mgr %p ctrl %p", mgr, ctrl);
-+
-+	return ctrl;
-+}
-+
-+void amp_ctrl_list_flush(struct amp_mgr *mgr)
-+{
-+	struct amp_ctrl *ctrl, *n;
-+
-+	BT_DBG("mgr %p", mgr);
-+
-+	mutex_lock(&mgr->amp_ctrls_lock);
-+	list_for_each_entry_safe(ctrl, n, &mgr->amp_ctrls, list) {
-+		list_del(&ctrl->list);
-+		amp_ctrl_put(ctrl);
-+	}
-+	mutex_unlock(&mgr->amp_ctrls_lock);
-+}
-+
-+struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id)
-+{
-+	struct amp_ctrl *ctrl = NULL;
-+
-+	mutex_lock(&mgr->amp_ctrls_lock);
-+	list_for_each_entry(ctrl, &mgr->amp_ctrls, list) {
-+		if (ctrl->id == id)
-+			break;
-+	}
-+	mutex_unlock(&mgr->amp_ctrls_lock);
-+
-+	BT_DBG("mgr %p id %d ctrl %p", mgr, id, ctrl);
-+
-+	if (ctrl)
-+		amp_ctrl_get(ctrl);
-+
-+	return ctrl;
-+}
-+
- /* Physical Link interface */
- void phylink_get(struct phy_link *plink)
+ static inline void __a2mp_cl_bredr(struct a2mp_cl *cl)
  {
+ 	cl->id = 0;
+@@ -161,6 +169,55 @@ static int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
+ }
+ 
++static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
++			     struct a2mp_cmd *hdr)
++{
++	struct a2mp_discov_rsp *rsp = (void *) skb->data;
++	u16 len = le16_to_cpu(hdr->len);
++	struct a2mp_cl *cl;
++	u16 ext_feat;
++
++	if (len < sizeof(*rsp))
++		return -EINVAL;
++
++	len -= sizeof(*rsp);
++	skb_pull(skb, sizeof(*rsp));
++
++	ext_feat = le16_to_cpu(rsp->ext_feat);
++
++	BT_DBG("mtu %d efm 0x%4.4x", le16_to_cpu(rsp->mtu), ext_feat);
++
++	/* check that packet is not broken for now */
++	while (ext_feat & A2MP_FEAT_EXT) {
++		if (len < sizeof(ext_feat))
++			return -EINVAL;
++
++		ext_feat = get_unaligned_le16(skb->data);
++		BT_DBG("efm 0x%4.4x", ext_feat);
++		len -= sizeof(ext_feat);
++		skb_pull(skb, sizeof(ext_feat));
++	}
++
++	cl = (void *) skb->data;
++	while (len >= sizeof(*cl)) {
++		BT_DBG("Remote AMP id %d type %d status %d", cl->id, cl->type,
++		       cl->status);
++
++		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
++			struct a2mp_info_req req;
++
++			req.id = cl->id;
++			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
++				  sizeof(req), &req);
++		}
++
++		len -= sizeof(*cl);
++		cl = (void *) skb_pull(skb, sizeof(*cl));
++	}
++
++	return 0;
++}
++
+ static int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
+ 			      struct a2mp_cmd *hdr)
+ {
+@@ -378,8 +435,11 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 			err = a2mp_discphyslink_req(mgr, skb, hdr);
+ 			break;
+ 
+-		case A2MP_CHANGE_RSP:
+ 		case A2MP_DISCOVER_RSP:
++			err = a2mp_discover_rsp(mgr, skb, hdr);
++			break;
++
++		case A2MP_CHANGE_RSP:
+ 		case A2MP_GETINFO_RSP:
+ 		case A2MP_GETAMPASSOC_RSP:
+ 		case A2MP_CREATEPHYSLINK_RSP:
 -- 
 1.7.9.5
 
