@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 11/20] Bluetooth: A2MP: Create A2MP workqueue
-Date: Mon, 13 Aug 2012 16:50:29 +0300
-Message-Id: <1344865838-9165-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 17/20] Bluetooth: A2MP: Add fallback to normal l2cap init sequence
+Date: Mon, 13 Aug 2012 16:50:35 +0300
+Message-Id: <1344865838-9165-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1344865838-9165-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1344865838-9165-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,106 +12,93 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Workqueue might be used for A2MP tasks which cannot be run from
-L2CAP of HCI code due to unsafe locking scenarios. For example in
-l2cap_security_cfm and l2cap_conn_start we need to discover and
-create amp manager from the code surrounded with &conn->chan_lock
-and &chan->lock.
+When there is no remote AMP controller found fallback to normal
+L2CAP sequence.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |    2 ++
- net/bluetooth/a2mp.c         |   38 ++++++++++++++++++++++++++++++++++++++
- net/bluetooth/l2cap_core.c   |    6 ++++++
- 3 files changed, 46 insertions(+)
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/a2mp.c          |   28 ++++++++++++++++++++++++++++
+ net/bluetooth/l2cap_core.c    |    2 +-
+ 3 files changed, 30 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 8ba236c..345fbc6 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -129,5 +129,7 @@ int amp_mgr_put(struct amp_mgr *mgr);
- struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
- 				       struct sk_buff *skb);
- void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data);
-+int a2mp_init(void);
-+void a2mp_exit(void);
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 26f1163..a5d6d16 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -775,5 +775,6 @@ void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
+ 			  long timeout);
+ bool l2cap_conn_clear_timer(struct l2cap_conn *conn,
+ 			    struct delayed_work *work);
++void l2cap_send_conn_req(struct l2cap_chan *chan);
  
- #endif /* __A2MP_H */
+ #endif /* __L2CAP_H */
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index d582fc8..f331a81 100644
+index fedfdb9..b143331 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -19,6 +19,8 @@
- #include <net/bluetooth/amp.h>
- #include <net/bluetooth/pal.h>
+@@ -179,6 +179,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	u16 len = le16_to_cpu(hdr->len);
+ 	struct a2mp_cl *cl;
+ 	u16 ext_feat;
++	bool found = false;
  
-+static struct workqueue_struct *amp_workqueue;
-+
- /* A2MP build & send command helper functions */
- static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
- {
-@@ -766,3 +768,39 @@ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
+ 	if (len < sizeof(*rsp))
+ 		return -EINVAL;
+@@ -209,6 +210,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
+ 			struct a2mp_info_req req;
  
- 	return mgr->a2mp_chan;
- }
-+
-+void l2cap_discover_amp(struct l2cap_chan *chan)
-+{
-+	struct a2mp_discov_req req;
-+	struct l2cap_conn *conn = chan->conn;
-+	struct amp_mgr *mgr = conn->hcon->amp_mgr;
-+
-+	BT_DBG("%p", conn);
-+
-+	if (!mgr) {
-+		mgr = amp_mgr_create(conn);
-+		if (!mgr)
-+			return;
-+	}
-+
-+	mgr->bredr_chan = chan;
-+
-+	req.mtu = cpu_to_le16(L2CAP_A2MP_DEFAULT_MTU);
-+	req.ext_feat = 0;
-+	a2mp_send(mgr, A2MP_DISCOVER_REQ, 1, sizeof(req), &req);
-+}
-+
-+int a2mp_init(void)
-+{
-+	amp_workqueue = create_singlethread_workqueue("a2mp");
-+	if (!amp_workqueue)
-+		return -EPERM;
-+
-+	return 0;
-+}
-+
-+void a2mp_exit(void)
-+{
-+	flush_workqueue(amp_workqueue);
-+	destroy_workqueue(amp_workqueue);
-+}
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 4dbbb79..d4e99d6 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5730,11 +5730,17 @@ int __init l2cap_init(void)
- 			BT_ERR("Failed to create L2CAP debug file");
++			found = true;
+ 			req.id = cl->id;
+ 			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
+ 				  sizeof(req), &req);
+@@ -218,6 +220,32 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 		cl = (void *) skb_pull(skb, sizeof(*cl));
  	}
  
-+	if (enable_hs)
-+		return a2mp_init();
++	/* Fall back to L2CAP init sequence */
++	if (!found) {
++		struct l2cap_conn *conn = mgr->l2cap_conn;
++		struct l2cap_chan *chan;
++
++		mutex_lock(&conn->chan_lock);
++
++		list_for_each_entry(chan, &conn->chan_l, list) {
++
++			BT_DBG("chan %p state %s", chan,
++			       state_to_string(chan->state));
++
++			if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
++				continue;
++
++			l2cap_chan_lock(chan);
++
++			if (chan->state == BT_CONNECT)
++				l2cap_send_conn_req(chan);
++
++			l2cap_chan_unlock(chan);
++		}
++
++		mutex_unlock(&conn->chan_lock);
++	}
 +
  	return 0;
  }
  
- void l2cap_exit(void)
- {
-+	if (enable_hs)
-+		a2mp_exit();
-+
- 	debugfs_remove(l2cap_debugfs);
- 	l2cap_cleanup_sockets();
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index a4a512e..c34fcd0 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1017,7 +1017,7 @@ static bool __amp_capable(struct l2cap_chan *chan)
+ 		return false;
  }
+ 
+-static void l2cap_send_conn_req(struct l2cap_chan *chan)
++void l2cap_send_conn_req(struct l2cap_chan *chan)
+ {
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct l2cap_conn_req req;
 -- 
 1.7.9.5
 
