@@ -1,30 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 13 Aug 2012 21:12:48 -0700 (PDT)
-Message-Id: <20120813.211248.127125657316651796.davem@davemloft.net>
-To: mcgrof@frijolero.org
-Cc: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
+MIME-Version: 1.0
+From: "Luis R. Rodriguez" <mcgrof@frijolero.org>
+Date: Mon, 13 Aug 2012 13:42:53 -0700
+Message-ID: <CAB=NE6W_SQUJmAXaLesyRShtQ=Urz=w5Ks5jEXq_50bRge+PWQ@mail.gmail.com>
+Subject: Backports mailing list
+To: David Miller <davem@davemloft.net>
+Cc: linux-kernel@vger.kernel.org,
+	linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
 	lf_driver_backport@lists.linux-foundation.org,
-	julia.lawall@lip6.fr, jespera@diku.dk, ozancag@gmail.com,
-	hauke@hauke-m.de
-Subject: Re: Backports mailing list
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <CAB=NE6W_SQUJmAXaLesyRShtQ=Urz=w5Ks5jEXq_50bRge+PWQ@mail.gmail.com>
-References: <CAB=NE6W_SQUJmAXaLesyRShtQ=Urz=w5Ks5jEXq_50bRge+PWQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+	Julia Lawall <julia.lawall@lip6.fr>,
+	Jesper Andersen <jespera@diku.dk>,
+	=?UTF-8?B?T3phbiDDh2HEn2xheWFu?= <ozancag@gmail.com>,
+	Hauke Mehrtens <hauke@hauke-m.de>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "Luis R. Rodriguez" <mcgrof@frijolero.org>
-Date: Mon, 13 Aug 2012 13:42:53 -0700
+David,
 
-> I was hoping we can get a mailing list set up on vger for the
-> project, perhaps backports@vger.kernel.org, so we don't flood the
-> other mailing lists with random kernel backport junk. Please let me
-> know if this is reasonable.
+The compat [0] / compat-wireless [1] [2] projects have received quite
+a bit of love of the years to the point we now have 3 subsystems
+backported: Ethernet, Bluetooth and 802.11. Ozan Çağlayan, a Linux
+Foundation Google Summer of Code student is folding in right now drm
+driver support. At the request of the community, specifically those
+part of the Linux Foundation driver working group [3], we are going to
+be renaming the project to compat-drivers soon after drm is integrated
+and will be housing documentation under the kernel.org infrastructure
+[4] under this new name. It'll take some time for us to migrate the
+documentation / releases but do not see major issues with that, it
+will just take a bit of time but hope to have it done for the next
+stable release based on the next kernel stable release. At this time
+for patches we do have a Linux Foundation mailing list but have had
+issues with it for a while now so we keep using linux-wireless for
+patches. Given that our focus is to always prioritize upstream and
+always try to work with solutions that ensure vendors are focusing on
+upstream solutions and prioritizing upstream [5] I was hoping we can
+get a mailing list set up on vger for the project, perhaps
+backports@vger.kernel.org, so we don't flood the other mailing lists
+with random kernel backport junk. Please let me know if this is
+reasonable.
 
-It would have been so much easier if you simply just asked for this
-instead of giving me a life story of all of these projects to read.
+[0] https://github.com/mcgrof/compat
+[1] http://wireless.kernel.org/en/users/Download/
+[2] http://wireless.kernel.org/en/users/Download/stable/
+[3] http://www.linuxfoundation.org/collaborate/workgroups/driver-backport/group
+[4] https://backports.wiki.kernel.org
+[5] http://wireless.kernel.org/en/users/Download/stable/#Additional_patches_to_stable_releases
 
-backports@vger.kernel.org has been created
+  Luis
