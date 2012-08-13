@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 16/20] Bluetooth: AMP: Write remote AMP Assoc
-Date: Mon, 13 Aug 2012 16:50:34 +0300
-Message-Id: <1344865838-9165-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 20/20] Bluetooth: AMP: Process physical link complete event
+Date: Mon, 13 Aug 2012 16:50:38 +0300
+Message-Id: <1344865838-9165-21-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1344865838-9165-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1344865838-9165-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,160 +12,86 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When receiving HCI Command Status after HCI Create Physical Link
-execute HCI Write Remote AMP Assoc command to AMP controller.
+Add new hci_conn for representing AMP physical link.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    2 +
- net/bluetooth/amp.c              |   80 ++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |   15 +++++++
- 3 files changed, 97 insertions(+)
+ include/net/bluetooth/hci.h |    1 +
+ net/bluetooth/hci_event.c   |   43 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 2094e02..fbf929a 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -138,6 +138,8 @@ struct hci_cb_cmd {
- struct amp_assoc {
- 	__u16	len;
- 	__u16	offset;
-+	__u16	rem_len;
-+	__u16	len_so_far;
- 	__u8	data[HCI_MAX_AMP_ASSOC_SIZE];
- };
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 7335fe1..581b9c3 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -207,6 +207,7 @@ enum {
+ #define ESCO_LINK	0x02
+ /* Low Energy links do not have defined link type. Use invented one */
+ #define LE_LINK		0x80
++#define AMP_LINK	0x81
  
-diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index 7f2c0fa..409ca3d 100644
---- a/net/bluetooth/amp.c
-+++ b/net/bluetooth/amp.c
-@@ -124,14 +124,94 @@ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
- 			      cb_destructor, GFP_KERNEL);
+ /* LMP features */
+ #define LMP_3SLOT	0x01
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index bb52a0e..66a0df2 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3394,6 +3394,45 @@ unlock:
+ 	hci_dev_unlock(hdev);
  }
  
-+static void amp_write_rem_assoc_frag(struct hci_dev *hdev, struct amp_mgr *mgr,
-+				     struct phy_link *plink);
-+
-+static void amp_write_rem_assoc_cs_cb(struct hci_dev *hdev,
-+				      struct hci_cb_cmd *cmd)
++static void hci_phy_link_complete_evt(struct hci_dev *hdev,
++				      struct sk_buff *skb)
 +{
-+	struct amp_mgr *mgr = cmd->opt;
++	struct hci_ev_phy_link_complete *ev = (void *) skb->data;
++	struct hci_conn *conn;
 +	struct phy_link *plink;
 +
-+	BT_DBG("mgr %p status 0x%2.2x", mgr, cmd->status);
++	BT_DBG("%s handle 0x%2.2x status 0x%2.2x", hdev->name, ev->phy_handle,
++	       ev->status);
 +
-+	if (cmd->status)
++	if (ev->status)
 +		return;
 +
-+	plink = phylink_lookup(mgr, hdev->id, 0);
++	plink = phylink_lookup_by_handle(ev->phy_handle);
 +	if (!plink)
 +		return;
 +
-+	amp_write_rem_assoc_frag(hdev, mgr, plink);
++	hci_dev_lock(hdev);
++
++	conn = hci_conn_add(hdev, AMP_LINK, BDADDR_ANY);
++	if (conn) {
++		conn->handle = ev->phy_handle;
++		conn->state = BT_CONNECTED;
++
++		hci_conn_hold(conn);
++		conn->disc_timeout = HCI_DISCONN_TIMEOUT/2;
++		hci_conn_put(conn);
++
++		hci_conn_hold_device(conn);
++		hci_conn_add_sysfs(conn);
++	} else {
++		BT_ERR("Cannot add connection");
++	}
++
++	hci_dev_unlock(hdev);
 +
 +	phylink_put(plink);
 +}
 +
-+static void amp_write_rem_assoc_frag(struct hci_dev *hdev, struct amp_mgr *mgr,
-+				     struct phy_link *plink)
-+{
-+	struct hci_cp_write_remote_amp_assoc *cp;
-+	struct amp_ctrl *ctrl;
-+	u16 frag_len, len;
-+
-+	ctrl = amp_ctrl_lookup(mgr, plink->remote_id);
-+	if (!ctrl)
-+		return;
-+
-+	if (!ctrl->assoc_rem_len) {
-+		BT_DBG("all fragments are written");
-+		ctrl->assoc_rem_len = ctrl->assoc_len;
-+		ctrl->assoc_len_so_far = 0;
-+
-+		amp_ctrl_put(ctrl);
-+		return;
-+	}
-+
-+	frag_len = min_t(u16, 248, ctrl->assoc_rem_len);
-+	len = frag_len + sizeof(*cp);
-+
-+	cp = kzalloc(len, GFP_KERNEL);
-+	if (!cp) {
-+		amp_ctrl_put(ctrl);
-+		return;
-+	}
-+
-+	BT_DBG("plink %p ctrl %p frag_len %u assoc_len %u rem_len %u",
-+	       plink, ctrl, frag_len, ctrl->assoc_len, ctrl->assoc_rem_len);
-+
-+	cp->phy_handle = plink->handle;
-+	cp->len_so_far = cpu_to_le16(ctrl->assoc_len_so_far);
-+	cp->rem_len = cpu_to_le16(ctrl->assoc_rem_len);
-+	memcpy(cp->frag, ctrl->assoc, frag_len);
-+
-+	ctrl->assoc_len_so_far += frag_len;
-+	ctrl->assoc_rem_len -= frag_len;
-+
-+	amp_ctrl_put(ctrl);
-+
-+	amp_mgr_get(mgr);
-+
-+	hci_callback_send_cmd(hdev, HCI_OP_WRITE_REMOTE_AMP_ASSOC, len, cp,
-+			      amp_write_rem_assoc_cs_cb, mgr, cb_destructor,
-+			      GFP_KERNEL);
-+
-+	kfree(cp);
-+}
-+
- static void amp_create_phylink_cs_cb(struct hci_dev *hdev,
- 				     struct hci_cb_cmd *cmd)
+ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
  {
- 	struct amp_mgr *mgr = cmd->opt;
-+	struct phy_link *plink;
- 
- 	BT_DBG("mgr %p", mgr);
- 
- 	/* Write Remote AMP Assoc */
-+	plink = phylink_lookup(mgr, hdev->id, 0);
-+	if (plink) {
-+		amp_write_rem_assoc_frag(hdev, mgr, plink);
-+		phylink_put(plink);
-+	}
- }
- 
- void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8110b94..2f54e76 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1214,6 +1214,17 @@ static void hci_cc_write_le_host_supported(struct hci_dev *hdev,
- 	hci_req_complete(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED, status);
- }
- 
-+static void hci_cc_write_remote_amp_assoc(struct hci_dev *hdev,
-+					  struct sk_buff *skb)
-+{
-+	struct hci_rp_write_remote_amp_assoc *rp = (void *) skb->data;
-+
-+	BT_DBG("%s status 0x%2.2x phy_handle 0x%2.2x",
-+	       hdev->name, rp->status, rp->phy_handle);
-+
-+	hci_callback_process(hdev, HCI_OP_WRITE_REMOTE_AMP_ASSOC, rp->status);
-+}
-+
- static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- {
- 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-@@ -2401,6 +2412,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_write_le_host_supported(hdev, skb);
+ 	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
+@@ -3716,6 +3755,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_remote_oob_data_request_evt(hdev, skb);
  		break;
  
-+	case HCI_OP_WRITE_REMOTE_AMP_ASSOC:
-+		hci_cc_write_remote_amp_assoc(hdev, skb);
++	case HCI_EV_PHY_LINK_COMPLETE:
++		hci_phy_link_complete_evt(hdev, skb);
 +		break;
 +
- 	default:
- 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
+ 	case HCI_EV_NUM_COMP_BLOCKS:
+ 		hci_num_comp_blocks_evt(hdev, skb);
  		break;
 -- 
 1.7.9.5
