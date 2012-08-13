@@ -1,41 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 13 Aug 2012 16:51:59 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv2 02/20] Bluetooth: Process HCI callbacks in a workqueue
+Message-ID: <20120813135157.GA20518@aemeltch-MOBL1>
+References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1343136121-22476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1343136121-22476-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20120724203647.GB20029@joana>
 MIME-Version: 1.0
-In-Reply-To: <1343816803-16228-1-git-send-email-jaganath.k@samsung.com>
-References: <1343816803-16228-1-git-send-email-jaganath.k@samsung.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 13 Aug 2012 11:03:23 -0300
-Message-ID: <CAMOw1v6_boNFVPeuujtzMp409Spd0cPV6-kxmvN31+W9TdgQpg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v0] gdbus: Fix compilation error if macro "error" is defined
-To: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120724203647.GB20029@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Aug 1, 2012 at 7:26 AM, Jaganath Kanakkassery
-<jaganath.k@samsung.com> wrote:
-> The variable "signature" used in error is not defined.
-> ---
-> v0 -> Made error message as per Lucas's suggestion
->
->  gdbus/object.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/gdbus/object.c b/gdbus/object.c
-> index 900e7ab..9689006 100644
-> --- a/gdbus/object.c
-> +++ b/gdbus/object.c
-> @@ -645,8 +645,8 @@ static dbus_bool_t emit_signal_valist(DBusConnection *conn,
->                 goto fail;
->
->         if (g_dbus_args_have_signature(args, signal) == FALSE) {
-> -               error("%s.%s: expected signature'%s' but got '%s'",
-> -                               interface, name, args, signature);
-> +               error("%s.%s: got unexpected signature '%s'", interface, name,
-> +                                       dbus_message_get_signature(signal));
->                 ret = FALSE;
->                 goto fail;
+Hi Gustavo,
 
-Ack.
+On Tue, Jul 24, 2012 at 05:36:47PM -0300, Gustavo Padovan wrote:
+> Hi Andrei,
+> 
+> * Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-07-24 16:21:43 +0300]:
+> 
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > Use workqueue to process HCI callbacks.
+> 
+> Could elaborate more on why a new workqueue is needed, I tried to figure this
+> out this but was unable to find a user for this function in the following
+> patches.
 
-Lucas De Marchi
+workqueue processing was removed in RFCv3.
+
+Best regards 
+Andrei Emeltchenko 
