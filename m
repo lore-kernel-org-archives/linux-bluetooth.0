@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC v4 5/8] dbusoob: Add support for Class in AddRemoteData
-Date: Mon, 13 Aug 2012 12:46:37 +0200
-Message-ID: <1344854800-20972-6-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC v4 3/8] dbusoob: Change ReadLocalData to match new API
+Date: Mon, 13 Aug 2012 12:46:35 +0200
+Message-ID: <1344854800-20972-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1344854800-20972-1-git-send-email-szymon.janc@tieto.com>
 References: <1344854800-20972-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,60 +12,70 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Class received in AddRemoteData is stored for future use when device
-object is created.
+ReadLocalData now returns dictionary instead of hardcoded pair of
+arrays.
 
 ---
- plugins/dbusoob.c |   15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ plugins/dbusoob.c |   31 +++++++++++++++++++++++--------
+ 1 file changed, 23 insertions(+), 8 deletions(-)
 
 diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
-index 2ae80fa..97de9c0 100644
+index d259159..92c4df1 100644
 --- a/plugins/dbusoob.c
 +++ b/plugins/dbusoob.c
-@@ -43,6 +43,7 @@
- #include "event.h"
- #include "error.h"
- #include "oob.h"
-+#include "storage.h"
+@@ -79,20 +79,36 @@ static void read_local_data_complete(struct btd_adapter *adapter, uint8_t *hash,
+ {
+ 	struct DBusMessage *reply;
+ 	struct oob_request *oob_request;
++	DBusMessageIter iter;
++	DBusMessageIter dict;
  
- #define OOB_INTERFACE	"org.bluez.OutOfBand"
+ 	oob_request = find_oob_request(adapter);
+ 	if (!oob_request)
+ 		return;
  
-@@ -55,6 +56,7 @@ struct oob_data {
- 	char *addr;
- 	uint8_t *hash;
- 	uint8_t *randomizer;
-+	uint32_t class;
- };
- 
- static GSList *oob_requests = NULL;
-@@ -189,6 +191,12 @@ static gboolean parse_data(DBusMessageIter *data, struct oob_data *remote_data)
- 
- 			if (size != 16)
- 				return FALSE;
-+		} else if (strcasecmp(key, "Class") == 0) {
-+			if (var != DBUS_TYPE_UINT32)
-+				return FALSE;
-+
-+			dbus_message_iter_get_basic(&value,
-+							&remote_data->class);
- 		}
- 
- 		dbus_message_iter_next(data);
-@@ -223,6 +231,13 @@ static gboolean store_data(struct btd_adapter *adapter, struct oob_data *data)
- 			return FALSE;
- 	}
- 
-+	if (data->class) {
-+		bdaddr_t local;
-+		adapter_get_address(adapter, &local);
-+
-+		write_remote_class(&local, &bdaddr, data->class);
+-	if (hash && randomizer)
+-		reply = g_dbus_create_reply(oob_request->msg,
+-			DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE, &hash, 16,
+-			DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE, &randomizer, 16,
+-			DBUS_TYPE_INVALID);
+-	else
++	if (!hash || !randomizer) {
+ 		reply = btd_error_failed(oob_request->msg,
+ 					"Failed to read local OOB data.");
++		goto done;
 +	}
 +
- 	return TRUE;
- }
++	reply = dbus_message_new_method_return(oob_request->msg);
++	if (!reply)
++		goto done;
++
++	dbus_message_iter_init_append(reply, &iter);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	dict_append_array(&dict, "Hash", DBUS_TYPE_BYTE, &hash, 16);
++	dict_append_array(&dict, "Randomizer", DBUS_TYPE_BYTE, &randomizer, 16);
++
++	dbus_message_iter_close_container(&iter, &dict);
  
++done:
+ 	oob_requests = g_slist_remove(oob_requests, oob_request);
+ 	dbus_message_unref(oob_request->msg);
+ 	g_free(oob_request);
+@@ -182,8 +198,7 @@ static const GDBusMethodTable oob_methods[] = {
+ 			GDBUS_ARGS({ "address", "s" }), NULL,
+ 			remove_remote_data) },
+ 	{ GDBUS_ASYNC_METHOD("ReadLocalData",
+-			NULL, GDBUS_ARGS({ "hash", "ay" },
+-						{ "randomizer", "ay" }),
++			NULL, GDBUS_ARGS({ "data", "a{sv}" }),
+ 			read_local_data) },
+ 	{ }
+ };
 -- 
 1.7.9.5
 
