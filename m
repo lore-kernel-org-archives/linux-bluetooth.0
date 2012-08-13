@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC v4 4/8] dbusoob: Change AddRemoteData to match new API
-Date: Mon, 13 Aug 2012 12:46:36 +0200
-Message-ID: <1344854800-20972-5-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC v4 7/8] dbusoob: Reply with error if SSP is not supported
+Date: Mon, 13 Aug 2012 12:46:39 +0200
+Message-ID: <1344854800-20972-8-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1344854800-20972-1-git-send-email-szymon.janc@tieto.com>
 References: <1344854800-20972-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,171 +12,99 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-AddRemoteData now expect dictionary for data instead of hardcoded pair
-of arrays.
+Reply with org.bluez.Error.NotSupported if methods were called on
+adapter without SSP enabled.
 
 ---
- plugins/dbusoob.c |  126 +++++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 108 insertions(+), 18 deletions(-)
+ plugins/dbusoob.c |    9 +++++++++
+ src/adapter.c     |    5 +++++
+ src/adapter.h     |    2 ++
+ src/mgmt.c        |    7 +++++++
+ src/mgmt.h        |    2 ++
+ 5 files changed, 25 insertions(+)
 
 diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
-index 92c4df1..2ae80fa 100644
+index 0e0eeca..885f247 100644
 --- a/plugins/dbusoob.c
 +++ b/plugins/dbusoob.c
-@@ -51,6 +51,12 @@ struct oob_request {
- 	DBusMessage *msg;
- };
+@@ -137,6 +137,9 @@ static DBusMessage *read_local_data(DBusConnection *conn, DBusMessage *msg,
+ 	struct btd_adapter *adapter = data;
+ 	struct oob_request *oob_request;
  
-+struct oob_data {
-+	char *addr;
-+	uint8_t *hash;
-+	uint8_t *randomizer;
-+};
++	if (!btd_adapter_ssp_enabled(adapter))
++		return btd_error_not_supported(msg);
 +
- static GSList *oob_requests = NULL;
- static DBusConnection *connection = NULL;
+ 	if (find_oob_request(adapter))
+ 		return btd_error_in_progress(msg);
  
-@@ -142,28 +148,113 @@ static DBusMessage *read_local_data(DBusConnection *conn, DBusMessage *msg,
- 	return NULL;
- }
+@@ -258,6 +261,9 @@ static DBusMessage *add_remote_data(DBusConnection *conn, DBusMessage *msg,
+ 	struct oob_data remote_data;
+ 	struct btd_device *device;
  
--static DBusMessage *add_remote_data(DBusConnection *conn, DBusMessage *msg,
--								void *data)
-+static gboolean parse_data(DBusMessageIter *data, struct oob_data *remote_data)
-+{
-+	while (dbus_message_iter_get_arg_type(data) == DBUS_TYPE_DICT_ENTRY) {
-+		const char *key;
-+		DBusMessageIter value, entry;
-+		int var;
++	if (!btd_adapter_ssp_enabled(adapter))
++		return btd_error_not_supported(msg);
 +
-+		dbus_message_iter_recurse(data, &entry);
-+		dbus_message_iter_get_basic(&entry, &key);
-+
-+		dbus_message_iter_next(&entry);
-+		dbus_message_iter_recurse(&entry, &value);
-+
-+		var = dbus_message_iter_get_arg_type(&value);
-+		if (strcasecmp(key, "Hash") == 0) {
-+			DBusMessageIter array;
-+			int size;
-+
-+			if (var != DBUS_TYPE_ARRAY)
-+				return FALSE;
-+
-+			dbus_message_iter_recurse(&value, &array);
-+			dbus_message_iter_get_fixed_array(&array,
-+						&remote_data->hash, &size);
-+
-+			if (size != 16)
-+				return FALSE;
-+		} else if (strcasecmp(key, "Randomizer") == 0) {
-+			DBusMessageIter array;
-+			int size;
-+
-+			if (var != DBUS_TYPE_ARRAY)
-+				return FALSE;
-+
-+			dbus_message_iter_recurse(&value, &array);
-+			dbus_message_iter_get_fixed_array(&array,
-+						&remote_data->randomizer,
-+						&size);
-+
-+			if (size != 16)
-+				return FALSE;
-+		}
-+
-+		dbus_message_iter_next(data);
-+	}
-+
-+	if (dbus_message_iter_get_arg_type(data) != DBUS_TYPE_INVALID)
-+		return FALSE;
-+
-+	/* If randomizer is provided, hash also needs to be provided. */
-+	if (remote_data->randomizer && !remote_data->hash)
-+		return FALSE;
-+
-+	return TRUE;
-+}
-+
-+static gboolean store_data(struct btd_adapter *adapter, struct oob_data *data)
- {
--	struct btd_adapter *adapter = data;
--	uint8_t *hash, *randomizer;
--	int32_t hlen, rlen;
--	const char *addr;
+ 	memset(&remote_data, 0, sizeof(remote_data));
+ 
+ 	dbus_message_iter_init(msg, &args);
+@@ -290,6 +296,9 @@ static DBusMessage *remove_remote_data(DBusConnection *conn, DBusMessage *msg,
+ 	const char *addr;
  	bdaddr_t bdaddr;
  
--	if (!dbus_message_get_args(msg, NULL,
--			DBUS_TYPE_STRING, &addr,
--			DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE, &hash, &hlen,
--			DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE, &randomizer, &rlen,
--			DBUS_TYPE_INVALID))
--		return btd_error_invalid_args(msg);
-+	str2ba(data->addr, &bdaddr);
++	if (!btd_adapter_ssp_enabled(adapter))
++		return btd_error_not_supported(msg);
 +
-+	if (data->hash) {
-+		uint8_t empty_randomizer[16];
- 
--	if (hlen != 16 || rlen != 16 || bachk(addr))
-+		if (!data->randomizer) {
-+			memset(empty_randomizer, 0, sizeof(empty_randomizer));
-+			data->randomizer = empty_randomizer;
-+		}
-+
-+		if (btd_adapter_add_remote_oob_data(adapter, &bdaddr,
-+					data->hash, data->randomizer) < 0)
-+			return FALSE;
-+	}
-+
-+	return TRUE;
-+}
-+
-+static DBusMessage *add_remote_data(DBusConnection *conn, DBusMessage *msg,
-+							void *user_data)
-+{
-+	struct btd_adapter *adapter = user_data;
-+	DBusMessageIter args;
-+	DBusMessageIter data;
-+	struct oob_data remote_data;
-+	struct btd_device *device;
-+
-+	memset(&remote_data, 0, sizeof(remote_data));
-+
-+	dbus_message_iter_init(msg, &args);
-+
-+	dbus_message_iter_get_basic(&args, &remote_data.addr);
-+	dbus_message_iter_next(&args);
-+
-+	if (bachk(remote_data.addr) < 0)
+ 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &addr,
+ 			DBUS_TYPE_INVALID))
  		return btd_error_invalid_args(msg);
- 
--	str2ba(addr, &bdaddr);
-+	device = adapter_find_device(adapter, remote_data.addr);
-+	if (device && device_is_paired(device))
-+		return btd_error_already_exists(msg);
+diff --git a/src/adapter.c b/src/adapter.c
+index b7691d0..e6b5559 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3498,3 +3498,8 @@ int btd_adapter_remove_remote_oob_data(struct btd_adapter *adapter,
+ {
+ 	return mgmt_remove_remote_oob_data(adapter->dev_id, bdaddr);
+ }
 +
-+	dbus_message_iter_recurse(&args, &data);
++int btd_adapter_ssp_enabled(struct btd_adapter *adapter)
++{
++	return mgmt_ssp_enabled(adapter->dev_id);
++}
+diff --git a/src/adapter.h b/src/adapter.h
+index d8a1bb1..5a0247e 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -230,3 +230,5 @@ int btd_adapter_remove_remote_oob_data(struct btd_adapter *adapter,
+ 
+ int btd_adapter_gatt_server_start(struct btd_adapter *adapter);
+ void btd_adapter_gatt_server_stop(struct btd_adapter *adapter);
 +
-+	if (!parse_data(&data, &remote_data))
-+		return btd_error_invalid_args(msg);
++int btd_adapter_ssp_enabled(struct btd_adapter *adapter);
+diff --git a/src/mgmt.c b/src/mgmt.c
+index c893972..b3ae776 100644
+--- a/src/mgmt.c
++++ b/src/mgmt.c
+@@ -2474,3 +2474,10 @@ int mgmt_load_ltks(int index, GSList *keys)
  
--	if (btd_adapter_add_remote_oob_data(adapter, &bdaddr, hash, randomizer))
-+	if (!store_data(adapter, &remote_data))
- 		return btd_error_failed(msg, "Request failed");
+ 	return err;
+ }
++
++int mgmt_ssp_enabled(int index)
++{
++	struct controller_info *info = &controllers[index];
++
++	return mgmt_ssp(info->current_settings);
++}
+diff --git a/src/mgmt.h b/src/mgmt.h
+index 0658198..95245d2 100644
+--- a/src/mgmt.h
++++ b/src/mgmt.h
+@@ -78,3 +78,5 @@ int mgmt_remove_remote_oob_data(int index, bdaddr_t *bdaddr);
  
- 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
-@@ -191,9 +282,8 @@ static DBusMessage *remove_remote_data(DBusConnection *conn, DBusMessage *msg,
- 
- static const GDBusMethodTable oob_methods[] = {
- 	{ GDBUS_METHOD("AddRemoteData",
--			GDBUS_ARGS({ "address", "s" }, { "hash", "ay" },
--					{ "randomizer", "ay" }), NULL,
--			add_remote_data) },
-+			GDBUS_ARGS({ "address", "s" }, { "data", "a{sv}"}),
-+			NULL, add_remote_data) },
- 	{ GDBUS_METHOD("RemoveRemoteData",
- 			GDBUS_ARGS({ "address", "s" }), NULL,
- 			remove_remote_data) },
+ int mgmt_confirm_name(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type,
+ 							gboolean name_known);
++
++int mgmt_ssp_enabled(int index);
 -- 
 1.7.9.5
 
