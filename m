@@ -1,107 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <1CB3935841BA480496A5362DA4A45798@sisodomain.com>
-From: Syam Sidhardhan <s.syam@samsung.com>
-To: Syam Sidhardhan <s.syam@samsung.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: jaganath.k@samsung.com
-References: <1343413282-8901-1-git-send-email-s.syam@samsung.com>
-Subject: Re: [PATCH] Bluetooth: Use kref for l2cap channel reference counting
-Date: Mon, 13 Aug 2012 20:05:51 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
+MIME-Version: 1.0
+In-Reply-To: <1343816803-16228-1-git-send-email-jaganath.k@samsung.com>
+References: <1343816803-16228-1-git-send-email-jaganath.k@samsung.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 13 Aug 2012 11:03:23 -0300
+Message-ID: <CAMOw1v6_boNFVPeuujtzMp409Spd0cPV6-kxmvN31+W9TdgQpg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v0] gdbus: Fix compilation error if macro "error" is defined
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
------ Original Message ----- 
-From: "Syam Sidhardhan" <s.syam@samsung.com>
-To: <linux-bluetooth@vger.kernel.org>
-Cc: <jaganath.k@samsung.com>; "Syam Sidhardhan" <s.syam@samsung.com>
-Sent: Friday, July 27, 2012 11:51 PM
-Subject: [PATCH] Bluetooth: Use kref for l2cap channel reference counting
-
-
-> This patch changes the struct l2cap_chan and associated code to use
-> kref api for object refcounting and freeing.
->
-> Suggested-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
-> Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+On Wed, Aug 1, 2012 at 7:26 AM, Jaganath Kanakkassery
+<jaganath.k@samsung.com> wrote:
+> The variable "signature" used in error is not defined.
 > ---
-> include/net/bluetooth/l2cap.h |    3 +--
-> net/bluetooth/l2cap_core.c    |   15 ++++++++-------
-> 2 files changed, 9 insertions(+), 9 deletions(-)
+> v0 -> Made error message as per Lucas's suggestion
 >
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index d206296..7ed8e35 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -433,11 +433,10 @@ struct l2cap_chan {
->  struct sock *sk;
+>  gdbus/object.c |    4 ++--
+>  1 files changed, 2 insertions(+), 2 deletions(-)
 >
->  struct l2cap_conn *conn;
-> + struct kref kref;
+> diff --git a/gdbus/object.c b/gdbus/object.c
+> index 900e7ab..9689006 100644
+> --- a/gdbus/object.c
+> +++ b/gdbus/object.c
+> @@ -645,8 +645,8 @@ static dbus_bool_t emit_signal_valist(DBusConnection *conn,
+>                 goto fail;
 >
->  __u8 state;
->
-> - atomic_t refcnt;
-> -
->  __le16 psm;
->  __u16 dcid;
->  __u16 scid;
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 6dde7c5..bedc960 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -406,7 +406,7 @@ struct l2cap_chan *l2cap_chan_create(void)
->
->  chan->state = BT_OPEN;
->
-> - atomic_set(&chan->refcnt, 1);
-> + kref_init(&chan->kref);
->
->  /* This flag is cleared in l2cap_chan_ready() */
->  set_bit(CONF_NOT_COMPLETE, &chan->conf_state);
-> @@ -416,8 +416,10 @@ struct l2cap_chan *l2cap_chan_create(void)
->  return chan;
-> }
->
-> -static void l2cap_chan_destroy(struct l2cap_chan *chan)
-> +static void l2cap_chan_destroy(struct kref *kref)
-> {
-> + struct l2cap_chan *chan = container_of(kref, struct l2cap_chan, kref);
-> +
->  BT_DBG("chan %p", chan);
->
->  write_lock(&chan_list_lock);
-> @@ -429,17 +431,16 @@ static void l2cap_chan_destroy(struct l2cap_chan 
-> *chan)
->
-> void l2cap_chan_hold(struct l2cap_chan *c)
-> {
-> - BT_DBG("chan %p orig refcnt %d", c, atomic_read(&c->refcnt));
-> + BT_DBG("chan %p orig refcnt %d", c, atomic_read(&c->kref.refcount));
->
-> - atomic_inc(&c->refcnt);
-> + kref_get(&c->kref);
-> }
->
-> void l2cap_chan_put(struct l2cap_chan *c)
-> {
-> - BT_DBG("chan %p orig refcnt %d", c, atomic_read(&c->refcnt));
-> + BT_DBG("chan %p orig refcnt %d", c, atomic_read(&c->kref.refcount));
->
-> - if (atomic_dec_and_test(&c->refcnt))
-> - l2cap_chan_destroy(c);
-> + kref_put(&c->kref, l2cap_chan_destroy);
-> }
->
-> void l2cap_chan_set_defaults(struct l2cap_chan *chan)
-> -- 
+>         if (g_dbus_args_have_signature(args, signal) == FALSE) {
+> -               error("%s.%s: expected signature'%s' but got '%s'",
+> -                               interface, name, args, signature);
+> +               error("%s.%s: got unexpected signature '%s'", interface, name,
+> +                                       dbus_message_get_signature(signal));
+>                 ret = FALSE;
+>                 goto fail;
 
-ping
+Ack.
 
-Regards,
-Syam
-
+Lucas De Marchi
