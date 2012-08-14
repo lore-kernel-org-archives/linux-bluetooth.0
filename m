@@ -1,53 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAAngNMZn-XqrmOjErhkUqfSKqg2WhdfgDCs-DtZkAyNtBX7XRg@mail.gmail.com>
-References: <cover.1344952391.git.jesse.sung@canonical.com>
-	<CAAngNMZn-XqrmOjErhkUqfSKqg2WhdfgDCs-DtZkAyNtBX7XRg@mail.gmail.com>
-Date: Wed, 15 Aug 2012 09:14:10 +0800
-Message-ID: <CAH10aOgwzxB-bKMrcb0cTgAd_2VZcGAC_0pCKw4r7Hz5DUdy_w@mail.gmail.com>
-Subject: Re: [RFC][PATCH 0/2] broadcom patchram firmware loader
-From: Jesse Sung <jesse.sung@canonical.com>
-To: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH] Bluetooth: mgmt: Fix returning a list with invalid indexes
+Date: Tue, 14 Aug 2012 20:59:48 -0300
+Message-Id: <1344988788-16378-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joao,
+When a device is in the HCI_SETUP state, it was being counted as
+a valid device, but it wasn't included in the list returned to
+userspace.
 
-Thanks for your reply. I'll send these patches again and make them inline.
+This can be reproduced when you add an adapter after doing
+'rfkill block all', for example.
 
-Regards,
-Jesse
+This commit also has the (intended) effect of making
+'btmgmt power on' work after the rfkill block has been lifted.
 
-2012/8/15 Joao Paulo Rechi Vita <jprvita@openbossa.org>:
-> Hello Jesse,
->
-> On Tue, Aug 14, 2012 at 11:24 AM, Jesse Sung <jesse.sung@canonical.com> wrote:
->>
->> There is a user space firmware loading tool which can be found at
->> http://article.gmane.org/gmane.linux.bluez.kernel/17932
->>
->> This tool requires hci device to do the firmware loading, but this
->> may cause some race condition between patchram tool and bluetoothd
->> or something that also works on hci interface.
->>
->> Also it needs some hooks to make firmware loads after bootup, s3,
->> s4, rfkill, and device hotplug events. Implement this loader in kernel
->> module would make things more easier.
->>
->>
->> Wen-chien Jesse Sung (2):
->>   Implement broadcom patchram firmware loader
->>   Cache firmware images for later use
->>
->
-> Can you please re-send the patches inline? This way it's easier for
-> people to comment on the mailing list and there is increased chance it
-> gets merged sooner. 'git send-email' is the best way to do that.
->
-> Thanks.
->
-> --
-> João Paulo Rechi Vita
-> Openbossa Labs - INdT
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ net/bluetooth/mgmt.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index a3329cb..c500b59 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -350,9 +350,6 @@ static int read_index_list(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	i = 0;
+ 	list_for_each_entry(d, &hci_dev_list, list) {
+-		if (test_bit(HCI_SETUP, &d->dev_flags))
+-			continue;
+-
+ 		if (!mgmt_valid_hdev(d))
+ 			continue;
+ 
+-- 
+1.7.11.4
+
