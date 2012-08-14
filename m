@@ -1,42 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH] Bluetooth: mgmt: Fix returning a list with invalid indexes
-Date: Tue, 14 Aug 2012 20:59:48 -0300
-Message-Id: <1344988788-16378-1-git-send-email-vinicius.gomes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CAB=NE6Wad1yNhUrvJZn0p62gZHAhpTjYaf5qNjjkdOboOiQ=Xg@mail.gmail.com>
+References: <CAB=NE6W_SQUJmAXaLesyRShtQ=Urz=w5Ks5jEXq_50bRge+PWQ@mail.gmail.com>
+ <CA+icZUU9qT9H2jy_H8_6Bk1XUbuV0N6_pGRoQbSJhnikewTc0Q@mail.gmail.com>
+ <CAB=NE6V=4J7yKbPdb4gVT6BBjdewhYRNEwrNdMd4XE5Ocg4SeQ@mail.gmail.com> <CAB=NE6Wad1yNhUrvJZn0p62gZHAhpTjYaf5qNjjkdOboOiQ=Xg@mail.gmail.com>
+From: "Luis R. Rodriguez" <mcgrof@frijolero.org>
+Date: Tue, 14 Aug 2012 16:00:17 -0700
+Message-ID: <CAB=NE6UztqzdJ20GV+bV3jZ-083h8NgX-+AXsyFYJ--V93_=_g@mail.gmail.com>
+Subject: Re: Backports mailing list
+To: sedat.dilek@gmail.com
+Cc: David Miller <davem@davemloft.net>, linux-kernel@vger.kernel.org,
+	linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	lf_driver_backport@lists.linux-foundation.org,
+	Julia Lawall <julia.lawall@lip6.fr>,
+	Jesper Andersen <jespera@diku.dk>,
+	=?UTF-8?B?T3phbiDDh2HEn2xheWFu?= <ozancag@gmail.com>,
+	Hauke Mehrtens <hauke@hauke-m.de>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When a device is in the HCI_SETUP state, it was being counted as
-a valid device, but it wasn't included in the list returned to
-userspace.
+On Tue, Aug 14, 2012 at 9:33 AM, Luis R. Rodriguez <mcgrof@frijolero.org> wrote:
+> On Tue, Aug 14, 2012 at 9:00 AM, Luis R. Rodriguez <mcgrof@frijolero.org> wrote:
+>> For more details please see:
+>>
+>> http://www.do-not-panic.com/2012/08/automatically-backporting-linux-kernel.html
+>> http://www.do-not-panic.com/2012/08/optimizing-backporting-collateral.html
+>>
+>>   Luis
+>
+> All that said, please use the shiny new mailing list:
+> backports@vger.kernel.org  for  patches for compat / compat-drivers.
 
-This can be reproduced when you add an adapter after doing
-'rfkill block all', for example.
+Furthermore, the project git tree has changed to be renamed to
+compat-drivers as well now, and the new wiki page should be used
+moving forward:
 
-This commit also has the (intended) effect of making
-'btmgmt power on' work after the rfkill block has been lifted.
+https://backports.wiki.kernel.org
+git://github.com/mcgrof/compat-drivers.git
 
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
----
- net/bluetooth/mgmt.c | 3 ---
- 1 file changed, 3 deletions(-)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a3329cb..c500b59 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -350,9 +350,6 @@ static int read_index_list(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	i = 0;
- 	list_for_each_entry(d, &hci_dev_list, list) {
--		if (test_bit(HCI_SETUP, &d->dev_flags))
--			continue;
--
- 		if (!mgmt_valid_hdev(d))
- 			continue;
- 
--- 
-1.7.11.4
-
+  Luis
