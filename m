@@ -1,44 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <cover.1344952391.git.jesse.sung@canonical.com>
-References: <cover.1344952391.git.jesse.sung@canonical.com>
-Date: Tue, 14 Aug 2012 14:14:57 -0300
-Message-ID: <CAAngNMZn-XqrmOjErhkUqfSKqg2WhdfgDCs-DtZkAyNtBX7XRg@mail.gmail.com>
-Subject: Re: [RFC][PATCH 0/2] broadcom patchram firmware loader
-From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-To: Jesse Sung <jesse.sung@canonical.com>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CAB=NE6V=4J7yKbPdb4gVT6BBjdewhYRNEwrNdMd4XE5Ocg4SeQ@mail.gmail.com>
+References: <CAB=NE6W_SQUJmAXaLesyRShtQ=Urz=w5Ks5jEXq_50bRge+PWQ@mail.gmail.com>
+ <CA+icZUU9qT9H2jy_H8_6Bk1XUbuV0N6_pGRoQbSJhnikewTc0Q@mail.gmail.com> <CAB=NE6V=4J7yKbPdb4gVT6BBjdewhYRNEwrNdMd4XE5Ocg4SeQ@mail.gmail.com>
+From: "Luis R. Rodriguez" <mcgrof@frijolero.org>
+Date: Tue, 14 Aug 2012 09:33:26 -0700
+Message-ID: <CAB=NE6Wad1yNhUrvJZn0p62gZHAhpTjYaf5qNjjkdOboOiQ=Xg@mail.gmail.com>
+Subject: Re: Backports mailing list
+To: sedat.dilek@gmail.com
+Cc: David Miller <davem@davemloft.net>, linux-kernel@vger.kernel.org,
+	linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	lf_driver_backport@lists.linux-foundation.org,
+	Julia Lawall <julia.lawall@lip6.fr>,
+	Jesper Andersen <jespera@diku.dk>,
+	=?UTF-8?B?T3phbiDDh2HEn2xheWFu?= <ozancag@gmail.com>,
+	Hauke Mehrtens <hauke@hauke-m.de>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Jesse,
+On Tue, Aug 14, 2012 at 9:00 AM, Luis R. Rodriguez <mcgrof@frijolero.org> wrote:
+> For more details please see:
+>
+> http://www.do-not-panic.com/2012/08/automatically-backporting-linux-kernel.html
+> http://www.do-not-panic.com/2012/08/optimizing-backporting-collateral.html
+>
+>   Luis
 
-On Tue, Aug 14, 2012 at 11:24 AM, Jesse Sung <jesse.sung@canonical.com> wrote:
->
-> There is a user space firmware loading tool which can be found at
-> http://article.gmane.org/gmane.linux.bluez.kernel/17932
->
-> This tool requires hci device to do the firmware loading, but this
-> may cause some race condition between patchram tool and bluetoothd
-> or something that also works on hci interface.
->
-> Also it needs some hooks to make firmware loads after bootup, s3,
-> s4, rfkill, and device hotplug events. Implement this loader in kernel
-> module would make things more easier.
->
->
-> Wen-chien Jesse Sung (2):
->   Implement broadcom patchram firmware loader
->   Cache firmware images for later use
->
+All that said, please use the shiny new mailing list:
+backports@vger.kernel.org  for  patches for compat / compat-drivers.
 
-Can you please re-send the patches inline? This way it's easier for
-people to comment on the mailing list and there is increased chance it
-gets merged sooner. 'git send-email' is the best way to do that.
-
-Thanks.
-
--- 
-João Paulo Rechi Vita
-Openbossa Labs - INdT
+  Luis
