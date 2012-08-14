@@ -1,82 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 14 Aug 2012 12:30:11 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v4 0/8]  DBus OutOfBand API update
+Message-ID: <20120814093011.GB1083@x220>
+References: <1344854800-20972-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <CAB=NE6W_SQUJmAXaLesyRShtQ=Urz=w5Ks5jEXq_50bRge+PWQ@mail.gmail.com>
-References: <CAB=NE6W_SQUJmAXaLesyRShtQ=Urz=w5Ks5jEXq_50bRge+PWQ@mail.gmail.com>
-Date: Tue, 14 Aug 2012 11:34:18 +0200
-Message-ID: <CA+icZUU9qT9H2jy_H8_6Bk1XUbuV0N6_pGRoQbSJhnikewTc0Q@mail.gmail.com>
-Subject: Re: Backports mailing list
-From: Sedat Dilek <sedat.dilek@gmail.com>
-To: "Luis R. Rodriguez" <mcgrof@frijolero.org>
-Cc: David Miller <davem@davemloft.net>, linux-kernel@vger.kernel.org,
-	linux-wireless <linux-wireless@vger.kernel.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	lf_driver_backport@lists.linux-foundation.org,
-	Julia Lawall <julia.lawall@lip6.fr>,
-	Jesper Andersen <jespera@diku.dk>,
-	=?UTF-8?B?T3phbiDDh2HEn2xheWFu?= <ozancag@gmail.com>,
-	Hauke Mehrtens <hauke@hauke-m.de>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1344854800-20972-1-git-send-email-szymon.janc@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Aug 13, 2012 at 10:42 PM, Luis R. Rodriguez
-<mcgrof@frijolero.org> wrote:
-> David,
->
-> The compat [0] / compat-wireless [1] [2] projects have received quite
-> a bit of love of the years to the point we now have 3 subsystems
-> backported: Ethernet, Bluetooth and 802.11. Ozan Çağlayan, a Linux
-> Foundation Google Summer of Code student is folding in right now drm
-> driver support. At the request of the community, specifically those
-> part of the Linux Foundation driver working group [3], we are going to
-> be renaming the project to compat-drivers soon after drm is integrated
-> and will be housing documentation under the kernel.org infrastructure
-> [4] under this new name. It'll take some time for us to migrate the
-> documentation / releases but do not see major issues with that, it
-> will just take a bit of time but hope to have it done for the next
-> stable release based on the next kernel stable release. At this time
-> for patches we do have a Linux Foundation mailing list but have had
-> issues with it for a while now so we keep using linux-wireless for
-> patches. Given that our focus is to always prioritize upstream and
-> always try to work with solutions that ensure vendors are focusing on
-> upstream solutions and prioritizing upstream [5] I was hoping we can
-> get a mailing list set up on vger for the project, perhaps
-> backports@vger.kernel.org, so we don't flood the other mailing lists
-> with random kernel backport junk. Please let me know if this is
-> reasonable.
->
-> [0] https://github.com/mcgrof/compat
-> [1] http://wireless.kernel.org/en/users/Download/
-> [2] http://wireless.kernel.org/en/users/Download/stable/
-> [3] http://www.linuxfoundation.org/collaborate/workgroups/driver-backport/group
-> [4] https://backports.wiki.kernel.org
-> [5] http://wireless.kernel.org/en/users/Download/stable/#Additional_patches_to_stable_releases
->
+Hi Szymon,
 
-Hi,
+On Mon, Aug 13, 2012, Szymon Janc wrote:
+> changes since V3:
+> - remove of DeviceFound signal (rationale below)
+> - remove of UUIDs from AddRemoteData dictionary
+> - AlreadyPaired -> AlreadyExist error change
+> - proposed implementation
+> 
+> 
+> After some more thinking about OOB API I've decided that emitting
+> DeviceFound signal when OOB data are provided is not the best thing to do.
+> 
+> Typical usecase with dbusoob plugin is to provide oob data and either start
+> pairing with CreatePairedDevice or wait for incoming pairing request. No need
+> to emit DeviceFound as OOB provider is already aware of device address and can
+> start pairing. If it doesn't provide pairing agent for device there will be
+> fallback to adapter agent (which doesn't need to know anything about OOB
+> channel).
+> 
+> 
+> For UUIDs removal is similar - OOB provider already knows which UUIDs are
+> supported by remote device and based on that can choose to pair or not. No
+> need to provide that to bluetoothd as it would be only used in DeviceFound
+> signal anyway.
+> 
+> Comments are welcome.
+> 
+> -- 
+> BR
+> Szymon Janc
+> 
+> Szymon Janc (8):
+>   dbusoob: Update API
+>   dbusoob: Simplify remove_remote_data
+>   dbusoob: Change ReadLocalData to match new API
+>   dbusoob: Change AddRemoteData to match new API
+>   dbusoob: Add support for Class in AddRemoteData
+>   dbusoob: Add support for Name in AddRemoteData
+>   dbusoob: Reply with error if SSP is not supported
+>   Update test/test-oob to match new DBus OOB API
+> 
+>  doc/oob-api.txt   |   59 ++++++++++++++--
+>  plugins/dbusoob.c |  193 +++++++++++++++++++++++++++++++++++++++++++++--------
+>  src/adapter.c     |    5 ++
+>  src/adapter.h     |    2 +
+>  src/mgmt.c        |    7 ++
+>  src/mgmt.h        |    2 +
+>  test/test-oob     |    4 +-
+>  7 files changed, 235 insertions(+), 37 deletions(-)
 
-I am wondering why people are not consistent in naming - here again a
-good example.
+The patches look good to me and have now been applied upstream. Thanks.
 
-The workgroup at Linux Foundation is called "driver-backport".
-You (Luis) are talking about a rename to "compat-drivers".
-And then the ML and wiki have the name "backports".
-
-So "backports" is for me is a bit confusing!
-That reminds me when I first read about "AAArgh64!!!" stuff which was
-in the end called mips64 to keep consistency to other existing arches.
-
-So, just to fool the world a bit more:
-What about "linux-backports" or why didn't you keep the "driver-backport" name?
-
-Just my 0.02EUR.
-
-Regards,
-- Sedat -
-
->   Luis
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-wireless" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Johan
