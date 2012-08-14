@@ -1,46 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Aug 2012 12:56:36 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Rafal Garbat <rafal.garbat@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: Re: [PATCH v2 01/13] Heart Rate Profile API
-Message-ID: <20120814095636.GA7055@x220>
-References: <1344870497-6929-1-git-send-email-rafal.garbat@tieto.com>
- <1344870497-6929-2-git-send-email-rafal.garbat@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1344870497-6929-2-git-send-email-rafal.garbat@tieto.com>
+Message-ID: <1344937850.2733.2.camel@novo.hadess.net>
+Subject: Re: [PATCH] input: Implement idle timeout for fakehid
+From: Bastien Nocera <hadess@hadess.net>
+To: Jeff Hansen <x@jeffhansen.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 14 Aug 2012 10:50:50 +0100
+In-Reply-To: <50293C10.2000305@jeffhansen.com>
+References: <50293C10.2000305@jeffhansen.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Mon, 2012-08-13 at 11:40 -0600, Jeff Hansen wrote:
+> (bump)
+> 
+> The batteries on my BD remote would die in a few days without this
+> patch.  The idle timeout needs to be enforced for fakehid devices as
+> well as normal HID devices.
 
-On Mon, Aug 13, 2012, Rafal Garbat wrote:
-> +Heart Rate Profile hierarchy
-> +============================
-> +
-> +Service		org.bluez
-> +Interface	org.bluez.HeartRate
-> +Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-> +
-> +Methods		dict GetProperties()
-> +
-> +			Returns all properties for the interface. See the
-> +			Properties section for the available properties.
-> +
-> +		RegisterWatcher(object agent)
-> +
-> +			Registers a watcher to monitor heart rate measurements.
-> +
-> +			Possible Errors: org.bluez.Error.InvalidArguments
+Except that the timeout is disabled by default for HID devices. I posted
+a patch that requires a little bit of work to get pushed last month or
+so.
 
-I'm wondering if it wouldn't make more sense to have these
-RegisterWatcher APIs (thermometer, heart rate, others?) per-adapter
-instead of per-device. That would be much friendlier to applications in
-that they wouldn't need to separately search for paired/configured
-devices supporting a specific service. Moving this to be per-adapter
-would also mean that the first parameter of the Watcher methods would be
-the object path of which device is in question.
-
-Johan
