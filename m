@@ -1,33 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Aug 2012 12:44:49 +0300
+Date: Tue, 14 Aug 2012 12:40:10 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 0/3] HoG: Add support for non-HID services
- encapsulated in the HID protocol
-Message-ID: <20120814094449.GA5818@x220>
-References: <1344860596-30617-1-git-send-email-jprvita@openbossa.org>
+Subject: Re: [PATCH BlueZ] mgmt: print error message when start_discovery
+ fails
+Message-ID: <20120814094010.GB5352@x220>
+References: <CAJdJm_N6R5C_EPpK985mYajc7i+R=5T44AvTF_C7-5giR1Z8XQ@mail.gmail.com>
+ <1344004954-2762-1-git-send-email-jprvita@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1344860596-30617-1-git-send-email-jprvita@openbossa.org>
+In-Reply-To: <1344004954-2762-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi João Paulo,
+Hi,
 
-On Mon, Aug 13, 2012, João Paulo Rechi Vita wrote:
-> The HID protocol support encapsulating non-HID service data as reports. This
-> patches adds support for this feature for HoG devices.
-> 
-> João Paulo Rechi Vita (3):
->   gatt: Add a new descriptor UUID
->   hog: discover External Report Reference descriptor
->   hog: discover the non-HID service characteristic
-> 
->  attrib/gatt.h               |  1 +
->  profiles/input/hog_device.c | 96 ++++++++++++++++++++++++++++++++++++++-------
->  2 files changed, 83 insertions(+), 14 deletions(-)
+On Fri, Aug 03, 2012, João Paulo Rechi Vita wrote:
+> If we fail to communicate with the MGMT socket is better to print the
+> error message on the mgmtops plugin, where it really happened, instead
+> of leaving this job to its users.
+> ---
+>  src/adapter.c | 6 +-----
+>  src/mgmt.c    | 7 +++++--
+>  2 files changed, 6 insertions(+), 7 deletions(-)
 
-All three patches have been applied. Thanks.
+How do these two patches differ from patches 02/14 and 07/14 of the
+patch set that was sent on July 27th? Why were these two patches resent
+separately? A cover letter would have been quite useful here.
 
 Johan
