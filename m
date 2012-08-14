@@ -1,46 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Aug 2012 13:12:14 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	pkrystad@codeaurora.org
-Subject: Re: [RFCv0 04/21] Bluetooth: Process create response and connect
- response identically
-Message-ID: <20120814101213.GA18949@aemeltch-MOBL1>
-References: <1343260274-11953-1-git-send-email-mathewm@codeaurora.org>
- <1343260274-11953-5-git-send-email-mathewm@codeaurora.org>
+Date: Tue, 14 Aug 2012 12:56:36 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Rafal Garbat <rafal.garbat@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: Re: [PATCH v2 01/13] Heart Rate Profile API
+Message-ID: <20120814095636.GA7055@x220>
+References: <1344870497-6929-1-git-send-email-rafal.garbat@tieto.com>
+ <1344870497-6929-2-git-send-email-rafal.garbat@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1343260274-11953-5-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1344870497-6929-2-git-send-email-rafal.garbat@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi,
 
-On Wed, Jul 25, 2012 at 04:50:56PM -0700, Mat Martineau wrote:
-...
-> -static inline int l2cap_create_channel_rsp(struct l2cap_conn *conn,
-> -					struct l2cap_cmd_hdr *cmd, void *data)
-> -{
-> -	BT_DBG("conn %p", conn);
-> -
-> -	return l2cap_connect_rsp(conn, cmd, data);
-> -}
-> -
->  static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
->  				     u16 icid, u16 result)
->  {
-> @@ -4249,6 +4241,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
->  		break;
->  
->  	case L2CAP_CONN_RSP:
-> +	case L2CAP_CREATE_CHAN_RSP:
->  		err = l2cap_connect_rsp(conn, cmd, data);
-...
+On Mon, Aug 13, 2012, Rafal Garbat wrote:
+> +Heart Rate Profile hierarchy
+> +============================
+> +
+> +Service		org.bluez
+> +Interface	org.bluez.HeartRate
+> +Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+> +
+> +Methods		dict GetProperties()
+> +
+> +			Returns all properties for the interface. See the
+> +			Properties section for the available properties.
+> +
+> +		RegisterWatcher(object agent)
+> +
+> +			Registers a watcher to monitor heart rate measurements.
+> +
+> +			Possible Errors: org.bluez.Error.InvalidArguments
 
-We might rename l2cap_connect_rsp to something like
-l2cap_connect_create_rsp
+I'm wondering if it wouldn't make more sense to have these
+RegisterWatcher APIs (thermometer, heart rate, others?) per-adapter
+instead of per-device. That would be much friendlier to applications in
+that they wouldn't need to separately search for paired/configured
+devices supporting a specific service. Moving this to be per-adapter
+would also mean that the first parameter of the Watcher methods would be
+the object path of which device is in question.
 
-Best regards 
-Andrei Emeltchenko 
-
+Johan
