@@ -1,48 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 14 Aug 2012 10:25:02 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	pkrystad@codeaurora.org
+Subject: Re: [RFCv0 04/21] Bluetooth: Process create response and connect
+ response identically
+In-Reply-To: <20120814101213.GA18949@aemeltch-MOBL1>
+Message-ID: <alpine.DEB.2.02.1208141024090.24089@mathewm-linux>
+References: <1343260274-11953-1-git-send-email-mathewm@codeaurora.org> <1343260274-11953-5-git-send-email-mathewm@codeaurora.org> <20120814101213.GA18949@aemeltch-MOBL1>
 MIME-Version: 1.0
-In-Reply-To: <20120814102812.GA8175@x220>
-References: <CAJdJm_N6R5C_EPpK985mYajc7i+R=5T44AvTF_C7-5giR1Z8XQ@mail.gmail.com>
-	<1344004954-2762-1-git-send-email-jprvita@openbossa.org>
-	<20120814094010.GB5352@x220>
-	<20120814102812.GA8175@x220>
-Date: Tue, 14 Aug 2012 14:53:01 -0300
-Message-ID: <CAAngNMYLQgBce2PPBm==vPpc-Cri3ve+tfZ7b0-+MaMTPpmgBg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] mgmt: print error message when start_discovery fails
-From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-To: =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Aug 14, 2012 at 7:28 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi,
+
+Hi Andrei -
+
+On Tue, 14 Aug 2012, Andrei Emeltchenko wrote:
+
+> Hi Mat,
 >
-> On Tue, Aug 14, 2012, Johan Hedberg wrote:
->> On Fri, Aug 03, 2012, João Paulo Rechi Vita wrote:
->> > If we fail to communicate with the MGMT socket is better to print the
->> > error message on the mgmtops plugin, where it really happened, instead
->> > of leaving this job to its users.
->> > ---
->> >  src/adapter.c | 6 +-----
->> >  src/mgmt.c    | 7 +++++--
->> >  2 files changed, 6 insertions(+), 7 deletions(-)
+> On Wed, Jul 25, 2012 at 04:50:56PM -0700, Mat Martineau wrote:
+> ...
+>> -static inline int l2cap_create_channel_rsp(struct l2cap_conn *conn,
+>> -					struct l2cap_cmd_hdr *cmd, void *data)
+>> -{
+>> -	BT_DBG("conn %p", conn);
+>> -
+>> -	return l2cap_connect_rsp(conn, cmd, data);
+>> -}
+>> -
+>>  static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
+>>  				     u16 icid, u16 result)
+>>  {
+>> @@ -4249,6 +4241,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
+>>  		break;
 >>
->> How do these two patches differ from patches 02/14 and 07/14 of the
->> patch set that was sent on July 27th? Why were these two patches resent
->> separately? A cover letter would have been quite useful here.
+>>  	case L2CAP_CONN_RSP:
+>> +	case L2CAP_CREATE_CHAN_RSP:
+>>  		err = l2cap_connect_rsp(conn, cmd, data);
+> ...
 >
-> Nevermind. I see that they reference the original thread and are
-> probably updates based on received comments. Anyway, it would have been
-> clearer if you'd have added "v2" to the subject and kept the xx/yy
-> numbering.
->
+> We might rename l2cap_connect_rsp to something like
+> l2cap_connect_create_rsp
 
-Sorry, I thought that using "--in-reply-to <message_id>" was enough
-for you to figure out what was going without problems. I've only
-re-generated these two when re-sending, that's why they got a
-different numbering. I'll be more caution next time.
+Ok, I'll update that function name.
 
--- 
-João Paulo Rechi Vita
-Openbossa Labs - INdT
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
