@@ -1,63 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <4055A7F7C23040269F1BF78CA05E2844@sisodomain.com>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-References: <1343816803-16228-1-git-send-email-jaganath.k@samsung.com>
- <CAMOw1v6_boNFVPeuujtzMp409Spd0cPV6-kxmvN31+W9TdgQpg@mail.gmail.com>
-In-reply-to: <CAMOw1v6_boNFVPeuujtzMp409Spd0cPV6-kxmvN31+W9TdgQpg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v0] gdbus: Fix compilation error if macro "error" is
- defined
-Date: Tue, 14 Aug 2012 19:54:36 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
+From: "Jesse Sung" <jesse.sung@canonical.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC][PATCH 0/2] broadcom patchram firmware loader
+Date: Tue, 14 Aug 2012 22:24:49 +0800
+Message-Id: <cover.1344952391.git.jesse.sung@canonical.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="------------1.7.9.5"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Wen-chien Jesse Sung <jesse.sung@canonical.com>
 
---------------------------------------------------
-From: "Lucas De Marchi" <lucas.demarchi@profusion.mobi>
-Sent: Monday, August 13, 2012 7:33 PM
-To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ v0] gdbus: Fix compilation error if macro "error" 
-is defined
+This is a multi-part message in MIME format.
+--------------1.7.9.5
+Content-Type: text/plain; charset=UTF-8; format=fixed
+Content-Transfer-Encoding: 8bit
 
-> On Wed, Aug 1, 2012 at 7:26 AM, Jaganath Kanakkassery
-> <jaganath.k@samsung.com> wrote:
->> The variable "signature" used in error is not defined.
->> ---
->> v0 -> Made error message as per Lucas's suggestion
->>
->>  gdbus/object.c |    4 ++--
->>  1 files changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/gdbus/object.c b/gdbus/object.c
->> index 900e7ab..9689006 100644
->> --- a/gdbus/object.c
->> +++ b/gdbus/object.c
->> @@ -645,8 +645,8 @@ static dbus_bool_t emit_signal_valist(DBusConnection 
->> *conn,
->>                 goto fail;
->>
->>         if (g_dbus_args_have_signature(args, signal) == FALSE) {
->> -               error("%s.%s: expected signature'%s' but got '%s'",
->> -                               interface, name, args, signature);
->> +               error("%s.%s: got unexpected signature '%s'", interface, 
->> name,
->> + 
->> dbus_message_get_signature(signal));
->>                 ret = FALSE;
->>                 goto fail;
->
-> Ack.
->
-> Lucas De Marchi
-> --
 
-Ping.
+There is a user space firmware loading tool which can be found at
+http://article.gmane.org/gmane.linux.bluez.kernel/17932
 
-Thanks,
-Jaganath 
+This tool requires hci device to do the firmware loading, but this
+may cause some race condition between patchram tool and bluetoothd
+or something that also works on hci interface.
 
+Also it needs some hooks to make firmware loads after bootup, s3,
+s4, rfkill, and device hotplug events. Implement this loader in kernel
+module would make things more easier.
+
+
+Wen-chien Jesse Sung (2):
+  Implement broadcom patchram firmware loader
+  Cache firmware images for later use
+
+ drivers/bluetooth/btusb.c |  154 ++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 147 insertions(+), 7 deletions(-)
+
+-- 
+1.7.9.5
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+--------------1.7.9.5--
