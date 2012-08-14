@@ -1,94 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CA+icZUU9qT9H2jy_H8_6Bk1XUbuV0N6_pGRoQbSJhnikewTc0Q@mail.gmail.com>
-References: <CAB=NE6W_SQUJmAXaLesyRShtQ=Urz=w5Ks5jEXq_50bRge+PWQ@mail.gmail.com>
- <CA+icZUU9qT9H2jy_H8_6Bk1XUbuV0N6_pGRoQbSJhnikewTc0Q@mail.gmail.com>
-From: "Luis R. Rodriguez" <mcgrof@frijolero.org>
-Date: Tue, 14 Aug 2012 09:00:07 -0700
-Message-ID: <CAB=NE6V=4J7yKbPdb4gVT6BBjdewhYRNEwrNdMd4XE5Ocg4SeQ@mail.gmail.com>
-Subject: Re: Backports mailing list
-To: sedat.dilek@gmail.com
-Cc: David Miller <davem@davemloft.net>, linux-kernel@vger.kernel.org,
-	linux-wireless <linux-wireless@vger.kernel.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	lf_driver_backport@lists.linux-foundation.org,
-	Julia Lawall <julia.lawall@lip6.fr>,
-	Jesper Andersen <jespera@diku.dk>,
-	=?UTF-8?B?T3phbiDDh2HEn2xheWFu?= <ozancag@gmail.com>,
-	Hauke Mehrtens <hauke@hauke-m.de>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-kernel-owner@vger.kernel.org
+Message-id: <4055A7F7C23040269F1BF78CA05E2844@sisodomain.com>
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+References: <1343816803-16228-1-git-send-email-jaganath.k@samsung.com>
+ <CAMOw1v6_boNFVPeuujtzMp409Spd0cPV6-kxmvN31+W9TdgQpg@mail.gmail.com>
+In-reply-to: <CAMOw1v6_boNFVPeuujtzMp409Spd0cPV6-kxmvN31+W9TdgQpg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v0] gdbus: Fix compilation error if macro "error" is
+ defined
+Date: Tue, 14 Aug 2012 19:54:36 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Aug 14, 2012 at 2:34 AM, Sedat Dilek <sedat.dilek@gmail.com> wrote:
-> On Mon, Aug 13, 2012 at 10:42 PM, Luis R. Rodriguez
-> <mcgrof@frijolero.org> wrote:
->> David,
+Hi,
+
+--------------------------------------------------
+From: "Lucas De Marchi" <lucas.demarchi@profusion.mobi>
+Sent: Monday, August 13, 2012 7:33 PM
+To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ v0] gdbus: Fix compilation error if macro "error" 
+is defined
+
+> On Wed, Aug 1, 2012 at 7:26 AM, Jaganath Kanakkassery
+> <jaganath.k@samsung.com> wrote:
+>> The variable "signature" used in error is not defined.
+>> ---
+>> v0 -> Made error message as per Lucas's suggestion
 >>
->> The compat [0] / compat-wireless [1] [2] projects have received quite
->> a bit of love of the years to the point we now have 3 subsystems
->> backported: Ethernet, Bluetooth and 802.11. Ozan Çağlayan, a Linux
->> Foundation Google Summer of Code student is folding in right now drm
->> driver support. At the request of the community, specifically those
->> part of the Linux Foundation driver working group [3], we are going to
->> be renaming the project to compat-drivers soon after drm is integrated
->> and will be housing documentation under the kernel.org infrastructure
->> [4] under this new name. It'll take some time for us to migrate the
->> documentation / releases but do not see major issues with that, it
->> will just take a bit of time but hope to have it done for the next
->> stable release based on the next kernel stable release. At this time
->> for patches we do have a Linux Foundation mailing list but have had
->> issues with it for a while now so we keep using linux-wireless for
->> patches. Given that our focus is to always prioritize upstream and
->> always try to work with solutions that ensure vendors are focusing on
->> upstream solutions and prioritizing upstream [5] I was hoping we can
->> get a mailing list set up on vger for the project, perhaps
->> backports@vger.kernel.org, so we don't flood the other mailing lists
->> with random kernel backport junk. Please let me know if this is
->> reasonable.
+>>  gdbus/object.c |    4 ++--
+>>  1 files changed, 2 insertions(+), 2 deletions(-)
 >>
->> [0] https://github.com/mcgrof/compat
->> [1] http://wireless.kernel.org/en/users/Download/
->> [2] http://wireless.kernel.org/en/users/Download/stable/
->> [3] http://www.linuxfoundation.org/collaborate/workgroups/driver-backport/group
->> [4] https://backports.wiki.kernel.org
->> [5] http://wireless.kernel.org/en/users/Download/stable/#Additional_patches_to_stable_releases
+>> diff --git a/gdbus/object.c b/gdbus/object.c
+>> index 900e7ab..9689006 100644
+>> --- a/gdbus/object.c
+>> +++ b/gdbus/object.c
+>> @@ -645,8 +645,8 @@ static dbus_bool_t emit_signal_valist(DBusConnection 
+>> *conn,
+>>                 goto fail;
 >>
+>>         if (g_dbus_args_have_signature(args, signal) == FALSE) {
+>> -               error("%s.%s: expected signature'%s' but got '%s'",
+>> -                               interface, name, args, signature);
+>> +               error("%s.%s: got unexpected signature '%s'", interface, 
+>> name,
+>> + 
+>> dbus_message_get_signature(signal));
+>>                 ret = FALSE;
+>>                 goto fail;
 >
-> Hi,
+> Ack.
 >
-> I am wondering why people are not consistent in naming - here again a
-> good example.
->
-> The workgroup at Linux Foundation is called "driver-backport".
-> You (Luis) are talking about a rename to "compat-drivers".
-> And then the ML and wiki have the name "backports".
->
-> So "backports" is for me is a bit confusing!
-> That reminds me when I first read about "AAArgh64!!!" stuff which was
-> in the end called mips64 to keep consistency to other existing arches.
->
-> So, just to fool the world a bit more:
-> What about "linux-backports" or why didn't you keep the "driver-backport" name?
->
-> Just my 0.02EUR.
+> Lucas De Marchi
+> --
 
-To start off with the compat-drivers name came as a recommendation
-from the workgroup and it follows the old name evolution:
-compat-wireless --> compat-drivers. The reason for not having a long
-similar alias for the mailing list is vger.kernel.org already implies
-Linux kernel so backports is nice and short. Another reason is that
-the backporting project already has 2 target source code projects:
+Ping.
 
-  * compat - a shared module
-  * compat-drivers - the drivers we pull and backport
+Thanks,
+Jaganath 
 
-When folks send patches they can prepend their patches with the
-project name as a prefix to the patch.
-
-For more details please see:
-
-http://www.do-not-panic.com/2012/08/automatically-backporting-linux-kernel.html
-http://www.do-not-panic.com/2012/08/optimizing-backporting-collateral.html
-
-  Luis
