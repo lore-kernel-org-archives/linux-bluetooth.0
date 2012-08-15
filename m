@@ -1,59 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Aug 2012 12:57:23 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv1 4/4] Bluetooth: trivial: Use preferred method for NULL
- check
-Message-ID: <20120815095721.GA5154@aemeltch-MOBL1>
-References: <1344351906-27563-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1344351906-27563-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20120815041655.GD3344@joana>
+Date: Wed, 15 Aug 2012 12:27:07 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Eder Ruiz Maria <eder.ruiz@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v2 1/3] att: Add prepare write support
+Message-ID: <20120815092707.GA25877@x220>
+References: <1343420976-19921-1-git-send-email-eder.ruiz@openbossa.org>
+ <1343669655-12586-1-git-send-email-eder.ruiz@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120815041655.GD3344@joana>
+In-Reply-To: <1343669655-12586-1-git-send-email-eder.ruiz@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Eder,
 
-On Wed, Aug 15, 2012 at 01:16:55AM -0300, Gustavo Padovan wrote:
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > 
-> > Use standard bluetooth way to check NULL pointer !var instead of
-> > var == NULL.
-> > 
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > ---
-> >  net/bluetooth/af_bluetooth.c |    4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> I applied patches 2, 3 and 4 to bluetooth-next. Patch 1 needs rebase. Thanks.
+On Mon, Jul 30, 2012, Eder Ruiz Maria wrote:
+> Add functions for encoding/decoding Prepare Write Request and
+> Response PDUs.
+> ---
+>  attrib/att.c |   54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  attrib/att.h |    5 +++++
+>  2 files changed, 59 insertions(+)
 
-Patches 1 and 3 needs patch from linux-next and wireless-testing
+All three patches have been applied. Thanks.
 
-<------8<------------------------------------------------------------------
-|  vsprintf: add %pMR for Bluetooth MAC address
-|
-|  author  Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-|          Mon, 30 Jul 2012 21:40:23 +0000 (14:40 -0700)
-|  committer       Linus Torvalds <torvalds@linux-foundation.org>
-|          Tue, 31 Jul 2012 00:25:14 +0000 (17:25 -0700)
-|  Bluetooth uses mostly LE byte order which is reversed for visual
-|  interpretation.  Currently in Bluetooth in use unsafe batostr function.
-|
-|  This is a slightly modified version of Joe's patch (sent Sat, Dec 4,
-|  2010).
-|
-|  Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-|  Cc: Joe Perches <joe@perches.com>
-|  Cc: Marcel Holtmann <marcel@holtmann.org>
-|  Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
-|  Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
-|
-<------8<------------------------------------------------------------------
+I also went ahead and finally updated the entire attrib code base to use
+proper size_t, ssize_t, off_t etc variables where appropriate. This
+means that any unapplied attrib patches may need rebasing (and fixing to
+follow the same convention).
 
-which adds actual specifier.
-
-Best regards 
-Andrei Emeltchenko 
+Johan
