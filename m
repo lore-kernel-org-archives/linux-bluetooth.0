@@ -1,69 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Aug 2012 01:07:32 -0300
+Date: Wed, 15 Aug 2012 01:04:39 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix use-after-free bug in SMP
-Message-ID: <20120815040732.GB3344@joana>
-References: <1343864055-23154-1-git-send-email-andre.guedes@openbossa.org>
+Subject: Re: [PATCH v3 7/7] Bluetooth: Add type information to the
+ hci_connect() debug statement
+Message-ID: <20120815040439.GA3344@joana>
+References: <1343428380-32705-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1343428380-32705-8-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1343864055-23154-1-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1343428380-32705-8-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Vinicius,
 
-* Andre Guedes <andre.guedes@openbossa.org> [2012-08-01 20:34:15 -0300]:
+* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2012-07-27 19:33:00 -0300]:
 
-> If SMP fails, we should always cancel security_timer delayed work.
-> Otherwise, security_timer function may run after l2cap_conn object
-> has been freed.
+> Now that we have a "connect" function for each link type, we should be
+> able to indentify which function is going to be called.
 > 
-> This patch fixes the following warning reported by ODEBUG:
-> 
-> WARNING: at lib/debugobjects.c:261 debug_print_object+0x7c/0x8d()
-> Hardware name: Bochs
-> ODEBUG: free active (active state 0) object type: timer_list hint: delayed_work_timer_fn+0x0/0x27
-> Modules linked in: btusb bluetooth
-> Pid: 440, comm: kworker/u:2 Not tainted 3.5.0-rc1+ #4
-> Call Trace:
->  [<ffffffff81174600>] ? free_obj_work+0x4a/0x7f
->  [<ffffffff81023eb8>] warn_slowpath_common+0x7e/0x97
->  [<ffffffff81023f65>] warn_slowpath_fmt+0x41/0x43
->  [<ffffffff811746b1>] debug_print_object+0x7c/0x8d
->  [<ffffffff810394f0>] ? __queue_work+0x241/0x241
->  [<ffffffff81174fdd>] debug_check_no_obj_freed+0x92/0x159
->  [<ffffffff810ac08e>] slab_free_hook+0x6f/0x77
->  [<ffffffffa0019145>] ? l2cap_conn_del+0x148/0x157 [bluetooth]
->  [<ffffffff810ae408>] kfree+0x59/0xac
->  [<ffffffffa0019145>] l2cap_conn_del+0x148/0x157 [bluetooth]
->  [<ffffffffa001b9a2>] l2cap_recv_frame+0xa77/0xfa4 [bluetooth]
->  [<ffffffff810592f9>] ? trace_hardirqs_on_caller+0x112/0x1ad
->  [<ffffffffa001c86c>] l2cap_recv_acldata+0xe2/0x264 [bluetooth]
->  [<ffffffffa0002b2f>] hci_rx_work+0x235/0x33c [bluetooth]
->  [<ffffffff81038dc3>] ? process_one_work+0x126/0x2fe
->  [<ffffffff81038e22>] process_one_work+0x185/0x2fe
->  [<ffffffff81038dc3>] ? process_one_work+0x126/0x2fe
->  [<ffffffff81059f2e>] ? lock_acquired+0x1b5/0x1cf
->  [<ffffffffa00028fa>] ? le_scan_work+0x11d/0x11d [bluetooth]
->  [<ffffffff81036fb6>] ? spin_lock_irq+0x9/0xb
->  [<ffffffff81039209>] worker_thread+0xcf/0x175
->  [<ffffffff8103913a>] ? rescuer_thread+0x175/0x175
->  [<ffffffff8103cfe0>] kthread+0x95/0x9d
->  [<ffffffff812c5054>] kernel_threadi_helper+0x4/0x10
->  [<ffffffff812c36b0>] ? retint_restore_args+0x13/0x13
->  [<ffffffff8103cf4b>] ? flush_kthread_worker+0xdb/0xdb
->  [<ffffffff812c5050>] ? gs_change+0x13/0x13
-> 
-> This bug can be reproduced using hctool lecc or l2test tools and
-> bluetoothd not running.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 > ---
->  net/bluetooth/smp.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  net/bluetooth/hci_conn.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Patch has been applied to bluetooth.git. Thanks.
+all 7 patches have been applied to bluetooth-next. Thanks.
 
 	Gustavo
