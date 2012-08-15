@@ -1,35 +1,217 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <502C0656.4050008@ntlworld.com>
-Date: Wed, 15 Aug 2012 21:28:06 +0100
-From: "alistair.rodger" <alistair.rodger@ntlworld.com>
+Date: Wed, 15 Aug 2012 09:56:04 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	pkrystad@codeaurora.org
+Subject: Re: [RFCv0 14/21] Bluetooth: Handle physical link completion
+In-Reply-To: <20120815135105.GA3555@aemeltch-MOBL1>
+Message-ID: <alpine.DEB.2.02.1208150951470.30981@mathewm-linux>
+References: <1343260274-11953-1-git-send-email-mathewm@codeaurora.org> <1343260274-11953-15-git-send-email-mathewm@codeaurora.org> <20120815135105.GA3555@aemeltch-MOBL1>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: gstreamer a2dpSource plugin
-References: <5027DC19.8020505@ntlworld.com> <CABBYNZJTkSf1BFZYge9R5WX7m79=hkDfaENh201EygSdck_yyQ@mail.gmail.com>
-In-Reply-To: <CABBYNZJTkSf1BFZYge9R5WX7m79=hkDfaENh201EygSdck_yyQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I am trying to stream_from_  the device to a local sink.  I am therefore looking for something like;
 
-gst-launch alsasrc device=bluetooth ! sbcdec ! .....
-or
+Andrei -
 
-gst-launch a2dpsource transport=/org/bluez/{PID}/hci0/dev_AA_BB_CC_DD_EE_FF/fd0 ! sbcdec ! ...
+On Wed, 15 Aug 2012, Andrei Emeltchenko wrote:
 
-preferably the second option as this would use SBC not PCM.
+> Hi Mat,
+>
+> On Wed, Jul 25, 2012 at 04:51:06PM -0700, Mat Martineau wrote:
+>> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+>> ---
+>>  net/bluetooth/l2cap_core.c | 147 +++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 147 insertions(+)
+>>
+>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>> index d981d87..7e253ce 100644
+>> --- a/net/bluetooth/l2cap_core.c
+>> +++ b/net/bluetooth/l2cap_core.c
+>> @@ -975,6 +975,19 @@ static void l2cap_send_conn_req(struct l2cap_chan *chan)
+>>  	l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_REQ, sizeof(req), &req);
+>>  }
+>>
+>> +static void l2cap_send_create_chan_req(struct l2cap_chan *chan, u8 chan_id)
+>> +{
+>> +	struct l2cap_create_chan_req req;
+>> +	req.scid = cpu_to_le16(chan->scid);
+>> +	req.psm  = chan->psm;
+>> +	req.amp_id = chan_id;
+>> +
+>> +	chan->ident = l2cap_get_ident(chan->conn);
+>> +
+>> +	l2cap_send_cmd(chan->conn, chan->ident, L2CAP_CREATE_CHAN_REQ,
+>> +		       sizeof(req), &req);
+>> +}
+>> +
+>>  static void l2cap_move_setup(struct l2cap_chan *chan)
+>>  {
+>>  	struct sk_buff *skb;
+>> @@ -4119,6 +4132,24 @@ static int l2cap_create_channel_req(struct l2cap_conn *conn,
+>>  	return 0;
+>>  }
+>>
+>> +static void l2cap_send_move_chan_req(struct l2cap_chan *chan, u8 dest_amp_id)
+>> +{
+>> +	struct l2cap_move_chan_req req;
+>> +	u8 ident;
+>> +
+>> +	BT_DBG("chan %p, dest_amp_id %d", chan, dest_amp_id);
+>> +
+>> +	ident = l2cap_get_ident(chan->conn);
+>> +	if (chan)
+>
+> I think that the check is not needed otherwise you crash at referencing
+> chan->scid below.
 
-But to clarify, I have been asked to investigate this as part of a product we are developing.  So I am trying to understand the approach we should take.  As an embedded device we cannot support PulseAudio but instead have been using gstreamer.  I can stream_from_  our device using gstreamer but, I understand, the only way to stream to a device, using the higher quality a2dp sbc codec, is using pulse audio.
+Or at the line above.  This check was added before everything had been 
+moved from l2cap_pi to l2cap_chan, and is no longer relevant.
 
-There are examples on the web using "gst-launch alsasource device=bluetooth ! ..." but I believe this has been deprecated and can only support the SCO headset profile "low" quality audio.
+>
+>> +		chan->ident = ident;
+>> +
+>> +	req.icid = cpu_to_le16(chan->scid);
+>> +	req.dest_amp_id = dest_amp_id;
+>> +
+>> +	l2cap_send_cmd(chan->conn, ident, L2CAP_MOVE_CHAN_REQ, sizeof(req),
+>> +		       &req);
+>> +}
+>> +
+>>  static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
+>>  				     u16 icid, u16 result)
+>>  {
+>> @@ -4284,6 +4315,122 @@ static void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
+>>  	}
+>>  }
+>>
+>> +void l2cap_physical_cfm(struct l2cap_chan *chan, int result, u8 local_id,
+>> +			u8 remote_id)
+>> +{
+>> +	BT_DBG("chan %p, result %d, local_id %d, remote_id %d", chan, result,
+>> +	       local_id, remote_id);
+>> +
+>> +	l2cap_chan_lock(chan);
+>> +
+>> +	if (chan->state == BT_DISCONN || chan->state == BT_CLOSED) {
+>> +		l2cap_chan_unlock(chan);
+>> +		return;
+>> +	}
+>> +
+>> +	if (chan->state != BT_CONNECTED) {
+>> +		if (!test_bit(CONF_CONNECT_PEND, &chan->conf_state)) {
+>> +			struct l2cap_conn_rsp rsp;
+>> +			char buf[128];
+>> +			rsp.scid = cpu_to_le16(chan->dcid);
+>> +			rsp.dcid = cpu_to_le16(chan->scid);
+>> +
+>> +			/* Incoming channel on AMP */
+>> +			if (result == L2CAP_CR_SUCCESS) {
+>> +				/* Send successful response */
+>> +				rsp.result = cpu_to_le16(L2CAP_CR_SUCCESS);
+>> +				rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
+>> +			} else {
+>> +				/* Send negative response */
+>> +				rsp.result = cpu_to_le16(L2CAP_CR_NO_MEM);
+>> +				rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
+>> +			}
+>> +
+>> +			l2cap_send_cmd(chan->conn, chan->ident,
+>> +				       L2CAP_CREATE_CHAN_RSP,
+>> +				       sizeof(rsp), &rsp);
+>> +
+>> +			if (result == L2CAP_CR_SUCCESS) {
+>> +				__l2cap_state_change(chan, BT_CONFIG);
+>> +				set_bit(CONF_REQ_SENT, &chan->conf_state);
+>> +				l2cap_send_cmd(chan->conn,
+>> +					       l2cap_get_ident(chan->conn),
+>> +					       L2CAP_CONF_REQ,
+>> +					       l2cap_build_conf_req(chan, buf),
+>> +					       buf);
+>> +				chan->num_conf_req++;
+>> +			}
+>> +		} else {
+>> +			/* Outgoing channel on AMP */
+>> +			if (result == L2CAP_CR_SUCCESS) {
+>> +				chan->chan_id = local_id;
+>> +				l2cap_send_create_chan_req(chan, remote_id);
+>> +			} else {
+>> +				/* Revert to BR/EDR connect */
+>> +				l2cap_send_conn_req(chan);
+>> +			}
+>> +		}
+>> +	} else if (result == L2CAP_MR_SUCCESS &&
+>> +		   chan->move_role == L2CAP_MOVE_ROLE_INITIATOR) {
+>> +		l2cap_move_setup(chan);
+>> +		chan->move_id = local_id;
+>> +		chan->move_state = L2CAP_MOVE_WAIT_RSP;
+>> +
+>> +		l2cap_send_move_chan_req(chan, remote_id);
+>> +		__set_chan_timer(chan, L2CAP_MOVE_TIMEOUT);
+>> +	} else if (result == L2CAP_MR_SUCCESS &&
+>> +		   chan->move_role == L2CAP_MOVE_ROLE_RESPONDER) {
+>> +		struct hci_chan *hchan = NULL;
+>> +
+>> +		/* Placeholder - get hci_chan for logical link */
+>> +
+>> +		if (hchan) {
+>> +			if (hchan->state == BT_CONNECTED) {
+>> +				/* Logical link is ready to go */
+>> +				chan->hs_hcon = hchan->conn;
+>> +				chan->hs_hcon->l2cap_data = chan->conn;
+>> +				chan->move_state = L2CAP_MOVE_WAIT_CONFIRM;
+>> +				l2cap_send_move_chan_rsp(chan->conn,
+>> +							 chan->move_cmd_ident,
+>> +							 chan->dcid,
+>> +							 L2CAP_MR_SUCCESS);
+>> +
+>> +				l2cap_logical_cfm(chan, hchan,
+>> +						  L2CAP_MR_SUCCESS);
+>> +			} else {
+>> +				/* Wait for logical link to be ready */
+>> +				chan->move_state = L2CAP_MOVE_WAIT_LOGICAL_CFM;
+>> +			}
+>> +		} else {
+>> +			/* Logical link not available */
+>> +			l2cap_send_move_chan_rsp(chan->conn,
+>> +						 chan->move_cmd_ident,
+>> +						 chan->dcid,
+>> +						 L2CAP_MR_NOT_ALLOWED);
+>> +		}
+>> +	} else {
+>> +		if (chan->move_role == L2CAP_MOVE_ROLE_RESPONDER) {
+>> +			u8 rsp_result;
+>> +			if (result == -EINVAL)
+>> +				rsp_result = L2CAP_MR_BAD_ID;
+>> +			else
+>> +				rsp_result = L2CAP_MR_NOT_ALLOWED;
+>> +
+>> +			l2cap_send_move_chan_rsp(chan->conn,
+>> +						 chan->move_cmd_ident,
+>> +						 chan->dcid, rsp_result);
+>> +		}
+>> +
+>> +		chan->move_role = L2CAP_MOVE_ROLE_NONE;
+>> +		chan->move_state = L2CAP_MOVE_STABLE;
+>> +
+>> +		/* Restart data transmission */
+>> +		l2cap_ertm_send(chan);
+>> +	}
+>> +
+>> +	l2cap_chan_unlock(chan);
+>> +}
+>
+> I feel that this function is too big. Maybe we could split channel move
+> and channel create operations?
 
-So what I am trying to determine is;
+Sure, the "if (chan->state != BT_CONNECTED)" clause would be clearer 
+in a channel create function, and the other clauses can go in a 
+channel move function.
 
-1) Is there a gstreamer source plugin which would take the audio out of the bluetooth stack and pipe it to the "sbcdec" plugin, from which I can pipe it to something like "alsasink"?
-2) is it possible to stream the higher quality audio over alsasrc, or is alsa fundamentally only PCM ?
-3) Is our only option to create or commission a gstreamer plugin?  If so what steps should we take to pursue its creation.
 
-Sincerely,
-alistair
-
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
