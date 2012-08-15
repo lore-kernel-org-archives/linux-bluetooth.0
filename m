@@ -4,182 +4,157 @@ From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ v2 06/14] core: mutually exclude concurrent connections
-Date: Wed, 15 Aug 2012 11:50:45 -0300
-Message-Id: <1345042253-15053-7-git-send-email-jprvita@openbossa.org>
+Subject: [PATCH BlueZ v2 05/14] core: use adapter connect list for LE connections
+Date: Wed, 15 Aug 2012 11:50:44 -0300
+Message-Id: <1345042253-15053-6-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1345042253-15053-1-git-send-email-jprvita@openbossa.org>
 References: <1345042253-15053-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since controllers don't support more than one ongoing connection
-procedure at the same time, new connection attempts needs to yield if
-there is an ongoing connection procedure already.
+When a connection is needed for a LE device it is added to the adapter
+connect list instead of directly connecting the ATT io channel.
 ---
- src/adapter.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++++++--------
- src/device.c  |  4 ++--
- src/device.h  |  2 +-
- 3 files changed, 60 insertions(+), 11 deletions(-)
+ src/adapter.c |  2 +-
+ src/device.c  | 43 +++++++++++--------------------------------
+ src/device.h  |  1 +
+ 3 files changed, 13 insertions(+), 33 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index ea707d3..52983ee 100644
+index 080b03f..ea707d3 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -133,8 +133,10 @@ struct btd_adapter {
- 	GSList *mode_sessions;		/* Request Mode sessions */
- 	GSList *disc_sessions;		/* Discovery sessions */
- 	GSList *connect_list;		/* Devices to connect when found */
-+	GSList *connecting_list;	/* Pending connects */
- 	guint discov_id;		/* Discovery timer */
- 	gboolean discovering;		/* Discovery active */
-+	gboolean connecting;		/* Connect active */
- 	gboolean discov_suspended;	/* Discovery suspended */
- 	guint auto_timeout_id;		/* Automatic connections timeout */
- 	sdp_list_t *services;		/* Services associated to adapter */
-@@ -2235,6 +2237,9 @@ void btd_adapter_start(struct btd_adapter *adapter)
- 	call_adapter_powered_callbacks(adapter, TRUE);
- 
- 	info("Adapter %s has been enabled", adapter->path);
-+
-+	if (g_slist_length(adapter->connect_list))
-+		mgmt_start_discovery(adapter->dev_id);
- }
- 
- static void reply_pending_requests(struct btd_adapter *adapter)
-@@ -2548,6 +2553,7 @@ void adapter_set_discovering(struct btd_adapter *adapter,
- 						gboolean discovering)
- {
- 	const char *path = adapter->path;
-+	guint connect_list_size;
- 
- 	adapter->discovering = discovering;
- 
-@@ -2562,11 +2568,17 @@ void adapter_set_discovering(struct btd_adapter *adapter,
- 	g_slist_free_full(adapter->oor_devices, dev_info_free);
- 	adapter->oor_devices = g_slist_copy(adapter->found_devices);
- 
--	if (!adapter_has_discov_sessions(adapter) || adapter->discov_suspended)
-+	if (adapter->discov_suspended)
- 		return;
- 
--	DBG("hci%u restarting discovery, disc_sessions %u", adapter->dev_id,
--					g_slist_length(adapter->disc_sessions));
-+	connect_list_size = g_slist_length(adapter->connect_list);
-+
-+	if (!adapter_has_discov_sessions(adapter) && !connect_list_size)
-+		return;
-+
-+	DBG("hci%u restarting discovery: disc_sessions %u, connect_list size "
-+		"%u", adapter->dev_id, g_slist_length(adapter->disc_sessions),
-+							connect_list_size);
- 
- 	adapter->discov_id = g_idle_add(discovery_cb, adapter);
- }
-@@ -2872,17 +2884,44 @@ static char *read_stored_data(bdaddr_t *local, bdaddr_t *peer,
- 	return textfile_get(filename, key);
- }
- 
-+static gboolean clean_connecting_state(GIOChannel *io, GIOCondition cond, gpointer user_data)
-+{
-+	struct btd_device *device = user_data;
-+	struct btd_adapter *adapter = device_get_adapter(device);
-+
-+	adapter_connect_list_remove(adapter, device);
-+	adapter->connecting_list = g_slist_remove(adapter->connecting_list,
-+								device);
-+
-+	adapter->connecting = FALSE;
-+
-+	if (!g_slist_length(adapter->connecting_list) &&
-+					g_slist_length(adapter->connect_list))
-+		mgmt_start_discovery(adapter->dev_id);
-+
-+	btd_device_unref(device);
-+
-+	return FALSE;
-+}
-+
- static gboolean connect_pending_cb(gpointer user_data)
- {
- 	struct btd_device *device = user_data;
- 	struct btd_adapter *adapter = device_get_adapter(device);
-+	GIOChannel *io;
- 
- 	/* in the future we may want to check here if the controller supports
- 	 * scanning and connecting at the same time */
+@@ -2882,7 +2882,7 @@ static gboolean connect_pending_cb(gpointer user_data)
  	if (adapter->discovering)
  		return TRUE;
  
--	device_att_connect(device);
-+	if (adapter->connecting)
-+		return TRUE;
-+
-+	adapter->connecting = TRUE;
-+	io = device_att_connect(device);
-+	g_io_add_watch(io, G_IO_OUT | G_IO_ERR, clean_connecting_state,
-+						btd_device_ref(device));
+-	/* TODO: call device connect callback */
++	device_att_connect(device);
  
  	return FALSE;
  }
-@@ -2975,12 +3014,22 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 
- 	if (bdaddr_type == BDADDR_LE_PUBLIC ||
- 					bdaddr_type == BDADDR_LE_RANDOM) {
-+		struct btd_device *device;
-+
- 		l = g_slist_find_custom(adapter->connect_list, bdaddr,
- 					(GCompareFunc) device_bdaddr_cmp);
--		if (l) {
--			g_idle_add(connect_pending_cb, l->data);
--			stop_discovery(adapter);
--		}
-+		if (!l)
-+			goto done;
-+
-+		device = l->data;
-+		l = g_slist_find(adapter->connecting_list, device);
-+		if (l)
-+			goto done;
-+
-+		g_idle_add(connect_pending_cb, device);
-+		adapter->connecting_list = g_slist_append(
-+					adapter->connecting_list, device);
-+		stop_discovery(adapter);
- 	}
- 
- done:
 diff --git a/src/device.c b/src/device.c
-index e677976..74d3c68 100644
+index 24b9065..e677976 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -1976,7 +1976,7 @@ static void att_success_cb(gpointer user_data)
+@@ -1798,15 +1798,6 @@ static void attio_disconnected(gpointer data, gpointer user_data)
+ 		attio->dcfunc(attio->user_data);
+ }
+ 
+-static void att_connect_dispatched(gpointer user_data)
+-{
+-	struct btd_device *device = user_data;
+-
+-	device->auto_id = 0;
+-}
+-
+-static gboolean att_connect(gpointer user_data);
+-
+ static gboolean attrib_disconnected_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+@@ -1826,10 +1817,7 @@ static gboolean attrib_disconnected_cb(GIOChannel *io, GIOCondition cond,
+ 	if (device->auto_connect == FALSE || err != ETIMEDOUT)
+ 		goto done;
+ 
+-	device->auto_id = g_timeout_add_seconds_full(G_PRIORITY_DEFAULT_IDLE,
+-						AUTO_CONNECTION_INTERVAL,
+-						att_connect, device,
+-						att_connect_dispatched);
++	adapter_connect_list_add(device_get_adapter(device), device);
+ 
+ done:
+ 	attio_cleanup(device);
+@@ -1973,11 +1961,7 @@ static void att_error_cb(const GError *gerr, gpointer user_data)
+ 	if (device->auto_connect == FALSE)
+ 		return;
+ 
+-	device->auto_id = g_timeout_add_seconds_full(G_PRIORITY_DEFAULT_IDLE,
+-						AUTO_CONNECTION_INTERVAL,
+-						att_connect, device,
+-						att_connect_dispatched);
+-
++	adapter_connect_list_add(device_get_adapter(device), device);
+ 	DBG("Enabling automatic connections");
+ }
+ 
+@@ -1992,7 +1976,7 @@ static void att_success_cb(gpointer user_data)
  	g_slist_foreach(device->attios, attio_connected, device->attrib);
  }
  
--gboolean device_att_connect(gpointer user_data)
-+GIOChannel *device_att_connect(gpointer user_data)
+-static gboolean att_connect(gpointer user_data)
++gboolean device_att_connect(gpointer user_data)
  {
  	struct btd_device *device = user_data;
  	struct btd_adapter *adapter = device->adapter;
-@@ -2024,7 +2024,7 @@ gboolean device_att_connect(gpointer user_data)
+@@ -2262,6 +2246,9 @@ void device_set_temporary(struct btd_device *device, gboolean temporary)
  
- 	device->att_io = io;
+ 	DBG("temporary %d", temporary);
  
--	return FALSE;
-+	return io;
++	if (temporary)
++		adapter_connect_list_remove(device_get_adapter(device), device);
++
+ 	device->temporary = temporary;
  }
  
- static void att_browse_error_cb(const GError *gerr, gpointer user_data)
+@@ -2277,6 +2264,7 @@ void device_set_bonded(struct btd_device *device, gboolean bonded)
+ 
+ void device_set_auto_connect(struct btd_device *device, gboolean enable)
+ {
++	struct btd_adapter *adapter = device_get_adapter(device);
+ 	char addr[18];
+ 
+ 	if (!device)
+@@ -2290,15 +2278,10 @@ void device_set_auto_connect(struct btd_device *device, gboolean enable)
+ 
+ 	/* Disabling auto connect */
+ 	if (enable == FALSE) {
+-		if (device->auto_id)
+-			g_source_remove(device->auto_id);
++		adapter_connect_list_remove(adapter, device);
+ 		return;
+ 	}
+ 
+-	/* Enabling auto connect */
+-	if (device->auto_id != 0)
+-		return;
+-
+ 	if (device->attrib) {
+ 		DBG("Already connected");
+ 		return;
+@@ -2307,9 +2290,8 @@ void device_set_auto_connect(struct btd_device *device, gboolean enable)
+ 	if (device->attios == NULL && device->attios_offline == NULL)
+ 		return;
+ 
+-	device->auto_id = g_idle_add_full(G_PRIORITY_DEFAULT_IDLE,
+-						att_connect, device,
+-						att_connect_dispatched);
++	/* Enabling auto connect */
++	adapter_connect_list_add(adapter, device);
+ }
+ 
+ static gboolean start_discovery(gpointer user_data)
+@@ -3091,10 +3073,7 @@ guint btd_device_add_attio_callback(struct btd_device *device,
+ 
+ 	device->attios = g_slist_append(device->attios, attio);
+ 
+-	if (device->auto_id == 0)
+-		device->auto_id = g_idle_add_full(G_PRIORITY_DEFAULT_IDLE,
+-						att_connect, device,
+-						att_connect_dispatched);
++	adapter_connect_list_add(device_get_adapter(device), device);
+ 
+ 	return attio->id;
+ }
 diff --git a/src/device.h b/src/device.h
-index 9b7df1c..5f51745 100644
+index 2b2e6d8..9b7df1c 100644
 --- a/src/device.h
 +++ b/src/device.h
-@@ -127,4 +127,4 @@ int device_unblock(DBusConnection *conn, struct btd_device *device,
+@@ -127,3 +127,4 @@ int device_unblock(DBusConnection *conn, struct btd_device *device,
  void device_set_pnpid(struct btd_device *device, uint8_t vendor_id_src,
  			uint16_t vendor_id, uint16_t product_id,
  			uint16_t product_ver);
--gboolean device_att_connect(gpointer user_data);
-+GIOChannel *device_att_connect(gpointer user_data);
++gboolean device_att_connect(gpointer user_data);
 -- 
 1.7.11.2
 
