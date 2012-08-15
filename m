@@ -1,65 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ v2 00/14] LE General Connection Establishment procedure
-Date: Wed, 15 Aug 2012 11:50:39 -0300
-Message-Id: <1345042253-15053-1-git-send-email-jprvita@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 10/10] gap: Don't store Appearance if value is "unknown"
+Date: Wed, 15 Aug 2012 11:20:07 -0300
+Message-Id: <1345040407-17767-11-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1345040407-17767-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1345040407-17767-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This series implement the LE General Connection Establishment procedure
-for LE connections.
+The Core SPEC is not clear regarding the behaviour or the Appearance
+characteristic. According to the SPEC, the Appearance characteristic
+should be readable without authentication or authorization. This patch
+will keep the Appearance characteristic value refresh (read) on every
+re-connection if the value is 0x0000.
+---
+ profiles/gap/gap.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-If there are LE bonded devices marked for auto connection they are added
-to a connect_list on the adapter. When there is any device on this list
-scan is performed continuously. When a device is found the connect_list
-is checked. If that device is on the list scan is stopped and a
-connection attempt is made to that device.
-
-If any client tries to perform discovery and the scan for the General
-Connection Establishment procedure is active, the discovery request is
-queued and performed right after the GCEP scan session finishes.
-
-This series changes quite a lot the LE connection logic, but we've been
-testing and using this code at INdT for about 4 weeks. Any comments and
-more testing are appreciated.
-
-Claudio Takahasi (7):
-  core: Control connections based on adapter state
-  mgmt: Add LE scanning callback
-  core: Replace interleaved by LE scanning
-  core: Start LE scanning when a device requests
-  core: Remove leftover define
-  core: Queue discovery if scanning is active
-  core: Re-connect for ECONNRESET or ECONNABORTED
-
-João Paulo Rechi Vita (5):
-  mgmt: print error message when start_discovery fails
-  core: add compare function for bdaddr in a struct btd_device
-  core: Add a list of LE devices to connect
-  core: use adapter connect list for LE connections
-  core: mutually exclude concurrent connections
-
-Paulo Alcantara (1):
-  core: Disable unnecessary auto connections
-
-Vinicius Costa Gomes (1):
-  test: Fix exiting the bus when a discovery session ends
-
- src/adapter.c       | 192 +++++++++++++++++++++++++++++++++++++++++++++-------
- src/adapter.h       |   3 +
- src/device.c        |  65 ++++++++----------
- src/device.h        |   2 +
- src/mgmt.c          |  41 ++++++++++-
- src/mgmt.h          |   1 +
- test/test-discovery |   8 ---
- 7 files changed, 242 insertions(+), 70 deletions(-)
-
+diff --git a/profiles/gap/gap.c b/profiles/gap/gap.c
+index ff5715b..596d0b9 100644
+--- a/profiles/gap/gap.c
++++ b/profiles/gap/gap.c
+@@ -98,6 +98,9 @@ static void appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 
+ 	device_set_appearance(gap->device, app);
+ 
++	if (app == 0x0000)
++		goto done;
++
+ 	adapter_get_address(device_get_adapter(gap->device), &src);
+ 	device_get_address(gap->device, &dst, &type);
+ 
 -- 
-1.7.11.2
+1.7.8.6
 
