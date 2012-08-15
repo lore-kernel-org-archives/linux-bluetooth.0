@@ -1,77 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Aug 2012 01:41:11 -0300
+Date: Wed, 15 Aug 2012 01:32:47 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: aborigines <7aborigines7@gmail.com>
-Cc: marcel@holtmann.org, padovan@profusion.mobi,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] add support bluetooth usb 0489:e046 Foxconn / Hon Hai
-Message-ID: <20120815044111.GG3344@joana>
-References: <1344757304-11555-1-git-send-email-7aborigines7@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [RFC v4 3/3] Bluetooth: mgmt: Add device disconnect reason
+Message-ID: <20120815043247.GF3344@joana>
+References: <1344498750-2698-1-git-send-email-mikel.astiz.oss@gmail.com>
+ <1344498750-2698-4-git-send-email-mikel.astiz.oss@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1344757304-11555-1-git-send-email-7aborigines7@gmail.com>
+In-Reply-To: <1344498750-2698-4-git-send-email-mikel.astiz.oss@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* aborigines <7aborigines7@gmail.com> [2012-08-12 14:41:44 +0700]:
+Hi Mikel,
 
-> $ usb-deveices
-> T: Bus=01 Lev=02 Prnt=02 Port=02 Cnt=03 Dev#= 5 Spd=12 MxCh= 0
-> D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-> P: Vendor=0489 ProdID=e046 Rev=01.12
-> S: Manufacturer=Broadcom Corp
-> S: Product=BCM20702A0
-> S: SerialNumber=C01885F67F9E
-> C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-> I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+* Mikel Astiz <mikel.astiz.oss@gmail.com> [2012-08-09 09:52:30 +0200]:
+
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 > 
-> $ lsusb
-> Bus 001 Device 005: ID 0489:e046 Foxconn / Hon Hai
+> MGMT_EV_DEVICE_DISCONNECTED will now expose the disconnection reason to
+> userland, distinguishing four possible values:
+> 
+> 	0x00	Reason not known or unspecified
+> 	0x01	Connection timeout
+> 	0x02	Connection terminated by local host
+> 	0x03	Connection terminated by remote host
+> 
+> Note that the local/remote distinction just determines which side
+> terminated the low-level connection, regardless of the disconnection of
+> the higher-level profiles.
+> 
+> This can sometimes be misleading and thus must be used with care. For
+> example, some hardware combinations would report a locally initiated
+> disconnection even if the user turned Bluetooth off in the remote side.
+> 
+> Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
 > ---
->  drivers/bluetooth/btusb.c |    1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index fc4bcd6..fb54c70 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -110,6 +110,7 @@ static struct usb_device_id btusb_table[] = {
->  
->  	/* Foxconn - Hon Hai */
->  	{ USB_DEVICE(0x0489, 0xe033) },
-> +	{ USB_DEVICE(0x0489, 0xe046) },
->  
->  	{ }	/* Terminating entry */
->  };
+>  include/net/bluetooth/hci_core.h |    2 +-
+>  include/net/bluetooth/mgmt.h     |    9 +++++++++
+>  net/bluetooth/hci_event.c        |   26 +++++++++++++++++++++++---
+>  net/bluetooth/mgmt.c             |    9 +++++----
+>  4 files changed, 38 insertions(+), 8 deletions(-)
 
-Can you try the following patch and see if it works for you.
+All 3 patches have been applied to bluetooth-next. Thanks.
 
 	Gustavo
-
----
-commit 8d2952f43af434f0aa5d109a9ae50c5886a9322c (HEAD, master)
-Author: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Date:   Wed Aug 15 01:38:11 2012 -0300
-
-    Bluetooth: Add USB_VENDOR_AND_INTERFACE_INFO() for Broadcom/Foxconn
-    
-    Foxconn devices has a vendor specific class of device, we will match them
-    differently now.
-    
-    Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f637c25..f077f4d 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -101,7 +101,7 @@ static struct usb_device_id btusb_table[] = {
-        { USB_DEVICE(0x413c, 0x8197) },
- 
-        /* Foxconn - Hon Hai */
--       { USB_DEVICE(0x0489, 0xe033) },
-+       { USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xff, 0x01, 0x01) },
- 
-        { }     /* Terminating entry */
- };
