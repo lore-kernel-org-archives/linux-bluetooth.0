@@ -1,21 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 15 Aug 2012 17:26:27 -0700
-Message-ID: <CACUGKYMjKcZZJsYi-SXCd1C=guWtKP3k=SBVPVe=+MR0R=pwHg@mail.gmail.com>
-Subject: Bluez 4.101
-From: John Tobias <john.tobias.ph@gmail.com>
+From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [PATCH BlueZ 1/2] mgmt: Fix Set LE command complete
+Date: Wed, 15 Aug 2012 18:13:59 -0300
+Message-Id: <1345065240-9250-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Once we get a Set LE command complete event, we should update
+current_settings from the controller_info. Otherwise, features
+which depend on that, such as device discovery, will not work
+properly.
+---
+ src/mgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I downloaded the latest Bluez 4.101, compiled and installed on my
-machine. After executing the command (/usr/sbin/bluetoothd -n -d), it
-returned "bluetoothd[15067]: mgmt setup failed: Invalid argument."
-I am just wondering what are the missing key on my build?.
+diff --git a/src/mgmt.c b/src/mgmt.c
+index b3ae776..fbd2a6b 100644
+--- a/src/mgmt.c
++++ b/src/mgmt.c
+@@ -1388,7 +1388,7 @@ static void mgmt_cmd_complete(int sk, uint16_t index, void *buf, size_t len)
+ 		DBG("set_ssp complete");
+ 		break;
+ 	case MGMT_OP_SET_LE:
+-		DBG("set_le complete");
++		mgmt_new_settings(sk, index, ev->data, len);
+ 		break;
+ 	case MGMT_OP_ADD_UUID:
+ 		mgmt_add_uuid_complete(sk, index, ev->data, len);
+-- 
+1.7.11.4
 
-Regards,
-
-John
