@@ -1,58 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Aug 2012 15:40:30 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Par-Gunnar HJALMDAHL <par-gunnar.hjalmdahl@stericsson.com>
+From: Par-Gunnar HJALMDAHL <par-gunnar.hjalmdahl@stericsson.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
 	Anurag GUPTA-1 <anurag.gupta@stericsson.com>
-Subject: Re: [PATCH] network: Check full BNEP UUID
-Message-ID: <20120815124030.GA2498@x220>
+Date: Wed, 15 Aug 2012 13:17:16 +0200
+Subject: RE: [PATCH] network: Check full BNEP UUID
+Message-ID: <81C3A93C17462B4BBD7E272753C1057923B924CB0D@EXDCVYMBSTM005.EQ1STM.local>
 References: <1343380000-24935-1-git-send-email-par-gunnar.hjalmdahl@stericsson.com>
  <20120815103912.GA26379@x220>
- <81C3A93C17462B4BBD7E272753C1057923B924CB0D@EXDCVYMBSTM005.EQ1STM.local>
+In-Reply-To: <20120815103912.GA26379@x220>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <81C3A93C17462B4BBD7E272753C1057923B924CB0D@EXDCVYMBSTM005.EQ1STM.local>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi P-G,
+Hi and thanks for you comments Johan,
 
-On Wed, Aug 15, 2012, Par-Gunnar HJALMDAHL wrote:
-> Basically I tried to keep the patch to a minimum since it was quite a 
-> simple issue to fix.
+> -----Original Message-----
+> From: Johan Hedberg [mailto:johan.hedberg@gmail.com]
+> Sent: den 15 augusti 2012 12:39
+> To: Par-Gunnar HJALMDAHL
+> Cc: linux-bluetooth@vger.kernel.org; Anurag GUPTA-1
+> Subject: Re: [PATCH] network: Check full BNEP UUID
 > 
-> I have no problems to use the UUID in lib/uuid.c. I could add a 2 new
-> exported functions for retrieving base UUID, one for little endian and
-> one for big endian, since uuid.c endian depends on CPU endian while
-> PAN endian is always big endian. So:
-> void get_le_bt_base_uuid(uint128_t *uuid);
-> void get_be_bt_base_uuid(uint128_t *uuid);
+> There are a couple of things that bug me a bit with this patch. One is
+> the re-definition of bluetooth_base_uuid which really should only exist
+> in one central place (lib/uuid.c). Another is the way the code logic
+> goes. It seems you want to test for two things:
+> 
+> 	1) That the UUID is a Bluetooth UUID. This is the memcmp
+> with
+> 	the last 12 bytes of the Bluetooth base UUID for the UUID128
+> 	case. 16 and 32 bit values are already implicitly assumed to
+> be
+> 	Bluetooth UUIDs as they don't contain any information to
+> reveal
+> 	this as such.
+> 
+> 	2) That the (now determined) Bluetooth UUID has a value less
+> 	than or equal to 0xffff. This is quite awkwardly tested for
+> by
+> 	comparing with the two first bytes from bluetooth_base_uuid,
+> 	which are both zeros. Based on your code comment it sounds
+> like
+> 	this test should really be covered by bnep_setup_chk().
+> 
+> If you really want to have the "<= 0xffff" test be in bnep_setup_decode
+> then I'd propose something like the attached patch. However, testing
+> for the exact value of the Bluetooth UUID (once the UUID has been
+> determined to be a Bluetooth UUID) seems like the task of
+> bnep_setup_chk from the way you've laid out the functions.
+> 
+> Johan
 
-Note that the uuid.{c,h} name space is bt_uuid_*
+Basically I tried to keep the patch to a minimum since it was quite a 
+simple issue to fix.
 
-So far uuid.c has been fully hiding any endianness issues in its public
-API by only talking host-endianness. So, if this was to be really done
-in a clean way I'd say the calling code should look like:
+I have no problems to use the UUID in lib/uuid.c. I could add a 2 new
+exported functions for retrieving base UUID, one for little endian and
+one for big endian, since uuid.c endian depends on CPU endian while
+PAN endian is always big endian. So:
+void get_le_bt_base_uuid(uint128_t *uuid);
+void get_be_bt_base_uuid(uint128_t *uuid);
 
-	uint128_t u128;
-	bt_uuid_t uuid;
+Your suggestion looks fine. It's a bit more effective than my original
+code. The reason I did the check in bnep_setup_decode() rather than in
+bnep_setup_chk is that only 16 bits are kept when exiting the function
+(bnep_setup_decode is the only function aware of the UUID size) and I
+thought that was a quite straightforward design.
 
-	u128 = bt_get_be128(dest);
+If it's OK with you I can create a new patch with suggestion above
+plus your patch.
 
-	bt_uuid128_create(&uuid, u128);
-	if (!bt_uuid_is_bluetooth(&uuid))
-		return BNEP_CONN_INVALID_DST;
+/P-G
 
-	/* same for source */
-
-However, as this would require at least two new functions
-(bt_get_be128() in lib/bluetooth.h and bt_uuid_is_bluetooth() in
-lib/uuid.c) and like you say the use case is quite trivial, I think this
-might be a bit overkill.
-
-So, since you were fine with my alteration of your patch I think I'll
-just go ahead and push it upstream. If you still want to add the
-necessary APIs for the "truly clean" approach, feel free, but I won't be
-bugging you about it ;)
-
-Johan
