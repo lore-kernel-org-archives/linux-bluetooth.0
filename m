@@ -1,135 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC hcidump 1/8] AVRCP: Add initial support for browsing channel
-Date: Wed, 15 Aug 2012 16:32:02 +0300
-Message-Id: <1345037529-1828-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20120815042727.GE3344@joana>
+References: <1344450186-14961-1-git-send-email-anderson.lizardo@openbossa.org>
+	<20120815042727.GE3344@joana>
+Date: Wed, 15 Aug 2012 09:01:10 -0400
+Message-ID: <CAJdJm_PrkwFdvDaq-6m5KkuJXmhfR65KLHxhry2rLiXCY2DFoA@mail.gmail.com>
+Subject: Re: [RFC BlueZ] doc: Introduce Alert API
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Gustavo,
 
----
- parser/avctp.c  |  4 ++--
- parser/avrcp.c  | 43 ++++++++++++++++++++++++++++++++++++++++---
- parser/l2cap.c  |  3 ++-
- parser/parser.h |  4 ++--
- 4 files changed, 46 insertions(+), 8 deletions(-)
+On Wed, Aug 15, 2012 at 12:27 AM, Gustavo Padovan <gustavo@padovan.org> wrote:
+>> +Currently, there are two different GATT server profiles that depend on
+>> +receiving alerts or notifications from the platform: Phone Alert Status (PASP)
+>> +and Alert Notification (ANP). Additionally, PASP is very specific to mobile
+>> +phones, and also allow limited control to alerts (i.e. mute once, or switch to
+>> +a silent mode).
+>> +
+>> +This document presents a unified API that allows to register,
+>
+> Is there some missing text here?
 
-diff --git a/parser/avctp.c b/parser/avctp.c
-index cf015d4..5d913cf 100644
---- a/parser/avctp.c
-+++ b/parser/avctp.c
-@@ -50,7 +50,7 @@ static char *pt2str(uint8_t hdr)
- 	}
- }
- 
--void avctp_dump(int level, struct frame *frm)
-+void avctp_dump(int level, struct frame *frm, uint16_t psm)
- {
- 	uint8_t hdr;
- 	uint16_t pid;
-@@ -65,7 +65,7 @@ void avctp_dump(int level, struct frame *frm)
- 				pt2str(hdr), hdr & 0x0c, hdr >> 4, pid);
- 
- 	if (pid == SDP_UUID_AV_REMOTE || pid == SDP_UUID_AV_REMOTE_TARGET)
--		avrcp_dump(level + 1, frm);
-+		avrcp_dump(level + 1, frm, psm);
- 	else
- 		raw_dump(level + 1, frm);
- }
-diff --git a/parser/avrcp.c b/parser/avrcp.c
-index f25dc34..46efec9 100644
---- a/parser/avrcp.c
-+++ b/parser/avrcp.c
-@@ -1502,13 +1502,34 @@ static const char *subunit2str(uint8_t subunit)
- 	}
- }
- 
--void avrcp_dump(int level, struct frame *frm)
-+static void avrcp_browsing_dump(int level, struct frame *frm)
-+{
-+	uint8_t pduid;
-+	uint16_t len;
-+
-+	pduid = get_u8(frm);
-+	len = get_u16(frm);
-+
-+	printf("AVRCP: %s: len 0x%04x\n", pdu2str(pduid), len);
-+
-+	if (len != frm->len) {
-+		p_indent(level, frm);
-+		printf("PDU Malformed\n");
-+		raw_dump(level, frm);
-+		return;
-+	}
-+
-+	switch (pduid) {
-+	default:
-+		raw_dump(level, frm);
-+	}
-+}
-+
-+static void avrcp_control_dump(int level, struct frame *frm)
- {
- 	uint8_t ctype, address, subunit, opcode, company[3];
- 	int i;
- 
--	p_indent(level, frm);
--
- 	ctype = get_u8(frm);
- 	address = get_u8(frm);
- 	opcode = get_u8(frm);
-@@ -1557,3 +1578,19 @@ void avrcp_dump(int level, struct frame *frm)
- 		raw_dump(level, frm);
- 	}
- }
-+
-+void avrcp_dump(int level, struct frame *frm, uint16_t psm)
-+{
-+	p_indent(level, frm);
-+
-+	switch (psm) {
-+		case 0x17:
-+			avrcp_control_dump(level, frm);
-+			break;
-+		case 0x1B:
-+			avrcp_browsing_dump(level, frm);
-+			break;
-+		default:
-+			raw_dump(level, frm);
-+	}
-+}
-diff --git a/parser/l2cap.c b/parser/l2cap.c
-index 8dc825b..a6162d7 100644
---- a/parser/l2cap.c
-+++ b/parser/l2cap.c
-@@ -1487,8 +1487,9 @@ static void l2cap_parse(int level, struct frame *frm)
- 			break;
- 
- 		case 0x17:
-+		case 0x1B:
- 			if (!p_filter(FILT_AVCTP))
--				avctp_dump(level, frm);
-+				avctp_dump(level, frm, psm);
- 			else
- 				raw_dump(level + 1, frm);
- 			break;
-diff --git a/parser/parser.h b/parser/parser.h
-index 1130a5f..c712d42 100644
---- a/parser/parser.h
-+++ b/parser/parser.h
-@@ -233,8 +233,8 @@ void cmtp_dump(int level, struct frame *frm);
- void hidp_dump(int level, struct frame *frm);
- void hcrp_dump(int level, struct frame *frm);
- void avdtp_dump(int level, struct frame *frm);
--void avctp_dump(int level, struct frame *frm);
--void avrcp_dump(int level, struct frame *frm);
-+void avctp_dump(int level, struct frame *frm, uint16_t psm);
-+void avrcp_dump(int level, struct frame *frm, uint16_t psm);
- void att_dump(int level, struct frame *frm);
- void smp_dump(int level, struct frame *frm);
- void sap_dump(int level, struct frame *frm);
+Yes, I will fill the missing text on next revision. I also have minor
+fixes to the alert categories.
+
+>> +
+>> +Alert hierarchy
+>> +===============
+>> +
+>> +Service              org.bluez
+>> +Interface    org.bluez.Alert
+>> +Object path  /org/bluez
+>> +
+>> +Methods              void RegisterAlert(string category)
+>> +
+>> +                     Register a new alert category. This means the
+>> +                     application will be responsible for notifying BlueZ of
+>> +                     any alerts of that category, using the Alert() method.
+>> +
+>> +                     Supported categories: generic, email, news, call,
+>> +                     missed_call, sms_mms, voice_mail, schedule,
+>> +                     instant_message, ringer, vibrate, display.
+>> +
+>> +                     Possible Errors: org.bluez.Error.InvalidArguments
+>> +
+>> +             void RegisterAgent(string category, object agent)
+>> +
+>> +                     Register a new agent for the alert category. The agent
+>> +                     object methods to be called depend on the category. The
+>> +                     currently supported category is "ringer", with methods
+>> +                     MuteOnce() and SetRingerMode().
+>> +
+>> +                     Possible Errors: org.bluez.Error.InvalidArguments
+>
+> If I got this right you RegisterAlert() and then RegisterAgent() in the
+> sequence, right? Why can't you merge both calls into one.
+
+Originally, the agent was only necessary for the "ringer" category.
+But after further thinking, looks like we can use it to update the
+"new alert" and "unread alert" counts necessary for ANP. I will
+prepare an updated document and send ASAP.
+
+>> +
+>> +             void NewAlert(string category, string description)
+>> +
+>> +                     Notify BlueZ of a new alert for the given category. The
+>> +                     description can be sender name, called ID, title, or
+>> +                     other information specific to the alert. For ringer,
+>> +                     vibrate and display categories, valid descriptions are
+>> +                     "active" and "not active".
+>
+> The way I understand it I see many NewAlert() calls happening almost at the
+> same time. Isn't possible to pass a dict with many {string category, string
+> description} inside?
+
+It is not clear from the description above (I will improve it), but
+for categories like "email" that can have many messages received after
+a sync, only a single NewAlert() call is made. The description is for
+the last e-mail sent. So the event is actually a single one: "you got
+N e-mails, and the sender for the last one is ...". The same applies
+to any alerts which have multiple items.
+
+>
+>> +
+>> +                     Possible Errors: org.bluez.Error.InvalidArguments
+>> +
+>> +             void UnreadAlertCount(string category, uint16 count)
+>> +
+>> +                     Some services (like SMS and e-mail) keep track of
+>> +                     number of unread items. This method allows to update
+>> +                     this counter, so peer devices can read it using Alert
+>> +                     Notification Profile.
+>> +
+>> +                     Note that just calling NewAlert() will not implicitly
+>> +                     increment the unread count for a category. The
+>> +                     application must call this method to increase or
+>> +                     decrease the unread counter.
+>
+> Is there a good reason for not increment the count on NewAlert()?
+
+There are two counts supported by the ANP profile: "Unread Alert
+count" and "New Alert count". I'll try to explain here, but I
+suggesting reading sections 1.7.2, 1.7.3, 4.1.2 and 4.1.3 from
+ANS_SPEC_V10.pdf. These counts are per category.
+
+Unread Alert count is only useful to some categories, like SMS and
+e-mail, that have the concept of "unread message". It may
+increase/decrease depending on user interaction with the host UI (e.g.
+marking messages as read/unread, deleting messages etc.)
+
+New Alert count is used to keep track of how many alerts are not yet
+acknowledged by the user. It is also applicable to SMS/email, and all
+other categories. E.g. two calendar events on the same day, and none
+of them were opened by the user, will increase this count by two.
+
+As mentioned above, we can use the zgent to have better tracking of
+these counts. This would avoid the need for this method, and instead
+BlueZ could request for the up-to-date alert counts from the e-mail
+application (for example). I will send soon a v2 of this document.
+
+
+Thanks for your comments!
+
+Best Regards,
 -- 
-1.7.11.2
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
