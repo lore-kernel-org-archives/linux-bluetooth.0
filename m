@@ -1,217 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Aug 2012 09:56:04 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	pkrystad@codeaurora.org
-Subject: Re: [RFCv0 14/21] Bluetooth: Handle physical link completion
-In-Reply-To: <20120815135105.GA3555@aemeltch-MOBL1>
-Message-ID: <alpine.DEB.2.02.1208150951470.30981@mathewm-linux>
-References: <1343260274-11953-1-git-send-email-mathewm@codeaurora.org> <1343260274-11953-15-git-send-email-mathewm@codeaurora.org> <20120815135105.GA3555@aemeltch-MOBL1>
+Date: Wed, 15 Aug 2012 17:22:07 +0200 (CEST)
+From: Jan Engelhardt <jengelh@inai.de>
+To: Gustavo Padovan <gustavo@padovan.org>
+cc: Masatake YAMATO <yamato@redhat.com>,
+	andrei.emeltchenko.news@gmail.com, linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v5 8/8] Added /proc/net/sco via bt_procfs_init()
+In-Reply-To: <20120726042411.GA3226@joana>
+Message-ID: <alpine.LNX.2.01.1208151721380.19409@frira.zrqbmnf.qr>
+References: <20120716.222018.2029110835026223294.yamato@redhat.com> <20120725001214.GP20029@joana> <20120725003507.GR20029@joana> <20120726.013012.2228722667223437938.yamato@redhat.com> <20120726042411.GA3226@joana>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Thursday 2012-07-26 06:24, Gustavo Padovan wrote:
 
-Andrei -
-
-On Wed, 15 Aug 2012, Andrei Emeltchenko wrote:
-
-> Hi Mat,
+>Hi Masatake,
 >
-> On Wed, Jul 25, 2012 at 04:51:06PM -0700, Mat Martineau wrote:
->> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+>* Masatake YAMATO <yamato@redhat.com> [2012-07-26 01:30:12 +0900]:
+>
+>> Added /proc/net/sco via bt_procfs_init().
+>> 
+>> Signed-off-by: Masatake YAMATO <yamato@redhat.com>
 >> ---
->>  net/bluetooth/l2cap_core.c | 147 +++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 147 insertions(+)
->>
->> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
->> index d981d87..7e253ce 100644
->> --- a/net/bluetooth/l2cap_core.c
->> +++ b/net/bluetooth/l2cap_core.c
->> @@ -975,6 +975,19 @@ static void l2cap_send_conn_req(struct l2cap_chan *chan)
->>  	l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_REQ, sizeof(req), &req);
->>  }
->>
->> +static void l2cap_send_create_chan_req(struct l2cap_chan *chan, u8 chan_id)
->> +{
->> +	struct l2cap_create_chan_req req;
->> +	req.scid = cpu_to_le16(chan->scid);
->> +	req.psm  = chan->psm;
->> +	req.amp_id = chan_id;
->> +
->> +	chan->ident = l2cap_get_ident(chan->conn);
->> +
->> +	l2cap_send_cmd(chan->conn, chan->ident, L2CAP_CREATE_CHAN_REQ,
->> +		       sizeof(req), &req);
->> +}
->> +
->>  static void l2cap_move_setup(struct l2cap_chan *chan)
->>  {
->>  	struct sk_buff *skb;
->> @@ -4119,6 +4132,24 @@ static int l2cap_create_channel_req(struct l2cap_conn *conn,
->>  	return 0;
->>  }
->>
->> +static void l2cap_send_move_chan_req(struct l2cap_chan *chan, u8 dest_amp_id)
->> +{
->> +	struct l2cap_move_chan_req req;
->> +	u8 ident;
->> +
->> +	BT_DBG("chan %p, dest_amp_id %d", chan, dest_amp_id);
->> +
->> +	ident = l2cap_get_ident(chan->conn);
->> +	if (chan)
+>>  net/bluetooth/sco.c |    9 +++++++++
+>>  1 file changed, 9 insertions(+)
 >
-> I think that the check is not needed otherwise you crash at referencing
-> chan->scid below.
+>All 8 patches have been applied to bluetooth-next. Thanks.
 
-Or at the line above.  This check was added before everything had been 
-moved from l2cap_pi to l2cap_chan, and is no longer relevant.
-
->
->> +		chan->ident = ident;
->> +
->> +	req.icid = cpu_to_le16(chan->scid);
->> +	req.dest_amp_id = dest_amp_id;
->> +
->> +	l2cap_send_cmd(chan->conn, ident, L2CAP_MOVE_CHAN_REQ, sizeof(req),
->> +		       &req);
->> +}
->> +
->>  static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
->>  				     u16 icid, u16 result)
->>  {
->> @@ -4284,6 +4315,122 @@ static void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
->>  	}
->>  }
->>
->> +void l2cap_physical_cfm(struct l2cap_chan *chan, int result, u8 local_id,
->> +			u8 remote_id)
->> +{
->> +	BT_DBG("chan %p, result %d, local_id %d, remote_id %d", chan, result,
->> +	       local_id, remote_id);
->> +
->> +	l2cap_chan_lock(chan);
->> +
->> +	if (chan->state == BT_DISCONN || chan->state == BT_CLOSED) {
->> +		l2cap_chan_unlock(chan);
->> +		return;
->> +	}
->> +
->> +	if (chan->state != BT_CONNECTED) {
->> +		if (!test_bit(CONF_CONNECT_PEND, &chan->conf_state)) {
->> +			struct l2cap_conn_rsp rsp;
->> +			char buf[128];
->> +			rsp.scid = cpu_to_le16(chan->dcid);
->> +			rsp.dcid = cpu_to_le16(chan->scid);
->> +
->> +			/* Incoming channel on AMP */
->> +			if (result == L2CAP_CR_SUCCESS) {
->> +				/* Send successful response */
->> +				rsp.result = cpu_to_le16(L2CAP_CR_SUCCESS);
->> +				rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
->> +			} else {
->> +				/* Send negative response */
->> +				rsp.result = cpu_to_le16(L2CAP_CR_NO_MEM);
->> +				rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
->> +			}
->> +
->> +			l2cap_send_cmd(chan->conn, chan->ident,
->> +				       L2CAP_CREATE_CHAN_RSP,
->> +				       sizeof(rsp), &rsp);
->> +
->> +			if (result == L2CAP_CR_SUCCESS) {
->> +				__l2cap_state_change(chan, BT_CONFIG);
->> +				set_bit(CONF_REQ_SENT, &chan->conf_state);
->> +				l2cap_send_cmd(chan->conn,
->> +					       l2cap_get_ident(chan->conn),
->> +					       L2CAP_CONF_REQ,
->> +					       l2cap_build_conf_req(chan, buf),
->> +					       buf);
->> +				chan->num_conf_req++;
->> +			}
->> +		} else {
->> +			/* Outgoing channel on AMP */
->> +			if (result == L2CAP_CR_SUCCESS) {
->> +				chan->chan_id = local_id;
->> +				l2cap_send_create_chan_req(chan, remote_id);
->> +			} else {
->> +				/* Revert to BR/EDR connect */
->> +				l2cap_send_conn_req(chan);
->> +			}
->> +		}
->> +	} else if (result == L2CAP_MR_SUCCESS &&
->> +		   chan->move_role == L2CAP_MOVE_ROLE_INITIATOR) {
->> +		l2cap_move_setup(chan);
->> +		chan->move_id = local_id;
->> +		chan->move_state = L2CAP_MOVE_WAIT_RSP;
->> +
->> +		l2cap_send_move_chan_req(chan, remote_id);
->> +		__set_chan_timer(chan, L2CAP_MOVE_TIMEOUT);
->> +	} else if (result == L2CAP_MR_SUCCESS &&
->> +		   chan->move_role == L2CAP_MOVE_ROLE_RESPONDER) {
->> +		struct hci_chan *hchan = NULL;
->> +
->> +		/* Placeholder - get hci_chan for logical link */
->> +
->> +		if (hchan) {
->> +			if (hchan->state == BT_CONNECTED) {
->> +				/* Logical link is ready to go */
->> +				chan->hs_hcon = hchan->conn;
->> +				chan->hs_hcon->l2cap_data = chan->conn;
->> +				chan->move_state = L2CAP_MOVE_WAIT_CONFIRM;
->> +				l2cap_send_move_chan_rsp(chan->conn,
->> +							 chan->move_cmd_ident,
->> +							 chan->dcid,
->> +							 L2CAP_MR_SUCCESS);
->> +
->> +				l2cap_logical_cfm(chan, hchan,
->> +						  L2CAP_MR_SUCCESS);
->> +			} else {
->> +				/* Wait for logical link to be ready */
->> +				chan->move_state = L2CAP_MOVE_WAIT_LOGICAL_CFM;
->> +			}
->> +		} else {
->> +			/* Logical link not available */
->> +			l2cap_send_move_chan_rsp(chan->conn,
->> +						 chan->move_cmd_ident,
->> +						 chan->dcid,
->> +						 L2CAP_MR_NOT_ALLOWED);
->> +		}
->> +	} else {
->> +		if (chan->move_role == L2CAP_MOVE_ROLE_RESPONDER) {
->> +			u8 rsp_result;
->> +			if (result == -EINVAL)
->> +				rsp_result = L2CAP_MR_BAD_ID;
->> +			else
->> +				rsp_result = L2CAP_MR_NOT_ALLOWED;
->> +
->> +			l2cap_send_move_chan_rsp(chan->conn,
->> +						 chan->move_cmd_ident,
->> +						 chan->dcid, rsp_result);
->> +		}
->> +
->> +		chan->move_role = L2CAP_MOVE_ROLE_NONE;
->> +		chan->move_state = L2CAP_MOVE_STABLE;
->> +
->> +		/* Restart data transmission */
->> +		l2cap_ertm_send(chan);
->> +	}
->> +
->> +	l2cap_chan_unlock(chan);
->> +}
->
-> I feel that this function is too big. Maybe we could split channel move
-> and channel create operations?
-
-Sure, the "if (chan->state != BT_CONNECTED)" clause would be clearer 
-in a channel create function, and the other clauses can go in a 
-channel move function.
-
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+It may have been raised before, but: should not the info be exported 
+over netlink rather than the oldfashioned and overabused procfs?
