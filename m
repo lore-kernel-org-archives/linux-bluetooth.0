@@ -1,64 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Aug 2012 01:08:59 -0300
+Date: Wed, 15 Aug 2012 01:07:32 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Mohammed Shafi Shajakhan <mohammed@qca.qualcomm.com>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
-	yevgeniy.melnichuk@googlemail.com
-Subject: Re: [PATCH v2] Bluetooth: Add support for Sony Vaio T-Series
-Message-ID: <20120815040856.GC3344@joana>
-References: <1344349090-4397-1-git-send-email-mohammed@qca.qualcomm.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix use-after-free bug in SMP
+Message-ID: <20120815040732.GB3344@joana>
+References: <1343864055-23154-1-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1344349090-4397-1-git-send-email-mohammed@qca.qualcomm.com>
+In-Reply-To: <1343864055-23154-1-git-send-email-andre.guedes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mohammed,
+Hi Andre,
 
-* Mohammed Shafi Shajakhan <mohammed@qca.qualcomm.com> [2012-08-07 19:48:10 +0530]:
+* Andre Guedes <andre.guedes@openbossa.org> [2012-08-01 20:34:15 -0300]:
 
-> From: Yevgeniy Melnichuk <yevgeniy.melnichuk@googlemail.com>
+> If SMP fails, we should always cancel security_timer delayed work.
+> Otherwise, security_timer function may run after l2cap_conn object
+> has been freed.
 > 
-> Add Sony Vaio T-Series Bluetooth Module( 0x489:0xE036) to
-> the blacklist of btusb module and add it to the ath3k module.
+> This patch fixes the following warning reported by ODEBUG:
 > 
-> output of cat /sys/kernel/debug/usb/devices
+> WARNING: at lib/debugobjects.c:261 debug_print_object+0x7c/0x8d()
+> Hardware name: Bochs
+> ODEBUG: free active (active state 0) object type: timer_list hint: delayed_work_timer_fn+0x0/0x27
+> Modules linked in: btusb bluetooth
+> Pid: 440, comm: kworker/u:2 Not tainted 3.5.0-rc1+ #4
+> Call Trace:
+>  [<ffffffff81174600>] ? free_obj_work+0x4a/0x7f
+>  [<ffffffff81023eb8>] warn_slowpath_common+0x7e/0x97
+>  [<ffffffff81023f65>] warn_slowpath_fmt+0x41/0x43
+>  [<ffffffff811746b1>] debug_print_object+0x7c/0x8d
+>  [<ffffffff810394f0>] ? __queue_work+0x241/0x241
+>  [<ffffffff81174fdd>] debug_check_no_obj_freed+0x92/0x159
+>  [<ffffffff810ac08e>] slab_free_hook+0x6f/0x77
+>  [<ffffffffa0019145>] ? l2cap_conn_del+0x148/0x157 [bluetooth]
+>  [<ffffffff810ae408>] kfree+0x59/0xac
+>  [<ffffffffa0019145>] l2cap_conn_del+0x148/0x157 [bluetooth]
+>  [<ffffffffa001b9a2>] l2cap_recv_frame+0xa77/0xfa4 [bluetooth]
+>  [<ffffffff810592f9>] ? trace_hardirqs_on_caller+0x112/0x1ad
+>  [<ffffffffa001c86c>] l2cap_recv_acldata+0xe2/0x264 [bluetooth]
+>  [<ffffffffa0002b2f>] hci_rx_work+0x235/0x33c [bluetooth]
+>  [<ffffffff81038dc3>] ? process_one_work+0x126/0x2fe
+>  [<ffffffff81038e22>] process_one_work+0x185/0x2fe
+>  [<ffffffff81038dc3>] ? process_one_work+0x126/0x2fe
+>  [<ffffffff81059f2e>] ? lock_acquired+0x1b5/0x1cf
+>  [<ffffffffa00028fa>] ? le_scan_work+0x11d/0x11d [bluetooth]
+>  [<ffffffff81036fb6>] ? spin_lock_irq+0x9/0xb
+>  [<ffffffff81039209>] worker_thread+0xcf/0x175
+>  [<ffffffff8103913a>] ? rescuer_thread+0x175/0x175
+>  [<ffffffff8103cfe0>] kthread+0x95/0x9d
+>  [<ffffffff812c5054>] kernel_threadi_helper+0x4/0x10
+>  [<ffffffff812c36b0>] ? retint_restore_args+0x13/0x13
+>  [<ffffffff8103cf4b>] ? flush_kthread_worker+0xdb/0xdb
+>  [<ffffffff812c5050>] ? gs_change+0x13/0x13
 > 
-> T:  Bus=01 Lev=02 Prnt=02 Port=01 Cnt=01 Dev#=  5 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0489 ProdID=e036 Rev= 0.02
-> S:  Manufacturer=Atheros Communications
-> S:  Product=Bluetooth USB Host Controller
-> S:  SerialNumber=Alaska Day 2006
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> This bug can be reproduced using hctool lecc or l2test tools and
+> bluetoothd not running.
 > 
-> Signed-off-by: Yevgeniy Melnichuk <yevgeniy.melnichuk@googlemail.com>
-> Signed-off-by: Mohammed Shafi Shajakhan <mohammed@qca.qualcomm.com>
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
->  drivers/bluetooth/ath3k.c |    2 ++
->  drivers/bluetooth/btusb.c |    1 +
->  2 files changed, 3 insertions(+), 0 deletions(-)
+>  net/bluetooth/smp.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
 Patch has been applied to bluetooth.git. Thanks.
 
