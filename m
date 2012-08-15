@@ -1,33 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Aug 2012 17:22:07 +0200 (CEST)
-From: Jan Engelhardt <jengelh@inai.de>
-To: Gustavo Padovan <gustavo@padovan.org>
-cc: Masatake YAMATO <yamato@redhat.com>,
-	andrei.emeltchenko.news@gmail.com, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v5 8/8] Added /proc/net/sco via bt_procfs_init()
-In-Reply-To: <20120726042411.GA3226@joana>
-Message-ID: <alpine.LNX.2.01.1208151721380.19409@frira.zrqbmnf.qr>
-References: <20120716.222018.2029110835026223294.yamato@redhat.com> <20120725001214.GP20029@joana> <20120725003507.GR20029@joana> <20120726.013012.2228722667223437938.yamato@redhat.com> <20120726042411.GA3226@joana>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Sender: linux-kernel-owner@vger.kernel.org
+From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v2 14/14] core: Re-connect for ECONNRESET or ECONNABORTED
+Date: Wed, 15 Aug 2012 11:50:53 -0300
+Message-Id: <1345042253-15053-15-git-send-email-jprvita@openbossa.org>
+In-Reply-To: <1345042253-15053-1-git-send-email-jprvita@openbossa.org>
+References: <1345042253-15053-1-git-send-email-jprvita@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thursday 2012-07-26 06:24, Gustavo Padovan wrote:
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
->Hi Masatake,
->
->* Masatake YAMATO <yamato@redhat.com> [2012-07-26 01:30:12 +0900]:
->
->> Added /proc/net/sco via bt_procfs_init().
->> 
->> Signed-off-by: Masatake YAMATO <yamato@redhat.com>
->> ---
->>  net/bluetooth/sco.c |    9 +++++++++
->>  1 file changed, 9 insertions(+)
->
->All 8 patches have been applied to bluetooth-next. Thanks.
+This patch keeps scanning and re-connections active if the disconnection
+reason is ECONNRESET(Remote Initiated Disconnection).
 
-It may have been raised before, but: should not the info be exported 
-over netlink rather than the oldfashioned and overabused procfs?
+Re-connection is a behaviour determined by Profiles or by the upper
+layer(user actions). For instance, HoG requires re-connection always
+active, no matter if the previous disconnection reason was page timeout
+or remote initiated disconnection (ECONNRESET). Some devices disconnects
+after some idle time, connectable advertises are sent by the peripheral
+when commanded by the user(eg: key pressed). Disconnection can be also
+triggered by the local host (ECONNABORTED) using command line tools or
+Disconnect method in the Device interface.
+
+The peripheral dictates the re-connection controlling the connectable
+advertises, BlueZ(central) needs to keep the scanning always active to
+able to detect the advertises and trigger the connection.
+---
+ src/device.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/src/device.c b/src/device.c
+index f116fd7..465783e 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1812,10 +1812,18 @@ static gboolean attrib_disconnected_cb(GIOChannel *io, GIOCondition cond,
+ 
+ 	g_slist_foreach(device->attios, attio_disconnected, NULL);
+ 
+-	if (device->auto_connect == FALSE || err != ETIMEDOUT)
++	if (device->auto_connect == FALSE) {
++		DBG("Automatic connection disabled");
+ 		goto done;
++	}
+ 
+-	adapter_connect_list_add(device_get_adapter(device), device);
++	/*
++	 * Keep scanning/re-connection active if disconnection reason
++	 * is page timeout, remote user terminated connection or local
++	 * initiated disconnection.
++	 */
++	if (err == ETIMEDOUT || err == ECONNRESET || err == ECONNABORTED)
++		adapter_connect_list_add(device_get_adapter(device), device);
+ 
+ done:
+ 	attio_cleanup(device);
+-- 
+1.7.11.2
+
