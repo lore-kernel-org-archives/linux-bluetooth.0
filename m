@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC hcidump 7/8] AVRCP: Add parsing for Search PDU
-Date: Wed, 15 Aug 2012 16:32:08 +0300
-Message-Id: <1345037529-1828-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC hcidump 6/8] AVRCP: Add parsing for PlayItem PDU
+Date: Wed, 15 Aug 2012 16:32:07 +0300
+Message-Id: <1345037529-1828-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1345037529-1828-1-git-send-email-luiz.dentz@gmail.com>
 References: <1345037529-1828-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,84 +12,107 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- parser/avrcp.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
+ parser/avrcp.c | 73 +++++++++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 57 insertions(+), 16 deletions(-)
 
 diff --git a/parser/avrcp.c b/parser/avrcp.c
-index 47dfc9b..1fb085c 100644
+index 046368c..47dfc9b 100644
 --- a/parser/avrcp.c
 +++ b/parser/avrcp.c
-@@ -2055,6 +2055,60 @@ response:
- 	avrcp_attribute_entry_list_dump(level, frm, count);
+@@ -1342,6 +1342,60 @@ response:
+ 	}
  }
  
-+static void avrcp_search_dump(int level, struct frame *frm, uint8_t hdr,
-+								uint16_t len)
++static const char *scope2str(uint8_t scope)
 +{
-+	uint32_t uidcounter, items;
-+	uint16_t charset;
-+	uint8_t namelen, status;
++	switch (scope) {
++	case AVRCP_MEDIA_PLAYER_LIST:
++		return "Media Player List";
++	case AVRCP_MEDIA_PLAYER_VFS:
++		return "Media Player Virtual Filesystem";
++	case AVRCP_MEDIA_SEARCH:
++		return "Search";
++	case AVRCP_MEDIA_NOW_PLAYING:
++		return "Now Playing";
++	default:
++		return "Unknown";
++	}
++}
++
++static void avrcp_play_item_dump(int level, struct frame *frm,
++						uint8_t ctype, uint16_t len)
++{
++	uint64_t uid;
++	uint32_t uidcounter;
++	uint8_t scope, status;
 +
 +	p_indent(level, frm);
 +
-+	if (hdr & 0x02)
++	if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
 +		goto response;
 +
-+	if (len < 3) {
++	if (len < 13) {
 +		printf("PDU Malformed\n");
 +		raw_dump(level, frm);
 +		return;
 +	}
 +
-+	charset = get_u16(frm);
-+	printf("CharsetID: 0x%04x (%s)\n", charset, charset2str(charset));
++	scope = get_u8(frm);
++	printf("Scope: 0x%02x (%s)", scope, scope2str(scope));
 +
 +	p_indent(level, frm);
 +
-+	namelen = get_u8(frm);
-+	printf("Length: 0x%02x (%u)\n", namelen, namelen);
-+
-+	p_indent(level, frm);
-+
-+	printf("String: ");
-+	for (; namelen > 0; namelen--) {
-+		uint8_t c = get_u8(frm);
-+		printf("%1c", isprint(c) ? c : '.');
-+	}
-+
-+	return;
-+
-+response:
-+	status = get_u8(frm);
-+	printf("Status: 0x%02x (%s)\n", status, error2str(status));
-+
-+	if (len == 1)
-+		return;
++	uid = get_u64(frm);
++	printf("UID: 0x%16" PRIx64 " (%" PRIu64 ")\n", uid, uid);
 +
 +	p_indent(level, frm);
 +
 +	uidcounter = get_u16(frm);
 +	printf("UIDCounter: 0x%04x (%u)\n", uidcounter, uidcounter);
 +
-+	p_indent(level, frm);
++	return;
 +
-+	items = get_u32(frm);
-+	printf("Number of Items: 0x%04x (%u)", items, items);
++response:
++	status = get_u8(frm);
++	printf("Status: 0x%02x (%s)\n", status, error2str(status));
 +}
 +
- static void avrcp_browsing_dump(int level, struct frame *frm, uint8_t hdr)
+ static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
  {
- 	uint8_t pduid;
-@@ -2085,6 +2139,9 @@ static void avrcp_browsing_dump(int level, struct frame *frm, uint8_t hdr)
- 	case AVRCP_GET_ITEM_ATTRIBUTES:
- 		avrcp_get_item_attributes_dump(level + 1, frm, hdr, len);
+ 	uint8_t pduid, pt;
+@@ -1414,6 +1468,9 @@ static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
+ 	case AVRCP_SET_ADDRESSED_PLAYER:
+ 		avrcp_set_addressed_player(level + 1, frm, ctype, len);
  		break;
-+	case AVRCP_SEARCH:
-+		avrcp_search_dump(level + 1, frm, hdr, len);
++	case AVRCP_PLAY_ITEM:
++		avrcp_play_item_dump(level + 1, frm, ctype, len);
 +		break;
  	default:
  		raw_dump(level, frm);
  	}
+@@ -1507,22 +1564,6 @@ static const char *subunit2str(uint8_t subunit)
+ 	}
+ }
+ 
+-static const char *scope2str(uint8_t scope)
+-{
+-	switch (scope) {
+-	case AVRCP_MEDIA_PLAYER_LIST:
+-		return "Media Player List";
+-	case AVRCP_MEDIA_PLAYER_VFS:
+-		return "Media Player Virtual Filesystem";
+-	case AVRCP_MEDIA_SEARCH:
+-		return "Search";
+-	case AVRCP_MEDIA_NOW_PLAYING:
+-		return "Now Playing";
+-	default:
+-		return "Unknown";
+-	}
+-}
+-
+ static const char *playertype2str(uint8_t type)
+ {
+ 	switch (type & 0x0F) {
 -- 
 1.7.11.2
 
