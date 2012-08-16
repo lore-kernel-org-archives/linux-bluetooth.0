@@ -1,74 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 16 Aug 2012 15:25:10 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [RFC BlueZ v2] mgmt-api: Add reason to device disconnect event
-Message-ID: <20120816122510.GA23760@x220>
-References: <1344498980-2829-1-git-send-email-mikel.astiz.oss@gmail.com>
+Message-ID: <502CE43C.7040804@ti.com>
+Date: Thu, 16 Aug 2012 15:14:52 +0300
+From: Chen Ganir <chen.ganir@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1344498980-2829-1-git-send-email-mikel.astiz.oss@gmail.com>
+To: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v4 01/10] Battery: Add Battery Service Gatt Client
+References: <1345109702-5698-1-git-send-email-chen.ganir@ti.com> <1345109702-5698-2-git-send-email-chen.ganir@ti.com> <20120816113941.GA20887@x220>
+In-Reply-To: <20120816113941.GA20887@x220>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+On 08/16/2012 02:39 PM, Johan Hedberg wrote:
+> Hi Chen,
+>
+> On Thu, Aug 16, 2012, chen.ganir@ti.com wrote:
+>> --- a/doc/device-api.txt
+>> +++ b/doc/device-api.txt
+>> @@ -179,3 +179,8 @@ Properties	string Address [readonly]
+>>   			Note that this property can exhibit false-positives
+>>   			in the case of Bluetooth 2.1 (or newer) devices that
+>>   			have disabled Extended Inquiry Response support.
+>> +
+>> +		array{string} Batteries [readonly]
+>> +
+>> +			List of device battery object paths that represents the available
+>> +			batteries on the remote device.
+>
+> I don't think it's ok to pollute the Device interface or src/device.c
+> with profile-specific details. That should happen in profile-specific
+> plugins and interfaces. Since we're switching over to object manager
+> maybe an interface/property like this isn't needed at all? (even if it
+> would be needed the type should be array{object} and not array{string}
+You are correct, the array should be object instead of string. However, 
+i fail to understand why the object manager prevents this from getting 
+accepted - do you have a time estimation when the object manager should 
+be active or available ? I do not think this patch set should be 
+deferred until we have changed the dbus API.
 
-On Thu, Aug 09, 2012, Mikel Astiz wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
-> 
-> Extend the management API with the disconnect reason, as now reported
-> by the Kernel in MGMT_EV_DEVICE_DISCONNECTED.
-> ---
-> Updated userland patch to test the recently submitted Kernel patches regarding ACL disconnect reason.
-> 
->  doc/mgmt-api.txt  |   16 ++++++++++++++++
->  lib/mgmt.h        |    6 ++++++
->  monitor/control.c |   19 +++++++++++++++----
->  src/mgmt.c        |   13 ++++++++-----
->  4 files changed, 45 insertions(+), 9 deletions(-)
+I prefer this way of putting the batteries below the device, since it is 
+obvious which battery belongs to each device. The other option i can 
+think of is to have another interface registered on the device object path:
 
-Seems like you're missing an update to tools/btmgmt.c?
+Service		org.bluez
+Interface	org.bluez.Batteries
+Object path	[variable prefix]/{hci0,..}/dev_XX_XX_XX_XX_XX_XX
 
-> --- a/monitor/control.c
-> +++ b/monitor/control.c
-> @@ -226,18 +226,29 @@ static void mgmt_device_disconnected(uint16_t len, const void *buf)
->  {
->  	const struct mgmt_ev_device_disconnected *ev = buf;
->  	char str[18];
-> +	uint8_t reason;
-> +	uint16_t l;
+Methods	dict GetProperties()
 
-I suppose size_t would be more appropriate instead of uint16_t as that's
-the return type of sizeof(). The variable name is also a bit
-uninformative and I'd have used something like consumed_len or
-parsed_len, but if this the convention in rest of the btmon code then I
-wont object to it.
+		Returns all properties for the interface. See the
+		Properties section for the available properties.
 
-> --- a/src/mgmt.c
-> +++ b/src/mgmt.c
-> @@ -510,18 +510,21 @@ static void mgmt_device_connected(int sk, uint16_t index, void *buf, size_t len)
->  static void mgmt_device_disconnected(int sk, uint16_t index, void *buf,
->  								size_t len)
->  {
-> -	struct mgmt_addr_info *ev = buf;
-> +	struct mgmt_ev_device_disconnected *ev = buf;
->  	struct controller_info *info;
->  	char addr[18];
->  
-> -	if (len < sizeof(*ev)) {
-> +	if (len < sizeof(struct mgmt_addr_info)) {
->  		error("Too small device_disconnected event");
->  		return;
->  	}
->  
-> -	ba2str(&ev->bdaddr, addr);
-> +	if (len < sizeof(*ev))
-> +		memset((char *) buf + len, 0, sizeof(*ev) - len);
+Signals		ProperyChanged(string name, variant value)
 
-I don't like how this assumes that there is usable space after the end
-of the buffer given to this function. Could you instead use a temporary
-"uint8_t reason" variable like you do for btmon?
+		This signal indicates a changed value of the given
+		property.
 
-Johan
+Properties	array{object} Batteries [readonly]
+
+		List of device battery object paths that represents the available 
+batteries on the remote devices.
+
+
+Service		org.bluez
+Interface	org.bluez.Battery
+Object path	[variable prefix]/{hci0,..}/dev_XX_XX_XX_XX_XX_XX/BATT-NN-DDDD
+
+
+Methods	dict GetProperties()
+
+		Returns all properties for the interface. See the
+		Properties section for the available properties.
+
+Signals		PropertyChanged(string name, variant value)
+
+		This signal indicates a changed value of the given
+		property.
+
+Properties	byte Level [readonly]
+
+			Battery level (0-100).
+
+Any other suggestion ?
+
+
+>
+> Johan
+>
+
+
+-- 
+BR,
+Chen Ganir
+Texas Instruments
