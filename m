@@ -1,62 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 16 Aug 2012 12:43:05 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 0/9] GObexApparam API
-Message-ID: <20120816094305.GA3566@x220>
-References: <1344508353-24647-1-git-send-email-luiz.dentz@gmail.com>
+From: <chen.ganir@ti.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Chen Ganir <chen.ganir@ti.com>
+Subject: [PATCH v4 10/10] Battery: Emit property changed on first read
+Date: Thu, 16 Aug 2012 12:37:15 +0300
+Message-ID: <1345109835-5786-1-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1344508353-24647-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Chen Ganir <chen.ganir@ti.com>
 
-On Thu, Aug 09, 2012, Luiz Augusto von Dentz wrote:
-> GObexApparam can encode/decode OBEX application parameter in a generic
-> way, only the tags are expecific to each profile.
-> 
-> Some remarks:
-> 
->   - Tag data is stored in network order/big endian because its type is
->     not known.
->   - Internally it uses a GHashTable to store the values which doesn't
->     guarantee the order of the tag will be exact the same as inserted.
-> 
-> Luiz Augusto von Dentz (9):
->   gobex: Introduce GObexApparam API
->   gobex: Add unit tests for GObexApparam API
->   gobex: Integrate GObexApparam with GObexHeader
->   gobex: Add unit test for encoding/decoding apparam headers
->   gobex: Add debug option to apparam
->   client: Port PBAP module to use GObexApparam
->   PBAP: Make use of GObexApparam API
->   MAP: Make use of GObexApparam API
->   core: Remove map_ap.c
-> 
->  Makefile.am               |  18 +-
->  client/pbap.c             | 181 +++++-------------
->  gobex/gobex-apparam.c     | 355 +++++++++++++++++++++++++++++++++++
->  gobex/gobex-apparam.h     |  59 ++++++
->  gobex/gobex-debug.h       |   7 +-
->  gobex/gobex-header.c      |  25 +++
->  gobex/gobex-header.h      |   3 +
->  gobex/gobex.c             |  11 +-
->  plugins/mas.c             |  81 ++++----
->  plugins/pbap.c            | 180 ++++--------------
->  plugins/phonebook.h       |   2 +-
->  src/map_ap.c              | 466 ----------------------------------------------
->  src/map_ap.h              |  63 -------
->  unit/test-gobex-apparam.c | 422 +++++++++++++++++++++++++++++++++++++++++
->  unit/test-gobex-header.c  |  46 +++++
->  15 files changed, 1058 insertions(+), 861 deletions(-)
->  create mode 100644 gobex/gobex-apparam.c
->  create mode 100644 gobex/gobex-apparam.h
->  delete mode 100644 src/map_ap.c
->  create mode 100644 unit/test-gobex-apparam.c
+Emit battery level property changed upon connection, on first read.
+---
+ profiles/battery/battery.c |   12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-All patches in this set have been applied. Thanks.
+diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
+index 3d3fb6b..e60811a 100644
+--- a/profiles/battery/battery.c
++++ b/profiles/battery/battery.c
+@@ -138,6 +138,12 @@ static void battery_free(gpointer user_data)
+ 	g_free(batt);
+ }
+ 
++static void emit_battery_level_changed(struct characteristic *c)
++{
++	emit_property_changed(c->batt->conn, c->path, BATTERY_INTERFACE,
++					"Level", DBUS_TYPE_BYTE, &c->level);
++}
++
+ static void read_batterylevel_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 							gpointer user_data)
+ {
+@@ -162,6 +168,7 @@ static void read_batterylevel_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 	}
+ 
+ 	ch->level = value[0];
++	emit_battery_level_changed(ch);
+ }
+ 
+ static void process_batteryservice_char(struct characteristic *ch)
+@@ -341,11 +348,6 @@ update_char:
+ 	process_batteryservice_char(ch);
+ 	}
+ }
+-static void emit_battery_level_changed(struct characteristic *c)
+-{
+-	emit_property_changed(c->batt->conn, c->path, BATTERY_INTERFACE,
+-					"Level", DBUS_TYPE_BYTE, &c->level);
+-}
+ 
+ static void configure_battery_cb(GSList *characteristics, guint8 status,
+ 
+-- 
+1.7.9.5
 
-Johan
