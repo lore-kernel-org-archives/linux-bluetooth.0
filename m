@@ -1,57 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120816092032.GA31761@x220>
-References: <1345042253-15053-1-git-send-email-jprvita@openbossa.org>
-	<1345042253-15053-5-git-send-email-jprvita@openbossa.org>
-	<20120816092032.GA31761@x220>
-Date: Thu, 16 Aug 2012 17:40:51 -0300
-Message-ID: <CAAngNMa2r0SD1qRiO_fB69cNYidQZ1D-G0zxv_pqK1VKcKLgWg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 04/14] core: Add a list of LE devices to connect
-From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-To: linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v1 10/10] gatt: Don't store Appearance if value is "unknown"
+Date: Thu, 16 Aug 2012 17:13:11 -0300
+Message-Id: <1345147991-31320-11-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1345147991-31320-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <CAKT1EBfp+iJfRSodDfoqtDB4X90BNR1wEJh_zXvw0t6JvnaWuA@mail.gmail.com>
+ <1345147991-31320-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Aug 16, 2012 at 6:20 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi João Paulo,
->
-> On Wed, Aug 15, 2012, João Paulo Rechi Vita wrote:
->> +     device_get_address(device, &bdaddr, NULL);
->> +     if (g_slist_find_custom(adapter->connect_list, &bdaddr,
->> +                                     (GCompareFunc) device_bdaddr_cmp)) {
->> +             DBG("trying to add device %s which is already in the connect "
->> +                             "list, ignoring", device_get_path(device));
->> +             return;
->> +     }
->
-> Why don't you just use g_slist_find here? If this is the only place
-> where you need the new device_bdaddr_cmp then patch 03/14 can be
-> removed.
->
+The Core SPEC is not clear regarding the behaviour or the GAP Appearance
+characteristic. According to the SPEC, the Appearance characteristic
+should be readable without authentication or authorization. This patch
+will keep the Appearance characteristic value refresh (read) on every
+re-connection if the value is 0x0000.
+---
+ profiles/gatt/gas.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-I agree with this change, but device_bdaddr_cmp is also used on this chunk:
-
-@@ -2930,6 +2973,16 @@ void adapter_update_found_devices(struct
-btd_adapter *adapter,
-
-        adapter->found_devices = g_slist_prepend(adapter->found_devices, dev);
-
-+       if (bdaddr_type == BDADDR_LE_PUBLIC ||
-+                                       bdaddr_type == BDADDR_LE_RANDOM) {
-+               l = g_slist_find_custom(adapter->connect_list, bdaddr,
-+                                       (GCompareFunc) device_bdaddr_cmp);
-+               if (l) {
-+                       g_idle_add(connect_pending_cb, l->data);
-+                       stop_discovery(adapter);
-+               }
-+       }
+diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
+index 8817e6d..248a88e 100644
+--- a/profiles/gatt/gas.c
++++ b/profiles/gatt/gas.c
+@@ -97,6 +97,9 @@ static void gap_appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 
+ 	device_set_appearance(gas->device, app);
+ 
++	if (app == 0x0000)
++		goto done;
 +
- done:
-        dev->rssi = rssi;
-
-
+ 	adapter_get_address(device_get_adapter(gas->device), &src);
+ 	device_get_address(gas->device, &dst, &type);
+ 
 -- 
-João Paulo Rechi Vita
-Openbossa Labs - INdT
+1.7.8.6
+
