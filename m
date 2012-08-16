@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: <chen.ganir@ti.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH v4 05/10] Battery: Get Battery ID
-Date: Thu, 16 Aug 2012 12:34:58 +0300
-Message-ID: <1345109702-5698-6-git-send-email-chen.ganir@ti.com>
+Subject: [PATCH v4 02/10] Battery: Add Battery Service plugin skeleton
+Date: Thu, 16 Aug 2012 12:34:55 +0300
+Message-ID: <1345109702-5698-3-git-send-email-chen.ganir@ti.com>
 In-Reply-To: <1345109702-5698-1-git-send-email-chen.ganir@ti.com>
 References: <1345109702-5698-1-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
@@ -14,170 +14,330 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chen Ganir <chen.ganir@ti.com>
 
-Read the battery level format characteristic descriptor to get the
-unique namespace and description values.
+Add support for the Battery Service Gatt Client side.
 ---
- profiles/battery/battery.c |  112 +++++++++++++++++++++++++++++++++-----------
- 1 file changed, 85 insertions(+), 27 deletions(-)
+ Makefile.am                |   10 ++++-
+ profiles/battery/battery.c |   88 ++++++++++++++++++++++++++++++++++++++++++++
+ profiles/battery/battery.h |   24 ++++++++++++
+ profiles/battery/main.c    |   53 ++++++++++++++++++++++++++
+ profiles/battery/manager.c |   62 +++++++++++++++++++++++++++++++
+ profiles/battery/manager.h |   24 ++++++++++++
+ 6 files changed, 259 insertions(+), 2 deletions(-)
+ create mode 100644 profiles/battery/battery.c
+ create mode 100644 profiles/battery/battery.h
+ create mode 100644 profiles/battery/main.c
+ create mode 100644 profiles/battery/manager.c
+ create mode 100644 profiles/battery/manager.h
 
+diff --git a/Makefile.am b/Makefile.am
+index a74709d..87e2c1c 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -211,7 +211,8 @@ builtin_sources += profiles/health/hdp_main.c profiles/health/hdp_types.h \
+ endif
+ 
+ if GATTMODULES
+-builtin_modules += thermometer alert time gatt_example proximity deviceinfo
++builtin_modules += thermometer alert time gatt_example proximity deviceinfo \
++            battery
+ builtin_sources += profiles/thermometer/main.c \
+ 			profiles/thermometer/manager.h \
+ 			profiles/thermometer/manager.c \
+@@ -237,7 +238,12 @@ builtin_sources += profiles/thermometer/main.c \
+ 			profiles/deviceinfo/manager.h \
+ 			profiles/deviceinfo/manager.c \
+ 			profiles/deviceinfo/deviceinfo.h \
+-			profiles/deviceinfo/deviceinfo.c
++			profiles/deviceinfo/deviceinfo.c \
++			profiles/battery/main.c \
++			profiles/battery/manager.c \
++			profiles/battery/manager.h \
++			profiles/battery/battery.c \
++			profiles/battery/battery.h
+ endif
+ 
+ builtin_modules += formfactor
 diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
-index f93fdbc..a33ac8c 100644
---- a/profiles/battery/battery.c
+new file mode 100644
+index 0000000..7ed5707
+--- /dev/null
 +++ b/profiles/battery/battery.c
-@@ -37,6 +37,8 @@
- #include "battery.h"
- #include "log.h"
- 
-+#define BATTERY_LEVEL_UUID	"00002a19-0000-1000-8000-00805f9b34fb"
+@@ -0,0 +1,88 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
- struct battery {
- 	struct btd_device	*dev;		/* Device reference */
- 	GAttrib			*attrib;	/* GATT connection */
-@@ -48,15 +50,17 @@ struct battery {
- static GSList *servers;
- 
- struct characteristic {
--	struct gatt_char	attr;	/* Characteristic */
--	struct battery		*batt;	/* Parent Battery Service */
-+	struct gatt_char	attr;		/* Characteristic */
-+	struct battery		*batt;		/* Parent Battery Service */
- 	GSList				*desc;	/* Descriptors */
-+	uint8_t			ns;		/* Battery Namespace */
-+	uint16_t		description;	/* Battery description */
- };
- 
- struct descriptor {
--	struct characteristic	*ch;	/* Parent Characteristic */
--	uint16_t		handle;	/* Descriptor Handle */
--	bt_uuid_t		uuid;	/* UUID */
-+	struct characteristic	*ch;		/* Parent Characteristic */
-+	uint16_t		handle;		/* Descriptor Handle */
-+	bt_uuid_t		uuid;		/* UUID */
- };
- 
- static gint cmp_device(gconstpointer a, gconstpointer b)
-@@ -87,6 +91,55 @@ static void battery_free(gpointer user_data)
- 	g_free(batt);
- }
- 
-+static void batterylevel_presentation_format_desc_cb(guint8 status,
-+						const guint8 *pdu, guint16 len,
-+						gpointer user_data)
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <glib.h>
++#include <bluetooth/uuid.h>
++
++#include "adapter.h"
++#include "device.h"
++#include "att.h"
++#include "gattrib.h"
++#include "gatt.h"
++#include "battery.h"
++
++struct battery {
++	struct btd_device	*dev;		/* Device reference */
++};
++
++static GSList *servers;
++
++static gint cmp_device(gconstpointer a, gconstpointer b)
 +{
-+	struct descriptor *desc = user_data;
-+	uint8_t value[ATT_MAX_MTU];
-+	int vlen;
++	const struct battery *batt = a;
++	const struct btd_device *dev = b;
 +
-+	if (status != 0) {
-+		error("Presentation Format desc read failed: %s",
-+							att_ecode2str(status));
-+		return;
-+	}
++	if (dev == batt->dev)
++		return 0;
 +
-+	vlen = dec_read_resp(pdu, len, value, sizeof(value));
-+	if (!vlen) {
-+		error("Presentation Format desc read failed: Protocol error\n");
-+		return;
-+	}
++	return -1;
++}
 +
-+	if (vlen < 7) {
-+		error("Presentation Format desc read failed: Invalid range");
-+		return;
-+	}
++static void battery_free(gpointer user_data)
++{
++	struct battery *batt = user_data;
 +
-+	desc->ch->ns = value[4];
-+	desc->ch->description = att_get_u16(&value[5]);
++	btd_device_unref(batt->dev);
++	g_free(batt);
 +}
 +
 +
-+static void process_batterylevel_desc(struct descriptor *desc)
++int battery_register(struct btd_device *device)
 +{
-+	struct characteristic *ch = desc->ch;
-+	char uuidstr[MAX_LEN_UUID_STR];
-+	bt_uuid_t btuuid;
++	struct battery *batt;
 +
-+	bt_uuid16_create(&btuuid, GATT_CHARAC_FMT_UUID);
++	batt = g_new0(struct battery, 1);
++	batt->dev = btd_device_ref(device);
 +
-+	if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0) {
-+		gatt_read_char(ch->batt->attrib, desc->handle, 0,
-+				batterylevel_presentation_format_desc_cb, desc);
-+		return;
-+	}
++	servers = g_slist_prepend(servers, batt);
 +
-+	bt_uuid_to_string(&desc->uuid, uuidstr, MAX_LEN_UUID_STR);
-+	DBG("Ignored descriptor %s characteristic %s", uuidstr,	ch->attr.uuid);
++	return 0;
 +}
 +
++void battery_unregister(struct btd_device *device)
++{
++	struct battery *batt;
++	GSList *l;
 +
- static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
- 							gpointer user_data)
- {
-@@ -120,6 +173,7 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
- 			desc->uuid = att_get_uuid128(&value[2]);
- 
- 		ch->desc = g_slist_append(ch->desc, desc);
-+		process_batterylevel_desc(desc);
- 	}
- 
- 	att_data_list_free(list);
-@@ -141,31 +195,35 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
- 
- 	for (l = characteristics; l; l = l->next) {
- 		struct gatt_char *c = l->data;
--		struct characteristic *ch;
--		uint16_t start, end;
--
--		ch = g_new0(struct characteristic, 1);
--		ch->attr.handle = c->handle;
--		ch->attr.properties = c->properties;
--		ch->attr.value_handle = c->value_handle;
--		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
--		ch->batt = batt;
- 
--		batt->chars = g_slist_append(batt->chars, ch);
--
--		start = c->value_handle + 1;
--
--		if (l->next != NULL) {
--			struct gatt_char *c = l->next->data;
--			if (start == c->handle)
-+		if (g_strcmp0(c->uuid, BATTERY_LEVEL_UUID) == 0) {
-+			struct characteristic *ch;
-+			uint16_t start, end;
++	l = g_slist_find_custom(servers, device, cmp_device);
++	if (l == NULL)
++		return;
 +
-+			ch = g_new0(struct characteristic, 1);
-+			ch->attr.handle = c->handle;
-+			ch->attr.properties = c->properties;
-+			ch->attr.value_handle = c->value_handle;
-+			memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
-+			ch->batt = batt;
++	batt = l->data;
++	servers = g_slist_remove(servers, batt);
 +
-+			batt->chars = g_slist_append(batt->chars, ch);
++	battery_free(batt);
++}
+diff --git a/profiles/battery/battery.h b/profiles/battery/battery.h
+new file mode 100644
+index 0000000..9933343
+--- /dev/null
++++ b/profiles/battery/battery.h
+@@ -0,0 +1,24 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+			start = c->value_handle + 1;
++int battery_register(struct btd_device *device);
++void battery_unregister(struct btd_device *device);
+diff --git a/profiles/battery/main.c b/profiles/battery/main.c
+new file mode 100644
+index 0000000..47f4249
+--- /dev/null
++++ b/profiles/battery/main.c
+@@ -0,0 +1,53 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+			if (l->next != NULL) {
-+				struct gatt_char *c = l->next->data;
-+				if (start == c->handle)
-+					continue;
-+				end = c->handle - 1;
-+			} else if (c->value_handle != batt->svc_range->end)
-+				end = batt->svc_range->end;
-+			else
- 				continue;
--			end = c->handle - 1;
--		} else if (c->value_handle != batt->svc_range->end)
--			end = batt->svc_range->end;
--		else
--			continue;
- 
--		gatt_find_info(batt->attrib, start, end, discover_desc_cb, ch);
-+			gatt_find_info(batt->attrib, start, end,
-+							discover_desc_cb, ch);
-+		}
- 	}
- }
- 
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdint.h>
++#include <glib.h>
++#include <errno.h>
++
++#include "hcid.h"
++#include "plugin.h"
++#include "manager.h"
++#include "log.h"
++
++static int battery_init(void)
++{
++	if (!main_opts.gatt_enabled) {
++		DBG("GATT is disabled");
++		return -ENOTSUP;
++	}
++
++	return battery_manager_init();
++}
++
++static void battery_exit(void)
++{
++	battery_manager_exit();
++}
++
++BLUETOOTH_PLUGIN_DEFINE(battery, VERSION,
++			BLUETOOTH_PLUGIN_PRIORITY_DEFAULT, battery_init,
++			battery_exit)
+diff --git a/profiles/battery/manager.c b/profiles/battery/manager.c
+new file mode 100644
+index 0000000..84b85a3
+--- /dev/null
++++ b/profiles/battery/manager.c
+@@ -0,0 +1,62 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#include <glib.h>
++#include <errno.h>
++#include <bluetooth/uuid.h>
++
++#include "adapter.h"
++#include "device.h"
++#include "att.h"
++#include "gattrib.h"
++#include "gatt.h"
++#include "battery.h"
++#include "manager.h"
++
++#define BATTERY_SERVICE_UUID		"0000180f-0000-1000-8000-00805f9b34fb"
++
++static int battery_driver_probe(struct btd_device *device, GSList *uuids)
++{
++	return battery_register(device);
++}
++
++static void battery_driver_remove(struct btd_device *device)
++{
++	battery_unregister(device);
++}
++
++static struct btd_device_driver battery_device_driver = {
++	.name	= "battery-driver",
++	.uuids	= BTD_UUIDS(BATTERY_SERVICE_UUID),
++	.probe	= battery_driver_probe,
++	.remove	= battery_driver_remove
++};
++
++int battery_manager_init(void)
++{
++	return btd_register_device_driver(&battery_device_driver);
++}
++
++void battery_manager_exit(void)
++{
++	btd_unregister_device_driver(&battery_device_driver);
++}
+diff --git a/profiles/battery/manager.h b/profiles/battery/manager.h
+new file mode 100644
+index 0000000..b2c849f
+--- /dev/null
++++ b/profiles/battery/manager.h
+@@ -0,0 +1,24 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012 Texas Instruments, Inc.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++int battery_manager_init(void);
++void battery_manager_exit(void);
 -- 
 1.7.9.5
 
