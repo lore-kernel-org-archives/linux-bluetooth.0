@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: <chen.ganir@ti.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH v4 03/10] Battery: Add connection logic
-Date: Thu, 16 Aug 2012 12:34:56 +0300
-Message-ID: <1345109702-5698-4-git-send-email-chen.ganir@ti.com>
+Subject: [PATCH v4 01/10] Battery: Add Battery Service Gatt Client
+Date: Thu, 16 Aug 2012 12:34:54 +0300
+Message-ID: <1345109702-5698-2-git-send-email-chen.ganir@ti.com>
 In-Reply-To: <1345109702-5698-1-git-send-email-chen.ganir@ti.com>
 References: <1345109702-5698-1-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
@@ -14,174 +14,58 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chen Ganir <chen.ganir@ti.com>
 
-Add connection logic to the Battery Plugin. When the driver is
-loaded, it will request a connection to the remote device and
-release the connection request when destroyed.
+Add documentation for new GATT Client Battery service plugin
 ---
- profiles/battery/battery.c |   91 ++++++++++++++++++++++++++++++++++++++++++++
- profiles/battery/battery.h |    2 +
- profiles/battery/manager.c |    2 -
- 3 files changed, 93 insertions(+), 2 deletions(-)
+ doc/battery-api.txt |   26 ++++++++++++++++++++++++++
+ doc/device-api.txt  |    5 +++++
+ 2 files changed, 31 insertions(+)
+ create mode 100644 doc/battery-api.txt
 
-diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
-index 7ed5707..f9ef73d 100644
---- a/profiles/battery/battery.c
-+++ b/profiles/battery/battery.c
-@@ -29,17 +29,29 @@
- 
- #include "adapter.h"
- #include "device.h"
-+#include "gattrib.h"
-+#include "attio.h"
- #include "att.h"
- #include "gattrib.h"
- #include "gatt.h"
- #include "battery.h"
-+#include "log.h"
- 
- struct battery {
- 	struct btd_device	*dev;		/* Device reference */
-+	GAttrib			*attrib;	/* GATT connection */
-+	guint			attioid;	/* Att watcher id */
-+	struct att_range	*svc_range;	/* Battery range */
-+	GSList			*chars;		/* Characteristics */
- };
- 
- static GSList *servers;
- 
-+struct characteristic {
-+	struct gatt_char	attr;	/* Characteristic */
-+	struct battery		*batt;	/* Parent Battery Service */
-+};
+diff --git a/doc/battery-api.txt b/doc/battery-api.txt
+new file mode 100644
+index 0000000..6e20a6a
+--- /dev/null
++++ b/doc/battery-api.txt
+@@ -0,0 +1,26 @@
++BlueZ D-Bus Battery API description
++****************************************
 +
- static gint cmp_device(gconstpointer a, gconstpointer b)
- {
- 	const struct battery *batt = a;
-@@ -55,20 +67,99 @@ static void battery_free(gpointer user_data)
- {
- 	struct battery *batt = user_data;
- 
-+	if (batt->chars != NULL)
-+		g_slist_free_full(batt->chars, g_free);
++	Texas Instruments, Inc. <chen.ganir@ti.com>
 +
-+	if (batt->attioid > 0)
-+		btd_device_remove_attio_callback(batt->dev, batt->attioid);
++Battery Service hierarchy
++=====================================
 +
-+	if (batt->attrib != NULL)
-+		g_attrib_unref(batt->attrib);
++Service		org.bluez
++Interface	org.bluez.Battery
++Object path	[variable prefix]/{hci0,..}/dev_XX_XX_XX_XX_XX_XX/BATT-NN-DDDD
 +
- 	btd_device_unref(batt->dev);
- 	g_free(batt);
- }
- 
-+static void configure_battery_cb(GSList *characteristics, guint8 status,
-+							gpointer user_data)
-+{
-+	struct battery *batt = user_data;
-+	GSList *l;
 +
-+	if (status != 0) {
-+		error("Discover Battery characteristics: %s",
-+							att_ecode2str(status));
-+		return;
-+	}
++Methods	dict GetProperties()
 +
-+	for (l = characteristics; l; l = l->next) {
-+		struct gatt_char *c = l->data;
-+		struct characteristic *ch;
++			Returns all properties for the interface. See the
++			Properties section for the available properties.
 +
-+		ch = g_new0(struct characteristic, 1);
-+		ch->attr.handle = c->handle;
-+		ch->attr.properties = c->properties;
-+		ch->attr.value_handle = c->value_handle;
-+		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
-+		ch->batt = batt;
++Signals		PropertyChanged(string name, variant value)
 +
-+		batt->chars = g_slist_append(batt->chars, ch);
-+	}
-+}
++		This signal indicates a changed value of the given
++		property.
 +
-+static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
-+{
-+	struct battery *batt = user_data;
++Properties	byte Level [readonly]
 +
-+	batt->attrib = g_attrib_ref(attrib);
++			Battery level (0-100).
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index 1f0dc96..5d760b1 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -179,3 +179,8 @@ Properties	string Address [readonly]
+ 			Note that this property can exhibit false-positives
+ 			in the case of Bluetooth 2.1 (or newer) devices that
+ 			have disabled Extended Inquiry Response support.
 +
-+	if (batt->chars == NULL) {
-+		gatt_discover_char(batt->attrib, batt->svc_range->start,
-+					batt->svc_range->end, NULL,
-+					configure_battery_cb, batt);
-+	}
-+}
++		array{string} Batteries [readonly]
 +
-+static void attio_disconnected_cb(gpointer user_data)
-+{
-+	struct battery *batt = user_data;
-+
-+	g_attrib_unref(batt->attrib);
-+	batt->attrib = NULL;
-+}
-+
-+static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
-+{
-+	const struct gatt_primary *prim = a;
-+	const char *uuid = b;
-+
-+	return g_strcmp0(prim->uuid, uuid);
-+}
- 
- int battery_register(struct btd_device *device)
- {
- 	struct battery *batt;
-+	struct gatt_primary *prim;
-+	GSList *primaries, *l;
-+
-+	primaries = btd_device_get_primaries(device);
-+
-+	l = g_slist_find_custom(primaries, BATTERY_SERVICE_UUID,
-+							primary_uuid_cmp);
-+	prim = l->data;
- 
- 	batt = g_new0(struct battery, 1);
- 	batt->dev = btd_device_ref(device);
- 
-+	batt->svc_range = g_new0(struct att_range, 1);
-+	batt->svc_range->start = prim->range.start;
-+	batt->svc_range->end = prim->range.end;
-+
- 	servers = g_slist_prepend(servers, batt);
- 
-+	batt->attioid = btd_device_add_attio_callback(device,
-+				attio_connected_cb, attio_disconnected_cb,
-+				batt);
- 	return 0;
- }
- 
-diff --git a/profiles/battery/battery.h b/profiles/battery/battery.h
-index 9933343..801186d 100644
---- a/profiles/battery/battery.h
-+++ b/profiles/battery/battery.h
-@@ -20,5 +20,7 @@
-  *
-  */
- 
-+#define BATTERY_SERVICE_UUID		"0000180f-0000-1000-8000-00805f9b34fb"
-+
- int battery_register(struct btd_device *device);
- void battery_unregister(struct btd_device *device);
-diff --git a/profiles/battery/manager.c b/profiles/battery/manager.c
-index 84b85a3..22b8b20 100644
---- a/profiles/battery/manager.c
-+++ b/profiles/battery/manager.c
-@@ -32,8 +32,6 @@
- #include "battery.h"
- #include "manager.h"
- 
--#define BATTERY_SERVICE_UUID		"0000180f-0000-1000-8000-00805f9b34fb"
--
- static int battery_driver_probe(struct btd_device *device, GSList *uuids)
- {
- 	return battery_register(device);
++			List of device battery object paths that represents the available
++			batteries on the remote device.
 -- 
 1.7.9.5
 
