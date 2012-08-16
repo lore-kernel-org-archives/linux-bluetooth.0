@@ -1,37 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 16 Aug 2012 14:39:41 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: chen.ganir@ti.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 01/10] Battery: Add Battery Service Gatt Client
-Message-ID: <20120816113941.GA20887@x220>
-References: <1345109702-5698-1-git-send-email-chen.ganir@ti.com>
- <1345109702-5698-2-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1345109702-5698-2-git-send-email-chen.ganir@ti.com>
+In-Reply-To: <CACUGKYOUh6G9zkifB98akXd_R8Axv6eh03-OCYnJyLNkkBTq3w@mail.gmail.com>
+References: <CACUGKYMjKcZZJsYi-SXCd1C=guWtKP3k=SBVPVe=+MR0R=pwHg@mail.gmail.com>
+	<502C49F4.9060007@samsung.com>
+	<CACUGKYOkxtCP_VgYtKWvSYHTb__m2rMCGujOAh6rKDXXYXLWZQ@mail.gmail.com>
+	<CACUGKYOUh6G9zkifB98akXd_R8Axv6eh03-OCYnJyLNkkBTq3w@mail.gmail.com>
+Date: Thu, 16 Aug 2012 06:57:27 -0400
+Message-ID: <CAJdJm_PoC6CqojaroHPXy6sf-Sg+uS_DJZzm38Re6LDbUBmLHg@mail.gmail.com>
+Subject: Re: Bluez 4.101
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: John Tobias <john.tobias.ph@gmail.com>
+Cc: Chan-yeol Park <chanyeol.park@samsung.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+Hi John,
 
-On Thu, Aug 16, 2012, chen.ganir@ti.com wrote:
-> --- a/doc/device-api.txt
-> +++ b/doc/device-api.txt
-> @@ -179,3 +179,8 @@ Properties	string Address [readonly]
->  			Note that this property can exhibit false-positives
->  			in the case of Bluetooth 2.1 (or newer) devices that
->  			have disabled Extended Inquiry Response support.
-> +
-> +		array{string} Batteries [readonly]
-> +
-> +			List of device battery object paths that represents the available
-> +			batteries on the remote device.
+On Wed, Aug 15, 2012 at 10:54 PM, John Tobias <john.tobias.ph@gmail.com> wrote:
+> Let me take it back. I used the kernel from ubuntu 12.04.
 
-I don't think it's ok to pollute the Device interface or src/device.c
-with profile-specific details. That should happen in profile-specific
-plugins and interfaces. Since we're switching over to object manager
-maybe an interface/property like this isn't needed at all? (even if it
-would be needed the type should be array{object} and not array{string}
+You need at least 3.4.0 to use latest BlueZ (although the latest
+kernel version is always recommended for development). Ubuntu 12.04
+has 3.2.0.
 
-Johan
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
