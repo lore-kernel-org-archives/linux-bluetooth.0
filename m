@@ -1,32 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 16 Aug 2012 16:25:41 +0300
-Message-ID: <CABBYNZJ16G7zOEm+AJwmb8SeEtRyGzfiKFf+QsK8NdQGUUGqDA@mail.gmail.com>
-Subject: Moving bluetooth plugin to gstreamer
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: gstreamer-devel@lists.freedesktop.org
-Cc: linux-bluetooth@vger.kernel.org,
-	Thiago Sousa Santos <thiagossantos@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Subject: [PATCH BlueZ v1] gdbus: Fix compilation error if macro "error" is
+ defined
+Date: Thu, 16 Aug 2012 18:21:19 +0530
+Message-id: <1345121479-9797-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+The variable "signature" used in error is not defined and "args" is now
+a struct instead of a string.
+---
+v1 -> Made a note of the removal of variable "args" in the commit message
 
-Since we now have a proper library for SBC codec
-(http://git.kernel.org/?p=bluetooth/sbc.git;a=summary) and its patent
-has expired June 2, 2010. (source:
-http://en.wikipedia.org/wiki/SBC_(codec)), I wonder if it wouldn't be
-a good idea to move the plugin to gstreamer tree?
+ gdbus/object.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-The plugin has the following elements:
-
-bluetooth:  sbcenc: Bluetooth SBC encoder
-bluetooth:  sbcdec: Bluetooth SBC decoder
-bluetooth:  sbcparse: Bluetooth SBC parser
-bluetooth:  avdtpsink: Bluetooth AVDTP sink
-bluetooth:  a2dpsink: Bluetooth A2DP sink
-bluetooth:  rtpsbcpay: RTP packet payloader
-
+diff --git a/gdbus/object.c b/gdbus/object.c
+index 900e7ab..9689006 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -645,8 +645,8 @@ static dbus_bool_t emit_signal_valist(DBusConnection *conn,
+ 		goto fail;
+ 
+ 	if (g_dbus_args_have_signature(args, signal) == FALSE) {
+-		error("%s.%s: expected signature'%s' but got '%s'",
+-				interface, name, args, signature);
++		error("%s.%s: got unexpected signature '%s'", interface, name,
++					dbus_message_get_signature(signal));
+ 		ret = FALSE;
+ 		goto fail;
+ 	}
 -- 
-Luiz Augusto von Dentz
+1.7.1
+
