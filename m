@@ -2,61 +2,83 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ v3 02/14] mgmt: print error message when start_discovery fails
-Date: Thu, 16 Aug 2012 18:28:32 -0300
-Message-Id: <1345152524-13404-3-git-send-email-jprvita@openbossa.org>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v3 01/14] core: Control connections based on adapter state
+Date: Thu, 16 Aug 2012 18:28:31 -0300
+Message-Id: <1345152524-13404-2-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1345152524-13404-1-git-send-email-jprvita@openbossa.org>
 References: <1345152524-13404-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If we fail to communicate with the MGMT socket is better to print the
-error message on the mgmtops plugin, where it really happened, instead
-of leaving this job to its users.
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+
+This patch disable automatic ATTIO connections when the adapter is
+powered down and enable automatic connection when the adapter is powered
+on.
 ---
- src/adapter.c | 6 +-----
- src/mgmt.c    | 7 +++++--
- 2 files changed, 6 insertions(+), 7 deletions(-)
+ src/adapter.c | 25 ++++++++++++++++---------
+ 1 file changed, 16 insertions(+), 9 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 3dec9cf..0fe344f 100644
+index b642e37..3dec9cf 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -1002,13 +1002,9 @@ struct btd_device *adapter_get_device(DBusConnection *conn,
- static gboolean discovery_cb(gpointer user_data)
+@@ -2098,6 +2098,14 @@ static int get_pairable_timeout(const char *src)
+ 	return main_opts.pairto;
+ }
+ 
++static void set_auto_connect(gpointer data, gpointer user_data)
++{
++	struct btd_device *device = data;
++	gboolean enable = GPOINTER_TO_INT(user_data);
++
++	device_set_auto_connect(device, enable);
++}
++
+ static void call_adapter_powered_callbacks(struct btd_adapter *adapter,
+ 						gboolean powered)
  {
- 	struct btd_adapter *adapter = user_data;
--	int err;
+@@ -2107,7 +2115,10 @@ static void call_adapter_powered_callbacks(struct btd_adapter *adapter,
+ 		btd_adapter_powered_cb cb = l->data;
  
- 	adapter->discov_id = 0;
--
--	err = mgmt_start_discovery(adapter->dev_id);
--	if (err < 0)
--		error("start_discovery: %s (%d)", strerror(-err), -err);
-+	mgmt_start_discovery(adapter->dev_id);
+ 		cb(adapter, powered);
+-       }
++	}
++
++	g_slist_foreach(adapter->devices, set_auto_connect,
++						GINT_TO_POINTER(powered));
+ }
  
+ static void emit_device_disappeared(gpointer data, gpointer user_data)
+@@ -3318,15 +3329,10 @@ static gboolean disable_auto(gpointer user_data)
  	return FALSE;
  }
-diff --git a/src/mgmt.c b/src/mgmt.c
-index 94b2a04..9c228f2 100644
---- a/src/mgmt.c
-+++ b/src/mgmt.c
-@@ -1990,8 +1990,11 @@ int mgmt_start_discovery(int index)
  
- 	cp->type = info->discov_type;
+-static void set_auto_connect(gpointer data, gpointer user_data)
+-{
+-	struct btd_device *device = data;
+-
+-	device_set_auto_connect(device, TRUE);
+-}
+-
+ void btd_adapter_enable_auto_connect(struct btd_adapter *adapter)
+ {
++	gboolean enable = TRUE;
++
+ 	if (!adapter->up)
+ 		return;
  
--	if (write(mgmt_sock, buf, sizeof(buf)) < 0)
--		return -errno;
-+	if (write(mgmt_sock, buf, sizeof(buf)) < 0) {
-+		int err = -errno;
-+		error("failed to write to MGMT socket: %s", strerror(-err));
-+		return err;
-+	}
+@@ -3335,7 +3341,8 @@ void btd_adapter_enable_auto_connect(struct btd_adapter *adapter)
+ 	if (adapter->auto_timeout_id)
+ 		return;
  
- 	return 0;
- }
+-	g_slist_foreach(adapter->devices, set_auto_connect, NULL);
++	g_slist_foreach(adapter->devices, set_auto_connect,
++						GINT_TO_POINTER(enable));
+ 
+ 	adapter->auto_timeout_id = g_timeout_add_seconds(main_opts.autoto,
+ 						disable_auto, adapter);
 -- 
 1.7.11.2
 
