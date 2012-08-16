@@ -1,29 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 16 Aug 2012 22:01:24 +0300
+Date: Thu, 16 Aug 2012 22:00:12 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: Henrique Dante de Almeida <hdante@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v1] gdbus: Fix compilation error if macro "error"
- is defined
-Message-ID: <20120816190124.GB25826@x220.P-661HNU-F1>
-References: <1345121479-9797-1-git-send-email-jaganath.k@samsung.com>
+Subject: Re: [PATCH] adapter: fix call to get_key_info
+Message-ID: <20120816190012.GA25826@x220.P-661HNU-F1>
+References: <1345140926-19076-1-git-send-email-hdante@profusion.mobi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1345121479-9797-1-git-send-email-jaganath.k@samsung.com>
+In-Reply-To: <1345140926-19076-1-git-send-email-hdante@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Hi Henrique,
 
-On Thu, Aug 16, 2012, Jaganath Kanakkassery wrote:
-> The variable "signature" used in error is not defined and "args" is now
-> a struct instead of a string.
+On Thu, Aug 16, 2012, Henrique Dante de Almeida wrote:
+> This complements commit 85128d40f4788acb0115f09c07b716e741444406 that
+> changed the "linkkeys" file format. The call to get_key_info must
+> include only the address string, instead of the new combined
+> address#type text.
 > ---
-> v1 -> Made a note of the removal of variable "args" in the commit message
-> 
->  gdbus/object.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
+>  src/adapter.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied to bluez.git and obexd.git. Thanks.
+Applied. Thanks.
 
 Johan
