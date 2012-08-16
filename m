@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: <chen.ganir@ti.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH v4 06/10] Battery: Add Battery list to btd_device
-Date: Thu, 16 Aug 2012 12:34:59 +0300
-Message-ID: <1345109702-5698-7-git-send-email-chen.ganir@ti.com>
+Subject: [PATCH v4 05/10] Battery: Get Battery ID
+Date: Thu, 16 Aug 2012 12:34:58 +0300
+Message-ID: <1345109702-5698-6-git-send-email-chen.ganir@ti.com>
 In-Reply-To: <1345109702-5698-1-git-send-email-chen.ganir@ti.com>
 References: <1345109702-5698-1-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
@@ -14,183 +14,170 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chen Ganir <chen.ganir@ti.com>
 
-Add peer battery list to the btd_device. New property added to Device
-called Batteries.
+Read the battery level format characteristic descriptor to get the
+unique namespace and description values.
 ---
- profiles/battery/battery.c |   14 ++++++++--
- src/device.c               |   65 ++++++++++++++++++++++++++++++++++++++++++++
- src/device.h               |    3 ++
- 3 files changed, 79 insertions(+), 3 deletions(-)
+ profiles/battery/battery.c |  112 +++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 85 insertions(+), 27 deletions(-)
 
 diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
-index a33ac8c..3f79c1f 100644
+index f93fdbc..a33ac8c 100644
 --- a/profiles/battery/battery.c
 +++ b/profiles/battery/battery.c
-@@ -50,6 +50,7 @@ struct battery {
+@@ -37,6 +37,8 @@
+ #include "battery.h"
+ #include "log.h"
+ 
++#define BATTERY_LEVEL_UUID	"00002a19-0000-1000-8000-00805f9b34fb"
++
+ struct battery {
+ 	struct btd_device	*dev;		/* Device reference */
+ 	GAttrib			*attrib;	/* GATT connection */
+@@ -48,15 +50,17 @@ struct battery {
  static GSList *servers;
  
  struct characteristic {
-+	char			*path;          /* object path */
- 	struct gatt_char	attr;		/* Characteristic */
- 	struct battery		*batt;		/* Parent Battery Service */
+-	struct gatt_char	attr;	/* Characteristic */
+-	struct battery		*batt;	/* Parent Battery Service */
++	struct gatt_char	attr;		/* Characteristic */
++	struct battery		*batt;		/* Parent Battery Service */
  	GSList				*desc;	/* Descriptors */
-@@ -151,12 +152,12 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
- 	if (status != 0) {
- 		error("Discover all characteristic descriptors failed [%s]: %s",
- 					ch->attr.uuid, att_ecode2str(status));
--		return;
-+		goto update_char;
- 	}
++	uint8_t			ns;		/* Battery Namespace */
++	uint16_t		description;	/* Battery description */
+ };
  
- 	list = dec_find_info_resp(pdu, len, &format);
- 	if (list == NULL)
--		return;
-+		goto update_char;
+ struct descriptor {
+-	struct characteristic	*ch;	/* Parent Characteristic */
+-	uint16_t		handle;	/* Descriptor Handle */
+-	bt_uuid_t		uuid;	/* UUID */
++	struct characteristic	*ch;		/* Parent Characteristic */
++	uint16_t		handle;		/* Descriptor Handle */
++	bt_uuid_t		uuid;		/* UUID */
+ };
  
- 	for (i = 0; i < list->num; i++) {
- 		struct descriptor *desc;
-@@ -177,6 +178,14 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+ static gint cmp_device(gconstpointer a, gconstpointer b)
+@@ -87,6 +91,55 @@ static void battery_free(gpointer user_data)
+ 	g_free(batt);
+ }
+ 
++static void batterylevel_presentation_format_desc_cb(guint8 status,
++						const guint8 *pdu, guint16 len,
++						gpointer user_data)
++{
++	struct descriptor *desc = user_data;
++	uint8_t value[ATT_MAX_MTU];
++	int vlen;
++
++	if (status != 0) {
++		error("Presentation Format desc read failed: %s",
++							att_ecode2str(status));
++		return;
++	}
++
++	vlen = dec_read_resp(pdu, len, value, sizeof(value));
++	if (!vlen) {
++		error("Presentation Format desc read failed: Protocol error\n");
++		return;
++	}
++
++	if (vlen < 7) {
++		error("Presentation Format desc read failed: Invalid range");
++		return;
++	}
++
++	desc->ch->ns = value[4];
++	desc->ch->description = att_get_u16(&value[5]);
++}
++
++
++static void process_batterylevel_desc(struct descriptor *desc)
++{
++	struct characteristic *ch = desc->ch;
++	char uuidstr[MAX_LEN_UUID_STR];
++	bt_uuid_t btuuid;
++
++	bt_uuid16_create(&btuuid, GATT_CHARAC_FMT_UUID);
++
++	if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0) {
++		gatt_read_char(ch->batt->attrib, desc->handle, 0,
++				batterylevel_presentation_format_desc_cb, desc);
++		return;
++	}
++
++	bt_uuid_to_string(&desc->uuid, uuidstr, MAX_LEN_UUID_STR);
++	DBG("Ignored descriptor %s characteristic %s", uuidstr,	ch->attr.uuid);
++}
++
++
+ static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 							gpointer user_data)
+ {
+@@ -120,6 +173,7 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 			desc->uuid = att_get_uuid128(&value[2]);
+ 
+ 		ch->desc = g_slist_append(ch->desc, desc);
++		process_batterylevel_desc(desc);
  	}
  
  	att_data_list_free(list);
-+
-+update_char:
-+	ch->path = g_strdup_printf("%s/BATT-%02X-%04X",
-+				device_get_path(ch->batt->dev),
-+				ch->ns,
-+				ch->description);
-+
-+	device_add_battery(ch->batt->dev, ch->path);
- }
+@@ -141,31 +195,35 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
  
- 
-@@ -206,7 +215,6 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
- 			ch->attr.value_handle = c->value_handle;
- 			memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
- 			ch->batt = batt;
+ 	for (l = characteristics; l; l = l->next) {
+ 		struct gatt_char *c = l->data;
+-		struct characteristic *ch;
+-		uint16_t start, end;
 -
- 			batt->chars = g_slist_append(batt->chars, ch);
+-		ch = g_new0(struct characteristic, 1);
+-		ch->attr.handle = c->handle;
+-		ch->attr.properties = c->properties;
+-		ch->attr.value_handle = c->value_handle;
+-		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
+-		ch->batt = batt;
  
- 			start = c->value_handle + 1;
-diff --git a/src/device.c b/src/device.c
-index f781298..c7c6c7d 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -124,6 +124,10 @@ struct att_callbacks {
- 	gpointer user_data;
- };
+-		batt->chars = g_slist_append(batt->chars, ch);
+-
+-		start = c->value_handle + 1;
+-
+-		if (l->next != NULL) {
+-			struct gatt_char *c = l->next->data;
+-			if (start == c->handle)
++		if (g_strcmp0(c->uuid, BATTERY_LEVEL_UUID) == 0) {
++			struct characteristic *ch;
++			uint16_t start, end;
++
++			ch = g_new0(struct characteristic, 1);
++			ch->attr.handle = c->handle;
++			ch->attr.properties = c->properties;
++			ch->attr.value_handle = c->value_handle;
++			memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
++			ch->batt = batt;
++
++			batt->chars = g_slist_append(batt->chars, ch);
++
++			start = c->value_handle + 1;
++
++			if (l->next != NULL) {
++				struct gatt_char *c = l->next->data;
++				if (start == c->handle)
++					continue;
++				end = c->handle - 1;
++			} else if (c->value_handle != batt->svc_range->end)
++				end = batt->svc_range->end;
++			else
+ 				continue;
+-			end = c->handle - 1;
+-		} else if (c->value_handle != batt->svc_range->end)
+-			end = batt->svc_range->end;
+-		else
+-			continue;
  
-+struct btd_battery {
-+	char *path;
-+};
-+
- struct btd_device {
- 	bdaddr_t	bdaddr;
- 	uint8_t		bdaddr_type;
-@@ -169,6 +173,7 @@ struct btd_device {
- 
- 	GIOChannel      *att_io;
- 	guint		cleanup_id;
-+	GSList		*batteries;
- };
- 
- static uint16_t uuid_list[] = {
-@@ -259,6 +264,7 @@ static void device_free(gpointer user_data)
- 	g_slist_free_full(device->primaries, g_free);
- 	g_slist_free_full(device->attios, g_free);
- 	g_slist_free_full(device->attios_offline, g_free);
-+	g_slist_free_full(device->batteries, g_free);
- 
- 	attio_cleanup(device);
- 
-@@ -433,6 +439,15 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 	ptr = adapter_get_path(adapter);
- 	dict_append_entry(&dict, "Adapter", DBUS_TYPE_OBJECT_PATH, &ptr);
- 
-+	/* Batteries */
-+	str = g_new0(char *, g_slist_length(device->batteries) + 1);
-+	for (i = 0, l = device->batteries; l; l = l->next, i++) {
-+		struct btd_battery *b = l->data;
-+		str[i] = b->path;
-+	}
-+	dict_append_array(&dict, "Batteries", DBUS_TYPE_OBJECT_PATH, &str, i);
-+	g_free(str);
-+
- 	dbus_message_iter_close_container(&iter, &dict);
- 
- 	return reply;
-@@ -1215,6 +1230,9 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
- 	g_slist_free(device->drivers);
- 	device->drivers = NULL;
- 
-+	g_slist_free(device->batteries);
-+	device->batteries = NULL;
-+
- 	attrib_client_unregister(device->services);
- 
- 	btd_device_unref(device);
-@@ -3147,3 +3165,50 @@ void device_set_pnpid(struct btd_device *device, uint8_t vendor_id_src,
- 	device_set_product(device, product_id);
- 	device_set_version(device, product_ver);
- }
-+
-+static void batteries_changed(struct btd_device *device)
-+{
-+	DBusConnection *conn = get_dbus_connection();
-+	char **batteries;
-+	GSList *l;
-+	int i;
-+
-+	batteries = g_new0(char *, g_slist_length(device->batteries) + 1);
-+	for (i = 0, l = device->batteries; l; l = l->next, i++) {
-+		struct btd_battery *batt = l->data;
-+		batteries[i] = batt->path;
-+	}
-+
-+	emit_array_property_changed(conn, device->path, DEVICE_INTERFACE,
-+				    "Batteries", DBUS_TYPE_STRING, &batteries,
-+				    i);
-+
-+	g_free(batteries);
-+}
-+
-+void device_add_battery(struct btd_device *device, char *path)
-+{
-+	struct btd_battery *batt;
-+
-+	batt = g_new0(struct btd_battery, 1);
-+	batt->path = g_strdup(path);
-+	device->batteries = g_slist_append(device->batteries, batt);
-+	batteries_changed(device);
-+}
-+
-+void device_remove_battery(struct btd_device *device, char *path)
-+{
-+	GSList *l;
-+
-+	for (l = device->batteries; l; l = l->next) {
-+		struct btd_battery *b = l->data;
-+
-+		if (g_strcmp0(path, b->path) == 0) {
-+			device->batteries = g_slist_remove(device->batteries, b);
-+			g_free(b->path);
-+			g_free(b);
-+			batteries_changed(device);
-+			return;
+-		gatt_find_info(batt->attrib, start, end, discover_desc_cb, ch);
++			gatt_find_info(batt->attrib, start, end,
++							discover_desc_cb, ch);
 +		}
-+	}
-+}
-diff --git a/src/device.h b/src/device.h
-index 26e17f7..db71a8a 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -126,3 +126,6 @@ int device_unblock(DBusConnection *conn, struct btd_device *device,
- void device_set_pnpid(struct btd_device *device, uint8_t vendor_id_src,
- 			uint16_t vendor_id, uint16_t product_id,
- 			uint16_t product_ver);
-+
-+void device_add_battery(struct btd_device *device, char *path);
-+void device_remove_battery(struct btd_device *device, char *path);
+ 	}
+ }
+ 
 -- 
 1.7.9.5
 
