@@ -1,68 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <69D93B07FE0348AC8E5E38C3EF8D6DB7@sisodomain.com>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Thu, 16 Aug 2012 14:39:41 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: chen.ganir@ti.com
 Cc: linux-bluetooth@vger.kernel.org
-References: <1343816803-16228-1-git-send-email-jaganath.k@samsung.com>
- <20120816074909.GA29336@x220>
-In-reply-to: <20120816074909.GA29336@x220>
-Subject: Re: [PATCH BlueZ v0] gdbus: Fix compilation error if macro "error" is
- defined
-Date: Thu, 16 Aug 2012 17:31:59 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
+Subject: Re: [PATCH v4 01/10] Battery: Add Battery Service Gatt Client
+Message-ID: <20120816113941.GA20887@x220>
+References: <1345109702-5698-1-git-send-email-chen.ganir@ti.com>
+ <1345109702-5698-2-git-send-email-chen.ganir@ti.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1345109702-5698-2-git-send-email-chen.ganir@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Chen,
 
---------------------------------------------------
-From: "Johan Hedberg" <johan.hedberg@gmail.com>
-Sent: Thursday, August 16, 2012 1:19 PM
-To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ v0] gdbus: Fix compilation error if macro "error" 
-is defined
+On Thu, Aug 16, 2012, chen.ganir@ti.com wrote:
+> --- a/doc/device-api.txt
+> +++ b/doc/device-api.txt
+> @@ -179,3 +179,8 @@ Properties	string Address [readonly]
+>  			Note that this property can exhibit false-positives
+>  			in the case of Bluetooth 2.1 (or newer) devices that
+>  			have disabled Extended Inquiry Response support.
+> +
+> +		array{string} Batteries [readonly]
+> +
+> +			List of device battery object paths that represents the available
+> +			batteries on the remote device.
 
-> Hi Jaganath,
->
-> On Wed, Aug 01, 2012, Jaganath Kanakkassery wrote:
->> The variable "signature" used in error is not defined.
->> ---
->> v0 -> Made error message as per Lucas's suggestion
->>
->>  gdbus/object.c |    4 ++--
->>  1 files changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/gdbus/object.c b/gdbus/object.c
->> index 900e7ab..9689006 100644
->> --- a/gdbus/object.c
->> +++ b/gdbus/object.c
->> @@ -645,8 +645,8 @@ static dbus_bool_t emit_signal_valist(DBusConnection 
->> *conn,
->>  goto fail;
->>
->>  if (g_dbus_args_have_signature(args, signal) == FALSE) {
->> - error("%s.%s: expected signature'%s' but got '%s'",
->> - interface, name, args, signature);
->> + error("%s.%s: got unexpected signature '%s'", interface, name,
->> + dbus_message_get_signature(signal));
->>  ret = FALSE;
->>  goto fail;
->>  }
->
-> What's the reason for dropping printing of the value of "args"? I'd
-> think that's quite useful in figuring out what went wrong. Even if there
-> is a reason to drop it it has nothing to do with fixing the compilation
-> error due to undefined "signature" and should therefore be in its own
-> patch.
->
+I don't think it's ok to pollute the Device interface or src/device.c
+with profile-specific details. That should happen in profile-specific
+plugins and interfaces. Since we're switching over to object manager
+maybe an interface/property like this isn't needed at all? (even if it
+would be needed the type should be array{object} and not array{string}
 
-"args" is a structure now and that's the reason it is removed and I think
-the complete signature of args cannot be available at the point where it is 
-printed.
-How about changing the commit message to "Correct error message"?
-
-Thanks,
-Jaganath 
-
+Johan
