@@ -1,34 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 16 Aug 2012 10:23:06 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	pkrystad@codeaurora.org
-Subject: Re: [RFCv0 14/21] Bluetooth: Handle physical link completion
-Message-ID: <20120816072259.GB24160@aemeltch-MOBL1>
-References: <1343260274-11953-1-git-send-email-mathewm@codeaurora.org>
- <1343260274-11953-15-git-send-email-mathewm@codeaurora.org>
- <20120815135105.GA3555@aemeltch-MOBL1>
- <alpine.DEB.2.02.1208150951470.30981@mathewm-linux>
+Date: Thu, 16 Aug 2012 10:14:16 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 5/7] Bluetooth: Refactor SCO connection into its own
+ function
+Message-ID: <20120816071414.GA24160@aemeltch-MOBL1>
+References: <1343428380-32705-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1343428380-32705-6-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.DEB.2.02.1208150951470.30981@mathewm-linux>
+In-Reply-To: <1343428380-32705-6-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi Vinicius,
 
-On Wed, Aug 15, 2012 at 09:56:04AM -0700, Mat Martineau wrote:
+On Fri, Jul 27, 2012 at 07:32:58PM -0300, Vinicius Costa Gomes wrote:
 ...
-> >
-> >I feel that this function is too big. Maybe we could split channel move
-> >and channel create operations?
-> 
-> Sure, the "if (chan->state != BT_CONNECTED)" clause would be clearer
-> in a channel create function, and the other clauses can go in a
-> channel move function.
+> -/* Create SCO, ACL or LE connection.
+> - * Device _must_ be locked */
+> -struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+> -			     __u8 dst_type, __u8 sec_level, __u8 auth_type)
+> +static struct hci_conn *hci_connect_sco(struct hci_dev *hdev, bdaddr_t *dst,
+> +				     u8 sec_level, u8 auth_type)
 
-Maybe we could define new state BT_MOVING ?
+Here we use u8
+
+...
+> +/* Create SCO, ACL or LE connection. */
+> +struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+> +			     __u8 dst_type, __u8 sec_level, __u8 auth_type
+...
+
+and here __u8
+
+Shall we agree about those type usage, I thought that we use __u* in
+headers and u* in c-files. At least in one file we shall use one type.
 
 Best regards 
 Andrei Emeltchenko 
