@@ -4,131 +4,53 @@ From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ v3 04/14] core: Add a list of LE devices to connect
-Date: Thu, 16 Aug 2012 18:28:34 -0300
-Message-Id: <1345152524-13404-5-git-send-email-jprvita@openbossa.org>
+Subject: [PATCH BlueZ v3 03/14] core: add compare function for bdaddr in a struct btd_device
+Date: Thu, 16 Aug 2012 18:28:33 -0300
+Message-Id: <1345152524-13404-4-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1345152524-13404-1-git-send-email-jprvita@openbossa.org>
 References: <1345152524-13404-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This commit creates a per-adapter list of LE devices to connect when a
-advertising from them is seen during a scan.
+This is a utility function similar to device_address_cmp but comparing
+bdaddr instead of the string representing the address. This way is
+possible to avoid allocating two buffers to temporarily hold the
+strings, two sprintf() calls to generate the strings from the bdaddr
+arrays, and a string comparison, substituting all of it for one memcmp()
+call.
 ---
- src/adapter.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- src/adapter.h |  5 +++++
- 2 files changed, 55 insertions(+), 1 deletion(-)
+ src/device.c | 5 +++++
+ src/device.h | 1 +
+ 2 files changed, 6 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 0fe344f..b844ca2 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -132,6 +132,7 @@ struct btd_adapter {
- 	GSList *devices;		/* Devices structure pointers */
- 	GSList *mode_sessions;		/* Request Mode sessions */
- 	GSList *disc_sessions;		/* Discovery sessions */
-+	GSList *connect_list;		/* Devices to connect when found */
- 	guint discov_id;		/* Discovery timer */
- 	gboolean discovering;		/* Discovery active */
- 	gboolean discov_suspended;	/* Discovery suspended */
-@@ -2181,6 +2182,28 @@ const char *btd_adapter_get_name(struct btd_adapter *adapter)
- 	return adapter->name;
+diff --git a/src/device.c b/src/device.c
+index f781298..d5aa60f 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1228,6 +1228,11 @@ gint device_address_cmp(struct btd_device *device, const gchar *address)
+ 	return strcasecmp(addr, address);
  }
  
-+void adapter_connect_list_add(struct btd_adapter *adapter,
-+					struct btd_device *device)
++gint device_bdaddr_cmp(struct btd_device *device, bdaddr_t *bdaddr)
 +{
-+	if (g_slist_find(adapter->connect_list, device)) {
-+		DBG("trying to add device %s which is already in the connect "
-+				"list, ignoring", device_get_path(device));
-+		return;
-+	}
-+
-+	adapter->connect_list = g_slist_append(adapter->connect_list, device);
-+	DBG("%s added to %s's connect_list", device_get_path(device),
-+								adapter->name);
++	return bacmp(&device->bdaddr, bdaddr);
 +}
 +
-+void adapter_connect_list_remove(struct btd_adapter *adapter,
-+					struct btd_device *device)
-+{
-+	adapter->connect_list = g_slist_remove(adapter->connect_list, device);
-+	DBG("%s removed from %s's connect_list", device_get_path(device),
-+								adapter->name);
-+}
-+
- void btd_adapter_start(struct btd_adapter *adapter)
+ static gboolean record_has_uuid(const sdp_record_t *rec,
+ 				const char *profile_uuid)
  {
- 	char address[18];
-@@ -2845,6 +2868,21 @@ static char *read_stored_data(bdaddr_t *local, bdaddr_t *peer,
- 	return textfile_get(filename, key);
- }
- 
-+static gboolean connect_pending_cb(gpointer user_data)
-+{
-+	struct btd_device *device = user_data;
-+	struct btd_adapter *adapter = device_get_adapter(device);
-+
-+	/* in the future we may want to check here if the controller supports
-+	 * scanning and connecting at the same time */
-+	if (adapter->discovering)
-+		return TRUE;
-+
-+	/* TODO: call device connect callback */
-+
-+	return FALSE;
-+}
-+
- void adapter_update_found_devices(struct btd_adapter *adapter,
- 					bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 					int8_t rssi, uint8_t confirm_name,
-@@ -2856,6 +2894,7 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 	gboolean legacy, name_known;
- 	uint32_t dev_class;
- 	int err;
-+	GSList *l;
- 
- 	memset(&eir_data, 0, sizeof(eir_data));
- 	err = eir_parse(&eir_data, data, data_len);
-@@ -2878,7 +2917,7 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 								eir_data.name);
- 
- 	dev = adapter_search_found_devices(adapter, bdaddr);
--	if (dev) {
-+	if (dev && dev->bdaddr_type == BDADDR_BREDR) {
- 		adapter->oor_devices = g_slist_remove(adapter->oor_devices,
- 							dev);
- 
-@@ -2930,6 +2969,16 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 
- 	adapter->found_devices = g_slist_prepend(adapter->found_devices, dev);
- 
-+	if (bdaddr_type == BDADDR_LE_PUBLIC ||
-+					bdaddr_type == BDADDR_LE_RANDOM) {
-+		l = g_slist_find_custom(adapter->connect_list, bdaddr,
-+					(GCompareFunc) device_bdaddr_cmp);
-+		if (l) {
-+			g_idle_add(connect_pending_cb, l->data);
-+			stop_discovery(adapter);
-+		}
-+	}
-+
- done:
- 	dev->rssi = rssi;
- 
-diff --git a/src/adapter.h b/src/adapter.h
-index 5a0247e..cd37b15 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -232,3 +232,8 @@ int btd_adapter_gatt_server_start(struct btd_adapter *adapter);
- void btd_adapter_gatt_server_stop(struct btd_adapter *adapter);
- 
- int btd_adapter_ssp_enabled(struct btd_adapter *adapter);
-+
-+void adapter_connect_list_add(struct btd_adapter *adapter,
-+						struct btd_device *device);
-+void adapter_connect_list_remove(struct btd_adapter *adapter,
-+						struct btd_device *device);
+diff --git a/src/device.h b/src/device.h
+index 26e17f7..2b2e6d8 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -45,6 +45,7 @@ uint16_t btd_device_get_product(struct btd_device *device);
+ uint16_t btd_device_get_version(struct btd_device *device);
+ void device_remove(struct btd_device *device, gboolean remove_stored);
+ gint device_address_cmp(struct btd_device *device, const gchar *address);
++gint device_bdaddr_cmp(struct btd_device *device, bdaddr_t *bdaddr);
+ int device_browse_primary(struct btd_device *device, DBusConnection *conn,
+ 				DBusMessage *msg, gboolean secure);
+ int device_browse_sdp(struct btd_device *device, DBusConnection *conn,
 -- 
 1.7.11.2
 
