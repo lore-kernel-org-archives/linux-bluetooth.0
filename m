@@ -2,75 +2,112 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v2 06/10] gatt: Emit PropertyChanged for Appearance
-Date: Fri, 17 Aug 2012 11:43:27 -0300
-Message-Id: <1345214611-9071-7-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v2 05/10] core: Remove Appearance characteristic read
+Date: Fri, 17 Aug 2012 11:43:26 -0300
+Message-Id: <1345214611-9071-6-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1345214611-9071-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1345147991-31320-1-git-send-email-claudio.takahasi@openbossa.org>
  <1345214611-9071-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Emit PropertyChanged changed signal in the Device hierarchy when the
-Appearance characteristic value is read from the remote GAP service.
+This patch removes the Appearance characteristic read from the core.
+Appearance characteristic is now being read by the GAP/GATT plugin.
 ---
- profiles/gatt/gas.c |    3 +++
- src/device.c        |    8 ++++++++
- src/device.h        |    1 +
- 3 files changed, 12 insertions(+), 0 deletions(-)
+ src/device.c |   56 +-------------------------------------------------------
+ 1 files changed, 1 insertions(+), 55 deletions(-)
 
-diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
-index 76db130..54f5842 100644
---- a/profiles/gatt/gas.c
-+++ b/profiles/gatt/gas.c
-@@ -67,6 +67,7 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
- static void gap_appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 							gpointer user_data)
- {
-+	struct gas *gas = user_data;
- 	struct att_data_list *list =  NULL;
- 	uint16_t app;
- 	uint8_t *atval;
-@@ -91,6 +92,8 @@ static void gap_appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 
- 	DBG("GAP Appearance: 0x%04x", app);
- 
-+	device_set_appearance(gas->device, app);
-+
- done:
- 	att_data_list_free(list);
- }
 diff --git a/src/device.c b/src/device.c
-index 00ab760..f612bb0 100644
+index 09a154d..00ab760 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -3012,6 +3012,14 @@ int device_get_appearance(struct btd_device *device, uint16_t *value)
- 	return 0;
+@@ -69,8 +69,6 @@
+ 
+ #define AUTO_CONNECTION_INTERVAL	5 /* Next connection attempt */
+ 
+-#define APPEARANCE_CHR_UUID 0x2a01
+-
+ struct btd_disconnect_data {
+ 	guint id;
+ 	disconnect_watch watch;
+@@ -1832,51 +1830,10 @@ done:
+ 	return FALSE;
  }
  
-+void device_set_appearance(struct btd_device *device, uint16_t value)
-+{
-+	DBusConnection *conn = get_dbus_connection();
-+
-+	emit_property_changed(conn, device->path, DEVICE_INTERFACE,
-+				"Appearance", DBUS_TYPE_UINT16, &value);
-+}
-+
- static gboolean notify_attios(gpointer user_data)
+-static void appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
+-							gpointer user_data)
+-{
+-	struct btd_device *device = user_data;
+-	struct btd_adapter *adapter = device->adapter;
+-	struct att_data_list *list =  NULL;
+-	uint16_t app;
+-	bdaddr_t src;
+-	uint8_t *atval;
+-
+-	if (status != 0) {
+-		DBG("Read characteristics by UUID failed: %s\n",
+-							att_ecode2str(status));
+-		goto done;
+-	}
+-
+-	list = dec_read_by_type_resp(pdu, plen);
+-	if (list == NULL)
+-		goto done;
+-
+-	if (list->len != 4) {
+-		DBG("Appearance value: invalid data");
+-		goto done;
+-	}
+-
+-	/* A device shall have only one instance of the
+-	Appearance characteristic. */
+-	atval = list->data[0] + 2; /* skip handle value */
+-	app = att_get_u16(atval);
+-
+-	adapter_get_address(adapter, &src);
+-	write_remote_appearance(&src, &device->bdaddr, device->bdaddr_type,
+-									app);
+-
+-done:
+-	att_data_list_free(list);
+-	if (device->attios == NULL && device->attios_offline == NULL)
+-		attio_cleanup(device);
+-}
+-
+ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
  {
- 	struct btd_device *device = user_data;
-diff --git a/src/device.h b/src/device.h
-index eb4b41e..85d265a 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -104,6 +104,7 @@ guint device_add_disconnect_watch(struct btd_device *device,
- void device_remove_disconnect_watch(struct btd_device *device, guint id);
- void device_set_class(struct btd_device *device, uint32_t value);
- int device_get_appearance(struct btd_device *device, uint16_t *value);
-+void device_set_appearance(struct btd_device *device, uint16_t value);
+ 	struct browse_req *req = user_data;
+ 	struct btd_device *device = req->device;
+-	struct gatt_primary *gap_prim = NULL;
+ 	GSList *l, *uuids = NULL;
  
- #define BTD_UUIDS(args...) ((const char *[]) { args, NULL } )
+ 	if (status) {
+@@ -1894,24 +1851,13 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
+ 	for (l = services; l; l = l->next) {
+ 		struct gatt_primary *prim = l->data;
  
+-		if (strcmp(prim->uuid, GAP_UUID) == 0)
+-			gap_prim = prim;
+-
+ 		uuids = g_slist_append(uuids, prim->uuid);
+ 	}
+ 
+ 	device_register_services(req->conn, device, g_slist_copy(services), -1);
+ 	device_probe_drivers(device, uuids);
+ 
+-	if (gap_prim) {
+-		/* Read appearance characteristic */
+-		bt_uuid_t uuid;
+-
+-		bt_uuid16_create(&uuid, APPEARANCE_CHR_UUID);
+-
+-		gatt_read_char_by_uuid(device->attrib, gap_prim->range.start,
+-			gap_prim->range.end, &uuid, appearance_cb, device);
+-	} else if (device->attios == NULL && device->attios_offline == NULL)
++	if (device->attios == NULL && device->attios_offline == NULL)
+ 		attio_cleanup(device);
+ 
+ 	g_slist_free(uuids);
 -- 
 1.7.8.6
 
