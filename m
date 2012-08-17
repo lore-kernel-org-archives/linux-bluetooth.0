@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 03/26] Bluetooth: Add HCI logical link cmds definitions
-Date: Fri, 17 Aug 2012 17:32:58 +0300
-Message-Id: <1345214001-7053-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 05/26] Bluetooth: Add callback clear to ops->teardown
+Date: Fri, 17 Aug 2012 17:33:00 +0300
+Message-Id: <1345214001-7053-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1345214001-7053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1345214001-7053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,64 +12,85 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+ops->teardown takes care about deleting queued callbacks for all AMP
+controllers.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci.h |   36 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 35 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/a2mp.c             |   17 ++++++++++++++++-
+ net/bluetooth/hci_core.c         |    3 +--
+ 3 files changed, 18 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 0f28f70..42aae18 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -556,12 +556,46 @@ struct hci_cp_accept_phy_link {
- 	__u8     key[HCI_AMP_LINK_KEY_SIZE];
- } __packed;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 3b98640..54b7aa4 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1121,5 +1121,6 @@ int hci_callback_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen,
+ 			  gfp_t flags);
+ void hci_callback_remove(struct hci_dev *hdev, struct hci_cb_cmd *cmd);
+ void hci_callback_process(struct hci_dev *hdev, __u16 opcode, u8 status);
++void hci_callback_clear(struct hci_dev *hdev);
  
--#define HCI_OP_DISCONN_PHY_LINK	0x0437
-+#define HCI_OP_DISCONN_PHY_LINK		0x0437
- struct hci_cp_disconn_phy_link {
- 	__u8     phy_handle;
- 	__u8     reason;
- } __packed;
+ #endif /* __HCI_CORE_H */
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 44ef201..3d872db 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -444,16 +444,31 @@ static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
+ 	return bt_skb_alloc(len, GFP_KERNEL);
+ }
  
-+struct ext_flow_spec {
-+	__u8       id;
-+	__u8       stype;
-+	__le16     msdu;
-+	__le32     sdu_itime;
-+	__le32     acc_lat;
-+	__le32     flush_to;
-+} __packed;
++static void a2mp_chan_teardown_cb(struct l2cap_chan *chan, int err)
++{
++	struct hci_dev *hdev, *tmp;
 +
-+#define HCI_OP_CREATE_LOGICAL_LINK	0x0438
-+#define HCI_OP_ACCEPT_LOGICAL_LINK	0x0439
-+struct hci_cp_create_accept_logical_link {
-+	__u8                  phy_handle;
-+	struct ext_flow_spec  tx_flow_spec;
-+	struct ext_flow_spec  rx_flow_spec;
-+} __packed;
++	BT_DBG("chan %p", chan);
 +
-+#define HCI_OP_DISCONN_LOGICAL_LINK	0x043a
-+struct hci_cp_disconn_logical_link {
-+	__le16   log_handle;
-+} __packed;
++	list_for_each_entry_safe(hdev, tmp, &hci_dev_list, list) {
++		hci_dev_hold(hdev);
++		/* Iterate through AMP controllers */
++		if (hdev->amp_type == HCI_AMP)
++			hci_callback_clear(hdev);
++		hci_dev_put(hdev);
++	}
++}
 +
-+#define HCI_OP_LOGICAL_LINK_CANCEL	0x043b
-+struct hci_cp_logical_link_cancel {
-+	__u8     phy_handle;
-+	__u8     flow_spec_id;
-+} __packed;
-+
-+struct hci_rp_logical_link_cancel {
-+	__u8     status;
-+	__u8     phy_handle;
-+	__u8     flow_spec_id;
-+} __packed;
-+
- #define HCI_OP_SNIFF_MODE		0x0803
- struct hci_cp_sniff_mode {
- 	__le16   handle;
+ static struct l2cap_ops a2mp_chan_ops = {
+ 	.name = "L2CAP A2MP channel",
+ 	.recv = a2mp_chan_recv_cb,
+ 	.close = a2mp_chan_close_cb,
+ 	.state_change = a2mp_chan_state_change_cb,
+ 	.alloc_skb = a2mp_chan_alloc_skb_cb,
++	.teardown = a2mp_chan_teardown_cb,
+ 
+ 	/* Not implemented for A2MP */
+ 	.new_connection = l2cap_chan_no_new_connection,
+-	.teardown = l2cap_chan_no_teardown,
+ 	.ready = l2cap_chan_no_ready,
+ };
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index a70f933..003f6ac 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -36,7 +36,6 @@
+ static void hci_rx_work(struct work_struct *work);
+ static void hci_cmd_work(struct work_struct *work);
+ static void hci_tx_work(struct work_struct *work);
+-static void hci_callback_clear(struct hci_dev *hdev);
+ 
+ /* HCI device list */
+ LIST_HEAD(hci_dev_list);
+@@ -2179,7 +2178,7 @@ void hci_callback_remove(struct hci_dev *hdev, struct hci_cb_cmd *cmd)
+ 	}
+ }
+ 
+-static void hci_callback_clear(struct hci_dev *hdev)
++void hci_callback_clear(struct hci_dev *hdev)
+ {
+ 	struct hci_cb_cmd *cmd, *tmp;
+ 
 -- 
 1.7.9.5
 
