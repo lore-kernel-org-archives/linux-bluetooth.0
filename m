@@ -1,69 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20120817082830.GA31481@x220>
-References: <CAKT1EBfp+iJfRSodDfoqtDB4X90BNR1wEJh_zXvw0t6JvnaWuA@mail.gmail.com>
-	<1345147991-31320-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1345147991-31320-5-git-send-email-claudio.takahasi@openbossa.org>
-	<20120817082830.GA31481@x220>
-Date: Fri, 17 Aug 2012 11:00:27 -0300
-Message-ID: <CAKT1EBf-qz4xzq1__OCd-7AMmJJJFAirW7Yvm_sTx2bTfHZDtQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 04/10] gatt: Add storing Appearance
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1345196026-6873-1-git-send-email-sunil.behera@samsung.com>
+References: <1345196026-6873-1-git-send-email-sunil.behera@samsung.com>
+Date: Fri, 17 Aug 2012 16:49:10 +0300
+Message-ID: <CABBYNZKesZfqq+WPC9KxZXb7VZ0voc9On7=NnMVP3JfrbPVPeQ@mail.gmail.com>
+Subject: Re: [PATCH obexd] MAP: Fix invalid oflag check
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Sunil Kumar Behera <sunil.behera@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan:
+Hi Sunil,
 
-On Fri, Aug 17, 2012 at 5:28 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Claudio,
+On Fri, Aug 17, 2012 at 12:33 PM, Sunil Kumar Behera
+<sunil.behera@samsung.com> wrote:
+> Change logic to check for O_WRONLY, as oflag is
+> created by an OR operation of O_WRONLY, O_CREAT and
+> O_TRUNC.
+> Message update is a PUT function, this check returns
+> bad response if GET is received.
+> ---
+>  plugins/mas.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> On Thu, Aug 16, 2012, Claudio Takahasi wrote:
->> This patch stores the Appearance characteristic value read from the
->> remote GAP service.
->> ---
->>  profiles/gatt/gas.c |    8 ++++++++
->>  1 files changed, 8 insertions(+), 0 deletions(-)
->>
->> diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
->> index 2fb12ce..bf603e8 100644
->> --- a/profiles/gatt/gas.c
->> +++ b/profiles/gatt/gas.c
->> @@ -68,8 +68,11 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
->>  static void gap_appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
->>                                                       gpointer user_data)
->>  {
->> +     struct gas *gas = user_data;
->>       struct att_data_list *list =  NULL;
->> +     bdaddr_t src, dst;
->>       uint16_t app;
->> +     uint8_t type;
->>       uint8_t *atval;
->>
->>       if (status != 0) {
->> @@ -92,6 +95,11 @@ static void gap_appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
->>
->>       DBG("GAP Appearance: 0x%04x", app);
->>
->> +     adapter_get_address(device_get_adapter(gas->device), &src);
->> +     device_get_address(gas->device, &dst, &type);
->> +
->> +     write_remote_appearance(&src, &dst, type, app);
+> diff --git a/plugins/mas.c b/plugins/mas.c
+> index 30e529f..57d9611 100644
+> --- a/plugins/mas.c
+> +++ b/plugins/mas.c
+> @@ -632,7 +632,7 @@ static void *message_update_open(const char *name, int oflag, mode_t mode,
 >
-> I'm not so sure it's a good idea to have plugins use the storage
-> functions directly. Instead I'd put this into the device_set_appearance
-> function which you add later in this patch set. If there really is a
-> need to access storage functions from within plugins (which there isn't
-> for this particular case) then we need to prefix all of the storage
-> functions with btd_* since those are the only types of symbols that
-> should be exported from the core daemon to plugins.
+>         DBG("");
 >
-> Johan
+> -       if (oflag != O_WRONLY) {
+> +       if (oflag == O_RDONLY) {
+>                 *err = -EBADR;
+>                 return NULL;
+>         }
+> --
+> 1.7.9.5
 
-ok. Wait for a new patch series, write_remote_appearance call will be
-moved to device_set_appearance.
+Pushed upstream, thanks.
 
-BR,
-Claudio
+
+-- 
+Luiz Augusto von Dentz
