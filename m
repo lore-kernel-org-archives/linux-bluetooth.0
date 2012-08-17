@@ -1,42 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 17 Aug 2012 10:39:11 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Paulo Alcantara <paulo.alcantara@openbossa.org>
-Subject: Re: [PATCH BlueZ v3 13/14] core: Disable unnecessary auto connections
-Message-ID: <20120817073911.GA30060@x220>
-References: <1345152524-13404-1-git-send-email-jprvita@openbossa.org>
- <1345152524-13404-14-git-send-email-jprvita@openbossa.org>
+Date: Fri, 17 Aug 2012 10:07:05 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Bluez 4.101
+Message-ID: <20120817070703.GA6348@aemeltch-MOBL1>
+References: <CACUGKYMjKcZZJsYi-SXCd1C=guWtKP3k=SBVPVe=+MR0R=pwHg@mail.gmail.com>
+ <502C49F4.9060007@samsung.com>
+ <CACUGKYOkxtCP_VgYtKWvSYHTb__m2rMCGujOAh6rKDXXYXLWZQ@mail.gmail.com>
+ <CACUGKYOUh6G9zkifB98akXd_R8Axv6eh03-OCYnJyLNkkBTq3w@mail.gmail.com>
+ <CAJdJm_PoC6CqojaroHPXy6sf-Sg+uS_DJZzm38Re6LDbUBmLHg@mail.gmail.com>
+ <CACUGKYMohmq0FDXk2DpmZfF_sPk_dfL7NEgN+jr9k+65D_r02A@mail.gmail.com>
+ <CAJdJm_OgdkmcXxFh_0pA3n+-RbPkWKB4ZZrsnDyndYrSGZ=rog@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1345152524-13404-14-git-send-email-jprvita@openbossa.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAJdJm_OgdkmcXxFh_0pA3n+-RbPkWKB4ZZrsnDyndYrSGZ=rog@mail.gmail.com>
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Thu, Aug 16, 2012, João Paulo Rechi Vita wrote:
-> BlueZ host disconnects the link when encryption fails. ECONNABORTED
-> error is returned by the kernel when the connection is terminated by the
-> local host. This scenario commonly happens when authentication fails due
-> PIN or Key Missing.
-> ---
->  src/device.c | 3 +++
->  1 file changed, 3 insertions(+)
+On Thu, Aug 16, 2012 at 11:57:46AM -0400, Anderson Lizardo wrote:
+> On Thu, Aug 16, 2012 at 11:38 AM, John Tobias <john.tobias.ph@gmail.com> wrote:
+> > Hi Anderson,
+> >
+> > Thanks for the info.
+> > May I know the difference between bluetooth.git and bluetooth-next.git repo?.
 > 
-> diff --git a/src/device.c b/src/device.c
-> index 645a2b7..5490e37 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -1956,6 +1956,9 @@ static void att_error_cb(const GError *gerr, gpointer user_data)
->  	struct att_callbacks *attcb = user_data;
->  	struct btd_device *device = attcb->user_data;
->  
-> +	if (gerr->code == ECONNABORTED)
-> +		return;
-> +
+> I may be wrong, but I think it is like this:
+> 
+> bluetooth-next.git contains what is going to the next kernel release
+> cycle. E.g. if we are on 3.6-rc1, what is currently on bluetooth-next
 
-I think it'd be more appropriate to use g_error_matches() here.
+BTW: Gustavo, when we rebase to 3.6-rc1 ?
 
-Johan
+Best regards 
+Andrei Emeltchenko 
+
