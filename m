@@ -1,35 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sunil Kumar Behera <sunil.behera@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sunil Kumar Behera <sunil.behera@samsung.com>
-Subject: [PATCH obexd] MAP: Fix invalid oflag check
-Date: Fri, 17 Aug 2012 15:03:46 +0530
-Message-id: <1345196026-6873-1-git-send-email-sunil.behera@samsung.com>
+Date: Fri, 17 Aug 2012 12:27:02 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [RFC v3] mgmt-api: Add reason to device disconnect event
+Message-ID: <20120817092702.GA7224@x220>
+References: <1345194655-8453-1-git-send-email-mikel.astiz.oss@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1345194655-8453-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Change logic to check for O_WRONLY, as oflag is
-created by an OR operation of O_WRONLY, O_CREAT and
-O_TRUNC.
-Message update is a PUT function, this check returns
-bad response if GET is received.
----
- plugins/mas.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Mikel,
 
-diff --git a/plugins/mas.c b/plugins/mas.c
-index 30e529f..57d9611 100644
---- a/plugins/mas.c
-+++ b/plugins/mas.c
-@@ -632,7 +632,7 @@ static void *message_update_open(const char *name, int oflag, mode_t mode,
- 
- 	DBG("");
- 
--	if (oflag != O_WRONLY) {
-+	if (oflag == O_RDONLY) {
- 		*err = -EBADR;
- 		return NULL;
- 	}
--- 
-1.7.9.5
+On Fri, Aug 17, 2012, Mikel Astiz wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+> 
+> Extend the management API with the disconnect reason, as now reported
+> by the Kernel in MGMT_EV_DEVICE_DISCONNECTED.
+> ---
+> v3 integrates the changes suggested by Johan with the exception of the type change between uint16_t and size_t in mgmt_device_disconnected().
+> 
+>  doc/mgmt-api.txt  |   16 ++++++++++++++++
+>  lib/mgmt.h        |    6 ++++++
+>  monitor/control.c |   19 +++++++++++++++----
+>  src/mgmt.c        |   16 +++++++++++-----
+>  tools/btmgmt.c    |   18 +++++++++++++-----
+>  5 files changed, 61 insertions(+), 14 deletions(-)
 
+Applied. Thanks.
+
+Johan
