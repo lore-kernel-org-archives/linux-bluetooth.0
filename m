@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20120817082916.GB31481@x220>
+In-Reply-To: <20120817082830.GA31481@x220>
 References: <CAKT1EBfp+iJfRSodDfoqtDB4X90BNR1wEJh_zXvw0t6JvnaWuA@mail.gmail.com>
 	<1345147991-31320-1-git-send-email-claudio.takahasi@openbossa.org>
-	<20120817082916.GB31481@x220>
-Date: Fri, 17 Aug 2012 11:04:50 -0300
-Message-ID: <CAKT1EBc1dmhZ89QjtjqPYS+2VkVNJdnHCJYJ75zX_SkN5mr6DQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 00/10] GATT Plugin
+	<1345147991-31320-5-git-send-email-claudio.takahasi@openbossa.org>
+	<20120817082830.GA31481@x220>
+Date: Fri, 17 Aug 2012 11:00:27 -0300
+Message-ID: <CAKT1EBf-qz4xzq1__OCd-7AMmJJJFAirW7Yvm_sTx2bTfHZDtQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 04/10] gatt: Add storing Appearance
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
 	linux-bluetooth@vger.kernel.org
@@ -14,55 +15,55 @@ Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Johan:
 
-On Fri, Aug 17, 2012 at 5:29 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+On Fri, Aug 17, 2012 at 5:28 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
 > Hi Claudio,
 >
 > On Thu, Aug 16, 2012, Claudio Takahasi wrote:
->> This patch series adds a new GATT based plugin for GAP and GATT service.
->> The objective is cleanup: moving some GATT related operations from the
->> device(core) to a GATT based plugin.
+>> This patch stores the Appearance characteristic value read from the
+>> remote GAP service.
+>> ---
+>>  profiles/gatt/gas.c |    8 ++++++++
+>>  1 files changed, 8 insertions(+), 0 deletions(-)
 >>
->> This first part is related to GAP appearance characteristic. A second
->> patch will be sent soon to manage Service Changed and GATT/ATT MTU.
+>> diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
+>> index 2fb12ce..bf603e8 100644
+>> --- a/profiles/gatt/gas.c
+>> +++ b/profiles/gatt/gas.c
+>> @@ -68,8 +68,11 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
+>>  static void gap_appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>>                                                       gpointer user_data)
+>>  {
+>> +     struct gas *gas = user_data;
+>>       struct att_data_list *list =  NULL;
+>> +     bdaddr_t src, dst;
+>>       uint16_t app;
+>> +     uint8_t type;
+>>       uint8_t *atval;
 >>
->> Claudio Takahasi (10):
->>   gatt: Add Generic Access/Attribute Profile plugin
->>   gatt: Add GAP/GATT device registration
->>   gatt: Add read Appearance characteristic
->>   gatt: Add storing Appearance
->>   core: Remove Appearance characteristic read
->>   gatt: Emit PropertyChanged for Appearance
->>   core: PropertyChanged signal for Icon/class
->>   core: PropertyChanged signal for Icon/Appearance
->>   gatt: Map Appearance value 0x0000 to "unknown"
->>   gatt: Don't store Appearance if value is "unknown"
+>>       if (status != 0) {
+>> @@ -92,6 +95,11 @@ static void gap_appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
 >>
->>  Makefile.am             |    8 ++-
->>  profiles/gatt/gas.c     |  179 +++++++++++++++++++++++++++++++++++++++++++++++
->>  profiles/gatt/gas.h     |   25 +++++++
->>  profiles/gatt/main.c    |   52 ++++++++++++++
->>  profiles/gatt/manager.c |   82 +++++++++++++++++++++
->>  profiles/gatt/manager.h |   24 ++++++
->>  src/dbus-common.c       |    2 +
->>  src/device.c            |   74 +++++--------------
->>  src/device.h            |    1 +
->>  9 files changed, 390 insertions(+), 57 deletions(-)
->>  create mode 100644 profiles/gatt/gas.c
->>  create mode 100644 profiles/gatt/gas.h
->>  create mode 100644 profiles/gatt/main.c
->>  create mode 100644 profiles/gatt/manager.c
->>  create mode 100644 profiles/gatt/manager.h
+>>       DBG("GAP Appearance: 0x%04x", app);
+>>
+>> +     adapter_get_address(device_get_adapter(gas->device), &src);
+>> +     device_get_address(gas->device, &dst, &type);
+>> +
+>> +     write_remote_appearance(&src, &dst, type, app);
 >
-> Besides the one comment I already sent about this patch set it looks
-> more or less ok to me. Would it also make sense to move the server-side
-> GAP functionality into this plugin?
+> I'm not so sure it's a good idea to have plugins use the storage
+> functions directly. Instead I'd put this into the device_set_appearance
+> function which you add later in this patch set. If there really is a
+> need to access storage functions from within plugins (which there isn't
+> for this particular case) then we need to prefix all of the storage
+> functions with btd_* since those are the only types of symbols that
+> should be exported from the core daemon to plugins.
 >
 > Johan
 
-Probably yes. If we don't find impediments we will send patches to
-move this code.
+ok. Wait for a new patch series, write_remote_appearance call will be
+moved to device_set_appearance.
 
 BR,
 Claudio
