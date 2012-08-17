@@ -1,59 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 17 Aug 2012 11:28:30 +0300
+Date: Fri, 17 Aug 2012 10:51:17 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v1 04/10] gatt: Add storing Appearance
-Message-ID: <20120817082830.GA31481@x220>
-References: <CAKT1EBfp+iJfRSodDfoqtDB4X90BNR1wEJh_zXvw0t6JvnaWuA@mail.gmail.com>
- <1345147991-31320-1-git-send-email-claudio.takahasi@openbossa.org>
- <1345147991-31320-5-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH BlueZ v3 06/14] core: mutually exclude concurrent
+ connections
+Message-ID: <20120817075117.GC30060@x220>
+References: <1345152524-13404-1-git-send-email-jprvita@openbossa.org>
+ <1345152524-13404-7-git-send-email-jprvita@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1345147991-31320-5-git-send-email-claudio.takahasi@openbossa.org>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1345152524-13404-7-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi,
 
-On Thu, Aug 16, 2012, Claudio Takahasi wrote:
-> This patch stores the Appearance characteristic value read from the
-> remote GAP service.
-> ---
->  profiles/gatt/gas.c |    8 ++++++++
->  1 files changed, 8 insertions(+), 0 deletions(-)
-> 
-> diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
-> index 2fb12ce..bf603e8 100644
-> --- a/profiles/gatt/gas.c
-> +++ b/profiles/gatt/gas.c
-> @@ -68,8 +68,11 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
->  static void gap_appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
->  							gpointer user_data)
+On Thu, Aug 16, 2012, João Paulo Rechi Vita wrote:
+> @@ -133,8 +133,10 @@ struct btd_adapter {
+> +	GSList *connecting_list;	/* Pending connects */
+> +	gboolean connecting;		/* Connect active */
+
+What's the relationship with the above two? Isn't connecting always true
+when g_slist_length(connecting_list) > 0 and false when the list is
+empty?
+
+>  static gboolean connect_pending_cb(gpointer user_data)
 >  {
-> +	struct gas *gas = user_data;
->  	struct att_data_list *list =  NULL;
-> +	bdaddr_t src, dst;
->  	uint16_t app;
-> +	uint8_t type;
->  	uint8_t *atval;
+>  	struct btd_device *device = user_data;
+>  	struct btd_adapter *adapter = device_get_adapter(device);
+> +	GIOChannel *io;
 >  
->  	if (status != 0) {
-> @@ -92,6 +95,11 @@ static void gap_appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>  	/* in the future we may want to check here if the controller supports
+>  	 * scanning and connecting at the same time */
+>  	if (adapter->discovering)
+>  		return TRUE;
 >  
->  	DBG("GAP Appearance: 0x%04x", app);
->  
-> +	adapter_get_address(device_get_adapter(gas->device), &src);
-> +	device_get_address(gas->device, &dst, &type);
+> -	device_att_connect(device);
+> +	if (adapter->connecting)
+> +		return TRUE;
 > +
-> +	write_remote_appearance(&src, &dst, type, app);
+> +	adapter->connecting = TRUE;
+> +	io = device_att_connect(device);
+> +	g_io_add_watch(io, G_IO_OUT | G_IO_ERR, clean_connecting_state,
+> +						btd_device_ref(device));
+>  
+>  	return FALSE;
+>  }
 
-I'm not so sure it's a good idea to have plugins use the storage
-functions directly. Instead I'd put this into the device_set_appearance
-function which you add later in this patch set. If there really is a
-need to access storage functions from within plugins (which there isn't
-for this particular case) then we need to prefix all of the storage
-functions with btd_* since those are the only types of symbols that
-should be exported from the core daemon to plugins.
+Since you're not storing "io" after the function returns you should be
+doing a g_io_channel_unref() after calling g_io_add_watch(). Looking at
+device_att_connect it seems like it's missing a g_io_channel_ref (either
+when assigning to device->att_io or when returning from the function).
+
+> +		adapter->connecting_list = g_slist_append(
+> +					adapter->connecting_list, device);
+>  
+
+Missing btd_device_unref()?
 
 Johan
