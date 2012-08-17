@@ -1,31 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sunil Kumar Behera <sunil.behera@samsung.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sunil Kumar Behera <sunil.behera@samsung.com>
-Subject: [PATCH obexd 1/2] MAP: Add offset parameter decription
-Date: Fri, 17 Aug 2012 20:36:41 +0530
-Message-id: <1345216001-8422-1-git-send-email-sunil.behera@samsung.com>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v2 10/10] gatt: Map Appearance value 0x0000 to "unknown"
+Date: Fri, 17 Aug 2012 11:43:31 -0300
+Message-Id: <1345214611-9071-11-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1345214611-9071-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1345147991-31320-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1345214611-9071-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add offset parameter description for
-messages_get_messages_listing() function header
+According to Bluetooth SIG Assigned numbers, Appearance characteristic
+value 0x0000 is designated to "unknown".
 ---
- plugins/messages.h |    1 +
- 1 file changed, 1 insertion(+)
+ src/dbus-common.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-diff --git a/plugins/messages.h b/plugins/messages.h
-index 83e087a..beca3a8 100644
---- a/plugins/messages.h
-+++ b/plugins/messages.h
-@@ -215,6 +215,7 @@ int messages_get_folder_listing(void *session, const char *name, uint16_t max,
-  * session: Backend session.
-  * name: Optional subdirectory name.
-  * max: Maximum number of entries to retrieve.
-+ * offset: Offset of the first entry.
-  * filter: Filter to apply on returned message listing.
-  * size: Total size of listing to be returned.
-  * newmsg: Indicates presence of unread messages.
+diff --git a/src/dbus-common.c b/src/dbus-common.c
+index 7e1bc94..fb55027 100644
+--- a/src/dbus-common.c
++++ b/src/dbus-common.c
+@@ -247,6 +247,8 @@ const char *class_to_icon(uint32_t class)
+ const char *gap_appearance_to_icon(uint16_t appearance)
+ {
+ 	switch ((appearance & 0xffc0) >> 6) {
++	case 0x00:
++		return "unknown";
+ 	case 0x01:
+ 		return "phone";
+ 	case 0x02:
 -- 
-1.7.9.5
+1.7.8.6
 
