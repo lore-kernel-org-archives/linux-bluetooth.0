@@ -1,281 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 09/26] Bluetooth: AMP: Physical link struct definitions
-Date: Fri, 17 Aug 2012 17:33:04 +0300
-Message-Id: <1345214001-7053-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1345214001-7053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1345214001-7053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20120817082916.GB31481@x220>
+References: <CAKT1EBfp+iJfRSodDfoqtDB4X90BNR1wEJh_zXvw0t6JvnaWuA@mail.gmail.com>
+	<1345147991-31320-1-git-send-email-claudio.takahasi@openbossa.org>
+	<20120817082916.GB31481@x220>
+Date: Fri, 17 Aug 2012 11:04:50 -0300
+Message-ID: <CAKT1EBc1dmhZ89QjtjqPYS+2VkVNJdnHCJYJ75zX_SkN5mr6DQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 00/10] GATT Plugin
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Johan,
 
-Define physical link structure. Physical links are managed by AMP
-manager inside amp_mgr structure and represent AMP physical links.
+On Fri, Aug 17, 2012 at 5:29 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Claudio,
+>
+> On Thu, Aug 16, 2012, Claudio Takahasi wrote:
+>> This patch series adds a new GATT based plugin for GAP and GATT service.
+>> The objective is cleanup: moving some GATT related operations from the
+>> device(core) to a GATT based plugin.
+>>
+>> This first part is related to GAP appearance characteristic. A second
+>> patch will be sent soon to manage Service Changed and GATT/ATT MTU.
+>>
+>> Claudio Takahasi (10):
+>>   gatt: Add Generic Access/Attribute Profile plugin
+>>   gatt: Add GAP/GATT device registration
+>>   gatt: Add read Appearance characteristic
+>>   gatt: Add storing Appearance
+>>   core: Remove Appearance characteristic read
+>>   gatt: Emit PropertyChanged for Appearance
+>>   core: PropertyChanged signal for Icon/class
+>>   core: PropertyChanged signal for Icon/Appearance
+>>   gatt: Map Appearance value 0x0000 to "unknown"
+>>   gatt: Don't store Appearance if value is "unknown"
+>>
+>>  Makefile.am             |    8 ++-
+>>  profiles/gatt/gas.c     |  179 +++++++++++++++++++++++++++++++++++++++++++++++
+>>  profiles/gatt/gas.h     |   25 +++++++
+>>  profiles/gatt/main.c    |   52 ++++++++++++++
+>>  profiles/gatt/manager.c |   82 +++++++++++++++++++++
+>>  profiles/gatt/manager.h |   24 ++++++
+>>  src/dbus-common.c       |    2 +
+>>  src/device.c            |   74 +++++--------------
+>>  src/device.h            |    1 +
+>>  9 files changed, 390 insertions(+), 57 deletions(-)
+>>  create mode 100644 profiles/gatt/gas.c
+>>  create mode 100644 profiles/gatt/gas.h
+>>  create mode 100644 profiles/gatt/main.c
+>>  create mode 100644 profiles/gatt/manager.c
+>>  create mode 100644 profiles/gatt/manager.h
+>
+> Besides the one comment I already sent about this patch set it looks
+> more or less ok to me. Would it also make sense to move the server-side
+> GAP functionality into this plugin?
+>
+> Johan
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- include/net/bluetooth/a2mp.h |    3 +
- include/net/bluetooth/pal.h  |   42 +++++++++++++
- net/bluetooth/Makefile       |    2 +-
- net/bluetooth/a2mp.c         |    6 ++
- net/bluetooth/pal.c          |  141 ++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 193 insertions(+), 1 deletion(-)
- create mode 100644 include/net/bluetooth/pal.h
- create mode 100644 net/bluetooth/pal.c
+Probably yes. If we don't find impediments we will send patches to
+move this code.
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index ec77ddc..012f573 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -26,6 +26,9 @@ struct amp_mgr {
- 	__u8			ident;
- 	__u8			handle;
- 	unsigned long		flags;
-+
-+	struct list_head	phy_links;
-+	struct mutex		phy_links_lock;
- };
- 
- struct a2mp_cmd {
-diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
-new file mode 100644
-index 0000000..201c501
---- /dev/null
-+++ b/include/net/bluetooth/pal.h
-@@ -0,0 +1,42 @@
-+/*
-+   Copyright (c) 2011,2012 Intel Corp.
-+
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License version 2 and
-+   only version 2 as published by the Free Software Foundation.
-+
-+   This program is distributed in the hope that it will be useful,
-+   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+   GNU General Public License for more details.
-+*/
-+
-+#ifndef __PAL_H
-+#define __PAL_H
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/l2cap.h>
-+#include <net/bluetooth/a2mp.h>
-+#include <net/bluetooth/amp.h>
-+
-+struct phy_link {
-+	struct list_head	list;
-+	__u8			local_id;
-+	__u8			remote_id;
-+	__u8			state;
-+	__u8			amp_role;
-+	__u8			handle;
-+	struct amp_mgr		*mgr;
-+	struct amp_assoc	rem_assoc;
-+	struct kref		kref;
-+};
-+
-+struct phy_link *phylink_add(struct amp_mgr *mgr, u8 local_id, u8 remote_id,
-+			     u8 *rem_assoc, u16 assoc_size);
-+struct phy_link *phylink_lookup(struct amp_mgr *mgr, u8 local_id, u8 remote_id);
-+int phylink_put(struct phy_link *plink);
-+void phylink_get(struct phy_link *plink);
-+void phylink_list_flush(struct amp_mgr *mgr);
-+
-+#endif /* __PAL_H */
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index dea6a28..3f76fc2 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -10,4 +10,4 @@ obj-$(CONFIG_BT_HIDP)	+= hidp/
- 
- bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
- 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
--	a2mp.o amp.o
-+	a2mp.o amp.o pal.o
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index a264f22..3df7cb5 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -17,6 +17,7 @@
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/a2mp.h>
- #include <net/bluetooth/amp.h>
-+#include <net/bluetooth/pal.h>
- 
- /* A2MP build & send command helper functions */
- static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
-@@ -594,6 +595,7 @@ static void amp_mgr_destroy(struct kref *kref)
- 
- 	BT_DBG("mgr %p", mgr);
- 
-+	phylink_list_flush(mgr);
- 	kfree(mgr);
- }
- 
-@@ -628,6 +630,10 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
- 
- 	conn->hcon->amp_mgr = mgr;
- 
-+	/* Phylink initialization */
-+	INIT_LIST_HEAD(&mgr->phy_links);
-+	mutex_init(&mgr->phy_links_lock);
-+
- 	kref_init(&mgr->kref);
- 
- 	return mgr;
-diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
-new file mode 100644
-index 0000000..24fb3aa
---- /dev/null
-+++ b/net/bluetooth/pal.c
-@@ -0,0 +1,141 @@
-+/*
-+   Copyright (c) 2011,2012 Intel Corp.
-+
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License version 2 and
-+   only version 2 as published by the Free Software Foundation.
-+
-+   This program is distributed in the hope that it will be useful,
-+   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+   GNU General Public License for more details.
-+*/
-+
-+#include <net/bluetooth/pal.h>
-+
-+enum pal_states {
-+	DISCONNECTED,
-+	STARTING,
-+	CONNECTING,
-+	AUTHENTICATING,
-+	CONNECTED,
-+	DISCONNECTING
-+};
-+
-+/* Physical Link interface */
-+void phylink_get(struct phy_link *plink)
-+{
-+	BT_DBG("plink %p orig refcnt %d", plink,
-+	       atomic_read(&plink->kref.refcount));
-+
-+	kref_get(&plink->kref);
-+}
-+
-+static void phylink_destroy(struct kref *kref)
-+{
-+	struct phy_link *plink = container_of(kref, struct phy_link, kref);
-+
-+	BT_DBG("plink %p", plink);
-+
-+	kfree(plink);
-+}
-+
-+int phylink_put(struct phy_link *plink)
-+{
-+	BT_DBG("plink %p orig refcnt %d", plink,
-+	       atomic_read(&plink->kref.refcount));
-+
-+	return kref_put(&plink->kref, &phylink_destroy);
-+}
-+
-+static u8 __next_handle(struct amp_mgr *mgr)
-+{
-+	if (++mgr->handle == 0)
-+		mgr->handle = 1;
-+
-+	return mgr->handle;
-+}
-+
-+struct phy_link *phylink_add(struct amp_mgr *mgr, u8 local_id, u8 remote_id,
-+			     u8 *rem_assoc, u16 assoc_size)
-+{
-+	struct phy_link *plink;
-+
-+	plink = kzalloc(sizeof(*plink), GFP_KERNEL);
-+	if (!plink)
-+		return NULL;
-+
-+	plink->local_id = local_id;
-+	plink->remote_id = remote_id;
-+	plink->mgr = mgr;
-+	plink->handle = __next_handle(mgr);
-+
-+	plink->rem_assoc.len = min_t(u16, assoc_size, HCI_MAX_AMP_ASSOC_SIZE);
-+	memcpy(plink->rem_assoc.data, rem_assoc, plink->rem_assoc.len);
-+
-+	plink->state = STARTING;
-+
-+	mutex_lock(&mgr->phy_links_lock);
-+	list_add(&plink->list, &mgr->phy_links);
-+	mutex_unlock(&mgr->phy_links_lock);
-+
-+	kref_init(&plink->kref);
-+
-+	BT_DBG("Physical link %p created", plink);
-+
-+	return plink;
-+}
-+
-+void phylink_del(struct amp_mgr *mgr, struct phy_link *plink)
-+{
-+	BT_DBG("phylink %p", plink);
-+
-+	mutex_lock(&mgr->phy_links_lock);
-+	list_del(&plink->list);
-+	mutex_unlock(&mgr->phy_links_lock);
-+
-+	phylink_put(plink);
-+}
-+
-+void phylink_list_flush(struct amp_mgr *mgr)
-+{
-+	struct phy_link *plink, *n;
-+
-+	BT_DBG("mgr %p", mgr);
-+
-+	mutex_lock(&mgr->phy_links_lock);
-+	list_for_each_entry_safe(plink, n, &mgr->phy_links, list) {
-+		list_del(&plink->list);
-+		phylink_put(plink);
-+	}
-+	mutex_unlock(&mgr->phy_links_lock);
-+}
-+
-+struct phy_link *phylink_lookup(struct amp_mgr *mgr, u8 local_id, u8 remote_id)
-+{
-+	struct phy_link *plink, *found = NULL;
-+
-+	mutex_lock(&mgr->phy_links_lock);
-+	list_for_each_entry(plink, &mgr->phy_links, list) {
-+		/* Closest match */
-+		if (!remote_id && plink->local_id == local_id) {
-+			found = plink;
-+			break;
-+		}
-+		/* Exact match */
-+		if (plink->local_id == local_id &&
-+		    plink->remote_id == remote_id) {
-+			found = plink;
-+			break;
-+		}
-+	}
-+	mutex_unlock(&mgr->phy_links_lock);
-+
-+	BT_DBG("local_id %d remote_id %d plink %p", local_id, remote_id,
-+	       plink);
-+
-+	if (found)
-+		phylink_get(plink);
-+
-+	return found;
-+}
--- 
-1.7.9.5
-
+BR,
+Claudio
