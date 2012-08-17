@@ -1,52 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Daniel J Blueman <daniel@quora.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Henrik Rydberg <rydberg@euromail.se>,
-	Daniel J Blueman <daniel@quora.org>
-Subject: [PATCH v3] Add device ID for Bluetooth on Macbook Pro 2012
-Date: Fri, 17 Aug 2012 13:44:46 +0800
-Message-Id: <1345182286-21776-1-git-send-email-daniel@quora.org>
+Message-ID: <502E56DF.3020103@globaledgesoft.com>
+Date: Fri, 17 Aug 2012 10:36:15 -0400
+From: Ajay KV <ajay.kv@globaledgesoft.com>
+MIME-Version: 1.0
+To: Andre Guedes <andre.guedes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: BLE - multiple connections
+References: <5008F67F.5030604@globaledgesoft.com> <CACJA=fUW4a-B-1SGQmPbh+J5YKJ9bVEFbz8ZUezPOD3w0Hmsxw@mail.gmail.com>
+In-Reply-To: <CACJA=fUW4a-B-1SGQmPbh+J5YKJ9bVEFbz8ZUezPOD3w0Hmsxw@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add the device ID for supporting the Macbook Pro 2012 'MacBookPro10,1'.
-The bluetooth device presents itself as:
+  Hi ,
+         I am facing some more issues regarding BLE multiple connection 
+, which is mentioned below . please  show me the right direction , since 
+i got stucked
 
-T:  Bus=02 Lev=04 Prnt=04 Port=02 Cnt=03 Dev#=  8 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=05ac ProdID=8286 Rev=00.86
-S:  Manufacturer=Apple Inc.
-S:  Product=Bluetooth USB Host Controller
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+1:  suppose device A  and B is in connected state (B as initiator  and 
+A  as advertising mode)  , so obviously role change happens and A 
+switches to slave mode .  meanwhile i wanted to  connect device C  to A 
+(C as initiator  and A as advertising mode) , since  A has switched to 
+slave mode , it cant able to advertise again ( controller returns  error 
+message " command disallowed") .  Even i tried to change the role  
+forcefully through hcitool command ,  the result was same.
+          My intention is to make  the device A as a server with 
+multiple clients.  Currently im not using any of the profiles(ATT , 
+GATT) . i want  it to be done using L2CAP sockets
 
-Patch originally written and tested by clipcarl (forums.opensuse.org).
+2. Is it possible to change the imtu  of the LE connection other than 
+23bits( which is hardcoded in L2cap driver)
 
-Signed-off-by: Daniel J Blueman <daniel@quora.org>
-Signed-off-by: Henrik Rydberg <rydberg@euromail.se>
----
- drivers/bluetooth/btusb.c |    3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index e272214..61f4eb7 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -76,6 +76,9 @@ static struct usb_device_id btusb_table[] = {
- 	/* Apple MacMini5,1 */
- 	{ USB_DEVICE(0x05ac, 0x8281) },
- 
-+	/* Apple MacBookPro10,1 */
-+	{ USB_DEVICE(0x05ac, 0x8286) },
-+
- 	/* AVM BlueFRITZ! USB v2.0 */
- 	{ USB_DEVICE(0x057c, 0x3800) },
- 
--- 
-1.7.10.4
+
+
+On 07/20/2012 10:21 AM, Andre Guedes wrote:
+> Hi Ajay,
+>
+> On Fri, Jul 20, 2012 at 3:11 AM, Ajay KV<ajay.kv@globaledgesoft.com>  wrote:
+>    
+>> Hi all,
+>>
+>> Since im new to bluetooth low energy technology , i need some guidance from
+>> you . Following are the issues that im searching for a solution
+>>
+>>
+>> 1 : Is it possible to establish mutiple LE connection at a time . Im using
+>> fedora 13 , linux 2.6.39 version with 4.0 LE supported dongles
+>>
+>> 2: now im not concentrating on user profiles like GATT and ATT . i wanted to
+>> do it using HCI and L2cap connections
+>>      
+> You are able to establish one LE connection at a time. If you have
+> more than one device you want to connect to, you can use whitelist.
+> Add the devices to whitelist and issue the LE connection command. As
+> soon as one of the devices starts advertising, the connection will be
+> established.
+>
+> You can use hcitool to add devices to whitelist and issue LE connection command.
+>
+> BR,
+>
+> Andre
+>
+>    
+
