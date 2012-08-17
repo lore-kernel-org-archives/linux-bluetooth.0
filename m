@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 13/26] Bluetooth: A2MP: Process A2MP Get AMP Assoc Rsp
-Date: Fri, 17 Aug 2012 17:33:08 +0300
-Message-Id: <1345214001-7053-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 17/26] Bluetooth: AMP: Add AMP key calculation
+Date: Fri, 17 Aug 2012 17:33:12 +0300
+Message-Id: <1345214001-7053-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1345214001-7053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1345214001-7053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,92 +12,93 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When receiving A2MP Get AMP Assoc Response save assoc data to remote
-AMP controller list and prepare for creating physical link.
+Function calculates AMP keys using hmac_sha256 helper. Calculated keys
+are Generic AMP Link Key (gamp) and Dedicated AMP Link Key with
+keyID "802b" for 802.11 PAL.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   59 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 58 insertions(+), 1 deletion(-)
+ include/net/bluetooth/pal.h |    1 +
+ net/bluetooth/Kconfig       |    1 +
+ net/bluetooth/pal.c         |   45 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 47 insertions(+)
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 5a238df..6f719d3 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -331,6 +331,60 @@ done:
- 	return 0;
- }
+diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
+index 6ce1dfb..8799285 100644
+--- a/include/net/bluetooth/pal.h
++++ b/include/net/bluetooth/pal.h
+@@ -53,5 +53,6 @@ int phylink_put(struct phy_link *plink);
+ void phylink_get(struct phy_link *plink);
+ void phylink_list_flush(struct amp_mgr *mgr);
+ void phylink_del(struct amp_mgr *mgr, struct phy_link *plink);
++int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type);
  
-+static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
-+				struct a2mp_cmd *hdr)
+ #endif /* __PAL_H */
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index 3537d38..1c11d0d 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -11,6 +11,7 @@ menuconfig BT
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_AES
+ 	select CRYPTO_ECB
++	select CRYPTO_SHA256
+ 	help
+ 	  Bluetooth is low-cost, low-power, short-range wireless technology.
+ 	  It was designed as a replacement for cables and other short-range
+diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
+index e766a98..b4eeb6a 100644
+--- a/net/bluetooth/pal.c
++++ b/net/bluetooth/pal.c
+@@ -255,3 +255,48 @@ int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
+ 	crypto_free_shash(tfm);
+ 	return ret;
+ }
++
++int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type)
 +{
-+	struct a2mp_amp_assoc_rsp *rsp = (void *) skb->data;
-+	u16 len = le16_to_cpu(hdr->len);
-+	struct hci_dev *hdev;
-+	struct amp_ctrl *ctrl;
-+	struct phy_link *plink;
++	struct hci_dev *hdev = conn->hdev;
++	struct link_key *key;
++	u8 keybuf[HCI_AMP_LINK_KEY_SIZE];
++	u8 gamp_key[HCI_AMP_LINK_KEY_SIZE];
++	int err;
 +
-+	if (len < sizeof(*rsp))
-+		return -EINVAL;
++	if (!hci_conn_check_link_mode(conn))
++		return -EACCES;
 +
-+	BT_DBG("id %d status 0x%2.2x assoc len %u", rsp->id, rsp->status,
-+	       len - sizeof(*rsp));
++	BT_DBG("conn %p key_type %d", conn, conn->key_type);
 +
-+	if (rsp->status)
-+		return -EINVAL;
-+
-+	/* Save remote ASSOC data */
-+	ctrl = amp_ctrl_lookup(mgr, rsp->id);
-+	if (ctrl) {
-+		u8 *assoc, assoc_len = len - sizeof(*rsp);
-+
-+		assoc = kzalloc(assoc_len, GFP_KERNEL);
-+		if (!assoc) {
-+			amp_ctrl_put(ctrl);
-+			return -ENOMEM;
-+		}
-+
-+		memcpy(assoc, rsp->amp_assoc, assoc_len);
-+		ctrl->assoc = assoc;
-+		ctrl->assoc_len = assoc_len;
-+		ctrl->assoc_rem_len = assoc_len;
-+		ctrl->assoc_len_so_far = 0;
-+
-+		amp_ctrl_put(ctrl);
++	/* Legacy key */
++	if (conn->key_type < 3) {
++		BT_ERR("Legacy key type %d", conn->key_type);
++		return -EACCES;
 +	}
 +
-+	/* Create Phys Link */
-+	hdev = hci_dev_get(rsp->id);
-+	if (!hdev)
-+		return -EINVAL;
++	*type = conn->key_type;
++	*len = HCI_AMP_LINK_KEY_SIZE;
 +
-+	plink = phylink_add(mgr, hdev->id, rsp->id, ctrl->assoc,
-+			    ctrl->assoc_len);
++	key = hci_find_link_key(hdev, &conn->dst);
 +
-+	BT_DBG("Created plink %p: loc:%d -> rem:%d", plink, hdev->id, rsp->id);
++	/* BR/EDR Link Key concatenated together with itself */
++	memcpy(&keybuf[0], key->val, HCI_LINK_KEY_SIZE);
++	memcpy(&keybuf[HCI_LINK_KEY_SIZE], key->val, HCI_LINK_KEY_SIZE);
 +
-+done:
-+	hci_dev_put(hdev);
-+	skb_pull(skb, len);
-+	return 0;
++	/* Derive Generic AMP Link Key (gamp) */
++	err = hmac_sha256(keybuf, HCI_AMP_LINK_KEY_SIZE, "gamp", 4, gamp_key);
++	if (err) {
++		BT_ERR("Could not derive Generic AMP Key: err %d", err);
++		return err;
++	}
++
++	if (conn->key_type == HCI_LK_DEBUG_COMBINATION) {
++		BT_DBG("Use Generic AMP Key (gamp)");
++		memcpy(data, gamp_key, HCI_AMP_LINK_KEY_SIZE);
++		return err;
++	}
++
++	/* Derive Dedicated AMP Link Key: "802b" is 802.11 PAL keyID */
++	return hmac_sha256(gamp_key, HCI_AMP_LINK_KEY_SIZE, "802b", 4, data);
 +}
-+
- static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 				   struct a2mp_cmd *hdr)
- {
-@@ -492,8 +546,11 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 			err = a2mp_getinfo_rsp(mgr, skb, hdr);
- 			break;
- 
--		case A2MP_CHANGE_RSP:
- 		case A2MP_GETAMPASSOC_RSP:
-+			err = a2mp_getampassoc_rsp(mgr, skb, hdr);
-+			break;
-+
-+		case A2MP_CHANGE_RSP:
- 		case A2MP_CREATEPHYSLINK_RSP:
- 		case A2MP_DISCONNPHYSLINK_RSP:
- 			err = a2mp_cmd_rsp(mgr, skb, hdr);
 -- 
 1.7.9.5
 
