@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 01/26] Bluetooth: debug: Print refcnt for hci_dev
-Date: Fri, 17 Aug 2012 17:32:56 +0300
-Message-Id: <1345214001-7053-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 12/26] Bluetooth: A2MP: Process A2MP Getinfo Rsp
+Date: Fri, 17 Aug 2012 17:33:07 +0300
+Message-Id: <1345214001-7053-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1345214001-7053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1345214001-7053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,34 +12,66 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Process A2MP Getinfo Response, send Get AMP Assoc Req.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    6 ++++++
- 1 file changed, 6 insertions(+)
+ net/bluetooth/a2mp.c |   34 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 1bbc109..5354e7b 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -612,11 +612,17 @@ static inline void hci_conn_put(struct hci_conn *conn)
- /* ----- HCI Devices ----- */
- static inline void hci_dev_put(struct hci_dev *d)
- {
-+	BT_DBG("%s orig refcnt %d", d->name,
-+	       atomic_read(&d->dev.kobj.kref.refcount));
-+
- 	put_device(&d->dev);
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 3a0e3b8..5a238df 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -269,6 +269,35 @@ done:
+ 	return 0;
  }
  
- static inline struct hci_dev *hci_dev_hold(struct hci_dev *d)
- {
-+	BT_DBG("%s orig refcnt %d", d->name,
-+	       atomic_read(&d->dev.kobj.kref.refcount));
++static int a2mp_getinfo_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
++			    struct a2mp_cmd *hdr)
++{
++	struct a2mp_info_rsp *rsp = (struct a2mp_info_rsp *) skb->data;
++	struct a2mp_amp_assoc_req req;
++	struct amp_ctrl *ctrl;
 +
- 	get_device(&d->dev);
- 	return d;
- }
++	if (le16_to_cpu(hdr->len) < sizeof(*rsp))
++		return -EINVAL;
++
++	BT_DBG("id %d status 0x%2.2x", rsp->id, rsp->status);
++
++	if (rsp->status)
++		return -EINVAL;
++
++	ctrl = amp_ctrl_add(mgr);
++	if (!ctrl)
++		return -ENOMEM;
++
++	ctrl->id = rsp->id;
++
++	req.id = rsp->id;
++	a2mp_send(mgr, A2MP_GETAMPASSOC_REQ, __next_ident(mgr), sizeof(req),
++		  &req);
++
++	skb_pull(skb, sizeof(*rsp));
++	return 0;
++}
++
+ static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 				struct a2mp_cmd *hdr)
+ {
+@@ -459,8 +488,11 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 			err = a2mp_discover_rsp(mgr, skb, hdr);
+ 			break;
+ 
+-		case A2MP_CHANGE_RSP:
+ 		case A2MP_GETINFO_RSP:
++			err = a2mp_getinfo_rsp(mgr, skb, hdr);
++			break;
++
++		case A2MP_CHANGE_RSP:
+ 		case A2MP_GETAMPASSOC_RSP:
+ 		case A2MP_CREATEPHYSLINK_RSP:
+ 		case A2MP_DISCONNPHYSLINK_RSP:
 -- 
 1.7.9.5
 
