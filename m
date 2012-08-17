@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 23/26] Bluetooth: AMP: Process physical link complete event
-Date: Fri, 17 Aug 2012 17:33:18 +0300
-Message-Id: <1345214001-7053-24-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 24/26] Bluetooth: AMP: Send Create Chan Req
+Date: Fri, 17 Aug 2012 17:33:19 +0300
+Message-Id: <1345214001-7053-25-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1345214001-7053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1345214001-7053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,104 +12,109 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add new hci_conn for representing AMP physical link.
+Send L2CAP Create Channel Request when receiving HCI Physical
+Link Complete event.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci.h      |    1 +
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_event.c        |   47 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 49 insertions(+)
+ include/net/bluetooth/hci_core.h |    5 +++++
+ net/bluetooth/hci_event.c        |   11 +++++++++++
+ net/bluetooth/l2cap_core.c       |   22 ++++++++++++++++++++++
+ 3 files changed, 38 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 1cb8b55..4c41b8c 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -207,6 +207,7 @@ enum {
- #define ESCO_LINK	0x02
- /* Low Energy links do not have defined link type. Use invented one */
- #define LE_LINK		0x80
-+#define AMP_LINK	0x81
- 
- /* LMP features */
- #define LMP_3SLOT	0x01
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 75e17d8..ba9a05f 100644
+index ba9a05f..1be2c81 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -353,6 +353,7 @@ struct hci_conn {
- 	struct amp_mgr	*amp_mgr;
+@@ -381,6 +381,7 @@ extern void l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason);
+ extern int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt);
+ extern int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb,
+ 			      u16 flags);
++extern void l2cap_chan_create_cfm(struct hci_conn *hcon, u8 status);
  
- 	struct hci_conn	*link;
-+	struct phy_link	*phy_link;
- 
- 	void (*connect_cfm_cb)	(struct hci_conn *conn, u8 status);
- 	void (*security_cfm_cb)	(struct hci_conn *conn, u8 status);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 15c7ce6..313bbad 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3414,6 +3414,49 @@ unlock:
- 	hci_dev_unlock(hdev);
- }
- 
-+static void hci_phy_link_complete_evt(struct hci_dev *hdev,
-+				      struct sk_buff *skb)
-+{
-+	struct hci_ev_phy_link_complete *ev = (void *) skb->data;
-+	struct hci_conn *conn;
-+	struct phy_link *plink;
-+
-+	BT_DBG("%s handle 0x%2.2x status 0x%2.2x", hdev->name, ev->phy_handle,
-+	       ev->status);
-+
-+	if (ev->status)
-+		return;
-+
-+	plink = phylink_lookup_by_handle(ev->phy_handle);
-+	if (!plink)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_add(hdev, AMP_LINK, BDADDR_ANY);
-+	if (conn) {
-+		conn->handle = ev->phy_handle;
-+		conn->state = BT_CONNECTED;
-+
-+		hci_conn_hold(conn);
-+		conn->disc_timeout = HCI_DISCONN_TIMEOUT/2;
-+		hci_conn_put(conn);
-+
-+		bacpy(&conn->dst, &plink->mgr->l2cap_conn->hcon->dst);
-+		conn->out = true;
-+		conn->phy_link = plink;
-+
-+		hci_conn_hold_device(conn);
-+		hci_conn_add_sysfs(conn);
-+	} else {
-+		BT_ERR("Cannot add connection");
-+	}
-+
-+	hci_dev_unlock(hdev);
-+
-+	phylink_put(plink);
-+}
-+
- static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
-@@ -3736,6 +3779,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_remote_oob_data_request_evt(hdev, skb);
+ extern int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr);
+ extern void sco_connect_cfm(struct hci_conn *hcon, __u8 status);
+@@ -791,6 +792,10 @@ static inline void hci_proto_connect_cfm(struct hci_conn *conn, __u8 status)
+ 		sco_connect_cfm(conn, status);
  		break;
  
-+	case HCI_EV_PHY_LINK_COMPLETE:
-+		hci_phy_link_complete_evt(hdev, skb);
++	case AMP_LINK:
++		l2cap_chan_create_cfm(conn, status);
 +		break;
 +
- 	case HCI_EV_NUM_COMP_BLOCKS:
- 		hci_num_comp_blocks_evt(hdev, skb);
+ 	default:
+ 		BT_ERR("unknown link type %d", conn->type);
  		break;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 313bbad..cdb32da 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3454,6 +3454,17 @@ static void hci_phy_link_complete_evt(struct hci_dev *hdev,
+ 
+ 	hci_dev_unlock(hdev);
+ 
++	if (conn) {
++		struct hci_conn *bredr_conn = plink->mgr->l2cap_conn->hcon;
++		struct hci_dev *bredr_hdev = bredr_conn->hdev;
++
++		if (bredr_hdev) {
++			hci_dev_hold(bredr_hdev);
++			l2cap_chan_create_cfm(bredr_conn, plink->remote_id);
++			hci_dev_put(bredr_hdev);
++		}
++	}
++
+ 	phylink_put(plink);
+ }
+ 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index c34fcd0..12da90b 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -38,6 +38,7 @@
+ #include <net/bluetooth/l2cap.h>
+ #include <net/bluetooth/smp.h>
+ #include <net/bluetooth/a2mp.h>
++#include <net/bluetooth/pal.h>
+ 
+ bool disable_ertm;
+ 
+@@ -1032,6 +1033,21 @@ void l2cap_send_conn_req(struct l2cap_chan *chan)
+ 	l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_REQ, sizeof(req), &req);
+ }
+ 
++static void l2cap_send_chan_create_req(struct l2cap_chan *chan, u8 remote_id)
++{
++	struct l2cap_conn *conn = chan->conn;
++	struct l2cap_create_chan_req req;
++
++	req.scid = cpu_to_le16(chan->scid);
++	req.psm = chan->psm;
++	req.amp_id = remote_id;
++
++	chan->ident = l2cap_get_ident(conn);
++
++	l2cap_send_cmd(conn, chan->ident, L2CAP_CREATE_CHAN_REQ,
++		       sizeof(req), &req);
++}
++
+ static void l2cap_chan_ready(struct l2cap_chan *chan)
+ {
+ 	/* This clears all conf flags, including CONF_NOT_COMPLETE */
+@@ -5447,7 +5463,13 @@ void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 
+ 		l2cap_conn_put(conn);
+ 	}
++}
++
++void l2cap_chan_create_cfm(struct hci_conn *hcon, u8 remote_id)
++{
++	struct amp_mgr *mgr = hcon->amp_mgr;
+ 
++	l2cap_send_chan_create_req(mgr->bredr_chan, remote_id);
+ }
+ 
+ int l2cap_disconn_ind(struct hci_conn *hcon)
 -- 
 1.7.9.5
 
