@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 17/26] Bluetooth: AMP: Add AMP key calculation
-Date: Fri, 17 Aug 2012 17:33:12 +0300
-Message-Id: <1345214001-7053-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 10/26] Bluetooth: AMP: Remote AMP ctrl definitions
+Date: Fri, 17 Aug 2012 17:33:05 +0300
+Message-Id: <1345214001-7053-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1345214001-7053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1345214001-7053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,93 +12,171 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Function calculates AMP keys using hmac_sha256 helper. Calculated keys
-are Generic AMP Link Key (gamp) and Dedicated AMP Link Key with
-keyID "802b" for 802.11 PAL.
+Create remote AMP controllers structure. It is used to keep information
+about discovered remote AMP controllers by A2MP protocol.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/pal.h |    1 +
- net/bluetooth/Kconfig       |    1 +
- net/bluetooth/pal.c         |   45 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 47 insertions(+)
+ include/net/bluetooth/a2mp.h |    3 ++
+ include/net/bluetooth/pal.h  |   14 ++++++++
+ net/bluetooth/a2mp.c         |    5 +++
+ net/bluetooth/pal.c          |   81 ++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 103 insertions(+)
 
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+index 012f573..8ba236c 100644
+--- a/include/net/bluetooth/a2mp.h
++++ b/include/net/bluetooth/a2mp.h
+@@ -29,6 +29,9 @@ struct amp_mgr {
+ 
+ 	struct list_head	phy_links;
+ 	struct mutex		phy_links_lock;
++
++	struct list_head	amp_ctrls;
++	struct mutex		amp_ctrls_lock;
+ };
+ 
+ struct a2mp_cmd {
 diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
-index 6ce1dfb..8799285 100644
+index 201c501..3223ec2 100644
 --- a/include/net/bluetooth/pal.h
 +++ b/include/net/bluetooth/pal.h
-@@ -53,5 +53,6 @@ int phylink_put(struct phy_link *plink);
- void phylink_get(struct phy_link *plink);
- void phylink_list_flush(struct amp_mgr *mgr);
- void phylink_del(struct amp_mgr *mgr, struct phy_link *plink);
-+int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type);
+@@ -32,6 +32,20 @@ struct phy_link {
+ 	struct kref		kref;
+ };
  
- #endif /* __PAL_H */
-diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-index 3537d38..1c11d0d 100644
---- a/net/bluetooth/Kconfig
-+++ b/net/bluetooth/Kconfig
-@@ -11,6 +11,7 @@ menuconfig BT
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_AES
- 	select CRYPTO_ECB
-+	select CRYPTO_SHA256
- 	help
- 	  Bluetooth is low-cost, low-power, short-range wireless technology.
- 	  It was designed as a replacement for cables and other short-range
++struct amp_ctrl {
++	struct list_head	list;
++	struct kref		kref;
++	__u8			id;
++	__u16			assoc_len_so_far;
++	__u16			assoc_rem_len;
++	__u16			assoc_len;
++	__u8			*assoc;
++};
++
++int amp_ctrl_put(struct amp_ctrl *ctrl);
++struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr);
++struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id);
++void amp_ctrl_list_flush(struct amp_mgr *mgr);
+ struct phy_link *phylink_add(struct amp_mgr *mgr, u8 local_id, u8 remote_id,
+ 			     u8 *rem_assoc, u16 assoc_size);
+ struct phy_link *phylink_lookup(struct amp_mgr *mgr, u8 local_id, u8 remote_id);
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 3df7cb5..f35d90f 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -595,6 +595,7 @@ static void amp_mgr_destroy(struct kref *kref)
+ 
+ 	BT_DBG("mgr %p", mgr);
+ 
++	amp_ctrl_list_flush(mgr);
+ 	phylink_list_flush(mgr);
+ 	kfree(mgr);
+ }
+@@ -634,6 +635,10 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
+ 	INIT_LIST_HEAD(&mgr->phy_links);
+ 	mutex_init(&mgr->phy_links_lock);
+ 
++	/* Remote AMP ctrl list initialization */
++	INIT_LIST_HEAD(&mgr->amp_ctrls);
++	mutex_init(&mgr->amp_ctrls_lock);
++
+ 	kref_init(&mgr->kref);
+ 
+ 	return mgr;
 diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
-index e766a98..b4eeb6a 100644
+index 24fb3aa..335cbc3 100644
 --- a/net/bluetooth/pal.c
 +++ b/net/bluetooth/pal.c
-@@ -255,3 +255,48 @@ int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
- 	crypto_free_shash(tfm);
- 	return ret;
- }
-+
-+int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type)
+@@ -22,6 +22,87 @@ enum pal_states {
+ 	DISCONNECTING
+ };
+ 
++/* Remote AMP Controllers handling */
++static void amp_ctrl_get(struct amp_ctrl *ctrl)
 +{
-+	struct hci_dev *hdev = conn->hdev;
-+	struct link_key *key;
-+	u8 keybuf[HCI_AMP_LINK_KEY_SIZE];
-+	u8 gamp_key[HCI_AMP_LINK_KEY_SIZE];
-+	int err;
++	BT_DBG("ctrl %p orig refcnt %d", ctrl,
++	       atomic_read(&ctrl->kref.refcount));
 +
-+	if (!hci_conn_check_link_mode(conn))
-+		return -EACCES;
-+
-+	BT_DBG("conn %p key_type %d", conn, conn->key_type);
-+
-+	/* Legacy key */
-+	if (conn->key_type < 3) {
-+		BT_ERR("Legacy key type %d", conn->key_type);
-+		return -EACCES;
-+	}
-+
-+	*type = conn->key_type;
-+	*len = HCI_AMP_LINK_KEY_SIZE;
-+
-+	key = hci_find_link_key(hdev, &conn->dst);
-+
-+	/* BR/EDR Link Key concatenated together with itself */
-+	memcpy(&keybuf[0], key->val, HCI_LINK_KEY_SIZE);
-+	memcpy(&keybuf[HCI_LINK_KEY_SIZE], key->val, HCI_LINK_KEY_SIZE);
-+
-+	/* Derive Generic AMP Link Key (gamp) */
-+	err = hmac_sha256(keybuf, HCI_AMP_LINK_KEY_SIZE, "gamp", 4, gamp_key);
-+	if (err) {
-+		BT_ERR("Could not derive Generic AMP Key: err %d", err);
-+		return err;
-+	}
-+
-+	if (conn->key_type == HCI_LK_DEBUG_COMBINATION) {
-+		BT_DBG("Use Generic AMP Key (gamp)");
-+		memcpy(data, gamp_key, HCI_AMP_LINK_KEY_SIZE);
-+		return err;
-+	}
-+
-+	/* Derive Dedicated AMP Link Key: "802b" is 802.11 PAL keyID */
-+	return hmac_sha256(gamp_key, HCI_AMP_LINK_KEY_SIZE, "802b", 4, data);
++	kref_get(&ctrl->kref);
 +}
++
++static void amp_ctrl_destroy(struct kref *kref)
++{
++	struct amp_ctrl *ctrl = container_of(kref, struct amp_ctrl, kref);
++
++	BT_DBG("ctrl %p", ctrl);
++
++	if (ctrl->assoc)
++		kfree(ctrl->assoc);
++
++	kfree(ctrl);
++}
++
++int amp_ctrl_put(struct amp_ctrl *ctrl)
++{
++	BT_DBG("ctrl %p orig refcnt %d", ctrl,
++	       atomic_read(&ctrl->kref.refcount));
++
++	return kref_put(&ctrl->kref, &amp_ctrl_destroy);
++}
++
++struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr)
++{
++	struct amp_ctrl *ctrl;
++
++	ctrl = kzalloc(sizeof(*ctrl), GFP_KERNEL);
++	if (!ctrl)
++		return NULL;
++
++	mutex_lock(&mgr->amp_ctrls_lock);
++	list_add(&ctrl->list, &mgr->amp_ctrls);
++	mutex_unlock(&mgr->amp_ctrls_lock);
++
++	kref_init(&ctrl->kref);
++
++	BT_DBG("mgr %p ctrl %p", mgr, ctrl);
++
++	return ctrl;
++}
++
++void amp_ctrl_list_flush(struct amp_mgr *mgr)
++{
++	struct amp_ctrl *ctrl, *n;
++
++	BT_DBG("mgr %p", mgr);
++
++	mutex_lock(&mgr->amp_ctrls_lock);
++	list_for_each_entry_safe(ctrl, n, &mgr->amp_ctrls, list) {
++		list_del(&ctrl->list);
++		amp_ctrl_put(ctrl);
++	}
++	mutex_unlock(&mgr->amp_ctrls_lock);
++}
++
++struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id)
++{
++	struct amp_ctrl *ctrl = NULL;
++
++	mutex_lock(&mgr->amp_ctrls_lock);
++	list_for_each_entry(ctrl, &mgr->amp_ctrls, list) {
++		if (ctrl->id == id)
++			break;
++	}
++	mutex_unlock(&mgr->amp_ctrls_lock);
++
++	BT_DBG("mgr %p id %d ctrl %p", mgr, id, ctrl);
++
++	if (ctrl)
++		amp_ctrl_get(ctrl);
++
++	return ctrl;
++}
++
+ /* Physical Link interface */
+ void phylink_get(struct phy_link *plink)
+ {
 -- 
 1.7.9.5
 
