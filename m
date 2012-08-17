@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 08/26] Bluetooth: A2MP: Process Discover Response
-Date: Fri, 17 Aug 2012 17:33:03 +0300
-Message-Id: <1345214001-7053-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 11/26] Bluetooth: AMP: Use phylink in create/disc phylink req
+Date: Fri, 17 Aug 2012 17:33:06 +0300
+Message-Id: <1345214001-7053-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1345214001-7053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1345214001-7053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,102 +12,78 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When receiving A2MP Discover Response send A2MP Get Info Request
-for each AMP controller in the discovery list.
+Use phy_link structure to keep track about physical connections.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   62 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 61 insertions(+), 1 deletion(-)
+ include/net/bluetooth/pal.h |    1 +
+ net/bluetooth/a2mp.c        |   19 +++++++++++++++++++
+ 2 files changed, 20 insertions(+)
 
+diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
+index 3223ec2..6ce1dfb 100644
+--- a/include/net/bluetooth/pal.h
++++ b/include/net/bluetooth/pal.h
+@@ -52,5 +52,6 @@ struct phy_link *phylink_lookup(struct amp_mgr *mgr, u8 local_id, u8 remote_id);
+ int phylink_put(struct phy_link *plink);
+ void phylink_get(struct phy_link *plink);
+ void phylink_list_flush(struct amp_mgr *mgr);
++void phylink_del(struct amp_mgr *mgr, struct phy_link *plink);
+ 
+ #endif /* __PAL_H */
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 3468599..a264f22 100644
+index f35d90f..3a0e3b8 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -63,6 +63,14 @@ void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data)
- 	kfree(cmd);
- }
+@@ -309,6 +309,7 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
  
-+static u8 __next_ident(struct amp_mgr *mgr)
-+{
-+	if (++mgr->ident == 0)
-+		mgr->ident = 1;
-+
-+	return mgr->ident;
-+}
-+
- static inline void __a2mp_cl_bredr(struct a2mp_cl *cl)
- {
- 	cl->id = 0;
-@@ -161,6 +169,55 @@ static int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 	return 0;
- }
+ 	struct a2mp_physlink_rsp rsp;
+ 	struct hci_dev *hdev;
++	struct phy_link *plink;
  
-+static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
-+			     struct a2mp_cmd *hdr)
-+{
-+	struct a2mp_discov_rsp *rsp = (void *) skb->data;
-+	u16 len = le16_to_cpu(hdr->len);
-+	struct a2mp_cl *cl;
-+	u16 ext_feat;
+ 	if (le16_to_cpu(hdr->len) < sizeof(*req))
+ 		return -EINVAL;
+@@ -326,6 +327,11 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 
+ 	/* TODO process physlink create */
+ 
++	plink = phylink_add(mgr, rsp.local_id, rsp.remote_id, req->amp_assoc,
++			    le16_to_cpu(hdr->len) - sizeof(*req));
 +
-+	if (len < sizeof(*rsp))
-+		return -EINVAL;
++	BT_DBG("plink %p", plink);
 +
-+	len -= sizeof(*rsp);
-+	skb_pull(skb, sizeof(*rsp));
-+
-+	ext_feat = le16_to_cpu(rsp->ext_feat);
-+
-+	BT_DBG("mtu %d efm 0x%4.4x", le16_to_cpu(rsp->mtu), ext_feat);
-+
-+	/* check that packet is not broken for now */
-+	while (ext_feat & A2MP_FEAT_EXT) {
-+		if (len < sizeof(ext_feat))
-+			return -EINVAL;
-+
-+		ext_feat = get_unaligned_le16(skb->data);
-+		BT_DBG("efm 0x%4.4x", ext_feat);
-+		len -= sizeof(ext_feat);
-+		skb_pull(skb, sizeof(ext_feat));
+ 	rsp.status = A2MP_STATUS_SUCCESS;
+ 
+ send_rsp:
+@@ -345,6 +351,7 @@ static int a2mp_discphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	struct a2mp_physlink_req *req = (void *) skb->data;
+ 	struct a2mp_physlink_rsp rsp;
+ 	struct hci_dev *hdev;
++	struct phy_link *plink;
+ 
+ 	if (le16_to_cpu(hdr->len) < sizeof(*req))
+ 		return -EINVAL;
+@@ -361,8 +368,20 @@ static int a2mp_discphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 		goto send_rsp;
+ 	}
+ 
++	plink = phylink_lookup(mgr, rsp.local_id, rsp.remote_id);
++	if (!plink) {
++		BT_ERR("No phys link exist");
++		rsp.status = A2MP_STATUS_NO_PHYSICAL_LINK_EXISTS;
++		goto clean;
 +	}
 +
-+	cl = (void *) skb->data;
-+	while (len >= sizeof(*cl)) {
-+		BT_DBG("Remote AMP id %d type %d status %d", cl->id, cl->type,
-+		       cl->status);
-+
-+		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
-+			struct a2mp_info_req req;
-+
-+			req.id = cl->id;
-+			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
-+				  sizeof(req), &req);
-+		}
-+
-+		len -= sizeof(*cl);
-+		cl = (void *) skb_pull(skb, sizeof(*cl));
-+	}
-+
-+	return 0;
-+}
-+
- static int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
- 			      struct a2mp_cmd *hdr)
- {
-@@ -378,8 +435,11 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 			err = a2mp_discphyslink_req(mgr, skb, hdr);
- 			break;
+ 	/* TODO Disconnect Phys Link here */
  
--		case A2MP_CHANGE_RSP:
- 		case A2MP_DISCOVER_RSP:
-+			err = a2mp_discover_rsp(mgr, skb, hdr);
-+			break;
++	phylink_put(plink);
 +
-+		case A2MP_CHANGE_RSP:
- 		case A2MP_GETINFO_RSP:
- 		case A2MP_GETAMPASSOC_RSP:
- 		case A2MP_CREATEPHYSLINK_RSP:
++	phylink_del(mgr, plink);
++
++clean:
+ 	hci_dev_put(hdev);
+ 
+ send_rsp:
 -- 
 1.7.9.5
 
