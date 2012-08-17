@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 25/26] Bluetooth: Set Exended Flowspec flag for HS chan
-Date: Fri, 17 Aug 2012 17:33:20 +0300
-Message-Id: <1345214001-7053-26-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 21/26] Bluetooth: A2MP: Create amp_mgr global list
+Date: Fri, 17 Aug 2012 17:33:16 +0300
+Message-Id: <1345214001-7053-22-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1345214001-7053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1345214001-7053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,46 +12,127 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-For AMP we always assume EFS L2CAP option.
+Create amp_mgr_list which is used for query for phy_link by
+phy_link handler.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |    2 ++
- net/bluetooth/l2cap_core.c    |    7 ++++++-
- 2 files changed, 8 insertions(+), 1 deletion(-)
+ include/net/bluetooth/a2mp.h |    4 ++++
+ include/net/bluetooth/pal.h  |    1 +
+ net/bluetooth/a2mp.c         |   12 ++++++++++++
+ net/bluetooth/pal.c          |   28 ++++++++++++++++++++++++++++
+ 4 files changed, 45 insertions(+)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index a5d6d16..2cf7229 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -509,6 +509,8 @@ struct l2cap_chan {
- 	__u32		remote_acc_lat;
- 	__u32		remote_flush_to;
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+index f3f0d7e..eaaa3e4 100644
+--- a/include/net/bluetooth/a2mp.h
++++ b/include/net/bluetooth/a2mp.h
+@@ -20,6 +20,7 @@
+ #define A2MP_FEAT_EXT	0x8000
  
-+	__u8		ctrl_id;
+ struct amp_mgr {
++	struct list_head	list;
+ 	struct l2cap_conn	*l2cap_conn;
+ 	struct l2cap_chan	*a2mp_chan;
+ 	struct l2cap_chan	*bredr_chan;
+@@ -125,6 +126,9 @@ struct a2mp_physlink_rsp {
+ #define A2MP_STATUS_PHYS_LINK_EXISTS		0x05
+ #define A2MP_STATUS_SECURITY_VIOLATION		0x06
+ 
++extern struct list_head amp_mgr_list;
++extern struct mutex amp_mgr_list_lock;
 +
- 	struct delayed_work	chan_timer;
- 	struct delayed_work	retrans_timer;
- 	struct delayed_work	monitor_timer;
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 12da90b..d99eaf9 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5468,8 +5468,13 @@ void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
- void l2cap_chan_create_cfm(struct hci_conn *hcon, u8 remote_id)
+ void amp_mgr_get(struct amp_mgr *mgr);
+ int amp_mgr_put(struct amp_mgr *mgr);
+ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
+diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
+index d9eb87e..55f4d5b 100644
+--- a/include/net/bluetooth/pal.h
++++ b/include/net/bluetooth/pal.h
+@@ -48,6 +48,7 @@ void amp_ctrl_list_flush(struct amp_mgr *mgr);
+ struct phy_link *phylink_add(struct amp_mgr *mgr, u8 local_id, u8 remote_id,
+ 			     u8 *rem_assoc, u16 assoc_size);
+ struct phy_link *phylink_lookup(struct amp_mgr *mgr, u8 local_id, u8 remote_id);
++struct phy_link *phylink_lookup_by_handle(u8 handle);
+ int phylink_put(struct phy_link *plink);
+ void phylink_get(struct phy_link *plink);
+ void phylink_list_flush(struct amp_mgr *mgr);
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index ec5afd1..40e3c94 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -21,6 +21,10 @@
+ 
+ static struct workqueue_struct *amp_workqueue;
+ 
++/* Global AMP Manager list */
++LIST_HEAD(amp_mgr_list);
++DEFINE_MUTEX(amp_mgr_list_lock);
++
+ /* A2MP build & send command helper functions */
+ static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
  {
- 	struct amp_mgr *mgr = hcon->amp_mgr;
-+	struct l2cap_chan *chan = mgr->bredr_chan;
+@@ -737,6 +741,10 @@ static void amp_mgr_destroy(struct kref *kref)
  
--	l2cap_send_chan_create_req(mgr->bredr_chan, remote_id);
-+	/* Set Extended Flow Spec for AMP */
-+	set_bit(FLAG_EFS_ENABLE, &chan->flags);
-+	chan->ctrl_id = remote_id;
+ 	BT_DBG("mgr %p", mgr);
+ 
++	mutex_lock(&amp_mgr_list_lock);
++	list_del(&mgr->list);
++	mutex_unlock(&amp_mgr_list_lock);
 +
-+	l2cap_send_chan_create_req(chan, remote_id);
+ 	amp_ctrl_list_flush(mgr);
+ 	phylink_list_flush(mgr);
+ 	kfree(mgr);
+@@ -781,6 +789,10 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
+ 	INIT_LIST_HEAD(&mgr->amp_ctrls);
+ 	mutex_init(&mgr->amp_ctrls_lock);
+ 
++	mutex_lock(&amp_mgr_list_lock);
++	list_add(&mgr->list, &amp_mgr_list);
++	mutex_unlock(&amp_mgr_list_lock);
++
+ 	kref_init(&mgr->kref);
+ 
+ 	return mgr;
+diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
+index b4eeb6a..f8bb66c 100644
+--- a/net/bluetooth/pal.c
++++ b/net/bluetooth/pal.c
+@@ -222,6 +222,34 @@ struct phy_link *phylink_lookup(struct amp_mgr *mgr, u8 local_id, u8 remote_id)
+ 	return found;
  }
  
- int l2cap_disconn_ind(struct hci_conn *hcon)
++/* Returns phy_link referenced if found */
++struct phy_link *phylink_lookup_by_handle(u8 handle)
++{
++	struct amp_mgr *mgr;
++	struct phy_link *found = NULL;
++
++	mutex_lock(&amp_mgr_list_lock);
++	list_for_each_entry(mgr, &amp_mgr_list, list) {
++		struct phy_link *plink;
++
++		mutex_lock(&mgr->phy_links_lock);
++		list_for_each_entry(plink, &mgr->phy_links, list) {
++			if (plink->handle == handle) {
++				phylink_get(plink);
++				found = plink;
++				break;
++			}
++		}
++		mutex_unlock(&mgr->phy_links_lock);
++
++		if (found)
++			break;
++	}
++	mutex_unlock(&amp_mgr_list_lock);
++
++	return found;
++}
++
+ int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
+ {
+ 	int ret = 0;
 -- 
 1.7.9.5
 
