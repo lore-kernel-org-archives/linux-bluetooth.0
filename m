@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Subject: [PATCH BlueZ v3 09/15] gdbus: Group interface changes to reduce the amount of signals emitted
-Date: Sat, 18 Aug 2012 03:50:56 -0300
-Message-Id: <1345272662-2850-10-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ v3 08/15] gdbus: Add support for org.freedesktop.DBus.ObjectManager interface
+Date: Sat, 18 Aug 2012 03:50:55 -0300
+Message-Id: <1345272662-2850-9-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1345272662-2850-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1345272662-2850-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,44 +12,129 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-InterfacesAdded and InterfacesRemoved can group all the interfaces
-changes together in one message.
+This implements initial support for ObjectManager, it automatically adds
+objects to its parents so no action is needed by daemons to get their
+objects managed by this interface.
+
+ObjectManager is part of D-Bus spec since revision 0.17:
+http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-objectmanager
 ---
- gdbus/object.c | 363 +++++++++++++++++++++++++++++++++------------------------
- 1 file changed, 209 insertions(+), 154 deletions(-)
+ gdbus/object.c | 248 ++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 238 insertions(+), 10 deletions(-)
 
 diff --git a/gdbus/object.c b/gdbus/object.c
-index a14d93e..11c317f 100644
+index df75116..a14d93e 100644
 --- a/gdbus/object.c
 +++ b/gdbus/object.c
-@@ -45,6 +45,9 @@ struct generic_data {
- 	char *path;
+@@ -37,10 +37,16 @@
+ #define error(fmt...)
+ #define debug(fmt...)
+ 
++#define DBUS_INTERFACE_OBJECT_MANAGER "org.freedesktop.DBus.ObjectManager"
++
+ struct generic_data {
+ 	unsigned int refcount;
++	DBusConnection *conn;
++	char *path;
  	GSList *interfaces;
- 	GSList *objects;
-+	GSList *added;
-+	GSList *removed;
-+	guint process_id;
++	GSList *objects;
  	char *introspect;
- 	struct generic_data *parent;
- };
-@@ -65,6 +68,8 @@ struct security_data {
- 	void *iface_user_data;
++	struct generic_data *parent;
  };
  
-+static gboolean process_changes(gpointer user_data);
-+
- static void print_arguments(GString *gstr, const GDBusArgInfo *args,
- 						const char *direction)
- {
-@@ -413,21 +418,71 @@ static void reset_parent(gpointer data, gpointer user_data)
- 	child->parent = parent;
+ struct interface_data {
+@@ -399,11 +405,28 @@ static gboolean check_privilege(DBusConnection *conn, DBusMessage *msg,
+ 	return FALSE;
  }
  
--static void generic_unregister(DBusConnection *connection, void *user_data)
++static void reset_parent(gpointer data, gpointer user_data)
++{
++	struct generic_data *child = data;
++	struct generic_data *parent = user_data;
++
++	child->parent = parent;
++}
++
+ static void generic_unregister(DBusConnection *connection, void *user_data)
+ {
+ 	struct generic_data *data = user_data;
++	struct generic_data *parent = data->parent;
+ 
++	if (parent != NULL)
++		parent->objects = g_slist_remove(parent->objects, data);
++
++	g_slist_foreach(data->objects, reset_parent, data->parent);
++	g_slist_free(data->objects);
++
++	dbus_connection_unref(data->conn);
+ 	g_free(data->introspect);
++	g_free(data->path);
+ 	g_free(data);
+ }
+ 
+@@ -485,9 +508,10 @@ static DBusObjectPathVTable generic_table = {
+ 	.message_function	= generic_message,
+ };
+ 
+-static void invalidate_parent_data(DBusConnection *conn, const char *child_path)
++static struct generic_data *invalidate_parent_data(DBusConnection *conn,
++						const char *child_path)
+ {
+-	struct generic_data *data = NULL;
++	struct generic_data *data = NULL, *child = NULL, *parent = NULL;
+ 	char *parent_path, *slash;
+ 
+ 	parent_path = g_strdup(child_path);
+@@ -508,16 +532,30 @@ static void invalidate_parent_data(DBusConnection *conn, const char *child_path)
+ 		goto done;
+ 	}
+ 
+-	invalidate_parent_data(conn, parent_path);
++	parent = invalidate_parent_data(conn, parent_path);
+ 
+-	if (data == NULL)
+-		goto done;
++	if (data == NULL) {
++		data = parent;
++		if (data == NULL)
++			goto done;
++	}
+ 
+ 	g_free(data->introspect);
+ 	data->introspect = NULL;
+ 
++	if (!dbus_connection_get_object_path_data(conn, child_path,
++							(void *) &child))
++		goto done;
++
++	if (child == NULL || g_slist_find(data->objects, child) != NULL)
++		goto done;
++
++	data->objects = g_slist_prepend(data->objects, child);
++	child->parent = data;
++
+ done:
+ 	g_free(parent_path);
++	return data;
+ }
+ 
+ static const GDBusMethodTable introspect_methods[] = {
+@@ -617,6 +655,7 @@ static DBusMessage *properties_get_all(DBusConnection *connection,
+ 		return NULL;
+ 
+ 	dbus_message_iter_init_append(reply, &iter);
++
+ 	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+ 			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+ 			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+@@ -737,7 +776,158 @@ static const GDBusSignalTable properties_signals[] = {
+ 	{ }
+ };
+ 
+-static void add_interface(struct generic_data *data, const char *name,
 +static void append_properties(struct interface_data *data,
 +							DBusMessageIter *iter)
- {
--	struct generic_data *data = user_data;
++{
 +	DBusMessageIter dict;
 +
 +	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
@@ -76,29 +161,106 @@ index a14d93e..11c317f 100644
 +	dbus_message_iter_close_container(array, &entry);
 +}
 +
-+static void emit_interfaces_added(struct generic_data *data)
++static void append_interfaces(struct generic_data *data, DBusMessageIter *iter)
++{
++	DBusMessageIter array;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++				DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++				DBUS_TYPE_STRING_AS_STRING
++				DBUS_TYPE_ARRAY_AS_STRING
++				DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++				DBUS_TYPE_STRING_AS_STRING
++				DBUS_TYPE_VARIANT_AS_STRING
++				DBUS_DICT_ENTRY_END_CHAR_AS_STRING
++				DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &array);
++
++	g_slist_foreach(data->interfaces, append_interface, &array);
++
++	dbus_message_iter_close_container(iter, &array);
++}
++
++static void append_object(gpointer data, gpointer user_data)
++{
++	struct generic_data *child = data;
++	DBusMessageIter *array = user_data;
++	DBusMessageIter entry;
++
++	dbus_message_iter_open_container(array, DBUS_TYPE_DICT_ENTRY, NULL,
++								&entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_OBJECT_PATH,
++								&child->path);
++	append_interfaces(child, &entry);
++	dbus_message_iter_close_container(array, &entry);
++}
++
++static DBusMessage *get_objects(DBusConnection *connection,
++				DBusMessage *message, void *user_data)
++{
++	struct generic_data *data = user_data;
++	DBusMessage *reply;
++	DBusMessageIter iter;
++	DBusMessageIter array;
++
++	reply = dbus_message_new_method_return(message);
++	if (reply == NULL)
++		return NULL;
++
++	dbus_message_iter_init_append(reply, &iter);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++					DBUS_TYPE_OBJECT_PATH_AS_STRING
++					DBUS_TYPE_ARRAY_AS_STRING
++					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++					DBUS_TYPE_STRING_AS_STRING
++					DBUS_TYPE_ARRAY_AS_STRING
++					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++					DBUS_TYPE_STRING_AS_STRING
++					DBUS_TYPE_VARIANT_AS_STRING
++					DBUS_DICT_ENTRY_END_CHAR_AS_STRING
++					DBUS_DICT_ENTRY_END_CHAR_AS_STRING
++					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
++					&array);
++
++	g_slist_foreach(data->objects, append_object, &array);
++
++	dbus_message_iter_close_container(&iter, &array);
++
++	return reply;
++}
++
++static const GDBusMethodTable manager_methods[] = {
++	{ GDBUS_METHOD("GetManagedObjects", NULL,
++		GDBUS_ARGS({ "objects", "a{oa{sa{sv}}}" }), get_objects) },
++	{ }
++};
++
++static const GDBusSignalTable manager_signals[] = {
++	{ GDBUS_SIGNAL("InterfacesAdded",
++		GDBUS_ARGS({ "object", "o" },
++				{ "interfaces", "a{sa{sv}}" })) },
++	{ GDBUS_SIGNAL("InterfacesRemoved",
++		GDBUS_ARGS({ "object", "o" }, { "interfaces", "as" })) },
++	{ }
++};
++
++static void emit_interface_added(struct generic_data *data,
++						struct interface_data *iface)
 +{
 +	DBusMessage *signal;
 +	DBusMessageIter iter, array;
- 	struct generic_data *parent = data->parent;
- 
--	if (parent != NULL)
--		parent->objects = g_slist_remove(parent->objects, data);
++	struct generic_data *parent = data->parent;
++
 +	if (parent == NULL)
 +		return;
- 
--	g_slist_foreach(data->objects, reset_parent, data->parent);
--	g_slist_free(data->objects);
++
 +	signal = dbus_message_new_signal(parent->path,
 +					DBUS_INTERFACE_OBJECT_MANAGER,
 +					"InterfacesAdded");
 +	if (signal == NULL)
 +		return;
- 
--	dbus_connection_unref(data->conn);
--	g_free(data->introspect);
--	g_free(data->path);
--	g_free(data);
++
 +	dbus_message_iter_init_append(signal, &iter);
 +	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH,
 +								&data->path);
@@ -113,132 +275,61 @@ index a14d93e..11c317f 100644
 +				DBUS_DICT_ENTRY_END_CHAR_AS_STRING
 +				DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &array);
 +
-+	g_slist_foreach(data->added, append_interface, &array);
-+	g_slist_free(data->added);
-+	data->added = NULL;
++	append_interface(iface, &array);
 +
 +	dbus_message_iter_close_container(&iter, &array);
 +
 +	g_dbus_send_message(data->conn, signal);
- }
- 
- static struct interface_data *find_interface(GSList *interfaces,
-@@ -440,6 +495,7 @@ static struct interface_data *find_interface(GSList *interfaces,
- 
- 	for (list = interfaces; list; list = list->next) {
- 		struct interface_data *iface = list->data;
-+
- 		if (!strcmp(name, iface->name))
- 			return iface;
- 	}
-@@ -468,45 +524,37 @@ static gboolean g_dbus_args_have_signature(const GDBusArgInfo *args,
- 	return TRUE;
- }
- 
--static DBusHandlerResult generic_message(DBusConnection *connection,
--					DBusMessage *message, void *user_data)
-+static gboolean remove_interface(struct generic_data *data, const char *name)
- {
--	struct generic_data *data = user_data;
- 	struct interface_data *iface;
--	const GDBusMethodTable *method;
--	const char *interface;
- 
--	interface = dbus_message_get_interface(message);
--
--	iface = find_interface(data->interfaces, interface);
-+	iface = find_interface(data->interfaces, name);
- 	if (iface == NULL)
--		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
--
--	for (method = iface->methods; method &&
--			method->name && method->function; method++) {
--		if (dbus_message_is_method_call(message, iface->name,
--							method->name) == FALSE)
--			continue;
-+		return FALSE;
- 
--		if (g_dbus_args_have_signature(method->in_args,
--							message) == FALSE)
--			continue;
-+	data->interfaces = g_slist_remove(data->interfaces, iface);
- 
--		if (check_privilege(connection, message, method,
--						iface->user_data) == TRUE)
--			return DBUS_HANDLER_RESULT_HANDLED;
-+	if (iface->destroy) {
-+		iface->destroy(iface->user_data);
-+		iface->user_data = NULL;
-+	}
- 
--		return process_message(connection, message, method,
--							iface->user_data);
-+	if (data->parent == NULL) {
-+		g_free(iface->name);
-+		g_free(iface);
-+		return TRUE;
- 	}
- 
--	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
--}
-+	data->removed = g_slist_prepend(data->removed, iface->name);
-+	g_free(iface);
- 
--static DBusObjectPathVTable generic_table = {
--	.unregister_function	= generic_unregister,
--	.message_function	= generic_message,
--};
-+	if (data->process_id > 0)
-+		return TRUE;
-+
-+	data->process_id = g_idle_add(process_changes, data);
-+
-+	return TRUE;
 +}
++
++static void add_interface(struct generic_data *data,
++				const char *name,
+ 				const GDBusMethodTable *methods,
+ 				const GDBusSignalTable *signals,
+ 				const GDBusPropertyTable *properties,
+@@ -755,6 +945,8 @@ static void add_interface(struct generic_data *data, const char *name,
+ 	iface->destroy = destroy;
  
- static struct generic_data *invalidate_parent_data(DBusConnection *conn,
- 						const char *child_path)
-@@ -558,12 +606,6 @@ done:
+ 	data->interfaces = g_slist_append(data->interfaces, iface);
++
++	emit_interface_added(data, iface);
+ }
+ 
+ static struct generic_data *object_path_ref(DBusConnection *connection,
+@@ -771,6 +963,8 @@ static struct generic_data *object_path_ref(DBusConnection *connection,
+ 	}
+ 
+ 	data = g_new0(struct generic_data, 1);
++	data->conn = dbus_connection_ref(connection);
++	data->path = g_strdup(path);
+ 	data->refcount = 1;
+ 
+ 	data->introspect = g_strdup(DBUS_INTROSPECT_1_0_XML_DOCTYPE_DECL_NODE "<node></node>");
+@@ -784,8 +978,11 @@ static struct generic_data *object_path_ref(DBusConnection *connection,
+ 
+ 	invalidate_parent_data(connection, path);
+ 
+-	add_interface(data, DBUS_INTERFACE_INTROSPECTABLE,
+-			introspect_methods, NULL, NULL, data, NULL);
++	add_interface(data, DBUS_INTERFACE_INTROSPECTABLE, introspect_methods,
++						NULL, NULL, data, NULL);
++
++	add_interface(data, DBUS_INTERFACE_OBJECT_MANAGER, manager_methods,
++					manager_signals, NULL, data, NULL);
+ 
+ 	add_interface(data, DBUS_INTERFACE_PROPERTIES, properties_methods,
+ 					properties_signals, NULL, data, NULL);
+@@ -793,6 +990,34 @@ static struct generic_data *object_path_ref(DBusConnection *connection,
  	return data;
  }
  
--static const GDBusMethodTable introspect_methods[] = {
--	{ GDBUS_METHOD("Introspect", NULL,
--			GDBUS_ARGS({ "xml", "s" }), introspect) },
--	{ }
--};
--
- static inline const GDBusPropertyTable *find_property(const GDBusPropertyTable *properties,
- 							const char *name)
- {
-@@ -776,35 +818,128 @@ static const GDBusSignalTable properties_signals[] = {
- 	{ }
- };
- 
--static void append_properties(struct interface_data *data,
--							DBusMessageIter *iter)
-+static void append_name(gpointer data, gpointer user_data)
- {
--	DBusMessageIter dict;
-+	char *name = data;
-+	DBusMessageIter *iter = user_data;
- 
--	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
--				DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
--				DBUS_TYPE_STRING_AS_STRING
--				DBUS_TYPE_VARIANT_AS_STRING
--				DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &name);
-+}
- 
--	/* TODO: list properties */
-+static void emit_interfaces_removed(struct generic_data *data)
++static void emit_interface_remove(struct generic_data *data,
++						struct interface_data *iface)
 +{
 +	DBusMessage *signal;
 +	DBusMessageIter iter, array;
 +	struct generic_data *parent = data->parent;
- 
--	dbus_message_iter_close_container(iter, &dict);
++
 +	if (parent == NULL)
 +		return;
 +
@@ -251,251 +342,46 @@ index a14d93e..11c317f 100644
 +	dbus_message_iter_init_append(signal, &iter);
 +	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH,
 +								&data->path);
++
 +	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
 +					DBUS_TYPE_STRING_AS_STRING, &array);
-+
-+	g_slist_foreach(data->removed, append_name, &array);
-+	g_slist_free_full(data->removed, g_free);
-+	data->removed = NULL;
-+
++	dbus_message_iter_append_basic(&array, DBUS_TYPE_STRING, &iface->name);
 +	dbus_message_iter_close_container(&iter, &array);
 +
 +	g_dbus_send_message(data->conn, signal);
- }
- 
--static void append_interface(gpointer data, gpointer user_data)
-+static gboolean process_changes(gpointer user_data)
- {
--	struct interface_data *iface = data;
--	DBusMessageIter *array = user_data;
--	DBusMessageIter entry;
-+	struct generic_data *data = user_data;
- 
--	dbus_message_iter_open_container(array, DBUS_TYPE_DICT_ENTRY, NULL,
--								&entry);
--	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &iface->name);
--	append_properties(data, &entry);
--	dbus_message_iter_close_container(array, &entry);
-+	data->process_id = 0;
-+
-+	if (data->added != NULL)
-+		emit_interfaces_added(data);
-+
-+	if (data->removed != NULL)
-+		emit_interfaces_removed(data);
-+
-+	return FALSE;
 +}
 +
-+static void generic_unregister(DBusConnection *connection, void *user_data)
-+{
-+	struct generic_data *data = user_data;
-+	struct generic_data *parent = data->parent;
-+
-+	if (parent != NULL)
-+		parent->objects = g_slist_remove(parent->objects, data);
-+
-+	if (data->process_id > 0) {
-+		g_source_remove(data->process_id);
-+		if (data->removed != NULL)
-+			emit_interfaces_removed(data);
-+	}
-+
-+	g_slist_foreach(data->objects, reset_parent, data->parent);
-+	g_slist_free(data->objects);
-+
-+	dbus_connection_unref(data->conn);
-+	g_free(data->introspect);
-+	g_free(data->path);
-+	g_free(data);
-+}
-+
-+static DBusHandlerResult generic_message(DBusConnection *connection,
-+					DBusMessage *message, void *user_data)
-+{
-+	struct generic_data *data = user_data;
-+	struct interface_data *iface;
-+	const GDBusMethodTable *method;
-+	const char *interface;
-+
-+	interface = dbus_message_get_interface(message);
-+
-+	iface = find_interface(data->interfaces, interface);
-+	if (iface == NULL)
-+		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-+
-+	for (method = iface->methods; method &&
-+			method->name && method->function; method++) {
-+		if (dbus_message_is_method_call(message, iface->name,
-+							method->name) == FALSE)
-+			continue;
-+
-+		if (g_dbus_args_have_signature(method->in_args,
-+							message) == FALSE)
-+			continue;
-+
-+		if (check_privilege(connection, message, method,
-+						iface->user_data) == TRUE)
-+			return DBUS_HANDLER_RESULT_HANDLED;
-+
-+		return process_message(connection, message, method,
-+							iface->user_data);
-+	}
-+
-+	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- }
- 
-+static DBusObjectPathVTable generic_table = {
-+	.unregister_function	= generic_unregister,
-+	.message_function	= generic_message,
-+};
-+
-+static const GDBusMethodTable introspect_methods[] = {
-+	{ GDBUS_METHOD("Introspect", NULL,
-+			GDBUS_ARGS({ "xml", "s" }), introspect) },
-+	{ }
-+};
-+
- static void append_interfaces(struct generic_data *data, DBusMessageIter *iter)
+ static gboolean remove_interface(struct generic_data *data, const char *name)
  {
- 	DBusMessageIter array;
-@@ -889,43 +1024,6 @@ static const GDBusSignalTable manager_signals[] = {
- 	{ }
- };
+ 	struct interface_data *iface;
+@@ -801,6 +1026,8 @@ static gboolean remove_interface(struct generic_data *data, const char *name)
+ 	if (iface == NULL)
+ 		return FALSE;
  
--static void emit_interface_added(struct generic_data *data,
--						struct interface_data *iface)
--{
--	DBusMessage *signal;
--	DBusMessageIter iter, array;
--	struct generic_data *parent = data->parent;
--
--	if (parent == NULL)
--		return;
--
--	signal = dbus_message_new_signal(parent->path,
--					DBUS_INTERFACE_OBJECT_MANAGER,
--					"InterfacesAdded");
--	if (signal == NULL)
--		return;
--
--	dbus_message_iter_init_append(signal, &iter);
--	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH,
--								&data->path);
--
--	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
--				DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
--				DBUS_TYPE_STRING_AS_STRING
--				DBUS_TYPE_ARRAY_AS_STRING
--				DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
--				DBUS_TYPE_STRING_AS_STRING
--				DBUS_TYPE_VARIANT_AS_STRING
--				DBUS_DICT_ENTRY_END_CHAR_AS_STRING
--				DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &array);
--
--	append_interface(iface, &array);
--
--	dbus_message_iter_close_container(&iter, &array);
--
--	g_dbus_send_message(data->conn, signal);
--}
--
- static void add_interface(struct generic_data *data,
- 				const char *name,
- 				const GDBusMethodTable *methods,
-@@ -945,8 +1043,14 @@ static void add_interface(struct generic_data *data,
- 	iface->destroy = destroy;
- 
- 	data->interfaces = g_slist_append(data->interfaces, iface);
-+	if (data->parent == NULL)
-+		return;
++	emit_interface_remove(data, iface);
 +
-+	data->added = g_slist_append(data->added, iface);
-+	if (data->process_id > 0)
-+		return;
+ 	data->interfaces = g_slist_remove(data->interfaces, iface);
  
--	emit_interface_added(data, iface);
-+	data->process_id = g_idle_add(process_changes, data);
- }
+ 	if (iface->destroy)
+@@ -830,6 +1057,7 @@ static void object_path_unref(DBusConnection *connection, const char *path)
  
- static struct generic_data *object_path_ref(DBusConnection *connection,
-@@ -990,55 +1094,6 @@ static struct generic_data *object_path_ref(DBusConnection *connection,
- 	return data;
- }
- 
--static void emit_interface_remove(struct generic_data *data,
--						struct interface_data *iface)
--{
--	DBusMessage *signal;
--	DBusMessageIter iter, array;
--	struct generic_data *parent = data->parent;
--
--	if (parent == NULL)
--		return;
--
--	signal = dbus_message_new_signal(parent->path,
--					DBUS_INTERFACE_OBJECT_MANAGER,
--					"InterfacesRemoved");
--	if (signal == NULL)
--		return;
--
--	dbus_message_iter_init_append(signal, &iter);
--	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH,
--								&data->path);
--
--	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
--					DBUS_TYPE_STRING_AS_STRING, &array);
--	dbus_message_iter_append_basic(&array, DBUS_TYPE_STRING, &iface->name);
--	dbus_message_iter_close_container(&iter, &array);
--
--	g_dbus_send_message(data->conn, signal);
--}
--
--static gboolean remove_interface(struct generic_data *data, const char *name)
--{
--	struct interface_data *iface;
--
--	iface = find_interface(data->interfaces, name);
--	if (iface == NULL)
--		return FALSE;
--
--	emit_interface_remove(data, iface);
--
--	data->interfaces = g_slist_remove(data->interfaces, iface);
--
--	if (iface->destroy)
--		iface->destroy(iface->user_data);
--
--	g_free(iface->name);
--	g_free(iface);
--
--	return TRUE;
--}
--
- static void object_path_unref(DBusConnection *connection, const char *path)
- {
- 	struct generic_data *data = NULL;
-@@ -1059,9 +1114,9 @@ static void object_path_unref(DBusConnection *connection, const char *path)
+ 	remove_interface(data, DBUS_INTERFACE_INTROSPECTABLE);
  	remove_interface(data, DBUS_INTERFACE_PROPERTIES);
- 	remove_interface(data, DBUS_INTERFACE_OBJECT_MANAGER);
++	remove_interface(data, DBUS_INTERFACE_OBJECT_MANAGER);
  
--	invalidate_parent_data(connection, path);
-+	invalidate_parent_data(data->conn, data->path);
+ 	invalidate_parent_data(connection, path);
  
--	dbus_connection_unregister_object_path(connection, path);
-+	dbus_connection_unregister_object_path(data->conn, data->path);
- }
+@@ -928,8 +1156,8 @@ gboolean g_dbus_register_interface(DBusConnection *connection,
+ 		return FALSE;
+ 	}
  
- static gboolean check_signal(DBusConnection *conn, const char *path,
-@@ -1186,7 +1241,7 @@ gboolean g_dbus_unregister_interface(DBusConnection *connection,
+-	add_interface(data, name, methods, signals,
+-			properties, user_data, destroy);
++	add_interface(data, name, methods, signals, properties, user_data,
++								destroy);
+ 
  	g_free(data->introspect);
  	data->introspect = NULL;
- 
--	object_path_unref(connection, path);
-+	object_path_unref(connection, data->path);
- 
- 	return TRUE;
- }
 -- 
 1.7.11.5
 
