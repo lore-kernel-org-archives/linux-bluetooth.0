@@ -1,65 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120817172130.GA940@polaris.bitmath.org>
-References: <1345182286-21776-1-git-send-email-daniel@quora.org>
-	<20120817172130.GA940@polaris.bitmath.org>
-Date: Sat, 18 Aug 2012 13:13:16 +0800
-Message-ID: <CAMVG2stkx3JX__dQ2+EnGB9fqT3wtnaGWvQFUvseK_4Jw+u+KQ@mail.gmail.com>
-Subject: Re: [PATCH v3] Add device ID for Bluetooth on Macbook Pro 2012
-From: Daniel J Blueman <daniel@quora.org>
-To: Henrik Rydberg <rydberg@euromail.se>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH] Bluetooth: Fix establishing ESCO links
+Date: Fri, 17 Aug 2012 21:37:59 -0300
+Message-Id: <1345250279-32158-1-git-send-email-vinicius.gomes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 18 August 2012 01:21, Henrik Rydberg <rydberg@euromail.se> wrote:
-> Hi Daniel,
->
->> Add the device ID for supporting the Macbook Pro 2012 'MacBookPro10,1'.
->> The bluetooth device presents itself as:
->>
->> T:  Bus=02 Lev=04 Prnt=04 Port=02 Cnt=03 Dev#=  8 Spd=12  MxCh= 0
->> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
->> P:  Vendor=05ac ProdID=8286 Rev=00.86
->> S:  Manufacturer=Apple Inc.
->> S:  Product=Bluetooth USB Host Controller
->> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
->> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
->> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
->> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
->>
->> Patch originally written and tested by clipcarl (forums.opensuse.org).
->>
->> Signed-off-by: Daniel J Blueman <daniel@quora.org>
->> Signed-off-by: Henrik Rydberg <rydberg@euromail.se>
->> ---
->
-> I did not sign off this patch. The author is different, the subject
-> and wording is different, the credits are different. It looks like you
-> sent a patch which I subsequently added my SOB to, but that is not the
-> case. Please do not do that.
->
-> If you meant to add your blessing somehow, or if you are the unknown
-> original author, adding an originally-by or tested-by or reviewed-by
-> would be more appropriate.
->
-> Either way, the patch is moot; With Gustavo's commit d81a5d195, the
-> plan is to support this machine via a more generic device entry.
+Commit 4cd2d98340b4f03d5532c30fdaeb451b035429cb "Bluetooth: Simplify
+the connection type handling" broke the creation of ESCO links.
 
-Apologies; my intent was to update your patch [1] description with the
-output Marcel asked (as I have the hardware), but I clarified the
-subject and description also. The actual content is identical of
-course, but I should have cited your post.
+This patch adds a type parameter to hci_connect_sco() so it creates
+the connection of the right kind.
 
-Great to know Gustavo has added support.
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ net/bluetooth/hci_conn.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-Thanks!
-
-Daniel
-
-[1] https://lkml.org/lkml/2012/7/10/150
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 98670b1..3e65c02 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -521,8 +521,8 @@ static struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
+ 	return acl;
+ }
+ 
+-static struct hci_conn *hci_connect_sco(struct hci_dev *hdev, bdaddr_t *dst,
+-				     u8 sec_level, u8 auth_type)
++static struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type,
++				bdaddr_t *dst, u8 sec_level, u8 auth_type)
+ {
+ 	struct hci_conn *acl;
+ 	struct hci_conn *sco;
+@@ -531,9 +531,9 @@ static struct hci_conn *hci_connect_sco(struct hci_dev *hdev, bdaddr_t *dst,
+ 	if (IS_ERR(acl))
+ 		return acl;
+ 
+-	sco = hci_conn_hash_lookup_ba(hdev, SCO_LINK, dst);
++	sco = hci_conn_hash_lookup_ba(hdev, type, dst);
+ 	if (!sco) {
+-		sco = hci_conn_add(hdev, SCO_LINK, dst);
++		sco = hci_conn_add(hdev, type, dst);
+ 		if (!sco) {
+ 			hci_conn_put(acl);
+ 			return ERR_PTR(-ENOMEM);
+@@ -574,7 +574,8 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 	case ACL_LINK:
+ 		return hci_connect_acl(hdev, dst, sec_level, auth_type);
+ 	case SCO_LINK:
+-		return hci_connect_sco(hdev, dst, sec_level, auth_type);
++	case ESCO_LINK:
++		return hci_connect_sco(hdev, type, dst, sec_level, auth_type);
+ 	}
+ 
+ 	return ERR_PTR(-EINVAL);
 -- 
-Daniel J Blueman
+1.7.11.4
+
