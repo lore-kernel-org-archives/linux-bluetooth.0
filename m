@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Subject: [PATCH BlueZ v3 11/15] gdbus: Integrates ObjectManager with Properties interface
-Date: Sat, 18 Aug 2012 03:50:58 -0300
-Message-Id: <1345272662-2850-12-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ v3 10/15] gdbus: Only export ObjectManager interface on root path
+Date: Sat, 18 Aug 2012 03:50:57 -0300
+Message-Id: <1345272662-2850-11-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1345272662-2850-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1345272662-2850-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,61 +12,61 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This appends the properties and its values when using ObjectManager.
+ObjectManager should be exported only in the root path and list all
+the children paths.
 ---
- gdbus/object.c | 28 +++++++++++++++++++++++++++-
- 1 file changed, 27 insertions(+), 1 deletion(-)
+ gdbus/object.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
 diff --git a/gdbus/object.c b/gdbus/object.c
-index 69bad68..b9c5db0 100644
+index 11c317f..69bad68 100644
 --- a/gdbus/object.c
 +++ b/gdbus/object.c
-@@ -418,10 +418,28 @@ static void reset_parent(gpointer data, gpointer user_data)
- 	child->parent = parent;
+@@ -456,6 +456,10 @@ static void emit_interfaces_added(struct generic_data *data)
+ 	if (parent == NULL)
+ 		return;
+ 
++	/* Find root data */
++	while (parent->parent)
++		parent = parent->parent;
++
+ 	signal = dbus_message_new_signal(parent->path,
+ 					DBUS_INTERFACE_OBJECT_MANAGER,
+ 					"InterfacesAdded");
+@@ -835,6 +839,10 @@ static void emit_interfaces_removed(struct generic_data *data)
+ 	if (parent == NULL)
+ 		return;
+ 
++	/* Find root data */
++	while (parent->parent)
++		parent = parent->parent;
++
+ 	signal = dbus_message_new_signal(parent->path,
+ 					DBUS_INTERFACE_OBJECT_MANAGER,
+ 					"InterfacesRemoved");
+@@ -971,6 +979,8 @@ static void append_object(gpointer data, gpointer user_data)
+ 								&child->path);
+ 	append_interfaces(child, &entry);
+ 	dbus_message_iter_close_container(array, &entry);
++
++	g_slist_foreach(child->objects, append_object, user_data);
  }
  
-+static void append_property(struct interface_data *iface,
-+			const GDBusPropertyTable *p, DBusMessageIter *dict)
-+{
-+	DBusMessageIter entry, value;
-+
-+	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY, NULL,
-+								&entry);
-+	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &p->name);
-+	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT, p->type,
-+								&value);
-+
-+	p->get(p, &value, iface->user_data);
-+
-+	dbus_message_iter_close_container(&entry, &value);
-+	dbus_message_iter_close_container(dict, &entry);
-+}
-+
- static void append_properties(struct interface_data *data,
- 							DBusMessageIter *iter)
- {
- 	DBusMessageIter dict;
-+	const GDBusPropertyTable *p;
+ static DBusMessage *get_objects(DBusConnection *connection,
+@@ -1085,8 +1095,11 @@ static struct generic_data *object_path_ref(DBusConnection *connection,
+ 	add_interface(data, DBUS_INTERFACE_INTROSPECTABLE, introspect_methods,
+ 						NULL, NULL, data, NULL);
  
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
- 				DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-@@ -429,7 +447,15 @@ static void append_properties(struct interface_data *data,
- 				DBUS_TYPE_VARIANT_AS_STRING
- 				DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+-	add_interface(data, DBUS_INTERFACE_OBJECT_MANAGER, manager_methods,
+-					manager_signals, NULL, data, NULL);
++	/* Only root path export ObjectManager interface */
++	if (data->parent == NULL)
++		add_interface(data, DBUS_INTERFACE_OBJECT_MANAGER,
++					manager_methods, manager_signals,
++					NULL, data, NULL);
  
--	/* TODO: list properties */
-+	for (p = data->properties; p && p->name; p++) {
-+		if (p->get == NULL)
-+			continue;
-+
-+		if (p->exists != NULL && !p->exists(p, data->user_data))
-+			continue;
-+
-+		append_property(data, p, &dict);
-+	}
- 
- 	dbus_message_iter_close_container(iter, &dict);
- }
+ 	add_interface(data, DBUS_INTERFACE_PROPERTIES, properties_methods,
+ 					properties_signals, NULL, data, NULL);
 -- 
 1.7.11.5
 
