@@ -1,44 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAKZqhqci7s16ofKQundHwTU=cEAJ-xsnVjNe7AYZciS8d1LyxQ@mail.gmail.com>
-References: <CAKZqhqe-Go8T+LTvq48PL7FbLs8ffa7oySnC1Em7pK+nuoEQvw@mail.gmail.com>
-	<CABBYNZ+0+XrPcq9WGZpehOMLPZ_NBHaukpX3CWfQDkCunVdtVw@mail.gmail.com>
-	<CAM4ayVD5_GHr8PxE3E5dCNB9-+hHTSSh98rug-=YGmQ7+BLtjQ@mail.gmail.com>
-	<CAKZqhqci7s16ofKQundHwTU=cEAJ-xsnVjNe7AYZciS8d1LyxQ@mail.gmail.com>
-Date: Sat, 18 Aug 2012 18:52:23 +0200
-Message-ID: <CAKZqhqfEbuFELtqCkz2yz_YfoA8HNvxDMqT39h4X-V+CKxm7sQ@mail.gmail.com>
-Subject: Re: GSoC: OBEX Filesystem In Userspace
-From: dmp <dmp0x7c5@gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Gomes <vcgomes@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ v3 15/15] audio: device: Use DBus.Properties
+Date: Sat, 18 Aug 2012 03:51:02 -0300
+Message-Id: <1345272662-2850-16-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1345272662-2850-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1345272662-2850-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello BlueZ Community,
+---
+ audio/device.c | 48 ++++++++++++++++++------------------------------
+ 1 file changed, 18 insertions(+), 30 deletions(-)
 
-After Summer of Code we are reaching firm 'pencils down' date.
+diff --git a/audio/device.c b/audio/device.c
+index 9507eac..ec6dc43 100644
+--- a/audio/device.c
++++ b/audio/device.c
+@@ -279,9 +279,8 @@ static void device_set_state(struct audio_device *dev, audio_state_t new_state)
+ 		g_dbus_send_message(dev->conn, reply);
+ 	}
+ 
+-	emit_property_changed(dev->conn, dev->path,
+-				AUDIO_INTERFACE, "State",
+-				DBUS_TYPE_STRING, &state_str);
++	g_dbus_emit_property_changed(dev->conn, dev->path,
++						AUDIO_INTERFACE, "State");
+ }
+ 
+ static gboolean avdtp_connect_timeout(gpointer user_data)
+@@ -586,48 +585,37 @@ static DBusMessage *dev_disconnect(DBusConnection *conn, DBusMessage *msg,
+ 	return NULL;
+ }
+ 
+-static DBusMessage *dev_get_properties(DBusConnection *conn, DBusMessage *msg,
++static gboolean dev_prop_exists_state(const GDBusPropertyTable *property,
+ 								void *data)
+ {
+ 	struct audio_device *device = data;
+-	DBusMessage *reply;
+-	DBusMessageIter iter;
+-	DBusMessageIter dict;
+-	const char *state;
++	const char *state = state2str(device->priv->state);
+ 
+-	reply = dbus_message_new_method_return(msg);
+-	if (!reply)
+-		return NULL;
+-
+-	dbus_message_iter_init_append(reply, &iter);
++	return state != NULL;
++}
+ 
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++static gboolean dev_prop_get_state(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct audio_device *device = data;
++	const char *state = state2str(device->priv->state);
+ 
+-	/* State */
+-	state = state2str(device->priv->state);
+-	if (state)
+-		dict_append_entry(&dict, "State", DBUS_TYPE_STRING, &state);
++	if (state == NULL)
++		return FALSE;
+ 
+-	dbus_message_iter_close_container(&iter, &dict);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &state);
+ 
+-	return reply;
++	return TRUE;
+ }
+ 
+ static const GDBusMethodTable dev_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, dev_connect) },
+ 	{ GDBUS_METHOD("Disconnect", NULL, NULL, dev_disconnect) },
+-	{ GDBUS_METHOD("GetProperties",
+-		NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
+-		dev_get_properties) },
+ 	{ }
+ };
+ 
+-static const GDBusSignalTable dev_signals[] = {
+-	{ GDBUS_SIGNAL("PropertyChanged",
+-			GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
++static const GDBusPropertyTable dev_properties[] = {
++	{ "State", "s", dev_prop_get_state, NULL, dev_prop_exists_state },
+ 	{ }
+ };
+ 
+@@ -653,7 +641,7 @@ struct audio_device *audio_device_register(DBusConnection *conn,
+ 
+ 	if (!g_dbus_register_interface(dev->conn, dev->path,
+ 					AUDIO_INTERFACE,
+-					dev_methods, dev_signals, NULL,
++					dev_methods, NULL, dev_properties,
+ 					dev, NULL)) {
+ 		error("Unable to register %s on %s", AUDIO_INTERFACE,
+ 								dev->path);
+-- 
+1.7.11.5
 
-Taking sentence from project's proposal: "Creating project using gobex
-will prove that library used by obexd has all the capabilities that
-open-obex has". I could definitely agree that gobex+glib based fuse
-filesystem - could replace obexfs. Prepared gobexfuse allows to
-listfolder, get, put, delete, mkdirs and move/copy files. From the
-user's point of view mounted gobexfuse behaves like local filesystem,
-just access time to larger files is noticeably slower due to bluetooth
-transfer.
-
-I've prepared (mentioned in previous e-mail) helpers middle layer
-between fuse and gobex operations. All functions declared by helpers.h
-could be easily used to write tool like obexftp (from openobex
-implementation). One think that I couldn't get tested (it's
-implemented) is rename operation (executed by g_obex_move).
-Unfortunately neither of my bluetooth devices supports this operation
-with their FTP profiles.
-
-Currently, with help from Vinicius code should be adopted to be in a
-reviewable state and then we could think about integration with obexd
-upstream.
-
-Thanks,
-Michal
