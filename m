@@ -1,52 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ v3 00/15] gdbus: DBus.Properties + ObjectManager
-Date: Sat, 18 Aug 2012 03:50:47 -0300
-Message-Id: <1345272662-2850-1-git-send-email-lucas.demarchi@profusion.mobi>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <20120817172130.GA940@polaris.bitmath.org>
+References: <1345182286-21776-1-git-send-email-daniel@quora.org>
+	<20120817172130.GA940@polaris.bitmath.org>
+Date: Sat, 18 Aug 2012 13:13:16 +0800
+Message-ID: <CAMVG2stkx3JX__dQ2+EnGB9fqT3wtnaGWvQFUvseK_4Jw+u+KQ@mail.gmail.com>
+Subject: Re: [PATCH v3] Add device ID for Bluetooth on Macbook Pro 2012
+From: Daniel J Blueman <daniel@quora.org>
+To: Henrik Rydberg <rydberg@euromail.se>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey,
-	
-here is a third version of the changes planned to gdbus. In contrary to
-previous versions, this patch set includes also the Object Manager, since the
-PropertiesChanged signal was made on top of it.
+On 18 August 2012 01:21, Henrik Rydberg <rydberg@euromail.se> wrote:
+> Hi Daniel,
+>
+>> Add the device ID for supporting the Macbook Pro 2012 'MacBookPro10,1'.
+>> The bluetooth device presents itself as:
+>>
+>> T:  Bus=02 Lev=04 Prnt=04 Port=02 Cnt=03 Dev#=  8 Spd=12  MxCh= 0
+>> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+>> P:  Vendor=05ac ProdID=8286 Rev=00.86
+>> S:  Manufacturer=Apple Inc.
+>> S:  Product=Bluetooth USB Host Controller
+>> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+>> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+>> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+>> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+>> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+>>
+>> Patch originally written and tested by clipcarl (forums.opensuse.org).
+>>
+>> Signed-off-by: Daniel J Blueman <daniel@quora.org>
+>> Signed-off-by: Henrik Rydberg <rydberg@euromail.se>
+>> ---
+>
+> I did not sign off this patch. The author is different, the subject
+> and wording is different, the credits are different. It looks like you
+> sent a patch which I subsequently added my SOB to, but that is not the
+> case. Please do not do that.
+>
+> If you meant to add your blessing somehow, or if you are the unknown
+> original author, adding an originally-by or tested-by or reviewed-by
+> would be more appropriate.
+>
+> Either way, the patch is moot; With Gustavo's commit d81a5d195, the
+> plan is to support this machine via a more generic device entry.
 
-The first two patches are cosmetics to the other ones and somehow independent.
+Apologies; my intent was to update your patch [1] description with the
+output Marcel asked (as I have the hardware), but I clarified the
+subject and description also. The actual content is identical of
+course, but I should have cited your post.
 
-The last two patches are examples on how we would use the API after the conversion.
+Great to know Gustavo has added support.
 
-DBus.Properties.Set() is async now. We pass the message on so user can use it
-to create the reply or error message.
+Thanks!
 
-Lucas De Marchi (10):
-  gdbus: Move typedefs up
-  gdbus: Define macros to add annotations
-  gdbus: Add skeleton of DBus.Properties interface
-  gdbus: Implement DBus.Properties.Get method
-  gdbus: Implement DBus.Properties.GetAll method
-  gdbus: Implement DBus.Properties.Set method
-  gdbus: Add properties into Introspectable interface
-  gdbus: Implement PropertiesChanged signal
-  control: Use DBus.Properties
-  audio: device: Use DBus.Properties
+Daniel
 
-Luiz Augusto von Dentz (5):
-  gdbus: Add support for org.freedesktop.DBus.ObjectManager interface
-  gdbus: Group interface changes to reduce the amount of signals
-    emitted
-  gdbus: Only export ObjectManager interface on root path
-  gdbus: Integrates ObjectManager with Properties interface
-  gdbus: Simplify code for appending properties
-
- audio/control.c |  56 ++--
- audio/device.c  |  48 ++--
- gdbus/gdbus.h   |  66 +++--
- gdbus/object.c  | 783 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
- 4 files changed, 797 insertions(+), 156 deletions(-)
-
+[1] https://lkml.org/lkml/2012/7/10/150
 -- 
-1.7.11.5
-
+Daniel J Blueman
