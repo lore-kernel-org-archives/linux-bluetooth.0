@@ -1,22 +1,147 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Mon, 20 Aug 2012 18:19:12 -0700
-Message-ID: <CACUGKYPK6qhJNdpk6-bXaxj2DsUvkvquXQzLZTNDOBmrx3+r7Q@mail.gmail.com>
-Subject: gatt-example plugin
-From: John Tobias <john.tobias.ph@gmail.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [RFC v2 BlueZ] doc: Introduce Alert API
+Date: Mon, 20 Aug 2012 14:05:46 -0400
+Message-Id: <1345485946-22668-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1344450186-14961-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1344450186-14961-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Guys,
+This API will be implemented and initially used by Phone Alert Status
+and Alert Notification GATT profiles (server role).
+---
+ doc/alert-api.txt |  119 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 119 insertions(+)
+ create mode 100644 doc/alert-api.txt
 
-I was playing with bluez-4.99 for LE. After setting the "EnableGatt to
-true" and re-start the bluetoothd, I was able to connect to the
-advertised services of the bluez. But, I could not figured out how to
-access/load the gatt_example plugin and access the services. Any
-information how to do it?
+diff --git a/doc/alert-api.txt b/doc/alert-api.txt
+new file mode 100644
+index 0000000..4ead9e8
+--- /dev/null
++++ b/doc/alert-api.txt
+@@ -0,0 +1,119 @@
++BlueZ D-Bus Alert API description
++*********************************
++
++Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
++
++Introduction
++------------
++
++Currently, there are two different GATT server profiles that depend on
++receiving alerts or notifications from the platform: Phone Alert Status (PASP)
++and Alert Notification (ANP). PASP is very specific to mobile phones, and also
++allows limited control to alerts (i.e. mute once or switch to a silent mode).
++
++This document presents a unified API that allows to register and notify alerts,
++and to control some alerts (using the provided agent object).
++
++
++Alert hierarchy
++===============
++
++Service		org.bluez
++Interface	org.bluez.Alert
++Object path	/org/bluez
++
++Methods		void RegisterAlert(string category, object agent)
++
++			Register a new alert category and an agent for it. This
++			means the application will be responsible for notifying
++			BlueZ of any alerts of that category, using the
++			NewAlert() method.
++
++			Supported ANP categories: simple, email, news, call,
++				missed_call, sms_mms, voice_mail, schedule,
++				high_priority, instant_message
++			Supported PASP categories: ringer, vibrate, display
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++		void NewAlert(string category, uint16 count, string description)
++
++			Notify BlueZ of new alert(s) for the given category. The
++			description is relative to the last received alert and
++			can be sender name, caller ID, title, or other
++			information specific to the category.
++
++			For ringer, vibrate and display categories, valid
++			descriptions are "active" and "not active". Alerts from
++			ringer category also accept "enabled" and "disabled",
++			depending on whether ringer is in silent mode or not.
++
++			If there is no description, an empty string can be
++			used.
++
++			The count argument contains the number of alerts not
++			yet acknowledged by the user on the UI. To save D-Bus
++			traffic, events that may generate multiple alerts at
++			the same time (like email, sms, news) should trigger a
++			single NewAlert().
++
++			PASP alerts should always set count to 1.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++		void UnreadAlert(string category, uint16 count)
++
++			Some services (like SMS and e-mail) keep track of
++			number of unread items. This method allows to update
++			this counter, so peer devices can be notified using
++			Alert Notification Profile.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++Alert Agent hierarchy
++=====================
++
++Service		org.bluez
++Interface	org.bluez.AlertAgent
++Object path	freely definable
++
++Methods		void MuteOnce()
++
++			This method is only called if "ringer" alert category
++			is specified when registering the agent.
++
++			Mute the ringer once (e.g. during a incoming call). If
++			ringer is not active, does nothing.
++
++		void SetRinger(string mode)
++
++			This method is only called if "ringer" alert category
++			is specified when registering the agent.
++
++			Set ringer to the specified mode. If mode is "enabled",
++			ringer is set to the default mode, as defined by the
++			current active profile. If mode is "disabled", ringer
++			will not activate on incoming calls, until it is set
++			back to "enabled" mode.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++		void Suspend(string category)
++
++			Suspend alerts for this category, which means that
++			new/unread alerts should not be reported to save D-Bus
++			traffic. This means that no client has enabled this
++			alert yet.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++		void Resume(string category)
++
++			Resume alerts for this category.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++		void Release()
++
++			Release this agent. At this point, it will be not used
++			by BlueZ anymore and can be destroyed by the owner.
+-- 
+1.7.9.5
 
-Thanks,
-
-John
