@@ -1,51 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 Aug 2012 20:44:30 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v0 00/10] GATT plugin: Service Changed and MTU
- exchange
-Message-ID: <20120820174430.GA3976@x220.P-661HNU-F1>
-References: <1345483375-27621-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1345483375-27621-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <CAAHv3KG6NteONyJ1oM9Lakc=iMBGc0OZvpDKB-YTeN7ugjvd2w@mail.gmail.com>
+References: <CAAHv3KHnRM=7WYgy-teqUZfFYNoGPdkOb0dgf3t4XiuYtoUOOA@mail.gmail.com>
+ <CAAHv3KG6NteONyJ1oM9Lakc=iMBGc0OZvpDKB-YTeN7ugjvd2w@mail.gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 20 Aug 2012 14:44:03 -0300
+Message-ID: <CAMOw1v5vTZpCYwCMSZjUmGYE65W63rKVH8r5_6Z43reNrPq02w@mail.gmail.com>
+Subject: Re: Setting up an A2DP server
+To: Niklas Claesson <nicke.claesson@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+On Fri, Aug 17, 2012 at 6:50 PM, Niklas Claesson
+<nicke.claesson@gmail.com> wrote:
+> I've actually solved the issue myself by writing an Agent that accepts
 
-On Mon, Aug 20, 2012, Claudio Takahasi wrote:
-> This patch series implements Service Changed attribute of the remote
-> Generic Attribute Profile Service, and the MTU exchange sub-procedure.
-> 
-> Service Changed characteristic is used to indicate to connected devices
-> that services have changed (i.e., added, removed or modified).
-> 
-> The MTU exchange sub-procedure is used by the client to set the ATT_MTU
-> to the maximum possible value that can be supported by both devices when
-> the client supports a value greater than the default ATT_MTU for the
-> Attribute Protocol. BlueZ host will always start this sub-procedure when
-> the ATT channel is established.
-> 
-> Claudio Takahasi (10):
->   gatt: Add Service Changed read
->   gatt: Add Service Changed CCC discovery
->   gatt: Enable indication for Service Changed
->   gatt: Confirm the indication received
->   gatt: Start Discover Services when handle changes
->   core: Rename update_services
->   core: Add updating GATT services
->   gatt: Primary service interval may not change
->   core: Rename services_changed to uuids_changed
->   gatt: Add MTU exchange procedure
-> 
->  attrib/gatt.h       |    1 +
->  profiles/gatt/gas.c |  214 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  src/device.c        |  101 +++++++++++++++++++------
->  src/device.h        |    2 +
->  4 files changed, 295 insertions(+), 23 deletions(-)
+You could mark the device as trusted, so you don't have to do this.
 
-All patches in this set have been applied. Thanks.
 
-Johan
+> all incoming requests, and another python script that polls 'pacmd
+> list-sources' every 2 seconds for new bluetooth sources. And third and
+
+Why do you need this?
+
+
+Lucas De Marchi
