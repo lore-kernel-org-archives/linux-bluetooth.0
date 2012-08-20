@@ -1,164 +1,156 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20120818181429.GA30527@echo>
-References: <1345272662-2850-1-git-send-email-lucas.demarchi@profusion.mobi>
- <1345272662-2850-14-git-send-email-lucas.demarchi@profusion.mobi> <20120818181429.GA30527@echo>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 20 Aug 2012 10:38:58 -0300
-Message-ID: <CAMOw1v49Pa-ffg2+CNxVKzVU9cecKz6kdDVMUXT6PxtczWuZLg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 13/15] gdbus: Implement PropertiesChanged signal
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20120816192440.GC25826@x220.P-661HNU-F1>
+References: <1345109702-5698-1-git-send-email-chen.ganir@ti.com>
+	<1345109702-5698-2-git-send-email-chen.ganir@ti.com>
+	<20120816113941.GA20887@x220>
+	<502CE43C.7040804@ti.com>
+	<20120816124410.GB24627@x220>
+	<502CEDA7.2040908@ti.com>
+	<20120816192440.GC25826@x220.P-661HNU-F1>
+Date: Mon, 20 Aug 2012 16:03:29 +0300
+Message-ID: <CABBYNZ+bn__fjNMSwix3J7ntRyTahEQca+z9EeWg2PPEwt3S1A@mail.gmail.com>
+Subject: Re: [PATCH v4 01/10] Battery: Add Battery Service Gatt Client
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Chen Ganir <chen.ganir@ti.com>, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Aug 18, 2012 at 3:14 PM, Vinicius Costa Gomes
-<vinicius.gomes@openbossa.org> wrote:
-> Hi Lucas,
->
-> On 03:51 Sat 18 Aug, Lucas De Marchi wrote:
->> ---
->>  gdbus/gdbus.h  |   4 +++
->>  gdbus/object.c | 108 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
->>  2 files changed, 110 insertions(+), 2 deletions(-)
->
-> [snip]
->
->> @@ -1397,3 +1405,99 @@ gboolean g_dbus_emit_signal_valist(DBusConnection *connection,
->>       return emit_signal_valist(connection, path, interface,
->>                                                       name, type, args);
->>  }
->> +
->> +static void process_properties_from_interface(struct generic_data *data,
->> +                                             struct interface_data *iface)
->> +{
->> +     GSList *l;
->> +     DBusMessage *signal;
->> +     DBusMessageIter iter, dict, array;
->> +
->> +     if (iface->pending_prop == NULL)
->> +             return;
->> +
->> +     signal = dbus_message_new_signal(data->path,
->> +                     DBUS_INTERFACE_PROPERTIES, "PropertiesChanged");
->> +     if (signal == NULL) {
->> +             error("Unable to allocate new " DBUS_INTERFACE_PROPERTIES
->> +                                             ".PropertiesChanged signal");
->> +             return;
->> +     }
->> +
->> +     iface->pending_prop = g_slist_reverse(iface->pending_prop);
->> +
->> +     dbus_message_iter_init_append(signal, &iter);
->> +     dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &iface->name);
->> +     dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
->> +                     DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
->> +                     DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
->> +                     DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
->> +
->> +     for (l = iface->pending_prop; l != NULL; l = l->next) {
->> +             GDBusPropertyTable *p = l->data;
->> +
->> +             if (p->get == NULL)
->> +                     continue;
->> +
->> +             if (p->exists != NULL && !p->exists(p, iface->user_data))
->> +                     continue;
->
-> I was thinking about if the following scenario where I want a property that
-> only gets notified when it changes, but I can't do Get() on it is something
-> that we want to support. (Yeah, using signals makes more sense for this, but
-> the question remains ;-))
->
-> I was with the impression that that was one of the purposes of the exists()
-> method.
+Hi Chen, Johan,
 
-Yeah... I'm not sure we're going to support these. I need  to convert
-the other places to the new DBus.Properties to see if this is needed.
-If it indeed is, then I'll write a separate patch to put this property
-in the list of invalidated properties.
-
-
+On Thu, Aug 16, 2012 at 10:24 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Chen,
 >
-> Anyway, looks good to me.
->
->> +
->> +             append_property(iface, p, &dict);
->> +     }
->> +
->> +     dbus_message_iter_close_container(&iter, &dict);
->> +     dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
->> +                             DBUS_TYPE_STRING_AS_STRING, &array);
->> +     dbus_message_iter_close_container(&iter, &array);
-
-Here... this is the empty array that we are sending now. If we need
-the case above I'll fill it here.
-
-Thanks
-Lucas De Marchi
-
->> +
->> +     g_dbus_send_message(data->conn, signal);
->> +
->> +     g_slist_free(iface->pending_prop);
->> +     iface->pending_prop = NULL;
->> +}
->> +
->> +static void process_property_changes(struct generic_data *data)
->> +{
->> +     GSList *l;
->> +
->> +     for (l = data->interfaces; l != NULL; l = l->next) {
->> +             struct interface_data *iface = l->data;
->> +
->> +             process_properties_from_interface(data, iface);
->> +     }
->> +
->> +     data->pending_prop = FALSE;
->> +}
->> +
->> +void g_dbus_emit_property_changed(DBusConnection *connection,
->> +                             const char *path, const char *interface,
->> +                             const char *name)
->> +{
->> +     const GDBusPropertyTable *property;
->> +     struct generic_data *data;
->> +     struct interface_data *iface;
->> +
->> +     if (!dbus_connection_get_object_path_data(connection, path,
->> +                                     (void **) &data) || data == NULL)
->> +             return;
->> +
->> +     iface = find_interface(data->interfaces, interface);
->> +     if (iface == NULL)
->> +             return;
->> +
->> +     property = find_property(iface->properties, name);
->> +     if (property == NULL) {
->> +             error("Could not find property %s in %p", name,
->> +                                                     iface->properties);
->> +             return;
->> +     }
->> +
->> +     data->pending_prop = TRUE;
->> +     iface->pending_prop = g_slist_prepend(iface->pending_prop,
->> +                                             (void *) property);
->> +
->> +     if (!data->process_id) {
->> +             data->process_id = g_idle_add(process_changes, data);
->> +             return;
->> +     }
->> +}
->> --
->> 1.7.11.5
+> On Thu, Aug 16, 2012, Chen Ganir wrote:
+>> >>However, i fail to understand why the object manager prevents this
+>> >>from getting accepted - do you have a time estimation when the
+>> >>object manager should be active or available ?
+>> >
+>> >By the time of our next release (as per the content under the BlueZ 5
+>> >section in our TODO file).
 >>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> Is there anywhere some documentation or instructions how to adapt
+>> the API for the new object manager ? Is it backward compatible to
+>> what we have today ? Do we really hold back DBUS additions until we
+>> change the DBUS API ?
 >
+> As an unrelated thing (but since I saw it in your commit messages too):
+> please spell D-Bus as D-Bus, not DBUS, DBus, or anything else in natural
+> written language. This keeps it consistent with the rest of our
+> documentation as well as how the D-Bus project itself spells the name.
 >
-> Cheers,
-> --
-> Vinicius
+> Regarding the Object Manager interface the implementation details you'd
+> get from Lucas and Luiz who are working on it whereas the API spec is
+> available here:
+>
+> http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-objectmanager
+
+With object manager we have to keep 2 things in mind while designing
+new interfaces:
+
+1. In case of returning new objects, as in CreateDevice, always
+include the interfaces and properties e.g. D-Bus signature oa{sa{sv}}
+(we will probably have a gdbus helper to do that) which is the
+equivalent to InterfacesAdded signal. This avoid having to call
+GetManagedObjects.
+2. No need to keep a list of objects or emit signals when one is
+created/destroyed, gdbus will take care of this automatically.
+
+Now if this is really relevant here Im not sure.
+
+>> >>I prefer this way of putting the batteries below the device, since it
+>> >>is obvious which battery belongs to each device.
+>> >
+>> >I fully agree with this. It's not what I had an issue with. However, if
+>> >we really want to make this clear you could additionally have a "Device"
+>> >property for each battery object pointing back to the parent object.
+>> I can do that, if it helps. Although it is not necessary, since the
+>> object path for a battery already contains the device objec path in
+>> it :
+>> [variable prefix]/{hci0,..}/dev_XX_XX_XX_XX_XX_XX/BATT-NN-DDDD
+>> Adding a device object path as a property will be redundant.
+>
+> Even though we do have such a hierarchical construction of the paths I
+> don't think we should encourage this kind of magic tricks in trying look
+> into actual values of object paths to infer their relation to each
+> other. However, since the battery object paths would be discovered
+> through the device object there might not be any need for such a
+> backwards reference.
+>
+>> >>The other option i can think of is to have another interface
+>> >>registered on the device object path:
+>> >>
+>> >>Service             org.bluez
+>> >>Interface   org.bluez.Batteries
+>> >>Object path [variable prefix]/{hci0,..}/dev_XX_XX_XX_XX_XX_XX
+>> >>
+>> >>Methods     dict GetProperties()
+>> >>
+>> >>            Returns all properties for the interface. See the
+>> >>            Properties section for the available properties.
+>> >>
+>> >>Signals             ProperyChanged(string name, variant value)
+>> >>
+>> >>            This signal indicates a changed value of the given
+>> >>            property.
+>> >>
+>> >>Properties  array{object} Batteries [readonly]
+>> >>
+>> >>            List of device battery object paths that represents the available
+>> >>batteries on the remote devices.
+>> >>
+>> >>
+>> >>Service             org.bluez
+>> >>Interface   org.bluez.Battery
+>> >>Object path [variable prefix]/{hci0,..}/dev_XX_XX_XX_XX_XX_XX/BATT-NN-DDDD
+>> >>
+>> >>
+>> >>Methods     dict GetProperties()
+>> >>
+>> >>            Returns all properties for the interface. See the
+>> >>            Properties section for the available properties.
+>> >>
+>> >>Signals             PropertyChanged(string name, variant value)
+>> >>
+>> >>            This signal indicates a changed value of the given
+>> >>            property.
+>> >>
+>> >>Properties  byte Level [readonly]
+>> >>
+>> >>                    Battery level (0-100).
+>> >>
+>> >>Any other suggestion ?
+>> >
+>> >That would work, although both of these interfaces are rather
+>> >light-weight in that they only contain a single property which begs the
+>> >question whether this is a bit over-kill.
+>> I know. I believe so as well, but if you want to separate the
+>> interfaces, it is a must.
+>>
+>> >
+>> >Another option is to do away with the per-battery object somehow and
+>> >expose all batteries through a single interface. I'm not so sure that's
+>> >a good idea though since it could prevent future extensibility of the
+>> >API and doesn't reuse the common tools we have for object-like
+>> >abstractions (which a battery certainly is).
+>> If we do what you suggest, a battery name (namespace+descriptor)
+>> will be the property name, and the value should be the battery
+>> level. i'm not too comfortable with it, and it is different than
+>> what we used to do up until now.
+>>
+>> So where do we go from here ?
+>
+> Some extra opinions/view points could help. Maybe Marcel or Luiz have
+> some preferences/ideas on how to do this.
+
+Im trying to think how having multiple objects could be useful for the
+UI, most likely it only gonna show a single meter aggregating all the
+batteries.
+
+Another thing that worth adding is that there are other profiles that
+do support battery status such as HFP and AVRCP, so I think this
+should be made generic enough so other sources could be supported.
+
+-- 
+Luiz Augusto von Dentz
