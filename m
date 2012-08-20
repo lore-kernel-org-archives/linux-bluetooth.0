@@ -2,56 +2,45 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0 4/4] gatt: Don't raise error if declaration was found
-Date: Mon, 20 Aug 2012 14:32:22 -0300
-Message-Id: <1345483942-27973-5-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 3/4] gatt: Return not found if characteritics is empty
+Date: Mon, 20 Aug 2012 14:32:21 -0300
+Message-Id: <1345483942-27973-4-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1345483942-27973-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1345483942-27973-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch avoids raising errors to the upper layer if at least one
-characteristic declaration has been found. According to the Core SPEC
-Characteristic declarations shall be read without authentication or
-authorization.
+This patch changes the behaviour of Discover All Characteristics and
+Discover Characteristics by UUID returning <<Attribute Not Found>> when
+Characteristic list that matches the defined criteria is empty. This
+scenario can happen when the GATT client avoids extra iteraction with
+the remote attribute server if the last received handle(or handle + 1)
+is equal to the end handle of the primary service.
 ---
- attrib/gatt.c |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+ attrib/gatt.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
 diff --git a/attrib/gatt.c b/attrib/gatt.c
-index aea59ec..6880e2d 100644
+index 9ab283f..aea59ec 100644
 --- a/attrib/gatt.c
 +++ b/attrib/gatt.c
-@@ -253,7 +253,7 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
- {
- 	struct discover_char *dc = user_data;
- 	struct att_data_list *list;
--	unsigned int i, err;
-+	unsigned int i, err = ATT_ECODE_ATTR_NOT_FOUND;
- 	size_t buflen;
- 	uint8_t *buf;
- 	guint16 oplen;
-@@ -261,7 +261,7 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
- 	uint16_t last = 0;
- 
- 	if (status) {
--		err = status == ATT_ECODE_ATTR_NOT_FOUND ? 0 : status;
-+		err = status;
- 		goto done;
+@@ -302,7 +302,6 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
  	}
  
-@@ -320,9 +320,9 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+ 	att_data_list_free(list);
+-	err = 0;
+ 
+ 	if (last != 0 && (last + 1 < dc->end)) {
+ 		buf = g_attrib_get_buffer(dc->attrib, &buflen);
+@@ -321,6 +320,8 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
  		return;
  	}
  
--	err = (dc->characteristics ? 0 : ATT_ECODE_ATTR_NOT_FOUND);
--
- done:
-+	err = (dc->characteristics ? 0 : err);
++	err = (dc->characteristics ? 0 : ATT_ECODE_ATTR_NOT_FOUND);
 +
+ done:
  	dc->cb(dc->characteristics, err, dc->user_data);
  	discover_char_free(dc);
- }
 -- 
 1.7.8.6
 
