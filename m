@@ -1,52 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1345272662-2850-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1345272662-2850-1-git-send-email-lucas.demarchi@profusion.mobi>
-Date: Mon, 20 Aug 2012 10:56:25 +0300
-Message-ID: <CABBYNZLNQUEiXgt1=TfoOE+fEigm4aNJR9haWAdNPMfPayH3CQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 00/15] gdbus: DBus.Properties + ObjectManager
+In-Reply-To: <CAKZqhqfEbuFELtqCkz2yz_YfoA8HNvxDMqT39h4X-V+CKxm7sQ@mail.gmail.com>
+References: <CAKZqhqe-Go8T+LTvq48PL7FbLs8ffa7oySnC1Em7pK+nuoEQvw@mail.gmail.com>
+	<CABBYNZ+0+XrPcq9WGZpehOMLPZ_NBHaukpX3CWfQDkCunVdtVw@mail.gmail.com>
+	<CAM4ayVD5_GHr8PxE3E5dCNB9-+hHTSSh98rug-=YGmQ7+BLtjQ@mail.gmail.com>
+	<CAKZqhqci7s16ofKQundHwTU=cEAJ-xsnVjNe7AYZciS8d1LyxQ@mail.gmail.com>
+	<CAKZqhqfEbuFELtqCkz2yz_YfoA8HNvxDMqT39h4X-V+CKxm7sQ@mail.gmail.com>
+Date: Mon, 20 Aug 2012 10:17:10 +0300
+Message-ID: <CABBYNZKwosFmtx+4b82R2LkY_EyC1QYGM3Yjv-Hah-r-wcV50g@mail.gmail.com>
+Subject: Re: GSoC: OBEX Filesystem In Userspace
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
+To: dmp <dmp0x7c5@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Vinicius Gomes <vcgomes@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Michal,
 
-On Sat, Aug 18, 2012 at 9:50 AM, Lucas De Marchi
-<lucas.demarchi@profusion.mobi> wrote:
-> Hey,
+On Sat, Aug 18, 2012 at 7:52 PM, dmp <dmp0x7c5@gmail.com> wrote:
+> Hello BlueZ Community,
 >
-> here is a third version of the changes planned to gdbus. In contrary to
-> previous versions, this patch set includes also the Object Manager, since the
-> PropertiesChanged signal was made on top of it.
+> After Summer of Code we are reaching firm 'pencils down' date.
 >
-> The first two patches are cosmetics to the other ones and somehow independent.
+> Taking sentence from project's proposal: "Creating project using gobex
+> will prove that library used by obexd has all the capabilities that
+> open-obex has". I could definitely agree that gobex+glib based fuse
+> filesystem - could replace obexfs. Prepared gobexfuse allows to
+> listfolder, get, put, delete, mkdirs and move/copy files. From the
+> user's point of view mounted gobexfuse behaves like local filesystem,
+> just access time to larger files is noticeably slower due to bluetooth
+> transfer.
 >
-> The last two patches are examples on how we would use the API after the conversion.
->
-> DBus.Properties.Set() is async now. We pass the message on so user can use it
-> to create the reply or error message.
+> I've prepared (mentioned in previous e-mail) helpers middle layer
+> between fuse and gobex operations. All functions declared by helpers.h
+> could be easily used to write tool like obexftp (from openobex
+> implementation). One think that I couldn't get tested (it's
+> implemented) is rename operation (executed by g_obex_move).
+> Unfortunately neither of my bluetooth devices supports this operation
+> with their FTP profiles.
 
-Another thing we discussed was getter to be async as well, but this
-had several implications:
+You can try against obexd, it does support move and copy action commands.
 
-1. Properties should be cacheable and by that it means the client can
-listen to PropertiesChanged after it knows about the initial value.
-
-2. In case of GetAll and GetManagedObjects where all properties are
-fetched it would be extremely difficult to deal with getter being
-async, each property could cause a delay in the response and in the
-meantime the properties already fetched could have changed.
-
-3. The error cases, when the getter fails, are complicated even more
-by libdbus not supporting changes to its items already in the
-iterator, so we would have to workaround this.
-
-So a property which the value is initially unknown by server should
-either be omitted or don't be exported as a property if the value
-cannot be cached consistently.
 
 -- 
 Luiz Augusto von Dentz
