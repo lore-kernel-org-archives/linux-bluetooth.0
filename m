@@ -2,62 +2,120 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0 09/10] core: Rename services_changed to uuids_changed
-Date: Mon, 20 Aug 2012 14:22:54 -0300
-Message-Id: <1345483375-27621-10-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 07/10] core: Add updating GATT services
+Date: Mon, 20 Aug 2012 14:22:52 -0300
+Message-Id: <1345483375-27621-8-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1345483375-27621-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1345483375-27621-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch renames the services_changed function to uuids_changed to
-avoid misinterpretation. "Service Changed" expression is used to refer
-to a GATT operation used to notify clients that a given attribute range
-in the GATT server is not valid anymore.
+This patch adds the functions to manage Profiles added, and removed
+after a Discover All Primary Services procedure.
 ---
- src/device.c |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+ src/device.c |   64 ++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 files changed, 56 insertions(+), 8 deletions(-)
 
 diff --git a/src/device.c b/src/device.c
-index c4b5554..7b44e27 100644
+index 57e7897..8626ad6 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -1409,7 +1409,7 @@ static void device_remove_drivers(struct btd_device *device, GSList *uuids)
- 		sdp_list_free(records, (sdp_free_func_t) sdp_record_free);
+@@ -1532,6 +1532,46 @@ static void update_bredr_services(struct browse_req *req, sdp_list_t *recs)
+ 	}
  }
  
--static void services_changed(struct btd_device *device)
-+static void uuids_changed(struct btd_device *device)
++static gint primary_cmp(gconstpointer a, gconstpointer b)
++{
++	return memcmp(a, b, sizeof(struct gatt_primary));
++}
++
++static void update_gatt_services(struct browse_req *req, GSList *current,
++								GSList *found)
++{
++	GSList *l, *lmatch, *left = g_slist_copy(current);
++
++	/* Added Profiles */
++	for (l = found; l; l = g_slist_next(l)) {
++		struct gatt_primary *prim = l->data;
++
++		/* Entry found ? */
++		lmatch = g_slist_find_custom(current, prim, primary_cmp);
++		if (lmatch) {
++			left = g_slist_remove(left, lmatch->data);
++			continue;
++		}
++
++		/* New entry */
++		req->profiles_added = g_slist_append(req->profiles_added,
++							g_strdup(prim->uuid));
++
++		DBG("UUID Added: %s", prim->uuid);
++	}
++
++	/* Removed Profiles */
++	for (l = left; l; l = g_slist_next(l)) {
++		struct gatt_primary *prim = l->data;
++		req->profiles_removed = g_slist_append(req->profiles_removed,
++							g_strdup(prim->uuid));
++
++		DBG("UUID Removed: %s", prim->uuid);
++	}
++
++	g_slist_free(left);
++}
++
+ static void store_profiles(struct btd_device *device)
  {
- 	DBusConnection *conn = get_dbus_connection();
- 	char **uuids;
-@@ -1689,7 +1689,7 @@ static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
- 		device_remove_drivers(device, req->profiles_removed);
+ 	struct btd_adapter *adapter = device->adapter;
+@@ -1830,11 +1870,17 @@ done:
+ 	return FALSE;
+ }
  
- 	/* Propagate services changes */
--	services_changed(req->device);
-+	uuids_changed(req->device);
++static void device_unregister_services(struct btd_device *device)
++{
++	attrib_client_unregister(device->services);
++	g_slist_free_full(device->services, g_free);
++	device->services = NULL;
++}
++
+ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
+ {
+ 	struct browse_req *req = user_data;
+ 	struct btd_device *device = req->device;
+-	GSList *l, *uuids = NULL;
  
- send_reply:
- 	if (!req->msg)
-@@ -1910,7 +1910,7 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
+ 	if (status) {
+ 		if (req->msg) {
+@@ -1848,20 +1894,22 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
+ 
+ 	device_set_temporary(device, FALSE);
+ 
+-	for (l = services; l; l = l->next) {
+-		struct gatt_primary *prim = l->data;
++	if (device->services)
++		device_unregister_services(device);
+ 
+-		uuids = g_slist_append(uuids, prim->uuid);
+-	}
++	update_gatt_services(req, device->primaries, services);
++	g_slist_free_full(device->primaries, g_free);
++	device->primaries = NULL;
+ 
+ 	device_register_services(req->conn, device, g_slist_copy(services), -1);
+-	device_probe_drivers(device, uuids);
++	if (req->profiles_removed)
++		device_remove_drivers(device, req->profiles_removed);
++
++	device_probe_drivers(device, req->profiles_added);
+ 
  	if (device->attios == NULL && device->attios_offline == NULL)
  		attio_cleanup(device);
  
--	services_changed(device);
-+	uuids_changed(device);
+-	g_slist_free(uuids);
+-
+ 	services_changed(device);
  	if (req->msg)
  		create_device_reply(device, req);
- 
-@@ -2971,7 +2971,7 @@ void btd_device_add_uuid(struct btd_device *device, const char *uuid)
- 	g_slist_free(uuid_list);
- 
- 	store_profiles(device);
--	services_changed(device);
-+	uuids_changed(device);
- }
- 
- const sdp_record_t *btd_device_get_record(struct btd_device *device,
 -- 
 1.7.8.6
 
