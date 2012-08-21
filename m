@@ -1,40 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAMOw1v5vTZpCYwCMSZjUmGYE65W63rKVH8r5_6Z43reNrPq02w@mail.gmail.com>
-References: <CAAHv3KHnRM=7WYgy-teqUZfFYNoGPdkOb0dgf3t4XiuYtoUOOA@mail.gmail.com>
-	<CAAHv3KG6NteONyJ1oM9Lakc=iMBGc0OZvpDKB-YTeN7ugjvd2w@mail.gmail.com>
-	<CAMOw1v5vTZpCYwCMSZjUmGYE65W63rKVH8r5_6Z43reNrPq02w@mail.gmail.com>
-Date: Tue, 21 Aug 2012 17:13:46 +0200
-Message-ID: <CAAHv3KF8Vnz+iT0_OviJqUYUrNH=2ygMNH-GAxhc5H=H89euTw@mail.gmail.com>
-Subject: Re: Setting up an A2DP server
-From: Niklas Claesson <nicke.claesson@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1345550923.13726.84.camel@aeonflux>
+References: <1345533815-5611-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1345537878.29868.185.camel@pohly-mobl1.fritz.box>
+	<CANT-zCV9exkSjQhvGqLVqdBL+GBvNG97EUnPGo55_AaAO60P+A@mail.gmail.com>
+	<1345550923.13726.84.camel@aeonflux>
+Date: Tue, 21 Aug 2012 14:15:56 +0200
+Message-ID: <CANT-zCXU2mF93PBYc=BiamFfxdbbG5jvUpQbZmR21n38__Dsgw@mail.gmail.com>
+Subject: Re: [PATCH obexd v0] client-doc: Guarantee prefix in transfer paths
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Patrick Ohly <patrick.ohly@intel.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2012/8/20 Lucas De Marchi <lucas.demarchi@profusion.mobi>:
-> On Fri, Aug 17, 2012 at 6:50 PM, Niklas Claesson
-> <nicke.claesson@gmail.com> wrote:
->> I've actually solved the issue myself by writing an Agent that accepts
->
-> You could mark the device as trusted, so you don't have to do this.
+Hi Marcel,
 
-I don't know which devices will connect, perhaps I could mark all
-nearby devices as trusted. But I don't know how I would do that.
+On Tue, Aug 21, 2012 at 2:08 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Mikel,
+>
+>> >> The client D-Bus documentation should mention that all transfer paths
+>> >> contain a prefix consisting of the path of the session they belong to.
+>> >>
+>> >> This can be conveniently used by clients to install D-Bus signal matches
+>> >> that concentrate on the relevant signals.
+>> >> ---
+>> >>  doc/client-api.txt |    2 +-
+>> >>  1 files changed, 1 insertions(+), 1 deletions(-)
+>> >>
+>> >> diff --git a/doc/client-api.txt b/doc/client-api.txt
+>> >> index 839a78c..7ca65cc 100644
+>> >> --- a/doc/client-api.txt
+>> >> +++ b/doc/client-api.txt
+>> >> @@ -466,7 +466,7 @@ Transfer hierarchy
+>> >>
+>> >>  Service              org.bluez.obex.client
+>> >>  Interface    org.bluez.obex.Transfer
+>> >> -Object path  [variable prefix]/{transfer0,transfer1,...}
+>> >> +Object path  [variable prefix]/{session0,session1,...}/{transfer0,...}
+>> >>
+>> >>  Methods              dict GetProperties()
+>> >
+>> > It would be even better to explicitly mention that the "[variable
+>> > prefix]" here is the same as the "[variable prefix]" in the Session.
+>>
+>> This documentation pattern can be widely found in Obexd and Bluez, as
+>> well as oFono. It's implicit that the variable prefix matches in both
+>> cases.
+>
+> it actually means that you can not count on this prefix. It might change
+> and it is perfect legal that it changes from one run of the daemon to
+> another. The variable prefix is discovered via some defined initial
+> method.
 
->
->
->> all incoming requests, and another python script that polls 'pacmd
->> list-sources' every 2 seconds for new bluetooth sources. And third and
->
-> Why do you need this?
+Indeed, you cannot rely on a stable prefix across different runs and
+clients should not try to parse these strings, but you do have
+relationships between objects that are guaranteed in the object path.
 
-I have to set the bluetooth device as current source in Pulseaudio.
+In this case you do know that, as long as the session is active (and
+obviously the daemon is running), the session path will be an exact
+prefix of the transfer path.
 
->
->
-> Lucas De Marchi
+> Remember that I intermixed the PID in the object path of BlueZ. Simple
+> because people started hardcoding object paths.
 
-Niklas Claesson
+Yes, we need to be careful to avoid clients making false assumptions
+about these paths.
+
+Cheers,
+Mikel
