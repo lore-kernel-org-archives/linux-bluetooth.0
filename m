@@ -1,47 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 21 Aug 2012 16:12:16 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: mgmt: Fix returning a list with invalid
- indexes
-Message-ID: <20120821191216.GB14471@samus>
-References: <1344988788-16378-1-git-send-email-vinicius.gomes@openbossa.org>
- <20120821181029.GA14471@samus>
+Date: Tue, 21 Aug 2012 15:56:06 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Dean Jenkins <djenkins@mvista.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/4] Bluetooth: Avoid rfcomm_session_timeout using freed
+ pointer
+Message-ID: <20120821185606.GF17005@joana>
+References: <1344710830-10301-1-git-send-email-djenkins@mvista.com>
+ <1344710830-10301-4-git-send-email-djenkins@mvista.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120821181029.GA14471@samus>
+In-Reply-To: <1344710830-10301-4-git-send-email-djenkins@mvista.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Dean,
 
-On 15:10 Tue 21 Aug, Vinicius Costa Gomes wrote:
-> Hi,
+* Dean Jenkins <djenkins@mvista.com> [2012-08-11 19:47:09 +0100]:
+
+> rfcomm_session_timeout() protects the scenario of the remote
+> Bluetooth device failing to send a DISC on the rfcomm control
+> channel after the last data DLC channel has been closed.
 > 
-> On 20:59 Tue 14 Aug, Vinicius Costa Gomes wrote:
-> > When a device is in the HCI_SETUP state, it was being counted as
-> > a valid device, but it wasn't included in the list returned to
-> > userspace.
-> > 
-> > This can be reproduced when you add an adapter after doing
-> > 'rfkill block all', for example.
-> > 
-> > This commit also has the (intended) effect of making
-> > 'btmgmt power on' work after the rfkill block has been lifted.
-> > 
-> > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> There is a race condition between the timer expiring causing
+> rfcomm_session_timeout() to run and the rfcomm session being
+> deleted. If the rfcomm session is deleted then
+> rfcomm_session_timeout() would use a freed rfcomm session
+> pointer resulting in a potential kernel crash or memory corruption.
+> Note the timer is cleared before the rfcomm session is deleted
+> by del_timer() so the circumstances for a failure to occur are
+> as follows:
 > 
-> bump :-)
+> rfcomm_session_timeout() needs to be executing before the
+> del_timer() is called to clear the timer but
+> rfcomm_session_timeout() needs to be delayed from using the
+> rfcomm session pointer until after the session has been deleted.
+> Therefore, there is a very small window of opportunity for failure.
+> 
+> The solution is to use del_timer_sync() instead of del_timer()
+> as this ensures that rfcomm_session_timeout() is not running
+> when del_timer_sync() returns. This means that it is not
+> possible for rfcomm_session_timeout() to run after the rfcomm
+> session has been deleted.
 
+> 
+> Signed-off-by: Dean Jenkins <djenkins@mvista.com>
+> ---
+>  net/bluetooth/rfcomm/core.c |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+> index 24d4d3c..c7921fd 100644
+> --- a/net/bluetooth/rfcomm/core.c
+> +++ b/net/bluetooth/rfcomm/core.c
+> @@ -264,8 +264,8 @@ static void rfcomm_session_clear_timer(struct rfcomm_session *s)
+>  {
+>  	BT_DBG("session %p state %ld", s, s->state);
+>  
+> -	if (timer_pending(&s->timer))
+> -		del_timer(&s->timer);
+> +	/* ensure rfcomm_session_timeout() is not running past this point */
+> +	del_timer_sync(&s->timer);
 
-Please ignore this patch.
+I'm not happy of the idea of let the stack broken between patches 2 and 3
+(this one). As you said if we use del_timer_sync() we don't need rfcnt here,
+can you add this as a first patch, maybe? and after this continue to remove
+the rest of the refcount code?
 
-As discussed on IRC, seems that the right solution would be to fix the
-num_controllers parameters to not count devices in the HCI_SETUP state
-and do a proper power on on the device when it leaves the rfkill blocked
-state.
-
-
-Cheers,
--- 
-Vinicius
+	Gustavo
