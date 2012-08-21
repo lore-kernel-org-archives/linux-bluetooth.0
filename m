@@ -1,46 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 21 Aug 2012 16:12:16 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: mgmt: Fix returning a list with invalid
+ indexes
+Message-ID: <20120821191216.GB14471@samus>
+References: <1344988788-16378-1-git-send-email-vinicius.gomes@openbossa.org>
+ <20120821181029.GA14471@samus>
 MIME-Version: 1.0
-In-Reply-To: <ac8af0be1001202354i7f1a98dbw55c56fc65f878358@mail.gmail.com>
-References: <fbf08281001110908s2c3412m456b3aa980b8ca10@mail.gmail.com>
- <fbf08281001111105pc2f0d3au61d0e205e1689ec2@mail.gmail.com>
- <fbf08281001131539l342a3062w70883c197dc52983@mail.gmail.com>
- <fbf08281001201158q23d13d9bj930a66271c527b43@mail.gmail.com> <ac8af0be1001202354i7f1a98dbw55c56fc65f878358@mail.gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Tue, 21 Aug 2012 19:46:04 -0300
-Message-ID: <CAMOw1v7Jtv0H0ZqWO=1sH+QnG78gcu8VO4pR2PE+q3XLDqWOHQ@mail.gmail.com>
-Subject: Re: [RFC] HFP support into oFono and BlueZ
-To: ofono@ofono.org
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	zhenhua.zhang@intel.com
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120821181029.GA14471@samus>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Zhao,
+Hi,
 
-On Thu, Jan 21, 2010 at 5:54 AM, Zhao Forrest <forrest.zhao@gmail.com> wrote:
-> Your patch removes many DBus APIs provided by audio/gateway.c, which
-> was originally designed to provide a set of DBus functions/signals for
-> ease of application development. In other words, your patch is too
-> oFono-specific, and is not a general support for HFP HF unit role in
-> BlueZ IMO. The DBus interface provided by your patch is not easy to
-> develop the application because the application developer has to parse
-> the AT commands by himself. I know that oFono could parse AT commands.
-> But I don't think it a common case for other application developers.
-> Why not extend audio/gateway.c instead of removing its DBus APIs or
-> create a new file to support HFP for oFono in blueZ?
->
-> I think maybe Marcel would have more comments on this to give a clear direction.
-
-First of all, please don't top-post to this list.
-
-Applications developers don't have to parse the AT commands by
-themselves but rather use a telephony stack that implements the DBus
-APIs.
-
-This is kind of an agent (as in the pairing process)  that anyone
-could implement. oFono implements it, so it's 1 option.
+On 15:10 Tue 21 Aug, Vinicius Costa Gomes wrote:
+> Hi,
+> 
+> On 20:59 Tue 14 Aug, Vinicius Costa Gomes wrote:
+> > When a device is in the HCI_SETUP state, it was being counted as
+> > a valid device, but it wasn't included in the list returned to
+> > userspace.
+> > 
+> > This can be reproduced when you add an adapter after doing
+> > 'rfkill block all', for example.
+> > 
+> > This commit also has the (intended) effect of making
+> > 'btmgmt power on' work after the rfkill block has been lifted.
+> > 
+> > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> 
+> bump :-)
 
 
-Lucas De Marchi
+Please ignore this patch.
+
+As discussed on IRC, seems that the right solution would be to fix the
+num_controllers parameters to not count devices in the HCI_SETUP state
+and do a proper power on on the device when it leaves the rfkill blocked
+state.
+
+
+Cheers,
+-- 
+Vinicius
