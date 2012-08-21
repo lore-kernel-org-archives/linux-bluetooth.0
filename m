@@ -1,32 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Tomasz Bursztyka <tomasz.bursztyka@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Tomasz Bursztyka <tomasz.bursztyka@linux.intel.com>
-Subject: [PATCH 4/5] network: Kill underlying session's connection before freeing it
-Date: Tue, 21 Aug 2012 13:45:54 +0300
-Message-Id: <1345545955-13144-5-git-send-email-tomasz.bursztyka@linux.intel.com>
-In-Reply-To: <1345545955-13144-1-git-send-email-tomasz.bursztyka@linux.intel.com>
-References: <1345545955-13144-1-git-send-email-tomasz.bursztyka@linux.intel.com>
+MIME-Version: 1.0
+In-Reply-To: <CACUGKYPK6qhJNdpk6-bXaxj2DsUvkvquXQzLZTNDOBmrx3+r7Q@mail.gmail.com>
+References: <CACUGKYPK6qhJNdpk6-bXaxj2DsUvkvquXQzLZTNDOBmrx3+r7Q@mail.gmail.com>
+Date: Tue, 21 Aug 2012 06:41:07 -0400
+Message-ID: <CAJdJm_OC4dcjY-yY4=LsNebeuAFnst4QxCO6oLCLATm9zTHVLA@mail.gmail.com>
+Subject: Re: gatt-example plugin
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: John Tobias <john.tobias.ph@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- profiles/network/server.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+Hi John,
 
-diff --git a/profiles/network/server.c b/profiles/network/server.c
-index 5d64ee2..1b9989d 100644
---- a/profiles/network/server.c
-+++ b/profiles/network/server.c
-@@ -598,6 +598,8 @@ static void server_remove_sessions(struct network_server *ns)
- 
- 		bnep_del_from_bridge(session->dev, ns->bridge);
- 		bnep_if_down(session->dev);
-+
-+		bnep_kill_connection(&session->dst);
- 	}
- 
- 	g_slist_free_full(ns->sessions, session_free);
+On Mon, Aug 20, 2012 at 9:19 PM, John Tobias <john.tobias.ph@gmail.com> wrote:
+> Hello Guys,
+>
+> I was playing with bluez-4.99 for LE. After setting the "EnableGatt to
+> true" and re-start the bluetoothd, I was able to connect to the
+> advertised services of the bluez. But, I could not figured out how to
+> access/load the gatt_example plugin and access the services. Any
+> information how to do it?
+
+First, make sure that gatt_example plugin was compiled into
+bluetoothd. You can check this by looking at the first lines of the
+debug log for this string:
+
+src/plugin.c:add_plugin() Loading gatt_example plugin
+
+As long as you don't pass any "-P" option to bluetoothd, all compiled
+plugins will load by default.
+
+Next, you can test GATT operations from a remote device, e.g. some
+GATT client you already have or the "gatttool" in BlueZ (running on
+another adapter).
+
+Best Regards,
 -- 
-1.7.8.6
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
