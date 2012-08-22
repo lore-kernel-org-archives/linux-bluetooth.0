@@ -5,12 +5,12 @@ References: <1345533815-5611-1-git-send-email-mikel.astiz.oss@gmail.com>
 	<1345537878.29868.185.camel@pohly-mobl1.fritz.box>
 	<CABBYNZLUS-BrZ=FN28gLgrA=1vS1JA-exECd3xgjj2EfPrAuyw@mail.gmail.com>
 	<1345637062.29868.313.camel@pohly-mobl1.fritz.box>
-Date: Wed, 22 Aug 2012 15:52:54 +0300
-Message-ID: <CABBYNZLmM4DNUr031d_2MrDczN+K6-przkUFzWNkR7UTrxWf9w@mail.gmail.com>
+Date: Wed, 22 Aug 2012 14:42:35 +0200
+Message-ID: <CANT-zCVm1AL+1vD7VkrgdO7i80sbe_pWV2B2P5yiGA3+AJ1zuQ@mail.gmail.com>
 Subject: Re: [PATCH obexd v0] client-doc: Guarantee prefix in transfer paths
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: Patrick Ohly <patrick.ohly@intel.com>
-Cc: Mikel Astiz <mikel.astiz.oss@gmail.com>,
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	linux-bluetooth@vger.kernel.org,
 	Mikel Astiz <mikel.astiz@bmw-carit.de>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -19,7 +19,7 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Patrick,
 
-On Wed, Aug 22, 2012 at 3:04 PM, Patrick Ohly <patrick.ohly@intel.com> wrote:
+On Wed, Aug 22, 2012 at 2:04 PM, Patrick Ohly <patrick.ohly@intel.com> wrote:
 > On Wed, 2012-08-22 at 14:39 +0300, Luiz Augusto von Dentz wrote:
 >> Hi Patrick,
 >>
@@ -54,82 +54,34 @@ On Wed, Aug 22, 2012 at 3:04 PM, Patrick Ohly <patrick.ohly@intel.com> wrote:
 > also my understand when reading the API description. Assigning some
 > other meaning to "variable prefix" would break with developer
 > expectations.
-
-But we are not changing that, that why we return the object path to
-you, you will never have to guess it.
-
+>
 > Unless the meaning of "variable prefix" gets redefined, "[variable
 > prefix]/{session0,session1,...}" still doesn't allow the developer to do
 > path_namespace filtering.
-
-Im not sure why this is important? Prefix or variable prefix it does
-not matter, you will not be able to hardcode nor you should be
-constructing a path based on the session prefix, so if you are
-planning to do prefix matching I would strongly advise not to.
-
+>
 > How about this:
 >
 > -Object path  [variable prefix]/{transfer0,transfer1,...}
 > +Object path  [prefix]/{session0,session1,...}/{transfer0,...}"
 > +             with "prefix" as in the corresponding session
->
->> > Using this knowledge efficiently is not always possible, however. D-Bus
->> > itself has a "path_namespace" filter [1], but many D-Bus bindings don't
->> > expose it (Python [2], GIO D-Bus [3]). Therefore a client using those
->> > bindings still has to receive all Transfer signals and do its own
->> > filtering.
->> >
->> > [1] http://dbus.freedesktop.org/doc/dbus-specification.html#message-bus-routing-match-rules
->> > [2] http://dbus.freedesktop.org/doc/dbus-python/api/dbus.connection.Connection-class.html#add_signal_receiver
->> > [3] http://developer.gnome.org/gio/stable/GDBusConnection.html#g-dbus-connection-signal-subscribe
->>
->> Apparently people are not doing a good job with bindings then, arg
->> matching is quite essential to things like NameOwnerChanged, anyway
->> for what is worth even properties have this race condition with values
->> changing in meantime while GetAll/Get/GetProperties is returning, so
->> it seems we need to solve this problem by making the transfer
->> properties unlikely to change so the application have enough time to
->> subscribe to signals.
->
-> "unlikely" doesn't sit well with me. An unlikely failure is still a
-> failure. Tell me if I'm too pedantic here ;-)
 
-I said unlikely because we cannot guarantee that we dont get some
-unexpected event e.g. remote device crash/disconnects.
+>From my point of view, this is beyond the scope of this patch. The
+modification proposed here is in general consistent with the existing
+documentation in the mentioned projects, and in particular with the
+file being modified (see org.bluez.obex.Message).
 
-> I can imagine three ways to address race conditions:
-> 1. Clients subscribe to signals in advance, before any are sent.
+I agree that the exact interpretation of "variable prefix" is
+undocumented, but fixing that has a broad scope affecting several
+projects. See for example org.bluez.Device or org.ofono.VoiceCall.
 
-Can be done already, but it means you have to listen to every transfer
-which can cause you application to wakeup a little too much.
+Personally, I find it relatively obvious that both variable prefixes
+match. Otherwise there would be no reference to the session (or
+BlueZ-adapter, oFono-modem, etc., depending on the case).
 
-> 2. Clients subscribe to signals later *and* check the current state.
-> 3. Clients provide a callback object with methods which get invoked by
->    obexd.
->
-> The second option increases traffic and depends on being able to check
-> the current state. Currently this approach is not possible for Transfer
-> objects because they can get removed before the client checked their
-> state.
+Regarding the lack of support in some bindings, I would say it's not
+critical. After all, we're doing an optimization here (reduce number
+of context-switches). If someone is using a limited binding, then
+there's a performance penalty.
 
-I don't thing this is true, we do return the properties of the
-transfer so you don't need to check the current state just listen for
-changes, btw if you mean a method call for checking the current state
-it does happen to have the same race conditions.
-
-> The third option has the drawback that there's no standard way of
-> letting the client declare which of these methods it wants to have
-> called (in contrast to D-Bus signals). The advantage is that it becomes
-> possible to clean up temp files after completion of the transfer: add an
-> explicit "here's your result" callback method and when that fails,
-> delete the temporary file.
-
-We normally used the term agent for this type of object that is
-registered to act as callback mechanism, in fact this was used before
-and was just replaced with the current design recently as it was
-considered more complicated to the client application to implement and
-did not allow any other application like a download manager to listen
-for transfer progress.
-
--- 
-Luiz Augusto von Dentz
+Cheers,
+Mikel
