@@ -2,102 +2,72 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0 3/8] scan: Add ATTIO callbacks registration
-Date: Wed, 22 Aug 2012 16:45:18 -0300
-Message-Id: <1345664723-30814-4-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 2/8] scan: Register device driver
+Date: Wed, 22 Aug 2012 16:45:17 -0300
+Message-Id: <1345664723-30814-3-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1345664723-30814-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1345664723-30814-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch add the functions to manage ATTIO callbacks. The current
-registration mechanism is not suitable for this service since it needs
-to be passive. Scan Parameters should not actively request connections,
-it needs to be notified if the connections has been established
-requested by other services.
+This patch add the probe and remove callbacks for the GATT Scan
+Parameters service.
 ---
- Makefile.am                  |   3 +-
- profiles/scanparam/manager.c |  26 ++++++++++-
- profiles/scanparam/scan.c    | 103 +++++++++++++++++++++++++++++++++++++++++++
- profiles/scanparam/scan.h    |  26 +++++++++++
- 4 files changed, 156 insertions(+), 2 deletions(-)
- create mode 100644 profiles/scanparam/scan.c
- create mode 100644 profiles/scanparam/scan.h
+ Makefile.am                  |  4 ++-
+ profiles/scanparam/main.c    |  4 ++-
+ profiles/scanparam/manager.c | 65 ++++++++++++++++++++++++++++++++++++++++++++
+ profiles/scanparam/manager.h | 26 ++++++++++++++++++
+ 4 files changed, 97 insertions(+), 2 deletions(-)
+ create mode 100644 profiles/scanparam/manager.c
+ create mode 100644 profiles/scanparam/manager.h
 
 diff --git a/Makefile.am b/Makefile.am
-index 0bc97ae..955c78f 100644
+index 161586e..0bc97ae 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -244,7 +244,8 @@ builtin_sources += profiles/thermometer/main.c \
+@@ -242,7 +242,9 @@ builtin_sources += profiles/thermometer/main.c \
+ 			profiles/gatt/main.c profiles/gatt/manager.h \
+ 			profiles/gatt/manager.c profiles/gatt/gas.h \
  			profiles/gatt/gas.c \
- 			profiles/scanparam/main.c \
- 			profiles/scanparam/manager.h \
--			profiles/scanparam/manager.c
-+			profiles/scanparam/manager.c \
-+			profiles/scanparam/scan.h profiles/scanparam/scan.c
+-			profiles/scanparam/main.c
++			profiles/scanparam/main.c \
++			profiles/scanparam/manager.h \
++			profiles/scanparam/manager.c
  endif
  
  builtin_modules += formfactor
-diff --git a/profiles/scanparam/manager.c b/profiles/scanparam/manager.c
-index 365320a..2d33f4b 100644
---- a/profiles/scanparam/manager.c
-+++ b/profiles/scanparam/manager.c
-@@ -26,24 +26,48 @@
- #include <config.h>
- #endif
- 
-+#include <errno.h>
- #include <glib.h>
-+#include <bluetooth/uuid.h>
- 
+diff --git a/profiles/scanparam/main.c b/profiles/scanparam/main.c
+index 6e90929..ba4b2c0 100644
+--- a/profiles/scanparam/main.c
++++ b/profiles/scanparam/main.c
+@@ -33,6 +33,7 @@
  #include "log.h"
- #include "adapter.h"
- #include "device.h"
-+#include "att.h"
-+#include "gattrib.h"
-+#include "gatt.h"
- #include "manager.h"
-+#include "scan.h"
+ #include "plugin.h"
+ #include "hcid.h"
++#include "manager.h"
  
- #define SCAN_PARAMETERS_UUID	"00001813-0000-1000-8000-00805f9b34fb"
- 
-+static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
-+{
-+	const struct gatt_primary *prim = a;
-+	const char *uuid = b;
-+
-+	return g_strcmp0(prim->uuid, uuid);
-+}
-+
- static int scan_param_probe(struct btd_device *device, GSList *uuids)
+ static int scan_param_init(void)
  {
-+	GSList *primaries, *l;
-+
- 	DBG("Probing Scan Parameters");
+@@ -41,11 +42,12 @@ static int scan_param_init(void)
+ 		return -ENOTSUP;
+ 	}
  
 -	return 0;
-+	primaries = btd_device_get_primaries(device);
-+
-+	l = g_slist_find_custom(primaries, SCAN_PARAMETERS_UUID,
-+							primary_uuid_cmp);
-+	if (!l)
-+		return -EINVAL;
-+
-+	return scan_register(device, l->data);
++	return scan_param_manager_init();
  }
  
- static void scan_param_remove(struct btd_device *device)
+ static void scan_param_exit(void)
  {
-+	scan_unregister(device);
++	scan_param_manager_exit();
  }
  
- static struct btd_device_driver scan_driver = {
-diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
+ BLUETOOTH_PLUGIN_DEFINE(scanparam, VERSION,
+diff --git a/profiles/scanparam/manager.c b/profiles/scanparam/manager.c
 new file mode 100644
-index 0000000..5af1e57
+index 0000000..365320a
 --- /dev/null
-+++ b/profiles/scanparam/scan.c
-@@ -0,0 +1,103 @@
++++ b/profiles/scanparam/manager.c
+@@ -0,0 +1,65 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -126,86 +96,48 @@ index 0000000..5af1e57
 +#include <config.h>
 +#endif
 +
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/uuid.h>
++#include <glib.h>
 +
++#include "log.h"
 +#include "adapter.h"
 +#include "device.h"
-+#include "att.h"
-+#include "gattrib.h"
-+#include "gatt.h"
-+#include "attio.h"
-+#include "scan.h"
++#include "manager.h"
 +
-+struct scan {
-+	struct btd_device *device;
-+	GAttrib *attrib;
-+	guint attioid;
-+};
++#define SCAN_PARAMETERS_UUID	"00001813-0000-1000-8000-00805f9b34fb"
 +
-+GSList *servers = NULL;
-+
-+static gint scan_device_cmp(gconstpointer a, gconstpointer b)
++static int scan_param_probe(struct btd_device *device, GSList *uuids)
 +{
-+	const struct scan *scan = a;
-+	const struct btd_device *device = b;
-+
-+	return (device == scan->device ? 0 : -1);
-+}
-+
-+static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
-+{
-+	struct scan *scan = user_data;
-+
-+	scan->attrib = g_attrib_ref(attrib);
-+}
-+
-+static void attio_disconnected_cb(gpointer user_data)
-+{
-+	struct scan *scan = user_data;
-+
-+	g_attrib_unref(scan->attrib);
-+	scan->attrib = NULL;
-+}
-+
-+int scan_register(struct btd_device *device, struct gatt_primary *prim)
-+{
-+	struct scan *scan;
-+
-+	scan = g_new0(struct scan, 1);
-+	scan->device = btd_device_ref(device);
-+	scan->attioid = btd_device_add_attio_callback(device,
-+							attio_connected_cb,
-+							attio_disconnected_cb,
-+							scan);
-+
-+	servers = g_slist_prepend(servers, scan);
++	DBG("Probing Scan Parameters");
 +
 +	return 0;
 +}
 +
-+void scan_unregister(struct btd_device *device)
++static void scan_param_remove(struct btd_device *device)
 +{
-+	struct scan *scan;
-+	GSList *l;
-+
-+	l = g_slist_find_custom(servers, device, scan_device_cmp);
-+	if (l == NULL)
-+		return;
-+
-+	scan = l->data;
-+	servers = g_slist_remove(servers, scan);
-+
-+	btd_device_remove_attio_callback(scan->device, scan->attioid);
-+	btd_device_unref(scan->device);
-+	g_attrib_unref(scan->attrib);
-+	g_free(scan);
 +}
-diff --git a/profiles/scanparam/scan.h b/profiles/scanparam/scan.h
++
++static struct btd_device_driver scan_driver = {
++	.name = "Scan Parameters Client Driver",
++	.uuids = BTD_UUIDS(SCAN_PARAMETERS_UUID),
++	.probe = scan_param_probe,
++	.remove = scan_param_remove,
++};
++
++int scan_param_manager_init(void)
++{
++	return btd_register_device_driver(&scan_driver);
++
++}
++
++void scan_param_manager_exit(void)
++{
++	btd_unregister_device_driver(&scan_driver);
++}
+diff --git a/profiles/scanparam/manager.h b/profiles/scanparam/manager.h
 new file mode 100644
-index 0000000..93f7edd
+index 0000000..1cf2e5e
 --- /dev/null
-+++ b/profiles/scanparam/scan.h
++++ b/profiles/scanparam/manager.h
 @@ -0,0 +1,26 @@
 +/*
 + *
@@ -231,8 +163,8 @@ index 0000000..93f7edd
 + *
 + */
 +
-+int scan_register(struct btd_device *device, struct gatt_primary *prim);
-+void scan_unregister(struct btd_device *device);
++int scan_param_manager_init(void);
++void scan_param_manager_exit(void);
 -- 
 1.7.12
 
