@@ -1,48 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
-From: Syam Sidhardhan <s.syam@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 1/4] build: BlueZ version 4.100 or later is required
-Date: Wed, 22 Aug 2012 21:40:55 +0530
-Message-id: <1345651858-23031-1-git-send-email-s.syam@samsung.com>
+Message-ID: <1345651474.29868.344.camel@pohly-mobl1.fritz.box>
+Subject: PBAP + two-step download
+From: Patrick Ohly <patrick.ohly@intel.com>
+To: Bluez <linux-bluetooth@vger.kernel.org>
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>,
+	Jeremy Whiting <jpwhiting@kde.org>
+Date: Wed, 22 Aug 2012 18:04:34 +0200
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If we use the BlueZ version less than 4.100, then the following
-compilation error happens.
+Hello!
 
-Error:
------
-btio/btio.c: In function ‘l2cap_connect’:
-btio/btio.c:301:6: error: ‘struct sockaddr_l2’ has no member named
- ‘l2_bdaddr_type’
-btio/btio.c: In function ‘parse_set_opts’:
-btio/btio.c:707:19: error: ‘BDADDR_BREDR’ undeclared (first use in
- this function)
-btio/btio.c:707:19: note: each undeclared identifier is reported only
- once for each function it appears in
-make[1]: *** [btio/btio.o] Error 1
-make: *** [all] Error 2
----
- configure.ac |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+For IVI use cases, Mikel and I were discussing how a phone's address
+book could be cached intelligently by an IVI head unit. The rough idea
+is that first all contacts get pulled without PHOTO data. This data is
+used to match the current phone address book with some potentially
+cached local data. Then in a second step, the PHOTO data of all contacts
+is requested (*). This is all done in the same PBAP session, so the
+numbering of contacts is the same in both steps.
 
-diff --git a/configure.ac b/configure.ac
-index 69d71b2..c8e61ac 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -79,8 +79,8 @@ PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.4, dummy=yes,
- AC_SUBST(DBUS_CFLAGS)
- AC_SUBST(DBUS_LIBS)
- 
--PKG_CHECK_MODULES(BLUEZ, bluez >= 4.99, dummy=yes,
--				AC_MSG_ERROR(BlueZ >= 4.99 is required))
-+PKG_CHECK_MODULES(BLUEZ, bluez >= 4.100, dummy=yes,
-+				AC_MSG_ERROR(BlueZ >= 4.100 is required))
- AC_SUBST(BLUEZ_CFLAGS)
- AC_SUBST(BLUEZ_LIBS)
- 
+The goal is to get the essential data (names, phone numbers) quickly and
+then add pictures later on.
+
+There's one problem with the obexd API regarding this: the result of
+PullAll does not include any information about the number that each
+entry has in the current PBAP session.
+
+For example, in the first step I get:
+BEGIN:VCARD
+N:John;;Doe
+END:VCARD
+
+In the second step I get:
+BEGIN:VCARD
+PHOTO:...
+END:VCARD
+
+There is no guarantee that this entry is for the same contact, is it?
+For example, "John Doe" might have been removed in the meantime, to be
+replaced by someone else. The API description also makes no guarantees
+about the ordering of entries.
+
+One could request additional data in the second step (and perhaps phones
+will send it anyway), but doing the matching based on that anew is
+expensive.
+
+Would it be acceptable to extend PullAll() semantics? If the caller
+gives the name of an existing target directory, obexd could write each
+contact into a separate file in that directory, using a <number>.vcf
+naming scheme.
+
+Alternatively, the content of each vcard could be extended with a
+"X-OBEXD-PBAP-NUMBER:x" where x is the number of that vcard.
+
+(*) If there was a way to request only contacts which have a photo, that
+would be used here. Is there something like it? Without it, the entire
+address book needs to be read again with a filter that includes PHOTO
+data and nothing else.
+
 -- 
-1.7.4.1
+Best Regards, Patrick Ohly
+
+The content of this message is my personal opinion only and although
+I am an employee of Intel, the statements I make here in no way
+represent Intel's position on the issue, nor am I authorized to speak
+on behalf of Intel on this matter.
+
 
