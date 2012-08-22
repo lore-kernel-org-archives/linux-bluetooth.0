@@ -1,47 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Shea Levy <shea@shealevy.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH RESEND RESEND] Bluetooth: Add support for Apple MacBook Pro 9,2
-Date: Wed, 22 Aug 2012 19:39:13 -0400
-Message-Id: <1345678753-32753-1-git-send-email-shea@shealevy.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLr1iENopeSbqqiQuryC0T99KkG=Go-K0j9zNca_ijpVQ@mail.gmail.com>
+References: <1345653354-23720-1-git-send-email-s.syam@samsung.com>
+	<1345653354-23720-2-git-send-email-s.syam@samsung.com>
+	<CABBYNZLr1iENopeSbqqiQuryC0T99KkG=Go-K0j9zNca_ijpVQ@mail.gmail.com>
+Date: Thu, 23 Aug 2012 01:36:51 +0300
+Message-ID: <CABBYNZJ37+GoQx66+xD+K9_Lbi4yQZq_TWt_qDMiObdmwUg0AA@mail.gmail.com>
+Subject: Re: [PATCH obexd v1 2/4] build: Require GLib 2.32 or later
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Syam Sidhardhan <s.syam@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-$ usb-devices
-<snip>
-T:  Bus=04 Lev=04 Prnt=04 Port=02 Cnt=01 Dev#=  9 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=05ac ProdID=821d Rev=00.86
-S:  Manufacturer=Apple Inc.
-S:  Product=Bluetooth USB Host Controller
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-<snip>
+Hi Syam,
 
-Signed-off-by: Shea Levy <shea@shealevy.com>
----
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
+On Thu, Aug 23, 2012 at 1:27 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Syam,
+>
+> On Wed, Aug 22, 2012 at 7:35 PM, Syam Sidhardhan <s.syam@samsung.com> wrote:
+>> If we use GLib version less than 2.32 (more precisely < 2.31.2) then
+>> the following build error may occure in a 32 bit.
+>
+> We had the issue with BlueZ but we did not bump the glib version,
+> which makes me wonder if you are able to compile bluetoothd?
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f077f4d..fdddb6e 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -73,6 +73,9 @@ static struct usb_device_id btusb_table[] = {
- 	/* Apple MacBookPro8,2 */
- 	{ USB_DEVICE(0x05ac, 0x821a) },
- 
-+	/* Apple MacBookPro9,2 */
-+	{ USB_DEVICE(0x05ac, 0x821d) },
-+
- 	/* Apple MacMini5,1 */
- 	{ USB_DEVICE(0x05ac, 0x8281) },
- 
+It looks like we fix it with use of a variable:
+
+ commit e34836262ba6a46491b6a760520158d70e8b51b5
+Author: Johan Hedberg <johan.hedberg@intel.com>
+Date:   Wed Oct 12 00:48:59 2011 +0300
+
+    Fix compilation error on 32-bit systems
+
+    This fixes the following compilation error with GLib on 32-bit sytems:
+
+    audio/media.c: In function 'get_setting':
+    audio/media.c:1109:44: error: cast to pointer from integer of
+different size [-Werror=int-to-pointer-cast]
+    audio/media.c: In function 'set_setting':
+    audio/media.c:1132:41: error: cast to pointer from integer of
+different size [-Werror=int-to-pointer-cast]
+
+
 -- 
-1.7.11.4
+Luiz Augusto von Dentz
