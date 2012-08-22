@@ -1,171 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <503568C5.4040000@globaledgesoft.com>
-Date: Wed, 22 Aug 2012 19:18:29 -0400
-From: Ajay KV <ajay.kv@globaledgesoft.com>
 MIME-Version: 1.0
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Re : BLE -Multiple connection
-References: <503545C5.80607@globaledgesoft.com> <CAJdJm_NHy82UOofuQv1jGObJPg4MOj68R3D_xcBjNhCZWdy9Hw@mail.gmail.com>
-In-Reply-To: <CAJdJm_NHy82UOofuQv1jGObJPg4MOj68R3D_xcBjNhCZWdy9Hw@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <1345637062.29868.313.camel@pohly-mobl1.fritz.box>
+References: <1345533815-5611-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1345537878.29868.185.camel@pohly-mobl1.fritz.box>
+	<CABBYNZLUS-BrZ=FN28gLgrA=1vS1JA-exECd3xgjj2EfPrAuyw@mail.gmail.com>
+	<1345637062.29868.313.camel@pohly-mobl1.fritz.box>
+Date: Wed, 22 Aug 2012 15:52:54 +0300
+Message-ID: <CABBYNZLmM4DNUr031d_2MrDczN+K6-przkUFzWNkR7UTrxWf9w@mail.gmail.com>
+Subject: Re: [PATCH obexd v0] client-doc: Guarantee prefix in transfer paths
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Patrick Ohly <patrick.ohly@intel.com>
+Cc: Mikel Astiz <mikel.astiz.oss@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 08/22/2012 08:24 AM, Anderson Lizardo wrote:
-> Hi Ajay,
+Hi Patrick,
+
+On Wed, Aug 22, 2012 at 3:04 PM, Patrick Ohly <patrick.ohly@intel.com> wrote:
+> On Wed, 2012-08-22 at 14:39 +0300, Luiz Augusto von Dentz wrote:
+>> Hi Patrick,
+>>
+>> On Tue, Aug 21, 2012 at 11:31 AM, Patrick Ohly <patrick.ohly@intel.com> wrote:
+>> >> diff --git a/doc/client-api.txt b/doc/client-api.txt
+>> >> index 839a78c..7ca65cc 100644
+>> >> --- a/doc/client-api.txt
+>> >> +++ b/doc/client-api.txt
+>> >> @@ -466,7 +466,7 @@ Transfer hierarchy
+>> >>
+>> >>  Service              org.bluez.obex.client
+>> >>  Interface    org.bluez.obex.Transfer
+>> >> -Object path  [variable prefix]/{transfer0,transfer1,...}
+>> >> +Object path  [variable prefix]/{session0,session1,...}/{transfer0,...}
+>> >>
+>> >>  Methods              dict GetProperties()
+>> >
+>> > It would be even better to explicitly mention that the "[variable
+>> > prefix]" here is the same as the "[variable prefix]" in the Session.
+>> >
+>> > Or perhaps change it like this?
+>> >
+>> > -Object path    [variable prefix]/{transfer0,transfer1,...}
+>> > +Object path    [session prefix]/{transfer0,...}
+>>
+>> Hmm, I prefer the original proposal since that imo looks more clear
+>> how the path is formatted, anyway the point here is that the transfers
+>> are tied to sessions.
 >
-> On Wed, Aug 22, 2012 at 4:49 PM, Ajay KV<ajay.kv@globaledgesoft.com>  wrote:
->>              I think we already discussed about this issue  . following is
->> our previous conversation. please go through it
+> But as Marcel said, "variable prefix" means "no guarantee made about its
+> content, none whatsoever". Without knowing Bluez conventions, that was
+> also my understand when reading the API description. Assigning some
+> other meaning to "variable prefix" would break with developer
+> expectations.
+
+But we are not changing that, that why we return the object path to
+you, you will never have to guess it.
+
+> Unless the meaning of "variable prefix" gets redefined, "[variable
+> prefix]/{session0,session1,...}" still doesn't allow the developer to do
+> path_namespace filtering.
+
+Im not sure why this is important? Prefix or variable prefix it does
+not matter, you will not be able to hardcode nor you should be
+constructing a path based on the session prefix, so if you are
+planning to do prefix matching I would strongly advise not to.
+
+> How about this:
 >
-> Please, try to disable HTML on your email client and send plain text
-> e-mails. It is difficult to follow your discussion with all this HTML.
-> It is very likely people are not helping you because your emails are
-> unreadable for a lot of people here.
+> -Object path  [variable prefix]/{transfer0,transfer1,...}
+> +Object path  [prefix]/{session0,session1,...}/{transfer0,...}"
+> +             with "prefix" as in the corresponding session
 >
-> Much information is missing from your previous messages:
+>> > Using this knowledge efficiently is not always possible, however. D-Bus
+>> > itself has a "path_namespace" filter [1], but many D-Bus bindings don't
+>> > expose it (Python [2], GIO D-Bus [3]). Therefore a client using those
+>> > bindings still has to receive all Transfer signals and do its own
+>> > filtering.
+>> >
+>> > [1] http://dbus.freedesktop.org/doc/dbus-specification.html#message-bus-routing-match-rules
+>> > [2] http://dbus.freedesktop.org/doc/dbus-python/api/dbus.connection.Connection-class.html#add_signal_receiver
+>> > [3] http://developer.gnome.org/gio/stable/GDBusConnection.html#g-dbus-connection-signal-subscribe
+>>
+>> Apparently people are not doing a good job with bindings then, arg
+>> matching is quite essential to things like NameOwnerChanged, anyway
+>> for what is worth even properties have this race condition with values
+>> changing in meantime while GetAll/Get/GetProperties is returning, so
+>> it seems we need to solve this problem by making the transfer
+>> properties unlikely to change so the application have enough time to
+>> subscribe to signals.
 >
-> 1) You did not provide the exact steps you followed (which commands
-> you run after plugging the bluetooth dongle). Therefore it is
-> difficult to reproduce your tests.
-> 2) Your HCI dump output shows just the command giving error. This is
-> not enough, you should provide the entire dump since the adapter was
-> plugged, including the first "B to A" connection you described, and
-> the second LE advertising attempt, otherwise it is not possible to
-> identify at which state the LE controller is when the LE adv. enable
-> command is issued.
+> "unlikely" doesn't sit well with me. An unlikely failure is still a
+> failure. Tell me if I'm too pedantic here ;-)
+
+I said unlikely because we cannot guarantee that we dont get some
+unexpected event e.g. remote device crash/disconnects.
+
+> I can imagine three ways to address race conditions:
+> 1. Clients subscribe to signals in advance, before any are sent.
+
+Can be done already, but it means you have to listen to every transfer
+which can cause you application to wakeup a little too much.
+
+> 2. Clients subscribe to signals later *and* check the current state.
+> 3. Clients provide a callback object with methods which get invoked by
+>    obexd.
 >
-> Also, do you realize that you are not allowed by the current Core spec
-> v4.0 to have one dual mode device connected to another dual mode over
-> the LE link? The spec says that a dual mode device in "connectable
-> mode" (like device "A" in you original scenario) shall not be issuing
-> connectable advertising over the LE channel. This is not enforced by
-> the controller (and we actually do this for testing BlueZ to BlueZ
-> connections over LE), but the spec explicitly forbids it.
->
-> Regards,
+> The second option increases traffic and depends on being able to check
+> the current state. Currently this approach is not possible for Transfer
+> objects because they can get removed before the client checked their
+> state.
 
+I don't thing this is true, we do return the properties of the
+transfer so you don't need to check the current state just listen for
+changes, btw if you mean a method call for checking the current state
+it does happen to have the same race conditions.
 
+> The third option has the drawback that there's no standard way of
+> letting the client declare which of these methods it wants to have
+> called (in contrast to D-Bus signals). The advantage is that it becomes
+> possible to clean up temp files after completion of the transfer: add an
+> explicit "here's your result" callback method and when that fails,
+> delete the temporary file.
 
-Hi Anderson,
+We normally used the term agent for this type of object that is
+registered to act as callback mechanism, in fact this was used before
+and was just replaced with the current design recently as it was
+considered more complicated to the client application to implement and
+did not allow any other application like a download manager to listen
+for transfer progress.
 
-	First of all, sorry for my ignorance . Following are the steps i did in 
-my test case.  i am also using dual mode dongles , so as you said  spec 
-is not allowing us to do  this operation
-
-In device A side:
-
-1: Enable advertise using  hciconfig  hci0 leadv
-2: run "l2test" tool in bluez  as a  server   ( slight modification has 
-been made  in this code, like we are explicitly making cid as 0x04 )
-
-  In Device B side:
-
-1: Enable scanning  using  hcitool lescan
-2: run "l2test -S <bdaddr A>"   as a  client   ( slight modification has 
-been made  in this code, like we are explicitly making cid as 0x04)
-
-      now the LE  connection is established  b/w A and B and data starts 
-transferring
-
-In this state i can not able to enable or disable advertise again , 
-showing "command disallowed"
-
-In Device C side
-
-1; Enabled LE scanning , but device A is not detecting since it is 
-connected to device B
-2: ran  l2test -s <bdaddr A > as client  gives connection timed out
-
-
-   Only essential log messages are given below
-  DEVICE A
-
-< HCI Command: LE Set Advertise Enable (0x08|0x000a) plen 1
-     value 0x01 (advertising enabled)
- > HCI Event: Command Complete (0x0e) plen 4
-     LE Set Advertise Enable (0x08|0x000a) ncmd 1
- > HCI Event: LE Meta Event (0x3e) plen 19
-     LE Connection Complete
-       status 0x00 handle 43, role slave
-
-data  receiving.......
-
-DEVICE B
-< HCI Command: LE Create Connection (0x08|0x000d) plen 25
-     bdaddr 00:1B:DC:05:E0:5D type 0
- > HCI Event: Command Status (0x0f) plen 4
-     LE Create Connection (0x08|0x000d) status 0x00 ncmd 1
- > HCI Event: LE Meta Event (0x3e) plen 19
-     LE Connection Complete
-       status 0x00 handle 64, role master
-
-data sending.......
-
-  Now if tries to enable or disable advertising  in Device A it shows 
-error as follows
-
-root@localhost ~]# hciconfig 0 leadv
-LE set advertise enable on hci0 returned status 12
-
-< HCI Command: LE Set Advertise Enable (0x08|0x000a) plen 1
-     value 0x01 (advertising enabled)
- > HCI Event: Command Complete (0x0e) plen 4
-     LE Set Advertise Enable (0x08|0x000a) ncmd 1
-     status 0x0c pktlen 0x0004 maxpkt 0x38
-     Error: Command Disallowed
-
-
-
-DEVICE C
-
-< HCI Command: LE Create Connection (0x08|0x000d) plen 25
-     bdaddr 00:1B:DC:05:E0:5D type 0
- > HCI Event: Command Status (0x0f) plen 4
-     LE Create Connection (0x08|0x000d) status 0x00 ncmd 1
-< HCI Command: LE Create Connection Cancel (0x08|0x000e)plen 0
- > HCI Event: Command Complete (0x0e) plen 4
-     LE Create Connection Cancel (0x08|0x000e) ncmd 1
- > HCI Event: LE Meta Event (0x3e) plen 19
-     LE Connection Complete
-       status 0x02 handle 0, role master
-
-
-BR,
-   ajay.kv
-
-
-
-
-
-
-
-
-
-
-
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-	
-
-
-
-
+-- 
+Luiz Augusto von Dentz
