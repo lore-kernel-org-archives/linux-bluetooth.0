@@ -1,49 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <503503C1.6060805@globaledgesoft.com>
-References: <5008F67F.5030604@globaledgesoft.com>
-	<CACJA=fUW4a-B-1SGQmPbh+J5YKJ9bVEFbz8ZUezPOD3w0Hmsxw@mail.gmail.com>
-	<502E56DF.3020103@globaledgesoft.com>
-	<CAJdJm_P=4fbHXG7gFpYQht9NmD88nixzO95N-HsgYwUOMx+pig@mail.gmail.com>
-	<502ED4E8.9040702@globaledgesoft.com>
-	<CAJdJm_OBh4OzKJejongsaWm1mSx2GN5Yki3B4nYc6C2DbVS=nw@mail.gmail.com>
-	<503503C1.6060805@globaledgesoft.com>
-Date: Wed, 22 Aug 2012 06:40:10 -0400
-Message-ID: <CAJdJm_Nj26JGoA6Hjd2kMbP-XSOsub65ZyjK3XB4ybh57D_+9A@mail.gmail.com>
-Subject: Re: BLE - multiple connections
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Ajay KV <ajay.kv@globaledgesoft.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: chanyeol.park@samsung.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH hcidump 2/2] core: set HCI channel explicitly when bind
+Date: Wed, 22 Aug 2012 18:20:45 +0900
+Message-id: <1345627245-19333-2-git-send-email-chanyeol.park@samsung.com>
+In-reply-to: <1345627245-19333-1-git-send-email-chanyeol.park@samsung.com>
+References: <1345627245-19333-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ajay,
+From: Chan-yeol Park <chanyeol.park@samsung.com>
 
-On Wed, Aug 22, 2012 at 12:07 PM, Ajay KV <ajay.kv@globaledgesoft.com> wrote:
->         i could not able to figure it out  yet , why its  showing this error
-> " command disallowed" . Here im using fedora 13 with kernel 2.6.39 . i tried
+---
+ src/hcidump.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-This kernel is too old. For sure a lot of LE stuff will not work
-correctly on it. Can you try compiling your own kernel (latest
-version) and use tha latest BlueZ version with it?
-
-> with both dongles , iogear and cirago . But the result is same.  i dont
-> think that  its something wrong with kernel version, as we  uses hci
-> commands (hciconfig hci0 leadv ) that directly talks with controller .
-> please clear this issue..
-
-Sorry, but I ran out of ideas. Can you describe with more details
-which exact steps are you taking to get the "command disallowed" HCI
-error? I.e. right after you attach the dongle, which commands are you
-issuing.
-
-Also an hcidump showing the entire session (since the dongle is
-attached) should help. Without more information we are not unable to
-help further.
-
-Regards,
+diff --git a/src/hcidump.c b/src/hcidump.c
+index 089d444..7423cdd 100644
+--- a/src/hcidump.c
++++ b/src/hcidump.c
+@@ -590,8 +590,10 @@ static int open_socket(int dev, unsigned long flags)
+ 	memset(&addr, 0, sizeof(addr));
+ 	addr.hci_family = AF_BLUETOOTH;
+ 	addr.hci_dev = dev;
++	addr.hci_channel = HCI_CHANNEL_RAW;
++
+ 	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+-		printf("Can't attach to device hci%d. %s(%d)\n", 
++		printf("Can't attach to device hci%d. %s(%d)\n",
+ 					dev, strerror(errno), errno);
+ 		return -1;
+ 	}
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.9.5
+
