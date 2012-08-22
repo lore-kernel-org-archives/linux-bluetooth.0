@@ -1,183 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 From: chanyeol.park@samsung.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] core: replace NULL by dbus invalid arguments
-Date: Wed, 22 Aug 2012 18:20:37 +0900
-Message-id: <1345627238-19290-2-git-send-email-chanyeol.park@samsung.com>
-In-reply-to: <1345627238-19290-1-git-send-email-chanyeol.park@samsung.com>
-References: <1345627238-19290-1-git-send-email-chanyeol.park@samsung.com>
+Subject: [PATCH 1/3] audio: Remove unused enum values
+Date: Wed, 22 Aug 2012 18:20:36 +0900
+Message-id: <1345627238-19290-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chan-yeol Park <chanyeol.park@samsung.com>
 
-This patch replaces NULL with dbus invalid arguments return
-if dbus method call gets invalid arguments from the peer.
-This will avoid dbus peer coommander's infinite wait.
 ---
- audio/media.c                 |    4 ++--
- audio/transport.c             |    4 ++--
- plugins/service.c             |    8 ++++----
- profiles/network/connection.c |    2 +-
- profiles/network/server.c     |    4 ++--
- src/adapter.c                 |    4 ++--
- src/manager.c                 |    2 +-
- 7 files changed, 14 insertions(+), 14 deletions(-)
+ audio/manager.c |   17 -----------------
+ 1 file changed, 17 deletions(-)
 
-diff --git a/audio/media.c b/audio/media.c
-index ea6d582..b0ea4e9 100644
---- a/audio/media.c
-+++ b/audio/media.c
-@@ -926,7 +926,7 @@ static DBusMessage *unregister_endpoint(DBusConnection *conn, DBusMessage *msg,
- 	if (!dbus_message_get_args(msg, NULL,
- 				DBUS_TYPE_OBJECT_PATH, &path,
- 				DBUS_TYPE_INVALID))
--		return NULL;
-+		return btd_error_invalid_args(msg);
+diff --git a/audio/manager.c b/audio/manager.c
+index 999124d..9db7479 100644
+--- a/audio/manager.c
++++ b/audio/manager.c
+@@ -69,23 +69,6 @@
+ #include "sdpd.h"
+ #include "telephony.h"
  
- 	sender = dbus_message_get_sender(msg);
- 
-@@ -1808,7 +1808,7 @@ static DBusMessage *unregister_player(DBusConnection *conn, DBusMessage *msg,
- 	if (!dbus_message_get_args(msg, NULL,
- 				DBUS_TYPE_OBJECT_PATH, &path,
- 				DBUS_TYPE_INVALID))
--		return NULL;
-+		return btd_error_invalid_args(msg);
- 
- 	sender = dbus_message_get_sender(msg);
- 
-diff --git a/audio/transport.c b/audio/transport.c
-index 832ad2a..d40c92d 100644
---- a/audio/transport.c
-+++ b/audio/transport.c
-@@ -667,7 +667,7 @@ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
- 	if (!dbus_message_get_args(msg, NULL,
- 				DBUS_TYPE_STRING, &accesstype,
- 				DBUS_TYPE_INVALID))
--		return NULL;
-+		return btd_error_invalid_args(msg);
- 
- 	sender = dbus_message_get_sender(msg);
- 
-@@ -704,7 +704,7 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
- 	if (!dbus_message_get_args(msg, NULL,
- 				DBUS_TYPE_STRING, &accesstype,
- 				DBUS_TYPE_INVALID))
--		return NULL;
-+		return btd_error_invalid_args(msg);
- 
- 	sender = dbus_message_get_sender(msg);
- 
-diff --git a/plugins/service.c b/plugins/service.c
-index 9f7bdb7..f16abe7 100644
---- a/plugins/service.c
-+++ b/plugins/service.c
-@@ -422,7 +422,7 @@ static DBusMessage *update_xml_record(DBusConnection *conn,
- 				DBUS_TYPE_UINT32, &handle,
- 				DBUS_TYPE_STRING, &record,
- 				DBUS_TYPE_INVALID) == FALSE)
--		return NULL;
-+		return btd_error_invalid_args(msg);
- 
- 	len = (record ? strlen(record) : 0);
- 	if (len == 0)
-@@ -475,7 +475,7 @@ static DBusMessage *add_service_record(DBusConnection *conn,
- 
- 	if (dbus_message_get_args(msg, NULL,
- 			DBUS_TYPE_STRING, &record, DBUS_TYPE_INVALID) == FALSE)
--		return NULL;
-+		return btd_error_invalid_args(msg);
- 
- 	sender = dbus_message_get_sender(msg);
- 	err = add_xml_record(conn, sender, serv_adapter, record, &handle);
-@@ -509,7 +509,7 @@ static DBusMessage *remove_service_record(DBusConnection *conn,
- 
- 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT32, &handle,
- 						DBUS_TYPE_INVALID) == FALSE)
--		return NULL;
-+		return btd_error_invalid_args(msg);
- 
- 	sender = dbus_message_get_sender(msg);
- 
-@@ -582,7 +582,7 @@ static DBusMessage *request_authorization(DBusConnection *conn,
- 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &address,
- 					DBUS_TYPE_UINT32, &handle,
- 					DBUS_TYPE_INVALID) == FALSE)
--		return NULL;
-+		return btd_error_invalid_args(msg);
- 
- 	sender = dbus_message_get_sender(msg);
- 	if (find_pending_by_sender(serv_adapter, sender))
-diff --git a/profiles/network/connection.c b/profiles/network/connection.c
-index 59423a9..321f567 100644
---- a/profiles/network/connection.c
-+++ b/profiles/network/connection.c
-@@ -400,7 +400,7 @@ static DBusMessage *connection_connect(DBusConnection *conn,
- 
- 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &svc,
- 						DBUS_TYPE_INVALID) == FALSE)
--		return NULL;
-+		return btd_error_invalid_args(msg);
- 
- 	id = bnep_service_id(svc);
- 	nc = find_connection(peer->connections, id);
-diff --git a/profiles/network/server.c b/profiles/network/server.c
-index 8ae608c..9bf2a02 100644
---- a/profiles/network/server.c
-+++ b/profiles/network/server.c
-@@ -607,7 +607,7 @@ static DBusMessage *register_server(DBusConnection *conn,
- 
- 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &uuid,
- 				DBUS_TYPE_STRING, &bridge, DBUS_TYPE_INVALID))
--		return NULL;
-+		return btd_error_invalid_args(msg);
- 
- 	if (g_strcmp0(uuid, "nap"))
- 		return btd_error_failed(msg, "Invalid UUID");
-@@ -642,7 +642,7 @@ static DBusMessage *unregister_server(DBusConnection *conn,
- 
- 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &uuid,
- 							DBUS_TYPE_INVALID))
--		return NULL;
-+		return btd_error_invalid_args(msg);
- 
- 	if (g_strcmp0(uuid, "nap"))
- 		return btd_error_failed(msg, "Invalid UUID");
-diff --git a/src/adapter.c b/src/adapter.c
-index b642e37..69ec821 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1574,7 +1574,7 @@ static DBusMessage *register_agent(DBusConnection *conn, DBusMessage *msg,
- 
- 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
- 			DBUS_TYPE_STRING, &capability, DBUS_TYPE_INVALID))
--		return NULL;
-+		return btd_error_invalid_args(msg);
- 
- 	if (adapter->agent)
- 		return btd_error_already_exists(msg);
-@@ -1604,7 +1604,7 @@ static DBusMessage *unregister_agent(DBusConnection *conn, DBusMessage *msg,
- 
- 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
- 						DBUS_TYPE_INVALID))
--		return NULL;
-+		return btd_error_invalid_args(msg);
- 
- 	name = dbus_message_get_sender(msg);
- 
-diff --git a/src/manager.c b/src/manager.c
-index 4a39461..738bf0b 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -96,7 +96,7 @@ static DBusMessage *find_adapter(DBusConnection *conn,
- 
- 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &pattern,
- 							DBUS_TYPE_INVALID))
--		return NULL;
-+		return btd_error_invalid_args(msg);
- 
- 	/* hci_devid() would make sense to use here, except it is
- 	 * restricted to devices which are up */
+-typedef enum {
+-	HEADSET	= 1 << 0,
+-	GATEWAY	= 1 << 1,
+-	SINK	= 1 << 2,
+-	SOURCE	= 1 << 3,
+-	CONTROL	= 1 << 4,
+-	TARGET	= 1 << 5,
+-	INVALID	= 1 << 6
+-} audio_service_type;
+-
+-typedef enum {
+-		GENERIC_AUDIO = 0,
+-		ADVANCED_AUDIO,
+-		AV_REMOTE,
+-		GET_RECORDS
+-} audio_sdp_state_t;
+-
+ struct audio_adapter {
+ 	struct btd_adapter *btd_adapter;
+ 	gboolean powered;
 -- 
 1.7.9.5
 
