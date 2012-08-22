@@ -1,115 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 22 Aug 2012 16:19:30 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	alexander.smirnov@siemens.com
-Subject: Agenda for Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit 2012
- (Barcelona!)
-Message-ID: <20120822201930.GC14913@tuxdriver.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 8/8] scan: Avoid discover if scan handle is known
+Date: Wed, 22 Aug 2012 16:45:23 -0300
+Message-Id: <1345664723-30814-9-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1345664723-30814-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1345664723-30814-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-All,
+This patch avoids the characteristic discovery for Scan Interval Window
+if the attribute value handle was discovered on a previous interaction.
+---
+ profiles/scanparam/scan.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-The time for our meeting in Barcelona is drawing near.  I think it
-is time that we start nailing-down the agenda.
-
-We have one room on the first day, and three rooms on the second day.
-I figure that the Bluetooth and 802.11 groups should each get a
-break-out room for their own in-depth discussons on the second day and
-the third room can be used for more general topics and presentations.
-
-With that said, there are still a number of slots available for
-presentations or discussion topics.  This is especially true for the
-802.11 group...  Please step-up with some suggested topics!
-
-Below is my strawman agenda proposal.  Please make suggestions for
-improvements!
-
-Day 1
------
-
-Everyone together in a single room...
-
-Time	Topic						Speaker
-----	-----						-------
-0930	Welcome/Intro/Agenda				John Linville
-
-1000	802.15.4 stack, 6lowpan				Alexander Smirnov
-
-1100	Break
-
-1130	Virtual Bluetooth AMP Controller for mac80211	Andrei Emeltchenko
-
-1230	Lunch
-
-1400	NFC "state of the union", etc.			Ortiz / Elias / Chlad
-
-1500	Break
-
-...
-
-1800	Adjourn
-
-
-Day 2
------
-
-802.11 break-out room...
-
-Time	Topic						Speaker
-----	-----						-------
-1000	Regulatory updates				Luis Rodriguez
-
-1100	Break
-
-...
-
-1800	Adjourn
-
-
-Bluetooth break-out room...
-
-Time	Topic						Speaker
-----	-----						-------
-1000	Bluetooth: state of the union			Marcel Holtmann
-
-1100	Break
-
-1130	status and roadmap of Bluetooth LE		Joao Paulo Rechi Vita
-
-1230	Lunch
-
-...
-
-1800	Adjourn
-
-
-Presentation room...
-
-Time	Topic						Speaker
-----	-----						-------
-1000	wireless community networks			Nick Kossifidis
-
-1100	Break
-
-1130	"a short overview what we do in ConnMan"	Wagner / Flykt
-
-1230	Lunch
-
-1400	oFono / mobile wireless				Denis Kenzior
-
-1500	Break
-
-...
-
-1800	Adjourn
-
-
-So...suggestions??
-
+diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
+index f292eb1..788f183 100644
+--- a/profiles/scanparam/scan.c
++++ b/profiles/scanparam/scan.c
+@@ -206,11 +206,16 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ 	struct scan *scan = user_data;
+ 	bt_uuid_t iwin_uuid, refresh_uuid;
+ 
++	scan->attrib = g_attrib_ref(attrib);
++
++	if (scan->iwhandle) {
++		write_scan_params(scan->attrib, scan->iwhandle);
++		return;
++	}
++
+ 	bt_uuid16_create(&iwin_uuid, SCAN_INTERVAL_WIN_UUID);
+ 	bt_uuid16_create(&refresh_uuid, SCAN_REFRESH_UUID);
+ 
+-	scan->attrib = g_attrib_ref(attrib);
+-
+ 	gatt_discover_char(scan->attrib, scan->range.start, scan->range.end,
+ 					&iwin_uuid, iwin_discovered_cb, scan);
+ 
 -- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+1.7.12
+
