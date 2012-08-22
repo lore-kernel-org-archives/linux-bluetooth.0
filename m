@@ -1,49 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 22 Aug 2012 16:41:23 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	alexander.smirnov@siemens.com
+Subject: Re: Agenda for Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
+ 2012 (Barcelona!)
+Message-ID: <20120822204122.GA2196@tuxdriver.com>
+References: <20120822201930.GC14913@tuxdriver.com>
+ <1345667975.8786.0.camel@jlt3.sipsolutions.net>
 MIME-Version: 1.0
-In-Reply-To: <1345237703-15342-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1345237703-15342-1-git-send-email-claudio.takahasi@openbossa.org>
-Date: Wed, 22 Aug 2012 18:28:41 -0300
-Message-ID: <CAKT1EBdUfD8yWpk+JFnxExmKXpPgp_Lmq=BE-hsG3+F5Xp+VAQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v0 0/5] HoG Suspend/Resume
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1345667975.8786.0.camel@jlt3.sipsolutions.net>
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Aug 17, 2012 at 6:08 PM, Claudio Takahasi
-<claudio.takahasi@openbossa.org> wrote:
-> This patch series adds HID Control Point support. This control point
-> allows the report host(BlueZ) to notify the report device(HoG device)
-> when the host is entering or leaving the Suspend Mode.
->
-> The low power Suspend Mode concept is implementation specific. This
-> proposal adds the support for UPower backend. UPower signals Resuming
-> /Sleeping are used to trigger the control point writing.
->
-> Claudio Takahasi (5):
->   hog: Adds initial files for suspend support
->   hog: Add UPower Resuming/Suspending watch
->   hog: Add Suspend/Resume callbacks
->   hog: Move HoG device list to manager
->   hog: Add writting Control Point
->
->  Makefile.am                  |    3 +-
->  profiles/input/hog_device.c  |   73 ++++++++++++++++++++----------
->  profiles/input/hog_device.h  |    9 +++-
->  profiles/input/hog_manager.c |   69 ++++++++++++++++++++++++++++-
->  profiles/input/upower.c      |  101 ++++++++++++++++++++++++++++++++++++++++++
->  profiles/input/upower.h      |   29 ++++++++++++
->  6 files changed, 254 insertions(+), 30 deletions(-)
->  create mode 100644 profiles/input/upower.c
->  create mode 100644 profiles/input/upower.h
->
-> --
-> 1.7.8.6
->
+On Wed, Aug 22, 2012 at 10:39:35PM +0200, Johannes Berg wrote:
+> On Wed, 2012-08-22 at 16:19 -0400, John W. Linville wrote:
+> 
+> > With that said, there are still a number of slots available for
+> > presentations or discussion topics.  This is especially true for the
+> > 802.11 group...  Please step-up with some suggested topics!
+> 
+> Anyone want to carefully review & present Michal's and my work on
+> multi-channel in mac80211? :-)
 
-ping ...
+I would _really_ like to see this.  Anyone (smarter than me) that is
+willing to do this for the group?
 
-Regards,
-Claudio
+John
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
