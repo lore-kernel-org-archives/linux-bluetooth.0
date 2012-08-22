@@ -1,28 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1345667975.8786.0.camel@jlt3.sipsolutions.net>
-Subject: Re: Agenda for Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
- 2012 (Barcelona!)
-From: Johannes Berg <johannes@sipsolutions.net>
-To: "John W. Linville" <linville@tuxdriver.com>
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+Date: Wed, 22 Aug 2012 16:19:30 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
 	alexander.smirnov@siemens.com
-Date: Wed, 22 Aug 2012 22:39:35 +0200
-In-Reply-To: <20120822201930.GC14913@tuxdriver.com> (sfid-20120822_223021_705167_DDBC53BF)
-References: <20120822201930.GC14913@tuxdriver.com>
-	 (sfid-20120822_223021_705167_DDBC53BF)
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: Agenda for Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit 2012
+ (Barcelona!)
+Message-ID: <20120822201930.GC14913@tuxdriver.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2012-08-22 at 16:19 -0400, John W. Linville wrote:
+All,
 
-> With that said, there are still a number of slots available for
-> presentations or discussion topics.  This is especially true for the
-> 802.11 group...  Please step-up with some suggested topics!
+The time for our meeting in Barcelona is drawing near.  I think it
+is time that we start nailing-down the agenda.
 
-Anyone want to carefully review & present Michal's and my work on
-multi-channel in mac80211? :-)
+We have one room on the first day, and three rooms on the second day.
+I figure that the Bluetooth and 802.11 groups should each get a
+break-out room for their own in-depth discussons on the second day and
+the third room can be used for more general topics and presentations.
 
-johannes
+With that said, there are still a number of slots available for
+presentations or discussion topics.  This is especially true for the
+802.11 group...  Please step-up with some suggested topics!
 
+Below is my strawman agenda proposal.  Please make suggestions for
+improvements!
+
+Day 1
+-----
+
+Everyone together in a single room...
+
+Time	Topic						Speaker
+----	-----						-------
+0930	Welcome/Intro/Agenda				John Linville
+
+1000	802.15.4 stack, 6lowpan				Alexander Smirnov
+
+1100	Break
+
+1130	Virtual Bluetooth AMP Controller for mac80211	Andrei Emeltchenko
+
+1230	Lunch
+
+1400	NFC "state of the union", etc.			Ortiz / Elias / Chlad
+
+1500	Break
+
+...
+
+1800	Adjourn
+
+
+Day 2
+-----
+
+802.11 break-out room...
+
+Time	Topic						Speaker
+----	-----						-------
+1000	Regulatory updates				Luis Rodriguez
+
+1100	Break
+
+...
+
+1800	Adjourn
+
+
+Bluetooth break-out room...
+
+Time	Topic						Speaker
+----	-----						-------
+1000	Bluetooth: state of the union			Marcel Holtmann
+
+1100	Break
+
+1130	status and roadmap of Bluetooth LE		Joao Paulo Rechi Vita
+
+1230	Lunch
+
+...
+
+1800	Adjourn
+
+
+Presentation room...
+
+Time	Topic						Speaker
+----	-----						-------
+1000	wireless community networks			Nick Kossifidis
+
+1100	Break
+
+1130	"a short overview what we do in ConnMan"	Wagner / Flykt
+
+1230	Lunch
+
+1400	oFono / mobile wireless				Denis Kenzior
+
+1500	Break
+
+...
+
+1800	Adjourn
+
+
+So...suggestions??
+
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
