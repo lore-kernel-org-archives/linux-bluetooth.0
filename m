@@ -1,46 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ] gatt: GAP and GATT services are mandatory
-Date: Wed, 22 Aug 2012 16:38:49 -0300
-Message-Id: <1345664329-30577-1-git-send-email-claudio.takahasi@openbossa.org>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH 2/2] Bluetooth: Power the device up after a rfkill unblock
+Date: Wed, 22 Aug 2012 16:33:30 -0300
+Message-Id: <1345664010-30471-2-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1345664010-30471-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1345664010-30471-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes potential segmentation fault if the remote doesn't
-support GAP and GATT services.
----
- profiles/gatt/manager.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+With the HCI_SETUP patches, this is all that is needed to make the
+case when a adapter is added with Bluetooth blocked in rfkill to work.
 
-diff --git a/profiles/gatt/manager.c b/profiles/gatt/manager.c
-index a1fa756..0702d26 100644
---- a/profiles/gatt/manager.c
-+++ b/profiles/gatt/manager.c
-@@ -30,6 +30,7 @@
- #include "gattrib.h"
- #include "gatt.h"
- #include "gas.h"
-+#include "log.h"
- #include "manager.h"
+When rfkill is unblocked, the device will be powered on, and if not
+needed it will be automatically powered off.
+
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ net/bluetooth/hci_core.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index fa974a1..395dcc6 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1061,8 +1061,10 @@ static int hci_rfkill_set_block(void *data, bool blocked)
  
- static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
-@@ -55,8 +56,12 @@ static int gatt_driver_probe(struct btd_device *device, GSList *uuids)
- 	if (l)
- 		gatt = l->data;
+ 	BT_DBG("%p name %s blocked %d", hdev, hdev->name, blocked);
  
--	return gas_register(device, gap ? &gap->range : NULL,
--				gatt ? &gatt->range : NULL);
-+	if (gap == NULL || gatt == NULL) {
-+		error("GAP and GATT are mandatory");
-+		return -EINVAL;
+-	if (!blocked)
++	if (!blocked) {
++		schedule_work(&hdev->power_on);
+ 		return 0;
 +	}
-+
-+	return gas_register(device, &gap->range, &gatt->range);
- }
  
- static void gatt_driver_remove(struct btd_device *device)
+ 	hci_dev_do_close(hdev);
+ 
 -- 
-1.7.12
+1.7.11.4
 
