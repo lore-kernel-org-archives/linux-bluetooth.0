@@ -1,67 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <50365374.2030605@globaledgesoft.com>
-References: <5008F67F.5030604@globaledgesoft.com>
-	<CACJA=fUW4a-B-1SGQmPbh+J5YKJ9bVEFbz8ZUezPOD3w0Hmsxw@mail.gmail.com>
-	<502E56DF.3020103@globaledgesoft.com>
-	<CAJdJm_P=4fbHXG7gFpYQht9NmD88nixzO95N-HsgYwUOMx+pig@mail.gmail.com>
-	<502ED4E8.9040702@globaledgesoft.com>
-	<CAJdJm_OBh4OzKJejongsaWm1mSx2GN5Yki3B4nYc6C2DbVS=nw@mail.gmail.com>
-	<503503C1.6060805@globaledgesoft.com>
-	<20120822151300.GA6746@samus>
-	<50365374.2030605@globaledgesoft.com>
-Date: Thu, 23 Aug 2012 15:09:15 -0400
-Message-ID: <CAJdJm_Ntt7TtD+nrNLMnqZ08AiAv4_83eqWEcRPJ9fyaBeoXqg@mail.gmail.com>
-Subject: Re: BLE - multiple connections
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Ajay KV <ajay.kv@globaledgesoft.com>
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Thu, 23 Aug 2012 13:14:07 -0400
+From: Chris Frey <cdfrey@foursquare.net>
+To: linux-bluetooth@vger.kernel.org
+Cc: dougkwan@google.com
+Subject: [PATCH] Add BDADDR_*_INITIALIZER defines to prevent C++0x compiler errors
+Message-ID: <20120823171407.GA24570@foursquare.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ajay,
+It is impossible to use BDADDR_ANY, _ALL, or _LOCAL, in a C++0x program
+without triggering a "taking address of temporary" error, depending on
+the version of GCC you are using.  It is unlikely this correct error
+is going away in the future, so bluez needs to be fixed to accommodate.
 
-On Thu, Aug 23, 2012 at 11:59 AM, Ajay KV <ajay.kv@globaledgesoft.com> wrote:
->         Still not working  , getting the same old error. i just want to know
-> , whether my dual-mode dongle allows this operation or not (Advertising
-> mode+ connected mode)
+This commit adds _INITIALIZER defines, which allows C++ code to create
+code like this:
 
-Did you try my suggestion?
+	baddr_t bdaddr_any = BDADDR_ANY_INITIALIZER;
+	...
+	function(&bdaddr_any);
 
-1) Enable LE adv on A
-2) Connect from B to A
-3) Try to enable LE adv on A (should give the error you are getting)
-4) disconnect connection from A side (using hcitool ledc)
-5) try to enable LE adv on A
+Thanks to Doug Kwan for the suggested fix.
+---
+ lib/bluetooth.h |   14 +++++++++++---
+ 1 files changed, 11 insertions(+), 3 deletions(-)
 
-if step (5) works, we have confirmation that a dual mode dongle in
-slave mode is not accepting more than one active connection.
-
-Anyway, I finally found the section from Core Spec v4.0, where it
-clearly says that a LE device operating in slave mode does not accept
-more than one connection (but a master device can create multiple
-connections). See Vol. 6, Part B, Section 1.1.1 "State and Role
-Combination Restrictions" (page 2195), specially second bullet. I copy
-the relevant text here:
-
-"""
-The Link Layer may optionally support multiple state machines. If it
-does support multiple state machines, the following state and role
-restrictions shall apply.
-* The Link Layer in the Connection State shall not operate in the
-Master Role and Slave Role at the same time.
-* The Link Layer in the Connection State operating in the Slave Role
-shall have only one connection.
-[...]
-"""
-
-That means you can't send connectable advertising from a slave LE
-device if one connection is active.
-
-Best regards,
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index 0fc4508..31b487e 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -227,9 +227,17 @@ typedef struct {
+ #define BDADDR_LE_PUBLIC       0x01
+ #define BDADDR_LE_RANDOM       0x02
+ 
+-#define BDADDR_ANY   (&(bdaddr_t) {{0, 0, 0, 0, 0, 0}})
+-#define BDADDR_ALL   (&(bdaddr_t) {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}})
+-#define BDADDR_LOCAL (&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}})
++/* These *_INITIALIZER macros are here to allow C++ code to behave in
++ * a conformant manner.  Using BDADDR_ANY in c++0x code returns a
++ * "taking address of temporary" warning.
++ */
++#define BDADDR_ANY_INITIALIZER   {{0, 0, 0, 0, 0, 0}}
++#define BDADDR_ALL_INITIALIZER   {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}}
++#define BDADDR_LOCAL_INITIALIZER {{0, 0, 0, 0xff, 0xff, 0xff}}
++
++#define BDADDR_ANY   (&(bdaddr_t) BDADDR_ANY_INITIALIZER)
++#define BDADDR_ALL   (&(bdaddr_t) BDADDR_ALL_INITIALIZER)
++#define BDADDR_LOCAL (&(bdaddr_t) BDADDR_LOCAL_INITIALIZER)
+ 
+ /* Copy, swap, convert BD Address */
+ static inline int bacmp(const bdaddr_t *ba1, const bdaddr_t *ba2)
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.2.3
+
