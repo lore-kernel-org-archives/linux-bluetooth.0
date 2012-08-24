@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 20/22] Bluetooth: A2MP: Add fallback to normal l2cap init sequence
-Date: Fri, 24 Aug 2012 17:00:19 +0300
-Message-Id: <1345816821-32331-21-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 13/22] Bluetooth: A2MP: Process A2MP Get AMP Assoc Rsp
+Date: Fri, 24 Aug 2012 17:00:12 +0300
+Message-Id: <1345816821-32331-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1345816821-32331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1345816821-32331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,93 +12,92 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When there is no remote AMP controller found fallback to normal
-L2CAP sequence.
+When receiving A2MP Get AMP Assoc Response save assoc data to remote
+AMP controller list and prepare for creating physical link.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |    1 +
- net/bluetooth/a2mp.c          |   28 ++++++++++++++++++++++++++++
- net/bluetooth/l2cap_core.c    |    2 +-
- 3 files changed, 30 insertions(+), 1 deletion(-)
+ net/bluetooth/a2mp.c |   59 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 58 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 0952311..3262dc7 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -775,5 +775,6 @@ void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
- 			  long timeout);
- bool l2cap_conn_clear_timer(struct l2cap_conn *conn,
- 			    struct delayed_work *work);
-+void l2cap_send_conn_req(struct l2cap_chan *chan);
- 
- #endif /* __L2CAP_H */
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 7355b6f..ed458d1 100644
+index 7d6f015..5cf7a78 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -181,6 +181,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 	u16 len = le16_to_cpu(hdr->len);
- 	struct a2mp_cl *cl;
- 	u16 ext_feat;
-+	bool found = false;
- 
- 	if (len < sizeof(*rsp))
- 		return -EINVAL;
-@@ -211,6 +212,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
- 			struct a2mp_info_req req;
- 
-+			found = true;
- 			req.id = cl->id;
- 			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
- 				  sizeof(req), &req);
-@@ -220,6 +222,32 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 		cl = (void *) skb_pull(skb, sizeof(*cl));
- 	}
- 
-+	/* Fall back to L2CAP init sequence */
-+	if (!found) {
-+		struct l2cap_conn *conn = mgr->l2cap_conn;
-+		struct l2cap_chan *chan;
-+
-+		mutex_lock(&conn->chan_lock);
-+
-+		list_for_each_entry(chan, &conn->chan_l, list) {
-+
-+			BT_DBG("chan %p state %s", chan,
-+			       state_to_string(chan->state));
-+
-+			if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
-+				continue;
-+
-+			l2cap_chan_lock(chan);
-+
-+			if (chan->state == BT_CONNECT)
-+				l2cap_send_conn_req(chan);
-+
-+			l2cap_chan_unlock(chan);
-+		}
-+
-+		mutex_unlock(&conn->chan_lock);
-+	}
-+
+@@ -334,6 +334,60 @@ done:
  	return 0;
  }
  
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b6d901f..e1007af 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1027,7 +1027,7 @@ static bool __amp_capable(struct l2cap_chan *chan)
- 		return false;
- }
- 
--static void l2cap_send_conn_req(struct l2cap_chan *chan)
-+void l2cap_send_conn_req(struct l2cap_chan *chan)
++static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
++				struct a2mp_cmd *hdr)
++{
++	struct a2mp_amp_assoc_rsp *rsp = (void *) skb->data;
++	u16 len = le16_to_cpu(hdr->len);
++	struct hci_dev *hdev;
++	struct amp_ctrl *ctrl;
++	struct phy_link *plink;
++
++	if (len < sizeof(*rsp))
++		return -EINVAL;
++
++	BT_DBG("id %d status 0x%2.2x assoc len %u", rsp->id, rsp->status,
++	       len - sizeof(*rsp));
++
++	if (rsp->status)
++		return -EINVAL;
++
++	/* Save remote ASSOC data */
++	ctrl = amp_ctrl_lookup(mgr, rsp->id);
++	if (ctrl) {
++		u8 *assoc, assoc_len = len - sizeof(*rsp);
++
++		assoc = kzalloc(assoc_len, GFP_KERNEL);
++		if (!assoc) {
++			amp_ctrl_put(ctrl);
++			return -ENOMEM;
++		}
++
++		memcpy(assoc, rsp->amp_assoc, assoc_len);
++		ctrl->assoc = assoc;
++		ctrl->assoc_len = assoc_len;
++		ctrl->assoc_rem_len = assoc_len;
++		ctrl->assoc_len_so_far = 0;
++
++		amp_ctrl_put(ctrl);
++	}
++
++	/* Create Phys Link */
++	hdev = hci_dev_get(rsp->id);
++	if (!hdev)
++		return -EINVAL;
++
++	plink = phylink_add(mgr, hdev->id, rsp->id, ctrl->assoc,
++			    ctrl->assoc_len);
++
++	BT_DBG("Created plink %p: loc:%d -> rem:%d", plink, hdev->id, rsp->id);
++
++done:
++	hci_dev_put(hdev);
++	skb_pull(skb, len);
++	return 0;
++}
++
+ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 				   struct a2mp_cmd *hdr)
  {
- 	struct l2cap_conn *conn = chan->conn;
- 	struct l2cap_conn_req req;
+@@ -495,8 +549,11 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 			err = a2mp_getinfo_rsp(mgr, skb, hdr);
+ 			break;
+ 
+-		case A2MP_CHANGE_RSP:
+ 		case A2MP_GETAMPASSOC_RSP:
++			err = a2mp_getampassoc_rsp(mgr, skb, hdr);
++			break;
++
++		case A2MP_CHANGE_RSP:
+ 		case A2MP_CREATEPHYSLINK_RSP:
+ 		case A2MP_DISCONNPHYSLINK_RSP:
+ 			err = a2mp_cmd_rsp(mgr, skb, hdr);
 -- 
 1.7.9.5
 
