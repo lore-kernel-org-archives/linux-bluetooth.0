@@ -1,46 +1,189 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 24 Aug 2012 15:28:00 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Message-id: <BC226EEEE15D4D729563BB95E44A75C3@sisodomain.com>
+From: Syam Sidhardhan <s.syam@samsung.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: Power the device up after a rfkill unblock
-Message-ID: <20120824122800.GA27292@x220.ger.corp.intel.com>
-References: <1345664010-30471-1-git-send-email-vinicius.gomes@openbossa.org>
- <1345664010-30471-2-git-send-email-vinicius.gomes@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1345664010-30471-2-git-send-email-vinicius.gomes@openbossa.org>
+References: <1345653354-23720-1-git-send-email-s.syam@samsung.com>
+ <1345653354-23720-2-git-send-email-s.syam@samsung.com>
+ <CABBYNZLr1iENopeSbqqiQuryC0T99KkG=Go-K0j9zNca_ijpVQ@mail.gmail.com>
+ <CABBYNZJ37+GoQx66+xD+K9_Lbi4yQZq_TWt_qDMiObdmwUg0AA@mail.gmail.com>
+ <CABBYNZLyT80dZHzuZA=F=KvqrQsK9sZqgyq211Uoysk0Gap7UA@mail.gmail.com>
+Subject: Re: [PATCH obexd v1 2/4] build: Require GLib 2.32 or later
+Date: Fri, 24 Aug 2012 17:03:07 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Luiz,
 
-On Wed, Aug 22, 2012, Vinicius Costa Gomes wrote:
-> With the HCI_SETUP patches, this is all that is needed to make the
-> case when a adapter is added with Bluetooth blocked in rfkill to work.
-> 
-> When rfkill is unblocked, the device will be powered on, and if not
-> needed it will be automatically powered off.
-> 
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> ---
->  net/bluetooth/hci_core.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index fa974a1..395dcc6 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1061,8 +1061,10 @@ static int hci_rfkill_set_block(void *data, bool blocked)
->  
->  	BT_DBG("%p name %s blocked %d", hdev, hdev->name, blocked);
->  
-> -	if (!blocked)
-> +	if (!blocked) {
-> +		schedule_work(&hdev->power_on);
+----- Original Message ----- 
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+To: "Syam Sidhardhan" <s.syam@samsung.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+Sent: Friday, August 24, 2012 3:15 PM
+Subject: Re: [PATCH obexd v1 2/4] build: Require GLib 2.32 or later
 
-Don't you need to check for HCI_SETUP before calling schedule_work here?
-It should be possible to have an adapter powered off and toggling rfkill
-back and forth shouldn't cause it to be powered on.
 
-Johan
+> Hi Syam,
+>
+> On Thu, Aug 23, 2012 at 1:36 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Syam,
+>>
+>> On Thu, Aug 23, 2012 at 1:27 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Syam,
+>>>
+>>> On Wed, Aug 22, 2012 at 7:35 PM, Syam Sidhardhan <s.syam@samsung.com> 
+>>> wrote:
+>>>> If we use GLib version less than 2.32 (more precisely < 2.31.2) then
+>>>> the following build error may occure in a 32 bit.
+>>>
+>>> We had the issue with BlueZ but we did not bump the glib version,
+>>> which makes me wonder if you are able to compile bluetoothd?
+>>
+>> It looks like we fix it with use of a variable:
+>>
+>>  commit e34836262ba6a46491b6a760520158d70e8b51b5
+>> Author: Johan Hedberg <johan.hedberg@intel.com>
+>> Date:   Wed Oct 12 00:48:59 2011 +0300
+>>
+>>     Fix compilation error on 32-bit systems
+>>
+>>     This fixes the following compilation error with GLib on 32-bit 
+>> sytems:
+>>
+>>     audio/media.c: In function 'get_setting':
+>>     audio/media.c:1109:44: error: cast to pointer from integer of
+>> different size [-Werror=int-to-pointer-cast]
+>>     audio/media.c: In function 'set_setting':
+>>     audio/media.c:1132:41: error: cast to pointer from integer of
+>> different size [-Werror=int-to-pointer-cast]
+>
+> How about the following patch:
+>
+> diff --git a/gobex/gobex-apparam.c b/gobex/gobex-apparam.c
+> index 8f72aa7..d29dfc1 100644
+> --- a/gobex/gobex-apparam.c
+> +++ b/gobex/gobex-apparam.c
+> @@ -112,12 +112,14 @@ GObexApparam *g_obex_apparam_decode(const void
+> *data, gsize size)
+>  while (count < size) {
+>  struct apparam_tag *tag;
+>  gsize parsed;
+> + guint id;
+>
+>  tag = apparam_tag_decode(data + count, size - count, &parsed);
+>  if (tag == NULL)
+>  break;
+>
+> - g_hash_table_insert(tags, GUINT_TO_POINTER(tag->id), tag);
+> + id = tag->id;
+> + g_hash_table_insert(tags, GUINT_TO_POINTER(id), tag);
+>
+>  count += parsed;
+>  }
+> @@ -167,12 +169,14 @@ GObexApparam
+> *g_obex_apparam_set_bytes(GObexApparam *apparam, guint8 id,
+>  const void *value, gsize len)
+> {
+>  struct apparam_tag *tag;
+> + guint uid;
+>
+>  if (apparam == NULL)
+>  apparam = g_obex_apparam_new();
+>
+>  tag = tag_new(id, len, value);
+> - g_hash_table_replace(apparam->tags, GUINT_TO_POINTER(id), tag);
+> + uid = id;
+
+Its ok, but in this case assigning id during variable declaration looks good 
+for me.
+ie, guint uid = id;
+
+> + g_hash_table_replace(apparam->tags, GUINT_TO_POINTER(uid), tag);
+>
+>  return apparam;
+> }
+> @@ -232,6 +236,12 @@ GObexApparam
+> *g_obex_apparam_set_string(GObexApparam *apparam, guint8 id,
+>  return g_obex_apparam_set_bytes(apparam, id, value, len);
+> }
+>
+> +static struct apparam_tag *g_obex_apparam_find_tag(GObexApparam *apparam,
+> + guint id)
+> +{
+> + return g_hash_table_lookup(apparam->tags, GUINT_TO_POINTER(id));
+> +}
+> +
+> gboolean g_obex_apparam_get_uint8(GObexApparam *apparam, guint8 id,
+>  guint8 *dest)
+> {
+> @@ -239,7 +249,7 @@ gboolean g_obex_apparam_get_uint8(GObexApparam
+> *apparam, guint8 id,
+>
+>  g_obex_debug(G_OBEX_DEBUG_APPARAM, "tag 0x%02x", id);
+>
+> - tag = g_hash_table_lookup(apparam->tags, GUINT_TO_POINTER(id));
+> + tag = g_obex_apparam_find_tag(apparam, id);
+>  if (tag == NULL)
+>  return FALSE;
+>
+> @@ -257,7 +267,7 @@ gboolean g_obex_apparam_get_uint16(GObexApparam
+> *apparam, guint8 id,
+>
+>  g_obex_debug(G_OBEX_DEBUG_APPARAM, "tag 0x%02x", id);
+>
+> - tag = g_hash_table_lookup(apparam->tags, GUINT_TO_POINTER(id));
+> + tag = g_obex_apparam_find_tag(apparam, id);
+>  if (tag == NULL)
+>  return FALSE;
+>
+> @@ -278,7 +288,7 @@ gboolean g_obex_apparam_get_uint32(GObexApparam
+> *apparam, guint8 id,
+>
+>  g_obex_debug(G_OBEX_DEBUG_APPARAM, "tag 0x%02x", id);
+>
+> - tag = g_hash_table_lookup(apparam->tags, GUINT_TO_POINTER(id));
+> + tag = g_obex_apparam_find_tag(apparam, id);
+>  if (tag == NULL)
+>  return FALSE;
+>
+> @@ -299,7 +309,7 @@ gboolean g_obex_apparam_get_uint64(GObexApparam
+> *apparam, guint8 id,
+>
+>  g_obex_debug(G_OBEX_DEBUG_APPARAM, "tag 0x%02x", id);
+>
+> - tag = g_hash_table_lookup(apparam->tags, GUINT_TO_POINTER(id));
+> + tag = g_obex_apparam_find_tag(apparam, id);
+>  if (tag == NULL)
+>  return FALSE;
+>
+> @@ -320,7 +330,7 @@ char *g_obex_apparam_get_string(GObexApparam
+> *apparam, guint8 id)
+>
+>  g_obex_debug(G_OBEX_DEBUG_APPARAM, "tag 0x%02x", id);
+>
+> - tag = g_hash_table_lookup(apparam->tags, GUINT_TO_POINTER(id));
+> + tag = g_obex_apparam_find_tag(apparam, id);
+>  if (tag == NULL)
+>  return NULL;
+>
+> @@ -338,7 +348,7 @@ gboolean g_obex_apparam_get_bytes(GObexApparam
+> *apparam, guint8 id,
+>
+>  g_obex_debug(G_OBEX_DEBUG_APPARAM, "tag 0x%02x", id);
+>
+> - tag = g_hash_table_lookup(apparam->tags, GUINT_TO_POINTER(id));
+> + tag = g_obex_apparam_find_tag(apparam, id);
+>  if (tag == NULL)
+>  return FALSE;
+>
+
+Apart form the above mention nitpick, this patch is ok for me. Its a better 
+fix.
+
+Thanks,
+Syam 
+
