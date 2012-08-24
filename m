@@ -1,115 +1,170 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 22/22] Bluetooth: AMP: Process physical link complete event
-Date: Fri, 24 Aug 2012 17:00:21 +0300
-Message-Id: <1345816821-32331-23-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1345816821-32331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1345816821-32331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH obexd 6/7] client: Move common code to pull_phonebook
+Date: Fri, 24 Aug 2012 16:59:54 +0300
+Message-Id: <1345816795-14092-6-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1345816795-14092-1-git-send-email-luiz.dentz@gmail.com>
+References: <1345816795-14092-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add new hci_conn for representing AMP physical link.
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci.h      |    1 +
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_event.c        |   47 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 49 insertions(+)
+ client/pbap.c | 79 +++++++++++++++++++++++------------------------------------
+ 1 file changed, 30 insertions(+), 49 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 1cb8b55..4c41b8c 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -207,6 +207,7 @@ enum {
- #define ESCO_LINK	0x02
- /* Low Energy links do not have defined link type. Use invented one */
- #define LE_LINK		0x80
-+#define AMP_LINK	0x81
- 
- /* LMP features */
- #define LMP_3SLOT	0x01
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 28b2f98..09ec48d 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -339,6 +339,7 @@ struct hci_conn {
- 	struct amp_mgr	*amp_mgr;
- 
- 	struct hci_conn	*link;
-+	struct phy_link	*phy_link;
- 
- 	void (*connect_cfm_cb)	(struct hci_conn *conn, u8 status);
- 	void (*security_cfm_cb)	(struct hci_conn *conn, u8 status);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 029ec04..5d75d47 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3427,6 +3427,49 @@ unlock:
- 	hci_dev_unlock(hdev);
+diff --git a/client/pbap.c b/client/pbap.c
+index 3e9301a..b460987 100644
+--- a/client/pbap.c
++++ b/client/pbap.c
+@@ -522,22 +522,29 @@ static GObexApparam *parse_filters(GObexApparam *apparam,
+ 	return apparam;
  }
  
-+static void hci_phy_link_complete_evt(struct hci_dev *hdev,
-+				      struct sk_buff *skb)
-+{
-+	struct hci_ev_phy_link_complete *ev = (void *) skb->data;
-+	struct hci_conn *conn;
-+	struct phy_link *plink;
-+
-+	BT_DBG("%s handle 0x%2.2x status 0x%2.2x", hdev->name, ev->phy_handle,
-+	       ev->status);
-+
-+	if (ev->status)
-+		return;
-+
-+	plink = phylink_lookup_by_handle(ev->phy_handle);
-+	if (!plink)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_add(hdev, AMP_LINK, BDADDR_ANY);
-+	if (conn) {
-+		conn->handle = ev->phy_handle;
-+		conn->state = BT_CONNECTED;
-+
-+		hci_conn_hold(conn);
-+		conn->disc_timeout = HCI_DISCONN_TIMEOUT/2;
-+		hci_conn_put(conn);
-+
-+		bacpy(&conn->dst, &plink->mgr->l2cap_conn->hcon->dst);
-+		conn->out = true;
-+		conn->phy_link = plink;
-+
-+		hci_conn_hold_device(conn);
-+		hci_conn_add_sysfs(conn);
-+	} else {
-+		BT_ERR("Cannot add connection");
-+	}
-+
-+	hci_dev_unlock(hdev);
-+
-+	phylink_put(plink);
-+}
-+
- static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+-static struct obc_transfer *pull_phonebook(struct pbap_data *pbap,
++static DBusMessage *pull_phonebook(struct pbap_data *pbap,
+ 						DBusMessage *message,
+-						guint8 type, const char *name,
++						guint8 type,
+ 						const char *targetfile,
+-						GObexApparam *apparam,
+-						GError **err)
++						GObexApparam *apparam)
  {
- 	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
-@@ -3749,6 +3792,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_remote_oob_data_request_evt(hdev, skb);
- 		break;
- 
-+	case HCI_EV_PHY_LINK_COMPLETE:
-+		hci_phy_link_complete_evt(hdev, skb);
-+		break;
+ 	struct pending_request *request;
+ 	struct obc_transfer *transfer;
++	char *name;
+ 	guint8 buf[32];
+ 	gsize len;
+ 	session_callback_t func;
++	DBusMessage *reply;
++	GError *err = NULL;
 +
- 	case HCI_EV_NUM_COMP_BLOCKS:
- 		hci_num_comp_blocks_evt(hdev, skb);
- 		break;
++	name = g_strconcat(pbap->path, ".vcf", NULL);
++
++	len = g_obex_apparam_encode(apparam, buf, sizeof(buf));
++	g_obex_apparam_free(apparam);
+ 
+-	transfer = obc_transfer_get("x-bt/phonebook", name, targetfile, err);
++	transfer = obc_transfer_get("x-bt/phonebook", name, targetfile, &err);
+ 	if (transfer == NULL)
+-		return NULL;
++		goto fail;
+ 
+ 	switch (type) {
+ 	case PULLPHONEBOOK:
+@@ -553,19 +560,28 @@ static struct obc_transfer *pull_phonebook(struct pbap_data *pbap,
+ 		return NULL;
+ 	}
+ 
+-	len = g_obex_apparam_encode(apparam, buf, sizeof(buf));
+-
+ 	obc_transfer_set_params(transfer, buf, len);
+ 
+-	if (!obc_session_queue(pbap->session, transfer, func, request, err)) {
++	if (!obc_session_queue(pbap->session, transfer, func, request, &err)) {
+ 		if (request != NULL)
+ 			pending_request_free(request);
+ 
+-		return NULL;
++		goto fail;
+ 	}
+ 
++	g_free(name);
++
++	if (targetfile == NULL)
++		return NULL;
+ 
+-	return transfer;
++	return obc_transfer_create_dbus_reply(transfer, message);
++
++fail:
++	g_free(name);
++	reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed", "%s",
++								err->message);
++	g_error_free(err);
++	return reply;
+ }
+ 
+ static DBusMessage *pull_vcard_listing(struct pbap_data *pbap,
+@@ -654,11 +670,8 @@ static DBusMessage *pbap_pull_all(DBusConnection *connection,
+ 					DBusMessage *message, void *user_data)
+ {
+ 	struct pbap_data *pbap = user_data;
+-	struct obc_transfer *transfer;
+ 	const char *targetfile;
+-	char *name;
+ 	GObexApparam *apparam;
+-	GError *err = NULL;
+ 	DBusMessageIter args;
+ 
+ 	if (!pbap->path)
+@@ -686,22 +699,8 @@ static DBusMessage *pbap_pull_all(DBusConnection *connection,
+ 				ERROR_INTERFACE ".InvalidArguments", NULL);
+ 	}
+ 
+-	name = g_strconcat(pbap->path, ".vcf", NULL);
+-
+-	transfer = pull_phonebook(pbap, message, PULLPHONEBOOK, name,
+-						targetfile, apparam, &err);
+-	g_free(name);
+-	g_obex_apparam_free(apparam);
+-
+-	if (transfer == NULL) {
+-		DBusMessage *reply = g_dbus_create_error(message,
+-					ERROR_INTERFACE ".Failed", "%s",
+-					err->message);
+-		g_error_free(err);
+-		return reply;
+-	}
+-
+-	return obc_transfer_create_dbus_reply(transfer, message);
++	return pull_phonebook(pbap, message, PULLPHONEBOOK, targetfile,
++								apparam);
+ }
+ 
+ static DBusMessage *pull_vcard(struct pbap_data *pbap, DBusMessage *message,
+@@ -877,11 +876,7 @@ static DBusMessage *pbap_get_size(DBusConnection *connection,
+ 					DBusMessage *message, void *user_data)
+ {
+ 	struct pbap_data *pbap = user_data;
+-	DBusMessage *reply;
+-	struct obc_transfer *transfer;
+-	char *name;
+ 	GObexApparam *apparam;
+-	GError *err = NULL;
+ 	DBusMessageIter args;
+ 
+ 	if (!pbap->path)
+@@ -891,25 +886,11 @@ static DBusMessage *pbap_get_size(DBusConnection *connection,
+ 
+ 	dbus_message_iter_init(message, &args);
+ 
+-	name = g_strconcat(pbap->path, ".vcf", NULL);
+-
+ 	apparam = g_obex_apparam_set_uint16(NULL, MAXLISTCOUNT_TAG, 0);
+ 	apparam = g_obex_apparam_set_uint16(apparam, LISTSTARTOFFSET_TAG,
+ 							DEFAULT_OFFSET);
+ 
+-	transfer = pull_phonebook(pbap, message, GETPHONEBOOKSIZE, name, NULL,
+-								apparam, &err);
+-
+-	g_free(name);
+-	g_obex_apparam_free(apparam);
+-
+-	if (transfer != NULL)
+-		return NULL;
+-
+-	reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed", "%s",
+-								err->message);
+-	g_error_free(err);
+-	return reply;
++	return pull_phonebook(pbap, message, GETPHONEBOOKSIZE, NULL, apparam);
+ }
+ 
+ static const GDBusMethodTable pbap_methods[] = {
 -- 
-1.7.9.5
+1.7.11.4
 
