@@ -1,35 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ] core: Fix memory leak
-Date: Fri, 24 Aug 2012 20:51:38 -0300
-Message-Id: <1345852298-9204-1-git-send-email-vinicius.gomes@openbossa.org>
+Message-ID: <1345847688.1779.27.camel@aeonflux>
+Subject: Re: [PATCH] btusb: add another Foxconn/Hon Hai ID
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Date: Fri, 24 Aug 2012 15:34:48 -0700
+In-Reply-To: <1345835818.3840.0.camel@jlt4.sipsolutions.net>
+References: <1345835818.3840.0.camel@jlt4.sipsolutions.net>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When ignoring a LE device that is not in a discoverable state 'alias'
-is leaking.
----
- src/adapter.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Hi Johannes,
 
-diff --git a/src/adapter.c b/src/adapter.c
-index b642e37..532fcdd 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2707,8 +2707,10 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
- 
- 		/* Avoid emitting DeviceFound() signal if device is not
- 		 * discoverable */
--		if (!(dev->flags & (EIR_LIM_DISC | EIR_GEN_DISC)))
-+		if (!(dev->flags & (EIR_LIM_DISC | EIR_GEN_DISC))) {
-+			g_free(alias);
- 			return;
-+		}
- 
- 		dev->legacy = FALSE;
- 
--- 
-1.7.12
+> I found a device using 0xe052 for idProduct, add it.
+
+only with /sys/kernel/debug/usb/devices part in the commit message
+please. Not that I don't believe you, I just want them recorded.
+
+Regards
+
+Marcel
+
 
