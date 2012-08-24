@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 15/22] Bluetooth: Close A2MP chan when deleting corr L2CAP chan
-Date: Fri, 24 Aug 2012 17:00:14 +0300
-Message-Id: <1345816821-32331-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 10/22] Bluetooth: AMP: Remote AMP ctrl definitions
+Date: Fri, 24 Aug 2012 17:00:09 +0300
+Message-Id: <1345816821-32331-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1345816821-32331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1345816821-32331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,41 +12,171 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When we delete L2CAP channel (e.g. when closing socket) we shall
-also delete corresponding A2MP channel.
+Create remote AMP controllers structure. It is used to keep information
+about discovered remote AMP controllers by A2MP protocol.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |    9 +++++++++
- 1 file changed, 9 insertions(+)
+ include/net/bluetooth/a2mp.h |    3 ++
+ include/net/bluetooth/pal.h  |   14 ++++++++
+ net/bluetooth/a2mp.c         |    5 +++
+ net/bluetooth/pal.c          |   81 ++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 103 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 45c7c82..b6d901f 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -589,6 +589,7 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 	BT_DBG("chan %p, conn %p, err %d", chan, conn, err);
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+index f53c1b1..1b98c63 100644
+--- a/include/net/bluetooth/a2mp.h
++++ b/include/net/bluetooth/a2mp.h
+@@ -34,6 +34,9 @@ struct amp_mgr {
  
- 	if (conn) {
-+		struct amp_mgr *mgr = conn->hcon->amp_mgr;
- 		/* Delete from channel list */
- 		list_del(&chan->list);
- 
-@@ -596,6 +597,14 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 
- 		chan->conn = NULL;
- 		hci_conn_put(conn->hcon);
+ 	struct list_head	phy_links;
+ 	struct mutex		phy_links_lock;
 +
-+		/* BREDR chan corresponding to A2MP chan */
-+		if (mgr && chan == mgr->bredr_chan) {
-+			BT_DBG("Remove amp_mgr %p", mgr);
-+			l2cap_chan_close(mgr->a2mp_chan, 0);
-+			amp_mgr_put(mgr);
-+			conn->hcon->amp_mgr = NULL;
-+		}
- 	}
++	struct list_head	amp_ctrls;
++	struct mutex		amp_ctrls_lock;
+ };
  
- 	if (chan->ops->teardown)
+ struct a2mp_cmd {
+diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
+index 31216cf..f99994a 100644
+--- a/include/net/bluetooth/pal.h
++++ b/include/net/bluetooth/pal.h
+@@ -32,6 +32,20 @@ struct phy_link {
+ 	struct kref		kref;
+ };
+ 
++struct amp_ctrl {
++	struct list_head	list;
++	struct kref		kref;
++	__u8			id;
++	__u16			assoc_len_so_far;
++	__u16			assoc_rem_len;
++	__u16			assoc_len;
++	__u8			*assoc;
++};
++
++int amp_ctrl_put(struct amp_ctrl *ctrl);
++struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr);
++struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id);
++void amp_ctrl_list_flush(struct amp_mgr *mgr);
+ struct phy_link *phylink_add(struct amp_mgr *mgr, u8 local_id, u8 remote_id,
+ 			     u8 *rem_assoc, u16 assoc_size);
+ struct phy_link *phylink_lookup(struct amp_mgr *mgr, u8 local_id, u8 remote_id);
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 3ceabc9..40147e6 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -587,6 +587,7 @@ static void amp_mgr_destroy(struct kref *kref)
+ 	list_del(&mgr->list);
+ 	mutex_unlock(&amp_mgr_list_lock);
+ 
++	amp_ctrl_list_flush(mgr);
+ 	phylink_list_flush(mgr);
+ 	kfree(mgr);
+ }
+@@ -630,6 +631,10 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
+ 	INIT_LIST_HEAD(&mgr->phy_links);
+ 	mutex_init(&mgr->phy_links_lock);
+ 
++	/* Remote AMP ctrl list initialization */
++	INIT_LIST_HEAD(&mgr->amp_ctrls);
++	mutex_init(&mgr->amp_ctrls_lock);
++
+ 	kref_init(&mgr->kref);
+ 
+ 	return mgr;
+diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
+index e781a20..3fa785d 100644
+--- a/net/bluetooth/pal.c
++++ b/net/bluetooth/pal.c
+@@ -22,6 +22,87 @@ enum pal_states {
+ 	DISCONNECTING
+ };
+ 
++/* Remote AMP Controllers handling */
++static void amp_ctrl_get(struct amp_ctrl *ctrl)
++{
++	BT_DBG("ctrl %p orig refcnt %d", ctrl,
++	       atomic_read(&ctrl->kref.refcount));
++
++	kref_get(&ctrl->kref);
++}
++
++static void amp_ctrl_destroy(struct kref *kref)
++{
++	struct amp_ctrl *ctrl = container_of(kref, struct amp_ctrl, kref);
++
++	BT_DBG("ctrl %p", ctrl);
++
++	if (ctrl->assoc)
++		kfree(ctrl->assoc);
++
++	kfree(ctrl);
++}
++
++int amp_ctrl_put(struct amp_ctrl *ctrl)
++{
++	BT_DBG("ctrl %p orig refcnt %d", ctrl,
++	       atomic_read(&ctrl->kref.refcount));
++
++	return kref_put(&ctrl->kref, &amp_ctrl_destroy);
++}
++
++struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr)
++{
++	struct amp_ctrl *ctrl;
++
++	ctrl = kzalloc(sizeof(*ctrl), GFP_KERNEL);
++	if (!ctrl)
++		return NULL;
++
++	mutex_lock(&mgr->amp_ctrls_lock);
++	list_add(&ctrl->list, &mgr->amp_ctrls);
++	mutex_unlock(&mgr->amp_ctrls_lock);
++
++	kref_init(&ctrl->kref);
++
++	BT_DBG("mgr %p ctrl %p", mgr, ctrl);
++
++	return ctrl;
++}
++
++void amp_ctrl_list_flush(struct amp_mgr *mgr)
++{
++	struct amp_ctrl *ctrl, *n;
++
++	BT_DBG("mgr %p", mgr);
++
++	mutex_lock(&mgr->amp_ctrls_lock);
++	list_for_each_entry_safe(ctrl, n, &mgr->amp_ctrls, list) {
++		list_del(&ctrl->list);
++		amp_ctrl_put(ctrl);
++	}
++	mutex_unlock(&mgr->amp_ctrls_lock);
++}
++
++struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id)
++{
++	struct amp_ctrl *ctrl = NULL;
++
++	mutex_lock(&mgr->amp_ctrls_lock);
++	list_for_each_entry(ctrl, &mgr->amp_ctrls, list) {
++		if (ctrl->id == id)
++			break;
++	}
++	mutex_unlock(&mgr->amp_ctrls_lock);
++
++	BT_DBG("mgr %p id %d ctrl %p", mgr, id, ctrl);
++
++	if (ctrl)
++		amp_ctrl_get(ctrl);
++
++	return ctrl;
++}
++
+ /* Physical Link interface */
+ void phylink_get(struct phy_link *plink)
+ {
 -- 
 1.7.9.5
 
