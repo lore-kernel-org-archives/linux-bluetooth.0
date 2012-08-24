@@ -1,75 +1,361 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 16/22] Bluetooth: Add function to derive AMP key using hmac
-Date: Fri, 24 Aug 2012 17:00:15 +0300
-Message-Id: <1345816821-32331-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1345816821-32331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1345816821-32331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH obexd 1/7] client: Add filters to Phonebook.PullAll
+Date: Fri, 24 Aug 2012 16:59:49 +0300
+Message-Id: <1345816795-14092-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-hmac(sha256) will be used for AMP key generation.
-
-Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+This avoid D-Bus round trips and is more aligned with what has been
+proposed for MessageAccess interface.
 ---
- net/bluetooth/pal.c |   35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ client/pbap.c | 254 +++++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 208 insertions(+), 46 deletions(-)
 
-diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
-index 3fa785d..6087295 100644
---- a/net/bluetooth/pal.c
-+++ b/net/bluetooth/pal.c
-@@ -12,6 +12,7 @@
- */
- 
- #include <net/bluetooth/pal.h>
-+#include <crypto/hash.h>
- 
- enum pal_states {
- 	DISCONNECTED,
-@@ -248,3 +249,37 @@ struct phy_link *phylink_lookup_by_handle(u8 handle)
- 
- 	return found;
+diff --git a/client/pbap.c b/client/pbap.c
+index ebd6320..0c1336c 100644
+--- a/client/pbap.c
++++ b/client/pbap.c
+@@ -351,18 +351,189 @@ send:
+ 	pending_request_free(request);
  }
-+
-+int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
+ 
++static GObexApparam *parse_format(GObexApparam *apparam, DBusMessageIter *iter)
 +{
-+	int ret = 0;
-+	struct crypto_shash *tfm;
++	const char *string;
++	guint8 format;
 +
-+	if (!ksize)
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
++		return NULL;
++
++	dbus_message_iter_get_basic(iter, &string);
++
++	if (!string || g_str_equal(string, ""))
++		format = FORMAT_VCARD21;
++	else if (!g_ascii_strcasecmp(string, "vcard21"))
++		format = FORMAT_VCARD21;
++	else if (!g_ascii_strcasecmp(string, "vcard30"))
++		format = FORMAT_VCARD30;
++	else
++		return NULL;
++
++	return g_obex_apparam_set_uint8(apparam, FORMAT_TAG, format);
++}
++
++static GObexApparam *parse_order(GObexApparam *apparam, DBusMessageIter *iter)
++{
++	const char *string;
++	guint8 order;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
++		return NULL;
++
++	dbus_message_iter_get_basic(iter, &string);
++
++	if (!string || g_str_equal(string, ""))
++		order = ORDER_INDEXED;
++	else if (!g_ascii_strcasecmp(string, "indexed"))
++		order = ORDER_INDEXED;
++	else if (!g_ascii_strcasecmp(string, "alphanumeric"))
++		order = ORDER_ALPHANUMERIC;
++	else if (!g_ascii_strcasecmp(string, "phonetic"))
++		order = ORDER_PHONETIC;
++	else
++		return NULL;
++
++	return g_obex_apparam_set_uint8(apparam, ORDER_TAG, order);
++}
++
++static GObexApparam *parse_offset(GObexApparam *apparam, DBusMessageIter *iter)
++{
++	guint16 num;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
++		return NULL;
++
++	dbus_message_iter_get_basic(iter, &num);
++
++	return g_obex_apparam_set_uint16(apparam, LISTSTARTOFFSET_TAG, num);
++}
++
++static GObexApparam *parse_items(GObexApparam *apparam, DBusMessageIter *iter)
++{
++	guint16 num;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
++		return NULL;
++
++	dbus_message_iter_get_basic(iter, &num);
++
++	return g_obex_apparam_set_uint16(apparam, MAXLISTCOUNT_TAG, num);
++}
++
++static uint64_t get_filter_mask(const char *filterstr)
++{
++	int i, bit = -1;
++
++	if (!filterstr)
++		return 0;
++
++	if (!g_ascii_strcasecmp(filterstr, "ALL"))
++		return FILTER_ALL;
++
++	for (i = 0; filter_list[i] != NULL; i++)
++		if (!g_ascii_strcasecmp(filterstr, filter_list[i]))
++			return 1ULL << i;
++
++	if (strlen(filterstr) < 4 || strlen(filterstr) > 5
++			|| g_ascii_strncasecmp(filterstr, "bit", 3) != 0)
++		return 0;
++
++	sscanf(&filterstr[3], "%d", &bit);
++	if (bit >= 0 && bit <= FILTER_BIT_MAX)
++		return 1ULL << bit;
++	else
++		return 0;
++}
++
++static int set_field(guint64 *filter, const char *filterstr)
++{
++	guint64 mask;
++
++	mask = get_filter_mask(filterstr);
++
++	if (mask == 0)
 +		return -EINVAL;
 +
-+	tfm = crypto_alloc_shash("hmac(sha256)", 0, 0);
-+	if (IS_ERR(tfm)) {
-+		BT_DBG("crypto_alloc_ahash failed: err %ld", PTR_ERR(tfm));
-+		return PTR_ERR(tfm);
-+	}
-+
-+	ret = crypto_shash_setkey(tfm, key, ksize);
-+	if (ret) {
-+		BT_DBG("crypto_ahash_setkey failed: err %d", ret);
-+	} else {
-+		struct {
-+			struct shash_desc shash;
-+			char ctx[crypto_shash_descsize(tfm)];
-+		} desc;
-+
-+		desc.shash.tfm = tfm;
-+		desc.shash.flags = CRYPTO_TFM_REQ_MAY_SLEEP;
-+
-+		ret = crypto_shash_digest(&desc.shash, plaintext, psize,
-+					  output);
-+	}
-+
-+	crypto_free_shash(tfm);
-+	return ret;
++	*filter |= mask;
++	return 0;
 +}
++
++static GObexApparam *parse_fields(GObexApparam *apparam, DBusMessageIter *iter)
++{
++	DBusMessageIter array;
++	guint64 filter = 0;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
++		return NULL;
++
++	dbus_message_iter_recurse(iter, &array);
++
++	while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_STRING) {
++		const char *string;
++
++		dbus_message_iter_get_basic(&array, &string);
++
++		if (set_field(&filter, string) < 0)
++			return NULL;
++
++		dbus_message_iter_next(&array);
++	}
++
++	return g_obex_apparam_set_uint64(apparam, FILTER_TAG, filter);
++}
++static GObexApparam *parse_filters(GObexApparam *apparam,
++							DBusMessageIter *iter)
++{
++	DBusMessageIter array;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
++		return NULL;
++
++	dbus_message_iter_recurse(iter, &array);
++
++	while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_DICT_ENTRY) {
++		const char *key;
++		DBusMessageIter value, entry;
++
++		dbus_message_iter_recurse(&array, &entry);
++		dbus_message_iter_get_basic(&entry, &key);
++
++		dbus_message_iter_next(&entry);
++		dbus_message_iter_recurse(&entry, &value);
++
++		if (strcasecmp(key, "Format") == 0) {
++			if (parse_format(apparam, &value) == NULL)
++				return NULL;
++		} else if (strcasecmp(key, "Order") == 0) {
++			if (parse_order(apparam, &value) == NULL)
++				return NULL;
++		} else if (strcasecmp(key, "Offset") == 0) {
++			if (parse_offset(apparam, &value) == NULL)
++				return NULL;
++		} else if (strcasecmp(key, "Items") == 0) {
++			if (parse_items(apparam, &value) == NULL)
++				return NULL;
++		} else if (strcasecmp(key, "Fields") == 0) {
++			if (parse_fields(apparam, &value) == NULL)
++				return NULL;
++		}
++
++		dbus_message_iter_next(&array);
++	}
++
++	return apparam;
++}
++
+ static struct obc_transfer *pull_phonebook(struct pbap_data *pbap,
+ 						DBusMessage *message,
+ 						guint8 type, const char *name,
+ 						const char *targetfile,
+-						uint64_t filter, guint8 format,
+-						guint16 maxlistcount,
+-						guint16 liststartoffset,
++						GObexApparam *apparam,
+ 						GError **err)
+ {
+ 	struct pending_request *request;
+ 	struct obc_transfer *transfer;
+-	GObexApparam *apparam;
+ 	guint8 buf[32];
+ 	gsize len;
+ 	session_callback_t func;
+@@ -371,13 +542,6 @@ static struct obc_transfer *pull_phonebook(struct pbap_data *pbap,
+ 	if (transfer == NULL)
+ 		return NULL;
+ 
+-	apparam = g_obex_apparam_set_uint64(NULL, FILTER_TAG, filter);
+-	apparam = g_obex_apparam_set_uint8(apparam, FORMAT_TAG, format);
+-	apparam = g_obex_apparam_set_uint16(apparam, MAXLISTCOUNT_TAG,
+-							maxlistcount);
+-	apparam = g_obex_apparam_set_uint16(apparam, LISTSTARTOFFSET_TAG,
+-							liststartoffset);
+-
+ 	switch (type) {
+ 	case PULLPHONEBOOK:
+ 		func = NULL;
+@@ -396,8 +560,6 @@ static struct obc_transfer *pull_phonebook(struct pbap_data *pbap,
+ 
+ 	obc_transfer_set_params(transfer, buf, len);
+ 
+-	g_obex_apparam_free(apparam);
+-
+ 	if (!obc_session_queue(pbap->session, transfer, func, request, err)) {
+ 		if (request != NULL)
+ 			pending_request_free(request);
+@@ -490,31 +652,6 @@ static int set_order(struct pbap_data *pbap, const char *orderstr)
+ 	return 0;
+ }
+ 
+-static uint64_t get_filter_mask(const char *filterstr)
+-{
+-	int i, bit = -1;
+-
+-	if (!filterstr)
+-		return 0;
+-
+-	if (!g_ascii_strcasecmp(filterstr, "ALL"))
+-		return FILTER_ALL;
+-
+-	for (i = 0; filter_list[i] != NULL; i++)
+-		if (!g_ascii_strcasecmp(filterstr, filter_list[i]))
+-			return 1ULL << i;
+-
+-	if (strlen(filterstr) < 4 || strlen(filterstr) > 5
+-			|| g_ascii_strncasecmp(filterstr, "bit", 3) != 0)
+-		return 0;
+-
+-	sscanf(&filterstr[3], "%d", &bit);
+-	if (bit >= 0 && bit <= FILTER_BIT_MAX)
+-		return 1ULL << bit;
+-	else
+-		return 0;
+-}
+-
+ static int add_filter(struct pbap_data *pbap, const char *filterstr)
+ {
+ 	uint64_t mask;
+@@ -618,25 +755,41 @@ static DBusMessage *pbap_pull_all(DBusConnection *connection,
+ 	struct obc_transfer *transfer;
+ 	const char *targetfile;
+ 	char *name;
++	GObexApparam *apparam;
+ 	GError *err = NULL;
++	DBusMessageIter args;
+ 
+ 	if (!pbap->path)
+ 		return g_dbus_create_error(message,
+ 					ERROR_INTERFACE ".Forbidden",
+ 					"Call Select first of all");
+ 
+-	if (dbus_message_get_args(message, NULL,
+-			DBUS_TYPE_STRING, &targetfile,
+-			DBUS_TYPE_INVALID) == FALSE)
++	dbus_message_iter_init(message, &args);
++
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_STRING)
+ 		return g_dbus_create_error(message,
+ 				ERROR_INTERFACE ".InvalidArguments", NULL);
+ 
++	dbus_message_iter_get_basic(&args, &targetfile);
++	dbus_message_iter_next(&args);
++
++	apparam = g_obex_apparam_set_uint16(NULL, MAXLISTCOUNT_TAG,
++							DEFAULT_COUNT);
++	apparam = g_obex_apparam_set_uint16(apparam, LISTSTARTOFFSET_TAG,
++							DEFAULT_OFFSET);
++
++	if (parse_filters(apparam, &args) == NULL) {
++		g_obex_apparam_free(apparam);
++		return g_dbus_create_error(message,
++				ERROR_INTERFACE ".InvalidArguments", NULL);
++	}
++
+ 	name = g_strconcat(pbap->path, ".vcf", NULL);
+ 
+ 	transfer = pull_phonebook(pbap, message, PULLPHONEBOOK, name,
+-				targetfile, pbap->filter, pbap->format,
+-				DEFAULT_COUNT, DEFAULT_OFFSET, &err);
++						targetfile, apparam, &err);
+ 	g_free(name);
++	g_obex_apparam_free(apparam);
+ 
+ 	if (transfer == NULL) {
+ 		DBusMessage *reply = g_dbus_create_error(message,
+@@ -754,20 +907,28 @@ static DBusMessage *pbap_get_size(DBusConnection *connection,
+ 	DBusMessage *reply;
+ 	struct obc_transfer *transfer;
+ 	char *name;
++	GObexApparam *apparam;
+ 	GError *err = NULL;
++	DBusMessageIter args;
+ 
+ 	if (!pbap->path)
+ 		return g_dbus_create_error(message,
+ 					ERROR_INTERFACE ".Forbidden",
+ 					"Call Select first of all");
+ 
++	dbus_message_iter_init(message, &args);
++
+ 	name = g_strconcat(pbap->path, ".vcf", NULL);
+ 
++	apparam = g_obex_apparam_set_uint16(NULL, MAXLISTCOUNT_TAG, 0);
++	apparam = g_obex_apparam_set_uint16(apparam, LISTSTARTOFFSET_TAG,
++							DEFAULT_OFFSET);
++
+ 	transfer = pull_phonebook(pbap, message, GETPHONEBOOKSIZE, name, NULL,
+-				pbap->filter, pbap->format, 0,
+-				DEFAULT_OFFSET, &err);
++								apparam, &err);
+ 
+ 	g_free(name);
++	g_obex_apparam_free(apparam);
+ 
+ 	if (transfer != NULL)
+ 		return NULL;
+@@ -891,7 +1052,8 @@ static const GDBusMethodTable pbap_methods[] = {
+ 			GDBUS_ARGS({ "location", "s" }, { "phonebook", "s" }),
+ 			NULL, pbap_select) },
+ 	{ GDBUS_METHOD("PullAll",
+-			GDBUS_ARGS({ "targetfile", "s" }),
++			GDBUS_ARGS({ "targetfile", "s" },
++					{ "filters", "a{sv}" }),
+ 			GDBUS_ARGS({ "transfer", "o" },
+ 					{ "properties", "a{sv}" }),
+ 			pbap_pull_all) },
 -- 
-1.7.9.5
+1.7.11.4
 
