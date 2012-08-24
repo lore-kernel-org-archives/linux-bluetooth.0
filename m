@@ -1,58 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH 2/2] Bluetooth: Fix sending a HCI Authorization Request over LE links
+Date: Thu, 23 Aug 2012 21:32:44 -0300
+Message-Id: <1345768364-9546-2-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1345768364-9546-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1345768364-9546-1-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
-In-Reply-To: <1345545955-13144-1-git-send-email-tomasz.bursztyka@linux.intel.com>
-References: <1345545955-13144-1-git-send-email-tomasz.bursztyka@linux.intel.com>
-Date: Fri, 24 Aug 2012 10:54:23 +0300
-Message-ID: <CABBYNZK=ND4egOi6x3ftZxcddpGF6eGAqqw5A-ya6R=88U6_3A@mail.gmail.com>
-Subject: Re: [PATCH 0/5] PAN server fixes
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Tomasz Bursztyka <tomasz.bursztyka@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tomasz,
+In the case that the link is already in the connected state and a
+Pairing request arrives from the mgmt interface, hci_conn_security()
+would be called but it was not considering LE links.
 
-On Tue, Aug 21, 2012 at 1:45 PM, Tomasz Bursztyka
-<tomasz.bursztyka@linux.intel.com> wrote:
-> Hi,
->
-> After looking at connman's bug https://bugs.meego.com/show_bug.cgi?id=25125 I figured out that PAN server code was missbehaving.
-> Basically, when DBus Unregister call is made: all bnep ifs and there corresponding connections are not touched at all, so on the
-> client side: it still thinks it's connected (it is, but it lost the tethering stuff and so on).
->
-> So here is a patch set that fixes the issue.
->
-> 1 - it tracks the bnep interface per session, it will be necessary afterwards
-> 2 - An helper to remove properly an interface from a bridge, it will be necessary afterwards also
-> 3 - Here we are: it deletes the interface from the bridge, and puts it down when the server is freed. It's on its own function since it will be
-> necessary aft
-> erwards.
-> 4 - It kills the underlying connection properly so the client is notified as it should
-> 5 - Finally, when Unregister method call is made: it cleans up all sessions so clients are disconnected accordingly etc...
->
-> Note: I tested this patch against 4.101 and it worken properly.
->
-> Please review,
->
->
-> Tomasz Bursztyka (5):
->   network: Keep track of session's interface name in server
->   network: Add helper function to remove an interface from a bridge
->   network: Release session's interface from bridge when unregistering
->   network: Kill underlying session's connection before freeing it
->   network: Remove sessions from server on DBus call Unregister
->
->  profiles/network/common.c |   29 +++++++++++++++++++++++++++++
->  profiles/network/common.h |    1 +
->  profiles/network/server.c |   31 ++++++++++++++++++++++++++++---
->  3 files changed, 58 insertions(+), 3 deletions(-)
->
-> --
-> 1.7.8.6
+Reported-by: João Paulo Rechi Vita <jprvita@openbossa.org>
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ net/bluetooth/hci_conn.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-All 5 patches are now upstream, thanks.
-
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 3e65c02..2f8013d 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -29,6 +29,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/a2mp.h>
++#include <net/bluetooth/smp.h>
+ 
+ static void hci_le_create_connection(struct hci_conn *conn)
+ {
+@@ -645,6 +646,9 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
+ {
+ 	BT_DBG("hcon %p", conn);
+ 
++	if (conn->type == LE_LINK)
++		return smp_conn_security(conn, sec_level);
++
+ 	/* For sdp we don't need the link key. */
+ 	if (sec_level == BT_SECURITY_SDP)
+ 		return 1;
 -- 
-Luiz Augusto von Dentz
+1.7.12
+
