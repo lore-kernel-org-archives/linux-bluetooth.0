@@ -1,43 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Geay Franck <franck.geay@technicolor.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Fri, 24 Aug 2012 10:12:54 +0200
-Subject: duplicate devices found when using StartDiscovery API
-Message-ID: <453EEB4CD4162742B6EF3D3F84E88A6E01ADB2AAC3@MOPESMBX01.eu.thmulti.com>
-Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
+In-Reply-To: <1345545955-13144-1-git-send-email-tomasz.bursztyka@linux.intel.com>
+References: <1345545955-13144-1-git-send-email-tomasz.bursztyka@linux.intel.com>
+Date: Fri, 24 Aug 2012 10:54:23 +0300
+Message-ID: <CABBYNZK=ND4egOi6x3ftZxcddpGF6eGAqqw5A-ya6R=88U6_3A@mail.gmail.com>
+Subject: Re: [PATCH 0/5] PAN server fixes
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Tomasz Bursztyka <tomasz.bursztyka@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi 
+Hi Tomasz,
 
-I have a problem with bluez scanning API 
-When I call StartDiscovery dbus API, I get some duplicate devices found signal whereas using hcitool scan doesn't list duplicate devices
-Is it normal, do I have to filter duplicate devices based on the BD address ? Is there a fix for this problem ?
-I am using bluez version 4.87
+On Tue, Aug 21, 2012 at 1:45 PM, Tomasz Bursztyka
+<tomasz.bursztyka@linux.intel.com> wrote:
+> Hi,
+>
+> After looking at connman's bug https://bugs.meego.com/show_bug.cgi?id=25125 I figured out that PAN server code was missbehaving.
+> Basically, when DBus Unregister call is made: all bnep ifs and there corresponding connections are not touched at all, so on the
+> client side: it still thinks it's connected (it is, but it lost the tethering stuff and so on).
+>
+> So here is a patch set that fixes the issue.
+>
+> 1 - it tracks the bnep interface per session, it will be necessary afterwards
+> 2 - An helper to remove properly an interface from a bridge, it will be necessary afterwards also
+> 3 - Here we are: it deletes the interface from the bridge, and puts it down when the server is freed. It's on its own function since it will be
+> necessary aft
+> erwards.
+> 4 - It kills the underlying connection properly so the client is notified as it should
+> 5 - Finally, when Unregister method call is made: it cleans up all sessions so clients are disconnected accordingly etc...
+>
+> Note: I tested this patch against 4.101 and it worken properly.
+>
+> Please review,
+>
+>
+> Tomasz Bursztyka (5):
+>   network: Keep track of session's interface name in server
+>   network: Add helper function to remove an interface from a bridge
+>   network: Release session's interface from bridge when unregistering
+>   network: Kill underlying session's connection before freeing it
+>   network: Remove sessions from server on DBus call Unregister
+>
+>  profiles/network/common.c |   29 +++++++++++++++++++++++++++++
+>  profiles/network/common.h |    1 +
+>  profiles/network/server.c |   31 ++++++++++++++++++++++++++++---
+>  3 files changed, 58 insertions(+), 3 deletions(-)
+>
+> --
+> 1.7.8.6
 
-root@localhost ~]# /usr/lib/bluez/test/test-discovery  | grep -e Name -e Addres
-    Name = MyLapTop
-    Address = 00:16:41:DB:FF:F2
-    Name = C1-01
-    Address = 78:2E:EF:10:F4:7B
-    Name = Dell Wireless 370 Bluetooth Mini-card
-    Address = 00:25:56:E4:0E:0C
-    Name = Nokia 2730              
-    Address = C8:DF:7C:CF:CE:E7
-    Name = MyLapTop
-    Address = 00:16:41:DB:FF:F2
-    Name = Nokia 2730              
-    Address = C8:DF:7C:CF:CE:E7
-    Name = Dell Wireless 370 Bluetooth Mini-card
-[root@localhost ~]# hcitool scan    
-Scanning ...
-        78:2E:EF:10:F4:7B       C1-01
-        00:25:56:E4:0E:0C       Dell Wireless 370 Bluetooth Mini-card
-        C8:DF:7C:CF:CE:E7       Nokia 2730  
-        00:16:41:DB:FF:F2       MyLapTop
-        34:4B:50:BC:EB:84       My Tara
-                              
+All 5 patches are now upstream, thanks.
 
-Thanks
-Franck
+-- 
+Luiz Augusto von Dentz
