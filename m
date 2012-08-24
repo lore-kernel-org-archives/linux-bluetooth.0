@@ -1,75 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 03/22] Bluetooth: Add HCI logical link cmds definitions
-Date: Fri, 24 Aug 2012 17:00:02 +0300
-Message-Id: <1345816821-32331-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1345816821-32331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 00/22] Bluetooth: Create AMP physical link
+Date: Fri, 24 Aug 2012 16:59:59 +0300
+Message-Id: <1345816821-32331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1345816821-32331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+This set of patches enhances A2MP protocol and creates physical
+link between AMP controllers. This is further iteration towards
+Bluetooth High Speed.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- include/net/bluetooth/hci.h |   36 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 35 insertions(+), 1 deletion(-)
+Changes:
+	* p2: Remove HCI callbacks and use amp_mgr global list, refactor code.
+	* p1: Fixed locking issues, added basic logical link preparation.
+	* v3: Remove workqueue from callback processing; change callback functions
+	names according to reviewers recommendations; create global amp_mgr_list to
+	have lookup to amp manager, physical and logical links so for those HCI events
+	which might be identified by __handler__ we have lookup; remove extensive
+	hexdump from gen_amp_key.
+	* v2: Fix typos and bugs, add functionality: now physical connection
+	might be established.
+	* v1: Fix typos, change debug prints, refactor code for better
+	splitting functionality.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 0f28f70..42aae18 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -556,12 +556,46 @@ struct hci_cp_accept_phy_link {
- 	__u8     key[HCI_AMP_LINK_KEY_SIZE];
- } __packed;
- 
--#define HCI_OP_DISCONN_PHY_LINK	0x0437
-+#define HCI_OP_DISCONN_PHY_LINK		0x0437
- struct hci_cp_disconn_phy_link {
- 	__u8     phy_handle;
- 	__u8     reason;
- } __packed;
- 
-+struct ext_flow_spec {
-+	__u8       id;
-+	__u8       stype;
-+	__le16     msdu;
-+	__le32     sdu_itime;
-+	__le32     acc_lat;
-+	__le32     flush_to;
-+} __packed;
-+
-+#define HCI_OP_CREATE_LOGICAL_LINK	0x0438
-+#define HCI_OP_ACCEPT_LOGICAL_LINK	0x0439
-+struct hci_cp_create_accept_logical_link {
-+	__u8                  phy_handle;
-+	struct ext_flow_spec  tx_flow_spec;
-+	struct ext_flow_spec  rx_flow_spec;
-+} __packed;
-+
-+#define HCI_OP_DISCONN_LOGICAL_LINK	0x043a
-+struct hci_cp_disconn_logical_link {
-+	__le16   log_handle;
-+} __packed;
-+
-+#define HCI_OP_LOGICAL_LINK_CANCEL	0x043b
-+struct hci_cp_logical_link_cancel {
-+	__u8     phy_handle;
-+	__u8     flow_spec_id;
-+} __packed;
-+
-+struct hci_rp_logical_link_cancel {
-+	__u8     status;
-+	__u8     phy_handle;
-+	__u8     flow_spec_id;
-+} __packed;
-+
- #define HCI_OP_SNIFF_MODE		0x0803
- struct hci_cp_sniff_mode {
- 	__le16   handle;
+Andrei Emeltchenko (21):
+  Bluetooth: debug: Print refcnt for hci_dev
+  Bluetooth: trivial: Remove empty line
+  Bluetooth: Add HCI logical link cmds definitions
+  Bluetooth: A2MP: Create amp_mgr global list
+  Bluetooth: AMP: Use HCI cmd to Read AMP Info
+  Bluetooth: AMP: Use HCI cmd to Read Loc AMP Assoc
+  Bluetooth: A2MP: Process Discover Response
+  Bluetooth: AMP: Physical link struct definitions
+  Bluetooth: Add phylink lookup helper function
+  Bluetooth: AMP: Remote AMP ctrl definitions
+  Bluetooth: AMP: Use phylink in create/disc phylink req
+  Bluetooth: A2MP: Process A2MP Getinfo Rsp
+  Bluetooth: A2MP: Process A2MP Get AMP Assoc Rsp
+  Bluetooth: Choose connection based on capabilities
+  Bluetooth: Close A2MP chan when deleting corr L2CAP chan
+  Bluetooth: AMP: Add AMP key calculation
+  Bluetooth: AMP: Create Physical Link
+  Bluetooth: AMP: Write remote AMP Assoc
+  Bluetooth: A2MP: Add fallback to normal l2cap init sequence
+  Bluetooth: AMP: Process Chan Selected event
+  Bluetooth: AMP: Process physical link complete event
+
+Dmitry Kasatkin (1):
+  Bluetooth: Add function to derive AMP key using hmac
+
+ include/net/bluetooth/a2mp.h     |   23 +++
+ include/net/bluetooth/amp.h      |   29 +++
+ include/net/bluetooth/hci.h      |   39 +++-
+ include/net/bluetooth/hci_core.h |   17 ++
+ include/net/bluetooth/l2cap.h    |    2 +
+ include/net/bluetooth/pal.h      |   58 ++++++
+ net/bluetooth/Kconfig            |    1 +
+ net/bluetooth/Makefile           |    2 +-
+ net/bluetooth/a2mp.c             |  421 +++++++++++++++++++++++++++++++++++---
+ net/bluetooth/amp.c              |  156 ++++++++++++++
+ net/bluetooth/hci_core.c         |    1 -
+ net/bluetooth/hci_event.c        |  156 +++++++++++++-
+ net/bluetooth/l2cap_core.c       |   44 +++-
+ net/bluetooth/pal.c              |  330 ++++++++++++++++++++++++++++++
+ 14 files changed, 1241 insertions(+), 38 deletions(-)
+ create mode 100644 include/net/bluetooth/amp.h
+ create mode 100644 include/net/bluetooth/pal.h
+ create mode 100644 net/bluetooth/amp.c
+ create mode 100644 net/bluetooth/pal.c
+
 -- 
 1.7.9.5
 
