@@ -1,70 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <503921AB.6060104@shealevy.com>
-Date: Sat, 25 Aug 2012 15:04:11 -0400
-From: Shea Levy <shea@shealevy.com>
-MIME-Version: 1.0
-To: Henrik Rydberg <rydberg@euromail.se>
-CC: Gustavo Padovan <gustavo@padovan.org>,
+From: "Henrik Rydberg" <rydberg@euromail.se>
+Date: Sat, 25 Aug 2012 20:35:43 +0200
+To: Shea Levy <shea@shealevy.com>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
 	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] Bluetooth: Add support for Apple vendor-specific devices
+Message-ID: <20120825183543.GA4517@polaris.bitmath.org>
 References: <1345915686-3915-1-git-send-email-rydberg@euromail.se>
-In-Reply-To: <1345915686-3915-1-git-send-email-rydberg@euromail.se>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+ <50390B54.4040706@shealevy.com>
+ <20120825174342.GA4057@polaris.bitmath.org>
+ <5039179D.6010909@shealevy.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <5039179D.6010909@shealevy.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 08/25/2012 01:28 PM, Henrik Rydberg wrote:
-> As pointed out by Gustavo and Marcel, all Apple-specific Broadcom
-> devices seen so far have the same interface class, subclass and
-> protocol numbers. This patch adds an entry which matches all of them,
-> using the new USB_VENDOR_AND_INTERFACE_INFO() macro.
->
-> In particular, this patch adds support for the MacBook Pro Retina
-> (05ac:8286), which is not in the present list.
->
-> Signed-off-by: Henrik Rydberg<rydberg@euromail.se>
-> ---
-> Hi Gustavo,
->
-> here is a patch for the Apple devices, utilizing commit d81a5d19, for
-> 3.6. Tested on the MacBookPro10,1 (Retina). If you want, I can
-> follow-up with a patch for 3.7 which removes the specific entries. I
-> have verified the lsusb output of all of them, except MacMini5,1.
->
-> Thanks,
-> Henrik
->
->   drivers/bluetooth/btusb.c | 3 +++
->   1 file changed, 3 insertions(+)
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 12075ad..1fae607 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -52,6 +52,9 @@ static struct usb_device_id btusb_table[] = {
->   	/* Generic Bluetooth USB device */
->   	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
->
-> +	/* Apple-specific (Broadcom) devices */
-> +	{ USB_VENDOR_AND_INTERFACE_INFO(0x05ac, 0xff, 0x01, 0x01) },
-> +
->   	/* Broadcom SoftSailing reporting vendor specific */
->   	{ USB_DEVICE(0x0a5c, 0x21e1) },
->
+> I'm getting a build error due to lack of
+> USB_VENDOR_AND_INTERFACE_INFO macro when patching 3.5.2 with that
+> patch. Which kernel tree should I patch with this patch to test?
 
-Tested on my Macbook Pro 9,2, usb-devices output:
+The macro is in the pipe to 3.5.x, probably only a couple of days
+away. The patch is for 3.6, as stated, meaning it applies on top of
+Linus's tree.
 
-T:  Bus=04 Lev=04 Prnt=04 Port=02 Cnt=01 Dev#=  9 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=05ac ProdID=821d Rev=00.86
-S:  Manufacturer=Apple Inc.
-S:  Product=Bluetooth USB Host Controller
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-
-So:
-
-Tested-by: Shea Levy <shea@shealevy.com>
+Henrik
