@@ -1,49 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1345533815-5611-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1345533815-5611-1-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Mon, 27 Aug 2012 10:00:00 +0300
-Message-ID: <CABBYNZLSq1FKmOvKHG9b6SuV0QQux_Zik3ov2eDez89WxhYRmw@mail.gmail.com>
-Subject: Re: [PATCH obexd v0] client-doc: Guarantee prefix in transfer paths
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1346000930.1779.29.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Add support for Apple vendor-specific devices
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Henrik Rydberg <rydberg@euromail.se>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Sun, 26 Aug 2012 10:08:50 -0700
+In-Reply-To: <1345915686-3915-1-git-send-email-rydberg@euromail.se>
+References: <1345915686-3915-1-git-send-email-rydberg@euromail.se>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Henrik,
 
-On Tue, Aug 21, 2012 at 10:23 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> The client D-Bus documentation should mention that all transfer paths
-> contain a prefix consisting of the path of the session they belong to.
->
-> This can be conveniently used by clients to install D-Bus signal matches
-> that concentrate on the relevant signals.
+> As pointed out by Gustavo and Marcel, all Apple-specific Broadcom
+> devices seen so far have the same interface class, subclass and
+> protocol numbers. This patch adds an entry which matches all of them,
+> using the new USB_VENDOR_AND_INTERFACE_INFO() macro.
+> 
+> In particular, this patch adds support for the MacBook Pro Retina
+> (05ac:8286), which is not in the present list.
+> 
+> Signed-off-by: Henrik Rydberg <rydberg@euromail.se>
 > ---
->  doc/client-api.txt |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/doc/client-api.txt b/doc/client-api.txt
-> index 839a78c..7ca65cc 100644
-> --- a/doc/client-api.txt
-> +++ b/doc/client-api.txt
-> @@ -466,7 +466,7 @@ Transfer hierarchy
->
->  Service                org.bluez.obex.client
->  Interface      org.bluez.obex.Transfer
-> -Object path    [variable prefix]/{transfer0,transfer1,...}
-> +Object path    [variable prefix]/{session0,session1,...}/{transfer0,...}
->
->  Methods                dict GetProperties()
->
-> --
-> 1.7.7.6
+> Hi Gustavo,
+> 
+> here is a patch for the Apple devices, utilizing commit d81a5d19, for
+> 3.6. Tested on the MacBookPro10,1 (Retina). If you want, I can
+> follow-up with a patch for 3.7 which removes the specific entries. I
+> have verified the lsusb output of all of them, except MacMini5,1.
+> 
+> Thanks,
+> Henrik
+> 
+>  drivers/bluetooth/btusb.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-I went ahead and applied this patch.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
--- 
-Luiz Augusto von Dentz
+Regards
+
+Marcel
+
+
