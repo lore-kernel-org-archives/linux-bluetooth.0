@@ -1,47 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1346000930.1779.29.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Add support for Apple vendor-specific devices
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Henrik Rydberg <rydberg@euromail.se>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Sun, 26 Aug 2012 10:08:50 -0700
-In-Reply-To: <1345915686-3915-1-git-send-email-rydberg@euromail.se>
-References: <1345915686-3915-1-git-send-email-rydberg@euromail.se>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+Date: Sun, 26 Aug 2012 13:20:36 +0100
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] Fix trivial coding style issues on pointer
+ declarations and casting
+Message-ID: <20120826122036.GA3627@x220.spectrum.wifi>
+References: <1345564164-15930-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1345564164-15930-1-git-send-email-anderson.lizardo@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Henrik,
+Hi Lizardo,
 
-> As pointed out by Gustavo and Marcel, all Apple-specific Broadcom
-> devices seen so far have the same interface class, subclass and
-> protocol numbers. This patch adds an entry which matches all of them,
-> using the new USB_VENDOR_AND_INTERFACE_INFO() macro.
-> 
-> In particular, this patch adds support for the MacBook Pro Retina
-> (05ac:8286), which is not in the present list.
-> 
-> Signed-off-by: Henrik Rydberg <rydberg@euromail.se>
+On Tue, Aug 21, 2012, Anderson Lizardo wrote:
+> Avoid using C++ style pointer declarations like "char* ptr", as most
+> BlueZ code uses "char *ptr".
 > ---
-> Hi Gustavo,
 > 
-> here is a patch for the Apple devices, utilizing commit d81a5d19, for
-> 3.6. Tested on the MacBookPro10,1 (Retina). If you want, I can
-> follow-up with a patch for 3.7 which removes the specific entries. I
-> have verified the lsusb output of all of them, except MacMini5,1.
+> This is a very trivial patch, but changes are so small that it was worthy to
+> fix.
 > 
-> Thanks,
-> Henrik
+> I avoided touching tools/ubcsp.c because it has even more coding style issues.
 > 
->  drivers/bluetooth/btusb.c | 3 +++
->  1 file changed, 3 insertions(+)
+> 
+>  audio/gstavdtpsink.h     |    2 +-
+>  audio/gstsbcutil.h       |    8 ++++----
+>  lib/sdp.c                |    4 ++--
+>  profiles/input/sixpair.c |    6 +++---
+>  test/l2test.c            |    4 ++--
+>  tools/hciattach.h        |    2 +-
+>  tools/hciattach_ti.c     |   22 +++++++++++++---------
+>  tools/ppporc.c           |    2 +-
+>  tools/rfcomm.c           |    4 ++--
+>  9 files changed, 29 insertions(+), 25 deletions(-)
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Applied. Thanks.
 
-Regards
-
-Marcel
-
-
+Johan
