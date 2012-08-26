@@ -1,25 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 26 Aug 2012 10:30:22 +0300
+Date: Sun, 26 Aug 2012 10:29:35 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] core: Fix memory leak
-Message-ID: <20120826073022.GC32318@x220>
-References: <1345852298-9204-1-git-send-email-vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH BlueZ] input: Fix signedness issue on POSIX error code
+ usage
+Message-ID: <20120826072935.GB32318@x220>
+References: <1345842229-11935-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1345852298-9204-1-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1345842229-11935-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Lizardo,
 
-On Fri, Aug 24, 2012, Vinicius Costa Gomes wrote:
-> When ignoring a LE device that is not in a discoverable state 'alias'
-> is leaking.
+On Fri, Aug 24, 2012, Anderson Lizardo wrote:
+> By convention, error variables containing POSIX error code (usually
+> called "err") are negative. This commit fixes a couple of places where
+> positive values are expected.
 > ---
->  src/adapter.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  profiles/input/hog_device.c |    2 +-
+>  profiles/input/server.c     |    2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 
 Applied. Thanks.
 
