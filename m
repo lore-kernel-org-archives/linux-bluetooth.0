@@ -1,113 +1,144 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [RFC BlueZ 23/33] observer: Add python test script
-Date: Mon, 27 Aug 2012 13:03:15 -0400
-Message-Id: <1346087005-24693-24-git-send-email-bruna.moreira@openbossa.org>
+Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Subject: [RFC BlueZ 21/33] eir: Add manufacturer and service data fields
+Date: Mon, 27 Aug 2012 13:03:13 -0400
+Message-Id: <1346087005-24693-22-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- test/test-observer |   87 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 87 insertions(+)
- create mode 100755 test/test-observer
+From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 
-diff --git a/test/test-observer b/test/test-observer
-new file mode 100755
-index 0000000..110f487
---- /dev/null
-+++ b/test/test-observer
-@@ -0,0 +1,87 @@
-+#!/usr/bin/python
+For advertising, there are another possible fields, Service Data and
+Manufacturer Specific Data.
+---
+ src/eir.c |   43 +++++++++++++++++++++++++++++++++++++++++++
+ src/eir.h |   16 ++++++++++++++++
+ 2 files changed, 59 insertions(+)
+
+diff --git a/src/eir.c b/src/eir.c
+index 9d42917..676e303 100644
+--- a/src/eir.c
++++ b/src/eir.c
+@@ -38,12 +38,32 @@
+ #include "glib-helper.h"
+ #include "eir.h"
+ 
++static void svc_data_free(void *p)
++{
++	struct svc_data *sdata = p;
 +
-+'''Observer test script
-+'''
++	g_free(sdata->data);
++	g_free(sdata);
++}
 +
-+from __future__ import absolute_import, print_function, unicode_literals
++static void manuf_data_free(void *p)
++{
++	struct manuf_data *mdata = p;
 +
-+from gi.repository import GObject
++	g_free(mdata->data);
++	g_free(mdata);
++}
 +
-+import sys
-+import dbus
-+import dbus.service
-+import dbus.mainloop.glib
-+from optparse import OptionParser, make_option
+ void eir_data_free(struct eir_data *eir)
+ {
+ 	g_slist_free_full(eir->services, g_free);
+ 	eir->services = NULL;
+ 	g_free(eir->name);
+ 	eir->name = NULL;
++	g_slist_free_full(eir->svcs_data, svc_data_free);
++	eir->svcs_data = NULL;
++	g_slist_free_full(eir->manufs_data, manuf_data_free);
++	eir->manufs_data = NULL;
+ }
+ 
+ static void eir_parse_uuid16(struct eir_data *eir, void *data, uint8_t len)
+@@ -107,6 +127,8 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
+ 	while (len < eir_len - 1) {
+ 		uint8_t field_len = eir_data[0];
+ 		uint8_t data_len, *data = &eir_data[2];
++		struct svc_data *sdata;
++		struct manuf_data *mdata;
+ 
+ 		/* Check for the end of EIR */
+ 		if (field_len == 0)
+@@ -163,11 +185,32 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
+ 			memcpy(eir->dev_class, data, 3);
+ 			break;
+ 
++		case EIR_SVC_DATA:
++			if (data_len < 2)
++				break;
++			sdata = g_new(struct svc_data, 1);
++			sdata->uuid = bt_get_le16(data);
++			sdata->data_len = data_len - 2;
++			sdata->data = g_memdup(data + 2, data_len - 2);
++			eir->svcs_data = g_slist_append(eir->svcs_data, sdata);
++			break;
 +
-+def dbus_data(data):
-+	return "".join(["%02x" % c for c in data])
+ 		case EIR_GAP_APPEARANCE:
+ 			if (data_len < 2)
+ 				break;
+ 			eir->appearance = bt_get_le16(data);
+ 			break;
 +
-+class Observer(dbus.service.Object):
-+	@dbus.service.method("org.bluez.Observer",
-+					in_signature="sqv", out_signature="")
-+	def ServiceReceived(self, address, uuid, value):
-+		print("[ " + address + " ]")
-+		print("    Service UUID = 0x%04x" % int(uuid))
-+		print("    Data = %s" % dbus_data(value))
-+		print()
++		case EIR_MANUF_DATA:
++			if (data_len < 2)
++				break;
++			mdata = g_new(struct manuf_data, 1);
++			mdata->company_id = bt_get_le16(data);
++			mdata->data_len = data_len - 2;
++			mdata->data = g_memdup(data + 2, data_len - 2);
++			eir->manufs_data = g_slist_append(eir->manufs_data,
++									mdata);
++			break;
+ 		}
+ 
+ 		eir_data += field_len + 1;
+diff --git a/src/eir.h b/src/eir.h
+index 3c81024..f8e6c7c 100644
+--- a/src/eir.h
++++ b/src/eir.h
+@@ -34,13 +34,27 @@
+ #define EIR_TX_POWER                0x0A  /* transmit power level */
+ #define EIR_CLASS_OF_DEV            0x0D  /* Class of Device */
+ #define EIR_DEVICE_ID               0x10  /* device ID */
++#define EIR_SVC_DATA                0x16  /* service data */
+ #define EIR_GAP_APPEARANCE          0x19  /* GAP appearance */
++#define EIR_MANUF_DATA              0xFF  /* manufacturer specific data */
+ 
+ struct uuid_info {
+ 	uuid_t uuid;
+ 	uint8_t svc_hint;
+ };
+ 
++struct svc_data {
++	uint16_t uuid;
++	uint8_t data_len;
++	uint8_t *data;
++};
 +
-+	@dbus.service.method("org.bluez.Observer",
-+					in_signature="sqv", out_signature="")
-+	def ManufacturerReceived(self, address, cid, value):
-+		print("[ " + address + " ]")
-+		print("    Company ID = 0x%04x" % int(cid))
-+		print("    Data = %s" % dbus_data(value))
-+		print()
++struct manuf_data {
++	uint16_t company_id;
++	uint8_t data_len;
++	uint8_t *data;
++};
 +
-+def property_changed(name, value):
-+	print("PropertyChanged('%s', '%s')" % (name, value))
-+
-+if __name__ == "__main__":
-+	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-+
-+	bus = dbus.SystemBus()
-+
-+	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
-+					"org.bluez.Manager")
-+
-+	option_list = [
-+		make_option("-i", "--adapter", action="store",
-+			type="string", dest="adapter"),
-+		make_option("-s", "--service", action="store",
-+			type="int", dest="service_uuid",
-+			help="Service UUID (e.g. \"0x0001\")"),
-+		make_option("-c", "--company", action="store",
-+			type="int", dest="company_id",
-+			help="Company Identifier Code (e.g. \"0x0002\")"),
-+		]
-+
-+	parser = OptionParser(option_list=option_list)
-+
-+	(options, args) = parser.parse_args()
-+
-+	if not options.service_uuid and not options.company_id:
-+		parser.error("At least one option is required: -c or -s")
-+
-+	if options.adapter:
-+		adapter_path = manager.FindAdapter(options.adapter)
-+	else:
-+		adapter_path = manager.DefaultAdapter()
-+
-+	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
-+							"org.bluez.Adapter")
-+
-+	bus.add_signal_receiver(property_changed, bus_name="org.bluez",
-+				dbus_interface="org.bluez.Adapter",
-+				signal_name="PropertyChanged")
-+
-+	path = "/test/observer"
-+	observer = Observer(bus, path)
-+
-+	if options.service_uuid:
-+		adapter.RegisterServiceObserver(path, dbus.UInt16(options.service_uuid))
-+
-+	if options.company_id:
-+		adapter.RegisterManufacturerObserver(path, dbus.UInt16(options.company_id))
-+
-+	mainloop = GObject.MainLoop()
-+	mainloop.run()
+ struct eir_data {
+ 	GSList *services;
+ 	int flags;
+@@ -48,6 +62,8 @@ struct eir_data {
+ 	uint8_t dev_class[3];
+ 	uint16_t appearance;
+ 	gboolean name_complete;
++	GSList *svcs_data;
++	GSList *manufs_data;
+ };
+ 
+ void eir_data_free(struct eir_data *eir);
 -- 
 1.7.9.5
 
