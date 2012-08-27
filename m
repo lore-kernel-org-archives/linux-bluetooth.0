@@ -1,42 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 27 Aug 2012 08:16:47 -0700
+Date: Mon, 27 Aug 2012 08:12:56 -0700
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Shea Levy <shea@shealevy.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH RESEND] Bluetooth: Add support for Apple MacBook Pro 9,2
-Message-ID: <20120827151647.GB8934@joana>
-References: <1344374463-21231-1-git-send-email-shea@shealevy.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: Fix sending a HCI Authorization Request
+ over LE links
+Message-ID: <20120827151256.GA8934@joana>
+References: <1345768364-9546-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1345768364-9546-2-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1344374463-21231-1-git-send-email-shea@shealevy.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1345768364-9546-2-git-send-email-vinicius.gomes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Shea,
+Hi Vinicius,
 
-* Shea Levy <shea@shealevy.com> [2012-08-07 17:21:03 -0400]:
+* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2012-08-23 21:32:44 -0300]:
 
-> $ usb-devices
-> <snip>
-> T:  Bus=04 Lev=04 Prnt=04 Port=02 Cnt=01 Dev#=  9 Spd=12  MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=05ac ProdID=821d Rev=00.86
-> S:  Manufacturer=Apple Inc.
-> S:  Product=Bluetooth USB Host Controller
-> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-> <snip>
+> In the case that the link is already in the connected state and a
+> Pairing request arrives from the mgmt interface, hci_conn_security()
+> would be called but it was not considering LE links.
 > 
-> Signed-off-by: Shea Levy <shea@shealevy.com>
+> Reported-by: João Paulo Rechi Vita <jprvita@openbossa.org>
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 > ---
->  drivers/bluetooth/btusb.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  net/bluetooth/hci_conn.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 
-So this is outdated by the USB_VENDOR_AND_INTERFACE_INFO() patch that I just
-applied.
+Both patches have been applied to the bluetooth.git tree. Thanks.
 
 	Gustavo
