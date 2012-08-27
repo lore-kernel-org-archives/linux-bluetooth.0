@@ -1,33 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 27 Aug 2012 08:24:09 -0700
+Date: Mon, 27 Aug 2012 08:16:47 -0700
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Sachin Kamat <sachin.kamat@linaro.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	johan.hedberg@gmail.com, raja_mani@ti.com, patches@linaro.org
-Subject: Re: [PATCH] Bluetooth: Use module_platform_driver() in btwilink.c
- file
-Message-ID: <20120827152409.GC8934@joana>
-References: <1344316065-2032-1-git-send-email-sachin.kamat@linaro.org>
+To: Shea Levy <shea@shealevy.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH RESEND] Bluetooth: Add support for Apple MacBook Pro 9,2
+Message-ID: <20120827151647.GB8934@joana>
+References: <1344374463-21231-1-git-send-email-shea@shealevy.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1344316065-2032-1-git-send-email-sachin.kamat@linaro.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1344374463-21231-1-git-send-email-shea@shealevy.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sachin,
+Hi Shea,
 
-* Sachin Kamat <sachin.kamat@linaro.org> [2012-08-07 10:37:45 +0530]:
+* Shea Levy <shea@shealevy.com> [2012-08-07 17:21:03 -0400]:
 
-> module_platform_driver() makes the code simpler by eliminating module_init
-> and module_exit calls.
+> $ usb-devices
+> <snip>
+> T:  Bus=04 Lev=04 Prnt=04 Port=02 Cnt=01 Dev#=  9 Spd=12  MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=05ac ProdID=821d Rev=00.86
+> S:  Manufacturer=Apple Inc.
+> S:  Product=Bluetooth USB Host Controller
+> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+> <snip>
 > 
-> Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
+> Signed-off-by: Shea Levy <shea@shealevy.com>
 > ---
-> This patch is based on bluetooth-next tree and is compile tested.
-> ---
->  drivers/bluetooth/btwilink.c |   16 +---------------
->  1 files changed, 1 insertions(+), 15 deletions(-)
+>  drivers/bluetooth/btusb.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-Patch has been applied to bluetooth-next. Thanks.
+So this is outdated by the USB_VENDOR_AND_INTERFACE_INFO() patch that I just
+applied.
 
 	Gustavo
