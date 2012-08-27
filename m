@@ -2,148 +2,151 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [RFC BlueZ 02/22] alert: Introduce manager abstraction layer
-Date: Mon, 27 Aug 2012 13:11:46 -0400
-Message-Id: <1346087526-15107-3-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [RFC BlueZ 01/22] doc: Introduce Alert API
+Date: Mon, 27 Aug 2012 13:11:45 -0400
+Message-Id: <1346087526-15107-2-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1346087526-15107-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1346087526-15107-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This abstraction layer makes the GATT Phone Alert Status and Alert
-Notification implementation consistent with other GATT profiles.
+This API will be implemented and initially used by Phone Alert Status
+and Alert Notification GATT profiles (server role).
 ---
- Makefile.am              |    3 ++-
- profiles/alert/main.c    |    6 +++---
- profiles/alert/manager.c |   40 ++++++++++++++++++++++++++++++++++++++++
- profiles/alert/manager.h |   26 ++++++++++++++++++++++++++
- 4 files changed, 71 insertions(+), 4 deletions(-)
- create mode 100644 profiles/alert/manager.c
- create mode 100644 profiles/alert/manager.h
+ doc/alert-api.txt |  124 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 124 insertions(+)
+ create mode 100644 doc/alert-api.txt
 
-diff --git a/Makefile.am b/Makefile.am
-index 4977a05..1088991 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -219,7 +219,8 @@ builtin_sources += profiles/thermometer/main.c \
- 			profiles/thermometer/thermometer.h \
- 			profiles/thermometer/thermometer.c \
- 			profiles/alert/main.c profiles/alert/server.h \
--			profiles/alert/server.c \
-+			profiles/alert/server.c profiles/alert/manager.h \
-+			profiles/alert/manager.c \
- 			profiles/time/main.c profiles/time/server.h \
- 			profiles/time/server.c profiles/time/manager.c \
- 			profiles/time/manager.h \
-diff --git a/profiles/alert/main.c b/profiles/alert/main.c
-index ec4ab6d..5e6910a 100644
---- a/profiles/alert/main.c
-+++ b/profiles/alert/main.c
-@@ -33,7 +33,7 @@
- #include "plugin.h"
- #include "hcid.h"
- #include "log.h"
--#include "server.h"
-+#include "manager.h"
- 
- static int alert_init(void)
- {
-@@ -42,7 +42,7 @@ static int alert_init(void)
- 		return -ENOTSUP;
- 	}
- 
--	return alert_server_init();
-+	return alert_manager_init();
- }
- 
- static void alert_exit(void)
-@@ -50,7 +50,7 @@ static void alert_exit(void)
- 	if (!main_opts.gatt_enabled)
- 		return;
- 
--	alert_server_exit();
-+	alert_manager_exit();
- }
- 
- BLUETOOTH_PLUGIN_DEFINE(alert, VERSION,
-diff --git a/profiles/alert/manager.c b/profiles/alert/manager.c
+diff --git a/doc/alert-api.txt b/doc/alert-api.txt
 new file mode 100644
-index 0000000..eb2d627
+index 0000000..79d65b8
 --- /dev/null
-+++ b/profiles/alert/manager.c
-@@ -0,0 +1,40 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012  Nokia Corporation
-+ *  Copyright (C) 2012  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
++++ b/doc/alert-api.txt
+@@ -0,0 +1,124 @@
++BlueZ D-Bus Alert API description
++*********************************
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
++Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
 +
-+#include "manager.h"
-+#include "server.h"
++Introduction
++------------
 +
-+int alert_manager_init(void)
-+{
-+	return alert_server_init();
-+}
++Currently, there are two different GATT server profiles that depend on
++receiving alerts or notifications from the platform: Phone Alert Status (PASP)
++and Alert Notification (ANP). PASP is very specific to mobile phones, and also
++allows limited control to alerts (i.e. mute once or switch to a silent mode).
 +
-+void alert_manager_exit(void)
-+{
-+	alert_server_exit();
-+}
-diff --git a/profiles/alert/manager.h b/profiles/alert/manager.h
-new file mode 100644
-index 0000000..e4c6bd0
---- /dev/null
-+++ b/profiles/alert/manager.h
-@@ -0,0 +1,26 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012  Nokia Corporation
-+ *  Copyright (C) 2012  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
++This document presents a unified API that allows to register and notify alerts,
++and to control some alerts (using the provided agent object).
 +
-+int alert_manager_init(void);
-+void alert_manager_exit(void);
++
++Alert hierarchy
++===============
++
++Service		org.bluez
++Interface	org.bluez.Alert
++Object path	/org/bluez
++
++Methods		void RegisterAlert(string category, object agent)
++
++			Register a new alert category and an agent for it. This
++			means the application will be responsible for notifying
++			BlueZ of any alerts of that category, using the
++			NewAlert() method.
++
++			Supported ANP categories: simple, email, news, call,
++				missed_call, sms_mms, voice_mail, schedule,
++				high_priority, instant_message
++			Supported PASP categories: ringer, vibrate, display
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++		void NewAlert(string category, uint16 count, string description)
++
++			Notify BlueZ of new alert(s) for the given category. The
++			description is relative to the last received alert and
++			can be sender name, caller ID, title, or other
++			information specific to the category.
++
++			For ringer, vibrate and display categories, valid
++			descriptions are "active" and "not active". Alerts from
++			ringer category also accept "enabled" and "disabled",
++			depending on whether ringer is in silent mode or not.
++
++			Description must not exceed 18 bytes when encoded in
++			UTF-8 format, otherwise an error is returned. If there
++			is no description, an empty string should be used.
++
++			The count argument contains the number of alerts not
++			yet acknowledged by the user on the UI. To save D-Bus
++			traffic, events that may generate multiple alerts at
++			the same time (like email, sms, news) should trigger a
++			single NewAlert().
++
++			If there are more than 254 new alerts, count must be
++			set to 255. PASP alerts should always set count to 1.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++		void UnreadAlert(string category, uint16 count)
++
++			Some services (like SMS and e-mail) keep track of
++			number of unread items. This method allows to update
++			this counter, so peer devices can be notified using
++			Alert Notification Profile.
++
++			If there are more than 254 unread alerts, count must be
++			set to 255.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++Alert Agent hierarchy
++=====================
++
++Service		org.bluez
++Interface	org.bluez.AlertAgent
++Object path	freely definable
++
++Methods		void MuteOnce()
++
++			This method is only called if "ringer" alert category
++			is specified when registering the agent.
++
++			Mute the ringer once (e.g. during a incoming call). If
++			ringer is not active, does nothing.
++
++		void SetRinger(string mode)
++
++			This method is only called if "ringer" alert category
++			is specified when registering the agent.
++
++			Set ringer to the specified mode. If mode is "enabled",
++			ringer is set to the default mode, as defined by the
++			current active profile. If mode is "disabled", ringer
++			will not activate on incoming calls, until it is set
++			back to "enabled" mode.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++		void Suspend(string category)
++
++			Suspend alerts for this category, which means that
++			new/unread alerts should not be reported to save D-Bus
++			traffic. This means that no client has enabled this
++			alert yet.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++		void Resume(string category)
++
++			Resume alerts for this category.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++		void Release()
++
++			Release this agent. At this point, it will be not used
++			by BlueZ anymore and can be destroyed by the owner.
 -- 
 1.7.9.5
 
