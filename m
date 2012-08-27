@@ -2,101 +2,36 @@ Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [RFC BlueZ 33/33] broadcaster: Add python test script
-Date: Mon, 27 Aug 2012 13:03:25 -0400
-Message-Id: <1346087005-24693-34-git-send-email-bruna.moreira@openbossa.org>
+Subject: [RFC BlueZ 32/33] broadcaster: Update some data of already broadcast value
+Date: Mon, 27 Aug 2012 13:03:24 -0400
+Message-Id: <1346087005-24693-33-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+To update a data set previously, it is need to use same identifier
+Service UUID or Company Identifier Code in SetServiceData() and
+SetManufacturerData(), respectively.
 ---
- test/test-broadcaster |   76 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 76 insertions(+)
- create mode 100755 test/test-broadcaster
+ src/adapter.c |    4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/test/test-broadcaster b/test/test-broadcaster
-new file mode 100755
-index 0000000..35283b1
---- /dev/null
-+++ b/test/test-broadcaster
-@@ -0,0 +1,76 @@
-+#!/usr/bin/python
+diff --git a/src/adapter.c b/src/adapter.c
+index bbf6b06..84535cd 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2009,6 +2009,10 @@ static void bcast_session_exit(DBusConnection *conn, void *user_data)
+ static void update_adv_data(struct btd_adapter *adapter,
+ 		struct bcast_session *session, uint8_t *data, int size)
+ {
++	session->data_len = size;
++	memcpy(session->data, data, size);
 +
-+'''Broadcaster test script
-+'''
-+
-+from __future__ import absolute_import, print_function, unicode_literals
-+
-+from gi.repository import GObject
-+
-+import sys
-+import dbus
-+import dbus.service
-+import dbus.mainloop.glib
-+from optparse import OptionParser, make_option
-+import time
-+
-+def property_changed(name, value):
-+	print("PropertyChanged('%s', '%s')" % (name, value))
-+
-+if __name__ == "__main__":
-+	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-+
-+	bus = dbus.SystemBus()
-+
-+	option_list = [
-+		make_option("-i", "--adapter", action="store",
-+			type="string", dest="adapter"),
-+		make_option("-s", "--service", action="store",
-+			type="int", dest="service",
-+			help="Format: Service UUID (0xNNNN) followed by" +
-+			" Service Data (e.g. aa bb cc)"),
-+		make_option("-m", "--manufacturer", action="store",
-+			type="int", dest="manufacturer",
-+			help="Format: Company Identifier Code (0xNNNN)" +
-+			" followed by Manufacturer Specific Data (e.g. 11 22 aa)"),
-+		]
-+
-+	parser = OptionParser(option_list=option_list,
-+			usage="Usage: %prog <-s uuid | -m cid> <data bytes in hex>")
-+
-+	(options, args) = parser.parse_args()
-+	if not args:
-+		parser.error("Hex encoded data is required.")
-+
-+	if options.service and options.manufacturer:
-+		parser.error("options -m and -s are mutually exclusive")
-+
-+	try:
-+		data = dbus.Array(map(lambda i: dbus.Byte(int(i, 16)), args))
-+	except ValueError:
-+		parser.error("Invalid data. Should be hex encoded bytes" +
-+		" separated by whitespace.")
-+
-+	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
-+					"org.bluez.Manager")
-+
-+	if options.adapter:
-+		adapter_path = manager.FindAdapter(options.adapter)
-+	else:
-+		adapter_path = manager.DefaultAdapter()
-+
-+	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
-+							"org.bluez.Adapter")
-+
-+	bus.add_signal_receiver(property_changed, bus_name="org.bluez",
-+				dbus_interface="org.bluez.Adapter",
-+				signal_name="PropertyChanged")
-+
-+	if options.service:
-+		adapter.SetServiceData(dbus.UInt16(options.service), data)
-+
-+	if options.manufacturer:
-+		adapter.SetManufacturerData(dbus.UInt16(options.manufacturer), data)
-+
-+	mainloop = GObject.MainLoop()
-+	mainloop.run()
++	restore_bcast_type(adapter, session->data_type);
+ }
+ 
+ static DBusMessage *set_service_data(DBusConnection *conn,
 -- 
 1.7.9.5
 
