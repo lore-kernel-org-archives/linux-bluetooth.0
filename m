@@ -1,51 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Bluetooth: Fix deadlock when closing socket
-Date: Mon, 27 Aug 2012 17:52:53 +0300
-Message-Id: <1346079173-3284-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 1/2] Bluetooth: mgmt: Fix enabling SSP while powered off
+Date: Mon, 27 Aug 2012 16:47:29 +0200
+Message-ID: <1346078850-32704-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Set SSP called when hdev is up but still has HCI_AUTO_OFF flag set will
+only change dev_flags and enable feature in host but won't enable feature
+in controller. As a result some devices will reject IO Capa Request due to
+missing SSP Host Support flag in extended features and thus won't allow
+SSP or fallback to legacy pairing.
 
-If we have unacked frames when closing bluetooth socket we deadlock
-since conn->chan_lock and chan->lock are taken.
+This patch ensures HCI Write Simple Pairing Mode is sent when Set Powered is
+called to clear HCI_AUTO_OFF flag.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 ---
- net/bluetooth/l2cap_core.c |    8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ net/bluetooth/mgmt.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index bd13fb7..52baf1b 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1692,10 +1692,14 @@ int __l2cap_wait_ack(struct sock *sk)
- 	DECLARE_WAITQUEUE(wait, current);
- 	int err = 0;
- 	int timeo = HZ/5;
-+	int tries = 5;
-+
-+	BT_DBG("chan %p conn %p unacked %d", chan, chan->conn,
-+	       chan->unacked_frames);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 05d4b83..ccc6716 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2891,6 +2891,12 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
+ 		if (scan)
+ 			hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
  
- 	add_wait_queue(sk_sleep(sk), &wait);
- 	set_current_state(TASK_INTERRUPTIBLE);
--	while (chan->unacked_frames > 0 && chan->conn) {
-+	while (chan->unacked_frames > 0 && chan->conn && tries--) {
- 		if (!timeo)
- 			timeo = HZ/5;
- 
-@@ -1712,6 +1716,8 @@ int __l2cap_wait_ack(struct sock *sk)
- 		err = sock_error(sk);
- 		if (err)
- 			break;
++		if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags)) {
++			u8 ssp = 1;
 +
-+		BT_DBG("chan %p timeo %d tries %d", chan, timeo, tries);
- 	}
- 	set_current_state(TASK_RUNNING);
- 	remove_wait_queue(sk_sleep(sk), &wait);
++			hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
++		}
++
+ 		update_class(hdev);
+ 		update_name(hdev, hdev->dev_name);
+ 		update_eir(hdev);
 -- 
-1.7.9.5
+1.7.11.3
 
