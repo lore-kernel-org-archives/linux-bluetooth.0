@@ -2,75 +2,112 @@ Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [RFC BlueZ 24/33] doc: Add Broadcaster D-Bus API documentation
-Date: Mon, 27 Aug 2012 13:03:16 -0400
-Message-Id: <1346087005-24693-25-git-send-email-bruna.moreira@openbossa.org>
+Subject: [RFC BlueZ 23/33] observer: Add python test script
+Date: Mon, 27 Aug 2012 13:03:15 -0400
+Message-Id: <1346087005-24693-24-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a "high level" API for Broadcaster GAP role.
 ---
- doc/adapter-api.txt |   45 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+ test/test-observer |   87 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 87 insertions(+)
+ create mode 100755 test/test-observer
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 9e2e652..139a1a2 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -224,6 +224,51 @@ Methods		dict GetProperties()
- 			Possible errors: org.bluez.Error.InvalidArguments
- 					 org.bluez.Error.DoesNotExist
- 
-+		void SetServiceData(uint16 uuid, variant data)
+diff --git a/test/test-observer b/test/test-observer
+new file mode 100755
+index 0000000..110f487
+--- /dev/null
++++ b/test/test-observer
+@@ -0,0 +1,87 @@
++#!/usr/bin/python
 +
-+			Set Service Data for broadcast. Different applications
-+			can register different Adv. data types, and they are
-+			all concatenated to form the Adv. data.	Broadcasting is
-+			enabled as soon as the first SetServiceData() call is
-+			made.
++'''Observer test script
++'''
 +
-+			This method can be used to update service data already
-+			being broadcasted.
++from __future__ import absolute_import, print_function, unicode_literals
 +
-+			Use ClearBroadcastData() to release any Adv. data for
-+			the application. Advertising data is also released when
-+			application exits, and once the last Broadcaster exits,
-+			advertising is disabled.
++from gi.repository import GObject
 +
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.Failed
++import sys
++import dbus
++import dbus.service
++import dbus.mainloop.glib
++from optparse import OptionParser, make_option
 +
-+		void SetManufacturerData(uint16 cid, variant data)
++def dbus_data(data):
++	return "".join(["%02x" % c for c in data])
 +
-+			Set Manufacturer Specific Data for broadcast. Different
-+			applications can register different Adv. data types,
-+			and they are all concatenated to form the Adv. data.
-+			Broadcasting is	enabled as soon as the first
-+			SetManufacturerData() call is made.
++class Observer(dbus.service.Object):
++	@dbus.service.method("org.bluez.Observer",
++					in_signature="sqv", out_signature="")
++	def ServiceReceived(self, address, uuid, value):
++		print("[ " + address + " ]")
++		print("    Service UUID = 0x%04x" % int(uuid))
++		print("    Data = %s" % dbus_data(value))
++		print()
 +
-+			This method can be used to update manufacturer data
-+			already being broadcasted.
++	@dbus.service.method("org.bluez.Observer",
++					in_signature="sqv", out_signature="")
++	def ManufacturerReceived(self, address, cid, value):
++		print("[ " + address + " ]")
++		print("    Company ID = 0x%04x" % int(cid))
++		print("    Data = %s" % dbus_data(value))
++		print()
 +
-+			Use ClearBroadcastData() to release any Adv. data for
-+			the application. Advertising data is also released when
-+			application exits, and once the last Broadcaster exits,
-+			advertising is disabled.
++def property_changed(name, value):
++	print("PropertyChanged('%s', '%s')" % (name, value))
 +
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.Failed
++if __name__ == "__main__":
++	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 +
-+		void ClearBroadcastData()
++	bus = dbus.SystemBus()
 +
-+			This method will release any previously set Advertising
-+			data.
++	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
++					"org.bluez.Manager")
 +
-+			Possible errors: org.bluez.Error.Failed
++	option_list = [
++		make_option("-i", "--adapter", action="store",
++			type="string", dest="adapter"),
++		make_option("-s", "--service", action="store",
++			type="int", dest="service_uuid",
++			help="Service UUID (e.g. \"0x0001\")"),
++		make_option("-c", "--company", action="store",
++			type="int", dest="company_id",
++			help="Company Identifier Code (e.g. \"0x0002\")"),
++		]
 +
- Signals		PropertyChanged(string name, variant value)
- 
- 			This signal indicates a changed value of the given
++	parser = OptionParser(option_list=option_list)
++
++	(options, args) = parser.parse_args()
++
++	if not options.service_uuid and not options.company_id:
++		parser.error("At least one option is required: -c or -s")
++
++	if options.adapter:
++		adapter_path = manager.FindAdapter(options.adapter)
++	else:
++		adapter_path = manager.DefaultAdapter()
++
++	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
++							"org.bluez.Adapter")
++
++	bus.add_signal_receiver(property_changed, bus_name="org.bluez",
++				dbus_interface="org.bluez.Adapter",
++				signal_name="PropertyChanged")
++
++	path = "/test/observer"
++	observer = Observer(bus, path)
++
++	if options.service_uuid:
++		adapter.RegisterServiceObserver(path, dbus.UInt16(options.service_uuid))
++
++	if options.company_id:
++		adapter.RegisterManufacturerObserver(path, dbus.UInt16(options.company_id))
++
++	mainloop = GObject.MainLoop()
++	mainloop.run()
 -- 
 1.7.9.5
 
