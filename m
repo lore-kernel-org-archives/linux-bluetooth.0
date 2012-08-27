@@ -2,26 +2,26 @@ Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [RFC BlueZ 19/33] observer: Add UnregisterManufacturerObserver() D-Bus method
-Date: Mon, 27 Aug 2012 13:03:11 -0400
-Message-Id: <1346087005-24693-20-git-send-email-bruna.moreira@openbossa.org>
+Subject: [RFC BlueZ 17/33] observer: Add UnregisterServiceObserver() D-Bus method
+Date: Mon, 27 Aug 2012 13:03:09 -0400
+Message-Id: <1346087005-24693-18-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Unregister an observer for Manufacturer Specific Data and avoid to send
-broadcaster to this agent.
+Unregister an observer for Service Data and avoid to send broadcaster to
+this agent.
 ---
  src/adapter.c |   15 +++++++++++++++
  1 file changed, 15 insertions(+)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index e5237b5..b2c052f 100644
+index 27692f9..b437cf6 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -1693,6 +1693,21 @@ static DBusMessage *register_manufobserver(DBusConnection *conn,
- static DBusMessage *unregister_manufobserver(DBusConnection *conn,
+@@ -1646,6 +1646,21 @@ static DBusMessage *register_service_observer(DBusConnection *conn,
+ static DBusMessage *unregister_service_observer(DBusConnection *conn,
  						DBusMessage *msg, void *data)
  {
 +	const char *path, *sender = dbus_message_get_sender(msg);
@@ -36,8 +36,8 @@ index e5237b5..b2c052f 100644
 +	if (err < 0)
 +		return btd_error_failed(msg, strerror(-err));
 +
-+	DBG("Manufacturer Specific Data Observer unregistered for hci%d at "
-+					"%s:%s", adapter->dev_id, sender, path);
++	DBG("Service Data Observer unregistered for hci%d at %s:%s",
++						adapter->dev_id, sender, path);
 +
  	return dbus_message_new_method_return(msg);
  }
