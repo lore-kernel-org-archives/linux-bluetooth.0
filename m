@@ -1,144 +1,296 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [RFC BlueZ 21/33] eir: Add manufacturer and service data fields
-Date: Mon, 27 Aug 2012 13:03:13 -0400
-Message-Id: <1346087005-24693-22-git-send-email-bruna.moreira@openbossa.org>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [RFC BlueZ 20/33] observer: Add watchers and filters for observers
+Date: Mon, 27 Aug 2012 13:03:12 -0400
+Message-Id: <1346087005-24693-21-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jefferson Delfes <jefferson.delfes@openbossa.org>
+The adapter will keep a list of observers to listening for advertising.
+The new observer is added on the list when it is registered.
 
-For advertising, there are another possible fields, Service Data and
-Manufacturer Specific Data.
+When an observer is registered, the filter must be stored to be used
+after receiving a new advertising. The observer only will received the
+data from advertising if the filter matches.
 ---
- src/eir.c |   43 +++++++++++++++++++++++++++++++++++++++++++
- src/eir.h |   16 ++++++++++++++++
- 2 files changed, 59 insertions(+)
+ src/adapter.c |  179 ++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 171 insertions(+), 8 deletions(-)
 
-diff --git a/src/eir.c b/src/eir.c
-index 9d42917..676e303 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -38,12 +38,32 @@
- #include "glib-helper.h"
- #include "eir.h"
+diff --git a/src/adapter.c b/src/adapter.c
+index b2c052f..3b8cbcd 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -82,6 +82,10 @@
  
-+static void svc_data_free(void *p)
-+{
-+	struct svc_data *sdata = p;
+ #define OFF_TIMER 3
+ 
++/* Filter Types (for Observer) */
++#define FILTER_SERVICE_UUID	0x01
++#define FILTER_COMPANY_IC	0x02
 +
-+	g_free(sdata->data);
-+	g_free(sdata);
-+}
+ static DBusConnection *connection = NULL;
+ static GSList *adapter_drivers = NULL;
+ 
+@@ -103,6 +107,16 @@ struct service_auth {
+ 	struct btd_adapter *adapter;
+ };
+ 
++struct observer_watcher {
++	struct btd_adapter *adapter;
++	guint id;			/* Listener id */
++	uint8_t filter_type;		/* Filer type: Service or Manufacturer
++					 * data */
++	void *filter_data;		/* Value of filter */
++	char *sender;			/* DBus sender */
++	char *path;			/* DBus path */
++};
 +
-+static void manuf_data_free(void *p)
-+{
-+	struct manuf_data *mdata = p;
-+
-+	g_free(mdata->data);
-+	g_free(mdata);
-+}
-+
- void eir_data_free(struct eir_data *eir)
- {
- 	g_slist_free_full(eir->services, g_free);
- 	eir->services = NULL;
- 	g_free(eir->name);
- 	eir->name = NULL;
-+	g_slist_free_full(eir->svcs_data, svc_data_free);
-+	eir->svcs_data = NULL;
-+	g_slist_free_full(eir->manufs_data, manuf_data_free);
-+	eir->manufs_data = NULL;
+ struct btd_adapter {
+ 	uint16_t dev_id;
+ 	gboolean up;
+@@ -132,6 +146,7 @@ struct btd_adapter {
+ 	GSList *devices;		/* Devices structure pointers */
+ 	GSList *mode_sessions;		/* Request Mode sessions */
+ 	GSList *disc_sessions;		/* Discovery sessions */
++	GSList *observers;		/* Observer watchers */
+ 	guint discov_id;		/* Discovery timer */
+ 	gboolean discovering;		/* Discovery active */
+ 	gboolean discov_suspended;	/* Discovery suspended */
+@@ -1617,10 +1632,85 @@ static DBusMessage *unregister_agent(DBusConnection *conn, DBusMessage *msg,
+ 	return dbus_message_new_method_return(msg);
  }
  
- static void eir_parse_uuid16(struct eir_data *eir, void *data, uint8_t len)
-@@ -107,6 +127,8 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
- 	while (len < eir_len - 1) {
- 		uint8_t field_len = eir_data[0];
- 		uint8_t data_len, *data = &eir_data[2];
-+		struct svc_data *sdata;
-+		struct manuf_data *mdata;
- 
- 		/* Check for the end of EIR */
- 		if (field_len == 0)
-@@ -163,11 +185,32 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
- 			memcpy(eir->dev_class, data, 3);
- 			break;
- 
-+		case EIR_SVC_DATA:
-+			if (data_len < 2)
-+				break;
-+			sdata = g_new(struct svc_data, 1);
-+			sdata->uuid = bt_get_le16(data);
-+			sdata->data_len = data_len - 2;
-+			sdata->data = g_memdup(data + 2, data_len - 2);
-+			eir->svcs_data = g_slist_append(eir->svcs_data, sdata);
-+			break;
++static void destroy_observer(gpointer user_data)
++{
++	struct observer_watcher *obs = user_data;
 +
- 		case EIR_GAP_APPEARANCE:
- 			if (data_len < 2)
- 				break;
- 			eir->appearance = bt_get_le16(data);
- 			break;
++	btd_adapter_unref(obs->adapter);
 +
-+		case EIR_MANUF_DATA:
-+			if (data_len < 2)
-+				break;
-+			mdata = g_new(struct manuf_data, 1);
-+			mdata->company_id = bt_get_le16(data);
-+			mdata->data_len = data_len - 2;
-+			mdata->data = g_memdup(data + 2, data_len - 2);
-+			eir->manufs_data = g_slist_append(eir->manufs_data,
-+									mdata);
-+			break;
- 		}
- 
- 		eir_data += field_len + 1;
-diff --git a/src/eir.h b/src/eir.h
-index 3c81024..f8e6c7c 100644
---- a/src/eir.h
-+++ b/src/eir.h
-@@ -34,13 +34,27 @@
- #define EIR_TX_POWER                0x0A  /* transmit power level */
- #define EIR_CLASS_OF_DEV            0x0D  /* Class of Device */
- #define EIR_DEVICE_ID               0x10  /* device ID */
-+#define EIR_SVC_DATA                0x16  /* service data */
- #define EIR_GAP_APPEARANCE          0x19  /* GAP appearance */
-+#define EIR_MANUF_DATA              0xFF  /* manufacturer specific data */
- 
- struct uuid_info {
- 	uuid_t uuid;
- 	uint8_t svc_hint;
- };
- 
-+struct svc_data {
-+	uint16_t uuid;
-+	uint8_t data_len;
-+	uint8_t *data;
-+};
++	g_dbus_remove_watch(connection, obs->id);
 +
-+struct manuf_data {
-+	uint16_t company_id;
-+	uint8_t data_len;
-+	uint8_t *data;
-+};
++	g_free(obs->path);
++	g_free(obs->sender);
++	g_free(obs);
++}
 +
- struct eir_data {
- 	GSList *services;
- 	int flags;
-@@ -48,6 +62,8 @@ struct eir_data {
- 	uint8_t dev_class[3];
- 	uint16_t appearance;
- 	gboolean name_complete;
-+	GSList *svcs_data;
-+	GSList *manufs_data;
- };
++static gint cmp_observer(gconstpointer a, gconstpointer b)
++{
++	const struct observer_watcher *obs = a;
++	const struct observer_watcher *match = b;
++	int ret;
++
++	ret = g_strcmp0(obs->sender, match->sender);
++	if (ret != 0)
++		return ret;
++
++	ret = g_strcmp0(obs->path, match->path);
++	if (ret != 0)
++		return ret;
++
++	return obs->filter_type - match->filter_type;
++}
++
++static struct observer_watcher *find_observer(GSList *list, const char *sender,
++					const char *path, uint8_t filter)
++{
++	struct observer_watcher *match;
++	GSList *l;
++
++	match = g_new0(struct observer_watcher, 1);
++	match->sender = g_strdup(sender);
++	match->path = g_strdup(path);
++	match->filter_type = filter;
++
++	l = g_slist_find_custom(list, match, cmp_observer);
++	g_free(match->sender);
++	g_free(match->path);
++	g_free(match);
++
++	return (l ? l->data : NULL);
++}
++
++static void observer_exit(DBusConnection *conn, void *user_data)
++{
++	struct observer_watcher *obs = user_data;
++	struct btd_adapter *adapter = obs->adapter;
++
++	if (obs->filter_type == FILTER_SERVICE_UUID)
++		DBG("Service Data Observer watcher %s disconnected", obs->path);
++	else
++		DBG("Manufacturer Data Observer watcher %s disconnected",
++								obs->path);
++
++	adapter->observers = g_slist_remove(adapter->observers, obs);
++
++	if (adapter->observers == NULL) {
++		int err;
++
++		err = mgmt_set_observer(adapter->dev_id, FALSE);
++		if (err < 0)
++			error("Failed to set Observer: %s (%d)",
++							strerror(-err), -err);
++	}
++
++	destroy_observer(obs);
++}
++
+ static DBusMessage *register_service_observer(DBusConnection *conn,
+ 						DBusMessage *msg, void *data)
+ {
+ 	struct btd_adapter *adapter = data;
++	struct observer_watcher *obs;
+ 	const char *path, *sender = dbus_message_get_sender(msg);
+ 	unsigned int uuid;
+ 	int err;
+@@ -1630,8 +1720,26 @@ static DBusMessage *register_service_observer(DBusConnection *conn,
+ 					DBUS_TYPE_INVALID) == FALSE)
+ 		return btd_error_invalid_args(msg);
  
- void eir_data_free(struct eir_data *eir);
++	obs = find_observer(adapter->observers, sender, path,
++							FILTER_SERVICE_UUID);
++	if (obs)
++		return btd_error_already_exists(msg);
++
++	obs = g_new0(struct observer_watcher, 1);
++	obs->filter_type = FILTER_SERVICE_UUID;
++	obs->filter_data = GUINT_TO_POINTER(uuid);
++	obs->sender = g_strdup(sender);
++	obs->path = g_strdup(path);
++	obs->adapter = btd_adapter_ref(adapter);
++	obs->id = g_dbus_add_disconnect_watch(conn, sender, observer_exit,
++								obs, NULL);
++
++	adapter->observers = g_slist_prepend(adapter->observers, obs);
++
+ 	err = mgmt_set_observer(adapter->dev_id, TRUE);
+ 	if (err < 0) {
++		adapter->observers = g_slist_remove(adapter->observers, obs);
++		destroy_observer(obs);
+ 		error("Failed to set Observer: %s (%d)", strerror(-err), -err);
+ 
+ 		return btd_error_failed(msg, strerror(-err));
+@@ -1648,15 +1756,28 @@ static DBusMessage *unregister_service_observer(DBusConnection *conn,
+ {
+ 	const char *path, *sender = dbus_message_get_sender(msg);
+ 	struct btd_adapter *adapter = data;
+-	int err;
++	struct observer_watcher *obs;
+ 
+ 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
+ 						DBUS_TYPE_INVALID) == FALSE)
+ 		return btd_error_invalid_args(msg);
+ 
+-	err = mgmt_set_observer(adapter->dev_id, FALSE);
+-	if (err < 0)
+-		return btd_error_failed(msg, strerror(-err));
++	obs = find_observer(adapter->observers, sender, path,
++							FILTER_SERVICE_UUID);
++	if (obs == NULL)
++		return btd_error_does_not_exist(msg);
++
++	adapter->observers = g_slist_remove(adapter->observers, obs);
++	g_dbus_remove_watch(connection, obs->id);
++	destroy_observer(obs);
++
++	if (adapter->observers == NULL) {
++		int err;
++
++		err = mgmt_set_observer(adapter->dev_id, FALSE);
++		if (err < 0)
++			return btd_error_failed(msg, strerror(-err));
++	}
+ 
+ 	DBG("Service Data Observer unregistered for hci%d at %s:%s",
+ 						adapter->dev_id, sender, path);
+@@ -1668,6 +1789,7 @@ static DBusMessage *register_manufobserver(DBusConnection *conn,
+ 						DBusMessage *msg, void *data)
+ {
+ 	struct btd_adapter *adapter = data;
++	struct observer_watcher *obs;
+ 	const char *path, *sender = dbus_message_get_sender(msg);
+ 	unsigned int company_id;
+ 	int err;
+@@ -1677,8 +1799,26 @@ static DBusMessage *register_manufobserver(DBusConnection *conn,
+ 					DBUS_TYPE_INVALID) == FALSE)
+ 		return btd_error_invalid_args(msg);
+ 
++	obs = find_observer(adapter->observers, sender, path,
++							FILTER_COMPANY_IC);
++	if (obs)
++		return btd_error_already_exists(msg);
++
++	obs = g_new0(struct observer_watcher, 1);
++	obs->filter_type = FILTER_COMPANY_IC;
++	obs->filter_data = GUINT_TO_POINTER(company_id);
++	obs->sender = g_strdup(sender);
++	obs->path = g_strdup(path);
++	obs->adapter = btd_adapter_ref(adapter);
++	obs->id = g_dbus_add_disconnect_watch(conn, sender, observer_exit,
++								obs, NULL);
++
++	adapter->observers = g_slist_prepend(adapter->observers, obs);
++
+ 	err = mgmt_set_observer(adapter->dev_id, TRUE);
+ 	if (err < 0) {
++		adapter->observers = g_slist_remove(adapter->observers, obs);
++		destroy_observer(obs);
+ 		error("Failed to set Observer: %s (%d)", strerror(-err), -err);
+ 
+ 		return btd_error_failed(msg, strerror(-err));
+@@ -1695,15 +1835,28 @@ static DBusMessage *unregister_manufobserver(DBusConnection *conn,
+ {
+ 	const char *path, *sender = dbus_message_get_sender(msg);
+ 	struct btd_adapter *adapter = data;
+-	int err;
++	struct observer_watcher *obs;
+ 
+ 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
+ 						DBUS_TYPE_INVALID) == FALSE)
+ 		return btd_error_invalid_args(msg);
+ 
+-	err = mgmt_set_observer(adapter->dev_id, FALSE);
+-	if (err < 0)
+-		return btd_error_failed(msg, strerror(-err));
++	obs = find_observer(adapter->observers, sender, path,
++							FILTER_COMPANY_IC);
++	if (obs == NULL)
++		return btd_error_does_not_exist(msg);
++
++	adapter->observers = g_slist_remove(adapter->observers, obs);
++	g_dbus_remove_watch(connection, obs->id);
++	destroy_observer(obs);
++
++	if (adapter->observers == NULL) {
++		int err;
++
++		err = mgmt_set_observer(adapter->dev_id, FALSE);
++		if (err < 0)
++			return btd_error_failed(msg, strerror(-err));
++	}
+ 
+ 	DBG("Manufacturer Specific Data Observer unregistered for hci%d at "
+ 					"%s:%s", adapter->dev_id, sender, path);
+@@ -2470,6 +2623,16 @@ static void adapter_free(gpointer user_data)
+ 
+ 	g_slist_free(adapter->oor_devices);
+ 
++	if (adapter->observers) {
++		int err;
++
++		err = mgmt_set_observer(adapter->dev_id, FALSE);
++		if (err < 0)
++			error("Failed to set Observer: %s (%d)",
++							strerror(-err), -err);
++		g_slist_free_full(adapter->observers, destroy_observer);
++	}
++
+ 	g_free(adapter->path);
+ 	g_free(adapter->name);
+ 	g_free(adapter);
 -- 
 1.7.9.5
 
