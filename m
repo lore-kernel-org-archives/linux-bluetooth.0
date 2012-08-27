@@ -1,66 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [RFC BlueZ 25/33] adapter: Add D-Bus API for Broadcaster GAP Role
-Date: Mon, 27 Aug 2012 13:03:17 -0400
-Message-Id: <1346087005-24693-26-git-send-email-bruna.moreira@openbossa.org>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [RFC BlueZ 24/33] doc: Add Broadcaster D-Bus API documentation
+Date: Mon, 27 Aug 2012 13:03:16 -0400
+Message-Id: <1346087005-24693-25-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jefferson Delfes <jefferson.delfes@openbossa.org>
-
-Implement dummy calls for register or unregister Broadcaster.
+This is a "high level" API for Broadcaster GAP role.
 ---
- src/adapter.c |   26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ doc/adapter-api.txt |   45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index cd0a1b4..61abb34 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1869,6 +1869,24 @@ static DBusMessage *unregister_manufobserver(DBusConnection *conn,
- 	return dbus_message_new_method_return(msg);
- }
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 9e2e652..139a1a2 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -224,6 +224,51 @@ Methods		dict GetProperties()
+ 			Possible errors: org.bluez.Error.InvalidArguments
+ 					 org.bluez.Error.DoesNotExist
  
-+static DBusMessage *set_service_data(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
-+{
-+	return dbus_message_new_method_return(msg);
-+}
++		void SetServiceData(uint16 uuid, variant data)
 +
-+static DBusMessage *set_manufacturer_data(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
-+{
-+	return dbus_message_new_method_return(msg);
-+}
++			Set Service Data for broadcast. Different applications
++			can register different Adv. data types, and they are
++			all concatenated to form the Adv. data.	Broadcasting is
++			enabled as soon as the first SetServiceData() call is
++			made.
 +
-+static DBusMessage *clear_broadcast_data(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
-+{
-+	return dbus_message_new_method_return(msg);
-+}
++			This method can be used to update service data already
++			being broadcasted.
 +
- static const GDBusMethodTable adapter_methods[] = {
- 	{ GDBUS_METHOD("GetProperties",
- 			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
-@@ -1924,6 +1942,14 @@ static const GDBusMethodTable adapter_methods[] = {
- 	{ GDBUS_METHOD("UnregisterManufacturerObserver",
- 			GDBUS_ARGS({ "observer", "o" }), NULL,
- 			unregister_manufobserver) },
-+	{ GDBUS_METHOD("SetServiceData", GDBUS_ARGS({ "uuid", "q" },
-+					{ "data", "ay" }), NULL,
-+			set_service_data) },
-+	{ GDBUS_METHOD("SetManufacturerData", GDBUS_ARGS({ "company_id", "q" },
-+					{ "data", "ay" }), NULL,
-+			set_manufacturer_data) },
-+	{ GDBUS_METHOD("ClearBroadcastData", NULL, NULL,
-+			clear_broadcast_data) },
- 	{ }
- };
++			Use ClearBroadcastData() to release any Adv. data for
++			the application. Advertising data is also released when
++			application exits, and once the last Broadcaster exits,
++			advertising is disabled.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.Failed
++
++		void SetManufacturerData(uint16 cid, variant data)
++
++			Set Manufacturer Specific Data for broadcast. Different
++			applications can register different Adv. data types,
++			and they are all concatenated to form the Adv. data.
++			Broadcasting is	enabled as soon as the first
++			SetManufacturerData() call is made.
++
++			This method can be used to update manufacturer data
++			already being broadcasted.
++
++			Use ClearBroadcastData() to release any Adv. data for
++			the application. Advertising data is also released when
++			application exits, and once the last Broadcaster exits,
++			advertising is disabled.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.Failed
++
++		void ClearBroadcastData()
++
++			This method will release any previously set Advertising
++			data.
++
++			Possible errors: org.bluez.Error.Failed
++
+ Signals		PropertyChanged(string name, variant value)
  
+ 			This signal indicates a changed value of the given
 -- 
 1.7.9.5
 
