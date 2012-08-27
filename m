@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [RFC BlueZ 05/22] alert: Add Ringer Control Point characteristic
-Date: Mon, 27 Aug 2012 13:11:49 -0400
-Message-Id: <1346087526-15107-6-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [RFC BlueZ 04/22] alert: Add Phone Alert Service
+Date: Mon, 27 Aug 2012 13:11:48 -0400
+Message-Id: <1346087526-15107-5-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1346087526-15107-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1346087526-15107-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,49 +13,45 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 
 ---
- profiles/alert/server.c |   18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ profiles/alert/server.c |   22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
 diff --git a/profiles/alert/server.c b/profiles/alert/server.c
-index cbf751f..0f96c55 100644
+index 3fda23d..cbf751f 100644
 --- a/profiles/alert/server.c
 +++ b/profiles/alert/server.c
-@@ -31,12 +31,25 @@
+@@ -26,11 +26,33 @@
+ #include <config.h>
+ #endif
  
- #include "att.h"
++#include <glib.h>
++#include <bluetooth/uuid.h>
++
++#include "att.h"
  #include "adapter.h"
-+#include "device.h"
-+#include "att-database.h"
-+#include "log.h"
- #include "gatt-service.h"
- #include "gattrib.h"
- #include "gatt.h"
++#include "gatt-service.h"
++#include "gattrib.h"
++#include "gatt.h"
  #include "server.h"
  
- #define PHONE_ALERT_STATUS_SVC_UUID		0x180E
-+#define RINGER_CP_CHR_UUID		0x2A40
++#define PHONE_ALERT_STATUS_SVC_UUID		0x180E
 +
-+static uint8_t ringer_cp_write(struct attribute *a,
-+						struct btd_device *device,
-+						gpointer user_data)
++static void register_phone_alert_service(struct btd_adapter *adapter)
 +{
-+	DBG("a = %p", a);
++	bt_uuid_t uuid;
 +
-+	return 0;
++	bt_uuid16_create(&uuid, PHONE_ALERT_STATUS_SVC_UUID);
++
++	/* Phone Alert Status Service */
++	gatt_service_add(adapter, GATT_PRIM_SVC_UUID, &uuid,
++			GATT_OPT_INVALID);
 +}
- 
- static void register_phone_alert_service(struct btd_adapter *adapter)
++
+ static int alert_server_probe(struct btd_adapter *adapter)
  {
-@@ -46,6 +59,11 @@ static void register_phone_alert_service(struct btd_adapter *adapter)
- 
- 	/* Phone Alert Status Service */
- 	gatt_service_add(adapter, GATT_PRIM_SVC_UUID, &uuid,
-+			/* Ringer Control Point characteristic */
-+			GATT_OPT_CHR_UUID, RINGER_CP_CHR_UUID,
-+			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_WRITE_WITHOUT_RESP,
-+			GATT_OPT_CHR_VALUE_CB, ATTRIB_WRITE,
-+			ringer_cp_write, NULL,
- 			GATT_OPT_INVALID);
++	register_phone_alert_service(adapter);
++
+ 	return 0;
  }
  
 -- 
