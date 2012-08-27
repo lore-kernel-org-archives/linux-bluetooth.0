@@ -1,55 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [RFC BlueZ 16/33] observer: Add RegisterServiceObserver() D-Bus method
-Date: Mon, 27 Aug 2012 13:03:08 -0400
-Message-Id: <1346087005-24693-17-git-send-email-bruna.moreira@openbossa.org>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [RFC BlueZ 14/33] doc: Add Observer D-Bus API documentation
+Date: Mon, 27 Aug 2012 13:03:06 -0400
+Message-Id: <1346087005-24693-15-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jefferson Delfes <jefferson.delfes@openbossa.org>
-
-An observer for Service Data must be registered using
-RegisterServiceObserver() D-Bus method so it can receive any advertising
-which matches with the filter used.
+This is a "high level" API for Observer GAP role.
 ---
- src/adapter.c |   20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ doc/adapter-api.txt |   75 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 75 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 36c285a..27692f9 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1620,6 +1620,26 @@ static DBusMessage *unregister_agent(DBusConnection *conn, DBusMessage *msg,
- static DBusMessage *register_service_observer(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
- {
-+	struct btd_adapter *adapter = data;
-+	const char *path, *sender = dbus_message_get_sender(msg);
-+	unsigned int uuid;
-+	int err;
-+
-+	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+					DBUS_TYPE_UINT16, &uuid,
-+					DBUS_TYPE_INVALID) == FALSE)
-+		return btd_error_invalid_args(msg);
-+
-+	err = mgmt_set_observer(adapter->dev_id, TRUE);
-+	if (err < 0) {
-+		error("Failed to set Observer: %s (%d)", strerror(-err), -err);
-+
-+		return btd_error_failed(msg, strerror(-err));
-+	}
-+
-+	DBG("Service Data Observer registered for hci%d at %s:%s",
-+						adapter->dev_id, sender, path);
-+
- 	return dbus_message_new_method_return(msg);
- }
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 23f0a2f..9e2e652 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -173,6 +173,57 @@ Methods		dict GetProperties()
  
+ 			Possible errors: org.bluez.Error.DoesNotExist
+ 
++		void RegisterServiceObserver(object observer,
++							uint16 match_value)
++
++			Registers an observer agent to monitor Service Data
++			broadcasts. This agent will be notified whenever a
++			broadcast is received that matches that filter. It is
++			possible use same object path for two observers:
++			Service Data and Manufacturer Specific Data.
++
++			The match_value parameter must be the 16-bit UUID for
++			the service whose data is to be monitored.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.AlreadyExists
++
++		void RegisterManufacturerObserver(object observer,
++							uint16 match_value)
++
++			Registers an observer agent to monitor Manufacturer
++			Specific Data broadcasts. This agent will be notified
++			whenever a broadcast is received that matches that
++			filter. It is possible use same object path for two
++			observers: Service Data and Manufacturer Specific Data.
++
++			The match_value parameter must be the 16-bit Company
++			Identifier Code for the manufacturer whose data is to
++			be monitored.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.AlreadyExists
++
++		void UnregisterServiceObserver(object observer)
++
++			Unregisters a Service Data observer. Broadcasts will
++			not be notified to this agent anymore. The observer
++			will be destroyed only if no Manufacturer Specific Data
++			was registered with the same object path.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.DoesNotExist
++
++		void UnregisterManufacturerObserver(object observer)
++
++			Unregisters a Manufacturer Specific Data observer.
++			Broadcasts will	not be notified to this agent anymore.
++			The observer will be destroyed only if no Service Data
++			was registered with the same object path.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.DoesNotExist
++
+ Signals		PropertyChanged(string name, variant value)
+ 
+ 			This signal indicates a changed value of the given
+@@ -275,3 +326,27 @@ Properties	string Address [readonly]
+ 
+ 			List of 128-bit UUIDs that represents the available
+ 			local services.
++
++Observer hierarchy
++==================
++
++Service		unique name
++Interface	org.bluez.Observer
++Object path	freely definable
++
++Methods		void ServiceReceived(string address, uint16 uuid, variant data)
++
++			This callback gets called when a broadcast data has
++			arrived that matches filter used in
++			RegisterServiceObserver.
++
++			Note: data is a bytearray.
++
++		void ManufacturerReceived(string address, uint16 cid,
++								variant data)
++
++			This callback gets called when a broadcast data has
++			arrived that matches filter used in
++			RegisterManufacturerObserver.
++
++			Note: data is a bytearray.
 -- 
 1.7.9.5
 
