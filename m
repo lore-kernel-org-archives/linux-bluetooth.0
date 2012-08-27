@@ -2,151 +2,66 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [RFC BlueZ 01/22] doc: Introduce Alert API
-Date: Mon, 27 Aug 2012 13:11:45 -0400
-Message-Id: <1346087526-15107-2-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1346087526-15107-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1346087526-15107-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [RFC BlueZ 00/22] alert: GATT ANP/PASP server role implementation
+Date: Mon, 27 Aug 2012 13:11:44 -0400
+Message-Id: <1346087526-15107-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This API will be implemented and initially used by Phone Alert Status
-and Alert Notification GATT profiles (server role).
----
- doc/alert-api.txt |  124 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 124 insertions(+)
- create mode 100644 doc/alert-api.txt
+Hi,
 
-diff --git a/doc/alert-api.txt b/doc/alert-api.txt
-new file mode 100644
-index 0000000..79d65b8
---- /dev/null
-+++ b/doc/alert-api.txt
-@@ -0,0 +1,124 @@
-+BlueZ D-Bus Alert API description
-+*********************************
-+
-+Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
-+
-+Introduction
-+------------
-+
-+Currently, there are two different GATT server profiles that depend on
-+receiving alerts or notifications from the platform: Phone Alert Status (PASP)
-+and Alert Notification (ANP). PASP is very specific to mobile phones, and also
-+allows limited control to alerts (i.e. mute once or switch to a silent mode).
-+
-+This document presents a unified API that allows to register and notify alerts,
-+and to control some alerts (using the provided agent object).
-+
-+
-+Alert hierarchy
-+===============
-+
-+Service		org.bluez
-+Interface	org.bluez.Alert
-+Object path	/org/bluez
-+
-+Methods		void RegisterAlert(string category, object agent)
-+
-+			Register a new alert category and an agent for it. This
-+			means the application will be responsible for notifying
-+			BlueZ of any alerts of that category, using the
-+			NewAlert() method.
-+
-+			Supported ANP categories: simple, email, news, call,
-+				missed_call, sms_mms, voice_mail, schedule,
-+				high_priority, instant_message
-+			Supported PASP categories: ringer, vibrate, display
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		void NewAlert(string category, uint16 count, string description)
-+
-+			Notify BlueZ of new alert(s) for the given category. The
-+			description is relative to the last received alert and
-+			can be sender name, caller ID, title, or other
-+			information specific to the category.
-+
-+			For ringer, vibrate and display categories, valid
-+			descriptions are "active" and "not active". Alerts from
-+			ringer category also accept "enabled" and "disabled",
-+			depending on whether ringer is in silent mode or not.
-+
-+			Description must not exceed 18 bytes when encoded in
-+			UTF-8 format, otherwise an error is returned. If there
-+			is no description, an empty string should be used.
-+
-+			The count argument contains the number of alerts not
-+			yet acknowledged by the user on the UI. To save D-Bus
-+			traffic, events that may generate multiple alerts at
-+			the same time (like email, sms, news) should trigger a
-+			single NewAlert().
-+
-+			If there are more than 254 new alerts, count must be
-+			set to 255. PASP alerts should always set count to 1.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		void UnreadAlert(string category, uint16 count)
-+
-+			Some services (like SMS and e-mail) keep track of
-+			number of unread items. This method allows to update
-+			this counter, so peer devices can be notified using
-+			Alert Notification Profile.
-+
-+			If there are more than 254 unread alerts, count must be
-+			set to 255.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+Alert Agent hierarchy
-+=====================
-+
-+Service		org.bluez
-+Interface	org.bluez.AlertAgent
-+Object path	freely definable
-+
-+Methods		void MuteOnce()
-+
-+			This method is only called if "ringer" alert category
-+			is specified when registering the agent.
-+
-+			Mute the ringer once (e.g. during a incoming call). If
-+			ringer is not active, does nothing.
-+
-+		void SetRinger(string mode)
-+
-+			This method is only called if "ringer" alert category
-+			is specified when registering the agent.
-+
-+			Set ringer to the specified mode. If mode is "enabled",
-+			ringer is set to the default mode, as defined by the
-+			current active profile. If mode is "disabled", ringer
-+			will not activate on incoming calls, until it is set
-+			back to "enabled" mode.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		void Suspend(string category)
-+
-+			Suspend alerts for this category, which means that
-+			new/unread alerts should not be reported to save D-Bus
-+			traffic. This means that no client has enabled this
-+			alert yet.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		void Resume(string category)
-+
-+			Resume alerts for this category.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		void Release()
-+
-+			Release this agent. At this point, it will be not used
-+			by BlueZ anymore and can be destroyed by the owner.
+This series contain the current implementation for ANP/PASP server roles. The
+D-Bus API was based on discussions on BlueZ meeting, and later improvements.
+
+Note that this implementation is not finished yet, we are submitting now for
+early feedback. Most importantly, it lacks support for notifications (essential
+for ANP) and the enabling/disabling ANP alerts using the control point.
+
+The series contain a test python script and API documentation.
+
+Comments/suggestions are welcome.
+
+Anderson Lizardo (11):
+  doc: Introduce Alert API
+  alert: Introduce manager abstraction layer
+  alert: Add adapter driver
+  alert: Initial Alert Notification
+  alert: Add initial support for UnreadAlert D-Bus method
+  alert: Add per adapter attribute handle information
+  alert: Update Supported New/Unread Category characteristic values
+  alert: Update new alert characteristic value
+  alert: Update unread alert characteristic value
+  alert: Implement MuteOnce command
+  alert: Update Alert Status and Ringer Setting characteristic values
+
+Bruna Moreira (4):
+  alert: Add Phone Alert Service
+  alert: Add Ringer Control Point characteristic
+  alert: Add Ringer Setting characteristic
+  alert: Add Alert Status characteristic
+
+Eder Ruiz Maria (7):
+  alert: Add initial support for RegisterAlert D-Bus method
+  alert: Implement category registration in RegisterAlert()
+  alert: Add initial support for NewAlert D-Bus method
+  alert: Add support for automatic unregister when agent leave D-Bus
+  alert: Add support to call MuteOnce()
+  alert: Add support to call SetRinger()
+  alert: Add test script
+
+ Makefile.am              |    3 +-
+ doc/alert-api.txt        |  124 ++++++++
+ profiles/alert/main.c    |    6 +-
+ profiles/alert/manager.c |   40 +++
+ profiles/alert/manager.h |   26 ++
+ profiles/alert/server.c  |  768 ++++++++++++++++++++++++++++++++++++++++++++++
+ test/test-alert          |  167 ++++++++++
+ 7 files changed, 1130 insertions(+), 4 deletions(-)
+ create mode 100644 doc/alert-api.txt
+ create mode 100644 profiles/alert/manager.c
+ create mode 100644 profiles/alert/manager.h
+ create mode 100755 test/test-alert
+
 -- 
 1.7.9.5
 
