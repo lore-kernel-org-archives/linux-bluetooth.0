@@ -1,73 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-Subject: [RFC BlueZ 19/22] alert: Add support to call MuteOnce()
-Date: Mon, 27 Aug 2012 13:12:03 -0400
-Message-Id: <1346087526-15107-20-git-send-email-anderson.lizardo@openbossa.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [RFC BlueZ 18/22] alert: Implement MuteOnce command
+Date: Mon, 27 Aug 2012 13:12:02 -0400
+Message-Id: <1346087526-15107-19-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1346087526-15107-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1346087526-15107-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-
-When BlueZ want call MuteOnce() method from org.bluez.AlertAgent
-interface for a registered agent, the function
-agent_ringer_mute_once() must be called.
 ---
- profiles/alert/server.c |   24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ profiles/alert/server.c |   25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
 diff --git a/profiles/alert/server.c b/profiles/alert/server.c
-index fcbd5aa..b7660b0 100644
+index bdf13ee..fcbd5aa 100644
 --- a/profiles/alert/server.c
 +++ b/profiles/alert/server.c
-@@ -58,6 +58,7 @@
+@@ -73,6 +73,12 @@ enum {
+ 	NOTIFY_UNREAD_CAT,
+ };
  
- #define ALERT_OBJECT_PATH "/org/bluez"
- #define ALERT_INTERFACE   "org.bluez.Alert"
-+#define ALERT_AGENT_INTERFACE "org.bluez.AlertAgent"
- 
- /* Maximum length for "Text String Information" */
- #define NEW_ALERT_MAX_INFO_SIZE		18
-@@ -402,6 +403,28 @@ static DBusMessage *new_alert(DBusConnection *conn, DBusMessage *msg,
- 	return dbus_message_new_method_return(msg);
- }
- 
-+static int agent_ringer_mute_once(void)
-+{
-+	struct alert_data *alert;
-+	DBusMessage *msg;
++enum {
++	RINGER_SILENT_MODE = 1,
++	RINGER_MUTE_ONCE,
++	RINGER_CANCEL_SILENT_MODE,
++};
 +
-+	alert = get_alert_data_by_category("ringer");
-+	if (!alert) {
-+		DBG("Category ringer is not registered");
-+		return -EINVAL;
+ /* Ringer Setting characteristic values */
+ enum {
+ 	RINGER_SILENT,
+@@ -460,6 +466,25 @@ static uint8_t ringer_cp_write(struct attribute *a,
+ {
+ 	DBG("a = %p", a);
+ 
++	if (a->len > 1) {
++		DBG("Invalid command size (%zu)", a->len);
++		return 0;
 +	}
 +
-+	msg = dbus_message_new_method_call(alert->srv, alert->path,
-+					ALERT_AGENT_INTERFACE, "MuteOnce");
-+	if (!msg)
-+		return -ENOMEM;
++	switch (a->data[0]) {
++	case RINGER_SILENT_MODE:
++		DBG("Silent Mode");
++		break;
++	case RINGER_MUTE_ONCE:
++		DBG("Mute Once");
++		break;
++	case RINGER_CANCEL_SILENT_MODE:
++		DBG("Cancel Silent Mode");
++		break;
++	default:
++		DBG("Invalid command (0x%02x)", a->data[0]);
++	}
 +
-+	dbus_message_set_no_reply(msg, TRUE);
-+	g_dbus_send_message(connection, msg);
-+
-+	return 0;
-+}
-+
- static void update_unread_alert(gpointer data, gpointer user_data)
- {
- 	struct alert_adapter *al_adapter = data;
-@@ -477,6 +500,7 @@ static uint8_t ringer_cp_write(struct attribute *a,
- 		break;
- 	case RINGER_MUTE_ONCE:
- 		DBG("Mute Once");
-+		agent_ringer_mute_once();
- 		break;
- 	case RINGER_CANCEL_SILENT_MODE:
- 		DBG("Cancel Silent Mode");
+ 	return 0;
+ }
+ 
 -- 
 1.7.9.5
 
