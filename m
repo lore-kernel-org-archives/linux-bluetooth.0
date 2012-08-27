@@ -1,46 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [RFC BlueZ 26/33] lib: Maximum value to advertising and scan response
-Date: Mon, 27 Aug 2012 13:03:18 -0400
-Message-Id: <1346087005-24693-27-git-send-email-bruna.moreira@openbossa.org>
+Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Subject: [RFC BlueZ 25/33] adapter: Add D-Bus API for Broadcaster GAP Role
+Date: Mon, 27 Aug 2012 13:03:17 -0400
+Message-Id: <1346087005-24693-26-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Create a constant to define the maximum lenght to advertising and scan
-response data format.
----
- lib/hci.h |    6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 
-diff --git a/lib/hci.h b/lib/hci.h
-index f90ac26..c93b1c6 100644
---- a/lib/hci.h
-+++ b/lib/hci.h
-@@ -1496,17 +1496,19 @@ typedef struct {
- } __attribute__ ((packed)) le_read_advertising_channel_tx_power_rp;
- #define LE_READ_ADVERTISING_CHANNEL_TX_POWER_RP_SIZE 2
+Implement dummy calls for register or unregister Broadcaster.
+---
+ src/adapter.c |   26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index cd0a1b4..61abb34 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1869,6 +1869,24 @@ static DBusMessage *unregister_manufobserver(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
+ }
  
-+#define HCI_LE_MAX_ADV_DATA_LENGTH		31
++static DBusMessage *set_service_data(DBusConnection *conn,
++						DBusMessage *msg, void *data)
++{
++	return dbus_message_new_method_return(msg);
++}
 +
- #define OCF_LE_SET_ADVERTISING_DATA		0x0008
- typedef struct {
- 	uint8_t		length;
--	uint8_t		data[31];
-+	uint8_t		data[HCI_LE_MAX_ADV_DATA_LENGTH];
- } __attribute__ ((packed)) le_set_advertising_data_cp;
- #define LE_SET_ADVERTISING_DATA_CP_SIZE 32
- 
- #define OCF_LE_SET_SCAN_RESPONSE_DATA		0x0009
- typedef struct {
- 	uint8_t		length;
--	uint8_t		data[31];
-+	uint8_t		data[HCI_LE_MAX_ADV_DATA_LENGTH];
- } __attribute__ ((packed)) le_set_scan_response_data_cp;
- #define LE_SET_SCAN_RESPONSE_DATA_CP_SIZE 32
++static DBusMessage *set_manufacturer_data(DBusConnection *conn,
++						DBusMessage *msg, void *data)
++{
++	return dbus_message_new_method_return(msg);
++}
++
++static DBusMessage *clear_broadcast_data(DBusConnection *conn,
++						DBusMessage *msg, void *data)
++{
++	return dbus_message_new_method_return(msg);
++}
++
+ static const GDBusMethodTable adapter_methods[] = {
+ 	{ GDBUS_METHOD("GetProperties",
+ 			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
+@@ -1924,6 +1942,14 @@ static const GDBusMethodTable adapter_methods[] = {
+ 	{ GDBUS_METHOD("UnregisterManufacturerObserver",
+ 			GDBUS_ARGS({ "observer", "o" }), NULL,
+ 			unregister_manufobserver) },
++	{ GDBUS_METHOD("SetServiceData", GDBUS_ARGS({ "uuid", "q" },
++					{ "data", "ay" }), NULL,
++			set_service_data) },
++	{ GDBUS_METHOD("SetManufacturerData", GDBUS_ARGS({ "company_id", "q" },
++					{ "data", "ay" }), NULL,
++			set_manufacturer_data) },
++	{ GDBUS_METHOD("ClearBroadcastData", NULL, NULL,
++			clear_broadcast_data) },
+ 	{ }
+ };
  
 -- 
 1.7.9.5
