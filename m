@@ -1,91 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [RFC BlueZ 15/33] adapter: Add D-Bus API for Observer GAP Role
-Date: Mon, 27 Aug 2012 13:03:07 -0400
-Message-Id: <1346087005-24693-16-git-send-email-bruna.moreira@openbossa.org>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [RFC BlueZ 33/33] broadcaster: Add python test script
+Date: Mon, 27 Aug 2012 13:03:25 -0400
+Message-Id: <1346087005-24693-34-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1346087005-24693-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jefferson Delfes <jefferson.delfes@openbossa.org>
-
-Implement dummy calls for register or unregister Observer Agents.
 ---
- src/adapter.c      |   38 ++++++++++++++++++++++++++++++++++++++
- src/bluetooth.conf |    1 +
- 2 files changed, 39 insertions(+)
+ test/test-broadcaster |   76 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 76 insertions(+)
+ create mode 100755 test/test-broadcaster
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 50779fd..36c285a 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1617,6 +1617,30 @@ static DBusMessage *unregister_agent(DBusConnection *conn, DBusMessage *msg,
- 	return dbus_message_new_method_return(msg);
- }
- 
-+static DBusMessage *register_service_observer(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
-+{
-+	return dbus_message_new_method_return(msg);
-+}
+diff --git a/test/test-broadcaster b/test/test-broadcaster
+new file mode 100755
+index 0000000..35283b1
+--- /dev/null
++++ b/test/test-broadcaster
+@@ -0,0 +1,76 @@
++#!/usr/bin/python
 +
-+static DBusMessage *unregister_service_observer(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
-+{
-+	return dbus_message_new_method_return(msg);
-+}
++'''Broadcaster test script
++'''
 +
-+static DBusMessage *register_manufobserver(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
-+{
-+	return dbus_message_new_method_return(msg);
-+}
++from __future__ import absolute_import, print_function, unicode_literals
 +
-+static DBusMessage *unregister_manufobserver(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
-+{
-+	return dbus_message_new_method_return(msg);
-+}
++from gi.repository import GObject
 +
- static const GDBusMethodTable adapter_methods[] = {
- 	{ GDBUS_METHOD("GetProperties",
- 			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
-@@ -1658,6 +1682,20 @@ static const GDBusMethodTable adapter_methods[] = {
- 	{ GDBUS_METHOD("UnregisterAgent",
- 			GDBUS_ARGS({ "agent", "o" }), NULL,
- 			unregister_agent) },
-+	{ GDBUS_METHOD("RegisterServiceObserver",
-+			GDBUS_ARGS({ "observer", "o" }, { "match_value", "q" }),
-+			NULL,
-+			register_service_observer) },
-+	{ GDBUS_METHOD("UnregisterServiceObserver",
-+			GDBUS_ARGS({ "observer", "o" }), NULL,
-+			unregister_service_observer) },
-+	{ GDBUS_METHOD("RegisterManufacturerObserver",
-+			GDBUS_ARGS({ "observer", "o" }, { "match_value", "q" }),
-+			NULL,
-+			register_manufobserver) },
-+	{ GDBUS_METHOD("UnregisterManufacturerObserver",
-+			GDBUS_ARGS({ "observer", "o" }), NULL,
-+			unregister_manufobserver) },
- 	{ }
- };
- 
-diff --git a/src/bluetooth.conf b/src/bluetooth.conf
-index 664dbd9..a2fef4f 100644
---- a/src/bluetooth.conf
-+++ b/src/bluetooth.conf
-@@ -14,6 +14,7 @@
-     <allow send_interface="org.bluez.HandsfreeAgent"/>
-     <allow send_interface="org.bluez.MediaEndpoint"/>
-     <allow send_interface="org.bluez.MediaPlayer"/>
-+    <allow send_interface="org.bluez.Observer"/>
-     <allow send_interface="org.bluez.Watcher"/>
-     <allow send_interface="org.bluez.ThermometerWatcher"/>
-   </policy>
++import sys
++import dbus
++import dbus.service
++import dbus.mainloop.glib
++from optparse import OptionParser, make_option
++import time
++
++def property_changed(name, value):
++	print("PropertyChanged('%s', '%s')" % (name, value))
++
++if __name__ == "__main__":
++	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++
++	bus = dbus.SystemBus()
++
++	option_list = [
++		make_option("-i", "--adapter", action="store",
++			type="string", dest="adapter"),
++		make_option("-s", "--service", action="store",
++			type="int", dest="service",
++			help="Format: Service UUID (0xNNNN) followed by" +
++			" Service Data (e.g. aa bb cc)"),
++		make_option("-m", "--manufacturer", action="store",
++			type="int", dest="manufacturer",
++			help="Format: Company Identifier Code (0xNNNN)" +
++			" followed by Manufacturer Specific Data (e.g. 11 22 aa)"),
++		]
++
++	parser = OptionParser(option_list=option_list,
++			usage="Usage: %prog <-s uuid | -m cid> <data bytes in hex>")
++
++	(options, args) = parser.parse_args()
++	if not args:
++		parser.error("Hex encoded data is required.")
++
++	if options.service and options.manufacturer:
++		parser.error("options -m and -s are mutually exclusive")
++
++	try:
++		data = dbus.Array(map(lambda i: dbus.Byte(int(i, 16)), args))
++	except ValueError:
++		parser.error("Invalid data. Should be hex encoded bytes" +
++		" separated by whitespace.")
++
++	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
++					"org.bluez.Manager")
++
++	if options.adapter:
++		adapter_path = manager.FindAdapter(options.adapter)
++	else:
++		adapter_path = manager.DefaultAdapter()
++
++	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
++							"org.bluez.Adapter")
++
++	bus.add_signal_receiver(property_changed, bus_name="org.bluez",
++				dbus_interface="org.bluez.Adapter",
++				signal_name="PropertyChanged")
++
++	if options.service:
++		adapter.SetServiceData(dbus.UInt16(options.service), data)
++
++	if options.manufacturer:
++		adapter.SetManufacturerData(dbus.UInt16(options.manufacturer), data)
++
++	mainloop = GObject.MainLoop()
++	mainloop.run()
 -- 
 1.7.9.5
 
