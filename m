@@ -1,50 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: chanyeol.park@samsung.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Fix Discoverable mode is not updated on storage.
-Date: Mon, 27 Aug 2012 18:19:52 +0900
-Message-id: <1346059192-6114-1-git-send-email-chanyeol.park@samsung.com>
-In-reply-to: <50321EA8.5000504@samsung.com>
-References: <50321EA8.5000504@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <1345533815-5611-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1345533815-5611-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Mon, 27 Aug 2012 10:00:00 +0300
+Message-ID: <CABBYNZLSq1FKmOvKHG9b6SuV0QQux_Zik3ov2eDez89WxhYRmw@mail.gmail.com>
+Subject: Re: [PATCH obexd v0] client-doc: Guarantee prefix in transfer paths
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chan-yeol Park <chanyeol.park@samsung.com>
+Hi Mikel,
 
-This patch fixes the problem that storage's Discoverable value is
-not updated like hciconfig when BlueZ receives the MGMT adapter mode
-changed event after DiscoverableTimeout has been expired.
----
- src/adapter.c |    9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+On Tue, Aug 21, 2012 at 10:23 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>
+> The client D-Bus documentation should mention that all transfer paths
+> contain a prefix consisting of the path of the session they belong to.
+>
+> This can be conveniently used by clients to install D-Bus signal matches
+> that concentrate on the relevant signals.
+> ---
+>  doc/client-api.txt |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/doc/client-api.txt b/doc/client-api.txt
+> index 839a78c..7ca65cc 100644
+> --- a/doc/client-api.txt
+> +++ b/doc/client-api.txt
+> @@ -466,7 +466,7 @@ Transfer hierarchy
+>
+>  Service                org.bluez.obex.client
+>  Interface      org.bluez.obex.Transfer
+> -Object path    [variable prefix]/{transfer0,transfer1,...}
+> +Object path    [variable prefix]/{session0,session1,...}/{transfer0,...}
+>
+>  Methods                dict GetProperties()
+>
+> --
+> 1.7.7.6
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 69ec821..673cee8 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2249,6 +2249,11 @@ static void set_mode_complete(struct btd_adapter *adapter)
- 		adapter->mode_sessions = NULL;
- 	}
- 
-+	modestr = mode2str(adapter->mode);
-+	write_device_mode(&adapter->bdaddr, modestr);
-+
-+	DBG("%s", modestr);
-+
- 	if (adapter->pending_mode == NULL)
- 		return;
- 
-@@ -2273,10 +2278,6 @@ static void set_mode_complete(struct btd_adapter *adapter)
- 		g_dbus_send_message(connection, reply);
- 	}
- 
--	modestr = mode2str(adapter->mode);
--
--	DBG("%s", modestr);
--
- 	/* restore if the mode doesn't matches the pending */
- 	if (err != 0) {
- 		write_device_mode(&adapter->bdaddr, modestr);
+I went ahead and applied this patch.
+
 -- 
-1.7.9.5
-
+Luiz Augusto von Dentz
