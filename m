@@ -1,43 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 27 Aug 2012 16:40:54 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "W. Trevor King" <wking@tremily.us>
-Cc: linux-bluetooth@vger.kernel.org,
-	Patrick Ohly <patrick.ohly@intel.com>,
-	Pacho Ramos <pacho@gentoo.org>
-Subject: Re: [PATCH] bluetooth.h: fix compile issue when using in C++
-Message-ID: <20120827234054.GA7793@x220.sheraton.com>
-References: <1343832093.2121.0.camel@belkin4>
- <20120727163853.GA11847@odin.tremily.us>
- <1330953167.3457.13.camel@pohly-mobl1.fritz.box>
- <20120817051852.GA32453@odin.tremily.us>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20120817051852.GA32453@odin.tremily.us>
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Mon, 27 Aug 2012 21:56:17 +0200
+From: thilo@cestona.ro
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Add support for BCM20702A0 [0489:e031]
+Message-ID: <59c5e634d1528d2a19a7958c0ce4aa67@cestona.ro>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hey,
 
-On Fri, Aug 17, 2012, W. Trevor King wrote:
-> On Wed, Aug 01, 2012 at 04:41:33PM +0200, Pacho Ramos wrote:
-> > El dom, 29-07-2012 a las 09:52 +0200, Pacho Ramos escribió:
-> > > Today I got a report downstream showing that old problem:
-> > > http://permalink.gmane.org/gmane.linux.bluez.kernel/22306
-> > > 
-> > > is still not fixed. 
-> > > 
-> > > Could you please commit debian patch to fix this?
-> > > http://patch-tracker.debian.org/patch/series/view/bluez/4.101-1/09_fix_ftbfs_with_c99.patch
-> > 
-> > Any news about this? Thanks
-> 
-> Bump :)
+> based on the trace and the .hex files I extracted from the Windows 
+> driver
+> package I wrote a simple python rampatch downloader script. I also 
+> started
+> writing a downloader kernel module. I have two questions though.
+>
+> Is there a need for a driver module at all?
 
-The patch would need to be sent as a proper git patch to this mailing
-list. Particularly, we need proper author information for the patch as
-well as a commit message explaining the background to the patch and why
-it is correct (including a reference to the C++ standard and/or gcc
-documentation).
+> If the module is needed for whatever reason, is there a way to 
+> implement it
+> using btusb HCI interface functions?
 
-Johan
+
+Could someone please answers David's questions? As this would be very 
+interessting for me too.
+
+@David: Could you possible share anything about the udev stuff or 
+kernel module you implemented?
+Your python script is working fine here ;).
+
+Regards
+Thilo
+
