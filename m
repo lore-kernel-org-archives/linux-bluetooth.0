@@ -1,68 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 2/2] Bluetooth: mgmt: Fix enabling LE while powered off
+Date: Tue, 28 Aug 2012 13:52:23 +0200
+Message-ID: <1346154743-18749-2-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1346154743-18749-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1346154743-18749-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1346146381.9800.56.camel@pohly-mobl1.fritz.box>
-References: <1345816795-14092-1-git-send-email-luiz.dentz@gmail.com>
-	<1345816795-14092-7-git-send-email-luiz.dentz@gmail.com>
-	<1346137014.9800.19.camel@pohly-mobl1.fritz.box>
-	<CABBYNZKi47Nigic1w=bZonOMf8FM5A=bz+aQoBaM9PnGsALxkg@mail.gmail.com>
-	<1346146381.9800.56.camel@pohly-mobl1.fritz.box>
-Date: Tue, 28 Aug 2012 15:03:30 +0300
-Message-ID: <CABBYNZJRARi7F1LCDn5Zq_6SACrLs0NyP-rEe1oeCSGPJ3_4Jw@mail.gmail.com>
-Subject: Re: [PATCH obexd 7/7] client-doc: Update documentation of
- PhonebookAccess interface
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Patrick Ohly <patrick.ohly@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Patrick,
+Set LE called when hdev is up but still has HCI_AUTO_OFF flag set will
+only change dev_flags and enable feature in host but won't enable feature
+in controller. As a resulit it's not possible to e.g. start LE only or
+interleaved discovery due to missing LE Supported flag in local features.
 
-On Tue, Aug 28, 2012 at 12:33 PM, Patrick Ohly <patrick.ohly@intel.com> wrote:
-> The user of a specific device would have to know that.
->
-> SyncEvolution's "exclude fields" logic is based on the assumption that
-> requesting everything, including the custom bits, will result in
-> everything the device supports, just like not specifying any filter at
-> all.
+This patch ensures HCI Write LE Host Supported is sent when Set Powered is
+called to clear HCI_AUTO_OFF flag.
 
-So there is a possibility that we detect what kind of extra bits the
-remote stack implements based on vendor id/product id, but I would
-like to avoid specific behavior per device. Besides it seems what we
-want is all custom bits.
+Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+---
+ net/bluetooth/mgmt.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
->> > Should the API spec really specify the full list? IMHO the documentation
->> > should make it clear that the list is not exhaustive - more fields might
->> > be added in future releases of the PBAP standard and obexd, without
->> > changing the obexd API.
->>
->> If we can discover what the bits mean then yes, but unfortunately this
->> is hardcoded in the PBAP spec (see page 30), so we are only defining
->> the one we know the meaning.
->
-> It's okay to only document those, but it should still allow the use of
-> the other things. Otherwise a user of the API would have to patch obexd
-> to use the extensions.
->
->> > In SyncEvolution, I use ListFilterFields() to a) do sanity checks on
->> > user input and to b) build a list of all fields from which the user can
->> > exclude specific fields. Because the field list is not hard-coded, that
->> > will work for fields which are not defined yet.
->>
->> As you can see from the spec this is pretty static so adding a round
->> trip to discover the list sounds wrong to me,
->
-> Hard-coding it in SyncEvolution seems equally wrong to me. If the list
-> changes, then only obexd needs to be updated, not "obexd +
-> SyncEvolution".
->
-> It's only one round-trip per session. As a tradeoff between performance
-> and being future-proof I think doing the call is worth it.
-
-Fair enough so Im keeping ListFilterFields with original names to be
-direct match to the vcard fields, I hope this is really useful for
-someone.
-
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index ccc6716..57ce7cd 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2897,6 +2897,16 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
+ 			hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
+ 		}
+ 
++		if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
++			struct hci_cp_write_le_host_supported cp;
++
++			cp.le = 1;
++			cp.simul = !!(hdev->features[6] & LMP_SIMUL_LE_BR);
++
++			hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED,
++				     sizeof(cp), &cp);
++		}
++
+ 		update_class(hdev);
+ 		update_name(hdev, hdev->dev_name);
+ 		update_eir(hdev);
 -- 
-Luiz Augusto von Dentz
+1.7.11.3
+
