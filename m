@@ -1,96 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2] Bluetooth: Fix deadlock when closing socket
-Date: Tue, 28 Aug 2012 11:20:32 +0300
-Message-Id: <1346142032-8845-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1346079173-3284-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1346079173-3284-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1346137014.9800.19.camel@pohly-mobl1.fritz.box>
+References: <1345816795-14092-1-git-send-email-luiz.dentz@gmail.com>
+	<1345816795-14092-7-git-send-email-luiz.dentz@gmail.com>
+	<1346137014.9800.19.camel@pohly-mobl1.fritz.box>
+Date: Tue, 28 Aug 2012 10:52:27 +0300
+Message-ID: <CABBYNZKi47Nigic1w=bZonOMf8FM5A=bz+aQoBaM9PnGsALxkg@mail.gmail.com>
+Subject: Re: [PATCH obexd 7/7] client-doc: Update documentation of
+ PhonebookAccess interface
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Patrick Ohly <patrick.ohly@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Patrick,
 
-If we have unacked frames when closing bluetooth socket we deadlock
-since conn->chan_lock, chan->lock and socket lock are taken. Remove
-__l2cap_wait_ack completely.
+On Tue, Aug 28, 2012 at 9:56 AM, Patrick Ohly <patrick.ohly@intel.com> wrote:
+> On Fri, 2012-08-24 at 16:59 +0300, Luiz Augusto von Dentz wrote:
+>> +                             array{string} Fields:
+>> +
+>> +                                     Item vcard fields, default is all
+>> +                                     values.
+>> +
+>> +                                     Possible values:
+>> +
+>> +                                             "VERSION",
+>> +                                             "FN",
+>> +                                             "N",
+>> +                                             "PHOTO",
+>> +                                             "BDAY",
+>> +                                             "ADR",
+>> +                                             "LABEL",
+>> +                                             "TEL",
+>> +                                             "EMAIL",
+>> +                                             "MAILER",
+>> +                                             "TZ",
+>> +                                             "GEO",
+>> +                                             "TITLE",
+>> +                                             "ROLE",
+>> +                                             "LOGO",
+>> +                                             "AGENT",
+>> +                                             "ORG",
+>> +                                             "NOTE",
+>> +                                             "REV",
+>> +                                             "SOUND",
+>> +                                             "URL",
+>> +                                             "UID",
+>> +                                             "KEY",
+>> +                                             "NICKNAME",
+>> +                                             "CATEGORIES",
+>> +                                             "PROID",
+>> +                                             "CLASS",
+>> +                                             "SORT-STRING",
+>> +                                             "X-IRMC-CALL-DATETIME"
+>
+> What about selecting the bits which don't have a named property
+> associated with them? They are reported by ListFilterFields() and thus
+> seem to be supported.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- include/net/bluetooth/l2cap.h |    1 -
- net/bluetooth/l2cap_core.c    |   32 --------------------------------
- net/bluetooth/l2cap_sock.c    |    3 ---
- 3 files changed, 36 deletions(-)
+ListFilterFields is removed in this case, anyway setting bits is still
+supported but Im not so sure I would keep it since apparently there is
+no way to discover what they mean which could be different from stack
+to stack.
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 430218b..3ec8679 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -755,7 +755,6 @@ int l2cap_init_sockets(void);
- void l2cap_cleanup_sockets(void);
- 
- void __l2cap_connect_rsp_defer(struct l2cap_chan *chan);
--int __l2cap_wait_ack(struct sock *sk);
- 
- int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm);
- int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index bd13fb7..ea2082a 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1686,38 +1686,6 @@ done:
- 	return err;
- }
- 
--int __l2cap_wait_ack(struct sock *sk)
--{
--	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
--	DECLARE_WAITQUEUE(wait, current);
--	int err = 0;
--	int timeo = HZ/5;
--
--	add_wait_queue(sk_sleep(sk), &wait);
--	set_current_state(TASK_INTERRUPTIBLE);
--	while (chan->unacked_frames > 0 && chan->conn) {
--		if (!timeo)
--			timeo = HZ/5;
--
--		if (signal_pending(current)) {
--			err = sock_intr_errno(timeo);
--			break;
--		}
--
--		release_sock(sk);
--		timeo = schedule_timeout(timeo);
--		lock_sock(sk);
--		set_current_state(TASK_INTERRUPTIBLE);
--
--		err = sock_error(sk);
--		if (err)
--			break;
--	}
--	set_current_state(TASK_RUNNING);
--	remove_wait_queue(sk_sleep(sk), &wait);
--	return err;
--}
--
- static void l2cap_monitor_timeout(struct work_struct *work)
- {
- 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 997e0cb..cc26b1f 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -866,9 +866,6 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
- 	lock_sock(sk);
- 
- 	if (!sk->sk_shutdown) {
--		if (chan->mode == L2CAP_MODE_ERTM)
--			err = __l2cap_wait_ack(sk);
--
- 		sk->sk_shutdown = SHUTDOWN_MASK;
- 
- 		release_sock(sk);
+> Should the API spec really specify the full list? IMHO the documentation
+> should make it clear that the list is not exhaustive - more fields might
+> be added in future releases of the PBAP standard and obexd, without
+> changing the obexd API.
+
+If we can discover what the bits mean then yes, but unfortunately this
+is hardcoded in the PBAP spec (see page 30), so we are only defining
+the one we know the meaning.
+
+> In SyncEvolution, I use ListFilterFields() to a) do sanity checks on
+> user input and to b) build a list of all fields from which the user can
+> exclude specific fields. Because the field list is not hard-coded, that
+> will work for fields which are not defined yet.
+
+As you can see from the spec this is pretty static so adding a round
+trip to discover the list sounds wrong to me, but perhaps you have
+some way to discover the meaning of the bits not defined in the spec?
+
 -- 
-1.7.9.5
-
+Luiz Augusto von Dentz
