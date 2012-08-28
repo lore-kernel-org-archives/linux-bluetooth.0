@@ -1,41 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] input: Fix build error due to O_CLOEXEC
-Date: Tue, 28 Aug 2012 10:28:47 -0400
-Message-Id: <1346164127-22102-1-git-send-email-anderson.lizardo@openbossa.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 2/2] Fix error reporting in sdp_service_search_attr_req
+Date: Tue, 28 Aug 2012 15:33:16 +0200
+Message-ID: <1346160796-23277-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1346160796-23277-1-git-send-email-szymon.janc@tieto.com>
+References: <1346160796-23277-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On some (not so old) systems like Ubuntu 10.04 LTS, O_CLOEXEC is only
-defined if _GNU_SOURCE is defined.
+This function reports error code via errno not return value.
 
-This fixes this build error:
-
-profiles/input/hog_device.c: In function 'hog_device_register':
-profiles/input/hog_device.c:712: error: 'O_CLOEXEC' undeclared (first
-use in this function)
-profiles/input/hog_device.c:712: error: (Each undeclared identifier is
-reported only once
-profiles/input/hog_device.c:712: error: for each function it appears
-in.)
 ---
- profiles/input/hog_device.c |    1 +
- 1 file changed, 1 insertion(+)
+ lib/sdp.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/profiles/input/hog_device.c b/profiles/input/hog_device.c
-index 000f173..b502274 100644
---- a/profiles/input/hog_device.c
-+++ b/profiles/input/hog_device.c
-@@ -27,6 +27,7 @@
- #include <config.h>
- #endif
- 
-+#define _GNU_SOURCE
- #include <stdlib.h>
- #include <errno.h>
- #include <unistd.h>
+diff --git a/lib/sdp.c b/lib/sdp.c
+index 9807c8d..36b4d08 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -4346,7 +4346,8 @@ int sdp_service_search_attr_req(sdp_session_t *session, const sdp_list_t *search
+ 	seqlen = gen_attridseq_pdu(pdata, attrids,
+ 		reqtype == SDP_ATTR_REQ_INDIVIDUAL ? SDP_UINT16 : SDP_UINT32);
+ 	if (seqlen == -1) {
+-		status = EINVAL;
++		errno = EINVAL;
++		status = -1;
+ 		goto end;
+ 	}
+ 	pdata += seqlen;
 -- 
 1.7.9.5
 
