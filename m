@@ -1,59 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 28 Aug 2012 10:30:04 -0700
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Fix redundant NULL checks in
+ convert_raw_attr_to_xml_func
+Message-ID: <20120828173004.GA4928@x220.sheraton.com>
+References: <1346160796-23277-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <20120828165650.GA3165@x220.sheraton.com>
-References: <1344870497-6929-1-git-send-email-rafal.garbat@tieto.com>
-	<1344870497-6929-2-git-send-email-rafal.garbat@tieto.com>
-	<20120814095636.GA7055@x220>
-	<20120828152058.GA18913@x220.sheraton.com>
-	<503CE72D.2030501@tieto.com>
-	<20120828165650.GA3165@x220.sheraton.com>
-Date: Tue, 28 Aug 2012 13:55:38 -0400
-Message-ID: <CAJdJm_PWn--HEsaex1zqL_CqEBvjKQXSABBnPeYP9CVKgeA6Wg@mail.gmail.com>
-Subject: Re: [PATCH v2 01/13] Heart Rate Profile API
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Garbat Rafal <rafal.garbat@tieto.com>,
-	linux-bluetooth@vger.kernel.org,
-	Santiago Carot-Nemesio <sancane@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1346160796-23277-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Szymon,
 
-On Tue, Aug 28, 2012 at 12:56 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> On Tue, Aug 28, 2012, Garbat Rafal wrote:
->> I guess that moving RegisterWatcher methods to the adapter iface
->> sounds reasonable, but we need to think how to do it i.e. to
->> properly handle devices that support several profiles based on
->> registering watchers (do we want to register watcher for all the
->> profiles or have a parameter for Watcher methods to specify the
->> target), etc.
->> Correct me if I'm wrong or missing something.
->> I'd suggest merging heartrate as this profile is quite similar to
->> the thermometer and it works (and no one have any objections to the
->> code) and re-factor this later on.
->> Unfortunately I'll be off for the next three weeks, but I can get
->> back to this when I'm back.
->
-> Since it's not just a refactoring but an API change/break I'd rather get
-> this right from the start. The thermometer API should also be updated to
-> be per-adapter for our next release (BlueZ 5).
+On Tue, Aug 28, 2012, Szymon Janc wrote:
+> Param data can't be NULL and was already dereferenced before check.
+> 
+> ---
+>  src/sdp-xml.c |    5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
 
-The registered "watcher" object will have different interface
-depending on the profile. The application which will call
-RegisterWatcher() needs to check that the device supports the expected
-GATT service (e.g. by checking the "UUIDs" property of that device
-object) before using the  org.bluez.HeartRate interface, therefore
-IMHO it makes sense to have RegisterWatcher() on the device object
-path.
+Both patches have been applied. Thanks.
 
-Unless you are proposing a generic Watcher API that could somehow be
-shared by all profiles (including a single shared interface for the
-watcher object)? How to represent data from profiles which are not
-"measurement" based?
-
-Best Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
