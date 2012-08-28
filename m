@@ -1,87 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1346137014.9800.19.camel@pohly-mobl1.fritz.box>
-References: <1345816795-14092-1-git-send-email-luiz.dentz@gmail.com>
-	<1345816795-14092-7-git-send-email-luiz.dentz@gmail.com>
-	<1346137014.9800.19.camel@pohly-mobl1.fritz.box>
-Date: Tue, 28 Aug 2012 10:52:27 +0300
-Message-ID: <CABBYNZKi47Nigic1w=bZonOMf8FM5A=bz+aQoBaM9PnGsALxkg@mail.gmail.com>
-Subject: Re: [PATCH obexd 7/7] client-doc: Update documentation of
- PhonebookAccess interface
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Patrick Ohly <patrick.ohly@intel.com>
+Date: Tue, 28 Aug 2012 10:40:10 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 2/2] Bluetooth: mgmt: Fix enabling LE while powered off
+Message-ID: <20120828074008.GA4602@aemeltch-MOBL1>
+References: <1346078850-32704-1-git-send-email-andrzej.kaczmarek@tieto.com>
+ <1346078850-32704-2-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1346078850-32704-2-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Patrick,
+Hi Andrzej,
 
-On Tue, Aug 28, 2012 at 9:56 AM, Patrick Ohly <patrick.ohly@intel.com> wrote:
-> On Fri, 2012-08-24 at 16:59 +0300, Luiz Augusto von Dentz wrote:
->> +                             array{string} Fields:
->> +
->> +                                     Item vcard fields, default is all
->> +                                     values.
->> +
->> +                                     Possible values:
->> +
->> +                                             "VERSION",
->> +                                             "FN",
->> +                                             "N",
->> +                                             "PHOTO",
->> +                                             "BDAY",
->> +                                             "ADR",
->> +                                             "LABEL",
->> +                                             "TEL",
->> +                                             "EMAIL",
->> +                                             "MAILER",
->> +                                             "TZ",
->> +                                             "GEO",
->> +                                             "TITLE",
->> +                                             "ROLE",
->> +                                             "LOGO",
->> +                                             "AGENT",
->> +                                             "ORG",
->> +                                             "NOTE",
->> +                                             "REV",
->> +                                             "SOUND",
->> +                                             "URL",
->> +                                             "UID",
->> +                                             "KEY",
->> +                                             "NICKNAME",
->> +                                             "CATEGORIES",
->> +                                             "PROID",
->> +                                             "CLASS",
->> +                                             "SORT-STRING",
->> +                                             "X-IRMC-CALL-DATETIME"
->
-> What about selecting the bits which don't have a named property
-> associated with them? They are reported by ListFilterFields() and thus
-> seem to be supported.
+On Mon, Aug 27, 2012 at 04:47:30PM +0200, Andrzej Kaczmarek wrote:
+> Set LE called when hdev is up but still has HCI_AUTO_OFF flag set will
+> only change dev_flags and enable feature in host but won't enable feature
+> in controller. As a resulit it's not possible to e.g. start LE only or
+> interleaved discovery due to missing LE Supported flag in local features.
+> 
+> This patch ensures HCI Write LE Host Supported is sent when Set Powered is
+> called to clear HCI_AUTO_OFF flag.
+> 
+> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+> ---
+>  net/bluetooth/mgmt.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index ccc6716..f73441f 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -2897,6 +2897,17 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
+>  			hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
+>  		}
+>  
+> +		if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
+> +			struct hci_cp_write_le_host_supported cp;
+> +
+> +			memset(&cp, 0, sizeof(cp));
 
-ListFilterFields is removed in this case, anyway setting bits is still
-supported but Im not so sure I would keep it since apparently there is
-no way to discover what they mean which could be different from stack
-to stack.
+Why memset is needed here?
 
-> Should the API spec really specify the full list? IMHO the documentation
-> should make it clear that the list is not exhaustive - more fields might
-> be added in future releases of the PBAP standard and obexd, without
-> changing the obexd API.
+Best regards 
+Andrei Emeltchenko 
 
-If we can discover what the bits mean then yes, but unfortunately this
-is hardcoded in the PBAP spec (see page 30), so we are only defining
-the one we know the meaning.
-
-> In SyncEvolution, I use ListFilterFields() to a) do sanity checks on
-> user input and to b) build a list of all fields from which the user can
-> exclude specific fields. Because the field list is not hard-coded, that
-> will work for fields which are not defined yet.
-
-As you can see from the spec this is pretty static so adding a round
-trip to discover the list sounds wrong to me, but perhaps you have
-some way to discover the meaning of the bits not defined in the spec?
-
--- 
-Luiz Augusto von Dentz
+> +			cp.le = 1;
+> +			cp.simul = !!(hdev->features[6] & LMP_SIMUL_LE_BR);
+> +
+> +			hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED,
+> +				     sizeof(cp), &cp);
+> +		}
+> +
+>  		update_class(hdev);
+>  		update_name(hdev, hdev->dev_name);
+>  		update_eir(hdev);
+> -- 
+> 1.7.11.3
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
