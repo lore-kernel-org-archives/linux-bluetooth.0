@@ -1,98 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: chanyeol.park@samsung.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/4] audio: remove redundant Media API option
-Date: Tue, 28 Aug 2012 19:24:52 +0900
-Message-id: <1346149495-9363-1-git-send-email-chanyeol.park@samsung.com>
+Message-ID: <503C92D3.5050408@tieto.com>
+Date: Tue, 28 Aug 2012 11:43:47 +0200
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	<linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 2/2] Bluetooth: mgmt: Fix enabling LE while powered off
+References: <1346078850-32704-1-git-send-email-andrzej.kaczmarek@tieto.com> <1346078850-32704-2-git-send-email-andrzej.kaczmarek@tieto.com> <20120828074008.GA4602@aemeltch-MOBL1>
+In-Reply-To: <20120828074008.GA4602@aemeltch-MOBL1>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chan-yeol Park <chanyeol.park@samsung.com>
+Hi Andrei,
 
-BlueZ supports only Media API. So option handler's are useless.
----
- audio/audio.conf |    2 +-
- audio/manager.c  |   12 ++----------
- audio/manager.h  |    2 --
- 3 files changed, 3 insertions(+), 13 deletions(-)
+On 08/28/2012 09:40 AM, Andrei Emeltchenko wrote:
+> Hi Andrzej,
+>
+> On Mon, Aug 27, 2012 at 04:47:30PM +0200, Andrzej Kaczmarek wrote:
+>> Set LE called when hdev is up but still has HCI_AUTO_OFF flag set will
+>> only change dev_flags and enable feature in host but won't enable feature
+>> in controller. As a resulit it's not possible to e.g. start LE only or
+>> interleaved discovery due to missing LE Supported flag in local features.
+>>
+>> This patch ensures HCI Write LE Host Supported is sent when Set Powered is
+>> called to clear HCI_AUTO_OFF flag.
+>>
+>> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+>> ---
+>>   net/bluetooth/mgmt.c | 11 +++++++++++
+>>   1 file changed, 11 insertions(+)
+>>
+>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+>> index ccc6716..f73441f 100644
+>> --- a/net/bluetooth/mgmt.c
+>> +++ b/net/bluetooth/mgmt.c
+>> @@ -2897,6 +2897,17 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
+>>   			hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
+>>   		}
+>>
+>> +		if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
+>> +			struct hci_cp_write_le_host_supported cp;
+>> +
+>> +			memset(&cp, 0, sizeof(cp));
+>
+> Why memset is needed here?
 
-diff --git a/audio/audio.conf b/audio/audio.conf
-index 662647c..d1c57d3 100644
---- a/audio/audio.conf
-+++ b/audio/audio.conf
-@@ -8,7 +8,7 @@
- #Master=true
- 
- # If we want to disable support for specific services
--# Defaults to supporting the services: HFP, Headset, Sink, Control and Media
-+# Defaults to supporting the services: HFP, Headset, Sink, Control
- #Disable=Gateway,Source
- 
- # SCO routing. Either PCM or HCI (in which case audio is routed to/from ALSA)
-diff --git a/audio/manager.c b/audio/manager.c
-index 999124d..6411707 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -112,7 +112,6 @@ static struct enabled_interfaces enabled = {
- 	.sink		= TRUE,
- 	.source		= FALSE,
- 	.control	= TRUE,
--	.media		= TRUE,
- };
- 
- static struct audio_adapter *find_adapter(GSList *list,
-@@ -1180,9 +1179,6 @@ int audio_manager_init(DBusConnection *conn, GKeyFile *conf,
- 			enabled.source = TRUE;
- 		else if (g_str_equal(list[i], "Control"))
- 			enabled.control = TRUE;
--		else if (g_str_equal(list[i], "Media"))
--			enabled.media = TRUE;
--
- 	}
- 	g_strfreev(list);
- 
-@@ -1199,8 +1195,6 @@ int audio_manager_init(DBusConnection *conn, GKeyFile *conf,
- 			enabled.source = FALSE;
- 		else if (g_str_equal(list[i], "Control"))
- 			enabled.control = FALSE;
--		else if (g_str_equal(list[i], "Media"))
--			enabled.media = FALSE;
- 	}
- 	g_strfreev(list);
- 
-@@ -1231,8 +1225,7 @@ proceed:
- 	if (enabled.control)
- 		btd_register_adapter_driver(&avrcp_server_driver);
- 
--	if (enabled.media)
--		btd_register_adapter_driver(&media_server_driver);
-+	btd_register_adapter_driver(&media_server_driver);
- 
- 	if (enabled.headset)
- 		btd_register_adapter_driver(&headset_server_driver);
-@@ -1264,8 +1257,7 @@ void audio_manager_exit(void)
- 		config = NULL;
- 	}
- 
--	if (enabled.media)
--		btd_unregister_adapter_driver(&media_server_driver);
-+	btd_unregister_adapter_driver(&media_server_driver);
- 
- 	if (enabled.headset)
- 		btd_unregister_adapter_driver(&headset_server_driver);
-diff --git a/audio/manager.h b/audio/manager.h
-index f1d3021..3c8b1e0 100644
---- a/audio/manager.h
-+++ b/audio/manager.h
-@@ -29,8 +29,6 @@ struct enabled_interfaces {
- 	gboolean sink;
- 	gboolean source;
- 	gboolean control;
--	gboolean socket;
--	gboolean media;
- 	gboolean media_player;
- };
- 
--- 
-1.7.9.5
+Not really needed, I forgot to remove it after copy&paste from other 
+code. I'll send v2 later with memset removed.
+
+BR,
+Andrzej
 
