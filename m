@@ -1,66 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 28 Aug 2012 10:40:10 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: mgmt: Fix enabling LE while powered off
-Message-ID: <20120828074008.GA4602@aemeltch-MOBL1>
-References: <1346078850-32704-1-git-send-email-andrzej.kaczmarek@tieto.com>
- <1346078850-32704-2-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1346078850-32704-2-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <20120828011708.GA11305@x220.sheraton.com>
+References: <1345816795-14092-1-git-send-email-luiz.dentz@gmail.com>
+	<1345816795-14092-7-git-send-email-luiz.dentz@gmail.com>
+	<20120828011708.GA11305@x220.sheraton.com>
+Date: Tue, 28 Aug 2012 10:00:45 +0300
+Message-ID: <CABBYNZLLgdRGzrY7z_8Nz8OeXtmapvsoKiQHL6UHLzuyqy=8HQ@mail.gmail.com>
+Subject: Re: [PATCH obexd 7/7] client-doc: Update documentation of
+ PhonebookAccess interface
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi Johan,
 
-On Mon, Aug 27, 2012 at 04:47:30PM +0200, Andrzej Kaczmarek wrote:
-> Set LE called when hdev is up but still has HCI_AUTO_OFF flag set will
-> only change dev_flags and enable feature in host but won't enable feature
-> in controller. As a resulit it's not possible to e.g. start LE only or
-> interleaved discovery due to missing LE Supported flag in local features.
-> 
-> This patch ensures HCI Write LE Host Supported is sent when Set Powered is
-> called to clear HCI_AUTO_OFF flag.
-> 
-> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-> ---
->  net/bluetooth/mgmt.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index ccc6716..f73441f 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -2897,6 +2897,17 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
->  			hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
->  		}
->  
-> +		if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
-> +			struct hci_cp_write_le_host_supported cp;
-> +
-> +			memset(&cp, 0, sizeof(cp));
+On Tue, Aug 28, 2012 at 4:17 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Fri, Aug 24, 2012, Luiz Augusto von Dentz wrote:
+>> ---
+>>  doc/client-api.txt | 180 ++++++++++++++++++++++++++++++++++++++++++-----------
+>>  1 file changed, 145 insertions(+), 35 deletions(-)
+>
+> I had a chat with Marcel about this API which resulted with the
+> following change proposals:
+>
+>> +                             string Order:
+>> +
+>> +                                     Items order
+>> +
+>> +                                     Possible values: "indexed" (default),
+>> +                                     "alphanumeric" or "phonetic"
+>> +
+>> +                             uint16 Offset:
+>> +
+>> +                                     Offset of the first item, default is 0
+>> +
+>> +                             uint16 Items:
+>> +
+>> +                                     Maximum number of items, default is
+>> +                                     unlimited (65535)
+>
+> Call this MaxCount or Count to make it clearer.
 
-Why memset is needed here?
+Will do it.
 
-Best regards 
-Andrei Emeltchenko 
+>> +
+>> +                             array{string} Fields:
+>> +
+>> +                                     Item vcard fields, default is all
+>> +                                     values.
+>> +
+>> +                                     Possible values:
+>> +
+>> +                                             "VERSION",
+>> +                                             "FN",
+>> +                                             "N",
+>> +                                             "PHOTO",
+>> +                                             "BDAY",
+>> +                                             "ADR",
+>> +                                             "LABEL",
+>> +                                             "TEL",
+>> +                                             "EMAIL",
+>> +                                             "MAILER",
+>> +                                             "TZ",
+>> +                                             "GEO",
+>> +                                             "TITLE",
+>> +                                             "ROLE",
+>> +                                             "LOGO",
+>> +                                             "AGENT",
+>> +                                             "ORG",
+>> +                                             "NOTE",
+>> +                                             "REV",
+>> +                                             "SOUND",
+>> +                                             "URL",
+>> +                                             "UID",
+>> +                                             "KEY",
+>> +                                             "NICKNAME",
+>> +                                             "CATEGORIES",
+>> +                                             "PROID",
+>> +                                             "CLASS",
+>> +                                             "SORT-STRING",
+>> +                                             "X-IRMC-CALL-DATETIME"
+>
+> Make these lower case (I know it's upper case in the spec. but let's
+> keep the consistency with the rest of the D-Bus API).
 
-> +			cp.le = 1;
-> +			cp.simul = !!(hdev->features[6] & LMP_SIMUL_LE_BR);
-> +
-> +			hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED,
-> +				     sizeof(cp), &cp);
-> +		}
-> +
->  		update_class(hdev);
->  		update_name(hdev, hdev->dev_name);
->  		update_eir(hdev);
-> -- 
-> 1.7.11.3
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Sure
+
+>> @@ -244,8 +325,54 @@ Methods          void Select(string location, string phonebook)
+>>                       The properties of this transfer are also returned along
+>>                       with the object path, to avoid a call to GetProperties.
+>>
+>> +                     filters:
+>> +
+>> +                             string Format:
+>> +
+>> +                                     Items vcard format
+>> +
+>> +                                     Possible values: "vcard21" (default) or
+>> +                                     "vcard30"
+>> +
+>> +                             array{string} Fields:
+>> +
+>> +                                     Item vcard fields, default is all
+>> +                                     values.
+>> +
+>> +                                     Possible values:
+>> +
+>> +                                             "VERSION",
+>> +                                             "FN",
+>> +                                             "N",
+>> +                                             "PHOTO",
+>> +                                             "BDAY",
+>> +                                             "ADR",
+>> +                                             "LABEL",
+>> +                                             "TEL",
+>> +                                             "EMAIL",
+>> +                                             "MAILER",
+>> +                                             "TZ",
+>> +                                             "GEO",
+>> +                                             "TITLE",
+>> +                                             "ROLE",
+>> +                                             "LOGO",
+>> +                                             "AGENT",
+>> +                                             "ORG",
+>> +                                             "NOTE",
+>> +                                             "REV",
+>> +                                             "SOUND",
+>> +                                             "URL",
+>> +                                             "UID",
+>> +                                             "KEY",
+>> +                                             "NICKNAME",
+>> +                                             "CATEGORIES",
+>> +                                             "PROID",
+>> +                                             "CLASS",
+>> +                                             "SORT-STRING",
+>> +                                             "X-IRMC-CALL-DATETIME"
+>
+> Is this a duplicate of the previous section. Maybe just move this out to
+> a common section and the refer to it from the places that need it.
+
+Depending on the method some parameters may not be valid, but maybe we
+can have a section explaining the filters parameter then in each of
+method we just enumerate what are the possible parameters for its
+filter.
+
+-- 
+Luiz Augusto von Dentz
