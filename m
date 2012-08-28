@@ -1,54 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <503C92D3.5050408@tieto.com>
-Date: Tue, 28 Aug 2012 11:43:47 +0200
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 2/2] Bluetooth: mgmt: Fix enabling LE while powered off
-References: <1346078850-32704-1-git-send-email-andrzej.kaczmarek@tieto.com> <1346078850-32704-2-git-send-email-andrzej.kaczmarek@tieto.com> <20120828074008.GA4602@aemeltch-MOBL1>
-In-Reply-To: <20120828074008.GA4602@aemeltch-MOBL1>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Message-ID: <1346146381.9800.56.camel@pohly-mobl1.fritz.box>
+Subject: Re: [PATCH obexd 7/7] client-doc: Update documentation of
+ PhonebookAccess interface
+From: Patrick Ohly <patrick.ohly@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 28 Aug 2012 11:33:01 +0200
+In-Reply-To: <CABBYNZKi47Nigic1w=bZonOMf8FM5A=bz+aQoBaM9PnGsALxkg@mail.gmail.com>
+References: <1345816795-14092-1-git-send-email-luiz.dentz@gmail.com>
+	 <1345816795-14092-7-git-send-email-luiz.dentz@gmail.com>
+	 <1346137014.9800.19.camel@pohly-mobl1.fritz.box>
+	 <CABBYNZKi47Nigic1w=bZonOMf8FM5A=bz+aQoBaM9PnGsALxkg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+On Tue, 2012-08-28 at 10:52 +0300, Luiz Augusto von Dentz wrote:
+> On Tue, Aug 28, 2012 at 9:56 AM, Patrick Ohly <patrick.ohly@intel.com> wrote:
+> > What about selecting the bits which don't have a named property
+> > associated with them? They are reported by ListFilterFields() and thus
+> > seem to be supported.
+> 
+> ListFilterFields is removed in this case,
 
-On 08/28/2012 09:40 AM, Andrei Emeltchenko wrote:
-> Hi Andrzej,
->
-> On Mon, Aug 27, 2012 at 04:47:30PM +0200, Andrzej Kaczmarek wrote:
->> Set LE called when hdev is up but still has HCI_AUTO_OFF flag set will
->> only change dev_flags and enable feature in host but won't enable feature
->> in controller. As a resulit it's not possible to e.g. start LE only or
->> interleaved discovery due to missing LE Supported flag in local features.
->>
->> This patch ensures HCI Write LE Host Supported is sent when Set Powered is
->> called to clear HCI_AUTO_OFF flag.
->>
->> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
->> ---
->>   net/bluetooth/mgmt.c | 11 +++++++++++
->>   1 file changed, 11 insertions(+)
->>
->> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->> index ccc6716..f73441f 100644
->> --- a/net/bluetooth/mgmt.c
->> +++ b/net/bluetooth/mgmt.c
->> @@ -2897,6 +2897,17 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
->>   			hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
->>   		}
->>
->> +		if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
->> +			struct hci_cp_write_le_host_supported cp;
->> +
->> +			memset(&cp, 0, sizeof(cp));
->
-> Why memset is needed here?
+I find it useful, please don't remove it.
 
-Not really needed, I forgot to remove it after copy&paste from other 
-code. I'll send v2 later with memset removed.
+>  anyway setting bits is still
+> supported but Im not so sure I would keep it since apparently there is
+> no way to discover what they mean which could be different from stack
+> to stack.
 
-BR,
-Andrzej
+The user of a specific device would have to know that.
+
+SyncEvolution's "exclude fields" logic is based on the assumption that
+requesting everything, including the custom bits, will result in
+everything the device supports, just like not specifying any filter at
+all.
+
+> > Should the API spec really specify the full list? IMHO the documentation
+> > should make it clear that the list is not exhaustive - more fields might
+> > be added in future releases of the PBAP standard and obexd, without
+> > changing the obexd API.
+> 
+> If we can discover what the bits mean then yes, but unfortunately this
+> is hardcoded in the PBAP spec (see page 30), so we are only defining
+> the one we know the meaning.
+
+It's okay to only document those, but it should still allow the use of
+the other things. Otherwise a user of the API would have to patch obexd
+to use the extensions.
+
+> > In SyncEvolution, I use ListFilterFields() to a) do sanity checks on
+> > user input and to b) build a list of all fields from which the user can
+> > exclude specific fields. Because the field list is not hard-coded, that
+> > will work for fields which are not defined yet.
+> 
+> As you can see from the spec this is pretty static so adding a round
+> trip to discover the list sounds wrong to me,
+
+Hard-coding it in SyncEvolution seems equally wrong to me. If the list
+changes, then only obexd needs to be updated, not "obexd +
+SyncEvolution".
+
+It's only one round-trip per session. As a tradeoff between performance
+and being future-proof I think doing the call is worth it.
+
+-- 
+Best Regards
+
+Patrick Ohly
+Senior Software Engineer
+
+Intel GmbH
+Open Source Technology Center               
+Pützstr. 5                              Phone: +49-228-2493652
+53129 Bonn
+Germany
 
