@@ -1,130 +1,183 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Tue, 28 Aug 2012 17:07:37 +0530
-Message-ID: <CAEd0BX-_PbMs1JV4g8_bYf43KScnHHKwsXaci=0cuqHcR-FGhg@mail.gmail.com>
-Subject: [Crash report & Patch obexd 1/1] map: gboolean holds int value which
- 0/1 crashes in DBusMessage
-From: "Venkateswaran, Srinivasa Ragavan"
-	<srinivasa.ragavan.venkateswaran@intel.com>
+From: chanyeol.park@samsung.com
 To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=20cf3074d4f2864bb004c851de0b
+Subject: [PATCH v2 3/4] core: replace NULL by dbus invalid arguments
+Date: Tue, 28 Aug 2012 19:24:54 +0900
+Message-id: <1346149495-9363-3-git-send-email-chanyeol.park@samsung.com>
+In-reply-to: <1346149495-9363-1-git-send-email-chanyeol.park@samsung.com>
+References: <1346149495-9363-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---20cf3074d4f2864bb004c851de0b
-Content-Type: text/plain; charset=ISO-8859-1
+From: Chan-yeol Park <chanyeol.park@samsung.com>
 
-Hi,
+This patch replaces NULL with dbus invalid arguments return
+if dbus method call gets invalid arguments from the peer.
+This will avoid dbus peer coommander's infinite wait.
+---
+ audio/media.c                 |    4 ++--
+ audio/transport.c             |    4 ++--
+ plugins/service.c             |    8 ++++----
+ profiles/network/connection.c |    2 +-
+ profiles/network/server.c     |    4 ++--
+ src/adapter.c                 |    4 ++--
+ src/manager.c                 |    2 +-
+ 7 files changed, 14 insertions(+), 14 deletions(-)
 
-I was testing MAP and I came across a crash (trace attached). I
-figured out that the crash is because dbus expects gboolean to be 0/1
-where as it holds the 'int' results from strcasecmp. I've attached the
-patch that fixed the problem for me. This is my first message/patch to
-this list, sorry if it isn't in the right/expected format, just
-suggest me and I could put it right.
+diff --git a/audio/media.c b/audio/media.c
+index ea6d582..b0ea4e9 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -926,7 +926,7 @@ static DBusMessage *unregister_endpoint(DBusConnection *conn, DBusMessage *msg,
+ 	if (!dbus_message_get_args(msg, NULL,
+ 				DBUS_TYPE_OBJECT_PATH, &path,
+ 				DBUS_TYPE_INVALID))
+-		return NULL;
++		return btd_error_invalid_args(msg);
+ 
+ 	sender = dbus_message_get_sender(msg);
+ 
+@@ -1808,7 +1808,7 @@ static DBusMessage *unregister_player(DBusConnection *conn, DBusMessage *msg,
+ 	if (!dbus_message_get_args(msg, NULL,
+ 				DBUS_TYPE_OBJECT_PATH, &path,
+ 				DBUS_TYPE_INVALID))
+-		return NULL;
++		return btd_error_invalid_args(msg);
+ 
+ 	sender = dbus_message_get_sender(msg);
+ 
+diff --git a/audio/transport.c b/audio/transport.c
+index 832ad2a..d40c92d 100644
+--- a/audio/transport.c
++++ b/audio/transport.c
+@@ -667,7 +667,7 @@ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
+ 	if (!dbus_message_get_args(msg, NULL,
+ 				DBUS_TYPE_STRING, &accesstype,
+ 				DBUS_TYPE_INVALID))
+-		return NULL;
++		return btd_error_invalid_args(msg);
+ 
+ 	sender = dbus_message_get_sender(msg);
+ 
+@@ -704,7 +704,7 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
+ 	if (!dbus_message_get_args(msg, NULL,
+ 				DBUS_TYPE_STRING, &accesstype,
+ 				DBUS_TYPE_INVALID))
+-		return NULL;
++		return btd_error_invalid_args(msg);
+ 
+ 	sender = dbus_message_get_sender(msg);
+ 
+diff --git a/plugins/service.c b/plugins/service.c
+index 9f7bdb7..f16abe7 100644
+--- a/plugins/service.c
++++ b/plugins/service.c
+@@ -422,7 +422,7 @@ static DBusMessage *update_xml_record(DBusConnection *conn,
+ 				DBUS_TYPE_UINT32, &handle,
+ 				DBUS_TYPE_STRING, &record,
+ 				DBUS_TYPE_INVALID) == FALSE)
+-		return NULL;
++		return btd_error_invalid_args(msg);
+ 
+ 	len = (record ? strlen(record) : 0);
+ 	if (len == 0)
+@@ -475,7 +475,7 @@ static DBusMessage *add_service_record(DBusConnection *conn,
+ 
+ 	if (dbus_message_get_args(msg, NULL,
+ 			DBUS_TYPE_STRING, &record, DBUS_TYPE_INVALID) == FALSE)
+-		return NULL;
++		return btd_error_invalid_args(msg);
+ 
+ 	sender = dbus_message_get_sender(msg);
+ 	err = add_xml_record(conn, sender, serv_adapter, record, &handle);
+@@ -509,7 +509,7 @@ static DBusMessage *remove_service_record(DBusConnection *conn,
+ 
+ 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT32, &handle,
+ 						DBUS_TYPE_INVALID) == FALSE)
+-		return NULL;
++		return btd_error_invalid_args(msg);
+ 
+ 	sender = dbus_message_get_sender(msg);
+ 
+@@ -582,7 +582,7 @@ static DBusMessage *request_authorization(DBusConnection *conn,
+ 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &address,
+ 					DBUS_TYPE_UINT32, &handle,
+ 					DBUS_TYPE_INVALID) == FALSE)
+-		return NULL;
++		return btd_error_invalid_args(msg);
+ 
+ 	sender = dbus_message_get_sender(msg);
+ 	if (find_pending_by_sender(serv_adapter, sender))
+diff --git a/profiles/network/connection.c b/profiles/network/connection.c
+index e8ac643..c1ae3fa 100644
+--- a/profiles/network/connection.c
++++ b/profiles/network/connection.c
+@@ -402,7 +402,7 @@ static DBusMessage *connection_connect(DBusConnection *conn,
+ 
+ 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &svc,
+ 						DBUS_TYPE_INVALID) == FALSE)
+-		return NULL;
++		return btd_error_invalid_args(msg);
+ 
+ 	id = bnep_service_id(svc);
+ 	nc = find_connection(peer->connections, id);
+diff --git a/profiles/network/server.c b/profiles/network/server.c
+index cfad893..a3274d9 100644
+--- a/profiles/network/server.c
++++ b/profiles/network/server.c
+@@ -633,7 +633,7 @@ static DBusMessage *register_server(DBusConnection *conn,
+ 
+ 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &uuid,
+ 				DBUS_TYPE_STRING, &bridge, DBUS_TYPE_INVALID))
+-		return NULL;
++		return btd_error_invalid_args(msg);
+ 
+ 	if (g_strcmp0(uuid, "nap"))
+ 		return btd_error_failed(msg, "Invalid UUID");
+@@ -668,7 +668,7 @@ static DBusMessage *unregister_server(DBusConnection *conn,
+ 
+ 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &uuid,
+ 							DBUS_TYPE_INVALID))
+-		return NULL;
++		return btd_error_invalid_args(msg);
+ 
+ 	if (g_strcmp0(uuid, "nap"))
+ 		return btd_error_failed(msg, "Invalid UUID");
+diff --git a/src/adapter.c b/src/adapter.c
+index 50779fd..4c70e2f 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1574,7 +1574,7 @@ static DBusMessage *register_agent(DBusConnection *conn, DBusMessage *msg,
+ 
+ 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
+ 			DBUS_TYPE_STRING, &capability, DBUS_TYPE_INVALID))
+-		return NULL;
++		return btd_error_invalid_args(msg);
+ 
+ 	if (adapter->agent)
+ 		return btd_error_already_exists(msg);
+@@ -1604,7 +1604,7 @@ static DBusMessage *unregister_agent(DBusConnection *conn, DBusMessage *msg,
+ 
+ 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
+ 						DBUS_TYPE_INVALID))
+-		return NULL;
++		return btd_error_invalid_args(msg);
+ 
+ 	name = dbus_message_get_sender(msg);
+ 
+diff --git a/src/manager.c b/src/manager.c
+index 4a39461..738bf0b 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -96,7 +96,7 @@ static DBusMessage *find_adapter(DBusConnection *conn,
+ 
+ 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &pattern,
+ 							DBUS_TYPE_INVALID))
+-		return NULL;
++		return btd_error_invalid_args(msg);
+ 
+ 	/* hci_devid() would make sense to use here, except it is
+ 	 * restricted to devices which are up */
+-- 
+1.7.9.5
 
-Thanks,
--Srini.
-
---20cf3074d4f2864bb004c851de0b
-Content-Type: text/plain; charset=US-ASCII; name="obex-crash.txt"
-Content-Disposition: attachment; filename="obex-crash.txt"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_h6ex820c0
-
-VGhyZWFkIDEgKFRocmVhZCAweDdmZmZmN2ZjZTcwMCAoTFdQIDYxMjQpKToKIzAgIDB4MDAwMDdm
-ZmZmNzMyOGQ5NSBpbiBfX0dJX3JhaXNlIChzaWc9NikgYXQgLi4vbnB0bC9zeXNkZXBzL3VuaXgv
-c3lzdi9saW51eC9yYWlzZS5jOjY0CiMxICAweDAwMDA3ZmZmZjczMmEyYWIgaW4gX19HSV9hYm9y
-dCAoKSBhdCBhYm9ydC5jOjkzCiMyICAweDAwMDA3ZmZmZjc4ZDA2NTUgaW4gX2RidXNfYWJvcnQg
-KCkgYXQgZGJ1cy1zeXNkZXBzLmM6OTQKIzMgIDB4MDAwMDdmZmZmNzhjNzVmMSBpbiBfZGJ1c193
-YXJuX2NoZWNrX2ZhaWxlZCAoZm9ybWF0PTB4N2ZmZmY3OGQ2OTIwICJhcmd1bWVudHMgdG8gJXMo
-KSB3ZXJlIGluY29ycmVjdCwgYXNzZXJ0aW9uIFwiJXNcIiBmYWlsZWQgaW4gZmlsZSAlcyBsaW5l
-ICVkLlxuVGhpcyBpcyBub3JtYWxseSBhIGJ1ZyBpbiBzb21lIGFwcGxpY2F0aW9uIHVzaW5nIHRo
-ZSBELUJ1cyBsaWJyYXJ5LlxuIikgYXQgZGJ1cy1pbnRlcm5hbHMuYzoyODkKIzQgIDB4MDAwMDdm
-ZmZmNzhiYTI4YiBpbiBkYnVzX21lc3NhZ2VfaXRlcl9hcHBlbmRfYmFzaWMgKGl0ZXI9MHg3ZmZm
-ZmZmZmQzMjAsIHR5cGU9PG9wdGltaXplZCBvdXQ+LCB2YWx1ZT0weDdmZmZmZmZmZDQzYykgYXQg
-ZGJ1cy1tZXNzYWdlLmM6MjUzOAojNSAgMHgwMDAwMDAwMDAwNDIwMWMzIGluIGFwcGVuZF92YXJp
-YW50IChpdGVyPTB4N2ZmZmZmZmZkM2IwLCB0eXBlPTk4LCB2YWx1ZT0weDdmZmZmZmZmZDQzYykg
-YXQgY2xpZW50L2RidXMuYzo0NAojNiAgMHgwMDAwMDAwMDAwNDIwMjRlIGluIG9iZXhfZGJ1c19k
-aWN0X2FwcGVuZCAoZGljdD0weDdmZmZmZmZmZDQ4MCwga2V5PTB4NDI1MmJiICJSZWFkIiwgdHlw
-ZT05OCwgdmFsdWU9MHg3ZmZmZmZmZmQ0M2MpIGF0IGNsaWVudC9kYnVzLmM6NjUKIzcgIDB4MDAw
-MDAwMDAwMDQxZGNjOSBpbiBwYXJzZV9yZWFkIChtc2c9MHg2M2M2NTAsIHZhbHVlPTB4NjNiZTAw
-ICJ5ZXMiLCBpdGVyPTB4N2ZmZmZmZmZkNDgwKSBhdCBjbGllbnQvbWFwLmM6NDIzCiM4ICAweDAw
-MDAwMDAwMDA0MWRmYTcgaW4gbXNnX2VsZW1lbnQgKGN0eHQ9MHg2M2JjNTAsIGVsZW1lbnQ9MHg2
-M2JkNzAgIm1zZyIsIG5hbWVzPTB4N2ZmZmZmZmZkNWYwLCB2YWx1ZXM9MHg3ZmZmZmZmZmQ1NjAs
-IHVzZXJfZGF0YT0weDYzNDdiMCwgZ2Vycj0weDdmZmZmZmZmZDY4MCkgYXQgY2xpZW50L21hcC5j
-OjUxOAojOSAgMHgwMDAwN2ZmZmY3YjMyM2I5IGluIGVtaXRfc3RhcnRfZWxlbWVudCAoY29udGV4
-dD0weDYzYmM1MCwgZXJyb3I9MHgwKSBhdCBnbWFya3VwLmM6OTg2CiMxMCAweDAwMDA3ZmZmZjdi
-MzNiNDQgaW4gZ19tYXJrdXBfcGFyc2VfY29udGV4dF9wYXJzZSAoY29udGV4dD0weDYzYmM1MCwg
-dGV4dD08b3B0aW1pemVkIG91dD4sIHRleHRfbGVuPTxvcHRpbWl6ZWQgb3V0PiwgZXJyb3I9MHgw
-KSBhdCBnbWFya3VwLmM6MTMyMwojMTEgMHgwMDAwMDAwMDAwNDFlMWFkIGluIG1lc3NhZ2VfbGlz
-dGluZ19jYiAoc2Vzc2lvbj0weDYzMTQ1MCwgdHJhbnNmZXI9MHg2MzNmZDAsIGVycj0weDAsIHVz
-ZXJfZGF0YT0weDYzOGI2MCkgYXQgY2xpZW50L21hcC5jOjU4NgojMTIgMHgwMDAwMDAwMDAwNDE3
-NDRjIGluIHNlc3Npb25fdGVybWluYXRlX3RyYW5zZmVyIChzZXNzaW9uPTB4NjMxNDUwLCB0cmFu
-c2Zlcj0weDYzM2ZkMCwgZ2Vycj0weDApIGF0IGNsaWVudC9zZXNzaW9uLmM6NzQzCiMxMyAweDAw
-MDAwMDAwMDA0MTc0ZDcgaW4gc2Vzc2lvbl9ub3RpZnlfY29tcGxldGUgKHNlc3Npb249MHg2MzE0
-NTAsIHRyYW5zZmVyPTB4NjMzZmQwKSBhdCBjbGllbnQvc2Vzc2lvbi5jOjc1OAojMTQgMHgwMDAw
-MDAwMDAwNDE3NTVhIGluIHRyYW5zZmVyX2NvbXBsZXRlICh0cmFuc2Zlcj0weDYzM2ZkMCwgZXJy
-PTB4MCwgdXNlcl9kYXRhPTB4NjMxNDUwKSBhdCBjbGllbnQvc2Vzc2lvbi5jOjc3OAojMTUgMHgw
-MDAwMDAwMDAwNDFmNTdiIGluIHhmZXJfY29tcGxldGUgKG9iZXg9MHg2MzQ2NjAsIGVycj0weDAs
-IHVzZXJfZGF0YT0weDYzM2ZkMCkgYXQgY2xpZW50L3RyYW5zZmVyLmM6NTIxCiMxNiAweDAwMDAw
-MDAwMDA0MGVmZGYgaW4gdHJhbnNmZXJfY29tcGxldGUgKHRyYW5zZmVyPTB4NjNiMjYwLCBlcnI9
-MHgwKSBhdCBnb2JleC9nb2JleC10cmFuc2Zlci5jOjEwMgojMTcgMHgwMDAwMDAwMDAwNDBmNDE4
-IGluIHRyYW5zZmVyX3Jlc3BvbnNlIChvYmV4PTB4NjM0NjYwLCBlcnI9MHgwLCByc3A9MHg2MzNk
-MDAsIHVzZXJfZGF0YT0weDYzYjI2MCkgYXQgZ29iZXgvZ29iZXgtdHJhbnNmZXIuYzoyMjEKIzE4
-IDB4MDAwMDAwMDAwMDQwYjMyMCBpbiBoYW5kbGVfcmVzcG9uc2UgKG9iZXg9MHg2MzQ2NjAsIGVy
-cj0weDAsIHJzcD0weDYzM2QwMCkgYXQgZ29iZXgvZ29iZXguYzo5NDgKIzE5IDB4MDAwMDAwMDAw
-MDQwYmJjMSBpbiBpbmNvbWluZ19kYXRhIChpbz0weDYzOGRhMCwgY29uZD1HX0lPX0lOLCB1c2Vy
-X2RhdGE9MHg2MzQ2NjApIGF0IGdvYmV4L2dvYmV4LmM6MTE5MQojMjAgMHgwMDAwN2ZmZmY3YjJm
-OTRhIGluIGdfbWFpbl9kaXNwYXRjaCAoY29udGV4dD0weDYyZjEzMCkgYXQgZ21haW4uYzoyNTE1
-CiMyMSBnX21haW5fY29udGV4dF9kaXNwYXRjaCAoY29udGV4dD0weDYyZjEzMCkgYXQgZ21haW4u
-YzozMDUyCiMyMiAweDAwMDA3ZmZmZjdiMmZkMTAgaW4gZ19tYWluX2NvbnRleHRfaXRlcmF0ZSAo
-ZGlzcGF0Y2g9MSwgYmxvY2s9PG9wdGltaXplZCBvdXQ+LCBjb250ZXh0PTB4NjJmMTMwLCBzZWxm
-PTxvcHRpbWl6ZWQgb3V0PikgYXQgZ21haW4uYzozMTIzCiMyMyBnX21haW5fY29udGV4dF9pdGVy
-YXRlIChjb250ZXh0PTB4NjJmMTMwLCBibG9jaz08b3B0aW1pemVkIG91dD4sIGRpc3BhdGNoPTEs
-IHNlbGY9PG9wdGltaXplZCBvdXQ+KSBhdCBnbWFpbi5jOjMwNjAKIzI0IDB4MDAwMDdmZmZmN2Iz
-MDEwYSBpbiBnX21haW5fbG9vcF9ydW4gKGxvb3A9MHg2MmUxYjApIGF0IGdtYWluLmM6MzMxNwoj
-MjUgMHgwMDAwMDAwMDAwNDE1MjdkIGluIG1haW4gKGFyZ2M9MSwgYXJndj0weDdmZmZmZmZmZGNh
-OCkgYXQgY2xpZW50L21haW4uYzoxNzUKKGdkYikgCg==
---20cf3074d4f2864bb004c851de0b
-Content-Type: application/octet-stream;
-	name="1849-Boolean-is-expected-to-be-1-0-where-as-strcasecmp-re.patch"
-Content-Disposition: attachment;
-	filename="1849-Boolean-is-expected-to-be-1-0-where-as-strcasecmp-re.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_h6ex8a3c1
-
-RnJvbSAyMWY1MmU1OWJmNTY3YTMyMWMwN2E5NGQ0NmQxZWUyYTEyMzMwYWJmIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTcmluaXZhc2EgUmFnYXZhbiA8c3JhZ2F2YW5AZ25vbWUub3Jn
-PgpEYXRlOiBUdWUsIDI4IEF1ZyAyMDEyIDE2OjQ0OjA1ICswNTMwClN1YmplY3Q6IFtQQVRDSCAx
-ODQ5LzE4NDldIEJvb2xlYW4gaXMgZXhwZWN0ZWQgdG8gYmUgMS8wIHdoZXJlIGFzIHN0cmNhc2Vj
-bXAKIHJldHVybnMgZ2ludC4gQ3Jhc2hlcyBpbiBEQnVzTWVzc2FnZSBhdAoKCV9kYnVzX3JldHVy
-bl92YWxfaWZfZmFpbCAoKmJvb2xfcCA9PSAwIHx8ICpib29sX3AgPT0gMSwgRkFMU0UpOwotLS0K
-IGNsaWVudC9tYXAuYyB8ICAgIDggKysrKy0tLS0KIDEgZmlsZXMgY2hhbmdlZCwgNCBpbnNlcnRp
-b25zKCspLCA0IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2NsaWVudC9tYXAuYyBiL2NsaWVu
-dC9tYXAuYwppbmRleCBlNjA2Y2IyLi40ZjA3ZmNiIDEwMDY0NAotLS0gYS9jbGllbnQvbWFwLmMK
-KysrIGIvY2xpZW50L21hcC5jCkBAIC00MDAsNyArNDAwLDcgQEAgc3RhdGljIHZvaWQgcGFyc2Vf
-c2l6ZShzdHJ1Y3QgbWFwX21zZyAqbXNnLCBjb25zdCBjaGFyICp2YWx1ZSwKIHN0YXRpYyB2b2lk
-IHBhcnNlX3ByaW9yaXR5KHN0cnVjdCBtYXBfbXNnICptc2csIGNvbnN0IGNoYXIgKnZhbHVlLAog
-CQkJCQkJCURCdXNNZXNzYWdlSXRlciAqaXRlcikKIHsKLQlnYm9vbGVhbiBmbGFnID0gc3RyY2Fz
-ZWNtcCh2YWx1ZSwgIm5vIik7CisJZ2Jvb2xlYW4gZmxhZyA9IHN0cmNhc2VjbXAodmFsdWUsICJu
-byIpICE9IDA7CiAKIAlpZiAoZmxhZykKIAkJbXNnLT5mbGFncyB8PSBNQVBfTVNHX0ZMQUdfUFJJ
-T1JJVFk7CkBAIC00MTMsNyArNDEzLDcgQEAgc3RhdGljIHZvaWQgcGFyc2VfcHJpb3JpdHkoc3Ry
-dWN0IG1hcF9tc2cgKm1zZywgY29uc3QgY2hhciAqdmFsdWUsCiBzdGF0aWMgdm9pZCBwYXJzZV9y
-ZWFkKHN0cnVjdCBtYXBfbXNnICptc2csIGNvbnN0IGNoYXIgKnZhbHVlLAogCQkJCQkJCURCdXNN
-ZXNzYWdlSXRlciAqaXRlcikKIHsKLQlnYm9vbGVhbiBmbGFnID0gc3RyY2FzZWNtcCh2YWx1ZSwg
-Im5vIik7CisJZ2Jvb2xlYW4gZmxhZyA9IHN0cmNhc2VjbXAodmFsdWUsICJubyIpICE9IDA7CiAK
-IAlpZiAoZmxhZykKIAkJbXNnLT5mbGFncyB8PSBNQVBfTVNHX0ZMQUdfUkVBRDsKQEAgLTQyNiw3
-ICs0MjYsNyBAQCBzdGF0aWMgdm9pZCBwYXJzZV9yZWFkKHN0cnVjdCBtYXBfbXNnICptc2csIGNv
-bnN0IGNoYXIgKnZhbHVlLAogc3RhdGljIHZvaWQgcGFyc2Vfc2VudChzdHJ1Y3QgbWFwX21zZyAq
-bXNnLCBjb25zdCBjaGFyICp2YWx1ZSwKIAkJCQkJCQlEQnVzTWVzc2FnZUl0ZXIgKml0ZXIpCiB7
-Ci0JZ2Jvb2xlYW4gZmxhZyA9IHN0cmNhc2VjbXAodmFsdWUsICJubyIpOworCWdib29sZWFuIGZs
-YWcgPSBzdHJjYXNlY21wKHZhbHVlLCAibm8iKSAhPSAwOwogCiAJaWYgKGZsYWcpCiAJCW1zZy0+
-ZmxhZ3MgfD0gTUFQX01TR19GTEFHX1NFTlQ7CkBAIC00MzksNyArNDM5LDcgQEAgc3RhdGljIHZv
-aWQgcGFyc2Vfc2VudChzdHJ1Y3QgbWFwX21zZyAqbXNnLCBjb25zdCBjaGFyICp2YWx1ZSwKIHN0
-YXRpYyB2b2lkIHBhcnNlX3Byb3RlY3RlZChzdHJ1Y3QgbWFwX21zZyAqbXNnLCBjb25zdCBjaGFy
-ICp2YWx1ZSwKIAkJCQkJCQlEQnVzTWVzc2FnZUl0ZXIgKml0ZXIpCiB7Ci0JZ2Jvb2xlYW4gZmxh
-ZyA9IHN0cmNhc2VjbXAodmFsdWUsICJubyIpOworCWdib29sZWFuIGZsYWcgPSBzdHJjYXNlY21w
-KHZhbHVlLCAibm8iKSAhPSAwOwogCiAJaWYgKGZsYWcpCiAJCW1zZy0+ZmxhZ3MgfD0gTUFQX01T
-R19GTEFHX1BST1RFQ1RFRDsKLS0gCjEuNy43Cgo=
---20cf3074d4f2864bb004c851de0b--
