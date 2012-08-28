@@ -1,49 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAJdJm_NL5ALYLKcHJ7uzWdtgkC_72++58GWm=CRXea_YEaYcqg@mail.gmail.com>
-References: <1344870497-6929-1-git-send-email-rafal.garbat@tieto.com>
-	<1344870497-6929-2-git-send-email-rafal.garbat@tieto.com>
-	<20120814095636.GA7055@x220>
-	<20120828152058.GA18913@x220.sheraton.com>
-	<503CE72D.2030501@tieto.com>
-	<20120828165650.GA3165@x220.sheraton.com>
-	<CAJdJm_PWn--HEsaex1zqL_CqEBvjKQXSABBnPeYP9CVKgeA6Wg@mail.gmail.com>
-	<20120828181041.GA7686@x220.sheraton.com>
-	<CAJdJm_NL5ALYLKcHJ7uzWdtgkC_72++58GWm=CRXea_YEaYcqg@mail.gmail.com>
-Date: Tue, 28 Aug 2012 15:21:01 -0400
-Message-ID: <CAJdJm_NTTyaKhmgnYJc40xpPLTRwAJ9EkLKCH67nmMJU8KvE+w@mail.gmail.com>
-Subject: Re: [PATCH v2 01/13] Heart Rate Profile API
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	Garbat Rafal <rafal.garbat@tieto.com>,
-	linux-bluetooth@vger.kernel.org,
-	Santiago Carot-Nemesio <sancane@gmail.com>
+In-Reply-To: <CAEd0BX-_PbMs1JV4g8_bYf43KScnHHKwsXaci=0cuqHcR-FGhg@mail.gmail.com>
+References: <CAEd0BX-_PbMs1JV4g8_bYf43KScnHHKwsXaci=0cuqHcR-FGhg@mail.gmail.com>
+Date: Tue, 28 Aug 2012 21:37:16 +0300
+Message-ID: <CABBYNZ+nSf9_tt+yRmwWJXouWNVnXvAXYJQYOp4MsyNc6JTuaQ@mail.gmail.com>
+Subject: Re: [Crash report & Patch obexd 1/1] map: gboolean holds int value
+ which 0/1 crashes in DBusMessage
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Venkateswaran, Srinivasa Ragavan"
+	<srinivasa.ragavan.venkateswaran@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-After some discussion with Johan on IRC, I think I understand what he
-is proposing, and it makes sense IMHO. The idea is to simply replace
-the object path for RegisterWatcher/UnregisterWatcher to [variable
-prefix]/{hci0,hci1,...} (adapter path) and have the watcher object
-methods accept a "object device" as first argument.
+On Tue, Aug 28, 2012 at 2:37 PM, Venkateswaran, Srinivasa Ragavan
+<srinivasa.ragavan.venkateswaran@intel.com> wrote:
+> Hi,
+>
+> I was testing MAP and I came across a crash (trace attached). I
+> figured out that the crash is because dbus expects gboolean to be 0/1
+> where as it holds the 'int' results from strcasecmp. I've attached the
+> patch that fixed the problem for me. This is my first message/patch to
+> this list, sorry if it isn't in the right/expected format, just
+> suggest me and I could put it right.
 
-This way, the application that wants to register wacthers will monitor
-only for new adapters (and not new devices) and register watchers on
-them. The D-Bus interface for RegisterWatcher() will still be profile
-specific (e.g. org.bluez.HeartRate in this case).
+Interesting that I did not run into this bug before, can you do a some
+changes to the commit message:
 
-One issue with this idea (and which still needs to be sorted out if we
-proceed with this), is that other methods specific to the profile
-(like Reset() for Heart Rate and EnableIntermediateMeasurement() for
-Thermometer) need to be in different interfaces.
+1. Add a prefix to the first line of the commit e.g: client: Fix crash
+on map module
+2. Add a description what you are fixing e.g. you can use the
+backtrace and state this is caused by line _dbus_return_val_if_fail
+(*bool_p == 0 || *bool_p == 1, FALSE);
+3. How about using your intel email?
 
-Johan, do you have any ideas for this?
+After you are done with that you can send us the patch with git
+format-email + git send-email
 
-Regards,
+
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Luiz Augusto von Dentz
