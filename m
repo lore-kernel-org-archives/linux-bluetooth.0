@@ -1,55 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1346164127-22102-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1346164127-22102-1-git-send-email-anderson.lizardo@openbossa.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Tue, 28 Aug 2012 21:15:47 -0300
-Message-ID: <CAMOw1v4t_KVBW6dJXracXmKEyCcs3Jg3M82mEwJDvorTt2hV8Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] input: Fix build error due to O_CLOEXEC
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CAJdJm_NL5ALYLKcHJ7uzWdtgkC_72++58GWm=CRXea_YEaYcqg@mail.gmail.com>
+References: <1344870497-6929-1-git-send-email-rafal.garbat@tieto.com>
+	<1344870497-6929-2-git-send-email-rafal.garbat@tieto.com>
+	<20120814095636.GA7055@x220>
+	<20120828152058.GA18913@x220.sheraton.com>
+	<503CE72D.2030501@tieto.com>
+	<20120828165650.GA3165@x220.sheraton.com>
+	<CAJdJm_PWn--HEsaex1zqL_CqEBvjKQXSABBnPeYP9CVKgeA6Wg@mail.gmail.com>
+	<20120828181041.GA7686@x220.sheraton.com>
+	<CAJdJm_NL5ALYLKcHJ7uzWdtgkC_72++58GWm=CRXea_YEaYcqg@mail.gmail.com>
+Date: Tue, 28 Aug 2012 15:21:01 -0400
+Message-ID: <CAJdJm_NTTyaKhmgnYJc40xpPLTRwAJ9EkLKCH67nmMJU8KvE+w@mail.gmail.com>
+Subject: Re: [PATCH v2 01/13] Heart Rate Profile API
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	Garbat Rafal <rafal.garbat@tieto.com>,
+	linux-bluetooth@vger.kernel.org,
+	Santiago Carot-Nemesio <sancane@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Aug 28, 2012 at 11:28 AM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> On some (not so old) systems like Ubuntu 10.04 LTS, O_CLOEXEC is only
-> defined if _GNU_SOURCE is defined.
->
-> This fixes this build error:
->
-> profiles/input/hog_device.c: In function 'hog_device_register':
-> profiles/input/hog_device.c:712: error: 'O_CLOEXEC' undeclared (first
-> use in this function)
-> profiles/input/hog_device.c:712: error: (Each undeclared identifier is
-> reported only once
-> profiles/input/hog_device.c:712: error: for each function it appears
-> in.)
-> ---
->  profiles/input/hog_device.c |    1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/profiles/input/hog_device.c b/profiles/input/hog_device.c
-> index 000f173..b502274 100644
-> --- a/profiles/input/hog_device.c
-> +++ b/profiles/input/hog_device.c
-> @@ -27,6 +27,7 @@
->  #include <config.h>
->  #endif
->
-> +#define _GNU_SOURCE
+Hi,
 
-this should be already in our config.h. It seems like we are missing
-the following in our configure.ac:
+After some discussion with Johan on IRC, I think I understand what he
+is proposing, and it makes sense IMHO. The idea is to simply replace
+the object path for RegisterWatcher/UnregisterWatcher to [variable
+prefix]/{hci0,hci1,...} (adapter path) and have the watcher object
+methods accept a "object device" as first argument.
 
-AC_USE_SYSTEM_EXTENSIONS.
+This way, the application that wants to register wacthers will monitor
+only for new adapters (and not new devices) and register watchers on
+them. The D-Bus interface for RegisterWatcher() will still be profile
+specific (e.g. org.bluez.HeartRate in this case).
 
-Btw, we should remove the other definitions of _GNU_SOURCE
+One issue with this idea (and which still needs to be sorted out if we
+proceed with this), is that other methods specific to the profile
+(like Reset() for Heart Rate and EnableIntermediateMeasurement() for
+Thermometer) need to be in different interfaces.
 
->  #include <stdlib.h>
->  #include <errno.h>
->  #include <unistd.h>
+Johan, do you have any ideas for this?
 
-
-Lucas De Marchi
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
