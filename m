@@ -1,27 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 28 Aug 2012 10:30:04 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Fix redundant NULL checks in
- convert_raw_attr_to_xml_func
-Message-ID: <20120828173004.GA4928@x220.sheraton.com>
-References: <1346160796-23277-1-git-send-email-szymon.janc@tieto.com>
+Date: Tue, 28 Aug 2012 10:24:00 -0700
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Wei Yongjun <weiyj.lk@gmail.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+	yongjun_wei@trendmicro.com.cn, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: btmrvl: remove pointless conditional before
+ kfree_skb()
+Message-ID: <20120828172400.GB23552@joana>
+References: <CAPgLHd-R2t_9aDOQ8Q-Q0nz6k4KZEBPVEO4SMea7T=ANbTOLnQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1346160796-23277-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <CAPgLHd-R2t_9aDOQ8Q-Q0nz6k4KZEBPVEO4SMea7T=ANbTOLnQ@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Wei,
 
-On Tue, Aug 28, 2012, Szymon Janc wrote:
-> Param data can't be NULL and was already dereferenced before check.
+* Wei Yongjun <weiyj.lk@gmail.com> [2012-08-28 21:12:48 +0800]:
+
+> From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
 > 
+> Remove pointless conditional before kfree_skb().
+> 
+> Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
 > ---
->  src/sdp-xml.c |    5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
+>  drivers/bluetooth/btmrvl_sdio.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
-Both patches have been applied. Thanks.
+Patch has been applied to bluetooth-next. Thanks.
 
-Johan
+	Gustavo
