@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 4/7 v2] client: Remove deprecated methods from PhonebookAccess
-Date: Tue, 28 Aug 2012 15:31:52 +0300
-Message-Id: <1346157115-23933-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 7/7 v2] client-doc: Update documentation of PhonebookAccess interface
+Date: Tue, 28 Aug 2012 15:31:55 +0300
+Message-Id: <1346157115-23933-7-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1346157115-23933-1-git-send-email-luiz.dentz@gmail.com>
 References: <1346157115-23933-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,248 +11,130 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-SetFormat, SetOrder, SetFilter and GetFilter methods are no longer
-necessary as other methods now take them as parameters to avoid round
-trips.
 ---
- client/pbap.c | 197 +++++-----------------------------------------------------
- 1 file changed, 14 insertions(+), 183 deletions(-)
+ doc/client-api.txt | 62 +++++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 36 insertions(+), 26 deletions(-)
 
-diff --git a/client/pbap.c b/client/pbap.c
-index 97c9ef5..e58efe5 100644
---- a/client/pbap.c
-+++ b/client/pbap.c
-@@ -116,9 +116,6 @@ static const char *filter_list[] = {
- struct pbap_data {
- 	struct obc_session *session;
- 	char *path;
--	guint8 format;
--	guint8 order;
--	uint64_t filter;
- };
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index 7ca65cc..f447789 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -206,7 +206,7 @@ Methods		void Select(string location, string phonebook)
+ 				"mch":	missing call history
+ 				"cch":	combination of ich och mch
  
- struct pending_request {
-@@ -607,91 +604,6 @@ fail:
- 	return reply;
- }
+-		object, dict PullAll(string targetfile)
++		object, dict PullAll(string targetfile, dict filters)
  
--static int set_format(struct pbap_data *pbap, const char *formatstr)
--{
--	if (!formatstr || g_str_equal(formatstr, "")) {
--		pbap->format = FORMAT_VCARD21;
--		return 0;
--	}
--
--	if (!g_ascii_strcasecmp(formatstr, "vcard21"))
--		pbap->format = FORMAT_VCARD21;
--	else if (!g_ascii_strcasecmp(formatstr, "vcard30"))
--		pbap->format = FORMAT_VCARD30;
--	else
--		return -EINVAL;
--
--	return 0;
--}
--
--static int set_order(struct pbap_data *pbap, const char *orderstr)
--{
--	if (!orderstr || g_str_equal(orderstr, "")) {
--		pbap->order = ORDER_INDEXED;
--		return 0;
--	}
--
--	if (!g_ascii_strcasecmp(orderstr, "indexed"))
--		pbap->order = ORDER_INDEXED;
--	else if (!g_ascii_strcasecmp(orderstr, "alphanumeric"))
--		pbap->order = ORDER_ALPHANUMERIC;
--	else if (!g_ascii_strcasecmp(orderstr, "phonetic"))
--		pbap->order = ORDER_PHONETIC;
--	else
--		return -EINVAL;
--
--	return 0;
--}
--
--static int add_filter(struct pbap_data *pbap, const char *filterstr)
--{
--	uint64_t mask;
--
--	mask = get_filter_mask(filterstr);
--
--	if (mask == 0)
--		return -EINVAL;
--
--	pbap->filter |= mask;
--	return 0;
--}
--
--static int remove_filter(struct pbap_data *pbap, const char *filterstr)
--{
--	uint64_t mask;
--
--	mask = get_filter_mask(filterstr);
--
--	if (mask == 0)
--		return -EINVAL;
--
--	pbap->filter &= ~mask;
--	return 0;
--}
--
--static gchar **get_filter_strs(uint64_t filter, gint *size)
--{
--	gchar **list, **item;
--	gint i;
--	gint filter_list_size = sizeof(filter_list) / sizeof(filter_list[0]) - 1;
--
--	list = g_malloc0(sizeof(gchar **) * (FILTER_BIT_MAX + 2));
--
--	item = list;
--
--	for (i = 0; i < filter_list_size; i++)
--		if (filter & (1ULL << i))
--			*(item++) = g_strdup(filter_list[i]);
--
--	for (i = filter_list_size; i <= FILTER_BIT_MAX; i++)
--		if (filter & (1ULL << i))
--			*(item++) = g_strdup_printf("%s%d", "BIT", i);
--
--	*item = NULL;
--	*size = item - list;
--	return list;
--}
--
- static DBusMessage *pbap_select(DBusConnection *connection,
- 					DBusMessage *message, void *user_data)
- {
-@@ -1001,95 +913,26 @@ static DBusMessage *pbap_get_size(DBusConnection *connection,
- 	return reply;
- }
+ 			Return the entire phonebook object from the PSE server
+ 			in plain string with vcard format, and store it in
+@@ -222,14 +222,21 @@ Methods		void Select(string location, string phonebook)
+ 			The properties of this transfer are also returned along
+ 			with the object path, to avoid a call to GetProperties.
  
--static DBusMessage *pbap_set_format(DBusConnection *connection,
--					DBusMessage *message, void *user_data)
--{
--	struct pbap_data *pbap = user_data;
--	const char *format;
--
--	if (dbus_message_get_args(message, NULL,
--			DBUS_TYPE_STRING, &format,
--			DBUS_TYPE_INVALID) == FALSE)
--		return g_dbus_create_error(message,
--				ERROR_INTERFACE ".InvalidArguments", NULL);
--
--	if (set_format(pbap, format) < 0)
--		return g_dbus_create_error(message,
--					ERROR_INTERFACE ".InvalidArguments",
--					"InvalidFormat");
--
--	return dbus_message_new_method_return(message);
--}
--
--static DBusMessage *pbap_set_order(DBusConnection *connection,
--					DBusMessage *message, void *user_data)
--{
--	struct pbap_data *pbap = user_data;
--	const char *order;
--
--	if (dbus_message_get_args(message, NULL,
--			DBUS_TYPE_STRING, &order,
--			DBUS_TYPE_INVALID) == FALSE)
--		return g_dbus_create_error(message,
--				ERROR_INTERFACE ".InvalidArguments", NULL);
--
--	if (set_order(pbap, order) < 0)
--		return g_dbus_create_error(message,
--					ERROR_INTERFACE ".InvalidArguments",
--					"InvalidFilter");
--
--	return dbus_message_new_method_return(message);
--}
--
--static DBusMessage *pbap_set_filter(DBusConnection *connection,
--					DBusMessage *message, void *user_data)
-+static gchar **get_filter_strs(uint64_t filter, gint *size)
- {
--	struct pbap_data *pbap = user_data;
--	char **filters, **item;
--	gint size;
--	uint64_t oldfilter = pbap->filter;
--
--	if (dbus_message_get_args(message, NULL, DBUS_TYPE_ARRAY,
--			DBUS_TYPE_STRING, &filters, &size,
--			DBUS_TYPE_INVALID) == FALSE)
--		return g_dbus_create_error(message,
--				ERROR_INTERFACE ".InvalidArguments", NULL);
--
--	remove_filter(pbap, "ALL");
--	if (size == 0)
--		goto done;
-+	gchar **list, **item;
-+	gint i;
+-		array{string vcard, string name} List()
++			Possible filters: Format, Order, Offset, MaxCount and
++			Fields
++
++		array{string vcard, string name} List(dict filters)
  
--	for (item = filters; *item; item++) {
--		if (add_filter(pbap, *item) < 0) {
--			pbap->filter = oldfilter;
--			g_strfreev(filters);
--			return g_dbus_create_error(message,
--					ERROR_INTERFACE ".InvalidArguments",
--					"InvalidFilters");
--		}
--	}
-+	list = g_malloc0(sizeof(gchar **) * (FILTER_BIT_MAX + 2));
+ 			Return an array of vcard-listing data where every entry
+ 			consists of a pair of strings containing the vcard
+ 			handle and the contact name. For example:
+ 				"1.vcf" : "John"
  
--done:
--	g_strfreev(filters);
--	return dbus_message_new_method_return(message);
--}
-+	item = list;
+-		object, dict Pull(string vcard, string targetfile)
++			Possible filters: Order, Offset and MaxCount
++
++
++		object, dict
++		Pull(string vcard, string targetfile, dict filters)
  
--static DBusMessage *pbap_get_filter(DBusConnection *connection,
--					DBusMessage *message, void *user_data)
--{
--	struct pbap_data *pbap = user_data;
--	gchar **filters = NULL;
--	gint size;
--	DBusMessage *reply;
-+	for (i = 0; filter_list[i] != NULL; i++)
-+		if (filter & (1ULL << i))
-+			*(item++) = g_strdup(filter_list[i]);
+ 			Given a vcard handle, retrieve the vcard in the current
+ 			phonebook object and store it in a local file.
+@@ -244,8 +251,11 @@ Methods		void Select(string location, string phonebook)
+ 			The properties of this transfer are also returned along
+ 			with the object path, to avoid a call to GetProperties.
  
--	filters = get_filter_strs(pbap->filter, &size);
--	reply = dbus_message_new_method_return(message);
--	dbus_message_append_args(reply, DBUS_TYPE_ARRAY,
--				DBUS_TYPE_STRING, &filters, size,
--				DBUS_TYPE_INVALID);
-+	for (; i <= FILTER_BIT_MAX; i++)
-+		if (filter & (1ULL << i))
-+			*(item++) = g_strdup_printf("%s%d", "BIT", i);
++			Possbile filters: Format and Fields
++
++
+ 		array{string vcard, string name}
+-		Search(string field, string value)
++		Search(string field, string value, dict filters)
  
--	g_strfreev(filters);
--	return reply;
-+	*item = NULL;
-+	*size = item - list;
-+	return list;
- }
+ 			Search for entries matching the given condition and
+ 			return an array of vcard-listing data where every entry
+@@ -258,47 +268,47 @@ Methods		void Select(string location, string phonebook)
+ 				{ "name" (default) | "number" | "sound" }
+ 			value : the string value to search for
  
- static DBusMessage *pbap_list_filter_fields(DBusConnection *connection,
-@@ -1137,18 +980,6 @@ static const GDBusMethodTable pbap_methods[] = {
- 	{ GDBUS_ASYNC_METHOD("GetSize",
- 				NULL, GDBUS_ARGS({ "size", "q" }),
- 				pbap_get_size) },
--	{ GDBUS_METHOD("SetFormat",
--				GDBUS_ARGS({ "format", "s" }), NULL,
--				pbap_set_format) },
--	{ GDBUS_METHOD("SetOrder",
--				GDBUS_ARGS({ "order", "s" }), NULL,
--				pbap_set_order) },
--	{ GDBUS_METHOD("SetFilter",
--				GDBUS_ARGS({ "fields", "as" }), NULL,
--				pbap_set_filter) },
--	{ GDBUS_METHOD("GetFilter",
--				NULL, GDBUS_ARGS({ "fields", "as" }),
--				pbap_get_filter) },
- 	{ GDBUS_METHOD("ListFilterFields",
- 				NULL, GDBUS_ARGS({ "fields", "as" }),
- 				pbap_list_filter_fields) },
++
++			Possible filters: Order, Offset and MaxCount
++
+ 		uint16 GetSize()
+ 
+ 			Return the number of entries in the selected phonebook
+ 			object that are actually used (i.e. indexes that
+ 			correspond to non-NULL entries).
+ 
+-		void SetFormat(string format)
++		array{string} ListFilterFields()
+ 
+-			Indicate the format of the vcard that should be return
+-			by related methods.
++			Return All Available fields that can be used in Fields
++			filter.
+ 
+-			format : { "vcard21" (default) | "vcard30" }
++Filter:		string Format:
+ 
+-		void SetOrder(string order)
++			Items vcard format
+ 
+-			Indicate the sorting method of the vcard-listing data
+-			returned by List and Search methods.
++			Possible values: "vcard21" (default) or "vcard30"
+ 
+-			order : { "indexed" (default) | "alphanumeric" |
+-					"phonetic" }
++		string Order:
+ 
+-		void SetFilter(array{string})
++			Items order
+ 
+-			Indicate fields that should be contained in vcards
+-			return by related methods.
++			Possible values: "indexed" (default), "alphanumeric" or
++			"phonetic"
+ 
+-			Give an empty array will clear the filter and return
+-			all fields available in vcards. And this is the default
+-			behavior.
++		uint16 Offset:
+ 
+-			Possible filter fields : "VERSION", "FN", ..., "ALL",
+-			"bit[0-63]"
++			Offset of the first item, default is 0
+ 
+-		array{string} ListFilterFields()
++		uint16 MaxCount:
++
++			Maximum number of items, default is unlimited (65535)
++
++		array{string} Fields:
+ 
+-			Return All Available fields that can be used in
+-			SetFilter method.
++			Item vcard fields, default is all values.
+ 
+-		array{string} GetFilter()
++			Possible values can be query with ListFilterFields.
+ 
+-			Return the current filter setting
+ 
+ Synchronization hierarchy
+ =======================
 -- 
 1.7.11.4
 
