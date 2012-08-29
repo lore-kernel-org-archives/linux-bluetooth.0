@@ -1,47 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120814091317.GA1083@x220>
-References: <1344632507-21381-1-git-send-email-jefferson.delfes@openbossa.org>
- <1344632507-21381-5-git-send-email-jefferson.delfes@openbossa.org> <20120814091317.GA1083@x220>
-From: Aloisio Almeida <aloisio.almeida@openbossa.org>
-Date: Wed, 29 Aug 2012 14:42:23 -0300
-Message-ID: <CAEsZsEhh9ipERRC__zZZ9gD1HtnTNYSHaxfZyycifgsrmr7-vw@mail.gmail.com>
-Subject: Re: [RFC 4/5] Bluetooth: Add set broadcaster MGMT command
-To: Jefferson Delfes <jefferson.delfes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Julia Lawall <Julia.Lawall@lip6.fr>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: kernel-janitors@vger.kernel.org,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 4/7] net/bluetooth/rfcomm/core.c: fix error return code
+Date: Wed, 29 Aug 2012 18:49:14 +0200
+Message-Id: <1346258957-7649-5-git-send-email-Julia.Lawall@lip6.fr>
+In-Reply-To: <1346258957-7649-1-git-send-email-Julia.Lawall@lip6.fr>
+References: <1346258957-7649-1-git-send-email-Julia.Lawall@lip6.fr>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Julia Lawall <Julia.Lawall@lip6.fr>
 
-It was decided to have broadcaster/observer in BR/EDR also. I think it
-was decided in the Bluez meeting, right?
+Initialize return variable before exiting on an error path.
 
-For now we're thinking in use this on BR/EDR only controllers. Dual
-mode controllers would use LE for broadcasting.
+A simplified version of the semantic match that finds this problem is as
+follows: (http://coccinelle.lip6.fr/)
 
-I'm working on adding this feature right now. Further I'll send the v2.
+// <smpl>
+(
+if@p1 (\(ret < 0\|ret != 0\))
+ { ... return ret; }
+|
+ret@p1 = 0
+)
+... when != ret = e1
+    when != &ret
+*if(...)
+{
+  ... when != ret = e2
+      when forall
+ return ret;
+}
 
-Aloisio
+// </smpl>
 
-On Tue, Aug 14, 2012 at 6:13 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Jefferson,
->
-> On Fri, Aug 10, 2012, Jefferson Delfes wrote:
->> --- a/net/bluetooth/mgmt.c
->> +++ b/net/bluetooth/mgmt.c
->> @@ -379,6 +379,7 @@ static u32 get_supported_settings(struct hci_dev *hdev)
->>       settings |= MGMT_SETTING_FAST_CONNECTABLE;
->>       settings |= MGMT_SETTING_DISCOVERABLE;
->>       settings |= MGMT_SETTING_PAIRABLE;
->> +     settings |= MGMT_SETTING_BROADCASTER;
->
-> Shouldn't this be behind the same conditional as MGMT_SETTING_LE? I.e.
-> only when hdev->features indicates LE support.
->
-> Johan
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
+
+---
+ net/bluetooth/rfcomm/core.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index c75107e..30141c0 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -2010,8 +2010,10 @@ static int rfcomm_add_listener(bdaddr_t *ba)
+ 
+ 	/* Add listening session */
+ 	s = rfcomm_session_add(sock, BT_LISTEN);
+-	if (!s)
++	if (!s) {
++		err = -ENOMEM;
+ 		goto failed;
++	}
+ 
+ 	rfcomm_session_hold(s);
+ 	return 0;
