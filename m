@@ -1,149 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: "chen.ganir@ti.com" <chen.ganir@ti.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] gatt: Translate Characteristic names
-Date: Wed, 29 Aug 2012 12:09:56 +0200
-Message-ID: <2328157.cIbN4hMyx7@uw000953>
-In-Reply-To: <1346231191-16708-1-git-send-email-chen.ganir@ti.com>
-References: <1346231191-16708-1-git-send-email-chen.ganir@ti.com>
+Message-ID: <503DE40F.1050008@tieto.com>
+Date: Wed, 29 Aug 2012 11:42:39 +0200
+From: Garbat Rafal <rafal.garbat@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Santiago Carot-Nemesio <sancane@gmail.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH v2 01/13] Heart Rate Profile API
+References: <1344870497-6929-1-git-send-email-rafal.garbat@tieto.com> <1344870497-6929-2-git-send-email-rafal.garbat@tieto.com> <20120814095636.GA7055@x220>	<20120828152058.GA18913@x220.sheraton.com> <503CE72D.2030501@tieto.com>	<20120828165650.GA3165@x220.sheraton.com> <CAJdJm_PWn--HEsaex1zqL_CqEBvjKQXSABBnPeYP9CVKgeA6Wg@mail.gmail.com> <20120828181041.GA7686@x220.sheraton.com> <CAJdJm_NL5ALYLKcHJ7uzWdtgkC_72++58GWm=CRXea_YEaYcqg@mail.gmail.com> <CAJdJm_NTTyaKhmgnYJc40xpPLTRwAJ9EkLKCH67nmMJU8KvE+w@mail.gmail.com>
+In-Reply-To: <CAJdJm_NTTyaKhmgnYJc40xpPLTRwAJ9EkLKCH67nmMJU8KvE+w@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday 29 of August 2012 12:06:31 chen.ganir@ti.com wrote:
-> From: Chen Ganir <chen.ganir@ti.com>
+Hi,
 
-Hi Chen,
- 
-  
-> +struct CharacteristicNames {
-> +    char uuid[MAX_LEN_UUID_STR + 1];
-> +    char name[50];
-> +};
+On 08/28/2012 09:21 PM, Anderson Lizardo wrote:
+> Hi,
+>
+> After some discussion with Johan on IRC, I think I understand what he
+> is proposing, and it makes sense IMHO. The idea is to simply replace
+> the object path for RegisterWatcher/UnregisterWatcher to [variable
+> prefix]/{hci0,hci1,...} (adapter path) and have the watcher object
+> methods accept a "object device" as first argument.
+>
+> This way, the application that wants to register wacthers will monitor
+> only for new adapters (and not new devices) and register watchers on
+> them. The D-Bus interface for RegisterWatcher() will still be profile
+> specific (e.g. org.bluez.HeartRate in this case).
+>
+> One issue with this idea (and which still needs to be sorted out if we
+> proceed with this), is that other methods specific to the profile
+> (like Reset() for Heart Rate and EnableIntermediateMeasurement() for
+> Thermometer) need to be in different interfaces.
+>
+> Johan, do you have any ideas for this?
+>
+> Regards,
+I guess, that with such approach, the HeartRate API could look something 
+like this :
 
-I would make it
-struct CharacteristicNames {
-    const char *uuid;
-    const char *name;
-};
+BlueZ D-Bus Heart Rate API description
+****************************************
 
-> +
-> +static struct CharacteristicNames charNames[] = {
+Copyright (C) 2012    Santiago Carot-Nemesio <sancane@gmail.com>
 
-constify charNames[]
+Heart Rate Manager hierarchy
+============================
 
-> +		{"00002a43-0000-1000-8000-00805f9b34fb","Alert Category ID" },
-> +		{"00002a42-0000-1000-8000-00805f9b34fb","Alert Category ID Bit Mask" },
-> +		{"00002a06-0000-1000-8000-00805f9b34fb","Alert Level" },
-> +		{"00002a44-0000-1000-8000-00805f9b34fb","Alert Notification Control Point" },
-> +		{"00002a3f-0000-1000-8000-00805f9b34fb","Alert Status" },
-> +		{"00002a01-0000-1000-8000-00805f9b34fb","Appearance" },
-> +		{"00002a49-0000-1000-8000-00805f9b34fb","Blood Pressure Feature" },
-> +		{"00002a35-0000-1000-8000-00805f9b34fb","Blood Pressure Measurement" },
-> +		{"00002a38-0000-1000-8000-00805f9b34fb","Body Sensor Location" },
-> +		{"00002a2b-0000-1000-8000-00805f9b34fb","Current Time" },
-> +		{"00002a08-0000-1000-8000-00805f9b34fb","Date Time" },
-> +		{"00002a0a-0000-1000-8000-00805f9b34fb","Day Date Time" },
-> +		{"00002a09-0000-1000-8000-00805f9b34fb","Day of Week" },
-> +		{"00002a00-0000-1000-8000-00805f9b34fb","Device Name" },
-> +		{"00002a0d-0000-1000-8000-00805f9b34fb","DST Offset" },
-> +		{"00002a0c-0000-1000-8000-00805f9b34fb","Exact Time 256" },
-> +		{"00002a26-0000-1000-8000-00805f9b34fb","Firmware Revision String" },
-> +		{"00002a27-0000-1000-8000-00805f9b34fb","Hardware Revision String" },
-> +		{"00002a39-0000-1000-8000-00805f9b34fb","Heart Rate Control Point" },
-> +		{"00002a37-0000-1000-8000-00805f9b34fb","Heart Rate Measurement" },
-> +		{"00002a2a-0000-1000-8000-00805f9b34fb","IEEE 11073-20601 Regulatory" },
-> +		{"00002a36-0000-1000-8000-00805f9b34fb","Intermediate Cuff Pressure" },
-> +		{"00002a1e-0000-1000-8000-00805f9b34fb","Intermediate Temperature" },
-> +		{"00002a0f-0000-1000-8000-00805f9b34fb","Local Time Information" },
-> +		{"00002a29-0000-1000-8000-00805f9b34fb","Manufacturer Name String" },
-> +		{"00002a21-0000-1000-8000-00805f9b34fb","Measurement Interval" },
-> +		{"00002a24-0000-1000-8000-00805f9b34fb","Model Number String" },
-> +		{"00002a46-0000-1000-8000-00805f9b34fb","New Alert" },
-> +		{"00002a04-0000-1000-8000-00805f9b34fb","Peripheral Preferred Connection Parameters" },
-> +		{"00002a02-0000-1000-8000-00805f9b34fb","Peripheral Privacy Flag" },
-> +		{"00002a03-0000-1000-8000-00805f9b34fb","Reconnection Address" },
-> +		{"00002a14-0000-1000-8000-00805f9b34fb","Reference Time Information" },
-> +		{"00002a40-0000-1000-8000-00805f9b34fb","Ringer Control Point" },
-> +		{"00002a41-0000-1000-8000-00805f9b34fb","Ringer Setting" },
-> +		{"00002a25-0000-1000-8000-00805f9b34fb","Serial Number String" },
-> +		{"00002a05-0000-1000-8000-00805f9b34fb","Service Changed" },
-> +		{"00002a28-0000-1000-8000-00805f9b34fb","Software Revision String" },
-> +		{"00002a47-0000-1000-8000-00805f9b34fb","Supported New Alert Category" },
-> +		{"00002a48-0000-1000-8000-00805f9b34fb","Supported Unread Alert Category" },
-> +		{"00002a23-0000-1000-8000-00805f9b34fb","System ID" },
-> +		{"00002a1c-0000-1000-8000-00805f9b34fb","Temperature Measurement" },
-> +		{"00002a1d-0000-1000-8000-00805f9b34fb","Temperature Type" },
-> +		{"00002a12-0000-1000-8000-00805f9b34fb","Time Accuracy" },
-> +		{"00002a13-0000-1000-8000-00805f9b34fb","Time Source" },
-> +		{"00002a16-0000-1000-8000-00805f9b34fb","Time Update Control Point" },
-> +		{"00002a17-0000-1000-8000-00805f9b34fb","Time Update State" },
-> +		{"00002a11-0000-1000-8000-00805f9b34fb","Time with DST" },
-> +		{"00002a0e-0000-1000-8000-00805f9b34fb","Time Zone" },
-> +		{"00002a07-0000-1000-8000-00805f9b34fb","Tx Power Level" },
-> +		{"00002a45-0000-1000-8000-00805f9b34fb","Unread Alert Status" },
-> +};
-> +
+Service        org.bluez
+Interface    org.bluez.HeartRateManager
+Object path    [variable prefix]/{hci0,hci1,...}
 
-I would add { } at the end...
+Methods        RegisterWatcher(object agent)
 
->  static GSList *gatt_services = NULL;
->  
-> +static const char* get_char_name(const char* uuid)
+                           Registers a watcher to monitor heart rate 
+measurements.
 
-this should be static const char *get_char_name(const char *uuid)
+                           Possible Errors: org.bluez.Error.InvalidArguments
 
-> +{
-> +	uint8_t i = 0;
-> +	uint8_t count = sizeof(charNames) / sizeof(struct CharacteristicNames);
-> +
-> +	for (i = 0; i < count; i++) {
-> +		if(g_strcmp0(charNames[i].uuid, uuid) == 0) {
-> +			return charNames[i].name;
-> +		}
-> +	}
+                       UnregisterWatcher(object agent)
 
-... and change this loop into to:
+                           Unregisters a watcher.
 
-const struct CharacteristicNames *c;
+Heart Rate Profile hierarchy
+============================
 
-for (c = charNames; c->uuid; c++) {
-...
-}
+Service        org.bluez
+Interface    org.bluez.HeartRate
+Object path    [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
 
-This will keep convention used.
+Methods        dict GetProperties()
 
-> +	return NULL;
-> +}
-> +
->  static void characteristic_free(void *user_data)
->  {
->  	struct characteristic *chr = user_data;
-> @@ -202,8 +273,10 @@ static void append_char_dict(DBusMessageIter *iter, struct characteristic *chr)
->  	dict_append_entry(&dict, "UUID", DBUS_TYPE_STRING, &uuid);
->  	g_free(uuid);
->  
-> -	/* FIXME: Translate UUID to name. */
-> -	dict_append_entry(&dict, "Name", DBUS_TYPE_STRING, &name);
-> +	name = get_char_name(chr->type);
-> +
-> +	if (name != NULL)
-> +		dict_append_entry(&dict, "Name", DBUS_TYPE_STRING, &name);
+                         Returns all properties for the interface. See the
+                         Properties section for the available properties.
 
-With that there is no need to initialize name to "" so this could be also
-part of a patch.
+                       Reset()
 
-If get_char_name() returned empty string instead of NULL if matching uuid is
-not found we could append empty string as Name (as it is now), but not sure
-what is better - append empty name or not append.
+                         Restart the accumulation of energy expended 
+from zero.
 
->  
->  	if (chr->desc)
->  		dict_append_entry(&dict, "Description", DBUS_TYPE_STRING,
-> 
+                         Possible Errors: org.bluez.Error.NotSupported
 
--- 
-BR
-Szymon Janc
+Properties    boolean ResetSupported [readonly]
+
+                         True if energy expended is supported.
+
+Heart Rate Watcher hierarchy
+
+============================
+Service        unique name
+Interface    org.bluez.HeartRateWatcher
+Object path    freely definable
+
+Methods        void MeasurementReceived(object device, dict measure)
+
+             This callback is called whenever a heart rate
+             measurement is received from the heart rate device.
+             The unit for the Value is expressed in beats per
+             minute (bpm). The energy field is optional and
+             represents the accumulated energy expended in
+             kilo Joules since last time it was reset. Furthermore,
+             the device will be automatically reset when it
+             is needed.
+             The Contact field, if present, indicates
+             that the device supports contact sensor, besides it
+             will be true if skin contact is detected. The optional
+             interval field is an array containing RR-Interval
+             values which represent the time between two R-Wave
+             detections, where the RR-Interval value 0 is older
+             than the value 1 and so on.
+
+             Dict is defined as below:
+             {
+                 "Value" : uint16,
+                 "Energy" : uint16,
+                 "Contact" : boolean,
+                 "Location" : ("Other", "Chest", "Wrist","Finger",
+                     "Hand", "Earlobe", "Foot"),
+                 "Interval" : array{uint16}
+             }
+
+
+Just a proposal, please comment.
+
+Rafal
