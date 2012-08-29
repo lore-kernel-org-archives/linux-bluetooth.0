@@ -1,37 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Sender: sonnyrao@google.com
-In-Reply-To: <CAPz6YkXjRAPs1UMGXPqGMDFYjcs_8ggxinF7sYNyjhYfgCBAAQ@mail.gmail.com>
-References: <CAPz6YkVEwWzosE5Tda+SvtmV1=0Q9g5uyW+RZsOVgOxT79c15Q@mail.gmail.com>
- <2583063.yEXEROAGYt@linux-lqwf.site> <CAPz6YkXjRAPs1UMGXPqGMDFYjcs_8ggxinF7sYNyjhYfgCBAAQ@mail.gmail.com>
-From: Sonny Rao <sonnyrao@chromium.org>
-Date: Tue, 28 Aug 2012 21:13:43 -0700
-Message-ID: <CAPz6YkVxwv_7XA7P7kqPdfXC2Yr5DsK8nMW_q-c=68QH8B0R6g@mail.gmail.com>
-Subject: Re: kernel crashes coming from btusb
-To: Oliver Neukum <oliver@neukum.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	vpalatin@chromium.org, keybuk@chromium.org
+In-Reply-To: <CAMOw1v4t_KVBW6dJXracXmKEyCcs3Jg3M82mEwJDvorTt2hV8Q@mail.gmail.com>
+References: <1346164127-22102-1-git-send-email-anderson.lizardo@openbossa.org>
+	<CAMOw1v4t_KVBW6dJXracXmKEyCcs3Jg3M82mEwJDvorTt2hV8Q@mail.gmail.com>
+Date: Tue, 28 Aug 2012 20:55:32 -0400
+Message-ID: <CAJdJm_Ng=92JbYvZHkMnvBJssRERqCsE3_bDwx+ZoymE7_B7ZQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] input: Fix build error due to O_CLOEXEC
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Aug 27, 2012 at 8:02 AM, Sonny Rao <sonnyrao@chromium.org> wrote:
-> On Mon, Aug 27, 2012 at 6:06 AM, Oliver Neukum <oliver@neukum.org> wrote:
->> On Monday 27 August 2012 03:30:55 Sonny Rao wrote:
->>> Hi, I've been investigating an issue where we were seeing random
->>> kernel crashes soon after resume and after using the great debugging
->>> facilities in SLUB I started getting output which pointed to "use
->>> after free" from the btusb driver.
->>
->> Which kernel version?
->>
->>         Regards
->>                 Oliver
->>
->
-> Oops sorry, kernel 3.4
+Hi Lucas,
 
-After some more investigation I am seeing the DMA unmap and it looks
-like everything is okay as far as the driver tearing down the intr URB
-correctly, sorry for the noise stating otherwise. This could be a
-hardware issue if the host controller is still dmaing over that
-transfer buffer.  I'll look into that some more, thanks.
+On Tue, Aug 28, 2012 at 8:15 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+>> +#define _GNU_SOURCE
+>
+> this should be already in our config.h. It seems like we are missing
+> the following in our configure.ac:
+>
+> AC_USE_SYSTEM_EXTENSIONS.
+>
+> Btw, we should remove the other definitions of _GNU_SOURCE
+
+Nice, I wasn't aware of this feature. Does it require any newer
+autoconf version?
+
+I can try this tomorrow and send a new patch set removing the
+_GNU_SOURCE defines.
+
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
