@@ -1,56 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v1 0/6] HoG Suspend/Resume
-Date: Wed, 29 Aug 2012 17:53:04 -0300
-Message-Id: <1346273590-16693-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1345237703-15342-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1345237703-15342-1-git-send-email-claudio.takahasi@openbossa.org>
+Message-ID: <1346264609.23377.6.camel@aeonflux>
+Subject: Re: [PATCH 4/7] net/bluetooth/rfcomm/core.c: fix error return code
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Julia Lawall <Julia.Lawall@lip6.fr>
+Cc: kernel-janitors@vger.kernel.org,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Date: Wed, 29 Aug 2012 11:23:29 -0700
+In-Reply-To: <1346258957-7649-5-git-send-email-Julia.Lawall@lip6.fr>
+References: <1346258957-7649-1-git-send-email-Julia.Lawall@lip6.fr>
+	 <1346258957-7649-5-git-send-email-Julia.Lawall@lip6.fr>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch series adds HID Control Point support. This control point
-allows the report host(BlueZ) to notify the report device(HoG device)
-when the host is entering or leaving the Suspend Mode.
+Hi Julia,
 
-The low power Suspend Mode concept is implementation specific. This
-proposal adds a selectable back-end for HoG Suspend/Resume control.
-Each platform is free to write it's own HoG suspend back-end.
-A dummy back-end based on a FIFO (/tmp/hogsuspend) is proposed for
-reference and testing purpose only. Writting "suspend" or "resume"
-in this FIFO will trigger the update of the HID Control Point.
+> Initialize return variable before exiting on an error path.
+> 
+> A simplified version of the semantic match that finds this problem is as
+> follows: (http://coccinelle.lip6.fr/)
+> 
+> // <smpl>
+> (
+> if@p1 (\(ret < 0\|ret != 0\))
+>  { ... return ret; }
+> |
+> ret@p1 = 0
+> )
+> ... when != ret = e1
+>     when != &ret
+> *if(...)
+> {
+>   ... when != ret = e2
+>       when forall
+>  return ret;
+> }
+> 
+> // </smpl>
+> 
+> Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
+> 
+> ---
+>  net/bluetooth/rfcomm/core.c |    4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
-Notify the HoG device is useful to save power. Devices can implement
-different actions (diff than disconnect) when commands are written
-on the HID control point. The HoG capable device cab reduce the key
-press detection frequency or disable LEDs.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-*** Changes from previous version:
-Replaces UPower by a dummy selectable back-end. As discussed in IRC
-tracking UPower "suspending" or "resuming" signals are not suitable
-for desktops since the connection is dropped right after detecting
-suspend.
+Regards
 
-Claudio Takahasi (6):
-  hog: Add initial files for suspend support
-  hog: Add suspend back-end selection
-  hog: Add suspend/resume callbacks declaration
-  hog: Create a FIFO for dummy suspend
-  hog: Move HoG device list to manager
-  hog: Add writting Control Point
+Marcel
 
- Makefile.am                    |   6 +-
- acinclude.m4                   |   7 ++
- profiles/input/hog_device.c    |  73 ++++++++++++++-------
- profiles/input/hog_device.h    |   9 ++-
- profiles/input/hog_manager.c   |  62 ++++++++++++++++-
- profiles/input/suspend-dummy.c | 146 +++++++++++++++++++++++++++++++++++++++++
- profiles/input/suspend.h       |  29 ++++++++
- 7 files changed, 302 insertions(+), 30 deletions(-)
- create mode 100644 profiles/input/suspend-dummy.c
- create mode 100644 profiles/input/suspend.h
-
--- 
-1.7.12
 
