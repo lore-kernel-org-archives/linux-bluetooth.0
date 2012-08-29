@@ -1,142 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vani-dineshbhai PATEL X <vani.patel@stericsson.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 30 Aug 2012 07:08:55 +0200
-Subject: [PATCH BlueZ V6 1/5] AVRCP: Add TG Record to support AVRCP Browsing
-Message-ID: <747C1E83C744F44E9ACFB89FAEEC2C7B23D4AD9596@EXDCVYMBSTM005.EQ1STM.local>
-References: <747C1E83C744F44E9ACFB89FAEEC2C7B23D4A4EAC2@EXDCVYMBSTM005.EQ1STM.local>
-In-Reply-To: <747C1E83C744F44E9ACFB89FAEEC2C7B23D4A4EAC2@EXDCVYMBSTM005.EQ1STM.local>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v1 3/6] hog: Add suspend/resume callbacks declaration
+Date: Wed, 29 Aug 2012 17:53:07 -0300
+Message-Id: <1346273590-16693-4-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1346273590-16693-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1345237703-15342-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1346273590-16693-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->From 7e32aecb2b13c6398108932e98fdd68faf9315d8 Mon Sep 17 00:00:00 2001
-From: Vani Patel <vani.patel@stericsson.com>
-Date: Tue, 5 Jun 2012 13:44:30 +0530
-Subject: [PATCH BlueZ V6 1/5] AVRCP: Add TG Record to support AVRCP Browsing
-
-Adds SDP record to support browsing
+This patch declares the callbacks functions that intend to be used
+by the suspend back-ends.
 ---
-audio/avctp.c |    4 ++--
-audio/avctp.h |    3 ++-
-audio/avrcp.c |   28 ++++++++++++++++++++++++----
-3 files changed, 28 insertions(+), 7 deletions(-)
+ profiles/input/hog_manager.c   | 12 +++++++++++-
+ profiles/input/suspend-dummy.c | 10 +++++++++-
+ profiles/input/suspend.h       |  5 ++++-
+ 3 files changed, 24 insertions(+), 3 deletions(-)
 
-diff --git a/audio/avctp.c b/audio/avctp.c
-index 074eabd..a20dba9 100644
---- a/audio/avctp.c
-+++ b/audio/avctp.c
-@@ -802,7 +802,7 @@ static GIOChannel *avctp_server_socket(const bdaddr_t *src, gboolean master)
-               io = bt_io_listen(BT_IO_L2CAP, NULL, avctp_confirm_cb, NULL,
-                                                               NULL, &err,
-                                                               BT_IO_OPT_SOURCE_BDADDR, src,
--                                                              BT_IO_OPT_PSM, AVCTP_PSM,
-+                                                              BT_IO_OPT_PSM, AVCTP_CONTROL_PSM,
-                                                               BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-                                                               BT_IO_OPT_MASTER, master,
-                                                               BT_IO_OPT_INVALID);
-@@ -1090,7 +1090,7 @@ struct avctp *avctp_connect(const bdaddr_t *src, const bdaddr_t *dst)
-               io = bt_io_connect(BT_IO_L2CAP, avctp_connect_cb, session, NULL, &err,
-                                                               BT_IO_OPT_SOURCE_BDADDR, &session->server->src,
-                                                               BT_IO_OPT_DEST_BDADDR, &session->dst,
--                                                              BT_IO_OPT_PSM, AVCTP_PSM,
-+                                                              BT_IO_OPT_PSM, AVCTP_CONTROL_PSM,
-                                                               BT_IO_OPT_INVALID);
-               if (err) {
-                               avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
-diff --git a/audio/avctp.h b/audio/avctp.h
-index d0cbd97..34b0c1c 100644
---- a/audio/avctp.h
-+++ b/audio/avctp.h
-@@ -22,7 +22,8 @@
-  *
-  */
-
--#define AVCTP_PSM 23
-+#define AVCTP_CONTROL_PSM              23
-+#define AVCTP_BROWSING_PSM          27
-
- #define AVC_MTU 512
-#define AVC_HEADER_LENGTH 3
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index d925365..c7c8ae6 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -105,6 +105,7 @@
-#define AVRCP_FEATURE_CATEGORY_3               0x0004
-#define AVRCP_FEATURE_CATEGORY_4               0x0008
-#define AVRCP_FEATURE_PLAYER_SETTINGS     0x0010
-+#define AVRCP_FEATURE_BROWSING                 0x0040
-
- #define AVRCP_BATTERY_STATUS_NORMAL                      0
-#define AVRCP_BATTERY_STATUS_WARNING                   1
-@@ -190,7 +191,7 @@ static sdp_record_t *avrcp_ct_record(void)
-               sdp_list_t *aproto, *proto[2];
-               sdp_record_t *record;
-               sdp_data_t *psm, *version, *features;
--              uint16_t lp = AVCTP_PSM;
-+              uint16_t lp = AVCTP_CONTROL_PSM;
-               uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103;
-               uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
-                                                                                               AVRCP_FEATURE_CATEGORY_2 |
-@@ -252,18 +253,21 @@ static sdp_record_t *avrcp_ct_record(void)
-
- static sdp_record_t *avrcp_tg_record(void)
-{
--              sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-+              sdp_list_t *svclass_id, *pfseq, *apseq, *root, *apseq_browsing;
-               uuid_t root_uuid, l2cap, avctp, avrtg;
-               sdp_profile_desc_t profile[1];
-               sdp_list_t *aproto, *proto[2];
-               sdp_record_t *record;
--              sdp_data_t *psm, *version, *features;
--              uint16_t lp = AVCTP_PSM;
-+              sdp_data_t *psm, *version, *features, *psm_browsing;
-+              sdp_list_t *aproto_browsing, *proto_browsing[2] = {0};
-+              uint16_t lp = AVCTP_CONTROL_PSM;
-+              uint16_t lp_browsing = AVCTP_BROWSING_PSM;
-               uint16_t avrcp_ver = 0x0104, avctp_ver = 0x0103;
-               uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
-                                                                               AVRCP_FEATURE_CATEGORY_2 |
-                                                                               AVRCP_FEATURE_CATEGORY_3 |
-                                                                               AVRCP_FEATURE_CATEGORY_4 |
-+                                                                              AVRCP_FEATURE_BROWSING |
-                                                                               AVRCP_FEATURE_PLAYER_SETTINGS );
-
-                record = sdp_record_alloc();
-@@ -294,6 +298,17 @@ static sdp_record_t *avrcp_tg_record(void)
-
-                aproto = sdp_list_append(0, apseq);
-               sdp_set_access_protos(record, aproto);
-+              proto_browsing[0] = sdp_list_append(0, &l2cap);
-+              psm_browsing = sdp_data_alloc(SDP_UINT16, &lp_browsing);
-+              proto_browsing[0] = sdp_list_append(proto_browsing[0], psm_browsing);
-+              apseq_browsing = sdp_list_append(0, proto_browsing[0]);
+diff --git a/profiles/input/hog_manager.c b/profiles/input/hog_manager.c
+index 149ed34..9c23980 100644
+--- a/profiles/input/hog_manager.c
++++ b/profiles/input/hog_manager.c
+@@ -40,6 +40,16 @@
+ 
+ static gboolean suspend_supported = FALSE;
+ 
++static void suspend_callback(void)
++{
++	DBG("Suspending ...");
++}
 +
-+              proto_browsing[1] = sdp_list_append(0, &avctp);
-+              proto_browsing[1] = sdp_list_append(proto_browsing[1], version);
-+              apseq_browsing = sdp_list_append(apseq_browsing, proto_browsing[1]);
++static void resume_callback(void)
++{
++	DBG("Resuming ...");
++}
 +
-+              aproto_browsing = sdp_list_append(0, apseq_browsing);
-+              sdp_set_add_access_protos(record, aproto_browsing);
-
-                /* Bluetooth Profile Descriptor List */
-               sdp_uuid16_create(&profile[0].uuid, AV_REMOTE_PROFILE_ID);
-@@ -306,6 +321,11 @@ static sdp_record_t *avrcp_tg_record(void)
-
-                sdp_set_info_attr(record, "AVRCP TG", 0, 0);
-
-+              free(psm_browsing);
-+              sdp_list_free(proto_browsing[0], 0);
-+              sdp_list_free(proto_browsing[1], 0);
-+              sdp_list_free(apseq_browsing, 0);
-+              sdp_list_free(aproto_browsing, 0);
-               free(psm);
-               free(version);
-               sdp_list_free(proto[0], 0);
+ static int hog_device_probe(struct btd_device *device, GSList *uuids)
+ {
+ 	const char *path = device_get_path(device);
+@@ -69,7 +79,7 @@ static int hog_manager_init(void)
+ {
+ 	int err;
+ 
+-	err = suspend_init();
++	err = suspend_init(suspend_callback, resume_callback);
+ 	if (err < 0)
+ 		DBG("Suspend: %s(%d)", strerror(-err), -err);
+ 	else
+diff --git a/profiles/input/suspend-dummy.c b/profiles/input/suspend-dummy.c
+index 0a97158..282d3fb 100644
+--- a/profiles/input/suspend-dummy.c
++++ b/profiles/input/suspend-dummy.c
+@@ -26,10 +26,18 @@
+ #include <config.h>
+ #endif
+ 
++#include <stdlib.h>
++
+ #include "suspend.h"
+ 
+-int suspend_init(void)
++static suspend_event suspend_cb = NULL;
++static resume_event resume_cb = NULL;
++
++int suspend_init(suspend_event suspend, resume_event resume)
+ {
++	suspend_cb = suspend;
++	resume_cb = resume;
++
+ 	return 0;
+ }
+ 
+diff --git a/profiles/input/suspend.h b/profiles/input/suspend.h
+index 3f37a29..bfee3cf 100644
+--- a/profiles/input/suspend.h
++++ b/profiles/input/suspend.h
+@@ -22,5 +22,8 @@
+  *
+  */
+ 
+-int suspend_init(void);
++typedef void (*suspend_event) (void);
++typedef void (*resume_event) (void);
++
++int suspend_init(suspend_event suspend, resume_event resume);
+ void suspend_exit(void);
 -- 
-1.7.5.4
+1.7.12
 
-Regards,
-Vani
