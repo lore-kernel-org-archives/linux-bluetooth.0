@@ -1,63 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ v4 00/15] LE General Connection Establishment procedure
-Date: Thu, 30 Aug 2012 19:15:45 -0300
-Message-Id: <1346364960-7699-1-git-send-email-jprvita@openbossa.org>
 MIME-Version: 1.0
+In-Reply-To: <20120817075117.GC30060@x220>
+References: <1345152524-13404-1-git-send-email-jprvita@openbossa.org>
+	<1345152524-13404-7-git-send-email-jprvita@openbossa.org>
+	<20120817075117.GC30060@x220>
+Date: Thu, 30 Aug 2012 19:08:28 -0300
+Message-ID: <CAAngNMbTJ-YOg=fPAgeV7UQgG1VR7y4cZ-gPT0UBYgNUvMdfNw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3 06/14] core: mutually exclude concurrent connections
+From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This series implement the LE General Connection Establishment procedure
-for LE connections.
+On Fri, Aug 17, 2012 at 4:51 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi,
+>
+> On Thu, Aug 16, 2012, João Paulo Rechi Vita wrote:
+>> @@ -133,8 +133,10 @@ struct btd_adapter {
+>> +     GSList *connecting_list;        /* Pending connects */
+>> +     gboolean connecting;            /* Connect active */
+>
+> What's the relationship with the above two? Isn't connecting always true
+> when g_slist_length(connecting_list) > 0 and false when the list is
+> empty?
+>
 
-If there are LE bonded devices marked for auto connection they are added
-to a connect_list on the adapter. When there is any device on this list
-scan is performed continuously. When a device is found the connect_list
-is checked. If that device is on the list scan is stopped and a
-connection attempt is made to that device.
+The connecting_list keeps track of devices that have been found but
+for which a connect has not been issued yet. This was mainly used for
+1) not trying to connect twice to the same device (on two subsequent
+device_found events), and 2) to know if there are still any device
+waiting for a connect when one connect finishes, to device if we
+should restart scanning or not.
 
-If any client tries to perform discovery and the scan for the General
-Connection Establishment procedure is active, the discovery request is
-queued and performed right after the GCEP scan session finishes.
+Reviewing this logic I've been able to simplify it a little bit, using
+a counter (adapter->waiting_to_connect) to address problem #2, and #1
+could be handled only using the adapter->connect_list.
 
-This series changes quite a lot the LE connection logic, but we've been
-testing and using this code at INdT for about 4 weeks. Any comments and
-more testing are appreciated.
+>>  static gboolean connect_pending_cb(gpointer user_data)
+>>  {
+>>       struct btd_device *device = user_data;
+>>       struct btd_adapter *adapter = device_get_adapter(device);
+>> +     GIOChannel *io;
+>>
+>>       /* in the future we may want to check here if the controller supports
+>>        * scanning and connecting at the same time */
+>>       if (adapter->discovering)
+>>               return TRUE;
+>>
+>> -     device_att_connect(device);
+>> +     if (adapter->connecting)
+>> +             return TRUE;
+>> +
+>> +     adapter->connecting = TRUE;
+>> +     io = device_att_connect(device);
+>> +     g_io_add_watch(io, G_IO_OUT | G_IO_ERR, clean_connecting_state,
+>> +                                             btd_device_ref(device));
+>>
+>>       return FALSE;
+>>  }
+>
+> Since you're not storing "io" after the function returns you should be
+> doing a g_io_channel_unref() after calling g_io_add_watch(). Looking at
+> device_att_connect it seems like it's missing a g_io_channel_ref (either
+> when assigning to device->att_io or when returning from the function).
+>
+>> +             adapter->connecting_list = g_slist_append(
+>> +                                     adapter->connecting_list, device);
+>>
+>
+> Missing btd_device_unref()?
+>
 
-Claudio Takahasi (6):
-  core: Control connections based on adapter state
-  mgmt: Add LE scanning callback
-  core: Replace interleaved by LE scanning
-  core: Start LE scanning when a device requests
-  core: Queue discovery if scanning is active
-  core: Re-connect for ECONNRESET or ECONNABORTED
-
-João Paulo Rechi Vita (8):
-  core: Fix missing g_io_channel_ref
-  mgmt: Print error message when start_discovery fails
-  core: Add compare function for bdaddr in a struct btd_device
-  core: Add a list of LE devices to connect
-  core: Use adapter connect list for LE connections
-  core: Mutually exclude concurrent connections
-  mgmt: Add address type to bonding debug message
-  core: Suspend scanning before connect on pairing
-
-Paulo Alcantara (1):
-  core: Disable unnecessary auto connections
-
- src/adapter.c | 193 ++++++++++++++++++++++++++++++++++++++++++++-------
- src/adapter.h |   5 ++
- src/device.c  | 219 +++++++++++++++++++++++++++++-----------------------------
- src/device.h  |   2 +
- src/mgmt.c    |  44 +++++++++++-
- src/mgmt.h    |   1 +
- 6 files changed, 326 insertions(+), 138 deletions(-)
+The whole ref counting has been reviewed as well, with the new logic
+modifications mentioned above.
 
 -- 
-1.7.11.4
-
+João Paulo Rechi Vita
+Openbossa Labs - INdT
