@@ -1,124 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] build: Use AC_USE_SYSTEM_EXTENSIONS for POSIX/C extensions
-Date: Thu, 30 Aug 2012 09:19:00 -0400
-Message-Id: <1346332740-29319-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH hcidump] amp: Decode Read Data Block Size HCI cmd
+Date: Thu, 30 Aug 2012 16:06:19 +0300
+Message-Id: <1346331979-3837-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Using this macro in configure.ac enables certain extensions that BlueZ
-currently depends on. The macro is recommended instead of defining
-_GNU_SOURCE on each C file.
----
- configure.ac      |    2 ++
- src/adapter.c     |    1 -
- src/event.c       |    1 -
- src/sdp-xml.c     |    1 -
- src/textfile.c    |    1 -
- tools/ciptool.c   |    1 -
- tools/hciattach.c |    1 -
- tools/rfcomm.c    |    1 -
- 8 files changed, 2 insertions(+), 7 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/configure.ac b/configure.ac
-index 7d9a34d..6c897d4 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -10,6 +10,8 @@ AM_MAINTAINER_MODE
+Decode Read Data Block Size HCI command and command status.
+
+ < HCI Command: Read Data Block Size (0x04|0x000a) plen 0
+ > HCI Event: Command Complete (0x0e) plen 10
+    Read Data Block Size (0x04|0x000a) ncmd 1
+    status 0x00
+    Max ACL 1492 Block len 1492 Num blocks 4
+---
+ lib/hci.h    |    8 ++++++++
+ parser/hci.c |   24 +++++++++++++++++++++++-
+ 2 files changed, 31 insertions(+), 1 deletion(-)
+
+diff --git a/lib/hci.h b/lib/hci.h
+index 3dbb221..d068a2f 100644
+--- a/lib/hci.h
++++ b/lib/hci.h
+@@ -1316,6 +1316,14 @@ typedef struct {
+ } __attribute__ ((packed)) read_bd_addr_rp;
+ #define READ_BD_ADDR_RP_SIZE 7
  
- PKG_PROG_PKG_CONFIG
- 
-+AC_USE_SYSTEM_EXTENSIONS
++#define OCF_READ_DATA_BLOCK_SIZE	0x000A
++typedef struct {
++	uint8_t		status;
++	uint16_t	max_acl_len;
++	uint16_t	data_block_len;
++	uint16_t	num_blocks;
++} __attribute__ ((packed)) read_data_block_size_rp;
 +
- AC_INIT_BLUEZ
+ /* Status params */
+ #define OGF_STATUS_PARAM	0x05
  
- COMPILER_FLAGS
-diff --git a/src/adapter.c b/src/adapter.c
-index 50779fd..e400603 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -26,7 +26,6 @@
- #include <config.h>
- #endif
+diff --git a/parser/hci.c b/parser/hci.c
+index 115cf1e..38794bd 100644
+--- a/parser/hci.c
++++ b/parser/hci.c
+@@ -338,7 +338,7 @@ static char *cmd_hostctl_str[CMD_HOSTCTL_NUM + 1] = {
+ 	"Write LE Host Supported",
+ };
  
--#define _GNU_SOURCE
- #include <stdio.h>
- #include <errno.h>
- #include <unistd.h>
-diff --git a/src/event.c b/src/event.c
-index 1586293..3b49dce 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -26,7 +26,6 @@
- #include <config.h>
- #endif
+-#define CMD_INFO_NUM 9
++#define CMD_INFO_NUM 10
+ static char *cmd_info_str[CMD_INFO_NUM + 1] = {
+ 	"Unknown",
+ 	"Read Local Version Information",
+@@ -350,6 +350,7 @@ static char *cmd_info_str[CMD_INFO_NUM + 1] = {
+ 	"Read Country Code",
+ 	"Unknown",
+ 	"Read BD ADDR",
++	"Read Data Block Size",
+ };
  
--#define _GNU_SOURCE
- #include <stdio.h>
- #include <ctype.h>
- #include <errno.h>
-diff --git a/src/sdp-xml.c b/src/sdp-xml.c
-index 52df285..1aca776 100644
---- a/src/sdp-xml.c
-+++ b/src/sdp-xml.c
-@@ -25,7 +25,6 @@
- #include <config.h>
- #endif
+ #define CMD_STATUS_NUM 11
+@@ -2041,6 +2042,24 @@ static inline void bdaddr_response_dump(int level, struct frame *frm)
+ 	raw_dump(level, frm);
+ }
  
--#define _GNU_SOURCE
- #include <stdio.h>
- #include <errno.h>
- #include <ctype.h>
-diff --git a/src/textfile.c b/src/textfile.c
-index 9d88fbc..b6a7e1f 100644
---- a/src/textfile.c
-+++ b/src/textfile.c
-@@ -25,7 +25,6 @@
- #include <config.h>
- #endif
++static inline void read_data_block_size_dump(int level, struct frame *frm)
++{
++	read_data_block_size_rp *rp = frm->ptr;
++
++	p_indent(level, frm);
++	printf("status 0x%2.2x\n", rp->status);
++
++	if (rp->status > 0) {
++		p_indent(level, frm);
++		printf("Error: %s\n", status2str(rp->status));
++	} else {
++		p_indent(level, frm);
++		printf("Max ACL %d Block len %d Num blocks %d\n",
++			btohs(rp->max_acl_len), btohs(rp->data_block_len),
++							btohs(rp->num_blocks));
++	}
++}
++
+ static inline void generic_response_dump(int level, struct frame *frm)
+ {
+ 	uint8_t status = get_u8(frm);
+@@ -2886,6 +2905,9 @@ static inline void cmd_complete_dump(int level, struct frame *frm)
+ 		case OCF_READ_BD_ADDR:
+ 			bdaddr_response_dump(level, frm);
+ 			return;
++		case OCF_READ_DATA_BLOCK_SIZE:
++			read_data_block_size_dump(level, frm);
++			return;
+ 		}
+ 		break;
  
--#define _GNU_SOURCE
- #include <stdio.h>
- #include <errno.h>
- #include <ctype.h>
-diff --git a/tools/ciptool.c b/tools/ciptool.c
-index edce9da..e240f38 100644
---- a/tools/ciptool.c
-+++ b/tools/ciptool.c
-@@ -25,7 +25,6 @@
- #include <config.h>
- #endif
- 
--#define _GNU_SOURCE
- #include <stdio.h>
- #include <errno.h>
- #include <stdlib.h>
-diff --git a/tools/hciattach.c b/tools/hciattach.c
-index d19fa33..e166730 100644
---- a/tools/hciattach.c
-+++ b/tools/hciattach.c
-@@ -27,7 +27,6 @@
- #include <config.h>
- #endif
- 
--#define _GNU_SOURCE
- #include <stdio.h>
- #include <errno.h>
- #include <fcntl.h>
-diff --git a/tools/rfcomm.c b/tools/rfcomm.c
-index e8bdd0f..affdbc7 100644
---- a/tools/rfcomm.c
-+++ b/tools/rfcomm.c
-@@ -25,7 +25,6 @@
- #include <config.h>
- #endif
- 
--#define _GNU_SOURCE
- #include <stdio.h>
- #include <errno.h>
- #include <fcntl.h>
 -- 
 1.7.9.5
 
