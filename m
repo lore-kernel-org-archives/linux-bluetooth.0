@@ -1,80 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20120817075117.GC30060@x220>
-References: <1345152524-13404-1-git-send-email-jprvita@openbossa.org>
-	<1345152524-13404-7-git-send-email-jprvita@openbossa.org>
-	<20120817075117.GC30060@x220>
-Date: Thu, 30 Aug 2012 19:08:28 -0300
-Message-ID: <CAAngNMbTJ-YOg=fPAgeV7UQgG1VR7y4cZ-gPT0UBYgNUvMdfNw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 06/14] core: mutually exclude concurrent connections
-From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <CAJdJm_NXvcfYeCT5gaYpDD0Oshk89ohUaj5BJ66CL29YwD7UgQ@mail.gmail.com>
+References: <1346332740-29319-1-git-send-email-anderson.lizardo@openbossa.org>
+ <1346339333.23377.10.camel@aeonflux> <CAJdJm_NXvcfYeCT5gaYpDD0Oshk89ohUaj5BJ66CL29YwD7UgQ@mail.gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Thu, 30 Aug 2012 17:02:43 -0300
+Message-ID: <CAMOw1v7bbYbhL59-imjzppztpC+e9+enTWx4nnWeVAT0zjW4Ag@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] build: Use AC_USE_SYSTEM_EXTENSIONS for POSIX/C extensions
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Aug 17, 2012 at 4:51 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi,
->
-> On Thu, Aug 16, 2012, João Paulo Rechi Vita wrote:
->> @@ -133,8 +133,10 @@ struct btd_adapter {
->> +     GSList *connecting_list;        /* Pending connects */
->> +     gboolean connecting;            /* Connect active */
->
-> What's the relationship with the above two? Isn't connecting always true
-> when g_slist_length(connecting_list) > 0 and false when the list is
-> empty?
->
+Hi Marcel,
 
-The connecting_list keeps track of devices that have been found but
-for which a connect has not been issued yet. This was mainly used for
-1) not trying to connect twice to the same device (on two subsequent
-device_found events), and 2) to know if there are still any device
-waiting for a connect when one connect finishes, to device if we
-should restart scanning or not.
-
-Reviewing this logic I've been able to simplify it a little bit, using
-a counter (adapter->waiting_to_connect) to address problem #2, and #1
-could be handled only using the adapter->connect_list.
-
->>  static gboolean connect_pending_cb(gpointer user_data)
->>  {
->>       struct btd_device *device = user_data;
->>       struct btd_adapter *adapter = device_get_adapter(device);
->> +     GIOChannel *io;
+On Thu, Aug 30, 2012 at 12:26 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Marcel,
+>
+> On Thu, Aug 30, 2012 at 11:08 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Hi Anderson,
 >>
->>       /* in the future we may want to check here if the controller supports
->>        * scanning and connecting at the same time */
->>       if (adapter->discovering)
->>               return TRUE;
+>>> Using this macro in configure.ac enables certain extensions that BlueZ
+>>> currently depends on. The macro is recommended instead of defining
+>>> _GNU_SOURCE on each C file.
 >>
->> -     device_att_connect(device);
->> +     if (adapter->connecting)
->> +             return TRUE;
->> +
->> +     adapter->connecting = TRUE;
->> +     io = device_att_connect(device);
->> +     g_io_add_watch(io, G_IO_OUT | G_IO_ERR, clean_connecting_state,
->> +                                             btd_device_ref(device));
->>
->>       return FALSE;
->>  }
+>> what is the advantage of this. I am actually fine with using _GNU_SOURCE
+>> in the C files. It is according to the man pages.
 >
-> Since you're not storing "io" after the function returns you should be
-> doing a g_io_channel_unref() after calling g_io_add_watch(). Looking at
-> device_att_connect it seems like it's missing a g_io_channel_ref (either
-> when assigning to device->att_io or when returning from the function).
+> The only advantage I see is that we don't have to worry about
+> reviewing these defines as the symbols get incorporated in newer
+> standards. For instance, this patch was brought up because O_CLOEXEC
+> does not exist on POSIX.1-2001, but was incorporated POSIX.1-2008, so
+> for newer systems _GNU_SOURCE is not necessary for it anymore, but for
+> some (still maintained) distros it is.
 >
->> +             adapter->connecting_list = g_slist_append(
->> +                                     adapter->connecting_list, device);
->>
->
-> Missing btd_device_unref()?
->
+> Sometimes we remove code that used these extensions, and simply forget
+> the _GNU_SOURCE there as well.
 
-The whole ref counting has been reviewed as well, with the new logic
-modifications mentioned above.
+And also forget to add it. Then 3 months later comes a patch to fix it
+by adding the definition.
 
--- 
-João Paulo Rechi Vita
-Openbossa Labs - INdT
+Using the autofoo macro we stop the build-fix patches for things like this.
+
+
+That is: it removes code, it's more future-proof and it has no
+downsides. So, what's the point of not using it?
+
+
+Some months ago I sent a patch to also remove a lot of dumb "#include
+config.h". It has the same reasoning behind it: remove code and be
+more future-proof. It was for connman, but if you are interested I can
+send it to bluez/ofono/etc too -
+http://permalink.gmane.org/gmane.linux.network.connman/7310
+
+
+Lucas De Marchi
