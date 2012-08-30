@@ -1,100 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20120821185606.GF17005@joana>
-References: <1344710830-10301-1-git-send-email-djenkins@mvista.com>
-	<1344710830-10301-4-git-send-email-djenkins@mvista.com>
-	<20120821185606.GF17005@joana>
-Date: Thu, 30 Aug 2012 16:36:00 +0100
-Message-ID: <CAJ2qBzaO=MOaGsiHjHehXE97wt0sG2O6gOQZsFYsmpTj+gchPA@mail.gmail.com>
-Subject: Re: [PATCH 3/4] Bluetooth: Avoid rfcomm_session_timeout using freed pointer
-From: Dean Jenkins <djenkins@mvista.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	Dean Jenkins <djenkins@mvista.com>,
-	linux-bluetooth@vger.kernel.org
+In-Reply-To: <1346339333.23377.10.camel@aeonflux>
+References: <1346332740-29319-1-git-send-email-anderson.lizardo@openbossa.org>
+	<1346339333.23377.10.camel@aeonflux>
+Date: Thu, 30 Aug 2012 11:26:20 -0400
+Message-ID: <CAJdJm_NXvcfYeCT5gaYpDD0Oshk89ohUaj5BJ66CL29YwD7UgQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] build: Use AC_USE_SYSTEM_EXTENSIONS for POSIX/C extensions
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Marcel,
 
-On 21 August 2012 19:56, Gustavo Padovan <gustavo@padovan.org> wrote:
-> Hi Dean,
+On Thu, Aug 30, 2012 at 11:08 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Anderson,
 >
-> * Dean Jenkins <djenkins@mvista.com> [2012-08-11 19:47:09 +0100]:
+>> Using this macro in configure.ac enables certain extensions that BlueZ
+>> currently depends on. The macro is recommended instead of defining
+>> _GNU_SOURCE on each C file.
 >
->> rfcomm_session_timeout() protects the scenario of the remote
->> Bluetooth device failing to send a DISC on the rfcomm control
->> channel after the last data DLC channel has been closed.
->>
->> There is a race condition between the timer expiring causing
->> rfcomm_session_timeout() to run and the rfcomm session being
->> deleted. If the rfcomm session is deleted then
->> rfcomm_session_timeout() would use a freed rfcomm session
->> pointer resulting in a potential kernel crash or memory corruption.
->> Note the timer is cleared before the rfcomm session is deleted
->> by del_timer() so the circumstances for a failure to occur are
->> as follows:
->>
->> rfcomm_session_timeout() needs to be executing before the
->> del_timer() is called to clear the timer but
->> rfcomm_session_timeout() needs to be delayed from using the
->> rfcomm session pointer until after the session has been deleted.
->> Therefore, there is a very small window of opportunity for failure.
->>
->> The solution is to use del_timer_sync() instead of del_timer()
->> as this ensures that rfcomm_session_timeout() is not running
->> when del_timer_sync() returns. This means that it is not
->> possible for rfcomm_session_timeout() to run after the rfcomm
->> session has been deleted.
->
->>
->> Signed-off-by: Dean Jenkins <djenkins@mvista.com>
->> ---
->>  net/bluetooth/rfcomm/core.c |    4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
->> index 24d4d3c..c7921fd 100644
->> --- a/net/bluetooth/rfcomm/core.c
->> +++ b/net/bluetooth/rfcomm/core.c
->> @@ -264,8 +264,8 @@ static void rfcomm_session_clear_timer(struct rfcomm_session *s)
->>  {
->>       BT_DBG("session %p state %ld", s, s->state);
->>
->> -     if (timer_pending(&s->timer))
->> -             del_timer(&s->timer);
->> +     /* ensure rfcomm_session_timeout() is not running past this point */
->> +     del_timer_sync(&s->timer);
->
-> I'm not happy of the idea of let the stack broken between patches 2 and 3
-> (this one). As you said if we use del_timer_sync() we don't need rfcnt here,
-> can you add this as a first patch, maybe? and after this continue to remove
-> the rest of the refcount code?
->
->         Gustavo
+> what is the advantage of this. I am actually fine with using _GNU_SOURCE
+> in the C files. It is according to the man pages.
 
-Thanks for your feedback. Sorry for the delay in getting back to you.
-My gmail failed to filter out your reply.
+The only advantage I see is that we don't have to worry about
+reviewing these defines as the symbols get incorporated in newer
+standards. For instance, this patch was brought up because O_CLOEXEC
+does not exist on POSIX.1-2001, but was incorporated POSIX.1-2008, so
+for newer systems _GNU_SOURCE is not necessary for it anymore, but for
+some (still maintained) distros it is.
 
-OK, I'll start with a patch for del_timer_sync(). This can be a
-standalone patch.
+Sometimes we remove code that used these extensions, and simply forget
+the _GNU_SOURCE there as well.
 
-For the removal of the refcnt, do you propose 1 patch to remove the
-refcnt AND to manage the rfcomm session pointer ? I have doubts now
-because you don't wish the stack to be broken between patches. Perhaps
-it is possible to add a patch to manage the rfcomm session pointer
-with the refcnt in place so we have "belt and braces" then have a
-patch to remove the refcnt as the last thing to do.
+It is just a minor build system simplification, if you think it is not
+worthy, please reconsider my original patch that adds _GNU_SOURCE just
+where it is necessary.
 
-I am open to suggestions.
-
-Thanks,
-
-Regards,
-Dean
-
+Best Regards,
 -- 
-Dean Jenkins
-Embedded Software Engineer
-Professional Services UK/EMEA
-MontaVista Software, LLC
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
