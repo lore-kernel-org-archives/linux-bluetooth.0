@@ -1,458 +1,333 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vani-dineshbhai PATEL X <vani.patel@stericsson.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Vani-dineshbhai PATEL X <vani.patel@stericsson.com>,
-	vani273 <vani273@gmail.com>,
-	Joohi RASTOGI <joohi.rastogi@stericsson.com>
-Date: Thu, 30 Aug 2012 11:50:44 +0200
-Subject: [PATCH BlueZ V7 3/5] AVRCP: Add browsing channel support
-Message-ID: <747C1E83C744F44E9ACFB89FAEEC2C7B23D4AD9779@EXDCVYMBSTM005.EQ1STM.local>
-Content-Type: text/plain; charset="us-ascii"
+From: <chen.ganir@ti.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <chen.ganir@ti.com>
+Subject: [PATCH] gatt: Delay D-Bus reply on char discovery
+Date: Thu, 30 Aug 2012 12:28:59 +0300
+Message-ID: <1346318939-9556-1-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->From 04eeee8851b3e7956f7f73dd48d91a789e25cdb5 Mon Sep 17 00:00:00 2001
-From: Vani Patel <vani.patel@stericsson.com>
-Date: Thu, 2 Aug 2012 16:42:14 +0530
-Subject: [PATCH BlueZ V7 3/5] AVRCP: Add browsing channel support
+From: Chen Ganir <chen.ganir@ti.com>
 
-Implements browsing channel creation and release.
+Delay sending the D-Bus reply for the discover_characteristics
+command. The D-Bus reply for characteristics is sent before all
+the relevant characteristic information is gathered. This can
+cause problems, when trying to get characteristic information too
+soon. This patch moves the D-Bus reply to the end of the char
+discovery process. Only after all descriptors are discovered and
+read, the D-Bus reply is sent.
 ---
- audio/avctp.c |  274 ++++++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 files changed, 242 insertions(+), 32 deletions(-)
+ attrib/client.c |  163 +++++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 116 insertions(+), 47 deletions(-)
 
-diff --git a/audio/avctp.c b/audio/avctp.c
-index 3bd021c..521fefa 100644
---- a/audio/avctp.c
-+++ b/audio/avctp.c
-@@ -41,6 +41,7 @@
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/sdp.h>
- #include <bluetooth/uuid.h>
-+#include <bluetooth/l2cap.h>
- 
- #include <glib.h>
- 
-@@ -119,6 +120,7 @@ struct avctp_state_callback {
- struct avctp_server {
- 	bdaddr_t src;
- 	GIOChannel *control_io;
-+	GIOChannel *browsing_io;
- 	GSList *sessions;
+diff --git a/attrib/client.c b/attrib/client.c
+index bb6adf8..9b2103b 100644
+--- a/attrib/client.c
++++ b/attrib/client.c
+@@ -78,6 +78,11 @@ struct gatt_service {
+ 	struct query *query;
  };
  
-@@ -137,9 +139,12 @@ struct avctp {
- 	int uinput;
- 
- 	GIOChannel *control_io;
-+	GIOChannel *browsing_io;
- 	guint control_io_id;
-+	guint browsing_io_id;
- 
- 	uint16_t control_mtu;
-+	uint16_t browsing_mtu;
- 
- 	uint8_t key_quirks[256];
- 	GSList *handlers;
-@@ -326,6 +331,17 @@ static void avctp_disconnected(struct avctp *session)
- 	if (!session)
- 		return;
- 
-+	if (session->browsing_io) {
-+		g_io_channel_shutdown(session->browsing_io, TRUE, NULL);
-+		g_io_channel_unref(session->browsing_io);
-+		session->browsing_io = NULL;
-+	}
++struct characteristic_descriptor {
++	uint16_t handle;
++	bt_uuid_t uuid;
++};
 +
-+	if (session->browsing_io_id) {
-+		g_source_remove(session->browsing_io_id);
-+		session->browsing_io_id = 0;
-+	}
+ struct characteristic {
+ 	struct gatt_service *gatt;
+ 	char *path;
+@@ -90,6 +95,9 @@ struct characteristic {
+ 	struct format *format;
+ 	uint8_t *value;
+ 	size_t vlen;
 +
- 	if (session->control_io) {
- 		g_io_channel_shutdown(session->control_io, TRUE, NULL);
- 		g_io_channel_unref(session->control_io);
-@@ -432,31 +448,77 @@ static void handle_response(struct avctp *session, struct avctp_header *avctp,
- 	}
++	GSList *descriptors;
++	uint16_t descriptor_count;
+ };
+ 
+ struct query_data {
+@@ -116,6 +124,7 @@ static void characteristic_free(void *user_data)
+ 	g_free(chr->format);
+ 	g_free(chr->value);
+ 	g_free(chr->name);
++	g_slist_free_full(chr->descriptors, g_free);
+ 	g_free(chr);
  }
  
-+static uint8_t *avctp_read_data(int *data_read, int length, GIOChannel *chan)
+@@ -263,6 +272,71 @@ static void update_watchers(gpointer data, gpointer user_data)
+ 	g_dbus_send_message(conn, msg);
+ }
+ 
++static DBusMessage *create_discover_char_reply(DBusMessage *msg, GSList *chars)
 +{
-+	uint8_t *buffer;
-+	int sock;
++	DBusMessage *reply;
++	DBusMessageIter iter, array_iter;
++	GSList *l;
 +
-+	buffer = g_new0(uint8_t, length);
-+	sock = g_io_channel_unix_get_fd(chan);
++	reply = dbus_message_new_method_return(msg);
 +
-+	*data_read = read(sock, buffer, length);
-+	if (*data_read <= 0)
-+		goto failed;
++	dbus_message_iter_init_append(reply, &iter);
 +
-+	if (*data_read < AVCTP_HEADER_LENGTH) {
-+		error("Too small AVCTP packet");
-+		goto failed;
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++				DBUS_TYPE_OBJECT_PATH_AS_STRING, &array_iter);
++
++	for (l = chars; l; l = l->next) {
++		struct characteristic *chr = l->data;
++
++		dbus_message_iter_append_basic(&array_iter,
++					DBUS_TYPE_OBJECT_PATH, &chr->path);
 +	}
-+	return buffer;
 +
-+failed:
-+	return NULL;
++	dbus_message_iter_close_container(&iter, &array_iter);
++
++	return reply;
 +}
 +
-+static gboolean session_browsing_cb(GIOChannel *chan, GIOCondition cond,
-+				gpointer data)
++
++static void check_chr_discovery_complete(struct gatt_service *gatt)
 +{
-+	struct avctp *session = data;
-+	uint8_t  *buf;
-+	struct avctp_header *avctp;
-+	int ret;
++	DBusMessage *reply;
++	GSList *l;
 +
-+	buf = avctp_read_data(&ret, session->browsing_mtu,
-+						session->browsing_io);
++	for (l = gatt->chars; l; l = l->next) {
++		struct characteristic *chr = l->data;
 +
-+	if (buf == NULL)
-+		goto failed;
++		if (chr->descriptor_count == 0xFFFF)
++			return;
 +
-+	if (!(cond & G_IO_IN))
-+		goto failed;
++		if (chr->descriptor_count > g_slist_length(chr->descriptors))
++			return;
++	}
 +
-+	avctp = (struct avctp_header *) buf;
++	reply = create_discover_char_reply(gatt->query->msg, gatt->chars);
 +
-+	if (avctp->packet_type != AVCTP_PACKET_SINGLE)
-+		goto failed;
++	dbus_message_unref(gatt->query->msg);
++	gatt->query->msg = NULL;
 +
-+	g_free(buf);
-+	return TRUE;
-+
-+failed:
-+	g_free(buf);
-+	return FALSE;
++	g_dbus_send_message(gatt->conn, reply);
 +}
 +
- static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
- 				gpointer data)
++static void add_descriptor(struct gatt_service *gatt,
++			      struct characteristic *chr, uint16_t handle,
++			      bt_uuid_t uuid)
++{
++	struct characteristic_descriptor *desc;
++
++	desc = g_new0(struct characteristic_descriptor, 1);
++
++	desc->handle = handle;
++	desc->uuid = uuid;
++
++	chr->descriptors = g_slist_append(chr->descriptors, desc);
++
++	check_chr_discovery_complete(gatt);
++}
++
+ static void events_handler(const uint8_t *pdu, uint16_t len,
+ 							gpointer user_data)
  {
- 	struct avctp *session = data;
--	uint8_t buf[1024], *operands, code, subunit;
-+	uint8_t *buf, *operands, code, subunit;
- 	struct avctp_header *avctp;
- 	struct avc_header *avc;
- 	int ret, packet_size, operand_count, sock;
- 	struct avctp_pdu_handler *handler;
+@@ -690,6 +764,7 @@ static void update_char_desc(guint8 status, const guint8 *pdu, guint16 len,
+ 	struct query_data *current = user_data;
+ 	struct gatt_service *gatt = current->gatt;
+ 	struct characteristic *chr = current->chr;
++	bt_uuid_t uuid;
  
--	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL))
-+	buf = avctp_read_data(&ret, session->control_mtu, session->control_io);
-+	if (buf == NULL)
- 		goto failed;
+ 	if (status == 0) {
  
--	sock = g_io_channel_unix_get_fd(session->control_io);
+@@ -720,6 +795,9 @@ static void update_char_desc(guint8 status, const guint8 *pdu, guint16 len,
+ 		}
+ 	}
+ 
++	bt_uuid16_create(&uuid, GATT_CHARAC_USER_DESC_UUID);
++	add_descriptor(current->gatt, chr, current->handle, uuid);
++
+ 	query_list_remove(gatt, current);
+ 	g_free(current);
+ }
+@@ -730,6 +808,7 @@ static void update_char_format(guint8 status, const guint8 *pdu, guint16 len,
+ 	struct query_data *current = user_data;
+ 	struct gatt_service *gatt = current->gatt;
+ 	struct characteristic *chr = current->chr;
++	bt_uuid_t uuid;
+ 
+ 	if (status != 0)
+ 		goto done;
+@@ -746,6 +825,9 @@ static void update_char_format(guint8 status, const guint8 *pdu, guint16 len,
+ 				(void *) chr->format, sizeof(*chr->format));
+ 
+ done:
++	bt_uuid16_create(&uuid, GATT_CHARAC_FMT_UUID);
++	add_descriptor(current->gatt, chr, current->handle, uuid);
++
+ 	query_list_remove(gatt, current);
+ 	g_free(current);
+ }
+@@ -789,24 +871,33 @@ static void descriptor_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ {
+ 	struct query_data *current = user_data;
+ 	struct gatt_service *gatt = current->gatt;
++	struct characteristic *chr = current->chr;
+ 	struct att_data_list *list;
+ 	guint8 format;
+ 	int i;
+ 
+-	if (status != 0)
++	chr->descriptor_count = 0;
++
++	if (status != 0) {
++		check_chr_discovery_complete(gatt);
+ 		goto done;
++	}
+ 
+ 	DBG("Find Information Response received");
+ 
+ 	list = dec_find_info_resp(pdu, plen, &format);
+-	if (list == NULL)
++	if (list == NULL) {
++		check_chr_discovery_complete(gatt);
+ 		goto done;
++	}
+ 
++	chr->descriptor_count = list->num;
+ 	for (i = 0; i < list->num; i++) {
+ 		guint16 handle;
+ 		bt_uuid_t uuid;
+ 		uint8_t *info = list->data[i];
+ 		struct query_data *qfmt;
++		guint ret = 0;
+ 
+ 		handle = att_get_u16(info);
+ 
+@@ -817,6 +908,7 @@ static void descriptor_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 			 * format" descriptors are used, and both have 16-bit
+ 			 * UUIDs. Therefore there is no need to support format
+ 			 * 0x02 yet. */
++			add_descriptor(gatt, chr, current->handle, uuid);
+ 			continue;
+ 		}
+ 		qfmt = g_new0(struct query_data, 1);
+@@ -826,14 +918,17 @@ static void descriptor_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 
+ 		if (uuid_desc16_cmp(&uuid, GATT_CHARAC_USER_DESC_UUID) == 0) {
+ 			query_list_append(gatt, qfmt);
+-			gatt_read_char(gatt->attrib, handle, 0, update_char_desc,
+-									qfmt);
++			ret = gatt_read_char(gatt->attrib, handle, 0,
++							update_char_desc, qfmt);
+ 		} else if (uuid_desc16_cmp(&uuid, GATT_CHARAC_FMT_UUID) == 0) {
+ 			query_list_append(gatt, qfmt);
+-			gatt_read_char(gatt->attrib, handle, 0,
++			ret = gatt_read_char(gatt->attrib, handle, 0,
+ 						update_char_format, qfmt);
+ 		} else
+ 			g_free(qfmt);
++
++		if (ret == 0)
++			add_descriptor(gatt, chr, current->handle, uuid);
+ 	}
+ 
+ 	att_data_list_free(list);
+@@ -848,53 +943,31 @@ static void update_all_chars(gpointer data, gpointer user_data)
+ 	struct characteristic *chr = data;
+ 	struct gatt_service *gatt = user_data;
+ 
+-	qdesc = g_new0(struct query_data, 1);
+-	qdesc->gatt = gatt;
+-	qdesc->chr = chr;
 -
--	ret = read(sock, buf, sizeof(buf));
--	if (ret <= 0)
--		goto failed;
-+        if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL))
-+                goto failed;
+-	query_list_append(gatt, qdesc);
+-
+-	gatt_find_info(gatt->attrib, chr->handle + 1, chr->end, descriptor_cb,
+-									qdesc);
+-
+ 	qvalue = g_new0(struct query_data, 1);
+ 	qvalue->gatt = gatt;
+ 	qvalue->chr = chr;
  
--	DBG("Got %d bytes of data for AVCTP session %p", ret, session);
-+	sock = g_io_channel_unix_get_fd(session->control_io);
++	g_slist_free_full(chr->descriptors, g_free);
++	chr->descriptors = NULL;
++	chr->descriptor_count = 0xFFFF;
++
+ 	query_list_append(gatt, qvalue);
  
--	if ((unsigned int) ret < sizeof(struct avctp_header)) {
--		error("Too small AVCTP packet");
--		goto failed;
+ 	gatt_read_char(gatt->attrib, chr->handle, 0, update_char_value, qvalue);
+-}
+-
+-static DBusMessage *create_discover_char_reply(DBusMessage *msg, GSList *chars)
+-{
+-	DBusMessage *reply;
+-	DBusMessageIter iter, array_iter;
+-	GSList *l;
+-
+-	reply = dbus_message_new_method_return(msg);
+-
+-	dbus_message_iter_init_append(reply, &iter);
+ 
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-				DBUS_TYPE_OBJECT_PATH_AS_STRING, &array_iter);
+-
+-	for (l = chars; l; l = l->next) {
+-		struct characteristic *chr = l->data;
+-
+-		dbus_message_iter_append_basic(&array_iter,
+-					DBUS_TYPE_OBJECT_PATH, &chr->path);
 -	}
++	qdesc = g_new0(struct query_data, 1);
++	qdesc->gatt = gatt;
++	qdesc->chr = chr;
  
- 	avctp = (struct avctp_header *) buf;
+-	dbus_message_iter_close_container(&iter, &array_iter);
++	query_list_append(gatt, qdesc);
  
-@@ -475,7 +537,8 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
- 
- 	ret -= sizeof(struct avc_header);
- 
--	operands = buf + sizeof(struct avctp_header) + sizeof(struct avc_header);
-+	operands = buf + sizeof(struct avctp_header) +
-+						sizeof(struct avc_header);
- 	operand_count = ret;
- 
- 	DBG("AV/C %s 0x%01X, subunit_type 0x%02X, subunit_id 0x%01X, "
-@@ -486,6 +549,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
- 
- 	if (avctp->cr == AVCTP_RESPONSE) {
- 		handle_response(session, avctp, avc, operands, operand_count);
-+		g_free(buf);
- 		return TRUE;
- 	}
- 
-@@ -526,9 +590,11 @@ done:
- 	if (ret != packet_size)
- 		goto failed;
- 
-+	g_free(buf);
- 	return TRUE;
- 
- failed:
-+	g_free(buf);
- 	DBG("AVCTP session %p got disconnected", session);
- 	avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
- 	return FALSE;
-@@ -613,6 +679,47 @@ static void init_uinput(struct avctp *session)
- 		DBG("AVRCP: uinput initialized for %s", address);
+-	return reply;
++	gatt_find_info(gatt->attrib, chr->handle + 1, chr->end, descriptor_cb,
++									qdesc);
  }
  
-+static void avctp_connect_browsing_cb(GIOChannel *chan,
-+					GError *err,
-+					gpointer data)
-+{
-+	struct avctp *session = data;
-+	char address[18];
-+	uint16_t imtu;
-+	GError *gerr = NULL;
-+
-+	if (err) {
-+		error("Browsing: %s", err->message);
-+		g_io_channel_shutdown(chan, TRUE, NULL);
-+		g_io_channel_unref(chan);
-+		session->browsing_io = NULL;
-+		return;
-+	}
-+
-+	bt_io_get(chan, BT_IO_L2CAP, &gerr,
-+			BT_IO_OPT_DEST, &address,
-+			BT_IO_OPT_IMTU, &imtu,
-+			BT_IO_OPT_INVALID);
-+	if (gerr) {
-+		error("%s", gerr->message);
-+		g_io_channel_shutdown(chan, TRUE, NULL);
-+		g_io_channel_unref(chan);
-+		session->browsing_io = NULL;
-+		error("%s", gerr->message);
-+		g_error_free(gerr);
-+		return;
-+	}
-+
-+	if (!session->browsing_io)
-+		session->browsing_io = g_io_channel_ref(chan);
-+
-+	session->browsing_mtu = imtu;
-+
-+	session->browsing_io_id = g_io_add_watch(chan,
-+				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-+				(GIOFunc) session_browsing_cb, session);
-+}
-+
- static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
+ static void char_discovered_cb(GSList *characteristics, guint8 status,
+ 							gpointer user_data)
  {
- 	struct avctp *session = data;
-@@ -651,6 +758,32 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
- 				(GIOFunc) session_cb, session);
- }
+-	DBusMessage *reply;
+ 	struct query_data *current = user_data;
+ 	struct gatt_service *gatt = current->gatt;
+ 	struct gatt_primary *prim = gatt->prim;
+@@ -905,10 +978,13 @@ static void char_discovered_cb(GSList *characteristics, guint8 status,
  
-+static void auth_browsing_cb(DBusError *derr, void *user_data)
-+{
-+	struct avctp *session = user_data;
-+	GError *err = NULL;
-+
-+	if (session->browsing_io_id) {
-+		g_source_remove(session->browsing_io_id);
-+		session->browsing_io_id = 0;
-+	}
-+
-+	if (derr && dbus_error_is_set(derr)) {
-+		error("Browsing Access denied: %s", derr->message);
-+		return;
-+	}
-+
-+	if (!bt_io_accept(session->browsing_io, avctp_connect_browsing_cb,
-+						session, NULL, &err)) {
-+		error("Browsing bt_io_accept: %s", err->message);
-+		if (session && session->browsing_io) {
-+			g_io_channel_unref(session->browsing_io);
-+			session->browsing_io = NULL;
-+		}
-+		g_error_free(err);
-+	}
-+}
-+
- static void auth_cb(DBusError *derr, void *user_data)
- {
- 	struct avctp *session = user_data;
-@@ -729,6 +862,65 @@ static struct avctp *avctp_get_internal(const bdaddr_t *src,
- 	return session;
- }
+ 	if (status != 0) {
+ 		const char *str = att_ecode2str(status);
++		DBusMessage *reply = btd_error_failed(gatt->query->msg, str);
  
-+static void avctp_control_confirm(struct avctp *session, GIOChannel *chan,
-+						struct audio_device *dev)
-+{
-+	if (session->control_io) {
-+		error("Refusing unexpected connect from");
-+		goto drop;
-+	}
+ 		DBG("Discover all characteristics failed: %s", str);
+-		reply = btd_error_failed(gatt->query->msg, str);
+-		goto fail;
++		dbus_message_unref(gatt->query->msg);
++		g_dbus_send_message(gatt->conn, reply);
 +
-+	avctp_set_state(session, AVCTP_STATE_CONNECTING);
-+	session->control_io = g_io_channel_ref(chan);
-+
-+	if (audio_device_request_authorization(dev, AVRCP_TARGET_UUID,
-+						auth_cb, session) < 0)
-+		goto drop;
-+
-+	session->control_io_id = g_io_add_watch(chan, G_IO_ERR | G_IO_HUP |
-+						G_IO_NVAL, session_cb, session);
-+	return;
-+
-+drop:
-+	if (!session || !session->control_io)
-+		g_io_channel_shutdown(chan, TRUE, NULL);
-+
-+	if (session && session->control_io)
-+		g_io_channel_unref(session->control_io);
-+
-+	if (session)
-+		avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
-+}
-+
-+static void avctp_browsing_confirm(struct avctp *session, GIOChannel *chan,
-+						struct audio_device *dev)
-+{
-+
-+	if (!session->control_io) {
-+		error("Browsing: Refusing unexpected connect from");
-+		goto drop;
-+	}
-+
-+	if (session->browsing_io) {
-+		error("Browsing channel already exists");
-+		goto drop;
-+	}
-+
-+	session->browsing_io = g_io_channel_ref(chan);
-+
-+	if (audio_device_request_authorization(dev, AVRCP_TARGET_UUID,
-+						auth_browsing_cb, session) < 0)
-+		goto drop;
-+	return;
-+
-+drop:
-+	if (!session || !session->control_io || !session->browsing_io)
-+		g_io_channel_shutdown(chan, TRUE, NULL);
-+
-+	if (session && session->browsing_io)
-+		g_io_channel_unref(session->browsing_io);
-+}
-+
- static void avctp_confirm_cb(GIOChannel *chan, gpointer data)
- {
- 	struct avctp *session;
-@@ -736,11 +928,13 @@ static void avctp_confirm_cb(GIOChannel *chan, gpointer data)
- 	char address[18];
- 	bdaddr_t src, dst;
- 	GError *err = NULL;
-+	uint16_t psm;
- 
- 	bt_io_get(chan, BT_IO_L2CAP, &err,
- 			BT_IO_OPT_SOURCE_BDADDR, &src,
- 			BT_IO_OPT_DEST_BDADDR, &dst,
- 			BT_IO_OPT_DEST, address,
-+			BT_IO_OPT_PSM, &psm,
- 			BT_IO_OPT_INVALID);
- 	if (err) {
- 		error("%s", err->message);
-@@ -771,40 +965,40 @@ static void avctp_confirm_cb(GIOChannel *chan, gpointer data)
- 			goto drop;
++		goto done;
  	}
  
--	if (session->control_io) {
--		error("Refusing unexpected connect from %s", address);
--		goto drop;
-+	switch (psm) {
-+	case AVCTP_CONTROL_PSM:
-+		avctp_control_confirm(session, chan, dev);
-+		break;
-+	case AVCTP_BROWSING_PSM:
-+		avctp_browsing_confirm(session, chan, dev);
-+		break;
- 	}
- 
--	avctp_set_state(session, AVCTP_STATE_CONNECTING);
--	session->control_io = g_io_channel_ref(chan);
+ 	for (l = characteristics; l; l = l->next) {
+@@ -943,16 +1019,9 @@ static void char_discovered_cb(GSList *characteristics, guint8 status,
+ 	gatt_get_address(gatt, &sba, &dba, &bdaddr_type);
+ 	store_characteristics(&sba, &dba, bdaddr_type, prim->range.start,
+ 								gatt->chars);
 -
--	if (audio_device_request_authorization(dev, AVRCP_TARGET_UUID,
--						auth_cb, session) < 0)
--		goto drop;
--
--	session->control_io_id = g_io_add_watch(chan, G_IO_ERR | G_IO_HUP |
--						G_IO_NVAL, session_cb, session);
- 	return;
+ 	g_slist_foreach(gatt->chars, update_all_chars, gatt);
  
- drop:
--	if (!session || !session->control_io)
--		g_io_channel_shutdown(chan, TRUE, NULL);
--	if (session)
-+	if (session && session->browsing_io)
-+		g_io_channel_unref(session->browsing_io);
-+
-+	if (session && session->control_io)
-+		g_io_channel_unref(session->control_io);
-+
-+	if (session && psm == AVCTP_CONTROL_PSM)
- 		avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
+-	reply = create_discover_char_reply(gatt->query->msg, gatt->chars);
+-
+-fail:
+-	dbus_message_unref(gatt->query->msg);
+-	gatt->query->msg = NULL;
+-
+-	g_dbus_send_message(gatt->conn, reply);
++done:
+ 	query_list_remove(gatt, current);
+ 	g_free(current);
  }
- 
--static GIOChannel *avctp_server_socket(const bdaddr_t *src, gboolean master)
-+static GIOChannel *avctp_server_socket(const bdaddr_t *src, gboolean master,
-+						uint8_t mode, uint16_t psm)
- {
- 	GError *err = NULL;
- 	GIOChannel *io;
--
- 	io = bt_io_listen(BT_IO_L2CAP, NULL, avctp_confirm_cb, NULL,
- 				NULL, &err,
- 				BT_IO_OPT_SOURCE_BDADDR, src,
--				BT_IO_OPT_PSM, AVCTP_CONTROL_PSM,
-+				BT_IO_OPT_PSM, psm,
- 				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
- 				BT_IO_OPT_MASTER, master,
-+				BT_IO_OPT_MODE, mode,
- 				BT_IO_OPT_INVALID);
- 	if (!io) {
- 		error("%s", err->message);
-@@ -824,12 +1018,25 @@ int avctp_register(const bdaddr_t *src, gboolean master)
- 
- 	server = g_new0(struct avctp_server, 1);
- 
--	server->control_io = avctp_server_socket(src, master);
-+	server->control_io = avctp_server_socket(src, master, L2CAP_MODE_BASIC,
-+							AVCTP_CONTROL_PSM);
- 	if (!server->control_io) {
- 		g_free(server);
- 		return -1;
- 	}
- 
-+	server->browsing_io = avctp_server_socket(src, master, L2CAP_MODE_ERTM,
-+							AVCTP_BROWSING_PSM);
-+	if (!server->browsing_io) {
-+		if (server->control_io) {
-+			g_io_channel_shutdown(server->control_io, TRUE, NULL);
-+			g_io_channel_unref(server->control_io);
-+			server->control_io = NULL;
-+		}
-+		g_free(server);
-+		return -1;
-+	}
-+
- 	bacpy(&server->src, src);
- 
- 	servers = g_slist_append(servers, server);
-@@ -861,6 +1068,9 @@ void avctp_unregister(const bdaddr_t *src)
- 		avctp_disconnected(server->sessions->data);
- 
- 	servers = g_slist_remove(servers, server);
-+	g_io_channel_shutdown(server->browsing_io, TRUE, NULL);
-+	g_io_channel_unref(server->browsing_io);
-+	server->browsing_io = NULL;
- 
- 	g_io_channel_shutdown(server->control_io, TRUE, NULL);
- 	g_io_channel_unref(server->control_io);
 -- 
-1.7.5.4
+1.7.9.5
 
-Regards,
-Vani
