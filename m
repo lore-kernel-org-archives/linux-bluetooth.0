@@ -2,141 +2,73 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ v4 05/15] core: Add a list of LE devices to connect
-Date: Thu, 30 Aug 2012 19:15:50 -0300
-Message-Id: <1346364960-7699-6-git-send-email-jprvita@openbossa.org>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v4 09/15] core: Replace interleaved by LE scanning
+Date: Thu, 30 Aug 2012 19:15:54 -0300
+Message-Id: <1346364960-7699-10-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1346364960-7699-1-git-send-email-jprvita@openbossa.org>
 References: <1346364960-7699-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This commit creates a per-adapter list of LE devices to connect when a
-advertising from them is seen during a scan.
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+
+This patches replaces the interleaved discovery by LE scanning when LE
+re-connection is required.
 ---
- src/adapter.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- src/adapter.h |  5 +++++
- 2 files changed, 63 insertions(+), 1 deletion(-)
+ src/adapter.c | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 3b3f0ad..5613056 100644
+index fdd9cf9..c30dd83 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -132,6 +132,7 @@ struct btd_adapter {
- 	GSList *devices;		/* Devices structure pointers */
- 	GSList *mode_sessions;		/* Request Mode sessions */
- 	GSList *disc_sessions;		/* Discovery sessions */
-+	GSList *connect_list;		/* Devices to connect when found */
- 	guint discov_id;		/* Discovery timer */
- 	gboolean discovering;		/* Discovery active */
- 	gboolean discov_suspended;	/* Discovery suspended */
-@@ -2181,6 +2182,36 @@ const char *btd_adapter_get_name(struct btd_adapter *adapter)
- 	return adapter->name;
+@@ -2243,7 +2243,7 @@ void btd_adapter_start(struct btd_adapter *adapter)
+ 	info("Adapter %s has been enabled", adapter->path);
+ 
+ 	if (g_slist_length(adapter->connect_list))
+-		mgmt_start_discovery(adapter->dev_id);
++		mgmt_start_scanning(adapter->dev_id);
  }
  
-+void adapter_connect_list_add(struct btd_adapter *adapter,
-+					struct btd_device *device)
-+{
-+	if (g_slist_find(adapter->connect_list, device)) {
-+		DBG("ignoring already added device %s",
-+						device_get_path(device));
+ static void reply_pending_requests(struct btd_adapter *adapter)
+@@ -2573,14 +2573,22 @@ void adapter_set_discovering(struct btd_adapter *adapter,
+ 
+ 	connect_list_size = g_slist_length(adapter->connect_list);
+ 
+-	if (!adapter_has_discov_sessions(adapter) && !connect_list_size)
++	if (adapter_has_discov_sessions(adapter)) {
++		adapter->discov_id = g_idle_add(discovery_cb, adapter);
++
++		DBG("hci%u restarting discovery: disc_sessions %u",
++				adapter->dev_id,
++				g_slist_length(adapter->disc_sessions));
+ 		return;
++	}
+ 
+-	DBG("hci%u restarting discovery: disc_sessions %u, connect_list size "
+-		"%u", adapter->dev_id, g_slist_length(adapter->disc_sessions),
+-							connect_list_size);
++	if (connect_list_size) {
++		mgmt_start_scanning(adapter->dev_id);
+ 
+-	adapter->discov_id = g_idle_add(discovery_cb, adapter);
++		DBG("hci%u restarting scanning connect_list size %u",
++				adapter->dev_id, connect_list_size);
 +		return;
 +	}
-+
-+	adapter->connect_list = g_slist_append(adapter->connect_list,
-+						btd_device_ref(device));
-+	DBG("%s added to %s's connect_list", device_get_path(device),
-+								adapter->name);
-+}
-+
-+void adapter_connect_list_remove(struct btd_adapter *adapter,
-+					struct btd_device *device)
-+{
-+	if (!g_slist_find(adapter->connect_list, device)) {
-+		DBG("device %s is not on the list, ignoring",
-+						device_get_path(device));
-+		return;
-+	}
-+
-+	adapter->connect_list = g_slist_remove(adapter->connect_list, device);
-+	DBG("%s removed from %s's connect_list", device_get_path(device),
-+								adapter->name);
-+	btd_device_unref(device);
-+}
-+
- void btd_adapter_start(struct btd_adapter *adapter)
- {
- 	char address[18];
-@@ -2843,6 +2874,21 @@ static char *read_stored_data(bdaddr_t *local, bdaddr_t *peer,
- 	return textfile_get(filename, key);
  }
  
-+static gboolean connect_pending_cb(gpointer user_data)
-+{
-+	struct btd_device *device = user_data;
-+	struct btd_adapter *adapter = device_get_adapter(device);
-+
-+	/* in the future we may want to check here if the controller supports
-+	 * scanning and connecting at the same time */
-+	if (adapter->discovering)
-+		return TRUE;
-+
-+	/* TODO: call device connect callback */
-+
-+	return FALSE;
-+}
-+
- void adapter_update_found_devices(struct btd_adapter *adapter,
- 					bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 					int8_t rssi, uint8_t confirm_name,
-@@ -2854,6 +2900,7 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 	gboolean legacy, name_known;
- 	uint32_t dev_class;
- 	int err;
-+	GSList *l;
+ static void suspend_discovery(struct btd_adapter *adapter)
+@@ -2895,7 +2903,7 @@ static gboolean clean_connecting_state(GIOChannel *io, GIOCondition cond, gpoint
  
- 	memset(&eir_data, 0, sizeof(eir_data));
- 	err = eir_parse(&eir_data, data, data_len);
-@@ -2876,7 +2923,7 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 								eir_data.name);
+ 	if (adapter->waiting_to_connect == 0 &&
+ 					g_slist_length(adapter->connect_list))
+-		mgmt_start_discovery(adapter->dev_id);
++		mgmt_start_scanning(adapter->dev_id);
  
- 	dev = adapter_search_found_devices(adapter, bdaddr);
--	if (dev) {
-+	if (dev && dev->bdaddr_type == BDADDR_BREDR) {
- 		adapter->oor_devices = g_slist_remove(adapter->oor_devices,
- 							dev);
+ 	btd_device_unref(device);
  
-@@ -2928,6 +2975,16 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 
- 	adapter->found_devices = g_slist_prepend(adapter->found_devices, dev);
- 
-+	if (bdaddr_type == BDADDR_LE_PUBLIC ||
-+					bdaddr_type == BDADDR_LE_RANDOM) {
-+		l = g_slist_find_custom(adapter->connect_list, bdaddr,
-+					(GCompareFunc) device_bdaddr_cmp);
-+		if (l) {
-+			g_idle_add(connect_pending_cb, l->data);
-+			stop_discovery(adapter);
-+		}
-+	}
-+
- done:
- 	dev->rssi = rssi;
- 
-diff --git a/src/adapter.h b/src/adapter.h
-index 5a0247e..cd37b15 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -232,3 +232,8 @@ int btd_adapter_gatt_server_start(struct btd_adapter *adapter);
- void btd_adapter_gatt_server_stop(struct btd_adapter *adapter);
- 
- int btd_adapter_ssp_enabled(struct btd_adapter *adapter);
-+
-+void adapter_connect_list_add(struct btd_adapter *adapter,
-+						struct btd_device *device);
-+void adapter_connect_list_remove(struct btd_adapter *adapter,
-+						struct btd_device *device);
 -- 
 1.7.11.4
 
