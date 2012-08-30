@@ -1,32 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Chen Ganir <chen.ganir@ti.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v2] gatt: Translate Characteristic names
+Date: Thu, 30 Aug 2012 14:43:57 +0200
+Message-ID: <1652968.T8pSJl1pGy@uw000953>
+In-Reply-To: <503F5EAC.4070909@ti.com>
+References: <1346237776-12781-1-git-send-email-chen.ganir@ti.com> <1472845.YqRC14yUFc@uw000953> <503F5EAC.4070909@ti.com>
 MIME-Version: 1.0
-In-Reply-To: <1346328542-13203-1-git-send-email-chen.ganir@ti.com>
-References: <1346328542-13203-1-git-send-email-chen.ganir@ti.com>
-Date: Thu, 30 Aug 2012 15:03:07 +0200
-Message-ID: <CAN_we7P2VhJR6XO4bYVZC8oqRiQ=hEFH=tfcTnU-R4YU+7tuTA@mail.gmail.com>
-Subject: Re: [PATCH] adapter: add API to find an existing device by D-Bus path
-From: Daniele Forsi <dforsi@gmail.com>
-To: chen.ganir@ti.com
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2012/8/30  <chen.ganir@ti...>:
+On Thursday 30 of August 2012 15:38:04 Chen Ganir wrote:
 
-> +       for (l = adapter->devices; l != NULL; l = g_slist_next(l))
-> +               if (g_strcmp0(device_get_path(l->data), path) == 0)
-> +                       break;
+> >>   static GSList *gatt_services = NULL;
+> >>
+> >> +static const struct characteristic_info *get_char_info(const char* uuid)
+> >
+> > I would leave this function returning name directly and not whole struct characteristic_info.
+> >
+> Why ? We have this struct with characteristic information (maybe later 
+> we'll add more information. Why limit ourselves to name only ?
 
-what about returning l->data here instead of breaking the loop, so you
-don't need the following NULL check?
-
-> +
-> +       if (!l)
-> +               return NULL;
-> +
-> +       return l->data;
-> +}
+If you plan to add more data into that structure then it is OK to return whole struct.
+But if only name is to be used, then I would just call that function get_name() and
+return name.
 
 -- 
-Daniele Forsi
+BR
+Szymon Janc
