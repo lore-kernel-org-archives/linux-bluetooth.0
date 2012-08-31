@@ -1,29 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 31 Aug 2012 10:54:58 -0700
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Szymon Janc <szymon.janc@tieto.com>
+Message-ID: <1346430004.23377.23.camel@aeonflux>
+Subject: Re: [PATCHv2] Bluetooth: Remove unneeded zero init
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Use GFP_KERNEL in read_index_list
-Message-ID: <20120831175458.GA5599@joana>
-References: <1346396746-3479-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1346396746-3479-1-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 31 Aug 2012 09:20:04 -0700
+In-Reply-To: <1346420369-11909-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1346339195.23377.8.camel@aeonflux>
+	 <1346420369-11909-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Andrei,
 
-* Szymon Janc <szymon.janc@tieto.com> [2012-08-31 09:05:46 +0200]:
-
-> read_index_list is executed by user thread running in kernel-mode
-> thus is allowed to sleep.
+> hdev is allocated with kzalloc so zero initialization is not needed.
 > 
-> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  net/bluetooth/mgmt.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  include/net/bluetooth/hci_core.h |    9 ---------
+>  net/bluetooth/hci_core.c         |    2 +-
+>  2 files changed, 1 insertion(+), 10 deletions(-)
 
-Patch has been applied to bluetooth-next. Thanks.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-	Gustavo
+Regards
+
+Marcel
+
+
