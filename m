@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 09/15] scotest: Fix compilation errors due to unaligned memory access
-Date: Fri, 31 Aug 2012 10:36:19 +0200
-Message-ID: <1346402185-9487-10-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC 10/15] avrcp: Fix compilation errors due to unaligned memory access
+Date: Fri, 31 Aug 2012 10:36:20 +0200
+Message-ID: <1346402185-9487-11-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1346402185-9487-1-git-send-email-szymon.janc@tieto.com>
 References: <1346402185-9487-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -14,37 +14,55 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 This fix following build errors on ARM.
 
-  CC     test/scotest.o
-test/scotest.c: In function send_mode:
-test/scotest.c:272:4: error: cast increases required alignment of
+  CC     audio/bluetoothd-avrcp.o
+audio/avrcp.c: In function avrcp_handle_get_element_attributes:
+audio/avrcp.c:667:25: error: cast increases required alignment of
 	target type [-Werror=cast-align]
-test/scotest.c:273:4: error: cast increases required alignment of
+audio/avrcp.c:690:20: error: cast increases required alignment of
 	target type [-Werror=cast-align]
 cc1: all warnings being treated as errors
-make[1]: *** [test/scotest.o] Error 1
+make[1]: *** [audio/bluetoothd-avrcp.o] Error 1
 make: *** [all] Error 2
 
-Change-Id: Ib0fb15e000f333bce4228e96762ee2c849c580d9
+Change-Id: I0c4b15063672b602170809ee1aecc6b9305c3a67
 ---
- test/scotest.c |    5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ audio/avrcp.c |   10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/test/scotest.c b/test/scotest.c
-index 17bd8a6..de65edf 100644
---- a/test/scotest.c
-+++ b/test/scotest.c
-@@ -269,8 +269,9 @@ static void send_mode(char *svr)
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index d925365..9c474f3 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -664,13 +664,13 @@ static uint8_t avrcp_handle_get_element_attributes(struct avrcp_player *player,
+ 						uint8_t transaction)
+ {
+ 	uint16_t len = ntohs(pdu->params_len);
+-	uint64_t *identifier = (uint64_t *) &pdu->params[0];
++	uint64_t identifier = bt_get_64(&pdu->params[0]);
+ 	uint16_t pos;
+ 	uint8_t nattr;
+ 	GList *attr_ids;
+ 	uint16_t offset;
  
- 	seq = 0;
- 	while (1) {
--		*(uint32_t *) buf = htobl(seq);
--		*(uint16_t *) (buf + 4) = htobs(data_size);
-+		bt_put_le32(seq, buf);
-+		bt_put_le16(data_size, buf + 4);
-+
- 		seq++;
+-	if (len < 9 || *identifier != 0)
++	if (len < 9 || identifier != 0)
+ 		goto err;
  
- 		if (send(sk, buf, so.mtu, 0) <= 0) {
+ 	nattr = pdu->params[8];
+@@ -687,10 +687,10 @@ static uint8_t avrcp_handle_get_element_attributes(struct avrcp_player *player,
+ 		len = g_list_length(attr_ids);
+ 	} else {
+ 		unsigned int i;
+-		uint32_t *attr = (uint32_t *) &pdu->params[9];
++		for (i = 0, len = 0, attr_ids = NULL; i < nattr; i++) {
++			uint32_t id;
+ 
+-		for (i = 0, len = 0, attr_ids = NULL; i < nattr; i++, attr++) {
+-			uint32_t id = ntohl(bt_get_unaligned(attr));
++			id = bt_get_be32(&pdu->params[9] + (i * sizeof(id)));
+ 
+ 			/* Don't add invalid attributes */
+ 			if (id == AVRCP_MEDIA_ATTRIBUTE_ILLEGAL ||
 -- 
 1.7.9.5
 
