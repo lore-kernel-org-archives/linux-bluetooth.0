@@ -1,38 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH] gatt: Fix whitespace in UUID definitions
+Date: Fri, 31 Aug 2012 16:36:32 +0200
+Message-ID: <1346423792-29996-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1346416811-23484-16-git-send-email-szymon.janc@tieto.com>
-References: <1346416811-23484-1-git-send-email-szymon.janc@tieto.com>
-	<1346416811-23484-16-git-send-email-szymon.janc@tieto.com>
-Date: Fri, 31 Aug 2012 11:19:59 -0400
-Message-ID: <CAJdJm_NHUsbuWvLwquROhq83+O0vQcv-w=g=CfpCje7rmSDdBA@mail.gmail.com>
-Subject: Re: [RFC v2 15/15] hciemu: Fix build errors due to unaligned memory access
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi  Szymon,
+---
+ attrib/gatt.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Fri, Aug 31, 2012 at 8:40 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> --- a/test/hciemu.c
-> +++ b/test/hciemu.c
-> @@ -426,8 +426,10 @@ static void num_completed_pkts(struct vhci_conn *conn)
->         np = (void *) ptr; ptr += EVT_NUM_COMP_PKTS_SIZE;
->         np->num_hndl = 1;
->
-> -       *((uint16_t *) ptr) = htobs(conn->handle); ptr += 2;
-> -       *((uint16_t *) ptr) = htobs(vdev.acl_cnt); ptr += 2;
-> +       bt_put_be16(conn->handle, ptr);
-> +       ptr += 2;
-> +       bt_put_be16(vdev.acl_cnt, ptr);
-> +       ptr += 2;
-
-These should be bt_put_le16().
-
-Regards,
+diff --git a/attrib/gatt.h b/attrib/gatt.h
+index a15e92f..6bb6f0f 100644
+--- a/attrib/gatt.h
++++ b/attrib/gatt.h
+@@ -46,8 +46,8 @@
+ #define GATT_CHARAC_FMT_UUID		0x2904
+ #define GATT_CHARAC_AGREG_FMT_UUID	0x2905
+ #define GATT_CHARAC_VALID_RANGE_UUID	0x2906
+-#define GATT_EXTERNAL_REPORT_REFERENCE  0x2907
+-#define GATT_REPORT_REFERENCE           0x2908
++#define GATT_EXTERNAL_REPORT_REFERENCE	0x2907
++#define GATT_REPORT_REFERENCE		0x2908
+ 
+ /* Client Characteristic Configuration bit field */
+ #define GATT_CLIENT_CHARAC_CFG_NOTIF_BIT	0x0001
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.11.3
+
