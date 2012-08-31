@@ -1,59 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1346429676.23377.22.camel@aeonflux>
-Subject: Re: [RFC 03/15] sdp: Use helper functions instead of
- bt_get_unaligned macro
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Fri, 31 Aug 2012 09:14:36 -0700
-In-Reply-To: <1346402185-9487-4-git-send-email-szymon.janc@tieto.com>
-References: <1346402185-9487-1-git-send-email-szymon.janc@tieto.com>
-	 <1346402185-9487-4-git-send-email-szymon.janc@tieto.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1346428924.23377.12.camel@aeonflux>
+References: <1346332740-29319-1-git-send-email-anderson.lizardo@openbossa.org>
+ <1346339333.23377.10.camel@aeonflux> <CAJdJm_NXvcfYeCT5gaYpDD0Oshk89ohUaj5BJ66CL29YwD7UgQ@mail.gmail.com>
+ <CAMOw1v7bbYbhL59-imjzppztpC+e9+enTWx4nnWeVAT0zjW4Ag@mail.gmail.com> <1346428924.23377.12.camel@aeonflux>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Fri, 31 Aug 2012 13:11:39 -0300
+Message-ID: <CAMOw1v6c5aYx-A2DzZng=01u+Jt+orpmvSjs_GNMkpE1EhTWyw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] build: Use AC_USE_SYSTEM_EXTENSIONS for POSIX/C extensions
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+On Fri, Aug 31, 2012 at 1:02 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Lucas,
+>
+>> > On Thu, Aug 30, 2012 at 11:08 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> >> Hi Anderson,
+>> >>
+>> >>> Using this macro in configure.ac enables certain extensions that BlueZ
+>> >>> currently depends on. The macro is recommended instead of defining
+>> >>> _GNU_SOURCE on each C file.
+>> >>
+>> >> what is the advantage of this. I am actually fine with using _GNU_SOURCE
+>> >> in the C files. It is according to the man pages.
+>> >
+>> > The only advantage I see is that we don't have to worry about
+>> > reviewing these defines as the symbols get incorporated in newer
+>> > standards. For instance, this patch was brought up because O_CLOEXEC
+>> > does not exist on POSIX.1-2001, but was incorporated POSIX.1-2008, so
+>> > for newer systems _GNU_SOURCE is not necessary for it anymore, but for
+>> > some (still maintained) distros it is.
+>> >
+>> > Sometimes we remove code that used these extensions, and simply forget
+>> > the _GNU_SOURCE there as well.
+>>
+>> And also forget to add it. Then 3 months later comes a patch to fix it
+>> by adding the definition.
+>>
+>> Using the autofoo macro we stop the build-fix patches for things like this.
+>>
+>>
+>> That is: it removes code, it's more future-proof and it has no
+>> downsides. So, what's the point of not using it?
+>
+> unless that autoconf thing breaks and we don't get what we want. Or we
+> are dealing with an outdated autoconf.
 
-> This fix number of compilation errors on ARM similar to one below.
-> 
-> lib/sdp.c: In function 'sdp_uuid_extract':
-> lib/sdp.c:1019:27: error: cast increases required alignment
-> 	of target type [-Werror=cast-align]
-> lib/sdp.c:1019:27: error: cast increases required alignment
-> 	of target type [-Werror=cast-align]
-> lib/sdp.c:1026:27: error: cast increases required alignment
-> 	of target type [-Werror=cast-align]
-> lib/sdp.c:1026:27: error: cast increases required alignment
-> 	of target type [-Werror=cast-align]
-> 
-> Change-Id: I587fb99328d7e5b9053af81597bd48b3a4e610ad
-> ---
->  lib/sdp.c |   56 ++++++++++++++++++++++++++++----------------------------
->  1 file changed, 28 insertions(+), 28 deletions(-)
-> 
-> diff --git a/lib/sdp.c b/lib/sdp.c
-> index 36b4d08..d40500f 100644
-> --- a/lib/sdp.c
-> +++ b/lib/sdp.c
-> @@ -376,27 +376,27 @@ sdp_data_t *sdp_data_alloc_with_length(uint8_t dtd, const void *value,
->  		d->unitSize += sizeof(int8_t);
->  		break;
->  	case SDP_UINT16:
-> -		d->val.uint16 = bt_get_unaligned((uint16_t *) value);
-> +		d->val.uint16 = bt_get_16(value);
->  		d->unitSize += sizeof(uint16_t);
->  		break;
-
-I do not like this. Either we use be16 here and store it in the native
-endian converted from the protocol endian or we leave it as it is.
-
-I want clear get_le16 and get_be16 and not another get_16. That just
-makes the code hard to read.
-
-Regards
-
-Marcel
+seriously? before 2.60? It's already a pre-requisite in our configure.ac
 
 
+>
+> I am against this. I rather get build fixes and have them recorded in
+> git compared to hoping that this magically fixes everything.
+>
+>> Some months ago I sent a patch to also remove a lot of dumb "#include
+>> config.h". It has the same reasoning behind it: remove code and be
+>> more future-proof. It was for connman, but if you are interested I can
+>> send it to bluez/ofono/etc too -
+>> http://permalink.gmane.org/gmane.linux.network.connman/7310
+>
+> Same thing. I believe that boilerplate is better being explicit than
+> magically having it done.
+
+If it helps to convince you: systemd, kmod, pulseaudio, libabc, and
+many others.... all of them use these macros.
+
+
+Lucas De Marchi
