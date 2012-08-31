@@ -1,56 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC v2 00/15] Unaligned memory access fixes
-Date: Fri, 31 Aug 2012 14:39:56 +0200
-Message-ID: <1346416811-23484-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <2567651.ypxvMR3dxG@uw000953>
+References: <1346402185-9487-1-git-send-email-szymon.janc@tieto.com>
+	<1346402185-9487-4-git-send-email-szymon.janc@tieto.com>
+	<CAJdJm_NpsHV77wKHd9RkCoVKoYt1RRaOQbLaXt_fCJ9tS3mcwQ@mail.gmail.com>
+	<2567651.ypxvMR3dxG@uw000953>
+Date: Fri, 31 Aug 2012 08:12:13 -0400
+Message-ID: <CAJdJm_N_qkhnPAZp459MJVSou2HR66r4OtBcz=cgM4xyUi+zPg@mail.gmail.com>
+Subject: Re: [RFC 03/15] sdp: Use helper functions instead of bt_get_unaligned macro
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-V2:
- - Removed Change-Ids from commits messages
- - drop extra parenthesis 
+Hi Szymon,
 
+On Fri, Aug 31, 2012 at 7:49 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+>> >         case SDP_INT16:
+>> > -               d->val.int16 = bt_get_unaligned((int16_t *) value);
+>> > +               d->val.int16 = bt_get_16(value);
+>> >                 d->unitSize += sizeof(int16_t);
+>> >                 break;
+>>
+>> Is this safe? You are assigning a unsigned type (return value from
+>> bt_get_16()) to a signed one. Same applies for SDP_INT32 and SDP_INT64
+>
+> Mixing signed and unsigned could introduce some problem when you interpret data (e.g. in
+> comparison), but here value will be simply assigned.
+>
+> I could add an explicit cast here (as this might bother some lint-like tools) if you prefer.
+
+I don't think it is necessary (I was just confirming if it was safe
+and intentional), so I'll leave to those who will apply your patches
+:)
+
+Regards,
 -- 
-BR
-Szymon Janc
-
-Szymon Janc (15):
-  lib: Add host order unaligned access functions
-  sap-u8500: Fix compile error due to unaligned memory access
-  sdp: Use helper functions instead of bt_get_unaligned macro
-  Add helper functions for putting integers on unaligned memory address
-  sdp: Fix compilation errors due to unaligned memory access
-  l2test: Fix compilation errors due to unaligned memory access
-  rctest: Fix compilation errors due to unaligned memory access
-  monitor: Fix compilation errors due to unaligned memory access
-  scotest: Fix compilation errors due to unaligned memory access
-  avrcp: Fix compilation errors due to unaligned memory access
-  sap: Fix compilation errors due to unaligned memory access
-  adaptername: Refactor handle_inotify_cb
-  sdpd-request: Fix build errors due to unaligned memory access
-  sdpd-service: Fix build errors due to unaligned memory access
-  hciemu: Fix build errors due to unaligned memory access
-
- audio/avrcp.c            |   10 ++---
- lib/bluetooth.h          |   76 +++++++++++++++++++++++++++++++++++++
- lib/sdp.c                |   94 ++++++++++++++++++++++++----------------------
- monitor/control.c        |    7 +++-
- monitor/hcidump.c        |   23 ++++++++----
- plugins/adaptername.c    |   44 ++++++++++++----------
- profiles/sap/sap-u8500.c |   10 +++--
- profiles/sap/server.c    |    9 ++---
- src/sdpd-request.c       |   62 ++++++++++++++++--------------
- src/sdpd-service.c       |   21 +++++------
- test/hciemu.c            |    6 ++-
- test/l2test.c            |    9 +++--
- test/rctest.c            |    5 ++-
- test/scotest.c           |    5 ++-
- 14 files changed, 243 insertions(+), 138 deletions(-)
-
--- 
-1.7.9.5
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
