@@ -1,115 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC v2 12/15] adaptername: Refactor handle_inotify_cb
-Date: Fri, 31 Aug 2012 16:25:51 +0200
-Message-ID: <1623298.VeVY2Kx13o@uw000953>
-In-Reply-To: <CAJdJm_NNYAHHVrr-uj97h7FEL0XatL5PuLnpOri6An4c-bz=mw@mail.gmail.com>
-References: <1346416811-23484-1-git-send-email-szymon.janc@tieto.com> <1346416811-23484-13-git-send-email-szymon.janc@tieto.com> <CAJdJm_NNYAHHVrr-uj97h7FEL0XatL5PuLnpOri6An4c-bz=mw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2] Bluetooth: Remove unneeded zero init
+Date: Fri, 31 Aug 2012 16:39:28 +0300
+Message-Id: <1346420369-11909-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1346339195.23377.8.camel@aeonflux>
+References: <1346339195.23377.8.camel@aeonflux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Friday 31 of August 2012 16:19:28 Anderson Lizardo wrote:
-> Hi Szymon,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Hi Anderson,
+hdev is allocated with kzalloc so zero initialization is not needed.
 
-> 
-> On Fri, Aug 31, 2012 at 8:40 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> > @@ -226,35 +226,41 @@ static int adaptername_probe(struct btd_adapter *adapter)
-> >  static gboolean handle_inotify_cb(GIOChannel *channel, GIOCondition cond,
-> >                                                                 gpointer data)
-> >  {
-> > -       char buf[EVENT_BUF_LEN];
-> 
-> Looks like EVENT_SIZE and EVENT_BUF_LEN defines are not used anymore
-> so they can be removed.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/hci_core.h |    9 ---------
+ net/bluetooth/hci_core.c         |    2 +-
+ 2 files changed, 1 insertion(+), 10 deletions(-)
 
-Yeap, will remove it.
-
-> 
-> > +               err = g_io_channel_read_chars(channel, name, event.len, &len,
-> > +                                                                       NULL);
-> 
-> No need to check for event.len <= FILENAME_MAX before the
-> *read_chars() call ? (I don't know inotify, so I'm not sure about the
-> allowed limits here)
-
-Well, data is a file name which can't be > FILENAME_MAX+1. We would have to receive
-some invalid data from kernel for that to happen... can we trust data from kernel?:)
-
-So I'm also not sure if we really needs to validate that data...
-This is what I've found in inotify-tools code about that situation:
-  // oh... no.  this can't be happening.  An incomplete event.
-  // Copy what we currently have into first element, call self to
-  // read remainder.
-  // oh, and they BETTER NOT overlap.
-  // Boy I hope this code works.
-  // But I think this can never happen due to how inotify is written.
-They try to recover from that but if events overlap it is fubared anyway..
-
-> 
-> Or maybe using sizeof(name) instead of event.len ?
-
-We can receive more events at once, so with that we could read name + part of next
-inotify_event.
-
-> 
-> > +               if (err != G_IO_STATUS_NORMAL) {
-> > +                       error("Error reading inotify event: %d", err);
-> > +                       return FALSE;
-> > +               }
-> 
-> Is it necessary to check whether event.len == len here ?
-
-As above, this should not happen... but I'll move error reporting code into label
-(to keep loop code short) and check for those anyway...
-
-> 
-> Otherwise a short read may not have the necessary "\0" for the
-> strcmp() (but see below).
-> 
-> >
-> > -               i += EVENT_SIZE + pevent->len;
-> > -       }
-> > +               if (strcmp(name, MACHINE_INFO_FILE) != 0)
-> > +                       continue;
-> 
-> What about using strncmp() just to be safe?
-
-Will fix that.
-
-> 
-> >
-> > -       if (changed != FALSE) {
-> >                 DBG(MACHINE_INFO_DIR MACHINE_INFO_FILE
-> >                                 " changed, changing names for adapters");
-> > +
-> >                 manager_foreach_adapter((adapter_cb) adaptername_probe, NULL);
-> > +               break;
-> 
-> what about having " if (strcmp(name, MACHINE_INFO_FILE) == 0) " and
-> moving the code above to inside the if() ? The "unconditional" break
-> at the end of the while() looks strange IMHO.
-
-Wanted to keep indentation low, but yes, this might look strange.
-
-> 
-> >         }
-> >
-> >         return TRUE;
-> 
-> Regards,
-> 
-
-I'll send V3 in a moment.
-Thanks for comments!
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 7542af4..4704ca4 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -428,15 +428,6 @@ static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
+ 	       test_bit(HCI_CONN_SSP_ENABLED, &conn->flags);
+ }
+ 
+-static inline void hci_conn_hash_init(struct hci_dev *hdev)
+-{
+-	struct hci_conn_hash *h = &hdev->conn_hash;
+-	INIT_LIST_HEAD(&h->list);
+-	h->acl_num = 0;
+-	h->sco_num = 0;
+-	h->le_num = 0;
+-}
+-
+ static inline void hci_conn_hash_add(struct hci_dev *hdev, struct hci_conn *c)
+ {
+ 	struct hci_conn_hash *h = &hdev->conn_hash;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 28bab9d..8dbbc01 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1652,6 +1652,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_LIST_HEAD(&hdev->link_keys);
+ 	INIT_LIST_HEAD(&hdev->long_term_keys);
+ 	INIT_LIST_HEAD(&hdev->remote_oob_data);
++	INIT_LIST_HEAD(&hdev->conn_hash.list);
+ 
+ 	INIT_WORK(&hdev->rx_work, hci_rx_work);
+ 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
+@@ -1674,7 +1675,6 @@ struct hci_dev *hci_alloc_dev(void)
+ 
+ 	hci_init_sysfs(hdev);
+ 	discovery_init(hdev);
+-	hci_conn_hash_init(hdev);
+ 
+ 	return hdev;
+ }
 -- 
-BR
-Szymon Janc
-
+1.7.9.5
 
