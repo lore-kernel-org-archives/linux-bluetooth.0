@@ -1,50 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50406678.5040002@linux.intel.com>
-Date: Fri, 31 Aug 2012 09:23:36 +0200
-From: Frederic Danis <frederic.danis@linux.intel.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] Bluetooth: Use GFP_KERNEL in read_index_list
+Date: Fri, 31 Aug 2012 09:05:46 +0200
+Message-ID: <1346396746-3479-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd] client: Add parameters to get message in map module
-References: <1346233190-6238-1-git-send-email-frederic.danis@linux.intel.com> <CABBYNZKgTHcPDGOj4Qi+6=XDqFK6g9c-zZ-tANKCjLQqhKKjQw@mail.gmail.com>
-In-Reply-To: <CABBYNZKgTHcPDGOj4Qi+6=XDqFK6g9c-zZ-tANKCjLQqhKKjQw@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Luiz,
+read_index_list is executed by user thread running in kernel-mode
+thus is allowed to sleep.
 
-On 30/08/2012 17:21, Luiz Augusto von Dentz wrote:
->> +       apparam = g_obex_apparam_set_uint8(NULL, MAP_AP_ATTACHMENT, 0);
->> +       apparam = g_obex_apparam_set_uint8(apparam, MAP_AP_CHARSET, 1);
->> +       len = g_obex_apparam_encode(apparam, buf, sizeof(buf));
->> +
->> +       obc_transfer_set_params(transfer, buf, len);
->> +
->> +       g_obex_apparam_free(apparam);
->> +
->>          if (!obc_session_queue(msg->data->session, transfer, NULL, NULL, &err))
->>                  goto fail;
->>
->> --
->> 1.7.9.5
->
-> I have a pending patchset to address this, basically adding filters
-> parameters so the application can enable what this parameters should
-> be. Btw, Im confused why are you setting attachment as type uint8, the
-> spec says it should assume "On" or "Off", which normally means it is
-> of string type.
->
+Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+---
+ net/bluetooth/mgmt.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I sent this as those parameters are needed to be able to retrieve 
-message on Samsung GT-I9300.
-Forgot it as you have more complete patchset.
-
-Attachment parameter is defined as a byte in chapter 6.3.1 of the MAP 
-spec (page 65, bitmask with 0="OFF" and 1="ON").
-
-
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index a3329cb..7b1a5c8 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -340,7 +340,7 @@ static int read_index_list(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	}
+ 
+ 	rp_len = sizeof(*rp) + (2 * count);
+-	rp = kmalloc(rp_len, GFP_ATOMIC);
++	rp = kmalloc(rp_len, GFP_KERNEL);
+ 	if (!rp) {
+ 		read_unlock(&hci_dev_list_lock);
+ 		return -ENOMEM;
 -- 
-Frederic Danis                            Open Source Technology Center
-frederic.danis@intel.com                              Intel Corporation
+1.7.9.5
 
