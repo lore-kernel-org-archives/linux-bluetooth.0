@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 01/15] lib: Add host order unaligned access functions
-Date: Fri, 31 Aug 2012 10:36:11 +0200
-Message-ID: <1346402185-9487-2-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC 02/15] sap-u8500: Fix compile error due to unaligned memory access
+Date: Fri, 31 Aug 2012 10:36:12 +0200
+Message-ID: <1346402185-9487-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1346402185-9487-1-git-send-email-szymon.janc@tieto.com>
 References: <1346402185-9487-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,37 +12,64 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Change-Id: I3c647249a88b8ca05ef215096e6b9a5609e8eab9
----
- lib/bluetooth.h |   15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+This fix following compilation error on ARM.
 
-diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-index 0fc4508..f0776aa 100644
---- a/lib/bluetooth.h
-+++ b/lib/bluetooth.h
-@@ -153,6 +153,21 @@ do {						\
- 	__p->__v = (val);			\
- } while(0)
+  CC     profiles/sap/sap-u8500.o
+profiles/sap/sap-u8500.c: In function recv_card_status:
+profiles/sap/sap-u8500.c:323:16: error: cast increases required
+	alignment of target type [-Werror=cast-align]
+profiles/sap/sap-u8500.c: In function recv_response:
+profiles/sap/sap-u8500.c:423:12: error: cast increases required
+	alignment of target type [-Werror=cast-align]
+cc1: all warnings being treated as errors
+
+Change-Id: Id771049b5c18ddd95a28aa50b48775f3ee3e9074
+---
+ profiles/sap/sap-u8500.c |   10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/profiles/sap/sap-u8500.c b/profiles/sap/sap-u8500.c
+index f07209d..6e95d7a 100644
+--- a/profiles/sap/sap-u8500.c
++++ b/profiles/sap/sap-u8500.c
+@@ -32,6 +32,8 @@
+ #include <sys/socket.h>
+ #include <sys/un.h>
  
-+static inline uint64_t bt_get_64(const void *ptr)
-+{
-+	return bt_get_unaligned((const uint64_t *) ptr);
-+}
++#include <bluetooth/bluetooth.h>
 +
-+static inline uint32_t bt_get_32(const void *ptr)
-+{
-+	return bt_get_unaligned((const uint32_t *) ptr);
-+}
-+
-+static inline uint16_t bt_get_16(const void *ptr)
-+{
-+	return bt_get_unaligned((const uint16_t *) ptr);
-+}
-+
- #if __BYTE_ORDER == __LITTLE_ENDIAN
- static inline uint64_t bt_get_le64(const void *ptr)
+ #include "log.h"
+ #include "sap.h"
+ 
+@@ -313,16 +315,16 @@ static void recv_status(uint32_t status)
+ 
+ static void recv_card_status(uint32_t status, uint8_t *param)
  {
+-	uint32_t *card_status;
++	uint32_t card_status;
+ 	uint8_t result;
+ 	uint8_t iccrs;
+ 
+ 	if (status != STE_STATUS_OK)
+ 		return;
+ 
+-	card_status = (uint32_t *)param;
++	card_status = bt_get_32(param);
+ 
+-	if (get_sap_reader_status(*card_status, &iccrs) < 0)
++	if (get_sap_reader_status(card_status, &iccrs) < 0)
+ 		result = SAP_RESULT_ERROR_NO_REASON;
+ 	else
+ 		result = get_sap_result(STE_GET_STATUS_MSG, status);
+@@ -420,7 +422,7 @@ static void recv_response(struct ste_message *msg)
+ 	}
+ 
+ 	param = msg->payload;
+-	status = *(uint32_t *)param;
++	status = bt_get_32(param);
+ 	param += sizeof(status);
+ 
+ 	SAP_VDBG("status 0x%x", status);
 -- 
 1.7.9.5
 
