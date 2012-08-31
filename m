@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC v2 15/15] hciemu: Fix build errors due to unaligned memory access
-Date: Fri, 31 Aug 2012 14:40:11 +0200
-Message-ID: <1346416811-23484-16-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC v2 11/15] sap: Fix compilation errors due to unaligned memory access
+Date: Fri, 31 Aug 2012 14:40:07 +0200
+Message-ID: <1346416811-23484-12-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1346416811-23484-1-git-send-email-szymon.janc@tieto.com>
 References: <1346416811-23484-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -14,37 +14,62 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 This fix following build errors on ARM.
 
-  CC     test/hciemu.o
-test/hciemu.c: In function num_completed_pkts:
-test/hciemu.c:429:4: error: cast increases required alignment of target
-	 type [-Werror=cast-align]
-test/hciemu.c:430:4: error: cast increases required alignment of target
-	type [-Werror=cast-align]
+  CC     profiles/sap/bluetoothd-server.o
+profiles/sap/server.c: In function connect_req:
+profiles/sap/server.c:317:8: error: cast increases required alignment
+	of targettype [-Werror=cast-align]
+profiles/sap/server.c: In function sap_connect_rsp:
+profiles/sap/server.c:676:16: error: cast increases required alignment
+	of target type [-Werror=cast-align]
 cc1: all warnings being treated as errors
-make[1]: *** [test/hciemu.o] Error 1
+make[1]: *** [profiles/sap/bluetoothd-server.o] Error 1
 make: *** [all] Error 2
 
 ---
- test/hciemu.c |    6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ profiles/sap/server.c |    9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/test/hciemu.c b/test/hciemu.c
-index 4c62223..8e31dbb 100644
---- a/test/hciemu.c
-+++ b/test/hciemu.c
-@@ -426,8 +426,10 @@ static void num_completed_pkts(struct vhci_conn *conn)
- 	np = (void *) ptr; ptr += EVT_NUM_COMP_PKTS_SIZE;
- 	np->num_hndl = 1;
+diff --git a/profiles/sap/server.c b/profiles/sap/server.c
+index 3adbb1a..78a63bf 100644
+--- a/profiles/sap/server.c
++++ b/profiles/sap/server.c
+@@ -302,7 +302,7 @@ static void connect_req(struct sap_server *server,
+ 				struct sap_parameter *param)
+ {
+ 	struct sap_connection *conn = server->conn;
+-	uint16_t maxmsgsize, *val;
++	uint16_t maxmsgsize;
  
--	*((uint16_t *) ptr) = htobs(conn->handle); ptr += 2;
--	*((uint16_t *) ptr) = htobs(vdev.acl_cnt); ptr += 2;
-+	bt_put_be16(conn->handle, ptr);
-+	ptr += 2;
-+	bt_put_be16(vdev.acl_cnt, ptr);
-+	ptr += 2;
+ 	DBG("conn %p state %d", conn, conn->state);
  
- 	write_snoop(vdev.dd, HCI_EVENT_PKT, 1, buf, ptr - buf);
+@@ -314,8 +314,7 @@ static void connect_req(struct sap_server *server,
  
+ 	stop_guard_timer(server);
+ 
+-	val = (uint16_t *) &param->val;
+-	maxmsgsize = ntohs(*val);
++	maxmsgsize = bt_get_be16(&param->val);
+ 
+ 	DBG("Connect MaxMsgSize: 0x%04x", maxmsgsize);
+ 
+@@ -638,7 +637,6 @@ int sap_connect_rsp(void *sap_device, uint8_t status)
+ 	struct sap_message *msg = (struct sap_message *) buf;
+ 	struct sap_parameter *param = (struct sap_parameter *) msg->param;
+ 	size_t size = sizeof(struct sap_message);
+-	uint16_t *maxmsgsize;
+ 
+ 	if (!conn)
+ 		return -EINVAL;
+@@ -673,8 +671,7 @@ int sap_connect_rsp(void *sap_device, uint8_t status)
+ 		param = (struct sap_parameter *) &buf[size];
+ 		param->id = SAP_PARAM_ID_MAX_MSG_SIZE;
+ 		param->len = htons(SAP_PARAM_ID_MAX_MSG_SIZE_LEN);
+-		maxmsgsize = (uint16_t *) &param->val;
+-		*maxmsgsize = htons(SAP_BUF_SIZE);
++		bt_put_be16(SAP_BUF_SIZE, &param->val);
+ 		size += PARAMETER_SIZE(SAP_PARAM_ID_MAX_MSG_SIZE_LEN);
+ 
+ 		/* fall */
 -- 
 1.7.9.5
 
