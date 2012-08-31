@@ -1,37 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Jesse Sung" <jesse.sung@canonical.com>
+Message-ID: <1346378760.7976.2.camel@obelisk.thedillows.org>
+Subject: [PATCH] Add support for Logitech Harmony Adapter for PS3
+From: David Dillow <dave@thedillows.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/2] broadcom patchram firmware loader
-Date: Fri, 31 Aug 2012 13:21:48 +0800
-Message-Id: <1346390510-18538-1-git-send-email-jesse.sung@canonical.com>
+Date: Thu, 30 Aug 2012 22:06:00 -0400
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Wen-chien Jesse Sung <jesse.sung@canonical.com>
+This emulates a Sony BD Remote for the Logitech Harmony series of
+universal remotes.
+--
+ profiles/input/fakehid.c |   10 ++++++++++
+ 1 files changed, 10 insertions(+), 0 deletions(-)
 
-There is an user space firmware loading tool which can be found at
-http://marc.info/?l=linux-bluetooth&m=132039175324993&w=2
+diff --git a/profiles/input/fakehid.c b/profiles/input/fakehid.c
+index 3be1489..dd47287 100644
+--- a/profiles/input/fakehid.c
++++ b/profiles/input/fakehid.c
+@@ -342,6 +342,16 @@ static struct fake_hid fake_hid_table[] = {
+ 		.setup_uinput	= ps3remote_setup_uinput,
+ 		.devices	= NULL,
+ 	},
++	/* Logitech Harmony Adapter for PS3 */
++	{
++		.vendor		= 0x046d,
++		.product	= 0x0306,
++		.connect	= fake_hid_common_connect,
++		.disconnect	= fake_hid_common_disconnect,
++		.event		= ps3remote_event,
++		.setup_uinput	= ps3remote_setup_uinput,
++		.devices	= NULL,
++	},
+ 
+ 	{ },
+ };
 
-This tool requires hci device to do the firmware loading, but this
-may cause some race condition between patchram tool and bluetoothd
-or something that also works on hci interface.
-
-Also it needs some hooks to make firmware loads after bootup, s3,
-s4, rfkill, and device hotplug events. Implement this loader in kernel
-module would make things more easier.
-
-These patches are sent to the mailing list for comment on Aug-15:
-http://marc.info/?t=134495475100008&r=1&w=2
-No further comment since then. I've rebased these patches against
-current bluetooth git tree and would like to propose them for merging.
-
-Wen-chien Jesse Sung (2):
-  Implement broadcom patchram firmware loader
-  Cache firmware images for later use
-
- drivers/bluetooth/btusb.c |  148 +++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 143 insertions(+), 5 deletions(-)
-
--- 
-1.7.9.5
 
