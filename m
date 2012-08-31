@@ -1,32 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH] thermometer: Fix indentation
-Date: Fri, 31 Aug 2012 10:51:24 +0200
-Message-ID: <1346403084-9587-1-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [RFC 12/15] adaptername: Refactor handle_inotify_cb
+Date: Fri, 31 Aug 2012 10:36:22 +0200
+Message-ID: <1346402185-9487-13-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1346402185-9487-1-git-send-email-szymon.janc@tieto.com>
+References: <1346402185-9487-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- profiles/thermometer/manager.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Refactor handle_inotify_cb to avoid unaligned memory access.
+Instead of reading whole events buffer and cast to event struct when
+iterating over it, read data directly to struct inotify_event one
+event at time.
 
-diff --git a/profiles/thermometer/manager.c b/profiles/thermometer/manager.c
-index 3d5452b..21cb5fe 100644
---- a/profiles/thermometer/manager.c
-+++ b/profiles/thermometer/manager.c
-@@ -77,7 +77,7 @@ int thermometer_manager_init(DBusConnection *conn)
+This fix following build error on ARM.
+
+  CC     plugins/bluetoothd-adaptername.o
+plugins/adaptername.c: In function handle_inotify_cb:
+plugins/adaptername.c:244:34: error: cast increases required alignment
+	of target type [-Werror=cast-align]
+cc1: all warnings being treated as errors
+make[1]: *** [plugins/bluetoothd-adaptername.o] Error 1
+make: *** [all] Error 2
+
+Change-Id: Ibcf2daa06fcb79853c71c00502b5ebe13773e6ff
+---
+ plugins/adaptername.c |   44 +++++++++++++++++++++++++-------------------
+ 1 file changed, 25 insertions(+), 19 deletions(-)
+
+diff --git a/plugins/adaptername.c b/plugins/adaptername.c
+index d3341b5..f5010ea 100644
+--- a/plugins/adaptername.c
++++ b/plugins/adaptername.c
+@@ -226,35 +226,41 @@ static int adaptername_probe(struct btd_adapter *adapter)
+ static gboolean handle_inotify_cb(GIOChannel *channel, GIOCondition cond,
+ 								gpointer data)
+ {
+-	char buf[EVENT_BUF_LEN];
++	struct inotify_event event;
++	gsize len;
+ 	GIOStatus err;
+-	gsize len, i;
+-	gboolean changed;
++	char name[FILENAME_MAX + 1];
  
- 	ret = btd_register_device_driver(&thermometer_device_driver);
- 	if (ret < 0)
--                return ret;
-+		return ret;
+-	changed = FALSE;
++	while ((err = g_io_channel_read_chars(channel, (gchar *)&event,
++			sizeof(event), &len, NULL)) != G_IO_STATUS_AGAIN) {
++		if (err != G_IO_STATUS_NORMAL) {
++			error("Error reading inotify event: %d", err);
++			return FALSE;
++		}
  
- 	connection = dbus_connection_ref(conn);
- 	return 0;
+-	err = g_io_channel_read_chars(channel, buf, EVENT_BUF_LEN, &len, NULL);
+-	if (err != G_IO_STATUS_NORMAL) {
+-		error("Error reading inotify event: %d\n", err);
+-		return FALSE;
+-	}
++		if (len != sizeof(event)) {
++			error("Not enough bytes of inotify event read");
++			return FALSE;
++		}
+ 
+-	i = 0;
+-	while (i < len) {
+-		struct inotify_event *pevent = (struct inotify_event *) &buf[i];
++		if (event.len == 0)
++			continue;
+ 
+-		/* check that it's ours */
+-		if (pevent->len && pevent->name != NULL &&
+-				strcmp(pevent->name, MACHINE_INFO_FILE) == 0)
+-			changed = TRUE;
++		err = g_io_channel_read_chars(channel, name, event.len, &len,
++									NULL);
++		if (err != G_IO_STATUS_NORMAL) {
++			error("Error reading inotify event: %d", err);
++			return FALSE;
++		}
+ 
+-		i += EVENT_SIZE + pevent->len;
+-	}
++		if (strcmp(name, MACHINE_INFO_FILE) != 0)
++			continue;
+ 
+-	if (changed != FALSE) {
+ 		DBG(MACHINE_INFO_DIR MACHINE_INFO_FILE
+ 				" changed, changing names for adapters");
++
+ 		manager_foreach_adapter((adapter_cb) adaptername_probe, NULL);
++		break;
+ 	}
+ 
+ 	return TRUE;
 -- 
-1.7.11.3
+1.7.9.5
 
