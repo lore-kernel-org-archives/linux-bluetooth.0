@@ -1,73 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 00/15] Unaligned memory access fixes
-Date: Fri, 31 Aug 2012 10:36:10 +0200
-Message-ID: <1346402185-9487-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH hcidump] amp: Decode Num Completed Data Blocks
+Date: Fri, 31 Aug 2012 10:37:20 +0300
+Message-Id: <1346398640-8423-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-A list of patches that address unaligned memory access issues all over
-the code base.
+Adds decoding Number Of Completed Data Blocks Event
 
-It looks like recent versions of GCC are more picky about that. These
-patches allow to build BlueZ in boostrap-configure configuration
-(excluding gstreamer code) with GCC 4.7.1 for ARM.
+> HCI Event: Number Of Completed Data Blocks (0x48) plen 9
+    Total num blocks 4 Num handles 1
+      Handle 0x0001: Num complt pkts 1 Num complt blks 1
+---
+ lib/hci.h    |   10 ++++++++++
+ parser/hci.c |   22 ++++++++++++++++++++++
+ 2 files changed, 32 insertions(+)
 
-In few places I had to do a small refactor instead of just use bt_put/get
-functions. So please have a look at those.
-
-There could be also bt_put_* functions added for putting u16/32/64 in
-unaligned memory in host order. That could allow to eliminate some of
-	memcpy(ptr, &some_u32, sizeof(some_u32);
-with more convenient
-	bt_put_32(some_u32, ptr);
-
-
-Comments are welcome.
-
--- 
-BR
-Szymon Janc
-
-Szymon Janc (15):
-  lib: Add host order unaligned access functions
-  sap-u8500: Fix compile error due to unaligned memory access
-  sdp: Use helper functions instead of bt_get_unaligned macro
-  Add helper functions for putting integers on unaligned memory address
-  sdp: Fix compilation errors due to unaligned memory access
-  l2test: Fix compilation errors due to unaligned memory access
-  rctest: Fix compilation errors due to unaligned memory access
-  monitor: Fix compilation errors due to unaligned memory access
-  scotest: Fix compilation errors due to unaligned memory access
-  avrcp: Fix compilation errors due to unaligned memory access
-  sap: Fix compilation errors due to unaligned memory access
-  adaptername: Refactor handle_inotify_cb
-  sdpd-request: Fix build errors due to unaligned memory access
-  sdpd-service: Fix build errors due to unaligned memory access
-  hciemu: Fix build errors due to unaligned memory access
-
- audio/avrcp.c            |   10 ++---
- lib/bluetooth.h          |   76 +++++++++++++++++++++++++++++++++++++
- lib/sdp.c                |   94 ++++++++++++++++++++++++----------------------
- monitor/control.c        |    7 +++-
- monitor/hcidump.c        |   23 ++++++++----
- plugins/adaptername.c    |   44 ++++++++++++----------
- profiles/sap/sap-u8500.c |   10 +++--
- profiles/sap/server.c    |    9 ++---
- src/sdpd-request.c       |   62 ++++++++++++++++--------------
- src/sdpd-service.c       |   21 +++++------
- test/hciemu.c            |    6 ++-
- test/l2test.c            |    9 +++--
- test/rctest.c            |    5 ++-
- test/scotest.c           |    5 ++-
- 14 files changed, 243 insertions(+), 138 deletions(-)
-
+diff --git a/lib/hci.h b/lib/hci.h
+index d068a2f..7eacca5 100644
+--- a/lib/hci.h
++++ b/lib/hci.h
+@@ -2197,6 +2197,16 @@ typedef struct {
+ #define EVT_FLOW_SPEC_MODIFY_COMPLETE_SIZE 3
+ 
+ #define EVT_NUMBER_COMPLETED_BLOCKS		0x48
++typedef struct {
++	uint16_t		handle;
++	uint16_t		num_cmplt_pkts;
++	uint16_t		num_cmplt_blks;
++} __attribute__ ((packed)) cmplt_handle;
++typedef struct {
++	uint16_t		total_num_blocks;
++	uint8_t			num_handles;
++	cmplt_handle		handles[0];
++}  __attribute__ ((packed)) evt_num_completed_blocks;
+ 
+ #define EVT_AMP_STATUS_CHANGE			0x4D
+ typedef struct {
+diff --git a/parser/hci.c b/parser/hci.c
+index 38794bd..19cd419 100644
+--- a/parser/hci.c
++++ b/parser/hci.c
+@@ -3743,6 +3743,25 @@ static inline void flow_spec_modify_dump(int level, struct frame *frm)
+ 	}
+ }
+ 
++static inline void num_completed_blocks_dump(int level, struct frame *frm)
++{
++	evt_num_completed_blocks *evt = frm->ptr;
++	int i;
++
++	p_indent(level, frm);
++	printf("Total num blocks %d Num handles %d\n",
++			btohs(evt->total_num_blocks), evt->num_handles);
++
++	for (i = 0; i < evt->num_handles; i++) {
++		cmplt_handle *h = &evt->handles[i];
++
++		p_indent(level + 1, frm);
++		printf("Handle 0x%4.4x: Num complt pkts %d Num complt blks %d\n",
++				btohs(h->handle), btohs(h->num_cmplt_pkts),
++				btohs(h->num_cmplt_blks));
++	}
++}
++
+ static inline void event_dump(int level, struct frame *frm)
+ {
+ 	hci_event_hdr *hdr = frm->ptr;
+@@ -3969,6 +3988,9 @@ static inline void event_dump(int level, struct frame *frm)
+ 	case EVT_FLOW_SPEC_MODIFY_COMPLETE:
+ 		flow_spec_modify_dump(level + 1, frm);
+ 		break;
++	case EVT_NUMBER_COMPLETED_BLOCKS:
++		num_completed_blocks_dump(level + 1, frm);
++		break;
+ 	default:
+ 		raw_dump(level, frm);
+ 		break;
 -- 
 1.7.9.5
 
