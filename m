@@ -2,46 +2,55 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC v2 01/15] lib: Add host order unaligned access functions
-Date: Fri, 31 Aug 2012 14:39:57 +0200
-Message-ID: <1346416811-23484-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1346416811-23484-1-git-send-email-szymon.janc@tieto.com>
-References: <1346416811-23484-1-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC v2 00/15] Unaligned memory access fixes
+Date: Fri, 31 Aug 2012 14:39:56 +0200
+Message-ID: <1346416811-23484-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- lib/bluetooth.h |   15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+V2:
+ - Removed Change-Ids from commits messages
+ - drop extra parenthesis 
 
-diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-index 0fc4508..f0776aa 100644
---- a/lib/bluetooth.h
-+++ b/lib/bluetooth.h
-@@ -153,6 +153,21 @@ do {						\
- 	__p->__v = (val);			\
- } while(0)
- 
-+static inline uint64_t bt_get_64(const void *ptr)
-+{
-+	return bt_get_unaligned((const uint64_t *) ptr);
-+}
-+
-+static inline uint32_t bt_get_32(const void *ptr)
-+{
-+	return bt_get_unaligned((const uint32_t *) ptr);
-+}
-+
-+static inline uint16_t bt_get_16(const void *ptr)
-+{
-+	return bt_get_unaligned((const uint16_t *) ptr);
-+}
-+
- #if __BYTE_ORDER == __LITTLE_ENDIAN
- static inline uint64_t bt_get_le64(const void *ptr)
- {
+-- 
+BR
+Szymon Janc
+
+Szymon Janc (15):
+  lib: Add host order unaligned access functions
+  sap-u8500: Fix compile error due to unaligned memory access
+  sdp: Use helper functions instead of bt_get_unaligned macro
+  Add helper functions for putting integers on unaligned memory address
+  sdp: Fix compilation errors due to unaligned memory access
+  l2test: Fix compilation errors due to unaligned memory access
+  rctest: Fix compilation errors due to unaligned memory access
+  monitor: Fix compilation errors due to unaligned memory access
+  scotest: Fix compilation errors due to unaligned memory access
+  avrcp: Fix compilation errors due to unaligned memory access
+  sap: Fix compilation errors due to unaligned memory access
+  adaptername: Refactor handle_inotify_cb
+  sdpd-request: Fix build errors due to unaligned memory access
+  sdpd-service: Fix build errors due to unaligned memory access
+  hciemu: Fix build errors due to unaligned memory access
+
+ audio/avrcp.c            |   10 ++---
+ lib/bluetooth.h          |   76 +++++++++++++++++++++++++++++++++++++
+ lib/sdp.c                |   94 ++++++++++++++++++++++++----------------------
+ monitor/control.c        |    7 +++-
+ monitor/hcidump.c        |   23 ++++++++----
+ plugins/adaptername.c    |   44 ++++++++++++----------
+ profiles/sap/sap-u8500.c |   10 +++--
+ profiles/sap/server.c    |    9 ++---
+ src/sdpd-request.c       |   62 ++++++++++++++++--------------
+ src/sdpd-service.c       |   21 +++++------
+ test/hciemu.c            |    6 ++-
+ test/l2test.c            |    9 +++--
+ test/rctest.c            |    5 ++-
+ test/scotest.c           |    5 ++-
+ 14 files changed, 243 insertions(+), 138 deletions(-)
+
 -- 
 1.7.9.5
 
