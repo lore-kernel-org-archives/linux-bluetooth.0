@@ -1,75 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 0/7] RFC: proximity cleanup
+Date: Fri, 31 Aug 2012 14:48:26 +0200
+Message-ID: <1346417314-25109-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1346416811-23484-13-git-send-email-szymon.janc@tieto.com>
-References: <1346416811-23484-1-git-send-email-szymon.janc@tieto.com>
-	<1346416811-23484-13-git-send-email-szymon.janc@tieto.com>
-Date: Fri, 31 Aug 2012 09:19:28 -0400
-Message-ID: <CAJdJm_NNYAHHVrr-uj97h7FEL0XatL5PuLnpOri6An4c-bz=mw@mail.gmail.com>
-Subject: Re: [RFC v2 12/15] adaptername: Refactor handle_inotify_cb
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi,
 
-On Fri, Aug 31, 2012 at 8:40 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> @@ -226,35 +226,41 @@ static int adaptername_probe(struct btd_adapter *adapter)
->  static gboolean handle_inotify_cb(GIOChannel *channel, GIOCondition cond,
->                                                                 gpointer data)
->  {
-> -       char buf[EVENT_BUF_LEN];
+Here are few patches to cleanup proximity profile code a bit which seem to
+keep track of some data which are redundant and has minor issue with device
+driver registration.
 
-Looks like EVENT_SIZE and EVENT_BUF_LEN defines are not used anymore
-so they can be removed.
+Most cleanup is done in patch #3 which removes tracking of DBusConnection
+across whole plugin and simply uses get_dbus_connection() wherever necessary.
+This is different than other profile plugins do, but reduces code size and
+memory footprint a bit so can be done for other plugins as well if accepted.
 
-> +               err = g_io_channel_read_chars(channel, name, event.len, &len,
-> +                                                                       NULL);
 
-No need to check for event.len <= FILENAME_MAX before the
-*read_chars() call ? (I don't know inotify, so I'm not sure about the
-allowed limits here)
+Andrzej Kaczmarek (7):
+  proximity: Change adapter driver function names
+  proximity: Remove unused definitions
+  proximity: Simplify DBusConnection object usage
+  proximity: Move reporter device driver registration to manager
+  proximity: Remove unnecessary check for GATT enabled
+  proximity: Remove list of adapter devices
+  proximity: Remove reporter_adapter
 
-Or maybe using sizeof(name) instead of event.len ?
+ profiles/proximity/immalert.c |   9 +---
+ profiles/proximity/immalert.h |   2 +-
+ profiles/proximity/linkloss.c |  10 +---
+ profiles/proximity/linkloss.h |   2 +-
+ profiles/proximity/main.c     |  10 +---
+ profiles/proximity/manager.c  |  38 +++++++++-----
+ profiles/proximity/manager.h  |   2 +-
+ profiles/proximity/monitor.c  |  20 ++++----
+ profiles/proximity/monitor.h  |   8 +--
+ profiles/proximity/reporter.c | 115 +++++-------------------------------------
+ profiles/proximity/reporter.h |   7 ++-
+ 11 files changed, 62 insertions(+), 161 deletions(-)
 
-> +               if (err != G_IO_STATUS_NORMAL) {
-> +                       error("Error reading inotify event: %d", err);
-> +                       return FALSE;
-> +               }
-
-Is it necessary to check whether event.len == len here ?
-
-Otherwise a short read may not have the necessary "\0" for the
-strcmp() (but see below).
-
->
-> -               i += EVENT_SIZE + pevent->len;
-> -       }
-> +               if (strcmp(name, MACHINE_INFO_FILE) != 0)
-> +                       continue;
-
-What about using strncmp() just to be safe?
-
->
-> -       if (changed != FALSE) {
->                 DBG(MACHINE_INFO_DIR MACHINE_INFO_FILE
->                                 " changed, changing names for adapters");
-> +
->                 manager_foreach_adapter((adapter_cb) adaptername_probe, NULL);
-> +               break;
-
-what about having " if (strcmp(name, MACHINE_INFO_FILE) == 0) " and
-moving the code above to inside the if() ? The "unconditional" break
-at the end of the while() looks strange IMHO.
-
->         }
->
->         return TRUE;
-
-Regards,
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.11.3
+
