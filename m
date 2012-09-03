@@ -1,128 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: <chen.ganir@ti.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <chen.ganir@ti.com>
-Subject: [PATCH v4] gatt: Translate Characteristic names
-Date: Mon, 3 Sep 2012 14:29:29 +0300
-Message-ID: <1346671769-10072-1-git-send-email-chen.ganir@ti.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC 03/15] sdp: Use helper functions instead of bt_get_unaligned macro
+Date: Mon, 3 Sep 2012 12:28:35 +0200
+Message-ID: <3352974.n8XuCXzX7n@uw000953>
+In-Reply-To: <20120903095739.GA22824@x220>
+References: <1346402185-9487-1-git-send-email-szymon.janc@tieto.com> <67335853.UVApWbuK0q@uw000953> <20120903095739.GA22824@x220>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chen Ganir <chen.ganir@ti.com>
+On Monday 03 of September 2012 12:57:39 Johan Hedberg wrote:
+> Hi Szymon,
 
-Translate Characteristic UUID's to name. This list was taken from
-the Bluetooth SIG developer site.
----
- attrib/client.c |   78 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 75 insertions(+), 3 deletions(-)
+Hi Johan,
 
-diff --git a/attrib/client.c b/attrib/client.c
-index bb6adf8..6abbb45 100644
---- a/attrib/client.c
-+++ b/attrib/client.c
-@@ -105,8 +105,79 @@ struct watcher {
- 	struct gatt_service *gatt;
- };
- 
-+struct characteristic_info {
-+	const char *uuid;
-+	const char *name;
-+};
-+
-+static const struct characteristic_info charInfo[] = {
-+	{ "00002a43-0000-1000-8000-00805f9b34fb", "Alert Category ID" },
-+	{ "00002a42-0000-1000-8000-00805f9b34fb", "Alert Category ID Bit Mask" },
-+	{ "00002a06-0000-1000-8000-00805f9b34fb", "Alert Level" },
-+	{ "00002a44-0000-1000-8000-00805f9b34fb", "Alert Notification Control Point" },
-+	{ "00002a3f-0000-1000-8000-00805f9b34fb", "Alert Status" },
-+	{ "00002a01-0000-1000-8000-00805f9b34fb", "Appearance" },
-+	{ "00002a49-0000-1000-8000-00805f9b34fb", "Blood Pressure Feature" },
-+	{ "00002a35-0000-1000-8000-00805f9b34fb", "Blood Pressure Measurement" },
-+	{ "00002a38-0000-1000-8000-00805f9b34fb", "Body Sensor Location" },
-+	{ "00002a2b-0000-1000-8000-00805f9b34fb", "Current Time" },
-+	{ "00002a08-0000-1000-8000-00805f9b34fb", "Date Time" },
-+	{ "00002a0a-0000-1000-8000-00805f9b34fb", "Day Date Time" },
-+	{ "00002a09-0000-1000-8000-00805f9b34fb", "Day of Week" },
-+	{ "00002a00-0000-1000-8000-00805f9b34fb", "Device Name" },
-+	{ "00002a0d-0000-1000-8000-00805f9b34fb", "DST Offset" },
-+	{ "00002a0c-0000-1000-8000-00805f9b34fb", "Exact Time 256" },
-+	{ "00002a26-0000-1000-8000-00805f9b34fb", "Firmware Revision String" },
-+	{ "00002a27-0000-1000-8000-00805f9b34fb", "Hardware Revision String" },
-+	{ "00002a39-0000-1000-8000-00805f9b34fb", "Heart Rate Control Point" },
-+	{ "00002a37-0000-1000-8000-00805f9b34fb", "Heart Rate Measurement" },
-+	{ "00002a2a-0000-1000-8000-00805f9b34fb", "IEEE 11073-20601 Regulatory" },
-+	{ "00002a36-0000-1000-8000-00805f9b34fb", "Intermediate Cuff Pressure" },
-+	{ "00002a1e-0000-1000-8000-00805f9b34fb", "Intermediate Temperature" },
-+	{ "00002a0f-0000-1000-8000-00805f9b34fb", "Local Time Information" },
-+	{ "00002a29-0000-1000-8000-00805f9b34fb", "Manufacturer Name String" },
-+	{ "00002a21-0000-1000-8000-00805f9b34fb", "Measurement Interval" },
-+	{ "00002a24-0000-1000-8000-00805f9b34fb", "Model Number String" },
-+	{ "00002a46-0000-1000-8000-00805f9b34fb", "New Alert" },
-+	{ "00002a04-0000-1000-8000-00805f9b34fb", "Peripheral Preferred Connection Parameters" },
-+	{ "00002a02-0000-1000-8000-00805f9b34fb", "Peripheral Privacy Flag" },
-+	{ "00002a03-0000-1000-8000-00805f9b34fb", "Reconnection Address" },
-+	{ "00002a14-0000-1000-8000-00805f9b34fb", "Reference Time Information" },
-+	{ "00002a40-0000-1000-8000-00805f9b34fb", "Ringer Control Point" },
-+	{ "00002a41-0000-1000-8000-00805f9b34fb", "Ringer Setting" },
-+	{ "00002a25-0000-1000-8000-00805f9b34fb", "Serial Number String" },
-+	{ "00002a05-0000-1000-8000-00805f9b34fb", "Service Changed" },
-+	{ "00002a28-0000-1000-8000-00805f9b34fb", "Software Revision String" },
-+	{ "00002a47-0000-1000-8000-00805f9b34fb", "Supported New Alert Category" },
-+	{ "00002a48-0000-1000-8000-00805f9b34fb", "Supported Unread Alert Category" },
-+	{ "00002a23-0000-1000-8000-00805f9b34fb", "System ID" },
-+	{ "00002a1c-0000-1000-8000-00805f9b34fb", "Temperature Measurement" },
-+	{ "00002a1d-0000-1000-8000-00805f9b34fb", "Temperature Type" },
-+	{ "00002a12-0000-1000-8000-00805f9b34fb", "Time Accuracy" },
-+	{ "00002a13-0000-1000-8000-00805f9b34fb", "Time Source" },
-+	{ "00002a16-0000-1000-8000-00805f9b34fb", "Time Update Control Point" },
-+	{ "00002a17-0000-1000-8000-00805f9b34fb", "Time Update State" },
-+	{ "00002a11-0000-1000-8000-00805f9b34fb", "Time with DST" },
-+	{ "00002a0e-0000-1000-8000-00805f9b34fb", "Time Zone" },
-+	{ "00002a07-0000-1000-8000-00805f9b34fb", "Tx Power Level" },
-+	{ "00002a45-0000-1000-8000-00805f9b34fb", "Unread Alert Status" },
-+	{ }
-+};
-+
- static GSList *gatt_services = NULL;
- 
-+static const char *get_char_name(const char *uuid)
-+{
-+	const struct characteristic_info *c;
-+
-+	for (c = charInfo; c->uuid; c++) {
-+		if (g_strcmp0(c->uuid, uuid) == 0)
-+			return c->name;
-+	}
-+
-+	return NULL;
-+}
-+
- static void characteristic_free(void *user_data)
- {
- 	struct characteristic *chr = user_data;
-@@ -190,7 +261,7 @@ static int watcher_cmp(gconstpointer a, gconstpointer b)
- static void append_char_dict(DBusMessageIter *iter, struct characteristic *chr)
- {
- 	DBusMessageIter dict;
--	const char *name = "";
-+	const char *name;
- 	char *uuid;
- 
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-@@ -202,8 +273,9 @@ static void append_char_dict(DBusMessageIter *iter, struct characteristic *chr)
- 	dict_append_entry(&dict, "UUID", DBUS_TYPE_STRING, &uuid);
- 	g_free(uuid);
- 
--	/* FIXME: Translate UUID to name. */
--	dict_append_entry(&dict, "Name", DBUS_TYPE_STRING, &name);
-+	name = get_char_name(chr->type);
-+	if (name != NULL)
-+		dict_append_entry(&dict, "Name", DBUS_TYPE_STRING, &name);
- 
- 	if (chr->desc)
- 		dict_append_entry(&dict, "Description", DBUS_TYPE_STRING,
+> 
+> On Mon, Sep 03, 2012, Szymon Janc wrote:
+> > > > This fix number of compilation errors on ARM similar to one below.
+> > > > 
+> > > > lib/sdp.c: In function 'sdp_uuid_extract':
+> > > > lib/sdp.c:1019:27: error: cast increases required alignment
+> > > > 	of target type [-Werror=cast-align]
+> > > > lib/sdp.c:1019:27: error: cast increases required alignment
+> > > > 	of target type [-Werror=cast-align]
+> > > > lib/sdp.c:1026:27: error: cast increases required alignment
+> > > > 	of target type [-Werror=cast-align]
+> > > > lib/sdp.c:1026:27: error: cast increases required alignment
+> > > > 	of target type [-Werror=cast-align]
+> > > > 
+> > > > Change-Id: I587fb99328d7e5b9053af81597bd48b3a4e610ad
+> > > > ---
+> > > >  lib/sdp.c |   56 ++++++++++++++++++++++++++++----------------------------
+> > > >  1 file changed, 28 insertions(+), 28 deletions(-)
+> > > > 
+> > > > diff --git a/lib/sdp.c b/lib/sdp.c
+> > > > index 36b4d08..d40500f 100644
+> > > > --- a/lib/sdp.c
+> > > > +++ b/lib/sdp.c
+> > > > @@ -376,27 +376,27 @@ sdp_data_t *sdp_data_alloc_with_length(uint8_t dtd, const void *value,
+> > > >  		d->unitSize += sizeof(int8_t);
+> > > >  		break;
+> > > >  	case SDP_UINT16:
+> > > > -		d->val.uint16 = bt_get_unaligned((uint16_t *) value);
+> > > > +		d->val.uint16 = bt_get_16(value);
+> > > >  		d->unitSize += sizeof(uint16_t);
+> > > >  		break;
+> > > 
+> > > I do not like this. Either we use be16 here and store it in the native
+> > > endian converted from the protocol endian or we leave it as it is.
+> > > 
+> > > I want clear get_le16 and get_be16 and not another get_16. That just
+> > > makes the code hard to read.
+> > 
+> > This data is already in protocol order, so bt_get_le/be can't be used here.
+> > If you don't like those non-converting helpers functions other option is to
+> > use memcpy.
+> 
+> I think the main point is that only PDU buffers used for writing/reading
+> to/from the connection should contain protocol data order, and anything
+> else (internal data structures and variables) should be in the host
+> order. However, since this is a library interface (one which hopefully
+> will be removed/replaced in the future though) such fixes might not
+> always be possible, making e.g. your memcpy proposal the best we can do.
+
+OK, will prepare v4 series with memcpy.
+
+> Johan
+
 -- 
-1.7.9.5
-
+BR
+Szymon Janc
