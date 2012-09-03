@@ -1,62 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <20120830233451.GA972@x220.sheraton.com>
+References: <1346364960-7699-1-git-send-email-jprvita@openbossa.org>
+	<1346364960-7699-2-git-send-email-jprvita@openbossa.org>
+	<20120830233451.GA972@x220.sheraton.com>
+Date: Mon, 3 Sep 2012 15:16:38 -0300
+Message-ID: <CAAngNMaDp89OB82zALNf9SvBsCxmx0FwUuhMcfpauamNzj6znQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v4 01/15] core: Fix missing g_io_channel_ref
+From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v2 2/6] hog: Add suspend back-end selection
-Date: Mon,  3 Sep 2012 15:23:10 -0300
-Message-Id: <1346696594-1062-3-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1346696594-1062-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1346273590-16693-1-git-send-email-claudio.takahasi@openbossa.org>
- <1346696594-1062-1-git-send-email-claudio.takahasi@openbossa.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch series introduces back-end selection for HoG suspend drivers.
-The default back-end is called "dummy", added for testing purpose only.
----
- Makefile.am  | 3 +++
- acinclude.m4 | 7 +++++++
- 2 files changed, 10 insertions(+)
+On Thu, Aug 30, 2012 at 8:34 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi João Paulo,
+>
+> On Thu, Aug 30, 2012, João Paulo Rechi Vita wrote:
+>> ---
+>>  src/device.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/src/device.c b/src/device.c
+>> index 3b44d9b..2c40ec2 100644
+>> --- a/src/device.c
+>> +++ b/src/device.c
+>> @@ -2027,7 +2027,7 @@ static gboolean att_connect(gpointer user_data)
+>>               return FALSE;
+>>       }
+>>
+>> -     device->att_io = io;
+>> +     device->att_io = g_io_channel_ref(io);
+>>
+>>       return FALSE;
+>>  }
+>
+> This doesn't look right to me. bt_io_connect returns a reference for the
+> caller and you shouldn't need to re-increment the ref count again unless
+> you store a pointer in multiple places (which you don't). If this patch
+> fixes some behavior the real bug must be somewhere else.
+>
 
-diff --git a/Makefile.am b/Makefile.am
-index f6eb96b..198515b 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -439,6 +439,9 @@ audio/telephony.c: audio/@TELEPHONY_DRIVER@
- profiles/sap/sap.c: profiles/sap/@SAP_DRIVER@
- 	$(AM_V_GEN)$(LN_S) $(abs_top_srcdir)/$< $@
- 
-+profiles/input/suspend.c: profiles/input/@HOG_SUSPEND_DRIVER@
-+	$(AM_V_GEN)$(LN_S) $(abs_top_srcdir)/$< $@
-+
- scripts/%.rules:
- 	$(AM_V_GEN)cp $(subst 97-,,$@) $@
- 
-diff --git a/acinclude.m4 b/acinclude.m4
-index 39b0a18..ed2d011 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -185,6 +185,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 	datafiles_enable=yes
- 	telephony_driver=dummy
- 	sap_driver=dummy
-+	hog_suspend_driver=dummy
- 	dbusoob_enable=no
- 	wiimote_enable=no
- 	gatt_enable=no
-@@ -288,6 +289,12 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 		wiimote_enable=${enableval}
- 	])
- 
-+	AC_ARG_WITH(gatt, AC_HELP_STRING([--with-hog-suspend=DRIVER], [select HoG suspend driver]), [
-+		hog_suspend_driver=${withval}
-+	])
-+
-+	AC_SUBST([HOG_SUSPEND_DRIVER], [suspend-${hog_suspend_driver}.c])
-+
- 	AC_ARG_ENABLE(gatt, AC_HELP_STRING([--enable-gatt], [enable gatt module]), [
- 		gatt_enable=${enableval}
- 	])
+Yes, this became wrong due to spliting this code out of "core:
+Mutually exclude concurrent connections". I'll fix that and re-send
+the series one more time.
+
 -- 
-1.7.12
-
+João Paulo Rechi Vita
+Openbossa Labs - INdT
