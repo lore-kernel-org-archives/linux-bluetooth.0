@@ -1,63 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 3 Sep 2012 14:33:23 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 0/7] RFC: proximity cleanup
-Message-ID: <20120903113323.GA28983@x220>
-References: <1346417314-25109-1-git-send-email-andrzej.kaczmarek@tieto.com>
- <CAJdJm_OxOaVeU=WS5RfprUBOj4wsoMMVwS9vH8S7ogxR1QPdsw@mail.gmail.com>
- <50445E09.9000909@tieto.com>
+From: <chen.ganir@ti.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <chen.ganir@ti.com>
+Subject: [PATCH v4] gatt: Translate Characteristic names
+Date: Mon, 3 Sep 2012 14:29:29 +0300
+Message-ID: <1346671769-10072-1-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <50445E09.9000909@tieto.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+From: Chen Ganir <chen.ganir@ti.com>
 
-On Mon, Sep 03, 2012, Andrzej Kaczmarek wrote:
-> On 08/31/2012 06:17 PM, Anderson Lizardo wrote:
-> >Hi Andrzej,
-> >
-> >On Fri, Aug 31, 2012 at 8:48 AM, Andrzej Kaczmarek
-> ><andrzej.kaczmarek@tieto.com> wrote:
-> >>Hi,
-> >>
-> >>Here are few patches to cleanup proximity profile code a bit which seem to
-> >>keep track of some data which are redundant and has minor issue with device
-> >>driver registration.
-> >>
-> >>Most cleanup is done in patch #3 which removes tracking of DBusConnection
-> >>across whole plugin and simply uses get_dbus_connection() wherever necessary.
-> >>This is different than other profile plugins do, but reduces code size and
-> >>memory footprint a bit so can be done for other plugins as well if accepted.
-> >
-> >While some cleanups here are very welcome, I'm worried that you are
-> >cleaning up things before finishing the Proximity Reporter
-> >implementation. Power Level characteristic for instance is currently a
-> >stub, how do you plan to store it per adapter, without the struct
-> >reporter_adapter?
-> 
-> Ah, I didn't find it on TODO so assumed it's complete. But you're
-> right, it probably should not be removed.
-> 
-> >Therefore I suggest you split the "trivial" cleanups from the removal
-> >of struct reporter_adapter.
-> 
-> Please just consider patches #6 and #7 as invalid for now, I think
-> there's no point in sending #1-5 once more until there are some
-> comments to fix.
-> 
-> >BTW, do you have plans to add more features to the Proximity Reporter
-> >implementation?
-> 
-> No plans at the moment, but perhaps I'll take a look on this in more
-> details after HRP is finished (v2 will be sent soon).
+Translate Characteristic UUID's to name. This list was taken from
+the Bluetooth SIG developer site.
+---
+ attrib/client.c |   78 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 75 insertions(+), 3 deletions(-)
 
-I've applied patches 1-4. Patch 5 didn't really make sense anymore after
-the btd_profile refactoring that went in just a moment ago, and as you
-said patch 6 and 7 can be considered invalid for now.
+diff --git a/attrib/client.c b/attrib/client.c
+index bb6adf8..6abbb45 100644
+--- a/attrib/client.c
++++ b/attrib/client.c
+@@ -105,8 +105,79 @@ struct watcher {
+ 	struct gatt_service *gatt;
+ };
+ 
++struct characteristic_info {
++	const char *uuid;
++	const char *name;
++};
++
++static const struct characteristic_info charInfo[] = {
++	{ "00002a43-0000-1000-8000-00805f9b34fb", "Alert Category ID" },
++	{ "00002a42-0000-1000-8000-00805f9b34fb", "Alert Category ID Bit Mask" },
++	{ "00002a06-0000-1000-8000-00805f9b34fb", "Alert Level" },
++	{ "00002a44-0000-1000-8000-00805f9b34fb", "Alert Notification Control Point" },
++	{ "00002a3f-0000-1000-8000-00805f9b34fb", "Alert Status" },
++	{ "00002a01-0000-1000-8000-00805f9b34fb", "Appearance" },
++	{ "00002a49-0000-1000-8000-00805f9b34fb", "Blood Pressure Feature" },
++	{ "00002a35-0000-1000-8000-00805f9b34fb", "Blood Pressure Measurement" },
++	{ "00002a38-0000-1000-8000-00805f9b34fb", "Body Sensor Location" },
++	{ "00002a2b-0000-1000-8000-00805f9b34fb", "Current Time" },
++	{ "00002a08-0000-1000-8000-00805f9b34fb", "Date Time" },
++	{ "00002a0a-0000-1000-8000-00805f9b34fb", "Day Date Time" },
++	{ "00002a09-0000-1000-8000-00805f9b34fb", "Day of Week" },
++	{ "00002a00-0000-1000-8000-00805f9b34fb", "Device Name" },
++	{ "00002a0d-0000-1000-8000-00805f9b34fb", "DST Offset" },
++	{ "00002a0c-0000-1000-8000-00805f9b34fb", "Exact Time 256" },
++	{ "00002a26-0000-1000-8000-00805f9b34fb", "Firmware Revision String" },
++	{ "00002a27-0000-1000-8000-00805f9b34fb", "Hardware Revision String" },
++	{ "00002a39-0000-1000-8000-00805f9b34fb", "Heart Rate Control Point" },
++	{ "00002a37-0000-1000-8000-00805f9b34fb", "Heart Rate Measurement" },
++	{ "00002a2a-0000-1000-8000-00805f9b34fb", "IEEE 11073-20601 Regulatory" },
++	{ "00002a36-0000-1000-8000-00805f9b34fb", "Intermediate Cuff Pressure" },
++	{ "00002a1e-0000-1000-8000-00805f9b34fb", "Intermediate Temperature" },
++	{ "00002a0f-0000-1000-8000-00805f9b34fb", "Local Time Information" },
++	{ "00002a29-0000-1000-8000-00805f9b34fb", "Manufacturer Name String" },
++	{ "00002a21-0000-1000-8000-00805f9b34fb", "Measurement Interval" },
++	{ "00002a24-0000-1000-8000-00805f9b34fb", "Model Number String" },
++	{ "00002a46-0000-1000-8000-00805f9b34fb", "New Alert" },
++	{ "00002a04-0000-1000-8000-00805f9b34fb", "Peripheral Preferred Connection Parameters" },
++	{ "00002a02-0000-1000-8000-00805f9b34fb", "Peripheral Privacy Flag" },
++	{ "00002a03-0000-1000-8000-00805f9b34fb", "Reconnection Address" },
++	{ "00002a14-0000-1000-8000-00805f9b34fb", "Reference Time Information" },
++	{ "00002a40-0000-1000-8000-00805f9b34fb", "Ringer Control Point" },
++	{ "00002a41-0000-1000-8000-00805f9b34fb", "Ringer Setting" },
++	{ "00002a25-0000-1000-8000-00805f9b34fb", "Serial Number String" },
++	{ "00002a05-0000-1000-8000-00805f9b34fb", "Service Changed" },
++	{ "00002a28-0000-1000-8000-00805f9b34fb", "Software Revision String" },
++	{ "00002a47-0000-1000-8000-00805f9b34fb", "Supported New Alert Category" },
++	{ "00002a48-0000-1000-8000-00805f9b34fb", "Supported Unread Alert Category" },
++	{ "00002a23-0000-1000-8000-00805f9b34fb", "System ID" },
++	{ "00002a1c-0000-1000-8000-00805f9b34fb", "Temperature Measurement" },
++	{ "00002a1d-0000-1000-8000-00805f9b34fb", "Temperature Type" },
++	{ "00002a12-0000-1000-8000-00805f9b34fb", "Time Accuracy" },
++	{ "00002a13-0000-1000-8000-00805f9b34fb", "Time Source" },
++	{ "00002a16-0000-1000-8000-00805f9b34fb", "Time Update Control Point" },
++	{ "00002a17-0000-1000-8000-00805f9b34fb", "Time Update State" },
++	{ "00002a11-0000-1000-8000-00805f9b34fb", "Time with DST" },
++	{ "00002a0e-0000-1000-8000-00805f9b34fb", "Time Zone" },
++	{ "00002a07-0000-1000-8000-00805f9b34fb", "Tx Power Level" },
++	{ "00002a45-0000-1000-8000-00805f9b34fb", "Unread Alert Status" },
++	{ }
++};
++
+ static GSList *gatt_services = NULL;
+ 
++static const char *get_char_name(const char *uuid)
++{
++	const struct characteristic_info *c;
++
++	for (c = charInfo; c->uuid; c++) {
++		if (g_strcmp0(c->uuid, uuid) == 0)
++			return c->name;
++	}
++
++	return NULL;
++}
++
+ static void characteristic_free(void *user_data)
+ {
+ 	struct characteristic *chr = user_data;
+@@ -190,7 +261,7 @@ static int watcher_cmp(gconstpointer a, gconstpointer b)
+ static void append_char_dict(DBusMessageIter *iter, struct characteristic *chr)
+ {
+ 	DBusMessageIter dict;
+-	const char *name = "";
++	const char *name;
+ 	char *uuid;
+ 
+ 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+@@ -202,8 +273,9 @@ static void append_char_dict(DBusMessageIter *iter, struct characteristic *chr)
+ 	dict_append_entry(&dict, "UUID", DBUS_TYPE_STRING, &uuid);
+ 	g_free(uuid);
+ 
+-	/* FIXME: Translate UUID to name. */
+-	dict_append_entry(&dict, "Name", DBUS_TYPE_STRING, &name);
++	name = get_char_name(chr->type);
++	if (name != NULL)
++		dict_append_entry(&dict, "Name", DBUS_TYPE_STRING, &name);
+ 
+ 	if (chr->desc)
+ 		dict_append_entry(&dict, "Description", DBUS_TYPE_STRING,
+-- 
+1.7.9.5
 
-Johan
