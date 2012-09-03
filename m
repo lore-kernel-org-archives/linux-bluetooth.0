@@ -1,57 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50445E09.9000909@tieto.com>
-Date: Mon, 3 Sep 2012 09:36:41 +0200
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 0/7] RFC: proximity cleanup
-References: <1346417314-25109-1-git-send-email-andrzej.kaczmarek@tieto.com> <CAJdJm_OxOaVeU=WS5RfprUBOj4wsoMMVwS9vH8S7ogxR1QPdsw@mail.gmail.com>
-In-Reply-To: <CAJdJm_OxOaVeU=WS5RfprUBOj4wsoMMVwS9vH8S7ogxR1QPdsw@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Subject: Re: [RFC 03/15] sdp: Use helper functions instead of bt_get_unaligned macro
+Date: Mon, 3 Sep 2012 09:06:29 +0200
+Message-ID: <67335853.UVApWbuK0q@uw000953>
+In-Reply-To: <1346429676.23377.22.camel@aeonflux>
+References: <1346402185-9487-1-git-send-email-szymon.janc@tieto.com> <1346402185-9487-4-git-send-email-szymon.janc@tieto.com> <1346429676.23377.22.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+On Friday 31 of August 2012 19:14:36 Marcel Holtmann wrote:
+> Hi Szymon,
 
-On 08/31/2012 06:17 PM, Anderson Lizardo wrote:
-> Hi Andrzej,
->
-> On Fri, Aug 31, 2012 at 8:48 AM, Andrzej Kaczmarek
-> <andrzej.kaczmarek@tieto.com> wrote:
->> Hi,
->>
->> Here are few patches to cleanup proximity profile code a bit which seem to
->> keep track of some data which are redundant and has minor issue with device
->> driver registration.
->>
->> Most cleanup is done in patch #3 which removes tracking of DBusConnection
->> across whole plugin and simply uses get_dbus_connection() wherever necessary.
->> This is different than other profile plugins do, but reduces code size and
->> memory footprint a bit so can be done for other plugins as well if accepted.
->
-> While some cleanups here are very welcome, I'm worried that you are
-> cleaning up things before finishing the Proximity Reporter
-> implementation. Power Level characteristic for instance is currently a
-> stub, how do you plan to store it per adapter, without the struct
-> reporter_adapter?
+Hi Marcel,
 
-Ah, I didn't find it on TODO so assumed it's complete. But you're right, 
-it probably should not be removed.
+> 
+> > This fix number of compilation errors on ARM similar to one below.
+> > 
+> > lib/sdp.c: In function 'sdp_uuid_extract':
+> > lib/sdp.c:1019:27: error: cast increases required alignment
+> > 	of target type [-Werror=cast-align]
+> > lib/sdp.c:1019:27: error: cast increases required alignment
+> > 	of target type [-Werror=cast-align]
+> > lib/sdp.c:1026:27: error: cast increases required alignment
+> > 	of target type [-Werror=cast-align]
+> > lib/sdp.c:1026:27: error: cast increases required alignment
+> > 	of target type [-Werror=cast-align]
+> > 
+> > Change-Id: I587fb99328d7e5b9053af81597bd48b3a4e610ad
+> > ---
+> >  lib/sdp.c |   56 ++++++++++++++++++++++++++++----------------------------
+> >  1 file changed, 28 insertions(+), 28 deletions(-)
+> > 
+> > diff --git a/lib/sdp.c b/lib/sdp.c
+> > index 36b4d08..d40500f 100644
+> > --- a/lib/sdp.c
+> > +++ b/lib/sdp.c
+> > @@ -376,27 +376,27 @@ sdp_data_t *sdp_data_alloc_with_length(uint8_t dtd, const void *value,
+> >  		d->unitSize += sizeof(int8_t);
+> >  		break;
+> >  	case SDP_UINT16:
+> > -		d->val.uint16 = bt_get_unaligned((uint16_t *) value);
+> > +		d->val.uint16 = bt_get_16(value);
+> >  		d->unitSize += sizeof(uint16_t);
+> >  		break;
+> 
+> I do not like this. Either we use be16 here and store it in the native
+> endian converted from the protocol endian or we leave it as it is.
+> 
+> I want clear get_le16 and get_be16 and not another get_16. That just
+> makes the code hard to read.
 
-> Therefore I suggest you split the "trivial" cleanups from the removal
-> of struct reporter_adapter.
+This data is already in protocol order, so bt_get_le/be can't be used here.
+If you don't like those non-converting helpers functions other option is to
+use memcpy.
 
-Please just consider patches #6 and #7 as invalid for now, I think 
-there's no point in sending #1-5 once more until there are some comments 
-to fix.
+> Regards
+> 
+> Marcel
+> 
 
-> BTW, do you have plans to add more features to the Proximity Reporter
-> implementation?
-
-No plans at the moment, but perhaps I'll take a look on this in more 
-details after HRP is finished (v2 will be sent soon).
-
-BR,
-Andrzej
-
+-- 
+BR
+Szymon Janc
