@@ -2,104 +2,171 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v1 4/8] scan: Add write scan interval window
-Date: Mon,  3 Sep 2012 15:12:41 -0300
-Message-Id: <1346695965-25422-5-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v1 2/8] scan: Register profile
+Date: Mon,  3 Sep 2012 15:12:39 -0300
+Message-Id: <1346695965-25422-3-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1346695965-25422-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1345664723-30814-1-git-send-email-claudio.takahasi@openbossa.org>
  <1346695965-25422-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the handle discovery of the Scan Interval Window
-Characteristic and writes the default value (hard-coded in the kernel)
-of the scan interval, and scan window in the remote's characteristic.
+This patch add the probe and remove callbacks for the GATT Scan
+Parameters service.
 ---
- profiles/scanparam/scan.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ Makefile.am                  |  4 ++-
+ profiles/scanparam/main.c    |  4 ++-
+ profiles/scanparam/manager.c | 66 ++++++++++++++++++++++++++++++++++++++++++++
+ profiles/scanparam/manager.h | 26 +++++++++++++++++
+ 4 files changed, 98 insertions(+), 2 deletions(-)
+ create mode 100644 profiles/scanparam/manager.c
+ create mode 100644 profiles/scanparam/manager.h
 
-diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
-index c6aaf97..03934b0 100644
---- a/profiles/scanparam/scan.c
-+++ b/profiles/scanparam/scan.c
-@@ -31,6 +31,7 @@
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/uuid.h>
+diff --git a/Makefile.am b/Makefile.am
+index 161586e..0bc97ae 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -242,7 +242,9 @@ builtin_sources += profiles/thermometer/main.c \
+ 			profiles/gatt/main.c profiles/gatt/manager.h \
+ 			profiles/gatt/manager.c profiles/gatt/gas.h \
+ 			profiles/gatt/gas.c \
+-			profiles/scanparam/main.c
++			profiles/scanparam/main.c \
++			profiles/scanparam/manager.h \
++			profiles/scanparam/manager.c
+ endif
  
-+#include "log.h"
- #include "adapter.h"
- #include "device.h"
- #include "att.h"
-@@ -39,10 +40,18 @@
- #include "attio.h"
- #include "scan.h"
+ builtin_modules += formfactor
+diff --git a/profiles/scanparam/main.c b/profiles/scanparam/main.c
+index 6e90929..ba4b2c0 100644
+--- a/profiles/scanparam/main.c
++++ b/profiles/scanparam/main.c
+@@ -33,6 +33,7 @@
+ #include "log.h"
+ #include "plugin.h"
+ #include "hcid.h"
++#include "manager.h"
  
-+#define SCAN_INTERVAL_WIN_UUID		0x2A4F
-+
-+#define SCAN_INTERVAL		0x0060
-+#define SCAN_WINDOW		0x0030
-+
- struct scan {
- 	struct btd_device *device;
- 	GAttrib *attrib;
-+	struct att_range range;
- 	guint attioid;
-+	uint16_t interval;
-+	uint16_t window;
- };
+ static int scan_param_init(void)
+ {
+@@ -41,11 +42,12 @@ static int scan_param_init(void)
+ 		return -ENOTSUP;
+ 	}
  
- GSList *servers = NULL;
-@@ -55,11 +64,42 @@ static gint scan_device_cmp(gconstpointer a, gconstpointer b)
- 	return (device == scan->device ? 0 : -1);
+-	return 0;
++	return scan_param_manager_init();
  }
  
-+static void iwin_discovered_cb(GSList *chars, guint8 status,
-+						gpointer user_data)
+ static void scan_param_exit(void)
+ {
++	scan_param_manager_exit();
+ }
+ 
+ BLUETOOTH_PLUGIN_DEFINE(scanparam, VERSION,
+diff --git a/profiles/scanparam/manager.c b/profiles/scanparam/manager.c
+new file mode 100644
+index 0000000..94625f5
+--- /dev/null
++++ b/profiles/scanparam/manager.c
+@@ -0,0 +1,66 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012  Nordic Semiconductor Inc.
++ *  Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdbool.h>
++#include <glib.h>
++
++#include "log.h"
++#include "adapter.h"
++#include "device.h"
++#include "manager.h"
++
++#define SCAN_PARAMETERS_UUID	"00001813-0000-1000-8000-00805f9b34fb"
++
++static int scan_param_probe(struct btd_device *device, GSList *uuids)
 +{
-+	struct scan *scan = user_data;
-+	struct gatt_char *chr;
-+	uint8_t value[4];
++	DBG("Probing Scan Parameters");
 +
-+	if (status) {
-+		error("Discover Scan Interval Window: %s",
-+						att_ecode2str(status));
-+		return;
-+	}
-+
-+	chr = chars->data;
-+
-+	DBG("Scan Interval Window handle: 0x%04x",
-+						chr->value_handle);
-+
-+	att_put_u16(SCAN_INTERVAL, &value[0]);
-+	att_put_u16(SCAN_WINDOW, &value[2]);
-+
-+	gatt_write_char(scan->attrib, chr->value_handle, value,
-+						sizeof(value), NULL, NULL);
++	return 0;
 +}
 +
- static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
- {
- 	struct scan *scan = user_data;
-+	bt_uuid_t iwin_uuid;
++static void scan_param_remove(struct btd_device *device)
++{
++}
 +
-+	bt_uuid16_create(&iwin_uuid, SCAN_INTERVAL_WIN_UUID);
- 
- 	scan->attrib = g_attrib_ref(attrib);
++static struct btd_profile scan_profile = {
++	.name = "Scan Parameters Client Driver",
++	.remote_uuids = BTD_UUIDS(SCAN_PARAMETERS_UUID),
++	.device_probe = scan_param_probe,
++	.device_remove = scan_param_remove,
++};
 +
-+	gatt_discover_char(scan->attrib, scan->range.start, scan->range.end,
-+					&iwin_uuid, iwin_discovered_cb, scan);
- }
- 
- static void attio_disconnected_cb(gpointer user_data)
-@@ -76,6 +116,7 @@ int scan_register(struct btd_device *device, struct gatt_primary *prim)
- 
- 	scan = g_new0(struct scan, 1);
- 	scan->device = btd_device_ref(device);
-+	scan->range = prim->range;
- 	scan->attioid = btd_device_add_attio_callback(device,
- 							attio_connected_cb,
- 							attio_disconnected_cb,
++int scan_param_manager_init(void)
++{
++	return btd_profile_register(&scan_profile);
++
++}
++
++void scan_param_manager_exit(void)
++{
++	btd_profile_unregister(&scan_profile);
++}
+diff --git a/profiles/scanparam/manager.h b/profiles/scanparam/manager.h
+new file mode 100644
+index 0000000..1cf2e5e
+--- /dev/null
++++ b/profiles/scanparam/manager.h
+@@ -0,0 +1,26 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012  Nordic Semiconductor Inc.
++ *  Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++int scan_param_manager_init(void);
++void scan_param_manager_exit(void);
 -- 
 1.7.12
 
