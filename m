@@ -1,126 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
-From: <chen.ganir@ti.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <chen.ganir@ti.com>
-Subject: [PATCH v7] gatt: Translate Characteristic names
-Date: Tue, 4 Sep 2012 07:46:30 +0300
-Message-ID: <1346733990-23351-1-git-send-email-chen.ganir@ti.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v2 6/6] hog: Add writting Control Point
+Date: Mon,  3 Sep 2012 15:23:14 -0300
+Message-Id: <1346696594-1062-7-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1346696594-1062-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1346273590-16693-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1346696594-1062-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chen Ganir <chen.ganir@ti.com>
-
-Translate Characteristic UUID's to name. This list was taken from
-the Bluetooth SIG developer site.
+This patch adds GATT write without response operation when suspending
+or resuming.
 ---
- attrib/client.c |   76 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 73 insertions(+), 3 deletions(-)
+ profiles/input/hog_device.c  | 27 ++++++++++++++++++++++++++-
+ profiles/input/hog_device.h  |  1 +
+ profiles/input/hog_manager.c | 16 ++++++++++++++++
+ 3 files changed, 43 insertions(+), 1 deletion(-)
 
-diff --git a/attrib/client.c b/attrib/client.c
-index 906d345..d51e558 100644
---- a/attrib/client.c
-+++ b/attrib/client.c
-@@ -106,8 +106,77 @@ struct watcher {
- 	struct gatt_service *gatt;
+diff --git a/profiles/input/hog_device.c b/profiles/input/hog_device.c
+index 6f73ede..e68134c 100644
+--- a/profiles/input/hog_device.c
++++ b/profiles/input/hog_device.c
+@@ -57,6 +57,7 @@
+ #define HOG_REPORT_MAP_UUID	0x2A4B
+ #define HOG_REPORT_UUID		0x2A4D
+ #define HOG_PROTO_MODE_UUID	0x2A4E
++#define HOG_CONTROL_POINT_UUID	0x2A4C
+ 
+ #define HOG_REPORT_TYPE_INPUT	1
+ #define HOG_REPORT_TYPE_OUTPUT	2
+@@ -84,6 +85,7 @@ struct hog_device {
+ 	uint16_t		bcdhid;
+ 	uint8_t			bcountrycode;
+ 	uint16_t		proto_mode_handle;
++	uint16_t		ctrlpt_handle;
+ 	uint8_t			flags;
  };
  
-+static const struct {
-+	const char *uuid;
-+	const char *name;
-+} char_names[] = {
-+	{ "00002a43-0000-1000-8000-00805f9b34fb", "Alert Category ID" },
-+	{ "00002a42-0000-1000-8000-00805f9b34fb", "Alert Category ID Bit Mask" },
-+	{ "00002a06-0000-1000-8000-00805f9b34fb", "Alert Level" },
-+	{ "00002a44-0000-1000-8000-00805f9b34fb", "Alert Notification Control Point" },
-+	{ "00002a3f-0000-1000-8000-00805f9b34fb", "Alert Status" },
-+	{ "00002a01-0000-1000-8000-00805f9b34fb", "Appearance" },
-+	{ "00002a49-0000-1000-8000-00805f9b34fb", "Blood Pressure Feature" },
-+	{ "00002a35-0000-1000-8000-00805f9b34fb", "Blood Pressure Measurement" },
-+	{ "00002a38-0000-1000-8000-00805f9b34fb", "Body Sensor Location" },
-+	{ "00002a2b-0000-1000-8000-00805f9b34fb", "Current Time" },
-+	{ "00002a08-0000-1000-8000-00805f9b34fb", "Date Time" },
-+	{ "00002a0a-0000-1000-8000-00805f9b34fb", "Day Date Time" },
-+	{ "00002a09-0000-1000-8000-00805f9b34fb", "Day of Week" },
-+	{ "00002a00-0000-1000-8000-00805f9b34fb", "Device Name" },
-+	{ "00002a0d-0000-1000-8000-00805f9b34fb", "DST Offset" },
-+	{ "00002a0c-0000-1000-8000-00805f9b34fb", "Exact Time 256" },
-+	{ "00002a26-0000-1000-8000-00805f9b34fb", "Firmware Revision String" },
-+	{ "00002a27-0000-1000-8000-00805f9b34fb", "Hardware Revision String" },
-+	{ "00002a39-0000-1000-8000-00805f9b34fb", "Heart Rate Control Point" },
-+	{ "00002a37-0000-1000-8000-00805f9b34fb", "Heart Rate Measurement" },
-+	{ "00002a2a-0000-1000-8000-00805f9b34fb", "IEEE 11073-20601 Regulatory" },
-+	{ "00002a36-0000-1000-8000-00805f9b34fb", "Intermediate Cuff Pressure" },
-+	{ "00002a1e-0000-1000-8000-00805f9b34fb", "Intermediate Temperature" },
-+	{ "00002a0f-0000-1000-8000-00805f9b34fb", "Local Time Information" },
-+	{ "00002a29-0000-1000-8000-00805f9b34fb", "Manufacturer Name String" },
-+	{ "00002a21-0000-1000-8000-00805f9b34fb", "Measurement Interval" },
-+	{ "00002a24-0000-1000-8000-00805f9b34fb", "Model Number String" },
-+	{ "00002a46-0000-1000-8000-00805f9b34fb", "New Alert" },
-+	{ "00002a04-0000-1000-8000-00805f9b34fb", "Peripheral Preferred Connection Parameters" },
-+	{ "00002a02-0000-1000-8000-00805f9b34fb", "Peripheral Privacy Flag" },
-+	{ "00002a03-0000-1000-8000-00805f9b34fb", "Reconnection Address" },
-+	{ "00002a14-0000-1000-8000-00805f9b34fb", "Reference Time Information" },
-+	{ "00002a40-0000-1000-8000-00805f9b34fb", "Ringer Control Point" },
-+	{ "00002a41-0000-1000-8000-00805f9b34fb", "Ringer Setting" },
-+	{ "00002a25-0000-1000-8000-00805f9b34fb", "Serial Number String" },
-+	{ "00002a05-0000-1000-8000-00805f9b34fb", "Service Changed" },
-+	{ "00002a28-0000-1000-8000-00805f9b34fb", "Software Revision String" },
-+	{ "00002a47-0000-1000-8000-00805f9b34fb", "Supported New Alert Category" },
-+	{ "00002a48-0000-1000-8000-00805f9b34fb", "Supported Unread Alert Category" },
-+	{ "00002a23-0000-1000-8000-00805f9b34fb", "System ID" },
-+	{ "00002a1c-0000-1000-8000-00805f9b34fb", "Temperature Measurement" },
-+	{ "00002a1d-0000-1000-8000-00805f9b34fb", "Temperature Type" },
-+	{ "00002a12-0000-1000-8000-00805f9b34fb", "Time Accuracy" },
-+	{ "00002a13-0000-1000-8000-00805f9b34fb", "Time Source" },
-+	{ "00002a16-0000-1000-8000-00805f9b34fb", "Time Update Control Point" },
-+	{ "00002a17-0000-1000-8000-00805f9b34fb", "Time Update State" },
-+	{ "00002a11-0000-1000-8000-00805f9b34fb", "Time with DST" },
-+	{ "00002a0e-0000-1000-8000-00805f9b34fb", "Time Zone" },
-+	{ "00002a07-0000-1000-8000-00805f9b34fb", "Tx Power Level" },
-+	{ "00002a45-0000-1000-8000-00805f9b34fb", "Unread Alert Status" },
-+	{ }
-+};
-+
- static GSList *gatt_services = NULL;
+@@ -439,7 +441,8 @@ static void proto_mode_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ {
+ 	struct hog_device *hogdev = user_data;
+-	bt_uuid_t report_uuid, report_map_uuid, info_uuid, proto_mode_uuid;
++	bt_uuid_t report_uuid, report_map_uuid, info_uuid, proto_mode_uuid,
++		  ctrlpt_uuid;
+ 	struct report *report;
+ 	GSList *l;
+ 	uint16_t info_handle = 0, proto_mode_handle = 0;
+@@ -454,6 +457,7 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ 	bt_uuid16_create(&report_map_uuid, HOG_REPORT_MAP_UUID);
+ 	bt_uuid16_create(&info_uuid, HOG_INFO_UUID);
+ 	bt_uuid16_create(&proto_mode_uuid, HOG_PROTO_MODE_UUID);
++	bt_uuid16_create(&ctrlpt_uuid, HOG_CONTROL_POINT_UUID);
  
-+static const char *get_char_name(const char *uuid)
+ 	for (l = chars; l; l = g_slist_next(l)) {
+ 		struct gatt_char *chr, *next;
+@@ -482,6 +486,8 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ 			info_handle = chr->value_handle;
+ 		else if (bt_uuid_cmp(&uuid, &proto_mode_uuid) == 0)
+ 			proto_mode_handle = chr->value_handle;
++		else if (bt_uuid_cmp(&uuid, &ctrlpt_uuid) == 0)
++			hogdev->ctrlpt_handle = chr->value_handle;
+ 	}
+ 
+ 	if (proto_mode_handle) {
+@@ -765,3 +771,22 @@ int hog_device_unregister(struct hog_device *hogdev)
+ 
+ 	return 0;
+ }
++
++int hog_device_set_control_point(struct hog_device *hogdev, gboolean suspend)
 +{
-+	unsigned int i;
++	uint8_t value = suspend ? 0x00 : 0x01;
 +
-+	for (i = 0; i < G_N_ELEMENTS(char_names); i++) {
-+		if (bt_uuid_strcmp(char_names[i].uuid, uuid) == 0)
-+			return char_names[i].name;
-+	}
++	if (hogdev->attrib == NULL)
++		return -ENOTCONN;
 +
-+	return NULL;
++	DBG("%s HID Control Point: %s", hogdev->path, suspend ?
++						"Suspend" : "Exit Suspend");
++
++	if (hogdev->ctrlpt_handle == 0)
++		return -ENOTSUP;
++
++	gatt_write_char(hogdev->attrib, hogdev->ctrlpt_handle, &value,
++					sizeof(value), NULL, NULL);
++
++	return 0;
++}
+diff --git a/profiles/input/hog_device.h b/profiles/input/hog_device.h
+index efb7b4f..03f1c90 100644
+--- a/profiles/input/hog_device.h
++++ b/profiles/input/hog_device.h
+@@ -31,3 +31,4 @@ struct hog_device *hog_device_register(struct btd_device *device,
+ 						const char *path, int *perr);
+ int hog_device_unregister(struct hog_device *hogdev);
+ struct hog_device *hog_device_find(GSList *list, const char *path);
++int hog_device_set_control_point(struct hog_device *hogdev, gboolean suspend);
+diff --git a/profiles/input/hog_manager.c b/profiles/input/hog_manager.c
+index 25974c4..d770b2a 100644
+--- a/profiles/input/hog_manager.c
++++ b/profiles/input/hog_manager.c
+@@ -42,14 +42,30 @@
+ static gboolean suspend_supported = FALSE;
+ static GSList *devices = NULL;
+ 
++static void set_suspend(gpointer data, gpointer user_data)
++{
++	struct hog_device *hogdev = data;
++	gboolean suspend = GPOINTER_TO_INT(user_data);
++
++	hog_device_set_control_point(hogdev, suspend);
 +}
 +
- static void characteristic_free(void *user_data)
+ static void suspend_callback(void)
  {
- 	struct characteristic *chr = user_data;
-@@ -191,7 +260,7 @@ static int watcher_cmp(gconstpointer a, gconstpointer b)
- static void append_char_dict(DBusMessageIter *iter, struct characteristic *chr)
++	gboolean suspend = TRUE;
++
+ 	DBG("Suspending ...");
++
++	g_slist_foreach(devices, set_suspend, GINT_TO_POINTER(suspend));
+ }
+ 
+ static void resume_callback(void)
  {
- 	DBusMessageIter dict;
--	const char *name = "";
-+	const char *name;
- 	char *uuid;
++	gboolean suspend = FALSE;
++
+ 	DBG("Resuming ...");
++
++	g_slist_foreach(devices, set_suspend, GINT_TO_POINTER(suspend));
+ }
  
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-@@ -203,8 +272,9 @@ static void append_char_dict(DBusMessageIter *iter, struct characteristic *chr)
- 	dict_append_entry(&dict, "UUID", DBUS_TYPE_STRING, &uuid);
- 	g_free(uuid);
- 
--	/* FIXME: Translate UUID to name. */
--	dict_append_entry(&dict, "Name", DBUS_TYPE_STRING, &name);
-+	name = get_char_name(chr->type);
-+	if (name)
-+		dict_append_entry(&dict, "Name", DBUS_TYPE_STRING, &name);
- 
- 	if (chr->desc)
- 		dict_append_entry(&dict, "Description", DBUS_TYPE_STRING,
+ static int hog_device_probe(struct btd_device *device, GSList *uuids)
 -- 
-1.7.9.5
+1.7.12
 
