@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: <chen.ganir@ti.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <chen.ganir@ti.com>
-Subject: [PATCH v6] gatt: Translate Characteristic names
-Date: Mon, 3 Sep 2012 16:29:21 +0300
-Message-ID: <1346678961-14659-1-git-send-email-chen.ganir@ti.com>
+Subject: [PATCH v5] gatt: Translate Characteristic names
+Date: Mon, 3 Sep 2012 16:20:03 +0300
+Message-ID: <1346678403-14322-1-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -19,19 +19,19 @@ the Bluetooth SIG developer site.
  1 file changed, 75 insertions(+), 3 deletions(-)
 
 diff --git a/attrib/client.c b/attrib/client.c
-index 906d345..1bbe9aa 100644
+index 906d345..479aac3 100644
 --- a/attrib/client.c
 +++ b/attrib/client.c
 @@ -106,8 +106,79 @@ struct watcher {
  	struct gatt_service *gatt;
  };
  
-+struct characteristic_name {
++struct characteristic_info {
 +	const char *uuid;
 +	const char *name;
 +};
 +
-+static const struct characteristic_name char_name[] = {
++static const struct characteristic_info charInfo[] = {
 +	{ "00002a43-0000-1000-8000-00805f9b34fb", "Alert Category ID" },
 +	{ "00002a42-0000-1000-8000-00805f9b34fb", "Alert Category ID Bit Mask" },
 +	{ "00002a06-0000-1000-8000-00805f9b34fb", "Alert Level" },
@@ -89,9 +89,9 @@ index 906d345..1bbe9aa 100644
  
 +static const char *get_char_name(const char *uuid)
 +{
-+	const struct characteristic_name *c;
++	const struct characteristic_info *c;
 +
-+	for (c = char_name; c->uuid; c++) {
++	for (c = charInfo; c->uuid; c++) {
 +		if (bt_uuid_strcmp(c->uuid, uuid) == 0)
 +			return c->name;
 +	}
