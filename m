@@ -1,51 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-CC: Gustavo Padovan <gustavo@padovan.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: Use GFP_KERNEL in read_index_list
-Date: Mon, 3 Sep 2012 15:07:36 +0200
-Message-ID: <1621656.TPhNxgHnm6@uw000953>
-In-Reply-To: <4083892.2VCRePhfBH@uw000953>
-References: <1346396746-3479-1-git-send-email-szymon.janc@tieto.com> <20120903123404.GA2789@aemeltch-MOBL1> <4083892.2VCRePhfBH@uw000953>
+Date: Mon, 3 Sep 2012 15:59:40 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: chen.ganir@ti.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v4] gatt: Translate Characteristic names
+Message-ID: <20120903125940.GA942@x220>
+References: <1346671769-10072-1-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1346671769-10072-1-git-send-email-chen.ganir@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 03 of September 2012 14:49:59 Szymon Janc wrote:
-> On Monday 03 of September 2012 15:34:11 Andrei Emeltchenko wrote:
-> > Hi all,
-> 
-> Hi Andrei,
-> 
-> > 
-> > On Fri, Aug 31, 2012 at 10:54:58AM -0700, Gustavo Padovan wrote:
-> > > Hi Szymon,
-> > > 
-> > > * Szymon Janc <szymon.janc@tieto.com> [2012-08-31 09:05:46 +0200]:
-> > > 
-> > > > read_index_list is executed by user thread running in kernel-mode
-> > > > thus is allowed to sleep.
-> > > > 
-> > > > Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
-> > > > ---
-> > > >  net/bluetooth/mgmt.c |    2 +-
-> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > Patch has been applied to bluetooth-next. Thanks.
-> > 
-> > Was this tested? Gustavo please remove this patch from the tree untill
-> > this issue is fixed.
-> 
-> read_index_list() is only called from mgmt_control() (via mgmt_handlers[]).
-> mgmt_control (as well as other mgmt_handlers) allocate memory with
-> GFP_KERNEL flag.
-> 
-> I'm not sure why do you get this warning...
+Hi Chen,
 
-Ahhh, rwlock is held while doing memory allocation..
-Yes, this should be reverted.
+On Mon, Sep 03, 2012, chen.ganir@ti.com wrote:
+> +static const struct characteristic_info charInfo[] = {
 
--- 
-Szymon Janc
+Only lower-case symbol names please, i.e. char_info[].
+
+> +static const char *get_char_name(const char *uuid)
+> +{
+> +	const struct characteristic_info *c;
+> +
+> +	for (c = charInfo; c->uuid; c++) {
+> +		if (g_strcmp0(c->uuid, uuid) == 0)
+
+Since these strings are in hexadecimal format you'd need to check both
+lower and upper case characters. So probably strcasecmp is best (you
+should anyway have a guarantee that both c->uuid and uuid are non-NULL).
+You could also use bt_uuid_strcmp from lib/uuid.h which was recently
+added to help g_slist_find_custom and similar situations.
+
+> +	if (name != NULL)
+> +		dict_append_entry(&dict, "Name", DBUS_TYPE_STRING, &name);
+
+"if (name)" would be more consistent with the rest of the code, such as
+the lines coming right after it:
+
+>  	if (chr->desc)
+>  		dict_append_entry(&dict, "Description", DBUS_TYPE_STRING,
+
+Johan
