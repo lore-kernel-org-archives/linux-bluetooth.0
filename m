@@ -1,50 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120830233451.GA972@x220.sheraton.com>
-References: <1346364960-7699-1-git-send-email-jprvita@openbossa.org>
-	<1346364960-7699-2-git-send-email-jprvita@openbossa.org>
-	<20120830233451.GA972@x220.sheraton.com>
-Date: Mon, 3 Sep 2012 15:16:38 -0300
-Message-ID: <CAAngNMaDp89OB82zALNf9SvBsCxmx0FwUuhMcfpauamNzj6znQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v4 01/15] core: Fix missing g_io_channel_ref
-From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v1 8/8] scan: Avoid discover if scan handle is known
+Date: Mon,  3 Sep 2012 15:12:45 -0300
+Message-Id: <1346695965-25422-9-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1346695965-25422-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1345664723-30814-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1346695965-25422-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Aug 30, 2012 at 8:34 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi João Paulo,
->
-> On Thu, Aug 30, 2012, João Paulo Rechi Vita wrote:
->> ---
->>  src/device.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/src/device.c b/src/device.c
->> index 3b44d9b..2c40ec2 100644
->> --- a/src/device.c
->> +++ b/src/device.c
->> @@ -2027,7 +2027,7 @@ static gboolean att_connect(gpointer user_data)
->>               return FALSE;
->>       }
->>
->> -     device->att_io = io;
->> +     device->att_io = g_io_channel_ref(io);
->>
->>       return FALSE;
->>  }
->
-> This doesn't look right to me. bt_io_connect returns a reference for the
-> caller and you shouldn't need to re-increment the ref count again unless
-> you store a pointer in multiple places (which you don't). If this patch
-> fixes some behavior the real bug must be somewhere else.
->
+This patch avoids the characteristic discovery for Scan Interval Window
+if the attribute value handle was discovered on a previous interaction.
+---
+ profiles/scanparam/scan.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-Yes, this became wrong due to spliting this code out of "core:
-Mutually exclude concurrent connections". I'll fix that and re-send
-the series one more time.
-
+diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
+index 50fef43..491b50d 100644
+--- a/profiles/scanparam/scan.c
++++ b/profiles/scanparam/scan.c
+@@ -208,11 +208,16 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ 	struct scan *scan = user_data;
+ 	bt_uuid_t iwin_uuid, refresh_uuid;
+ 
++	scan->attrib = g_attrib_ref(attrib);
++
++	if (scan->iwhandle) {
++		write_scan_params(scan->attrib, scan->iwhandle);
++		return;
++	}
++
+ 	bt_uuid16_create(&iwin_uuid, SCAN_INTERVAL_WIN_UUID);
+ 	bt_uuid16_create(&refresh_uuid, SCAN_REFRESH_UUID);
+ 
+-	scan->attrib = g_attrib_ref(attrib);
+-
+ 	gatt_discover_char(scan->attrib, scan->range.start, scan->range.end,
+ 					&iwin_uuid, iwin_discovered_cb, scan);
+ 
 -- 
-João Paulo Rechi Vita
-Openbossa Labs - INdT
+1.7.12
+
