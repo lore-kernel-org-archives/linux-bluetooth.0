@@ -1,60 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 14/15] Bluetooth: Process create response and connect response identically
-Date: Tue,  4 Sep 2012 16:44:33 +0300
-Message-Id: <1346766274-21612-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 13/15] Bluetooth: AMP: Use Loglink handle in ACL Handle field
+Date: Tue,  4 Sep 2012 16:44:32 +0300
+Message-Id: <1346766274-21612-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1346766274-21612-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1346766274-21612-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mat Martineau <mathewm@codeaurora.org>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+For AMP HCI controller use Logical Link handle in HCI ACL
+Handle field.
+
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |   13 +------------
- 1 file changed, 1 insertion(+), 12 deletions(-)
+ net/bluetooth/hci_core.c |   15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index cc7ec41..9e917a2 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4101,14 +4101,6 @@ static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
- 	return 0;
- }
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 7a0c20c..9c50cdc 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2162,7 +2162,20 @@ static void hci_queue_acl(struct hci_chan *chan, struct sk_buff_head *queue,
+ 	skb->data_len = 0;
  
--static inline int l2cap_create_channel_rsp(struct l2cap_conn *conn,
--					struct l2cap_cmd_hdr *cmd, void *data)
--{
--	BT_DBG("conn %p", conn);
--
--	return l2cap_connect_rsp(conn, cmd, data);
--}
--
- static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
- 				     u16 icid, u16 result)
- {
-@@ -4312,6 +4304,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 		break;
+ 	bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
+-	hci_add_acl_hdr(skb, conn->handle, flags);
++
++	switch (hdev->dev_type) {
++	case HCI_BREDR:
++		hci_add_acl_hdr(skb, conn->handle, flags);
++		break;
++
++	case HCI_AMP:
++		hci_add_acl_hdr(skb, chan->handle, flags);
++		break;
++
++	default:
++		BT_ERR("%s unknown dev_type %d", hdev->name, hdev->dev_type);
++		return;
++	}
  
- 	case L2CAP_CONN_RSP:
-+	case L2CAP_CREATE_CHAN_RSP:
- 		err = l2cap_connect_rsp(conn, cmd, data);
- 		break;
- 
-@@ -4350,10 +4343,6 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 		err = l2cap_create_channel_req(conn, cmd, cmd_len, data);
- 		break;
- 
--	case L2CAP_CREATE_CHAN_RSP:
--		err = l2cap_create_channel_rsp(conn, cmd, data);
--		break;
--
- 	case L2CAP_MOVE_CHAN_REQ:
- 		err = l2cap_move_channel_req(conn, cmd, cmd_len, data);
- 		break;
+ 	list = skb_shinfo(skb)->frag_list;
+ 	if (!list) {
 -- 
 1.7.9.5
 
