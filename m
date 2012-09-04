@@ -1,34 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH] audio: Fix gateway probe always failing
-Date: Tue,  4 Sep 2012 11:55:27 +0200
-Message-Id: <1346752527-8761-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Tue, 4 Sep 2012 10:47:21 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: chen.ganir@ti.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v7] gatt: Translate Characteristic names
+Message-ID: <20120904074721.GA4286@x220>
+References: <1346733990-23351-1-git-send-email-chen.ganir@ti.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1346733990-23351-1-git-send-email-chen.ganir@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Chen,
 
-Commit 813b674bce1aab009e7f2d14d1825f603330563d introduced this trivial
-bug which causes the failure of the gateway profile probe.
----
- audio/manager.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Tue, Sep 04, 2012, chen.ganir@ti.com wrote:
+> From: Chen Ganir <chen.ganir@ti.com>
+> 
+> Translate Characteristic UUID's to name. This list was taken from
+> the Bluetooth SIG developer site.
+> ---
+>  attrib/client.c |   76 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 73 insertions(+), 3 deletions(-)
 
-diff --git a/audio/manager.c b/audio/manager.c
-index 9ca8593..5c81957 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -706,7 +706,7 @@ static int ag_probe(struct btd_device *device, GSList *uuids)
- 		return -1;
- 	}
- 
--	if (!audio_dev->gateway)
-+	if (audio_dev->gateway)
- 		return -EALREADY;
- 
- 	audio_dev->gateway = gateway_init(audio_dev);
--- 
-1.7.7.6
+Applied after removing one last issue with the empty element at the end
+of the list. Thanks.
 
+Johan
