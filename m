@@ -1,57 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix freeing uninitialized delayed works
-Date: Tue,  4 Sep 2012 15:00:38 +0300
-Message-Id: <1346760038-3381-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH v0 3/3] audio: Handle error in gateway_request_stream()
+Date: Tue,  4 Sep 2012 13:15:56 +0200
+Message-Id: <1346757356-20341-3-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1346757356-20341-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1346757356-20341-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-When releasing L2CAP socket which is in BT_CONFIG state l2cap_chan_close
-invokes l2cap_send_disconn_req which cancel delayed works which are only
-set in BT_CONNECTED state with l2cap_ertm_init. Add state check before
-cancelling those works.
-
-...
-[ 9668.574372] [21085] l2cap_sock_release: sock cd065200, sk f073e800
-[ 9668.574399] [21085] l2cap_sock_shutdown: sock cd065200, sk f073e800
-[ 9668.574411] [21085] l2cap_chan_close: chan f073ec00 state BT_CONFIG sk f073e800
-[ 9668.574421] [21085] l2cap_send_disconn_req: chan f073ec00 conn ecc16600
-[ 9668.574441] INFO: trying to register non-static key.
-[ 9668.574443] the code is fine but needs lockdep annotation.
-[ 9668.574446] turning off the locking correctness validator.
-[ 9668.574450] Pid: 21085, comm: obex-client Tainted: G           O 3.5.0+ #57
-[ 9668.574452] Call Trace:
-[ 9668.574463]  [<c10a64b3>] __lock_acquire+0x12e3/0x1700
-[ 9668.574468]  [<c10a44fb>] ? trace_hardirqs_on+0xb/0x10
-[ 9668.574476]  [<c15e4f60>] ? printk+0x4d/0x4f
-[ 9668.574479]  [<c10a6e38>] lock_acquire+0x88/0x130
-[ 9668.574487]  [<c1059740>] ? try_to_del_timer_sync+0x60/0x60
-[ 9668.574491]  [<c1059790>] del_timer_sync+0x50/0xc0
-[ 9668.574495]  [<c1059740>] ? try_to_del_timer_sync+0x60/0x60
-[ 9668.574515]  [<f8aa1c23>] l2cap_send_disconn_req+0xe3/0x160 [bluetooth]
-...
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+gateway_request_stream() should check if the call to get_records() has
+succeeded, and fail otherwise.
 ---
- net/bluetooth/l2cap_core.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ audio/gateway.c |    7 ++++---
+ 1 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 4d7f6ea..5661d85 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1152,7 +1152,7 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
+diff --git a/audio/gateway.c b/audio/gateway.c
+index 8603038..0603f12 100644
+--- a/audio/gateway.c
++++ b/audio/gateway.c
+@@ -846,9 +846,10 @@ unsigned int gateway_request_stream(struct audio_device *dev,
+ 	GError *err = NULL;
+ 	GIOChannel *io;
  
- 	BT_DBG("chan %p conn %p", chan, conn);
- 
--	if (chan->mode == L2CAP_MODE_ERTM) {
-+	if (chan->mode == L2CAP_MODE_ERTM && chan->state == BT_CONNECTED) {
- 		__clear_retrans_timer(chan);
- 		__clear_monitor_timer(chan);
- 		__clear_ack_timer(chan);
+-	if (!gw->rfcomm)
+-		get_records(dev);
+-	else if (!gw->sco) {
++	if (!gw->rfcomm) {
++		if (get_records(dev) < 0)
++			return 0;
++	} else if (!gw->sco) {
+ 		io = bt_io_connect(sco_connect_cb, dev, NULL, &err,
+ 				BT_IO_OPT_SOURCE_BDADDR, &dev->src,
+ 				BT_IO_OPT_DEST_BDADDR, &dev->dst,
 -- 
-1.7.9.5
+1.7.7.6
 
