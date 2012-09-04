@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 08/15] Bluetooth: AMP: Send EFS Conf Rsp when loglink cmpl
-Date: Tue,  4 Sep 2012 16:44:27 +0300
-Message-Id: <1346766274-21612-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 12/15] Bluetooth: Factor out hci_queue_acl
+Date: Tue,  4 Sep 2012 16:44:31 +0300
+Message-Id: <1346766274-21612-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1346766274-21612-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1346766274-21612-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,91 +11,47 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-After receiving HCI Logical Link Complete event send
-L2CAP Configuration Response.
+Use hci_chan as parameter instead of hci_conn as we need logical
+handle from hci_chan for AMP link.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |    1 +
- net/bluetooth/hci_event.c     |   22 ++++++++++++++++++++++
- net/bluetooth/l2cap_core.c    |   14 ++++++++++++++
- 3 files changed, 37 insertions(+)
+ net/bluetooth/hci_core.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 3ec8679..064be7f 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -777,5 +777,6 @@ void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
- bool l2cap_conn_clear_timer(struct l2cap_conn *conn,
- 			    struct delayed_work *work);
- void l2cap_send_conn_req(struct l2cap_chan *chan);
-+void l2cap_finish_efs_config(struct l2cap_chan *chan);
- 
- #endif /* __L2CAP_H */
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 00387aa..a4b2f1d 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3493,12 +3493,34 @@ static void hci_phy_link_complete_evt(struct hci_dev *hdev,
- static void hci_loglink_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_logical_link_complete *ev = (void *) skb->data;
-+	struct hci_conn *hcon;
-+	struct hci_chan *hchan;
-+	struct amp_mgr *mgr;
- 
- 	BT_DBG("%s log_handle 0x%4.4x phy_handle 0x%2.2x status 0x%2.2x",
- 	       hdev->name, le16_to_cpu(ev->handle), ev->phy_handle,
- 	       ev->status);
- 
- 	/* Return Config Rsp with success */
-+	hcon = hci_conn_hash_lookup_handle(hdev, ev->phy_handle);
-+	if (!hcon)
-+		return;
-+
-+	/* Create AMP hchan */
-+	hchan = hci_chan_create(hcon);
-+	if (!hchan)
-+		return;
-+
-+	hchan->handle = le16_to_cpu(ev->handle);
-+
-+	BT_DBG("hcon %p mgr %p hchan %p", hcon, hcon->phy_link->mgr, hchan);
-+
-+	mgr = hcon->phy_link->mgr;
-+	if (mgr) {
-+		struct l2cap_chan *bredr_chan = mgr->bredr_chan;
-+
-+		l2cap_finish_efs_config(bredr_chan);
-+	}
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 179b9e3..7a0c20c 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2151,9 +2151,10 @@ static void hci_add_acl_hdr(struct sk_buff *skb, __u16 handle, __u16 flags)
+ 	hdr->dlen   = cpu_to_le16(len);
  }
  
- static void hci_disconn_loglink_complete_evt(struct hci_dev *hdev,
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 609a4cd..c662344 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3647,6 +3647,20 @@ static void l2cap_send_efs_conf_rsp(struct l2cap_chan *chan, void *data,
- 					    L2CAP_CONF_SUCCESS, flags), data);
- }
- 
-+void l2cap_finish_efs_config(struct l2cap_chan *chan)
-+{
-+	char buf[64];
-+
-+	BT_DBG("chan %p", chan);
-+
-+	/* Init also BR/EDR chan */
-+	l2cap_ertm_init(chan);
-+
-+	l2cap_send_efs_conf_rsp(chan, buf, chan->ident, 0);
-+
-+	l2cap_chan_ready(chan);
-+}
-+
- static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd, u16 cmd_len, u8 *data)
+-static void hci_queue_acl(struct hci_conn *conn, struct sk_buff_head *queue,
++static void hci_queue_acl(struct hci_chan *chan, struct sk_buff_head *queue,
+ 			  struct sk_buff *skb, __u16 flags)
  {
- 	struct l2cap_conf_req *req = (struct l2cap_conf_req *) data;
++	struct hci_conn *conn = chan->conn;
+ 	struct hci_dev *hdev = conn->hdev;
+ 	struct sk_buff *list;
+ 
+@@ -2200,14 +2201,13 @@ static void hci_queue_acl(struct hci_conn *conn, struct sk_buff_head *queue,
+ 
+ void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags)
+ {
+-	struct hci_conn *conn = chan->conn;
+-	struct hci_dev *hdev = conn->hdev;
++	struct hci_dev *hdev = chan->conn->hdev;
+ 
+ 	BT_DBG("%s chan %p flags 0x%4.4x", hdev->name, chan, flags);
+ 
+ 	skb->dev = (void *) hdev;
+ 
+-	hci_queue_acl(conn, &chan->data_q, skb, flags);
++	hci_queue_acl(chan, &chan->data_q, skb, flags);
+ 
+ 	queue_work(hdev->workqueue, &hdev->tx_work);
+ }
 -- 
 1.7.9.5
 
