@@ -1,91 +1,234 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5046DC86.7030905@ti.com>
-Date: Wed, 5 Sep 2012 08:00:54 +0300
-From: Chen Ganir <chen.ganir@ti.com>
-MIME-Version: 1.0
-To: =?UTF-8?B?Sm/Do28gUGF1bG8gUmVjaGkgVml0YQ==?=
+From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ v5 00/14] LE General Connection Establishment procedure
-References: <1346785482-13359-1-git-send-email-jprvita@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+Subject: [PATCH BlueZ v5 14/14] core: Suspend scanning before connect on pairing
+Date: Tue,  4 Sep 2012 16:04:42 -0300
+Message-Id: <1346785482-13359-15-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1346785482-13359-1-git-send-email-jprvita@openbossa.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+References: <1346785482-13359-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-João,
+If there is a disconnected bonded device there will be a scanning
+procedure active due to the General Connection Establishment Procedure.
+This scan have to be suspended before trying to connect to the remote
+device for pairing.
+---
+ src/device.c | 150 ++++++++++++++++++++++++++++++-----------------------------
+ 1 file changed, 77 insertions(+), 73 deletions(-)
 
-On 09/04/2012 10:04 PM, João Paulo Rechi Vita wrote:
-> This series implement the LE General Connection Establishment procedure
-> for LE connections.
->
-> If there are LE bonded devices marked for auto connection they are added
-> to a connect_list on the adapter. When there is any device on this list
-> scan is performed continuously. When a device is found the connect_list
-How do we stop this scan ? Do we need to remove all auto-connect settings?
-
-> is checked. If that device is on the list scan is stopped and a
-> connection attempt is made to that device.
-Do we have a timeout for this ? What happens if we succeed ? Do we start 
-scanning again if more devices are set to auto-connect ? What happens 
-when we fail a connection ? Do we retry to the same or start scanning 
-again ?
-
->
-> If any client tries to perform discovery and the scan for the General
-> Connection Establishment procedure is active, the discovery request is
-> queued and performed right after the GCEP scan session finishes.
->
-I'm am having difficulties understanding the logic here. You say that as 
-long as we have bonded devices set for auto-connect, the GCE scan will 
-run until a connection is made?. What happens if we do not find any 
-device ? Do we scan forever?
-
-This is a bit of a problem - device discovery can not be queued. 
-Discovering devices is a user initiated command, and it should run 
-whenever a client requires it. When a user requests for a list of 
-devices, he expects to get the list. He does not care about background 
-logic. The proper logic here is to pause the background scanning, 
-discover devices (if LE scan reveals bonded devices that have 
-auto-connect setting they should connect and then resume the discovery). 
-After Device discovery is terminated, background connect scan should be 
-continued.
-
-
-> This series changes quite a lot the LE connection logic, but we've been
-> testing and using this code at INdT for about 4 weeks. Any comments and
-> more testing are appreciated.
->
-> Claudio Takahasi (6):
->    core: Control connections based on adapter state
->    mgmt: Add LE scanning callback
->    core: Replace interleaved by LE scanning
->    core: Start LE scanning when a device requests
->    core: Queue discovery if scanning is active
->    core: Re-connect for ECONNRESET or ECONNABORTED
->
-> João Paulo Rechi Vita (7):
->    mgmt: Print error message when start_discovery fails
->    core: Add compare function for bdaddr in a struct btd_device
->    core: Add a list of LE devices to connect
->    core: Use adapter connect list for LE connections
->    core: Mutually exclude concurrent connections
->    mgmt: Add address type to bonding debug message
->    core: Suspend scanning before connect on pairing
->
-> Paulo Alcantara (1):
->    core: Disable unnecessary auto connections
->
->   src/adapter.c | 193 ++++++++++++++++++++++++++++++++++++++++++++-------
->   src/adapter.h |   5 ++
->   src/device.c  | 217 +++++++++++++++++++++++++++++-----------------------------
->   src/device.h  |   2 +
->   src/mgmt.c    |  44 +++++++++++-
->   src/mgmt.h    |   1 +
->   6 files changed, 325 insertions(+), 137 deletions(-)
->
-
-
-BR,
-Chen Ganir
+diff --git a/src/device.c b/src/device.c
+index d0cebf4..81cd3b1 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1702,8 +1702,8 @@ send_reply:
+ 	else if (dbus_message_is_method_call(req->msg, ADAPTER_INTERFACE,
+ 						"CreateDevice")) {
+ 		if (err < 0) {
+-			DBusMessage *reply;
+-			reply = btd_error_failed(req->msg, strerror(-err));
++			DBusMessage *reply = btd_error_failed(req->msg,
++							strerror(-err));
+ 			g_dbus_send_message(req->conn, reply);
+ 			goto cleanup;
+ 		}
+@@ -1915,6 +1915,38 @@ done:
+ 	browse_request_free(req);
+ }
+ 
++static void bonding_request_free(struct bonding_req *bonding)
++{
++	struct btd_device *device;
++
++	if (!bonding)
++		return;
++
++	if (bonding->listener_id)
++		g_dbus_remove_watch(bonding->conn, bonding->listener_id);
++
++	if (bonding->msg)
++		dbus_message_unref(bonding->msg);
++
++	if (bonding->conn)
++		dbus_connection_unref(bonding->conn);
++
++	device = bonding->device;
++	g_free(bonding);
++
++	if (!device)
++		return;
++
++	device->bonding = NULL;
++
++	if (!device->agent)
++		return;
++
++	agent_cancel(device->agent);
++	agent_free(device->agent);
++	device->agent = NULL;
++}
++
+ static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ {
+ 	struct att_callbacks *attcb = user_data;
+@@ -1944,6 +1976,21 @@ static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ 
+ 	if (attcb->success)
+ 		attcb->success(user_data);
++
++	if (device->bonding) {
++		/* this is a LE device during pairing */
++		int err = adapter_create_bonding(device->adapter,
++				&device->bdaddr, device->bdaddr_type,
++				agent_get_io_capability(device->agent));
++		if (err < 0) {
++			DBusMessage *reply = btd_error_failed(
++					device->bonding->msg, strerror(-err));
++			g_dbus_send_message(device->bonding->conn, reply);
++			bonding_request_cancel(device->bonding);
++			bonding_request_free(device->bonding);
++		}
++	}
++
+ done:
+ 	g_free(attcb);
+ }
+@@ -1995,16 +2042,30 @@ GIOChannel *device_att_connect(gpointer user_data)
+ 	attcb->user_data = device;
+ 
+ 	if (device_is_bredr(device)) {
+-		io = bt_io_connect(att_connect_cb,
+-					attcb, NULL, &gerr,
++		io = bt_io_connect(att_connect_cb, attcb, NULL, &gerr,
+ 					BT_IO_OPT_SOURCE_BDADDR, &sba,
+ 					BT_IO_OPT_DEST_BDADDR, &device->bdaddr,
+ 					BT_IO_OPT_PSM, ATT_PSM,
+ 					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+ 					BT_IO_OPT_INVALID);
++	} else if (device->bonding) {
++		/* this is a LE device during pairing, using low sec level */
++		io = bt_io_connect(att_connect_cb, attcb, NULL, &gerr,
++				BT_IO_OPT_SOURCE_BDADDR, &sba,
++				BT_IO_OPT_DEST_BDADDR, &device->bdaddr,
++				BT_IO_OPT_DEST_TYPE, device->bdaddr_type,
++				BT_IO_OPT_CID, ATT_CID,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++				BT_IO_OPT_INVALID);
++		if (io == NULL) {
++			DBusMessage *reply = btd_error_failed(
++					device->bonding->msg, gerr->message);
++			g_dbus_send_message(device->bonding->conn, reply);
++			bonding_request_cancel(device->bonding);
++			bonding_request_free(device->bonding);
++		}
+ 	} else {
+-		io = bt_io_connect(att_connect_cb,
+-				attcb, NULL, &gerr,
++		io = bt_io_connect(att_connect_cb, attcb, NULL, &gerr,
+ 				BT_IO_OPT_SOURCE_BDADDR, &sba,
+ 				BT_IO_OPT_DEST_BDADDR, &device->bdaddr,
+ 				BT_IO_OPT_DEST_TYPE, device->bdaddr_type,
+@@ -2330,38 +2391,6 @@ static DBusMessage *new_authentication_return(DBusMessage *msg, uint8_t status)
+ 	}
+ }
+ 
+-static void bonding_request_free(struct bonding_req *bonding)
+-{
+-	struct btd_device *device;
+-
+-	if (!bonding)
+-		return;
+-
+-	if (bonding->listener_id)
+-		g_dbus_remove_watch(bonding->conn, bonding->listener_id);
+-
+-	if (bonding->msg)
+-		dbus_message_unref(bonding->msg);
+-
+-	if (bonding->conn)
+-		dbus_connection_unref(bonding->conn);
+-
+-	device = bonding->device;
+-	g_free(bonding);
+-
+-	if (!device)
+-		return;
+-
+-	device->bonding = NULL;
+-
+-	if (!device->agent)
+-		return;
+-
+-	agent_cancel(device->agent);
+-	agent_free(device->agent);
+-	device->agent = NULL;
+-}
+-
+ void device_set_paired(struct btd_device *device, gboolean value)
+ {
+ 	DBusConnection *conn = get_dbus_connection();
+@@ -2455,41 +2484,6 @@ DBusMessage *device_create_bonding(struct btd_device *device,
+ 	if (device_is_bonded(device))
+ 		return btd_error_already_exists(msg);
+ 
+-	if (device_is_le(device)) {
+-		struct att_callbacks *attcb;
+-		GError *gerr = NULL;
+-		bdaddr_t sba;
+-
+-		adapter_get_address(adapter, &sba);
+-
+-		attcb = g_new0(struct att_callbacks, 1);
+-		attcb->user_data = device;
+-
+-		device->att_io = bt_io_connect(att_connect_cb,
+-				attcb, NULL, &gerr,
+-				BT_IO_OPT_SOURCE_BDADDR, &sba,
+-				BT_IO_OPT_DEST_BDADDR, &device->bdaddr,
+-				BT_IO_OPT_DEST_TYPE, device->bdaddr_type,
+-				BT_IO_OPT_CID, ATT_CID,
+-				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+-				BT_IO_OPT_INVALID);
+-
+-		if (device->att_io == NULL) {
+-			DBusMessage *reply = btd_error_failed(msg,
+-								gerr->message);
+-
+-			error("Bonding bt_io_connect(): %s", gerr->message);
+-			g_error_free(gerr);
+-			g_free(attcb);
+-			return reply;
+-		}
+-	}
+-
+-	err = adapter_create_bonding(adapter, &device->bdaddr,
+-					device->bdaddr_type, capability);
+-	if (err < 0)
+-		return btd_error_failed(msg, strerror(-err));
+-
+ 	bonding = bonding_request_new(conn, msg, device, agent_path,
+ 					capability);
+ 
+@@ -2501,6 +2495,16 @@ DBusMessage *device_create_bonding(struct btd_device *device,
+ 	device->bonding = bonding;
+ 	bonding->device = device;
+ 
++	if (device_is_le(device)) {
++		adapter_connect_list_add(adapter, device);
++		return NULL;
++	}
++
++	err = adapter_create_bonding(adapter, &device->bdaddr,
++					device->bdaddr_type, capability);
++	if (err < 0)
++		return btd_error_failed(msg, strerror(-err));
++
+ 	return NULL;
+ }
+ 
+-- 
+1.7.11.4
 
