@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC v4 13/18] eir: Use bt_get_* helper functions to access unaligned memory
-Date: Tue, 4 Sep 2012 16:41:32 +0200
-Message-ID: <1346769697-9930-14-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC v4 11/18] hciemu: Fix build errors due to unaligned memory access
+Date: Tue, 4 Sep 2012 16:41:30 +0200
+Message-ID: <1346769697-9930-12-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1346769697-9930-1-git-send-email-szymon.janc@tieto.com>
 References: <1346769697-9930-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,34 +12,39 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This fix following build errors on ARM.
+
+  CC     test/hciemu.o
+test/hciemu.c: In function num_completed_pkts:
+test/hciemu.c:429:4: error: cast increases required alignment of target
+	 type [-Werror=cast-align]
+test/hciemu.c:430:4: error: cast increases required alignment of target
+	type [-Werror=cast-align]
+cc1: all warnings being treated as errors
+make[1]: *** [test/hciemu.o] Error 1
+make: *** [all] Error 2
+
 ---
- src/eir.c |    6 ++++--
+ test/hciemu.c |    6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/src/eir.c b/src/eir.c
-index 9d42917..50912a0 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -55,7 +55,8 @@ static void eir_parse_uuid16(struct eir_data *eir, void *data, uint8_t len)
+diff --git a/test/hciemu.c b/test/hciemu.c
+index 4c62223..a125cf4 100644
+--- a/test/hciemu.c
++++ b/test/hciemu.c
+@@ -426,8 +426,10 @@ static void num_completed_pkts(struct vhci_conn *conn)
+ 	np = (void *) ptr; ptr += EVT_NUM_COMP_PKTS_SIZE;
+ 	np->num_hndl = 1;
  
- 	service.type = SDP_UUID16;
- 	for (i = 0; i < len / 2; i++, uuid16++) {
--		service.value.uuid16 = btohs(bt_get_unaligned(uuid16));
-+		service.value.uuid16 = bt_get_le16(uuid16);
-+
- 		uuid_str = bt_uuid2string(&service);
- 		eir->services = g_slist_append(eir->services, uuid_str);
- 	}
-@@ -70,7 +71,8 @@ static void eir_parse_uuid32(struct eir_data *eir, void *data, uint8_t len)
+-	*((uint16_t *) ptr) = htobs(conn->handle); ptr += 2;
+-	*((uint16_t *) ptr) = htobs(vdev.acl_cnt); ptr += 2;
++	bt_put_le16(conn->handle, ptr);
++	ptr += 2;
++	bt_put_le16(vdev.acl_cnt, ptr);
++	ptr += 2;
  
- 	service.type = SDP_UUID32;
- 	for (i = 0; i < len / 4; i++, uuid32++) {
--		service.value.uuid32 = btohl(bt_get_unaligned(uuid32));
-+		service.value.uuid32 = bt_get_le32(uuid32);
-+
- 		uuid_str = bt_uuid2string(&service);
- 		eir->services = g_slist_append(eir->services, uuid_str);
- 	}
+ 	write_snoop(vdev.dd, HCI_EVENT_PKT, 1, buf, ptr - buf);
+ 
 -- 
 1.7.9.5
 
