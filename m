@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC v4 04/18] l2test: Fix compilation errors due to unaligned memory access
-Date: Tue, 4 Sep 2012 16:41:23 +0200
-Message-ID: <1346769697-9930-5-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC v4 01/18] Add helper functions for putting integers on unaligned memory address
+Date: Tue, 4 Sep 2012 16:41:20 +0200
+Message-ID: <1346769697-9930-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1346769697-9930-1-git-send-email-szymon.janc@tieto.com>
 References: <1346769697-9930-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,60 +12,91 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fix following build errors on ARM.
-
-  CC     test/l2test.o
-test/l2test.c: In function recv_mode:
-test/l2test.c:826:9: error: cast increases required alignment of target
-	type [-Werror=cast-align]
-test/l2test.c:834:8: error: cast increases required alignment of target
-	type [-Werror=cast-align]
-test/l2test.c: In function do_send:
-test/l2test.c:893:4: error: cast increases required alignment of target
-	type [-Werror=cast-align]
-test/l2test.c:894:4: error: cast increases required alignment of target
-	type [-Werror=cast-align]
-cc1: all warnings being treated as errors
-make[1]: *** [test/l2test.o] Error 1
+Those functions are similar to bt_get_* functions.
 
 ---
- test/l2test.c |    9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ lib/bluetooth.h |   61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 61 insertions(+)
 
-diff --git a/test/l2test.c b/test/l2test.c
-index d31be10..7645681 100644
---- a/test/l2test.c
-+++ b/test/l2test.c
-@@ -823,7 +823,7 @@ static void recv_mode(int sk)
- 			}
- 
- 			/* Check sequence */
--			sq = btohl(*(uint32_t *) buf);
-+			sq = bt_get_le32(buf);
- 			if (seq != sq) {
- 				syslog(LOG_INFO, "seq missmatch: %d -> %d", seq, sq);
- 				seq = sq;
-@@ -831,7 +831,7 @@ static void recv_mode(int sk)
- 			seq++;
- 
- 			/* Check length */
--			l = btohs(*(uint16_t *) (buf + 4));
-+			l = bt_get_le16(buf + 4);
- 			if (len != l) {
- 				syslog(LOG_INFO, "size missmatch: %d -> %d", len, l);
- 				continue;
-@@ -890,8 +890,9 @@ static void do_send(int sk)
- 
- 	seq = 0;
- 	while ((num_frames == -1) || (num_frames-- > 0)) {
--		*(uint32_t *) buf = htobl(seq);
--		*(uint16_t *) (buf + 4) = htobs(data_size);
-+		bt_put_le32(seq, buf);
-+		bt_put_le16(data_size, buf + 4);
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index 0fc4508..161b7bd 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -183,6 +183,37 @@ static inline uint16_t bt_get_be16(const void *ptr)
+ {
+ 	return bswap_16(bt_get_unaligned((const uint16_t *) ptr));
+ }
 +
- 		seq++;
- 
- 		sent = 0;
++static inline void bt_put_le64(uint64_t val, const void *ptr)
++{
++	bt_put_unaligned(val, (uint64_t *) ptr);
++}
++
++static inline void bt_put_be64(uint64_t val, const void *ptr)
++{
++	bt_put_unaligned(bswap_64(val), (uint64_t *) ptr);
++}
++
++static inline void bt_put_le32(uint32_t val, const void *ptr)
++{
++	bt_put_unaligned(val, (uint32_t *) ptr);
++}
++
++static inline void bt_put_be32(uint32_t val, const void *ptr)
++{
++	bt_put_unaligned(bswap_32(val), (uint32_t *) ptr);
++}
++
++static inline void bt_put_le16(uint16_t val, const void *ptr)
++{
++	bt_put_unaligned(val, (uint16_t *) ptr);
++}
++
++static inline void bt_put_be16(uint16_t val, const void *ptr)
++{
++	bt_put_unaligned(bswap_16(val), (uint16_t *) ptr);
++}
++
+ #elif __BYTE_ORDER == __BIG_ENDIAN
+ static inline uint64_t bt_get_le64(const void *ptr)
+ {
+@@ -213,6 +244,36 @@ static inline uint16_t bt_get_be16(const void *ptr)
+ {
+ 	return bt_get_unaligned((const uint16_t *) ptr);
+ }
++
++static inline void bt_put_le64(uint64_t val, const void *ptr)
++{
++	bt_put_unaligned(bswap_64(val), (uint64_t *) ptr);
++}
++
++static inline void bt_put_be64(uint64_t val, const void *ptr)
++{
++	bt_put_unaligned(val, (uint64_t *) ptr);
++}
++
++static inline void bt_put_le32(uint32_t val, const void *ptr)
++{
++	bt_put_unaligned(bswap_32(val), (uint32_t *) ptr);
++}
++
++static inline void bt_put_be32(uint32_t val, const void *ptr)
++{
++	bt_put_unaligned(val, (uint32_t *) ptr);
++}
++
++static inline void bt_put_le16(uint16_t val, const void *ptr)
++{
++	bt_put_unaligned(bswap_16(val), (uint16_t *) ptr);
++}
++
++static inline void bt_put_be16(uint16_t val, const void *ptr)
++{
++	bt_put_unaligned(val, (uint16_t *) ptr);
++}
+ #else
+ #error "Unknown byte order"
+ #endif
 -- 
 1.7.9.5
 
