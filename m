@@ -1,84 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v5 01/14] core: Control connections based on adapter state
-Date: Tue,  4 Sep 2012 16:04:29 -0300
-Message-Id: <1346785482-13359-2-git-send-email-jprvita@openbossa.org>
-In-Reply-To: <1346785482-13359-1-git-send-email-jprvita@openbossa.org>
-References: <1346785482-13359-1-git-send-email-jprvita@openbossa.org>
+Date: Tue, 4 Sep 2012 15:52:11 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: szymon.janc@tieto.com, linux-bluetooth@vger.kernel.org
+Subject: Re: Bluetooth: Use GFP_KERNEL in read_index_list
+Message-ID: <20120904185151.GA2344@joana>
+References: <20120904162137.GA11841@elgon.mountain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120904162137.GA11841@elgon.mountain>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Hi Dan,
 
-This patch disable automatic ATTIO connections when the adapter is
-powered down and enable automatic connection when the adapter is powered
-on.
----
- src/adapter.c | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
+* Dan Carpenter <dan.carpenter@oracle.com> [2012-09-04 19:21:37 +0300]:
 
-diff --git a/src/adapter.c b/src/adapter.c
-index f507aa5..d4ba4fc 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2116,6 +2116,14 @@ static int get_pairable_timeout(const char *src)
- 	return main_opts.pairto;
- }
- 
-+static void set_auto_connect(gpointer data, gpointer user_data)
-+{
-+	struct btd_device *device = data;
-+	gboolean enable = GPOINTER_TO_INT(user_data);
-+
-+	device_set_auto_connect(device, enable);
-+}
-+
- static void call_adapter_powered_callbacks(struct btd_adapter *adapter,
- 						gboolean powered)
- {
-@@ -2125,7 +2133,10 @@ static void call_adapter_powered_callbacks(struct btd_adapter *adapter,
- 		btd_adapter_powered_cb cb = l->data;
- 
- 		cb(adapter, powered);
--       }
-+	}
-+
-+	g_slist_foreach(adapter->devices, set_auto_connect,
-+						GINT_TO_POINTER(powered));
- }
- 
- static void emit_device_disappeared(gpointer data, gpointer user_data)
-@@ -3348,15 +3359,10 @@ static gboolean disable_auto(gpointer user_data)
- 	return FALSE;
- }
- 
--static void set_auto_connect(gpointer data, gpointer user_data)
--{
--	struct btd_device *device = data;
--
--	device_set_auto_connect(device, TRUE);
--}
--
- void btd_adapter_enable_auto_connect(struct btd_adapter *adapter)
- {
-+	gboolean enable = TRUE;
-+
- 	if (!adapter->up)
- 		return;
- 
-@@ -3365,7 +3371,8 @@ void btd_adapter_enable_auto_connect(struct btd_adapter *adapter)
- 	if (adapter->auto_timeout_id)
- 		return;
- 
--	g_slist_foreach(adapter->devices, set_auto_connect, NULL);
-+	g_slist_foreach(adapter->devices, set_auto_connect,
-+						GINT_TO_POINTER(enable));
- 
- 	adapter->auto_timeout_id = g_timeout_add_seconds(main_opts.autoto,
- 						disable_auto, adapter);
--- 
-1.7.11.4
+> Hello Szymon Janc,
+> 
+> The patch 7cfeb868eb85: "Bluetooth: Use GFP_KERNEL in
+> read_index_list" from Aug 31, 2012, leads to the following warning:
+> net/bluetooth/mgmt.c:343 read_index_list()
+> 	 error: scheduling with locks held:  'read_lock:hci_dev_list_lock'
+> 
+> This patch should be reverted because we're not allowed to schedule
+> while holding the read lock.  The way to avoid these bugs in the future
+> is to test with CONFIG_DEBUG_ATOMIC_SLEEP=y.  It will give a big splat.
 
+I reverted this patch earlier this morning. It should be ok now.
+
+	Gustavo
