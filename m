@@ -2,101 +2,67 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC v4 01/18] Add helper functions for putting integers on unaligned memory address
-Date: Tue, 4 Sep 2012 16:41:20 +0200
-Message-ID: <1346769697-9930-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1346769697-9930-1-git-send-email-szymon.janc@tieto.com>
-References: <1346769697-9930-1-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC v4 00/18] Unaligned memory access fixes
+Date: Tue, 4 Sep 2012 16:41:19 +0200
+Message-ID: <1346769697-9930-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Those functions are similar to bt_get_* functions.
+Changes since V2:
 
----
- lib/bluetooth.h |   61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
+- fixed issues pointed by Anderson
+- some other fixes, cleanups
+- proposed change to bt_get_unaligned macro (PATCH 15) to avoid offending
+  pointer cast, this allow to use this macro instead of memcpy (in places
+  where it is more clean compared to memcpy e.g. where memcpy requires
+  temporary variable) - this is not commonly used since most macro uses
+  are now replaced with helper functions.
 
-diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-index 0fc4508..161b7bd 100644
---- a/lib/bluetooth.h
-+++ b/lib/bluetooth.h
-@@ -183,6 +183,37 @@ static inline uint16_t bt_get_be16(const void *ptr)
- {
- 	return bswap_16(bt_get_unaligned((const uint16_t *) ptr));
- }
-+
-+static inline void bt_put_le64(uint64_t val, const void *ptr)
-+{
-+	bt_put_unaligned(val, (uint64_t *) ptr);
-+}
-+
-+static inline void bt_put_be64(uint64_t val, const void *ptr)
-+{
-+	bt_put_unaligned(bswap_64(val), (uint64_t *) ptr);
-+}
-+
-+static inline void bt_put_le32(uint32_t val, const void *ptr)
-+{
-+	bt_put_unaligned(val, (uint32_t *) ptr);
-+}
-+
-+static inline void bt_put_be32(uint32_t val, const void *ptr)
-+{
-+	bt_put_unaligned(bswap_32(val), (uint32_t *) ptr);
-+}
-+
-+static inline void bt_put_le16(uint16_t val, const void *ptr)
-+{
-+	bt_put_unaligned(val, (uint16_t *) ptr);
-+}
-+
-+static inline void bt_put_be16(uint16_t val, const void *ptr)
-+{
-+	bt_put_unaligned(bswap_16(val), (uint16_t *) ptr);
-+}
-+
- #elif __BYTE_ORDER == __BIG_ENDIAN
- static inline uint64_t bt_get_le64(const void *ptr)
- {
-@@ -213,6 +244,36 @@ static inline uint16_t bt_get_be16(const void *ptr)
- {
- 	return bt_get_unaligned((const uint16_t *) ptr);
- }
-+
-+static inline void bt_put_le64(uint64_t val, const void *ptr)
-+{
-+	bt_put_unaligned(bswap_64(val), (uint64_t *) ptr);
-+}
-+
-+static inline void bt_put_be64(uint64_t val, const void *ptr)
-+{
-+	bt_put_unaligned(val, (uint64_t *) ptr);
-+}
-+
-+static inline void bt_put_le32(uint32_t val, const void *ptr)
-+{
-+	bt_put_unaligned(bswap_32(val), (uint32_t *) ptr);
-+}
-+
-+static inline void bt_put_be32(uint32_t val, const void *ptr)
-+{
-+	bt_put_unaligned(val, (uint32_t *) ptr);
-+}
-+
-+static inline void bt_put_le16(uint16_t val, const void *ptr)
-+{
-+	bt_put_unaligned(bswap_16(val), (uint16_t *) ptr);
-+}
-+
-+static inline void bt_put_be16(uint16_t val, const void *ptr)
-+{
-+	bt_put_unaligned(val, (uint16_t *) ptr);
-+}
- #else
- #error "Unknown byte order"
- #endif
+-- 
+BR
+Szymon Janc
+
+Szymon Janc (18):
+  Add helper functions for putting integers on unaligned memory address
+  sdp: Fix compilation errors due to unaligned memory access
+  sdp: Use bt_get_be* helpers instead of bt_get_unaligned
+  l2test: Fix compilation errors due to unaligned memory access
+  rctest: Fix compilation errors due to unaligned memory access
+  scotest: Fix compilation errors due to unaligned memory access
+  sap: Fix compilation errors due to unaligned memory access
+  adaptername: Refactor handle_inotify_cb
+  sdpd-request: Fix build errors due to unaligned memory access
+  sdpd-service: Fix build errors due to unaligned memory access
+  hciemu: Fix build errors due to unaligned memory access
+  avrcp: Fix compilation errors due to unaligned memory access
+  eir: Use bt_get_* helper functions to access unaligned memory
+  mgmt: Use bt_get_* helper functions to access unaligned memory
+  Refactor bt_get_unaligned macro
+  sap-u8500: Fix compile error due to unaligned memory access
+  monitor: Fix compilation errors due to unaligned memory access
+  sdp: Fix build error due to unaligned memory access
+
+ attrib/att.h             |    6 +--
+ audio/avrcp.c            |   10 ++---
+ lib/bluetooth.h          |   89 +++++++++++++++++++++++++++++++++++++-------
+ lib/sdp.c                |   92 +++++++++++++++++++++++-----------------------
+ monitor/control.c        |    7 +++-
+ monitor/hcidump.c        |   21 +++++++----
+ plugins/adaptername.c    |   48 ++++++++++++------------
+ profiles/sap/sap-u8500.c |   10 +++--
+ profiles/sap/server.c    |    9 ++---
+ src/eir.c                |    6 ++-
+ src/mgmt.c               |   18 ++++-----
+ src/sdpd-request.c       |   62 ++++++++++++++++---------------
+ src/sdpd-service.c       |   21 +++++------
+ test/hciemu.c            |    6 ++-
+ test/l2test.c            |    9 +++--
+ test/rctest.c            |    5 ++-
+ test/scotest.c           |    5 ++-
+ 17 files changed, 253 insertions(+), 171 deletions(-)
+
 -- 
 1.7.9.5
 
