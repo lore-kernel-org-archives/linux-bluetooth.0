@@ -1,80 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1346772105.21200.2.camel@aeonflux>
-Subject: Re: [RFC v4 15/18] Refactor bt_get_unaligned macro
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 04 Sep 2012 08:21:45 -0700
-In-Reply-To: <1346769697-9930-16-git-send-email-szymon.janc@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [RFC v4 08/18] adaptername: Refactor handle_inotify_cb
+Date: Tue, 4 Sep 2012 16:41:27 +0200
+Message-ID: <1346769697-9930-9-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1346769697-9930-1-git-send-email-szymon.janc@tieto.com>
 References: <1346769697-9930-1-git-send-email-szymon.janc@tieto.com>
-	 <1346769697-9930-16-git-send-email-szymon.janc@tieto.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Refactor handle_inotify_cb to avoid unaligned memory access.
+Instead of reading whole events buffer and cast to event struct when
+iterating over it, read data directly to struct inotify_event one
+event at time.
 
-> Use extra parameter type for bt_get_unaligned to avoid pointer casting
-> which might trigger compile time errors due to unaligned memory access.
-> 
-> ---
->  attrib/att.h       |    6 +++---
->  lib/bluetooth.h    |   28 ++++++++++++++--------------
->  lib/sdp.c          |   22 +++++++++++-----------
->  src/sdpd-request.c |    4 ++--
->  4 files changed, 30 insertions(+), 30 deletions(-)
-> 
-> diff --git a/attrib/att.h b/attrib/att.h
-> index a563255..6101dac 100644
-> --- a/attrib/att.h
-> +++ b/attrib/att.h
-> @@ -115,19 +115,19 @@ struct att_range {
->  static inline uint8_t att_get_u8(const void *ptr)
->  {
->  	const uint8_t *u8_ptr = ptr;
-> -	return bt_get_unaligned(u8_ptr);
-> +	return bt_get_unaligned(u8_ptr, uint8_t);
->  }
->  
->  static inline uint16_t att_get_u16(const void *ptr)
->  {
->  	const uint16_t *u16_ptr = ptr;
-> -	return btohs(bt_get_unaligned(u16_ptr));
-> +	return btohs(bt_get_unaligned(u16_ptr, uint16_t));
->  }
->  
->  static inline uint32_t att_get_u32(const void *ptr)
->  {
->  	const uint32_t *u32_ptr = ptr;
-> -	return btohl(bt_get_unaligned(u32_ptr));
-> +	return btohl(bt_get_unaligned(u32_ptr, uint32_t));
->  }
->  
->  static inline uint128_t att_get_u128(const void *ptr)
-> diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-> index 161b7bd..898a122 100644
-> --- a/lib/bluetooth.h
-> +++ b/lib/bluetooth.h
-> @@ -137,10 +137,10 @@ enum {
->  #endif
->  
->  /* Bluetooth unaligned access */
-> -#define bt_get_unaligned(ptr)			\
-> +#define bt_get_unaligned(ptr, type)		\
->  ({						\
->  	struct __attribute__((packed)) {	\
-> -		typeof(*(ptr)) __v;		\
-> +		type __v;			\
->  	} *__p = (typeof(__p)) (ptr);		\
->  	__p->__v;				\
->  })
+This fix following build error on ARM.
 
-I am not in favor of this change at all. We should not need such a
-change. And in addition, it break the API.
+  CC     plugins/bluetoothd-adaptername.o
+plugins/adaptername.c: In function handle_inotify_cb:
+plugins/adaptername.c:244:34: error: cast increases required alignment
+	of target type [-Werror=cast-align]
+cc1: all warnings being treated as errors
+make[1]: *** [plugins/bluetoothd-adaptername.o] Error 1
+make: *** [all] Error 2
 
-Regards
+---
+ plugins/adaptername.c |   48 ++++++++++++++++++++++++------------------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
 
-Marcel
-
+diff --git a/plugins/adaptername.c b/plugins/adaptername.c
+index c109b44..da94f1e 100644
+--- a/plugins/adaptername.c
++++ b/plugins/adaptername.c
+@@ -46,8 +46,6 @@
+ #include "log.h"
+ 
+ #include <sys/inotify.h>
+-#define EVENT_SIZE  (sizeof (struct inotify_event))
+-#define EVENT_BUF_LEN (1024 * (EVENT_SIZE + 16))
+ 
+ #define MACHINE_INFO_DIR "/etc/"
+ #define MACHINE_INFO_FILE "machine-info"
+@@ -227,38 +225,40 @@ static int adaptername_probe(struct btd_adapter *adapter)
+ static gboolean handle_inotify_cb(GIOChannel *channel, GIOCondition cond,
+ 								gpointer data)
+ {
+-	char buf[EVENT_BUF_LEN];
++	struct inotify_event event;
++	gsize len;
+ 	GIOStatus err;
+-	gsize len, i;
+-	gboolean changed;
++	char name[FILENAME_MAX + 1];
+ 
+-	changed = FALSE;
++	while ((err = g_io_channel_read_chars(channel, (gchar *)&event,
++			sizeof(event), &len, NULL)) != G_IO_STATUS_AGAIN) {
++		if (err != G_IO_STATUS_NORMAL || len != sizeof(event) ||
++				event.len > sizeof(name))
++			goto fail;
+ 
+-	err = g_io_channel_read_chars(channel, buf, EVENT_BUF_LEN, &len, NULL);
+-	if (err != G_IO_STATUS_NORMAL) {
+-		error("Error reading inotify event: %d\n", err);
+-		return FALSE;
+-	}
++		if (event.len == 0)
++			continue;
+ 
+-	i = 0;
+-	while (i < len) {
+-		struct inotify_event *pevent = (struct inotify_event *) &buf[i];
++		err = g_io_channel_read_chars(channel, name, event.len, &len,
++									NULL);
+ 
+-		/* check that it's ours */
+-		if (pevent->len && pevent->name != NULL &&
+-				strcmp(pevent->name, MACHINE_INFO_FILE) == 0)
+-			changed = TRUE;
++		if (err != G_IO_STATUS_NORMAL || len != event.len)
++			goto fail;
+ 
+-		i += EVENT_SIZE + pevent->len;
+-	}
++		if (strncmp(name, MACHINE_INFO_FILE, event.len) == 0) {
++			DBG(MACHINE_INFO_DIR MACHINE_INFO_FILE
++					" changed, updating adapters' names");
+ 
+-	if (changed != FALSE) {
+-		DBG(MACHINE_INFO_DIR MACHINE_INFO_FILE
+-				" changed, changing names for adapters");
+-		manager_foreach_adapter((adapter_cb) adaptername_probe, NULL);
++			manager_foreach_adapter((adapter_cb) adaptername_probe,
++									NULL);
++			break;
++		}
+ 	}
+ 
+ 	return TRUE;
++fail:
++	error("Error reading inotify event");
++	return FALSE;
+ }
+ 
+ static void adaptername_remove(struct btd_adapter *adapter)
+-- 
+1.7.9.5
 
