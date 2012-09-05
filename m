@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 09/17] heartrate: Enable measurement when watchers are registered
-Date: Wed, 5 Sep 2012 15:05:40 +0200
-Message-ID: <1346850348-21176-10-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 03/17] heartrate: Add attio callbacks
+Date: Wed, 5 Sep 2012 15:05:34 +0200
+Message-ID: <1346850348-21176-4-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1346850348-21176-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1346850348-21176-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,192 +12,93 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch will enable measurement notification when first watcher is
-registered or when device is connected and watcher is already registered.
-
-Measurement will be disabled when last watcher is unregistered.
-
 ---
- profiles/heartrate/heartrate.c | 129 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 128 insertions(+), 1 deletion(-)
+ profiles/heartrate/heartrate.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index a223fe0..5464a9f 100644
+index 17514c0..918546e 100644
 --- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
-@@ -101,6 +101,22 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
- 	return -1;
- }
+@@ -31,7 +31,12 @@
  
-+static gint cmp_char_uuid(gconstpointer a, gconstpointer b)
-+{
-+	const struct characteristic *ch = a;
-+	const char *uuid = b;
-+
-+	return g_strcmp0(ch->attr.uuid, uuid);
-+}
-+
-+static gint cmp_descriptor(gconstpointer a, gconstpointer b)
-+{
-+	const struct descriptor *desc = a;
-+	const bt_uuid_t *uuid = b;
-+
-+	return bt_uuid_cmp(&desc->uuid, uuid);
-+}
-+
- static gint cmp_watcher(gconstpointer a, gconstpointer b)
+ #include "adapter.h"
+ #include "device.h"
++#include "gattrib.h"
++#include "attio.h"
++#include "att.h"
++#include "gatt.h"
+ #include "heartrate.h"
++#include "log.h"
+ 
+ struct heartrate_adapter {
+ 	struct btd_adapter	*adapter;
+@@ -41,6 +46,8 @@ struct heartrate_adapter {
+ struct heartrate {
+ 	struct btd_device		*dev;
+ 	struct heartrate_adapter	*hra;
++	GAttrib				*attrib;
++	guint				attioid;
+ };
+ 
+ static GSList *heartrate_adapters = NULL;
+@@ -82,6 +89,12 @@ static void destroy_heartrate_device(gpointer user_data)
  {
- 	const struct watcher *watcher = a;
-@@ -181,6 +197,91 @@ static void destroy_heartrate_adapter(gpointer user_data)
+ 	struct heartrate *hr = user_data;
+ 
++	if (hr->attioid > 0)
++		btd_device_remove_attio_callback(hr->dev, hr->attioid);
++
++	if (hr->attrib != NULL)
++		g_attrib_unref(hr->attrib);
++
+ 	btd_device_unref(hr->dev);
+ 	g_free(hr);
+ }
+@@ -90,9 +103,31 @@ static void destroy_heartrate_adapter(gpointer user_data)
+ {
+ 	struct heartrate_adapter *hra = user_data;
+ 
++	if (hra->devices != NULL)
++		g_slist_free_full(hra->devices, destroy_heartrate_device);
++
  	g_free(hra);
  }
  
-+static struct characteristic *
-+get_characteristic(struct heartrate *hr, const char *uuid)
++static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
 +{
-+	GSList *l;
++	struct heartrate *hr = user_data;
 +
-+	l = g_slist_find_custom(hr->chars, uuid, cmp_char_uuid);
-+	if (l == NULL)
-+		return NULL;
++	DBG("GATT Connected");
 +
-+	return l->data;
++	hr->attrib = g_attrib_ref(attrib);
 +}
 +
-+static struct descriptor *get_descriptor(struct characteristic *ch,
-+							const bt_uuid_t *uuid)
++static void attio_disconnected_cb(gpointer user_data)
 +{
-+	GSList *l;
++	struct heartrate *hr = user_data;
 +
-+	l = g_slist_find_custom(ch->desc, uuid, cmp_descriptor);
-+	if (l == NULL)
-+		return NULL;
++	DBG("GATT Disconnected");
 +
-+	return l->data;
++	g_attrib_unref(hr->attrib);
++	hr->attrib = NULL;
 +}
 +
-+static void char_write_cb(guint8 status, const guint8 *pdu, guint16 len,
-+							gpointer user_data)
-+{
-+	char *msg = user_data;
-+
-+	if (status != 0)
-+		error("%s failed", msg);
-+
-+	g_free(msg);
-+}
-+
-+static void measurement_toggle(struct heartrate *hr, gboolean enable)
-+{
-+	struct characteristic *ch;
-+	struct descriptor *desc;
-+	bt_uuid_t btuuid;
-+	uint8_t atval[2];
-+	char *msg;
-+
-+	if (hr->attrib == NULL)
-+		return;
-+
-+	ch = get_characteristic(hr, HEART_RATE_MEASUREMENT_UUID);
-+	if (ch == NULL) {
-+		DBG("Heart Rate Measurement characteristic not found");
-+		return;
-+	}
-+
-+	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
-+	desc = get_descriptor(ch, &btuuid);
-+	if (desc == NULL) {
-+		DBG("Client Characteristic Configuration descriptor not found");
-+		return;
-+	}
-+
-+	if (enable) {
-+		att_put_u16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, atval);
-+		msg = g_strdup("Enable measurement");
-+	} else {
-+		att_put_u16(0x0000, atval);
-+		msg = g_strdup("Disable measurement");
-+	}
-+
-+	gatt_write_char(hr->attrib, desc->handle, atval, 2, char_write_cb, msg);
-+
-+}
-+
-+static void measurement_enable(gpointer data, gpointer user_data)
-+{
-+	struct heartrate *hr = data;
-+
-+	measurement_toggle(hr, TRUE);
-+}
-+
-+static void measurement_disable(gpointer data, gpointer user_data)
-+{
-+	struct heartrate *hr = data;
-+
-+	measurement_toggle(hr, FALSE);
-+}
-+
- static void watcher_exit(DBusConnection *conn, void *user_data)
+ int heartrate_adapter_register(struct btd_adapter *adapter)
  {
- 	struct watcher *watcher = user_data;
-@@ -190,6 +291,9 @@ static void watcher_exit(DBusConnection *conn, void *user_data)
+ 	struct heartrate_adapter *hra;
+@@ -137,6 +172,11 @@ int heartrate_device_register(struct btd_device *device)
  
- 	hr->watchers = g_slist_remove(hr->watchers, watcher);
- 	g_dbus_remove_watch(conn, watcher->id);
+ 	hra->devices = g_slist_prepend(hra->devices, hr);
+ 
++	hr->attioid = btd_device_add_attio_callback(device,
++						attio_connected_cb,
++						attio_disconnected_cb,
++						hr);
 +
-+	if (g_slist_length(hr->watchers) == 0)
-+		g_slist_foreach(hr->devices, measurement_disable, 0);
+ 	return 0;
  }
  
- static struct watcher *find_watcher(GSList *list, const char *sender,
-@@ -236,6 +340,9 @@ static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
- 	watcher->id = g_dbus_add_disconnect_watch(conn, sender, watcher_exit,
- 						watcher, destroy_watcher);
- 
-+	if (g_slist_length(hra->watchers) == 0)
-+		g_slist_foreach(hra->devices, measurement_enable, 0);
-+
- 	hra->watchers = g_slist_prepend(hra->watchers, watcher);
- 
- 	return dbus_message_new_method_return(msg);
-@@ -262,6 +369,9 @@ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
- 	hr->watchers = g_slist_remove(hr->watchers, watcher);
- 	g_dbus_remove_watch(get_dbus_connection(), watcher->id);
- 
-+	if (g_slist_length(hr->watchers) == 0)
-+		g_slist_foreach(hr->devices, measurement_disable, 0);
-+
- 	return dbus_message_new_method_return(msg);
- }
- 
-@@ -291,9 +401,26 @@ static void process_heartrate_desc(struct descriptor *desc)
- 
- 	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
- 
--	if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0)
-+	if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0) {
-+		uint8_t atval[2];
-+		char *msg;
-+
-+		if (g_strcmp0(ch->attr.uuid, HEART_RATE_MEASUREMENT_UUID) != 0)
-+			goto done;
-+
-+		if (g_slist_length(ch->hr->hra->watchers) == 0)
-+			return;
-+
-+		att_put_u16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, atval);
-+		msg = g_strdup("Enable measurement");
-+
-+		gatt_write_char(ch->hr->attrib, desc->handle,
-+					atval, 2, char_write_cb, msg);
-+
- 		return;
-+	}
- 
-+done:
- 	bt_uuid_to_string(&desc->uuid, uuidstr, MAX_LEN_UUID_STR);
- 	DBG("Ignored descriptor %s in characteristic %s", uuidstr,
- 							ch->attr.uuid);
 -- 
 1.7.11.3
 
