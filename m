@@ -1,45 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 5 Sep 2012 12:28:24 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Date: Wed, 5 Sep 2012 12:25:43 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH] Bluetooth: mgmt: Implement support for passkey
  notification
-Message-ID: <20120905092824.GA25573@x220>
+Message-ID: <20120905092536.GA28333@aemeltch-MOBL1>
 References: <1346832850-25061-1-git-send-email-johan.hedberg@gmail.com>
- <1346833772.21200.79.camel@aeonflux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1346833772.21200.79.camel@aeonflux>
+In-Reply-To: <1346832850-25061-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Wed, Sep 05, 2012, Marcel Holtmann wrote:
-> Hi Johan,
-> 
-> > This patch adds support for Secure Simple Pairing with devices that have
-> > KeyboardOnly as their IO capability. Such devices will cause a passkey
-> > notification on our side and optionally also keypress notifications.
-> > Without this patch some keyboards cannot be paired using the mgmt
-> > interface.
-> 
-> can we see a mgmt-api.txt documentation patch as RFC first.
+nitpicks
 
-Actually I already pushed that yesterday. We can still change it of
-course if you have improvement suggestions:
+On Wed, Sep 05, 2012 at 11:14:10AM +0300, Johan Hedberg wrote:
+...
+> +	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
+> +	if (!conn)
+> +		return;
+> +
+> +	switch (ev->type) {
+> +	case HCI_KEYPRESS_STARTED:
+> +		conn->passkey_entered = 0;
+> +		return;
+> +	case HCI_KEYPRESS_ENTERED:
+> +		conn->passkey_entered++;
+> +		break;
+> +	case HCI_KEYPRESS_ERASED:
+> +		conn->passkey_entered--;
+> +		break;
+> +	case HCI_KEYPRESS_CLEARED:
+> +		conn->passkey_entered = 0;
+> +		break;
 
-+Passkey Notify Event
-+====================
-+
-+Event Code             0x0017
-+Controller Index       <controller id>
-+Event Parameters       Address (6 Octets)
-+                       Address_Type (1 Octet)
-+                       Passkey (4 Octets)
-+                       Entered (1 Octet)
+Can we use the same style for switch like below:
 
-And yes, I know some description for the event (and most other events in
-mgmt-api.txt) would be good.
+...
+> +	case HCI_EV_USER_PASSKEY_NOTIFY:
+> +		hci_user_passkey_notify_evt(hdev, skb);
+> +		break;
+> +
+> +	case HCI_EV_KEYPRESS_NOTIFY:
+> +		hci_keypress_notify_evt(hdev, skb);
+> +		break;
+> +
+>  	case HCI_EV_SIMPLE_PAIR_COMPLETE:
+>  		hci_simple_pair_complete_evt(hdev, skb);
+>  		break;
 
-Johan
+Best regards 
+Andrei Emeltchenko 
