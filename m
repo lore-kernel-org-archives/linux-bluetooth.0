@@ -2,457 +2,195 @@ Return-Path: <cyrus@holtmann.org>
 From: Anton Weber <ant@antweb.me>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anton Weber <ant@antweb.me>
-Subject: [PATCH BlueZ v3 2/6] replay: Add timing functionality
-Date: Wed,  5 Sep 2012 16:14:18 +0200
-Message-Id: <1346854462-12396-2-git-send-email-ant@antweb.me>
+Subject: [PATCH BlueZ v3 5/6] replay: Add man page
+Date: Wed,  5 Sep 2012 16:14:21 +0200
+Message-Id: <1346854462-12396-5-git-send-email-ant@antweb.me>
 In-Reply-To: <1346854462-12396-1-git-send-email-ant@antweb.me>
 References: <1344533773-12914-1-git-send-email-ant@antweb.me>
  <1346854462-12396-1-git-send-email-ant@antweb.me>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add -d parameter that lets user choose between two delay modes.
-delta: use time difference between two packets for delay
-none: no delay
-
-Add -m parameter to specify a factor that multiplies delays in
-delta delay mode.
-
-Add -t parameter to set the epoll timeout when receiving packets.
 ---
-v2 -> v3: Rename long parameters timing and factor
-
- Makefile.tools        |    3 +-
- tools/replay/hciseq.c |   53 ++++++++++++++++++++++++++++
- tools/replay/hciseq.h |   23 +++++++++++++
- tools/replay/main.c   |   62 ++++++++++++++++++++++++++++++---
- tools/replay/main.h   |   21 +-----------
- tools/replay/time.c   |   91 +++++++++++++++++++++++++++++++++++++++++++++++++
- tools/replay/time.h   |   31 +++++++++++++++++
- 7 files changed, 259 insertions(+), 25 deletions(-)
- create mode 100644 tools/replay/hciseq.c
- create mode 100644 tools/replay/time.c
- create mode 100644 tools/replay/time.h
+ Makefile.tools          |    6 +-
+ tools/replay/btreplay.1 |  148 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 152 insertions(+), 2 deletions(-)
+ create mode 100644 tools/replay/btreplay.1
 
 diff --git a/Makefile.tools b/Makefile.tools
-index 4a3aca5..6767300 100644
+index ba2db00..8b1e3de 100644
 --- a/Makefile.tools
 +++ b/Makefile.tools
-@@ -70,7 +70,8 @@ emulator_btvirt_SOURCES = emulator/main.c monitor/bt.h \
- 					emulator/btdev.h emulator/btdev.c
+@@ -94,11 +94,13 @@ endif
  
- tools_replay_btreplay_SOURCES = tools/replay/main.h tools/replay/main.c \
--					tools/replay/hciseq.h \
-+					tools/replay/hciseq.h tools/replay/hciseq.c \
-+					tools/replay/time.h tools/replay/time.c \
- 					monitor/packet.h monitor/packet.c \
- 					monitor/btsnoop.h monitor/btsnoop.c \
- 					monitor/control.h monitor/control.c \
-diff --git a/tools/replay/hciseq.c b/tools/replay/hciseq.c
+ dist_man_MANS += tools/rfcomm.1 tools/l2ping.8 \
+ 			tools/hciattach.8 tools/hciconfig.8 \
+-			tools/hcitool.1 tools/sdptool.1 tools/ciptool.1
++			tools/hcitool.1 tools/sdptool.1 tools/ciptool.1 \
++			tools/replay/btreplay.1
+ else
+ EXTRA_DIST += tools/rfcomm.1 tools/l2ping.8 \
+ 			tools/hciattach.8 tools/hciconfig.8 \
+-			tools/hcitool.1 tools/sdptool.1 tools/ciptool.1
++			tools/hcitool.1 tools/sdptool.1 tools/ciptool.1 \
++			tools/replay/btreplay.1
+ endif
+ 
+ CLEANFILES += tools/lexer.c tools/parser.c tools/parser.h
+diff --git a/tools/replay/btreplay.1 b/tools/replay/btreplay.1
 new file mode 100644
-index 0000000..8b24264
+index 0000000..36fd6c7
 --- /dev/null
-+++ b/tools/replay/hciseq.c
-@@ -0,0 +1,53 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *  Copyright (C) 2012       Anton Weber <ant@antweb.me>
-+ *  Copyright (C) 2011-2012  Intel Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
++++ b/tools/replay/btreplay.1
+@@ -0,0 +1,148 @@
++.TH BTREPLAY 1 "August 2012" BlueZ "Linux System Administration "
 +
-+#include <stdlib.h>
-+#include <stdint.h>
++.SH NAME
++btreplay \- Bluetooth Replayer
 +
-+#include "hciseq.h"
-+#include "time.h"
-+#include "monitor/bt.h"
++.SH SYNOPSIS
++.B btreplay
++.RB [\| \-d
++.IR none|delta \|]
++.RB [\| \-m
++.IR factor \|]
++.RB [\| \-t
++.IR timeout \|]
++.RB [\| \-c
++.IR config-file \|]
++.RB [\| \-v \|]
++.RI "" file " ..."
 +
-+void calc_rel_ts(struct hciseq_list *seq)
-+{
-+	struct timeval start;
-+	struct hciseq_node *tmp;
++.SH DESCRIPTION
++.B btreplay
++uses a VHCI interface to simulate HCI traffic from a recorded scenario. It
++reads packets from BTSnoop dump files and replays them on the virtual
++interface.
++.PP
++.TP
++.B "Delay modes"
++The delay mode handles the delay between two packets in the replay process.
++.br
++Following delay modes are supported:
 +
-+	start = seq->current->frame->ts;
-+	tmp = seq->current;
++.BR "delta" ": use time difference between two packets (delta value) from the"
++dump for delay
++.br
++.BR "none" ": no delay"
++.TP
++.B "Delay modifier"
++Allows to speed up or slow down the  overall  packet  delay.  When used with
++delta delay mode, each delta value in the sequence is multiplied with the
++specified factor.
++.TP
++.B "Packet action"
++The action defines how packets are handled within the replay process.
++.BR "" "The default action is " "replay" "."
 +
-+	/* first packet */
-+	tmp->attr->ts_rel.tv_sec = 0;
-+	tmp->attr->ts_rel.tv_usec = 0;
-+	tmp->attr->ts_diff.tv_sec = 0;
-+	tmp->attr->ts_diff.tv_usec = 0;
++.BR "replay" ": Replay packet from dump file"
++.br
++.BR "skip" ": Skip packet"
++.br
++.BR "emulate" ": Forward packet to emulator"
++.TP
++.B "Config file"
++A config file can alter attributes and actions for specific packets in the
++sequence or packet types.
 +
-+	while (tmp->next != NULL) {
-+		timeval_diff(&tmp->next->frame->ts, &start,
-+				&tmp->next->attr->ts_rel);
-+		timeval_diff(&tmp->next->frame->ts, &tmp->frame->ts,
-+				&tmp->next->attr->ts_diff);
-+		tmp = tmp->next;
-+	}
-+}
-diff --git a/tools/replay/hciseq.h b/tools/replay/hciseq.h
-index bf953cd..f9fe7c8 100644
---- a/tools/replay/hciseq.h
-+++ b/tools/replay/hciseq.h
-@@ -22,6 +22,25 @@
-  *
-  */
- 
-+struct frame {
-+	void *data;
-+	uint32_t data_len;
-+	void *ptr;
-+	uint32_t len;
-+	uint16_t dev_id;
-+	uint8_t in;
-+	uint8_t master;
-+	uint16_t handle;
-+	uint16_t cid;
-+	uint16_t num;
-+	uint8_t dlci;
-+	uint8_t channel;
-+	unsigned long flags;
-+	struct timeval ts;
-+	int pppdump_fd;
-+	int audio_fd;
-+};
++.SH OPTIONS
++.TP
++.BI "\-d, --delay-mode=" "none|delta"
++.RI "Specify delay mode (default is " "none" ")"
++.TP
++.BI "\-m, --delay-modifier=" "N"
++Set delay modifier to N (default is 1)
++.TP
++.BI "\-t, --timeout=" "N"
++.RI "Set timeout to " "N" " milliseconds when receiving packets from host."
++.br
++Set to -1 by default (no timeout)
++.TP
++.BI "\-c, --config=" "config-file"
++Use config file
++.TP
++.BI "\-v, --verbose"
++Enable verbose output
++.TP
++.BI \--version
++Give version information
++.TP
++.BI \--help
++Give a short usage message
 +
- enum hciseq_action {
- 	HCISEQ_ACTION_REPLAY = 0,
- };
-@@ -33,6 +52,8 @@ struct hciseq_list {
- };
- 
- struct hciseq_attr {
-+	struct timeval ts_rel;
-+	struct timeval ts_diff;
- 	enum hciseq_action action;
- };
- 
-@@ -41,3 +62,5 @@ struct hciseq_node {
- 	struct hciseq_node *next;
- 	struct hciseq_attr *attr;
- };
++.SH CONFIG FILE FORMAT
++The config parser expects one definition per line. Each line has the syntax
 +
-+void calc_rel_ts(struct hciseq_list *seq);
-diff --git a/tools/replay/main.c b/tools/replay/main.c
-index 509d968..e026d98 100644
---- a/tools/replay/main.c
-+++ b/tools/replay/main.c
-@@ -37,8 +37,10 @@
- #include <unistd.h>
- #include <sys/epoll.h>
- #include <sys/ioctl.h>
-+#include <sys/time.h>
- 
- #include "main.h"
-+#include "time.h"
- #include "lib/bluetooth.h"
- #include "lib/hci.h"
- #include "monitor/bt.h"
-@@ -49,16 +51,22 @@
- #define MAX_EPOLL_EVENTS 1
- #define MAX_MSG 128
- 
-+#define TIMING_NONE 0
-+#define TIMING_DELTA 1
++.in +4n
++.nf
++.I "scope key=value[,key=value,...]"
++.fi
++.in
 +
- static struct hciseq_list dumpseq;
- 
- static int fd;
- static int pos = 1;
- static int skipped = 0;
-+static struct timeval start;
- 
- static int epoll_fd;
- static struct epoll_event epoll_event;
- 
- static int timeout = -1;
-+static int timing = TIMING_NONE;
-+static double factor = 1;
- static bool verbose = false;
- 
- static inline int read_n(int fd, char *buf, int len)
-@@ -313,6 +321,10 @@ static bool process_in()
- 	if (n < 0) {
- 		perror("Could not receive\n");
- 		return false;
-+	} else if (n == 0) {
-+		printf("[%4d/%4d] Timeout\n", pos, dumpseq.len);
-+		skipped++;
-+		return true;
- 	}
- 
- 	/* is this the packet in the sequence? */
-@@ -353,9 +365,29 @@ static bool process_out()
- 
- static void process()
- {
-+	struct timeval last, last_diff;
-+	__useconds_t delay;
- 	bool processed;
- 
-+	gettimeofday(&last, NULL);
- 	do {
-+		/* delay */
-+		if (timing == TIMING_DELTA) {
-+			/* consider exec time of process_out()/process_in() */
-+			get_timeval_passed(&last, &last_diff);
-+			if (timeval_cmp(&dumpseq.current->attr->ts_diff, &last_diff) >= 0) {
-+				delay = timeval_diff(&dumpseq.current->attr->ts_diff,
-+								&last_diff, NULL);
-+				delay *= factor;
-+				if (usleep(delay) == -1)
-+					printf("Delay failed\n");
-+			} else {
-+				/* exec time was longer than delay */
-+				printf("Packet delay - processing previous packet took longer than recorded time difference\n");
-+			}
-+			gettimeofday(&last, NULL);
-+		}
++and must be terminated by EOF or '\\n'.
 +
- 		if (dumpseq.current->frame->in == 1)
- 			processed = process_out();
- 		else
-@@ -417,12 +449,18 @@ static void usage(void)
- 	printf("hcireplay - Bluetooth replayer\n"
- 	       "Usage:\thcireplay-client [options] file...\n"
- 	       "options:\n"
--	       "\t-v, --verbose                Enable verbose output\n"
--	       "\t    --version                Give version information\n"
--	       "\t    --help                   Give a short usage message\n");
-+	       "\t-d, --delay-mode={none|delta}    Specify delay mode (default is none)\n"
-+	       "\t-m, --delay-modifier=N           Set delay modifier to N (default is 1)\n"
-+	       "\t-t, --timeout=N                  Set timeout to N milliseconds when receiving packets from host\n"
-+	       "\t-v, --verbose                    Enable verbose output\n"
-+	       "\t    --version                    Give version information\n"
-+	       "\t    --help                       Give a short usage message\n");
- }
- 
- static const struct option main_options[] = {
-+	{"delay-mode", required_argument, NULL, 'd'},
-+	{"delay-modifier", required_argument, NULL, 'm'},
-+	{"timeout", required_argument, NULL, 't'},
- 	{"verbose", no_argument, NULL, 'v'},
- 	{"version", no_argument, NULL, 'V'},
- 	{"help", no_argument, NULL, 'H'},
-@@ -437,12 +475,25 @@ int main(int argc, char *argv[])
- 	while (1) {
- 		int opt;
- 
--		opt = getopt_long(argc, argv, "v",
-+		opt = getopt_long(argc, argv, "d:m:t:v",
- 						main_options, NULL);
- 		if (opt < 0)
- 			break;
- 
- 		switch (opt) {
-+		case 'd':
-+			if (!strcmp(optarg, "none"))
-+				timing = TIMING_NONE;
-+			else if (!strcmp(optarg, "delta"))
-+				timing = TIMING_DELTA;
++.SS Scopes
++The scope defines which packets are affected by the configuration. All scopes
++that do not specify a particular position in the sequence are used as a type
++filter (i.e. they also apply to all incoming and outgoing packets, even if they
++are not in the sequence).
++.TP
++.B all
++All packets in the sequence
++.TP
++.B N
++Single packet
++.TP
++.B N-M
++Packet range (e.g. 2-10, from packet 2 to 10)
++.TP
++.B HCI_ACL
++ACL data packets
++.TP
++.B HCI_EVT_0xXX
++Event code
++.br
++(e.g. HCI_EVT_0x0e, all packets with event code 0x0e (Command Complete))
++.TP
++.B HCI_CMD_0xXX|0xXXXX
++Opcode
++.br
++(e.g. 0x03|0x0003, all packets with OGF 0x03 and OCF 0x0003 (Reset)).
++.br
++Also applies to corresponding Command Complete event packets.
++.PP
++(N and M being the packet position in the sequence, starting with 1)
 +
-+			break;
-+		case 'm':
-+			factor = atof(optarg);
-+			break;
-+		case 't':
-+			timeout = atoi(optarg);
-+			break;
- 		case 'v':
- 			verbose = true;
- 			break;
-@@ -478,6 +529,9 @@ int main(int argc, char *argv[])
- 		}
- 	}
- 	dumpseq.current = dumpseq.frames;
-+	calc_rel_ts(&dumpseq);
++.SS Properties
++The properties define the configuration that should be applied to the scope.
++.RB "Every property has a " "key"
++.RI " and a " "value" " delimited by an equals sign."
++.TP
++.BI "action="replay|skip|emulate
++Set packet action
++.TP
++.BI "delta="value
++Override delta value (used in delta delay mode)
 +
-+	gettimeofday(&start, NULL);
- 
- 	/*
- 	 * make sure we open the interface after parsing
-diff --git a/tools/replay/main.h b/tools/replay/main.h
-index d80deec..2223789 100644
---- a/tools/replay/main.h
-+++ b/tools/replay/main.h
-@@ -42,23 +42,4 @@ struct btsnoop_pkt {
- } __attribute__ ((packed));
- #define BTSNOOP_PKT_SIZE (sizeof(struct btsnoop_pkt))
- 
--static uint8_t btsnoop_id[] = { 0x62, 0x74, 0x73, 0x6e, 0x6f, 0x6f, 0x70, 0x00 };
--
--struct frame {
--	void *data;
--	uint32_t data_len;
--	void *ptr;
--	uint32_t len;
--	uint16_t dev_id;
--	uint8_t in;
--	uint8_t master;
--	uint16_t handle;
--	uint16_t cid;
--	uint16_t num;
--	uint8_t dlci;
--	uint8_t channel;
--	unsigned long flags;
--	struct timeval ts;
--	int pppdump_fd;
--	int audio_fd;
--};
-+uint8_t btsnoop_id[] = { 0x62, 0x74, 0x73, 0x6e, 0x6f, 0x6f, 0x70, 0x00 };
-diff --git a/tools/replay/time.c b/tools/replay/time.c
-new file mode 100644
-index 0000000..029501a
---- /dev/null
-+++ b/tools/replay/time.c
-@@ -0,0 +1,91 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *  Copyright (C) 2012       Anton Weber <ant@antweb.me>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <stdlib.h>
-+#include <sys/time.h>
-+
-+#include "time.h"
-+
-+/*
-+ * Adjust timeval structs to make sure usec difference is not negative
-+ * see http://www.gnu.org/software/libc/manual/html_node/Elapsed-Time.html
-+ */
-+void timeval_adjust_usec(struct timeval *l, struct timeval *r) {
-+	int tmpsec;
-+
-+	if (r->tv_usec > l->tv_usec) {
-+		tmpsec = (r->tv_usec - l->tv_usec) / 1000000 + 1;
-+		r->tv_sec += tmpsec;
-+		r->tv_usec -= 1000000 * tmpsec;
-+	}
-+
-+	if ((l->tv_usec - r->tv_usec) > 1000000) {
-+		tmpsec = (l->tv_usec - r->tv_usec) / 1000000;
-+		r->tv_sec -= tmpsec;
-+		r->tv_usec += 1000000 * tmpsec;
-+	}
-+}
-+
-+__useconds_t
-+timeval_diff(struct timeval *l, struct timeval *r, struct timeval *diff)
-+{
-+	static struct timeval tmp;
-+
-+	timeval_adjust_usec(l, r);
-+
-+	/* use local variable if we only need return value */
-+	if (diff == NULL)
-+		diff = &tmp;
-+
-+	diff->tv_sec = l->tv_sec - r->tv_sec;
-+	diff->tv_usec = l->tv_usec - r->tv_usec;
-+
-+	return (diff->tv_sec * 1000000) + diff->tv_usec;
-+}
-+
-+int timeval_cmp(struct timeval *l, struct timeval *r)
-+{
-+	timeval_adjust_usec(l, r);
-+
-+	if (l->tv_sec > r->tv_sec) {
-+		return 1;
-+	} else if (l->tv_sec < r->tv_sec) {
-+		return -1;
-+	} else {
-+		if (l->tv_usec > r->tv_usec)
-+			return 1;
-+		else if (l->tv_usec < r->tv_usec)
-+			return -1;
-+		else
-+			return 0;
-+	}
-+}
-+
-+inline __useconds_t
-+get_timeval_passed(struct timeval *since, struct timeval *diff)
-+{
-+	struct timeval now;
-+
-+	gettimeofday(&now, NULL);
-+
-+	return timeval_diff(&now, since, diff);
-+}
-diff --git a/tools/replay/time.h b/tools/replay/time.h
-new file mode 100644
-index 0000000..0c876a4
---- /dev/null
-+++ b/tools/replay/time.h
-@@ -0,0 +1,31 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *  Copyright (C) 2012       Anton Weber <ant@antweb.me>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+void timeval_adjust_usec(struct timeval *l, struct timeval *r);
-+
-+__useconds_t
-+timeval_diff(struct timeval *l, struct timeval *r, struct timeval *diff);
-+
-+int timeval_cmp(struct timeval *l, struct timeval *r);
-+
-+inline __useconds_t
-+	get_timeval_passed(struct timeval *since, struct timeval *diff);
++.SS Example configuration
++all delta=300,action=replay
++.br
++1-4 action=emulate
++.br
++1 delta=500
++.br
++HCI_EVT_0x0e delta=0
++.br
++HCI_CMD_0x03|0x0003 action=emulate
++.br
++HCI_ACL action=replay
++.br
++.SH AUTHOR
++Written by Anton Weber <ant@antweb.me>
 -- 
 1.7.9.5
 
