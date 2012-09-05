@@ -1,75 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 00/17] Heart Rate Profile plugin
-Date: Wed, 5 Sep 2012 15:05:31 +0200
-Message-ID: <1346850348-21176-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Wed, 5 Sep 2012 13:07:18 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jeff Hansen <x@jeffhansen.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] input: Implement idle timeout for fakehid.
+Message-ID: <20120905100718.GC766@x220>
+References: <1346077185-18377-1-git-send-email-x@jeffhansen.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1346077185-18377-1-git-send-email-x@jeffhansen.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Jeff,
 
-Here's v2 of HRP plugin implementation. Changes from v1 include:
-- update to btd_profile
-- API change: make watchers per-adapter instead of per-device
-  there's new interface registered for adapter HeartRateManager to (un)register
-  watchers and MeasurementReceived method in HeartRateWatcher interface has
-  additional parameter with device object path
-- API change: make "Location" device property
-  "Location" is now device property, previously it was send with every single
-  measurement which does not make sense since it's not part of measurement
-  (unlike Temperature Type in HTP) and cannot change
-- other small fixes and some refactoring so patches can be split better
+On Mon, Aug 27, 2012, Jeff Hansen wrote:
+> +		fake->timeout = iconn->timeout * 1000;
 
-Comments are welcome.
+Why not use the original iconn->timeout value and then use
+g_timeout_add_seconds instead of g_timeout_add?
 
+> +	guint		idle_timeout;
+> +	uint32_t	timeout;
 
-Andrzej Kaczmarek (6):
-  heartrate: Add attio callbacks
-  heartrate: Enable measurement when watchers are registered
-  heartrate: Read Heart Rate Control Point characteristics
-  heartrate: Handle characteristics value changed notification
-  heartrate: Process Heart Rate Measurement characteristics
-  heartrate: Add Reset method
+Why uint32_t instead of just int that iconn->timeout is?
 
-Rafal Garbat (10):
-  heartrate: Add Heart Rate Profile client
-  heartrate: Discover characteristics
-  heartrate: Process characteristics
-  heartrate: Discover characteristics descriptors
-  heartrate: Process characteristics descriptors
-  heartrate: Add HeartRateManager interface
-  heartrate: Read Body Sensor Location characteristics
-  heartrate: Add GetProperties method
-  heartrate: Add HeartRateWatcher interface to default policy
-  heartrate: Add test script
+> +static gboolean ps3remote_idle(gpointer data)
+> +{
+> +	struct fake_input *fake = data;
+> +	input_device_request_disconnect(fake->idev);
+> +	return FALSE;
+> +}
 
-Santiago Carot-Nemesio (1):
-  Heart Rate Profile API
+Could you add an empty line before and after
+input_device_request_disconnect for slightly better readability.
 
- Makefile.am                    |   9 +-
- Makefile.tools                 |   4 +-
- doc/heartrate-api.txt          |  83 ++++
- lib/uuid.h                     |   5 +
- profiles/heartrate/heartrate.c | 971 +++++++++++++++++++++++++++++++++++++++++
- profiles/heartrate/heartrate.h |  27 ++
- profiles/heartrate/main.c      |  52 +++
- profiles/heartrate/manager.c   |  95 ++++
- profiles/heartrate/manager.h   |  24 +
- src/bluetooth.conf             |   1 +
- test/test-heartrate            | 103 +++++
- 11 files changed, 1370 insertions(+), 4 deletions(-)
- create mode 100644 doc/heartrate-api.txt
- create mode 100644 profiles/heartrate/heartrate.c
- create mode 100644 profiles/heartrate/heartrate.h
- create mode 100644 profiles/heartrate/main.c
- create mode 100644 profiles/heartrate/manager.c
- create mode 100644 profiles/heartrate/manager.h
- create mode 100755 test/test-heartrate
+> +	if (fake->idle_timeout) {
 
--- 
-1.7.11.3
+For consistency with the rest of the code base please use > 0 for
+checking for valid GSource IDs. I'd also just call it idle_id to avoid
+confusion with "timeout" which is not a GSource ID.
 
+> +		g_source_remove(fake->idle_timeout);
+> +		fake->idle_timeout = 0;
+> +	}
+> +	if (fake->timeout)
+> +		fake->idle_timeout = g_timeout_add(fake->timeout, ps3remote_idle, fake);
+
+Please add an empty line before this second if statement and also do > 0
+here.
+
+> +	if (fake->idle_timeout) {
+
+And > 0 again here.
+
+Johan
