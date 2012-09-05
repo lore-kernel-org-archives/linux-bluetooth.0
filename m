@@ -1,130 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1346874819.21200.109.camel@aeonflux>
-Subject: Re: Agenda for Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
- 2012 (Barcelona!)
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "John W. Linville" <linville@tuxdriver.com>
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	alexander.smirnov@siemens.com
-Date: Wed, 05 Sep 2012 12:53:39 -0700
-In-Reply-To: <20120822201930.GC14913@tuxdriver.com>
-References: <20120822201930.GC14913@tuxdriver.com>
+Message-ID: <1346873325.2913.0.camel@frustration.ornl.gov>
+Subject: Re: [PATCH] Add support for Logitech Harmony Adapter for PS3
+From: David Dillow <dave@thedillows.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 05 Sep 2012 15:28:45 -0400
+In-Reply-To: <1346870088.2680.30.camel@novo.hadess.net>
+References: <1346378760.7976.2.camel@obelisk.thedillows.org>
+	 <1346870088.2680.30.camel@novo.hadess.net>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+On Wed, 2012-09-05 at 19:34 +0100, Bastien Nocera wrote:
+> On Thu, 2012-08-30 at 22:06 -0400, David Dillow wrote:
+> > This emulates a Sony BD Remote for the Logitech Harmony series of
+> > universal remotes.
+> 
+> Can't test this, but looks good to me.
 
-> The time for our meeting in Barcelona is drawing near.  I think it
-> is time that we start nailing-down the agenda.
-> 
-> We have one room on the first day, and three rooms on the second day.
-> I figure that the Bluetooth and 802.11 groups should each get a
-> break-out room for their own in-depth discussons on the second day and
-> the third room can be used for more general topics and presentations.
-> 
-> With that said, there are still a number of slots available for
-> presentations or discussion topics.  This is especially true for the
-> 802.11 group...  Please step-up with some suggested topics!
-> 
-> Below is my strawman agenda proposal.  Please make suggestions for
-> improvements!
-> 
-> Day 1
-> -----
-> 
-> Everyone together in a single room...
-> 
-> Time	Topic						Speaker
-> ----	-----						-------
-> 0930	Welcome/Intro/Agenda				John Linville
-> 
-> 1000	802.15.4 stack, 6lowpan				Alexander Smirnov
-> 
-> 1100	Break
-> 
-> 1130	Virtual Bluetooth AMP Controller for mac80211	Andrei Emeltchenko
-
-can we swap this talk with my Bluetooth overview talk. So that we get
-all the overview talks on the first day. And keep the breakout talks on
-the next day.
-
-> 1230	Lunch
-> 
-> 1400	NFC "state of the union", etc.			Ortiz / Elias / Chlad
-> 
-> 1500	Break
-> 
-> ...
-> 
-> 1800	Adjourn
-> 
-> 
-> Day 2
-> -----
-> 
-> 802.11 break-out room...
-> 
-> Time	Topic						Speaker
-> ----	-----						-------
-> 1000	Regulatory updates				Luis Rodriguez
-> 
-> 1100	Break
-> 
-> ...
-> 
-> 1800	Adjourn
-
-We could move the mac80211 AMP controller here.
-
-> Bluetooth break-out room...
-> 
-> Time	Topic						Speaker
-> ----	-----						-------
-> 1000	Bluetooth: state of the union			Marcel Holtmann
-> 
-> 1100	Break
-> 
-> 1130	status and roadmap of Bluetooth LE		Joao Paulo Rechi Vita
-
-And then just continue with the LE topic. Then we only have two parallel
-tracks on Friday.
-
-> 
-> 1230	Lunch
-> 
-> ...
-> 
-> 1800	Adjourn
-> 
-> 
-> Presentation room...
-> 
-> Time	Topic						Speaker
-> ----	-----						-------
-> 1000	wireless community networks			Nick Kossifidis
-> 
-> 1100	Break
-> 
-> 1130	"a short overview what we do in ConnMan"	Wagner / Flykt
-> 
-> 1230	Lunch
-> 
-> 1400	oFono / mobile wireless				Denis Kenzior
-> 
-> 1500	Break
-> 
-> ...
-> 
-> 1800	Adjourn
-> 
-> 
-> So...suggestions??
-> 
-
-Regards
-
-Marcel
-
-
+Good point, I should mention that this is working quite well for my
+MythTV setup downstairs...
