@@ -1,60 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 5 Sep 2012 15:54:03 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        alexander.smirnov@siemens.com
+Message-ID: <1346874819.21200.109.camel@aeonflux>
 Subject: Re: Agenda for Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
  2012 (Barcelona!)
-Message-ID: <20120905195402.GF12843@tuxdriver.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "John W. Linville" <linville@tuxdriver.com>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	alexander.smirnov@siemens.com
+Date: Wed, 05 Sep 2012 12:53:39 -0700
+In-Reply-To: <20120822201930.GC14913@tuxdriver.com>
 References: <20120822201930.GC14913@tuxdriver.com>
- <1346874819.21200.109.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1346874819.21200.109.camel@aeonflux>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Sep 05, 2012 at 12:53:39PM -0700, Marcel Holtmann wrote:
-> Hi John,
+Hi John,
+
+> The time for our meeting in Barcelona is drawing near.  I think it
+> is time that we start nailing-down the agenda.
 > 
-> > The time for our meeting in Barcelona is drawing near.  I think it
-> > is time that we start nailing-down the agenda.
-> > 
-> > We have one room on the first day, and three rooms on the second day.
-> > I figure that the Bluetooth and 802.11 groups should each get a
-> > break-out room for their own in-depth discussons on the second day and
-> > the third room can be used for more general topics and presentations.
-> > 
-> > With that said, there are still a number of slots available for
-> > presentations or discussion topics.  This is especially true for the
-> > 802.11 group...  Please step-up with some suggested topics!
-> > 
-> > Below is my strawman agenda proposal.  Please make suggestions for
-> > improvements!
-> > 
-> > Day 1
-> > -----
-> > 
-> > Everyone together in a single room...
-> > 
-> > Time	Topic						Speaker
-> > ----	-----						-------
-> > 0930	Welcome/Intro/Agenda				John Linville
-> > 
-> > 1000	802.15.4 stack, 6lowpan				Alexander Smirnov
-> > 
-> > 1100	Break
-> > 
-> > 1130	Virtual Bluetooth AMP Controller for mac80211	Andrei Emeltchenko
+> We have one room on the first day, and three rooms on the second day.
+> I figure that the Bluetooth and 802.11 groups should each get a
+> break-out room for their own in-depth discussons on the second day and
+> the third room can be used for more general topics and presentations.
 > 
-> can we swap this talk with my Bluetooth overview talk. So that we get
-> all the overview talks on the first day. And keep the breakout talks on
-> the next day.
+> With that said, there are still a number of slots available for
+> presentations or discussion topics.  This is especially true for the
+> 802.11 group...  Please step-up with some suggested topics!
+> 
+> Below is my strawman agenda proposal.  Please make suggestions for
+> improvements!
+> 
+> Day 1
+> -----
+> 
+> Everyone together in a single room...
+> 
+> Time	Topic						Speaker
+> ----	-----						-------
+> 0930	Welcome/Intro/Agenda				John Linville
+> 
+> 1000	802.15.4 stack, 6lowpan				Alexander Smirnov
+> 
+> 1100	Break
+> 
+> 1130	Virtual Bluetooth AMP Controller for mac80211	Andrei Emeltchenko
 
-Sure, no problem.
+can we swap this talk with my Bluetooth overview talk. So that we get
+all the overview talks on the first day. And keep the breakout talks on
+the next day.
 
-Now, if we only had a few 802.11-related topics...
+> 1230	Lunch
+> 
+> 1400	NFC "state of the union", etc.			Ortiz / Elias / Chlad
+> 
+> 1500	Break
+> 
+> ...
+> 
+> 1800	Adjourn
+> 
+> 
+> Day 2
+> -----
+> 
+> 802.11 break-out room...
+> 
+> Time	Topic						Speaker
+> ----	-----						-------
+> 1000	Regulatory updates				Luis Rodriguez
+> 
+> 1100	Break
+> 
+> ...
+> 
+> 1800	Adjourn
 
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+We could move the mac80211 AMP controller here.
+
+> Bluetooth break-out room...
+> 
+> Time	Topic						Speaker
+> ----	-----						-------
+> 1000	Bluetooth: state of the union			Marcel Holtmann
+> 
+> 1100	Break
+> 
+> 1130	status and roadmap of Bluetooth LE		Joao Paulo Rechi Vita
+
+And then just continue with the LE topic. Then we only have two parallel
+tracks on Friday.
+
+> 
+> 1230	Lunch
+> 
+> ...
+> 
+> 1800	Adjourn
+> 
+> 
+> Presentation room...
+> 
+> Time	Topic						Speaker
+> ----	-----						-------
+> 1000	wireless community networks			Nick Kossifidis
+> 
+> 1100	Break
+> 
+> 1130	"a short overview what we do in ConnMan"	Wagner / Flykt
+> 
+> 1230	Lunch
+> 
+> 1400	oFono / mobile wireless				Denis Kenzior
+> 
+> 1500	Break
+> 
+> ...
+> 
+> 1800	Adjourn
+> 
+> 
+> So...suggestions??
+> 
+
+Regards
+
+Marcel
+
+
