@@ -1,71 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] bluetooth.h: fix compile issue when using in C++
-From: Pacho Ramos <pacho@gentoo.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>, iwamatsu@debian.org,
-	pkg-bluetooth-maintainers@lists.alioth.debian.org
-Cc: "W. Trevor King" <wking@tremily.us>,
-	linux-bluetooth@vger.kernel.org,
-	Patrick Ohly <patrick.ohly@intel.com>
-In-Reply-To: <20120827234054.GA7793@x220.sheraton.com>
-References: <1343832093.2121.0.camel@belkin4>
-	 <20120727163853.GA11847@odin.tremily.us>
-	 <1330953167.3457.13.camel@pohly-mobl1.fritz.box>
-	 <20120817051852.GA32453@odin.tremily.us>
-	 <20120827234054.GA7793@x220.sheraton.com>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-rnCvSL6PBYG3o7Cuc0Ui"
-Date: Wed, 05 Sep 2012 19:27:13 +0200
-Message-ID: <1346866033.17971.4.camel@belkin4>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <5046DC86.7030905@ti.com>
+References: <1346785482-13359-1-git-send-email-jprvita@openbossa.org>
+	<5046DC86.7030905@ti.com>
+Date: Wed, 5 Sep 2012 14:15:15 -0300
+Message-ID: <CAAngNMaxNBWWHcmC1z27j79e=jsrcNTE_-4P+FiA66+EwYn44Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v5 00/14] LE General Connection Establishment procedure
+From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
+To: Chen Ganir <chen.ganir@ti.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Wed, Sep 5, 2012 at 2:00 AM, Chen Ganir <chen.ganir@ti.com> wrote:
+> João,
+>
+>
+> On 09/04/2012 10:04 PM, João Paulo Rechi Vita wrote:
+>>
+>> This series implement the LE General Connection Establishment procedure
+>> for LE connections.
+>>
+>> If there are LE bonded devices marked for auto connection they are added
+>> to a connect_list on the adapter. When there is any device on this list
+>> scan is performed continuously. When a device is found the connect_list
+>
+> How do we stop this scan ? Do we need to remove all auto-connect settings?
+>
 
---=-rnCvSL6PBYG3o7Cuc0Ui
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+The scan stops when there are no devices left on the connect_list. The
+connect_list is the new interface to connect to LE devices, and it
+will use the GCE procedure. The auto-connect flag here simply states
+whether or not we should try to re-connect to a device after
+disconnection (adding it back to the connect_list).
 
-El lun, 27-08-2012 a las 16:40 -0700, Johan Hedberg escribi=C3=B3:
-> Hi,
->=20
-> On Fri, Aug 17, 2012, W. Trevor King wrote:
-> > On Wed, Aug 01, 2012 at 04:41:33PM +0200, Pacho Ramos wrote:
-> > > El dom, 29-07-2012 a las 09:52 +0200, Pacho Ramos escribi=C3=B3:
-> > > > Today I got a report downstream showing that old problem:
-> > > > http://permalink.gmane.org/gmane.linux.bluez.kernel/22306
-> > > >=20
-> > > > is still not fixed.=20
-> > > >=20
-> > > > Could you please commit debian patch to fix this?
-> > > > http://patch-tracker.debian.org/patch/series/view/bluez/4.101-1/09_=
-fix_ftbfs_with_c99.patch
-> > >=20
-> > > Any news about this? Thanks
-> >=20
-> > Bump :)
->=20
-> The patch would need to be sent as a proper git patch to this mailing
-> list. Particularly, we need proper author information for the patch as
-> well as a commit message explaining the background to the patch and why
-> it is correct (including a reference to the C++ standard and/or gcc
-> documentation).
->=20
-> Johan
->=20
+>
+>> is checked. If that device is on the list scan is stopped and a
+>> connection attempt is made to that device.
+>
+> Do we have a timeout for this ? What happens if we succeed ? Do we start
+> scanning again if more devices are set to auto-connect ? What happens when
+> we fail a connection ? Do we retry to the same or start scanning again ?
+>
 
-Will forward this message to patch authors and debian maintainers to let
-them reformat it with proper authoring.
+Yes, right now there is the L2CAP timeout of 40s for an LE connect. If
+the connection fails the device is added back to the connect_list, on
+the att_error_cb() on src/device.c. After a connect attempt finishes
+(either with sucess or fail) we check if there are any devices on the
+connect_list and if so, we restart scanning.
 
---=-rnCvSL6PBYG3o7Cuc0Ui
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+>
+>>
+>> If any client tries to perform discovery and the scan for the General
+>> Connection Establishment procedure is active, the discovery request is
+>> queued and performed right after the GCEP scan session finishes.
+>>
+> I'm am having difficulties understanding the logic here. You say that as
+> long as we have bonded devices set for auto-connect, the GCE scan will run
+> until a connection is made?. What happens if we do not find any device ? Do
+> we scan forever?
+>
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.19 (GNU/Linux)
+Scan will be active until a all LE bonded devices are connected or
+removed (unpaired).
 
-iEYEABECAAYFAlBHi3EACgkQCaWpQKGI+9RcPQCcCGrPaHAoXreMYOgvOIl30l64
-/wEAnja2+LgCEpvZ8tfTMmyD9bj0E93A
-=5Rp1
------END PGP SIGNATURE-----
+> This is a bit of a problem - device discovery can not be queued. Discovering
+> devices is a user initiated command, and it should run whenever a client
+> requires it. When a user requests for a list of devices, he expects to get
+> the list. He does not care about background logic. The proper logic here is
+> to pause the background scanning, discover devices (if LE scan reveals
+> bonded devices that have auto-connect setting they should connect and then
+> resume the discovery). After Device discovery is terminated, background
+> connect scan should be continued.
+>
 
---=-rnCvSL6PBYG3o7Cuc0Ui--
+And that is exactly what is implemented right now :)
 
+Thanks for the reviewing, Chen!
+
+-- 
+João Paulo Rechi Vita
+Openbossa Labs - INdT
