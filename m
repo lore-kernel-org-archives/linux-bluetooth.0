@@ -1,74 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 6 Sep 2012 10:03:09 -0700 (PDT)
+Date: Thu, 6 Sep 2012 10:01:52 -0700 (PDT)
 From: Mat Martineau <mathewm@codeaurora.org>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/6] Bluetooth: Fix freeing uninitialized delayed works
-In-Reply-To: <1346933147-11789-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Message-ID: <alpine.DEB.2.02.1209061002150.22884@mathewm-linux>
-References: <1346933147-11789-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1346933147-11789-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
+Subject: Re: [PATCH 1/6] Bluetooth: Fix deadlock when closing socket
+In-Reply-To: <1346933147-11789-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <alpine.DEB.2.02.1209060946190.22884@mathewm-linux>
+References: <1346933147-11789-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
-Andrei -
+Hi Andrei -
 
 On Thu, 6 Sep 2012, Andrei Emeltchenko wrote:
 
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
-> When releasing L2CAP socket which is in BT_CONFIG state l2cap_chan_close
-> invokes l2cap_send_disconn_req which cancel delayed works which are only
-> set in BT_CONNECTED state with l2cap_ertm_init. Add state check before
-> cancelling those works.
->
-> ...
-> [ 9668.574372] [21085] l2cap_sock_release: sock cd065200, sk f073e800
-> [ 9668.574399] [21085] l2cap_sock_shutdown: sock cd065200, sk f073e800
-> [ 9668.574411] [21085] l2cap_chan_close: chan f073ec00 state BT_CONFIG sk f073e800
-> [ 9668.574421] [21085] l2cap_send_disconn_req: chan f073ec00 conn ecc16600
-> [ 9668.574441] INFO: trying to register non-static key.
-> [ 9668.574443] the code is fine but needs lockdep annotation.
-> [ 9668.574446] turning off the locking correctness validator.
-> [ 9668.574450] Pid: 21085, comm: obex-client Tainted: G           O 3.5.0+ #57
-> [ 9668.574452] Call Trace:
-> [ 9668.574463]  [<c10a64b3>] __lock_acquire+0x12e3/0x1700
-> [ 9668.574468]  [<c10a44fb>] ? trace_hardirqs_on+0xb/0x10
-> [ 9668.574476]  [<c15e4f60>] ? printk+0x4d/0x4f
-> [ 9668.574479]  [<c10a6e38>] lock_acquire+0x88/0x130
-> [ 9668.574487]  [<c1059740>] ? try_to_del_timer_sync+0x60/0x60
-> [ 9668.574491]  [<c1059790>] del_timer_sync+0x50/0xc0
-> [ 9668.574495]  [<c1059740>] ? try_to_del_timer_sync+0x60/0x60
-> [ 9668.574515]  [<f8aa1c23>] l2cap_send_disconn_req+0xe3/0x160 [bluetooth]
-> ...
+> If we have unacked frames when closing bluetooth socket we deadlock
+> since conn->chan_lock, chan->lock and socket lock are taken. Remove
+> __l2cap_wait_ack completely.
 >
 > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+
+I don't think you want to remove this code completely, at least not 
+without giving some thought to the problem it is solving.
+
+The problem is that programs may have an open socket which they send 
+some data on, then immediately close.  There is no feedback when data 
+is actually sent over the air, so the socket may end up getting torn 
+down while there is still data in the HCI tx buffer or some data was 
+lost and needs to be retransmitted.  Waiting for an acknowledgement 
+confirms that the application's sent data made it to the remote 
+device.
+
+Without this code, it's difficult to use l2test on a number of 
+qualification tests.  Profiles or applications using ERTM may depend 
+on the "wait for ack before closing" behavior in order to have a clean 
+disconnect.
+
+It is not reasonable to deadlock while waiting for unacked packets to 
+go to 0, so maybe more needs to be done in __l2cap_wait_ack to limit 
+the wait time.
+
+
 > ---
-> net/bluetooth/l2cap_core.c |    2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> include/net/bluetooth/l2cap.h |    1 -
+> net/bluetooth/l2cap_core.c    |   32 --------------------------------
+> net/bluetooth/l2cap_sock.c    |    3 ---
+> 3 files changed, 36 deletions(-)
 >
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 4e188dc..0330894 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -753,7 +753,6 @@ int l2cap_init_sockets(void);
+> void l2cap_cleanup_sockets(void);
+>
+> void __l2cap_connect_rsp_defer(struct l2cap_chan *chan);
+> -int __l2cap_wait_ack(struct sock *sk);
+>
+> int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm);
+> int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
 > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 8e4b57b..b47c325 100644
+> index 3686506..8e4b57b 100644
 > --- a/net/bluetooth/l2cap_core.c
 > +++ b/net/bluetooth/l2cap_core.c
-> @@ -1089,7 +1089,7 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
-> 	if (!conn)
-> 		return;
+> @@ -1633,38 +1633,6 @@ done:
+> 	return err;
+> }
 >
-> -	if (chan->mode == L2CAP_MODE_ERTM) {
-> +	if (chan->mode == L2CAP_MODE_ERTM && chan->state == BT_CONNECTED) {
-> 		__clear_retrans_timer(chan);
-> 		__clear_monitor_timer(chan);
-> 		__clear_ack_timer(chan);
+> -int __l2cap_wait_ack(struct sock *sk)
+> -{
+> -	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+> -	DECLARE_WAITQUEUE(wait, current);
+> -	int err = 0;
+> -	int timeo = HZ/5;
+> -
+> -	add_wait_queue(sk_sleep(sk), &wait);
+> -	set_current_state(TASK_INTERRUPTIBLE);
+> -	while (chan->unacked_frames > 0 && chan->conn) {
+> -		if (!timeo)
+> -			timeo = HZ/5;
+> -
+> -		if (signal_pending(current)) {
+> -			err = sock_intr_errno(timeo);
+> -			break;
+> -		}
+> -
+> -		release_sock(sk);
+> -		timeo = schedule_timeout(timeo);
+> -		lock_sock(sk);
+> -		set_current_state(TASK_INTERRUPTIBLE);
+> -
+> -		err = sock_error(sk);
+> -		if (err)
+> -			break;
+> -	}
+> -	set_current_state(TASK_RUNNING);
+> -	remove_wait_queue(sk_sleep(sk), &wait);
+> -	return err;
+> -}
+> -
+> static void l2cap_monitor_timeout(struct work_struct *work)
+> {
+> 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 997e0cb..cc26b1f 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -866,9 +866,6 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
+> 	lock_sock(sk);
+>
+> 	if (!sk->sk_shutdown) {
+> -		if (chan->mode == L2CAP_MODE_ERTM)
+> -			err = __l2cap_wait_ack(sk);
+> -
+> 		sk->sk_shutdown = SHUTDOWN_MASK;
+>
+> 		release_sock(sk);
 > -- 
 > 1.7.9.5
 
-Looks good to me.
+
+Regards,
 
 --
 Mat Martineau
 Employee of Qualcomm Innovation Center, Inc.
 Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
