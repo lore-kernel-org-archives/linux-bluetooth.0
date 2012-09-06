@@ -1,93 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1346914639-11040-1-git-send-email-acho@suse.com>
-References: <1346914639-11040-1-git-send-email-acho@suse.com>
-Date: Thu, 6 Sep 2012 15:32:21 +0800
-Message-ID: <CAKzePaqHw4LXiQP_2Uz7Sgtu=ki0+omZff1_CDO7mr5dzS0q3A@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Add support for BCM20702A0 [04ca, 2003]
-From: Al Cho <acho@suse.com>
-To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
+From: acho@suse.com
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Cc: oneukum@suse.com, acho@suse.com, jlee@suse.com, resler@cs.cas.cz
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: oneukum@suse.com,
+	acho@suse.com,
+	jlee@suse.com,
+	resler@cs.cas.cz
+Subject: [PATCH] Bluetooth: Add support for BCM20702A0 [04ca, 2003]
+Date: Thu,  6 Sep 2012 14:57:19 +0800
+Message-Id: <1346914639-11040-1-git-send-email-acho@suse.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Sent a new patch that have new FROM tag
+From: "Cho, Yu-Chen" <acho@suse.com>
 
-On Thu, Sep 6, 2012 at 2:57 PM,  <acho@suse.com> wrote:
-> From: "Cho, Yu-Chen" <acho@suse.com>
->
-> Add another vendor specific ID for BCM20702A0.
->
-> output of usb-devices:
-> T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=02 Dev#=  4 Spd=12   MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=04ca ProdID=2003 Rev= 1.12
-> S:  Manufacturer=Broadcom Corp
-> S:  Product=BCM20702A0
-> S:  SerialNumber=446D57861623
-> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
->
-> Signed-off-by: Cho, Yu-Chen <acho@suse.com>
-> ---
->  drivers/bluetooth/btusb.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index f077f4d..75943c3 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -93,6 +93,7 @@ static struct usb_device_id btusb_table[] = {
->         { USB_DEVICE(0x0c10, 0x0000) },
->
->         /* Broadcom BCM20702A0 */
-> +       { USB_DEVICE(0x04ca, 0x2003) },
->         { USB_DEVICE(0x0489, 0xe042) },
->         { USB_DEVICE(0x0a5c, 0x21e3) },
->         { USB_DEVICE(0x0a5c, 0x21e6) },
-> --
-> 1.7.7
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+Add another vendor specific ID for BCM20702A0.
 
+output of usb-devices:
+T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=02 Dev#=  4 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=04ca ProdID=2003 Rev= 1.12
+S:  Manufacturer=Broadcom Corp
+S:  Product=BCM20702A0
+S:  SerialNumber=446D57861623
+C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 
+Signed-off-by: Cho, Yu-Chen <acho@suse.com>
+---
+ drivers/bluetooth/btusb.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f077f4d..75943c3 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -93,6 +93,7 @@ static struct usb_device_id btusb_table[] = {
+ 	{ USB_DEVICE(0x0c10, 0x0000) },
+ 
+ 	/* Broadcom BCM20702A0 */
++	{ USB_DEVICE(0x04ca, 0x2003) },
+ 	{ USB_DEVICE(0x0489, 0xe042) },
+ 	{ USB_DEVICE(0x0a5c, 0x21e3) },
+ 	{ USB_DEVICE(0x0a5c, 0x21e6) },
 -- 
-Al Yu-Chen Cho
-Software Engineer
-Room B, 26/F, No. 216 Tun-Hwa S. Road, Sec. 2
-Taipei, 106
-+8862-2376-0010 X20031
-acho@suse.com
-SUSE
+1.7.7
