@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 02/19] Bluetooth: A2MP: Create amp_mgr global list
-Date: Thu,  6 Sep 2012 15:19:40 +0300
-Message-Id: <1346933997-14369-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 08/19] Bluetooth: AMP: Handle create / disc phylink req
+Date: Thu,  6 Sep 2012 15:19:46 +0300
+Message-Id: <1346933997-14369-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1346933997-14369-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1346933997-14369-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,107 +12,73 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Create amp_mgr_list global list which will be used by different
-hci devices to find amp_mgr.
+Use hci_conn structure to keep track about AMP physical connections.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |    8 ++++++++
- net/bluetooth/a2mp.c         |   29 +++++++++++++++++++++++++++++
- 2 files changed, 37 insertions(+)
+ net/bluetooth/a2mp.c |   21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 6a76e0a..e56d656 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -20,11 +20,15 @@
- #define A2MP_FEAT_EXT	0x8000
- 
- struct amp_mgr {
-+	struct list_head	list;
- 	struct l2cap_conn	*l2cap_conn;
- 	struct l2cap_chan	*a2mp_chan;
- 	struct kref		kref;
- 	__u8			ident;
- 	__u8			handle;
-+	enum {
-+		READ_LOC_AMP_INFO,
-+	} state;
- 	unsigned long		flags;
- };
- 
-@@ -118,9 +122,13 @@ struct a2mp_physlink_rsp {
- #define A2MP_STATUS_PHYS_LINK_EXISTS		0x05
- #define A2MP_STATUS_SECURITY_VIOLATION		0x06
- 
-+extern struct list_head amp_mgr_list;
-+extern struct mutex amp_mgr_list_lock;
-+
- void amp_mgr_get(struct amp_mgr *mgr);
- int amp_mgr_put(struct amp_mgr *mgr);
- struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
- 				       struct sk_buff *skb);
-+struct amp_mgr *amp_mgr_lookup_by_state(u8 state);
- 
- #endif /* __A2MP_H */
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 0760d1f..6b7a4b4 100644
+index 36bf0f4..8c6cda4 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -17,6 +17,10 @@
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/a2mp.h>
+@@ -312,6 +312,7 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
  
-+/* Global AMP Manager list */
-+LIST_HEAD(amp_mgr_list);
-+DEFINE_MUTEX(amp_mgr_list_lock);
+ 	struct a2mp_physlink_rsp rsp;
+ 	struct hci_dev *hdev;
++	struct hci_conn *hcon;
+ 
+ 	if (le16_to_cpu(hdr->len) < sizeof(*req))
+ 		return -EINVAL;
+@@ -329,7 +330,14 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 
+ 	/* TODO process physlink create */
+ 
+-	rsp.status = A2MP_STATUS_SUCCESS;
++	hcon = phylink_add(hdev, mgr, req->local_id);
++	if (hcon) {
++		BT_DBG("hcon %p", hcon);
 +
- /* A2MP build & send command helper functions */
- static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
- {
-@@ -516,6 +520,10 @@ static void amp_mgr_destroy(struct kref *kref)
- 
- 	BT_DBG("mgr %p", mgr);
- 
-+	mutex_lock(&amp_mgr_list_lock);
-+	list_del(&mgr->list);
-+	mutex_unlock(&amp_mgr_list_lock);
-+
- 	kfree(mgr);
- }
- 
-@@ -550,6 +558,10 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
- 
- 	conn->hcon->amp_mgr = mgr;
- 
-+	mutex_lock(&amp_mgr_list_lock);
-+	list_add(&mgr->list, &amp_mgr_list);
-+	mutex_unlock(&amp_mgr_list_lock);
-+
- 	kref_init(&mgr->kref);
- 
- 	return mgr;
-@@ -570,3 +582,20 @@ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
- 
- 	return mgr->a2mp_chan;
- }
-+
-+struct amp_mgr *amp_mgr_lookup_by_state(u8 state)
-+{
-+	struct amp_mgr *mgr;
-+
-+	mutex_lock(&amp_mgr_list_lock);
-+	list_for_each_entry(mgr, &amp_mgr_list, list) {
-+		if (mgr->state == state) {
-+			amp_mgr_get(mgr);
-+			mutex_unlock(&amp_mgr_list_lock);
-+			return mgr;
-+		}
++		rsp.status = A2MP_STATUS_SUCCESS;
++	} else {
++		rsp.status = A2MP_STATUS_UNABLE_START_LINK_CREATION;
 +	}
-+	mutex_unlock(&amp_mgr_list_lock);
+ 
+ send_rsp:
+ 	if (hdev)
+@@ -348,6 +356,7 @@ static int a2mp_discphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	struct a2mp_physlink_req *req = (void *) skb->data;
+ 	struct a2mp_physlink_rsp rsp;
+ 	struct hci_dev *hdev;
++	struct hci_conn *hcon;
+ 
+ 	if (le16_to_cpu(hdr->len) < sizeof(*req))
+ 		return -EINVAL;
+@@ -358,14 +367,22 @@ static int a2mp_discphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	rsp.remote_id = req->local_id;
+ 	rsp.status = A2MP_STATUS_SUCCESS;
+ 
+-	hdev = hci_dev_get(req->local_id);
++	hdev = hci_dev_get(req->remote_id);
+ 	if (!hdev) {
+ 		rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
+ 		goto send_rsp;
+ 	}
+ 
++	hcon = hci_conn_hash_lookup_id(hdev, rsp.local_id);
++	if (!hcon) {
++		BT_ERR("No phys link exist");
++		rsp.status = A2MP_STATUS_NO_PHYSICAL_LINK_EXISTS;
++		goto clean;
++	}
 +
-+	return NULL;
-+}
+ 	/* TODO Disconnect Phys Link here */
+ 
++clean:
+ 	hci_dev_put(hdev);
+ 
+ send_rsp:
 -- 
 1.7.9.5
 
