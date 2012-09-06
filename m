@@ -1,133 +1,304 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 6 Sep 2012 10:01:52 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
-Subject: Re: [PATCH 1/6] Bluetooth: Fix deadlock when closing socket
-In-Reply-To: <1346933147-11789-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Message-ID: <alpine.DEB.2.02.1209060946190.22884@mathewm-linux>
-References: <1346933147-11789-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+Message-id: <0004441400404C638F928BC1E2E8285B@sisodomain.com>
+From: Syam Sidhardhan <s.syam@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: HDP source incoming connection with new kernel & BlueZ 4.101
+Date: Thu, 06 Sep 2012 21:34:20 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Johan, Luiz, Andrei,
 
-Hi Andrei -
+I have backported the bluetooth.git kernel and testing the HDP profile using
+the bluez 4.101 release at both end. As per the code and my understanding 
+HDP
+MCAP is not using defer setup (bt_io_listen confirm param is null), hence 
+there
+should not be any authorization. Am I correct here?
 
-On Thu, 6 Sep 2012, Andrei Emeltchenko wrote:
+While initiating connection from HDP Sync to Source, I'm getting 
+authorization
+request at Source side in the backported bluetooth.git code (based on commit 
+id:
+ea1e76a3f92f8565d395c549b9ca836c7eaa44b9  Date:2012-06-19). I have tried 
+with
+disabling the mgmtops using bluetoothd -P option, but the same authorization
+is coming at the Source side.
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> If we have unacked frames when closing bluetooth socket we deadlock
-> since conn->chan_lock, chan->lock and socket lock are taken. Remove
-> __l2cap_wait_ack completely.
->
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-I don't think you want to remove this code completely, at least not 
-without giving some thought to the problem it is solving.
-
-The problem is that programs may have an open socket which they send 
-some data on, then immediately close.  There is no feedback when data 
-is actually sent over the air, so the socket may end up getting torn 
-down while there is still data in the HCI tx buffer or some data was 
-lost and needs to be retransmitted.  Waiting for an acknowledgement 
-confirms that the application's sent data made it to the remote 
-device.
-
-Without this code, it's difficult to use l2test on a number of 
-qualification tests.  Profiles or applications using ERTM may depend 
-on the "wait for ack before closing" behavior in order to have a clean 
-disconnect.
-
-It is not reasonable to deadlock while waiting for unacked packets to 
-go to 0, so maybe more needs to be done in __l2cap_wait_ack to limit 
-the wait time.
+When I tested it on the 3.0 kernel with same Bluez 4.101, it is working 
+fine.
+In the hcidump, the difference is old 3.0 kernel requesting for 
+authentication request,
+instead of authorization request.
+Failed case hcidump logs given below.
+The l2cap kernel log is provided here "http://pastebin.com/FxSDmPcV"-(used 
+printk)
+and the success logs with the old kernel is given here 
+"http://pastebin.com/L6ZMcTu"
 
 
-> ---
-> include/net/bluetooth/l2cap.h |    1 -
-> net/bluetooth/l2cap_core.c    |   32 --------------------------------
-> net/bluetooth/l2cap_sock.c    |    3 ---
-> 3 files changed, 36 deletions(-)
->
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 4e188dc..0330894 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -753,7 +753,6 @@ int l2cap_init_sockets(void);
-> void l2cap_cleanup_sockets(void);
->
-> void __l2cap_connect_rsp_defer(struct l2cap_chan *chan);
-> -int __l2cap_wait_ack(struct sock *sk);
->
-> int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm);
-> int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 3686506..8e4b57b 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -1633,38 +1633,6 @@ done:
-> 	return err;
-> }
->
-> -int __l2cap_wait_ack(struct sock *sk)
-> -{
-> -	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-> -	DECLARE_WAITQUEUE(wait, current);
-> -	int err = 0;
-> -	int timeo = HZ/5;
-> -
-> -	add_wait_queue(sk_sleep(sk), &wait);
-> -	set_current_state(TASK_INTERRUPTIBLE);
-> -	while (chan->unacked_frames > 0 && chan->conn) {
-> -		if (!timeo)
-> -			timeo = HZ/5;
-> -
-> -		if (signal_pending(current)) {
-> -			err = sock_intr_errno(timeo);
-> -			break;
-> -		}
-> -
-> -		release_sock(sk);
-> -		timeo = schedule_timeout(timeo);
-> -		lock_sock(sk);
-> -		set_current_state(TASK_INTERRUPTIBLE);
-> -
-> -		err = sock_error(sk);
-> -		if (err)
-> -			break;
-> -	}
-> -	set_current_state(TASK_RUNNING);
-> -	remove_wait_queue(sk_sleep(sk), &wait);
-> -	return err;
-> -}
-> -
-> static void l2cap_monitor_timeout(struct work_struct *work)
-> {
-> 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 997e0cb..cc26b1f 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -866,9 +866,6 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
-> 	lock_sock(sk);
->
-> 	if (!sk->sk_shutdown) {
-> -		if (chan->mode == L2CAP_MODE_ERTM)
-> -			err = __l2cap_wait_ack(sk);
-> -
-> 		sk->sk_shutdown = SHUTDOWN_MASK;
->
-> 		release_sock(sk);
-> -- 
-> 1.7.9.5
+So it seems something is broken in the bluetooth kernel.
+Any idea, what is wrong?
 
+
+Hcidump logs failure logs:
+------------------------------------
+1) Activate HDP source
+
+
+< HCI Command: Write Extended Inquiry Response (0x03|0x0052) plen 241
+    fec 0x00
+    Unknown type 0x52 with 8 bytes data
+    Flags: 0x14 0x16
+> HCI Event: Command Complete (0x0e) plen 4
+    Write Extended Inquiry Response (0x03|0x0052) ncmd 1
+    status 0x00
+
+2) Incoming connection from the remote HDP Sync device
+
+> HCI Event: Connect Request (0x04) plen 10
+    bdaddr 00:02:C4:EC:AD:E6 class 0x5a020c type ACL
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+    bdaddr 00:02:C4:EC:AD:E6 role 0x00
+    Role: Master
+> HCI Event: Command Status (0x0f) plen 4
+    Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
+> HCI Event: Role Change (0x12) plen 8
+    status 0x00 bdaddr 00:02:C4:EC:AD:E6 role 0x00
+    Role: Master
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x00 handle 11 bdaddr 00:02:C4:EC:AD:E6 type ACL encrypt 0x00
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+    handle 11
+> HCI Event: Command Status (0x0f) plen 4
+    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+> HCI Event: Read Remote Supported Features (0x0b) plen 11
+    status 0x00 handle 11
+    Features: 0xbf 0xfe 0xcf 0xfe 0xdb 0xff 0x7b 0x87
+< HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
+    handle 11 page 1
+> HCI Event: Command Status (0x0f) plen 4
+    Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
+> HCI Event: Read Remote Extended Features (0x23) plen 13
+    status 0x00 handle 11 page 1 max 1
+    Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+
+ < HCI Command: Remote Name Request (0x01|0x0019) plen 10
+    bdaddr 00:02:C4:EC:AD:E6 mode 2 clkoffset 0x0000
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> HCI Event: Max Slots Change (0x1b) plen 3
+    handle 11 slots 5
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+    status 0x00 bdaddr 00:02:C4:EC:AD:E6 name 'Redwood'
+> ACL data: handle 11 flags 0x02 dlen 10
+    L2CAP(s): Info req: type 2
+< ACL data: handle 11 flags 0x00 dlen 16
+    L2CAP(s): Info rsp: type 2 result 0
+      Extended feature mask 0x00b8
+        Enhanced Retransmission mode
+        Streaming mode
+        FCS Option
+        Fixed Channels
+> ACL data: handle 11 flags 0x02 dlen 10
+    L2CAP(s): Info req: type 3
+< ACL data: handle 11 flags 0x00 dlen 20
+    L2CAP(s): Info rsp: type 3 result 0
+      Fixed channel list 0x00000002
+        L2CAP Signalling Channel
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 11 packets 2
+> ACL data: handle 11 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0040
+< ACL data: handle 11 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 0
+      Connection pending - No futher information available
+< ACL data: handle 11 flags 0x00 dlen 10
+    L2CAP(s): Info req: type 2
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 11 packets 2
+> ACL data: handle 11 flags 0x02 dlen 16
+    L2CAP(s): Info rsp: type 2 result 0
+      Extended feature mask 0x00b8
+        Enhanced Retransmission mode
+        Streaming mode
+        FCS Option
+        Fixed Channels
+< ACL data: handle 11 flags 0x00 dlen 10
+    L2CAP(s): Info req: type 3
+> ACL data: handle 11 flags 0x02 dlen 20
+    L2CAP(s): Info rsp: type 3 result 0
+      Fixed channel list 0x00000002
+        L2CAP Signalling Channel
+< ACL data: handle 11 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
+      Connection successful
+< ACL data: handle 11 flags 0x00 dlen 23
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 11
+      RFC 0x00 (Basic)
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 11 packets 2
+> ACL data: handle 11 flags 0x02 dlen 23
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 11
+      RFC 0x00 (Basic)
+< ACL data: handle 11 flags 0x00 dlen 18
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
+      MTU 672
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 11 packets 2
+> ACL data: handle 11 flags 0x02 dlen 18
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
+      MTU 672
+> ACL data: handle 11 flags 0x02 dlen 38
+    L2CAP(d): cid 0x0040 len 34 [psm 1]
+        SDP SSA Req: tid 0x0 len 0x1d
+          pat uuid-128 00001400-0000-1000-8000-00805f9b34fb
+          max 65535
+          aid(s) 0x0000 - 0xffff
+          cont 00
+< ACL data: handle 11 flags 0x00 dlen 206
+    L2CAP(d): cid 0x0040 len 202 [psm 1]
+        SDP SSA Rsp: tid 0x0 len 0xc5
+          count 194
+          record #0
+              aid 0x0000 (SrvRecHndl)
+                 uint 0x1000b
+              aid 0x0001 (SrvClassIDList)
+                 < uuid-16 0x1401 >
+              aid 0x0002 (SrvRecState)
+                 uint 0x0
+              aid 0x0004 (ProtocolDescList)
+                 < < uuid-16 0x0100 (L2CAP) uint 0x1001 > <
+                 uuid-16 0x001e uint 0x100 > >
+              aid 0x0009 (BTProfileDescList)
+                 < < uuid-16 0x1400 uint 0x100 > >
+              aid 0x000d (AdditionalProtocolDescLists)
+                 < < < uuid-16 0x0100 (L2CAP) uint 0x1003 > < uuid-16 0x001f 
+ > > >
+              aid 0x0100 (SrvName)
+                 str "Bluez HDP"
+              aid 0x0101 (SrvDesc)
+                 str "A Bluez health device profile implementation"
+              aid 0x0102 (ProviderName)
+                 str "Bluez"
+              aid 0x0200 (VersionNumList)
+                 < < uint 0x1 uint 0x1007 uint 0x0 str "Health Device" > >
+              aid 0x0301 (SuppDataStoresList)
+                 uint 0x1
+              aid 0x0302 (unknown)
+                 uint 0x6
+          cont 00
+> ACL data: handle 11 flags 0x02 dlen 38
+    L2CAP(d): cid 0x0040 len 34 [psm 1]
+        SDP SSA Req: tid 0x1 len 0x1d
+          pat uuid-128 00001400-0000-1000-8000-00805f9b34fb
+          max 65535
+          aid(s) 0x0000 - 0xffff
+          cont 00
+< ACL data: handle 11 flags 0x00 dlen 206
+    L2CAP(d): cid 0x0040 len 202 [psm 1]
+        SDP SSA Rsp: tid 0x1 len 0xc5
+          count 194
+          record #0
+              aid 0x0000 (SrvRecHndl)
+                 uint 0x1000b
+              aid 0x0001 (SrvClassIDList)
+                 < uuid-16 0x1401 >
+              aid 0x0002 (SrvRecState)
+                 uint 0x0
+              aid 0x0004 (ProtocolDescList)
+                 < < uuid-16 0x0100 (L2CAP) uint 0x1001 > <
+                 uuid-16 0x001e uint 0x100 > >
+              aid 0x0009 (BTProfileDescList)
+                 < < uuid-16 0x1400 uint 0x100 > >
+              aid 0x000d (AdditionalProtocolDescLists)
+                 < < < uuid-16 0x0100 (L2CAP) uint 0x1003 > < uuid-16 0x001f 
+ > > >
+              aid 0x0100 (SrvName)
+                 str "Bluez HDP"
+              aid 0x0101 (SrvDesc)
+                 str "A Bluez health device profile implementation"
+              aid 0x0102 (ProviderName)
+                 str "Bluez"
+              aid 0x0200 (VersionNumList)
+                 < < uint 0x1 uint 0x1007 uint 0x0 str "Health Device" > >
+              aid 0x0301 (SuppDataStoresList)
+                 uint 0x1
+              aid 0x0302 (unknown)
+                 uint 0x6
+          cont 00
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 11 packets 2
+> HCI Event: Link Key Request (0x17) plen 6
+    bdaddr 00:02:C4:EC:AD:E6
+< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+    bdaddr 00:02:C4:EC:AD:E6 key 83E54CBBC30B55A90DFE81F7B63CF9BC
+> HCI Event: Command Complete (0x0e) plen 10
+    Link Key Request Reply (0x01|0x000b) ncmd 1
+    status 0x00 bdaddr 00:02:C4:EC:AD:E6
+> HCI Event: Encrypt Change (0x08) plen 4
+    status 0x00 handle 11 encrypt 0x01
+> ACL data: handle 11 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 4097 scid 0x0041
+< ACL data: handle 11 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 1 status 2
+      Connection pending - Authorization pending
+
+3) Why authorization is coming with new kernel and not with old kernel with
+same user space bluez?
+
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 11 packets 1
+> ACL data: handle 11 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+< ACL data: handle 11 flags 0x00 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 11 packets 1
+< ACL data: handle 11 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 0 status 0
+      Connection successful
+< ACL data: handle 11 flags 0x00 dlen 27
+    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 15
+      MTU 32767
+      RFC 0x03 (Enhanced Retransmission, TxWin 63, MaxTx 3, RTo 0, MTo 0, 
+MPS 1009)
+> ACL data: handle 11 flags 0x02 dlen 23
+    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 11
+      RFC 0x03 (Enhanced Retransmission, TxWin 63, MaxTx 3, RTo 0, MTo 0, 
+MPS 1009)
+< ACL data: handle 11 flags 0x00 dlen 29
+    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 15
+      MTU 672
+      RFC 0x03 (Enhanced Retransmission, TxWin 63, MaxTx 3, RTo 2000, MTo 
+12000, MPS 1009)
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 11 packets 2
+> ACL data: handle 11 flags 0x02 dlen 29
+     L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 15
+       MTU 32767
+       RFC 0x03 (Enhanced Retransmission, TxWin 63, MaxTx 3, RTo 2000, MTo 
+12000, MPS 1009)
+
+> ACL data: handle 11 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 ctrl 0x0000 fcs 0xe464 [psm 4097]
+      I-frame: Unsegmented TxSeq 0 ReqSeq 0
+      0000: 01 77 31 01 00                                    .w1..
+< ACL data: handle 11 flags 0x00 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0041 scid 0x0041
+
+4) Here HDP source initiate disconnection request
+
+> ACL data: handle 11 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0041
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 11 packets 2
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 11 reason 0x13
+    Reason: Remote User Terminated Connection
 
 Regards,
+Syam
 
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
