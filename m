@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 07/19] Bluetooth: AMP: Remote AMP ctrl definitions
-Date: Thu,  6 Sep 2012 15:19:45 +0300
-Message-Id: <1346933997-14369-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 01/19] Bluetooth: Add HCI logical link cmds definitions
+Date: Thu,  6 Sep 2012 15:19:39 +0300
+Message-Id: <1346933997-14369-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1346933997-14369-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1346933997-14369-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,171 +12,64 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Create remote AMP controllers structure. It is used to keep information
-about discovered remote AMP controllers by A2MP protocol.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |    3 ++
- include/net/bluetooth/pal.h  |   14 ++++++++
- net/bluetooth/a2mp.c         |    5 +++
- net/bluetooth/pal.c          |   81 ++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 103 insertions(+)
+ include/net/bluetooth/hci.h |   36 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 35 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index f9010c0..93967f1 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -31,6 +31,9 @@ struct amp_mgr {
- 		READ_LOC_AMP_ASSOC,
- 	} state;
- 	unsigned long		flags;
-+
-+	struct list_head	amp_ctrls;
-+	struct mutex		amp_ctrls_lock;
- };
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 0f28f70..42aae18 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -556,12 +556,46 @@ struct hci_cp_accept_phy_link {
+ 	__u8     key[HCI_AMP_LINK_KEY_SIZE];
+ } __packed;
  
- struct a2mp_cmd {
-diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
-index a0f441b..918a4be 100644
---- a/include/net/bluetooth/pal.h
-+++ b/include/net/bluetooth/pal.h
-@@ -20,6 +20,20 @@
- #include <net/bluetooth/a2mp.h>
- #include <net/bluetooth/amp.h>
+-#define HCI_OP_DISCONN_PHY_LINK	0x0437
++#define HCI_OP_DISCONN_PHY_LINK		0x0437
+ struct hci_cp_disconn_phy_link {
+ 	__u8     phy_handle;
+ 	__u8     reason;
+ } __packed;
  
-+struct amp_ctrl {
-+	struct list_head	list;
-+	struct kref		kref;
-+	__u8			id;
-+	__u16			assoc_len_so_far;
-+	__u16			assoc_rem_len;
-+	__u16			assoc_len;
-+	__u8			*assoc;
-+};
++struct ext_flow_spec {
++	__u8       id;
++	__u8       stype;
++	__le16     msdu;
++	__le32     sdu_itime;
++	__le32     acc_lat;
++	__le32     flush_to;
++} __packed;
 +
-+int amp_ctrl_put(struct amp_ctrl *ctrl);
-+struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr);
-+struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id);
-+void amp_ctrl_list_flush(struct amp_mgr *mgr);
- struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
- 			     u8 remote_id);
- 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 8f236db..36bf0f4 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -585,6 +585,7 @@ static void amp_mgr_destroy(struct kref *kref)
- 	list_del(&mgr->list);
- 	mutex_unlock(&amp_mgr_list_lock);
- 
-+	amp_ctrl_list_flush(mgr);
- 	kfree(mgr);
- }
- 
-@@ -623,6 +624,10 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
- 	list_add(&mgr->list, &amp_mgr_list);
- 	mutex_unlock(&amp_mgr_list_lock);
- 
-+	/* Remote AMP ctrl list initialization */
-+	INIT_LIST_HEAD(&mgr->amp_ctrls);
-+	mutex_init(&mgr->amp_ctrls_lock);
++#define HCI_OP_CREATE_LOGICAL_LINK	0x0438
++#define HCI_OP_ACCEPT_LOGICAL_LINK	0x0439
++struct hci_cp_create_accept_logical_link {
++	__u8                  phy_handle;
++	struct ext_flow_spec  tx_flow_spec;
++	struct ext_flow_spec  rx_flow_spec;
++} __packed;
 +
- 	kref_init(&mgr->kref);
- 
- 	return mgr;
-diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
-index c71ef16..cb1fa86 100644
---- a/net/bluetooth/pal.c
-+++ b/net/bluetooth/pal.c
-@@ -13,6 +13,87 @@
- 
- #include <net/bluetooth/pal.h>
- 
-+/* Remote AMP Controllers handling */
-+static void amp_ctrl_get(struct amp_ctrl *ctrl)
-+{
-+	BT_DBG("ctrl %p orig refcnt %d", ctrl,
-+	       atomic_read(&ctrl->kref.refcount));
++#define HCI_OP_DISCONN_LOGICAL_LINK	0x043a
++struct hci_cp_disconn_logical_link {
++	__le16   log_handle;
++} __packed;
 +
-+	kref_get(&ctrl->kref);
-+}
++#define HCI_OP_LOGICAL_LINK_CANCEL	0x043b
++struct hci_cp_logical_link_cancel {
++	__u8     phy_handle;
++	__u8     flow_spec_id;
++} __packed;
 +
-+static void amp_ctrl_destroy(struct kref *kref)
-+{
-+	struct amp_ctrl *ctrl = container_of(kref, struct amp_ctrl, kref);
++struct hci_rp_logical_link_cancel {
++	__u8     status;
++	__u8     phy_handle;
++	__u8     flow_spec_id;
++} __packed;
 +
-+	BT_DBG("ctrl %p", ctrl);
-+
-+	if (ctrl->assoc)
-+		kfree(ctrl->assoc);
-+
-+	kfree(ctrl);
-+}
-+
-+int amp_ctrl_put(struct amp_ctrl *ctrl)
-+{
-+	BT_DBG("ctrl %p orig refcnt %d", ctrl,
-+	       atomic_read(&ctrl->kref.refcount));
-+
-+	return kref_put(&ctrl->kref, &amp_ctrl_destroy);
-+}
-+
-+struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr)
-+{
-+	struct amp_ctrl *ctrl;
-+
-+	ctrl = kzalloc(sizeof(*ctrl), GFP_KERNEL);
-+	if (!ctrl)
-+		return NULL;
-+
-+	mutex_lock(&mgr->amp_ctrls_lock);
-+	list_add(&ctrl->list, &mgr->amp_ctrls);
-+	mutex_unlock(&mgr->amp_ctrls_lock);
-+
-+	kref_init(&ctrl->kref);
-+
-+	BT_DBG("mgr %p ctrl %p", mgr, ctrl);
-+
-+	return ctrl;
-+}
-+
-+void amp_ctrl_list_flush(struct amp_mgr *mgr)
-+{
-+	struct amp_ctrl *ctrl, *n;
-+
-+	BT_DBG("mgr %p", mgr);
-+
-+	mutex_lock(&mgr->amp_ctrls_lock);
-+	list_for_each_entry_safe(ctrl, n, &mgr->amp_ctrls, list) {
-+		list_del(&ctrl->list);
-+		amp_ctrl_put(ctrl);
-+	}
-+	mutex_unlock(&mgr->amp_ctrls_lock);
-+}
-+
-+struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id)
-+{
-+	struct amp_ctrl *ctrl = NULL;
-+
-+	mutex_lock(&mgr->amp_ctrls_lock);
-+	list_for_each_entry(ctrl, &mgr->amp_ctrls, list) {
-+		if (ctrl->id == id)
-+			break;
-+	}
-+	mutex_unlock(&mgr->amp_ctrls_lock);
-+
-+	BT_DBG("mgr %p id %d ctrl %p", mgr, id, ctrl);
-+
-+	if (ctrl)
-+		amp_ctrl_get(ctrl);
-+
-+	return ctrl;
-+}
-+
- /* Physical Link interface */
- static u8 __next_handle(struct amp_mgr *mgr)
- {
+ #define HCI_OP_SNIFF_MODE		0x0803
+ struct hci_cp_sniff_mode {
+ 	__le16   handle;
 -- 
 1.7.9.5
 
