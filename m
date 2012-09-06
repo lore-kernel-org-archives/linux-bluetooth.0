@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 06/19] Bluetooth: AMP: Physical link struct and heplers
-Date: Thu,  6 Sep 2012 15:19:44 +0300
-Message-Id: <1346933997-14369-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 16/19] Bluetooth: A2MP: Add fallback to normal l2cap init sequence
+Date: Thu,  6 Sep 2012 15:19:54 +0300
+Message-Id: <1346933997-14369-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1346933997-14369-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1346933997-14369-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,173 +12,93 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Define physical link structures. Physical links are represented by
-hci_conn structure. For BR/EDR we use type ACL_LINK and for AMP
-we use AMP_LINK.
+When there is no remote AMP controller found fallback to normal
+L2CAP sequence.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci.h      |    1 +
- include/net/bluetooth/hci_core.h |   20 +++++++++++++++++++
- include/net/bluetooth/pal.h      |   26 ++++++++++++++++++++++++
- net/bluetooth/Makefile           |    2 +-
- net/bluetooth/a2mp.c             |    1 +
- net/bluetooth/pal.c              |   41 ++++++++++++++++++++++++++++++++++++++
- 6 files changed, 90 insertions(+), 1 deletion(-)
- create mode 100644 include/net/bluetooth/pal.h
- create mode 100644 net/bluetooth/pal.c
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/a2mp.c          |   28 ++++++++++++++++++++++++++++
+ net/bluetooth/l2cap_core.c    |    2 +-
+ 3 files changed, 30 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 1cb8b55..4c41b8c 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -207,6 +207,7 @@ enum {
- #define ESCO_LINK	0x02
- /* Low Energy links do not have defined link type. Use invented one */
- #define LE_LINK		0x80
-+#define AMP_LINK	0x81
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 3e2d4e6..161be83 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -774,5 +774,6 @@ void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
+ 			  long timeout);
+ bool l2cap_conn_clear_timer(struct l2cap_conn *conn,
+ 			    struct delayed_work *work);
++void l2cap_send_conn_req(struct l2cap_chan *chan);
  
- /* LMP features */
- #define LMP_3SLOT	0x01
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 1174218..4ae5293 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -316,6 +316,7 @@ struct hci_conn {
- 
- 	__u8		remote_cap;
- 	__u8		remote_auth;
-+	__u8		remote_id;
- 	bool		flush_key;
- 
- 	unsigned int	sent;
-@@ -510,6 +511,25 @@ static inline struct hci_conn *hci_conn_hash_lookup_handle(struct hci_dev *hdev,
- 	return NULL;
- }
- 
-+static inline struct hci_conn *hci_conn_hash_lookup_id(struct hci_dev *hdev,
-+						       __u8 remote_id)
-+{
-+	struct hci_conn_hash *h = &hdev->conn_hash;
-+	struct hci_conn  *c;
-+
-+	rcu_read_lock();
-+
-+	list_for_each_entry_rcu(c, &h->list, list) {
-+		if (c->remote_id == remote_id) {
-+			rcu_read_unlock();
-+			return c;
-+		}
-+	}
-+	rcu_read_unlock();
-+
-+	return NULL;
-+}
-+
- static inline struct hci_conn *hci_conn_hash_lookup_ba(struct hci_dev *hdev,
- 							__u8 type, bdaddr_t *ba)
- {
-diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
-new file mode 100644
-index 0000000..a0f441b
---- /dev/null
-+++ b/include/net/bluetooth/pal.h
-@@ -0,0 +1,26 @@
-+/*
-+   Copyright (c) 2011,2012 Intel Corp.
-+
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License version 2 and
-+   only version 2 as published by the Free Software Foundation.
-+
-+   This program is distributed in the hope that it will be useful,
-+   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+   GNU General Public License for more details.
-+*/
-+
-+#ifndef __PAL_H
-+#define __PAL_H
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/l2cap.h>
-+#include <net/bluetooth/a2mp.h>
-+#include <net/bluetooth/amp.h>
-+
-+struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
-+			     u8 remote_id);
-+
-+#endif /* __PAL_H */
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index dea6a28..3f76fc2 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -10,4 +10,4 @@ obj-$(CONFIG_BT_HIDP)	+= hidp/
- 
- bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
- 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
--	a2mp.o amp.o
-+	a2mp.o amp.o pal.o
+ #endif /* __L2CAP_H */
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index c876997..8f236db 100644
+index 39e0f95..05522ea 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -17,6 +17,7 @@
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/a2mp.h>
- #include <net/bluetooth/amp.h>
-+#include <net/bluetooth/pal.h>
+@@ -181,6 +181,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	u16 len = le16_to_cpu(hdr->len);
+ 	struct a2mp_cl *cl;
+ 	u16 ext_feat;
++	bool found = false;
  
- /* Global AMP Manager list */
- LIST_HEAD(amp_mgr_list);
-diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
-new file mode 100644
-index 0000000..c71ef16
---- /dev/null
-+++ b/net/bluetooth/pal.c
-@@ -0,0 +1,41 @@
-+/*
-+   Copyright (c) 2011,2012 Intel Corp.
+ 	if (len < sizeof(*rsp))
+ 		return -EINVAL;
+@@ -211,6 +212,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
+ 			struct a2mp_info_req req;
+ 
++			found = true;
+ 			req.id = cl->id;
+ 			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
+ 				  sizeof(req), &req);
+@@ -220,6 +222,32 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 		cl = (void *) skb_pull(skb, sizeof(*cl));
+ 	}
+ 
++	/* Fall back to L2CAP init sequence */
++	if (!found) {
++		struct l2cap_conn *conn = mgr->l2cap_conn;
++		struct l2cap_chan *chan;
 +
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License version 2 and
-+   only version 2 as published by the Free Software Foundation.
++		mutex_lock(&conn->chan_lock);
 +
-+   This program is distributed in the hope that it will be useful,
-+   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+   GNU General Public License for more details.
-+*/
++		list_for_each_entry(chan, &conn->chan_l, list) {
 +
-+#include <net/bluetooth/pal.h>
++			BT_DBG("chan %p state %s", chan,
++			       state_to_string(chan->state));
 +
-+/* Physical Link interface */
-+static u8 __next_handle(struct amp_mgr *mgr)
-+{
-+	if (++mgr->handle == 0)
-+		mgr->handle = 1;
++			if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
++				continue;
 +
-+	return mgr->handle;
-+}
++			l2cap_chan_lock(chan);
 +
-+struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
-+			     u8 remote_id)
-+{
-+	struct hci_conn *hcon;
++			if (chan->state == BT_CONNECT)
++				l2cap_send_conn_req(chan);
 +
-+	hcon = hci_conn_add(hdev, AMP_LINK, BDADDR_ANY);
-+	if (!hcon)
-+		return NULL;
++			l2cap_chan_unlock(chan);
++		}
 +
-+	hcon->state = BT_CONNECT;
-+	hcon->out = true;
-+	hcon->attempt++;
-+	hcon->handle = __next_handle(mgr);
-+	hcon->remote_id = remote_id;
++		mutex_unlock(&conn->chan_lock);
++	}
 +
-+	return hcon;
-+}
+ 	return 0;
+ }
+ 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b33ce3c..a7a62f6 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1020,7 +1020,7 @@ static bool __amp_capable(struct l2cap_chan *chan)
+ 		return false;
+ }
+ 
+-static void l2cap_send_conn_req(struct l2cap_chan *chan)
++void l2cap_send_conn_req(struct l2cap_chan *chan)
+ {
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct l2cap_conn_req req;
 -- 
 1.7.9.5
 
