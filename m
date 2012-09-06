@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 16/19] Bluetooth: A2MP: Add fallback to normal l2cap init sequence
-Date: Thu,  6 Sep 2012 15:19:54 +0300
-Message-Id: <1346933997-14369-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 19/19] Bluetooth: AMP: Process physical link complete event
+Date: Thu,  6 Sep 2012 15:19:57 +0300
+Message-Id: <1346933997-14369-20-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1346933997-14369-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1346933997-14369-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,93 +12,72 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When there is no remote AMP controller found fallback to normal
-L2CAP sequence.
+Add new hci_conn for representing AMP physical link.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |    1 +
- net/bluetooth/a2mp.c          |   28 ++++++++++++++++++++++++++++
- net/bluetooth/l2cap_core.c    |    2 +-
- 3 files changed, 30 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_event.c |   41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 3e2d4e6..161be83 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -774,5 +774,6 @@ void l2cap_conn_set_timer(struct l2cap_conn *conn, struct delayed_work *work,
- 			  long timeout);
- bool l2cap_conn_clear_timer(struct l2cap_conn *conn,
- 			    struct delayed_work *work);
-+void l2cap_send_conn_req(struct l2cap_chan *chan);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 0841b25..3630044 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3427,6 +3427,43 @@ unlock:
+ 	hci_dev_unlock(hdev);
+ }
  
- #endif /* __L2CAP_H */
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 39e0f95..05522ea 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -181,6 +181,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 	u16 len = le16_to_cpu(hdr->len);
- 	struct a2mp_cl *cl;
- 	u16 ext_feat;
-+	bool found = false;
- 
- 	if (len < sizeof(*rsp))
- 		return -EINVAL;
-@@ -211,6 +212,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
- 			struct a2mp_info_req req;
- 
-+			found = true;
- 			req.id = cl->id;
- 			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
- 				  sizeof(req), &req);
-@@ -220,6 +222,32 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 		cl = (void *) skb_pull(skb, sizeof(*cl));
- 	}
- 
-+	/* Fall back to L2CAP init sequence */
-+	if (!found) {
-+		struct l2cap_conn *conn = mgr->l2cap_conn;
-+		struct l2cap_chan *chan;
++static void hci_phy_link_complete_evt(struct hci_dev *hdev,
++				      struct sk_buff *skb)
++{
++	struct hci_ev_phy_link_complete *ev = (void *) skb->data;
++	struct hci_conn *hcon, *bredr_hcon;
++	struct hci_dev *bredr_hdev;
 +
-+		mutex_lock(&conn->chan_lock);
++	BT_DBG("%s handle 0x%2.2x status 0x%2.2x", hdev->name, ev->phy_handle,
++	       ev->status);
 +
-+		list_for_each_entry(chan, &conn->chan_l, list) {
++	if (ev->status)
++		return;
 +
-+			BT_DBG("chan %p state %s", chan,
-+			       state_to_string(chan->state));
++	hci_dev_lock(hdev);
 +
-+			if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
-+				continue;
++	hcon = hci_conn_hash_lookup_handle(hdev, ev->phy_handle);
++	if (!hcon)
++		return;
 +
-+			l2cap_chan_lock(chan);
++	bredr_hcon = hcon->amp_mgr->l2cap_conn->hcon;
 +
-+			if (chan->state == BT_CONNECT)
-+				l2cap_send_conn_req(chan);
++	hcon->state = BT_CONNECTED;
++	bacpy(&hcon->dst, &bredr_hcon->dst);
 +
-+			l2cap_chan_unlock(chan);
-+		}
++	hci_conn_hold_device(hcon);
++	hci_conn_add_sysfs(hcon);
 +
-+		mutex_unlock(&conn->chan_lock);
++	hci_dev_unlock(hdev);
++
++	bredr_hdev = bredr_hcon->hdev;
++	if (bredr_hdev) {
++		hci_dev_hold(bredr_hdev);
++		l2cap_chan_create_cfm(bredr_hcon, hcon->remote_id);
++		hci_dev_put(bredr_hdev);
 +	}
++}
 +
- 	return 0;
- }
- 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b33ce3c..a7a62f6 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1020,7 +1020,7 @@ static bool __amp_capable(struct l2cap_chan *chan)
- 		return false;
- }
- 
--static void l2cap_send_conn_req(struct l2cap_chan *chan)
-+void l2cap_send_conn_req(struct l2cap_chan *chan)
+ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
  {
- 	struct l2cap_conn *conn = chan->conn;
- 	struct l2cap_conn_req req;
+ 	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
+@@ -3746,6 +3783,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_remote_oob_data_request_evt(hdev, skb);
+ 		break;
+ 
++	case HCI_EV_PHY_LINK_COMPLETE:
++		hci_phy_link_complete_evt(hdev, skb);
++		break;
++
+ 	case HCI_EV_NUM_COMP_BLOCKS:
+ 		hci_num_comp_blocks_evt(hdev, skb);
+ 		break;
 -- 
 1.7.9.5
 
