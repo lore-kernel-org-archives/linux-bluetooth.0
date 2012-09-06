@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 11/17] heartrate: Read Heart Rate Control Point characteristics
-Date: Thu, 6 Sep 2012 13:32:45 +0200
-Message-ID: <1346931171-18968-12-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: Rafal Garbat <rafal.garbat@tieto.com>
+Subject: [PATCH v3 15/17] heartrate: Add GetProperties method
+Date: Thu, 6 Sep 2012 13:32:49 +0200
+Message-ID: <1346931171-18968-16-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1346931171-18968-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1346931171-18968-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,32 +12,94 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch reads and stores Heart Rate Control Point characteristics value.
+From: Rafal Garbat <rafal.garbat@tieto.com>
 
 ---
- profiles/heartrate/heartrate.c | 2 ++
- 1 file changed, 2 insertions(+)
+ profiles/heartrate/heartrate.c | 57 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
 
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index 150a675..4591e56 100644
+index 48d3cd1..43f94c1 100644
 --- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
-@@ -58,6 +58,7 @@ struct heartrate {
- 	GSList				*chars;
- 	gboolean			has_location;
- 	uint8_t				location;
-+	gboolean			has_cp_reset;
+@@ -104,6 +104,25 @@ struct watcher {
+ 
+ static GSList *heartrate_adapters = NULL;
+ 
++static const char * const location_type[] = {
++	"Other",
++	"Chest",
++	"Wrist",
++	"Finger",
++	"Hand",
++	"Earlobe",
++	"Foot"
++};
++
++static const gchar *location2str(uint8_t value)
++{
++	 if (value < G_N_ELEMENTS(location_type))
++		return location_type[value];
++
++	error("Location type %d reserved for future use", value);
++	return NULL;
++}
++
+ static gint cmp_adapter(gconstpointer a, gconstpointer b)
+ {
+ 	const struct heartrate_adapter *hra = a;
+@@ -410,6 +429,41 @@ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
++static DBusMessage *get_properties(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	struct heartrate *hr = data;
++	DBusMessageIter iter;
++	DBusMessageIter dict;
++	DBusMessage *reply;
++
++	reply = dbus_message_new_method_return(msg);
++	if (reply == NULL)
++		return NULL;
++
++	dbus_message_iter_init_append(reply, &iter);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	if (hr->has_location) {
++		char *loc = g_strdup(location2str(hr->location));
++
++		dict_append_entry(&dict, "Location", DBUS_TYPE_STRING, &loc);
++
++		g_free(loc);
++	}
++
++	dict_append_entry(&dict, "ResetSupported", DBUS_TYPE_BOOLEAN,
++							&hr->has_cp_reset);
++
++	dbus_message_iter_close_container(&iter, &dict);
++
++	return reply;
++}
++
+ static gint process_att_reset(struct heartrate *hr)
+ {
+ 	struct characteristic *ch;
+@@ -458,6 +512,9 @@ static const GDBusMethodTable heartrate_manager_methods[] = {
  };
  
- struct characteristic {
-@@ -420,6 +421,7 @@ static void process_heartrate_char(struct characteristic *ch)
- {
- 	if (g_strcmp0(ch->attr.uuid, HEART_RATE_CONTROL_POINT_UUID) == 0) {
- 		DBG("Heart Rate Control Point reset supported by client");
-+		ch->hr->has_cp_reset = TRUE;
- 	} else if (g_strcmp0(ch->attr.uuid, BODY_SENSOR_LOCATION_UUID) == 0) {
- 		DBG("Body Sensor Location supported by client");
- 		gatt_read_char(ch->hr->attrib, ch->attr.value_handle, 0,
+ static const GDBusMethodTable heartrate_device_methods[] = {
++	{ GDBUS_METHOD("GetProperties",
++			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
++			get_properties) },
+ 	{ GDBUS_METHOD("Reset", NULL, NULL,
+ 			control_point_reset) },
+ 	{ }
 -- 
 1.7.11.3
 
