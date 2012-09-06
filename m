@@ -1,114 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH v3 01/17] Heart Rate Profile API
-Date: Thu, 6 Sep 2012 13:32:35 +0200
-Message-ID: <1346931171-18968-2-git-send-email-andrzej.kaczmarek@tieto.com>
-In-Reply-To: <1346931171-18968-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1346931171-18968-1-git-send-email-andrzej.kaczmarek@tieto.com>
+From: Peng Chen <pengchen@qca.qualcomm.com>
+To: <gustavo@padovan.org>
+CC: <linux-bluetooth@vger.kernel.org>, <marcel@holtmann.org>, Peng Chen
+	<pengchen@qca.qualcomm.com>
+Subject: [PATCH] Fix endian safe issue, make driver work on both little and big endian cpu.
+Date: Thu, 6 Sep 2012 19:30:43 +0800
+Message-ID: <1346931043-11541-1-git-send-email-pengchen@qca.qualcomm.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Santiago Carot-Nemesio <sancane@gmail.com>
 
+Signed-off-by: Peng Chen <pengchen@qca.qualcomm.com>
 ---
- doc/heartrate-api.txt | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 84 insertions(+)
- create mode 100644 doc/heartrate-api.txt
+ drivers/bluetooth/ath3k.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/doc/heartrate-api.txt b/doc/heartrate-api.txt
-new file mode 100644
-index 0000000..4ce96d8
---- /dev/null
-+++ b/doc/heartrate-api.txt
-@@ -0,0 +1,84 @@
-+			 Heart Rate API description
-+****************************************
-+
-+Copyright (C) 2012	Santiago Carot-Nemesio <sancane@gmail.com>
-+Copyright (C) 2012	Tieto Poland
-+
-+Heart Rate Manager hierarchy
-+============================
-+
-+Service		org.bluez
-+Interface	org.bluez.HeartRateManager
-+Object path	[variable prefix]/{hci0,hci1,...}
-+
-+Methods		RegisterWatcher(object agent)
-+
-+			Registers a watcher to monitor heart rate measurements.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		UnregisterWatcher(object agent)
-+
-+			Unregisters a watcher.
-+
-+Heart Rate Profile hierarchy
-+============================
-+
-+Service		org.bluez
-+Interface	org.bluez.HeartRate
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-+
-+Methods		dict GetProperties()
-+
-+			Returns all properties for the interface. See the
-+			Properties section for the available properties.
-+
-+		Reset()
-+
-+			Restart the accumulation of energy expended from zero.
-+
-+			Possible Errors: org.bluez.Error.NotSupported
-+
-+Properties	String Location (optional) [readonly]
-+
-+			Possible values: "Other", "Chest", "Wrist","Finger",
-+					"Hand", "Earlobe", "Foot"
-+
-+		boolean ResetSupported [readonly]
-+
-+			True if energy expended is supported.
-+
-+Heart Rate Watcher hierarchy
-+
-+============================
-+Service		unique name
-+Interface	org.bluez.HeartRateWatcher
-+Object path	freely definable
-+
-+Methods		void MeasurementReceived(object device, dict measurement)
-+
-+			This callback is called whenever a heart rate
-+			measurement is received from the heart rate device.
-+
-+			Measurement:
-+
-+				uint16 Value:
-+
-+					Measurement value expressed in beats per
-+					minute (bpm)
-+
-+				uint16 Energy (optional):
-+
-+					Accumulated energy expended in kilo Joules
-+
-+				boolean Contact (optional):
-+
-+					true if skin contact is detected by sensor,
-+					false otherwise
-+
-+				array{uint16} Interval (optional):
-+
-+					RR-Interval values which represent the time
-+					between two consecutive R waves in an ECG.
-+					Values are ordered starting from oldest to
-+					most recent.
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 10308cd..e63aee1 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -299,7 +299,7 @@ static int ath3k_load_patch(struct usb_device *udev)
+ 	}
+ 
+ 	snprintf(filename, ATH3K_NAME_LEN, "ar3k/AthrBT_0x%08x.dfu",
+-		fw_version.rom_version);
++		le32_to_cpu(fw_version.rom_version));
+ 
+ 	ret = request_firmware(&firmware, filename, &udev->dev);
+ 	if (ret < 0) {
+@@ -361,7 +361,7 @@ static int ath3k_load_syscfg(struct usb_device *udev)
+ 	}
+ 
+ 	snprintf(filename, ATH3K_NAME_LEN, "ar3k/ramps_0x%08x_%d%s",
+-		fw_version.rom_version, clk_value, ".dfu");
++		le32_to_cpu(fw_version.rom_version), clk_value, ".dfu");
+ 
+ 	ret = request_firmware(&firmware, filename, &udev->dev);
+ 	if (ret < 0) {
 -- 
-1.7.11.3
-
+1.7.9.5
