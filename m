@@ -1,117 +1,184 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1346943469.21200.112.camel@aeonflux>
-Subject: Re: [PATCH v2] Bluetooth: mgmt: Implement support for passkey
- notification
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1346239086-29543-1-git-send-email-sunil.behera@samsung.com>
+References: <1346239086-29543-1-git-send-email-sunil.behera@samsung.com>
+Date: Thu, 6 Sep 2012 17:51:17 +0300
+Message-ID: <CABBYNZJ15tr-KNsLs0cpH=6eT+cmJ0m21XE7cacJAQs3HPWZXg@mail.gmail.com>
+Subject: Re: [PATCH obexd] MAP: Add SetMessageStatus function
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Sunil Kumar Behera <sunil.behera@samsung.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 06 Sep 2012 07:57:49 -0700
-In-Reply-To: <1346918998-8642-1-git-send-email-johan.hedberg@gmail.com>
-References: <1346832850-25061-1-git-send-email-johan.hedberg@gmail.com>
-	 <1346918998-8642-1-git-send-email-johan.hedberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Sunil,
 
-> This patch adds support for Secure Simple Pairing with devices that have
-> KeyboardOnly as their IO capability. Such devices will cause a passkey
-> notification on our side and optionally also keypress notifications.
-> Without this patch some keyboards cannot be paired using the mgmt
-> interface.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+On Wed, Aug 29, 2012 at 2:18 PM, Sunil Kumar Behera
+<sunil.behera@samsung.com> wrote:
+> SetMessageStatus function allows the MCE to modify the status
+> of a message on the MSE. This function modifies the read and
+> delete status of the message.
 > ---
-> v2: Make the keypress switch statement consistent with the rest of the code
-> 
->  include/net/bluetooth/hci.h      |   18 ++++++++++
->  include/net/bluetooth/hci_core.h |    5 +++
->  include/net/bluetooth/mgmt.h     |    7 ++++
->  net/bluetooth/hci_event.c        |   67 ++++++++++++++++++++++++++++++++++++++
->  net/bluetooth/mgmt.c             |   16 +++++++++
->  5 files changed, 113 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 0f28f70..76b2b6b 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -1249,6 +1249,24 @@ struct hci_ev_simple_pair_complete {
->  	bdaddr_t bdaddr;
->  } __packed;
->  
-> +#define HCI_EV_USER_PASSKEY_NOTIFY	0x3b
-> +struct hci_ev_user_passkey_notify {
-> +	bdaddr_t	bdaddr;
-> +	__le32		passkey;
-> +} __packed;
+>  plugins/mas.c              |   52 +++++++++++++++++++++++++++++++++++++++++++-
+>  plugins/messages-dummy.c   |    8 +++++++
+>  plugins/messages-tracker.c |    8 +++++++
+>  plugins/messages.h         |   20 +++++++++++++++++
+>  4 files changed, 87 insertions(+), 1 deletion(-)
+>
+> diff --git a/plugins/mas.c b/plugins/mas.c
+> index 1c9199d..26e8f7d 100644
+> --- a/plugins/mas.c
+> +++ b/plugins/mas.c
+> @@ -499,6 +499,20 @@ static void update_inbox_cb(void *session, int err, void *user_data)
+>                 obex_object_set_io_flags(mas, G_IO_OUT, 0);
+>  }
+>
+> +static void message_status_cb(void *session, int err, void *user_data)
+> +{
+> +       struct mas_session *mas = user_data;
 > +
-> +#define HCI_KEYPRESS_STARTED		0
-> +#define HCI_KEYPRESS_ENTERED		1
-> +#define HCI_KEYPRESS_ERASED		2
-> +#define HCI_KEYPRESS_CLEARED		3
-> +#define HCI_KEYPRESS_COMPLETED		4
+> +       DBG("");
 > +
-> +#define HCI_EV_KEYPRESS_NOTIFY		0x3c
-> +struct hci_ev_keypress_notify {
-> +	bdaddr_t	bdaddr;
-> +	__u8		type;
-> +} __packed;
+> +       mas->finished = TRUE;
 > +
->  #define HCI_EV_REMOTE_HOST_FEATURES	0x3d
->  struct hci_ev_remote_host_features {
->  	bdaddr_t bdaddr;
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index fa807a3..b998b9c 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -303,6 +303,8 @@ struct hci_conn {
->  	__u8		pin_length;
->  	__u8		enc_key_size;
->  	__u8		io_capability;
-> +	__u32		passkey_notify;
-> +	__u8		passkey_entered;
->  	__u16		disc_timeout;
->  	unsigned long	flags;
->  
-> @@ -1016,6 +1018,9 @@ int mgmt_user_passkey_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
->  				     u8 link_type, u8 addr_type, u8 status);
->  int mgmt_user_passkey_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
->  					 u8 link_type, u8 addr_type, u8 status);
-> +int mgmt_user_passkey_notify(struct hci_dev *hdev, bdaddr_t *bdaddr,
-> +			     u8 link_type, u8 addr_type, u32 passkey,
-> +			     u8 entered);
->  int mgmt_auth_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
->  		     u8 addr_type, u8 status);
->  int mgmt_auth_enable_complete(struct hci_dev *hdev, u8 status);
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index 1b48eff..22980a7 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -478,3 +478,10 @@ struct mgmt_ev_device_unblocked {
->  struct mgmt_ev_device_unpaired {
->  	struct mgmt_addr_info addr;
->  } __packed;
+> +       if (err < 0)
+> +               obex_object_set_io_flags(mas, G_IO_ERR, err);
+> +       else
+> +               obex_object_set_io_flags(mas, G_IO_OUT, 0);
+> +}
 > +
-> +#define MGMT_EV_PASSKEY_NOTIFY		0x0017
-> +struct mgmt_ev_passkey_notify {
-> +	struct mgmt_addr_info addr;
-> +	__le32	passkey;
-> +	__u8	entered;
-> +} __packed;
+>  static int mas_setpath(struct obex_session *os, void *user_data)
+>  {
+>         const char *name;
+> @@ -649,6 +663,42 @@ static void *message_update_open(const char *name, int oflag, mode_t mode,
+>                 return mas;
+>  }
+>
+> +static void *message_status_open(const char *name, int oflag, mode_t mode,
+> +                                       void *driver_data, size_t *size,
+> +                                       int *err)
+> +
+> +{
+> +       struct mas_session *mas = driver_data;
+> +       uint8_t indicator;
+> +       uint8_t value;
+> +
+> +       DBG("");
+> +
+> +       if (oflag == O_RDONLY) {
+> +               *err = -EBADR;
+> +               return NULL;
+> +       }
+> +
+> +       if (!g_obex_apparam_get_uint8(mas->inparams, MAP_AP_STATUSINDICATOR,
+> +                               &indicator)) {
+> +               *err = -EBADR;
+> +               return NULL;
+> +       }
+> +
+> +       if (!g_obex_apparam_get_uint8(mas->inparams, MAP_AP_STATUSVALUE,
+> +                               &value)) {
+> +               *err = -EBADR;
+> +               return NULL;
+> +       }
+> +
+> +       *err = messages_set_message_status(mas->backend_data, name, indicator,
+> +                                               value, message_status_cb, mas);
+> +       if (*err < 0)
+> +               return NULL;
+> +       else
+> +               return mas;
 
-you need to add this to mgmt_events[] as well.
+No need for else statement if you are returning on if statement already.
 
-And we need an extra follow on patch that increases the API revision.
-However only one of the revision increases per kernel release please.
+> +}
+> +
+>  static ssize_t any_get_next_header(void *object, void *buf, size_t mtu,
+>                                                                 uint8_t *hi)
+>  {
+> @@ -784,7 +834,7 @@ static struct obex_mime_type_driver mime_message_status = {
+>         .target = MAS_TARGET,
+>         .target_size = TARGET_SIZE,
+>         .mimetype = "x-bt/messageStatus",
+> -       .open = any_open,
+> +       .open = message_status_open,
+>         .close = any_close,
+>         .read = any_read,
+>         .write = any_write,
+> diff --git a/plugins/messages-dummy.c b/plugins/messages-dummy.c
+> index a47f143..1a38d0d 100644
+> --- a/plugins/messages-dummy.c
+> +++ b/plugins/messages-dummy.c
+> @@ -347,6 +347,14 @@ int messages_get_message(void *session, const char *handle,
+>         return -ENOSYS;
+>  }
+>
+> +int messages_set_message_status(void *session, const char *handle,
+> +                                       int indicator, int value,
+> +                                       messages_set_message_status_cb callback,
+> +                                       void *user_data)
+> +{
+> +       return -ENOSYS;
+> +}
+> +
+>  int messages_update_inbox(void *session, messages_update_inbox_cb callback,
+>                                                         void *user_data)
+>  {
+> diff --git a/plugins/messages-tracker.c b/plugins/messages-tracker.c
+> index 92c1767..7bdba1b 100644
+> --- a/plugins/messages-tracker.c
+> +++ b/plugins/messages-tracker.c
+> @@ -321,6 +321,14 @@ int messages_get_message(void *session, const char *handle,
+>         return -ENOSYS;
+>  }
+>
+> +int messages_set_message_status(void *session, const char *handle,
+> +                               int indicator, int value,
+> +                               messages_set_message_status_cb callback,
+> +                               void *user_data)
+> +{
+> +       return -ENOSYS;
+> +}
+> +
+>  int messages_update_inbox(void *session, messages_update_inbox_cb callback,
+>                                                         void *user_data)
+>  {
+> diff --git a/plugins/messages.h b/plugins/messages.h
+> index 669f7c2..9805bb0 100644
+> --- a/plugins/messages.h
+> +++ b/plugins/messages.h
+> @@ -268,6 +268,26 @@ int messages_get_message(void *session, const char *handle,
+>                                         messages_get_message_cb callback,
+>                                         void *user_data);
+>
+> +/* Informs Message Server to modify status of a given message.
+> + *
+> + * session: Backend session.
+> + * handle: Unique identifier to the message.
+> + * indicator: To indicate which status information is to be modified,
+> + *     "readStatus" or "deleteStatus".
+> + * value: To indicate the value of the indicator
+> + *     read/unread for "readstatus" and deleted/undeleted for "deleteStatus".
+> + * Callback shall be called for every message status update request
+> + *     recieved from MCE.
+> + * user_data: User data if any to be sent.
+> + */
+> +typedef void (*messages_set_message_status_cb)(void *session, int err,
+> +                                       void *user_data);
+> +
+> +int messages_set_message_status(void *session, const char *handle,
+> +                                       int indicator, int value,
+> +                                       messages_set_message_status_cb callback,
+> +                                       void *user_data);
+> +
 
-Otherwise this looks fine to me.
-
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
-Regards
-
-Marcel
+The indicator and value types seems wrong, it should be uint8_t, but
+perhaps we should have dedicated functions for each of the indicators,
+set_read_status/set_delete_status, so the backend don't have to decode
+the indicators themselves. What do you think?
 
 
+
+-- 
+Luiz Augusto von Dentz
