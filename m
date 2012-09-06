@@ -1,59 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/6] Bluetooth: trivial: Make hci_chan_del return void
-Date: Thu,  6 Sep 2012 15:05:43 +0300
-Message-Id: <1346933147-11789-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1346933147-11789-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1346933147-11789-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3 12/17] heartrate: Handle characteristics value changed notification
+Date: Thu, 6 Sep 2012 13:32:46 +0200
+Message-ID: <1346931171-18968-13-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1346931171-18968-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1346931171-18968-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+This patch adds stub for handling characteristics value changed notification.
 
-Return code is not needed in hci_chan_del
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    2 +-
- net/bluetooth/hci_conn.c         |    4 +---
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ profiles/heartrate/heartrate.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index fa807a3..4704ca4 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -552,7 +552,7 @@ void hci_conn_hash_flush(struct hci_dev *hdev);
- void hci_conn_check_pending(struct hci_dev *hdev);
+diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
+index 4591e56..f78d91d 100644
+--- a/profiles/heartrate/heartrate.c
++++ b/profiles/heartrate/heartrate.c
+@@ -43,6 +43,8 @@
  
- struct hci_chan *hci_chan_create(struct hci_conn *conn);
--int hci_chan_del(struct hci_chan *chan);
-+void hci_chan_del(struct hci_chan *chan);
- void hci_chan_list_flush(struct hci_conn *conn);
+ #define HEART_RATE_MANAGER_IFACE "org.bluez.HeartRateManager"
  
- struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 4dc8227..c809063 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -935,7 +935,7 @@ struct hci_chan *hci_chan_create(struct hci_conn *conn)
- 	return chan;
++#define MIN_NOTIFICATION_LEN 3  /* 1-byte opcode + 2-byte handle */
++
+ struct heartrate_adapter {
+ 	struct btd_adapter	*adapter;
+ 	GSList			*devices;
+@@ -54,6 +56,7 @@ struct heartrate {
+ 	struct heartrate_adapter	*hra;
+ 	GAttrib				*attrib;
+ 	guint				attioid;
++	guint				attionotid;
+ 	struct att_range		*svc_range;
+ 	GSList				*chars;
+ 	gboolean			has_location;
+@@ -176,8 +179,10 @@ static void destroy_heartrate_device(gpointer user_data)
+ 	if (hr->attioid > 0)
+ 		btd_device_remove_attio_callback(hr->dev, hr->attioid);
+ 
+-	if (hr->attrib != NULL)
++	if (hr->attrib != NULL) {
++		g_attrib_unregister(hr->attrib, hr->attionotid);
+ 		g_attrib_unref(hr->attrib);
++	}
+ 
+ 	if (hr->chars != NULL)
+ 		g_slist_free_full(hr->chars, destroy_char);
+@@ -547,6 +552,14 @@ static void configure_heartrate_cb(GSList *characteristics, guint8 status,
+ 	}
  }
  
--int hci_chan_del(struct hci_chan *chan)
-+void hci_chan_del(struct hci_chan *chan)
++static void notify_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
++{
++	if (len < MIN_NOTIFICATION_LEN) {
++		error("Bad pdu received");
++		return;
++	}
++}
++
+ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
  {
- 	struct hci_conn *conn = chan->conn;
- 	struct hci_dev *hdev = conn->hdev;
-@@ -948,8 +948,6 @@ int hci_chan_del(struct hci_chan *chan)
+ 	struct heartrate *hr = user_data;
+@@ -555,6 +568,9 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
  
- 	skb_queue_purge(&chan->data_q);
- 	kfree(chan);
--
--	return 0;
+ 	hr->attrib = g_attrib_ref(attrib);
+ 
++	hr->attionotid = g_attrib_register(hr->attrib,
++			ATT_OP_HANDLE_NOTIFY, notify_handler, hr, NULL);
++
+ 	gatt_discover_char(hr->attrib, hr->svc_range->start,
+ 					hr->svc_range->end, NULL,
+ 					configure_heartrate_cb, hr);
+@@ -566,6 +582,11 @@ static void attio_disconnected_cb(gpointer user_data)
+ 
+ 	DBG("GATT Disconnected");
+ 
++	if (hr->attionotid > 0) {
++		g_attrib_unregister(hr->attrib, hr->attionotid);
++		hr->attionotid = 0;
++	}
++
+ 	g_attrib_unref(hr->attrib);
+ 	hr->attrib = NULL;
  }
- 
- void hci_chan_list_flush(struct hci_conn *conn)
 -- 
-1.7.9.5
+1.7.11.3
 
