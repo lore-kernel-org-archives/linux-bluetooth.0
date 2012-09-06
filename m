@@ -1,54 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 6 Sep 2012 17:02:43 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] gatt: Fix reading Service Changed CCC
+Message-ID: <20120906140243.GA15938@x220.P-661HNU-F1>
+References: <1346922908-16016-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <20120822201930.GC14913@tuxdriver.com>
-References: <20120822201930.GC14913@tuxdriver.com>
-Date: Thu, 6 Sep 2012 10:25:33 -0400
-Message-ID: <CAJdJm_Px_see=f1W09BeV+F7qP-=U6CPkk_NUU5KCtjvxLuYqQ@mail.gmail.com>
-Subject: Re: Agenda for Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit 2012 (Barcelona!)
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: "John W. Linville" <linville@tuxdriver.com>
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	alexander.smirnov@siemens.com
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-wireless-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1346922908-16016-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Andrzej,
 
-On Wed, Aug 22, 2012 at 4:19 PM, John W. Linville
-<linville@tuxdriver.com> wrote:
-> All,
->
-> The time for our meeting in Barcelona is drawing near.  I think it
-> is time that we start nailing-down the agenda.
->
-> We have one room on the first day, and three rooms on the second day.
-> I figure that the Bluetooth and 802.11 groups should each get a
-> break-out room for their own in-depth discussons on the second day and
-> the third room can be used for more general topics and presentations.
->
-> With that said, there are still a number of slots available for
-> presentations or discussion topics.  This is especially true for the
-> 802.11 group...  Please step-up with some suggested topics!
+On Thu, Sep 06, 2012, Andrzej Kaczmarek wrote:
+> Find Information Request is only sent when there are no more attributes
+> following Service Changed Value (incorrect) and thus will never find CCC.
+> ---
+>  profiles/gatt/gas.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-If there are still available slots, we would like to present and
-discuss our current proposal for a Bluetooth Broadcaster/Observer API.
-These are new GAP Operational Modes for connectionless communication
-available since Core spec 4.0 (it is specified for LE channel, but the
-plan is to reuse the same API for broadcasting and observing data over
-EIR on BR/EDR channel as well).
+Applied. Thanks.
 
-Title: Bluetooth Broadcaster/Observer API
-Speakers: Anderson Lizardo, Jefferson Delfes
-
-The relevant patch series:
-
-http://thread.gmane.org/gmane.linux.bluez.kernel/28228 (kernel space
-management API)
-http://thread.gmane.org/gmane.linux.bluez.kernel/28798 (userspace API in BlueZ)
-
-Best Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
