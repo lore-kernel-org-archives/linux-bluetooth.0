@@ -1,60 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1346961700.21200.116.camel@aeonflux>
-Subject: Re: [PATCH BlueZ v3 06/15] gdbus: Implement DBus.Properties.Set
- method
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+MIME-Version: 1.0
+In-Reply-To: <1346325980-11411-2-git-send-email-chen.ganir@ti.com>
+References: <1346325980-11411-1-git-send-email-chen.ganir@ti.com>
+	<1346325980-11411-2-git-send-email-chen.ganir@ti.com>
+Date: Thu, 6 Sep 2012 16:34:20 -0300
+Message-ID: <CAKT1EBdo=yJX+DZmnFJoMydE4D_sD-CzOpYFwdKTXwKmcHQgAw@mail.gmail.com>
+Subject: Re: [PATCH RFC] battery: Add generic device battery interface
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: chen.ganir@ti.com
 Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 06 Sep 2012 13:01:40 -0700
-In-Reply-To: <1345272662-2850-7-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1345272662-2850-1-git-send-email-lucas.demarchi@profusion.mobi>
-	 <1345272662-2850-7-git-send-email-lucas.demarchi@profusion.mobi>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Chen Ganir:
 
-> Contrary to Get() and GetAll(), Set is asynchronous so we pass on the
-> DBusMessage so user is able to create the response. It's the only use of
-> this parameter.
+On Thu, Aug 30, 2012 at 8:26 AM,  <chen.ganir@ti.com> wrote:
+> From: Chen Ganir <chen.ganir@ti.com>
+>
+> Add the D-Bus API documentation for the new generic device battery
+> interface. This API provides generic access to peer devcice
+> batteries.
 > ---
->  gdbus/gdbus.h  |  7 +++++++
->  gdbus/object.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
->  2 files changed, 64 insertions(+), 2 deletions(-)
-> 
-> diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-> index b2e78c4..3e4aa16 100644
-> --- a/gdbus/gdbus.h
-> +++ b/gdbus/gdbus.h
-> @@ -31,6 +31,8 @@ extern "C" {
->  #include <dbus/dbus.h>
->  #include <glib.h>
->  
-> +typedef enum GDBusPropertySetReturn GDBusPropertySetReturn;
+>  doc/battery-api.txt |   34 ++++++++++++++++++++++++++++++++++
+>  doc/device-api.txt  |    5 +++++
+>  2 files changed, 39 insertions(+)
+>  create mode 100644 doc/battery-api.txt
+>
+> diff --git a/doc/battery-api.txt b/doc/battery-api.txt
+> new file mode 100644
+> index 0000000..da82024
+> --- /dev/null
+> +++ b/doc/battery-api.txt
+> @@ -0,0 +1,34 @@
+> +BlueZ D-Bus Battery API description
+> +****************************************
 > +
->  typedef enum GDBusMethodFlags GDBusMethodFlags;
->  typedef enum GDBusSignalFlags GDBusSignalFlags;
->  typedef enum GDBusPropertyFlags GDBusPropertyFlags;
-> @@ -69,6 +71,10 @@ typedef DBusMessage * (* GDBusMethodFunction) (DBusConnection *connection,
->  typedef gboolean (*GDBusPropertyGetter)(const GDBusPropertyTable *property,
->  					DBusMessageIter *iter, void *data);
->  
-> +typedef DBusMessage *(*GDBusPropertySetter)(const GDBusPropertyTable *property,
-> +					DBusMessageIter *value,
-> +					DBusMessage *msg, void *data);
+> +       Texas Instruments, Inc. <chen.ganir@ti.com>
 > +
+> +Device Battery hierarchy
+> +=====================================
+> +
+> +Service                org.bluez
+> +Interface      org.bluez.Battery
+> +Object path    [variable prefix]/{hci0,..}/dev_XX_XX_XX_XX_XX_XX/BATTYYYY
+> +YYYY is numeric value between 0 and 9999.
+> +
+> +Methods        dict GetProperties()
+> +
+> +                       Returns all properties for the interface. See the
+> +                       Properties section for the available properties.
+> +
+> +Signals                PropertyChanged(string name, variant value)
+> +
+> +               This signal indicates a changed value of the given
+> +               property.
+> +
+> +Properties     uint16 Level [readonly]
+> +
+> +                       Battery level (0-100).
+> +
+> +               uint16 Description [readonly]
+> +
+> +                       Battery description.
+> +
+> +               uint16 Namespace [readonly]
+> +
+> +                       Battery Namespace.
 
-I am not really happy with this. We just need a unique handle here since
-the return value is either success or an error. I rather don't send
-messages around for no other reason to create the error.
+IMO "Description" and "Namespace" should be string:
+http://developer.bluetooth.org/gatt/Pages/GattNamespaceDescriptors.aspx
 
-Inside the authorization code I am using GDBusPendingReply as unique
-token. What about using the same approach?
+For BLE Presentation Format is mandatory(Namespace and Description).
+For AVRCP, probably it doesn't make sense. I recommend to include
+additional description for these fields.
 
-Regards
+> diff --git a/doc/device-api.txt b/doc/device-api.txt
+> index 1f0dc96..c98d539 100644
+> --- a/doc/device-api.txt
+> +++ b/doc/device-api.txt
+> @@ -179,3 +179,8 @@ Properties  string Address [readonly]
+>                         Note that this property can exhibit false-positives
+>                         in the case of Bluetooth 2.1 (or newer) devices that
+>                         have disabled Extended Inquiry Response support.
+> +
+> +               array{object} Batteries [readonly]
+> +
+> +                       List of device battery object paths that represents the available
+> +                       batteries on the remote device.
+> --
+> 1.7.9.5
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Marcel
+Are you planning to implement the Battery Service on BlueZ? (using UPower)
+It seems to be straightforward.
 
-
+Regards,
+Claudio
