@@ -1,103 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 6 Sep 2012 10:03:09 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/6] Bluetooth: Fix freeing uninitialized delayed works
+In-Reply-To: <1346933147-11789-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <alpine.DEB.2.02.1209061002150.22884@mathewm-linux>
+References: <1346933147-11789-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1346933147-11789-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1346325980-11411-2-git-send-email-chen.ganir@ti.com>
-References: <1346325980-11411-1-git-send-email-chen.ganir@ti.com>
-	<1346325980-11411-2-git-send-email-chen.ganir@ti.com>
-Date: Thu, 6 Sep 2012 16:34:20 -0300
-Message-ID: <CAKT1EBdo=yJX+DZmnFJoMydE4D_sD-CzOpYFwdKTXwKmcHQgAw@mail.gmail.com>
-Subject: Re: [PATCH RFC] battery: Add generic device battery interface
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: chen.ganir@ti.com
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen Ganir:
 
-On Thu, Aug 30, 2012 at 8:26 AM,  <chen.ganir@ti.com> wrote:
-> From: Chen Ganir <chen.ganir@ti.com>
+Andrei -
+
+On Thu, 6 Sep 2012, Andrei Emeltchenko wrote:
+
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
-> Add the D-Bus API documentation for the new generic device battery
-> interface. This API provides generic access to peer devcice
-> batteries.
+> When releasing L2CAP socket which is in BT_CONFIG state l2cap_chan_close
+> invokes l2cap_send_disconn_req which cancel delayed works which are only
+> set in BT_CONNECTED state with l2cap_ertm_init. Add state check before
+> cancelling those works.
+>
+> ...
+> [ 9668.574372] [21085] l2cap_sock_release: sock cd065200, sk f073e800
+> [ 9668.574399] [21085] l2cap_sock_shutdown: sock cd065200, sk f073e800
+> [ 9668.574411] [21085] l2cap_chan_close: chan f073ec00 state BT_CONFIG sk f073e800
+> [ 9668.574421] [21085] l2cap_send_disconn_req: chan f073ec00 conn ecc16600
+> [ 9668.574441] INFO: trying to register non-static key.
+> [ 9668.574443] the code is fine but needs lockdep annotation.
+> [ 9668.574446] turning off the locking correctness validator.
+> [ 9668.574450] Pid: 21085, comm: obex-client Tainted: G           O 3.5.0+ #57
+> [ 9668.574452] Call Trace:
+> [ 9668.574463]  [<c10a64b3>] __lock_acquire+0x12e3/0x1700
+> [ 9668.574468]  [<c10a44fb>] ? trace_hardirqs_on+0xb/0x10
+> [ 9668.574476]  [<c15e4f60>] ? printk+0x4d/0x4f
+> [ 9668.574479]  [<c10a6e38>] lock_acquire+0x88/0x130
+> [ 9668.574487]  [<c1059740>] ? try_to_del_timer_sync+0x60/0x60
+> [ 9668.574491]  [<c1059790>] del_timer_sync+0x50/0xc0
+> [ 9668.574495]  [<c1059740>] ? try_to_del_timer_sync+0x60/0x60
+> [ 9668.574515]  [<f8aa1c23>] l2cap_send_disconn_req+0xe3/0x160 [bluetooth]
+> ...
+>
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  doc/battery-api.txt |   34 ++++++++++++++++++++++++++++++++++
->  doc/device-api.txt  |    5 +++++
->  2 files changed, 39 insertions(+)
->  create mode 100644 doc/battery-api.txt
+> net/bluetooth/l2cap_core.c |    2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/doc/battery-api.txt b/doc/battery-api.txt
-> new file mode 100644
-> index 0000000..da82024
-> --- /dev/null
-> +++ b/doc/battery-api.txt
-> @@ -0,0 +1,34 @@
-> +BlueZ D-Bus Battery API description
-> +****************************************
-> +
-> +       Texas Instruments, Inc. <chen.ganir@ti.com>
-> +
-> +Device Battery hierarchy
-> +=====================================
-> +
-> +Service                org.bluez
-> +Interface      org.bluez.Battery
-> +Object path    [variable prefix]/{hci0,..}/dev_XX_XX_XX_XX_XX_XX/BATTYYYY
-> +YYYY is numeric value between 0 and 9999.
-> +
-> +Methods        dict GetProperties()
-> +
-> +                       Returns all properties for the interface. See the
-> +                       Properties section for the available properties.
-> +
-> +Signals                PropertyChanged(string name, variant value)
-> +
-> +               This signal indicates a changed value of the given
-> +               property.
-> +
-> +Properties     uint16 Level [readonly]
-> +
-> +                       Battery level (0-100).
-> +
-> +               uint16 Description [readonly]
-> +
-> +                       Battery description.
-> +
-> +               uint16 Namespace [readonly]
-> +
-> +                       Battery Namespace.
-
-IMO "Description" and "Namespace" should be string:
-http://developer.bluetooth.org/gatt/Pages/GattNamespaceDescriptors.aspx
-
-For BLE Presentation Format is mandatory(Namespace and Description).
-For AVRCP, probably it doesn't make sense. I recommend to include
-additional description for these fields.
-
-> diff --git a/doc/device-api.txt b/doc/device-api.txt
-> index 1f0dc96..c98d539 100644
-> --- a/doc/device-api.txt
-> +++ b/doc/device-api.txt
-> @@ -179,3 +179,8 @@ Properties  string Address [readonly]
->                         Note that this property can exhibit false-positives
->                         in the case of Bluetooth 2.1 (or newer) devices that
->                         have disabled Extended Inquiry Response support.
-> +
-> +               array{object} Batteries [readonly]
-> +
-> +                       List of device battery object paths that represents the available
-> +                       batteries on the remote device.
-> --
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 8e4b57b..b47c325 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1089,7 +1089,7 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
+> 	if (!conn)
+> 		return;
+>
+> -	if (chan->mode == L2CAP_MODE_ERTM) {
+> +	if (chan->mode == L2CAP_MODE_ERTM && chan->state == BT_CONNECTED) {
+> 		__clear_retrans_timer(chan);
+> 		__clear_monitor_timer(chan);
+> 		__clear_ack_timer(chan);
+> -- 
 > 1.7.9.5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Are you planning to implement the Battery Service on BlueZ? (using UPower)
-It seems to be straightforward.
+Looks good to me.
 
-Regards,
-Claudio
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
