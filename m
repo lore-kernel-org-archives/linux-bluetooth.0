@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 19/19] Bluetooth: AMP: Process physical link complete event
-Date: Thu,  6 Sep 2012 15:19:57 +0300
-Message-Id: <1346933997-14369-20-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 09/19] Bluetooth: A2MP: Process A2MP Getinfo Rsp
+Date: Thu,  6 Sep 2012 15:19:47 +0300
+Message-Id: <1346933997-14369-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1346933997-14369-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1346933997-14369-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,72 +12,66 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add new hci_conn for representing AMP physical link.
+Process A2MP Getinfo Response, send Get AMP Assoc Req.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/hci_event.c |   41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ net/bluetooth/a2mp.c |   34 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 0841b25..3630044 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3427,6 +3427,43 @@ unlock:
- 	hci_dev_unlock(hdev);
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 8c6cda4..e012855 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -272,6 +272,35 @@ static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	return 0;
  }
  
-+static void hci_phy_link_complete_evt(struct hci_dev *hdev,
-+				      struct sk_buff *skb)
++static int a2mp_getinfo_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
++			    struct a2mp_cmd *hdr)
 +{
-+	struct hci_ev_phy_link_complete *ev = (void *) skb->data;
-+	struct hci_conn *hcon, *bredr_hcon;
-+	struct hci_dev *bredr_hdev;
++	struct a2mp_info_rsp *rsp = (struct a2mp_info_rsp *) skb->data;
++	struct a2mp_amp_assoc_req req;
++	struct amp_ctrl *ctrl;
 +
-+	BT_DBG("%s handle 0x%2.2x status 0x%2.2x", hdev->name, ev->phy_handle,
-+	       ev->status);
++	if (le16_to_cpu(hdr->len) < sizeof(*rsp))
++		return -EINVAL;
 +
-+	if (ev->status)
-+		return;
++	BT_DBG("id %d status 0x%2.2x", rsp->id, rsp->status);
 +
-+	hci_dev_lock(hdev);
++	if (rsp->status)
++		return -EINVAL;
 +
-+	hcon = hci_conn_hash_lookup_handle(hdev, ev->phy_handle);
-+	if (!hcon)
-+		return;
++	ctrl = amp_ctrl_add(mgr);
++	if (!ctrl)
++		return -ENOMEM;
 +
-+	bredr_hcon = hcon->amp_mgr->l2cap_conn->hcon;
++	ctrl->id = rsp->id;
 +
-+	hcon->state = BT_CONNECTED;
-+	bacpy(&hcon->dst, &bredr_hcon->dst);
++	req.id = rsp->id;
++	a2mp_send(mgr, A2MP_GETAMPASSOC_REQ, __next_ident(mgr), sizeof(req),
++		  &req);
 +
-+	hci_conn_hold_device(hcon);
-+	hci_conn_add_sysfs(hcon);
-+
-+	hci_dev_unlock(hdev);
-+
-+	bredr_hdev = bredr_hcon->hdev;
-+	if (bredr_hdev) {
-+		hci_dev_hold(bredr_hdev);
-+		l2cap_chan_create_cfm(bredr_hcon, hcon->remote_id);
-+		hci_dev_put(bredr_hdev);
-+	}
++	skb_pull(skb, sizeof(*rsp));
++	return 0;
 +}
 +
- static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 				struct a2mp_cmd *hdr)
  {
- 	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
-@@ -3746,6 +3783,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_remote_oob_data_request_evt(hdev, skb);
- 		break;
+@@ -460,8 +489,11 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 			err = a2mp_discover_rsp(mgr, skb, hdr);
+ 			break;
  
-+	case HCI_EV_PHY_LINK_COMPLETE:
-+		hci_phy_link_complete_evt(hdev, skb);
-+		break;
+-		case A2MP_CHANGE_RSP:
+ 		case A2MP_GETINFO_RSP:
++			err = a2mp_getinfo_rsp(mgr, skb, hdr);
++			break;
 +
- 	case HCI_EV_NUM_COMP_BLOCKS:
- 		hci_num_comp_blocks_evt(hdev, skb);
- 		break;
++		case A2MP_CHANGE_RSP:
+ 		case A2MP_GETAMPASSOC_RSP:
+ 		case A2MP_CREATEPHYSLINK_RSP:
+ 		case A2MP_DISCONNPHYSLINK_RSP:
 -- 
 1.7.9.5
 
