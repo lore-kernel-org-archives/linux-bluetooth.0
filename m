@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 13/19] Bluetooth: AMP: Add AMP key calculation
-Date: Thu,  6 Sep 2012 15:19:51 +0300
-Message-Id: <1346933997-14369-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 06/19] Bluetooth: AMP: Physical link struct and heplers
+Date: Thu,  6 Sep 2012 15:19:44 +0300
+Message-Id: <1346933997-14369-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1346933997-14369-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1340981212-21709-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1346933997-14369-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,92 +12,172 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Function calculates AMP keys using hmac_sha256 helper. Calculated keys
-are Generic AMP Link Key (gamp) and Dedicated AMP Link Key with
-keyID "802b" for 802.11 PAL.
+Define physical link structures. Physical links are represented by
+hci_conn structure. For BR/EDR we use type ACL_LINK and for AMP
+we use AMP_LINK.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/pal.h |    1 +
- net/bluetooth/Kconfig       |    1 +
- net/bluetooth/pal.c         |   45 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 47 insertions(+)
+ include/net/bluetooth/hci.h      |    1 +
+ include/net/bluetooth/hci_core.h |   20 +++++++++++++++++++
+ include/net/bluetooth/pal.h      |   26 ++++++++++++++++++++++++
+ net/bluetooth/Makefile           |    2 +-
+ net/bluetooth/a2mp.c             |    1 +
+ net/bluetooth/pal.c              |   41 ++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 90 insertions(+), 1 deletion(-)
+ create mode 100644 include/net/bluetooth/pal.h
+ create mode 100644 net/bluetooth/pal.c
 
-diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
-index 918a4be..3b6213c 100644
---- a/include/net/bluetooth/pal.h
-+++ b/include/net/bluetooth/pal.h
-@@ -36,5 +36,6 @@ struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id);
- void amp_ctrl_list_flush(struct amp_mgr *mgr);
- struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
- 			     u8 remote_id);
-+int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type);
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 1cb8b55..4c41b8c 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -207,6 +207,7 @@ enum {
+ #define ESCO_LINK	0x02
+ /* Low Energy links do not have defined link type. Use invented one */
+ #define LE_LINK		0x80
++#define AMP_LINK	0x81
  
- #endif /* __PAL_H */
-diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-index 3537d38..1c11d0d 100644
---- a/net/bluetooth/Kconfig
-+++ b/net/bluetooth/Kconfig
-@@ -11,6 +11,7 @@ menuconfig BT
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_AES
- 	select CRYPTO_ECB
-+	select CRYPTO_SHA256
- 	help
- 	  Bluetooth is low-cost, low-power, short-range wireless technology.
- 	  It was designed as a replacement for cables and other short-range
-diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
-index 2526891..ea3eefa 100644
---- a/net/bluetooth/pal.c
-+++ b/net/bluetooth/pal.c
-@@ -155,3 +155,48 @@ int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
- 	crypto_free_shash(tfm);
- 	return ret;
+ /* LMP features */
+ #define LMP_3SLOT	0x01
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 1174218..4ae5293 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -316,6 +316,7 @@ struct hci_conn {
+ 
+ 	__u8		remote_cap;
+ 	__u8		remote_auth;
++	__u8		remote_id;
+ 	bool		flush_key;
+ 
+ 	unsigned int	sent;
+@@ -510,6 +511,25 @@ static inline struct hci_conn *hci_conn_hash_lookup_handle(struct hci_dev *hdev,
+ 	return NULL;
  }
-+
-+int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type)
+ 
++static inline struct hci_conn *hci_conn_hash_lookup_id(struct hci_dev *hdev,
++						       __u8 remote_id)
 +{
-+	struct hci_dev *hdev = conn->hdev;
-+	struct link_key *key;
-+	u8 keybuf[HCI_AMP_LINK_KEY_SIZE];
-+	u8 gamp_key[HCI_AMP_LINK_KEY_SIZE];
-+	int err;
++	struct hci_conn_hash *h = &hdev->conn_hash;
++	struct hci_conn  *c;
 +
-+	if (!hci_conn_check_link_mode(conn))
-+		return -EACCES;
++	rcu_read_lock();
 +
-+	BT_DBG("conn %p key_type %d", conn, conn->key_type);
-+
-+	/* Legacy key */
-+	if (conn->key_type < 3) {
-+		BT_ERR("Legacy key type %d", conn->key_type);
-+		return -EACCES;
++	list_for_each_entry_rcu(c, &h->list, list) {
++		if (c->remote_id == remote_id) {
++			rcu_read_unlock();
++			return c;
++		}
 +	}
++	rcu_read_unlock();
 +
-+	*type = conn->key_type;
-+	*len = HCI_AMP_LINK_KEY_SIZE;
++	return NULL;
++}
 +
-+	key = hci_find_link_key(hdev, &conn->dst);
+ static inline struct hci_conn *hci_conn_hash_lookup_ba(struct hci_dev *hdev,
+ 							__u8 type, bdaddr_t *ba)
+ {
+diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
+new file mode 100644
+index 0000000..a0f441b
+--- /dev/null
++++ b/include/net/bluetooth/pal.h
+@@ -0,0 +1,26 @@
++/*
++   Copyright (c) 2011,2012 Intel Corp.
 +
-+	/* BR/EDR Link Key concatenated together with itself */
-+	memcpy(&keybuf[0], key->val, HCI_LINK_KEY_SIZE);
-+	memcpy(&keybuf[HCI_LINK_KEY_SIZE], key->val, HCI_LINK_KEY_SIZE);
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License version 2 and
++   only version 2 as published by the Free Software Foundation.
 +
-+	/* Derive Generic AMP Link Key (gamp) */
-+	err = hmac_sha256(keybuf, HCI_AMP_LINK_KEY_SIZE, "gamp", 4, gamp_key);
-+	if (err) {
-+		BT_ERR("Could not derive Generic AMP Key: err %d", err);
-+		return err;
-+	}
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++*/
 +
-+	if (conn->key_type == HCI_LK_DEBUG_COMBINATION) {
-+		BT_DBG("Use Generic AMP Key (gamp)");
-+		memcpy(data, gamp_key, HCI_AMP_LINK_KEY_SIZE);
-+		return err;
-+	}
++#ifndef __PAL_H
++#define __PAL_H
 +
-+	/* Derive Dedicated AMP Link Key: "802b" is 802.11 PAL keyID */
-+	return hmac_sha256(gamp_key, HCI_AMP_LINK_KEY_SIZE, "802b", 4, data);
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/l2cap.h>
++#include <net/bluetooth/a2mp.h>
++#include <net/bluetooth/amp.h>
++
++struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
++			     u8 remote_id);
++
++#endif /* __PAL_H */
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index dea6a28..3f76fc2 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -10,4 +10,4 @@ obj-$(CONFIG_BT_HIDP)	+= hidp/
+ 
+ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+ 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
+-	a2mp.o amp.o
++	a2mp.o amp.o pal.o
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index c876997..8f236db 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -17,6 +17,7 @@
+ #include <net/bluetooth/l2cap.h>
+ #include <net/bluetooth/a2mp.h>
+ #include <net/bluetooth/amp.h>
++#include <net/bluetooth/pal.h>
+ 
+ /* Global AMP Manager list */
+ LIST_HEAD(amp_mgr_list);
+diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
+new file mode 100644
+index 0000000..c71ef16
+--- /dev/null
++++ b/net/bluetooth/pal.c
+@@ -0,0 +1,41 @@
++/*
++   Copyright (c) 2011,2012 Intel Corp.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License version 2 and
++   only version 2 as published by the Free Software Foundation.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++*/
++
++#include <net/bluetooth/pal.h>
++
++/* Physical Link interface */
++static u8 __next_handle(struct amp_mgr *mgr)
++{
++	if (++mgr->handle == 0)
++		mgr->handle = 1;
++
++	return mgr->handle;
++}
++
++struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
++			     u8 remote_id)
++{
++	struct hci_conn *hcon;
++
++	hcon = hci_conn_add(hdev, AMP_LINK, BDADDR_ANY);
++	if (!hcon)
++		return NULL;
++
++	hcon->state = BT_CONNECT;
++	hcon->out = true;
++	hcon->attempt++;
++	hcon->handle = __next_handle(mgr);
++	hcon->remote_id = remote_id;
++
++	return hcon;
 +}
 -- 
 1.7.9.5
