@@ -1,38 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Senna Tschudin <peter.senna@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: kernel-janitors@vger.kernel.org,
-	Julia.Lawall@lip6.fr,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 3/10] drivers/bluetooth/hci_ldisc.c: removes unnecessary semicolon
-Date: Fri,  7 Sep 2012 17:24:39 +0200
-Message-Id: <1347031488-26598-1-git-send-email-peter.senna@gmail.com>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [RFC v3 9/9] media: Extend media API with optional acquire
+Date: Fri,  7 Sep 2012 17:20:33 +0200
+Message-Id: <1347031233-21621-10-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1347031233-21621-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1347031233-21621-1-git-send-email-mikel.astiz.oss@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Peter Senna Tschudin <peter.senna@gmail.com>
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-removes unnecessary semicolon
+Acquiring a transport is needed in two different situations: either
+we are initiating the audio stream locally, or the remote side initiated
+it and thus we are just reacting. In the second case, we would expect
+the stream is already available, and otherwise the operation should
+fail. This means the media API needs to be extended in order to make
+this difference.
 
-Found by Coccinelle: http://coccinelle.lip6.fr/
+This issue is specially relevant in the case of SCO, because the current
+approach is racy. With HFP, for example (say BlueZ has the HS role), the
+following race condition could be met:
 
-Signed-off-by: Peter Senna Tschudin <peter.senna@gmail.com>
+1. Phone has an incoming call and thus starts in-band ringing.
+2. SCO connection is accepted and stablished by BlueZ.
+3. Gateway interface state is changed to Playing.
+4. Exactly afterwards, the user routes the audio to the phone, to have
+   a private conversation. So the SCO link is closed.
+5. In parallel, PulseAudio sees the transition to Playing, and acquires
+   the transport.
+6. BlueZ receives an Acquire() request, but SCO is down. So it tries to
+   reconnect the SCO link.
 
+The last step is an undesired behavior (the audio is routed back to the
+car). BlueZ should be smart enough to know that the SCO connection
+shouldn't be reestablished, but this is only possible if the endpoint
+provides additional information in the media API.
+
+Note that the API change introduced by this patch is backward
+compatible, meaning that older versions of BlueZ will just ignore the
+flag. So clients are encouraged to use it without necessarily adding a
+dependency to newer versions of BlueZ.
 ---
- drivers/bluetooth/hci_ldisc.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ audio/transport.c |    5 +++++
+ doc/media-api.txt |   11 +++++++++++
+ 2 files changed, 16 insertions(+), 0 deletions(-)
 
-diff -u -p a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -531,7 +531,7 @@ static int hci_uart_tty_ioctl(struct tty
- 	default:
- 		err = n_tty_ioctl_helper(tty, file, cmd, arg);
- 		break;
--	};
-+	}
+diff --git a/audio/transport.c b/audio/transport.c
+index 05bb953..f759e86 100644
+--- a/audio/transport.c
++++ b/audio/transport.c
+@@ -807,10 +807,15 @@ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
+ 	if (lock == 0)
+ 		return btd_error_invalid_args(msg);
  
- 	return err;
- }
++	if (transport->state != TRANSPORT_STATE_PENDING &&
++				g_strstr_len(accesstype, -1, "?") != NULL)
++		return btd_error_failed(msg, "Transport not playing");
++
+ 	if (media_transport_acquire(transport, lock) == FALSE)
+ 		return btd_error_not_authorized(msg);
+ 
+ 	owner = media_owner_create(conn, msg, lock);
++
+ 	id = transport->resume(transport, owner);
+ 	if (id == 0) {
+ 		media_transport_release(transport, lock);
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index dfbff2e..1934426 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -282,6 +282,17 @@ Methods		dict GetProperties()
+ 
+ 				"rw": Read and write access
+ 
++			The accesstype string can also be combined with a "?"
++			suffix, which will make the request optional. This
++			typically means the transport will only be acquired if
++			it is already available (remote-initiated), but
++			otherwise no request will be sent to the remote side.
++			In this last case the function will fail. Note that,
++			due to compatibility issues with older versions of
++			BlueZ, clients are encouraged to use exactly the same
++			accesstype for Release(), matching the string provided
++			to Acquire().
++
+ 		void Release(string accesstype)
+ 
+ 			Releases file descriptor.
+-- 
+1.7.7.6
+
