@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v3 1/9] media: Fix accesstype comparison
-Date: Fri,  7 Sep 2012 17:20:25 +0200
-Message-Id: <1347031233-21621-2-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v3 4/9] media: Replace transport->in_use flag with state
+Date: Fri,  7 Sep 2012 17:20:28 +0200
+Message-Id: <1347031233-21621-5-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1347031233-21621-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1347031233-21621-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,290 +12,198 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Replace the string representation of the accesstype with a conventional
-binary representation. This makes the code simpler and more efficient.
+Refactor the code to use a enum type to represent the transport state.
+This should scale better when additional states need to be represented.
 
-This also fixes a minor bug in the Release() D-Bus method, where the
-string comparison was used to see whether the owner should be removed. A
-client acquiring with "rw" and releasing with "wr" would lead to the
-inconsistent state of having a released transport with an owner with no
-accesstype. Partial releases can also get affected by this bug since the
-released character (partial accesstype) got replaced by a whitespace.
-
-Additionally, this approach is more robust in case new flags are added
-in the future.
+A helper function has been added to help track the mapping between the
+enum type and the old in_use flag.
 ---
- audio/transport.c |  119 ++++++++++++++++++++++++++++++-----------------------
- 1 files changed, 68 insertions(+), 51 deletions(-)
+ audio/transport.c |   77 ++++++++++++++++++++++++++++++++++++++++-------------
+ 1 files changed, 58 insertions(+), 19 deletions(-)
 
 diff --git a/audio/transport.c b/audio/transport.c
-index d40c92d..d418878 100644
+index d418878..0ae9a8c 100644
 --- a/audio/transport.c
 +++ b/audio/transport.c
-@@ -49,6 +49,11 @@
- 
- #define MEDIA_TRANSPORT_INTERFACE "org.bluez.MediaTransport"
+@@ -54,6 +54,16 @@ typedef enum {
+ 	TRANSPORT_LOCK_WRITE = 1 << 1,
+ } transport_lock_t;
  
 +typedef enum {
-+	TRANSPORT_LOCK_READ = 1,
-+	TRANSPORT_LOCK_WRITE = 1 << 1,
-+} transport_lock_t;
++	TRANSPORT_STATE_IDLE,		/* Not acquired */
++	TRANSPORT_STATE_ACQUIRED,	/* Acquired (not necessarily playing) */
++} transport_state_t;
++
++static char *str_state[] = {
++	"TRANSPORT_STATE_IDLE",
++	"TRANSPORT_STATE_ACQUIRED",
++};
 +
  struct media_request {
  	DBusMessage		*msg;
  	guint			id;
-@@ -58,7 +63,7 @@ struct media_owner {
- 	struct media_transport	*transport;
- 	struct media_request	*pending;
- 	char			*name;
--	char			*accesstype;
-+	transport_lock_t	lock;
- 	guint			watch;
- };
- 
-@@ -84,8 +89,7 @@ struct media_transport {
- 	int			fd;		/* Transport file descriptor */
+@@ -90,7 +100,7 @@ struct media_transport {
  	uint16_t		imtu;		/* Transport input mtu */
  	uint16_t		omtu;		/* Transport output mtu */
--	gboolean		read_lock;
--	gboolean		write_lock;
-+	transport_lock_t	lock;
- 	gboolean		in_use;
+ 	transport_lock_t	lock;
+-	gboolean		in_use;
++	transport_state_t	state;
  	guint			(*resume) (struct media_transport *transport,
  					struct media_owner *owner);
-@@ -104,6 +108,31 @@ struct media_transport {
- 	void			*data;
- };
+ 	guint			(*suspend) (struct media_transport *transport,
+@@ -133,6 +143,32 @@ static transport_lock_t str2lock(const char *str)
+ 	return lock;
+ }
  
-+static const char *lock2str(transport_lock_t lock)
++static gboolean state_in_use(transport_state_t state)
 +{
-+	if (lock == 0)
-+		return "";
-+	else if (lock == TRANSPORT_LOCK_READ)
-+		return "r";
-+	else if (lock == TRANSPORT_LOCK_WRITE)
-+		return "w";
-+	else
-+		return "rw";
++	switch (state) {
++	case TRANSPORT_STATE_IDLE:
++		return FALSE;
++	case TRANSPORT_STATE_ACQUIRED:
++		return TRUE;
++	}
++
++	return FALSE;
 +}
 +
-+static transport_lock_t str2lock(const char *str)
++static void transport_set_state(struct media_transport *transport,
++							transport_state_t state)
 +{
-+	transport_lock_t lock = 0;
++	transport_state_t old_state = transport->state;
 +
-+	if (g_strstr_len(str, -1, "r") != NULL)
-+		lock |= TRANSPORT_LOCK_READ;
++	if (old_state == state)
++		return;
 +
-+	if (g_strstr_len(str, -1, "w") != NULL)
-+		lock |= TRANSPORT_LOCK_WRITE;
++	transport->state = state;
 +
-+	return lock;
++	DBG("State changed %s: %s -> %s", transport->path, str_state[old_state],
++							str_state[state]);
 +}
 +
  void media_transport_destroy(struct media_transport *transport)
  {
  	char *path;
-@@ -148,17 +177,15 @@ static void media_request_reply(struct media_request *req,
+@@ -240,7 +276,7 @@ static void media_transport_remove(struct media_transport *transport,
+ 	media_owner_free(owner);
+ 
+ 	/* Suspend if there is no longer any owner */
+-	if (transport->owners == NULL && transport->in_use)
++	if (transport->owners == NULL && state_in_use(transport->state))
+ 		transport->suspend(transport, NULL);
  }
  
- static gboolean media_transport_release(struct media_transport *transport,
--					const char *accesstype)
-+							transport_lock_t lock)
- {
--	if (g_strstr_len(accesstype, -1, "r") != NULL) {
--		transport->read_lock = FALSE;
-+	transport->lock &= ~lock;
-+
-+	if (lock & TRANSPORT_LOCK_READ)
- 		DBG("Transport %s: read lock released", transport->path);
--	}
- 
--	if (g_strstr_len(accesstype, -1, "w") != NULL) {
--		transport->write_lock = FALSE;
-+	if (lock & TRANSPORT_LOCK_WRITE)
- 		DBG("Transport %s: write lock released", transport->path);
--	}
- 
- 	return TRUE;
- }
-@@ -191,7 +218,6 @@ static void media_owner_free(struct media_owner *owner)
- 	media_owner_remove(owner);
- 
- 	g_free(owner->name);
--	g_free(owner->accesstype);
- 	g_free(owner);
- }
- 
-@@ -200,7 +226,7 @@ static void media_transport_remove(struct media_transport *transport,
- {
- 	DBG("Transport %s Owner %s", transport->path, owner->name);
- 
--	media_transport_release(transport, owner->accesstype);
-+	media_transport_release(transport, owner->lock);
- 
- 	/* Reply if owner has a pending request */
- 	if (owner->pending)
-@@ -260,10 +286,10 @@ static void a2dp_resume_complete(struct avdtp *session,
- 
- 	media_transport_set_fd(transport, fd, imtu, omtu);
- 
--	if (g_strstr_len(owner->accesstype, -1, "r") == NULL)
-+	if ((owner->lock & TRANSPORT_LOCK_READ) == 0)
- 		imtu = 0;
- 
--	if (g_strstr_len(owner->accesstype, -1, "w") == NULL)
-+	if ((owner->lock & TRANSPORT_LOCK_WRITE) == 0)
- 		omtu = 0;
- 
- 	ret = g_dbus_send_reply(transport->conn, req->msg,
-@@ -371,10 +397,10 @@ static void headset_resume_complete(struct audio_device *dev, void *user_data)
- 
- 	media_transport_set_fd(transport, fd, imtu, omtu);
- 
--	if (g_strstr_len(owner->accesstype, -1, "r") == NULL)
-+	if ((owner->lock & TRANSPORT_LOCK_READ) == 0)
- 		imtu = 0;
- 
--	if (g_strstr_len(owner->accesstype, -1, "w") == NULL)
-+	if ((owner->lock & TRANSPORT_LOCK_WRITE) == 0)
- 		omtu = 0;
- 
- 	ret = g_dbus_send_reply(transport->conn, req->msg,
-@@ -476,10 +502,10 @@ static void gateway_resume_complete(struct audio_device *dev, GError *err,
- 
- 	media_transport_set_fd(transport, fd, imtu, omtu);
- 
--	if (g_strstr_len(owner->accesstype, -1, "r") == NULL)
-+	if ((owner->lock & TRANSPORT_LOCK_READ) == 0)
- 		imtu = 0;
- 
--	if (g_strstr_len(owner->accesstype, -1, "w") == NULL)
-+	if ((owner->lock & TRANSPORT_LOCK_WRITE) == 0)
- 		omtu = 0;
- 
- 	ret = g_dbus_send_reply(transport->conn, req->msg,
-@@ -569,35 +595,18 @@ static void media_owner_exit(DBusConnection *connection, void *user_data)
- }
- 
- static gboolean media_transport_acquire(struct media_transport *transport,
--							const char *accesstype)
-+							transport_lock_t lock)
- {
--	gboolean read_lock = FALSE, write_lock = FALSE;
--
--	if (g_strstr_len(accesstype, -1, "r") != NULL) {
--		if (transport->read_lock == TRUE)
--			return FALSE;
--		read_lock = TRUE;
--	}
--
--	if (g_strstr_len(accesstype, -1, "w") != NULL) {
--		if (transport->write_lock == TRUE)
--			return FALSE;
--		write_lock = TRUE;
--	}
--
--	/* Check invalid accesstype */
--	if (read_lock == FALSE && write_lock == FALSE)
-+	if (transport->lock & lock)
- 		return FALSE;
- 
--	if (read_lock) {
--		transport->read_lock = read_lock;
-+	transport->lock |= lock;
-+
-+	if (lock & TRANSPORT_LOCK_READ)
- 		DBG("Transport %s: read lock acquired", transport->path);
--	}
- 
--	if (write_lock) {
--		transport->write_lock = write_lock;
-+	if (lock & TRANSPORT_LOCK_WRITE)
- 		DBG("Transport %s: write lock acquired", transport->path);
--	}
- 
- 
- 	return TRUE;
-@@ -616,16 +625,16 @@ static void media_transport_add(struct media_transport *transport,
- 
- static struct media_owner *media_owner_create(DBusConnection *conn,
- 						DBusMessage *msg,
--						const char *accesstype)
-+						transport_lock_t lock)
- {
- 	struct media_owner *owner;
- 
- 	owner = g_new0(struct media_owner, 1);
- 	owner->name = g_strdup(dbus_message_get_sender(msg));
--	owner->accesstype = g_strdup(accesstype);
-+	owner->lock = lock;
- 
- 	DBG("Owner created: sender=%s accesstype=%s", owner->name,
--			accesstype);
-+							lock2str(lock));
- 
- 	return owner;
- }
-@@ -662,6 +671,7 @@ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
- 	struct media_owner *owner;
- 	struct media_request *req;
- 	const char *accesstype, *sender;
-+	transport_lock_t lock;
- 	guint id;
- 
- 	if (!dbus_message_get_args(msg, NULL,
-@@ -675,13 +685,17 @@ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
- 	if (owner != NULL)
- 		return btd_error_not_authorized(msg);
- 
--	if (media_transport_acquire(transport, accesstype) == FALSE)
-+	lock = str2lock(accesstype);
-+	if (lock == 0)
-+		return btd_error_invalid_args(msg);
-+
-+	if (media_transport_acquire(transport, lock) == FALSE)
- 		return btd_error_not_authorized(msg);
- 
--	owner = media_owner_create(conn, msg, accesstype);
-+	owner = media_owner_create(conn, msg, lock);
- 	id = transport->resume(transport, owner);
- 	if (id == 0) {
--		media_transport_release(transport, accesstype);
-+		media_transport_release(transport, lock);
- 		media_owner_free(owner);
- 		return btd_error_not_authorized(msg);
+@@ -322,13 +358,14 @@ static guint resume_a2dp(struct media_transport *transport,
+ 			return 0;
  	}
-@@ -699,6 +713,7 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
- 	struct media_transport *transport = data;
- 	struct media_owner *owner;
- 	const char *accesstype, *sender;
-+	transport_lock_t lock;
- 	struct media_request *req;
  
- 	if (!dbus_message_get_args(msg, NULL,
-@@ -712,7 +727,9 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
- 	if (owner == NULL)
- 		return btd_error_not_authorized(msg);
+-	if (transport->in_use == TRUE)
++	if (state_in_use(transport->state))
+ 		goto done;
  
--	if (g_strcmp0(owner->accesstype, accesstype) == 0) {
-+	lock = str2lock(accesstype);
+-	transport->in_use = a2dp_sep_lock(sep, a2dp->session);
+-	if (transport->in_use == FALSE)
++	if (a2dp_sep_lock(sep, a2dp->session) == FALSE)
+ 		return 0;
+ 
++	transport_set_state(transport, TRANSPORT_STATE_ACQUIRED);
 +
-+	if (owner->lock == lock) {
- 		guint id;
+ done:
+ 	return a2dp_resume(a2dp->session, sep, a2dp_resume_complete, owner);
+ }
+@@ -349,7 +386,7 @@ static void a2dp_suspend_complete(struct avdtp *session,
+ 	}
  
- 		/* Not the last owner, no need to suspend */
-@@ -742,9 +759,9 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
- 		media_owner_add(owner, req);
+ 	a2dp_sep_unlock(sep, a2dp->session);
+-	transport->in_use = FALSE;
++	transport_set_state(transport, TRANSPORT_STATE_IDLE);
+ 	media_transport_remove(transport, owner);
+ }
  
- 		return NULL;
--	} else if (g_strstr_len(owner->accesstype, -1, accesstype) != NULL) {
--		media_transport_release(transport, accesstype);
--		g_strdelimit(owner->accesstype, accesstype, ' ');
-+	} else if ((owner->lock & lock) == lock) {
-+		media_transport_release(transport, lock);
-+		owner->lock &= ~lock;
- 	} else
- 		return btd_error_not_authorized(msg);
+@@ -362,7 +399,7 @@ static guint suspend_a2dp(struct media_transport *transport,
+ 
+ 	if (!owner) {
+ 		a2dp_sep_unlock(sep, a2dp->session);
+-		transport->in_use = FALSE;
++		transport_set_state(transport, TRANSPORT_STATE_IDLE);
+ 		return 0;
+ 	}
+ 
+@@ -424,14 +461,15 @@ static guint resume_headset(struct media_transport *transport,
+ {
+ 	struct audio_device *device = transport->device;
+ 
+-	if (transport->in_use == TRUE)
++	if (state_in_use(transport->state))
+ 		goto done;
+ 
+-	transport->in_use = headset_lock(device, HEADSET_LOCK_READ |
+-						HEADSET_LOCK_WRITE);
+-	if (transport->in_use == FALSE)
++	if (headset_lock(device, HEADSET_LOCK_READ |
++						HEADSET_LOCK_WRITE) == FALSE)
+ 		return 0;
+ 
++	transport_set_state(transport, TRANSPORT_STATE_ACQUIRED);
++
+ done:
+ 	return headset_request_stream(device, headset_resume_complete,
+ 					owner);
+@@ -450,7 +488,7 @@ static void headset_suspend_complete(struct audio_device *dev, void *user_data)
+ 	}
+ 
+ 	headset_unlock(dev, HEADSET_LOCK_READ | HEADSET_LOCK_WRITE);
+-	transport->in_use = FALSE;
++	transport_set_state(transport, TRANSPORT_STATE_IDLE);
+ 	media_transport_remove(transport, owner);
+ }
+ 
+@@ -461,7 +499,7 @@ static guint suspend_headset(struct media_transport *transport,
+ 
+ 	if (!owner) {
+ 		headset_unlock(device, HEADSET_LOCK_READ | HEADSET_LOCK_WRITE);
+-		transport->in_use = FALSE;
++		transport_set_state(transport, TRANSPORT_STATE_IDLE);
+ 		return 0;
+ 	}
+ 
+@@ -529,14 +567,15 @@ static guint resume_gateway(struct media_transport *transport,
+ {
+ 	struct audio_device *device = transport->device;
+ 
+-	if (transport->in_use == TRUE)
++	if (state_in_use(transport->state))
+ 		goto done;
+ 
+-	transport->in_use = gateway_lock(device, GATEWAY_LOCK_READ |
+-						GATEWAY_LOCK_WRITE);
+-	if (transport->in_use == FALSE)
++	if (gateway_lock(device, GATEWAY_LOCK_READ |
++						GATEWAY_LOCK_WRITE) == FALSE)
+ 		return 0;
+ 
++	transport_set_state(transport, TRANSPORT_STATE_ACQUIRED);
++
+ done:
+ 	return gateway_request_stream(device, gateway_resume_complete,
+ 					owner);
+@@ -556,7 +595,7 @@ static gboolean gateway_suspend_complete(gpointer user_data)
+ 	}
+ 
+ 	gateway_unlock(device, GATEWAY_LOCK_READ | GATEWAY_LOCK_WRITE);
+-	transport->in_use = FALSE;
++	transport_set_state(transport, TRANSPORT_STATE_IDLE);
+ 	media_transport_remove(transport, owner);
+ 	return FALSE;
+ }
+@@ -569,7 +608,7 @@ static guint suspend_gateway(struct media_transport *transport,
+ 
+ 	if (!owner) {
+ 		gateway_unlock(device, GATEWAY_LOCK_READ | GATEWAY_LOCK_WRITE);
+-		transport->in_use = FALSE;
++		transport_set_state(transport, TRANSPORT_STATE_IDLE);
+ 		return 0;
+ 	}
  
 -- 
 1.7.7.6
