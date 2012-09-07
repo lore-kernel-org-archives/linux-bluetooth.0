@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v3 8/9] media: Expose transport state in D-Bus
-Date: Fri,  7 Sep 2012 17:20:32 +0200
-Message-Id: <1347031233-21621-9-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v3 5/9] media: Watch interface state changes in transport
+Date: Fri,  7 Sep 2012 17:20:29 +0200
+Message-Id: <1347031233-21621-6-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1347031233-21621-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1347031233-21621-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,121 +12,168 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Extend the Media API to expose the transport state in D-Bus, as a
-property of the transport. This way the clients do not have to find
-out which is the corresponding profile-specific interface for the
-transport.
-
-Additionally, this state along with the automatic release of transports
-will allow clients to avoid the "optional release" or "accept remote
-release" race condition. For example, with HSP/HFP profiles, the problem
-is the following:
-
-1. User suspends SCO in the remote end.
-2. BlueZ signals the Playing->Connected state change in D-Bus.
-3. Exactly afterwards, the user resumes SCO in the remote end.
-4. In parallel, PulseAudio sees the aforementioned transition to
-   Connected, and thus releases the transport.
-5. BlueZ receives a Release() request while SCO is up. So the audio
-   stream will be suspended.
-
-The last step is an undesired behavior since the user explicitly wanted
-to route the audio stream through Bluetooth.
-
-The issue is difficult to reproduce but it can easily be solved by
-exposing the transport state in D-Bus.
+Install watches to keep track whether the audio is streaming or not.
+This should be relevant if the transport needs to reflect this state.
 ---
- audio/transport.c |   29 +++++++++++++++++++++++++++++
- doc/media-api.txt |    8 ++++++++
- 2 files changed, 37 insertions(+), 0 deletions(-)
+ audio/transport.c |  103 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 103 insertions(+), 0 deletions(-)
 
 diff --git a/audio/transport.c b/audio/transport.c
-index 79fa38d..05bb953 100644
+index 0ae9a8c..3026022 100644
 --- a/audio/transport.c
 +++ b/audio/transport.c
-@@ -155,6 +155,22 @@ static transport_lock_t str2lock(const char *str)
- 	return lock;
+@@ -45,6 +45,8 @@
+ #include "a2dp.h"
+ #include "headset.h"
+ #include "gateway.h"
++#include "sink.h"
++#include "source.h"
+ #include "avrcp.h"
+ 
+ #define MEDIA_TRANSPORT_INTERFACE "org.bluez.MediaTransport"
+@@ -101,6 +103,10 @@ struct media_transport {
+ 	uint16_t		omtu;		/* Transport output mtu */
+ 	transport_lock_t	lock;
+ 	transport_state_t	state;
++	guint			hs_watch;
++	guint			ag_watch;
++	guint			source_watch;
++	guint			sink_watch;
+ 	guint			(*resume) (struct media_transport *transport,
+ 					struct media_owner *owner);
+ 	guint			(*suspend) (struct media_transport *transport,
+@@ -173,6 +179,18 @@ void media_transport_destroy(struct media_transport *transport)
+ {
+ 	char *path;
+ 
++	if (transport->hs_watch)
++		headset_remove_state_cb(transport->hs_watch);
++
++	if (transport->ag_watch)
++		gateway_remove_state_cb(transport->ag_watch);
++
++	if (transport->sink_watch)
++		sink_remove_state_cb(transport->sink_watch);
++
++	if (transport->source_watch)
++		source_remove_state_cb(transport->source_watch);
++
+ 	path = g_strdup(transport->path);
+ 	g_dbus_unregister_interface(transport->conn, path,
+ 						MEDIA_TRANSPORT_INTERFACE);
+@@ -1083,6 +1101,76 @@ static void headset_nrec_changed(struct audio_device *dev, gboolean nrec,
+ 				DBUS_TYPE_BOOLEAN, &nrec);
  }
  
-+static const char *state2str(transport_state_t state)
++static void transport_update_playing(struct media_transport *transport,
++							gboolean playing)
 +{
-+	switch (state) {
-+	case TRANSPORT_STATE_IDLE:
-+	case TRANSPORT_STATE_REQUESTING:
-+		return "idle";
-+	case TRANSPORT_STATE_PENDING:
-+		return "pending";
-+	case TRANSPORT_STATE_ACQUIRED:
-+	case TRANSPORT_STATE_SUSPENDING:
-+		return "acquired";
-+	}
-+
-+	return NULL;
++	DBG("%s Playing=%d", transport->path, playing);
 +}
 +
- static gboolean state_in_use(transport_state_t state)
- {
- 	switch (state) {
-@@ -174,6 +190,7 @@ static void transport_set_state(struct media_transport *transport,
- 							transport_state_t state)
- {
- 	transport_state_t old_state = transport->state;
-+	const char *str;
- 
- 	if (old_state == state)
- 		return;
-@@ -182,6 +199,13 @@ static void transport_set_state(struct media_transport *transport,
- 
- 	DBG("State changed %s: %s -> %s", transport->path, str_state[old_state],
- 							str_state[state]);
++static void headset_state_changed(struct audio_device *dev,
++						headset_state_t old_state,
++						headset_state_t new_state,
++						void *user_data)
++{
++	struct media_transport *transport = user_data;
 +
-+	str = state2str(state);
++	if (dev != transport->device)
++		return;
 +
-+	if (g_strcmp0(str, state2str(old_state)) != 0)
-+		emit_property_changed(transport->conn, transport->path,
-+					MEDIA_TRANSPORT_INTERFACE, "State",
-+					DBUS_TYPE_STRING, &str);
- }
- 
- void media_transport_destroy(struct media_transport *transport)
-@@ -1017,6 +1041,7 @@ void transport_get_properties(struct media_transport *transport,
- 	DBusMessageIter dict;
- 	const char *uuid;
- 	uint8_t codec;
-+	const char *state;
- 
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
- 			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-@@ -1036,6 +1061,10 @@ void transport_get_properties(struct media_transport *transport,
- 	dict_append_array(&dict, "Configuration", DBUS_TYPE_BYTE,
- 				&transport->configuration, transport->size);
- 
-+	/* State */
-+	state = state2str(transport->state);
-+	dict_append_entry(&dict, "State", DBUS_TYPE_STRING, &state);
++	if (new_state == HEADSET_STATE_PLAYING)
++		transport_update_playing(transport, TRUE);
++	else
++		transport_update_playing(transport, FALSE);
++}
 +
- 	if (transport->get_properties)
- 		transport->get_properties(transport, &dict);
- 
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index e5eeaa0..dfbff2e 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -317,6 +317,14 @@ Properties	object Device [readonly]
- 			Configuration blob, it is used as it is so the size and
- 			byte order must match.
- 
-+		string State [readonly]
++static void gateway_state_changed(struct audio_device *dev,
++						gateway_state_t old_state,
++						gateway_state_t new_state,
++						void *user_data)
++{
++	struct media_transport *transport = user_data;
 +
-+			Indicates the state of the transport. Possible
-+			values are:
-+				"idle": not streaming
-+				"pending": streaming but not acquired
-+				"acquired": streaming and acquired
++	if (dev != transport->device)
++		return;
 +
- 		uint16 Delay [readwrite]
++	if (new_state == GATEWAY_STATE_PLAYING)
++		transport_update_playing(transport, TRUE);
++	else
++		transport_update_playing(transport, FALSE);
++}
++
++static void sink_state_changed(struct audio_device *dev,
++						sink_state_t old_state,
++						sink_state_t new_state,
++						void *user_data)
++{
++	struct media_transport *transport = user_data;
++
++	if (dev != transport->device)
++		return;
++
++	if (new_state == SINK_STATE_PLAYING)
++		transport_update_playing(transport, TRUE);
++	else
++		transport_update_playing(transport, FALSE);
++}
++
++static void source_state_changed(struct audio_device *dev,
++						source_state_t old_state,
++						source_state_t new_state,
++						void *user_data)
++{
++	struct media_transport *transport = user_data;
++
++	if (dev != transport->device)
++		return;
++
++	if (new_state == SOURCE_STATE_PLAYING)
++		transport_update_playing(transport, TRUE);
++	else
++		transport_update_playing(transport, FALSE);
++}
++
+ struct media_transport *media_transport_create(DBusConnection *conn,
+ 						struct media_endpoint *endpoint,
+ 						struct audio_device *device,
+@@ -1118,6 +1206,15 @@ struct media_transport *media_transport_create(DBusConnection *conn,
+ 		transport->set_property = set_property_a2dp;
+ 		transport->data = a2dp;
+ 		transport->destroy = destroy_a2dp;
++
++		if (strcasecmp(uuid, A2DP_SOURCE_UUID) == 0)
++			transport->sink_watch = sink_add_state_cb(
++							sink_state_changed,
++							transport);
++		else
++			transport->source_watch = source_add_state_cb(
++							source_state_changed,
++							transport);
+ 	} else if (strcasecmp(uuid, HFP_AG_UUID) == 0 ||
+ 			strcasecmp(uuid, HSP_AG_UUID) == 0) {
+ 		struct headset_transport *headset;
+@@ -1135,6 +1232,9 @@ struct media_transport *media_transport_create(DBusConnection *conn,
+ 		transport->set_property = set_property_headset;
+ 		transport->data = headset;
+ 		transport->destroy = destroy_headset;
++		transport->hs_watch = headset_add_state_cb(
++							headset_state_changed,
++							transport);
+ 	} else if (strcasecmp(uuid, HFP_HS_UUID) == 0 ||
+ 			strcasecmp(uuid, HSP_HS_UUID) == 0) {
+ 		transport->resume = resume_gateway;
+@@ -1142,6 +1242,9 @@ struct media_transport *media_transport_create(DBusConnection *conn,
+ 		transport->cancel = cancel_gateway;
+ 		transport->get_properties = get_properties_gateway;
+ 		transport->set_property = set_property_gateway;
++		transport->ag_watch = gateway_add_state_cb(
++							gateway_state_changed,
++							transport);
+ 	} else
+ 		goto fail;
  
- 			Optional. Transport delay in 1/10 of millisecond, this
 -- 
 1.7.7.6
 
