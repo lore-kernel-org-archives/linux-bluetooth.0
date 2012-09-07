@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v3 2/9] media: Add a2dp_sep_is_playing() to internal API
-Date: Fri,  7 Sep 2012 17:20:26 +0200
-Message-Id: <1347031233-21621-3-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v3 3/9] media: Add gateway_get_state() to internal API
+Date: Fri,  7 Sep 2012 17:20:27 +0200
+Message-Id: <1347031233-21621-4-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1347031233-21621-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1347031233-21621-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,43 +12,42 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Add this function to expose whether the local SEP is streaming or not.
+Expose the state of the gateway interface in the internal API.
 ---
- audio/a2dp.c |    8 ++++++++
- audio/a2dp.h |    1 +
- 2 files changed, 9 insertions(+), 0 deletions(-)
+ audio/gateway.c |    7 +++++++
+ audio/gateway.h |    1 +
+ 2 files changed, 8 insertions(+), 0 deletions(-)
 
-diff --git a/audio/a2dp.c b/audio/a2dp.c
-index a9546b7..64b37e7 100644
---- a/audio/a2dp.c
-+++ b/audio/a2dp.c
-@@ -1833,6 +1833,14 @@ gboolean a2dp_sep_unlock(struct a2dp_sep *sep, struct avdtp *session)
- 	return TRUE;
+diff --git a/audio/gateway.c b/audio/gateway.c
+index 0603f12..53094af 100644
+--- a/audio/gateway.c
++++ b/audio/gateway.c
+@@ -787,6 +787,13 @@ gboolean gateway_is_active(struct audio_device *dev)
+ 	return FALSE;
  }
  
-+gboolean a2dp_sep_is_playing(struct a2dp_sep *sep)
++gateway_state_t gateway_get_state(struct audio_device *dev)
 +{
-+	if (avdtp_sep_get_state(sep->lsep) == AVDTP_STATE_STREAMING)
-+		return TRUE;
-+	else
-+		return FALSE;
++	struct gateway *gw = dev->gateway;
++
++	return gw->state;
 +}
 +
- gboolean a2dp_sep_get_lock(struct a2dp_sep *sep)
+ int gateway_connect_rfcomm(struct audio_device *dev, GIOChannel *io)
  {
- 	return sep->locked;
-diff --git a/audio/a2dp.h b/audio/a2dp.h
-index 27b4a57..deab3b8 100644
---- a/audio/a2dp.h
-+++ b/audio/a2dp.h
-@@ -90,6 +90,7 @@ gboolean a2dp_cancel(struct audio_device *dev, unsigned int id);
- gboolean a2dp_sep_lock(struct a2dp_sep *sep, struct avdtp *session);
- gboolean a2dp_sep_unlock(struct a2dp_sep *sep, struct avdtp *session);
- gboolean a2dp_sep_get_lock(struct a2dp_sep *sep);
-+gboolean a2dp_sep_is_playing(struct a2dp_sep *sep);
- struct avdtp_stream *a2dp_sep_get_stream(struct a2dp_sep *sep);
- struct a2dp_sep *a2dp_get_sep(struct avdtp *session,
- 				struct avdtp_stream *stream);
+ 	if (!io)
+diff --git a/audio/gateway.h b/audio/gateway.h
+index 0893962..d87d76a 100644
+--- a/audio/gateway.h
++++ b/audio/gateway.h
+@@ -59,6 +59,7 @@ void gateway_unregister(struct audio_device *dev);
+ struct gateway *gateway_init(struct audio_device *dev);
+ gboolean gateway_is_active(struct audio_device *dev);
+ gboolean gateway_is_connected(struct audio_device *dev);
++gateway_state_t gateway_get_state(struct audio_device *dev);
+ int gateway_connect_rfcomm(struct audio_device *dev, GIOChannel *io);
+ int gateway_connect_sco(struct audio_device *dev, GIOChannel *chan);
+ void gateway_start_service(struct audio_device *device);
 -- 
 1.7.7.6
 
