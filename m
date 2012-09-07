@@ -1,68 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5049A718.6020701@tieto.com>
-Date: Fri, 7 Sep 2012 09:49:44 +0200
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] gatt: Remove reading Service Changed characteristic after
- connected
-References: <1346928807-17149-1-git-send-email-andrzej.kaczmarek@tieto.com> <CAKT1EBdHL8q-sm=ibqZFoTFYtzeNTVHjB2wvoFBS=zHrb7xyxQ@mail.gmail.com>
-In-Reply-To: <CAKT1EBdHL8q-sm=ibqZFoTFYtzeNTVHjB2wvoFBS=zHrb7xyxQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Message-ID: <1346996989.21200.120.camel@aeonflux>
+Subject: Re: [PATCH BlueZ v3 06/15] gdbus: Implement DBus.Properties.Set
+ method
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Date: Thu, 06 Sep 2012 22:49:49 -0700
+In-Reply-To: <CABBYNZLZJTcw1Swp-Le25+F8fAweTDy=733PTVffc4sRJbFikQ@mail.gmail.com>
+References: <1345272662-2850-1-git-send-email-lucas.demarchi@profusion.mobi>
+	 <1345272662-2850-7-git-send-email-lucas.demarchi@profusion.mobi>
+	 <1346961700.21200.116.camel@aeonflux>
+	 <CABBYNZLZJTcw1Swp-Le25+F8fAweTDy=733PTVffc4sRJbFikQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Luiz,
 
-On 09/06/2012 03:56 PM, Claudio Takahasi wrote:
-> Hi Andrzej:
->
-> On Thu, Sep 6, 2012 at 7:53 AM, Andrzej Kaczmarek
-> <andrzej.kaczmarek@tieto.com> wrote:
+> >> Contrary to Get() and GetAll(), Set is asynchronous so we pass on the
+> >> DBusMessage so user is able to create the response. It's the only use of
+> >> this parameter.
+> >> ---
+> >>  gdbus/gdbus.h  |  7 +++++++
+> >>  gdbus/object.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+> >>  2 files changed, 64 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+> >> index b2e78c4..3e4aa16 100644
+> >> --- a/gdbus/gdbus.h
+> >> +++ b/gdbus/gdbus.h
+> >> @@ -31,6 +31,8 @@ extern "C" {
+> >>  #include <dbus/dbus.h>
+> >>  #include <glib.h>
+> >>
+> >> +typedef enum GDBusPropertySetReturn GDBusPropertySetReturn;
+> >> +
+> >>  typedef enum GDBusMethodFlags GDBusMethodFlags;
+> >>  typedef enum GDBusSignalFlags GDBusSignalFlags;
+> >>  typedef enum GDBusPropertyFlags GDBusPropertyFlags;
+> >> @@ -69,6 +71,10 @@ typedef DBusMessage * (* GDBusMethodFunction) (DBusConnection *connection,
+> >>  typedef gboolean (*GDBusPropertyGetter)(const GDBusPropertyTable *property,
+> >>                                       DBusMessageIter *iter, void *data);
+> >>
+> >> +typedef DBusMessage *(*GDBusPropertySetter)(const GDBusPropertyTable *property,
+> >> +                                     DBusMessageIter *value,
+> >> +                                     DBusMessage *msg, void *data);
+> >> +
+> >
+> > I am not really happy with this. We just need a unique handle here since
+> > the return value is either success or an error. I rather don't send
+> > messages around for no other reason to create the error.
+> >
+> > Inside the authorization code I am using GDBusPendingReply as unique
+> > token. What about using the same approach?
+> 
+> It would be perfect, but Im afraid sometimes the properties can have
+> restriction on which sender can set them, so perhaps we need to add
+> the name of the sender as parameter in addiction to just the handle?
 
-<snip>
+that should be done through the same security handling we have for the
+method calls. Don't try to invent something new.
 
->>   static void gatt_descriptors_cb(guint8 status, const guint8 *pdu, guint16 len,
->>                                                          gpointer user_data)
->>   {
->> @@ -311,8 +280,6 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
->>          /* TODO: Read other GAP characteristics - See Core spec page 1739 */
->>
->>          /*
->> -        * Always read the characteristic value in the first connection
->> -        * since attribute handles caching is not supported at the moment.
->>           * When re-connecting <<Service Changed>> handle and characteristic
->>           * value doesn't need to read again: known information from the
->>           * previous interaction.
->> @@ -322,10 +289,6 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
->>
->>                  bt_uuid16_create(&uuid, GATT_CHARAC_SERVICE_CHANGED);
->>
->> -               gatt_read_char_by_uuid(gas->attrib, gas->gatt.start,
->> -                                               gas->gatt.end, &uuid,
->> -                                               gatt_service_changed_cb, gas);
->> -
->>                  gatt_discover_char(gas->attrib, gas->gatt.start, gas->gatt.end,
->>                                          &uuid, gatt_characteristic_cb, gas);
->>          }
->> --
->> 1.7.11.3
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> As discussed in the IRC, please add in the commit message the BT SPEC
-> errata information/section.
->
-> Since we can't read the characteristic value, it will be necessary to
-> store the handle, otherwise BlueZ will loose the Service Changed
-> Indication when re-connecting.
+Regards
 
-Handle is already stored during characteristics discovery 
-(gatt_characteristic_cb) so this should not be a problem.
+Marcel
 
-BR,
-Andrzej
+
