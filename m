@@ -1,34 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1347049242.21200.131.camel@aeonflux>
-Subject: Re: [PATCH 2/10] drivers/bluetooth/bluecard_cs.c: removes
- unnecessary semicolon
+Message-ID: <1347049144.21200.130.camel@aeonflux>
+Subject: Re: [PATCH BlueZ v3 06/15] gdbus: Implement DBus.Properties.Set
+ method
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Peter Senna Tschudin <peter.senna@gmail.com>
-Cc: kernel-janitors@vger.kernel.org, Julia.Lawall@lip6.fr,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Fri, 07 Sep 2012 13:20:43 -0700
-In-Reply-To: <1347031488-26598-2-git-send-email-peter.senna@gmail.com>
-References: <1347031488-26598-2-git-send-email-peter.senna@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Date: Fri, 07 Sep 2012 13:19:04 -0700
+In-Reply-To: <CABBYNZJhaZkixESrBAjaczGpFgysB8CKv12FFw2fLhBG-h-1yg@mail.gmail.com>
+References: <1345272662-2850-1-git-send-email-lucas.demarchi@profusion.mobi>
+	 <1345272662-2850-7-git-send-email-lucas.demarchi@profusion.mobi>
+	 <1346961700.21200.116.camel@aeonflux>
+	 <CABBYNZLZJTcw1Swp-Le25+F8fAweTDy=733PTVffc4sRJbFikQ@mail.gmail.com>
+	 <1346996989.21200.120.camel@aeonflux>
+	 <CABBYNZJhaZkixESrBAjaczGpFgysB8CKv12FFw2fLhBG-h-1yg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+Hi Luiz,
 
-> removes unnecessary semicolon
+> >> >> Contrary to Get() and GetAll(), Set is asynchronous so we pass on the
+> >> >> DBusMessage so user is able to create the response. It's the only use of
+> >> >> this parameter.
+> >> >> ---
+> >> >>  gdbus/gdbus.h  |  7 +++++++
+> >> >>  gdbus/object.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+> >> >>  2 files changed, 64 insertions(+), 2 deletions(-)
+> >> >>
+> >> >> diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+> >> >> index b2e78c4..3e4aa16 100644
+> >> >> --- a/gdbus/gdbus.h
+> >> >> +++ b/gdbus/gdbus.h
+> >> >> @@ -31,6 +31,8 @@ extern "C" {
+> >> >>  #include <dbus/dbus.h>
+> >> >>  #include <glib.h>
+> >> >>
+> >> >> +typedef enum GDBusPropertySetReturn GDBusPropertySetReturn;
+> >> >> +
+> >> >>  typedef enum GDBusMethodFlags GDBusMethodFlags;
+> >> >>  typedef enum GDBusSignalFlags GDBusSignalFlags;
+> >> >>  typedef enum GDBusPropertyFlags GDBusPropertyFlags;
+> >> >> @@ -69,6 +71,10 @@ typedef DBusMessage * (* GDBusMethodFunction) (DBusConnection *connection,
+> >> >>  typedef gboolean (*GDBusPropertyGetter)(const GDBusPropertyTable *property,
+> >> >>                                       DBusMessageIter *iter, void *data);
+> >> >>
+> >> >> +typedef DBusMessage *(*GDBusPropertySetter)(const GDBusPropertyTable *property,
+> >> >> +                                     DBusMessageIter *value,
+> >> >> +                                     DBusMessage *msg, void *data);
+> >> >> +
+> >> >
+> >> > I am not really happy with this. We just need a unique handle here since
+> >> > the return value is either success or an error. I rather don't send
+> >> > messages around for no other reason to create the error.
+> >> >
+> >> > Inside the authorization code I am using GDBusPendingReply as unique
+> >> > token. What about using the same approach?
+> >>
+> >> It would be perfect, but Im afraid sometimes the properties can have
+> >> restriction on which sender can set them, so perhaps we need to add
+> >> the name of the sender as parameter in addiction to just the handle?
+> >
+> > that should be done through the same security handling we have for the
+> > method calls. Don't try to invent something new.
 > 
-> Found by Coccinelle: http://coccinelle.lip6.fr/
-> 
-> Signed-off-by: Peter Senna Tschudin <peter.senna@gmail.com>
-> 
-> ---
->  drivers/bluetooth/bluecard_cs.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Im afraid you will have to go in detail what you want here, the
+> security table seems to be meant for checking privileges in a method
+> level while we can probably extend it for properties and have
+> privileges also in the properties table, but the security table seems
+> to be global not per interface.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+you can specify unique integer identifiers as security label to each
+method. We could extend that to each property. The security label is
+used to pick which security callback to call.
 
 Regards
 
