@@ -7,9 +7,9 @@ Cc: kernel-janitors@vger.kernel.org,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/10] drivers/bluetooth/bluecard_cs.c: removes unnecessary semicolon
-Date: Fri,  7 Sep 2012 17:24:40 +0200
-Message-Id: <1347031488-26598-2-git-send-email-peter.senna@gmail.com>
+Subject: [PATCH 3/10] drivers/bluetooth/hci_ldisc.c: removes unnecessary semicolon
+Date: Fri,  7 Sep 2012 17:24:39 +0200
+Message-Id: <1347031488-26598-1-git-send-email-peter.senna@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Peter Senna Tschudin <peter.senna@gmail.com>
@@ -21,18 +21,18 @@ Found by Coccinelle: http://coccinelle.lip6.fr/
 Signed-off-by: Peter Senna Tschudin <peter.senna@gmail.com>
 
 ---
- drivers/bluetooth/bluecard_cs.c |    2 +-
+ drivers/bluetooth/hci_ldisc.c |    2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff -u -p a/drivers/bluetooth/bluecard_cs.c b/drivers/bluetooth/bluecard_cs.c
---- a/drivers/bluetooth/bluecard_cs.c
-+++ b/drivers/bluetooth/bluecard_cs.c
-@@ -681,7 +681,7 @@ static int bluecard_hci_send_frame(struc
- 	case HCI_SCODATA_PKT:
- 		hdev->stat.sco_tx++;
+diff -u -p a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -531,7 +531,7 @@ static int hci_uart_tty_ioctl(struct tty
+ 	default:
+ 		err = n_tty_ioctl_helper(tty, file, cmd, arg);
  		break;
 -	};
 +	}
  
- 	/* Prepend skb with frame type */
- 	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
+ 	return err;
+ }
