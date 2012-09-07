@@ -7,9 +7,9 @@ Cc: kernel-janitors@vger.kernel.org,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 5/10] drivers/bluetooth/hci_vhci.c: removes unnecessary semicolon
-Date: Fri,  7 Sep 2012 17:24:47 +0200
-Message-Id: <1347031488-26598-9-git-send-email-peter.senna@gmail.com>
+Subject: [PATCH 4/10] drivers/bluetooth/hci_ll.c: removes unnecessary semicolon
+Date: Fri,  7 Sep 2012 17:24:42 +0200
+Message-Id: <1347031488-26598-4-git-send-email-peter.senna@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Peter Senna Tschudin <peter.senna@gmail.com>
@@ -21,18 +21,18 @@ Found by Coccinelle: http://coccinelle.lip6.fr/
 Signed-off-by: Peter Senna Tschudin <peter.senna@gmail.com>
 
 ---
- drivers/bluetooth/hci_vhci.c |    2 +-
+ drivers/bluetooth/hci_ll.c |    2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff -u -p a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
---- a/drivers/bluetooth/hci_vhci.c
-+++ b/drivers/bluetooth/hci_vhci.c
-@@ -156,7 +156,7 @@ static inline ssize_t vhci_put_user(stru
- 	case HCI_SCODATA_PKT:
- 		data->hdev->stat.sco_tx++;
- 		break;
--	};
-+	}
+diff -u -p a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -481,7 +481,7 @@ static int ll_recv(struct hci_uart *hu,
+ 			hu->hdev->stat.err_rx++;
+ 			ptr++; count--;
+ 			continue;
+-		};
++		}
  
- 	return total;
- }
+ 		ptr++; count--;
+ 
