@@ -1,82 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1347049144.21200.130.camel@aeonflux>
-Subject: Re: [PATCH BlueZ v3 06/15] gdbus: Implement DBus.Properties.Set
- method
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org
-Date: Fri, 07 Sep 2012 13:19:04 -0700
-In-Reply-To: <CABBYNZJhaZkixESrBAjaczGpFgysB8CKv12FFw2fLhBG-h-1yg@mail.gmail.com>
-References: <1345272662-2850-1-git-send-email-lucas.demarchi@profusion.mobi>
-	 <1345272662-2850-7-git-send-email-lucas.demarchi@profusion.mobi>
-	 <1346961700.21200.116.camel@aeonflux>
-	 <CABBYNZLZJTcw1Swp-Le25+F8fAweTDy=733PTVffc4sRJbFikQ@mail.gmail.com>
-	 <1346996989.21200.120.camel@aeonflux>
-	 <CABBYNZJhaZkixESrBAjaczGpFgysB8CKv12FFw2fLhBG-h-1yg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Fri, 7 Sep 2012 10:00:40 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+cc: Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org, gustavo@padovan.org
+Subject: Re: [PATCH 1/6] Bluetooth: Fix deadlock when closing socket
+In-Reply-To: <20120907140813.GC22944@aemeltch-MOBL1>
+Message-ID: <alpine.DEB.2.02.1209070949580.3761@mathewm-linux>
+References: <1346933147-11789-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <alpine.DEB.2.02.1209060946190.22884@mathewm-linux> <1346962251.21200.119.camel@aeonflux> <20120907140813.GC22944@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
 
-> >> >> Contrary to Get() and GetAll(), Set is asynchronous so we pass on the
-> >> >> DBusMessage so user is able to create the response. It's the only use of
-> >> >> this parameter.
-> >> >> ---
-> >> >>  gdbus/gdbus.h  |  7 +++++++
-> >> >>  gdbus/object.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
-> >> >>  2 files changed, 64 insertions(+), 2 deletions(-)
-> >> >>
-> >> >> diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-> >> >> index b2e78c4..3e4aa16 100644
-> >> >> --- a/gdbus/gdbus.h
-> >> >> +++ b/gdbus/gdbus.h
-> >> >> @@ -31,6 +31,8 @@ extern "C" {
-> >> >>  #include <dbus/dbus.h>
-> >> >>  #include <glib.h>
-> >> >>
-> >> >> +typedef enum GDBusPropertySetReturn GDBusPropertySetReturn;
-> >> >> +
-> >> >>  typedef enum GDBusMethodFlags GDBusMethodFlags;
-> >> >>  typedef enum GDBusSignalFlags GDBusSignalFlags;
-> >> >>  typedef enum GDBusPropertyFlags GDBusPropertyFlags;
-> >> >> @@ -69,6 +71,10 @@ typedef DBusMessage * (* GDBusMethodFunction) (DBusConnection *connection,
-> >> >>  typedef gboolean (*GDBusPropertyGetter)(const GDBusPropertyTable *property,
-> >> >>                                       DBusMessageIter *iter, void *data);
-> >> >>
-> >> >> +typedef DBusMessage *(*GDBusPropertySetter)(const GDBusPropertyTable *property,
-> >> >> +                                     DBusMessageIter *value,
-> >> >> +                                     DBusMessage *msg, void *data);
-> >> >> +
-> >> >
-> >> > I am not really happy with this. We just need a unique handle here since
-> >> > the return value is either success or an error. I rather don't send
-> >> > messages around for no other reason to create the error.
-> >> >
-> >> > Inside the authorization code I am using GDBusPendingReply as unique
-> >> > token. What about using the same approach?
-> >>
-> >> It would be perfect, but Im afraid sometimes the properties can have
-> >> restriction on which sender can set them, so perhaps we need to add
-> >> the name of the sender as parameter in addiction to just the handle?
-> >
-> > that should be done through the same security handling we have for the
-> > method calls. Don't try to invent something new.
-> 
-> Im afraid you will have to go in detail what you want here, the
-> security table seems to be meant for checking privileges in a method
-> level while we can probably extend it for properties and have
-> privileges also in the properties table, but the security table seems
-> to be global not per interface.
+Andrei -
 
-you can specify unique integer identifiers as security label to each
-method. We could extend that to each property. The security label is
-used to pick which security callback to call.
+On Fri, 7 Sep 2012, Andrei Emeltchenko wrote:
 
-Regards
+> Hi Marcel,
+>
+> On Thu, Sep 06, 2012 at 01:10:51PM -0700, Marcel Holtmann wrote:
+>> Hi Mat,
+>>
+>>>> If we have unacked frames when closing bluetooth socket we deadlock
+>>>> since conn->chan_lock, chan->lock and socket lock are taken. Remove
+>>>> __l2cap_wait_ack completely.
+>>>>
+>>>> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>>>
+>>> I don't think you want to remove this code completely, at least not
+>>> without giving some thought to the problem it is solving.
+>>>
+>>> The problem is that programs may have an open socket which they send
+>>> some data on, then immediately close.  There is no feedback when data
+>>> is actually sent over the air, so the socket may end up getting torn
+>>> down while there is still data in the HCI tx buffer or some data was
+>>> lost and needs to be retransmitted.  Waiting for an acknowledgement
+>>> confirms that the application's sent data made it to the remote
+>>> device.
+>>>
+>>> Without this code, it's difficult to use l2test on a number of
+>>> qualification tests.  Profiles or applications using ERTM may depend
+>>> on the "wait for ack before closing" behavior in order to have a clean
+>>> disconnect.
+>>
+>> isn't that what we have SO_LINGER for?
+>
+> Looking at the code I suspect that SO_LINGER is not working. Maybe we need
+> to merge linger code and wait_ack stuff.
 
-Marcel
+It does look like a bug that the "wait_ack" behavior happens even 
+without SO_LINGER.
 
+In order to do SO_LINGER right, it would be better to check chan->tx_q 
+instead of chan->unacked_frames to makes sure all data is sent and 
+acked.  chan->unacked_frames only tells you how many sent frames are 
+unacked and does not take in to account queued data that hasn't been 
+sent yet.
+
+--
+Mat Martineau
+
+The Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum,
+hosted by The Linux Foundation
 
