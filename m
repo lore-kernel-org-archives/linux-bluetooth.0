@@ -1,54 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 8 Sep 2012 16:49:05 -0300
+Date: Sat, 8 Sep 2012 16:46:44 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix freeing uninitialized delayed works
-Message-ID: <20120908194905.GC5788@joana>
-References: <1346760038-3381-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] Bluetooth: mgmt: Fix enabling LE while powered off
+Message-ID: <20120908194644.GB5788@joana>
+References: <1346227329-1686-1-git-send-email-andrzej.kaczmarek@tieto.com>
+ <1346227329-1686-2-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1346760038-3381-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1346227329-1686-2-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Andrzej,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-09-04 15:00:38 +0300]:
+* Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com> [2012-08-29 10:02:09 +0200]:
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> When new BT USB adapter is plugged in it's configured while still being powered
+> off (HCI_AUTO_OFF flag is set), thus Set LE will only set dev_flags but won't
+> write changes to controller. As a result it's not possible to start device
+> discovery session on LE controller as it uses interleaved discovery which
+> requires LE Supported Host flag in extended features.
 > 
-> When releasing L2CAP socket which is in BT_CONFIG state l2cap_chan_close
-> invokes l2cap_send_disconn_req which cancel delayed works which are only
-> set in BT_CONNECTED state with l2cap_ertm_init. Add state check before
-> cancelling those works.
+> This patch ensures HCI Write LE Host Supported is sent when Set Powered is
+> called to power on controller and clear HCI_AUTO_OFF flag.
 > 
-> ...
-> [ 9668.574372] [21085] l2cap_sock_release: sock cd065200, sk f073e800
-> [ 9668.574399] [21085] l2cap_sock_shutdown: sock cd065200, sk f073e800
-> [ 9668.574411] [21085] l2cap_chan_close: chan f073ec00 state BT_CONFIG sk f073e800
-> [ 9668.574421] [21085] l2cap_send_disconn_req: chan f073ec00 conn ecc16600
-> [ 9668.574441] INFO: trying to register non-static key.
-> [ 9668.574443] the code is fine but needs lockdep annotation.
-> [ 9668.574446] turning off the locking correctness validator.
-> [ 9668.574450] Pid: 21085, comm: obex-client Tainted: G           O 3.5.0+ #57
-> [ 9668.574452] Call Trace:
-> [ 9668.574463]  [<c10a64b3>] __lock_acquire+0x12e3/0x1700
-> [ 9668.574468]  [<c10a44fb>] ? trace_hardirqs_on+0xb/0x10
-> [ 9668.574476]  [<c15e4f60>] ? printk+0x4d/0x4f
-> [ 9668.574479]  [<c10a6e38>] lock_acquire+0x88/0x130
-> [ 9668.574487]  [<c1059740>] ? try_to_del_timer_sync+0x60/0x60
-> [ 9668.574491]  [<c1059790>] del_timer_sync+0x50/0xc0
-> [ 9668.574495]  [<c1059740>] ? try_to_del_timer_sync+0x60/0x60
-> [ 9668.574515]  [<f8aa1c23>] l2cap_send_disconn_req+0xe3/0x160 [bluetooth]
-> ...
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+> Cc: stable@vger.kernel.org
 > ---
->  net/bluetooth/l2cap_core.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  net/bluetooth/mgmt.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 
-Please rebase this patch on top of bluetooth.git. It is a important fix.
-Thanks.
+Both patches have been applied to bluetooth.git. Thanks
 
 	Gustavo
