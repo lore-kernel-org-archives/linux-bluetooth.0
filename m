@@ -1,35 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 8 Sep 2012 18:34:22 -0300
+Date: Sat, 8 Sep 2012 18:14:39 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Peter Senna Tschudin <peter.senna@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, kernel-janitors@vger.kernel.org,
-	Julia.Lawall@lip6.fr, Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/10] drivers/bluetooth/bluecard_cs.c: removes
- unnecessary semicolon
-Message-ID: <20120908213422.GK5788@joana>
-References: <1347031488-26598-2-git-send-email-peter.senna@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 6/6] Bluetooth: AMP: Add Read Data Block Size to amp_init
+Message-ID: <20120908211439.GJ5788@joana>
+References: <1346933147-11789-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1346933147-11789-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1347031488-26598-2-git-send-email-peter.senna@gmail.com>
+In-Reply-To: <1346933147-11789-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+Hi Andrei,
 
-* Peter Senna Tschudin <peter.senna@gmail.com> [2012-09-07 17:24:40 +0200]:
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-09-06 15:05:46 +0300]:
 
-> From: Peter Senna Tschudin <peter.senna@gmail.com>
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> removes unnecessary semicolon
+> Add Read Data Block Size HCI cmd to AMP initialization, then it
+> makes possible to send data.
 > 
-> Found by Coccinelle: http://coccinelle.lip6.fr/
-> 
-> Signed-off-by: Peter Senna Tschudin <peter.senna@gmail.com>
-> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  drivers/bluetooth/bluecard_cs.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  net/bluetooth/hci_core.c |    3 +++
+>  1 file changed, 3 insertions(+)
 
-patch has been applied to the bluetooth-next tree. Thanks.
+Patch has been applied to bluetooth-next. Thanks.
 
 	Gustavo
