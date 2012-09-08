@@ -1,79 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 8 Sep 2012 16:56:31 -0300
+Date: Sat, 8 Sep 2012 16:49:05 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: acho@suse.com
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org, oneukum@suse.com, jlee@suse.com,
-	resler@cs.cas.cz
-Subject: Re: [PATCH] Bluetooth: Add support for BCM20702A0 [04ca, 2003]
-Message-ID: <20120908195631.GD5788@joana>
-References: <1346914639-11040-1-git-send-email-acho@suse.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix freeing uninitialized delayed works
+Message-ID: <20120908194905.GC5788@joana>
+References: <1346760038-3381-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1346914639-11040-1-git-send-email-acho@suse.com>
+In-Reply-To: <1346760038-3381-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Acho,
+Hi Andrei,
 
-* acho@suse.com <acho@suse.com> [2012-09-06 14:57:19 +0800]:
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-09-04 15:00:38 +0300]:
 
-> From: "Cho, Yu-Chen" <acho@suse.com>
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Add another vendor specific ID for BCM20702A0.
+> When releasing L2CAP socket which is in BT_CONFIG state l2cap_chan_close
+> invokes l2cap_send_disconn_req which cancel delayed works which are only
+> set in BT_CONNECTED state with l2cap_ertm_init. Add state check before
+> cancelling those works.
 > 
-> output of usb-devices:
-> T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=02 Dev#=  4 Spd=12   MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=04ca ProdID=2003 Rev= 1.12
-> S:  Manufacturer=Broadcom Corp
-> S:  Product=BCM20702A0
-> S:  SerialNumber=446D57861623
-> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+> ...
+> [ 9668.574372] [21085] l2cap_sock_release: sock cd065200, sk f073e800
+> [ 9668.574399] [21085] l2cap_sock_shutdown: sock cd065200, sk f073e800
+> [ 9668.574411] [21085] l2cap_chan_close: chan f073ec00 state BT_CONFIG sk f073e800
+> [ 9668.574421] [21085] l2cap_send_disconn_req: chan f073ec00 conn ecc16600
+> [ 9668.574441] INFO: trying to register non-static key.
+> [ 9668.574443] the code is fine but needs lockdep annotation.
+> [ 9668.574446] turning off the locking correctness validator.
+> [ 9668.574450] Pid: 21085, comm: obex-client Tainted: G           O 3.5.0+ #57
+> [ 9668.574452] Call Trace:
+> [ 9668.574463]  [<c10a64b3>] __lock_acquire+0x12e3/0x1700
+> [ 9668.574468]  [<c10a44fb>] ? trace_hardirqs_on+0xb/0x10
+> [ 9668.574476]  [<c15e4f60>] ? printk+0x4d/0x4f
+> [ 9668.574479]  [<c10a6e38>] lock_acquire+0x88/0x130
+> [ 9668.574487]  [<c1059740>] ? try_to_del_timer_sync+0x60/0x60
+> [ 9668.574491]  [<c1059790>] del_timer_sync+0x50/0xc0
+> [ 9668.574495]  [<c1059740>] ? try_to_del_timer_sync+0x60/0x60
+> [ 9668.574515]  [<f8aa1c23>] l2cap_send_disconn_req+0xe3/0x160 [bluetooth]
+> ...
 > 
-> Signed-off-by: Cho, Yu-Chen <acho@suse.com>
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  drivers/bluetooth/btusb.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index f077f4d..75943c3 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -93,6 +93,7 @@ static struct usb_device_id btusb_table[] = {
->  	{ USB_DEVICE(0x0c10, 0x0000) },
->  
->  	/* Broadcom BCM20702A0 */
-> +	{ USB_DEVICE(0x04ca, 0x2003) },
->  	{ USB_DEVICE(0x0489, 0xe042) },
->  	{ USB_DEVICE(0x0a5c, 0x21e3) },
->  	{ USB_DEVICE(0x0a5c, 0x21e6) },
+>  net/bluetooth/l2cap_core.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-can you rebase this patch against latest bluetooth.git tree. Thanks.
+Please rebase this patch on top of bluetooth.git. It is a important fix.
+Thanks.
 
 	Gustavo
