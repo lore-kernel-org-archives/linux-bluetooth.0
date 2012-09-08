@@ -1,32 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 8 Sep 2012 17:33:16 -0300
+Date: Sat, 8 Sep 2012 17:28:27 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/6] Bluetooth: trivial: Make hci_chan_del return void
-Message-ID: <20120908203316.GF5788@joana>
+Subject: Re: [PATCH 2/6] Bluetooth: Fix freeing uninitialized delayed works
+Message-ID: <20120908202827.GE5788@joana>
 References: <1346933147-11789-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1346933147-11789-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1346933147-11789-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1346933147-11789-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1346933147-11789-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-09-06 15:05:43 +0300]:
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-09-06 15:05:42 +0300]:
 
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Return code is not needed in hci_chan_del
+> When releasing L2CAP socket which is in BT_CONFIG state l2cap_chan_close
+> invokes l2cap_send_disconn_req which cancel delayed works which are only
+> set in BT_CONNECTED state with l2cap_ertm_init. Add state check before
+> cancelling those works.
+> 
+> ...
+> [ 9668.574372] [21085] l2cap_sock_release: sock cd065200, sk f073e800
+> [ 9668.574399] [21085] l2cap_sock_shutdown: sock cd065200, sk f073e800
+> [ 9668.574411] [21085] l2cap_chan_close: chan f073ec00 state BT_CONFIG sk f073e800
+> [ 9668.574421] [21085] l2cap_send_disconn_req: chan f073ec00 conn ecc16600
+> [ 9668.574441] INFO: trying to register non-static key.
+> [ 9668.574443] the code is fine but needs lockdep annotation.
+> [ 9668.574446] turning off the locking correctness validator.
+> [ 9668.574450] Pid: 21085, comm: obex-client Tainted: G           O 3.5.0+ #57
+> [ 9668.574452] Call Trace:
+> [ 9668.574463]  [<c10a64b3>] __lock_acquire+0x12e3/0x1700
+> [ 9668.574468]  [<c10a44fb>] ? trace_hardirqs_on+0xb/0x10
+> [ 9668.574476]  [<c15e4f60>] ? printk+0x4d/0x4f
+> [ 9668.574479]  [<c10a6e38>] lock_acquire+0x88/0x130
+> [ 9668.574487]  [<c1059740>] ? try_to_del_timer_sync+0x60/0x60
+> [ 9668.574491]  [<c1059790>] del_timer_sync+0x50/0xc0
+> [ 9668.574495]  [<c1059740>] ? try_to_del_timer_sync+0x60/0x60
+> [ 9668.574515]  [<f8aa1c23>] l2cap_send_disconn_req+0xe3/0x160 [bluetooth]
+> ...
 > 
 > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  include/net/bluetooth/hci_core.h |    2 +-
->  net/bluetooth/hci_conn.c         |    4 +---
->  2 files changed, 2 insertions(+), 4 deletions(-)
+>  net/bluetooth/l2cap_core.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-patch has been applied to bluetooth-next.git. Thanks.
+patch has been applied to bluetooth.git. Thanks.
 
 	Gustavo
