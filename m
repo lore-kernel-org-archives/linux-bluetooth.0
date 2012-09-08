@@ -1,37 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 8 Sep 2012 16:46:44 -0300
+Date: Sat, 8 Sep 2012 16:40:13 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] Bluetooth: mgmt: Fix enabling LE while powered off
-Message-ID: <20120908194644.GB5788@joana>
-References: <1346227329-1686-1-git-send-email-andrzej.kaczmarek@tieto.com>
- <1346227329-1686-2-git-send-email-andrzej.kaczmarek@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Make hci_chan_del return void
+Message-ID: <20120908194013.GA5788@joana>
+References: <1346224851-16625-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1346227329-1686-2-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1346224851-16625-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi Andrei,
 
-* Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com> [2012-08-29 10:02:09 +0200]:
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-08-29 10:20:51 +0300]:
 
-> When new BT USB adapter is plugged in it's configured while still being powered
-> off (HCI_AUTO_OFF flag is set), thus Set LE will only set dev_flags but won't
-> write changes to controller. As a result it's not possible to start device
-> discovery session on LE controller as it uses interleaved discovery which
-> requires LE Supported Host flag in extended features.
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> This patch ensures HCI Write LE Host Supported is sent when Set Powered is
-> called to power on controller and clear HCI_AUTO_OFF flag.
+> Return code is not needed in hci_chan_del
 > 
-> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-> Cc: stable@vger.kernel.org
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  net/bluetooth/mgmt.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+>  include/net/bluetooth/hci_core.h |    2 +-
+>  net/bluetooth/hci_conn.c         |    4 +---
+>  2 files changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 0964954..36720f0 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -573,7 +573,7 @@ void hci_conn_hash_flush(struct hci_dev *hdev);
+>  void hci_conn_check_pending(struct hci_dev *hdev);
+>  
+>  struct hci_chan *hci_chan_create(struct hci_conn *conn);
+> -int hci_chan_del(struct hci_chan *chan);
+> +void hci_chan_del(struct hci_chan *chan);
+>  void hci_chan_list_flush(struct hci_conn *conn);
+>  struct hci_chan *hci_chan_lookup_handle(struct hci_conn *hcon, __u16 handle);
+>  struct hci_chan *hci_chan_lookup_handle_all(struct hci_dev *hdev,
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 1c79a76..4695880 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -935,7 +935,7 @@ struct hci_chan *hci_chan_create(struct hci_conn *conn)
+>  	return chan;
+>  }
+>  
+> -int hci_chan_del(struct hci_chan *chan)
+> +void hci_chan_del(struct hci_chan *chan)
+>  {
+>  	struct hci_conn *conn = chan->conn;
+>  	struct hci_dev *hdev = conn->hdev;
+> @@ -948,8 +948,6 @@ int hci_chan_del(struct hci_chan *chan)
+>  
+>  	skb_queue_purge(&chan->data_q);
+>  	kfree(chan);
+> -
+> -	return 0;
+>  }
+>  
+>  void hci_chan_list_flush(struct hci_conn *conn) > -- 
 
-Both patches have been applied to bluetooth.git. Thanks
+This patch doesn't apply on bluetooth-next anymore, please rebase.
 
 	Gustavo
