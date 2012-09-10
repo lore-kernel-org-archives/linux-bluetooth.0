@@ -1,78 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 10 Sep 2012 16:49:36 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv1 01/15] Bluetooth: Set Exended Flowspec flag for HS chan
-In-Reply-To: <1346766274-21612-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Message-ID: <alpine.DEB.2.02.1209101647520.2859@mathewm-linux>
-References: <1346766274-21612-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1346766274-21612-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+In-Reply-To: <CACUGKYONE6a2PWtOEY4Kgg9TQkX3pCwhW9UJLk5KGVtpL5eVaw@mail.gmail.com>
+References: <CACUGKYONE6a2PWtOEY4Kgg9TQkX3pCwhW9UJLk5KGVtpL5eVaw@mail.gmail.com>
+Date: Mon, 10 Sep 2012 16:34:46 -0700
+Message-ID: <CACUGKYPwTxRS8JN78J-oPSwz0mhnKvxHg=ybm5vyiKivEpM03A@mail.gmail.com>
+Subject: Re: Dropping connection (bit off-topic)
+From: John Tobias <john.tobias.ph@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Just to follow up, I used hcidump and found out an interesting info:
 
-Andrei -
+    bdaddr 5C:35:3C:72:B2:AF type 1
+> HCI Event: Command Status (0x0f) plen 4
+    LE Create Connection (0x08|0x000d) status 0x00 ncmd 1
+> HCI Event: LE Meta Event (0x3e) plen 19
+    LE Connection Complete
+      status 0x00 handle 77, role master
+      bdaddr 5C:35:3C:72:B2:AF (Random)
+> ACL data: handle 77 flags 0x02 dlen 11
+    ATT: Read By Type req (0x08)
+      start 0x0001, end 0xffff
+      type-uuid 0x2a00
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 77 reason 0x13
+    Reason: Remote User Terminated Connection
 
-On Tue, 4 Sep 2012, Andrei Emeltchenko wrote:
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> For AMP we always assume EFS L2CAP option.
->
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
-> include/net/bluetooth/l2cap.h |    2 ++
-> net/bluetooth/l2cap_core.c    |    7 ++++++-
-> 2 files changed, 8 insertions(+), 1 deletion(-)
->
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 161be83..3ec8679 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -508,6 +508,8 @@ struct l2cap_chan {
-> 	__u32		remote_acc_lat;
-> 	__u32		remote_flush_to;
->
-> +	__u8		ctrl_id;
-> +
+The iPhone was requesting for "ATT: Read By Type req (0x08)" and the
+gatttool seems not reponding. So, after 30 secs the iPhone dropped the
+connection.
 
-How about "remote_amp_id" instead of ctrl_id?  The channel move code 
-tracks local_amp_id.  Why does the remote controller id need to be 
-tracked?
-
-> 	struct delayed_work	chan_timer;
-> 	struct delayed_work	retrans_timer;
-> 	struct delayed_work	monitor_timer;
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index de6f52c..aea2b50 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -5439,8 +5439,13 @@ void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
-> void l2cap_chan_create_cfm(struct hci_conn *hcon, u8 remote_id)
-> {
-> 	struct amp_mgr *mgr = hcon->amp_mgr;
-> +	struct l2cap_chan *chan = mgr->bredr_chan;
->
-> -	l2cap_send_chan_create_req(mgr->bredr_chan, remote_id);
-> +	/* Set Extended Flow Spec for AMP */
-> +	set_bit(FLAG_EFS_ENABLE, &chan->flags);
-> +	chan->ctrl_id = remote_id;
-> +
-> +	l2cap_send_chan_create_req(chan, remote_id);
-> }
->
-> int l2cap_disconn_ind(struct hci_conn *hcon)
-> -- 
-> 1.7.9.5
+Any idea how the gatttool could respond to the said request?.
 
 Regards,
 
---
-Mat Martineau
-
-The Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum,
-hosted by The Linux Foundation
+john
 
 
+On Mon, Sep 10, 2012 at 2:35 PM, John Tobias <john.tobias.ph@gmail.com> wrote:
+> Hello Guys,
+>
+> I am using pandaboard with USB BLE dongle and an apps in iPhone that
+> do the advertising. I was able to connect to the said device from my
+> pandaboard using the following commands:
+>
+> gatttool -i hci1 -m 27 -I -b 74:xx:xx:xx:xx:xx
+> connect
+>
+> But, I've noticed that after 30 secs, the iPhone dropped off the
+> connection. I am just wondering if anyone here have tried playing with
+> the iPhone using the ble connection?.
+>
+> Regards,
+>
+> John
