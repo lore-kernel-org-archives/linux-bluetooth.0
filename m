@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 7/7 v4] client-doc: Update documentation of PhonebookAccess interface
-Date: Mon, 10 Sep 2012 11:02:59 +0300
-Message-Id: <1347264179-31477-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 6/7 v4] client: Move common code to pull_phonebook
+Date: Mon, 10 Sep 2012 11:02:58 +0300
+Message-Id: <1347264179-31477-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1347264179-31477-1-git-send-email-luiz.dentz@gmail.com>
 References: <1347264179-31477-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,129 +12,159 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- doc/client-api.txt | 62 +++++++++++++++++++++++++++++++-----------------------
- 1 file changed, 36 insertions(+), 26 deletions(-)
+ client/pbap.c | 79 +++++++++++++++++++++++------------------------------------
+ 1 file changed, 30 insertions(+), 49 deletions(-)
 
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 7ca65cc..f447789 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -206,7 +206,7 @@ Methods		void Select(string location, string phonebook)
- 				"mch":	missing call history
- 				"cch":	combination of ich och mch
+diff --git a/client/pbap.c b/client/pbap.c
+index c0ccbdc..a8db1cf 100644
+--- a/client/pbap.c
++++ b/client/pbap.c
+@@ -524,22 +524,29 @@ static GObexApparam *parse_filters(GObexApparam *apparam,
+ 	return apparam;
+ }
  
--		object, dict PullAll(string targetfile)
-+		object, dict PullAll(string targetfile, dict filters)
- 
- 			Return the entire phonebook object from the PSE server
- 			in plain string with vcard format, and store it in
-@@ -222,14 +222,21 @@ Methods		void Select(string location, string phonebook)
- 			The properties of this transfer are also returned along
- 			with the object path, to avoid a call to GetProperties.
- 
--		array{string vcard, string name} List()
-+			Possible filters: Format, Order, Offset, MaxCount and
-+			Fields
+-static struct obc_transfer *pull_phonebook(struct pbap_data *pbap,
++static DBusMessage *pull_phonebook(struct pbap_data *pbap,
+ 						DBusMessage *message,
+-						guint8 type, const char *name,
++						guint8 type,
+ 						const char *targetfile,
+-						GObexApparam *apparam,
+-						GError **err)
++						GObexApparam *apparam)
+ {
+ 	struct pending_request *request;
+ 	struct obc_transfer *transfer;
++	char *name;
+ 	guint8 buf[32];
+ 	gsize len;
+ 	session_callback_t func;
++	DBusMessage *reply;
++	GError *err = NULL;
 +
-+		array{string vcard, string name} List(dict filters)
- 
- 			Return an array of vcard-listing data where every entry
- 			consists of a pair of strings containing the vcard
- 			handle and the contact name. For example:
- 				"1.vcf" : "John"
- 
--		object, dict Pull(string vcard, string targetfile)
-+			Possible filters: Order, Offset and MaxCount
++	name = g_strconcat(pbap->path, ".vcf", NULL);
 +
++	len = g_obex_apparam_encode(apparam, buf, sizeof(buf));
++	g_obex_apparam_free(apparam);
+ 
+-	transfer = obc_transfer_get("x-bt/phonebook", name, targetfile, err);
++	transfer = obc_transfer_get("x-bt/phonebook", name, targetfile, &err);
+ 	if (transfer == NULL)
+-		return NULL;
++		goto fail;
+ 
+ 	switch (type) {
+ 	case PULLPHONEBOOK:
+@@ -555,19 +562,28 @@ static struct obc_transfer *pull_phonebook(struct pbap_data *pbap,
+ 		return NULL;
+ 	}
+ 
+-	len = g_obex_apparam_encode(apparam, buf, sizeof(buf));
+-
+ 	obc_transfer_set_params(transfer, buf, len);
+ 
+-	if (!obc_session_queue(pbap->session, transfer, func, request, err)) {
++	if (!obc_session_queue(pbap->session, transfer, func, request, &err)) {
+ 		if (request != NULL)
+ 			pending_request_free(request);
+ 
+-		return NULL;
++		goto fail;
+ 	}
+ 
++	g_free(name);
 +
-+		object, dict
-+		Pull(string vcard, string targetfile, dict filters)
++	if (targetfile == NULL)
++		return NULL;
  
- 			Given a vcard handle, retrieve the vcard in the current
- 			phonebook object and store it in a local file.
-@@ -244,8 +251,11 @@ Methods		void Select(string location, string phonebook)
- 			The properties of this transfer are also returned along
- 			with the object path, to avoid a call to GetProperties.
- 
-+			Possbile filters: Format and Fields
+-	return transfer;
++	return obc_transfer_create_dbus_reply(transfer, message);
 +
-+
- 		array{string vcard, string name}
--		Search(string field, string value)
-+		Search(string field, string value, dict filters)
++fail:
++	g_free(name);
++	reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed", "%s",
++								err->message);
++	g_error_free(err);
++	return reply;
+ }
  
- 			Search for entries matching the given condition and
- 			return an array of vcard-listing data where every entry
-@@ -258,47 +268,47 @@ Methods		void Select(string location, string phonebook)
- 				{ "name" (default) | "number" | "sound" }
- 			value : the string value to search for
+ static DBusMessage *pull_vcard_listing(struct pbap_data *pbap,
+@@ -655,11 +671,8 @@ static DBusMessage *pbap_pull_all(DBusConnection *connection,
+ 					DBusMessage *message, void *user_data)
+ {
+ 	struct pbap_data *pbap = user_data;
+-	struct obc_transfer *transfer;
+ 	const char *targetfile;
+-	char *name;
+ 	GObexApparam *apparam;
+-	GError *err = NULL;
+ 	DBusMessageIter args;
  
-+
-+			Possible filters: Order, Offset and MaxCount
-+
- 		uint16 GetSize()
+ 	if (!pbap->path)
+@@ -687,22 +700,8 @@ static DBusMessage *pbap_pull_all(DBusConnection *connection,
+ 				ERROR_INTERFACE ".InvalidArguments", NULL);
+ 	}
  
- 			Return the number of entries in the selected phonebook
- 			object that are actually used (i.e. indexes that
- 			correspond to non-NULL entries).
+-	name = g_strconcat(pbap->path, ".vcf", NULL);
+-
+-	transfer = pull_phonebook(pbap, message, PULLPHONEBOOK, name,
+-						targetfile, apparam, &err);
+-	g_free(name);
+-	g_obex_apparam_free(apparam);
+-
+-	if (transfer == NULL) {
+-		DBusMessage *reply = g_dbus_create_error(message,
+-					ERROR_INTERFACE ".Failed", "%s",
+-					err->message);
+-		g_error_free(err);
+-		return reply;
+-	}
+-
+-	return obc_transfer_create_dbus_reply(transfer, message);
++	return pull_phonebook(pbap, message, PULLPHONEBOOK, targetfile,
++								apparam);
+ }
  
--		void SetFormat(string format)
-+		array{string} ListFilterFields()
+ static DBusMessage *pull_vcard(struct pbap_data *pbap, DBusMessage *message,
+@@ -878,11 +877,7 @@ static DBusMessage *pbap_get_size(DBusConnection *connection,
+ 					DBusMessage *message, void *user_data)
+ {
+ 	struct pbap_data *pbap = user_data;
+-	DBusMessage *reply;
+-	struct obc_transfer *transfer;
+-	char *name;
+ 	GObexApparam *apparam;
+-	GError *err = NULL;
+ 	DBusMessageIter args;
  
--			Indicate the format of the vcard that should be return
--			by related methods.
-+			Return All Available fields that can be used in Fields
-+			filter.
+ 	if (!pbap->path)
+@@ -892,25 +887,11 @@ static DBusMessage *pbap_get_size(DBusConnection *connection,
  
--			format : { "vcard21" (default) | "vcard30" }
-+Filter:		string Format:
+ 	dbus_message_iter_init(message, &args);
  
--		void SetOrder(string order)
-+			Items vcard format
+-	name = g_strconcat(pbap->path, ".vcf", NULL);
+-
+ 	apparam = g_obex_apparam_set_uint16(NULL, MAXLISTCOUNT_TAG, 0);
+ 	apparam = g_obex_apparam_set_uint16(apparam, LISTSTARTOFFSET_TAG,
+ 							DEFAULT_OFFSET);
  
--			Indicate the sorting method of the vcard-listing data
--			returned by List and Search methods.
-+			Possible values: "vcard21" (default) or "vcard30"
+-	transfer = pull_phonebook(pbap, message, GETPHONEBOOKSIZE, name, NULL,
+-								apparam, &err);
+-
+-	g_free(name);
+-	g_obex_apparam_free(apparam);
+-
+-	if (transfer != NULL)
+-		return NULL;
+-
+-	reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed", "%s",
+-								err->message);
+-	g_error_free(err);
+-	return reply;
++	return pull_phonebook(pbap, message, GETPHONEBOOKSIZE, NULL, apparam);
+ }
  
--			order : { "indexed" (default) | "alphanumeric" |
--					"phonetic" }
-+		string Order:
- 
--		void SetFilter(array{string})
-+			Items order
- 
--			Indicate fields that should be contained in vcards
--			return by related methods.
-+			Possible values: "indexed" (default), "alphanumeric" or
-+			"phonetic"
- 
--			Give an empty array will clear the filter and return
--			all fields available in vcards. And this is the default
--			behavior.
-+		uint16 Offset:
- 
--			Possible filter fields : "VERSION", "FN", ..., "ALL",
--			"bit[0-63]"
-+			Offset of the first item, default is 0
- 
--		array{string} ListFilterFields()
-+		uint16 MaxCount:
-+
-+			Maximum number of items, default is unlimited (65535)
-+
-+		array{string} Fields:
- 
--			Return All Available fields that can be used in
--			SetFilter method.
-+			Item vcard fields, default is all values.
- 
--		array{string} GetFilter()
-+			Possible values can be query with ListFilterFields.
- 
--			Return the current filter setting
- 
- Synchronization hierarchy
- =======================
+ static gchar **get_filter_strs(uint64_t filter, gint *size)
 -- 
 1.7.11.4
 
