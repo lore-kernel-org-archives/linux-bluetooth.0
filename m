@@ -1,43 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: marcel <marcel@holtmann.org>, albert.o.ho@intel.com
-Subject: [RFC 0/3] Support for Intel BT USB driver
-Date: Mon, 10 Sep 2012 15:34:51 -0700
-Message-ID: <1860916.qXTngGPbFd@tedd-ubuntu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <CACUGKYONE6a2PWtOEY4Kgg9TQkX3pCwhW9UJLk5KGVtpL5eVaw@mail.gmail.com>
+References: <CACUGKYONE6a2PWtOEY4Kgg9TQkX3pCwhW9UJLk5KGVtpL5eVaw@mail.gmail.com>
+Date: Mon, 10 Sep 2012 14:39:11 -0700
+Message-ID: <CACUGKYPHy2XyFK_LBHmMh4E1ZdN71SUbdJH9Ye8SJ-ijPmfxKQ@mail.gmail.com>
+Subject: Re: Dropping connection (bit off-topic)
+From: John Tobias <john.tobias.ph@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+Addition to that, if iPhone to iPhone bluetooth le connection, it
+won't drop the connectivity.
 
-These set of patches adds Intel BT USB support.  The patch adds an extension
-to execute of vendor specific initialization at early stage (before normal
-BT controller initialization & after the USB is initialized).
+Regards,
 
-- During the USB probe time, if the VID/PID are matched, it executes a
-  vendor specific initialization routine and uses a vendor specific HCI
-  event handler.  When completed, the existing HCI event handler is restored. 
+John
 
-- When vendor specific initialization completes, normal BT controller
-  initialization continues.
-
-The rest of patches are Intel specific implementation.
-
-Tedd Ho-Jeong An (3):
-  Bluetooth: Add initial skeleton for Intel BT USB support
-  Bluetooth: Implement Intel specific device initialization
-  Bluetooth: Add timeout for Intel specific device initialization
-
- drivers/bluetooth/Makefile       |    2 +-
- drivers/bluetooth/btusb.c        |   29 +++
- drivers/bluetooth/btusb.h        |   31 +++
- drivers/bluetooth/btusb_intel.c  |  420 ++++++++++++++++++++++++++++++++++++++
- include/net/bluetooth/hci_core.h |    6 +
- net/bluetooth/hci_core.c         |   16 ++
- 6 files changed, 503 insertions(+), 1 deletion(-)
- create mode 100644 drivers/bluetooth/btusb.h
- create mode 100644 drivers/bluetooth/btusb_intel.c
-
--- 
-1.7.9.5
+On Mon, Sep 10, 2012 at 2:35 PM, John Tobias <john.tobias.ph@gmail.com> wrote:
+> Hello Guys,
+>
+> I am using pandaboard with USB BLE dongle and an apps in iPhone that
+> do the advertising. I was able to connect to the said device from my
+> pandaboard using the following commands:
+>
+> gatttool -i hci1 -m 27 -I -b 74:xx:xx:xx:xx:xx
+> connect
+>
+> But, I've noticed that after 30 secs, the iPhone dropped off the
+> connection. I am just wondering if anyone here have tried playing with
+> the iPhone using the ble connection?.
+>
+> Regards,
+>
+> John
