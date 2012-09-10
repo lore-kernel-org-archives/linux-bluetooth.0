@@ -1,44 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd] client: Use larger timeout first packet in transfers
-Date: Mon, 10 Sep 2012 14:32:38 +0300
-Message-Id: <1347276758-5527-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 10 Sep 2012 13:55:57 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv0] Bluetooth: Fix SO_LINGER in L2CAP
+Message-ID: <20120910105550.GA2558@aemeltch-MOBL1>
+References: <alpine.DEB.2.02.1209070949580.3761@mathewm-linux>
+ <1347265388-19759-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CAJdJm_PpSukMH=d1giiN1WKmXAam7s5OQB9-YS1aYwv1rB+84Q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAJdJm_PpSukMH=d1giiN1WKmXAam7s5OQB9-YS1aYwv1rB+84Q@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Anderson,
 
-This align the client timeout for GET operations with g_obex_get_req_pkt
-which does use 60 seconds to cover for extra interaction during the first
-packet.
----
- client/transfer.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+On Mon, Sep 10, 2012 at 06:43:53AM -0400, Anderson Lizardo wrote:
+> Hi Andrei,
+> 
+> On Mon, Sep 10, 2012 at 4:23 AM, Andrei Emeltchenko
+> <Andrei.Emeltchenko.news@gmail.com> wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Could you explain on the commit message what is broken on the current
+> code, so we can review the semantics of your changes?
 
-diff --git a/client/transfer.c b/client/transfer.c
-index 76f6681..e9fabfb 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -48,6 +48,8 @@
- 
- #define OBC_TRANSFER_ERROR obc_transfer_error_quark()
- 
-+#define FIRST_PACKET_TIMEOUT 60
-+
- static guint64 counter = 0;
- 
- struct transfer_callback {
-@@ -662,7 +664,8 @@ static gboolean transfer_start_get(struct obc_transfer *transfer, GError **err)
- 						transfer->params->data,
- 						transfer->params->size);
- 
--	transfer->xfer = g_obex_send_req(transfer->obex, req, -1,
-+	transfer->xfer = g_obex_send_req(transfer->obex, req,
-+						FIRST_PACKET_TIMEOUT,
- 						get_xfer_progress_first,
- 						transfer, err);
- 	if (transfer->xfer == 0)
--- 
-1.7.11.4
+ If we have unacked frames when closing bluetooth socket we deadlock
+ since conn->chan_lock, chan->lock and socket lock are taken.
+
+Also see Mat comments.
+
+Best regards 
+Andrei Emeltchenko 
 
