@@ -1,117 +1,140 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0] Bluetooth: Fix SO_LINGER in L2CAP
-Date: Mon, 10 Sep 2012 11:23:08 +0300
-Message-Id: <1347265388-19759-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <alpine.DEB.2.02.1209070949580.3761@mathewm-linux>
-References: <alpine.DEB.2.02.1209070949580.3761@mathewm-linux>
+Subject: [PATCH obexd 7/7 v4] client-doc: Update documentation of PhonebookAccess interface
+Date: Mon, 10 Sep 2012 11:02:59 +0300
+Message-Id: <1347264179-31477-7-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1347264179-31477-1-git-send-email-luiz.dentz@gmail.com>
+References: <1347264179-31477-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- include/net/bluetooth/l2cap.h |    2 +-
- net/bluetooth/l2cap_core.c    |   35 ++++++++++++++++-------------------
- net/bluetooth/l2cap_sock.c    |    9 +++------
- 3 files changed, 20 insertions(+), 26 deletions(-)
+ doc/client-api.txt | 62 +++++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 36 insertions(+), 26 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 8a726ff..72ffe53 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -757,7 +757,7 @@ int l2cap_init_sockets(void);
- void l2cap_cleanup_sockets(void);
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index 7ca65cc..f447789 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -206,7 +206,7 @@ Methods		void Select(string location, string phonebook)
+ 				"mch":	missing call history
+ 				"cch":	combination of ich och mch
  
- void __l2cap_connect_rsp_defer(struct l2cap_chan *chan);
--int __l2cap_wait_ack(struct sock *sk);
-+int __l2cap_wait_ack(struct sock *sk, unsigned long timeo);
+-		object, dict PullAll(string targetfile)
++		object, dict PullAll(string targetfile, dict filters)
  
- int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm);
- int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b1914e6..0502042 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1696,35 +1696,32 @@ done:
- 	return err;
- }
+ 			Return the entire phonebook object from the PSE server
+ 			in plain string with vcard format, and store it in
+@@ -222,14 +222,21 @@ Methods		void Select(string location, string phonebook)
+ 			The properties of this transfer are also returned along
+ 			with the object path, to avoid a call to GetProperties.
  
--int __l2cap_wait_ack(struct sock *sk)
-+int __l2cap_wait_ack(struct sock *sk, unsigned long timeo)
- {
- 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
--	DECLARE_WAITQUEUE(wait, current);
- 	int err = 0;
--	int timeo = HZ/5;
- 
--	add_wait_queue(sk_sleep(sk), &wait);
--	set_current_state(TASK_INTERRUPTIBLE);
--	while (chan->unacked_frames > 0 && chan->conn) {
--		if (!timeo)
--			timeo = HZ/5;
-+	if (unlikely(!skb_queue_empty(&chan->tx_q))) {
-+		DECLARE_WAITQUEUE(wait, current);
+-		array{string vcard, string name} List()
++			Possible filters: Format, Order, Offset, MaxCount and
++			Fields
 +
-+		add_wait_queue(sk_sleep(sk), &wait);
-+		set_current_state(TASK_INTERRUPTIBLE);
++		array{string vcard, string name} List(dict filters)
  
- 		if (signal_pending(current)) {
- 			err = sock_intr_errno(timeo);
--			break;
--		}
-+		} else {
-+			release_sock(sk);
-+			timeo = schedule_timeout(timeo);
-+			lock_sock(sk);
-+			set_current_state(TASK_INTERRUPTIBLE);
+ 			Return an array of vcard-listing data where every entry
+ 			consists of a pair of strings containing the vcard
+ 			handle and the contact name. For example:
+ 				"1.vcf" : "John"
  
--		release_sock(sk);
--		timeo = schedule_timeout(timeo);
--		lock_sock(sk);
--		set_current_state(TASK_INTERRUPTIBLE);
-+			err = sock_error(sk);
-+		}
- 
--		err = sock_error(sk);
--		if (err)
--			break;
-+		set_current_state(TASK_RUNNING);
-+		remove_wait_queue(sk_sleep(sk), &wait);
- 	}
--	set_current_state(TASK_RUNNING);
--	remove_wait_queue(sk_sleep(sk), &wait);
+-		object, dict Pull(string vcard, string targetfile)
++			Possible filters: Order, Offset and MaxCount
 +
- 	return err;
- }
++
++		object, dict
++		Pull(string vcard, string targetfile, dict filters)
  
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index f9cdc02..bb3515f 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -866,18 +866,15 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
- 	lock_sock(sk);
+ 			Given a vcard handle, retrieve the vcard in the current
+ 			phonebook object and store it in a local file.
+@@ -244,8 +251,11 @@ Methods		void Select(string location, string phonebook)
+ 			The properties of this transfer are also returned along
+ 			with the object path, to avoid a call to GetProperties.
  
- 	if (!sk->sk_shutdown) {
--		if (chan->mode == L2CAP_MODE_ERTM)
--			err = __l2cap_wait_ack(sk);
-+		if (chan->mode == L2CAP_MODE_ERTM &&
-+		    sock_flag(sk, SOCK_LINGER && sk->sk_lingertime))
-+			err = __l2cap_wait_ack(sk, sk->sk_lingertime);
++			Possbile filters: Format and Fields
++
++
+ 		array{string vcard, string name}
+-		Search(string field, string value)
++		Search(string field, string value, dict filters)
  
- 		sk->sk_shutdown = SHUTDOWN_MASK;
+ 			Search for entries matching the given condition and
+ 			return an array of vcard-listing data where every entry
+@@ -258,47 +268,47 @@ Methods		void Select(string location, string phonebook)
+ 				{ "name" (default) | "number" | "sound" }
+ 			value : the string value to search for
  
- 		release_sock(sk);
- 		l2cap_chan_close(chan, 0);
- 		lock_sock(sk);
--
--		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime)
--			err = bt_sock_wait_state(sk, BT_CLOSED,
--							sk->sk_lingertime);
- 	}
++
++			Possible filters: Order, Offset and MaxCount
++
+ 		uint16 GetSize()
  
- 	if (!err && sk->sk_err)
+ 			Return the number of entries in the selected phonebook
+ 			object that are actually used (i.e. indexes that
+ 			correspond to non-NULL entries).
+ 
+-		void SetFormat(string format)
++		array{string} ListFilterFields()
+ 
+-			Indicate the format of the vcard that should be return
+-			by related methods.
++			Return All Available fields that can be used in Fields
++			filter.
+ 
+-			format : { "vcard21" (default) | "vcard30" }
++Filter:		string Format:
+ 
+-		void SetOrder(string order)
++			Items vcard format
+ 
+-			Indicate the sorting method of the vcard-listing data
+-			returned by List and Search methods.
++			Possible values: "vcard21" (default) or "vcard30"
+ 
+-			order : { "indexed" (default) | "alphanumeric" |
+-					"phonetic" }
++		string Order:
+ 
+-		void SetFilter(array{string})
++			Items order
+ 
+-			Indicate fields that should be contained in vcards
+-			return by related methods.
++			Possible values: "indexed" (default), "alphanumeric" or
++			"phonetic"
+ 
+-			Give an empty array will clear the filter and return
+-			all fields available in vcards. And this is the default
+-			behavior.
++		uint16 Offset:
+ 
+-			Possible filter fields : "VERSION", "FN", ..., "ALL",
+-			"bit[0-63]"
++			Offset of the first item, default is 0
+ 
+-		array{string} ListFilterFields()
++		uint16 MaxCount:
++
++			Maximum number of items, default is unlimited (65535)
++
++		array{string} Fields:
+ 
+-			Return All Available fields that can be used in
+-			SetFilter method.
++			Item vcard fields, default is all values.
+ 
+-		array{string} GetFilter()
++			Possible values can be query with ListFilterFields.
+ 
+-			Return the current filter setting
+ 
+ Synchronization hierarchy
+ =======================
 -- 
-1.7.9.5
+1.7.11.4
 
