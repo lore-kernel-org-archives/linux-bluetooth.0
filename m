@@ -1,59 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: marcel <marcel@holtmann.org>, albert.o.ho@intel.com
+Subject: [RFC 3/3] Bluetooth: Add timeout for Intel specific device initialization
+Date: Mon, 10 Sep 2012 15:35:41 -0700
+Message-ID: <2047428.SOUXqlU6Wn@tedd-ubuntu>
 MIME-Version: 1.0
-In-Reply-To: <CACUGKYONE6a2PWtOEY4Kgg9TQkX3pCwhW9UJLk5KGVtpL5eVaw@mail.gmail.com>
-References: <CACUGKYONE6a2PWtOEY4Kgg9TQkX3pCwhW9UJLk5KGVtpL5eVaw@mail.gmail.com>
-Date: Mon, 10 Sep 2012 16:34:46 -0700
-Message-ID: <CACUGKYPwTxRS8JN78J-oPSwz0mhnKvxHg=ybm5vyiKivEpM03A@mail.gmail.com>
-Subject: Re: Dropping connection (bit off-topic)
-From: John Tobias <john.tobias.ph@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Just to follow up, I used hcidump and found out an interesting info:
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-    bdaddr 5C:35:3C:72:B2:AF type 1
-> HCI Event: Command Status (0x0f) plen 4
-    LE Create Connection (0x08|0x000d) status 0x00 ncmd 1
-> HCI Event: LE Meta Event (0x3e) plen 19
-    LE Connection Complete
-      status 0x00 handle 77, role master
-      bdaddr 5C:35:3C:72:B2:AF (Random)
-> ACL data: handle 77 flags 0x02 dlen 11
-    ATT: Read By Type req (0x08)
-      start 0x0001, end 0xffff
-      type-uuid 0x2a00
-> HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 77 reason 0x13
-    Reason: Remote User Terminated Connection
+This patch adds the tiemout for Intel specific device initialization.
 
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+---
+ drivers/bluetooth/btusb_intel.c |   19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-The iPhone was requesting for "ATT: Read By Type req (0x08)" and the
-gatttool seems not reponding. So, after 30 secs the iPhone dropped the
-connection.
-
-Any idea how the gatttool could respond to the said request?.
-
-Regards,
-
-john
-
-
-On Mon, Sep 10, 2012 at 2:35 PM, John Tobias <john.tobias.ph@gmail.com> wrote:
-> Hello Guys,
->
-> I am using pandaboard with USB BLE dongle and an apps in iPhone that
-> do the advertising. I was able to connect to the said device from my
-> pandaboard using the following commands:
->
-> gatttool -i hci1 -m 27 -I -b 74:xx:xx:xx:xx:xx
-> connect
->
-> But, I've noticed that after 30 secs, the iPhone dropped off the
-> connection. I am just wondering if anyone here have tried playing with
-> the iPhone using the ble connection?.
->
-> Regards,
->
-> John
+diff --git a/drivers/bluetooth/btusb_intel.c b/drivers/bluetooth/btusb_intel.c
+index d45ddb9..3657203 100644
+--- a/drivers/bluetooth/btusb_intel.c
++++ b/drivers/bluetooth/btusb_intel.c
+@@ -30,6 +30,9 @@
+ 
+ #include "btusb.h"
+ 
++/* patch timeout - 10 seconds */
++#define INTEL_PATCH_TIMEOUT		msecs_to_jiffies(10000)
++
+ /* Intel specific HCI cmd opcodes */
+ #define INTEL_HCI_MFG_MODE		0xfc11
+ #define INTEL_HCI_GET_VER		0xfc05
+@@ -71,6 +74,7 @@ struct intel_patch_data {
+ 	u8			patch_reset;
+ 
+ 	struct completion	wait_patch_completion;
++	struct timer_list	patch_timeout;
+ 
+ 	char			device_ver[32];
+ 	const struct firmware	*fw;
+@@ -222,6 +226,16 @@ static int intel_prepare_patch_file(struct intel_patch_data *data)
+ 	return 0;
+ }
+ 
++static void intel_patch_timeout(unsigned long arg)
++{
++	struct intel_patch_data *data = (void *)arg;
++
++	BT_ERR("patch timer expired");
++	data->state = INTEL_PATCH_ERROR;
++
++	complete(&data->wait_patch_completion);
++}
++
+ int btusb_intel_init(struct hci_dev *hdev)
+ {
+ 	int ret;
+@@ -243,6 +257,10 @@ int btusb_intel_init(struct hci_dev *hdev)
+ 
+ 	init_completion(&data->wait_patch_completion);
+ 
++	setup_timer(&data->patch_timeout, intel_patch_timeout,
++		    (unsigned long) data);
++	mod_timer(&data->patch_timeout, jiffies + INTEL_PATCH_TIMEOUT);
++
+ 	while (cont) {
+ 		BT_DBG("patch state: %d", data->state);
+ 		switch (data->state) {
+@@ -324,6 +342,7 @@ skip_wait:
+ 	}
+ 
+ exit_error:
++	del_timer_sync(&data->patch_timeout);
+ 	release_firmware(data->fw);
+ 	kfree(data);
+ 
+-- 
+1.7.9.5
