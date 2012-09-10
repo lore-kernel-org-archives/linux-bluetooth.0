@@ -1,91 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: marcel <marcel@holtmann.org>, "Ho, Albert O" <albert.o.ho@intel.com>, "tedd.an" <tedd.an@intel.com>
-Subject: [RFC 0/3] Support for Intel BT USB driver
-Date: Mon, 10 Sep 2012 14:29:04 -0700
-Message-ID: <1738183.v9YWhIEdjP@tedd-ubuntu>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="nextPart1494215.BJ7lXqxGKP"
+In-Reply-To: <CABBYNZJpHkt8CGDsfVwirZ=vecb-fhbpPbrVFKt1UR_rA25mSw@mail.gmail.com>
+References: <1346378760.7976.2.camel@obelisk.thedillows.org>
+	<20120907124559.GA16092@x220>
+	<CABBYNZ+5E+BC-+9fj0e7iUpEDFJrJBQo8aoMZj8ZEkmiuB=QLA@mail.gmail.com>
+	<1347284864.3532.1.camel@sirocco.hadess.net>
+	<CABBYNZJpHkt8CGDsfVwirZ=vecb-fhbpPbrVFKt1UR_rA25mSw@mail.gmail.com>
+Date: Mon, 10 Sep 2012 22:03:18 +0300
+Message-ID: <CABBYNZ+n9obON7iNcv66x2ZVQCeTs_JoJUDXZFwxJJ6C4cb4YQ@mail.gmail.com>
+Subject: Re: [PATCH] Add support for Logitech Harmony Adapter for PS3
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: David Dillow <dave@thedillows.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Bastien,
 
---nextPart1494215.BJ7lXqxGKP
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+On Mon, Sep 10, 2012 at 4:58 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Bastien,
+>
+> On Mon, Sep 10, 2012 at 4:47 PM, Bastien Nocera <hadess@hadess.net> wrote:
+>> Em Mon, 2012-09-10 às 16:11 +0300, Luiz Augusto von Dentz escreveu:
+>>> Hi David, Bastien,
+>>>
+>>> So we are plannin to rid of the fakehid.c in favor of implementing it
+>>> properly inside the kernel similarly to what was done to wiimote, so
+>>> is there any obstacle for doing that?
+>>>
+>>> The kernel seems to already have some support for sixaxis in
+>>> drivers/hid/hid-sony.c, so I suppose the following would enable us to
+>>> use it:
+>>
+>> It won't. They're not the same hardware.
+>
+> What hardware is that then? And why wouldn't the kernel be able to
+> support even if it is a different driver?
 
-From: Tedd Ho-Jeong AN <tedd.an@intel.com>
+So what exactly are the difference between 0x0268 and 0x0306? And why
+sixpair.c save as 0x0268 while fakeinput.c uses 0x0306?
 
-These set of patches adds Intel BT USB support.  The patch adds an extension
-to execute of vendor specific initialization at early stage (before normal
-BT controller initialization & after the USB is initialized).
-
-- During the USB probe time, if the VID/PID are matched, it executes a
-  vendor specific initialization routine and uses a vendor specific HCI
-  event handler.  When completed, the existing HCI event handler is restored.
-- When vendor specific initialization completes, normal BT controller
-  initialization continues.
-
-The rest of patches are Intel specific implementation.
-
-Tedd Ho-Jeong An (3):
-  Bluetooth: Add initial skeleton for Intel BT USB support
-  Bluetooth: Implement Intel specific device initialization
-  Bluetooth: Add timeout for Intel specific device initialization
-
- drivers/bluetooth/Makefile       |    2 +-
- drivers/bluetooth/btusb.c        |   29 +++
- drivers/bluetooth/btusb.h        |   31 +++
- drivers/bluetooth/btusb_intel.c  |  420 ++++++++++++++++++++++++++++++++++++++
- include/net/bluetooth/hci_core.h |    6 +
- net/bluetooth/hci_core.c         |   16 ++
- 6 files changed, 503 insertions(+), 1 deletion(-)
- create mode 100644 drivers/bluetooth/btusb.h
- create mode 100644 drivers/bluetooth/btusb_intel.c
+Also, after fixing sixpair.c to be able to compile it does add to the
+storage but it does not create any object until bluetoothd is
+restarted and even after restart it does not allow the device to
+connect because it does has the record (although this can be fixed by
+automatically add the UUID once we find out it is attempt to connect).
 
 -- 
-1.7.9.5
-
-
---nextPart1494215.BJ7lXqxGKP
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/html; charset="us-ascii"
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
-<html><head><meta name="qrichtext" content="1" /><style type="text/css">
-p, li { white-space: pre-wrap; }
-</style></head><body style=" font-family:'Ubuntu'; font-size:9pt; font-weight:400; font-style:normal;">
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;">From: Tedd Ho-Jeong AN &lt;tedd.an@intel.com&gt;</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; ">&nbsp;</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;">These set of patches adds Intel BT USB support.  The patch adds an extension</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;">to execute of vendor specific initialization at early stage (before normal</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;">BT controller initialization &amp; after the USB is initialized).</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; ">&nbsp;</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;">- During the USB probe time, if the VID/PID are matched, it executes a</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;">  vendor specific initialization routine and uses a vendor specific HCI</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;">  event handler.  When completed, the existing HCI event handler is restored.</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;">- When vendor specific initialization completes, normal BT controller</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;">  initialization continues.</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; ">&nbsp;</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;">The rest of patches are Intel specific implementation.</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; ">&nbsp;</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;">Tedd Ho-Jeong An (3):</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;">  Bluetooth: Add initial skeleton for Intel BT USB support</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;">  Bluetooth: Implement Intel specific device initialization</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;">  Bluetooth: Add timeout for Intel specific device initialization</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; ">&nbsp;</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;"> drivers/bluetooth/Makefile       |    2 +-</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;"> drivers/bluetooth/btusb.c        |   29 +++</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;"> drivers/bluetooth/btusb.h        |   31 +++</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;"> drivers/bluetooth/btusb_intel.c  |  420 ++++++++++++++++++++++++++++++++++++++</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;"> include/net/bluetooth/hci_core.h |    6 +</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;"> net/bluetooth/hci_core.c         |   16 ++</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;"> 6 files changed, 503 insertions(+), 1 deletion(-)</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;"> create mode 100644 drivers/bluetooth/btusb.h</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;"> create mode 100644 drivers/bluetooth/btusb_intel.c</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; ">&nbsp;</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;">-- </p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; -qt-user-state:0;">1.7.9.5</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; ">&nbsp;</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; ">&nbsp;</p></body></html>
---nextPart1494215.BJ7lXqxGKP--
+Luiz Augusto von Dentz
