@@ -2,72 +2,58 @@ Return-Path: <cyrus@holtmann.org>
 From: Mat Martineau <mathewm@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
 Cc: sunnyk@codeaurora.org
-Subject: [RFCv1 04/20] Bluetooth: Process create response and connect response identically
-Date: Tue, 11 Sep 2012 11:21:15 -0700
-Message-Id: <1347387691-5285-5-git-send-email-mathewm@codeaurora.org>
+Subject: [RFCv1 02/20] Bluetooth: Factor out common L2CAP connection code
+Date: Tue, 11 Sep 2012 11:21:13 -0700
+Message-Id: <1347387691-5285-3-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1347387691-5285-1-git-send-email-mathewm@codeaurora.org>
 References: <1347387691-5285-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This removes an intermediate function for sending a create response
-which added no functionality.
+L2CAP connect requests and create channel requests share a significant
+amount of code.  This change moves common code to a new function.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c | 18 ++++--------------
- 1 file changed, 4 insertions(+), 14 deletions(-)
+ net/bluetooth/l2cap_core.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 17e02d9..a042bcf 100644
+index 111e716..166382c 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -3501,7 +3501,8 @@ static int l2cap_connect_req(struct l2cap_conn *conn,
+@@ -3362,7 +3362,8 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn, struct l2cap_cmd_hd
  	return 0;
  }
  
--static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd, u8 *data)
-+static inline int l2cap_connect_create_rsp(struct l2cap_conn *conn,
-+					   struct l2cap_cmd_hdr *cmd, u8 *data)
+-static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd, u8 *data)
++static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
++			    u8 *data, u8 rsp_code, u8 amp_id)
  {
- 	struct l2cap_conn_rsp *rsp = (struct l2cap_conn_rsp *) data;
- 	u16 scid, dcid, result, status;
-@@ -4039,14 +4040,6 @@ static int l2cap_create_channel_req(struct l2cap_conn *conn,
+ 	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
+ 	struct l2cap_conn_rsp rsp;
+@@ -3456,7 +3457,7 @@ sendresp:
+ 	rsp.dcid   = cpu_to_le16(dcid);
+ 	rsp.result = cpu_to_le16(result);
+ 	rsp.status = cpu_to_le16(status);
+-	l2cap_send_cmd(conn, cmd->ident, L2CAP_CONN_RSP, sizeof(rsp), &rsp);
++	l2cap_send_cmd(conn, cmd->ident, rsp_code, sizeof(rsp), &rsp);
+ 
+ 	if (result == L2CAP_CR_PEND && status == L2CAP_CS_NO_INFO) {
+ 		struct l2cap_info_req info;
+@@ -3479,7 +3480,12 @@ sendresp:
+ 					l2cap_build_conf_req(chan, buf), buf);
+ 		chan->num_conf_req++;
+ 	}
++}
+ 
++static int l2cap_connect_req(struct l2cap_conn *conn,
++			     struct l2cap_cmd_hdr *cmd, u8 *data)
++{
++	__l2cap_connect(conn, cmd, data, L2CAP_CONN_RSP, 0);
  	return 0;
  }
  
--static inline int l2cap_create_channel_rsp(struct l2cap_conn *conn,
--					struct l2cap_cmd_hdr *cmd, void *data)
--{
--	BT_DBG("conn %p", conn);
--
--	return l2cap_connect_rsp(conn, cmd, data);
--}
--
- static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
- 				     u16 icid, u16 result)
- {
-@@ -4250,7 +4243,8 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 		break;
- 
- 	case L2CAP_CONN_RSP:
--		err = l2cap_connect_rsp(conn, cmd, data);
-+	case L2CAP_CREATE_CHAN_RSP:
-+		err = l2cap_connect_create_rsp(conn, cmd, data);
- 		break;
- 
- 	case L2CAP_CONF_REQ:
-@@ -4288,10 +4282,6 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 		err = l2cap_create_channel_req(conn, cmd, cmd_len, data);
- 		break;
- 
--	case L2CAP_CREATE_CHAN_RSP:
--		err = l2cap_create_channel_rsp(conn, cmd, data);
--		break;
--
- 	case L2CAP_MOVE_CHAN_REQ:
- 		err = l2cap_move_channel_req(conn, cmd, cmd_len, data);
- 		break;
 -- 
 1.7.12
 
