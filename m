@@ -1,53 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <504F305E.1080404@ti.com>
-Date: Tue, 11 Sep 2012 15:36:46 +0300
-From: Chen Ganir <chen.ganir@ti.com>
 MIME-Version: 1.0
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <504F2CF9.7060900@ti.com>
+References: <1347353240-1942-1-git-send-email-chen.ganir@ti.com>
+	<CAJdJm_OZZ+SrYdfbpqy+yFmppx9xAs-YMmDtn3PzQbU1JD_pOA@mail.gmail.com>
+	<504F2CF9.7060900@ti.com>
+Date: Tue, 11 Sep 2012 08:27:25 -0400
+Message-ID: <CAJdJm_OMtRy08-55cxrWH-0WM06r0M8JAH8wHw0a8S11k2hO+Q@mail.gmail.com>
 Subject: Re: [PATCH v2] gatt: Delay D-Bus reply on char discovery
-References: <1347353240-1942-1-git-send-email-chen.ganir@ti.com> <CAJdJm_OZZ+SrYdfbpqy+yFmppx9xAs-YMmDtn3PzQbU1JD_pOA@mail.gmail.com> <504F2CF9.7060900@ti.com> <CAJdJm_OMtRy08-55cxrWH-0WM06r0M8JAH8wHw0a8S11k2hO+Q@mail.gmail.com>
-In-Reply-To: <CAJdJm_OMtRy08-55cxrWH-0WM06r0M8JAH8wHw0a8S11k2hO+Q@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Chen Ganir <chen.ganir@ti.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Anderson,
-On 09/11/2012 03:27 PM, Anderson Lizardo wrote:
-> Hi Chen,
->
-> On Tue, Sep 11, 2012 at 8:22 AM, Chen Ganir <chen.ganir@ti.com> wrote:
->> The plan is to replace characteristic::format, and add CCC, SCC and any
->> other descriptor we find in the future to this list. This way we have a
->> unified list of descriptors and the data contained in them. This is already
->> done in some patches i already have, which rely on this patch. Next patch
->> set includes notification/indication implementation to the D-Bus API (Auto
->> registration to notification/indication if CCC is found).
->
-> Do you have patches ready for adding CCC support on GATT D-Bus API ?
-> Are you planning to send soon to the list, or could send it as RFC?
->
-> Best Regards,
->
-I already have those patches running. Some cleanup is still needed, and 
-this patch also needs to be upstreamed.
+Hi Chen,
 
-Basically what i did was discover the CCC, SCC and extended properties. 
-I save them (current value and handle) in the descriptor list. Once the 
-entire characteristic range is discovered, and a watcher is registered, 
-i check the characteristic properties and cross it with the availability 
-of the CCC. Then, i try to automatically enable indication or 
-notification according to the characteristic properties.
+On Tue, Sep 11, 2012 at 8:22 AM, Chen Ganir <chen.ganir@ti.com> wrote:
+> The plan is to replace characteristic::format, and add CCC, SCC and any
+> other descriptor we find in the future to this list. This way we have a
+> unified list of descriptors and the data contained in them. This is already
+> done in some patches i already have, which rely on this patch. Next patch
+> set includes notification/indication implementation to the D-Bus API (Auto
+> registration to notification/indication if CCC is found).
 
-when the watcher is abandoned or unregistered, i unset the 
-notification/indication for all the characters of that service.
+Do you have patches ready for adding CCC support on GATT D-Bus API ?
+Are you planning to send soon to the list, or could send it as RFC?
 
-In addition, i plan to add a property called "Broadcast" which will be 
-read/write, and it will set/get the SCC descriptor of the char.
-
-
-
+Best Regards,
 -- 
-BR,
-Chen Ganir
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
