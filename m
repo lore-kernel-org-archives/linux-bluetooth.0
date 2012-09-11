@@ -1,57 +1,179 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 11 Sep 2012 11:15:08 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv1 01/15] Bluetooth: Set Exended Flowspec flag for HS chan
-Message-ID: <20120911081506.GB2597@aemeltch-MOBL1>
-References: <1346766274-21612-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1346766274-21612-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <alpine.DEB.2.02.1209101647520.2859@mathewm-linux>
+From: <chen.ganir@ti.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <chen.ganir@ti.com>
+Subject: [PATCH 10/10] battery: Support persistent battery level
+Date: Tue, 11 Sep 2012 10:39:14 +0300
+Message-ID: <1347349154-24293-1-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.DEB.2.02.1209101647520.2859@mathewm-linux>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+From: Chen Ganir <chen.ganir@ti.com>
 
-On Mon, Sep 10, 2012 at 04:49:36PM -0700, Mat Martineau wrote:
-> 
-> Andrei -
-> 
-> On Tue, 4 Sep 2012, Andrei Emeltchenko wrote:
-> 
-> >From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> >
-> >For AMP we always assume EFS L2CAP option.
-> >
-> >Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> >---
-> >include/net/bluetooth/l2cap.h |    2 ++
-> >net/bluetooth/l2cap_core.c    |    7 ++++++-
-> >2 files changed, 8 insertions(+), 1 deletion(-)
-> >
-> >diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> >index 161be83..3ec8679 100644
-> >--- a/include/net/bluetooth/l2cap.h
-> >+++ b/include/net/bluetooth/l2cap.h
-> >@@ -508,6 +508,8 @@ struct l2cap_chan {
-> >	__u32		remote_acc_lat;
-> >	__u32		remote_flush_to;
-> >
-> >+	__u8		ctrl_id;
-> >+
-> 
-> How about "remote_amp_id" instead of ctrl_id?  The channel move code
-> tracks local_amp_id.  
-> Why does the remote controller id need to be
-> tracked?
+Store battery level when read, and use the level from storage
+when connecting, to reduce GATT traffic.
+---
+ profiles/battery/battery.c |  106 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 104 insertions(+), 2 deletions(-)
 
-I think you are right, I think it shall be local AMP controller id. So we
-can keep this name ctrl_id for local one or do you think local_amp_id is
-better?
-
-Best regards 
-Andrei Emeltchenko 
+diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
+index 95f548e..bae9487 100644
+--- a/profiles/battery/battery.c
++++ b/profiles/battery/battery.c
+@@ -27,6 +27,8 @@
+ #include <glib.h>
+ #include <bluetooth/uuid.h>
+ #include <stdbool.h>
++#include <sys/file.h>
++#include <stdlib.h>
+ 
+ #include "adapter.h"
+ #include "device.h"
+@@ -37,6 +39,10 @@
+ #include "gatt.h"
+ #include "battery.h"
+ #include "log.h"
++#include "storage.h"
++
++#define BATTERY_KEY_FORMAT	"%17s#%04X"
++#define BATTERY_LEVEL_FORMAT	"%03d"
+ 
+ struct battery {
+ 	struct btd_device	*dev;		/* Device reference */
+@@ -77,10 +83,103 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
+ 	return -1;
+ }
+ 
++static inline int create_filename(char *buf, size_t size,
++				const bdaddr_t *bdaddr, const char *name)
++{
++	char addr[18];
++
++	ba2str(bdaddr, addr);
++
++	return create_name(buf, size, STORAGEDIR, addr, name);
++}
++
++static int store_battery_char(struct characteristic *chr)
++{
++	char filename[PATH_MAX + 1], addr[18], key[23];
++	bdaddr_t sba, dba;
++	char level[4];
++
++	adapter_get_address(device_get_adapter(chr->batt->dev), &sba);
++	device_get_address(chr->batt->dev, &dba, NULL);
++
++	create_filename(filename, PATH_MAX, &sba, "battery_gatt_client");
++
++	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
++
++	ba2str(&dba, addr);
++
++	snprintf(key, sizeof(key), BATTERY_KEY_FORMAT, addr, chr->attr.handle);
++	snprintf(level, sizeof(level), BATTERY_LEVEL_FORMAT, chr->level);
++
++	return textfile_caseput(filename, key, level);
++}
++
++static char *read_battery_char(struct characteristic *chr)
++{
++	char filename[PATH_MAX + 1], addr[18], key[23];
++	char *str, *strnew;
++	bdaddr_t sba, dba;
++
++	adapter_get_address(device_get_adapter(chr->batt->dev), &sba);
++	device_get_address(chr->batt->dev, &dba, NULL);
++
++	create_filename(filename, PATH_MAX, &sba, "battery_gatt_client");
++
++	ba2str(&dba, addr);
++	snprintf(key, sizeof(key), BATTERY_KEY_FORMAT, addr, chr->attr.handle);
++
++	str = textfile_caseget(filename, key);
++	if (str == NULL)
++		return NULL;
++
++	strnew = g_strdup(str);
++	g_free(str);
++
++	return strnew;
++}
++
++static void del_battery_char(struct characteristic *chr)
++{
++	char filename[PATH_MAX + 1], addr[18], key[23];
++	bdaddr_t sba, dba;
++
++	adapter_get_address(device_get_adapter(chr->batt->dev), &sba);
++	device_get_address(chr->batt->dev, &dba, NULL);
++
++	create_filename(filename, PATH_MAX, &sba, "battery_gatt_client");
++
++	ba2str(&dba, addr);
++	snprintf(key, sizeof(key), BATTERY_KEY_FORMAT, addr, chr->attr.handle);
++
++	textfile_casedel(filename, key);
++}
++
++static gboolean read_battery_level_value(struct characteristic *chr)
++{
++	char *str;
++
++	if (!chr)
++		return FALSE;
++
++	str = read_battery_char(chr);
++	if (!str)
++		return FALSE;
++
++	chr->level = atoi(str);
++
++	btd_device_set_battery_opt(chr->devbatt, BATTERY_OPT_LEVEL, chr->level,
++						BATTERY_OPT_INVALID);
++
++	g_free(str);
++	return TRUE;
++}
++
+ static void char_free(gpointer user_data)
+ {
+ 	struct characteristic *c = user_data;
+ 
++	del_battery_char(c);
++
+ 	g_slist_free_full(c->desc, g_free);
+ 
+ 	btd_device_remove_battery(c->devbatt);
+@@ -144,6 +243,8 @@ static void read_batterylevel_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 	ch->level = value[0];
+ 	btd_device_set_battery_opt(ch->devbatt, BATTERY_OPT_LEVEL, ch->level,
+ 						BATTERY_OPT_INVALID);
++
++	store_battery_char(ch);
+ }
+ 
+ static void process_batteryservice_char(struct characteristic *ch)
+@@ -315,7 +416,8 @@ update_char:
+ 	btd_device_set_battery_opt(ch->devbatt, BATTERY_OPT_REFRESH_FUNC,
+ 			      batterylevel_refresh_cb, BATTERY_OPT_INVALID);
+ 
+-	process_batteryservice_char(ch);
++	if (!read_battery_level_value(ch))
++		process_batteryservice_char(ch);
+ }
+ 
+ static void configure_battery_cb(GSList *characteristics, guint8 status,
+@@ -421,7 +523,7 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ 		GSList *l;
+ 		for (l = batt->chars; l; l = l->next) {
+ 			struct characteristic *c = l->data;
+-			if (!c->canNotify)
++			if (!read_battery_level_value(c) && !c->canNotify)
+ 				process_batteryservice_char(c);
+ 		}
+ 	}
+-- 
+1.7.9.5
 
