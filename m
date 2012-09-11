@@ -1,80 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <20120907095932.GA7057@x220>
+References: <1346785482-13359-1-git-send-email-jprvita@openbossa.org>
+	<1346785482-13359-2-git-send-email-jprvita@openbossa.org>
+	<20120907095932.GA7057@x220>
+Date: Tue, 11 Sep 2012 10:34:13 -0300
+Message-ID: <CAAngNMa2Gewn-GOpW_RVM2ji0F=rvtPOH1D6eAKt2Cm=Q=FAtg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v5 01/14] core: Control connections based on adapter state
+From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v6 01/11] core: Control connections based on adapter state
-Date: Tue, 11 Sep 2012 10:32:57 -0300
-Message-Id: <1347370387-17670-1-git-send-email-jprvita@openbossa.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+On Fri, Sep 7, 2012 at 6:59 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi,
+>
+> On Tue, Sep 04, 2012, João Paulo Rechi Vita wrote:
+>> +static void set_auto_connect(gpointer data, gpointer user_data)
+>> +{
+>> +     struct btd_device *device = data;
+>> +     gboolean enable = GPOINTER_TO_INT(user_data);
+>> +
+>> +     device_set_auto_connect(device, enable);
+>> +}
+>> +
+>>  static void call_adapter_powered_callbacks(struct btd_adapter *adapter,
+>>                                               gboolean powered)
+>>  {
+>> @@ -2125,7 +2133,10 @@ static void call_adapter_powered_callbacks(struct btd_adapter *adapter,
+>>               btd_adapter_powered_cb cb = l->data;
+>>
+>>               cb(adapter, powered);
+>> -       }
+>> +     }
+>> +
+>> +     g_slist_foreach(adapter->devices, set_auto_connect,
+>> +                                             GINT_TO_POINTER(powered));
+>
+> Instead of this GINT_TO_POINTER magic on a variable that isn't even a
+> gint couldn't you just pass &powered to g_slist_foreach and then in the
+> callback do:
+>
+>         gboolean enable = *(gboolean *) user_data;
+>
+> or
+>
+>         gboolean *enable = user_data;
+>
+>         device_set_auto_connect(device, *enable);
+>
 
-This patch disable automatic ATTIO connections when the adapter is
-powered down and enable automatic connection when the adapter is powered
-on.
----
- src/adapter.c | 23 ++++++++++++++---------
- 1 file changed, 14 insertions(+), 9 deletions(-)
+I'm sending an updated version now.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 4b675e8..6b8435e 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2113,6 +2113,14 @@ static int get_pairable_timeout(const char *src)
- 	return main_opts.pairto;
- }
- 
-+static void set_auto_connect(gpointer data, gpointer user_data)
-+{
-+	struct btd_device *device = data;
-+	gboolean *enable = user_data;
-+
-+	device_set_auto_connect(device, *enable);
-+}
-+
- static void call_adapter_powered_callbacks(struct btd_adapter *adapter,
- 						gboolean powered)
- {
-@@ -2122,7 +2130,9 @@ static void call_adapter_powered_callbacks(struct btd_adapter *adapter,
- 		btd_adapter_powered_cb cb = l->data;
- 
- 		cb(adapter, powered);
--       }
-+	}
-+
-+	g_slist_foreach(adapter->devices, set_auto_connect, &powered);
- }
- 
- static void emit_device_disappeared(gpointer data, gpointer user_data)
-@@ -3401,15 +3411,10 @@ static gboolean disable_auto(gpointer user_data)
- 	return FALSE;
- }
- 
--static void set_auto_connect(gpointer data, gpointer user_data)
--{
--	struct btd_device *device = data;
--
--	device_set_auto_connect(device, TRUE);
--}
--
- void btd_adapter_enable_auto_connect(struct btd_adapter *adapter)
- {
-+	gboolean enable = TRUE;
-+
- 	if (!adapter->up)
- 		return;
- 
-@@ -3418,7 +3423,7 @@ void btd_adapter_enable_auto_connect(struct btd_adapter *adapter)
- 	if (adapter->auto_timeout_id)
- 		return;
- 
--	g_slist_foreach(adapter->devices, set_auto_connect, NULL);
-+	g_slist_foreach(adapter->devices, set_auto_connect, &enable);
- 
- 	adapter->auto_timeout_id = g_timeout_add_seconds(main_opts.autoto,
- 						disable_auto, adapter);
 -- 
-1.7.11.4
-
+João Paulo Rechi Vita
+Openbossa Labs - INdT
