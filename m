@@ -2,74 +2,65 @@ Return-Path: <cyrus@holtmann.org>
 From: Mat Martineau <mathewm@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
 Cc: sunnyk@codeaurora.org
-Subject: [RFCv1 15/20] Bluetooth: Do not send data during channel move
-Date: Tue, 11 Sep 2012 11:21:26 -0700
-Message-Id: <1347387691-5285-16-git-send-email-mathewm@codeaurora.org>
+Subject: [RFCv1 12/20] Bluetooth: Add move confirm response handling
+Date: Tue, 11 Sep 2012 11:21:23 -0700
+Message-Id: <1347387691-5285-13-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1347387691-5285-1-git-send-email-mathewm@codeaurora.org>
 References: <1347387691-5285-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Outgoing ERTM data is queued during a channel move.  The ERTM state
-machine is partially reset at the start of a move, and must be
-resynchronized with the remote state machine at the end of the move.
-Data is not sent so that there are no state transitions between the
-partial reset and the resync.
-
-Streaming mode frames are dropped during a move.
+The move confirm response concludes the channel move command sequence.
+Receipt of this command indicates that data may begin to flow again.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ net/bluetooth/l2cap_core.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 4a5c42b..0a7df20 100644
+index 4c5191e..0d57ab3 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -921,6 +921,10 @@ static void l2cap_send_sframe(struct l2cap_chan *chan,
- 	if (!control->sframe)
- 		return;
+@@ -4581,6 +4581,7 @@ static inline int l2cap_move_channel_confirm_rsp(struct l2cap_conn *conn,
+ 						 u16 cmd_len, void *data)
+ {
+ 	struct l2cap_move_chan_cfm_rsp *rsp = data;
++	struct l2cap_chan *chan;
+ 	u16 icid;
  
-+	if (chan->move_state != L2CAP_MOVE_STABLE &&
-+	    chan->move_state != L2CAP_MOVE_WAIT_PREPARE)
-+		return;
-+
- 	if (test_and_clear_bit(CONN_SEND_FBIT, &chan->conn_state) &&
- 	    !control->poll)
- 		control->final = 1;
-@@ -1765,6 +1769,10 @@ static void l2cap_streaming_send(struct l2cap_chan *chan,
+ 	if (cmd_len != sizeof(*rsp))
+@@ -4590,6 +4591,31 @@ static inline int l2cap_move_channel_confirm_rsp(struct l2cap_conn *conn,
  
- 	BT_DBG("chan %p, skbs %p", chan, skbs);
+ 	BT_DBG("icid 0x%4.4x", icid);
  
-+	if (chan->move_state != L2CAP_MOVE_STABLE &&
-+	    chan->move_state != L2CAP_MOVE_WAIT_PREPARE)
-+		return;
-+
- 	skb_queue_splice_tail_init(skbs, &chan->tx_q);
- 
- 	while (!skb_queue_empty(&chan->tx_q)) {
-@@ -1807,6 +1815,10 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
- 	if (test_bit(CONN_REMOTE_BUSY, &chan->conn_state))
- 		return 0;
- 
-+	if (chan->move_state != L2CAP_MOVE_STABLE &&
-+	    chan->move_state != L2CAP_MOVE_WAIT_PREPARE)
++	chan = l2cap_get_chan_by_scid(conn, icid);
++	if (!chan)
 +		return 0;
 +
- 	while (chan->tx_send_head &&
- 	       chan->unacked_frames < chan->remote_tx_win &&
- 	       chan->tx_state == L2CAP_TX_STATE_XMIT) {
-@@ -1872,6 +1884,10 @@ static void l2cap_ertm_resend(struct l2cap_chan *chan)
- 	if (test_bit(CONN_REMOTE_BUSY, &chan->conn_state))
- 		return;
- 
-+	if (chan->move_state != L2CAP_MOVE_STABLE &&
-+	    chan->move_state != L2CAP_MOVE_WAIT_PREPARE)
-+		return;
++	__clear_chan_timer(chan);
 +
- 	while (chan->retrans_list.head != L2CAP_SEQ_LIST_CLEAR) {
- 		seq = l2cap_seq_list_pop(&chan->retrans_list);
++	if (chan->move_state == L2CAP_MOVE_WAIT_CONFIRM_RSP) {
++		chan->move_state = L2CAP_MOVE_STABLE;
++		chan->local_amp_id = chan->move_id;
++
++		if (!chan->local_amp_id && chan->hs_hchan) {
++			/* Have moved off of AMP, free the channel */
++			chan->hs_hchan = NULL;
++			chan->hs_hcon = NULL;
++
++			/* Placeholder - free the logical link */
++		}
++
++		l2cap_move_success(chan);
++
++		chan->move_role = L2CAP_MOVE_ROLE_NONE;
++	}
++
++	l2cap_chan_unlock(chan);
++
+ 	return 0;
+ }
  
 -- 
 1.7.12
