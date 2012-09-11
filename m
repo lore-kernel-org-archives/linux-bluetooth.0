@@ -1,28 +1,170 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 11 Sep 2012 22:51:43 +0100 (BST)
-From: "G.W. Haywood" <ged@jubileegroup.co.uk>
-To: "John W. Linville" <linville@tuxdriver.com>
-cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	alexander.smirnov@siemens.com
-Subject: Re: Agenda (v2) for Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
- 2012 (Barcelona!)
-In-Reply-To: <20120911201729.GJ7015@tuxdriver.com>
-Message-ID: <Pine.LNX.4.64.1209112250460.8356@mail5.jubileegroup.co.uk>
-References: <20120911201729.GJ7015@tuxdriver.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Sender: linux-wireless-owner@vger.kernel.org
+In-Reply-To: <1347349100-24228-9-git-send-email-chen.ganir@ti.com>
+References: <1347349100-24228-1-git-send-email-chen.ganir@ti.com> <1347349100-24228-9-git-send-email-chen.ganir@ti.com>
+From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
+Date: Tue, 11 Sep 2012 18:50:10 -0300
+Message-ID: <CAAngNMYezceDToeNVC5a96_odOzDWnLRBQ0GrJJUd84s0hRqiw@mail.gmail.com>
+Subject: Re: [PATCH 08/10] battery: Read Battery level characteristic
+To: chen.ganir@ti.com
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi there,
+On Tue, Sep 11, 2012 at 4:38 AM,  <chen.ganir@ti.com> wrote:
+> From: Chen Ganir <chen.ganir@ti.com>
+>
+> Implement support for reading the battery level characteristic on
+> connection establishment.
+> ---
+>  profiles/battery/battery.c |   87 +++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 85 insertions(+), 2 deletions(-)
+>
+> diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
+> index 31f2297..a93b352 100644
+> --- a/profiles/battery/battery.c
+> +++ b/profiles/battery/battery.c
+> @@ -55,6 +55,7 @@ struct characteristic {
+>         GSList                          *desc;  /* Descriptors */
+>         uint8_t                 ns;             /* Battery Namespace */
+>         uint16_t                description;    /* Battery description */
+> +       uint8_t        level;
 
-On Tue, 11 Sep 2012, John W. Linville wrote:
+Alignment problem here.
 
-> So...suggestions??
+>  };
+>
+>  struct descriptor {
+> @@ -103,6 +104,80 @@ static void battery_free(gpointer user_data)
+>         g_free(batt);
+>  }
+>
+> +static void read_batterylevel_cb(guint8 status, const guint8 *pdu, guint16 len,
+> +                                                       gpointer user_data)
+> +{
+> +       struct characteristic *ch = user_data;
+> +       uint8_t value[ATT_MAX_MTU];
+> +       int vlen;
+> +
+> +       if (status != 0) {
+> +               error("Failed to read Battery Level:%s", att_ecode2str(status));
+> +               return;
+> +       }
+> +
+> +       vlen = dec_read_resp(pdu, len, value, sizeof(value));
+> +       if (!vlen) {
+> +               error("Failed to read Battery Level: Protocol error\n");
+> +               return;
+> +       }
+> +
+> +       if (vlen < 1) {
+> +               error("Failed to read Battery Level: Wrong pdu len");
+> +               return;
+> +       }
+> +
+> +       ch->level = value[0];
+> +       btd_device_set_battery_opt(ch->devbatt, BATTERY_OPT_LEVEL, ch->level,
+> +                                               BATTERY_OPT_INVALID);
+> +}
+> +
+> +static void process_batteryservice_char(struct characteristic *ch)
+> +{
+> +       if (g_strcmp0(ch->attr.uuid, BATTERY_LEVEL_UUID) == 0) {
+> +               gatt_read_char(ch->batt->attrib, ch->attr.value_handle, 0,
+> +                                               read_batterylevel_cb, ch);
+> +       }
+> +}
+> +
+> +static gint device_battery_cmp(gconstpointer a, gconstpointer b)
+> +{
+> +       const struct characteristic *ch = a;
+> +       const struct device_battery *batt = b;
+> +
+> +       if (batt == ch->devbatt)
+> +               return 0;
+> +
+> +       return -1;
+> +}
+> +
+> +static struct characteristic *find_battery_char(struct device_battery *db)
+> +{
+> +       GSList *l, *b;
+> +
+> +       for (l = servers; l != NULL; l = g_slist_next(l)) {
+> +               struct battery *batt = l->data;
+> +
+> +               b = g_slist_find_custom(batt->chars, db, device_battery_cmp);
+> +               if (!b)
+> +                       return NULL;
+> +
+> +               return b->data;
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+> +static void batterylevel_refresh_cb(struct device_battery *batt)
+> +{
+> +       struct characteristic *ch;
+> +
+> +       ch = find_battery_char(batt);
+> +
+> +       if (ch)
+> +               process_batteryservice_char(ch);
+> +}
+> +
+>  static void batterylevel_presentation_format_desc_cb(guint8 status,
+>                                                 const guint8 *pdu, guint16 len,
+>                                                 gpointer user_data)
+> @@ -151,7 +226,6 @@ static void process_batterylevel_desc(struct descriptor *desc)
+>         DBG("Ignored descriptor %s characteristic %s", uuidstr, ch->attr.uuid);
+>  }
+>
+> -
+>  static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+>                                                         gpointer user_data)
+>  {
+> @@ -192,8 +266,11 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+>
+>  update_char:
+>         ch->devbatt = btd_device_add_battery(ch->batt->dev);
+> -}
+> +       btd_device_set_battery_opt(ch->devbatt, BATTERY_OPT_REFRESH_FUNC,
+> +                             batterylevel_refresh_cb, BATTERY_OPT_INVALID);
+>
+> +       process_batteryservice_char(ch);
 
-Dates?
+There two call also should be part of configure_battery_cb() instead
+of discover_desc_cb().
 
---
+> +}
+>
+>  static void configure_battery_cb(GSList *characteristics, guint8 status,
+>
+> @@ -252,6 +329,12 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+>                 gatt_discover_char(batt->attrib, batt->svc_range->start,
+>                                         batt->svc_range->end, NULL,
+>                                         configure_battery_cb, batt);
+> +       } else {
+> +               GSList *l;
+> +               for (l = batt->chars; l; l = l->next) {
+> +                       struct characteristic *c = l->data;
+> +                       process_batteryservice_char(c);
+> +               }
+>         }
+>  }
+>
+> --
+> 1.7.9.5
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-73,
-Ged.
+
+
+-- 
+João Paulo Rechi Vita
+Openbossa Labs - INdT
