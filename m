@@ -2,97 +2,167 @@ Return-Path: <cyrus@holtmann.org>
 From: Mat Martineau <mathewm@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
 Cc: sunnyk@codeaurora.org
-Subject: [RFCv1 16/20] Bluetooth: Configure appropriate timeouts for AMP controllers
-Date: Tue, 11 Sep 2012 11:21:27 -0700
-Message-Id: <1347387691-5285-17-git-send-email-mathewm@codeaurora.org>
+Subject: [RFCv1 11/20] Bluetooth: Add logical link confirm
+Date: Tue, 11 Sep 2012 11:21:22 -0700
+Message-Id: <1347387691-5285-12-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1347387691-5285-1-git-send-email-mathewm@codeaurora.org>
 References: <1347387691-5285-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The L2CAP spec recommends specific retransmit and monitor timeouts for
-ERTM channels that are on AMP controllers.  These timeouts are
-calculated from the AMP controller's best effort flush timeout.
+The logical link confirm callback is executed when the AMP controller
+completes its logical link setup.  During a channel move, a newly
+formed logical link allows a move responder to send a move channel
+response.  A move initiator will send a move channel confirm.  A
+failed logical link will end the channel move and send an appropriate
+response or confirm command indicating a failure.
 
-BR/EDR controllers use the default retransmit and monitor timeouts.
+If the channel is being created on an AMP controller, L2CAP
+configuration is started after the logical link is set up.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c | 47 ++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 41 insertions(+), 6 deletions(-)
+ net/bluetooth/l2cap_core.c | 117 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 115 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 0a7df20..e7c2efc 100644
+index 37f3bf8..4c5191e 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -2924,6 +2924,44 @@ static inline bool __l2cap_efs_supported(struct l2cap_chan *chan)
- 	return enable_hs && chan->conn->feat_mask & L2CAP_FEAT_EXT_FLOW;
+@@ -3725,6 +3725,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 		goto unlock;
+ 	}
+ 
++	chan->ident = cmd->ident;
+ 	l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP, len, rsp);
+ 	chan->num_conf_rsp++;
+ 
+@@ -4170,11 +4171,123 @@ static void l2cap_send_move_chan_cfm_rsp(struct l2cap_conn *conn, u8 ident,
+ 	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM_RSP, sizeof(rsp), &rsp);
  }
  
-+static void __l2cap_set_ertm_timeouts(struct l2cap_chan *chan,
-+				      struct l2cap_conf_rfc *rfc)
-+{
-+	if (chan->local_amp_id && chan->hs_hcon) {
-+		u64 ertm_to = chan->hs_hcon->hdev->amp_be_flush_to;
-+
-+		/* Class 1 devices have must have ERTM timeouts
-+		 * exceeding the Link Supervision Timeout.  The
-+		 * default Link Supervision Timeout for AMP
-+		 * controllers is 10 seconds.
-+		 *
-+		 * Class 1 devices use 0xffffffff for their
-+		 * best-effort flush timeout, so the clamping logic
-+		 * will result in a timeout that meets the above
-+		 * requirement.  ERTM timeouts are 16-bit values, so
-+		 * the maximum timeout is 65.535 seconds.
-+		 */
-+
-+		/* Convert timeout to milliseconds and round */
-+		ertm_to = div_u64(ertm_to + 999, 1000);
-+
-+		/* This is the recommended formula for class 2 devices
-+		 * that start ERTM timers when packets are sent to the
-+		 * controller.
-+		 */
-+		ertm_to = 3 * ertm_to + 500;
-+
-+		if (ertm_to > 0xffff)
-+			ertm_to = 0xffff;
-+
-+		rfc->retrans_timeout = cpu_to_le16((u16) ertm_to);
-+		rfc->monitor_timeout = rfc->retrans_timeout;
-+	} else {
-+		rfc->retrans_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
-+		rfc->monitor_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
-+	}
-+}
-+
- static inline void l2cap_txwin_setup(struct l2cap_chan *chan)
++/* Call with chan locked */
+ static void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
+ 			      u8 status)
  {
- 	if (chan->tx_win > L2CAP_DEFAULT_TX_WINDOW &&
-@@ -2990,8 +3028,8 @@ done:
- 	case L2CAP_MODE_ERTM:
- 		rfc.mode            = L2CAP_MODE_ERTM;
- 		rfc.max_transmit    = chan->max_tx;
--		rfc.retrans_timeout = 0;
--		rfc.monitor_timeout = 0;
+-	/* Placeholder */
+-	return;
++	BT_DBG("chan %p, hchan %p, status %d", chan, hchan, status);
 +
-+		__l2cap_set_ertm_timeouts(chan, &rfc);
++	if (chan->state != BT_CONNECTED && !chan->local_amp_id)
++		return;
++
++	if (!status && chan->state != BT_CONNECTED) {
++		struct l2cap_conf_rsp rsp;
++		u8 code;
++
++		/* Create channel complete */
++		chan->hs_hcon = hchan->conn;
++		chan->hs_hcon->l2cap_data = chan->conn;
++
++		code = l2cap_build_conf_rsp(chan, &rsp,
++					    L2CAP_CONF_SUCCESS, 0);
++		l2cap_send_cmd(chan->conn, chan->ident, L2CAP_CONF_RSP, code,
++			       &rsp);
++		set_bit(CONF_OUTPUT_DONE, &chan->conf_state);
++
++		if (test_bit(CONF_INPUT_DONE, &chan->conf_state)) {
++			int err = 0;
++
++			set_default_fcs(chan);
++
++			if (chan->mode == L2CAP_MODE_ERTM ||
++			    chan->mode == L2CAP_MODE_STREAMING)
++				err = l2cap_ertm_init(chan);
++
++			if (err < 0)
++				l2cap_send_disconn_req(chan->conn, chan, -err);
++			else
++				l2cap_chan_ready(chan);
++		}
++	} else if (chan && !status) {
++		/* Channel move */
++		chan->hs_hcon = hchan->conn;
++		chan->hs_hcon->l2cap_data = chan->conn;
++
++		BT_DBG("move_state %d", chan->move_state);
++
++		if (chan->state != BT_CONNECTED)
++			return;
++
++		switch (chan->move_state) {
++		case L2CAP_MOVE_WAIT_LOGICAL_COMP:
++			/* Move confirm will be sent after a success
++			 * response is received
++			 */
++			chan->move_state = L2CAP_MOVE_WAIT_RSP_SUCCESS;
++			break;
++		case L2CAP_MOVE_WAIT_LOGICAL_CFM:
++			if (test_bit(CONN_LOCAL_BUSY, &chan->conn_state)) {
++				chan->move_state = L2CAP_MOVE_WAIT_LOCAL_BUSY;
++			} else if (chan->move_role ==
++				   L2CAP_MOVE_ROLE_INITIATOR) {
++				chan->move_state = L2CAP_MOVE_WAIT_CONFIRM_RSP;
++				l2cap_send_move_chan_cfm(chan->conn, chan,
++							 chan->scid,
++							 L2CAP_MR_SUCCESS);
++				__set_chan_timer(chan, L2CAP_MOVE_TIMEOUT);
++			} else if (chan->move_role ==
++				   L2CAP_MOVE_ROLE_RESPONDER) {
++				chan->move_state = L2CAP_MOVE_WAIT_CONFIRM;
++				l2cap_send_move_chan_rsp(chan->conn,
++							 chan->ident,
++							 chan->dcid,
++							 L2CAP_MR_SUCCESS);
++			}
++			break;
++		default:
++			/* Move was not in expected state, free the channel */
++			chan->hs_hchan = NULL;
++			chan->hs_hcon = NULL;
++
++			/* Placeholder - free the logical link */
++
++			chan->move_state = L2CAP_MOVE_STABLE;
++		}
++	} else {
++		/* Logical link setup failed. */
++
++		if (chan->state != BT_CONNECTED)
++			l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
++		else if (chan->move_role == L2CAP_MOVE_ROLE_RESPONDER) {
++			l2cap_move_revert(chan);
++			chan->move_role = L2CAP_MOVE_ROLE_NONE;
++			chan->move_state = L2CAP_MOVE_STABLE;
++			l2cap_send_move_chan_rsp(chan->conn, chan->ident,
++						 chan->dcid, L2CAP_MR_NOT_SUPP);
++		} else if (chan->move_role == L2CAP_MOVE_ROLE_INITIATOR) {
++			if (chan->move_state == L2CAP_MOVE_WAIT_LOGICAL_COMP ||
++			    chan->move_state == L2CAP_MOVE_WAIT_LOGICAL_CFM) {
++				/* Remote has only sent pending or
++				 * success responses, clean up
++				 */
++				l2cap_move_revert(chan);
++				chan->move_role = L2CAP_MOVE_ROLE_NONE;
++				chan->move_state = L2CAP_MOVE_STABLE;
++			}
++
++			/* Other amp move states imply that the move
++			 * has already aborted
++			 */
++			l2cap_send_move_chan_cfm(chan->conn, chan, chan->scid,
++						 L2CAP_MC_UNCONFIRMED);
++			__set_chan_timer(chan, L2CAP_MOVE_TIMEOUT);
++		}
++
++		chan->hs_hchan = NULL;
++		chan->hs_hcon = NULL;
++
++		/* Placeholder - free logical link */
++	}
+ }
  
- 		size = min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->conn->mtu -
- 						L2CAP_EXT_HDR_SIZE -
-@@ -3223,10 +3261,7 @@ done:
- 			rfc.max_pdu_size = cpu_to_le16(size);
- 			chan->remote_mps = size;
- 
--			rfc.retrans_timeout =
--				__constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
--			rfc.monitor_timeout =
--				__constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
-+			__l2cap_set_ertm_timeouts(chan, &rfc);
- 
- 			set_bit(CONF_MODE_DONE, &chan->conf_state);
- 
+ static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
 -- 
 1.7.12
 
