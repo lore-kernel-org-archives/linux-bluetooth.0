@@ -1,58 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: <chen.ganir@ti.com>
+From: Par-Gunnar Hjalmdahl <par-gunnar.hjalmdahl@stericsson.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: <chen.ganir@ti.com>
-Subject: [PATCH 00/10] Implement Generic battery and LE Battery client
-Date: Tue, 11 Sep 2012 10:38:11 +0300
-Message-ID: <1347349100-24228-1-git-send-email-chen.ganir@ti.com>
+Cc: Anurag Gupta <anurag.gupta@stericsson.com>,
+	Par-Gunnar Hjalmdahl <par-gunnar.hjalmdahl@stericsson.com>
+Subject: [PATCH] avctp: Fix reply for message with invalid PID
+Date: Tue, 11 Sep 2012 08:16:26 +0200
+Message-ID: <1347344186-8517-1-git-send-email-par-gunnar.hjalmdahl@stericsson.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chen Ganir <chen.ganir@ti.com>
+Reply for control message with invalid (not registered for reception
+of messages) PID should not have message information field present.
 
-This patch set replaces previous patch sets which implemented the LE battery
-GATT Client. This patch set implements a generic device battery D-Bus interface
-that can be used to get remote device battery status using D-Bus. In addition,
-This patch set also implements the GATT Battery client, which uses the generic
-device battery to expose LE device battery status.
+This was affecting AVCTP qualification test case TP/NFR/BI-01-C.
+---
+ audio/avctp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-see doc/battery-api.txt and doc/device-api.txt for more information.
-
-
-Chen Ganir (10):
-  battery: Add generic device battery documentation
-  battery: Implement Generic device battery
-  battery: Add GATT Battery Client Service skeleton
-  battery: Add client connection logic
-  battery: Discover Characteristic Descriptors
-  battery: Get Battery ID
-  battery: Add Battery to device
-  battery: Read Battery level characteristic
-  battery: Add support for notifications
-  battery: Support persistent battery level
-
- Makefile.am                |    9 +-
- doc/battery-api.txt        |   33 +++
- doc/device-api.txt         |    5 +
- lib/uuid.h                 |    3 +
- profiles/battery/battery.c |  590 ++++++++++++++++++++++++++++++++++++++++++++
- profiles/battery/battery.h |   24 ++
- profiles/battery/main.c    |   52 ++++
- profiles/battery/manager.c |   61 +++++
- profiles/battery/manager.h |   24 ++
- src/device.c               |  184 ++++++++++++++
- src/device.h               |   15 ++
- test/test-device           |   13 +
- 12 files changed, 1011 insertions(+), 2 deletions(-)
- create mode 100644 doc/battery-api.txt
- create mode 100644 profiles/battery/battery.c
- create mode 100644 profiles/battery/battery.h
- create mode 100644 profiles/battery/main.c
- create mode 100644 profiles/battery/manager.c
- create mode 100644 profiles/battery/manager.h
-
+diff --git a/audio/avctp.c b/audio/avctp.c
+index 03f3e7f..4e0e8dc 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -500,7 +500,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 
+ 	if (avctp->pid != htons(AV_REMOTE_SVCLASS_ID)) {
+ 		avctp->ipid = 1;
+-		avc->code = AVC_CTYPE_REJECTED;
++		packet_size = AVCTP_HEADER_LENGTH;
+ 		goto done;
+ 	}
+ 
 -- 
-1.7.9.5
+1.7.11.3
 
