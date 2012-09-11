@@ -1,48 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 11 Sep 2012 11:15:08 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv1 01/15] Bluetooth: Set Exended Flowspec flag for HS chan
+Message-ID: <20120911081506.GB2597@aemeltch-MOBL1>
+References: <1346766274-21612-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1346766274-21612-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <alpine.DEB.2.02.1209101647520.2859@mathewm-linux>
 MIME-Version: 1.0
-In-Reply-To: <1347344186-8517-1-git-send-email-par-gunnar.hjalmdahl@stericsson.com>
-References: <1347344186-8517-1-git-send-email-par-gunnar.hjalmdahl@stericsson.com>
-Date: Tue, 11 Sep 2012 11:22:03 +0300
-Message-ID: <CABBYNZKa-Mm3XPEOw2M2xwz2ya3YDVKqVYktbNPx3_dumHC4Sw@mail.gmail.com>
-Subject: Re: [PATCH] avctp: Fix reply for message with invalid PID
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Par-Gunnar Hjalmdahl <par-gunnar.hjalmdahl@stericsson.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Anurag Gupta <anurag.gupta@stericsson.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <alpine.DEB.2.02.1209101647520.2859@mathewm-linux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Mat,
 
-On Tue, Sep 11, 2012 at 9:16 AM, Par-Gunnar Hjalmdahl
-<par-gunnar.hjalmdahl@stericsson.com> wrote:
-> Reply for control message with invalid (not registered for reception
-> of messages) PID should not have message information field present.
->
-> This was affecting AVCTP qualification test case TP/NFR/BI-01-C.
-> ---
->  audio/avctp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/audio/avctp.c b/audio/avctp.c
-> index 03f3e7f..4e0e8dc 100644
-> --- a/audio/avctp.c
-> +++ b/audio/avctp.c
-> @@ -500,7 +500,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
->
->         if (avctp->pid != htons(AV_REMOTE_SVCLASS_ID)) {
->                 avctp->ipid = 1;
-> -               avc->code = AVC_CTYPE_REJECTED;
-> +               packet_size = AVCTP_HEADER_LENGTH;
->                 goto done;
->         }
->
-> --
-> 1.7.11.3
+On Mon, Sep 10, 2012 at 04:49:36PM -0700, Mat Martineau wrote:
+> 
+> Andrei -
+> 
+> On Tue, 4 Sep 2012, Andrei Emeltchenko wrote:
+> 
+> >From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> >
+> >For AMP we always assume EFS L2CAP option.
+> >
+> >Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> >---
+> >include/net/bluetooth/l2cap.h |    2 ++
+> >net/bluetooth/l2cap_core.c    |    7 ++++++-
+> >2 files changed, 8 insertions(+), 1 deletion(-)
+> >
+> >diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> >index 161be83..3ec8679 100644
+> >--- a/include/net/bluetooth/l2cap.h
+> >+++ b/include/net/bluetooth/l2cap.h
+> >@@ -508,6 +508,8 @@ struct l2cap_chan {
+> >	__u32		remote_acc_lat;
+> >	__u32		remote_flush_to;
+> >
+> >+	__u8		ctrl_id;
+> >+
+> 
+> How about "remote_amp_id" instead of ctrl_id?  The channel move code
+> tracks local_amp_id.  
+> Why does the remote controller id need to be
+> tracked?
 
-Pushed, thanks.
+I think you are right, I think it shall be local AMP controller id. So we
+can keep this name ctrl_id for local one or do you think local_amp_id is
+better?
 
+Best regards 
+Andrei Emeltchenko 
 
--- 
-Luiz Augusto von Dentz
