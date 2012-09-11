@@ -1,164 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 11 Sep 2012 16:17:29 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	alexander.smirnov@siemens.com
+Subject: Agenda (v2) for Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
+ 2012 (Barcelona!)
+Message-ID: <20120911201729.GJ7015@tuxdriver.com>
 MIME-Version: 1.0
-In-Reply-To: <1347349100-24228-6-git-send-email-chen.ganir@ti.com>
-References: <1347349100-24228-1-git-send-email-chen.ganir@ti.com> <1347349100-24228-6-git-send-email-chen.ganir@ti.com>
-From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-Date: Tue, 11 Sep 2012 17:52:13 -0300
-Message-ID: <CAAngNMaudTwxYNXqSsYFW+tU7OOTiPkseDKHux64HLzxp-5ALw@mail.gmail.com>
-Subject: Re: [PATCH 05/10] battery: Discover Characteristic Descriptors
-To: chen.ganir@ti.com
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Sep 11, 2012 at 4:38 AM,  <chen.ganir@ti.com> wrote:
-> From: Chen Ganir <chen.ganir@ti.com>
->
-> Discover all characteristic descriptors, and build a descriptor
-> list. Presentation Format Descriptor and Client Characteristic
-> Configuration descriptors are searched.
-> ---
->  profiles/battery/battery.c |   73 +++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 72 insertions(+), 1 deletion(-)
->
-> diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
-> index 37cbce4..3a24a7b 100644
-> --- a/profiles/battery/battery.c
-> +++ b/profiles/battery/battery.c
-> @@ -51,6 +51,13 @@ static GSList *servers;
->  struct characteristic {
->         struct gatt_char        attr;   /* Characteristic */
->         struct battery          *batt;  /* Parent Battery Service */
-> +       GSList                          *desc;  /* Descriptors */
+OK, making progress...still, we need some more discussion topics...
 
-Wrong alignment here.
+We have one room on the first day, and three rooms on the second day.
+I figure that the Bluetooth and 802.11 groups should each get a
+break-out room for their own in-depth discussons on the second day and
+the third room can be used for more general topics and presentations.
 
-> +};
-> +
-> +struct descriptor {
-> +       struct characteristic   *ch;            /* Parent Characteristic */
-> +       uint16_t                handle;         /* Descriptor Handle */
-> +       bt_uuid_t               uuid;           /* UUID */
->  };
->
->  static gint cmp_device(gconstpointer a, gconstpointer b)
-> @@ -64,12 +71,21 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
->         return -1;
->  }
->
-> +static void char_free(gpointer user_data)
-> +{
-> +       struct characteristic *c = user_data;
-> +
-> +       g_slist_free_full(c->desc, g_free);
-> +
-> +       g_free(c);
-> +}
-> +
->  static void battery_free(gpointer user_data)
->  {
->         struct battery *batt = user_data;
->
->         if (batt->chars != NULL)
-> -               g_slist_free_full(batt->chars, g_free);
-> +               g_slist_free_full(batt->chars, char_free);
->
->         if (batt->attioid > 0)
->                 btd_device_remove_attio_callback(batt->dev, batt->attioid);
-> @@ -82,7 +98,47 @@ static void battery_free(gpointer user_data)
->         g_free(batt);
->  }
->
-> +static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
-> +                                                       gpointer user_data)
-> +{
-> +       struct characteristic *ch = user_data;
-> +       struct att_data_list *list;
-> +       uint8_t format;
-> +       int i;
-> +
-> +       if (status != 0) {
-> +               error("Discover all characteristic descriptors failed [%s]: %s",
-> +                                       ch->attr.uuid, att_ecode2str(status));
-> +               return;
-> +       }
-> +
-> +       list = dec_find_info_resp(pdu, len, &format);
-> +       if (list == NULL)
-> +               return;
-> +
-> +       for (i = 0; i < list->num; i++) {
-> +               struct descriptor *desc;
-> +               uint8_t *value;
-> +
-> +               value = list->data[i];
-> +               desc = g_new0(struct descriptor, 1);
-> +               desc->handle = att_get_u16(value);
-> +               desc->ch = ch;
-> +
-> +               if (format == 0x01)
-> +                       desc->uuid = att_get_uuid16(&value[2]);
-> +               else
-> +                       desc->uuid = att_get_uuid128(&value[2]);
-> +
-> +               ch->desc = g_slist_append(ch->desc, desc);
-> +       }
-> +
-> +       att_data_list_free(list);
-> +}
-> +
-> +
+Below is my strawman agenda proposal.  Please make suggestions for
+improvements!
 
-Remove extra blank line here.
+Day 1
+-----
 
->  static void configure_battery_cb(GSList *characteristics, guint8 status,
-> +
+Everyone together in a single room...
 
-Remove extra blank line here.
+Time	Topic						Speaker
+----	-----						-------
+0930	Welcome/Intro/Agenda				John Linville
 
->                                                         gpointer user_data)
->  {
->         struct battery *batt = user_data;
-> @@ -97,6 +153,7 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
->         for (l = characteristics; l; l = l->next) {
->                 struct gatt_char *c = l->data;
->                 struct characteristic *ch;
-> +               uint16_t start, end;
->
->                 ch = g_new0(struct characteristic, 1);
->                 ch->attr.handle = c->handle;
-> @@ -106,6 +163,20 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
->                 ch->batt = batt;
->
->                 batt->chars = g_slist_append(batt->chars, ch);
-> +
-> +               start = c->value_handle + 1;
-> +
-> +               if (l->next != NULL) {
-> +                       struct gatt_char *c = l->next->data;
-> +                       if (start == c->handle)
-> +                               continue;
-> +                       end = c->handle - 1;
-> +               } else if (c->value_handle != batt->svc_range->end)
-> +                       end = batt->svc_range->end;
-> +               else
-> +                       continue;
-> +
-> +               gatt_find_info(batt->attrib, start, end, discover_desc_cb, ch);
->         }
->  }
->
-> --
-> 1.7.9.5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+1000	802.15.4 stack, 6lowpan				Alexander Smirnov
+
+1100	Break
+
+1130	Bluetooth: state of the union			Marcel Holtmann
+
+1230	Lunch
+
+1400	NFC "state of the union", etc.			Ortiz / Elias / Chlad
+
+1500	Break
+
+...
+
+1800	Adjourn
 
 
+Day 2
+-----
+
+802.11 break-out room...
+
+Time	Topic						Speaker
+----	-----						-------
+1000	Regulatory updates				Luis Rodriguez
+
+1100	Break
+
+1130	Virtual Bluetooth AMP Controller for mac80211	Andrei Emeltchenko
+
+1230	Lunch
+
+1400	IEEE802.11/WFA Update & HotSpot 2.0		Jouni Malinen
+
+...
+
+1800	Adjourn
+
+
+Bluetooth break-out room...
+
+Time	Topic						Speaker
+----	-----						-------
+1000	Bluetooth Broadcaster/Observer API		Lizardo & Delfes
+
+1100	Break
+
+1130	status and roadmap of Bluetooth LE		Joao Paulo Rechi Vita
+
+1230	Lunch
+
+...
+
+1800	Adjourn
+
+
+Presentation room...
+
+Time	Topic						Speaker
+----	-----						-------
+1000	wireless community networks			Nick Kossifidis
+
+1100	Break
+
+1130	"a short overview what we do in ConnMan"	Wagner / Flykt
+
+1230	Lunch
+
+1400	oFono / mobile wireless				Denis Kenzior
+
+1500	Break
+
+...
+
+1800	Adjourn
+
+
+So...suggestions??
 
 -- 
-João Paulo Rechi Vita
-Openbossa Labs - INdT
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
