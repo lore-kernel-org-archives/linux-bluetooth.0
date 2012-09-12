@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: mathewm@codeaurora.org, gustavo@padovan.org
-Subject: [PATCHv4 05/17] Bluetooth: A2MP: Process Discover Response
-Date: Wed, 12 Sep 2012 11:06:20 +0300
-Message-Id: <1347437192-24694-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 01/17] Bluetooth: Add HCI logical link cmds definitions
+Date: Wed, 12 Sep 2012 11:06:16 +0300
+Message-Id: <1347437192-24694-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <alpine.DEB.2.02.1209111121550.3754@mathewm-linux>
  <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -13,102 +13,64 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When receiving A2MP Discover Response send A2MP Get Info Request
-for each AMP controller in the discovery list.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   62 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 61 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci.h |   36 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 35 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 27ebf31..c876997 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -67,6 +67,14 @@ void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data)
- 	kfree(cmd);
- }
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 0f28f70..42aae18 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -556,12 +556,46 @@ struct hci_cp_accept_phy_link {
+ 	__u8     key[HCI_AMP_LINK_KEY_SIZE];
+ } __packed;
  
-+static u8 __next_ident(struct amp_mgr *mgr)
-+{
-+	if (++mgr->ident == 0)
-+		mgr->ident = 1;
-+
-+	return mgr->ident;
-+}
-+
- static inline void __a2mp_cl_bredr(struct a2mp_cl *cl)
- {
- 	cl->id = 0;
-@@ -165,6 +173,55 @@ static int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 	return 0;
- }
+-#define HCI_OP_DISCONN_PHY_LINK	0x0437
++#define HCI_OP_DISCONN_PHY_LINK		0x0437
+ struct hci_cp_disconn_phy_link {
+ 	__u8     phy_handle;
+ 	__u8     reason;
+ } __packed;
  
-+static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
-+			     struct a2mp_cmd *hdr)
-+{
-+	struct a2mp_discov_rsp *rsp = (void *) skb->data;
-+	u16 len = le16_to_cpu(hdr->len);
-+	struct a2mp_cl *cl;
-+	u16 ext_feat;
++struct ext_flow_spec {
++	__u8       id;
++	__u8       stype;
++	__le16     msdu;
++	__le32     sdu_itime;
++	__le32     acc_lat;
++	__le32     flush_to;
++} __packed;
 +
-+	if (len < sizeof(*rsp))
-+		return -EINVAL;
++#define HCI_OP_CREATE_LOGICAL_LINK	0x0438
++#define HCI_OP_ACCEPT_LOGICAL_LINK	0x0439
++struct hci_cp_create_accept_logical_link {
++	__u8                  phy_handle;
++	struct ext_flow_spec  tx_flow_spec;
++	struct ext_flow_spec  rx_flow_spec;
++} __packed;
 +
-+	len -= sizeof(*rsp);
-+	skb_pull(skb, sizeof(*rsp));
++#define HCI_OP_DISCONN_LOGICAL_LINK	0x043a
++struct hci_cp_disconn_logical_link {
++	__le16   log_handle;
++} __packed;
 +
-+	ext_feat = le16_to_cpu(rsp->ext_feat);
++#define HCI_OP_LOGICAL_LINK_CANCEL	0x043b
++struct hci_cp_logical_link_cancel {
++	__u8     phy_handle;
++	__u8     flow_spec_id;
++} __packed;
 +
-+	BT_DBG("mtu %d efm 0x%4.4x", le16_to_cpu(rsp->mtu), ext_feat);
++struct hci_rp_logical_link_cancel {
++	__u8     status;
++	__u8     phy_handle;
++	__u8     flow_spec_id;
++} __packed;
 +
-+	/* check that packet is not broken for now */
-+	while (ext_feat & A2MP_FEAT_EXT) {
-+		if (len < sizeof(ext_feat))
-+			return -EINVAL;
-+
-+		ext_feat = get_unaligned_le16(skb->data);
-+		BT_DBG("efm 0x%4.4x", ext_feat);
-+		len -= sizeof(ext_feat);
-+		skb_pull(skb, sizeof(ext_feat));
-+	}
-+
-+	cl = (void *) skb->data;
-+	while (len >= sizeof(*cl)) {
-+		BT_DBG("Remote AMP id %d type %d status %d", cl->id, cl->type,
-+		       cl->status);
-+
-+		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
-+			struct a2mp_info_req req;
-+
-+			req.id = cl->id;
-+			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
-+				  sizeof(req), &req);
-+		}
-+
-+		len -= sizeof(*cl);
-+		cl = (void *) skb_pull(skb, sizeof(*cl));
-+	}
-+
-+	return 0;
-+}
-+
- static int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
- 			      struct a2mp_cmd *hdr)
- {
-@@ -381,8 +438,11 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 			err = a2mp_discphyslink_req(mgr, skb, hdr);
- 			break;
- 
--		case A2MP_CHANGE_RSP:
- 		case A2MP_DISCOVER_RSP:
-+			err = a2mp_discover_rsp(mgr, skb, hdr);
-+			break;
-+
-+		case A2MP_CHANGE_RSP:
- 		case A2MP_GETINFO_RSP:
- 		case A2MP_GETAMPASSOC_RSP:
- 		case A2MP_CREATEPHYSLINK_RSP:
+ #define HCI_OP_SNIFF_MODE		0x0803
+ struct hci_cp_sniff_mode {
+ 	__le16   handle;
 -- 
 1.7.9.5
 
