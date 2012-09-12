@@ -1,161 +1,347 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5050145A.7000408@ti.com>
-Date: Wed, 12 Sep 2012 07:49:30 +0300
+Message-ID: <50501416.90408@ti.com>
+Date: Wed, 12 Sep 2012 07:48:22 +0300
 From: Chen Ganir <chen.ganir@ti.com>
 MIME-Version: 1.0
 To: Joao Paulo Rechi Vita <jprvita@openbossa.org>
 CC: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 05/10] battery: Discover Characteristic Descriptors
-References: <1347349100-24228-1-git-send-email-chen.ganir@ti.com> <1347349100-24228-6-git-send-email-chen.ganir@ti.com> <CAAngNMaudTwxYNXqSsYFW+tU7OOTiPkseDKHux64HLzxp-5ALw@mail.gmail.com>
-In-Reply-To: <CAAngNMaudTwxYNXqSsYFW+tU7OOTiPkseDKHux64HLzxp-5ALw@mail.gmail.com>
+Subject: Re: [PATCH 02/10] battery: Implement Generic device battery
+References: <1347349100-24228-1-git-send-email-chen.ganir@ti.com> <1347349100-24228-3-git-send-email-chen.ganir@ti.com> <CAAngNMbUQzxAdwo2JUjzrqkLGXFhpyRVqtz03u+3t3nfXcyxpg@mail.gmail.com>
+In-Reply-To: <CAAngNMbUQzxAdwo2JUjzrqkLGXFhpyRVqtz03u+3t3nfXcyxpg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Joao,
 
-On 09/11/2012 11:52 PM, Joao Paulo Rechi Vita wrote:
+On 09/11/2012 09:27 PM, Joao Paulo Rechi Vita wrote:
 > On Tue, Sep 11, 2012 at 4:38 AM,  <chen.ganir@ti.com> wrote:
 >> From: Chen Ganir <chen.ganir@ti.com>
 >>
->> Discover all characteristic descriptors, and build a descriptor
->> list. Presentation Format Descriptor and Client Characteristic
->> Configuration descriptors are searched.
+>> Add implementation for the generic battery in bluetooth device.
+>> This patch adds new D-Bus interface for adding/removing/changing
+>> peer device battery status, allowing management of remote device
+>> batteries.
 >> ---
->>   profiles/battery/battery.c |   73 +++++++++++++++++++++++++++++++++++++++++++-
->>   1 file changed, 72 insertions(+), 1 deletion(-)
+>>   src/device.c     |  184 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>   src/device.h     |   15 +++++
+>>   test/test-device |   13 ++++
+>>   3 files changed, 212 insertions(+)
 >>
->> diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
->> index 37cbce4..3a24a7b 100644
->> --- a/profiles/battery/battery.c
->> +++ b/profiles/battery/battery.c
->> @@ -51,6 +51,13 @@ static GSList *servers;
->>   struct characteristic {
->>          struct gatt_char        attr;   /* Characteristic */
->>          struct battery          *batt;  /* Parent Battery Service */
->> +       GSList                          *desc;  /* Descriptors */
->
-> Wrong alignment here.
->
-Thanks.
-
->> +};
->> +
->> +struct descriptor {
->> +       struct characteristic   *ch;            /* Parent Characteristic */
->> +       uint16_t                handle;         /* Descriptor Handle */
->> +       bt_uuid_t               uuid;           /* UUID */
+>> diff --git a/src/device.c b/src/device.c
+>> index 02ef35e..ce4d467 100644
+>> --- a/src/device.c
+>> +++ b/src/device.c
+>> @@ -166,6 +166,7 @@ struct btd_device {
+>>
+>>          gboolean        authorizing;
+>>          gint            ref;
+>> +       GSList          *batteries;
+>>
+>>          GIOChannel      *att_io;
+>>          guint           cleanup_id;
+>> @@ -180,6 +181,26 @@ static uint16_t uuid_list[] = {
+>>          0
 >>   };
 >>
->>   static gint cmp_device(gconstpointer a, gconstpointer b)
->> @@ -64,12 +71,21 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
->>          return -1;
->>   }
->>
->> +static void char_free(gpointer user_data)
+>> +struct device_battery {
+>> +       DBusConnection          *conn;
+>> +       uint16_t                level;
+>> +       char                    *path;
+>> +       struct btd_device       *device;
+>> +       RefreshBattFunc         refresh_func;
+>> +};
+>> +
+>> +static void battery_free(gpointer user_data)
 >> +{
->> +       struct characteristic *c = user_data;
+>> +       struct device_battery *b = user_data;
 >> +
->> +       g_slist_free_full(c->desc, g_free);
+>> +       g_dbus_unregister_interface(b->conn, b->path, BATTERY_INTERFACE);
+>> +       dbus_connection_unref(b->conn);
+>> +       btd_device_unref(b->device);
+>> +       g_free(b->path);
+>> +       g_free(b);
 >> +
->> +       g_free(c);
 >> +}
 >> +
->>   static void battery_free(gpointer user_data)
+>>   static void browse_request_free(struct browse_req *req)
 >>   {
->>          struct battery *batt = user_data;
+>>          if (req->listener_id)
+>> @@ -259,6 +280,7 @@ static void device_free(gpointer user_data)
+>>          g_slist_free_full(device->primaries, g_free);
+>>          g_slist_free_full(device->attios, g_free);
+>>          g_slist_free_full(device->attios_offline, g_free);
+>> +       g_slist_free_full(device->batteries, battery_free);
 >>
->>          if (batt->chars != NULL)
->> -               g_slist_free_full(batt->chars, g_free);
->> +               g_slist_free_full(batt->chars, char_free);
+>>          attio_cleanup(device);
 >>
->>          if (batt->attioid > 0)
->>                  btd_device_remove_attio_callback(batt->dev, batt->attioid);
->> @@ -82,7 +98,47 @@ static void battery_free(gpointer user_data)
->>          g_free(batt);
+>> @@ -433,6 +455,15 @@ static DBusMessage *get_properties(DBusConnection *conn,
+>>          ptr = adapter_get_path(adapter);
+>>          dict_append_entry(&dict, "Adapter", DBUS_TYPE_OBJECT_PATH, &ptr);
+>>
+>> +       /* Batteries */
+>> +       str = g_new0(char *, g_slist_length(device->batteries) + 1);
+>> +       for (i = 0, l = device->batteries; l; l = l->next, i++) {
+>> +               struct device_battery *b = l->data;
+>> +               str[i] = b->path;
+>> +       }
+>> +       dict_append_array(&dict, "Batteries", DBUS_TYPE_OBJECT_PATH, &str, i);
+>> +       g_free(str);
+>> +
+>>          dbus_message_iter_close_container(&iter, &dict);
+>>
+>>          return reply;
+>> @@ -3263,3 +3294,156 @@ void btd_profile_disconnected(struct btd_profile *profile,
+>>   {
+>>          device->conns = g_slist_remove(device->conns, profile);
 >>   }
->>
->> +static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
->> +                                                       gpointer user_data)
+>> +
+>> +static void batteries_changed(struct btd_device *device)
 >> +{
->> +       struct characteristic *ch = user_data;
->> +       struct att_data_list *list;
->> +       uint8_t format;
+>> +       DBusConnection *conn = get_dbus_connection();
+>> +       char **batteries;
+>> +       GSList *l;
 >> +       int i;
 >> +
->> +       if (status != 0) {
->> +               error("Discover all characteristic descriptors failed [%s]: %s",
->> +                                       ch->attr.uuid, att_ecode2str(status));
->> +               return;
+>> +       batteries = g_new0(char *, g_slist_length(device->batteries) + 1);
+>> +       for (i = 0, l = device->batteries; l; l = l->next, i++) {
+>> +               struct device_battery *batt = l->data;
+>> +               batteries[i] = batt->path;
 >> +       }
 >> +
->> +       list = dec_find_info_resp(pdu, len, &format);
->> +       if (list == NULL)
->> +               return;
+>> +       emit_array_property_changed(conn, device->path, DEVICE_INTERFACE,
+>> +                                    "Batteries", DBUS_TYPE_OBJECT_PATH,
+>> +                                    &batteries, i);
 >> +
->> +       for (i = 0; i < list->num; i++) {
->> +               struct descriptor *desc;
->> +               uint8_t *value;
->> +
->> +               value = list->data[i];
->> +               desc = g_new0(struct descriptor, 1);
->> +               desc->handle = att_get_u16(value);
->> +               desc->ch = ch;
->> +
->> +               if (format == 0x01)
->> +                       desc->uuid = att_get_uuid16(&value[2]);
->> +               else
->> +                       desc->uuid = att_get_uuid128(&value[2]);
->> +
->> +               ch->desc = g_slist_append(ch->desc, desc);
->> +       }
->> +
->> +       att_data_list_free(list);
+>> +       g_free(batteries);
 >> +}
 >> +
+>> +static DBusMessage *refresh_batt_level(DBusConnection *conn,
+>> +                                                 DBusMessage *msg, void *data)
+>> +{
+>> +       struct device_battery *b = data;
 >> +
->
-> Remove extra blank line here.
->
->>   static void configure_battery_cb(GSList *characteristics, guint8 status,
+>> +       if (!b->refresh_func)
+>> +               return btd_error_not_supported(msg);
 >> +
+>> +       b->refresh_func(b);
+>> +
+>> +       return dbus_message_new_method_return(msg);
+>> +}
+>> +
+>> +static DBusMessage *get_batt_properties(DBusConnection *conn,
+>> +                                                 DBusMessage *msg, void *data)
+>> +{
+>> +       struct device_battery *b = data;
+>> +       DBusMessageIter iter;
+>> +       DBusMessageIter dict;
+>> +       DBusMessage *reply;
+>> +
+>> +       reply = dbus_message_new_method_return(msg);
+>> +       if (reply == NULL)
+>> +               return NULL;
+>> +
+>> +       dbus_message_iter_init_append(reply, &iter);
+>> +
+>> +       dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+>> +                       DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+>> +                       DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+>> +                       DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+>> +
+>> +       dict_append_entry(&dict, "Level", DBUS_TYPE_UINT16, &b->level);
+>> +
+>> +       dbus_message_iter_close_container(&iter, &dict);
+>> +
+>> +       return reply;
+>> +}
+>> +
+>> +static GDBusMethodTable battery_methods[] = {
+>> +       { GDBUS_METHOD("GetProperties",
+>> +               NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
+>> +               get_batt_properties) },
+>> +       { GDBUS_METHOD("Refresh",
+>> +               NULL, NULL,
+>> +               refresh_batt_level) },
+>> +       { }
+>> +};
+>> +
+>> +static GDBusSignalTable battery_signals[] = {
+>> +       { GDBUS_SIGNAL("PropertyChanged",
+>> +               GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
+>> +       { }
+>> +};
+>> +
+>> +struct device_battery *btd_device_add_battery(struct btd_device *device)
+>> +{
+>> +       struct device_battery *batt;
+>> +       DBusConnection *conn = get_dbus_connection();
+>> +
+>> +       batt = g_new0(struct device_battery, 1);
+>> +       batt->path = g_strdup_printf("%s/BATT%04X", device->path,
+>> +                                            g_slist_length(device->batteries));
+>> +       batt->conn = dbus_connection_ref(conn);
+>> +
+>> +       if (!g_dbus_register_interface(batt->conn, batt->path,
+>> +                       BATTERY_INTERFACE, battery_methods, battery_signals,
+>> +                       NULL, batt, NULL)) {
+>> +               error("D-Bus register interface %s failed", BATTERY_INTERFACE);
+>> +               dbus_connection_unref(batt->conn);
+>> +               g_free(batt->path);
+>> +               g_free(batt);
+>> +               return NULL;
+>> +       }
+>> +
+>> +       batt->device = btd_device_ref(device);
+>> +       device->batteries = g_slist_append(device->batteries, batt);
+>> +       batteries_changed(device);
+>> +
+>> +       return batt;
+>> +}
+>> +
+>> +void btd_device_remove_battery(struct device_battery *batt)
+>> +{
+>> +       struct btd_device *dev = batt->device;
+>> +
+>> +       dev->batteries = g_slist_remove(dev->batteries, batt);
+>> +
+>> +       battery_free(batt);
+>> +
+>> +       batteries_changed(dev);
+>> +}
+>> +
+>> +gboolean btd_device_set_battery_opt(struct device_battery *batt,
+>> +                                                       BatteryOption opt1, ...)
+>> +{
+>> +       va_list args;
+>> +       BatteryOption opt = opt1;
+>> +       int level;
+>> +
+>> +       if (!batt)
+>> +               return FALSE;
+>> +
+>> +       va_start(args, opt1);
+>> +
+>> +       while (opt != BATTERY_OPT_INVALID) {
+>> +               switch (opt) {
+>> +               case BATTERY_OPT_LEVEL:
+>> +                       level = va_arg(args, int);
+>> +                       if (level != batt->level) {
+>> +                               batt->level = level;
+>> +                               emit_property_changed(batt->conn, batt->path,
+>> +                                               BATTERY_INTERFACE, "Level",
+>> +                                               DBUS_TYPE_UINT16, &level);
+>> +                       }
+>> +                       break;
+>> +               case BATTERY_OPT_REFRESH_FUNC:
+>> +                       batt->refresh_func = va_arg(args, RefreshBattFunc);
+>> +                       break;
+>> +               default:
+>> +                       error("Unknown option %d", opt);
+>> +                       return FALSE;
+>> +               }
+>> +
+>> +               opt = va_arg(args, int);
+>> +       }
+>> +
+>> +       va_end(args);
+>> +
+>> +       return TRUE;
+>> +
+>> +}
 >
-> Remove extra blank line here.
+> Please remove this empty line also.
 >
-Ok, will remove both of them.
+Thanks, missed that as well.
 
->>                                                          gpointer user_data)
->>   {
->>          struct battery *batt = user_data;
->> @@ -97,6 +153,7 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
->>          for (l = characteristics; l; l = l->next) {
->>                  struct gatt_char *c = l->data;
->>                  struct characteristic *ch;
->> +               uint16_t start, end;
+
+>> diff --git a/src/device.h b/src/device.h
+>> index f1d95c6..66eb5e8 100644
+>> --- a/src/device.h
+>> +++ b/src/device.h
+>> @@ -23,8 +23,10 @@
+>>    */
 >>
->>                  ch = g_new0(struct characteristic, 1);
->>                  ch->attr.handle = c->handle;
->> @@ -106,6 +163,20 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
->>                  ch->batt = batt;
+>>   #define DEVICE_INTERFACE       "org.bluez.Device"
+>> +#define BATTERY_INTERFACE      "org.bluez.Battery"
 >>
->>                  batt->chars = g_slist_append(batt->chars, ch);
->> +
->> +               start = c->value_handle + 1;
->> +
->> +               if (l->next != NULL) {
->> +                       struct gatt_char *c = l->next->data;
->> +                       if (start == c->handle)
->> +                               continue;
->> +                       end = c->handle - 1;
->> +               } else if (c->value_handle != batt->svc_range->end)
->> +                       end = batt->svc_range->end;
->> +               else
->> +                       continue;
->> +
->> +               gatt_find_info(batt->attrib, start, end, discover_desc_cb, ch);
->>          }
->>   }
+>>   struct btd_device;
+>> +struct device_battery;
+>
+> Since this symbol is being exported, shouldn't it be prefixed with btd_ as well?
+>
+I will rename it to struct btd_battery. Is that ok ?
+
+
 >>
+>>   typedef enum {
+>>          AUTH_TYPE_PINCODE,
+>> @@ -54,6 +56,14 @@ struct btd_profile {
+>>          void (*adapter_remove) (struct btd_adapter *adapter);
+>>   };
+>>
+>> +typedef void (*RefreshBattFunc) (struct device_battery *batt);
+>
+> I don't think we use CamelCase for anything other than D-Bus method names.
+>
+We use it in gattrib.h for function pointers. What is the correct 
+convention for function pointers ? same as in adapter_ops ?
+
+>> +
+>> +typedef enum {
+>> +       BATTERY_OPT_INVALID = 0,
+>> +       BATTERY_OPT_LEVEL,
+>> +       BATTERY_OPT_REFRESH_FUNC,
+>> +} BatteryOption;
+>
+> Fix CamelCase usage here and on uses of this type as well.
+>
+btio.h also uses this convention. What should be the correct convention ?
+
+
+
+>> +
+>>   void btd_profile_foreach(void (*func)(struct btd_profile *p, void *data),
+>>                                                                  void *data);
+>>
+>> @@ -158,3 +168,8 @@ int device_unblock(DBusConnection *conn, struct btd_device *device,
+>>   void device_set_pnpid(struct btd_device *device, uint8_t vendor_id_src,
+>>                          uint16_t vendor_id, uint16_t product_id,
+>>                          uint16_t product_ver);
+>> +
+>> +struct device_battery *btd_device_add_battery(struct btd_device *device);
+>> +void btd_device_remove_battery(struct device_battery *batt);
+>> +gboolean btd_device_set_battery_opt(struct device_battery *batt,
+>> +                                                      BatteryOption opt1, ...);
+>> diff --git a/test/test-device b/test/test-device
+>> index 63a96d3..7edb7b8 100755
+>> --- a/test/test-device
+>> +++ b/test/test-device
+>> @@ -37,6 +37,7 @@ if (len(args) < 1):
+>>          print("")
+>>          print("  list")
+>>          print("  services <address>")
+>> +       print("  batteries <address>")
+>>          print("  create <address>")
+>>          print("  remove <address|path>")
+>>          print("  disconnect <address>")
+>> @@ -205,5 +206,17 @@ if (args[0] == "services"):
+>>                          print(path)
+>>          sys.exit(0)
+>>
+>> +if (args[0] == "batteries"):
+>> +       if (len(args) < 2):
+>> +               print("Need address parameter")
+>> +       else:
+>> +               path = adapter.FindDevice(args[1])
+>> +               device = dbus.Interface(bus.get_object("org.bluez", path),
+>> +                                                       "org.bluez.Device")
+>> +               properties = device.GetProperties()
+>> +               for path in properties["Batteries"]:
+>> +                       print(path)
+>> +       sys.exit(0)
+>> +
+>>   print("Unknown command")
+>>   sys.exit(1)
 >> --
 >> 1.7.9.5
 >>
@@ -168,7 +354,6 @@ Ok, will remove both of them.
 >
 
 Thanks,
-
 
 
 -- 
