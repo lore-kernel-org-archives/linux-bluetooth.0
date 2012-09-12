@@ -1,53 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 12 Sep 2012 11:45:37 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Chen Ganir <chen.ganir@ti.com>
-Cc: Joao Paulo Rechi Vita <jprvita@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 02/10] battery: Implement Generic device battery
-Message-ID: <20120912084537.GA31700@x220.P-661HNU-F1>
-References: <1347349100-24228-1-git-send-email-chen.ganir@ti.com>
- <1347349100-24228-3-git-send-email-chen.ganir@ti.com>
- <CAAngNMbUQzxAdwo2JUjzrqkLGXFhpyRVqtz03u+3t3nfXcyxpg@mail.gmail.com>
- <50501416.90408@ti.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <50501416.90408@ti.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: mathewm@codeaurora.org, gustavo@padovan.org
+Subject: [PATCHv4 16/17] Bluetooth: A2MP: Add fallback to normal l2cap init sequence
+Date: Wed, 12 Sep 2012 11:06:31 +0300
+Message-Id: <1347437192-24694-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <alpine.DEB.2.02.1209111121550.3754@mathewm-linux>
+ <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Wed, Sep 12, 2012, Chen Ganir wrote:
-> >Since this symbol is being exported, shouldn't it be prefixed with
-> >btd_ as well?
-> >
-> I will rename it to struct btd_battery. Is that ok ?
+When there is no remote AMP controller found fallback to normal
+L2CAP sequence.
 
-Yes.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/a2mp.c          |   28 ++++++++++++++++++++++++++++
+ net/bluetooth/l2cap_core.c    |    2 +-
+ 3 files changed, 30 insertions(+), 1 deletion(-)
 
-> 
-> >>+typedef void (*RefreshBattFunc) (struct device_battery *batt);
-> >
-> >I don't think we use CamelCase for anything other than D-Bus method names.
-> >
-> We use it in gattrib.h for function pointers. What is the correct
-> convention for function pointers ? same as in adapter_ops ?
-> 
-> >>+
-> >>+typedef enum {
-> >>+       BATTERY_OPT_INVALID = 0,
-> >>+       BATTERY_OPT_LEVEL,
-> >>+       BATTERY_OPT_REFRESH_FUNC,
-> >>+} BatteryOption;
-> >
-> >Fix CamelCase usage here and on uses of this type as well.
-> >
-> btio.h also uses this convention. What should be the correct convention ?
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index aba830f..0967f9e 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -769,5 +769,6 @@ int l2cap_ertm_init(struct l2cap_chan *chan);
+ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ void l2cap_chan_del(struct l2cap_chan *chan, int err);
++void l2cap_send_conn_req(struct l2cap_chan *chan);
+ 
+ #endif /* __L2CAP_H */
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 39e0f95..05522ea 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -181,6 +181,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	u16 len = le16_to_cpu(hdr->len);
+ 	struct a2mp_cl *cl;
+ 	u16 ext_feat;
++	bool found = false;
+ 
+ 	if (len < sizeof(*rsp))
+ 		return -EINVAL;
+@@ -211,6 +212,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
+ 			struct a2mp_info_req req;
+ 
++			found = true;
+ 			req.id = cl->id;
+ 			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
+ 				  sizeof(req), &req);
+@@ -220,6 +222,32 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 		cl = (void *) skb_pull(skb, sizeof(*cl));
+ 	}
+ 
++	/* Fall back to L2CAP init sequence */
++	if (!found) {
++		struct l2cap_conn *conn = mgr->l2cap_conn;
++		struct l2cap_chan *chan;
++
++		mutex_lock(&conn->chan_lock);
++
++		list_for_each_entry(chan, &conn->chan_l, list) {
++
++			BT_DBG("chan %p state %s", chan,
++			       state_to_string(chan->state));
++
++			if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
++				continue;
++
++			l2cap_chan_lock(chan);
++
++			if (chan->state == BT_CONNECT)
++				l2cap_send_conn_req(chan);
++
++			l2cap_chan_unlock(chan);
++		}
++
++		mutex_unlock(&conn->chan_lock);
++	}
++
+ 	return 0;
+ }
+ 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index cfe047f..d2ab82c 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -958,7 +958,7 @@ static bool __amp_capable(struct l2cap_chan *chan)
+ 		return false;
+ }
+ 
+-static void l2cap_send_conn_req(struct l2cap_chan *chan)
++void l2cap_send_conn_req(struct l2cap_chan *chan)
+ {
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct l2cap_conn_req req;
+-- 
+1.7.9.5
 
-Both BtIO and GAttrib intend to mimic GLib-like libraries where this is
-the convention. The plan is not to let this spread to the entire code
-base (particularly with the likely move to libell in the long run), so
-please don't use CamelCase.
-
-Johan
