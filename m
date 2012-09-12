@@ -1,111 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CACUGKYMP7YRu1=P4Uf9T_RfOKQFPvZq8sK+GGi0T1jB6GDXcDQ@mail.gmail.com>
-References: <CACUGKYONE6a2PWtOEY4Kgg9TQkX3pCwhW9UJLk5KGVtpL5eVaw@mail.gmail.com>
-	<CACUGKYPwTxRS8JN78J-oPSwz0mhnKvxHg=ybm5vyiKivEpM03A@mail.gmail.com>
-	<20120910235838.GA26986@samus>
-	<CACUGKYMP7YRu1=P4Uf9T_RfOKQFPvZq8sK+GGi0T1jB6GDXcDQ@mail.gmail.com>
-Date: Wed, 12 Sep 2012 19:52:36 -0700
-Message-ID: <CACUGKYN-+AKvVOZwxR7b6cvSujBMRHnjzNGcGezYynP2gTm6KA@mail.gmail.com>
-Subject: Re: Dropping connection (bit off-topic)
-From: John Tobias <john.tobias.ph@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Thu, 13 Sep 2012 00:36:28 +0200
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bastien Nocera <hadess@hadess.net>,
+	David Dillow <dave@thedillows.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Add support for Logitech Harmony Adapter for PS3
+Message-Id: <20120913003628.ce5babb2a66d09fe17fa15de@studenti.unina.it>
+In-Reply-To: <CANq1E4SDXVHcumBbEA-4xpeuOQ0SjDxxtL_RqAiNYRPj6ccagQ@mail.gmail.com>
+References: <1346378760.7976.2.camel@obelisk.thedillows.org>
+	<20120907124559.GA16092@x220>
+	<CABBYNZ+5E+BC-+9fj0e7iUpEDFJrJBQo8aoMZj8ZEkmiuB=QLA@mail.gmail.com>
+	<1347284864.3532.1.camel@sirocco.hadess.net>
+	<CABBYNZJpHkt8CGDsfVwirZ=vecb-fhbpPbrVFKt1UR_rA25mSw@mail.gmail.com>
+	<CABBYNZ+n9obON7iNcv66x2ZVQCeTs_JoJUDXZFwxJJ6C4cb4YQ@mail.gmail.com>
+	<CABBYNZKggzJ7bzQWVmWi30kxOUR8bVCyMLL=SM1=Oe74YPwvKg@mail.gmail.com>
+	<1347394656.1606.10.camel@sirocco.hadess.net>
+	<CABBYNZ+gpheC9sNeTp2uvDFBV-yPs+cY4PUR2omPt_kLTCafKw@mail.gmail.com>
+	<1347456657.23874.29.camel@sirocco.hadess.net>
+	<CABBYNZLwXhF0gixPGKUTJY4sZ7EHynTYmHzGtiZsoRGXgeEFaw@mail.gmail.com>
+	<CANq1E4SDXVHcumBbEA-4xpeuOQ0SjDxxtL_RqAiNYRPj6ccagQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello again,
+On Wed, 12 Sep 2012 22:26:04 +0200
+David Herrmann <dh.herrmann@googlemail.com> wrote:
 
-I enabled the GATT in my bluetoothd and found out that there was an
-unimplemented attribute (below) and might be the reason why the iPhone
-connection got disconnected after 30 secs.
+> Hi all
+> 
+> On Wed, Sep 12, 2012 at 4:32 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> > Hi Bastien
+> >
+> > Getting the device does not seems to be a problem and we have a
+> > similar driver already in the kernel, so Im really optimistic that it
+> > will not take long to have this implemented in the kernel.
+> 
+> Please, just redirect me to the information of the device protocols.
+> It is pretty simple to make the kernel drivers work with these kinds
+> of HID devices. There is no need to look at the wiimote driver as this
+> one is pretty complex and does something totally different than normal
+> HID drivers.
+> 
+> I am willing to write the kernel drivers, but I need a short
+> introduction or some pointers on how these devices work. I cannot
+> afford buying these (yeah, not even 30$...) so I also need people
+> willing to test these. This should be pretty easy, though.
+> 
+> Also Jiri Kosina (the HID maintainer) is willing to accept any weird
+> quirks we need for these devices. But please stop using fakehid. The
+> idea is wrong and hidraw should be used to write userspace HID
+> drivers. (uhid is only for transport side! So cannot be used here).
+> The kernel HID community is also very active and helps a lot on
+> maintaining the drivers.
+> 
+> So if the devices only need some short setup-command during
+> initialization and then they send HID reports whenever a button is
+> pressed, then everything should be very easy to get working. Even
+> auto-reconnect and 10min idle-disconnect are _very_ easy to get
+> working in the kernel with the current HID infrastructure.
+> 
 
-2012-09-12 15:36:55.419980 > ACL data: handle 76 flags 0x02 dlen 9
-    ATT: Error (0x01)
-      Error: Attribute not found (10)
-      Read By Type req (0x08) on handle 0x0039
+I too will take a look during the week-end about writing a kernel
+driver, if it's not that much of an effort I might take the project
+(no promises yet). I have a PS3 BD remote Bastien donated.
 
-I would like to know if anyone here has a patch?.
+David AFAICS from profiles/input/fakehid.c[1], a custom report has to be
+decoded and appropriate input events have to be sent.
 
 Regards,
+   Antonio
 
-john
+[1]
+http://git.kernel.org/?p=bluetooth/bluez.git;a=blob;f=profiles/input/fakehid.c;h=05f5894c7bd537d78a010b3905af9f98c0364002;hb=96f60e1411514fb4b0d8690aca1c02b3c6b32b9c
 
+-- 
+Antonio Ospite
+http://ao2.it
 
-On Mon, Sep 10, 2012 at 5:45 PM, John Tobias <john.tobias.ph@gmail.com> wrote:
-> thanks for the info.
->
-> Regards,
->
-> john
->
-> On Mon, Sep 10, 2012 at 4:58 PM, Vinicius Costa Gomes
-> <vinicius.gomes@openbossa.org> wrote:
->> Hi John,
->>
->> On 16:34 Mon 10 Sep, John Tobias wrote:
->>> Just to follow up, I used hcidump and found out an interesting info:
->>>
->>>     bdaddr 5C:35:3C:72:B2:AF type 1
->>> > HCI Event: Command Status (0x0f) plen 4
->>>     LE Create Connection (0x08|0x000d) status 0x00 ncmd 1
->>> > HCI Event: LE Meta Event (0x3e) plen 19
->>>     LE Connection Complete
->>>       status 0x00 handle 77, role master
->>>       bdaddr 5C:35:3C:72:B2:AF (Random)
->>> > ACL data: handle 77 flags 0x02 dlen 11
->>>     ATT: Read By Type req (0x08)
->>>       start 0x0001, end 0xffff
->>>       type-uuid 0x2a00
->>> > HCI Event: Disconn Complete (0x05) plen 4
->>>     status 0x00 handle 77 reason 0x13
->>>     Reason: Remote User Terminated Connection
->>>
->>>
->>> The iPhone was requesting for "ATT: Read By Type req (0x08)" and the
->>> gatttool seems not reponding. So, after 30 secs the iPhone dropped the
->>> connection.
->>>
->>> Any idea how the gatttool could respond to the said request?.
->>
->> The problem is that gatttool still hasn't any support for sending
->> responses. bluetoothd has, if you enable GATT support, 'EnableGatt' in
->> '/etc/bluetooth/main.conf' (usual location).
->>
->> But using 'bluetoothd' means that will need to use the D-Bus API, which
->> makes me wonder that having a simple GATT server inside gatttool makes
->> some sense, for some use cases.
->>
->>>
->>> Regards,
->>>
->>> john
->>>
->>>
->>> On Mon, Sep 10, 2012 at 2:35 PM, John Tobias <john.tobias.ph@gmail.com> wrote:
->>> > Hello Guys,
->>> >
->>> > I am using pandaboard with USB BLE dongle and an apps in iPhone that
->>> > do the advertising. I was able to connect to the said device from my
->>> > pandaboard using the following commands:
->>> >
->>> > gatttool -i hci1 -m 27 -I -b 74:xx:xx:xx:xx:xx
->>> > connect
->>> >
->>> > But, I've noticed that after 30 secs, the iPhone dropped off the
->>> > connection. I am just wondering if anyone here have tried playing with
->>> > the iPhone using the ble connection?.
->>> >
->>> > Regards,
->>> >
->>> > John
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->> Cheers,
->> --
->> Vinicius
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
