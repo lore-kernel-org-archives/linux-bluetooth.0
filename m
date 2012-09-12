@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: mathewm@codeaurora.org, gustavo@padovan.org
-Subject: [PATCHv4 16/17] Bluetooth: A2MP: Add fallback to normal l2cap init sequence
-Date: Wed, 12 Sep 2012 11:06:31 +0300
-Message-Id: <1347437192-24694-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 07/17] Bluetooth: AMP: Remote AMP ctrl definitions
+Date: Wed, 12 Sep 2012 11:06:22 +0300
+Message-Id: <1347437192-24694-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <alpine.DEB.2.02.1209111121550.3754@mathewm-linux>
  <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -13,93 +13,171 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When there is no remote AMP controller found fallback to normal
-L2CAP sequence.
+Create remote AMP controllers structure. It is used to keep information
+about discovered remote AMP controllers by A2MP protocol.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |    1 +
- net/bluetooth/a2mp.c          |   28 ++++++++++++++++++++++++++++
- net/bluetooth/l2cap_core.c    |    2 +-
- 3 files changed, 30 insertions(+), 1 deletion(-)
+ include/net/bluetooth/a2mp.h |    3 ++
+ include/net/bluetooth/pal.h  |   14 ++++++++
+ net/bluetooth/a2mp.c         |    5 +++
+ net/bluetooth/pal.c          |   81 ++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 103 insertions(+)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index aba830f..0967f9e 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -769,5 +769,6 @@ int l2cap_ertm_init(struct l2cap_chan *chan);
- void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
- void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
- void l2cap_chan_del(struct l2cap_chan *chan, int err);
-+void l2cap_send_conn_req(struct l2cap_chan *chan);
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+index f9010c0..93967f1 100644
+--- a/include/net/bluetooth/a2mp.h
++++ b/include/net/bluetooth/a2mp.h
+@@ -31,6 +31,9 @@ struct amp_mgr {
+ 		READ_LOC_AMP_ASSOC,
+ 	} state;
+ 	unsigned long		flags;
++
++	struct list_head	amp_ctrls;
++	struct mutex		amp_ctrls_lock;
+ };
  
- #endif /* __L2CAP_H */
+ struct a2mp_cmd {
+diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
+index a0f441b..918a4be 100644
+--- a/include/net/bluetooth/pal.h
++++ b/include/net/bluetooth/pal.h
+@@ -20,6 +20,20 @@
+ #include <net/bluetooth/a2mp.h>
+ #include <net/bluetooth/amp.h>
+ 
++struct amp_ctrl {
++	struct list_head	list;
++	struct kref		kref;
++	__u8			id;
++	__u16			assoc_len_so_far;
++	__u16			assoc_rem_len;
++	__u16			assoc_len;
++	__u8			*assoc;
++};
++
++int amp_ctrl_put(struct amp_ctrl *ctrl);
++struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr);
++struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id);
++void amp_ctrl_list_flush(struct amp_mgr *mgr);
+ struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
+ 			     u8 remote_id);
+ 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 39e0f95..05522ea 100644
+index 8f236db..36bf0f4 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -181,6 +181,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 	u16 len = le16_to_cpu(hdr->len);
- 	struct a2mp_cl *cl;
- 	u16 ext_feat;
-+	bool found = false;
+@@ -585,6 +585,7 @@ static void amp_mgr_destroy(struct kref *kref)
+ 	list_del(&mgr->list);
+ 	mutex_unlock(&amp_mgr_list_lock);
  
- 	if (len < sizeof(*rsp))
- 		return -EINVAL;
-@@ -211,6 +212,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
- 			struct a2mp_info_req req;
++	amp_ctrl_list_flush(mgr);
+ 	kfree(mgr);
+ }
  
-+			found = true;
- 			req.id = cl->id;
- 			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
- 				  sizeof(req), &req);
-@@ -220,6 +222,32 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 		cl = (void *) skb_pull(skb, sizeof(*cl));
- 	}
+@@ -623,6 +624,10 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
+ 	list_add(&mgr->list, &amp_mgr_list);
+ 	mutex_unlock(&amp_mgr_list_lock);
  
-+	/* Fall back to L2CAP init sequence */
-+	if (!found) {
-+		struct l2cap_conn *conn = mgr->l2cap_conn;
-+		struct l2cap_chan *chan;
++	/* Remote AMP ctrl list initialization */
++	INIT_LIST_HEAD(&mgr->amp_ctrls);
++	mutex_init(&mgr->amp_ctrls_lock);
 +
-+		mutex_lock(&conn->chan_lock);
+ 	kref_init(&mgr->kref);
+ 
+ 	return mgr;
+diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
+index 3377ad1..7548644 100644
+--- a/net/bluetooth/pal.c
++++ b/net/bluetooth/pal.c
+@@ -13,6 +13,87 @@
+ 
+ #include <net/bluetooth/pal.h>
+ 
++/* Remote AMP Controllers handling */
++static void amp_ctrl_get(struct amp_ctrl *ctrl)
++{
++	BT_DBG("ctrl %p orig refcnt %d", ctrl,
++	       atomic_read(&ctrl->kref.refcount));
 +
-+		list_for_each_entry(chan, &conn->chan_l, list) {
++	kref_get(&ctrl->kref);
++}
 +
-+			BT_DBG("chan %p state %s", chan,
-+			       state_to_string(chan->state));
++static void amp_ctrl_destroy(struct kref *kref)
++{
++	struct amp_ctrl *ctrl = container_of(kref, struct amp_ctrl, kref);
 +
-+			if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
-+				continue;
++	BT_DBG("ctrl %p", ctrl);
 +
-+			l2cap_chan_lock(chan);
++	if (ctrl->assoc)
++		kfree(ctrl->assoc);
 +
-+			if (chan->state == BT_CONNECT)
-+				l2cap_send_conn_req(chan);
++	kfree(ctrl);
++}
 +
-+			l2cap_chan_unlock(chan);
-+		}
++int amp_ctrl_put(struct amp_ctrl *ctrl)
++{
++	BT_DBG("ctrl %p orig refcnt %d", ctrl,
++	       atomic_read(&ctrl->kref.refcount));
 +
-+		mutex_unlock(&conn->chan_lock);
++	return kref_put(&ctrl->kref, &amp_ctrl_destroy);
++}
++
++struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr)
++{
++	struct amp_ctrl *ctrl;
++
++	ctrl = kzalloc(sizeof(*ctrl), GFP_KERNEL);
++	if (!ctrl)
++		return NULL;
++
++	mutex_lock(&mgr->amp_ctrls_lock);
++	list_add(&ctrl->list, &mgr->amp_ctrls);
++	mutex_unlock(&mgr->amp_ctrls_lock);
++
++	kref_init(&ctrl->kref);
++
++	BT_DBG("mgr %p ctrl %p", mgr, ctrl);
++
++	return ctrl;
++}
++
++void amp_ctrl_list_flush(struct amp_mgr *mgr)
++{
++	struct amp_ctrl *ctrl, *n;
++
++	BT_DBG("mgr %p", mgr);
++
++	mutex_lock(&mgr->amp_ctrls_lock);
++	list_for_each_entry_safe(ctrl, n, &mgr->amp_ctrls, list) {
++		list_del(&ctrl->list);
++		amp_ctrl_put(ctrl);
 +	}
++	mutex_unlock(&mgr->amp_ctrls_lock);
++}
 +
- 	return 0;
- }
- 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index cfe047f..d2ab82c 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -958,7 +958,7 @@ static bool __amp_capable(struct l2cap_chan *chan)
- 		return false;
- }
- 
--static void l2cap_send_conn_req(struct l2cap_chan *chan)
-+void l2cap_send_conn_req(struct l2cap_chan *chan)
++struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id)
++{
++	struct amp_ctrl *ctrl = NULL;
++
++	mutex_lock(&mgr->amp_ctrls_lock);
++	list_for_each_entry(ctrl, &mgr->amp_ctrls, list) {
++		if (ctrl->id == id)
++			break;
++	}
++	mutex_unlock(&mgr->amp_ctrls_lock);
++
++	BT_DBG("mgr %p id %d ctrl %p", mgr, id, ctrl);
++
++	if (ctrl)
++		amp_ctrl_get(ctrl);
++
++	return ctrl;
++}
++
+ /* Physical Link interface */
+ static u8 __next_handle(struct amp_mgr *mgr)
  {
- 	struct l2cap_conn *conn = chan->conn;
- 	struct l2cap_conn_req req;
 -- 
 1.7.9.5
 
