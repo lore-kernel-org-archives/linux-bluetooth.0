@@ -1,43 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1347455822.21218.3.camel@obelisk.thedillows.org>
-Subject: Re: [PATCH] Add support for Logitech Harmony Adapter for PS3
-From: David Dillow <dave@thedillows.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Bastien Nocera <hadess@hadess.net>, linux-bluetooth@vger.kernel.org
-Date: Wed, 12 Sep 2012 09:17:02 -0400
-In-Reply-To: <CABBYNZ+gpheC9sNeTp2uvDFBV-yPs+cY4PUR2omPt_kLTCafKw@mail.gmail.com>
-References: <1346378760.7976.2.camel@obelisk.thedillows.org>
-	 <20120907124559.GA16092@x220>
-	 <CABBYNZ+5E+BC-+9fj0e7iUpEDFJrJBQo8aoMZj8ZEkmiuB=QLA@mail.gmail.com>
-	 <1347284864.3532.1.camel@sirocco.hadess.net>
-	 <CABBYNZJpHkt8CGDsfVwirZ=vecb-fhbpPbrVFKt1UR_rA25mSw@mail.gmail.com>
-	 <CABBYNZ+n9obON7iNcv66x2ZVQCeTs_JoJUDXZFwxJJ6C4cb4YQ@mail.gmail.com>
-	 <CABBYNZKggzJ7bzQWVmWi30kxOUR8bVCyMLL=SM1=Oe74YPwvKg@mail.gmail.com>
-	 <1347394656.1606.10.camel@sirocco.hadess.net>
-	 <CABBYNZ+gpheC9sNeTp2uvDFBV-yPs+cY4PUR2omPt_kLTCafKw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <5050644F.5040902@ti.com>
+References: <1347349100-24228-1-git-send-email-chen.ganir@ti.com>
+	<1347349100-24228-3-git-send-email-chen.ganir@ti.com>
+	<CAAngNMbUQzxAdwo2JUjzrqkLGXFhpyRVqtz03u+3t3nfXcyxpg@mail.gmail.com>
+	<50501416.90408@ti.com>
+	<20120912084537.GA31700@x220.P-661HNU-F1>
+	<5050644F.5040902@ti.com>
+Date: Wed, 12 Sep 2012 06:57:20 -0400
+Message-ID: <CAJdJm_NNR86qNnxm-CPFqfuu0sPkoQhqAZY6nGUKB6GYeJ2HAw@mail.gmail.com>
+Subject: Re: [PATCH 02/10] battery: Implement Generic device battery
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Chen Ganir <chen.ganir@ti.com>
+Cc: Joao Paulo Rechi Vita <jprvita@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2012-09-12 at 13:56 +0300, Luiz Augusto von Dentz wrote:
-> Hi Bastien,
-> 
-> On Tue, Sep 11, 2012 at 11:17 PM, Bastien Nocera <hadess@hadess.net> wrote:
-> > Certainly, but until somebody writes the code (I already have at least 3
-> > drivers to submit to the kernel that I've not had time to handle,
-> > include one Bluetooth device), I think it would be nice not to drop
-> > support for the existing hardware. The cost of David's patch is close to
-> > none.
-> 
-> Do you have any code already? Anyway it is now removed from upstream,
-> I will try to get one of these devices myself and start writing some
-> code if you don't have it done already.
+Hi Chen,
 
-I first looked to the kernel for support, but found it in user space and
-stopped. I'll take a stab a it, with wiimote as a reference -- it really
-shouldn't be too hard.
+On Wed, Sep 12, 2012 at 6:30 AM, Chen Ganir <chen.ganir@ti.com> wrote:
+>> Both BtIO and GAttrib intend to mimic GLib-like libraries where this is
+>> the convention. The plan is not to let this spread to the entire code
+>> base (particularly with the likely move to libell in the long run), so
+>> please don't use CamelCase.
+>>
+> Ok. So for the battery options i'll simply change it to battery_option. What
+> about the convention for defining a function pointer ?
 
-But it'll take a little time -- the device is in use for MythTV, so I
-risk a mutiny if I try to test before bedtime... ;)
+See the result of:
 
+grep -r 'typedef.*(' *
+
+on your bluez tree. As Johan mentioned, you should ignore the (few)
+occurrences of camel case typedef declarations.
+
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
