@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: mathewm@codeaurora.org, gustavo@padovan.org
-Subject: [PATCHv4 14/17] Bluetooth: AMP: Create Physical Link
-Date: Wed, 12 Sep 2012 11:06:29 +0300
-Message-Id: <1347437192-24694-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 03/17] Bluetooth: AMP: Use HCI cmd to Read AMP Info
+Date: Wed, 12 Sep 2012 11:06:18 +0300
+Message-Id: <1347437192-24694-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <alpine.DEB.2.02.1209111121550.3754@mathewm-linux>
  <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -13,115 +13,150 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When receiving A2MP Get AMP Assoc Response execute HCI Create Physical
-Link to AMP controller. Define function which will run when receiving
-HCI Command Status.
+When receiving A2MP Get Info Request execute Read Local AMP Info HCI
+command to AMP controller with function to be executed upon receiving
+command complete event. Function will handle A2MP Get Info Response.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/amp.h |    4 ++++
- include/net/bluetooth/pal.h |    1 -
- net/bluetooth/a2mp.c        |    2 ++
- net/bluetooth/amp.c         |   19 +++++++++++++++++++
- net/bluetooth/hci_event.c   |    9 +++++++++
- 5 files changed, 34 insertions(+), 1 deletion(-)
+ include/net/bluetooth/a2mp.h |    2 ++
+ net/bluetooth/a2mp.c         |   57 ++++++++++++++++++++++++++++++------------
+ net/bluetooth/hci_event.c    |    6 ++++-
+ 3 files changed, 48 insertions(+), 17 deletions(-)
 
-diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
-index e861675..b6c08ce 100644
---- a/include/net/bluetooth/amp.h
-+++ b/include/net/bluetooth/amp.h
-@@ -14,8 +14,12 @@
- #ifndef __AMP_H
- #define __AMP_H
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+index e56d656..c21268a 100644
+--- a/include/net/bluetooth/a2mp.h
++++ b/include/net/bluetooth/a2mp.h
+@@ -130,5 +130,7 @@ int amp_mgr_put(struct amp_mgr *mgr);
+ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
+ 				       struct sk_buff *skb);
+ struct amp_mgr *amp_mgr_lookup_by_state(u8 state);
++void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data);
++void a2mp_send_getinfo_rsp(struct hci_dev *hdev);
  
-+#include <net/bluetooth/pal.h>
-+
- void amp_read_loc_info(struct hci_dev *hdev, struct amp_mgr *mgr);
- void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle);
- void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr);
-+void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
-+			struct hci_conn *hcon);
- 
- #endif /* __AMP_H */
-diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
-index 3b6213c..35f1765 100644
---- a/include/net/bluetooth/pal.h
-+++ b/include/net/bluetooth/pal.h
-@@ -18,7 +18,6 @@
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/a2mp.h>
--#include <net/bluetooth/amp.h>
- 
- struct amp_ctrl {
- 	struct list_head	list;
+ #endif /* __A2MP_H */
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index c550589..39e0f95 100644
+index 6b7a4b4..7b98250 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -383,6 +383,8 @@ static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+@@ -41,8 +41,7 @@ static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
+ 	return cmd;
+ }
  
- 	BT_DBG("Created hcon %p: loc:%d -> rem:%d", hcon, hdev->id, rsp->id);
+-static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
+-		      void *data)
++void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data)
+ {
+ 	struct l2cap_chan *chan = mgr->a2mp_chan;
+ 	struct a2mp_cmd *cmd;
+@@ -185,7 +184,6 @@ static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 			    struct a2mp_cmd *hdr)
+ {
+ 	struct a2mp_info_req *req  = (void *) skb->data;
+-	struct a2mp_info_rsp rsp;
+ 	struct hci_dev *hdev;
  
-+	amp_create_phylink(hdev, mgr, hcon);
+ 	if (le16_to_cpu(hdr->len) < sizeof(*req))
+@@ -193,23 +191,23 @@ static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 
+ 	BT_DBG("id %d", req->id);
+ 
+-	rsp.id = req->id;
+-	rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
+-
+ 	hdev = hci_dev_get(req->id);
+-	if (hdev && hdev->amp_type != HCI_BREDR) {
+-		rsp.status = 0;
+-		rsp.total_bw = cpu_to_le32(hdev->amp_total_bw);
+-		rsp.max_bw = cpu_to_le32(hdev->amp_max_bw);
+-		rsp.min_latency = cpu_to_le32(hdev->amp_min_latency);
+-		rsp.pal_cap = cpu_to_le16(hdev->amp_pal_cap);
+-		rsp.assoc_size = cpu_to_le16(hdev->amp_assoc_size);
++	if (!hdev) {
++		struct a2mp_info_rsp rsp;
 +
- done:
- 	hci_dev_put(hdev);
- 	skb_pull(skb, len);
-diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index 2d4e79e..9676393 100644
---- a/net/bluetooth/amp.c
-+++ b/net/bluetooth/amp.c
-@@ -43,3 +43,22 @@ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
- 	mgr->state = READ_LOC_AMP_ASSOC;
- 	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp);
++		rsp.id = req->id;
++		rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
++
++		a2mp_send(mgr, A2MP_GETINFO_RSP, hdr->ident, sizeof(rsp),
++			  &rsp);
+ 	}
+ 
+-	if (hdev)
+-		hci_dev_put(hdev);
++	if (hdev->dev_type != HCI_BREDR) {
++		mgr->state = READ_LOC_AMP_INFO;
++		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL);
++	}
+ 
+-	a2mp_send(mgr, A2MP_GETINFO_RSP, hdr->ident, sizeof(rsp), &rsp);
++	hci_dev_put(hdev);
+ 
+ 	skb_pull(skb, sizeof(*req));
+ 	return 0;
+@@ -599,3 +597,30 @@ struct amp_mgr *amp_mgr_lookup_by_state(u8 state)
+ 
+ 	return NULL;
  }
 +
-+void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
-+			struct hci_conn *hcon)
++void a2mp_send_getinfo_rsp(struct hci_dev *hdev)
 +{
-+	struct hci_cp_create_phy_link cp;
++	struct amp_mgr *mgr;
++	struct a2mp_info_rsp rsp;
 +
-+	cp.phy_handle = hcon->handle;
-+
-+	BT_DBG("%s hcon %p phy handle 0x%2.2x", hdev->name, hcon,
-+	       hcon->handle);
-+
-+	if (phylink_gen_key(mgr->l2cap_conn->hcon, cp.key, &cp.key_len,
-+			    &cp.key_type)) {
-+		BT_DBG("Cannot create link key");
++	mgr = amp_mgr_lookup_by_state(READ_LOC_AMP_INFO);
++	if (!mgr)
 +		return;
++
++	BT_DBG("%s mgr %p", hdev->name, mgr);
++
++	rsp.id = hdev->id;
++	rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
++
++	if (hdev->amp_type != HCI_BREDR) {
++		rsp.status = 0;
++		rsp.total_bw = cpu_to_le32(hdev->amp_total_bw);
++		rsp.max_bw = cpu_to_le32(hdev->amp_max_bw);
++		rsp.min_latency = cpu_to_le32(hdev->amp_min_latency);
++		rsp.pal_cap = cpu_to_le16(hdev->amp_pal_cap);
++		rsp.assoc_size = cpu_to_le16(hdev->amp_assoc_size);
 +	}
 +
-+	hci_send_cmd(hdev, HCI_OP_CREATE_PHY_LINK, sizeof(cp), &cp);
++	a2mp_send(mgr, A2MP_GETINFO_RSP, mgr->ident, sizeof(rsp), &rsp);
++	amp_mgr_put(mgr);
 +}
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 6cc44cf..4b093f8 100644
+index 48d7302..5ae5121 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -1687,6 +1687,11 @@ static void hci_cs_le_start_enc(struct hci_dev *hdev, u8 status)
- 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+@@ -30,6 +30,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/mgmt.h>
++#include <net/bluetooth/a2mp.h>
+ 
+ /* Handle HCI Event packets */
+ 
+@@ -846,7 +847,7 @@ static void hci_cc_read_local_amp_info(struct hci_dev *hdev,
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
+ 
+ 	if (rp->status)
+-		return;
++		goto a2mp_rsp;
+ 
+ 	hdev->amp_status = rp->amp_status;
+ 	hdev->amp_total_bw = __le32_to_cpu(rp->total_bw);
+@@ -860,6 +861,9 @@ static void hci_cc_read_local_amp_info(struct hci_dev *hdev,
+ 	hdev->amp_max_flush_to = __le32_to_cpu(rp->max_flush_to);
+ 
+ 	hci_req_complete(hdev, HCI_OP_READ_LOCAL_AMP_INFO, rp->status);
++
++a2mp_rsp:
++	a2mp_send_getinfo_rsp(hdev);
  }
  
-+static void hci_cs_create_phylink(struct hci_dev *hdev, u8 status)
-+{
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+}
-+
- static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -2496,6 +2501,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cs_le_start_enc(hdev, ev->status);
- 		break;
- 
-+	case HCI_OP_CREATE_PHY_LINK:
-+		hci_cs_create_phylink(hdev, ev->status);
-+		break;
-+
- 	default:
- 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
- 		break;
+ static void hci_cc_delete_stored_link_key(struct hci_dev *hdev,
 -- 
 1.7.9.5
 
