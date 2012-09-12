@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: mathewm@codeaurora.org, gustavo@padovan.org
-Subject: [PATCHv4 10/17] Bluetooth: A2MP: Process A2MP Get AMP Assoc Rsp
-Date: Wed, 12 Sep 2012 11:06:25 +0300
-Message-Id: <1347437192-24694-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 08/17] Bluetooth: AMP: Handle create / disc phylink req
+Date: Wed, 12 Sep 2012 11:06:23 +0300
+Message-Id: <1347437192-24694-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <alpine.DEB.2.02.1209111121550.3754@mathewm-linux>
  <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -13,93 +13,73 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When receiving A2MP Get AMP Assoc Response save assoc data to remote
-AMP controller list and prepare for creating physical link.
+Use hci_conn structure to keep track about AMP physical connections.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   60 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 59 insertions(+), 1 deletion(-)
+ net/bluetooth/a2mp.c |   21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index e012855..42bce4a 100644
+index 36bf0f4..8c6cda4 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -334,6 +334,61 @@ done:
- 	return 0;
- }
+@@ -312,6 +312,7 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
  
-+static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
-+				struct a2mp_cmd *hdr)
-+{
-+	struct a2mp_amp_assoc_rsp *rsp = (void *) skb->data;
-+	u16 len = le16_to_cpu(hdr->len);
-+	struct hci_dev *hdev;
-+	struct amp_ctrl *ctrl;
+ 	struct a2mp_physlink_rsp rsp;
+ 	struct hci_dev *hdev;
 +	struct hci_conn *hcon;
+ 
+ 	if (le16_to_cpu(hdr->len) < sizeof(*req))
+ 		return -EINVAL;
+@@ -329,7 +330,14 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 
+ 	/* TODO process physlink create */
+ 
+-	rsp.status = A2MP_STATUS_SUCCESS;
++	hcon = phylink_add(hdev, mgr, req->local_id);
++	if (hcon) {
++		BT_DBG("hcon %p", hcon);
 +
-+	if (len < sizeof(*rsp))
-+		return -EINVAL;
-+
-+	BT_DBG("id %d status 0x%2.2x assoc len %u", rsp->id, rsp->status,
-+	       len - sizeof(*rsp));
-+
-+	if (rsp->status)
-+		return -EINVAL;
-+
-+	/* Save remote ASSOC data */
-+	ctrl = amp_ctrl_lookup(mgr, rsp->id);
-+	if (ctrl) {
-+		u8 *assoc, assoc_len = len - sizeof(*rsp);
-+
-+		assoc = kzalloc(assoc_len, GFP_KERNEL);
-+		if (!assoc) {
-+			amp_ctrl_put(ctrl);
-+			return -ENOMEM;
-+		}
-+
-+		memcpy(assoc, rsp->amp_assoc, assoc_len);
-+		ctrl->assoc = assoc;
-+		ctrl->assoc_len = assoc_len;
-+		ctrl->assoc_rem_len = assoc_len;
-+		ctrl->assoc_len_so_far = 0;
-+
-+		amp_ctrl_put(ctrl);
++		rsp.status = A2MP_STATUS_SUCCESS;
++	} else {
++		rsp.status = A2MP_STATUS_UNABLE_START_LINK_CREATION;
++	}
+ 
+ send_rsp:
+ 	if (hdev)
+@@ -348,6 +356,7 @@ static int a2mp_discphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	struct a2mp_physlink_req *req = (void *) skb->data;
+ 	struct a2mp_physlink_rsp rsp;
+ 	struct hci_dev *hdev;
++	struct hci_conn *hcon;
+ 
+ 	if (le16_to_cpu(hdr->len) < sizeof(*req))
+ 		return -EINVAL;
+@@ -358,14 +367,22 @@ static int a2mp_discphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	rsp.remote_id = req->local_id;
+ 	rsp.status = A2MP_STATUS_SUCCESS;
+ 
+-	hdev = hci_dev_get(req->local_id);
++	hdev = hci_dev_get(req->remote_id);
+ 	if (!hdev) {
+ 		rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
+ 		goto send_rsp;
+ 	}
+ 
++	hcon = hci_conn_hash_lookup_id(hdev, rsp.local_id);
++	if (!hcon) {
++		BT_ERR("No phys link exist");
++		rsp.status = A2MP_STATUS_NO_PHYSICAL_LINK_EXISTS;
++		goto clean;
 +	}
 +
-+	/* Create Phys Link */
-+	hdev = hci_dev_get(rsp->id);
-+	if (!hdev)
-+		return -EINVAL;
-+
-+	hcon = phylink_add(hdev, mgr, rsp->id);
-+	if (!hcon)
-+		goto done;
-+
-+	BT_DBG("Created hcon %p: loc:%d -> rem:%d", hcon, hdev->id, rsp->id);
-+
-+done:
-+	hci_dev_put(hdev);
-+	skb_pull(skb, len);
-+	return 0;
-+}
-+
- static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 				   struct a2mp_cmd *hdr)
- {
-@@ -493,8 +548,11 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 			err = a2mp_getinfo_rsp(mgr, skb, hdr);
- 			break;
+ 	/* TODO Disconnect Phys Link here */
  
--		case A2MP_CHANGE_RSP:
- 		case A2MP_GETAMPASSOC_RSP:
-+			err = a2mp_getampassoc_rsp(mgr, skb, hdr);
-+			break;
-+
-+		case A2MP_CHANGE_RSP:
- 		case A2MP_CREATEPHYSLINK_RSP:
- 		case A2MP_DISCONNPHYSLINK_RSP:
- 			err = a2mp_cmd_rsp(mgr, skb, hdr);
++clean:
+ 	hci_dev_put(hdev);
+ 
+ send_rsp:
 -- 
 1.7.9.5
 
