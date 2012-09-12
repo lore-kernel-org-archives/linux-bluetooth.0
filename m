@@ -1,223 +1,166 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5050167A.8020400@ti.com>
-Date: Wed, 12 Sep 2012 07:58:34 +0300
+Message-ID: <505015DF.10606@ti.com>
+Date: Wed, 12 Sep 2012 07:55:59 +0300
 From: Chen Ganir <chen.ganir@ti.com>
 MIME-Version: 1.0
 To: Joao Paulo Rechi Vita <jprvita@openbossa.org>
 CC: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 09/10] battery: Add support for notifications
-References: <1347349100-24228-1-git-send-email-chen.ganir@ti.com> <1347349100-24228-10-git-send-email-chen.ganir@ti.com> <CAAngNMaMmfx1+PpzJLcRJnBSa6+1LPyw+i489VgtoyRkK9Wqfg@mail.gmail.com>
-In-Reply-To: <CAAngNMaMmfx1+PpzJLcRJnBSa6+1LPyw+i489VgtoyRkK9Wqfg@mail.gmail.com>
+Subject: Re: [PATCH 08/10] battery: Read Battery level characteristic
+References: <1347349100-24228-1-git-send-email-chen.ganir@ti.com> <1347349100-24228-9-git-send-email-chen.ganir@ti.com> <CAAngNMYezceDToeNVC5a96_odOzDWnLRBQ0GrJJUd84s0hRqiw@mail.gmail.com>
+In-Reply-To: <CAAngNMYezceDToeNVC5a96_odOzDWnLRBQ0GrJJUd84s0hRqiw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Joao,
-On 09/12/2012 01:08 AM, Joao Paulo Rechi Vita wrote:
+On 09/12/2012 12:50 AM, Joao Paulo Rechi Vita wrote:
 > On Tue, Sep 11, 2012 at 4:38 AM,  <chen.ganir@ti.com> wrote:
 >> From: Chen Ganir <chen.ganir@ti.com>
 >>
->> Add support for emitting PropertyChanged when a battery level
->> characteristic notification is sent from the peer device.
+>> Implement support for reading the battery level characteristic on
+>> connection establishment.
 >> ---
->>   profiles/battery/battery.c |   95 +++++++++++++++++++++++++++++++++++++++++++-
->>   1 file changed, 93 insertions(+), 2 deletions(-)
+>>   profiles/battery/battery.c |   87 +++++++++++++++++++++++++++++++++++++++++++-
+>>   1 file changed, 85 insertions(+), 2 deletions(-)
 >>
 >> diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
->> index a93b352..95f548e 100644
+>> index 31f2297..a93b352 100644
 >> --- a/profiles/battery/battery.c
 >> +++ b/profiles/battery/battery.c
->> @@ -43,6 +43,7 @@ struct battery {
->>          GAttrib                 *attrib;        /* GATT connection */
->>          guint                   attioid;        /* Att watcher id */
->>          struct att_range        *svc_range;     /* Battery range */
->> +       guint                   attnotid;       /* Att notifications id */
->>          GSList                  *chars;         /* Characteristics */
->>   };
->>
->> @@ -56,6 +57,7 @@ struct characteristic {
+>> @@ -55,6 +55,7 @@ struct characteristic {
+>>          GSList                          *desc;  /* Descriptors */
 >>          uint8_t                 ns;             /* Battery Namespace */
 >>          uint16_t                description;    /* Battery description */
->>          uint8_t        level;
->> +       gboolean                canNotify;
+>> +       uint8_t        level;
+>
+> Alignment problem here.
+>
+Thanks.
+
+
 >>   };
 >>
 >>   struct descriptor {
->> @@ -86,6 +88,14 @@ static void char_free(gpointer user_data)
->>          g_free(c);
->>   }
->>
->> +static gint cmp_char_val_handle(gconstpointer a, gconstpointer b)
->> +{
->> +       const struct characteristic *ch = a;
->> +       const uint16_t *handle = b;
->> +
->> +       return ch->attr.value_handle - *handle;
->> +}
->> +
->>   static void battery_free(gpointer user_data)
->>   {
->>          struct battery *batt = user_data;
->> @@ -99,6 +109,10 @@ static void battery_free(gpointer user_data)
->>          if (batt->attrib != NULL)
->>                  g_attrib_unref(batt->attrib);
->>
->> +       if (batt->attrib != NULL) {
->> +               g_attrib_unregister(batt->attrib, batt->attnotid);
->> +               g_attrib_unref(batt->attrib);
->> +       }
->
-> You're using the same condition twice here (batt->attrib != NULL).
-> Looks like a copy & paste error. Make sure you check for attnotid
-> before checking attrib, and that you don't unref attrib twice.
->
-Correct. I'll fix this and check for attnotid.
-
->>          btd_device_unref(batt->dev);
->>          g_free(batt->svc_range);
+>> @@ -103,6 +104,80 @@ static void battery_free(gpointer user_data)
 >>          g_free(batt);
->> @@ -140,6 +154,18 @@ static void process_batteryservice_char(struct characteristic *ch)
->>          }
 >>   }
 >>
->> +static void batterylevel_enable_notify_cb(guint8 status, const guint8 *pdu,
->> +                                               guint16 len, gpointer user_data)
+>> +static void read_batterylevel_cb(guint8 status, const guint8 *pdu, guint16 len,
+>> +                                                       gpointer user_data)
 >> +{
->> +       struct characteristic *ch = (struct characteristic *)user_data;
+>> +       struct characteristic *ch = user_data;
+>> +       uint8_t value[ATT_MAX_MTU];
+>> +       int vlen;
 >> +
 >> +       if (status != 0) {
->> +               error("Could not enable batt level notification.");
->> +               ch->canNotify = FALSE;
->> +               process_batteryservice_char(ch);
->
-> I don't think is necessary to call process_batteryservice_char() here,
-> since you already called it during the characteristics discovery.
->
-I'll remove the unnecessary call here.
-
-
+>> +               error("Failed to read Battery Level:%s", att_ecode2str(status));
+>> +               return;
+>> +       }
+>> +
+>> +       vlen = dec_read_resp(pdu, len, value, sizeof(value));
+>> +       if (!vlen) {
+>> +               error("Failed to read Battery Level: Protocol error\n");
+>> +               return;
+>> +       }
+>> +
+>> +       if (vlen < 1) {
+>> +               error("Failed to read Battery Level: Wrong pdu len");
+>> +               return;
+>> +       }
+>> +
+>> +       ch->level = value[0];
+>> +       btd_device_set_battery_opt(ch->devbatt, BATTERY_OPT_LEVEL, ch->level,
+>> +                                               BATTERY_OPT_INVALID);
+>> +}
+>> +
+>> +static void process_batteryservice_char(struct characteristic *ch)
+>> +{
+>> +       if (g_strcmp0(ch->attr.uuid, BATTERY_LEVEL_UUID) == 0) {
+>> +               gatt_read_char(ch->batt->attrib, ch->attr.value_handle, 0,
+>> +                                               read_batterylevel_cb, ch);
 >> +       }
 >> +}
 >> +
->>   static gint device_battery_cmp(gconstpointer a, gconstpointer b)
->>   {
->>          const struct characteristic *ch = a;
->> @@ -178,6 +204,19 @@ static void batterylevel_refresh_cb(struct device_battery *batt)
->>                  process_batteryservice_char(ch);
->>   }
->>
->> +static void enable_battery_notification(struct characteristic *ch,
->> +                                                               uint16_t handle)
+>> +static gint device_battery_cmp(gconstpointer a, gconstpointer b)
 >> +{
->> +       uint8_t atval[2];
->> +       uint16_t val;
+>> +       const struct characteristic *ch = a;
+>> +       const struct device_battery *batt = b;
 >> +
->> +       val = GATT_CLIENT_CHARAC_CFG_NOTIF_BIT;
+>> +       if (batt == ch->devbatt)
+>> +               return 0;
 >> +
->> +       att_put_u16(val, atval);
->> +       gatt_write_char(ch->batt->attrib, handle, atval, 2,
->> +                               batterylevel_enable_notify_cb, ch);
+>> +       return -1;
+>> +}
+>> +
+>> +static struct characteristic *find_battery_char(struct device_battery *db)
+>> +{
+>> +       GSList *l, *b;
+>> +
+>> +       for (l = servers; l != NULL; l = g_slist_next(l)) {
+>> +               struct battery *batt = l->data;
+>> +
+>> +               b = g_slist_find_custom(batt->chars, db, device_battery_cmp);
+>> +               if (!b)
+>> +                       return NULL;
+>> +
+>> +               return b->data;
+>> +       }
+>> +
+>> +       return NULL;
+>> +}
+>> +
+>> +static void batterylevel_refresh_cb(struct device_battery *batt)
+>> +{
+>> +       struct characteristic *ch;
+>> +
+>> +       ch = find_battery_char(batt);
+>> +
+>> +       if (ch)
+>> +               process_batteryservice_char(ch);
 >> +}
 >> +
 >>   static void batterylevel_presentation_format_desc_cb(guint8 status,
 >>                                                  const guint8 *pdu, guint16 len,
 >>                                                  gpointer user_data)
->> @@ -207,13 +246,20 @@ static void batterylevel_presentation_format_desc_cb(guint8 status,
->>          desc->ch->description = att_get_u16(&value[5]);
+>> @@ -151,7 +226,6 @@ static void process_batterylevel_desc(struct descriptor *desc)
+>>          DBG("Ignored descriptor %s characteristic %s", uuidstr, ch->attr.uuid);
 >>   }
 >>
 >> -
->>   static void process_batterylevel_desc(struct descriptor *desc)
+>>   static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+>>                                                          gpointer user_data)
 >>   {
->>          struct characteristic *ch = desc->ch;
->>          char uuidstr[MAX_LEN_UUID_STR];
->>          bt_uuid_t btuuid;
+>> @@ -192,8 +266,11 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
 >>
->> +       bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
->> +
->> +       if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0 && g_strcmp0(ch->attr.uuid,
->> +                                               BATTERY_LEVEL_UUID) == 0) {
->> +               enable_battery_notification(ch, desc->handle);
->> +               return;
->> +       }
->> +
->>          bt_uuid16_create(&btuuid, GATT_CHARAC_FMT_UUID);
+>>   update_char:
+>>          ch->devbatt = btd_device_add_battery(ch->batt->dev);
+>> -}
+>> +       btd_device_set_battery_opt(ch->devbatt, BATTERY_OPT_REFRESH_FUNC,
+>> +                             batterylevel_refresh_cb, BATTERY_OPT_INVALID);
 >>
->>          if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0) {
->> @@ -319,12 +365,54 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
->>          }
->>   }
->>
->> +static void proc_batterylevel(struct characteristic *c, const uint8_t *pdu,
->> +                                               uint16_t len, gboolean final)
->> +{
->> +       if (!pdu) {
->> +               error("Battery level notification: Invalid pdu length");
->> +               return;
->> +       }
->> +
->> +       c->level = pdu[1];
->> +
->> +       btd_device_set_battery_opt(c->devbatt, BATTERY_OPT_LEVEL, c->level,
->> +                                                       BATTERY_OPT_INVALID);
+>> +       process_batteryservice_char(ch);
+>
+> There two call also should be part of configure_battery_cb() instead
+> of discover_desc_cb().
+>
+True. Once i move the btd_device_add_battery call, i'll move those as well.
+
 >> +}
->> +
->> +static void notif_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
->> +{
->> +       struct battery *batt = user_data;
->> +       struct characteristic *ch;
->> +       uint16_t handle;
->> +       GSList *l;
->> +
->> +       if (len < 3) {
->> +               error("notif_handler: Bad pdu received");
->> +               return;
->> +       }
->> +
->> +       handle = att_get_u16(&pdu[1]);
->> +       l = g_slist_find_custom(batt->chars, &handle, cmp_char_val_handle);
->> +       if (l == NULL) {
->> +               error("notif_handler: Unexpected handle 0x%04x", handle);
->> +               return;
->> +       }
->> +
->> +       ch = l->data;
->> +       if (g_strcmp0(ch->attr.uuid, BATTERY_LEVEL_UUID) == 0) {
->> +               proc_batterylevel(ch, pdu, len, FALSE);
->> +       }
->> +}
->> +
->>   static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
->>   {
->>          struct battery *batt = user_data;
 >>
->>          batt->attrib = g_attrib_ref(attrib);
+>>   static void configure_battery_cb(GSList *characteristics, guint8 status,
 >>
->> +       batt->attnotid = g_attrib_register(batt->attrib, ATT_OP_HANDLE_NOTIFY,
->> +                                               notif_handler, batt, NULL);
->> +
->>          if (batt->chars == NULL) {
+>> @@ -252,6 +329,12 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
 >>                  gatt_discover_char(batt->attrib, batt->svc_range->start,
 >>                                          batt->svc_range->end, NULL,
->> @@ -333,7 +421,8 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
->>                  GSList *l;
->>                  for (l = batt->chars; l; l = l->next) {
->>                          struct characteristic *c = l->data;
->> -                       process_batteryservice_char(c);
->> +                       if (!c->canNotify)
->> +                               process_batteryservice_char(c);
->>                  }
+>>                                          configure_battery_cb, batt);
+>> +       } else {
+>> +               GSList *l;
+>> +               for (l = batt->chars; l; l = l->next) {
+>> +                       struct characteristic *c = l->data;
+>> +                       process_batteryservice_char(c);
+>> +               }
 >>          }
 >>   }
->> @@ -342,6 +431,8 @@ static void attio_disconnected_cb(gpointer user_data)
->>   {
->>          struct battery *batt = user_data;
 >>
->> +       g_attrib_unregister(batt->attrib, batt->attnotid);
->> +       batt->attnotid = 0;
->>          g_attrib_unref(batt->attrib);
->>          batt->attrib = NULL;
->>   }
 >> --
 >> 1.7.9.5
 >>
@@ -230,6 +173,7 @@ I'll remove the unnecessary call here.
 >
 
 Thanks,
+
 
 -- 
 BR,
