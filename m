@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: mathewm@codeaurora.org, gustavo@padovan.org
-Subject: [PATCHv4 06/17] Bluetooth: AMP: Physical link struct and heplers
-Date: Wed, 12 Sep 2012 11:06:21 +0300
-Message-Id: <1347437192-24694-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 14/17] Bluetooth: AMP: Create Physical Link
+Date: Wed, 12 Sep 2012 11:06:29 +0300
+Message-Id: <1347437192-24694-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <alpine.DEB.2.02.1209111121550.3754@mathewm-linux>
  <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -13,174 +13,115 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Define physical link structures. Physical links are represented by
-hci_conn structure. For BR/EDR we use type ACL_LINK and for AMP
-we use AMP_LINK.
+When receiving A2MP Get AMP Assoc Response execute HCI Create Physical
+Link to AMP controller. Define function which will run when receiving
+HCI Command Status.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci.h      |    1 +
- include/net/bluetooth/hci_core.h |   20 ++++++++++++++++++
- include/net/bluetooth/pal.h      |   26 +++++++++++++++++++++++
- net/bluetooth/Makefile           |    2 +-
- net/bluetooth/a2mp.c             |    1 +
- net/bluetooth/pal.c              |   42 ++++++++++++++++++++++++++++++++++++++
- 6 files changed, 91 insertions(+), 1 deletion(-)
- create mode 100644 include/net/bluetooth/pal.h
- create mode 100644 net/bluetooth/pal.c
+ include/net/bluetooth/amp.h |    4 ++++
+ include/net/bluetooth/pal.h |    1 -
+ net/bluetooth/a2mp.c        |    2 ++
+ net/bluetooth/amp.c         |   19 +++++++++++++++++++
+ net/bluetooth/hci_event.c   |    9 +++++++++
+ 5 files changed, 34 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 1cb8b55..4c41b8c 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -207,6 +207,7 @@ enum {
- #define ESCO_LINK	0x02
- /* Low Energy links do not have defined link type. Use invented one */
- #define LE_LINK		0x80
-+#define AMP_LINK	0x81
+diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
+index e861675..b6c08ce 100644
+--- a/include/net/bluetooth/amp.h
++++ b/include/net/bluetooth/amp.h
+@@ -14,8 +14,12 @@
+ #ifndef __AMP_H
+ #define __AMP_H
  
- /* LMP features */
- #define LMP_3SLOT	0x01
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 1174218..4ae5293 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -316,6 +316,7 @@ struct hci_conn {
++#include <net/bluetooth/pal.h>
++
+ void amp_read_loc_info(struct hci_dev *hdev, struct amp_mgr *mgr);
+ void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle);
+ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr);
++void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
++			struct hci_conn *hcon);
  
- 	__u8		remote_cap;
- 	__u8		remote_auth;
-+	__u8		remote_id;
- 	bool		flush_key;
- 
- 	unsigned int	sent;
-@@ -510,6 +511,25 @@ static inline struct hci_conn *hci_conn_hash_lookup_handle(struct hci_dev *hdev,
- 	return NULL;
- }
- 
-+static inline struct hci_conn *hci_conn_hash_lookup_id(struct hci_dev *hdev,
-+						       __u8 remote_id)
-+{
-+	struct hci_conn_hash *h = &hdev->conn_hash;
-+	struct hci_conn  *c;
-+
-+	rcu_read_lock();
-+
-+	list_for_each_entry_rcu(c, &h->list, list) {
-+		if (c->remote_id == remote_id) {
-+			rcu_read_unlock();
-+			return c;
-+		}
-+	}
-+	rcu_read_unlock();
-+
-+	return NULL;
-+}
-+
- static inline struct hci_conn *hci_conn_hash_lookup_ba(struct hci_dev *hdev,
- 							__u8 type, bdaddr_t *ba)
- {
+ #endif /* __AMP_H */
 diff --git a/include/net/bluetooth/pal.h b/include/net/bluetooth/pal.h
-new file mode 100644
-index 0000000..a0f441b
---- /dev/null
+index 3b6213c..35f1765 100644
+--- a/include/net/bluetooth/pal.h
 +++ b/include/net/bluetooth/pal.h
-@@ -0,0 +1,26 @@
-+/*
-+   Copyright (c) 2011,2012 Intel Corp.
-+
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License version 2 and
-+   only version 2 as published by the Free Software Foundation.
-+
-+   This program is distributed in the hope that it will be useful,
-+   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+   GNU General Public License for more details.
-+*/
-+
-+#ifndef __PAL_H
-+#define __PAL_H
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/l2cap.h>
-+#include <net/bluetooth/a2mp.h>
-+#include <net/bluetooth/amp.h>
-+
-+struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
-+			     u8 remote_id);
-+
-+#endif /* __PAL_H */
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index dea6a28..3f76fc2 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -10,4 +10,4 @@ obj-$(CONFIG_BT_HIDP)	+= hidp/
- 
- bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
- 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
--	a2mp.o amp.o
-+	a2mp.o amp.o pal.o
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index c876997..8f236db 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -17,6 +17,7 @@
+@@ -18,7 +18,6 @@
+ #include <net/bluetooth/hci_core.h>
  #include <net/bluetooth/l2cap.h>
  #include <net/bluetooth/a2mp.h>
- #include <net/bluetooth/amp.h>
-+#include <net/bluetooth/pal.h>
+-#include <net/bluetooth/amp.h>
  
- /* Global AMP Manager list */
- LIST_HEAD(amp_mgr_list);
-diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
-new file mode 100644
-index 0000000..3377ad1
---- /dev/null
-+++ b/net/bluetooth/pal.c
-@@ -0,0 +1,42 @@
-+/*
-+   Copyright (c) 2011,2012 Intel Corp.
+ struct amp_ctrl {
+ 	struct list_head	list;
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index c550589..39e0f95 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -383,6 +383,8 @@ static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 
+ 	BT_DBG("Created hcon %p: loc:%d -> rem:%d", hcon, hdev->id, rsp->id);
+ 
++	amp_create_phylink(hdev, mgr, hcon);
 +
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License version 2 and
-+   only version 2 as published by the Free Software Foundation.
+ done:
+ 	hci_dev_put(hdev);
+ 	skb_pull(skb, len);
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index 2d4e79e..9676393 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -43,3 +43,22 @@ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
+ 	mgr->state = READ_LOC_AMP_ASSOC;
+ 	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp);
+ }
 +
-+   This program is distributed in the hope that it will be useful,
-+   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+   GNU General Public License for more details.
-+*/
-+
-+#include <net/bluetooth/pal.h>
-+
-+/* Physical Link interface */
-+static u8 __next_handle(struct amp_mgr *mgr)
++void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
++			struct hci_conn *hcon)
 +{
-+	if (++mgr->handle == 0)
-+		mgr->handle = 1;
++	struct hci_cp_create_phy_link cp;
 +
-+	return mgr->handle;
++	cp.phy_handle = hcon->handle;
++
++	BT_DBG("%s hcon %p phy handle 0x%2.2x", hdev->name, hcon,
++	       hcon->handle);
++
++	if (phylink_gen_key(mgr->l2cap_conn->hcon, cp.key, &cp.key_len,
++			    &cp.key_type)) {
++		BT_DBG("Cannot create link key");
++		return;
++	}
++
++	hci_send_cmd(hdev, HCI_OP_CREATE_PHY_LINK, sizeof(cp), &cp);
++}
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 6cc44cf..4b093f8 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1687,6 +1687,11 @@ static void hci_cs_le_start_enc(struct hci_dev *hdev, u8 status)
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+ }
+ 
++static void hci_cs_create_phylink(struct hci_dev *hdev, u8 status)
++{
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
 +}
 +
-+struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
-+			     u8 remote_id)
-+{
-+	struct hci_conn *hcon;
+ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	__u8 status = *((__u8 *) skb->data);
+@@ -2496,6 +2501,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cs_le_start_enc(hdev, ev->status);
+ 		break;
+ 
++	case HCI_OP_CREATE_PHY_LINK:
++		hci_cs_create_phylink(hdev, ev->status);
++		break;
 +
-+	hcon = hci_conn_add(hdev, AMP_LINK, BDADDR_ANY);
-+	if (!hcon)
-+		return NULL;
-+
-+	hcon->state = BT_CONNECT;
-+	hcon->out = true;
-+	hcon->attempt++;
-+	hcon->handle = __next_handle(mgr);
-+	hcon->remote_id = remote_id;
-+	hcon->amp_mgr = mgr;
-+
-+	return hcon;
-+}
+ 	default:
+ 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
+ 		break;
 -- 
 1.7.9.5
 
