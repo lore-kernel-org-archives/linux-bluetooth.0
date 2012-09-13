@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v5 13/17] heartrate: Process Heart Rate Measurement characteristics
-Date: Thu, 13 Sep 2012 16:31:47 +0200
-Message-ID: <1347546711-19961-14-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: Rafal Garbat <rafal.garbat@tieto.com>
+Subject: [PATCH v5 04/17] heartrate: Discover characteristics
+Date: Thu, 13 Sep 2012 16:31:38 +0200
+Message-ID: <1347546711-19961-5-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1347546711-19961-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1347546711-19961-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,222 +12,165 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Rafal Garbat <rafal.garbat@tieto.com>
+
+This patch adds support to discover Heart Rate Service characteristics when
+connected to remote device.
+
 ---
- profiles/heartrate/heartrate.c | 171 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 171 insertions(+)
+ profiles/heartrate/heartrate.c | 49 +++++++++++++++++++++++++++++++++++++++++-
+ profiles/heartrate/heartrate.h |  3 ++-
+ profiles/heartrate/manager.c   | 22 ++++++++++++++++++-
+ 3 files changed, 71 insertions(+), 3 deletions(-)
 
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index f78d91d..6549d4b 100644
+index 918546e..e4147cf 100644
 --- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
-@@ -42,9 +42,16 @@
- #include "log.h"
- 
- #define HEART_RATE_MANAGER_IFACE "org.bluez.HeartRateManager"
-+#define HEART_RATE_WATCHER_IFACE "org.bluez.HeartRateWatcher"
- 
- #define MIN_NOTIFICATION_LEN 3  /* 1-byte opcode + 2-byte handle */
- 
-+#define HR_VALUE_FORMAT		0x01
-+#define SENSOR_CONTACT_DETECTED	0x02
-+#define SENSOR_CONTACT_SUPPORT	0x04
-+#define ENERGY_EXP_STATUS	0x08
-+#define RR_INTERVAL		0x10
-+
- struct heartrate_adapter {
- 	struct btd_adapter	*adapter;
- 	GSList			*devices;
-@@ -76,6 +83,17 @@ struct descriptor {
- 	bt_uuid_t		uuid;
- };
- 
-+struct measurement {
-+	struct heartrate	*hr;
-+	uint16_t		value;
-+	gboolean		has_energy;
-+	uint16_t		energy;
-+	gboolean		has_contact;
-+	gboolean		contact;
-+	uint16_t		num_interval;
-+	uint16_t		*interval;
+@@ -48,6 +48,13 @@ struct heartrate {
+ 	struct heartrate_adapter	*hra;
+ 	GAttrib				*attrib;
+ 	guint				attioid;
++	struct att_range		*svc_range;
++	GSList				*chars;
 +};
 +
- struct watcher {
- 	struct heartrate_adapter	*hra;
- 	guint				id;
-@@ -123,6 +141,14 @@ static gint cmp_descriptor(gconstpointer a, gconstpointer b)
- 	return bt_uuid_cmp(&desc->uuid, uuid);
++struct characteristic {
++	struct gatt_char	attr;
++	struct heartrate	*hr;
+ };
+ 
+ static GSList *heartrate_adapters = NULL;
+@@ -95,7 +102,11 @@ static void destroy_heartrate_device(gpointer user_data)
+ 	if (hr->attrib != NULL)
+ 		g_attrib_unref(hr->attrib);
+ 
++	if (hr->chars != NULL)
++		g_slist_free_full(hr->chars, g_free);
++
+ 	btd_device_unref(hr->dev);
++	g_free(hr->svc_range);
+ 	g_free(hr);
  }
  
-+static gint cmp_char_val_handle(gconstpointer a, gconstpointer b)
-+{
-+	const struct characteristic *ch = a;
-+	const uint16_t *handle = b;
-+
-+	return ch->attr.value_handle - *handle;
-+}
-+
- static gint cmp_watcher(gconstpointer a, gconstpointer b)
- {
- 	const struct watcher *watcher = a;
-@@ -552,12 +578,157 @@ static void configure_heartrate_cb(GSList *characteristics, guint8 status,
- 	}
+@@ -109,6 +120,33 @@ static void destroy_heartrate_adapter(gpointer user_data)
+ 	g_free(hra);
  }
  
-+static void update_watcher(gpointer data, gpointer user_data)
++static void configure_heartrate_cb(GSList *characteristics, guint8 status,
++							gpointer user_data)
 +{
-+	struct watcher *w = data;
-+	struct measurement *m = user_data;
-+	struct heartrate *hr = m->hr;
-+	const gchar *path = device_get_path(hr->dev);
-+	DBusMessageIter iter;
-+	DBusMessageIter dict;
-+	DBusMessage *msg;
-+
-+	msg = dbus_message_new_method_call(w->srv, w->path,
-+						HEART_RATE_WATCHER_IFACE,
-+						"MeasurementReceived");
-+	if (msg == NULL)
-+		return;
-+
-+	dbus_message_iter_init_append(msg, &iter);
-+
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH , &path);
-+
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
-+			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
-+			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
-+
-+	dict_append_entry(&dict, "Value", DBUS_TYPE_UINT16, &m->value);
-+
-+	if (m->has_energy)
-+		dict_append_entry(&dict, "Energy", DBUS_TYPE_UINT16,
-+								&m->energy);
-+
-+	if (m->has_contact)
-+		dict_append_entry(&dict, "Contact", DBUS_TYPE_BOOLEAN,
-+								&m->contact);
-+
-+	if (m->num_interval > 0)
-+		dict_append_array(&dict, "Interval", DBUS_TYPE_UINT16,
-+						&m->interval, m->num_interval);
-+
-+	dbus_message_iter_close_container(&iter, &dict);
-+
-+	dbus_message_set_no_reply(msg, TRUE);
-+	g_dbus_send_message(get_dbus_connection(), msg);
-+}
-+
-+static void recv_measurement(struct heartrate *hr, struct measurement *m)
-+{
-+	GSList *wlist = hr->hra->watchers;
-+
-+	m->hr = hr;
-+
-+	g_slist_foreach(wlist, update_watcher, m);
-+}
-+
-+static void proc_measurement(struct heartrate *hr, const uint8_t *pdu,
-+								uint16_t len)
-+{
-+	struct measurement m;
-+	uint8_t flags;
-+
-+	if (len < 4) {
-+		error("Mandatory flags are not provided");
-+		return;
-+	}
-+
-+	flags = pdu[3];
-+
-+	pdu += 4;
-+	len -= 4;
-+
-+	memset(&m, 0, sizeof(m));
-+
-+	if (flags & HR_VALUE_FORMAT) {
-+		if (len < 2) {
-+			error("Heart Rate Measurement field missing");
-+			return;
-+		}
-+
-+		m.value = att_get_u16(pdu);
-+		pdu += 2;
-+		len -= 2;
-+	} else {
-+		if (len < 1) {
-+			error("Heart Rate Measurement field missing");
-+			return;
-+		}
-+
-+		m.value = *pdu;
-+		pdu++;
-+		len--;
-+	}
-+
-+	if (flags & ENERGY_EXP_STATUS) {
-+		if (len < 2) {
-+			error("Energy Expended field missing");
-+			return;
-+		}
-+
-+		m.has_energy = TRUE;
-+		m.energy = att_get_u16(pdu);
-+		pdu += 2;
-+		len -= 2;
-+	}
-+
-+	if (flags & RR_INTERVAL) {
-+		int i;
-+
-+		if (len == 0 || (len % 2 != 0)) {
-+			error("RR-Interval field malformed");
-+			return;
-+		}
-+
-+		m.num_interval = len / 2;
-+		m.interval = g_new(uint16_t, m.num_interval);
-+
-+		for (i = 0; i < m.num_interval; pdu += 2, i++)
-+			m.interval[i] = att_get_u16(pdu);
-+	}
-+
-+	if (flags & SENSOR_CONTACT_SUPPORT) {
-+		m.has_contact = TRUE;
-+		m.contact = !!(flags & SENSOR_CONTACT_DETECTED);
-+	}
-+
-+	recv_measurement(hr, &m);
-+
-+	g_free(m.interval);
-+}
-+
- static void notify_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
- {
 +	struct heartrate *hr = user_data;
-+	const struct characteristic *ch;
-+	uint16_t handle;
 +	GSList *l;
 +
- 	if (len < MIN_NOTIFICATION_LEN) {
- 		error("Bad pdu received");
- 		return;
- 	}
-+
-+	handle = att_get_u16(&pdu[1]);
-+	l = g_slist_find_custom(hr->chars, &handle, cmp_char_val_handle);
-+	if (l == NULL) {
-+		error("Unexpected handle: 0x%04x", handle);
++	if (status != 0) {
++		error("Discover Heart Rate characteristics: %s",
++							att_ecode2str(status));
 +		return;
 +	}
 +
-+	ch = l->data;
-+	if (g_strcmp0(ch->attr.uuid, HEART_RATE_MEASUREMENT_UUID) == 0)
-+		proc_measurement(hr, pdu, len);
++	for (l = characteristics; l; l = l->next) {
++		struct gatt_char *c = l->data;
++		struct characteristic *ch;
++
++		ch = g_new0(struct characteristic, 1);
++		ch->attr.handle = c->handle;
++		ch->attr.properties = c->properties;
++		ch->attr.value_handle = c->value_handle;
++		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
++		ch->hr = hr;
++
++		hr->chars = g_slist_append(hr->chars, ch);
++	}
++}
++
+ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ {
+ 	struct heartrate *hr = user_data;
+@@ -116,6 +154,10 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ 	DBG("GATT Connected");
+ 
+ 	hr->attrib = g_attrib_ref(attrib);
++
++	gatt_discover_char(hr->attrib, hr->svc_range->start,
++					hr->svc_range->end, NULL,
++					configure_heartrate_cb, hr);
  }
  
- static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ static void attio_disconnected_cb(gpointer user_data)
+@@ -153,7 +195,8 @@ void heartrate_adapter_unregister(struct btd_adapter *adapter)
+ 	destroy_heartrate_adapter(hra);
+ }
+ 
+-int heartrate_device_register(struct btd_device *device)
++int heartrate_device_register(struct btd_device *device,
++						struct gatt_primary *pattr)
+ {
+ 	struct heartrate_adapter *hra;
+ 	struct btd_adapter *adapter;
+@@ -172,6 +215,10 @@ int heartrate_device_register(struct btd_device *device)
+ 
+ 	hra->devices = g_slist_prepend(hra->devices, hr);
+ 
++	hr->svc_range = g_new0(struct att_range, 1);
++	hr->svc_range->start = pattr->range.start;
++	hr->svc_range->end = pattr->range.end;
++
+ 	hr->attioid = btd_device_add_attio_callback(device,
+ 						attio_connected_cb,
+ 						attio_disconnected_cb,
+diff --git a/profiles/heartrate/heartrate.h b/profiles/heartrate/heartrate.h
+index 486f5b3..ec3ed7a 100644
+--- a/profiles/heartrate/heartrate.h
++++ b/profiles/heartrate/heartrate.h
+@@ -22,5 +22,6 @@
+ 
+ int heartrate_adapter_register(struct btd_adapter *adapter);
+ void heartrate_adapter_unregister(struct btd_adapter *adapter);
+-int heartrate_device_register(struct btd_device *device);
++int heartrate_device_register(struct btd_device *device,
++						struct gatt_primary *pattr);
+ void heartrate_device_unregister(struct btd_device *device);
+diff --git a/profiles/heartrate/manager.c b/profiles/heartrate/manager.c
+index 2a9326d..d7d7ae4 100644
+--- a/profiles/heartrate/manager.c
++++ b/profiles/heartrate/manager.c
+@@ -34,6 +34,14 @@
+ #include "heartrate.h"
+ #include "manager.h"
+ 
++static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
++{
++	const struct gatt_primary *prim = a;
++	const char *uuid = b;
++
++	return g_strcmp0(prim->uuid, uuid);
++}
++
+ static int heartrate_adapter_probe(struct btd_adapter *adapter)
+ {
+ 	return heartrate_adapter_register(adapter);
+@@ -46,7 +54,19 @@ static void heartrate_adapter_remove(struct btd_adapter *adapter)
+ 
+ static int heartrate_device_probe(struct btd_device *device, GSList *uuids)
+ {
+-	return heartrate_device_register(device);
++	struct gatt_primary *pattr;
++	GSList *primaries, *l;
++
++	primaries = btd_device_get_primaries(device);
++
++	l = g_slist_find_custom(primaries, HEART_RATE_UUID,
++							primary_uuid_cmp);
++	if (l == NULL)
++		return -EINVAL;
++
++	pattr = l->data;
++
++	return heartrate_device_register(device, pattr);
+ }
+ 
+ static void heartrate_device_remove(struct btd_device *device)
 -- 
 1.7.11.3
 
