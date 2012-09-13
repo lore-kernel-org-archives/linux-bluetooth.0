@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: <chen.ganir@ti.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <chen.ganir@ti.com>
-Subject: [PATCH v2 05/10] battery: Discover Characteristic Descriptors
-Date: Thu, 13 Sep 2012 16:03:18 +0300
-Message-ID: <1347541403-11780-6-git-send-email-chen.ganir@ti.com>
+Subject: [PATCH v2 10/10] battery: Support persistent battery level
+Date: Thu, 13 Sep 2012 16:03:23 +0300
+Message-ID: <1347541403-11780-11-git-send-email-chen.ganir@ti.com>
 In-Reply-To: <1347541403-11780-1-git-send-email-chen.ganir@ti.com>
 References: <1347541403-11780-1-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
@@ -14,134 +14,176 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chen Ganir <chen.ganir@ti.com>
 
-Discover all characteristic descriptors, and build a descriptor
-list. Presentation Format Descriptor and Client Characteristic
-Configuration descriptors are searched.
+Store battery level when read, and use the level from storage
+when connecting, to reduce GATT traffic.
 ---
- profiles/battery/battery.c |   73 +++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 72 insertions(+), 1 deletion(-)
+ profiles/battery/battery.c |  107 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 105 insertions(+), 2 deletions(-)
 
 diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
-index 5e52275..dada15b 100644
+index 355c7b4..6808f1e 100644
 --- a/profiles/battery/battery.c
 +++ b/profiles/battery/battery.c
-@@ -51,7 +51,15 @@ static GSList *servers;
- struct characteristic {
- 	struct gatt_char	attr;		/* Characteristic */
- 	struct battery		*batt;		/* Parent Battery Service */
-+	GSList			*desc;		/* Descriptors */
- };
+@@ -27,6 +27,8 @@
+ #include <glib.h>
+ #include <bluetooth/uuid.h>
+ #include <stdbool.h>
++#include <sys/file.h>
++#include <stdlib.h>
+ 
+ #include "adapter.h"
+ #include "device.h"
+@@ -37,6 +39,10 @@
+ #include "gatt.h"
+ #include "battery.h"
+ #include "log.h"
++#include "storage.h"
 +
-+struct descriptor {
-+	struct characteristic	*ch;		/* Parent Characteristic */
-+	uint16_t		handle;		/* Descriptor Handle */
-+	bt_uuid_t		uuid;		/* UUID */
-+};
-+
- static gint cmp_device(gconstpointer a, gconstpointer b)
- {
- 	const struct battery *batt = a;
-@@ -63,12 +71,21 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
++#define BATTERY_KEY_FORMAT	"%17s#%04X"
++#define BATTERY_LEVEL_FORMAT	"%03d"
+ 
+ struct battery {
+ 	struct btd_device	*dev;		/* Device reference */
+@@ -77,10 +83,103 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
  	return -1;
  }
  
-+static void char_free(gpointer user_data)
++static inline int create_filename(char *buf, size_t size,
++				const bdaddr_t *bdaddr, const char *name)
 +{
-+	struct characteristic *c = user_data;
++	char addr[18];
 +
-+	g_slist_free_full(c->desc, g_free);
++	ba2str(bdaddr, addr);
 +
-+	g_free(c);
++	return create_name(buf, size, STORAGEDIR, addr, name);
 +}
 +
- static void battery_free(gpointer user_data)
++static int store_battery_char(struct characteristic *chr)
++{
++	char filename[PATH_MAX + 1], addr[18], key[23];
++	bdaddr_t sba, dba;
++	char level[4];
++
++	adapter_get_address(device_get_adapter(chr->batt->dev), &sba);
++	device_get_address(chr->batt->dev, &dba, NULL);
++
++	create_filename(filename, PATH_MAX, &sba, "battery_gatt_client");
++
++	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
++
++	ba2str(&dba, addr);
++
++	snprintf(key, sizeof(key), BATTERY_KEY_FORMAT, addr, chr->attr.handle);
++	snprintf(level, sizeof(level), BATTERY_LEVEL_FORMAT, chr->level);
++
++	return textfile_caseput(filename, key, level);
++}
++
++static char *read_battery_char(struct characteristic *chr)
++{
++	char filename[PATH_MAX + 1], addr[18], key[23];
++	char *str, *strnew;
++	bdaddr_t sba, dba;
++
++	adapter_get_address(device_get_adapter(chr->batt->dev), &sba);
++	device_get_address(chr->batt->dev, &dba, NULL);
++
++	create_filename(filename, PATH_MAX, &sba, "battery_gatt_client");
++
++	ba2str(&dba, addr);
++	snprintf(key, sizeof(key), BATTERY_KEY_FORMAT, addr, chr->attr.handle);
++
++	str = textfile_caseget(filename, key);
++	if (str == NULL)
++		return NULL;
++
++	strnew = g_strdup(str);
++	g_free(str);
++
++	return strnew;
++}
++
++static void del_battery_char(struct characteristic *chr)
++{
++	char filename[PATH_MAX + 1], addr[18], key[23];
++	bdaddr_t sba, dba;
++
++	adapter_get_address(device_get_adapter(chr->batt->dev), &sba);
++	device_get_address(chr->batt->dev, &dba, NULL);
++
++	create_filename(filename, PATH_MAX, &sba, "battery_gatt_client");
++
++	ba2str(&dba, addr);
++	snprintf(key, sizeof(key), BATTERY_KEY_FORMAT, addr, chr->attr.handle);
++
++	textfile_casedel(filename, key);
++}
++
++static gboolean read_battery_level_value(struct characteristic *chr)
++{
++	char *str;
++
++	if (!chr)
++		return FALSE;
++
++	str = read_battery_char(chr);
++	if (!str)
++		return FALSE;
++
++	chr->level = atoi(str);
++
++	btd_device_set_battery_opt(chr->devbatt, BATTERY_OPT_LEVEL, chr->level,
++						BATTERY_OPT_INVALID);
++
++	g_free(str);
++	return TRUE;
++}
++
+ static void char_free(gpointer user_data)
  {
- 	struct battery *batt = user_data;
+ 	struct characteristic *c = user_data;
  
- 	if (batt->chars != NULL)
--		g_slist_free_full(batt->chars, g_free);
-+		g_slist_free_full(batt->chars, char_free);
++	del_battery_char(c);
++
+ 	g_slist_free_full(c->desc, g_free);
  
- 	if (batt->attioid > 0)
- 		btd_device_remove_attio_callback(batt->dev, batt->attioid);
-@@ -77,9 +94,48 @@ static void battery_free(gpointer user_data)
- 		g_attrib_unref(batt->attrib);
- 
- 	btd_device_unref(batt->dev);
-+	g_free(batt->svc_range);
- 	g_free(batt);
+ 	btd_device_remove_battery(c->devbatt);
+@@ -148,6 +247,8 @@ static void read_batterylevel_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 	ch->level = value[0];
+ 	btd_device_set_battery_opt(ch->devbatt, BATTERY_OPT_LEVEL, ch->level,
+ 						BATTERY_OPT_INVALID);
++
++	store_battery_char(ch);
  }
  
-+static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
-+							gpointer user_data)
-+{
-+	struct characteristic *ch = user_data;
-+	struct att_data_list *list;
-+	uint8_t format;
-+	int i;
+ static void process_batteryservice_char(struct characteristic *ch)
+@@ -313,6 +414,7 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 	}
+ 
+ 	att_data_list_free(list);
 +
-+	if (status != 0) {
-+		error("Discover all characteristic descriptors failed [%s]: %s",
-+					ch->attr.uuid, att_ecode2str(status));
-+		return;
-+	}
-+
-+	list = dec_find_info_resp(pdu, len, &format);
-+	if (list == NULL)
-+		return;
-+
-+	for (i = 0; i < list->num; i++) {
-+		struct descriptor *desc;
-+		uint8_t *value;
-+
-+		value = list->data[i];
-+		desc = g_new0(struct descriptor, 1);
-+		desc->handle = att_get_u16(value);
-+		desc->ch = ch;
-+
-+		if (format == 0x01)
-+			desc->uuid = att_get_uuid16(&value[2]);
-+		else
-+			desc->uuid = att_get_uuid128(&value[2]);
-+
-+		ch->desc = g_slist_append(ch->desc, desc);
-+	}
-+
-+	att_data_list_free(list);
-+}
-+
+ }
+ 
  static void configure_battery_cb(GSList *characteristics, guint8 status,
- 							gpointer user_data)
- {
-@@ -95,6 +151,7 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
- 	for (l = characteristics; l; l = l->next) {
- 		struct gatt_char *c = l->data;
- 		struct characteristic *ch;
-+		uint16_t start, end;
+@@ -364,7 +466,8 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
+ 						   batterylevel_refresh_cb,
+ 						   BATTERY_OPT_INVALID);
  
- 		ch = g_new0(struct characteristic, 1);
- 		ch->attr.handle = c->handle;
-@@ -104,6 +161,20 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
- 		ch->batt = batt;
- 
- 		batt->chars = g_slist_append(batt->chars, ch);
-+
-+		start = c->value_handle + 1;
-+
-+		if (l->next != NULL) {
-+			struct gatt_char *c = l->next->data;
-+			if (start == c->handle)
-+				continue;
-+			end = c->handle - 1;
-+		} else if (c->value_handle != batt->svc_range->end)
-+			end = batt->svc_range->end;
-+		else
-+			continue;
-+
-+		gatt_find_info(batt->attrib, start, end, discover_desc_cb, ch);
+-			process_batteryservice_char(ch);
++			if (!read_battery_level_value(ch))
++				process_batteryservice_char(ch);
+ 		}
  	}
  }
- 
+@@ -425,7 +528,7 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ 		GSList *l;
+ 		for (l = batt->chars; l; l = l->next) {
+ 			struct characteristic *c = l->data;
+-			if (!c->canNotify)
++			if (!read_battery_level_value(c) && !c->canNotify)
+ 				process_batteryservice_char(c);
+ 		}
+ 	}
 -- 
 1.7.9.5
 
