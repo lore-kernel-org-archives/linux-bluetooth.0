@@ -1,70 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sunil Kumar Behera <sunil.behera@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sunil Kumar Behera <sunil.behera@samsung.com>
-Subject: [PATCH obexd 1/3] MAP: Add binding to support SetMessageStatus function
-Date: Thu, 13 Sep 2012 11:36:19 +0530
-Message-id: <1347516379-28342-1-git-send-email-sunil.behera@samsung.com>
+In-Reply-To: <CANq1E4RYuVy2b1GD2E4MsErbkGZgD6gnDaYeDmyWyYnKaze0Jg@mail.gmail.com>
+References: <5050F5A9.5090401@butterbrot.org> <CANq1E4RYuVy2b1GD2E4MsErbkGZgD6gnDaYeDmyWyYnKaze0Jg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Subject: Re: Wii Balance Board vs. bluez
+From: Florian Echtler <floe@butterbrot.org>
+Date: Thu, 13 Sep 2012 07:59:11 +0200
+To: David Herrmann <dh.herrmann@googlemail.com>
+CC: linux-bluetooth@vger.kernel.org
+Message-ID: <ed6fbaf1-1410-4539-a36e-1d6d6f6220b5@email.android.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add message_set_status_open binding in MIME driver
-to support SetMessageStatus function.
----
- plugins/mas.c |   33 ++++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
 
-diff --git a/plugins/mas.c b/plugins/mas.c
-index 1c9199d..f2ff9e6 100644
---- a/plugins/mas.c
-+++ b/plugins/mas.c
-@@ -649,6 +649,37 @@ static void *message_update_open(const char *name, int oflag, mode_t mode,
- 		return mas;
- }
- 
-+static void *message_set_status_open(const char *name, int oflag, mode_t mode,
-+					void *driver_data, size_t *size,
-+					int *err)
-+
-+{
-+	struct mas_session *mas = driver_data;
-+	uint8_t indicator;
-+	uint8_t value;
-+
-+	DBG("");
-+
-+	if (oflag == O_RDONLY) {
-+		*err = -EBADR;
-+		return NULL;
-+	}
-+
-+	if (!g_obex_apparam_get_uint8(mas->inparams, MAP_AP_STATUSINDICATOR,
-+					&indicator)) {
-+		*err = -EBADR;
-+		return NULL;
-+	}
-+
-+	if (!g_obex_apparam_get_uint8(mas->inparams, MAP_AP_STATUSVALUE,
-+					&value)) {
-+		*err = -EBADR;
-+		return NULL;
-+	}
-+
-+	return mas;
-+}
-+
- static ssize_t any_get_next_header(void *object, void *buf, size_t mtu,
- 								uint8_t *hi)
- {
-@@ -784,7 +815,7 @@ static struct obex_mime_type_driver mime_message_status = {
- 	.target = MAS_TARGET,
- 	.target_size = TARGET_SIZE,
- 	.mimetype = "x-bt/messageStatus",
--	.open = any_open,
-+	.open = message_set_status_open,
- 	.close = any_close,
- 	.read = any_read,
- 	.write = any_write,
+
+David Herrmann <dh.herrmann@googlemail.com> wrote:
+
+>"backported"? Why would you backport the hid-wiimote driver? Or do you
+>mean "forwardport"? Anyway, the hid-wiimote driver does not have
+>support for the wii-balance board as I do not have access to them.
+By "backport", I just meant that I recompiled the driver from 3.5 for my 3.2 kernel :-)
+
+>However, if you are willing to test it, I will send some patches which
+>will implement it.
+Absolutely, I'd be happy to test.
+
+>Ouh, I see. I will send a patch fixing this to the BlueZ mailing list.
+>I will put you on CC if you don't mind.
+Thanks, I'll test this later today.
+
+One additional question: it looks like this problem with the pairing is going
+to pop up again with 3rd-party controllers, the new Wii U controller etc. 
+Would it make sense to create a new PIN option which users can select 
+explicitly? 
+
+Florian
 -- 
-1.7.9.5
-
+SENT FROM MY PDP-11
