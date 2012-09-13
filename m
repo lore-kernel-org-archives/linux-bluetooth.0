@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Rafal Garbat <rafal.garbat@tieto.com>
-Subject: [PATCH v5 10/17] heartrate: Read Body Sensor Location characteristics
-Date: Thu, 13 Sep 2012 16:31:44 +0200
-Message-ID: <1347546711-19961-11-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v5 05/17] heartrate: Process characteristics
+Date: Thu, 13 Sep 2012 16:31:39 +0200
+Message-ID: <1347546711-19961-6-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1347546711-19961-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1347546711-19961-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -14,73 +14,54 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Rafal Garbat <rafal.garbat@tieto.com>
 
-This patch reads and stores Body Sensor Location characteristics value.
+This patch adds stub to process discovered characteristics.
 
 ---
- profiles/heartrate/heartrate.c | 40 +++++++++++++++++++++++++++++++++++++---
- 1 file changed, 37 insertions(+), 3 deletions(-)
+ lib/uuid.h                     |  2 ++
+ profiles/heartrate/heartrate.c | 10 ++++++++++
+ 2 files changed, 12 insertions(+)
 
+diff --git a/lib/uuid.h b/lib/uuid.h
+index 3488e66..0a9db51 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -64,6 +64,8 @@ extern "C" {
+ #define SAP_UUID		"0000112D-0000-1000-8000-00805f9b34fb"
+ 
+ #define HEART_RATE_UUID			"0000180d-0000-1000-8000-00805f9b34fb"
++#define HEART_RATE_CONTROL_POINT_UUID	"00002a39-0000-1000-8000-00805f9b34fb"
++#define BODY_SENSOR_LOCATION_UUID	"00002a38-0000-1000-8000-00805f9b34fb"
+ 
+ #define HEALTH_THERMOMETER_UUID		"00001809-0000-1000-8000-00805f9b34fb"
+ #define TEMPERATURE_MEASUREMENT_UUID	"00002a1c-0000-1000-8000-00805f9b34fb"
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index 9d29ee0..150a675 100644
+index e4147cf..02a4617 100644
 --- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
-@@ -56,6 +56,8 @@ struct heartrate {
- 	guint				attioid;
- 	struct att_range		*svc_range;
- 	GSList				*chars;
-+	gboolean			has_location;
-+	uint8_t				location;
- };
- 
- struct characteristic {
-@@ -385,12 +387,44 @@ static const GDBusMethodTable heartrate_manager_methods[] = {
- 	{ }
- };
- 
-+static void read_sensor_location_cb(guint8 status, const guint8 *pdu,
-+						guint16 len, gpointer user_data)
-+{
-+	struct characteristic *ch = user_data;
-+	struct heartrate *hr = ch->hr;
-+	uint8_t value;
-+	ssize_t vlen;
-+
-+	if (status != 0) {
-+		error("Body Sensor Location value read failed: %s",
-+							att_ecode2str(status));
-+		return;
-+	}
-+
-+	vlen = dec_read_resp(pdu, len, &value, sizeof(value));
-+	if (vlen < 0) {
-+		error("Protocol error.");
-+		return;
-+	}
-+
-+	if (vlen != 1) {
-+		error("Invalid length for Body Sensor Location");
-+		return;
-+	}
-+
-+	hr->has_location = TRUE;
-+	hr->location = value;
-+}
-+
- static void process_heartrate_char(struct characteristic *ch)
- {
--	if (g_strcmp0(ch->attr.uuid, HEART_RATE_CONTROL_POINT_UUID) == 0)
--		DBG("Heart Rate Control Point supported by client");
--	 else if (g_strcmp0(ch->attr.uuid, BODY_SENSOR_LOCATION_UUID) == 0)
-+	if (g_strcmp0(ch->attr.uuid, HEART_RATE_CONTROL_POINT_UUID) == 0) {
-+		DBG("Heart Rate Control Point reset supported by client");
-+	} else if (g_strcmp0(ch->attr.uuid, BODY_SENSOR_LOCATION_UUID) == 0) {
- 		DBG("Body Sensor Location supported by client");
-+		gatt_read_char(ch->hr->attrib, ch->attr.value_handle, 0,
-+						read_sensor_location_cb, ch);
-+	}
+@@ -120,6 +120,14 @@ static void destroy_heartrate_adapter(gpointer user_data)
+ 	g_free(hra);
  }
  
- static void process_heartrate_desc(struct descriptor *desc)
++static void process_heartrate_char(struct characteristic *ch)
++{
++	if (g_strcmp0(ch->attr.uuid, HEART_RATE_CONTROL_POINT_UUID) == 0)
++		DBG("Heart Rate Control Point supported by client");
++	 else if (g_strcmp0(ch->attr.uuid, BODY_SENSOR_LOCATION_UUID) == 0)
++		DBG("Body Sensor Location supported by client");
++}
++
+ static void configure_heartrate_cb(GSList *characteristics, guint8 status,
+ 							gpointer user_data)
+ {
+@@ -144,6 +152,8 @@ static void configure_heartrate_cb(GSList *characteristics, guint8 status,
+ 		ch->hr = hr;
+ 
+ 		hr->chars = g_slist_append(hr->chars, ch);
++
++		process_heartrate_char(ch);
+ 	}
+ }
+ 
 -- 
 1.7.11.3
 
