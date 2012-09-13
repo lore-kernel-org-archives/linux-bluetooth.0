@@ -1,130 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sunil Kumar Behera <sunil.behera@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sunil Kumar Behera <sunil.behera@samsung.com>
-Subject: [PATCH obexd v1 2/3] MAP: Add set read status function
-Date: Thu, 13 Sep 2012 19:13:28 +0530
-Message-id: <1347543808-1220-1-git-send-email-sunil.behera@samsung.com>
+Message-ID: <5051E10A.9010105@tieto.com>
+Date: Thu, 13 Sep 2012 15:35:06 +0200
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v4 00/17] Heart Rate Profile plugin
+References: <1347538401-6417-1-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1347538401-6417-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This function will inform MAP server to modify the
-read status of a given message.
----
- plugins/mas.c              |   25 +++++++++++++++++++++++++
- plugins/messages-dummy.c   |    6 ++++++
- plugins/messages-tracker.c |    6 ++++++
- plugins/messages.h         |   13 +++++++++++++
- 4 files changed, 50 insertions(+)
+Hi again,
 
-diff --git a/plugins/mas.c b/plugins/mas.c
-index f2ff9e6..14e7478 100644
---- a/plugins/mas.c
-+++ b/plugins/mas.c
-@@ -46,6 +46,8 @@
- 
- #include "messages.h"
- 
-+#define READ_STATUS_REQ 0
-+
- /* Channel number according to bluez doc/assigned-numbers.txt */
- #define MAS_CHANNEL	16
- 
-@@ -499,6 +501,20 @@ static void update_inbox_cb(void *session, int err, void *user_data)
- 		obex_object_set_io_flags(mas, G_IO_OUT, 0);
- }
- 
-+static void set_read_status_cb(void *session, int err, void *user_data)
-+{
-+	struct mas_session *mas = user_data;
-+
-+	DBG("");
-+
-+	mas->finished = TRUE;
-+
-+	if (err < 0)
-+		obex_object_set_io_flags(mas, G_IO_ERR, err);
-+	else
-+		obex_object_set_io_flags(mas, G_IO_OUT, 0);
-+}
-+
- static int mas_setpath(struct obex_session *os, void *user_data)
- {
- 	const char *name;
-@@ -677,6 +693,15 @@ static void *message_set_status_open(const char *name, int oflag, mode_t mode,
- 		return NULL;
- 	}
- 
-+	if (indicator == READ_STATUS_REQ)
-+		*err = messages_set_read(mas->backend_data, name, value,
-+						set_read_status_cb, mas);
-+	else
-+		*err = -EBADR;
-+
-+	if (*err < 0)
-+		return NULL;
-+
- 	return mas;
- }
- 
-diff --git a/plugins/messages-dummy.c b/plugins/messages-dummy.c
-index a47f143..78e20ae 100644
---- a/plugins/messages-dummy.c
-+++ b/plugins/messages-dummy.c
-@@ -353,6 +353,12 @@ int messages_update_inbox(void *session, messages_update_inbox_cb callback,
- 	return -ENOSYS;
- }
- 
-+int messages_set_read(void *session, const char *handle, uint8_t value,
-+				messages_set_read_cb callback, void *user_data)
-+{
-+	return -ENOSYS;
-+}
-+
- void messages_abort(void *s)
- {
- 	struct session *session = s;
-diff --git a/plugins/messages-tracker.c b/plugins/messages-tracker.c
-index 92c1767..1516dc7 100644
---- a/plugins/messages-tracker.c
-+++ b/plugins/messages-tracker.c
-@@ -327,6 +327,12 @@ int messages_update_inbox(void *session, messages_update_inbox_cb callback,
- 	return -ENOSYS;
- }
- 
-+int messages_set_read(void *session, const char *handle, uint8_t value,
-+				messages_set_read_cb callback, void *user_data)
-+{
-+	return -ENOSYS;
-+}
-+
- void messages_abort(void *session)
- {
- }
-diff --git a/plugins/messages.h b/plugins/messages.h
-index 669f7c2..45579d3 100644
---- a/plugins/messages.h
-+++ b/plugins/messages.h
-@@ -279,6 +279,19 @@ typedef void (*messages_update_inbox_cb)(void *session, int err,
- 
- int messages_update_inbox(void *session, messages_update_inbox_cb callback,
- 							void *user_data);
-+/* Informs Message Server to modify read status of a given message.
-+ *
-+ * session: Backend session.
-+ * handle: Unique identifier to the message.
-+ * value: Indicates the new value of the read status for a given message.
-+ * Callback shall be called for every read status update request
-+ *	recieved from MCE.
-+ * user_data: User data if any to be sent.
-+ */
-+typedef void (*messages_set_read_cb)(void *session, int err, void *user_data);
-+
-+int messages_set_read(void *session, const char *handle, uint8_t value,
-+				messages_set_read_cb callback, void *user_data);
- 
- /* Aborts currently pending request.
-  *
--- 
-1.7.9.5
+On 09/13/2012 02:13 PM, Kaczmarek Andrzej wrote:
+> Hi,
+>
+> Changes since v3:
+> * rebased due to profile code moved to separate files
+>
+<snip>
 
+Please ignore v4, I rebased older version of patches by mistake. Will 
+send proper v5 shortly.
+
+BR,
+Andrzej
