@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v4 14/17] heartrate: Add Reset method
-Date: Thu, 13 Sep 2012 14:13:18 +0200
-Message-ID: <1347538401-6417-15-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v4 13/17] heartrate: Process Heart Rate Measurement characteristics
+Date: Thu, 13 Sep 2012 14:13:17 +0200
+Message-ID: <1347538401-6417-14-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1347538401-6417-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1347538401-6417-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,108 +12,254 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds Reset method on HeartRate interface to reset Energy Expended.
-
-Change-Id: I54eb89c757627757dc1b934c103fc9444326b36a
+Change-Id: Ic64336c084891ad63b67fe900663a7835c1f78fb
 ---
- profiles/heartrate/heartrate.c | 58 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 57 insertions(+), 1 deletion(-)
+ profiles/heartrate/heartrate.c | 193 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 193 insertions(+)
 
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index 0031e4d..8fec7e7 100644
+index dec09d0..0031e4d 100644
 --- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
-@@ -43,6 +43,7 @@
+@@ -42,11 +42,18 @@
+ #include "log.h"
  
  #define HEART_RATE_MANAGER_IFACE "org.bluez.HeartRateManager"
- #define HEART_RATE_WATCHER_IFACE "org.bluez.HeartRateWatcher"
-+#define HEART_RATE_IFACE "org.bluez.HeartRate"
++#define HEART_RATE_WATCHER_IFACE "org.bluez.HeartRateWatcher"
  
  #define MIN_NOTIFICATION_LEN 3  /* 1-byte opcode + 2-byte handle */
  
-@@ -432,6 +433,43 @@ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
- 	return dbus_message_new_method_return(msg);
- }
+ #define SENSOR_LOCATION_SIZE 1
  
-+static gint process_att_reset(struct heartrate_device *hrdev)
-+{
-+	struct characteristic *ch;
-+	char *msg;
-+	uint8_t atval;
++#define HR_VALUE_FORMAT		0x01
++#define SENSOR_CONTACT_SUPPORT	0x02
++#define SENSOR_CONTACT_DETECTED	0x04
++#define ENERGY_EXP_STATUS	0x08
++#define RR_INTERVAL		0x10
 +
-+	if (hrdev->attrib == NULL)
-+		return -1;
-+
-+	ch = get_characteristic(hrdev, HEART_RATE_CONTROL_POINT_UUID);
-+	if (ch == NULL)
-+		return -1;
-+
-+	atval = 0x01;
-+	msg = g_strdup("Reset Control Point");
-+
-+	gatt_write_char(hrdev->attrib, ch->attr.value_handle, &atval,
-+							1, char_write_cb, msg);
-+	return 0;
-+}
-+
-+static DBusMessage *control_point_reset(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	struct heartrate_device *hrdev = data;
-+
-+	if (!hrdev->has_cp_reset)
-+		return btd_error_not_supported(msg);
-+
-+	if (process_att_reset(hrdev) < 0)
-+		return btd_error_not_available(msg);
-+
-+	DBG("Energy Expended Value has been reset");
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
- static const GDBusMethodTable heartrate_manager_methods[] = {
- 	{ GDBUS_METHOD("RegisterWatcher",
- 			GDBUS_ARGS({ "agent", "o" }), NULL,
-@@ -442,6 +480,12 @@ static const GDBusMethodTable heartrate_manager_methods[] = {
- 	{ }
+ struct heartrate_adapter {
+ 	struct btd_adapter	*adapter;
+ 	GSList			*devices;
+@@ -78,6 +85,18 @@ struct descriptor {
+ 	bt_uuid_t		uuid;
  };
  
-+static const GDBusMethodTable heartrate_device_methods[] = {
-+	{ GDBUS_METHOD("Reset", NULL, NULL,
-+			control_point_reset) },
-+	{ }
++struct measurement {
++	struct heartrate_device	*hrdev;
++	uint16_t		value;
++	gboolean		has_energy;
++	uint16_t		energy;
++	gboolean		has_contact;
++	gboolean		contact;
++	uint16_t		num_interval;
++	uint16_t		*interval;
++	char			*location;
 +};
 +
- static void read_sensor_location_cb(guint8 status, const guint8 *pdu,
- 						guint16 len, gpointer user_data)
- {
-@@ -844,6 +888,16 @@ int heartrate_device_register(struct btd_device *device,
- 	hrdev->dev = btd_device_ref(device);
- 	hrdev->hr = hr;
+ struct watcher {
+ 	struct heartrate_adapter	*hr;
+ 	guint				id;
+@@ -85,6 +104,25 @@ struct watcher {
+ 	char				*path;
+ };
  
-+	if (!g_dbus_register_interface(get_dbus_connection(),
-+				device_get_path(device), HEART_RATE_IFACE,
-+				heartrate_device_methods, NULL, NULL,
-+				hrdev, destroy_heartrate_device)) {
-+		error("D-Bus failed to register %s interface",
-+						HEART_RATE_IFACE);
-+		destroy_heartrate_device(hrdev);
-+		return -EIO;
++static const char *location_type[] = {
++	"Other",
++	"Chest",
++	"Wrist",
++	"Finger",
++	"Hand",
++	"Earlobe",
++	"Foot"
++};
++
++static const gchar *location2str(uint8_t value)
++{
++	 if (value < G_N_ELEMENTS(location_type))
++		return location_type[value];
++
++	error("Location type %d reserved for future use", value);
++	return NULL;
++}
++
+ static GSList *heartrate_adapters = NULL;
+ 
+ static gint cmp_adapter(gconstpointer a, gconstpointer b)
+@@ -125,6 +163,14 @@ static gint cmp_descriptor(gconstpointer a, gconstpointer b)
+ 	return bt_uuid_cmp(&desc->uuid, uuid);
+ }
+ 
++static gint cmp_char_val_handle(gconstpointer a, gconstpointer b)
++{
++	const struct characteristic *ch = a;
++	const uint16_t *handle = b;
++
++	return ch->attr.value_handle - *handle;
++}
++
+ static gint cmp_watcher(gconstpointer a, gconstpointer b)
+ {
+ 	const struct watcher *watcher = a;
+@@ -556,12 +602,159 @@ static void configure_heartrate_cb(GSList *characteristics, guint8 status,
+ 	}
+ }
+ 
++static void update_watcher(gpointer data, gpointer user_data)
++{
++	struct watcher *w = data;
++	struct measurement *m = user_data;
++	struct heartrate_device *hrdev = m->hrdev;
++	const gchar *path = device_get_path(hrdev->dev);
++	DBusMessageIter iter;
++	DBusMessageIter dict;
++	DBusMessage *msg;
++
++	msg = dbus_message_new_method_call(w->srv, w->path,
++						HEART_RATE_WATCHER_IFACE,
++						"MeasurementReceived");
++	if (msg == NULL)
++		return;
++
++	dbus_message_iter_init_append(msg, &iter);
++
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH , &path);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	dict_append_entry(&dict, "Value", DBUS_TYPE_UINT16, &m->value);
++	if (m->has_energy)
++		dict_append_entry(&dict, "Energy", DBUS_TYPE_UINT16, &m->energy);
++	if (m->has_contact)
++		dict_append_entry(&dict, "Contact", DBUS_TYPE_BOOLEAN, &m->contact);
++	dict_append_entry(&dict, "Location", DBUS_TYPE_STRING, &m->location);
++
++	if (m->num_interval > 0)
++		dict_append_array(&dict, "Interval", DBUS_TYPE_UINT16,
++						&m->interval, m->num_interval);
++
++	dbus_message_iter_close_container(&iter, &dict);
++
++	dbus_message_set_no_reply(msg, TRUE);
++	g_dbus_send_message(get_dbus_connection(), msg);
++}
++
++static void recv_measurement(struct heartrate_device *hrdev,
++							struct measurement *m)
++{
++	GSList *wlist = hrdev->hr->watchers;
++
++	m->hrdev = hrdev;
++
++	g_slist_foreach(wlist, update_watcher, m);
++}
++
++static void proc_measurement(struct heartrate_device *hrdev,
++					const uint8_t *pdu, uint16_t len)
++{
++	struct measurement m;
++	uint8_t flags;
++
++	if (len < 4) {
++		error("Mandatory flags are not provided");
++		return;
 +	}
 +
- 	hr->devices = g_slist_prepend(hr->devices, hrdev);
- 
- 	hrdev->svc_range = g_new0(struct att_range, 1);
-@@ -878,5 +932,7 @@ void heartrate_device_unregister(struct btd_device *device)
- 
- 	hr->devices = g_slist_remove(hr->devices, hrdev);
- 
--	destroy_heartrate_device(hrdev);
-+	g_dbus_unregister_interface(get_dbus_connection(),
-+							device_get_path(device),
-+							HEART_RATE_IFACE);
++	flags = pdu[3];
++
++	pdu += 4;
++	len -= 4;
++
++	memset(&m, 0, sizeof(m));
++
++	if (flags & HR_VALUE_FORMAT) {
++		if (len < 2) {
++			error("Heart Rate Measurement field missing");
++			return;
++		}
++
++		m.value = att_get_u16(pdu);
++		pdu += 2;
++		len -= 2;
++	} else {
++		if (len < 1) {
++			error("Heart Rate Measurement field missing");
++			return;
++		}
++
++		m.value = *pdu;
++		pdu++;
++		len--;
++	}
++
++	if (flags & ENERGY_EXP_STATUS) {
++		if (len < 2) {
++			error("Energy Expended field missing");
++			return;
++		}
++
++		m.has_energy = TRUE;
++		m.energy = att_get_u16(pdu);
++		pdu += 2;
++		len -= 2;
++	}
++
++	if (flags & RR_INTERVAL) {
++		int i;
++
++		if (len == 0 || (len % 2 != 0)) {
++			error("RR-Interval field malformed");
++			return;
++		}
++
++		m.num_interval = len / 2;
++		m.interval = g_new(uint16_t, m.num_interval);
++
++		for (i = 0; i < m.num_interval; pdu += 2, i++)
++				m.interval[i] = att_get_u16(pdu);
++	}
++
++	if (flags & SENSOR_CONTACT_SUPPORT) {
++		m.has_contact = TRUE;
++		m.contact = !!(flags & SENSOR_CONTACT_DETECTED);
++	}
++
++	if (hrdev->has_location)
++		m.location = g_strdup(location2str(hrdev->location));
++
++	recv_measurement(hrdev, &m);
++
++	g_free(m.interval);
++	g_free(m.location);
++}
++
+ static void notify_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
+ {
++	struct heartrate_device *hrdev = user_data;
++	const struct characteristic *ch;
++	uint16_t handle;
++	GSList *l;
++
+ 	if (len < MIN_NOTIFICATION_LEN) {
+ 		error("Bad pdu received");
+ 		return;
+ 	}
++
++	handle = att_get_u16(&pdu[1]);
++	l = g_slist_find_custom(hrdev->chars, &handle, cmp_char_val_handle);
++	if (l == NULL) {
++		error("Unexpected handle: 0x%04x", handle);
++		return;
++	}
++
++	ch = l->data;
++	if (g_strcmp0(ch->attr.uuid, HEART_RATE_MEASUREMENT_UUID) == 0)
++		proc_measurement(hrdev, pdu, len);
  }
+ 
+ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
 -- 
 1.7.11.3
 
