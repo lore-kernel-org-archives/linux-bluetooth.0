@@ -1,114 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH v5 01/17] Heart Rate Profile API
-Date: Thu, 13 Sep 2012 16:31:35 +0200
-Message-ID: <1347546711-19961-2-git-send-email-andrzej.kaczmarek@tieto.com>
-In-Reply-To: <1347546711-19961-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1347546711-19961-1-git-send-email-andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Sunil Kumar Behera <sunil.behera@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sunil Kumar Behera <sunil.behera@samsung.com>
+Subject: [PATCH obexd v1 1/3] MAP: Add binding to support SetMessageStatus
+ function
+Date: Thu, 13 Sep 2012 19:12:25 +0530
+Message-id: <1347543745-1176-1-git-send-email-sunil.behera@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Santiago Carot-Nemesio <sancane@gmail.com>
-
+Add message_set_status_open binding in MIME driver
+to support SetMessageStatus function.
 ---
- doc/heartrate-api.txt | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 84 insertions(+)
- create mode 100644 doc/heartrate-api.txt
+ plugins/mas.c |   33 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 32 insertions(+), 1 deletion(-)
 
-diff --git a/doc/heartrate-api.txt b/doc/heartrate-api.txt
-new file mode 100644
-index 0000000..4ce96d8
---- /dev/null
-+++ b/doc/heartrate-api.txt
-@@ -0,0 +1,84 @@
-+			 Heart Rate API description
-+****************************************
+diff --git a/plugins/mas.c b/plugins/mas.c
+index 1c9199d..f2ff9e6 100644
+--- a/plugins/mas.c
++++ b/plugins/mas.c
+@@ -649,6 +649,37 @@ static void *message_update_open(const char *name, int oflag, mode_t mode,
+ 		return mas;
+ }
+ 
++static void *message_set_status_open(const char *name, int oflag, mode_t mode,
++					void *driver_data, size_t *size,
++					int *err)
 +
-+Copyright (C) 2012	Santiago Carot-Nemesio <sancane@gmail.com>
-+Copyright (C) 2012	Tieto Poland
++{
++	struct mas_session *mas = driver_data;
++	uint8_t indicator;
++	uint8_t value;
 +
-+Heart Rate Manager hierarchy
-+============================
++	DBG("");
 +
-+Service		org.bluez
-+Interface	org.bluez.HeartRateManager
-+Object path	[variable prefix]/{hci0,hci1,...}
++	if (oflag == O_RDONLY) {
++		*err = -EBADR;
++		return NULL;
++	}
 +
-+Methods		RegisterWatcher(object agent)
++	if (!g_obex_apparam_get_uint8(mas->inparams, MAP_AP_STATUSINDICATOR,
++					&indicator)) {
++		*err = -EBADR;
++		return NULL;
++	}
 +
-+			Registers a watcher to monitor heart rate measurements.
++	if (!g_obex_apparam_get_uint8(mas->inparams, MAP_AP_STATUSVALUE,
++					&value)) {
++		*err = -EBADR;
++		return NULL;
++	}
 +
-+			Possible Errors: org.bluez.Error.InvalidArguments
++	return mas;
++}
 +
-+		UnregisterWatcher(object agent)
-+
-+			Unregisters a watcher.
-+
-+Heart Rate Profile hierarchy
-+============================
-+
-+Service		org.bluez
-+Interface	org.bluez.HeartRate
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-+
-+Methods		dict GetProperties()
-+
-+			Returns all properties for the interface. See the
-+			Properties section for the available properties.
-+
-+		Reset()
-+
-+			Restart the accumulation of energy expended from zero.
-+
-+			Possible Errors: org.bluez.Error.NotSupported
-+
-+Properties	String Location (optional) [readonly]
-+
-+			Possible values: "Other", "Chest", "Wrist","Finger",
-+					"Hand", "Earlobe", "Foot"
-+
-+		boolean ResetSupported [readonly]
-+
-+			True if energy expended is supported.
-+
-+Heart Rate Watcher hierarchy
-+
-+============================
-+Service		unique name
-+Interface	org.bluez.HeartRateWatcher
-+Object path	freely definable
-+
-+Methods		void MeasurementReceived(object device, dict measurement)
-+
-+			This callback is called whenever a heart rate
-+			measurement is received from the heart rate device.
-+
-+			Measurement:
-+
-+				uint16 Value:
-+
-+					Measurement value expressed in beats per
-+					minute (bpm)
-+
-+				uint16 Energy (optional):
-+
-+					Accumulated energy expended in kilo Joules
-+
-+				boolean Contact (optional):
-+
-+					true if skin contact is detected by sensor,
-+					false otherwise
-+
-+				array{uint16} Interval (optional):
-+
-+					RR-Interval values which represent the time
-+					between two consecutive R waves in an ECG.
-+					Values are ordered starting from oldest to
-+					most recent.
+ static ssize_t any_get_next_header(void *object, void *buf, size_t mtu,
+ 								uint8_t *hi)
+ {
+@@ -784,7 +815,7 @@ static struct obex_mime_type_driver mime_message_status = {
+ 	.target = MAS_TARGET,
+ 	.target_size = TARGET_SIZE,
+ 	.mimetype = "x-bt/messageStatus",
+-	.open = any_open,
++	.open = message_set_status_open,
+ 	.close = any_close,
+ 	.read = any_read,
+ 	.write = any_write,
 -- 
-1.7.11.3
+1.7.9.5
 
