@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Rafal Garbat <rafal.garbat@tieto.com>
-Subject: [PATCH v4 05/17] heartrate: Process characteristics
-Date: Thu, 13 Sep 2012 14:13:09 +0200
-Message-ID: <1347538401-6417-6-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v4 15/17] heartrate: Add GetProperties method
+Date: Thu, 13 Sep 2012 14:13:19 +0200
+Message-ID: <1347538401-6417-16-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1347538401-6417-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1347538401-6417-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -14,55 +14,60 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Rafal Garbat <rafal.garbat@tieto.com>
 
-This patch adds stub to process discovered characteristics.
-
-Change-Id: I983c942a33668e86fa73453a7649295bc0c032b6
+Change-Id: I56d9fd06aeb9a37451f31257380e0f6d0ed409f2
 ---
- lib/uuid.h                     |  2 ++
- profiles/heartrate/heartrate.c | 10 ++++++++++
- 2 files changed, 12 insertions(+)
+ profiles/heartrate/heartrate.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-diff --git a/lib/uuid.h b/lib/uuid.h
-index 3488e66..0a9db51 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -64,6 +64,8 @@ extern "C" {
- #define SAP_UUID		"0000112D-0000-1000-8000-00805f9b34fb"
- 
- #define HEART_RATE_UUID			"0000180d-0000-1000-8000-00805f9b34fb"
-+#define HEART_RATE_CONTROL_POINT_UUID	"00002a39-0000-1000-8000-00805f9b34fb"
-+#define BODY_SENSOR_LOCATION_UUID	"00002a38-0000-1000-8000-00805f9b34fb"
- 
- #define HEALTH_THERMOMETER_UUID		"00001809-0000-1000-8000-00805f9b34fb"
- #define TEMPERATURE_MEASUREMENT_UUID	"00002a1c-0000-1000-8000-00805f9b34fb"
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index 140a2fb..3d918e9 100644
+index 8fec7e7..0e9c80f 100644
 --- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
-@@ -120,6 +120,14 @@ static void destroy_heartrate_adapter(gpointer user_data)
- 	g_free(hr);
+@@ -433,6 +433,34 @@ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
+ 	return dbus_message_new_method_return(msg);
  }
  
-+static void process_heartrate_char(struct characteristic *ch)
++
++static DBusMessage *get_properties(DBusConnection *conn, DBusMessage *msg,
++								void *data)
 +{
-+	if (g_strcmp0(ch->attr.uuid, HEART_RATE_CONTROL_POINT_UUID) == 0)
-+		DBG("Heart Rate Control Point supported by client");
-+	 else if (g_strcmp0(ch->attr.uuid, BODY_SENSOR_LOCATION_UUID) == 0)
-+		DBG("Body Sensor Location supported by client");
++	struct heartrate_device *hrdev = data;
++	DBusMessageIter iter;
++	DBusMessageIter dict;
++	DBusMessage *reply;
++
++	reply = dbus_message_new_method_return(msg);
++	if (reply == NULL)
++		return NULL;
++
++	dbus_message_iter_init_append(reply, &iter);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	dict_append_entry(&dict, "ResetSupported", DBUS_TYPE_BOOLEAN,
++							&hrdev->has_cp_reset);
++
++	dbus_message_iter_close_container(&iter, &dict);
++
++	return reply;
 +}
 +
- static void configure_heartrate_cb(GSList *characteristics, guint8 status,
- 							gpointer user_data)
+ static gint process_att_reset(struct heartrate_device *hrdev)
  {
-@@ -144,6 +152,8 @@ static void configure_heartrate_cb(GSList *characteristics, guint8 status,
- 		ch->hrdev = hrdev;
+ 	struct characteristic *ch;
+@@ -481,6 +509,9 @@ static const GDBusMethodTable heartrate_manager_methods[] = {
+ };
  
- 		hrdev->chars = g_slist_append(hrdev->chars, ch);
-+
-+		process_heartrate_char(ch);
- 	}
- }
- 
+ static const GDBusMethodTable heartrate_device_methods[] = {
++	{ GDBUS_METHOD("GetProperties",
++			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
++			get_properties) },
+ 	{ GDBUS_METHOD("Reset", NULL, NULL,
+ 			control_point_reset) },
+ 	{ }
 -- 
 1.7.11.3
 
