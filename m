@@ -1,452 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1347591892.6145.14.camel@obelisk.thedillows.org>
-Subject: [KERNEL PATCH] HID: Add support for Sony BD Remote
-From: David Dillow <dave@thedillows.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: David Herrmann <dh.herrmann@googlemail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bastien Nocera <hadess@hadess.net>,
-	Antonio Ospite <ospite@studenti.unina.it>
-Date: Thu, 13 Sep 2012 23:04:52 -0400
-In-Reply-To: <20120913003628.ce5babb2a66d09fe17fa15de@studenti.unina.it>
-References: <1346378760.7976.2.camel@obelisk.thedillows.org>
-	 <20120907124559.GA16092@x220>
-	 <CABBYNZ+5E+BC-+9fj0e7iUpEDFJrJBQo8aoMZj8ZEkmiuB=QLA@mail.gmail.com>
-	 <1347284864.3532.1.camel@sirocco.hadess.net>
-	 <CABBYNZJpHkt8CGDsfVwirZ=vecb-fhbpPbrVFKt1UR_rA25mSw@mail.gmail.com>
-	 <CABBYNZ+n9obON7iNcv66x2ZVQCeTs_JoJUDXZFwxJJ6C4cb4YQ@mail.gmail.com>
-	 <CABBYNZKggzJ7bzQWVmWi30kxOUR8bVCyMLL=SM1=Oe74YPwvKg@mail.gmail.com>
-	 <1347394656.1606.10.camel@sirocco.hadess.net>
-	 <CABBYNZ+gpheC9sNeTp2uvDFBV-yPs+cY4PUR2omPt_kLTCafKw@mail.gmail.com>
-	 <1347456657.23874.29.camel@sirocco.hadess.net>
-	 <CABBYNZLwXhF0gixPGKUTJY4sZ7EHynTYmHzGtiZsoRGXgeEFaw@mail.gmail.com>
-	 <CANq1E4SDXVHcumBbEA-4xpeuOQ0SjDxxtL_RqAiNYRPj6ccagQ@mail.gmail.com>
-	 <20120913003628.ce5babb2a66d09fe17fa15de@studenti.unina.it>
+Message-ID: <1347580581.5975.4.camel@maxim-laptop>
+Subject: Re: [PATCH] Bluetooth: Free the l2cap channel list only when
+ refcount is zero
+From: Maxim Levitsky <maximlevitsky@gmail.com>
+To: Jaganath <jaganath.k@samsung.com>
+Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org, s.syam@samsung.com
+Date: Fri, 14 Sep 2012 02:56:21 +0300
+In-Reply-To: <4368C8F191BB414F84A70D30771FE893@sisodomain.com>
+References: <1342165923-4901-1-git-send-email-jaganath.k@samsung.com>
+	 <20120713084859.GC2729@aemeltch-MOBL1>
+	 <4368C8F191BB414F84A70D30771FE893@sisodomain.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We also gain support for the Logitech Harmony Adapter for PS3.
-
-Signed-off-by: David Dillow <dave@thedillows.org>
---
- drivers/hid/Kconfig         |    7 +
- drivers/hid/Makefile        |    1 +
- drivers/hid/hid-core.c      |    2 +
- drivers/hid/hid-ps3remote.c |  325 +++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 335 insertions(+), 0 deletions(-)
-
-On Thu, 2012-09-13 at 00:36 +0200, Antonio Ospite wrote:
-On Wed, 12 Sep 2012 22:26:04 +0200 David Herrmann wrote:
-> > So if the devices only need some short setup-command during
-> > initialization and then they send HID reports whenever a button is
-> > pressed, then everything should be very easy to get working. Even
-> > auto-reconnect and 10min idle-disconnect are _very_ easy to get
-> > working in the kernel with the current HID infrastructure.
+On Fri, 2012-07-13 at 16:56 +0530, Jaganath wrote: 
+> Hi Andrei,
 > 
-> I too will take a look during the week-end about writing a kernel
-> driver, if it's not that much of an effort I might take the project
-> (no promises yet). I have a PS3 BD remote Bastien donated.
+> --------------------------------------------------
+> From: "Andrei Emeltchenko" <andrei.emeltchenko.news@gmail.com>
+> Sent: Friday, July 13, 2012 2:19 PM
+> To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
+> Cc: <linux-bluetooth@vger.kernel.org>; <s.syam@samsung.com>
+> Subject: Re: [PATCH] Bluetooth: Free the l2cap channel list only when 
+> refcount is zero
+> 
+> > Hi Jaganath,
+> >
+> > On Fri, Jul 13, 2012 at 01:22:03PM +0530, Jaganath Kanakkassery wrote:
+> >> Move the l2cap channel list chan->global_l under the refcnt
+> >> protection and free it based on the refcnt.
+> >
+> > The idea is good.
+> >
+Note that in 3.6-rc5 which soon to be released, it trivial to trigger a
+crash by suspending the system with a2dp headphones connected.
+I also have seem (and I strongly suspect the same) crash in 3.5
+This patch seems to fix this so far.
+Could you sent it to Linus, to fix this kernel panic?
 
-Here's a first pass at a kernel driver to support the BD remote and
-Harmony PS adapter. I've tested it on Fedora 16 with single keypresses
-only, as I cannot send multiple simultaneous keypresses with the
-Harmony. This patch is against kernel.org's bluetooth.git as of an hour
-ago, but should apply to other versions without much fuss.
+Best  regards,
+Maxim Levitsky
 
-Antonio, if you could test this with the real remote you have, I'd be
-very appreciative.
-
-David, could you point me at the controls for the 10min idle-disconnect?
-auto-connect and idle-disconnect seem to be working on my Fedora 16 box,
-though it looks like the Harmony adapter is initiating the disconnect --
-this is likely an area for improvement with the Sony remote.
-
-
-
-diff --git a/drivers/hid/Kconfig b/drivers/hid/Kconfig
-index fbf4950..7e6ab25 100644
---- a/drivers/hid/Kconfig
-+++ b/drivers/hid/Kconfig
-@@ -534,6 +534,13 @@ config HID_PRIMAX
- 	Support for Primax devices that are not fully compliant with the
- 	HID standard.
- 
-+config HID_PS3REMOTE
-+	tristate "Sony PS3 Bluetooth BD Remote"
-+	depends on BT_HIDP
-+	---help---
-+	Support for Sony PS3 Bluetooth BD Remote and Logitech Harmony Adapter
-+	for PS3.
-+
- config HID_ROCCAT
- 	tristate "Roccat device support"
- 	depends on USB_HID
-diff --git a/drivers/hid/Makefile b/drivers/hid/Makefile
-index f975485..333ed6c 100644
---- a/drivers/hid/Makefile
-+++ b/drivers/hid/Makefile
-@@ -70,6 +70,7 @@ obj-$(CONFIG_HID_PANTHERLORD)	+= hid-pl.o
- obj-$(CONFIG_HID_PETALYNX)	+= hid-petalynx.o
- obj-$(CONFIG_HID_PICOLCD)	+= hid-picolcd.o
- obj-$(CONFIG_HID_PRIMAX)	+= hid-primax.o
-+obj-$(CONFIG_HID_PS3REMOTE)	+= hid-ps3remote.o
- obj-$(CONFIG_HID_ROCCAT)	+= hid-roccat.o hid-roccat-common.o \
- 	hid-roccat-arvo.o hid-roccat-isku.o hid-roccat-kone.o \
- 	hid-roccat-koneplus.o hid-roccat-kovaplus.o hid-roccat-pyra.o \
-diff --git a/drivers/hid/hid-core.c b/drivers/hid/hid-core.c
-index 60ea284..1838c12 100644
---- a/drivers/hid/hid-core.c
-+++ b/drivers/hid/hid-core.c
-@@ -1591,6 +1591,7 @@ static const struct hid_device_id hid_have_special_driver[] = {
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_LOGITECH_RUMBLEPAD2) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_SPACETRAVELLER) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_SPACENAVIGATOR) },
-+	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_LOGITECH, 0x0306) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_MICROCHIP, USB_DEVICE_ID_PICOLCD) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_MICROCHIP, USB_DEVICE_ID_PICOLCD_BOOTLOADER) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_MICROSOFT, USB_DEVICE_ID_MS_COMFORT_MOUSE_4500) },
-@@ -1641,6 +1642,7 @@ static const struct hid_device_id hid_have_special_driver[] = {
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_NAVIGATION_CONTROLLER) },
- 	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_VAIO_VGX_MOUSE) },
-+	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_SONY, 0x0306) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_SUNPLUS, USB_DEVICE_ID_SUNPLUS_WDESKTOP) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_THRUSTMASTER, 0xb300) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_THRUSTMASTER, 0xb304) },
-diff --git a/drivers/hid/hid-ps3remote.c b/drivers/hid/hid-ps3remote.c
-new file mode 100644
-index 0000000..a87346e
---- /dev/null
-+++ b/drivers/hid/hid-ps3remote.c
-@@ -0,0 +1,325 @@
-+/*
-+ * HID driver for Sony PS3 BD Remote
-+ *
-+ * Copyright (c) 2012 David Dillow <dave@thedillows.org>
-+ * Based on a blend of the bluez fakehid user-space code by Marcel Holtmann
-+ * and other kernel HID drivers.
-+ */
-+
-+/*
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ */
-+
-+#include <linux/device.h>
-+#include <linux/hid.h>
-+#include <linux/module.h>
-+
-+#include "hid-ids.h"
-+
-+enum ps3remote_special_keys {
-+	PS3R_BIT_PS	  = 0,
-+	PS3R_BIT_ENTER	  = 3,
-+	PS3R_BIT_L2	  = 8,
-+	PS3R_BIT_R2	  = 9,
-+	PS3R_BIT_L1	  = 10,
-+	PS3R_BIT_R1	  = 11,
-+	PS3R_BIT_TRIANGLE = 12,
-+	PS3R_BIT_CIRCLE	  = 13,
-+	PS3R_BIT_CROSS	  = 14,
-+	PS3R_BIT_SQUARE	  = 15,
-+	PS3R_BIT_SELECT	  = 16,
-+	PS3R_BIT_L3	  = 17,
-+	PS3R_BIT_R3	  = 18,
-+	PS3R_BIT_START	  = 19,
-+	PS3R_BIT_UP	  = 20,
-+	PS3R_BIT_RIGHT	  = 21,
-+	PS3R_BIT_DOWN	  = 22,
-+	PS3R_BIT_LEFT	  = 23,
-+};
-+
-+static unsigned int ps3remote_bits[] = {
-+	[PS3R_BIT_ENTER]    = 0x0b,
-+	[PS3R_BIT_PS]	    = 0x43,
-+	[PS3R_BIT_SQUARE]   = 0x5f,
-+	[PS3R_BIT_CROSS]    = 0x5e,
-+	[PS3R_BIT_CIRCLE]   = 0x5d,
-+	[PS3R_BIT_TRIANGLE] = 0x5c,
-+	[PS3R_BIT_R1]       = 0x5b,
-+	[PS3R_BIT_L1]	    = 0x5a,
-+	[PS3R_BIT_R2]	    = 0x59,
-+	[PS3R_BIT_L2]	    = 0x58,
-+	[PS3R_BIT_LEFT]	    = 0x57,
-+	[PS3R_BIT_DOWN]	    = 0x56,
-+	[PS3R_BIT_RIGHT]    = 0x55,
-+	[PS3R_BIT_UP]	    = 0x54,
-+	[PS3R_BIT_START]    = 0x53,
-+	[PS3R_BIT_R3]	    = 0x52,
-+	[PS3R_BIT_L3]	    = 0x51,
-+	[PS3R_BIT_SELECT]   = 0x50,
-+};
-+
-+const static unsigned int ps3remote_keymap[] = {
-+	[0x16] = KEY_EJECTCD,
-+	[0x64] = KEY_AUDIO,
-+	[0x65] = KEY_ANGLE,
-+	[0x63] = KEY_SUBTITLE,
-+	[0x0f] = KEY_CLEAR,
-+	[0x28] = KEY_TIME,
-+	[0x00] = KEY_1,
-+	[0x01] = KEY_2,
-+	[0x02] = KEY_3,
-+	[0x03] = KEY_4,
-+	[0x04] = KEY_5,
-+	[0x05] = KEY_6,
-+	[0x06] = KEY_7,
-+	[0x07] = KEY_8,
-+	[0x08] = KEY_9,
-+	[0x09] = KEY_0,
-+	[0x81] = KEY_RED,
-+	[0x82] = KEY_GREEN,
-+	[0x80] = KEY_BLUE,
-+	[0x83] = KEY_YELLOW,
-+	[0x70] = KEY_INFO,		/* display */
-+	[0x1a] = KEY_MENU,		/* top menu */
-+	[0x40] = KEY_CONTEXT_MENU,	/* pop up/menu */
-+	[0x0e] = KEY_ESC,		/* return */
-+	[0x5c] = KEY_OPTION,		/* options/triangle */
-+	[0x5d] = KEY_BACK,		/* back/circle */
-+	[0x5f] = KEY_SCREEN,		/* view/square */
-+	[0x5e] = BTN_0,			/* cross */
-+	[0x54] = KEY_UP,
-+	[0x56] = KEY_DOWN,
-+	[0x57] = KEY_LEFT,
-+	[0x55] = KEY_RIGHT,
-+	[0x0b] = KEY_ENTER,
-+	[0x5a] = BTN_TL,		/* L1 */
-+	[0x58] = BTN_TL2,		/* L2 */
-+	[0x51] = BTN_THUMBL,		/* L3 */
-+	[0x5b] = BTN_TR,		/* R1 */
-+	[0x59] = BTN_TR2,		/* R2 */
-+	[0x52] = BTN_THUMBR,		/* R3 */
-+	[0x43] = KEY_HOMEPAGE,		/* PS button */
-+	[0x50] = KEY_SELECT,
-+	[0x53] = BTN_START,
-+	[0x33] = KEY_REWIND,		/* scan back */
-+	[0x32] = KEY_PLAY,
-+	[0x34] = KEY_FORWARD,		/* scan forward */
-+	[0x30] = KEY_PREVIOUS,
-+	[0x38] = KEY_STOP,
-+	[0x31] = KEY_NEXT,
-+	[0x60] = KEY_FRAMEBACK,		/* slow/step back */
-+	[0x39] = KEY_PAUSE,
-+	[0x61] = KEY_FRAMEFORWARD,	/* slow/step forward */
-+};
-+
-+static __u8 ps3remote_rdesc[] = {
-+	0x05, 0x01,	/* USAGE PAGE (Generic Desktop) */
-+	0x09, 0x05,	/* USAGE (Game Pad) */
-+	0xa1, 0x01,	/* COLLECTION (Application) */
-+	0x05, 0x06,	/*   USAGE PAGE (Generic Device) */
-+	0x09, 0x20,	/*   USAGE (Battery Strength) */
-+	0x15, 0x00,	/*   LOGICAL MINIMUM (0) */
-+	0x25, 0x64,	/*   LOGICAL MAXIMUM (100) */
-+	0x75, 0x08,	/*   REPORT SIZE (8) */
-+	0x95, 0x01,	/*   REPORT COUNT (1) */
-+	0x81, 0x02,	/*   INPUT (Variable, Absolute) */
-+	0x05, 0x09,	/*   USAGE PAGE (Button) */
-+	0x19, 0x00,	/*   USAGE MINUMUM (0) */
-+	0x29, 0xfe,	/*   USAGE MAXIMUM (254) */
-+	0x15, 0x00,	/*   LOGICAL MINIMUM (0) */
-+	0x25, 0xfe,	/*   LOGICAL MAXIMUM (254) */
-+	0x75, 0x08,	/*   REPORT SIZE (8) */
-+	0x95, 0x01,	/*   REPORT COUNT (11) */
-+	0x81, 0x00,	/*   INPUT (Array, Absolute) */
-+	0xc0,		/* END_COLLECTION */
-+};
-+
-+struct ps3remote_data {
-+	u8  report[12];
-+	u8  last_key;
-+	u32 last_mask;
-+};
-+
-+static __u8 *ps3remote_fixup(struct hid_device *hdev, __u8 *rdesc,
-+			     unsigned int *rsize)
-+{
-+	*rsize = sizeof(ps3remote_rdesc);
-+	return ps3remote_rdesc;
-+}
-+
-+static int ps3remote_mapping(struct hid_device *hdev, struct hid_input *hi,
-+			     struct hid_field *field, struct hid_usage *usage,
-+			     unsigned long **bit, int *max)
-+{
-+	unsigned int key = usage->hid & HID_USAGE;
-+
-+	if ((usage->hid & HID_USAGE_PAGE) != HID_UP_BUTTON ||
-+	    key >= ARRAY_SIZE(ps3remote_keymap))
-+		return -1;
-+
-+	key = ps3remote_keymap[key];
-+	if (!key)
-+		return -1;
-+
-+	hid_map_usage_clear(hi, usage, bit, max, EV_KEY, key);
-+	return 1;
-+}
-+
-+static void ps3remote_keychange(struct ps3remote_data *data, u8 key, u8 pressed)
-+{
-+	/*
-+	 * Update our report to include/exclude the key that changed, but
-+	 * make sure it doesn't get listed twice. It's OK if we don't have
-+	 * room to store a keypress, as that means 11 keys are simultaneously
-+	 * pressed.
-+	 */
-+	u8 *p = memchr(data->report + 1, key, 11);
-+	if (pressed) {
-+		if (p)
-+			return;
-+
-+		/* Not present, find a free spot to add it */
-+		p = memchr(data->report + 1, 0xff, 11);
-+	} else
-+		key = 0xff;
-+
-+	if (p)
-+		*p = key;
-+}
-+
-+static int ps3remote_event(struct hid_device *hdev, struct hid_report *report,
-+			   u8 *raw_data, int size)
-+{
-+	struct ps3remote_data *data = hid_get_drvdata(hdev);
-+	u32 mask, changed;
-+	u8 key, pressed;
-+	int i;
-+
-+	if (size != 12) {
-+		hid_dbg(hdev, "unsupported report size\n");
-+		return 1;
-+	}
-+
-+	/* Battery appears to range from 0 to 5, convert into a percentage */
-+	data->report[0] = raw_data[11] * 20;
-+
-+	/*
-+	 * Sometimes key presses are reported in the bitmask, sometimes
-+	 * standalone. It appears the bitmask is used for buttons that
-+	 * may pressed at the same time.
-+	 */
-+	mask = be32_to_cpup((__be32 *) raw_data);
-+	mask &= ~0xff000000;
-+	key = raw_data[4];
-+	pressed = raw_data[10];
-+
-+	changed = data->last_mask ^ mask;
-+	if (changed) {
-+		/* Update any changed multiple keypress reports */
-+		for (i = 0; i < 24; i++) {
-+			if ((changed & (1 << i)) && ps3remote_bits[i]) {
-+				ps3remote_keychange(data, ps3remote_bits[i],
-+						    !!(mask & (1 << i)));
-+			}
-+		}
-+		data->last_mask = mask;
-+	} else if (pressed && key != 0xff) {
-+		/* Single key pressed */
-+		ps3remote_keychange(data, key, 1);
-+		data->last_key = key;
-+	} else if (!pressed && data->last_key != 0xff) {
-+		/* Single key released */
-+		ps3remote_keychange(data, data->last_key, 0);
-+		data->last_key = 0xff;
-+	} else {
-+		hid_dbg(hdev, "Incoherent report, %06x %06x %02x %02x %02x\n",
-+			mask, data->last_mask, key, data->last_key, pressed);
-+	}
-+
-+	/* Substitue our updated report */
-+	memcpy(raw_data, data->report, 12);
-+	return 0;
-+}
-+
-+static int ps3remote_probe(struct hid_device *hdev,
-+			   const struct hid_device_id *id)
-+{
-+	struct ps3remote_data *data;
-+	int ret = -ENOMEM;
-+
-+	data = kmalloc(sizeof(*data), GFP_KERNEL);
-+	if (!data) {
-+		hid_err(hdev, "Can't alloc private data\n");
-+		goto err;
-+	}
-+
-+	data->report[0] = 0;
-+	memset(data->report + 1, 0xff, 11);
-+	data->last_key = 0xff;
-+	data->last_mask = 0;
-+
-+	hid_set_drvdata(hdev, data);
-+
-+	ret = hid_parse(hdev);
-+	if (ret) {
-+		hid_err(hdev, "HID parse failed\n");
-+		goto err;
-+	}
-+
-+	ret = hid_hw_start(hdev, HID_CONNECT_DEFAULT);
-+	if (ret) {
-+		hid_err(hdev, "HW start failed\n");
-+		goto err;
-+	}
-+
-+	return ret;
-+
-+err:
-+	kfree(data);
-+	return ret;
-+}
-+
-+static void ps3remote_remove(struct hid_device *hdev)
-+{
-+	struct ps3remote_data *data = hid_get_drvdata(hdev);
-+
-+	hid_hw_stop(hdev);
-+	kfree(data);
-+}
-+
-+static const struct hid_device_id ps3remote_devices[] = {
-+	/* PS3 BD Remote */
-+	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_SONY, 0x0306) },
-+	/* Logitech Harmony Adapter for PS3 */
-+	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_LOGITECH, 0x0306) },
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(hid, ps3remote_devices);
-+
-+static struct hid_driver ps3remote_driver = {
-+	.name 		= "ps3_remote",
-+	.id_table	= ps3remote_devices,
-+	.probe		= ps3remote_probe,
-+	.remove		= ps3remote_remove,
-+	.report_fixup	= ps3remote_fixup,
-+	.input_mapping	= ps3remote_mapping,
-+	.raw_event	= ps3remote_event,
-+};
-+
-+static int __init ps3remote_init(void)
-+{
-+	return hid_register_driver(&ps3remote_driver);
-+}
-+
-+static void __exit ps3remote_exit(void)
-+{
-+	hid_unregister_driver(&ps3remote_driver);
-+}
-+
-+module_init(ps3remote_init);
-+module_exit(ps3remote_exit);
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("David Dillow <dave@thedillows.org>");
+PS:
+The backtrace:
 
 
-
+fg80211: Calling CRDA to update world regulatory domain
+cfg80211: World regulatory domain updated:
+cfg80211:   (start_freq - end_freq @ bandwidth), (max_antenna_gain,
+max_eirp)
+cfg80211:   (2402000 KHz - 2472000 KHz @ 40000 KHz), (300 mBi, 2000
+mBm)2
+cfg80211:   (2457000 KHz - 2482000 KHz @ 20000 KHz), (300 mBi, 2000 mBm)
+cfg80211:   (2474000 KHz - 2494000 KHz @ 20000 KHz), (300 mBi, 2000
+mBm)T:
+cfg80211:   (5170000 KHz - 5250000 KHz @ 40000 KHz), (300 mBi, 2000 mBm)
+cfg80211:   (5735000 KHz - 5835000 KHz @ 40000 KHz), (300 mBi, 2000 mBm)
+8
+cfg80211: World regulatory domain updated:
+cfg80211:   (start_freq - end_freq @ bandwidth), (max_antenna_gain,
+max_eirp)
+cfg80211:   (2402000 KHz - 2472000 KHz @ 40000 KHz), (300 mBi, 2000
+mBm)<
+cfg80211:   (2457000 KHz - 2482000 KHz @ 20000 KHz), (300 mBi, 2000
+mBm)P@
+cfg80211:   (2474000 KHz - 2494000 KHz @ 20000 KHz), (300 mBi, 2000 mBm)
+cfg80211:   (5170000 KHz - 5250000 KHz @ 40000 KHz), (300 mBi, 2000 mBm)
+cfg80211:   (5735000 KHz - 5835000 KHz @ 40000 KHz), (300 mBi, 2000 mBm)
+general protection fault: 0000 [#1] PREEMPT SMP 
+Modules linked in: hidp af_packet bnep rfcomm iwl3945
+snd_hda_codec_realtek iwlegacy mac80211 snd_hda_intel nfsd btusb
+snd_hda_codec uvcvideo snd_hwdep videobuf2_core snd_pcm bluetooth
+videobuf2_vmalloc videobuf2_memops nfs_acl auth_rpcgss r592 cfg80211
+microcode nfs psmouse memstick serio_raw snd_page_alloc ene_ir battery
+ac lockd sunrpc rc_lirc ir_lirc_codec lirc_dev ir_rc6_decoder
+firewire_net iTCO_wdt firewire_sbp2 nouveau ttm drm_kms_helper mxm_wmi
+usb_storage video wmi uhci_hcd sdhci_pci firewire_ohci firewire_core
+sdhci mmc_core atkbd ehci_hcd thermal [last unloaded: tg3]
+CPU 0 
+Pid: 3512, comm: bluetoothd Not tainted 3.6.0-rc5+ #34 Acer       Aspire
+5720     /Nettiling?b
+RIP: 0010:[<ffffffffa03a1d56>]  [<ffffffffa03a1d56>] l2cap_chan_destroy
++0x46/0xb0 [bluetooth]
+RSP: 0018:ffff8800619dbca8  EFLAGS: 00010296
+RAX: dead000000200200 RBX: ffff88007d3f1000 RCX: dead000000100100
+RDX: dead000000100100 RSI: dead000000200200 RDI: ffffffffa03b7cc0
+RBP: ffff8800619dbcb8 R08: 0000000000000000 R09: 0000000000000000
+R10: 0001cc0f349b43de R11: ffffffffa03a1d2d R12: ffff88007d3f1000
+R13: ffff88007d3f1014 R14: ffff88005f922570 R15: ffff88005f9229e0
+FS:  00007f8aa4634740(0000) GS:ffff88007fa00000(0000)
+knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f8aa46b7d90 CR3: 000000005f945000 CR4: 00000000000007f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+Process bluetoothd (pid: 3512, threadinfo ffff8800619da000, task
+ffff88005ec4bde0)
+Stack:
+ffff8800619dbcd8 ffff880079945800 ffff8800619dbcd8 ffffffffa03a7b3c
+ffff88007d3f1000 ffff88005f922800 ffff8800619dbce8 ffffffffa03a7b85
+ffff8800619dbd48 ffffffffa03a231e ffff88007d3f14a0 ffff88005f9229f0
+Call Trace:
+[<ffffffffa03a7b3c>] l2cap_sock_kill+0x7c/0xb0 [bluetooth]
+[<ffffffffa03a7b85>] l2cap_sock_close_cb+0x15/0x20 [bluetooth]
+[<ffffffffa03a231e>] l2cap_conn_del+0x11e/0x1f0 [bluetooth]
+[<ffffffffa038301a>] ? hci_dev_do_close+0x18a/0x370 [bluetooth]
+[<ffffffffa03a6db3>] l2cap_disconn_cfm+0x53/0x60 [bluetooth]
+[<ffffffffa0388c55>] hci_conn_hash_flush+0x95/0x100 [bluetooth]
+[<ffffffffa038302a>] hci_dev_do_close+0x19a/0x370 [bluetooth]
+[<ffffffffa0384af0>] hci_dev_close+0x50/0x80 [bluetooth]
+[<ffffffffa039af3a>] hci_sock_ioctl+0x15a/0x420 [bluetooth]
+[<ffffffff8144c6e0>] sock_do_ioctl+0x30/0x60
+[<ffffffff8105f3e0>] ? task_work_run+0x30/0xa0
+[<ffffffff8144d570>] sock_ioctl+0x290/0x2b0
+[<ffffffff81147f20>] do_vfs_ioctl+0x580/0x5e0
+[<ffffffff8151630b>] ? _raw_spin_unlock_irq+0x3b/0x60
+[<ffffffff81147fcf>] sys_ioctl+0x4f/0x80
+[<ffffffff81517016>] system_call_fastpath+0x1a/0x1f
+Code: 17 e1 48 8b 93 80 04 00 00 48 b9 00 01 10 00 00 00 ad de 48 8b 83
+88 04 00 00 48 c7 c7 c0 7c 3b a0 48 be 00 02 20 00 00 00 ad de <48> 89
+42 08 48 89 10 48 89 8b 80 04 00 00 48 89 b3 88 04 00 00 
+"RIP  [<ffffffffa03a1d56>] l2cap_chan_destroy+0x46/0xb0 [bluetooth]
+RSP <ffff8800619dbca8>
+---[ end trace 6e537072816e99b2 ]---+qZ
+Kernel panic - not syncing: Fatal exception
+fpanic occurred, switching back to text console
+Rebooting in 10 seconds..
+ACPI MEMORY or I/O RESET_REG.
 
