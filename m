@@ -1,64 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v4 00/17] Heart Rate Profile plugin
-Date: Thu, 13 Sep 2012 14:13:04 +0200
-Message-ID: <1347538401-6417-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Message-ID: <5051C434.9030009@ti.com>
+Date: Thu, 13 Sep 2012 14:32:04 +0300
+From: Chen Ganir <chen.ganir@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+CC: Joao Paulo Rechi Vita <jprvita@openbossa.org>,
+	<linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 02/10] battery: Implement Generic device battery
+References: <1347349100-24228-1-git-send-email-chen.ganir@ti.com> <1347349100-24228-3-git-send-email-chen.ganir@ti.com> <CAAngNMbUQzxAdwo2JUjzrqkLGXFhpyRVqtz03u+3t3nfXcyxpg@mail.gmail.com> <50501416.90408@ti.com> <20120912084537.GA31700@x220.P-661HNU-F1> <5050644F.5040902@ti.com> <CAJdJm_NNR86qNnxm-CPFqfuu0sPkoQhqAZY6nGUKB6GYeJ2HAw@mail.gmail.com>
+In-Reply-To: <CAJdJm_NNR86qNnxm-CPFqfuu0sPkoQhqAZY6nGUKB6GYeJ2HAw@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Anderson,
 
-Changes since v3:
-* rebased due to profile code moved to separate files
-
-
-Andrzej Kaczmarek (6):
-  heartrate: Add attio callbacks
-  heartrate: Enable measurement when watchers are registered
-  heartrate: Read Heart Rate Control Point characteristics
-  heartrate: Handle characteristics value changed notification
-  heartrate: Process Heart Rate Measurement characteristics
-  heartrate: Add Reset method
-
-Rafal Garbat (10):
-  heartrate: Add Heart Rate Profile client
-  heartrate: Discover characteristics
-  heartrate: Process characteristics
-  heartrate: Discover characteristics descriptors
-  heartrate: Process characteristics descriptors
-  heartrate: Add HeartRateManager interface
-  heartrate: Read Body Sensor Location characteristics
-  heartrate: Add GetProperties method
-  heartrate: Add HeartRateWatcher interface to default policy
-  heartrate: Add test script
-
-Santiago Carot-Nemesio (1):
-  Heart Rate Profile API
-
- Makefile.am                    |   9 +-
- Makefile.tools                 |   4 +-
- doc/heartrate-api.txt          |  80 ++++
- lib/uuid.h                     |   5 +
- profiles/heartrate/heartrate.c | 969 +++++++++++++++++++++++++++++++++++++++++
- profiles/heartrate/heartrate.h |  27 ++
- profiles/heartrate/main.c      |  52 +++
- profiles/heartrate/manager.c   |  96 ++++
- profiles/heartrate/manager.h   |  24 +
- src/bluetooth.conf             |   1 +
- test/test-heartrate            | 101 +++++
- 11 files changed, 1364 insertions(+), 4 deletions(-)
- create mode 100644 doc/heartrate-api.txt
- create mode 100644 profiles/heartrate/heartrate.c
- create mode 100644 profiles/heartrate/heartrate.h
- create mode 100644 profiles/heartrate/main.c
- create mode 100644 profiles/heartrate/manager.c
- create mode 100644 profiles/heartrate/manager.h
- create mode 100755 test/test-heartrate
+On 09/12/2012 01:57 PM, Anderson Lizardo wrote:
+> Hi Chen,
+>
+> On Wed, Sep 12, 2012 at 6:30 AM, Chen Ganir <chen.ganir@ti.com> wrote:
+>>> Both BtIO and GAttrib intend to mimic GLib-like libraries where this is
+>>> the convention. The plan is not to let this spread to the entire code
+>>> base (particularly with the likely move to libell in the long run), so
+>>> please don't use CamelCase.
+>>>
+>> Ok. So for the battery options i'll simply change it to battery_option. What
+>> about the convention for defining a function pointer ?
+>
+> See the result of:
+>
+> grep -r 'typedef.*(' *
+>
+> on your bluez tree. As Johan mentioned, you should ignore the (few)
+> occurrences of camel case typedef declarations.
+>
+> Regards,
+>
+Thanks.
 
 -- 
-1.7.11.3
+BR,
+Chen Ganir
 
