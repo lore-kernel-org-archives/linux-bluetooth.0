@@ -1,54 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 13 Sep 2012 09:39:57 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
+Subject: Re: [PATCHv4 16/17] Bluetooth: A2MP: Add fallback to normal l2cap
+ init sequence
+In-Reply-To: <1347437192-24694-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <alpine.DEB.2.02.1209130935110.19321@mathewm-linux>
+References: <alpine.DEB.2.02.1209111121550.3754@mathewm-linux> <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1347437192-24694-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <67399724.T38U7nJAul@arawn>
-References: <67399724.T38U7nJAul@arawn>
-Date: Thu, 13 Sep 2012 12:54:26 -0400
-Message-ID: <CAJdJm_MY_TZqay8L0=qOXy3kFkM4RMsXgRKKh1nK7ukokB7WqA@mail.gmail.com>
-Subject: Re: Connecting to Bluetooth Low Energy devices
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Philipp Claves <claves@budelmann-elektronik.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Philipp,
 
-On Thu, Sep 13, 2012 at 11:34 AM, Philipp Claves
-<claves@budelmann-elektronik.com> wrote:
-> Hello
+Andrei -
+
+On Wed, 12 Sep 2012, Andrei Emeltchenko wrote:
+
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
-> Trying  to get started with Bluetooth Low Energy devices, i used hcitool and
-> gatttool to enumerate device attributes, but did not get far:
+> When there is no remote AMP controller found fallback to normal
+> L2CAP sequence.
 >
-> # hcitool lescan
-> LE Scan ...
-> <MAC-Device1> Battery V1.0
-> <MAC-Device1> (unknown)
-> <MAC-Device2> Battery V1.0
-> <MAC-Device2> (unknown)
-> ^C
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+> include/net/bluetooth/l2cap.h |    1 +
+> net/bluetooth/a2mp.c          |   28 ++++++++++++++++++++++++++++
+> net/bluetooth/l2cap_core.c    |    2 +-
+> 3 files changed, 30 insertions(+), 1 deletion(-)
 >
-> # gatttool -b <MAC-Device1> -I
-> [   ][<MAC-Device1>][LE]> connect
-> Connecting... connect error: connect error: Connection refused (111)
-> [   ][<MAC-Device1>][LE]>
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index aba830f..0967f9e 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -769,5 +769,6 @@ int l2cap_ertm_init(struct l2cap_chan *chan);
+> void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+> void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+> void l2cap_chan_del(struct l2cap_chan *chan, int err);
+> +void l2cap_send_conn_req(struct l2cap_chan *chan);
 >
-> This is all i get.
+> #endif /* __L2CAP_H */
+> diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+> index 39e0f95..05522ea 100644
+> --- a/net/bluetooth/a2mp.c
+> +++ b/net/bluetooth/a2mp.c
+> @@ -181,6 +181,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+> 	u16 len = le16_to_cpu(hdr->len);
+> 	struct a2mp_cl *cl;
+> 	u16 ext_feat;
+> +	bool found = false;
+>
+> 	if (len < sizeof(*rsp))
+> 		return -EINVAL;
+> @@ -211,6 +212,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+> 		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
+> 			struct a2mp_info_req req;
+>
+> +			found = true;
+> 			req.id = cl->id;
+> 			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
+> 				  sizeof(req), &req);
+> @@ -220,6 +222,32 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+> 		cl = (void *) skb_pull(skb, sizeof(*cl));
+> 	}
+>
+> +	/* Fall back to L2CAP init sequence */
+> +	if (!found) {
+> +		struct l2cap_conn *conn = mgr->l2cap_conn;
+> +		struct l2cap_chan *chan;
+> +
+> +		mutex_lock(&conn->chan_lock);
+> +
+> +		list_for_each_entry(chan, &conn->chan_l, list) {
+> +
+> +			BT_DBG("chan %p state %s", chan,
+> +			       state_to_string(chan->state));
+> +
+> +			if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
+> +				continue;
+> +
+> +			l2cap_chan_lock(chan);
+> +
+> +			if (chan->state == BT_CONNECT)
+> +				l2cap_send_conn_req(chan);
+> +
+> +			l2cap_chan_unlock(chan);
+> +		}
+> +
+> +		mutex_unlock(&conn->chan_lock);
+> +	}
+> +
+> 	return 0;
+> }
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index cfe047f..d2ab82c 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -958,7 +958,7 @@ static bool __amp_capable(struct l2cap_chan *chan)
+> 		return false;
+> }
+>
+> -static void l2cap_send_conn_req(struct l2cap_chan *chan)
+> +void l2cap_send_conn_req(struct l2cap_chan *chan)
+> {
+> 	struct l2cap_conn *conn = chan->conn;
+> 	struct l2cap_conn_req req;
+> -- 
+> 1.7.9.5
+>
+>
 
-Which kernel version are you running?
+Here's another place where we have duplicated functionality.  This 
+patch has BR/EDR fallback too:
 
-> Am i doing something obviously wrong?
-> Any tips where to get more information about the error (dmesg shows nothing)?
+[RFCv1 13/20] Bluetooth: Handle physical link completion
 
-run "hcidump -X" and check the logs while you run "hcitool lescan".
-Then check the type of advertising those devices are sending. They
-should be connectable advertisings to be able to connect to them. Also
-check the address type, if it is "Random" you need to pass "-t random"
-to gatttool.
+You can call l2cap_physical_cfm() with a failure result instead of 
+calling l2cap_send_conn_req() directly.
 
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+--
+Mat Martineau
+
+The Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum,
+hosted by The Linux Foundation
+
