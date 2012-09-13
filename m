@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Rafal Garbat <rafal.garbat@tieto.com>
-Subject: [PATCH v5 04/17] heartrate: Discover characteristics
-Date: Thu, 13 Sep 2012 16:31:38 +0200
-Message-ID: <1347546711-19961-5-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v5 15/17] heartrate: Add GetProperties method
+Date: Thu, 13 Sep 2012 16:31:49 +0200
+Message-ID: <1347546711-19961-16-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1347546711-19961-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1347546711-19961-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -14,163 +14,92 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Rafal Garbat <rafal.garbat@tieto.com>
 
-This patch adds support to discover Heart Rate Service characteristics when
-connected to remote device.
-
 ---
- profiles/heartrate/heartrate.c | 49 +++++++++++++++++++++++++++++++++++++++++-
- profiles/heartrate/heartrate.h |  3 ++-
- profiles/heartrate/manager.c   | 22 ++++++++++++++++++-
- 3 files changed, 71 insertions(+), 3 deletions(-)
+ profiles/heartrate/heartrate.c | 57 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
 
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index 918546e..e4147cf 100644
+index 48d3cd1..43f94c1 100644
 --- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
-@@ -48,6 +48,13 @@ struct heartrate {
- 	struct heartrate_adapter	*hra;
- 	GAttrib				*attrib;
- 	guint				attioid;
-+	struct att_range		*svc_range;
-+	GSList				*chars;
-+};
-+
-+struct characteristic {
-+	struct gatt_char	attr;
-+	struct heartrate	*hr;
- };
+@@ -104,6 +104,25 @@ struct watcher {
  
  static GSList *heartrate_adapters = NULL;
-@@ -95,7 +102,11 @@ static void destroy_heartrate_device(gpointer user_data)
- 	if (hr->attrib != NULL)
- 		g_attrib_unref(hr->attrib);
  
-+	if (hr->chars != NULL)
-+		g_slist_free_full(hr->chars, g_free);
++static const char * const location_type[] = {
++	"Other",
++	"Chest",
++	"Wrist",
++	"Finger",
++	"Hand",
++	"Earlobe",
++	"Foot"
++};
 +
- 	btd_device_unref(hr->dev);
-+	g_free(hr->svc_range);
- 	g_free(hr);
- }
- 
-@@ -109,6 +120,33 @@ static void destroy_heartrate_adapter(gpointer user_data)
- 	g_free(hra);
- }
- 
-+static void configure_heartrate_cb(GSList *characteristics, guint8 status,
-+							gpointer user_data)
++static const gchar *location2str(uint8_t value)
 +{
-+	struct heartrate *hr = user_data;
-+	GSList *l;
++	 if (value < G_N_ELEMENTS(location_type))
++		return location_type[value];
 +
-+	if (status != 0) {
-+		error("Discover Heart Rate characteristics: %s",
-+							att_ecode2str(status));
-+		return;
-+	}
-+
-+	for (l = characteristics; l; l = l->next) {
-+		struct gatt_char *c = l->data;
-+		struct characteristic *ch;
-+
-+		ch = g_new0(struct characteristic, 1);
-+		ch->attr.handle = c->handle;
-+		ch->attr.properties = c->properties;
-+		ch->attr.value_handle = c->value_handle;
-+		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
-+		ch->hr = hr;
-+
-+		hr->chars = g_slist_append(hr->chars, ch);
-+	}
++	error("Location type %d reserved for future use", value);
++	return NULL;
 +}
 +
- static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ static gint cmp_adapter(gconstpointer a, gconstpointer b)
  {
- 	struct heartrate *hr = user_data;
-@@ -116,6 +154,10 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
- 	DBG("GATT Connected");
- 
- 	hr->attrib = g_attrib_ref(attrib);
-+
-+	gatt_discover_char(hr->attrib, hr->svc_range->start,
-+					hr->svc_range->end, NULL,
-+					configure_heartrate_cb, hr);
+ 	const struct heartrate_adapter *hra = a;
+@@ -410,6 +429,41 @@ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
+ 	return dbus_message_new_method_return(msg);
  }
  
- static void attio_disconnected_cb(gpointer user_data)
-@@ -153,7 +195,8 @@ void heartrate_adapter_unregister(struct btd_adapter *adapter)
- 	destroy_heartrate_adapter(hra);
- }
- 
--int heartrate_device_register(struct btd_device *device)
-+int heartrate_device_register(struct btd_device *device,
-+						struct gatt_primary *pattr)
- {
- 	struct heartrate_adapter *hra;
- 	struct btd_adapter *adapter;
-@@ -172,6 +215,10 @@ int heartrate_device_register(struct btd_device *device)
- 
- 	hra->devices = g_slist_prepend(hra->devices, hr);
- 
-+	hr->svc_range = g_new0(struct att_range, 1);
-+	hr->svc_range->start = pattr->range.start;
-+	hr->svc_range->end = pattr->range.end;
-+
- 	hr->attioid = btd_device_add_attio_callback(device,
- 						attio_connected_cb,
- 						attio_disconnected_cb,
-diff --git a/profiles/heartrate/heartrate.h b/profiles/heartrate/heartrate.h
-index 486f5b3..ec3ed7a 100644
---- a/profiles/heartrate/heartrate.h
-+++ b/profiles/heartrate/heartrate.h
-@@ -22,5 +22,6 @@
- 
- int heartrate_adapter_register(struct btd_adapter *adapter);
- void heartrate_adapter_unregister(struct btd_adapter *adapter);
--int heartrate_device_register(struct btd_device *device);
-+int heartrate_device_register(struct btd_device *device,
-+						struct gatt_primary *pattr);
- void heartrate_device_unregister(struct btd_device *device);
-diff --git a/profiles/heartrate/manager.c b/profiles/heartrate/manager.c
-index 2a9326d..d7d7ae4 100644
---- a/profiles/heartrate/manager.c
-+++ b/profiles/heartrate/manager.c
-@@ -34,6 +34,14 @@
- #include "heartrate.h"
- #include "manager.h"
- 
-+static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
++static DBusMessage *get_properties(DBusConnection *conn, DBusMessage *msg,
++								void *data)
 +{
-+	const struct gatt_primary *prim = a;
-+	const char *uuid = b;
++	struct heartrate *hr = data;
++	DBusMessageIter iter;
++	DBusMessageIter dict;
++	DBusMessage *reply;
 +
-+	return g_strcmp0(prim->uuid, uuid);
++	reply = dbus_message_new_method_return(msg);
++	if (reply == NULL)
++		return NULL;
++
++	dbus_message_iter_init_append(reply, &iter);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	if (hr->has_location) {
++		char *loc = g_strdup(location2str(hr->location));
++
++		dict_append_entry(&dict, "Location", DBUS_TYPE_STRING, &loc);
++
++		g_free(loc);
++	}
++
++	dict_append_entry(&dict, "ResetSupported", DBUS_TYPE_BOOLEAN,
++							&hr->has_cp_reset);
++
++	dbus_message_iter_close_container(&iter, &dict);
++
++	return reply;
 +}
 +
- static int heartrate_adapter_probe(struct btd_adapter *adapter)
+ static gint process_att_reset(struct heartrate *hr)
  {
- 	return heartrate_adapter_register(adapter);
-@@ -46,7 +54,19 @@ static void heartrate_adapter_remove(struct btd_adapter *adapter)
+ 	struct characteristic *ch;
+@@ -458,6 +512,9 @@ static const GDBusMethodTable heartrate_manager_methods[] = {
+ };
  
- static int heartrate_device_probe(struct btd_device *device, GSList *uuids)
- {
--	return heartrate_device_register(device);
-+	struct gatt_primary *pattr;
-+	GSList *primaries, *l;
-+
-+	primaries = btd_device_get_primaries(device);
-+
-+	l = g_slist_find_custom(primaries, HEART_RATE_UUID,
-+							primary_uuid_cmp);
-+	if (l == NULL)
-+		return -EINVAL;
-+
-+	pattr = l->data;
-+
-+	return heartrate_device_register(device, pattr);
- }
- 
- static void heartrate_device_remove(struct btd_device *device)
+ static const GDBusMethodTable heartrate_device_methods[] = {
++	{ GDBUS_METHOD("GetProperties",
++			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
++			get_properties) },
+ 	{ GDBUS_METHOD("Reset", NULL, NULL,
+ 			control_point_reset) },
+ 	{ }
 -- 
 1.7.11.3
 
