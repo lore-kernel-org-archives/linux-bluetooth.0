@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v4 12/17] heartrate: Handle characteristics value changed notification
-Date: Thu, 13 Sep 2012 14:13:16 +0200
-Message-ID: <1347538401-6417-13-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: Rafal Garbat <rafal.garbat@tieto.com>
+Subject: [PATCH v4 07/17] heartrate: Process characteristics descriptors
+Date: Thu, 13 Sep 2012 14:13:11 +0200
+Message-ID: <1347538401-6417-8-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1347538401-6417-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1347538401-6417-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,83 +12,64 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds stub for handling characteristics value changed notification.
+From: Rafal Garbat <rafal.garbat@tieto.com>
 
-Change-Id: Ic975d16327cfa32361fa590195b1d2b58fe5da03
+This patch adds stub to process discovered characteristics descriptors.
+
+Change-Id: I0d881e0a8924af85677e83f8593131ad66f3efe6
 ---
- profiles/heartrate/heartrate.c | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+ lib/uuid.h                     |  1 +
+ profiles/heartrate/heartrate.c | 18 ++++++++++++++++++
+ 2 files changed, 19 insertions(+)
 
+diff --git a/lib/uuid.h b/lib/uuid.h
+index 0a9db51..15a80a0 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -64,6 +64,7 @@ extern "C" {
+ #define SAP_UUID		"0000112D-0000-1000-8000-00805f9b34fb"
+ 
+ #define HEART_RATE_UUID			"0000180d-0000-1000-8000-00805f9b34fb"
++#define HEART_RATE_MEASUREMENT_UUID	"00002a37-0000-1000-8000-00805f9b34fb"
+ #define HEART_RATE_CONTROL_POINT_UUID	"00002a39-0000-1000-8000-00805f9b34fb"
+ #define BODY_SENSOR_LOCATION_UUID	"00002a38-0000-1000-8000-00805f9b34fb"
+ 
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index a0e0113..dec09d0 100644
+index 839d9e3..24b691a 100644
 --- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
-@@ -43,6 +43,8 @@
- 
- #define HEART_RATE_MANAGER_IFACE "org.bluez.HeartRateManager"
- 
-+#define MIN_NOTIFICATION_LEN 3  /* 1-byte opcode + 2-byte handle */
-+
- #define SENSOR_LOCATION_SIZE 1
- 
- struct heartrate_adapter {
-@@ -56,6 +58,7 @@ struct heartrate_device {
- 	struct heartrate_adapter	*hr;
- 	GAttrib				*attrib;
- 	guint				attioid;
-+	guint				attionotid;
- 	struct att_range		*svc_range;
- 	GSList				*chars;
- 	gboolean			has_location;
-@@ -178,8 +181,10 @@ static void destroy_heartrate_device(gpointer user_data)
- 	if (hrdev->attioid > 0)
- 		btd_device_remove_attio_callback(hrdev->dev, hrdev->attioid);
- 
--	if (hrdev->attrib != NULL)
-+	if (hrdev->attrib != NULL) {
-+		g_attrib_unregister(hrdev->attrib, hrdev->attionotid);
- 		g_attrib_unref(hrdev->attrib);
-+	}
- 
- 	if (hrdev->chars != NULL)
- 		g_slist_free_full(hrdev->chars, destroy_char);
-@@ -551,6 +556,14 @@ static void configure_heartrate_cb(GSList *characteristics, guint8 status,
- 	}
+@@ -144,6 +144,22 @@ static void process_heartrate_char(struct characteristic *ch)
+ 		DBG("Body Sensor Location supported by client");
  }
  
-+static void notify_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
++static void process_heartrate_desc(struct descriptor *desc)
 +{
-+	if (len < MIN_NOTIFICATION_LEN) {
-+		error("Bad pdu received");
++	struct characteristic *ch = desc->ch;
++	char uuidstr[MAX_LEN_UUID_STR];
++	bt_uuid_t btuuid;
++
++	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
++
++	if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0)
 +		return;
-+	}
++
++	bt_uuid_to_string(&desc->uuid, uuidstr, MAX_LEN_UUID_STR);
++	DBG("Ignored descriptor %s in characteristic %s", uuidstr,
++							ch->attr.uuid);
 +}
 +
- static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ static void discover_desc_cb(guint8 status, const guint8 *pdu,
+ 					guint16 len, gpointer user_data)
  {
- 	struct heartrate_device *hrdev = user_data;
-@@ -559,6 +572,9 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+@@ -177,6 +193,8 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu,
+ 			desc->uuid = att_get_uuid128(&value[2]);
  
- 	hrdev->attrib = g_attrib_ref(attrib);
- 
-+	hrdev->attionotid = g_attrib_register(hrdev->attrib,
-+			ATT_OP_HANDLE_NOTIFY, notify_handler, hrdev, NULL);
+ 		ch->desc = g_slist_append(ch->desc, desc);
 +
- 	gatt_discover_char(hrdev->attrib, hrdev->svc_range->start,
- 					hrdev->svc_range->end, NULL,
- 					configure_heartrate_cb, hrdev);
-@@ -570,6 +586,11 @@ static void attio_disconnected_cb(gpointer user_data)
++		process_heartrate_desc(desc);
+ 	}
  
- 	DBG("GATT Disconnected");
- 
-+	if (hrdev->attionotid > 0) {
-+		g_attrib_unregister(hrdev->attrib, hrdev->attionotid);
-+		hrdev->attionotid = 0;
-+	}
-+
- 	g_attrib_unref(hrdev->attrib);
- 	hrdev->attrib = NULL;
- }
+ 	att_data_list_free(list);
 -- 
 1.7.11.3
 
