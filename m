@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v4 11/17] heartrate: Read Heart Rate Control Point characteristics
-Date: Thu, 13 Sep 2012 14:13:15 +0200
-Message-ID: <1347538401-6417-12-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: Rafal Garbat <rafal.garbat@tieto.com>
+Subject: [PATCH v4 17/17] heartrate: Add test script
+Date: Thu, 13 Sep 2012 14:13:21 +0200
+Message-ID: <1347538401-6417-18-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1347538401-6417-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1347538401-6417-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,33 +12,136 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch reads and stores Heart Rate Control Point characteristics value.
+From: Rafal Garbat <rafal.garbat@tieto.com>
 
-Change-Id: I2716410c3c03ecb006a484006384aa53630aa6bf
+Change-Id: I638b2f255ab15cce87fa05db14f4a2b4642f7422
 ---
- profiles/heartrate/heartrate.c | 2 ++
- 1 file changed, 2 insertions(+)
+ Makefile.tools      |   4 +--
+ test/test-heartrate | 101 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 103 insertions(+), 2 deletions(-)
+ create mode 100755 test/test-heartrate
 
-diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index aaadee1..a0e0113 100644
---- a/profiles/heartrate/heartrate.c
-+++ b/profiles/heartrate/heartrate.c
-@@ -60,6 +60,7 @@ struct heartrate_device {
- 	GSList				*chars;
- 	gboolean			has_location;
- 	uint8_t				location;
-+	gboolean			has_cp_reset;
- };
- 
- struct characteristic {
-@@ -423,6 +424,7 @@ static void process_heartrate_char(struct characteristic *ch)
- {
- 	if (g_strcmp0(ch->attr.uuid, HEART_RATE_CONTROL_POINT_UUID) == 0) {
- 		DBG("Heart Rate Control Point reset supported by client");
-+		ch->hrdev->has_cp_reset = TRUE;
- 	} else if (g_strcmp0(ch->attr.uuid, BODY_SENSOR_LOCATION_UUID) == 0) {
- 		DBG("Body Sensor Location supported by client");
- 		gatt_read_char(ch->hrdev->attrib, ch->attr.value_handle, 0,
+diff --git a/Makefile.tools b/Makefile.tools
+index d3b6f57..f59a7c4 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -209,7 +209,7 @@ EXTRA_DIST += test/sap_client.py test/hsplay test/hsmicro \
+ 		test/test-network test/simple-agent test/simple-service \
+ 		test/simple-endpoint test/test-audio test/test-input \
+ 		test/test-sap-server test/test-oob test/test-attrib \
+-		test/test-proximity test/test-thermometer test/test-health \
+-		test/test-health-sink test/service-record.dtd \
++		test/test-proximity test/test-thermometer test/test-heartrate \
++		test/test-health test/test-health-sink test/service-record.dtd \
+ 		test/service-did.xml test/service-spp.xml test/service-opp.xml \
+ 		test/service-ftp.xml test/simple-player test/test-nap
+diff --git a/test/test-heartrate b/test/test-heartrate
+new file mode 100755
+index 0000000..a124f2c
+--- /dev/null
++++ b/test/test-heartrate
+@@ -0,0 +1,101 @@
++#!/usr/bin/python
++
++from __future__ import absolute_import, print_function, unicode_literals
++
++'''
++Heart Rate Monitor test script
++'''
++
++import gobject
++
++import sys
++import dbus
++import dbus.service
++import dbus.mainloop.glib
++from optparse import OptionParser, make_option
++
++class Watcher(dbus.service.Object):
++	@dbus.service.method("org.bluez.HeartRateWatcher",
++					in_signature="oa{sv}", out_signature="")
++	def MeasurementReceived(self, device, measure):
++		print("Measurement received from %s" % device)
++		print("Value: ", measure["Value"])
++
++		if "Energy" in measure:
++			print("Energy: ", measure["Energy"])
++
++		if "Contact" in measure:
++			print("Contact: ", measure["Contact"])
++
++		if "Location" in measure:
++			print("Location: ", measure["Location"])
++
++		if "Interval" in measure:
++			for i in measure["Interval"]:
++				print("Interval: ", i)
++
++if __name__ == "__main__":
++	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++
++	bus = dbus.SystemBus()
++
++	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
++					"org.bluez.Manager")
++
++	option_list = [
++		make_option("-i", "--adapter", action="store",
++			type="string", dest="adapter"),
++		make_option("-b", "--device", action="store",
++			type="string", dest="address"),
++		]
++
++	parser = OptionParser(option_list=option_list)
++
++	(options, args) = parser.parse_args()
++
++	if not options.address:
++		print("Usage: %s [-i <adapter>] -b <bdaddr> [cmd]" % (sys.argv[0]))
++		print("Possible commands:")
++		print("\tReset")
++		sys.exit(1)
++
++	if options.adapter:
++		adapter_path = manager.FindAdapter(options.adapter)
++	else:
++		adapter_path = manager.DefaultAdapter()
++
++	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
++							"org.bluez.Adapter")
++
++	heartrateManager = dbus.Interface(bus.get_object("org.bluez",
++				adapter_path), "org.bluez.HeartRateManager")
++
++	path = "/test/watcher"
++	heartrateManager.RegisterWatcher(path)
++
++	device_path = adapter.FindDevice(options.address)
++
++	device = dbus.Interface(bus.get_object("org.bluez", device_path),
++							"org.bluez.Device")
++
++	heartrate = dbus.Interface(bus.get_object("org.bluez",
++					device_path), "org.bluez.HeartRate")
++
++	watcher = Watcher(bus, path)
++
++	properties = heartrate.GetProperties()
++	reset_sup = properties["ResetSupported"]
++
++	if len(args) > 0:
++		if args[0] == "Reset":
++			if reset_sup:
++				heartrate.Reset()
++			else:
++				print("Reset not supported")
++				sys.exit(1)
++		else:
++			print("unknown command")
++			sys.exit(1)
++
++	mainloop = gobject.MainLoop()
++	mainloop.run()
 -- 
 1.7.11.3
 
