@@ -1,115 +1,169 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <5052519F.30803@butterbrot.org>
+Date: Thu, 13 Sep 2012 23:35:27 +0200
+From: Florian Echtler <floe@butterbrot.org>
 MIME-Version: 1.0
-In-Reply-To: <CAJdJm_MFT=KTREZavd_oaOVT24+jUsAXH=d-K8F0Rwyi6V1rQg@mail.gmail.com>
-References: <CACUGKYONE6a2PWtOEY4Kgg9TQkX3pCwhW9UJLk5KGVtpL5eVaw@mail.gmail.com>
-	<CACUGKYPwTxRS8JN78J-oPSwz0mhnKvxHg=ybm5vyiKivEpM03A@mail.gmail.com>
-	<20120910235838.GA26986@samus>
-	<CACUGKYMP7YRu1=P4Uf9T_RfOKQFPvZq8sK+GGi0T1jB6GDXcDQ@mail.gmail.com>
-	<CACUGKYN-+AKvVOZwxR7b6cvSujBMRHnjzNGcGezYynP2gTm6KA@mail.gmail.com>
-	<CAJdJm_OfccWTVuphRQfjfouY3m8_HgSeGwE-XSyHetzy+tjFFw@mail.gmail.com>
-	<CACUGKYMv_X4DgU+C0V=PA_PfYRQYnKO1LM4SoDbfcB2O-XkJvQ@mail.gmail.com>
-	<CAJdJm_MYn=eG93WTPmHWu98t3Ufqrc9pXDpdBbCvbT-JdYeOaw@mail.gmail.com>
-	<CACUGKYPSTh0CcN6fKc9NcbYmvZK3j8AwfNnMqkBkoTt-UFccSg@mail.gmail.com>
-	<CAJdJm_PwrHdWnp6xXoYzd8GLigO3YSHdS-6feVj+c-9u3sjk5A@mail.gmail.com>
-	<CACUGKYNPWDCbQgtA6u33NXn_U3CMm9q6vGqEAaA9FOPPjqeJiw@mail.gmail.com>
-	<CACUGKYPf+2ZP6y5rfy8kbnanxCJt3pL800E6bHNO6WUSifQW+A@mail.gmail.com>
-	<CAJdJm_MFT=KTREZavd_oaOVT24+jUsAXH=d-K8F0Rwyi6V1rQg@mail.gmail.com>
-Date: Thu, 13 Sep 2012 14:59:56 -0700
-Message-ID: <CACUGKYMKHvoAbH97-QLbxxYic_+5WjONc76mO642ywf6Jo-5+A@mail.gmail.com>
-Subject: Re: Dropping connection (bit off-topic)
-From: John Tobias <john.tobias.ph@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: David Herrmann <dh.herrmann@googlemail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Wii Balance Board vs. bluez
+References: <5050F5A9.5090401@butterbrot.org> <CANq1E4RYuVy2b1GD2E4MsErbkGZgD6gnDaYeDmyWyYnKaze0Jg@mail.gmail.com> <ed6fbaf1-1410-4539-a36e-1d6d6f6220b5@email.android.com> <CANq1E4RmacRAkTVtRt2JH_+V=qn1AH3iJWZZS_LCqmj_yt4DoQ@mail.gmail.com> <CANq1E4S70tqhTG7PTMj5cHp45NLO9g4n1eLVaHJMuDZx1KMYjg@mail.gmail.com>
+In-Reply-To: <CANq1E4S70tqhTG7PTMj5cHp45NLO9g4n1eLVaHJMuDZx1KMYjg@mail.gmail.com>
+Content-Type: multipart/mixed;
+ boundary="------------070003080007080200010103"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+This is a multi-part message in MIME format.
+--------------070003080007080200010103
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-I added these line of codes in gatttool:
-
-listen_start:
-g_attrib_register(attrib, ATT_OP_READ_BY_TYPE_RESP, events_handler,
-							attrib, NULL);
-
-Then, in events_handler I dumped the handles for
-ATT_OP_READ_BY_TYPE_REQ and ATT_OP_READ_BY_TYPE_RESP:
-
-ATT_OP_READ_BY_TYPE_REQ:   handle = 0x1 value: ff ff 00 2a
-ATT_OP_READ_BY_TYPE_RESP:   handle = 0x207 value: 00 02 03 00 00 2a 04
-00 02 05 00 01 2a 07 00 20 08 00 05 2a
-ATT_OP_READ_BY_TYPE_RESP:   handle = 0xb15 value: 00 02 0c 00 31 3d 35
-06 1e 60 70 a3 8d 4e 58 9c 2d 6a 3c 16
-ATT_OP_READ_BY_TYPE_RESP:   handle = 0xd15 value: 00 8a 0e 00 32 3d 35
-06 1e 60 70 a3 8d 4e 58 9c 2d 6a 3c 16
-ATT_OP_READ_BY_TYPE_RESP:   handle = 0x1015 value: 00 88 11 00 33 3d
-35 06 1e 60 70 a3 8d 4e 58 9c 2d 6a 3c 16
-ATT_OP_READ_BY_TYPE_RESP:   handle = 0x1315 value: 00 9a 14 00 52 72
-3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
-ATT_OP_READ_BY_TYPE_RESP:   handle = 0x1715 value: 00 9a 18 00 36 72
-3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
-ATT_OP_READ_BY_TYPE_RESP:   handle = 0x1b15 value: 00 9a 1c 00 37 72
-3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
-ATT_OP_READ_BY_TYPE_RESP:   handle = 0x1f15 value: 00 8a 20 00 38 72
-3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
-ATT_OP_READ_BY_TYPE_RESP:   handle = 0x2215 value: 00 98 23 00 40 72
-3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
-ATT_OP_READ_BY_TYPE_RESP:   handle = 0x2615 value: 00 9a 27 00 41 72
-3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
-ATT_OP_READ_BY_TYPE_RESP:   handle = 0x2a15 value: 00 98 2b 00 42 72
-3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
-ATT_OP_READ_BY_TYPE_RESP:   handle = 0x2e15 value: 00 88 2f 00 60 72
-3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
-ATT_OP_READ_BY_TYPE_RESP:   handle = 0x3115 value: 00 88 32 00 61 72
-3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
-ATT_OP_READ_BY_TYPE_RESP:   handle = 0x3415 value: 00 12 35 00 62 72
-3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
-ATT_OP_READ_BY_TYPE_RESP:   handle = 0x3715 value: 00 8a 38 00 39 72
-3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
-
-In hcidump:
-
- ACL data: handle 76 flags 0x02 dlen 9
-ATT: Error (0x01)
-Error: Attribute not found (10)
-Read By Type req (0x08) on handle 0x0039
-
-
-In hcidump, the error was the attribute for handle 0x0039. How I can
-respond to that request if the I did not receive the said handle?
-
-
-Regards,
-
-John
-
-
-
-On Thu, Sep 13, 2012 at 1:18 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi John,
->
-> On Thu, Sep 13, 2012 at 4:11 PM, John Tobias <john.tobias.ph@gmail.com> wrote:
->> Hi Anderson,
+On 13.09.2012 16:39, David Herrmann wrote:
+>> Please see the appended patch. You have to apply it to your kernel
+>> tree and recompile the hid-wiimote driver. No other sources are
+>> changed so you don't need to reboot or install the new kernel. Just
+>> install the new hid-wiimote.ko module.
 >>
->> If I add a simple GATT/GAP server on gatttool, should I still use the
->> DBUS to listen or I can communicate directly to the kernel?.
->
-> You either talk to bluetoothd (using D-Bus, like those test-* python
-> scripts do), which will handle connections for you, or you talk
-> directly to kernel using bluetooth socket (like gatttool does). You
-> have more flexibility talking to the kernel directly, but your app
-> will not be interoperable with other apps running at the same time,
-> specially if they try to call connect() at the same time (one of them
-> will get a EBUSY error).
->
-> Using D-Bus, on the other hand, bluetoothd queues the connections properly.
->
-> So you should use what is more appropriate for your use case.
->
-> Best Regards,
-> --
-> Anderson Lizardo
-> Instituto Nokia de Tecnologia - INdT
-> Manaus - Brazil
+>> One of the 5 input devices should then report the wiimote weight
+>> sensor data. (the input device with name "Wii Remote Balance Board").
+> Forgot to attach the patch... Here it is.
+Awesome - works as expected, weight sensor data can be read from one of 
+the event devices.
+
+I've attached an additional patch on top of yours to also read the 
+calibration data (24 bytes at address 0xa40024). Calibration data is 
+applied in handler_balance_board, resulting values are in units of 10 
+grams. Although this looks correct to me, I'm not getting any events 
+with my patch applied - I suspect some connection to the min/max input 
+values. Do you have any ideas what's wrong?
+
+Florian
+-- 
+SENT FROM MY DEC VT50 TERMINAL
+
+--------------070003080007080200010103
+Content-Type: text/x-patch;
+ name="balance_calibration.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="balance_calibration.patch"
+
+diff -u a/hid-wiimote-ext.c b/hid-wiimote-ext.c
+--- a/hid-wiimote-ext.c	2012-09-13 21:04:01.600494774 +0200
++++ b/hid-wiimote-ext.c	2012-09-13 23:30:57.416209821 +0200
+@@ -28,6 +28,7 @@
+ 	bool mp_plugged;
+ 	bool motionp;
+ 	__u8 ext_type;
++	__u16 calib[4][3];
+ };
+ 
+ enum wiiext_type {
+@@ -127,6 +128,7 @@
+ static __u8 ext_read(struct wiimote_ext *ext)
+ {
+ 	ssize_t ret;
++	__u8 buf[24];
+ 	__u8 rmem[2], wmem;
+ 	__u8 type = WIIEXT_NONE;
+ 
+@@ -159,6 +161,29 @@
+ 				 rmem[0], rmem[1]);
+ 	}
+ 
++	/* get balance board calibration */
++	if (type == WIIEXT_BALANCE_BOARD) {
++
++		ret = wiimote_cmd_read(ext->wdata, 0xa40024, buf, 24);
++		if (ret != 24)
++			type = WIIEXT_NONE;
++
++		ext->calib[0][0] = ((__u16)buf[ 0]<<8 | (__u16)buf[ 1]);
++		ext->calib[1][0] = ((__u16)buf[ 2]<<8 | (__u16)buf[ 3]);
++		ext->calib[2][0] = ((__u16)buf[ 4]<<8 | (__u16)buf[ 5]);
++		ext->calib[3][0] = ((__u16)buf[ 6]<<8 | (__u16)buf[ 7]);
++
++		ext->calib[0][1] = ((__u16)buf[ 8]<<8 | (__u16)buf[ 9]);
++		ext->calib[1][1] = ((__u16)buf[10]<<8 | (__u16)buf[11]);
++		ext->calib[2][1] = ((__u16)buf[12]<<8 | (__u16)buf[13]);
++		ext->calib[3][1] = ((__u16)buf[14]<<8 | (__u16)buf[15]);
++
++		ext->calib[0][2] = ((__u16)buf[16]<<8 | (__u16)buf[17]);
++		ext->calib[1][2] = ((__u16)buf[18]<<8 | (__u16)buf[19]);
++		ext->calib[2][2] = ((__u16)buf[20]<<8 | (__u16)buf[21]);
++		ext->calib[3][2] = ((__u16)buf[22]<<8 | (__u16)buf[23]);
++	}
++
+ 	wiimote_cmd_release(ext->wdata);
+ 
+ 	return type;
+@@ -517,7 +542,9 @@
+ 
+ static void handler_balance_board(struct wiimote_ext *ext, const __u8 *payload)
+ {
+-	__s16 tr, br, tl, bl;
++	__s16 val[4]; /*tr, br, tl, bl;*/
++	unsigned long tmp;
++	__u8 i;
+ 
+ 	/*   Byte |  8  7  6  5  4  3  2  1  |
+ 	 *   -----+--------------------------+
+@@ -540,19 +567,28 @@
+ 	 * The balance-board is never reported interleaved with motionp.
+ 	 */
+ 
+-	tr = payload[0] << 8;
+-	tr |= payload[1];
+-	br = payload[2] << 8;
+-	br |= payload[3];
+-	tl = payload[4] << 8;
+-	tl |= payload[5];
+-	bl = payload[6] << 8;
+-	bl |= payload[7];
+-
+-	input_report_abs(ext->input, ABS_HAT0X, tl);
+-	input_report_abs(ext->input, ABS_HAT0Y, tr);
+-	input_report_abs(ext->input, ABS_HAT1X, bl);
+-	input_report_abs(ext->input, ABS_HAT1Y, br);
++	val[0]  = payload[0] << 8;
++	val[0] |= payload[1];
++	val[1]  = payload[2] << 8;
++	val[1] |= payload[3];
++	val[2]  = payload[4] << 8;
++	val[2] |= payload[5];
++	val[3]  = payload[6] << 8;
++	val[3] |= payload[7];
++
++	/* apply calibration data */
++	for( i = 0; i < 4; i++ ) {
++		if (val[i] < ext->calib[i][1])
++			tmp = 1700 * (val[i] - ext->calib[i][0]) / (ext->calib[i][1] - ext->calib[i][0]);
++		else
++			tmp = 1700 * (val[i] - ext->calib[i][1]) / (ext->calib[i][2] - ext->calib[i][1]) + 1700;
++		val[i] = tmp;
++	}
++
++	input_report_abs(ext->input, ABS_HAT0X, val[0]);
++	input_report_abs(ext->input, ABS_HAT0Y, val[1]);
++	input_report_abs(ext->input, ABS_HAT1X, val[2]);
++	input_report_abs(ext->input, ABS_HAT1Y, val[3]);
+ 
+ 	input_sync(ext->input);
+ }
+@@ -707,10 +743,10 @@
+ 	set_bit(ABS_HAT2Y, ext->input->absbit);
+ 	set_bit(ABS_HAT3X, ext->input->absbit);
+ 	set_bit(ABS_HAT3Y, ext->input->absbit);
+-	input_set_abs_params(ext->input, ABS_HAT0X, -120, 120, 2, 4);
+-	input_set_abs_params(ext->input, ABS_HAT0Y, -120, 120, 2, 4);
+-	input_set_abs_params(ext->input, ABS_HAT1X, -30, 30, 1, 1);
+-	input_set_abs_params(ext->input, ABS_HAT1Y, -30, 30, 1, 1);
++	input_set_abs_params(ext->input, ABS_HAT0X, -20000, 20000, 2, 4);
++	input_set_abs_params(ext->input, ABS_HAT0Y, -20000, 20000, 2, 4);
++	input_set_abs_params(ext->input, ABS_HAT1X, -20000, 20000, 1, 1);
++	input_set_abs_params(ext->input, ABS_HAT1Y, -20000, 20000, 1, 1);
+ 	input_set_abs_params(ext->input, ABS_HAT2X, -30, 30, 1, 1);
+ 	input_set_abs_params(ext->input, ABS_HAT2Y, -30, 30, 1, 1);
+ 	input_set_abs_params(ext->input, ABS_HAT3X, -30, 30, 1, 1);
+
+--------------070003080007080200010103--
