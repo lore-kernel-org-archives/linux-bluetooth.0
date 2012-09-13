@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v4 03/17] heartrate: Add attio callbacks
-Date: Thu, 13 Sep 2012 14:13:07 +0200
-Message-ID: <1347538401-6417-4-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: Rafal Garbat <rafal.garbat@tieto.com>
+Subject: [PATCH v4 05/17] heartrate: Process characteristics
+Date: Thu, 13 Sep 2012 14:13:09 +0200
+Message-ID: <1347538401-6417-6-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1347538401-6417-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1347538401-6417-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,94 +12,57 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Change-Id: I9f5d69c1c0d50160e4a7c2c27c92fb159c197fa1
----
- profiles/heartrate/heartrate.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+From: Rafal Garbat <rafal.garbat@tieto.com>
 
+This patch adds stub to process discovered characteristics.
+
+Change-Id: I983c942a33668e86fa73453a7649295bc0c032b6
+---
+ lib/uuid.h                     |  2 ++
+ profiles/heartrate/heartrate.c | 10 ++++++++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/lib/uuid.h b/lib/uuid.h
+index 3488e66..0a9db51 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -64,6 +64,8 @@ extern "C" {
+ #define SAP_UUID		"0000112D-0000-1000-8000-00805f9b34fb"
+ 
+ #define HEART_RATE_UUID			"0000180d-0000-1000-8000-00805f9b34fb"
++#define HEART_RATE_CONTROL_POINT_UUID	"00002a39-0000-1000-8000-00805f9b34fb"
++#define BODY_SENSOR_LOCATION_UUID	"00002a38-0000-1000-8000-00805f9b34fb"
+ 
+ #define HEALTH_THERMOMETER_UUID		"00001809-0000-1000-8000-00805f9b34fb"
+ #define TEMPERATURE_MEASUREMENT_UUID	"00002a1c-0000-1000-8000-00805f9b34fb"
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index 06cb12a..6b470e5 100644
+index 140a2fb..3d918e9 100644
 --- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
-@@ -31,7 +31,12 @@
- 
- #include "adapter.h"
- #include "device.h"
-+#include "gattrib.h"
-+#include "attio.h"
-+#include "att.h"
-+#include "gatt.h"
- #include "heartrate.h"
-+#include "log.h"
- 
- struct heartrate_adapter {
- 	struct btd_adapter	*adapter;
-@@ -41,6 +46,8 @@ struct heartrate_adapter {
- struct heartrate_device {
- 	struct btd_device		*dev;
- 	struct heartrate_adapter	*hr;
-+	GAttrib				*attrib;
-+	guint				attioid;
- };
- 
- static GSList *heartrate_adapters = NULL;
-@@ -82,6 +89,12 @@ static void destroy_heartrate_device(gpointer user_data)
- {
- 	struct heartrate_device *hrdev = user_data;
- 
-+	if (hrdev->attioid > 0)
-+		btd_device_remove_attio_callback(hrdev->dev, hrdev->attioid);
-+
-+	if (hrdev->attrib != NULL)
-+		g_attrib_unref(hrdev->attrib);
-+
- 	btd_device_unref(hrdev->dev);
- 	g_free(hrdev);
- }
-@@ -90,9 +103,31 @@ static void destroy_heartrate_adapter(gpointer user_data)
- {
- 	struct heartrate_adapter *hr = user_data;
- 
-+	if (hr->devices != NULL)
-+		g_slist_free_full(hr->devices, destroy_heartrate_device);
-+
+@@ -120,6 +120,14 @@ static void destroy_heartrate_adapter(gpointer user_data)
  	g_free(hr);
  }
  
-+static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
++static void process_heartrate_char(struct characteristic *ch)
 +{
-+	struct heartrate_device *hrdev = user_data;
-+
-+	DBG("GATT Connected");
-+
-+	hrdev->attrib = g_attrib_ref(attrib);
++	if (g_strcmp0(ch->attr.uuid, HEART_RATE_CONTROL_POINT_UUID) == 0)
++		DBG("Heart Rate Control Point supported by client");
++	 else if (g_strcmp0(ch->attr.uuid, BODY_SENSOR_LOCATION_UUID) == 0)
++		DBG("Body Sensor Location supported by client");
 +}
 +
-+static void attio_disconnected_cb(gpointer user_data)
-+{
-+	struct heartrate_device *hrdev = user_data;
-+
-+	DBG("GATT Disconnected");
-+
-+	g_attrib_unref(hrdev->attrib);
-+	hrdev->attrib = NULL;
-+}
-+
- int heartrate_adapter_register(struct btd_adapter *adapter)
+ static void configure_heartrate_cb(GSList *characteristics, guint8 status,
+ 							gpointer user_data)
  {
- 	struct heartrate_adapter *hr;
-@@ -136,6 +171,11 @@ int heartrate_device_register(struct btd_device *device)
+@@ -144,6 +152,8 @@ static void configure_heartrate_cb(GSList *characteristics, guint8 status,
+ 		ch->hrdev = hrdev;
  
- 	hr->devices = g_slist_prepend(hr->devices, hrdev);
- 
-+	hrdev->attioid = btd_device_add_attio_callback(device,
-+						attio_connected_cb,
-+						attio_disconnected_cb,
-+						hrdev);
+ 		hrdev->chars = g_slist_append(hrdev->chars, ch);
 +
- 	return 0;
++		process_heartrate_char(ch);
+ 	}
  }
- void heartrate_device_unregister(struct btd_device *device)
+ 
 -- 
 1.7.11.3
 
