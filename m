@@ -1,104 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CANq1E4RmacRAkTVtRt2JH_+V=qn1AH3iJWZZS_LCqmj_yt4DoQ@mail.gmail.com>
+In-Reply-To: <ed6fbaf1-1410-4539-a36e-1d6d6f6220b5@email.android.com>
 References: <5050F5A9.5090401@butterbrot.org>
 	<CANq1E4RYuVy2b1GD2E4MsErbkGZgD6gnDaYeDmyWyYnKaze0Jg@mail.gmail.com>
 	<ed6fbaf1-1410-4539-a36e-1d6d6f6220b5@email.android.com>
-	<CANq1E4RmacRAkTVtRt2JH_+V=qn1AH3iJWZZS_LCqmj_yt4DoQ@mail.gmail.com>
-Date: Thu, 13 Sep 2012 16:39:00 +0200
-Message-ID: <CANq1E4S70tqhTG7PTMj5cHp45NLO9g4n1eLVaHJMuDZx1KMYjg@mail.gmail.com>
+Date: Thu, 13 Sep 2012 16:38:03 +0200
+Message-ID: <CANq1E4RmacRAkTVtRt2JH_+V=qn1AH3iJWZZS_LCqmj_yt4DoQ@mail.gmail.com>
 Subject: Re: Wii Balance Board vs. bluez
 From: David Herrmann <dh.herrmann@googlemail.com>
 To: Florian Echtler <floe@butterbrot.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=20cf301fb653a25cee04c99644da
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---20cf301fb653a25cee04c99644da
-Content-Type: text/plain; charset=ISO-8859-1
+Hi Florian
 
-On Thu, Sep 13, 2012 at 4:38 PM, David Herrmann
-<dh.herrmann@googlemail.com> wrote:
-> Hi Florian
+On Thu, Sep 13, 2012 at 7:59 AM, Florian Echtler <floe@butterbrot.org> wrote:
 >
-> On Thu, Sep 13, 2012 at 7:59 AM, Florian Echtler <floe@butterbrot.org> wrote:
->>
->>
->> David Herrmann <dh.herrmann@googlemail.com> wrote:
->>>However, if you are willing to test it, I will send some patches which
->>>will implement it.
->> Absolutely, I'd be happy to test.
 >
-> Please see the appended patch. You have to apply it to your kernel
-> tree and recompile the hid-wiimote driver. No other sources are
-> changed so you don't need to reboot or install the new kernel. Just
-> install the new hid-wiimote.ko module.
+> David Herrmann <dh.herrmann@googlemail.com> wrote:
+>>However, if you are willing to test it, I will send some patches which
+>>will implement it.
+> Absolutely, I'd be happy to test.
+
+Please see the appended patch. You have to apply it to your kernel
+tree and recompile the hid-wiimote driver. No other sources are
+changed so you don't need to reboot or install the new kernel. Just
+install the new hid-wiimote.ko module.
+
+One of the 5 input devices should then report the wiimote weight
+sensor data. (the input device with name "Wii Remote Balance Board").
+
+>>Ouh, I see. I will send a patch fixing this to the BlueZ mailing list.
+>>I will put you on CC if you don't mind.
+> Thanks, I'll test this later today.
 >
-> One of the 5 input devices should then report the wiimote weight
-> sensor data. (the input device with name "Wii Remote Balance Board").
+> One additional question: it looks like this problem with the pairing is going
+> to pop up again with 3rd-party controllers, the new Wii U controller etc.
+> Would it make sense to create a new PIN option which users can select
+> explicitly?
 
-Forgot to attach the patch... Here it is.
+No. First: there are very restrictive time-constraints on most of
+these devices so user-input would be too slow. Second: The BlueZ
+maintainers don't like this approach.
 
---20cf301fb653a25cee04c99644da
-Content-Type: application/octet-stream; name="wiimote_balance_board.patch"
-Content-Disposition: attachment; filename="wiimote_balance_board.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_h71yu8e70
+So just send an email to the linux-bluetooth mailing list and we will
+add quirks to BlueZ so new devices will work, too.
 
-ZGlmZiAtLWdpdCBhL2RyaXZlcnMvaGlkL2hpZC13aWltb3RlLWV4dC5jIGIvZHJpdmVycy9oaWQv
-aGlkLXdpaW1vdGUtZXh0LmMKaW5kZXggZDM3Y2QwOS4uYWU3YzFiNiAxMDA2NDQKLS0tIGEvZHJp
-dmVycy9oaWQvaGlkLXdpaW1vdGUtZXh0LmMKKysrIGIvZHJpdmVycy9oaWQvaGlkLXdpaW1vdGUt
-ZXh0LmMKQEAgLTM0LDYgKzM0LDcgQEAgZW51bSB3aWlleHRfdHlwZSB7CiAJV0lJRVhUX05PTkUs
-CQkvKiBwbGFjZWhvbGRlciAqLwogCVdJSUVYVF9DTEFTU0lDLAkJLyogTmludGVuZG8gY2xhc3Np
-YyBjb250cm9sbGVyICovCiAJV0lJRVhUX05VTkNIVUNLLAkvKiBOaW50ZW5kbyBudW5jaHVjayBj
-b250cm9sbGVyICovCisJV0lJRVhUX0JBTEFOQ0VfQk9BUkQsCS8qIE5pbnRlbmRvIGJhbGFuY2Ug
-Ym9hcmQgY29udHJvbGxlciAqLwogfTsKIAogZW51bSB3aWlleHRfa2V5cyB7CkBAIC0xNTEsNiAr
-MTUyLDExIEBAIHN0YXRpYyBfX3U4IGV4dF9yZWFkKHN0cnVjdCB3aWltb3RlX2V4dCAqZXh0KQog
-CQkJdHlwZSA9IFdJSUVYVF9OVU5DSFVDSzsKIAkJZWxzZSBpZiAocm1lbVswXSA9PSAweDAxICYm
-IHJtZW1bMV0gPT0gMHgwMSkKIAkJCXR5cGUgPSBXSUlFWFRfQ0xBU1NJQzsKKwkJZWxzZSBpZiAo
-cm1lbVswXSA9PSAweDA0ICYmIHJtZW1bMV0gPT0gMHgwMikKKwkJCXR5cGUgPSBXSUlFWFRfQkFM
-QU5DRV9CT0FSRDsKKwkJZWxzZQorCQkJaGlkX2luZm8oZXh0LT53ZGF0YS0+aGRldiwgIlVua25v
-d24gZXh0ZW5zaW9uIGRldmljZSAoJXgleClcbiIsCisJCQkJIHJtZW1bMF0sIHJtZW1bMV0pOwog
-CX0KIAogCXdpaW1vdGVfY21kX3JlbGVhc2UoZXh0LT53ZGF0YSk7CkBAIC01MDksNiArNTE1LDQ4
-IEBAIHN0YXRpYyB2b2lkIGhhbmRsZXJfY2xhc3NpYyhzdHJ1Y3Qgd2lpbW90ZV9leHQgKmV4dCwg
-Y29uc3QgX191OCAqcGF5bG9hZCkKIAlpbnB1dF9zeW5jKGV4dC0+aW5wdXQpOwogfQogCitzdGF0
-aWMgdm9pZCBoYW5kbGVyX2JhbGFuY2VfYm9hcmQoc3RydWN0IHdpaW1vdGVfZXh0ICpleHQsIGNv
-bnN0IF9fdTggKnBheWxvYWQpCit7CisJX19zMTYgdHIsIGJyLCB0bCwgYmw7CisKKwkvKiAgIEJ5
-dGUgfCAgOCAgNyAgNiAgNSAgNCAgMyAgMiAgMSAgfAorCSAqICAgLS0tLS0rLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0rCisJICogICAgMSAgIHwgICAgVG9wIFJpZ2h0IDwxNTo4PiAgICAgIHwK
-KwkgKiAgICAyICAgfCAgICBUb3AgUmlnaHQgIDw3OjA+ICAgICAgfAorCSAqICAgLS0tLS0rLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rCisJICogICAgMyAgIHwgQm90dG9tIFJpZ2h0IDwxNTo4
-PiAgICAgIHwKKwkgKiAgICA0ICAgfCBCb3R0b20gUmlnaHQgIDw3OjA+ICAgICAgfAorCSAqICAg
-LS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rCisJICogICAgNSAgIHwgICAgIFRvcCBM
-ZWZ0IDwxNTo4PiAgICAgIHwKKwkgKiAgICA2ICAgfCAgICAgVG9wIExlZnQgIDw3OjA+ICAgICAg
-fAorCSAqICAgLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rCisJICogICAgNyAgIHwg
-IEJvdHRvbSBMZWZ0IDwxNTo4PiAgICAgIHwKKwkgKiAgICA4ICAgfCAgQm90dG9tIExlZnQgIDw3
-OjA+ICAgICAgfAorCSAqICAgLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rCisJICoK
-KwkgKiBUaGVzZSB2YWx1ZXMgcmVwcmVzZW50IHRoZSB3ZWlnaHQtbWVhc3VyZW1lbnRzIG9mIHRo
-ZSBXaWktYmFsYW5jZQorCSAqIGJvYXJkIHdpdGggMTZiaXQgcHJlY2lzaW9uLgorCSAqCisJICog
-VGhlIGJhbGFuY2UtYm9hcmQgaXMgbmV2ZXIgcmVwb3J0ZWQgaW50ZXJsZWF2ZWQgd2l0aCBtb3Rp
-b25wLgorCSAqLworCisJdHIgPSBwYXlsb2FkWzBdIDw8IDg7CisJdHIgfD0gcGF5bG9hZFsxXTsK
-KwliciA9IHBheWxvYWRbMl0gPDwgODsKKwliciB8PSBwYXlsb2FkWzNdOworCXRsID0gcGF5bG9h
-ZFs0XSA8PCA4OworCXRsIHw9IHBheWxvYWRbNV07CisJYmwgPSBwYXlsb2FkWzZdIDw8IDg7CisJ
-YmwgfD0gcGF5bG9hZFs3XTsKKworCWlucHV0X3JlcG9ydF9hYnMoZXh0LT5pbnB1dCwgQUJTX0hB
-VDBYLCB0bCk7CisJaW5wdXRfcmVwb3J0X2FicyhleHQtPmlucHV0LCBBQlNfSEFUMFksIHRyKTsK
-KwlpbnB1dF9yZXBvcnRfYWJzKGV4dC0+aW5wdXQsIEFCU19IQVQxWCwgYmwpOworCWlucHV0X3Jl
-cG9ydF9hYnMoZXh0LT5pbnB1dCwgQUJTX0hBVDFZLCBicik7CisKKwlpbnB1dF9zeW5jKGV4dC0+
-aW5wdXQpOworfQorCiAvKiBjYWxsIHRoaXMgd2l0aCBzdGF0ZS5sb2NrIHNwaW5sb2NrIGhlbGQg
-Ki8KIHZvaWQgd2lpZXh0X2hhbmRsZShzdHJ1Y3Qgd2lpbW90ZV9kYXRhICp3ZGF0YSwgY29uc3Qg
-X191OCAqcGF5bG9hZCkKIHsKQEAgLTUyMyw2ICs1NzEsOCBAQCB2b2lkIHdpaWV4dF9oYW5kbGUo
-c3RydWN0IHdpaW1vdGVfZGF0YSAqd2RhdGEsIGNvbnN0IF9fdTggKnBheWxvYWQpCiAJCWhhbmRs
-ZXJfbnVuY2h1Y2soZXh0LCBwYXlsb2FkKTsKIAl9IGVsc2UgaWYgKGV4dC0+ZXh0X3R5cGUgPT0g
-V0lJRVhUX0NMQVNTSUMpIHsKIAkJaGFuZGxlcl9jbGFzc2ljKGV4dCwgcGF5bG9hZCk7CisJfSBl
-bHNlIGlmIChleHQtPmV4dF90eXBlID09IFdJSUVYVF9CQUxBTkNFX0JPQVJEKSB7CisJCWhhbmRs
-ZXJfYmFsYW5jZV9ib2FyZChleHQsIHBheWxvYWQpOwogCX0KIH0KIApAQCAtNTUxLDYgKzYwMSwx
-MSBAQCBzdGF0aWMgc3NpemVfdCB3aWlleHRfc2hvdyhzdHJ1Y3QgZGV2aWNlICpkZXYsIHN0cnVj
-dCBkZXZpY2VfYXR0cmlidXRlICphdHRyLAogCQkJcmV0dXJuIHNwcmludGYoYnVmLCAibW90aW9u
-cCtjbGFzc2ljXG4iKTsKIAkJZWxzZQogCQkJcmV0dXJuIHNwcmludGYoYnVmLCAiY2xhc3NpY1xu
-Iik7CisJfSBlbHNlIGlmICh0eXBlID09IFdJSUVYVF9CQUxBTkNFX0JPQVJEKSB7CisJCWlmICht
-b3Rpb25wKQorCQkJcmV0dXJuIHNwcmludGYoYnVmLCAibW90aW9ucCtiYWxhbmNlYm9hcmRcbiIp
-OworCQllbHNlCisJCQlyZXR1cm4gc3ByaW50ZihidWYsICJiYWxhbmNlYm9hcmRcbiIpOwogCX0g
-ZWxzZSB7CiAJCWlmIChtb3Rpb25wKQogCQkJcmV0dXJuIHNwcmludGYoYnVmLCAibW90aW9ucFxu
-Iik7Cg==
---20cf301fb653a25cee04c99644da--
+Regards
+David
