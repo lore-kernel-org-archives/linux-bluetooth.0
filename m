@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CACUGKYPf+2ZP6y5rfy8kbnanxCJt3pL800E6bHNO6WUSifQW+A@mail.gmail.com>
+In-Reply-To: <CACUGKYNPWDCbQgtA6u33NXn_U3CMm9q6vGqEAaA9FOPPjqeJiw@mail.gmail.com>
 References: <CACUGKYONE6a2PWtOEY4Kgg9TQkX3pCwhW9UJLk5KGVtpL5eVaw@mail.gmail.com>
 	<CACUGKYPwTxRS8JN78J-oPSwz0mhnKvxHg=ybm5vyiKivEpM03A@mail.gmail.com>
 	<20120910235838.GA26986@samus>
@@ -12,9 +12,8 @@ References: <CACUGKYONE6a2PWtOEY4Kgg9TQkX3pCwhW9UJLk5KGVtpL5eVaw@mail.gmail.com>
 	<CACUGKYPSTh0CcN6fKc9NcbYmvZK3j8AwfNnMqkBkoTt-UFccSg@mail.gmail.com>
 	<CAJdJm_PwrHdWnp6xXoYzd8GLigO3YSHdS-6feVj+c-9u3sjk5A@mail.gmail.com>
 	<CACUGKYNPWDCbQgtA6u33NXn_U3CMm9q6vGqEAaA9FOPPjqeJiw@mail.gmail.com>
-	<CACUGKYPf+2ZP6y5rfy8kbnanxCJt3pL800E6bHNO6WUSifQW+A@mail.gmail.com>
-Date: Thu, 13 Sep 2012 16:18:15 -0400
-Message-ID: <CAJdJm_MFT=KTREZavd_oaOVT24+jUsAXH=d-K8F0Rwyi6V1rQg@mail.gmail.com>
+Date: Thu, 13 Sep 2012 16:11:28 -0400
+Message-ID: <CAJdJm_PR+e0nRZ6bpfcV7JsBPmR6Zm8u0BcggAQTMQ2QO6GX5A@mail.gmail.com>
 Subject: Re: Dropping connection (bit off-topic)
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: John Tobias <john.tobias.ph@gmail.com>
@@ -26,23 +25,22 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi John,
 
-On Thu, Sep 13, 2012 at 4:11 PM, John Tobias <john.tobias.ph@gmail.com> wrote:
-> Hi Anderson,
+On Thu, Sep 13, 2012 at 2:44 PM, John Tobias <john.tobias.ph@gmail.com> wrote:
+>> Which messages did you see?
 >
-> If I add a simple GATT/GAP server on gatttool, should I still use the
-> DBUS to listen or I can communicate directly to the kernel?.
+> The ran the bluetoothd with debug message:
+>
+> [snip]
 
-You either talk to bluetoothd (using D-Bus, like those test-* python
-scripts do), which will handle connections for you, or you talk
-directly to kernel using bluetooth socket (like gatttool does). You
-have more flexibility talking to the kernel directly, but your app
-will not be interoperable with other apps running at the same time,
-specially if they try to call connect() at the same time (one of them
-will get a EBUSY error).
+This log just shows the temporary device being created due to the
+connection made by gatttool. bluetoothd does not have any open socket
+where the ATT requests could be handled (unless the connection was
+created by bluetoothd itself and not gatttool).
 
-Using D-Bus, on the other hand, bluetoothd queues the connections properly.
+If bluetoothd GATT server processed the ATT request sent by your
+phone, you would see this:
 
-So you should use what is more appropriate for your use case.
+bluetoothd[NNNN]: src/attrib-server.c:channel_handler() op 0x10
 
 Best Regards,
 -- 
