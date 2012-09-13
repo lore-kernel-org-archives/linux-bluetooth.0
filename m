@@ -1,42 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50522A54.4050907@butterbrot.org>
-Date: Thu, 13 Sep 2012 20:47:48 +0200
-From: Florian Echtler <floe@butterbrot.org>
 MIME-Version: 1.0
-To: David Herrmann <dh.herrmann@googlemail.com>
-CC: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
-Subject: Re: [PATCH] wiimote: add Wii Balance Board detection
-References: <1347485573-23623-1-git-send-email-dh.herrmann@googlemail.com>
-In-Reply-To: <1347485573-23623-1-git-send-email-dh.herrmann@googlemail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <CAJdJm_PwrHdWnp6xXoYzd8GLigO3YSHdS-6feVj+c-9u3sjk5A@mail.gmail.com>
+References: <CACUGKYONE6a2PWtOEY4Kgg9TQkX3pCwhW9UJLk5KGVtpL5eVaw@mail.gmail.com>
+	<CACUGKYPwTxRS8JN78J-oPSwz0mhnKvxHg=ybm5vyiKivEpM03A@mail.gmail.com>
+	<20120910235838.GA26986@samus>
+	<CACUGKYMP7YRu1=P4Uf9T_RfOKQFPvZq8sK+GGi0T1jB6GDXcDQ@mail.gmail.com>
+	<CACUGKYN-+AKvVOZwxR7b6cvSujBMRHnjzNGcGezYynP2gTm6KA@mail.gmail.com>
+	<CAJdJm_OfccWTVuphRQfjfouY3m8_HgSeGwE-XSyHetzy+tjFFw@mail.gmail.com>
+	<CACUGKYMv_X4DgU+C0V=PA_PfYRQYnKO1LM4SoDbfcB2O-XkJvQ@mail.gmail.com>
+	<CAJdJm_MYn=eG93WTPmHWu98t3Ufqrc9pXDpdBbCvbT-JdYeOaw@mail.gmail.com>
+	<CACUGKYPSTh0CcN6fKc9NcbYmvZK3j8AwfNnMqkBkoTt-UFccSg@mail.gmail.com>
+	<CAJdJm_PwrHdWnp6xXoYzd8GLigO3YSHdS-6feVj+c-9u3sjk5A@mail.gmail.com>
+Date: Thu, 13 Sep 2012 11:44:21 -0700
+Message-ID: <CACUGKYNPWDCbQgtA6u33NXn_U3CMm9q6vGqEAaA9FOPPjqeJiw@mail.gmail.com>
+Subject: Re: Dropping connection (bit off-topic)
+From: John Tobias <john.tobias.ph@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Confirmed to work, with patch applied against 4.101 Ubuntu package.
+Hi Anderson,
 
-Florian
 
-On 12.09.2012 23:32, David Herrmann wrote:
-> Add the name of the Wii Balance Board so it can be paired with BlueZ like
-> any other Wii Remote. Reported by Florian Echtler.
-> ---
->   plugins/wiimote.c | 1 +
->   1 file changed, 1 insertion(+)
+
+On Thu, Sep 13, 2012 at 11:36 AM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi John,
 >
-> diff --git a/plugins/wiimote.c b/plugins/wiimote.c
-> index 337d408..3d16966 100644
-> --- a/plugins/wiimote.c
-> +++ b/plugins/wiimote.c
-> @@ -76,6 +76,7 @@ static ssize_t wii_pincb(struct btd_adapter *adapter, struct btd_device *device,
->   	name[sizeof(name) - 1] = 0;
+> On Thu, Sep 13, 2012 at 2:18 PM, John Tobias <john.tobias.ph@gmail.com> wrote:
+>> Hi Anderson,
+>>
+>> Here's what I did:
+>>
+>> I set the EnableGatt=true and executed my bluetoothd. The debug
+>> messages of bluetoothd confirmed that it was responding to the request
+>> of my iPhone.
 >
->   	if (g_str_equal(name, "Nintendo RVL-CNT-01") ||
-> +	    g_str_equal(name, "Nintendo RVL-WBC-01") ||
->   				(vendor == 0x057e && product == 0x0306)) {
->   		DBG("Forcing fixed pin on detected wiimote %s", addr);
->   		memcpy(pinbuf, &sba, 6);
->
+> Which messages did you see?
+
+The ran the bluetoothd with debug message:
+
+bluetoothd[14762]: plugins/mgmtops.c:mgmt_event() cond 1
+bluetoothd[14762]: plugins/mgmtops.c:mgmt_event() Received 19 bytes
+from management socket
+bluetoothd[14762]: plugins/mgmtops.c:mgmt_device_connected() hci0
+device 6E:FA:41:C4:DA:AD connected eir_len 0
+bluetoothd[14762]: src/event.c:btd_event_conn_complete() Entry:
+btd_event_conn_complete
+bluetoothd[14762]: src/adapter.c:adapter_get_device() 6E:FA:41:C4:DA:AD
+bluetoothd[14762]: src/adapter.c:adapter_create_device() 6E:FA:41:C4:DA:AD
+bluetoothd[14762]: src/device.c:device_create() Creating device
+/org/bluez/14762/hci0/dev_6E_FA_41_C4_DA_AD
+bluetoothd[14762]: src/device.c:btd_device_ref() 0xb8600018: ref=1
+bluetoothd[14762]: src/device.c:device_set_temporary() temporary 1
+bluetoothd[14762]: plugins/mgmtops.c:mgmt_event() cond 1
+bluetoothd[14762]: plugins/mgmtops.c:mgmt_event() Received 13 bytes
+from management socket
+bluetoothd[14762]: plugins/mgmtops.c:mgmt_device_disconnected() hci0
+device 6E:FA:41:C4:DA:AD disconnected
+bluetoothd[14762]: src/event.c:btd_event_disconn_complete()
+bluetoothd[14762]: src/adapter.c:adapter_remove_connection()
+bluetoothd[14762]: src/adapter.c:adapter_remove_connection() Removing
+temporary device /org/bluez/14762/hci0/dev_6E_FA_41_C4_DA_AD
+bluetoothd[14762]: src/device.c:device_remove() Removing device
+/org/bluez/14762/hci0/dev_6E_FA_41_C4_DA_AD
+bluetoothd[14762]: src/device.c:btd_device_unref() 0xb8600018: ref=0
+bluetoothd[14762]: src/device.c:device_free() 0xb8600018
 
 
--- 
-SENT FROM MY DEC VT50 TERMINAL
+
+I will look at the code you mention and will start from there.
+
+Regards,
+
+john
+
+>
+>>
+>> I used gatttool to connect to the device and read the characteristic..
+>
+> gatttool is only for testing. It will open a bluetooth socket and talk
+> directly with the kernel (without bluetoothd help). In fact, it runs
+> just fine without any bluetoothd running (you need to do a "hciconfig
+> hciX up" though).
+>
+> If you want your app to properly integrate with bluetoothd, you need
+> to create connections using BlueZ's D-Bus APIs.
+>
+> Take a look at some example code:
+>
+> test/test-device (if you need to do the pairing from your application)
+> test/test-attrib (if you want to talk to some profile not supported by
+> BlueZ yet)
+> test/test-thermometer (for GATT Health Thermometer)
+> test/test-proximity (for GATT Proximity)
+> ...
+>
+> if the profile you want to use is one of the official ones, we
+> encourage you implement them as a BlueZ plugin, and provide some D-Bus
+> API that your app (or other apps) can use. That way we avoid
+> duplicating profile implementations. See for example the thermometer
+> (HTP) and proximity (PXP) implementations in BlueZ.
+>
+> Some others are in process of being implemented upstream: Battery,
+> Heart Rate, and Server profiles (Time, Alert Notification, Phone Alert
+> Status).
+>
+> Best Regards,
+> --
+> Anderson Lizardo
+> Instituto Nokia de Tecnologia - INdT
+> Manaus - Brazil
