@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Rafal Garbat <rafal.garbat@tieto.com>
-Subject: [PATCH v4 02/17] heartrate: Add Heart Rate Profile client
-Date: Thu, 13 Sep 2012 14:13:06 +0200
-Message-ID: <1347538401-6417-3-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v4 08/17] heartrate: Add HeartRateManager interface
+Date: Thu, 13 Sep 2012 14:13:12 +0200
+Message-ID: <1347538401-6417-9-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1347538401-6417-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1347538401-6417-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -14,435 +14,242 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Rafal Garbat <rafal.garbat@tieto.com>
 
-This patch adds initial support for the Heart Rate Profile client.
+This patch adds support for org.bluez.HeartRateManager interface on adapters
+which allows to register and unregister per-adapter watcher.
 
-Change-Id: I4cff5789a4d37ec1e2fe4c506159fd2ed578da91
+Change-Id: Id4ba29672efb4985bc99250a3fe9db661f21fcae
 ---
- Makefile.am                    |   9 ++-
- lib/uuid.h                     |   2 +
- profiles/heartrate/heartrate.c | 163 +++++++++++++++++++++++++++++++++++++++++
- profiles/heartrate/heartrate.h |  26 +++++++
- profiles/heartrate/main.c      |  52 +++++++++++++
- profiles/heartrate/manager.c   |  76 +++++++++++++++++++
- profiles/heartrate/manager.h   |  24 ++++++
- 7 files changed, 350 insertions(+), 2 deletions(-)
- create mode 100644 profiles/heartrate/heartrate.c
- create mode 100644 profiles/heartrate/heartrate.h
- create mode 100644 profiles/heartrate/main.c
- create mode 100644 profiles/heartrate/manager.c
- create mode 100644 profiles/heartrate/manager.h
+ profiles/heartrate/heartrate.c | 155 ++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 154 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 372111a..808a81f 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -211,7 +211,7 @@ endif
- 
- if GATTMODULES
- builtin_modules += thermometer alert time gatt_example proximity deviceinfo \
--			gatt
-+			gatt heartrate
- builtin_sources += profiles/thermometer/main.c \
- 			profiles/thermometer/manager.h \
- 			profiles/thermometer/manager.c \
-@@ -240,7 +240,12 @@ builtin_sources += profiles/thermometer/main.c \
- 			profiles/deviceinfo/deviceinfo.c \
- 			profiles/gatt/main.c profiles/gatt/manager.h \
- 			profiles/gatt/manager.c profiles/gatt/gas.h \
--			profiles/gatt/gas.c
-+			profiles/gatt/gas.c \
-+			profiles/heartrate/main.c \
-+			profiles/heartrate/manager.c \
-+			profiles/heartrate/manager.h \
-+			profiles/heartrate/heartrate.c \
-+			profiles/heartrate/heartrate.h
- endif
- 
- builtin_modules += formfactor
-diff --git a/lib/uuid.h b/lib/uuid.h
-index aa6efdf..3488e66 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -63,6 +63,8 @@ extern "C" {
- 
- #define SAP_UUID		"0000112D-0000-1000-8000-00805f9b34fb"
- 
-+#define HEART_RATE_UUID			"0000180d-0000-1000-8000-00805f9b34fb"
-+
- #define HEALTH_THERMOMETER_UUID		"00001809-0000-1000-8000-00805f9b34fb"
- #define TEMPERATURE_MEASUREMENT_UUID	"00002a1c-0000-1000-8000-00805f9b34fb"
- #define TEMPERATURE_TYPE_UUID		"00002a1d-0000-1000-8000-00805f9b34fb"
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-new file mode 100644
-index 0000000..06cb12a
---- /dev/null
+index 24b691a..861428a 100644
+--- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
-@@ -0,0 +1,163 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012 Tieto Poland
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
+@@ -24,13 +24,16 @@
+ #include <config.h>
+ #endif
+ 
++#include <gdbus.h>
+ #include <errno.h>
+ #include <stdbool.h>
+ #include <glib.h>
+ #include <bluetooth/uuid.h>
+ 
+ #include "adapter.h"
++#include "dbus-common.h"
+ #include "device.h"
++#include "error.h"
+ #include "gattrib.h"
+ #include "attio.h"
+ #include "att.h"
+@@ -38,9 +41,12 @@
+ #include "heartrate.h"
+ #include "log.h"
+ 
++#define HEART_RATE_MANAGER_IFACE "org.bluez.HeartRateManager"
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <errno.h>
-+#include <stdbool.h>
-+#include <glib.h>
-+#include <bluetooth/uuid.h>
-+
-+#include "adapter.h"
-+#include "device.h"
-+#include "heartrate.h"
-+
-+struct heartrate_adapter {
-+	struct btd_adapter	*adapter;
-+	GSList			*devices;
-+};
-+
-+struct heartrate_device {
-+	struct btd_device		*dev;
+ struct heartrate_adapter {
+ 	struct btd_adapter	*adapter;
+ 	GSList			*devices;
++	GSList			*watchers;
+ };
+ 
+ struct heartrate_device {
+@@ -64,6 +70,13 @@ struct descriptor {
+ 	bt_uuid_t		uuid;
+ };
+ 
++struct watcher {
 +	struct heartrate_adapter	*hr;
++	guint				id;
++	char				*srv;
++	char				*path;
 +};
 +
-+static GSList *heartrate_adapters = NULL;
-+
-+static gint cmp_adapter(gconstpointer a, gconstpointer b)
+ static GSList *heartrate_adapters = NULL;
+ 
+ static gint cmp_adapter(gconstpointer a, gconstpointer b)
+@@ -88,6 +101,19 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
+ 	return -1;
+ }
+ 
++static gint cmp_watcher(gconstpointer a, gconstpointer b)
 +{
-+	const struct heartrate_adapter *hr = a;
-+	const struct btd_adapter *adapter = b;
++	const struct watcher *watcher = a;
++	const struct watcher *match = b;
++	int ret;
 +
-+	if (adapter == hr->adapter)
-+		return 0;
++	ret = g_strcmp0(watcher->srv, match->srv);
++	if (ret != 0)
++		return ret;
 +
-+	return -1;
++	return g_strcmp0(watcher->path, match->path);
 +}
 +
-+static gint cmp_device(gconstpointer a, gconstpointer b)
+ static struct heartrate_adapter *
+ find_heartrate_adapter(struct btd_adapter *adapter)
+ {
+@@ -108,6 +134,22 @@ static void destroy_char(gpointer user_data)
+ 	g_free(c);
+ }
+ 
++static void remove_watcher(gpointer user_data)
 +{
-+	const struct heartrate_device *hrdev = a;
-+	const struct btd_device *dev = b;
++	struct watcher *watcher = user_data;
 +
-+	if (dev == hrdev->dev)
-+		return 0;
-+
-+	return -1;
++	g_dbus_remove_watch(get_dbus_connection(), watcher->id);
 +}
 +
-+static struct heartrate_adapter *
-+find_heartrate_adapter(struct btd_adapter *adapter)
++static void destroy_watcher(gpointer user_data)
 +{
-+	GSList *l = g_slist_find_custom(heartrate_adapters, adapter,
-+								cmp_adapter);
-+	if (!l)
-+		return NULL;
++	struct watcher *watcher = user_data;
 +
-+	return l->data;
++	g_free(watcher->path);
++	g_free(watcher->srv);
++	g_free(watcher);
 +}
 +
-+static void destroy_heartrate_device(gpointer user_data)
-+{
-+	struct heartrate_device *hrdev = user_data;
+ static void destroy_heartrate_device(gpointer user_data)
+ {
+ 	struct heartrate_device *hrdev = user_data;
+@@ -133,9 +175,106 @@ static void destroy_heartrate_adapter(gpointer user_data)
+ 	if (hr->devices != NULL)
+ 		g_slist_free_full(hr->devices, destroy_heartrate_device);
+ 
++	if (hr->watchers != NULL)
++		g_slist_free_full(hr->watchers, remove_watcher);
 +
-+	btd_device_unref(hrdev->dev);
-+	g_free(hrdev);
+ 	g_free(hr);
+ }
+ 
++static void watcher_exit(DBusConnection *conn, void *user_data)
++{
++	struct watcher *watcher = user_data;
++	struct heartrate_adapter *hr = watcher->hr;
++
++	DBG("Heart Rate watcher %s disconnected", watcher->path);
++
++	hr->watchers = g_slist_remove(hr->watchers, watcher);
++	g_dbus_remove_watch(conn, watcher->id);
 +}
 +
-+static void destroy_heartrate_adapter(gpointer user_data)
++static struct watcher *find_watcher(GSList *list, const char *sender,
++							const char *path)
 +{
-+	struct heartrate_adapter *hr = user_data;
-+
-+	g_free(hr);
-+}
-+
-+int heartrate_adapter_register(struct btd_adapter *adapter)
-+{
-+	struct heartrate_adapter *hr;
-+
-+	hr = g_new0(struct heartrate_adapter, 1);
-+	hr->adapter = adapter;
-+
-+	heartrate_adapters = g_slist_prepend(heartrate_adapters, hr);
-+
-+	return 0;
-+}
-+void heartrate_adapter_unregister(struct btd_adapter *adapter)
-+{
-+	struct heartrate_adapter *hr;
-+
-+	hr = find_heartrate_adapter(adapter);
-+	if (hr == NULL)
-+		return;
-+
-+	heartrate_adapters = g_slist_remove(heartrate_adapters, hr);
-+
-+	destroy_heartrate_adapter(hr);
-+}
-+
-+int heartrate_device_register(struct btd_device *device)
-+{
-+	struct heartrate_adapter *hr;
-+	struct btd_adapter *adapter;
-+	struct heartrate_device *hrdev;
-+
-+	adapter = device_get_adapter(device);
-+
-+	hr = find_heartrate_adapter(adapter);
-+
-+	if (hr == NULL)
-+		return -1;
-+
-+	hrdev = g_new0(struct heartrate_device, 1);
-+	hrdev->dev = btd_device_ref(device);
-+	hrdev->hr = hr;
-+
-+	hr->devices = g_slist_prepend(hr->devices, hrdev);
-+
-+	return 0;
-+}
-+void heartrate_device_unregister(struct btd_device *device)
-+{
-+	struct heartrate_adapter *hr;
-+	struct btd_adapter *adapter;
-+	struct heartrate_device *hrdev;
++	struct watcher *match;
 +	GSList *l;
 +
-+	adapter = device_get_adapter(device);
++	match = g_new0(struct watcher, 1);
++	match->srv = g_strdup(sender);
++	match->path = g_strdup(path);
 +
-+	hr = find_heartrate_adapter(adapter);
-+	if (hr == NULL)
-+		return;
++	l = g_slist_find_custom(list, match, cmp_watcher);
++	destroy_watcher(match);
 +
-+	l = g_slist_find_custom(hr->devices, device, cmp_device);
-+	if (l == NULL)
-+		return;
++	if (l != NULL)
++		return l->data;
 +
-+	hrdev = l->data;
-+
-+	hr->devices = g_slist_remove(hr->devices, hrdev);
-+
-+	destroy_heartrate_device(hrdev);
++	return NULL;
 +}
-diff --git a/profiles/heartrate/heartrate.h b/profiles/heartrate/heartrate.h
-new file mode 100644
-index 0000000..486f5b3
---- /dev/null
-+++ b/profiles/heartrate/heartrate.h
-@@ -0,0 +1,26 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012 Tieto Poland
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
 +
-+int heartrate_adapter_register(struct btd_adapter *adapter);
-+void heartrate_adapter_unregister(struct btd_adapter *adapter);
-+int heartrate_device_register(struct btd_device *device);
-+void heartrate_device_unregister(struct btd_device *device);
-diff --git a/profiles/heartrate/main.c b/profiles/heartrate/main.c
-new file mode 100644
-index 0000000..40f34bc
---- /dev/null
-+++ b/profiles/heartrate/main.c
-@@ -0,0 +1,52 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012 Tieto Poland
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdint.h>
-+#include <glib.h>
-+#include <errno.h>
-+
-+#include "plugin.h"
-+#include "manager.h"
-+#include "hcid.h"
-+#include "log.h"
-+
-+static int heartrate_init(void)
++static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
++								void *data)
 +{
-+	if (!main_opts.gatt_enabled) {
-+		DBG("GATT is disabled");
-+		return -ENOTSUP;
-+	}
++	const char *sender = dbus_message_get_sender(msg);
++	struct heartrate_adapter *hr = data;
++	struct watcher *watcher;
++	char *path;
 +
-+	return heartrate_manager_init();
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
++							DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
++
++	watcher = find_watcher(hr->watchers, sender, path);
++	if (watcher != NULL)
++		return btd_error_already_exists(msg);
++
++	DBG("Heart Rate watcher %s registered", path);
++
++	watcher = g_new0(struct watcher, 1);
++	watcher->srv = g_strdup(sender);
++	watcher->path = g_strdup(path);
++	watcher->hr = hr;
++	watcher->id = g_dbus_add_disconnect_watch(conn, sender, watcher_exit,
++						watcher, destroy_watcher);
++
++	hr->watchers = g_slist_prepend(hr->watchers, watcher);
++
++	return dbus_message_new_method_return(msg);
 +}
 +
-+static void heartrate_exit(void)
++static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
++								void *data)
 +{
-+	heartrate_manager_exit();
++	const char *sender = dbus_message_get_sender(msg);
++	struct heartrate_adapter *hr = data;
++	struct watcher *watcher;
++	char *path;
++
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
++							DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
++
++	watcher = find_watcher(hr->watchers, sender, path);
++	if (watcher == NULL)
++		return btd_error_does_not_exist(msg);
++
++	DBG("Heart Rate watcher %s unregistered", path);
++
++	hr->watchers = g_slist_remove(hr->watchers, watcher);
++	g_dbus_remove_watch(get_dbus_connection(), watcher->id);
++
++	return dbus_message_new_method_return(msg);
 +}
 +
-+BLUETOOTH_PLUGIN_DEFINE(heartrate, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-+					heartrate_init, heartrate_exit)
-diff --git a/profiles/heartrate/manager.c b/profiles/heartrate/manager.c
-new file mode 100644
-index 0000000..2a9326d
---- /dev/null
-+++ b/profiles/heartrate/manager.c
-@@ -0,0 +1,76 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012 Tieto Poland
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <gdbus.h>
-+#include <errno.h>
-+#include <stdbool.h>
-+#include <bluetooth/uuid.h>
-+
-+#include "adapter.h"
-+#include "device.h"
-+#include "profile.h"
-+#include "att.h"
-+#include "gattrib.h"
-+#include "gatt.h"
-+#include "heartrate.h"
-+#include "manager.h"
-+
-+static int heartrate_adapter_probe(struct btd_adapter *adapter)
-+{
-+	return heartrate_adapter_register(adapter);
-+}
-+
-+static void heartrate_adapter_remove(struct btd_adapter *adapter)
-+{
-+	heartrate_adapter_unregister(adapter);
-+}
-+
-+static int heartrate_device_probe(struct btd_device *device, GSList *uuids)
-+{
-+	return heartrate_device_register(device);
-+}
-+
-+static void heartrate_device_remove(struct btd_device *device)
-+{
-+	heartrate_device_unregister(device);
-+}
-+
-+static struct btd_profile hrp_profile = {
-+	.name		= "Heart Rate GATT Driver",
-+	.remote_uuids	= BTD_UUIDS(HEART_RATE_UUID),
-+
-+	.device_probe	= heartrate_device_probe,
-+	.device_remove	= heartrate_device_remove,
-+
-+	.adapter_probe	= heartrate_adapter_probe,
-+	.adapter_remove	= heartrate_adapter_remove,
++static const GDBusMethodTable heartrate_manager_methods[] = {
++	{ GDBUS_METHOD("RegisterWatcher",
++			GDBUS_ARGS({ "agent", "o" }), NULL,
++			register_watcher) },
++	{ GDBUS_METHOD("UnregisterWatcher",
++			GDBUS_ARGS({ "agent", "o" }), NULL,
++			unregister_watcher) },
++	{ }
 +};
 +
-+int heartrate_manager_init(void)
-+{
-+	return btd_profile_register(&hrp_profile);
-+}
+ static void process_heartrate_char(struct characteristic *ch)
+ {
+ 	if (g_strcmp0(ch->attr.uuid, HEART_RATE_CONTROL_POINT_UUID) == 0)
+@@ -276,6 +415,18 @@ int heartrate_adapter_register(struct btd_adapter *adapter)
+ 	hr = g_new0(struct heartrate_adapter, 1);
+ 	hr->adapter = adapter;
+ 
++	if (!g_dbus_register_interface(get_dbus_connection(),
++						adapter_get_path(adapter),
++						HEART_RATE_MANAGER_IFACE,
++						heartrate_manager_methods,
++						NULL, NULL, hr,
++						destroy_heartrate_adapter)) {
++		error("D-Bus failed to register %s interface",
++						HEART_RATE_MANAGER_IFACE);
++		destroy_heartrate_adapter(hr);
++		return -EIO;
++	}
 +
-+void heartrate_manager_exit(void)
-+{
-+	btd_profile_unregister(&hrp_profile);
-+}
-diff --git a/profiles/heartrate/manager.h b/profiles/heartrate/manager.h
-new file mode 100644
-index 0000000..de799f6
---- /dev/null
-+++ b/profiles/heartrate/manager.h
-@@ -0,0 +1,24 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012 Tieto Poland
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+int heartrate_manager_init(void);
-+void heartrate_manager_exit(void);
+ 	heartrate_adapters = g_slist_prepend(heartrate_adapters, hr);
+ 
+ 	return 0;
+@@ -290,7 +441,9 @@ void heartrate_adapter_unregister(struct btd_adapter *adapter)
+ 
+ 	heartrate_adapters = g_slist_remove(heartrate_adapters, hr);
+ 
+-	destroy_heartrate_adapter(hr);
++	g_dbus_unregister_interface(get_dbus_connection(),
++						adapter_get_path(hr->adapter),
++						HEART_RATE_MANAGER_IFACE);
+ }
+ 
+ int heartrate_device_register(struct btd_device *device,
 -- 
 1.7.11.3
 
