@@ -1,133 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1347580581.5975.4.camel@maxim-laptop>
-Subject: Re: [PATCH] Bluetooth: Free the l2cap channel list only when
- refcount is zero
-From: Maxim Levitsky <maximlevitsky@gmail.com>
-To: Jaganath <jaganath.k@samsung.com>
-Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org, s.syam@samsung.com
-Date: Fri, 14 Sep 2012 02:56:21 +0300
-In-Reply-To: <4368C8F191BB414F84A70D30771FE893@sisodomain.com>
-References: <1342165923-4901-1-git-send-email-jaganath.k@samsung.com>
-	 <20120713084859.GC2729@aemeltch-MOBL1>
-	 <4368C8F191BB414F84A70D30771FE893@sisodomain.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <CAJdJm_MFT=KTREZavd_oaOVT24+jUsAXH=d-K8F0Rwyi6V1rQg@mail.gmail.com>
+References: <CACUGKYONE6a2PWtOEY4Kgg9TQkX3pCwhW9UJLk5KGVtpL5eVaw@mail.gmail.com>
+	<CACUGKYPwTxRS8JN78J-oPSwz0mhnKvxHg=ybm5vyiKivEpM03A@mail.gmail.com>
+	<20120910235838.GA26986@samus>
+	<CACUGKYMP7YRu1=P4Uf9T_RfOKQFPvZq8sK+GGi0T1jB6GDXcDQ@mail.gmail.com>
+	<CACUGKYN-+AKvVOZwxR7b6cvSujBMRHnjzNGcGezYynP2gTm6KA@mail.gmail.com>
+	<CAJdJm_OfccWTVuphRQfjfouY3m8_HgSeGwE-XSyHetzy+tjFFw@mail.gmail.com>
+	<CACUGKYMv_X4DgU+C0V=PA_PfYRQYnKO1LM4SoDbfcB2O-XkJvQ@mail.gmail.com>
+	<CAJdJm_MYn=eG93WTPmHWu98t3Ufqrc9pXDpdBbCvbT-JdYeOaw@mail.gmail.com>
+	<CACUGKYPSTh0CcN6fKc9NcbYmvZK3j8AwfNnMqkBkoTt-UFccSg@mail.gmail.com>
+	<CAJdJm_PwrHdWnp6xXoYzd8GLigO3YSHdS-6feVj+c-9u3sjk5A@mail.gmail.com>
+	<CACUGKYNPWDCbQgtA6u33NXn_U3CMm9q6vGqEAaA9FOPPjqeJiw@mail.gmail.com>
+	<CACUGKYPf+2ZP6y5rfy8kbnanxCJt3pL800E6bHNO6WUSifQW+A@mail.gmail.com>
+	<CAJdJm_MFT=KTREZavd_oaOVT24+jUsAXH=d-K8F0Rwyi6V1rQg@mail.gmail.com>
+Date: Thu, 13 Sep 2012 14:59:56 -0700
+Message-ID: <CACUGKYMKHvoAbH97-QLbxxYic_+5WjONc76mO642ywf6Jo-5+A@mail.gmail.com>
+Subject: Re: Dropping connection (bit off-topic)
+From: John Tobias <john.tobias.ph@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2012-07-13 at 16:56 +0530, Jaganath wrote: 
-> Hi Andrei,
-> 
-> --------------------------------------------------
-> From: "Andrei Emeltchenko" <andrei.emeltchenko.news@gmail.com>
-> Sent: Friday, July 13, 2012 2:19 PM
-> To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
-> Cc: <linux-bluetooth@vger.kernel.org>; <s.syam@samsung.com>
-> Subject: Re: [PATCH] Bluetooth: Free the l2cap channel list only when 
-> refcount is zero
-> 
-> > Hi Jaganath,
-> >
-> > On Fri, Jul 13, 2012 at 01:22:03PM +0530, Jaganath Kanakkassery wrote:
-> >> Move the l2cap channel list chan->global_l under the refcnt
-> >> protection and free it based on the refcnt.
-> >
-> > The idea is good.
-> >
-Note that in 3.6-rc5 which soon to be released, it trivial to trigger a
-crash by suspending the system with a2dp headphones connected.
-I also have seem (and I strongly suspect the same) crash in 3.5
-This patch seems to fix this so far.
-Could you sent it to Linus, to fix this kernel panic?
+Hi Anderson,
 
-Best  regards,
-Maxim Levitsky
+I added these line of codes in gatttool:
 
-PS:
-The backtrace:
+listen_start:
+g_attrib_register(attrib, ATT_OP_READ_BY_TYPE_RESP, events_handler,
+							attrib, NULL);
+
+Then, in events_handler I dumped the handles for
+ATT_OP_READ_BY_TYPE_REQ and ATT_OP_READ_BY_TYPE_RESP:
+
+ATT_OP_READ_BY_TYPE_REQ:   handle = 0x1 value: ff ff 00 2a
+ATT_OP_READ_BY_TYPE_RESP:   handle = 0x207 value: 00 02 03 00 00 2a 04
+00 02 05 00 01 2a 07 00 20 08 00 05 2a
+ATT_OP_READ_BY_TYPE_RESP:   handle = 0xb15 value: 00 02 0c 00 31 3d 35
+06 1e 60 70 a3 8d 4e 58 9c 2d 6a 3c 16
+ATT_OP_READ_BY_TYPE_RESP:   handle = 0xd15 value: 00 8a 0e 00 32 3d 35
+06 1e 60 70 a3 8d 4e 58 9c 2d 6a 3c 16
+ATT_OP_READ_BY_TYPE_RESP:   handle = 0x1015 value: 00 88 11 00 33 3d
+35 06 1e 60 70 a3 8d 4e 58 9c 2d 6a 3c 16
+ATT_OP_READ_BY_TYPE_RESP:   handle = 0x1315 value: 00 9a 14 00 52 72
+3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+ATT_OP_READ_BY_TYPE_RESP:   handle = 0x1715 value: 00 9a 18 00 36 72
+3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+ATT_OP_READ_BY_TYPE_RESP:   handle = 0x1b15 value: 00 9a 1c 00 37 72
+3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+ATT_OP_READ_BY_TYPE_RESP:   handle = 0x1f15 value: 00 8a 20 00 38 72
+3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+ATT_OP_READ_BY_TYPE_RESP:   handle = 0x2215 value: 00 98 23 00 40 72
+3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+ATT_OP_READ_BY_TYPE_RESP:   handle = 0x2615 value: 00 9a 27 00 41 72
+3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+ATT_OP_READ_BY_TYPE_RESP:   handle = 0x2a15 value: 00 98 2b 00 42 72
+3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+ATT_OP_READ_BY_TYPE_RESP:   handle = 0x2e15 value: 00 88 2f 00 60 72
+3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+ATT_OP_READ_BY_TYPE_RESP:   handle = 0x3115 value: 00 88 32 00 61 72
+3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+ATT_OP_READ_BY_TYPE_RESP:   handle = 0x3415 value: 00 12 35 00 62 72
+3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+ATT_OP_READ_BY_TYPE_RESP:   handle = 0x3715 value: 00 8a 38 00 39 72
+3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+
+In hcidump:
+
+ ACL data: handle 76 flags 0x02 dlen 9
+ATT: Error (0x01)
+Error: Attribute not found (10)
+Read By Type req (0x08) on handle 0x0039
 
 
-fg80211: Calling CRDA to update world regulatory domain
-cfg80211: World regulatory domain updated:
-cfg80211:   (start_freq - end_freq @ bandwidth), (max_antenna_gain,
-max_eirp)
-cfg80211:   (2402000 KHz - 2472000 KHz @ 40000 KHz), (300 mBi, 2000
-mBm)2
-cfg80211:   (2457000 KHz - 2482000 KHz @ 20000 KHz), (300 mBi, 2000 mBm)
-cfg80211:   (2474000 KHz - 2494000 KHz @ 20000 KHz), (300 mBi, 2000
-mBm)T:
-cfg80211:   (5170000 KHz - 5250000 KHz @ 40000 KHz), (300 mBi, 2000 mBm)
-cfg80211:   (5735000 KHz - 5835000 KHz @ 40000 KHz), (300 mBi, 2000 mBm)
-8
-cfg80211: World regulatory domain updated:
-cfg80211:   (start_freq - end_freq @ bandwidth), (max_antenna_gain,
-max_eirp)
-cfg80211:   (2402000 KHz - 2472000 KHz @ 40000 KHz), (300 mBi, 2000
-mBm)<
-cfg80211:   (2457000 KHz - 2482000 KHz @ 20000 KHz), (300 mBi, 2000
-mBm)P@
-cfg80211:   (2474000 KHz - 2494000 KHz @ 20000 KHz), (300 mBi, 2000 mBm)
-cfg80211:   (5170000 KHz - 5250000 KHz @ 40000 KHz), (300 mBi, 2000 mBm)
-cfg80211:   (5735000 KHz - 5835000 KHz @ 40000 KHz), (300 mBi, 2000 mBm)
-general protection fault: 0000 [#1] PREEMPT SMP 
-Modules linked in: hidp af_packet bnep rfcomm iwl3945
-snd_hda_codec_realtek iwlegacy mac80211 snd_hda_intel nfsd btusb
-snd_hda_codec uvcvideo snd_hwdep videobuf2_core snd_pcm bluetooth
-videobuf2_vmalloc videobuf2_memops nfs_acl auth_rpcgss r592 cfg80211
-microcode nfs psmouse memstick serio_raw snd_page_alloc ene_ir battery
-ac lockd sunrpc rc_lirc ir_lirc_codec lirc_dev ir_rc6_decoder
-firewire_net iTCO_wdt firewire_sbp2 nouveau ttm drm_kms_helper mxm_wmi
-usb_storage video wmi uhci_hcd sdhci_pci firewire_ohci firewire_core
-sdhci mmc_core atkbd ehci_hcd thermal [last unloaded: tg3]
-CPU 0 
-Pid: 3512, comm: bluetoothd Not tainted 3.6.0-rc5+ #34 Acer       Aspire
-5720     /Nettiling?b
-RIP: 0010:[<ffffffffa03a1d56>]  [<ffffffffa03a1d56>] l2cap_chan_destroy
-+0x46/0xb0 [bluetooth]
-RSP: 0018:ffff8800619dbca8  EFLAGS: 00010296
-RAX: dead000000200200 RBX: ffff88007d3f1000 RCX: dead000000100100
-RDX: dead000000100100 RSI: dead000000200200 RDI: ffffffffa03b7cc0
-RBP: ffff8800619dbcb8 R08: 0000000000000000 R09: 0000000000000000
-R10: 0001cc0f349b43de R11: ffffffffa03a1d2d R12: ffff88007d3f1000
-R13: ffff88007d3f1014 R14: ffff88005f922570 R15: ffff88005f9229e0
-FS:  00007f8aa4634740(0000) GS:ffff88007fa00000(0000)
-knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f8aa46b7d90 CR3: 000000005f945000 CR4: 00000000000007f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-Process bluetoothd (pid: 3512, threadinfo ffff8800619da000, task
-ffff88005ec4bde0)
-Stack:
-ffff8800619dbcd8 ffff880079945800 ffff8800619dbcd8 ffffffffa03a7b3c
-ffff88007d3f1000 ffff88005f922800 ffff8800619dbce8 ffffffffa03a7b85
-ffff8800619dbd48 ffffffffa03a231e ffff88007d3f14a0 ffff88005f9229f0
-Call Trace:
-[<ffffffffa03a7b3c>] l2cap_sock_kill+0x7c/0xb0 [bluetooth]
-[<ffffffffa03a7b85>] l2cap_sock_close_cb+0x15/0x20 [bluetooth]
-[<ffffffffa03a231e>] l2cap_conn_del+0x11e/0x1f0 [bluetooth]
-[<ffffffffa038301a>] ? hci_dev_do_close+0x18a/0x370 [bluetooth]
-[<ffffffffa03a6db3>] l2cap_disconn_cfm+0x53/0x60 [bluetooth]
-[<ffffffffa0388c55>] hci_conn_hash_flush+0x95/0x100 [bluetooth]
-[<ffffffffa038302a>] hci_dev_do_close+0x19a/0x370 [bluetooth]
-[<ffffffffa0384af0>] hci_dev_close+0x50/0x80 [bluetooth]
-[<ffffffffa039af3a>] hci_sock_ioctl+0x15a/0x420 [bluetooth]
-[<ffffffff8144c6e0>] sock_do_ioctl+0x30/0x60
-[<ffffffff8105f3e0>] ? task_work_run+0x30/0xa0
-[<ffffffff8144d570>] sock_ioctl+0x290/0x2b0
-[<ffffffff81147f20>] do_vfs_ioctl+0x580/0x5e0
-[<ffffffff8151630b>] ? _raw_spin_unlock_irq+0x3b/0x60
-[<ffffffff81147fcf>] sys_ioctl+0x4f/0x80
-[<ffffffff81517016>] system_call_fastpath+0x1a/0x1f
-Code: 17 e1 48 8b 93 80 04 00 00 48 b9 00 01 10 00 00 00 ad de 48 8b 83
-88 04 00 00 48 c7 c7 c0 7c 3b a0 48 be 00 02 20 00 00 00 ad de <48> 89
-42 08 48 89 10 48 89 8b 80 04 00 00 48 89 b3 88 04 00 00 
-"RIP  [<ffffffffa03a1d56>] l2cap_chan_destroy+0x46/0xb0 [bluetooth]
-RSP <ffff8800619dbca8>
----[ end trace 6e537072816e99b2 ]---+qZ
-Kernel panic - not syncing: Fatal exception
-fpanic occurred, switching back to text console
-Rebooting in 10 seconds..
-ACPI MEMORY or I/O RESET_REG.
+In hcidump, the error was the attribute for handle 0x0039. How I can
+respond to that request if the I did not receive the said handle?
 
+
+Regards,
+
+John
+
+
+
+On Thu, Sep 13, 2012 at 1:18 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi John,
+>
+> On Thu, Sep 13, 2012 at 4:11 PM, John Tobias <john.tobias.ph@gmail.com> wrote:
+>> Hi Anderson,
+>>
+>> If I add a simple GATT/GAP server on gatttool, should I still use the
+>> DBUS to listen or I can communicate directly to the kernel?.
+>
+> You either talk to bluetoothd (using D-Bus, like those test-* python
+> scripts do), which will handle connections for you, or you talk
+> directly to kernel using bluetooth socket (like gatttool does). You
+> have more flexibility talking to the kernel directly, but your app
+> will not be interoperable with other apps running at the same time,
+> specially if they try to call connect() at the same time (one of them
+> will get a EBUSY error).
+>
+> Using D-Bus, on the other hand, bluetoothd queues the connections properly.
+>
+> So you should use what is more appropriate for your use case.
+>
+> Best Regards,
+> --
+> Anderson Lizardo
+> Instituto Nokia de Tecnologia - INdT
+> Manaus - Brazil
