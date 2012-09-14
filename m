@@ -1,76 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Philipp Claves <claves@budelmann-elektronik.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Connecting to Bluetooth Low Energy devices
-Date: Fri, 14 Sep 2012 10:55:58 +0200
-Message-ID: <6387889.teEb9JopTL@arawn>
-In-Reply-To: <CAJdJm_MY_TZqay8L0=qOXy3kFkM4RMsXgRKKh1nK7ukokB7WqA@mail.gmail.com>
-References: <67399724.T38U7nJAul@arawn> <CAJdJm_MY_TZqay8L0=qOXy3kFkM4RMsXgRKKh1nK7ukokB7WqA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+In-Reply-To: <5052519F.30803@butterbrot.org>
+References: <5050F5A9.5090401@butterbrot.org>
+	<CANq1E4RYuVy2b1GD2E4MsErbkGZgD6gnDaYeDmyWyYnKaze0Jg@mail.gmail.com>
+	<ed6fbaf1-1410-4539-a36e-1d6d6f6220b5@email.android.com>
+	<CANq1E4RmacRAkTVtRt2JH_+V=qn1AH3iJWZZS_LCqmj_yt4DoQ@mail.gmail.com>
+	<CANq1E4S70tqhTG7PTMj5cHp45NLO9g4n1eLVaHJMuDZx1KMYjg@mail.gmail.com>
+	<5052519F.30803@butterbrot.org>
+Date: Fri, 14 Sep 2012 02:02:21 -0700
+Message-ID: <CANq1E4TRWGTdpiXsrR3uUp+n1jtptRnSaOp++LBKqyiRM0=eGg@mail.gmail.com>
+Subject: Re: Wii Balance Board vs. bluez
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: Florian Echtler <floe@butterbrot.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson
+Hi Florian
 
-On Thu, Sep 13, 2012 at 12:54:26, Anderson Lizardo wrote:
-> Hi Philipp,
-> 
-> On Thu, Sep 13, 2012 at 11:34 AM, Philipp Claves
-> 
-> <claves@budelmann-elektronik.com> wrote:
-> > Hello
-> > 
-> > Trying  to get started with Bluetooth Low Energy devices, i used hcitool
-> > and gatttool to enumerate device attributes, but did not get far:
-> > 
-> > # hcitool lescan
-> > LE Scan ...
-> > <MAC-Device1> Battery V1.0
-> > <MAC-Device1> (unknown)
-> > <MAC-Device2> Battery V1.0
-> > <MAC-Device2> (unknown)
-> > ^C
-> > 
-> > # gatttool -b <MAC-Device1> -I
-> > [   ][<MAC-Device1>][LE]> connect
-> > Connecting... connect error: connect error: Connection refused (111)
-> > [   ][<MAC-Device1>][LE]>
-> > 
-> > This is all i get.
-> 
-> Which kernel version are you running?
-Linux 3.5.3
-Which is the minimum version required?
+On Thu, Sep 13, 2012 at 2:35 PM, Florian Echtler <floe@butterbrot.org> wrote:
+> On 13.09.2012 16:39, David Herrmann wrote:
+>>>
+>>> Please see the appended patch. You have to apply it to your kernel
+>>> tree and recompile the hid-wiimote driver. No other sources are
+>>> changed so you don't need to reboot or install the new kernel. Just
+>>> install the new hid-wiimote.ko module.
+>>>
+>>> One of the 5 input devices should then report the wiimote weight
+>>> sensor data. (the input device with name "Wii Remote Balance Board").
+>>
+>> Forgot to attach the patch... Here it is.
+>
+> Awesome - works as expected, weight sensor data can be read from one of the
+> event devices.
 
-> 
-> > Am i doing something obviously wrong?
-> > Any tips where to get more information about the error (dmesg shows
-> > nothing)?
-> run "hcidump -X" and check the logs while you run "hcitool lescan".
-> Then check the type of advertising those devices are sending. They
-> should be connectable advertisings to be able to connect to them. Also
-> check the address type, if it is "Random" you need to pass "-t random"
-> to gatttool.
+Good to hear. I hate writing drivers for devices I don't have...
+Thanks for testing!
 
-Thanks, -t random did the trick.
-But it's still strange, the device addresses never changed even once while 
-working with them. The bluetooth SIG talk about LE adresses mentioned random 
-adresses to change every 15 minutes or so....
-I need to investigate this more.
+> I've attached an additional patch on top of yours to also read the
+> calibration data (24 bytes at address 0xa40024). Calibration data is applied
+> in handler_balance_board, resulting values are in units of 10 grams.
+> Although this looks correct to me, I'm not getting any events with my patch
+> applied - I suspect some connection to the min/max input values. Do you have
+> any ideas what's wrong?
 
-Thanks for your help!
+Ah, yeah I forgot to change the min/max values of ABS_HAT**. I will
+fix that. The calibration data looks also nice. I have no idea what
+went wrong, but you should definitely initialize it to some sane value
+and fallback to this if you cannot read the data from the device. I
+would also like to split this into two patches. The first one without
+calibration and the second one applies the calibration data.
 
+I will try to resend these this afternoon, otherwise, I will not have
+time until Sunday afternoon. Sorry.
 
-Philipp Claves
--- 
-Budelmann Elektronik GmbH
-Von-Renesse-Weg 60
-48163 Münster
-Germany
-
-Tel.  +49 (0)2501 9208440
-Fax   +49 (0)2501 5887024
-claves@budelmann-elektronik.com
-www.budelmann-elektronik.com
+Thanks for the efforts!
+David
