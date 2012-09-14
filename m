@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v4 4/9] media: Replace transport->in_use flag with state
-Date: Fri, 14 Sep 2012 14:03:11 +0200
-Message-Id: <1347624196-11281-5-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v4 6/9] media: Split transport state based on playing flag
+Date: Fri, 14 Sep 2012 14:03:13 +0200
+Message-Id: <1347624196-11281-7-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1347624196-11281-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1347624196-11281-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,199 +12,185 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Refactor the code to use a enum type to represent the transport state.
-This should scale better when additional states need to be represented.
+Split the transport states (formerly in_use) into more specific states
+where the stream state (playing or suspended) is explicitly represented,
+along with the transitional states (locally initiated suspend and
+resume).
 
-A helper function has been added to help track the mapping between the
-enum type and the old in_use flag.
+TRANSPORT_STATE_ACTIVE is an exception since it also includes the state
+where the transport is acquired, but the audio was later suspended (not
+released yet though).
 ---
- audio/transport.c |   77 ++++++++++++++++++++++++++++++++++++++++-------------
- 1 files changed, 58 insertions(+), 19 deletions(-)
+ audio/transport.c |   62 ++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 files changed, 54 insertions(+), 8 deletions(-)
 
 diff --git a/audio/transport.c b/audio/transport.c
-index d418878..410601f 100644
+index 639c87f..e0402ad 100644
 --- a/audio/transport.c
 +++ b/audio/transport.c
-@@ -54,6 +54,16 @@ typedef enum {
- 	TRANSPORT_LOCK_WRITE = 1 << 1,
+@@ -57,13 +57,19 @@ typedef enum {
  } transport_lock_t;
  
-+typedef enum {
-+	TRANSPORT_STATE_IDLE,		/* Not acquired */
-+	TRANSPORT_STATE_ACTIVE,		/* Acquired (not necessarily playing) */
-+} transport_state_t;
-+
-+static char *str_state[] = {
-+	"TRANSPORT_STATE_IDLE",
-+	"TRANSPORT_STATE_ACTIVE",
-+};
-+
+ typedef enum {
+-	TRANSPORT_STATE_IDLE,		/* Not acquired */
++	TRANSPORT_STATE_IDLE,		/* Not acquired and suspended */
++	TRANSPORT_STATE_PENDING,	/* Playing but not acquired */
++	TRANSPORT_STATE_REQUESTING,	/* Acquire in progress */
+ 	TRANSPORT_STATE_ACTIVE,		/* Acquired (not necessarily playing) */
++	TRANSPORT_STATE_SUSPENDING,     /* Release in progress */
+ } transport_state_t;
+ 
+ static char *str_state[] = {
+ 	"TRANSPORT_STATE_IDLE",
++	"TRANSPORT_STATE_PENDING",
++	"TRANSPORT_STATE_REQUESTING",
+ 	"TRANSPORT_STATE_ACTIVE",
++	"TRANSPORT_STATE_SUSPENDING",
+ };
+ 
  struct media_request {
- 	DBusMessage		*msg;
- 	guint			id;
-@@ -90,7 +100,7 @@ struct media_transport {
- 	uint16_t		imtu;		/* Transport input mtu */
- 	uint16_t		omtu;		/* Transport output mtu */
- 	transport_lock_t	lock;
--	gboolean		in_use;
-+	transport_state_t	state;
- 	guint			(*resume) (struct media_transport *transport,
- 					struct media_owner *owner);
- 	guint			(*suspend) (struct media_transport *transport,
-@@ -133,6 +143,32 @@ static transport_lock_t str2lock(const char *str)
- 	return lock;
- }
- 
-+static gboolean state_in_use(transport_state_t state)
-+{
-+	switch (state) {
-+	case TRANSPORT_STATE_IDLE:
-+		return FALSE;
-+	case TRANSPORT_STATE_ACTIVE:
-+		return TRUE;
-+	}
-+
-+	return FALSE;
-+}
-+
-+static void transport_set_state(struct media_transport *transport,
-+							transport_state_t state)
-+{
-+	transport_state_t old_state = transport->state;
-+
-+	if (old_state == state)
-+		return;
-+
-+	transport->state = state;
-+
-+	DBG("State changed %s: %s -> %s", transport->path, str_state[old_state],
-+							str_state[state]);
-+}
-+
- void media_transport_destroy(struct media_transport *transport)
+@@ -153,8 +159,11 @@ static gboolean state_in_use(transport_state_t state)
  {
- 	char *path;
-@@ -240,7 +276,7 @@ static void media_transport_remove(struct media_transport *transport,
- 	media_owner_free(owner);
- 
- 	/* Suspend if there is no longer any owner */
--	if (transport->owners == NULL && transport->in_use)
-+	if (transport->owners == NULL && state_in_use(transport->state))
- 		transport->suspend(transport, NULL);
- }
- 
-@@ -322,13 +358,14 @@ static guint resume_a2dp(struct media_transport *transport,
- 			return 0;
+ 	switch (state) {
+ 	case TRANSPORT_STATE_IDLE:
++	case TRANSPORT_STATE_PENDING:
+ 		return FALSE;
++	case TRANSPORT_STATE_REQUESTING:
+ 	case TRANSPORT_STATE_ACTIVE:
++	case TRANSPORT_STATE_SUSPENDING:
+ 		return TRUE;
  	}
  
--	if (transport->in_use == TRUE)
-+	if (state_in_use(transport->state))
- 		goto done;
+@@ -356,6 +365,8 @@ static void a2dp_resume_complete(struct avdtp *session,
  
--	transport->in_use = a2dp_sep_lock(sep, a2dp->session);
--	if (transport->in_use == FALSE)
-+	if (a2dp_sep_lock(sep, a2dp->session) == FALSE)
- 		return 0;
+ 	media_owner_remove(owner);
  
 +	transport_set_state(transport, TRANSPORT_STATE_ACTIVE);
 +
+ 	return;
+ 
+ fail:
+@@ -382,7 +393,8 @@ static guint resume_a2dp(struct media_transport *transport,
+ 	if (a2dp_sep_lock(sep, a2dp->session) == FALSE)
+ 		return 0;
+ 
+-	transport_set_state(transport, TRANSPORT_STATE_ACTIVE);
++	if (transport->state == TRANSPORT_STATE_IDLE)
++		transport_set_state(transport, TRANSPORT_STATE_REQUESTING);
+ 
  done:
  	return a2dp_resume(a2dp->session, sep, a2dp_resume_complete, owner);
- }
-@@ -349,7 +386,7 @@ static void a2dp_suspend_complete(struct avdtp *session,
- 	}
- 
- 	a2dp_sep_unlock(sep, a2dp->session);
--	transport->in_use = FALSE;
-+	transport_set_state(transport, TRANSPORT_STATE_IDLE);
- 	media_transport_remove(transport, owner);
- }
- 
-@@ -362,7 +399,7 @@ static guint suspend_a2dp(struct media_transport *transport,
+@@ -417,7 +429,12 @@ static guint suspend_a2dp(struct media_transport *transport,
  
  	if (!owner) {
  		a2dp_sep_unlock(sep, a2dp->session);
--		transport->in_use = FALSE;
-+		transport_set_state(transport, TRANSPORT_STATE_IDLE);
+-		transport_set_state(transport, TRANSPORT_STATE_IDLE);
++
++		if (a2dp_sep_is_playing(sep))
++			transport_set_state(transport, TRANSPORT_STATE_PENDING);
++		else
++			transport_set_state(transport, TRANSPORT_STATE_IDLE);
++
  		return 0;
  	}
  
-@@ -424,14 +461,15 @@ static guint resume_headset(struct media_transport *transport,
- {
- 	struct audio_device *device = transport->device;
+@@ -468,6 +485,8 @@ static void headset_resume_complete(struct audio_device *dev, void *user_data)
  
--	if (transport->in_use == TRUE)
-+	if (state_in_use(transport->state))
- 		goto done;
- 
--	transport->in_use = headset_lock(device, HEADSET_LOCK_READ |
--						HEADSET_LOCK_WRITE);
--	if (transport->in_use == FALSE)
-+	if (headset_lock(device, HEADSET_LOCK_READ |
-+						HEADSET_LOCK_WRITE) == FALSE)
- 		return 0;
+ 	media_owner_remove(owner);
  
 +	transport_set_state(transport, TRANSPORT_STATE_ACTIVE);
 +
+ 	return;
+ 
+ fail:
+@@ -486,7 +505,8 @@ static guint resume_headset(struct media_transport *transport,
+ 						HEADSET_LOCK_WRITE) == FALSE)
+ 		return 0;
+ 
+-	transport_set_state(transport, TRANSPORT_STATE_ACTIVE);
++	if (transport->state == TRANSPORT_STATE_IDLE)
++		transport_set_state(transport, TRANSPORT_STATE_REQUESTING);
+ 
  done:
  	return headset_request_stream(device, headset_resume_complete,
- 					owner);
-@@ -450,7 +488,7 @@ static void headset_suspend_complete(struct audio_device *dev, void *user_data)
- 	}
- 
- 	headset_unlock(dev, HEADSET_LOCK_READ | HEADSET_LOCK_WRITE);
--	transport->in_use = FALSE;
-+	transport_set_state(transport, TRANSPORT_STATE_IDLE);
- 	media_transport_remove(transport, owner);
- }
- 
-@@ -461,7 +499,7 @@ static guint suspend_headset(struct media_transport *transport,
- 
- 	if (!owner) {
- 		headset_unlock(device, HEADSET_LOCK_READ | HEADSET_LOCK_WRITE);
--		transport->in_use = FALSE;
-+		transport_set_state(transport, TRANSPORT_STATE_IDLE);
- 		return 0;
- 	}
- 
-@@ -529,14 +567,15 @@ static guint resume_gateway(struct media_transport *transport,
- {
+@@ -516,8 +536,15 @@ static guint suspend_headset(struct media_transport *transport,
  	struct audio_device *device = transport->device;
  
--	if (transport->in_use == TRUE)
-+	if (state_in_use(transport->state))
- 		goto done;
- 
--	transport->in_use = gateway_lock(device, GATEWAY_LOCK_READ |
--						GATEWAY_LOCK_WRITE);
--	if (transport->in_use == FALSE)
-+	if (gateway_lock(device, GATEWAY_LOCK_READ |
-+						GATEWAY_LOCK_WRITE) == FALSE)
+ 	if (!owner) {
++		headset_state_t state = headset_get_state(device);
++
+ 		headset_unlock(device, HEADSET_LOCK_READ | HEADSET_LOCK_WRITE);
+-		transport_set_state(transport, TRANSPORT_STATE_IDLE);
++
++		if (state == HEADSET_STATE_PLAYING)
++			transport_set_state(transport, TRANSPORT_STATE_PENDING);
++		else
++			transport_set_state(transport, TRANSPORT_STATE_IDLE);
++
  		return 0;
+ 	}
+ 
+@@ -574,6 +601,8 @@ static void gateway_resume_complete(struct audio_device *dev, GError *err,
+ 
+ 	media_owner_remove(owner);
  
 +	transport_set_state(transport, TRANSPORT_STATE_ACTIVE);
 +
+ 	return;
+ 
+ fail:
+@@ -592,7 +621,8 @@ static guint resume_gateway(struct media_transport *transport,
+ 						GATEWAY_LOCK_WRITE) == FALSE)
+ 		return 0;
+ 
+-	transport_set_state(transport, TRANSPORT_STATE_ACTIVE);
++	if (transport->state == TRANSPORT_STATE_IDLE)
++		transport_set_state(transport, TRANSPORT_STATE_REQUESTING);
+ 
  done:
  	return gateway_request_stream(device, gateway_resume_complete,
- 					owner);
-@@ -556,7 +595,7 @@ static gboolean gateway_suspend_complete(gpointer user_data)
- 	}
- 
- 	gateway_unlock(device, GATEWAY_LOCK_READ | GATEWAY_LOCK_WRITE);
--	transport->in_use = FALSE;
-+	transport_set_state(transport, TRANSPORT_STATE_IDLE);
- 	media_transport_remove(transport, owner);
- 	return FALSE;
- }
-@@ -569,7 +608,7 @@ static guint suspend_gateway(struct media_transport *transport,
+@@ -625,8 +655,15 @@ static guint suspend_gateway(struct media_transport *transport,
+ 	static int id = 1;
  
  	if (!owner) {
++		gateway_state_t state = gateway_get_state(device);
++
  		gateway_unlock(device, GATEWAY_LOCK_READ | GATEWAY_LOCK_WRITE);
--		transport->in_use = FALSE;
-+		transport_set_state(transport, TRANSPORT_STATE_IDLE);
+-		transport_set_state(transport, TRANSPORT_STATE_IDLE);
++
++		if (state == GATEWAY_STATE_PLAYING)
++			transport_set_state(transport, TRANSPORT_STATE_PENDING);
++		else
++			transport_set_state(transport, TRANSPORT_STATE_IDLE);
++
  		return 0;
  	}
  
+@@ -806,6 +843,8 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
+ 				return btd_error_in_progress(msg);
+ 		}
+ 
++		transport_set_state(transport, TRANSPORT_STATE_SUSPENDING);
++
+ 		id = transport->suspend(transport, owner);
+ 		if (id == 0) {
+ 			media_transport_remove(transport, owner);
+@@ -1104,7 +1143,14 @@ static void headset_nrec_changed(struct audio_device *dev, gboolean nrec,
+ static void transport_update_playing(struct media_transport *transport,
+ 							gboolean playing)
+ {
+-	DBG("%s Playing=%d", transport->path, playing);
++	DBG("%s State=%s Playing=%d", transport->path,
++					str_state[transport->state], playing);
++
++	if (playing == FALSE) {
++		if (transport->state == TRANSPORT_STATE_PENDING)
++			transport_set_state(transport, TRANSPORT_STATE_IDLE);
++	} else if (transport->state == TRANSPORT_STATE_IDLE)
++		transport_set_state(transport, TRANSPORT_STATE_PENDING);
+ }
+ 
+ static void headset_state_changed(struct audio_device *dev,
 -- 
 1.7.7.6
 
