@@ -1,56 +1,179 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1347031233-21621-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1347031233-21621-1-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Fri, 14 Sep 2012 15:11:24 +0300
-Message-ID: <CABBYNZ+YLJhfOkS0LtW4U8ag+mQeN9jkGg7=Pt9Z-R2Xt7d7KQ@mail.gmail.com>
-Subject: Re: [RFC v3 0/9] Optional acquire in Media API and related
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=US-ASCII
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [RFC v4 5/9] media: Watch interface state changes in transport
+Date: Fri, 14 Sep 2012 14:03:12 +0200
+Message-Id: <1347624196-11281-6-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1347624196-11281-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1347624196-11281-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-On Fri, Sep 7, 2012 at 6:20 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> This patchset addresses the same problems as before (optional acquire race condition, see patch v3 9/9) along with the symmetric "optional release" problem as described in patch v3 8/9. The solution in this second case consists of exposing the transport state in D-Bus, as discussed in the IRC.
->
-> From original patch:
->
-> This patch reopens the discussion started by the thread "when is acquire
-> ok to call". The race condition seems to be real (even thought difficult
-> to reproduce), and I couldn't think of any approach to solve this
-> without altering the Media API.
->
-> Mikel Astiz (9):
->   media: Fix accesstype comparison
->   media: Add a2dp_sep_is_playing() to internal API
->   media: Add gateway_get_state() to internal API
->   media: Replace transport->in_use flag with state
->   media: Watch interface state changes in transport
->   media: Split transport state based on playing flag
->   media: Automatically release transport when HUP
->   media: Expose transport state in D-Bus
->   media: Extend media API with optional acquire
->
->  audio/a2dp.c      |    8 +
->  audio/a2dp.h      |    1 +
->  audio/gateway.c   |    7 +
->  audio/gateway.h   |    1 +
->  audio/transport.c |  390 +++++++++++++++++++++++++++++++++++++++++++----------
->  doc/media-api.txt |   19 +++
->  6 files changed, 356 insertions(+), 70 deletions(-)
->
-> --
-> 1.7.7.6
+Install watches to keep track whether the audio is streaming or not.
+This should be relevant if the transport needs to reflect this state.
+---
+ audio/transport.c |  103 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 103 insertions(+), 0 deletions(-)
 
-Patches 1-5 are now upstream, thanks.
-
-
+diff --git a/audio/transport.c b/audio/transport.c
+index 410601f..639c87f 100644
+--- a/audio/transport.c
++++ b/audio/transport.c
+@@ -45,6 +45,8 @@
+ #include "a2dp.h"
+ #include "headset.h"
+ #include "gateway.h"
++#include "sink.h"
++#include "source.h"
+ #include "avrcp.h"
+ 
+ #define MEDIA_TRANSPORT_INTERFACE "org.bluez.MediaTransport"
+@@ -101,6 +103,10 @@ struct media_transport {
+ 	uint16_t		omtu;		/* Transport output mtu */
+ 	transport_lock_t	lock;
+ 	transport_state_t	state;
++	guint			hs_watch;
++	guint			ag_watch;
++	guint			source_watch;
++	guint			sink_watch;
+ 	guint			(*resume) (struct media_transport *transport,
+ 					struct media_owner *owner);
+ 	guint			(*suspend) (struct media_transport *transport,
+@@ -173,6 +179,18 @@ void media_transport_destroy(struct media_transport *transport)
+ {
+ 	char *path;
+ 
++	if (transport->hs_watch)
++		headset_remove_state_cb(transport->hs_watch);
++
++	if (transport->ag_watch)
++		gateway_remove_state_cb(transport->ag_watch);
++
++	if (transport->sink_watch)
++		sink_remove_state_cb(transport->sink_watch);
++
++	if (transport->source_watch)
++		source_remove_state_cb(transport->source_watch);
++
+ 	path = g_strdup(transport->path);
+ 	g_dbus_unregister_interface(transport->conn, path,
+ 						MEDIA_TRANSPORT_INTERFACE);
+@@ -1083,6 +1101,76 @@ static void headset_nrec_changed(struct audio_device *dev, gboolean nrec,
+ 				DBUS_TYPE_BOOLEAN, &nrec);
+ }
+ 
++static void transport_update_playing(struct media_transport *transport,
++							gboolean playing)
++{
++	DBG("%s Playing=%d", transport->path, playing);
++}
++
++static void headset_state_changed(struct audio_device *dev,
++						headset_state_t old_state,
++						headset_state_t new_state,
++						void *user_data)
++{
++	struct media_transport *transport = user_data;
++
++	if (dev != transport->device)
++		return;
++
++	if (new_state == HEADSET_STATE_PLAYING)
++		transport_update_playing(transport, TRUE);
++	else
++		transport_update_playing(transport, FALSE);
++}
++
++static void gateway_state_changed(struct audio_device *dev,
++						gateway_state_t old_state,
++						gateway_state_t new_state,
++						void *user_data)
++{
++	struct media_transport *transport = user_data;
++
++	if (dev != transport->device)
++		return;
++
++	if (new_state == GATEWAY_STATE_PLAYING)
++		transport_update_playing(transport, TRUE);
++	else
++		transport_update_playing(transport, FALSE);
++}
++
++static void sink_state_changed(struct audio_device *dev,
++						sink_state_t old_state,
++						sink_state_t new_state,
++						void *user_data)
++{
++	struct media_transport *transport = user_data;
++
++	if (dev != transport->device)
++		return;
++
++	if (new_state == SINK_STATE_PLAYING)
++		transport_update_playing(transport, TRUE);
++	else
++		transport_update_playing(transport, FALSE);
++}
++
++static void source_state_changed(struct audio_device *dev,
++						source_state_t old_state,
++						source_state_t new_state,
++						void *user_data)
++{
++	struct media_transport *transport = user_data;
++
++	if (dev != transport->device)
++		return;
++
++	if (new_state == SOURCE_STATE_PLAYING)
++		transport_update_playing(transport, TRUE);
++	else
++		transport_update_playing(transport, FALSE);
++}
++
+ struct media_transport *media_transport_create(DBusConnection *conn,
+ 						struct media_endpoint *endpoint,
+ 						struct audio_device *device,
+@@ -1118,6 +1206,15 @@ struct media_transport *media_transport_create(DBusConnection *conn,
+ 		transport->set_property = set_property_a2dp;
+ 		transport->data = a2dp;
+ 		transport->destroy = destroy_a2dp;
++
++		if (strcasecmp(uuid, A2DP_SOURCE_UUID) == 0)
++			transport->sink_watch = sink_add_state_cb(
++							sink_state_changed,
++							transport);
++		else
++			transport->source_watch = source_add_state_cb(
++							source_state_changed,
++							transport);
+ 	} else if (strcasecmp(uuid, HFP_AG_UUID) == 0 ||
+ 			strcasecmp(uuid, HSP_AG_UUID) == 0) {
+ 		struct headset_transport *headset;
+@@ -1135,6 +1232,9 @@ struct media_transport *media_transport_create(DBusConnection *conn,
+ 		transport->set_property = set_property_headset;
+ 		transport->data = headset;
+ 		transport->destroy = destroy_headset;
++		transport->hs_watch = headset_add_state_cb(
++							headset_state_changed,
++							transport);
+ 	} else if (strcasecmp(uuid, HFP_HS_UUID) == 0 ||
+ 			strcasecmp(uuid, HSP_HS_UUID) == 0) {
+ 		transport->resume = resume_gateway;
+@@ -1142,6 +1242,9 @@ struct media_transport *media_transport_create(DBusConnection *conn,
+ 		transport->cancel = cancel_gateway;
+ 		transport->get_properties = get_properties_gateway;
+ 		transport->set_property = set_property_gateway;
++		transport->ag_watch = gateway_add_state_cb(
++							gateway_state_changed,
++							transport);
+ 	} else
+ 		goto fail;
+ 
 -- 
-Luiz Augusto von Dentz
+1.7.7.6
+
