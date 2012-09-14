@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v5 4/4] media: Extend media API with optional acquire
-Date: Fri, 14 Sep 2012 14:56:00 +0200
-Message-Id: <1347627360-13997-5-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v5 2/4] media: Expose transport state in D-Bus
+Date: Fri, 14 Sep 2012 14:55:58 +0200
+Message-Id: <1347627360-13997-3-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1347627360-13997-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1347627360-13997-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,78 +12,121 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Acquiring a transport is needed in two different situations: either
-we are initiating the audio stream locally, or the remote side initiated
-it and thus we are just reacting. In the second case, we would expect
-the stream is already available, and otherwise the operation should
-fail. This means the media API needs to be extended in order to make
-this difference.
+Extend the Media API to expose the transport state in D-Bus, as a
+property of the transport. This way the clients do not have to find
+out which is the corresponding profile-specific interface for the
+transport.
 
-This issue is specially relevant in the case of SCO, because the current
-approach is racy. With HFP, for example (say BlueZ has the HS role), the
-following race condition could be met:
+Additionally, this state along with the automatic release of transports
+will allow clients to avoid the "optional release" or "accept remote
+release" race condition. For example, with HSP/HFP profiles, the problem
+is the following:
 
-1. Phone has an incoming call and thus starts in-band ringing.
-2. SCO connection is accepted and stablished by BlueZ.
-3. Gateway interface state is changed to Playing.
-4. Exactly afterwards, the user routes the audio to the phone, to have
-   a private conversation. So the SCO link is closed.
-5. In parallel, PulseAudio sees the transition to Playing, and acquires
-   the transport.
-6. BlueZ receives an Acquire() request, but SCO is down. So it tries to
-   reconnect the SCO link.
+1. User suspends SCO in the remote end.
+2. BlueZ signals the Playing->Connected state change in D-Bus.
+3. Exactly afterwards, the user resumes SCO in the remote end.
+4. In parallel, PulseAudio sees the aforementioned transition to
+   Connected, and thus releases the transport.
+5. BlueZ receives a Release() request while SCO is up. So the audio
+   stream will be suspended.
 
-The last step is an undesired behavior (the audio is routed back to the
-car). BlueZ should be smart enough to know that the SCO connection
-shouldn't be reestablished, but this is only possible if the endpoint
-provides additional information in the media API.
+The last step is an undesired behavior since the user explicitly wanted
+to route the audio stream through Bluetooth.
 
-Note that the API change introduced by this patch is backward
-compatible, meaning that older versions of BlueZ will just ignore the
-flag. So clients are encouraged to use it without necessarily adding a
-dependency to newer versions of BlueZ.
+The issue is difficult to reproduce but it can easily be solved by
+exposing the transport state in D-Bus.
 ---
- audio/transport.c |    4 ++++
- doc/media-api.txt |   11 +++++++++++
- 2 files changed, 15 insertions(+), 0 deletions(-)
+ audio/transport.c |   29 +++++++++++++++++++++++++++++
+ doc/media-api.txt |    8 ++++++++
+ 2 files changed, 37 insertions(+), 0 deletions(-)
 
 diff --git a/audio/transport.c b/audio/transport.c
-index 4653cc7..cc9c56f 100644
+index e0402ad..742cc72 100644
 --- a/audio/transport.c
 +++ b/audio/transport.c
-@@ -807,6 +807,10 @@ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
- 	if (lock == 0)
- 		return btd_error_invalid_args(msg);
+@@ -155,6 +155,22 @@ static transport_lock_t str2lock(const char *str)
+ 	return lock;
+ }
  
-+	if (transport->state != TRANSPORT_STATE_PENDING &&
-+				g_strstr_len(accesstype, -1, "?") != NULL)
-+		return btd_error_failed(msg, "Transport not playing");
++static const char *state2str(transport_state_t state)
++{
++	switch (state) {
++	case TRANSPORT_STATE_IDLE:
++	case TRANSPORT_STATE_REQUESTING:
++		return "idle";
++	case TRANSPORT_STATE_PENDING:
++		return "pending";
++	case TRANSPORT_STATE_ACTIVE:
++	case TRANSPORT_STATE_SUSPENDING:
++		return "active";
++	}
 +
- 	if (media_transport_acquire(transport, lock) == FALSE)
- 		return btd_error_not_authorized(msg);
++	return NULL;
++}
++
+ static gboolean state_in_use(transport_state_t state)
+ {
+ 	switch (state) {
+@@ -174,6 +190,7 @@ static void transport_set_state(struct media_transport *transport,
+ 							transport_state_t state)
+ {
+ 	transport_state_t old_state = transport->state;
++	const char *str;
+ 
+ 	if (old_state == state)
+ 		return;
+@@ -182,6 +199,13 @@ static void transport_set_state(struct media_transport *transport,
+ 
+ 	DBG("State changed %s: %s -> %s", transport->path, str_state[old_state],
+ 							str_state[state]);
++
++	str = state2str(state);
++
++	if (g_strcmp0(str, state2str(old_state)) != 0)
++		emit_property_changed(transport->conn, transport->path,
++					MEDIA_TRANSPORT_INTERFACE, "State",
++					DBUS_TYPE_STRING, &str);
+ }
+ 
+ void media_transport_destroy(struct media_transport *transport)
+@@ -1017,6 +1041,7 @@ void transport_get_properties(struct media_transport *transport,
+ 	DBusMessageIter dict;
+ 	const char *uuid;
+ 	uint8_t codec;
++	const char *state;
+ 
+ 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+ 			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+@@ -1036,6 +1061,10 @@ void transport_get_properties(struct media_transport *transport,
+ 	dict_append_array(&dict, "Configuration", DBUS_TYPE_BYTE,
+ 				&transport->configuration, transport->size);
+ 
++	/* State */
++	state = state2str(transport->state);
++	dict_append_entry(&dict, "State", DBUS_TYPE_STRING, &state);
++
+ 	if (transport->get_properties)
+ 		transport->get_properties(transport, &dict);
  
 diff --git a/doc/media-api.txt b/doc/media-api.txt
-index da8ef53..b9802d9 100644
+index e5eeaa0..da8ef53 100644
 --- a/doc/media-api.txt
 +++ b/doc/media-api.txt
-@@ -282,6 +282,17 @@ Methods		dict GetProperties()
+@@ -317,6 +317,14 @@ Properties	object Device [readonly]
+ 			Configuration blob, it is used as it is so the size and
+ 			byte order must match.
  
- 				"rw": Read and write access
- 
-+			The accesstype string can also be combined with a "?"
-+			suffix, which will make the request optional. This
-+			typically means the transport will only be acquired if
-+			it is already available (remote-initiated), but
-+			otherwise no request will be sent to the remote side.
-+			In this last case the function will fail. Note that,
-+			due to compatibility issues with older versions of
-+			BlueZ, clients are encouraged to use exactly the same
-+			accesstype for Release(), matching the string provided
-+			to Acquire().
++		string State [readonly]
 +
- 		void Release(string accesstype)
++			Indicates the state of the transport. Possible
++			values are:
++				"idle": not streaming
++				"pending": streaming but not acquired
++				"active": streaming and acquired
++
+ 		uint16 Delay [readwrite]
  
- 			Releases file descriptor.
+ 			Optional. Transport delay in 1/10 of millisecond, this
 -- 
 1.7.7.6
 
