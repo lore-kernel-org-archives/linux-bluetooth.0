@@ -1,64 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1347541403-11780-8-git-send-email-chen.ganir@ti.com>
-References: <1347541403-11780-1-git-send-email-chen.ganir@ti.com>
-	<1347541403-11780-8-git-send-email-chen.ganir@ti.com>
-Date: Fri, 14 Sep 2012 18:15:55 +0200
-Message-ID: <CA+6KyKas1KMg8XZ=Ch52HCnNGiuXGW7X9cWKDNL68R0=bphHqA@mail.gmail.com>
-Subject: Re: [PATCH v2 07/10] battery: Add Battery to device
-From: Andrzej Kaczmarek <andrzejk@gmail.com>
-To: chen.ganir@ti.com
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Syam Sidhardhan <s.syam@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v0 4/4] cups: Free D-Bus error
+Date: Fri, 14 Sep 2012 21:40:11 +0530
+Message-id: <1347639011-22924-4-git-send-email-s.syam@samsung.com>
+In-reply-to: <1347639011-22924-1-git-send-email-s.syam@samsung.com>
+References: <1347639011-22924-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+If D-Bus error is set we should free it.
+---
+ profiles/cups/main.c |    9 +++++++--
+ 1 files changed, 7 insertions(+), 2 deletions(-)
 
-On Thu, Sep 13, 2012 at 3:03 PM,  <chen.ganir@ti.com> wrote:
-> From: Chen Ganir <chen.ganir@ti.com>
->
-> Add/Remove battery from device
-> ---
->  profiles/battery/battery.c |    5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
-> index c368768..3a2e604 100644
-> --- a/profiles/battery/battery.c
-> +++ b/profiles/battery/battery.c
-> @@ -49,6 +49,7 @@ struct battery {
->  static GSList *servers;
->
->  struct characteristic {
-> +       struct btd_battery      *devbatt;       /* device_battery pointer */
->         struct gatt_char        attr;           /* Characteristic */
->         struct battery          *batt;          /* Parent Battery Service */
->         GSList                  *desc;          /* Descriptors */
-> @@ -79,6 +80,8 @@ static void char_free(gpointer user_data)
->
->         g_slist_free_full(c->desc, g_free);
->
-> +       btd_device_remove_battery(c->devbatt);
-> +
->         g_free(c);
->  }
->
-> @@ -228,6 +231,8 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
->
->                         gatt_find_info(batt->attrib, start, end,
->                                                         discover_desc_cb, ch);
-> +
-> +                       ch->devbatt = btd_device_add_battery(ch->batt->dev);
+diff --git a/profiles/cups/main.c b/profiles/cups/main.c
+index a884c6e..5aa927f 100644
+--- a/profiles/cups/main.c
++++ b/profiles/cups/main.c
+@@ -446,8 +446,10 @@ static gboolean list_known_printers(const char *adapter)
+ 
+ 	dbus_message_unref(message);
+ 
+-	if (dbus_error_is_set(&error))
++	if (dbus_error_is_set(&error)) {
++		dbus_error_free(&error);
+ 		return FALSE;
++	}
+ 
+ 	dbus_message_iter_init(reply, &reply_iter);
+ 	if (dbus_message_iter_get_arg_type(&reply_iter) != DBUS_TYPE_ARRAY) {
+@@ -549,8 +551,10 @@ static gboolean list_printers(void)
+ 
+ 	dbus_error_init(&error);
+ 	hcid_exists = dbus_bus_name_has_owner(conn, "org.bluez", &error);
+-	if (dbus_error_is_set(&error))
++	if (dbus_error_is_set(&error)) {
++		dbus_error_free(&error);
+ 		return TRUE;
++	}
+ 
+ 	if (!hcid_exists)
+ 		return TRUE;
+@@ -570,6 +574,7 @@ static gboolean list_printers(void)
+ 	dbus_message_unref(message);
+ 
+ 	if (dbus_error_is_set(&error)) {
++		dbus_error_free(&error);
+ 		dbus_connection_unref(conn);
+ 		/* No adapter */
+ 		return TRUE;
+-- 
+1.7.4.1
 
-This should be done before starting characteristics discovery as
-otherwise Battery won't be registered in case characteristics has no
-descriptors (e.g. most devices which do not support notifications for
-Battery Level and have only one battery).
-
->                 }
->         }
->  }
-
-BR,
-Andrzej
