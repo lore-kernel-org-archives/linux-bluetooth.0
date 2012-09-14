@@ -1,128 +1,163 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 14 Sep 2012 13:29:15 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
-Subject: Re: [PATCHv4 16/17] Bluetooth: A2MP: Add fallback to normal l2cap
- init sequence
-Message-ID: <20120914102913.GG7483@aemeltch-MOBL1>
-References: <alpine.DEB.2.02.1209111121550.3754@mathewm-linux>
- <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1347437192-24694-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <alpine.DEB.2.02.1209130935110.19321@mathewm-linux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.DEB.2.02.1209130935110.19321@mathewm-linux>
+Message-ID: <1347618394.6586.1.camel@maxim-laptop>
+Subject: Re: [PATCH] Bluetooth: Free the l2cap channel list only when
+ refcount is zero
+From: Maxim Levitsky <maximlevitsky@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Cc: Jaganath <jaganath.k@samsung.com>, linux-bluetooth@vger.kernel.org,
+	s.syam@samsung.com
+Date: Fri, 14 Sep 2012 13:26:34 +0300
+In-Reply-To: <20120914094458.GD7483@aemeltch-MOBL1>
+References: <1342165923-4901-1-git-send-email-jaganath.k@samsung.com>
+	 <20120713084859.GC2729@aemeltch-MOBL1>
+	 <4368C8F191BB414F84A70D30771FE893@sisodomain.com>
+	 <1347580581.5975.4.camel@maxim-laptop>
+	 <20120914094458.GD7483@aemeltch-MOBL1>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
-
-On Thu, Sep 13, 2012 at 09:39:57AM -0700, Mat Martineau wrote:
-> >From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> >
-> >When there is no remote AMP controller found fallback to normal
-> >L2CAP sequence.
-> >
-> >Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> >---
-> >include/net/bluetooth/l2cap.h |    1 +
-> >net/bluetooth/a2mp.c          |   28 ++++++++++++++++++++++++++++
-> >net/bluetooth/l2cap_core.c    |    2 +-
-> >3 files changed, 30 insertions(+), 1 deletion(-)
-> >
-> >diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> >index aba830f..0967f9e 100644
-> >--- a/include/net/bluetooth/l2cap.h
-> >+++ b/include/net/bluetooth/l2cap.h
-> >@@ -769,5 +769,6 @@ int l2cap_ertm_init(struct l2cap_chan *chan);
-> >void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
-> >void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
-> >void l2cap_chan_del(struct l2cap_chan *chan, int err);
-> >+void l2cap_send_conn_req(struct l2cap_chan *chan);
-> >
-> >#endif /* __L2CAP_H */
-> >diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-> >index 39e0f95..05522ea 100644
-> >--- a/net/bluetooth/a2mp.c
-> >+++ b/net/bluetooth/a2mp.c
-> >@@ -181,6 +181,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
-> >	u16 len = le16_to_cpu(hdr->len);
-> >	struct a2mp_cl *cl;
-> >	u16 ext_feat;
-> >+	bool found = false;
-> >
-> >	if (len < sizeof(*rsp))
-> >		return -EINVAL;
-> >@@ -211,6 +212,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
-> >		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
-> >			struct a2mp_info_req req;
-> >
-> >+			found = true;
-> >			req.id = cl->id;
-> >			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
-> >				  sizeof(req), &req);
-> >@@ -220,6 +222,32 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
-> >		cl = (void *) skb_pull(skb, sizeof(*cl));
-> >	}
-> >
-> >+	/* Fall back to L2CAP init sequence */
-> >+	if (!found) {
-> >+		struct l2cap_conn *conn = mgr->l2cap_conn;
-> >+		struct l2cap_chan *chan;
-> >+
-> >+		mutex_lock(&conn->chan_lock);
-> >+
-> >+		list_for_each_entry(chan, &conn->chan_l, list) {
-> >+
-> >+			BT_DBG("chan %p state %s", chan,
-> >+			       state_to_string(chan->state));
-> >+
-> >+			if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
-> >+				continue;
-> >+
-> >+			l2cap_chan_lock(chan);
-> >+
-> >+			if (chan->state == BT_CONNECT)
-> >+				l2cap_send_conn_req(chan);
-> >+
-> >+			l2cap_chan_unlock(chan);
-> >+		}
-> >+
-> >+		mutex_unlock(&conn->chan_lock);
-> >+	}
-> >+
-> >	return 0;
-> >}
-> >
-> >diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> >index cfe047f..d2ab82c 100644
-> >--- a/net/bluetooth/l2cap_core.c
-> >+++ b/net/bluetooth/l2cap_core.c
-> >@@ -958,7 +958,7 @@ static bool __amp_capable(struct l2cap_chan *chan)
-> >		return false;
-> >}
-> >
-> >-static void l2cap_send_conn_req(struct l2cap_chan *chan)
-> >+void l2cap_send_conn_req(struct l2cap_chan *chan)
-> >{
-> >	struct l2cap_conn *conn = chan->conn;
-> >	struct l2cap_conn_req req;
-> >-- 
-> >1.7.9.5
-> >
-> >
+On Fri, 2012-09-14 at 12:45 +0300, Andrei Emeltchenko wrote: 
+> Hi Maxim,
 > 
-> Here's another place where we have duplicated functionality.  This
-> patch has BR/EDR fallback too:
+> On Fri, Sep 14, 2012 at 02:56:21AM +0300, Maxim Levitsky wrote:
+> > On Fri, 2012-07-13 at 16:56 +0530, Jaganath wrote: 
+> > > Hi Andrei,
+> > > 
+> > > --------------------------------------------------
+> > > From: "Andrei Emeltchenko" <andrei.emeltchenko.news@gmail.com>
+> > > Sent: Friday, July 13, 2012 2:19 PM
+> > > To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
+> > > Cc: <linux-bluetooth@vger.kernel.org>; <s.syam@samsung.com>
+> > > Subject: Re: [PATCH] Bluetooth: Free the l2cap channel list only when 
+> > > refcount is zero
+> > > 
+> > > > Hi Jaganath,
+> > > >
+> > > > On Fri, Jul 13, 2012 at 01:22:03PM +0530, Jaganath Kanakkassery wrote:
+> > > >> Move the l2cap channel list chan->global_l under the refcnt
+> > > >> protection and free it based on the refcnt.
+> > > >
+> > > > The idea is good.
+> > > >
+> > Note that in 3.6-rc5 which soon to be released, it trivial to trigger a
+> > crash by suspending the system with a2dp headphones connected.
+> > I also have seem (and I strongly suspect the same) crash in 3.5
+> > This patch seems to fix this so far.
+> > Could you sent it to Linus, to fix this kernel panic?
 > 
-> [RFCv1 13/20] Bluetooth: Handle physical link completion
+> AFAIK the updated patch has been applied. Concerning your crash you can
+> also check my patch in the mail archive "Bluetooth: Add refcnt to l2cap_conn"
 > 
-> You can call l2cap_physical_cfm() with a failure result instead of
-> calling l2cap_send_conn_req() directly.
+> Best regards 
+> Andrei Emeltchenko 
 
-I suppose there is no such function yet, otherwise this can be done.
+I'll will.
+Even if it is applied, its not yet in Linus's tree of today.
 
-Best regards 
-Andrei Emeltchenko 
+Thanks for  your patch!
+
+Best regards,
+Maxim Levitsky
+
+> 
+> > 
+> > Best  regards,
+> > Maxim Levitsky
+> > 
+> > PS:
+> > The backtrace:
+> > 
+> > 
+> > fg80211: Calling CRDA to update world regulatory domain
+> > cfg80211: World regulatory domain updated:
+> > cfg80211:   (start_freq - end_freq @ bandwidth), (max_antenna_gain,
+> > max_eirp)
+> > cfg80211:   (2402000 KHz - 2472000 KHz @ 40000 KHz), (300 mBi, 2000
+> > mBm)2
+> > cfg80211:   (2457000 KHz - 2482000 KHz @ 20000 KHz), (300 mBi, 2000 mBm)
+> > cfg80211:   (2474000 KHz - 2494000 KHz @ 20000 KHz), (300 mBi, 2000
+> > mBm)T:
+> > cfg80211:   (5170000 KHz - 5250000 KHz @ 40000 KHz), (300 mBi, 2000 mBm)
+> > cfg80211:   (5735000 KHz - 5835000 KHz @ 40000 KHz), (300 mBi, 2000 mBm)
+> > 8
+> > cfg80211: World regulatory domain updated:
+> > cfg80211:   (start_freq - end_freq @ bandwidth), (max_antenna_gain,
+> > max_eirp)
+> > cfg80211:   (2402000 KHz - 2472000 KHz @ 40000 KHz), (300 mBi, 2000
+> > mBm)<
+> > cfg80211:   (2457000 KHz - 2482000 KHz @ 20000 KHz), (300 mBi, 2000
+> > mBm)P@
+> > cfg80211:   (2474000 KHz - 2494000 KHz @ 20000 KHz), (300 mBi, 2000 mBm)
+> > cfg80211:   (5170000 KHz - 5250000 KHz @ 40000 KHz), (300 mBi, 2000 mBm)
+> > cfg80211:   (5735000 KHz - 5835000 KHz @ 40000 KHz), (300 mBi, 2000 mBm)
+> > general protection fault: 0000 [#1] PREEMPT SMP 
+> > Modules linked in: hidp af_packet bnep rfcomm iwl3945
+> > snd_hda_codec_realtek iwlegacy mac80211 snd_hda_intel nfsd btusb
+> > snd_hda_codec uvcvideo snd_hwdep videobuf2_core snd_pcm bluetooth
+> > videobuf2_vmalloc videobuf2_memops nfs_acl auth_rpcgss r592 cfg80211
+> > microcode nfs psmouse memstick serio_raw snd_page_alloc ene_ir battery
+> > ac lockd sunrpc rc_lirc ir_lirc_codec lirc_dev ir_rc6_decoder
+> > firewire_net iTCO_wdt firewire_sbp2 nouveau ttm drm_kms_helper mxm_wmi
+> > usb_storage video wmi uhci_hcd sdhci_pci firewire_ohci firewire_core
+> > sdhci mmc_core atkbd ehci_hcd thermal [last unloaded: tg3]
+> > CPU 0 
+> > Pid: 3512, comm: bluetoothd Not tainted 3.6.0-rc5+ #34 Acer       Aspire
+> > 5720     /Nettiling?b
+> > RIP: 0010:[<ffffffffa03a1d56>]  [<ffffffffa03a1d56>] l2cap_chan_destroy
+> > +0x46/0xb0 [bluetooth]
+> > RSP: 0018:ffff8800619dbca8  EFLAGS: 00010296
+> > RAX: dead000000200200 RBX: ffff88007d3f1000 RCX: dead000000100100
+> > RDX: dead000000100100 RSI: dead000000200200 RDI: ffffffffa03b7cc0
+> > RBP: ffff8800619dbcb8 R08: 0000000000000000 R09: 0000000000000000
+> > R10: 0001cc0f349b43de R11: ffffffffa03a1d2d R12: ffff88007d3f1000
+> > R13: ffff88007d3f1014 R14: ffff88005f922570 R15: ffff88005f9229e0
+> > FS:  00007f8aa4634740(0000) GS:ffff88007fa00000(0000)
+> > knlGS:0000000000000000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 00007f8aa46b7d90 CR3: 000000005f945000 CR4: 00000000000007f0
+> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+> > Process bluetoothd (pid: 3512, threadinfo ffff8800619da000, task
+> > ffff88005ec4bde0)
+> > Stack:
+> > ffff8800619dbcd8 ffff880079945800 ffff8800619dbcd8 ffffffffa03a7b3c
+> > ffff88007d3f1000 ffff88005f922800 ffff8800619dbce8 ffffffffa03a7b85
+> > ffff8800619dbd48 ffffffffa03a231e ffff88007d3f14a0 ffff88005f9229f0
+> > Call Trace:
+> > [<ffffffffa03a7b3c>] l2cap_sock_kill+0x7c/0xb0 [bluetooth]
+> > [<ffffffffa03a7b85>] l2cap_sock_close_cb+0x15/0x20 [bluetooth]
+> > [<ffffffffa03a231e>] l2cap_conn_del+0x11e/0x1f0 [bluetooth]
+> > [<ffffffffa038301a>] ? hci_dev_do_close+0x18a/0x370 [bluetooth]
+> > [<ffffffffa03a6db3>] l2cap_disconn_cfm+0x53/0x60 [bluetooth]
+> > [<ffffffffa0388c55>] hci_conn_hash_flush+0x95/0x100 [bluetooth]
+> > [<ffffffffa038302a>] hci_dev_do_close+0x19a/0x370 [bluetooth]
+> > [<ffffffffa0384af0>] hci_dev_close+0x50/0x80 [bluetooth]
+> > [<ffffffffa039af3a>] hci_sock_ioctl+0x15a/0x420 [bluetooth]
+> > [<ffffffff8144c6e0>] sock_do_ioctl+0x30/0x60
+> > [<ffffffff8105f3e0>] ? task_work_run+0x30/0xa0
+> > [<ffffffff8144d570>] sock_ioctl+0x290/0x2b0
+> > [<ffffffff81147f20>] do_vfs_ioctl+0x580/0x5e0
+> > [<ffffffff8151630b>] ? _raw_spin_unlock_irq+0x3b/0x60
+> > [<ffffffff81147fcf>] sys_ioctl+0x4f/0x80
+> > [<ffffffff81517016>] system_call_fastpath+0x1a/0x1f
+> > Code: 17 e1 48 8b 93 80 04 00 00 48 b9 00 01 10 00 00 00 ad de 48 8b 83
+> > 88 04 00 00 48 c7 c7 c0 7c 3b a0 48 be 00 02 20 00 00 00 ad de <48> 89
+> > 42 08 48 89 10 48 89 8b 80 04 00 00 48 89 b3 88 04 00 00 
+> > "RIP  [<ffffffffa03a1d56>] l2cap_chan_destroy+0x46/0xb0 [bluetooth]
+> > RSP <ffff8800619dbca8>
+> > ---[ end trace 6e537072816e99b2 ]---+qZ
+> > Kernel panic - not syncing: Fatal exception
+> > fpanic occurred, switching back to text console
+> > Rebooting in 10 seconds..
+> > ACPI MEMORY or I/O RESET_REG.
+> > 
+
+-- 
+Best regards,
+        Maxim Levitsky
+
+Visit my blog: http://maximlevitsky.wordpress.com
+Warning: Above blog contains rants.
 
