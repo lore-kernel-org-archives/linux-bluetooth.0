@@ -1,60 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: bluetoothd: Refusing input device connect: Operation already in
- progress (114)
-From: Pacho Ramos <pacho@gentoo.org>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-uIvwwzyNmNtx+ZOjENBu"
-Date: Sat, 15 Sep 2012 12:15:53 +0200
-Message-ID: <1347704153.24322.11.camel@belkin4>
-Mime-Version: 1.0
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [RFC] Bluetooth: Fix not removing power_off delayed work
+Date: Fri, 14 Sep 2012 16:34:46 -0300
+Message-Id: <1347651286-4699-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+For example, when a usb reset is received (I could reproduce it
+running something very similar to this[1] in a loop) it could be
+that the device is unregistered while the power_off delayed work
+is still scheduled to run.
 
---=-uIvwwzyNmNtx+ZOjENBu
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Backtrace:
 
-Hello
+WARNING: at lib/debugobjects.c:261 debug_print_object+0x7c/0x8d()
+Hardware name: To Be Filled By O.E.M.
+ODEBUG: free active (active state 0) object type: timer_list hint: delayed_work_timer_fn+0x0/0x26
+Modules linked in: nouveau mxm_wmi btusb wmi bluetooth ttm coretemp drm_kms_helper
+Pid: 2114, comm: usb-reset Not tainted 3.5.0bt-next #2
+Call Trace:
+ [<ffffffff8124cc00>] ? free_obj_work+0x57/0x91
+ [<ffffffff81058f88>] warn_slowpath_common+0x7e/0x97
+ [<ffffffff81059035>] warn_slowpath_fmt+0x41/0x43
+ [<ffffffff8124ccb6>] debug_print_object+0x7c/0x8d
+ [<ffffffff8106e3ec>] ? __queue_work+0x259/0x259
+ [<ffffffff8124d63e>] ? debug_check_no_obj_freed+0x6f/0x1b5
+ [<ffffffff8124d667>] debug_check_no_obj_freed+0x98/0x1b5
+ [<ffffffffa00aa031>] ? bt_host_release+0x10/0x1e [bluetooth]
+ [<ffffffff810fc035>] kfree+0x90/0xe6
+ [<ffffffffa00aa031>] bt_host_release+0x10/0x1e [bluetooth]
+ [<ffffffff812ec2f9>] device_release+0x4a/0x7e
+ [<ffffffff8123ef57>] kobject_release+0x11d/0x154
+ [<ffffffff8123ed98>] kobject_put+0x4a/0x4f
+ [<ffffffff812ec0d9>] put_device+0x12/0x14
+ [<ffffffffa009472b>] hci_free_dev+0x22/0x26 [bluetooth]
+ [<ffffffffa0280dd0>] btusb_disconnect+0x96/0x9f [btusb]
+ [<ffffffff813581b4>] usb_unbind_interface+0x57/0x106
+ [<ffffffff812ef988>] __device_release_driver+0x83/0xd6
+ [<ffffffff812ef9fb>] device_release_driver+0x20/0x2d
+ [<ffffffff813582a7>] usb_driver_release_interface+0x44/0x7b
+ [<ffffffff81358795>] usb_forced_unbind_intf+0x45/0x4e
+ [<ffffffff8134f959>] usb_reset_device+0xa6/0x12e
+ [<ffffffff8135df86>] usbdev_do_ioctl+0x319/0xe20
+ [<ffffffff81203244>] ? avc_has_perm_flags+0xc9/0x12e
+ [<ffffffff812031a0>] ? avc_has_perm_flags+0x25/0x12e
+ [<ffffffff81050101>] ? do_page_fault+0x31e/0x3a1
+ [<ffffffff8135eaa6>] usbdev_ioctl+0x9/0xd
+ [<ffffffff811126b1>] vfs_ioctl+0x21/0x34
+ [<ffffffff81112f7b>] do_vfs_ioctl+0x408/0x44b
+ [<ffffffff81208d45>] ? file_has_perm+0x76/0x81
+ [<ffffffff8111300f>] sys_ioctl+0x51/0x76
+ [<ffffffff8158db22>] system_call_fastpath+0x16/0x1b
 
-Downstream we got the following report:
-https://bugs.gentoo.org/show_bug.cgi?id=3D431624
+[1] http://cpansearch.perl.org/src/DPAVLIN/Biblio-RFID-0.03/examples/usbreset.c
 
-After adding mouse (via Blueman's "Add device" dialog) it works fine
-until sleeping or powering off. After that it fails reconnecting.
-In /var/log/messages appears strings like these:
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ net/bluetooth/hci_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Aug 16 15:40:31 user bluetoothd[3222]: Refusing input device connect:
-Operation already in progress (114)
-Aug 16 15:45:13 user bluetoothd[3222]: Refusing input device connect:
-Operation already in progress (114)
-Aug 16 15:45:16 user bluetoothd[3222]: Refusing input device connect:
-Operation already in progress (114)
-Aug 16 15:45:17 user bluetoothd[3222]: Refusing input device connect:
-Operation already in progress (114)
-Aug 16 15:45:19 user bluetoothd[3222]: Refusing input device connect:
-Operation already in progress (114)
-Aug 16 15:47:46 user bluetoothd[3222]: Refusing input device connect:
-Operation already in progress (114)
-
-Searching, I found this thread that pointed to the culprit, but I
-haven't found what finally occurred with it, if patch was reverted or a
-different fix was pulled in:
-http://www.spinics.net/lists/linux-bluetooth/msg26442.html
-
-Thanks
-
---=-uIvwwzyNmNtx+ZOjENBu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.19 (GNU/Linux)
-
-iEYEABECAAYFAlBUVVkACgkQCaWpQKGI+9TcPwCdFuI9c2oIK8L02XgtIWphVVt3
-ezMAn0sq+JVxCB47j0iVquvD9iXI72ON
-=x7Tf
------END PGP SIGNATURE-----
-
---=-uIvwwzyNmNtx+ZOjENBu--
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e407051..8a0ce70 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -737,6 +737,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 
+ 	cancel_work_sync(&hdev->le_scan);
+ 
++	cancel_delayed_work(&hdev->power_off);
++
+ 	hci_req_cancel(hdev, ENODEV);
+ 	hci_req_lock(hdev);
+ 
+-- 
+1.7.12
 
