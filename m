@@ -1,79 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [RFC] Bluetooth: Fix not removing power_off delayed work
-Date: Fri, 14 Sep 2012 16:34:46 -0300
-Message-Id: <1347651286-4699-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <CACUGKYMKHvoAbH97-QLbxxYic_+5WjONc76mO642ywf6Jo-5+A@mail.gmail.com>
+References: <CACUGKYONE6a2PWtOEY4Kgg9TQkX3pCwhW9UJLk5KGVtpL5eVaw@mail.gmail.com>
+	<CACUGKYPwTxRS8JN78J-oPSwz0mhnKvxHg=ybm5vyiKivEpM03A@mail.gmail.com>
+	<20120910235838.GA26986@samus>
+	<CACUGKYMP7YRu1=P4Uf9T_RfOKQFPvZq8sK+GGi0T1jB6GDXcDQ@mail.gmail.com>
+	<CACUGKYN-+AKvVOZwxR7b6cvSujBMRHnjzNGcGezYynP2gTm6KA@mail.gmail.com>
+	<CAJdJm_OfccWTVuphRQfjfouY3m8_HgSeGwE-XSyHetzy+tjFFw@mail.gmail.com>
+	<CACUGKYMv_X4DgU+C0V=PA_PfYRQYnKO1LM4SoDbfcB2O-XkJvQ@mail.gmail.com>
+	<CAJdJm_MYn=eG93WTPmHWu98t3Ufqrc9pXDpdBbCvbT-JdYeOaw@mail.gmail.com>
+	<CACUGKYPSTh0CcN6fKc9NcbYmvZK3j8AwfNnMqkBkoTt-UFccSg@mail.gmail.com>
+	<CAJdJm_PwrHdWnp6xXoYzd8GLigO3YSHdS-6feVj+c-9u3sjk5A@mail.gmail.com>
+	<CACUGKYNPWDCbQgtA6u33NXn_U3CMm9q6vGqEAaA9FOPPjqeJiw@mail.gmail.com>
+	<CACUGKYPf+2ZP6y5rfy8kbnanxCJt3pL800E6bHNO6WUSifQW+A@mail.gmail.com>
+	<CAJdJm_MFT=KTREZavd_oaOVT24+jUsAXH=d-K8F0Rwyi6V1rQg@mail.gmail.com>
+	<CACUGKYMKHvoAbH97-QLbxxYic_+5WjONc76mO642ywf6Jo-5+A@mail.gmail.com>
+Date: Fri, 14 Sep 2012 12:04:38 -0700
+Message-ID: <CACUGKYNEYREQTM4s7vGcjHLij9KB4Sav2Zi-S0SLZREe+K+XPg@mail.gmail.com>
+Subject: Re: Dropping connection (bit off-topic)
+From: John Tobias <john.tobias.ph@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For example, when a usb reset is received (I could reproduce it
-running something very similar to this[1] in a loop) it could be
-that the device is unregistered while the power_off delayed work
-is still scheduled to run.
+Hi Anderson,
 
-Backtrace:
+Could you give me some bit of information on how to respond to the
+handle 0x0039?. I'm digging the bluez sources but I'm kind a lost
+right now and I don't know exactly what library/function should I use
+in order to configure it.
 
-WARNING: at lib/debugobjects.c:261 debug_print_object+0x7c/0x8d()
-Hardware name: To Be Filled By O.E.M.
-ODEBUG: free active (active state 0) object type: timer_list hint: delayed_work_timer_fn+0x0/0x26
-Modules linked in: nouveau mxm_wmi btusb wmi bluetooth ttm coretemp drm_kms_helper
-Pid: 2114, comm: usb-reset Not tainted 3.5.0bt-next #2
-Call Trace:
- [<ffffffff8124cc00>] ? free_obj_work+0x57/0x91
- [<ffffffff81058f88>] warn_slowpath_common+0x7e/0x97
- [<ffffffff81059035>] warn_slowpath_fmt+0x41/0x43
- [<ffffffff8124ccb6>] debug_print_object+0x7c/0x8d
- [<ffffffff8106e3ec>] ? __queue_work+0x259/0x259
- [<ffffffff8124d63e>] ? debug_check_no_obj_freed+0x6f/0x1b5
- [<ffffffff8124d667>] debug_check_no_obj_freed+0x98/0x1b5
- [<ffffffffa00aa031>] ? bt_host_release+0x10/0x1e [bluetooth]
- [<ffffffff810fc035>] kfree+0x90/0xe6
- [<ffffffffa00aa031>] bt_host_release+0x10/0x1e [bluetooth]
- [<ffffffff812ec2f9>] device_release+0x4a/0x7e
- [<ffffffff8123ef57>] kobject_release+0x11d/0x154
- [<ffffffff8123ed98>] kobject_put+0x4a/0x4f
- [<ffffffff812ec0d9>] put_device+0x12/0x14
- [<ffffffffa009472b>] hci_free_dev+0x22/0x26 [bluetooth]
- [<ffffffffa0280dd0>] btusb_disconnect+0x96/0x9f [btusb]
- [<ffffffff813581b4>] usb_unbind_interface+0x57/0x106
- [<ffffffff812ef988>] __device_release_driver+0x83/0xd6
- [<ffffffff812ef9fb>] device_release_driver+0x20/0x2d
- [<ffffffff813582a7>] usb_driver_release_interface+0x44/0x7b
- [<ffffffff81358795>] usb_forced_unbind_intf+0x45/0x4e
- [<ffffffff8134f959>] usb_reset_device+0xa6/0x12e
- [<ffffffff8135df86>] usbdev_do_ioctl+0x319/0xe20
- [<ffffffff81203244>] ? avc_has_perm_flags+0xc9/0x12e
- [<ffffffff812031a0>] ? avc_has_perm_flags+0x25/0x12e
- [<ffffffff81050101>] ? do_page_fault+0x31e/0x3a1
- [<ffffffff8135eaa6>] usbdev_ioctl+0x9/0xd
- [<ffffffff811126b1>] vfs_ioctl+0x21/0x34
- [<ffffffff81112f7b>] do_vfs_ioctl+0x408/0x44b
- [<ffffffff81208d45>] ? file_has_perm+0x76/0x81
- [<ffffffff8111300f>] sys_ioctl+0x51/0x76
- [<ffffffff8158db22>] system_call_fastpath+0x16/0x1b
+Regards,
 
-[1] http://cpansearch.perl.org/src/DPAVLIN/Biblio-RFID-0.03/examples/usbreset.c
+John
 
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
----
- net/bluetooth/hci_core.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e407051..8a0ce70 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -737,6 +737,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 
- 	cancel_work_sync(&hdev->le_scan);
- 
-+	cancel_delayed_work(&hdev->power_off);
-+
- 	hci_req_cancel(hdev, ENODEV);
- 	hci_req_lock(hdev);
- 
--- 
-1.7.12
-
+On Thu, Sep 13, 2012 at 2:59 PM, John Tobias <john.tobias.ph@gmail.com> wrote:
+> Hi Anderson,
+>
+> I added these line of codes in gatttool:
+>
+> listen_start:
+> g_attrib_register(attrib, ATT_OP_READ_BY_TYPE_RESP, events_handler,
+>                                                         attrib, NULL);
+>
+> Then, in events_handler I dumped the handles for
+> ATT_OP_READ_BY_TYPE_REQ and ATT_OP_READ_BY_TYPE_RESP:
+>
+> ATT_OP_READ_BY_TYPE_REQ:   handle = 0x1 value: ff ff 00 2a
+> ATT_OP_READ_BY_TYPE_RESP:   handle = 0x207 value: 00 02 03 00 00 2a 04
+> 00 02 05 00 01 2a 07 00 20 08 00 05 2a
+> ATT_OP_READ_BY_TYPE_RESP:   handle = 0xb15 value: 00 02 0c 00 31 3d 35
+> 06 1e 60 70 a3 8d 4e 58 9c 2d 6a 3c 16
+> ATT_OP_READ_BY_TYPE_RESP:   handle = 0xd15 value: 00 8a 0e 00 32 3d 35
+> 06 1e 60 70 a3 8d 4e 58 9c 2d 6a 3c 16
+> ATT_OP_READ_BY_TYPE_RESP:   handle = 0x1015 value: 00 88 11 00 33 3d
+> 35 06 1e 60 70 a3 8d 4e 58 9c 2d 6a 3c 16
+> ATT_OP_READ_BY_TYPE_RESP:   handle = 0x1315 value: 00 9a 14 00 52 72
+> 3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+> ATT_OP_READ_BY_TYPE_RESP:   handle = 0x1715 value: 00 9a 18 00 36 72
+> 3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+> ATT_OP_READ_BY_TYPE_RESP:   handle = 0x1b15 value: 00 9a 1c 00 37 72
+> 3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+> ATT_OP_READ_BY_TYPE_RESP:   handle = 0x1f15 value: 00 8a 20 00 38 72
+> 3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+> ATT_OP_READ_BY_TYPE_RESP:   handle = 0x2215 value: 00 98 23 00 40 72
+> 3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+> ATT_OP_READ_BY_TYPE_RESP:   handle = 0x2615 value: 00 9a 27 00 41 72
+> 3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+> ATT_OP_READ_BY_TYPE_RESP:   handle = 0x2a15 value: 00 98 2b 00 42 72
+> 3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+> ATT_OP_READ_BY_TYPE_RESP:   handle = 0x2e15 value: 00 88 2f 00 60 72
+> 3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+> ATT_OP_READ_BY_TYPE_RESP:   handle = 0x3115 value: 00 88 32 00 61 72
+> 3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+> ATT_OP_READ_BY_TYPE_RESP:   handle = 0x3415 value: 00 12 35 00 62 72
+> 3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+> ATT_OP_READ_BY_TYPE_RESP:   handle = 0x3715 value: 00 8a 38 00 39 72
+> 3a 71 ae 82 0c ae e0 49 1d 18 c2 b4 d8 37
+>
+> In hcidump:
+>
+>  ACL data: handle 76 flags 0x02 dlen 9
+> ATT: Error (0x01)
+> Error: Attribute not found (10)
+> Read By Type req (0x08) on handle 0x0039
+>
+>
+> In hcidump, the error was the attribute for handle 0x0039. How I can
+> respond to that request if the I did not receive the said handle?
+>
+>
+> Regards,
+>
+> John
+>
+>
+>
+> On Thu, Sep 13, 2012 at 1:18 PM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+>> Hi John,
+>>
+>> On Thu, Sep 13, 2012 at 4:11 PM, John Tobias <john.tobias.ph@gmail.com> wrote:
+>>> Hi Anderson,
+>>>
+>>> If I add a simple GATT/GAP server on gatttool, should I still use the
+>>> DBUS to listen or I can communicate directly to the kernel?.
+>>
+>> You either talk to bluetoothd (using D-Bus, like those test-* python
+>> scripts do), which will handle connections for you, or you talk
+>> directly to kernel using bluetooth socket (like gatttool does). You
+>> have more flexibility talking to the kernel directly, but your app
+>> will not be interoperable with other apps running at the same time,
+>> specially if they try to call connect() at the same time (one of them
+>> will get a EBUSY error).
+>>
+>> Using D-Bus, on the other hand, bluetoothd queues the connections properly.
+>>
+>> So you should use what is more appropriate for your use case.
+>>
+>> Best Regards,
+>> --
+>> Anderson Lizardo
+>> Instituto Nokia de Tecnologia - INdT
+>> Manaus - Brazil
