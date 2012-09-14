@@ -2,45 +2,48 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v4 0/9] Optional acquire in Media API and related
-Date: Fri, 14 Sep 2012 14:03:07 +0200
-Message-Id: <1347624196-11281-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH v0] media: Fix infinite loop due to release_endpoint()
+Date: Fri, 14 Sep 2012 13:18:40 +0200
+Message-Id: <1347621520-30411-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Similar patchset as v3 with the integration of Luiz's feedback, including the following changes:
-- Patches 7 and 8 swapped
-- State "acquired" renamed to "active" (both in D-Bus and in the code)
-- TRANSPORT_STATE_POST_ACQUIRE (which was transitional) dropped
+release_endpoint() cannot succeed unless all transports are released
+first. For example a2dp_remove_sep() will ignore the call if the SEP is
+locked, leading to an infinite loop in path_free(), which expects to
+successfully release and remove the endpoint in each call to
+release_endpoint().
 
->From original patch:
+This issue can easily be reproduced by shutting bluetoothd daemon
+during A2DP streaming (tested in sink role).
+---
+ audio/media.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-This patch reopens the discussion started by the thread "when is acquire
-ok to call". The race condition seems to be real (even thought difficult
-to reproduce), and I couldn't think of any approach to solve this
-without altering the Media API.
-
-Mikel Astiz (9):
-  media: Fix accesstype comparison
-  media: Add a2dp_sep_is_playing() to internal API
-  media: Add gateway_get_state() to internal API
-  media: Replace transport->in_use flag with state
-  media: Watch interface state changes in transport
-  media: Split transport state based on playing flag
-  media: Expose transport state in D-Bus
-  media: Automatically release transport when HUP
-  media: Extend media API with optional acquire
-
- audio/a2dp.c      |    8 +
- audio/a2dp.h      |    1 +
- audio/gateway.c   |    7 +
- audio/gateway.h   |    1 +
- audio/transport.c |  390 +++++++++++++++++++++++++++++++++++++++++++----------
- doc/media-api.txt |   19 +++
- 6 files changed, 356 insertions(+), 70 deletions(-)
-
+diff --git a/audio/media.c b/audio/media.c
+index b0ea4e9..e4a7684 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -454,6 +454,8 @@ static void release_endpoint(struct media_endpoint *endpoint)
+ 	if (endpoint->watch == 0)
+ 		goto done;
+ 
++	clear_endpoint(endpoint);
++
+ 	msg = dbus_message_new_method_call(endpoint->sender, endpoint->path,
+ 						MEDIA_ENDPOINT_INTERFACE,
+ 						"Release");
+@@ -615,8 +617,6 @@ static void a2dp_destroy_endpoint(void *user_data)
+ {
+ 	struct media_endpoint *endpoint = user_data;
+ 
+-	clear_endpoint(endpoint);
+-
+ 	endpoint->sep = NULL;
+ 	release_endpoint(endpoint);
+ }
 -- 
 1.7.7.6
 
