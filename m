@@ -1,165 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ v2 3/4] core: Add support for included services
-Date: Mon, 17 Sep 2012 17:46:43 -0300
-Message-Id: <1347914804-29624-4-git-send-email-vinicius.gomes@openbossa.org>
+Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Subject: [PATCH BlueZ v2 2/4] gatttool: Add "included" command
+Date: Mon, 17 Sep 2012 17:46:42 -0300
+Message-Id: <1347914804-29624-3-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1347914804-29624-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1347914804-29624-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Soon after the primary service discovery is complete, we do a included
-services discovery for all found services and add each included service
-to the 'services' list so they can be probe()'d as a normal profile.
+From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 
-This will also make these services to appear on the D-Bus object tree.
+New command to find included services in interactive mode.
 ---
- src/device.c | 109 ++++++++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 96 insertions(+), 13 deletions(-)
+ attrib/interactive.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
 
-diff --git a/src/device.c b/src/device.c
-index 77215f1..648d2f1 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -108,6 +108,12 @@ struct browse_req {
- 	guint listener_id;
- };
- 
-+struct included_search {
-+	struct browse_req *req;
-+	GSList *services;
-+	GSList *current;
-+};
-+
- struct attio_data {
- 	guint id;
- 	attio_connect_cb cfunc;
-@@ -1848,21 +1854,10 @@ static void device_unregister_services(struct btd_device *device)
- 	device->services = NULL;
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index c96df3e..ec5f2a5 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -209,6 +209,34 @@ static void primary_by_uuid_cb(GSList *ranges, guint8 status,
+ 	rl_forced_update_display();
  }
  
--static void primary_cb(GSList *services, guint8 status, gpointer user_data)
-+static void register_all_services(struct browse_req *req, GSList *services)
- {
--	struct browse_req *req = user_data;
- 	struct btd_device *device = req->device;
- 
--	if (status) {
--		if (req->msg) {
--			DBusMessage *reply;
--			reply = btd_error_failed(req->msg,
--							att_ecode2str(status));
--			g_dbus_send_message(req->conn, reply);
--		}
--		goto done;
--	}
--
- 	device_set_temporary(device, FALSE);
- 
- 	if (device->services)
-@@ -1887,11 +1882,99 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
- 
- 	store_services(device);
- 
--done:
- 	device->browse = NULL;
- 	browse_request_free(req);
- }
- 
-+static int service_by_range_cmp(gconstpointer a, gconstpointer b)
++static void included_cb(GSList *includes, guint8 status, gpointer user_data)
 +{
-+	const struct gatt_primary *prim = a;
-+	const struct att_range *range = b;
-+
-+	return memcmp(&prim->range, range, sizeof(*range));
-+}
-+
-+static void find_included_cb(GSList *includes, uint8_t status,
-+						gpointer user_data)
-+{
-+	struct included_search *search = user_data;
-+	struct btd_device *device = search->req->device;
-+	struct gatt_primary *prim;
 +	GSList *l;
 +
-+	if (includes == NULL)
++	if (status) {
++		printf("Find included services failed: %s\n",
++							att_ecode2str(status));
 +		goto done;
++	}
 +
++	if (includes == NULL) {
++		printf("No included services found for this range\n");
++		goto done;
++	}
++
++	printf("\n");
 +	for (l = includes; l; l = l->next) {
 +		struct gatt_included *incl = l->data;
-+
-+		if (g_slist_find_custom(search->services, &incl->range,
-+						service_by_range_cmp))
-+			continue;
-+
-+		prim = g_new0(struct gatt_primary, 1);
-+		memcpy(prim->uuid, incl->uuid, sizeof(prim->uuid));
-+		memcpy(&prim->range, &incl->range, sizeof(prim->range));
-+
-+		search->services = g_slist_append(search->services, prim);
++		printf("handle: 0x%04x, start handle: 0x%04x, "
++						"end handle: 0x%04x uuid: %s\n",
++						incl->handle, incl->range.start,
++						incl->range.end, incl->uuid);
 +	}
 +
 +done:
-+	search->current = search->current->next;
-+	if (search->current == NULL) {
-+		register_all_services(search->req, search->services);
-+		g_slist_free(search->services);
-+		g_free(search);
-+		return;
-+	}
-+
-+	prim = search->current->data;
-+	gatt_find_included(device->attrib, prim->range.start, prim->range.end,
-+					find_included_cb, search);
++	rl_forced_update_display();
 +}
 +
-+static void find_included_services(struct browse_req *req, GSList *services)
-+{
-+	struct btd_device *device = req->device;
-+	struct included_search *search;
-+	struct gatt_primary *prim;
-+
-+	if (services == NULL)
-+		return;
-+
-+	search = g_new0(struct included_search, 1);
-+	search->req = req;
-+	search->services = g_slist_copy(services);
-+	search->current = search->services;
-+
-+	prim = search->current->data;
-+	gatt_find_included(device->attrib, prim->range.start, prim->range.end,
-+					find_included_cb, search);
-+
-+}
-+
-+static void primary_cb(GSList *services, guint8 status, gpointer user_data)
-+{
-+	struct browse_req *req = user_data;
-+
-+	if (status) {
-+		struct btd_device *device = req->device;
-+
-+		if (req->msg) {
-+			DBusMessage *reply;
-+			reply = btd_error_failed(req->msg,
-+							att_ecode2str(status));
-+			g_dbus_send_message(req->conn, reply);
-+		}
-+
-+		device->browse = NULL;
-+		browse_request_free(req);
-+		return;
-+	}
-+
-+	find_included_services(req, services);
-+}
-+
- static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ static void char_cb(GSList *characteristics, guint8 status, gpointer user_data)
  {
- 	struct att_callbacks *attcb = user_data;
+ 	GSList *l;
+@@ -426,6 +454,36 @@ static int strtohandle(const char *src)
+ 	return dst;
+ }
+ 
++static void cmd_included(int argcp, char **argvp)
++{
++	int start = 0x0001;
++	int end = 0xffff;
++
++	if (conn_state != STATE_CONNECTED) {
++		printf("Command failed: disconnected\n");
++		return;
++	}
++
++	if (argcp > 1) {
++		start = strtohandle(argvp[1]);
++		if (start < 0) {
++			printf("Invalid start handle: %s\n", argvp[1]);
++			return;
++		}
++		end = start;
++	}
++
++	if (argcp > 2) {
++		end = strtohandle(argvp[2]);
++		if (end < 0) {
++			printf("Invalid end handle: %s\n", argvp[2]);
++			return;
++		}
++	}
++
++	gatt_find_included(attrib, start, end, included_cb, NULL);
++}
++
+ static void cmd_char(int argcp, char **argvp)
+ {
+ 	int start = 0x0001;
+@@ -751,6 +809,8 @@ static struct {
+ 		"Disconnect from a remote device" },
+ 	{ "primary",		cmd_primary,	"[UUID]",
+ 		"Primary Service Discovery" },
++	{ "included",		cmd_included,	"[start hnd [end hnd]]",
++		"Find Included Services" },
+ 	{ "characteristics",	cmd_char,	"[start hnd [end hnd [UUID]]]",
+ 		"Characteristics Discovery" },
+ 	{ "char-desc",		cmd_char_desc,	"[start hnd] [end hnd]",
 -- 
 1.7.12
 
