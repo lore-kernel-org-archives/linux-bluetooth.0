@@ -2,118 +2,77 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: mathewm@codeaurora.org, gustavo@padovan.org
-Subject: [PATCHv5 02/17] Bluetooth: A2MP: Create amp_mgr global list
-Date: Mon, 17 Sep 2012 16:24:19 +0300
-Message-Id: <1347888274-30779-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1347888274-30779-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv5 00/17] Bluetooth: Create AMP physical link
+Date: Mon, 17 Sep 2012 16:24:17 +0300
+Message-Id: <1347888274-30779-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1347888274-30779-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Create amp_mgr_list global list which will be used by different
-hci devices to find amp_mgr.
+This set of patches enhances A2MP protocol and creates physical
+link between AMP controllers. This is further iteration towards
+Bluetooth High Speed.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- include/net/bluetooth/a2mp.h |    8 ++++++++
- net/bluetooth/a2mp.c         |   29 +++++++++++++++++++++++++++++
- 2 files changed, 37 insertions(+)
+Changes:
+	* p5: Fix issues reported by Mat in mailing list review
+	* p4: Rebased against recent bluetooth-next, minor fixes
+	* p3: Use hci_conn for representing physical link(type AMP_LINK) instead of
+	struct phy_link, refactoring.
+	* p2: Remove HCI callbacks and use amp_mgr global list, refactor code.
+	* p1: Fixed locking issues, added basic logical link preparation.
+	* v3: Remove workqueue from callback processing; change callback functions
+	names according to reviewers recommendations; create global amp_mgr_list to
+	have lookup to amp manager, physical and logical links so for those HCI events
+	which might be identified by __handler__ we have lookup; remove extensive
+	hexdump from gen_amp_key.
+	* v2: Fix typos and bugs, add functionality: now physical connection
+	might be established.
+	* v1: Fix typos, change debug prints, refactor code for better
+	splitting functionality.
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 6a76e0a..e56d656 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -20,11 +20,15 @@
- #define A2MP_FEAT_EXT	0x8000
- 
- struct amp_mgr {
-+	struct list_head	list;
- 	struct l2cap_conn	*l2cap_conn;
- 	struct l2cap_chan	*a2mp_chan;
- 	struct kref		kref;
- 	__u8			ident;
- 	__u8			handle;
-+	enum {
-+		READ_LOC_AMP_INFO,
-+	} state;
- 	unsigned long		flags;
- };
- 
-@@ -118,9 +122,13 @@ struct a2mp_physlink_rsp {
- #define A2MP_STATUS_PHYS_LINK_EXISTS		0x05
- #define A2MP_STATUS_SECURITY_VIOLATION		0x06
- 
-+extern struct list_head amp_mgr_list;
-+extern struct mutex amp_mgr_list_lock;
-+
- void amp_mgr_get(struct amp_mgr *mgr);
- int amp_mgr_put(struct amp_mgr *mgr);
- struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
- 				       struct sk_buff *skb);
-+struct amp_mgr *amp_mgr_lookup_by_state(u8 state);
- 
- #endif /* __A2MP_H */
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 0760d1f..3f93060 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -17,6 +17,10 @@
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/a2mp.h>
- 
-+/* Global AMP Manager list */
-+LIST_HEAD(amp_mgr_list);
-+DEFINE_MUTEX(amp_mgr_list_lock);
-+
- /* A2MP build & send command helper functions */
- static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
- {
-@@ -516,6 +520,10 @@ static void amp_mgr_destroy(struct kref *kref)
- 
- 	BT_DBG("mgr %p", mgr);
- 
-+	mutex_lock(&amp_mgr_list_lock);
-+	list_del(&mgr->list);
-+	mutex_unlock(&amp_mgr_list_lock);
-+
- 	kfree(mgr);
- }
- 
-@@ -552,6 +560,10 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
- 
- 	kref_init(&mgr->kref);
- 
-+	mutex_lock(&amp_mgr_list_lock);
-+	list_add(&mgr->list, &amp_mgr_list);
-+	mutex_unlock(&amp_mgr_list_lock);
-+
- 	return mgr;
- }
- 
-@@ -570,3 +582,20 @@ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
- 
- 	return mgr->a2mp_chan;
- }
-+
-+struct amp_mgr *amp_mgr_lookup_by_state(u8 state)
-+{
-+	struct amp_mgr *mgr;
-+
-+	mutex_lock(&amp_mgr_list_lock);
-+	list_for_each_entry(mgr, &amp_mgr_list, list) {
-+		if (mgr->state == state) {
-+			amp_mgr_get(mgr);
-+			mutex_unlock(&amp_mgr_list_lock);
-+			return mgr;
-+		}
-+	}
-+	mutex_unlock(&amp_mgr_list_lock);
-+
-+	return NULL;
-+}
+Andrei Emeltchenko (16):
+  Bluetooth: Add HCI logical link cmds definitions
+  Bluetooth: A2MP: Create amp_mgr global list
+  Bluetooth: AMP: Use HCI cmd to Read AMP Info
+  Bluetooth: AMP: Use HCI cmd to Read Loc AMP Assoc
+  Bluetooth: A2MP: Process Discover Response
+  Bluetooth: AMP: Physical link struct and heplers
+  Bluetooth: AMP: Remote AMP ctrl definitions
+  Bluetooth: AMP: Handle create / disc phylink req
+  Bluetooth: A2MP: Process A2MP Getinfo Rsp
+  Bluetooth: A2MP: Process A2MP Get AMP Assoc Rsp
+  Bluetooth: Choose connection based on capabilities
+  Bluetooth: AMP: Add AMP key calculation
+  Bluetooth: AMP: Create Physical Link
+  Bluetooth: AMP: Write remote AMP Assoc
+  Bluetooth: A2MP: Add fallback to normal l2cap init sequence
+  Bluetooth: AMP: Process Chan Selected event
+
+Dmitry Kasatkin (1):
+  Bluetooth: Add function to derive AMP key using hmac
+
+ include/net/bluetooth/a2mp.h     |   20 ++
+ include/net/bluetooth/amp.h      |   29 +++
+ include/net/bluetooth/hci.h      |   39 +++-
+ include/net/bluetooth/hci_core.h |   11 +
+ include/net/bluetooth/l2cap.h    |    2 +
+ include/net/bluetooth/pal.h      |   40 ++++
+ net/bluetooth/Kconfig            |    1 +
+ net/bluetooth/Makefile           |    2 +-
+ net/bluetooth/a2mp.c             |  424 +++++++++++++++++++++++++++++++++++---
+ net/bluetooth/amp.c              |  159 ++++++++++++++
+ net/bluetooth/hci_event.c        |  106 +++++++++-
+ net/bluetooth/l2cap_core.c       |   35 +++-
+ net/bluetooth/pal.c              |  204 ++++++++++++++++++
+ 13 files changed, 1034 insertions(+), 38 deletions(-)
+ create mode 100644 include/net/bluetooth/amp.h
+ create mode 100644 include/net/bluetooth/pal.h
+ create mode 100644 net/bluetooth/amp.c
+ create mode 100644 net/bluetooth/pal.c
+
 -- 
 1.7.9.5
 
