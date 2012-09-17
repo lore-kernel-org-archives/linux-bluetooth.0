@@ -1,105 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1347929527.29391.9.camel@obelisk.thedillows.org>
-Subject: Re: [KERNEL PATCH] HID: Add support for Sony BD Remote
-From: David Dillow <dave@thedillows.org>
-To: Antonio Ospite <ospite@studenti.unina.it>
-Cc: linux-bluetooth@vger.kernel.org,
-	David Herrmann <dh.herrmann@googlemail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bastien Nocera <hadess@hadess.net>
-Date: Mon, 17 Sep 2012 20:52:07 -0400
-In-Reply-To: <20120917120441.a164d2e10bb02aa9a1e8d523@studenti.unina.it>
-References: <1346378760.7976.2.camel@obelisk.thedillows.org>
-	 <20120907124559.GA16092@x220>
-	 <CABBYNZ+5E+BC-+9fj0e7iUpEDFJrJBQo8aoMZj8ZEkmiuB=QLA@mail.gmail.com>
-	 <1347284864.3532.1.camel@sirocco.hadess.net>
-	 <CABBYNZJpHkt8CGDsfVwirZ=vecb-fhbpPbrVFKt1UR_rA25mSw@mail.gmail.com>
-	 <CABBYNZ+n9obON7iNcv66x2ZVQCeTs_JoJUDXZFwxJJ6C4cb4YQ@mail.gmail.com>
-	 <CABBYNZKggzJ7bzQWVmWi30kxOUR8bVCyMLL=SM1=Oe74YPwvKg@mail.gmail.com>
-	 <1347394656.1606.10.camel@sirocco.hadess.net>
-	 <CABBYNZ+gpheC9sNeTp2uvDFBV-yPs+cY4PUR2omPt_kLTCafKw@mail.gmail.com>
-	 <1347456657.23874.29.camel@sirocco.hadess.net>
-	 <CABBYNZLwXhF0gixPGKUTJY4sZ7EHynTYmHzGtiZsoRGXgeEFaw@mail.gmail.com>
-	 <CANq1E4SDXVHcumBbEA-4xpeuOQ0SjDxxtL_RqAiNYRPj6ccagQ@mail.gmail.com>
-	 <20120913003628.ce5babb2a66d09fe17fa15de@studenti.unina.it>
-	 <1347591892.6145.14.camel@obelisk.thedillows.org>
-	 <20120917120441.a164d2e10bb02aa9a1e8d523@studenti.unina.it>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <CAJdJm_OfTBZed2aAYQssGS4HhBV5tDt95=NaMy6qevShKCwnBQ@mail.gmail.com>
+References: <CACUGKYONE6a2PWtOEY4Kgg9TQkX3pCwhW9UJLk5KGVtpL5eVaw@mail.gmail.com>
+	<CACUGKYPwTxRS8JN78J-oPSwz0mhnKvxHg=ybm5vyiKivEpM03A@mail.gmail.com>
+	<20120910235838.GA26986@samus>
+	<CACUGKYMP7YRu1=P4Uf9T_RfOKQFPvZq8sK+GGi0T1jB6GDXcDQ@mail.gmail.com>
+	<CACUGKYN-+AKvVOZwxR7b6cvSujBMRHnjzNGcGezYynP2gTm6KA@mail.gmail.com>
+	<CAJdJm_OfccWTVuphRQfjfouY3m8_HgSeGwE-XSyHetzy+tjFFw@mail.gmail.com>
+	<CACUGKYMv_X4DgU+C0V=PA_PfYRQYnKO1LM4SoDbfcB2O-XkJvQ@mail.gmail.com>
+	<CAJdJm_MYn=eG93WTPmHWu98t3Ufqrc9pXDpdBbCvbT-JdYeOaw@mail.gmail.com>
+	<CACUGKYPSTh0CcN6fKc9NcbYmvZK3j8AwfNnMqkBkoTt-UFccSg@mail.gmail.com>
+	<CAJdJm_PwrHdWnp6xXoYzd8GLigO3YSHdS-6feVj+c-9u3sjk5A@mail.gmail.com>
+	<CACUGKYNPWDCbQgtA6u33NXn_U3CMm9q6vGqEAaA9FOPPjqeJiw@mail.gmail.com>
+	<CACUGKYPf+2ZP6y5rfy8kbnanxCJt3pL800E6bHNO6WUSifQW+A@mail.gmail.com>
+	<CAJdJm_MFT=KTREZavd_oaOVT24+jUsAXH=d-K8F0Rwyi6V1rQg@mail.gmail.com>
+	<CACUGKYMKHvoAbH97-QLbxxYic_+5WjONc76mO642ywf6Jo-5+A@mail.gmail.com>
+	<CACUGKYNEYREQTM4s7vGcjHLij9KB4Sav2Zi-S0SLZREe+K+XPg@mail.gmail.com>
+	<CAJdJm_OfTBZed2aAYQssGS4HhBV5tDt95=NaMy6qevShKCwnBQ@mail.gmail.com>
+Date: Mon, 17 Sep 2012 14:21:21 -0700
+Message-ID: <CACUGKYN1_7X4P_-_NNVUOTERWzw=ib6fwWyUeqo7aF3gXUge_w@mail.gmail.com>
+Subject: Re: Dropping connection (bit off-topic)
+From: John Tobias <john.tobias.ph@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2012-09-17 at 12:04 +0200, Antonio Ospite wrote:
-> On Thu, 13 Sep 2012 23:04:52 -0400
-> David Dillow <dave@thedillows.org> wrote:
-> > Antonio, if you could test this with the real remote you have, I'd be
-> > very appreciative.
-> >
-> 
-> Works here as well with original PS3 BR remote, thanks David D.
-> 
-> About multiple key-presses, when I hold two _different_ keys at the same
-> time, I get the message:
-> 
-> ps3_remote 0005:054C:0306.0004: Incoherent report, 000000 000000 ff 16
-> 01
-> 
-> I just tried a couple of combinations tho.
+Hi Anderson,
 
-I found a typo in the custom report descriptor which could cause this --
-where it says REPORT COUNT (11), I have 0x95, 0x01 as values in the
-array. Those should be 0x95, 0x0b instead. This would prevent it from
-looking at any more than the first key reported. Could you fix that up
-and retest?
+Thanks for the info., we will be going to snip what the iOS is sending
+to understand the scenario. I think iOS stack has some handshaking
+procedure or required in order to maintain the connection. I used
+gatttool to connect to the CC2540 demo board and it did not disconnect
+like the iOS does.
 
-Looking at this gave me an idea that would avoid needing a raw event
-handler; I've got a version built and will test in a bit, once the kids
-are down. I'll send it along after that.
+Regards,
 
-If both fail, it would be useful to see the output
-from /sys/kernel/debug/hid/0005:*:0306:*/event while you are pressing
-both single and multiple buttons.
-
-> What about adding a note about the association maneuver? I mean the one
-> when we press Start+Enter for a few second when we add the BD remote as
-> a new BT device. I forget about it every time I associate the BD
-> remote with a new system; I know kernel code is not the most
-> user-friendly spot for this documentation but having it here wouldn't
-> hurt.
-> 
-> Now I noted it on the back of the battery cover too :)
-
-Indeed; I don't have one of the real remotes -- could you provide text?
+John
 
 
-> > +static int ps3remote_event(struct hid_device *hdev, struct hid_report *report,
-> > +			   u8 *raw_data, int size)
-> > +{
-> > +	struct ps3remote_data *data = hid_get_drvdata(hdev);
-> > +	u32 mask, changed;
-> > +	u8 key, pressed;
-> 
-> The preferred kernel style for declarations is to have one per line, no
-> commas, but that's up to you.
-
-I've seen it both ways, so I'll stick with the less vertical space. If
-they were initialized here, I'd be more inclined to change.
-
-> > +	if (size != 12) {
-> > +		hid_dbg(hdev, "unsupported report size\n");
-> > +		return 1;
-> 
-> The raw_event callback should return negative on error, is there a
-> reason why 1 is returned here?
-
-I was just eating the event rather than passing it on. It probably makes
-more sense to return an error, but I didn't investigate how the rest of
-the stack handled that.
-
-I'll likely change this if I need to keep the raw event handler.
-
-Thank you for the review, I've incorporated your other comments into the
-driver before I started working on the simpler version.
-
-Dave
-
+On Mon, Sep 17, 2012 at 1:30 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi John,
+>
+> On Fri, Sep 14, 2012 at 3:04 PM, John Tobias <john.tobias.ph@gmail.com> wrote:
+>> Hi Anderson,
+>>
+>> Could you give me some bit of information on how to respond to the
+>> handle 0x0039?. I'm digging the bluez sources but I'm kind a lost
+>> right now and I don't know exactly what library/function should I use
+>> in order to configure it.
+>
+> I suggest you take a look on GATT Procedures on the Core spec (see
+> "Discover All Characteristics of a Service" on pages 1916 and the
+> Figure 4.5 on page 1917). You will see that "Attribute not found" is
+> used to inform the client that there are no more characteristics to
+> discover.
+>
+> Also see channel_handler() in src/attrib-server.c (and the functions
+> called by it) to understand how BlueZ's GATT server work.
+>
+> To avoid the GATT disconnection after 30 sec. you really need to
+> figure out what the iPhone app is trying to do, it is clear from your
+> hcidump logs that iPhone is disconnecting, not the Linux "client"
+> side.
+>
+> Regards,
+> --
+> Anderson Lizardo
+> Instituto Nokia de Tecnologia - INdT
+> Manaus - Brazil
