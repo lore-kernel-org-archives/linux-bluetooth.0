@@ -1,47 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1347627360-13997-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1347627360-13997-1-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Mon, 17 Sep 2012 16:33:37 +0300
-Message-ID: <CABBYNZ+VH5MGYKkmHZ9usjWd2uxNEND5xuD6rPkPLOw8cpdCfw@mail.gmail.com>
-Subject: Re: [RFC v5 0/4] Optional acquire in Media API and related
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: mathewm@codeaurora.org, gustavo@padovan.org
+Subject: [PATCHv5 12/17] Bluetooth: Add function to derive AMP key using hmac
+Date: Mon, 17 Sep 2012 16:24:29 +0300
+Message-Id: <1347888274-30779-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1347888274-30779-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1347888274-30779-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+From: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
 
-On Fri, Sep 14, 2012 at 3:55 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> Same as v4 but rebased on the latest pushed patches.
->
-> From original patch:
->
-> This patch reopens the discussion started by the thread "when is acquire
-> ok to call". The race condition seems to be real (even thought difficult
-> to reproduce), and I couldn't think of any approach to solve this
-> without altering the Media API.
->
-> Mikel Astiz (4):
->   media: Split transport state based on playing flag
->   media: Expose transport state in D-Bus
->   media: Automatically release transport when HUP
->   media: Extend media API with optional acquire
->
->  audio/transport.c |  113 +++++++++++++++++++++++++++++++++++++++++++++++-----
->  doc/media-api.txt |   19 +++++++++
->  2 files changed, 121 insertions(+), 11 deletions(-)
->
-> --
-> 1.7.7.6
+hmac(sha256) will be used for AMP key generation.
 
-All 4 patches are now upstream, thanks.
+Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/pal.c |   35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-
+diff --git a/net/bluetooth/pal.c b/net/bluetooth/pal.c
+index bc2426a..8e28986 100644
+--- a/net/bluetooth/pal.c
++++ b/net/bluetooth/pal.c
+@@ -12,6 +12,7 @@
+ */
+ 
+ #include <net/bluetooth/pal.h>
++#include <crypto/hash.h>
+ 
+ /* Remote AMP Controllers handling */
+ static void amp_ctrl_get(struct amp_ctrl *ctrl)
+@@ -122,3 +123,37 @@ struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
+ 
+ 	return hcon;
+ }
++
++int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
++{
++	int ret = 0;
++	struct crypto_shash *tfm;
++
++	if (!ksize)
++		return -EINVAL;
++
++	tfm = crypto_alloc_shash("hmac(sha256)", 0, 0);
++	if (IS_ERR(tfm)) {
++		BT_DBG("crypto_alloc_ahash failed: err %ld", PTR_ERR(tfm));
++		return PTR_ERR(tfm);
++	}
++
++	ret = crypto_shash_setkey(tfm, key, ksize);
++	if (ret) {
++		BT_DBG("crypto_ahash_setkey failed: err %d", ret);
++	} else {
++		struct {
++			struct shash_desc shash;
++			char ctx[crypto_shash_descsize(tfm)];
++		} desc;
++
++		desc.shash.tfm = tfm;
++		desc.shash.flags = CRYPTO_TFM_REQ_MAY_SLEEP;
++
++		ret = crypto_shash_digest(&desc.shash, plaintext, psize,
++					  output);
++	}
++
++	crypto_free_shash(tfm);
++	return ret;
++}
 -- 
-Luiz Augusto von Dentz
+1.7.9.5
+
