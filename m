@@ -1,45 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ v2 0/4] Support for GATT Find Included
-Date: Mon, 17 Sep 2012 17:46:40 -0300
-Message-Id: <1347914804-29624-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <CACUGKYNEYREQTM4s7vGcjHLij9KB4Sav2Zi-S0SLZREe+K+XPg@mail.gmail.com>
+References: <CACUGKYONE6a2PWtOEY4Kgg9TQkX3pCwhW9UJLk5KGVtpL5eVaw@mail.gmail.com>
+	<CACUGKYPwTxRS8JN78J-oPSwz0mhnKvxHg=ybm5vyiKivEpM03A@mail.gmail.com>
+	<20120910235838.GA26986@samus>
+	<CACUGKYMP7YRu1=P4Uf9T_RfOKQFPvZq8sK+GGi0T1jB6GDXcDQ@mail.gmail.com>
+	<CACUGKYN-+AKvVOZwxR7b6cvSujBMRHnjzNGcGezYynP2gTm6KA@mail.gmail.com>
+	<CAJdJm_OfccWTVuphRQfjfouY3m8_HgSeGwE-XSyHetzy+tjFFw@mail.gmail.com>
+	<CACUGKYMv_X4DgU+C0V=PA_PfYRQYnKO1LM4SoDbfcB2O-XkJvQ@mail.gmail.com>
+	<CAJdJm_MYn=eG93WTPmHWu98t3Ufqrc9pXDpdBbCvbT-JdYeOaw@mail.gmail.com>
+	<CACUGKYPSTh0CcN6fKc9NcbYmvZK3j8AwfNnMqkBkoTt-UFccSg@mail.gmail.com>
+	<CAJdJm_PwrHdWnp6xXoYzd8GLigO3YSHdS-6feVj+c-9u3sjk5A@mail.gmail.com>
+	<CACUGKYNPWDCbQgtA6u33NXn_U3CMm9q6vGqEAaA9FOPPjqeJiw@mail.gmail.com>
+	<CACUGKYPf+2ZP6y5rfy8kbnanxCJt3pL800E6bHNO6WUSifQW+A@mail.gmail.com>
+	<CAJdJm_MFT=KTREZavd_oaOVT24+jUsAXH=d-K8F0Rwyi6V1rQg@mail.gmail.com>
+	<CACUGKYMKHvoAbH97-QLbxxYic_+5WjONc76mO642ywf6Jo-5+A@mail.gmail.com>
+	<CACUGKYNEYREQTM4s7vGcjHLij9KB4Sav2Zi-S0SLZREe+K+XPg@mail.gmail.com>
+Date: Mon, 17 Sep 2012 16:30:46 -0400
+Message-ID: <CAJdJm_OfTBZed2aAYQssGS4HhBV5tDt95=NaMy6qevShKCwnBQ@mail.gmail.com>
+Subject: Re: Dropping connection (bit off-topic)
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: John Tobias <john.tobias.ph@gmail.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi John,
 
-Changes from last version: 
- - Fixed problems found during PTS tests;
+On Fri, Sep 14, 2012 at 3:04 PM, John Tobias <john.tobias.ph@gmail.com> wrote:
+> Hi Anderson,
+>
+> Could you give me some bit of information on how to respond to the
+> handle 0x0039?. I'm digging the bluez sources but I'm kind a lost
+> right now and I don't know exactly what library/function should I use
+> in order to configure it.
 
- - Added a reference count for requests that are running in "parallel"
-   (if a included service has a 128 bit UUID, it needs to make an
-   aditional request to resolve this included service);
+I suggest you take a look on GATT Procedures on the Core spec (see
+"Discover All Characteristics of a Service" on pages 1916 and the
+Figure 4.5 on page 1917). You will see that "Attribute not found" is
+used to inform the client that there are no more characteristics to
+discover.
 
---
+Also see channel_handler() in src/attrib-server.c (and the functions
+called by it) to understand how BlueZ's GATT server work.
 
-Jefferson Delfes (1):
-  gatttool: Add "included" command
+To avoid the GATT disconnection after 30 sec. you really need to
+figure out what the iPhone app is trying to do, it is clear from your
+hcidump logs that iPhone is disconnecting, not the Linux "client"
+side.
 
-Vinicius Costa Gomes (3):
-  gatt: Add support for find included services
-  core: Add support for included services
-  attrib: Remove opcode parameter from g_attrib_send()
-
- attrib/client.c                    |   3 +-
- attrib/gatt.c                      | 242 ++++++++++++++++++++++++++++++++-----
- attrib/gatt.h                      |   9 ++
- attrib/gattrib.c                   |   9 +-
- attrib/gattrib.h                   |   6 +-
- attrib/gatttool.c                  |   2 +-
- attrib/interactive.c               |  62 +++++++++-
- profiles/gatt/gas.c                |   2 +-
- profiles/thermometer/thermometer.c |   3 +-
- src/attrib-server.c                |   3 +-
- src/device.c                       | 109 +++++++++++++++--
- 11 files changed, 394 insertions(+), 56 deletions(-)
-
+Regards,
 -- 
-1.7.12
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
