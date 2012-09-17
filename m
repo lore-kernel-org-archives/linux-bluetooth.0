@@ -2,227 +2,181 @@ Return-Path: <cyrus@holtmann.org>
 From: Sunil Kumar Behera <sunil.behera@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sunil Kumar Behera <sunil.behera@samsung.com>
-Subject: [PATCH obexd 1/2] client: Add skeleton for Message Notification
-Date: Mon, 17 Sep 2012 20:21:15 +0530
-Message-id: <1347893475-13166-1-git-send-email-sunil.behera@samsung.com>
+Subject: [PATCH obexd] MAP: Add Notification Registration support
+Date: Mon, 17 Sep 2012 20:11:57 +0530
+Message-id: <1347892917-13013-1-git-send-email-sunil.behera@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This feature allows the MCE to set the notification mode
+on the MSE side.
 ---
- Makefile.am      |    1 +
- client/manager.c |    2 +
- client/mns.c     |  138 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- client/mns.h     |   24 ++++++++++
- 4 files changed, 165 insertions(+)
- create mode 100644 client/mns.c
- create mode 100644 client/mns.h
+ plugins/mas.c              |   50 ++++++++++++++++++++++++++++++++++++++++++--
+ plugins/messages-dummy.c   |    6 ++----
+ plugins/messages-tracker.c |    6 ++----
+ plugins/messages.h         |   17 +++++++--------
+ 4 files changed, 60 insertions(+), 19 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 724dd5d..709f1bc 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -127,6 +127,7 @@ client_obex_client_SOURCES = $(gdbus_sources) $(gobex_sources) \
- 				client/transport.h client/transport.c \
- 				client/dbus.h client/dbus.c \
- 				client/driver.h client/driver.c \
-+				client/mns.h client/mns.c \
- 				src/map_ap.h
- 
- client_obex_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ @BLUEZ_LIBS@
-diff --git a/client/manager.c b/client/manager.c
-index 7f2fede9..8ba1647 100644
---- a/client/manager.c
-+++ b/client/manager.c
-@@ -44,6 +44,7 @@
- #include "pbap.h"
- #include "sync.h"
- #include "map.h"
-+#include "mns.h"
- 
- #define CLIENT_SERVICE		"org.bluez.obex.client"
- 
-@@ -252,6 +253,7 @@ static struct obc_module {
- 	{ "pbap", pbap_init, pbap_exit },
- 	{ "sync", sync_init, sync_exit },
- 	{ "map", map_init, map_exit },
-+	{ "mns", mns_init, mns_exit },
- 	{ }
+diff --git a/plugins/mas.c b/plugins/mas.c
+index 186d267..977e5a1 100644
+--- a/plugins/mas.c
++++ b/plugins/mas.c
+@@ -119,6 +119,8 @@ struct mas_session {
+ 	GObexApparam *inparams;
+ 	GObexApparam *outparams;
+ 	gboolean ap_sent;
++	uint8_t notification_status;
++	char *remote_addr;
  };
  
-diff --git a/client/mns.c b/client/mns.c
-new file mode 100644
-index 0000000..f5a5905
---- /dev/null
-+++ b/client/mns.c
-@@ -0,0 +1,138 @@
-+/*
-+ *
-+ *  OBEX Client
-+ *
-+ *  Copyright (C) 2012 Samsung Electronics Co., Ltd.
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
+ static const uint8_t MAS_TARGET[TARGET_SIZE] = {
+@@ -167,12 +169,14 @@ static void reset_request(struct mas_session *mas)
+ static void mas_clean(struct mas_session *mas)
+ {
+ 	reset_request(mas);
++	g_free(mas->remote_addr);
+ 	g_free(mas);
+ }
+ 
+ static void *mas_connect(struct obex_session *os, int *err)
+ {
+ 	struct mas_session *mas;
++	char *address;
+ 
+ 	DBG("");
+ 
+@@ -184,6 +188,9 @@ static void *mas_connect(struct obex_session *os, int *err)
+ 
+ 	manager_register_session(os);
+ 
++	if (obex_getpeername(os, &address) == 0)
++		mas->remote_addr = address;
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <errno.h>
-+#include <glib.h>
-+#include <gdbus.h>
-+#include <string.h>
-+
-+#include <gobex-apparam.h>
-+
-+#include "log.h"
-+
-+#include "transfer.h"
-+#include "session.h"
-+#include "driver.h"
-+#include "mns.h"
-+
-+#define OBEX_MNS_UUID \
-+	"\xBB\x58\x2B\x41\x42\x0C\x11\xDB\xB0\xDE\x08\x00\x20\x0C\x9A\x66"
-+#define OBEX_MNS_UUID_LEN 16
-+
-+#define MNS_INTERFACE  "org.bluez.obex.MessageNotification"
-+#define ERROR_INTERFACE "org.bluez.obex.Error"
-+#define MNS_UUID "00001133-0000-1000-8000-00805f9b34fb"
-+
-+struct mns_data {
-+	struct obc_session *session;
-+	DBusMessage *msg;
-+};
-+
-+static DBusConnection *conn = NULL;
-+
-+static GDBusMethodTable mns_methods[] = {
-+	{ }
-+};
-+
-+static void mns_free(void *data)
+ 	return mas;
+ 
+ failed:
+@@ -695,6 +702,45 @@ static void *message_set_status_open(const char *name, int oflag, mode_t mode,
+ 	return mas;
+ }
+ 
++static void *notification_registration_open(const char *name, int oflag,
++						mode_t mode, void *driver_data,
++						size_t *size, int *err)
 +{
-+	struct mns_data *mns = data;
++	struct mas_session *mas = driver_data;
++	uint8_t status;
 +
-+	obc_session_unref(mns->session);
-+	g_free(mns);
++	if (oflag == O_RDONLY) {
++		*err = -EBADR;
++		return NULL;
++	}
++
++	if (!g_obex_apparam_get_uint8(mas->inparams, MAP_AP_NOTIFICATIONSTATUS,
++								&status)) {
++		*err = -EBADR;
++		return NULL;
++	}
++
++	*err = 0;
++	mas->notification_status = status;
++	mas->finished = TRUE;
++	return mas;
 +}
 +
-+static int mns_probe(struct obc_session *session)
++static int notification_registration_close(void *obj)
 +{
-+	struct mns_data *mns;
-+	const char *path;
++	struct mas_session *mas = obj;
 +
-+	path = obc_session_get_path(session);
++	DBG("");
 +
-+	DBG("%s", path);
++	messages_set_notification_registration(mas->backend_data,
++						mas->remote_addr,
++						mas->notification_status, mas);
 +
-+	mns = g_try_new0(struct mns_data, 1);
-+	if (!mns)
-+		return -ENOMEM;
-+
-+	mns->session = obc_session_ref(session);
-+
-+	if (!g_dbus_register_interface(conn, path, MNS_INTERFACE, mns_methods,
-+						NULL, NULL, mns, mns_free)) {
-+		mns_free(mns);
-+		return -ENOMEM;
-+	}
++	reset_request(mas);
 +
 +	return 0;
 +}
 +
-+static void mns_remove(struct obc_session *session)
-+{
-+	const char *path = obc_session_get_path(session);
+ static ssize_t any_get_next_header(void *object, void *buf, size_t mtu,
+ 								uint8_t *hi)
+ {
+@@ -820,8 +866,8 @@ static struct obex_mime_type_driver mime_notification_registration = {
+ 	.target = MAS_TARGET,
+ 	.target_size = TARGET_SIZE,
+ 	.mimetype = "x-bt/MAP-NotificationRegistration",
+-	.open = any_open,
+-	.close = any_close,
++	.open = notification_registration_open,
++	.close = notification_registration_close,
+ 	.read = any_read,
+ 	.write = any_write,
+ };
+diff --git a/plugins/messages-dummy.c b/plugins/messages-dummy.c
+index 4c66f51..ecbe894 100644
+--- a/plugins/messages-dummy.c
++++ b/plugins/messages-dummy.c
+@@ -251,10 +251,8 @@ void messages_disconnect(void *s)
+ 	g_free(session);
+ }
+ 
+-int messages_set_notification_registration(void *session,
+-		void (*send_event)(void *session,
+-			const struct messages_event *event, void *user_data),
+-		void *user_data)
++int messages_set_notification_registration(void *session, char *address,
++						uint8_t status, void *user_data)
+ {
+ 	return -ENOSYS;
+ }
+diff --git a/plugins/messages-tracker.c b/plugins/messages-tracker.c
+index 2c7541b..aa62870 100644
+--- a/plugins/messages-tracker.c
++++ b/plugins/messages-tracker.c
+@@ -180,10 +180,8 @@ void messages_disconnect(void *s)
+ 	g_free(session);
+ }
+ 
+-int messages_set_notification_registration(void *session,
+-		void (*send_event)(void *session,
+-			const struct messages_event *event, void *user_data),
+-		void *user_data)
++int messages_set_notification_registration(void *session, char *address,
++						uint8_t status, void *user_data)
+ {
+ 	return -ENOSYS;
+ }
+diff --git a/plugins/messages.h b/plugins/messages.h
+index 00a16b1..0fe5cc3 100644
+--- a/plugins/messages.h
++++ b/plugins/messages.h
+@@ -169,18 +169,17 @@ void messages_disconnect(void *session);
+  * value is used to set the error code in OBEX response.
+  ******************************************************************************/
+ 
+-/* Registers for messaging events notifications.
++/* Registers Message Client for receiving message event reports.
+  *
+  * session: Backend session.
+- * send_event: Function that will be called to indicate a new event.
+- *
+- * To unregister currently registered notifications, call this with send_event
+- * set to NULL.
++ * address: Remote device address that request notification registration.
++ * status: To indicate message notification registraton status
++ * user_data: User data if any to be sent.
+  */
+-int messages_set_notification_registration(void *session,
+-		void (*send_event)(void *session,
+-			const struct messages_event *event, void *user_data),
+-		void *user_data);
 +
-+	DBG("%s", path);
-+
-+	g_dbus_unregister_interface(conn, path, MNS_INTERFACE);
-+}
-+
-+static struct obc_driver mns = {
-+	.service = "MNS",
-+	.uuid = MNS_UUID,
-+	.target = OBEX_MNS_UUID,
-+	.target_len = OBEX_MNS_UUID_LEN,
-+	.probe = mns_probe,
-+	.remove = mns_remove
-+};
-+
-+int mns_init(void)
-+{
-+	int err;
-+
-+	DBG("");
-+
-+	conn = dbus_bus_get(DBUS_BUS_SESSION, NULL);
-+	if (!conn)
-+		return -EIO;
-+
-+	err = obc_driver_register(&mns);
-+	if (err < 0) {
-+		dbus_connection_unref(conn);
-+		conn = NULL;
-+		return err;
-+	}
-+
-+	return 0;
-+}
-+
-+void mns_exit(void)
-+{
-+	DBG("");
-+
-+	dbus_connection_unref(conn);
-+	conn = NULL;
-+
-+	obc_driver_unregister(&mns);
-+}
-diff --git a/client/mns.h b/client/mns.h
-new file mode 100644
-index 0000000..e4ee5e5
---- /dev/null
-+++ b/client/mns.h
-@@ -0,0 +1,24 @@
-+/*
-+ *
-+ *  OBEX Client
-+ *
-+ *  Copyright (C) 2012 Samsung Electronics Co., Ltd.
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+int mns_init(void);
-+void mns_exit(void);
++int messages_set_notification_registration(void *session, char *address,
++						uint8_t status,
++						void *user_data);
+ 
+ /* Changes current directory.
+  *
 -- 
 1.7.9.5
 
