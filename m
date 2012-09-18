@@ -4,9 +4,9 @@ To: linux-bluetooth@vger.kernel.org
 Cc: mathewm@codeaurora.org,
 	gustavo@padovan.org,
 	marcel@holtmann.org
-Subject: [PATCHv6 10/17] Bluetooth: A2MP: Process A2MP Get AMP Assoc Rsp
-Date: Tue, 18 Sep 2012 17:28:22 +0300
-Message-Id: <1347978509-12133-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv6 02/17] Bluetooth: A2MP: Create amp_mgr global list
+Date: Tue, 18 Sep 2012 17:28:14 +0300
+Message-Id: <1347978509-12133-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1347978509-12133-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1347978509-12133-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -14,92 +14,109 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When receiving A2MP Get AMP Assoc Response save assoc data to remote
-AMP controller list and prepare for creating physical link.
+Create amp_mgr_list global list which will be used by different
+hci devices to find amp_mgr.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   60 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 59 insertions(+), 1 deletion(-)
+ include/net/bluetooth/a2mp.h |   10 ++++++++++
+ net/bluetooth/a2mp.c         |   29 +++++++++++++++++++++++++++++
+ 2 files changed, 39 insertions(+)
 
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+index 6a76e0a..316c1c8 100644
+--- a/include/net/bluetooth/a2mp.h
++++ b/include/net/bluetooth/a2mp.h
+@@ -19,12 +19,18 @@
+ 
+ #define A2MP_FEAT_EXT	0x8000
+ 
++enum amp_mgr_state {
++	READ_LOC_AMP_INFO,
++};
++
+ struct amp_mgr {
++	struct list_head	list;
+ 	struct l2cap_conn	*l2cap_conn;
+ 	struct l2cap_chan	*a2mp_chan;
+ 	struct kref		kref;
+ 	__u8			ident;
+ 	__u8			handle;
++	enum amp_mgr_state	state;
+ 	unsigned long		flags;
+ };
+ 
+@@ -118,9 +124,13 @@ struct a2mp_physlink_rsp {
+ #define A2MP_STATUS_PHYS_LINK_EXISTS		0x05
+ #define A2MP_STATUS_SECURITY_VIOLATION		0x06
+ 
++extern struct list_head amp_mgr_list;
++extern struct mutex amp_mgr_list_lock;
++
+ void amp_mgr_get(struct amp_mgr *mgr);
+ int amp_mgr_put(struct amp_mgr *mgr);
+ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
+ 				       struct sk_buff *skb);
++struct amp_mgr *amp_mgr_lookup_by_state(u8 state);
+ 
+ #endif /* __A2MP_H */
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 594df96..d0fde05 100644
+index 0760d1f..3f93060 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -343,6 +343,61 @@ done:
- 	return 0;
+@@ -17,6 +17,10 @@
+ #include <net/bluetooth/l2cap.h>
+ #include <net/bluetooth/a2mp.h>
+ 
++/* Global AMP Manager list */
++LIST_HEAD(amp_mgr_list);
++DEFINE_MUTEX(amp_mgr_list_lock);
++
+ /* A2MP build & send command helper functions */
+ static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
+ {
+@@ -516,6 +520,10 @@ static void amp_mgr_destroy(struct kref *kref)
+ 
+ 	BT_DBG("mgr %p", mgr);
+ 
++	mutex_lock(&amp_mgr_list_lock);
++	list_del(&mgr->list);
++	mutex_unlock(&amp_mgr_list_lock);
++
+ 	kfree(mgr);
  }
  
-+static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
-+				struct a2mp_cmd *hdr)
-+{
-+	struct a2mp_amp_assoc_rsp *rsp = (void *) skb->data;
-+	u16 len = le16_to_cpu(hdr->len);
-+	struct hci_dev *hdev;
-+	struct amp_ctrl *ctrl;
-+	struct hci_conn *hcon;
-+
-+	if (len < sizeof(*rsp))
-+		return -EINVAL;
-+
-+	BT_DBG("id %d status 0x%2.2x assoc len %u", rsp->id, rsp->status,
-+	       len - sizeof(*rsp));
-+
-+	if (rsp->status)
-+		return -EINVAL;
-+
-+	/* Save remote ASSOC data */
-+	ctrl = amp_ctrl_lookup(mgr, rsp->id);
-+	if (ctrl) {
-+		u8 *assoc, assoc_len = len - sizeof(*rsp);
-+
-+		assoc = kzalloc(assoc_len, GFP_KERNEL);
-+		if (!assoc) {
-+			amp_ctrl_put(ctrl);
-+			return -ENOMEM;
-+		}
-+
-+		memcpy(assoc, rsp->amp_assoc, assoc_len);
-+		ctrl->assoc = assoc;
-+		ctrl->assoc_len = assoc_len;
-+		ctrl->assoc_rem_len = assoc_len;
-+		ctrl->assoc_len_so_far = 0;
-+
-+		amp_ctrl_put(ctrl);
-+	}
-+
-+	/* Create Phys Link */
-+	hdev = hci_dev_get(rsp->id);
-+	if (!hdev)
-+		return -EINVAL;
-+
-+	hcon = phylink_add(hdev, mgr, rsp->id);
-+	if (!hcon)
-+		goto done;
-+
-+	BT_DBG("Created hcon %p: loc:%d -> rem:%d", hcon, hdev->id, rsp->id);
-+
-+done:
-+	hci_dev_put(hdev);
-+	skb_pull(skb, len);
-+	return 0;
-+}
-+
- static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 				   struct a2mp_cmd *hdr)
- {
-@@ -502,8 +557,11 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 			err = a2mp_getinfo_rsp(mgr, skb, hdr);
- 			break;
+@@ -552,6 +560,10 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
  
--		case A2MP_CHANGE_RSP:
- 		case A2MP_GETAMPASSOC_RSP:
-+			err = a2mp_getampassoc_rsp(mgr, skb, hdr);
-+			break;
+ 	kref_init(&mgr->kref);
+ 
++	mutex_lock(&amp_mgr_list_lock);
++	list_add(&mgr->list, &amp_mgr_list);
++	mutex_unlock(&amp_mgr_list_lock);
 +
-+		case A2MP_CHANGE_RSP:
- 		case A2MP_CREATEPHYSLINK_RSP:
- 		case A2MP_DISCONNPHYSLINK_RSP:
- 			err = a2mp_cmd_rsp(mgr, skb, hdr);
+ 	return mgr;
+ }
+ 
+@@ -570,3 +582,20 @@ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
+ 
+ 	return mgr->a2mp_chan;
+ }
++
++struct amp_mgr *amp_mgr_lookup_by_state(u8 state)
++{
++	struct amp_mgr *mgr;
++
++	mutex_lock(&amp_mgr_list_lock);
++	list_for_each_entry(mgr, &amp_mgr_list, list) {
++		if (mgr->state == state) {
++			amp_mgr_get(mgr);
++			mutex_unlock(&amp_mgr_list_lock);
++			return mgr;
++		}
++	}
++	mutex_unlock(&amp_mgr_list_lock);
++
++	return NULL;
++}
 -- 
 1.7.9.5
