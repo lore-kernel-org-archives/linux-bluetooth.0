@@ -1,57 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 18 Sep 2012 20:18:20 -0300
+Date: Tue, 18 Sep 2012 20:16:50 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: AceLan Kao <acelan.kao@canonical.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: [PATCH] Bluetooth: Add support for BCM20702A0 [0a5c:21f1]
-Message-ID: <20120918231820.GB24689@joana>
-References: <1347871235-11538-1-git-send-email-acelan.kao@canonical.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] Bluetooth: Fix not removing power_off delayed work
+Message-ID: <20120918231650.GA24689@joana>
+References: <1347651286-4699-1-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1347871235-11538-1-git-send-email-acelan.kao@canonical.com>
+In-Reply-To: <1347651286-4699-1-git-send-email-vinicius.gomes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi AceLan,
+Hi Vinicius,
 
-* AceLan Kao <acelan.kao@canonical.com> [2012-09-17 16:40:35 +0800]:
+* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2012-09-14 16:34:46 -0300]:
 
-> Add another vendor specific ID for BCM20702A0.
+> For example, when a usb reset is received (I could reproduce it
+> running something very similar to this[1] in a loop) it could be
+> that the device is unregistered while the power_off delayed work
+> is still scheduled to run.
 > 
-> output of usb-devices:
-> T:  Bus=02 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0a5c ProdID=21f1 Rev=01.12
-> S:  Manufacturer=Broadcom Corp
-> S:  Product=BCM20702A0
-> S:  SerialNumber=9CB70D807395
-> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+> Backtrace:
 > 
-> Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+> WARNING: at lib/debugobjects.c:261 debug_print_object+0x7c/0x8d()
+> Hardware name: To Be Filled By O.E.M.
+> ODEBUG: free active (active state 0) object type: timer_list hint: delayed_work_timer_fn+0x0/0x26
+> Modules linked in: nouveau mxm_wmi btusb wmi bluetooth ttm coretemp drm_kms_helper
+> Pid: 2114, comm: usb-reset Not tainted 3.5.0bt-next #2
+> Call Trace:
+>  [<ffffffff8124cc00>] ? free_obj_work+0x57/0x91
+>  [<ffffffff81058f88>] warn_slowpath_common+0x7e/0x97
+>  [<ffffffff81059035>] warn_slowpath_fmt+0x41/0x43
+>  [<ffffffff8124ccb6>] debug_print_object+0x7c/0x8d
+>  [<ffffffff8106e3ec>] ? __queue_work+0x259/0x259
+>  [<ffffffff8124d63e>] ? debug_check_no_obj_freed+0x6f/0x1b5
+>  [<ffffffff8124d667>] debug_check_no_obj_freed+0x98/0x1b5
+>  [<ffffffffa00aa031>] ? bt_host_release+0x10/0x1e [bluetooth]
+>  [<ffffffff810fc035>] kfree+0x90/0xe6
+>  [<ffffffffa00aa031>] bt_host_release+0x10/0x1e [bluetooth]
+>  [<ffffffff812ec2f9>] device_release+0x4a/0x7e
+>  [<ffffffff8123ef57>] kobject_release+0x11d/0x154
+>  [<ffffffff8123ed98>] kobject_put+0x4a/0x4f
+>  [<ffffffff812ec0d9>] put_device+0x12/0x14
+>  [<ffffffffa009472b>] hci_free_dev+0x22/0x26 [bluetooth]
+>  [<ffffffffa0280dd0>] btusb_disconnect+0x96/0x9f [btusb]
+>  [<ffffffff813581b4>] usb_unbind_interface+0x57/0x106
+>  [<ffffffff812ef988>] __device_release_driver+0x83/0xd6
+>  [<ffffffff812ef9fb>] device_release_driver+0x20/0x2d
+>  [<ffffffff813582a7>] usb_driver_release_interface+0x44/0x7b
+>  [<ffffffff81358795>] usb_forced_unbind_intf+0x45/0x4e
+>  [<ffffffff8134f959>] usb_reset_device+0xa6/0x12e
+>  [<ffffffff8135df86>] usbdev_do_ioctl+0x319/0xe20
+>  [<ffffffff81203244>] ? avc_has_perm_flags+0xc9/0x12e
+>  [<ffffffff812031a0>] ? avc_has_perm_flags+0x25/0x12e
+>  [<ffffffff81050101>] ? do_page_fault+0x31e/0x3a1
+>  [<ffffffff8135eaa6>] usbdev_ioctl+0x9/0xd
+>  [<ffffffff811126b1>] vfs_ioctl+0x21/0x34
+>  [<ffffffff81112f7b>] do_vfs_ioctl+0x408/0x44b
+>  [<ffffffff81208d45>] ? file_has_perm+0x76/0x81
+>  [<ffffffff8111300f>] sys_ioctl+0x51/0x76
+>  [<ffffffff8158db22>] system_call_fastpath+0x16/0x1b
+> 
+> [1] http://cpansearch.perl.org/src/DPAVLIN/Biblio-RFID-0.03/examples/usbreset.c
+> 
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 > ---
->  drivers/bluetooth/btusb.c |    1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index f637c25..817f661 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -99,6 +99,7 @@ static struct usb_device_id btusb_table[] = {
->  	{ USB_DEVICE(0x0a5c, 0x21e8) },
->  	{ USB_DEVICE(0x0a5c, 0x21f3) },
->  	{ USB_DEVICE(0x413c, 0x8197) },
-> +	{ USB_DEVICE(0x0a5c, 0x21f1) },
->  
->  	/* Foxconn - Hon Hai */
->  	{ USB_DEVICE(0x0489, 0xe033) },
+>  net/bluetooth/hci_core.c | 2 ++
+>  1 file changed, 2 insertions(+)
 
-This patch is not needed anymore, we already supports it in latest
-bluetooth.git tree.
+patch has been applied to the bluetooth.git tree. Thanks.
 
 	Gustavo
