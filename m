@@ -1,66 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: bluetoothd: Refusing input device connect: Operation already
- in progress (114)
-From: Pacho Ramos <pacho@gentoo.org>
+From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1347704153.24322.11.camel@belkin4>
-References: <1347704153.24322.11.camel@belkin4>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-QUe2lmCBSJ110ZtQyfkD"
-Date: Tue, 18 Sep 2012 21:01:41 +0200
-Message-ID: <1347994901.27524.21.camel@belkin4>
-Mime-Version: 1.0
+Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Subject: [PATCH] Bluetooth: Force the process of unpair command if disconnect failed
+Date: Tue, 18 Sep 2012 13:36:54 -0400
+Message-Id: <1347989814-4958-1-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+The unpair process tries to disconnect any connection pending with
+remote. If there are some connection in connecting state, disconnect
+command will fail and unpair mgmt command will stay pending.
 
---=-QUe2lmCBSJ110ZtQyfkD
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+That pending mgmt command can cause strange behavior like automatic
+unpair after a lost connection.
+---
+ net/bluetooth/mgmt.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-El s=C3=A1b, 15-09-2012 a las 12:15 +0200, Pacho Ramos escribi=C3=B3:
-> Hello
->=20
-> Downstream we got the following report:
-> https://bugs.gentoo.org/show_bug.cgi?id=3D431624
->=20
-> After adding mouse (via Blueman's "Add device" dialog) it works fine
-> until sleeping or powering off. After that it fails reconnecting.
-> In /var/log/messages appears strings like these:
->=20
-> Aug 16 15:40:31 user bluetoothd[3222]: Refusing input device connect:
-> Operation already in progress (114)
-> Aug 16 15:45:13 user bluetoothd[3222]: Refusing input device connect:
-> Operation already in progress (114)
-> Aug 16 15:45:16 user bluetoothd[3222]: Refusing input device connect:
-> Operation already in progress (114)
-> Aug 16 15:45:17 user bluetoothd[3222]: Refusing input device connect:
-> Operation already in progress (114)
-> Aug 16 15:45:19 user bluetoothd[3222]: Refusing input device connect:
-> Operation already in progress (114)
-> Aug 16 15:47:46 user bluetoothd[3222]: Refusing input device connect:
-> Operation already in progress (114)
->=20
-> Searching, I found this thread that pointed to the culprit, but I
-> haven't found what finally occurred with it, if patch was reverted or a
-> different fix was pulled in:
-> http://www.spinics.net/lists/linux-bluetooth/msg26442.html
->=20
-> Thanks
-
-No idea? :/
-
-
---=-QUe2lmCBSJ110ZtQyfkD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.19 (GNU/Linux)
-
-iEYEABECAAYFAlBYxRUACgkQCaWpQKGI+9RzZACfZldC6dk+dqQKwDnHx0/vnsHy
-Z5IAnj1ojy357jbzJyZ17rVPknmlhf5g
-=WHNu
------END PGP SIGNATURE-----
-
---=-QUe2lmCBSJ110ZtQyfkD--
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 05d4b83..78caef2 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3108,6 +3108,9 @@ int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 	struct pending_cmd *cmd;
+ 	int err;
+ 
++	mgmt_pending_foreach(MGMT_OP_UNPAIR_DEVICE, hdev, unpair_device_rsp,
++			     hdev);
++
+ 	cmd = mgmt_pending_find(MGMT_OP_DISCONNECT, hdev);
+ 	if (!cmd)
+ 		return -ENOENT;
+@@ -3120,8 +3123,6 @@ int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 
+ 	mgmt_pending_remove(cmd);
+ 
+-	mgmt_pending_foreach(MGMT_OP_UNPAIR_DEVICE, hdev, unpair_device_rsp,
+-			     hdev);
+ 	return err;
+ }
+ 
+-- 
+1.7.12
 
