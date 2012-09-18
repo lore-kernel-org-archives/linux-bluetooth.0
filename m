@@ -1,35 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1347979623-14643-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1347979623-14643-1-git-send-email-claudio.takahasi@openbossa.org>
-Date: Tue, 18 Sep 2012 11:59:20 -0400
-Message-ID: <CAJdJm_OSzp9i_ox380aFJvrTWwUKUeR2OYeZQDPvoBxSXvYYjw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] gatttool: Fix Characteristic descriptor discovery
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ] gatttool: Fix Characteristic descriptor discovery
+Date: Tue, 18 Sep 2012 11:47:03 -0300
+Message-Id: <1347979623-14643-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+This patch fixes end condition for Characteristic Descriptor Discovery.
+This sub-procedure is complete when the Error Response is received and
+the Error Code is set to Attribute Not Found or the Find Information
+Response has an Attribute Handle that is equal to the Ending Handle of
+the request.
+---
+ attrib/interactive.c | 22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
 
-On Tue, Sep 18, 2012 at 10:47 AM, Claudio Takahasi
-<claudio.takahasi@openbossa.org> wrote:
-> @@ -298,7 +300,10 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
->
->         att_data_list_free(list);
->
-> -       rl_forced_update_display();
-> +       if (handle != 0xffff && handle < end) {
-> +               gatt_find_info(attrib, handle + 1, end, char_desc_cb, NULL);
-> +       } else
-> +               rl_forced_update_display();
-
-Just a minor nitpick: no need for curly brackets here.
-
-Regards,
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index 1b0edf4..503daa7 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -48,6 +48,8 @@ static gchar *opt_dst_type = NULL;
+ static gchar *opt_sec_level = NULL;
+ static int opt_psm = 0;
+ static int opt_mtu = 0;
++static int start;
++static int end;
+ 
+ struct characteristic_data {
+ 	uint16_t orig_start;
+@@ -265,11 +267,12 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ {
+ 	struct att_data_list *list;
+ 	guint8 format;
++	uint16_t handle = 0xffff;
+ 	int i;
+ 
+ 	if (status != 0) {
+-		printf("Discover all characteristic descriptors failed: "
+-						"%s\n", att_ecode2str(status));
++		printf("Discover descriptors finished: %s\n",
++						att_ecode2str(status));
+ 		return;
+ 	}
+ 
+@@ -280,7 +283,6 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	printf("\n");
+ 	for (i = 0; i < list->num; i++) {
+ 		char uuidstr[MAX_LEN_UUID_STR];
+-		uint16_t handle;
+ 		uint8_t *value;
+ 		bt_uuid_t uuid;
+ 
+@@ -298,7 +300,10 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 
+ 	att_data_list_free(list);
+ 
+-	rl_forced_update_display();
++	if (handle != 0xffff && handle < end) {
++		gatt_find_info(attrib, handle + 1, end, char_desc_cb, NULL);
++	} else
++		rl_forced_update_display();
+ }
+ 
+ static void char_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+@@ -527,9 +532,6 @@ static void cmd_char(int argcp, char **argvp)
+ 
+ static void cmd_char_desc(int argcp, char **argvp)
+ {
+-	int start = 0x0001;
+-	int end = 0xffff;
+-
+ 	if (conn_state != STATE_CONNECTED) {
+ 		printf("Command failed: disconnected\n");
+ 		return;
+@@ -541,7 +543,8 @@ static void cmd_char_desc(int argcp, char **argvp)
+ 			printf("Invalid start handle: %s\n", argvp[1]);
+ 			return;
+ 		}
+-	}
++	} else
++		start = 0x0001;
+ 
+ 	if (argcp > 2) {
+ 		end = strtohandle(argvp[2]);
+@@ -549,7 +552,8 @@ static void cmd_char_desc(int argcp, char **argvp)
+ 			printf("Invalid end handle: %s\n", argvp[2]);
+ 			return;
+ 		}
+-	}
++	} else
++		end = 0xffff;
+ 
+ 	gatt_find_info(attrib, start, end, char_desc_cb, NULL);
+ }
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.12
+
