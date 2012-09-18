@@ -4,9 +4,9 @@ To: linux-bluetooth@vger.kernel.org
 Cc: mathewm@codeaurora.org,
 	gustavo@padovan.org,
 	marcel@holtmann.org
-Subject: [PATCHv6 11/17] Bluetooth: Choose connection based on capabilities
-Date: Tue, 18 Sep 2012 17:28:23 +0300
-Message-Id: <1347978509-12133-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv6 14/17] Bluetooth: AMP: Create Physical Link
+Date: Tue, 18 Sep 2012 17:28:26 +0300
+Message-Id: <1347978509-12133-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1347978509-12133-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1347978509-12133-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -14,204 +14,96 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Choose which L2CAP connection to establish by checking support
-for HS and remote side supported features.
+When receiving A2MP Get AMP Assoc Response execute HCI Create Physical
+Link to AMP controller. Define function which will run when receiving
+HCI Command Status.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h  |    2 ++
- include/net/bluetooth/l2cap.h |    1 +
- net/bluetooth/a2mp.c          |   34 +++++++++++++++++++++++++++++-----
- net/bluetooth/l2cap_core.c    |   33 ++++++++++++++++++++++++++++-----
- 4 files changed, 60 insertions(+), 10 deletions(-)
+ include/net/bluetooth/amp.h |    2 ++
+ net/bluetooth/a2mp.c        |    2 ++
+ net/bluetooth/amp.c         |   19 +++++++++++++++++++
+ net/bluetooth/hci_event.c   |    9 +++++++++
+ 4 files changed, 32 insertions(+)
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 99c7389..9fda7c9 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -28,6 +28,7 @@ struct amp_mgr {
- 	struct list_head	list;
- 	struct l2cap_conn	*l2cap_conn;
- 	struct l2cap_chan	*a2mp_chan;
-+	struct l2cap_chan	*bredr_chan;
- 	struct kref		kref;
- 	__u8			ident;
- 	__u8			handle;
-@@ -137,6 +138,7 @@ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
- 				       struct sk_buff *skb);
- struct amp_mgr *amp_mgr_lookup_by_state(u8 state);
- void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data);
-+void a2mp_discover_amp(struct l2cap_chan *chan);
- void a2mp_send_getinfo_rsp(struct hci_dev *hdev);
- void a2mp_send_getampassoc_rsp(struct hci_dev *hdev, u8 status);
+diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
+index 763b463..cadb3d0 100644
+--- a/include/net/bluetooth/amp.h
++++ b/include/net/bluetooth/amp.h
+@@ -37,5 +37,7 @@ int phylink_gen_key(struct hci_conn *hcon, u8 *data, u8 *len, u8 *type);
+ void amp_read_loc_info(struct hci_dev *hdev, struct amp_mgr *mgr);
+ void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle);
+ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr);
++void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
++			struct hci_conn *hcon);
  
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 7ed8e35..aba830f 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -767,6 +767,7 @@ int l2cap_chan_check_security(struct l2cap_chan *chan);
- void l2cap_chan_set_defaults(struct l2cap_chan *chan);
- int l2cap_ertm_init(struct l2cap_chan *chan);
- void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
-+void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
- void l2cap_chan_del(struct l2cap_chan *chan, int err);
- 
- #endif /* __L2CAP_H */
+ #endif /* __AMP_H */
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index d0fde05..93adaad 100644
+index 93adaad..773e8fc 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -638,7 +638,7 @@ static struct l2cap_ops a2mp_chan_ops = {
- 	.ready = l2cap_chan_no_ready,
- };
+@@ -392,6 +392,8 @@ static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
  
--static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
-+static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn, bool locked)
- {
- 	struct l2cap_chan *chan;
- 	int err;
-@@ -673,7 +673,10 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn)
+ 	BT_DBG("Created hcon %p: loc:%d -> rem:%d", hcon, hdev->id, rsp->id);
  
- 	chan->conf_state = 0;
- 
--	l2cap_chan_add(conn, chan);
-+	if (locked)
-+		__l2cap_chan_add(conn, chan);
-+	else
-+		l2cap_chan_add(conn, chan);
- 
- 	chan->remote_mps = chan->omtu;
- 	chan->mps = chan->omtu;
-@@ -712,7 +715,7 @@ int amp_mgr_put(struct amp_mgr *mgr)
- 	return kref_put(&mgr->kref, &amp_mgr_destroy);
- }
- 
--static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
-+static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn, bool locked)
- {
- 	struct amp_mgr *mgr;
- 	struct l2cap_chan *chan;
-@@ -725,7 +728,7 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
- 
- 	mgr->l2cap_conn = conn;
- 
--	chan = a2mp_chan_open(conn);
-+	chan = a2mp_chan_open(conn, locked);
- 	if (!chan) {
- 		kfree(mgr);
- 		return NULL;
-@@ -754,7 +757,7 @@ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
- {
- 	struct amp_mgr *mgr;
- 
--	mgr = amp_mgr_create(conn);
-+	mgr = amp_mgr_create(conn, false);
- 	if (!mgr) {
- 		BT_ERR("Could not create AMP manager");
- 		return NULL;
-@@ -842,3 +845,24 @@ void a2mp_send_getampassoc_rsp(struct hci_dev *hdev, u8 status)
- 	amp_mgr_put(mgr);
- 	kfree(rsp);
++	amp_create_phylink(hdev, mgr, hcon);
++
+ done:
+ 	hci_dev_put(hdev);
+ 	skb_pull(skb, len);
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index de45696..c95e455 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -232,3 +232,22 @@ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
+ 	mgr->state = READ_LOC_AMP_ASSOC;
+ 	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp);
  }
 +
-+void a2mp_discover_amp(struct l2cap_chan *chan)
++void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
++			struct hci_conn *hcon)
 +{
-+	struct l2cap_conn *conn = chan->conn;
-+	struct amp_mgr *mgr = conn->hcon->amp_mgr;
-+	struct a2mp_discov_req req;
++	struct hci_cp_create_phy_link cp;
 +
-+	BT_DBG("chan %p conn %p mgr %p", chan, conn, mgr);
++	cp.phy_handle = hcon->handle;
 +
-+	if (!mgr) {
-+		mgr = amp_mgr_create(conn, true);
-+		if (!mgr)
-+			return;
++	BT_DBG("%s hcon %p phy handle 0x%2.2x", hdev->name, hcon,
++	       hcon->handle);
++
++	if (phylink_gen_key(mgr->l2cap_conn->hcon, cp.key, &cp.key_len,
++			    &cp.key_type)) {
++		BT_DBG("Cannot create link key");
++		return;
 +	}
 +
-+	mgr->bredr_chan = chan;
-+
-+	req.mtu = cpu_to_le16(L2CAP_A2MP_DEFAULT_MTU);
-+	req.ext_feat = 0;
-+	a2mp_send(mgr, A2MP_DISCOVER_REQ, 1, sizeof(req), &req);
++	hci_send_cmd(hdev, HCI_OP_CREATE_PHY_LINK, sizeof(cp), &cp);
 +}
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 9732f03..df27198 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -455,7 +455,7 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan)
- 	set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 6cc44cf..4b093f8 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1687,6 +1687,11 @@ static void hci_cs_le_start_enc(struct hci_dev *hdev, u8 status)
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
  }
  
--static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
-+void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- {
- 	BT_DBG("conn %p, psm 0x%2.2x, dcid 0x%4.4x", conn,
- 	       __le16_to_cpu(chan->psm), chan->dcid);
-@@ -946,6 +946,18 @@ static inline int __l2cap_no_conn_pending(struct l2cap_chan *chan)
- 	return !test_bit(CONF_CONNECT_PEND, &chan->conf_state);
- }
- 
-+static bool __amp_capable(struct l2cap_chan *chan)
++static void hci_cs_create_phylink(struct hci_dev *hdev, u8 status)
 +{
-+	struct l2cap_conn *conn = chan->conn;
-+
-+	if (enable_hs &&
-+	    chan->chan_policy == BT_CHANNEL_POLICY_AMP_PREFERRED &&
-+	    conn->fixed_chan_mask & L2CAP_FC_A2MP)
-+		return true;
-+	else
-+		return false;
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
 +}
 +
- static void l2cap_send_conn_req(struct l2cap_chan *chan)
+ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
  {
- 	struct l2cap_conn *conn = chan->conn;
-@@ -972,6 +984,16 @@ static void l2cap_chan_ready(struct l2cap_chan *chan)
- 	chan->ops->ready(chan);
- }
+ 	__u8 status = *((__u8 *) skb->data);
+@@ -2496,6 +2501,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cs_le_start_enc(hdev, ev->status);
+ 		break;
  
-+static void l2cap_start_connection(struct l2cap_chan *chan)
-+{
-+	if (__amp_capable(chan)) {
-+		BT_DBG("chan %p AMP capable: discover AMPs", chan);
-+		a2mp_discover_amp(chan);
-+	} else {
-+		l2cap_send_conn_req(chan);
-+	}
-+}
++	case HCI_OP_CREATE_PHY_LINK:
++		hci_cs_create_phylink(hdev, ev->status);
++		break;
 +
- static void l2cap_do_start(struct l2cap_chan *chan)
- {
- 	struct l2cap_conn *conn = chan->conn;
-@@ -986,8 +1008,9 @@ static void l2cap_do_start(struct l2cap_chan *chan)
- 			return;
- 
- 		if (l2cap_chan_check_security(chan) &&
--				__l2cap_no_conn_pending(chan))
--			l2cap_send_conn_req(chan);
-+				__l2cap_no_conn_pending(chan)) {
-+			l2cap_start_connection(chan);
-+		}
- 	} else {
- 		struct l2cap_info_req req;
- 		req.type = __constant_cpu_to_le16(L2CAP_IT_FEAT_MASK);
-@@ -1082,7 +1105,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 				continue;
- 			}
- 
--			l2cap_send_conn_req(chan);
-+			l2cap_start_connection(chan);
- 
- 		} else if (chan->state == BT_CONNECT2) {
- 			struct l2cap_conn_rsp rsp;
-@@ -5454,7 +5477,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 
- 		if (chan->state == BT_CONNECT) {
- 			if (!status) {
--				l2cap_send_conn_req(chan);
-+				l2cap_start_connection(chan);
- 			} else {
- 				__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
- 			}
+ 	default:
+ 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
+ 		break;
 -- 
 1.7.9.5
