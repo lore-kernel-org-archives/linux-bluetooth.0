@@ -4,77 +4,220 @@ To: linux-bluetooth@vger.kernel.org
 Cc: mathewm@codeaurora.org,
 	gustavo@padovan.org,
 	marcel@holtmann.org
-Subject: [PATCHv6 12/17] Bluetooth: Add function to derive AMP key using hmac
-Date: Tue, 18 Sep 2012 17:28:24 +0300
-Message-Id: <1347978509-12133-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv6 17/17] Bluetooth: AMP: Process Chan Selected event
+Date: Tue, 18 Sep 2012 17:28:29 +0300
+Message-Id: <1347978509-12133-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1347978509-12133-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1347978509-12133-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-hmac(sha256) will be used for AMP key generation.
+Channel Selected event indicates that link information data is available.
+Read it with Read Local AMP Assoc command. The data shall be sent in the
+A2MP Create Physical Link Request.
 
-Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/amp.c |   36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ include/net/bluetooth/a2mp.h  |    3 +++
+ include/net/bluetooth/amp.h   |    2 ++
+ include/net/bluetooth/l2cap.h |    2 ++
+ net/bluetooth/a2mp.c          |   41 ++++++++++++++++++++++++++++++++++++++++-
+ net/bluetooth/amp.c           |   15 +++++++++++++++
+ net/bluetooth/hci_event.c     |   21 +++++++++++++++++++++
+ 6 files changed, 83 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index b26ca7c..c9636ae 100644
---- a/net/bluetooth/amp.c
-+++ b/net/bluetooth/amp.c
-@@ -16,6 +16,7 @@
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/a2mp.h>
- #include <net/bluetooth/amp.h>
-+#include <crypto/hash.h>
+diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+index 9fda7c9..e776ab2 100644
+--- a/include/net/bluetooth/a2mp.h
++++ b/include/net/bluetooth/a2mp.h
+@@ -22,6 +22,7 @@
+ enum amp_mgr_state {
+ 	READ_LOC_AMP_INFO,
+ 	READ_LOC_AMP_ASSOC,
++	READ_LOC_AMP_ASSOC_FINAL,
+ };
  
- /* Remote AMP Controllers interface */
- static void amp_ctrl_get(struct amp_ctrl *ctrl)
-@@ -125,6 +126,41 @@ struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
- 	return hcon;
+ struct amp_mgr {
+@@ -134,6 +135,7 @@ extern struct mutex amp_mgr_list_lock;
+ 
+ void amp_mgr_get(struct amp_mgr *mgr);
+ int amp_mgr_put(struct amp_mgr *mgr);
++u8 __next_ident(struct amp_mgr *mgr);
+ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
+ 				       struct sk_buff *skb);
+ struct amp_mgr *amp_mgr_lookup_by_state(u8 state);
+@@ -141,5 +143,6 @@ void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data);
+ void a2mp_discover_amp(struct l2cap_chan *chan);
+ void a2mp_send_getinfo_rsp(struct hci_dev *hdev);
+ void a2mp_send_getampassoc_rsp(struct hci_dev *hdev, u8 status);
++void a2mp_send_create_phy_link_req(struct hci_dev *hdev, u8 status);
+ 
+ #endif /* __A2MP_H */
+diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
+index 8f80329..70496c0 100644
+--- a/include/net/bluetooth/amp.h
++++ b/include/net/bluetooth/amp.h
+@@ -37,6 +37,8 @@ int phylink_gen_key(struct hci_conn *hcon, u8 *data, u8 *len, u8 *type);
+ void amp_read_loc_info(struct hci_dev *hdev, struct amp_mgr *mgr);
+ void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle);
+ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr);
++void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
++				   struct hci_conn *hcon);
+ void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+ 			struct hci_conn *hcon);
+ void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle);
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 0967f9e..ab58b81 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -508,6 +508,8 @@ struct l2cap_chan {
+ 	__u32		remote_acc_lat;
+ 	__u32		remote_flush_to;
+ 
++	__u8		ctrl_id;
++
+ 	struct delayed_work	chan_timer;
+ 	struct delayed_work	retrans_timer;
+ 	struct delayed_work	monitor_timer;
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 28d1246..375a67f 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -67,7 +67,7 @@ void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data)
+ 	kfree(cmd);
  }
  
-+/* AMP crypto key generation interface */
-+static int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
+-static u8 __next_ident(struct amp_mgr *mgr)
++u8 __next_ident(struct amp_mgr *mgr)
+ {
+ 	if (++mgr->ident == 0)
+ 		mgr->ident = 1;
+@@ -420,6 +420,8 @@ static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 
+ 	BT_DBG("Created hcon %p: loc:%d -> rem:%d", hcon, hdev->id, rsp->id);
+ 
++	mgr->bredr_chan->ctrl_id = rsp->id;
++
+ 	amp_create_phylink(hdev, mgr, hcon);
+ 
+ done:
+@@ -876,6 +878,43 @@ void a2mp_send_getampassoc_rsp(struct hci_dev *hdev, u8 status)
+ 	kfree(rsp);
+ }
+ 
++void a2mp_send_create_phy_link_req(struct hci_dev *hdev, u8 status)
 +{
-+	int ret = 0;
-+	struct crypto_shash *tfm;
++	struct amp_mgr *mgr;
++	struct amp_assoc *loc_assoc = &hdev->loc_assoc;
++	struct a2mp_physlink_req *req;
++	struct l2cap_chan *bredr_chan;
++	size_t len;
 +
-+	if (!ksize)
-+		return -EINVAL;
++	mgr = amp_mgr_lookup_by_state(READ_LOC_AMP_ASSOC_FINAL);
++	if (!mgr)
++		return;
 +
-+	tfm = crypto_alloc_shash("hmac(sha256)", 0, 0);
-+	if (IS_ERR(tfm)) {
-+		BT_DBG("crypto_alloc_ahash failed: err %ld", PTR_ERR(tfm));
-+		return PTR_ERR(tfm);
++	len = sizeof(*req) + loc_assoc->len;
++
++	BT_DBG("%s mgr %p assoc_len %zu", hdev->name, mgr, len);
++
++	req = kzalloc(len, GFP_KERNEL);
++	if (!req) {
++		amp_mgr_put(mgr);
++		return;
 +	}
 +
-+	ret = crypto_shash_setkey(tfm, key, ksize);
-+	if (ret) {
-+		BT_DBG("crypto_ahash_setkey failed: err %d", ret);
-+	} else {
-+		struct {
-+			struct shash_desc shash;
-+			char ctx[crypto_shash_descsize(tfm)];
-+		} desc;
++	bredr_chan = mgr->bredr_chan;
++	if (!bredr_chan)
++		goto clean;
 +
-+		desc.shash.tfm = tfm;
-+		desc.shash.flags = CRYPTO_TFM_REQ_MAY_SLEEP;
++	req->local_id = hdev->id;
++	req->remote_id = bredr_chan->ctrl_id;
++	memcpy(req->amp_assoc, loc_assoc->data, loc_assoc->len);
 +
-+		ret = crypto_shash_digest(&desc.shash, plaintext, psize,
-+					  output);
-+	}
++	a2mp_send(mgr, A2MP_CREATEPHYSLINK_REQ, __next_ident(mgr), len, req);
 +
-+	crypto_free_shash(tfm);
-+	return ret;
++clean:
++	amp_mgr_put(mgr);
++	kfree(req);
 +}
 +
- void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle)
+ void a2mp_discover_amp(struct l2cap_chan *chan)
  {
- 	struct hci_cp_read_local_amp_assoc cp;
+ 	struct l2cap_conn *conn = chan->conn;
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index da8ae2d..05e2636 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -233,6 +233,21 @@ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
+ 	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp);
+ }
+ 
++void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
++				   struct hci_conn *hcon)
++{
++	struct hci_cp_read_local_amp_assoc cp;
++	struct amp_mgr *mgr = hcon->amp_mgr;
++
++	cp.phy_handle = hcon->handle;
++	cp.len_so_far = cpu_to_le16(0);
++	cp.max_len = cpu_to_le16(hdev->amp_assoc_size);
++
++	mgr->state = READ_LOC_AMP_ASSOC_FINAL;
++
++	/* Read Local AMP Assoc final link information data */
++	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp);
++}
+ 
+ /* Write AMP Assoc data fragments, returns true with last fragment written*/
+ static bool amp_write_rem_assoc_frag(struct hci_dev *hdev,
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 57a6a16..c5214e9 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -901,6 +901,7 @@ static void hci_cc_read_local_amp_assoc(struct hci_dev *hdev,
+ a2mp_rsp:
+ 	/* Send A2MP Rsp when all fragments are received */
+ 	a2mp_send_getampassoc_rsp(hdev, rp->status);
++	a2mp_send_create_phy_link_req(hdev, rp->status);
+ }
+ 
+ static void hci_cc_delete_stored_link_key(struct hci_dev *hdev,
+@@ -3566,6 +3567,22 @@ static void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	}
+ }
+ 
++static void hci_chan_selected_evt(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct hci_ev_channel_selected *ev = (void *) skb->data;
++	struct hci_conn *hcon;
++
++	BT_DBG("%s handle 0x%2.2x", hdev->name, ev->phy_handle);
++
++	skb_pull(skb, sizeof(*ev));
++
++	hcon = hci_conn_hash_lookup_handle(hdev, ev->phy_handle);
++	if (!hcon)
++		return;
++
++	amp_read_loc_assoc_final_data(hdev, hcon);
++}
++
+ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_event_hdr *hdr = (void *) skb->data;
+@@ -3722,6 +3739,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_le_meta_evt(hdev, skb);
+ 		break;
+ 
++	case HCI_EV_CHANNEL_SELECTED:
++		hci_chan_selected_evt(hdev, skb);
++		break;
++
+ 	case HCI_EV_REMOTE_OOB_DATA_REQUEST:
+ 		hci_remote_oob_data_request_evt(hdev, skb);
+ 		break;
 -- 
 1.7.9.5
