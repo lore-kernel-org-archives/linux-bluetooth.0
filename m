@@ -1,130 +1,249 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Tue, 18 Sep 2012 16:26:48 +0300
-Message-ID: <CAB7uhOR9JjcU_iKrb=9KmYcko5LQFWffYa9Ae4pe3vbBs43zJA@mail.gmail.com>
-Subject: hstest fails in Android
-From: Ahmed Abdelfattah <ahmed.abdelfattah.elshemisy@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Jesse Sung <jesse.sung@canonical.com>
+To: linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH v2 2/2] Bluetooth: broadcom patchram firmware loader
+Date: Tue, 18 Sep 2012 17:49:44 +0800
+Message-Id: <e323a010f7d617184e6fd511438d4f7080bf1707.1347959921.git.jesse.sung@canonical.com>
+In-Reply-To: <cover.1347959921.git.jesse.sung@canonical.com>
+References: <cover.1347959921.git.jesse.sung@canonical.com>
+In-Reply-To: <cover.1347959921.git.jesse.sung@canonical.com>
+References: <cover.1347959921.git.jesse.sung@canonical.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello all,
+From: Wen-chien Jesse Sung <jesse.sung@canonical.com>
 
-I am testing a Bluetooth chip on Android . Now, I am in the phase of
-testing audio connection functionality but it's failing.I ran hstest
-with piantronics Bluetooth headset and the problem seems to happen
-after a Parameter Negotiation command to the HS, the HS doesn't reply
-with PN RSP but instead with DM and then disconnects what could be .
-The same test works fine on ubuntu 11.10 so I am sure the headset is
-ok. What could be a possible reason for this behavior ?
-Here is hcidump log:
+There is an user space firmware loading tool which can be found at
+http://marc.info/?l=linux-bluetooth&m=132039175324993&w=2
 
-< HCI Command: Read Voice Setting (0x03|0x0025) plen 0
-> HCI Event: Command Complete (0x0e) plen 6
-    Read Voice Setting (0x03|0x0025) ncmd 5
-    status 0x00 voice setting 0x0060
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:23:7F:EB:4F:10 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 5
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 128 bdaddr 00:23:7F:EB:4F:10 type ACL encrypt 0x00
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-    handle 128
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 5
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
-    status 0x00 handle 128
-    Features: 0xbc 0xec 0x01 0x00 0x18 0x18 0x00 0x00
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-    bdaddr 00:23:7F:EB:4F:10 mode 2 clkoffset 0x0000
-< ACL data: handle 128 flags 0x00 dlen 10
-    L2CAP(s): Info req: type 2
-> HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 5
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 128 packets 1
-> ACL data: handle 128 flags 0x02 dlen 16
-    L2CAP(s): Info rsp: type 2 result 0
-      Extended feature mask 0x0000
-< ACL data: handle 128 flags 0x00 dlen 12
-    L2CAP(s): Connect req: psm 3 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 128 packets 1
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x00 bdaddr 00:23:7F:EB:4F:10 name 'PLT_MLXX'
-> ACL data: handle 128 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x004c scid 0x0040 result 1 status 2
-      Connection pending - Authorization pending
-> HCI Event: Link Key Request (0x17) plen 6
-    bdaddr 00:23:7F:EB:4F:10
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-    bdaddr 00:23:7F:EB:4F:10 key 81305E3AB5D0447783B7079E1E107374
-> HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Reply (0x01|0x000b) ncmd 5
-    status 0x00 bdaddr 00:23:7F:EB:4F:10
-> ACL data: handle 128 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x004c scid 0x0040 result 0 status 0
-      Connection successful
-< ACL data: handle 128 flags 0x00 dlen 16
-    L2CAP(s): Config req: dcid 0x004c flags 0x00 clen 4
-      MTU 1013
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 128 packets 1
-> ACL data: handle 128 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-      Success
-> ACL data: handle 128 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-      MTU 1013
-< ACL data: handle 128 flags 0x00 dlen 18
-    L2CAP(s): Config rsp: scid 0x004c flags 0x00 result 0 clen 4
-      MTU 1013
-< ACL data: handle 128 flags 0x00 dlen 8
-    L2CAP(d): cid 0x004c len 4 [psm 3]
-      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 128 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 128 packets 1
-> ACL data: handle 128 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-< ACL data: handle 128 flags 0x00 dlen 18
-    L2CAP(d): cid 0x004c len 14 [psm 3]
-      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
-      dlci 12 frame_type 0 credit_flow 15 pri 7 ack_timer 0
-      frame_size 1008 max_retrans 0 credits 7
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 128 packets 1
-> ACL data: handle 128 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): DM: cr 1 dlci 12 pf 1 ilen 0 fcs 0x69
-< ACL data: handle 128 flags 0x00 dlen 8
-    L2CAP(d): cid 0x004c len 4 [psm 3]
-      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
-< ACL data: handle 128 flags 0x00 dlen 12
-    L2CAP(s): Disconn req: dcid 0x004c scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 128 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 128 packets 1
-> ACL data: handle 128 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-> ACL data: handle 128 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x004c scid 0x0040
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-    handle 128 reason 0x13
-    Reason: Remote User Terminated Connection
-> HCI Event: Command Status (0x0f) plen 4
-    Disconnect (0x01|0x0006) status 0x00 ncmd 5
-> HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 128 reason 0x16
-    Reason: Connection Terminated by Local Host
+This tool requires hci device to do the firmware loading, but this
+may cause some race condition between patchram tool and bluetoothd
+or something that also works on hci interface.
 
+Also it needs some hooks to make firmware loads after bootup, s3,
+s4, rfkill, and device hotplug events. Implement this loader in kernel
+module would make things more easier.
+
+The supported firmware is in hcd format, which is a collection of
+hci commands. The download process would be:
+1. reset command
+2. download command
+3. firmware image in hcd file
+4. reset command
+
+/sys/kernel/debug/usb/devices before loading firmware:
+T:  Bus=01 Lev=02 Prnt=02 Port=04 Cnt=02 Dev#=  4 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0a5c ProdID=21d3 Rev= 1.12
+S:  Manufacturer=Broadcom Corp
+S:  Product=BCM43142A0
+S:  SerialNumber=3859F9D6199A
+C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+
+/sys/kernel/debug/usb/devices after loading firmware:
+T:  Bus=01 Lev=02 Prnt=02 Port=04 Cnt=02 Dev#=  4 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0a5c ProdID=21d3 Rev= 1.12
+S:  Manufacturer=Broadcom Corp
+S:  Product=BCM43142A0
+S:  SerialNumber=3859F9D6199A
+C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+
+Signed-off-by: Wen-chien Jesse Sung <jesse.sung@canonical.com>
+---
+ drivers/bluetooth/btusb.c |   75 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 73 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index fbfb069..408a5c6 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -23,6 +23,8 @@
+ 
+ #include <linux/module.h>
+ #include <linux/usb.h>
++#include <linux/delay.h>
++#include <linux/firmware.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -47,6 +49,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_BROKEN_ISOC	0x20
+ #define BTUSB_WRONG_SCO_MTU	0x40
+ #define BTUSB_ATH3012		0x80
++#define BTUSB_BCM_PATCHRAM	0x100
+ 
+ static struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -97,13 +100,13 @@ static struct usb_device_id btusb_table[] = {
+ 
+ 	/* Broadcom BCM20702A0 */
+ 	{ USB_DEVICE(0x0489, 0xe042) },
+-	{ USB_DEVICE(0x413c, 0x8197) },
++	{ USB_DEVICE(0x413c, 0x8197), .driver_info = BTUSB_BCM_PATCHRAM },
+ 
+ 	/* Foxconn - Hon Hai */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xff, 0x01, 0x01) },
+ 
+ 	/*Broadcom devices with vendor specific id */
+-	{ USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01) },
++	{ USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01), .driver_info = BTUSB_BCM_PATCHRAM },
+ 
+ 	{ }	/* Terminating entry */
+ };
+@@ -204,12 +207,14 @@ static struct usb_device_id blacklist_table[] = {
+ #define BTUSB_ISOC_RUNNING	2
+ #define BTUSB_SUSPENDING	3
+ #define BTUSB_DID_ISO_RESUME	4
++#define BTUSB_FIRMWARE_DONE	5
+ 
+ struct btusb_data {
+ 	struct hci_dev       *hdev;
+ 	struct usb_device    *udev;
+ 	struct usb_interface *intf;
+ 	struct usb_interface *isoc;
++	const struct usb_device_id *id;
+ 
+ 	spinlock_t lock;
+ 
+@@ -914,6 +919,69 @@ static void btusb_waker(struct work_struct *work)
+ 	usb_autopm_put_interface(data->intf);
+ }
+ 
++#define PATCHRAM_TIMEOUT	1000
++#define PATCHRAM_NAME_LEN	20
++
++static void btusb_load_firmware(struct hci_dev *hdev)
++{
++	struct btusb_data *data = hci_get_drvdata(hdev);
++	struct usb_device *udev = data->udev;
++	const struct usb_device_id *id = data->id;
++	size_t pos = 0;
++	int err = 0;
++	char filename[PATCHRAM_NAME_LEN];
++	const struct firmware *fw;
++
++	unsigned char reset_cmd[] = { 0x03, 0x0c, 0x00 };
++	unsigned char download_cmd[] = { 0x2e, 0xfc, 0x00 };
++
++	if (!(id->driver_info & BTUSB_BCM_PATCHRAM))
++		return;
++	if (test_and_set_bit(BTUSB_FIRMWARE_DONE, &data->flags))
++		return;
++
++	snprintf(filename, PATCHRAM_NAME_LEN, "fw-%04x_%04x.hcd",
++		id->idVendor, id->idProduct);
++	if (request_firmware(&fw, (const char *) filename, &udev->dev) < 0) {
++		BT_INFO("can't load firmware, may not work correctly");
++		return;
++	}
++
++	if (usb_control_msg(udev, usb_sndctrlpipe(udev, 0), 0, USB_TYPE_CLASS, 0, 0,
++		reset_cmd, sizeof(reset_cmd), PATCHRAM_TIMEOUT) < 0) {
++		err = -1;
++		goto out;
++	}
++	msleep(300);
++
++	if (usb_control_msg(udev, usb_sndctrlpipe(udev, 0), 0, USB_TYPE_CLASS, 0, 0,
++		download_cmd, sizeof(download_cmd), PATCHRAM_TIMEOUT) < 0) {
++		err = -1;
++		goto out;
++	}
++	msleep(300);
++
++	while (pos < fw->size) {
++		size_t len;
++		len = fw->data[pos + 2] + 3;
++		if ((pos + len > fw->size) ||
++			(usb_control_msg(udev, usb_sndctrlpipe(udev, 0), 0,
++			USB_TYPE_CLASS, 0, 0, (void *)fw->data + pos, len,
++			PATCHRAM_TIMEOUT) < 0)) {
++			err = -1;
++			goto out;
++		}
++		pos += len;
++	}
++
++	err = (usb_control_msg(udev, usb_sndctrlpipe(udev, 0), 0, USB_TYPE_CLASS, 0, 0,
++		reset_cmd, sizeof(reset_cmd), PATCHRAM_TIMEOUT) < 0);
++out:
++	if (err)
++		BT_INFO("fail to load firmware, may not work correctly");
++	release_firmware(fw);
++}
++
+ static int btusb_probe(struct usb_interface *intf,
+ 				const struct usb_device_id *id)
+ {
+@@ -1001,6 +1069,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 	init_usb_anchor(&data->isoc_anchor);
+ 	init_usb_anchor(&data->deferred);
+ 
++	data->id = id;
++
+ 	hdev = hci_alloc_dev();
+ 	if (!hdev) {
+ 		kfree(data);
+@@ -1019,6 +1089,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 	hdev->flush    = btusb_flush;
+ 	hdev->send     = btusb_send_frame;
+ 	hdev->notify   = btusb_notify;
++	hdev->load_firmware = btusb_load_firmware;
+ 
+ 	/* Interface numbers are hardcoded in the specification */
+ 	data->isoc = usb_ifnum_to_if(data->udev, 1);
 -- 
-regards ,
-Ahmed Abdelfattah
+1.7.9.5
