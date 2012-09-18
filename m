@@ -4,9 +4,9 @@ To: linux-bluetooth@vger.kernel.org
 Cc: mathewm@codeaurora.org,
 	gustavo@padovan.org,
 	marcel@holtmann.org
-Subject: [PATCHv6 13/17] Bluetooth: AMP: Add AMP key calculation
-Date: Tue, 18 Sep 2012 17:28:25 +0300
-Message-Id: <1347978509-12133-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv6 15/17] Bluetooth: AMP: Write remote AMP Assoc
+Date: Tue, 18 Sep 2012 17:28:27 +0300
+Message-Id: <1347978509-12133-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1347978509-12133-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1347978509-12133-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -14,97 +14,187 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Function calculates AMP keys using hmac_sha256 helper. Calculated keys
-are Generic AMP Link Key (gamp) and Dedicated AMP Link Key with
-keyID "802b" for 802.11 PAL.
+When receiving HCI Command Status after HCI Create Physical Link
+execute HCI Write Remote AMP Assoc command to AMP controller.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/amp.h |    2 ++
- net/bluetooth/Kconfig       |    1 +
- net/bluetooth/amp.c         |   45 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 48 insertions(+)
+ include/net/bluetooth/amp.h      |    2 +
+ include/net/bluetooth/hci_core.h |    2 +
+ net/bluetooth/amp.c              |   80 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |   29 ++++++++++++++
+ 4 files changed, 113 insertions(+)
 
 diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
-index f57854f..763b463 100644
+index cadb3d0..8f80329 100644
 --- a/include/net/bluetooth/amp.h
 +++ b/include/net/bluetooth/amp.h
-@@ -32,6 +32,8 @@ void amp_ctrl_list_flush(struct amp_mgr *mgr);
- struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
- 			     u8 remote_id);
- 
-+int phylink_gen_key(struct hci_conn *hcon, u8 *data, u8 *len, u8 *type);
-+
- void amp_read_loc_info(struct hci_dev *hdev, struct amp_mgr *mgr);
- void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle);
+@@ -39,5 +39,7 @@ void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle);
  void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr);
-diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-index 3537d38..1c11d0d 100644
---- a/net/bluetooth/Kconfig
-+++ b/net/bluetooth/Kconfig
-@@ -11,6 +11,7 @@ menuconfig BT
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_AES
- 	select CRYPTO_ECB
-+	select CRYPTO_SHA256
- 	help
- 	  Bluetooth is low-cost, low-power, short-range wireless technology.
- 	  It was designed as a replacement for cables and other short-range
+ void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+ 			struct hci_conn *hcon);
++void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle);
++void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle);
+ 
+ #endif /* __AMP_H */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a1cda4d..eebfc61 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -127,6 +127,8 @@ struct le_scan_params {
+ struct amp_assoc {
+ 	__u16	len;
+ 	__u16	offset;
++	__u16	rem_len;
++	__u16	len_so_far;
+ 	__u8	data[HCI_MAX_AMP_ASSOC_SIZE];
+ };
+ 
 diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index c9636ae..de45696 100644
+index c95e455..da8ae2d 100644
 --- a/net/bluetooth/amp.c
 +++ b/net/bluetooth/amp.c
-@@ -161,6 +161,51 @@ static int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
- 	return ret;
+@@ -233,6 +233,86 @@ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
+ 	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp);
  }
  
-+int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type)
++
++/* Write AMP Assoc data fragments, returns true with last fragment written*/
++static bool amp_write_rem_assoc_frag(struct hci_dev *hdev,
++				     struct hci_conn *hcon)
 +{
-+	struct hci_dev *hdev = conn->hdev;
-+	struct link_key *key;
-+	u8 keybuf[HCI_AMP_LINK_KEY_SIZE];
-+	u8 gamp_key[HCI_AMP_LINK_KEY_SIZE];
-+	int err;
++	struct hci_cp_write_remote_amp_assoc *cp;
++	struct amp_mgr *mgr = hcon->amp_mgr;
++	struct amp_ctrl *ctrl;
++	u16 frag_len, len;
 +
-+	if (!hci_conn_check_link_mode(conn))
-+		return -EACCES;
++	ctrl = amp_ctrl_lookup(mgr, hcon->remote_id);
++	if (!ctrl)
++		return false;
 +
-+	BT_DBG("conn %p key_type %d", conn, conn->key_type);
++	if (!ctrl->assoc_rem_len) {
++		BT_DBG("all fragments are written");
++		ctrl->assoc_rem_len = ctrl->assoc_len;
++		ctrl->assoc_len_so_far = 0;
 +
-+	/* Legacy key */
-+	if (conn->key_type < 3) {
-+		BT_ERR("Legacy key type %d", conn->key_type);
-+		return -EACCES;
++		amp_ctrl_put(ctrl);
++		return true;
 +	}
 +
-+	*type = conn->key_type;
-+	*len = HCI_AMP_LINK_KEY_SIZE;
++	frag_len = min_t(u16, 248, ctrl->assoc_rem_len);
++	len = frag_len + sizeof(*cp);
 +
-+	key = hci_find_link_key(hdev, &conn->dst);
-+
-+	/* BR/EDR Link Key concatenated together with itself */
-+	memcpy(&keybuf[0], key->val, HCI_LINK_KEY_SIZE);
-+	memcpy(&keybuf[HCI_LINK_KEY_SIZE], key->val, HCI_LINK_KEY_SIZE);
-+
-+	/* Derive Generic AMP Link Key (gamp) */
-+	err = hmac_sha256(keybuf, HCI_AMP_LINK_KEY_SIZE, "gamp", 4, gamp_key);
-+	if (err) {
-+		BT_ERR("Could not derive Generic AMP Key: err %d", err);
-+		return err;
++	cp = kzalloc(len, GFP_KERNEL);
++	if (!cp) {
++		amp_ctrl_put(ctrl);
++		return false;
 +	}
 +
-+	if (conn->key_type == HCI_LK_DEBUG_COMBINATION) {
-+		BT_DBG("Use Generic AMP Key (gamp)");
-+		memcpy(data, gamp_key, HCI_AMP_LINK_KEY_SIZE);
-+		return err;
-+	}
++	BT_DBG("hcon %p ctrl %p frag_len %u assoc_len %u rem_len %u",
++	       hcon, ctrl, frag_len, ctrl->assoc_len, ctrl->assoc_rem_len);
 +
-+	/* Derive Dedicated AMP Link Key: "802b" is 802.11 PAL keyID */
-+	return hmac_sha256(gamp_key, HCI_AMP_LINK_KEY_SIZE, "802b", 4, data);
++	cp->phy_handle = hcon->handle;
++	cp->len_so_far = cpu_to_le16(ctrl->assoc_len_so_far);
++	cp->rem_len = cpu_to_le16(ctrl->assoc_rem_len);
++	memcpy(cp->frag, ctrl->assoc, frag_len);
++
++	ctrl->assoc_len_so_far += frag_len;
++	ctrl->assoc_rem_len -= frag_len;
++
++	amp_ctrl_put(ctrl);
++
++	hci_send_cmd(hdev, HCI_OP_WRITE_REMOTE_AMP_ASSOC, len, cp);
++
++	kfree(cp);
++
++	return false;
 +}
 +
- void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle)
++void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle)
++{
++	struct hci_conn *hcon;
++
++	BT_DBG("%s phy handle 0x%2.2x", hdev->name, handle);
++
++	hcon = hci_conn_hash_lookup_handle(hdev, handle);
++	if (!hcon)
++		return;
++
++	amp_write_rem_assoc_frag(hdev, hcon);
++}
++
++void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle)
++{
++	struct hci_conn *hcon;
++
++	BT_DBG("%s phy handle 0x%2.2x", hdev->name, handle);
++
++	hcon = hci_conn_hash_lookup_handle(hdev, handle);
++	if (!hcon)
++		return;
++
++	BT_DBG("%s phy handle 0x%2.2x hcon %p", hdev->name, handle, hcon);
++
++	amp_write_rem_assoc_frag(hdev, hcon);
++}
++
+ void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+ 			struct hci_conn *hcon)
  {
- 	struct hci_cp_read_local_amp_assoc cp;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 4b093f8..57a6a16 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1215,6 +1215,20 @@ static void hci_cc_write_le_host_supported(struct hci_dev *hdev,
+ 	hci_req_complete(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED, status);
+ }
+ 
++static void hci_cc_write_remote_amp_assoc(struct hci_dev *hdev,
++					  struct sk_buff *skb)
++{
++	struct hci_rp_write_remote_amp_assoc *rp = (void *) skb->data;
++
++	BT_DBG("%s status 0x%2.2x phy_handle 0x%2.2x",
++	       hdev->name, rp->status, rp->phy_handle);
++
++	if (rp->status)
++		return;
++
++	amp_write_rem_assoc_continue(hdev, rp->phy_handle);
++}
++
+ static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+ {
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+@@ -1689,7 +1703,18 @@ static void hci_cs_le_start_enc(struct hci_dev *hdev, u8 status)
+ 
+ static void hci_cs_create_phylink(struct hci_dev *hdev, u8 status)
+ {
++	struct hci_cp_create_phy_link *cp;
++
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	if (status)
++		return;
++
++	cp = hci_sent_cmd_data(hdev, HCI_OP_CREATE_PHY_LINK);
++	if (!cp)
++		return;
++
++	amp_write_remote_assoc(hdev, cp->phy_handle);
+ }
+ 
+ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -2420,6 +2445,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cc_write_le_host_supported(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_WRITE_REMOTE_AMP_ASSOC:
++		hci_cc_write_remote_amp_assoc(hdev, skb);
++		break;
++
+ 	default:
+ 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
+ 		break;
 -- 
 1.7.9.5
