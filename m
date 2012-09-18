@@ -2,50 +2,32 @@ Return-Path: <cyrus@holtmann.org>
 From: Jesse Sung <jesse.sung@canonical.com>
 To: linux-bluetooth@vger.kernel.org,
 	Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH v2 1/2] Bluetooth: Introduced a load_firmware callback to struct hci_dev
-Date: Tue, 18 Sep 2012 17:49:43 +0800
-Message-Id: <e3804705ce378572af7f0a9613eb69b4773a49fc.1347959921.git.jesse.sung@canonical.com>
-In-Reply-To: <cover.1347959921.git.jesse.sung@canonical.com>
-References: <cover.1347959921.git.jesse.sung@canonical.com>
-In-Reply-To: <cover.1347959921.git.jesse.sung@canonical.com>
-References: <cover.1347959921.git.jesse.sung@canonical.com>
+Subject: [PATCH v2 0/2] Bluetooth: broadcom patchram firmware loader
+Date: Tue, 18 Sep 2012 17:49:42 +0800
+Message-Id: <cover.1347959921.git.jesse.sung@canonical.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Wen-chien Jesse Sung <jesse.sung@canonical.com>
 
-load_firmware will be called at the end of hci_dev_open() if it
-is defined.
+There is an user space firmware loading tool which can be found at
+http://marc.info/?l=linux-bluetooth&m=132039175324993&w=2
 
-Signed-off-by: Wen-chien Jesse Sung <jesse.sung@canonical.com>
----
+This tool requires hci device to do the firmware loading, but this
+may cause some race condition between patchram tool and bluetoothd
+or something that also works on hci interface.
+
+Also it needs some hooks to make firmware loads after bootup, s3,
+s4, rfkill, and device hotplug events. Implement this loader in kernel
+module would make things more easier.
+
+Wen-chien Jesse Sung (2):
+  Introduced a load_firmware callback to struct hci_dev
+  broadcom patchram firmware loader
+
+ drivers/bluetooth/btusb.c        |   75 +++++++++++++++++++++++++++++++++++++-
  include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_core.c         |    2 ++
- 2 files changed, 3 insertions(+)
+ net/bluetooth/hci_core.c         |    2 +
+ 3 files changed, 76 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 593cd1d..40972a3 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -281,6 +281,7 @@ struct hci_dev {
- 	int (*send)(struct sk_buff *skb);
- 	void (*notify)(struct hci_dev *hdev, unsigned int evt);
- 	int (*ioctl)(struct hci_dev *hdev, unsigned int cmd, unsigned long arg);
-+	void (*load_firmware)(struct hci_dev *hdev);
- };
- 
- struct hci_conn {
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d4de5db..49be87a 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -725,6 +725,8 @@ int hci_dev_open(__u16 dev)
- done:
- 	hci_req_unlock(hdev);
- 	hci_dev_put(hdev);
-+	if (!ret && hdev->load_firmware)
-+		hdev->load_firmware(hdev);
- 	return ret;
- }
- 
 -- 
 1.7.9.5
