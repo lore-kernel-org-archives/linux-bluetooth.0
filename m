@@ -1,46 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jefferson Delfes <jefferson.delfes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [PATCH] Bluetooth: Force the process of unpair command if disconnect failed
-Date: Tue, 18 Sep 2012 13:36:54 -0400
-Message-Id: <1347989814-4958-1-git-send-email-jefferson.delfes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1347979623-14643-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1347979623-14643-1-git-send-email-claudio.takahasi@openbossa.org>
+Date: Tue, 18 Sep 2012 11:59:20 -0400
+Message-ID: <CAJdJm_OSzp9i_ox380aFJvrTWwUKUeR2OYeZQDPvoBxSXvYYjw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gatttool: Fix Characteristic descriptor discovery
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The unpair process tries to disconnect any connection pending with
-remote. If there are some connection in connecting state, disconnect
-command will fail and unpair mgmt command will stay pending.
+Hi Claudio,
 
-That pending mgmt command can cause strange behavior like automatic
-unpair after a lost connection.
----
- net/bluetooth/mgmt.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+On Tue, Sep 18, 2012 at 10:47 AM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
+> @@ -298,7 +300,10 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>
+>         att_data_list_free(list);
+>
+> -       rl_forced_update_display();
+> +       if (handle != 0xffff && handle < end) {
+> +               gatt_find_info(attrib, handle + 1, end, char_desc_cb, NULL);
+> +       } else
+> +               rl_forced_update_display();
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 05d4b83..78caef2 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3108,6 +3108,9 @@ int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 	struct pending_cmd *cmd;
- 	int err;
- 
-+	mgmt_pending_foreach(MGMT_OP_UNPAIR_DEVICE, hdev, unpair_device_rsp,
-+			     hdev);
-+
- 	cmd = mgmt_pending_find(MGMT_OP_DISCONNECT, hdev);
- 	if (!cmd)
- 		return -ENOENT;
-@@ -3120,8 +3123,6 @@ int mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 
- 	mgmt_pending_remove(cmd);
- 
--	mgmt_pending_foreach(MGMT_OP_UNPAIR_DEVICE, hdev, unpair_device_rsp,
--			     hdev);
- 	return err;
- }
- 
+Just a minor nitpick: no need for curly brackets here.
+
+Regards,
 -- 
-1.7.12
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
