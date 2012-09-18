@@ -1,33 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jesse Sung <jesse.sung@canonical.com>
-To: linux-bluetooth@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH v2 0/2] Bluetooth: broadcom patchram firmware loader
-Date: Tue, 18 Sep 2012 17:49:42 +0800
-Message-Id: <cover.1347959921.git.jesse.sung@canonical.com>
+Date: Tue, 18 Sep 2012 11:45:48 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, mathewm@codeaurora.org,
+	gustavo@padovan.org
+Subject: Re: [PATCHv5 02/17] Bluetooth: A2MP: Create amp_mgr global list
+Message-ID: <20120918084534.GA16126@aemeltch-MOBL1>
+References: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1347888274-30779-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1347888274-30779-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1347954231.10756.0.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1347954231.10756.0.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Wen-chien Jesse Sung <jesse.sung@canonical.com>
+Hi Marcel,
 
-There is an user space firmware loading tool which can be found at
-http://marc.info/?l=linux-bluetooth&m=132039175324993&w=2
+On Tue, Sep 18, 2012 at 09:43:51AM +0200, Marcel Holtmann wrote:
+> Hi Andrei,
+> 
+> > Create amp_mgr_list global list which will be used by different
+> > hci devices to find amp_mgr.
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  include/net/bluetooth/a2mp.h |    8 ++++++++
+> >  net/bluetooth/a2mp.c         |   29 +++++++++++++++++++++++++++++
+> >  2 files changed, 37 insertions(+)
+> > 
+> > diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
+> > index 6a76e0a..e56d656 100644
+> > --- a/include/net/bluetooth/a2mp.h
+> > +++ b/include/net/bluetooth/a2mp.h
+> > @@ -20,11 +20,15 @@
+> >  #define A2MP_FEAT_EXT	0x8000
+> >  
+> >  struct amp_mgr {
+> > +	struct list_head	list;
+> >  	struct l2cap_conn	*l2cap_conn;
+> >  	struct l2cap_chan	*a2mp_chan;
+> >  	struct kref		kref;
+> >  	__u8			ident;
+> >  	__u8			handle;
+> > +	enum {
+> > +		READ_LOC_AMP_INFO,
+> > +	} state;
+> 
+> I am not a huge fan of these things. Wouldn't it be better to define the
+> states externally properly.
 
-This tool requires hci device to do the firmware loading, but this
-may cause some race condition between patchram tool and bluetoothd
-or something that also works on hci interface.
+Yes, this might be done.
 
-Also it needs some hooks to make firmware loads after bootup, s3,
-s4, rfkill, and device hotplug events. Implement this loader in kernel
-module would make things more easier.
-
-Wen-chien Jesse Sung (2):
-  Introduced a load_firmware callback to struct hci_dev
-  broadcom patchram firmware loader
-
- drivers/bluetooth/btusb.c        |   75 +++++++++++++++++++++++++++++++++++++-
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_core.c         |    2 +
- 3 files changed, 76 insertions(+), 2 deletions(-)
-
--- 
-1.7.9.5
+Best regards 
+Andrei Emeltchenko 
