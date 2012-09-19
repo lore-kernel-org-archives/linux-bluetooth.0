@@ -1,141 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 18 Sep 2012 22:31:13 -0300
+Date: Tue, 18 Sep 2012 22:06:03 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next 2012-09-18
-Message-ID: <20120919013113.GG24689@joana>
+To: Fengguang Wu <fengguang.wu@intel.com>
+Cc: Jaroslav Resler <resler@cs.cas.cz>,
+	kernel-janitors@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
+	"Cho, Yu-Chen" <acho@suse.com>, linux-bluetooth@vger.kernel.org
+Subject: Re: [bluetooth:master 22/22] drivers/bluetooth/btusb.c:97:2: error:
+ expected '}' before '{' token
+Message-ID: <20120919010603.GF24689@joana>
+References: <20120919000657.GA9208@localhost>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="kfjH4zxOES6UT95V"
-Sender: linux-kernel-owner@vger.kernel.org
+	protocol="application/pgp-signature"; boundary="MfFXiAuoTsnnDAfZ"
+In-Reply-To: <20120919000657.GA9208@localhost>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---kfjH4zxOES6UT95V
+--MfFXiAuoTsnnDAfZ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Fengguang,
 
-My last pull request to 3.7. There is nothin really exciting here.
-The biggest stuff is hci_connect() code re-write, the rest is just bugfixes,
-clean up and small improvements.=20
+* Fengguang Wu <fengguang.wu@intel.com> [2012-09-19 08:06:57 +0800]:
 
-Please pull!
+> Hi Jaroslav,
+>=20
+> FYI, kernel build failed on
+>=20
+> tree:   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth=
+-next.git master
+> head:   493969cf4728668412ecd428a60b39914d9831e3
+> commit: 493969cf4728668412ecd428a60b39914d9831e3 [22/22] Bluetooth: Add s=
+upport for BCM20702A0 [04ca, 2003]
+> config: x86_64-allmodconfig
+>=20
+> All related error/warning messages:
+>=20
+> drivers/bluetooth/btusb.c:97:2: error: expected '}' before '{' token
+>=20
+> vim +97 drivers/bluetooth/btusb.c
+>     92		/* Canyon CN-BTU1 with HID interfaces */
+>     93		{ USB_DEVICE(0x0c10, 0x0000) },
+>     94=09
+>     95		/* Broadcom BCM20702A0 */
+>     96		{ USB_DEVICE(0x04ca, 0x2003) }
+>   > 97		{ USB_DEVICE(0x0489, 0xe042) },
+>     98		{ USB_DEVICE(0x0a5c, 0x21e3) },
+>     99		{ USB_DEVICE(0x0a5c, 0x21e6) },
+>    100		{ USB_DEVICE(0x0a5c, 0x21e8) },
+>    101		{ USB_DEVICE(0x0a5c, 0x21f3) },
+>    102		{ USB_DEVICE(0x413c, 0x8197) },
+
+I fixed this upstream already. Thanks for reporting.
 
 	Gustavo
 
----
-The following changes since commit 22c5649eef0fc37532e20c14d2656b28ca708a69:
-
-  p54: fix powerpc gcc warnings (2012-08-13 15:28:35 -0400)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next ma=
-ster
-
-for you to fetch changes up to 3c860f3d3cd75f0e1a33ba6eb9f96bdb2194ec41:
-
-  Bluetooth: Add support for BCM20702A0 [04ca, 2003] (2012-09-18 21:22:39 -=
-0300)
-
-----------------------------------------------------------------
-Andrei Emeltchenko (7):
-      Bluetooth: trivial: Shorten variable scope
-      Bluetooth: trivial: Use preferred method for NULL check
-      Bluetooth: Remove unneeded zero init
-      Bluetooth: trivial: Make hci_chan_del return void
-      Bluetooth: trivial: Remove empty line
-      Bluetooth: debug: Print refcnt for hci_dev
-      Bluetooth: AMP: Add Read Data Block Size to amp_init
-
-Gustavo Padovan (1):
-      Bluetooth: Add USB_VENDOR_AND_INTERFACE_INFO() for Broadcom/Foxconn
-
-Jaroslav Resler (1):
-      Bluetooth: Add support for BCM20702A0 [04ca, 2003]
-
-Johan Hedberg (2):
-      Bluetooth: mgmt: Implement support for passkey notification
-      Bluetooth: Update management interface revision
-
-Mikel Astiz (3):
-      Bluetooth: Add more HCI error codes
-      Bluetooth: Fix minor coding style in hci_event.c
-      Bluetooth: mgmt: Add device disconnect reason
-
-Peter Senna Tschudin (5):
-      drivers/bluetooth/bluecard_cs.c: removes unnecessary semicolon
-      drivers/bluetooth/hci_ldisc.c: removes unnecessary semicolon
-      drivers/bluetooth/hci_ll.c: removes unnecessary semicolon
-      drivers/bluetooth/hci_vhci.c: removes unnecessary semicolon
-      drivers/bluetooth/btuart_cs.c: removes unnecessary semicolon
-
-Sachin Kamat (1):
-      Bluetooth: Use module_platform_driver() in btwilink.c file
-
-Syam Sidhardhan (2):
-      Bluetooth: debug: Correct the PSM printing
-      Bluetooth: Use kref for l2cap channel reference counting
-
-Vinicius Costa Gomes (8):
-      Bluetooth: Remove some functions from being exported
-      Bluetooth: Rename LE and ACL connection functions
-      Bluetooth: Refactor LE connection into its own function
-      Bluetooth: Refactor ACL connection into its own function
-      Bluetooth: Refactor SCO connection into its own function
-      Bluetooth: Simplify a the connection type handling
-      Bluetooth: Add type information to the hci_connect() debug statement
-      Bluetooth: Fix establishing ESCO links
-
-Wei Yongjun (1):
-      Bluetooth: btmrvl: remove pointless conditional before kfree_skb()
-
- drivers/bluetooth/bluecard_cs.c  |   2 +-
- drivers/bluetooth/btmrvl_sdio.c  |   3 +-
- drivers/bluetooth/btuart_cs.c    |   2 +-
- drivers/bluetooth/btusb.c        |   3 +-
- drivers/bluetooth/btwilink.c     |  16 +------
- drivers/bluetooth/hci_ldisc.c    |   2 +-
- drivers/bluetooth/hci_ll.c       |   2 +-
- drivers/bluetooth/hci_vhci.c     |   2 +-
- include/net/bluetooth/hci.h      |  21 +++++++++
- include/net/bluetooth/hci_core.h |  26 +++++------
- include/net/bluetooth/l2cap.h    |   3 +-
- include/net/bluetooth/mgmt.h     |  16 +++++++
- net/bluetooth/af_bluetooth.c     |  10 ++---
- net/bluetooth/hci_conn.c         | 100 +++++++++++++++++++++++++----------=
-------
- net/bluetooth/hci_core.c         |   6 ++-
- net/bluetooth/hci_event.c        |  99 +++++++++++++++++++++++++++++++++++=
-++---
- net/bluetooth/l2cap_core.c       |  17 +++----
- net/bluetooth/mgmt.c             |  28 +++++++++---
- 18 files changed, 255 insertions(+), 103 deletions(-)
-
---kfjH4zxOES6UT95V
+--MfFXiAuoTsnnDAfZ
 Content-Type: application/pgp-signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQIcBAEBAgAGBQJQWSBgAAoJEPs3PUX4s20oSPQP/ipur+/nO52XNNwEg+JZZSE5
-Oa05R2FX237TyqUHTJ58IESNdwfQBcW0xkjWT/EiwtLj1qRa8A2UsSYB22GYVfzN
-vzv1gzlz9NDj9EFw1TXkq7gUVUGXt44EjV+2Wmr0GAYueEyNouR/HFIcNOQczlUn
-TmAa5/EVrUCa7m9cPvjd2/N9TAPs37QR8bI0S7Lvs+dw741Q8TD8h2CPAlhPfH3x
-M2Ue2iH+ZLcL3WBch+DAjdY3dmlQlMx7G0UEmz+ijZ6F2P8WQhAR7jTk2IP+95ns
-2hJhWoONU1EycKPFPos0H1eXrLu8MJanxAaJw/c4dqp00VNrI3Q2Rf8c9TUk7tEK
-xJst4oU0S81F81KZdpbxWN8MhU4j1ZIwXu+t1yoT2jpwB3InegueIFV5ng7Y+Vf8
-BcDX7dFABvi4MjO3BByrdV7kJMP+/bMdt5lKkP1Y0ZLNylEVr+O8Z2SdXDpuzH+m
-TDi1DE+bc56LydWsmjseVx5IKJvdwjS4cprll3rGG7lWmMZ8Ozvoevfce2tIDXGe
-8QO+t0oEWWJw2Jh/sJrpsa3CvVVH2syaB+yVgbW6QDVfxZQV1NKgC8DUfYwt8lYN
-cpw39tFlPGzCX9o9Qe7+JE8m6BOfdI1LlpIbxgpzKpnbd4pUCDlk+gNVsaqmNFWz
-tMvMnTJa6ZkaED7zRBKe
-=m+av
+iQIcBAEBAgAGBQJQWRp7AAoJEPs3PUX4s20oTfwP/RT9AjsJtreETsluIoi8lMi1
+jSa45LWkDw9uk8lhyRxuS3Bqqqsr5oQZFHATHNn4qHAVO/UNTGF1c+RWAJwWmuRk
+f6tOM9Kl0JA4qqS8hembaJmDrglPVUWXHi0X8kQU0zt06N15lyXxrJ2T+gDlIzuJ
+4Gja4lX3RZKE1ZEQKQVS8yzJmMh83mmkEq8srBYgZB5E52HE84jITd54qx62i4Mb
+8cDOWqU9m2eC9noK3DbfEdBvs3QSgVLZU0jZkE8uW9XsDy1yFGN0vTqiVTWoP1nl
+Ir8WqcZj+5tyY7/2Q3DbINliyzUm48yjHNETvxt8TvWUEnft65cY6IhAJB1vQZIh
+24zJ9e5ojKCh8fePEXH/jrNR4x3Q8n573uPyrtnunURtz4Mhn3EeG2bvUGuFnKIU
+KD6dBf7f09BN6TCgXm3QaTjBJpsq5TiXziuqZgBrubPzkH54S9VVkFOeskLef8Bm
+tPwJSBMqJhqHCH3lb2CY2LVIBDBqU74V3t2DCpij5Wm4NPl/t47/YQ1GDgtOE1OE
+bDgClSz8X4goxtWIJdIo1ib29iqDF2VGnZqGlZAdz5HzjUXPhjJ2RTda12zvOag0
+lzg3hLYWSjDNffDjGeC/yKsdAoOs/fLCPG3dFINxPz6flcILfywI1al6z1Gad1PL
+PEgLvAKeJNPz17+pKSf4
+=A2jb
 -----END PGP SIGNATURE-----
 
---kfjH4zxOES6UT95V--
+--MfFXiAuoTsnnDAfZ--
