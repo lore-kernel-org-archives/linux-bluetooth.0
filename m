@@ -1,98 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 1/2] proximity: Split profile driver into Monitor and Reporter
+Date: Wed, 19 Sep 2012 16:27:18 +0200
+Message-ID: <1348064839-5602-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <20120911201729.GJ7015@tuxdriver.com>
-References: <20120911201729.GJ7015@tuxdriver.com>
-From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-Date: Wed, 19 Sep 2012 11:48:49 -0300
-Message-ID: <CAAngNMZ21mecau7xP2b-1gGh28Q6VaM4i_vRSqhsqyzw8ggjcQ@mail.gmail.com>
-Subject: Re: Agenda (v2) for Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
- 2012 (Barcelona!)
-To: "John W. Linville" <linville@tuxdriver.com>
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	alexander.smirnov@siemens.com,
-	Claudio Takahasi <claudio.takahasi@openbossa.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-wireless-owner@vger.kernel.org
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello John,
+Proximity Monitor interface is registered for each GATT device since profile
+driver matches by GATT_UUID which is intended only for Reporter role.
 
-On Tue, Sep 11, 2012 at 5:17 PM, John W. Linville
-<linville@tuxdriver.com> wrote:
-> OK, making progress...still, we need some more discussion topics...
->
-> We have one room on the first day, and three rooms on the second day.
-> I figure that the Bluetooth and 802.11 groups should each get a
-> break-out room for their own in-depth discussons on the second day and
-> the third room can be used for more general topics and presentations.
->
-> Below is my strawman agenda proposal.  Please make suggestions for
-> improvements!
->
-> Day 1
-> -----
->
-> Everyone together in a single room...
->
-> Time    Topic                                           Speaker
-> ----    -----                                           -------
-> 0930    Welcome/Intro/Agenda                            John Linville
->
-> 1000    802.15.4 stack, 6lowpan                         Alexander Smirnov
->
-> 1100    Break
->
-> 1130    Bluetooth: state of the union                   Marcel Holtmann
->
-> 1230    Lunch
->
-> 1400    NFC "state of the union", etc.                  Ortiz / Elias / Chlad
->
-> 1500    Break
->
-> ...
->
-> 1800    Adjourn
->
->
-> Day 2
-> -----
->
-> 802.11 break-out room...
->
-> Time    Topic                                           Speaker
-> ----    -----                                           -------
-> 1000    Regulatory updates                              Luis Rodriguez
->
-> 1100    Break
->
-> 1130    Virtual Bluetooth AMP Controller for mac80211   Andrei Emeltchenko
->
-> 1230    Lunch
->
-> 1400    IEEE802.11/WFA Update & HotSpot 2.0             Jouni Malinen
->
-> ...
->
-> 1800    Adjourn
->
->
-> Bluetooth break-out room...
->
-> Time    Topic                                           Speaker
-> ----    -----                                           -------
-> 1000    Bluetooth Broadcaster/Observer API              Lizardo & Delfes
->
-> 1100    Break
->
-> 1130    status and roadmap of Bluetooth LE              Joao Paulo Rechi Vita
->
+This patches splits Proximity profile driver into two separate drivers for
+Monitor and Reporter role to register interfaces properly.
+---
+ profiles/proximity/manager.c  | 29 +++++++++++++++++++++--------
+ profiles/proximity/reporter.c |  2 +-
+ profiles/proximity/reporter.h |  2 +-
+ 3 files changed, 23 insertions(+), 10 deletions(-)
 
-Claudio Takahasi will present this talk with me, could you please add
-his name to the agenda as well?
-
-Thanks!
-
+diff --git a/profiles/proximity/manager.c b/profiles/proximity/manager.c
+index 39c2bfe..df87cb0 100644
+--- a/profiles/proximity/manager.c
++++ b/profiles/proximity/manager.c
+@@ -61,8 +61,6 @@ static int attio_device_probe(struct btd_device *device, GSList *uuids)
+ 	struct gatt_primary *linkloss, *txpower, *immediate;
+ 	GSList *l, *primaries;
+ 
+-	reporter_device_probe(device);
+-
+ 	primaries = btd_device_get_primaries(device);
+ 
+ 	l = g_slist_find_custom(primaries, IMMEDIATE_ALERT_UUID,
+@@ -81,15 +79,21 @@ static int attio_device_probe(struct btd_device *device, GSList *uuids)
+ static void attio_device_remove(struct btd_device *device)
+ {
+ 	monitor_unregister(device);
+-	reporter_device_remove(device);
+ }
+ 
+-static struct btd_profile pxp_profile = {
+-	.name		= "Proximity GATT Driver",
+-	.remote_uuids	= BTD_UUIDS(GATT_UUID, IMMEDIATE_ALERT_UUID,
++static struct btd_profile pxp_monitor_profile = {
++	.name		= "Proximity Monitor GATT Driver",
++	.remote_uuids	= BTD_UUIDS(IMMEDIATE_ALERT_UUID,
+ 						LINK_LOSS_UUID, TX_POWER_UUID),
+ 	.device_probe	= attio_device_probe,
+ 	.device_remove	= attio_device_remove,
++};
++
++static struct btd_profile pxp_reporter_profile = {
++	.name		= "Proximity Reporter GATT Driver",
++	.remote_uuids	= BTD_UUIDS(GATT_UUID),
++	.device_probe	= reporter_device_probe,
++	.device_remove	= reporter_device_remove,
+ 
+ 	.adapter_probe	= reporter_adapter_probe,
+ 	.adapter_remove	= reporter_adapter_remove,
+@@ -121,10 +125,19 @@ int proximity_manager_init(GKeyFile *config)
+ {
+ 	load_config_file(config);
+ 
+-	return btd_profile_register(&pxp_profile);
++	if (btd_profile_register(&pxp_monitor_profile) < 0)
++		return -1;
++
++	if (btd_profile_register(&pxp_reporter_profile) < 0) {
++		btd_profile_unregister(&pxp_monitor_profile);
++		return -1;
++	}
++
++	return 0;
+ }
+ 
+ void proximity_manager_exit(void)
+ {
+-	btd_profile_unregister(&pxp_profile);
++	btd_profile_unregister(&pxp_monitor_profile);
++	btd_profile_unregister(&pxp_reporter_profile);
+ }
+diff --git a/profiles/proximity/reporter.c b/profiles/proximity/reporter.c
+index 3843018..ae6af09 100644
+--- a/profiles/proximity/reporter.c
++++ b/profiles/proximity/reporter.c
+@@ -222,7 +222,7 @@ static void register_reporter_device(struct btd_device *device,
+ 	radapter->devices = g_slist_prepend(radapter->devices, device);
+ }
+ 
+-int reporter_device_probe(struct btd_device *device)
++int reporter_device_probe(struct btd_device *device, GSList *uuids)
+ {
+ 	struct reporter_adapter *radapter;
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+diff --git a/profiles/proximity/reporter.h b/profiles/proximity/reporter.h
+index d038c0e..9b4b3a5 100644
+--- a/profiles/proximity/reporter.h
++++ b/profiles/proximity/reporter.h
+@@ -37,7 +37,7 @@ enum {
+ };
+ 
+ void reporter_device_remove(struct btd_device *device);
+-int reporter_device_probe(struct btd_device *device);
++int reporter_device_probe(struct btd_device *device, GSList *uuids);
+ 
+ int reporter_adapter_probe(struct btd_adapter *adapter);
+ void reporter_adapter_remove(struct btd_adapter *adapter);
 -- 
-João Paulo Rechi Vita
-Openbossa Labs - INdT
+1.7.11.3
+
