@@ -1,203 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, XiaX" <xiax.li@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "zhouzhy@neusoft.com" <zhouzhy@neusoft.com>
-Subject: Bluez/Obexd upstream test result_20120920(bluez-4.101.319+
- obexd-0.47.37)
-Date: Thu, 20 Sep 2012 03:06:06 +0000
-Message-ID: <59D61FAED4CD054490460E73F56D57750CAD66@SHSMSX101.ccr.corp.intel.com>
-Content-Type: multipart/mixed;
-	boundary="_002_59D61FAED4CD054490460E73F56D57750CAD66SHSMSX101ccrcorpi_"
-MIME-Version: 1.0
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v1] gatttool: Fix Characteristic descriptor discovery
+Date: Wed, 19 Sep 2012 16:37:56 -0300
+Message-Id: <1348083476-21435-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <CAJdJm_OSzp9i_ox380aFJvrTWwUKUeR2OYeZQDPvoBxSXvYYjw@mail.gmail.com>
+References: <CAJdJm_OSzp9i_ox380aFJvrTWwUKUeR2OYeZQDPvoBxSXvYYjw@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---_002_59D61FAED4CD054490460E73F56D57750CAD66SHSMSX101ccrcorpi_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+This patch fixes end condition for Characteristic Descriptor Discovery.
+This sub-procedure is complete when the Error Response is received and
+the Error Code is set to Attribute Not Found or the Find Information
+Response has an Attribute Handle that is equal to the Ending Handle of
+the request.
+---
+ attrib/interactive.c | 22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
 
-Hi all,
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index 1b0edf4..1b0b9cf 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -48,6 +48,8 @@ static gchar *opt_dst_type = NULL;
+ static gchar *opt_sec_level = NULL;
+ static int opt_psm = 0;
+ static int opt_mtu = 0;
++static int start;
++static int end;
+ 
+ struct characteristic_data {
+ 	uint16_t orig_start;
+@@ -265,11 +267,12 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ {
+ 	struct att_data_list *list;
+ 	guint8 format;
++	uint16_t handle = 0xffff;
+ 	int i;
+ 
+ 	if (status != 0) {
+-		printf("Discover all characteristic descriptors failed: "
+-						"%s\n", att_ecode2str(status));
++		printf("Discover descriptors finished: %s\n",
++						att_ecode2str(status));
+ 		return;
+ 	}
+ 
+@@ -280,7 +283,6 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	printf("\n");
+ 	for (i = 0; i < list->num; i++) {
+ 		char uuidstr[MAX_LEN_UUID_STR];
+-		uint16_t handle;
+ 		uint8_t *value;
+ 		bt_uuid_t uuid;
+ 
+@@ -298,7 +300,10 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 
+ 	att_data_list_free(list);
+ 
+-	rl_forced_update_display();
++	if (handle != 0xffff && handle < end)
++		gatt_find_info(attrib, handle + 1, end, char_desc_cb, NULL);
++	else
++		rl_forced_update_display();
+ }
+ 
+ static void char_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+@@ -527,9 +532,6 @@ static void cmd_char(int argcp, char **argvp)
+ 
+ static void cmd_char_desc(int argcp, char **argvp)
+ {
+-	int start = 0x0001;
+-	int end = 0xffff;
+-
+ 	if (conn_state != STATE_CONNECTED) {
+ 		printf("Command failed: disconnected\n");
+ 		return;
+@@ -541,7 +543,8 @@ static void cmd_char_desc(int argcp, char **argvp)
+ 			printf("Invalid start handle: %s\n", argvp[1]);
+ 			return;
+ 		}
+-	}
++	} else
++		start = 0x0001;
+ 
+ 	if (argcp > 2) {
+ 		end = strtohandle(argvp[2]);
+@@ -549,7 +552,8 @@ static void cmd_char_desc(int argcp, char **argvp)
+ 			printf("Invalid end handle: %s\n", argvp[2]);
+ 			return;
+ 		}
+-	}
++	} else
++		end = 0xffff;
+ 
+ 	gatt_find_info(attrib, start, end, char_desc_cb, NULL);
+ }
+-- 
+1.7.12
 
-QA finished upstream testing. The test is for bluez-4.101.319 and obexd-0.4=
-7.37. Against last, BlueZ is changed from 4.101.207 to 4.101.319, Obexd is =
-changed from 0.47.22 to 0.47.37.
-In this test, totally ran 100 case: 79 Pass, 5 Fail. Other 16 are blocked o=
-r unavailable (some cases validation method is still in investigating).=20
-The pass rate is 94% (pass / <pass + fail>). Pulseaudio has not caught up w=
-ith the BlueZ interface changing in HFP profile.
-
-New bugs:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-25724 - [HFP] Fail to launch pulseaduio daemon without SBC library
-https://bugs.meego.com/show_bug.cgi?id=3D25724
-
-Re-open bugs:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-No
-
-Verified bugs:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-No
-
-Testing Environment
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-Hardware:=A0 netbook Eeepc 1005HA | Acer AspireOne NAV50
-Image:=A0=A0=A0=A0 netbook-ia32-pinetrail-tizen_20120424.2
-Linux Kernel: v3.4-rc7
-bluez-4.101.319.g7b1bda3-1.1.i586
-obexd-0.47.37.g9434ebf-2.1.i586
-obexd-server-0.47.37.g9434ebf-2.1.i586
-connman-1.6.43.g7b0eb7b-1.1.i586
-ofono-1.11.14.gbddfb9b-1.2.i586
-Pulseaudio: 2c8aa18b1d95e7486fd2f2a337942795abf0cc37 (sep, 16th)
-
-For detailed test results, please see attached file.
-
-Thanks
-Li Xia
-
-
---_002_59D61FAED4CD054490460E73F56D57750CAD66SHSMSX101ccrcorpi_
-Content-Type: text/plain; name="Bluetooth_upstream_quality_20120920.txt"
-Content-Description: Bluetooth_upstream_quality_20120920.txt
-Content-Disposition: attachment;
-	filename="Bluetooth_upstream_quality_20120920.txt"; size=7345;
-	creation-date="Thu, 20 Sep 2012 02:35:32 GMT";
-	modification-date="Thu, 20 Sep 2012 02:38:08 GMT"
-Content-Transfer-Encoding: base64
-
-PT0gRGV0YWlsIFJlc3VsdCA9PQ0KW1BBU1NdOiBjYXNlIHBhc3NlZCA8YnI+DQpbRkFJTF06IGNh
-c2UgZmFpbGVkIDxicj4NCltCbG9ja106IGNhc2UgaXMgYmxvY2tlZCBieSBvbmUgYnVnIDxicj4N
-CltOL0FdOiBjYXNlIG5vdCBhdmFpbGFibGUgdG8gYmUgdGVzdGVkDQoNCj09PSBBdWRpby1BMkRQ
-ID09PQ0KICBbUEFTU10gQTJEUF8wMDE6IGF1ZGlvIHNpbmsgY29ubmVjdC9yZS1jb25uZWN0IA0K
-ICBbUEFTU10gQTJEUF8wMDI6IHN0ZXJlbyBoZWFkc2V0IHBsYXliYWNrIA0KICBbUEFTU10gQTJE
-UF8wMDM6IHN0ZXJlbyBoZWFkc2V0IHZvaWNlIHJlY29yZCANCiAgW1BBU1NdIEEyRFBfMDA0OiBD
-b2RlYyBzdXBwb3J0OiBTQkMgDQogIFtQQVNTXSBBMkRQXzAwNTogUGxheWJhY2sgbXVzaWMgb24g
-bGluZQ0KICBbUEFTU10gQTJEUF8wMDY6IFNJTksgcm9sZSwgYXMgc3BlYWtlciBmb3Igb3RoZXIg
-ZGV2aWNlIG11c2ljIHBsYXlpbmcNCiAgICBXaXRoIHNvbWUgQlQgaGVhZHNldCwgd2UgZXZlciBt
-ZXQgaXNzdWUgW2h0dHBzOi8vYnVncy5tZWVnby5jb20vc2hvd19idWcuY2dpP2lkPTI1NDgwIEJ1
-ZyMyNTQ4MCBBMkRQLXNvdXJjZTogcHVsc2VhdWRpbyBmYWlscyB0byBjcmVhdGUgYmx1ZXpfc2lu
-ayBhbmQgYmx1ZXpfc291cmNlXQ0KDQo9PT0gQXVkaW8tQVZSQ1AgPT09DQogIFtQQVNTXSBBVlJD
-UF8wMDE6IFZvbHVtZSBVcC9Eb3duDQogIFtCbG9ja10gQVZSQ1BfMDAyOiBQbGF5L1BhdXNlIChi
-eSB1bmF2YWlsYWJsZSBtZWRpYS1wbGF5ZXIpDQogIFtCbG9ja10gQVZSQ1BfMDAzOiBOZXh0L1By
-aXZpb3VzIChieSB1bmF2YWlsYWJsZSBtZWRpYS1wbGF5ZXIpDQogIFtQQVNTXSBBVlJDUF8wMDQ6
-IENvbm5lY3Rpb24gRXN0YWJsaXNoL1JlbGVhc2UNCiAgW04vQV0gQVZSQ1BfMDA1OiBBdWRpbyBt
-ZXRhZGF0YSBnZXQuDQogICAgV2Ugc3RpbGwgdHJ5IHRvIGZpbmQgYXZhbGlhYmxlIG1lZGlhLXBs
-YXllciB0byBzdXBwb3J0IEFWUkNQLTEuNA0KDQo9PT0gQXVkaW8tSEZQID09PQ0KICBbUEFTU10g
-SEZQXzAwMTogUkZDT01NIGNvbm5lY3Rpb24gb24gQUcNCiAgICBOZWVkIGluc3RhbGwgc2JjIGZv
-ciBsYXRlc3QgcHVsc2VhdWRpbyANCiAgW1BBU1NdIEhGUF8wMDI6IGxpc3QgKG9mb25vKSBoZnAg
-bW9kZW0gDQogIFtQQVNTXSBIRlBfMDAzOiBIRlAgbW9kZW0gZXN0YWJsaXNobWVudCAoT2Zvbm8p
-DQogIFtGQUlMXSBIRlBfMDA0OiBBdWRpbyBTTksgYW5kIFNSQyBlc3RhYmxpc2htZW50ICANCiAg
-W0ZBSUxdIEhGUF8wMDU6IHZvaWNlY2FsbCwgYXVkaW8gY3JlYXRlcyBCVCBTTksvU1JDIA0KICBb
-RkFJTF0gSEZQXzAwNjogcmVkaXJlY3QgQUcgU05LL1NSQyB0byBsb2NhbCBTUkMvU05LDQogICAg
-Qmx1ZVogaW50ZXJmYWNlIGhhcyBzb21lIHJlZ3Jlc3Npb24sIGJ1ZyBpcyByZXBvcnRlZCBhcyBb
-aHR0cHM6Ly9idWdzLm1lZWdvLmNvbS9zaG93X2J1Zy5jZ2k/aWQ9MjU0NzMgQnVnIzI1NDczIEhG
-UDogbGF0ZXN0IGJsdWV6IGNhbm5vdCBzdXBwb3J0IHB1bHNlYXVkaW8gdG8gY3JlYXRlIGJsdWV6
-X3NpbmsgYW5kIGJsdWV6X3NvdXJjZV0NCiAgICBQdWxzZWF1ZGlvIGhhcyBuZXcgY3Jhc2ggYnVn
-OiBbaHR0cHM6Ly9idWdzLm1lZWdvLmNvbS9zaG93X2J1Zy5jZ2k/aWQ9MjU1OTMgQnVnIzI1NTkz
-IFB1bHNlYXVkaW8gY3Jhc2hlcyBhZnRlciBjb25uZWN0IEJUIHNpbmsgdG8gYWxzYSBzb3VyY2Vd
-ICANCiAgW1BBU1NdIEhGUF8wMDc6IENoZWNrIEFULWNvbW1hbmRzIGZyb20gSEYgcGFydA0KICBb
-UEFTU10gSEZQXzAwODogQ29ubmVjdCBCVCBIZWFkc2V0IHRvIEhGUCBwaG9uZQ0KDQo9PT0gQXVk
-aW8tSFNQID09PQ0KICBbUEFTU10gSFNQXzAwMTogVXNlIG1vbm8gaGVhZHNldCB0byBwbGF5IG11
-c2ljDQogICoqKiBEVVQgaXMgYSBOZXRib29rLCB1bmFibGUgdG8gdGFrZSBwaG9uZSAqKioNCiAg
-W04vQV0gSFNQXzAwMjogVGFrZSBpbmNvbWluZyBjYWxsIGJ5IGJ1dHRvbi1wcmVzcw0KICBbTi9B
-XSBIU1BfMDAzOiBBdWRpbyB0cmFuc2ZlciBiZXR3ZWVuIEFHIGFuZCBIUw0KICBbUEFTU10gSFNQ
-XzAwNDogQWRqdXN0IFZvbHVtZSBVcC9Eb3duDQoNCj09PSBPQkVYLUZUUCA9PT0NCiAgW1BBU1Nd
-IEZUUF8wMDE6IHB1bGwvcHVzaCBmaWxlcyBmcm9tL3RvIHNlcnZlci4NCiAgW1BBU1NdIEZUUF8w
-MDI6IGJyb3dzZSBzZXJ2ZXIgZmlsZXMgDQogIFtQQVNTXSBGVFBfMDAzOiBDbGllbnQgImRlbGV0
-ZSBmaWxlIiwgInJlbmFtZSBmaWxlIg0KICBbUEFTU10gRlRQXzAwNDogU2VydmVyIGVuYWJsZXMg
-RlRQIHBhcmFtZXRlciAgDQogIFtQQVNTXSBGVFBfMDA1OiBTZXJ2ZXIgc2V0cyBzaGFyaW5nIHJv
-b3QgcGF0aA0KICBbUEFTU10gRlRQXzAwNjogU2VydmVyIGhhbmRsZXMgYWxsIHJlcXVpcmVtZW50
-cw0KICBbUEFTU10gRlRQXzAwNzogU2VydmVyIGhhcyBhYmlsaXR5IHRvIHNldCBwZXJtaXNzaW9u
-IGZvciBGVFANCiAgW1BBU1NdIEZUUF8wMDg6IEZUUCBkYXRhLXJhdGUgYWJvdXQgMzBrL3N+MjMw
-ay9zDQogIFtQQVNTXSBGVFBfMDA5OiBCaWcgc2l6ZSBmaWxlIHRyYW5zZmVycmVkIHN0YWJsZQ0K
-DQo9PT0gT0JFWC1PUFAgPT09DQogIFtQQVNTXSBPUFBfMDAxOiBwdWxsIHVuLXBhdHRlcm5lZCBv
-YmplY3QgZnJvbSBzZXJ2ZXIuIA0KICBbUEFTU10gT1BQXzAwMjogU2VydmVyIGVuYWJsZXMgT1BQ
-IHBhcmFtZXRlcg0KICBbUEFTU10gT1BQXzAwMzogRHVyaW5nIG9iamVjdCB0cmFuc2ZlcnJpbmcs
-IHRoZSBwcm9ncmVzcyBpcyBjbGVhcg0KDQo9PT0gT0JFWC1QQkFQID09PQ0KICBbUEFTU10gUEJB
-UF8wMDE6IENsaWVudCBnZXRzIHBob25lIGJvb2sgZW50cmllcyBmcm9tIHNlcnZlcg0KICBbUEFT
-U10gUEJBUF8wMDI6IENsaWVudCBnZXRzIElDSCwgT0NILCBNQ0ggYW5kIENDSCBmcm9tIHNlcnZl
-cg0KICBbRkFJTF0gUEJBUF8wMDM6IFBTRSBjYW4gcHJvdmlkZSBQQkFQIGRhZW1vbiBieSBlbmFi
-bGluZyBjb3JyZXNwb25kaW5nIHBhcmFtZXRlcg0KICBDYXNlIGZhaWxlZCBkdWUgdG8gW2h0dHBz
-Oi8vYnVncy5tZWVnby5jb20vc2hvd19idWcuY2dpP2lkPTI1NTk4IEJ1ZyMyNTU5OCwgUEJBUCBz
-ZXJ2ZXIgZmFpbHMgdG8gb3BlbiAvdGVsZWNvbS9wYi52Y2YgZmlsZV0NCiAgW1BBU1NdIFBCQVBf
-MDA0OiBCb3RoIHNpZGVzIHN1cHBvcnQgdkNhcmQyLjEvdkNhcmQzLjANCg0KPT09IE9CRVgtU1lO
-QyA9PT0NCiAgW1BBU1NdIFNZTkNfMDAxOiBTZXJ2ZXIgZW5hYmxlcyBTWU5DIGRhZW1vbg0KICBb
-UEFTU10gU1lOQ18wMDI6IER1cmluZyBzeW5jLCBTZXJ2ZXIgY2FuIHNob3cgInN5bmNpbmcuLi4i
-DQogIFtQQVNTXSBTWU5DXzAwMzogY2xpZW50IGNhbiBzZXQgUElNIGZldGNoaW5nIGZyb20gSU5U
-DQogIFtQQVNTXSBTWU5DXzAwNDogU2VydmVyIGdldC9wdXQgZW50aXJlIHBob25lYm9vayBmcm9t
-L3RvIGNsaWVudC4gDQogIFtQQVNTXSBTWU5DXzAwNTogQ2xpZW50IGNhbiBzdXBwb3J0IHZDYXJk
-Mi4xLCB2Q2FyZDMuMA0KDQo9PT0gT0JFWC1NQVAgTUNFID09PQ0KICBbRkFJTF0gTUFQXzAwMTog
-TUNFIGNhbiBicm93c2UgbWVzc2FnZS9mb2xkZXIgbGlzdCBvbiBNU0UgDQogICAgUmVncmVzc2lv
-biBoYXBwZW5lZCBvbiBjbGllbnQgc2lkZSwgYnVnIGlzIHJlcG9ydGVkIGFzIFtodHRwczovL2J1
-Z3MubWVlZ28uY29tL3Nob3dfYnVnLmNnaT9pZD0yNTU5NSBCdWcjMjU1OTUgTUFQIGNsaWVudCBm
-YWlsIHRvIGdldCBtZXNzYWdlIGxpc3QgZnJvbSBTYW1zdW5nIEdULWk5MTAwXQ0KICBbQkxPQ0td
-IE1BUF8wMDI6IE1DRSBjYW4gdXBsb2FkIGxvY2FsIG1lc3NhZ2UgdG8gTVNFDQogIFtCTE9DS10g
-TUFQXzAwMzogTUNFIGNhbiBkZWxldGUgdGhlIG1lc3NhZ2Ugb24gTVNFIHNpZGUNCiAgW0JMT0NL
-XSBNQVBfMDA0OiBNQ0UgY2FuIHRha2UgdXNlIG9mIE1TRSB0byBzZW5kIG1lc3NhZ2UNCg0KPT09
-IE5ldHdvcmstUEFOID09PQ0KICBbUEFTU10gUEFOXzAwMTogUEFOVSBjYW4gaW5pdCBuYXAwIGRl
-dmljZSBjb25uZWN0IHRvIE5BUA0KICBbUEFTU10gUEFOXzAwMjogUEFOVSBjYW4gZ2V0IGlwIGFk
-ZHJlc3Mgb3IgYXNzaWduZWQgc3RhdGljIGlwDQogIFtQQVNTXSBQQU5fMDAzOiBQQU5VIGNhbiBs
-b2dvbiBpbnRlcm5ldCB3ZWJzaXRlIA0KICBbTi9BXSBQQU5fMDA0OiBOQVAgY2FuIGluaXQgYnJp
-ZGdlIGJuZXAgDQogIFtOL0FdIFBBTl8wMDU6IE5BUCBjYW4gc3VwcG9ydCBvbmUgb3IgbXVsdGlw
-bGUgUEFOVSBjb25uZWN0aW9uDQogIFtOL0FdIFBBTl8wMDY6IE5BUCBjYW4gaGF2ZSBESENQIHJl
-c3BvbmRpbmcgdG8gZWFjaCBQQU5VDQogIEN1cnJlbnQgY29ubm1hbiBkb2VzIG5vdCBzdXBwb3J0
-IERIQ1AgZnVuY3Rpb25zLg0KDQo9PT0gTmV0d29yay1CTkVQID09PQ0KICBbUEFTU10gQk5FUF8w
-MDE6IENoZWNrIEJORVAgc3VwcG9ydCBvbiBEVVQNCg0KPT09IE5ldHdvcmwtRFVOID09PQ0KICBb
-UEFTU10gRFVOXzAwMTogR1cgKERVVCkgY2FuIHBhcnNlIGEgc2VyaWVzIG9mIEFUIGNvbW1hbmRz
-IGZyb20gdGhlIGRhdGEgdGVybWluYWwuIA0KICBbUEFTU10gRFVOXzAwMjogRFQgY2FuIGJ1aWxk
-IHVwIHJmY29tbSBkZXZpY2UgYnkgYmx1ZXRvb3RoIGFuZCBEVU4gbW9kZW0gYnkgT2Zvbm8uDQog
-IFtQQVNTXSBEVU5fMDAzOiBEVCBjYW4gdXNlIE9mb25vIHRvIGRpYWwgdXAgc3BlY2lhbCBzZXJ2
-aWNlIG51bWJlciAoIio5OSMiKS4NCiAgW1BBU1NdIERVTl8wMDQ6IFdoZW4gbmV0d29yayBjb25u
-ZWN0ZWQsIERUIGNhbiBsb2cgb24gd2Vic2l0ZSBpbiBpbnRlcm5ldC4NCg0KPT09IFNJTS1TQVAg
-PT09DQogIFRoZSBTQVAgdGVzdCBtZXRob2QgaXMgc3RpbGwgaW4gaW52ZXN0aWdhdGlvbi4gDQog
-IFtOL0FdIFNBUF8wMDE6IFNlcnZlciBjYW4gZW5hYmxlIGEgbW9kdWxlIHRvIHJlZ2lzdGVyIENs
-aWVudA0KICBbTi9BXSBTQVBfMDAyOiBTZXJ2ZXIgY2FuIHBvd2VyIG9uL29mZiBTSU0gQ2FyZCBv
-ciByZXNldCBpdCANCiAgW04vQV0gU0FQXzAwMzogU2VydmVyIGNhbiBkaXNjb25uZWN0IENsaWVu
-dCAgDQogIFtOL0FdIFNBUF8wMDQ6IFNlcnZlciBjYW4gZGlzY29ubmVjdCBTSU0NCiAgW04vQV0g
-U0FQXzAwNTogQ2xpZW50IGNhbiBjb25uZWN0IHRvIFNlcnZlciBTSU0NCiAgW04vQV0gU0FQXzAw
-NjogQ2xpZW50IGNhbiBwb3dlciBvbiBTZXJ2ZXIgU0lNDQogIFtOL0FdIFNBUF8wMDc6IENsaWVu
-dCBjYW4gZGlzY29ubmVjdCBTZXJ2ZXINCg0KPT09IEdlbmVyaWMtR0FQID09PQ0KICBbUEFTU10g
-R0FQXzAwMTogUFNDQU4vSVNDQU4gbW9kZSBzZXR0aW5nLg0KICBbUEFTU10gR0FQXzAwMjogQWN0
-aXZlIHBhaXJpbmcgdG8gYW5vdGhlciBibHVldG9vdGggZGV2aWNlLg0KICBbUEFTU10gR0FQXzAw
-MzogUGFzc2l2ZSBwYWlyaW5nLCBhY2NlcHRlIHBhaXIgbWFzdGVyIHJlcXVpcmVtZW50DQogIFtQ
-QVNTXSBHQVBfMDA0OiBTU1Agc3VwcG9ydHMgDQogIFtQQVNTXSBHQVBfMDA1OiBJZiBsb3N0IGxp
-bmsta2V5LCBpdCBuZWVkcyByZS1wYWlyIA0KICBbUEFTU10gR0FQXzAwNjogcmVib290IERVVCB3
-aXRoIGxpbmsta2V5IHJlc3RvcmVkLCBubyBuZWVkIHRvIHJlLXBhaXIgDQogIFtQQVNTXSBHQVBf
-MDA3OiBQYWlyIGNhbiBiZSByZWxlYXNlZA0KDQo9PT0gR2VuZXJpYy1TRFAgPT09DQogIFtQQVNT
-XSBTRFBfMDAxOiBicm93c2UgYXZhaWxhYmxlIHNlcnZpY2UgbGlzdCBpbiBsb2NhbA0KICBbUEFT
-U10gU0RQXzAwMjogYnJvd3NlIGF2YWlsYWJsZSBzZXJ2aWNlIGxpc3QgZnJvbSByZW1vdGUNCiAg
-W1BBU1NdIFNEUF8wMDM6IGJyb3dzZSBzZXJ2aWNlIGJ5IFJlY0hhbmRsZSBmb3IgZGV0YWlsIGlu
-Zm8NCiAgW1BBU1NdIFNEUF8wMDQ6IFNlcnZlciBjYW4gYW5zd2VyIFNEUCBzZWFyY2hpbmcgcmVx
-dWVzdA0KICBbUEFTU10gU0RQXzAwNTogU2VydmVyIGNhbiBhZGQvZGVsL3VwZGF0ZSBzZXJ2aWNl
-IHJlY29yZHMNCg0KPT09IE90aGVycy1ISUQgPT09DQogIFtQQVNTXSBISURfMDAxOiBIb3N0IGNh
-biBzZWFyY2ggbmVhcmJ5IEhJRCBkZXZpY2UuDQogIFtQQVNTXSBISURfMDAyOiBbQkFUXSBIb3N0
-IGNhbiBjb25uZWN0IHRvIEhJRCBkZXZpY2UuDQogIFtQQVNTXSBISURfMDAzOiBIb3N0IGNhbiBo
-YW5kbGUgbXVsdGlwbGUgaHVtYW4gaW5wdXQvb3V0cHV0IGRldmljZXMuDQoNCj09PSBIQ0kgPT09
-DQogIFtQQVNTXSBIQ0lfMDAxOiBCdWlsZCBoY2kgY29ubmVjdGlvbiBiZXR3ZWVuIERldl9BIGFu
-ZCBEZXZfQi4NCiAgW1BBU1NdIEhDSV8wMDI6IFJlY2VpdmUgQUNMIGRhdGEgd2l0aCBIQ0kuDQog
-IFtQQVNTXSBIQ0lfMDAzOiBTZW5kIEFDTCBkYXRhIHdpdGggSENJLg0KICBbUEFTU10gSENJXzAw
-NDogQ2hhbmdlIG5hbWUgb2YgcmVtb3RlIERldiBieSBIQ0kuDQogIFtQQVNTXSBIQ0lfMDA1OiBD
-aGFuZ2UgY2xhc3Mgb2YgcmVtb3RlIERldiBieSBIQ0kuDQogIFtQQVNTXSBIQ0lfMDA2OiBSZWFk
-IGxvY2FsIEhDSSBjb250cm9sbGVyIGluZm9ybWF0aW9uLg0KICBbUEFTU10gSENJXzAwNzogUmVh
-ZCByZW1vdGUgSENJIGNvbnRyb2xsZXIgaW5mb3JtYXRpb24uDQoNCj09PSBMMkNBUCA9PT0NCiAg
-W1BBU1NdIEwyQ0FQXzAwMTogQnVpbGQgbDJjYXAgY29ubmVjdGlvbiBiZXR3ZWVuIERldl9BIGFu
-ZCBEZXZfQi4gIA0KICBbUEFTU10gTDJDQVBfMDAyOiBEZXZfQSBhbmQgRGV2X0IgdGFrZSBsMmNh
-cCBwcm90b2NvbCB0byBkbyBwaW5ncG9uZy4NCg0KPT09IFJGQ09NTSA9PT0NCiAgW1BBU1NdIFJG
-Q09NTV8wMDE6IEJ1aWxkIHJmY29tbSBjb25uZWN0aW9uIGJldHdlZW4gRGV2X0EgYW5kIERldl9C
-LiAgDQogIFtQQVNTXSBSRkNPTU1fMDAyOiBEZXZfQSBhbmQgRGV2X0IgdGFrZSByZmNvbW0gcHJv
-dG9jb2wgdG8gZG8gcGluZ3BvbmcuDQoNCj09PSBTZXR0aW5ncyA9PT0NCiAgW1BBU1NdIFNFVF8w
-MDE6IFtCQVRdIE5vIGVycm9yIG91dHB1dCBkdXJpbmcgYmx1ZXRvb3RoZCBzdGFydHVwIHByb2Nl
-c3MuDQoNCj09PSBCbHVldG9vdGggVXRpbHMgPT09DQpTb21lIGJhc2ljIGNoZWNraW5nIGZvciBo
-Y2ljb25maWcsIGhjaXRvb2wsIHNkcHRvb2wgY29tbWFuZHMuIA0KICBbUEFTU10gQlRDTURfMDAx
-OiBoY2ljb25maWcgLWENCiAgW1BBU1NdIEJUQ01EXzAwMjogaGNpY29uZmlnIDxhZGFwdGVyPiBw
-aXNjYW4NCiAgW1BBU1NdIEJUQ01EXzAwMzogaGNpY29uZmlnIDxhZGFwdGVyPiB1cC9kb3duICAN
-CiAgW1BBU1NdIEJUQ01EXzAwNDogaGNpdG9vbCBzY2FuDQogIFtQQVNTXSBCVENNRF8wMDU6IHNk
-cHRvb2wgYnJvd3NlIGxvY2FsDQogIFtQQVNTXSBCVENNRF8wMDY6IHNkcHRvb2wgYnJvd3NlIDxl
-cm1vdGUgTUFDPg0KICBbUEFTU10gQlRDTURfMDA3OiBzZHB0b29sIGFkZC9kZWwNCg==
-
---_002_59D61FAED4CD054490460E73F56D57750CAD66SHSMSX101ccrcorpi_--
