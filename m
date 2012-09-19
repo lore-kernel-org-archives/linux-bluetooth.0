@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 06/17] agent: Simplify DBusConnection object handling
-Date: Wed, 19 Sep 2012 12:22:08 +0200
-Message-ID: <1348050139-27883-7-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 04/17] dbus-common: Remove conn parameter from emit_array_property_changed
+Date: Wed, 19 Sep 2012 12:22:06 +0200
+Message-ID: <1348050139-27883-5-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1348050139-27883-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1348050139-27883-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,193 +12,116 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes local reference to DBusConnection object and uses
-btd_get_dbus_connection() call wherever such object is needed instead.
-
-Pointer returned by this call is guaranteed to be valid for entire
-bluetoothd lifetime and thus do not need to be refcounted.
+DBusConnection pointer is already stored in connection static variable
+so it's redundant to pass it as function parameter.
 ---
- src/agent.c | 44 +++++++++++++++++---------------------------
- src/agent.h |  3 ---
- src/main.c  |  4 ----
- 3 files changed, 17 insertions(+), 34 deletions(-)
+ src/adapter.c     | 7 ++++---
+ src/dbus-common.c | 5 ++---
+ src/dbus-common.h | 3 +--
+ src/device.c      | 6 +++---
+ src/manager.c     | 3 +--
+ 5 files changed, 11 insertions(+), 13 deletions(-)
 
-diff --git a/src/agent.c b/src/agent.c
-index 36e96e9..8cf37b1 100644
---- a/src/agent.c
-+++ b/src/agent.c
-@@ -42,6 +42,7 @@
+diff --git a/src/adapter.c b/src/adapter.c
+index 2db3200..fb6a2e5 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -811,7 +811,7 @@ static void adapter_update_devices(struct btd_adapter *adapter)
+ 		devices[i] = (char *) device_get_path(dev);
+ 	}
  
- #include "log.h"
+-	emit_array_property_changed(connection, adapter->path,
++	emit_array_property_changed(adapter->path,
+ 					ADAPTER_INTERFACE, "Devices",
+ 					DBUS_TYPE_OBJECT_PATH, &devices, i);
+ 	g_free(devices);
+@@ -837,8 +837,9 @@ static void adapter_emit_uuids_updated(struct btd_adapter *adapter)
+ 			uuids[i++] = uuid;
+ 	}
  
-+#include "dbus-common.h"
- #include "adapter.h"
- #include "device.h"
- #include "agent.h"
-@@ -79,8 +80,6 @@ struct agent_request {
- 	GDestroyNotify destroy;
- };
+-	emit_array_property_changed(connection, adapter->path,
+-			ADAPTER_INTERFACE, "UUIDs", DBUS_TYPE_STRING, &uuids, i);
++	emit_array_property_changed(adapter->path,
++					ADAPTER_INTERFACE, "UUIDs",
++					DBUS_TYPE_STRING, &uuids, i);
  
--static DBusConnection *connection = NULL;
--
- static void agent_release(struct agent *agent)
+ 	g_strfreev(uuids);
+ }
+diff --git a/src/dbus-common.c b/src/dbus-common.c
+index 21395d9..afd07de 100644
+--- a/src/dbus-common.c
++++ b/src/dbus-common.c
+@@ -143,8 +143,7 @@ dbus_bool_t emit_property_changed(const char *path,
+ 	return g_dbus_send_message(connection, signal);
+ }
+ 
+-dbus_bool_t emit_array_property_changed(DBusConnection *conn,
+-					const char *path,
++dbus_bool_t emit_array_property_changed(const char *path,
+ 					const char *interface,
+ 					const char *name,
+ 					int type, void *value, int num)
+@@ -166,7 +165,7 @@ dbus_bool_t emit_array_property_changed(DBusConnection *conn,
+ 
+ 	append_array_variant(&iter, type, value, num);
+ 
+-	return g_dbus_send_message(conn, signal);
++	return g_dbus_send_message(connection, signal);
+ }
+ 
+ void set_dbus_connection(DBusConnection *conn)
+diff --git a/src/dbus-common.h b/src/dbus-common.h
+index ff130ff..823a292 100644
+--- a/src/dbus-common.h
++++ b/src/dbus-common.h
+@@ -34,8 +34,7 @@ dbus_bool_t emit_property_changed(const char *path,
+ 					const char *name,
+ 					int type, void *value);
+ 
+-dbus_bool_t emit_array_property_changed(DBusConnection *conn,
+-					const char *path,
++dbus_bool_t emit_array_property_changed(const char *path,
+ 					const char *interface,
+ 					const char *name,
+ 					int type, void *value, int num);
+diff --git a/src/device.c b/src/device.c
+index b732cc6..3e28608 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1377,7 +1377,6 @@ static void device_remove_profiles(struct btd_device *device, GSList *uuids)
+ 
+ static void uuids_changed(struct btd_device *device)
  {
- 	DBusMessage *message;
-@@ -97,7 +96,7 @@ static void agent_release(struct agent *agent)
- 		return;
- 	}
+-	DBusConnection *conn = btd_get_dbus_connection();
+ 	char **uuids;
+ 	GSList *l;
+ 	int i;
+@@ -1386,8 +1385,9 @@ static void uuids_changed(struct btd_device *device)
+ 	for (i = 0, l = device->uuids; l; l = l->next, i++)
+ 		uuids[i] = l->data;
  
--	g_dbus_send_message(connection, message);
-+	g_dbus_send_message(btd_get_dbus_connection(), message);
+-	emit_array_property_changed(conn, device->path, DEVICE_INTERFACE,
+-					"UUIDs", DBUS_TYPE_STRING, &uuids, i);
++	emit_array_property_changed(device->path,
++					DEVICE_INTERFACE, "UUIDs",
++					DBUS_TYPE_STRING, &uuids, i);
+ 
+ 	g_free(uuids);
  }
- 
- static int send_cancel_request(struct agent_request *req)
-@@ -114,7 +113,7 @@ static int send_cancel_request(struct agent_request *req)
- 		return -ENOMEM;
+diff --git a/src/manager.c b/src/manager.c
+index 738bf0b..31feb84 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -217,8 +217,7 @@ static void manager_update_adapters(void)
+ 		i++;
  	}
  
--	g_dbus_send_message(connection, message);
-+	g_dbus_send_message(btd_get_dbus_connection(), message);
+-	emit_array_property_changed(connection, "/",
+-					MANAGER_INTERFACE, "Adapters",
++	emit_array_property_changed("/", MANAGER_INTERFACE, "Adapters",
+ 					DBUS_TYPE_OBJECT_PATH, &array, i);
  
- 	return 0;
- }
-@@ -180,7 +179,8 @@ void agent_free(struct agent *agent)
- 	}
- 
- 	if (!agent->exited) {
--		g_dbus_remove_watch(connection, agent->listener_id);
-+		g_dbus_remove_watch(btd_get_dbus_connection(),
-+							agent->listener_id);
- 		agent_release(agent);
- 	}
- 
-@@ -205,9 +205,9 @@ struct agent *agent_create(struct btd_adapter *adapter, const char *name,
- 	agent->remove_cb = cb;
- 	agent->remove_cb_data = remove_cb_data;
- 
--	agent->listener_id = g_dbus_add_disconnect_watch(connection, name,
--							agent_exited, agent,
--							NULL);
-+	agent->listener_id =
-+		g_dbus_add_disconnect_watch(btd_get_dbus_connection(), name,
-+						agent_exited, agent, NULL);
- 
- 	return agent;
- }
-@@ -311,8 +311,9 @@ static int agent_call_authorize(struct agent_request *req,
- 				DBUS_TYPE_STRING, &uuid,
- 				DBUS_TYPE_INVALID);
- 
--	if (dbus_connection_send_with_reply(connection, req->msg,
--					&req->call, REQUEST_TIMEOUT) == FALSE) {
-+	if (dbus_connection_send_with_reply(btd_get_dbus_connection(),
-+						req->msg, &req->call,
-+						REQUEST_TIMEOUT) == FALSE) {
- 		error("D-Bus send failed");
- 		return -EIO;
- 	}
-@@ -427,7 +428,7 @@ static int pincode_request_new(struct agent_request *req, const char *device_pat
- 	dbus_message_append_args(req->msg, DBUS_TYPE_OBJECT_PATH, &device_path,
- 					DBUS_TYPE_INVALID);
- 
--	if (dbus_connection_send_with_reply(connection, req->msg,
-+	if (dbus_connection_send_with_reply(btd_get_dbus_connection(), req->msg,
- 					&req->call, REQUEST_TIMEOUT) == FALSE) {
- 		error("D-Bus send failed");
- 		return -EIO;
-@@ -480,7 +481,7 @@ static int confirm_mode_change_request_new(struct agent_request *req,
- 				DBUS_TYPE_STRING, &mode,
- 				DBUS_TYPE_INVALID);
- 
--	if (dbus_connection_send_with_reply(connection, req->msg,
-+	if (dbus_connection_send_with_reply(btd_get_dbus_connection(), req->msg,
- 					&req->call, REQUEST_TIMEOUT) == FALSE) {
- 		error("D-Bus send failed");
- 		return -EIO;
-@@ -576,7 +577,7 @@ static int passkey_request_new(struct agent_request *req,
- 	dbus_message_append_args(req->msg, DBUS_TYPE_OBJECT_PATH, &device_path,
- 					DBUS_TYPE_INVALID);
- 
--	if (dbus_connection_send_with_reply(connection, req->msg,
-+	if (dbus_connection_send_with_reply(btd_get_dbus_connection(), req->msg,
- 					&req->call, REQUEST_TIMEOUT) == FALSE) {
- 		error("D-Bus send failed");
- 		return -EIO;
-@@ -634,7 +635,7 @@ static int confirmation_request_new(struct agent_request *req,
- 				DBUS_TYPE_UINT32, &passkey,
- 				DBUS_TYPE_INVALID);
- 
--	if (dbus_connection_send_with_reply(connection, req->msg,
-+	if (dbus_connection_send_with_reply(btd_get_dbus_connection(), req->msg,
- 				&req->call, REQUEST_TIMEOUT) == FALSE) {
- 		error("D-Bus send failed");
- 		return -EIO;
-@@ -694,7 +695,7 @@ int agent_display_passkey(struct agent *agent, struct btd_device *device,
- 				DBUS_TYPE_UINT16, &entered,
- 				DBUS_TYPE_INVALID);
- 
--	if (!g_dbus_send_message(connection, message)) {
-+	if (!g_dbus_send_message(btd_get_dbus_connection(), message)) {
- 		error("D-Bus send failed");
- 		return -1;
- 	}
-@@ -768,7 +769,7 @@ static int display_pincode_request_new(struct agent_request *req,
- 					DBUS_TYPE_STRING, &pincode,
- 					DBUS_TYPE_INVALID);
- 
--	if (dbus_connection_send_with_reply(connection, req->msg,
-+	if (dbus_connection_send_with_reply(btd_get_dbus_connection(), req->msg,
- 				&req->call, REQUEST_TIMEOUT) == FALSE) {
- 		error("D-Bus send failed");
- 		return -EIO;
-@@ -833,14 +834,3 @@ gboolean agent_is_busy(struct agent *agent, void *user_data)
- 
- 	return TRUE;
- }
--
--void agent_exit(void)
--{
--	dbus_connection_unref(connection);
--	connection = NULL;
--}
--
--void agent_init(void)
--{
--	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
--}
-diff --git a/src/agent.h b/src/agent.h
-index a729633..8fb4758 100644
---- a/src/agent.h
-+++ b/src/agent.h
-@@ -75,6 +75,3 @@ gboolean agent_is_busy(struct agent *agent, void *user_data);
- uint8_t agent_get_io_capability(struct agent *agent);
- 
- gboolean agent_matches(struct agent *agent, const char *name, const char *path);
--
--void agent_init(void);
--void agent_exit(void);
-diff --git a/src/main.c b/src/main.c
-index 7593b15..f8c9369 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -513,8 +513,6 @@ int main(int argc, char *argv[])
- 
- 	parse_config(config);
- 
--	agent_init();
--
- 	if (option_udev == FALSE) {
- 		if (connect_dbus() < 0) {
- 			error("Unable to get on D-Bus");
-@@ -562,8 +560,6 @@ int main(int argc, char *argv[])
- 
- 	stop_sdp_server();
- 
--	agent_exit();
--
- 	g_main_loop_unref(event_loop);
- 
- 	if (config)
+ 	g_free(array);
 -- 
 1.7.11.3
 
