@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1348074340.1926.17.camel@sirocco.hadess.net>
+Message-ID: <1348073986.10827.21.camel@frustration.ornl.gov>
 Subject: Re: [PATCH v2] HID: Add support for Sony PS3 BD Remote Control
-From: Bastien Nocera <hadess@hadess.net>
+From: David Dillow <dave@thedillows.org>
 To: Antonio Ospite <ospite@studenti.unina.it>
-Cc: David Dillow <dave@thedillows.org>,
-	linux-bluetooth@vger.kernel.org,
+Cc: linux-bluetooth@vger.kernel.org,
 	David Herrmann <dh.herrmann@googlemail.com>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bastien Nocera <hadess@hadess.net>,
 	linux-input@vger.kernel.org, jkosina@suse.cz
-Date: Wed, 19 Sep 2012 19:05:40 +0200
+Date: Wed, 19 Sep 2012 12:59:46 -0400
 In-Reply-To: <20120919184834.8093076c520dba2dc91c2f5d@studenti.unina.it>
 References: <1346378760.7976.2.camel@obelisk.thedillows.org>
 	 <CABBYNZ+5E+BC-+9fj0e7iUpEDFJrJBQo8aoMZj8ZEkmiuB=QLA@mail.gmail.com>
@@ -32,28 +32,62 @@ Mime-Version: 1.0
 Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Em Wed, 2012-09-19 às 18:48 +0200, Antonio Ospite escreveu:
+On Wed, 2012-09-19 at 18:48 +0200, Antonio Ospite wrote:
+> On Mon, 17 Sep 2012 21:33:58 -0400
+> David Dillow <dave@thedillows.org> wrote:
+
+> While on the remote I see:
+> 
+> I press '1' and keep it pressed:
+> Event: time 1348069656.505528, type 1 (EV_KEY), code 2 (KEY_1), value 1
+> 1111111111...
+> 
+> I press '2' and release it ('1' is sent):
+> Event: time 1348069666.025543, type 1 (EV_KEY), code 2 (KEY_1), value 0
+> Event: time 1348069668.395531, type 1 (EV_KEY), code 2 (KEY_1), value 1
+> 1111111111...
+> 
+> I release '1':
+> Event: time 1348069671.625541, type 1 (EV_KEY), code 2 (KEY_1), value 0
+> 
+> I don't know at what level this behavior is enforced.
+> 
+> I will test later with the old raw_event callback and the fix to the
+> descriptor you suggested in the other mail.
+
+Please capture the raw reports
+from /sys/kernel/debug/hid/0005:*:0306:*/events when pressing multiple
+keys -- and tell me which ones they were. You may need to mount debugfs
+to get to this path.
+
+It looks like this simple approach isn't going to work when you press
+multiple keys, so I'll need more information to see if I can do
+something else -- my Harmony can only do one key press at a time, as it
+is converting IR to an emulated BD remote.
+
+> > +config HID_PS3REMOTE
+> > +	tristate "Sony PS3 BD Remote"
+> 
+> If you are going for a v3, consider using "Sony PS3 BD Remote Control"
+> here too, not a big deal but that's the name on the user manual.
+
+Will do, thanks.
+
 > For the note about the association procedure I had in mind something
 > like this:
 > 
-> /* NOTE: in order to associate the Sony PS3 BD Remote with a Bluetooth
-> host
->  * the key combination Start+Enter has to be kept pressed for about 7
-> seconds,
+> /* NOTE: in order to associate the Sony PS3 BD Remote with a Bluetooth host
+>  * the key combination Start+Enter has to be kept pressed for about 7 seconds,
 >  * with the host BT Controller in discovering mode.
 >  *
->  * Also the pin request should be ignored by the BT Controller (NULL
-> pin).
+>  * Also the pin request should be ignored by the BT Controller (NULL pin).
 >  */
 > 
 > Could someone more into BT please check the terminology here? Thanks.
 
-Pairing means that the communication between the 2 Bluetooth devices
-will be encrypted. In this case (and as is usually the case for mice),
-the communication isn't encrypted, they will just agree to communicate
-and the computer will just agree not to ask whether the connection is
-allowed at every attempt (favourite/trusted settings depending on the OS
-or terminology). There will be no PIN request.
+Will add something along these lines, though I think you mean there is
+no authentication step rather than a NULL pin, which implies we still
+need to do auth. Or maybe that's just how the Harmony needed it...
 
-Cheers
-
+Thanks,
+Dave
