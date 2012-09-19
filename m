@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 15/17] thermometer: Simplify DBusConnection object handling
-Date: Wed, 19 Sep 2012 12:22:17 +0200
-Message-ID: <1348050139-27883-16-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 14/17] sap: Simplify DBusConnection object handling
+Date: Wed, 19 Sep 2012 12:22:16 +0200
+Message-ID: <1348050139-27883-15-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1348050139-27883-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1348050139-27883-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -19,235 +19,213 @@ such object is needed instead.
 Pointer returned by this call is guaranteed to be valid for entire
 bluetoothd lifetime and thus do not need to be refcounted.
 ---
- profiles/thermometer/main.c        | 17 +----------------
- profiles/thermometer/manager.c     | 11 ++---------
- profiles/thermometer/manager.h     |  2 +-
- profiles/thermometer/thermometer.c | 22 +++++++++-------------
- profiles/thermometer/thermometer.h |  3 +--
- 5 files changed, 14 insertions(+), 41 deletions(-)
+ profiles/sap/main.c      | 16 +---------------
+ profiles/sap/manager.c   | 17 +----------------
+ profiles/sap/manager.h   |  2 +-
+ profiles/sap/sap-dummy.c | 19 ++++++-------------
+ profiles/sap/server.c    | 21 ++++-----------------
+ profiles/sap/server.h    |  2 --
+ 6 files changed, 13 insertions(+), 64 deletions(-)
 
-diff --git a/profiles/thermometer/main.c b/profiles/thermometer/main.c
-index 4447b52..fd4b8e2 100644
---- a/profiles/thermometer/main.c
-+++ b/profiles/thermometer/main.c
-@@ -27,15 +27,12 @@
- #include <stdint.h>
- #include <glib.h>
- #include <errno.h>
--#include <gdbus.h>
- 
+diff --git a/profiles/sap/main.c b/profiles/sap/main.c
+index c9c90bd..4894f2e 100644
+--- a/profiles/sap/main.c
++++ b/profiles/sap/main.c
+@@ -27,28 +27,14 @@
  #include "plugin.h"
  #include "manager.h"
- #include "hcid.h"
- #include "log.h"
  
--static DBusConnection *connection = NULL;
+-static DBusConnection *connection;
 -
- static int thermometer_init(void)
+ static int sap_init(void)
  {
- 	if (!main_opts.gatt_enabled) {
-@@ -43,16 +40,7 @@ static int thermometer_init(void)
- 		return -ENOTSUP;
- 	}
- 
 -	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
--	if (connection == NULL)
+-
+-	if (!connection)
 -		return -EIO;
 -
--	if (thermometer_manager_init(connection) < 0) {
+-	if (sap_manager_init(connection) < 0) {
 -		dbus_connection_unref(connection);
 -		return -EIO;
 -	}
 -
 -	return 0;
-+	return thermometer_manager_init();
++	return sap_manager_init();
  }
  
- static void thermometer_exit(void)
-@@ -61,9 +49,6 @@ static void thermometer_exit(void)
- 		return;
- 
- 	thermometer_manager_exit();
+ static void sap_exit(void)
+ {
+ 	sap_manager_exit();
 -
 -	dbus_connection_unref(connection);
--	connection = NULL;
  }
  
- BLUETOOTH_PLUGIN_DEFINE(thermometer, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-diff --git a/profiles/thermometer/manager.c b/profiles/thermometer/manager.c
-index 4a894cf..1b5173e 100644
---- a/profiles/thermometer/manager.c
-+++ b/profiles/thermometer/manager.c
-@@ -20,7 +20,6 @@
-  *
-  */
- 
--#include <gdbus.h>
- #include <errno.h>
- #include <stdbool.h>
- #include <bluetooth/uuid.h>
-@@ -34,8 +33,6 @@
- #include "thermometer.h"
+ BLUETOOTH_PLUGIN_DEFINE(sap, VERSION,
+diff --git a/profiles/sap/manager.c b/profiles/sap/manager.c
+index ecf672e..ebfe266 100644
+--- a/profiles/sap/manager.c
++++ b/profiles/sap/manager.c
+@@ -32,8 +32,6 @@
  #include "manager.h"
+ #include "server.h"
  
 -static DBusConnection *connection = NULL;
 -
- static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
+ static int sap_server_probe(struct btd_adapter *adapter)
  {
- 	const struct gatt_primary *prim = a;
-@@ -58,7 +55,7 @@ static int thermometer_driver_probe(struct btd_device *device, GSList *uuids)
- 
- 	tattr = l->data;
- 
--	return thermometer_register(connection, device, tattr);
-+	return thermometer_register(device, tattr);
- }
- 
- static void thermometer_driver_remove(struct btd_device *device)
-@@ -73,7 +70,7 @@ static struct btd_profile thermometer_profile = {
- 	.device_remove	= thermometer_driver_remove
+ 	const char *path = adapter_get_path(adapter);
+@@ -61,16 +59,8 @@ static struct btd_profile sap_profile = {
+ 	.adapter_remove	= sap_server_remove,
  };
  
--int thermometer_manager_init(DBusConnection *conn)
-+int thermometer_manager_init(void)
+-int sap_manager_init(DBusConnection *conn)
++int sap_manager_init(void)
  {
- 	int ret;
- 
-@@ -81,14 +78,10 @@ int thermometer_manager_init(DBusConnection *conn)
- 	if (ret < 0)
- 		return ret;
- 
 -	connection = dbus_connection_ref(conn);
- 	return 0;
- }
+-
+-	if (sap_server_init(connection) < 0) {
+-		error("Can't init SAP server");
+-		dbus_connection_unref(conn);
+-		return -1;
+-	}
+-
+ 	btd_profile_register(&sap_profile);
  
- void thermometer_manager_exit(void)
+ 	return 0;
+@@ -79,9 +69,4 @@ int sap_manager_init(DBusConnection *conn)
+ void sap_manager_exit(void)
  {
- 	btd_profile_unregister(&thermometer_profile);
+ 	btd_profile_unregister(&sap_profile);
 -
 -	dbus_connection_unref(connection);
 -	connection = NULL;
+-
+-	sap_server_exit();
  }
-diff --git a/profiles/thermometer/manager.h b/profiles/thermometer/manager.h
-index ed928ad..01e4f62 100644
---- a/profiles/thermometer/manager.h
-+++ b/profiles/thermometer/manager.h
-@@ -20,5 +20,5 @@
-  *
+diff --git a/profiles/sap/manager.h b/profiles/sap/manager.h
+index e08c882..6601a03 100644
+--- a/profiles/sap/manager.h
++++ b/profiles/sap/manager.h
+@@ -18,5 +18,5 @@
+  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   */
  
--int thermometer_manager_init(DBusConnection *conn);
-+int thermometer_manager_init(void);
- void thermometer_manager_exit(void);
-diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
-index 44043e8..77dcb26 100644
---- a/profiles/thermometer/thermometer.c
-+++ b/profiles/thermometer/thermometer.c
-@@ -56,7 +56,6 @@
- #define MEASUREMENT_INTERVAL_SIZE	2
+-int sap_manager_init(DBusConnection *conn);
++int sap_manager_init(void);
+ void sap_manager_exit(void);
+diff --git a/profiles/sap/sap-dummy.c b/profiles/sap/sap-dummy.c
+index dab5acc..36354b8 100644
+--- a/profiles/sap/sap-dummy.c
++++ b/profiles/sap/sap-dummy.c
+@@ -28,7 +28,9 @@
  
- struct thermometer {
--	DBusConnection		*conn;		/* The connection to the bus */
- 	struct btd_device	*dev;		/* Device reference */
- 	GAttrib			*attrib;	/* GATT connection */
- 	struct att_range	*svc_range;	/* Thermometer range */
-@@ -146,7 +145,7 @@ static void remove_watcher(gpointer user_data)
- {
- 	struct watcher *watcher = user_data;
+ #include <glib.h>
+ #include <gdbus.h>
++#include <stdint.h>
  
--	g_dbus_remove_watch(watcher->t->conn, watcher->id);
-+	g_dbus_remove_watch(btd_get_dbus_connection(), watcher->id);
- }
++#include "dbus-common.h"
+ #include "log.h"
+ #include "sap.h"
  
- static void destroy_char(gpointer user_data)
-@@ -179,7 +178,6 @@ static void destroy_thermometer(gpointer user_data)
- 	if (t->fwatchers != NULL)
- 		g_slist_free_full(t->fwatchers, remove_watcher);
+@@ -42,7 +44,6 @@ enum {
+ 	SIM_MISSING	 = 0x03
+ };
  
--	dbus_connection_unref(t->conn);
- 	btd_device_unref(t->dev);
- 	g_free(t->svc_range);
- 	g_free(t);
-@@ -822,7 +820,7 @@ static void watcher_exit(DBusConnection *conn, void *user_data)
- 	remove_int_watcher(t, watcher);
+-static DBusConnection *connection = NULL;
+ static unsigned int init_cnt = 0;
  
- 	t->fwatchers = g_slist_remove(t->fwatchers, watcher);
--	g_dbus_remove_watch(watcher->t->conn, watcher->id);
-+	g_dbus_remove_watch(btd_get_dbus_connection(), watcher->id);
+ static int sim_card_conn_status = SIM_DISCONNECTED;
+@@ -359,18 +360,13 @@ int sap_init(void)
+ 	if (init_cnt++)
+ 		return 0;
  
- 	if (g_slist_length(t->fwatchers) == 0)
- 		disable_final_measurement(t);
-@@ -901,7 +899,7 @@ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
- 	remove_int_watcher(t, watcher);
+-	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
+-
+-	if (g_dbus_register_interface(connection, SAP_DUMMY_PATH,
++	if (g_dbus_register_interface(btd_get_dbus_connection(), SAP_DUMMY_PATH,
+ 				SAP_DUMMY_IFACE, dummy_methods, NULL, NULL,
+ 				NULL, NULL) == FALSE) {
+ 		error("sap-dummy interface %s init failed on path %s",
+ 					SAP_DUMMY_IFACE, SAP_DUMMY_PATH);
  
- 	t->fwatchers = g_slist_remove(t->fwatchers, watcher);
--	g_dbus_remove_watch(watcher->t->conn, watcher->id);
-+	g_dbus_remove_watch(btd_get_dbus_connection(), watcher->id);
+-		if (init_cnt--) {
+-			dbus_connection_unref(connection);
+-			connection = NULL;
+-		}
++		init_cnt--;
+ 		return -1;
+ 	}
  
- 	if (g_slist_length(t->fwatchers) == 0)
- 		disable_final_measurement(t);
-@@ -996,7 +994,6 @@ static void update_watcher(gpointer data, gpointer user_data)
- {
- 	struct watcher *w = data;
- 	struct measurement *m = user_data;
--	DBusConnection *conn = w->t->conn;
- 	DBusMessageIter iter;
- 	DBusMessageIter dict;
- 	DBusMessage *msg;
-@@ -1027,7 +1024,7 @@ static void update_watcher(gpointer data, gpointer user_data)
- 	dbus_message_iter_close_container(&iter, &dict);
+@@ -382,9 +378,6 @@ void sap_exit(void)
+ 	if (--init_cnt)
+ 		return;
  
- 	dbus_message_set_no_reply(msg, TRUE);
--	g_dbus_send_message(conn, msg);
-+	g_dbus_send_message(btd_get_dbus_connection(), msg);
- }
- 
- static void recv_measurement(struct thermometer *t, struct measurement *m)
-@@ -1232,20 +1229,19 @@ static void attio_disconnected_cb(gpointer user_data)
- 	t->attrib = NULL;
- }
- 
--int thermometer_register(DBusConnection *connection, struct btd_device *device,
--						struct gatt_primary *tattr)
-+int thermometer_register(struct btd_device *device, struct gatt_primary *tattr)
- {
- 	const gchar *path = device_get_path(device);
- 	struct thermometer *t;
- 
- 	t = g_new0(struct thermometer, 1);
--	t->conn = dbus_connection_ref(connection);
- 	t->dev = btd_device_ref(device);
- 	t->svc_range = g_new0(struct att_range, 1);
- 	t->svc_range->start = tattr->range.start;
- 	t->svc_range->end = tattr->range.end;
- 
--	if (!g_dbus_register_interface(t->conn, path, THERMOMETER_INTERFACE,
-+	if (!g_dbus_register_interface(btd_get_dbus_connection(),
-+				path, THERMOMETER_INTERFACE,
- 				thermometer_methods, thermometer_signals,
- 				NULL, t, destroy_thermometer)) {
- 		error("D-Bus failed to register %s interface",
-@@ -1272,6 +1268,6 @@ void thermometer_unregister(struct btd_device *device)
- 
- 	t = l->data;
- 	thermometers = g_slist_remove(thermometers, t);
--	g_dbus_unregister_interface(t->conn, device_get_path(t->dev),
--							THERMOMETER_INTERFACE);
+-	g_dbus_unregister_interface(connection, SAP_DUMMY_PATH,
+-							SAP_DUMMY_IFACE);
+-
+-	dbus_connection_unref(connection);
+-	connection = NULL;
 +	g_dbus_unregister_interface(btd_get_dbus_connection(),
-+				device_get_path(t->dev), THERMOMETER_INTERFACE);
++					SAP_DUMMY_PATH, SAP_DUMMY_IFACE);
  }
-diff --git a/profiles/thermometer/thermometer.h b/profiles/thermometer/thermometer.h
-index 330503c..2744ed6 100644
---- a/profiles/thermometer/thermometer.h
-+++ b/profiles/thermometer/thermometer.h
-@@ -20,6 +20,5 @@
-  *
-  */
+diff --git a/profiles/sap/server.c b/profiles/sap/server.c
+index fc3d83c..6c5aa21 100644
+--- a/profiles/sap/server.c
++++ b/profiles/sap/server.c
+@@ -79,8 +79,6 @@ struct sap_server {
+ 	struct sap_connection *conn;
+ };
  
--int thermometer_register(DBusConnection *connection, struct btd_device *device,
--						struct gatt_primary *tattr);
-+int thermometer_register(struct btd_device *device, struct gatt_primary *tattr);
- void thermometer_unregister(struct btd_device *device);
+-static DBusConnection *connection;
+-
+ static void start_guard_timer(struct sap_server *server, guint interval);
+ static void stop_guard_timer(struct sap_server *server);
+ static gboolean guard_timeout(gpointer data);
+@@ -1410,8 +1408,8 @@ int sap_server_register(const char *path, bdaddr_t *src)
+ 	}
+ 	server->listen_io = io;
+ 
+-	if (!g_dbus_register_interface(connection, server->path,
+-					SAP_SERVER_INTERFACE,
++	if (!g_dbus_register_interface(btd_get_dbus_connection(),
++					server->path, SAP_SERVER_INTERFACE,
+ 					server_methods, server_signals, NULL,
+ 					server, destroy_sap_interface)) {
+ 		error("D-Bus failed to register %s interface",
+@@ -1434,19 +1432,8 @@ sdp_err:
+ 
+ void sap_server_unregister(const char *path)
+ {
+-	g_dbus_unregister_interface(connection, path, SAP_SERVER_INTERFACE);
++	g_dbus_unregister_interface(btd_get_dbus_connection(),
++						path, SAP_SERVER_INTERFACE);
+ 
+ 	sap_exit();
+ }
+-
+-int sap_server_init(DBusConnection *conn)
+-{
+-	connection = dbus_connection_ref(conn);
+-	return 0;
+-}
+-
+-void sap_server_exit(void)
+-{
+-	dbus_connection_unref(connection);
+-	connection = NULL;
+-}
+diff --git a/profiles/sap/server.h b/profiles/sap/server.h
+index 6d2f5e9..9ea9a78 100644
+--- a/profiles/sap/server.h
++++ b/profiles/sap/server.h
+@@ -20,7 +20,5 @@
+ 
+ #include <gdbus.h>
+ 
+-int sap_server_init(DBusConnection *conn);
+-void sap_server_exit(void);
+ int sap_server_register(const char *path, bdaddr_t *src);
+ void sap_server_unregister(const char *path);
 -- 
 1.7.11.3
 
