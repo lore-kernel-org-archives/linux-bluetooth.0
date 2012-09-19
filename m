@@ -1,53 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 18 Sep 2012 21:11:43 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth 2012-09-18
-Message-ID: <20120919001143.GD24689@joana>
+Date: Wed, 19 Sep 2012 08:06:57 +0800
+From: Fengguang Wu <fengguang.wu@intel.com>
+To: Jaroslav Resler <resler@cs.cas.cz>
+Cc: kernel-janitors@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
+	"Cho, Yu-Chen" <acho@suse.com>, linux-bluetooth@vger.kernel.org
+Subject: [bluetooth:master 22/22] drivers/bluetooth/btusb.c:97:2: error:
+ expected '}' before '{' token
+Message-ID: <20120919000657.GA9208@localhost>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Jaroslav,
 
-Here goes probably my last update to 3.6. It includes the two patches you
-were ok last week(from Andrzej Kaczmarek), those are critical ones, and two
-other fixes one for a system crash and the other for a missing lockdep
-annotation.
+FYI, kernel build failed on
 
-Please pull or let me know of any problems!
+tree:   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+head:   493969cf4728668412ecd428a60b39914d9831e3
+commit: 493969cf4728668412ecd428a60b39914d9831e3 [22/22] Bluetooth: Add support for BCM20702A0 [04ca, 2003]
+config: x86_64-allmodconfig
 
-	Gustavo
+All related error/warning messages:
+
+drivers/bluetooth/btusb.c:97:2: error: expected '}' before '{' token
+
+vim +97 drivers/bluetooth/btusb.c
+    92		/* Canyon CN-BTU1 with HID interfaces */
+    93		{ USB_DEVICE(0x0c10, 0x0000) },
+    94	
+    95		/* Broadcom BCM20702A0 */
+    96		{ USB_DEVICE(0x04ca, 0x2003) }
+  > 97		{ USB_DEVICE(0x0489, 0xe042) },
+    98		{ USB_DEVICE(0x0a5c, 0x21e3) },
+    99		{ USB_DEVICE(0x0a5c, 0x21e6) },
+   100		{ USB_DEVICE(0x0a5c, 0x21e8) },
+   101		{ USB_DEVICE(0x0a5c, 0x21f3) },
+   102		{ USB_DEVICE(0x413c, 0x8197) },
 
 ---
-The following changes since commit e020a83d0942a5aceac35986500c9834efc8707d:
-
-  brcmfmac: Fix big endian host configuration data. (2012-09-12 14:15:31 -0400)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
-
-for you to fetch changes up to 78c04c0bf52360dc2f7185e99c8e9aa05d73ae5a:
-
-  Bluetooth: Fix not removing power_off delayed work (2012-09-18 20:13:02 -0300)
-
-----------------------------------------------------------------
-Andrei Emeltchenko (1):
-      Bluetooth: Fix freeing uninitialized delayed works
-
-Andrzej Kaczmarek (2):
-      Bluetooth: mgmt: Fix enabling SSP while powered off
-      Bluetooth: mgmt: Fix enabling LE while powered off
-
-Vinicius Costa Gomes (1):
-      Bluetooth: Fix not removing power_off delayed work
-
- net/bluetooth/hci_core.c   |  2 ++
- net/bluetooth/l2cap_core.c |  2 +-
- net/bluetooth/mgmt.c       | 16 ++++++++++++++++
- 3 files changed, 19 insertions(+), 1 deletion(-)
-
+0-DAY kernel build testing backend         Open Source Technology Centre
+Fengguang Wu, Yuanhan Liu                              Intel Corporation
