@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v6 08/13] heartrate: Add support to enable notifications
-Date: Thu, 20 Sep 2012 13:14:45 +0200
-Message-ID: <1348139690-26985-9-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v6 09/13] heartrate: Process measurement notifications
+Date: Thu, 20 Sep 2012 13:14:46 +0200
+Message-ID: <1348139690-26985-10-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1348139690-26985-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1348139690-26985-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,126 +12,233 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support to enable notifications for Heart Rate Measurement
-characteristic value. Notifications are enabled automatically when at least
-one watcher is registered and disabled otherwise.
+This patch adds processing of received Heart Rate Measurement characteristic
+notifications and sends processed data to registered watchers.
 ---
- profiles/heartrate/heartrate.c | 67 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 67 insertions(+)
+ profiles/heartrate/heartrate.c | 167 ++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 166 insertions(+), 1 deletion(-)
 
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index 760b294..60ab2df 100644
+index 60ab2df..2e8e896 100644
 --- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
-@@ -207,6 +207,17 @@ static void read_sensor_location_cb(guint8 status, const guint8 *pdu,
- 	hr->location = value;
+@@ -42,6 +42,13 @@
+ #include "heartrate.h"
+ 
+ #define HEART_RATE_MANAGER_INTERFACE	"org.bluez.HeartRateManager"
++#define HEART_RATE_WATCHER_INTERFACE	"org.bluez.HeartRateWatcher"
++
++#define HR_VALUE_FORMAT		0x01
++#define SENSOR_CONTACT_DETECTED	0x02
++#define SENSOR_CONTACT_SUPPORT	0x04
++#define ENERGY_EXP_STATUS	0x08
++#define RR_INTERVAL		0x10
+ 
+ struct heartrate_adapter {
+ 	struct btd_adapter	*adapter;
+@@ -54,6 +61,7 @@ struct heartrate {
+ 	struct heartrate_adapter	*hradapter;
+ 	GAttrib				*attrib;
+ 	guint				attioid;
++	guint				attionotid;
+ 
+ 	struct att_range		*svc_range;	/* primary svc range */
+ 
+@@ -72,6 +80,17 @@ struct watcher {
+ 	char				*path;
+ };
+ 
++struct measurement {
++	struct heartrate	*hr;
++	uint16_t		value;
++	gboolean		has_energy;
++	uint16_t		energy;
++	gboolean		has_contact;
++	gboolean		contact;
++	uint16_t		num_interval;
++	uint16_t		*interval;
++};
++
+ static GSList *heartrate_adapters = NULL;
+ 
+ static gint cmp_adapter(gconstpointer a, gconstpointer b)
+@@ -155,8 +174,10 @@ static void destroy_heartrate(gpointer user_data)
+ 	if (hr->attioid > 0)
+ 		btd_device_remove_attio_callback(hr->dev, hr->attioid);
+ 
+-	if (hr->attrib != NULL)
++	if (hr->attrib != NULL) {
++		g_attrib_unregister(hr->attrib, hr->attionotid);
+ 		g_attrib_unref(hr->attrib);
++	}
+ 
+ 	btd_device_unref(hr->dev);
+ 	g_free(hr->svc_range);
+@@ -356,6 +377,142 @@ static void disable_measurement(gpointer data, gpointer user_data)
+ 							char_write_cb, msg);
  }
  
-+static void char_write_cb(guint8 status, const guint8 *pdu, guint16 len,
-+							gpointer user_data)
++static void update_watcher(gpointer data, gpointer user_data)
 +{
-+	char *msg = user_data;
++	struct watcher *w = data;
++	struct measurement *m = user_data;
++	struct heartrate *hr = m->hr;
++	const gchar *path = device_get_path(hr->dev);
++	DBusMessageIter iter;
++	DBusMessageIter dict;
++	DBusMessage *msg;
 +
-+	if (status != 0)
-+		error("%s failed", msg);
-+
-+	g_free(msg);
-+}
-+
- static void discover_ccc_cb(guint8 status, const guint8 *pdu,
- 						guint16 len, gpointer user_data)
- {
-@@ -238,6 +249,18 @@ static void discover_ccc_cb(guint8 status, const guint8 *pdu,
- 
- 		if (uuid == GATT_CLIENT_CHARAC_CFG_UUID) {
- 			hr->measurement_ccc_handle = handle;
-+
-+			if (g_slist_length(hr->hradapter->watchers) > 0) {
-+				uint8_t value[2];
-+				char *msg;
-+
-+				att_put_u16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT,
-+									value);
-+				msg = g_strdup("Enable measurement");
-+
-+				gatt_write_char(hr->attrib, handle, value,
-+					sizeof(value), char_write_cb, msg);
-+			}
- 			break;
- 		}
- 	}
-@@ -299,6 +322,40 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
- 	}
- }
- 
-+static void enable_measurement(gpointer data, gpointer user_data)
-+{
-+	struct heartrate *hr = data;
-+	uint16_t handle = hr->measurement_ccc_handle;
-+	uint8_t value[2];
-+	char *msg;
-+
-+	if (hr->attrib == NULL || !handle)
++	msg = dbus_message_new_method_call(w->srv, w->path,
++			HEART_RATE_WATCHER_INTERFACE, "MeasurementReceived");
++	if (msg == NULL)
 +		return;
 +
-+	att_put_u16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
-+	msg = g_strdup("Enable measurement");
++	dbus_message_iter_init_append(msg, &iter);
 +
-+	gatt_write_char(hr->attrib, handle, value, sizeof(value),
-+							char_write_cb, msg);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH , &path);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	dict_append_entry(&dict, "Value", DBUS_TYPE_UINT16, &m->value);
++
++	if (m->has_energy)
++		dict_append_entry(&dict, "Energy", DBUS_TYPE_UINT16,
++								&m->energy);
++
++	if (m->has_contact)
++		dict_append_entry(&dict, "Contact", DBUS_TYPE_BOOLEAN,
++								&m->contact);
++
++	if (m->num_interval > 0)
++		dict_append_array(&dict, "Interval", DBUS_TYPE_UINT16,
++						&m->interval, m->num_interval);
++
++	dbus_message_iter_close_container(&iter, &dict);
++
++	dbus_message_set_no_reply(msg, TRUE);
++	g_dbus_send_message(get_dbus_connection(), msg);
 +}
 +
-+static void disable_measurement(gpointer data, gpointer user_data)
++static void process_measurement(struct heartrate *hr, const uint8_t *pdu,
++								uint16_t len)
 +{
-+	struct heartrate *hr = data;
-+	uint16_t handle = hr->measurement_ccc_handle;
-+	uint8_t value[2];
-+	char *msg;
++	struct measurement m;
++	uint8_t flags;
 +
-+	if (hr->attrib == NULL || !handle)
++	flags = *pdu;
++
++	pdu++;
++	len--;
++
++	memset(&m, 0, sizeof(m));
++
++	if (flags & HR_VALUE_FORMAT) {
++		if (len < 2) {
++			error("Heart Rate Measurement field missing");
++			return;
++		}
++
++		m.value = att_get_u16(pdu);
++		pdu += 2;
++		len -= 2;
++	} else {
++		if (len < 1) {
++			error("Heart Rate Measurement field missing");
++			return;
++		}
++
++		m.value = *pdu;
++		pdu++;
++		len--;
++	}
++
++	if (flags & ENERGY_EXP_STATUS) {
++		if (len < 2) {
++			error("Energy Expended field missing");
++			return;
++		}
++
++		m.has_energy = TRUE;
++		m.energy = att_get_u16(pdu);
++		pdu += 2;
++		len -= 2;
++	}
++
++	if (flags & RR_INTERVAL) {
++		int i;
++
++		if (len == 0 || (len % 2 != 0)) {
++			error("RR-Interval field malformed");
++			return;
++		}
++
++		m.num_interval = len / 2;
++		m.interval = g_new(uint16_t, m.num_interval);
++
++		for (i = 0; i < m.num_interval; pdu += 2, i++)
++			m.interval[i] = att_get_u16(pdu);
++	}
++
++	if (flags & SENSOR_CONTACT_SUPPORT) {
++		m.has_contact = TRUE;
++		m.contact = !!(flags & SENSOR_CONTACT_DETECTED);
++	}
++
++	/* Notify all registered watchers */
++	m.hr = hr;
++	g_slist_foreach(hr->hradapter->watchers, update_watcher, &m);
++
++	g_free(m.interval);
++}
++
++static void notify_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
++{
++	struct heartrate *hr = user_data;
++	uint16_t handle;
++
++	/* should be at least opcode (1b) + handle (2b) */
++	if (len < 3) {
++		error("Invalid PDU received");
 +		return;
++	}
 +
-+	att_put_u16(0x0000, value);
-+	msg = g_strdup("Disable measurement");
++	handle = att_get_u16(pdu + 1);
++	if (handle != hr->measurement_val_handle) {
++		error("Unexpected handle: 0x%04x", handle);
++		return;
++	}
 +
-+	gatt_write_char(hr->attrib, handle, value, sizeof(value),
-+							char_write_cb, msg);
++	process_measurement(hr, pdu + 3, len - 3);
 +}
 +
  static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
  {
  	struct heartrate *hr = user_data;
-@@ -330,6 +387,10 @@ static void watcher_exit_cb(DBusConnection *conn, void *user_data)
+@@ -364,6 +521,9 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
  
- 	hradapter->watchers = g_slist_remove(hradapter->watchers, watcher);
- 	g_dbus_remove_watch(conn, watcher->id);
+ 	hr->attrib = g_attrib_ref(attrib);
+ 
++	hr->attionotid = g_attrib_register(hr->attrib, ATT_OP_HANDLE_NOTIFY,
++						notify_handler, hr, NULL);
 +
-+
-+	if (g_slist_length(hradapter->watchers) == 0)
-+		g_slist_foreach(hradapter->devices, disable_measurement, 0);
+ 	gatt_discover_char(hr->attrib, hr->svc_range->start, hr->svc_range->end,
+ 						NULL, discover_char_cb, hr);
  }
+@@ -374,6 +534,11 @@ static void attio_disconnected_cb(gpointer user_data)
  
- static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
-@@ -355,6 +416,9 @@ static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
- 	watcher->srv = g_strdup(sender);
- 	watcher->path = g_strdup(path);
+ 	DBG("");
  
-+	if (g_slist_length(hradapter->watchers) == 0)
-+		g_slist_foreach(hradapter->devices, enable_measurement, 0);
++	if (hr->attionotid > 0) {
++		g_attrib_unregister(hr->attrib, hr->attionotid);
++		hr->attionotid = 0;
++	}
 +
- 	hradapter->watchers = g_slist_prepend(hradapter->watchers, watcher);
- 
- 	DBG("heartrate watcher [%s] registered", path);
-@@ -381,6 +445,9 @@ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
- 	hradapter->watchers = g_slist_remove(hradapter->watchers, watcher);
- 	g_dbus_remove_watch(conn, watcher->id);
- 
-+	if (g_slist_length(hradapter->watchers) == 0)
-+		g_slist_foreach(hradapter->devices, disable_measurement, 0);
-+
- 	DBG("heartrate watcher [%s] unregistered", path);
- 
- 	return dbus_message_new_method_return(msg);
+ 	g_attrib_unref(hr->attrib);
+ 	hr->attrib = NULL;
+ }
 -- 
 1.7.11.3
 
