@@ -1,85 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 20 Sep 2012 14:01:00 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: mathewm@codeaurora.org, gustavo@padovan.org, marcel@holtmann.org
-Subject: Re: [PATCHv6 00/17] Bluetooth: Create AMP physical link
-Message-ID: <20120920110058.GD13291@aemeltch-MOBL1>
-References: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1347978509-12133-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <505AF7F2.7010304@ti.com>
+Date: Thu, 20 Sep 2012 14:03:14 +0300
+From: Chen Ganir <chen.ganir@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1347978509-12133-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+CC: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v3 06/10] battery: Get Battery ID
+References: <1348129663-1701-1-git-send-email-chen.ganir@ti.com> <1348129663-1701-7-git-send-email-chen.ganir@ti.com> <CAJdJm_MyO5Fq-rDWMnSm3pkR_Qj8ghCri8We0fXtaYVXtpzB6A@mail.gmail.com>
+In-Reply-To: <CAJdJm_MyO5Fq-rDWMnSm3pkR_Qj8ghCri8We0fXtaYVXtpzB6A@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ping
+Anderson,
 
-On Tue, Sep 18, 2012 at 05:28:12PM +0300, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> This set of patches enhances A2MP protocol and creates physical
-> link between AMP controllers. This is further iteration towards
-> Bluetooth High Speed.
-> 
-> Changes:
-> 	* p6: Refactoring: moving code from pal.[ch] to amp.[ch]
-> 	* p5: Fix issues reported by Mat in mailing list review
-> 	* p4: Rebased against recent bluetooth-next, minor fixes
-> 	* p3: Use hci_conn for representing physical link(type AMP_LINK) instead of
-> 	struct phy_link, refactoring.
-> 	* p2: Remove HCI callbacks and use amp_mgr global list, refactor code.
-> 	* p1: Fixed locking issues, added basic logical link preparation.
-> 	* v3: Remove workqueue from callback processing; change callback functions
-> 	names according to reviewers recommendations; create global amp_mgr_list to
-> 	have lookup to amp manager, physical and logical links so for those HCI events
-> 	which might be identified by __handler__ we have lookup; remove extensive
-> 	hexdump from gen_amp_key.
-> 	* v2: Fix typos and bugs, add functionality: now physical connection
-> 	might be established.
-> 	* v1: Fix typos, change debug prints, refactor code for better
-> 	splitting functionality.
-> 
-> Andrei Emeltchenko (16):
->   Bluetooth: Add HCI logical link cmds definitions
->   Bluetooth: A2MP: Create amp_mgr global list
->   Bluetooth: AMP: Use HCI cmd to Read AMP Info
->   Bluetooth: AMP: Use HCI cmd to Read Loc AMP Assoc
->   Bluetooth: A2MP: Process Discover Response
->   Bluetooth: AMP: Physical link struct and heplers
->   Bluetooth: AMP: Remote AMP ctrl definitions
->   Bluetooth: AMP: Handle create / disc phylink req
->   Bluetooth: A2MP: Process A2MP Getinfo Rsp
->   Bluetooth: A2MP: Process A2MP Get AMP Assoc Rsp
->   Bluetooth: Choose connection based on capabilities
->   Bluetooth: AMP: Add AMP key calculation
->   Bluetooth: AMP: Create Physical Link
->   Bluetooth: AMP: Write remote AMP Assoc
->   Bluetooth: A2MP: Add fallback to normal l2cap init sequence
->   Bluetooth: AMP: Process Chan Selected event
-> 
-> Dmitry Kasatkin (1):
->   Bluetooth: Add function to derive AMP key using hmac
-> 
->  include/net/bluetooth/a2mp.h     |   22 ++
->  include/net/bluetooth/amp.h      |   47 +++++
->  include/net/bluetooth/hci.h      |   39 +++-
->  include/net/bluetooth/hci_core.h |   11 +
->  include/net/bluetooth/l2cap.h    |    4 +
->  net/bluetooth/Kconfig            |    1 +
->  net/bluetooth/Makefile           |    2 +-
->  net/bluetooth/a2mp.c             |  423 +++++++++++++++++++++++++++++++++++---
->  net/bluetooth/amp.c              |  348 +++++++++++++++++++++++++++++++
->  net/bluetooth/hci_event.c        |  106 +++++++++-
->  net/bluetooth/l2cap_core.c       |   35 +++-
->  11 files changed, 1000 insertions(+), 38 deletions(-)
->  create mode 100644 include/net/bluetooth/amp.h
->  create mode 100644 net/bluetooth/amp.c
-> 
-> -- 
-> 1.7.9.5
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+On 09/20/2012 01:46 PM, Anderson Lizardo wrote:
+> Hi Chen,
+>
+> On Thu, Sep 20, 2012 at 4:27 AM,  <chen.ganir@ti.com> wrote:
+>> @@ -150,31 +200,35 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
+>>
+>>          for (l = characteristics; l; l = l->next) {
+>>                  struct gatt_char *c = l->data;
+>> -               struct characteristic *ch;
+>> -               uint16_t start, end;
+>> -
+>> -               ch = g_new0(struct characteristic, 1);
+>> -               ch->attr.handle = c->handle;
+>> -               ch->attr.properties = c->properties;
+>> -               ch->attr.value_handle = c->value_handle;
+>> -               memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
+>> -               ch->batt = batt;
+>>
+>> -               batt->chars = g_slist_append(batt->chars, ch);
+>> -
+>> -               start = c->value_handle + 1;
+>> -
+>> -               if (l->next != NULL) {
+>> -                       struct gatt_char *c = l->next->data;
+>> -                       if (start == c->handle)
+>> +               if (g_strcmp0(c->uuid, BATTERY_LEVEL_UUID) == 0) {
+>
+> Minor comment, but looks like it would be cleaner if you used:
+>
+> if (g_strcmp0(c->uuid, BATTERY_LEVEL_UUID) != 0)
+>      continue;
+>
+> and avoided all this shifting and one more level of indentation.
+>
+I'll change that. It does make more sense.
+
+
+>> +                       struct characteristic *ch;
+>> +                       uint16_t start, end;
+>> +
+>> +                       ch = g_new0(struct characteristic, 1);
+>> +                       ch->attr.handle = c->handle;
+>> +                       ch->attr.properties = c->properties;
+>> +                       ch->attr.value_handle = c->value_handle;
+>> +                       memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
+>> +                       ch->batt = batt;
+>> +
+>> +                       batt->chars = g_slist_append(batt->chars, ch);
+>> +
+>> +                       start = c->value_handle + 1;
+>> +
+>> +                       if (l->next != NULL) {
+>> +                               struct gatt_char *c = l->next->data;
+>> +                               if (start == c->handle)
+>> +                                       continue;
+>> +                               end = c->handle - 1;
+>> +                       } else if (c->value_handle != batt->svc_range->end)
+>> +                               end = batt->svc_range->end;
+>> +                       else
+>>                                  continue;
+>> -                       end = c->handle - 1;
+>> -               } else if (c->value_handle != batt->svc_range->end)
+>> -                       end = batt->svc_range->end;
+>> -               else
+>> -                       continue;
+>>
+>> -               gatt_find_info(batt->attrib, start, end, discover_desc_cb, ch);
+>> +                       gatt_find_info(batt->attrib, start, end,
+>> +                                                       discover_desc_cb, ch);
+>> +               }
+>>          }
+>>   }
+>
+> Regards,
+>
+
+Thanks,
+
+-- 
+BR,
+Chen Ganir
+
