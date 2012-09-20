@@ -1,46 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 1/2 v2] client: Use larger timeout first packet in transfers
-Date: Thu, 20 Sep 2012 15:07:14 +0300
-Message-Id: <1348142835-13146-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 2/2 v2] test: Use longer D-Bus timeout in test scripts
+Date: Thu, 20 Sep 2012 15:07:15 +0300
+Message-Id: <1348142835-13146-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1348142835-13146-1-git-send-email-luiz.dentz@gmail.com>
+References: <1348142835-13146-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This align the client timeout for GET operations with g_obex_get_req_pkt
-which does use 60 seconds to cover for extra interaction during the first
-packet.
+As the daemon already waits for 60 seconds for the first response this
+just use the same timeout for calls that don't use transfer but return the
+response as reply.
 ---
-v2: Change clients to use 60 seconds timeout.
+ test/map-client | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
- client/transfer.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/client/transfer.c b/client/transfer.c
-index 76f6681..e9fabfb 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -48,6 +48,8 @@
+diff --git a/test/map-client b/test/map-client
+index ac1a8ca..7741c7f 100755
+--- a/test/map-client
++++ b/test/map-client
+@@ -109,11 +109,11 @@ class MapClient:
+ 			print "%s/" % (i["Name"])
  
- #define OBC_TRANSFER_ERROR obc_transfer_error_quark()
+ 	def list_messages(self, folder):
+-		ret = self.map.GetMessageListing(folder, dict())
++		ret = self.map.GetMessageListing(folder, dict(), timeout=60)
+ 		print pformat(unwrap(ret))
  
-+#define FIRST_PACKET_TIMEOUT 60
-+
- static guint64 counter = 0;
- 
- struct transfer_callback {
-@@ -662,7 +664,8 @@ static gboolean transfer_start_get(struct obc_transfer *transfer, GError **err)
- 						transfer->params->data,
- 						transfer->params->size);
- 
--	transfer->xfer = g_obex_send_req(transfer->obex, req, -1,
-+	transfer->xfer = g_obex_send_req(transfer->obex, req,
-+						FIRST_PACKET_TIMEOUT,
- 						get_xfer_progress_first,
- 						transfer, err);
- 	if (transfer->xfer == 0)
+ 	def get_message(self, handle):
+-		self.map.GetMessageListing("", dict())
++		self.map.GetMessageListing("", dict(), timeout=60)
+ 		path = self.path + "/message" + handle
+ 		obj = bus.get_object("org.bluez.obex.client", path)
+ 		msg = dbus.Interface(obj, "org.bluez.obex.Message")
 -- 
 1.7.11.4
 
