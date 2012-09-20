@@ -1,48 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <505AF82A.3060601@ti.com>
-Date: Thu, 20 Sep 2012 14:04:10 +0300
-From: Chen Ganir <chen.ganir@ti.com>
+Date: Thu, 20 Sep 2012 14:01:00 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: mathewm@codeaurora.org, gustavo@padovan.org, marcel@holtmann.org
+Subject: Re: [PATCHv6 00/17] Bluetooth: Create AMP physical link
+Message-ID: <20120920110058.GD13291@aemeltch-MOBL1>
+References: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1347978509-12133-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v3 00/10] Implement Generic battery and LE Battery client
-References: <1348129663-1701-1-git-send-email-chen.ganir@ti.com> <CAJdJm_MhZwRyD8JVsmm6QTWqhWh1x2FXkopTQqdmNy=td0aj8Q@mail.gmail.com>
-In-Reply-To: <CAJdJm_MhZwRyD8JVsmm6QTWqhWh1x2FXkopTQqdmNy=td0aj8Q@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1347978509-12133-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Anderson,
+ping
 
-On 09/20/2012 01:56 PM, Anderson Lizardo wrote:
-> Hi Chen,
->
-> On Thu, Sep 20, 2012 at 4:27 AM,  <chen.ganir@ti.com> wrote:
->> From: Chen Ganir <chen.ganir@ti.com>
->>
->> This patch set replaces previous patch sets which implemented the LE battery
->> GATT Client. This patch set implements a generic device battery D-Bus interface
->> that can be used to get remote device battery status using D-Bus. In addition,
->> This patch set also implements the GATT Battery client, which uses the generic
->> device battery to expose LE device battery status.
->>
->> see doc/battery-api.txt and doc/device-api.txt for more information.
->>
->> This is version 2 of the patch set, including multiple style and other comments
->> reported on the ML. This version is rebased on the latest code.
->
-> Besides some minor style comments (found on this last round of
-> review), patch set looks good to me.
->
-> Regards,
->
-Thanks for the review !
-
-I'll wait and see if there are any more comments before i send the next 
-patch set with fixes.
-
-
--- 
-BR,
-Chen Ganir
-
+On Tue, Sep 18, 2012 at 05:28:12PM +0300, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> This set of patches enhances A2MP protocol and creates physical
+> link between AMP controllers. This is further iteration towards
+> Bluetooth High Speed.
+> 
+> Changes:
+> 	* p6: Refactoring: moving code from pal.[ch] to amp.[ch]
+> 	* p5: Fix issues reported by Mat in mailing list review
+> 	* p4: Rebased against recent bluetooth-next, minor fixes
+> 	* p3: Use hci_conn for representing physical link(type AMP_LINK) instead of
+> 	struct phy_link, refactoring.
+> 	* p2: Remove HCI callbacks and use amp_mgr global list, refactor code.
+> 	* p1: Fixed locking issues, added basic logical link preparation.
+> 	* v3: Remove workqueue from callback processing; change callback functions
+> 	names according to reviewers recommendations; create global amp_mgr_list to
+> 	have lookup to amp manager, physical and logical links so for those HCI events
+> 	which might be identified by __handler__ we have lookup; remove extensive
+> 	hexdump from gen_amp_key.
+> 	* v2: Fix typos and bugs, add functionality: now physical connection
+> 	might be established.
+> 	* v1: Fix typos, change debug prints, refactor code for better
+> 	splitting functionality.
+> 
+> Andrei Emeltchenko (16):
+>   Bluetooth: Add HCI logical link cmds definitions
+>   Bluetooth: A2MP: Create amp_mgr global list
+>   Bluetooth: AMP: Use HCI cmd to Read AMP Info
+>   Bluetooth: AMP: Use HCI cmd to Read Loc AMP Assoc
+>   Bluetooth: A2MP: Process Discover Response
+>   Bluetooth: AMP: Physical link struct and heplers
+>   Bluetooth: AMP: Remote AMP ctrl definitions
+>   Bluetooth: AMP: Handle create / disc phylink req
+>   Bluetooth: A2MP: Process A2MP Getinfo Rsp
+>   Bluetooth: A2MP: Process A2MP Get AMP Assoc Rsp
+>   Bluetooth: Choose connection based on capabilities
+>   Bluetooth: AMP: Add AMP key calculation
+>   Bluetooth: AMP: Create Physical Link
+>   Bluetooth: AMP: Write remote AMP Assoc
+>   Bluetooth: A2MP: Add fallback to normal l2cap init sequence
+>   Bluetooth: AMP: Process Chan Selected event
+> 
+> Dmitry Kasatkin (1):
+>   Bluetooth: Add function to derive AMP key using hmac
+> 
+>  include/net/bluetooth/a2mp.h     |   22 ++
+>  include/net/bluetooth/amp.h      |   47 +++++
+>  include/net/bluetooth/hci.h      |   39 +++-
+>  include/net/bluetooth/hci_core.h |   11 +
+>  include/net/bluetooth/l2cap.h    |    4 +
+>  net/bluetooth/Kconfig            |    1 +
+>  net/bluetooth/Makefile           |    2 +-
+>  net/bluetooth/a2mp.c             |  423 +++++++++++++++++++++++++++++++++++---
+>  net/bluetooth/amp.c              |  348 +++++++++++++++++++++++++++++++
+>  net/bluetooth/hci_event.c        |  106 +++++++++-
+>  net/bluetooth/l2cap_core.c       |   35 +++-
+>  11 files changed, 1000 insertions(+), 38 deletions(-)
+>  create mode 100644 include/net/bluetooth/amp.h
+>  create mode 100644 net/bluetooth/amp.c
+> 
+> -- 
+> 1.7.9.5
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
