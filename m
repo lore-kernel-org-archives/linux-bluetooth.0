@@ -1,89 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 20 Sep 2012 13:39:22 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	sunnyk@codeaurora.org
+Subject: Re: [RFCv1 01/20] Bluetooth: Add new l2cap_chan struct members for
+ high speed channels
+Message-ID: <20120920103920.GC13291@aemeltch-MOBL1>
+References: <1347387691-5285-1-git-send-email-mathewm@codeaurora.org>
+ <1347387691-5285-2-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <1348129663-1701-7-git-send-email-chen.ganir@ti.com>
-References: <1348129663-1701-1-git-send-email-chen.ganir@ti.com>
-	<1348129663-1701-7-git-send-email-chen.ganir@ti.com>
-Date: Thu, 20 Sep 2012 06:46:48 -0400
-Message-ID: <CAJdJm_MyO5Fq-rDWMnSm3pkR_Qj8ghCri8We0fXtaYVXtpzB6A@mail.gmail.com>
-Subject: Re: [PATCH v3 06/10] battery: Get Battery ID
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: chen.ganir@ti.com
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1347387691-5285-2-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+Hi Mat,
 
-On Thu, Sep 20, 2012 at 4:27 AM,  <chen.ganir@ti.com> wrote:
-> @@ -150,31 +200,35 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
->
->         for (l = characteristics; l; l = l->next) {
->                 struct gatt_char *c = l->data;
-> -               struct characteristic *ch;
-> -               uint16_t start, end;
-> -
-> -               ch = g_new0(struct characteristic, 1);
-> -               ch->attr.handle = c->handle;
-> -               ch->attr.properties = c->properties;
-> -               ch->attr.value_handle = c->value_handle;
-> -               memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
-> -               ch->batt = batt;
->
-> -               batt->chars = g_slist_append(batt->chars, ch);
-> -
-> -               start = c->value_handle + 1;
-> -
-> -               if (l->next != NULL) {
-> -                       struct gatt_char *c = l->next->data;
-> -                       if (start == c->handle)
-> +               if (g_strcmp0(c->uuid, BATTERY_LEVEL_UUID) == 0) {
+On Tue, Sep 11, 2012 at 11:21:12AM -0700, Mat Martineau wrote:
+> An L2CAP channel using high speed continues to be associated with a
+> BR/EDR l2cap_conn, while also tracking an additional hci_conn
+> (representing a physical link on a high speed controller) and hci_chan
+> (representing a logical link).  There may only be one physical link
+> between two high speed controllers.  Each physical link may contain
+> several logical links, with each logical link representing a channel
+> with specific quality of service.
+> 
+> During a channel move, the destination channel id, current move state,
+> and role (initiator vs. responder) are tracked and used by the channel
+> move state machine.  The ident value associated with a move request
+> must also be stored in order to use it in later move responses.
+> 
+> The active channel is stored in local_amp_id.
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  include/net/bluetooth/l2cap.h | 29 +++++++++++++++++++++++++++++
+>  net/bluetooth/l2cap_core.c    |  5 +++++
+>  2 files changed, 34 insertions(+)
+> 
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 7ed8e35..6b6fb27 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -433,6 +433,8 @@ struct l2cap_chan {
+>  	struct sock *sk;
+>  
+>  	struct l2cap_conn	*conn;
+> +	struct hci_conn		*hs_hcon;
 
-Minor comment, but looks like it would be cleaner if you used:
+Do we need hs_hcon if we have hs_hchan ?
 
-if (g_strcmp0(c->uuid, BATTERY_LEVEL_UUID) != 0)
-    continue;
+> +	struct hci_chan		*hs_hchan;
+>  	struct kref	kref;
+>  
+>  	__u8		state;
+> @@ -476,6 +478,11 @@ struct l2cap_chan {
+>  	unsigned long	conn_state;
+>  	unsigned long	flags;
+>  
+> +	__u8		local_amp_id;
+> +	__u8		move_id;
 
-and avoided all this shifting and one more level of indentation.
+So this is Destination AMP ctrl id, would this be better to name it like
+move_dst_amp_id or dst_amp_id;
 
-> +                       struct characteristic *ch;
-> +                       uint16_t start, end;
-> +
-> +                       ch = g_new0(struct characteristic, 1);
-> +                       ch->attr.handle = c->handle;
-> +                       ch->attr.properties = c->properties;
-> +                       ch->attr.value_handle = c->value_handle;
-> +                       memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
-> +                       ch->batt = batt;
-> +
-> +                       batt->chars = g_slist_append(batt->chars, ch);
-> +
-> +                       start = c->value_handle + 1;
-> +
-> +                       if (l->next != NULL) {
-> +                               struct gatt_char *c = l->next->data;
-> +                               if (start == c->handle)
-> +                                       continue;
-> +                               end = c->handle - 1;
-> +                       } else if (c->value_handle != batt->svc_range->end)
-> +                               end = batt->svc_range->end;
-> +                       else
->                                 continue;
-> -                       end = c->handle - 1;
-> -               } else if (c->value_handle != batt->svc_range->end)
-> -                       end = batt->svc_range->end;
-> -               else
-> -                       continue;
->
-> -               gatt_find_info(batt->attrib, start, end, discover_desc_cb, ch);
-> +                       gatt_find_info(batt->attrib, start, end,
-> +                                                       discover_desc_cb, ch);
-> +               }
->         }
->  }
+...
 
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Best regards 
+Andrei Emeltchenko 
+
