@@ -1,25 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 20 Sep 2012 15:10:25 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: Rebase against recent wireless-next
-Message-ID: <20120920181025.GB8193@joana>
-References: <20120920110543.GE13291@aemeltch-MOBL1>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120920110543.GE13291@aemeltch-MOBL1>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1348147820.13371.2.camel@aeonflux>
+Subject: Re: Agenda (v2) for Linux Wireless (802.11/Bluetooth/NFC)
+ Mini-Summit 2012 (Barcelona!)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "John W. Linville" <linville@tuxdriver.com>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	alexander.smirnov@siemens.com
+Date: Thu, 20 Sep 2012 15:30:20 +0200
+In-Reply-To: <20120911201729.GJ7015@tuxdriver.com>
+References: <20120911201729.GJ7015@tuxdriver.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi John,
 
-* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2012-09-20 14:05:45 +0300]:
-
-> Hi Gustavo,
+> OK, making progress...still, we need some more discussion topics...
 > 
-> When we get rebased against wireless-next?
+> We have one room on the first day, and three rooms on the second day.
+> I figure that the Bluetooth and 802.11 groups should each get a
+> break-out room for their own in-depth discussons on the second day and
+> the third room can be used for more general topics and presentations.
+> 
+> Below is my strawman agenda proposal.  Please make suggestions for
+> improvements!
 
-That will happen as soon as John pulls my latest pull request.
+I think this looks pretty good. Lets see if we can find some volunteers
+for the empty slots. Should be make sure that this schedule so far gets
+published on the LinuxCon website?
 
-	Gustavo
+Regards
+
+Marcel
+
+
