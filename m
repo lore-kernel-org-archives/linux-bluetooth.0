@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Rafal Garbat <rafal.garbat@tieto.com>
-Subject: [PATCH v6 06/13] heartrate: Read Body Sensor Location characteristics
-Date: Thu, 20 Sep 2012 13:14:43 +0200
-Message-ID: <1348139690-26985-7-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v6 03/13] heartrate: Add attio callbacks
+Date: Thu, 20 Sep 2012 13:14:40 +0200
+Message-ID: <1348139690-26985-4-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1348139690-26985-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1348139690-26985-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,74 +12,84 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Rafal Garbat <rafal.garbat@tieto.com>
-
-This patch adds support to read and store Body Sensor Location characteristic
-value.
 ---
- profiles/heartrate/heartrate.c | 35 ++++++++++++++++++++++++++++++++++-
- 1 file changed, 34 insertions(+), 1 deletion(-)
+ profiles/heartrate/heartrate.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index d3d6d43..8c12101 100644
+index 87bc309..e057180 100644
 --- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
-@@ -54,6 +54,9 @@ struct heartrate {
- 	uint16_t			measurement_val_handle;
- 	uint16_t			measurement_ccc_handle;
- 	uint16_t			hrcp_val_handle;
-+
-+	gboolean			has_location;
-+	uint8_t				location;
+@@ -31,6 +31,11 @@
+ 
+ #include "adapter.h"
+ #include "device.h"
++#include "gattrib.h"
++#include "att.h"
++#include "gatt.h"
++#include "attio.h"
++#include "log.h"
+ #include "heartrate.h"
+ 
+ struct heartrate_adapter {
+@@ -41,6 +46,8 @@ struct heartrate_adapter {
+ struct heartrate {
+ 	struct btd_device		*dev;
+ 	struct heartrate_adapter	*hradapter;
++	GAttrib				*attrib;
++	guint				attioid;
  };
  
  static GSList *heartrate_adapters = NULL;
-@@ -113,6 +116,34 @@ static void destroy_heartrate_adapter(gpointer user_data)
+@@ -82,6 +89,12 @@ static void destroy_heartrate(gpointer user_data)
+ {
+ 	struct heartrate *hr = user_data;
+ 
++	if (hr->attioid > 0)
++		btd_device_remove_attio_callback(hr->dev, hr->attioid);
++
++	if (hr->attrib != NULL)
++		g_attrib_unref(hr->attrib);
++
+ 	btd_device_unref(hr->dev);
+ 	g_free(hr);
+ }
+@@ -93,6 +106,25 @@ static void destroy_heartrate_adapter(gpointer user_data)
  	g_free(hradapter);
  }
  
-+static void read_sensor_location_cb(guint8 status, const guint8 *pdu,
-+						guint16 len, gpointer user_data)
++static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
 +{
 +	struct heartrate *hr = user_data;
-+	uint8_t value;
-+	ssize_t vlen;
 +
-+	if (status != 0) {
-+		error("Body Sensor Location read failed: %s",
-+							att_ecode2str(status));
-+		return;
-+	}
++	DBG("");
 +
-+	vlen = dec_read_resp(pdu, len, &value, sizeof(value));
-+	if (vlen < 0) {
-+		error("Protocol error");
-+		return;
-+	}
-+
-+	if (vlen != 1) {
-+		error("Invalid length for Body Sensor Location");
-+		return;
-+	}
-+
-+	hr->has_location = TRUE;
-+	hr->location = value;
++	hr->attrib = g_attrib_ref(attrib);
 +}
 +
- static void discover_ccc_cb(guint8 status, const guint8 *pdu,
- 						guint16 len, gpointer user_data)
- {
-@@ -194,7 +225,9 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
- 			discover_measurement_ccc(hr, c, c_next);
- 		} else if (g_strcmp0(c->uuid, BODY_SENSOR_LOCATION_UUID) == 0) {
- 			DBG("Body Sensor Location supported");
--			/* TODO: read characterictic value */
++static void attio_disconnected_cb(gpointer user_data)
++{
++	struct heartrate *hr = user_data;
 +
-+			gatt_read_char(hr->attrib, c->value_handle, 0,
-+						read_sensor_location_cb, hr);
- 		} else if (g_strcmp0(c->uuid,
- 					HEART_RATE_CONTROL_POINT_UUID) == 0) {
- 			DBG("Heart Rate Control Point supported");
++	DBG("");
++
++	g_attrib_unref(hr->attrib);
++	hr->attrib = NULL;
++}
++
+ int heartrate_adapter_register(struct btd_adapter *adapter)
+ {
+ 	struct heartrate_adapter *hradapter;
+@@ -137,6 +169,9 @@ int heartrate_device_register(struct btd_device *device)
+ 
+ 	hradapter->devices = g_slist_prepend(hradapter->devices, hr);
+ 
++	hr->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
++						attio_disconnected_cb, hr);
++
+ 	return 0;
+ }
+ 
 -- 
 1.7.11.3
 
