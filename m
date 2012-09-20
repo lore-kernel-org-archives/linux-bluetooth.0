@@ -1,69 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v6 00/13] Heart Rate Profile plugin
-Date: Thu, 20 Sep 2012 13:14:37 +0200
-Message-ID: <1348139690-26985-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Thu, 20 Sep 2012 14:11:35 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v1] gatttool: Fix Characteristic descriptor
+ discovery
+Message-ID: <20120920111135.GA9102@x220>
+References: <CAJdJm_OSzp9i_ox380aFJvrTWwUKUeR2OYeZQDPvoBxSXvYYjw@mail.gmail.com>
+ <1348083476-21435-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1348083476-21435-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Claudio,
 
-Here's v6 of heartrate plugin patches. After some thinking I decided to
-refactor code a bit to keep it more compact and (hopefully) easier to
-follow. Most important change here is that instead of nested structures
-to hold all characteristics and descriptors I only store handles to few
-attributes which are used later. This allows to remove some code lines,
-mostly helper functions to traverse lists of structures in order to get
-some attribute handle which is now accessible immediately.
+On Wed, Sep 19, 2012, Claudio Takahasi wrote:
+> This patch fixes end condition for Characteristic Descriptor Discovery.
+> This sub-procedure is complete when the Error Response is received and
+> the Error Code is set to Attribute Not Found or the Find Information
+> Response has an Attribute Handle that is equal to the Ending Handle of
+> the request.
+> ---
+>  attrib/interactive.c | 22 +++++++++++++---------
+>  1 file changed, 13 insertions(+), 9 deletions(-)
 
-So to sum up v5 vs. v6: less code, less patches, still works.
+Applied. Thanks.
 
-Comments are welcome.
-
-
-Andrzej Kaczmarek (6):
-  heartrate: Add attio callbacks
-  heartrate: Discover HRS characteristics
-  heartrate: Discover Heart Rate Measurement CCC
-  heartrate: Add support to enable notifications
-  heartrate: Process measurement notifications
-  heartrate: Add support to reset Energy Expended
-
-Rafal Garbat (6):
-  heartrate: Add initial HRP client support
-  heartrate: Read Body Sensor Location characteristics
-  heartrate: Add HeartRateManager interface
-  heartrate: Add GetProperties method
-  heartrate: Add HeartRateWatcher interface to default policy
-  heartrate: Add test script
-
-Santiago Carot-Nemesio (1):
-  Heart Rate Profile (HRP) client API
-
- Makefile.am                    |   9 +-
- Makefile.tools                 |   4 +-
- doc/heartrate-api.txt          |  84 +++++
- lib/uuid.h                     |   5 +
- profiles/heartrate/heartrate.c | 826 +++++++++++++++++++++++++++++++++++++++++
- profiles/heartrate/heartrate.h |  27 ++
- profiles/heartrate/main.c      |  52 +++
- profiles/heartrate/manager.c   |  93 +++++
- profiles/heartrate/manager.h   |  24 ++
- src/bluetooth.conf             |   1 +
- test/test-heartrate            | 103 +++++
- 11 files changed, 1224 insertions(+), 4 deletions(-)
- create mode 100644 doc/heartrate-api.txt
- create mode 100644 profiles/heartrate/heartrate.c
- create mode 100644 profiles/heartrate/heartrate.h
- create mode 100644 profiles/heartrate/main.c
- create mode 100644 profiles/heartrate/manager.c
- create mode 100644 profiles/heartrate/manager.h
- create mode 100755 test/test-heartrate
-
--- 
-1.7.11.3
-
+Johan
