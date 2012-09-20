@@ -1,49 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1347371730-14933-2-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1347371730-14933-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1347371730-14933-2-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Thu, 20 Sep 2012 15:20:24 +0300
-Message-ID: <CABBYNZ+J-URDs_301Z07K6T9g7idHF+HK0NUUfuaUfDKmOrnDg@mail.gmail.com>
-Subject: Re: [PATCH v0 1/4] adapter: Replace device authorizing flag
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH obexd 1/2 v2] client: Use larger timeout first packet in transfers
+Date: Thu, 20 Sep 2012 15:07:14 +0300
+Message-Id: <1348142835-13146-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Sep 11, 2012 at 4:55 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> Refactor code to drop the device authorizing flag by replacing it with a
-> private authorization pointer in btd_adapter. After all, no more than
-> one authorization can be ongoing, so the code is easier to follow if
-> this is made explicit.
-> ---
->  src/adapter.c |   48 ++++++++++++++++++++++++++++++++----------------
->  src/device.c  |   11 -----------
->  src/device.h  |    2 --
->  3 files changed, 32 insertions(+), 29 deletions(-)
->
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 4b675e8..14c5322 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -128,7 +128,8 @@ struct btd_adapter {
->         GSList *found_devices;
->         GSList *oor_devices;            /* out of range device list */
->         struct agent *agent;            /* For the new API */
-> -       guint auth_idle_id;             /* Ongoing authorization */
-> +       guint auth_idle_id;             /* Ongoing authorization (trusted) */
-> +       struct service_auth *auth;      /* Ongoing authorization */
+This align the client timeout for GET operations with g_obex_get_req_pkt
+which does use 60 seconds to cover for extra interaction during the first
+packet.
+---
+v2: Change clients to use 60 seconds timeout.
 
-You should probably store the id directly inside struct service_auth
-as they depend on each other then when you free auth you also remove
-the id if not set to 0.
+ client/transfer.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
+diff --git a/client/transfer.c b/client/transfer.c
+index 76f6681..e9fabfb 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -48,6 +48,8 @@
+ 
+ #define OBC_TRANSFER_ERROR obc_transfer_error_quark()
+ 
++#define FIRST_PACKET_TIMEOUT 60
++
+ static guint64 counter = 0;
+ 
+ struct transfer_callback {
+@@ -662,7 +664,8 @@ static gboolean transfer_start_get(struct obc_transfer *transfer, GError **err)
+ 						transfer->params->data,
+ 						transfer->params->size);
+ 
+-	transfer->xfer = g_obex_send_req(transfer->obex, req, -1,
++	transfer->xfer = g_obex_send_req(transfer->obex, req,
++						FIRST_PACKET_TIMEOUT,
+ 						get_xfer_progress_first,
+ 						transfer, err);
+ 	if (transfer->xfer == 0)
 -- 
-Luiz Augusto von Dentz
+1.7.11.4
+
