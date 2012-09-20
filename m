@@ -1,60 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <505AF75F.6080509@ti.com>
-Date: Thu, 20 Sep 2012 14:00:47 +0300
-From: Chen Ganir <chen.ganir@ti.com>
 MIME-Version: 1.0
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v3 09/10] battery: Add support for notifications
-References: <1348129663-1701-1-git-send-email-chen.ganir@ti.com> <1348129663-1701-10-git-send-email-chen.ganir@ti.com> <CAJdJm_P07N-VwgnHy=1m3D68086dP9fFy5AmkhZC_3b4d2xpmg@mail.gmail.com>
-In-Reply-To: <CAJdJm_P07N-VwgnHy=1m3D68086dP9fFy5AmkhZC_3b4d2xpmg@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+In-Reply-To: <1348129663-1701-1-git-send-email-chen.ganir@ti.com>
+References: <1348129663-1701-1-git-send-email-chen.ganir@ti.com>
+Date: Thu, 20 Sep 2012 06:56:58 -0400
+Message-ID: <CAJdJm_MhZwRyD8JVsmm6QTWqhWh1x2FXkopTQqdmNy=td0aj8Q@mail.gmail.com>
+Subject: Re: [PATCH v3 00/10] Implement Generic battery and LE Battery client
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: chen.ganir@ti.com
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Anderson,
+Hi Chen,
 
-On 09/20/2012 01:54 PM, Anderson Lizardo wrote:
-> Hi Chen,
+On Thu, Sep 20, 2012 at 4:27 AM,  <chen.ganir@ti.com> wrote:
+> From: Chen Ganir <chen.ganir@ti.com>
 >
-> On Thu, Sep 20, 2012 at 4:27 AM,  <chen.ganir@ti.com> wrote:
->> @@ -140,6 +156,18 @@ static void process_batteryservice_char(struct characteristic *ch)
->>          }
->>   }
->>
->> +static void batterylevel_enable_notify_cb(guint8 status, const guint8 *pdu,
->> +                                               guint16 len, gpointer user_data)
->> +{
->> +       struct characteristic *ch = (struct characteristic *)user_data;
+> This patch set replaces previous patch sets which implemented the LE battery
+> GATT Client. This patch set implements a generic device battery D-Bus interface
+> that can be used to get remote device battery status using D-Bus. In addition,
+> This patch set also implements the GATT Battery client, which uses the generic
+> device battery to expose LE device battery status.
 >
-> Casting above seems unnecessary (gpointer is typedef to void*).
+> see doc/battery-api.txt and doc/device-api.txt for more information.
 >
-I'll change that.
+> This is version 2 of the patch set, including multiple style and other comments
+> reported on the ML. This version is rebased on the latest code.
 
->> +
->> +       if (status != 0) {
->> +               error("Could not enable batt level notification.");
->> +               ch->canNotify = FALSE;
->
-> This camelCase is inconsistent with other struct fields on the same file.
->
-Will be changed.
+Besides some minor style comments (found on this last round of
+review), patch set looks good to me.
 
-
->> +               process_batteryservice_char(ch);
->> +       }
->> +}
->> +
->>   static gint device_battery_cmp(gconstpointer a, gconstpointer b)
->>   {
->>          const struct characteristic *ch = a;
->
-> Regards,
->
-
-Thanks !
-
+Regards,
 -- 
-BR,
-Chen Ganir
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
