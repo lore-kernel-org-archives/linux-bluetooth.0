@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v6 09/13] heartrate: Process measurement notifications
-Date: Thu, 20 Sep 2012 13:14:46 +0200
-Message-ID: <1348139690-26985-10-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: Rafal Garbat <rafal.garbat@tieto.com>
+Subject: [PATCH v6 13/13] heartrate: Add test script
+Date: Thu, 20 Sep 2012 13:14:50 +0200
+Message-ID: <1348139690-26985-14-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1348139690-26985-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1348139690-26985-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,233 +12,137 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds processing of received Heart Rate Measurement characteristic
-notifications and sends processed data to registered watchers.
----
- profiles/heartrate/heartrate.c | 167 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 166 insertions(+), 1 deletion(-)
+From: Rafal Garbat <rafal.garbat@tieto.com>
 
-diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index 60ab2df..2e8e896 100644
---- a/profiles/heartrate/heartrate.c
-+++ b/profiles/heartrate/heartrate.c
-@@ -42,6 +42,13 @@
- #include "heartrate.h"
- 
- #define HEART_RATE_MANAGER_INTERFACE	"org.bluez.HeartRateManager"
-+#define HEART_RATE_WATCHER_INTERFACE	"org.bluez.HeartRateWatcher"
+---
+ Makefile.tools      |   4 +-
+ test/test-heartrate | 103 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 105 insertions(+), 2 deletions(-)
+ create mode 100755 test/test-heartrate
+
+diff --git a/Makefile.tools b/Makefile.tools
+index d3b6f57..f59a7c4 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -209,7 +209,7 @@ EXTRA_DIST += test/sap_client.py test/hsplay test/hsmicro \
+ 		test/test-network test/simple-agent test/simple-service \
+ 		test/simple-endpoint test/test-audio test/test-input \
+ 		test/test-sap-server test/test-oob test/test-attrib \
+-		test/test-proximity test/test-thermometer test/test-health \
+-		test/test-health-sink test/service-record.dtd \
++		test/test-proximity test/test-thermometer test/test-heartrate \
++		test/test-health test/test-health-sink test/service-record.dtd \
+ 		test/service-did.xml test/service-spp.xml test/service-opp.xml \
+ 		test/service-ftp.xml test/simple-player test/test-nap
+diff --git a/test/test-heartrate b/test/test-heartrate
+new file mode 100755
+index 0000000..316375d
+--- /dev/null
++++ b/test/test-heartrate
+@@ -0,0 +1,103 @@
++#!/usr/bin/python
 +
-+#define HR_VALUE_FORMAT		0x01
-+#define SENSOR_CONTACT_DETECTED	0x02
-+#define SENSOR_CONTACT_SUPPORT	0x04
-+#define ENERGY_EXP_STATUS	0x08
-+#define RR_INTERVAL		0x10
- 
- struct heartrate_adapter {
- 	struct btd_adapter	*adapter;
-@@ -54,6 +61,7 @@ struct heartrate {
- 	struct heartrate_adapter	*hradapter;
- 	GAttrib				*attrib;
- 	guint				attioid;
-+	guint				attionotid;
- 
- 	struct att_range		*svc_range;	/* primary svc range */
- 
-@@ -72,6 +80,17 @@ struct watcher {
- 	char				*path;
- };
- 
-+struct measurement {
-+	struct heartrate	*hr;
-+	uint16_t		value;
-+	gboolean		has_energy;
-+	uint16_t		energy;
-+	gboolean		has_contact;
-+	gboolean		contact;
-+	uint16_t		num_interval;
-+	uint16_t		*interval;
-+};
++from __future__ import absolute_import, print_function, unicode_literals
 +
- static GSList *heartrate_adapters = NULL;
- 
- static gint cmp_adapter(gconstpointer a, gconstpointer b)
-@@ -155,8 +174,10 @@ static void destroy_heartrate(gpointer user_data)
- 	if (hr->attioid > 0)
- 		btd_device_remove_attio_callback(hr->dev, hr->attioid);
- 
--	if (hr->attrib != NULL)
-+	if (hr->attrib != NULL) {
-+		g_attrib_unregister(hr->attrib, hr->attionotid);
- 		g_attrib_unref(hr->attrib);
-+	}
- 
- 	btd_device_unref(hr->dev);
- 	g_free(hr->svc_range);
-@@ -356,6 +377,142 @@ static void disable_measurement(gpointer data, gpointer user_data)
- 							char_write_cb, msg);
- }
- 
-+static void update_watcher(gpointer data, gpointer user_data)
-+{
-+	struct watcher *w = data;
-+	struct measurement *m = user_data;
-+	struct heartrate *hr = m->hr;
-+	const gchar *path = device_get_path(hr->dev);
-+	DBusMessageIter iter;
-+	DBusMessageIter dict;
-+	DBusMessage *msg;
++'''
++Heart Rate Monitor test script
++'''
 +
-+	msg = dbus_message_new_method_call(w->srv, w->path,
-+			HEART_RATE_WATCHER_INTERFACE, "MeasurementReceived");
-+	if (msg == NULL)
-+		return;
++import gobject
 +
-+	dbus_message_iter_init_append(msg, &iter);
++import sys
++import dbus
++import dbus.service
++import dbus.mainloop.glib
++from optparse import OptionParser, make_option
 +
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH , &path);
++class Watcher(dbus.service.Object):
++	@dbus.service.method("org.bluez.HeartRateWatcher",
++					in_signature="oa{sv}", out_signature="")
++	def MeasurementReceived(self, device, measure):
++		print("Measurement received from %s" % device)
++		print("Value: ", measure["Value"])
 +
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
-+			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
-+			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++		if "Energy" in measure:
++			print("Energy: ", measure["Energy"])
 +
-+	dict_append_entry(&dict, "Value", DBUS_TYPE_UINT16, &m->value);
++		if "Contact" in measure:
++			print("Contact: ", measure["Contact"])
 +
-+	if (m->has_energy)
-+		dict_append_entry(&dict, "Energy", DBUS_TYPE_UINT16,
-+								&m->energy);
++		if "Interval" in measure:
++			for i in measure["Interval"]:
++				print("Interval: ", i)
 +
-+	if (m->has_contact)
-+		dict_append_entry(&dict, "Contact", DBUS_TYPE_BOOLEAN,
-+								&m->contact);
++if __name__ == "__main__":
++	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 +
-+	if (m->num_interval > 0)
-+		dict_append_array(&dict, "Interval", DBUS_TYPE_UINT16,
-+						&m->interval, m->num_interval);
++	bus = dbus.SystemBus()
 +
-+	dbus_message_iter_close_container(&iter, &dict);
++	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
++					"org.bluez.Manager")
 +
-+	dbus_message_set_no_reply(msg, TRUE);
-+	g_dbus_send_message(get_dbus_connection(), msg);
-+}
++	option_list = [
++		make_option("-i", "--adapter", action="store",
++			type="string", dest="adapter"),
++		make_option("-b", "--device", action="store",
++			type="string", dest="address"),
++		]
 +
-+static void process_measurement(struct heartrate *hr, const uint8_t *pdu,
-+								uint16_t len)
-+{
-+	struct measurement m;
-+	uint8_t flags;
++	parser = OptionParser(option_list=option_list)
 +
-+	flags = *pdu;
++	(options, args) = parser.parse_args()
 +
-+	pdu++;
-+	len--;
++	if not options.address:
++		print("Usage: %s [-i <adapter>] -b <bdaddr> [cmd]" % (sys.argv[0]))
++		print("Possible commands:")
++		print("\tReset")
++		sys.exit(1)
 +
-+	memset(&m, 0, sizeof(m));
++	if options.adapter:
++		adapter_path = manager.FindAdapter(options.adapter)
++	else:
++		adapter_path = manager.DefaultAdapter()
 +
-+	if (flags & HR_VALUE_FORMAT) {
-+		if (len < 2) {
-+			error("Heart Rate Measurement field missing");
-+			return;
-+		}
++	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
++							"org.bluez.Adapter")
 +
-+		m.value = att_get_u16(pdu);
-+		pdu += 2;
-+		len -= 2;
-+	} else {
-+		if (len < 1) {
-+			error("Heart Rate Measurement field missing");
-+			return;
-+		}
++	heartrateManager = dbus.Interface(bus.get_object("org.bluez",
++				adapter_path), "org.bluez.HeartRateManager")
 +
-+		m.value = *pdu;
-+		pdu++;
-+		len--;
-+	}
++	path = "/test/watcher"
++	heartrateManager.RegisterWatcher(path)
 +
-+	if (flags & ENERGY_EXP_STATUS) {
-+		if (len < 2) {
-+			error("Energy Expended field missing");
-+			return;
-+		}
++	device_path = adapter.FindDevice(options.address)
 +
-+		m.has_energy = TRUE;
-+		m.energy = att_get_u16(pdu);
-+		pdu += 2;
-+		len -= 2;
-+	}
++	device = dbus.Interface(bus.get_object("org.bluez", device_path),
++							"org.bluez.Device")
 +
-+	if (flags & RR_INTERVAL) {
-+		int i;
++	heartrate = dbus.Interface(bus.get_object("org.bluez",
++					device_path), "org.bluez.HeartRate")
 +
-+		if (len == 0 || (len % 2 != 0)) {
-+			error("RR-Interval field malformed");
-+			return;
-+		}
++	watcher = Watcher(bus, path)
 +
-+		m.num_interval = len / 2;
-+		m.interval = g_new(uint16_t, m.num_interval);
++	properties = heartrate.GetProperties()
 +
-+		for (i = 0; i < m.num_interval; pdu += 2, i++)
-+			m.interval[i] = att_get_u16(pdu);
-+	}
++	if "Location" in properties:
++		print("Sensor location: %s" % properties["Location"])
++	else:
++		print("Sensor location is not supported")
 +
-+	if (flags & SENSOR_CONTACT_SUPPORT) {
-+		m.has_contact = TRUE;
-+		m.contact = !!(flags & SENSOR_CONTACT_DETECTED);
-+	}
++	if len(args) > 0:
++		if args[0] == "Reset":
++			reset_sup = properties["ResetSupported"]
++			if reset_sup:
++				heartrate.Reset()
++			else:
++				print("Reset not supported")
++				sys.exit(1)
++		else:
++			print("unknown command")
++			sys.exit(1)
 +
-+	/* Notify all registered watchers */
-+	m.hr = hr;
-+	g_slist_foreach(hr->hradapter->watchers, update_watcher, &m);
-+
-+	g_free(m.interval);
-+}
-+
-+static void notify_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
-+{
-+	struct heartrate *hr = user_data;
-+	uint16_t handle;
-+
-+	/* should be at least opcode (1b) + handle (2b) */
-+	if (len < 3) {
-+		error("Invalid PDU received");
-+		return;
-+	}
-+
-+	handle = att_get_u16(pdu + 1);
-+	if (handle != hr->measurement_val_handle) {
-+		error("Unexpected handle: 0x%04x", handle);
-+		return;
-+	}
-+
-+	process_measurement(hr, pdu + 3, len - 3);
-+}
-+
- static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
- {
- 	struct heartrate *hr = user_data;
-@@ -364,6 +521,9 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
- 
- 	hr->attrib = g_attrib_ref(attrib);
- 
-+	hr->attionotid = g_attrib_register(hr->attrib, ATT_OP_HANDLE_NOTIFY,
-+						notify_handler, hr, NULL);
-+
- 	gatt_discover_char(hr->attrib, hr->svc_range->start, hr->svc_range->end,
- 						NULL, discover_char_cb, hr);
- }
-@@ -374,6 +534,11 @@ static void attio_disconnected_cb(gpointer user_data)
- 
- 	DBG("");
- 
-+	if (hr->attionotid > 0) {
-+		g_attrib_unregister(hr->attrib, hr->attionotid);
-+		hr->attionotid = 0;
-+	}
-+
- 	g_attrib_unref(hr->attrib);
- 	hr->attrib = NULL;
- }
++	mainloop = gobject.MainLoop()
++	mainloop.run()
 -- 
 1.7.11.3
 
