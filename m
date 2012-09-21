@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 14/18] eir: Add support for creating proper OOB EIR
-Date: Fri, 21 Sep 2012 14:36:31 +0200
-Message-ID: <1348230995-8967-15-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v3 18/18] neard: Implement RequestOOB function
+Date: Fri, 21 Sep 2012 14:36:35 +0200
+Message-ID: <1348230995-8967-19-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1348230995-8967-1-git-send-email-szymon.janc@tieto.com>
 References: <1348230995-8967-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,152 +12,147 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Address and total length field are mandatory part of OOB EIR.
+This function is used by neard to request data to be transmitted over
+OOB channel. It also allows neard to provide data to be used in OOB
+pairing without initializing pairing it self.
 
 ---
- src/eir.c |   39 ++++++++++++++++++++++++++-------------
- src/eir.h |    2 +-
- 2 files changed, 27 insertions(+), 14 deletions(-)
+ plugins/neard.c |   85 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 82 insertions(+), 3 deletions(-)
 
-diff --git a/src/eir.c b/src/eir.c
-index 78ae070..05b3723 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -282,7 +282,7 @@ static void eir_generate_uuid128(sdp_list_t *list, uint8_t *ptr,
- 	}
- }
+diff --git a/plugins/neard.c b/plugins/neard.c
+index dd6a422..288a47e 100644
+--- a/plugins/neard.c
++++ b/plugins/neard.c
+@@ -42,6 +42,7 @@
+ #include "storage.h"
+ #include "agent.h"
+ #include "oob.h"
++#include "hcid.h"
  
--int eir_create_oob(const char *name, uint32_t cod,
-+int eir_create_oob(bdaddr_t *addr, const char *name, uint32_t cod,
- 			uint8_t *hash, uint8_t *randomizer,
- 			uint16_t did_vendor, uint16_t did_product,
- 			uint16_t did_version, uint16_t did_source,
-@@ -290,12 +290,19 @@ int eir_create_oob(const char *name, uint32_t cod,
+ #define NEARD_NAME "org.neard"
+ #define NEARD_PATH "/"
+@@ -56,6 +57,9 @@ static gboolean agent_registered = FALSE;
+ static struct btd_adapter *pending_adapter = NULL;
+ static DBusMessage *pending_msg = NULL;
+ 
++/* For NFC mimetype limits max OOB EIR size */
++#define NFC_OOB_EIR_MAX UINT8_MAX
++
+ static DBusMessage *error_reply(DBusMessage *msg, int error)
  {
- 	sdp_list_t *l;
- 	uint8_t *ptr = data;
--	uint16_t eir_len = 0;
-+	uint16_t eir_optional_len = 0;
-+	uint16_t eir_total_len;
- 	uint16_t uuid16[HCI_MAX_EIR_LENGTH / 2];
- 	int i, uuid_count = 0;
- 	gboolean truncated = FALSE;
- 	size_t name_len;
- 
-+	eir_total_len =  sizeof(uint16_t) + sizeof(bdaddr_t);
-+	ptr += sizeof(uint16_t);
-+
-+	memcpy(ptr, addr, sizeof(bdaddr_t));
-+	ptr += sizeof(bdaddr_t);
-+
- 	if (cod > 0) {
- 		uint8_t class[3];
- 
-@@ -309,7 +316,7 @@ int eir_create_oob(const char *name, uint32_t cod,
- 		memcpy(ptr, class, sizeof(class));
- 		ptr += sizeof(class);
- 
--		eir_len += sizeof(class) + 2;
-+		eir_optional_len += sizeof(class) + 2;
- 	}
- 
- 	if (hash) {
-@@ -319,7 +326,7 @@ int eir_create_oob(const char *name, uint32_t cod,
- 		memcpy(ptr, hash, 16);
- 		ptr += 16;
- 
--		eir_len += 16 + 2;
-+		eir_optional_len += 16 + 2;
- 	}
- 
- 	if (randomizer) {
-@@ -329,7 +336,7 @@ int eir_create_oob(const char *name, uint32_t cod,
- 		memcpy(ptr, randomizer, 16);
- 		ptr += 16;
- 
--		eir_len += 16 + 2;
-+		eir_optional_len += 16 + 2;
- 	}
- 
- 	name_len = strlen(name);
-@@ -347,7 +354,7 @@ int eir_create_oob(const char *name, uint32_t cod,
- 
- 		memcpy(ptr + 2, name, name_len);
- 
--		eir_len += (name_len + 2);
-+		eir_optional_len += (name_len + 2);
- 		ptr += (name_len + 2);
- 	}
- 
-@@ -362,7 +369,7 @@ int eir_create_oob(const char *name, uint32_t cod,
- 		*ptr++ = (did_product & 0xff00) >> 8;
- 		*ptr++ = (did_version & 0x00ff);
- 		*ptr++ = (did_version & 0xff00) >> 8;
--		eir_len += 10;
-+		eir_optional_len += 10;
- 	}
- 
- 	/* Group all UUID16 types */
-@@ -380,7 +387,8 @@ int eir_create_oob(const char *name, uint32_t cod,
- 			continue;
- 
- 		/* Stop if not enough space to put next UUID16 */
--		if ((eir_len + 2 + sizeof(uint16_t)) > HCI_MAX_EIR_LENGTH) {
-+		if ((eir_optional_len + 2 + sizeof(uint16_t)) >
-+				HCI_MAX_EIR_LENGTH) {
- 			truncated = TRUE;
- 			break;
- 		}
-@@ -394,7 +402,7 @@ int eir_create_oob(const char *name, uint32_t cod,
- 			continue;
- 
- 		uuid16[uuid_count++] = uuid->value.uuid16;
--		eir_len += sizeof(uint16_t);
-+		eir_optional_len += sizeof(uint16_t);
- 	}
- 
- 	if (uuid_count > 0) {
-@@ -404,7 +412,7 @@ int eir_create_oob(const char *name, uint32_t cod,
- 		ptr[1] = truncated ? EIR_UUID16_SOME : EIR_UUID16_ALL;
- 
- 		ptr += 2;
--		eir_len += 2;
-+		eir_optional_len += 2;
- 
- 		for (i = 0; i < uuid_count; i++) {
- 			*ptr++ = (uuid16[i] & 0x00ff);
-@@ -413,10 +421,15 @@ int eir_create_oob(const char *name, uint32_t cod,
- 	}
- 
- 	/* Group all UUID128 types */
--	if (eir_len <= HCI_MAX_EIR_LENGTH - 2)
--		eir_generate_uuid128(uuids, ptr, &eir_len);
-+	if (eir_optional_len <= HCI_MAX_EIR_LENGTH - 2)
-+		eir_generate_uuid128(uuids, ptr, &eir_optional_len);
- 
--	return eir_len;
-+	eir_total_len += eir_optional_len;
-+
-+	/* store total length */
-+	bt_put_le16(eir_total_len, data);
-+
-+	return eir_total_len;
+ 	switch (error) {
+@@ -156,6 +160,60 @@ unregister:
+ 							AGENT_INTERFACE);
  }
  
- gboolean eir_has_data_type(uint8_t *data, size_t len, uint8_t type)
-diff --git a/src/eir.h b/src/eir.h
-index 0755da5..d8c5e32 100644
---- a/src/eir.h
-+++ b/src/eir.h
-@@ -53,7 +53,7 @@ struct eir_data {
- void eir_data_free(struct eir_data *eir);
- int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len);
- int eir_parse_oob(struct eir_data *eir, uint8_t *eir_data, uint16_t eir_len);
--int eir_create_oob(const char *name, uint32_t cod,
-+int eir_create_oob(bdaddr_t *addr, const char *name, uint32_t cod,
- 			uint8_t *hash, uint8_t *randomizer,
- 			uint16_t did_vendor, uint16_t did_product,
- 			uint16_t did_version, uint16_t did_source,
++static void read_local_complete(struct btd_adapter *adapter, uint8_t *hash,
++							uint8_t *randomizer)
++{
++	DBusMessage *reply;
++
++	DBG("hci%u", adapter_get_dev_id(adapter));
++
++	if (pending_adapter != adapter)
++		return;
++
++	if (hash && randomizer) {
++		int len;
++		uint8_t eir[NFC_OOB_EIR_MAX];
++		uint8_t *peir = eir;
++		bdaddr_t addr;
++		DBusMessageIter iter;
++		DBusMessageIter dict;
++
++		adapter_get_address(adapter, &addr);
++
++		len = eir_create_oob(&addr, btd_adapter_get_name(adapter),
++				btd_adapter_get_class(adapter), hash,
++				randomizer, main_opts.did_vendor,
++				main_opts.did_product, main_opts.did_version,
++				main_opts.did_source,
++				btd_adapter_get_services(adapter), eir);
++
++		reply = dbus_message_new_method_return(pending_msg);
++
++		dbus_message_iter_init_append(reply, &iter);
++
++		dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++					DBUS_TYPE_STRING_AS_STRING
++					DBUS_TYPE_VARIANT_AS_STRING
++					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
++					&dict);
++
++		dict_append_array(&dict, "EIR", DBUS_TYPE_BYTE, &peir, len);
++
++		dbus_message_iter_close_container(&iter, &dict);
++
++	} else {
++		reply = error_reply(pending_msg, EIO);
++	}
++
++	dbus_message_unref(pending_msg);
++	pending_msg = NULL;
++	pending_adapter = NULL;
++
++	if (!g_dbus_send_message(btd_get_dbus_connection(), reply))
++		error("D-Bus send failed");
++}
++
+ static void pairing_complete(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ 							uint8_t status)
+ {
+@@ -293,7 +351,7 @@ static int process_params(DBusMessageIter *iter, struct btd_adapter *adapter,
+ 		dbus_message_iter_recurse(&value, &array);
+ 		dbus_message_iter_get_fixed_array(&array, &eir, &size);
+ 
+-		return process_eir(adapter, eir, size, TRUE);
++		return process_eir(adapter, eir, size, pair);
+ 	} else if (strcasecmp(key, "nokia.com:bt") == 0) {
+ 		/* TODO add support for Nokia BT 2.0 proprietary stuff */
+ 		return -ENOTSUP;
+@@ -354,9 +412,30 @@ static DBusMessage *push_oob(DBusConnection *conn, DBusMessage *msg, void *data)
+ static DBusMessage *request_oob(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
++	struct btd_adapter *adapter;
++	DBusMessageIter iter;
++	int ret;
++
+ 	DBG("");
+ 
+-	return error_reply(msg, ENOTSUP);
++	adapter = manager_get_default_adapter();
++	ret = check_adapter(adapter);
++	if (ret < 0)
++		return error_reply(msg, -ret);
++
++	dbus_message_iter_init(msg, &iter);
++
++	ret = process_params(&iter, adapter, FALSE);
++	if (ret < 0)
++		return error_reply(msg, -ret);
++
++	ret = btd_adapter_read_local_oob_data(adapter);
++	if (ret < 0)
++		return error_reply(msg, -ret);
++
++	pending_adapter = adapter;
++	pending_msg = dbus_message_ref(msg);
++	return NULL;
+ }
+ 
+ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
+@@ -414,7 +493,7 @@ static void neard_vanished(DBusConnection *conn, void *user_data)
+ }
+ 
+ static struct oob_handler neard_handler = {
+-	.read_local_cb = NULL,
++	.read_local_cb = read_local_complete,
+ 	.pairing_cb = pairing_complete,
+ };
+ 
 -- 
 1.7.9.5
 
