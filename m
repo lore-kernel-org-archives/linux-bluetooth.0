@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 03/18] eir: Store class in struct eir_data as uint32_t
-Date: Fri, 21 Sep 2012 12:02:15 +0200
-Message-ID: <1348221750-15345-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 05/18] oob: Allow to register pairing complete callback
+Date: Fri, 21 Sep 2012 12:02:17 +0200
+Message-ID: <1348221750-15345-6-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1348221750-15345-1-git-send-email-szymon.janc@tieto.com>
 References: <1348221750-15345-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,136 +12,119 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This simplify code as class is stored on storage as uint32_t and
-had to be converted to it in few places.
+This will allow to register callback to be called when pairing is
+finished.
 
 ---
- src/adapter.c |   11 ++++-------
- src/eir.c     |    3 ++-
- src/eir.h     |    2 +-
- src/event.c   |   11 +++--------
- src/event.h   |    2 +-
- src/mgmt.c    |    2 +-
- 6 files changed, 12 insertions(+), 19 deletions(-)
+ plugins/dbusoob.c |    7 ++++++-
+ src/mgmt.c        |    1 +
+ src/oob.c         |   22 +++++++++++++++++-----
+ src/oob.h         |   15 ++++++++++++---
+ 4 files changed, 36 insertions(+), 9 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 06ba78c..d34e966 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2929,7 +2929,6 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 	struct eir_data eir_data;
- 	char *alias, *name;
- 	gboolean legacy, name_known;
--	uint32_t dev_class;
- 	int err;
- 	GSList *l;
+diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
+index a7259ba..a66c21d 100644
+--- a/plugins/dbusoob.c
++++ b/plugins/dbusoob.c
+@@ -354,13 +354,18 @@ static struct btd_adapter_driver oob_driver = {
+ 	.remove	= oob_remove,
+ };
  
-@@ -2940,10 +2939,8 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 		return;
- 	}
- 
--	dev_class = eir_data.dev_class[0] | (eir_data.dev_class[1] << 8) |
--						(eir_data.dev_class[2] << 16);
--	if (dev_class != 0)
--		write_remote_class(&adapter->bdaddr, bdaddr, dev_class);
-+	if (eir_data.class != 0)
-+		write_remote_class(&adapter->bdaddr, bdaddr, eir_data.class);
- 
- 	if (eir_data.appearance != 0)
- 		write_remote_appearance(&adapter->bdaddr, bdaddr, bdaddr_type,
-@@ -2999,8 +2996,8 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 	alias = read_stored_data(&adapter->bdaddr, bdaddr, bdaddr_type,
- 								"aliases");
- 
--	dev = found_device_new(bdaddr, bdaddr_type, name, alias, dev_class,
--						legacy, eir_data.flags);
-+	dev = found_device_new(bdaddr, bdaddr_type, name, alias,
-+				eir_data.class, legacy, eir_data.flags);
- 	free(name);
- 	free(alias);
- 
-diff --git a/src/eir.c b/src/eir.c
-index c29be40..4b054ea 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -166,7 +166,8 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
- 		case EIR_CLASS_OF_DEV:
- 			if (data_len < 3)
- 				break;
--			memcpy(eir->dev_class, data, 3);
-+			eir->class = data[0] | (data[1] << 8) |
-+							(data[2] << 16);
- 			break;
- 
- 		case EIR_GAP_APPEARANCE:
-diff --git a/src/eir.h b/src/eir.h
-index e6e870a..3a52563 100644
---- a/src/eir.h
-+++ b/src/eir.h
-@@ -47,7 +47,7 @@ struct eir_data {
- 	GSList *services;
- 	int flags;
- 	char *name;
--	uint8_t dev_class[3];
-+	uint32_t class;
- 	uint16_t appearance;
- 	gboolean name_complete;
- 	uint8_t *hash;
-diff --git a/src/event.c b/src/event.c
-index 3b85961..670b79a 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -453,7 +453,7 @@ int btd_event_ltk_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
- }
- 
- void btd_event_conn_complete(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
--						char *name, uint8_t *dev_class)
-+						char *name, uint32_t class)
++static struct oob_handler dbusoob_handler = {
++	.read_local_cb = read_local_data_complete,
++	.pairing_cb = NULL,
++};
++
+ static int dbusoob_init(void)
  {
- 	struct btd_adapter *adapter;
- 	struct btd_device *device;
-@@ -463,13 +463,8 @@ void btd_event_conn_complete(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_typ
+ 	DBG("Setup dbusoob plugin");
  
- 	update_lastused(local, peer, bdaddr_type);
+ 	connection = get_dbus_connection();
  
--	if (dev_class != NULL) {
--		uint32_t class = dev_class[0] | (dev_class[1] << 8) |
--							(dev_class[2] << 16);
--
--		if (class != 0)
--			write_remote_class(local, peer, class);
--	}
-+	if (class != 0)
-+		write_remote_class(local, peer, class);
+-	oob_register_cb(read_local_data_complete);
++	oob_register_cb(&dbusoob_handler);
  
- 	device_set_addr_type(device, bdaddr_type);
- 
-diff --git a/src/event.h b/src/event.h
-index 7031cc9..6d001dd 100644
---- a/src/event.h
-+++ b/src/event.h
-@@ -30,7 +30,7 @@ void btd_event_set_legacy_pairing(bdaddr_t *local, bdaddr_t *peer, gboolean lega
- void btd_event_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class);
- void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name);
- void btd_event_conn_complete(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
--					char *name, uint8_t *dev_class);
-+						char *name, uint32_t class);
- void btd_event_conn_failed(bdaddr_t *local, bdaddr_t *peer, uint8_t status);
- void btd_event_disconn_complete(bdaddr_t *local, bdaddr_t *peer);
- void btd_event_simple_pairing_complete(bdaddr_t *local, bdaddr_t *peer, uint8_t status);
+ 	return btd_register_adapter_driver(&oob_driver);
+ }
 diff --git a/src/mgmt.c b/src/mgmt.c
-index 3f83fdf..ee4cbbe 100644
+index ee4cbbe..1dec839 100644
 --- a/src/mgmt.c
 +++ b/src/mgmt.c
-@@ -503,7 +503,7 @@ static void mgmt_device_connected(int sk, uint16_t index, void *buf, size_t len)
- 	btd_event_conn_complete(&info->bdaddr, &ev->addr.bdaddr,
- 						ev->addr.type,
- 						eir_data.name,
--						eir_data.dev_class);
-+						eir_data.class);
+@@ -1181,6 +1181,7 @@ static void pair_device_complete(int sk, uint16_t index, uint8_t status,
+ 	info = &controllers[index];
  
- 	eir_data_free(&eir_data);
+ 	bonding_complete(info, &rp->addr.bdaddr, status);
++	oob_pairing_complete(&info->bdaddr, &rp->addr.bdaddr, status);
  }
+ 
+ static void get_connections_complete(int sk, uint16_t index, void *buf,
+diff --git a/src/oob.c b/src/oob.c
+index 75798fb..73a15db 100644
+--- a/src/oob.c
++++ b/src/oob.c
+@@ -24,18 +24,30 @@
+  */
+ 
+ #include "adapter.h"
++#include "manager.h"
+ #include "oob.h"
+ 
+-static oob_read_cb_t local_oob_read_cb = NULL;
++static struct oob_handler *oob_handler = NULL;
+ 
+-void oob_register_cb(oob_read_cb_t cb)
++
++void oob_register_cb(struct oob_handler *handler)
+ {
+-	local_oob_read_cb = cb;
++	oob_handler = handler;
+ }
+ 
+ void oob_read_local_data_complete(struct btd_adapter *adapter, uint8_t *hash,
+ 							uint8_t *randomizer)
+ {
+-	if (local_oob_read_cb)
+-		local_oob_read_cb(adapter, hash, randomizer);
++	if (oob_handler && oob_handler->read_local_cb)
++		oob_handler->read_local_cb(adapter, hash, randomizer);
++}
++
++void oob_pairing_complete(bdaddr_t *local, bdaddr_t *remote, uint8_t status)
++{
++	struct btd_adapter *adapter;
++
++	adapter = manager_find_adapter(local);
++
++	if (adapter && oob_handler && oob_handler->pairing_cb)
++		oob_handler->pairing_cb(adapter, remote, status);
+ }
+diff --git a/src/oob.h b/src/oob.h
+index 5805082..843ffdf 100644
+--- a/src/oob.h
++++ b/src/oob.h
+@@ -23,10 +23,19 @@
+  *
+  */
+ 
+-typedef void (*oob_read_cb_t) (struct btd_adapter *adapter, uint8_t *hash,
+-							uint8_t *randomizer);
++typedef void (*oob_read_local_cb_t) (struct btd_adapter *adapter,
++					uint8_t *hash, uint8_t *randomizer);
++typedef void (*oob_pairing_cb_t) (struct btd_adapter *adapter,
++					bdaddr_t *bdaddr, uint8_t status);
++
++struct oob_handler {
++	oob_read_local_cb_t read_local_cb;
++	oob_pairing_cb_t pairing_cb;
++};
+ 
+-void oob_register_cb(oob_read_cb_t cb);
++void oob_register_cb(struct oob_handler *handler);
+ 
+ void oob_read_local_data_complete(struct btd_adapter *adapter, uint8_t *hash,
+ 							uint8_t *randomizer);
++
++void oob_pairing_complete(bdaddr_t *local, bdaddr_t *remote, uint8_t status);
 -- 
 1.7.9.5
 
