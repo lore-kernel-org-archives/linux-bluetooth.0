@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v7 10/13] heartrate: Add support to reset Energy Expended
-Date: Fri, 21 Sep 2012 17:16:07 +0200
-Message-ID: <1348240570-7532-11-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: Rafal Garbat <rafal.garbat@tieto.com>
+Subject: [PATCH v7 06/13] heartrate: Read Body Sensor Location characteristics
+Date: Fri, 21 Sep 2012 17:16:03 +0200
+Message-ID: <1348240570-7532-7-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1348240570-7532-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1348240570-7532-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,87 +12,74 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds Reset method on HeartRate interface to reset Energy
-Expended.
+From: Rafal Garbat <rafal.garbat@tieto.com>
+
+This patch adds support to read and store Body Sensor Location
+characteristic value.
 ---
- profiles/heartrate/heartrate.c | 45 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 44 insertions(+), 1 deletion(-)
+ profiles/heartrate/heartrate.c | 35 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 34 insertions(+), 1 deletion(-)
 
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index ba1c1fa..add34b8 100644
+index d3d6d43..2547f9b 100644
 --- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
-@@ -41,6 +41,7 @@
- #include "log.h"
- #include "heartrate.h"
- 
-+#define HEART_RATE_INTERFACE		"org.bluez.HeartRate"
- #define HEART_RATE_MANAGER_INTERFACE	"org.bluez.HeartRateManager"
- #define HEART_RATE_WATCHER_INTERFACE	"org.bluez.HeartRateWatcher"
- 
-@@ -628,6 +629,35 @@ static const GDBusMethodTable heartrate_manager_methods[] = {
- 	{ }
+@@ -54,6 +54,9 @@ struct heartrate {
+ 	uint16_t			measurement_val_handle;
+ 	uint16_t			measurement_ccc_handle;
+ 	uint16_t			hrcp_val_handle;
++
++	gboolean			has_location;
++	uint8_t				location;
  };
  
-+static DBusMessage *hrcp_reset(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	struct heartrate *hr = data;
-+	uint8_t value;
-+	char *vmsg;
-+
-+	if (!hr->hrcp_val_handle)
-+		return btd_error_not_supported(msg);
-+
-+	if (!hr->attrib)
-+		return btd_error_not_available(msg);
-+
-+	value = 0x01;
-+	vmsg = g_strdup("Reset Control Point");
-+	gatt_write_char(hr->attrib, hr->hrcp_val_handle, &value,
-+					sizeof(value), char_write_cb, vmsg);
-+
-+	DBG("Energy Expended Value has been reset");
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static const GDBusMethodTable heartrate_device_methods[] = {
-+	{ GDBUS_METHOD("Reset", NULL, NULL,
-+			hrcp_reset) },
-+	{ }
-+};
-+
- int heartrate_adapter_register(struct btd_adapter *adapter)
- {
- 	struct heartrate_adapter *hradapter;
-@@ -685,6 +715,18 @@ int heartrate_device_register(struct btd_device *device,
- 	hr->dev = btd_device_ref(device);
- 	hr->hradapter = hradapter;
+ static GSList *heartrate_adapters = NULL;
+@@ -113,6 +116,34 @@ static void destroy_heartrate_adapter(gpointer user_data)
+ 	g_free(hradapter);
+ }
  
-+	if (!g_dbus_register_interface(btd_get_dbus_connection(),
-+						device_get_path(device),
-+						HEART_RATE_INTERFACE,
-+						heartrate_device_methods,
-+						NULL, NULL, hr,
-+						destroy_heartrate)) {
-+		error("D-Bus failed to register %s interface",
-+						HEART_RATE_INTERFACE);
-+		destroy_heartrate(hr);
-+		return -EIO;
++static void read_sensor_location_cb(guint8 status, const guint8 *pdu,
++						guint16 len, gpointer user_data)
++{
++	struct heartrate *hr = user_data;
++	uint8_t value;
++	ssize_t vlen;
++
++	if (status != 0) {
++		error("Body Sensor Location read failed: %s",
++							att_ecode2str(status));
++		return;
 +	}
 +
- 	hr->svc_range = g_new0(struct att_range, 1);
- 	hr->svc_range->start = prim->range.start;
- 	hr->svc_range->end = prim->range.end;
-@@ -718,5 +760,6 @@ void heartrate_device_unregister(struct btd_device *device)
- 
- 	hradapter->devices = g_slist_remove(hradapter->devices, hr);
- 
--	destroy_heartrate(hr);
-+	g_dbus_unregister_interface(btd_get_dbus_connection(),
-+				device_get_path(device), HEART_RATE_INTERFACE);
- }
++	vlen = dec_read_resp(pdu, len, &value, sizeof(value));
++	if (vlen < 0) {
++		error("Protocol error");
++		return;
++	}
++
++	if (vlen != sizeof(value)) {
++		error("Invalid length for Body Sensor Location");
++		return;
++	}
++
++	hr->has_location = TRUE;
++	hr->location = value;
++}
++
+ static void discover_ccc_cb(guint8 status, const guint8 *pdu,
+ 						guint16 len, gpointer user_data)
+ {
+@@ -194,7 +225,9 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ 			discover_measurement_ccc(hr, c, c_next);
+ 		} else if (g_strcmp0(c->uuid, BODY_SENSOR_LOCATION_UUID) == 0) {
+ 			DBG("Body Sensor Location supported");
+-			/* TODO: read characterictic value */
++
++			gatt_read_char(hr->attrib, c->value_handle, 0,
++						read_sensor_location_cb, hr);
+ 		} else if (g_strcmp0(c->uuid,
+ 					HEART_RATE_CONTROL_POINT_UUID) == 0) {
+ 			DBG("Heart Rate Control Point supported");
 -- 
 1.7.11.3
 
