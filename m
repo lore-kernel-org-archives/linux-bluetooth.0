@@ -2,86 +2,55 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: gustavo@padovan.org, johan.hedberg@gmail.com
-Subject: [PATCH 2/2] Bluetooth: Factor out Create Configuration Response
-Date: Fri, 21 Sep 2012 12:30:05 +0300
-Message-Id: <1348219805-19406-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1348219805-19406-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1348219805-19406-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: Factor out hci_queue_acl
+Date: Fri, 21 Sep 2012 12:30:04 +0300
+Message-Id: <1348219805-19406-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Use function to factor out similar code. For BR/EDR send EFS
-Configuration Response immediately, for HS response will be sent
-after receiving HCI Logical Link Complete event in the following
-patches.
+Use hci_chan as parameter instead of hci_conn as we need logical
+handle from hci_chan for AMP link.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |   32 +++++++++++++++++++-------------
- 1 file changed, 19 insertions(+), 13 deletions(-)
+ net/bluetooth/hci_core.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 9732f03..d43128f 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3557,6 +3557,22 @@ static inline void set_default_fcs(struct l2cap_chan *chan)
- 		chan->fcs = L2CAP_FCS_CRC16;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e407051..3588f31 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2151,9 +2151,10 @@ static void hci_add_acl_hdr(struct sk_buff *skb, __u16 handle, __u16 flags)
+ 	hdr->dlen   = cpu_to_le16(len);
  }
  
-+static void l2cap_send_efs_conf_rsp(struct l2cap_chan *chan, void *data,
-+				    u8 ident, u16 flags)
-+{
-+	struct l2cap_conn *conn = chan->conn;
-+
-+	BT_DBG("conn %p chan %p ident %d flags 0x%4.4x", conn, chan, ident,
-+	       flags);
-+
-+	clear_bit(CONF_LOC_CONF_PEND, &chan->conf_state);
-+	set_bit(CONF_OUTPUT_DONE, &chan->conf_state);
-+
-+	l2cap_send_cmd(conn, ident, L2CAP_CONF_RSP,
-+		       l2cap_build_conf_rsp(chan, data,
-+					    L2CAP_CONF_SUCCESS, flags), data);
-+}
-+
- static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd, u16 cmd_len, u8 *data)
+-static void hci_queue_acl(struct hci_conn *conn, struct sk_buff_head *queue,
++static void hci_queue_acl(struct hci_chan *chan, struct sk_buff_head *queue,
+ 			  struct sk_buff *skb, __u16 flags)
  {
- 	struct l2cap_conf_req *req = (struct l2cap_conf_req *) data;
-@@ -3648,16 +3664,11 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	/* Got Conf Rsp PENDING from remote side and asume we sent
- 	   Conf Rsp PENDING in the code above */
- 	if (test_bit(CONF_REM_CONF_PEND, &chan->conf_state) &&
--			test_bit(CONF_LOC_CONF_PEND, &chan->conf_state)) {
-+	    test_bit(CONF_LOC_CONF_PEND, &chan->conf_state)) {
++	struct hci_conn *conn = chan->conn;
+ 	struct hci_dev *hdev = conn->hdev;
+ 	struct sk_buff *list;
  
- 		/* check compatibility */
+@@ -2200,14 +2201,13 @@ static void hci_queue_acl(struct hci_conn *conn, struct sk_buff_head *queue,
  
--		clear_bit(CONF_LOC_CONF_PEND, &chan->conf_state);
--		set_bit(CONF_OUTPUT_DONE, &chan->conf_state);
--
--		l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
--					l2cap_build_conf_rsp(chan, rsp,
--					L2CAP_CONF_SUCCESS, flags), rsp);
-+		l2cap_send_efs_conf_rsp(chan, rsp, cmd->ident, flags);
- 	}
+ void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags)
+ {
+-	struct hci_conn *conn = chan->conn;
+-	struct hci_dev *hdev = conn->hdev;
++	struct hci_dev *hdev = chan->conn->hdev;
  
- unlock:
-@@ -3705,12 +3716,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	BT_DBG("%s chan %p flags 0x%4.4x", hdev->name, chan, flags);
  
- 			/* check compatibility */
+ 	skb->dev = (void *) hdev;
  
--			clear_bit(CONF_LOC_CONF_PEND, &chan->conf_state);
--			set_bit(CONF_OUTPUT_DONE, &chan->conf_state);
--
--			l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
--						l2cap_build_conf_rsp(chan, buf,
--						L2CAP_CONF_SUCCESS, 0x0000), buf);
-+			l2cap_send_efs_conf_rsp(chan, buf, cmd->ident, 0);
- 		}
- 		goto done;
+-	hci_queue_acl(conn, &chan->data_q, skb, flags);
++	hci_queue_acl(chan, &chan->data_q, skb, flags);
  
+ 	queue_work(hdev->workqueue, &hdev->tx_work);
+ }
 -- 
 1.7.9.5
 
