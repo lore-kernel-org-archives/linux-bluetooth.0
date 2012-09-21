@@ -1,63 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Rafal Garbat <rafal.garbat@tieto.com>
+Subject: [PATCH v7 12/13] heartrate: Add HeartRateWatcher interface to default policy
+Date: Fri, 21 Sep 2012 17:16:09 +0200
+Message-ID: <1348240570-7532-13-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1348240570-7532-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1348240570-7532-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1348218561-24509-2-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1348218561-24509-1-git-send-email-andrzej.kaczmarek@tieto.com>
-	<1348218561-24509-2-git-send-email-andrzej.kaczmarek@tieto.com>
-Date: Fri, 21 Sep 2012 11:51:23 -0400
-Message-ID: <CAJdJm_PyC22Les5_=+z+MjnbFzGGZ7CepQNEo9QRdV0z_SaUKA@mail.gmail.com>
-Subject: Re: [PATCH] Cycling Speed and Cadence profile (CSCP) API
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+From: Rafal Garbat <rafal.garbat@tieto.com>
 
-On Fri, Sep 21, 2012 at 5:09 AM, Andrzej Kaczmarek
-<andrzej.kaczmarek@tieto.com> wrote:
-> +Cycling Speed and Cadence API description
-> +****************************************
-> +
-> +Copyright (C) 2012     Tieto Poland
-> +
-> +Cycling Manager hierarchy
-> +============================
-> +
-> +Service                org.bluez
-> +Interface      org.bluez.CyclingManager
+---
+ src/bluetooth.conf | 1 +
+ 1 file changed, 1 insertion(+)
 
-I don't have much to comment on the API as I haven't had time to read
-the CSCP spec yet, but about the name prefix, what about
-"CyclingSpeed" (and "RunningSpeed" for the future RSCP) ? Too long?
-
-The "Cycling" name is slightly uncommon, but still not that bad IMHO.
-
-> +Properties     String Location (optional) [readwrite]
-
-String -> string
-
-> +                               uint16 LastWheelEventTime (optional):
-> +
-> +                                       Value of Last Wheel Event time
-
-Better specify that this is in "1/1024 second units" (just checked on
-developer.bluetooth.org).
-
-> +
-> +                               uint16 CrankRevolutions (optional):
-> +
-> +                                       Cumulative number of crank revolutions
-> +
-> +                               uint16 LastCrankEventTime (optional):
-> +
-> +                                       Value of Last Crank Event time
-
-Same here.
-
-Regards,
+diff --git a/src/bluetooth.conf b/src/bluetooth.conf
+index 664dbd9..77a9371 100644
+--- a/src/bluetooth.conf
++++ b/src/bluetooth.conf
+@@ -16,6 +16,7 @@
+     <allow send_interface="org.bluez.MediaPlayer"/>
+     <allow send_interface="org.bluez.Watcher"/>
+     <allow send_interface="org.bluez.ThermometerWatcher"/>
++    <allow send_interface="org.bluez.HeartRateWatcher"/>
+   </policy>
+ 
+   <policy at_console="true">
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.11.3
+
