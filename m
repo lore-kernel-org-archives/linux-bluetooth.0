@@ -1,51 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 21 Sep 2012 15:43:23 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Pacho Ramos <pacho@gentoo.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: bluetoothd: Refusing input device connect: Operation already in
- progress (114)
-Message-ID: <20120921124323.GA14885@x220>
-References: <1347704153.24322.11.camel@belkin4>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v3 17/18] adapter: Add btd_adapter_get_class function
+Date: Fri, 21 Sep 2012 14:36:34 +0200
+Message-ID: <1348230995-8967-18-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1348230995-8967-1-git-send-email-szymon.janc@tieto.com>
+References: <1348230995-8967-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1347704153.24322.11.camel@belkin4>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This is a simple getter to get current Class Of Device of adapter.
 
-On Sat, Sep 15, 2012, Pacho Ramos wrote:
-> Downstream we got the following report:
-> https://bugs.gentoo.org/show_bug.cgi?id=431624
-> 
-> After adding mouse (via Blueman's "Add device" dialog) it works fine
-> until sleeping or powering off. After that it fails reconnecting.
-> In /var/log/messages appears strings like these:
-> 
-> Aug 16 15:40:31 user bluetoothd[3222]: Refusing input device connect:
-> Operation already in progress (114)
-> Aug 16 15:45:13 user bluetoothd[3222]: Refusing input device connect:
-> Operation already in progress (114)
-> Aug 16 15:45:16 user bluetoothd[3222]: Refusing input device connect:
-> Operation already in progress (114)
-> Aug 16 15:45:17 user bluetoothd[3222]: Refusing input device connect:
-> Operation already in progress (114)
-> Aug 16 15:45:19 user bluetoothd[3222]: Refusing input device connect:
-> Operation already in progress (114)
-> Aug 16 15:47:46 user bluetoothd[3222]: Refusing input device connect:
-> Operation already in progress (114)
-> 
-> Searching, I found this thread that pointed to the culprit, but I
-> haven't found what finally occurred with it, if patch was reverted or a
-> different fix was pulled in:
-> http://www.spinics.net/lists/linux-bluetooth/msg26442.html
+---
+ src/adapter.c |    5 +++++
+ src/adapter.h |    2 ++
+ 2 files changed, 7 insertions(+)
 
-This is a different issue but the cause seems to be similar. You don't
-need to patch bluetoothd though but just disable the mgmt part by
-passing -P mgmtops to bluetoothd. For whatever reason the connection
-state isn't cleaned up with mgmt (which shouldn't be dependent on mgmt
-to begin with) and the input_device_set_channel function returns
--EALREADY when accepting a connection.
+diff --git a/src/adapter.c b/src/adapter.c
+index ae61f6d..43df465 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2185,6 +2185,11 @@ void btd_adapter_read_class(struct btd_adapter *adapter, uint8_t *major,
+ 	*minor = cls[0];
+ }
+ 
++uint32_t btd_adapter_get_class(struct btd_adapter *adapter)
++{
++	return adapter->dev_class;
++}
++
+ const char *btd_adapter_get_name(struct btd_adapter *adapter)
+ {
+ 	return adapter->name;
+diff --git a/src/adapter.h b/src/adapter.h
+index f7c4237..4f2f39f 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -86,6 +86,8 @@ void btd_adapter_get_mode(struct btd_adapter *adapter, uint8_t *mode,
+ 
+ void btd_adapter_read_class(struct btd_adapter *adapter, uint8_t *major,
+ 							uint8_t *minor);
++
++uint32_t btd_adapter_get_class(struct btd_adapter *adapter);
+ const char *btd_adapter_get_name(struct btd_adapter *adapter);
+ struct btd_device *adapter_get_device(struct btd_adapter *adapter,
+ 							const char *address);
+-- 
+1.7.9.5
 
-Johan
