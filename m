@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v7 08/13] heartrate: Add support to enable notifications
-Date: Fri, 21 Sep 2012 17:16:05 +0200
-Message-ID: <1348240570-7532-9-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: Rafal Garbat <rafal.garbat@tieto.com>
+Subject: [PATCH v7 11/13] heartrate: Add GetProperties method
+Date: Fri, 21 Sep 2012 17:16:08 +0200
+Message-ID: <1348240570-7532-12-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1348240570-7532-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1348240570-7532-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,127 +12,98 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support to enable notifications for Heart Rate Measurement
-characteristic value. Notifications are enabled automatically when at
-least one watcher is registered and disabled otherwise.
+From: Rafal Garbat <rafal.garbat@tieto.com>
+
 ---
- profiles/heartrate/heartrate.c | 67 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 67 insertions(+)
+ profiles/heartrate/heartrate.c | 61 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 61 insertions(+)
 
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index b07a343..dda030b 100644
+index add34b8..81dd5cc 100644
 --- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
-@@ -207,6 +207,17 @@ static void read_sensor_location_cb(guint8 status, const guint8 *pdu,
- 	hr->location = value;
- }
+@@ -94,6 +94,25 @@ struct measurement {
  
-+static void char_write_cb(guint8 status, const guint8 *pdu, guint16 len,
-+							gpointer user_data)
+ static GSList *heartrate_adapters = NULL;
+ 
++static const char * const location_enum[] = {
++	"Other",
++	"Chest",
++	"Wrist",
++	"Finger",
++	"Hand",
++	"Earlobe",
++	"Foot",
++};
++
++static const gchar *location2str(uint8_t value)
 +{
-+	char *msg = user_data;
++	 if (value < G_N_ELEMENTS(location_enum))
++		return location_enum[value];
 +
-+	if (status != 0)
-+		error("%s failed", msg);
-+
-+	g_free(msg);
++	error("Body Sensor Location [%d] is RFU", value);
++	return NULL;
 +}
 +
- static void discover_ccc_cb(guint8 status, const guint8 *pdu,
- 						guint16 len, gpointer user_data)
+ static gint cmp_adapter(gconstpointer a, gconstpointer b)
  {
-@@ -237,7 +248,20 @@ static void discover_ccc_cb(guint8 status, const guint8 *pdu,
- 		uuid = att_get_u16(value + 2);
+ 	const struct heartrate_adapter *hradapter = a;
+@@ -629,6 +648,45 @@ static const GDBusMethodTable heartrate_manager_methods[] = {
+ 	{ }
+ };
  
- 		if (uuid == GATT_CLIENT_CHARAC_CFG_UUID) {
-+			uint8_t value[2];
-+			char *msg;
-+
- 			hr->measurement_ccc_handle = handle;
-+
-+			if (g_slist_length(hr->hradapter->watchers) == 0)
-+				break;
-+
-+			att_put_u16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
-+			msg = g_strdup("Enable measurement");
-+
-+			gatt_write_char(hr->attrib, handle, value,
-+					sizeof(value), char_write_cb, msg);
-+
- 			break;
- 		}
- 	}
-@@ -299,6 +323,40 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
- 	}
- }
- 
-+static void enable_measurement(gpointer data, gpointer user_data)
++static DBusMessage *get_properties(DBusConnection *conn, DBusMessage *msg,
++								void *data)
 +{
 +	struct heartrate *hr = data;
-+	uint16_t handle = hr->measurement_ccc_handle;
-+	uint8_t value[2];
-+	char *msg;
++	DBusMessageIter iter;
++	DBusMessageIter dict;
++	DBusMessage *reply;
++	gboolean has_reset;
 +
-+	if (hr->attrib == NULL || !handle)
-+		return;
++	reply = dbus_message_new_method_return(msg);
++	if (reply == NULL)
++		return NULL;
 +
-+	att_put_u16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
-+	msg = g_strdup("Enable measurement");
++	dbus_message_iter_init_append(reply, &iter);
 +
-+	gatt_write_char(hr->attrib, handle, value, sizeof(value),
-+							char_write_cb, msg);
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	if (hr->has_location) {
++		char *loc = g_strdup(location2str(hr->location));
++
++		if (loc) {
++			dict_append_entry(&dict, "Location",
++						DBUS_TYPE_STRING, &loc);
++			g_free(loc);
++		}
++	}
++
++	has_reset = !!hr->hrcp_val_handle;
++	dict_append_entry(&dict, "ResetSupported", DBUS_TYPE_BOOLEAN,
++								&has_reset);
++
++	dbus_message_iter_close_container(&iter, &dict);
++
++	return reply;
 +}
 +
-+static void disable_measurement(gpointer data, gpointer user_data)
-+{
-+	struct heartrate *hr = data;
-+	uint16_t handle = hr->measurement_ccc_handle;
-+	uint8_t value[2];
-+	char *msg;
-+
-+	if (hr->attrib == NULL || !handle)
-+		return;
-+
-+	att_put_u16(0x0000, value);
-+	msg = g_strdup("Disable measurement");
-+
-+	gatt_write_char(hr->attrib, handle, value, sizeof(value),
-+							char_write_cb, msg);
-+}
-+
- static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ static DBusMessage *hrcp_reset(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
  {
- 	struct heartrate *hr = user_data;
-@@ -330,6 +388,9 @@ static void watcher_exit_cb(DBusConnection *conn, void *user_data)
- 
- 	hradapter->watchers = g_slist_remove(hradapter->watchers, watcher);
- 	g_dbus_remove_watch(conn, watcher->id);
-+
-+	if (g_slist_length(hradapter->watchers) == 0)
-+		g_slist_foreach(hradapter->devices, disable_measurement, 0);
+@@ -653,6 +711,9 @@ static DBusMessage *hrcp_reset(DBusConnection *conn, DBusMessage *msg,
  }
  
- static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
-@@ -355,6 +416,9 @@ static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
- 	watcher->srv = g_strdup(sender);
- 	watcher->path = g_strdup(path);
- 
-+	if (g_slist_length(hradapter->watchers) == 0)
-+		g_slist_foreach(hradapter->devices, enable_measurement, 0);
-+
- 	hradapter->watchers = g_slist_prepend(hradapter->watchers, watcher);
- 
- 	DBG("heartrate watcher [%s] registered", path);
-@@ -381,6 +445,9 @@ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
- 	hradapter->watchers = g_slist_remove(hradapter->watchers, watcher);
- 	g_dbus_remove_watch(conn, watcher->id);
- 
-+	if (g_slist_length(hradapter->watchers) == 0)
-+		g_slist_foreach(hradapter->devices, disable_measurement, 0);
-+
- 	DBG("heartrate watcher [%s] unregistered", path);
- 
- 	return dbus_message_new_method_return(msg);
+ static const GDBusMethodTable heartrate_device_methods[] = {
++	{ GDBUS_METHOD("GetProperties",
++			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
++			get_properties) },
+ 	{ GDBUS_METHOD("Reset", NULL, NULL,
+ 			hrcp_reset) },
+ 	{ }
 -- 
 1.7.11.3
 
