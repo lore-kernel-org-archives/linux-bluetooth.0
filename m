@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 05/18] oob: Allow to register pairing complete callback
-Date: Fri, 21 Sep 2012 14:36:22 +0200
-Message-ID: <1348230995-8967-6-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v3 04/18] eir: Add eir_parse_oob function
+Date: Fri, 21 Sep 2012 14:36:21 +0200
+Message-ID: <1348230995-8967-5-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1348230995-8967-1-git-send-email-szymon.janc@tieto.com>
 References: <1348230995-8967-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,117 +12,74 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will allow to register callback to be called when pairing is
-finished.
+This will parse EIR received over OOB. Such EIR contains mandatory
+and optional part.
 
 ---
- plugins/dbusoob.c |    7 ++++++-
- src/mgmt.c        |    1 +
- src/oob.c         |   22 +++++++++++++++++-----
- src/oob.h         |   15 ++++++++++++---
- 4 files changed, 36 insertions(+), 9 deletions(-)
+ src/eir.c |   25 +++++++++++++++++++++++++
+ src/eir.h |    2 ++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
-index 543b272..b49e68d 100644
---- a/plugins/dbusoob.c
-+++ b/plugins/dbusoob.c
-@@ -355,11 +355,16 @@ static struct btd_adapter_driver oob_driver = {
- 	.remove	= oob_remove,
- };
+diff --git a/src/eir.c b/src/eir.c
+index 4b054ea..144f65c 100644
+--- a/src/eir.c
++++ b/src/eir.c
+@@ -38,6 +38,8 @@
+ #include "glib-helper.h"
+ #include "eir.h"
  
-+static struct oob_handler dbusoob_handler = {
-+	.read_local_cb = read_local_data_complete,
-+	.pairing_cb = NULL,
-+};
++#define EIR_OOB_MIN (2 + 6)
 +
- static int dbusoob_init(void)
+ void eir_data_free(struct eir_data *eir)
  {
- 	DBG("Setup dbusoob plugin");
- 
--	oob_register_cb(read_local_data_complete);
-+	oob_register_cb(&dbusoob_handler);
- 
- 	return btd_register_adapter_driver(&oob_driver);
- }
-diff --git a/src/mgmt.c b/src/mgmt.c
-index 9d78ce1..2accf24 100644
---- a/src/mgmt.c
-+++ b/src/mgmt.c
-@@ -1193,6 +1193,7 @@ static void pair_device_complete(int sk, uint16_t index, uint8_t status,
- 	info = &controllers[index];
- 
- 	bonding_complete(info, &rp->addr.bdaddr, status);
-+	oob_pairing_complete(&info->bdaddr, &rp->addr.bdaddr, status);
+ 	g_slist_free_full(eir->services, g_free);
+@@ -197,6 +199,29 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
+ 	return 0;
  }
  
- static void get_connections_complete(int sk, uint16_t index, void *buf,
-diff --git a/src/oob.c b/src/oob.c
-index 75798fb..73a15db 100644
---- a/src/oob.c
-+++ b/src/oob.c
-@@ -24,18 +24,30 @@
-  */
- 
- #include "adapter.h"
-+#include "manager.h"
- #include "oob.h"
- 
--static oob_read_cb_t local_oob_read_cb = NULL;
-+static struct oob_handler *oob_handler = NULL;
- 
--void oob_register_cb(oob_read_cb_t cb)
++int eir_parse_oob(struct eir_data *eir, uint8_t *eir_data, uint16_t eir_len)
++{
 +
-+void oob_register_cb(struct oob_handler *handler)
- {
--	local_oob_read_cb = cb;
-+	oob_handler = handler;
- }
- 
- void oob_read_local_data_complete(struct btd_adapter *adapter, uint8_t *hash,
- 							uint8_t *randomizer)
- {
--	if (local_oob_read_cb)
--		local_oob_read_cb(adapter, hash, randomizer);
-+	if (oob_handler && oob_handler->read_local_cb)
-+		oob_handler->read_local_cb(adapter, hash, randomizer);
++	if (eir_len < EIR_OOB_MIN)
++		return -1;
++
++	if (eir_len != bt_get_le16(eir_data))
++		return -1;
++
++	eir_data += sizeof(uint16_t);
++	eir_len -= sizeof(uint16_t);
++
++	memcpy(&eir->addr, eir_data, sizeof(bdaddr_t));
++	eir_data += sizeof(bdaddr_t);
++	eir_len -= sizeof(bdaddr_t);
++
++	/* optional OOB EIR data */
++	if (eir_len > 0)
++		return eir_parse(eir, eir_data, eir_len);
++
++	return 0;
 +}
 +
-+void oob_pairing_complete(bdaddr_t *local, bdaddr_t *remote, uint8_t status)
-+{
-+	struct btd_adapter *adapter;
-+
-+	adapter = manager_find_adapter(local);
-+
-+	if (adapter && oob_handler && oob_handler->pairing_cb)
-+		oob_handler->pairing_cb(adapter, remote, status);
- }
-diff --git a/src/oob.h b/src/oob.h
-index 5805082..843ffdf 100644
---- a/src/oob.h
-+++ b/src/oob.h
-@@ -23,10 +23,19 @@
-  *
-  */
+ #define SIZEOF_UUID128 16
  
--typedef void (*oob_read_cb_t) (struct btd_adapter *adapter, uint8_t *hash,
--							uint8_t *randomizer);
-+typedef void (*oob_read_local_cb_t) (struct btd_adapter *adapter,
-+					uint8_t *hash, uint8_t *randomizer);
-+typedef void (*oob_pairing_cb_t) (struct btd_adapter *adapter,
-+					bdaddr_t *bdaddr, uint8_t status);
-+
-+struct oob_handler {
-+	oob_read_local_cb_t read_local_cb;
-+	oob_pairing_cb_t pairing_cb;
-+};
+ static void eir_generate_uuid128(GSList *list, uint8_t *ptr, uint16_t *eir_len)
+diff --git a/src/eir.h b/src/eir.h
+index 3a52563..d2d6dc7 100644
+--- a/src/eir.h
++++ b/src/eir.h
+@@ -52,10 +52,12 @@ struct eir_data {
+ 	gboolean name_complete;
+ 	uint8_t *hash;
+ 	uint8_t *randomizer;
++	bdaddr_t addr;
+ };
  
--void oob_register_cb(oob_read_cb_t cb);
-+void oob_register_cb(struct oob_handler *handler);
- 
- void oob_read_local_data_complete(struct btd_adapter *adapter, uint8_t *hash,
- 							uint8_t *randomizer);
-+
-+void oob_pairing_complete(bdaddr_t *local, bdaddr_t *remote, uint8_t status);
+ void eir_data_free(struct eir_data *eir);
+ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len);
++int eir_parse_oob(struct eir_data *eir, uint8_t *eir_data, uint16_t eir_len);
+ void eir_create(const char *name, int8_t tx_power, uint16_t did_vendor,
+ 			uint16_t did_product, uint16_t did_version,
+ 			uint16_t did_source, GSList *uuids, uint8_t *data);
 -- 
 1.7.9.5
 
