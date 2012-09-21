@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 15/18] adapter: Add btd_adapter_get_services function
-Date: Fri, 21 Sep 2012 14:36:32 +0200
-Message-ID: <1348230995-8967-16-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v3 11/18] eir: Remove support for creating EIR with tx_power fields
+Date: Fri, 21 Sep 2012 14:36:28 +0200
+Message-ID: <1348230995-8967-12-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1348230995-8967-1-git-send-email-szymon.janc@tieto.com>
 References: <1348230995-8967-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,41 +12,53 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Services will be used to create EIR to be send over OOB.
+This field is not used for OOB EIR.
 
 ---
- src/adapter.c |    5 +++++
- src/adapter.h |    1 +
- 2 files changed, 6 insertions(+)
+ src/eir.c |    9 +--------
+ src/eir.h |    2 +-
+ 2 files changed, 2 insertions(+), 9 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 6d2ca69..a938c24 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -990,6 +990,11 @@ struct btd_device *adapter_get_device(struct btd_adapter *adapter,
- 	return adapter_create_device(adapter, address, BDADDR_BREDR);
+diff --git a/src/eir.c b/src/eir.c
+index a3c99e8..c67cf6f 100644
+--- a/src/eir.c
++++ b/src/eir.c
+@@ -280,7 +280,7 @@ static void eir_generate_uuid128(GSList *list, uint8_t *ptr, uint16_t *eir_len)
+ 	}
  }
  
-+sdp_list_t *btd_adapter_get_services(struct btd_adapter *adapter)
-+{
-+	return adapter->services;
-+}
-+
- static gboolean discovery_cb(gpointer user_data)
- {
- 	struct btd_adapter *adapter = user_data;
-diff --git a/src/adapter.h b/src/adapter.h
-index eece6f5..4afe40f 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -89,6 +89,7 @@ void btd_adapter_get_class(struct btd_adapter *adapter, uint8_t *major,
- const char *btd_adapter_get_name(struct btd_adapter *adapter);
- struct btd_device *adapter_get_device(struct btd_adapter *adapter,
- 							const char *address);
-+sdp_list_t *btd_adapter_get_services(struct btd_adapter *adapter);
+-void eir_create_oob(const char *name, int8_t tx_power, uint32_t cod,
++void eir_create_oob(const char *name, uint32_t cod,
+ 			uint8_t *hash, uint8_t *randomizer,
+ 			uint16_t did_vendor, uint16_t did_product,
+ 			uint16_t did_version, uint16_t did_source,
+@@ -349,13 +349,6 @@ void eir_create_oob(const char *name, int8_t tx_power, uint32_t cod,
+ 		ptr += (name_len + 2);
+ 	}
  
- struct btd_device *adapter_find_device(struct btd_adapter *adapter, const char *dest);
- 
+-	if (tx_power != 0) {
+-		*ptr++ = 2;
+-		*ptr++ = EIR_TX_POWER;
+-		*ptr++ = (uint8_t) tx_power;
+-		eir_len += 3;
+-	}
+-
+ 	if (did_vendor != 0x0000) {
+ 		*ptr++ = 9;
+ 		*ptr++ = EIR_DEVICE_ID;
+diff --git a/src/eir.h b/src/eir.h
+index 55289f9..d5c4afc 100644
+--- a/src/eir.h
++++ b/src/eir.h
+@@ -58,7 +58,7 @@ struct eir_data {
+ void eir_data_free(struct eir_data *eir);
+ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len);
+ int eir_parse_oob(struct eir_data *eir, uint8_t *eir_data, uint16_t eir_len);
+-void eir_create_oob(const char *name, int8_t tx_power, uint32_t cod,
++void eir_create_oob(const char *name, uint32_t cod,
+ 			uint8_t *hash, uint8_t *randomizer,
+ 			uint16_t did_vendor, uint16_t did_product,
+ 			uint16_t did_version, uint16_t did_source,
 -- 
 1.7.9.5
 
