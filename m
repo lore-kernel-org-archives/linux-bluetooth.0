@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 08/18] eir: Add support creating EIR with hash and randomizer fields
-Date: Fri, 21 Sep 2012 14:36:25 +0200
-Message-ID: <1348230995-8967-9-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v3 06/18] Handle missing randomizer in mgmt_add_remote_oob_data
+Date: Fri, 21 Sep 2012 14:36:23 +0200
+Message-ID: <1348230995-8967-7-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1348230995-8967-1-git-send-email-szymon.janc@tieto.com>
 References: <1348230995-8967-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,78 +12,47 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will be used to create EIR to be send over OOB channel.
+Randomizer is optional. Handling missing randomizer in
+mgmt_add_remote_oob_data is easy and will simplify caller code.
 
 ---
- src/eir.c |   28 +++++++++++++++++++++++++---
- src/eir.h |    8 +++++---
- 2 files changed, 30 insertions(+), 6 deletions(-)
+ plugins/dbusoob.c |    7 -------
+ src/mgmt.c        |    4 +++-
+ 2 files changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/src/eir.c b/src/eir.c
-index 144f65c..0ef18e2 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -280,9 +280,11 @@ static void eir_generate_uuid128(GSList *list, uint8_t *ptr, uint16_t *eir_len)
- 	}
- }
+diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
+index b49e68d..ba04830 100644
+--- a/plugins/dbusoob.c
++++ b/plugins/dbusoob.c
+@@ -232,13 +232,6 @@ static gboolean store_data(struct btd_adapter *adapter, struct oob_data *data)
+ 	adapter_get_address(adapter, &local);
  
--void eir_create(const char *name, int8_t tx_power, uint16_t did_vendor,
--			uint16_t did_product, uint16_t did_version,
--			uint16_t did_source, GSList *uuids, uint8_t *data)
-+void eir_create(const char *name, int8_t tx_power,
-+			uint8_t *hash, uint8_t *randomizer,
-+			uint16_t did_vendor, uint16_t did_product,
-+			uint16_t did_version, uint16_t did_source,
-+			GSList *uuids, uint8_t *data)
- {
- 	GSList *l;
- 	uint8_t *ptr = data;
-@@ -292,6 +294,26 @@ void eir_create(const char *name, int8_t tx_power, uint16_t did_vendor,
- 	gboolean truncated = FALSE;
- 	size_t name_len;
+ 	if (data->hash) {
+-		uint8_t empty_randomizer[16];
+-
+-		if (!data->randomizer) {
+-			memset(empty_randomizer, 0, sizeof(empty_randomizer));
+-			data->randomizer = empty_randomizer;
+-		}
+-
+ 		if (btd_adapter_add_remote_oob_data(adapter, &bdaddr,
+ 					data->hash, data->randomizer) < 0)
+ 			return FALSE;
+diff --git a/src/mgmt.c b/src/mgmt.c
+index 2accf24..a3f31dd 100644
+--- a/src/mgmt.c
++++ b/src/mgmt.c
+@@ -2425,7 +2425,9 @@ int mgmt_add_remote_oob_data(int index, bdaddr_t *bdaddr,
  
-+	if (hash) {
-+		*ptr++ = 17;
-+		*ptr++ = EIR_SSP_HASH;
+ 	bacpy(&cp->addr.bdaddr, bdaddr);
+ 	memcpy(cp->hash, hash, 16);
+-	memcpy(cp->randomizer, randomizer, 16);
 +
-+		memcpy(ptr, hash, 16);
-+		ptr += 16;
-+
-+		eir_len += 16 + 2;
-+	}
-+
-+	if (randomizer) {
-+		*ptr++ = 17;
-+		*ptr++ = EIR_SSP_RANDOMIZER;
-+
-+		memcpy(ptr, randomizer, 16);
-+		ptr += 16;
-+
-+		eir_len += 16 + 2;
-+	}
-+
- 	name_len = strlen(name);
++	if (randomizer)
++		memcpy(cp->randomizer, randomizer, 16);
  
- 	if (name_len > 0) {
-diff --git a/src/eir.h b/src/eir.h
-index d2d6dc7..844c162 100644
---- a/src/eir.h
-+++ b/src/eir.h
-@@ -58,9 +58,11 @@ struct eir_data {
- void eir_data_free(struct eir_data *eir);
- int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len);
- int eir_parse_oob(struct eir_data *eir, uint8_t *eir_data, uint16_t eir_len);
--void eir_create(const char *name, int8_t tx_power, uint16_t did_vendor,
--			uint16_t did_product, uint16_t did_version,
--			uint16_t did_source, GSList *uuids, uint8_t *data);
-+void eir_create(const char *name, int8_t tx_power,
-+			uint8_t *hash, uint8_t *randomizer,
-+			uint16_t did_vendor, uint16_t did_product,
-+			uint16_t did_version, uint16_t did_source,
-+			GSList *uuids, uint8_t *data);
- 
- gboolean eir_has_data_type(uint8_t *data, size_t len, uint8_t type);
- 
+ 	if (write(mgmt_sock, &buf, sizeof(buf)) < 0)
+ 		return -errno;
 -- 
 1.7.9.5
 
