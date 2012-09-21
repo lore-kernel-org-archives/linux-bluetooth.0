@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v7 05/13] heartrate: Discover Heart Rate Measurement CCC
-Date: Fri, 21 Sep 2012 17:16:02 +0200
-Message-ID: <1348240570-7532-6-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: Rafal Garbat <rafal.garbat@tieto.com>
+Subject: [PATCH v7 07/13] heartrate: Add HeartRateManager interface
+Date: Fri, 21 Sep 2012 17:16:04 +0200
+Message-ID: <1348240570-7532-8-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1348240570-7532-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1348240570-7532-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,104 +12,249 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support to discover CCC descriptor for Heart Rate
-Measurement characteristic.
+From: Rafal Garbat <rafal.garbat@tieto.com>
+
+This patch adds support for org.bluez.HeartRateManager interface on
+adapters which allows to register and unregister per-adapter watcher.
 ---
- profiles/heartrate/heartrate.c | 66 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 65 insertions(+), 1 deletion(-)
+ profiles/heartrate/heartrate.c | 154 ++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 153 insertions(+), 1 deletion(-)
 
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index a6733d3..d3d6d43 100644
+index 2547f9b..b07a343 100644
 --- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
-@@ -52,6 +52,7 @@ struct heartrate {
- 	struct att_range		*svc_range;	/* primary svc range */
+@@ -24,13 +24,16 @@
+ #include <config.h>
+ #endif
  
- 	uint16_t			measurement_val_handle;
-+	uint16_t			measurement_ccc_handle;
- 	uint16_t			hrcp_val_handle;
++#include <gdbus.h>
+ #include <errno.h>
+ #include <stdbool.h>
+ #include <glib.h>
+ #include <bluetooth/uuid.h>
+ 
+ #include "adapter.h"
++#include "dbus-common.h"
+ #include "device.h"
++#include "error.h"
+ #include "gattrib.h"
+ #include "att.h"
+ #include "gatt.h"
+@@ -38,9 +41,12 @@
+ #include "log.h"
+ #include "heartrate.h"
+ 
++#define HEART_RATE_MANAGER_INTERFACE	"org.bluez.HeartRateManager"
++
+ struct heartrate_adapter {
+ 	struct btd_adapter	*adapter;
+ 	GSList			*devices;
++	GSList			*watchers;
  };
  
-@@ -112,6 +113,65 @@ static void destroy_heartrate_adapter(gpointer user_data)
+ struct heartrate {
+@@ -59,6 +65,13 @@ struct heartrate {
+ 	uint8_t				location;
+ };
+ 
++struct watcher {
++	struct heartrate_adapter	*hradapter;
++	guint				id;
++	char				*srv;
++	char				*path;
++};
++
+ static GSList *heartrate_adapters = NULL;
+ 
+ static gint cmp_adapter(gconstpointer a, gconstpointer b)
+@@ -83,6 +96,19 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
+ 	return -1;
+ }
+ 
++static gint cmp_watcher(gconstpointer a, gconstpointer b)
++{
++	const struct watcher *watcher = a;
++	const struct watcher *match = b;
++	int ret;
++
++	ret = g_strcmp0(watcher->srv, match->srv);
++	if (ret != 0)
++		return ret;
++
++	return g_strcmp0(watcher->path, match->path);
++}
++
+ static struct heartrate_adapter *
+ find_heartrate_adapter(struct btd_adapter *adapter)
+ {
+@@ -94,6 +120,34 @@ find_heartrate_adapter(struct btd_adapter *adapter)
+ 	return l->data;
+ }
+ 
++static void destroy_watcher(gpointer user_data)
++{
++	struct watcher *watcher = user_data;
++
++	g_free(watcher->path);
++	g_free(watcher->srv);
++	g_free(watcher);
++}
++
++static struct watcher *find_watcher(GSList *list, const char *sender,
++							const char *path)
++{
++	struct watcher *match;
++	GSList *l;
++
++	match = g_new0(struct watcher, 1);
++	match->srv = g_strdup(sender);
++	match->path = g_strdup(path);
++
++	l = g_slist_find_custom(list, match, cmp_watcher);
++	destroy_watcher(match);
++
++	if (l != NULL)
++		return l->data;
++
++	return NULL;
++}
++
+ static void destroy_heartrate(gpointer user_data)
+ {
+ 	struct heartrate *hr = user_data;
+@@ -109,10 +163,19 @@ static void destroy_heartrate(gpointer user_data)
+ 	g_free(hr);
+ }
+ 
++static void remove_watcher(gpointer user_data)
++{
++	struct watcher *watcher = user_data;
++
++	g_dbus_remove_watch(btd_get_dbus_connection(), watcher->id);
++}
++
+ static void destroy_heartrate_adapter(gpointer user_data)
+ {
+ 	struct heartrate_adapter *hradapter = user_data;
+ 
++	g_slist_free_full(hradapter->watchers, remove_watcher);
++
  	g_free(hradapter);
  }
  
-+static void discover_ccc_cb(guint8 status, const guint8 *pdu,
-+						guint16 len, gpointer user_data)
-+{
-+	struct heartrate *hr = user_data;
-+	struct att_data_list *list;
-+	uint8_t format;
-+	int i;
-+
-+	if (status != 0) {
-+		error("Discover Heart Rate Measurement descriptors failed: %s",
-+							att_ecode2str(status));
-+		return;
-+	}
-+
-+	list = dec_find_info_resp(pdu, len, &format);
-+	if (list == NULL)
-+		return;
-+
-+	if (format != ATT_FIND_INFO_RESP_FMT_16BIT)
-+		goto done;
-+
-+	for (i = 0; i < list->num; i++) {
-+		uint8_t *value;
-+		uint16_t handle, uuid;
-+
-+		value = list->data[i];
-+		handle = att_get_u16(value);
-+		uuid = att_get_u16(value + 2);
-+
-+		if (uuid == GATT_CLIENT_CHARAC_CFG_UUID) {
-+			hr->measurement_ccc_handle = handle;
-+			break;
-+		}
-+	}
-+
-+done:
-+	att_data_list_free(list);
-+}
-+
-+static void discover_measurement_ccc(struct heartrate *hr,
-+				struct gatt_char *c, struct gatt_char *c_next)
-+{
-+	uint16_t start, end;
-+
-+	start = c->value_handle + 1;
-+
-+	if (c_next != NULL) {
-+		if (start == c_next->handle)
-+			return;
-+		end = c_next->handle - 1;
-+	} else if (c->value_handle != hr->svc_range->end) {
-+		end = hr->svc_range->end;
-+	} else {
-+		return;
-+	}
-+
-+	gatt_find_info(hr->attrib, start, end, discover_ccc_cb, hr);
-+}
-+
- static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
- {
- 	struct heartrate *hr = user_data;
-@@ -126,8 +186,12 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
- 		struct gatt_char *c = chars->data;
+@@ -258,6 +321,81 @@ static void attio_disconnected_cb(gpointer user_data)
+ 	hr->attrib = NULL;
+ }
  
- 		if (g_strcmp0(c->uuid, HEART_RATE_MEASUREMENT_UUID) == 0) {
-+			struct gatt_char *c_next =
-+				(chars->next ? chars->next->data : NULL);
++static void watcher_exit_cb(DBusConnection *conn, void *user_data)
++{
++	struct watcher *watcher = user_data;
++	struct heartrate_adapter *hradapter = watcher->hradapter;
 +
- 			hr->measurement_val_handle = c->value_handle;
--			/* TODO: discover CCC handle */
++	DBG("heartrate watcher [%s] disconnected", watcher->path);
 +
-+			discover_measurement_ccc(hr, c, c_next);
- 		} else if (g_strcmp0(c->uuid, BODY_SENSOR_LOCATION_UUID) == 0) {
- 			DBG("Body Sensor Location supported");
- 			/* TODO: read characterictic value */
++	hradapter->watchers = g_slist_remove(hradapter->watchers, watcher);
++	g_dbus_remove_watch(conn, watcher->id);
++}
++
++static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	struct heartrate_adapter *hradapter = data;
++	struct watcher *watcher;
++	const char *sender = dbus_message_get_sender(msg);
++	char *path;
++
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
++							DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
++
++	watcher = find_watcher(hradapter->watchers, sender, path);
++	if (watcher != NULL)
++		return btd_error_already_exists(msg);
++
++	watcher = g_new0(struct watcher, 1);
++	watcher->hradapter = hradapter;
++	watcher->id = g_dbus_add_disconnect_watch(conn, sender, watcher_exit_cb,
++						watcher, destroy_watcher);
++	watcher->srv = g_strdup(sender);
++	watcher->path = g_strdup(path);
++
++	hradapter->watchers = g_slist_prepend(hradapter->watchers, watcher);
++
++	DBG("heartrate watcher [%s] registered", path);
++
++	return dbus_message_new_method_return(msg);
++}
++
++static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	struct heartrate_adapter *hradapter = data;
++	struct watcher *watcher;
++	const char *sender = dbus_message_get_sender(msg);
++	char *path;
++
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
++							DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
++
++	watcher = find_watcher(hradapter->watchers, sender, path);
++	if (watcher == NULL)
++		return btd_error_does_not_exist(msg);
++
++	hradapter->watchers = g_slist_remove(hradapter->watchers, watcher);
++	g_dbus_remove_watch(conn, watcher->id);
++
++	DBG("heartrate watcher [%s] unregistered", path);
++
++	return dbus_message_new_method_return(msg);
++}
++
++static const GDBusMethodTable heartrate_manager_methods[] = {
++	{ GDBUS_METHOD("RegisterWatcher",
++			GDBUS_ARGS({ "agent", "o" }), NULL,
++			register_watcher) },
++	{ GDBUS_METHOD("UnregisterWatcher",
++			GDBUS_ARGS({ "agent", "o" }), NULL,
++			unregister_watcher) },
++	{ }
++};
++
+ int heartrate_adapter_register(struct btd_adapter *adapter)
+ {
+ 	struct heartrate_adapter *hradapter;
+@@ -267,6 +405,18 @@ int heartrate_adapter_register(struct btd_adapter *adapter)
+ 
+ 	heartrate_adapters = g_slist_prepend(heartrate_adapters, hradapter);
+ 
++	if (!g_dbus_register_interface(btd_get_dbus_connection(),
++						adapter_get_path(adapter),
++						HEART_RATE_MANAGER_INTERFACE,
++						heartrate_manager_methods,
++						NULL, NULL, hradapter,
++						destroy_heartrate_adapter)) {
++		error("D-Bus failed to register %s interface",
++						HEART_RATE_MANAGER_INTERFACE);
++		destroy_heartrate_adapter(hradapter);
++		return -EIO;
++	}
++
+ 	return 0;
+ }
+ 
+@@ -280,7 +430,9 @@ void heartrate_adapter_unregister(struct btd_adapter *adapter)
+ 
+ 	heartrate_adapters = g_slist_remove(heartrate_adapters, hradapter);
+ 
+-	destroy_heartrate_adapter(hradapter);
++	g_dbus_unregister_interface(btd_get_dbus_connection(),
++					adapter_get_path(hradapter->adapter),
++					HEART_RATE_MANAGER_INTERFACE);
+ }
+ 
+ int heartrate_device_register(struct btd_device *device,
 -- 
 1.7.11.3
 
