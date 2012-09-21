@@ -1,119 +1,169 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Fri, 21 Sep 2012 22:45:40 +0200
-Message-ID: <CAAq6ZEKA8rE7BHQ1rAM3Ax0a4EUGVrHbkEZfXouTpbPbKYVOqw@mail.gmail.com>
-Subject: ATH3012 bluetooth not working in kernel-3.2.x
-From: Giorgio Cardarelli <giorgio.cardarelli@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=f46d042f9f78b1283604ca3c52b8
+Date: Fri, 21 Sep 2012 22:06:59 +0200
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: David Dillow <dave@thedillows.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	David Herrmann <dh.herrmann@googlemail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bastien Nocera <hadess@hadess.net>,
+	linux-input@vger.kernel.org, jkosina@suse.cz
+Subject: Re: [PATCH v2] HID: Add support for Sony PS3 BD Remote Control
+Message-Id: <20120921220659.1e257048fed597061efb07f9@studenti.unina.it>
+In-Reply-To: <1348073986.10827.21.camel@frustration.ornl.gov>
+References: <1346378760.7976.2.camel@obelisk.thedillows.org>
+	<CABBYNZJpHkt8CGDsfVwirZ=vecb-fhbpPbrVFKt1UR_rA25mSw@mail.gmail.com>
+	<CABBYNZ+n9obON7iNcv66x2ZVQCeTs_JoJUDXZFwxJJ6C4cb4YQ@mail.gmail.com>
+	<CABBYNZKggzJ7bzQWVmWi30kxOUR8bVCyMLL=SM1=Oe74YPwvKg@mail.gmail.com>
+	<1347394656.1606.10.camel@sirocco.hadess.net>
+	<CABBYNZ+gpheC9sNeTp2uvDFBV-yPs+cY4PUR2omPt_kLTCafKw@mail.gmail.com>
+	<1347456657.23874.29.camel@sirocco.hadess.net>
+	<CABBYNZLwXhF0gixPGKUTJY4sZ7EHynTYmHzGtiZsoRGXgeEFaw@mail.gmail.com>
+	<CANq1E4SDXVHcumBbEA-4xpeuOQ0SjDxxtL_RqAiNYRPj6ccagQ@mail.gmail.com>
+	<20120913003628.ce5babb2a66d09fe17fa15de@studenti.unina.it>
+	<1347591892.6145.14.camel@obelisk.thedillows.org>
+	<20120917120441.a164d2e10bb02aa9a1e8d523@studenti.unina.it>
+	<1347929527.29391.9.camel@obelisk.thedillows.org>
+	<1347932038.29391.17.camel@obelisk.thedillows.org>
+	<20120919184834.8093076c520dba2dc91c2f5d@studenti.unina.it>
+	<1348073986.10827.21.camel@frustration.ornl.gov>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---f46d042f9f78b1283604ca3c52b8
-Content-Type: multipart/alternative; boundary=f46d042f9f78b1282f04ca3c52b6
+On Wed, 19 Sep 2012 12:59:46 -0400
+David Dillow <dave@thedillows.org> wrote:
 
---f46d042f9f78b1282f04ca3c52b6
-Content-Type: text/plain; charset=ISO-8859-1
-
-Hello,
-
-I have an Atheros ATH3012 bluetooth chip not working under Ubuntu 12.04
-(kernel 3.2.0-30, Ubuntu patched).
-
-This is an excerpt from lsusb -v:
-
-Bus 001 Device 004: ID 0489:e036 Foxconn / Hon Hai
-Device Descriptor:
-bLength 18
-bDescriptorType 1
-bcdUSB 1.10
-bDeviceClass 224 Wireless
-bDeviceSubClass 1 Radio Frequency
-bDeviceProtocol 1 Bluetooth
-bMaxPacketSize0 64
-idVendor 0x0489 Foxconn / Hon Hai
-idProduct 0xe036
-bcdDevice 0.02
-iManufacturer 1 Atheros Communications
-iProduct 2 Bluetooth USB Host Controller
-iSerial 3 Alaska Day 2006
-bNumConfigurations 1
-
-Basicly following what's explained here
-http://wireless.kernel.org/en/users/Drivers/ath3k I've produced the patch
-attached to this e-mail, which fixes the problem for my chip.
-
-I've checked with vanilla kernel v3.2.30, and the patch applies for that
-kernel too. Vanilla v3.5.4 is slightly different, but I think the problem
-is still there.
-
-I hope I've followed the right steps for submitting a bugfix.
-
-HTH,
-Giorgio
-
-Signed-off-by: Giorgio Cardarelli <giorgio.cardarelli@gmail.com>
-
---f46d042f9f78b1282f04ca3c52b6
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-
-<div>Hello,<br></div><div><br></div><div>I have an Atheros ATH3012 bluetoot=
-h chip not working under Ubuntu 12.04 (kernel 3.2.0-30, Ubuntu patched).</d=
-iv><div><br></div><div>This is an excerpt from lsusb -v:</div><div><br></di=
-v>
-<div>Bus 001 Device 004: ID 0489:e036 Foxconn / Hon Hai <br>Device Descript=
-or:<br>  bLength                18<br>  bDescriptorType         1<br>  bcdU=
-SB               1.10<br>  bDeviceClass          224 Wireless<br>  bDeviceS=
-ubClass         1 Radio Frequency<br>
-  bDeviceProtocol         1 Bluetooth<br>  bMaxPacketSize0        64<br>  i=
-dVendor           0x0489 Foxconn / Hon Hai<br>  idProduct          0xe036 <=
-br>  bcdDevice            0.02<br>  iManufacturer           1 Atheros Commu=
-nications<br>
-  iProduct                2 Bluetooth USB Host Controller<br>  iSerial     =
-            3 Alaska Day 2006<br>  bNumConfigurations      1<br></div><div>=
-<br></div><div>Basicly following what&#39;s explained here <a href=3D"http:=
-//wireless.kernel.org/en/users/Drivers/ath3k">http://wireless.kernel.org/en=
-/users/Drivers/ath3k</a> I&#39;ve produced the patch attached to this e-mai=
-l, which fixes the problem for my chip.</div>
-<div><br></div><div>I&#39;ve checked with vanilla kernel v3.2.30, and the p=
-atch applies for that kernel too. Vanilla v3.5.4 is slightly different, but=
- I think the problem is still there.</div><div><br></div><div>I hope I&#39;=
-ve followed the right steps for submitting a bugfix.</div>
-<div><br></div><div>HTH,</div><div>Giorgio</div><div><br></div><div>Signed-=
-off-by: Giorgio Cardarelli &lt;<a href=3D"mailto:giorgio.cardarelli@gmail.c=
-om">giorgio.cardarelli@gmail.com</a>&gt;</div><div><br></div><div><br></div=
+> On Wed, 2012-09-19 at 18:48 +0200, Antonio Ospite wrote:
+> > On Mon, 17 Sep 2012 21:33:58 -0400
+> > David Dillow <dave@thedillows.org> wrote:
+> 
+> > While on the remote I see:
+> > 
+> > I press '1' and keep it pressed:
+> > Event: time 1348069656.505528, type 1 (EV_KEY), code 2 (KEY_1), value 1
+> > 1111111111...
+> > 
+> > I press '2' and release it ('1' is sent):
+> > Event: time 1348069666.025543, type 1 (EV_KEY), code 2 (KEY_1), value 0
+> > Event: time 1348069668.395531, type 1 (EV_KEY), code 2 (KEY_1), value 1
+> > 1111111111...
+> > 
+> > I release '1':
+> > Event: time 1348069671.625541, type 1 (EV_KEY), code 2 (KEY_1), value 0
+> > 
+> > I don't know at what level this behavior is enforced.
+> > 
+> > I will test later with the old raw_event callback and the fix to the
+> > descriptor you suggested in the other mail.
+> 
+> Please capture the raw reports
+> from /sys/kernel/debug/hid/0005:*:0306:*/events when pressing multiple
+> keys -- and tell me which ones they were. You may need to mount debugfs
+> to get to this path.
 >
 
---f46d042f9f78b1282f04ca3c52b6--
+I used hidraw which is equivalent in this case.
 
---f46d042f9f78b1283604ca3c52b8
-Content-Type: application/octet-stream; name="ATH3012.patch"
-Content-Disposition: attachment; filename="ATH3012.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_h7dr3i970
+$ sudo cat /dev/hidraw1 | hexdump -e '12/1 "%02X " "\n"'
 
-LS0tIGRyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMub2xkCTIwMTItMDktMjEgMjE6Mjk6MzIuNDYz
-Mzk4NjIzICswMjAwCisrKyBkcml2ZXJzL2JsdWV0b290aC9idHVzYi5jCTIwMTItMDktMjEgMjE6
-MzI6NDQuMjM5MzkwNjA0ICswMjAwCkBAIC0xNDEsNiArMTQxLDcgQEAKIAl7IFVTQl9ERVZJQ0Uo
-MHgwNGNhLCAweDMwMDUpLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9BVEgzMDEyIH0sCiAJeyBVU0Jf
-REVWSUNFKDB4MTNkMywgMHgzMzYyKSwgLmRyaXZlcl9pbmZvID0gQlRVU0JfQVRIMzAxMiB9LAog
-CXsgVVNCX0RFVklDRSgweDBjZjMsIDB4ZTAwNCksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0FUSDMw
-MTIgfSwKKwl7IFVTQl9ERVZJQ0UoMHgwNDg5LCAweGUwMzYpLCAuZHJpdmVyX2luZm8gPSBCVFVT
-Ql9BVEgzMDEyIH0sCiAKIAkvKiBBdGhlcm9zIEFSNUJCVTEyIHdpdGggc2ZsYXNoIGZpcm13YXJl
-ICovCiAJeyBVU0JfREVWSUNFKDB4MDQ4OSwgMHhlMDJjKSwgLmRyaXZlcl9pbmZvID0gQlRVU0Jf
-SUdOT1JFIH0sCi0tLSBkcml2ZXJzL2JsdWV0b290aC9hdGgzay5jLm9sZAkyMDEyLTA5LTIxIDIx
-OjI5OjIxLjY0MzM5OTA3NyArMDIwMAorKysgZHJpdmVycy9ibHVldG9vdGgvYXRoM2suYwkyMDEy
-LTA5LTIxIDIxOjMzOjA0LjI5MTM4OTc2NCArMDIwMApAQCAtNzYsNiArNzYsNyBAQAogCXsgVVNC
-X0RFVklDRSgweDA0Q0EsIDB4MzAwNSkgfSwKIAl7IFVTQl9ERVZJQ0UoMHgxM2QzLCAweDMzNjIp
-IH0sCiAJeyBVU0JfREVWSUNFKDB4MENGMywgMHhFMDA0KSB9LAorCXsgVVNCX0RFVklDRSgweDA0
-ODksIDB4RTAzNikgfSwKIAogCS8qIEF0aGVyb3MgQVI1QkJVMTIgd2l0aCBzZmxhc2ggZmlybXdh
-cmUgKi8KIAl7IFVTQl9ERVZJQ0UoMHgwNDg5LCAweEUwMkMpIH0sCkBAIC0xMDAsNiArMTAxLDcg
-QEAKIAl7IFVTQl9ERVZJQ0UoMHgwNGNhLCAweDMwMDUpLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9B
-VEgzMDEyIH0sCiAJeyBVU0JfREVWSUNFKDB4MTNkMywgMHgzMzYyKSwgLmRyaXZlcl9pbmZvID0g
-QlRVU0JfQVRIMzAxMiB9LAogCXsgVVNCX0RFVklDRSgweDBjZjMsIDB4ZTAwNCksIC5kcml2ZXJf
-aW5mbyA9IEJUVVNCX0FUSDMwMTIgfSwKKwl7IFVTQl9ERVZJQ0UoMHgwNDg5LCAweEUwMzYpLCAu
-ZHJpdmVyX2luZm8gPSBCVFVTQl9BVEgzMDEyIH0sCiAKIAkvKiBBdGhlcm9zIEFSNUJCVTIyIHdp
-dGggc2ZsYXNoIGZpcm13YXJlICovCiAJeyBVU0JfREVWSUNFKDB4MDQ4OSwgMHhFMDNDKSwgLmRy
-aXZlcl9pbmZvID0gQlRVU0JfQVRIMzAxMiB9LAo=
---f46d042f9f78b1283604ca3c52b8--
+I press and release 'Play'
+01 00 00 00 32 FF FF FF FF FF 01 05
+01 00 00 00 FF FF FF FF FF FF 00 05
+
+I press and release 'Stop'
+01 00 00 00 32 FF FF FF FF FF 01 05
+01 00 00 00 FF FF FF FF FF FF 00 05
+
+I press 'Play', keep it pressed and press 'Stop'
+01 00 00 00 32 FF FF FF FF FF 01 05
+01 00 00 00 FF FF FF FF FF FF 01 05
+I release 'Stop' and then release 'Play'
+01 00 00 00 32 FF FF FF FF FF 01 05
+01 00 00 00 FF FF FF FF FF FF 00 05
+
+So this combination cannot be detected at all, but:
+
+I press and release 'Triangle'
+01 00 10 00 5C FF FF FF FF FF 01 05
+01 00 00 00 FF FF FF FF FF FF 00 05
+
+I press and release 'Circle'
+01 00 20 00 5D FF FF FF FF FF 01 05
+01 00 00 00 FF FF FF FF FF FF 00 05
+
+I press 'Triangle', keep it pressed and press 'Circle'
+01 00 10 00 5C FF FF FF FF FF 01 05
+01 00 30 00 FF FF FF FF FF FF 01 05
+I release 'Circle' and then release 'Triangle'
+01 00 10 00 5C FF FF FF FF FF 01 05
+01 00 00 00 FF FF FF FF FF FF 00 05
+
+So using the third byte (actually second, third and fourth right?) this
+combination of multiple key presses can be detected, that happens to be
+true for the "joypad buttons" which makes sense.
+
+We can express the decoding of a bitfield in terms of HID descriptor,
+right? Maybe copying from the Sixaxis report descriptor as the raw
+report data for the first four bytes looks the same as the Sixaxis.
+I'll try modifying the descriptor later.
+
+David D. if you want you could send the version with the raw_event
+callback first and get that merged and we can improve the descriptor
+later, that would be fine to me.
+
+BTW Some three keys combinations also produce a 03 in the one to last
+byte: 01 00 00 00 FF FF FF FF FF FF 03 05
+combinations like "Play+Stop+Next" do but some other do not and I could
+not find a rule about that, so I don't know what the 03 really means.
+
+> It looks like this simple approach isn't going to work when you press
+> multiple keys, so I'll need more information to see if I can do
+> something else -- my Harmony can only do one key press at a time, as it
+> is converting IR to an emulated BD remote.
+> 
+> > > +config HID_PS3REMOTE
+> > > +	tristate "Sony PS3 BD Remote"
+> > 
+> > If you are going for a v3, consider using "Sony PS3 BD Remote Control"
+> > here too, not a big deal but that's the name on the user manual.
+> 
+> Will do, thanks.
+> 
+> > For the note about the association procedure I had in mind something
+> > like this:
+> > 
+> > /* NOTE: in order to associate the Sony PS3 BD Remote with a Bluetooth host
+> >  * the key combination Start+Enter has to be kept pressed for about 7 seconds,
+> >  * with the host BT Controller in discovering mode.
+> >  *
+> >  * Also the pin request should be ignored by the BT Controller (NULL pin).
+> >  */
+> > 
+> > Could someone more into BT please check the terminology here? Thanks.
+> 
+> Will add something along these lines, though I think you mean there is
+> no authentication step rather than a NULL pin, which implies we still
+> need to do auth. Or maybe that's just how the Harmony needed it...
+>
+
+>From a user point of view there is still some "set up" happening,
+the gnome bluetooth-applet tells "Successfully set up new device '%
+s'", so maybe we can just call this "set up" in the comment above too, I
+mentioned the PIN because Gnome bluetooth does something about that[1],
+Bastien in gnome-bt case pin="NULL" means that there will be no
+pin request at all by the device, right?
+
+Thanks,
+   Antonio
+
+[1]
+http://git.gnome.org/browse/gnome-bluetooth/tree/wizard/pin-code-database.xml#n59
+
+-- 
+Antonio Ospite
+http://ao2.it
+
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
