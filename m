@@ -1,169 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 21 Sep 2012 22:06:59 +0200
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: David Dillow <dave@thedillows.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	David Herrmann <dh.herrmann@googlemail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bastien Nocera <hadess@hadess.net>,
-	linux-input@vger.kernel.org, jkosina@suse.cz
-Subject: Re: [PATCH v2] HID: Add support for Sony PS3 BD Remote Control
-Message-Id: <20120921220659.1e257048fed597061efb07f9@studenti.unina.it>
-In-Reply-To: <1348073986.10827.21.camel@frustration.ornl.gov>
-References: <1346378760.7976.2.camel@obelisk.thedillows.org>
-	<CABBYNZJpHkt8CGDsfVwirZ=vecb-fhbpPbrVFKt1UR_rA25mSw@mail.gmail.com>
-	<CABBYNZ+n9obON7iNcv66x2ZVQCeTs_JoJUDXZFwxJJ6C4cb4YQ@mail.gmail.com>
-	<CABBYNZKggzJ7bzQWVmWi30kxOUR8bVCyMLL=SM1=Oe74YPwvKg@mail.gmail.com>
-	<1347394656.1606.10.camel@sirocco.hadess.net>
-	<CABBYNZ+gpheC9sNeTp2uvDFBV-yPs+cY4PUR2omPt_kLTCafKw@mail.gmail.com>
-	<1347456657.23874.29.camel@sirocco.hadess.net>
-	<CABBYNZLwXhF0gixPGKUTJY4sZ7EHynTYmHzGtiZsoRGXgeEFaw@mail.gmail.com>
-	<CANq1E4SDXVHcumBbEA-4xpeuOQ0SjDxxtL_RqAiNYRPj6ccagQ@mail.gmail.com>
-	<20120913003628.ce5babb2a66d09fe17fa15de@studenti.unina.it>
-	<1347591892.6145.14.camel@obelisk.thedillows.org>
-	<20120917120441.a164d2e10bb02aa9a1e8d523@studenti.unina.it>
-	<1347929527.29391.9.camel@obelisk.thedillows.org>
-	<1347932038.29391.17.camel@obelisk.thedillows.org>
-	<20120919184834.8093076c520dba2dc91c2f5d@studenti.unina.it>
-	<1348073986.10827.21.camel@frustration.ornl.gov>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-input-owner@vger.kernel.org
+Date: Fri, 21 Sep 2012 22:07:32 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Pacho Ramos <pacho@gentoo.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: bluetoothd: Refusing input device connect: Operation already in
+ progress (114)
+Message-ID: <20120921190732.GA9428@x220.P-661HNU-F1>
+References: <1347704153.24322.11.camel@belkin4>
+ <20120921124323.GA14885@x220>
+ <1348254019.2085.2.camel@belkin4>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1348254019.2085.2.camel@belkin4>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 19 Sep 2012 12:59:46 -0400
-David Dillow <dave@thedillows.org> wrote:
+Hi Pacho,
 
-> On Wed, 2012-09-19 at 18:48 +0200, Antonio Ospite wrote:
-> > On Mon, 17 Sep 2012 21:33:58 -0400
-> > David Dillow <dave@thedillows.org> wrote:
+On Fri, Sep 21, 2012, Pacho Ramos wrote:
+> > > Searching, I found this thread that pointed to the culprit, but I
+> > > haven't found what finally occurred with it, if patch was reverted or a
+> > > different fix was pulled in:
+> > > http://www.spinics.net/lists/linux-bluetooth/msg26442.html
+> > 
+> > This is a different issue but the cause seems to be similar. You don't
+> > need to patch bluetoothd though but just disable the mgmt part by
+> > passing -P mgmtops to bluetoothd. For whatever reason the connection
+> > state isn't cleaned up with mgmt (which shouldn't be dependent on mgmt
+> > to begin with) and the input_device_set_channel function returns
+> > -EALREADY when accepting a connection.
 > 
-> > While on the remote I see:
-> > 
-> > I press '1' and keep it pressed:
-> > Event: time 1348069656.505528, type 1 (EV_KEY), code 2 (KEY_1), value 1
-> > 1111111111...
-> > 
-> > I press '2' and release it ('1' is sent):
-> > Event: time 1348069666.025543, type 1 (EV_KEY), code 2 (KEY_1), value 0
-> > Event: time 1348069668.395531, type 1 (EV_KEY), code 2 (KEY_1), value 1
-> > 1111111111...
-> > 
-> > I release '1':
-> > Event: time 1348069671.625541, type 1 (EV_KEY), code 2 (KEY_1), value 0
-> > 
-> > I don't know at what level this behavior is enforced.
-> > 
-> > I will test later with the old raw_event callback and the fix to the
-> > descriptor you suggested in the other mail.
-> 
-> Please capture the raw reports
-> from /sys/kernel/debug/hid/0005:*:0306:*/events when pressing multiple
-> keys -- and tell me which ones they were. You may need to mount debugfs
-> to get to this path.
->
+> But it sounds like a workaround as mgmt is still broken as compared with
+> bluetoothd previous above change was committed, no? Thanks for the
+> info :)
 
-I used hidraw which is equivalent in this case.
+Yes, it's still a workaround and the real cause needs to be figured out
+and fixed (either with more detailed logs or by the developers
+reproducing this themselves).
 
-$ sudo cat /dev/hidraw1 | hexdump -e '12/1 "%02X " "\n"'
-
-I press and release 'Play'
-01 00 00 00 32 FF FF FF FF FF 01 05
-01 00 00 00 FF FF FF FF FF FF 00 05
-
-I press and release 'Stop'
-01 00 00 00 32 FF FF FF FF FF 01 05
-01 00 00 00 FF FF FF FF FF FF 00 05
-
-I press 'Play', keep it pressed and press 'Stop'
-01 00 00 00 32 FF FF FF FF FF 01 05
-01 00 00 00 FF FF FF FF FF FF 01 05
-I release 'Stop' and then release 'Play'
-01 00 00 00 32 FF FF FF FF FF 01 05
-01 00 00 00 FF FF FF FF FF FF 00 05
-
-So this combination cannot be detected at all, but:
-
-I press and release 'Triangle'
-01 00 10 00 5C FF FF FF FF FF 01 05
-01 00 00 00 FF FF FF FF FF FF 00 05
-
-I press and release 'Circle'
-01 00 20 00 5D FF FF FF FF FF 01 05
-01 00 00 00 FF FF FF FF FF FF 00 05
-
-I press 'Triangle', keep it pressed and press 'Circle'
-01 00 10 00 5C FF FF FF FF FF 01 05
-01 00 30 00 FF FF FF FF FF FF 01 05
-I release 'Circle' and then release 'Triangle'
-01 00 10 00 5C FF FF FF FF FF 01 05
-01 00 00 00 FF FF FF FF FF FF 00 05
-
-So using the third byte (actually second, third and fourth right?) this
-combination of multiple key presses can be detected, that happens to be
-true for the "joypad buttons" which makes sense.
-
-We can express the decoding of a bitfield in terms of HID descriptor,
-right? Maybe copying from the Sixaxis report descriptor as the raw
-report data for the first four bytes looks the same as the Sixaxis.
-I'll try modifying the descriptor later.
-
-David D. if you want you could send the version with the raw_event
-callback first and get that merged and we can improve the descriptor
-later, that would be fine to me.
-
-BTW Some three keys combinations also produce a 03 in the one to last
-byte: 01 00 00 00 FF FF FF FF FF FF 03 05
-combinations like "Play+Stop+Next" do but some other do not and I could
-not find a rule about that, so I don't know what the 03 really means.
-
-> It looks like this simple approach isn't going to work when you press
-> multiple keys, so I'll need more information to see if I can do
-> something else -- my Harmony can only do one key press at a time, as it
-> is converting IR to an emulated BD remote.
-> 
-> > > +config HID_PS3REMOTE
-> > > +	tristate "Sony PS3 BD Remote"
-> > 
-> > If you are going for a v3, consider using "Sony PS3 BD Remote Control"
-> > here too, not a big deal but that's the name on the user manual.
-> 
-> Will do, thanks.
-> 
-> > For the note about the association procedure I had in mind something
-> > like this:
-> > 
-> > /* NOTE: in order to associate the Sony PS3 BD Remote with a Bluetooth host
-> >  * the key combination Start+Enter has to be kept pressed for about 7 seconds,
-> >  * with the host BT Controller in discovering mode.
-> >  *
-> >  * Also the pin request should be ignored by the BT Controller (NULL pin).
-> >  */
-> > 
-> > Could someone more into BT please check the terminology here? Thanks.
-> 
-> Will add something along these lines, though I think you mean there is
-> no authentication step rather than a NULL pin, which implies we still
-> need to do auth. Or maybe that's just how the Harmony needed it...
->
-
->From a user point of view there is still some "set up" happening,
-the gnome bluetooth-applet tells "Successfully set up new device '%
-s'", so maybe we can just call this "set up" in the comment above too, I
-mentioned the PIN because Gnome bluetooth does something about that[1],
-Bastien in gnome-bt case pin="NULL" means that there will be no
-pin request at all by the device, right?
-
-Thanks,
-   Antonio
-
-[1]
-http://git.gnome.org/browse/gnome-bluetooth/tree/wizard/pin-code-database.xml#n59
-
--- 
-Antonio Ospite
-http://ao2.it
-
-A: Because it messes up the order in which people normally read text.
-   See http://en.wikipedia.org/wiki/Posting_style
-Q: Why is top-posting such a bad thing?
+Johan
