@@ -1,31 +1,446 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [RFC] Cycling Speed and Cadence profile (CSCP) API
-Date: Fri, 21 Sep 2012 11:09:20 +0200
-Message-ID: <1348218561-24509-1-git-send-email-andrzej.kaczmarek@tieto.com>
+From: Joohi RASTOGI <joohi.rastogi@stericsson.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Joohi RASTOGI <joohi.rastogi@stericsson.com>
+Date: Fri, 21 Sep 2012 07:22:27 +0200
+Subject: [PATCH BlueZ V7 2/5] AVRCP: Rename variables used for control
+ channel
+Message-ID: <3176460F0F455A44B2E93431E34FC86C228F881F32@EXDCVYMBSTM005.EQ1STM.local>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+>From 130000e4095a4db119ec760542b2c7be4aed7c1c Mon Sep 17 00:00:00 2001
+From: Joohi Rastogi <joohi.rastogi@stericsson.com>
+Date: Thu, 20 Sep 2012 15:30:01 +0530
+Subject: [PATCH BlueZ V7 2/5] Prefix "control" is added to variables used for control
+ channel. This will improve redability when Browsing channel
+ is implemented
 
-Here's proposal for CSCP API. This is of course for Collector role.
-Not sure if 'Cycling' prefix for interface names (and probably also for plugin
-name) is good enough, but couldn't think of anything better.
+---
+ audio/avctp.c |   80 ++++++++++++++++++++++++++++----------------------------
+ audio/avctp.h |    4 +-
+ audio/avrcp.c |   55 ++++++++++++++++++++-------------------
+ 3 files changed, 70 insertions(+), 69 deletions(-)
 
-Comments are welcome.
-
-
-Andrzej Kaczmarek (1):
-  Cycling Speed and Cadence profile (CSCP) API
-
- doc/cycling-api.txt | 112 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 112 insertions(+)
- create mode 100644 doc/cycling-api.txt
-
+diff --git a/audio/avctp.c b/audio/avctp.c
+index 20aed66..36133b3 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -119,7 +119,7 @@ struct avctp_state_callback {
+ 
+ struct avctp_server {
+ 	bdaddr_t src;
+-	GIOChannel *io;
++	GIOChannel *control_io;
+ 	GSList *sessions;
+ };
+ 
+@@ -137,10 +137,10 @@ struct avctp {
+ 
+ 	int uinput;
+ 
+-	GIOChannel *io;
+-	guint io_id;
++	GIOChannel *control_io;
++	guint control_io_id;
+ 
+-	uint16_t mtu;
++	uint16_t control_mtu;
+ 
+ 	uint8_t key_quirks[256];
+ 	GSList *handlers;
+@@ -148,7 +148,7 @@ struct avctp {
+ 
+ struct avctp_pdu_handler {
+ 	uint8_t opcode;
+-	avctp_pdu_cb cb;
++	avctp_control_pdu_cb cb;
+ 	void *user_data;
+ 	unsigned int id;
+ };
+@@ -170,7 +170,7 @@ static struct {
+ 
+ static GSList *callbacks = NULL;
+ static GSList *servers = NULL;
+-static GSList *handlers = NULL;
++static GSList *control_handlers = NULL;
+ static uint8_t id = 0;
+ 
+ static void auth_cb(DBusError *derr, void *user_data);
+@@ -327,15 +327,15 @@ static void avctp_disconnected(struct avctp *session)
+ 	if (!session)
+ 		return;
+ 
+-	if (session->io) {
+-		g_io_channel_shutdown(session->io, TRUE, NULL);
+-		g_io_channel_unref(session->io);
+-		session->io = NULL;
++	if (session->control_io) {
++		g_io_channel_shutdown(session->control_io, TRUE, NULL);
++		g_io_channel_unref(session->control_io);
++		session->control_io = NULL;
+ 	}
+ 
+-	if (session->io_id) {
+-		g_source_remove(session->io_id);
+-		session->io_id = 0;
++	if (session->control_io_id) {
++		g_source_remove(session->control_io_id);
++		session->control_io_id = 0;
+ 
+ 		if (session->state == AVCTP_STATE_CONNECTING) {
+ 			struct audio_device *dev;
+@@ -446,7 +446,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL))
+ 		goto failed;
+ 
+-	sock = g_io_channel_unix_get_fd(session->io);
++	sock = g_io_channel_unix_get_fd(session->control_io);
+ 
+ 	ret = read(sock, buf, sizeof(buf));
+ 	if (ret <= 0)
+@@ -504,7 +504,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 		goto done;
+ 	}
+ 
+-	handler = find_handler(handlers, avc->opcode);
++	handler = find_handler(control_handlers, avc->opcode);
+ 	if (!handler) {
+ 		DBG("handler not found for 0x%02x", avc->opcode);
+ 		packet_size += avrcp_handle_vendor_reject(&code, operands);
+@@ -640,14 +640,14 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
+ 
+ 	DBG("AVCTP: connected to %s", address);
+ 
+-	if (!session->io)
+-		session->io = g_io_channel_ref(chan);
++	if (!session->control_io)
++		session->control_io = g_io_channel_ref(chan);
+ 
+ 	init_uinput(session);
+ 
+ 	avctp_set_state(session, AVCTP_STATE_CONNECTED);
+-	session->mtu = imtu;
+-	session->io_id = g_io_add_watch(chan,
++	session->control_mtu = imtu;
++	 session->control_io_id = g_io_add_watch(chan,
+ 				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+ 				(GIOFunc) session_cb, session);
+ }
+@@ -657,9 +657,9 @@ static void auth_cb(DBusError *derr, void *user_data)
+ 	struct avctp *session = user_data;
+ 	GError *err = NULL;
+ 
+-	if (session->io_id) {
+-		g_source_remove(session->io_id);
+-		session->io_id = 0;
++	if (session->control_io_id) {
++		g_source_remove(session->control_io_id);
++		session->control_io_id = 0;
+ 	}
+ 
+ 	if (derr && dbus_error_is_set(derr)) {
+@@ -668,7 +668,7 @@ static void auth_cb(DBusError *derr, void *user_data)
+ 		return;
+ 	}
+ 
+-	if (!bt_io_accept(session->io, avctp_connect_cb, session,
++	if (!bt_io_accept(session->control_io, avctp_connect_cb, session,
+ 								NULL, &err)) {
+ 		error("bt_io_accept: %s", err->message);
+ 		g_error_free(err);
+@@ -772,24 +772,24 @@ static void avctp_confirm_cb(GIOChannel *chan, gpointer data)
+ 			goto drop;
+ 	}
+ 
+-	if (session->io) {
++	if (session->control_io) {
+ 		error("Refusing unexpected connect from %s", address);
+ 		goto drop;
+ 	}
+ 
+ 	avctp_set_state(session, AVCTP_STATE_CONNECTING);
+-	session->io = g_io_channel_ref(chan);
++	session->control_io = g_io_channel_ref(chan);
+ 
+ 	if (audio_device_request_authorization(dev, AVRCP_TARGET_UUID,
+ 						auth_cb, session) < 0)
+ 		goto drop;
+ 
+-	session->io_id = g_io_add_watch(chan, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++	session->control_io_id = g_io_add_watch(chan, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+ 							session_cb, session);
+ 	return;
+ 
+ drop:
+-	if (!session || !session->io)
++	if (!session || !session->control_io)
+ 		g_io_channel_shutdown(chan, TRUE, NULL);
+ 	if (session)
+ 		avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
+@@ -825,8 +825,8 @@ int avctp_register(const bdaddr_t *src, gboolean master)
+ 
+ 	server = g_new0(struct avctp_server, 1);
+ 
+-	server->io = avctp_server_socket(src, master);
+-	if (!server->io) {
++	server->control_io = avctp_server_socket(src, master);
++	if (!server->control_io) {
+ 		g_free(server);
+ 		return -1;
+ 	}
+@@ -863,8 +863,8 @@ void avctp_unregister(const bdaddr_t *src)
+ 
+ 	servers = g_slist_remove(servers, server);
+ 
+-	g_io_channel_shutdown(server->io, TRUE, NULL);
+-	g_io_channel_unref(server->io);
++	g_io_channel_shutdown(server->control_io, TRUE, NULL);
++	g_io_channel_unref(server->control_io);
+ 	g_free(server);
+ 
+ 	if (servers)
+@@ -911,7 +911,7 @@ int avctp_send_passthrough(struct avctp *session, uint8_t op)
+ 	operands[0] = op & 0x7f;
+ 	operands[1] = 0;
+ 
+-	sk = g_io_channel_unix_get_fd(session->io);
++	sk = g_io_channel_unix_get_fd(session->control_io);
+ 
+ 	if (write(sk, buf, sizeof(buf)) < 0)
+ 		return -errno;
+@@ -940,7 +940,7 @@ static int avctp_send(struct avctp *session, uint8_t transaction, uint8_t cr,
+ 	if (session->state != AVCTP_STATE_CONNECTED)
+ 		return -ENOTCONN;
+ 
+-	sk = g_io_channel_unix_get_fd(session->io);
++	sk = g_io_channel_unix_get_fd(session->control_io);
+ 
+ 	memset(buf, 0, sizeof(buf));
+ 
+@@ -1035,13 +1035,13 @@ gboolean avctp_remove_state_cb(unsigned int id)
+ 	return FALSE;
+ }
+ 
+-unsigned int avctp_register_pdu_handler(uint8_t opcode, avctp_pdu_cb cb,
++unsigned int avctp_register_pdu_handler(uint8_t opcode, avctp_control_pdu_cb cb,
+ 							void *user_data)
+ {
+ 	struct avctp_pdu_handler *handler;
+ 	static unsigned int id = 0;
+ 
+-	handler = find_handler(handlers, opcode);
++	handler = find_handler(control_handlers, opcode);
+ 	if (handler)
+ 		return 0;
+ 
+@@ -1051,7 +1051,7 @@ unsigned int avctp_register_pdu_handler(uint8_t opcode, avctp_pdu_cb cb,
+ 	handler->user_data = user_data;
+ 	handler->id = ++id;
+ 
+-	handlers = g_slist_append(handlers, handler);
++	control_handlers = g_slist_append(control_handlers, handler);
+ 
+ 	return handler->id;
+ }
+@@ -1060,11 +1060,11 @@ gboolean avctp_unregister_pdu_handler(unsigned int id)
+ {
+ 	GSList *l;
+ 
+-	for (l = handlers; l != NULL; l = l->next) {
++	for (l = control_handlers; l != NULL; l = l->next) {
+ 		struct avctp_pdu_handler *handler = l->data;
+ 
+ 		if (handler->id == id) {
+-			handlers = g_slist_remove(handlers, handler);
++			control_handlers = g_slist_remove(control_handlers, handler);
+ 			g_free(handler);
+ 			return TRUE;
+ 		}
+@@ -1100,14 +1100,14 @@ struct avctp *avctp_connect(const bdaddr_t *src, const bdaddr_t *dst)
+ 		return NULL;
+ 	}
+ 
+-	session->io = io;
++	session->control_io = io;
+ 
+ 	return session;
+ }
+ 
+ void avctp_disconnect(struct avctp *session)
+ {
+-	if (!session->io)
++	if (!session->control_io)
+ 		return;
+ 
+ 	avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
+diff --git a/audio/avctp.h b/audio/avctp.h
+index 9d19b5d..53919de 100755
+--- a/audio/avctp.h
++++ b/audio/avctp.h
+@@ -75,7 +75,7 @@ typedef void (*avctp_state_cb) (struct audio_device *dev,
+ 				avctp_state_t new_state,
+ 				void *user_data);
+ 
+-typedef size_t (*avctp_pdu_cb) (struct avctp *session, uint8_t transaction,
++typedef size_t (*avctp_control_pdu_cb) (struct avctp *session, uint8_t transaction,
+ 					uint8_t *code, uint8_t *subunit,
+ 					uint8_t *operands, size_t operand_count,
+ 					void *user_data);
+@@ -93,7 +93,7 @@ struct avctp *avctp_connect(const bdaddr_t *src, const bdaddr_t *dst);
+ struct avctp *avctp_get(const bdaddr_t *src, const bdaddr_t *dst);
+ void avctp_disconnect(struct avctp *session);
+ 
+-unsigned int avctp_register_pdu_handler(uint8_t opcode, avctp_pdu_cb cb,
++unsigned int avctp_register_pdu_handler(uint8_t opcode, avctp_control_pdu_cb cb,
+ 							void *user_data);
+ gboolean avctp_unregister_pdu_handler(unsigned int id);
+ 
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index 206d8fa..8259183 100755
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -164,7 +164,7 @@ struct avrcp_player {
+ 	struct avctp *session;
+ 	struct audio_device *dev;
+ 
+-	unsigned int handler;
++	unsigned int control_handler;
+ 	uint16_t registered_events;
+ 	uint8_t transaction_events[AVRCP_EVENT_LAST + 1];
+ 	struct pending_pdu *pending_pdu;
+@@ -257,8 +257,9 @@ static sdp_record_t *avrcp_tg_record(void)
+ 	sdp_list_t *svclass_id, *pfseq, *apseq, *root, *apseq_browsing;
+ 	uuid_t root_uuid, l2cap, avctp, avrtg;
+ 	sdp_profile_desc_t profile[1];
+-	sdp_list_t *aproto, *proto[2];
+-	sdp_record_t *record;sdp_data_t *psm, *version, *features, *psm_browsing;
++	sdp_list_t *aproto_control, *proto_control[2];
++	sdp_record_t *record;
++	sdp_data_t *psm_control, *version, *features, *psm_browsing;
+ 	sdp_list_t *aproto_browsing, *proto_browsing[2] = {0};
+ 	uint16_t lp = AVCTP_CONTROL_PSM;
+ 	uint16_t lp_browsing = AVCTP_BROWSING_PSM;
+@@ -285,19 +286,19 @@ static sdp_record_t *avrcp_tg_record(void)
+ 
+ 	/* Protocol Descriptor List */
+ 	sdp_uuid16_create(&l2cap, L2CAP_UUID);
+-	proto[0] = sdp_list_append(0, &l2cap);
+-	psm = sdp_data_alloc(SDP_UINT16, &lp);
+-	proto[0] = sdp_list_append(proto[0], psm);
+-	apseq = sdp_list_append(0, proto[0]);
++	proto_control[0] = sdp_list_append(0, &l2cap);
++	psm_control = sdp_data_alloc(SDP_UINT16, &lp);
++	proto_control[0] = sdp_list_append(proto_control[0], psm_control);
++	apseq = sdp_list_append(apseq, proto_control[1]);
+ 
+ 	sdp_uuid16_create(&avctp, AVCTP_UUID);
+-	proto[1] = sdp_list_append(0, &avctp);
++	proto_control[1] = sdp_list_append(0, &avctp);
+ 	version = sdp_data_alloc(SDP_UINT16, &avctp_ver);
+-	proto[1] = sdp_list_append(proto[1], version);
+-	apseq = sdp_list_append(apseq, proto[1]);
++	proto_control[1] = sdp_list_append(proto_control[1], version);
++	apseq = sdp_list_append(apseq, proto_control[1]);
+ 
+-	aproto = sdp_list_append(0, apseq);
+-	sdp_set_access_protos(record, aproto);
++	aproto_control = sdp_list_append(0, apseq);
++	sdp_set_access_protos(record, aproto_control);
+ 	proto_browsing[0] = sdp_list_append(0, &l2cap);
+ 	psm_browsing = sdp_data_alloc(SDP_UINT16, &lp_browsing);
+ 	proto_browsing[0] = sdp_list_append(proto_browsing[0], psm_browsing);
+@@ -327,12 +328,12 @@ static sdp_record_t *avrcp_tg_record(void)
+ 	sdp_list_free(apseq_browsing, 0);
+ 	sdp_list_free(aproto_browsing, 0);
+ 
+-	free(psm);
++	free(psm_control);
+ 	free(version);
+-	sdp_list_free(proto[0], 0);
+-	sdp_list_free(proto[1], 0);
++	sdp_list_free(proto_control[0], 0);
++	sdp_list_free(proto_control[1], 0);
+ 	sdp_list_free(apseq, 0);
+-	sdp_list_free(aproto, 0);
++	sdp_list_free(aproto_control, 0);
+ 	sdp_list_free(pfseq, 0);
+ 	sdp_list_free(root, 0);
+ 	sdp_list_free(svclass_id, 0);
+@@ -1041,13 +1042,13 @@ err:
+ 	return AVC_CTYPE_REJECTED;
+ }
+ 
+-static struct pdu_handler {
++static struct control_pdu_handler {
+ 	uint8_t pdu_id;
+ 	uint8_t code;
+ 	uint8_t (*func) (struct avrcp_player *player,
+ 					struct avrcp_header *pdu,
+ 					uint8_t transaction);
+-} handlers[] = {
++} control_handlers[] = {
+ 		{ AVRCP_GET_CAPABILITIES, AVC_CTYPE_STATUS,
+ 					avrcp_handle_get_capabilities },
+ 		{ AVRCP_LIST_PLAYER_ATTRIBUTES, AVC_CTYPE_STATUS,
+@@ -1086,7 +1087,7 @@ static size_t handle_vendordep_pdu(struct avctp *session, uint8_t transaction,
+ 					void *user_data)
+ {
+ 	struct avrcp_player *player = user_data;
+-	struct pdu_handler *handler;
++	struct control_pdu_handler *handler;
+ 	struct avrcp_header *pdu = (void *) operands;
+ 	uint32_t company_id = get_company_id(pdu->company_id);
+ 
+@@ -1106,7 +1107,7 @@ static size_t handle_vendordep_pdu(struct avctp *session, uint8_t transaction,
+ 		goto err_metadata;
+ 	}
+ 
+-	for (handler = handlers; handler; handler++) {
++	for (handler = control_handlers; handler; handler++) {
+ 		if (handler->pdu_id == pdu->pdu_id)
+ 			break;
+ 	}
+@@ -1233,9 +1234,9 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
+ 		player->dev = NULL;
+ 		player->registered_events = 0;
+ 
+-		if (player->handler) {
+-			avctp_unregister_pdu_handler(player->handler);
+-			player->handler = 0;
++		if (player->control_handler) {
++			avctp_unregister_pdu_handler(player->control_handler);
++			player->control_handler = 0;
+ 		}
+ 
+ 		break;
+@@ -1243,8 +1244,8 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
+ 		player->session = avctp_connect(&dev->src, &dev->dst);
+ 		player->dev = dev;
+ 
+-		if (!player->handler)
+-			player->handler = avctp_register_pdu_handler(
++		if (!player->control_handler)
++			player->control_handler = avctp_register_pdu_handler(
+ 							AVC_OP_VENDORDEP,
+ 							handle_vendordep_pdu,
+ 							player);
+@@ -1362,8 +1363,8 @@ static void player_destroy(gpointer data)
+ 
+ 	player_abort_pending_pdu(player);
+ 
+-	if (player->handler)
+-		avctp_unregister_pdu_handler(player->handler);
++	if (player->control_handler)
++		avctp_unregister_pdu_handler(player->control_handler);
+ 
+ 	g_free(player);
+ }
 -- 
-1.7.11.3
+1.7.5.4
 
+Regards
+Joohi
