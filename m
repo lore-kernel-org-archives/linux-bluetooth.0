@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Rafal Garbat <rafal.garbat@tieto.com>
-Subject: [PATCH v7 13/13] heartrate: Add test script
-Date: Fri, 21 Sep 2012 17:16:10 +0200
-Message-ID: <1348240570-7532-14-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v7 08/13] heartrate: Add support to enable notifications
+Date: Fri, 21 Sep 2012 17:16:05 +0200
+Message-ID: <1348240570-7532-9-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1348240570-7532-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1348240570-7532-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,137 +12,127 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Rafal Garbat <rafal.garbat@tieto.com>
-
+This patch adds support to enable notifications for Heart Rate Measurement
+characteristic value. Notifications are enabled automatically when at
+least one watcher is registered and disabled otherwise.
 ---
- Makefile.tools      |   4 +-
- test/test-heartrate | 103 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 105 insertions(+), 2 deletions(-)
- create mode 100755 test/test-heartrate
+ profiles/heartrate/heartrate.c | 67 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 67 insertions(+)
 
-diff --git a/Makefile.tools b/Makefile.tools
-index d3b6f57..f59a7c4 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -209,7 +209,7 @@ EXTRA_DIST += test/sap_client.py test/hsplay test/hsmicro \
- 		test/test-network test/simple-agent test/simple-service \
- 		test/simple-endpoint test/test-audio test/test-input \
- 		test/test-sap-server test/test-oob test/test-attrib \
--		test/test-proximity test/test-thermometer test/test-health \
--		test/test-health-sink test/service-record.dtd \
-+		test/test-proximity test/test-thermometer test/test-heartrate \
-+		test/test-health test/test-health-sink test/service-record.dtd \
- 		test/service-did.xml test/service-spp.xml test/service-opp.xml \
- 		test/service-ftp.xml test/simple-player test/test-nap
-diff --git a/test/test-heartrate b/test/test-heartrate
-new file mode 100755
-index 0000000..316375d
---- /dev/null
-+++ b/test/test-heartrate
-@@ -0,0 +1,103 @@
-+#!/usr/bin/python
+diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
+index b07a343..dda030b 100644
+--- a/profiles/heartrate/heartrate.c
++++ b/profiles/heartrate/heartrate.c
+@@ -207,6 +207,17 @@ static void read_sensor_location_cb(guint8 status, const guint8 *pdu,
+ 	hr->location = value;
+ }
+ 
++static void char_write_cb(guint8 status, const guint8 *pdu, guint16 len,
++							gpointer user_data)
++{
++	char *msg = user_data;
 +
-+from __future__ import absolute_import, print_function, unicode_literals
++	if (status != 0)
++		error("%s failed", msg);
 +
-+'''
-+Heart Rate Monitor test script
-+'''
++	g_free(msg);
++}
 +
-+import gobject
+ static void discover_ccc_cb(guint8 status, const guint8 *pdu,
+ 						guint16 len, gpointer user_data)
+ {
+@@ -237,7 +248,20 @@ static void discover_ccc_cb(guint8 status, const guint8 *pdu,
+ 		uuid = att_get_u16(value + 2);
+ 
+ 		if (uuid == GATT_CLIENT_CHARAC_CFG_UUID) {
++			uint8_t value[2];
++			char *msg;
 +
-+import sys
-+import dbus
-+import dbus.service
-+import dbus.mainloop.glib
-+from optparse import OptionParser, make_option
+ 			hr->measurement_ccc_handle = handle;
 +
-+class Watcher(dbus.service.Object):
-+	@dbus.service.method("org.bluez.HeartRateWatcher",
-+					in_signature="oa{sv}", out_signature="")
-+	def MeasurementReceived(self, device, measure):
-+		print("Measurement received from %s" % device)
-+		print("Value: ", measure["Value"])
++			if (g_slist_length(hr->hradapter->watchers) == 0)
++				break;
 +
-+		if "Energy" in measure:
-+			print("Energy: ", measure["Energy"])
++			att_put_u16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
++			msg = g_strdup("Enable measurement");
 +
-+		if "Contact" in measure:
-+			print("Contact: ", measure["Contact"])
++			gatt_write_char(hr->attrib, handle, value,
++					sizeof(value), char_write_cb, msg);
 +
-+		if "Interval" in measure:
-+			for i in measure["Interval"]:
-+				print("Interval: ", i)
+ 			break;
+ 		}
+ 	}
+@@ -299,6 +323,40 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ 	}
+ }
+ 
++static void enable_measurement(gpointer data, gpointer user_data)
++{
++	struct heartrate *hr = data;
++	uint16_t handle = hr->measurement_ccc_handle;
++	uint8_t value[2];
++	char *msg;
 +
-+if __name__ == "__main__":
-+	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++	if (hr->attrib == NULL || !handle)
++		return;
 +
-+	bus = dbus.SystemBus()
++	att_put_u16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
++	msg = g_strdup("Enable measurement");
 +
-+	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
-+					"org.bluez.Manager")
++	gatt_write_char(hr->attrib, handle, value, sizeof(value),
++							char_write_cb, msg);
++}
 +
-+	option_list = [
-+		make_option("-i", "--adapter", action="store",
-+			type="string", dest="adapter"),
-+		make_option("-b", "--device", action="store",
-+			type="string", dest="address"),
-+		]
++static void disable_measurement(gpointer data, gpointer user_data)
++{
++	struct heartrate *hr = data;
++	uint16_t handle = hr->measurement_ccc_handle;
++	uint8_t value[2];
++	char *msg;
 +
-+	parser = OptionParser(option_list=option_list)
++	if (hr->attrib == NULL || !handle)
++		return;
 +
-+	(options, args) = parser.parse_args()
++	att_put_u16(0x0000, value);
++	msg = g_strdup("Disable measurement");
 +
-+	if not options.address:
-+		print("Usage: %s [-i <adapter>] -b <bdaddr> [cmd]" % (sys.argv[0]))
-+		print("Possible commands:")
-+		print("\tReset")
-+		sys.exit(1)
++	gatt_write_char(hr->attrib, handle, value, sizeof(value),
++							char_write_cb, msg);
++}
 +
-+	if options.adapter:
-+		adapter_path = manager.FindAdapter(options.adapter)
-+	else:
-+		adapter_path = manager.DefaultAdapter()
+ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ {
+ 	struct heartrate *hr = user_data;
+@@ -330,6 +388,9 @@ static void watcher_exit_cb(DBusConnection *conn, void *user_data)
+ 
+ 	hradapter->watchers = g_slist_remove(hradapter->watchers, watcher);
+ 	g_dbus_remove_watch(conn, watcher->id);
 +
-+	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
-+							"org.bluez.Adapter")
++	if (g_slist_length(hradapter->watchers) == 0)
++		g_slist_foreach(hradapter->devices, disable_measurement, 0);
+ }
+ 
+ static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
+@@ -355,6 +416,9 @@ static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
+ 	watcher->srv = g_strdup(sender);
+ 	watcher->path = g_strdup(path);
+ 
++	if (g_slist_length(hradapter->watchers) == 0)
++		g_slist_foreach(hradapter->devices, enable_measurement, 0);
 +
-+	heartrateManager = dbus.Interface(bus.get_object("org.bluez",
-+				adapter_path), "org.bluez.HeartRateManager")
+ 	hradapter->watchers = g_slist_prepend(hradapter->watchers, watcher);
+ 
+ 	DBG("heartrate watcher [%s] registered", path);
+@@ -381,6 +445,9 @@ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
+ 	hradapter->watchers = g_slist_remove(hradapter->watchers, watcher);
+ 	g_dbus_remove_watch(conn, watcher->id);
+ 
++	if (g_slist_length(hradapter->watchers) == 0)
++		g_slist_foreach(hradapter->devices, disable_measurement, 0);
 +
-+	path = "/test/watcher"
-+	heartrateManager.RegisterWatcher(path)
-+
-+	device_path = adapter.FindDevice(options.address)
-+
-+	device = dbus.Interface(bus.get_object("org.bluez", device_path),
-+							"org.bluez.Device")
-+
-+	heartrate = dbus.Interface(bus.get_object("org.bluez",
-+					device_path), "org.bluez.HeartRate")
-+
-+	watcher = Watcher(bus, path)
-+
-+	properties = heartrate.GetProperties()
-+
-+	if "Location" in properties:
-+		print("Sensor location: %s" % properties["Location"])
-+	else:
-+		print("Sensor location is not supported")
-+
-+	if len(args) > 0:
-+		if args[0] == "Reset":
-+			reset_sup = properties["ResetSupported"]
-+			if reset_sup:
-+				heartrate.Reset()
-+			else:
-+				print("Reset not supported")
-+				sys.exit(1)
-+		else:
-+			print("unknown command")
-+			sys.exit(1)
-+
-+	mainloop = gobject.MainLoop()
-+	mainloop.run()
+ 	DBG("heartrate watcher [%s] unregistered", path);
+ 
+ 	return dbus_message_new_method_return(msg);
 -- 
 1.7.11.3
 
