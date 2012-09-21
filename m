@@ -1,57 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 00/18] neard plugin
-Date: Fri, 21 Sep 2012 14:36:17 +0200
-Message-ID: <1348230995-8967-1-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 21 Sep 2012 13:55:59 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 00/17] RFC: Simplify DBusConnection object handling
+Message-ID: <20120921105559.GA5561@x220>
+References: <1348050139-27883-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1348050139-27883-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changes since previous version:
-- handle empty randomizer in mgmt_add_remote_oob_data as suggested by Johan
-- rebased against latest changes related to D-Bus connection
-- remove not needed static pending call pointer
+Hi Andrzej,
 
-Szymon Janc (18):
-  Add initial neard plugin implementation
-  eir: Add support for parsing SSP hash and randomizer
-  eir: Store class in struct eir_data as uint32_t
-  eir: Add eir_parse_oob function
-  oob: Allow to register pairing complete callback
-  Handle missing randomizer in mgmt_add_remote_oob_data
-  neard: Implement PushOOB function
-  eir: Add support creating EIR with hash and randomizer fields
-  eir: Add support for creating EIR with CoD field
-  eir: Rename eir_create to eir_create_oob
-  eir: Remove support for creating EIR with tx_power fields
-  eir: Return number of bytes written by eir_create_oob
-  eir: Remove struct uuid_info
-  eir: Add support for creating proper OOB EIR
-  adapter: Add btd_adapter_get_services function
-  adapter: Rename btd_adapter_get_class to btd_adapter_read_class
-  adapter: Add btd_adapter_get_class function
-  neard: Implement RequestOOB function
+On Wed, Sep 19, 2012, Andrzej Kaczmarek wrote:
+> Here's series of patches which makes handling of DBusConnection object
+> across code simpler and more consistent.
+> 
+> Problem with current implementation is that different modules handles
+> reference to D-Bus in a different way, e.g. some use dbus_bus_get() and
+> just store it in static variable, others pass this around via multiple
+> calls to finally store it in per-{adapter,device,request} structure or
+> some just use get_dbus_connection() call to have it immediately.
+> 
+> This creates a lot of redundant code which only (un)refs DBusConnection
+> and pass it around for no particular reason, because you can use global
+> reference which is exactly the same object.
+> 
+> What following patches do is:
+> (1) prefix get_dbus_connection() with btd_ so it can be used by external
+>     plugins
+> (2) make sure D-Bus is disconnected after all modules (agent, mamanger,
+>     plugins etc.) are shutdown
+> (3) remove any redundant internal references and function parameters that
+>     pass/store DBusConnection and just use btd_get_dbus_connection() where
+>     need to pass valid DBusConnection object (no need to ref it, there's
+>     one global ref and it's always valid as per #2)
+> 
+> This makes things with D-Bus really simple: you need to pass DBusConnection
+> object somewhere - call btd_get_dbus_connection() and you have it. No need
+> to store it, no need to ref it. Perhaps some downside of this approach is
+> that few files (hdp.c, telephony-maemo{5,6}.c) have quite a lot of such calls
+> but if this is something to avoid we can still add global static variable
+> and call btd_get_dbus_connection() once in *_init(), just like dbusoob plugin
+> does now.
+> 
+> Comments are welcome.
 
- Makefile.am         |   11 +-
- acinclude.m4        |   19 +-
- bootstrap-configure |    3 +-
- plugins/dbusoob.c   |   14 +-
- plugins/neard.c     |  527 +++++++++++++++++++++++++++++++++++++++++++++++++++
- src/adapter.c       |   23 ++-
- src/adapter.h       |    5 +-
- src/eir.c           |  155 ++++++++++++---
- src/eir.h           |   21 +-
- src/event.c         |   11 +-
- src/event.h         |    2 +-
- src/mgmt.c          |    9 +-
- src/oob.c           |   22 ++-
- src/oob.h           |   15 +-
- 14 files changed, 750 insertions(+), 87 deletions(-)
- create mode 100644 plugins/neard.c
+I didn't see any major issues with this set so all patches have now been
+applied. Thanks.
 
--- 
-1.7.9.5
-
+Johan
