@@ -1,68 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 21 Sep 2012 13:17:23 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 06/18] adapter: Handle missing randomizer in
- btd_adapter_add_remote_oob_data
-Message-ID: <20120921101723.GA4441@x220>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 11/18] eir: Remove support for creating EIR with tx_power fields
+Date: Fri, 21 Sep 2012 12:02:23 +0200
+Message-ID: <1348221750-15345-12-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1348221750-15345-1-git-send-email-szymon.janc@tieto.com>
 References: <1348221750-15345-1-git-send-email-szymon.janc@tieto.com>
- <1348221750-15345-7-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1348221750-15345-7-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+This field is not used for OOB EIR.
 
-On Fri, Sep 21, 2012, Szymon Janc wrote:
-> Randomizer is optional. Handling missing randomizer in
-> btd_adapter_add_remote_oob_data is easy and will simplify caller code.
-> 
-> ---
->  plugins/dbusoob.c |    7 -------
->  src/adapter.c     |    7 +++++++
->  2 files changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
-> index a66c21d..ce9e5d4 100644
-> --- a/plugins/dbusoob.c
-> +++ b/plugins/dbusoob.c
-> @@ -233,13 +233,6 @@ static gboolean store_data(struct btd_adapter *adapter, struct oob_data *data)
->  	adapter_get_address(adapter, &local);
->  
->  	if (data->hash) {
-> -		uint8_t empty_randomizer[16];
-> -
-> -		if (!data->randomizer) {
-> -			memset(empty_randomizer, 0, sizeof(empty_randomizer));
-> -			data->randomizer = empty_randomizer;
-> -		}
-> -
->  		if (btd_adapter_add_remote_oob_data(adapter, &bdaddr,
->  					data->hash, data->randomizer) < 0)
->  			return FALSE;
-> diff --git a/src/adapter.c b/src/adapter.c
-> index d34e966..a00522a 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -3574,6 +3574,13 @@ int btd_adapter_read_local_oob_data(struct btd_adapter *adapter)
->  int btd_adapter_add_remote_oob_data(struct btd_adapter *adapter,
->  			bdaddr_t *bdaddr, uint8_t *hash, uint8_t *randomizer)
->  {
-> +	uint8_t empty_randomizer[16];
-> +
-> +	if (!randomizer) {
-> +		memset(empty_randomizer, 0, sizeof(empty_randomizer));
-> +		randomizer = empty_randomizer;
-> +	}
-> +
->  	return mgmt_add_remote_oob_data(adapter->dev_id, bdaddr, hash,
->  								randomizer);
+---
+ src/eir.c |    9 +--------
+ src/eir.h |    2 +-
+ 2 files changed, 2 insertions(+), 9 deletions(-)
 
-I'd rather have mgmt_add_remote_oob_data accept a NULL pointer and have
-the randomizer memcpy behind a NULL test (the code is anyway already
-initializing the send buffer to zeros).
+diff --git a/src/eir.c b/src/eir.c
+index a3c99e8..c67cf6f 100644
+--- a/src/eir.c
++++ b/src/eir.c
+@@ -280,7 +280,7 @@ static void eir_generate_uuid128(GSList *list, uint8_t *ptr, uint16_t *eir_len)
+ 	}
+ }
+ 
+-void eir_create_oob(const char *name, int8_t tx_power, uint32_t cod,
++void eir_create_oob(const char *name, uint32_t cod,
+ 			uint8_t *hash, uint8_t *randomizer,
+ 			uint16_t did_vendor, uint16_t did_product,
+ 			uint16_t did_version, uint16_t did_source,
+@@ -349,13 +349,6 @@ void eir_create_oob(const char *name, int8_t tx_power, uint32_t cod,
+ 		ptr += (name_len + 2);
+ 	}
+ 
+-	if (tx_power != 0) {
+-		*ptr++ = 2;
+-		*ptr++ = EIR_TX_POWER;
+-		*ptr++ = (uint8_t) tx_power;
+-		eir_len += 3;
+-	}
+-
+ 	if (did_vendor != 0x0000) {
+ 		*ptr++ = 9;
+ 		*ptr++ = EIR_DEVICE_ID;
+diff --git a/src/eir.h b/src/eir.h
+index 55289f9..d5c4afc 100644
+--- a/src/eir.h
++++ b/src/eir.h
+@@ -58,7 +58,7 @@ struct eir_data {
+ void eir_data_free(struct eir_data *eir);
+ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len);
+ int eir_parse_oob(struct eir_data *eir, uint8_t *eir_data, uint16_t eir_len);
+-void eir_create_oob(const char *name, int8_t tx_power, uint32_t cod,
++void eir_create_oob(const char *name, uint32_t cod,
+ 			uint8_t *hash, uint8_t *randomizer,
+ 			uint16_t did_vendor, uint16_t did_product,
+ 			uint16_t did_version, uint16_t did_source,
+-- 
+1.7.9.5
 
-Johan
