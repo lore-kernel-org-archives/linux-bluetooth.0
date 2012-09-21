@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 13/18] eir: Remove struct uuid_info
-Date: Fri, 21 Sep 2012 12:02:25 +0200
-Message-ID: <1348221750-15345-14-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 14/18] eir: Add support for creating proper OOB EIR
+Date: Fri, 21 Sep 2012 12:02:26 +0200
+Message-ID: <1348221750-15345-15-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1348221750-15345-1-git-send-email-szymon.janc@tieto.com>
 References: <1348221750-15345-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,120 +12,152 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remove struct uuid_info and convert functions to use sdp_record_t
-list instead. This will allow to easily use services list from
-struct btd_adapter to create EIR.
+Address and total length field are mandatory part of OOB EIR.
 
 ---
- src/eir.c |   29 ++++++++++++++++-------------
- src/eir.h |    7 +------
- 2 files changed, 17 insertions(+), 19 deletions(-)
+ src/eir.c |   39 ++++++++++++++++++++++++++-------------
+ src/eir.h |    2 +-
+ 2 files changed, 27 insertions(+), 14 deletions(-)
 
 diff --git a/src/eir.c b/src/eir.c
-index 598c0e4..78ae070 100644
+index 78ae070..05b3723 100644
 --- a/src/eir.c
 +++ b/src/eir.c
-@@ -224,7 +224,8 @@ int eir_parse_oob(struct eir_data *eir, uint8_t *eir_data, uint16_t eir_len)
+@@ -282,7 +282,7 @@ static void eir_generate_uuid128(sdp_list_t *list, uint8_t *ptr,
+ 	}
+ }
  
- #define SIZEOF_UUID128 16
- 
--static void eir_generate_uuid128(GSList *list, uint8_t *ptr, uint16_t *eir_len)
-+static void eir_generate_uuid128(sdp_list_t *list, uint8_t *ptr,
-+							uint16_t *eir_len)
- {
- 	int i, k, uuid_count = 0;
- 	uint16_t len = *eir_len;
-@@ -235,10 +236,11 @@ static void eir_generate_uuid128(GSList *list, uint8_t *ptr, uint16_t *eir_len)
- 	uuid128 = ptr + 2;
- 
- 	for (; list; list = list->next) {
--		struct uuid_info *uuid = list->data;
--		uint8_t *uuid128_data = uuid->uuid.value.uuid128.data;
-+		sdp_record_t *rec = list->data;
-+		uuid_t *uuid = &rec->svclass;
-+		uint8_t *uuid128_data = uuid->value.uuid128.data;
- 
--		if (uuid->uuid.type != SDP_UUID128)
-+		if (uuid->type != SDP_UUID128)
- 			continue;
- 
- 		/* Stop if not enough space to put next UUID128 */
-@@ -284,9 +286,9 @@ int eir_create_oob(const char *name, uint32_t cod,
+-int eir_create_oob(const char *name, uint32_t cod,
++int eir_create_oob(bdaddr_t *addr, const char *name, uint32_t cod,
  			uint8_t *hash, uint8_t *randomizer,
  			uint16_t did_vendor, uint16_t did_product,
  			uint16_t did_version, uint16_t did_source,
--			GSList *uuids, uint8_t *data)
-+			sdp_list_t *uuids, uint8_t *data)
+@@ -290,12 +290,19 @@ int eir_create_oob(const char *name, uint32_t cod,
  {
--	GSList *l;
-+	sdp_list_t *l;
+ 	sdp_list_t *l;
  	uint8_t *ptr = data;
- 	uint16_t eir_len = 0;
+-	uint16_t eir_len = 0;
++	uint16_t eir_optional_len = 0;
++	uint16_t eir_total_len;
  	uint16_t uuid16[HCI_MAX_EIR_LENGTH / 2];
-@@ -364,16 +366,17 @@ int eir_create_oob(const char *name, uint32_t cod,
+ 	int i, uuid_count = 0;
+ 	gboolean truncated = FALSE;
+ 	size_t name_len;
+ 
++	eir_total_len =  sizeof(uint16_t) + sizeof(bdaddr_t);
++	ptr += sizeof(uint16_t);
++
++	memcpy(ptr, addr, sizeof(bdaddr_t));
++	ptr += sizeof(bdaddr_t);
++
+ 	if (cod > 0) {
+ 		uint8_t class[3];
+ 
+@@ -309,7 +316,7 @@ int eir_create_oob(const char *name, uint32_t cod,
+ 		memcpy(ptr, class, sizeof(class));
+ 		ptr += sizeof(class);
+ 
+-		eir_len += sizeof(class) + 2;
++		eir_optional_len += sizeof(class) + 2;
+ 	}
+ 
+ 	if (hash) {
+@@ -319,7 +326,7 @@ int eir_create_oob(const char *name, uint32_t cod,
+ 		memcpy(ptr, hash, 16);
+ 		ptr += 16;
+ 
+-		eir_len += 16 + 2;
++		eir_optional_len += 16 + 2;
+ 	}
+ 
+ 	if (randomizer) {
+@@ -329,7 +336,7 @@ int eir_create_oob(const char *name, uint32_t cod,
+ 		memcpy(ptr, randomizer, 16);
+ 		ptr += 16;
+ 
+-		eir_len += 16 + 2;
++		eir_optional_len += 16 + 2;
+ 	}
+ 
+ 	name_len = strlen(name);
+@@ -347,7 +354,7 @@ int eir_create_oob(const char *name, uint32_t cod,
+ 
+ 		memcpy(ptr + 2, name, name_len);
+ 
+-		eir_len += (name_len + 2);
++		eir_optional_len += (name_len + 2);
+ 		ptr += (name_len + 2);
+ 	}
+ 
+@@ -362,7 +369,7 @@ int eir_create_oob(const char *name, uint32_t cod,
+ 		*ptr++ = (did_product & 0xff00) >> 8;
+ 		*ptr++ = (did_version & 0x00ff);
+ 		*ptr++ = (did_version & 0xff00) >> 8;
+-		eir_len += 10;
++		eir_optional_len += 10;
  	}
  
  	/* Group all UUID16 types */
--	for (l = uuids; l != NULL; l = g_slist_next(l)) {
--		struct uuid_info *uuid = l->data;
-+	for (l = uuids; l != NULL; l = l->next) {
-+		sdp_record_t *rec = l->data;
-+		uuid_t *uuid = &rec->svclass;
- 
--		if (uuid->uuid.type != SDP_UUID16)
-+		if (uuid->type != SDP_UUID16)
- 			continue;
- 
--		if (uuid->uuid.value.uuid16 < 0x1100)
-+		if (uuid->value.uuid16 < 0x1100)
- 			continue;
- 
--		if (uuid->uuid.value.uuid16 == PNP_INFO_SVCLASS_ID)
-+		if (uuid->value.uuid16 == PNP_INFO_SVCLASS_ID)
+@@ -380,7 +387,8 @@ int eir_create_oob(const char *name, uint32_t cod,
  			continue;
  
  		/* Stop if not enough space to put next UUID16 */
-@@ -384,13 +387,13 @@ int eir_create_oob(const char *name, uint32_t cod,
- 
- 		/* Check for duplicates */
- 		for (i = 0; i < uuid_count; i++)
--			if (uuid16[i] == uuid->uuid.value.uuid16)
-+			if (uuid16[i] == uuid->value.uuid16)
- 				break;
- 
- 		if (i < uuid_count)
+-		if ((eir_len + 2 + sizeof(uint16_t)) > HCI_MAX_EIR_LENGTH) {
++		if ((eir_optional_len + 2 + sizeof(uint16_t)) >
++				HCI_MAX_EIR_LENGTH) {
+ 			truncated = TRUE;
+ 			break;
+ 		}
+@@ -394,7 +402,7 @@ int eir_create_oob(const char *name, uint32_t cod,
  			continue;
  
--		uuid16[uuid_count++] = uuid->uuid.value.uuid16;
-+		uuid16[uuid_count++] = uuid->value.uuid16;
- 		eir_len += sizeof(uint16_t);
+ 		uuid16[uuid_count++] = uuid->value.uuid16;
+-		eir_len += sizeof(uint16_t);
++		eir_optional_len += sizeof(uint16_t);
  	}
  
+ 	if (uuid_count > 0) {
+@@ -404,7 +412,7 @@ int eir_create_oob(const char *name, uint32_t cod,
+ 		ptr[1] = truncated ? EIR_UUID16_SOME : EIR_UUID16_ALL;
+ 
+ 		ptr += 2;
+-		eir_len += 2;
++		eir_optional_len += 2;
+ 
+ 		for (i = 0; i < uuid_count; i++) {
+ 			*ptr++ = (uuid16[i] & 0x00ff);
+@@ -413,10 +421,15 @@ int eir_create_oob(const char *name, uint32_t cod,
+ 	}
+ 
+ 	/* Group all UUID128 types */
+-	if (eir_len <= HCI_MAX_EIR_LENGTH - 2)
+-		eir_generate_uuid128(uuids, ptr, &eir_len);
++	if (eir_optional_len <= HCI_MAX_EIR_LENGTH - 2)
++		eir_generate_uuid128(uuids, ptr, &eir_optional_len);
+ 
+-	return eir_len;
++	eir_total_len += eir_optional_len;
++
++	/* store total length */
++	bt_put_le16(eir_total_len, data);
++
++	return eir_total_len;
+ }
+ 
+ gboolean eir_has_data_type(uint8_t *data, size_t len, uint8_t type)
 diff --git a/src/eir.h b/src/eir.h
-index 036172e..0755da5 100644
+index 0755da5..d8c5e32 100644
 --- a/src/eir.h
 +++ b/src/eir.h
-@@ -38,11 +38,6 @@
- #define EIR_DEVICE_ID               0x10  /* device ID */
- #define EIR_GAP_APPEARANCE          0x19  /* GAP appearance */
- 
--struct uuid_info {
--	uuid_t uuid;
--	uint8_t svc_hint;
--};
--
- struct eir_data {
- 	GSList *services;
- 	int flags;
-@@ -62,7 +57,7 @@ int eir_create_oob(const char *name, uint32_t cod,
+@@ -53,7 +53,7 @@ struct eir_data {
+ void eir_data_free(struct eir_data *eir);
+ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len);
+ int eir_parse_oob(struct eir_data *eir, uint8_t *eir_data, uint16_t eir_len);
+-int eir_create_oob(const char *name, uint32_t cod,
++int eir_create_oob(bdaddr_t *addr, const char *name, uint32_t cod,
  			uint8_t *hash, uint8_t *randomizer,
  			uint16_t did_vendor, uint16_t did_product,
  			uint16_t did_version, uint16_t did_source,
--			GSList *uuids, uint8_t *data);
-+			sdp_list_t *uuids, uint8_t *data);
- 
- gboolean eir_has_data_type(uint8_t *data, size_t len, uint8_t type);
- 
 -- 
 1.7.9.5
 
