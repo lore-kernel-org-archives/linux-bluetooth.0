@@ -1,97 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20120919013113.GG24689@joana>
-References: <20120919013113.GG24689@joana>
-From: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>
-Date: Fri, 21 Sep 2012 18:06:42 -0700
-Message-ID: <CAB=NE6XKNSMeS3_uzcGsGBhcm6ZKtJwJ=DdAq_DoWmKTXQvV=Q@mail.gmail.com>
-Subject: Re: pull request: bluetooth-next 2012-09-18
-To: Gustavo Padovan <gustavo@padovan.org>, linville@tuxdriver.com,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-kernel-owner@vger.kernel.org
+Message-ID: <1348260355.705.9.camel@sirocco.hadess.net>
+Subject: Re: [PATCH v2] HID: Add support for Sony PS3 BD Remote Control
+From: Bastien Nocera <hadess@hadess.net>
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: David Dillow <dave@thedillows.org>,
+	linux-bluetooth@vger.kernel.org,
+	David Herrmann <dh.herrmann@googlemail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-input@vger.kernel.org, jkosina@suse.cz
+Date: Fri, 21 Sep 2012 22:45:55 +0200
+In-Reply-To: <20120921220659.1e257048fed597061efb07f9@studenti.unina.it>
+References: <1346378760.7976.2.camel@obelisk.thedillows.org>
+	 <CABBYNZJpHkt8CGDsfVwirZ=vecb-fhbpPbrVFKt1UR_rA25mSw@mail.gmail.com>
+	 <CABBYNZ+n9obON7iNcv66x2ZVQCeTs_JoJUDXZFwxJJ6C4cb4YQ@mail.gmail.com>
+	 <CABBYNZKggzJ7bzQWVmWi30kxOUR8bVCyMLL=SM1=Oe74YPwvKg@mail.gmail.com>
+	 <1347394656.1606.10.camel@sirocco.hadess.net>
+	 <CABBYNZ+gpheC9sNeTp2uvDFBV-yPs+cY4PUR2omPt_kLTCafKw@mail.gmail.com>
+	 <1347456657.23874.29.camel@sirocco.hadess.net>
+	 <CABBYNZLwXhF0gixPGKUTJY4sZ7EHynTYmHzGtiZsoRGXgeEFaw@mail.gmail.com>
+	 <CANq1E4SDXVHcumBbEA-4xpeuOQ0SjDxxtL_RqAiNYRPj6ccagQ@mail.gmail.com>
+	 <20120913003628.ce5babb2a66d09fe17fa15de@studenti.unina.it>
+	 <1347591892.6145.14.camel@obelisk.thedillows.org>
+	 <20120917120441.a164d2e10bb02aa9a1e8d523@studenti.unina.it>
+	 <1347929527.29391.9.camel@obelisk.thedillows.org>
+	 <1347932038.29391.17.camel@obelisk.thedillows.org>
+	 <20120919184834.8093076c520dba2dc91c2f5d@studenti.unina.it>
+	 <1348073986.10827.21.camel@frustration.ornl.gov>
+	 <20120921220659.1e257048fed597061efb07f9@studenti.unina.it>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Sep 18, 2012 at 6:31 PM, Gustavo Padovan <gustavo@padovan.org> wrote:
+Em Fri, 2012-09-21 às 22:06 +0200, Antonio Ospite escreveu:
+> From a user point of view there is still some "set up" happening,
+> the gnome bluetooth-applet tells "Successfully set up new device '%
+> s'", so maybe we can just call this "set up" in the comment above too,
+> I
+> mentioned the PIN because Gnome bluetooth does something about
+> that[1],
+> Bastien in gnome-bt case pin="NULL" means that there will be no
+> pin request at all by the device, right?
 
-> Johan Hedberg (2):
->       Bluetooth: mgmt: Implement support for passkey notification
+Yep. That means we don't try to pair, we just connect to it. No
+security, first come first serve.
 
-Too late now... but why did we allow this a stable fix? I get its a
-feature that is important and likely overlooked / someone had a brain
-fart, but from what I gather this is not on v3.5.4 and yet may make it
-to v3.5.5. At least for backporting this was a bitch:
-
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3290:52:
-error: dereferencing pointer to incomplete type
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3294:6:
-error: ‘struct hci_conn’ has no member named ‘passkey_notify’
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3294:25:
-error: dereferencing pointer to incomplete type
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3295:6:
-error: ‘struct hci_conn’ has no member named ‘passkey_entered’
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3298:3:
-error: implicit declaration of function ‘mgmt_user_passkey_notify’
-[-Werror=implicit-function-declaration]
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3299:27:
-error: ‘struct hci_conn’ has no member named ‘passkey_notify’
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3300:11:
-error: ‘struct hci_conn’ has no member named ‘passkey_entered’
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:
-In function ‘hci_keypress_notify_evt’:
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3310:52:
-error: dereferencing pointer to incomplete type
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3314:12:
-error: dereferencing pointer to incomplete type
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3315:7:
-error: ‘HCI_KEYPRESS_STARTED’ undeclared (first use in this function)
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3315:7:
-note: each undeclared identifier is reported only once for each
-function it appears in
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3316:7:
-error: ‘struct hci_conn’ has no member named ‘passkey_entered’
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3319:7:
-error: ‘HCI_KEYPRESS_ENTERED’ undeclared (first use in this function)
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3320:7:
-error: ‘struct hci_conn’ has no member named ‘passkey_entered’
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3323:7:
-error: ‘HCI_KEYPRESS_ERASED’ undeclared (first use in this function)
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3324:7:
-error: ‘struct hci_conn’ has no member named ‘passkey_entered’
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3327:7:
-error: ‘HCI_KEYPRESS_CLEARED’ undeclared (first use in this function)
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3328:7:
-error: ‘struct hci_conn’ has no member named ‘passkey_entered’
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3331:7:
-error: ‘HCI_KEYPRESS_COMPLETED’ undeclared (first use in this
-function)
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3337:27:
-error: ‘struct hci_conn’ has no member named ‘passkey_notify’
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3338:11:
-error: ‘struct hci_conn’ has no member named ‘passkey_entered’
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:
-In function ‘hci_event_packet’:
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3701:7:
-error: ‘HCI_EV_USER_PASSKEY_NOTIFY’ undeclared (first use in this
-function)
-/home/mcgrof/staging/v3.5.4/compat-wireless-3.5.3-2-snpc/net/bluetooth/hci_event.c:3705:7:
-error: ‘HCI_EV_KEYPRESS_NOTIFY’ undeclared (first use in this
-function)
-
-I'd much prefer to see things like these identified as 'important' but
-not 'fuck, this fixes that crash'. The fact that kernel maintainers
-may be anal about these sorts of patches is *good* for many reasons
-and figuring out a way to categorize, identify and allow users to reap
-benefits of backporting suck fixes / cherry picking a full solution is
-what something that should not interfere and hopefully be transparent
-to Linux upstream development.
-
-Here's one way I dealt with these type of patches:
-
-https://backports.wiki.kernel.org/index.php/Documentation/compat-drivers/additional-patches
-
-If you look at the patch 'Bluetooth: mgmt: Implement support for
-passkey' its  a clear "feature" implementation, not a fucking fix.
-
-  Luis
