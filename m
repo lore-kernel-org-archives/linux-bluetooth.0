@@ -2,11 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: <chen.ganir@ti.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <chen.ganir@ti.com>
-Subject: [PATCH v4 01/10] battery: Add generic device battery documentation
-Date: Mon, 24 Sep 2012 09:15:10 +0200
-Message-ID: <1348470919-25567-2-git-send-email-chen.ganir@ti.com>
-In-Reply-To: <1348470919-25567-1-git-send-email-chen.ganir@ti.com>
-References: <1348470919-25567-1-git-send-email-chen.ganir@ti.com>
+Subject: [PATCH v4 00/10] Implement Generic battery and LE Battery client
+Date: Mon, 24 Sep 2012 09:15:09 +0200
+Message-ID: <1348470919-25567-1-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,63 +12,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chen Ganir <chen.ganir@ti.com>
 
-Add documentation for the generic battery D-Bus interface.
----
- doc/battery-api.txt |   31 +++++++++++++++++++++++++++++++
- doc/device-api.txt  |    5 +++++
- 2 files changed, 36 insertions(+)
- create mode 100644 doc/battery-api.txt
+This patch set replaces previous patch sets which implemented the LE battery
+GATT Client. This patch set implements a generic device battery D-Bus interface
+that can be used to get remote device battery status using D-Bus. In addition,
+This patch set also implements the GATT Battery client, which uses the generic
+device battery to expose LE device battery status.
 
-diff --git a/doc/battery-api.txt b/doc/battery-api.txt
-new file mode 100644
-index 0000000..7e1b94f
---- /dev/null
-+++ b/doc/battery-api.txt
-@@ -0,0 +1,31 @@
-+BlueZ D-Bus Battery API description
-+****************************************
-+
-+	Texas Instruments, Inc. <chen.ganir@ti.com>
-+
-+Device Battery hierarchy
-+=====================================
-+
-+Service		org.bluez
-+Interface	org.bluez.Battery
-+Object path	[variable prefix]/{hci0,..}/dev_XX_XX_XX_XX_XX_XX/BATTYYYY
-+YYYY is numeric value between 0 and 9999.
-+
-+Methods	dict GetProperties()
-+
-+			Returns all properties for the interface. See the
-+			Properties section for the available properties.
-+
-+		void Refresh()
-+
-+			Refresh the batterty level. If the battery level changed, the
-+			PropertyChanged signal will be sent with the new value.
-+
-+Signals		PropertyChanged(string name, variant value)
-+
-+			This signal indicates a changed value of the given
-+			property.
-+
-+Properties	uint16 Level [readonly]
-+
-+			Battery level (0-100).
-diff --git a/doc/device-api.txt b/doc/device-api.txt
-index 1f0dc96..c98d539 100644
---- a/doc/device-api.txt
-+++ b/doc/device-api.txt
-@@ -179,3 +179,8 @@ Properties	string Address [readonly]
- 			Note that this property can exhibit false-positives
- 			in the case of Bluetooth 2.1 (or newer) devices that
- 			have disabled Extended Inquiry Response support.
-+
-+		array{object} Batteries [readonly]
-+
-+			List of device battery object paths that represents the available
-+			batteries on the remote device.
+see doc/battery-api.txt and doc/device-api.txt for more information.
+
+This is version 4 of the patch set, including multiple style and other comments
+reported on the ML. This version is rebased on the latest code.
+
+Chen Ganir (10):
+  battery: Add generic device battery documentation
+  battery: Implement Generic device battery
+  battery: Add GATT Battery Client Service skeleton
+  battery: Add client connection logic
+  battery: Discover Characteristic Descriptors
+  battery: Get Battery ID
+  battery: Add Battery to device
+  battery: Read Battery level characteristic
+  battery: Add support for notifications
+  battery: Support persistent battery level
+
+ Makefile.am                |    9 +-
+ doc/battery-api.txt        |   31 +++
+ doc/device-api.txt         |    5 +
+ lib/uuid.h                 |    3 +
+ profiles/battery/battery.c |  592 ++++++++++++++++++++++++++++++++++++++++++++
+ profiles/battery/battery.h |   24 ++
+ profiles/battery/main.c    |   52 ++++
+ profiles/battery/manager.c |   62 +++++
+ profiles/battery/manager.h |   24 ++
+ src/device.c               |  175 +++++++++++++
+ src/device.h               |   14 ++
+ test/test-device           |   13 +
+ 12 files changed, 1002 insertions(+), 2 deletions(-)
+ create mode 100644 doc/battery-api.txt
+ create mode 100644 profiles/battery/battery.c
+ create mode 100644 profiles/battery/battery.h
+ create mode 100644 profiles/battery/main.c
+ create mode 100644 profiles/battery/manager.c
+ create mode 100644 profiles/battery/manager.h
+
 -- 
 1.7.9.5
 
