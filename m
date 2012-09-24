@@ -1,42 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v3 02/18] eir: Add support for parsing SSP hash and randomizer
-Date: Mon, 24 Sep 2012 12:20:20 +0200
-Message-ID: <1547583.CpXLWu3Fx2@uw000953>
-In-Reply-To: <20120924080845.GA19184@x220>
-References: <1348230995-8967-1-git-send-email-szymon.janc@tieto.com> <1348230995-8967-3-git-send-email-szymon.janc@tieto.com> <20120924080845.GA19184@x220>
+Date: Mon, 24 Sep 2012 12:09:41 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 07/18] neard: Implement PushOOB function
+Message-ID: <20120924090941.GA20042@x220>
+References: <1348230995-8967-1-git-send-email-szymon.janc@tieto.com>
+ <1348230995-8967-8-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1348230995-8967-8-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 24 of September 2012 11:08:45 Johan Hedberg wrote:
-> Hi Szymon,
+Hi Szymon,
 
-Hi Johan,
- 
-> On Fri, Sep 21, 2012, Szymon Janc wrote:
-> > +		case EIR_SSP_HASH:
-> > +			if (data_len < 16)
-> > +				break;
-> > +			eir->hash = g_malloc(16);
-> > +			memcpy(eir->hash, data, 16);
-> > +			break;
-> > +
-> > +		case EIR_SSP_RANDOMIZER:
-> > +			if (data_len < 16)
-> > +				break;
-> > +			eir->randomizer = g_malloc(16);
-> > +			memcpy(eir->randomizer, data, 16);
-> > +			break;
-> 
-> I suppose using g_memdup would be simpler than g_malloc + memcpy.
+On Fri, Sep 21, 2012, Szymon Janc wrote:
+> +static struct btd_adapter *pending_adapter = NULL;
+> +static DBusMessage *pending_msg = NULL;
 
-Yeap that looks simpler, will use g_memdup in next version.
+I'm not really a fan of these global variables. Any chance of moving
+them to a non-global temporary context that gets passed around. In
+general I find it hard to get the big picture on the life-time of these
+variables as it seems you don't actually explicitly initiate the pairing
+process from your code but are relying on some external entity to do
+that? Or did I miss something? The whole thing just looks quite brittle
+right now.
 
-
--- 
-BR
-Szymon Janc
+Johan
