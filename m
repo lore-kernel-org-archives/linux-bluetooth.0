@@ -2,45 +2,37 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH v1 0/4] Audio profile authorization
-Date: Mon, 24 Sep 2012 17:42:14 +0200
-Message-Id: <1348501338-29639-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH v0] audio: Fix crash on gateway close
+Date: Mon, 24 Sep 2012 17:34:36 +0200
+Message-Id: <1348500876-29367-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-v1 of this patchset includes the modifications suggested by Luiz, most significantly the removal of the authorization hashmap in favor of code simplicity.
+gateway_close() can be called multiple times and thus the code must
+handle the case where device->gateway is already NULL.
 
-Additionally, a bug in v0 has been fixed affecting adapter_remove_device().
+This issue can be easily reproduced if a device is removed (unpaired)
+while HFP gateway is connected.
+---
+ audio/gateway.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
->From original cover-letter:
-
-The agent-based profile authorization makes a special consideration for audio profiles: they are processed as if they all belonged to one single profile. This includes several internal policies that are inconvenient for IVI use-cases.
-
-This patchset removes this exception by making use of the conventional authorization mechanism also for audio profiles.
-
-The new approach is not straightforward since devices might send several connection requets in parallel (i.e. HFP, A2DP, AVRCP). This cannot be neither automatically rejected (EBUSY) nor forwarded in parallel to the agent, so a queue was added to store the pending authorization requests. These will be sent to the agent sequentially.
-
-Mikel Astiz (4):
-  adapter: Replace device authorizing flag
-  adapter: Use authorization id for cancelling
-  adapter: Queue parallel authorization requests
-  audio: Drop audio-specific authorization mechanism
-
- audio/avctp.c           |   29 +++----
- audio/avdtp.c           |   25 ++++--
- audio/device.c          |  144 -----------------------------------
- audio/device.h          |   12 +---
- audio/manager.c         |   18 +++--
- plugins/service.c       |   18 +++--
- profiles/input/server.c |    2 +-
- src/adapter.c           |  194 ++++++++++++++++++++++++++++++----------------
- src/adapter.h           |    2 +-
- src/device.c            |   11 ---
- src/device.h            |    2 -
- 11 files changed, 179 insertions(+), 278 deletions(-)
-
+diff --git a/audio/gateway.c b/audio/gateway.c
+index 45b25a1..93a70ba 100644
+--- a/audio/gateway.c
++++ b/audio/gateway.c
+@@ -566,6 +566,9 @@ int gateway_close(struct audio_device *device)
+ 	struct gateway *gw = device->gateway;
+ 	int sock;
+ 
++	if (gw == NULL)
++		return 0;
++
+ 	if (gw->rfcomm) {
+ 		sock = g_io_channel_unix_get_fd(gw->rfcomm);
+ 		shutdown(sock, SHUT_RDWR);
 -- 
 1.7.7.6
 
