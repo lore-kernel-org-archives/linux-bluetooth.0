@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: <chen.ganir@ti.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <chen.ganir@ti.com>
-Subject: [PATCH v4 06/10] battery: Get Battery ID
-Date: Mon, 24 Sep 2012 09:15:15 +0200
-Message-ID: <1348470919-25567-7-git-send-email-chen.ganir@ti.com>
+Subject: [PATCH v4 05/10] battery: Discover Characteristic Descriptors
+Date: Mon, 24 Sep 2012 09:15:14 +0200
+Message-ID: <1348470919-25567-6-git-send-email-chen.ganir@ti.com>
 In-Reply-To: <1348470919-25567-1-git-send-email-chen.ganir@ti.com>
 References: <1348470919-25567-1-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
@@ -14,110 +14,134 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chen Ganir <chen.ganir@ti.com>
 
-Read the battery level format characteristic descriptor to get the
-unique namespace and description values.
+Discover all characteristic descriptors, and build a descriptor
+list. Presentation Format Descriptor and Client Characteristic
+Configuration descriptors are searched.
 ---
- lib/uuid.h                 |    1 +
- profiles/battery/battery.c |   53 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 54 insertions(+)
+ profiles/battery/battery.c |   73 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 72 insertions(+), 1 deletion(-)
 
-diff --git a/lib/uuid.h b/lib/uuid.h
-index 58ad0b3..5c1b3ff 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -57,6 +57,7 @@ extern "C" {
- #define DEVICE_INFORMATION_UUID	"0000180a-0000-1000-8000-00805f9b34fb"
- 
- #define BATTERY_SERVICE_UUID	"0000180f-0000-1000-8000-00805f9b34fb"
-+#define BATTERY_LEVEL_UUID	"00002a19-0000-1000-8000-00805f9b34fb"
- 
- #define GATT_UUID		"00001801-0000-1000-8000-00805f9b34fb"
- #define IMMEDIATE_ALERT_UUID	"00001802-0000-1000-8000-00805f9b34fb"
 diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
-index dada15b..2fbf26e 100644
+index 5e52275..dada15b 100644
 --- a/profiles/battery/battery.c
 +++ b/profiles/battery/battery.c
-@@ -52,6 +52,8 @@ struct characteristic {
+@@ -51,7 +51,15 @@ static GSList *servers;
+ struct characteristic {
  	struct gatt_char	attr;		/* Characteristic */
  	struct battery		*batt;		/* Parent Battery Service */
- 	GSList			*desc;		/* Descriptors */
-+	uint8_t			ns;		/* Battery Namespace */
-+	uint16_t		description;	/* Battery description */
++	GSList			*desc;		/* Descriptors */
  };
++
++struct descriptor {
++	struct characteristic	*ch;		/* Parent Characteristic */
++	uint16_t		handle;		/* Descriptor Handle */
++	bt_uuid_t		uuid;		/* UUID */
++};
++
+ static gint cmp_device(gconstpointer a, gconstpointer b)
+ {
+ 	const struct battery *batt = a;
+@@ -63,12 +71,21 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
+ 	return -1;
+ }
  
- struct descriptor {
-@@ -98,6 +100,53 @@ static void battery_free(gpointer user_data)
++static void char_free(gpointer user_data)
++{
++	struct characteristic *c = user_data;
++
++	g_slist_free_full(c->desc, g_free);
++
++	g_free(c);
++}
++
+ static void battery_free(gpointer user_data)
+ {
+ 	struct battery *batt = user_data;
+ 
+ 	if (batt->chars != NULL)
+-		g_slist_free_full(batt->chars, g_free);
++		g_slist_free_full(batt->chars, char_free);
+ 
+ 	if (batt->attioid > 0)
+ 		btd_device_remove_attio_callback(batt->dev, batt->attioid);
+@@ -77,9 +94,48 @@ static void battery_free(gpointer user_data)
+ 		g_attrib_unref(batt->attrib);
+ 
+ 	btd_device_unref(batt->dev);
++	g_free(batt->svc_range);
  	g_free(batt);
  }
  
-+static void batterylevel_presentation_format_desc_cb(guint8 status,
-+						const guint8 *pdu, guint16 len,
-+						gpointer user_data)
++static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
++							gpointer user_data)
 +{
-+	struct descriptor *desc = user_data;
-+	uint8_t value[ATT_MAX_MTU];
-+	int vlen;
++	struct characteristic *ch = user_data;
++	struct att_data_list *list;
++	uint8_t format;
++	int i;
 +
 +	if (status != 0) {
-+		error("Presentation Format desc read failed: %s",
-+							att_ecode2str(status));
++		error("Discover all characteristic descriptors failed [%s]: %s",
++					ch->attr.uuid, att_ecode2str(status));
 +		return;
 +	}
 +
-+	vlen = dec_read_resp(pdu, len, value, sizeof(value));
-+	if (vlen < 0) {
-+		error("Presentation Format desc read failed: Protocol error");
++	list = dec_find_info_resp(pdu, len, &format);
++	if (list == NULL)
 +		return;
++
++	for (i = 0; i < list->num; i++) {
++		struct descriptor *desc;
++		uint8_t *value;
++
++		value = list->data[i];
++		desc = g_new0(struct descriptor, 1);
++		desc->handle = att_get_u16(value);
++		desc->ch = ch;
++
++		if (format == 0x01)
++			desc->uuid = att_get_uuid16(&value[2]);
++		else
++			desc->uuid = att_get_uuid128(&value[2]);
++
++		ch->desc = g_slist_append(ch->desc, desc);
 +	}
 +
-+	if (vlen < 7) {
-+		error("Presentation Format desc read failed: Invalid range");
-+		return;
-+	}
-+
-+	desc->ch->ns = value[4];
-+	desc->ch->description = att_get_u16(&value[5]);
++	att_data_list_free(list);
 +}
 +
-+static void process_batterylevel_desc(struct descriptor *desc)
-+{
-+	struct characteristic *ch = desc->ch;
-+	char uuidstr[MAX_LEN_UUID_STR];
-+	bt_uuid_t btuuid;
-+
-+	bt_uuid16_create(&btuuid, GATT_CHARAC_FMT_UUID);
-+
-+	if (bt_uuid_cmp(&desc->uuid, &btuuid) == 0) {
-+		gatt_read_char(ch->batt->attrib, desc->handle, 0,
-+				batterylevel_presentation_format_desc_cb, desc);
-+		return;
-+	}
-+
-+	bt_uuid_to_string(&desc->uuid, uuidstr, MAX_LEN_UUID_STR);
-+	DBG("Ignored descriptor %s characteristic %s", uuidstr,	ch->attr.uuid);
-+}
-+
- static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+ static void configure_battery_cb(GSList *characteristics, guint8 status,
  							gpointer user_data)
  {
-@@ -131,6 +180,7 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
- 			desc->uuid = att_get_uuid128(&value[2]);
- 
- 		ch->desc = g_slist_append(ch->desc, desc);
-+		process_batterylevel_desc(desc);
- 	}
- 
- 	att_data_list_free(list);
-@@ -153,6 +203,9 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
+@@ -95,6 +151,7 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
+ 	for (l = characteristics; l; l = l->next) {
+ 		struct gatt_char *c = l->data;
  		struct characteristic *ch;
- 		uint16_t start, end;
++		uint16_t start, end;
  
-+		if (g_strcmp0(c->uuid, BATTERY_LEVEL_UUID) != 0)
-+			continue;
-+
  		ch = g_new0(struct characteristic, 1);
  		ch->attr.handle = c->handle;
- 		ch->attr.properties = c->properties;
+@@ -104,6 +161,20 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
+ 		ch->batt = batt;
+ 
+ 		batt->chars = g_slist_append(batt->chars, ch);
++
++		start = c->value_handle + 1;
++
++		if (l->next != NULL) {
++			struct gatt_char *c = l->next->data;
++			if (start == c->handle)
++				continue;
++			end = c->handle - 1;
++		} else if (c->value_handle != batt->svc_range->end)
++			end = batt->svc_range->end;
++		else
++			continue;
++
++		gatt_find_info(batt->attrib, start, end, discover_desc_cb, ch);
+ 	}
+ }
+ 
 -- 
 1.7.9.5
 
