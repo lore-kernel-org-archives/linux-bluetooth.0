@@ -1,77 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CAKON4OzNeFMb=8Sm5_Mzb8g8CFT50umTvEc+cRNbJvQzq9UHnQ@mail.gmail.com>
+References: <CAKON4OwW4_4KoseeQqa4_JW5nY0UCLdSAZzU36RrOAtuiA151g@mail.gmail.com>
+	<CAJdJm_N3E+J4rtaT6g=K-Hmd1tXpWwuZP8PxZGy-x=HqtHMHqw@mail.gmail.com>
+	<CAKON4OzNeFMb=8Sm5_Mzb8g8CFT50umTvEc+cRNbJvQzq9UHnQ@mail.gmail.com>
+Date: Mon, 24 Sep 2012 12:49:26 -0400
+Message-ID: <CAJdJm_PabYdxZcGepX+bo6=LTzdDW_zobVSfmRxQMnfKFB-gGw@mail.gmail.com>
+Subject: Re: LE thermometer on Ubuntu 12.10
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 00/25] Add support for PASP and ANP server profiles
-Date: Mon, 24 Sep 2012 14:00:36 -0400
-Message-Id: <1348509661-15967-1-git-send-email-anderson.lizardo@openbossa.org>
+To: "jonsmirl@gmail.com" <jonsmirl@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Jon,
 
-This series implement most of mandatory features for Phone Alert Status (PASP)
-and Alert Notification (ANP) profiles. The only major mandatory feature
-currently missing is support for ANP control point (which will be added on a
-future series).
+On Mon, Sep 24, 2012 at 12:27 PM, jonsmirl@gmail.com <jonsmirl@gmail.com> wrote:
+> On Mon, Sep 24, 2012 at 11:11 AM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+>> Hi Jon,
+>>
+>> On Mon, Sep 24, 2012 at 8:55 AM, jonsmirl@gmail.com <jonsmirl@gmail.com> wrote:
+>>> Ubuntu 12.10 has 4.101 and kernel 3.5. I'm trying to get the sample
+>>> CC2540 thermometer application from TI working.  The 4.101 package
+>>> build has --enable-thermometer set.
+>>
+>> There is no "--enable-thermometer" since 4.100. Please enable GATT
+>> with "--enable-gatt". This will enable all supported GATT profiles at
+>> once.
+>
+> Ubuntu is building this wrong for the 12.10 release then.  I'm filing
+> a bug about this, what should the configure option be?
+>
+> I rebuilt their bluez-4.101 package and it complains about...
+>
+> configure: WARNING: unrecognized options: --enable-proximity,
+> --enable-time, --enable-alert, --enable-gatt-example, --enable-tracer,
+> --enable-thermometer, --enable-capng
 
-Note: for those planning to use ANP/PASP in BlueZ using these patches, it is
-necessary to implement an "agent" that forwards platform events (SMS, calls,
-e-mail, and ringer/display/vibra status) to BlueZ. See doc/alert-api.txt and
-test/test-alert for more details. Alternatively, the components that generate
-these events can register themselves and report alerts directly to BlueZ.
+You should check bootstrap-configure for the available options. For
+GATT, you now need only --enable-gatt.
 
-This implementation was tested against PTS and all tests passed (except for the
-features not yet implemented). The D-Bus API was implemented accordingly to the
-previously proposed Alert API (documented on the first patch).
-
-Comments/suggestions are welcome.
-
-
-Anderson Lizardo (11):
-  doc: Introduce Alert API
-  alert: Introduce manager abstraction layer
-  alert: Initial profile registration
-  alert: Initial Alert Notification
-  alert: Add initial support for UnreadAlert D-Bus method
-  alert: Add per adapter attribute handle information
-  alert: Update Supported New/Unread Category characteristic values
-  alert: Update new alert characteristic value
-  alert: Update unread alert characteristic value
-  alert: Implement MuteOnce command
-  alert: Update Alert Status and Ringer Setting characteristic values
-
-Bruna Moreira (4):
-  alert: Add Phone Alert Status Service
-  alert: Add Ringer Control Point characteristic
-  alert: Add Ringer Setting characteristic
-  alert: Add Alert Status characteristic
-
-Eder Ruiz Maria (10):
-  alert: Implement category registration in RegisterAlert()
-  alert: Add initial support for NewAlert D-Bus method
-  alert: Automatically unregister alert when agent leaves D-Bus
-  alert: Add support for calling MuteOnce()
-  alert: Add support for calling SetRinger()
-  alert: Add test-alert script
-  alert: Add support for ringer setting notification
-  alert: Add support for alert status notification
-  alert: Add support for new alert notification
-  alert: Add support for unread alert notification
-
- Makefile.am              |    3 +-
- doc/alert-api.txt        |  124 ++++++
- profiles/alert/main.c    |    6 +-
- profiles/alert/manager.c |   40 ++
- profiles/alert/manager.h |   26 ++
- profiles/alert/server.c  |  944 ++++++++++++++++++++++++++++++++++++++++++++++
- test/test-alert          |  173 +++++++++
- 7 files changed, 1312 insertions(+), 4 deletions(-)
- create mode 100644 doc/alert-api.txt
- create mode 100644 profiles/alert/manager.c
- create mode 100644 profiles/alert/manager.h
- create mode 100755 test/test-alert
-
+Best Regards,
 -- 
-1.7.9.5
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
