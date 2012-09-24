@@ -1,48 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH v3 BlueZ 0/4] Support for GATT Find Included
-Date: Mon, 24 Sep 2012 19:33:35 -0300
-Message-Id: <1348526019-28402-1-git-send-email-vinicius.gomes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 24 Sep 2012 19:31:49 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: "John W. Linville" <linville@tuxdriver.com>
+Cc: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2012-09-18
+Message-ID: <20120924223149.GB7922@joana>
+References: <20120919013113.GG24689@joana>
+ <CAB=NE6XKNSMeS3_uzcGsGBhcm6ZKtJwJ=DdAq_DoWmKTXQvV=Q@mail.gmail.com>
+ <20120924184622.GA7922@joana>
+ <20120924195422.GF32351@tuxdriver.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120924195422.GF32351@tuxdriver.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+* John W. Linville <linville@tuxdriver.com> [2012-09-24 15:54:22 -0400]:
 
-Changes from v2:
- - Rebased against latest git tree;
+> On Mon, Sep 24, 2012 at 03:46:22PM -0300, Gustavo Padovan wrote:
+> > * Luis R. Rodriguez <mcgrof@do-not-panic.com> [2012-09-21 18:06:42 -0700]:
+> > 
+> > > On Tue, Sep 18, 2012 at 6:31 PM, Gustavo Padovan <gustavo@padovan.org> wrote:
+> > > 
+> > > > Johan Hedberg (2):
+> > > >       Bluetooth: mgmt: Implement support for passkey notification
+> > > 
+> > > Too late now... but why did we allow this a stable fix? I get its a
+> > > feature that is important and likely overlooked / someone had a brain
+> > > fart, but from what I gather this is not on v3.5.4 and yet may make it
+> > > to v3.5.5. At least for backporting this was a bitch:
+> 
+> <snip>
+> 
+> > Yes, this patch is wrongly marked as stable, it is not even going to 3.5. I'm
+> > just removing the tag from it and resending the pull request to John.
+> 
+> Hmmm...well, I already pulled it, and I just pushed it out.  Can we live with it?
 
-Changes from v1:
- - Fixed problems found during PTS tests;
+Yes, that would be ok for me.
 
- - Added a reference count for requests that are running in "parallel"
-   (if a included service has a 128 bit UUID, it needs to make an
-   aditional request to resolve this included service);
-
---
-
-Jefferson Delfes (1):
-  gatttool: Add "included" command
-
-Vinicius Costa Gomes (3):
-  gatt: Add support for find included services
-  core: Add support for included services
-  attrib: Remove opcode parameter from g_attrib_send()
-
- attrib/client.c                    |   3 +-
- attrib/gatt.c                      | 242 ++++++++++++++++++++++++++++++++-----
- attrib/gatt.h                      |   9 ++
- attrib/gattrib.c                   |   9 +-
- attrib/gattrib.h                   |   6 +-
- attrib/gatttool.c                  |   2 +-
- attrib/interactive.c               |  62 +++++++++-
- profiles/gatt/gas.c                |   2 +-
- profiles/thermometer/thermometer.c |   3 +-
- src/attrib-server.c                |   3 +-
- src/device.c                       | 109 +++++++++++++++--
- 11 files changed, 394 insertions(+), 56 deletions(-)
-
--- 
-1.7.12.1
-
+	Gustavo
