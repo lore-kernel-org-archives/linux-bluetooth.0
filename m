@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH BlueZ 06/25] alert: Add Ringer Setting characteristic
-Date: Mon, 24 Sep 2012 14:00:42 -0400
-Message-Id: <1348509661-15967-7-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 05/25] alert: Add Ringer Control Point characteristic
+Date: Mon, 24 Sep 2012 14:00:41 -0400
+Message-Id: <1348509661-15967-6-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1348509661-15967-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1348509661-15967-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,71 +12,52 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 
-This characteristic allows to read or notify the ringer mode (silent or
-normal).
+Ringer CP characteristic is used for configuring "silent mode" or muting
+the ringer once.
 ---
- profiles/alert/server.c |   31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ profiles/alert/server.c |   18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/profiles/alert/server.c b/profiles/alert/server.c
-index 68ef0c0..a66d431 100644
+index a35da99..68ef0c0 100644
 --- a/profiles/alert/server.c
 +++ b/profiles/alert/server.c
-@@ -37,12 +37,22 @@
- #include "log.h"
+@@ -32,6 +32,9 @@
+ 
+ #include "att.h"
+ #include "adapter.h"
++#include "device.h"
++#include "att-database.h"
++#include "log.h"
  #include "gatt-service.h"
  #include "gattrib.h"
-+#include "attrib-server.h"
  #include "gatt.h"
- #include "server.h"
+@@ -39,6 +42,16 @@
  #include "profile.h"
  
  #define PHONE_ALERT_STATUS_SVC_UUID		0x180E
- #define RINGER_CP_CHR_UUID		0x2A40
-+#define RINGER_SETTING_CHR_UUID		0x2A41
++#define RINGER_CP_CHR_UUID		0x2A40
 +
-+/* Ringer Setting characteristic values */
-+enum {
-+	RINGER_SILENT,
-+	RINGER_NORMAL,
-+};
-+
-+static uint8_t ringer_setting = RINGER_NORMAL;
- 
- static uint8_t ringer_cp_write(struct attribute *a,
- 						struct btd_device *device,
-@@ -53,6 +63,21 @@ static uint8_t ringer_cp_write(struct attribute *a,
- 	return 0;
- }
- 
-+static uint8_t ringer_setting_read(struct attribute *a,
++static uint8_t ringer_cp_write(struct attribute *a,
 +						struct btd_device *device,
 +						gpointer user_data)
 +{
-+	struct btd_adapter *adapter = user_data;
-+
 +	DBG("a = %p", a);
-+
-+	if (a->data == NULL || a->data[0] != ringer_setting)
-+		attrib_db_update(adapter, a->handle, NULL, &ringer_setting,
-+						sizeof(ringer_setting), NULL);
 +
 +	return 0;
 +}
-+
+ 
  static void register_phone_alert_service(struct btd_adapter *adapter)
  {
- 	bt_uuid_t uuid;
-@@ -66,6 +91,12 @@ static void register_phone_alert_service(struct btd_adapter *adapter)
- 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_WRITE_WITHOUT_RESP,
- 			GATT_OPT_CHR_VALUE_CB, ATTRIB_WRITE,
- 			ringer_cp_write, NULL,
-+			/* Ringer Setting characteristic */
-+			GATT_OPT_CHR_UUID, RINGER_SETTING_CHR_UUID,
-+			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ |
-+							ATT_CHAR_PROPER_NOTIFY,
-+			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
-+			ringer_setting_read, adapter,
+@@ -48,6 +61,11 @@ static void register_phone_alert_service(struct btd_adapter *adapter)
+ 
+ 	/* Phone Alert Status Service */
+ 	gatt_service_add(adapter, GATT_PRIM_SVC_UUID, &uuid,
++			/* Ringer Control Point characteristic */
++			GATT_OPT_CHR_UUID, RINGER_CP_CHR_UUID,
++			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_WRITE_WITHOUT_RESP,
++			GATT_OPT_CHR_VALUE_CB, ATTRIB_WRITE,
++			ringer_cp_write, NULL,
  			GATT_OPT_INVALID);
  }
  
