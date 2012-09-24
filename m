@@ -1,29 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Mon, 24 Sep 2012 08:55:05 -0400
-Message-ID: <CAKON4OwW4_4KoseeQqa4_JW5nY0UCLdSAZzU36RrOAtuiA151g@mail.gmail.com>
-Subject: LE thermometer on Ubuntu 12.10
-From: "jonsmirl@gmail.com" <jonsmirl@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1348486377.17479.5.camel@sirocco.hadess.net>
+Subject: Re: [RFC, PATCH] hid-ps3remote: handle multiple keypresses for
+ joypad buttons
+From: Bastien Nocera <hadess@hadess.net>
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: David Dillow <dave@thedillows.org>,
+	linux-bluetooth@vger.kernel.org,
+	David Herrmann <dh.herrmann@googlemail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-input@vger.kernel.org, jkosina@suse.cz
+Date: Mon, 24 Sep 2012 13:32:57 +0200
+In-Reply-To: <1348485938-20510-1-git-send-email-ospite@studenti.unina.it>
+References: <20120921220659.1e257048fed597061efb07f9@studenti.unina.it>
+	 <1348485938-20510-1-git-send-email-ospite@studenti.unina.it>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ubuntu 12.10 has 4.101 and kernel 3.5. I'm trying to get the sample
-CC2540 thermometer application from TI working.  The 4.101 package
-build has --enable-thermometer set.
+Em Mon, 2012-09-24 às 13:25 +0200, Antonio Ospite escreveu:
+> +       //[0x5c] = KEY_OPTION,          /* options/triangle */
 
-I can see my TI device under dbus. It shows the expect four services
-and sixteen characteristics.
-I have EnableGatt = true in /etc/bluetooth/main.conf
+I don't think that C++ will be liked here.
 
-The test script, test-thermometer, is looking for
-org.bluez.Thermometer which isn't there. Using d-feet to browse dbus
-confirms that it is not there.
+Cheers
 
-Is this profile plugin not registered somehow? How can I query the LE
-profiles supported by my Bluez installation?
-
--- 
-Jon Smirl
-jonsmirl@gmail.com
