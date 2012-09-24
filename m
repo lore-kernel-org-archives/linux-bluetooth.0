@@ -1,51 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 24 Sep 2012 15:54:22 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	"Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2012-09-18
+Message-ID: <20120924195422.GF32351@tuxdriver.com>
+References: <20120919013113.GG24689@joana>
+ <CAB=NE6XKNSMeS3_uzcGsGBhcm6ZKtJwJ=DdAq_DoWmKTXQvV=Q@mail.gmail.com>
+ <20120924184622.GA7922@joana>
 MIME-Version: 1.0
-In-Reply-To: <506044CD.7070209@ti.com>
-References: <1348485571-17397-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<506044CD.7070209@ti.com>
-Date: Mon, 24 Sep 2012 23:10:12 +0300
-Message-ID: <CABBYNZ+W9g6ZWfe5t-BAZgDxW4K9JSswNXjx7d-x-d=g5D0NeQ@mail.gmail.com>
-Subject: Re: [RFC v0] device: Add DiscoveryComplete signal
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Chen Ganir <chen.ganir@ti.com>
-Cc: Mikel Astiz <mikel.astiz.oss@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120924184622.GA7922@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel, Chen,
+On Mon, Sep 24, 2012 at 03:46:22PM -0300, Gustavo Padovan wrote:
+> * Luis R. Rodriguez <mcgrof@do-not-panic.com> [2012-09-21 18:06:42 -0700]:
+> 
+> > On Tue, Sep 18, 2012 at 6:31 PM, Gustavo Padovan <gustavo@padovan.org> wrote:
+> > 
+> > > Johan Hedberg (2):
+> > >       Bluetooth: mgmt: Implement support for passkey notification
+> > 
+> > Too late now... but why did we allow this a stable fix? I get its a
+> > feature that is important and likely overlooked / someone had a brain
+> > fart, but from what I gather this is not on v3.5.4 and yet may make it
+> > to v3.5.5. At least for backporting this was a bitch:
 
-On Mon, Sep 24, 2012 at 2:32 PM, Chen Ganir <chen.ganir@ti.com> wrote:
-> Mikel,
->
->
-> On 09/24/2012 01:19 PM, Mikel Astiz wrote:
->>
->> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->>
->> The D-Bus API has to report when the UUID property has been fully
->> populated, once the service discovery has been finished as part of the
->> pairing process. This allows UIs to show the device only after its
->> services are known, avoiding transitional states.
->> ---
->
-> We have the PropertyChanged signal, which is triggered wach time the
-> search_cb is called (device.c). Why do you need to create a new signal,
-> instead of using this already existing event, and send PropertyChanged on
-> UUIDS with the peer device list of UUID's only when the list is complete and
-> not on every SDP record found ? This way, you can keep the existing
-> implementations working, and you can also add new functionality based on the
-> fact that you only receive one instance of this event ?
+<snip>
 
-The Properties interfaces will have grouping support:
-http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-properties
+> Yes, this patch is wrongly marked as stable, it is not even going to 3.5. I'm
+> just removing the tag from it and resending the pull request to John.
 
-Not only that, but the UI will also be able to listen for the device
-object interfaces once we have the ObjectManager integrated, which
-should also support grouping the interfaces which is probably a more
-correct way to determine what are supported.
+Hmmm...well, I already pulled it, and I just pushed it out.  Can we live with it?
 
+John
 -- 
-Luiz Augusto von Dentz
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
