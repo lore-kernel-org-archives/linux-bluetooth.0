@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-Subject: [PATCH BlueZ 24/25] alert: Add support for new alert notification
-Date: Mon, 24 Sep 2012 14:01:00 -0400
-Message-Id: <1348509661-15967-25-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 23/25] alert: Add support for alert status notification
+Date: Mon, 24 Sep 2012 14:00:59 -0400
+Message-Id: <1348509661-15967-24-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1348509661-15967-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1348509661-15967-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,69 +12,65 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
 
-When NewAlert D-Bus method is called for one category from Alert
-Notification Profile, the new alert characteristic value is notified.
+The notification is sent (to peer devices that have it enabled on the
+CCC descriptor) every time the alert status characteristic value
+changes.
 ---
- profiles/alert/server.c |   17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+ profiles/alert/server.c |   18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
 diff --git a/profiles/alert/server.c b/profiles/alert/server.c
-index c531e02..497891b 100644
+index d14f98e..c531e02 100644
 --- a/profiles/alert/server.c
 +++ b/profiles/alert/server.c
-@@ -95,6 +95,7 @@ enum {
+@@ -94,6 +94,7 @@ enum {
+ 
  enum notify_type {
  	NOTIFY_RINGER_SETTING = 0,
- 	NOTIFY_ALERT_STATUS,
-+	NOTIFY_NEW_ALERT,
++	NOTIFY_ALERT_STATUS,
  	NOTIFY_SIZE,
  };
  
-@@ -109,7 +110,6 @@ struct alert_adapter {
- 	struct btd_adapter *adapter;
- 	uint16_t supp_new_alert_cat_handle;
- 	uint16_t supp_unread_alert_cat_handle;
--	uint16_t new_alert_handle;
- 	uint16_t unread_alert_handle;
- 	uint16_t hnd_ccc[NOTIFY_SIZE];
- 	uint16_t hnd_value[NOTIFY_SIZE];
-@@ -351,6 +351,10 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
- 				&alert_status, sizeof(alert_status),
+@@ -345,6 +346,11 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ 				&ringer_setting, sizeof(ringer_setting),
  				pdu, sizeof(pdu));
  		break;
-+	case NOTIFY_NEW_ALERT:
++	case NOTIFY_ALERT_STATUS:
 +		len = enc_notification(al_adapter->hnd_value[type],
-+					nd->value, nd->len, pdu, sizeof(pdu));
++				&alert_status, sizeof(alert_status),
++				pdu, sizeof(pdu));
 +		break;
  	default:
  		DBG("Unknown type, could not send notification");
  		goto end;
-@@ -483,8 +487,11 @@ static void update_new_alert(gpointer data, gpointer user_data)
- 	struct btd_adapter *adapter = al_adapter->adapter;
- 	uint8_t *value = user_data;
+@@ -499,10 +505,14 @@ static void update_phone_alerts(const char *category, const char *description)
  
--	attrib_db_update(adapter, al_adapter->new_alert_handle, NULL, &value[1],
--								value[0], NULL);
-+        attrib_db_update(adapter,
-+				al_adapter->hnd_value[NOTIFY_NEW_ALERT],
-+				NULL, &value[1], value[0], NULL);
-+
-+	notify_devices(al_adapter, NOTIFY_NEW_ALERT, &value[1], value[0]);
+ 	for (i = 0; i < G_N_ELEMENTS(pasp_categories); i++) {
+ 		if (g_str_equal(pasp_categories[i], category)) {
+-			if (g_str_equal(description, "active"))
++			if (g_str_equal(description, "active")) {
+ 				alert_status |= (1 << i);
+-			else if (g_str_equal(description, "not active"))
++				pasp_notification(NOTIFY_ALERT_STATUS);
++			} else if (g_str_equal(description, "not active")) {
+ 				alert_status &= ~(1 << i);
++				pasp_notification(NOTIFY_ALERT_STATUS);
++			}
++			break;
+ 		}
+ 	}
  }
- 
- static void update_phone_alerts(const char *category, const char *description)
-@@ -869,8 +876,10 @@ static void register_alert_notif_service(struct alert_adapter *al_adapter)
- 			/* New Alert */
- 			GATT_OPT_CHR_UUID, NEW_ALERT_CHR_UUID,
- 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_NOTIFY,
+@@ -755,6 +765,10 @@ static void register_phone_alert_service(struct alert_adapter *al_adapter)
+ 							ATT_CHAR_PROPER_NOTIFY,
+ 			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
+ 			alert_status_read, al_adapter->adapter,
 +			GATT_OPT_CCC_GET_HANDLE,
-+			&al_adapter->hnd_ccc[NOTIFY_NEW_ALERT],
- 			GATT_OPT_CHR_VALUE_GET_HANDLE,
--			&al_adapter->new_alert_handle,
-+			&al_adapter->hnd_value[NOTIFY_NEW_ALERT],
- 			/* Supported Unread Alert Category */
- 			GATT_OPT_CHR_UUID, SUPP_UNREAD_ALERT_CAT_CHR_UUID,
- 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ,
++			&al_adapter->hnd_ccc[NOTIFY_ALERT_STATUS],
++			GATT_OPT_CHR_VALUE_GET_HANDLE,
++			&al_adapter->hnd_value[NOTIFY_ALERT_STATUS],
+ 			/* Ringer Control Point characteristic */
+ 			GATT_OPT_CHR_UUID, RINGER_CP_CHR_UUID,
+ 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_WRITE_WITHOUT_RESP,
 -- 
 1.7.9.5
 
