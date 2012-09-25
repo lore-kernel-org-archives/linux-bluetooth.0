@@ -1,53 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1348590438.13371.3.camel@aeonflux>
-Subject: Re: [PATCHv2 0/4] Remove unsafe batostr
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
-Date: Tue, 25 Sep 2012 18:27:18 +0200
-In-Reply-To: <1348566586-28572-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <20120821175534.GD17005@joana>
-	 <1348566586-28572-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v3 6/6] hog: Add writting Control Point
+Date: Tue, 25 Sep 2012 12:34:20 -0300
+Message-Id: <1348587260-431-7-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1348587260-431-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1346696594-1062-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1348587260-431-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+This patch adds GATT write without response operation when suspending
+or resuming.
+---
+ profiles/input/hog_device.c  | 27 ++++++++++++++++++++++++++-
+ profiles/input/hog_device.h  |  1 +
+ profiles/input/hog_manager.c | 16 ++++++++++++++++
+ 3 files changed, 43 insertions(+), 1 deletion(-)
 
-> Since the patch "vsprintf: add %pMR for Bluetooth MAC address" in in bluetooth-next resend the patch series.
-> 
-> Changes:
-> 	* v2: Rebase against recent bluetooth-next.
-> 
-> Andrei Emeltchenko (4):
->   Bluetooth: Use %pMR in debug instead of batostr
->   Bluetooth: Use %pMR in sprintf/seq_printf  instead of batostr
->   Bluetooth: Use %pMR instead of baswap in seq_show
->   bluetooth: Remove unneeded batostr function
-> 
->  include/net/bluetooth/bluetooth.h |    1 -
->  net/bluetooth/af_bluetooth.c      |   10 ++++------
->  net/bluetooth/bnep/core.c         |    3 +--
->  net/bluetooth/cmtp/core.c         |    2 +-
->  net/bluetooth/hci_conn.c          |    6 +++---
->  net/bluetooth/hci_core.c          |   22 +++++++++++-----------
->  net/bluetooth/hci_event.c         |   15 +++++++--------
->  net/bluetooth/hci_sysfs.c         |   10 +++++-----
->  net/bluetooth/hidp/core.c         |    8 ++++++--
->  net/bluetooth/l2cap_core.c        |   17 ++++++++---------
->  net/bluetooth/lib.c               |   14 --------------
->  net/bluetooth/rfcomm/core.c       |   15 +++++++--------
->  net/bluetooth/rfcomm/sock.c       |    9 ++++-----
->  net/bluetooth/rfcomm/tty.c        |    6 +++---
->  net/bluetooth/sco.c               |   12 ++++++------
->  15 files changed, 66 insertions(+), 84 deletions(-)
-> 
-
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
-Regards
-
-Marcel
-
+diff --git a/profiles/input/hog_device.c b/profiles/input/hog_device.c
+index 4b43d67..a558110 100644
+--- a/profiles/input/hog_device.c
++++ b/profiles/input/hog_device.c
+@@ -57,6 +57,7 @@
+ #define HOG_REPORT_MAP_UUID	0x2A4B
+ #define HOG_REPORT_UUID		0x2A4D
+ #define HOG_PROTO_MODE_UUID	0x2A4E
++#define HOG_CONTROL_POINT_UUID	0x2A4C
+ 
+ #define HOG_REPORT_TYPE_INPUT	1
+ #define HOG_REPORT_TYPE_OUTPUT	2
+@@ -84,6 +85,7 @@ struct hog_device {
+ 	uint16_t		bcdhid;
+ 	uint8_t			bcountrycode;
+ 	uint16_t		proto_mode_handle;
++	uint16_t		ctrlpt_handle;
+ 	uint8_t			flags;
+ };
+ 
+@@ -439,7 +441,8 @@ static void proto_mode_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ {
+ 	struct hog_device *hogdev = user_data;
+-	bt_uuid_t report_uuid, report_map_uuid, info_uuid, proto_mode_uuid;
++	bt_uuid_t report_uuid, report_map_uuid, info_uuid, proto_mode_uuid,
++		  ctrlpt_uuid;
+ 	struct report *report;
+ 	GSList *l;
+ 	uint16_t info_handle = 0, proto_mode_handle = 0;
+@@ -454,6 +457,7 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ 	bt_uuid16_create(&report_map_uuid, HOG_REPORT_MAP_UUID);
+ 	bt_uuid16_create(&info_uuid, HOG_INFO_UUID);
+ 	bt_uuid16_create(&proto_mode_uuid, HOG_PROTO_MODE_UUID);
++	bt_uuid16_create(&ctrlpt_uuid, HOG_CONTROL_POINT_UUID);
+ 
+ 	for (l = chars; l; l = g_slist_next(l)) {
+ 		struct gatt_char *chr, *next;
+@@ -482,6 +486,8 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ 			info_handle = chr->value_handle;
+ 		else if (bt_uuid_cmp(&uuid, &proto_mode_uuid) == 0)
+ 			proto_mode_handle = chr->value_handle;
++		else if (bt_uuid_cmp(&uuid, &ctrlpt_uuid) == 0)
++			hogdev->ctrlpt_handle = chr->value_handle;
+ 	}
+ 
+ 	if (proto_mode_handle) {
+@@ -765,3 +771,22 @@ int hog_device_unregister(struct hog_device *hogdev)
+ 
+ 	return 0;
+ }
++
++int hog_device_set_control_point(struct hog_device *hogdev, gboolean suspend)
++{
++	uint8_t value = suspend ? 0x00 : 0x01;
++
++	if (hogdev->attrib == NULL)
++		return -ENOTCONN;
++
++	DBG("%s HID Control Point: %s", hogdev->path, suspend ?
++						"Suspend" : "Exit Suspend");
++
++	if (hogdev->ctrlpt_handle == 0)
++		return -ENOTSUP;
++
++	gatt_write_char(hogdev->attrib, hogdev->ctrlpt_handle, &value,
++					sizeof(value), NULL, NULL);
++
++	return 0;
++}
+diff --git a/profiles/input/hog_device.h b/profiles/input/hog_device.h
+index efb7b4f..03f1c90 100644
+--- a/profiles/input/hog_device.h
++++ b/profiles/input/hog_device.h
+@@ -31,3 +31,4 @@ struct hog_device *hog_device_register(struct btd_device *device,
+ 						const char *path, int *perr);
+ int hog_device_unregister(struct hog_device *hogdev);
+ struct hog_device *hog_device_find(GSList *list, const char *path);
++int hog_device_set_control_point(struct hog_device *hogdev, gboolean suspend);
+diff --git a/profiles/input/hog_manager.c b/profiles/input/hog_manager.c
+index 3888c2b..2d72444 100644
+--- a/profiles/input/hog_manager.c
++++ b/profiles/input/hog_manager.c
+@@ -43,14 +43,30 @@
+ static gboolean suspend_supported = FALSE;
+ static GSList *devices = NULL;
+ 
++static void set_suspend(gpointer data, gpointer user_data)
++{
++	struct hog_device *hogdev = data;
++	gboolean suspend = GPOINTER_TO_INT(user_data);
++
++	hog_device_set_control_point(hogdev, suspend);
++}
++
+ static void suspend_callback(void)
+ {
++	gboolean suspend = TRUE;
++
+ 	DBG("Suspending ...");
++
++	g_slist_foreach(devices, set_suspend, GINT_TO_POINTER(suspend));
+ }
+ 
+ static void resume_callback(void)
+ {
++	gboolean suspend = FALSE;
++
+ 	DBG("Resuming ...");
++
++	g_slist_foreach(devices, set_suspend, GINT_TO_POINTER(suspend));
+ }
+ 
+ static int hog_device_probe(struct btd_profile *p, struct btd_device *device,
+-- 
+1.7.12
 
