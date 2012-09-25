@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 05/14] thermometer: Update API document
-Date: Tue, 25 Sep 2012 16:52:34 +0200
-Message-ID: <1348584763-22824-6-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 02/14] thermometer: Register ThermometerManager interface on adapter path
+Date: Tue, 25 Sep 2012 16:52:31 +0200
+Message-ID: <1348584763-22824-3-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1348584763-22824-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1348584763-22824-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,107 +12,80 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch updates Thermometer API document to reflect changes in
-Thermometer interface and introduction of ThermometerManager
-interface.
 ---
- doc/thermometer-api.txt | 59 +++++++++++++++++++++++++------------------------
- 1 file changed, 30 insertions(+), 29 deletions(-)
+ profiles/thermometer/thermometer.c | 33 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 32 insertions(+), 1 deletion(-)
 
-diff --git a/doc/thermometer-api.txt b/doc/thermometer-api.txt
-index 2271270..b0b0fe2 100644
---- a/doc/thermometer-api.txt
-+++ b/doc/thermometer-api.txt
-@@ -3,28 +3,14 @@ BlueZ D-Bus Thermometer API description
+diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
+index c8a6826..f2568c9 100644
+--- a/profiles/thermometer/thermometer.c
++++ b/profiles/thermometer/thermometer.c
+@@ -42,7 +42,8 @@
+ #include "gatt.h"
+ #include "thermometer.h"
  
- 	Santiago Carot-Nemesio <sancane@gmail.com>
+-#define THERMOMETER_INTERFACE "org.bluez.Thermometer"
++#define THERMOMETER_INTERFACE		"org.bluez.Thermometer"
++#define THERMOMETER_MANAGER_INTERFACE	"org.bluez.ThermometerManager"
  
--Health Thermometer Profile hierarchy
--=====================================
--
--Service		org.bluez
--Interface	org.bluez.Thermometer
--Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
--
--
--Methods		void SetProperty(string name, variant value)
--
--			Changes the value of the specified property. Only
--			read-write properties can be changed. On success
--			this will emit a PropertyChanged signal.
-+Health Thermometer Manager hierarchy
-+============================
+ /* Temperature measurement flag fields */
+ #define TEMP_UNITS		0x01
+@@ -189,6 +190,16 @@ static void destroy_thermometer(gpointer user_data)
+ 	g_free(t);
+ }
  
--			Possible Errors: org.bluez.Error.InvalidArguments
-+Service 	org.bluez
-+Interface	org.bluez.ThermometerManager
-+Object path	[variable prefix]/{hci0,hci1,...}
- 
--		dict GetProperties()
--
--			Returns all properties for the interface. See the
--			Properties section for the available properties.
--
--		RegisterWatcher(object agent)
-+Methods 	RegisterWatcher(object agent)
- 
- 			Registers a watcher to monitor scanned measurements.
- 			This agent will be notified about final temperature
-@@ -36,30 +22,45 @@ Methods		void SetProperty(string name, variant value)
- 
- 			Unregisters a watcher.
- 
--			Final and intermediate temperatures won't be notified to
--			this agent any more.
--
--			Possible Errors: org.bluez.Error.InvalidArguments
--					org.bluez.Error.NotFound
--
- 		EnableIntermediateMeasurement(object agent)
- 
- 			Enables intermediate measurement notifications for this
--			agent if the thermometer supports it.
-+			agent. Intermediate measurements will be enabled only
-+			for thermometers which support it.
- 
- 			Possible Errors: org.bluez.Error.InvalidArguments
--					org.bluez.Error.NotSupported
- 
- 		DisableIntermediateMeasurement(object agent)
- 
- 			Disables intermediate measurement notifications for this
--			agent. It will disable notifications in the thermometer
-+			agent. It will disable notifications in thermometers
- 			when the last agent removes the watcher for intermediate
- 			measurements.
- 
- 			Possible Errors: org.bluez.Error.InvalidArguments
- 					org.bluez.Error.NotFound
- 
-+Health Thermometer Profile hierarchy
-+=====================================
++static void destroy_thermometer_adapter(gpointer user_data)
++{
++	struct thermometer_adapter *tadapter = user_data;
 +
-+Service		org.bluez
-+Interface	org.bluez.Thermometer
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
++	if (tadapter->devices != NULL)
++		g_slist_free_full(tadapter->devices, destroy_thermometer);
 +
++	g_free(tadapter);
++}
 +
-+Methods		void SetProperty(string name, variant value)
-+
-+			Changes the value of the specified property. Only
-+			read-write properties can be changed. On success
-+			this will emit a PropertyChanged signal.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		dict GetProperties()
-+
-+			Returns all properties for the interface. See the
-+			Properties section for the available properties.
-+
- Signals		PropertyChanged(string name, variant value)
+ static gint cmp_adapter(gconstpointer a, gconstpointer b)
+ {
+ 	const struct thermometer_adapter *tadapter = a;
+@@ -1321,6 +1332,10 @@ void thermometer_unregister(struct btd_device *device)
+ 				device_get_path(t->dev), THERMOMETER_INTERFACE);
+ }
  
- 			This signal indicates a changed value of the given
++static const GDBusMethodTable thermometer_manager_methods[] = {
++	{ }
++};
++
+ int thermometer_adapter_register(struct btd_adapter *adapter)
+ {
+ 	struct thermometer_adapter *tadapter;
+@@ -1328,6 +1343,18 @@ int thermometer_adapter_register(struct btd_adapter *adapter)
+ 	tadapter = g_new0(struct thermometer_adapter, 1);
+ 	tadapter->adapter = adapter;
+ 
++	if (!g_dbus_register_interface(btd_get_dbus_connection(),
++						adapter_get_path(adapter),
++						THERMOMETER_MANAGER_INTERFACE,
++						thermometer_manager_methods,
++						NULL, NULL, tadapter,
++						destroy_thermometer_adapter)) {
++		error("D-Bus failed to register %s interface",
++						THERMOMETER_MANAGER_INTERFACE);
++		destroy_thermometer_adapter(tadapter);
++		return -EIO;
++	}
++
+ 	thermometer_adapters = g_slist_prepend(thermometer_adapters, tadapter);
+ 
+ 	return 0;
+@@ -1342,4 +1369,8 @@ void thermometer_adapter_unregister(struct btd_adapter *adapter)
+ 		return;
+ 
+ 	thermometer_adapters = g_slist_remove(thermometer_adapters, tadapter);
++
++	g_dbus_unregister_interface(btd_get_dbus_connection(),
++					adapter_get_path(tadapter->adapter),
++					THERMOMETER_MANAGER_INTERFACE);
+ }
 -- 
 1.7.11.3
 
