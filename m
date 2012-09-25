@@ -1,78 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Sep 2012 13:21:36 +0200
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: David Dillow <dave@thedillows.org>
+MIME-Version: 1.0
+In-Reply-To: <1348565429-3045-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1348565429-3045-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Tue, 25 Sep 2012 14:04:21 +0300
+Message-ID: <CABBYNZLckSE7dksVq77V57uEpBwFX6xtOEo2wxtg2vgEM4k6YQ@mail.gmail.com>
+Subject: Re: [PATCH v0] audio: Fix crash if gateway closed before reply
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
-	David Herrmann <dh.herrmann@googlemail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bastien Nocera <hadess@hadess.net>,
-	linux-input@vger.kernel.org, jkosina@suse.cz
-Subject: Re: [RFC, PATCH] hid-ps3remote: handle multiple keypresses for
- joypad buttons
-Message-Id: <20120925132136.985de0b203fd342bce6dc77d@studenti.unina.it>
-In-Reply-To: <1348539215.15050.6.camel@obelisk.thedillows.org>
-References: <20120921220659.1e257048fed597061efb07f9@studenti.unina.it>
-	<1348485938-20510-1-git-send-email-ospite@studenti.unina.it>
-	<1348495002.7637.4.camel@obelisk.thedillows.org>
-	<1348539215.15050.6.camel@obelisk.thedillows.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 24 Sep 2012 22:13:35 -0400
-David Dillow <dave@thedillows.org> wrote:
+Hi Mikel,
 
-> On Mon, 2012-09-24 at 09:56 -0400, David Dillow wrote:
-> > On Mon, 2012-09-24 at 13:25 +0200, Antonio Ospite wrote:
-> > > In order to make this work I have to put joypad buttons only in one of
-> > > the key maps, I don't know if that is compatible with the Harmony
-> > > adapter.
-> > 
-> > I suspect it is, but I'll try to test later tonight. Feel free to merge
-> > my patch and yours and push it upstream under your name/copyright; I'm
-> > not attached to it.
-> 
-> Yep, this works with the Harmony.
+On Tue, Sep 25, 2012 at 12:30 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 >
-
-Good.
-
-I will send a v3 then, with you as the main author (the From: field) and
-with myself added in the MODULE_AUTHOR section, this looks like the best
-way to me as you are the initial author. I'd like you to take a final
-look at that one tho, and maybe do an actual test too.
-
-I will add the note about the "setup" procedure too.
-
-> I think the logic you are using may result in some combinations being
-> missed -- say Triangle + Play -- but I'm not sure how much it matters.
-
-Yes, when pressing something like Triangle+Play the Play pressure is
-completely ignored as a 0xff is reported in the 5th byte, but it's the
-hardware which behaves that way, the driver is just very adherent to
-what the hardware provides.
-
-> I
-> can rework the first version (building a custom report based on the
-> funky rules of coding) in the next few days, or you can push your
-> version if you'd like. Or perhaps a middle way, that erases the buttons
-> reported in the bitmap from the byte array, but otherwise keeps track of
-> the last press in that area to avoid weirdness when the user presses a
-> button combo that cannot be reported due to the HW limitations.
+> The audio gateway can be closed (dev->gateway == NULL) before the reply
+> from the agent has been received, resulting in the following crash as
+> reproduced while removing (unpairing) a device:
 >
+> bluetoothd[2219]: src/mgmt.c:mgmt_unpair_device() index 0 addr 38:16:D1:C5:D1:A2
+> bluetoothd[2219]: audio/gateway.c:path_unregister() Unregistered interface org.bluez.HandsfreeGateway on path /org/bluez/2219/hci0/dev_38_16_D1_C5_D1_A2
+> bluetoothd[2219]: audio/media.c:gateway_state_changed()
+> bluetoothd[2219]: audio/media.c:gateway_state_changed() Clear endpoint 0x555555820640
+> bluetoothd[2219]: audio/source.c:path_unregister() Unregistered interface org.bluez.AudioSource on path /org/bluez/2219/hci0/dev_38_16_D1_C5_D1_A2
+> bluetoothd[2219]: src/device.c:btd_device_unref() 0x555555833e70: ref=1
+> bluetoothd[2219]: src/adapter.c:adapter_get_device() 38:16:D1:C5:D1:A2
+> bluetoothd[2219]: src/adapter.c:adapter_create_device() 38:16:D1:C5:D1:A2
+> bluetoothd[2219]: src/device.c:device_create() Creating device /org/bluez/2219/hci0/dev_38_16_D1_C5_D1_A2
+> bluetoothd[2219]: src/device.c:device_free() 0x55555581f9c0
+> bluetoothd[2219]: Unable to get btd_device object for 38:16:D1:C5:D1:A2
+> bluetoothd[2219]: src/device.c:btd_device_unref() 0x555555833e70: ref=0
+> bluetoothd[2219]: src/device.c:device_free() 0x555555833e70
+> bluetoothd[2219]: src/mgmt.c:mgmt_event() cond 1
+> bluetoothd[2219]: src/mgmt.c:mgmt_event() Received 16 bytes from management socket
+> bluetoothd[2219]: src/mgmt.c:mgmt_cmd_complete()
+> bluetoothd[2219]: src/mgmt.c:mgmt_cmd_complete() unpair_device complete
+>
+> Program received signal SIGSEGV, Segmentation fault.
+> 0x000055555556fa26 in newconnection_reply (call=<optimized out>, data=0x555555824dd0) at audio/gateway.c:285
+> 285             if (!dev->gateway->rfcomm) {
+> ---
+>  audio/gateway.c |    5 +++++
+>  1 files changed, 5 insertions(+), 0 deletions(-)
+>
+> diff --git a/audio/gateway.c b/audio/gateway.c
+> index 45b25a1..6990573 100644
+> --- a/audio/gateway.c
+> +++ b/audio/gateway.c
+> @@ -282,6 +282,11 @@ static void newconnection_reply(DBusPendingCall *call, void *data)
+>         DBusMessage *reply = dbus_pending_call_steal_reply(call);
+>         DBusError derr;
+>
+> +       if (gw == NULL) {
+> +               DBG("Gateway closed before agent reply");
+> +               goto done;
+> +       }
+> +
+>         if (!dev->gateway->rfcomm) {
+>                 DBG("RFCOMM disconnected from server before agent reply");
+>                 goto done;
+> --
+> 1.7.7.6
 
-I'd say we ignore this fact and not try to be too smart here, the
-hardware has the limitation so we can blame someone else.
-Does that make sense to you?
+We should probably cancel the pending request so newconnection_reply
+would not be called in this condition.
 
-Thanks,
-   Antonio
 
 -- 
-Antonio Ospite
-http://ao2.it
-
-A: Because it messes up the order in which people normally read text.
-   See http://en.wikipedia.org/wiki/Posting_style
-Q: Why is top-posting such a bad thing?
+Luiz Augusto von Dentz
