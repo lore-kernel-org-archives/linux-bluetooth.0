@@ -1,49 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v2 0/8] Scan Parameters Plugin
-Date: Tue, 25 Sep 2012 12:26:34 -0300
-Message-Id: <1348586802-32613-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1346695965-25422-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1346695965-25422-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1348584763-22824-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1348584763-22824-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Tue, 25 Sep 2012 11:21:21 -0400
+Message-ID: <CAJdJm_N3g2YN32dUo4Af9zBnaVPAcTW5MgF9O-mXz8y_Dt23CQ@mail.gmail.com>
+Subject: Re: [PATCH 00/14] Thermometer watchers API change + fixes
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch series implements a new GATT based service/plugin for Scan
-Parameters: Optional service for HID devices.
+Hi Andrzej,
 
-This service enables a GATT Client to store the LE scan parameters on
-a GATT Server device, allowing the GATT Server to use this information
-to adjust the scanning settings to optimize power consumption and/or
-reconnection latency.
+On Tue, Sep 25, 2012 at 10:52 AM, Andrzej Kaczmarek
+<andrzej.kaczmarek@tieto.com> wrote:
+> Hi,
+>
+> Here's series of patches to move watchers from per-device to per-adapter
+> interface (basically the same as done for HRP, see other series of patches).
+> This applies to both final and intermediate temperature watchers - once
+> watcher is registered, all connected devices are setup to send measurement
+> notifications and the opposite when last watcher is unregistered.
+>
+> This major change is done in patches 1-6.
+>
+> Patches 7-11 contain some code and documentation refactoring, i.e. to
+> remove duplicated code.
+>
+> Patches 12-14 are trival coding style fixes.
+>
+> Unfortunately, I wasn't able to fully test this code due to lack of proper
+> thermometer device and sample device from CC2540 devkit does not quite
+> work as expected (e.g. I can see CCC is written properly when watcher is
+> registered but remote does not send any indications for unknown reason).
 
-v1 changes: Using new profile abstraction (replaces btd_device drivers)
-v2 changes: Add profile parameter to device probe function
+Unfortunately, the thermometer demo app (at least on TI's BLE stack
+v1.1 installation) has several bugs. I haven't tested yet the latest
+release (1.2.1), which version are you using?
 
-Claudio Takahasi (8):
-  scan: Add plugin skeleton
-  scan: Register profile
-  scan: Add ATTIO callbacks registration
-  scan: Add write scan interval window
-  scan: Enable Scan Refresh notification
-  scan: Register notification handler
-  scan: Write parameters when requested
-  scan: Avoid discover if scan handle is known
+Do you have access to PTS? You could test with it as well.
 
- Makefile.am                  |   8 +-
- profiles/scanparam/main.c    |  55 +++++++++
- profiles/scanparam/manager.c |  92 +++++++++++++++
- profiles/scanparam/manager.h |  26 ++++
- profiles/scanparam/scan.c    | 274 +++++++++++++++++++++++++++++++++++++++++++
- profiles/scanparam/scan.h    |  26 ++++
- 6 files changed, 479 insertions(+), 2 deletions(-)
- create mode 100644 profiles/scanparam/main.c
- create mode 100644 profiles/scanparam/manager.c
- create mode 100644 profiles/scanparam/manager.h
- create mode 100644 profiles/scanparam/scan.c
- create mode 100644 profiles/scanparam/scan.h
+Maybe we should consider implementing a simple Thermometer role in
+BlueZ for testing purposes. It is a relatively simple profile.
 
+Regards,
 -- 
-1.7.12
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
