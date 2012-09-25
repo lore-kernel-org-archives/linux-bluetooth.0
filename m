@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Rafal Garbat <rafal.garbat@tieto.com>
-Subject: [PATCH v8 11/13] heartrate: Add GetProperties method
-Date: Tue, 25 Sep 2012 16:27:44 +0200
-Message-ID: <1348583267-16816-12-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v8 10/13] heartrate: Add support to reset Energy Expended
+Date: Tue, 25 Sep 2012 16:27:43 +0200
+Message-ID: <1348583267-16816-11-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1348583267-16816-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1348583267-16816-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,98 +12,87 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Rafal Garbat <rafal.garbat@tieto.com>
-
+This patch adds Reset method on HeartRate interface to reset Energy
+Expended.
 ---
- profiles/heartrate/heartrate.c | 61 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
+ profiles/heartrate/heartrate.c | 45 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 44 insertions(+), 1 deletion(-)
 
 diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index add34b8..81dd5cc 100644
+index ba1c1fa..add34b8 100644
 --- a/profiles/heartrate/heartrate.c
 +++ b/profiles/heartrate/heartrate.c
-@@ -94,6 +94,25 @@ struct measurement {
+@@ -41,6 +41,7 @@
+ #include "log.h"
+ #include "heartrate.h"
  
- static GSList *heartrate_adapters = NULL;
++#define HEART_RATE_INTERFACE		"org.bluez.HeartRate"
+ #define HEART_RATE_MANAGER_INTERFACE	"org.bluez.HeartRateManager"
+ #define HEART_RATE_WATCHER_INTERFACE	"org.bluez.HeartRateWatcher"
  
-+static const char * const location_enum[] = {
-+	"Other",
-+	"Chest",
-+	"Wrist",
-+	"Finger",
-+	"Hand",
-+	"Earlobe",
-+	"Foot",
-+};
-+
-+static const gchar *location2str(uint8_t value)
-+{
-+	 if (value < G_N_ELEMENTS(location_enum))
-+		return location_enum[value];
-+
-+	error("Body Sensor Location [%d] is RFU", value);
-+	return NULL;
-+}
-+
- static gint cmp_adapter(gconstpointer a, gconstpointer b)
- {
- 	const struct heartrate_adapter *hradapter = a;
-@@ -629,6 +648,45 @@ static const GDBusMethodTable heartrate_manager_methods[] = {
+@@ -628,6 +629,35 @@ static const GDBusMethodTable heartrate_manager_methods[] = {
  	{ }
  };
  
-+static DBusMessage *get_properties(DBusConnection *conn, DBusMessage *msg,
++static DBusMessage *hrcp_reset(DBusConnection *conn, DBusMessage *msg,
 +								void *data)
 +{
 +	struct heartrate *hr = data;
-+	DBusMessageIter iter;
-+	DBusMessageIter dict;
-+	DBusMessage *reply;
-+	gboolean has_reset;
++	uint8_t value;
++	char *vmsg;
 +
-+	reply = dbus_message_new_method_return(msg);
-+	if (reply == NULL)
-+		return NULL;
++	if (!hr->hrcp_val_handle)
++		return btd_error_not_supported(msg);
 +
-+	dbus_message_iter_init_append(reply, &iter);
++	if (!hr->attrib)
++		return btd_error_not_available(msg);
 +
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
-+			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
-+			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++	value = 0x01;
++	vmsg = g_strdup("Reset Control Point");
++	gatt_write_char(hr->attrib, hr->hrcp_val_handle, &value,
++					sizeof(value), char_write_cb, vmsg);
 +
-+	if (hr->has_location) {
-+		char *loc = g_strdup(location2str(hr->location));
++	DBG("Energy Expended Value has been reset");
 +
-+		if (loc) {
-+			dict_append_entry(&dict, "Location",
-+						DBUS_TYPE_STRING, &loc);
-+			g_free(loc);
-+		}
-+	}
-+
-+	has_reset = !!hr->hrcp_val_handle;
-+	dict_append_entry(&dict, "ResetSupported", DBUS_TYPE_BOOLEAN,
-+								&has_reset);
-+
-+	dbus_message_iter_close_container(&iter, &dict);
-+
-+	return reply;
++	return dbus_message_new_method_return(msg);
 +}
 +
- static DBusMessage *hrcp_reset(DBusConnection *conn, DBusMessage *msg,
- 								void *data)
++static const GDBusMethodTable heartrate_device_methods[] = {
++	{ GDBUS_METHOD("Reset", NULL, NULL,
++			hrcp_reset) },
++	{ }
++};
++
+ int heartrate_adapter_register(struct btd_adapter *adapter)
  {
-@@ -653,6 +711,9 @@ static DBusMessage *hrcp_reset(DBusConnection *conn, DBusMessage *msg,
- }
+ 	struct heartrate_adapter *hradapter;
+@@ -685,6 +715,18 @@ int heartrate_device_register(struct btd_device *device,
+ 	hr->dev = btd_device_ref(device);
+ 	hr->hradapter = hradapter;
  
- static const GDBusMethodTable heartrate_device_methods[] = {
-+	{ GDBUS_METHOD("GetProperties",
-+			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
-+			get_properties) },
- 	{ GDBUS_METHOD("Reset", NULL, NULL,
- 			hrcp_reset) },
- 	{ }
++	if (!g_dbus_register_interface(btd_get_dbus_connection(),
++						device_get_path(device),
++						HEART_RATE_INTERFACE,
++						heartrate_device_methods,
++						NULL, NULL, hr,
++						destroy_heartrate)) {
++		error("D-Bus failed to register %s interface",
++						HEART_RATE_INTERFACE);
++		destroy_heartrate(hr);
++		return -EIO;
++	}
++
+ 	hr->svc_range = g_new0(struct att_range, 1);
+ 	hr->svc_range->start = prim->range.start;
+ 	hr->svc_range->end = prim->range.end;
+@@ -718,5 +760,6 @@ void heartrate_device_unregister(struct btd_device *device)
+ 
+ 	hradapter->devices = g_slist_remove(hradapter->devices, hr);
+ 
+-	destroy_heartrate(hr);
++	g_dbus_unregister_interface(btd_get_dbus_connection(),
++				device_get_path(device), HEART_RATE_INTERFACE);
+ }
 -- 
 1.7.11.3
 
