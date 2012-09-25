@@ -1,96 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Sep 2012 13:02:24 +0300
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH hcidump] amp: Decode Num Completed Data Blocks
-Message-ID: <20120925100222.GD2509@aemeltch-MOBL1>
-References: <1346398640-8423-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1346398640-8423-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: gustavo@padovan.org
+Subject: [PATCHv2 4/4] bluetooth: Remove unneeded batostr function
+Date: Tue, 25 Sep 2012 12:49:46 +0300
+Message-Id: <1348566586-28572-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1348566586-28572-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <20120821175534.GD17005@joana>
+ <1348566586-28572-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ping
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Fri, Aug 31, 2012 at 10:37:20AM +0300, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Adds decoding Number Of Completed Data Blocks Event
-> 
-> > HCI Event: Number Of Completed Data Blocks (0x48) plen 9
->     Total num blocks 4 Num handles 1
->       Handle 0x0001: Num complt pkts 1 Num complt blks 1
-> ---
->  lib/hci.h    |   10 ++++++++++
->  parser/hci.c |   22 ++++++++++++++++++++++
->  2 files changed, 32 insertions(+)
-> 
-> diff --git a/lib/hci.h b/lib/hci.h
-> index d068a2f..7eacca5 100644
-> --- a/lib/hci.h
-> +++ b/lib/hci.h
-> @@ -2197,6 +2197,16 @@ typedef struct {
->  #define EVT_FLOW_SPEC_MODIFY_COMPLETE_SIZE 3
->  
->  #define EVT_NUMBER_COMPLETED_BLOCKS		0x48
-> +typedef struct {
-> +	uint16_t		handle;
-> +	uint16_t		num_cmplt_pkts;
-> +	uint16_t		num_cmplt_blks;
-> +} __attribute__ ((packed)) cmplt_handle;
-> +typedef struct {
-> +	uint16_t		total_num_blocks;
-> +	uint8_t			num_handles;
-> +	cmplt_handle		handles[0];
-> +}  __attribute__ ((packed)) evt_num_completed_blocks;
->  
->  #define EVT_AMP_STATUS_CHANGE			0x4D
->  typedef struct {
-> diff --git a/parser/hci.c b/parser/hci.c
-> index 38794bd..19cd419 100644
-> --- a/parser/hci.c
-> +++ b/parser/hci.c
-> @@ -3743,6 +3743,25 @@ static inline void flow_spec_modify_dump(int level, struct frame *frm)
->  	}
->  }
->  
-> +static inline void num_completed_blocks_dump(int level, struct frame *frm)
-> +{
-> +	evt_num_completed_blocks *evt = frm->ptr;
-> +	int i;
-> +
-> +	p_indent(level, frm);
-> +	printf("Total num blocks %d Num handles %d\n",
-> +			btohs(evt->total_num_blocks), evt->num_handles);
-> +
-> +	for (i = 0; i < evt->num_handles; i++) {
-> +		cmplt_handle *h = &evt->handles[i];
-> +
-> +		p_indent(level + 1, frm);
-> +		printf("Handle 0x%4.4x: Num complt pkts %d Num complt blks %d\n",
-> +				btohs(h->handle), btohs(h->num_cmplt_pkts),
-> +				btohs(h->num_cmplt_blks));
-> +	}
-> +}
-> +
->  static inline void event_dump(int level, struct frame *frm)
->  {
->  	hci_event_hdr *hdr = frm->ptr;
-> @@ -3969,6 +3988,9 @@ static inline void event_dump(int level, struct frame *frm)
->  	case EVT_FLOW_SPEC_MODIFY_COMPLETE:
->  		flow_spec_modify_dump(level + 1, frm);
->  		break;
-> +	case EVT_NUMBER_COMPLETED_BLOCKS:
-> +		num_completed_blocks_dump(level + 1, frm);
-> +		break;
->  	default:
->  		raw_dump(level, frm);
->  		break;
-> -- 
-> 1.7.9.5
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+batostr is not needed anymore since for printing Bluetooth
+addresses we use %pMR specifier.
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/bluetooth.h |    1 -
+ net/bluetooth/lib.c               |   14 --------------
+ 2 files changed, 15 deletions(-)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index ede0369..2554b3f 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -180,7 +180,6 @@ static inline void bacpy(bdaddr_t *dst, bdaddr_t *src)
+ }
+ 
+ void baswap(bdaddr_t *dst, bdaddr_t *src);
+-char *batostr(bdaddr_t *ba);
+ 
+ /* Common socket structures and functions */
+ 
+diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
+index e1c9752..b3fbc73 100644
+--- a/net/bluetooth/lib.c
++++ b/net/bluetooth/lib.c
+@@ -41,20 +41,6 @@ void baswap(bdaddr_t *dst, bdaddr_t *src)
+ }
+ EXPORT_SYMBOL(baswap);
+ 
+-char *batostr(bdaddr_t *ba)
+-{
+-	static char str[2][18];
+-	static int i = 1;
+-
+-	i ^= 1;
+-	sprintf(str[i], "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
+-		ba->b[5], ba->b[4], ba->b[3],
+-		ba->b[2], ba->b[1], ba->b[0]);
+-
+-	return str[i];
+-}
+-EXPORT_SYMBOL(batostr);
+-
+ /* Bluetooth error codes to Unix errno mapping */
+ int bt_to_errno(__u16 code)
+ {
+-- 
+1.7.9.5
+
