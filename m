@@ -1,63 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: gustavo@padovan.org
-Subject: [PATCHv2 3/4] Bluetooth: Use %pMR instead of baswap in seq_show
-Date: Tue, 25 Sep 2012 12:49:45 +0300
-Message-Id: <1348566586-28572-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1348566586-28572-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <20120821175534.GD17005@joana>
- <1348566586-28572-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH v0] audio: Fix crash if gateway closed before reply
+Date: Tue, 25 Sep 2012 11:30:29 +0200
+Message-Id: <1348565429-3045-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Use new bluetooth address print specifier %pMR for printing
-bluetooth addresses instead of dedicated variable and baswap.
+The audio gateway can be closed (dev->gateway == NULL) before the reply
+from the agent has been received, resulting in the following crash as
+reproduced while removing (unpairing) a device:
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+bluetoothd[2219]: src/mgmt.c:mgmt_unpair_device() index 0 addr 38:16:D1:C5:D1:A2
+bluetoothd[2219]: audio/gateway.c:path_unregister() Unregistered interface org.bluez.HandsfreeGateway on path /org/bluez/2219/hci0/dev_38_16_D1_C5_D1_A2
+bluetoothd[2219]: audio/media.c:gateway_state_changed()
+bluetoothd[2219]: audio/media.c:gateway_state_changed() Clear endpoint 0x555555820640
+bluetoothd[2219]: audio/source.c:path_unregister() Unregistered interface org.bluez.AudioSource on path /org/bluez/2219/hci0/dev_38_16_D1_C5_D1_A2
+bluetoothd[2219]: src/device.c:btd_device_unref() 0x555555833e70: ref=1
+bluetoothd[2219]: src/adapter.c:adapter_get_device() 38:16:D1:C5:D1:A2
+bluetoothd[2219]: src/adapter.c:adapter_create_device() 38:16:D1:C5:D1:A2
+bluetoothd[2219]: src/device.c:device_create() Creating device /org/bluez/2219/hci0/dev_38_16_D1_C5_D1_A2
+bluetoothd[2219]: src/device.c:device_free() 0x55555581f9c0
+bluetoothd[2219]: Unable to get btd_device object for 38:16:D1:C5:D1:A2
+bluetoothd[2219]: src/device.c:btd_device_unref() 0x555555833e70: ref=0
+bluetoothd[2219]: src/device.c:device_free() 0x555555833e70
+bluetoothd[2219]: src/mgmt.c:mgmt_event() cond 1
+bluetoothd[2219]: src/mgmt.c:mgmt_event() Received 16 bytes from management socket
+bluetoothd[2219]: src/mgmt.c:mgmt_cmd_complete()
+bluetoothd[2219]: src/mgmt.c:mgmt_cmd_complete() unpair_device complete
+
+Program received signal SIGSEGV, Segmentation fault.
+0x000055555556fa26 in newconnection_reply (call=<optimized out>, data=0x555555824dd0) at audio/gateway.c:285
+285		if (!dev->gateway->rfcomm) {
 ---
- net/bluetooth/af_bluetooth.c |   10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ audio/gateway.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 9d49ee6..a9ad589 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -569,7 +569,6 @@ static int bt_seq_show(struct seq_file *seq, void *v)
- {
- 	struct bt_seq_state *s = seq->private;
- 	struct bt_sock_list *l = s->l;
--	bdaddr_t src_baswapped, dst_baswapped;
+diff --git a/audio/gateway.c b/audio/gateway.c
+index 45b25a1..6990573 100644
+--- a/audio/gateway.c
++++ b/audio/gateway.c
+@@ -282,6 +282,11 @@ static void newconnection_reply(DBusPendingCall *call, void *data)
+ 	DBusMessage *reply = dbus_pending_call_steal_reply(call);
+ 	DBusError derr;
  
- 	if (v == SEQ_START_TOKEN) {
- 		seq_puts(seq ,"sk               RefCnt Rmem   Wmem   User   Inode  Src Dst Parent");
-@@ -583,18 +582,17 @@ static int bt_seq_show(struct seq_file *seq, void *v)
- 	} else {
- 		struct sock *sk = sk_entry(v);
- 		struct bt_sock *bt = bt_sk(sk);
--		baswap(&src_baswapped, &bt->src);
--		baswap(&dst_baswapped, &bt->dst);
- 
--		seq_printf(seq, "%pK %-6d %-6u %-6u %-6u %-6lu %pM %pM %-6lu",
-+		seq_printf(seq,
-+			   "%pK %-6d %-6u %-6u %-6u %-6lu %pMR %pMR %-6lu",
- 			   sk,
- 			   atomic_read(&sk->sk_refcnt),
- 			   sk_rmem_alloc_get(sk),
- 			   sk_wmem_alloc_get(sk),
- 			   sock_i_uid(sk),
- 			   sock_i_ino(sk),
--			   &src_baswapped,
--			   &dst_baswapped,
-+			   &bt->src,
-+			   &bt->dst,
- 			   bt->parent? sock_i_ino(bt->parent): 0LU);
- 
- 		if (l->custom_seq_show) {
++	if (gw == NULL) {
++		DBG("Gateway closed before agent reply");
++		goto done;
++	}
++
+ 	if (!dev->gateway->rfcomm) {
+ 		DBG("RFCOMM disconnected from server before agent reply");
+ 		goto done;
 -- 
-1.7.9.5
+1.7.7.6
 
