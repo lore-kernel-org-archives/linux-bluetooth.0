@@ -2,195 +2,149 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v3 5/6] hog: Move HoG device list to manager
-Date: Tue, 25 Sep 2012 12:34:19 -0300
-Message-Id: <1348587260-431-6-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v3 4/6] hog: Create a FIFO for dummy suspend
+Date: Tue, 25 Sep 2012 12:34:18 -0300
+Message-Id: <1348587260-431-5-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1348587260-431-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1346696594-1062-1-git-send-email-claudio.takahasi@openbossa.org>
  <1348587260-431-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch moves the HoG device list from hog_device.c to hog_manager.c
-in order to be possible to easily notify suspend/resume events to each
-created device.
+This patch creates a FIFO on "/tmp/hogsuspend" to allow the users to
+test the HoG suspend(HID Control Point) when the dummy back-end is
+enabled.
 ---
- profiles/input/hog_device.c  | 46 +++++++++++++++++++++-----------------------
- profiles/input/hog_device.h  |  8 ++++++--
- profiles/input/hog_manager.c | 22 +++++++++++++++++++--
- 3 files changed, 48 insertions(+), 28 deletions(-)
+ profiles/input/suspend-dummy.c | 102 ++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 101 insertions(+), 1 deletion(-)
 
-diff --git a/profiles/input/hog_device.c b/profiles/input/hog_device.c
-index 03af931..4b43d67 100644
---- a/profiles/input/hog_device.c
-+++ b/profiles/input/hog_device.c
-@@ -94,8 +94,6 @@ struct report {
- 	struct hog_device	*hogdev;
- };
+diff --git a/profiles/input/suspend-dummy.c b/profiles/input/suspend-dummy.c
+index 282d3fb..f2941fe 100644
+--- a/profiles/input/suspend-dummy.c
++++ b/profiles/input/suspend-dummy.c
+@@ -26,21 +26,121 @@
+ #include <config.h>
+ #endif
  
--static GSList *devices = NULL;
--
- static gint report_handle_cmp(gconstpointer a, gconstpointer b)
- {
- 	const struct report *report = a;
-@@ -629,7 +627,7 @@ static void attio_disconnected_cb(gpointer user_data)
- 	hogdev->attrib = NULL;
- }
++#include <errno.h>
+ #include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <unistd.h>
  
--static struct hog_device *find_device_by_path(GSList *list, const char *path)
-+struct hog_device *hog_device_find(GSList *list, const char *path)
- {
- 	for (; list; list = list->next) {
- 		struct hog_device *hogdev = list->data;
-@@ -691,31 +689,33 @@ static void hog_device_free(struct hog_device *hogdev)
- 	g_free(hogdev);
- }
++#include <glib.h>
++
++#include "log.h"
+ #include "suspend.h"
  
--int hog_device_register(struct btd_device *device, const char *path)
-+struct hog_device *hog_device_register(struct btd_device *device,
-+					const char *path, int *perr)
- {
--	struct hog_device *hogdev;
- 	struct gatt_primary *prim;
-+	struct hog_device *hogdev;
- 	GIOCondition cond = G_IO_IN | G_IO_ERR | G_IO_NVAL;
- 	GIOChannel *io;
--
--	hogdev = find_device_by_path(devices, path);
--	if (hogdev)
--		return -EALREADY;
-+	int err;
- 
- 	prim = load_hog_primary(device);
--	if (!prim)
--		return -EINVAL;
-+	if (!prim) {
-+		err = -EINVAL;
++#define HOG_SUSPEND_FIFO	"/tmp/hogsuspend"
++
+ static suspend_event suspend_cb = NULL;
+ static resume_event resume_cb = NULL;
++static GIOChannel *fifoio = NULL;
++
++static int fifo_open(void);
++
++static gboolean read_fifo(GIOChannel *io, GIOCondition cond, gpointer user_data)
++{
++	gchar buffer[12];
++	gsize offset, left, bread;
++	GIOStatus iostatus;
++
++	if (cond & (G_IO_ERR | G_IO_HUP))
 +		goto failed;
-+	}
- 
- 	hogdev = hog_device_new(device, path);
--	if (!hogdev)
--		return -ENOMEM;
-+	if (!hogdev) {
-+		err = -ENOMEM;
-+		goto failed;
-+	}
- 
- 	hogdev->uhid_fd = open(UHID_DEVICE_FILE, O_RDWR | O_CLOEXEC);
- 	if (hogdev->uhid_fd < 0) {
--		int err = -errno;
-+		err = -errno;
- 		error("Failed to open uHID device: %s", strerror(-err));
- 		hog_device_free(hogdev);
--		return err;
-+		goto failed;
- 	}
- 
- 	io = g_io_channel_unix_new(hogdev->uhid_fd);
-@@ -733,20 +733,19 @@ int hog_device_register(struct btd_device *device, const char *path)
- 
- 	device_set_auto_connect(device, TRUE);
- 
--	devices = g_slist_append(devices, hogdev);
-+	return hogdev;
- 
--	return 0;
++
++	offset = 0;
++	left = sizeof(buffer) - 1;
++	memset(buffer, 0, sizeof(buffer));
++
++	do {
++		iostatus = g_io_channel_read_chars(io, &buffer[offset], left,
++								&bread, NULL);
++
++		offset += bread;
++		left -= bread;
++		if (left == 0)
++			break;
++	} while (iostatus == G_IO_STATUS_NORMAL);
++
++	if (g_ascii_strncasecmp("suspend", buffer, 7) == 0)
++		suspend_cb();
++	else if (g_ascii_strncasecmp("resume", buffer, 6) == 0)
++		resume_cb();
++
++	return TRUE;
++
 +failed:
-+	if (perr)
-+		*perr = err;
++	/*
++	 * Both ends needs to be open simultaneously before proceeding any input
++	 * or output operation. When the remote closes the channel, hup signal is
++	 * received on this end.
++	 */
 +
-+	return NULL;
- }
- 
--int hog_device_unregister(const char *path)
-+int hog_device_unregister(struct hog_device *hogdev)
- {
--	struct hog_device *hogdev;
- 	struct uhid_event ev;
- 
--	hogdev = find_device_by_path(devices, path);
--	if (hogdev == NULL)
--		return -EINVAL;
--
- 	btd_device_remove_attio_callback(hogdev->device, hogdev->attioid);
- 
- 	if (hogdev->uhid_watch_id) {
-@@ -762,7 +761,6 @@ int hog_device_unregister(const char *path)
- 	close(hogdev->uhid_fd);
- 	hogdev->uhid_fd = -1;
- 
--	devices = g_slist_remove(devices, hogdev);
- 	hog_device_free(hogdev);
- 
- 	return 0;
-diff --git a/profiles/input/hog_device.h b/profiles/input/hog_device.h
-index 597dc7c..efb7b4f 100644
---- a/profiles/input/hog_device.h
-+++ b/profiles/input/hog_device.h
-@@ -25,5 +25,9 @@
- 
- #define HOG_UUID		"00001812-0000-1000-8000-00805f9b34fb"
- 
--int hog_device_register(struct btd_device *device, const char *path);
--int hog_device_unregister(const char *path);
-+struct hog_device;
++	g_io_channel_unref(fifoio);
++	fifoio = NULL;
 +
-+struct hog_device *hog_device_register(struct btd_device *device,
-+						const char *path, int *perr);
-+int hog_device_unregister(struct hog_device *hogdev);
-+struct hog_device *hog_device_find(GSList *list, const char *path);
-diff --git a/profiles/input/hog_manager.c b/profiles/input/hog_manager.c
-index 6d173cc..3888c2b 100644
---- a/profiles/input/hog_manager.c
-+++ b/profiles/input/hog_manager.c
-@@ -41,6 +41,7 @@
- #include "hog_device.h"
- 
- static gboolean suspend_supported = FALSE;
-+static GSList *devices = NULL;
- 
- static void suspend_callback(void)
- {
-@@ -56,19 +57,36 @@ static int hog_device_probe(struct btd_profile *p, struct btd_device *device,
- 								GSList *uuids)
- {
- 	const char *path = device_get_path(device);
-+	struct hog_device *hogdev;
-+	int err;
- 
- 	DBG("path %s", path);
- 
--	return hog_device_register(device, path);
-+	hogdev = hog_device_find(devices, path);
-+	if (hogdev)
-+		return -EALREADY;
++	fifo_open();
 +
-+	hogdev = hog_device_register(device, path, &err);
-+	if (hogdev == NULL)
++	return FALSE;
++}
++
++static int fifo_open(void)
++{
++	GIOCondition condition = G_IO_IN | G_IO_ERR | G_IO_HUP;
++	int fd;
++
++	fd = open(HOG_SUSPEND_FIFO, O_RDONLY | O_NONBLOCK);
++	if (fd < 0) {
++		int err = -errno;
++		error("Can't open FIFO (%s): %s(%d)", HOG_SUSPEND_FIFO,
++							strerror(-err), -err);
 +		return err;
++	}
 +
-+	devices = g_slist_append(devices, hogdev);
++	fifoio = g_io_channel_unix_new(fd);
++	g_io_channel_set_close_on_unref(fifoio, TRUE);
++
++	g_io_add_watch(fifoio, condition, read_fifo, NULL);
 +
 +	return 0;
- }
++}
  
- static void hog_device_remove(struct btd_profile *p, struct btd_device *device)
+ int suspend_init(suspend_event suspend, resume_event resume)
  {
- 	const gchar *path = device_get_path(device);
-+	struct hog_device *hogdev;
++	int ret;
++
+ 	suspend_cb = suspend;
+ 	resume_cb = resume;
  
- 	DBG("path %s", path);
- 
--	hog_device_unregister(path);
-+	hogdev = hog_device_find(devices, path);
-+	if (hogdev) {
-+		devices = g_slist_remove(devices, hogdev);
-+		hog_device_unregister(hogdev);
+-	return 0;
++	if (mkfifo(HOG_SUSPEND_FIFO, S_IRWXU) < 0) {
++		int err = -errno;
++		error("Can't create FIFO (%s) : %s(%d)", HOG_SUSPEND_FIFO,
++							strerror(-err), -err);
++		return err;
 +	}
++
++	ret = fifo_open();
++	if (ret < 0)
++		remove(HOG_SUSPEND_FIFO);
++
++	return ret;
  }
  
- static struct btd_profile hog_profile = {
+ void suspend_exit(void)
+ {
++	if (fifoio) {
++		g_io_channel_shutdown(fifoio, FALSE, NULL);
++		g_io_channel_unref(fifoio);
++	}
++
++	remove(HOG_SUSPEND_FIFO);
+ }
 -- 
 1.7.12
 
