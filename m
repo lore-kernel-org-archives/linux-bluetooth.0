@@ -2,195 +2,44 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: gustavo@padovan.org
-Subject: [PATCHv2 2/4] Bluetooth: Use %pMR in sprintf/seq_printf  instead of batostr
-Date: Tue, 25 Sep 2012 12:49:44 +0300
-Message-Id: <1348566586-28572-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1348566586-28572-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 0/4] Remove unsafe batostr
+Date: Tue, 25 Sep 2012 12:49:42 +0300
+Message-Id: <1348566586-28572-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <20120821175534.GD17005@joana>
 References: <20120821175534.GD17005@joana>
- <1348566586-28572-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Instead of old unsafe batostr function use %pMR print specifier
-for printing Bluetooth addresses in sprintf and seq_printf
-statements.
+Since the patch "vsprintf: add %pMR for Bluetooth MAC address" in in bluetooth-next resend the patch series.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/cmtp/core.c   |    2 +-
- net/bluetooth/hci_sysfs.c   |   10 +++++-----
- net/bluetooth/hidp/core.c   |    8 ++++++--
- net/bluetooth/l2cap_core.c  |   11 +++++------
- net/bluetooth/rfcomm/core.c |    9 ++++-----
- net/bluetooth/rfcomm/sock.c |    7 +++----
- net/bluetooth/rfcomm/tty.c  |    2 +-
- net/bluetooth/sco.c         |    4 ++--
- 8 files changed, 27 insertions(+), 26 deletions(-)
+Changes:
+	* v2: Rebase against recent bluetooth-next.
 
-diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
-index 6c9c1fd..e0a6ebf 100644
---- a/net/bluetooth/cmtp/core.c
-+++ b/net/bluetooth/cmtp/core.c
-@@ -353,7 +353,7 @@ int cmtp_add_connection(struct cmtp_connadd_req *req, struct socket *sock)
- 
- 	BT_DBG("mtu %d", session->mtu);
- 
--	sprintf(session->name, "%s", batostr(&bt_sk(sock->sk)->dst));
-+	sprintf(session->name, "%pMR", &bt_sk(sock->sk)->dst);
- 
- 	session->sock  = sock;
- 	session->state = BT_CONFIG;
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index a20e61c..55cceee 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -38,7 +38,7 @@ static ssize_t show_link_address(struct device *dev,
- 				 struct device_attribute *attr, char *buf)
- {
- 	struct hci_conn *conn = to_hci_conn(dev);
--	return sprintf(buf, "%s\n", batostr(&conn->dst));
-+	return sprintf(buf, "%pMR\n", &conn->dst);
- }
- 
- static ssize_t show_link_features(struct device *dev,
-@@ -224,7 +224,7 @@ static ssize_t show_address(struct device *dev,
- 			    struct device_attribute *attr, char *buf)
- {
- 	struct hci_dev *hdev = to_hci_dev(dev);
--	return sprintf(buf, "%s\n", batostr(&hdev->bdaddr));
-+	return sprintf(buf, "%pMR\n", &hdev->bdaddr);
- }
- 
- static ssize_t show_features(struct device *dev,
-@@ -406,8 +406,8 @@ static int inquiry_cache_show(struct seq_file *f, void *p)
- 
- 	list_for_each_entry(e, &cache->all, all) {
- 		struct inquiry_data *data = &e->data;
--		seq_printf(f, "%s %d %d %d 0x%.2x%.2x%.2x 0x%.4x %d %d %u\n",
--			   batostr(&data->bdaddr),
-+		seq_printf(f, "%pMR %d %d %d 0x%.2x%.2x%.2x 0x%.4x %d %d %u\n",
-+			   &data->bdaddr,
- 			   data->pscan_rep_mode, data->pscan_period_mode,
- 			   data->pscan_mode, data->dev_class[2],
- 			   data->dev_class[1], data->dev_class[0],
-@@ -440,7 +440,7 @@ static int blacklist_show(struct seq_file *f, void *p)
- 	hci_dev_lock(hdev);
- 
- 	list_for_each_entry(b, &hdev->blacklist, list)
--		seq_printf(f, "%s\n", batostr(&b->bdaddr));
-+		seq_printf(f, "%pMR\n", &b->bdaddr);
- 
- 	hci_dev_unlock(hdev);
- 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index ccd985d..0c00284 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -932,8 +932,12 @@ static int hidp_setup_hid(struct hidp_session *session,
- 	hid->country = req->country;
- 
- 	strncpy(hid->name, req->name, 128);
--	strncpy(hid->phys, batostr(&bt_sk(session->ctrl_sock->sk)->src), 64);
--	strncpy(hid->uniq, batostr(&bt_sk(session->ctrl_sock->sk)->dst), 64);
-+
-+	snprintf(hid->phys, sizeof(hid->phys), "%pMR",
-+		 &bt_sk(session->ctrl_sock->sk)->src);
-+
-+	snprintf(hid->uniq, sizeof(hid->uniq), "%pMR",
-+		 &bt_sk(session->ctrl_sock->sk)->dst);
- 
- 	hid->dev.parent = &session->conn->dev;
- 	hid->ll_driver = &hidp_hid_driver;
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 3de48c9..0873345 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5623,12 +5623,11 @@ static int l2cap_debugfs_show(struct seq_file *f, void *p)
- 	list_for_each_entry(c, &chan_list, global_l) {
- 		struct sock *sk = c->sk;
- 
--		seq_printf(f, "%s %s %d %d 0x%4.4x 0x%4.4x %d %d %d %d\n",
--					batostr(&bt_sk(sk)->src),
--					batostr(&bt_sk(sk)->dst),
--					c->state, __le16_to_cpu(c->psm),
--					c->scid, c->dcid, c->imtu, c->omtu,
--					c->sec_level, c->mode);
-+		seq_printf(f, "%pMR %pMR %d %d 0x%4.4x 0x%4.4x %d %d %d %d\n",
-+			   &bt_sk(sk)->src, &bt_sk(sk)->dst,
-+			   c->state, __le16_to_cpu(c->psm),
-+			   c->scid, c->dcid, c->imtu, c->omtu,
-+			   c->sec_level, c->mode);
- 	}
- 
- 	read_unlock(&chan_list_lock);
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index f6d066c..fb1d83d 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -2125,11 +2125,10 @@ static int rfcomm_dlc_debugfs_show(struct seq_file *f, void *x)
- 		list_for_each_entry(d, &s->dlcs, list) {
- 			struct sock *sk = s->sock->sk;
- 
--			seq_printf(f, "%s %s %ld %d %d %d %d\n",
--						batostr(&bt_sk(sk)->src),
--						batostr(&bt_sk(sk)->dst),
--						d->state, d->dlci, d->mtu,
--						d->rx_credits, d->tx_credits);
-+			seq_printf(f, "%pMR %pMR %ld %d %d %d %d\n",
-+				   &bt_sk(sk)->src, &bt_sk(sk)->dst,
-+				   d->state, d->dlci, d->mtu,
-+				   d->rx_credits, d->tx_credits);
- 		}
- 	}
- 
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index ebd2f57..867a065 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -973,10 +973,9 @@ static int rfcomm_sock_debugfs_show(struct seq_file *f, void *p)
- 	read_lock(&rfcomm_sk_list.lock);
- 
- 	sk_for_each(sk, node, &rfcomm_sk_list.head) {
--		seq_printf(f, "%s %s %d %d\n",
--				batostr(&bt_sk(sk)->src),
--				batostr(&bt_sk(sk)->dst),
--				sk->sk_state, rfcomm_pi(sk)->channel);
-+		seq_printf(f, "%pMR %pMR %d %d\n",
-+			   &bt_sk(sk)->src, &bt_sk(sk)->dst,
-+			   sk->sk_state, rfcomm_pi(sk)->channel);
- 	}
- 
- 	read_unlock(&rfcomm_sk_list.lock);
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index 0e487e9..6baf64d 100644
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -166,7 +166,7 @@ static struct device *rfcomm_get_device(struct rfcomm_dev *dev)
- static ssize_t show_address(struct device *tty_dev, struct device_attribute *attr, char *buf)
- {
- 	struct rfcomm_dev *dev = dev_get_drvdata(tty_dev);
--	return sprintf(buf, "%s\n", batostr(&dev->dst));
-+	return sprintf(buf, "%pMR\n", &dev->dst);
- }
- 
- static ssize_t show_channel(struct device *tty_dev, struct device_attribute *attr, char *buf)
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 347d3b9..450cdcd 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -959,8 +959,8 @@ static int sco_debugfs_show(struct seq_file *f, void *p)
- 	read_lock(&sco_sk_list.lock);
- 
- 	sk_for_each(sk, node, &sco_sk_list.head) {
--		seq_printf(f, "%s %s %d\n", batostr(&bt_sk(sk)->src),
--			   batostr(&bt_sk(sk)->dst), sk->sk_state);
-+		seq_printf(f, "%pMR %pMR %d\n", &bt_sk(sk)->src,
-+			   &bt_sk(sk)->dst, sk->sk_state);
- 	}
- 
- 	read_unlock(&sco_sk_list.lock);
+Andrei Emeltchenko (4):
+  Bluetooth: Use %pMR in debug instead of batostr
+  Bluetooth: Use %pMR in sprintf/seq_printf  instead of batostr
+  Bluetooth: Use %pMR instead of baswap in seq_show
+  bluetooth: Remove unneeded batostr function
+
+ include/net/bluetooth/bluetooth.h |    1 -
+ net/bluetooth/af_bluetooth.c      |   10 ++++------
+ net/bluetooth/bnep/core.c         |    3 +--
+ net/bluetooth/cmtp/core.c         |    2 +-
+ net/bluetooth/hci_conn.c          |    6 +++---
+ net/bluetooth/hci_core.c          |   22 +++++++++++-----------
+ net/bluetooth/hci_event.c         |   15 +++++++--------
+ net/bluetooth/hci_sysfs.c         |   10 +++++-----
+ net/bluetooth/hidp/core.c         |    8 ++++++--
+ net/bluetooth/l2cap_core.c        |   17 ++++++++---------
+ net/bluetooth/lib.c               |   14 --------------
+ net/bluetooth/rfcomm/core.c       |   15 +++++++--------
+ net/bluetooth/rfcomm/sock.c       |    9 ++++-----
+ net/bluetooth/rfcomm/tty.c        |    6 +++---
+ net/bluetooth/sco.c               |   12 ++++++------
+ 15 files changed, 66 insertions(+), 84 deletions(-)
+
 -- 
 1.7.9.5
 
