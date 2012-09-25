@@ -1,209 +1,161 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ 1/2] gdbus: Fix wrong signal handler match
-Date: Tue, 25 Sep 2012 16:28:07 -0300
-Message-Id: <1348601288-18975-1-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Tue, 25 Sep 2012 11:57:14 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	sunnyk@codeaurora.org
+Subject: Re: [RFCv1 03/20] Bluetooth: Add L2CAP create channel request
+ handling
+In-Reply-To: <20120925113828.GG2509@aemeltch-MOBL1>
+Message-ID: <alpine.DEB.2.02.1209251155430.2455@mathewm-linux>
+References: <1347387691-5285-1-git-send-email-mathewm@codeaurora.org> <1347387691-5285-4-git-send-email-mathewm@codeaurora.org> <20120925113828.GG2509@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When we add a signal handler with g_dbus_add_signal_watch(), this
-function tries to multiplex the matches added in libdbus by checking
-if there's a previous filter_data with the same fields. However, if the
-field is NULL it accepts as being the same. The result is that the
-following watches will use the same filter data:
 
-watch1 = g_dbus_add_signal_watch(conn, BUS_NAME, NULL, iface, member,
-						cb1, data1, NULL);
-watch2 = g_dbus_add_signal_watch(conn, BUS_NAME, "/path2", iface, member,
-						cb2, data2, NULL);
-watch3 = g_dbus_add_signal_watch(conn, BUS_NAME, "/path3", iface, member,
-						cb3, data3, NULL);
+Andrei -
 
-The result is that when a signal arrives with path == "/path2", all 3
-callbacks above will be called, with the same signal delivered to all of
-them.
+On Tue, 25 Sep 2012, Andrei Emeltchenko wrote:
 
-Another problem is that, if we invert the calls like below, only signals
-to cb1 will never be trigerred, nonetheless it used path == NULL.
+> Hi Mat,
+>
+> On Tue, Sep 11, 2012 at 11:21:14AM -0700, Mat Martineau wrote:
+>> The L2CAP create channel request is very similar to an L2CAP connect
+>> request, but it has an additional parameter for the controller ID.  If
+>> the controller id is 0, the channel is set up on the BR/EDR controller
+>> (just like a connect request).  Using a valid high speed controller ID
+>> will cause the channel to be initially created on that high speed
+>> controller.  While the L2CAP data will be initially routed over the
+>> AMP controller, the L2CAP fixed signaling channel only uses BR/EDR.
+>>
+>> When a create channel request is received for a high speed controller,
+>> a pending response is always sent first.  After the high speed
+>> physical and logical links are complete a success response will be
+>> sent.
+>>
+>> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+>> ---
+>>  net/bluetooth/l2cap_core.c | 70 +++++++++++++++++++++++++++++++++++-----------
+>>  1 file changed, 54 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>> index 166382c..17e02d9 100644
+>> --- a/net/bluetooth/l2cap_core.c
+>> +++ b/net/bluetooth/l2cap_core.c
+>> @@ -3362,8 +3362,9 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn, struct l2cap_cmd_hd
+>>  	return 0;
+>>  }
+>>
+>> -static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
+>> -			    u8 *data, u8 rsp_code, u8 amp_id)
+>> +static struct l2cap_chan *__l2cap_connect(struct l2cap_conn *conn,
+>> +					  struct l2cap_cmd_hdr *cmd,
+>> +					  u8 *data, u8 rsp_code, u8 amp_id)
+>>  {
+>>  	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
+>>  	struct l2cap_conn_rsp rsp;
+>> @@ -3390,7 +3391,7 @@ static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
+>>
+>>  	/* Check if the ACL is secure enough (if not SDP) */
+>>  	if (psm != __constant_cpu_to_le16(L2CAP_PSM_SDP) &&
+>> -				!hci_conn_check_link_mode(conn->hcon)) {
+>> +	    !hci_conn_check_link_mode(conn->hcon)) {
+>>  		conn->disc_reason = HCI_ERROR_AUTH_FAILURE;
+>>  		result = L2CAP_CR_SEC_BLOCK;
+>>  		goto response;
+>> @@ -3414,6 +3415,7 @@ static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
+>>  	bacpy(&bt_sk(sk)->dst, conn->dst);
+>>  	chan->psm  = psm;
+>>  	chan->dcid = scid;
+>> +	chan->local_amp_id = amp_id;
+>>
+>>  	bt_accept_enqueue(parent, sk);
+>>
+>> @@ -3433,8 +3435,16 @@ static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
+>>  				status = L2CAP_CS_AUTHOR_PEND;
+>>  				parent->sk_data_ready(parent, 0);
+>>  			} else {
+>> -				__l2cap_state_change(chan, BT_CONFIG);
+>> -				result = L2CAP_CR_SUCCESS;
+>> +				/* Force pending result for AMP controllers.
+>> +				 * The connection will succeed after the
+>> +				 * physical link is up. */
+>> +				if (amp_id) {
+>> +					__l2cap_state_change(chan, BT_CONNECT2);
+>> +					result = L2CAP_CR_PEND;
+>> +				} else {
+>> +					__l2cap_state_change(chan, BT_CONFIG);
+>> +					result = L2CAP_CR_SUCCESS;
+>> +				}
+>>  				status = L2CAP_CS_NO_INFO;
+>>  			}
+>>  		} else {
+>> @@ -3480,6 +3490,8 @@ sendresp:
+>>  					l2cap_build_conf_req(chan, buf), buf);
+>>  		chan->num_conf_req++;
+>>  	}
+>> +
+>> +	return chan;
+>>  }
+>>
+>>  static int l2cap_connect_req(struct l2cap_conn *conn,
+>> @@ -3970,12 +3982,12 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
+>>  	return 0;
+>>  }
+>>
+>> -static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
+>> -					struct l2cap_cmd_hdr *cmd, u16 cmd_len,
+>> -					void *data)
+>> +static int l2cap_create_channel_req(struct l2cap_conn *conn,
+>> +				    struct l2cap_cmd_hdr *cmd, u16 cmd_len,
+>> +				    void *data)
+>>  {
+>>  	struct l2cap_create_chan_req *req = data;
+>> -	struct l2cap_create_chan_rsp rsp;
+>> +	struct l2cap_chan *chan;
+>>  	u16 psm, scid;
+>>
+>>  	if (cmd_len != sizeof(*req))
+>> @@ -3989,14 +4001,40 @@ static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
+>>
+>>  	BT_DBG("psm 0x%2.2x, scid 0x%4.4x, amp_id %d", psm, scid, req->amp_id);
+>>
+>> -	/* Placeholder: Always reject */
+>> -	rsp.dcid = 0;
+>> -	rsp.scid = cpu_to_le16(scid);
+>> -	rsp.result = __constant_cpu_to_le16(L2CAP_CR_NO_MEM);
+>> -	rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
+>> +	if (req->amp_id) {
+>> +		struct hci_dev *hdev;
+>>
+>> -	l2cap_send_cmd(conn, cmd->ident, L2CAP_CREATE_CHAN_RSP,
+>> -		       sizeof(rsp), &rsp);
+>> +		/* Validate AMP controller id */
+>> +		hdev = hci_dev_get(req->amp_id);
+>> +		if (!hdev || hdev->dev_type != HCI_AMP ||
+>> +		    !test_bit(HCI_UP, &hdev->flags)) {
+>> +			struct l2cap_create_chan_rsp rsp;
+>> +
+>> +			rsp.dcid = 0;
+>> +			rsp.scid = cpu_to_le16(scid);
+>> +			rsp.result = L2CAP_CR_BAD_AMP;
+>> +			rsp.status = L2CAP_CS_NO_INFO;
+>
+> Please consider this:
+>
+> -                       rsp.result = L2CAP_CR_BAD_AMP;
+> -                       rsp.status = L2CAP_CS_NO_INFO;
+> +                       rsp.result = __constant_cpu_to_le16(L2CAP_CR_BAD_AMP);
+> +                       rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
+>
 
-watch2 = g_dbus_add_signal_watch(conn, BUS_NAME, "/path2", iface, member,
-						cb2, data2, NULL);
-watch1 = g_dbus_add_signal_watch(conn, BUS_NAME, NULL, iface, member,
-						cb1, data1, NULL);
-watch3 = g_dbus_add_signal_watch(conn, BUS_NAME, "/path3", iface, member,
-						cb3, data3, NULL);
+Ok, I'll fix that and look for similar issues.
 
-This is fixed by not multiplexing the matchs with filter data if any of
-the fields are different, including being NULL. When a signal arrives,
-if a field is NULL we accept it as a match, but not when adding the
-signal handler.
----
- gdbus/watch.c | 115 +++++++++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 94 insertions(+), 21 deletions(-)
+--
+Mat Martineau
 
-diff --git a/gdbus/watch.c b/gdbus/watch.c
-index d749176..33c12ed 100644
---- a/gdbus/watch.c
-+++ b/gdbus/watch.c
-@@ -78,6 +78,47 @@ struct filter_data {
- 	gboolean registered;
- };
- 
-+static struct filter_data *filter_data_find_nonnull(DBusConnection *connection,
-+							const char *name,
-+							const char *owner,
-+							const char *path,
-+							const char *interface,
-+							const char *member,
-+							const char *argument)
-+{
-+	GSList *current;
-+
-+	for (current = listeners;
-+			current != NULL; current = current->next) {
-+		struct filter_data *data = current->data;
-+
-+		if (connection != data->connection)
-+			continue;
-+
-+		if (g_strcmp0(name, data->name) != 0)
-+			continue;
-+
-+		if (g_strcmp0(owner, data->owner) != 0)
-+			continue;
-+
-+		if (g_strcmp0(path, data->path) != 0)
-+			continue;
-+
-+		if (g_strcmp0(interface, data->interface) != 0)
-+			continue;
-+
-+		if (g_strcmp0(member, data->member) != 0)
-+			continue;
-+
-+		if (g_strcmp0(argument, data->argument) != 0)
-+			continue;
-+
-+		return data;
-+	}
-+
-+	return NULL;
-+}
-+
- static struct filter_data *filter_data_find(DBusConnection *connection,
- 							const char *name,
- 							const char *owner,
-@@ -221,8 +262,8 @@ static struct filter_data *filter_data_get(DBusConnection *connection,
- 		name = sender;
- 
- proceed:
--	data = filter_data_find(connection, name, owner, path, interface,
--					member, argument);
-+	data = filter_data_find_nonnull(connection, name, owner, path,
-+						interface, member, argument);
- 	if (data)
- 		return data;
- 
-@@ -501,6 +542,7 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
- {
- 	struct filter_data *data;
- 	const char *sender, *path, *iface, *member, *arg = NULL;
-+	GSList *current, *delete_listener = NULL;
- 
- 	/* Only filter signals */
- 	if (dbus_message_get_type(message) != DBUS_MESSAGE_TYPE_SIGNAL)
-@@ -512,30 +554,63 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
- 	member = dbus_message_get_member(message);
- 	dbus_message_get_args(message, NULL, DBUS_TYPE_STRING, &arg, DBUS_TYPE_INVALID);
- 
--	/* Sender is always bus name */
--	data = filter_data_find(connection, NULL, sender, path, iface, member,
--					arg);
--	if (data == NULL) {
--		error("Got %s.%s signal which has no listeners", iface, member);
--		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
--	}
-+	/* Sender is always the owner */
-+
-+	for (current = listeners; current != NULL; current = current->next) {
-+		data = current->data;
-+
-+		if (connection != data->connection)
-+			continue;
-+
-+		if (data->owner && g_str_equal(sender, data->owner) == FALSE)
-+			continue;
- 
--	if (data->handle_func) {
--		data->lock = TRUE;
-+		if (data->path && g_str_equal(path, data->path) == FALSE)
-+			continue;
-+
-+		if (data->interface && g_str_equal(iface,
-+						data->interface) == FALSE)
-+			continue;
- 
--		data->handle_func(connection, message, data);
-+		if (data->member && g_str_equal(member, data->member) == FALSE)
-+			continue;
- 
--		data->callbacks = data->processed;
--		data->processed = NULL;
--		data->lock = FALSE;
-+		if (data->argument && g_str_equal(arg,
-+						data->argument) == FALSE)
-+			continue;
-+
-+		if (data->handle_func) {
-+			data->lock = TRUE;
-+
-+			data->handle_func(connection, message, data);
-+
-+			data->callbacks = data->processed;
-+			data->processed = NULL;
-+			data->lock = FALSE;
-+		}
-+
-+		if (!data->callbacks)
-+			delete_listener = g_slist_prepend(delete_listener,
-+								current);
- 	}
- 
--	if (data->callbacks)
--		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-+	for (current = delete_listener; current != NULL;
-+					current = delete_listener->next) {
-+		GSList *l = current->data;
- 
--	remove_match(data);
-+		data = l->data;
- 
--	listeners = g_slist_remove(listeners, data);
-+		/* Has any other callback added callbacks back to this data? */
-+		if (data->callbacks != NULL)
-+			continue;
-+
-+		remove_match(data);
-+		listeners = g_slist_remove_link(listeners, l);
-+
-+		filter_data_free(data);
-+	}
-+
-+	g_slist_free(delete_listener);
- 
- 	/* Remove filter if there are no listeners left for the connection */
- 	if (filter_data_find(connection, NULL, NULL, NULL, NULL, NULL,
-@@ -543,8 +618,6 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
- 		dbus_connection_remove_filter(connection, message_filter,
- 						NULL);
- 
--	filter_data_free(data);
--
- 	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- }
- 
--- 
-1.7.12.1
+The Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum,
+hosted by The Linux Foundation
 
