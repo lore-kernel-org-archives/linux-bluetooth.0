@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v8 10/13] heartrate: Add support to reset Energy Expended
-Date: Tue, 25 Sep 2012 16:27:43 +0200
-Message-ID: <1348583267-16816-11-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: Rafal Garbat <rafal.garbat@tieto.com>
+Subject: [PATCH v8 13/13] heartrate: Add test script
+Date: Tue, 25 Sep 2012 16:27:46 +0200
+Message-ID: <1348583267-16816-14-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1348583267-16816-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1348583267-16816-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,87 +12,134 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds Reset method on HeartRate interface to reset Energy
-Expended.
----
- profiles/heartrate/heartrate.c | 45 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 44 insertions(+), 1 deletion(-)
+From: Rafal Garbat <rafal.garbat@tieto.com>
 
-diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index ba1c1fa..add34b8 100644
---- a/profiles/heartrate/heartrate.c
-+++ b/profiles/heartrate/heartrate.c
-@@ -41,6 +41,7 @@
- #include "log.h"
- #include "heartrate.h"
- 
-+#define HEART_RATE_INTERFACE		"org.bluez.HeartRate"
- #define HEART_RATE_MANAGER_INTERFACE	"org.bluez.HeartRateManager"
- #define HEART_RATE_WATCHER_INTERFACE	"org.bluez.HeartRateWatcher"
- 
-@@ -628,6 +629,35 @@ static const GDBusMethodTable heartrate_manager_methods[] = {
- 	{ }
- };
- 
-+static DBusMessage *hrcp_reset(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	struct heartrate *hr = data;
-+	uint8_t value;
-+	char *vmsg;
+---
+ Makefile.tools      |   3 +-
+ test/test-heartrate | 103 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 105 insertions(+), 1 deletion(-)
+ create mode 100755 test/test-heartrate
+
+diff --git a/Makefile.tools b/Makefile.tools
+index 15fe4e2..81feb75 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -212,4 +212,5 @@ EXTRA_DIST += test/sap_client.py test/hsplay test/hsmicro \
+ 		test/test-proximity test/test-thermometer test/test-profile \
+ 		test/test-health test/test-health-sink test/service-record.dtd \
+ 		test/service-did.xml test/service-spp.xml test/service-opp.xml \
+-		test/service-ftp.xml test/simple-player test/test-nap
++		test/service-ftp.xml test/simple-player test/test-nap \
++		test/test-heartrate
+diff --git a/test/test-heartrate b/test/test-heartrate
+new file mode 100755
+index 0000000..316375d
+--- /dev/null
++++ b/test/test-heartrate
+@@ -0,0 +1,103 @@
++#!/usr/bin/python
 +
-+	if (!hr->hrcp_val_handle)
-+		return btd_error_not_supported(msg);
++from __future__ import absolute_import, print_function, unicode_literals
 +
-+	if (!hr->attrib)
-+		return btd_error_not_available(msg);
++'''
++Heart Rate Monitor test script
++'''
 +
-+	value = 0x01;
-+	vmsg = g_strdup("Reset Control Point");
-+	gatt_write_char(hr->attrib, hr->hrcp_val_handle, &value,
-+					sizeof(value), char_write_cb, vmsg);
++import gobject
 +
-+	DBG("Energy Expended Value has been reset");
++import sys
++import dbus
++import dbus.service
++import dbus.mainloop.glib
++from optparse import OptionParser, make_option
 +
-+	return dbus_message_new_method_return(msg);
-+}
++class Watcher(dbus.service.Object):
++	@dbus.service.method("org.bluez.HeartRateWatcher",
++					in_signature="oa{sv}", out_signature="")
++	def MeasurementReceived(self, device, measure):
++		print("Measurement received from %s" % device)
++		print("Value: ", measure["Value"])
 +
-+static const GDBusMethodTable heartrate_device_methods[] = {
-+	{ GDBUS_METHOD("Reset", NULL, NULL,
-+			hrcp_reset) },
-+	{ }
-+};
++		if "Energy" in measure:
++			print("Energy: ", measure["Energy"])
 +
- int heartrate_adapter_register(struct btd_adapter *adapter)
- {
- 	struct heartrate_adapter *hradapter;
-@@ -685,6 +715,18 @@ int heartrate_device_register(struct btd_device *device,
- 	hr->dev = btd_device_ref(device);
- 	hr->hradapter = hradapter;
- 
-+	if (!g_dbus_register_interface(btd_get_dbus_connection(),
-+						device_get_path(device),
-+						HEART_RATE_INTERFACE,
-+						heartrate_device_methods,
-+						NULL, NULL, hr,
-+						destroy_heartrate)) {
-+		error("D-Bus failed to register %s interface",
-+						HEART_RATE_INTERFACE);
-+		destroy_heartrate(hr);
-+		return -EIO;
-+	}
++		if "Contact" in measure:
++			print("Contact: ", measure["Contact"])
 +
- 	hr->svc_range = g_new0(struct att_range, 1);
- 	hr->svc_range->start = prim->range.start;
- 	hr->svc_range->end = prim->range.end;
-@@ -718,5 +760,6 @@ void heartrate_device_unregister(struct btd_device *device)
- 
- 	hradapter->devices = g_slist_remove(hradapter->devices, hr);
- 
--	destroy_heartrate(hr);
-+	g_dbus_unregister_interface(btd_get_dbus_connection(),
-+				device_get_path(device), HEART_RATE_INTERFACE);
- }
++		if "Interval" in measure:
++			for i in measure["Interval"]:
++				print("Interval: ", i)
++
++if __name__ == "__main__":
++	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++
++	bus = dbus.SystemBus()
++
++	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
++					"org.bluez.Manager")
++
++	option_list = [
++		make_option("-i", "--adapter", action="store",
++			type="string", dest="adapter"),
++		make_option("-b", "--device", action="store",
++			type="string", dest="address"),
++		]
++
++	parser = OptionParser(option_list=option_list)
++
++	(options, args) = parser.parse_args()
++
++	if not options.address:
++		print("Usage: %s [-i <adapter>] -b <bdaddr> [cmd]" % (sys.argv[0]))
++		print("Possible commands:")
++		print("\tReset")
++		sys.exit(1)
++
++	if options.adapter:
++		adapter_path = manager.FindAdapter(options.adapter)
++	else:
++		adapter_path = manager.DefaultAdapter()
++
++	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
++							"org.bluez.Adapter")
++
++	heartrateManager = dbus.Interface(bus.get_object("org.bluez",
++				adapter_path), "org.bluez.HeartRateManager")
++
++	path = "/test/watcher"
++	heartrateManager.RegisterWatcher(path)
++
++	device_path = adapter.FindDevice(options.address)
++
++	device = dbus.Interface(bus.get_object("org.bluez", device_path),
++							"org.bluez.Device")
++
++	heartrate = dbus.Interface(bus.get_object("org.bluez",
++					device_path), "org.bluez.HeartRate")
++
++	watcher = Watcher(bus, path)
++
++	properties = heartrate.GetProperties()
++
++	if "Location" in properties:
++		print("Sensor location: %s" % properties["Location"])
++	else:
++		print("Sensor location is not supported")
++
++	if len(args) > 0:
++		if args[0] == "Reset":
++			reset_sup = properties["ResetSupported"]
++			if reset_sup:
++				heartrate.Reset()
++			else:
++				print("Reset not supported")
++				sys.exit(1)
++		else:
++			print("unknown command")
++			sys.exit(1)
++
++	mainloop = gobject.MainLoop()
++	mainloop.run()
 -- 
 1.7.11.3
 
