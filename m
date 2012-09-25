@@ -2,149 +2,91 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v3 4/6] hog: Create a FIFO for dummy suspend
-Date: Tue, 25 Sep 2012 12:34:18 -0300
-Message-Id: <1348587260-431-5-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v3 3/6] hog: Add suspend/resume callbacks declaration
+Date: Tue, 25 Sep 2012 12:34:17 -0300
+Message-Id: <1348587260-431-4-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1348587260-431-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1346696594-1062-1-git-send-email-claudio.takahasi@openbossa.org>
  <1348587260-431-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch creates a FIFO on "/tmp/hogsuspend" to allow the users to
-test the HoG suspend(HID Control Point) when the dummy back-end is
-enabled.
+This patch declares the callbacks functions that intend to be used
+by the suspend back-ends.
 ---
- profiles/input/suspend-dummy.c | 102 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 101 insertions(+), 1 deletion(-)
+ profiles/input/hog_manager.c   | 12 +++++++++++-
+ profiles/input/suspend-dummy.c | 10 +++++++++-
+ profiles/input/suspend.h       |  5 ++++-
+ 3 files changed, 24 insertions(+), 3 deletions(-)
 
+diff --git a/profiles/input/hog_manager.c b/profiles/input/hog_manager.c
+index 8ddaf2f..6d173cc 100644
+--- a/profiles/input/hog_manager.c
++++ b/profiles/input/hog_manager.c
+@@ -42,6 +42,16 @@
+ 
+ static gboolean suspend_supported = FALSE;
+ 
++static void suspend_callback(void)
++{
++	DBG("Suspending ...");
++}
++
++static void resume_callback(void)
++{
++	DBG("Resuming ...");
++}
++
+ static int hog_device_probe(struct btd_profile *p, struct btd_device *device,
+ 								GSList *uuids)
+ {
+@@ -72,7 +82,7 @@ static int hog_manager_init(void)
+ {
+ 	int err;
+ 
+-	err = suspend_init();
++	err = suspend_init(suspend_callback, resume_callback);
+ 	if (err < 0)
+ 		DBG("Suspend: %s(%d)", strerror(-err), -err);
+ 	else
 diff --git a/profiles/input/suspend-dummy.c b/profiles/input/suspend-dummy.c
-index 282d3fb..f2941fe 100644
+index 0a97158..282d3fb 100644
 --- a/profiles/input/suspend-dummy.c
 +++ b/profiles/input/suspend-dummy.c
-@@ -26,21 +26,121 @@
+@@ -26,10 +26,18 @@
  #include <config.h>
  #endif
  
-+#include <errno.h>
- #include <stdlib.h>
-+#include <stdio.h>
-+#include <string.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+#include <unistd.h>
- 
-+#include <glib.h>
++#include <stdlib.h>
 +
-+#include "log.h"
  #include "suspend.h"
  
-+#define HOG_SUSPEND_FIFO	"/tmp/hogsuspend"
+-int suspend_init(void)
++static suspend_event suspend_cb = NULL;
++static resume_event resume_cb = NULL;
 +
- static suspend_event suspend_cb = NULL;
- static resume_event resume_cb = NULL;
-+static GIOChannel *fifoio = NULL;
-+
-+static int fifo_open(void);
-+
-+static gboolean read_fifo(GIOChannel *io, GIOCondition cond, gpointer user_data)
-+{
-+	gchar buffer[12];
-+	gsize offset, left, bread;
-+	GIOStatus iostatus;
-+
-+	if (cond & (G_IO_ERR | G_IO_HUP))
-+		goto failed;
-+
-+	offset = 0;
-+	left = sizeof(buffer) - 1;
-+	memset(buffer, 0, sizeof(buffer));
-+
-+	do {
-+		iostatus = g_io_channel_read_chars(io, &buffer[offset], left,
-+								&bread, NULL);
-+
-+		offset += bread;
-+		left -= bread;
-+		if (left == 0)
-+			break;
-+	} while (iostatus == G_IO_STATUS_NORMAL);
-+
-+	if (g_ascii_strncasecmp("suspend", buffer, 7) == 0)
-+		suspend_cb();
-+	else if (g_ascii_strncasecmp("resume", buffer, 6) == 0)
-+		resume_cb();
-+
-+	return TRUE;
-+
-+failed:
-+	/*
-+	 * Both ends needs to be open simultaneously before proceeding any input
-+	 * or output operation. When the remote closes the channel, hup signal is
-+	 * received on this end.
-+	 */
-+
-+	g_io_channel_unref(fifoio);
-+	fifoio = NULL;
-+
-+	fifo_open();
-+
-+	return FALSE;
-+}
-+
-+static int fifo_open(void)
-+{
-+	GIOCondition condition = G_IO_IN | G_IO_ERR | G_IO_HUP;
-+	int fd;
-+
-+	fd = open(HOG_SUSPEND_FIFO, O_RDONLY | O_NONBLOCK);
-+	if (fd < 0) {
-+		int err = -errno;
-+		error("Can't open FIFO (%s): %s(%d)", HOG_SUSPEND_FIFO,
-+							strerror(-err), -err);
-+		return err;
-+	}
-+
-+	fifoio = g_io_channel_unix_new(fd);
-+	g_io_channel_set_close_on_unref(fifoio, TRUE);
-+
-+	g_io_add_watch(fifoio, condition, read_fifo, NULL);
-+
-+	return 0;
-+}
- 
- int suspend_init(suspend_event suspend, resume_event resume)
++int suspend_init(suspend_event suspend, resume_event resume)
  {
-+	int ret;
++	suspend_cb = suspend;
++	resume_cb = resume;
 +
- 	suspend_cb = suspend;
- 	resume_cb = resume;
- 
--	return 0;
-+	if (mkfifo(HOG_SUSPEND_FIFO, S_IRWXU) < 0) {
-+		int err = -errno;
-+		error("Can't create FIFO (%s) : %s(%d)", HOG_SUSPEND_FIFO,
-+							strerror(-err), -err);
-+		return err;
-+	}
-+
-+	ret = fifo_open();
-+	if (ret < 0)
-+		remove(HOG_SUSPEND_FIFO);
-+
-+	return ret;
+ 	return 0;
  }
  
- void suspend_exit(void)
- {
-+	if (fifoio) {
-+		g_io_channel_shutdown(fifoio, FALSE, NULL);
-+		g_io_channel_unref(fifoio);
-+	}
+diff --git a/profiles/input/suspend.h b/profiles/input/suspend.h
+index 3f37a29..bfee3cf 100644
+--- a/profiles/input/suspend.h
++++ b/profiles/input/suspend.h
+@@ -22,5 +22,8 @@
+  *
+  */
+ 
+-int suspend_init(void);
++typedef void (*suspend_event) (void);
++typedef void (*resume_event) (void);
 +
-+	remove(HOG_SUSPEND_FIFO);
- }
++int suspend_init(suspend_event suspend, resume_event resume);
+ void suspend_exit(void);
 -- 
 1.7.12
 
