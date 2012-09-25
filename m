@@ -2,134 +2,104 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v2 5/8] scan: Enable Scan Refresh notification
-Date: Tue, 25 Sep 2012 12:26:39 -0300
-Message-Id: <1348586802-32613-6-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v2 4/8] scan: Add write scan interval window
+Date: Tue, 25 Sep 2012 12:26:38 -0300
+Message-Id: <1348586802-32613-5-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1348586802-32613-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1346695965-25422-1-git-send-email-claudio.takahasi@openbossa.org>
  <1348586802-32613-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch discovers the Scan Refresh Characteristic handle and sets
-it's Client Characteristic Configuration bit to enable notifications.
+This patch adds the handle discovery of the Scan Interval Window
+Characteristic and writes the default value (hard-coded in the kernel)
+of the scan interval, and scan window in the remote's characteristic.
 ---
- profiles/scanparam/scan.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 80 insertions(+), 1 deletion(-)
+ profiles/scanparam/scan.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
 diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
-index 03934b0..7285774 100644
+index c6aaf97..03934b0 100644
 --- a/profiles/scanparam/scan.c
 +++ b/profiles/scanparam/scan.c
-@@ -41,6 +41,7 @@
+@@ -31,6 +31,7 @@
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/uuid.h>
+ 
++#include "log.h"
+ #include "adapter.h"
+ #include "device.h"
+ #include "att.h"
+@@ -39,10 +40,18 @@
+ #include "attio.h"
  #include "scan.h"
  
- #define SCAN_INTERVAL_WIN_UUID		0x2A4F
-+#define SCAN_REFRESH_UUID		0x2A31
++#define SCAN_INTERVAL_WIN_UUID		0x2A4F
++
++#define SCAN_INTERVAL		0x0060
++#define SCAN_WINDOW		0x0030
++
+ struct scan {
+ 	struct btd_device *device;
+ 	GAttrib *attrib;
++	struct att_range range;
+ 	guint attioid;
++	uint16_t interval;
++	uint16_t window;
+ };
  
- #define SCAN_INTERVAL		0x0060
- #define SCAN_WINDOW		0x0030
-@@ -64,6 +65,80 @@ static gint scan_device_cmp(gconstpointer a, gconstpointer b)
+ GSList *servers = NULL;
+@@ -55,11 +64,42 @@ static gint scan_device_cmp(gconstpointer a, gconstpointer b)
  	return (device == scan->device ? 0 : -1);
  }
  
-+static void ccc_written_cb(guint8 status, const guint8 *pdu,
-+					guint16 plen, gpointer user_data)
-+{
-+	if (status != 0) {
-+		error("Write Scan Refresh CCC failed: %s",
-+						att_ecode2str(status));
-+		return;
-+	}
-+
-+	DBG("Scan Refresh: notification enabled");
-+}
-+
-+static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
-+					guint16 len, gpointer user_data)
-+{
-+	struct scan *scan = user_data;
-+	struct att_data_list *list;
-+	uint8_t *ptr;
-+	uint16_t uuid16, handle;
-+	uint8_t value[2];
-+	uint8_t format;
-+
-+	list = dec_find_info_resp(pdu, len, &format);
-+	if (list == NULL)
-+		return;
-+
-+	if (format != ATT_FIND_INFO_RESP_FMT_16BIT)
-+		goto done;
-+
-+	ptr = list->data[0];
-+	handle = att_get_u16(ptr);
-+	uuid16 = att_get_u16(&ptr[2]);
-+
-+	if (uuid16 != GATT_CLIENT_CHARAC_CFG_UUID)
-+		goto done;
-+
-+	att_put_u16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
-+	gatt_write_char(scan->attrib, handle, value, sizeof(value),
-+						ccc_written_cb, NULL);
-+done:
-+	att_data_list_free(list);
-+}
-+
-+static void refresh_discovered_cb(GSList *chars, guint8 status,
++static void iwin_discovered_cb(GSList *chars, guint8 status,
 +						gpointer user_data)
 +{
 +	struct scan *scan = user_data;
 +	struct gatt_char *chr;
-+	uint16_t start, end;
++	uint8_t value[4];
 +
 +	if (status) {
-+		error("Scan Refresh %s", att_ecode2str(status));
-+		return;
-+	}
-+
-+	if (!chars) {
-+		DBG("Scan Refresh not supported");
++		error("Discover Scan Interval Window: %s",
++						att_ecode2str(status));
 +		return;
 +	}
 +
 +	chr = chars->data;
 +
-+	DBG("Scan Refresh handle: 0x%04x", chr->value_handle);
++	DBG("Scan Interval Window handle: 0x%04x",
++						chr->value_handle);
 +
-+	start = chr->value_handle + 1;
-+	end = scan->range.end;
++	att_put_u16(SCAN_INTERVAL, &value[0]);
++	att_put_u16(SCAN_WINDOW, &value[2]);
 +
-+	if (start >= end)
-+		return;
-+
-+	gatt_find_info(scan->attrib, start, end,
-+				discover_descriptor_cb, user_data);
++	gatt_write_char(scan->attrib, chr->value_handle, value,
++						sizeof(value), NULL, NULL);
 +}
 +
- static void iwin_discovered_cb(GSList *chars, guint8 status,
- 						gpointer user_data)
- {
-@@ -92,14 +167,18 @@ static void iwin_discovered_cb(GSList *chars, guint8 status,
  static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
  {
  	struct scan *scan = user_data;
--	bt_uuid_t iwin_uuid;
-+	bt_uuid_t iwin_uuid, refresh_uuid;
- 
- 	bt_uuid16_create(&iwin_uuid, SCAN_INTERVAL_WIN_UUID);
-+	bt_uuid16_create(&refresh_uuid, SCAN_REFRESH_UUID);
++	bt_uuid_t iwin_uuid;
++
++	bt_uuid16_create(&iwin_uuid, SCAN_INTERVAL_WIN_UUID);
  
  	scan->attrib = g_attrib_ref(attrib);
- 
- 	gatt_discover_char(scan->attrib, scan->range.start, scan->range.end,
- 					&iwin_uuid, iwin_discovered_cb, scan);
 +
 +	gatt_discover_char(scan->attrib, scan->range.start, scan->range.end,
-+				&refresh_uuid, refresh_discovered_cb, scan);
++					&iwin_uuid, iwin_discovered_cb, scan);
  }
  
  static void attio_disconnected_cb(gpointer user_data)
+@@ -76,6 +116,7 @@ int scan_register(struct btd_device *device, struct gatt_primary *prim)
+ 
+ 	scan = g_new0(struct scan, 1);
+ 	scan->device = btd_device_ref(device);
++	scan->range = prim->range;
+ 	scan->attioid = btd_device_add_attio_callback(device,
+ 							attio_connected_cb,
+ 							attio_disconnected_cb,
 -- 
 1.7.12
 
