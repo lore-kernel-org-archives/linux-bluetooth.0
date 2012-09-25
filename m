@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Rafal Garbat <rafal.garbat@tieto.com>
-Subject: [PATCH v8 13/13] heartrate: Add test script
-Date: Tue, 25 Sep 2012 16:27:46 +0200
-Message-ID: <1348583267-16816-14-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v8 05/13] heartrate: Discover Heart Rate Measurement CCC
+Date: Tue, 25 Sep 2012 16:27:38 +0200
+Message-ID: <1348583267-16816-6-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1348583267-16816-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1348583267-16816-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,134 +12,104 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Rafal Garbat <rafal.garbat@tieto.com>
-
+This patch adds support to discover CCC descriptor for Heart Rate
+Measurement characteristic.
 ---
- Makefile.tools      |   3 +-
- test/test-heartrate | 103 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 105 insertions(+), 1 deletion(-)
- create mode 100755 test/test-heartrate
+ profiles/heartrate/heartrate.c | 66 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 65 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 15fe4e2..81feb75 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -212,4 +212,5 @@ EXTRA_DIST += test/sap_client.py test/hsplay test/hsmicro \
- 		test/test-proximity test/test-thermometer test/test-profile \
- 		test/test-health test/test-health-sink test/service-record.dtd \
- 		test/service-did.xml test/service-spp.xml test/service-opp.xml \
--		test/service-ftp.xml test/simple-player test/test-nap
-+		test/service-ftp.xml test/simple-player test/test-nap \
-+		test/test-heartrate
-diff --git a/test/test-heartrate b/test/test-heartrate
-new file mode 100755
-index 0000000..316375d
---- /dev/null
-+++ b/test/test-heartrate
-@@ -0,0 +1,103 @@
-+#!/usr/bin/python
+diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
+index a6733d3..d3d6d43 100644
+--- a/profiles/heartrate/heartrate.c
++++ b/profiles/heartrate/heartrate.c
+@@ -52,6 +52,7 @@ struct heartrate {
+ 	struct att_range		*svc_range;	/* primary svc range */
+ 
+ 	uint16_t			measurement_val_handle;
++	uint16_t			measurement_ccc_handle;
+ 	uint16_t			hrcp_val_handle;
+ };
+ 
+@@ -112,6 +113,65 @@ static void destroy_heartrate_adapter(gpointer user_data)
+ 	g_free(hradapter);
+ }
+ 
++static void discover_ccc_cb(guint8 status, const guint8 *pdu,
++						guint16 len, gpointer user_data)
++{
++	struct heartrate *hr = user_data;
++	struct att_data_list *list;
++	uint8_t format;
++	int i;
 +
-+from __future__ import absolute_import, print_function, unicode_literals
++	if (status != 0) {
++		error("Discover Heart Rate Measurement descriptors failed: %s",
++							att_ecode2str(status));
++		return;
++	}
 +
-+'''
-+Heart Rate Monitor test script
-+'''
++	list = dec_find_info_resp(pdu, len, &format);
++	if (list == NULL)
++		return;
 +
-+import gobject
++	if (format != ATT_FIND_INFO_RESP_FMT_16BIT)
++		goto done;
 +
-+import sys
-+import dbus
-+import dbus.service
-+import dbus.mainloop.glib
-+from optparse import OptionParser, make_option
++	for (i = 0; i < list->num; i++) {
++		uint8_t *value;
++		uint16_t handle, uuid;
 +
-+class Watcher(dbus.service.Object):
-+	@dbus.service.method("org.bluez.HeartRateWatcher",
-+					in_signature="oa{sv}", out_signature="")
-+	def MeasurementReceived(self, device, measure):
-+		print("Measurement received from %s" % device)
-+		print("Value: ", measure["Value"])
++		value = list->data[i];
++		handle = att_get_u16(value);
++		uuid = att_get_u16(value + 2);
 +
-+		if "Energy" in measure:
-+			print("Energy: ", measure["Energy"])
++		if (uuid == GATT_CLIENT_CHARAC_CFG_UUID) {
++			hr->measurement_ccc_handle = handle;
++			break;
++		}
++	}
 +
-+		if "Contact" in measure:
-+			print("Contact: ", measure["Contact"])
++done:
++	att_data_list_free(list);
++}
 +
-+		if "Interval" in measure:
-+			for i in measure["Interval"]:
-+				print("Interval: ", i)
++static void discover_measurement_ccc(struct heartrate *hr,
++				struct gatt_char *c, struct gatt_char *c_next)
++{
++	uint16_t start, end;
 +
-+if __name__ == "__main__":
-+	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++	start = c->value_handle + 1;
 +
-+	bus = dbus.SystemBus()
++	if (c_next != NULL) {
++		if (start == c_next->handle)
++			return;
++		end = c_next->handle - 1;
++	} else if (c->value_handle != hr->svc_range->end) {
++		end = hr->svc_range->end;
++	} else {
++		return;
++	}
 +
-+	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
-+					"org.bluez.Manager")
++	gatt_find_info(hr->attrib, start, end, discover_ccc_cb, hr);
++}
 +
-+	option_list = [
-+		make_option("-i", "--adapter", action="store",
-+			type="string", dest="adapter"),
-+		make_option("-b", "--device", action="store",
-+			type="string", dest="address"),
-+		]
+ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ {
+ 	struct heartrate *hr = user_data;
+@@ -126,8 +186,12 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ 		struct gatt_char *c = chars->data;
+ 
+ 		if (g_strcmp0(c->uuid, HEART_RATE_MEASUREMENT_UUID) == 0) {
++			struct gatt_char *c_next =
++				(chars->next ? chars->next->data : NULL);
 +
-+	parser = OptionParser(option_list=option_list)
+ 			hr->measurement_val_handle = c->value_handle;
+-			/* TODO: discover CCC handle */
 +
-+	(options, args) = parser.parse_args()
-+
-+	if not options.address:
-+		print("Usage: %s [-i <adapter>] -b <bdaddr> [cmd]" % (sys.argv[0]))
-+		print("Possible commands:")
-+		print("\tReset")
-+		sys.exit(1)
-+
-+	if options.adapter:
-+		adapter_path = manager.FindAdapter(options.adapter)
-+	else:
-+		adapter_path = manager.DefaultAdapter()
-+
-+	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
-+							"org.bluez.Adapter")
-+
-+	heartrateManager = dbus.Interface(bus.get_object("org.bluez",
-+				adapter_path), "org.bluez.HeartRateManager")
-+
-+	path = "/test/watcher"
-+	heartrateManager.RegisterWatcher(path)
-+
-+	device_path = adapter.FindDevice(options.address)
-+
-+	device = dbus.Interface(bus.get_object("org.bluez", device_path),
-+							"org.bluez.Device")
-+
-+	heartrate = dbus.Interface(bus.get_object("org.bluez",
-+					device_path), "org.bluez.HeartRate")
-+
-+	watcher = Watcher(bus, path)
-+
-+	properties = heartrate.GetProperties()
-+
-+	if "Location" in properties:
-+		print("Sensor location: %s" % properties["Location"])
-+	else:
-+		print("Sensor location is not supported")
-+
-+	if len(args) > 0:
-+		if args[0] == "Reset":
-+			reset_sup = properties["ResetSupported"]
-+			if reset_sup:
-+				heartrate.Reset()
-+			else:
-+				print("Reset not supported")
-+				sys.exit(1)
-+		else:
-+			print("unknown command")
-+			sys.exit(1)
-+
-+	mainloop = gobject.MainLoop()
-+	mainloop.run()
++			discover_measurement_ccc(hr, c, c_next);
+ 		} else if (g_strcmp0(c->uuid, BODY_SENSOR_LOCATION_UUID) == 0) {
+ 			DBG("Body Sensor Location supported");
+ 			/* TODO: read characterictic value */
 -- 
 1.7.11.3
 
