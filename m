@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 04/14] thermometer: Include remote device information in MeasurementReceived
-Date: Tue, 25 Sep 2012 16:52:33 +0200
-Message-ID: <1348584763-22824-5-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 08/14] thermometer: Update driver naming style
+Date: Tue, 25 Sep 2012 16:52:37 +0200
+Message-ID: <1348584763-22824-9-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1348584763-22824-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1348584763-22824-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,67 +12,52 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since watchers are now registered per-adapter it's necessary to include
-remote device information in MeasurementReceived callback.
+This patch changes device probe and remove functions name to include
+'device' rather than 'driver' name as it better describes what both
+do.
 
-This patch adds parameter to MeasurementReceived method which is an
-object path to remote device object.
+Also profile driver name is changed to better describe that it's now
+profile driver rather than device driver only.
 ---
- profiles/thermometer/thermometer.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ profiles/thermometer/manager.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
-index 4eb67a7..f0c1d67 100644
---- a/profiles/thermometer/thermometer.c
-+++ b/profiles/thermometer/thermometer.c
-@@ -101,13 +101,14 @@ struct watcher {
- };
+diff --git a/profiles/thermometer/manager.c b/profiles/thermometer/manager.c
+index 86e3a0f..6057633 100644
+--- a/profiles/thermometer/manager.c
++++ b/profiles/thermometer/manager.c
+@@ -41,7 +41,7 @@ static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
+ 	return g_strcmp0(prim->uuid, uuid);
+ }
  
- struct measurement {
--	int16_t		exp;
--	int32_t		mant;
--	uint64_t	time;
--	gboolean	suptime;
--	char		*unit;
--	char		*type;
--	char		*value;
-+	struct thermometer	*t;
-+	int16_t			exp;
-+	int32_t			mant;
-+	uint64_t		time;
-+	gboolean		suptime;
-+	char			*unit;
-+	char			*type;
-+	char			*value;
- };
- 
- struct tmp_interval_data {
-@@ -1027,6 +1028,7 @@ static void update_watcher(gpointer data, gpointer user_data)
+-static int thermometer_driver_probe(struct btd_profile *p,
++static int thermometer_device_probe(struct btd_profile *p,
+ 					struct btd_device *device,
+ 					GSList *uuids)
  {
- 	struct watcher *w = data;
- 	struct measurement *m = user_data;
-+	const gchar *path = device_get_path(m->t->dev);
- 	DBusMessageIter iter;
- 	DBusMessageIter dict;
- 	DBusMessage *msg;
-@@ -1039,6 +1041,8 @@ static void update_watcher(gpointer data, gpointer user_data)
+@@ -60,7 +60,7 @@ static int thermometer_driver_probe(struct btd_profile *p,
+ 	return thermometer_register(device, tattr);
+ }
  
- 	dbus_message_iter_init_append(msg, &iter);
- 
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH , &path);
-+
- 	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
- 			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
- 			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
-@@ -1064,6 +1068,8 @@ static void recv_measurement(struct thermometer *t, struct measurement *m)
+-static void thermometer_driver_remove(struct btd_profile *p,
++static void thermometer_device_remove(struct btd_profile *p,
+ 						struct btd_device *device)
  {
- 	GSList *wlist;
+ 	thermometer_unregister(device);
+@@ -79,10 +79,10 @@ static void thermometer_adapter_remove(struct btd_profile *p,
+ }
  
-+	m->t = t;
-+
- 	if (g_strcmp0(m->value, "Intermediate") == 0)
- 		wlist = t->tadapter->iwatchers;
- 	else
+ static struct btd_profile thermometer_profile = {
+-	.name		= "thermometer-device-driver",
++	.name		= "Health Thermometer GATT driver",
+ 	.remote_uuids	= BTD_UUIDS(HEALTH_THERMOMETER_UUID),
+-	.device_probe	= thermometer_driver_probe,
+-	.device_remove	= thermometer_driver_remove,
++	.device_probe	= thermometer_device_probe,
++	.device_remove	= thermometer_device_remove,
+ 	.adapter_probe	= thermometer_adapter_probe,
+ 	.adapter_remove	= thermometer_adapter_remove
+ };
 -- 
 1.7.11.3
 
