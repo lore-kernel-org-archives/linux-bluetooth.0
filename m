@@ -1,108 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Sep 2012 13:03:38 +0300
+Date: Tue, 25 Sep 2012 13:02:24 +0300
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH hcidump] amp: Decode Read Data Block Size HCI cmd
-Message-ID: <20120925100322.GE2509@aemeltch-MOBL1>
-References: <1346331979-3837-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH hcidump] amp: Decode Num Completed Data Blocks
+Message-ID: <20120925100222.GD2509@aemeltch-MOBL1>
+References: <1346398640-8423-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1346331979-3837-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1346398640-8423-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ping
 
-On Thu, Aug 30, 2012 at 04:06:19PM +0300, Andrei Emeltchenko wrote:
+On Fri, Aug 31, 2012 at 10:37:20AM +0300, Andrei Emeltchenko wrote:
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Decode Read Data Block Size HCI command and command status.
+> Adds decoding Number Of Completed Data Blocks Event
 > 
->  < HCI Command: Read Data Block Size (0x04|0x000a) plen 0
->  > HCI Event: Command Complete (0x0e) plen 10
->     Read Data Block Size (0x04|0x000a) ncmd 1
->     status 0x00
->     Max ACL 1492 Block len 1492 Num blocks 4
+> > HCI Event: Number Of Completed Data Blocks (0x48) plen 9
+>     Total num blocks 4 Num handles 1
+>       Handle 0x0001: Num complt pkts 1 Num complt blks 1
 > ---
->  lib/hci.h    |    8 ++++++++
->  parser/hci.c |   24 +++++++++++++++++++++++-
->  2 files changed, 31 insertions(+), 1 deletion(-)
+>  lib/hci.h    |   10 ++++++++++
+>  parser/hci.c |   22 ++++++++++++++++++++++
+>  2 files changed, 32 insertions(+)
 > 
 > diff --git a/lib/hci.h b/lib/hci.h
-> index 3dbb221..d068a2f 100644
+> index d068a2f..7eacca5 100644
 > --- a/lib/hci.h
 > +++ b/lib/hci.h
-> @@ -1316,6 +1316,14 @@ typedef struct {
->  } __attribute__ ((packed)) read_bd_addr_rp;
->  #define READ_BD_ADDR_RP_SIZE 7
+> @@ -2197,6 +2197,16 @@ typedef struct {
+>  #define EVT_FLOW_SPEC_MODIFY_COMPLETE_SIZE 3
 >  
-> +#define OCF_READ_DATA_BLOCK_SIZE	0x000A
+>  #define EVT_NUMBER_COMPLETED_BLOCKS		0x48
 > +typedef struct {
-> +	uint8_t		status;
-> +	uint16_t	max_acl_len;
-> +	uint16_t	data_block_len;
-> +	uint16_t	num_blocks;
-> +} __attribute__ ((packed)) read_data_block_size_rp;
-> +
->  /* Status params */
->  #define OGF_STATUS_PARAM	0x05
+> +	uint16_t		handle;
+> +	uint16_t		num_cmplt_pkts;
+> +	uint16_t		num_cmplt_blks;
+> +} __attribute__ ((packed)) cmplt_handle;
+> +typedef struct {
+> +	uint16_t		total_num_blocks;
+> +	uint8_t			num_handles;
+> +	cmplt_handle		handles[0];
+> +}  __attribute__ ((packed)) evt_num_completed_blocks;
 >  
+>  #define EVT_AMP_STATUS_CHANGE			0x4D
+>  typedef struct {
 > diff --git a/parser/hci.c b/parser/hci.c
-> index 115cf1e..38794bd 100644
+> index 38794bd..19cd419 100644
 > --- a/parser/hci.c
 > +++ b/parser/hci.c
-> @@ -338,7 +338,7 @@ static char *cmd_hostctl_str[CMD_HOSTCTL_NUM + 1] = {
->  	"Write LE Host Supported",
->  };
->  
-> -#define CMD_INFO_NUM 9
-> +#define CMD_INFO_NUM 10
->  static char *cmd_info_str[CMD_INFO_NUM + 1] = {
->  	"Unknown",
->  	"Read Local Version Information",
-> @@ -350,6 +350,7 @@ static char *cmd_info_str[CMD_INFO_NUM + 1] = {
->  	"Read Country Code",
->  	"Unknown",
->  	"Read BD ADDR",
-> +	"Read Data Block Size",
->  };
->  
->  #define CMD_STATUS_NUM 11
-> @@ -2041,6 +2042,24 @@ static inline void bdaddr_response_dump(int level, struct frame *frm)
->  	raw_dump(level, frm);
+> @@ -3743,6 +3743,25 @@ static inline void flow_spec_modify_dump(int level, struct frame *frm)
+>  	}
 >  }
 >  
-> +static inline void read_data_block_size_dump(int level, struct frame *frm)
+> +static inline void num_completed_blocks_dump(int level, struct frame *frm)
 > +{
-> +	read_data_block_size_rp *rp = frm->ptr;
+> +	evt_num_completed_blocks *evt = frm->ptr;
+> +	int i;
 > +
 > +	p_indent(level, frm);
-> +	printf("status 0x%2.2x\n", rp->status);
+> +	printf("Total num blocks %d Num handles %d\n",
+> +			btohs(evt->total_num_blocks), evt->num_handles);
 > +
-> +	if (rp->status > 0) {
-> +		p_indent(level, frm);
-> +		printf("Error: %s\n", status2str(rp->status));
-> +	} else {
-> +		p_indent(level, frm);
-> +		printf("Max ACL %d Block len %d Num blocks %d\n",
-> +			btohs(rp->max_acl_len), btohs(rp->data_block_len),
-> +							btohs(rp->num_blocks));
+> +	for (i = 0; i < evt->num_handles; i++) {
+> +		cmplt_handle *h = &evt->handles[i];
+> +
+> +		p_indent(level + 1, frm);
+> +		printf("Handle 0x%4.4x: Num complt pkts %d Num complt blks %d\n",
+> +				btohs(h->handle), btohs(h->num_cmplt_pkts),
+> +				btohs(h->num_cmplt_blks));
 > +	}
 > +}
 > +
->  static inline void generic_response_dump(int level, struct frame *frm)
+>  static inline void event_dump(int level, struct frame *frm)
 >  {
->  	uint8_t status = get_u8(frm);
-> @@ -2886,6 +2905,9 @@ static inline void cmd_complete_dump(int level, struct frame *frm)
->  		case OCF_READ_BD_ADDR:
->  			bdaddr_response_dump(level, frm);
->  			return;
-> +		case OCF_READ_DATA_BLOCK_SIZE:
-> +			read_data_block_size_dump(level, frm);
-> +			return;
->  		}
+>  	hci_event_hdr *hdr = frm->ptr;
+> @@ -3969,6 +3988,9 @@ static inline void event_dump(int level, struct frame *frm)
+>  	case EVT_FLOW_SPEC_MODIFY_COMPLETE:
+>  		flow_spec_modify_dump(level + 1, frm);
 >  		break;
->  
+> +	case EVT_NUMBER_COMPLETED_BLOCKS:
+> +		num_completed_blocks_dump(level + 1, frm);
+> +		break;
+>  	default:
+>  		raw_dump(level, frm);
+>  		break;
 > -- 
 > 1.7.9.5
 > 
