@@ -2,105 +2,53 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v2 3/8] scan: Add ATTIO callbacks registration
-Date: Tue, 25 Sep 2012 12:26:37 -0300
-Message-Id: <1348586802-32613-4-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v2 1/8] scan: Add plugin skeleton
+Date: Tue, 25 Sep 2012 12:26:35 -0300
+Message-Id: <1348586802-32613-2-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1348586802-32613-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1346695965-25422-1-git-send-email-claudio.takahasi@openbossa.org>
  <1348586802-32613-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch add the functions to manage ATTIO callbacks. The current
-registration mechanism is not suitable for this service since it needs
-to be passive. Scan Parameters should not actively request connections,
-it needs to be notified if the connections has been established
-requested by other services.
+This patch adds the Makefile changes and plugin declaration to support
+Scan Parameters service. BlueZ will act as Scan Client writting to a Scan
+Server the scanning parameters.
 ---
- Makefile.am                  |   3 +-
- profiles/scanparam/manager.c |  26 ++++++++++-
- profiles/scanparam/scan.c    | 105 +++++++++++++++++++++++++++++++++++++++++++
- profiles/scanparam/scan.h    |  26 +++++++++++
- 4 files changed, 158 insertions(+), 2 deletions(-)
- create mode 100644 profiles/scanparam/scan.c
- create mode 100644 profiles/scanparam/scan.h
+ Makefile.am               |  5 +++--
+ profiles/scanparam/main.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 56 insertions(+), 2 deletions(-)
+ create mode 100644 profiles/scanparam/main.c
 
 diff --git a/Makefile.am b/Makefile.am
-index 50f780e..bdfa1cd 100644
+index 315077f..bf86453 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -243,7 +243,8 @@ builtin_sources += profiles/thermometer/main.c \
- 			profiles/gatt/gas.c \
- 			profiles/scanparam/main.c \
- 			profiles/scanparam/manager.h \
--			profiles/scanparam/manager.c
-+			profiles/scanparam/manager.c \
-+			profiles/scanparam/scan.h profiles/scanparam/scan.c
+@@ -211,7 +211,7 @@ endif
+ 
+ if GATTMODULES
+ builtin_modules += thermometer alert time gatt_example proximity deviceinfo \
+-			gatt
++			gatt scanparam
+ builtin_sources += profiles/thermometer/main.c \
+ 			profiles/thermometer/manager.h \
+ 			profiles/thermometer/manager.c \
+@@ -240,7 +240,8 @@ builtin_sources += profiles/thermometer/main.c \
+ 			profiles/deviceinfo/deviceinfo.c \
+ 			profiles/gatt/main.c profiles/gatt/manager.h \
+ 			profiles/gatt/manager.c profiles/gatt/gas.h \
+-			profiles/gatt/gas.c
++			profiles/gatt/gas.c \
++			profiles/scanparam/main.c
  endif
  
  builtin_modules += formfactor
-diff --git a/profiles/scanparam/manager.c b/profiles/scanparam/manager.c
-index c1ac0bb..24d1e78 100644
---- a/profiles/scanparam/manager.c
-+++ b/profiles/scanparam/manager.c
-@@ -27,26 +27,50 @@
- #endif
- 
- #include <stdbool.h>
-+#include <errno.h>
- #include <glib.h>
-+#include <bluetooth/uuid.h>
- 
- #include "log.h"
- #include "adapter.h"
- #include "device.h"
- #include "profile.h"
-+#include "att.h"
-+#include "gattrib.h"
-+#include "gatt.h"
- #include "manager.h"
-+#include "scan.h"
- 
- #define SCAN_PARAMETERS_UUID	"00001813-0000-1000-8000-00805f9b34fb"
- 
-+static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
-+{
-+	const struct gatt_primary *prim = a;
-+	const char *uuid = b;
-+
-+	return g_strcmp0(prim->uuid, uuid);
-+}
-+
- static int scan_param_probe(struct btd_profile *p, struct btd_device *device,
- 								GSList *uuids)
- {
-+	GSList *primaries, *l;
-+
- 	DBG("Probing Scan Parameters");
- 
--	return 0;
-+	primaries = btd_device_get_primaries(device);
-+
-+	l = g_slist_find_custom(primaries, SCAN_PARAMETERS_UUID,
-+							primary_uuid_cmp);
-+	if (!l)
-+		return -EINVAL;
-+
-+	return scan_register(device, l->data);
- }
- 
- static void scan_param_remove(struct btd_profile *p, struct btd_device *device)
- {
-+	scan_unregister(device);
- }
- 
- static struct btd_profile scan_profile = {
-diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
+diff --git a/profiles/scanparam/main.c b/profiles/scanparam/main.c
 new file mode 100644
-index 0000000..c6aaf97
+index 0000000..6e90929
 --- /dev/null
-+++ b/profiles/scanparam/scan.c
-@@ -0,0 +1,105 @@
++++ b/profiles/scanparam/main.c
+@@ -0,0 +1,53 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -129,115 +77,31 @@ index 0000000..c6aaf97
 +#include <config.h>
 +#endif
 +
-+#include <stdbool.h>
++#include <errno.h>
++#include <stdint.h>
++#include <glib.h>
 +
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/uuid.h>
++#include "log.h"
++#include "plugin.h"
++#include "hcid.h"
 +
-+#include "adapter.h"
-+#include "device.h"
-+#include "att.h"
-+#include "gattrib.h"
-+#include "gatt.h"
-+#include "attio.h"
-+#include "scan.h"
-+
-+struct scan {
-+	struct btd_device *device;
-+	GAttrib *attrib;
-+	guint attioid;
-+};
-+
-+GSList *servers = NULL;
-+
-+static gint scan_device_cmp(gconstpointer a, gconstpointer b)
++static int scan_param_init(void)
 +{
-+	const struct scan *scan = a;
-+	const struct btd_device *device = b;
-+
-+	return (device == scan->device ? 0 : -1);
-+}
-+
-+static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
-+{
-+	struct scan *scan = user_data;
-+
-+	scan->attrib = g_attrib_ref(attrib);
-+}
-+
-+static void attio_disconnected_cb(gpointer user_data)
-+{
-+	struct scan *scan = user_data;
-+
-+	g_attrib_unref(scan->attrib);
-+	scan->attrib = NULL;
-+}
-+
-+int scan_register(struct btd_device *device, struct gatt_primary *prim)
-+{
-+	struct scan *scan;
-+
-+	scan = g_new0(struct scan, 1);
-+	scan->device = btd_device_ref(device);
-+	scan->attioid = btd_device_add_attio_callback(device,
-+							attio_connected_cb,
-+							attio_disconnected_cb,
-+							scan);
-+
-+	servers = g_slist_prepend(servers, scan);
++	if (!main_opts.gatt_enabled) {
++		DBG("Scan Parameters: GATT is disabled");
++		return -ENOTSUP;
++	}
 +
 +	return 0;
 +}
 +
-+void scan_unregister(struct btd_device *device)
++static void scan_param_exit(void)
 +{
-+	struct scan *scan;
-+	GSList *l;
-+
-+	l = g_slist_find_custom(servers, device, scan_device_cmp);
-+	if (l == NULL)
-+		return;
-+
-+	scan = l->data;
-+	servers = g_slist_remove(servers, scan);
-+
-+	btd_device_remove_attio_callback(scan->device, scan->attioid);
-+	btd_device_unref(scan->device);
-+	g_attrib_unref(scan->attrib);
-+	g_free(scan);
 +}
-diff --git a/profiles/scanparam/scan.h b/profiles/scanparam/scan.h
-new file mode 100644
-index 0000000..93f7edd
---- /dev/null
-+++ b/profiles/scanparam/scan.h
-@@ -0,0 +1,26 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012  Nordic Semiconductor Inc.
-+ *  Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
 +
-+int scan_register(struct btd_device *device, struct gatt_primary *prim);
-+void scan_unregister(struct btd_device *device);
++BLUETOOTH_PLUGIN_DEFINE(scanparam, VERSION,
++			BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++			scan_param_init, scan_param_exit)
 -- 
 1.7.12
 
