@@ -1,73 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 25 Sep 2012 13:03:38 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH hcidump] amp: Decode Read Data Block Size HCI cmd
+Message-ID: <20120925100322.GE2509@aemeltch-MOBL1>
+References: <1346331979-3837-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1348501338-29639-4-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1348501338-29639-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1348501338-29639-4-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Tue, 25 Sep 2012 13:07:31 +0300
-Message-ID: <CABBYNZLGW=QZHUQmWzHux+f4Lgg_HkSctUh7hcB6W+mPejX9Pg@mail.gmail.com>
-Subject: Re: [PATCH v1 3/4] adapter: Queue parallel authorization requests
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1346331979-3837-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+ping
 
-On Mon, Sep 24, 2012 at 6:42 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-
-> +       g_queue_foreach(adapter->auths, (GFunc) g_free, NULL);
-> +       g_queue_free(adapter->auths);
-
-Above is probably a candidate to replace with g_queue_free_full
-
->  int btd_cancel_authorization(int auth_id)
->  {
-> -       struct btd_adapter *adapter;
-> -       struct agent *agent;
-> -       int err;
-> -
-> -       adapter = find_authorization(auth_id);
-> -       if (adapter == NULL)
-> -               return -EPERM;
-> -
-> -       if (adapter->auth_idle_id) {
-> -               g_source_remove(adapter->auth_idle_id);
-> -               adapter->auth_idle_id = 0;
-> -               g_free(adapter->auth);
-> -               adapter->auth = NULL;
-> -               return 0;
-> -       }
-> -
-> -       /*
-> -        * FIXME: Cancel fails if authorization is requested to adapter's
-> -        * agent and in the meanwhile CreatePairedDevice is called.
-> -        */
-> +       struct service_auth *auth;
->
-> -       agent = device_get_agent(adapter->auth->device);
-> -       if (!agent)
-> +       auth = find_authorization(auth_id);
-> +       if (auth == NULL)
->                 return -EPERM;
->
-> -       err = agent_cancel(agent);
-> +       g_queue_remove(auth->adapter->auths, auth);
->
-> -       if (err == 0) {
-> -               g_free(adapter->auth);
-> -               adapter->auth = NULL;
-> -       }
-> +       service_auth_cancel(auth);
->
-> -       return err;
-> +       return 0;
+On Thu, Aug 30, 2012 at 04:06:19PM +0300, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Decode Read Data Block Size HCI command and command status.
+> 
+>  < HCI Command: Read Data Block Size (0x04|0x000a) plen 0
+>  > HCI Event: Command Complete (0x0e) plen 10
+>     Read Data Block Size (0x04|0x000a) ncmd 1
+>     status 0x00
+>     Max ACL 1492 Block len 1492 Num blocks 4
+> ---
+>  lib/hci.h    |    8 ++++++++
+>  parser/hci.c |   24 +++++++++++++++++++++++-
+>  2 files changed, 31 insertions(+), 1 deletion(-)
+> 
+> diff --git a/lib/hci.h b/lib/hci.h
+> index 3dbb221..d068a2f 100644
+> --- a/lib/hci.h
+> +++ b/lib/hci.h
+> @@ -1316,6 +1316,14 @@ typedef struct {
+>  } __attribute__ ((packed)) read_bd_addr_rp;
+>  #define READ_BD_ADDR_RP_SIZE 7
+>  
+> +#define OCF_READ_DATA_BLOCK_SIZE	0x000A
+> +typedef struct {
+> +	uint8_t		status;
+> +	uint16_t	max_acl_len;
+> +	uint16_t	data_block_len;
+> +	uint16_t	num_blocks;
+> +} __attribute__ ((packed)) read_data_block_size_rp;
+> +
+>  /* Status params */
+>  #define OGF_STATUS_PARAM	0x05
+>  
+> diff --git a/parser/hci.c b/parser/hci.c
+> index 115cf1e..38794bd 100644
+> --- a/parser/hci.c
+> +++ b/parser/hci.c
+> @@ -338,7 +338,7 @@ static char *cmd_hostctl_str[CMD_HOSTCTL_NUM + 1] = {
+>  	"Write LE Host Supported",
+>  };
+>  
+> -#define CMD_INFO_NUM 9
+> +#define CMD_INFO_NUM 10
+>  static char *cmd_info_str[CMD_INFO_NUM + 1] = {
+>  	"Unknown",
+>  	"Read Local Version Information",
+> @@ -350,6 +350,7 @@ static char *cmd_info_str[CMD_INFO_NUM + 1] = {
+>  	"Read Country Code",
+>  	"Unknown",
+>  	"Read BD ADDR",
+> +	"Read Data Block Size",
+>  };
+>  
+>  #define CMD_STATUS_NUM 11
+> @@ -2041,6 +2042,24 @@ static inline void bdaddr_response_dump(int level, struct frame *frm)
+>  	raw_dump(level, frm);
 >  }
-
-You can probably call id instead of auth_id, besides we normally use
-uint/guint for handlers like this.
-
--- 
-Luiz Augusto von Dentz
+>  
+> +static inline void read_data_block_size_dump(int level, struct frame *frm)
+> +{
+> +	read_data_block_size_rp *rp = frm->ptr;
+> +
+> +	p_indent(level, frm);
+> +	printf("status 0x%2.2x\n", rp->status);
+> +
+> +	if (rp->status > 0) {
+> +		p_indent(level, frm);
+> +		printf("Error: %s\n", status2str(rp->status));
+> +	} else {
+> +		p_indent(level, frm);
+> +		printf("Max ACL %d Block len %d Num blocks %d\n",
+> +			btohs(rp->max_acl_len), btohs(rp->data_block_len),
+> +							btohs(rp->num_blocks));
+> +	}
+> +}
+> +
+>  static inline void generic_response_dump(int level, struct frame *frm)
+>  {
+>  	uint8_t status = get_u8(frm);
+> @@ -2886,6 +2905,9 @@ static inline void cmd_complete_dump(int level, struct frame *frm)
+>  		case OCF_READ_BD_ADDR:
+>  			bdaddr_response_dump(level, frm);
+>  			return;
+> +		case OCF_READ_DATA_BLOCK_SIZE:
+> +			read_data_block_size_dump(level, frm);
+> +			return;
+>  		}
+>  		break;
+>  
+> -- 
+> 1.7.9.5
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
