@@ -1,60 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v8 00/13] Heart Rate Profile plugin
-Date: Tue, 25 Sep 2012 16:27:33 +0200
-Message-ID: <1348583267-16816-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Tue, 25 Sep 2012 15:58:06 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] audio: Fix attempting to create a device on driver
+ .remove
+Message-ID: <20120925125806.GA22183@x220>
+References: <1348570499-7442-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1348570499-7442-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-Changes since v7:
-- rebased to latest upstream master (btd_profile changes)
+On Tue, Sep 25, 2012, Luiz Augusto von Dentz wrote:
+> audio_remove calls get_audio_dev which may attempt to create the device
+> if it doesn't exist.
+> ---
+>  audio/manager.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 
+Applied. Thanks.
 
-Andrzej Kaczmarek (6):
-  heartrate: Add attio callbacks
-  heartrate: Discover HRS characteristics
-  heartrate: Discover Heart Rate Measurement CCC
-  heartrate: Add support to enable notifications
-  heartrate: Process measurement notifications
-  heartrate: Add support to reset Energy Expended
-
-Rafal Garbat (6):
-  heartrate: Add initial HRP client support
-  heartrate: Read Body Sensor Location characteristics
-  heartrate: Add HeartRateManager interface
-  heartrate: Add GetProperties method
-  heartrate: Add HeartRateWatcher interface to default policy
-  heartrate: Add test script
-
-Santiago Carot-Nemesio (1):
-  Heart Rate Profile (HRP) client API
-
- Makefile.am                    |   9 +-
- Makefile.tools                 |   3 +-
- doc/heartrate-api.txt          |  84 +++++
- lib/uuid.h                     |   5 +
- profiles/heartrate/heartrate.c | 826 +++++++++++++++++++++++++++++++++++++++++
- profiles/heartrate/heartrate.h |  27 ++
- profiles/heartrate/main.c      |  52 +++
- profiles/heartrate/manager.c   |  97 +++++
- profiles/heartrate/manager.h   |  24 ++
- src/bluetooth.conf             |   1 +
- test/test-heartrate            | 103 +++++
- 11 files changed, 1228 insertions(+), 3 deletions(-)
- create mode 100644 doc/heartrate-api.txt
- create mode 100644 profiles/heartrate/heartrate.c
- create mode 100644 profiles/heartrate/heartrate.h
- create mode 100644 profiles/heartrate/main.c
- create mode 100644 profiles/heartrate/manager.c
- create mode 100644 profiles/heartrate/manager.h
- create mode 100755 test/test-heartrate
-
--- 
-1.7.11.3
-
+Johan
