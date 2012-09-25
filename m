@@ -1,386 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: David Dillow <dave@thedillows.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	David Herrmann <dh.herrmann@googlemail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bastien Nocera <hadess@hadess.net>,
-	linux-input@vger.kernel.org, jkosina@suse.cz,
-	Antonio Ospite <ospite@studenti.unina.it>
-Subject: [PATCH v3] HID: Add support for Sony PS3 BD Remote Control
-Date: Tue, 25 Sep 2012 16:30:47 +0200
-Message-Id: <1348583447-31820-1-git-send-email-ospite@studenti.unina.it>
-In-Reply-To: <20120925132136.985de0b203fd342bce6dc77d@studenti.unina.it>
-References: <20120925132136.985de0b203fd342bce6dc77d@studenti.unina.it>
-Sender: linux-input-owner@vger.kernel.org
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Rafal Garbat <rafal.garbat@tieto.com>
+Subject: [PATCH v8 06/13] heartrate: Read Body Sensor Location characteristics
+Date: Tue, 25 Sep 2012 16:27:39 +0200
+Message-ID: <1348583267-16816-7-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1348583267-16816-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1348583267-16816-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: David Dillow <dave@thedillows.org>
+From: Rafal Garbat <rafal.garbat@tieto.com>
 
-The Sony PS3 Blue-ray Disc Remote Control used to be supported by the
-BlueZ project's user space, but the code that handled it was recently
-removed as its functionality conflicted with a real HSP implementation
-and the mapping was thought to be better handled in the kernel. This is
-a port of the mapping logic from the fakehid driver by Marcel Holtmann
-to the in-kernel HID layer.
-
-We also add support for the Logitech Harmony Adapter for PS3, which
-emulates the BD Remote.
-
-Signed-off-by: David Dillow <dave@thedillows.org>
-Signed-off-by: Antonio Ospite <ospite@studenti.unina.it>
+This patch adds support to read and store Body Sensor Location
+characteristic value.
 ---
- drivers/hid/Kconfig         |   13 ++-
- drivers/hid/Makefile        |    1 +
- drivers/hid/hid-core.c      |    2 +
- drivers/hid/hid-ids.h       |    2 +
- drivers/hid/hid-ps3remote.c |  210 +++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 227 insertions(+), 1 deletion(-)
- create mode 100644 drivers/hid/hid-ps3remote.c
+ profiles/heartrate/heartrate.c | 35 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 34 insertions(+), 1 deletion(-)
 
-Changes since v2:
-
-  - new HID descriptor to handle multiple keypresses for joypad buttons,
-    the descriptor has been designed with gHID:
-    http://code.google.com/p/ghid/
-
-    Descriptor changes:
-      + Mark the first byte as constant
-
-      + Describe bytes 2nd to 4th used for joypad buttons
-
-      + Split the constant 0xff bytes (bytes from 6th to 10th) so they
-        are marked as constant in the descriptor too
-
-      + split the data into two collections, to map them
-        independently
-
-  - move the descriptor definition before the keymaps, as the keymaps refer
-    to UsageMinimum and UsageMaximum as defined in the descriptor
-
-  - sort keymaps according to their index, as this reflects the Usage
-    number
-
-  - use spaces to align stuff in ps3remote_driver struct
-
-  - add myself in the author field
-
-  - reformat description in Kconfig
-
-  - sort symbolic constants trying to match the ordering criterion used
-    for other entries
-
-  - add a note about the setup maneuver
-
-TODO (but I think we could merge the driver as it is now regardless):
-  - verify that battery strength is reported via the power_supply class
-  - see how to handle disconnection on idle timeout
-
-Jiri, are we still in time for 3.7 ?
-
-Thanks,
-   Antonio Ospite
-   http://ao2.it
-
-diff --git a/drivers/hid/Kconfig b/drivers/hid/Kconfig
-index fbf4950..378be0b 100644
---- a/drivers/hid/Kconfig
-+++ b/drivers/hid/Kconfig
-@@ -534,6 +534,15 @@ config HID_PRIMAX
- 	Support for Primax devices that are not fully compliant with the
- 	HID standard.
+diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
+index d3d6d43..2547f9b 100644
+--- a/profiles/heartrate/heartrate.c
++++ b/profiles/heartrate/heartrate.c
+@@ -54,6 +54,9 @@ struct heartrate {
+ 	uint16_t			measurement_val_handle;
+ 	uint16_t			measurement_ccc_handle;
+ 	uint16_t			hrcp_val_handle;
++
++	gboolean			has_location;
++	uint8_t				location;
+ };
  
-+config HID_PS3REMOTE
-+	tristate "Sony PS3 BD Remote Control"
-+	depends on BT_HIDP
-+	---help---
-+	Support for the Sony PS3 Blue-ray Disk Remote Control and Logitech
-+	Harmony Adapter for PS3, which connect over Bluetooth.
-+
-+	Support for the 6-axis controllers is provided by HID_SONY.
-+
- config HID_ROCCAT
- 	tristate "Roccat device support"
- 	depends on USB_HID
-@@ -561,7 +570,9 @@ config HID_SONY
- 	tristate "Sony PS3 controller"
- 	depends on USB_HID
- 	---help---
--	Support for Sony PS3 controller.
-+	Support for Sony PS3 6-axis controllers.
-+
-+	Support for the Sony PS3 BD Remote is provided by HID_PS3REMOTE.
+ static GSList *heartrate_adapters = NULL;
+@@ -113,6 +116,34 @@ static void destroy_heartrate_adapter(gpointer user_data)
+ 	g_free(hradapter);
+ }
  
- config HID_SPEEDLINK
- 	tristate "Speedlink VAD Cezanne mouse support"
-diff --git a/drivers/hid/Makefile b/drivers/hid/Makefile
-index f975485..333ed6c 100644
---- a/drivers/hid/Makefile
-+++ b/drivers/hid/Makefile
-@@ -70,6 +70,7 @@ obj-$(CONFIG_HID_PANTHERLORD)	+= hid-pl.o
- obj-$(CONFIG_HID_PETALYNX)	+= hid-petalynx.o
- obj-$(CONFIG_HID_PICOLCD)	+= hid-picolcd.o
- obj-$(CONFIG_HID_PRIMAX)	+= hid-primax.o
-+obj-$(CONFIG_HID_PS3REMOTE)	+= hid-ps3remote.o
- obj-$(CONFIG_HID_ROCCAT)	+= hid-roccat.o hid-roccat-common.o \
- 	hid-roccat-arvo.o hid-roccat-isku.o hid-roccat-kone.o \
- 	hid-roccat-koneplus.o hid-roccat-kovaplus.o hid-roccat-pyra.o \
-diff --git a/drivers/hid/hid-core.c b/drivers/hid/hid-core.c
-index 8bcd168..e4275d4 100644
---- a/drivers/hid/hid-core.c
-+++ b/drivers/hid/hid-core.c
-@@ -1566,6 +1566,7 @@ static const struct hid_device_id hid_have_special_driver[] = {
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_S510_RECEIVER) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_S510_RECEIVER_2) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_LOGITECH_RECEIVER) },
-+	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_LOGITECH_HARMONY_PS3) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_DINOVO_DESKTOP) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_DINOVO_EDGE) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_DINOVO_MINI) },
-@@ -1639,6 +1640,7 @@ static const struct hid_device_id hid_have_special_driver[] = {
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_SAMSUNG, USB_DEVICE_ID_SAMSUNG_IR_REMOTE) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_SAMSUNG, USB_DEVICE_ID_SAMSUNG_WIRELESS_KBD_MOUSE) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_SKYCABLE, USB_DEVICE_ID_SKYCABLE_WIRELESS_PRESENTER) },
-+	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_BDREMOTE) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_NAVIGATION_CONTROLLER) },
- 	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
-diff --git a/drivers/hid/hid-ids.h b/drivers/hid/hid-ids.h
-index 1dcb76f..40411c9 100644
---- a/drivers/hid/hid-ids.h
-+++ b/drivers/hid/hid-ids.h
-@@ -496,6 +496,7 @@
- #define USB_DEVICE_ID_LOGITECH_RECEIVER	0xc101
- #define USB_DEVICE_ID_LOGITECH_HARMONY_FIRST  0xc110
- #define USB_DEVICE_ID_LOGITECH_HARMONY_LAST 0xc14f
-+#define USB_DEVICE_ID_LOGITECH_HARMONY_PS3 0x0306
- #define USB_DEVICE_ID_LOGITECH_RUMBLEPAD_CORD	0xc20a
- #define USB_DEVICE_ID_LOGITECH_RUMBLEPAD	0xc211
- #define USB_DEVICE_ID_LOGITECH_EXTREME_3D	0xc215
-@@ -683,6 +684,7 @@
- 
- #define USB_VENDOR_ID_SONY			0x054c
- #define USB_DEVICE_ID_SONY_VAIO_VGX_MOUSE	0x024b
-+#define USB_DEVICE_ID_SONY_PS3_BDREMOTE		0x0306
- #define USB_DEVICE_ID_SONY_PS3_CONTROLLER	0x0268
- #define USB_DEVICE_ID_SONY_NAVIGATION_CONTROLLER	0x042f
- 
-diff --git a/drivers/hid/hid-ps3remote.c b/drivers/hid/hid-ps3remote.c
-new file mode 100644
-index 0000000..4c92e24
---- /dev/null
-+++ b/drivers/hid/hid-ps3remote.c
-@@ -0,0 +1,210 @@
-+/*
-+ * HID driver for Sony PS3 BD Remote Control
-+ *
-+ * Copyright (c) 2012 David Dillow <dave@thedillows.org>
-+ * Based on a blend of the bluez fakehid user-space code by Marcel Holtmann
-+ * and other kernel HID drivers.
-+ */
-+
-+/*
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ */
-+
-+/* NOTE: in order for the Sony PS3 BD Remote Control to be found by
-+ * a Bluetooth host, the key combination Start+Enter has to be kept pressed
-+ * for about 7 seconds with the Bluetooth Host Controller in discovering mode.
-+ *
-+ * There will be no PIN request from the device.
-+ */
-+
-+#include <linux/device.h>
-+#include <linux/hid.h>
-+#include <linux/module.h>
-+
-+#include "hid-ids.h"
-+
-+static __u8 ps3remote_rdesc[] = {
-+	0x05, 0x01,          /* GUsagePage Generic Desktop */
-+	0x09, 0x05,          /* LUsage 0x05 [Game Pad] */
-+	0xA1, 0x01,          /* MCollection Application (mouse, keyboard) */
-+
-+	 /* Use collection 1 for joypad buttons */
-+	 0xA1, 0x02,         /* MCollection Logical (interrelated data) */
-+
-+	  /* Ignore the 1st byte, maybe it is used for a controller
-+	   * number but it's not needed for correct operation */
-+	  0x75, 0x08,        /* GReportSize 0x08 [8] */
-+	  0x95, 0x01,        /* GReportCount 0x01 [1] */
-+	  0x81, 0x01,        /* MInput 0x01 (Const[0] Arr[1] Abs[2]) */
-+
-+	  /* Bytes from 2nd to 4th are a bitmap for joypad buttons, for these
-+	   * buttons multiple keypresses are allowed */
-+	  0x05, 0x09,        /* GUsagePage Button */
-+	  0x19, 0x01,        /* LUsageMinimum 0x01 [Button 1 (primary/trigger)] */
-+	  0x29, 0x18,        /* LUsageMaximum 0x18 [Button 24] */
-+	  0x14,              /* GLogicalMinimum [0] */
-+	  0x25, 0x01,        /* GLogicalMaximum 0x01 [1] */
-+	  0x75, 0x01,        /* GReportSize 0x01 [1] */
-+	  0x95, 0x18,        /* GReportCount 0x18 [24] */
-+	  0x81, 0x02,        /* MInput 0x02 (Data[0] Var[1] Abs[2]) */
-+
-+	  0xC0,              /* MEndCollection */
-+
-+	 /* Use collection 2 for remote control buttons */
-+	 0xA1, 0x02,         /* MCollection Logical (interrelated data) */
-+
-+	  /* 5th byte is used for remote control buttons */
-+	  0x05, 0x09,        /* GUsagePage Button */
-+	  0x18,              /* LUsageMinimum [No button pressed] */
-+	  0x29, 0xFE,        /* LUsageMaximum 0xFE [Button 254] */
-+	  0x14,              /* GLogicalMinimum [0] */
-+	  0x26, 0xFE, 0x00,  /* GLogicalMaximum 0x00FE [254] */
-+	  0x75, 0x08,        /* GReportSize 0x08 [8] */
-+	  0x95, 0x01,        /* GReportCount 0x01 [1] */
-+	  0x80,              /* MInput  */
-+
-+	  /* Ignore bytes from 6th to 11th, 6th to 10th are always constant at
-+	   * 0xff and 11th is for press indication */
-+	  0x75, 0x08,        /* GReportSize 0x08 [8] */
-+	  0x95, 0x06,        /* GReportCount 0x06 [6] */
-+	  0x81, 0x01,        /* MInput 0x01 (Const[0] Arr[1] Abs[2]) */
-+
-+	  /* 12th byte is for battery strength */
-+	  0x05, 0x06,        /* GUsagePage Generic Device Controls */
-+	  0x09, 0x20,        /* LUsage 0x20 [Battery Strength] */
-+	  0x14,              /* GLogicalMinimum [0] */
-+	  0x25, 0x05,        /* GLogicalMaximum 0x05 [5] */
-+	  0x75, 0x08,        /* GReportSize 0x08 [8] */
-+	  0x95, 0x01,        /* GReportCount 0x01 [1] */
-+	  0x81, 0x02,        /* MInput 0x02 (Data[0] Var[1] Abs[2]) */
-+
-+	  0xC0,              /* MEndCollection */
-+
-+	 0xC0                /* MEndCollection [Game Pad] */
-+};
-+
-+static const unsigned int ps3remote_keymap_joypad_buttons[] = {
-+	[0x01] = KEY_SELECT,
-+	[0x02] = BTN_THUMBL,		/* L3 */
-+	[0x03] = BTN_THUMBR,		/* R3 */
-+	[0x04] = BTN_START,
-+	[0x05] = KEY_UP,
-+	[0x06] = KEY_RIGHT,
-+	[0x07] = KEY_DOWN,
-+	[0x08] = KEY_LEFT,
-+	[0x09] = BTN_TL2,		/* L2 */
-+	[0x0a] = BTN_TR2,		/* R2 */
-+	[0x0b] = BTN_TL,		/* L1 */
-+	[0x0c] = BTN_TR,		/* R1 */
-+	[0x0d] = KEY_OPTION,		/* options/triangle */
-+	[0x0e] = KEY_BACK,		/* back/circle */
-+	[0x0f] = BTN_0,			/* cross */
-+	[0x10] = KEY_SCREEN,		/* view/square */
-+	[0x11] = KEY_HOMEPAGE,		/* PS button */
-+	[0x14] = KEY_ENTER,
-+};
-+static const unsigned int ps3remote_keymap_remote_buttons[] = {
-+	[0x00] = KEY_1,
-+	[0x01] = KEY_2,
-+	[0x02] = KEY_3,
-+	[0x03] = KEY_4,
-+	[0x04] = KEY_5,
-+	[0x05] = KEY_6,
-+	[0x06] = KEY_7,
-+	[0x07] = KEY_8,
-+	[0x08] = KEY_9,
-+	[0x09] = KEY_0,
-+	[0x0e] = KEY_ESC,		/* return */
-+	[0x0f] = KEY_CLEAR,
-+	[0x16] = KEY_EJECTCD,
-+	[0x1a] = KEY_MENU,		/* top menu */
-+	[0x28] = KEY_TIME,
-+	[0x30] = KEY_PREVIOUS,
-+	[0x31] = KEY_NEXT,
-+	[0x32] = KEY_PLAY,
-+	[0x33] = KEY_REWIND,		/* scan back */
-+	[0x34] = KEY_FORWARD,		/* scan forward */
-+	[0x38] = KEY_STOP,
-+	[0x39] = KEY_PAUSE,
-+	[0x40] = KEY_CONTEXT_MENU,	/* pop up/menu */
-+	[0x60] = KEY_FRAMEBACK,		/* slow/step back */
-+	[0x61] = KEY_FRAMEFORWARD,	/* slow/step forward */
-+	[0x63] = KEY_SUBTITLE,
-+	[0x64] = KEY_AUDIO,
-+	[0x65] = KEY_ANGLE,
-+	[0x70] = KEY_INFO,		/* display */
-+	[0x80] = KEY_BLUE,
-+	[0x81] = KEY_RED,
-+	[0x82] = KEY_GREEN,
-+	[0x83] = KEY_YELLOW,
-+};
-+
-+static __u8 *ps3remote_fixup(struct hid_device *hdev, __u8 *rdesc,
-+			     unsigned int *rsize)
++static void read_sensor_location_cb(guint8 status, const guint8 *pdu,
++						guint16 len, gpointer user_data)
 +{
-+	*rsize = sizeof(ps3remote_rdesc);
-+	return ps3remote_rdesc;
-+}
++	struct heartrate *hr = user_data;
++	uint8_t value;
++	ssize_t vlen;
 +
-+static int ps3remote_mapping(struct hid_device *hdev, struct hid_input *hi,
-+			     struct hid_field *field, struct hid_usage *usage,
-+			     unsigned long **bit, int *max)
-+{
-+	unsigned int key = usage->hid & HID_USAGE;
-+
-+	if ((usage->hid & HID_USAGE_PAGE) != HID_UP_BUTTON ||
-+	    key >= ARRAY_SIZE(ps3remote_keymap_remote_buttons))
-+		return -1;
-+
-+	switch (usage->collection_index) {
-+	case 1:
-+		key = ps3remote_keymap_joypad_buttons[key];
-+		if (!key)
-+			return -1;
-+		break;
-+	case 2:
-+		key = ps3remote_keymap_remote_buttons[key];
-+		if (!key)
-+			return -1;
-+		break;
-+	default:
-+		return -1;
++	if (status != 0) {
++		error("Body Sensor Location read failed: %s",
++							att_ecode2str(status));
++		return;
 +	}
 +
-+	hid_map_usage_clear(hi, usage, bit, max, EV_KEY, key);
-+	return 1;
++	vlen = dec_read_resp(pdu, len, &value, sizeof(value));
++	if (vlen < 0) {
++		error("Protocol error");
++		return;
++	}
++
++	if (vlen != sizeof(value)) {
++		error("Invalid length for Body Sensor Location");
++		return;
++	}
++
++	hr->has_location = TRUE;
++	hr->location = value;
 +}
 +
-+static const struct hid_device_id ps3remote_devices[] = {
-+	/* PS3 BD Remote Control */
-+	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_BDREMOTE) },
-+	/* Logitech Harmony Adapter for PS3 */
-+	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_LOGITECH_HARMONY_PS3) },
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(hid, ps3remote_devices);
+ static void discover_ccc_cb(guint8 status, const guint8 *pdu,
+ 						guint16 len, gpointer user_data)
+ {
+@@ -194,7 +225,9 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ 			discover_measurement_ccc(hr, c, c_next);
+ 		} else if (g_strcmp0(c->uuid, BODY_SENSOR_LOCATION_UUID) == 0) {
+ 			DBG("Body Sensor Location supported");
+-			/* TODO: read characterictic value */
 +
-+static struct hid_driver ps3remote_driver = {
-+	.name          = "ps3_remote",
-+	.id_table      = ps3remote_devices,
-+	.report_fixup  = ps3remote_fixup,
-+	.input_mapping = ps3remote_mapping,
-+};
-+
-+static int __init ps3remote_init(void)
-+{
-+	return hid_register_driver(&ps3remote_driver);
-+}
-+
-+static void __exit ps3remote_exit(void)
-+{
-+	hid_unregister_driver(&ps3remote_driver);
-+}
-+
-+module_init(ps3remote_init);
-+module_exit(ps3remote_exit);
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("David Dillow <dave@thedillows.org>, Antonio Ospite <ospite@studenti.unina.it>");
++			gatt_read_char(hr->attrib, c->value_handle, 0,
++						read_sensor_location_cb, hr);
+ 		} else if (g_strcmp0(c->uuid,
+ 					HEART_RATE_CONTROL_POINT_UUID) == 0) {
+ 			DBG("Heart Rate Control Point supported");
 -- 
-1.7.10.4
+1.7.11.3
 
