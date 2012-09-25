@@ -1,41 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v7 4/9] core: Start LE scanning when a device requests
-Date: Tue, 25 Sep 2012 14:38:01 -0300
-Message-Id: <1348594686-26221-4-git-send-email-jprvita@openbossa.org>
-In-Reply-To: <1348594686-26221-1-git-send-email-jprvita@openbossa.org>
-References: <1348594686-26221-1-git-send-email-jprvita@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <20120920114323.GA11861@x220>
+References: <1347370387-17670-1-git-send-email-jprvita@openbossa.org>
+ <1347370387-17670-3-git-send-email-jprvita@openbossa.org> <20120920114323.GA11861@x220>
+From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
+Date: Tue, 25 Sep 2012 14:37:59 -0300
+Message-ID: <CAAngNMYj6M3hpc=4E3bfa6ajDyTyW2_OrMvWRSErd=G9yxGm6A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v6 03/11] core: Mutually exclude concurrent connections
+To: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+On Thu, Sep 20, 2012 at 8:43 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
 
-This patch enables the LE scanning when a device requires connection and
-there isn't discovery sessions, triggering the General Connection
-Establishment Procedure.
----
- src/adapter.c | 5 +++++
- 1 file changed, 5 insertions(+)
+(...)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 49dee85..201e6a0 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2200,6 +2200,11 @@ void adapter_connect_list_add(struct btd_adapter *adapter,
- 						btd_device_ref(device));
- 	DBG("%s added to %s's connect_list", device_get_path(device),
- 								adapter->name);
-+
-+	if (adapter->disc_sessions)
-+		return;
-+
-+	mgmt_start_scanning(adapter->dev_id);
- }
- 
- void adapter_connect_list_remove(struct btd_adapter *adapter,
+>
+> As a general note (not relating specifically to this patch) I'd like to
+> see a clearer split and naming of LE/GATT-specific functionality and
+> variables (function names, struct btd_adapter/device member naming &
+> grouping, etc.). Right now these seem to be sprinkled all over the place
+> which can be confusing for someone looking at the code from a
+> BR/EDR-only or LE-only perspective.
+>
+
+Any suggestions on how to improve that? I've tried to improve naming
+for quite a while before sending these for the first time to the list,
+and neither I nor anyone else from INdT could come up with better
+naming.
+
+I'm sending an updated version now, than you can comment about other
+improvements on top of that.
+
 -- 
-1.7.11.4
-
+João Paulo Rechi Vita
+Openbossa Labs - INdT
