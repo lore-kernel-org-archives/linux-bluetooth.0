@@ -3,9 +3,9 @@ From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v7 3/9] core: Replace interleaved by LE scanning
-Date: Tue, 25 Sep 2012 14:38:00 -0300
-Message-Id: <1348594686-26221-3-git-send-email-jprvita@openbossa.org>
+Subject: [PATCH BlueZ v7 2/9] mgmt: Add LE scanning callback
+Date: Tue, 25 Sep 2012 14:37:59 -0300
+Message-Id: <1348594686-26221-2-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1348594686-26221-1-git-send-email-jprvita@openbossa.org>
 References: <1348594686-26221-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,62 +13,71 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
-This patches replaces the interleaved discovery by LE scanning when LE
-re-connection is required.
+This patch adds a new callback to allow the adapter to control LE
+scanning. The current approach uses the active scanning with default
+windows and intervals defined by the core spec without any filtering.
 ---
- src/adapter.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ src/mgmt.c | 34 ++++++++++++++++++++++++++++++++++
+ src/mgmt.h |  1 +
+ 2 files changed, 35 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 47f82c0..49dee85 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2246,7 +2246,7 @@ void btd_adapter_start(struct btd_adapter *adapter)
- 	info("Adapter %s has been enabled", adapter->path);
- 
- 	if (g_slist_length(adapter->connect_list) > 0)
--		mgmt_start_discovery(adapter->dev_id);
-+		mgmt_start_scanning(adapter->dev_id);
+diff --git a/src/mgmt.c b/src/mgmt.c
+index dbd9786..405a683 100644
+--- a/src/mgmt.c
++++ b/src/mgmt.c
+@@ -2055,6 +2055,40 @@ int mgmt_start_discovery(int index)
+ 	return 0;
  }
  
- static void reply_pending_requests(struct btd_adapter *adapter)
-@@ -2590,14 +2590,22 @@ void adapter_set_discovering(struct btd_adapter *adapter,
- 
- 	connect_list_len = g_slist_length(adapter->connect_list);
- 
--	if (!adapter_has_discov_sessions(adapter) && connect_list_len == 0)
-+	if (adapter_has_discov_sessions(adapter)) {
-+		adapter->discov_id = g_idle_add(discovery_cb, adapter);
++int mgmt_start_scanning(int index)
++{
++	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_start_discovery)];
++	struct mgmt_hdr *hdr = (void *) buf;
++	struct mgmt_cp_start_discovery *cp = (void *) &buf[sizeof(*hdr)];
++	struct controller_info *info = &controllers[index];
 +
-+		DBG("hci%u restarting discovery: disc_sessions %u",
-+				adapter->dev_id,
-+				g_slist_length(adapter->disc_sessions));
- 		return;
++	DBG("index %d", index);
++
++	if (!mgmt_low_energy(info->current_settings)) {
++		error("scanning failed: Low Energy not enabled/supported");
++		return -ENOTSUP;
 +	}
- 
--	DBG("hci%u restarting discovery: disc_sessions %u connect_list_len %u",
--		adapter->dev_id, g_slist_length(adapter->disc_sessions),
--							connect_list_len);
-+	if (connect_list_len > 0) {
-+		mgmt_start_scanning(adapter->dev_id);
- 
--	adapter->discov_id = g_idle_add(discovery_cb, adapter);
-+		DBG("hci%u restarting scanning connect_list_len %u",
-+				adapter->dev_id, connect_list_len);
-+		return;
++
++	info->discov_type = 0;
++	hci_set_bit(BDADDR_LE_PUBLIC, &info->discov_type);
++	hci_set_bit(BDADDR_LE_RANDOM, &info->discov_type);
++
++	memset(buf, 0, sizeof(buf));
++	hdr->opcode = htobs(MGMT_OP_START_DISCOVERY);
++	hdr->len = htobs(sizeof(*cp));
++	hdr->index = htobs(index);
++
++	cp->type = info->discov_type;
++
++	if (write(mgmt_sock, buf, sizeof(buf)) < 0) {
++		int err = -errno;
++		error("failed to write to MGMT socket: %s", strerror(-err));
++		return err;
 +	}
- }
++
++	return 0;
++}
++
+ int mgmt_stop_discovery(int index)
+ {
+ 	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_start_discovery)];
+diff --git a/src/mgmt.h b/src/mgmt.h
+index 95245d2..eb7434a 100644
+--- a/src/mgmt.h
++++ b/src/mgmt.h
+@@ -33,6 +33,7 @@ int mgmt_set_dev_class(int index, uint8_t major, uint8_t minor);
+ int mgmt_set_fast_connectable(int index, gboolean enable);
  
- static void suspend_discovery(struct btd_adapter *adapter)
-@@ -2912,7 +2920,7 @@ static gboolean clean_connecting_state(GIOChannel *io, GIOCondition cond,
+ int mgmt_start_discovery(int index);
++int mgmt_start_scanning(int index);
+ int mgmt_stop_discovery(int index);
  
- 	if (adapter->waiting_to_connect == 0 &&
- 				g_slist_length(adapter->connect_list) > 0)
--		mgmt_start_discovery(adapter->dev_id);
-+		mgmt_start_scanning(adapter->dev_id);
- 
- 	btd_device_unref(device);
- 
+ int mgmt_read_clock(int index, bdaddr_t *bdaddr, int which, int timeout,
 -- 
 1.7.11.4
 
