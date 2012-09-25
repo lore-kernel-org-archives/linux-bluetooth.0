@@ -1,60 +1,197 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH v0] audio: Fix crash if gateway closed before reply
-Date: Tue, 25 Sep 2012 11:30:29 +0200
-Message-Id: <1348565429-3045-1-git-send-email-mikel.astiz.oss@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1347892917-13013-1-git-send-email-sunil.behera@samsung.com>
+References: <1347892917-13013-1-git-send-email-sunil.behera@samsung.com>
+Date: Tue, 25 Sep 2012 11:22:16 +0300
+Message-ID: <CABBYNZKde0LyRh9Adxu1UoA6MXSqZ4tyhP3qK22S9NF457-Kfw@mail.gmail.com>
+Subject: Re: [PATCH obexd] MAP: Add Notification Registration support
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Sunil Kumar Behera <sunil.behera@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Sunil,
 
-The audio gateway can be closed (dev->gateway == NULL) before the reply
-from the agent has been received, resulting in the following crash as
-reproduced while removing (unpairing) a device:
+On Mon, Sep 17, 2012 at 5:41 PM, Sunil Kumar Behera
+<sunil.behera@samsung.com> wrote:
+> This feature allows the MCE to set the notification mode
+> on the MSE side.
+> ---
+>  plugins/mas.c              |   50 ++++++++++++++++++++++++++++++++++++++++++--
+>  plugins/messages-dummy.c   |    6 ++----
+>  plugins/messages-tracker.c |    6 ++----
+>  plugins/messages.h         |   17 +++++++--------
+>  4 files changed, 60 insertions(+), 19 deletions(-)
+>
+> diff --git a/plugins/mas.c b/plugins/mas.c
+> index 186d267..977e5a1 100644
+> --- a/plugins/mas.c
+> +++ b/plugins/mas.c
+> @@ -119,6 +119,8 @@ struct mas_session {
+>         GObexApparam *inparams;
+>         GObexApparam *outparams;
+>         gboolean ap_sent;
+> +       uint8_t notification_status;
+> +       char *remote_addr;
+>  };
+>
+>  static const uint8_t MAS_TARGET[TARGET_SIZE] = {
+> @@ -167,12 +169,14 @@ static void reset_request(struct mas_session *mas)
+>  static void mas_clean(struct mas_session *mas)
+>  {
+>         reset_request(mas);
+> +       g_free(mas->remote_addr);
+>         g_free(mas);
+>  }
+>
+>  static void *mas_connect(struct obex_session *os, int *err)
+>  {
+>         struct mas_session *mas;
+> +       char *address;
+>
+>         DBG("");
+>
+> @@ -184,6 +188,9 @@ static void *mas_connect(struct obex_session *os, int *err)
+>
+>         manager_register_session(os);
+>
+> +       if (obex_getpeername(os, &address) == 0)
+> +               mas->remote_addr = address;
+> +
+>         return mas;
+>
+>  failed:
+> @@ -695,6 +702,45 @@ static void *message_set_status_open(const char *name, int oflag, mode_t mode,
+>         return mas;
+>  }
+>
+> +static void *notification_registration_open(const char *name, int oflag,
+> +                                               mode_t mode, void *driver_data,
+> +                                               size_t *size, int *err)
+> +{
+> +       struct mas_session *mas = driver_data;
+> +       uint8_t status;
+> +
+> +       if (oflag == O_RDONLY) {
+> +               *err = -EBADR;
+> +               return NULL;
+> +       }
+> +
+> +       if (!g_obex_apparam_get_uint8(mas->inparams, MAP_AP_NOTIFICATIONSTATUS,
+> +                                                               &status)) {
+> +               *err = -EBADR;
+> +               return NULL;
+> +       }
+> +
+> +       *err = 0;
+> +       mas->notification_status = status;
+> +       mas->finished = TRUE;
+> +       return mas;
+> +}
+> +
+> +static int notification_registration_close(void *obj)
+> +{
+> +       struct mas_session *mas = obj;
+> +
+> +       DBG("");
+> +
+> +       messages_set_notification_registration(mas->backend_data,
+> +                                               mas->remote_addr,
+> +                                               mas->notification_status, mas);
+> +
+> +       reset_request(mas);
+> +
+> +       return 0;
+> +}
+> +
+>  static ssize_t any_get_next_header(void *object, void *buf, size_t mtu,
+>                                                                 uint8_t *hi)
+>  {
+> @@ -820,8 +866,8 @@ static struct obex_mime_type_driver mime_notification_registration = {
+>         .target = MAS_TARGET,
+>         .target_size = TARGET_SIZE,
+>         .mimetype = "x-bt/MAP-NotificationRegistration",
+> -       .open = any_open,
+> -       .close = any_close,
+> +       .open = notification_registration_open,
+> +       .close = notification_registration_close,
+>         .read = any_read,
+>         .write = any_write,
+>  };
+> diff --git a/plugins/messages-dummy.c b/plugins/messages-dummy.c
+> index 4c66f51..ecbe894 100644
+> --- a/plugins/messages-dummy.c
+> +++ b/plugins/messages-dummy.c
+> @@ -251,10 +251,8 @@ void messages_disconnect(void *s)
+>         g_free(session);
+>  }
+>
+> -int messages_set_notification_registration(void *session,
+> -               void (*send_event)(void *session,
+> -                       const struct messages_event *event, void *user_data),
+> -               void *user_data)
+> +int messages_set_notification_registration(void *session, char *address,
+> +                                               uint8_t status, void *user_data)
+>  {
+>         return -ENOSYS;
+>  }
+> diff --git a/plugins/messages-tracker.c b/plugins/messages-tracker.c
+> index 2c7541b..aa62870 100644
+> --- a/plugins/messages-tracker.c
+> +++ b/plugins/messages-tracker.c
+> @@ -180,10 +180,8 @@ void messages_disconnect(void *s)
+>         g_free(session);
+>  }
+>
+> -int messages_set_notification_registration(void *session,
+> -               void (*send_event)(void *session,
+> -                       const struct messages_event *event, void *user_data),
+> -               void *user_data)
+> +int messages_set_notification_registration(void *session, char *address,
+> +                                               uint8_t status, void *user_data)
+>  {
+>         return -ENOSYS;
+>  }
+> diff --git a/plugins/messages.h b/plugins/messages.h
+> index 00a16b1..0fe5cc3 100644
+> --- a/plugins/messages.h
+> +++ b/plugins/messages.h
+> @@ -169,18 +169,17 @@ void messages_disconnect(void *session);
+>   * value is used to set the error code in OBEX response.
+>   ******************************************************************************/
+>
+> -/* Registers for messaging events notifications.
+> +/* Registers Message Client for receiving message event reports.
+>   *
+>   * session: Backend session.
+> - * send_event: Function that will be called to indicate a new event.
+> - *
+> - * To unregister currently registered notifications, call this with send_event
+> - * set to NULL.
+> + * address: Remote device address that request notification registration.
+> + * status: To indicate message notification registraton status
+> + * user_data: User data if any to be sent.
+>   */
+> -int messages_set_notification_registration(void *session,
+> -               void (*send_event)(void *session,
+> -                       const struct messages_event *event, void *user_data),
+> -               void *user_data);
+> +
+> +int messages_set_notification_registration(void *session, char *address,
+> +                                               uint8_t status,
+> +                                               void *user_data);
+>
+>  /* Changes current directory.
+>   *
+> --
+> 1.7.9.5
 
-bluetoothd[2219]: src/mgmt.c:mgmt_unpair_device() index 0 addr 38:16:D1:C5:D1:A2
-bluetoothd[2219]: audio/gateway.c:path_unregister() Unregistered interface org.bluez.HandsfreeGateway on path /org/bluez/2219/hci0/dev_38_16_D1_C5_D1_A2
-bluetoothd[2219]: audio/media.c:gateway_state_changed()
-bluetoothd[2219]: audio/media.c:gateway_state_changed() Clear endpoint 0x555555820640
-bluetoothd[2219]: audio/source.c:path_unregister() Unregistered interface org.bluez.AudioSource on path /org/bluez/2219/hci0/dev_38_16_D1_C5_D1_A2
-bluetoothd[2219]: src/device.c:btd_device_unref() 0x555555833e70: ref=1
-bluetoothd[2219]: src/adapter.c:adapter_get_device() 38:16:D1:C5:D1:A2
-bluetoothd[2219]: src/adapter.c:adapter_create_device() 38:16:D1:C5:D1:A2
-bluetoothd[2219]: src/device.c:device_create() Creating device /org/bluez/2219/hci0/dev_38_16_D1_C5_D1_A2
-bluetoothd[2219]: src/device.c:device_free() 0x55555581f9c0
-bluetoothd[2219]: Unable to get btd_device object for 38:16:D1:C5:D1:A2
-bluetoothd[2219]: src/device.c:btd_device_unref() 0x555555833e70: ref=0
-bluetoothd[2219]: src/device.c:device_free() 0x555555833e70
-bluetoothd[2219]: src/mgmt.c:mgmt_event() cond 1
-bluetoothd[2219]: src/mgmt.c:mgmt_event() Received 16 bytes from management socket
-bluetoothd[2219]: src/mgmt.c:mgmt_cmd_complete()
-bluetoothd[2219]: src/mgmt.c:mgmt_cmd_complete() unpair_device complete
 
-Program received signal SIGSEGV, Segmentation fault.
-0x000055555556fa26 in newconnection_reply (call=<optimized out>, data=0x555555824dd0) at audio/gateway.c:285
-285		if (!dev->gateway->rfcomm) {
----
- audio/gateway.c |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+The plan is to merge client with server so we don't have to call each
+other daemon to connect the notification service.
 
-diff --git a/audio/gateway.c b/audio/gateway.c
-index 45b25a1..6990573 100644
---- a/audio/gateway.c
-+++ b/audio/gateway.c
-@@ -282,6 +282,11 @@ static void newconnection_reply(DBusPendingCall *call, void *data)
- 	DBusMessage *reply = dbus_pending_call_steal_reply(call);
- 	DBusError derr;
- 
-+	if (gw == NULL) {
-+		DBG("Gateway closed before agent reply");
-+		goto done;
-+	}
-+
- 	if (!dev->gateway->rfcomm) {
- 		DBG("RFCOMM disconnected from server before agent reply");
- 		goto done;
+
 -- 
-1.7.7.6
-
+Luiz Augusto von Dentz
