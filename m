@@ -1,152 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Sep 2012 14:39:07 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	sunnyk@codeaurora.org
-Subject: Re: [RFCv1 03/20] Bluetooth: Add L2CAP create channel request
- handling
-Message-ID: <20120925113828.GG2509@aemeltch-MOBL1>
-References: <1347387691-5285-1-git-send-email-mathewm@codeaurora.org>
- <1347387691-5285-4-git-send-email-mathewm@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1347387691-5285-4-git-send-email-mathewm@codeaurora.org>
+Date: Tue, 25 Sep 2012 13:21:36 +0200
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: David Dillow <dave@thedillows.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	David Herrmann <dh.herrmann@googlemail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bastien Nocera <hadess@hadess.net>,
+	linux-input@vger.kernel.org, jkosina@suse.cz
+Subject: Re: [RFC, PATCH] hid-ps3remote: handle multiple keypresses for
+ joypad buttons
+Message-Id: <20120925132136.985de0b203fd342bce6dc77d@studenti.unina.it>
+In-Reply-To: <1348539215.15050.6.camel@obelisk.thedillows.org>
+References: <20120921220659.1e257048fed597061efb07f9@studenti.unina.it>
+	<1348485938-20510-1-git-send-email-ospite@studenti.unina.it>
+	<1348495002.7637.4.camel@obelisk.thedillows.org>
+	<1348539215.15050.6.camel@obelisk.thedillows.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+On Mon, 24 Sep 2012 22:13:35 -0400
+David Dillow <dave@thedillows.org> wrote:
 
-On Tue, Sep 11, 2012 at 11:21:14AM -0700, Mat Martineau wrote:
-> The L2CAP create channel request is very similar to an L2CAP connect
-> request, but it has an additional parameter for the controller ID.  If
-> the controller id is 0, the channel is set up on the BR/EDR controller
-> (just like a connect request).  Using a valid high speed controller ID
-> will cause the channel to be initially created on that high speed
-> controller.  While the L2CAP data will be initially routed over the
-> AMP controller, the L2CAP fixed signaling channel only uses BR/EDR.
+> On Mon, 2012-09-24 at 09:56 -0400, David Dillow wrote:
+> > On Mon, 2012-09-24 at 13:25 +0200, Antonio Ospite wrote:
+> > > In order to make this work I have to put joypad buttons only in one of
+> > > the key maps, I don't know if that is compatible with the Harmony
+> > > adapter.
+> > 
+> > I suspect it is, but I'll try to test later tonight. Feel free to merge
+> > my patch and yours and push it upstream under your name/copyright; I'm
+> > not attached to it.
 > 
-> When a create channel request is received for a high speed controller,
-> a pending response is always sent first.  After the high speed
-> physical and logical links are complete a success response will be
-> sent.
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  net/bluetooth/l2cap_core.c | 70 +++++++++++++++++++++++++++++++++++-----------
->  1 file changed, 54 insertions(+), 16 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 166382c..17e02d9 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -3362,8 +3362,9 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn, struct l2cap_cmd_hd
->  	return 0;
->  }
->  
-> -static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
-> -			    u8 *data, u8 rsp_code, u8 amp_id)
-> +static struct l2cap_chan *__l2cap_connect(struct l2cap_conn *conn,
-> +					  struct l2cap_cmd_hdr *cmd,
-> +					  u8 *data, u8 rsp_code, u8 amp_id)
->  {
->  	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
->  	struct l2cap_conn_rsp rsp;
-> @@ -3390,7 +3391,7 @@ static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
->  
->  	/* Check if the ACL is secure enough (if not SDP) */
->  	if (psm != __constant_cpu_to_le16(L2CAP_PSM_SDP) &&
-> -				!hci_conn_check_link_mode(conn->hcon)) {
-> +	    !hci_conn_check_link_mode(conn->hcon)) {
->  		conn->disc_reason = HCI_ERROR_AUTH_FAILURE;
->  		result = L2CAP_CR_SEC_BLOCK;
->  		goto response;
-> @@ -3414,6 +3415,7 @@ static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
->  	bacpy(&bt_sk(sk)->dst, conn->dst);
->  	chan->psm  = psm;
->  	chan->dcid = scid;
-> +	chan->local_amp_id = amp_id;
->  
->  	bt_accept_enqueue(parent, sk);
->  
-> @@ -3433,8 +3435,16 @@ static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
->  				status = L2CAP_CS_AUTHOR_PEND;
->  				parent->sk_data_ready(parent, 0);
->  			} else {
-> -				__l2cap_state_change(chan, BT_CONFIG);
-> -				result = L2CAP_CR_SUCCESS;
-> +				/* Force pending result for AMP controllers.
-> +				 * The connection will succeed after the
-> +				 * physical link is up. */
-> +				if (amp_id) {
-> +					__l2cap_state_change(chan, BT_CONNECT2);
-> +					result = L2CAP_CR_PEND;
-> +				} else {
-> +					__l2cap_state_change(chan, BT_CONFIG);
-> +					result = L2CAP_CR_SUCCESS;
-> +				}
->  				status = L2CAP_CS_NO_INFO;
->  			}
->  		} else {
-> @@ -3480,6 +3490,8 @@ sendresp:
->  					l2cap_build_conf_req(chan, buf), buf);
->  		chan->num_conf_req++;
->  	}
-> +
-> +	return chan;
->  }
->  
->  static int l2cap_connect_req(struct l2cap_conn *conn,
-> @@ -3970,12 +3982,12 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
->  	return 0;
->  }
->  
-> -static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
-> -					struct l2cap_cmd_hdr *cmd, u16 cmd_len,
-> -					void *data)
-> +static int l2cap_create_channel_req(struct l2cap_conn *conn,
-> +				    struct l2cap_cmd_hdr *cmd, u16 cmd_len,
-> +				    void *data)
->  {
->  	struct l2cap_create_chan_req *req = data;
-> -	struct l2cap_create_chan_rsp rsp;
-> +	struct l2cap_chan *chan;
->  	u16 psm, scid;
->  
->  	if (cmd_len != sizeof(*req))
-> @@ -3989,14 +4001,40 @@ static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
->  
->  	BT_DBG("psm 0x%2.2x, scid 0x%4.4x, amp_id %d", psm, scid, req->amp_id);
->  
-> -	/* Placeholder: Always reject */
-> -	rsp.dcid = 0;
-> -	rsp.scid = cpu_to_le16(scid);
-> -	rsp.result = __constant_cpu_to_le16(L2CAP_CR_NO_MEM);
-> -	rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
-> +	if (req->amp_id) {
-> +		struct hci_dev *hdev;
->  
-> -	l2cap_send_cmd(conn, cmd->ident, L2CAP_CREATE_CHAN_RSP,
-> -		       sizeof(rsp), &rsp);
-> +		/* Validate AMP controller id */
-> +		hdev = hci_dev_get(req->amp_id);
-> +		if (!hdev || hdev->dev_type != HCI_AMP ||
-> +		    !test_bit(HCI_UP, &hdev->flags)) {
-> +			struct l2cap_create_chan_rsp rsp;
-> +
-> +			rsp.dcid = 0;
-> +			rsp.scid = cpu_to_le16(scid);
-> +			rsp.result = L2CAP_CR_BAD_AMP;
-> +			rsp.status = L2CAP_CS_NO_INFO;
+> Yep, this works with the Harmony.
+>
 
-Please consider this:
+Good.
 
--                       rsp.result = L2CAP_CR_BAD_AMP;
--                       rsp.status = L2CAP_CS_NO_INFO;
-+                       rsp.result = __constant_cpu_to_le16(L2CAP_CR_BAD_AMP);
-+                       rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
+I will send a v3 then, with you as the main author (the From: field) and
+with myself added in the MODULE_AUTHOR section, this looks like the best
+way to me as you are the initial author. I'd like you to take a final
+look at that one tho, and maybe do an actual test too.
 
+I will add the note about the "setup" procedure too.
 
-Best regards 
-Andrei Emeltchenko 
+> I think the logic you are using may result in some combinations being
+> missed -- say Triangle + Play -- but I'm not sure how much it matters.
 
+Yes, when pressing something like Triangle+Play the Play pressure is
+completely ignored as a 0xff is reported in the 5th byte, but it's the
+hardware which behaves that way, the driver is just very adherent to
+what the hardware provides.
+
+> I
+> can rework the first version (building a custom report based on the
+> funky rules of coding) in the next few days, or you can push your
+> version if you'd like. Or perhaps a middle way, that erases the buttons
+> reported in the bitmap from the byte array, but otherwise keeps track of
+> the last press in that area to avoid weirdness when the user presses a
+> button combo that cannot be reported due to the HW limitations.
+>
+
+I'd say we ignore this fact and not try to be too smart here, the
+hardware has the limitation so we can blame someone else.
+Does that make sense to you?
+
+Thanks,
+   Antonio
+
+-- 
+Antonio Ospite
+http://ao2.it
+
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
