@@ -1,225 +1,354 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1348601288-18975-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1348601288-18975-1-git-send-email-lucas.demarchi@profusion.mobi>
-Date: Wed, 26 Sep 2012 13:20:31 +0300
-Message-ID: <CABBYNZ+1fsVReRj6HKPjXZY6LJZ7Ts+PwMW3c=+rE-7YCMk4mg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] gdbus: Fix wrong signal handler match
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: David Dillow <dave@thedillows.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	David Herrmann <dh.herrmann@googlemail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bastien Nocera <hadess@hadess.net>,
+	linux-input@vger.kernel.org, jkosina@suse.cz,
+	Antonio Ospite <ospite@studenti.unina.it>
+Subject: [PATCH v4] HID: Add support for Sony PS3 BD Remote Control
+Date: Tue, 25 Sep 2012 23:02:27 +0200
+Message-Id: <1348606947-3055-1-git-send-email-ospite@studenti.unina.it>
+In-Reply-To: <1348584182.27596.28.camel@frustration.ornl.gov>
+References: <1348584182.27596.28.camel@frustration.ornl.gov>
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HI Lucas,
+From: David Dillow <dave@thedillows.org>
 
-On Tue, Sep 25, 2012 at 10:28 PM, Lucas De Marchi
-<lucas.demarchi@profusion.mobi> wrote:
-> When we add a signal handler with g_dbus_add_signal_watch(), this
-> function tries to multiplex the matches added in libdbus by checking
-> if there's a previous filter_data with the same fields. However, if the
-> field is NULL it accepts as being the same. The result is that the
-> following watches will use the same filter data:
->
-> watch1 = g_dbus_add_signal_watch(conn, BUS_NAME, NULL, iface, member,
->                                                 cb1, data1, NULL);
-> watch2 = g_dbus_add_signal_watch(conn, BUS_NAME, "/path2", iface, member,
->                                                 cb2, data2, NULL);
-> watch3 = g_dbus_add_signal_watch(conn, BUS_NAME, "/path3", iface, member,
->                                                 cb3, data3, NULL);
->
-> The result is that when a signal arrives with path == "/path2", all 3
-> callbacks above will be called, with the same signal delivered to all of
-> them.
->
-> Another problem is that, if we invert the calls like below, only signals
-> to cb1 will never be trigerred, nonetheless it used path == NULL.
->
-> watch2 = g_dbus_add_signal_watch(conn, BUS_NAME, "/path2", iface, member,
->                                                 cb2, data2, NULL);
-> watch1 = g_dbus_add_signal_watch(conn, BUS_NAME, NULL, iface, member,
->                                                 cb1, data1, NULL);
-> watch3 = g_dbus_add_signal_watch(conn, BUS_NAME, "/path3", iface, member,
->                                                 cb3, data3, NULL);
->
-> This is fixed by not multiplexing the matchs with filter data if any of
-> the fields are different, including being NULL. When a signal arrives,
-> if a field is NULL we accept it as a match, but not when adding the
-> signal handler.
-> ---
->  gdbus/watch.c | 115 +++++++++++++++++++++++++++++++++++++++++++++++-----------
->  1 file changed, 94 insertions(+), 21 deletions(-)
->
-> diff --git a/gdbus/watch.c b/gdbus/watch.c
-> index d749176..33c12ed 100644
-> --- a/gdbus/watch.c
-> +++ b/gdbus/watch.c
-> @@ -78,6 +78,47 @@ struct filter_data {
->         gboolean registered;
->  };
->
-> +static struct filter_data *filter_data_find_nonnull(DBusConnection *connection,
-> +                                                       const char *name,
-> +                                                       const char *owner,
-> +                                                       const char *path,
-> +                                                       const char *interface,
-> +                                                       const char *member,
-> +                                                       const char *argument)
-> +{
-> +       GSList *current;
-> +
-> +       for (current = listeners;
-> +                       current != NULL; current = current->next) {
-> +               struct filter_data *data = current->data;
-> +
-> +               if (connection != data->connection)
-> +                       continue;
-> +
-> +               if (g_strcmp0(name, data->name) != 0)
-> +                       continue;
-> +
-> +               if (g_strcmp0(owner, data->owner) != 0)
-> +                       continue;
-> +
-> +               if (g_strcmp0(path, data->path) != 0)
-> +                       continue;
-> +
-> +               if (g_strcmp0(interface, data->interface) != 0)
-> +                       continue;
-> +
-> +               if (g_strcmp0(member, data->member) != 0)
-> +                       continue;
-> +
-> +               if (g_strcmp0(argument, data->argument) != 0)
-> +                       continue;
-> +
-> +               return data;
-> +       }
-> +
-> +       return NULL;
-> +}
-> +
->  static struct filter_data *filter_data_find(DBusConnection *connection,
->                                                         const char *name,
->                                                         const char *owner,
-> @@ -221,8 +262,8 @@ static struct filter_data *filter_data_get(DBusConnection *connection,
->                 name = sender;
->
->  proceed:
-> -       data = filter_data_find(connection, name, owner, path, interface,
-> -                                       member, argument);
-> +       data = filter_data_find_nonnull(connection, name, owner, path,
-> +                                               interface, member, argument);
+The Sony PS3 Blue-ray Disc Remote Control used to be supported by the
+BlueZ project's user space, but the code that handled it was recently
+removed as its functionality conflicted with a real HSP implementation
+and the mapping was thought to be better handled in the kernel. This is
+a port of the mapping logic from the fakehid driver by Marcel Holtmann
+to the in-kernel HID layer.
 
-Call it filter_data_find_match to be more obvious that we need an
-exact match here.
+We also add support for the Logitech Harmony Adapter for PS3, which
+emulates the BD Remote.
 
->         if (data)
->                 return data;
->
-> @@ -501,6 +542,7 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
->  {
->         struct filter_data *data;
->         const char *sender, *path, *iface, *member, *arg = NULL;
-> +       GSList *current, *delete_listener = NULL;
->
->         /* Only filter signals */
->         if (dbus_message_get_type(message) != DBUS_MESSAGE_TYPE_SIGNAL)
-> @@ -512,30 +554,63 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
->         member = dbus_message_get_member(message);
->         dbus_message_get_args(message, NULL, DBUS_TYPE_STRING, &arg, DBUS_TYPE_INVALID);
->
-> -       /* Sender is always bus name */
-> -       data = filter_data_find(connection, NULL, sender, path, iface, member,
-> -                                       arg);
-> -       if (data == NULL) {
-> -               error("Got %s.%s signal which has no listeners", iface, member);
-> -               return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-> -       }
-> +       /* Sender is always the owner */
-> +
-> +       for (current = listeners; current != NULL; current = current->next) {
-> +               data = current->data;
-> +
-> +               if (connection != data->connection)
-> +                       continue;
-> +
-> +               if (data->owner && g_str_equal(sender, data->owner) == FALSE)
-> +                       continue;
->
-> -       if (data->handle_func) {
-> -               data->lock = TRUE;
-> +               if (data->path && g_str_equal(path, data->path) == FALSE)
-> +                       continue;
-> +
-> +               if (data->interface && g_str_equal(iface,
-> +                                               data->interface) == FALSE)
-> +                       continue;
->
-> -               data->handle_func(connection, message, data);
-> +               if (data->member && g_str_equal(member, data->member) == FALSE)
-> +                       continue;
->
-> -               data->callbacks = data->processed;
-> -               data->processed = NULL;
-> -               data->lock = FALSE;
-> +               if (data->argument && g_str_equal(arg,
-> +                                               data->argument) == FALSE)
-> +                       continue;
-> +
-> +               if (data->handle_func) {
-> +                       data->lock = TRUE;
-> +
-> +                       data->handle_func(connection, message, data);
-> +
-> +                       data->callbacks = data->processed;
-> +                       data->processed = NULL;
-> +                       data->lock = FALSE;
-> +               }
-> +
-> +               if (!data->callbacks)
-> +                       delete_listener = g_slist_prepend(delete_listener,
-> +                                                               current);
->         }
->
-> -       if (data->callbacks)
-> -               return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-> +       for (current = delete_listener; current != NULL;
-> +                                       current = delete_listener->next) {
-> +               GSList *l = current->data;
->
-> -       remove_match(data);
-> +               data = l->data;
->
-> -       listeners = g_slist_remove(listeners, data);
-> +               /* Has any other callback added callbacks back to this data? */
-> +               if (data->callbacks != NULL)
-> +                       continue;
-> +
-> +               remove_match(data);
-> +               listeners = g_slist_remove_link(listeners, l);
-> +
-> +               filter_data_free(data);
-> +       }
-> +
-> +       g_slist_free(delete_listener);
->
->         /* Remove filter if there are no listeners left for the connection */
->         if (filter_data_find(connection, NULL, NULL, NULL, NULL, NULL,
-> @@ -543,8 +618,6 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
->                 dbus_connection_remove_filter(connection, message_filter,
->                                                 NULL);
->
-> -       filter_data_free(data);
-> -
->         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
->  }
->
-> --
-> 1.7.12.1
+Signed-off-by: David Dillow <dave@thedillows.org>
+Signed-off-by: Antonio Ospite <ospite@studenti.unina.it>
+---
 
-The rest looks good.
+Changes since v3:
+  - move the size check into the switch statement.
 
+Thanks,
+   Antonio
+
+ drivers/hid/Kconfig         |   13 ++-
+ drivers/hid/Makefile        |    1 +
+ drivers/hid/hid-core.c      |    2 +
+ drivers/hid/hid-ids.h       |    2 +
+ drivers/hid/hid-ps3remote.c |  215 +++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 232 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/hid/hid-ps3remote.c
+
+diff --git a/drivers/hid/Kconfig b/drivers/hid/Kconfig
+index fbf4950..378be0b 100644
+--- a/drivers/hid/Kconfig
++++ b/drivers/hid/Kconfig
+@@ -534,6 +534,15 @@ config HID_PRIMAX
+ 	Support for Primax devices that are not fully compliant with the
+ 	HID standard.
+ 
++config HID_PS3REMOTE
++	tristate "Sony PS3 BD Remote Control"
++	depends on BT_HIDP
++	---help---
++	Support for the Sony PS3 Blue-ray Disk Remote Control and Logitech
++	Harmony Adapter for PS3, which connect over Bluetooth.
++
++	Support for the 6-axis controllers is provided by HID_SONY.
++
+ config HID_ROCCAT
+ 	tristate "Roccat device support"
+ 	depends on USB_HID
+@@ -561,7 +570,9 @@ config HID_SONY
+ 	tristate "Sony PS3 controller"
+ 	depends on USB_HID
+ 	---help---
+-	Support for Sony PS3 controller.
++	Support for Sony PS3 6-axis controllers.
++
++	Support for the Sony PS3 BD Remote is provided by HID_PS3REMOTE.
+ 
+ config HID_SPEEDLINK
+ 	tristate "Speedlink VAD Cezanne mouse support"
+diff --git a/drivers/hid/Makefile b/drivers/hid/Makefile
+index f975485..333ed6c 100644
+--- a/drivers/hid/Makefile
++++ b/drivers/hid/Makefile
+@@ -70,6 +70,7 @@ obj-$(CONFIG_HID_PANTHERLORD)	+= hid-pl.o
+ obj-$(CONFIG_HID_PETALYNX)	+= hid-petalynx.o
+ obj-$(CONFIG_HID_PICOLCD)	+= hid-picolcd.o
+ obj-$(CONFIG_HID_PRIMAX)	+= hid-primax.o
++obj-$(CONFIG_HID_PS3REMOTE)	+= hid-ps3remote.o
+ obj-$(CONFIG_HID_ROCCAT)	+= hid-roccat.o hid-roccat-common.o \
+ 	hid-roccat-arvo.o hid-roccat-isku.o hid-roccat-kone.o \
+ 	hid-roccat-koneplus.o hid-roccat-kovaplus.o hid-roccat-pyra.o \
+diff --git a/drivers/hid/hid-core.c b/drivers/hid/hid-core.c
+index 8bcd168..e4275d4 100644
+--- a/drivers/hid/hid-core.c
++++ b/drivers/hid/hid-core.c
+@@ -1566,6 +1566,7 @@ static const struct hid_device_id hid_have_special_driver[] = {
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_S510_RECEIVER) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_S510_RECEIVER_2) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_LOGITECH_RECEIVER) },
++	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_LOGITECH_HARMONY_PS3) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_DINOVO_DESKTOP) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_DINOVO_EDGE) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_DINOVO_MINI) },
+@@ -1639,6 +1640,7 @@ static const struct hid_device_id hid_have_special_driver[] = {
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SAMSUNG, USB_DEVICE_ID_SAMSUNG_IR_REMOTE) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SAMSUNG, USB_DEVICE_ID_SAMSUNG_WIRELESS_KBD_MOUSE) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SKYCABLE, USB_DEVICE_ID_SKYCABLE_WIRELESS_PRESENTER) },
++	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_BDREMOTE) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_NAVIGATION_CONTROLLER) },
+ 	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
+diff --git a/drivers/hid/hid-ids.h b/drivers/hid/hid-ids.h
+index 1dcb76f..40411c9 100644
+--- a/drivers/hid/hid-ids.h
++++ b/drivers/hid/hid-ids.h
+@@ -496,6 +496,7 @@
+ #define USB_DEVICE_ID_LOGITECH_RECEIVER	0xc101
+ #define USB_DEVICE_ID_LOGITECH_HARMONY_FIRST  0xc110
+ #define USB_DEVICE_ID_LOGITECH_HARMONY_LAST 0xc14f
++#define USB_DEVICE_ID_LOGITECH_HARMONY_PS3 0x0306
+ #define USB_DEVICE_ID_LOGITECH_RUMBLEPAD_CORD	0xc20a
+ #define USB_DEVICE_ID_LOGITECH_RUMBLEPAD	0xc211
+ #define USB_DEVICE_ID_LOGITECH_EXTREME_3D	0xc215
+@@ -683,6 +684,7 @@
+ 
+ #define USB_VENDOR_ID_SONY			0x054c
+ #define USB_DEVICE_ID_SONY_VAIO_VGX_MOUSE	0x024b
++#define USB_DEVICE_ID_SONY_PS3_BDREMOTE		0x0306
+ #define USB_DEVICE_ID_SONY_PS3_CONTROLLER	0x0268
+ #define USB_DEVICE_ID_SONY_NAVIGATION_CONTROLLER	0x042f
+ 
+diff --git a/drivers/hid/hid-ps3remote.c b/drivers/hid/hid-ps3remote.c
+new file mode 100644
+index 0000000..03811e5
+--- /dev/null
++++ b/drivers/hid/hid-ps3remote.c
+@@ -0,0 +1,215 @@
++/*
++ * HID driver for Sony PS3 BD Remote Control
++ *
++ * Copyright (c) 2012 David Dillow <dave@thedillows.org>
++ * Based on a blend of the bluez fakehid user-space code by Marcel Holtmann
++ * and other kernel HID drivers.
++ */
++
++/*
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ */
++
++/* NOTE: in order for the Sony PS3 BD Remote Control to be found by
++ * a Bluetooth host, the key combination Start+Enter has to be kept pressed
++ * for about 7 seconds with the Bluetooth Host Controller in discovering mode.
++ *
++ * There will be no PIN request from the device.
++ */
++
++#include <linux/device.h>
++#include <linux/hid.h>
++#include <linux/module.h>
++
++#include "hid-ids.h"
++
++static __u8 ps3remote_rdesc[] = {
++	0x05, 0x01,          /* GUsagePage Generic Desktop */
++	0x09, 0x05,          /* LUsage 0x05 [Game Pad] */
++	0xA1, 0x01,          /* MCollection Application (mouse, keyboard) */
++
++	 /* Use collection 1 for joypad buttons */
++	 0xA1, 0x02,         /* MCollection Logical (interrelated data) */
++
++	  /* Ignore the 1st byte, maybe it is used for a controller
++	   * number but it's not needed for correct operation */
++	  0x75, 0x08,        /* GReportSize 0x08 [8] */
++	  0x95, 0x01,        /* GReportCount 0x01 [1] */
++	  0x81, 0x01,        /* MInput 0x01 (Const[0] Arr[1] Abs[2]) */
++
++	  /* Bytes from 2nd to 4th are a bitmap for joypad buttons, for these
++	   * buttons multiple keypresses are allowed */
++	  0x05, 0x09,        /* GUsagePage Button */
++	  0x19, 0x01,        /* LUsageMinimum 0x01 [Button 1 (primary/trigger)] */
++	  0x29, 0x18,        /* LUsageMaximum 0x18 [Button 24] */
++	  0x14,              /* GLogicalMinimum [0] */
++	  0x25, 0x01,        /* GLogicalMaximum 0x01 [1] */
++	  0x75, 0x01,        /* GReportSize 0x01 [1] */
++	  0x95, 0x18,        /* GReportCount 0x18 [24] */
++	  0x81, 0x02,        /* MInput 0x02 (Data[0] Var[1] Abs[2]) */
++
++	  0xC0,              /* MEndCollection */
++
++	 /* Use collection 2 for remote control buttons */
++	 0xA1, 0x02,         /* MCollection Logical (interrelated data) */
++
++	  /* 5th byte is used for remote control buttons */
++	  0x05, 0x09,        /* GUsagePage Button */
++	  0x18,              /* LUsageMinimum [No button pressed] */
++	  0x29, 0xFE,        /* LUsageMaximum 0xFE [Button 254] */
++	  0x14,              /* GLogicalMinimum [0] */
++	  0x26, 0xFE, 0x00,  /* GLogicalMaximum 0x00FE [254] */
++	  0x75, 0x08,        /* GReportSize 0x08 [8] */
++	  0x95, 0x01,        /* GReportCount 0x01 [1] */
++	  0x80,              /* MInput  */
++
++	  /* Ignore bytes from 6th to 11th, 6th to 10th are always constant at
++	   * 0xff and 11th is for press indication */
++	  0x75, 0x08,        /* GReportSize 0x08 [8] */
++	  0x95, 0x06,        /* GReportCount 0x06 [6] */
++	  0x81, 0x01,        /* MInput 0x01 (Const[0] Arr[1] Abs[2]) */
++
++	  /* 12th byte is for battery strength */
++	  0x05, 0x06,        /* GUsagePage Generic Device Controls */
++	  0x09, 0x20,        /* LUsage 0x20 [Battery Strength] */
++	  0x14,              /* GLogicalMinimum [0] */
++	  0x25, 0x05,        /* GLogicalMaximum 0x05 [5] */
++	  0x75, 0x08,        /* GReportSize 0x08 [8] */
++	  0x95, 0x01,        /* GReportCount 0x01 [1] */
++	  0x81, 0x02,        /* MInput 0x02 (Data[0] Var[1] Abs[2]) */
++
++	  0xC0,              /* MEndCollection */
++
++	 0xC0                /* MEndCollection [Game Pad] */
++};
++
++static const unsigned int ps3remote_keymap_joypad_buttons[] = {
++	[0x01] = KEY_SELECT,
++	[0x02] = BTN_THUMBL,		/* L3 */
++	[0x03] = BTN_THUMBR,		/* R3 */
++	[0x04] = BTN_START,
++	[0x05] = KEY_UP,
++	[0x06] = KEY_RIGHT,
++	[0x07] = KEY_DOWN,
++	[0x08] = KEY_LEFT,
++	[0x09] = BTN_TL2,		/* L2 */
++	[0x0a] = BTN_TR2,		/* R2 */
++	[0x0b] = BTN_TL,		/* L1 */
++	[0x0c] = BTN_TR,		/* R1 */
++	[0x0d] = KEY_OPTION,		/* options/triangle */
++	[0x0e] = KEY_BACK,		/* back/circle */
++	[0x0f] = BTN_0,			/* cross */
++	[0x10] = KEY_SCREEN,		/* view/square */
++	[0x11] = KEY_HOMEPAGE,		/* PS button */
++	[0x14] = KEY_ENTER,
++};
++static const unsigned int ps3remote_keymap_remote_buttons[] = {
++	[0x00] = KEY_1,
++	[0x01] = KEY_2,
++	[0x02] = KEY_3,
++	[0x03] = KEY_4,
++	[0x04] = KEY_5,
++	[0x05] = KEY_6,
++	[0x06] = KEY_7,
++	[0x07] = KEY_8,
++	[0x08] = KEY_9,
++	[0x09] = KEY_0,
++	[0x0e] = KEY_ESC,		/* return */
++	[0x0f] = KEY_CLEAR,
++	[0x16] = KEY_EJECTCD,
++	[0x1a] = KEY_MENU,		/* top menu */
++	[0x28] = KEY_TIME,
++	[0x30] = KEY_PREVIOUS,
++	[0x31] = KEY_NEXT,
++	[0x32] = KEY_PLAY,
++	[0x33] = KEY_REWIND,		/* scan back */
++	[0x34] = KEY_FORWARD,		/* scan forward */
++	[0x38] = KEY_STOP,
++	[0x39] = KEY_PAUSE,
++	[0x40] = KEY_CONTEXT_MENU,	/* pop up/menu */
++	[0x60] = KEY_FRAMEBACK,		/* slow/step back */
++	[0x61] = KEY_FRAMEFORWARD,	/* slow/step forward */
++	[0x63] = KEY_SUBTITLE,
++	[0x64] = KEY_AUDIO,
++	[0x65] = KEY_ANGLE,
++	[0x70] = KEY_INFO,		/* display */
++	[0x80] = KEY_BLUE,
++	[0x81] = KEY_RED,
++	[0x82] = KEY_GREEN,
++	[0x83] = KEY_YELLOW,
++};
++
++static __u8 *ps3remote_fixup(struct hid_device *hdev, __u8 *rdesc,
++			     unsigned int *rsize)
++{
++	*rsize = sizeof(ps3remote_rdesc);
++	return ps3remote_rdesc;
++}
++
++static int ps3remote_mapping(struct hid_device *hdev, struct hid_input *hi,
++			     struct hid_field *field, struct hid_usage *usage,
++			     unsigned long **bit, int *max)
++{
++	unsigned int key = usage->hid & HID_USAGE;
++
++	if ((usage->hid & HID_USAGE_PAGE) != HID_UP_BUTTON)
++		return -1;
++
++	switch (usage->collection_index) {
++	case 1:
++		if (key >= ARRAY_SIZE(ps3remote_keymap_joypad_buttons))
++			return -1;
++
++		key = ps3remote_keymap_joypad_buttons[key];
++		if (!key)
++			return -1;
++		break;
++	case 2:
++		if (key >= ARRAY_SIZE(ps3remote_keymap_remote_buttons))
++			return -1;
++
++		key = ps3remote_keymap_remote_buttons[key];
++		if (!key)
++			return -1;
++		break;
++	default:
++		return -1;
++	}
++
++	hid_map_usage_clear(hi, usage, bit, max, EV_KEY, key);
++	return 1;
++}
++
++static const struct hid_device_id ps3remote_devices[] = {
++	/* PS3 BD Remote Control */
++	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_BDREMOTE) },
++	/* Logitech Harmony Adapter for PS3 */
++	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_LOGITECH, USB_DEVICE_ID_LOGITECH_HARMONY_PS3) },
++	{ }
++};
++MODULE_DEVICE_TABLE(hid, ps3remote_devices);
++
++static struct hid_driver ps3remote_driver = {
++	.name          = "ps3_remote",
++	.id_table      = ps3remote_devices,
++	.report_fixup  = ps3remote_fixup,
++	.input_mapping = ps3remote_mapping,
++};
++
++static int __init ps3remote_init(void)
++{
++	return hid_register_driver(&ps3remote_driver);
++}
++
++static void __exit ps3remote_exit(void)
++{
++	hid_unregister_driver(&ps3remote_driver);
++}
++
++module_init(ps3remote_init);
++module_exit(ps3remote_exit);
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("David Dillow <dave@thedillows.org>, Antonio Ospite <ospite@studenti.unina.it>");
 -- 
-Luiz Augusto von Dentz
+1.7.10.4
+
