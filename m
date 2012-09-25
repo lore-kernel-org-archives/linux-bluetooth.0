@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 14/14] thermometer: Fix missing braces
-Date: Tue, 25 Sep 2012 16:52:43 +0200
-Message-ID: <1348584763-22824-15-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 06/14] thermometer: Update test script
+Date: Tue, 25 Sep 2012 16:52:35 +0200
+Message-ID: <1348584763-22824-7-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1348584763-22824-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1348584763-22824-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -13,65 +13,55 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- profiles/thermometer/thermometer.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ test/test-thermometer | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
-index 8733843..0e2bf0a 100644
---- a/profiles/thermometer/thermometer.c
-+++ b/profiles/thermometer/thermometer.c
-@@ -335,8 +335,9 @@ static void change_property(struct thermometer *t, const char *name,
- 		emit_property_changed(device_get_path(t->dev),
- 					THERMOMETER_INTERFACE, name,
- 					DBUS_TYPE_UINT16, &t->min);
--	} else
-+	} else {
- 		DBG("%s is not a thermometer property", name);
-+	}
- }
+diff --git a/test/test-thermometer b/test/test-thermometer
+index 9216264..2ca260f 100755
+--- a/test/test-thermometer
++++ b/test/test-thermometer
+@@ -16,9 +16,9 @@ from optparse import OptionParser, make_option
  
- static void valid_range_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
-@@ -421,8 +422,9 @@ static void process_thermometer_desc(struct descriptor *desc)
- 			val = GATT_CLIENT_CHARAC_CFG_IND_BIT;
- 			msg = g_strdup("Enable Measurement Interval "
- 								"indication");
--		} else
-+		} else {
- 			goto done;
-+		}
+ class Watcher(dbus.service.Object):
+ 	@dbus.service.method("org.bluez.ThermometerWatcher",
+-					in_signature="a{sv}", out_signature="")
+-	def MeasurementReceived(self, measure):
+-		print(measure["Measurement"], " measurement received")
++					in_signature="oa{sv}", out_signature="")
++	def MeasurementReceived(self, device, measure):
++		print("%s measurement received from %s" % (measure["Measurement"], device))
+ 		print("Exponent: ", measure["Exponent"])
+ 		print("Mantissa: ", measure["Mantissa"])
+ 		print("Unit: ", measure["Unit"])
+@@ -66,23 +66,23 @@ if __name__ == "__main__":
+ 	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
+ 							"org.bluez.Adapter")
  
- 		att_put_u16(val, atval);
- 		gatt_write_char(ch->t->attrib, desc->handle, atval, 2,
-@@ -548,12 +550,13 @@ static void process_thermometer_char(struct characteristic *ch)
- 		gboolean intermediate = TRUE;
- 		change_property(ch->t, "Intermediate", &intermediate);
- 		return;
--	} else if (g_strcmp0(ch->attr.uuid, TEMPERATURE_TYPE_UUID) == 0)
-+	} else if (g_strcmp0(ch->attr.uuid, TEMPERATURE_TYPE_UUID) == 0) {
- 		gatt_read_char(ch->t->attrib, ch->attr.value_handle, 0,
- 							read_temp_type_cb, ch);
--	else if (g_strcmp0(ch->attr.uuid, MEASUREMENT_INTERVAL_UUID) == 0)
-+	} else if (g_strcmp0(ch->attr.uuid, MEASUREMENT_INTERVAL_UUID) == 0) {
- 		gatt_read_char(ch->t->attrib, ch->attr.value_handle, 0,
- 							read_interval_cb, ch);
-+	}
- }
++	thermometer_manager = dbus.Interface(bus.get_object("org.bluez",
++				adapter_path), "org.bluez.ThermometerManager")
++
+ 	device_path = adapter.FindDevice(options.address)
  
- static void configure_thermometer_cb(GSList *characteristics, guint8 status,
-@@ -591,10 +594,11 @@ static void configure_thermometer_cb(GSList *characteristics, guint8 status,
- 			if (start == c->handle)
- 				continue;
- 			end = c->handle - 1;
--		} else if (c->value_handle != t->svc_range->end)
-+		} else if (c->value_handle != t->svc_range->end) {
- 			end = t->svc_range->end;
--		else
-+		} else {
- 			continue;
-+		}
+ 	bus.add_signal_receiver(property_changed, bus_name="org.bluez",
+ 				dbus_interface="org.bluez.Thermometer",
+ 				signal_name="PropertyChanged")
  
- 		gatt_find_info(t->attrib, start, end, discover_desc_cb, ch);
- 	}
+-	thermometer = dbus.Interface(bus.get_object("org.bluez",
+-					device_path), "org.bluez.Thermometer")
+-
+ 	path = "/test/watcher"
+ 	watcher = Watcher(bus, path)
+ 
+-	thermometer.RegisterWatcher(path)
++	thermometer_manager.RegisterWatcher(path)
+ 
+ 	if len(args) > 0:
+ 		if args[0] == "EnableIntermediateMeasurement":
+-			thermometer.EnableIntermediateMeasurement(path)
++			thermometer_manager.EnableIntermediateMeasurement(path)
+ 		else:
+ 			print("unknown command")
+ 			sys.exit(1)
 -- 
 1.7.11.3
 
