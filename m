@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v8 03/13] heartrate: Add attio callbacks
-Date: Tue, 25 Sep 2012 16:27:36 +0200
-Message-ID: <1348583267-16816-4-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH v8 01/13] Heart Rate Profile (HRP) client API
+Date: Tue, 25 Sep 2012 16:27:34 +0200
+Message-ID: <1348583267-16816-2-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1348583267-16816-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1348583267-16816-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,84 +12,103 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- profiles/heartrate/heartrate.c | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+From: Santiago Carot-Nemesio <sancane@gmail.com>
 
-diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index 87bc309..e057180 100644
---- a/profiles/heartrate/heartrate.c
-+++ b/profiles/heartrate/heartrate.c
-@@ -31,6 +31,11 @@
- 
- #include "adapter.h"
- #include "device.h"
-+#include "gattrib.h"
-+#include "att.h"
-+#include "gatt.h"
-+#include "attio.h"
-+#include "log.h"
- #include "heartrate.h"
- 
- struct heartrate_adapter {
-@@ -41,6 +46,8 @@ struct heartrate_adapter {
- struct heartrate {
- 	struct btd_device		*dev;
- 	struct heartrate_adapter	*hradapter;
-+	GAttrib				*attrib;
-+	guint				attioid;
- };
- 
- static GSList *heartrate_adapters = NULL;
-@@ -82,6 +89,12 @@ static void destroy_heartrate(gpointer user_data)
- {
- 	struct heartrate *hr = user_data;
- 
-+	if (hr->attioid > 0)
-+		btd_device_remove_attio_callback(hr->dev, hr->attioid);
+---
+ doc/heartrate-api.txt | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 84 insertions(+)
+ create mode 100644 doc/heartrate-api.txt
+
+diff --git a/doc/heartrate-api.txt b/doc/heartrate-api.txt
+new file mode 100644
+index 0000000..1fa9d0b
+--- /dev/null
++++ b/doc/heartrate-api.txt
+@@ -0,0 +1,84 @@
++Heart Rate API description
++****************************************
 +
-+	if (hr->attrib != NULL)
-+		g_attrib_unref(hr->attrib);
++Copyright (C) 2012	Santiago Carot-Nemesio <sancane@gmail.com>
++Copyright (C) 2012	Tieto Poland
 +
- 	btd_device_unref(hr->dev);
- 	g_free(hr);
- }
-@@ -93,6 +106,25 @@ static void destroy_heartrate_adapter(gpointer user_data)
- 	g_free(hradapter);
- }
- 
-+static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
-+{
-+	struct heartrate *hr = user_data;
++Heart Rate Manager hierarchy
++============================
 +
-+	DBG("");
++Service		org.bluez
++Interface	org.bluez.HeartRateManager
++Object path	[variable prefix]/{hci0,hci1,...}
 +
-+	hr->attrib = g_attrib_ref(attrib);
-+}
++Methods		RegisterWatcher(object agent)
 +
-+static void attio_disconnected_cb(gpointer user_data)
-+{
-+	struct heartrate *hr = user_data;
++			Registers a watcher to monitor heart rate measurements.
 +
-+	DBG("");
++			Possible Errors: org.bluez.Error.InvalidArguments
 +
-+	g_attrib_unref(hr->attrib);
-+	hr->attrib = NULL;
-+}
++		UnregisterWatcher(object agent)
 +
- int heartrate_adapter_register(struct btd_adapter *adapter)
- {
- 	struct heartrate_adapter *hradapter;
-@@ -137,6 +169,9 @@ int heartrate_device_register(struct btd_device *device)
- 
- 	hradapter->devices = g_slist_prepend(hradapter->devices, hr);
- 
-+	hr->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
-+						attio_disconnected_cb, hr);
++			Unregisters a watcher.
 +
- 	return 0;
- }
- 
++Heart Rate Profile hierarchy
++============================
++
++Service		org.bluez
++Interface	org.bluez.HeartRate
++Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
++
++Methods		dict GetProperties()
++
++			Returns all properties for the interface. See the
++			Properties section for the available properties.
++
++		Reset()
++
++			Restart the accumulation of energy expended from zero.
++
++			Possible Errors: org.bluez.Error.NotSupported
++
++Properties	String Location (optional) [readonly]
++
++			Possible values: "Other", "Chest", "Wrist","Finger",
++					"Hand", "Earlobe", "Foot"
++
++		boolean ResetSupported [readonly]
++
++			True if energy expended is supported.
++
++Heart Rate Watcher hierarchy
++
++============================
++Service		unique name
++Interface	org.bluez.HeartRateWatcher
++Object path	freely definable
++
++Methods		void MeasurementReceived(object device, dict measurement)
++
++			This callback is called whenever a heart rate
++			measurement is received from the heart rate device.
++
++			Measurement:
++
++				uint16 Value:
++
++					Measurement value expressed in beats per
++					minute (bpm)
++
++				uint16 Energy (optional):
++
++					Accumulated energy expended in kilo Joules
++
++				boolean Contact (optional):
++
++					true if skin contact is detected by sensor,
++					false otherwise
++
++				array{uint16} Interval (optional):
++
++					RR-Interval values which represent the time
++					between two consecutive R waves in an ECG.
++					Values are ordered starting from oldest to
++					most recent.
 -- 
 1.7.11.3
 
