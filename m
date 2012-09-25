@@ -1,50 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH v2 0/6] Audio profile authorization
-Date: Tue, 25 Sep 2012 16:55:40 +0200
-Message-Id: <1348584946-13895-1-git-send-email-mikel.astiz.oss@gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 07/14] thermometer: Reformat MeasurementReceived description
+Date: Tue, 25 Sep 2012 16:52:36 +0200
+Message-ID: <1348584763-22824-8-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1348584763-22824-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1348584763-22824-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+MeasurementReceived method description is reformatted to be more
+readable and consistent with other API documents.
 
-v2 includes the modification suggested by Luiz:
-- Variable renaming from auth_id to id
-- Use of g_queue_free_full, requiring a dependency update to glib 2.32
+Special values for Exponent and Mantissa fields specify now only NaN
+value as this is only special value defined by HTS specification for
+measurement.
+---
+ doc/thermometer-api.txt | 67 +++++++++++++++++++++++++++----------------------
+ 1 file changed, 37 insertions(+), 30 deletions(-)
 
->From original cover-letter:
-
-The agent-based profile authorization makes a special consideration for audio profiles: they are processed as if they all belonged to one single profile. This includes several internal policies that are inconvenient for IVI use-cases.
-
-This patchset removes this exception by making use of the conventional authorization mechanism also for audio profiles.
-
-The new approach is not straightforward since devices might send several connection requets in parallel (i.e. HFP, A2DP, AVRCP). This cannot be neither automatically rejected (EBUSY) nor forwarded in parallel to the agent, so a queue was added to store the pending authorization requests. These will be sent to the agent sequentially.
-
-Mikel Astiz (6):
-  build: Update glib dependency to 2.32
-  audio: Fix crash on gateway close
-  adapter: Replace device authorizing flag
-  adapter: Use authorization id for cancelling
-  adapter: Queue parallel authorization requests
-  audio: Drop audio-specific authorization mechanism
-
- acinclude.m4            |   4 +-
- audio/avctp.c           |  29 +++-----
- audio/avdtp.c           |  25 +++++--
- audio/device.c          | 144 ------------------------------------
- audio/device.h          |  12 +--
- audio/gateway.c         |   3 +
- audio/manager.c         |  18 +++--
- plugins/service.c       |  18 +++--
- profiles/input/server.c |   2 +-
- src/adapter.c           | 193 +++++++++++++++++++++++++++++++-----------------
- src/adapter.h           |   2 +-
- src/device.c            |  11 ---
- src/device.h            |   2 -
- 13 files changed, 183 insertions(+), 280 deletions(-)
-
+diff --git a/doc/thermometer-api.txt b/doc/thermometer-api.txt
+index b0b0fe2..1665aa1 100644
+--- a/doc/thermometer-api.txt
++++ b/doc/thermometer-api.txt
+@@ -96,33 +96,40 @@ Service		unique name
+ Interface	org.bluez.ThermometerWatcher
+ Object path	freely definable
+ 
+-Methods		void MeasurementReceived(dict measure)
+-
+-			This callback gets called when a measure has been
+-			scanned	in the thermometer. The Time entry in the dict
+-			will be only present if the device supports storing of
+-			data. The time value is expressed in seconds since epoch.
+-			The value represented is (mantissa) x (10**exponent)
+-			See foot note for special values when treating with
+-			health devices. The Type entry is only present if the
+-			measurement type is known. Otherwise, it is undefined.
+-
+-			Dict is defined as below:
+-			{
+-				"Exponent" : int8,
+-				"Mantissa" : int32,
+-				"Unit" : ("Celsius" or "Fahrenheit"),
+-				"Time" : uint64,
+-				"Type" : ("Armpit", "Body", "Ear", "Finger",
+-					"Intestines", "Mouth", "Rectum", "Toe",
+-					"Tympanum"),
+-				"Measurement" : ("Final" or "Intermediate"),
+-			}
+-
+-			For special cases, the exponent shall always be zero and
+-			the mantissa should be one of following values:
+-
+-			NRes = -(2**23)
+-			NaN = +(2**23-1)
+-			INFINITY = (2**23-2)
+-			-INFINITY = -(2**23-2)
++Methods		void MeasurementReceived(dict measurement)
++
++			This callback gets called when a measurement has been
++			scanned in the thermometer.
++
++			Measurement:
++
++				int16 Exponent:
++				int32 Mantissa:
++
++					Measurement value is calculated as
++					(Mantissa) x (10^Exponent)
++
++					In case of invalid or missing data,
++					Exponent is set to 0 and Mantissa is
++					set to 2^23-1 (0x7FFFFF hexadecimal).
++
++				string Unit:
++
++					Possible values: "Celsius" or "Fahrenheit"
++
++				uint64 Time (optional):
++
++					Time of measurement, if supported by device.
++					Expressed in seconds since epoch.
++
++				string Type (optional):
++
++					Only present if measurement type is known.
++
++					Possible values: "Armpit", "Body", "Ear",
++						"Finger", "Intestines", "Mouth",
++						"Rectum", "Toe", "Tympanum"
++
++				string Measurement:
++
++					Possible values: "Final" or "Intermediate"
 -- 
-1.7.11.4
+1.7.11.3
 
