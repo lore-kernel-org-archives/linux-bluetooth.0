@@ -1,60 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 00/14] Thermometer watchers API change + fixes
-Date: Tue, 25 Sep 2012 16:52:29 +0200
-Message-ID: <1348584763-22824-1-git-send-email-andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1348584182.27596.28.camel@frustration.ornl.gov>
+Subject: Re: [PATCH v3] HID: Add support for Sony PS3 BD Remote Control
+From: David Dillow <dave@thedillows.org>
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: linux-bluetooth@vger.kernel.org,
+	David Herrmann <dh.herrmann@googlemail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bastien Nocera <hadess@hadess.net>,
+	linux-input@vger.kernel.org, jkosina@suse.cz
+Date: Tue, 25 Sep 2012 10:43:02 -0400
+In-Reply-To: <1348583447-31820-1-git-send-email-ospite@studenti.unina.it>
+References: <20120925132136.985de0b203fd342bce6dc77d@studenti.unina.it>
+	 <1348583447-31820-1-git-send-email-ospite@studenti.unina.it>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Tue, 2012-09-25 at 16:30 +0200, Antonio Ospite wrote:
+> +static int ps3remote_mapping(struct hid_device *hdev, struct hid_input *hi,
+> +			     struct hid_field *field, struct hid_usage *usage,
+> +			     unsigned long **bit, int *max)
+> +{
+> +	unsigned int key = usage->hid & HID_USAGE;
 
-Here's series of patches to move watchers from per-device to per-adapter
-interface (basically the same as done for HRP, see other series of patches).
-This applies to both final and intermediate temperature watchers - once
-watcher is registered, all connected devices are setup to send measurement
-notifications and the opposite when last watcher is unregistered.
+The size check below should be moved into the switch statement, and
+modified for each, as you could access beyond the joypad_buttons array
+as-is. The usage page check can stay outside the switch.
 
-This major change is done in patches 1-6.
-
-Patches 7-11 contain some code and documentation refactoring, i.e. to
-remove duplicated code.
-
-Patches 12-14 are trival coding style fixes.
-
-Unfortunately, I wasn't able to fully test this code due to lack of proper
-thermometer device and sample device from CC2540 devkit does not quite
-work as expected (e.g. I can see CCC is written properly when watcher is
-registered but remote does not send any indications for unknown reason).
-
-
-
-Andrzej Kaczmarek (14):
-  thermometer: Store thermometer devices per-adapter
-  thermometer: Register ThermometerManager interface on adapter path
-  thermometer: Move watcher logic to adapter interface
-  thermometer: Include remote device information in MeasurementReceived
-  thermometer: Update API document
-  thermometer: Update test script
-  thermometer: Reformat MeasurementReceived description
-  thermometer: Update driver naming style
-  thermometer: Add constant definition for watcher interface name
-  thermometer: Add common function to write characteristics CCC
-  thermometer: Refactor processing of measurement characteristic value
-  thermometer: Fix whitespace
-  thermometer: Fix indentation
-  thermometer: Fix missing braces
-
- doc/thermometer-api.txt            | 126 +++++-----
- profiles/thermometer/manager.c     |  24 +-
- profiles/thermometer/thermometer.c | 486 +++++++++++++++++++++----------------
- profiles/thermometer/thermometer.h |   2 +
- test/test-thermometer              |  16 +-
- 5 files changed, 372 insertions(+), 282 deletions(-)
-
--- 
-1.7.11.3
+> +	if ((usage->hid & HID_USAGE_PAGE) != HID_UP_BUTTON ||
+> +	    key >= ARRAY_SIZE(ps3remote_keymap_remote_buttons))
+> +		return -1;
+> +
+> +	switch (usage->collection_index) {
+> +	case 1:
+> +		key = ps3remote_keymap_joypad_buttons[key];
+> +		if (!key)
+> +			return -1;
+> +		break;
+> +	case 2:
+> +		key = ps3remote_keymap_remote_buttons[key];
+> +		if (!key)
+> +			return -1;
+> +		break;
+> +	default:
+> +		return -1;
+> +	}
+> +
+> +	hid_map_usage_clear(hi, usage, bit, max, EV_KEY, key);
+> +	return 1;
+> +}
 
