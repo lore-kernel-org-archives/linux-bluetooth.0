@@ -1,27 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 26 Sep 2012 21:36:53 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] build: Fix make distcheck for src/profile.c
-Message-ID: <20120926183653.GA22623@x220.P-661HNU-F1>
-References: <1348683762-28057-1-git-send-email-anderson.lizardo@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1348683762-28057-1-git-send-email-anderson.lizardo@openbossa.org>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ] build: Fix make distcheck for src/profile.c
+Date: Wed, 26 Sep 2012 14:22:42 -0400
+Message-Id: <1348683762-28057-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Fix this "make distcheck" error:
 
-On Wed, Sep 26, 2012, Anderson Lizardo wrote:
-> Fix this "make distcheck" error:
-> 
-> ../src/profile.c:39:18: fatal error: uuid.h: No such file or directory
-> ---
->  src/profile.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+../src/profile.c:39:18: fatal error: uuid.h: No such file or directory
+---
+ src/profile.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Good catch, thanks! The patch is now upstream.
+diff --git a/src/profile.c b/src/profile.c
+index 4e84d19..ad2ad4a 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -34,9 +34,9 @@
+ #include <gdbus.h>
+ 
+ #include <bluetooth/bluetooth.h>
++#include <bluetooth/uuid.h>
+ 
+ #include "btio.h"
+-#include "uuid.h"
+ #include "log.h"
+ #include "error.h"
+ #include "dbus-common.h"
+-- 
+1.7.9.5
 
-Johan
