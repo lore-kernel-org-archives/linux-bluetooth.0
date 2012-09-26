@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1348601288-18975-2-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1348601288-18975-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1348601288-18975-1-git-send-email-lucas.demarchi@profusion.mobi>
-	<1348601288-18975-2-git-send-email-lucas.demarchi@profusion.mobi>
-Date: Wed, 26 Sep 2012 13:21:37 +0300
-Message-ID: <CABBYNZLDj2rLyuFMOvJOr7PUv2V6NwjBUrNBBvQ-hK3c5TLaDQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] gdbus: Refactor filter_data_find()
+Date: Wed, 26 Sep 2012 13:20:31 +0300
+Message-ID: <CABBYNZ+1fsVReRj6HKPjXZY6LJZ7Ts+PwMW3c=+rE-7YCMk4mg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] gdbus: Fix wrong signal handler match
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
@@ -13,110 +12,214 @@ Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+HI Lucas,
 
 On Tue, Sep 25, 2012 at 10:28 PM, Lucas De Marchi
 <lucas.demarchi@profusion.mobi> wrote:
-> Now this function is only used for searching the listeners of a
-> connection and the other parameters are not needed anymore.
+> When we add a signal handler with g_dbus_add_signal_watch(), this
+> function tries to multiplex the matches added in libdbus by checking
+> if there's a previous filter_data with the same fields. However, if the
+> field is NULL it accepts as being the same. The result is that the
+> following watches will use the same filter data:
+>
+> watch1 = g_dbus_add_signal_watch(conn, BUS_NAME, NULL, iface, member,
+>                                                 cb1, data1, NULL);
+> watch2 = g_dbus_add_signal_watch(conn, BUS_NAME, "/path2", iface, member,
+>                                                 cb2, data2, NULL);
+> watch3 = g_dbus_add_signal_watch(conn, BUS_NAME, "/path3", iface, member,
+>                                                 cb3, data3, NULL);
+>
+> The result is that when a signal arrives with path == "/path2", all 3
+> callbacks above will be called, with the same signal delivered to all of
+> them.
+>
+> Another problem is that, if we invert the calls like below, only signals
+> to cb1 will never be trigerred, nonetheless it used path == NULL.
+>
+> watch2 = g_dbus_add_signal_watch(conn, BUS_NAME, "/path2", iface, member,
+>                                                 cb2, data2, NULL);
+> watch1 = g_dbus_add_signal_watch(conn, BUS_NAME, NULL, iface, member,
+>                                                 cb1, data1, NULL);
+> watch3 = g_dbus_add_signal_watch(conn, BUS_NAME, "/path3", iface, member,
+>                                                 cb3, data3, NULL);
+>
+> This is fixed by not multiplexing the matchs with filter data if any of
+> the fields are different, including being NULL. When a signal arrives,
+> if a field is NULL we accept it as a match, but not when adding the
+> signal handler.
 > ---
->  gdbus/watch.c | 43 +++++--------------------------------------
->  1 file changed, 5 insertions(+), 38 deletions(-)
+>  gdbus/watch.c | 115 +++++++++++++++++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 94 insertions(+), 21 deletions(-)
 >
 > diff --git a/gdbus/watch.c b/gdbus/watch.c
-> index 33c12ed..c4066c0 100644
+> index d749176..33c12ed 100644
 > --- a/gdbus/watch.c
 > +++ b/gdbus/watch.c
-> @@ -119,13 +119,7 @@ static struct filter_data *filter_data_find_nonnull(DBusConnection *connection,
->         return NULL;
+> @@ -78,6 +78,47 @@ struct filter_data {
+>         gboolean registered;
+>  };
+>
+> +static struct filter_data *filter_data_find_nonnull(DBusConnection *connection,
+> +                                                       const char *name,
+> +                                                       const char *owner,
+> +                                                       const char *path,
+> +                                                       const char *interface,
+> +                                                       const char *member,
+> +                                                       const char *argument)
+> +{
+> +       GSList *current;
+> +
+> +       for (current = listeners;
+> +                       current != NULL; current = current->next) {
+> +               struct filter_data *data = current->data;
+> +
+> +               if (connection != data->connection)
+> +                       continue;
+> +
+> +               if (g_strcmp0(name, data->name) != 0)
+> +                       continue;
+> +
+> +               if (g_strcmp0(owner, data->owner) != 0)
+> +                       continue;
+> +
+> +               if (g_strcmp0(path, data->path) != 0)
+> +                       continue;
+> +
+> +               if (g_strcmp0(interface, data->interface) != 0)
+> +                       continue;
+> +
+> +               if (g_strcmp0(member, data->member) != 0)
+> +                       continue;
+> +
+> +               if (g_strcmp0(argument, data->argument) != 0)
+> +                       continue;
+> +
+> +               return data;
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+>  static struct filter_data *filter_data_find(DBusConnection *connection,
+>                                                         const char *name,
+>                                                         const char *owner,
+> @@ -221,8 +262,8 @@ static struct filter_data *filter_data_get(DBusConnection *connection,
+>                 name = sender;
+>
+>  proceed:
+> -       data = filter_data_find(connection, name, owner, path, interface,
+> -                                       member, argument);
+> +       data = filter_data_find_nonnull(connection, name, owner, path,
+> +                                               interface, member, argument);
+
+Call it filter_data_find_match to be more obvious that we need an
+exact match here.
+
+>         if (data)
+>                 return data;
+>
+> @@ -501,6 +542,7 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
+>  {
+>         struct filter_data *data;
+>         const char *sender, *path, *iface, *member, *arg = NULL;
+> +       GSList *current, *delete_listener = NULL;
+>
+>         /* Only filter signals */
+>         if (dbus_message_get_type(message) != DBUS_MESSAGE_TYPE_SIGNAL)
+> @@ -512,30 +554,63 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
+>         member = dbus_message_get_member(message);
+>         dbus_message_get_args(message, NULL, DBUS_TYPE_STRING, &arg, DBUS_TYPE_INVALID);
+>
+> -       /* Sender is always bus name */
+> -       data = filter_data_find(connection, NULL, sender, path, iface, member,
+> -                                       arg);
+> -       if (data == NULL) {
+> -               error("Got %s.%s signal which has no listeners", iface, member);
+> -               return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+> -       }
+> +       /* Sender is always the owner */
+> +
+> +       for (current = listeners; current != NULL; current = current->next) {
+> +               data = current->data;
+> +
+> +               if (connection != data->connection)
+> +                       continue;
+> +
+> +               if (data->owner && g_str_equal(sender, data->owner) == FALSE)
+> +                       continue;
+>
+> -       if (data->handle_func) {
+> -               data->lock = TRUE;
+> +               if (data->path && g_str_equal(path, data->path) == FALSE)
+> +                       continue;
+> +
+> +               if (data->interface && g_str_equal(iface,
+> +                                               data->interface) == FALSE)
+> +                       continue;
+>
+> -               data->handle_func(connection, message, data);
+> +               if (data->member && g_str_equal(member, data->member) == FALSE)
+> +                       continue;
+>
+> -               data->callbacks = data->processed;
+> -               data->processed = NULL;
+> -               data->lock = FALSE;
+> +               if (data->argument && g_str_equal(arg,
+> +                                               data->argument) == FALSE)
+> +                       continue;
+> +
+> +               if (data->handle_func) {
+> +                       data->lock = TRUE;
+> +
+> +                       data->handle_func(connection, message, data);
+> +
+> +                       data->callbacks = data->processed;
+> +                       data->processed = NULL;
+> +                       data->lock = FALSE;
+> +               }
+> +
+> +               if (!data->callbacks)
+> +                       delete_listener = g_slist_prepend(delete_listener,
+> +                                                               current);
+>         }
+>
+> -       if (data->callbacks)
+> -               return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+> +       for (current = delete_listener; current != NULL;
+> +                                       current = delete_listener->next) {
+> +               GSList *l = current->data;
+>
+> -       remove_match(data);
+> +               data = l->data;
+>
+> -       listeners = g_slist_remove(listeners, data);
+> +               /* Has any other callback added callbacks back to this data? */
+> +               if (data->callbacks != NULL)
+> +                       continue;
+> +
+> +               remove_match(data);
+> +               listeners = g_slist_remove_link(listeners, l);
+> +
+> +               filter_data_free(data);
+> +       }
+> +
+> +       g_slist_free(delete_listener);
+>
+>         /* Remove filter if there are no listeners left for the connection */
+>         if (filter_data_find(connection, NULL, NULL, NULL, NULL, NULL,
+> @@ -543,8 +618,6 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
+>                 dbus_connection_remove_filter(connection, message_filter,
+>                                                 NULL);
+>
+> -       filter_data_free(data);
+> -
+>         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 >  }
 >
-> -static struct filter_data *filter_data_find(DBusConnection *connection,
-> -                                                       const char *name,
-> -                                                       const char *owner,
-> -                                                       const char *path,
-> -                                                       const char *interface,
-> -                                                       const char *member,
-> -                                                       const char *argument)
-> +static struct filter_data *filter_data_find(DBusConnection *connection)
->  {
->         GSList *current;
->
-> @@ -136,30 +130,6 @@ static struct filter_data *filter_data_find(DBusConnection *connection,
->                 if (connection != data->connection)
->                         continue;
->
-> -               if (name && data->name &&
-> -                               g_str_equal(name, data->name) == FALSE)
-> -                       continue;
-> -
-> -               if (owner && data->owner &&
-> -                               g_str_equal(owner, data->owner) == FALSE)
-> -                       continue;
-> -
-> -               if (path && data->path &&
-> -                               g_str_equal(path, data->path) == FALSE)
-> -                       continue;
-> -
-> -               if (interface && data->interface &&
-> -                               g_str_equal(interface, data->interface) == FALSE)
-> -                       continue;
-> -
-> -               if (member && data->member &&
-> -                               g_str_equal(member, data->member) == FALSE)
-> -                       continue;
-> -
-> -               if (argument && data->argument &&
-> -                               g_str_equal(argument, data->argument) == FALSE)
-> -                       continue;
-> -
->                 return data;
->         }
->
-> @@ -245,7 +215,7 @@ static struct filter_data *filter_data_get(DBusConnection *connection,
->         struct filter_data *data;
->         const char *name = NULL, *owner = NULL;
->
-> -       if (filter_data_find(connection, NULL, NULL, NULL, NULL, NULL, NULL) == NULL) {
-> +       if (filter_data_find(connection) == NULL) {
->                 if (!dbus_connection_add_filter(connection,
->                                         message_filter, NULL, NULL)) {
->                         error("dbus_connection_add_filter() failed");
-> @@ -419,8 +389,7 @@ static gboolean filter_data_remove_callback(struct filter_data *data,
->         listeners = g_slist_remove(listeners, data);
->
->         /* Remove filter if there are no listeners left for the connection */
-> -       if (filter_data_find(connection, NULL, NULL, NULL, NULL, NULL,
-> -                                                               NULL) == NULL)
-> +       if (filter_data_find(connection) == NULL)
->                 dbus_connection_remove_filter(connection, message_filter,
->                                                 NULL);
->
-> @@ -613,8 +582,7 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
->         g_slist_free(delete_listener);
->
->         /* Remove filter if there are no listeners left for the connection */
-> -       if (filter_data_find(connection, NULL, NULL, NULL, NULL, NULL,
-> -                                                               NULL) == NULL)
-> +       if (filter_data_find(connection) == NULL)
->                 dbus_connection_remove_filter(connection, message_filter,
->                                                 NULL);
->
-> @@ -810,8 +778,7 @@ void g_dbus_remove_all_watches(DBusConnection *connection)
->  {
->         struct filter_data *data;
->
-> -       while ((data = filter_data_find(connection, NULL, NULL, NULL, NULL,
-> -                                       NULL, NULL))) {
-> +       while ((data = filter_data_find(connection))) {
->                 listeners = g_slist_remove(listeners, data);
->                 filter_data_call_and_free(data);
->         }
 > --
 > 1.7.12.1
 
-Ack.
-
+The rest looks good.
 
 -- 
 Luiz Augusto von Dentz
