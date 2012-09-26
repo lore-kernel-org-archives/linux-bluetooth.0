@@ -1,51 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 26 Sep 2012 15:58:18 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        alexander.smirnov@siemens.com
-Subject: Re: Agenda (v2) for Linux Wireless (802.11/Bluetooth/NFC)
- Mini-Summit 2012 (Barcelona!)
-Message-ID: <20120926195818.GB15658@tuxdriver.com>
-References: <20120911201729.GJ7015@tuxdriver.com>
- <1348147820.13371.2.camel@aeonflux>
+Date: Wed, 26 Sep 2012 21:36:53 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] build: Fix make distcheck for src/profile.c
+Message-ID: <20120926183653.GA22623@x220.P-661HNU-F1>
+References: <1348683762-28057-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1348147820.13371.2.camel@aeonflux>
+In-Reply-To: <1348683762-28057-1-git-send-email-anderson.lizardo@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Sep 20, 2012 at 03:30:20PM +0200, Marcel Holtmann wrote:
-> Hi John,
+Hi Lizardo,
+
+On Wed, Sep 26, 2012, Anderson Lizardo wrote:
+> Fix this "make distcheck" error:
 > 
-> > OK, making progress...still, we need some more discussion topics...
-> > 
-> > We have one room on the first day, and three rooms on the second day.
-> > I figure that the Bluetooth and 802.11 groups should each get a
-> > break-out room for their own in-depth discussons on the second day and
-> > the third room can be used for more general topics and presentations.
-> > 
-> > Below is my strawman agenda proposal.  Please make suggestions for
-> > improvements!
-> 
-> I think this looks pretty good. Lets see if we can find some volunteers
-> for the empty slots. Should be make sure that this schedule so far gets
-> published on the LinuxCon website?
+> ../src/profile.c:39:18: fatal error: uuid.h: No such file or directory
+> ---
+>  src/profile.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-OK, I have transferred the existing schedule to wireless.kernel.org:
+Good catch, thanks! The patch is now upstream.
 
-	http://wireless.kernel.org/en/developers/Summits/Barcelona-2012
-
-Please note that this is a wiki, so anyone can edit it.  If you
-(i.e. anyone) have suggestions for organizational/schedule changes or
-(even better) _more_ or different discussions topics, then please
-feel free to add them!
-
-Also, I would appreciate it if everyone planning to attend could add
-their name to the list of attendees.
-
-Thanks,
-
-John
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Johan
