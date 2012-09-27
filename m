@@ -1,53 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1348584946-13895-3-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1348584946-13895-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1348584946-13895-3-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Thu, 27 Sep 2012 11:00:01 +0300
-Message-ID: <CABBYNZJuk0=C0V99UbJdGXiey1YpDdefdZpOYzfwwajCGxsvdA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/6] audio: Fix crash on gateway close
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv1 1/3] Bluetooth: btmrvl: Correct num_block name
+Date: Thu, 27 Sep 2012 10:51:46 +0300
+Message-Id: <1348732308-29348-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tue, Sep 25, 2012 at 5:55 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> gateway_close() can be called multiple times and thus the code must
-> handle the case where device->gateway is already NULL.
->
-> This issue can be easily reproduced if a device is removed (unpaired)
-> while HFP gateway is connected.
-> ---
->  audio/gateway.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/audio/gateway.c b/audio/gateway.c
-> index 45b25a1..93a70ba 100644
-> --- a/audio/gateway.c
-> +++ b/audio/gateway.c
-> @@ -566,6 +566,9 @@ int gateway_close(struct audio_device *device)
->         struct gateway *gw = device->gateway;
->         int sock;
->
-> +       if (gw == NULL)
-> +               return 0;
-> +
->         if (gw->rfcomm) {
->                 sock = g_io_channel_unix_get_fd(gw->rfcomm);
->                 shutdown(sock, SHUT_RDWR);
-> --
-> 1.7.11.4
+Make code readable by correcting name from buf_block_len to num_blocks
+since it represent number of blocks; NOT a length of a block buffer.
 
-There is something wrong if this is being called multiple times, so we
-need to find the root cause of this happening and fix there.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ drivers/bluetooth/btmrvl_sdio.c |   13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index da4df9c..25dc53b 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -492,7 +492,7 @@ done:
+ static int btmrvl_sdio_card_to_host(struct btmrvl_private *priv)
+ {
+ 	u16 buf_len = 0;
+-	int ret, buf_block_len, blksz;
++	int ret, num_blocks, blksz;
+ 	struct sk_buff *skb = NULL;
+ 	u32 type;
+ 	u8 *payload = NULL;
+@@ -516,18 +516,17 @@ static int btmrvl_sdio_card_to_host(struct btmrvl_private *priv)
+ 	BT_DBG("%s buf_len %zu", hdev->name, buf_len);
+ 
+ 	blksz = SDIO_BLOCK_SIZE;
+-	buf_block_len = (buf_len + blksz - 1) / blksz;
++	num_blocks = (buf_len + blksz - 1) / blksz;
+ 
+ 	if (buf_len <= SDIO_HEADER_LEN
+-			|| (buf_block_len * blksz) > ALLOC_BUF_SIZE) {
++	    || (num_blocks * blksz) > ALLOC_BUF_SIZE) {
+ 		BT_ERR("invalid packet length: %d", buf_len);
+ 		ret = -EINVAL;
+ 		goto exit;
+ 	}
+ 
+ 	/* Allocate buffer */
+-	skb = bt_skb_alloc(buf_block_len * blksz + BTSDIO_DMA_ALIGN,
+-								GFP_ATOMIC);
++	skb = bt_skb_alloc(num_blocks * blksz + BTSDIO_DMA_ALIGN, GFP_ATOMIC);
+ 	if (skb == NULL) {
+ 		BT_ERR("No free skb");
+ 		goto exit;
+@@ -543,7 +542,7 @@ static int btmrvl_sdio_card_to_host(struct btmrvl_private *priv)
+ 	payload = skb->data;
+ 
+ 	ret = sdio_readsb(card->func, payload, card->ioport,
+-			  buf_block_len * blksz);
++			  num_blocks * blksz);
+ 	if (ret < 0) {
+ 		BT_ERR("readsb failed: %d", ret);
+ 		ret = -EIO;
+@@ -594,7 +593,7 @@ static int btmrvl_sdio_card_to_host(struct btmrvl_private *priv)
+ 	default:
+ 		BT_ERR("Unknown packet type:%d", type);
+ 		print_hex_dump_bytes("", DUMP_PREFIX_OFFSET, payload,
+-						blksz * buf_block_len);
++				     blksz * num_blocks);
+ 
+ 		kfree_skb(skb);
+ 		skb = NULL;
 -- 
-Luiz Augusto von Dentz
+1.7.9.5
+
