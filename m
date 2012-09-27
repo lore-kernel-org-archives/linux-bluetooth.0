@@ -1,77 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 27 Sep 2012 23:34:20 +0300
-From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-To: =?UTF-8?B?RnLDqWTDqXJpYw==?= Dalleau
-	<frederic.dalleau@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/5] mSBC tests
-Message-ID: <20120927233420.3441f14e@i7>
-In-Reply-To: <1348757068-31048-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1348757068-31048-1-git-send-email-frederic.dalleau@linux.intel.com>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <20120927074206.GB9610@x220>
+References: <1348594686-26221-1-git-send-email-jprvita@openbossa.org> <20120927074206.GB9610@x220>
+From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
+Date: Thu, 27 Sep 2012 17:31:05 -0300
+Message-ID: <CAAngNMZka=wBQTn1y5bFPaWwUog+p-qugbC9cPnUkD-ygLNbDg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v7 1/9] core: Mutually exclude concurrent connections
+To: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 27 Sep 2012 16:44:23 +0200
-Frédéric Dalleau  <frederic.dalleau@linux.intel.com> wrote:
+Hello Johan,
 
-> Hi folks,
-> 
-> I wanted to know more about mSBC and I look into the spec and saw it
-> was just a set of settings for SBC. So I tried to exercise them using
-> sbcenc and sbcdec and found it wasn't possible, I ended modifying SBC
-> library and now it should be possible to use mSBC settings.
-> Using 15 block doesn't work using SIMD processing because of data
-> reordering so I recalled some legacy C code from an older release
-> (sbc_analyse_eight) and put in a separate primitives file.
+On Thu, Sep 27, 2012 at 4:42 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi,
+>
+> On Tue, Sep 25, 2012, João Paulo Rechi Vita wrote:
+>> Since controllers don't support more than one ongoing connection
+>> procedure at the same time, new connection attempts needs to yield if
+>> there is an ongoing connection procedure already.
+>
+> Simply based on this description the first question that comes to mind
+> is wouldn't this be better handled on the kernel side? After all other
+> processes besides bluetoothd (like obexd) are also capable of initiating
+> connections and we can't control that within bluetoothd.
+>
 
-Hi,
+This whole series implements the General Connection Establishment
+Procedure (GCEP), as described in the core spec. According to this
+procedure, when a new connection to a remote device is requested, a
+scan is initiated and only when an advertise from this device is seen
+the connect command is sent to the controller.
 
-I wonder why they decided to go with the odd sided blocks? Anyway,
-I guess there is no other way but to adapt to this extended spec.
-Thanks for taking a look at this stuff.
+We could implement the whole procedure inside the kernel, but on the
+discussions we (me, André, Vinicius and Claudio) had, it seems that
+some changes on the socket api (related to the l2cap socket timeout)
+will be needed to accommodate that. Also, it is still  an open
+question if we can make use of the controller white-list to improve LE
+connections management, and in this case it wouldn't make sense to
+have the GCEP in the kernel.
 
-Have you tried to tweak the SIMD code to make it process one
-block at a time instead of batches of 4?
-
-I suspect that we might only need to track the state and flip between
-"even" and "odd" constant tables for every other processed block in
-"sbc_analyze_4b_4s_simd" and "sbc_analyze_4b_8s_simd" replacement
-functions. The functions "sbc_encoder_process_input_s4_internal"
-and "sbc_encoder_process_input_s8_internal" also need to be
-updated to handle arbitrary number of blocks and not just
-multiples of 4. Though I haven't been working with sbc code lately
-and may be mistaken.
-
-Using the old tables "_sbc_proto_fixed8" and "_sbc_proto_fixed4" has
-a disadvantage of not having the tweaks from:
-    http://git.kernel.org/?p=bluetooth/sbc.git;a=commit;h=bec3d3989ba2
-They haven't been in use for ages and just remained in the sources by.
-
-If we just could make SIMD code work, that would be the best option in
-my opinion.
-
-> Work done from the spec, not tested with any reference encoder.
-
-Does a reference mSBC encoder exist somewhere? Or any ideas how to test
-the new code with something other than bluez just to be sure that it's
-correct?
-
-> How to use:
-> sample.au should be an .au audio file 16000hz 16bits 1 channel pcm.
-> $ src/sbcenc  -m -b26 -B16 -s8   sample.au > sample.au.msbc
-> $ src/sbcinfo sample.au.msbc
-> $ src/sbcdec  -m -f sample.au.msbc.au sample.au.msbc
-> $ mplayer sample.au.msbc.au
-> 
-> Note sure there is any application yet but I thought I should share.
-
-Thanks for sharing this information and patches. I would love to try
-experimenting with mSBC code myself (mostly curious to check whether
-SIMD has any chance to remain useful), but don't have much time right
-now and will be away from my primary computer for the whole next week.
+And more important, having the GCEP in userspace is a big improvement
+over what we have now. Current upstream code doesn't handle LE
+re-connections at all, so if a remote device disconnects to save power
+(which all HoG devices we have do), we're starting the GCEP to
+re-connect to it. We can discuss a way to better support multiple
+processes opening LE sockets, but I don't think having this code
+upstream will hurt right now.
 
 -- 
-Best regards,
-Siarhei Siamashka
+João Paulo Rechi Vita
+Openbossa Labs - INdT
