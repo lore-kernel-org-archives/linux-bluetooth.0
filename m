@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: gustavo@padovan.org, mathewm@codeaurora.org
-Subject: [PATCHv7 03/19] Bluetooth: AMP: Use HCI cmd to Read AMP Info
-Date: Thu, 27 Sep 2012 17:26:08 +0300
-Message-Id: <1348755984-6403-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv7 02/19] Bluetooth: A2MP: Create amp_mgr global list
+Date: Thu, 27 Sep 2012 17:26:07 +0300
+Message-Id: <1348755984-6403-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1348755984-6403-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1348755984-6403-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -13,150 +13,110 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When receiving A2MP Get Info Request execute Read Local AMP Info HCI
-command to AMP controller with function to be executed upon receiving
-command complete event. Function will handle A2MP Get Info Response.
+Create amp_mgr_list global list which will be used by different
+hci devices to find amp_mgr.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |    2 ++
- net/bluetooth/a2mp.c         |   57 ++++++++++++++++++++++++++++++------------
- net/bluetooth/hci_event.c    |    6 ++++-
- 3 files changed, 48 insertions(+), 17 deletions(-)
+ include/net/bluetooth/a2mp.h |   10 ++++++++++
+ net/bluetooth/a2mp.c         |   29 +++++++++++++++++++++++++++++
+ 2 files changed, 39 insertions(+)
 
 diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 316c1c8..af59468 100644
+index 6a76e0a..316c1c8 100644
 --- a/include/net/bluetooth/a2mp.h
 +++ b/include/net/bluetooth/a2mp.h
-@@ -132,5 +132,7 @@ int amp_mgr_put(struct amp_mgr *mgr);
+@@ -19,12 +19,18 @@
+ 
+ #define A2MP_FEAT_EXT	0x8000
+ 
++enum amp_mgr_state {
++	READ_LOC_AMP_INFO,
++};
++
+ struct amp_mgr {
++	struct list_head	list;
+ 	struct l2cap_conn	*l2cap_conn;
+ 	struct l2cap_chan	*a2mp_chan;
+ 	struct kref		kref;
+ 	__u8			ident;
+ 	__u8			handle;
++	enum amp_mgr_state	state;
+ 	unsigned long		flags;
+ };
+ 
+@@ -118,9 +124,13 @@ struct a2mp_physlink_rsp {
+ #define A2MP_STATUS_PHYS_LINK_EXISTS		0x05
+ #define A2MP_STATUS_SECURITY_VIOLATION		0x06
+ 
++extern struct list_head amp_mgr_list;
++extern struct mutex amp_mgr_list_lock;
++
+ void amp_mgr_get(struct amp_mgr *mgr);
+ int amp_mgr_put(struct amp_mgr *mgr);
  struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
  				       struct sk_buff *skb);
- struct amp_mgr *amp_mgr_lookup_by_state(u8 state);
-+void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data);
-+void a2mp_send_getinfo_rsp(struct hci_dev *hdev);
++struct amp_mgr *amp_mgr_lookup_by_state(u8 state);
  
  #endif /* __A2MP_H */
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 3f93060..0e97b3b 100644
+index 0760d1f..3f93060 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -41,8 +41,7 @@ static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
- 	return cmd;
+@@ -17,6 +17,10 @@
+ #include <net/bluetooth/l2cap.h>
+ #include <net/bluetooth/a2mp.h>
+ 
++/* Global AMP Manager list */
++LIST_HEAD(amp_mgr_list);
++DEFINE_MUTEX(amp_mgr_list_lock);
++
+ /* A2MP build & send command helper functions */
+ static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
+ {
+@@ -516,6 +520,10 @@ static void amp_mgr_destroy(struct kref *kref)
+ 
+ 	BT_DBG("mgr %p", mgr);
+ 
++	mutex_lock(&amp_mgr_list_lock);
++	list_del(&mgr->list);
++	mutex_unlock(&amp_mgr_list_lock);
++
+ 	kfree(mgr);
  }
  
--static void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len,
--		      void *data)
-+void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data)
- {
- 	struct l2cap_chan *chan = mgr->a2mp_chan;
- 	struct a2mp_cmd *cmd;
-@@ -185,7 +184,6 @@ static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 			    struct a2mp_cmd *hdr)
- {
- 	struct a2mp_info_req *req  = (void *) skb->data;
--	struct a2mp_info_rsp rsp;
- 	struct hci_dev *hdev;
+@@ -552,6 +560,10 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
  
- 	if (le16_to_cpu(hdr->len) < sizeof(*req))
-@@ -193,23 +191,23 @@ static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	kref_init(&mgr->kref);
  
- 	BT_DBG("id %d", req->id);
- 
--	rsp.id = req->id;
--	rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
--
- 	hdev = hci_dev_get(req->id);
--	if (hdev && hdev->amp_type != HCI_BREDR) {
--		rsp.status = 0;
--		rsp.total_bw = cpu_to_le32(hdev->amp_total_bw);
--		rsp.max_bw = cpu_to_le32(hdev->amp_max_bw);
--		rsp.min_latency = cpu_to_le32(hdev->amp_min_latency);
--		rsp.pal_cap = cpu_to_le16(hdev->amp_pal_cap);
--		rsp.assoc_size = cpu_to_le16(hdev->amp_assoc_size);
-+	if (!hdev) {
-+		struct a2mp_info_rsp rsp;
++	mutex_lock(&amp_mgr_list_lock);
++	list_add(&mgr->list, &amp_mgr_list);
++	mutex_unlock(&amp_mgr_list_lock);
 +
-+		rsp.id = req->id;
-+		rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
-+
-+		a2mp_send(mgr, A2MP_GETINFO_RSP, hdr->ident, sizeof(rsp),
-+			  &rsp);
- 	}
+ 	return mgr;
+ }
  
--	if (hdev)
--		hci_dev_put(hdev);
-+	if (hdev->dev_type != HCI_BREDR) {
-+		mgr->state = READ_LOC_AMP_INFO;
-+		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL);
-+	}
+@@ -570,3 +582,20 @@ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
  
--	a2mp_send(mgr, A2MP_GETINFO_RSP, hdr->ident, sizeof(rsp), &rsp);
-+	hci_dev_put(hdev);
- 
- 	skb_pull(skb, sizeof(*req));
- 	return 0;
-@@ -599,3 +597,30 @@ struct amp_mgr *amp_mgr_lookup_by_state(u8 state)
- 
- 	return NULL;
+ 	return mgr->a2mp_chan;
  }
 +
-+void a2mp_send_getinfo_rsp(struct hci_dev *hdev)
++struct amp_mgr *amp_mgr_lookup_by_state(u8 state)
 +{
 +	struct amp_mgr *mgr;
-+	struct a2mp_info_rsp rsp;
 +
-+	mgr = amp_mgr_lookup_by_state(READ_LOC_AMP_INFO);
-+	if (!mgr)
-+		return;
-+
-+	BT_DBG("%s mgr %p", hdev->name, mgr);
-+
-+	rsp.id = hdev->id;
-+	rsp.status = A2MP_STATUS_INVALID_CTRL_ID;
-+
-+	if (hdev->amp_type != HCI_BREDR) {
-+		rsp.status = 0;
-+		rsp.total_bw = cpu_to_le32(hdev->amp_total_bw);
-+		rsp.max_bw = cpu_to_le32(hdev->amp_max_bw);
-+		rsp.min_latency = cpu_to_le32(hdev->amp_min_latency);
-+		rsp.pal_cap = cpu_to_le16(hdev->amp_pal_cap);
-+		rsp.assoc_size = cpu_to_le16(hdev->amp_assoc_size);
++	mutex_lock(&amp_mgr_list_lock);
++	list_for_each_entry(mgr, &amp_mgr_list, list) {
++		if (mgr->state == state) {
++			amp_mgr_get(mgr);
++			mutex_unlock(&amp_mgr_list_lock);
++			return mgr;
++		}
 +	}
++	mutex_unlock(&amp_mgr_list_lock);
 +
-+	a2mp_send(mgr, A2MP_GETINFO_RSP, mgr->ident, sizeof(rsp), &rsp);
-+	amp_mgr_put(mgr);
++	return NULL;
 +}
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 6f2b519..d05b8fe 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -30,6 +30,7 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/mgmt.h>
-+#include <net/bluetooth/a2mp.h>
- 
- /* Handle HCI Event packets */
- 
-@@ -846,7 +847,7 @@ static void hci_cc_read_local_amp_info(struct hci_dev *hdev,
- 	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
- 
- 	if (rp->status)
--		return;
-+		goto a2mp_rsp;
- 
- 	hdev->amp_status = rp->amp_status;
- 	hdev->amp_total_bw = __le32_to_cpu(rp->total_bw);
-@@ -860,6 +861,9 @@ static void hci_cc_read_local_amp_info(struct hci_dev *hdev,
- 	hdev->amp_max_flush_to = __le32_to_cpu(rp->max_flush_to);
- 
- 	hci_req_complete(hdev, HCI_OP_READ_LOCAL_AMP_INFO, rp->status);
-+
-+a2mp_rsp:
-+	a2mp_send_getinfo_rsp(hdev);
- }
- 
- static void hci_cc_delete_stored_link_key(struct hci_dev *hdev,
 -- 
 1.7.9.5
 
