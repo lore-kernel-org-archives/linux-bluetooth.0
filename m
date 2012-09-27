@@ -1,64 +1,200 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH 0/5] mSBC tests
-Date: Thu, 27 Sep 2012 16:44:23 +0200
-Message-Id: <1348757068-31048-1-git-send-email-frederic.dalleau@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+Cc: gustavo@padovan.org, mathewm@codeaurora.org
+Subject: [PATCHv7 15/19] Bluetooth: AMP: Write remote AMP Assoc
+Date: Thu, 27 Sep 2012 17:26:20 +0300
+Message-Id: <1348755984-6403-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1348755984-6403-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1348755984-6403-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi folks,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-I wanted to know more about mSBC and I look into the spec and saw it was just
-a set of settings for SBC. So I tried to exercise them using sbcenc and sbcdec
-and found it wasn't possible, I ended modifying SBC library and now it should
-be possible to use mSBC settings.
-Using 15 block doesn't work using SIMD processing because of data
-reordering so I recalled some legacy C code from an older release
-(sbc_analyse_eight) and put in a separate primitives file.
+When receiving HCI Command Status after HCI Create Physical Link
+execute HCI Write Remote AMP Assoc command to AMP controller.
 
-Work done from the spec, not tested with any reference encoder.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/amp.h      |    2 +
+ include/net/bluetooth/hci_core.h |    2 +
+ net/bluetooth/amp.c              |   80 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |   29 ++++++++++++++
+ 4 files changed, 113 insertions(+)
 
-How to use:
-sample.au should be an .au audio file 16000hz 16bits 1 channel pcm.
-$ src/sbcenc  -m -b26 -B16 -s8   sample.au > sample.au.msbc
-$ src/sbcinfo sample.au.msbc
-$ src/sbcdec  -m -f sample.au.msbc.au sample.au.msbc
-$ mplayer sample.au.msbc.au
-
-Note sure there is any application yet but I thought I should share.
-
-Regards,
-Frederic
-
-
-Frédéric Dalleau (5):
-  Add msbc encoding and decoding flag
-  Add support for mSBC frame header
-  update sbcdec for msbc
-  update sbcenc for msbc
-  update sbcinfo for msbc
-
- Makefile.am               |    1 +
- sbc/sbc.c                 |  227 +++++++++++++++++++-------------
- sbc/sbc.h                 |    3 +
- sbc/sbc_primitives.c      |    8 +-
- sbc/sbc_primitives.h      |    7 +-
- sbc/sbc_primitives_stdc.c |  321 +++++++++++++++++++++++++++++++++++++++++++++
- sbc/sbc_primitives_stdc.h |   36 +++++
- src/sbcdec.c              |   17 ++-
- src/sbcenc.c              |   25 +++-
- src/sbcinfo.c             |   51 ++++---
- 10 files changed, 574 insertions(+), 122 deletions(-)
- create mode 100644 sbc/sbc_primitives_stdc.c
- create mode 100644 sbc/sbc_primitives_stdc.h
-
+diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
+index cadb3d0..8f80329 100644
+--- a/include/net/bluetooth/amp.h
++++ b/include/net/bluetooth/amp.h
+@@ -39,5 +39,7 @@ void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle);
+ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr);
+ void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+ 			struct hci_conn *hcon);
++void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle);
++void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle);
+ 
+ #endif /* __AMP_H */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 464eae3..ea1f934 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -127,6 +127,8 @@ struct le_scan_params {
+ struct amp_assoc {
+ 	__u16	len;
+ 	__u16	offset;
++	__u16	rem_len;
++	__u16	len_so_far;
+ 	__u8	data[HCI_MAX_AMP_ASSOC_SIZE];
+ };
+ 
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index 657ec73..5895ad0 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -233,6 +233,86 @@ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
+ 	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp);
+ }
+ 
++
++/* Write AMP Assoc data fragments, returns true with last fragment written*/
++static bool amp_write_rem_assoc_frag(struct hci_dev *hdev,
++				     struct hci_conn *hcon)
++{
++	struct hci_cp_write_remote_amp_assoc *cp;
++	struct amp_mgr *mgr = hcon->amp_mgr;
++	struct amp_ctrl *ctrl;
++	u16 frag_len, len;
++
++	ctrl = amp_ctrl_lookup(mgr, hcon->remote_id);
++	if (!ctrl)
++		return false;
++
++	if (!ctrl->assoc_rem_len) {
++		BT_DBG("all fragments are written");
++		ctrl->assoc_rem_len = ctrl->assoc_len;
++		ctrl->assoc_len_so_far = 0;
++
++		amp_ctrl_put(ctrl);
++		return true;
++	}
++
++	frag_len = min_t(u16, 248, ctrl->assoc_rem_len);
++	len = frag_len + sizeof(*cp);
++
++	cp = kzalloc(len, GFP_KERNEL);
++	if (!cp) {
++		amp_ctrl_put(ctrl);
++		return false;
++	}
++
++	BT_DBG("hcon %p ctrl %p frag_len %u assoc_len %u rem_len %u",
++	       hcon, ctrl, frag_len, ctrl->assoc_len, ctrl->assoc_rem_len);
++
++	cp->phy_handle = hcon->handle;
++	cp->len_so_far = cpu_to_le16(ctrl->assoc_len_so_far);
++	cp->rem_len = cpu_to_le16(ctrl->assoc_rem_len);
++	memcpy(cp->frag, ctrl->assoc, frag_len);
++
++	ctrl->assoc_len_so_far += frag_len;
++	ctrl->assoc_rem_len -= frag_len;
++
++	amp_ctrl_put(ctrl);
++
++	hci_send_cmd(hdev, HCI_OP_WRITE_REMOTE_AMP_ASSOC, len, cp);
++
++	kfree(cp);
++
++	return false;
++}
++
++void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle)
++{
++	struct hci_conn *hcon;
++
++	BT_DBG("%s phy handle 0x%2.2x", hdev->name, handle);
++
++	hcon = hci_conn_hash_lookup_handle(hdev, handle);
++	if (!hcon)
++		return;
++
++	amp_write_rem_assoc_frag(hdev, hcon);
++}
++
++void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle)
++{
++	struct hci_conn *hcon;
++
++	BT_DBG("%s phy handle 0x%2.2x", hdev->name, handle);
++
++	hcon = hci_conn_hash_lookup_handle(hdev, handle);
++	if (!hcon)
++		return;
++
++	BT_DBG("%s phy handle 0x%2.2x hcon %p", hdev->name, handle, hcon);
++
++	amp_write_rem_assoc_frag(hdev, hcon);
++}
++
+ void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+ 			struct hci_conn *hcon)
+ {
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index e7d2db4..2c7e27a 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1215,6 +1215,20 @@ static void hci_cc_write_le_host_supported(struct hci_dev *hdev,
+ 	hci_req_complete(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED, status);
+ }
+ 
++static void hci_cc_write_remote_amp_assoc(struct hci_dev *hdev,
++					  struct sk_buff *skb)
++{
++	struct hci_rp_write_remote_amp_assoc *rp = (void *) skb->data;
++
++	BT_DBG("%s status 0x%2.2x phy_handle 0x%2.2x",
++	       hdev->name, rp->status, rp->phy_handle);
++
++	if (rp->status)
++		return;
++
++	amp_write_rem_assoc_continue(hdev, rp->phy_handle);
++}
++
+ static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+ {
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+@@ -1699,7 +1713,18 @@ static void hci_cs_le_start_enc(struct hci_dev *hdev, u8 status)
+ 
+ static void hci_cs_create_phylink(struct hci_dev *hdev, u8 status)
+ {
++	struct hci_cp_create_phy_link *cp;
++
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	if (status)
++		return;
++
++	cp = hci_sent_cmd_data(hdev, HCI_OP_CREATE_PHY_LINK);
++	if (!cp)
++		return;
++
++	amp_write_remote_assoc(hdev, cp->phy_handle);
+ }
+ 
+ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -2435,6 +2460,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cc_write_le_host_supported(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_WRITE_REMOTE_AMP_ASSOC:
++		hci_cc_write_remote_amp_assoc(hdev, skb);
++		break;
++
+ 	default:
+ 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
+ 		break;
 -- 
 1.7.9.5
 
