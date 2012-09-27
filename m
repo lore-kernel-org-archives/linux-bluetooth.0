@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH v3 5/5] audio: Drop audio-specific authorization mechanism
-Date: Thu, 27 Sep 2012 10:07:52 +0200
-Message-Id: <1348733272-2117-6-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH v3 4/5] adapter: Queue parallel authorization requests
+Date: Thu, 27 Sep 2012 10:07:51 +0200
+Message-Id: <1348733272-2117-5-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1348733272-2117-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1348733272-2117-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,444 +12,334 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Remove the audio-specific service authorization mechanism in favor of
-using the conventional one.
-
-The main difference is that audio profiles will be authorized
-independently. Therefore a single connection might result in several
-profile authorization requests to the agent (i.e. HFP, A2DP and AVRCP).
-
-This removes any internal policy that would skip the authorization
-procedure, making it simpler and more convenient for IVI use-cases.
-
-Agents interested in simulating the old behavior are encouraged to
-either set the device as trusted or just reply to the additional
-authorization requests automatically without user intervention.
+Remote device could try to connect several profiles in parallel, or
+several devices could be trying to connect services. Instead of
+returning EBUSY, this patch adds a queue to each adapter such that the
+authorization requests will be queued and processed sequentially.
 ---
- audio/avctp.c   |  30 +++++-------
- audio/avdtp.c   |  25 +++++++---
- audio/device.c  | 150 --------------------------------------------------------
- audio/device.h  |  12 +----
- audio/manager.c |  18 ++++---
- 5 files changed, 41 insertions(+), 194 deletions(-)
+ src/adapter.c | 181 +++++++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 103 insertions(+), 78 deletions(-)
 
-diff --git a/audio/avctp.c b/audio/avctp.c
-index 6fd5491..690339b 100644
---- a/audio/avctp.c
-+++ b/audio/avctp.c
-@@ -143,6 +143,7 @@ struct avctp {
- 	GIOChannel *browsing_io;
- 	guint control_io_id;
- 	guint browsing_io_id;
-+	int service_auth_id;
+diff --git a/src/adapter.c b/src/adapter.c
+index e77d305..b896182 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -101,8 +101,10 @@ struct service_auth {
+ 	int id;
+ 	service_auth_cb cb;
+ 	void *user_data;
++	const char *uuid;
+ 	struct btd_device *device;
+ 	struct btd_adapter *adapter;
++	struct agent *agent;		/* NULL for queued auths */
+ };
  
- 	uint16_t control_mtu;
- 	uint16_t browsing_mtu;
-@@ -360,13 +361,9 @@ static void avctp_disconnected(struct avctp *session)
- 		g_source_remove(session->control_io_id);
- 		session->control_io_id = 0;
+ struct btd_adapter {
+@@ -129,8 +131,8 @@ struct btd_adapter {
+ 	GSList *found_devices;
+ 	GSList *oor_devices;		/* out of range device list */
+ 	struct agent *agent;		/* For the new API */
+-	guint auth_idle_id;		/* Ongoing authorization (trusted) */
+-	struct service_auth *auth;	/* Ongoing authorization */
++	guint auth_idle_id;		/* Pending authorization dequeue */
++	GQueue *auths;			/* Ongoing and pending auths */
+ 	GSList *connections;		/* Connected devices */
+ 	GSList *devices;		/* Devices structure pointers */
+ 	GSList *mode_sessions;		/* Request Mode sessions */
+@@ -158,6 +160,8 @@ struct btd_adapter {
+ 	GSList *profiles;
+ };
  
--		if (session->state == AVCTP_STATE_CONNECTING) {
--			struct audio_device *dev;
++static gboolean process_auth_queue(gpointer user_data);
++
+ static void dev_info_free(void *data)
+ {
+ 	struct remote_dev_info *dev = data;
+@@ -951,16 +955,49 @@ static struct btd_device *adapter_create_device(struct btd_adapter *adapter,
+ 	return device;
+ }
+ 
++static void service_auth_cancel(struct service_auth *auth)
++{
++	DBusError derr;
++
++	dbus_error_init(&derr);
++	dbus_set_error_const(&derr, "org.bluez.Error.Canceled", NULL);
++
++	auth->cb(&derr, auth->user_data);
++
++	dbus_error_free(&derr);
++
++	if (auth->agent != NULL)
++		agent_cancel(auth->agent);
++
++	g_free(auth);
++}
++
+ void adapter_remove_device(struct btd_adapter *adapter,
+ 						struct btd_device *device,
+ 						gboolean remove_storage)
+ {
+ 	const gchar *dev_path = device_get_path(device);
+-	struct agent *agent;
++	GList *l;
+ 
+ 	adapter->devices = g_slist_remove(adapter->devices, device);
+ 	adapter->connections = g_slist_remove(adapter->connections, device);
+ 
++	l = adapter->auths->head;
++	while (l != NULL) {
++		struct service_auth *auth = l->data;
++		GList *next = g_list_next(l);
++
++		if (auth->device != device) {
++			l = next;
++			continue;
++		}
++
++		g_queue_delete_link(adapter->auths, l);
++		l = next;
++
++		service_auth_cancel(auth);
++	}
++
+ 	adapter_update_devices(adapter);
+ 
+ 	g_dbus_emit_signal(btd_get_dbus_connection(), adapter->path,
+@@ -968,14 +1005,6 @@ void adapter_remove_device(struct btd_adapter *adapter,
+ 			DBUS_TYPE_OBJECT_PATH, &dev_path,
+ 			DBUS_TYPE_INVALID);
+ 
+-	agent = device_get_agent(device);
 -
--			dev = manager_get_device(&session->server->src,
--							&session->dst, FALSE);
--			audio_device_cancel_authorization(dev, auth_cb,
--								session);
-+		if (session->service_auth_id > 0) {
-+			btd_cancel_authorization(session->service_auth_id);
-+			session->service_auth_id = 0;
- 		}
+-	if (agent && adapter->auth && adapter->auth->device == device) {
+-		g_free(adapter->auth);
+-		adapter->auth = NULL;
+-		agent_cancel(agent);
+-	}
+-
+ 	device_remove(device, remove_storage);
+ }
+ 
+@@ -2426,8 +2455,7 @@ static void adapter_free(gpointer user_data)
+ 	if (adapter->auth_idle_id)
+ 		g_source_remove(adapter->auth_idle_id);
+ 
+-	if (adapter->auth)
+-		g_free(adapter->auth);
++	g_queue_free_full(adapter->auths, g_free);
+ 
+ 	if (adapter->off_timer)
+ 		off_timer_remove(adapter);
+@@ -2521,6 +2549,7 @@ struct btd_adapter *adapter_create(int id)
  	}
  
-@@ -409,15 +406,7 @@ static void avctp_set_state(struct avctp *session, avctp_state_t new_state)
- 	switch (new_state) {
- 	case AVCTP_STATE_DISCONNECTED:
- 		DBG("AVCTP Disconnected");
--
- 		avctp_disconnected(session);
--
--		if (old_state != AVCTP_STATE_CONNECTED)
--			break;
--
--		if (!audio_device_is_active(dev, NULL))
--			audio_device_set_authorized(dev, FALSE);
--
- 		break;
- 	case AVCTP_STATE_CONNECTING:
- 		DBG("AVCTP Connecting");
-@@ -769,6 +758,8 @@ static void auth_cb(DBusError *derr, void *user_data)
- 	struct avctp *session = user_data;
- 	GError *err = NULL;
+ 	adapter->dev_id = id;
++	adapter->auths = g_queue_new();
  
-+	session->service_auth_id = 0;
-+
- 	if (session->control_io_id) {
- 		g_source_remove(session->control_io_id);
- 		session->control_io_id = 0;
-@@ -845,6 +836,8 @@ static struct avctp *avctp_get_internal(const bdaddr_t *src,
- static void avctp_control_confirm(struct avctp *session, GIOChannel *chan,
- 						struct audio_device *dev)
+ 	snprintf(path, sizeof(path), "%s/hci%d", base_path, id);
+ 	adapter->path = g_strdup(path);
+@@ -3164,26 +3193,60 @@ static void agent_auth_cb(struct agent *agent, DBusError *derr,
+ 							void *user_data)
  {
-+	int auth_id;
+ 	struct btd_adapter *adapter = user_data;
+-	struct service_auth *auth = adapter->auth;
++	struct service_auth *auth = adapter->auths->head->data;
+ 
+-	adapter->auth = NULL;
++	g_queue_pop_head(adapter->auths);
+ 
+ 	auth->cb(derr, auth->user_data);
+ 
+ 	g_free(auth);
 +
- 	if (session->control_io) {
- 		error("Control: Refusing unexpected connect");
- 		g_io_channel_shutdown(chan, TRUE, NULL);
-@@ -854,10 +847,13 @@ static void avctp_control_confirm(struct avctp *session, GIOChannel *chan,
- 	avctp_set_state(session, AVCTP_STATE_CONNECTING);
- 	session->control_io = g_io_channel_ref(chan);
++	adapter->auth_idle_id = g_idle_add(process_auth_queue, adapter);
+ }
  
--	if (audio_device_request_authorization(dev, AVRCP_TARGET_UUID,
--						auth_cb, session) < 0)
-+	auth_id = btd_request_authorization(&dev->src, &dev->dst,
-+							AVRCP_TARGET_UUID,
-+							auth_cb, session);
-+	if (auth_id < 0)
- 		goto drop;
- 
-+	session->service_auth_id = auth_id;
- 	session->control_io_id = g_io_add_watch(chan, G_IO_ERR | G_IO_HUP |
- 						G_IO_NVAL, session_cb, session);
- 	return;
-diff --git a/audio/avdtp.c b/audio/avdtp.c
-index d44c504..3137094 100644
---- a/audio/avdtp.c
-+++ b/audio/avdtp.c
-@@ -400,6 +400,8 @@ struct avdtp {
- 	/* True if the entire device is being disconnected */
- 	gboolean device_disconnect;
- 
-+	int service_auth_id;
-+
- 	GIOChannel *io;
- 	guint io_id;
- 
-@@ -1129,16 +1131,21 @@ static void release_stream(struct avdtp_stream *stream, struct avdtp *session)
- 
- static int avdtp_cancel_authorization(struct avdtp *session)
+-static gboolean auth_idle_cb(gpointer user_data)
++static gboolean process_auth_queue(gpointer user_data)
  {
--	struct audio_device *dev;
-+	int err;
+ 	struct btd_adapter *adapter = user_data;
+-	struct service_auth *auth = adapter->auth;
++	DBusError err;
  
- 	if (session->state != AVDTP_SESSION_STATE_CONNECTING)
- 		return 0;
+-	adapter->auth = NULL;
+ 	adapter->auth_idle_id = 0;
  
--	dev = manager_get_device(&session->server->src, &session->dst, FALSE);
--	if (dev == NULL)
--		return -ENODEV;
-+	if (!session->service_auth_id)
-+		return 0;
+-	auth->cb(NULL, auth->user_data);
++	dbus_error_init(&err);
++	dbus_set_error_const(&err, "org.bluez.Error.Rejected", NULL);
  
--	return audio_device_cancel_authorization(dev, auth_cb, session);
-+	err = btd_cancel_authorization(session->service_auth_id);
-+	if (err < 0)
-+		return err;
+-	g_free(auth);
++	while (!g_queue_is_empty(adapter->auths)) {
++		struct service_auth *auth = adapter->auths->head->data;
++		struct btd_device *device = auth->device;
++		const gchar *dev_path;
 +
-+	session->service_auth_id = 0;
++		if (device_is_trusted(device) == TRUE) {
++			auth->cb(NULL, auth->user_data);
++			goto next;
++		}
 +
++		auth->agent = device_get_agent(device);
++		if (auth->agent == NULL) {
++			warn("Can't find device agent");
++			auth->cb(&err, auth->user_data);
++			goto next;
++		}
++
++		dev_path = device_get_path(device);
++
++		if (agent_authorize(auth->agent, dev_path, auth->uuid,
++					agent_auth_cb, adapter, NULL) < 0) {
++			auth->cb(&err, auth->user_data);
++			goto next;
++		}
++
++		break;
++
++next:
++		g_free(auth);
++		g_queue_pop_head(adapter->auths);
++	}
++
++	dbus_error_free(&err);
+ 
+ 	return FALSE;
+ }
+@@ -3194,10 +3257,7 @@ static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
+ {
+ 	struct service_auth *auth;
+ 	struct btd_device *device;
+-	struct agent *agent;
+ 	char address[18];
+-	const gchar *dev_path;
+-	int err;
+ 
+ 	ba2str(dst, address);
+ 	device = adapter_find_device(adapter, address);
+@@ -3208,42 +3268,27 @@ static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
+ 	if (!g_slist_find(adapter->connections, device))
+ 		error("Authorization request for non-connected device!?");
+ 
+-	if (adapter->auth != NULL)
+-		return -EBUSY;
+-
+ 	auth = g_try_new0(struct service_auth, 1);
+ 	if (!auth)
+ 		return -ENOMEM;
+ 
+ 	auth->cb = cb;
+ 	auth->user_data = user_data;
++	auth->uuid = uuid;
+ 	auth->device = device;
+ 	auth->adapter = adapter;
+ 	auth->id = ++service_auth_id;
+ 
+-	if (device_is_trusted(device) == TRUE) {
+-		adapter->auth_idle_id = g_idle_add(auth_idle_cb, adapter);
+-		goto done;
+-	}
++	g_queue_push_tail(adapter->auths, auth);
+ 
+-	agent = device_get_agent(device);
+-	if (!agent) {
+-		warn("Can't find device agent");
+-		g_free(auth);
+-		return -EPERM;
+-	}
++	if (adapter->auths->length != 1)
++		return auth->id;
+ 
+-	dev_path = device_get_path(device);
++	if (adapter->auth_idle_id != 0)
++		return auth->id;
+ 
+-	err = agent_authorize(agent, dev_path, uuid, agent_auth_cb, adapter,
+-									NULL);
+-	if (err < 0) {
+-		g_free(auth);
+-		return err;
+-	}
++	adapter->auth_idle_id = g_idle_add(process_auth_queue, adapter);
+ 
+-done:
+-	adapter->auth = auth;
+ 	return auth->id;
+ }
+ 
+@@ -3275,18 +3320,20 @@ int btd_request_authorization(const bdaddr_t *src, const bdaddr_t *dst,
+ 	return -EPERM;
+ }
+ 
+-static struct btd_adapter *find_authorization(int id)
++static struct service_auth *find_authorization(int id)
+ {
+ 	GSList *l;
++	GList *l2;
+ 
+ 	for (l = manager_get_adapters(); l != NULL; l = g_slist_next(l)) {
+ 		struct btd_adapter *adapter = l->data;
+ 
+-		if (adapter->auth == NULL)
+-			continue;
++		for (l2 = adapter->auths->head; l2 != NULL; l2 = l2->next) {
++			struct service_auth *auth = l2->data;
+ 
+-		if (adapter->auth->id == id)
+-			return adapter;
++			if (auth->id == id)
++				return auth;
++		}
+ 	}
+ 
+ 	return NULL;
+@@ -3294,39 +3341,17 @@ static struct btd_adapter *find_authorization(int id)
+ 
+ int btd_cancel_authorization(int id)
+ {
+-	struct btd_adapter *adapter;
+-	struct agent *agent;
+-	int err;
+-
+-	adapter = find_authorization(id);
+-	if (adapter == NULL)
+-		return -EPERM;
+-
+-	if (adapter->auth_idle_id) {
+-		g_source_remove(adapter->auth_idle_id);
+-		adapter->auth_idle_id = 0;
+-		g_free(adapter->auth);
+-		adapter->auth = NULL;
+-		return 0;
+-	}
+-
+-	/*
+-	 * FIXME: Cancel fails if authorization is requested to adapter's
+-	 * agent and in the meanwhile CreatePairedDevice is called.
+-	 */
++	struct service_auth *auth;
+ 
+-	agent = device_get_agent(adapter->auth->device);
+-	if (!agent)
++	auth = find_authorization(id);
++	if (auth == NULL)
+ 		return -EPERM;
+ 
+-	err = agent_cancel(agent);
++	g_queue_remove(auth->adapter->auths, auth);
+ 
+-	if (err == 0) {
+-		g_free(adapter->auth);
+-		adapter->auth = NULL;
+-	}
++	service_auth_cancel(auth);
+ 
+-	return err;
 +	return 0;
  }
  
- static void connection_lost(struct avdtp *session, int err)
-@@ -2507,7 +2514,7 @@ static void avdtp_confirm_cb(GIOChannel *chan, gpointer data)
- 	struct audio_device *dev;
- 	char address[18];
- 	bdaddr_t src, dst;
--	int perr;
-+	int auth_id;
- 	GError *err = NULL;
- 
- 	bt_io_get(chan, &err,
-@@ -2566,15 +2573,17 @@ static void avdtp_confirm_cb(GIOChannel *chan, gpointer data)
- 	session->io_id = g_io_add_watch(chan, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
- 					(GIOFunc) session_cb, session);
- 
--	perr = audio_device_request_authorization(dev, ADVANCED_AUDIO_UUID,
-+	auth_id = btd_request_authorization(&dev->src, &dev->dst,
-+							ADVANCED_AUDIO_UUID,
- 							auth_cb, session);
--	if (perr < 0) {
-+	if (auth_id < 0) {
- 		avdtp_set_state(session, AVDTP_SESSION_STATE_DISCONNECTED);
- 		avdtp_unref(session);
- 		goto drop;
- 	}
- 
- 	dev->auto_connect = auto_connect;
-+	session->service_auth_id = auth_id;
- 
- 	return;
- 
-diff --git a/audio/device.c b/audio/device.c
-index 454bbb9..175e3c0 100644
---- a/audio/device.c
-+++ b/audio/device.c
-@@ -71,19 +71,12 @@ typedef enum {
- 	AUDIO_STATE_CONNECTED,
- } audio_state_t;
- 
--struct service_auth {
--	service_auth_cb cb;
--	void *user_data;
--};
--
- struct dev_priv {
- 	audio_state_t state;
- 
- 	headset_state_t hs_state;
- 	sink_state_t sink_state;
- 	avctp_state_t avctp_state;
--	GSList *auths;
--	int auth_id;
- 
- 	DBusMessage *conn_req;
- 	DBusMessage *dc_req;
-@@ -94,8 +87,6 @@ struct dev_priv {
- 	guint dc_id;
- 
- 	gboolean disconnecting;
--	gboolean authorized;
--	guint auth_idle_id;
- };
- 
- static unsigned int sink_callback_id = 0;
-@@ -110,8 +101,6 @@ static void device_free(struct audio_device *dev)
- 	btd_device_unref(dev->btd_dev);
- 
- 	if (priv) {
--		if (priv->auths)
--			audio_device_cancel_authorization(dev, NULL, NULL);
- 		if (priv->control_timer)
- 			g_source_remove(priv->control_timer);
- 		if (priv->avdtp_timer)
-@@ -238,8 +227,6 @@ static void device_set_state(struct audio_device *dev, audio_state_t new_state)
- 		return;
- 
- 	if (new_state == AUDIO_STATE_DISCONNECTED) {
--		priv->authorized = FALSE;
--
- 		if (priv->dc_id) {
- 			device_remove_disconnect_watch(dev->btd_dev,
- 							priv->dc_id);
-@@ -732,140 +719,3 @@ void audio_device_unregister(struct audio_device *device)
- 
- 	device_free(device);
- }
--
--static void auth_cb(DBusError *derr, void *user_data)
--{
--	struct audio_device *dev = user_data;
--	struct dev_priv *priv = dev->priv;
--
--	priv->auth_id = 0;
--
--	if (derr == NULL)
--		priv->authorized = TRUE;
--
--	while (priv->auths) {
--		struct service_auth *auth = priv->auths->data;
--
--		auth->cb(derr, auth->user_data);
--		priv->auths = g_slist_remove(priv->auths, auth);
--		g_free(auth);
--	}
--}
--
--static gboolean auth_idle_cb(gpointer user_data)
--{
--	struct audio_device *dev = user_data;
--	struct dev_priv *priv = dev->priv;
--
--	priv->auth_idle_id = 0;
--
--	auth_cb(NULL, dev);
--
--	return FALSE;
--}
--
--static gboolean audio_device_is_connected(struct audio_device *dev)
--{
--	if (dev->headset) {
--		headset_state_t state = headset_get_state(dev);
--
--		if (state == HEADSET_STATE_CONNECTED ||
--				state == HEADSET_STATE_PLAY_IN_PROGRESS ||
--				state == HEADSET_STATE_PLAYING)
--			return TRUE;
--	}
--
--	if (dev->sink) {
--		sink_state_t state = sink_get_state(dev);
--
--		if (state == SINK_STATE_CONNECTED ||
--				state == SINK_STATE_PLAYING)
--			return TRUE;
--	}
--
--	if (dev->source) {
--		source_state_t state = source_get_state(dev);
--
--		if (state == SOURCE_STATE_CONNECTED ||
--				state == SOURCE_STATE_PLAYING)
--			return TRUE;
--	}
--
--	return FALSE;
--}
--
--int audio_device_request_authorization(struct audio_device *dev,
--					const char *uuid, service_auth_cb cb,
--					void *user_data)
--{
--	struct dev_priv *priv = dev->priv;
--	struct service_auth *auth;
--	int err;
--
--	auth = g_try_new0(struct service_auth, 1);
--	if (!auth)
--		return -ENOMEM;
--
--	auth->cb = cb;
--	auth->user_data = user_data;
--
--	priv->auths = g_slist_append(priv->auths, auth);
--	if (g_slist_length(priv->auths) > 1)
--		return 0;
--
--	if (priv->authorized || audio_device_is_connected(dev)) {
--		priv->auth_idle_id = g_idle_add(auth_idle_cb, dev);
--		return 0;
--	}
--
--	err = btd_request_authorization(&dev->src, &dev->dst, uuid, auth_cb,
--					dev);
--	if (err < 0) {
--		priv->auths = g_slist_remove(priv->auths, auth);
--		g_free(auth);
--	} else
--		priv->auth_id = err;
--
--	return err;
--}
--
--int audio_device_cancel_authorization(struct audio_device *dev,
--					authorization_cb cb, void *user_data)
--{
--	struct dev_priv *priv = dev->priv;
--	GSList *l, *next;
--
--	for (l = priv->auths; l != NULL; l = next) {
--		struct service_auth *auth = l->data;
--
--		next = g_slist_next(l);
--
--		if (cb && auth->cb != cb)
--			continue;
--
--		if (user_data && auth->user_data != user_data)
--			continue;
--
--		priv->auths = g_slist_remove(priv->auths, auth);
--		g_free(auth);
--	}
--
--	if (g_slist_length(priv->auths) == 0) {
--		if (priv->auth_idle_id > 0) {
--			g_source_remove(priv->auth_idle_id);
--			priv->auth_idle_id = 0;
--		} else {
--			btd_cancel_authorization(priv->auth_id);
--			priv->auth_id = 0;
--		}
--	}
--
--	return 0;
--}
--
--void audio_device_set_authorized(struct audio_device *dev, gboolean auth)
--{
--	struct dev_priv *priv = dev->priv;
--
--	priv->authorized = auth;
--}
-diff --git a/audio/device.h b/audio/device.h
-index f9b868f..548462b 100644
---- a/audio/device.h
-+++ b/audio/device.h
-@@ -47,6 +47,7 @@ struct audio_device {
- 	struct target *target;
- 
- 	guint hs_preauth_id;
-+	int hs_service_auth_id;
- 
- 	struct dev_priv *priv;
- };
-@@ -59,14 +60,3 @@ void audio_device_unregister(struct audio_device *device);
- 
- gboolean audio_device_is_active(struct audio_device *dev,
- 						const char *interface);
--
--typedef void (*authorization_cb) (DBusError *derr, void *user_data);
--
--int audio_device_cancel_authorization(struct audio_device *dev,
--					authorization_cb cb, void *user_data);
--
--int audio_device_request_authorization(struct audio_device *dev,
--					const char *uuid, authorization_cb cb,
--					void *user_data);
--
--void audio_device_set_authorized(struct audio_device *dev, gboolean auth);
-diff --git a/audio/manager.c b/audio/manager.c
-index 70be01b..731b883 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -328,7 +328,7 @@ static gboolean hs_preauth_cb(GIOChannel *chan, GIOCondition cond,
- 
- 	DBG("Headset disconnected during authorization");
- 
--	audio_device_cancel_authorization(device, headset_auth_cb, device);
-+	btd_cancel_authorization(device->hs_service_auth_id);
- 
- 	headset_set_state(device, HEADSET_STATE_DISCONNECTED);
- 
-@@ -343,7 +343,7 @@ static void ag_confirm(GIOChannel *chan, gpointer data)
- 	struct audio_device *device;
- 	gboolean hfp_active;
- 	bdaddr_t src, dst;
--	int perr;
-+	int auth_id;
- 	GError *err = NULL;
- 	uint8_t ch;
- 
-@@ -398,10 +398,11 @@ static void ag_confirm(GIOChannel *chan, gpointer data)
- 
- 	headset_set_state(device, HEADSET_STATE_CONNECTING);
- 
--	perr = audio_device_request_authorization(device, server_uuid,
--						headset_auth_cb, device);
--	if (perr < 0) {
--		DBG("Authorization denied: %s", strerror(-perr));
-+	auth_id = btd_request_authorization(&device->src, &device->dst,
-+						server_uuid, headset_auth_cb,
-+						device);
-+	if (auth_id < 0) {
-+		DBG("Authorization denied: %s", strerror(-auth_id));
- 		headset_set_state(device, HEADSET_STATE_DISCONNECTED);
- 		return;
- 	}
-@@ -480,8 +481,9 @@ static void hf_io_cb(GIOChannel *chan, gpointer data)
- 		goto drop;
- 	}
- 
--	perr = audio_device_request_authorization(device, server_uuid,
--						gateway_auth_cb, device);
-+	perr = btd_request_authorization(&device->src, &device->dst,
-+						server_uuid, gateway_auth_cb,
-+						device);
- 	if (perr < 0) {
- 		DBG("Authorization denied: %s", strerror(-perr));
- 		gateway_set_state(device, GATEWAY_STATE_DISCONNECTED);
+ static gchar *adapter_any_path = NULL;
 -- 
 1.7.11.4
 
