@@ -2,105 +2,101 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH v2 BlueZ 15/27] alert: Update new alert characteristic value
-Date: Thu, 27 Sep 2012 14:36:24 -0400
-Message-Id: <1348770996-12236-16-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH v2 BlueZ 14/27] alert: Update Supported New/Unread Category characteristic values
+Date: Thu, 27 Sep 2012 14:36:23 -0400
+Message-Id: <1348770996-12236-15-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1348770996-12236-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1348509661-15967-1-git-send-email-anderson.lizardo@openbossa.org>
  <1348770996-12236-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Update the attribute value when a new alert is reported to BlueZ.
+The value is now kept up-to-date when new/unread alerts arrive. This
+value is not notified yet.
 ---
- profiles/alert/server.c |   39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ profiles/alert/server.c |   34 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
 
 diff --git a/profiles/alert/server.c b/profiles/alert/server.c
-index f38761b..49cf530 100644
+index 9288ffe..f38761b 100644
 --- a/profiles/alert/server.c
 +++ b/profiles/alert/server.c
-@@ -64,6 +64,8 @@
+@@ -89,7 +89,8 @@ struct alert_data {
  
- /* Maximum length for "Text String Information" */
- #define NEW_ALERT_MAX_INFO_SIZE		18
-+/* Maximum length for New Alert Characteristic Value */
-+#define NEW_ALERT_CHR_MAX_VALUE_SIZE	(NEW_ALERT_MAX_INFO_SIZE + 2)
- 
- enum {
- 	ENABLE_NEW_INCOMING,
-@@ -91,6 +93,7 @@ struct alert_adapter {
+ struct alert_adapter {
  	struct btd_adapter *adapter;
- 	uint16_t supp_new_alert_cat_handle;
- 	uint16_t supp_unread_alert_cat_handle;
-+	uint16_t new_alert_handle;
+-	/* TODO: store characteristic value handles */
++	uint16_t supp_new_alert_cat_handle;
++	uint16_t supp_unread_alert_cat_handle;
  };
  
  static GSList *registered_alerts = NULL;
-@@ -318,6 +321,16 @@ static DBusMessage *register_alert(DBusConnection *conn, DBusMessage *msg,
- 	return dbus_message_new_method_return(msg);
+@@ -235,6 +236,29 @@ static gboolean valid_count(const char *category, uint16_t count)
+ 	return FALSE;
  }
  
-+static void update_new_alert(gpointer data, gpointer user_data)
++static void update_supported_categories(gpointer data, gpointer user_data)
 +{
 +	struct alert_adapter *al_adapter = data;
 +	struct btd_adapter *adapter = al_adapter->adapter;
-+	uint8_t *value = user_data;
-+
-+	attrib_db_update(adapter, al_adapter->new_alert_handle, NULL, &value[1],
-+								value[0], NULL);
-+}
-+
- static DBusMessage *new_alert(DBusConnection *conn, DBusMessage *msg,
- 								void *data)
- {
-@@ -325,6 +338,7 @@ static DBusMessage *new_alert(DBusConnection *conn, DBusMessage *msg,
- 	const char *category, *description;
- 	struct alert_data *alert;
- 	uint16_t count;
++	uint8_t value[2];
 +	unsigned int i;
- 
- 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &category,
- 			DBUS_TYPE_UINT16, &count, DBUS_TYPE_STRING,
-@@ -354,6 +368,29 @@ static DBusMessage *new_alert(DBusConnection *conn, DBusMessage *msg,
- 		return btd_error_invalid_args(msg);
- 	}
- 
++
++	memset(value, 0, sizeof(value));
++
 +	for (i = 0; i < G_N_ELEMENTS(anp_categories); i++) {
-+		if (g_str_equal(anp_categories[i], category)) {
-+			uint8_t value[NEW_ALERT_CHR_MAX_VALUE_SIZE + 1];
-+			size_t dlen = strlen(description);
-+			uint8_t *ptr = value;
-+
-+			memset(value, 0, sizeof(value));
-+
-+			*ptr++ = 2; /* Attribute value size */
-+			*ptr++ = i; /* Category ID (mandatory) */
-+			*ptr++ = count; /* Number of New Alert (mandatory) */
-+			/* Text String Information (optional) */
-+			strncpy((char *) ptr, description,
-+						NEW_ALERT_MAX_INFO_SIZE - 1);
-+
-+			if (dlen > 0)
-+				*value += dlen + 1;
-+
-+			g_slist_foreach(alert_adapters, update_new_alert,
-+									value);
-+		}
++		if (registered_category(anp_categories[i]))
++			hci_set_bit(i, value);
 +	}
 +
- 	DBG("NewAlert(\"%s\", %d, \"%s\")", category, count, description);
++	attrib_db_update(adapter, al_adapter->supp_new_alert_cat_handle, NULL,
++						value, sizeof(value), NULL);
++
++	/* FIXME: For now report all registered categories as supporting unread
++	 * status, until it is known which ones should be supported */
++	attrib_db_update(adapter, al_adapter->supp_unread_alert_cat_handle,
++					NULL, value, sizeof(value), NULL);
++}
++
+ static void watcher_disconnect(DBusConnection *conn, void *user_data)
+ {
+ 	struct alert_data *alert = user_data;
+@@ -243,6 +267,8 @@ static void watcher_disconnect(DBusConnection *conn, void *user_data)
+ 
+ 	registered_alerts = g_slist_remove(registered_alerts, alert);
+ 	alert_data_destroy(alert);
++
++	g_slist_foreach(alert_adapters, update_supported_categories, NULL);
+ }
+ 
+ static DBusMessage *register_alert(DBusConnection *conn, DBusMessage *msg,
+@@ -285,6 +311,8 @@ static DBusMessage *register_alert(DBusConnection *conn, DBusMessage *msg,
+ 
+ 	registered_alerts = g_slist_append(registered_alerts, alert);
+ 
++	g_slist_foreach(alert_adapters, update_supported_categories, NULL);
++
+ 	DBG("RegisterAlert(\"%s\", \"%s\")", alert->category, alert->path);
  
  	return dbus_message_new_method_return(msg);
-@@ -538,6 +575,8 @@ static void register_alert_notif_service(struct alert_adapter *al_adapter)
+@@ -505,6 +533,8 @@ static void register_alert_notif_service(struct alert_adapter *al_adapter)
+ 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ,
+ 			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
+ 			supp_new_alert_cat_read, al_adapter->adapter,
++			GATT_OPT_CHR_VALUE_GET_HANDLE,
++			&al_adapter->supp_new_alert_cat_handle,
  			/* New Alert */
  			GATT_OPT_CHR_UUID, NEW_ALERT_CHR_UUID,
  			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_NOTIFY,
-+			GATT_OPT_CHR_VALUE_GET_HANDLE,
-+			&al_adapter->new_alert_handle,
- 			/* Supported Unread Alert Category */
- 			GATT_OPT_CHR_UUID, SUPP_UNREAD_ALERT_CAT_CHR_UUID,
+@@ -513,6 +543,8 @@ static void register_alert_notif_service(struct alert_adapter *al_adapter)
  			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ,
+ 			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
+ 			supp_unread_alert_cat_read, al_adapter->adapter,
++			GATT_OPT_CHR_VALUE_GET_HANDLE,
++			&al_adapter->supp_unread_alert_cat_handle,
+ 			/* Unread Alert Status */
+ 			GATT_OPT_CHR_UUID, UNREAD_ALERT_CHR_UUID,
+ 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_NOTIFY,
 -- 
 1.7.9.5
 
