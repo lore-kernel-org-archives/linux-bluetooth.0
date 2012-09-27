@@ -1,324 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: unixcoder@gmail.com
-Date: Fri, 28 Sep 2012 00:18:58 +0900
-Message-ID: <CACySJQVFNf8OjwtY4W-0XYu0g2GO_Nk0jUQ34ypjHDOTa5LuYA@mail.gmail.com>
-Subject: [PATCH] ath3k: Added VID/PID for the Gigabyte GC-WB300D
- Wifi/Bluetooth card
-From: Wouter Thielen <wouter@morannon.org>
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Content-Type: multipart/mixed; boundary=001636eeeb7373fcf904cab075db
+Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Subject: [PATCH 4/5] update sbcenc for msbc
+Date: Thu, 27 Sep 2012 16:44:27 +0200
+Message-Id: <1348757068-31048-5-git-send-email-frederic.dalleau@linux.intel.com>
+In-Reply-To: <1348757068-31048-1-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1348757068-31048-1-git-send-email-frederic.dalleau@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001636eeeb7373fcf904cab075db
-Content-Type: multipart/alternative; boundary=001636eeeb7373fce104cab075d9
+---
+ src/sbcenc.c |   25 ++++++++++++++++++++-----
+ 1 file changed, 20 insertions(+), 5 deletions(-)
 
---001636eeeb7373fce104cab075d9
-Content-Type: text/plain; charset=UTF-8
+diff --git a/src/sbcenc.c b/src/sbcenc.c
+index a723b03..71ad6bb 100644
+--- a/src/sbcenc.c
++++ b/src/sbcenc.c
+@@ -45,7 +45,7 @@ static int verbose = 0;
+ static unsigned char input[BUF_SIZE], output[BUF_SIZE + BUF_SIZE / 4];
+ 
+ static void encode(char *filename, int subbands, int bitpool, int joint,
+-					int dualchannel, int snr, int blocks)
++				int dualchannel, int snr, int blocks, int msbc)
+ {
+ 	struct au_header au_hdr;
+ 	sbc_t sbc;
+@@ -87,7 +87,7 @@ static void encode(char *filename, int subbands, int bitpool, int joint,
+ 		goto done;
+ 	}
+ 
+-	sbc_init(&sbc, 0L);
++	sbc_init(&sbc, msbc ? SBC_MSBC : 0L);
+ 
+ 	switch (BE_INT(au_hdr.sample_rate)) {
+ 	case 16000:
+@@ -215,6 +215,7 @@ static void usage(void)
+ 	printf("Options:\n"
+ 		"\t-h, --help           Display help\n"
+ 		"\t-v, --verbose        Verbose mode\n"
++		"\t-m, --msbc           mSBC codec\n"
+ 		"\t-s, --subbands       Number of subbands to use (4 or 8)\n"
+ 		"\t-b, --bitpool        Bitpool value (default is 32)\n"
+ 		"\t-j, --joint          Joint stereo\n"
+@@ -227,6 +228,7 @@ static void usage(void)
+ static struct option main_options[] = {
+ 	{ "help",	0, 0, 'h' },
+ 	{ "verbose",	0, 0, 'v' },
++	{ "msbc",	0, 0, 'm' },
+ 	{ "subbands",	1, 0, 's' },
+ 	{ "bitpool",	1, 0, 'b' },
+ 	{ "joint",	0, 0, 'j' },
+@@ -239,9 +241,9 @@ static struct option main_options[] = {
+ int main(int argc, char *argv[])
+ {
+ 	int i, opt, subbands = 8, bitpool = 32, joint = 0, dualchannel = 0;
+-	int snr = 0, blocks = 16;
++	int snr = 0, blocks = 16, msbc = 0;
+ 
+-	while ((opt = getopt_long(argc, argv, "+hvs:b:jdSB:",
++	while ((opt = getopt_long(argc, argv, "+hmvs:b:jdSB:",
+ 						main_options, NULL)) != -1) {
+ 		switch(opt) {
+ 		case 'h':
+@@ -252,6 +254,10 @@ int main(int argc, char *argv[])
+ 			verbose = 1;
+ 			break;
+ 
++		case 'm':
++			msbc = 1;
++			break;
++
+ 		case 's':
+ 			subbands = atoi(optarg);
+ 			if (subbands != 8 && subbands != 4) {
+@@ -300,9 +306,18 @@ int main(int argc, char *argv[])
+ 		exit(1);
+ 	}
+ 
++	if (msbc) {
++		subbands = 8;
++		bitpool = 26;
++		joint = 0;
++		dualchannel = 0;
++		snr = 0;
++		blocks = 15;
++	}
++
+ 	for (i = 0; i < argc; i++)
+ 		encode(argv[i], subbands, bitpool, joint, dualchannel,
+-								snr, blocks);
++							snr, blocks, msbc);
+ 
+ 	return 0;
+ }
+-- 
+1.7.9.5
 
-This card is supplied with the Gigabyte Sniper 3 motherboard (and some
-others). I followed the information on
-http://wireless.kernel.org/en/users/Drivers/ath3k and confirmed with lsusb
--v that it is using the AR3012 chipset.
-(Marcel Holtmann told me to send this to the linux-bluetooth list, with the
-output of /sys/kernel/debug/usb/devices attached. You can find
-the Bluetooth USB device on line 60 of the usbdevices.txt file.)
-
-
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index fc2de55..29a713a 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -76,6 +76,7 @@ static struct usb_device_id ath3k_table[] = {
-        { USB_DEVICE(0x0CF3, 0x311D) },
-        { USB_DEVICE(0x13d3, 0x3375) },
-        { USB_DEVICE(0x04CA, 0x3005) },
-+       { USB_DEVICE(0x04CA, 0x3006) },
-        { USB_DEVICE(0x13d3, 0x3362) },
-        { USB_DEVICE(0x0CF3, 0xE004) },
-        { USB_DEVICE(0x0930, 0x0219) },
-@@ -103,6 +104,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
-        { USB_DEVICE(0x0cf3, 0x311D), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
-+       { USB_DEVICE(0x04ca, 0x3006), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 654e248..8a9a3e4 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -132,6 +132,7 @@ static struct usb_device_id blacklist_table[] = {
-        { USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
-+       { USB_DEVICE(0x04ca, 0x3006), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
-Signed-off-by: Wouter Thielen <wouter@morannon.org>
-
---001636eeeb7373fce104cab075d9
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-<div>This card is supplied with the Gigabyte Sniper 3 motherboard (and some=
- others). I followed the information on <a href=3D"http://wireless.kernel.o=
-rg/en/users/Drivers/ath3k" target=3D"_blank">http://wireless.kernel.org/en/=
-users/Drivers/ath3k</a> and confirmed with lsusb -v that it is using the AR=
-3012 chipset.</div>
-
-<div>(Marcel Holtmann told me to send this to the linux-bluetooth list, wit=
-h the output of /sys/kernel/debug/usb/devices attached. You can find the=C2=
-=A0Bluetooth=C2=A0USB=C2=A0device on line 60 of the usbdevices.txt file.)</=
-div>
-
-<div><br></div><div><br></div><div>diff --git a/drivers/bluetooth/ath3k.c b=
-/drivers/bluetooth/ath3k.c</div><div>index fc2de55..29a713a 100644</div><di=
-v>--- a/drivers/bluetooth/ath3k.c</div><div>+++ b/drivers/bluetooth/ath3k.c=
-</div>
-
-
-
-<div>@@ -76,6 +76,7 @@ static struct usb_device_id ath3k_table[] =3D {</div=
-><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x0CF3, 0x311D) },</div><div=
->=C2=A0 =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x13d3, 0x3375) },</div><div>=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x04CA, 0x3005) },</div>
-
-
-
-<div>+ =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x04CA, 0x3006) },</div><div>=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x13d3, 0x3362) },</div><div>=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x0CF3, 0xE004) },</div><div>=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x0930, 0x0219) },</div><div>@@ -103,6 +104,=
-7 @@ static struct usb_device_id ath3k_blist_tbl[] =3D {</div>
-
-
-
-<div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x0cf3, 0x311D), .driver_info=
- =3D BTUSB_ATH3012 },</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x=
-13d3, 0x3375), .driver_info =3D BTUSB_ATH3012 },</div><div>=C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 { USB_DEVICE(0x04ca, 0x3005), .driver_info =3D BTUSB_ATH3012 =
-},</div>
-
-
-
-<div>+ =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x04ca, 0x3006), .driver_info =3D =
-BTUSB_ATH3012 },</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x13d3,=
- 0x3362), .driver_info =3D BTUSB_ATH3012 },</div><div>=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 { USB_DEVICE(0x0cf3, 0xe004), .driver_info =3D BTUSB_ATH3012 },</div=
->
-
-
-
-<div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x0930, 0x0219), .driver_info=
- =3D BTUSB_ATH3012 },</div><div>diff --git a/drivers/bluetooth/btusb.c b/dr=
-ivers/bluetooth/btusb.c</div><div>index 654e248..8a9a3e4 100644</div><div>-=
--- a/drivers/bluetooth/btusb.c</div>
-
-
-
-<div>+++ b/drivers/bluetooth/btusb.c</div><div>@@ -132,6 +132,7 @@ static s=
-truct usb_device_id blacklist_table[] =3D {</div><div>=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 { USB_DEVICE(0x0cf3, 0x311d), .driver_info =3D BTUSB_ATH3012 },</div=
-><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x13d3, 0x3375), .driver_inf=
-o =3D BTUSB_ATH3012 },</div>
-
-
-
-<div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x04ca, 0x3005), .driver_info=
- =3D BTUSB_ATH3012 },</div><div>+ =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x04ca,=
- 0x3006), .driver_info =3D BTUSB_ATH3012 },</div><div>=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 { USB_DEVICE(0x13d3, 0x3362), .driver_info =3D BTUSB_ATH3012 },</div=
->
-
-
-
-<div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x0cf3, 0xe004), .driver_info=
- =3D BTUSB_ATH3012 },</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 { USB_DEVICE(0x=
-0930, 0x0219), .driver_info =3D BTUSB_ATH3012 },</div><div>Signed-off-by: W=
-outer Thielen &lt;<a href=3D"mailto:wouter@morannon.org" target=3D"_blank">=
-wouter@morannon.org</a>&gt;</div>
-
-
-
-<div><br></div>
-
---001636eeeb7373fce104cab075d9--
-
---001636eeeb7373fcf904cab075db
-Content-Type: text/plain; charset=US-ASCII; name="usbdevices.txt"
-Content-Disposition: attachment; filename="usbdevices.txt"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_h7m09zhs0
-
-ClQ6ICBCdXM9MDQgTGV2PTAwIFBybnQ9MDAgUG9ydD0wMCBDbnQ9MDAgRGV2Iz0gIDEgU3BkPTUw
-MDAgTXhDaD0gNApCOiAgQWxsb2M9ICAwLzgwMCB1cyAoIDAlKSwgI0ludD0gIDAsICNJc289ICAw
-CkQ6ICBWZXI9IDMuMDAgQ2xzPTA5KGh1YiAgKSBTdWI9MDAgUHJvdD0wMyBNeFBTPSA5ICNDZmdz
-PSAgMQpQOiAgVmVuZG9yPTFkNmIgUHJvZElEPTAwMDMgUmV2PSAzLjA1ClM6ICBNYW51ZmFjdHVy
-ZXI9TGludXggMy41LjAtMTUtZ2VuZXJpYyB4aGNpX2hjZApTOiAgUHJvZHVjdD14SENJIEhvc3Qg
-Q29udHJvbGxlcgpTOiAgU2VyaWFsTnVtYmVyPTAwMDA6MDA6MTQuMApDOiogI0lmcz0gMSBDZmcj
-PSAxIEF0cj1lMCBNeFB3cj0gIDBtQQpJOiogSWYjPSAwIEFsdD0gMCAjRVBzPSAxIENscz0wOSho
-dWIgICkgU3ViPTAwIFByb3Q9MDAgRHJpdmVyPWh1YgpFOiAgQWQ9ODEoSSkgQXRyPTAzKEludC4p
-IE14UFM9ICAgNCBJdmw9MjU2bXMKClQ6ICBCdXM9MDQgTGV2PTAxIFBybnQ9MDEgUG9ydD0wMiBD
-bnQ9MDEgRGV2Iz0gIDIgU3BkPTUwMDAgTXhDaD0gNApEOiAgVmVyPSAzLjAwIENscz0wOShodWIg
-ICkgU3ViPTAwIFByb3Q9MDMgTXhQUz0gOSAjQ2Zncz0gIDEKUDogIFZlbmRvcj0yMTA5IFByb2RJ
-RD0wODEwIFJldj0gMy45NQpTOiAgTWFudWZhY3R1cmVyPVZJQSBMYWJzLCBJbmMuClM6ICBQcm9k
-dWN0PTQtUG9ydCBVU0IgMy4wIEh1YgpDOiogI0lmcz0gMSBDZmcjPSAxIEF0cj1jMCBNeFB3cj0g
-IDJtQQpJOiogSWYjPSAwIEFsdD0gMCAjRVBzPSAxIENscz0wOShodWIgICkgU3ViPTAwIFByb3Q9
-MDAgRHJpdmVyPWh1YgpFOiAgQWQ9ODEoSSkgQXRyPTEzKEludC4pIE14UFM9ICAgMiBJdmw9NDA5
-Nm1zCgpUOiAgQnVzPTA0IExldj0wMSBQcm50PTAxIFBvcnQ9MDMgQ250PTAyIERldiM9ICAzIFNw
-ZD01MDAwIE14Q2g9IDQKRDogIFZlcj0gMy4wMCBDbHM9MDkoaHViICApIFN1Yj0wMCBQcm90PTAz
-IE14UFM9IDkgI0NmZ3M9ICAxClA6ICBWZW5kb3I9MjEwOSBQcm9kSUQ9MDgxMCBSZXY9IDMuOTUK
-UzogIE1hbnVmYWN0dXJlcj1WSUEgTGFicywgSW5jLgpTOiAgUHJvZHVjdD00LVBvcnQgVVNCIDMu
-MCBIdWIKQzoqICNJZnM9IDEgQ2ZnIz0gMSBBdHI9YzAgTXhQd3I9ICAybUEKSToqIElmIz0gMCBB
-bHQ9IDAgI0VQcz0gMSBDbHM9MDkoaHViICApIFN1Yj0wMCBQcm90PTAwIERyaXZlcj1odWIKRTog
-IEFkPTgxKEkpIEF0cj0xMyhJbnQuKSBNeFBTPSAgIDIgSXZsPTQwOTZtcwoKVDogIEJ1cz0wMyBM
-ZXY9MDAgUHJudD0wMCBQb3J0PTAwIENudD0wMCBEZXYjPSAgMSBTcGQ9NDgwICBNeENoPSA0CkI6
-ICBBbGxvYz0gIDAvODAwIHVzICggMCUpLCAjSW50PSAgMCwgI0lzbz0gIDAKRDogIFZlcj0gMi4w
-MCBDbHM9MDkoaHViICApIFN1Yj0wMCBQcm90PTAxIE14UFM9NjQgI0NmZ3M9ICAxClA6ICBWZW5k
-b3I9MWQ2YiBQcm9kSUQ9MDAwMiBSZXY9IDMuMDUKUzogIE1hbnVmYWN0dXJlcj1MaW51eCAzLjUu
-MC0xNS1nZW5lcmljIHhoY2lfaGNkClM6ICBQcm9kdWN0PXhIQ0kgSG9zdCBDb250cm9sbGVyClM6
-ICBTZXJpYWxOdW1iZXI9MDAwMDowMDoxNC4wCkM6KiAjSWZzPSAxIENmZyM9IDEgQXRyPWUwIE14
-UHdyPSAgMG1BCkk6KiBJZiM9IDAgQWx0PSAwICNFUHM9IDEgQ2xzPTA5KGh1YiAgKSBTdWI9MDAg
-UHJvdD0wMCBEcml2ZXI9aHViCkU6ICBBZD04MShJKSBBdHI9MDMoSW50LikgTXhQUz0gICA0IEl2
-bD0yNTZtcwoKVDogIEJ1cz0wMiBMZXY9MDAgUHJudD0wMCBQb3J0PTAwIENudD0wMCBEZXYjPSAg
-MSBTcGQ9NDgwICBNeENoPSAyCkI6ICBBbGxvYz0gIDMvODAwIHVzICggMCUpLCAjSW50PSAgMiwg
-I0lzbz0gIDAKRDogIFZlcj0gMi4wMCBDbHM9MDkoaHViICApIFN1Yj0wMCBQcm90PTAwIE14UFM9
-NjQgI0NmZ3M9ICAxClA6ICBWZW5kb3I9MWQ2YiBQcm9kSUQ9MDAwMiBSZXY9IDMuMDUKUzogIE1h
-bnVmYWN0dXJlcj1MaW51eCAzLjUuMC0xNS1nZW5lcmljIGVoY2lfaGNkClM6ICBQcm9kdWN0PUVI
-Q0kgSG9zdCBDb250cm9sbGVyClM6ICBTZXJpYWxOdW1iZXI9MDAwMDowMDoxZC4wCkM6KiAjSWZz
-PSAxIENmZyM9IDEgQXRyPWUwIE14UHdyPSAgMG1BCkk6KiBJZiM9IDAgQWx0PSAwICNFUHM9IDEg
-Q2xzPTA5KGh1YiAgKSBTdWI9MDAgUHJvdD0wMCBEcml2ZXI9aHViCkU6ICBBZD04MShJKSBBdHI9
-MDMoSW50LikgTXhQUz0gICA0IEl2bD0yNTZtcwoKVDogIEJ1cz0wMiBMZXY9MDEgUHJudD0wMSBQ
-b3J0PTAwIENudD0wMSBEZXYjPSAgMiBTcGQ9NDgwICBNeENoPSA4CkQ6ICBWZXI9IDIuMDAgQ2xz
-PTA5KGh1YiAgKSBTdWI9MDAgUHJvdD0wMSBNeFBTPTY0ICNDZmdzPSAgMQpQOiAgVmVuZG9yPTgw
-ODcgUHJvZElEPTAwMjQgUmV2PSAwLjAwCkM6KiAjSWZzPSAxIENmZyM9IDEgQXRyPWUwIE14UHdy
-PSAgMG1BCkk6KiBJZiM9IDAgQWx0PSAwICNFUHM9IDEgQ2xzPTA5KGh1YiAgKSBTdWI9MDAgUHJv
-dD0wMCBEcml2ZXI9aHViCkU6ICBBZD04MShJKSBBdHI9MDMoSW50LikgTXhQUz0gICAyIEl2bD0y
-NTZtcwoKVDogIEJ1cz0wMiBMZXY9MDIgUHJudD0wMiBQb3J0PTA0IENudD0wMSBEZXYjPSAgMyBT
-cGQ9MTIgICBNeENoPSAwCkQ6ICBWZXI9IDEuMTAgQ2xzPWUwKHdsY29uKSBTdWI9MDEgUHJvdD0w
-MSBNeFBTPTY0ICNDZmdzPSAgMQpQOiAgVmVuZG9yPTA0Y2EgUHJvZElEPTMwMDYgUmV2PSAwLjAy
-CkM6KiAjSWZzPSAyIENmZyM9IDEgQXRyPWUwIE14UHdyPTEwMG1BCkk6KiBJZiM9IDAgQWx0PSAw
-ICNFUHM9IDMgQ2xzPWUwKHdsY29uKSBTdWI9MDEgUHJvdD0wMSBEcml2ZXI9YnR1c2IKRTogIEFk
-PTgxKEkpIEF0cj0wMyhJbnQuKSBNeFBTPSAgMTYgSXZsPTFtcwpFOiAgQWQ9ODIoSSkgQXRyPTAy
-KEJ1bGspIE14UFM9ICA2NCBJdmw9MG1zCkU6ICBBZD0wMihPKSBBdHI9MDIoQnVsaykgTXhQUz0g
-IDY0IEl2bD0wbXMKSToqIElmIz0gMSBBbHQ9IDAgI0VQcz0gMiBDbHM9ZTAod2xjb24pIFN1Yj0w
-MSBQcm90PTAxIERyaXZlcj1idHVzYgpFOiAgQWQ9ODMoSSkgQXRyPTAxKElzb2MpIE14UFM9ICAg
-MCBJdmw9MW1zCkU6ICBBZD0wMyhPKSBBdHI9MDEoSXNvYykgTXhQUz0gICAwIEl2bD0xbXMKSTog
-IElmIz0gMSBBbHQ9IDEgI0VQcz0gMiBDbHM9ZTAod2xjb24pIFN1Yj0wMSBQcm90PTAxIERyaXZl
-cj1idHVzYgpFOiAgQWQ9ODMoSSkgQXRyPTAxKElzb2MpIE14UFM9ICAgOSBJdmw9MW1zCkU6ICBB
-ZD0wMyhPKSBBdHI9MDEoSXNvYykgTXhQUz0gICA5IEl2bD0xbXMKSTogIElmIz0gMSBBbHQ9IDIg
-I0VQcz0gMiBDbHM9ZTAod2xjb24pIFN1Yj0wMSBQcm90PTAxIERyaXZlcj1idHVzYgpFOiAgQWQ9
-ODMoSSkgQXRyPTAxKElzb2MpIE14UFM9ICAxNyBJdmw9MW1zCkU6ICBBZD0wMyhPKSBBdHI9MDEo
-SXNvYykgTXhQUz0gIDE3IEl2bD0xbXMKSTogIElmIz0gMSBBbHQ9IDMgI0VQcz0gMiBDbHM9ZTAo
-d2xjb24pIFN1Yj0wMSBQcm90PTAxIERyaXZlcj1idHVzYgpFOiAgQWQ9ODMoSSkgQXRyPTAxKElz
-b2MpIE14UFM9ICAyNSBJdmw9MW1zCkU6ICBBZD0wMyhPKSBBdHI9MDEoSXNvYykgTXhQUz0gIDI1
-IEl2bD0xbXMKSTogIElmIz0gMSBBbHQ9IDQgI0VQcz0gMiBDbHM9ZTAod2xjb24pIFN1Yj0wMSBQ
-cm90PTAxIERyaXZlcj1idHVzYgpFOiAgQWQ9ODMoSSkgQXRyPTAxKElzb2MpIE14UFM9ICAzMyBJ
-dmw9MW1zCkU6ICBBZD0wMyhPKSBBdHI9MDEoSXNvYykgTXhQUz0gIDMzIEl2bD0xbXMKSTogIElm
-Iz0gMSBBbHQ9IDUgI0VQcz0gMiBDbHM9ZTAod2xjb24pIFN1Yj0wMSBQcm90PTAxIERyaXZlcj1i
-dHVzYgpFOiAgQWQ9ODMoSSkgQXRyPTAxKElzb2MpIE14UFM9ICA0OSBJdmw9MW1zCkU6ICBBZD0w
-MyhPKSBBdHI9MDEoSXNvYykgTXhQUz0gIDQ5IEl2bD0xbXMKClQ6ICBCdXM9MDEgTGV2PTAwIFBy
-bnQ9MDAgUG9ydD0wMCBDbnQ9MDAgRGV2Iz0gIDEgU3BkPTQ4MCAgTXhDaD0gMgpCOiAgQWxsb2M9
-ICA4LzgwMCB1cyAoIDElKSwgI0ludD0gIDUsICNJc289ICAzCkQ6ICBWZXI9IDIuMDAgQ2xzPTA5
-KGh1YiAgKSBTdWI9MDAgUHJvdD0wMCBNeFBTPTY0ICNDZmdzPSAgMQpQOiAgVmVuZG9yPTFkNmIg
-UHJvZElEPTAwMDIgUmV2PSAzLjA1ClM6ICBNYW51ZmFjdHVyZXI9TGludXggMy41LjAtMTUtZ2Vu
-ZXJpYyBlaGNpX2hjZApTOiAgUHJvZHVjdD1FSENJIEhvc3QgQ29udHJvbGxlcgpTOiAgU2VyaWFs
-TnVtYmVyPTAwMDA6MDA6MWEuMApDOiogI0lmcz0gMSBDZmcjPSAxIEF0cj1lMCBNeFB3cj0gIDBt
-QQpJOiogSWYjPSAwIEFsdD0gMCAjRVBzPSAxIENscz0wOShodWIgICkgU3ViPTAwIFByb3Q9MDAg
-RHJpdmVyPWh1YgpFOiAgQWQ9ODEoSSkgQXRyPTAzKEludC4pIE14UFM9ICAgNCBJdmw9MjU2bXMK
-ClQ6ICBCdXM9MDEgTGV2PTAxIFBybnQ9MDEgUG9ydD0wMCBDbnQ9MDEgRGV2Iz0gIDIgU3BkPTQ4
-MCAgTXhDaD0gNgpEOiAgVmVyPSAyLjAwIENscz0wOShodWIgICkgU3ViPTAwIFByb3Q9MDEgTXhQ
-Uz02NCAjQ2Zncz0gIDEKUDogIFZlbmRvcj04MDg3IFByb2RJRD0wMDI0IFJldj0gMC4wMApDOiog
-I0lmcz0gMSBDZmcjPSAxIEF0cj1lMCBNeFB3cj0gIDBtQQpJOiogSWYjPSAwIEFsdD0gMCAjRVBz
-PSAxIENscz0wOShodWIgICkgU3ViPTAwIFByb3Q9MDAgRHJpdmVyPWh1YgpFOiAgQWQ9ODEoSSkg
-QXRyPTAzKEludC4pIE14UFM9ICAgMSBJdmw9MjU2bXMKClQ6ICBCdXM9MDEgTGV2PTAyIFBybnQ9
-MDIgUG9ydD0wMSBDbnQ9MDEgRGV2Iz0gIDMgU3BkPTQ4MCAgTXhDaD0gMApEOiAgVmVyPSAyLjAw
-IENscz1lZihtaXNjICkgU3ViPTAyIFByb3Q9MDEgTXhQUz02NCAjQ2Zncz0gIDEKUDogIFZlbmRv
-cj0wNDZkIFByb2RJRD0wODA1IFJldj0gMC4wOQpTOiAgU2VyaWFsTnVtYmVyPUE2MjYzNjkwCkM6
-KiAjSWZzPSA0IENmZyM9IDEgQXRyPTgwIE14UHdyPTUwMG1BCkE6ICBGaXJzdElmIz0gMCBJZkNv
-dW50PSAyIENscz0wZSh2aWRlbykgU3ViPTAzIFByb3Q9MDAKQTogIEZpcnN0SWYjPSAyIElmQ291
-bnQ9IDIgQ2xzPTAxKGF1ZGlvKSBTdWI9MDIgUHJvdD0wMApJOiogSWYjPSAwIEFsdD0gMCAjRVBz
-PSAxIENscz0wZSh2aWRlbykgU3ViPTAxIFByb3Q9MDAgRHJpdmVyPXV2Y3ZpZGVvCkU6ICBBZD04
-NyhJKSBBdHI9MDMoSW50LikgTXhQUz0gIDE2IEl2bD0xNm1zCkk6KiBJZiM9IDEgQWx0PSAwICNF
-UHM9IDAgQ2xzPTBlKHZpZGVvKSBTdWI9MDIgUHJvdD0wMCBEcml2ZXI9dXZjdmlkZW8KSTogIElm
-Iz0gMSBBbHQ9IDEgI0VQcz0gMSBDbHM9MGUodmlkZW8pIFN1Yj0wMiBQcm90PTAwIERyaXZlcj11
-dmN2aWRlbwpFOiAgQWQ9ODEoSSkgQXRyPTA1KElzb2MpIE14UFM9IDE5MiBJdmw9MTI1dXMKSTog
-IElmIz0gMSBBbHQ9IDIgI0VQcz0gMSBDbHM9MGUodmlkZW8pIFN1Yj0wMiBQcm90PTAwIERyaXZl
-cj11dmN2aWRlbwpFOiAgQWQ9ODEoSSkgQXRyPTA1KElzb2MpIE14UFM9IDM4NCBJdmw9MTI1dXMK
-STogIElmIz0gMSBBbHQ9IDMgI0VQcz0gMSBDbHM9MGUodmlkZW8pIFN1Yj0wMiBQcm90PTAwIERy
-aXZlcj11dmN2aWRlbwpFOiAgQWQ9ODEoSSkgQXRyPTA1KElzb2MpIE14UFM9IDUxMiBJdmw9MTI1
-dXMKSTogIElmIz0gMSBBbHQ9IDQgI0VQcz0gMSBDbHM9MGUodmlkZW8pIFN1Yj0wMiBQcm90PTAw
-IERyaXZlcj11dmN2aWRlbwpFOiAgQWQ9ODEoSSkgQXRyPTA1KElzb2MpIE14UFM9IDY0MCBJdmw9
-MTI1dXMKSTogIElmIz0gMSBBbHQ9IDUgI0VQcz0gMSBDbHM9MGUodmlkZW8pIFN1Yj0wMiBQcm90
-PTAwIERyaXZlcj11dmN2aWRlbwpFOiAgQWQ9ODEoSSkgQXRyPTA1KElzb2MpIE14UFM9IDgwMCBJ
-dmw9MTI1dXMKSTogIElmIz0gMSBBbHQ9IDYgI0VQcz0gMSBDbHM9MGUodmlkZW8pIFN1Yj0wMiBQ
-cm90PTAwIERyaXZlcj11dmN2aWRlbwpFOiAgQWQ9ODEoSSkgQXRyPTA1KElzb2MpIE14UFM9IDk0
-NCBJdmw9MTI1dXMKSTogIElmIz0gMSBBbHQ9IDcgI0VQcz0gMSBDbHM9MGUodmlkZW8pIFN1Yj0w
-MiBQcm90PTAwIERyaXZlcj11dmN2aWRlbwpFOiAgQWQ9ODEoSSkgQXRyPTA1KElzb2MpIE14UFM9
-MTI4MCBJdmw9MTI1dXMKSTogIElmIz0gMSBBbHQ9IDggI0VQcz0gMSBDbHM9MGUodmlkZW8pIFN1
-Yj0wMiBQcm90PTAwIERyaXZlcj11dmN2aWRlbwpFOiAgQWQ9ODEoSSkgQXRyPTA1KElzb2MpIE14
-UFM9MTYwMCBJdmw9MTI1dXMKSTogIElmIz0gMSBBbHQ9IDkgI0VQcz0gMSBDbHM9MGUodmlkZW8p
-IFN1Yj0wMiBQcm90PTAwIERyaXZlcj11dmN2aWRlbwpFOiAgQWQ9ODEoSSkgQXRyPTA1KElzb2Mp
-IE14UFM9MTk4NCBJdmw9MTI1dXMKSTogIElmIz0gMSBBbHQ9MTAgI0VQcz0gMSBDbHM9MGUodmlk
-ZW8pIFN1Yj0wMiBQcm90PTAwIERyaXZlcj11dmN2aWRlbwpFOiAgQWQ9ODEoSSkgQXRyPTA1KElz
-b2MpIE14UFM9MjY4OCBJdmw9MTI1dXMKSTogIElmIz0gMSBBbHQ9MTEgI0VQcz0gMSBDbHM9MGUo
-dmlkZW8pIFN1Yj0wMiBQcm90PTAwIERyaXZlcj11dmN2aWRlbwpFOiAgQWQ9ODEoSSkgQXRyPTA1
-KElzb2MpIE14UFM9MzA2MCBJdmw9MTI1dXMKSToqIElmIz0gMiBBbHQ9IDAgI0VQcz0gMCBDbHM9
-MDEoYXVkaW8pIFN1Yj0wMSBQcm90PTAwIERyaXZlcj1zbmQtdXNiLWF1ZGlvCkk6KiBJZiM9IDMg
-QWx0PSAwICNFUHM9IDAgQ2xzPTAxKGF1ZGlvKSBTdWI9MDIgUHJvdD0wMCBEcml2ZXI9c25kLXVz
-Yi1hdWRpbwpJOiAgSWYjPSAzIEFsdD0gMSAjRVBzPSAxIENscz0wMShhdWRpbykgU3ViPTAyIFBy
-b3Q9MDAgRHJpdmVyPXNuZC11c2ItYXVkaW8KRTogIEFkPTg2KEkpIEF0cj0wNShJc29jKSBNeFBT
-PSAgNjggSXZsPTFtcwpJOiAgSWYjPSAzIEFsdD0gMiAjRVBzPSAxIENscz0wMShhdWRpbykgU3Vi
-PTAyIFByb3Q9MDAgRHJpdmVyPXNuZC11c2ItYXVkaW8KRTogIEFkPTg2KEkpIEF0cj0wNShJc29j
-KSBNeFBTPSAxMDAgSXZsPTFtcwpJOiAgSWYjPSAzIEFsdD0gMyAjRVBzPSAxIENscz0wMShhdWRp
-bykgU3ViPTAyIFByb3Q9MDAgRHJpdmVyPXNuZC11c2ItYXVkaW8KRTogIEFkPTg2KEkpIEF0cj0w
-NShJc29jKSBNeFBTPSAxMzIgSXZsPTFtcwpJOiAgSWYjPSAzIEFsdD0gNCAjRVBzPSAxIENscz0w
-MShhdWRpbykgU3ViPTAyIFByb3Q9MDAgRHJpdmVyPXNuZC11c2ItYXVkaW8KRTogIEFkPTg2KEkp
-IEF0cj0wNShJc29jKSBNeFBTPSAxOTYgSXZsPTFtcwoKVDogIEJ1cz0wMSBMZXY9MDIgUHJudD0w
-MiBQb3J0PTA0IENudD0wMiBEZXYjPSAgNCBTcGQ9MTIgICBNeENoPSAwCkQ6ICBWZXI9IDIuMDAg
-Q2xzPTAwKD5pZmMgKSBTdWI9MDAgUHJvdD0wMCBNeFBTPSA4ICNDZmdzPSAgMQpQOiAgVmVuZG9y
-PTE1MzIgUHJvZElEPTAwMjQgUmV2PSAyLjAwClM6ICBNYW51ZmFjdHVyZXI9UmF6ZXIKUzogIFBy
-b2R1Y3Q9UmF6ZXIgTWFtYmEKQzoqICNJZnM9IDIgQ2ZnIz0gMSBBdHI9YTAgTXhQd3I9MTAwbUEK
-SToqIElmIz0gMCBBbHQ9IDAgI0VQcz0gMSBDbHM9MDMoSElEICApIFN1Yj0wMSBQcm90PTAyIERy
-aXZlcj11c2JoaWQKRTogIEFkPTgxKEkpIEF0cj0wMyhJbnQuKSBNeFBTPSAgIDggSXZsPTFtcwpJ
-OiogSWYjPSAxIEFsdD0gMCAjRVBzPSAxIENscz0wMyhISUQgICkgU3ViPTAxIFByb3Q9MDEgRHJp
-dmVyPXVzYmhpZApFOiAgQWQ9ODIoSSkgQXRyPTAzKEludC4pIE14UFM9ICAgOSBJdmw9MW1zCgpU
-OiAgQnVzPTAxIExldj0wMiBQcm50PTAyIFBvcnQ9MDUgQ250PTAzIERldiM9ICA1IFNwZD00ODAg
-IE14Q2g9IDQKRDogIFZlcj0gMi4wMCBDbHM9MDkoaHViICApIFN1Yj0wMCBQcm90PTAxIE14UFM9
-NjQgI0NmZ3M9ICAxClA6ICBWZW5kb3I9MDU4ZiBQcm9kSUQ9NjI1NCBSZXY9IDEuMDAKUzogIFBy
-b2R1Y3Q9VVNCMi4wSHViCkM6KiAjSWZzPSAxIENmZyM9IDEgQXRyPWUwIE14UHdyPTEwMG1BCkk6
-KiBJZiM9IDAgQWx0PSAwICNFUHM9IDEgQ2xzPTA5KGh1YiAgKSBTdWI9MDAgUHJvdD0wMCBEcml2
-ZXI9aHViCkU6ICBBZD04MShJKSBBdHI9MDMoSW50LikgTXhQUz0gICAxIEl2bD0yNTZtcwoKVDog
-IEJ1cz0wMSBMZXY9MDMgUHJudD0wNSBQb3J0PTAwIENudD0wMSBEZXYjPSAgNiBTcGQ9MTIgICBN
-eENoPSAwCkQ6ICBWZXI9IDEuMTAgQ2xzPTAwKD5pZmMgKSBTdWI9MDAgUHJvdD0wMCBNeFBTPSA4
-ICNDZmdzPSAgMQpQOiAgVmVuZG9yPTBkOGMgUHJvZElEPTAwMDEgUmV2PSAwLjEwClM6ICBNYW51
-ZmFjdHVyZXI9Qy1NZWRpYSBJTkMuClM6ICBQcm9kdWN0PVVTQiBBdWRpbwpDOiogI0lmcz0gMiBD
-ZmcjPSAxIEF0cj04MCBNeFB3cj01MDBtQQpJOiogSWYjPSAwIEFsdD0gMCAjRVBzPSAwIENscz0w
-MShhdWRpbykgU3ViPTAxIFByb3Q9MDAgRHJpdmVyPXNuZC11c2ItYXVkaW8KSTogIElmIz0gMSBB
-bHQ9IDAgI0VQcz0gMCBDbHM9MDEoYXVkaW8pIFN1Yj0wMiBQcm90PTAwIERyaXZlcj1zbmQtdXNi
-LWF1ZGlvCkk6KiBJZiM9IDEgQWx0PSAxICNFUHM9IDEgQ2xzPTAxKGF1ZGlvKSBTdWI9MDIgUHJv
-dD0wMCBEcml2ZXI9c25kLXVzYi1hdWRpbwpFOiAgQWQ9MDYoTykgQXRyPTA5KElzb2MpIE14UFM9
-IDE5MiBJdmw9MW1zCgpUOiAgQnVzPTAxIExldj0wMyBQcm50PTA1IFBvcnQ9MDIgQ250PTAyIERl
-diM9ICA3IFNwZD0xMiAgIE14Q2g9IDAKRDogIFZlcj0gMi4wMCBDbHM9MDAoPmlmYyApIFN1Yj0w
-MCBQcm90PTAwIE14UFM9IDggI0NmZ3M9ICAxClA6ICBWZW5kb3I9MDQ2ZCBQcm9kSUQ9YzUyYiBS
-ZXY9MTIuMDEKUzogIE1hbnVmYWN0dXJlcj1Mb2dpdGVjaApTOiAgUHJvZHVjdD1VU0IgUmVjZWl2
-ZXIKQzoqICNJZnM9IDMgQ2ZnIz0gMSBBdHI9YTAgTXhQd3I9IDk4bUEKSToqIElmIz0gMCBBbHQ9
-IDAgI0VQcz0gMSBDbHM9MDMoSElEICApIFN1Yj0wMSBQcm90PTAxIERyaXZlcj11c2JoaWQKRTog
-IEFkPTgxKEkpIEF0cj0wMyhJbnQuKSBNeFBTPSAgIDggSXZsPThtcwpJOiogSWYjPSAxIEFsdD0g
-MCAjRVBzPSAxIENscz0wMyhISUQgICkgU3ViPTAxIFByb3Q9MDIgRHJpdmVyPXVzYmhpZApFOiAg
-QWQ9ODIoSSkgQXRyPTAzKEludC4pIE14UFM9ICAgOCBJdmw9Mm1zCkk6KiBJZiM9IDIgQWx0PSAw
-ICNFUHM9IDEgQ2xzPTAzKEhJRCAgKSBTdWI9MDAgUHJvdD0wMCBEcml2ZXI9dXNiaGlkCkU6ICBB
-ZD04MyhJKSBBdHI9MDMoSW50LikgTXhQUz0gIDMyIEl2bD0ybXMKClQ6ICBCdXM9MDEgTGV2PTAz
-IFBybnQ9MDUgUG9ydD0wMyBDbnQ9MDMgRGV2Iz0gIDggU3BkPTQ4MCAgTXhDaD0gMApEOiAgVmVy
-PSAyLjAwIENscz0wMCg+aWZjICkgU3ViPTAwIFByb3Q9MDAgTXhQUz02NCAjQ2Zncz0gIDEKUDog
-IFZlbmRvcj0wNThmIFByb2RJRD02MzY2IFJldj0gMS4wMApTOiAgTWFudWZhY3R1cmVyPUdlbmVy
-aWMKUzogIFByb2R1Y3Q9TWFzcyBTdG9yYWdlIERldmljZQpTOiAgU2VyaWFsTnVtYmVyPTA1OEYw
-TzExMTFCMQpDOiogI0lmcz0gMSBDZmcjPSAxIEF0cj04MCBNeFB3cj0xMDBtQQpJOiogSWYjPSAw
-IEFsdD0gMCAjRVBzPSAyIENscz0wOChzdG9yLikgU3ViPTA2IFByb3Q9NTAgRHJpdmVyPXVzYi1z
-dG9yYWdlCkU6ICBBZD0wMShPKSBBdHI9MDIoQnVsaykgTXhQUz0gNTEyIEl2bD0wbXMKRTogIEFk
-PTgyKEkpIEF0cj0wMihCdWxrKSBNeFBTPSA1MTIgSXZsPTBtcwo=
---001636eeeb7373fcf904cab075db--
