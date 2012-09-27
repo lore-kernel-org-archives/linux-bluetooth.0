@@ -2,101 +2,161 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH v2 BlueZ 14/27] alert: Update Supported New/Unread Category characteristic values
-Date: Thu, 27 Sep 2012 14:36:23 -0400
-Message-Id: <1348770996-12236-15-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH v2 BlueZ 13/27] alert: Add per adapter attribute handle information
+Date: Thu, 27 Sep 2012 14:36:22 -0400
+Message-Id: <1348770996-12236-14-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1348770996-12236-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1348509661-15967-1-git-send-email-anderson.lizardo@openbossa.org>
  <1348770996-12236-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The value is now kept up-to-date when new/unread alerts arrive. This
-value is not notified yet.
+Each adapter may have different GATT services running, therefore any
+attribute handles (e.g. for updating characteristic values) need to be
+saved per adapter.
 ---
- profiles/alert/server.c |   34 +++++++++++++++++++++++++++++++++-
- 1 file changed, 33 insertions(+), 1 deletion(-)
+ profiles/alert/server.c |   57 ++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 47 insertions(+), 10 deletions(-)
 
 diff --git a/profiles/alert/server.c b/profiles/alert/server.c
-index 9288ffe..f38761b 100644
+index 465496c..9288ffe 100644
 --- a/profiles/alert/server.c
 +++ b/profiles/alert/server.c
-@@ -89,7 +89,8 @@ struct alert_data {
- 
- struct alert_adapter {
- 	struct btd_adapter *adapter;
--	/* TODO: store characteristic value handles */
-+	uint16_t supp_new_alert_cat_handle;
-+	uint16_t supp_unread_alert_cat_handle;
+@@ -87,7 +87,13 @@ struct alert_data {
+ 	guint watcher;
  };
  
++struct alert_adapter {
++	struct btd_adapter *adapter;
++	/* TODO: store characteristic value handles */
++};
++
  static GSList *registered_alerts = NULL;
-@@ -235,6 +236,29 @@ static gboolean valid_count(const char *category, uint16_t count)
- 	return FALSE;
- }
++static GSList *alert_adapters = NULL;
+ static uint8_t ringer_setting = RINGER_NORMAL;
+ static uint8_t alert_status = 0;
  
-+static void update_supported_categories(gpointer data, gpointer user_data)
+@@ -110,6 +116,21 @@ static const char *pasp_categories[] = {
+ 	"display",
+ };
+ 
++static int adapter_cmp(gconstpointer a, gconstpointer b)
 +{
-+	struct alert_adapter *al_adapter = data;
-+	struct btd_adapter *adapter = al_adapter->adapter;
-+	uint8_t value[2];
-+	unsigned int i;
++	const struct alert_adapter *al_adapter = a;
++	const struct btd_adapter *adapter = b;
 +
-+	memset(value, 0, sizeof(value));
-+
-+	for (i = 0; i < G_N_ELEMENTS(anp_categories); i++) {
-+		if (registered_category(anp_categories[i]))
-+			hci_set_bit(i, value);
-+	}
-+
-+	attrib_db_update(adapter, al_adapter->supp_new_alert_cat_handle, NULL,
-+						value, sizeof(value), NULL);
-+
-+	/* FIXME: For now report all registered categories as supporting unread
-+	 * status, until it is known which ones should be supported */
-+	attrib_db_update(adapter, al_adapter->supp_unread_alert_cat_handle,
-+					NULL, value, sizeof(value), NULL);
++	return (al_adapter->adapter == adapter ? 0 : -1);
 +}
 +
- static void watcher_disconnect(DBusConnection *conn, void *user_data)
++static struct alert_adapter *find_alert_adapter(struct btd_adapter *adapter)
++{
++	GSList *l = g_slist_find_custom(alert_adapters, adapter, adapter_cmp);
++
++	return (l ? l->data : NULL);
++}
++
+ static void alert_data_destroy(gpointer user_data)
  {
  	struct alert_data *alert = user_data;
-@@ -243,6 +267,8 @@ static void watcher_disconnect(DBusConnection *conn, void *user_data)
- 
- 	registered_alerts = g_slist_remove(registered_alerts, alert);
- 	alert_data_destroy(alert);
-+
-+	g_slist_foreach(alert_adapters, update_supported_categories, NULL);
+@@ -379,20 +400,20 @@ static uint8_t ringer_setting_read(struct attribute *a,
+ 	return 0;
  }
  
- static DBusMessage *register_alert(DBusConnection *conn, DBusMessage *msg,
-@@ -285,6 +311,8 @@ static DBusMessage *register_alert(DBusConnection *conn, DBusMessage *msg,
+-static void register_phone_alert_service(struct btd_adapter *adapter)
++static void register_phone_alert_service(struct alert_adapter *al_adapter)
+ {
+ 	bt_uuid_t uuid;
  
- 	registered_alerts = g_slist_append(registered_alerts, alert);
+ 	bt_uuid16_create(&uuid, PHONE_ALERT_STATUS_SVC_UUID);
  
-+	g_slist_foreach(alert_adapters, update_supported_categories, NULL);
-+
- 	DBG("RegisterAlert(\"%s\", \"%s\")", alert->category, alert->path);
+ 	/* Phone Alert Status Service */
+-	gatt_service_add(adapter, GATT_PRIM_SVC_UUID, &uuid,
++	gatt_service_add(al_adapter->adapter, GATT_PRIM_SVC_UUID, &uuid,
+ 			/* Alert Status characteristic */
+ 			GATT_OPT_CHR_UUID, ALERT_STATUS_CHR_UUID,
+ 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ |
+ 							ATT_CHAR_PROPER_NOTIFY,
+ 			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
+-			alert_status_read, adapter,
++			alert_status_read, al_adapter->adapter,
+ 			/* Ringer Control Point characteristic */
+ 			GATT_OPT_CHR_UUID, RINGER_CP_CHR_UUID,
+ 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_WRITE_WITHOUT_RESP,
+@@ -403,7 +424,7 @@ static void register_phone_alert_service(struct btd_adapter *adapter)
+ 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ |
+ 							ATT_CHAR_PROPER_NOTIFY,
+ 			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
+-			ringer_setting_read, adapter,
++			ringer_setting_read, al_adapter->adapter,
+ 			GATT_OPT_INVALID);
+ }
  
- 	return dbus_message_new_method_return(msg);
-@@ -505,6 +533,8 @@ static void register_alert_notif_service(struct alert_adapter *al_adapter)
+@@ -471,19 +492,19 @@ static uint8_t alert_notif_cp_write(struct attribute *a,
+ 	return 0;
+ }
+ 
+-static void register_alert_notif_service(struct btd_adapter *adapter)
++static void register_alert_notif_service(struct alert_adapter *al_adapter)
+ {
+ 	bt_uuid_t uuid;
+ 
+ 	bt_uuid16_create(&uuid, ALERT_NOTIF_SVC_UUID);
+ 
+ 	/* Alert Notification Service */
+-	gatt_service_add(adapter, GATT_PRIM_SVC_UUID, &uuid,
++	gatt_service_add(al_adapter->adapter, GATT_PRIM_SVC_UUID, &uuid,
+ 			/* Supported New Alert Category */
+ 			GATT_OPT_CHR_UUID, SUPP_NEW_ALERT_CAT_CHR_UUID,
  			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ,
  			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
- 			supp_new_alert_cat_read, al_adapter->adapter,
-+			GATT_OPT_CHR_VALUE_GET_HANDLE,
-+			&al_adapter->supp_new_alert_cat_handle,
+-			supp_new_alert_cat_read, adapter,
++			supp_new_alert_cat_read, al_adapter->adapter,
  			/* New Alert */
  			GATT_OPT_CHR_UUID, NEW_ALERT_CHR_UUID,
  			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_NOTIFY,
-@@ -513,6 +543,8 @@ static void register_alert_notif_service(struct alert_adapter *al_adapter)
+@@ -491,7 +512,7 @@ static void register_alert_notif_service(struct btd_adapter *adapter)
+ 			GATT_OPT_CHR_UUID, SUPP_UNREAD_ALERT_CAT_CHR_UUID,
  			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ,
  			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
- 			supp_unread_alert_cat_read, al_adapter->adapter,
-+			GATT_OPT_CHR_VALUE_GET_HANDLE,
-+			&al_adapter->supp_unread_alert_cat_handle,
+-			supp_unread_alert_cat_read, adapter,
++			supp_unread_alert_cat_read, al_adapter->adapter,
  			/* Unread Alert Status */
  			GATT_OPT_CHR_UUID, UNREAD_ALERT_CHR_UUID,
  			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_NOTIFY,
+@@ -506,8 +527,15 @@ static void register_alert_notif_service(struct btd_adapter *adapter)
+ static int alert_server_probe(struct btd_profile *p,
+ 						struct btd_adapter *adapter)
+ {
+-	register_phone_alert_service(adapter);
+-	register_alert_notif_service(adapter);
++	struct alert_adapter *al_adapter;
++
++	al_adapter = g_new0(struct alert_adapter, 1);
++	al_adapter->adapter = btd_adapter_ref(adapter);
++
++	alert_adapters = g_slist_append(alert_adapters, al_adapter);
++
++	register_phone_alert_service(al_adapter);
++	register_alert_notif_service(al_adapter);
+ 
+ 	return 0;
+ }
+@@ -515,6 +543,15 @@ static int alert_server_probe(struct btd_profile *p,
+ static void alert_server_remove(struct btd_profile *p,
+ 						struct btd_adapter *adapter)
+ {
++	struct alert_adapter *al_adapter;
++
++	al_adapter = find_alert_adapter(adapter);
++	if (!al_adapter)
++		return;
++
++	alert_adapters = g_slist_remove(alert_adapters, al_adapter);
++	btd_adapter_unref(al_adapter->adapter);
++	g_free(al_adapter);
+ }
+ 
+ static struct btd_profile alert_profile = {
 -- 
 1.7.9.5
 
