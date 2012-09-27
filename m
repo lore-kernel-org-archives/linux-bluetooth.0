@@ -1,122 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: gustavo@padovan.org, mathewm@codeaurora.org
-Subject: [PATCHv7 02/19] Bluetooth: A2MP: Create amp_mgr global list
-Date: Thu, 27 Sep 2012 17:26:07 +0300
-Message-Id: <1348755984-6403-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1348755984-6403-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1348755984-6403-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <50642ED8.3090007@tieto.com>
+References: <1348584763-22824-1-git-send-email-andrzej.kaczmarek@tieto.com>
+	<CAJdJm_N3g2YN32dUo4Af9zBnaVPAcTW5MgF9O-mXz8y_Dt23CQ@mail.gmail.com>
+	<50642ED8.3090007@tieto.com>
+Date: Thu, 27 Sep 2012 08:03:46 -0400
+Message-ID: <CAJdJm_NLz-rd1w59pBDP_QMWKVcZ3-N0FMNqy1UCisBzZL-VNQ@mail.gmail.com>
+Subject: Re: [PATCH 00/14] Thermometer watchers API change + fixes
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Andrzej,
 
-Create amp_mgr_list global list which will be used by different
-hci devices to find amp_mgr.
+On Thu, Sep 27, 2012 at 6:47 AM, Andrzej Kaczmarek
+<andrzej.kaczmarek@tieto.com> wrote:
+>> Maybe we should consider implementing a simple Thermometer role in
+>> BlueZ for testing purposes. It is a relatively simple profile.
+>
+>
+> So you mean something like optional org.bluez.ThermometerSensor interface on
+> adapter, similar to what is done for reporter role for Proximity?
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- include/net/bluetooth/a2mp.h |   10 ++++++++++
- net/bluetooth/a2mp.c         |   29 +++++++++++++++++++++++++++++
- 2 files changed, 39 insertions(+)
+Yes. There has been some interest on the past on the mailing list from
+people willing to implement this role on BlueZ (although I have not
+heard anymore from them), so it would become not just a test plugin,
+but have an API that allows for BlueZ to expose some external
+thermometer measurements over LE. But for now a "dummy" thermometer
+which sends dummy measurements in various formats should be enough
+(probably enabled only with --enable-test so it is not installed in
+production).
 
-diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 6a76e0a..316c1c8 100644
---- a/include/net/bluetooth/a2mp.h
-+++ b/include/net/bluetooth/a2mp.h
-@@ -19,12 +19,18 @@
- 
- #define A2MP_FEAT_EXT	0x8000
- 
-+enum amp_mgr_state {
-+	READ_LOC_AMP_INFO,
-+};
-+
- struct amp_mgr {
-+	struct list_head	list;
- 	struct l2cap_conn	*l2cap_conn;
- 	struct l2cap_chan	*a2mp_chan;
- 	struct kref		kref;
- 	__u8			ident;
- 	__u8			handle;
-+	enum amp_mgr_state	state;
- 	unsigned long		flags;
- };
- 
-@@ -118,9 +124,13 @@ struct a2mp_physlink_rsp {
- #define A2MP_STATUS_PHYS_LINK_EXISTS		0x05
- #define A2MP_STATUS_SECURITY_VIOLATION		0x06
- 
-+extern struct list_head amp_mgr_list;
-+extern struct mutex amp_mgr_list_lock;
-+
- void amp_mgr_get(struct amp_mgr *mgr);
- int amp_mgr_put(struct amp_mgr *mgr);
- struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
- 				       struct sk_buff *skb);
-+struct amp_mgr *amp_mgr_lookup_by_state(u8 state);
- 
- #endif /* __A2MP_H */
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 0760d1f..3f93060 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -17,6 +17,10 @@
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/a2mp.h>
- 
-+/* Global AMP Manager list */
-+LIST_HEAD(amp_mgr_list);
-+DEFINE_MUTEX(amp_mgr_list_lock);
-+
- /* A2MP build & send command helper functions */
- static struct a2mp_cmd *__a2mp_build(u8 code, u8 ident, u16 len, void *data)
- {
-@@ -516,6 +520,10 @@ static void amp_mgr_destroy(struct kref *kref)
- 
- 	BT_DBG("mgr %p", mgr);
- 
-+	mutex_lock(&amp_mgr_list_lock);
-+	list_del(&mgr->list);
-+	mutex_unlock(&amp_mgr_list_lock);
-+
- 	kfree(mgr);
- }
- 
-@@ -552,6 +560,10 @@ static struct amp_mgr *amp_mgr_create(struct l2cap_conn *conn)
- 
- 	kref_init(&mgr->kref);
- 
-+	mutex_lock(&amp_mgr_list_lock);
-+	list_add(&mgr->list, &amp_mgr_list);
-+	mutex_unlock(&amp_mgr_list_lock);
-+
- 	return mgr;
- }
- 
-@@ -570,3 +582,20 @@ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
- 
- 	return mgr->a2mp_chan;
- }
-+
-+struct amp_mgr *amp_mgr_lookup_by_state(u8 state)
-+{
-+	struct amp_mgr *mgr;
-+
-+	mutex_lock(&amp_mgr_list_lock);
-+	list_for_each_entry(mgr, &amp_mgr_list, list) {
-+		if (mgr->state == state) {
-+			amp_mgr_get(mgr);
-+			mutex_unlock(&amp_mgr_list_lock);
-+			return mgr;
-+		}
-+	}
-+	mutex_unlock(&amp_mgr_list_lock);
-+
-+	return NULL;
-+}
+Do you have interest/time for working on something like this?
+
+BTW, I definitely plan to test both your HRP implementation and the
+HTP changes, but currently I'm working in other things... I'll let you
+know once I have these tested (probably with patches if I find any
+issues).
+
+Best Regards,
 -- 
-1.7.9.5
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
