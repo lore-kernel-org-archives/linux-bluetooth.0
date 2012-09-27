@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: gustavo@padovan.org, mathewm@codeaurora.org
-Subject: [PATCHv7 05/19] Bluetooth: A2MP: Process Discover Response
-Date: Thu, 27 Sep 2012 17:26:10 +0300
-Message-Id: <1348755984-6403-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv7 18/19] Bluetooth: AMP: Accept Physical Link
+Date: Thu, 27 Sep 2012 17:26:23 +0300
+Message-Id: <1348755984-6403-19-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1348755984-6403-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1348755984-6403-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -13,102 +13,74 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When receiving A2MP Discover Response send A2MP Get Info Request
-for each AMP controller in the discovery list.
+When receiving A2MP Create Physical Link message execute HCI
+Accept Physical Link command to AMP controller.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/a2mp.c |   62 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 61 insertions(+), 1 deletion(-)
+ include/net/bluetooth/amp.h |    2 ++
+ net/bluetooth/a2mp.c        |    5 +----
+ net/bluetooth/amp.c         |   19 +++++++++++++++++++
+ 3 files changed, 22 insertions(+), 4 deletions(-)
 
+diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
+index 70496c0..1b06d7b 100644
+--- a/include/net/bluetooth/amp.h
++++ b/include/net/bluetooth/amp.h
+@@ -41,6 +41,8 @@ void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
+ 				   struct hci_conn *hcon);
+ void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+ 			struct hci_conn *hcon);
++void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
++			struct hci_conn *hcon);
+ void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle);
+ void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle);
+ 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 7140061..f04c441 100644
+index 375a67f..dbfdbbb 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -67,6 +67,14 @@ void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data)
- 	kfree(cmd);
- }
+@@ -453,12 +453,9 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 		goto send_rsp;
+ 	}
  
-+static u8 __next_ident(struct amp_mgr *mgr)
-+{
-+	if (++mgr->ident == 0)
-+		mgr->ident = 1;
-+
-+	return mgr->ident;
-+}
-+
- static inline void __a2mp_cl_bredr(struct a2mp_cl *cl)
- {
- 	cl->id = 0;
-@@ -165,6 +173,55 @@ static int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 	return 0;
- }
+-	/* TODO process physlink create */
+-
+ 	hcon = phylink_add(hdev, mgr, req->local_id);
+ 	if (hcon) {
+-		BT_DBG("hcon %p", hcon);
+-
++		amp_accept_phylink(hdev, mgr, hcon);
+ 		rsp.status = A2MP_STATUS_SUCCESS;
+ 	} else {
+ 		rsp.status = A2MP_STATUS_UNABLE_START_LINK_CREATION;
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index 4f7b264..845e430 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -346,3 +346,22 @@ void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
  
-+static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
-+			     struct a2mp_cmd *hdr)
+ 	hci_send_cmd(hdev, HCI_OP_CREATE_PHY_LINK, sizeof(cp), &cp);
+ }
++
++void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
++			struct hci_conn *hcon)
 +{
-+	struct a2mp_discov_rsp *rsp = (void *) skb->data;
-+	u16 len = le16_to_cpu(hdr->len);
-+	struct a2mp_cl *cl;
-+	u16 ext_feat;
++	struct hci_cp_accept_phy_link cp;
 +
-+	if (len < sizeof(*rsp))
-+		return -EINVAL;
++	cp.phy_handle = hcon->handle;
 +
-+	len -= sizeof(*rsp);
-+	skb_pull(skb, sizeof(*rsp));
++	BT_DBG("%s hcon %p phy handle 0x%2.2x", hdev->name, hcon,
++	       hcon->handle);
 +
-+	ext_feat = le16_to_cpu(rsp->ext_feat);
-+
-+	BT_DBG("mtu %d efm 0x%4.4x", le16_to_cpu(rsp->mtu), ext_feat);
-+
-+	/* check that packet is not broken for now */
-+	while (ext_feat & A2MP_FEAT_EXT) {
-+		if (len < sizeof(ext_feat))
-+			return -EINVAL;
-+
-+		ext_feat = get_unaligned_le16(skb->data);
-+		BT_DBG("efm 0x%4.4x", ext_feat);
-+		len -= sizeof(ext_feat);
-+		skb_pull(skb, sizeof(ext_feat));
++	if (phylink_gen_key(mgr->l2cap_conn->hcon, cp.key, &cp.key_len,
++			    &cp.key_type)) {
++		BT_DBG("Cannot create link key");
++		return;
 +	}
 +
-+	cl = (void *) skb->data;
-+	while (len >= sizeof(*cl)) {
-+		BT_DBG("Remote AMP id %d type %d status %d", cl->id, cl->type,
-+		       cl->status);
-+
-+		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
-+			struct a2mp_info_req req;
-+
-+			req.id = cl->id;
-+			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
-+				  sizeof(req), &req);
-+		}
-+
-+		len -= sizeof(*cl);
-+		cl = (void *) skb_pull(skb, sizeof(*cl));
-+	}
-+
-+	return 0;
++	hci_send_cmd(hdev, HCI_OP_ACCEPT_PHY_LINK, sizeof(cp), &cp);
 +}
-+
- static int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
- 			      struct a2mp_cmd *hdr)
- {
-@@ -391,8 +448,11 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 			err = a2mp_discphyslink_req(mgr, skb, hdr);
- 			break;
- 
--		case A2MP_CHANGE_RSP:
- 		case A2MP_DISCOVER_RSP:
-+			err = a2mp_discover_rsp(mgr, skb, hdr);
-+			break;
-+
-+		case A2MP_CHANGE_RSP:
- 		case A2MP_GETINFO_RSP:
- 		case A2MP_GETAMPASSOC_RSP:
- 		case A2MP_CREATEPHYSLINK_RSP:
 -- 
 1.7.9.5
 
