@@ -1,37 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 2/3] Bluetooth: btmrvl: Use DIV_ROUND_UP macro
-Date: Thu, 27 Sep 2012 10:51:47 +0300
-Message-Id: <1348732308-29348-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1348732308-29348-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1348732308-29348-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 27 Sep 2012 10:43:38 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH BlueZ v7 2/9] mgmt: Add LE scanning callback
+Message-ID: <20120927074338.GC9610@x220>
+References: <1348594686-26221-1-git-send-email-jprvita@openbossa.org>
+ <1348594686-26221-2-git-send-email-jprvita@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1348594686-26221-2-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi,
 
-The kernel.h macro DIV_ROUND_UP performs the computation
-(((n) + (d) - 1) / (d))
+On Tue, Sep 25, 2012, João Paulo Rechi Vita wrote:
+> +int mgmt_start_scanning(int index)
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- drivers/bluetooth/btmrvl_sdio.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Firstly I don't think the name is good since BR/EDR also has the concept
+of scanning (page scan & inquiry scan). Secondly, maybe it'd be simpler
+to reuse mgmt_start_discovery and simply add a new parameter which
+provides the value for info->discov_type?
 
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 25dc53b..1457f25 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -516,7 +516,7 @@ static int btmrvl_sdio_card_to_host(struct btmrvl_private *priv)
- 	BT_DBG("%s buf_len %zu", hdev->name, buf_len);
- 
- 	blksz = SDIO_BLOCK_SIZE;
--	num_blocks = (buf_len + blksz - 1) / blksz;
-+	num_blocks = DIV_ROUND_UP(buf_len, blksz);
- 
- 	if (buf_len <= SDIO_HEADER_LEN
- 	    || (num_blocks * blksz) > ALLOC_BUF_SIZE) {
--- 
-1.7.9.5
-
+Johan
