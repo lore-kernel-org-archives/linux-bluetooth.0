@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-Subject: [PATCH v2 BlueZ 10/27] alert: Add initial support for NewAlert D-Bus method
-Date: Thu, 27 Sep 2012 14:36:19 -0400
-Message-Id: <1348770996-12236-11-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH v2 BlueZ 09/27] alert: Implement category registration in RegisterAlert()
+Date: Thu, 27 Sep 2012 14:36:18 -0400
+Message-Id: <1348770996-12236-10-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1348770996-12236-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1348509661-15967-1-git-send-email-anderson.lizardo@openbossa.org>
  <1348770996-12236-1-git-send-email-anderson.lizardo@openbossa.org>
@@ -13,40 +13,75 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
 
-NewAlert() is used for notifying BlueZ of new alert(s) for the given
-category.
+The given alert category is now validated and registered.
 ---
- profiles/alert/server.c |  106 ++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 105 insertions(+), 1 deletion(-)
+ profiles/alert/server.c |  102 +++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 98 insertions(+), 4 deletions(-)
 
 diff --git a/profiles/alert/server.c b/profiles/alert/server.c
-index 2c7373c..ce8404c 100644
+index c0434a4..2c7373c 100644
 --- a/profiles/alert/server.c
 +++ b/profiles/alert/server.c
-@@ -62,6 +62,9 @@
- #define ALERT_OBJECT_PATH "/org/bluez"
- #define ALERT_INTERFACE   "org.bluez.Alert"
+@@ -77,19 +77,113 @@ enum {
+ 	RINGER_NORMAL,
+ };
  
-+/* Maximum length for "Text String Information" */
-+#define NEW_ALERT_MAX_INFO_SIZE		18
++struct alert_data {
++	const char *category;
++	char *srv;
++	char *path;
++};
 +
- enum {
- 	ENABLE_NEW_INCOMING,
- 	ENABLE_UNREAD_CAT,
-@@ -138,7 +141,7 @@ static const char *valid_category(const char *category)
- 	return NULL;
- }
++static GSList *registered_alerts = NULL;
+ static uint8_t ringer_setting = RINGER_NORMAL;
+ static uint8_t alert_status = 0;
  
--static gboolean registered_category(const char *category)
-+static struct alert_data *get_alert_data_by_category(const char *category)
- {
- 	GSList *l;
- 	struct alert_data *alert;
-@@ -146,9 +149,64 @@ static gboolean registered_category(const char *category)
- 	for (l = registered_alerts; l; l = g_slist_next(l)) {
- 		alert = l->data;
- 		if (g_str_equal(alert->category, category))
-+			return alert;
++static const char *anp_categories[] = {
++	"simple",
++	"email",
++	"news",
++	"call",
++	"missed_call",
++	"sms_mms",
++	"voice_mail",
++	"schedule",
++	"high_priority",
++	"instant_message",
++};
++
++static const char *pasp_categories[] = {
++	"ringer",
++	"vibrate",
++	"display",
++};
++
++static void alert_data_destroy(gpointer user_data)
++{
++	struct alert_data *alert = user_data;
++
++	g_free(alert->srv);
++	g_free(alert->path);
++	g_free(alert);
++}
++
++static void alert_destroy(gpointer user_data)
++{
++	g_slist_free_full(registered_alerts, alert_data_destroy);
++	registered_alerts = NULL;
++}
++
++static const char *valid_category(const char *category)
++{
++	unsigned i;
++
++	for (i = 0; i < G_N_ELEMENTS(anp_categories); i++) {
++		if (g_str_equal(anp_categories[i], category))
++			return anp_categories[i];
++	}
++
++	for (i = 0; i < G_N_ELEMENTS(pasp_categories); i++) {
++		if (g_str_equal(pasp_categories[i], category))
++			return pasp_categories[i];
 +	}
 +
 +	return NULL;
@@ -54,119 +89,65 @@ index 2c7373c..ce8404c 100644
 +
 +static gboolean registered_category(const char *category)
 +{
++	GSList *l;
 +	struct alert_data *alert;
 +
-+	alert = get_alert_data_by_category(category);
-+	if (alert)
-+		return TRUE;
-+
-+	return FALSE;
-+}
-+
-+static gboolean pasp_category(const char *category)
-+{
-+	unsigned i;
-+
-+	for (i = 0; i < G_N_ELEMENTS(pasp_categories); i++)
-+		if (g_str_equal(category, pasp_categories[i]))
- 			return TRUE;
-+
-+	return FALSE;
-+}
-+
-+static gboolean valid_description(const char *category,
-+							const char *description)
-+{
-+	if (!pasp_category(category)) {
-+		if (strlen(description) >= NEW_ALERT_MAX_INFO_SIZE)
-+			return FALSE;
-+
-+		return TRUE;
- 	}
- 
-+	if (g_str_equal(description, "active") ||
-+					g_str_equal(description, "not active"))
-+		return TRUE;
-+
-+	if (g_str_equal(category, "ringer"))
-+		if (g_str_equal(description, "enabled") ||
-+					g_str_equal(description, "disabled"))
++	for (l = registered_alerts; l; l = g_slist_next(l)) {
++		alert = l->data;
++		if (g_str_equal(alert->category, category))
 +			return TRUE;
++	}
 +
 +	return FALSE;
 +}
 +
-+static gboolean valid_count(const char *category, uint16_t count)
-+{
-+	if (!pasp_category(category) && count > 0 && count <= 255)
-+		return TRUE;
+ static DBusMessage *register_alert(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
++	const char *sender = dbus_message_get_sender(msg);
++	char *path;
+ 	const char *category;
++	const char *c;
++	struct alert_data *alert;
 +
-+	if (pasp_category(category) && count == 1)
-+		return TRUE;
-+
- 	return FALSE;
- }
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &c,
++			DBUS_TYPE_OBJECT_PATH, &path, DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
  
-@@ -188,6 +246,47 @@ static DBusMessage *register_alert(DBusConnection *conn, DBusMessage *msg,
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &category,
+-							DBUS_TYPE_INVALID))
++	category = valid_category(c);
++	if (!category) {
++		DBG("Invalid category: %s", c);
+ 		return btd_error_invalid_args(msg);
++	}
++
++	if (registered_category(category)) {
++		DBG("Category %s already registered", category);
++		return dbus_message_new_method_return(msg);
++	}
++
++	alert = g_new0(struct alert_data, 1);
++	alert->srv = g_strdup(sender);
++	alert->path = g_strdup(path);
++	alert->category = category;
++
++	registered_alerts = g_slist_append(registered_alerts, alert);
+ 
+-	DBG("RegisterAlert: %s", category);
++	DBG("RegisterAlert(\"%s\", \"%s\")", alert->category, alert->path);
+ 
  	return dbus_message_new_method_return(msg);
  }
- 
-+static DBusMessage *new_alert(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	const char *sender = dbus_message_get_sender(msg);
-+	const char *category, *description;
-+	struct alert_data *alert;
-+	uint16_t count;
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &category,
-+			DBUS_TYPE_UINT16, &count, DBUS_TYPE_STRING,
-+			&description, DBUS_TYPE_INVALID))
-+		return btd_error_invalid_args(msg);
-+
-+	alert = get_alert_data_by_category(category);
-+	if (!alert) {
-+		DBG("Category %s not registered", category);
-+		return btd_error_invalid_args(msg);
-+	}
-+
-+	if (!g_str_equal(alert->srv, sender)) {
-+		DBG("Sender %s is not registered in category %s", sender,
-+								category);
-+		return btd_error_invalid_args(msg);
-+	}
-+
-+	if (!valid_description(category, description)) {
-+		DBG("Description %s is invalid for %s category",
-+							description, category);
-+		return btd_error_invalid_args(msg);
-+	}
-+
-+	if (!valid_count(category, count)) {
-+		DBG("Count %d is invalid for %s category", count, category);
-+		return btd_error_invalid_args(msg);
-+	}
-+
-+	DBG("NewAlert(\"%s\", %d, \"%s\")", category, count, description);
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
- static uint8_t ringer_cp_write(struct attribute *a,
- 						struct btd_device *device,
- 						gpointer user_data)
-@@ -376,6 +475,11 @@ static const GDBusMethodTable alert_methods[] = {
- 			GDBUS_ARGS({ "category", "s" },
- 				   { "agent", "o" }), NULL,
- 			register_alert) },
-+	{ GDBUS_METHOD("NewAlert",
-+			GDBUS_ARGS({ "category", "s" },
-+				   { "count", "q" },
-+				   { "description", "s" }), NULL,
-+			new_alert) },
- 	{ }
- };
- 
+@@ -290,7 +384,7 @@ int alert_server_init(void)
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+ 					ALERT_OBJECT_PATH, ALERT_INTERFACE,
+ 					alert_methods, NULL, NULL, NULL,
+-					NULL)) {
++					alert_destroy)) {
+ 		error("D-Bus failed to register %s interface",
+ 							ALERT_INTERFACE);
+ 		return -EIO;
 -- 
 1.7.9.5
 
