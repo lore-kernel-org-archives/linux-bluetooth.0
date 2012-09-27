@@ -1,62 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 28 Sep 2012 09:16:24 +0800
-From: Fengguang Wu <fengguang.wu@intel.com>
-To: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Cc: Yuanhan Liu <yuanhan.liu@intel.com>,
-	kernel-janitors@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
-	linux-bluetooth@vger.kernel.org
-Subject: [bluetooth:master 224/240] net/bluetooth/hci_event.c:886:3: warning:
- format '%d' expects argument of type 'int', but argument 3 has type 'size_t'
-Message-ID: <20120928011624.GB5522@localhost>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20120928012005.1c6c6d87@i7>
+References: <CABax29VLUHg_jePnhHz_6WHYCZBHoir5TBLuauK+Ktfg9-8Xjw@mail.gmail.com>
+	<CABax29VadeA+6WZWRDiZZUhpRqk2Nk35__b0Cjfz8HO12Tq4vQ@mail.gmail.com>
+	<CACY+gR0DJfbOgfSGHrsAj5vk00v4-_+KYwR+SF+0BRRs2oYBkw@mail.gmail.com>
+	<CABax29X+ke_PO9obAxbEJjdx68g8JW4ZZn7vS7mYpE7+00iYng@mail.gmail.com>
+	<CABax29WFvAXH9g8CnOtEDAqfmKmURnt4eYY58fi+P9zBa5Ji1A@mail.gmail.com>
+	<CACY+gR3pqj6xoJ-G-pt5QTY6BjuyUNXTZRzsQmmutcSNBzY3qQ@mail.gmail.com>
+	<CABax29Unh0AOhExp_FJwUr=edmPSDXy=_YJAXN81M5tp5+yUxw@mail.gmail.com>
+	<CABax29XWLWcBT6hHgSQud6qzhQ-Y-WAMjQ8ytCT7Px09H1iQtg@mail.gmail.com>
+	<CACY+gR3aPvvMRvNW+c3QdF8UkGR4ZGPChWt4MAoa+5fK=HSBNQ@mail.gmail.com>
+	<CABax29U=bsb0T2FQtzkQ2WGOkDTgJ8STshcu8fRmC4QvHEv=QQ@mail.gmail.com>
+	<CACY+gR326euT9fgXMZF_XLV28peJUJVWxOVZAA_xNEfHAsRRWA@mail.gmail.com>
+	<CABax29XEJ5V5_cN9ieXfb1byDB7bQsuuwenJLOUDos7NNuepaQ@mail.gmail.com>
+	<CACY+gR3rjZ9_5zJ2yAf7Z+yfa7RsNWBRhNk5NJadpF5_V2TS7Q@mail.gmail.com>
+	<CABBYNZKzJCqnkManeGxtWuDsKF_hHK+Ucbb1SXzUuce5cLdmqw@mail.gmail.com>
+	<20120928012005.1c6c6d87@i7>
+Date: Fri, 28 Sep 2012 01:25:08 +0300
+Message-ID: <CACY+gR1SeM_FuKQ95k_8OZZBCxT303F6EhORdqba-PCBB9oyJQ@mail.gmail.com>
+Subject: Re: [PATCH] Re: A2DP quality (bluetooth-alsa)
+From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+On Fri, Sep 28, 2012 at 1:20 AM, Siarhei Siamashka
+<siarhei.siamashka@gmail.com> wrote:
+> On Tue, 31 Jul 2012 13:09:19 +0300
+> Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>
+>> Hi Siarhei,
 
-FYI, there are new compile warnings show up in
+By the way, thanks for moving libsbc into its own library. This
+definitely looks like the right thing.
 
-tree:   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-head:   392f44d3e7894f6fe314b85b4a1611b7b1d98226
-commit: 903e45411099ae8292f5ce637ad0c72f6fef61db [224/240] Bluetooth: AMP: Use HCI cmd to Read Loc AMP Assoc
-config: x86_64-allmodconfig
-
-All warnings:
-
-net/bluetooth/hci_event.c: In function 'hci_cc_read_local_amp_assoc':
-net/bluetooth/hci_event.c:886:3: warning: format '%d' expects argument of type 'int', but argument 3 has type 'size_t' [-Wformat]
-net/bluetooth/hci_event.c:886:3: warning: format '%d' expects argument of type 'int', but argument 4 has type 'size_t' [-Wformat]
-
-vim +886 net/bluetooth/hci_event.c
-
-903e4541 (Andrei Emeltchenko 2012-09-27  870) static void hci_cc_read_local_amp_assoc(struct hci_dev *hdev,
-903e4541 (Andrei Emeltchenko 2012-09-27  871) 					struct sk_buff *skb)
-903e4541 (Andrei Emeltchenko 2012-09-27  872) {
-903e4541 (Andrei Emeltchenko 2012-09-27  873) 	struct hci_rp_read_local_amp_assoc *rp = (void *) skb->data;
-903e4541 (Andrei Emeltchenko 2012-09-27  874) 	struct amp_assoc *assoc = &hdev->loc_assoc;
-903e4541 (Andrei Emeltchenko 2012-09-27  875) 	size_t rem_len, frag_len;
-903e4541 (Andrei Emeltchenko 2012-09-27  876) 
-903e4541 (Andrei Emeltchenko 2012-09-27  877) 	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
-903e4541 (Andrei Emeltchenko 2012-09-27  878) 
-903e4541 (Andrei Emeltchenko 2012-09-27  879) 	if (rp->status)
-903e4541 (Andrei Emeltchenko 2012-09-27  880) 		goto a2mp_rsp;
-903e4541 (Andrei Emeltchenko 2012-09-27  881) 
-903e4541 (Andrei Emeltchenko 2012-09-27  882) 	frag_len = skb->len - sizeof(*rp);
-903e4541 (Andrei Emeltchenko 2012-09-27  883) 	rem_len = __le16_to_cpu(rp->rem_len);
-903e4541 (Andrei Emeltchenko 2012-09-27  884) 
-903e4541 (Andrei Emeltchenko 2012-09-27  885) 	if (rem_len > frag_len) {
-903e4541 (Andrei Emeltchenko 2012-09-27 @886) 		BT_DBG("frag_len %d rem_len %d", frag_len, rem_len);
-903e4541 (Andrei Emeltchenko 2012-09-27  887) 
-903e4541 (Andrei Emeltchenko 2012-09-27  888) 		memcpy(assoc->data + assoc->offset, rp->frag, frag_len);
-903e4541 (Andrei Emeltchenko 2012-09-27  889) 		assoc->offset += frag_len;
-903e4541 (Andrei Emeltchenko 2012-09-27  890) 
-903e4541 (Andrei Emeltchenko 2012-09-27  891) 		/* Read other fragments */
-903e4541 (Andrei Emeltchenko 2012-09-27  892) 		amp_read_loc_assoc_frag(hdev, rp->phy_handle);
-903e4541 (Andrei Emeltchenko 2012-09-27  893) 
-903e4541 (Andrei Emeltchenko 2012-09-27  894) 		return;
-
----
-0-DAY kernel build testing backend         Open Source Technology Centre
-Fengguang Wu, Yuanhan Liu                              Intel Corporation
+-- 
+Best regards,
+Siarhei Siamashka
