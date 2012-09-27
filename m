@@ -1,70 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 27 Sep 2012 17:44:24 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, mathewm@codeaurora.org
-Subject: Re: [PATCHv7 00/19] Bluetooth: Create AMP physical link
-Message-ID: <20120927204424.GA15463@joana>
-References: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1348755984-6403-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1348755984-6403-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <20120927031616.GA7630@echo>
+References: <1348594686-26221-1-git-send-email-jprvita@openbossa.org>
+ <1348594686-26221-5-git-send-email-jprvita@openbossa.org> <20120927031616.GA7630@echo>
+From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
+Date: Thu, 27 Sep 2012 17:34:14 -0300
+Message-ID: <CAAngNMZ7NoeSpchT_ZOYZSgO9oDbm2qX49Kq6975cQxojgyiiw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v7 5/9] core: Queue discovery if scanning is active
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+On Thu, Sep 27, 2012 at 12:16 AM, Vinicius Costa Gomes
+<vinicius.gomes@openbossa.org> wrote:
+> Hi João, Claudio,
+>
+> On 14:38 Tue 25 Sep, João Paulo Rechi Vita wrote:
+>> From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+>>
+>> This patch manages BR/EDR inquiry and BLE scanning discovery sessions.
+>> A scanning session is added in the discovery session list when there is
+>> a bonded device which requires re-connection.
+>>
+>> bluetoothd decides if interleaved or scanning needs to be executed based
+>> on the queued discovery sessions. Interleaved discovery has higher
+>> priority, scanning only is executed when there is only a scanning
+>> session active.
+>> ---
+>>  src/adapter.c | 65 ++++++++++++++++++++++++++++++++++++++++++-----------------
+>>  1 file changed, 46 insertions(+), 19 deletions(-)
+>>
+>> diff --git a/src/adapter.c b/src/adapter.c
+>> index 201e6a0..0a0ac8f 100644
+>> --- a/src/adapter.c
+>> +++ b/src/adapter.c
+>> @@ -132,6 +132,7 @@ struct btd_adapter {
+>>       GSList *devices;                /* Devices structure pointers */
+>>       GSList *mode_sessions;          /* Request Mode sessions */
+>>       GSList *disc_sessions;          /* Discovery sessions */
+>> +     struct session_req *scanning_session;
+>>       GSList *connect_list;           /* Devices to connect when found */
+>>       guint discov_id;                /* Discovery timer */
+>>       gboolean discovering;           /* Discovery active */
+>> @@ -221,17 +222,18 @@ static struct session_req *create_session(struct btd_adapter *adapter,
+>>                                       DBusMessage *msg, uint8_t mode,
+>>                                       GDBusWatchFunction cb)
+>>  {
+>> -     const char *sender = dbus_message_get_sender(msg);
+>> +     const char *sender;
+>>       struct session_req *req;
+>>
+>>       req = g_new0(struct session_req, 1);
+>>       req->adapter = adapter;
+>> -     req->msg = dbus_message_ref(msg);
+>>       req->mode = mode;
+>>
+>> -     if (cb == NULL)
+>> +     if (cb == NULL || msg == NULL)
+>>               return session_ref(req);
+>
+> Sorry for taking so long to notice this, but there is a problem here.
+> 'req->msg' is needed in 'set_mode_complete()' (around adapter.c:2329) even
+> when 'cb' is NULL: when setting the "Powered" or "Discoverable" property,
+> the session created doesn't have a 'cb' but it has a 'msg'.
+>
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-09-27 17:26:05 +0300]:
+Good catch, Vinicius. Thanks!
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> This set of patches enhances A2MP protocol and creates physical
-> link between AMP controllers. This is further iteration towards
-> Bluetooth High Speed.
-> 
-> Changes:
-> 	* p7: Fix ctrl_lookup, add phylink accept functions.
-> 	* p6: Refactoring: moving code from pal.[ch] to amp.[ch]
-> 	* p5: Fix issues reported by Mat in mailing list review
-> 	* p4: Rebased against recent bluetooth-next, minor fixes
-> 	* p3: Use hci_conn for representing physical link(type AMP_LINK) instead of
-> 	struct phy_link, refactoring.
-> 	* p2: Remove HCI callbacks and use amp_mgr global list, refactor code.
-> 	* p1: Fixed locking issues, added basic logical link preparation.
-> 	* v3: Remove workqueue from callback processing; change callback functions
-> 	names according to reviewers recommendations; create global amp_mgr_list to
-> 	have lookup to amp manager, physical and logical links so for those HCI events
-> 	which might be identified by __handler__ we have lookup; remove extensive
-> 	hexdump from gen_amp_key.
-> 	* v2: Fix typos and bugs, add functionality: now physical connection
-> 	might be established.
-> 	* v1: Fix typos, change debug prints, refactor code for better
-> 	splitting functionality.
-> 
-> Andrei Emeltchenko (18):
->   Bluetooth: Add HCI logical link cmds definitions
->   Bluetooth: A2MP: Create amp_mgr global list
->   Bluetooth: AMP: Use HCI cmd to Read AMP Info
->   Bluetooth: AMP: Use HCI cmd to Read Loc AMP Assoc
->   Bluetooth: A2MP: Process Discover Response
->   Bluetooth: AMP: Physical link struct and heplers
->   Bluetooth: AMP: Remote AMP ctrl definitions
->   Bluetooth: AMP: Handle create / disc phylink req
->   Bluetooth: A2MP: Process A2MP Getinfo Rsp
->   Bluetooth: A2MP: Process A2MP Get AMP Assoc Rsp
->   Bluetooth: Choose connection based on capabilities
->   Bluetooth: AMP: Add AMP key calculation
->   Bluetooth: AMP: Create Physical Link
->   Bluetooth: AMP: Write remote AMP Assoc
->   Bluetooth: A2MP: Add fallback to normal l2cap init sequence
->   Bluetooth: AMP: Process Chan Selected event
->   Bluetooth: AMP: Accept Physical Link
->   Bluetooth: AMP: Handle Accept phylink command status evt
-> 
-> Dmitry Kasatkin (1):
->   Bluetooth: Add function to derive AMP key using hmac
-
-All 19 patches were applied to bluetooth-next. Thanks.
-
-	Gustavo
+-- 
+João Paulo Rechi Vita
+Openbossa Labs - INdT
