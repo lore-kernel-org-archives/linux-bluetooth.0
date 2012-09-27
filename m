@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH v3 4/5] adapter: Queue parallel authorization requests
-Date: Thu, 27 Sep 2012 10:07:51 +0200
-Message-Id: <1348733272-2117-5-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH v3 3/5] adapter: Use authorization id for cancelling
+Date: Thu, 27 Sep 2012 10:07:50 +0200
+Message-Id: <1348733272-2117-4-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1348733272-2117-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1348733272-2117-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,334 +12,328 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Remote device could try to connect several profiles in parallel, or
-several devices could be trying to connect services. Instead of
-returning EBUSY, this patch adds a queue to each adapter such that the
-authorization requests will be queued and processed sequentially.
+Return a request id in btd_request_authorization() in order to be used
+when the request needs to be cancelled. This id alone will be enough to
+use btd_cancel_authorization().
 ---
- src/adapter.c | 181 +++++++++++++++++++++++++++++++++-------------------------
- 1 file changed, 103 insertions(+), 78 deletions(-)
+ audio/device.c          | 12 +++++++++---
+ plugins/service.c       | 18 ++++++++++-------
+ profiles/input/server.c |  2 +-
+ src/adapter.c           | 51 +++++++++++++++++++++++++++++++------------------
+ src/adapter.h           |  2 +-
+ src/profile.c           | 24 +++++++++--------------
+ 6 files changed, 63 insertions(+), 46 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index e77d305..b896182 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -101,8 +101,10 @@ struct service_auth {
- 	int id;
- 	service_auth_cb cb;
- 	void *user_data;
-+	const char *uuid;
- 	struct btd_device *device;
- 	struct btd_adapter *adapter;
-+	struct agent *agent;		/* NULL for queued auths */
- };
+diff --git a/audio/device.c b/audio/device.c
+index 99d6512..454bbb9 100644
+--- a/audio/device.c
++++ b/audio/device.c
+@@ -83,6 +83,7 @@ struct dev_priv {
+ 	sink_state_t sink_state;
+ 	avctp_state_t avctp_state;
+ 	GSList *auths;
++	int auth_id;
  
- struct btd_adapter {
-@@ -129,8 +131,8 @@ struct btd_adapter {
- 	GSList *found_devices;
- 	GSList *oor_devices;		/* out of range device list */
- 	struct agent *agent;		/* For the new API */
--	guint auth_idle_id;		/* Ongoing authorization (trusted) */
--	struct service_auth *auth;	/* Ongoing authorization */
-+	guint auth_idle_id;		/* Pending authorization dequeue */
-+	GQueue *auths;			/* Ongoing and pending auths */
- 	GSList *connections;		/* Connected devices */
- 	GSList *devices;		/* Devices structure pointers */
- 	GSList *mode_sessions;		/* Request Mode sessions */
-@@ -158,6 +160,8 @@ struct btd_adapter {
- 	GSList *profiles;
- };
+ 	DBusMessage *conn_req;
+ 	DBusMessage *dc_req;
+@@ -737,6 +738,8 @@ static void auth_cb(DBusError *derr, void *user_data)
+ 	struct audio_device *dev = user_data;
+ 	struct dev_priv *priv = dev->priv;
  
-+static gboolean process_auth_queue(gpointer user_data);
++	priv->auth_id = 0;
 +
- static void dev_info_free(void *data)
- {
- 	struct remote_dev_info *dev = data;
-@@ -951,16 +955,49 @@ static struct btd_device *adapter_create_device(struct btd_adapter *adapter,
- 	return device;
- }
+ 	if (derr == NULL)
+ 		priv->authorized = TRUE;
  
-+static void service_auth_cancel(struct service_auth *auth)
-+{
-+	DBusError derr;
-+
-+	dbus_error_init(&derr);
-+	dbus_set_error_const(&derr, "org.bluez.Error.Canceled", NULL);
-+
-+	auth->cb(&derr, auth->user_data);
-+
-+	dbus_error_free(&derr);
-+
-+	if (auth->agent != NULL)
-+		agent_cancel(auth->agent);
-+
-+	g_free(auth);
-+}
-+
- void adapter_remove_device(struct btd_adapter *adapter,
- 						struct btd_device *device,
- 						gboolean remove_storage)
- {
- 	const gchar *dev_path = device_get_path(device);
--	struct agent *agent;
-+	GList *l;
- 
- 	adapter->devices = g_slist_remove(adapter->devices, device);
- 	adapter->connections = g_slist_remove(adapter->connections, device);
- 
-+	l = adapter->auths->head;
-+	while (l != NULL) {
-+		struct service_auth *auth = l->data;
-+		GList *next = g_list_next(l);
-+
-+		if (auth->device != device) {
-+			l = next;
-+			continue;
-+		}
-+
-+		g_queue_delete_link(adapter->auths, l);
-+		l = next;
-+
-+		service_auth_cancel(auth);
-+	}
-+
- 	adapter_update_devices(adapter);
- 
- 	g_dbus_emit_signal(btd_get_dbus_connection(), adapter->path,
-@@ -968,14 +1005,6 @@ void adapter_remove_device(struct btd_adapter *adapter,
- 			DBUS_TYPE_OBJECT_PATH, &dev_path,
- 			DBUS_TYPE_INVALID);
- 
--	agent = device_get_agent(device);
--
--	if (agent && adapter->auth && adapter->auth->device == device) {
--		g_free(adapter->auth);
--		adapter->auth = NULL;
--		agent_cancel(agent);
+@@ -820,7 +823,8 @@ int audio_device_request_authorization(struct audio_device *dev,
+ 	if (err < 0) {
+ 		priv->auths = g_slist_remove(priv->auths, auth);
+ 		g_free(auth);
 -	}
--
- 	device_remove(device, remove_storage);
++	} else
++		priv->auth_id = err;
+ 
+ 	return err;
  }
- 
-@@ -2426,8 +2455,7 @@ static void adapter_free(gpointer user_data)
- 	if (adapter->auth_idle_id)
- 		g_source_remove(adapter->auth_idle_id);
- 
--	if (adapter->auth)
--		g_free(adapter->auth);
-+	g_queue_free_full(adapter->auths, g_free);
- 
- 	if (adapter->off_timer)
- 		off_timer_remove(adapter);
-@@ -2521,6 +2549,7 @@ struct btd_adapter *adapter_create(int id)
+@@ -850,8 +854,10 @@ int audio_device_cancel_authorization(struct audio_device *dev,
+ 		if (priv->auth_idle_id > 0) {
+ 			g_source_remove(priv->auth_idle_id);
+ 			priv->auth_idle_id = 0;
+-		} else
+-			btd_cancel_authorization(&dev->src, &dev->dst);
++		} else {
++			btd_cancel_authorization(priv->auth_id);
++			priv->auth_id = 0;
++		}
  	}
  
- 	adapter->dev_id = id;
-+	adapter->auths = g_queue_new();
+ 	return 0;
+diff --git a/plugins/service.c b/plugins/service.c
+index e02a673..fca559d 100644
+--- a/plugins/service.c
++++ b/plugins/service.c
+@@ -65,6 +65,7 @@ struct pending_auth {
+ 	char *sender;
+ 	bdaddr_t dst;
+ 	char uuid[MAX_LEN_UUID_STR];
++	int id;
+ };
  
- 	snprintf(path, sizeof(path), "%s/hci%d", base_path, id);
- 	adapter->path = g_strdup(path);
-@@ -3164,26 +3193,60 @@ static void agent_auth_cb(struct agent *agent, DBusError *derr,
- 							void *user_data)
- {
- 	struct btd_adapter *adapter = user_data;
--	struct service_auth *auth = adapter->auth;
-+	struct service_auth *auth = adapter->auths->head->data;
+ struct service_adapter {
+@@ -557,8 +558,9 @@ done:
+ 	else
+ 		bacpy(&src, BDADDR_ANY);
  
--	adapter->auth = NULL;
-+	g_queue_pop_head(adapter->auths);
- 
- 	auth->cb(derr, auth->user_data);
- 
- 	g_free(auth);
-+
-+	adapter->auth_idle_id = g_idle_add(process_auth_queue, adapter);
+-	btd_request_authorization(&src, &auth->dst,
+-					auth->uuid, auth_cb, serv_adapter);
++	auth->id = btd_request_authorization(&src, &auth->dst,
++							auth->uuid, auth_cb,
++							serv_adapter);
  }
  
--static gboolean auth_idle_cb(gpointer user_data)
-+static gboolean process_auth_queue(gpointer user_data)
- {
- 	struct btd_adapter *adapter = user_data;
--	struct service_auth *auth = adapter->auth;
-+	DBusError err;
+ static DBusMessage *request_authorization(DBusConnection *conn,
+@@ -633,8 +635,9 @@ static DBusMessage *request_authorization(DBusConnection *conn,
+ 	else
+ 		bacpy(&src, BDADDR_ANY);
  
--	adapter->auth = NULL;
- 	adapter->auth_idle_id = 0;
+-	if (btd_request_authorization(&src, &auth->dst, auth->uuid, auth_cb,
+-							serv_adapter) < 0) {
++	auth->id = btd_request_authorization(&src, &auth->dst, auth->uuid,
++							auth_cb, serv_adapter);
++	if (auth->id < 0) {
+ 		serv_adapter->pending_list = g_slist_remove(serv_adapter->pending_list,
+ 									auth);
+ 		g_free(auth);
+@@ -664,7 +667,7 @@ static DBusMessage *cancel_authorization(DBusConnection *conn,
+ 	else
+ 		bacpy(&src, BDADDR_ANY);
  
--	auth->cb(NULL, auth->user_data);
-+	dbus_error_init(&err);
-+	dbus_set_error_const(&err, "org.bluez.Error.Rejected", NULL);
+-	btd_cancel_authorization(&src, &auth->dst);
++	btd_cancel_authorization(auth->id);
  
--	g_free(auth);
-+	while (!g_queue_is_empty(adapter->auths)) {
-+		struct service_auth *auth = adapter->auths->head->data;
-+		struct btd_device *device = auth->device;
-+		const gchar *dev_path;
-+
-+		if (device_is_trusted(device) == TRUE) {
-+			auth->cb(NULL, auth->user_data);
-+			goto next;
-+		}
-+
-+		auth->agent = device_get_agent(device);
-+		if (auth->agent == NULL) {
-+			warn("Can't find device agent");
-+			auth->cb(&err, auth->user_data);
-+			goto next;
-+		}
-+
-+		dev_path = device_get_path(device);
-+
-+		if (agent_authorize(auth->agent, dev_path, auth->uuid,
-+					agent_auth_cb, adapter, NULL) < 0) {
-+			auth->cb(&err, auth->user_data);
-+			goto next;
-+		}
-+
-+		break;
-+
-+next:
-+		g_free(auth);
-+		g_queue_pop_head(adapter->auths);
-+	}
-+
-+	dbus_error_free(&err);
+ 	reply = btd_error_not_authorized(auth->msg);
+ 	dbus_message_unref(auth->msg);
+@@ -683,8 +686,9 @@ static DBusMessage *cancel_authorization(DBusConnection *conn,
+ 	else
+ 		bacpy(&src, BDADDR_ANY);
  
- 	return FALSE;
- }
-@@ -3194,10 +3257,7 @@ static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
- {
- 	struct service_auth *auth;
+-	btd_request_authorization(&src, &auth->dst,
+-					auth->uuid, auth_cb, serv_adapter);
++	auth->id = btd_request_authorization(&src, &auth->dst,
++							auth->uuid, auth_cb,
++							serv_adapter);
+ 
+ done:
+ 	return dbus_message_new_method_return(msg);
+diff --git a/profiles/input/server.c b/profiles/input/server.c
+index f71fdc0..773e933 100644
+--- a/profiles/input/server.c
++++ b/profiles/input/server.c
+@@ -179,7 +179,7 @@ static void confirm_event_cb(GIOChannel *chan, gpointer user_data)
+ 
+ 	ret = btd_request_authorization(&src, &dst, HID_UUID,
+ 					auth_callback, server);
+-	if (ret == 0)
++	if (ret >= 0)
+ 		return;
+ 
+ 	ba2str(&src, addr);
+diff --git a/src/adapter.c b/src/adapter.c
+index 0664d23..e77d305 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -85,6 +85,7 @@
+ #define OFF_TIMER 3
+ 
+ static GSList *adapter_drivers = NULL;
++static int service_auth_id = 0;
+ 
+ struct session_req {
+ 	struct btd_adapter	*adapter;
+@@ -97,6 +98,7 @@ struct session_req {
+ };
+ 
+ struct service_auth {
++	int id;
+ 	service_auth_cb cb;
+ 	void *user_data;
  	struct btd_device *device;
--	struct agent *agent;
- 	char address[18];
--	const gchar *dev_path;
--	int err;
- 
- 	ba2str(dst, address);
- 	device = adapter_find_device(adapter, address);
-@@ -3208,42 +3268,27 @@ static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
- 	if (!g_slist_find(adapter->connections, device))
- 		error("Authorization request for non-connected device!?");
- 
--	if (adapter->auth != NULL)
--		return -EBUSY;
--
- 	auth = g_try_new0(struct service_auth, 1);
- 	if (!auth)
- 		return -ENOMEM;
- 
- 	auth->cb = cb;
+@@ -3217,6 +3219,7 @@ static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
  	auth->user_data = user_data;
-+	auth->uuid = uuid;
  	auth->device = device;
  	auth->adapter = adapter;
- 	auth->id = ++service_auth_id;
++	auth->id = ++service_auth_id;
  
--	if (device_is_trusted(device) == TRUE) {
--		adapter->auth_idle_id = g_idle_add(auth_idle_cb, adapter);
--		goto done;
--	}
-+	g_queue_push_tail(adapter->auths, auth);
+ 	if (device_is_trusted(device) == TRUE) {
+ 		adapter->auth_idle_id = g_idle_add(auth_idle_cb, adapter);
+@@ -3241,7 +3244,7 @@ static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
  
--	agent = device_get_agent(device);
--	if (!agent) {
--		warn("Can't find device agent");
--		g_free(auth);
--		return -EPERM;
--	}
-+	if (adapter->auths->length != 1)
-+		return auth->id;
- 
--	dev_path = device_get_path(device);
-+	if (adapter->auth_idle_id != 0)
-+		return auth->id;
- 
--	err = agent_authorize(agent, dev_path, uuid, agent_auth_cb, adapter,
--									NULL);
--	if (err < 0) {
--		g_free(auth);
--		return err;
--	}
-+	adapter->auth_idle_id = g_idle_add(process_auth_queue, adapter);
- 
--done:
--	adapter->auth = auth;
- 	return auth->id;
+ done:
+ 	adapter->auth = auth;
+-	return 0;
++	return auth->id;
  }
  
-@@ -3275,18 +3320,20 @@ int btd_request_authorization(const bdaddr_t *src, const bdaddr_t *dst,
+ int btd_request_authorization(const bdaddr_t *src, const bdaddr_t *dst,
+@@ -3260,49 +3263,59 @@ int btd_request_authorization(const bdaddr_t *src, const bdaddr_t *dst,
+ 	}
+ 
+ 	for (l = manager_get_adapters(); l != NULL; l = g_slist_next(l)) {
+-		int err;
++		int id;
+ 
+ 		adapter = l->data;
+ 
+-		err = adapter_authorize(adapter, dst, uuid, cb, user_data);
+-		if (err == 0)
+-			return 0;
++		id = adapter_authorize(adapter, dst, uuid, cb, user_data);
++		if (id >= 0)
++			return id;
+ 	}
+ 
  	return -EPERM;
  }
  
--static struct btd_adapter *find_authorization(int id)
-+static struct service_auth *find_authorization(int id)
+-int btd_cancel_authorization(const bdaddr_t *src, const bdaddr_t *dst)
++static struct btd_adapter *find_authorization(int id)
  {
- 	GSList *l;
-+	GList *l2;
+-	struct btd_adapter *adapter = manager_find_adapter(src);
+-	struct btd_device *device;
++	GSList *l;
++
++	for (l = manager_get_adapters(); l != NULL; l = g_slist_next(l)) {
++		struct btd_adapter *adapter = l->data;
++
++		if (adapter->auth == NULL)
++			continue;
++
++		if (adapter->auth->id == id)
++			return adapter;
++	}
++
++	return NULL;
++}
++
++int btd_cancel_authorization(int id)
++{
++	struct btd_adapter *adapter;
+ 	struct agent *agent;
+-	char address[18];
+ 	int err;
  
- 	for (l = manager_get_adapters(); l != NULL; l = g_slist_next(l)) {
- 		struct btd_adapter *adapter = l->data;
- 
--		if (adapter->auth == NULL)
--			continue;
-+		for (l2 = adapter->auths->head; l2 != NULL; l2 = l2->next) {
-+			struct service_auth *auth = l2->data;
- 
--		if (adapter->auth->id == id)
--			return adapter;
-+			if (auth->id == id)
-+				return auth;
-+		}
- 	}
- 
- 	return NULL;
-@@ -3294,39 +3341,17 @@ static struct btd_adapter *find_authorization(int id)
- 
- int btd_cancel_authorization(int id)
- {
--	struct btd_adapter *adapter;
--	struct agent *agent;
--	int err;
--
--	adapter = find_authorization(id);
--	if (adapter == NULL)
+-	if (!adapter)
 -		return -EPERM;
 -
--	if (adapter->auth_idle_id) {
--		g_source_remove(adapter->auth_idle_id);
--		adapter->auth_idle_id = 0;
--		g_free(adapter->auth);
--		adapter->auth = NULL;
--		return 0;
--	}
--
--	/*
--	 * FIXME: Cancel fails if authorization is requested to adapter's
--	 * agent and in the meanwhile CreatePairedDevice is called.
--	 */
-+	struct service_auth *auth;
- 
--	agent = device_get_agent(adapter->auth->device);
--	if (!agent)
-+	auth = find_authorization(id);
-+	if (auth == NULL)
+-	ba2str(dst, address);
+-	device = adapter_find_device(adapter, address);
+-	if (!device)
++	adapter = find_authorization(id);
++	if (adapter == NULL)
  		return -EPERM;
  
--	err = agent_cancel(agent);
-+	g_queue_remove(auth->adapter->auths, auth);
+ 	if (adapter->auth_idle_id) {
+ 		g_source_remove(adapter->auth_idle_id);
+ 		adapter->auth_idle_id = 0;
++		g_free(adapter->auth);
++		adapter->auth = NULL;
+ 		return 0;
+ 	}
  
--	if (err == 0) {
--		g_free(adapter->auth);
--		adapter->auth = NULL;
+-	if (!adapter->auth || adapter->auth->device != device)
+-		return -EPERM;
+-
+ 	/*
+ 	 * FIXME: Cancel fails if authorization is requested to adapter's
+ 	 * agent and in the meanwhile CreatePairedDevice is called.
+ 	 */
+ 
+-	agent = device_get_agent(device);
++	agent = device_get_agent(adapter->auth->device);
+ 	if (!agent)
+ 		return -EPERM;
+ 
+diff --git a/src/adapter.h b/src/adapter.h
+index 9f840e8..39add98 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -150,7 +150,7 @@ int btd_register_adapter_driver(struct btd_adapter_driver *driver);
+ void btd_unregister_adapter_driver(struct btd_adapter_driver *driver);
+ int btd_request_authorization(const bdaddr_t *src, const bdaddr_t *dst,
+ 		const char *uuid, service_auth_cb cb, void *user_data);
+-int btd_cancel_authorization(const bdaddr_t *src, const bdaddr_t *dst);
++int btd_cancel_authorization(int id);
+ 
+ const char *adapter_any_get_path(void);
+ 
+diff --git a/src/profile.c b/src/profile.c
+index ad2ad4a..c7fedef 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -72,7 +72,7 @@ struct ext_io {
+ 	GIOChannel *io;
+ 	guint io_id;
+ 
+-	bool authorizing;
++	int service_auth_id;
+ 	DBusPendingCall *new_conn;
+ };
+ 
+@@ -151,14 +151,8 @@ static void ext_io_destroy(gpointer p)
+ 	g_io_channel_shutdown(ext_io->io, FALSE, NULL);
+ 	g_io_channel_unref(ext_io->io);
+ 
+-	if (ext_io->authorizing) {
+-		bdaddr_t src, dst;
+-
+-		if (bt_io_get(ext_io->io, NULL, BT_IO_OPT_SOURCE_BDADDR, &src,
+-						BT_IO_OPT_DEST_BDADDR, &dst,
+-						BT_IO_OPT_INVALID))
+-			btd_cancel_authorization(&src, &dst);
 -	}
-+	service_auth_cancel(auth);
++	if (ext_io->service_auth_id > 0)
++		btd_cancel_authorization(ext_io->service_auth_id);
  
--	return err;
-+	return 0;
- }
+ 	if (ext_io->new_conn) {
+ 		dbus_pending_call_cancel(ext_io->new_conn);
+@@ -318,7 +312,7 @@ static void ext_auth(DBusError *err, void *user_data)
+ 	GError *gerr = NULL;
+ 	char addr[18];
  
- static gchar *adapter_any_path = NULL;
+-	conn->authorizing = false;
++	conn->service_auth_id = 0;
+ 
+ 	bt_io_get(conn->io, &gerr, BT_IO_OPT_DEST, addr, BT_IO_OPT_INVALID);
+ 	if (gerr != NULL) {
+@@ -372,7 +366,7 @@ static void ext_confirm(GIOChannel *io, gpointer user_data)
+ 	GError *gerr = NULL;
+ 	bdaddr_t src, dst;
+ 	char addr[18];
+-	int err;
++	int ret;
+ 
+ 	bt_io_get(io, &gerr,
+ 			BT_IO_OPT_SOURCE_BDADDR, &src,
+@@ -390,15 +384,15 @@ static void ext_confirm(GIOChannel *io, gpointer user_data)
+ 
+ 	conn = create_conn(server, io);
+ 
+-	err = btd_request_authorization(&src, &dst, ext->uuid, ext_auth, conn);
+-	if (err < 0) {
++	ret = btd_request_authorization(&src, &dst, ext->uuid, ext_auth, conn);
++	if (ret < 0) {
+ 		error("%s authorization failure: %s", ext->name,
+-							strerror(-err));
++							strerror(-ret));
+ 		ext_io_destroy(conn);
+ 		return;
+ 	}
+ 
+-	conn->authorizing = true;
++	conn->service_auth_id = ret;
+ 
+ 	ext->conns = g_slist_append(ext->conns, conn);
+ 
 -- 
 1.7.11.4
 
