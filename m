@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: gustavo@padovan.org, mathewm@codeaurora.org
-Subject: [PATCHv7 01/19] Bluetooth: Add HCI logical link cmds definitions
-Date: Thu, 27 Sep 2012 17:26:06 +0300
-Message-Id: <1348755984-6403-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv7 13/19] Bluetooth: AMP: Add AMP key calculation
+Date: Thu, 27 Sep 2012 17:26:18 +0300
+Message-Id: <1348755984-6403-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1348755984-6403-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1348755984-6403-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -13,64 +13,98 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Function calculates AMP keys using hmac_sha256 helper. Calculated keys
+are Generic AMP Link Key (gamp) and Dedicated AMP Link Key with
+keyID "802b" for 802.11 PAL.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci.h |   36 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 35 insertions(+), 1 deletion(-)
+ include/net/bluetooth/amp.h |    2 ++
+ net/bluetooth/Kconfig       |    1 +
+ net/bluetooth/amp.c         |   45 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 48 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 76b2b6b..4be26abf6d 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -556,12 +556,46 @@ struct hci_cp_accept_phy_link {
- 	__u8     key[HCI_AMP_LINK_KEY_SIZE];
- } __packed;
+diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
+index f57854f..763b463 100644
+--- a/include/net/bluetooth/amp.h
++++ b/include/net/bluetooth/amp.h
+@@ -32,6 +32,8 @@ void amp_ctrl_list_flush(struct amp_mgr *mgr);
+ struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
+ 			     u8 remote_id);
  
--#define HCI_OP_DISCONN_PHY_LINK	0x0437
-+#define HCI_OP_DISCONN_PHY_LINK		0x0437
- struct hci_cp_disconn_phy_link {
- 	__u8     phy_handle;
- 	__u8     reason;
- } __packed;
++int phylink_gen_key(struct hci_conn *hcon, u8 *data, u8 *len, u8 *type);
++
+ void amp_read_loc_info(struct hci_dev *hdev, struct amp_mgr *mgr);
+ void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle);
+ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr);
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index 3537d38..1c11d0d 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -11,6 +11,7 @@ menuconfig BT
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_AES
+ 	select CRYPTO_ECB
++	select CRYPTO_SHA256
+ 	help
+ 	  Bluetooth is low-cost, low-power, short-range wireless technology.
+ 	  It was designed as a replacement for cables and other short-range
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index ea4d5ff..67bc2c2f 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -161,6 +161,51 @@ static int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
+ 	return ret;
+ }
  
-+struct ext_flow_spec {
-+	__u8       id;
-+	__u8       stype;
-+	__le16     msdu;
-+	__le32     sdu_itime;
-+	__le32     acc_lat;
-+	__le32     flush_to;
-+} __packed;
++int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type)
++{
++	struct hci_dev *hdev = conn->hdev;
++	struct link_key *key;
++	u8 keybuf[HCI_AMP_LINK_KEY_SIZE];
++	u8 gamp_key[HCI_AMP_LINK_KEY_SIZE];
++	int err;
 +
-+#define HCI_OP_CREATE_LOGICAL_LINK	0x0438
-+#define HCI_OP_ACCEPT_LOGICAL_LINK	0x0439
-+struct hci_cp_create_accept_logical_link {
-+	__u8                  phy_handle;
-+	struct ext_flow_spec  tx_flow_spec;
-+	struct ext_flow_spec  rx_flow_spec;
-+} __packed;
++	if (!hci_conn_check_link_mode(conn))
++		return -EACCES;
 +
-+#define HCI_OP_DISCONN_LOGICAL_LINK	0x043a
-+struct hci_cp_disconn_logical_link {
-+	__le16   log_handle;
-+} __packed;
++	BT_DBG("conn %p key_type %d", conn, conn->key_type);
 +
-+#define HCI_OP_LOGICAL_LINK_CANCEL	0x043b
-+struct hci_cp_logical_link_cancel {
-+	__u8     phy_handle;
-+	__u8     flow_spec_id;
-+} __packed;
++	/* Legacy key */
++	if (conn->key_type < 3) {
++		BT_ERR("Legacy key type %d", conn->key_type);
++		return -EACCES;
++	}
 +
-+struct hci_rp_logical_link_cancel {
-+	__u8     status;
-+	__u8     phy_handle;
-+	__u8     flow_spec_id;
-+} __packed;
++	*type = conn->key_type;
++	*len = HCI_AMP_LINK_KEY_SIZE;
 +
- #define HCI_OP_SNIFF_MODE		0x0803
- struct hci_cp_sniff_mode {
- 	__le16   handle;
++	key = hci_find_link_key(hdev, &conn->dst);
++
++	/* BR/EDR Link Key concatenated together with itself */
++	memcpy(&keybuf[0], key->val, HCI_LINK_KEY_SIZE);
++	memcpy(&keybuf[HCI_LINK_KEY_SIZE], key->val, HCI_LINK_KEY_SIZE);
++
++	/* Derive Generic AMP Link Key (gamp) */
++	err = hmac_sha256(keybuf, HCI_AMP_LINK_KEY_SIZE, "gamp", 4, gamp_key);
++	if (err) {
++		BT_ERR("Could not derive Generic AMP Key: err %d", err);
++		return err;
++	}
++
++	if (conn->key_type == HCI_LK_DEBUG_COMBINATION) {
++		BT_DBG("Use Generic AMP Key (gamp)");
++		memcpy(data, gamp_key, HCI_AMP_LINK_KEY_SIZE);
++		return err;
++	}
++
++	/* Derive Dedicated AMP Link Key: "802b" is 802.11 PAL keyID */
++	return hmac_sha256(gamp_key, HCI_AMP_LINK_KEY_SIZE, "802b", 4, data);
++}
++
+ void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle)
+ {
+ 	struct hci_cp_read_local_amp_assoc cp;
 -- 
 1.7.9.5
 
