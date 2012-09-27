@@ -2,77 +2,104 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: gustavo@padovan.org, mathewm@codeaurora.org
-Subject: [PATCHv7 00/19] Bluetooth: Create AMP physical link
-Date: Thu, 27 Sep 2012 17:26:05 +0300
-Message-Id: <1348755984-6403-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv7 16/19] Bluetooth: A2MP: Add fallback to normal l2cap init sequence
+Date: Thu, 27 Sep 2012 17:26:21 +0300
+Message-Id: <1348755984-6403-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1348755984-6403-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1347437192-24694-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1348755984-6403-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This set of patches enhances A2MP protocol and creates physical
-link between AMP controllers. This is further iteration towards
-Bluetooth High Speed.
+When there is no remote AMP controller found fallback to normal
+L2CAP sequence.
 
-Changes:
-	* p7: Fix ctrl_lookup, add phylink accept functions.
-	* p6: Refactoring: moving code from pal.[ch] to amp.[ch]
-	* p5: Fix issues reported by Mat in mailing list review
-	* p4: Rebased against recent bluetooth-next, minor fixes
-	* p3: Use hci_conn for representing physical link(type AMP_LINK) instead of
-	struct phy_link, refactoring.
-	* p2: Remove HCI callbacks and use amp_mgr global list, refactor code.
-	* p1: Fixed locking issues, added basic logical link preparation.
-	* v3: Remove workqueue from callback processing; change callback functions
-	names according to reviewers recommendations; create global amp_mgr_list to
-	have lookup to amp manager, physical and logical links so for those HCI events
-	which might be identified by __handler__ we have lookup; remove extensive
-	hexdump from gen_amp_key.
-	* v2: Fix typos and bugs, add functionality: now physical connection
-	might be established.
-	* v1: Fix typos, change debug prints, refactor code for better
-	splitting functionality.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/a2mp.c          |   28 ++++++++++++++++++++++++++++
+ net/bluetooth/l2cap_core.c    |    2 +-
+ 3 files changed, 30 insertions(+), 1 deletion(-)
 
-Andrei Emeltchenko (18):
-  Bluetooth: Add HCI logical link cmds definitions
-  Bluetooth: A2MP: Create amp_mgr global list
-  Bluetooth: AMP: Use HCI cmd to Read AMP Info
-  Bluetooth: AMP: Use HCI cmd to Read Loc AMP Assoc
-  Bluetooth: A2MP: Process Discover Response
-  Bluetooth: AMP: Physical link struct and heplers
-  Bluetooth: AMP: Remote AMP ctrl definitions
-  Bluetooth: AMP: Handle create / disc phylink req
-  Bluetooth: A2MP: Process A2MP Getinfo Rsp
-  Bluetooth: A2MP: Process A2MP Get AMP Assoc Rsp
-  Bluetooth: Choose connection based on capabilities
-  Bluetooth: AMP: Add AMP key calculation
-  Bluetooth: AMP: Create Physical Link
-  Bluetooth: AMP: Write remote AMP Assoc
-  Bluetooth: A2MP: Add fallback to normal l2cap init sequence
-  Bluetooth: AMP: Process Chan Selected event
-  Bluetooth: AMP: Accept Physical Link
-  Bluetooth: AMP: Handle Accept phylink command status evt
-
-Dmitry Kasatkin (1):
-  Bluetooth: Add function to derive AMP key using hmac
-
- include/net/bluetooth/a2mp.h     |   22 ++
- include/net/bluetooth/amp.h      |   50 +++++
- include/net/bluetooth/hci.h      |   39 +++-
- include/net/bluetooth/hci_core.h |   11 +
- include/net/bluetooth/l2cap.h    |    4 +
- net/bluetooth/Kconfig            |    1 +
- net/bluetooth/Makefile           |    2 +-
- net/bluetooth/a2mp.c             |  454 +++++++++++++++++++++++++++++++++++---
- net/bluetooth/amp.c              |  367 ++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |  126 ++++++++++-
- net/bluetooth/l2cap_core.c       |   35 ++-
- 11 files changed, 1072 insertions(+), 39 deletions(-)
- create mode 100644 include/net/bluetooth/amp.h
- create mode 100644 net/bluetooth/amp.c
-
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index aba830f..0967f9e 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -769,5 +769,6 @@ int l2cap_ertm_init(struct l2cap_chan *chan);
+ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ void l2cap_chan_del(struct l2cap_chan *chan, int err);
++void l2cap_send_conn_req(struct l2cap_chan *chan);
+ 
+ #endif /* __L2CAP_H */
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 773e8fc..28d1246 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -180,6 +180,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	u16 len = le16_to_cpu(hdr->len);
+ 	struct a2mp_cl *cl;
+ 	u16 ext_feat;
++	bool found = false;
+ 
+ 	if (len < sizeof(*rsp))
+ 		return -EINVAL;
+@@ -210,6 +211,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 		if (cl->id != HCI_BREDR_ID && cl->type == HCI_AMP) {
+ 			struct a2mp_info_req req;
+ 
++			found = true;
+ 			req.id = cl->id;
+ 			a2mp_send(mgr, A2MP_GETINFO_REQ, __next_ident(mgr),
+ 				  sizeof(req), &req);
+@@ -219,6 +221,32 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 		cl = (void *) skb_pull(skb, sizeof(*cl));
+ 	}
+ 
++	/* Fall back to L2CAP init sequence */
++	if (!found) {
++		struct l2cap_conn *conn = mgr->l2cap_conn;
++		struct l2cap_chan *chan;
++
++		mutex_lock(&conn->chan_lock);
++
++		list_for_each_entry(chan, &conn->chan_l, list) {
++
++			BT_DBG("chan %p state %s", chan,
++			       state_to_string(chan->state));
++
++			if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
++				continue;
++
++			l2cap_chan_lock(chan);
++
++			if (chan->state == BT_CONNECT)
++				l2cap_send_conn_req(chan);
++
++			l2cap_chan_unlock(chan);
++		}
++
++		mutex_unlock(&conn->chan_lock);
++	}
++
+ 	return 0;
+ }
+ 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 0dc3a98..b4e707b 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -958,7 +958,7 @@ static bool __amp_capable(struct l2cap_chan *chan)
+ 		return false;
+ }
+ 
+-static void l2cap_send_conn_req(struct l2cap_chan *chan)
++void l2cap_send_conn_req(struct l2cap_chan *chan)
+ {
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct l2cap_conn_req req;
 -- 
 1.7.9.5
 
