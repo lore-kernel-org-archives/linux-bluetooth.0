@@ -1,58 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 28 Sep 2012 13:43:18 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 07/14] thermometer: Reformat MeasurementReceived
+ description
+Message-ID: <20120928104318.GC25415@x220>
+References: <1348584763-22824-1-git-send-email-andrzej.kaczmarek@tieto.com>
+ <1348584763-22824-8-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <50642389.40107@intel.com>
-References: <50642389.40107@intel.com>
-Date: Fri, 28 Sep 2012 06:56:32 -0400
-Message-ID: <CAJdJm_NbPw0jwWvuUiu7L=wzxc+qxfF_4i2vj7U1G06b=BE2qw@mail.gmail.com>
-Subject: Re: [RFC] Convert storage to use per-remote device directories
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Frederic Danis <frederic.danis@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1348584763-22824-8-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frederic,
+Hi Andrzej,
 
-On Thu, Sep 27, 2012 at 5:59 AM, Frederic Danis
-<frederic.danis@intel.com> wrote:
-> Hi everyone,
->
-> Here is my proposal for new storage directory structure using ini-file
-> format.
+On Tue, Sep 25, 2012, Andrzej Kaczmarek wrote:
+> +			Measurement:
+> +
+> +				int16 Exponent:
+> +				int32 Mantissa:
+> +
+> +					Measurement value is calculated as
+> +					(Mantissa) x (10^Exponent)
+> +
+> +					In case of invalid or missing data,
+> +					Exponent is set to 0 and Mantissa is
+> +					set to 2^23-1 (0x7FFFFF hexadecimal).
 
-Do you know if the INI parser in glib allows for multiple groups with
-same name? In LE we can have services with same UUID (not sure if this
-is valid for BR/EDR also), and they are differentiated by other means
-(e.g. a "Description" descriptor with different value, besides the
-different handle).
+Why aren't we using the D-Bus DOUBLE type for this? For invalid/missing
+data just leave out these values from the dict. No need to try to
+brute-force a 1:1 mapping from the protocol to D-Bus.
 
-Regarding LE, we have two kinds of storage needs: server profiles, and
-client profiles.
+> +
+> +				string Unit:
+> +
+> +					Possible values: "Celsius" or "Fahrenheit"
 
-For server profiles, we need to store the attribute database.
-Currently we don't do this, but we need to implement it, or have
-ServiceChanged characteristic notifying that the service ranges have
-changed every time BlueZ restarts (which adds overhead as service
-discovery is triggered on the client side). I suggest we store the
-attribute database into a "attribute_db.conf" file containing the
-attribute name/value/uuid triples. Additionally, we also need to store
-the Client Characteristic Configuration descriptor values (which are
-specific to each bonded device), currently stored into a "ccc" file.
-We could have one group just for them into attribute_db.conf.
+String properties should be lower-case. Please fix (both doc and
+implementation).
 
-For client profiles, I think the storage needs are specific to each
-profile. From memory, only the generic GATT client and the GAP plugin
-use storage currently (other profiles eventually need to use storage
-to avoid full service discovery every time a bonded device
-re-connects). The generic GATT client stores service/characteristics
-handles/uuids ("primaries" and "characteristics" files), and the GAP
-plugin stores appearance data ("appearances" file).
+> +				string Type (optional):
+> +
+> +					Only present if measurement type is known.
+> +
+> +					Possible values: "Armpit", "Body", "Ear",
+> +						"Finger", "Intestines", "Mouth",
+> +						"Rectum", "Toe", "Tympanum"
 
-Johan, what do you think?
+Same here.
 
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+> +				string Measurement:
+> +
+> +					Possible values: "Final" or "Intermediate"
+
+And here.
+
+Johan
