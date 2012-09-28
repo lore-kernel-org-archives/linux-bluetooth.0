@@ -1,55 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [RFC BlueZ v0 0/4] Remove profile specific storage
-Date: Fri, 28 Sep 2012 17:01:30 -0300
-Message-Id: <1348862494-16911-1-git-send-email-claudio.takahasi@openbossa.org>
+Date: Fri, 28 Sep 2012 16:52:57 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, bzhao@marvell.com
+Subject: Re: [PATCH 3/3] Bluetooth: btmrvl: Fix skb buffer overflow
+Message-ID: <20120928195257.GI15463@joana>
+References: <20120927205145.GC15463@joana>
+ <1348832170-13250-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1348832170-13250-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1348832170-13250-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In the current implementation it is not possible to detect in the
-profile driver remove callback if the device is being removed from
-the system or if bluetoothd is exiting.
+Hi Andrei,
 
-This patch series allows the profile to identify when a given device
-is being removed from the system, allowing the profiles to execute
-actions or remove stored data before being removed.
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-09-28 14:36:10 +0300]:
 
-Another possible approach could be add a new callback in the profile
-indicating that the device is being removed.
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Add extra check to avoid skb buffer overflow. Fixes crash below:
+> 
+>  [  101.030427] ------------[ cut here ]------------
+>  [  101.030459] kernel BUG at net/core/skbuff.c:127!
+>  [  101.030486] invalid opcode: 0000 [#1] SMP
+> ...
+>  [  101.030806] Pid: 2010, comm: btmrvl_main_ser Not tainted 3.5.0+ #80 Laptop
+>  [  101.030859] EIP: 0060:[<c14f2ba9>] EFLAGS: 00010282 CPU: 0
+>  [  101.030894] EIP is at skb_put+0x99/0xa0
+>  [  101.030919] EAX: 00000080 EBX: f129380b ECX: ef923540 EDX: 00000001
+>  [  101.030956] ESI: f00a4000 EDI: 00001003 EBP: ed4a5efc ESP: ed4a5ecc
+>  [  101.030992]  DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
+>  [  101.031024] CR0: 8005003b CR2: 08fca014 CR3: 30960000 CR4: 000407f0
+>  [  101.031062] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
+>  [  101.031100] DR6: ffff0ff0 DR7: 00000400
+>  [  101.031125] Process btmrvl_main_ser (pid: 2010, ti=ed4a4000 task=ef923540 task.ti=ed4a4000)
+>  [  101.031174] Stack:
+>  [  101.031188]  c18126f8 c1651938 f853f8d2 00001003 00001003 f1292800 f1292808 f129380b
+>  [  101.031250]  f1292940 f00a4000 eddb1280 efc0f9c0 ed4a5f44 f853f8d2 00000040 00000000
+>  [  101.031312]  ef923540 c15ee096 ef923540 eddb12d4 00000004 f00a4000 00000040 00000000
+>  [  101.031376] Call Trace:
+>  [  101.031396]  [<f853f8d2>] ? btmrvl_sdio_process_int_status+0x272/0x3d0 [btmrvl_sdio]
+>  [  101.031444]  [<f853f8d2>] btmrvl_sdio_process_int_status+0x272/0x3d0 [btmrvl_sdio]
+>  [  101.031488]  [<c15ee096>] ? _raw_spin_unlock_irqrestore+0x36/0x70
+>  [  101.031526]  [<f85a46e4>] btmrvl_service_main_thread+0x244/0x300 [btmrvl]
+>  [  101.031568]  [<f853fb50>] ? btmrvl_sdio_poll_card_status.isra.6.constprop.7+0x90/0x90 [btmrvl_sdio]
+>  [  101.031619]  [<c107eda0>] ? try_to_wake_up+0x270/0x270
+>  [  101.031648]  [<f85a44a0>] ? btmrvl_process_event+0x3b0/0x3b0 [btmrvl]
+>  [  101.031686]  [<c106d19d>] kthread+0x7d/0x90
+>  [  101.031713]  [<c106d120>] ? flush_kthread_work+0x150/0x150
+>  [  101.031745]  [<c15f5a82>] kernel_thread_helper+0x6/0x10
+> ...
+>  [  101.032008] EIP: [<c14f2ba9>] skb_put+0x99/0xa0 SS:ESP 0068:ed4a5ecc
+>  [  101.056125] ---[ end trace a0bd01d1a9a796c8 ]---
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  drivers/bluetooth/btmrvl_sdio.c |   11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
 
-There is also a TODO file item: "Convert storage to user per-remote
-device directories and ini-file format". What is the idea? Should the
-core remove everything under the remote device address directory?
+All 3 patches were applied. Thanks.
 
-Claudio Takahasi (4):
-  core: Add purge parameter to profile remove
-  proximity: Remove alert level storage
-  proximity: Store Bluetooth Address type
-  gatt: Remove Service Changed handle from storage
-
- audio/manager.c                |  3 ++-
- profiles/deviceinfo/manager.c  |  2 +-
- profiles/gatt/gas.c            | 26 +++++++++++++++++++++++++-
- profiles/gatt/gas.h            |  2 +-
- profiles/gatt/manager.c        |  4 ++--
- profiles/health/hdp_manager.c  |  3 ++-
- profiles/heartrate/manager.c   |  2 +-
- profiles/input/hog_manager.c   |  3 ++-
- profiles/input/manager.c       |  3 ++-
- profiles/network/manager.c     |  3 ++-
- profiles/proximity/manager.c   |  4 ++--
- profiles/proximity/monitor.c   | 41 +++++++++++++++++++++++++++++------------
- profiles/proximity/monitor.h   |  2 +-
- profiles/proximity/reporter.c  |  3 ++-
- profiles/proximity/reporter.h  |  3 ++-
- profiles/scanparam/manager.c   |  3 ++-
- profiles/thermometer/manager.c |  2 +-
- src/device.c                   | 26 +++++++++++++++++---------
- src/profile.h                  |  2 +-
- 19 files changed, 97 insertions(+), 40 deletions(-)
-
--- 
-1.7.12
-
+	Gustavo
