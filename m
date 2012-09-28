@@ -1,65 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 28 Sep 2012 16:59:21 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Christian Cier-Zniewski <c.cier@gmx.de>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v8 00/13] Heart Rate Profile plugin
-Message-ID: <20120928135921.GB6803@x220>
-References: <1348583267-16816-1-git-send-email-andrzej.kaczmarek@tieto.com>
- <20120928102503.GA25415@x220>
- <50659E54.5010206@gmx.de>
- <20120928131647.GA4026@x220>
+Date: Fri, 28 Sep 2012 16:57:50 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Michal.Labedzki@tieto.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Wireshark
+Message-ID: <20120928135747.GD8184@aemeltch-MOBL1>
+References: <E50901D4F2CF69428D43141B7C8586792CFACCF505@EXMB03.eu.tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20120928131647.GA4026@x220>
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <E50901D4F2CF69428D43141B7C8586792CFACCF505@EXMB03.eu.tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Michał,
 
-On Fri, Sep 28, 2012, Johan Hedberg wrote:
-> On Fri, Sep 28, 2012, Christian Cier-Zniewski wrote:
-> > Hello Johan,
-> > 
-> > On 28.09.2012 12:25, Johan Hedberg wrote:
-> > >   Heart Rate Profile (HRP) client API
-> > >
-> > >  Makefile.am                    |   9 +-
-> > >
-> > >All patches in this set have been applied. Thanks.
-> > >
-> > >
-> > 
-> > 
-> > I had to apply the following patch to get the heart rate profile working.
-> > It is currently missing in HEAD although it was present in the
-> > patchset provided by Andrzej.
-> > 
-> > Christian
-> > 
-> > ---
-> > 
-> > diff --git a/Makefile.am b/Makefile.am
-> > index 3b37198..c27eb01 100644
-> > --- a/Makefile.am
-> > +++ b/Makefile.am
-> > @@ -212,7 +212,7 @@ endif
-> > 
-> >  if GATTMODULES
-> >  builtin_modules += thermometer alert time gatt_example proximity
-> > deviceinfo \
-> > -                       gatt scanparam
-> > +                       gatt scanparam heartrate
-> >  builtin_sources += profiles/thermometer/main.c \
-> >                         profiles/thermometer/manager.h \
-> >                         profiles/thermometer/manager.c \
-> > 
+On Fri, Sep 28, 2012 at 04:07:44PM +0300, Michal.Labedzki@tieto.com wrote:
+> Hello All,
 > 
-> The Makefile.am changes had conflicts because of other GATT profiles I
-> applied earlier, so I had to completely manually fix this and probably
-> made some mistake. Could you please send a proper git patch for this and
-> I'll apply it?
+> I am trying to add full Bluetooth support to a Wireshark. Wireshark can be
+> used as replacement for "hcidump" or other GUI applications for displaying
+> Bluetooth frames/packets.
+> 
+> Currently Wireshark support:
+> 1. Sniffing via Bluetooth dongle
+> 2. Protocols/Profiles:
+>     HCI (without BLE)
 
-Nevermind, I went ahead and fixed it myself.
+HCI also does not have full support for AMP HCI commands. I can send that
+log.
 
-Johan
+Best regards 
+Andrei Emeltchenko 
+
