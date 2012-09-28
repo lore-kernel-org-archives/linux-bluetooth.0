@@ -1,66 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2] Bluetooth: A2MP: Correct assoc_len size
-Date: Fri, 28 Sep 2012 16:55:00 +0300
-Message-Id: <1348840500-16336-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1348832490-13448-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1348832490-13448-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 28 Sep 2012 16:51:49 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] hciconfig: Clarify what oobdata command do
+Message-ID: <20120928135149.GA6803@x220>
+References: <1348833533-25427-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1348833533-25427-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Szymon,
 
-Correct assoc_len and fix warning for x86-64 by using %zu specifier
-reported by Fengguang Wu <fengguang.wu@intel.com>.
+On Fri, Sep 28, 2012, Szymon Janc wrote:
+> oobdata command results in reading new local OOB data and invalidates
+> previously read data. Current command description is misleading.
+> 
+> ---
+>  tools/hciconfig.8 |    2 +-
+>  tools/hciconfig.c |    2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
-	v2: make assoc_len type of size_t
- net/bluetooth/a2mp.c |   12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+Applied. Thanks.
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index a55449e..d4946b5 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -381,12 +381,15 @@ static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 	struct hci_dev *hdev;
- 	struct amp_ctrl *ctrl;
- 	struct hci_conn *hcon;
-+	size_t assoc_len;
- 
- 	if (len < sizeof(*rsp))
- 		return -EINVAL;
- 
--	BT_DBG("id %d status 0x%2.2x assoc len %lu", rsp->id, rsp->status,
--	       len - sizeof(*rsp));
-+	assoc_len = len - sizeof(*rsp);
-+
-+	BT_DBG("id %d status 0x%2.2x assoc len %zu", rsp->id, rsp->status,
-+	       assoc_len);
- 
- 	if (rsp->status)
- 		return -EINVAL;
-@@ -394,7 +397,7 @@ static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 	/* Save remote ASSOC data */
- 	ctrl = amp_ctrl_lookup(mgr, rsp->id);
- 	if (ctrl) {
--		u8 *assoc, assoc_len = len - sizeof(*rsp);
-+		u8 *assoc;
- 
- 		assoc = kzalloc(assoc_len, GFP_KERNEL);
- 		if (!assoc) {
-@@ -468,7 +471,8 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 	}
- 
- 	if (ctrl) {
--		u8 *assoc, assoc_len = le16_to_cpu(hdr->len) - sizeof(*req);
-+		size_t assoc_len = le16_to_cpu(hdr->len) - sizeof(*req);
-+		u8 *assoc;
- 
- 		ctrl->id = rsp.remote_id;
- 
--- 
-1.7.9.5
-
+Johan
