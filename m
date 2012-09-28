@@ -1,92 +1,268 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1348844742.13371.38.camel@aeonflux>
-Subject: Re: [PATCH 0/5] mSBC tests
+Message-ID: <1348843982.13371.34.camel@aeonflux>
+Subject: Re: [PATCH 1/5] Add msbc encoding and decoding flag
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-Cc: =?ISO-8859-1?Q?Fr=E9d=E9ric?= Dalleau
-	<frederic.dalleau@linux.intel.com>, linux-bluetooth@vger.kernel.org
-Date: Fri, 28 Sep 2012 17:05:42 +0200
-In-Reply-To: <20120927233420.3441f14e@i7>
+To: =?ISO-8859-1?Q?Fr=E9d=E9ric?= Dalleau
+	<frederic.dalleau@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Fri, 28 Sep 2012 16:53:02 +0200
+In-Reply-To: <1348757068-31048-2-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1348757068-31048-1-git-send-email-frederic.dalleau@linux.intel.com>
-	 <20120927233420.3441f14e@i7>
+	 <1348757068-31048-2-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Siarhei,
+Hi Fred,
 
-> > I wanted to know more about mSBC and I look into the spec and saw it
-> > was just a set of settings for SBC. So I tried to exercise them using
-> > sbcenc and sbcdec and found it wasn't possible, I ended modifying SBC
-> > library and now it should be possible to use mSBC settings.
-> > Using 15 block doesn't work using SIMD processing because of data
-> > reordering so I recalled some legacy C code from an older release
-> > (sbc_analyse_eight) and put in a separate primitives file.
->
-> 
-> I wonder why they decided to go with the odd sided blocks? Anyway,
-> I guess there is no other way but to adapt to this extended spec.
-> Thanks for taking a look at this stuff.
-> 
-> Have you tried to tweak the SIMD code to make it process one
-> block at a time instead of batches of 4?
-> 
-> I suspect that we might only need to track the state and flip between
-> "even" and "odd" constant tables for every other processed block in
-> "sbc_analyze_4b_4s_simd" and "sbc_analyze_4b_8s_simd" replacement
-> functions. The functions "sbc_encoder_process_input_s4_internal"
-> and "sbc_encoder_process_input_s8_internal" also need to be
-> updated to handle arbitrary number of blocks and not just
-> multiples of 4. Though I haven't been working with sbc code lately
-> and may be mistaken.
-> 
-> Using the old tables "_sbc_proto_fixed8" and "_sbc_proto_fixed4" has
-> a disadvantage of not having the tweaks from:
->     http://git.kernel.org/?p=bluetooth/sbc.git;a=commit;h=bec3d3989ba2
-> They haven't been in use for ages and just remained in the sources by.
-> 
-> If we just could make SIMD code work, that would be the best option in
-> my opinion.
-> 
-> > Work done from the spec, not tested with any reference encoder.
-> 
-> Does a reference mSBC encoder exist somewhere? Or any ideas how to test
-> the new code with something other than bluez just to be sure that it's
-> correct?
+> Also enable 15 blocks support using stdc sbc primitives
+> ---
+>  Makefile.am               |    1 +
+>  sbc/sbc.c                 |  123 +++++++++--------
+>  sbc/sbc.h                 |    3 +
+>  sbc/sbc_primitives.c      |    8 +-
+>  sbc/sbc_primitives.h      |    7 +-
+>  sbc/sbc_primitives_stdc.c |  321 +++++++++++++++++++++++++++++++++++++++++++++
+>  sbc/sbc_primitives_stdc.h |   36 +++++
+>  7 files changed, 443 insertions(+), 56 deletions(-)
+>  create mode 100644 sbc/sbc_primitives_stdc.c
+>  create mode 100644 sbc/sbc_primitives_stdc.h
 
-I looked at the Bluetooth SIG website and couldn't find a reference
-encoder or sample files. The old SBC reference encoder and decoder don't
-seem to support other block sizes.
+can you split this patch into at least two?
 
-SBC Encoder LIB Version 1.5
-Copyright (c) 2002  Philips Consumer Electronics, ASA Labs
+> diff --git a/Makefile.am b/Makefile.am
+> index cad6a3b..75e3a4a 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -14,6 +14,7 @@ sbc_headers = sbc/sbc.h
+>  
+>  sbc_sources = sbc/sbc.c sbc/sbc_private.h sbc/sbc_math.h sbc/sbc_tables.h \
+>  		sbc/sbc_primitives.h sbc/sbc_primitives.c \
+> +		sbc/sbc_primitives_stdc.h sbc/sbc_primitives_stdc.c \
+>  		sbc/sbc_primitives_mmx.h sbc/sbc_primitives_mmx.c \
+>  		sbc/sbc_primitives_iwmmxt.h sbc/sbc_primitives_iwmmxt.c \
+>  		sbc/sbc_primitives_neon.h sbc/sbc_primitives_neon.c \
+> diff --git a/sbc/sbc.c b/sbc/sbc.c
+> index f0c77c7..7e4faa0 100644
+> --- a/sbc/sbc.c
+> +++ b/sbc/sbc.c
+> @@ -6,6 +6,7 @@
+>   *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+>   *  Copyright (C) 2004-2005  Henryk Ploetz <henryk@ploetzli.ch>
+>   *  Copyright (C) 2005-2008  Brad Midgley <bmidgley@xmission.com>
+> + *  Copyright (C) 2012       Intel Corporation
+>   *
+>   *
+>   *  This library is free software; you can redistribute it and/or
+> @@ -51,6 +52,17 @@
+>  #include "sbc_primitives.h"
+>  
+>  #define SBC_SYNCWORD	0x9C
+> +#define MSBC_SYNCWORD	0xAD
+> +#define SBC_BLOCKS(sbc, blocks) (((sbc)->flags & SBC_MSBC) \
+> +				? MSBC_BLOCKS : (blocks))
 
-Usage:
-sbc_encoder [-jsv] [-lblk_len] [-nsubbands] [-p] [-rrate] [-ooutputfile] inputfile
-            [-s] use the stereo mode for stereo signals
-            [-v] verbose mode
-            [-j] allow the use of joint coding for stereo signals
-            [-lblk_len] blk_len specifies the APCM block length, out of [4,8,12,16]
-            [-nsubbands] subbands specifies the number of subbands, out of [4,8]
-            [-p] a simple psycho acoustic model is used
-            [-rrate] specifies the bit rate in bps
-            [-ooutputfile] specifies the name of the bitstream output file
-            inputfile specifies the audio input file, the major audio formats are supported
+Not sure about this macro. Why do we need this? Wouldn't it be better to
+make it explicit in the code.
 
+> +#define MSBC_BLOCKMODE		SBC_BLK_16
+> +#define MSBC_BLOCKS		15
+> +#define MSBC_BITPOOL		26
+> +#define MSBC_SUBBAND_MODE	1
+> +#define MSBC_SUBBANDS		8
+> +#define MSBC_CHANNEL		1
+> +#define MSBC_ALLOCATION		SBC_AM_LOUDNESS
 
-SBC Decoder LIB Version 1.5
-Copyright (c) 2002  Philips Consumer Electronics, ASA Labs
+And as a nitpick, keep an empty line between SBC_ and MSBC_ constants.
+ 
+>  /* This structure contains an unpacked SBC frame.
+>     Yes, there is probably quite some unused space herein */
+> @@ -373,9 +385,11 @@ static void sbc_calculate_bits(const struct sbc_frame *frame, int (*bits)[8])
+>   *  -2   Sync byte incorrect
+>   *  -3   CRC8 incorrect
+>   *  -4   Bitpool value out of bounds
+> + *  -5   msbc reserved byte 1 not 0
+> + *  -6   msbc reserved byte 2 not 0
+>   */
 
-Usage:
-sbc_decoder [-v] [-ooutputfile] [-pstartpos] inputfile
-            [-v] verbose mode
-            [-pstartpos] startpos specifies the byte offset to start with decoding
-            [-ooutputfile] specifies the name of the audio output file
-            inputfile specifies the name of the bitstream input file
+What are you doing with these return values. If nothing, then just
+return sync byte incorrect.
 
-And the sample files are all from 2001. We might have to create our own
-ones and our own naive and stupid reference encoder/decoder.
+> -static int sbc_unpack_frame(const uint8_t *data, struct sbc_frame *frame,
+> -								size_t len)
+> +static int sbc_unpack_frame(sbc_t *sbc, const uint8_t *data,
+> +		struct sbc_frame *frame, size_t len)
+>  {
+
+As in the comment from the other patch, instead of changing the function
+prototype, just provide two separate function, that we choose from on
+sbc_init.
+
+>  	unsigned int consumed;
+>  	/* Will copy the parts of the header that are relevant to crc
+> @@ -413,6 +427,8 @@ static int sbc_unpack_frame(const uint8_t *data, struct sbc_frame *frame,
+>  		frame->blocks = 16;
+>  		break;
+>  	}
+> +	if (sbc->flags & SBC_MSBC)
+> +		frame->blocks = MSBC_BLOCKS;
+>  
+>  	frame->mode = (data[1] >> 2) & 0x03;
+>  	switch (frame->mode) {
+> @@ -690,13 +706,13 @@ static int sbc_analyze_audio(struct sbc_encoder_state *state,
+>  		for (ch = 0; ch < frame->channels; ch++) {
+>  			x = &state->X[ch][state->position - 16 +
+>  							frame->blocks * 4];
+> -			for (blk = 0; blk < frame->blocks; blk += 4) {
+> +			for (blk = 0; blk < frame->blocks; blk += state->inc) {
+>  				state->sbc_analyze_4b_4s(
+>  					x,
+>  					frame->sb_sample_f[blk][ch],
+>  					frame->sb_sample_f[blk + 1][ch] -
+>  					frame->sb_sample_f[blk][ch]);
+> -				x -= 16;
+> +				x -= 4 * state->inc;
+>  			}
+>  		}
+>  		return frame->blocks * 4;
+> @@ -705,13 +721,13 @@ static int sbc_analyze_audio(struct sbc_encoder_state *state,
+>  		for (ch = 0; ch < frame->channels; ch++) {
+>  			x = &state->X[ch][state->position - 32 +
+>  							frame->blocks * 8];
+> -			for (blk = 0; blk < frame->blocks; blk += 4) {
+> +			for (blk = 0; blk < frame->blocks; blk += state->inc) {
+>  				state->sbc_analyze_4b_8s(
+>  					x,
+>  					frame->sb_sample_f[blk][ch],
+>  					frame->sb_sample_f[blk + 1][ch] -
+>  					frame->sb_sample_f[blk][ch]);
+> -				x -= 32;
+> +				x -= 8 * state->inc;
+>  			}
+>  		}
+>  		return frame->blocks * 8;
+> @@ -764,10 +780,9 @@ static int sbc_analyze_audio(struct sbc_encoder_state *state,
+>   * -99 not implemented
+>   */
+>  
+> -static SBC_ALWAYS_INLINE ssize_t sbc_pack_frame_internal(uint8_t *data,
+> -					struct sbc_frame *frame, size_t len,
+> -					int frame_subbands, int frame_channels,
+> -					int joint)
+> +static SBC_ALWAYS_INLINE ssize_t sbc_pack_frame_internal(sbc_t *sbc,
+> +			uint8_t *data, struct sbc_frame *frame, size_t len,
+> +			int frame_subbands, int frame_channels, int joint)
+>  {
+>  	/* Bitstream writer starts from the fourth byte */
+>  	uint8_t *data_ptr = data + 4;
+> @@ -785,37 +800,37 @@ static SBC_ALWAYS_INLINE ssize_t sbc_pack_frame_internal(uint8_t *data,
+>  	uint32_t levels[2][8];	/* levels are derived from that */
+>  	uint32_t sb_sample_delta[2][8];
+>  
+> -	data[0] = SBC_SYNCWORD;
+> +		data[0] = SBC_SYNCWORD;
+>  
+> -	data[1] = (frame->frequency & 0x03) << 6;
+> +		data[1] = (frame->frequency & 0x03) << 6;
+>  
+> -	data[1] |= (frame->block_mode & 0x03) << 4;
+> +		data[1] |= (frame->block_mode & 0x03) << 4;
+>  
+> -	data[1] |= (frame->mode & 0x03) << 2;
+> +		data[1] |= (frame->mode & 0x03) << 2;
+>  
+> -	data[1] |= (frame->allocation & 0x01) << 1;
+> +		data[1] |= (frame->allocation & 0x01) << 1;
+>  
+> -	switch (frame_subbands) {
+> -	case 4:
+> -		/* Nothing to do */
+> -		break;
+> -	case 8:
+> -		data[1] |= 0x01;
+> -		break;
+> -	default:
+> -		return -4;
+> -		break;
+> -	}
+> +		switch (frame_subbands) {
+> +		case 4:
+> +			/* Nothing to do */
+> +			break;
+> +		case 8:
+> +			data[1] |= 0x01;
+> +			break;
+> +		default:
+> +			return -4;
+> +			break;
+> +		}
+>  
+> -	data[2] = frame->bitpool;
+> +		data[2] = frame->bitpool;
+>  
+> -	if ((frame->mode == MONO || frame->mode == DUAL_CHANNEL) &&
+> -			frame->bitpool > frame_subbands << 4)
+> -		return -5;
+> +		if ((frame->mode == MONO || frame->mode == DUAL_CHANNEL) &&
+> +				frame->bitpool > frame_subbands << 4)
+> +			return -5;
+>  
+> -	if ((frame->mode == STEREO || frame->mode == JOINT_STEREO) &&
+> -			frame->bitpool > frame_subbands << 5)
+> -		return -5;
+> +		if ((frame->mode == STEREO || frame->mode == JOINT_STEREO) &&
+> +				frame->bitpool > frame_subbands << 5)
+> +			return -5;
+>  
+>  	/* Can't fill in crc yet */
+>  
+> @@ -881,33 +896,33 @@ static SBC_ALWAYS_INLINE ssize_t sbc_pack_frame_internal(uint8_t *data,
+>  	return data_ptr - data;
+>  }
+>  
+> -static ssize_t sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len,
+> -								int joint)
+> +static ssize_t sbc_pack_frame(sbc_t *sbc, uint8_t *data,
+> +		struct sbc_frame *frame, size_t len, int joint)
+>  {
+>  	if (frame->subbands == 4) {
+>  		if (frame->channels == 1)
+>  			return sbc_pack_frame_internal(
+> -				data, frame, len, 4, 1, joint);
+> +				sbc, data, frame, len, 4, 1, joint);
+>  		else
+>  			return sbc_pack_frame_internal(
+> -				data, frame, len, 4, 2, joint);
+> +				sbc, data, frame, len, 4, 2, joint);
+>  	} else {
+>  		if (frame->channels == 1)
+>  			return sbc_pack_frame_internal(
+> -				data, frame, len, 8, 1, joint);
+> +				sbc, data, frame, len, 8, 1, joint);
+>  		else
+>  			return sbc_pack_frame_internal(
+> -				data, frame, len, 8, 2, joint);
+> +				sbc, data, frame, len, 8, 2, joint);
+>  	}
+>  }
+>  
+> -static void sbc_encoder_init(struct sbc_encoder_state *state,
+> +static void sbc_encoder_init(int msbc, struct sbc_encoder_state *state,
+>  					const struct sbc_frame *frame)
+>  {
+>  	memset(&state->X, 0, sizeof(state->X));
+>  	state->position = (SBC_X_BUFFER_SIZE - frame->subbands * 9) & ~7;
+>  
+> -	sbc_init_primitives(state);
+> +	sbc_init_primitives(msbc, state);
+>  }
+
+I personally prefer having mSBC capable primitives. If this would
+actually lead to some sort of issue, then we might need a different
+option that allows us to fallback to non-optimized primitives. And then
+we might not just bind this for mSBC, then we might just make that an
+option for the library users.
 
 Regards
 
