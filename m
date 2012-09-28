@@ -1,30 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 28 Sep 2012 16:26:13 +0300
+Date: Fri, 28 Sep 2012 16:24:04 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Cycling Speed and Cadence profile (CSCP) API
-Message-ID: <20120928132613.GB5075@x220>
-References: <1348585647-25458-1-git-send-email-andrzej.kaczmarek@tieto.com>
- <1348585647-25458-2-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: Re: [PATCH BlueZ v1 2/2] hog: Add support for multiple instances
+Message-ID: <20120928132404.GA5075@x220>
+References: <1348083222-15294-2-git-send-email-claudio.takahasi@openbossa.org>
+ <1348837062-17226-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1348585647-25458-2-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1348837062-17226-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi Claudio,
 
-On Tue, Sep 25, 2012, Andrzej Kaczmarek wrote:
-> +			Possible values: "Other", "Top of shoe", "In shoe",
-> +					"Hip", "Front Wheel", "Left Crank",
-> +					"Right Crank", "Left Pedal",
-> +					"Right Pedal", "Front Hub",
-> +					"Rear Dropout", "Chainstay",
-> +					"Rear Wheel", "Rear Hub"
+On Fri, Sep 28, 2012, Claudio Takahasi wrote:
+> This patch adds support for multiple HID services instances exposed by
+> the same remote device.
+> ---
+>  profiles/input/hog_device.c  | 90 +++++++++++---------------------------------
+>  profiles/input/hog_device.h  |  3 +-
+>  profiles/input/hog_manager.c | 41 ++++++++++++--------
+>  3 files changed, 48 insertions(+), 86 deletions(-)
 
-As I've pointed out in a couple of other (unrelated) patch reviews keep
-string dict values lower-case. Also leave the spaces out. So you'll end
-up getting stuff like "top-of-shoe", "in-shoe", "hip", etc.
+Applied. Thanks.
 
 Johan
