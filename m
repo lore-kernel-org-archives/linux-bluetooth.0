@@ -1,96 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5065A248.7020009@linux.intel.com>
-Date: Fri, 28 Sep 2012 15:12:40 +0200
-From: Frederic Danis <frederic.danis@linux.intel.com>
+From: <Michal.Labedzki@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+Date: Fri, 28 Sep 2012 16:07:44 +0300
+Subject: Wireshark
+Message-ID: <E50901D4F2CF69428D43141B7C8586792CFACCF505@EXMB03.eu.tieto.com>
+Content-Type: text/plain; charset="iso-8859-2"
 MIME-Version: 1.0
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC] Convert storage to use per-remote device directories
-References: <50642389.40107@intel.com> <CAJdJm_NbPw0jwWvuUiu7L=wzxc+qxfF_4i2vj7U1G06b=BE2qw@mail.gmail.com>
-In-Reply-To: <CAJdJm_NbPw0jwWvuUiu7L=wzxc+qxfF_4i2vj7U1G06b=BE2qw@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Anderson,
+Hello All,
 
-On 28/09/2012 12:56, Anderson Lizardo wrote:
-> Hi Frederic,
->
-> On Thu, Sep 27, 2012 at 5:59 AM, Frederic Danis
-> <frederic.danis@intel.com> wrote:
->> Hi everyone,
->>
->> Here is my proposal for new storage directory structure using ini-file
->> format.
->
-> Do you know if the INI parser in glib allows for multiple groups with
-> same name?
+I am trying to add full Bluetooth support to a Wireshark. Wireshark can be
+used as replacement for "hcidump" or other GUI applications for displaying
+Bluetooth frames/packets.
 
-Following glib documentation:
-"groups in key files may contain the same key multiple times; the last 
-entry wins. Key files may also contain multiple groups with the same 
-name; they are merged together."
+Currently Wireshark support:
+1. Sniffing via Bluetooth dongle
+2. Protocols/Profiles:
+    HCI (without BLE)
+    L2CAP
+    SDP (little broken)
+    RFCOMM 1.1
+    OBEX (so all OBEX profiles can be treat as supported)
+    AMP
+    HID 1.0
+    SAP 1.1
+    BNEP 1.0
+    AVCTP 1.4
+    AVRCP 1.5
 
-So, I do not think this meet our needs.
+At this moment I am working on: (finishing)
+1. ATT
+2. HCRP
+3. MCAP
+4. AVDTP/A2DP/VDP
 
-> In LE we can have services with same UUID (not sure if this
-> is valid for BR/EDR also), and they are differentiated by other means
-> (e.g. a "Description" descriptor with different value, besides the
-> different handle).
+So I need a lot of Bluetooth logs to test them. Could you send me all your
+logs? Profile or protocol there is not important [SAP? OK!], but only
+BT SNOOP format is requires, of course PCAP too. Please share your logs, to my e-mail or wherever you want,.
+I guess logs may be useful for other BlueZ developer too (so... logs database?)
 
-For BDEDR, it is easy to retrieve info related to a profile as profile's 
-UUIDs are unique.
+I will be very happy if somebody send me AVDTP/A2DP/VDP logs where used all
+known codecs (mean MPEG12_AUDIO//MPEG24_AAC/ATRAC/ H263/MPEG4)
 
-Are "Description" descriptors for a profile well-know or implementation 
-dependent ?
 
-Do you think we can use [<UUID>,<Description>] as group name ?
+Try Wireshark :)
 
-> Regarding LE, we have two kinds of storage needs: server profiles, and
-> client profiles.
->
-> For server profiles, we need to store the attribute database.
+PS. "tshark  -r hcidump.log" is similar to "hcidump"
 
-Is it possible to save it as we did for SDP records (record entry in 
-profile group) ?
 
-> Currently we don't do this, but we need to implement it, or have
-> ServiceChanged characteristic notifying that the service ranges have
-> changed every time BlueZ restarts (which adds overhead as service
-> discovery is triggered on the client side). I suggest we store the
-> attribute database into a "attribute_db.conf" file containing the
-> attribute name/value/uuid triples.
+Regards / Pozdrawiam
+-------------------------------------------------------------------------------------------------------------
+Micha³ £abêdzki
+ASCII: Michal Labedzki
+e-mail: michal.labedzki@tieto.com
 
-Isn't it possible to save it in [<uuid>] group of device.conf file ?
-
-> Additionally, we also need to store
-> the Client Characteristic Configuration descriptor values (which are
-> specific to each bonded device), currently stored into a "ccc" file.
-> We could have one group just for them into attribute_db.conf.
->
-> For client profiles, I think the storage needs are specific to each
-> profile. From memory, only the generic GATT client and the GAP plugin
-> use storage currently (other profiles eventually need to use storage
-> to avoid full service discovery every time a bonded device
-> re-connects). The generic GATT client stores service/characteristics
-> handles/uuids ("primaries" and "characteristics" files), and the GAP
-> plugin stores appearance data ("appearances" file).
-
-My first thought for LE data in device.conf is:
-   [<Primary UUID>#<Description>]
-   Handle=
-   Characteristic=
-   Attribute=
-   CCC=
-
-I think we can easily add other key entries when needed.
-
-Regards
-
-Fred
-
--- 
-Frederic Danis                            Open Source Technology Center
-frederic.danis@intel.com                              Intel Corporation
-
+---
+Tieto Corporation / Tieto Poland
+http://www.tieto.com / http://www.tieto.pl
+---
+Tieto Poland spó³ka z ograniczon± odpowiedzialno¶ci± z siedzib± w Szczecinie, ul. Malczewskiego 26. Zarejestrowana w S±dzie Rejonowym Szczecin-Centrum w Szczecinie, XIII Wydzia³ Gospodarczy Krajowego Rejestru S±dowego pod numerem 0000124858. NIP: 8542085557. REGON: 812023656. Kapita³ zak³adowy: 4 271500 PLN
