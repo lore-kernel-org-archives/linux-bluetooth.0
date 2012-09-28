@@ -1,45 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 28 Sep 2012 14:08:33 +0300
+Date: Fri, 28 Sep 2012 13:59:37 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: chen.ganir@ti.com
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 BlueZ 1/4] gatt: Add support for find included services
-Message-ID: <20120928110833.GB14450@x220>
-References: <1348526019-28402-1-git-send-email-vinicius.gomes@openbossa.org>
- <1348526019-28402-2-git-send-email-vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH v4 01/10] battery: Add generic device battery
+ documentation
+Message-ID: <20120928105937.GA14450@x220>
+References: <1348470919-25567-1-git-send-email-chen.ganir@ti.com>
+ <1348470919-25567-2-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1348526019-28402-2-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1348470919-25567-2-git-send-email-chen.ganir@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Chen,
 
-On Mon, Sep 24, 2012, Vinicius Costa Gomes wrote:
-> Some services like HID over LE can reference another service using
-> included services.
-> 
-> See Vol 3, Part G, section 2.6.3 of Core specification for more
-> details.
-> ---
->  attrib/gatt.c | 194 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  attrib/gatt.h |   9 +++
->  2 files changed, 203 insertions(+)
+On Mon, Sep 24, 2012, chen.ganir@ti.com wrote:
+> +BlueZ D-Bus Battery API description
+> +****************************************
 
-This one doesn't apply:
+Please keep the "underline" consistent with the length of the text above
+it.
 
-Applying: gatt: Add support for find included services
-WARNING:LONG_LINE: line over 80 characters
-#107: FILE: attrib/gatt.c:335:
-+					resolve_included_uuid_cb, resolve, NULL);
+> +	Texas Instruments, Inc. <chen.ganir@ti.com>
 
-Btw, if you guys are wondering why the stricter coding style checks,
-I've added the following to .git/hooks/pre-{commit,applypatch}:
+What's this supposed to be? If you want a copyright statement here then
+make it of the proper format. Author info is not needed as we have the
+AUTHORS file and the commit history.
 
-git diff --cached | ~/src/linux/scripts/checkpatch.pl --no-signoff --ignore INITIALISED_STATIC,NEW_TYPEDEFS,VOLATILE --show-types --mailback -
+> +Device Battery hierarchy
+> +=====================================
 
-You might want to do the same (with the correct path to checkpatch.pl)).
-And thanks to Luiz for the idea (he's using the same when applying
-patches).
+Same thing with the consistency of the "underline"
+
+> +Service		org.bluez
+> +Interface	org.bluez.Battery
+> +Object path	[variable prefix]/{hci0,..}/dev_XX_XX_XX_XX_XX_XX/BATTYYYY
+> +YYYY is numeric value between 0 and 9999.
+
+I don't think you need a separate comment for the "YYY". We don't have
+that for the "XX" stuff either.
+
+> +		array{object} Batteries [readonly]
+
+I guess you should mark this with [experimental] since it'll be removed
+with the advent of ObjectManager.
 
 Johan
