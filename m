@@ -2,91 +2,102 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0 4/4] gatt: Add reading stored Service Changed handle
-Date: Fri, 28 Sep 2012 11:47:54 -0300
-Message-Id: <1348843674-10878-5-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 3/4] gatt: Add storing Service Changed handle
+Date: Fri, 28 Sep 2012 11:47:53 -0300
+Message-Id: <1348843674-10878-4-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1348843674-10878-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1348843674-10878-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch avoids discovering Service Changed handle when the ATT
-connection is established and there is a previous stored handle.
+This patch stores the Service Changed control-point handle in order to
+be able to listen for Service Changed indications when the connection
+is established.
 ---
- profiles/gatt/gas.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ profiles/gatt/gas.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
 diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
-index 8b6a0bd..da6d555 100644
+index b42aa64..8b6a0bd 100644
 --- a/profiles/gatt/gas.c
 +++ b/profiles/gatt/gas.c
-@@ -25,9 +25,11 @@
+@@ -25,6 +25,9 @@
  #endif
  
  #include <stdbool.h>
-+#include <stdlib.h>
- #include <sys/types.h>
- #include <sys/stat.h>
- #include <fcntl.h>
-+#include <errno.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
  
  #include <glib.h>
  #include <bluetooth/uuid.h>
-@@ -102,6 +104,32 @@ static int write_ctp_handle(bdaddr_t *sba, bdaddr_t *dba, uint8_t bdaddr_type,
- 	return textfile_put(filename, key, value);
+@@ -37,6 +40,7 @@
+ #include "btio.h"
+ #include "gatt.h"
+ #include "log.h"
++#include "textfile.h"
+ #include "gas.h"
+ 
+ /* Generic Attribute/Access Service */
+@@ -70,6 +74,34 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
+ 	return (gas->device == device ? 0 : -1);
  }
  
-+static int read_ctp_handle(bdaddr_t *sba, bdaddr_t *dba, uint8_t bdaddr_type,
-+						uint16_t uuid, uint16_t *value)
++static inline int create_filename(char *buf, size_t size,
++				const bdaddr_t *bdaddr, const char *name)
 +{
-+	char filename[PATH_MAX + 1], addr[18], key[27];
-+	char *str;
++	char addr[18];
++
++	ba2str(bdaddr, addr);
++
++	return create_name(buf, size, STORAGEDIR, addr, name);
++}
++
++static int write_ctp_handle(bdaddr_t *sba, bdaddr_t *dba, uint8_t bdaddr_type,
++						uint16_t uuid, uint16_t handle)
++{
++	char filename[PATH_MAX + 1], addr[18], key[27], value[7];
 +
 +	create_filename(filename, PATH_MAX, sba, "gatt");
 +
++	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
++
 +	ba2str(dba, addr);
-+	snprintf(key, sizeof(key), "%17s#%hhu#0x%04x", addr, bdaddr_type,
++
++	snprintf(key, sizeof(key), "%17s#%hhu#0x%4.4x", addr, bdaddr_type,
 +									uuid);
++	snprintf(value, sizeof(value), "0x%4.4x", handle);
 +
-+	str = textfile_get(filename, key);
-+	if (str == NULL)
-+		return -errno;
-+
-+	if (sscanf(str, "%hx", value) != 1) {
-+		free(str);
-+		return -ENOENT;
-+	}
-+
-+	free(str);
-+
-+	return 0;
++	return textfile_put(filename, key, value);
 +}
 +
  static void gap_appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
  							gpointer user_data)
  {
-@@ -349,6 +377,8 @@ int gas_register(struct btd_device *device, struct att_range *gap,
- 						struct att_range *gatt)
+@@ -107,6 +139,10 @@ done:
+ static void ccc_written_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 							gpointer user_data)
  {
- 	struct gas *gas;
++	struct gas *gas = user_data;
 +	bdaddr_t sba, dba;
 +	uint8_t bdaddr_type;
++
+ 	if (status) {
+ 		error("Write Service Changed CCC failed: %s",
+ 						att_ecode2str(status));
+@@ -114,6 +150,12 @@ static void ccc_written_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	}
  
- 	gas = g_new0(struct gas, 1);
- 	gas->gap.start = gap->start;
-@@ -364,6 +394,12 @@ int gas_register(struct btd_device *device, struct att_range *gap,
- 						attio_connected_cb,
- 						attio_disconnected_cb, gas);
- 
+ 	DBG("Service Changed indications enabled");
++
 +	adapter_get_address(device_get_adapter(gas->device), &sba);
 +	device_get_address(gas->device, &dba, &bdaddr_type);
 +
-+	read_ctp_handle(&sba, &dba, bdaddr_type, GATT_CHARAC_SERVICE_CHANGED,
-+							&gas->changed_handle);
-+
- 	return 0;
++	write_ctp_handle(&sba, &dba, bdaddr_type, GATT_CHARAC_SERVICE_CHANGED,
++							gas->changed_handle);
  }
  
+ static void write_ccc(GAttrib *attrib, uint16_t handle, gpointer user_data)
 -- 
 1.7.12
 
