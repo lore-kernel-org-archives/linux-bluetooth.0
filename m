@@ -1,35 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 28 Sep 2012 12:58:14 +0300
+Date: Fri, 28 Sep 2012 12:47:57 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v3 4/6] hog: Create a FIFO for dummy suspend
-Message-ID: <20120928095814.GC2518@x220>
-References: <1348587260-431-1-git-send-email-claudio.takahasi@openbossa.org>
- <1348587260-431-5-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH 1/2] proximity: Split profile driver into Monitor and
+ Reporter
+Message-ID: <20120928094757.GB2518@x220>
+References: <1348064839-5602-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1348587260-431-5-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1348064839-5602-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Andrzej,
 
-On Tue, Sep 25, 2012, Claudio Takahasi wrote:
-> This patch creates a FIFO on "/tmp/hogsuspend" to allow the users to
-> test the HoG suspend(HID Control Point) when the dummy back-end is
-> enabled.
+On Wed, Sep 19, 2012, Andrzej Kaczmarek wrote:
+> Proximity Monitor interface is registered for each GATT device since profile
+> driver matches by GATT_UUID which is intended only for Reporter role.
+> 
+> This patches splits Proximity profile driver into two separate drivers for
+> Monitor and Reporter role to register interfaces properly.
 > ---
->  profiles/input/suspend-dummy.c | 102 ++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 101 insertions(+), 1 deletion(-)
+>  profiles/proximity/manager.c  | 29 +++++++++++++++++++++--------
+>  profiles/proximity/reporter.c |  2 +-
+>  profiles/proximity/reporter.h |  2 +-
+>  3 files changed, 23 insertions(+), 10 deletions(-)
 
-Patches 1-3 have been applied but this one has issues:
-
-Applying: hog: Create a FIFO for dummy suspend
-WARNING:LONG_LINE: line over 80 characters
-#64: FILE: profiles/input/suspend-dummy.c:84:
-+	 * or output operation. When the remote closes the channel, hup signal is
-
-Please fix and resend.
+Both of these patches have been applied after some rework to match the
+newer profile API.
 
 Johan
