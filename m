@@ -1,42 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] adapter: Remove unused struct btd_adapter members
-Date: Fri, 28 Sep 2012 11:35:29 +0200
-Message-ID: <1348824929-9884-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20120927233420.3441f14e@i7>
+References: <1348757068-31048-1-git-send-email-frederic.dalleau@linux.intel.com>
+	<20120927233420.3441f14e@i7>
+Date: Fri, 28 Sep 2012 10:21:18 +0200
+Message-ID: <CA+QXtDvf3J33dusXDa6gVbYX=Q5zwOFxy5UqjVZF+=8NAuHSwQ@mail.gmail.com>
+Subject: Re: [PATCH 0/5] mSBC tests
+From: "Dalleau, Frederic" <frederic.dalleau@intel.com>
+To: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+Cc: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
+	<frederic.dalleau@linux.intel.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-stop_discov_id and state are not used anymore.
+Hi Siarhei,
 
----
- src/adapter.c |    3 ---
- 1 file changed, 3 deletions(-)
+Thanks for reply,
 
-diff --git a/src/adapter.c b/src/adapter.c
-index b1ea3ea..48d6294 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -112,7 +112,6 @@ struct btd_adapter {
- 	uint32_t dev_class;		/* Class of Device */
- 	char *name;			/* adapter name */
- 	gboolean allow_name_changes;	/* whether the adapter name can be changed */
--	guint stop_discov_id;		/* stop inquiry/scanning id */
- 	uint32_t discov_timeout;	/* discoverable time(sec) */
- 	guint pairable_timeout_id;	/* pairable timeout id */
- 	uint32_t pairable_timeout;	/* pairable time(sec) */
-@@ -122,8 +121,6 @@ struct btd_adapter {
- 					 * limited */
- 	uint8_t global_mode;		/* last valid global mode */
- 	struct session_req *pending_mode;
--	int state;			/* standard inq, periodic inq, name
--					 * resolving, suspended discovery */
- 	GSList *found_devices;
- 	GSList *oor_devices;		/* out of range device list */
- 	struct agent *agent;		/* For the new API */
--- 
-1.7.9.5
+On Thu, Sep 27, 2012 at 10:34 PM, Siarhei Siamashka
+<siarhei.siamashka@gmail.com> wrote:
+> Have you tried to tweak the SIMD code to make it process one
+> block at a time instead of batches of 4?
 
+I looked at sbc_analyze_4b_8s_simd but I missed the logic behind
+reordering. That's
+why I reused generic code in order to make sure that it would work.
+If there is some interest I can look into it deeper. And if you have
+any pointers
+they are welcome.
+
+> If we just could make SIMD code work, that would be the best option in
+> my opinion.
+
+Agreed, for sure.
+
+>> Work done from the spec, not tested with any reference encoder.
+>
+> Does a reference mSBC encoder exist somewhere? Or any ideas how to test
+> the new code with something other than bluez just to be sure that it's
+> correct?
+
+IIRC there used to be one, it was a windows program sbcencoder.exe but
+I couldn't find
+it anymore, and I'm not sure that it would support mSBC.
+
+Regards,
+Frédéric
