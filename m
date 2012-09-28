@@ -1,49 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 28 Sep 2012 09:24:17 +0800
+From: Fengguang Wu <fengguang.wu@intel.com>
+To: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+Cc: kernel-janitors@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
+	Andrei Emeltchenko <andrei.emeltchenko@intel.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: [bluetooth:master 231/247] net/bluetooth/amp.c:150:55: sparse: bad
+ constant expression
+Message-ID: <20120928012417.GH5522@localhost>
 MIME-Version: 1.0
-In-Reply-To: <20120927233420.3441f14e@i7>
-References: <1348757068-31048-1-git-send-email-frederic.dalleau@linux.intel.com>
-	<20120927233420.3441f14e@i7>
-Date: Fri, 28 Sep 2012 10:21:18 +0200
-Message-ID: <CA+QXtDvf3J33dusXDa6gVbYX=Q5zwOFxy5UqjVZF+=8NAuHSwQ@mail.gmail.com>
-Subject: Re: [PATCH 0/5] mSBC tests
-From: "Dalleau, Frederic" <frederic.dalleau@intel.com>
-To: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-Cc: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
-	<frederic.dalleau@linux.intel.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Siarhei,
+Hi Dmitry,
 
-Thanks for reply,
+FYI, there are new sparse warnings show up in
 
-On Thu, Sep 27, 2012 at 10:34 PM, Siarhei Siamashka
-<siarhei.siamashka@gmail.com> wrote:
-> Have you tried to tweak the SIMD code to make it process one
-> block at a time instead of batches of 4?
+tree:   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+head:   29d8a5909bba10accb82eb805c884a2943d7710f
+commit: ba221bbabadd5fc2c80677b52178138fd694cc26 [231/247] Bluetooth: Add function to derive AMP key using hmac
 
-I looked at sbc_analyze_4b_8s_simd but I missed the logic behind
-reordering. That's
-why I reused generic code in order to make sure that it would work.
-If there is some interest I can look into it deeper. And if you have
-any pointers
-they are welcome.
++ net/bluetooth/amp.c:150:55: sparse: bad constant expression
+  net/bluetooth/amp.c:130:12: warning: 'hmac_sha256' defined but not used [-Wunused-function]
 
-> If we just could make SIMD code work, that would be the best option in
-> my opinion.
+vim +150 net/bluetooth/amp.c
 
-Agreed, for sure.
+ba221bba (Dmitry Kasatkin 2012-09-27  144) 	ret = crypto_shash_setkey(tfm, key, ksize);
+ba221bba (Dmitry Kasatkin 2012-09-27  145) 	if (ret) {
+ba221bba (Dmitry Kasatkin 2012-09-27  146) 		BT_DBG("crypto_ahash_setkey failed: err %d", ret);
+ba221bba (Dmitry Kasatkin 2012-09-27  147) 	} else {
+ba221bba (Dmitry Kasatkin 2012-09-27  148) 		struct {
+ba221bba (Dmitry Kasatkin 2012-09-27  149) 			struct shash_desc shash;
+ba221bba (Dmitry Kasatkin 2012-09-27 @150) 			char ctx[crypto_shash_descsize(tfm)];
+ba221bba (Dmitry Kasatkin 2012-09-27  151) 		} desc;
+ba221bba (Dmitry Kasatkin 2012-09-27  152) 
+ba221bba (Dmitry Kasatkin 2012-09-27  153) 		desc.shash.tfm = tfm;
+ba221bba (Dmitry Kasatkin 2012-09-27  154) 		desc.shash.flags = CRYPTO_TFM_REQ_MAY_SLEEP;
+ba221bba (Dmitry Kasatkin 2012-09-27  155) 
+ba221bba (Dmitry Kasatkin 2012-09-27  156) 		ret = crypto_shash_digest(&desc.shash, plaintext, psize,
+ba221bba (Dmitry Kasatkin 2012-09-27  157) 					  output);
+ba221bba (Dmitry Kasatkin 2012-09-27  158) 	}
 
->> Work done from the spec, not tested with any reference encoder.
->
-> Does a reference mSBC encoder exist somewhere? Or any ideas how to test
-> the new code with something other than bluez just to be sure that it's
-> correct?
-
-IIRC there used to be one, it was a windows program sbcencoder.exe but
-I couldn't find
-it anymore, and I'm not sure that it would support mSBC.
-
-Regards,
-Frédéric
+---
+0-DAY kernel build testing backend         Open Source Technology Centre
+Fengguang Wu, Yuanhan Liu                              Intel Corporation
