@@ -1,59 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: A2MP: Fix potential NULL dereference
-Date: Fri, 28 Sep 2012 14:28:50 +0300
-Message-Id: <1348831731-12934-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <20120928012323.GG5522@localhost>
-References: <20120928012323.GG5522@localhost>
+Date: Fri, 28 Sep 2012 14:17:19 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v0 2/2] hog: Add support for multiple instances
+Message-ID: <20120928111719.GF14450@x220>
+References: <1348083222-15294-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1348083222-15294-2-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1348083222-15294-2-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Claudio,
 
-Return INVALID_CTRL_ID for unknown AMP controller and for BR/EDR
-controller and fixes dereference possible NULL pointer.
+On Wed, Sep 19, 2012, Claudio Takahasi wrote:
+> This patch adds support for multiple HID services instances exposed by
+> the same remote device.
+> ---
+> 
+>  *** Apply after "[PATCH BlueZ v2 0/6] HoG Suspend/Resume" series
+> 
+>  profiles/input/hog_device.c  | 90 +++++++++++---------------------------------
+>  profiles/input/hog_device.h  |  3 +-
+>  profiles/input/hog_manager.c | 41 ++++++++++++--------
+>  3 files changed, 48 insertions(+), 86 deletions(-)
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/a2mp.c |   14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+Patch 1/2 has been applied but this 2/2 doesn't apply even though I did
+already push the HoG Suspend/Resume patches upstream. Please fix and
+resend.
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 61e657a..a55449e 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -278,7 +278,7 @@ static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 	BT_DBG("id %d", req->id);
- 
- 	hdev = hci_dev_get(req->id);
--	if (!hdev) {
-+	if (!hdev || hdev->dev_type != HCI_AMP) {
- 		struct a2mp_info_rsp rsp;
- 
- 		rsp.id = req->id;
-@@ -286,14 +286,16 @@ static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 
- 		a2mp_send(mgr, A2MP_GETINFO_RSP, hdr->ident, sizeof(rsp),
- 			  &rsp);
--	}
- 
--	if (hdev->dev_type != HCI_BREDR) {
--		mgr->state = READ_LOC_AMP_INFO;
--		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL);
-+		goto done;
- 	}
- 
--	hci_dev_put(hdev);
-+	mgr->state = READ_LOC_AMP_INFO;
-+	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL);
-+
-+done:
-+	if (hdev)
-+		hci_dev_put(hdev);
- 
- 	skb_pull(skb, sizeof(*req));
- 	return 0;
--- 
-1.7.9.5
-
+Johan
