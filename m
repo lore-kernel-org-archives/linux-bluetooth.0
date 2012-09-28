@@ -1,50 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 28 Sep 2012 13:59:37 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: chen.ganir@ti.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 01/10] battery: Add generic device battery
- documentation
-Message-ID: <20120928105937.GA14450@x220>
-References: <1348470919-25567-1-git-send-email-chen.ganir@ti.com>
- <1348470919-25567-2-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1348470919-25567-2-git-send-email-chen.ganir@ti.com>
+In-Reply-To: <50642389.40107@intel.com>
+References: <50642389.40107@intel.com>
+Date: Fri, 28 Sep 2012 06:56:32 -0400
+Message-ID: <CAJdJm_NbPw0jwWvuUiu7L=wzxc+qxfF_4i2vj7U1G06b=BE2qw@mail.gmail.com>
+Subject: Re: [RFC] Convert storage to use per-remote device directories
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Frederic Danis <frederic.danis@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+Hi Frederic,
 
-On Mon, Sep 24, 2012, chen.ganir@ti.com wrote:
-> +BlueZ D-Bus Battery API description
-> +****************************************
+On Thu, Sep 27, 2012 at 5:59 AM, Frederic Danis
+<frederic.danis@intel.com> wrote:
+> Hi everyone,
+>
+> Here is my proposal for new storage directory structure using ini-file
+> format.
 
-Please keep the "underline" consistent with the length of the text above
-it.
+Do you know if the INI parser in glib allows for multiple groups with
+same name? In LE we can have services with same UUID (not sure if this
+is valid for BR/EDR also), and they are differentiated by other means
+(e.g. a "Description" descriptor with different value, besides the
+different handle).
 
-> +	Texas Instruments, Inc. <chen.ganir@ti.com>
+Regarding LE, we have two kinds of storage needs: server profiles, and
+client profiles.
 
-What's this supposed to be? If you want a copyright statement here then
-make it of the proper format. Author info is not needed as we have the
-AUTHORS file and the commit history.
+For server profiles, we need to store the attribute database.
+Currently we don't do this, but we need to implement it, or have
+ServiceChanged characteristic notifying that the service ranges have
+changed every time BlueZ restarts (which adds overhead as service
+discovery is triggered on the client side). I suggest we store the
+attribute database into a "attribute_db.conf" file containing the
+attribute name/value/uuid triples. Additionally, we also need to store
+the Client Characteristic Configuration descriptor values (which are
+specific to each bonded device), currently stored into a "ccc" file.
+We could have one group just for them into attribute_db.conf.
 
-> +Device Battery hierarchy
-> +=====================================
+For client profiles, I think the storage needs are specific to each
+profile. From memory, only the generic GATT client and the GAP plugin
+use storage currently (other profiles eventually need to use storage
+to avoid full service discovery every time a bonded device
+re-connects). The generic GATT client stores service/characteristics
+handles/uuids ("primaries" and "characteristics" files), and the GAP
+plugin stores appearance data ("appearances" file).
 
-Same thing with the consistency of the "underline"
+Johan, what do you think?
 
-> +Service		org.bluez
-> +Interface	org.bluez.Battery
-> +Object path	[variable prefix]/{hci0,..}/dev_XX_XX_XX_XX_XX_XX/BATTYYYY
-> +YYYY is numeric value between 0 and 9999.
-
-I don't think you need a separate comment for the "YYY". We don't have
-that for the "XX" stuff either.
-
-> +		array{object} Batteries [readonly]
-
-I guess you should mark this with [experimental] since it'll be removed
-with the advent of ObjectManager.
-
-Johan
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
