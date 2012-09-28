@@ -1,34 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 28 Sep 2012 16:57:50 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Michal.Labedzki@tieto.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Wireshark
-Message-ID: <20120928135747.GD8184@aemeltch-MOBL1>
-References: <E50901D4F2CF69428D43141B7C8586792CFACCF505@EXMB03.eu.tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <E50901D4F2CF69428D43141B7C8586792CFACCF505@EXMB03.eu.tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2] Bluetooth: A2MP: Correct assoc_len size
+Date: Fri, 28 Sep 2012 16:55:00 +0300
+Message-Id: <1348840500-16336-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1348832490-13448-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1348832490-13448-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michał,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Fri, Sep 28, 2012 at 04:07:44PM +0300, Michal.Labedzki@tieto.com wrote:
-> Hello All,
-> 
-> I am trying to add full Bluetooth support to a Wireshark. Wireshark can be
-> used as replacement for "hcidump" or other GUI applications for displaying
-> Bluetooth frames/packets.
-> 
-> Currently Wireshark support:
-> 1. Sniffing via Bluetooth dongle
-> 2. Protocols/Profiles:
->     HCI (without BLE)
+Correct assoc_len and fix warning for x86-64 by using %zu specifier
+reported by Fengguang Wu <fengguang.wu@intel.com>.
 
-HCI also does not have full support for AMP HCI commands. I can send that
-log.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+	v2: make assoc_len type of size_t
+ net/bluetooth/a2mp.c |   12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-Best regards 
-Andrei Emeltchenko 
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index a55449e..d4946b5 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -381,12 +381,15 @@ static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	struct hci_dev *hdev;
+ 	struct amp_ctrl *ctrl;
+ 	struct hci_conn *hcon;
++	size_t assoc_len;
+ 
+ 	if (len < sizeof(*rsp))
+ 		return -EINVAL;
+ 
+-	BT_DBG("id %d status 0x%2.2x assoc len %lu", rsp->id, rsp->status,
+-	       len - sizeof(*rsp));
++	assoc_len = len - sizeof(*rsp);
++
++	BT_DBG("id %d status 0x%2.2x assoc len %zu", rsp->id, rsp->status,
++	       assoc_len);
+ 
+ 	if (rsp->status)
+ 		return -EINVAL;
+@@ -394,7 +397,7 @@ static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	/* Save remote ASSOC data */
+ 	ctrl = amp_ctrl_lookup(mgr, rsp->id);
+ 	if (ctrl) {
+-		u8 *assoc, assoc_len = len - sizeof(*rsp);
++		u8 *assoc;
+ 
+ 		assoc = kzalloc(assoc_len, GFP_KERNEL);
+ 		if (!assoc) {
+@@ -468,7 +471,8 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	}
+ 
+ 	if (ctrl) {
+-		u8 *assoc, assoc_len = le16_to_cpu(hdr->len) - sizeof(*req);
++		size_t assoc_len = le16_to_cpu(hdr->len) - sizeof(*req);
++		u8 *assoc;
+ 
+ 		ctrl->id = rsp.remote_id;
+ 
+-- 
+1.7.9.5
 
