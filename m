@@ -2,77 +2,79 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: bzhao@marvell.com
-Subject: [PATCH 1/3] Bluetooth: btmrvl: Correct num_block name
-Date: Fri, 28 Sep 2012 14:36:08 +0300
-Message-Id: <1348832170-13250-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <20120927205145.GC15463@joana>
+Subject: [PATCH 3/3] Bluetooth: btmrvl: Fix skb buffer overflow
+Date: Fri, 28 Sep 2012 14:36:10 +0300
+Message-Id: <1348832170-13250-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1348832170-13250-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <20120927205145.GC15463@joana>
+ <1348832170-13250-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Make code readable by correcting name from buf_block_len to num_blocks
-since it represent number of blocks; NOT a length of a block buffer.
+Add extra check to avoid skb buffer overflow. Fixes crash below:
+
+ [  101.030427] ------------[ cut here ]------------
+ [  101.030459] kernel BUG at net/core/skbuff.c:127!
+ [  101.030486] invalid opcode: 0000 [#1] SMP
+...
+ [  101.030806] Pid: 2010, comm: btmrvl_main_ser Not tainted 3.5.0+ #80 Laptop
+ [  101.030859] EIP: 0060:[<c14f2ba9>] EFLAGS: 00010282 CPU: 0
+ [  101.030894] EIP is at skb_put+0x99/0xa0
+ [  101.030919] EAX: 00000080 EBX: f129380b ECX: ef923540 EDX: 00000001
+ [  101.030956] ESI: f00a4000 EDI: 00001003 EBP: ed4a5efc ESP: ed4a5ecc
+ [  101.030992]  DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
+ [  101.031024] CR0: 8005003b CR2: 08fca014 CR3: 30960000 CR4: 000407f0
+ [  101.031062] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
+ [  101.031100] DR6: ffff0ff0 DR7: 00000400
+ [  101.031125] Process btmrvl_main_ser (pid: 2010, ti=ed4a4000 task=ef923540 task.ti=ed4a4000)
+ [  101.031174] Stack:
+ [  101.031188]  c18126f8 c1651938 f853f8d2 00001003 00001003 f1292800 f1292808 f129380b
+ [  101.031250]  f1292940 f00a4000 eddb1280 efc0f9c0 ed4a5f44 f853f8d2 00000040 00000000
+ [  101.031312]  ef923540 c15ee096 ef923540 eddb12d4 00000004 f00a4000 00000040 00000000
+ [  101.031376] Call Trace:
+ [  101.031396]  [<f853f8d2>] ? btmrvl_sdio_process_int_status+0x272/0x3d0 [btmrvl_sdio]
+ [  101.031444]  [<f853f8d2>] btmrvl_sdio_process_int_status+0x272/0x3d0 [btmrvl_sdio]
+ [  101.031488]  [<c15ee096>] ? _raw_spin_unlock_irqrestore+0x36/0x70
+ [  101.031526]  [<f85a46e4>] btmrvl_service_main_thread+0x244/0x300 [btmrvl]
+ [  101.031568]  [<f853fb50>] ? btmrvl_sdio_poll_card_status.isra.6.constprop.7+0x90/0x90 [btmrvl_sdio]
+ [  101.031619]  [<c107eda0>] ? try_to_wake_up+0x270/0x270
+ [  101.031648]  [<f85a44a0>] ? btmrvl_process_event+0x3b0/0x3b0 [btmrvl]
+ [  101.031686]  [<c106d19d>] kthread+0x7d/0x90
+ [  101.031713]  [<c106d120>] ? flush_kthread_work+0x150/0x150
+ [  101.031745]  [<c15f5a82>] kernel_thread_helper+0x6/0x10
+...
+ [  101.032008] EIP: [<c14f2ba9>] skb_put+0x99/0xa0 SS:ESP 0068:ed4a5ecc
+ [  101.056125] ---[ end trace a0bd01d1a9a796c8 ]---
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- drivers/bluetooth/btmrvl_sdio.c |   13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ drivers/bluetooth/btmrvl_sdio.c |   11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 3f4bfc8..645b42e 100644
+index ec5c456..1896e91 100644
 --- a/drivers/bluetooth/btmrvl_sdio.c
 +++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -492,7 +492,7 @@ done:
- static int btmrvl_sdio_card_to_host(struct btmrvl_private *priv)
- {
- 	u16 buf_len = 0;
--	int ret, buf_block_len, blksz;
-+	int ret, num_blocks, blksz;
- 	struct sk_buff *skb = NULL;
- 	u32 type;
- 	u8 *payload = NULL;
-@@ -514,18 +514,17 @@ static int btmrvl_sdio_card_to_host(struct btmrvl_private *priv)
- 	}
+@@ -552,7 +552,16 @@ static int btmrvl_sdio_card_to_host(struct btmrvl_private *priv)
+ 	 */
  
- 	blksz = SDIO_BLOCK_SIZE;
--	buf_block_len = (buf_len + blksz - 1) / blksz;
-+	num_blocks = (buf_len + blksz - 1) / blksz;
+ 	buf_len = payload[0];
+-	buf_len |= (u16) payload[1] << 8;
++	buf_len |= payload[1] << 8;
++	buf_len |= payload[2] << 16;
++
++	if (buf_len > blksz * num_blocks) {
++		BT_ERR("Skip incorrect packet: hdrlen %d buffer %d",
++		       buf_len, blksz * num_blocks);
++		ret = -EIO;
++		goto exit;
++	}
++
+ 	type = payload[3];
  
- 	if (buf_len <= SDIO_HEADER_LEN
--			|| (buf_block_len * blksz) > ALLOC_BUF_SIZE) {
-+	    || (num_blocks * blksz) > ALLOC_BUF_SIZE) {
- 		BT_ERR("invalid packet length: %d", buf_len);
- 		ret = -EINVAL;
- 		goto exit;
- 	}
- 
- 	/* Allocate buffer */
--	skb = bt_skb_alloc(buf_block_len * blksz + BTSDIO_DMA_ALIGN,
--								GFP_ATOMIC);
-+	skb = bt_skb_alloc(num_blocks * blksz + BTSDIO_DMA_ALIGN, GFP_ATOMIC);
- 	if (skb == NULL) {
- 		BT_ERR("No free skb");
- 		goto exit;
-@@ -541,7 +540,7 @@ static int btmrvl_sdio_card_to_host(struct btmrvl_private *priv)
- 	payload = skb->data;
- 
- 	ret = sdio_readsb(card->func, payload, card->ioport,
--			  buf_block_len * blksz);
-+			  num_blocks * blksz);
- 	if (ret < 0) {
- 		BT_ERR("readsb failed: %d", ret);
- 		ret = -EIO;
-@@ -590,7 +589,7 @@ static int btmrvl_sdio_card_to_host(struct btmrvl_private *priv)
- 	default:
- 		BT_ERR("Unknown packet type:%d", type);
- 		print_hex_dump_bytes("", DUMP_PREFIX_OFFSET, payload,
--						blksz * buf_block_len);
-+				     blksz * num_blocks);
- 
- 		kfree_skb(skb);
- 		skb = NULL;
+ 	switch (type) {
 -- 
 1.7.9.5
 
