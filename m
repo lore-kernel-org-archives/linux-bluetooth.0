@@ -1,49 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] hciconfig: Clarify what oobdata command do
-Date: Fri, 28 Sep 2012 13:58:53 +0200
-Message-ID: <1348833533-25427-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Use %zu print specifier for size_t type
+Date: Fri, 28 Sep 2012 14:44:23 +0300
+Message-Id: <1348832663-13569-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <20120928011624.GB5522@localhost>
+References: <20120928011624.GB5522@localhost>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-oobdata command results in reading new local OOB data and invalidates
-previously read data. Current command description is misleading.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Correct warnings reported by Fengguang Wu <fengguang.wu@intel.com>.
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- tools/hciconfig.8 |    2 +-
- tools/hciconfig.c |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_event.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/hciconfig.8 b/tools/hciconfig.8
-index 35956c4..6397427 100644
---- a/tools/hciconfig.8
-+++ b/tools/hciconfig.8
-@@ -223,7 +223,7 @@ This command deletes the stored link key for
- from the device.
- .TP
- .BI oobdata
--Display local OOB data.
-+Get local OOB data (invalidates previously read data).
- .TP
- .BI commands
- Display supported commands.
-diff --git a/tools/hciconfig.c b/tools/hciconfig.c
-index f1458b9..64f2650 100644
---- a/tools/hciconfig.c
-+++ b/tools/hciconfig.c
-@@ -1924,7 +1924,7 @@ static struct {
- 	{ "scomtu",	cmd_scomtu,	"<mtu:pkt>",	"Set SCO MTU and number of packets" },
- 	{ "putkey",	cmd_putkey,	"<bdaddr>",	"Store link key on the device" },
- 	{ "delkey",	cmd_delkey,	"<bdaddr>",	"Delete link key from the device" },
--	{ "oobdata",	cmd_oob_data,	0,		"Display local OOB data" },
-+	{ "oobdata",	cmd_oob_data,	0,		"Get local OOB data" },
- 	{ "commands",	cmd_commands,	0,		"Display supported commands" },
- 	{ "features",	cmd_features,	0,		"Display device features" },
- 	{ "version",	cmd_version,	0,		"Display version information" },
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 3151d85..82e478a 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -883,7 +883,7 @@ static void hci_cc_read_local_amp_assoc(struct hci_dev *hdev,
+ 	rem_len = __le16_to_cpu(rp->rem_len);
+ 
+ 	if (rem_len > frag_len) {
+-		BT_DBG("frag_len %ld rem_len %ld", frag_len, rem_len);
++		BT_DBG("frag_len %zu rem_len %zu", frag_len, rem_len);
+ 
+ 		memcpy(assoc->data + assoc->offset, rp->frag, frag_len);
+ 		assoc->offset += frag_len;
 -- 
 1.7.9.5
 
