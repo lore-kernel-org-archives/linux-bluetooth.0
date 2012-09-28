@@ -1,55 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1348842611.13371.23.camel@aeonflux>
-Subject: Re: Wireshark
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Michal.Labedzki@tieto.com, linux-bluetooth@vger.kernel.org
-Date: Fri, 28 Sep 2012 16:30:11 +0200
-In-Reply-To: <20120928133944.GC5075@x220>
-References: <E50901D4F2CF69428D43141B7C8586792CFACCF505@EXMB03.eu.tieto.com>
-	 <20120928133944.GC5075@x220>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <20120927074338.GC9610@x220>
+References: <1348594686-26221-1-git-send-email-jprvita@openbossa.org>
+	<1348594686-26221-2-git-send-email-jprvita@openbossa.org>
+	<20120927074338.GC9610@x220>
+Date: Fri, 28 Sep 2012 11:27:39 -0300
+Message-ID: <CAKT1EBdhhqsEU9_zxcAHArtpwzzOo2hmwDmz91SrYNQeiEdEJw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v7 2/9] mgmt: Add LE scanning callback
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@openbossa.org>,
+	linux-bluetooth@vger.kernel.org,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+Hi Johan:
 
-> Have you looked into supporting the new HCI_CHANNEL_MONITOR available in
-> recent kernels? There's a very simple "btmon" command-line tool for it
-> in bluez.git (see e.g. monitor/control.c) but it can't do any kind of
-> high-level decoding (e.g. profiles). It'd be interesting to know if it
-> could be easily supported in wireshark since right now there doesn't
-> seem to be a viable way of porting decoders from hcidump to btmon due to
-> their very different ways of handling buffers etc.
-> 
-> One of the big benefits of the monitor channel compared traditional HCI
-> sockets is that you get dynamic notifications of added and removed
-> adapters including the very early HCI traffic that occurs. In the long
-> run I think the idea is to add also "replay" connection events for
-> existing ACL and L2CAP links so that you'd get the right protocol
-> decoded even if you start logging when the connection already exists.
+On Thu, Sep 27, 2012 at 4:43 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi,
+>
+> On Tue, Sep 25, 2012, João Paulo Rechi Vita wrote:
+>> +int mgmt_start_scanning(int index)
+>
+> Firstly I don't think the name is good since BR/EDR also has the concept
+> of scanning (page scan & inquiry scan). Secondly, maybe it'd be simpler
+> to reuse mgmt_start_discovery and simply add a new parameter which
+> provides the value for info->discov_type?
+>
+> Johan
 
-I can only second this. Wireshark should only be using the new monitor
-socket that we introduced. It could be compared to the pseudo interface
-for network interfaces with extra information about added and removed
-adapters. It will also tell you if you see a BR/EDR/LE controller vs AMP
-controller HCI device.
+My suggestions are:
+1. rename to mgmt_start_le_scanning
+2. add a new parameter to mgmt_start_discovery: gboolean le_only
+3. add a new parameter to mgmt_start_discovery: informing the adapter
+operation mode(BREDR/LE/BREDR_LE)
 
-Especially if you want to do Bluetooth High-Speed debugging, you need to
-be able to trace a BR/EDR/LE controller + AMP controller at the same
-time.
+Option 3 will require to expose controller info/settings to adapter.c.
+It is necessary to know the controller features to send the right
+discover type. btd_adapter_start function could be extended to receive
+the supported features or a parameter specifying the operation mode.
+IMO, using this approach we are duplicating information.
 
-In addition it will tell you the BD_ADDR of the controller even if you
-missed the initial setup HCI packets. That allows for an unique matching
-of traffic from different HCI devices even after unplug-replug and their
-device names and indexes differ.
+Which approach do you prefer?
 
-The protocol for it is documented in include/net/bluetooth/hci_mon.h in
-the kernel code. It is really simple and does support SCM_TIMESTAMP.
-
-Regards
-
-Marcel
-
-
+Regards,
+Claudio.
