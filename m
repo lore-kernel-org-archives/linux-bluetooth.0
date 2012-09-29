@@ -1,72 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5067ED60.1080202@ti.com>
-Date: Sun, 30 Sep 2012 08:57:36 +0200
-From: Chen Ganir <chen.ganir@ti.com>
+Date: Sat, 29 Sep 2012 18:12:40 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Kevin Wilson <wkevils@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: scan fails
+Message-ID: <20120929211240.GA8075@echo>
+References: <CAGXs5wX2N7P5=_ZwPPUw-kUxGjhpMB2xyfWHmHOUM99XggvQ2Q@mail.gmail.com>
+ <CAGXs5wVu=deRjaKwh0wLKCPy+Pqf3F9rH4pMyCCPCM_iA-yNeg@mail.gmail.com>
 MIME-Version: 1.0
-To: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v4 01/10] battery: Add generic device battery documentation
-References: <1348470919-25567-1-git-send-email-chen.ganir@ti.com> <1348470919-25567-2-git-send-email-chen.ganir@ti.com> <20120928105937.GA14450@x220>
-In-Reply-To: <20120928105937.GA14450@x220>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAGXs5wVu=deRjaKwh0wLKCPy+Pqf3F9rH4pMyCCPCM_iA-yNeg@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Johan,
-On 09/28/2012 12:59 PM, Johan Hedberg wrote:
-> Hi Chen,
->
-> On Mon, Sep 24, 2012, chen.ganir@ti.com wrote:
->> +BlueZ D-Bus Battery API description
->> +****************************************
->
-> Please keep the "underline" consistent with the length of the text above
-> it.
->
->> +	Texas Instruments, Inc. <chen.ganir@ti.com>
->
-> What's this supposed to be? If you want a copyright statement here then
-> make it of the proper format. Author info is not needed as we have the
-> AUTHORS file and the commit history.
->
-Would you please specify what is the proper copyright message format ? 
-doc/adapter-api.txt, doc/health-api.txt have two different styles. 
-doc/oob-api.txt has a third style (AUTHOR <author@email> for COMPANY),
-doc/media-api.txt for example does not have any copyright information. 
-In addition - you say author information is not required, yet all other 
-copyright messages contain this. Is this a new policy ? If so, please 
-specify the proper copyright message.
+Hi Kevin,
 
+On 22:29 Sat 29 Sep, Kevin Wilson wrote:
+> Hi,
+> Sorry , just forget to mention that in reset I also
+> get an error:
+> hciconfig hci0 reset
+> Can't init device hci0: Connection timed out (110)
 
->> +Device Battery hierarchy
->> +=====================================
->
-> Same thing with the consistency of the "underline"
->
-Ok.
+Can you install hcidump (IIRC in Fedora it is called bluez-hcidump) and send
+the log, pass '-Xt' to it please, when doing 'hciconfig hci0 up'? 
 
->> +Service		org.bluez
->> +Interface	org.bluez.Battery
->> +Object path	[variable prefix]/{hci0,..}/dev_XX_XX_XX_XX_XX_XX/BATTYYYY
->> +YYYY is numeric value between 0 and 9999.
->
-> I don't think you need a separate comment for the "YYY". We don't have
-> that for the "XX" stuff either.
->
-Ok.
+Right now, I am thinking that our initialization procedure sends a command
+that your device doesn't support, probably because we expect a newer Bluetooth
+version than your device is.
 
->> +		array{object} Batteries [readonly]
->
-> I guess you should mark this with [experimental] since it'll be removed
-> with the advent of ObjectManager.
->
-What is the difference between the Batteries property and the services 
-or UUIDs property in device-api.txt ? Should all of them get marked with 
-experimental ?
-> Johan
->
+> kevin
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-
+Cheers,
 -- 
-BR,
-Chen Ganir
-Texas Instruments
+Vinicius
