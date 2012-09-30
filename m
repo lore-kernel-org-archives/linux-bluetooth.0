@@ -1,57 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5068F597.9020403@xenotime.net>
-Date: Sun, 30 Sep 2012 18:44:55 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
+Date: Sun, 30 Sep 2012 13:56:21 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Chen Ganir <chen.ganir@ti.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v4 01/10] battery: Add generic device battery
+ documentation
+Message-ID: <20120930105621.GA30560@x220.Elisa>
+References: <1348470919-25567-1-git-send-email-chen.ganir@ti.com>
+ <1348470919-25567-2-git-send-email-chen.ganir@ti.com>
+ <20120928105937.GA14450@x220>
+ <5067ED60.1080202@ti.com>
 MIME-Version: 1.0
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-CC: linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
- Marcel Holtmann <marcel@holtmann.org>,
- Gustavo Padovan <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- linux-bluetooth@vger.kernel.org
-Subject: [PATCH -next] bluetooth: fix printk format warnings
-References: <20120928165112.6b0f5328b72428799c3f995d@canb.auug.org.au>
-In-Reply-To: <20120928165112.6b0f5328b72428799c3f995d@canb.auug.org.au>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <5067ED60.1080202@ti.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Randy Dunlap <rdunlap@xenotime.net>
+Hi Chen,
 
-Fix printk format warnings in net/bluetooth/:
+On Sun, Sep 30, 2012, Chen Ganir wrote:
+> >On Mon, Sep 24, 2012, chen.ganir@ti.com wrote:
+> >>+BlueZ D-Bus Battery API description
+> >>+****************************************
+> >
+> >Please keep the "underline" consistent with the length of the text above
+> >it.
+> >
+> >>+	Texas Instruments, Inc. <chen.ganir@ti.com>
+> >
+> >What's this supposed to be? If you want a copyright statement here then
+> >make it of the proper format. Author info is not needed as we have the
+> >AUTHORS file and the commit history.
+> >
+> Would you please specify what is the proper copyright message format
+> ? doc/adapter-api.txt, doc/health-api.txt have two different styles.
+> doc/oob-api.txt has a third style (AUTHOR <author@email> for
+> COMPANY),
+> doc/media-api.txt for example does not have any copyright
+> information. In addition - you say author information is not
+> required, yet all other copyright messages contain this. Is this a
+> new policy ? If so, please specify the proper copyright message.
 
-net/bluetooth/hci_event.c:886:3: warning: format '%ld' expects type 'long int', but argument 2 has type 'size_t'
-net/bluetooth/hci_event.c:886:3: warning: format '%ld' expects type 'long int', but argument 3 has type 'size_t'
-net/bluetooth/a2mp.c:386:2: warning: format '%lu' expects type 'long unsigned int', but argument 4 has type 'unsigned int'
+How about git grep "Texas Instruments"? None of the entries contain
+author information so your assertion makes it look like you didn't
+really dig too deep. The policy has always been to keep author info in
+AUTHORS and the commit history and have copyright statements only for
+the sake of copyright information. Exceptions do of course slip through
+as the maintainers are humans and not robots ;)
 
-Signed-off-by: Randy Dunlap <rdunlap@xenotime.net>
-M:	Marcel Holtmann <marcel@holtmann.org>
-M:	Gustavo Padovan <gustavo@padovan.org>
-M:	Johan Hedberg <johan.hedberg@gmail.com>
-L:	linux-bluetooth@vger.kernel.org
----
- net/bluetooth/a2mp.c      |    2 +-
- net/bluetooth/hci_event.c |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Ultimately you need to ask your employer for what kind of copyright
+statement you should use, e.g. some prefer to have a "All rights
+reserved" at the end whereas others don't care.
 
---- linux-next-20120928.orig/net/bluetooth/a2mp.c
-+++ linux-next-20120928/net/bluetooth/a2mp.c
-@@ -383,7 +383,7 @@ static int a2mp_getampassoc_rsp(struct a
- 	if (len < sizeof(*rsp))
- 		return -EINVAL;
- 
--	BT_DBG("id %d status 0x%2.2x assoc len %lu", rsp->id, rsp->status,
-+	BT_DBG("id %d status 0x%2.2x assoc len %zu", rsp->id, rsp->status,
- 	       len - sizeof(*rsp));
- 
- 	if (rsp->status)
---- linux-next-20120928.orig/net/bluetooth/hci_event.c
-+++ linux-next-20120928/net/bluetooth/hci_event.c
-@@ -883,7 +883,7 @@ static void hci_cc_read_local_amp_assoc(
- 	rem_len = __le16_to_cpu(rp->rem_len);
- 
- 	if (rem_len > frag_len) {
--		BT_DBG("frag_len %ld rem_len %ld", frag_len, rem_len);
-+		BT_DBG("frag_len %zu rem_len %zu", frag_len, rem_len);
- 
- 		memcpy(assoc->data + assoc->offset, rp->frag, frag_len);
- 		assoc->offset += frag_len;
+> >>+		array{object} Batteries [readonly]
+> >
+> >I guess you should mark this with [experimental] since it'll be removed
+> >with the advent of ObjectManager.
+> >
+> What is the difference between the Batteries property and the
+> services or UUIDs property in device-api.txt ? Should all of them
+> get marked with experimental ?
+
+The Services property will probably be removed for 5.0 but the UUIDs
+will stay (not sure why you brought it up anyway?). Just mark this new
+property as experimental since it'll likely be gone by the time 5.0 goes
+out.
+
+Johan
