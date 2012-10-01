@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 7/7] AVRCP: Don't respond with errors when no player is registered
-Date: Mon,  1 Oct 2012 14:37:51 +0300
-Message-Id: <1349091471-17396-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/7] AVCTP: Simplify channel handling
+Date: Mon,  1 Oct 2012 14:37:48 +0300
+Message-Id: <1349091471-17396-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1349091471-17396-1-git-send-email-luiz.dentz@gmail.com>
 References: <1349091471-17396-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,206 +11,365 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Some devices w.g. Sony MW600 will stop using certain commands if an
-error happen, so the code now just fake a player and once a real
-player is registered it takes place of the fake one.
+Make both control and browsing channels to use the same structure to
+store its channel information.
 ---
- audio/avrcp.c | 77 ++++++++++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 63 insertions(+), 14 deletions(-)
+ audio/avctp.c | 159 +++++++++++++++++++++++++++++-----------------------------
+ 1 file changed, 79 insertions(+), 80 deletions(-)
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 21d105a..6b426f5 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -477,6 +477,17 @@ void avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data)
- 	return;
+diff --git a/audio/avctp.c b/audio/avctp.c
+index 6fd5491..dfc5601 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -131,6 +131,12 @@ struct avctp_rsp_handler {
+ 	void *user_data;
+ };
+ 
++struct avctp_channel {
++	GIOChannel *io;
++	guint watch;
++	uint16_t mtu;
++};
++
+ struct avctp {
+ 	struct avctp_server *server;
+ 	bdaddr_t dst;
+@@ -139,13 +145,8 @@ struct avctp {
+ 
+ 	int uinput;
+ 
+-	GIOChannel *control_io;
+-	GIOChannel *browsing_io;
+-	guint control_io_id;
+-	guint browsing_io_id;
+-
+-	uint16_t control_mtu;
+-	uint16_t browsing_mtu;
++	struct avctp_channel *control;
++	struct avctp_channel *browsing;
+ 
+ 	uint8_t key_quirks[256];
+ 	GSList *handlers;
+@@ -332,6 +333,17 @@ static struct avctp_pdu_handler *find_handler(GSList *list, uint8_t opcode)
+ 	return NULL;
  }
  
-+static void *player_get_metadata(struct avrcp_player *player, uint32_t attr)
++static void avctp_channel_destroy(struct avctp_channel *chan)
 +{
-+	if (player != NULL)
-+		return player->cb->get_metadata(attr, player->user_data);
++	g_io_channel_shutdown(chan->io, TRUE, NULL);
++	g_io_channel_unref(chan->io);
 +
-+	if (attr == AVRCP_MEDIA_ATTRIBUTE_TITLE)
-+		return "";
++	if (chan->watch)
++		g_source_remove(chan->watch);
 +
-+	return NULL;
++	g_free(chan);
 +}
 +
- static uint16_t player_write_media_attribute(struct avrcp_player *player,
- 						uint32_t id, uint8_t *buf,
- 						uint16_t *pos,
-@@ -489,7 +500,7 @@ static uint16_t player_write_media_attribute(struct avrcp_player *player,
- 
- 	DBG("%u", id);
- 
--	value = player->cb->get_metadata(id, player->user_data);
-+	value = player_get_metadata(player, id);
- 	if (value == NULL) {
- 		*offset = 0;
- 		return 0;
-@@ -588,6 +599,9 @@ static int player_set_attribute(struct avrcp_player *player,
+ static void avctp_disconnected(struct avctp *session)
  {
- 	DBG("Change attribute: %u %u", attr, val);
+ 	struct avctp_server *server;
+@@ -339,36 +351,11 @@ static void avctp_disconnected(struct avctp *session)
+ 	if (!session)
+ 		return;
  
-+	if (player == NULL)
-+		return -ENOENT;
-+
- 	return player->cb->set_setting(attr, val, player->user_data);
+-	if (session->browsing_io) {
+-		g_io_channel_shutdown(session->browsing_io, TRUE, NULL);
+-		g_io_channel_unref(session->browsing_io);
+-		session->browsing_io = NULL;
+-	}
+-
+-	if (session->browsing_io_id) {
+-		g_source_remove(session->browsing_io_id);
+-		session->browsing_io_id = 0;
+-	}
+-
+-	if (session->control_io) {
+-		g_io_channel_shutdown(session->control_io, TRUE, NULL);
+-		g_io_channel_unref(session->control_io);
+-		session->control_io = NULL;
+-	}
+-
+-	if (session->control_io_id) {
+-		g_source_remove(session->control_io_id);
+-		session->control_io_id = 0;
++	if (session->browsing)
++		avctp_channel_destroy(session->browsing);
+ 
+-		if (session->state == AVCTP_STATE_CONNECTING) {
+-			struct audio_device *dev;
+-
+-			dev = manager_get_device(&session->server->src,
+-							&session->dst, FALSE);
+-			audio_device_cancel_authorization(dev, auth_cb,
+-								session);
+-		}
+-	}
++	if (session->control)
++		avctp_channel_destroy(session->control);
+ 
+ 	if (session->uinput >= 0) {
+ 		char address[18];
+@@ -431,7 +418,7 @@ static void avctp_set_state(struct avctp *session, avctp_state_t new_state)
+ 	}
  }
  
-@@ -597,6 +611,9 @@ static int player_get_attribute(struct avrcp_player *player, uint8_t attr)
+-static void handle_response(struct avctp *session, struct avctp_header *avctp,
++static void control_response(struct avctp *session, struct avctp_header *avctp,
+ 				struct avc_header *avc, uint8_t *operands,
+ 				size_t operand_count)
+ {
+@@ -467,7 +454,7 @@ static gboolean session_browsing_cb(GIOChannel *chan, GIOCondition cond,
+ 	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL))
+ 		goto failed;
  
- 	DBG("attr %u", attr);
+-	sock = g_io_channel_unix_get_fd(session->browsing_io);
++	sock = g_io_channel_unix_get_fd(chan);
  
-+	if (player == NULL)
-+		return -ENOENT;
-+
- 	value = player->cb->get_setting(attr, player->user_data);
- 	if (value < 0)
- 		DBG("attr %u not supported by player", attr);
-@@ -653,7 +670,7 @@ static uint8_t avrcp_handle_list_player_attributes(struct avrcp *session,
- 	uint16_t len = ntohs(pdu->params_len);
- 	unsigned int i;
+ 	ret = read(sock, buf, sizeof(buf));
+ 	if (ret <= 0)
+@@ -519,7 +506,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL))
+ 		goto failed;
  
--	if (len != 0 || player == NULL) {
-+	if (len != 0) {
- 		pdu->params_len = htons(1);
- 		pdu->params[0] = AVRCP_STATUS_INVALID_PARAM;
- 		return AVC_CTYPE_REJECTED;
-@@ -685,7 +702,7 @@ static uint8_t avrcp_handle_list_player_values(struct avrcp *session,
- 	uint16_t len = ntohs(pdu->params_len);
- 	unsigned int i;
+-	sock = g_io_channel_unix_get_fd(session->control_io);
++	sock = g_io_channel_unix_get_fd(chan);
  
--	if (len != 1 || player == NULL)
-+	if (len != 1)
- 		goto err;
+ 	ret = read(sock, buf, sizeof(buf));
+ 	if (ret <= 0)
+@@ -559,7 +546,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 			avc->opcode, operand_count);
  
- 	if (player_get_attribute(player, pdu->params[0]) < 0)
-@@ -707,6 +724,15 @@ err:
- 	return AVC_CTYPE_REJECTED;
- }
- 
-+static GList *player_list_metadata(struct avrcp_player *player)
-+{
-+	if (player != NULL)
-+		return player->cb->list_metadata(player->user_data);
-+
-+	return g_list_prepend(NULL,
-+				GUINT_TO_POINTER(AVRCP_MEDIA_ATTRIBUTE_TITLE));
-+}
-+
- static uint8_t avrcp_handle_get_element_attributes(struct avrcp *session,
- 						struct avrcp_header *pdu,
- 						uint8_t transaction)
-@@ -719,7 +745,7 @@ static uint8_t avrcp_handle_get_element_attributes(struct avrcp *session,
- 	GList *attr_ids;
- 	uint16_t offset;
- 
--	if (len < 9 || identifier != 0 || player == NULL)
-+	if (len < 9 || identifier != 0)
- 		goto err;
- 
- 	nattr = pdu->params[8];
-@@ -732,7 +758,7 @@ static uint8_t avrcp_handle_get_element_attributes(struct avrcp *session,
- 		 * Return all available information, at least
- 		 * title must be returned if there's a track selected.
- 		 */
--		attr_ids = player->cb->list_metadata(player->user_data);
-+		attr_ids = player_list_metadata(player);
- 		len = g_list_length(attr_ids);
- 	} else {
- 		unsigned int i;
-@@ -788,8 +814,7 @@ static uint8_t avrcp_handle_get_current_player_value(struct avrcp *session,
- 	uint8_t *settings;
- 	unsigned int i;
- 
--	if (player == NULL || len <= 1 || pdu->params[0] != len - 1 ||
--							player == NULL)
-+	if (len <= 1 || pdu->params[0] != len - 1)
- 		goto err;
- 
- 	/*
-@@ -922,6 +947,14 @@ err:
- 	return AVC_CTYPE_REJECTED;
- }
- 
-+static uint32_t player_get_position(struct avrcp_player *player)
-+{
-+	if (player == NULL)
-+		return 0;
-+
-+	return player->cb->get_position(player->user_data);
-+}
-+
- static uint8_t avrcp_handle_get_play_status(struct avrcp *session,
- 						struct avrcp_header *pdu,
- 						uint8_t transaction)
-@@ -932,15 +965,15 @@ static uint8_t avrcp_handle_get_play_status(struct avrcp *session,
- 	uint32_t duration;
- 	void *pduration;
- 
--	if (len != 0 || player == NULL) {
-+	if (len != 0) {
- 		pdu->params_len = htons(1);
- 		pdu->params[0] = AVRCP_STATUS_INVALID_PARAM;
- 		return AVC_CTYPE_REJECTED;
+ 	if (avctp->cr == AVCTP_RESPONSE) {
+-		handle_response(session, avctp, avc, operands, operand_count);
++		control_response(session, avctp, avc, operands, operand_count);
+ 		return TRUE;
  	}
  
--	position = player->cb->get_position(player->user_data);
--	pduration = player->cb->get_metadata(AVRCP_MEDIA_ATTRIBUTE_DURATION,
--							player->user_data);
-+	position = player_get_position(player);
-+	pduration = player_get_metadata(player,
-+					AVRCP_MEDIA_ATTRIBUTE_DURATION);
- 	if (pduration != NULL)
- 		duration = htonl(GPOINTER_TO_UINT(pduration));
- 	else
-@@ -957,6 +990,22 @@ static uint8_t avrcp_handle_get_play_status(struct avrcp *session,
- 	return AVC_CTYPE_STABLE;
+@@ -687,6 +674,16 @@ static void init_uinput(struct avctp *session)
+ 		DBG("AVRCP: uinput initialized for %s", address);
  }
  
-+static uint64_t player_get_uid(struct avrcp_player *player)
++static struct avctp_channel *avctp_channel_create(GIOChannel *io)
 +{
-+	if (player == NULL)
-+		return UINT64_MAX;
++	struct avctp_channel *chan;
 +
-+	return player->cb->get_status(player->user_data);
++	chan = g_new0(struct avctp_channel, 1);
++	chan->io = g_io_channel_ref(io);
++
++	return chan;
 +}
 +
-+static uint8_t player_get_status(struct avrcp_player *player)
-+{
-+	if (player == NULL)
-+		return AVRCP_PLAY_STATUS_STOPPED;
+ static void avctp_connect_browsing_cb(GIOChannel *chan, GError *err,
+ 							gpointer data)
+ {
+@@ -697,10 +694,7 @@ static void avctp_connect_browsing_cb(GIOChannel *chan, GError *err,
+ 
+ 	if (err) {
+ 		error("Browsing: %s", err->message);
+-		g_io_channel_shutdown(chan, TRUE, NULL);
+-		g_io_channel_unref(chan);
+-		session->browsing_io = NULL;
+-		return;
++		goto fail;
+ 	}
+ 
+ 	bt_io_get(chan, &gerr,
+@@ -711,20 +705,28 @@ static void avctp_connect_browsing_cb(GIOChannel *chan, GError *err,
+ 		error("%s", gerr->message);
+ 		g_io_channel_shutdown(chan, TRUE, NULL);
+ 		g_io_channel_unref(chan);
+-		session->browsing_io = NULL;
+ 		g_error_free(gerr);
+-		return;
++		goto fail;
+ 	}
+ 
+ 	DBG("AVCTP Browsing: connected to %s", address);
+ 
+-	if (!session->browsing_io)
+-		session->browsing_io = g_io_channel_ref(chan);
++	if (session->browsing == NULL)
++		session->browsing = avctp_channel_create(chan);
+ 
+-	session->browsing_mtu = imtu;
+-	session->browsing_io_id = g_io_add_watch(chan,
++	session->browsing->mtu = imtu;
++	session->browsing->watch = g_io_add_watch(session->browsing->io,
+ 				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+-				(GIOFunc) session_browsing_cb, session); }
++				(GIOFunc) session_browsing_cb, session);
 +
-+	return player->cb->get_status(player->user_data);
++	return;
++
++fail:
++	if (session->browsing) {
++		avctp_channel_destroy(session->browsing);
++		session->browsing = NULL;
++	}
 +}
+ 
+ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
+ {
+@@ -752,16 +754,17 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
+ 
+ 	DBG("AVCTP: connected to %s", address);
+ 
+-	if (!session->control_io)
+-		session->control_io = g_io_channel_ref(chan);
++	if (session->control == NULL)
++		session->control = avctp_channel_create(chan);
 +
- static uint8_t avrcp_handle_register_notification(struct avrcp *session,
- 						struct avrcp_header *pdu,
- 						uint8_t transaction)
-@@ -970,18 +1019,18 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
- 	 * one is applicable only for EVENT_PLAYBACK_POS_CHANGED. See AVRCP
- 	 * 1.3 spec, section 5.4.2.
- 	 */
--	if (len != 5 || player == NULL)
-+	if (len != 5)
- 		goto err;
++	session->control->mtu = imtu;
++	session->control->watch = g_io_add_watch(session->control->io,
++				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++				(GIOFunc) session_cb, session);
  
- 	switch (pdu->params[0]) {
- 	case AVRCP_EVENT_STATUS_CHANGED:
- 		len = 2;
--		pdu->params[1] = player->cb->get_status(player->user_data);
-+		pdu->params[1] = player_get_status(player);
+ 	init_uinput(session);
  
- 		break;
- 	case AVRCP_EVENT_TRACK_CHANGED:
- 		len = 9;
--		uid = player->cb->get_uid(player->user_data);
-+		uid = player_get_uid(player);
- 		memcpy(&pdu->params[1], &uid, sizeof(uint64_t));
+ 	avctp_set_state(session, AVCTP_STATE_CONNECTED);
+-	session->control_mtu = imtu;
+-	session->control_io_id = g_io_add_watch(chan,
+-				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+-				(GIOFunc) session_cb, session);
+ }
  
- 		break;
+ static void auth_cb(DBusError *derr, void *user_data)
+@@ -769,9 +772,9 @@ static void auth_cb(DBusError *derr, void *user_data)
+ 	struct avctp *session = user_data;
+ 	GError *err = NULL;
+ 
+-	if (session->control_io_id) {
+-		g_source_remove(session->control_io_id);
+-		session->control_io_id = 0;
++	if (session->control->watch > 0) {
++		g_source_remove(session->control->watch);
++		session->control->watch = 0;
+ 	}
+ 
+ 	if (derr && dbus_error_is_set(derr)) {
+@@ -780,7 +783,7 @@ static void auth_cb(DBusError *derr, void *user_data)
+ 		return;
+ 	}
+ 
+-	if (!bt_io_accept(session->control_io, avctp_connect_cb, session,
++	if (!bt_io_accept(session->control->io, avctp_connect_cb, session,
+ 								NULL, &err)) {
+ 		error("bt_io_accept: %s", err->message);
+ 		g_error_free(err);
+@@ -845,20 +848,20 @@ static struct avctp *avctp_get_internal(const bdaddr_t *src,
+ static void avctp_control_confirm(struct avctp *session, GIOChannel *chan,
+ 						struct audio_device *dev)
+ {
+-	if (session->control_io) {
++	if (session->control != NULL) {
+ 		error("Control: Refusing unexpected connect");
+ 		g_io_channel_shutdown(chan, TRUE, NULL);
+ 		return;
+ 	}
+ 
+ 	avctp_set_state(session, AVCTP_STATE_CONNECTING);
+-	session->control_io = g_io_channel_ref(chan);
++	session->control = avctp_channel_create(chan);
+ 
+ 	if (audio_device_request_authorization(dev, AVRCP_TARGET_UUID,
+ 						auth_cb, session) < 0)
+ 		goto drop;
+ 
+-	session->control_io_id = g_io_add_watch(chan, G_IO_ERR | G_IO_HUP |
++	session->control->watch = g_io_add_watch(chan, G_IO_ERR | G_IO_HUP |
+ 						G_IO_NVAL, session_cb, session);
+ 	return;
+ 
+@@ -871,7 +874,7 @@ static void avctp_browsing_confirm(struct avctp *session, GIOChannel *chan,
+ {
+ 	GError *err = NULL;
+ 
+-	if (session->control_io == NULL || session->browsing_io) {
++	if (session->control == NULL || session->browsing != NULL) {
+ 		error("Browsing: Refusing unexpected connect");
+ 		g_io_channel_shutdown(chan, TRUE, NULL);
+ 		return;
+@@ -918,8 +921,8 @@ static void avctp_confirm_cb(GIOChannel *chan, gpointer data)
+ 	DBG("AVCTP: incoming connect from %s", address);
+ 
+ 	session = avctp_get_internal(&src, &dst);
+-	if (!session)
+-		goto drop;
++	if (session == NULL)
++		return;
+ 
+ 	dev = manager_get_device(&src, &dst, FALSE);
+ 	if (!dev) {
+@@ -949,13 +952,7 @@ static void avctp_confirm_cb(GIOChannel *chan, gpointer data)
+ 	return;
+ 
+ drop:
+-	if (session && session->browsing_io)
+-		g_io_channel_unref(session->browsing_io);
+-
+-	if (session && session->control_io)
+-		g_io_channel_unref(session->control_io);
+-
+-	if (session && psm == AVCTP_CONTROL_PSM)
++	if (psm == AVCTP_CONTROL_PSM)
+ 		avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
+ }
+ 
+@@ -1093,7 +1090,7 @@ int avctp_send_passthrough(struct avctp *session, uint8_t op)
+ 	operands[0] = op & 0x7f;
+ 	operands[1] = 0;
+ 
+-	sk = g_io_channel_unix_get_fd(session->control_io);
++	sk = g_io_channel_unix_get_fd(session->control->io);
+ 
+ 	if (write(sk, buf, sizeof(buf)) < 0)
+ 		return -errno;
+@@ -1122,7 +1119,7 @@ static int avctp_send(struct avctp *session, uint8_t transaction, uint8_t cr,
+ 	if (session->state != AVCTP_STATE_CONNECTED)
+ 		return -ENOTCONN;
+ 
+-	sk = g_io_channel_unix_get_fd(session->control_io);
++	sk = g_io_channel_unix_get_fd(session->control->io);
+ 
+ 	memset(buf, 0, sizeof(buf));
+ 
+@@ -1306,7 +1303,8 @@ struct avctp *avctp_connect(const bdaddr_t *src, const bdaddr_t *dst)
+ 		return NULL;
+ 	}
+ 
+-	session->control_io = io;
++	session->control = avctp_channel_create(io);
++	g_io_channel_unref(io);
+ 
+ 	return session;
+ }
+@@ -1319,7 +1317,7 @@ int avctp_connect_browsing(struct avctp *session)
+ 	if (session->state != AVCTP_STATE_CONNECTED)
+ 		return -ENOTCONN;
+ 
+-	if (session->browsing_io != NULL)
++	if (session->browsing != NULL)
+ 		return 0;
+ 
+ 	io = bt_io_connect(avctp_connect_browsing_cb, session, NULL, &err,
+@@ -1334,14 +1332,15 @@ int avctp_connect_browsing(struct avctp *session)
+ 		return -EIO;
+ 	}
+ 
+-	session->browsing_io = io;
++	session->browsing = avctp_channel_create(io);
++	g_io_channel_unref(io);
+ 
+ 	return 0;
+ }
+ 
+ void avctp_disconnect(struct avctp *session)
+ {
+-	if (!session->control_io)
++	if (session->state == AVCTP_STATE_DISCONNECTED)
+ 		return;
+ 
+ 	avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
 -- 
 1.7.11.4
 
