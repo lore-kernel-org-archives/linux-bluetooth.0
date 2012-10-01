@@ -1,21 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-From: Srinivasa Ragavan <srinivasa.ragavan.venkateswaran@intel.com>
+From: srinivasa.ragavan.venkateswaran@intel.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Srinivasa Ragavan <srinivasa.ragavan.venkateswaran@intel.com>
 Subject: [PATCH] client: Add Message.MarkAsRead and Message.MarkAsDeleted implementation and documentation.
-Date: Mon,  1 Oct 2012 12:40:05 +0530
-Message-Id: <1349075405-31674-1-git-send-email-srinivasa.ragavan.venkateswaran@intel.com>
+Date: Mon,  1 Oct 2012 12:33:23 +0530
+Message-Id: <5069401d.e758420a.0377.6163@mx.google.com>
+In-Reply-To: <y>
+References: <y>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Srinivasa Ragavan <srinivasa.ragavan.venkateswaran@intel.com>
+
 ---
- client/map.c       |  112 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ client/map.c       |  115 +++++++++++++++++++++++++++++++++++++++++++++++++++-
  client/transfer.c  |    3 +-
- doc/client-api.txt |   11 ++++++
- 3 files changed, 125 insertions(+), 1 deletion(-)
+ doc/client-api.txt |   11 +++++
+ 3 files changed, 127 insertions(+), 2 deletions(-)
 
 diff --git a/client/map.c b/client/map.c
-index 4f07fcb..69a9a21 100644
+index 4f07fcb..a08d272 100644
 --- a/client/map.c
 +++ b/client/map.c
 @@ -26,7 +26,9 @@
@@ -56,7 +60,7 @@ index 4f07fcb..69a9a21 100644
  };
  
  struct map_parser {
-@@ -284,12 +293,115 @@ fail:
+@@ -284,12 +293,116 @@ fail:
  	return reply;
  }
  
@@ -159,7 +163,9 @@ index 4f07fcb..69a9a21 100644
 +
  static const GDBusMethodTable map_msg_methods[] = {
  	{ GDBUS_METHOD("Get",
- 			GDBUS_ARGS({ "targetfile", "s" }),
+-			GDBUS_ARGS({ "targetfile", "s" }),
++			GDBUS_ARGS({ "targetfile", "s" },
++						{ "attachment", "b" }),
  			GDBUS_ARGS({ "transfer", "o" },
  						{ "properties", "a{sv}" }),
  			map_msg_get) },
