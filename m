@@ -1,40 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 1 Oct 2012 10:12:31 +0200 (CEST)
-From: Jiri Kosina <jkosina@suse.cz>
-To: Antonio Ospite <ospite@studenti.unina.it>
-Cc: David Dillow <dave@thedillows.org>,
-	linux-bluetooth@vger.kernel.org,
-	David Herrmann <dh.herrmann@googlemail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bastien Nocera <hadess@hadess.net>, linux-input@vger.kernel.org
-Subject: Re: [PATCH v4] HID: Add support for Sony PS3 BD Remote Control
-In-Reply-To: <1348606947-3055-1-git-send-email-ospite@studenti.unina.it>
-Message-ID: <alpine.LNX.2.00.1210011012200.27440@pobox.suse.cz>
-References: <1348584182.27596.28.camel@frustration.ornl.gov> <1348606947-3055-1-git-send-email-ospite@studenti.unina.it>
+Date: Mon, 1 Oct 2012 10:52:20 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Kevin Wilson <wkevils@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: question: what is the git repository of linux bluetooth (kernel)
+ for submitting pathces ? Kevin EOM
+Message-ID: <20121001075218.GE10053@aemeltch-MOBL1>
+References: <CAGXs5wXFnr-Rc26JQ0+TuRGWinwUHM3GyWZvp37h7F6tV4UVcQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Sender: linux-input-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAGXs5wXFnr-Rc26JQ0+TuRGWinwUHM3GyWZvp37h7F6tV4UVcQ@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 25 Sep 2012, Antonio Ospite wrote:
+Hi Kevin,
 
-> From: David Dillow <dave@thedillows.org>
-> 
-> The Sony PS3 Blue-ray Disc Remote Control used to be supported by the
-> BlueZ project's user space, but the code that handled it was recently
-> removed as its functionality conflicted with a real HSP implementation
-> and the mapping was thought to be better handled in the kernel. This is
-> a port of the mapping logic from the fakehid driver by Marcel Holtmann
-> to the in-kernel HID layer.
-> 
-> We also add support for the Logitech Harmony Adapter for PS3, which
-> emulates the BD Remote.
-> 
-> Signed-off-by: David Dillow <dave@thedillows.org>
-> Signed-off-by: Antonio Ospite <ospite@studenti.unina.it>
+origin
+git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
 
-Applied, thanks.
+Best regards 
+Andrei Emeltchenko 
 
--- 
-Jiri Kosina
-SUSE Labs
+On Sun, Sep 30, 2012 at 11:02:26AM +0200, Kevin Wilson wrote:
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
