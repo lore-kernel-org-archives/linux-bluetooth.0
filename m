@@ -1,29 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 1 Oct 2012 10:52:20 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Kevin Wilson <wkevils@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: question: what is the git repository of linux bluetooth (kernel)
- for submitting pathces ? Kevin EOM
-Message-ID: <20121001075218.GE10053@aemeltch-MOBL1>
-References: <CAGXs5wXFnr-Rc26JQ0+TuRGWinwUHM3GyWZvp37h7F6tV4UVcQ@mail.gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 2/2] mgmt: Fix error code passed to bonding_complete in disconnect_complete
+Date: Mon, 1 Oct 2012 09:49:23 +0200
+Message-ID: <1349077763-26830-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1349077763-26830-1-git-send-email-szymon.janc@tieto.com>
+References: <1349077763-26830-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAGXs5wXFnr-Rc26JQ0+TuRGWinwUHM3GyWZvp37h7F6tV4UVcQ@mail.gmail.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kevin,
+bonding_complete expects mgmt status code not hci error code.
 
-origin
-git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
+---
+ src/mgmt.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Best regards 
-Andrei Emeltchenko 
+diff --git a/src/mgmt.c b/src/mgmt.c
+index 2472173..e368b8a 100644
+--- a/src/mgmt.c
++++ b/src/mgmt.c
+@@ -1166,7 +1166,7 @@ static void disconnect_complete(int sk, uint16_t index, uint8_t status,
+ 
+ 	btd_event_disconn_complete(&info->bdaddr, &rp->addr.bdaddr);
+ 
+-	bonding_complete(info, &rp->addr.bdaddr, HCI_CONNECTION_TERMINATED);
++	bonding_complete(info, &rp->addr.bdaddr, MGMT_STATUS_DISCONNECTED);
+ }
+ 
+ static void pair_device_complete(int sk, uint16_t index, uint8_t status,
+-- 
+1.7.9.5
 
-On Sun, Sep 30, 2012 at 11:02:26AM +0200, Kevin Wilson wrote:
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
