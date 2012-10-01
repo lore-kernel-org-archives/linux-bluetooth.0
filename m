@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 5/7] AVCTP: Allocate memory to hold incoming/outgoing PDUs
-Date: Mon,  1 Oct 2012 14:37:49 +0300
-Message-Id: <1349091471-17396-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 7/7] AVRCP: Don't respond with errors when no player is registered
+Date: Mon,  1 Oct 2012 14:37:51 +0300
+Message-Id: <1349091471-17396-7-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1349091471-17396-1-git-send-email-luiz.dentz@gmail.com>
 References: <1349091471-17396-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,134 +11,206 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes possible to the handler to respond asyncronous as the memory
-remains valid after it returns.
-
-In addition to that it uses the MTU to calculate the buffer size
-necessary.
+Some devices w.g. Sony MW600 will stop using certain commands if an
+error happen, so the code now just fake a player and once a real
+player is registered it takes place of the fake one.
 ---
- audio/avctp.c | 31 ++++++++++++++++++++++---------
- 1 file changed, 22 insertions(+), 9 deletions(-)
+ audio/avrcp.c | 77 ++++++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 63 insertions(+), 14 deletions(-)
 
-diff --git a/audio/avctp.c b/audio/avctp.c
-index dfc5601..baf5da0 100644
---- a/audio/avctp.c
-+++ b/audio/avctp.c
-@@ -134,7 +134,9 @@ struct avctp_rsp_handler {
- struct avctp_channel {
- 	GIOChannel *io;
- 	guint watch;
--	uint16_t mtu;
-+	uint16_t imtu;
-+	uint16_t omtu;
-+	uint8_t *buffer;
- };
- 
- struct avctp {
-@@ -341,6 +343,7 @@ static void avctp_channel_destroy(struct avctp_channel *chan)
- 	if (chan->watch)
- 		g_source_remove(chan->watch);
- 
-+	g_free(chan->buffer);
- 	g_free(chan);
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index 21d105a..6b426f5 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -477,6 +477,17 @@ void avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data)
+ 	return;
  }
  
-@@ -447,7 +450,9 @@ static gboolean session_browsing_cb(GIOChannel *chan, GIOCondition cond,
- 				gpointer data)
++static void *player_get_metadata(struct avrcp_player *player, uint32_t attr)
++{
++	if (player != NULL)
++		return player->cb->get_metadata(attr, player->user_data);
++
++	if (attr == AVRCP_MEDIA_ATTRIBUTE_TITLE)
++		return "";
++
++	return NULL;
++}
++
+ static uint16_t player_write_media_attribute(struct avrcp_player *player,
+ 						uint32_t id, uint8_t *buf,
+ 						uint16_t *pos,
+@@ -489,7 +500,7 @@ static uint16_t player_write_media_attribute(struct avrcp_player *player,
+ 
+ 	DBG("%u", id);
+ 
+-	value = player->cb->get_metadata(id, player->user_data);
++	value = player_get_metadata(player, id);
+ 	if (value == NULL) {
+ 		*offset = 0;
+ 		return 0;
+@@ -588,6 +599,9 @@ static int player_set_attribute(struct avrcp_player *player,
  {
- 	struct avctp *session = data;
--	uint8_t buf[1024], *operands;
-+	struct avctp_channel *browsing = session->browsing;
-+	uint8_t *buf = browsing->buffer;
-+	uint8_t *operands;
- 	struct avctp_header *avctp;
- 	int sock, ret, packet_size, operand_count;
+ 	DBG("Change attribute: %u %u", attr, val);
  
-@@ -456,7 +461,7 @@ static gboolean session_browsing_cb(GIOChannel *chan, GIOCondition cond,
++	if (player == NULL)
++		return -ENOENT;
++
+ 	return player->cb->set_setting(attr, val, player->user_data);
+ }
  
- 	sock = g_io_channel_unix_get_fd(chan);
+@@ -597,6 +611,9 @@ static int player_get_attribute(struct avrcp_player *player, uint8_t attr)
  
--	ret = read(sock, buf, sizeof(buf));
-+	ret = read(sock, buf, sizeof(browsing->imtu));
- 	if (ret <= 0)
- 		goto failed;
+ 	DBG("attr %u", attr);
  
-@@ -497,7 +502,9 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
- 				gpointer data)
- {
- 	struct avctp *session = data;
--	uint8_t buf[1024], *operands, code, subunit;
-+	struct avctp_channel *control = session->control;
-+	uint8_t *buf = control->buffer;
-+	uint8_t *operands, code, subunit;
- 	struct avctp_header *avctp;
- 	struct avc_header *avc;
- 	int ret, packet_size, operand_count, sock;
-@@ -508,7 +515,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
++	if (player == NULL)
++		return -ENOENT;
++
+ 	value = player->cb->get_setting(attr, player->user_data);
+ 	if (value < 0)
+ 		DBG("attr %u not supported by player", attr);
+@@ -653,7 +670,7 @@ static uint8_t avrcp_handle_list_player_attributes(struct avrcp *session,
+ 	uint16_t len = ntohs(pdu->params_len);
+ 	unsigned int i;
  
- 	sock = g_io_channel_unix_get_fd(chan);
+-	if (len != 0 || player == NULL) {
++	if (len != 0) {
+ 		pdu->params_len = htons(1);
+ 		pdu->params[0] = AVRCP_STATUS_INVALID_PARAM;
+ 		return AVC_CTYPE_REJECTED;
+@@ -685,7 +702,7 @@ static uint8_t avrcp_handle_list_player_values(struct avrcp *session,
+ 	uint16_t len = ntohs(pdu->params_len);
+ 	unsigned int i;
  
--	ret = read(sock, buf, sizeof(buf));
-+	ret = read(sock, buf, control->imtu);
- 	if (ret <= 0)
- 		goto failed;
+-	if (len != 1 || player == NULL)
++	if (len != 1)
+ 		goto err;
  
-@@ -689,7 +696,7 @@ static void avctp_connect_browsing_cb(GIOChannel *chan, GError *err,
- {
- 	struct avctp *session = data;
- 	char address[18];
--	uint16_t imtu;
-+	uint16_t imtu, omtu;
- 	GError *gerr = NULL;
+ 	if (player_get_attribute(player, pdu->params[0]) < 0)
+@@ -707,6 +724,15 @@ err:
+ 	return AVC_CTYPE_REJECTED;
+ }
  
- 	if (err) {
-@@ -700,6 +707,7 @@ static void avctp_connect_browsing_cb(GIOChannel *chan, GError *err,
- 	bt_io_get(chan, &gerr,
- 			BT_IO_OPT_DEST, &address,
- 			BT_IO_OPT_IMTU, &imtu,
-+			BT_IO_OPT_OMTU, &omtu,
- 			BT_IO_OPT_INVALID);
- 	if (gerr) {
- 		error("%s", gerr->message);
-@@ -714,7 +722,9 @@ static void avctp_connect_browsing_cb(GIOChannel *chan, GError *err,
- 	if (session->browsing == NULL)
- 		session->browsing = avctp_channel_create(chan);
++static GList *player_list_metadata(struct avrcp_player *player)
++{
++	if (player != NULL)
++		return player->cb->list_metadata(player->user_data);
++
++	return g_list_prepend(NULL,
++				GUINT_TO_POINTER(AVRCP_MEDIA_ATTRIBUTE_TITLE));
++}
++
+ static uint8_t avrcp_handle_get_element_attributes(struct avrcp *session,
+ 						struct avrcp_header *pdu,
+ 						uint8_t transaction)
+@@ -719,7 +745,7 @@ static uint8_t avrcp_handle_get_element_attributes(struct avrcp *session,
+ 	GList *attr_ids;
+ 	uint16_t offset;
  
--	session->browsing->mtu = imtu;
-+	session->browsing->imtu = imtu;
-+	session->browsing->omtu = omtu;
-+	session->browsing->buffer = g_malloc0(MAX(imtu, omtu));
- 	session->browsing->watch = g_io_add_watch(session->browsing->io,
- 				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
- 				(GIOFunc) session_browsing_cb, session);
-@@ -732,7 +742,7 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
- {
- 	struct avctp *session = data;
- 	char address[18];
--	uint16_t imtu;
-+	uint16_t imtu, omtu;
- 	GError *gerr = NULL;
+-	if (len < 9 || identifier != 0 || player == NULL)
++	if (len < 9 || identifier != 0)
+ 		goto err;
  
- 	if (err) {
-@@ -744,6 +754,7 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
- 	bt_io_get(chan, &gerr,
- 			BT_IO_OPT_DEST, &address,
- 			BT_IO_OPT_IMTU, &imtu,
-+			BT_IO_OPT_IMTU, &omtu,
- 			BT_IO_OPT_INVALID);
- 	if (gerr) {
- 		avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
-@@ -757,7 +768,9 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
- 	if (session->control == NULL)
- 		session->control = avctp_channel_create(chan);
+ 	nattr = pdu->params[8];
+@@ -732,7 +758,7 @@ static uint8_t avrcp_handle_get_element_attributes(struct avrcp *session,
+ 		 * Return all available information, at least
+ 		 * title must be returned if there's a track selected.
+ 		 */
+-		attr_ids = player->cb->list_metadata(player->user_data);
++		attr_ids = player_list_metadata(player);
+ 		len = g_list_length(attr_ids);
+ 	} else {
+ 		unsigned int i;
+@@ -788,8 +814,7 @@ static uint8_t avrcp_handle_get_current_player_value(struct avrcp *session,
+ 	uint8_t *settings;
+ 	unsigned int i;
  
--	session->control->mtu = imtu;
-+	session->control->imtu = imtu;
-+	session->control->omtu = omtu;
-+	session->control->buffer = g_malloc0(MAX(imtu, omtu));
- 	session->control->watch = g_io_add_watch(session->control->io,
- 				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
- 				(GIOFunc) session_cb, session);
+-	if (player == NULL || len <= 1 || pdu->params[0] != len - 1 ||
+-							player == NULL)
++	if (len <= 1 || pdu->params[0] != len - 1)
+ 		goto err;
+ 
+ 	/*
+@@ -922,6 +947,14 @@ err:
+ 	return AVC_CTYPE_REJECTED;
+ }
+ 
++static uint32_t player_get_position(struct avrcp_player *player)
++{
++	if (player == NULL)
++		return 0;
++
++	return player->cb->get_position(player->user_data);
++}
++
+ static uint8_t avrcp_handle_get_play_status(struct avrcp *session,
+ 						struct avrcp_header *pdu,
+ 						uint8_t transaction)
+@@ -932,15 +965,15 @@ static uint8_t avrcp_handle_get_play_status(struct avrcp *session,
+ 	uint32_t duration;
+ 	void *pduration;
+ 
+-	if (len != 0 || player == NULL) {
++	if (len != 0) {
+ 		pdu->params_len = htons(1);
+ 		pdu->params[0] = AVRCP_STATUS_INVALID_PARAM;
+ 		return AVC_CTYPE_REJECTED;
+ 	}
+ 
+-	position = player->cb->get_position(player->user_data);
+-	pduration = player->cb->get_metadata(AVRCP_MEDIA_ATTRIBUTE_DURATION,
+-							player->user_data);
++	position = player_get_position(player);
++	pduration = player_get_metadata(player,
++					AVRCP_MEDIA_ATTRIBUTE_DURATION);
+ 	if (pduration != NULL)
+ 		duration = htonl(GPOINTER_TO_UINT(pduration));
+ 	else
+@@ -957,6 +990,22 @@ static uint8_t avrcp_handle_get_play_status(struct avrcp *session,
+ 	return AVC_CTYPE_STABLE;
+ }
+ 
++static uint64_t player_get_uid(struct avrcp_player *player)
++{
++	if (player == NULL)
++		return UINT64_MAX;
++
++	return player->cb->get_status(player->user_data);
++}
++
++static uint8_t player_get_status(struct avrcp_player *player)
++{
++	if (player == NULL)
++		return AVRCP_PLAY_STATUS_STOPPED;
++
++	return player->cb->get_status(player->user_data);
++}
++
+ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+ 						struct avrcp_header *pdu,
+ 						uint8_t transaction)
+@@ -970,18 +1019,18 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+ 	 * one is applicable only for EVENT_PLAYBACK_POS_CHANGED. See AVRCP
+ 	 * 1.3 spec, section 5.4.2.
+ 	 */
+-	if (len != 5 || player == NULL)
++	if (len != 5)
+ 		goto err;
+ 
+ 	switch (pdu->params[0]) {
+ 	case AVRCP_EVENT_STATUS_CHANGED:
+ 		len = 2;
+-		pdu->params[1] = player->cb->get_status(player->user_data);
++		pdu->params[1] = player_get_status(player);
+ 
+ 		break;
+ 	case AVRCP_EVENT_TRACK_CHANGED:
+ 		len = 9;
+-		uid = player->cb->get_uid(player->user_data);
++		uid = player_get_uid(player);
+ 		memcpy(&pdu->params[1], &uid, sizeof(uint64_t));
+ 
+ 		break;
 -- 
 1.7.11.4
 
