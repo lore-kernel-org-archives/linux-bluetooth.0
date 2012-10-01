@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 11/15] thermometer: Add common function to write characteristics CCC
-Date: Mon, 1 Oct 2012 11:23:53 +0200
-Message-ID: <1349083437-23528-12-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 07/15] thermometer: Reformat MeasurementReceived description
+Date: Mon, 1 Oct 2012 11:23:49 +0200
+Message-ID: <1349083437-23528-8-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1349083437-23528-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1349083437-23528-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,184 +12,91 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There are now few separate functions to write CCC for measurement
-characteristics which looks similar. This patch adds common function
-to write given value into CCC for given characteristics and leaves
-dedicated functions to act only as simple wrappers.
----
- profiles/thermometer/thermometer.c | 108 ++++++++-----------------------------
- 1 file changed, 23 insertions(+), 85 deletions(-)
+MeasurementReceived method description is reformatted to be more
+readable and consistent with other API documents.
 
-diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
-index 27effc3..43c14b0 100644
---- a/profiles/thermometer/thermometer.c
-+++ b/profiles/thermometer/thermometer.c
-@@ -376,7 +376,7 @@ static void valid_range_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
- 	change_property(desc->ch->t, "Minimum", &min);
- }
+Special values for Exponent and Mantissa fields specify now only NaN
+value as this is only special value defined by HTS specification for
+measurement.
+---
+ doc/thermometer-api.txt | 67 +++++++++++++++++++++++++++----------------------
+ 1 file changed, 37 insertions(+), 30 deletions(-)
+
+diff --git a/doc/thermometer-api.txt b/doc/thermometer-api.txt
+index 1828811..0fb28f5 100644
+--- a/doc/thermometer-api.txt
++++ b/doc/thermometer-api.txt
+@@ -97,33 +97,40 @@ Service		unique name
+ Interface	org.bluez.ThermometerWatcher
+ Object path	freely definable
  
--static void measurement_cb(guint8 status, const guint8 *pdu,
-+static void write_ccc_cb(guint8 status, const guint8 *pdu,
- 						guint16 len, gpointer user_data)
- {
- 	char *msg = user_data;
-@@ -426,7 +426,7 @@ static void process_thermometer_desc(struct descriptor *desc)
- 
- 		att_put_u16(val, atval);
- 		gatt_write_char(ch->t->attrib, desc->handle, atval, 2,
--							measurement_cb, msg);
-+							write_ccc_cb, msg);
- 		return;
- 	}
- 
-@@ -720,9 +720,8 @@ static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
- 	return write_attr_interval(t, msg, value);
- }
- 
--static void enable_final_measurement(gpointer data, gpointer user_data)
-+static void write_ccc(struct thermometer *t, const char *uuid, uint16_t value)
- {
--	struct thermometer *t = data;
- 	struct characteristic *ch;
- 	struct descriptor *desc;
- 	bt_uuid_t btuuid;
-@@ -732,116 +731,55 @@ static void enable_final_measurement(gpointer data, gpointer user_data)
- 	if (t->attrib == NULL)
- 		return;
- 
--	ch = get_characteristic(t, TEMPERATURE_MEASUREMENT_UUID);
-+	ch = get_characteristic(t, uuid);
- 	if (ch == NULL) {
--		DBG("Temperature measurement characteristic not found");
-+		DBG("Characteristic %s not found", uuid);
- 		return;
- 	}
- 
- 	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
- 	desc = get_descriptor(ch, &btuuid);
- 	if (desc == NULL) {
--		DBG("Client characteristic configuration descriptor not found");
-+		DBG("CCC descriptor for %s not found", uuid);
- 		return;
- 	}
- 
--	atval[0] = 0x02;
--	atval[1] = 0x00;
--	msg = g_strdup("Enable final measurement");
--	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
-+	att_put_u16(value, atval);
+-Methods		void MeasurementReceived(dict measure)
+-
+-			This callback gets called when a measure has been
+-			scanned	in the thermometer. The Time entry in the dict
+-			will be only present if the device supports storing of
+-			data. The time value is expressed in seconds since epoch.
+-			The value represented is (mantissa) x (10**exponent)
+-			See foot note for special values when treating with
+-			health devices. The Type entry is only present if the
+-			measurement type is known. Otherwise, it is undefined.
+-
+-			Dict is defined as below:
+-			{
+-				"Exponent" : int8,
+-				"Mantissa" : int32,
+-				"Unit" : ("Celsius" or "Fahrenheit"),
+-				"Time" : uint64,
+-				"Type" : ("Armpit", "Body", "Ear", "Finger",
+-					"Intestines", "Mouth", "Rectum", "Toe",
+-					"Tympanum"),
+-				"Measurement" : ("Final" or "Intermediate"),
+-			}
+-
+-			For special cases, the exponent shall always be zero and
+-			the mantissa should be one of following values:
+-
+-			NRes = -(2**23)
+-			NaN = +(2**23-1)
+-			INFINITY = (2**23-2)
+-			-INFINITY = -(2**23-2)
++Methods		void MeasurementReceived(dict measurement)
 +
-+	msg = g_strdup_printf("Write CCC: %04x for %s", value, uuid);
++			This callback gets called when a measurement has been
++			scanned in the thermometer.
 +
-+	gatt_write_char(t->attrib, desc->handle, atval, sizeof(atval),
-+							write_ccc_cb, msg);
- }
- 
--static void enable_intermediate_measurement(gpointer data, gpointer user_data)
-+static void enable_final_measurement(gpointer data, gpointer user_data)
- {
- 	struct thermometer *t = data;
--	struct characteristic *ch;
--	struct descriptor *desc;
--	bt_uuid_t btuuid;
--	uint8_t atval[2];
--	char *msg;
--
--	if (t->attrib == NULL || !t->intermediate)
--		return;
- 
--	ch = get_characteristic(t, INTERMEDIATE_TEMPERATURE_UUID);
--	if (ch == NULL) {
--		DBG("Intermediate measurement characteristic not found");
--		return;
--	}
-+	write_ccc(t, TEMPERATURE_MEASUREMENT_UUID,
-+					GATT_CLIENT_CHARAC_CFG_IND_BIT);
-+}
- 
--	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
--	desc = get_descriptor(ch, &btuuid);
--	if (desc == NULL) {
--		DBG("Client characteristic configuration descriptor not found");
--		return;
--	}
-+static void enable_intermediate_measurement(gpointer data, gpointer user_data)
-+{
-+	struct thermometer *t = data;
- 
--	atval[0] = 0x01;
--	atval[1] = 0x00;
--	msg = g_strdup("Enable intermediate measurement");
--	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
-+	write_ccc(t, INTERMEDIATE_TEMPERATURE_UUID,
-+					GATT_CLIENT_CHARAC_CFG_NOTIF_BIT);
- }
- 
- static void disable_final_measurement(gpointer data, gpointer user_data)
- {
- 	struct thermometer *t = data;
--	struct characteristic *ch;
--	struct descriptor *desc;
--	bt_uuid_t btuuid;
--	uint8_t atval[2];
--	char *msg;
- 
--	if (t->attrib == NULL)
--		return;
--
--	ch = get_characteristic(t, TEMPERATURE_MEASUREMENT_UUID);
--	if (ch == NULL) {
--		DBG("Temperature measurement characteristic not found");
--		return;
--	}
--
--	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
--	desc = get_descriptor(ch, &btuuid);
--	if (desc == NULL) {
--		DBG("Client characteristic configuration descriptor not found");
--		return;
--	}
--
--	atval[0] = 0x00;
--	atval[1] = 0x00;
--	msg = g_strdup("Disable final measurement");
--	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
-+	write_ccc(t, TEMPERATURE_MEASUREMENT_UUID, 0x0000);
- }
- 
- static void disable_intermediate_measurement(gpointer data, gpointer user_data)
- {
- 	struct thermometer *t = data;
--	struct characteristic *ch;
--	struct descriptor *desc;
--	bt_uuid_t btuuid;
--	uint8_t atval[2];
--	char *msg;
--
--	if (t->attrib == NULL)
--		return;
--
--	ch = get_characteristic(t, INTERMEDIATE_TEMPERATURE_UUID);
--	if (ch == NULL) {
--		DBG("Intermediate measurement characteristic not found");
--		return;
--	}
--
--	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
--	desc = get_descriptor(ch, &btuuid);
--	if (desc == NULL) {
--		DBG("Client characteristic configuration descriptor not found");
--		return;
--	}
- 
--	atval[0] = 0x00;
--	atval[1] = 0x00;
--	msg = g_strdup("Disable intermediate measurement");
--	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
-+	write_ccc(t, INTERMEDIATE_TEMPERATURE_UUID, 0x0000);
- }
- 
- static void remove_int_watcher(struct thermometer_adapter *tadapter,
++			Measurement:
++
++				int16 Exponent:
++				int32 Mantissa:
++
++					Measurement value is calculated as
++					(Mantissa) x (10^Exponent)
++
++					In case of invalid or missing data,
++					Exponent is set to 0 and Mantissa is
++					set to 2^23-1 (0x7FFFFF hexadecimal).
++
++				string Unit:
++
++					Possible values: "Celsius" or "Fahrenheit"
++
++				uint64 Time (optional):
++
++					Time of measurement, if supported by device.
++					Expressed in seconds since epoch.
++
++				string Type (optional):
++
++					Only present if measurement type is known.
++
++					Possible values: "Armpit", "Body", "Ear",
++						"Finger", "Intestines", "Mouth",
++						"Rectum", "Toe", "Tympanum"
++
++				string Measurement:
++
++					Possible values: "Final" or "Intermediate"
 -- 
 1.7.11.3
 
