@@ -1,31 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 1 Oct 2012 11:46:51 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	sunnyk@codeaurora.org
-Subject: Re: [RFCv1 17/20] Bluetooth: Ignore BR/EDR packet size constraints
- when fragmenting for AMP
-Message-ID: <20121001084649.GM10053@aemeltch-MOBL1>
-References: <1347387691-5285-1-git-send-email-mathewm@codeaurora.org>
- <1347387691-5285-18-git-send-email-mathewm@codeaurora.org>
+Date: Mon, 1 Oct 2012 11:42:41 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v0 0/4] Fix losing Service Changed indication
+Message-ID: <20121001084241.GC22036@x220>
+References: <1348843674-10878-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1347387691-5285-18-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1348843674-10878-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Claudio,
 
-On Tue, Sep 11, 2012 at 11:21:28AM -0700, Mat Martineau wrote:
-> When operating over BR/EDR, ERTM accounts for the maximum over-the-air
-> packet size when setting the PDU size.  AMP controllers do not use the
-> same over-the-air packets, so the PDU size should only be based on the
-> HCI MTU of the AMP controller.
+On Fri, Sep 28, 2012, Claudio Takahasi wrote:
+> Apply after:
+> "gatt: Remove reading Service Changed characteristic after connected"
+> sent from Andrzej Kaczmarek
 > 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> This patch series adds Service Changed characteristic handle storage
+> allowing GATT service to manage Service Changed indication when the
+> connection is established.
+> 
+> The patch to remove the entry from "gatt" file will be sent in the next
+> patch series. It is unclear to me if we need to extend the device or
+> profile drive to indicate that the device is being removed/purged from
+> the system or if the expected implementation is to move to per-device
+> storage(TODO file). At the moment, it is not possible to detect in the
+> drivers remove callback if the device is being removed from the system
+> or if it bluetoothd is exiting.
+> 
+> 
+> Claudio Takahasi (4):
+>   gatt: Remove unneeded handle range check
+>   gatt: Ignore Service Changed if not bonded
+>   gatt: Add storing Service Changed handle
+>   gatt: Add reading stored Service Changed handle
+> 
+>  profiles/gatt/gas.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 83 insertions(+), 7 deletions(-)
 
-Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com> 
+All patches in this set have been applied. Thanks.
 
-Best regards 
-Andrei Emeltchenko 
+Johan
