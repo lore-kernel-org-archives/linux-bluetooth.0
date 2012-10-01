@@ -1,42 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 1 Oct 2012 11:29:24 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	sunnyk@codeaurora.org
-Subject: Re: [RFCv1 01/20] Bluetooth: Add new l2cap_chan struct members for
- high speed channels
-Message-ID: <20121001082922.GJ10053@aemeltch-MOBL1>
-References: <1347387691-5285-1-git-send-email-mathewm@codeaurora.org>
- <1347387691-5285-2-git-send-email-mathewm@codeaurora.org>
+Date: Mon, 1 Oct 2012 10:24:01 +0200 (CEST)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: David Dillow <dave@thedillows.org>,
+	linux-bluetooth@vger.kernel.org,
+	David Herrmann <dh.herrmann@googlemail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bastien Nocera <hadess@hadess.net>, linux-input@vger.kernel.org
+Subject: Re: [PATCH v4] HID: Add support for Sony PS3 BD Remote Control
+In-Reply-To: <20121001101938.d7736c5e1faf179cb06dcd9a@studenti.unina.it>
+Message-ID: <alpine.LNX.2.00.1210011023380.27440@pobox.suse.cz>
+References: <1348584182.27596.28.camel@frustration.ornl.gov> <1348606947-3055-1-git-send-email-ospite@studenti.unina.it> <20121001101938.d7736c5e1faf179cb06dcd9a@studenti.unina.it>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1347387691-5285-2-git-send-email-mathewm@codeaurora.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Mon, 1 Oct 2012, Antonio Ospite wrote:
 
-On Tue, Sep 11, 2012 at 11:21:12AM -0700, Mat Martineau wrote:
-> An L2CAP channel using high speed continues to be associated with a
-> BR/EDR l2cap_conn, while also tracking an additional hci_conn
-> (representing a physical link on a high speed controller) and hci_chan
-> (representing a logical link).  There may only be one physical link
-> between two high speed controllers.  Each physical link may contain
-> several logical links, with each logical link representing a channel
-> with specific quality of service.
+> Ping.
 > 
-> During a channel move, the destination channel id, current move state,
-> and role (initiator vs. responder) are tracked and used by the channel
-> move state machine.  The ident value associated with a move request
-> must also be stored in order to use it in later move responses.
-> 
-> The active channel is stored in local_amp_id.
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> Jiri, I see that linux-3.6 is out, can we have this in for 3.7-rc1?
 
-Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+As replied earlier today, it's in my for-next branch and I'll be pushing 
+that for 3.7-rc1.
 
-Best regards 
-Andrei Emeltchenko 
-
+-- 
+Jiri Kosina
+SUSE Labs
