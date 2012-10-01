@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 07/15] thermometer: Reformat MeasurementReceived description
-Date: Mon, 1 Oct 2012 11:23:49 +0200
-Message-ID: <1349083437-23528-8-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 04/15] thermometer: Include remote device information in MeasurementReceived
+Date: Mon, 1 Oct 2012 11:23:46 +0200
+Message-ID: <1349083437-23528-5-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1349083437-23528-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1349083437-23528-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,91 +12,67 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-MeasurementReceived method description is reformatted to be more
-readable and consistent with other API documents.
+Since watchers are now registered per-adapter it's necessary to include
+remote device information in MeasurementReceived callback.
 
-Special values for Exponent and Mantissa fields specify now only NaN
-value as this is only special value defined by HTS specification for
-measurement.
+This patch adds parameter to MeasurementReceived method which is an
+object path to remote device object.
 ---
- doc/thermometer-api.txt | 67 +++++++++++++++++++++++++++----------------------
- 1 file changed, 37 insertions(+), 30 deletions(-)
+ profiles/thermometer/thermometer.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/doc/thermometer-api.txt b/doc/thermometer-api.txt
-index 1828811..0fb28f5 100644
---- a/doc/thermometer-api.txt
-+++ b/doc/thermometer-api.txt
-@@ -97,33 +97,40 @@ Service		unique name
- Interface	org.bluez.ThermometerWatcher
- Object path	freely definable
+diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
+index 4eb67a7..f0c1d67 100644
+--- a/profiles/thermometer/thermometer.c
++++ b/profiles/thermometer/thermometer.c
+@@ -101,13 +101,14 @@ struct watcher {
+ };
  
--Methods		void MeasurementReceived(dict measure)
--
--			This callback gets called when a measure has been
--			scanned	in the thermometer. The Time entry in the dict
--			will be only present if the device supports storing of
--			data. The time value is expressed in seconds since epoch.
--			The value represented is (mantissa) x (10**exponent)
--			See foot note for special values when treating with
--			health devices. The Type entry is only present if the
--			measurement type is known. Otherwise, it is undefined.
--
--			Dict is defined as below:
--			{
--				"Exponent" : int8,
--				"Mantissa" : int32,
--				"Unit" : ("Celsius" or "Fahrenheit"),
--				"Time" : uint64,
--				"Type" : ("Armpit", "Body", "Ear", "Finger",
--					"Intestines", "Mouth", "Rectum", "Toe",
--					"Tympanum"),
--				"Measurement" : ("Final" or "Intermediate"),
--			}
--
--			For special cases, the exponent shall always be zero and
--			the mantissa should be one of following values:
--
--			NRes = -(2**23)
--			NaN = +(2**23-1)
--			INFINITY = (2**23-2)
--			-INFINITY = -(2**23-2)
-+Methods		void MeasurementReceived(dict measurement)
+ struct measurement {
+-	int16_t		exp;
+-	int32_t		mant;
+-	uint64_t	time;
+-	gboolean	suptime;
+-	char		*unit;
+-	char		*type;
+-	char		*value;
++	struct thermometer	*t;
++	int16_t			exp;
++	int32_t			mant;
++	uint64_t		time;
++	gboolean		suptime;
++	char			*unit;
++	char			*type;
++	char			*value;
+ };
+ 
+ struct tmp_interval_data {
+@@ -1027,6 +1028,7 @@ static void update_watcher(gpointer data, gpointer user_data)
+ {
+ 	struct watcher *w = data;
+ 	struct measurement *m = user_data;
++	const gchar *path = device_get_path(m->t->dev);
+ 	DBusMessageIter iter;
+ 	DBusMessageIter dict;
+ 	DBusMessage *msg;
+@@ -1039,6 +1041,8 @@ static void update_watcher(gpointer data, gpointer user_data)
+ 
+ 	dbus_message_iter_init_append(msg, &iter);
+ 
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH , &path);
 +
-+			This callback gets called when a measurement has been
-+			scanned in the thermometer.
+ 	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+ 			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+ 			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+@@ -1064,6 +1068,8 @@ static void recv_measurement(struct thermometer *t, struct measurement *m)
+ {
+ 	GSList *wlist;
+ 
++	m->t = t;
 +
-+			Measurement:
-+
-+				int16 Exponent:
-+				int32 Mantissa:
-+
-+					Measurement value is calculated as
-+					(Mantissa) x (10^Exponent)
-+
-+					In case of invalid or missing data,
-+					Exponent is set to 0 and Mantissa is
-+					set to 2^23-1 (0x7FFFFF hexadecimal).
-+
-+				string Unit:
-+
-+					Possible values: "Celsius" or "Fahrenheit"
-+
-+				uint64 Time (optional):
-+
-+					Time of measurement, if supported by device.
-+					Expressed in seconds since epoch.
-+
-+				string Type (optional):
-+
-+					Only present if measurement type is known.
-+
-+					Possible values: "Armpit", "Body", "Ear",
-+						"Finger", "Intestines", "Mouth",
-+						"Rectum", "Toe", "Tympanum"
-+
-+				string Measurement:
-+
-+					Possible values: "Final" or "Intermediate"
+ 	if (g_strcmp0(m->value, "Intermediate") == 0)
+ 		wlist = t->tadapter->iwatchers;
+ 	else
 -- 
 1.7.11.3
 
