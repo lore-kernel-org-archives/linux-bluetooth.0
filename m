@@ -4,205 +4,32 @@ From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ v8 8/8] core: Suspend scanning before connect on pairing
-Date: Mon,  1 Oct 2012 18:24:11 -0300
-Message-Id: <1349126651-749-8-git-send-email-jprvita@openbossa.org>
+Subject: [PATCH BlueZ v8 7/8] mgmt: Add address type to bonding debug message
+Date: Mon,  1 Oct 2012 18:24:10 -0300
+Message-Id: <1349126651-749-7-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1349126651-749-1-git-send-email-jprvita@openbossa.org>
 References: <1349126651-749-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If there is a disconnected bonded device there will be a scanning
-procedure active due to the General Connection Establishment Procedure.
-This scan have to be suspended before trying to connect to the remote
-device for pairing.
 ---
- src/device.c | 137 +++++++++++++++++++++++++++++++----------------------------
- 1 file changed, 72 insertions(+), 65 deletions(-)
+ src/mgmt.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/src/device.c b/src/device.c
-index dccec4f..cf8ade1 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2020,6 +2020,36 @@ done:
- 	browse_request_free(req);
- }
+diff --git a/src/mgmt.c b/src/mgmt.c
+index fc0e5e4..4354dc4 100644
+--- a/src/mgmt.c
++++ b/src/mgmt.c
+@@ -2383,7 +2383,8 @@ int mgmt_create_bonding(int index, bdaddr_t *bdaddr, uint8_t addr_type, uint8_t
+ 	char addr[18];
  
-+static void bonding_request_free(struct bonding_req *bonding)
-+{
-+	struct btd_device *device;
-+
-+	if (!bonding)
-+		return;
-+
-+	if (bonding->listener_id)
-+		g_dbus_remove_watch(btd_get_dbus_connection(),
-+							bonding->listener_id);
-+
-+	if (bonding->msg)
-+		dbus_message_unref(bonding->msg);
-+
-+	device = bonding->device;
-+	g_free(bonding);
-+
-+	if (!device)
-+		return;
-+
-+	device->bonding = NULL;
-+
-+	if (!device->agent)
-+		return;
-+
-+	agent_cancel(device->agent);
-+	agent_free(device->agent);
-+	device->agent = NULL;
-+}
-+
- static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- {
- 	struct att_callbacks *attcb = user_data;
-@@ -2049,6 +2079,21 @@ static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ 	ba2str(bdaddr, addr);
+-	DBG("hci%d bdaddr %s io_cap 0x%02x", index, addr, io_cap);
++	DBG("hci%d bdaddr %s type %d io_cap 0x%02x",
++					index, addr, addr_type, io_cap);
  
- 	if (attcb->success)
- 		attcb->success(user_data);
-+
-+	if (device->bonding) {
-+		/* this is a LE device during pairing */
-+		int err = adapter_create_bonding(device->adapter,
-+				&device->bdaddr, device->bdaddr_type,
-+				agent_get_io_capability(device->agent));
-+		if (err < 0) {
-+			DBusMessage *reply = btd_error_failed(
-+					device->bonding->msg, strerror(-err));
-+			g_dbus_send_message(btd_get_dbus_connection(), reply);
-+			bonding_request_cancel(device->bonding);
-+			bonding_request_free(device->bonding);
-+		}
-+	}
-+
- done:
- 	g_free(attcb);
- }
-@@ -2107,6 +2152,23 @@ GIOChannel *device_att_connect(gpointer user_data)
- 					BT_IO_OPT_PSM, ATT_PSM,
- 					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
- 					BT_IO_OPT_INVALID);
-+	} else if (device->bonding) {
-+		/* this is a LE device during pairing, using low sec level */
-+		io = bt_io_connect(att_connect_cb,
-+				attcb, NULL, &gerr,
-+				BT_IO_OPT_SOURCE_BDADDR, &sba,
-+				BT_IO_OPT_DEST_BDADDR, &device->bdaddr,
-+				BT_IO_OPT_DEST_TYPE, device->bdaddr_type,
-+				BT_IO_OPT_CID, ATT_CID,
-+				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-+				BT_IO_OPT_INVALID);
-+		if (io == NULL) {
-+			DBusMessage *reply = btd_error_failed(
-+					device->bonding->msg, gerr->message);
-+			g_dbus_send_message(btd_get_dbus_connection(), reply);
-+			bonding_request_cancel(device->bonding);
-+			bonding_request_free(device->bonding);
-+		}
- 	} else {
- 		io = bt_io_connect(att_connect_cb,
- 				attcb, NULL, &gerr,
-@@ -2429,36 +2491,6 @@ static DBusMessage *new_authentication_return(DBusMessage *msg, uint8_t status)
- 	}
- }
- 
--static void bonding_request_free(struct bonding_req *bonding)
--{
--	struct btd_device *device;
--
--	if (!bonding)
--		return;
--
--	if (bonding->listener_id)
--		g_dbus_remove_watch(btd_get_dbus_connection(),
--							bonding->listener_id);
--
--	if (bonding->msg)
--		dbus_message_unref(bonding->msg);
--
--	device = bonding->device;
--	g_free(bonding);
--
--	if (!device)
--		return;
--
--	device->bonding = NULL;
--
--	if (!device->agent)
--		return;
--
--	agent_cancel(device->agent);
--	agent_free(device->agent);
--	device->agent = NULL;
--}
--
- void device_set_paired(struct btd_device *device, gboolean value)
- {
- 	if (device->paired == value)
-@@ -2548,41 +2580,6 @@ DBusMessage *device_create_bonding(struct btd_device *device,
- 	if (device_is_bonded(device))
- 		return btd_error_already_exists(msg);
- 
--	if (device_is_le(device)) {
--		struct att_callbacks *attcb;
--		GError *gerr = NULL;
--		bdaddr_t sba;
--
--		adapter_get_address(adapter, &sba);
--
--		attcb = g_new0(struct att_callbacks, 1);
--		attcb->user_data = device;
--
--		device->att_io = bt_io_connect(att_connect_cb,
--				attcb, NULL, &gerr,
--				BT_IO_OPT_SOURCE_BDADDR, &sba,
--				BT_IO_OPT_DEST_BDADDR, &device->bdaddr,
--				BT_IO_OPT_DEST_TYPE, device->bdaddr_type,
--				BT_IO_OPT_CID, ATT_CID,
--				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
--				BT_IO_OPT_INVALID);
--
--		if (device->att_io == NULL) {
--			DBusMessage *reply = btd_error_failed(msg,
--								gerr->message);
--
--			error("Bonding bt_io_connect(): %s", gerr->message);
--			g_error_free(gerr);
--			g_free(attcb);
--			return reply;
--		}
--	}
--
--	err = adapter_create_bonding(adapter, &device->bdaddr,
--					device->bdaddr_type, capability);
--	if (err < 0)
--		return btd_error_failed(msg, strerror(-err));
--
- 	bonding = bonding_request_new(msg, device, agent_path,
- 					capability);
- 
-@@ -2595,6 +2592,16 @@ DBusMessage *device_create_bonding(struct btd_device *device,
- 	device->bonding = bonding;
- 	bonding->device = device;
- 
-+	if (device_is_le(device)) {
-+		adapter_connect_list_add(adapter, device);
-+		return NULL;
-+	}
-+
-+	err = adapter_create_bonding(adapter, &device->bdaddr,
-+					device->bdaddr_type, capability);
-+	if (err < 0)
-+		return btd_error_failed(msg, strerror(-err));
-+
- 	return NULL;
- }
- 
+ 	memset(buf, 0, sizeof(buf));
+ 	hdr->opcode = htobs(MGMT_OP_PAIR_DEVICE);
 -- 
 1.7.11.4
 
