@@ -1,29 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 1 Oct 2012 11:37:02 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	sunnyk@codeaurora.org
-Subject: Re: [RFCv1 04/20] Bluetooth: Process create response and connect
- response identically
-Message-ID: <20121001083700.GL10053@aemeltch-MOBL1>
-References: <1347387691-5285-1-git-send-email-mathewm@codeaurora.org>
- <1347387691-5285-5-git-send-email-mathewm@codeaurora.org>
+Date: Mon, 1 Oct 2012 11:30:10 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Frederic Danis <frederic.danis@linux.intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC] Convert storage to use per-remote device directories
+Message-ID: <20121001083010.GA21726@x220>
+References: <50642389.40107@intel.com>
+ <CAJdJm_NbPw0jwWvuUiu7L=wzxc+qxfF_4i2vj7U1G06b=BE2qw@mail.gmail.com>
+ <5065A248.7020009@linux.intel.com>
+ <CAJdJm_O+8tWER69LEbz9oMeoadfp=gGT3_6V0=fY-LDZ8B90kA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1347387691-5285-5-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <CAJdJm_O+8tWER69LEbz9oMeoadfp=gGT3_6V0=fY-LDZ8B90kA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lizardo,
 
-On Tue, Sep 11, 2012 at 11:21:15AM -0700, Mat Martineau wrote:
-> This removes an intermediate function for sending a create response
-> which added no functionality.
+On Fri, Sep 28, 2012, Anderson Lizardo wrote:
+> > Is it possible to save it as we did for SDP records (record entry in profile
+> > group) ?
 > 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> It seems the SDP records have the UUID as group on the INI file. This
+> is not feasible for GATT/ATT because the UUID is not a unique key, but
+> the attribute handle is.
+> 
+> Are you sure that for SDP each record has its own UUID (i.e. no SDP
+> record shares same UUID)?
 
-Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com> 
+There's no such restriction for BR/EDR. As with ATT the only unique
+identifier is the SDP record handle, however (at least with SDP) I think
+this is only guaranteed to have the same value for a single connection ,
+i.e. in theory subsequent connections could have the same record behind
+a different handle.
 
-Best regards 
-Andrei Emeltchenko 
+Johan
