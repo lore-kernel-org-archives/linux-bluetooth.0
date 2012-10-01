@@ -1,33 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rami Rosen <ramirose@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	Rami Rosen <ramirose@gmail.com>
-Subject: [PATCH BlueZ] bluetooth: remove unused member of hci_dev.
-Date: Mon,  1 Oct 2012 15:15:15 +0200
-Message-Id: <1349097315-19653-1-git-send-email-ramirose@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1349073517.13371.43.camel@aeonflux>
+References: <1348861411-31555-1-git-send-email-anderson.lizardo@openbossa.org>
+	<1349073517.13371.43.camel@aeonflux>
+Date: Mon, 1 Oct 2012 06:50:18 -0400
+Message-ID: <CAJdJm_PpVLw6vC4Bf9gkjtpv9Fsx48-QFBoDAtWiBK9j47qE+w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] build: Fix out-of-tree builds
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes core_data member from hci_dev struct as it is unused.
-Signed-off-by: Rami Rosen <ramirose@gmail.com>
----
- include/net/bluetooth/hci_core.h | 2 --
- 1 file changed, 2 deletions(-)
+Hi Marcel,
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index ea1f934..90ae4f0 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -262,8 +262,6 @@ struct hci_dev {
- 
- 	struct sk_buff_head	driver_init;
- 
--	void			*core_data;
--
- 	atomic_t		promisc;
- 
- 	struct dentry		*debugfs;
+On Mon, Oct 1, 2012 at 2:38 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>>  profiles/sap/sap.c: profiles/sap/@SAP_DRIVER@
+>> -     $(AM_V_GEN)$(LN_S) $(abs_top_srcdir)/$< $@
+>> +     $(AM_V_GEN)$(LN_S) $(abs_top_builddir)/$< $@
+>>
+>>  profiles/input/suspend.c: profiles/input/@HOG_SUSPEND_DRIVER@
+>>       $(AM_V_GEN)$(LN_S) $(abs_top_srcdir)/$< $@
+>
+> personally I am no longer a big fan of these selection of a specific
+> driver. We should be able to build all of them and make the selection at
+> runtime. So there is more work needed here.
+
+I agree, this could also help on testing as well (actually, all
+drivers are built, regardless of which one was selected by configure,
+but only the selected object is linked).
+
+What do you propose? a config file option, e.g. "sap_driver=u8500" ,
+"hog_suspend_driver=dummy" , etc (this could fit of the INI config
+format proposal).
+
+Regards,
 -- 
-1.7.11.4
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
