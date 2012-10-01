@@ -1,57 +1,144 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50698235.10804@tieto.com>
-Date: Mon, 1 Oct 2012 13:44:53 +0200
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 00/14] Thermometer watchers API change + fixes
-References: <1348584763-22824-1-git-send-email-andrzej.kaczmarek@tieto.com> <CAJdJm_N3g2YN32dUo4Af9zBnaVPAcTW5MgF9O-mXz8y_Dt23CQ@mail.gmail.com> <50642ED8.3090007@tieto.com> <CAJdJm_NLz-rd1w59pBDP_QMWKVcZ3-N0FMNqy1UCisBzZL-VNQ@mail.gmail.com>
-In-Reply-To: <CAJdJm_NLz-rd1w59pBDP_QMWKVcZ3-N0FMNqy1UCisBzZL-VNQ@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 5/7] AVCTP: Allocate memory to hold incoming/outgoing PDUs
+Date: Mon,  1 Oct 2012 14:37:49 +0300
+Message-Id: <1349091471-17396-5-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1349091471-17396-1-git-send-email-luiz.dentz@gmail.com>
+References: <1349091471-17396-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On 09/27/2012 02:03 PM, Anderson Lizardo wrote:
-> Hi Andrzej,
->
-> On Thu, Sep 27, 2012 at 6:47 AM, Andrzej Kaczmarek
-> <andrzej.kaczmarek@tieto.com> wrote:
->>> Maybe we should consider implementing a simple Thermometer role in
->>> BlueZ for testing purposes. It is a relatively simple profile.
->>
->>
->> So you mean something like optional org.bluez.ThermometerSensor interface on
->> adapter, similar to what is done for reporter role for Proximity?
->
-> Yes. There has been some interest on the past on the mailing list from
-> people willing to implement this role on BlueZ (although I have not
-> heard anymore from them), so it would become not just a test plugin,
-> but have an API that allows for BlueZ to expose some external
-> thermometer measurements over LE. But for now a "dummy" thermometer
-> which sends dummy measurements in various formats should be enough
-> (probably enabled only with --enable-test so it is not installed in
-> production).
->
-> Do you have interest/time for working on something like this?
+This makes possible to the handler to respond asyncronous as the memory
+remains valid after it returns.
 
-I could take a look on this in spare time, sure.
+In addition to that it uses the MTU to calculate the buffer size
+necessary.
+---
+ audio/avctp.c | 31 ++++++++++++++++++++++---------
+ 1 file changed, 22 insertions(+), 9 deletions(-)
 
-By "dummy" thermometer you mean separate plugin (dummythermometer or 
-sth) which, once enabled, will register service in GATT and send dummy 
-measurements when configured by remote? Or perhaps develop it inside 
-thermometer profile (implemented as described above) so it can be 
-changed into full blown thermometer role with API etc. later?
+diff --git a/audio/avctp.c b/audio/avctp.c
+index dfc5601..baf5da0 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -134,7 +134,9 @@ struct avctp_rsp_handler {
+ struct avctp_channel {
+ 	GIOChannel *io;
+ 	guint watch;
+-	uint16_t mtu;
++	uint16_t imtu;
++	uint16_t omtu;
++	uint8_t *buffer;
+ };
+ 
+ struct avctp {
+@@ -341,6 +343,7 @@ static void avctp_channel_destroy(struct avctp_channel *chan)
+ 	if (chan->watch)
+ 		g_source_remove(chan->watch);
+ 
++	g_free(chan->buffer);
+ 	g_free(chan);
+ }
+ 
+@@ -447,7 +450,9 @@ static gboolean session_browsing_cb(GIOChannel *chan, GIOCondition cond,
+ 				gpointer data)
+ {
+ 	struct avctp *session = data;
+-	uint8_t buf[1024], *operands;
++	struct avctp_channel *browsing = session->browsing;
++	uint8_t *buf = browsing->buffer;
++	uint8_t *operands;
+ 	struct avctp_header *avctp;
+ 	int sock, ret, packet_size, operand_count;
+ 
+@@ -456,7 +461,7 @@ static gboolean session_browsing_cb(GIOChannel *chan, GIOCondition cond,
+ 
+ 	sock = g_io_channel_unix_get_fd(chan);
+ 
+-	ret = read(sock, buf, sizeof(buf));
++	ret = read(sock, buf, sizeof(browsing->imtu));
+ 	if (ret <= 0)
+ 		goto failed;
+ 
+@@ -497,7 +502,9 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 				gpointer data)
+ {
+ 	struct avctp *session = data;
+-	uint8_t buf[1024], *operands, code, subunit;
++	struct avctp_channel *control = session->control;
++	uint8_t *buf = control->buffer;
++	uint8_t *operands, code, subunit;
+ 	struct avctp_header *avctp;
+ 	struct avc_header *avc;
+ 	int ret, packet_size, operand_count, sock;
+@@ -508,7 +515,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 
+ 	sock = g_io_channel_unix_get_fd(chan);
+ 
+-	ret = read(sock, buf, sizeof(buf));
++	ret = read(sock, buf, control->imtu);
+ 	if (ret <= 0)
+ 		goto failed;
+ 
+@@ -689,7 +696,7 @@ static void avctp_connect_browsing_cb(GIOChannel *chan, GError *err,
+ {
+ 	struct avctp *session = data;
+ 	char address[18];
+-	uint16_t imtu;
++	uint16_t imtu, omtu;
+ 	GError *gerr = NULL;
+ 
+ 	if (err) {
+@@ -700,6 +707,7 @@ static void avctp_connect_browsing_cb(GIOChannel *chan, GError *err,
+ 	bt_io_get(chan, &gerr,
+ 			BT_IO_OPT_DEST, &address,
+ 			BT_IO_OPT_IMTU, &imtu,
++			BT_IO_OPT_OMTU, &omtu,
+ 			BT_IO_OPT_INVALID);
+ 	if (gerr) {
+ 		error("%s", gerr->message);
+@@ -714,7 +722,9 @@ static void avctp_connect_browsing_cb(GIOChannel *chan, GError *err,
+ 	if (session->browsing == NULL)
+ 		session->browsing = avctp_channel_create(chan);
+ 
+-	session->browsing->mtu = imtu;
++	session->browsing->imtu = imtu;
++	session->browsing->omtu = omtu;
++	session->browsing->buffer = g_malloc0(MAX(imtu, omtu));
+ 	session->browsing->watch = g_io_add_watch(session->browsing->io,
+ 				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+ 				(GIOFunc) session_browsing_cb, session);
+@@ -732,7 +742,7 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
+ {
+ 	struct avctp *session = data;
+ 	char address[18];
+-	uint16_t imtu;
++	uint16_t imtu, omtu;
+ 	GError *gerr = NULL;
+ 
+ 	if (err) {
+@@ -744,6 +754,7 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
+ 	bt_io_get(chan, &gerr,
+ 			BT_IO_OPT_DEST, &address,
+ 			BT_IO_OPT_IMTU, &imtu,
++			BT_IO_OPT_IMTU, &omtu,
+ 			BT_IO_OPT_INVALID);
+ 	if (gerr) {
+ 		avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
+@@ -757,7 +768,9 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
+ 	if (session->control == NULL)
+ 		session->control = avctp_channel_create(chan);
+ 
+-	session->control->mtu = imtu;
++	session->control->imtu = imtu;
++	session->control->omtu = omtu;
++	session->control->buffer = g_malloc0(MAX(imtu, omtu));
+ 	session->control->watch = g_io_add_watch(session->control->io,
+ 				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+ 				(GIOFunc) session_cb, session);
+-- 
+1.7.11.4
 
-> BTW, I definitely plan to test both your HRP implementation and the
-> HTP changes, but currently I'm working in other things... I'll let you
-> know once I have these tested (probably with patches if I find any
-> issues).
-
-I should have BLE PTS dongle this week so will test both implementations 
-as well in case you won't manage to do this until then.
-
-BR,
-Andrzej
