@@ -1,168 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 1 Oct 2012 13:16:06 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	sunnyk@codeaurora.org
-Subject: Re: [RFCv1 03/20] Bluetooth: Add L2CAP create channel request
- handling
-Message-ID: <20121001101605.GO10053@aemeltch-MOBL1>
-References: <1347387691-5285-1-git-send-email-mathewm@codeaurora.org>
- <1347387691-5285-4-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1347387691-5285-4-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <CAEd0BX-FANQzvTCL8WrW+YMMQNobPPMEhq1HVZrXs+r6c3k9Ng@mail.gmail.com>
+References: <5069401d.e758420a.0377.6163@mx.google.com>
+	<CAEd0BX9Mhz_SobzniiqXaXhEFC4gEaPfepubkY59TOpiCA+3ug@mail.gmail.com>
+	<CABBYNZJLgciDDAjppOYZpeQRrtX7zWyePRyg7Jr3sCGJ=9xz_g@mail.gmail.com>
+	<CAEd0BX-FANQzvTCL8WrW+YMMQNobPPMEhq1HVZrXs+r6c3k9Ng@mail.gmail.com>
+Date: Mon, 1 Oct 2012 13:04:01 +0300
+Message-ID: <CABBYNZ+a78oE5OviAC47h71FhtKW9zZxK1zONEn9QC3-bqByNg@mail.gmail.com>
+Subject: Re: [PATCH] client: Add Message.MarkAsRead and Message.MarkAsDeleted
+ implementation and documentation.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Venkateswaran, Srinivasa Ragavan"
+	<srinivasa.ragavan.venkateswaran@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi,
 
-On Tue, Sep 11, 2012 at 11:21:14AM -0700, Mat Martineau wrote:
-> The L2CAP create channel request is very similar to an L2CAP connect
-> request, but it has an additional parameter for the controller ID.  If
-> the controller id is 0, the channel is set up on the BR/EDR controller
-> (just like a connect request).  Using a valid high speed controller ID
-> will cause the channel to be initially created on that high speed
-> controller.  While the L2CAP data will be initially routed over the
-> AMP controller, the L2CAP fixed signaling channel only uses BR/EDR.
-> 
-> When a create channel request is received for a high speed controller,
-> a pending response is always sent first.  After the high speed
-> physical and logical links are complete a success response will be
-> sent.
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  net/bluetooth/l2cap_core.c | 70 +++++++++++++++++++++++++++++++++++-----------
->  1 file changed, 54 insertions(+), 16 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 166382c..17e02d9 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -3362,8 +3362,9 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn, struct l2cap_cmd_hd
->  	return 0;
->  }
->  
-> -static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
-> -			    u8 *data, u8 rsp_code, u8 amp_id)
-> +static struct l2cap_chan *__l2cap_connect(struct l2cap_conn *conn,
-> +					  struct l2cap_cmd_hdr *cmd,
-> +					  u8 *data, u8 rsp_code, u8 amp_id)
->  {
->  	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
->  	struct l2cap_conn_rsp rsp;
-> @@ -3390,7 +3391,7 @@ static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
->  
->  	/* Check if the ACL is secure enough (if not SDP) */
->  	if (psm != __constant_cpu_to_le16(L2CAP_PSM_SDP) &&
-> -				!hci_conn_check_link_mode(conn->hcon)) {
-> +	    !hci_conn_check_link_mode(conn->hcon)) {
->  		conn->disc_reason = HCI_ERROR_AUTH_FAILURE;
->  		result = L2CAP_CR_SEC_BLOCK;
->  		goto response;
-> @@ -3414,6 +3415,7 @@ static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
->  	bacpy(&bt_sk(sk)->dst, conn->dst);
->  	chan->psm  = psm;
->  	chan->dcid = scid;
-> +	chan->local_amp_id = amp_id;
->  
->  	bt_accept_enqueue(parent, sk);
->  
-> @@ -3433,8 +3435,16 @@ static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
->  				status = L2CAP_CS_AUTHOR_PEND;
->  				parent->sk_data_ready(parent, 0);
->  			} else {
-> -				__l2cap_state_change(chan, BT_CONFIG);
-> -				result = L2CAP_CR_SUCCESS;
-> +				/* Force pending result for AMP controllers.
-> +				 * The connection will succeed after the
-> +				 * physical link is up. */
-> +				if (amp_id) {
-> +					__l2cap_state_change(chan, BT_CONNECT2);
-> +					result = L2CAP_CR_PEND;
-> +				} else {
-> +					__l2cap_state_change(chan, BT_CONFIG);
-> +					result = L2CAP_CR_SUCCESS;
-> +				}
->  				status = L2CAP_CS_NO_INFO;
->  			}
->  		} else {
-> @@ -3480,6 +3490,8 @@ sendresp:
->  					l2cap_build_conf_req(chan, buf), buf);
->  		chan->num_conf_req++;
->  	}
-> +
-> +	return chan;
->  }
->  
->  static int l2cap_connect_req(struct l2cap_conn *conn,
-> @@ -3970,12 +3982,12 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
->  	return 0;
->  }
->  
-> -static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
-> -					struct l2cap_cmd_hdr *cmd, u16 cmd_len,
-> -					void *data)
-> +static int l2cap_create_channel_req(struct l2cap_conn *conn,
-> +				    struct l2cap_cmd_hdr *cmd, u16 cmd_len,
-> +				    void *data)
->  {
->  	struct l2cap_create_chan_req *req = data;
-> -	struct l2cap_create_chan_rsp rsp;
-> +	struct l2cap_chan *chan;
->  	u16 psm, scid;
->  
->  	if (cmd_len != sizeof(*req))
-> @@ -3989,14 +4001,40 @@ static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
->  
->  	BT_DBG("psm 0x%2.2x, scid 0x%4.4x, amp_id %d", psm, scid, req->amp_id);
->  
-> -	/* Placeholder: Always reject */
-> -	rsp.dcid = 0;
-> -	rsp.scid = cpu_to_le16(scid);
-> -	rsp.result = __constant_cpu_to_le16(L2CAP_CR_NO_MEM);
-> -	rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
-> +	if (req->amp_id) {
-> +		struct hci_dev *hdev;
->  
-> -	l2cap_send_cmd(conn, cmd->ident, L2CAP_CREATE_CHAN_RSP,
-> -		       sizeof(rsp), &rsp);
-> +		/* Validate AMP controller id */
-> +		hdev = hci_dev_get(req->amp_id);
-> +		if (!hdev || hdev->dev_type != HCI_AMP ||
-> +		    !test_bit(HCI_UP, &hdev->flags)) {
-> +			struct l2cap_create_chan_rsp rsp;
-> +
-> +			rsp.dcid = 0;
-> +			rsp.scid = cpu_to_le16(scid);
-> +			rsp.result = L2CAP_CR_BAD_AMP;
-> +			rsp.status = L2CAP_CS_NO_INFO;
-> +
-> +			l2cap_send_cmd(conn, cmd->ident, L2CAP_CREATE_CHAN_RSP,
-> +				       sizeof(rsp), &rsp);
-> +
-> +			if (hdev)
-> +				hci_dev_put(hdev);
-> +
-> +			return 0;
-> +		}
-> +
-> +		hci_dev_put(hdev);
-> +	}
-> +
-> +	chan = __l2cap_connect(conn, cmd, data, L2CAP_CREATE_CHAN_RSP,
-> +			       req->amp_id);
-> +
-> +	/* Placeholder - uncomment when amp functions are available
-> +	if (chan && req->amp_id &&
-> +	    (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
-> +		amp_accept_physical(conn, req->amp_id, chan);
-> +	*/
+On Mon, Oct 1, 2012 at 12:05 PM, Venkateswaran, Srinivasa Ragavan
+<srinivasa.ragavan.venkateswaran@intel.com> wrote:
+>> 1. Use properties, so for setting delete/read the application should
+>> use SetProperty method and it can get the values with GetProperties
+>> and PropertyChanged to signal when the values has changed. (Note this
+>> may change if we add support to standard D-Bus Properties interface
+>> but the idea is the same just the interface change)
+>
+> I'll do it as SetProperty ("read/deleted", true/false) . But I don't
+> see a support in MAP ('s spec) for getting a message status or being
+> notified for message update. If you can point me, I could do this also
+> and give a complete patch the Message object.
 
-I believe this comment shall be deleted, we accept physical link long time
-ago before this sequence.
+Yep, it is not in the spec, but it doesn't mean we should not have
+support for getting updates asynchronously as signals because
+different processes can change the properties and in future if this is
+added in the spec we already have support for them, besides it is
+consistent with overall use of properties.
 
-Best regards 
-Andrei Emeltchenko 
+>> 2. What is this filler byte and lseek for?
+>
+> lseek was because, after just we write to the file, the read always
+> failed and I thought the position was the end of the file. I just seek
+> to the beginning of the file, it worked. I hope I didn't overlook
+> something.
 
+Yep, it is actually a bug so could you please have it in a separate patch?
+
+>> 3. We probably need to add support for non-body/apparam only PUT so we
+>> can pass NULL to filename. (maybe this is the reason for 2?)
+>
+> For SetMessageStatus the spec mentioned that Body/End of Body,
+> specifying the filler byte 0x30 is mandatory. Quoting from the spec
+> below:
+> "To avoid PUT with empty Body leading to a 'delete' of the related message these
+> headers shall contain a filler byte. The value of this byte shall be
+> set to 0x30 (="0")."
+>
+> If it wasn't for this, I would have updated PUT with support to empty
+> body. I assume, this is fine.
+
+Yep, very strange requirement to be honest but I guess the author was
+afraid the OBEX parser would trigger delete of the message if no body
+was found, anyway sending 0x30 is mandatory so we should include as
+you did. Still I think the proper way to support this is to have
+obc_transfer_put supporting NULL filename, in that case the caller
+need to provide the contents which should be stored in a temporary
+which is automatically removed (transfer_open already takes care of
+this).
+
+
+-- 
+Luiz Augusto von Dentz
