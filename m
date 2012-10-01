@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 06/10] AVRCP: Fix not removing session from player upon disconnect
-Date: Mon,  1 Oct 2012 20:53:37 +0300
-Message-Id: <1349114021-19067-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 05/10] AVRCP: Fix not freeing player session list on exit
+Date: Mon,  1 Oct 2012 20:53:36 +0300
+Message-Id: <1349114021-19067-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1349114021-19067-1-git-send-email-luiz.dentz@gmail.com>
 References: <1349114021-19067-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,46 +11,35 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Invalid read of size 8
-   at 0x1310E3: avrcp_unregister_player (avrcp.c:1604)
-   by 0x13EB57: path_free (media.c:1834)
-   by 0x123208: remove_interface.isra.1 (object.c:558)
-   by 0x1238DD: g_dbus_unregister_interface (object.c:705)
-   by 0x124BB8: media_server_remove (manager.c:1077)
-   by 0x4E91C5C: g_slist_foreach (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x17B349: adapter_remove (adapter.c:2309)
-   by 0x176F39: manager_cleanup (manager.c:290)
-   by 0x120E65: main (main.c:555)
- Address 0x6685058 is 24 bytes inside a block of size 80 free'd
-   at 0x4C279AE: free (vg_replace_malloc.c:427)
-   by 0x4E7C50E: g_free (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x12FC97: state_changed (avrcp.c:1380)
-   by 0x12D351: avctp_set_state (avctp.c:396)
-   by 0x12D7B4: session_cb (avctp.c:601)
-   by 0x4E76824: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x4E76B57: ??? (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x4E76F51: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x120E51: main (main.c:551)
+16 bytes in 1 blocks are definitely lost in loss record 111 of 359
+   at 0x4A0884D: malloc (vg_replace_malloc.c:263)
+   by 0x4C8026E: g_malloc (in /usr/lib64/libglib-2.0.so.0.3200.4)
+   by 0x4C94671: g_slice_alloc (in /usr/lib64/libglib-2.0.so.0.3200.4)
+   by 0x4C959B2: g_slist_append (in /usr/lib64/libglib-2.0.so.0.3200.4)
+   by 0x130FCC: avrcp_register_player (avrcp.c:1584)
+   by 0x13FA1F: register_player (media.c:1689)
+   by 0x123100: process_message.isra.0 (object.c:197)
+   by 0x4F70684: ??? (in /usr/lib64/libdbus-1.so.3.5.6)
+   by 0x4F6290C: dbus_connection_dispatch (in /usr/lib64/libdbus-1.so.3.5.6)
+   by 0x121747: message_dispatch (mainloop.c:76)
+   by 0x4C7B22A: ??? (in /usr/lib64/libglib-2.0.so.0.3200.4)
+   by 0x4C7A694: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3200.4)
 ---
- audio/avrcp.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ audio/avrcp.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 49f1550..2e36fb7 100644
+index 376f4a1..49f1550 100644
 --- a/audio/avrcp.c
 +++ b/audio/avrcp.c
-@@ -1328,6 +1328,11 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
- 			avctp_unregister_browsing_pdu_handler(
- 						session->browsing_handler);
+@@ -1472,6 +1472,7 @@ static void player_destroy(gpointer data)
+ 	if (player->destroy)
+ 		player->destroy(player->user_data);
  
-+		if (session->player != NULL)
-+			session->player->sessions = g_slist_remove(
-+						session->player->sessions,
-+						session);
-+
- 		g_free(session);
- 		break;
- 	case AVCTP_STATE_CONNECTING:
++	g_slist_free(player->sessions);
+ 	g_free(player);
+ }
+ 
 -- 
 1.7.11.4
 
