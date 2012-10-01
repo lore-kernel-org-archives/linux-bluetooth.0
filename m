@@ -1,20 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 1 Oct 2012 13:10:11 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Rami Rosen <ramirose@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	johan.hedberg@gmail.com
+Message-ID: <1349106806.23068.9.camel@aeonflux>
 Subject: Re: [PATCH v2] Bluetooth: remove unused member of hci_dev.
-Message-ID: <20121001161011.GL15463@joana>
-References: <1349113051-27803-1-git-send-email-ramirose@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Rami Rosen <ramirose@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	johan.hedberg@gmail.com
+Date: Mon, 01 Oct 2012 17:53:26 +0200
 In-Reply-To: <1349113051-27803-1-git-send-email-ramirose@gmail.com>
+References: <1349113051-27803-1-git-send-email-ramirose@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Rami,
-
-* Rami Rosen <ramirose@gmail.com> [2012-10-01 19:37:31 +0200]:
 
 > This patch removes core_data member from hci_dev struct as it is unused.
 > 
@@ -23,6 +22,10 @@ Hi Rami,
 >  include/net/bluetooth/hci_core.h | 2 --
 >  1 file changed, 2 deletions(-)
 
-Patch has been applied to bluetooth-next, thanks.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-	Gustavo
+Regards
+
+Marcel
+
+
