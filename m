@@ -1,33 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 01/10] gdbus: Fix not freeing list node by using g_slist_delete_link
-Date: Mon,  1 Oct 2012 20:53:32 +0300
-Message-Id: <1349114021-19067-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 1 Oct 2012 13:10:11 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Rami Rosen <ramirose@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	johan.hedberg@gmail.com
+Subject: Re: [PATCH v2] Bluetooth: remove unused member of hci_dev.
+Message-ID: <20121001161011.GL15463@joana>
+References: <1349113051-27803-1-git-send-email-ramirose@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1349113051-27803-1-git-send-email-ramirose@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Rami,
 
-g_slist_remove_link does not free the node which can cause leaks so
-replace that with g_slist_delete_link which does free memory properly.
----
- gdbus/watch.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+* Rami Rosen <ramirose@gmail.com> [2012-10-01 19:37:31 +0200]:
 
-diff --git a/gdbus/watch.c b/gdbus/watch.c
-index a402ca9..07feb61 100644
---- a/gdbus/watch.c
-+++ b/gdbus/watch.c
-@@ -574,7 +574,7 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
- 			continue;
- 
- 		remove_match(data);
--		listeners = g_slist_remove_link(listeners, l);
-+		listeners = g_slist_delete_link(listeners, l);
- 
- 		filter_data_free(data);
- 	}
--- 
-1.7.11.4
+> This patch removes core_data member from hci_dev struct as it is unused.
+> 
+> Signed-off-by: Rami Rosen <ramirose@gmail.com>
+> ---
+>  include/net/bluetooth/hci_core.h | 2 --
+>  1 file changed, 2 deletions(-)
 
+Patch has been applied to bluetooth-next, thanks.
+
+	Gustavo
