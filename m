@@ -1,34 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <506B3010.6060606@globaledgesoft.com>
+Date: Tue, 02 Oct 2012 23:48:56 +0530
+From: Ajay <ajay.kv@globaledgesoft.com>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Allow to set flush timeout
-Date: Mon,  8 Oct 2012 12:09:16 +0300
-Message-Id: <1349687357-11829-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <506B3010.6060606@globaledgesoft.com>
-References: <506B3010.6060606@globaledgesoft.com>
+Subject: L2CAP Flush_Timeout  Error
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi,
+     Im currently working in an A2DP stuff, where i noticed an error. 
+Here i wanted to monitor the flushed packets due to timeout.
+
+  I used the  l2test code for my testing purpose
+
+               On client side   "l2test  -R  -S <bdadddr> "
+               and i set the flush timeout as 100 (opts.flush_to = 100)
+
+        But  later  when i print the getsockopt value of flush_to, it 
+was showing some default value (65532)  harcoded at kernel side.
+
+     so  how can i flush some packets in the sender side,  without 
+enabling any retransmission  and  able to monitor the sequence number in 
+the receiver side.
 
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/l2cap_sock.c |    1 +
- 1 file changed, 1 insertion(+)
+   --
+  Thanks & regards
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 0c05d7d..70578d8 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -536,6 +536,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
- 		chan->fcs  = opts.fcs;
- 		chan->max_tx = opts.max_tx;
- 		chan->tx_win = opts.txwin_size;
-+		chan->flush_to = opts.flush_to;
- 		break;
- 
- 	case L2CAP_LM:
--- 
-1.7.9.5
+AJAY KV
+8892753703
 
