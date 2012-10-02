@@ -1,18 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <506B4CC3.1010203@globaledgesoft.com>
-Date: Wed, 03 Oct 2012 01:51:23 +0530
+Message-ID: <506B4479.3050105@globaledgesoft.com>
+Date: Wed, 03 Oct 2012 01:16:01 +0530
 From: Ajay <ajay.kv@globaledgesoft.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Subject: Re: L2CAP Flush_Timeout  Error
-References: <506B4479.3050105@globaledgesoft.com>
-In-Reply-To: <506B4479.3050105@globaledgesoft.com>
+References: <506B3010.6060606@globaledgesoft.com> <20121008091144.GF2456@aemeltch-MOBL1>
+In-Reply-To: <20121008091144.GF2456@aemeltch-MOBL1>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
-
+On Monday 08 October 2012 02:41 PM, Andrei Emeltchenko wrote:
 > On Tue, Oct 02, 2012 at 11:48:56PM +0530, Ajay wrote:
 >> Hi,
 >>      Im currently working in an A2DP stuff, where i noticed an error.
@@ -32,12 +32,12 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 > Andrei Emeltchenko
 >
 
-    Thanks for your patch , its working fine. Now even  if i set the
-flush_timeout = 5 , i couldnt  able to see any packets missing at the
-receiver side . Here in the sender  side  im giving proper sequence
-number, and these same sequence is getting at the receiver side . i
-doubted even though its flushing , controller is doing some
-retransmission job...please help . My kernel is 2.6.39 , and im using
+    Thanks for your patch , its working fine. Now even  if i set the 
+flush_timeout = 5 , i couldnt  able to see any packets missing at the 
+receiver side . Here in the sender  side  im giving proper sequence 
+number, and these same sequence is getting at the receiver side . i 
+doubted even though its flushing , controller is doing some 
+retransmission job...please help . My kernel is 2.6.39 , and im using 
 BASIC MODE of transmission. so shall i change it to STEAMING MODE ????
 
 -- 
@@ -45,5 +45,3 @@ BASIC MODE of transmission. so shall i change it to STEAMING MODE ????
 
 AJAY KV
 8892753703
-
-
