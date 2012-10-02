@@ -1,31 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 2 Oct 2012 10:45:37 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [PATCH v1 0/2] audio: Fixes in HFP gateway
-Message-ID: <20121002074537.GA1969@x220>
-References: <1349105046-20035-1-git-send-email-mikel.astiz.oss@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1349105046-20035-1-git-send-email-mikel.astiz.oss@gmail.com>
+From: Srinivasa Ragavan <srinivasa.ragavan.venkateswaran@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Srinivasa Ragavan <srinivasa.ragavan.venkateswaran@intel.com>
+Subject: [PATCH 2/2] client-doc: Add documentation for Message.SetProperty and Message.GetProperties
+Date: Tue,  2 Oct 2012 12:13:49 +0530
+Message-Id: <1349160229-17547-1-git-send-email-srinivasa.ragavan.venkateswaran@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+---
+ doc/client-api.txt |   79 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 79 insertions(+)
 
-On Mon, Oct 01, 2012, Mikel Astiz wrote:
-> I'm grouping these two patches -originally sent separately- into a
-> single patchset, after changing the approach as suggested by Luiz.
-> 
-> Mikel Astiz (2):
->   audio: Fix crash if gateway closed before reply
->   audio: Fix crash on gateway close while connected
-> 
->  audio/gateway.c | 68 +++++++++++++++++++++++++++++++++++++++++++++------------
->  1 file changed, 54 insertions(+), 14 deletions(-)
+diff --git a/doc/client-api.txt b/doc/client-api.txt
+index 25fd3e4..6487146 100644
+--- a/doc/client-api.txt
++++ b/doc/client-api.txt
+@@ -534,6 +534,85 @@ Methods		object, dict Get(string targetfile, boolean attachment)
+ 			The properties of this transfer are also returned along
+ 			with the object path, to avoid a call to GetProperties.
+ 
++		dict GetProperties()
++
++			Returns all properties for the message. See the
++			properties section for available properties.
++
++		void SetProperty (string name, variant value)
++			
++			Sets value to the mentioned property. 
++
++			Possible properties: Read and Deleted.
++			
++			
++Properties	string Subject [readonly]
++
++			Message subject
++
++		string Timestamp [readonly]
++
++			Message timestamp
++
++		string Sender [readonly]
++
++			Message sender name
++
++		string SenderAddress [readonly]
++
++			Message sender address
++
++		string ReplyTo [readonly]
++
++			Message Reply-To address
++
++		string Recipient [readonly]
++
++			Message recipient name
++
++		string RecipientAddress [readonly]
++
++			Message recipient address
++
++		string Type [readonly]
++
++			Message type
++
++			Possible values: "EMAIL", "SMS_GSM",
++			"SMS_CDMA" and "MMS"
++
++		uint64 Size [readonly]
++
++			Message size in bytes
++
++		string Status [readonly]
++
++			Message reception status
++
++			Possible values: "complete",
++			"fractioned" and "notification"
++
++		boolean Priority [readonly]
++
++			Message priority flag
++
++		boolean Read [read/write]
++
++			Message read flag
++
++		boolean Deleted [writeonly]
++
++			Message read flag
++
++		boolean Sent [readonly]
++
++			Message sent flag
++
++		boolean Protected [readonly]
++
++			Message protected flag
++
++
+ Transfer hierarchy
+ ==================
+ 
+-- 
+1.7.10.4
 
-Both patches have been applied. Thanks.
-
-Johan
