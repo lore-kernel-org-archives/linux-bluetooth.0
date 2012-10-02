@@ -1,50 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 2 Oct 2012 11:30:56 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v8 1/8] core: Mutually exclude concurrent
- connections
-Message-ID: <20121002083056.GB1969@x220>
-References: <1349126651-749-1-git-send-email-jprvita@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1349126651-749-1-git-send-email-jprvita@openbossa.org>
+In-Reply-To: <CAMOw1v503Fxkx6tD-cN1s_buev89ytSG1P-ngSxUCLk4eMVa6Q@mail.gmail.com>
+References: <1349114021-19067-1-git-send-email-luiz.dentz@gmail.com>
+	<1349114021-19067-2-git-send-email-luiz.dentz@gmail.com>
+	<CAMOw1v503Fxkx6tD-cN1s_buev89ytSG1P-ngSxUCLk4eMVa6Q@mail.gmail.com>
+Date: Tue, 2 Oct 2012 11:05:32 +0300
+Message-ID: <CABBYNZ+f+idjJw1_i4uqoTJTdXMfr1xHAvdpGj4-59vchV+ouA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 02/10] gdbus: Remove connection from g_dbus_remove_watch
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lucas,
 
-On Mon, Oct 01, 2012, João Paulo Rechi Vita wrote:
->  static gboolean connect_pending_cb(gpointer user_data)
->  {
->  	struct btd_device *device = user_data;
->  	struct btd_adapter *adapter = device_get_adapter(device);
-> +	GIOChannel *io;
->  
->  	/* in the future we may want to check here if the controller supports
->  	 * scanning and connecting at the same time */
->  	if (adapter->discovering)
->  		return TRUE;
->  
-> -	device_att_connect(device);
-> +	if (adapter->connecting)
-> +		return TRUE;
-> +
-> +	adapter->connecting = TRUE;
-> +	adapter->waiting_to_connect--;
-> +
-> +	io = device_att_connect(device);
-> +	g_io_add_watch(io, G_IO_OUT | G_IO_ERR, clean_connecting_state,
-> +						btd_device_ref(device));
+On Tue, Oct 2, 2012 at 7:23 AM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> On Mon, Oct 1, 2012 at 2:53 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> The connection is not really needed since the list of listeners is
+>> global not per connection, besides it is more convenient this way as
+>> only the id is needed.
+>> ---
+>>  gdbus/gdbus.h | 2 +-
+>>  gdbus/watch.c | 4 ++--
+>>  2 files changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+>> index 0a8a27c..3bd8986 100644
+>> --- a/gdbus/gdbus.h
+>> +++ b/gdbus/gdbus.h
+>> @@ -217,7 +217,7 @@ guint g_dbus_add_signal_watch(DBusConnection *connection,
+>>                                 const char *interface, const char *member,
+>>                                 GDBusSignalFunction function, void *user_data,
+>>                                 GDBusDestroyFunction destroy);
+>> -gboolean g_dbus_remove_watch(DBusConnection *connection, guint tag);
+>> +gboolean g_dbus_remove_watch(guint id);
+>>  void g_dbus_remove_all_watches(DBusConnection *connection);
+>>
+>>  #ifdef __cplusplus
+>> diff --git a/gdbus/watch.c b/gdbus/watch.c
+>> index 07feb61..00cedae 100644
+>> --- a/gdbus/watch.c
+>> +++ b/gdbus/watch.c
+>> @@ -285,7 +285,7 @@ static void filter_data_free(struct filter_data *data)
+>>                 g_free(l->data);
+>>
+>>         g_slist_free(data->callbacks);
+>> -       g_dbus_remove_watch(data->connection, data->name_watch);
+>> +       g_dbus_remove_watch(data->name_watch);
+>>         g_free(data->name);
+>>         g_free(data->owner);
+>>         g_free(data->path);
+>> @@ -752,7 +752,7 @@ guint g_dbus_add_signal_watch(DBusConnection *connection,
+>>         return cb->id;
+>>  }
+>>
+>> -gboolean g_dbus_remove_watch(DBusConnection *connection, guint id)
+>> +gboolean g_dbus_remove_watch(guint id)
+>>  {
+>>         struct filter_data *data;
+>>         struct filter_callback *cb;
+>> --
+>
+> This will lead to a broken build which is not nice to bisect. Any
+> other option besides adding with another name, converting everybody
+> and then renaming?
+>
+> The only other option I can think of is adding an ifdef and an option
+> to build-sys... this would avoid the final renaming.
 
-Looks like there is some error handling missing here since
-device_att_connect could return NULL;
+I guess this time it worth having the break of bisect in favor of a
+more convenient API, if you look at what the code is doing the
+connection is useless and normally we end up having to call the core
+to figure out a connection that is not used for anything.
 
-> +		g_idle_add(connect_pending_cb,  btd_device_ref(device));
-
-Two spaces after the comma here. What's a bit worrying also is that you
-don't store the idle id, but I suppose that's safe since you ensure that
-this asynchronous operation has it's own reference to the device.
-
-Johan
+-- 
+Luiz Augusto von Dentz
