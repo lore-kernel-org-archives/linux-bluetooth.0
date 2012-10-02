@@ -1,53 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <506AEDFC.9060300@rug.nl>
-Date: Tue, 02 Oct 2012 15:37:00 +0200
-From: Sietse Achterop <s.achterop@rug.nl>
-MIME-Version: 1.0
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: Unreliable communication with multiple bluetooth devices and some
- delay
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ] attrib: Get address type using gatt_get_address()
+Date: Tue,  2 Oct 2012 08:50:20 -0400
+Message-Id: <1349182220-525-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This avoids a separate call to device_get_addr_type().
+---
+ attrib/client.c |    5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-     Dear list,
+diff --git a/attrib/client.c b/attrib/client.c
+index ece16bf..d49804c 100644
+--- a/attrib/client.c
++++ b/attrib/client.c
+@@ -705,7 +705,6 @@ static GSList *load_characteristics(struct gatt_service *gatt, uint16_t start)
+ static void store_attribute(struct gatt_service *gatt, uint16_t handle,
+ 				uint16_t type, uint8_t *value, gsize len)
+ {
+-	struct btd_device *device = gatt->dev;
+ 	bdaddr_t sba, dba;
+ 	uint8_t bdaddr_type;
+ 	bt_uuid_t uuid;
+@@ -722,9 +721,7 @@ static void store_attribute(struct gatt_service *gatt, uint16_t handle,
+ 	for (i = 0, tmp = str + MAX_LEN_UUID_STR; i < len; i++, tmp += 2)
+ 		sprintf(tmp, "%02X", value[i]);
+ 
+-	gatt_get_address(gatt, &sba, &dba, NULL);
+-
+-	bdaddr_type = device_get_addr_type(device);
++	gatt_get_address(gatt, &sba, &dba, &bdaddr_type);
+ 
+ 	write_device_attribute(&sba, &dba, bdaddr_type, handle, str);
+ 
+-- 
+1.7.9.5
 
-not sure wheather this for this list, but if so please tell me.
-I have problems with unreliable bluetooth communication.
-
-I have 7 bluetooth devices (epucks, educational robots:  http://www.e-puck.org/).
-They use the lmx9838 device for bluetooth and are seen as rfcomm-devices on linux.
-The lmx-device is used in transparent mode.
-This is on various linuxes, with kernels 2.6.32, 3.0.0 and 3.2, e.g. as in the latest ubuntu 12.04.1.
-
-The test program is a simple loop that continuously sends each epuck a small message,
-a string of say 6 characters.
-I use stdio's fprintf to send chars to the /dev/rfcomm devices.
-In pseudo code:
-  open_devices();
-  while true do
-    for i = 1 to 7 do
-       fprintf(fp[i], "l,1,2\n");
-    od
-    delay( 0.5 seconds);
-  od
-
-This works perfectly if the delay statement is REMOVED.
-Then each 2 milliseconds a message is send to the next epuck.
-But if the delay is ADDED again it gets very UNRELIABLE.
-After 1 to 30 seconds a communication is failing and after a
-20 second delay the connection of a epuck is dropped.
-After a longer time all connections are dropped.
-
-I tried a lot, but am at a loss at the moment.
-The question is, where the problem. Why is the delay the problem?
-Are the short messages the problem?
-Is it a bug in the linux driver?
-
-Hopefully someone on the list can help me a step in the right direction.
-
-   Thanks in advance.
-      Sietse Achterop
-      University of Groningen
-      The Netherlands
