@@ -1,70 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon@janc.net.pl>
-Subject: [PATCH] event: Remove not used btd_event_remote_class
-Date: Mon, 8 Oct 2012 14:11:28 +0200
-Message-ID: <1349698288-15112-1-git-send-email-szymon.janc@tieto.com>
+Message-ID: <506B4CC3.1010203@globaledgesoft.com>
+Date: Wed, 03 Oct 2012 01:51:23 +0530
+From: Ajay <ajay.kv@globaledgesoft.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: L2CAP Flush_Timeout  Error
+References: <506B4479.3050105@globaledgesoft.com>
+In-Reply-To: <506B4479.3050105@globaledgesoft.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Szymon Janc <szymon@janc.net.pl>
 
-This was used in hciops only. With mgmt interface remote CoD is
-received in EIR from Device Found/Connected events.
 
----
- src/event.c |   22 ----------------------
- src/event.h |    1 -
- 2 files changed, 23 deletions(-)
+> On Tue, Oct 02, 2012 at 11:48:56PM +0530, Ajay wrote:
+>> Hi,
+>>      Im currently working in an A2DP stuff, where i noticed an error.
+>> Here i wanted to monitor the flushed packets due to timeout.
+>>
+>>   I used the  l2test code for my testing purpose
+>>
+>>                On client side   "l2test  -R  -S <bdadddr> "
+>>                and i set the flush timeout as 100 (opts.flush_to = 100)
+>>
+>>         But  later  when i print the getsockopt value of flush_to, it
+>> was showing some default value (65532)  harcoded at kernel side.
+>
+> Try the patch in this thread.
+>
+> Best regards
+> Andrei Emeltchenko
+>
 
-diff --git a/src/event.c b/src/event.c
-index 84c7f88..0ebab19 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -280,28 +280,6 @@ void btd_event_set_legacy_pairing(bdaddr_t *local, bdaddr_t *peer,
- 		dev->legacy = legacy;
- }
- 
--void btd_event_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class)
--{
--	struct btd_adapter *adapter;
--	struct btd_device *device;
--	uint32_t old_class = 0;
--
--	read_remote_class(local, peer, &old_class);
--
--	if (old_class == class)
--		return;
--
--	write_remote_class(local, peer, class);
--
--	if (!get_adapter_and_device(local, peer, &adapter, &device, FALSE))
--		return;
--
--	if (!device)
--		return;
--
--	device_set_class(device, class);
--}
--
- void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name)
- {
- 	struct btd_adapter *adapter;
-diff --git a/src/event.h b/src/event.h
-index 6d001dd..6adf1f5 100644
---- a/src/event.h
-+++ b/src/event.h
-@@ -27,7 +27,6 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type
- 					int8_t rssi, uint8_t confirm_name,
- 					uint8_t *data, uint8_t data_len);
- void btd_event_set_legacy_pairing(bdaddr_t *local, bdaddr_t *peer, gboolean legacy);
--void btd_event_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class);
- void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name);
- void btd_event_conn_complete(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
- 						char *name, uint32_t class);
+    Thanks for your patch , its working fine. Now even  if i set the
+flush_timeout = 5 , i couldnt  able to see any packets missing at the
+receiver side . Here in the sender  side  im giving proper sequence
+number, and these same sequence is getting at the receiver side . i
+doubted even though its flushing , controller is doing some
+retransmission job...please help . My kernel is 2.6.39 , and im using
+BASIC MODE of transmission. so shall i change it to STEAMING MODE ????
+
 -- 
-1.7.9.5
+  Thanks & regards
+
+AJAY KV
+8892753703
+
 
