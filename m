@@ -1,41 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] attrib: Get address type using gatt_get_address()
-Date: Tue,  2 Oct 2012 08:50:20 -0400
-Message-Id: <1349182220-525-1-git-send-email-anderson.lizardo@openbossa.org>
+Date: Tue, 2 Oct 2012 15:41:29 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Frederic Danis <frederic.danis@linux.intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC v2] Convert storage to use per-remote device directories
+Message-ID: <20121002124129.GA19094@x220>
+References: <506AD942.5020902@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <506AD942.5020902@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This avoids a separate call to device_get_addr_type().
----
- attrib/client.c |    5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+Hi Frederic,
 
-diff --git a/attrib/client.c b/attrib/client.c
-index ece16bf..d49804c 100644
---- a/attrib/client.c
-+++ b/attrib/client.c
-@@ -705,7 +705,6 @@ static GSList *load_characteristics(struct gatt_service *gatt, uint16_t start)
- static void store_attribute(struct gatt_service *gatt, uint16_t handle,
- 				uint16_t type, uint8_t *value, gsize len)
- {
--	struct btd_device *device = gatt->dev;
- 	bdaddr_t sba, dba;
- 	uint8_t bdaddr_type;
- 	bt_uuid_t uuid;
-@@ -722,9 +721,7 @@ static void store_attribute(struct gatt_service *gatt, uint16_t handle,
- 	for (i = 0, tmp = str + MAX_LEN_UUID_STR; i < len; i++, tmp += 2)
- 		sprintf(tmp, "%02X", value[i]);
- 
--	gatt_get_address(gatt, &sba, &dba, NULL);
--
--	bdaddr_type = device_get_addr_type(device);
-+	gatt_get_address(gatt, &sba, &dba, &bdaddr_type);
- 
- 	write_device_attribute(&sba, &dba, bdaddr_type, handle, str);
- 
--- 
-1.7.9.5
+On Tue, Oct 02, 2012, Frederic Danis wrote:
+> The adapter config file just need to be converted to ini-file format
+> with only 1 group called [adapter], for example:
+>   [Adapter]
+>   Name=desktop-0
+>   Class=0x780011
+>   Pairable=true
+>   OnMode=discoverable
+>   Mode=discoverable
 
+Looks ok, except I'd call the main section [General] to make it more
+natural to extend the file with new sections in the future. This is also
+consistent with what we have under /etc/bluetooth.
+
+> Remote device config file will include a [device] group with general
+> device infos (name, alias, profiles or primary services list, ...),
+> for example:
+>   [Device]
+
+Same thing as with adapter.conf, i.e. I'd call this simply [General]
+
+>   DeviceId=FFFF 0000 0000 0000
+
+I'd move this into its own [DeviceID] section with separate Assigner,
+Vendor, Product and Version fields.
+
+> Keys file will include informations related to link key or long term
+> link key, for example:
+>   [LinkKey]
+>   Key=9EF4BDFA68C5438A176DF42ACD59816C
+>   Type=0
+>   Length=4
+
+I suppose s/Length/PINLength/ would be in order here.
+
+Johan
