@@ -1,45 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20121003193921.GA32176@x220.P-661HNU-F1>
-References: <1349209490-31830-2-git-send-email-anderson.lizardo@openbossa.org>
-	<1349268398-14620-1-git-send-email-anderson.lizardo@openbossa.org>
-	<20121003193921.GA32176@x220.P-661HNU-F1>
-Date: Wed, 3 Oct 2012 16:17:01 -0400
-Message-ID: <CAJdJm_OtyC-Et9C0Cva3mej=3P9qq1823NdUdcyWT-pxrs7JWQ@mail.gmail.com>
-Subject: Re: [PATCH v4 BlueZ 01/27] doc: Introduce Alert API
+In-Reply-To: <1349274401-32012-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1349274401-32012-1-git-send-email-frederic.danis@linux.intel.com>
+Date: Wed, 3 Oct 2012 16:14:16 -0400
+Message-ID: <CAJdJm_Oq2QoSJ-1xQSssL0+Tku4WAqb6nppbe1eAvc1LWoRMKg@mail.gmail.com>
+Subject: Re: [PATCH] storage: Move adapter info to adapter.conf
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
+To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Danis?=
+	<frederic.danis@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Frédéric,
 
-On Wed, Oct 3, 2012 at 3:39 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Lizardo,
->
-> On Wed, Oct 03, 2012, Anderson Lizardo wrote:
->> This API will be implemented and initially used by Phone Alert Status
->> and Alert Notification GATT profiles (server role).
->> ---
->>
->> v4: Modify enumeration strings to use "-" as word separator.
->>
->>  Makefile.am       |    2 +-
->>  doc/alert-api.txt |  109 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 110 insertions(+), 1 deletion(-)
->>  create mode 100644 doc/alert-api.txt
->
-> Thanks. All patches from this set are now upstream. I also pushed one
-> additional coding style patch since I didn't want to bother with another
-> review round for such a large patch set (and please don't do these huge
-> sets in the future - keep them under 10 or so).
+On Wed, Oct 3, 2012 at 10:26 AM, Frédéric Danis
+<frederic.danis@linux.intel.com> wrote:
+> +int keyfile_put_string(const char *pathname, const char *group,
+> +                               const char *key, const char *value);
+> +int keyfile_put_boolean(const char *pathname, const char *group,
+> +                               const char *key, gboolean value);
+> +int keyfile_put_integer(const char *pathname, const char *group,
+> +                               const char *key, int value);
+> +
+> +char *keyfile_get_string(const char *pathname, const char *group,
+> +                               const char *key);
 
-Thanks! We'll try to keep future series under a reasonable size.
-Unfortunately, this one aggregated features too fast while the API was
-being defined, but we could have split at least the skeleton GATT
-server stuff to send earlier.
+One suggestion (which may or may not be acked by core devs), what
+about being consistent here and use:
+
+int keyfile_get_string(const char *pathname, const char *group, const
+char *key, char **value);
+
+(i.e. use return value for error and value pointer on last parameter).
+
+> +int keyfile_get_boolean(const char *pathname, const char *group,
+> +                               const char *key, gboolean *value);
+> +int keyfile_get_integer(const char *pathname, const char *group,
+> +                               const char *key, int *value);
+> +
+> +int keyfile_del(const char *pathname, const char *group, const char *key);
+> +
+> +typedef void (*keyfile_key_cb) (char *key, char *value, void *data);
+> +typedef void (*keyfile_group_cb) (char *group, void *data);
+> +
+> +int keyfile_foreach_key(const char *pathname, const char *group,
+> +                               keyfile_key_cb func, void *data);
+> +int keyfile_foreach_group(const char *pathname,
+> +                               keyfile_group_cb func, void *data);
+> +
+> +#endif /* __KEYFILE_H */
 
 Regards,
 -- 
