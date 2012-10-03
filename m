@@ -1,39 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 3 Oct 2012 11:21:18 +0300
+Date: Wed, 3 Oct 2012 11:12:15 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 BlueZ 01/27] doc: Introduce Alert API
-Message-ID: <20121003082118.GA12607@x220>
-References: <1348770996-12236-1-git-send-email-anderson.lizardo@openbossa.org>
- <1349209490-31830-1-git-send-email-anderson.lizardo@openbossa.org>
- <1349209490-31830-2-git-send-email-anderson.lizardo@openbossa.org>
+Subject: Re: [PATCH BlueZ v9 1/8] core: Mutually exclude concurrent
+ connections
+Message-ID: <20121003081215.GA12564@x220>
+References: <1349198578-2818-1-git-send-email-jprvita@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1349209490-31830-2-git-send-email-anderson.lizardo@openbossa.org>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1349198578-2818-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi,
 
-On Tue, Oct 02, 2012, Anderson Lizardo wrote:
-> +		void SetRinger(string mode)
-> +
-> +			This method is only called if "ringer" alert category
-> +			is specified when registering the agent.
-> +
-> +			Set ringer to the specified mode. If mode is "enabled",
-> +			ringer is set to the default mode, as defined by the
-> +			current active profile. If mode is "disabled", ringer
-> +			will not activate on incoming calls, until it is set
-> +			back to "enabled" mode.
-> +
-> +			Possible Errors: org.bluez.Error.InvalidArguments
+On Tue, Oct 02, 2012, João Paulo Rechi Vita wrote:
+> Since controllers don't support more than one ongoing connection
+> procedure at the same time, new connection attempts needs to yield if
+> there is an ongoing connection procedure already.
+> ---
+>  src/adapter.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++--------
+>  src/device.c  |  6 +++---
+>  src/device.h  |  2 +-
+>  3 files changed, 62 insertions(+), 12 deletions(-)
 
-Since you've used a string here instead of a boolean is it correct to
-assume that you want to maintain the capability of extending the
-possible values to more than just "enabled" and "disabled"? Does the
-current profile/service specification already proved more possibilities
-than these two values?
+After a couple of minor coding style cleanups this patch-set has now
+been applied. Thanks.
 
 Johan
