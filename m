@@ -1,72 +1,155 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v4 00/18] neard plugin
-Date: Wed, 3 Oct 2012 15:18:13 +0200
-Message-ID: <1349270311-31103-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
+Subject: [PATCH v4 BlueZ 09/27] alert: Implement category registration in RegisterAlert()
+Date: Wed,  3 Oct 2012 08:49:15 -0400
+Message-Id: <1349268555-14864-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1349209490-31830-10-git-send-email-anderson.lizardo@openbossa.org>
+References: <1349209490-31830-10-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Next round of neard plugin patches.
+From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
 
-Changes since v3:
-- enable neard support with --enable-neard
-- use g_memdup instead of g_malloc+memcpy
-- introduce oob_handler functionality that allows to register cb to be called
-  when certain adapter actions are completed (dbusoob plugin adjusted)
-- remove static pointers from neard plugin, this data is now passed to/from
-  callback as user data
-- other small fixes
+The given alert category is now validated and registered.
+---
 
-Comments are welcome.
+v4: Modify enumeration strings to use "-" as word separator.
 
--- 
-BR
-Szymon Janc
+ profiles/alert/server.c |  102 +++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 98 insertions(+), 4 deletions(-)
 
-
-Szymon Janc (18):
-  Handle missing randomizer in mgmt_add_remote_oob_data
-  eir: Add support for parsing SSP hash and randomizer
-  eir: Store class in struct eir_data as uint32_t
-  eir: Add eir_parse_oob function
-  eir: Add support creating EIR with hash and randomizer fields
-  eir: Add support for creating EIR with CoD field
-  eir: Rename eir_create to eir_create_oob
-  eir: Remove support for creating EIR with tx_power fields
-  eir: Return number of bytes written by eir_create_oob
-  eir: Remove struct uuid_info
-  eir: Add support for creating proper OOB EIR
-  adapter: Add btd_adapter_get_services function
-  adapter: Rename btd_adapter_get_class to btd_adapter_read_class
-  adapter: Add btd_adapter_get_class function
-  oob: Refactor oob callback handling and move it to adapter code
-  Add initial neard plugin implementation
-  neard: Implement PushOOB function
-  neard: Implement RequestOOB function
-
- Makefile.am         |    8 +-
- acinclude.m4        |    6 +
- bootstrap-configure |    1 +
- plugins/dbusoob.c   |   69 ++-----
- plugins/neard.c     |  546 +++++++++++++++++++++++++++++++++++++++++++++++++++
- src/adapter.c       |   67 ++++++-
- src/adapter.h       |   25 ++-
- src/eir.c           |  153 ++++++++++++---
- src/eir.h           |   21 +-
- src/event.c         |   11 +-
- src/event.h         |    2 +-
- src/mgmt.c          |   16 +-
- src/oob.c           |   41 ----
- src/oob.h           |   32 ---
- 14 files changed, 801 insertions(+), 197 deletions(-)
- create mode 100644 plugins/neard.c
- delete mode 100644 src/oob.c
- delete mode 100644 src/oob.h
-
+diff --git a/profiles/alert/server.c b/profiles/alert/server.c
+index c0434a4..feb7b77 100644
+--- a/profiles/alert/server.c
++++ b/profiles/alert/server.c
+@@ -77,19 +77,113 @@ enum {
+ 	RINGER_NORMAL,
+ };
+ 
++struct alert_data {
++	const char *category;
++	char *srv;
++	char *path;
++};
++
++static GSList *registered_alerts = NULL;
+ static uint8_t ringer_setting = RINGER_NORMAL;
+ static uint8_t alert_status = 0;
+ 
++static const char * const anp_categories[] = {
++	"simple",
++	"email",
++	"news",
++	"call",
++	"missed-call",
++	"sms-mms",
++	"voice-mail",
++	"schedule",
++	"high-priority",
++	"instant-message",
++};
++
++static const char * const pasp_categories[] = {
++	"ringer",
++	"vibrate",
++	"display",
++};
++
++static void alert_data_destroy(gpointer user_data)
++{
++	struct alert_data *alert = user_data;
++
++	g_free(alert->srv);
++	g_free(alert->path);
++	g_free(alert);
++}
++
++static void alert_destroy(gpointer user_data)
++{
++	g_slist_free_full(registered_alerts, alert_data_destroy);
++	registered_alerts = NULL;
++}
++
++static const char *valid_category(const char *category)
++{
++	unsigned i;
++
++	for (i = 0; i < G_N_ELEMENTS(anp_categories); i++) {
++		if (g_str_equal(anp_categories[i], category))
++			return anp_categories[i];
++	}
++
++	for (i = 0; i < G_N_ELEMENTS(pasp_categories); i++) {
++		if (g_str_equal(pasp_categories[i], category))
++			return pasp_categories[i];
++	}
++
++	return NULL;
++}
++
++static gboolean registered_category(const char *category)
++{
++	GSList *l;
++	struct alert_data *alert;
++
++	for (l = registered_alerts; l; l = g_slist_next(l)) {
++		alert = l->data;
++		if (g_str_equal(alert->category, category))
++			return TRUE;
++	}
++
++	return FALSE;
++}
++
+ static DBusMessage *register_alert(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
++	const char *sender = dbus_message_get_sender(msg);
++	char *path;
+ 	const char *category;
++	const char *c;
++	struct alert_data *alert;
++
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &c,
++			DBUS_TYPE_OBJECT_PATH, &path, DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
+ 
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &category,
+-							DBUS_TYPE_INVALID))
++	category = valid_category(c);
++	if (!category) {
++		DBG("Invalid category: %s", c);
+ 		return btd_error_invalid_args(msg);
++	}
++
++	if (registered_category(category)) {
++		DBG("Category %s already registered", category);
++		return dbus_message_new_method_return(msg);
++	}
++
++	alert = g_new0(struct alert_data, 1);
++	alert->srv = g_strdup(sender);
++	alert->path = g_strdup(path);
++	alert->category = category;
++
++	registered_alerts = g_slist_append(registered_alerts, alert);
+ 
+-	DBG("RegisterAlert: %s", category);
++	DBG("RegisterAlert(\"%s\", \"%s\")", alert->category, alert->path);
+ 
+ 	return dbus_message_new_method_return(msg);
+ }
+@@ -290,7 +384,7 @@ int alert_server_init(void)
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+ 					ALERT_OBJECT_PATH, ALERT_INTERFACE,
+ 					alert_methods, NULL, NULL, NULL,
+-					NULL)) {
++					alert_destroy)) {
+ 		error("D-Bus failed to register %s interface",
+ 							ALERT_INTERFACE);
+ 		return -EIO;
 -- 
 1.7.9.5
 
