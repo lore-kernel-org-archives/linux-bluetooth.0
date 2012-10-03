@@ -1,73 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Srinivasa Ragavan <srinivasa.ragavan.venkateswaran@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: L2CAP: Fix using default Flush Timeout for EFS
-Date: Wed,  3 Oct 2012 14:45:12 +0300
-Message-Id: <1349264712-7374-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Srinivasa Ragavan <srinivasa.ragavan.venkateswaran@intel.com>
+Subject: [PATCH 4/4] test: Update map-client to include Message.SetProperty and Message.GetProperties
+Date: Wed,  3 Oct 2012 17:01:57 +0530
+Message-Id: <1349263917-11413-4-git-send-email-srinivasa.ragavan.venkateswaran@intel.com>
+In-Reply-To: <1349263917-11413-1-git-send-email-srinivasa.ragavan.venkateswaran@intel.com>
+References: <1349263917-11413-1-git-send-email-srinivasa.ragavan.venkateswaran@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-There are two Flush Timeouts: one is old Flush Timeot Option
-which is 2 octets and the second is Flush Timeout inside EFS
-which is 4 octets long.
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |    3 ++-
- net/bluetooth/l2cap_core.c    |   10 ++++++----
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ test/map-client |   42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index ab58b81..83fb9c7 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -32,7 +32,8 @@
- /* L2CAP defaults */
- #define L2CAP_DEFAULT_MTU		672
- #define L2CAP_DEFAULT_MIN_MTU		48
--#define L2CAP_DEFAULT_FLUSH_TO		0xffff
-+#define L2CAP_DEFAULT_FLUSH_TO		0xFFFF
-+#define L2CAP_EFS_DEFAULT_FLUSH_TO	0xFFFFFFFF
- #define L2CAP_DEFAULT_TX_WINDOW		63
- #define L2CAP_DEFAULT_EXT_WINDOW	0x3FFF
- #define L2CAP_DEFAULT_MAX_TX		3
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b4e707b..ab6853d 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -504,7 +504,7 @@ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 	chan->local_msdu	= L2CAP_DEFAULT_MAX_SDU_SIZE;
- 	chan->local_sdu_itime	= L2CAP_DEFAULT_SDU_ITIME;
- 	chan->local_acc_lat	= L2CAP_DEFAULT_ACC_LAT;
--	chan->local_flush_to	= L2CAP_DEFAULT_FLUSH_TO;
-+	chan->local_flush_to	= L2CAP_EFS_DEFAULT_FLUSH_TO;
+diff --git a/test/map-client b/test/map-client
+index 2075844..54e3900 100755
+--- a/test/map-client
++++ b/test/map-client
+@@ -41,6 +41,16 @@ def parse_options():
+ 			help="List messages in supplied CWD subdir")
+ 	parser.add_option("-g", "--get", action="store", dest="get_msg",
+ 			help="Get message contents")
++	parser.add_option("--get-properties", action="store", dest="get_msg_properties",
++			help="Get message properties")
++	parser.add_option("--mark-read", action="store", dest="mark_msg_read",
++			help="Marks the messages as read")
++	parser.add_option("--mark-unread", action="store", dest="mark_msg_unread",
++			help="Marks the messages as unread")	
++	parser.add_option("--mark-deleted", action="store", dest="mark_msg_deleted",
++			help="Deletes the message from the folder")
++	parser.add_option("--mark-undeleted", action="store", dest="mark_msg_undeleted",
++			help="Undeletes the message")
  
- 	l2cap_chan_hold(chan);
+ 	return parser.parse_args()
  
-@@ -2714,8 +2714,10 @@ static void l2cap_add_opt_efs(void **ptr, struct l2cap_chan *chan)
- 		efs.stype	= chan->local_stype;
- 		efs.msdu	= cpu_to_le16(chan->local_msdu);
- 		efs.sdu_itime	= cpu_to_le32(chan->local_sdu_itime);
--		efs.acc_lat	= __constant_cpu_to_le32(L2CAP_DEFAULT_ACC_LAT);
--		efs.flush_to	= __constant_cpu_to_le32(L2CAP_DEFAULT_FLUSH_TO);
-+		efs.acc_lat	=
-+			__constant_cpu_to_le32(L2CAP_DEFAULT_ACC_LAT);
-+		efs.flush_to	=
-+			__constant_cpu_to_le32(L2CAP_EFS_DEFAULT_FLUSH_TO);
- 		break;
+@@ -120,6 +130,22 @@ class MapClient:
+ 		msg.Get("", True, reply_handler=self.create_transfer_reply,
+ 						error_handler=self.error)
  
- 	case L2CAP_MODE_STREAMING:
-@@ -2732,7 +2734,7 @@ static void l2cap_add_opt_efs(void **ptr, struct l2cap_chan *chan)
- 	}
++	def get_message_properties(self, handle):
++		self.map.ListMessages("", dict())
++		path = self.path + "/message" + handle
++		obj = bus.get_object("org.bluez.obex.client", path)
++		msg = dbus.Interface(obj, "org.bluez.obex.Message")
++		ret = msg.GetProperties()
++		print pformat(unwrap(ret))
++	
++	def set_message_property(self, handle, prop, flag):
++		self.map.ListMessages("", dict())
++		path = self.path + "/message" + handle
++		obj = bus.get_object("org.bluez.obex.client", path)
++		msg = dbus.Interface(obj, "org.bluez.obex.Message")
++		msg.SetProperty (prop, flag);
++
++
+ if  __name__ == '__main__':
  
- 	l2cap_add_conf_opt(ptr, L2CAP_CONF_EFS, sizeof(efs),
--							(unsigned long) &efs);
-+			   (unsigned long) &efs);
- }
+ 	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+@@ -155,4 +181,20 @@ if  __name__ == '__main__':
+ 	if options.get_msg is not None:
+ 		map_client.get_message(options.get_msg)
  
- static void l2cap_ack_timeout(struct work_struct *work)
++	if options.get_msg_properties is not None:
++		map_client.get_message_properties(options.get_msg_properties)
++
++	if options.mark_msg_read is not None:
++		map_client.set_message_property(options.mark_msg_read, "Read", True)
++
++	if options.mark_msg_unread is not None:
++		map_client.set_message_property(options.mark_msg_unread, "Read", False)
++
++	if options.mark_msg_deleted is not None:
++		map_client.set_message_property(options.mark_msg_deleted, "Deleted", True)
++
++	if options.mark_msg_undeleted is not None:
++		map_client.set_message_property(options.mark_msg_undeleted, "Deleted", False)
++
++
+ 	mainloop.run()
 -- 
-1.7.9.5
+1.7.10.4
 
