@@ -2,57 +2,71 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v4 01/18] Handle missing randomizer in mgmt_add_remote_oob_data
-Date: Wed, 3 Oct 2012 15:18:14 +0200
-Message-ID: <1349270311-31103-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1349270311-31103-1-git-send-email-szymon.janc@tieto.com>
-References: <1349270311-31103-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v4 00/18] neard plugin
+Date: Wed, 3 Oct 2012 15:18:13 +0200
+Message-ID: <1349270311-31103-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Randomizer is optional. Handling missing randomizer in
-mgmt_add_remote_oob_data is easy and will simplify caller code.
+Next round of neard plugin patches.
 
----
- plugins/dbusoob.c |    7 -------
- src/mgmt.c        |    4 +++-
- 2 files changed, 3 insertions(+), 8 deletions(-)
+Changes since v3:
+- enable neard support with --enable-neard
+- use g_memdup instead of g_malloc+memcpy
+- introduce oob_handler functionality that allows to register cb to be called
+  when certain adapter actions are completed (dbusoob plugin adjusted)
+- remove static pointers from neard plugin, this data is now passed to/from
+  callback as user data
+- other small fixes
 
-diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
-index 543b272..d3bca9e 100644
---- a/plugins/dbusoob.c
-+++ b/plugins/dbusoob.c
-@@ -232,13 +232,6 @@ static gboolean store_data(struct btd_adapter *adapter, struct oob_data *data)
- 	adapter_get_address(adapter, &local);
- 
- 	if (data->hash) {
--		uint8_t empty_randomizer[16];
--
--		if (!data->randomizer) {
--			memset(empty_randomizer, 0, sizeof(empty_randomizer));
--			data->randomizer = empty_randomizer;
--		}
--
- 		if (btd_adapter_add_remote_oob_data(adapter, &bdaddr,
- 					data->hash, data->randomizer) < 0)
- 			return FALSE;
-diff --git a/src/mgmt.c b/src/mgmt.c
-index 4354dc4..5bba732 100644
---- a/src/mgmt.c
-+++ b/src/mgmt.c
-@@ -2459,7 +2459,9 @@ int mgmt_add_remote_oob_data(int index, bdaddr_t *bdaddr,
- 
- 	bacpy(&cp->addr.bdaddr, bdaddr);
- 	memcpy(cp->hash, hash, 16);
--	memcpy(cp->randomizer, randomizer, 16);
-+
-+	if (randomizer)
-+		memcpy(cp->randomizer, randomizer, 16);
- 
- 	if (write(mgmt_sock, &buf, sizeof(buf)) < 0)
- 		return -errno;
+Comments are welcome.
+
+-- 
+BR
+Szymon Janc
+
+
+Szymon Janc (18):
+  Handle missing randomizer in mgmt_add_remote_oob_data
+  eir: Add support for parsing SSP hash and randomizer
+  eir: Store class in struct eir_data as uint32_t
+  eir: Add eir_parse_oob function
+  eir: Add support creating EIR with hash and randomizer fields
+  eir: Add support for creating EIR with CoD field
+  eir: Rename eir_create to eir_create_oob
+  eir: Remove support for creating EIR with tx_power fields
+  eir: Return number of bytes written by eir_create_oob
+  eir: Remove struct uuid_info
+  eir: Add support for creating proper OOB EIR
+  adapter: Add btd_adapter_get_services function
+  adapter: Rename btd_adapter_get_class to btd_adapter_read_class
+  adapter: Add btd_adapter_get_class function
+  oob: Refactor oob callback handling and move it to adapter code
+  Add initial neard plugin implementation
+  neard: Implement PushOOB function
+  neard: Implement RequestOOB function
+
+ Makefile.am         |    8 +-
+ acinclude.m4        |    6 +
+ bootstrap-configure |    1 +
+ plugins/dbusoob.c   |   69 ++-----
+ plugins/neard.c     |  546 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/adapter.c       |   67 ++++++-
+ src/adapter.h       |   25 ++-
+ src/eir.c           |  153 ++++++++++++---
+ src/eir.h           |   21 +-
+ src/event.c         |   11 +-
+ src/event.h         |    2 +-
+ src/mgmt.c          |   16 +-
+ src/oob.c           |   41 ----
+ src/oob.h           |   32 ---
+ 14 files changed, 801 insertions(+), 197 deletions(-)
+ create mode 100644 plugins/neard.c
+ delete mode 100644 src/oob.c
+ delete mode 100644 src/oob.h
+
 -- 
 1.7.9.5
 
