@@ -1,154 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH v4 BlueZ 01/27] doc: Introduce Alert API
-Date: Wed,  3 Oct 2012 08:46:38 -0400
-Message-Id: <1349268398-14620-1-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1349209490-31830-2-git-send-email-anderson.lizardo@openbossa.org>
-References: <1349209490-31830-2-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH] Bluetooth: L2CAP: Fix using default Flush Timeout for EFS
+Date: Wed,  3 Oct 2012 14:45:12 +0300
+Message-Id: <1349264712-7374-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This API will be implemented and initially used by Phone Alert Status
-and Alert Notification GATT profiles (server role).
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+
+There are two Flush Timeouts: one is old Flush Timeot Option
+which is 2 octets and the second is Flush Timeout inside EFS
+which is 4 octets long.
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
+ include/net/bluetooth/l2cap.h |    3 ++-
+ net/bluetooth/l2cap_core.c    |   10 ++++++----
+ 2 files changed, 8 insertions(+), 5 deletions(-)
 
-v4: Modify enumeration strings to use "-" as word separator.
-
- Makefile.am       |    2 +-
- doc/alert-api.txt |  109 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 110 insertions(+), 1 deletion(-)
- create mode 100644 doc/alert-api.txt
-
-diff --git a/Makefile.am b/Makefile.am
-index c27eb01..470dbad 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -396,7 +396,7 @@ EXTRA_DIST += doc/manager-api.txt \
- 		doc/network-api.txt doc/input-api.txt doc/audio-api.txt \
- 		doc/control-api.txt doc/hfp-api.txt doc/health-api.txt \
- 		doc/sap-api.txt doc/media-api.txt doc/assigned-numbers.txt \
--		doc/supported-features.txt
-+		doc/supported-features.txt doc/alert-api.txt
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index ab58b81..83fb9c7 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -32,7 +32,8 @@
+ /* L2CAP defaults */
+ #define L2CAP_DEFAULT_MTU		672
+ #define L2CAP_DEFAULT_MIN_MTU		48
+-#define L2CAP_DEFAULT_FLUSH_TO		0xffff
++#define L2CAP_DEFAULT_FLUSH_TO		0xFFFF
++#define L2CAP_EFS_DEFAULT_FLUSH_TO	0xFFFFFFFF
+ #define L2CAP_DEFAULT_TX_WINDOW		63
+ #define L2CAP_DEFAULT_EXT_WINDOW	0x3FFF
+ #define L2CAP_DEFAULT_MAX_TX		3
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b4e707b..ab6853d 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -504,7 +504,7 @@ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ 	chan->local_msdu	= L2CAP_DEFAULT_MAX_SDU_SIZE;
+ 	chan->local_sdu_itime	= L2CAP_DEFAULT_SDU_ITIME;
+ 	chan->local_acc_lat	= L2CAP_DEFAULT_ACC_LAT;
+-	chan->local_flush_to	= L2CAP_DEFAULT_FLUSH_TO;
++	chan->local_flush_to	= L2CAP_EFS_DEFAULT_FLUSH_TO;
  
- AM_YFLAGS = -d
+ 	l2cap_chan_hold(chan);
  
-diff --git a/doc/alert-api.txt b/doc/alert-api.txt
-new file mode 100644
-index 0000000..bcaaaf3
---- /dev/null
-+++ b/doc/alert-api.txt
-@@ -0,0 +1,109 @@
-+BlueZ D-Bus Alert API description
-+*********************************
-+
-+Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
-+
-+Introduction
-+------------
-+
-+Currently, there are two different GATT server profiles that depend on
-+receiving alerts or notifications from the platform: Phone Alert Status (PASP)
-+and Alert Notification (ANP). PASP is very specific to mobile phones, and also
-+allows limited control to alerts (i.e. mute once or switch to a silent mode).
-+
-+This document presents a unified API that allows to register and notify alerts,
-+and to control some alerts (using the provided agent object).
-+
-+
-+Alert hierarchy
-+===============
-+
-+Service		org.bluez
-+Interface	org.bluez.Alert
-+Object path	/org/bluez
-+
-+Methods		void RegisterAlert(string category, object agent)
-+
-+			Register a new alert category and an agent for it. This
-+			means the application will be responsible for notifying
-+			BlueZ of any alerts of that category, using the
-+			NewAlert() method.
-+
-+			Supported ANP categories: simple, email, news, call,
-+				missed-call, sms-mms, voice-mail, schedule,
-+				high-priority, instant-message
-+			Supported PASP categories: ringer, vibrate, display
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		void NewAlert(string category, uint16 count, string description)
-+
-+			Notify BlueZ of new alert(s) for the given category. The
-+			description is relative to the last received alert and
-+			can be sender name, caller ID, title, or other
-+			information specific to the category.
-+
-+			For ringer, vibrate and display categories, valid
-+			descriptions are "active" and "not active". Alerts from
-+			ringer category also accept "enabled" and "disabled",
-+			depending on whether ringer is in silent mode or not.
-+
-+			Description must not exceed 18 bytes when encoded in
-+			UTF-8 format, otherwise an error is returned. If there
-+			is no description, an empty string should be used.
-+
-+			The count argument contains the number of alerts not
-+			yet acknowledged by the user on the UI. To save D-Bus
-+			traffic, events that may generate multiple alerts at
-+			the same time (like email, sms, news) should trigger a
-+			single NewAlert().
-+
-+			If there are more than 254 new alerts, count must be
-+			set to 255. PASP alerts should always set count to 1.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		void UnreadAlert(string category, uint16 count)
-+
-+			Some services (like SMS and e-mail) keep track of
-+			number of unread items. This method allows to update
-+			this counter, so peer devices can be notified using
-+			Alert Notification Profile.
-+
-+			If there are more than 254 unread alerts, count must be
-+			set to 255.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+Alert Agent hierarchy
-+=====================
-+
-+Service		org.bluez
-+Interface	org.bluez.AlertAgent
-+Object path	freely definable
-+
-+Methods		void MuteOnce()
-+
-+			This method is only called if "ringer" alert category
-+			is specified when registering the agent.
-+
-+			Mute the ringer once (e.g. during a incoming call). If
-+			ringer is not active, does nothing.
-+
-+		void SetRinger(string mode)
-+
-+			This method is only called if "ringer" alert category
-+			is specified when registering the agent.
-+
-+			Set ringer to the specified mode. If mode is "enabled",
-+			ringer is set to the default mode, as defined by the
-+			current active profile. If mode is "disabled", ringer
-+			will not activate on incoming calls, until it is set
-+			back to "enabled" mode.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		void Release()
-+
-+			Release this agent. At this point, it will not be used
-+			by BlueZ anymore and can be destroyed by the owner.
+@@ -2714,8 +2714,10 @@ static void l2cap_add_opt_efs(void **ptr, struct l2cap_chan *chan)
+ 		efs.stype	= chan->local_stype;
+ 		efs.msdu	= cpu_to_le16(chan->local_msdu);
+ 		efs.sdu_itime	= cpu_to_le32(chan->local_sdu_itime);
+-		efs.acc_lat	= __constant_cpu_to_le32(L2CAP_DEFAULT_ACC_LAT);
+-		efs.flush_to	= __constant_cpu_to_le32(L2CAP_DEFAULT_FLUSH_TO);
++		efs.acc_lat	=
++			__constant_cpu_to_le32(L2CAP_DEFAULT_ACC_LAT);
++		efs.flush_to	=
++			__constant_cpu_to_le32(L2CAP_EFS_DEFAULT_FLUSH_TO);
+ 		break;
+ 
+ 	case L2CAP_MODE_STREAMING:
+@@ -2732,7 +2734,7 @@ static void l2cap_add_opt_efs(void **ptr, struct l2cap_chan *chan)
+ 	}
+ 
+ 	l2cap_add_conf_opt(ptr, L2CAP_CONF_EFS, sizeof(efs),
+-							(unsigned long) &efs);
++			   (unsigned long) &efs);
+ }
+ 
+ static void l2cap_ack_timeout(struct work_struct *work)
 -- 
 1.7.9.5
 
