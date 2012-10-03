@@ -1,104 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 3 Oct 2012 22:59:12 +0300
+Date: Wed, 3 Oct 2012 22:48:51 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
-	<frederic.danis@linux.intel.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] storage: Move adapter info to adapter.conf
-Message-ID: <20121003195912.GA27664@x220.P-661HNU-F1>
-References: <1349274401-32012-1-git-send-email-frederic.danis@linux.intel.com>
+Subject: Re: [PATCH v4 00/18] neard plugin
+Message-ID: <20121003194851.GB32176@x220.P-661HNU-F1>
+References: <1349270311-31103-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1349274401-32012-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1349270311-31103-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+Hi Szymon,
 
-On Wed, Oct 03, 2012, Frédéric Danis wrote:
-> Add functions to read and write to .conf files.
-> Convert adapter "config" file to "adapter.conf".
-> ---
->  .gitignore          |    1 +
->  Makefile.am         |    3 +-
->  Makefile.tools      |    6 +-
->  src/keyfile.c       |  282 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  src/keyfile.h       |   51 ++++++++++
->  src/storage.c       |  100 +++++++-----------
->  test/test-keyfile.c |  252 +++++++++++++++++++++++++++++++++++++++++++++
->  7 files changed, 627 insertions(+), 68 deletions(-)
->  create mode 100644 src/keyfile.c
->  create mode 100644 src/keyfile.h
->  create mode 100644 test/test-keyfile.c
+On Wed, Oct 03, 2012, Szymon Janc wrote:
+> Next round of neard plugin patches.
+> 
+> Changes since v3:
+> - enable neard support with --enable-neard
+> - use g_memdup instead of g_malloc+memcpy
+> - introduce oob_handler functionality that allows to register cb to be called
+>   when certain adapter actions are completed (dbusoob plugin adjusted)
+> - remove static pointers from neard plugin, this data is now passed to/from
+>   callback as user data
+> - other small fixes
+> 
+> Comments are welcome.
+> 
+> Szymon Janc (18):
+>   Handle missing randomizer in mgmt_add_remote_oob_data
+>   eir: Add support for parsing SSP hash and randomizer
+>   eir: Store class in struct eir_data as uint32_t
+>   eir: Add eir_parse_oob function
+>   eir: Add support creating EIR with hash and randomizer fields
+>   eir: Add support for creating EIR with CoD field
+>   eir: Rename eir_create to eir_create_oob
+>   eir: Remove support for creating EIR with tx_power fields
+>   eir: Return number of bytes written by eir_create_oob
+>   eir: Remove struct uuid_info
+>   eir: Add support for creating proper OOB EIR
+>   adapter: Add btd_adapter_get_services function
+>   adapter: Rename btd_adapter_get_class to btd_adapter_read_class
+>   adapter: Add btd_adapter_get_class function
+>   oob: Refactor oob callback handling and move it to adapter code
+>   Add initial neard plugin implementation
+>   neard: Implement PushOOB function
+>   neard: Implement RequestOOB function
+> 
+>  Makefile.am         |    8 +-
+>  acinclude.m4        |    6 +
+>  bootstrap-configure |    1 +
+>  plugins/dbusoob.c   |   69 ++-----
+>  plugins/neard.c     |  546 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/adapter.c       |   67 ++++++-
+>  src/adapter.h       |   25 ++-
+>  src/eir.c           |  153 ++++++++++++---
+>  src/eir.h           |   21 +-
+>  src/event.c         |   11 +-
+>  src/event.h         |    2 +-
+>  src/mgmt.c          |   16 +-
+>  src/oob.c           |   41 ----
+>  src/oob.h           |   32 ---
+>  14 files changed, 801 insertions(+), 197 deletions(-)
+>  create mode 100644 plugins/neard.c
+>  delete mode 100644 src/oob.c
+>  delete mode 100644 src/oob.h
 
-The keyfile.[ch] files should be split into their own patch along with
-test-keyfile.c.
-
-> +int keyfile_put_string(const char *pathname, const char *group,
-> +				const char *key, const char *value)
-> +{
-> +	GKeyFile *key_file;
-> +	char *data;
-> +	FILE *file;
-> +
-> +	key_file = g_key_file_new();
-> +
-> +	g_key_file_load_from_file(key_file, pathname, 0, NULL);
-> +
-> +	g_key_file_set_string(key_file, group, key, value);
-> +
-> +	data = g_key_file_to_data(key_file, NULL, NULL);
-> +	file = fopen(pathname, "w");
-> +	fputs(data, file);
-> +	fclose(file);
-
-It seems like there's some error checking missing here as both
-g_key_file_load_from_file and fopen could fail.
-
-> +}
-> +
-> +
-> +int keyfile_get_boolean(const char *pathname, const char *group,
-
-Two consecutive empty lines above. Please remove one.
-
-> +				const char *key, gboolean *value)
-> +{
-> +	GKeyFile *key_file;
-> +	GError *error = NULL;
-
-Please don't reuse the symbol name "error" since we already have that
-for error logging. Use gerr instead
-
-> +	int err = 0;
-
-This initialization upon declaration is unnecessary. Set to 0 at the end
-of the success path instead.
-
-> +	if (error) {
-> +		g_error_free(error);
-> +		err = -EINVAL;
-> +	}
-
-< i.e. here >
-
-> +
-> +failed:
-> +	g_key_file_free(key_file);
-> +	errno = -err;
-
-Don't mix errno into this. It should be considered "owned" by libc and
-we should only read it and not write to it. Return the error in the
-function return value instead.
-
-> +	return keyfile_put_integer(filename, "General", "DiscovTO", timeout);
-
-I really dislike this "TO" short-hand for timeout. I think we can use
-longer and more readable names in the INI-format files. In this case
-DiscoverableTimeout should be perfectly fine. 
-
-> +	return keyfile_put_integer(filename, "General", "PairTO", timeout);
-
-Same here. PairableTimeout should be fine.
+I didn't find any major issues so all patches in this set have now been
+applied. Thanks.
 
 Johan
