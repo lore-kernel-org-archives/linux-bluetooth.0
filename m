@@ -1,902 +1,422 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] storage: Move adapter info to adapter.conf
-Date: Wed,  3 Oct 2012 16:26:41 +0200
-Message-Id: <1349274401-32012-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v4 15/18] oob: Refactor oob callback handling and move it to adapter code
+Date: Wed, 3 Oct 2012 15:18:28 +0200
+Message-ID: <1349270311-31103-16-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1349270311-31103-1-git-send-email-szymon.janc@tieto.com>
+References: <1349270311-31103-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add functions to read and write to .conf files.
-Convert adapter "config" file to "adapter.conf".
----
- .gitignore          |    1 +
- Makefile.am         |    3 +-
- Makefile.tools      |    6 +-
- src/keyfile.c       |  282 +++++++++++++++++++++++++++++++++++++++++++++++++++
- src/keyfile.h       |   51 ++++++++++
- src/storage.c       |  100 +++++++-----------
- test/test-keyfile.c |  252 +++++++++++++++++++++++++++++++++++++++++++++
- 7 files changed, 627 insertions(+), 68 deletions(-)
- create mode 100644 src/keyfile.c
- create mode 100644 src/keyfile.h
- create mode 100644 test/test-keyfile.c
+This allows oob plugin to register for callback after executing
+certain action on adapter. Currently reading local OOB data and
+pairing is supported. It should be easy to support more callbacks
+in future if needed e.g. powering on.
 
-diff --git a/.gitignore b/.gitignore
-index c9f293a..2f89353 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -82,6 +82,7 @@ unit/test-eir
- tools/btmgmt
- monitor/btmon
- emulator/btvirt
-+test/test-keyfile
- 
- doc/*.bak
- doc/*.stamp
+Thanks to this plugin is not required to duplicate code that would
+validate adapter/device when callback is received as callback condition
+is check in adapter.
+
+It also allows to pass user data which will be provided back when cb
+is called further reducing plugin code.
+
+---
+ Makefile.am       |    3 +--
+ plugins/dbusoob.c |   62 +++++++++++------------------------------------------
+ src/adapter.c     |   44 +++++++++++++++++++++++++++++++++++++
+ src/adapter.h     |   20 +++++++++++++++++
+ src/mgmt.c        |    8 +++----
+ src/oob.c         |   41 -----------------------------------
+ src/oob.h         |   32 ---------------------------
+ 7 files changed, 81 insertions(+), 129 deletions(-)
+ delete mode 100644 src/oob.c
+ delete mode 100644 src/oob.h
+
 diff --git a/Makefile.am b/Makefile.am
-index c27eb01..ba7c8d8 100644
+index c27eb01..9868710 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -309,7 +309,8 @@ src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
+@@ -307,8 +307,7 @@ src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
+ 			src/profile.h src/profile.c \
+ 			src/device.h src/device.c src/attio.h \
  			src/dbus-common.c src/dbus-common.h \
- 			src/event.h src/event.c \
- 			src/oob.h src/oob.c src/eir.h src/eir.c \
--			src/mgmt.c src/mgmt.h
-+			src/mgmt.c src/mgmt.h \
-+			src/keyfile.h src/keyfile.c
+-			src/event.h src/event.c \
+-			src/oob.h src/oob.c src/eir.h src/eir.c \
++			src/event.h src/event.c src/eir.h src/eir.c \
+ 			src/mgmt.c src/mgmt.h
  src_bluetoothd_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@ @DBUS_LIBS@ \
  								-ldl -lrt
- src_bluetoothd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic \
-diff --git a/Makefile.tools b/Makefile.tools
-index 9637a9f..e122b0a 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -157,7 +157,8 @@ noinst_PROGRAMS += test/gaptest test/sdptest test/scotest \
- 			test/attest test/hstest test/avtest \
- 					test/lmptest test/bdaddr test/agent \
- 					test/btiotest test/test-textfile \
--					test/uuidtest test/mpris-player
-+					test/uuidtest test/mpris-player \
-+					test/test-keyfile
- 
- test_hciemu_LDADD = lib/libbluetooth-private.la
- 
-@@ -195,6 +196,9 @@ test_mpris_player_LDADD = @DBUS_LIBS@ @GLIB_LIBS@
- 
- test_test_textfile_SOURCES = test/test-textfile.c src/textfile.h src/textfile.c
- 
-+test_test_keyfile_SOURCES = test/test-keyfile.c src/keyfile.h src/keyfile.c
-+test_test_keyfile_LDADD = @GLIB_LIBS@
-+
- dist_man_MANS += test/rctest.1 test/hciemu.1
- 
- EXTRA_DIST += test/bdaddr.8
-diff --git a/src/keyfile.c b/src/keyfile.c
-new file mode 100644
-index 0000000..ea5f0bf
---- /dev/null
-+++ b/src/keyfile.c
-@@ -0,0 +1,282 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#define _GNU_SOURCE
-+#include <stdio.h>
-+#include <errno.h>
-+
-+#include <glib.h>
-+
-+#include "keyfile.h"
-+
-+int keyfile_put_string(const char *pathname, const char *group,
-+				const char *key, const char *value)
-+{
-+	GKeyFile *key_file;
-+	char *data;
-+	FILE *file;
-+
-+	key_file = g_key_file_new();
-+
-+	g_key_file_load_from_file(key_file, pathname, 0, NULL);
-+
-+	g_key_file_set_string(key_file, group, key, value);
-+
-+	data = g_key_file_to_data(key_file, NULL, NULL);
-+	file = fopen(pathname, "w");
-+	fputs(data, file);
-+	fclose(file);
-+
-+	g_free(data);
-+	g_key_file_free(key_file);
-+
-+	return 0;
-+}
-+
-+int keyfile_put_boolean(const char *pathname, const char *group,
-+				const char *key, gboolean value)
-+{
-+	GKeyFile *key_file;
-+	char *data;
-+	FILE *file;
-+
-+	key_file = g_key_file_new();
-+
-+	g_key_file_load_from_file(key_file, pathname, 0, NULL);
-+
-+	g_key_file_set_boolean(key_file, group, key, value);
-+
-+	data = g_key_file_to_data(key_file, NULL, NULL);
-+	file = fopen(pathname, "w");
-+	fputs(data, file);
-+	fclose(file);
-+
-+	g_free(data);
-+	g_key_file_free(key_file);
-+
-+	return 0;
-+}
-+
-+int keyfile_put_integer(const char *pathname, const char *group,
-+				const char *key, int value)
-+{
-+	GKeyFile *key_file;
-+	char *data;
-+	FILE *file;
-+
-+	key_file = g_key_file_new();
-+
-+	g_key_file_load_from_file(key_file, pathname, 0, NULL);
-+
-+	g_key_file_set_integer(key_file, group, key, value);
-+
-+	data = g_key_file_to_data(key_file, NULL, NULL);
-+	file = fopen(pathname, "w");
-+	fputs(data, file);
-+	fclose(file);
-+
-+	g_free(data);
-+	g_key_file_free(key_file);
-+
-+	return 0;
-+}
-+
-+char *keyfile_get_string(const char *pathname, const char *group,
-+				const char *key)
-+{
-+	char *str = NULL;
-+	GKeyFile *key_file;
-+	int err = 0;
-+
-+	key_file = g_key_file_new();
-+
-+	if (!g_key_file_load_from_file(key_file, pathname, 0, NULL)) {
-+		err = -ENOENT;
-+		goto failed;
-+	}
-+
-+	str = g_key_file_get_string(key_file, group, key, NULL);
-+	if (!str)
-+		err = -EINVAL;
-+
-+failed:
-+	g_key_file_free(key_file);
-+	errno = -err;
-+
-+	return str;
-+}
-+
-+
-+int keyfile_get_boolean(const char *pathname, const char *group,
-+				const char *key, gboolean *value)
-+{
-+	GKeyFile *key_file;
-+	GError *error = NULL;
-+	int err = 0;
-+
-+	key_file = g_key_file_new();
-+
-+	if (!g_key_file_load_from_file(key_file, pathname, 0, NULL)) {
-+		err = -ENOENT;
-+		goto failed;
-+	}
-+
-+	*value = g_key_file_get_boolean(key_file, group, key, &error);
-+	if (error) {
-+		g_error_free(error);
-+		err = -EINVAL;
-+	}
-+
-+failed:
-+	g_key_file_free(key_file);
-+	errno = -err;
-+
-+	return 0;
-+}
-+
-+int keyfile_get_integer(const char *pathname, const char *group,
-+				const char *key, int *value)
-+{
-+	GKeyFile *key_file;
-+	GError *error = NULL;
-+	int err = 0;
-+
-+	key_file = g_key_file_new();
-+
-+	if (!g_key_file_load_from_file(key_file, pathname, 0, NULL)) {
-+		err = -ENOENT;
-+		goto failed;
-+	}
-+
-+	*value = g_key_file_get_integer(key_file, group, key, &error);
-+	if (error) {
-+		g_error_free(error);
-+		err = -EINVAL;
-+	}
-+
-+failed:
-+	g_key_file_free(key_file);
-+	errno = -err;
-+
-+	return 0;
-+}
-+
-+int keyfile_del(const char *pathname, const char *group, const char *key)
-+{
-+	GKeyFile *key_file;
-+	char *data;
-+	FILE *file;
-+	GError *error = NULL;
-+	int err = 0;
-+
-+	key_file = g_key_file_new();
-+
-+	g_key_file_load_from_file(key_file, pathname, 0, NULL);
-+
-+	if (key)
-+		g_key_file_remove_key(key_file, group, key, &error);
-+	else
-+		g_key_file_remove_group(key_file, group, &error);
-+
-+	if (error) {
-+		if (error->code != G_KEY_FILE_ERROR_GROUP_NOT_FOUND &&
-+				error->code != G_KEY_FILE_ERROR_KEY_NOT_FOUND)
-+			err = -EINVAL;
-+
-+		g_error_free(error);
-+		goto failed;
-+	}
-+
-+	data = g_key_file_to_data(key_file, NULL, NULL);
-+	file = fopen(pathname, "w");
-+	fputs(data, file);
-+	fclose(file);
-+
-+	g_free(data);
-+
-+failed:
-+	g_key_file_free(key_file);
-+	errno = -err;
-+
-+	return err;
-+}
-+
-+int keyfile_foreach_key(const char *pathname, const char *group,
-+				keyfile_key_cb func, void *data)
-+{
-+	GKeyFile *key_file;
-+	char **keys, **key, *value;
-+	int err = 0;
-+
-+	key_file = g_key_file_new();
-+
-+	g_key_file_load_from_file(key_file, pathname, 0, NULL);
-+	keys = g_key_file_get_keys(key_file, group, NULL, NULL);
-+
-+	if (!keys) {
-+		err = -EINVAL;
-+		goto failed;
-+	}
-+
-+	for (key = keys; *key; key++) {
-+		value = g_key_file_get_string(key_file, group, *key, NULL);
-+		func(*key, value, data);
-+	}
-+
-+failed:
-+	g_key_file_free(key_file);
-+	errno = -err;
-+
-+	return err;
-+}
-+
-+int keyfile_foreach_group(const char *pathname,
-+				keyfile_group_cb func, void *data)
-+{
-+	GKeyFile *key_file;
-+	char **groups, **group;
-+	int err = 0;
-+
-+	key_file = g_key_file_new();
-+
-+	g_key_file_load_from_file(key_file, pathname, 0, NULL);
-+	groups = g_key_file_get_groups(key_file, NULL);
-+
-+	if (!groups) {
-+		err = -EINVAL;
-+		goto failed;
-+	}
-+
-+	for (group = groups; *group; group++)
-+		func(*group, data);
-+
-+failed:
-+	g_key_file_free(key_file);
-+	errno = -err;
-+
-+	return err;
-+}
-diff --git a/src/keyfile.h b/src/keyfile.h
-new file mode 100644
-index 0000000..b2e19c3
---- /dev/null
-+++ b/src/keyfile.h
-@@ -0,0 +1,51 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifndef __KEYFILE_H
-+#define __KEYFILE_H
-+
-+int keyfile_put_string(const char *pathname, const char *group,
-+				const char *key, const char *value);
-+int keyfile_put_boolean(const char *pathname, const char *group,
-+				const char *key, gboolean value);
-+int keyfile_put_integer(const char *pathname, const char *group,
-+				const char *key, int value);
-+
-+char *keyfile_get_string(const char *pathname, const char *group,
-+				const char *key);
-+int keyfile_get_boolean(const char *pathname, const char *group,
-+				const char *key, gboolean *value);
-+int keyfile_get_integer(const char *pathname, const char *group,
-+				const char *key, int *value);
-+
-+int keyfile_del(const char *pathname, const char *group, const char *key);
-+
-+typedef void (*keyfile_key_cb) (char *key, char *value, void *data);
-+typedef void (*keyfile_group_cb) (char *group, void *data);
-+
-+int keyfile_foreach_key(const char *pathname, const char *group,
-+				keyfile_key_cb func, void *data);
-+int keyfile_foreach_group(const char *pathname,
-+				keyfile_group_cb func, void *data);
-+
-+#endif /* __KEYFILE_H */
-diff --git a/src/storage.c b/src/storage.c
-index 96db6f5..eeae246 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -44,6 +44,7 @@
- #include <bluetooth/uuid.h>
- 
- #include "textfile.h"
-+#include "keyfile.h"
- #include "glib-helper.h"
+diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
+index d3bca9e..ea40355 100644
+--- a/plugins/dbusoob.c
++++ b/plugins/dbusoob.c
+@@ -44,16 +44,10 @@
+ #include "dbus-common.h"
+ #include "event.h"
+ #include "error.h"
+-#include "oob.h"
  #include "storage.h"
  
-@@ -112,91 +113,65 @@ int write_device_alias(const char *src, const char *dst, uint8_t dst_type,
+ #define OOB_INTERFACE	"org.bluez.OutOfBand"
  
- int write_discoverable_timeout(bdaddr_t *bdaddr, int timeout)
+-struct oob_request {
+-	struct btd_adapter *adapter;
+-	DBusMessage *msg;
+-};
+-
+ struct oob_data {
+ 	char *addr;
+ 	uint8_t *hash;
+@@ -62,47 +56,22 @@ struct oob_data {
+ 	const char *name;
+ };
+ 
+-static GSList *oob_requests = NULL;
+-
+-static gint oob_request_cmp(gconstpointer a, gconstpointer b)
+-{
+-	const struct oob_request *data = a;
+-	const struct btd_adapter *adapter = b;
+-
+-	return data->adapter != adapter;
+-}
+-
+-static struct oob_request *find_oob_request(struct btd_adapter *adapter)
+-{
+-	GSList *match;
+-
+-	match = g_slist_find_custom(oob_requests, adapter, oob_request_cmp);
+-
+-	if (match)
+-		return match->data;
+-
+-	return NULL;
+-}
+-
+ static void read_local_data_complete(struct btd_adapter *adapter, uint8_t *hash,
+-				uint8_t *randomizer)
++				uint8_t *randomizer, void *user_data)
  {
--	char filename[PATH_MAX + 1], str[32];
--
--	snprintf(str, sizeof(str), "%d", timeout);
-+	char filename[PATH_MAX + 1];
+ 	struct DBusMessage *reply;
+-	struct oob_request *oob_request;
+ 	DBusMessageIter iter;
+ 	DBusMessageIter dict;
++	DBusMessage *msg = user_data;
  
--	create_filename(filename, PATH_MAX, bdaddr, "config");
-+	create_filename(filename, PATH_MAX, bdaddr, "adapter.conf");
+-	oob_request = find_oob_request(adapter);
+-	if (!oob_request)
+-		return;
++	DBG("");
  
- 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+ 	if (!hash || !randomizer) {
+-		reply = btd_error_failed(oob_request->msg,
+-					"Failed to read local OOB data.");
++		reply = btd_error_failed(msg, "Failed to read local OOB data");
+ 		goto done;
+ 	}
  
--	return textfile_put(filename, "discovto", str);
-+	return keyfile_put_integer(filename, "General", "DiscovTO", timeout);
- }
+-	reply = dbus_message_new_method_return(oob_request->msg);
++	reply = dbus_message_new_method_return(msg);
+ 	if (!reply)
+ 		goto done;
  
- int read_discoverable_timeout(const char *src, int *timeout)
+@@ -119,9 +88,7 @@ static void read_local_data_complete(struct btd_adapter *adapter, uint8_t *hash,
+ 	dbus_message_iter_close_container(&iter, &dict);
+ 
+ done:
+-	oob_requests = g_slist_remove(oob_requests, oob_request);
+-	dbus_message_unref(oob_request->msg);
+-	g_free(oob_request);
++	dbus_message_unref(msg);
+ 
+ 	if (!reply) {
+ 		error("Couldn't allocate D-Bus message");
+@@ -136,21 +103,22 @@ static DBusMessage *read_local_data(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
  {
--	char filename[PATH_MAX + 1], *str;
--
--	create_name(filename, PATH_MAX, STORAGEDIR, src, "config");
--
--	str = textfile_get(filename, "discovto");
--	if (!str)
--		return -ENOENT;
--
--	if (sscanf(str, "%d", timeout) != 1) {
--		free(str);
--		return -ENOENT;
--	}
-+	char filename[PATH_MAX + 1];
+ 	struct btd_adapter *adapter = data;
+-	struct oob_request *oob_request;
++	struct oob_handler *handler;
  
--	free(str);
-+	create_name(filename, PATH_MAX, STORAGEDIR, src, "adapter.conf");
+ 	if (!btd_adapter_ssp_enabled(adapter))
+ 		return btd_error_not_supported(msg);
  
--	return 0;
-+	return keyfile_get_integer(filename, "General", "DiscovTO", timeout);
- }
+-	if (find_oob_request(adapter))
++	if (btd_adapter_check_oob_handler(adapter))
+ 		return btd_error_in_progress(msg);
  
- int write_pairable_timeout(bdaddr_t *bdaddr, int timeout)
- {
--	char filename[PATH_MAX + 1], str[32];
--
--	snprintf(str, sizeof(str), "%d", timeout);
-+	char filename[PATH_MAX + 1];
+ 	if (btd_adapter_read_local_oob_data(adapter))
+ 		return btd_error_failed(msg, "Request failed.");
  
--	create_filename(filename, PATH_MAX, bdaddr, "config");
-+	create_filename(filename, PATH_MAX, bdaddr, "adapter.conf");
- 
- 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- 
--	return textfile_put(filename, "pairto", str);
-+	return keyfile_put_integer(filename, "General", "PairTO", timeout);
- }
- 
- int read_pairable_timeout(const char *src, int *timeout)
- {
--	char filename[PATH_MAX + 1], *str;
--
--	create_name(filename, PATH_MAX, STORAGEDIR, src, "config");
--
--	str = textfile_get(filename, "pairto");
--	if (!str)
--		return -ENOENT;
--
--	if (sscanf(str, "%d", timeout) != 1) {
--		free(str);
--		return -ENOENT;
--	}
-+	char filename[PATH_MAX + 1];
- 
--	free(str);
-+	create_name(filename, PATH_MAX, STORAGEDIR, src, "adapter.conf");
- 
--	return 0;
-+	return keyfile_get_integer(filename, "General", "PairTO", timeout);
- }
- 
- int write_device_mode(bdaddr_t *bdaddr, const char *mode)
- {
- 	char filename[PATH_MAX + 1];
- 
--	create_filename(filename, PATH_MAX, bdaddr, "config");
-+	create_filename(filename, PATH_MAX, bdaddr, "adapter.conf");
- 
- 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- 
- 	if (strcmp(mode, "off") != 0)
--		textfile_put(filename, "onmode", mode);
-+		keyfile_put_string(filename, "General", "OnMode", mode);
- 
--	return textfile_put(filename, "mode", mode);
-+	return keyfile_put_string(filename, "General", "Mode", mode);
- }
- 
- int read_device_mode(const char *src, char *mode, int length)
- {
- 	char filename[PATH_MAX + 1], *str;
- 
--	create_name(filename, PATH_MAX, STORAGEDIR, src, "config");
-+	create_name(filename, PATH_MAX, STORAGEDIR, src, "adapter.conf");
- 
--	str = textfile_get(filename, "mode");
-+	str = keyfile_get_string(filename, "General", "Mode");
- 	if (!str)
- 		return -ENOENT;
- 
-@@ -212,9 +187,9 @@ int read_on_mode(const char *src, char *mode, int length)
- {
- 	char filename[PATH_MAX + 1], *str;
- 
--	create_name(filename, PATH_MAX, STORAGEDIR, src, "config");
-+	create_name(filename, PATH_MAX, STORAGEDIR, src, "adapter.conf");
- 
--	str = textfile_get(filename, "onmode");
-+	str = keyfile_get_string(filename, "General", "OnMode");
- 	if (!str)
- 		return -ENOENT;
- 
-@@ -238,11 +213,11 @@ int write_local_name(bdaddr_t *bdaddr, const char *name)
- 		else
- 			str[i] = name[i];
- 
--	create_filename(filename, PATH_MAX, bdaddr, "config");
-+	create_filename(filename, PATH_MAX, bdaddr, "adapter.conf");
- 
- 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- 
--	return textfile_put(filename, "name", str);
-+	return keyfile_put_string(filename, "General", "Name", str);
- }
- 
- int read_local_name(bdaddr_t *bdaddr, char *name)
-@@ -250,9 +225,10 @@ int read_local_name(bdaddr_t *bdaddr, char *name)
- 	char filename[PATH_MAX + 1], *str;
- 	int len;
- 
--	create_filename(filename, PATH_MAX, bdaddr, "config");
-+	create_filename(filename, PATH_MAX, bdaddr, "adapter.conf");
+-	oob_request = g_new(struct oob_request, 1);
+-	oob_request->adapter = adapter;
+-	oob_requests = g_slist_append(oob_requests, oob_request);
+-	oob_request->msg = dbus_message_ref(msg);
++	handler = g_new0(struct oob_handler, 1);
++	handler->read_local_cb = read_local_data_complete;
++	handler->user_data = dbus_message_ref(msg);
 +
-+	str = keyfile_get_string(filename, "General", "Name");
++	btd_adapter_set_oob_handler(adapter, handler);
  
--	str = textfile_get(filename, "name");
- 	if (!str)
- 		return -ENOENT;
- 
-@@ -272,11 +248,11 @@ int write_local_class(bdaddr_t *bdaddr, uint8_t *class)
- 
- 	sprintf(str, "0x%2.2x%2.2x%2.2x", class[2], class[1], class[0]);
- 
--	create_filename(filename, PATH_MAX, bdaddr, "config");
-+	create_filename(filename, PATH_MAX, bdaddr, "adapter.conf");
- 
- 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- 
--	return textfile_put(filename, "class", str);
-+	return keyfile_put_string(filename, "General", "Class", str);
+ 	return NULL;
  }
+@@ -336,8 +304,6 @@ static int oob_probe(struct btd_adapter *adapter)
  
- int read_local_class(bdaddr_t *bdaddr, uint8_t *class)
-@@ -284,9 +260,9 @@ int read_local_class(bdaddr_t *bdaddr, uint8_t *class)
- 	char filename[PATH_MAX + 1], tmp[3], *str;
- 	int i;
- 
--	create_filename(filename, PATH_MAX, bdaddr, "config");
-+	create_filename(filename, PATH_MAX, bdaddr, "adapter.conf");
- 
--	str = textfile_get(filename, "class");
-+	str = keyfile_get_string(filename, "General", "Class");
- 	if (!str)
- 		return -ENOENT;
- 
-@@ -1151,28 +1127,20 @@ int write_device_pairable(bdaddr_t *bdaddr, gboolean mode)
+ static void oob_remove(struct btd_adapter *adapter)
  {
- 	char filename[PATH_MAX + 1];
- 
--	create_filename(filename, PATH_MAX, bdaddr, "config");
-+	create_filename(filename, PATH_MAX, bdaddr, "adapter.conf");
- 
- 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- 
--	return textfile_put(filename, "pairable", mode ? "yes" : "no");
-+	return keyfile_put_boolean(filename, "General", "Pairable", mode);
+-	read_local_data_complete(adapter, NULL, NULL);
+-
+ 	g_dbus_unregister_interface(btd_get_dbus_connection(),
+ 				adapter_get_path(adapter), OOB_INTERFACE);
  }
- 
- int read_device_pairable(bdaddr_t *bdaddr, gboolean *mode)
+@@ -352,8 +318,6 @@ static int dbusoob_init(void)
  {
--	char filename[PATH_MAX + 1], *str;
--
--	create_filename(filename, PATH_MAX, bdaddr, "config");
--
--	str = textfile_get(filename, "pairable");
--	if (!str)
--		return -ENOENT;
--
--	*mode = strcmp(str, "yes") == 0 ? TRUE : FALSE;
-+	char filename[PATH_MAX + 1];
+ 	DBG("Setup dbusoob plugin");
  
--	free(str);
-+	create_filename(filename, PATH_MAX, bdaddr, "adapter.conf");
- 
--	return 0;
-+	return keyfile_get_boolean(filename, "General", "Pairable", mode);
+-	oob_register_cb(read_local_data_complete);
+-
+ 	return btd_register_adapter_driver(&oob_driver);
  }
  
- gboolean read_blocked(const bdaddr_t *local, const bdaddr_t *remote,
-diff --git a/test/test-keyfile.c b/test/test-keyfile.c
-new file mode 100644
-index 0000000..61d3929
---- /dev/null
-+++ b/test/test-keyfile.c
-@@ -0,0 +1,252 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2012  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
+diff --git a/src/adapter.c b/src/adapter.c
+index 0871a37..073c722 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -157,6 +157,8 @@ struct btd_adapter {
+ 
+ 	GSList *drivers;
+ 	GSList *profiles;
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <string.h>
-+
-+#include <glib.h>
-+
-+#include "keyfile.h"
-+
-+#define GROUP_1	 "Test strings"
-+#define GROUP_2 "others"
-+
-+static void print_entry(char *key, char *value, void *data)
++	struct oob_handler *oob_handler;
+ };
+ 
+ static gboolean process_auth_queue(gpointer user_data);
+@@ -3716,6 +3718,22 @@ int adapter_cancel_bonding(struct btd_adapter *adapter, bdaddr_t *bdaddr)
+ 	return mgmt_cancel_bonding(adapter->dev_id, bdaddr);
+ }
+ 
++static void check_oob_bonding_complete(struct btd_adapter *adapter,
++					bdaddr_t *bdaddr, uint8_t status)
 +{
-+	printf("%s %s\n", key, value);
++	if (!adapter->oob_handler || !adapter->oob_handler->bonding_cb)
++		return;
++
++	if (bacmp(bdaddr, &adapter->oob_handler->remote_addr) != 0)
++		return;
++
++	adapter->oob_handler->bonding_cb(adapter, bdaddr, status,
++					adapter->oob_handler->user_data);
++
++	g_free(adapter->oob_handler);
++	adapter->oob_handler = NULL;
 +}
 +
-+static void print_group(char *group, void *data)
-+{
-+	char *filename = data;
+ void adapter_bonding_complete(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ 								uint8_t status)
+ {
+@@ -3735,6 +3753,8 @@ void adapter_bonding_complete(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ 		adapter->discov_suspended = FALSE;
+ 		mgmt_start_discovery(adapter->dev_id);
+ 	}
 +
-+	printf("[%s]\n", group);
-+	keyfile_foreach_key(filename, group, print_entry, NULL);
++	check_oob_bonding_complete(adapter, bdaddr, status);
+ }
+ 
+ int btd_adapter_read_local_oob_data(struct btd_adapter *adapter)
+@@ -3759,3 +3779,27 @@ int btd_adapter_ssp_enabled(struct btd_adapter *adapter)
+ {
+ 	return mgmt_ssp_enabled(adapter->dev_id);
+ }
++
++void btd_adapter_set_oob_handler(struct btd_adapter *adapter,
++						struct oob_handler *handler)
++{
++	adapter->oob_handler = handler;
 +}
 +
-+int main(int argc, char *argv[])
++gboolean btd_adapter_check_oob_handler(struct btd_adapter *adapter)
 +{
-+	char filename[] = "/tmp/keyfile.conf";
-+	char key[18], value[512], *str;
-+	unsigned int i, j, size, max = 10;
-+	gboolean bval;
-+	int ival;
-+	int fd;
-+
-+	size = getpagesize();
-+	printf("System uses a page size of %d bytes\n\n", size);
-+
-+	fd = creat(filename, 0644);
-+	if (ftruncate(fd, 0) < 0)
-+		return -errno;
-+
-+	memset(value, 0, sizeof(value));
-+	for (i = 0; i < (size / sizeof(value)); i++) {
-+		if (write(fd, value, sizeof(value)) < 0)
-+			return -errno;
-+	}
-+
-+	close(fd);
-+
-+	/* Test retrieval for non existent group and string key */
-+	sprintf(key, "11:11:11:11:11:11");
-+	str = keyfile_get_string(filename, GROUP_1, key);
-+
-+	if (truncate(filename, 0) < 0)
-+		return -errno;
-+
-+	/* Test deletion for non existent group and key */
-+	sprintf(key, "00:00:00:00:00:00");
-+	if (keyfile_del(filename, GROUP_1, key) < 0)
-+		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+
-+	/* Test retrieval for existent group and string key */
-+	memset(value, 0, sizeof(value));
-+	if (keyfile_put_string(filename, GROUP_1, key, value) < 0)
-+		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+
-+	str = keyfile_get_string(filename, GROUP_1, key);
-+	if (!str)
-+		fprintf(stderr, "No value for %s\n", key);
-+	else
-+		free(str);
-+
-+	/* Test multiple write of same key before deletion */
-+	snprintf(value, sizeof(value), "Test");
-+	if (keyfile_put_string(filename, GROUP_1, key, value) < 0)
-+		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+
-+	if (keyfile_put_string(filename, GROUP_1, key, value) < 0)
-+		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+
-+	if (keyfile_put_string(filename, GROUP_1, key, value) < 0)
-+		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+
-+	if (keyfile_del(filename, GROUP_1, key) < 0)
-+		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+
-+	str = keyfile_get_string(filename, GROUP_1, key);
-+	if (str) {
-+		fprintf(stderr, "Found value for %s\n", key);
-+		free(str);
-+	}
-+
-+	/* Test retrieval for existent group and boolean key */
-+	if (keyfile_put_boolean(filename, GROUP_2, "bool_key", FALSE) < 0)
-+		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+
-+	if (keyfile_get_boolean(filename, GROUP_2, "bool_key", &bval) < 0)
-+		fprintf(stderr, "No value for bool_key\n");
-+
-+	if (bval)
-+		fprintf(stderr, "Error on bool_key\n");
-+
-+	if (keyfile_put_boolean(filename, GROUP_2, "bool_key", TRUE) < 0)
-+		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+
-+	if (keyfile_get_boolean(filename, GROUP_2, "bool_key", &bval) < 0)
-+		fprintf(stderr, "No value for bool_key\n");
-+
-+	if (!bval)
-+		fprintf(stderr, "Error on bool_key\n");
-+
-+	/* Test retrieval for existent group and integer key */
-+	if (keyfile_put_integer(filename, GROUP_2, "int_key", 42) < 0)
-+		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+
-+	if (keyfile_get_integer(filename, GROUP_2, "int_key", &ival) < 0)
-+		fprintf(stderr, "No value for int_key\n");
-+
-+	if (ival != 42)
-+		fprintf(stderr, "Error on int_key\n");
-+
-+	if (keyfile_put_integer(filename, GROUP_2, "int_key", 1) < 0)
-+		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+
-+	if (keyfile_get_integer(filename, GROUP_2, "int_key", &ival) < 0)
-+		fprintf(stderr, "No value for int_key\n");
-+
-+	if (ival != 1)
-+		fprintf(stderr, "Error on int_key\n");
-+
-+	/* Write multiple string keys and check them */
-+	for (i = 1; i < max + 1; i++) {
-+		sprintf(key, "00:00:00:00:00:%02X", i);
-+
-+		memset(value, 0, sizeof(value));
-+		for (j = 0; j < i; j++)
-+			value[j] = 'x';
-+
-+		printf("%s %s\n", key, value);
-+
-+		if (keyfile_put_string(filename, GROUP_1, key, value) < 0) {
-+			fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+			break;
-+		}
-+
-+		str = keyfile_get_string(filename, GROUP_1, key);
-+		if (!str)
-+			fprintf(stderr, "No value for %s\n", key);
-+		else
-+			free(str);
-+	}
-+
-+	/* Re-write first and last keys */
-+	sprintf(key, "00:00:00:00:00:%02X", max);
-+
-+	memset(value, 0, sizeof(value));
-+	for (j = 0; j < max; j++)
-+		value[j] = 'y';
-+
-+	if (keyfile_put_string(filename, GROUP_1, key, value) < 0)
-+		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+
-+	sprintf(key, "00:00:00:00:00:%02X", 1);
-+
-+	memset(value, 0, sizeof(value));
-+	for (j = 0; j < max; j++)
-+		value[j] = 'z';
-+
-+	if (keyfile_put_string(filename, GROUP_1, key, value) < 0)
-+		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+
-+	printf("\n");
-+
-+	for (i = 1; i < max + 1; i++) {
-+		sprintf(key, "00:00:00:00:00:%02X", i);
-+
-+		str = keyfile_get_string(filename, GROUP_1, key);
-+		if (str) {
-+			printf("%s %s\n", key, str);
-+			free(str);
-+		}
-+	}
-+
-+
-+	/* Remove 2nd and (max - 3) keys */
-+	sprintf(key, "00:00:00:00:00:%02X", 2);
-+
-+	if (keyfile_del(filename, GROUP_1, key) < 0)
-+		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+
-+	sprintf(key, "00:00:00:00:00:%02X", max - 3);
-+
-+	if (keyfile_del(filename, GROUP_1, key) < 0)
-+		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+
-+	printf("\n");
-+
-+	keyfile_foreach_key(filename, GROUP_1, print_entry, NULL);
-+
-+
-+	/* Remove first, last and non-existent keys */
-+	sprintf(key, "00:00:00:00:00:%02X", 1);
-+
-+	if (keyfile_del(filename, GROUP_1, key) < 0)
-+		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+
-+	sprintf(key, "00:00:00:00:00:%02X", max);
-+
-+	if (keyfile_del(filename, GROUP_1, key) < 0)
-+		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+
-+	sprintf(key, "00:00:00:00:00:%02X", max + 1);
-+
-+	if (keyfile_del(filename, GROUP_1, key) < 0)
-+		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
-+
-+	printf("\n");
-+
-+	keyfile_foreach_group(filename, print_group, filename);
-+
-+	return 0;
++	return adapter->oob_handler != NULL;
 +}
++
++void adapter_read_local_oob_data_complete(struct btd_adapter *adapter,
++					uint8_t *hash, uint8_t *randomizer)
++{
++	if (!adapter->oob_handler || !adapter->oob_handler->read_local_cb)
++		return;
++
++	adapter->oob_handler->read_local_cb(adapter, hash, randomizer,
++					adapter->oob_handler->user_data);
++
++	g_free(adapter->oob_handler);
++	adapter->oob_handler = NULL;
++}
+diff --git a/src/adapter.h b/src/adapter.h
+index f41ca55..7ca8d95 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -43,6 +43,20 @@
+ 
+ struct btd_adapter;
+ 
++typedef void (*oob_read_local_cb_t) (struct btd_adapter *adapter,
++					uint8_t *hash, uint8_t *randomizer,
++					void *user_data);
++typedef void (*oob_bonding_cb_t) (struct btd_adapter *adapter,
++					bdaddr_t *bdaddr, uint8_t status,
++					void *user_data);
++
++struct oob_handler {
++	oob_read_local_cb_t read_local_cb;
++	oob_bonding_cb_t bonding_cb;
++	bdaddr_t remote_addr;
++	void *user_data;
++};
++
+ struct link_key_info {
+ 	bdaddr_t bdaddr;
+ 	unsigned char key[16];
+@@ -226,6 +240,8 @@ void adapter_bonding_complete(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ 							uint8_t status);
+ 
+ int btd_adapter_read_local_oob_data(struct btd_adapter *adapter);
++void adapter_read_local_oob_data_complete(struct btd_adapter *adapter,
++					uint8_t *hash, uint8_t *randomizer);
+ 
+ int btd_adapter_add_remote_oob_data(struct btd_adapter *adapter,
+ 			bdaddr_t *bdaddr, uint8_t *hash, uint8_t *randomizer);
+@@ -242,3 +258,7 @@ void adapter_connect_list_add(struct btd_adapter *adapter,
+ 						struct btd_device *device);
+ void adapter_connect_list_remove(struct btd_adapter *adapter,
+ 						struct btd_device *device);
++
++void btd_adapter_set_oob_handler(struct btd_adapter *adapter,
++						struct oob_handler *handler);
++gboolean btd_adapter_check_oob_handler(struct btd_adapter *adapter);
+diff --git a/src/mgmt.c b/src/mgmt.c
+index d273b2b..b689be8 100644
+--- a/src/mgmt.c
++++ b/src/mgmt.c
+@@ -48,7 +48,6 @@
+ #include "manager.h"
+ #include "device.h"
+ #include "event.h"
+-#include "oob.h"
+ #include "eir.h"
+ #include "mgmt.h"
+ 
+@@ -1277,9 +1276,9 @@ static void read_local_oob_data_complete(int sk, uint16_t index, void *buf,
+ 	DBG("hci%u", index);
+ 
+ 	adapter = manager_find_adapter_by_id(index);
+-
+ 	if (adapter)
+-		oob_read_local_data_complete(adapter, rp->hash, rp->randomizer);
++		adapter_read_local_oob_data_complete(adapter, rp->hash,
++							rp->randomizer);
+ }
+ 
+ static void start_discovery_complete(int sk, uint16_t index, uint8_t status,
+@@ -1323,9 +1322,8 @@ static void read_local_oob_data_failed(int sk, uint16_t index)
+ 	DBG("hci%u", index);
+ 
+ 	adapter = manager_find_adapter_by_id(index);
+-
+ 	if (adapter)
+-		oob_read_local_data_complete(adapter, NULL, NULL);
++		adapter_read_local_oob_data_complete(adapter, NULL, NULL);
+ }
+ 
+ static void handle_pending_uuids(uint16_t index)
+diff --git a/src/oob.c b/src/oob.c
+deleted file mode 100644
+index 75798fb..0000000
+--- a/src/oob.c
++++ /dev/null
+@@ -1,41 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2011  ST-Ericsson SA
+- *
+- *  Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#include "adapter.h"
+-#include "oob.h"
+-
+-static oob_read_cb_t local_oob_read_cb = NULL;
+-
+-void oob_register_cb(oob_read_cb_t cb)
+-{
+-	local_oob_read_cb = cb;
+-}
+-
+-void oob_read_local_data_complete(struct btd_adapter *adapter, uint8_t *hash,
+-							uint8_t *randomizer)
+-{
+-	if (local_oob_read_cb)
+-		local_oob_read_cb(adapter, hash, randomizer);
+-}
+diff --git a/src/oob.h b/src/oob.h
+deleted file mode 100644
+index 5805082..0000000
+--- a/src/oob.h
++++ /dev/null
+@@ -1,32 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2011  ST-Ericsson SA
+- *
+- *  Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-typedef void (*oob_read_cb_t) (struct btd_adapter *adapter, uint8_t *hash,
+-							uint8_t *randomizer);
+-
+-void oob_register_cb(oob_read_cb_t cb);
+-
+-void oob_read_local_data_complete(struct btd_adapter *adapter, uint8_t *hash,
+-							uint8_t *randomizer);
 -- 
 1.7.9.5
 
