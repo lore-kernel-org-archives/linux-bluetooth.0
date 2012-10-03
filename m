@@ -1,34 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: [PATCH BlueZ 1/2] AVCTP: Remove hand-written function name from log
-Date: Thu,  4 Oct 2012 02:14:33 -0300
-Message-Id: <1349327674-23672-1-git-send-email-lucas.demarchi@profusion.mobi>
+MIME-Version: 1.0
+In-Reply-To: <20121003193921.GA32176@x220.P-661HNU-F1>
+References: <1349209490-31830-2-git-send-email-anderson.lizardo@openbossa.org>
+	<1349268398-14620-1-git-send-email-anderson.lizardo@openbossa.org>
+	<20121003193921.GA32176@x220.P-661HNU-F1>
+Date: Wed, 3 Oct 2012 16:17:01 -0400
+Message-ID: <CAJdJm_OtyC-Et9C0Cva3mej=3P9qq1823NdUdcyWT-pxrs7JWQ@mail.gmail.com>
+Subject: Re: [PATCH v4 BlueZ 01/27] doc: Introduce Alert API
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Lucas De Marchi <lucas.de.marchi@gmail.com>
+Hi Johan,
 
-Besides being hand-written, it was wrong which leads to confusion with
-the AVDTP.
----
- audio/avctp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Oct 3, 2012 at 3:39 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Lizardo,
+>
+> On Wed, Oct 03, 2012, Anderson Lizardo wrote:
+>> This API will be implemented and initially used by Phone Alert Status
+>> and Alert Notification GATT profiles (server role).
+>> ---
+>>
+>> v4: Modify enumeration strings to use "-" as word separator.
+>>
+>>  Makefile.am       |    2 +-
+>>  doc/alert-api.txt |  109 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 110 insertions(+), 1 deletion(-)
+>>  create mode 100644 doc/alert-api.txt
+>
+> Thanks. All patches from this set are now upstream. I also pushed one
+> additional coding style patch since I didn't want to bother with another
+> review round for such a large patch set (and please don't do these huge
+> sets in the future - keep them under 10 or so).
 
-diff --git a/audio/avctp.c b/audio/avctp.c
-index b7b3083..53c28ec 100644
---- a/audio/avctp.c
-+++ b/audio/avctp.c
-@@ -392,7 +392,7 @@ static void avctp_set_state(struct avctp *session, avctp_state_t new_state)
- 
- 	dev = manager_get_device(&session->server->src, &session->dst, FALSE);
- 	if (dev == NULL) {
--		error("avdtp_set_state(): no matching audio device");
-+		error("%s(): No matching audio device", __func__);
- 		return;
- 	}
- 
+Thanks! We'll try to keep future series under a reasonable size.
+Unfortunately, this one aggregated features too fast while the API was
+being defined, but we could have split at least the skeleton GATT
+server stuff to send earlier.
+
+Regards,
 -- 
-1.7.12.2
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
