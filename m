@@ -1,155 +1,154 @@
 Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-Subject: [PATCH v4 BlueZ 09/27] alert: Implement category registration in RegisterAlert()
-Date: Wed,  3 Oct 2012 08:49:15 -0400
-Message-Id: <1349268555-14864-1-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1349209490-31830-10-git-send-email-anderson.lizardo@openbossa.org>
-References: <1349209490-31830-10-git-send-email-anderson.lizardo@openbossa.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH v4 BlueZ 01/27] doc: Introduce Alert API
+Date: Wed,  3 Oct 2012 08:46:38 -0400
+Message-Id: <1349268398-14620-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1349209490-31830-2-git-send-email-anderson.lizardo@openbossa.org>
+References: <1349209490-31830-2-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-
-The given alert category is now validated and registered.
+This API will be implemented and initially used by Phone Alert Status
+and Alert Notification GATT profiles (server role).
 ---
 
 v4: Modify enumeration strings to use "-" as word separator.
 
- profiles/alert/server.c |  102 +++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 98 insertions(+), 4 deletions(-)
+ Makefile.am       |    2 +-
+ doc/alert-api.txt |  109 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 110 insertions(+), 1 deletion(-)
+ create mode 100644 doc/alert-api.txt
 
-diff --git a/profiles/alert/server.c b/profiles/alert/server.c
-index c0434a4..feb7b77 100644
---- a/profiles/alert/server.c
-+++ b/profiles/alert/server.c
-@@ -77,19 +77,113 @@ enum {
- 	RINGER_NORMAL,
- };
+diff --git a/Makefile.am b/Makefile.am
+index c27eb01..470dbad 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -396,7 +396,7 @@ EXTRA_DIST += doc/manager-api.txt \
+ 		doc/network-api.txt doc/input-api.txt doc/audio-api.txt \
+ 		doc/control-api.txt doc/hfp-api.txt doc/health-api.txt \
+ 		doc/sap-api.txt doc/media-api.txt doc/assigned-numbers.txt \
+-		doc/supported-features.txt
++		doc/supported-features.txt doc/alert-api.txt
  
-+struct alert_data {
-+	const char *category;
-+	char *srv;
-+	char *path;
-+};
-+
-+static GSList *registered_alerts = NULL;
- static uint8_t ringer_setting = RINGER_NORMAL;
- static uint8_t alert_status = 0;
+ AM_YFLAGS = -d
  
-+static const char * const anp_categories[] = {
-+	"simple",
-+	"email",
-+	"news",
-+	"call",
-+	"missed-call",
-+	"sms-mms",
-+	"voice-mail",
-+	"schedule",
-+	"high-priority",
-+	"instant-message",
-+};
+diff --git a/doc/alert-api.txt b/doc/alert-api.txt
+new file mode 100644
+index 0000000..bcaaaf3
+--- /dev/null
++++ b/doc/alert-api.txt
+@@ -0,0 +1,109 @@
++BlueZ D-Bus Alert API description
++*********************************
 +
-+static const char * const pasp_categories[] = {
-+	"ringer",
-+	"vibrate",
-+	"display",
-+};
++Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
 +
-+static void alert_data_destroy(gpointer user_data)
-+{
-+	struct alert_data *alert = user_data;
++Introduction
++------------
 +
-+	g_free(alert->srv);
-+	g_free(alert->path);
-+	g_free(alert);
-+}
++Currently, there are two different GATT server profiles that depend on
++receiving alerts or notifications from the platform: Phone Alert Status (PASP)
++and Alert Notification (ANP). PASP is very specific to mobile phones, and also
++allows limited control to alerts (i.e. mute once or switch to a silent mode).
 +
-+static void alert_destroy(gpointer user_data)
-+{
-+	g_slist_free_full(registered_alerts, alert_data_destroy);
-+	registered_alerts = NULL;
-+}
++This document presents a unified API that allows to register and notify alerts,
++and to control some alerts (using the provided agent object).
 +
-+static const char *valid_category(const char *category)
-+{
-+	unsigned i;
 +
-+	for (i = 0; i < G_N_ELEMENTS(anp_categories); i++) {
-+		if (g_str_equal(anp_categories[i], category))
-+			return anp_categories[i];
-+	}
++Alert hierarchy
++===============
 +
-+	for (i = 0; i < G_N_ELEMENTS(pasp_categories); i++) {
-+		if (g_str_equal(pasp_categories[i], category))
-+			return pasp_categories[i];
-+	}
++Service		org.bluez
++Interface	org.bluez.Alert
++Object path	/org/bluez
 +
-+	return NULL;
-+}
++Methods		void RegisterAlert(string category, object agent)
 +
-+static gboolean registered_category(const char *category)
-+{
-+	GSList *l;
-+	struct alert_data *alert;
++			Register a new alert category and an agent for it. This
++			means the application will be responsible for notifying
++			BlueZ of any alerts of that category, using the
++			NewAlert() method.
 +
-+	for (l = registered_alerts; l; l = g_slist_next(l)) {
-+		alert = l->data;
-+		if (g_str_equal(alert->category, category))
-+			return TRUE;
-+	}
++			Supported ANP categories: simple, email, news, call,
++				missed-call, sms-mms, voice-mail, schedule,
++				high-priority, instant-message
++			Supported PASP categories: ringer, vibrate, display
 +
-+	return FALSE;
-+}
++			Possible Errors: org.bluez.Error.InvalidArguments
 +
- static DBusMessage *register_alert(DBusConnection *conn, DBusMessage *msg,
- 								void *data)
- {
-+	const char *sender = dbus_message_get_sender(msg);
-+	char *path;
- 	const char *category;
-+	const char *c;
-+	struct alert_data *alert;
++		void NewAlert(string category, uint16 count, string description)
 +
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &c,
-+			DBUS_TYPE_OBJECT_PATH, &path, DBUS_TYPE_INVALID))
-+		return btd_error_invalid_args(msg);
- 
--	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &category,
--							DBUS_TYPE_INVALID))
-+	category = valid_category(c);
-+	if (!category) {
-+		DBG("Invalid category: %s", c);
- 		return btd_error_invalid_args(msg);
-+	}
++			Notify BlueZ of new alert(s) for the given category. The
++			description is relative to the last received alert and
++			can be sender name, caller ID, title, or other
++			information specific to the category.
 +
-+	if (registered_category(category)) {
-+		DBG("Category %s already registered", category);
-+		return dbus_message_new_method_return(msg);
-+	}
++			For ringer, vibrate and display categories, valid
++			descriptions are "active" and "not active". Alerts from
++			ringer category also accept "enabled" and "disabled",
++			depending on whether ringer is in silent mode or not.
 +
-+	alert = g_new0(struct alert_data, 1);
-+	alert->srv = g_strdup(sender);
-+	alert->path = g_strdup(path);
-+	alert->category = category;
++			Description must not exceed 18 bytes when encoded in
++			UTF-8 format, otherwise an error is returned. If there
++			is no description, an empty string should be used.
 +
-+	registered_alerts = g_slist_append(registered_alerts, alert);
- 
--	DBG("RegisterAlert: %s", category);
-+	DBG("RegisterAlert(\"%s\", \"%s\")", alert->category, alert->path);
- 
- 	return dbus_message_new_method_return(msg);
- }
-@@ -290,7 +384,7 @@ int alert_server_init(void)
- 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
- 					ALERT_OBJECT_PATH, ALERT_INTERFACE,
- 					alert_methods, NULL, NULL, NULL,
--					NULL)) {
-+					alert_destroy)) {
- 		error("D-Bus failed to register %s interface",
- 							ALERT_INTERFACE);
- 		return -EIO;
++			The count argument contains the number of alerts not
++			yet acknowledged by the user on the UI. To save D-Bus
++			traffic, events that may generate multiple alerts at
++			the same time (like email, sms, news) should trigger a
++			single NewAlert().
++
++			If there are more than 254 new alerts, count must be
++			set to 255. PASP alerts should always set count to 1.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++		void UnreadAlert(string category, uint16 count)
++
++			Some services (like SMS and e-mail) keep track of
++			number of unread items. This method allows to update
++			this counter, so peer devices can be notified using
++			Alert Notification Profile.
++
++			If there are more than 254 unread alerts, count must be
++			set to 255.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++Alert Agent hierarchy
++=====================
++
++Service		org.bluez
++Interface	org.bluez.AlertAgent
++Object path	freely definable
++
++Methods		void MuteOnce()
++
++			This method is only called if "ringer" alert category
++			is specified when registering the agent.
++
++			Mute the ringer once (e.g. during a incoming call). If
++			ringer is not active, does nothing.
++
++		void SetRinger(string mode)
++
++			This method is only called if "ringer" alert category
++			is specified when registering the agent.
++
++			Set ringer to the specified mode. If mode is "enabled",
++			ringer is set to the default mode, as defined by the
++			current active profile. If mode is "disabled", ringer
++			will not activate on incoming calls, until it is set
++			back to "enabled" mode.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++		void Release()
++
++			Release this agent. At this point, it will not be used
++			by BlueZ anymore and can be destroyed by the owner.
 -- 
 1.7.9.5
 
