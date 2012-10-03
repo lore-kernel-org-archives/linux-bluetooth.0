@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v4 03/18] eir: Store class in struct eir_data as uint32_t
-Date: Wed, 3 Oct 2012 15:18:16 +0200
-Message-ID: <1349270311-31103-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v4 01/18] Handle missing randomizer in mgmt_add_remote_oob_data
+Date: Wed, 3 Oct 2012 15:18:14 +0200
+Message-ID: <1349270311-31103-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1349270311-31103-1-git-send-email-szymon.janc@tieto.com>
 References: <1349270311-31103-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,136 +12,47 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This simplify code as class is stored on storage as uint32_t and
-had to be converted to it in few places.
+Randomizer is optional. Handling missing randomizer in
+mgmt_add_remote_oob_data is easy and will simplify caller code.
 
 ---
- src/adapter.c |   11 ++++-------
- src/eir.c     |    3 ++-
- src/eir.h     |    2 +-
- src/event.c   |   11 +++--------
- src/event.h   |    2 +-
- src/mgmt.c    |    2 +-
- 6 files changed, 12 insertions(+), 19 deletions(-)
+ plugins/dbusoob.c |    7 -------
+ src/mgmt.c        |    4 +++-
+ 2 files changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index a6a4a4b..4ca0c53 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3063,7 +3063,6 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 	struct eir_data eir_data;
- 	char *alias, *name;
- 	gboolean legacy, name_known;
--	uint32_t dev_class;
- 	int err;
- 	GSList *l;
+diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
+index 543b272..d3bca9e 100644
+--- a/plugins/dbusoob.c
++++ b/plugins/dbusoob.c
+@@ -232,13 +232,6 @@ static gboolean store_data(struct btd_adapter *adapter, struct oob_data *data)
+ 	adapter_get_address(adapter, &local);
  
-@@ -3074,10 +3073,8 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 		return;
- 	}
- 
--	dev_class = eir_data.dev_class[0] | (eir_data.dev_class[1] << 8) |
--						(eir_data.dev_class[2] << 16);
--	if (dev_class != 0)
--		write_remote_class(&adapter->bdaddr, bdaddr, dev_class);
-+	if (eir_data.class != 0)
-+		write_remote_class(&adapter->bdaddr, bdaddr, eir_data.class);
- 
- 	if (eir_data.appearance != 0)
- 		write_remote_appearance(&adapter->bdaddr, bdaddr, bdaddr_type,
-@@ -3133,8 +3130,8 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 	alias = read_stored_data(&adapter->bdaddr, bdaddr, bdaddr_type,
- 								"aliases");
- 
--	dev = found_device_new(bdaddr, bdaddr_type, name, alias, dev_class,
--						legacy, eir_data.flags);
-+	dev = found_device_new(bdaddr, bdaddr_type, name, alias,
-+				eir_data.class, legacy, eir_data.flags);
- 	free(name);
- 	free(alias);
- 
-diff --git a/src/eir.c b/src/eir.c
-index 9226c32..e380b0f 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -166,7 +166,8 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len)
- 		case EIR_CLASS_OF_DEV:
- 			if (data_len < 3)
- 				break;
--			memcpy(eir->dev_class, data, 3);
-+			eir->class = data[0] | (data[1] << 8) |
-+							(data[2] << 16);
- 			break;
- 
- 		case EIR_GAP_APPEARANCE:
-diff --git a/src/eir.h b/src/eir.h
-index e6e870a..3a52563 100644
---- a/src/eir.h
-+++ b/src/eir.h
-@@ -47,7 +47,7 @@ struct eir_data {
- 	GSList *services;
- 	int flags;
- 	char *name;
--	uint8_t dev_class[3];
-+	uint32_t class;
- 	uint16_t appearance;
- 	gboolean name_complete;
- 	uint8_t *hash;
-diff --git a/src/event.c b/src/event.c
-index 1db73be..9626053 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -452,7 +452,7 @@ int btd_event_ltk_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
- }
- 
- void btd_event_conn_complete(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
--						char *name, uint8_t *dev_class)
-+						char *name, uint32_t class)
- {
- 	struct btd_adapter *adapter;
- 	struct btd_device *device;
-@@ -462,13 +462,8 @@ void btd_event_conn_complete(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_typ
- 
- 	update_lastused(local, peer, bdaddr_type);
- 
--	if (dev_class != NULL) {
--		uint32_t class = dev_class[0] | (dev_class[1] << 8) |
--							(dev_class[2] << 16);
+ 	if (data->hash) {
+-		uint8_t empty_randomizer[16];
 -
--		if (class != 0)
--			write_remote_class(local, peer, class);
--	}
-+	if (class != 0)
-+		write_remote_class(local, peer, class);
- 
- 	device_set_addr_type(device, bdaddr_type);
- 
-diff --git a/src/event.h b/src/event.h
-index 7031cc9..6d001dd 100644
---- a/src/event.h
-+++ b/src/event.h
-@@ -30,7 +30,7 @@ void btd_event_set_legacy_pairing(bdaddr_t *local, bdaddr_t *peer, gboolean lega
- void btd_event_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class);
- void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name);
- void btd_event_conn_complete(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
--					char *name, uint8_t *dev_class);
-+						char *name, uint32_t class);
- void btd_event_conn_failed(bdaddr_t *local, bdaddr_t *peer, uint8_t status);
- void btd_event_disconn_complete(bdaddr_t *local, bdaddr_t *peer);
- void btd_event_simple_pairing_complete(bdaddr_t *local, bdaddr_t *peer, uint8_t status);
+-		if (!data->randomizer) {
+-			memset(empty_randomizer, 0, sizeof(empty_randomizer));
+-			data->randomizer = empty_randomizer;
+-		}
+-
+ 		if (btd_adapter_add_remote_oob_data(adapter, &bdaddr,
+ 					data->hash, data->randomizer) < 0)
+ 			return FALSE;
 diff --git a/src/mgmt.c b/src/mgmt.c
-index 5bba732..462e02b 100644
+index 4354dc4..5bba732 100644
 --- a/src/mgmt.c
 +++ b/src/mgmt.c
-@@ -515,7 +515,7 @@ static void mgmt_device_connected(int sk, uint16_t index, void *buf, size_t len)
- 	btd_event_conn_complete(&info->bdaddr, &ev->addr.bdaddr,
- 						ev->addr.type,
- 						eir_data.name,
--						eir_data.dev_class);
-+						eir_data.class);
+@@ -2459,7 +2459,9 @@ int mgmt_add_remote_oob_data(int index, bdaddr_t *bdaddr,
  
- 	eir_data_free(&eir_data);
- }
+ 	bacpy(&cp->addr.bdaddr, bdaddr);
+ 	memcpy(cp->hash, hash, 16);
+-	memcpy(cp->randomizer, randomizer, 16);
++
++	if (randomizer)
++		memcpy(cp->randomizer, randomizer, 16);
+ 
+ 	if (write(mgmt_sock, &buf, sizeof(buf)) < 0)
+ 		return -errno;
 -- 
 1.7.9.5
 
