@@ -1,87 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 0/7] adapter and device bdaddr_t getters
-Date: Thu, 4 Oct 2012 14:05:57 +0200
-Message-ID: <1349352364-5491-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1349335599-12443-15-git-send-email-lucas.de.marchi@gmail.com>
+References: <1349335599-12443-1-git-send-email-lucas.de.marchi@gmail.com>
+	<1349335599-12443-15-git-send-email-lucas.de.marchi@gmail.com>
+Date: Thu, 4 Oct 2012 07:42:17 -0400
+Message-ID: <CAJdJm_PZbDinMxO4En=3XMzjnNVTWpGQ9-pOV7VyfLJOJjY9Qg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v4 14/15] Use DBus.Properties on Control interface
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org,
+	Lucas De Marchi <lucas.de.marchi@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lucas,
 
-I've noticed that in many places similar code was created to adapt to current
-adapter/device_get_address API:
+On Thu, Oct 4, 2012 at 3:26 AM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> @@ -77,13 +76,11 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
+>                 if (old_state != AVCTP_STATE_CONNECTED)
+>                         break;
+>
+> -               value = FALSE;
+>                 g_dbus_emit_signal(conn, dev->path,
+>                                         AUDIO_CONTROL_INTERFACE,
+>                                         "Disconnected", DBUS_TYPE_INVALID);
+> -               emit_property_changed(dev->path,
+> -                                       AUDIO_CONTROL_INTERFACE, "Connected",
+> -                                       DBUS_TYPE_BOOLEAN, &value);
+> +               g_dbus_emit_property_changed(conn, dev->path,
+> +                                       AUDIO_CONTROL_INTERFACE, "Connected");
 
-bdaddr_t addr;
-adapter_get_address(adapter, &addr);
-foo(&addr);
+Out of curiosity, do you know why this API has Connected/Disconnected
+signals besides the PropertyChanged("Connected", ...) ?
 
-bdaddr is constant anyway and such code can be converted to more convenient
-foo(adapter_get_address(adapter));
-
-Thanks to this we reduce number of memcpy calls of data that is not going to
-change. Also number of local variables is removed (in places where it reduced
-number of consecutive get_address calls or due to code readibility local
-pointers were left).
-
-Since this leads to calls where return is passed directly as function parameter
-adapter/device_get_address could also be renamed to shorter form e.g.
-adapter/device_get_addr  (like device_get_addr_type is called now).
-(this is not done in this patchset).
-
-Comments are welcome.
-
-Szymon Janc (7):
-  adapter: Convert adapter_get_address into simple getter
-  storage: Constify bdaddr_t pointers parameters
-  adapter: Constify pointer returned by adapter_get_address
-  device: Convert device_get_address into simple getter
-  mgmt: Constify use of bdaddr_t pointer parameters
-  adapter: Constify use of bdaddr_t pointer parameters
-  device: Make device_get_address return const pointer
-
- attrib/client.c               |   42 +++++------
- audio/manager.c               |   50 +++++--------
- plugins/adaptername.c         |    4 +-
- plugins/dbusoob.c             |    8 +--
- plugins/neard.c               |   21 +++---
- plugins/service.c             |   57 +++++----------
- plugins/wiimote.c             |    7 +-
- profiles/alert/server.c       |    4 +-
- profiles/gatt/gas.c           |   34 +++++----
- profiles/health/hdp.c         |   18 +++--
- profiles/health/hdp_util.c    |   42 +++++------
- profiles/health/mcap.c        |    2 +-
- profiles/health/mcap_lib.h    |    2 +-
- profiles/input/device.c       |    8 +--
- profiles/input/manager.c      |   11 +--
- profiles/network/connection.c |    6 +-
- profiles/network/connection.h |    2 +-
- profiles/network/manager.c    |   13 ++--
- profiles/network/server.c     |    8 +--
- profiles/proximity/monitor.c  |   20 +++---
- profiles/sap/manager.c        |    5 +-
- profiles/sap/server.c         |    2 +-
- profiles/sap/server.h         |    2 +-
- src/adapter.c                 |   73 +++++++++----------
- src/adapter.h                 |   59 +++++++++-------
- src/attrib-server.c           |   18 ++---
- src/device.c                  |  157 ++++++++++++++++-------------------------
- src/device.h                  |    3 +-
- src/eir.c                     |    2 +-
- src/eir.h                     |    2 +-
- src/event.c                   |   27 +++----
- src/manager.c                 |    5 +-
- src/mgmt.c                    |   31 ++++----
- src/mgmt.h                    |   26 +++----
- src/profile.c                 |   47 ++++++------
- src/storage.c                 |   97 +++++++++++++------------
- src/storage.h                 |   95 ++++++++++++++-----------
- 37 files changed, 451 insertions(+), 559 deletions(-)
-
+Regards,
 -- 
-1.7.9.5
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
