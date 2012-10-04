@@ -1,44 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 4 Oct 2012 17:22:10 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org,
-	Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: Re: [PATCH BlueZ v4 14/15] Use DBus.Properties on Control interface
-Message-ID: <20121004142210.GA9024@x220>
-References: <1349335599-12443-1-git-send-email-lucas.de.marchi@gmail.com>
- <1349335599-12443-15-git-send-email-lucas.de.marchi@gmail.com>
- <CAJdJm_PZbDinMxO4En=3XMzjnNVTWpGQ9-pOV7VyfLJOJjY9Qg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAJdJm_PZbDinMxO4En=3XMzjnNVTWpGQ9-pOV7VyfLJOJjY9Qg@mail.gmail.com>
+From: Srinivasa Ragavan <srinivasa.ragavan.venkateswaran@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Srinivasa Ragavan <srinivasa.ragavan.venkateswaran@intel.com>
+Subject: [PATCH 4/4] test: Update map-client to include Message.SetProperty and Message.GetProperties
+Date: Thu,  4 Oct 2012 19:52:40 +0530
+Message-Id: <1349360560-21631-4-git-send-email-srinivasa.ragavan.venkateswaran@intel.com>
+In-Reply-To: <1349360560-21631-1-git-send-email-srinivasa.ragavan.venkateswaran@intel.com>
+References: <1349360560-21631-1-git-send-email-srinivasa.ragavan.venkateswaran@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+---
+ test/map-client |   42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-On Thu, Oct 04, 2012, Anderson Lizardo wrote:
-> On Thu, Oct 4, 2012 at 3:26 AM, Lucas De Marchi
-> <lucas.demarchi@profusion.mobi> wrote:
-> > @@ -77,13 +76,11 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
-> >                 if (old_state != AVCTP_STATE_CONNECTED)
-> >                         break;
-> >
-> > -               value = FALSE;
-> >                 g_dbus_emit_signal(conn, dev->path,
-> >                                         AUDIO_CONTROL_INTERFACE,
-> >                                         "Disconnected", DBUS_TYPE_INVALID);
-> > -               emit_property_changed(dev->path,
-> > -                                       AUDIO_CONTROL_INTERFACE, "Connected",
-> > -                                       DBUS_TYPE_BOOLEAN, &value);
-> > +               g_dbus_emit_property_changed(conn, dev->path,
-> > +                                       AUDIO_CONTROL_INTERFACE, "Connected");
-> 
-> Out of curiosity, do you know why this API has Connected/Disconnected
-> signals besides the PropertyChanged("Connected", ...) ?
+diff --git a/test/map-client b/test/map-client
+index 2075844..e8c42e3 100755
+--- a/test/map-client
++++ b/test/map-client
+@@ -41,6 +41,16 @@ def parse_options():
+ 			help="List messages in supplied CWD subdir")
+ 	parser.add_option("-g", "--get", action="store", dest="get_msg",
+ 			help="Get message contents")
++	parser.add_option("--get-properties", action="store", dest="get_msg_properties",
++			help="Get message properties")
++	parser.add_option("--mark-read", action="store", dest="mark_msg_read",
++			help="Marks the messages as read")
++	parser.add_option("--mark-unread", action="store", dest="mark_msg_unread",
++			help="Marks the messages as unread")
++	parser.add_option("--mark-deleted", action="store", dest="mark_msg_deleted",
++			help="Deletes the message from the folder")
++	parser.add_option("--mark-undeleted", action="store", dest="mark_msg_undeleted",
++			help="Undeletes the message")
+ 
+ 	return parser.parse_args()
+ 
+@@ -120,6 +130,22 @@ class MapClient:
+ 		msg.Get("", True, reply_handler=self.create_transfer_reply,
+ 						error_handler=self.error)
+ 
++	def get_message_properties(self, handle):
++		self.map.ListMessages("", dict())
++		path = self.path + "/message" + handle
++		obj = bus.get_object("org.bluez.obex.client", path)
++		msg = dbus.Interface(obj, "org.bluez.obex.Message")
++		ret = msg.GetProperties()
++		print pformat(unwrap(ret))
++
++	def set_message_property(self, handle, prop, flag):
++		self.map.ListMessages("", dict())
++		path = self.path + "/message" + handle
++		obj = bus.get_object("org.bluez.obex.client", path)
++		msg = dbus.Interface(obj, "org.bluez.obex.Message")
++		msg.SetProperty (prop, flag);
++
++
+ if  __name__ == '__main__':
+ 
+ 	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+@@ -155,4 +181,20 @@ if  __name__ == '__main__':
+ 	if options.get_msg is not None:
+ 		map_client.get_message(options.get_msg)
+ 
++	if options.get_msg_properties is not None:
++		map_client.get_message_properties(options.get_msg_properties)
++
++	if options.mark_msg_read is not None:
++		map_client.set_message_property(options.mark_msg_read, "Read", True)
++
++	if options.mark_msg_unread is not None:
++		map_client.set_message_property(options.mark_msg_unread, "Read", False)
++
++	if options.mark_msg_deleted is not None:
++		map_client.set_message_property(options.mark_msg_deleted, "Deleted", True)
++
++	if options.mark_msg_undeleted is not None:
++		map_client.set_message_property(options.mark_msg_undeleted, "Deleted", False)
++
++
+ 	mainloop.run()
+-- 
+1.7.10.4
 
-I think those should have been marked as deprecated in 4.x and removed
-for BlueZ 5.
-
-Johan
