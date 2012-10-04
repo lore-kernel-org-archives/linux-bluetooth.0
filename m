@@ -1,109 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Srinivasa Ragavan <srinivasa.ragavan.venkateswaran@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Srinivasa Ragavan <srinivasa.ragavan.venkateswaran@intel.com>
-Subject: [PATCH 3/4] client-doc: Add documentation for Message.SetProperty and Message.GetProperties
-Date: Thu,  4 Oct 2012 19:52:39 +0530
-Message-Id: <1349360560-21631-3-git-send-email-srinivasa.ragavan.venkateswaran@intel.com>
-In-Reply-To: <1349360560-21631-1-git-send-email-srinivasa.ragavan.venkateswaran@intel.com>
-References: <1349360560-21631-1-git-send-email-srinivasa.ragavan.venkateswaran@intel.com>
+Date: Thu, 4 Oct 2012 17:17:22 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org,
+	Lucas De Marchi <lucas.de.marchi@gmail.com>
+Subject: Re: [PATCH BlueZ v4 00/15] Properties + ObjectManager
+Message-ID: <20121004141722.GA4173@x220>
+References: <1349335599-12443-1-git-send-email-lucas.de.marchi@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1349335599-12443-1-git-send-email-lucas.de.marchi@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/client-api.txt |   79 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 79 insertions(+)
+Hi Lucas,
 
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 25fd3e4..e680427 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -534,6 +534,85 @@ Methods		object, dict Get(string targetfile, boolean attachment)
- 			The properties of this transfer are also returned along
- 			with the object path, to avoid a call to GetProperties.
- 
-+		dict GetProperties()
-+
-+			Returns all properties for the message. See the
-+			properties section for available properties.
-+
-+		void SetProperty (string name, variant value)
-+
-+			Sets value to the mentioned property.
-+
-+			Possible properties: Read and Deleted.
-+
-+
-+Properties	string Subject [readonly]
-+
-+			Message subject
-+
-+		string Timestamp [readonly]
-+
-+			Message timestamp
-+
-+		string Sender [readonly]
-+
-+			Message sender name
-+
-+		string SenderAddress [readonly]
-+
-+			Message sender address
-+
-+		string ReplyTo [readonly]
-+
-+			Message Reply-To address
-+
-+		string Recipient [readonly]
-+
-+			Message recipient name
-+
-+		string RecipientAddress [readonly]
-+
-+			Message recipient address
-+
-+		string Type [readonly]
-+
-+			Message type
-+
-+			Possible values: "EMAIL", "SMS_GSM",
-+			"SMS_CDMA" and "MMS"
-+
-+		uint64 Size [readonly]
-+
-+			Message size in bytes
-+
-+		string Status [readonly]
-+
-+			Message reception status
-+
-+			Possible values: "complete",
-+			"fractioned" and "notification"
-+
-+		boolean Priority [readonly]
-+
-+			Message priority flag
-+
-+		boolean Read [read/write]
-+
-+			Message read flag
-+
-+		boolean Deleted [writeonly]
-+
-+			Message read flag
-+
-+		boolean Sent [readonly]
-+
-+			Message sent flag
-+
-+		boolean Protected [readonly]
-+
-+			Message protected flag
-+
-+
- Transfer hierarchy
- ==================
- 
--- 
-1.7.10.4
+On Thu, Oct 04, 2012, Lucas De Marchi wrote:
+> Here is a rebased version of the patches. Most notable change is on patch
+> implementing the Set() method after feedback from Marcel. It doesn't cover the
+> concerns from Luiz about checking privileges per-property since I think this
+> could be added in a separate patch. As far as I could see the only user is
+> MediaTransport interface. The most obvious way would be to add another hook in
+> GDBusPropertyTable in order to check the privileges. Suggestions?
+> 
+> First 2 patches could be applied nonetheles. Get and GetAll are well tested,
+> both now and in the previous version of this patch set. Set() is still a
+> bit raw - the users implementing it are very big (adapter, device) so
+> they are not converted yet (previous patch doesn't apply anymore and there's a
+> change in the API that requires them to be rewritten).
+> 
+> 
+> Lucas De Marchi (10):
+>   gdbus: Move typedefs up
+>   gdbus: Use macros to add annotations
+>   gdbus: Add skeleton of DBus.Properties interface
+>   gdbus: Implement DBus.Properties.Get method
+>   gdbus: Implement DBus.Properties.GetAll method
+>   gdbus: Implement DBus.Properties.Set method
+>   gdbus: Add properties into Introspectable interface
+>   gdbus: Implement PropertiesChanged signal
+>   Use DBus.Properties on Control interface
+>   Use DBus.Properties on Manager interface
+> 
+> Luiz Augusto von Dentz (5):
+>   gdbus: Add support for org.freedesktop.DBus.ObjectManager interface
+>   gdbus: Group interface changes to reduce the amount of signals
+>     emitted
+>   gdbus: Only export ObjectManager interface on root path
+>   gdbus: Integrates ObjectManager with Properties interface
+>   gdbus: Simplify code for appending properties
+> 
+>  audio/control.c |  57 ++--
+>  gdbus/gdbus.h   |  74 +++--
+>  gdbus/object.c  | 867 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
+>  src/manager.c   |  81 ++----
+>  4 files changed, 897 insertions(+), 182 deletions(-)
 
+This initial set has been applied. Now let's get testing it and fix any
+pending issues that are found. Also please remember send the adapter and
+device conversions when you've got them ready so that we get them stress
+tested at the UPF next week.
+
+Johan
