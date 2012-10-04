@@ -2,52 +2,36 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: [PATCH BlueZ v4 00/15] Properties + ObjectManager
-Date: Thu,  4 Oct 2012 04:26:24 -0300
-Message-Id: <1349335599-12443-1-git-send-email-lucas.de.marchi@gmail.com>
+Subject: [PATCH BlueZ 1/2] build-sys: Don't use deprecated AM_PROG_MKDIR_P
+Date: Thu,  4 Oct 2012 03:37:09 -0300
+Message-Id: <1349332630-8901-1-git-send-email-lucas.de.marchi@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Here is a rebased version of the patches. Most notable change is on patch
-implementing the Set() method after feedback from Marcel. It doesn't cover the
-concerns from Luiz about checking privileges per-property since I think this
-could be added in a separate patch. As far as I could see the only user is
-MediaTransport interface. The most obvious way would be to add another hook in
-GDBusPropertyTable in order to check the privileges. Suggestions?
+AM_PROG_MKDIR_P is deprecated since:
 
-First 2 patches could be applied nonetheles. Get and GetAll are well tested,
-both now and in the previous version of this patch set. Set() is still a
-bit raw - the users implementing it are very big (adapter, device) so
-they are not converted yet (previous patch doesn't apply anymore and there's a
-change in the API that requires them to be rewritten).
+configure.ac:23: warning: The 'AM_PROG_MKDIR_P' macro is deprecated, and will soon be removed.
+configure.ac:23: You should use the Autoconf-provided 'AC_PROG_MKDIR_P' macro instead,
+configure.ac:23: and use '$(MKDIR_P)' instead of '$(mkdir_p)'in your Makefile.am files.
 
+We are already using $(MKDIR_P) so we just need to call the right macro.
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Lucas De Marchi (10):
-  gdbus: Move typedefs up
-  gdbus: Use macros to add annotations
-  gdbus: Add skeleton of DBus.Properties interface
-  gdbus: Implement DBus.Properties.Get method
-  gdbus: Implement DBus.Properties.GetAll method
-  gdbus: Implement DBus.Properties.Set method
-  gdbus: Add properties into Introspectable interface
-  gdbus: Implement PropertiesChanged signal
-  Use DBus.Properties on Control interface
-  Use DBus.Properties on Manager interface
-
-Luiz Augusto von Dentz (5):
-  gdbus: Add support for org.freedesktop.DBus.ObjectManager interface
-  gdbus: Group interface changes to reduce the amount of signals
-    emitted
-  gdbus: Only export ObjectManager interface on root path
-  gdbus: Integrates ObjectManager with Properties interface
-  gdbus: Simplify code for appending properties
-
- audio/control.c |  57 ++--
- gdbus/gdbus.h   |  74 +++--
- gdbus/object.c  | 867 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
- src/manager.c   |  81 ++----
- 4 files changed, 897 insertions(+), 182 deletions(-)
-
+diff --git a/configure.ac b/configure.ac
+index 7d9a34d..deab9e9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -20,7 +20,7 @@ AC_PROG_CC
+ AM_PROG_CC_C_O
+ AC_PROG_CC_PIE
+ AC_PROG_INSTALL
+-AM_PROG_MKDIR_P
++AC_PROG_MKDIR_P
+ 
+ m4_define([_LT_AC_TAGCONFIG], [])
+ m4_ifdef([AC_LIBTOOL_TAGS], [AC_LIBTOOL_TAGS([])])
 -- 
 1.7.12.2
 
