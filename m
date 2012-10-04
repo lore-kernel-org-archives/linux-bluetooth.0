@@ -1,98 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1349374431.27233.40.camel@aeonflux>
-Subject: Re: [PATCH v2 resend 1/2] Introduced a load_firmware callback to
- struct hci_dev
+Message-ID: <1349374268.27233.38.camel@aeonflux>
+Subject: Re: [PATCH BlueZ v4 00/15] Properties + ObjectManager
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jesse Sung <jesse.sung@canonical.com>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
+To: Lucas De Marchi <lucas.de.marchi@gmail.com>
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
 	linux-bluetooth@vger.kernel.org
-Date: Thu, 04 Oct 2012 20:13:51 +0200
-In-Reply-To: <CAH10aOja5o=HjsLN3qKZey=POpjgMsf+V_RU=iHH+sk1oZOOuw@mail.gmail.com>
-References: <cover.1347959921.git.jesse.sung@canonical.com>
-	 <1349335847-1615-1-git-send-email-jesse.sung@canonical.com>
-	 <1349335847-1615-2-git-send-email-jesse.sung@canonical.com>
-	 <1349344897.27233.13.camel@aeonflux>
-	 <CAH10aOiwWGseiYEiqk_h=WhNyGGGhpWPhU1TO8E948Ka+xHu9w@mail.gmail.com>
-	 <1349355967.27233.35.camel@aeonflux>
-	 <CAH10aOja5o=HjsLN3qKZey=POpjgMsf+V_RU=iHH+sk1oZOOuw@mail.gmail.com>
+Date: Thu, 04 Oct 2012 20:11:08 +0200
+In-Reply-To: <CAKi4VALefFdx=omzNhY96-Ha4uPZN7n3m_Pu5NomDD5rNeU9eA@mail.gmail.com>
+References: <1349335599-12443-1-git-send-email-lucas.de.marchi@gmail.com>
+	 <20121004141722.GA4173@x220>
+	 <CAKi4VALefFdx=omzNhY96-Ha4uPZN7n3m_Pu5NomDD5rNeU9eA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jesse,
+Hi Lucas,
 
-> >> >> load_firmware will be called at the end of hci_dev_open() if it
-> >> >> is defined.
-> >> >>
-> >> >> Signed-off-by: Wen-chien Jesse Sung <jesse.sung@canonical.com>
-> >> >> ---
-> >> >>  include/net/bluetooth/hci_core.h |    1 +
-> >> >>  net/bluetooth/hci_core.c         |    2 ++
-> >> >>  2 files changed, 3 insertions(+)
-> >> >>
-> >> >> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> >> >> index 593cd1d..40972a3 100644
-> >> >> --- a/include/net/bluetooth/hci_core.h
-> >> >> +++ b/include/net/bluetooth/hci_core.h
-> >> >> @@ -281,6 +281,7 @@ struct hci_dev {
-> >> >>       int (*send)(struct sk_buff *skb);
-> >> >>       void (*notify)(struct hci_dev *hdev, unsigned int evt);
-> >> >>       int (*ioctl)(struct hci_dev *hdev, unsigned int cmd, unsigned long arg);
-> >> >> +     void (*load_firmware)(struct hci_dev *hdev);
-> >> >>  };
-> >> >>
-> >> >>  struct hci_conn {
-> >> >> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> >> >> index d4de5db..49be87a 100644
-> >> >> --- a/net/bluetooth/hci_core.c
-> >> >> +++ b/net/bluetooth/hci_core.c
-> >> >> @@ -725,6 +725,8 @@ int hci_dev_open(__u16 dev)
-> >> >>  done:
-> >> >>       hci_req_unlock(hdev);
-> >> >>       hci_dev_put(hdev);
-> >> >> +     if (!ret && hdev->load_firmware)
-> >> >> +             hdev->load_firmware(hdev);
-> >> >>       return ret;
-> >> >>  }
-> >> >>
-> >> >
-> >> > has anybody thought this through actually? Do we need to reload the
-> >> > firmware after every HCI_Reset? Since hci_dev_open() is used at least
-> >> > twice during normal operation. And for every RFKILL or power down/up
-> >> > cycle of the chip.
-> >> >
-> >> > And there is an internal process of hci_dev_open() trigger on
-> >> > registration and others triggered by hciconfig hci0 up. I am pretty much
-> >> > against having to wait for all this firmware loading crap during every
-> >> > bring up of the device. Especially since it always does a trip via
-> >> > request_firmware().
+> >> Here is a rebased version of the patches. Most notable change is on patch
+> >> implementing the Set() method after feedback from Marcel. It doesn't cover the
+> >> concerns from Luiz about checking privileges per-property since I think this
+> >> could be added in a separate patch. As far as I could see the only user is
+> >> MediaTransport interface. The most obvious way would be to add another hook in
+> >> GDBusPropertyTable in order to check the privileges. Suggestions?
 > >>
-> >> In the second patch, firmware loading would be done only once per
-> >> power cycle of the chip. Since I think it should be the device driver, not hci,
-> >> who knows when and how to load firmware, the lock is placed in btusb.c.
+> >> First 2 patches could be applied nonetheles. Get and GetAll are well tested,
+> >> both now and in the previous version of this patch set. Set() is still a
+> >> bit raw - the users implementing it are very big (adapter, device) so
+> >> they are not converted yet (previous patch doesn't apply anymore and there's a
+> >> change in the API that requires them to be rewritten).
+> >>
+> >>
+> >> Lucas De Marchi (10):
+> >>   gdbus: Move typedefs up
+> >>   gdbus: Use macros to add annotations
+> >>   gdbus: Add skeleton of DBus.Properties interface
+> >>   gdbus: Implement DBus.Properties.Get method
+> >>   gdbus: Implement DBus.Properties.GetAll method
+> >>   gdbus: Implement DBus.Properties.Set method
+> >>   gdbus: Add properties into Introspectable interface
+> >>   gdbus: Implement PropertiesChanged signal
+> >>   Use DBus.Properties on Control interface
+> >>   Use DBus.Properties on Manager interface
+> >>
+> >> Luiz Augusto von Dentz (5):
+> >>   gdbus: Add support for org.freedesktop.DBus.ObjectManager interface
+> >>   gdbus: Group interface changes to reduce the amount of signals
+> >>     emitted
+> >>   gdbus: Only export ObjectManager interface on root path
+> >>   gdbus: Integrates ObjectManager with Properties interface
+> >>   gdbus: Simplify code for appending properties
+> >>
+> >>  audio/control.c |  57 ++--
+> >>  gdbus/gdbus.h   |  74 +++--
+> >>  gdbus/object.c  | 867 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
+> >>  src/manager.c   |  81 ++----
+> >>  4 files changed, 897 insertions(+), 182 deletions(-)
 > >
-> > and how does the driver knows these details? That makes no sense. How
-> > does the driver know it got rebooted?
-> >
-> > The hci_dev_open() will start the transport. And as I explained before,
-> > that can happen twice during boot time.
+> > This initial set has been applied. Now let's get testing it and fix any
+> > pending issues that are found. Also please remember send the adapter and
+> > device conversions when you've got them ready so that we get them stress
+> > tested at the UPF next week.
 > 
-> Please take a look at the second part of this patchset, which is in patch 2/2.
-> Loading firmware is needed when the chip is rebooted, and a reboot would trigger
-> a probe in btusb. So btusb can know a firmware loading is needed whenever
-> a new patchram device is probed. And the load_firmware callback in
-> btusb would do
-> test_and_set_bit to ensure that the loading process would only be done once.
+> Thanks... I'll submit them soonish.
+> 
+> Should we change the interface names to include a version, too? Or
+> change the bus name to something like bluez5?
 
-that is horrible hackish. So NAK from my side. Look at what I told the
-Intel guys to do on supporting their USB dongle. You have the same
-problem and I want it solved in a similar way.
+I am not in favor of that actually. Since this the reverse domain name.
+And we do not own bluez5.org and I am not planning to get a new domain
+name for every major release.
 
-The probe() callback is actually not a good idea either btw. It is for
-binding a driver. Binding and unbinding the driver has nothing to do
-with reboot of the device.
+We need to think about the versioning at some point, but maybe we leave
+that for BlueZ 6.x then. At some point we need to finish this one first.
 
 Regards
 
