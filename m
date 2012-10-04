@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1349356447-8369-2-git-send-email-chanyeol.park@samsung.com>
+In-Reply-To: <1349356447-8369-1-git-send-email-chanyeol.park@samsung.com>
 References: <1349356447-8369-1-git-send-email-chanyeol.park@samsung.com>
-	<1349356447-8369-2-git-send-email-chanyeol.park@samsung.com>
-Date: Thu, 4 Oct 2012 17:11:59 +0300
-Message-ID: <CABBYNZ+X0WOCEotv-hiJDCcPiknUFXh_PSxQvNvW0ajKoB1Srg@mail.gmail.com>
-Subject: Re: [PATCH 3/4] audio: Remove redundant procedure when a2dp connect
+Date: Thu, 4 Oct 2012 17:02:30 +0300
+Message-ID: <CABBYNZKHzKv+GQhynnGN04O17kwjDobwL-+CeVB9hJqrVEF05A@mail.gmail.com>
+Subject: Re: [PATCH 4/4] audio: Add check for non-a2dp codec
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: chanyeol.park@samsung.com
 Cc: linux-bluetooth@vger.kernel.org
@@ -13,33 +12,160 @@ Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chanyeol,
+Hi Chanyel,
 
 On Thu, Oct 4, 2012 at 4:14 PM,  <chanyeol.park@samsung.com> wrote:
 > From: Chan-yeol Park <chanyeol.park@samsung.com>
 >
-> This patch fixes the bug that a2dp connection failure is handled like XCASE
-> when remote host is down.
+> This patch adds checks(vendor ID, vendor specific codec ID) to make sure of
+> non-a2dp codec selection.
 > ---
->  audio/avdtp.c |    3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  audio/a2dp-codecs.h |    6 +++++
+>  audio/a2dp.c        |   68 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 73 insertions(+), 1 deletion(-)
 >
-> diff --git a/audio/avdtp.c b/audio/avdtp.c
-> index 54b3d08..e450ec7 100644
-> --- a/audio/avdtp.c
-> +++ b/audio/avdtp.c
-> @@ -2481,7 +2481,8 @@ failed:
->                         avdtp_sep_set_state(session, stream->lsep,
->                                                 AVDTP_STATE_IDLE);
->         } else
-> -               connection_lost(session, EIO);
-> +               connection_lost(session, err->code == EHOSTDOWN ?
-> +                                               EHOSTDOWN : EIO);
+> diff --git a/audio/a2dp-codecs.h b/audio/a2dp-codecs.h
+> index 51c796a..e3d2cba 100644
+> --- a/audio/a2dp-codecs.h
+> +++ b/audio/a2dp-codecs.h
+> @@ -26,6 +26,7 @@
+>  #define A2DP_CODEC_MPEG12              0x01
+>  #define A2DP_CODEC_MPEG24              0x02
+>  #define A2DP_CODEC_ATRAC               0x03
+> +#define A2DP_CODEC_NON_A2DP            0xFF
+
+I prefer A2DP_CODEC_VENDOR
+
+>  #define SBC_SAMPLING_FREQ_16000                (1 << 3)
+>  #define SBC_SAMPLING_FREQ_32000                (1 << 2)
+> @@ -114,3 +115,8 @@ typedef struct {
+>  #else
+>  #error "Unknown byte order"
+>  #endif
+> +
+> +typedef struct {
+> +       uint8_t vendor_id[4];
+> +       uint8_t codec_id[2];
+> +} __attribute__ ((packed)) non_a2dp_vendor_codec_t;
+
+We normally don't typedef this type of structs, besides
+a2dp_vendor_codec should be enough so this should be named struct
+a2dp_vendor_codec.
+
+> diff --git a/audio/a2dp.c b/audio/a2dp.c
+> index fd1c494..9b4adb1 100644
+> --- a/audio/a2dp.c
+> +++ b/audio/a2dp.c
+> @@ -44,6 +44,7 @@
+>  #include "sink.h"
+>  #include "source.h"
+>  #include "a2dp.h"
+> +#include "a2dp-codecs.h"
+>  #include "sdpd.h"
+>
+>  /* The duration that streams without users are allowed to stay in
+> @@ -1427,11 +1428,66 @@ done:
+>         finalize_select(setup);
 >  }
+>
+> +static gboolean non_a2dp_codec_is_supported(uint8_t *remote_cap,
+> +                               size_t remote_cap_len, struct a2dp_sep *sep)
 
-This rely on err being set which may not always be the case since
-there are other places calling goto failed.
+Use vendor_codec_is_supported as function name.
 
+> +{
+> +       uint8_t *capabilities;
+> +       size_t  length;
+> +
+> +       non_a2dp_vendor_codec_t *local_codec;
+> +       non_a2dp_vendor_codec_t *remote_codec;
+> +
+> +       if (remote_cap_len < sizeof(non_a2dp_vendor_codec_t))
+> +               return FALSE;
+> +
+> +       remote_codec = (non_a2dp_vendor_codec_t *) remote_cap;
+> +
+> +       DBG("Remote vendor id %x %x %x %x", remote_codec->vendor_id[0],
+> +                       remote_codec->vendor_id[1], remote_codec->vendor_id[2],
+> +                                               remote_codec->vendor_id[3]);
+> +
+> +       DBG("Remote vendor codec id %x %x", remote_codec->codec_id[0],
+> +                                               remote_codec->codec_id[1]);
+
+You can probably join this 2 DBGs in one, also fix the printing format
+for uint8_t it should be %02x and if is hex add 0x e.g. Remote vendor
+0x%02x%02x%02x%02x codec 0x%02x%02x
+
+> +       if (sep->endpoint == NULL)
+> +               return FALSE;
+> +
+> +       length = sep->endpoint->get_capabilities(sep,
+> +                               &capabilities, sep->user_data);
+> +
+> +       if (length < sizeof(non_a2dp_vendor_codec_t))
+> +               return FALSE;
+> +
+> +       local_codec = (non_a2dp_vendor_codec_t *) capabilities;
+> +
+> +       DBG("Registered vendor id %x %x %x %x", local_codec->vendor_id[0],
+> +                       local_codec->vendor_id[1], local_codec->vendor_id[2],
+> +                                               local_codec->vendor_id[3]);
+> +
+> +       DBG("Registered vendor codec id %x %x", local_codec->codec_id[0],
+> +                                               local_codec->codec_id[1]);
+
+Same as above.
+
+> +       if (memcmp(remote_codec->vendor_id, local_codec->vendor_id,
+> +                                       sizeof(local_codec->vendor_id)))
+> +               return FALSE;
+> +
+> +       if (memcmp(remote_codec->codec_id, local_codec->codec_id,
+> +                                       sizeof(local_codec->codec_id)))
+> +               return FALSE;
+> +
+> +       DBG("Remote non a2dp codec is supported");
+
+Not sure if this DBG would be of much use since latter you select it,
+so it is implicit whether it is supported or not.
+
+> +       return TRUE;
+> +}
+> +
+>  static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
+>                                         const char *sender)
+>  {
+>         for (; list; list = list->next) {
+>                 struct a2dp_sep *sep = list->data;
+> +               struct avdtp_remote_sep *rsep;
+> +               struct avdtp_media_codec_capability *rsep_codec;
+> +               struct avdtp_service_capability *service;
+>
+>                 /* Use sender's endpoint if available */
+>                 if (sender) {
+> @@ -1445,7 +1501,17 @@ static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
+>                                 continue;
+>                 }
+>
+> -               if (avdtp_find_remote_sep(session, sep->lsep) == NULL)
+> +               rsep = avdtp_find_remote_sep(session, sep->lsep);
+> +               if (rsep == NULL)
+> +                       continue;
+> +
+> +               service = avdtp_get_codec(rsep);
+> +               rsep_codec = (struct avdtp_media_codec_capability *)
+> +                                                               service->data;
+> +
+> +               if (rsep_codec->media_codec_type == A2DP_CODEC_NON_A2DP &&
+> +                       !non_a2dp_codec_is_supported(rsep_codec->data,
+> +                               service->length - sizeof(*rsep_codec), sep))
+>                         continue;
+>
+>                 return sep;
+> --
+> 1.7.9.5
+
+The rest looks okay.
 
 -- 
 Luiz Augusto von Dentz
