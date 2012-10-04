@@ -1,36 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: AMP: Fix possible NULL dereference
-Date: Thu,  4 Oct 2012 13:31:07 +0300
-Message-Id: <1349346667-32070-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <1349346388.27233.33.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: AMP: Register AMP only if High Speed enabled
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 04 Oct 2012 12:26:28 +0200
+In-Reply-To: <20121004101010.GA12229@aemeltch-MOBL1>
+References: <1349339215-8422-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1349344331.27233.9.camel@aeonflux> <20121004101010.GA12229@aemeltch-MOBL1>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Andrei,
 
-Check that link key exist before accessing.
+> > > Make sure that AMP controller is registered only if HS enables.
+> > > Return EINVAL if High Speed is not enabled and dev_type is HCI_AMP.
+> > 
+> > I don't think this is a good idea. I like to keep the adapter registers,
+> > but maybe have a hciconfig hciX up fail. Not the registration itself.
+> 
+> So currently AMP registers itself as RAW device, maybe leave it as is.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/amp.c |    4 ++++
- 1 file changed, 4 insertions(+)
+we can do that, but that will also never give us enough testing
+exposure. An adapter registered a RAW device, can not undo the RAW
+device from userspace, you need to recompile the kernel.
 
-diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index c933c72..7e4a1e5 100644
---- a/net/bluetooth/amp.c
-+++ b/net/bluetooth/amp.c
-@@ -185,6 +185,10 @@ int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type)
- 	*len = HCI_AMP_LINK_KEY_SIZE;
- 
- 	key = hci_find_link_key(hdev, &conn->dst);
-+	if (!key) {
-+		BT_DBG("No Link key for conn %p dst %pMR", conn, &conn->dst);
-+		return -EACCES;
-+	}
- 
- 	/* BR/EDR Link Key concatenated together with itself */
- 	memcpy(&keybuf[0], key->val, HCI_LINK_KEY_SIZE);
--- 
-1.7.9.5
+So as I said, I rather have hciconfig hciX up fail in the case enable_hs
+is set to false.
+
+I am even fine with allowing to bring up AMP controllers. Just when it
+comes to A2MP, you can not announce them to the other side unless
+enable_hs is set to true.
+
+You can not even list A2MP in the fixed channel list if enanble_hs is
+false and L2CAP and A2MP procedures should just fail or return an error.
+
+Regards
+
+Marcel
+
 
