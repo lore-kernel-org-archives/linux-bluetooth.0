@@ -1,41 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1349374107.27233.36.camel@aeonflux>
-Subject: Re: [PATCH 4/4] audio: Add check for non-a2dp codec
+Message-ID: <1349374431.27233.40.camel@aeonflux>
+Subject: Re: [PATCH v2 resend 1/2] Introduced a load_firmware callback to
+ struct hci_dev
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: chanyeol.park@samsung.com, linux-bluetooth@vger.kernel.org
-Date: Thu, 04 Oct 2012 20:08:27 +0200
-In-Reply-To: <CABBYNZKHzKv+GQhynnGN04O17kwjDobwL-+CeVB9hJqrVEF05A@mail.gmail.com>
-References: <1349356447-8369-1-git-send-email-chanyeol.park@samsung.com>
-	 <CABBYNZKHzKv+GQhynnGN04O17kwjDobwL-+CeVB9hJqrVEF05A@mail.gmail.com>
+To: Jesse Sung <jesse.sung@canonical.com>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Date: Thu, 04 Oct 2012 20:13:51 +0200
+In-Reply-To: <CAH10aOja5o=HjsLN3qKZey=POpjgMsf+V_RU=iHH+sk1oZOOuw@mail.gmail.com>
+References: <cover.1347959921.git.jesse.sung@canonical.com>
+	 <1349335847-1615-1-git-send-email-jesse.sung@canonical.com>
+	 <1349335847-1615-2-git-send-email-jesse.sung@canonical.com>
+	 <1349344897.27233.13.camel@aeonflux>
+	 <CAH10aOiwWGseiYEiqk_h=WhNyGGGhpWPhU1TO8E948Ka+xHu9w@mail.gmail.com>
+	 <1349355967.27233.35.camel@aeonflux>
+	 <CAH10aOja5o=HjsLN3qKZey=POpjgMsf+V_RU=iHH+sk1oZOOuw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Jesse,
 
-> > This patch adds checks(vendor ID, vendor specific codec ID) to make sure of
-> > non-a2dp codec selection.
-> > ---
-> >  audio/a2dp-codecs.h |    6 +++++
-> >  audio/a2dp.c        |   68 ++++++++++++++++++++++++++++++++++++++++++++++++++-
-> >  2 files changed, 73 insertions(+), 1 deletion(-)
+> >> >> load_firmware will be called at the end of hci_dev_open() if it
+> >> >> is defined.
+> >> >>
+> >> >> Signed-off-by: Wen-chien Jesse Sung <jesse.sung@canonical.com>
+> >> >> ---
+> >> >>  include/net/bluetooth/hci_core.h |    1 +
+> >> >>  net/bluetooth/hci_core.c         |    2 ++
+> >> >>  2 files changed, 3 insertions(+)
+> >> >>
+> >> >> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> >> >> index 593cd1d..40972a3 100644
+> >> >> --- a/include/net/bluetooth/hci_core.h
+> >> >> +++ b/include/net/bluetooth/hci_core.h
+> >> >> @@ -281,6 +281,7 @@ struct hci_dev {
+> >> >>       int (*send)(struct sk_buff *skb);
+> >> >>       void (*notify)(struct hci_dev *hdev, unsigned int evt);
+> >> >>       int (*ioctl)(struct hci_dev *hdev, unsigned int cmd, unsigned long arg);
+> >> >> +     void (*load_firmware)(struct hci_dev *hdev);
+> >> >>  };
+> >> >>
+> >> >>  struct hci_conn {
+> >> >> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> >> >> index d4de5db..49be87a 100644
+> >> >> --- a/net/bluetooth/hci_core.c
+> >> >> +++ b/net/bluetooth/hci_core.c
+> >> >> @@ -725,6 +725,8 @@ int hci_dev_open(__u16 dev)
+> >> >>  done:
+> >> >>       hci_req_unlock(hdev);
+> >> >>       hci_dev_put(hdev);
+> >> >> +     if (!ret && hdev->load_firmware)
+> >> >> +             hdev->load_firmware(hdev);
+> >> >>       return ret;
+> >> >>  }
+> >> >>
+> >> >
+> >> > has anybody thought this through actually? Do we need to reload the
+> >> > firmware after every HCI_Reset? Since hci_dev_open() is used at least
+> >> > twice during normal operation. And for every RFKILL or power down/up
+> >> > cycle of the chip.
+> >> >
+> >> > And there is an internal process of hci_dev_open() trigger on
+> >> > registration and others triggered by hciconfig hci0 up. I am pretty much
+> >> > against having to wait for all this firmware loading crap during every
+> >> > bring up of the device. Especially since it always does a trip via
+> >> > request_firmware().
+> >>
+> >> In the second patch, firmware loading would be done only once per
+> >> power cycle of the chip. Since I think it should be the device driver, not hci,
+> >> who knows when and how to load firmware, the lock is placed in btusb.c.
 > >
-> > diff --git a/audio/a2dp-codecs.h b/audio/a2dp-codecs.h
-> > index 51c796a..e3d2cba 100644
-> > --- a/audio/a2dp-codecs.h
-> > +++ b/audio/a2dp-codecs.h
-> > @@ -26,6 +26,7 @@
-> >  #define A2DP_CODEC_MPEG12              0x01
-> >  #define A2DP_CODEC_MPEG24              0x02
-> >  #define A2DP_CODEC_ATRAC               0x03
-> > +#define A2DP_CODEC_NON_A2DP            0xFF
+> > and how does the driver knows these details? That makes no sense. How
+> > does the driver know it got rebooted?
+> >
+> > The hci_dev_open() will start the transport. And as I explained before,
+> > that can happen twice during boot time.
 > 
-> I prefer A2DP_CODEC_VENDOR
+> Please take a look at the second part of this patchset, which is in patch 2/2.
+> Loading firmware is needed when the chip is rebooted, and a reboot would trigger
+> a probe in btusb. So btusb can know a firmware loading is needed whenever
+> a new patchram device is probed. And the load_firmware callback in
+> btusb would do
+> test_and_set_bit to ensure that the loading process would only be done once.
 
-what is the specification calling these? And yes, I would prefer VENDOR
-as well.
+that is horrible hackish. So NAK from my side. Look at what I told the
+Intel guys to do on supporting their USB dongle. You have the same
+problem and I want it solved in a similar way.
+
+The probe() callback is actually not a good idea either btw. It is for
+binding a driver. Binding and unbinding the driver has nothing to do
+with reboot of the device.
 
 Regards
 
