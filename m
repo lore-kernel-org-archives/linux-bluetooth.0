@@ -1,57 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: mgmt: Fix dereference after NULL check
-Date: Thu,  4 Oct 2012 13:56:58 +0300
-Message-Id: <1349348218-676-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] Bluetooth: Fix dereference after NULL check
+Date: Thu,  4 Oct 2012 13:45:46 +0300
+Message-Id: <1349347546-32523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-hdev might be NULL, so we need to avoid possible NULL derefernce in
-handler->func functions.
+Move code dereferencing possible NULL pointer to the check branch.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/mgmt.c |   14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ net/bluetooth/l2cap_sock.c |   11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index b127b88..be3182c 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2738,7 +2738,6 @@ static const struct mgmt_handler {
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- {
- 	void *buf;
--	u8 *cp;
- 	struct mgmt_hdr *hdr;
- 	u16 opcode, index, len;
- 	struct hci_dev *hdev = NULL;
-@@ -2802,14 +2801,17 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- 		goto done;
- 	}
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index e6238eb..0c05d7d 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -386,13 +386,14 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+ 		}
  
--	if (hdev)
-+	if (hdev) {
-+		u8 *cp;
-+
- 		mgmt_init_hdev(sk, hdev);
+ 		memset(&sec, 0, sizeof(sec));
+-		if (chan->conn)
++		if (chan->conn) {
+ 			sec.level = chan->conn->hcon->sec_level;
+-		else
+-			sec.level = chan->sec_level;
  
--	cp = buf + sizeof(*hdr);
-+		cp = buf + sizeof(*hdr);
+-		if (sk->sk_state == BT_CONNECTED)
+-			sec.key_size = chan->conn->hcon->enc_key_size;
++			if (sk->sk_state == BT_CONNECTED)
++				sec.key_size = chan->conn->hcon->enc_key_size;
++		} else {
++			sec.level = chan->sec_level;
++		}
  
--	err = handler->func(sk, hdev, cp, len);
--	if (err < 0)
--		goto done;
-+		err = handler->func(sk, hdev, cp, len);
-+		if (err < 0)
-+			goto done;
-+	}
- 
- 	err = msglen;
- 
+ 		len = min_t(unsigned int, len, sizeof(sec));
+ 		if (copy_to_user(optval, (char *) &sec, len))
 -- 
 1.7.9.5
 
