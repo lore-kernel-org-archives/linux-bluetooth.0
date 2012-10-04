@@ -2,83 +2,227 @@ Return-Path: <cyrus@holtmann.org>
 From: Srinivasa Ragavan <srinivasa.ragavan.venkateswaran@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Srinivasa Ragavan <srinivasa.ragavan.venkateswaran@intel.com>
-Subject: [PATCH 4/4] test: Update map-client to include Message.SetProperty and Message.GetProperties
-Date: Thu,  4 Oct 2012 19:00:03 +0530
-Message-Id: <1349357403-16354-4-git-send-email-srinivasa.ragavan.venkateswaran@intel.com>
+Subject: [PATCH 2/4] client: Add Message.SetProperty and Message.GetProperties implementation.
+Date: Thu,  4 Oct 2012 19:00:01 +0530
+Message-Id: <1349357403-16354-2-git-send-email-srinivasa.ragavan.venkateswaran@intel.com>
 In-Reply-To: <1349357403-16354-1-git-send-email-srinivasa.ragavan.venkateswaran@intel.com>
 References: <1349357403-16354-1-git-send-email-srinivasa.ragavan.venkateswaran@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- test/map-client |   42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ client/map.c |  170 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 170 insertions(+)
 
-diff --git a/test/map-client b/test/map-client
-index 2075844..54e3900 100755
---- a/test/map-client
-+++ b/test/map-client
-@@ -41,6 +41,16 @@ def parse_options():
- 			help="List messages in supplied CWD subdir")
- 	parser.add_option("-g", "--get", action="store", dest="get_msg",
- 			help="Get message contents")
-+	parser.add_option("--get-properties", action="store", dest="get_msg_properties",
-+			help="Get message properties")
-+	parser.add_option("--mark-read", action="store", dest="mark_msg_read",
-+			help="Marks the messages as read")
-+	parser.add_option("--mark-unread", action="store", dest="mark_msg_unread",
-+			help="Marks the messages as unread")
-+	parser.add_option("--mark-deleted", action="store", dest="mark_msg_deleted",
-+			help="Deletes the message from the folder")
-+	parser.add_option("--mark-undeleted", action="store", dest="mark_msg_undeleted",
-+			help="Undeletes the message")
+diff --git a/client/map.c b/client/map.c
+index e78cd68..8d6f930 100644
+--- a/client/map.c
++++ b/client/map.c
+@@ -28,6 +28,7 @@
+ #include <string.h>
+ #include <stdio.h>
+ #include <glib.h>
++#include <glib/gstdio.h>
+ #include <gdbus.h>
  
- 	return parser.parse_args()
+ #include <gobex-apparam.h>
+@@ -78,6 +79,10 @@ static const char * const filter_list[] = {
+ #define FILTER_BIT_MAX	15
+ #define FILTER_ALL	0xFF
  
-@@ -120,6 +130,22 @@ class MapClient:
- 		msg.Get("", True, reply_handler=self.create_transfer_reply,
- 						error_handler=self.error)
++#define STATUS_READ 0
++#define STATUS_DELETE 1
++#define FILLER_BYTE 0x30
++
+ struct map_data {
+ 	struct obc_session *session;
+ 	DBusMessage *msg;
+@@ -104,6 +109,7 @@ struct map_msg {
+ 	uint64_t size;
+ 	char *status;
+ 	uint8_t flags;
++	DBusMessage *msg;
+ };
  
-+	def get_message_properties(self, handle):
-+		self.map.ListMessages("", dict())
-+		path = self.path + "/message" + handle
-+		obj = bus.get_object("org.bluez.obex.client", path)
-+		msg = dbus.Interface(obj, "org.bluez.obex.Message")
-+		ret = msg.GetProperties()
-+		print pformat(unwrap(ret))
-+
-+	def set_message_property(self, handle, prop, flag):
-+		self.map.ListMessages("", dict())
-+		path = self.path + "/message" + handle
-+		obj = bus.get_object("org.bluez.obex.client", path)
-+		msg = dbus.Interface(obj, "org.bluez.obex.Message")
-+		msg.SetProperty (prop, flag);
-+
-+
- if  __name__ == '__main__':
+ struct map_parser {
+@@ -412,6 +418,163 @@ fail:
+ 	return reply;
+ }
  
- 	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-@@ -155,4 +181,20 @@ if  __name__ == '__main__':
- 	if options.get_msg is not None:
- 		map_client.get_message(options.get_msg)
++static void set_message_status_cb(struct obc_session *session,
++						struct obc_transfer *transfer,
++						GError *err, void *user_data)
++{
++	struct map_msg *msg = user_data;
++	DBusMessage *reply;
++
++	if (err != NULL) {
++		reply = g_dbus_create_error(msg->msg,
++						ERROR_INTERFACE ".Failed",
++						"%s", err->message);
++		goto done;
++	}
++
++	reply = dbus_message_new_method_return(msg->msg);
++	if (reply == NULL) {
++		reply = g_dbus_create_error(msg->msg,
++						ERROR_INTERFACE ".Failed",
++						"%s", err->message);
++	}
++
++done:
++	g_dbus_send_message(conn, reply);
++	dbus_message_unref(msg->msg);
++	msg->msg = NULL;
++}
++
++static DBusMessage *map_msg_set_property (DBusConnection *connection,
++						DBusMessage *message, void *user_data)
++{
++	struct map_msg *msg = user_data;
++	struct obc_transfer *transfer;
++	char *property;
++	gboolean status;
++	GError *err = NULL;
++	DBusMessage *reply;
++	GObexApparam *apparam;
++	char contents[2];
++	int op;
++	DBusMessageIter args, variant;
++
++	dbus_message_iter_init(message, &args);
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_STRING)
++		return g_dbus_create_error(message,
++				ERROR_INTERFACE ".InvalidArguments", NULL);
++
++	dbus_message_iter_get_basic(&args, &property);
++	dbus_message_iter_next (&args);
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_VARIANT)
++		return g_dbus_create_error(message,
++				ERROR_INTERFACE ".InvalidArguments", NULL);
++
++	dbus_message_iter_recurse(&args, &variant);
++	if (dbus_message_iter_get_arg_type(&variant) != DBUS_TYPE_BOOLEAN)
++		return g_dbus_create_error(message,
++				ERROR_INTERFACE ".InvalidArguments", NULL);
++
++	dbus_message_iter_get_basic(&variant, &status);
++
++	/* MAP supports modifying only these two properties. */
++	if (property && strcasecmp (property, "Read") == 0) {
++		op = STATUS_READ;
++		if (status)
++			msg->flags |= MAP_MSG_FLAG_READ;
++		else
++			msg->flags &= ~MAP_MSG_FLAG_READ;
++	} else if (property && strcasecmp (property, "Deleted") == 0)
++		op = STATUS_DELETE;
++	else {
++		return g_dbus_create_error(message,
++				ERROR_INTERFACE ".InvalidArguments", NULL);
++	}
++
++	contents[0] = FILLER_BYTE;
++	contents[1] = '\0';
++
++	transfer = obc_transfer_put("x-bt/messageStatus", msg->handle, NULL,
++							contents, sizeof(contents), &err);
++	if (transfer == NULL)
++		goto fail;
++
++	apparam = g_obex_apparam_set_uint8(NULL, MAP_AP_STATUSINDICATOR,
++								op);
++	apparam = g_obex_apparam_set_uint8(apparam, MAP_AP_STATUSVALUE,
++								status);
++	obc_transfer_set_apparam(transfer, apparam);
++
++	if (!obc_session_queue(msg->data->session, transfer, set_message_status_cb, msg, &err))
++		goto fail;
++
++	msg->msg = dbus_message_ref (message);
++	return NULL;
++
++fail:
++	reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed", "%s",
++								err->message);
++	g_error_free(err);
++	return reply;
++}
++
++static DBusMessage *map_msg_get_properties (DBusConnection *connection,
++						DBusMessage *message, void *user_data)
++{
++	struct map_msg *msg = user_data;
++	GError *err = NULL;
++	DBusMessage *reply;
++	DBusMessageIter iter, data_array;
++	gboolean flag;
++
++	reply = dbus_message_new_method_return(message);
++	if (reply == NULL) {
++		reply = g_dbus_create_error(message,
++						ERROR_INTERFACE ".Failed",
++						NULL);
++		goto done;
++	}
++
++	dbus_message_iter_init_append(reply, &iter);
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++					DBUS_TYPE_STRING_AS_STRING
++					DBUS_TYPE_VARIANT_AS_STRING
++					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
++					&data_array);
++
++
++	obex_dbus_dict_append(&data_array, "Subject", DBUS_TYPE_STRING, &msg->subject);
++	obex_dbus_dict_append(&data_array, "Timestamp", DBUS_TYPE_STRING, &msg->timestamp);
++	obex_dbus_dict_append(&data_array, "Sender", DBUS_TYPE_STRING, &msg->sender);
++	obex_dbus_dict_append(&data_array, "SenderAddress", DBUS_TYPE_STRING,
++						&msg->sender_address);
++	obex_dbus_dict_append(&data_array, "ReplyTo", DBUS_TYPE_STRING, &msg->replyto);
++	obex_dbus_dict_append(&data_array, "Recipient", DBUS_TYPE_STRING, &msg->recipient);
++	obex_dbus_dict_append(&data_array, "RecipientAddress", DBUS_TYPE_STRING,
++								&msg->recipient_address);
++	obex_dbus_dict_append(&data_array, "Type", DBUS_TYPE_STRING, &msg->type);
++	obex_dbus_dict_append(&data_array, "Status", DBUS_TYPE_STRING, &msg->status);
++	obex_dbus_dict_append(&data_array, "Size", DBUS_TYPE_UINT64, &msg->size);
++	flag = (msg->flags & MAP_MSG_FLAG_PRIORITY) != 0;
++	obex_dbus_dict_append(&data_array, "Priority", DBUS_TYPE_BOOLEAN, &flag);
++	flag = (msg->flags & MAP_MSG_FLAG_READ) != 0;
++	obex_dbus_dict_append(&data_array, "Read", DBUS_TYPE_BOOLEAN, &flag);
++	flag = (msg->flags & MAP_MSG_FLAG_SENT) != 0;
++	obex_dbus_dict_append(&data_array, "Sent", DBUS_TYPE_BOOLEAN, &flag);
++	flag = (msg->flags & MAP_MSG_FLAG_PROTECTED) != 0;
++	obex_dbus_dict_append(&data_array, "Protected", DBUS_TYPE_BOOLEAN, &flag);
++
++	dbus_message_iter_close_container(&iter, &data_array);
++
++
++done:
++	if (err)
++		g_error_free(err);
++
++	return reply;
++}
++
+ static const GDBusMethodTable map_msg_methods[] = {
+ 	{ GDBUS_METHOD("Get",
+ 			GDBUS_ARGS({ "targetfile", "s" },
+@@ -419,6 +582,13 @@ static const GDBusMethodTable map_msg_methods[] = {
+ 			GDBUS_ARGS({ "transfer", "o" },
+ 						{ "properties", "a{sv}" }),
+ 			map_msg_get) },
++	{ GDBUS_METHOD("GetProperties",
++			NULL,
++			GDBUS_ARGS({ "properties", "a{sv}" }),
++			map_msg_get_properties) },
++	{ GDBUS_ASYNC_METHOD("SetProperty",
++			GDBUS_ARGS({ "property", "sv" }), NULL,
++			map_msg_set_property) },
+ 	{ }
+ };
  
-+	if options.get_msg_properties is not None:
-+		map_client.get_message_properties(options.get_msg_properties)
-+
-+	if options.mark_msg_read is not None:
-+		map_client.set_message_property(options.mark_msg_read, "Read", True)
-+
-+	if options.mark_msg_unread is not None:
-+		map_client.set_message_property(options.mark_msg_unread, "Read", False)
-+
-+	if options.mark_msg_deleted is not None:
-+		map_client.set_message_property(options.mark_msg_deleted, "Deleted", True)
-+
-+	if options.mark_msg_undeleted is not None:
-+		map_client.set_message_property(options.mark_msg_undeleted, "Deleted", False)
-+
-+
- 	mainloop.run()
 -- 
 1.7.10.4
 
