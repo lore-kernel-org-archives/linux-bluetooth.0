@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 5/7] mgmt: Constify use of bdaddr_t pointer parameters
-Date: Thu, 4 Oct 2012 14:06:02 +0200
-Message-ID: <1349352364-5491-6-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC 3/7] adapter: Constify pointer returned by adapter_get_address
+Date: Thu, 4 Oct 2012 14:06:00 +0200
+Message-ID: <1349352364-5491-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1349352364-5491-1-git-send-email-szymon.janc@tieto.com>
 References: <1349352364-5491-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,274 +12,354 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Mark all input only bdaddr_t pointer parameters as const.
-
 ---
- plugins/neard.c |    5 +++--
- src/adapter.c   |    6 +++---
- src/adapter.h   |    6 +++---
- src/mgmt.c      |   31 ++++++++++++++++---------------
- src/mgmt.h      |   26 +++++++++++++-------------
- 5 files changed, 38 insertions(+), 36 deletions(-)
+ audio/manager.c               |    4 ++--
+ profiles/gatt/gas.c           |   10 ++++++----
+ profiles/health/hdp_util.c    |    9 ++++++---
+ profiles/health/mcap.c        |    2 +-
+ profiles/health/mcap_lib.h    |    2 +-
+ profiles/network/connection.c |    6 +++---
+ profiles/network/connection.h |    2 +-
+ profiles/network/manager.c    |    3 ++-
+ profiles/proximity/monitor.c  |    4 ++--
+ profiles/sap/server.c         |    2 +-
+ profiles/sap/server.h         |    2 +-
+ src/adapter.c                 |    2 +-
+ src/adapter.h                 |    2 +-
+ src/attrib-server.c           |    2 +-
+ src/device.c                  |    5 +++--
+ src/eir.c                     |    2 +-
+ src/eir.h                     |    2 +-
+ src/profile.c                 |    9 ++++++---
+ 18 files changed, 40 insertions(+), 30 deletions(-)
 
-diff --git a/plugins/neard.c b/plugins/neard.c
-index 2fe1785..2da5024 100644
---- a/plugins/neard.c
-+++ b/plugins/neard.c
-@@ -216,8 +216,9 @@ static void read_local_complete(struct btd_adapter *adapter, uint8_t *hash,
- 		error("D-Bus send failed");
+diff --git a/audio/manager.c b/audio/manager.c
+index 6ddea5a..e6886d7 100644
+--- a/audio/manager.c
++++ b/audio/manager.c
+@@ -507,7 +507,7 @@ static int headset_server_init(struct audio_adapter *adapter)
+ 	GError *err = NULL;
+ 	uint32_t features;
+ 	GIOChannel *io;
+-	bdaddr_t *src;
++	const bdaddr_t *src;
+ 
+ 	if (config) {
+ 		gboolean tmp;
+@@ -608,7 +608,7 @@ static int gateway_server_init(struct audio_adapter *adapter)
+ 	gboolean master = TRUE;
+ 	GError *err = NULL;
+ 	GIOChannel *io;
+-	bdaddr_t *src;
++	const bdaddr_t *src;
+ 
+ 	if (config) {
+ 		gboolean tmp;
+diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
+index f0fcbe7..03bdd5a 100644
+--- a/profiles/gatt/gas.c
++++ b/profiles/gatt/gas.c
+@@ -86,8 +86,9 @@ static inline int create_filename(char *buf, size_t size,
+ 	return create_name(buf, size, STORAGEDIR, addr, name);
  }
  
--static void bonding_complete(struct btd_adapter *adapter, bdaddr_t *bdaddr,
--					uint8_t status, void *user_data)
-+static void bonding_complete(struct btd_adapter *adapter,
-+					const bdaddr_t *bdaddr, uint8_t status,
-+					void *user_data)
+-static int write_ctp_handle(bdaddr_t *sba, bdaddr_t *dba, uint8_t bdaddr_type,
+-						uint16_t uuid, uint16_t handle)
++static int write_ctp_handle(const bdaddr_t *sba, const bdaddr_t *dba,
++					uint8_t bdaddr_type, uint16_t uuid,
++					uint16_t handle)
  {
- 	DBusMessage *msg = user_data;
- 	DBusMessage *reply;
+ 	char filename[PATH_MAX + 1], addr[18], key[27], value[7];
+ 
+@@ -104,8 +105,9 @@ static int write_ctp_handle(bdaddr_t *sba, bdaddr_t *dba, uint8_t bdaddr_type,
+ 	return textfile_put(filename, key, value);
+ }
+ 
+-static int read_ctp_handle(bdaddr_t *sba, bdaddr_t *dba, uint8_t bdaddr_type,
+-						uint16_t uuid, uint16_t *value)
++static int read_ctp_handle(const bdaddr_t *sba, const bdaddr_t *dba,
++					uint8_t bdaddr_type, uint16_t uuid,
++					uint16_t *value)
+ {
+ 	char filename[PATH_MAX + 1], addr[18], key[27];
+ 	char *str;
+diff --git a/profiles/health/hdp_util.c b/profiles/health/hdp_util.c
+index 931c1dd..1d9419e 100644
+--- a/profiles/health/hdp_util.c
++++ b/profiles/health/hdp_util.c
+@@ -857,7 +857,8 @@ gboolean hdp_get_mdep(struct hdp_device *device, struct hdp_application *app,
+ 				GDestroyNotify destroy, GError **err)
+ {
+ 	struct get_mdep_data *mdep_data;
+-	bdaddr_t dst, *src;
++	bdaddr_t dst;
++	const bdaddr_t *src;
+ 	uuid_t uuid;
+ 
+ 	device_get_address(device->dev, &dst, NULL);
+@@ -1086,7 +1087,8 @@ gboolean hdp_establish_mcl(struct hdp_device *device,
+ 						GError **err)
+ {
+ 	struct conn_mcl_data *conn_data;
+-	bdaddr_t dst, *src;
++	bdaddr_t dst;
++	const bdaddr_t *src;
+ 	uuid_t uuid;
+ 
+ 	device_get_address(device->dev, &dst, NULL);
+@@ -1156,7 +1158,8 @@ gboolean hdp_get_dcpsm(struct hdp_device *device, hdp_continue_dcpsm_f func,
+ 							GError **err)
+ {
+ 	struct get_dcpsm_data *dcpsm_data;
+-	bdaddr_t dst, *src;
++	bdaddr_t dst;
++	const bdaddr_t *src;
+ 	uuid_t uuid;
+ 
+ 	device_get_address(device->dev, &dst, NULL);
+diff --git a/profiles/health/mcap.c b/profiles/health/mcap.c
+index 86f0575..57ea1c3 100644
+--- a/profiles/health/mcap.c
++++ b/profiles/health/mcap.c
+@@ -1984,7 +1984,7 @@ drop:
+ 	g_io_channel_shutdown(chan, TRUE, NULL);
+ }
+ 
+-struct mcap_instance *mcap_create_instance(bdaddr_t *src,
++struct mcap_instance *mcap_create_instance(const bdaddr_t *src,
+ 					BtIOSecLevel sec,
+ 					uint16_t ccpsm,
+ 					uint16_t dcpsm,
+diff --git a/profiles/health/mcap_lib.h b/profiles/health/mcap_lib.h
+index 8fcc141..603ccc0 100644
+--- a/profiles/health/mcap_lib.h
++++ b/profiles/health/mcap_lib.h
+@@ -196,7 +196,7 @@ void mcap_sync_set_req(struct mcap_mcl *mcl,
+ 
+ /* MCAP main operations */
+ 
+-struct mcap_instance *mcap_create_instance(bdaddr_t *src,
++struct mcap_instance *mcap_create_instance(const bdaddr_t *src,
+ 					BtIOSecLevel sec, uint16_t ccpsm,
+ 					uint16_t dcpsm,
+ 					mcap_mcl_event_cb mcl_connected,
+diff --git a/profiles/network/connection.c b/profiles/network/connection.c
+index 7688beb..9646e5a 100644
+--- a/profiles/network/connection.c
++++ b/profiles/network/connection.c
+@@ -594,8 +594,8 @@ void connection_unregister(const char *path)
+ }
+ 
+ static struct network_peer *create_peer(struct btd_device *device,
+-					const char *path, bdaddr_t *src,
+-					bdaddr_t *dst)
++					const char *path, const bdaddr_t *src,
++					const bdaddr_t *dst)
+ {
+ 	struct network_peer *peer;
+ 
+@@ -623,7 +623,7 @@ static struct network_peer *create_peer(struct btd_device *device,
+ }
+ 
+ int connection_register(struct btd_device *device, const char *path,
+-			bdaddr_t *src, bdaddr_t *dst, uint16_t id)
++			const bdaddr_t *src, const bdaddr_t *dst, uint16_t id)
+ {
+ 	struct network_peer *peer;
+ 	struct network_conn *nc;
+diff --git a/profiles/network/connection.h b/profiles/network/connection.h
+index 2e33c55..efc4ccb 100644
+--- a/profiles/network/connection.h
++++ b/profiles/network/connection.h
+@@ -22,5 +22,5 @@
+  */
+ 
+ int connection_register(struct btd_device *device, const char *path,
+-			bdaddr_t *src, bdaddr_t *dst, uint16_t id);
++			const bdaddr_t *src, const bdaddr_t *dst, uint16_t id);
+ void connection_unregister(const char *path);
+diff --git a/profiles/network/manager.c b/profiles/network/manager.c
+index 661181d..42b5214 100644
+--- a/profiles/network/manager.c
++++ b/profiles/network/manager.c
+@@ -78,7 +78,8 @@ static int network_probe(struct btd_profile *p, struct btd_device *device,
+ {
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+ 	const gchar *path = device_get_path(device);
+-	bdaddr_t *src, dst;
++	const bdaddr_t *src;
++	bdaddr_t dst;
+ 
+ 	DBG("path %s", path);
+ 
+diff --git a/profiles/proximity/monitor.c b/profiles/proximity/monitor.c
+index 477eeea..03df0e2 100644
+--- a/profiles/proximity/monitor.c
++++ b/profiles/proximity/monitor.c
+@@ -93,7 +93,7 @@ static inline int create_filename(char *buf, size_t size,
+ 	return create_name(buf, size, STORAGEDIR, addr, name);
+ }
+ 
+-static int write_proximity_config(bdaddr_t *sba, bdaddr_t *dba,
++static int write_proximity_config(const bdaddr_t *sba, const bdaddr_t *dba,
+ 					const char *alert, const char *level)
+ {
+ 	char filename[PATH_MAX + 1], addr[18], key[38];
+@@ -109,7 +109,7 @@ static int write_proximity_config(bdaddr_t *sba, bdaddr_t *dba,
+ 	return textfile_put(filename, key, level);
+ }
+ 
+-static char *read_proximity_config(bdaddr_t *sba, bdaddr_t *dba,
++static char *read_proximity_config(const bdaddr_t *sba, const bdaddr_t *dba,
+ 							const char *alert)
+ {
+ 	char filename[PATH_MAX + 1], addr[18], key[38];
+diff --git a/profiles/sap/server.c b/profiles/sap/server.c
+index 6072432..9a7cb72 100644
+--- a/profiles/sap/server.c
++++ b/profiles/sap/server.c
+@@ -1366,7 +1366,7 @@ static void destroy_sap_interface(void *data)
+ 	server_remove(server);
+ }
+ 
+-int sap_server_register(const char *path, bdaddr_t *src)
++int sap_server_register(const char *path, const bdaddr_t *src)
+ {
+ 	sdp_record_t *record = NULL;
+ 	GError *gerr = NULL;
+diff --git a/profiles/sap/server.h b/profiles/sap/server.h
+index 9ea9a78..e636d91 100644
+--- a/profiles/sap/server.h
++++ b/profiles/sap/server.h
+@@ -20,5 +20,5 @@
+ 
+ #include <gdbus.h>
+ 
+-int sap_server_register(const char *path, bdaddr_t *src);
++int sap_server_register(const char *path, const bdaddr_t *src);
+ void sap_server_unregister(const char *path);
 diff --git a/src/adapter.c b/src/adapter.c
-index 4610b85..439046d 100644
+index 166b64f..9ed580c 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -3714,7 +3714,7 @@ int adapter_cancel_bonding(struct btd_adapter *adapter, bdaddr_t *bdaddr)
+@@ -2666,7 +2666,7 @@ const gchar *adapter_get_path(struct btd_adapter *adapter)
+ 	return adapter->path;
  }
  
- static void check_oob_bonding_complete(struct btd_adapter *adapter,
--					bdaddr_t *bdaddr, uint8_t status)
-+					const bdaddr_t *bdaddr, uint8_t status)
+-bdaddr_t *adapter_get_address(struct btd_adapter *adapter)
++const bdaddr_t *adapter_get_address(struct btd_adapter *adapter)
  {
- 	if (!adapter->oob_handler || !adapter->oob_handler->bonding_cb)
- 		return;
-@@ -3729,8 +3729,8 @@ static void check_oob_bonding_complete(struct btd_adapter *adapter,
- 	adapter->oob_handler = NULL;
+ 	return &adapter->bdaddr;
  }
- 
--void adapter_bonding_complete(struct btd_adapter *adapter, bdaddr_t *bdaddr,
--								uint8_t status)
-+void adapter_bonding_complete(struct btd_adapter *adapter,
-+					const bdaddr_t *bdaddr, uint8_t status)
- {
- 	struct btd_device *device;
- 	char addr[18];
 diff --git a/src/adapter.h b/src/adapter.h
-index d4fb14b..07c0ad5 100644
+index f3599b5..d4fb14b 100644
 --- a/src/adapter.h
 +++ b/src/adapter.h
-@@ -47,7 +47,7 @@ typedef void (*oob_read_local_cb_t) (struct btd_adapter *adapter,
- 					uint8_t *hash, uint8_t *randomizer,
- 					void *user_data);
- typedef void (*oob_bonding_cb_t) (struct btd_adapter *adapter,
--					bdaddr_t *bdaddr, uint8_t status,
-+					const bdaddr_t *bdaddr, uint8_t status,
- 					void *user_data);
- 
- struct oob_handler {
-@@ -236,8 +236,8 @@ int adapter_create_bonding(struct btd_adapter *adapter, bdaddr_t *bdaddr,
- 
- int adapter_cancel_bonding(struct btd_adapter *adapter, bdaddr_t *bdaddr);
- 
--void adapter_bonding_complete(struct btd_adapter *adapter, bdaddr_t *bdaddr,
--							uint8_t status);
-+void adapter_bonding_complete(struct btd_adapter *adapter,
-+					const bdaddr_t *bdaddr, uint8_t status);
- 
- int btd_adapter_read_local_oob_data(struct btd_adapter *adapter);
- void adapter_read_local_oob_data_complete(struct btd_adapter *adapter,
-diff --git a/src/mgmt.c b/src/mgmt.c
-index b689be8..d3f7809 100644
---- a/src/mgmt.c
-+++ b/src/mgmt.c
-@@ -432,8 +432,8 @@ static void mgmt_new_settings(int sk, uint16_t index, void *buf, size_t len)
- 	info->current_settings = settings;
- }
- 
--static void bonding_complete(struct controller_info *info, bdaddr_t *bdaddr,
--								uint8_t status)
-+static void bonding_complete(struct controller_info *info,
-+					const bdaddr_t *bdaddr, uint8_t status)
+@@ -122,7 +122,7 @@ void adapter_set_discovering(struct btd_adapter *adapter,
+ 						gboolean discovering);
+ uint16_t adapter_get_dev_id(struct btd_adapter *adapter);
+ const gchar *adapter_get_path(struct btd_adapter *adapter);
+-bdaddr_t *adapter_get_address(struct btd_adapter *adapter);
++const bdaddr_t *adapter_get_address(struct btd_adapter *adapter);
+ struct remote_dev_info *adapter_search_found_devices(struct btd_adapter *adapter,
+ 							bdaddr_t *bdaddr);
+ void adapter_update_found_devices(struct btd_adapter *adapter,
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index e7e2531..9155ab2 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -1237,7 +1237,7 @@ int btd_adapter_gatt_server_start(struct btd_adapter *adapter)
  {
- 	struct btd_adapter *adapter;
+ 	struct gatt_server *server;
+ 	GError *gerr = NULL;
+-	bdaddr_t *addr;
++	const bdaddr_t *addr;
  
-@@ -579,7 +579,7 @@ static void mgmt_connect_failed(int sk, uint16_t index, void *buf, size_t len)
- 	bonding_complete(info, &ev->addr.bdaddr, ev->status);
- }
+ 	DBG("Start GATT server in hci%d", adapter_get_dev_id(adapter));
  
--int mgmt_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin,
-+int mgmt_pincode_reply(int index, const bdaddr_t *bdaddr, const char *pin,
- 								size_t pin_len)
+diff --git a/src/device.c b/src/device.c
+index 499dbc2..7133137 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1116,7 +1116,7 @@ struct btd_device *device_create(struct btd_adapter *adapter,
+ 	gchar *address_up;
+ 	struct btd_device *device;
+ 	const gchar *adapter_path = adapter_get_path(adapter);
+-	bdaddr_t *src;
++	const bdaddr_t *src;
+ 	char srcaddr[18], alias[MAX_NAME_LENGTH + 1];
+ 	uint16_t vendor, product, version;
+ 
+@@ -1222,7 +1222,8 @@ uint16_t btd_device_get_version(struct btd_device *device)
+ 
+ static void device_remove_stored(struct btd_device *device)
  {
- 	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_pin_code_reply)];
-@@ -660,7 +660,7 @@ static void mgmt_pin_code_request(int sk, uint16_t index, void *buf, size_t len)
+-	bdaddr_t *src, dst;
++	const bdaddr_t *src;
++	bdaddr_t dst;
+ 	uint8_t dst_type;
+ 
+ 	src = adapter_get_address(device->adapter);
+diff --git a/src/eir.c b/src/eir.c
+index d9fdb32..1f8d229 100644
+--- a/src/eir.c
++++ b/src/eir.c
+@@ -280,7 +280,7 @@ static void eir_generate_uuid128(sdp_list_t *list, uint8_t *ptr,
  	}
  }
  
--int mgmt_confirm_reply(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type,
-+int mgmt_confirm_reply(int index, const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 							gboolean success)
- {
- 	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_user_confirm_reply)];
-@@ -691,7 +691,7 @@ int mgmt_confirm_reply(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 	return 0;
+-int eir_create_oob(bdaddr_t *addr, const char *name, uint32_t cod,
++int eir_create_oob(const bdaddr_t *addr, const char *name, uint32_t cod,
+ 			uint8_t *hash, uint8_t *randomizer,
+ 			uint16_t did_vendor, uint16_t did_product,
+ 			uint16_t did_version, uint16_t did_source,
+diff --git a/src/eir.h b/src/eir.h
+index d8c5e32..1ad0832 100644
+--- a/src/eir.h
++++ b/src/eir.h
+@@ -53,7 +53,7 @@ struct eir_data {
+ void eir_data_free(struct eir_data *eir);
+ int eir_parse(struct eir_data *eir, uint8_t *eir_data, uint8_t eir_len);
+ int eir_parse_oob(struct eir_data *eir, uint8_t *eir_data, uint16_t eir_len);
+-int eir_create_oob(bdaddr_t *addr, const char *name, uint32_t cod,
++int eir_create_oob(const bdaddr_t *addr, const char *name, uint32_t cod,
+ 			uint8_t *hash, uint8_t *randomizer,
+ 			uint16_t did_vendor, uint16_t did_product,
+ 			uint16_t did_version, uint16_t did_source,
+diff --git a/src/profile.c b/src/profile.c
+index c10e315..46b2e21 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -470,7 +470,8 @@ static sdp_record_t *ext_get_record(struct ext_profile *ext)
+ 	return NULL;
  }
  
--int mgmt_passkey_reply(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type,
-+int mgmt_passkey_reply(int index, const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 							uint32_t passkey)
+-static uint16_t ext_register_record(struct ext_profile *ext, bdaddr_t *src)
++static uint16_t ext_register_record(struct ext_profile *ext,
++							const bdaddr_t *src)
  {
- 	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_user_passkey_reply)];
-@@ -2130,7 +2130,7 @@ int mgmt_set_fast_connectable(int index, gboolean enable)
- 	return 0;
+ 	sdp_record_t *rec;
+ 
+@@ -661,7 +662,8 @@ static void ext_device_remove(struct btd_profile *p, struct btd_device *dev)
+ 	remove_connect(ext, dev);
  }
  
--int mgmt_read_clock(int index, bdaddr_t *bdaddr, int which, int timeout,
-+int mgmt_read_clock(int index, const bdaddr_t *bdaddr, int which, int timeout,
- 					uint32_t *clock, uint16_t *accuracy)
+-static int connect_io(struct ext_io *conn, bdaddr_t *src, bdaddr_t *dst)
++static int connect_io(struct ext_io *conn, const bdaddr_t *src,
++							const bdaddr_t *dst)
  {
- 	char addr[18];
-@@ -2158,7 +2158,7 @@ int mgmt_read_bdaddr(int index, bdaddr_t *bdaddr)
- 	return 0;
+ 	struct ext_profile *ext = conn->ext;
+ 	GError *gerr = NULL;
+@@ -786,7 +788,8 @@ failed:
+ 	ext_io_destroy(conn);
  }
  
--int mgmt_block_device(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type)
-+int mgmt_block_device(int index, const bdaddr_t *bdaddr, uint8_t bdaddr_type)
+-static int resolve_service(struct ext_io *conn, bdaddr_t *src, bdaddr_t *dst)
++static int resolve_service(struct ext_io *conn, const bdaddr_t *src,
++							const bdaddr_t *dst)
  {
- 	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_block_device)];
- 	struct mgmt_hdr *hdr = (void *) buf;
-@@ -2187,7 +2187,7 @@ int mgmt_block_device(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type)
- 	return 0;
- }
- 
--int mgmt_unblock_device(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type)
-+int mgmt_unblock_device(int index, const bdaddr_t *bdaddr, uint8_t bdaddr_type)
- {
- 	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_unblock_device)];
- 	struct mgmt_hdr *hdr = (void *) buf;
-@@ -2228,7 +2228,7 @@ int mgmt_get_conn_list(int index, GSList **conns)
- 	return 0;
- }
- 
--int mgmt_disconnect(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type)
-+int mgmt_disconnect(int index, const bdaddr_t *bdaddr, uint8_t bdaddr_type)
- {
- 	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_disconnect)];
- 	struct mgmt_hdr *hdr = (void *) buf;
-@@ -2252,7 +2252,7 @@ int mgmt_disconnect(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type)
- 	return 0;
- }
- 
--int mgmt_unpair_device(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type)
-+int mgmt_unpair_device(int index, const bdaddr_t *bdaddr, uint8_t bdaddr_type)
- {
- 	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_unpair_device)];
- 	struct mgmt_hdr *hdr = (void *) buf;
-@@ -2373,7 +2373,8 @@ int mgmt_set_io_capability(int index, uint8_t io_capability)
- 	return 0;
- }
- 
--int mgmt_create_bonding(int index, bdaddr_t *bdaddr, uint8_t addr_type, uint8_t io_cap)
-+int mgmt_create_bonding(int index, const bdaddr_t *bdaddr, uint8_t addr_type,
-+								uint8_t io_cap)
- {
- 	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_pair_device)];
- 	struct mgmt_hdr *hdr = (void *) buf;
-@@ -2399,7 +2400,7 @@ int mgmt_create_bonding(int index, bdaddr_t *bdaddr, uint8_t addr_type, uint8_t
- 	return 0;
- }
- 
--int mgmt_cancel_bonding(int index, bdaddr_t *bdaddr)
-+int mgmt_cancel_bonding(int index, const bdaddr_t *bdaddr)
- {
- 	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_addr_info)];
- 	struct mgmt_hdr *hdr = (void *) buf;
-@@ -2438,7 +2439,7 @@ int mgmt_read_local_oob_data(int index)
- 	return 0;
- }
- 
--int mgmt_add_remote_oob_data(int index, bdaddr_t *bdaddr,
-+int mgmt_add_remote_oob_data(int index, const bdaddr_t *bdaddr,
- 					uint8_t *hash, uint8_t *randomizer)
- {
- 	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_add_remote_oob_data)];
-@@ -2467,7 +2468,7 @@ int mgmt_add_remote_oob_data(int index, bdaddr_t *bdaddr,
- 	return 0;
- }
- 
--int mgmt_remove_remote_oob_data(int index, bdaddr_t *bdaddr)
-+int mgmt_remove_remote_oob_data(int index, const bdaddr_t *bdaddr)
- {
- 	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_remove_remote_oob_data)];
- 	struct mgmt_hdr *hdr = (void *) buf;
-@@ -2491,7 +2492,7 @@ int mgmt_remove_remote_oob_data(int index, bdaddr_t *bdaddr)
- 	return 0;
- }
- 
--int mgmt_confirm_name(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type,
-+int mgmt_confirm_name(int index, const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 							gboolean name_known)
- {
- 	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_confirm_name)];
-diff --git a/src/mgmt.h b/src/mgmt.h
-index 1d25cb0..a2c0497 100644
---- a/src/mgmt.h
-+++ b/src/mgmt.h
-@@ -36,18 +36,18 @@ int mgmt_start_discovery(int index);
- int mgmt_start_le_scanning(int index);
- int mgmt_stop_discovery(int index);
- 
--int mgmt_read_clock(int index, bdaddr_t *bdaddr, int which, int timeout,
-+int mgmt_read_clock(int index, const bdaddr_t *bdaddr, int which, int timeout,
- 					uint32_t *clock, uint16_t *accuracy);
- int mgmt_read_bdaddr(int index, bdaddr_t *bdaddr);
- 
--int mgmt_block_device(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type);
--int mgmt_unblock_device(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type);
-+int mgmt_block_device(int index, const bdaddr_t *bdaddr, uint8_t bdaddr_type);
-+int mgmt_unblock_device(int index, const bdaddr_t *bdaddr, uint8_t bdaddr_type);
- 
- int mgmt_get_conn_list(int index, GSList **conns);
- 
--int mgmt_disconnect(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type);
-+int mgmt_disconnect(int index, const bdaddr_t *bdaddr, uint8_t bdaddr_type);
- 
--int mgmt_unpair_device(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type);
-+int mgmt_unpair_device(int index, const bdaddr_t *bdaddr, uint8_t bdaddr_type);
- 
- int mgmt_add_uuid(int index, uuid_t *uuid, uint8_t svc_hint);
- int mgmt_remove_uuid(int index, uuid_t *uuid);
-@@ -60,24 +60,24 @@ int mgmt_load_ltks(int index, GSList *keys);
- 
- int mgmt_set_io_capability(int index, uint8_t io_capability);
- 
--int mgmt_create_bonding(int index, bdaddr_t *bdaddr, uint8_t addr_type,
-+int mgmt_create_bonding(int index, const bdaddr_t *bdaddr, uint8_t addr_type,
- 							uint8_t io_cap);
--int mgmt_cancel_bonding(int index, bdaddr_t *bdaddr);
-+int mgmt_cancel_bonding(int index, const bdaddr_t *bdaddr);
- 
--int mgmt_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin,
-+int mgmt_pincode_reply(int index, const bdaddr_t *bdaddr, const char *pin,
- 								size_t pin_len);
--int mgmt_confirm_reply(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type,
-+int mgmt_confirm_reply(int index, const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 							gboolean success);
--int mgmt_passkey_reply(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type,
-+int mgmt_passkey_reply(int index, const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 							uint32_t passkey);
- 
- int mgmt_read_local_oob_data(int index);
- 
--int mgmt_add_remote_oob_data(int index, bdaddr_t *bdaddr,
-+int mgmt_add_remote_oob_data(int index, const bdaddr_t *bdaddr,
- 					uint8_t *hash, uint8_t *randomizer);
--int mgmt_remove_remote_oob_data(int index, bdaddr_t *bdaddr);
-+int mgmt_remove_remote_oob_data(int index, const bdaddr_t *bdaddr);
- 
--int mgmt_confirm_name(int index, bdaddr_t *bdaddr, uint8_t bdaddr_type,
-+int mgmt_confirm_name(int index, const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 							gboolean name_known);
- 
- int mgmt_ssp_enabled(int index);
+ 	struct ext_profile *ext = conn->ext;
+ 	uuid_t uuid;
 -- 
 1.7.9.5
 
