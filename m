@@ -1,84 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1349355967.27233.35.camel@aeonflux>
-Subject: Re: [PATCH v2 resend 1/2] Introduced a load_firmware callback to
- struct hci_dev
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Jesse Sung <jesse.sung@canonical.com>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Date: Thu, 04 Oct 2012 15:06:07 +0200
-In-Reply-To: <CAH10aOiwWGseiYEiqk_h=WhNyGGGhpWPhU1TO8E948Ka+xHu9w@mail.gmail.com>
-References: <cover.1347959921.git.jesse.sung@canonical.com>
-	 <1349335847-1615-1-git-send-email-jesse.sung@canonical.com>
-	 <1349335847-1615-2-git-send-email-jesse.sung@canonical.com>
-	 <1349344897.27233.13.camel@aeonflux>
-	 <CAH10aOiwWGseiYEiqk_h=WhNyGGGhpWPhU1TO8E948Ka+xHu9w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Thu, 4 Oct 2012 15:33:26 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: mgmt: Fix dereference after NULL check
+Message-ID: <20121004123325.GC12229@aemeltch-MOBL1>
+References: <1349348218-676-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20121004121702.GA31328@x220>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20121004121702.GA31328@x220>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jesse,
+Hi Johan,
 
-> >> load_firmware will be called at the end of hci_dev_open() if it
-> >> is defined.
-> >>
-> >> Signed-off-by: Wen-chien Jesse Sung <jesse.sung@canonical.com>
-> >> ---
-> >>  include/net/bluetooth/hci_core.h |    1 +
-> >>  net/bluetooth/hci_core.c         |    2 ++
-> >>  2 files changed, 3 insertions(+)
-> >>
-> >> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> >> index 593cd1d..40972a3 100644
-> >> --- a/include/net/bluetooth/hci_core.h
-> >> +++ b/include/net/bluetooth/hci_core.h
-> >> @@ -281,6 +281,7 @@ struct hci_dev {
-> >>       int (*send)(struct sk_buff *skb);
-> >>       void (*notify)(struct hci_dev *hdev, unsigned int evt);
-> >>       int (*ioctl)(struct hci_dev *hdev, unsigned int cmd, unsigned long arg);
-> >> +     void (*load_firmware)(struct hci_dev *hdev);
-> >>  };
-> >>
-> >>  struct hci_conn {
-> >> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> >> index d4de5db..49be87a 100644
-> >> --- a/net/bluetooth/hci_core.c
-> >> +++ b/net/bluetooth/hci_core.c
-> >> @@ -725,6 +725,8 @@ int hci_dev_open(__u16 dev)
-> >>  done:
-> >>       hci_req_unlock(hdev);
-> >>       hci_dev_put(hdev);
-> >> +     if (!ret && hdev->load_firmware)
-> >> +             hdev->load_firmware(hdev);
-> >>       return ret;
-> >>  }
-> >>
-> >
-> > has anybody thought this through actually? Do we need to reload the
-> > firmware after every HCI_Reset? Since hci_dev_open() is used at least
-> > twice during normal operation. And for every RFKILL or power down/up
-> > cycle of the chip.
-> >
-> > And there is an internal process of hci_dev_open() trigger on
-> > registration and others triggered by hciconfig hci0 up. I am pretty much
-> > against having to wait for all this firmware loading crap during every
-> > bring up of the device. Especially since it always does a trip via
-> > request_firmware().
+On Thu, Oct 04, 2012 at 03:17:02PM +0300, Johan Hedberg wrote:
+> Hi Andrei,
 > 
-> In the second patch, firmware loading would be done only once per
-> power cycle of the chip. Since I think it should be the device driver, not hci,
-> who knows when and how to load firmware, the lock is placed in btusb.c.
+> On Thu, Oct 04, 2012, Andrei Emeltchenko wrote:
+> > hdev might be NULL, so we need to avoid possible NULL derefernce in
+> > handler->func functions.
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  net/bluetooth/mgmt.c |   14 ++++++++------
+> >  1 file changed, 8 insertions(+), 6 deletions(-)
+> 
+> Nack. Some of the handlers actually should be getting a NULL hdev and
+> there's code higher up in the function you're changing that ensures that
+> NULL is allowed for those handlers but not for any others (which should
+> safely be able to skip NULL checks).
 
-and how does the driver knows these details? That makes no sense. How
-does the driver know it got rebooted?
+True, BTW: this would be nice to put this explanation as comment there.
 
-The hci_dev_open() will start the transport. And as I explained before,
-that can happen twice during boot time.
-
-Regards
-
-Marcel
-
+Best regards 
+Andrei Emeltchenko 
 
