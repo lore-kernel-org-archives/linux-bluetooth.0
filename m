@@ -1,32 +1,140 @@
 Return-Path: <cyrus@holtmann.org>
 From: chanyeol.park@samsung.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] mgmt: Add string for Passkey Notify Event
-Date: Thu, 04 Oct 2012 22:14:07 +0900
-Message-id: <1349356447-8369-4-git-send-email-chanyeol.park@samsung.com>
-In-reply-to: <1349356447-8369-1-git-send-email-chanyeol.park@samsung.com>
-References: <1349356447-8369-1-git-send-email-chanyeol.park@samsung.com>
+Subject: [PATCH 4/4] audio: Add check for non-a2dp codec
+Date: Thu, 04 Oct 2012 22:14:04 +0900
+Message-id: <1349356447-8369-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chan-yeol Park <chanyeol.park@samsung.com>
 
+This patch adds checks(vendor ID, vendor specific codec ID) to make sure of
+non-a2dp codec selection.
 ---
- lib/mgmt.h |    1 +
- 1 file changed, 1 insertion(+)
+ audio/a2dp-codecs.h |    6 +++++
+ audio/a2dp.c        |   68 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 73 insertions(+), 1 deletion(-)
 
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index 3432f94..6c7e44a 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -522,6 +522,7 @@ static const char *mgmt_ev[] = {
- 	"Device Blocked",
- 	"Device Unblocked",
- 	"Device Unpaired",
-+	"Passkey Notify",
- };
+diff --git a/audio/a2dp-codecs.h b/audio/a2dp-codecs.h
+index 51c796a..e3d2cba 100644
+--- a/audio/a2dp-codecs.h
++++ b/audio/a2dp-codecs.h
+@@ -26,6 +26,7 @@
+ #define A2DP_CODEC_MPEG12		0x01
+ #define A2DP_CODEC_MPEG24		0x02
+ #define A2DP_CODEC_ATRAC		0x03
++#define A2DP_CODEC_NON_A2DP		0xFF
  
- static const char *mgmt_status[] = {
+ #define SBC_SAMPLING_FREQ_16000		(1 << 3)
+ #define SBC_SAMPLING_FREQ_32000		(1 << 2)
+@@ -114,3 +115,8 @@ typedef struct {
+ #else
+ #error "Unknown byte order"
+ #endif
++
++typedef struct {
++	uint8_t vendor_id[4];
++	uint8_t codec_id[2];
++} __attribute__ ((packed)) non_a2dp_vendor_codec_t;
+diff --git a/audio/a2dp.c b/audio/a2dp.c
+index fd1c494..9b4adb1 100644
+--- a/audio/a2dp.c
++++ b/audio/a2dp.c
+@@ -44,6 +44,7 @@
+ #include "sink.h"
+ #include "source.h"
+ #include "a2dp.h"
++#include "a2dp-codecs.h"
+ #include "sdpd.h"
+ 
+ /* The duration that streams without users are allowed to stay in
+@@ -1427,11 +1428,66 @@ done:
+ 	finalize_select(setup);
+ }
+ 
++static gboolean non_a2dp_codec_is_supported(uint8_t *remote_cap,
++				size_t remote_cap_len, struct a2dp_sep *sep)
++{
++	uint8_t *capabilities;
++	size_t	length;
++
++	non_a2dp_vendor_codec_t *local_codec;
++	non_a2dp_vendor_codec_t *remote_codec;
++
++	if (remote_cap_len < sizeof(non_a2dp_vendor_codec_t))
++		return FALSE;
++
++	remote_codec = (non_a2dp_vendor_codec_t *) remote_cap;
++
++	DBG("Remote vendor id %x %x %x %x", remote_codec->vendor_id[0],
++			remote_codec->vendor_id[1], remote_codec->vendor_id[2],
++						remote_codec->vendor_id[3]);
++
++	DBG("Remote vendor codec id %x %x", remote_codec->codec_id[0],
++						remote_codec->codec_id[1]);
++
++	if (sep->endpoint == NULL)
++		return FALSE;
++
++	length = sep->endpoint->get_capabilities(sep,
++				&capabilities, sep->user_data);
++
++	if (length < sizeof(non_a2dp_vendor_codec_t))
++		return FALSE;
++
++	local_codec = (non_a2dp_vendor_codec_t *) capabilities;
++
++	DBG("Registered vendor id %x %x %x %x", local_codec->vendor_id[0],
++			local_codec->vendor_id[1], local_codec->vendor_id[2],
++						local_codec->vendor_id[3]);
++
++	DBG("Registered vendor codec id %x %x", local_codec->codec_id[0],
++						local_codec->codec_id[1]);
++
++	if (memcmp(remote_codec->vendor_id, local_codec->vendor_id,
++					sizeof(local_codec->vendor_id)))
++		return FALSE;
++
++	if (memcmp(remote_codec->codec_id, local_codec->codec_id,
++					sizeof(local_codec->codec_id)))
++		return FALSE;
++
++	DBG("Remote non a2dp codec is supported");
++
++	return TRUE;
++}
++
+ static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
+ 					const char *sender)
+ {
+ 	for (; list; list = list->next) {
+ 		struct a2dp_sep *sep = list->data;
++		struct avdtp_remote_sep *rsep;
++		struct avdtp_media_codec_capability *rsep_codec;
++		struct avdtp_service_capability *service;
+ 
+ 		/* Use sender's endpoint if available */
+ 		if (sender) {
+@@ -1445,7 +1501,17 @@ static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
+ 				continue;
+ 		}
+ 
+-		if (avdtp_find_remote_sep(session, sep->lsep) == NULL)
++		rsep = avdtp_find_remote_sep(session, sep->lsep);
++		if (rsep == NULL)
++			continue;
++
++		service = avdtp_get_codec(rsep);
++		rsep_codec = (struct avdtp_media_codec_capability *)
++								service->data;
++
++		if (rsep_codec->media_codec_type == A2DP_CODEC_NON_A2DP &&
++			!non_a2dp_codec_is_supported(rsep_codec->data,
++				service->length - sizeof(*rsep_codec), sep))
+ 			continue;
+ 
+ 		return sep;
 -- 
 1.7.9.5
 
