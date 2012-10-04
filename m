@@ -1,171 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1349356447-8369-1-git-send-email-chanyeol.park@samsung.com>
-References: <1349356447-8369-1-git-send-email-chanyeol.park@samsung.com>
-Date: Thu, 4 Oct 2012 17:02:30 +0300
-Message-ID: <CABBYNZKHzKv+GQhynnGN04O17kwjDobwL-+CeVB9hJqrVEF05A@mail.gmail.com>
-Subject: Re: [PATCH 4/4] audio: Add check for non-a2dp codec
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: chanyeol.park@samsung.com
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1349355967.27233.35.camel@aeonflux>
+References: <cover.1347959921.git.jesse.sung@canonical.com>
+	<1349335847-1615-1-git-send-email-jesse.sung@canonical.com>
+	<1349335847-1615-2-git-send-email-jesse.sung@canonical.com>
+	<1349344897.27233.13.camel@aeonflux>
+	<CAH10aOiwWGseiYEiqk_h=WhNyGGGhpWPhU1TO8E948Ka+xHu9w@mail.gmail.com>
+	<1349355967.27233.35.camel@aeonflux>
+Date: Thu, 4 Oct 2012 21:39:18 +0800
+Message-ID: <CAH10aOja5o=HjsLN3qKZey=POpjgMsf+V_RU=iHH+sk1oZOOuw@mail.gmail.com>
+Subject: Re: [PATCH v2 resend 1/2] Introduced a load_firmware callback to
+ struct hci_dev
+From: Jesse Sung <jesse.sung@canonical.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chanyel,
+Hi Marcel,
 
-On Thu, Oct 4, 2012 at 4:14 PM,  <chanyeol.park@samsung.com> wrote:
-> From: Chan-yeol Park <chanyeol.park@samsung.com>
+>> >> load_firmware will be called at the end of hci_dev_open() if it
+>> >> is defined.
+>> >>
+>> >> Signed-off-by: Wen-chien Jesse Sung <jesse.sung@canonical.com>
+>> >> ---
+>> >>  include/net/bluetooth/hci_core.h |    1 +
+>> >>  net/bluetooth/hci_core.c         |    2 ++
+>> >>  2 files changed, 3 insertions(+)
+>> >>
+>> >> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>> >> index 593cd1d..40972a3 100644
+>> >> --- a/include/net/bluetooth/hci_core.h
+>> >> +++ b/include/net/bluetooth/hci_core.h
+>> >> @@ -281,6 +281,7 @@ struct hci_dev {
+>> >>       int (*send)(struct sk_buff *skb);
+>> >>       void (*notify)(struct hci_dev *hdev, unsigned int evt);
+>> >>       int (*ioctl)(struct hci_dev *hdev, unsigned int cmd, unsigned long arg);
+>> >> +     void (*load_firmware)(struct hci_dev *hdev);
+>> >>  };
+>> >>
+>> >>  struct hci_conn {
+>> >> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> >> index d4de5db..49be87a 100644
+>> >> --- a/net/bluetooth/hci_core.c
+>> >> +++ b/net/bluetooth/hci_core.c
+>> >> @@ -725,6 +725,8 @@ int hci_dev_open(__u16 dev)
+>> >>  done:
+>> >>       hci_req_unlock(hdev);
+>> >>       hci_dev_put(hdev);
+>> >> +     if (!ret && hdev->load_firmware)
+>> >> +             hdev->load_firmware(hdev);
+>> >>       return ret;
+>> >>  }
+>> >>
+>> >
+>> > has anybody thought this through actually? Do we need to reload the
+>> > firmware after every HCI_Reset? Since hci_dev_open() is used at least
+>> > twice during normal operation. And for every RFKILL or power down/up
+>> > cycle of the chip.
+>> >
+>> > And there is an internal process of hci_dev_open() trigger on
+>> > registration and others triggered by hciconfig hci0 up. I am pretty much
+>> > against having to wait for all this firmware loading crap during every
+>> > bring up of the device. Especially since it always does a trip via
+>> > request_firmware().
+>>
+>> In the second patch, firmware loading would be done only once per
+>> power cycle of the chip. Since I think it should be the device driver, not hci,
+>> who knows when and how to load firmware, the lock is placed in btusb.c.
 >
-> This patch adds checks(vendor ID, vendor specific codec ID) to make sure of
-> non-a2dp codec selection.
-> ---
->  audio/a2dp-codecs.h |    6 +++++
->  audio/a2dp.c        |   68 ++++++++++++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 73 insertions(+), 1 deletion(-)
+> and how does the driver knows these details? That makes no sense. How
+> does the driver know it got rebooted?
 >
-> diff --git a/audio/a2dp-codecs.h b/audio/a2dp-codecs.h
-> index 51c796a..e3d2cba 100644
-> --- a/audio/a2dp-codecs.h
-> +++ b/audio/a2dp-codecs.h
-> @@ -26,6 +26,7 @@
->  #define A2DP_CODEC_MPEG12              0x01
->  #define A2DP_CODEC_MPEG24              0x02
->  #define A2DP_CODEC_ATRAC               0x03
-> +#define A2DP_CODEC_NON_A2DP            0xFF
+> The hci_dev_open() will start the transport. And as I explained before,
+> that can happen twice during boot time.
 
-I prefer A2DP_CODEC_VENDOR
+Please take a look at the second part of this patchset, which is in patch 2/2.
+Loading firmware is needed when the chip is rebooted, and a reboot would trigger
+a probe in btusb. So btusb can know a firmware loading is needed whenever
+a new patchram device is probed. And the load_firmware callback in
+btusb would do
+test_and_set_bit to ensure that the loading process would only be done once.
 
->  #define SBC_SAMPLING_FREQ_16000                (1 << 3)
->  #define SBC_SAMPLING_FREQ_32000                (1 << 2)
-> @@ -114,3 +115,8 @@ typedef struct {
->  #else
->  #error "Unknown byte order"
->  #endif
-> +
-> +typedef struct {
-> +       uint8_t vendor_id[4];
-> +       uint8_t codec_id[2];
-> +} __attribute__ ((packed)) non_a2dp_vendor_codec_t;
-
-We normally don't typedef this type of structs, besides
-a2dp_vendor_codec should be enough so this should be named struct
-a2dp_vendor_codec.
-
-> diff --git a/audio/a2dp.c b/audio/a2dp.c
-> index fd1c494..9b4adb1 100644
-> --- a/audio/a2dp.c
-> +++ b/audio/a2dp.c
-> @@ -44,6 +44,7 @@
->  #include "sink.h"
->  #include "source.h"
->  #include "a2dp.h"
-> +#include "a2dp-codecs.h"
->  #include "sdpd.h"
->
->  /* The duration that streams without users are allowed to stay in
-> @@ -1427,11 +1428,66 @@ done:
->         finalize_select(setup);
->  }
->
-> +static gboolean non_a2dp_codec_is_supported(uint8_t *remote_cap,
-> +                               size_t remote_cap_len, struct a2dp_sep *sep)
-
-Use vendor_codec_is_supported as function name.
-
-> +{
-> +       uint8_t *capabilities;
-> +       size_t  length;
-> +
-> +       non_a2dp_vendor_codec_t *local_codec;
-> +       non_a2dp_vendor_codec_t *remote_codec;
-> +
-> +       if (remote_cap_len < sizeof(non_a2dp_vendor_codec_t))
-> +               return FALSE;
-> +
-> +       remote_codec = (non_a2dp_vendor_codec_t *) remote_cap;
-> +
-> +       DBG("Remote vendor id %x %x %x %x", remote_codec->vendor_id[0],
-> +                       remote_codec->vendor_id[1], remote_codec->vendor_id[2],
-> +                                               remote_codec->vendor_id[3]);
-> +
-> +       DBG("Remote vendor codec id %x %x", remote_codec->codec_id[0],
-> +                                               remote_codec->codec_id[1]);
-
-You can probably join this 2 DBGs in one, also fix the printing format
-for uint8_t it should be %02x and if is hex add 0x e.g. Remote vendor
-0x%02x%02x%02x%02x codec 0x%02x%02x
-
-> +       if (sep->endpoint == NULL)
-> +               return FALSE;
-> +
-> +       length = sep->endpoint->get_capabilities(sep,
-> +                               &capabilities, sep->user_data);
-> +
-> +       if (length < sizeof(non_a2dp_vendor_codec_t))
-> +               return FALSE;
-> +
-> +       local_codec = (non_a2dp_vendor_codec_t *) capabilities;
-> +
-> +       DBG("Registered vendor id %x %x %x %x", local_codec->vendor_id[0],
-> +                       local_codec->vendor_id[1], local_codec->vendor_id[2],
-> +                                               local_codec->vendor_id[3]);
-> +
-> +       DBG("Registered vendor codec id %x %x", local_codec->codec_id[0],
-> +                                               local_codec->codec_id[1]);
-
-Same as above.
-
-> +       if (memcmp(remote_codec->vendor_id, local_codec->vendor_id,
-> +                                       sizeof(local_codec->vendor_id)))
-> +               return FALSE;
-> +
-> +       if (memcmp(remote_codec->codec_id, local_codec->codec_id,
-> +                                       sizeof(local_codec->codec_id)))
-> +               return FALSE;
-> +
-> +       DBG("Remote non a2dp codec is supported");
-
-Not sure if this DBG would be of much use since latter you select it,
-so it is implicit whether it is supported or not.
-
-> +       return TRUE;
-> +}
-> +
->  static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
->                                         const char *sender)
->  {
->         for (; list; list = list->next) {
->                 struct a2dp_sep *sep = list->data;
-> +               struct avdtp_remote_sep *rsep;
-> +               struct avdtp_media_codec_capability *rsep_codec;
-> +               struct avdtp_service_capability *service;
->
->                 /* Use sender's endpoint if available */
->                 if (sender) {
-> @@ -1445,7 +1501,17 @@ static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
->                                 continue;
->                 }
->
-> -               if (avdtp_find_remote_sep(session, sep->lsep) == NULL)
-> +               rsep = avdtp_find_remote_sep(session, sep->lsep);
-> +               if (rsep == NULL)
-> +                       continue;
-> +
-> +               service = avdtp_get_codec(rsep);
-> +               rsep_codec = (struct avdtp_media_codec_capability *)
-> +                                                               service->data;
-> +
-> +               if (rsep_codec->media_codec_type == A2DP_CODEC_NON_A2DP &&
-> +                       !non_a2dp_codec_is_supported(rsep_codec->data,
-> +                               service->length - sizeof(*rsep_codec), sep))
->                         continue;
->
->                 return sep;
-> --
-> 1.7.9.5
-
-The rest looks okay.
-
--- 
-Luiz Augusto von Dentz
+Thanks,
+Jesse
