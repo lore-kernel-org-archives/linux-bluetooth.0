@@ -1,42 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1349335599-12443-15-git-send-email-lucas.de.marchi@gmail.com>
-References: <1349335599-12443-1-git-send-email-lucas.de.marchi@gmail.com>
-	<1349335599-12443-15-git-send-email-lucas.de.marchi@gmail.com>
-Date: Thu, 4 Oct 2012 07:42:17 -0400
-Message-ID: <CAJdJm_PZbDinMxO4En=3XMzjnNVTWpGQ9-pOV7VyfLJOJjY9Qg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v4 14/15] Use DBus.Properties on Control interface
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org,
-	Lucas De Marchi <lucas.de.marchi@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: mgmt: Fix dereference after NULL check
+Date: Thu,  4 Oct 2012 13:56:58 +0300
+Message-Id: <1349348218-676-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Thu, Oct 4, 2012 at 3:26 AM, Lucas De Marchi
-<lucas.demarchi@profusion.mobi> wrote:
-> @@ -77,13 +76,11 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
->                 if (old_state != AVCTP_STATE_CONNECTED)
->                         break;
->
-> -               value = FALSE;
->                 g_dbus_emit_signal(conn, dev->path,
->                                         AUDIO_CONTROL_INTERFACE,
->                                         "Disconnected", DBUS_TYPE_INVALID);
-> -               emit_property_changed(dev->path,
-> -                                       AUDIO_CONTROL_INTERFACE, "Connected",
-> -                                       DBUS_TYPE_BOOLEAN, &value);
-> +               g_dbus_emit_property_changed(conn, dev->path,
-> +                                       AUDIO_CONTROL_INTERFACE, "Connected");
+hdev might be NULL, so we need to avoid possible NULL derefernce in
+handler->func functions.
 
-Out of curiosity, do you know why this API has Connected/Disconnected
-signals besides the PropertyChanged("Connected", ...) ?
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/mgmt.c |   14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-Regards,
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index b127b88..be3182c 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2738,7 +2738,6 @@ static const struct mgmt_handler {
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ {
+ 	void *buf;
+-	u8 *cp;
+ 	struct mgmt_hdr *hdr;
+ 	u16 opcode, index, len;
+ 	struct hci_dev *hdev = NULL;
+@@ -2802,14 +2801,17 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 		goto done;
+ 	}
+ 
+-	if (hdev)
++	if (hdev) {
++		u8 *cp;
++
+ 		mgmt_init_hdev(sk, hdev);
+ 
+-	cp = buf + sizeof(*hdr);
++		cp = buf + sizeof(*hdr);
+ 
+-	err = handler->func(sk, hdev, cp, len);
+-	if (err < 0)
+-		goto done;
++		err = handler->func(sk, hdev, cp, len);
++		if (err < 0)
++			goto done;
++	}
+ 
+ 	err = msglen;
+ 
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.9.5
+
