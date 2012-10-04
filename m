@@ -2,467 +2,86 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 2/7] storage: Constify bdaddr_t pointers parameters
-Date: Thu, 4 Oct 2012 14:05:59 +0200
-Message-ID: <1349352364-5491-3-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1349352364-5491-1-git-send-email-szymon.janc@tieto.com>
-References: <1349352364-5491-1-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC 0/7] adapter and device bdaddr_t getters
+Date: Thu, 4 Oct 2012 14:05:57 +0200
+Message-ID: <1349352364-5491-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/storage.c |   97 +++++++++++++++++++++++++++++++--------------------------
- src/storage.h |   95 ++++++++++++++++++++++++++++++-------------------------
- 2 files changed, 105 insertions(+), 87 deletions(-)
+Hi,
 
-diff --git a/src/storage.c b/src/storage.c
-index 96db6f5..df6b0aa 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -110,7 +110,7 @@ int write_device_alias(const char *src, const char *dst, uint8_t dst_type,
- 	return textfile_put(filename, key, alias);
- }
- 
--int write_discoverable_timeout(bdaddr_t *bdaddr, int timeout)
-+int write_discoverable_timeout(const bdaddr_t *bdaddr, int timeout)
- {
- 	char filename[PATH_MAX + 1], str[32];
- 
-@@ -143,7 +143,7 @@ int read_discoverable_timeout(const char *src, int *timeout)
- 	return 0;
- }
- 
--int write_pairable_timeout(bdaddr_t *bdaddr, int timeout)
-+int write_pairable_timeout(const bdaddr_t *bdaddr, int timeout)
- {
- 	char filename[PATH_MAX + 1], str[32];
- 
-@@ -176,7 +176,7 @@ int read_pairable_timeout(const char *src, int *timeout)
- 	return 0;
- }
- 
--int write_device_mode(bdaddr_t *bdaddr, const char *mode)
-+int write_device_mode(const bdaddr_t *bdaddr, const char *mode)
- {
- 	char filename[PATH_MAX + 1];
- 
-@@ -226,7 +226,7 @@ int read_on_mode(const char *src, char *mode, int length)
- 	return 0;
- }
- 
--int write_local_name(bdaddr_t *bdaddr, const char *name)
-+int write_local_name(const bdaddr_t *bdaddr, const char *name)
- {
- 	char filename[PATH_MAX + 1], str[249];
- 	int i;
-@@ -245,7 +245,7 @@ int write_local_name(bdaddr_t *bdaddr, const char *name)
- 	return textfile_put(filename, "name", str);
- }
- 
--int read_local_name(bdaddr_t *bdaddr, char *name)
-+int read_local_name(const bdaddr_t *bdaddr, char *name)
- {
- 	char filename[PATH_MAX + 1], *str;
- 	int len;
-@@ -266,7 +266,7 @@ int read_local_name(bdaddr_t *bdaddr, char *name)
- 	return 0;
- }
- 
--int write_local_class(bdaddr_t *bdaddr, uint8_t *class)
-+int write_local_class(const bdaddr_t *bdaddr, uint8_t *class)
- {
- 	char filename[PATH_MAX + 1], str[9];
- 
-@@ -279,7 +279,7 @@ int write_local_class(bdaddr_t *bdaddr, uint8_t *class)
- 	return textfile_put(filename, "class", str);
- }
- 
--int read_local_class(bdaddr_t *bdaddr, uint8_t *class)
-+int read_local_class(const bdaddr_t *bdaddr, uint8_t *class)
- {
- 	char filename[PATH_MAX + 1], tmp[3], *str;
- 	int i;
-@@ -301,8 +301,8 @@ int read_local_class(bdaddr_t *bdaddr, uint8_t *class)
- 	return 0;
- }
- 
--int read_remote_appearance(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
--							uint16_t *appearance)
-+int read_remote_appearance(const bdaddr_t *local, const bdaddr_t *peer,
-+				uint8_t bdaddr_type, uint16_t *appearance)
- {
- 	char filename[PATH_MAX + 1], key[20], *str;
- 
-@@ -325,7 +325,7 @@ int read_remote_appearance(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
- 	return 0;
- }
- 
--int write_remote_appearance(bdaddr_t *local, bdaddr_t *peer,
-+int write_remote_appearance(const bdaddr_t *local, const bdaddr_t *peer,
- 				uint8_t bdaddr_type, uint16_t appearance)
- {
- 	char filename[PATH_MAX + 1], key[20], str[7];
-@@ -342,7 +342,8 @@ int write_remote_appearance(bdaddr_t *local, bdaddr_t *peer,
- 	return textfile_put(filename, key, str);
- }
- 
--int write_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class)
-+int write_remote_class(const bdaddr_t *local, const bdaddr_t *peer,
-+								uint32_t class)
- {
- 	char filename[PATH_MAX + 1], addr[18], str[9];
- 
-@@ -356,7 +357,8 @@ int write_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class)
- 	return textfile_put(filename, addr, str);
- }
- 
--int read_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t *class)
-+int read_remote_class(const bdaddr_t *local, const bdaddr_t *peer,
-+							uint32_t *class)
- {
- 	char filename[PATH_MAX + 1], addr[18], *str;
- 
-@@ -378,8 +380,8 @@ int read_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t *class)
- 	return 0;
- }
- 
--int write_device_name(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
--							const char *name)
-+int write_device_name(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint8_t peer_type, const char *name)
- {
- 	char filename[PATH_MAX + 1], key[20], str[HCI_MAX_NAME_LENGTH + 1];
- 	int i;
-@@ -433,8 +435,9 @@ done:
- 	return 0;
- }
- 
--int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
--						uint8_t *data, uint8_t data_len)
-+int write_remote_eir(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint8_t peer_type, uint8_t *data,
-+					uint8_t data_len)
- {
- 	char filename[PATH_MAX + 1], key[20], str[481];
- 	int i;
-@@ -453,8 +456,8 @@ int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
- 	return textfile_put(filename, key, str);
- }
- 
--int read_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
--								uint8_t *data)
-+int read_remote_eir(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint8_t peer_type, uint8_t *data)
- {
- 	char filename[PATH_MAX + 1], key[18], *str;
- 	int i;
-@@ -494,8 +497,9 @@ done:
- 	return 0;
- }
- 
--int write_version_info(bdaddr_t *local, bdaddr_t *peer, uint16_t manufacturer,
--					uint8_t lmp_ver, uint16_t lmp_subver)
-+int write_version_info(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint16_t manufacturer, uint8_t lmp_ver,
-+					uint16_t lmp_subver)
- {
- 	char filename[PATH_MAX + 1], addr[18], str[16];
- 
-@@ -510,7 +514,7 @@ int write_version_info(bdaddr_t *local, bdaddr_t *peer, uint16_t manufacturer,
- 	return textfile_put(filename, addr, str);
- }
- 
--int write_features_info(bdaddr_t *local, bdaddr_t *peer,
-+int write_features_info(const bdaddr_t *local, const bdaddr_t *peer,
- 				unsigned char *page1, unsigned char *page2)
- {
- 	char filename[PATH_MAX + 1], addr[18];
-@@ -554,7 +558,7 @@ static int decode_bytes(const char *str, unsigned char *bytes, size_t len)
- 	return 0;
- }
- 
--int read_remote_features(bdaddr_t *local, bdaddr_t *peer,
-+int read_remote_features(const bdaddr_t *local, const bdaddr_t *peer,
- 				unsigned char *page1, unsigned char *page2)
- {
- 	char filename[PATH_MAX + 1], addr[18], *str;
-@@ -587,8 +591,8 @@ int read_remote_features(bdaddr_t *local, bdaddr_t *peer,
- 	return err;
- }
- 
--int write_lastseen_info(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
--								struct tm *tm)
-+int write_lastseen_info(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint8_t peer_type, struct tm *tm)
- {
- 	char filename[PATH_MAX + 1], key[20], str[24];
- 
-@@ -605,8 +609,8 @@ int write_lastseen_info(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
- 	return textfile_put(filename, key, str);
- }
- 
--int write_lastused_info(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
--								struct tm *tm)
-+int write_lastused_info(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint8_t peer_type, struct tm *tm)
- {
- 	char filename[PATH_MAX + 1], key[20], str[24];
- 
-@@ -623,8 +627,9 @@ int write_lastused_info(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
- 	return textfile_put(filename, key, str);
- }
- 
--int write_link_key(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
--				unsigned char *key, uint8_t type, int length)
-+int write_link_key(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint8_t peer_type, unsigned char *key,
-+					uint8_t type, int length)
- {
- 	char filename[PATH_MAX + 1], addr[20], str[38];
- 	int i;
-@@ -653,8 +658,9 @@ int write_link_key(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
- 	return textfile_put(filename, addr, str);
- }
- 
--int read_link_key(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
--					unsigned char *key, uint8_t *type)
-+int read_link_key(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint8_t peer_type, unsigned char *key,
-+					uint8_t *type)
- {
- 	char filename[PATH_MAX + 1], addr[20], tmp[3], *str;
- 	int i;
-@@ -697,7 +703,7 @@ done:
- 	return 0;
- }
- 
--ssize_t read_pin_code(bdaddr_t *local, bdaddr_t *peer, char *pin)
-+ssize_t read_pin_code(const bdaddr_t *local, const bdaddr_t *peer, char *pin)
- {
- 	char filename[PATH_MAX + 1], addr[18], *str;
- 	ssize_t len;
-@@ -760,8 +766,8 @@ gboolean read_trust(const bdaddr_t *local, const char *addr, uint8_t addr_type)
- 	return ret;
- }
- 
--int write_device_profiles(bdaddr_t *src, bdaddr_t *dst, uint8_t dst_type,
--							const char *profiles)
-+int write_device_profiles(const bdaddr_t *src, const bdaddr_t *dst,
-+					uint8_t dst_type, const char *profiles)
- {
- 	char filename[PATH_MAX + 1], key[20];
- 
-@@ -778,7 +784,7 @@ int write_device_profiles(bdaddr_t *src, bdaddr_t *dst, uint8_t dst_type,
- 	return textfile_put(filename, key, profiles);
- }
- 
--int delete_entry(bdaddr_t *src, const char *storage, bdaddr_t *dst,
-+int delete_entry(const bdaddr_t *src, const char *storage, const bdaddr_t *dst,
- 							uint8_t dst_type)
- {
- 	char filename[PATH_MAX + 1], key[20];
-@@ -1147,7 +1153,7 @@ int read_device_id(const gchar *srcaddr, const gchar *dstaddr,
- 	return 0;
- }
- 
--int write_device_pairable(bdaddr_t *bdaddr, gboolean mode)
-+int write_device_pairable(const bdaddr_t *bdaddr, gboolean mode)
- {
- 	char filename[PATH_MAX + 1];
- 
-@@ -1158,7 +1164,7 @@ int write_device_pairable(bdaddr_t *bdaddr, gboolean mode)
- 	return textfile_put(filename, "pairable", mode ? "yes" : "no");
- }
- 
--int read_device_pairable(bdaddr_t *bdaddr, gboolean *mode)
-+int read_device_pairable(const bdaddr_t *bdaddr, gboolean *mode)
- {
- 	char filename[PATH_MAX + 1], *str;
- 
-@@ -1359,8 +1365,9 @@ int read_device_attributes(const bdaddr_t *sba, textfile_cb func, void *data)
- 	return textfile_foreach(filename, func, data);
- }
- 
--int read_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
--					uint16_t handle, uint16_t *value)
-+int read_device_ccc(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint8_t bdaddr_type, uint16_t handle,
-+					uint16_t *value)
- {
- 	char filename[PATH_MAX + 1], addr[18], key[25];
- 	char *str;
-@@ -1386,8 +1393,9 @@ int read_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
- 	return err;
- }
- 
--int write_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
--					uint16_t handle, uint16_t value)
-+int write_device_ccc(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint8_t bdaddr_type, uint16_t handle,
-+					uint16_t value)
- {
- 	char filename[PATH_MAX + 1], addr[18], key[25], config[5];
- 
-@@ -1403,7 +1411,7 @@ int write_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
- 	return textfile_put(filename, key, config);
- }
- 
--void delete_device_ccc(bdaddr_t *local, bdaddr_t *peer)
-+void delete_device_ccc(const bdaddr_t *local, const bdaddr_t *peer)
- {
- 	char filename[PATH_MAX + 1], addr[18];
- 
-@@ -1414,8 +1422,8 @@ void delete_device_ccc(bdaddr_t *local, bdaddr_t *peer)
- 	delete_by_pattern(filename, addr);
- }
- 
--int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
--								const char *key)
-+int write_longtermkeys(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint8_t bdaddr_type, const char *key)
- {
- 	char filename[PATH_MAX + 1], addr[20];
- 
-@@ -1432,7 +1440,8 @@ int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
- 	return textfile_put(filename, addr, key);
- }
- 
--gboolean has_longtermkeys(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type)
-+gboolean has_longtermkeys(const bdaddr_t *local, const bdaddr_t *peer,
-+							uint8_t bdaddr_type)
- {
- 	char filename[PATH_MAX + 1], key[20], *str;
- 
-diff --git a/src/storage.h b/src/storage.h
-index 6a8df83..741b8a7 100644
---- a/src/storage.h
-+++ b/src/storage.h
-@@ -27,50 +27,57 @@ int read_device_alias(const char *src, const char *dst, uint8_t dst_type,
- 						char *alias, size_t size);
- int write_device_alias(const char *src, const char *dst, uint8_t dst_type,
- 							const char *alias);
--int write_discoverable_timeout(bdaddr_t *bdaddr, int timeout);
-+int write_discoverable_timeout(const bdaddr_t *bdaddr, int timeout);
- int read_discoverable_timeout(const char *src, int *timeout);
--int write_pairable_timeout(bdaddr_t *bdaddr, int timeout);
-+int write_pairable_timeout(const bdaddr_t *bdaddr, int timeout);
- int read_pairable_timeout(const char *src, int *timeout);
--int write_device_mode(bdaddr_t *bdaddr, const char *mode);
-+int write_device_mode(const bdaddr_t *bdaddr, const char *mode);
- int read_device_mode(const char *src, char *mode, int length);
- int read_on_mode(const char *src, char *mode, int length);
--int write_local_name(bdaddr_t *bdaddr, const char *name);
--int read_local_name(bdaddr_t *bdaddr, char *name);
--int write_local_class(bdaddr_t *bdaddr, uint8_t *class);
--int read_local_class(bdaddr_t *bdaddr, uint8_t *class);
--int write_remote_appearance(bdaddr_t *local, bdaddr_t *peer,
-+int write_local_name(const bdaddr_t *bdaddr, const char *name);
-+int read_local_name(const bdaddr_t *bdaddr, char *name);
-+int write_local_class(const bdaddr_t *bdaddr, uint8_t *class);
-+int read_local_class(const bdaddr_t *bdaddr, uint8_t *class);
-+int write_remote_appearance(const bdaddr_t *local, const bdaddr_t *peer,
- 				uint8_t bdaddr_type, uint16_t appearance);
--int read_remote_appearance(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
--							uint16_t *appearance);
--int write_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class);
--int read_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t *class);
--int write_device_name(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
--							const char *name);
-+int read_remote_appearance(const bdaddr_t *local, const bdaddr_t *peer,
-+				uint8_t bdaddr_type, uint16_t *appearance);
-+int write_remote_class(const bdaddr_t *local, const bdaddr_t *peer,
-+							uint32_t class);
-+int read_remote_class(const bdaddr_t *local, const bdaddr_t *peer,
-+							uint32_t *class);
-+int write_device_name(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint8_t peer_type, const char *name);
- int read_device_name(const char *src, const char *dst, uint8_t dst_type,
- 								char *name);
--int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
--					uint8_t *data, uint8_t data_len);
--int read_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
--								uint8_t *data);
--int write_version_info(bdaddr_t *local, bdaddr_t *peer, uint16_t manufacturer, uint8_t lmp_ver, uint16_t lmp_subver);
--int write_features_info(bdaddr_t *local, bdaddr_t *peer, unsigned char *page1, unsigned char *page2);
--int read_remote_features(bdaddr_t *local, bdaddr_t *peer, unsigned char *page1, unsigned char *page2);
--int write_lastseen_info(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
--								struct tm *tm);
--int write_lastused_info(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
--								struct tm *tm);
--int write_link_key(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
--				unsigned char *key, uint8_t type, int length);
--int read_link_key(bdaddr_t *local, bdaddr_t *peer, uint8_t peer_type,
--					unsigned char *key, uint8_t *type);
--ssize_t read_pin_code(bdaddr_t *local, bdaddr_t *peer, char *pin);
-+int write_remote_eir(const bdaddr_t *local, const bdaddr_t *peer,
-+			uint8_t peer_type, uint8_t *data, uint8_t data_len);
-+int read_remote_eir(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint8_t peer_type, uint8_t *data);
-+int write_version_info(const bdaddr_t *local, const bdaddr_t *peer,
-+				uint16_t manufacturer, uint8_t lmp_ver,
-+				uint16_t lmp_subver);
-+int write_features_info(const bdaddr_t *local, const bdaddr_t *peer,
-+				unsigned char *page1, unsigned char *page2);
-+int read_remote_features(const bdaddr_t *local, const bdaddr_t *peer,
-+				unsigned char *page1, unsigned char *page2);
-+int write_lastseen_info(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint8_t peer_type, struct tm *tm);
-+int write_lastused_info(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint8_t peer_type, struct tm *tm);
-+int write_link_key(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint8_t peer_type, unsigned char *key,
-+					uint8_t type, int length);
-+int read_link_key(const bdaddr_t *local, const bdaddr_t *peer,
-+			uint8_t peer_type, unsigned char *key, uint8_t *type);
-+ssize_t read_pin_code(const bdaddr_t *local, const bdaddr_t *peer, char *pin);
- gboolean read_trust(const bdaddr_t *local, const char *addr,
- 						uint8_t addr_type);
- int write_trust(const char *src, const char *addr, uint8_t addr_type,
- 							gboolean trust);
--int write_device_profiles(bdaddr_t *src, bdaddr_t *dst, uint8_t dst_type,
--							const char *profiles);
--int delete_entry(bdaddr_t *src, const char *storage, bdaddr_t *dst,
-+int write_device_profiles(const bdaddr_t *src, const bdaddr_t *dst,
-+				uint8_t dst_type, const char *profiles);
-+int delete_entry(const bdaddr_t *src, const char *storage, const bdaddr_t *dst,
- 							uint8_t dst_type);
- int store_record(const gchar *src, const gchar *dst, uint8_t dst_type,
- 							sdp_record_t *rec);
-@@ -89,8 +96,8 @@ int store_device_id(const gchar *src, const gchar *dst, uint8_t dst_type,
- int read_device_id(const gchar *src, const gchar *dst, uint8_t dst_type,
- 					uint16_t *source, uint16_t *vendor,
- 					uint16_t *product, uint16_t *version);
--int write_device_pairable(bdaddr_t *local, gboolean mode);
--int read_device_pairable(bdaddr_t *local, gboolean *mode);
-+int write_device_pairable(const bdaddr_t *local, gboolean mode);
-+int read_device_pairable(const bdaddr_t *local, gboolean *mode);
- gboolean read_blocked(const bdaddr_t *local, const bdaddr_t *remote,
- 							uint8_t remote_type);
- int write_blocked(const bdaddr_t *local, const bdaddr_t *remote,
-@@ -110,11 +117,13 @@ int write_device_attribute(const bdaddr_t *sba, const bdaddr_t *dba,
- 				uint8_t bdaddr_type, uint16_t handle,
- 							const char *chars);
- int read_device_attributes(const bdaddr_t *sba, textfile_cb func, void *data);
--int read_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
--					uint16_t handle, uint16_t *value);
--int write_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
--					uint16_t handle, uint16_t value);
--void delete_device_ccc(bdaddr_t *local, bdaddr_t *peer);
--int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
--							const char *key);
--gboolean has_longtermkeys(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type);
-+int read_device_ccc(const bdaddr_t *local, const bdaddr_t *peer,
-+			uint8_t bdaddr_type, uint16_t handle, uint16_t *value);
-+int write_device_ccc(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint8_t bdaddr_type, uint16_t handle,
-+					uint16_t value);
-+void delete_device_ccc(const bdaddr_t *local, const bdaddr_t *peer);
-+int write_longtermkeys(const bdaddr_t *local, const bdaddr_t *peer,
-+					uint8_t bdaddr_type, const char *key);
-+gboolean has_longtermkeys(const bdaddr_t *local, const bdaddr_t *peer,
-+							uint8_t bdaddr_type);
+I've noticed that in many places similar code was created to adapt to current
+adapter/device_get_address API:
+
+bdaddr_t addr;
+adapter_get_address(adapter, &addr);
+foo(&addr);
+
+bdaddr is constant anyway and such code can be converted to more convenient
+foo(adapter_get_address(adapter));
+
+Thanks to this we reduce number of memcpy calls of data that is not going to
+change. Also number of local variables is removed (in places where it reduced
+number of consecutive get_address calls or due to code readibility local
+pointers were left).
+
+Since this leads to calls where return is passed directly as function parameter
+adapter/device_get_address could also be renamed to shorter form e.g.
+adapter/device_get_addr  (like device_get_addr_type is called now).
+(this is not done in this patchset).
+
+Comments are welcome.
+
+Szymon Janc (7):
+  adapter: Convert adapter_get_address into simple getter
+  storage: Constify bdaddr_t pointers parameters
+  adapter: Constify pointer returned by adapter_get_address
+  device: Convert device_get_address into simple getter
+  mgmt: Constify use of bdaddr_t pointer parameters
+  adapter: Constify use of bdaddr_t pointer parameters
+  device: Make device_get_address return const pointer
+
+ attrib/client.c               |   42 +++++------
+ audio/manager.c               |   50 +++++--------
+ plugins/adaptername.c         |    4 +-
+ plugins/dbusoob.c             |    8 +--
+ plugins/neard.c               |   21 +++---
+ plugins/service.c             |   57 +++++----------
+ plugins/wiimote.c             |    7 +-
+ profiles/alert/server.c       |    4 +-
+ profiles/gatt/gas.c           |   34 +++++----
+ profiles/health/hdp.c         |   18 +++--
+ profiles/health/hdp_util.c    |   42 +++++------
+ profiles/health/mcap.c        |    2 +-
+ profiles/health/mcap_lib.h    |    2 +-
+ profiles/input/device.c       |    8 +--
+ profiles/input/manager.c      |   11 +--
+ profiles/network/connection.c |    6 +-
+ profiles/network/connection.h |    2 +-
+ profiles/network/manager.c    |   13 ++--
+ profiles/network/server.c     |    8 +--
+ profiles/proximity/monitor.c  |   20 +++---
+ profiles/sap/manager.c        |    5 +-
+ profiles/sap/server.c         |    2 +-
+ profiles/sap/server.h         |    2 +-
+ src/adapter.c                 |   73 +++++++++----------
+ src/adapter.h                 |   59 +++++++++-------
+ src/attrib-server.c           |   18 ++---
+ src/device.c                  |  157 ++++++++++++++++-------------------------
+ src/device.h                  |    3 +-
+ src/eir.c                     |    2 +-
+ src/eir.h                     |    2 +-
+ src/event.c                   |   27 +++----
+ src/manager.c                 |    5 +-
+ src/mgmt.c                    |   31 ++++----
+ src/mgmt.h                    |   26 +++----
+ src/profile.c                 |   47 ++++++------
+ src/storage.c                 |   97 +++++++++++++------------
+ src/storage.h                 |   95 ++++++++++++++-----------
+ 37 files changed, 451 insertions(+), 559 deletions(-)
+
 -- 
 1.7.9.5
 
