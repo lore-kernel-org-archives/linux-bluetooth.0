@@ -1,63 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ] gdbus: Fix invalid memory access while unregistering
-Date: Thu,  4 Oct 2012 17:42:33 -0300
-Message-Id: <1349383353-16733-1-git-send-email-lucas.demarchi@profusion.mobi>
+Message-ID: <1349382629.27233.43.camel@aeonflux>
+Subject: Re: [PATCH 4/4] audio: Add check for non-a2dp codec
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: chanyeol.park@samsung.com, linux-bluetooth@vger.kernel.org
+Date: Thu, 04 Oct 2012 22:30:29 +0200
+In-Reply-To: <CABBYNZ+qKN_q9-t1a_i3FayCUxZ2a8M9x6USKVn-Ssy7eBNYzg@mail.gmail.com>
+References: <1349356447-8369-1-git-send-email-chanyeol.park@samsung.com>
+	 <CABBYNZKHzKv+GQhynnGN04O17kwjDobwL-+CeVB9hJqrVEF05A@mail.gmail.com>
+	 <1349374107.27233.36.camel@aeonflux>
+	 <CABBYNZ+qKN_q9-t1a_i3FayCUxZ2a8M9x6USKVn-Ssy7eBNYzg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If an interface is added and removed on the same mailoop iteration,
-ObjectManager would try to send InterfacesAdded signal while running the
-idler because the interface was added to data->added list.
+Hi Luiz,
 
-This is easily reproduced by forcing an error path in a plugin
-registration, like on sap_server_register(), resulting in the following
-error:
+> >> > This patch adds checks(vendor ID, vendor specific codec ID) to make sure of
+> >> > non-a2dp codec selection.
+> >> > ---
+> >> >  audio/a2dp-codecs.h |    6 +++++
+> >> >  audio/a2dp.c        |   68 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+> >> >  2 files changed, 73 insertions(+), 1 deletion(-)
+> >> >
+> >> > diff --git a/audio/a2dp-codecs.h b/audio/a2dp-codecs.h
+> >> > index 51c796a..e3d2cba 100644
+> >> > --- a/audio/a2dp-codecs.h
+> >> > +++ b/audio/a2dp-codecs.h
+> >> > @@ -26,6 +26,7 @@
+> >> >  #define A2DP_CODEC_MPEG12              0x01
+> >> >  #define A2DP_CODEC_MPEG24              0x02
+> >> >  #define A2DP_CODEC_ATRAC               0x03
+> >> > +#define A2DP_CODEC_NON_A2DP            0xFF
+> >>
+> >> I prefer A2DP_CODEC_VENDOR
+> >
+> > what is the specification calling these? And yes, I would prefer VENDOR
+> > as well.
+> 
+> Apparently it comes from the assigned numbers
+> http://www.bluetooth.org/Technical/AssignedNumbers/audio-video.htm:
+> 
+> 1	1	1	1	1	1	1	1	non-A2DP	n/a	A2DP
+> 
+> But the spec refer to it as 4.7 Vendor Specific A2DP Codec, IMO the
+> term non-A2DP can be confused with not defined in A2DP spec when in
+> fact it is defined:
+> 
+> "4.2.3 Vendor Specific A2DP Codecs
+> The device may support other codecs as Vendor Specific A2DP codecs. A
+> user of a Vendor Specific A2DP codec (hereafter the Vendor) will need
+> to define parameters and other information necessary for use of the
+> codec in A2DP."
+> 
+> There is no such a thing as non-A2DP in the spec, so again to avoid
+> confusion I would stick to the terminology vendor or vendor specific.
 
-==11795== Invalid read of size 4
-==11795==    at 0x496F592: dbus_message_iter_append_basic (dbus-message.c:2598)
-==11795==    by 0x117B39: append_interface (object.c:554)
-==11795==    by 0x48955E7: g_slist_foreach (gslist.c:840)
-==11795==    by 0x11923B: process_changes (object.c:592)
-==11795==    by 0x11956D: generic_unregister (object.c:980)
-==11795==    by 0x4973BAC: _dbus_object_tree_unregister_and_unlock (dbus-object-tree.c:516)
-==11795==    by 0x4965240: dbus_connection_unregister_object_path (dbus-connection.c:5776)
-==11795==    by 0x1178A5: object_path_unref (object.c:1219)
-==11795==    by 0x118517: g_dbus_unregister_interface (object.c:1344)
-==11795==    by 0x19AF5B: sap_exit (sap.c:385)
-==11795==    by 0x13E9E2: sap_server_register (server.c:1428)
-==11795==    by 0x13C092: sap_server_probe (manager.c:44)
+lets use "vendor" for these. Otherwise the function and variable naming
+gets too complicated.
 
-With this patch we don't send the InterfacesAdded signal, removing it
-from data->added while unregistering.
----
- gdbus/object.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Regards
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index c63a26d..444728c 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -657,6 +657,17 @@ static gboolean remove_interface(struct generic_data *data, const char *name)
- 		return TRUE;
- 	}
- 
-+	/*
-+	 * Interface being removed was just added, on the same mainloop
-+	 * iteration? Don't send any signal
-+	 */
-+	if (g_slist_find(data->added, iface)) {
-+		data->added = g_slist_remove(data->added, iface);
-+		g_free(iface->name);
-+		g_free(iface);
-+		return TRUE;
-+	}
-+
- 	data->removed = g_slist_prepend(data->removed, iface->name);
- 	g_free(iface);
- 
--- 
-1.7.12.2
+Marcel
+
 
