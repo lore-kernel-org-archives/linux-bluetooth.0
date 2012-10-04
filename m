@@ -1,40 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 4 Oct 2012 13:10:11 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: AMP: Register AMP only if High Speed enabled
-Message-ID: <20121004101010.GA12229@aemeltch-MOBL1>
-References: <1349339215-8422-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1349344331.27233.9.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1349344331.27233.9.camel@aeonflux>
+Message-ID: <1349344897.27233.13.camel@aeonflux>
+Subject: Re: [PATCH v2 resend 1/2] Introduced a load_firmware callback to
+ struct hci_dev
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jesse Sung <jesse.sung@canonical.com>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Date: Thu, 04 Oct 2012 12:01:37 +0200
+In-Reply-To: <1349335847-1615-2-git-send-email-jesse.sung@canonical.com>
+References: <cover.1347959921.git.jesse.sung@canonical.com>
+	 <1349335847-1615-1-git-send-email-jesse.sung@canonical.com>
+	 <1349335847-1615-2-git-send-email-jesse.sung@canonical.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Jesse,
 
-On Thu, Oct 04, 2012 at 11:52:11AM +0200, Marcel Holtmann wrote:
-> Hi Andrei,
+> load_firmware will be called at the end of hci_dev_open() if it
+> is defined.
 > 
-> > Make sure that AMP controller is registered only if HS enables.
-> > Return EINVAL if High Speed is not enabled and dev_type is HCI_AMP.
+> Signed-off-by: Wen-chien Jesse Sung <jesse.sung@canonical.com>
+> ---
+>  include/net/bluetooth/hci_core.h |    1 +
+>  net/bluetooth/hci_core.c         |    2 ++
+>  2 files changed, 3 insertions(+)
 > 
-> I don't think this is a good idea. I like to keep the adapter registers,
-> but maybe have a hciconfig hciX up fail. Not the registration itself.
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 593cd1d..40972a3 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -281,6 +281,7 @@ struct hci_dev {
+>  	int (*send)(struct sk_buff *skb);
+>  	void (*notify)(struct hci_dev *hdev, unsigned int evt);
+>  	int (*ioctl)(struct hci_dev *hdev, unsigned int cmd, unsigned long arg);
+> +	void (*load_firmware)(struct hci_dev *hdev);
+>  };
+>  
+>  struct hci_conn {
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index d4de5db..49be87a 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -725,6 +725,8 @@ int hci_dev_open(__u16 dev)
+>  done:
+>  	hci_req_unlock(hdev);
+>  	hci_dev_put(hdev);
+> +	if (!ret && hdev->load_firmware)
+> +		hdev->load_firmware(hdev);
+>  	return ret;
+>  }
+>  
 
-So currently AMP registers itself as RAW device, maybe leave it as is.
+has anybody thought this through actually? Do we need to reload the
+firmware after every HCI_Reset? Since hci_dev_open() is used at least
+twice during normal operation. And for every RFKILL or power down/up
+cycle of the chip.
 
-Best regards 
-Andrei Emeltchenko 
+And there is an internal process of hci_dev_open() trigger on
+registration and others triggered by hciconfig hci0 up. I am pretty much
+against having to wait for all this firmware loading crap during every
+bring up of the device. Especially since it always does a trip via
+request_firmware().
 
-> 
-> If you would fail the registration itself, then you have the problem
-> that you need to unplug and replug the hardware once you changed
-> enable_hs. And that might not always be possible.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
+Regards
+
+Marcel
+
+
