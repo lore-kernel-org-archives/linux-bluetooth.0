@@ -1,45 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix dereference after NULL check
-Date: Thu,  4 Oct 2012 13:45:46 +0300
-Message-Id: <1349347546-32523-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1349332630-8901-2-git-send-email-lucas.de.marchi@gmail.com>
+References: <1349332630-8901-1-git-send-email-lucas.de.marchi@gmail.com>
+	<1349332630-8901-2-git-send-email-lucas.de.marchi@gmail.com>
+Date: Thu, 4 Oct 2012 06:38:28 -0400
+Message-ID: <CAJdJm_Pc8T1yk3hpfugZNsAjLqh2RDCFxV7AXy-_ZKWhHZg9tw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] build-sys: Don't use deprecated INCLUDES variable
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org,
+	Lucas De Marchi <lucas.de.marchi@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Lucas/Johan,
 
-Move code dereferencing possible NULL pointer to the check branch.
+On Thu, Oct 4, 2012 at 2:37 AM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> Makefile.am:410: warning: 'INCLUDES' is the old name for 'AM_CPPFLAGS' (or '*_CPPFLAGS')
+> ---
+>  Makefile.am | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/Makefile.am b/Makefile.am
+> index dea207e..3b08f9a 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -407,13 +407,13 @@ AM_YFLAGS = -d
+>
+>  AM_CFLAGS += @DBUS_CFLAGS@ @GLIB_CFLAGS@
+>
+> -INCLUDES = -I$(builddir)/lib -I$(builddir)/src -I$(srcdir)/src \
+> +AM_CPPFLAGS = -I$(builddir)/lib -I$(builddir)/src -I$(srcdir)/src \
+>                         -I$(srcdir)/audio -I$(srcdir)/sbc -I$(srcdir)/gdbus \
+>                         -I$(srcdir)/attrib -I$(srcdir)/btio -I$(srcdir)/tools \
+>                         -I$(builddir)/tools -I$(srcdir)/monitor
+>
+>  if MCAP
+> -INCLUDES += -I$(builddir)/health
+> +AM_CPPFLAGS += -I$(builddir)/health
+>  endif
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/l2cap_sock.c |   11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+This reminds me that the patch I sent few days ago which removes the
+snippet above (which is unnecessary, given the directory does not
+exist anymore and profiles/health still builds just fine) was not
+applied yet.
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index e6238eb..0c05d7d 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -386,13 +386,14 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
- 		}
- 
- 		memset(&sec, 0, sizeof(sec));
--		if (chan->conn)
-+		if (chan->conn) {
- 			sec.level = chan->conn->hcon->sec_level;
--		else
--			sec.level = chan->sec_level;
- 
--		if (sk->sk_state == BT_CONNECTED)
--			sec.key_size = chan->conn->hcon->enc_key_size;
-+			if (sk->sk_state == BT_CONNECTED)
-+				sec.key_size = chan->conn->hcon->enc_key_size;
-+		} else {
-+			sec.level = chan->sec_level;
-+		}
- 
- 		len = min_t(unsigned int, len, sizeof(sec));
- 		if (copy_to_user(optval, (char *) &sec, len))
+I'll rebase and resend. There were comments from Marcel regarding the
+use of symlinks for drivers (i.e. telephony, sap), which will be
+addressed in a separate patch.
+
+Best Regards,
 -- 
-1.7.9.5
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
