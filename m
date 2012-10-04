@@ -1,121 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ v4 01/15] gdbus: Move typedefs up
-Date: Thu,  4 Oct 2012 04:26:25 -0300
-Message-Id: <1349335599-12443-2-git-send-email-lucas.de.marchi@gmail.com>
-In-Reply-To: <1349335599-12443-1-git-send-email-lucas.de.marchi@gmail.com>
-References: <1349335599-12443-1-git-send-email-lucas.de.marchi@gmail.com>
+Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
+Subject: [PATCH BlueZ v4 00/15] Properties + ObjectManager
+Date: Thu,  4 Oct 2012 04:26:24 -0300
+Message-Id: <1349335599-12443-1-git-send-email-lucas.de.marchi@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Here is a rebased version of the patches. Most notable change is on patch
+implementing the Set() method after feedback from Marcel. It doesn't cover the
+concerns from Luiz about checking privileges per-property since I think this
+could be added in a separate patch. As far as I could see the only user is
+MediaTransport interface. The most obvious way would be to add another hook in
+GDBusPropertyTable in order to check the privileges. Suggestions?
 
-Move the typedefs up so they can be used by functions and callbacks.
----
- gdbus/gdbus.h | 47 +++++++++++++++++++++++++++++------------------
- 1 file changed, 29 insertions(+), 18 deletions(-)
+First 2 patches could be applied nonetheles. Get and GetAll are well tested,
+both now and in the previous version of this patch set. Set() is still a
+bit raw - the users implementing it are very big (adapter, device) so
+they are not converted yet (previous patch doesn't apply anymore and there's a
+change in the API that requires them to be rewritten).
 
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index 0a8a27c..34e3cb3 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -31,6 +31,17 @@ extern "C" {
- #include <dbus/dbus.h>
- #include <glib.h>
- 
-+typedef enum GDBusMethodFlags GDBusMethodFlags;
-+typedef enum GDBusSignalFlags GDBusSignalFlags;
-+typedef enum GDBusPropertyFlags GDBusPropertyFlags;
-+typedef enum GDBusSecurityFlags GDBusSecurityFlags;
-+
-+typedef struct GDBusArgInfo GDBusArgInfo;
-+typedef struct GDBusMethodTable GDBusMethodTable;
-+typedef struct GDBusSignalTable GDBusSignalTable;
-+typedef struct GDBusPropertyTable GDBusPropertyTable;
-+typedef struct GDBusSecurityTable GDBusSecurityTable;
-+
- typedef void (* GDBusWatchFunction) (DBusConnection *connection,
- 							void *user_data);
- 
-@@ -62,58 +73,58 @@ typedef void (* GDBusSecurityFunction) (DBusConnection *connection,
- 						gboolean interaction,
- 						GDBusPendingReply pending);
- 
--typedef enum {
-+enum GDBusMethodFlags {
- 	G_DBUS_METHOD_FLAG_DEPRECATED = (1 << 0),
- 	G_DBUS_METHOD_FLAG_NOREPLY    = (1 << 1),
- 	G_DBUS_METHOD_FLAG_ASYNC      = (1 << 2),
--} GDBusMethodFlags;
-+};
- 
--typedef enum {
-+enum GDBusSignalFlags {
- 	G_DBUS_SIGNAL_FLAG_DEPRECATED = (1 << 0),
--} GDBusSignalFlags;
-+};
- 
--typedef enum {
-+enum GDBusPropertyFlags {
- 	G_DBUS_PROPERTY_FLAG_DEPRECATED = (1 << 0),
--} GDBusPropertyFlags;
-+};
- 
--typedef enum {
-+enum GDBusSecurityFlags {
- 	G_DBUS_SECURITY_FLAG_DEPRECATED        = (1 << 0),
- 	G_DBUS_SECURITY_FLAG_BUILTIN           = (1 << 1),
- 	G_DBUS_SECURITY_FLAG_ALLOW_INTERACTION = (1 << 2),
--} GDBusSecurityFlags;
-+};
- 
--typedef struct {
-+struct GDBusArgInfo {
- 	const char *name;
- 	const char *signature;
--} GDBusArgInfo;
-+};
- 
--typedef struct {
-+struct GDBusMethodTable {
- 	const char *name;
- 	GDBusMethodFunction function;
- 	GDBusMethodFlags flags;
- 	unsigned int privilege;
- 	const GDBusArgInfo *in_args;
- 	const GDBusArgInfo *out_args;
--} GDBusMethodTable;
-+};
- 
--typedef struct {
-+struct GDBusSignalTable {
- 	const char *name;
- 	GDBusSignalFlags flags;
- 	const GDBusArgInfo *args;
--} GDBusSignalTable;
-+};
- 
--typedef struct {
-+struct GDBusPropertyTable {
- 	const char *name;
- 	const char *type;
- 	GDBusPropertyFlags flags;
--} GDBusPropertyTable;
-+};
- 
--typedef struct {
-+struct GDBusSecurityTable {
- 	unsigned int privilege;
- 	const char *action;
- 	GDBusSecurityFlags flags;
- 	GDBusSecurityFunction function;
--} GDBusSecurityTable;
-+};
- 
- #define GDBUS_ARGS(args...) (const GDBusArgInfo[]) { args, { } }
- 
+
+Lucas De Marchi (10):
+  gdbus: Move typedefs up
+  gdbus: Use macros to add annotations
+  gdbus: Add skeleton of DBus.Properties interface
+  gdbus: Implement DBus.Properties.Get method
+  gdbus: Implement DBus.Properties.GetAll method
+  gdbus: Implement DBus.Properties.Set method
+  gdbus: Add properties into Introspectable interface
+  gdbus: Implement PropertiesChanged signal
+  Use DBus.Properties on Control interface
+  Use DBus.Properties on Manager interface
+
+Luiz Augusto von Dentz (5):
+  gdbus: Add support for org.freedesktop.DBus.ObjectManager interface
+  gdbus: Group interface changes to reduce the amount of signals
+    emitted
+  gdbus: Only export ObjectManager interface on root path
+  gdbus: Integrates ObjectManager with Properties interface
+  gdbus: Simplify code for appending properties
+
+ audio/control.c |  57 ++--
+ gdbus/gdbus.h   |  74 +++--
+ gdbus/object.c  | 867 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ src/manager.c   |  81 ++----
+ 4 files changed, 897 insertions(+), 182 deletions(-)
+
 -- 
 1.7.12.2
 
