@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ v4 02/15] gdbus: Use macros to add annotations
-Date: Thu,  4 Oct 2012 04:26:26 -0300
-Message-Id: <1349335599-12443-3-git-send-email-lucas.de.marchi@gmail.com>
+Subject: [PATCH BlueZ v4 01/15] gdbus: Move typedefs up
+Date: Thu,  4 Oct 2012 04:26:25 -0300
+Message-Id: <1349335599-12443-2-git-send-email-lucas.de.marchi@gmail.com>
 In-Reply-To: <1349335599-12443-1-git-send-email-lucas.de.marchi@gmail.com>
 References: <1349335599-12443-1-git-send-email-lucas.de.marchi@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,86 +12,110 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 
-Besides being more readable this way it avoids going over 80 chars.
+Move the typedefs up so they can be used by functions and callbacks.
 ---
- gdbus/object.c | 40 ++++++++++++++++++++++++++++------------
- 1 file changed, 28 insertions(+), 12 deletions(-)
+ gdbus/gdbus.h | 47 +++++++++++++++++++++++++++++------------------
+ 1 file changed, 29 insertions(+), 18 deletions(-)
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 9689006..24e8285 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -76,6 +76,16 @@ static void print_arguments(GString *gstr, const GDBusArgInfo *args,
- 	}
- }
+diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+index 0a8a27c..34e3cb3 100644
+--- a/gdbus/gdbus.h
++++ b/gdbus/gdbus.h
+@@ -31,6 +31,17 @@ extern "C" {
+ #include <dbus/dbus.h>
+ #include <glib.h>
  
-+#define G_DBUS_ANNOTATE(prefix_, name_, value_)				\
-+	prefix_ "<annotation name=\"org.freedesktop.DBus." name_ "\" "	\
-+	"value=\"" value_ "\"/>\n"
++typedef enum GDBusMethodFlags GDBusMethodFlags;
++typedef enum GDBusSignalFlags GDBusSignalFlags;
++typedef enum GDBusPropertyFlags GDBusPropertyFlags;
++typedef enum GDBusSecurityFlags GDBusSecurityFlags;
 +
-+#define G_DBUS_ANNOTATE_DEPRECATED(prefix_) \
-+	G_DBUS_ANNOTATE(prefix_, "Deprecated", "true")
++typedef struct GDBusArgInfo GDBusArgInfo;
++typedef struct GDBusMethodTable GDBusMethodTable;
++typedef struct GDBusSignalTable GDBusSignalTable;
++typedef struct GDBusPropertyTable GDBusPropertyTable;
++typedef struct GDBusSecurityTable GDBusSecurityTable;
 +
-+#define G_DBUS_ANNOTATE_NOREPLY(prefix_) \
-+	G_DBUS_ANNOTATE(prefix_, "Method.NoReply", "true")
-+
- static void generate_interface_xml(GString *gstr, struct interface_data *iface)
- {
- 	const GDBusMethodTable *method;
-@@ -90,19 +100,22 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
- 		if (!deprecated && !noreply &&
- 				!(method->in_args && method->in_args->name) &&
- 				!(method->out_args && method->out_args->name))
--			g_string_append_printf(gstr, "\t\t<method name=\"%s\"/>\n",
--								method->name);
-+			g_string_append_printf(gstr,
-+						"\t\t<method name=\"%s\"/>\n",
-+						method->name);
- 		else {
--			g_string_append_printf(gstr, "\t\t<method name=\"%s\">\n",
--								method->name);
-+			g_string_append_printf(gstr,
-+						"\t\t<method name=\"%s\">\n",
-+						method->name);
- 			print_arguments(gstr, method->in_args, "in");
- 			print_arguments(gstr, method->out_args, "out");
+ typedef void (* GDBusWatchFunction) (DBusConnection *connection,
+ 							void *user_data);
  
- 			if (deprecated)
--				g_string_append_printf(gstr, "\t\t\t<annotation name=\"org.freedesktop.DBus.Deprecated\" value=\"true\"/>\n");
--
-+				g_string_append_printf(gstr,
-+					G_DBUS_ANNOTATE_DEPRECATED("\t\t\t"));
- 			if (noreply)
--				g_string_append_printf(gstr, "\t\t\t<annotation name=\"org.freedesktop.DBus.Method.NoReply\" value=\"true\"/>\n");
-+				g_string_append_printf(gstr,
-+					G_DBUS_ANNOTATE_NOREPLY("\t\t\t"));
+@@ -62,58 +73,58 @@ typedef void (* GDBusSecurityFunction) (DBusConnection *connection,
+ 						gboolean interaction,
+ 						GDBusPendingReply pending);
  
- 			g_string_append_printf(gstr, "\t\t</method>\n");
- 		}
-@@ -113,15 +126,18 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
- 						G_DBUS_SIGNAL_FLAG_DEPRECATED;
+-typedef enum {
++enum GDBusMethodFlags {
+ 	G_DBUS_METHOD_FLAG_DEPRECATED = (1 << 0),
+ 	G_DBUS_METHOD_FLAG_NOREPLY    = (1 << 1),
+ 	G_DBUS_METHOD_FLAG_ASYNC      = (1 << 2),
+-} GDBusMethodFlags;
++};
  
- 		if (!deprecated && !(signal->args && signal->args->name))
--			g_string_append_printf(gstr, "\t\t<signal name=\"%s\"/>\n",
--								signal->name);
-+			g_string_append_printf(gstr,
-+						"\t\t<signal name=\"%s\"/>\n",
-+						signal->name);
- 		else {
--			g_string_append_printf(gstr, "\t\t<signal name=\"%s\">\n",
--								signal->name);
-+			g_string_append_printf(gstr,
-+						"\t\t<signal name=\"%s\">\n",
-+						signal->name);
- 			print_arguments(gstr, signal->args, NULL);
+-typedef enum {
++enum GDBusSignalFlags {
+ 	G_DBUS_SIGNAL_FLAG_DEPRECATED = (1 << 0),
+-} GDBusSignalFlags;
++};
  
- 			if (deprecated)
--				g_string_append_printf(gstr, "\t\t\t<annotation name=\"org.freedesktop.DBus.Deprecated\" value=\"true\"/>\n");
-+				g_string_append_printf(gstr,
-+					G_DBUS_ANNOTATE_DEPRECATED("\t\t\t"));
+-typedef enum {
++enum GDBusPropertyFlags {
+ 	G_DBUS_PROPERTY_FLAG_DEPRECATED = (1 << 0),
+-} GDBusPropertyFlags;
++};
  
- 			g_string_append_printf(gstr, "\t\t</signal>\n");
- 		}
+-typedef enum {
++enum GDBusSecurityFlags {
+ 	G_DBUS_SECURITY_FLAG_DEPRECATED        = (1 << 0),
+ 	G_DBUS_SECURITY_FLAG_BUILTIN           = (1 << 1),
+ 	G_DBUS_SECURITY_FLAG_ALLOW_INTERACTION = (1 << 2),
+-} GDBusSecurityFlags;
++};
+ 
+-typedef struct {
++struct GDBusArgInfo {
+ 	const char *name;
+ 	const char *signature;
+-} GDBusArgInfo;
++};
+ 
+-typedef struct {
++struct GDBusMethodTable {
+ 	const char *name;
+ 	GDBusMethodFunction function;
+ 	GDBusMethodFlags flags;
+ 	unsigned int privilege;
+ 	const GDBusArgInfo *in_args;
+ 	const GDBusArgInfo *out_args;
+-} GDBusMethodTable;
++};
+ 
+-typedef struct {
++struct GDBusSignalTable {
+ 	const char *name;
+ 	GDBusSignalFlags flags;
+ 	const GDBusArgInfo *args;
+-} GDBusSignalTable;
++};
+ 
+-typedef struct {
++struct GDBusPropertyTable {
+ 	const char *name;
+ 	const char *type;
+ 	GDBusPropertyFlags flags;
+-} GDBusPropertyTable;
++};
+ 
+-typedef struct {
++struct GDBusSecurityTable {
+ 	unsigned int privilege;
+ 	const char *action;
+ 	GDBusSecurityFlags flags;
+ 	GDBusSecurityFunction function;
+-} GDBusSecurityTable;
++};
+ 
+ #define GDBUS_ARGS(args...) (const GDBusArgInfo[]) { args, { } }
+ 
 -- 
 1.7.12.2
 
