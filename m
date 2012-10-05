@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 5/7] Bluetooth: AMP: Factor out phylink_add
-Date: Fri,  5 Oct 2012 16:56:56 +0300
-Message-Id: <1349445419-16788-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 3/7] Bluetooth: Fix dereference after NULL check
+Date: Fri,  5 Oct 2012 16:56:54 +0300
+Message-Id: <1349445419-16788-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1349445419-16788-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1349445419-16788-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,79 +11,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add direction parameter to phylink_add since it is anyway set later.
+Move code dereferencing possible NULL pointer to the check branch.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/amp.h |    2 +-
- net/bluetooth/a2mp.c        |    4 ++--
- net/bluetooth/amp.c         |    6 ++++--
- 3 files changed, 7 insertions(+), 5 deletions(-)
+ net/bluetooth/l2cap_sock.c |   11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
-index ae2c3e5..2e7c79e 100644
---- a/include/net/bluetooth/amp.h
-+++ b/include/net/bluetooth/amp.h
-@@ -31,7 +31,7 @@ struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id);
- void amp_ctrl_list_flush(struct amp_mgr *mgr);
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 2542abd..a71c408 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -382,13 +382,14 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+ 		}
  
- struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
--			     u8 remote_id);
-+			     u8 remote_id, bool out);
+ 		memset(&sec, 0, sizeof(sec));
+-		if (chan->conn)
++		if (chan->conn) {
+ 			sec.level = chan->conn->hcon->sec_level;
+-		else
+-			sec.level = chan->sec_level;
  
- int phylink_gen_key(struct hci_conn *hcon, u8 *data, u8 *len, u8 *type);
+-		if (sk->sk_state == BT_CONNECTED)
+-			sec.key_size = chan->conn->hcon->enc_key_size;
++			if (sk->sk_state == BT_CONNECTED)
++				sec.key_size = chan->conn->hcon->enc_key_size;
++		} else {
++			sec.level = chan->sec_level;
++		}
  
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 88a4b58..3ff4dc9 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -417,7 +417,7 @@ static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 	if (!hdev)
- 		return -EINVAL;
- 
--	hcon = phylink_add(hdev, mgr, rsp->id);
-+	hcon = phylink_add(hdev, mgr, rsp->id, true);
- 	if (!hcon)
- 		goto done;
- 
-@@ -487,7 +487,7 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 		amp_ctrl_put(ctrl);
- 	}
- 
--	hcon = phylink_add(hdev, mgr, req->local_id);
-+	hcon = phylink_add(hdev, mgr, req->local_id, false);
- 	if (hcon) {
- 		amp_accept_phylink(hdev, mgr, hcon);
- 		rsp.status = A2MP_STATUS_SUCCESS;
-diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index 2fc5562..59da0f1 100644
---- a/net/bluetooth/amp.c
-+++ b/net/bluetooth/amp.c
-@@ -108,7 +108,7 @@ static u8 __next_handle(struct amp_mgr *mgr)
- }
- 
- struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
--			     u8 remote_id)
-+			     u8 remote_id, bool out)
- {
- 	bdaddr_t *dst = mgr->l2cap_conn->dst;
- 	struct hci_conn *hcon;
-@@ -117,12 +117,14 @@ struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
- 	if (!hcon)
- 		return NULL;
- 
-+	BT_DBG("hcon %p dst %pMR", hcon, dst);
-+
- 	hcon->state = BT_CONNECT;
--	hcon->out = true;
- 	hcon->attempt++;
- 	hcon->handle = __next_handle(mgr);
- 	hcon->remote_id = remote_id;
- 	hcon->amp_mgr = mgr;
-+	hcon->out = out;
- 
- 	return hcon;
- }
+ 		len = min_t(unsigned int, len, sizeof(sec));
+ 		if (copy_to_user(optval, (char *) &sec, len))
 -- 
 1.7.9.5
 
