@@ -1,56 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 5 Oct 2012 13:22:00 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Sasha Levin <sasha.levin@oracle.com>
-Cc: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
-	davem@davemloft.net, levinsasha928@gmail.com, davej@redhat.com,
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] net, bluetooth: don't attempt to free a channel that
- wasn't created
-Message-ID: <20121005102159.GF12229@aemeltch-MOBL1>
-References: <1349395197-12395-1-git-send-email-sasha.levin@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1349395197-12395-1-git-send-email-sasha.levin@oracle.com>
+Message-id: <506EA0F0.4070501@samsung.com>
+Date: Fri, 05 Oct 2012 17:57:20 +0900
+From: Chan-yeol Park <chanyeol.park@samsung.com>
+MIME-version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	chanyeol.park@samsung.com, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 4/4] audio: Add check for non-a2dp codec
+References: <1349356447-8369-1-git-send-email-chanyeol.park@samsung.com>
+ <CABBYNZKHzKv+GQhynnGN04O17kwjDobwL-+CeVB9hJqrVEF05A@mail.gmail.com>
+ <506E8AA5.7090709@gmail.com> <1349426477.27233.44.camel@aeonflux>
+In-reply-to: <1349426477.27233.44.camel@aeonflux>
+Content-type: text/plain; charset=UTF-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sasha,
+Hi Marcel,
+On 10/05/2012 05:41 PM, Marcel Holtmann wrote:
+> Hi Chan-yeol,
+>
+>>>    #define SBC_SAMPLING_FREQ_16000                (1 << 3)
+>>>    #define SBC_SAMPLING_FREQ_32000                (1 << 2)
+>>> @@ -114,3 +115,8 @@ typedef struct {
+>>>    #else
+>>>    #error "Unknown byte order"
+>>>    #endif
+>>> +
+>>> +typedef struct {
+>>> +       uint8_t vendor_id[4];
+>>> +       uint8_t codec_id[2];
+>>> +} __attribute__ ((packed)) non_a2dp_vendor_codec_t;
+>>> We normally don't typedef this type of structs, besides
+>>> a2dp_vendor_codec should be enough so this should be named struct
+>>> a2dp_vendor_codec.
+>> You're right. originally I didn't use typedef.
+>> but in order to achieve harmony in a2dp-codecs.h like sbc,mpeg, I've
+>> changed it.
+>>
+>> If you make decision about this, I will raise a second patch.
+> hold on for a second, is this the file that is shared with PulseAudio?
+Yes right. PulseAudio copy it as far as I know.
 
-On Thu, Oct 04, 2012 at 07:59:57PM -0400, Sasha Levin wrote:
-> We may currently attempt to free a channel which wasn't created due to
-> an error in the initialization path, this would cause a NULL ptr deref.
-
-Please put oops dump here.
-
-> Introduced in commit 61d6ef3e ("Bluetooth: Make better use of l2cap_chan
-> reference counting").
-> 
-> Signed-off-by: Sasha Levin <sasha.levin@oracle.com>
-> ---
->  net/bluetooth/l2cap_sock.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 083f2bf..66c295a 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -1083,7 +1083,8 @@ static void l2cap_sock_destruct(struct sock *sk)
->  {
->  	BT_DBG("sk %p", sk);
->  
-> -	l2cap_chan_put(l2cap_pi(sk)->chan);
-> +	if (l2cap_pi(sk)->chan)
-> +		l2cap_chan_put(l2cap_pi(sk)->chan);
-
-This does not look right, I suppose you want to put somewhere missing
-chan_hold
-
->  	if (l2cap_pi(sk)->rx_busy_skb) {
->  		kfree_skb(l2cap_pi(sk)->rx_busy_skb);
->  		l2cap_pi(sk)->rx_busy_skb = NULL;
-> -- 
-> 1.7.12
-
-Best regards 
-Andrei Emeltchenko 
+Regards
