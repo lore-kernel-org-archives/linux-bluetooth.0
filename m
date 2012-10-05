@@ -1,104 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 4/7] Bluetooth: AMP: Factor out amp_ctrl_add
-Date: Fri,  5 Oct 2012 16:56:55 +0300
-Message-Id: <1349445419-16788-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1349445419-16788-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1349445419-16788-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 1/7] Bluetooth: L2CAP: Fix using default Flush Timeout for EFS
+Date: Fri,  5 Oct 2012 16:56:52 +0300
+Message-Id: <1349445419-16788-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add ctrl_id parameter to amp_ctrl_add since we always set it
-after function ctrl is created.
+There are two Flush Timeouts: one is old Flush Timeot Option
+which is 2 octets and the second is Flush Timeout inside EFS
+which is 4 octets long.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/amp.h |    2 +-
- net/bluetooth/a2mp.c        |    8 ++------
- net/bluetooth/amp.c         |    7 ++++---
- 3 files changed, 7 insertions(+), 10 deletions(-)
+ include/net/bluetooth/l2cap.h |    3 ++-
+ net/bluetooth/l2cap_core.c    |   10 ++++++----
+ 2 files changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
-index b1e5490..ae2c3e5 100644
---- a/include/net/bluetooth/amp.h
-+++ b/include/net/bluetooth/amp.h
-@@ -26,7 +26,7 @@ struct amp_ctrl {
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index ab58b81..83fb9c7 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -32,7 +32,8 @@
+ /* L2CAP defaults */
+ #define L2CAP_DEFAULT_MTU		672
+ #define L2CAP_DEFAULT_MIN_MTU		48
+-#define L2CAP_DEFAULT_FLUSH_TO		0xffff
++#define L2CAP_DEFAULT_FLUSH_TO		0xFFFF
++#define L2CAP_EFS_DEFAULT_FLUSH_TO	0xFFFFFFFF
+ #define L2CAP_DEFAULT_TX_WINDOW		63
+ #define L2CAP_DEFAULT_EXT_WINDOW	0x3FFF
+ #define L2CAP_DEFAULT_MAX_TX		3
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b4e707b..ab6853d 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -504,7 +504,7 @@ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ 	chan->local_msdu	= L2CAP_DEFAULT_MAX_SDU_SIZE;
+ 	chan->local_sdu_itime	= L2CAP_DEFAULT_SDU_ITIME;
+ 	chan->local_acc_lat	= L2CAP_DEFAULT_ACC_LAT;
+-	chan->local_flush_to	= L2CAP_DEFAULT_FLUSH_TO;
++	chan->local_flush_to	= L2CAP_EFS_DEFAULT_FLUSH_TO;
  
- int amp_ctrl_put(struct amp_ctrl *ctrl);
- void amp_ctrl_get(struct amp_ctrl *ctrl);
--struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr);
-+struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr, u8 id);
- struct amp_ctrl *amp_ctrl_lookup(struct amp_mgr *mgr, u8 id);
- void amp_ctrl_list_flush(struct amp_mgr *mgr);
+ 	l2cap_chan_hold(chan);
  
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index d4946b5..88a4b58 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -316,12 +316,10 @@ static int a2mp_getinfo_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 	if (rsp->status)
- 		return -EINVAL;
+@@ -2714,8 +2714,10 @@ static void l2cap_add_opt_efs(void **ptr, struct l2cap_chan *chan)
+ 		efs.stype	= chan->local_stype;
+ 		efs.msdu	= cpu_to_le16(chan->local_msdu);
+ 		efs.sdu_itime	= cpu_to_le32(chan->local_sdu_itime);
+-		efs.acc_lat	= __constant_cpu_to_le32(L2CAP_DEFAULT_ACC_LAT);
+-		efs.flush_to	= __constant_cpu_to_le32(L2CAP_DEFAULT_FLUSH_TO);
++		efs.acc_lat	=
++			__constant_cpu_to_le32(L2CAP_DEFAULT_ACC_LAT);
++		efs.flush_to	=
++			__constant_cpu_to_le32(L2CAP_EFS_DEFAULT_FLUSH_TO);
+ 		break;
  
--	ctrl = amp_ctrl_add(mgr);
-+	ctrl = amp_ctrl_add(mgr, rsp->id);
- 	if (!ctrl)
- 		return -ENOMEM;
+ 	case L2CAP_MODE_STREAMING:
+@@ -2732,7 +2734,7 @@ static void l2cap_add_opt_efs(void **ptr, struct l2cap_chan *chan)
+ 	}
  
--	ctrl->id = rsp->id;
--
- 	req.id = rsp->id;
- 	a2mp_send(mgr, A2MP_GETAMPASSOC_REQ, __next_ident(mgr), sizeof(req),
- 		  &req);
-@@ -461,7 +459,7 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 
- 	ctrl = amp_ctrl_lookup(mgr, rsp.remote_id);
- 	if (!ctrl) {
--		ctrl = amp_ctrl_add(mgr);
-+		ctrl = amp_ctrl_add(mgr, rsp.remote_id);
- 		if (ctrl) {
- 			amp_ctrl_get(ctrl);
- 		} else {
-@@ -474,8 +472,6 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 		size_t assoc_len = le16_to_cpu(hdr->len) - sizeof(*req);
- 		u8 *assoc;
- 
--		ctrl->id = rsp.remote_id;
--
- 		assoc = kzalloc(assoc_len, GFP_KERNEL);
- 		if (!assoc) {
- 			amp_ctrl_put(ctrl);
-diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index b6e1c3a..2fc5562 100644
---- a/net/bluetooth/amp.c
-+++ b/net/bluetooth/amp.c
-@@ -45,7 +45,7 @@ int amp_ctrl_put(struct amp_ctrl *ctrl)
- 	return kref_put(&ctrl->kref, &amp_ctrl_destroy);
+ 	l2cap_add_conf_opt(ptr, L2CAP_CONF_EFS, sizeof(efs),
+-							(unsigned long) &efs);
++			   (unsigned long) &efs);
  }
  
--struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr)
-+struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr, u8 id)
- {
- 	struct amp_ctrl *ctrl;
- 
-@@ -53,12 +53,13 @@ struct amp_ctrl *amp_ctrl_add(struct amp_mgr *mgr)
- 	if (!ctrl)
- 		return NULL;
- 
-+	kref_init(&ctrl->kref);
-+	ctrl->id = id;
-+
- 	mutex_lock(&mgr->amp_ctrls_lock);
- 	list_add(&ctrl->list, &mgr->amp_ctrls);
- 	mutex_unlock(&mgr->amp_ctrls_lock);
- 
--	kref_init(&ctrl->kref);
--
- 	BT_DBG("mgr %p ctrl %p", mgr, ctrl);
- 
- 	return ctrl;
+ static void l2cap_ack_timeout(struct work_struct *work)
 -- 
 1.7.9.5
 
