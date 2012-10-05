@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 6/7] Bluetooth: AMP: Use block_mtu for AMP controller
-Date: Fri,  5 Oct 2012 16:56:57 +0300
-Message-Id: <1349445419-16788-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 2/7] Bluetooth: AMP: Fix possible NULL dereference
+Date: Fri,  5 Oct 2012 16:56:53 +0300
+Message-Id: <1349445419-16788-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1349445419-16788-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1349445419-16788-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,42 +11,28 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Check that link key exist before accessing.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |   18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+ net/bluetooth/amp.c |    4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index ab6853d..3066157 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1390,10 +1390,22 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index 5dab2d1..b6e1c3a 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -184,6 +184,10 @@ int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type)
+ 	*len = HCI_AMP_LINK_KEY_SIZE;
  
- 	BT_DBG("hcon %p conn %p hchan %p", hcon, conn, hchan);
- 
--	if (hcon->hdev->le_mtu && hcon->type == LE_LINK)
--		conn->mtu = hcon->hdev->le_mtu;
--	else
-+	switch (hcon->type) {
-+	case AMP_LINK:
-+		conn->mtu = hcon->hdev->block_mtu;
-+		break;
-+
-+	case LE_LINK:
-+		if (hcon->hdev->le_mtu) {
-+			conn->mtu = hcon->hdev->le_mtu;
-+			break;
-+		}
-+		/* fall through */
-+
-+	default:
- 		conn->mtu = hcon->hdev->acl_mtu;
-+		break;
+ 	key = hci_find_link_key(hdev, &conn->dst);
++	if (!key) {
++		BT_DBG("No Link key for conn %p dst %pMR", conn, &conn->dst);
++		return -EACCES;
 +	}
  
- 	conn->src = &hcon->hdev->bdaddr;
- 	conn->dst = &hcon->dst;
+ 	/* BR/EDR Link Key concatenated together with itself */
+ 	memcpy(&keybuf[0], key->val, HCI_LINK_KEY_SIZE);
 -- 
 1.7.9.5
 
