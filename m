@@ -1,33 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] device: Remove bogus line from device_create_bonding
-Date: Fri, 5 Oct 2012 13:08:37 +0200
-Message-ID: <1349435317-10736-1-git-send-email-szymon.janc@tieto.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/7] adapter: Convert adapter_get_address into simple getter
+Date: Fri, 5 Oct 2012 13:00:43 +0200
+Message-ID: <2873952.xf1WXSFxdW@uw000953>
+In-Reply-To: <CAJdJm_N7omVUmhsmWoOUyCmuWojAKN5Lms=6a0qwbsYbXCf_Bw@mail.gmail.com>
+References: <1349425021-16766-1-git-send-email-szymon.janc@tieto.com> <CAJdJm_N7omVUmhsmWoOUyCmuWojAKN5Lms=6a0qwbsYbXCf_Bw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a typo from 899e6561d284806007b7e57e1ab3b65e54be3d22.
+On Friday 05 of October 2012 13:54:17 Anderson Lizardo wrote:
+> Hi Szymon,
 
----
- src/device.c |    1 -
- 1 file changed, 1 deletion(-)
+Hi,
 
-diff --git a/src/device.c b/src/device.c
-index 1c65b68..0d25631 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2549,7 +2549,6 @@ DBusMessage *device_create_bonding(struct btd_device *device,
- 	if (device_is_bonded(device))
- 		return btd_error_already_exists(msg);
- 
--				adapter_get_address(adapter),
- 	bonding = bonding_request_new(msg, device, agent_path,
- 					capability);
- 
+> 
+> On Fri, Oct 5, 2012 at 4:16 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> > @@ -2578,6 +2557,7 @@ DBusMessage *device_create_bonding(struct btd_device *device,
+> >         if (device_is_bonded(device))
+> >                 return btd_error_already_exists(msg);
+> >
+> > +                               adapter_get_address(adapter),
+> >         bonding = bonding_request_new(msg, device, agent_path,
+> >                                         capability);
+> >
+> 
+> The above looks like a typo (and unfortunately, it compiles, due to the comma).
+
+
+Crap, will send fix asap.
+
 -- 
-1.7.9.5
-
+BR
+Szymon Janc
