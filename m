@@ -1,57 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLzCx+4kAwtq6+pcc_uBX1=jJE-CXU2aAat00bGe_Kd8A@mail.gmail.com>
+References: <1349383353-16733-1-git-send-email-lucas.demarchi@profusion.mobi>
+	<CABBYNZLzCx+4kAwtq6+pcc_uBX1=jJE-CXU2aAat00bGe_Kd8A@mail.gmail.com>
+Date: Fri, 5 Oct 2012 22:31:48 +0300
+Message-ID: <CABBYNZJEmiEtBUEzEHbJWePVJUxqRGVP_dwKo=zU+tofQ8=jdA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gdbus: Fix invalid memory access while unregistering
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/9] gdbus: Remove connection from g_dbus_remove_watch
-Date: Fri,  5 Oct 2012 23:20:42 +0200
-Message-Id: <1349472050-25928-1-git-send-email-luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Lucas,
 
-The connection is not really needed since the list of listeners is
-global not per connection, besides it is more convenient this way as
-only the id is needed.
----
- gdbus/gdbus.h | 2 +-
- gdbus/watch.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+On Thu, Oct 4, 2012 at 11:57 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Lucas,
+>
+> On Thu, Oct 4, 2012 at 11:42 PM, Lucas De Marchi
+> <lucas.demarchi@profusion.mobi> wrote:
+>> If an interface is added and removed on the same mailoop iteration,
+>> ObjectManager would try to send InterfacesAdded signal while running the
+>> idler because the interface was added to data->added list.
+>>
+>> This is easily reproduced by forcing an error path in a plugin
+>> registration, like on sap_server_register(), resulting in the following
+>> error:
+>>
+>> ==11795== Invalid read of size 4
+>> ==11795==    at 0x496F592: dbus_message_iter_append_basic (dbus-message.c:2598)
+>> ==11795==    by 0x117B39: append_interface (object.c:554)
+>> ==11795==    by 0x48955E7: g_slist_foreach (gslist.c:840)
+>> ==11795==    by 0x11923B: process_changes (object.c:592)
+>> ==11795==    by 0x11956D: generic_unregister (object.c:980)
+>> ==11795==    by 0x4973BAC: _dbus_object_tree_unregister_and_unlock (dbus-object-tree.c:516)
+>> ==11795==    by 0x4965240: dbus_connection_unregister_object_path (dbus-connection.c:5776)
+>> ==11795==    by 0x1178A5: object_path_unref (object.c:1219)
+>> ==11795==    by 0x118517: g_dbus_unregister_interface (object.c:1344)
+>> ==11795==    by 0x19AF5B: sap_exit (sap.c:385)
+>> ==11795==    by 0x13E9E2: sap_server_register (server.c:1428)
+>> ==11795==    by 0x13C092: sap_server_probe (manager.c:44)
+>>
+>> With this patch we don't send the InterfacesAdded signal, removing it
+>> from data->added while unregistering.
+>> ---
+>>  gdbus/object.c | 11 +++++++++++
+>>  1 file changed, 11 insertions(+)
+>>
+>> diff --git a/gdbus/object.c b/gdbus/object.c
+>> index c63a26d..444728c 100644
+>> --- a/gdbus/object.c
+>> +++ b/gdbus/object.c
+>> @@ -657,6 +657,17 @@ static gboolean remove_interface(struct generic_data *data, const char *name)
+>>                 return TRUE;
+>>         }
+>>
+>> +       /*
+>> +        * Interface being removed was just added, on the same mainloop
+>> +        * iteration? Don't send any signal
+>> +        */
+>> +       if (g_slist_find(data->added, iface)) {
+>> +               data->added = g_slist_remove(data->added, iface);
+>> +               g_free(iface->name);
+>> +               g_free(iface);
+>> +               return TRUE;
+>> +       }
+>> +
+>>         data->removed = g_slist_prepend(data->removed, iface->name);
+>>         g_free(iface);
+>>
+>> --
+>> 1.7.12.2
+>
+> Ack, gonna apply it tomorrow in case of no objections.
 
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index a96c97f..065fd6f 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -243,7 +243,7 @@ guint g_dbus_add_signal_watch(DBusConnection *connection,
- 				const char *interface, const char *member,
- 				GDBusSignalFunction function, void *user_data,
- 				GDBusDestroyFunction destroy);
--gboolean g_dbus_remove_watch(DBusConnection *connection, guint tag);
-+gboolean g_dbus_remove_watch(guint id);
- void g_dbus_remove_all_watches(DBusConnection *connection);
- 
- void g_dbus_pending_property_success(DBusConnection *connection,
-diff --git a/gdbus/watch.c b/gdbus/watch.c
-index 07feb61..00cedae 100644
---- a/gdbus/watch.c
-+++ b/gdbus/watch.c
-@@ -285,7 +285,7 @@ static void filter_data_free(struct filter_data *data)
- 		g_free(l->data);
- 
- 	g_slist_free(data->callbacks);
--	g_dbus_remove_watch(data->connection, data->name_watch);
-+	g_dbus_remove_watch(data->name_watch);
- 	g_free(data->name);
- 	g_free(data->owner);
- 	g_free(data->path);
-@@ -752,7 +752,7 @@ guint g_dbus_add_signal_watch(DBusConnection *connection,
- 	return cb->id;
- }
- 
--gboolean g_dbus_remove_watch(DBusConnection *connection, guint id)
-+gboolean g_dbus_remove_watch(guint id)
- {
- 	struct filter_data *data;
- 	struct filter_callback *cb;
+Applied, thanks.
+
+
 -- 
-1.7.11.4
-
+Luiz Augusto von Dentz
