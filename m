@@ -1,42 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <506E8AA5.7090709@gmail.com>
-Date: Fri, 05 Oct 2012 16:22:13 +0900
-From: Chan-yeol Park <chanyeol.park@gmail.com>
 MIME-version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: chanyeol.park@samsung.com, linux-bluetooth@vger.kernel.org
+Content-type: text/plain; charset=UTF-8; format=flowed
+Message-id: <506E47CE.4060508@samsung.com>
+Date: Fri, 05 Oct 2012 11:37:02 +0900
+From: Chan-yeol Park <chanyeol.park@samsung.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-bluetooth@vger.kernel.org
+Cc: chanyeol.park@samsung.com
 Subject: Re: [PATCH 4/4] audio: Add check for non-a2dp codec
 References: <1349356447-8369-1-git-send-email-chanyeol.park@samsung.com>
  <CABBYNZKHzKv+GQhynnGN04O17kwjDobwL-+CeVB9hJqrVEF05A@mail.gmail.com>
-In-reply-to: <CABBYNZKHzKv+GQhynnGN04O17kwjDobwL-+CeVB9hJqrVEF05A@mail.gmail.com>
-Content-type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+ <1349374107.27233.36.camel@aeonflux>
+ <CABBYNZ+qKN_q9-t1a_i3FayCUxZ2a8M9x6USKVn-Ssy7eBNYzg@mail.gmail.com>
+ <1349382629.27233.43.camel@aeonflux>
+In-reply-to: <1349382629.27233.43.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi All,
 
-On 10/04/2012 11:02 PM, Luiz Augusto von Dentz wrote:
->   #define SBC_SAMPLING_FREQ_16000                (1 << 3)
->   #define SBC_SAMPLING_FREQ_32000                (1 << 2)
-> @@ -114,3 +115,8 @@ typedef struct {
->   #else
->   #error "Unknown byte order"
->   #endif
-> +
-> +typedef struct {
-> +       uint8_t vendor_id[4];
-> +       uint8_t codec_id[2];
-> +} __attribute__ ((packed)) non_a2dp_vendor_codec_t;
-> We normally don't typedef this type of structs, besides
-> a2dp_vendor_codec should be enough so this should be named struct
-> a2dp_vendor_codec.
-You're right. originally I didn't use typedef.
-but in order to achieve harmony in a2dp-codecs.h like sbc,mpeg, I've 
-changed it.
+On 10/05/2012 05:30 AM, Marcel Holtmann wrote:
+> Hi Luiz,
+>
+>>>>> This patch adds checks(vendor ID, vendor specific codec ID) to make sure of
+>>>>> non-a2dp codec selection.
+>>>>> ---
+>>>>>   audio/a2dp-codecs.h |    6 +++++
+>>>>>   audio/a2dp.c        |   68 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>>>>   2 files changed, 73 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/audio/a2dp-codecs.h b/audio/a2dp-codecs.h
+>>>>> index 51c796a..e3d2cba 100644
+>>>>> --- a/audio/a2dp-codecs.h
+>>>>> +++ b/audio/a2dp-codecs.h
+>>>>> @@ -26,6 +26,7 @@
+>>>>>   #define A2DP_CODEC_MPEG12              0x01
+>>>>>   #define A2DP_CODEC_MPEG24              0x02
+>>>>>   #define A2DP_CODEC_ATRAC               0x03
+>>>>> +#define A2DP_CODEC_NON_A2DP            0xFF
+>>>> I prefer A2DP_CODEC_VENDOR
+>>> what is the specification calling these? And yes, I would prefer VENDOR
+>>> as well.
+>> Apparently it comes from the assigned numbers
+>> http://www.bluetooth.org/Technical/AssignedNumbers/audio-video.htm:
+>>
+>> 1	1	1	1	1	1	1	1	non-A2DP	n/a	A2DP
+>>
+>> But the spec refer to it as 4.7 Vendor Specific A2DP Codec, IMO the
+>> term non-A2DP can be confused with not defined in A2DP spec when in
+>> fact it is defined:
+>>
+>> "4.2.3 Vendor Specific A2DP Codecs
+>> The device may support other codecs as Vendor Specific A2DP codecs. A
+>> user of a Vendor Specific A2DP codec (hereafter the Vendor) will need
+>> to define parameters and other information necessary for use of the
+>> codec in A2DP."
+>>
+>> There is no such a thing as non-A2DP in the spec, so again to avoid
+>> confusion I would stick to the terminology vendor or vendor specific.
+> lets use "vendor" for these. Otherwise the function and variable naming
+> gets too complicated.
+As you guided I prefer "vendor" codec rather than "non-a2dp" codec. I 
+just follow the word in the spec 1.2 because current bluez A2DP version 
+is 1.2.  Actually A2DP spec changes the name of 0xff codec from 1.2 to 
+1.3 like the below.
 
-If you make decision about this, I will raise a second patch.
+1.4 Bluetooth A2DP Profile Change History
+1.4.1 Changes from 1.2 to 1.3
+1.4.1.1 General Changes
+· Non-A2DP codecs from A2DP 1.2 are now referred to as Vendor-Specific 
+A2DP codecs
+
+Anyway I think "vendor" is more suitable than "non-a2dp".
+I will raise a second patch.
 
 Regards
 Chanyeol
-
-
