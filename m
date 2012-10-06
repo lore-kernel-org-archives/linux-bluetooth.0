@@ -1,90 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 8 Oct 2012 05:41:17 +0800
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Sasha Levin <sasha.levin@oracle.com>
-Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
-	davej@redhat.com, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] net, bluetooth: don't attempt to free a channel that
- wasn't created
-Message-ID: <20121007214117.GA13325@joana>
-References: <1349395197-12395-1-git-send-email-sasha.levin@oracle.com>
- <20121005102159.GF12229@aemeltch-MOBL1>
- <506EF827.3060100@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <506EF827.3060100@oracle.com>
+In-Reply-To: <1349530857.27233.45.camel@aeonflux>
+References: <1349472050-25928-1-git-send-email-luiz.dentz@gmail.com>
+	<1349530857.27233.45.camel@aeonflux>
+Date: Sat, 6 Oct 2012 18:09:16 +0300
+Message-ID: <CABBYNZLfkNu5-Jynoz14hY9U2bY77qzG0_yQJCoYAw+H5UUqQw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/9] gdbus: Remove connection from g_dbus_remove_watch
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sasha,
+Hi Marcel,
 
-* Sasha Levin <sasha.levin@oracle.com> [2012-10-05 11:09:27 -0400]:
+On Sat, Oct 6, 2012 at 4:40 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
+>
+>> The connection is not really needed since the list of listeners is
+>> global not per connection, besides it is more convenient this way as
+>> only the id is needed.
+>
+> they are not global, they are per connection. That we do not fully
+> implement this correctly is another story. That should be fixed here.
 
-> On 10/05/2012 06:22 AM, Andrei Emeltchenko wrote:
-> > Hi Sasha,
-> > 
-> > On Thu, Oct 04, 2012 at 07:59:57PM -0400, Sasha Levin wrote:
-> >> We may currently attempt to free a channel which wasn't created due to
-> >> an error in the initialization path, this would cause a NULL ptr deref.
-> > 
-> > Please put oops dump here.
-> 
-> [   12.919073] BUG: unable to handle kernel NULL pointer dereference at 0000000000000010
-> [   12.919131] IP: [<ffffffff836645c4>] l2cap_chan_put+0x34/0x50
-> [   12.919135] PGD 0
-> [   12.919138] Oops: 0002 [#1] PREEMPT SMP DEBUG_PAGEALLOC
-> [   12.919193] Dumping ftrace buffer:
-> [   12.919242]    (ftrace buffer empty)
-> [   12.919314] Modules linked in:
-> [   12.919318] CPU 1
-> [   12.919319] Pid: 6210, comm: krfcommd Tainted: G        W    3.6.0-next-20121004-sasha-00005-gb010653-dirty #30
-> [   12.919374] RIP: 0010:[<ffffffff836645c4>]  [<ffffffff836645c4>] l2cap_chan_put+0x34/0x50
-> [   12.919377] RSP: 0000:ffff880066933c38  EFLAGS: 00010246
-> [   12.919378] RAX: ffffffff8366c780 RBX: 0000000000000000 RCX: 6666666666666667
-> [   12.919379] RDX: 0000000000000fa0 RSI: ffffffff84d3f79e RDI: 0000000000000010
-> [   12.919381] RBP: ffff880066933c48 R08: ffffffff859989f8 R09: 0000000000000001
-> [   12.919382] R10: 0000000000000000 R11: 7fffffffffffffff R12: 0000000000000000
-> [   12.919383] R13: ffff88009b00a200 R14: ffff88009b00a200 R15: 0000000000000001
-> [   12.919385] FS:  0000000000000000(0000) GS:ffff880033600000(0000) knlGS:0000000000000000
-> [   12.919437] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [   12.919440] CR2: 0000000000000010 CR3: 0000000005026000 CR4: 00000000000406e0
-> [   12.919446] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> [   12.919451] DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-> [   12.919504] Process krfcommd (pid: 6210, threadinfo ffff880066932000, task ffff880065c4b000)
-> [   12.919506] Stack:
-> [   12.919510]  ffff88009b00a200 ffff880032084000 ffff880066933c68 ffffffff8366c7bc
-> [   12.919513]  7fffffffffffffff ffff880032084000 ffff880066933c98 ffffffff833ae0ae
-> [   12.919516]  ffff880066933ca8 0000000000000000 0000000000000000 ffff88009b00a200
-> [   12.919517] Call Trace:
-> [   12.919522]  [<ffffffff8366c7bc>] l2cap_sock_destruct+0x3c/0x80
-> [   12.919527]  [<ffffffff833ae0ae>] __sk_free+0x1e/0x1f0
-> [   12.919530]  [<ffffffff833ae2f7>] sk_free+0x17/0x20
-> [   12.919585]  [<ffffffff8366ca4e>] l2cap_sock_alloc.constprop.5+0x9e/0xd0
-> [   12.919591]  [<ffffffff8366cb9e>] l2cap_sock_create+0x7e/0x100
-> [   12.919652]  [<ffffffff83a4f32a>] ? _raw_read_lock+0x6a/0x80
-> [   12.919658]  [<ffffffff836402c4>] ? bt_sock_create+0x74/0x110
-> [   12.919660]  [<ffffffff83640308>] bt_sock_create+0xb8/0x110
-> [   12.919664]  [<ffffffff833aa232>] __sock_create+0x282/0x3b0
-> [   12.919720]  [<ffffffff833aa0b0>] ? __sock_create+0x100/0x3b0
-> [   12.919725]  [<ffffffff836785b0>] ? rfcomm_process_sessions+0x17e0/0x17e0
-> [   12.919779]  [<ffffffff833aa37f>] sock_create_kern+0x1f/0x30
-> [   12.919784]  [<ffffffff83675714>] rfcomm_l2sock_create+0x44/0x70
-> [   12.919787]  [<ffffffff836785b0>] ? rfcomm_process_sessions+0x17e0/0x17e0
-> [   12.919790]  [<ffffffff836785fe>] rfcomm_run+0x4e/0x1f0
-> [   12.919846]  [<ffffffff836785b0>] ? rfcomm_process_sessions+0x17e0/0x17e0
-> [   12.919852]  [<ffffffff81138ee3>] kthread+0xe3/0xf0
-> [   12.919908]  [<ffffffff8117b12e>] ? put_lock_stats.isra.14+0xe/0x40
-> [   12.919914]  [<ffffffff81138e00>] ? flush_kthread_work+0x1f0/0x1f0
-> [   12.919968]  [<ffffffff83a5077c>] ret_from_fork+0x7c/0x90
-> [   12.919973]  [<ffffffff81138e00>] ? flush_kthread_work+0x1f0/0x1f0
-> [   12.920161] Code: 83 ec 08 f6 05 ff 58 44 02 04 74 1b 8b 4f 10 48 89 fa 48 c7 c6 d9 d7 d4 84 48 c7 c7 80 9e aa 85 31 c0 e8 80
-> ac 3a fe 48 8d 7b 10 <f0> 83 6b 10 01 0f 94 c0 84 c0 74 05 e8 8b e0 ff ff 48 83 c4 08
-> [   12.920165] RIP  [<ffffffff836645c4>] l2cap_chan_put+0x34/0x50
-> [   12.920166]  RSP <ffff880066933c38>
-> [   12.920167] CR2: 0000000000000010
-> [   12.920417] ---[ end trace 5a9114e8a158ab84 ]---
+Not sure if Im following you, the point here is that the caller only
+need to store the id because the data that the id refer to already
+store the connection as context. Btw let me paste what
+g_dbus_remove_watch does:
 
-Can you append the crash output to the commit message and resend this patch? 
+	for (ldata = listeners; ldata; ldata = ldata->next) {
+		data = ldata->data;
 
-	Gustavo
+		cb = filter_data_find_callback(data, id);
+		if (cb) {
+			filter_data_remove_callback(data, cb);
+			return TRUE;
+		}
+	}
+
+So as per current implementation the listeners are global, you can
+argue it is not very efficient and can cause extra iteration if there
+are more connections but overall this seems to pay off to avoid having
+the caller to manage connection. Btw this is the same approach glib
+uses regarding io watches, they are global so you don't have to store
+the GIOChannel together with the id to be able to remove them as the
+g_source_remove only takes the id.
+
+-- 
+Luiz Augusto von Dentz
