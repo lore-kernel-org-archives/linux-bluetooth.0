@@ -2,63 +2,76 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: [PATCH BlueZ 2/6] core: Remove useless memset and make icon optional
-Date: Sat,  6 Oct 2012 04:10:44 -0300
-Message-Id: <1349507448-9595-2-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1349507448-9595-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1349507448-9595-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ 1/6] gdbus: Fix up Properties.Set() code path
+Date: Sat,  6 Oct 2012 04:10:43 -0300
+Message-Id: <1349507448-9595-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Lucas De Marchi <lucas.de.marchi@gmail.com>
 
-name is not being really used anywhere, so remove it together with the
-memset from Device.GetProperties().
+Minor fixes to make setter actually work:
 
-icon is optional, so check if it's not NULL before adding it to the list
-of device properties.
+	- Add propdata in pending_property_set
+	- Break loop when we are removing propdata from list and we
+	  found it
+	- in_args and out_args were swapped
+	- interface and method name arguments were swapped
 ---
+ gdbus/object.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-I'm about to remove this function entirely on the next patch, but I preferred
-doing like this to facilitate the review, which is mostly copy and paste from
-the current code.
-
- src/device.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/src/device.c b/src/device.c
-index 656f109..3658eeb 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -318,7 +318,7 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 	DBusMessage *reply;
- 	DBusMessageIter iter;
- 	DBusMessageIter dict;
--	char name[MAX_NAME_LENGTH + 1], dstaddr[18];
-+	char dstaddr[18];
- 	char **str;
- 	const char *ptr, *icon = NULL;
- 	dbus_bool_t boolean;
-@@ -345,9 +345,6 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 	dict_append_entry(&dict, "Address", DBUS_TYPE_STRING, &ptr);
- 
- 	/* Name */
--	ptr = NULL;
--	memset(name, 0, sizeof(name));
--
- 	ptr = device->name;
- 	dict_append_entry(&dict, "Name", DBUS_TYPE_STRING, &ptr);
- 
-@@ -375,7 +372,8 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 		dict_append_entry(&dict, "Appearance", DBUS_TYPE_UINT16, &app);
+diff --git a/gdbus/object.c b/gdbus/object.c
+index 444728c..66431de 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -433,6 +433,8 @@ static struct property_data *remove_pending_property_data(
+ 		propdata = l->data;
+ 		if (propdata->id != id)
+ 			continue;
++
++		break;
  	}
  
--	dict_append_entry(&dict, "Icon", DBUS_TYPE_STRING, &icon);
-+	if (icon != NULL)
-+		dict_append_entry(&dict, "Icon", DBUS_TYPE_STRING, &icon);
+ 	if (l == NULL)
+@@ -844,7 +846,7 @@ static DBusMessage *properties_set(DBusConnection *connection,
+ 					"Invalid argument type: '%c'",
+ 					dbus_message_iter_get_arg_type(&iter));
  
- 	/* Vendor */
- 	if (device->vendor)
+-	dbus_message_iter_get_basic(&iter, &name);
++	dbus_message_iter_get_basic(&iter, &interface);
+ 	dbus_message_iter_next(&iter);
+ 
+ 	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
+@@ -852,7 +854,7 @@ static DBusMessage *properties_set(DBusConnection *connection,
+ 					"Invalid argument type: '%c'",
+ 					dbus_message_iter_get_arg_type(&iter));
+ 
+-	dbus_message_iter_get_basic(&iter, &interface);
++	dbus_message_iter_get_basic(&iter, &name);
+ 	dbus_message_iter_next(&iter);
+ 
+ 	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_VARIANT)
+@@ -887,6 +889,7 @@ static DBusMessage *properties_set(DBusConnection *connection,
+ 	propdata = g_new(struct property_data, 1);
+ 	propdata->id = next_pending_property++;
+ 	propdata->message = dbus_message_ref(message);
++	pending_property_set = g_slist_prepend(pending_property_set, propdata);
+ 
+ 	property->set(property, &sub, propdata->id, iface->user_data);
+ 
+@@ -898,9 +901,10 @@ static const GDBusMethodTable properties_methods[] = {
+ 			GDBUS_ARGS({ "interface", "s" }, { "name", "s" }),
+ 			GDBUS_ARGS({ "value", "v" }),
+ 			properties_get) },
+-	{ GDBUS_ASYNC_METHOD("Set", NULL,
++	{ GDBUS_ASYNC_METHOD("Set",
+ 			GDBUS_ARGS({ "interface", "s" }, { "name", "s" },
+ 							{ "value", "v" }),
++			NULL,
+ 			properties_set) },
+ 	{ GDBUS_METHOD("GetAll",
+ 			GDBUS_ARGS({ "interface", "s" }),
 -- 
 1.7.12.2
 
