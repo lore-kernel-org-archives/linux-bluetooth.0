@@ -2,479 +2,496 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: [PATCH BlueZ 5/6] core: Add setters and signals to Device interface
-Date: Sat,  6 Oct 2012 04:02:39 -0300
-Message-Id: <1349506960-9398-5-git-send-email-lucas.de.marchi@gmail.com>
+Subject: [PATCH BlueZ 4/6] core: Add DBus.Properties getters for Device interface
+Date: Sat,  6 Oct 2012 04:02:38 -0300
+Message-Id: <1349506960-9398-4-git-send-email-lucas.de.marchi@gmail.com>
 In-Reply-To: <1349506960-9398-1-git-send-email-lucas.de.marchi@gmail.com>
 References: <1349506960-9398-1-git-send-email-lucas.de.marchi@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/device.c | 257 +++++++++++++++++++++++++++++++----------------------------
- 1 file changed, 133 insertions(+), 124 deletions(-)
+ src/device.c | 407 ++++++++++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 319 insertions(+), 88 deletions(-)
 
 diff --git a/src/device.c b/src/device.c
-index 95543cb..d78b294 100644
+index 3658eeb..95543cb 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -358,6 +358,27 @@ static gboolean dev_property_get_alias(const GDBusPropertyTable *property,
- 	return TRUE;
+@@ -310,128 +310,332 @@ gboolean device_is_trusted(struct btd_device *device)
+ 	return device->trusted;
  }
  
-+static void set_alias(GDBusPendingPropertySet id, const char *alias,
-+								void *data);
-+
-+static void dev_property_set_alias(const GDBusPropertyTable *property,
-+					DBusMessageIter *value,
-+					GDBusPendingPropertySet id, void *data)
-+{
-+	const char *alias;
-+
-+	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_STRING) {
-+		g_dbus_pending_property_error(btd_get_dbus_connection(),
-+				id, ERROR_INTERFACE ".InvalidArguments",
-+				"Invalid arguments in method call");
-+		return;
-+	}
-+
-+	dbus_message_iter_get_basic(value, &alias);
-+
-+	set_alias(id, alias, data);
-+}
-+
- static gboolean get_class(const GDBusPropertyTable *property, void *data,
- 							uint32_t *class)
+-static DBusMessage *get_properties(DBusConnection *conn,
+-				DBusMessage *msg, void *user_data)
++static gboolean dev_property_get_address(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
  {
-@@ -566,6 +587,26 @@ static gboolean dev_property_get_trusted(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
-+static void set_trust(GDBusPendingPropertySet id, gboolean value, void *data);
-+
-+static void dev_property_set_trusted(const GDBusPropertyTable *property,
-+					DBusMessageIter *value,
-+					GDBusPendingPropertySet id, void *data)
-+{
-+	dbus_bool_t b;
-+
-+	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_BOOLEAN) {
-+		g_dbus_pending_property_error(btd_get_dbus_connection(),
-+				id, ERROR_INTERFACE ".InvalidArguments",
-+				"Invalid arguments in method call");
-+		return;
-+	}
-+
-+	dbus_message_iter_get_basic(value, &b);
-+
-+	set_trust(id, b, data);
-+}
-+
- static gboolean dev_property_get_blocked(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data)
- {
-@@ -577,6 +618,26 @@ static gboolean dev_property_get_blocked(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
-+static void set_blocked(GDBusPendingPropertySet id, gboolean value, void *data);
-+
-+static void dev_property_set_blocked(const GDBusPropertyTable *property,
-+					DBusMessageIter *value,
-+					GDBusPendingPropertySet id, void *data)
-+{
-+	dbus_bool_t b;
-+
-+	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_BOOLEAN) {
-+		g_dbus_pending_property_error(btd_get_dbus_connection(),
-+				id, ERROR_INTERFACE ".InvalidArguments",
-+				"Invalid arguments in method call");
-+		return;
-+	}
-+
-+	dbus_message_iter_get_basic(value, &b);
-+
-+	set_blocked(id, b, data);
-+}
-+
- static gboolean dev_property_get_connected(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data)
- {
-@@ -638,7 +699,8 @@ static gboolean dev_property_get_adapter(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
--static DBusMessage *set_alias(DBusMessage *msg, const char *alias, void *data)
-+static void set_alias(GDBusPendingPropertySet id, const char *alias,
-+								void *data)
- {
- 	struct btd_device *device = data;
- 	struct btd_adapter *adapter = device->adapter;
-@@ -647,8 +709,10 @@ static DBusMessage *set_alias(DBusMessage *msg, const char *alias, void *data)
- 
- 	/* No change */
- 	if ((device->alias == NULL && g_str_equal(alias, "")) ||
--			g_strcmp0(device->alias, alias) == 0)
--		return dbus_message_new_method_return(msg);
-+					g_strcmp0(device->alias, alias) == 0) {
-+		g_dbus_pending_property_success(btd_get_dbus_connection(), id);
-+		return;
-+	}
- 
- 	ba2str(adapter_get_address(adapter), srcaddr);
- 	ba2str(&device->bdaddr, dstaddr);
-@@ -656,43 +720,49 @@ static DBusMessage *set_alias(DBusMessage *msg, const char *alias, void *data)
- 	/* Remove alias if empty string */
- 	err = write_device_alias(srcaddr, dstaddr, device->bdaddr_type,
- 					g_str_equal(alias, "") ? NULL : alias);
--	if (err < 0)
--		return btd_error_failed(msg, strerror(-err));
-+	if (err < 0) {
-+		g_dbus_pending_property_error(btd_get_dbus_connection(),
-+				id, ERROR_INTERFACE ".Failed", strerror(-err));
-+		return;
-+	}
- 
- 	g_free(device->alias);
- 	device->alias = g_str_equal(alias, "") ? NULL : g_strdup(alias);
- 
--	emit_property_changed(dbus_message_get_path(msg),
--				DEVICE_INTERFACE, "Alias",
--				DBUS_TYPE_STRING, &alias);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+				device->path, DEVICE_INTERFACE, "Alias");
- 
--	return dbus_message_new_method_return(msg);
-+	g_dbus_pending_property_success(btd_get_dbus_connection(), id);
- }
- 
--static DBusMessage *set_trust(DBusMessage *msg, gboolean value, void *data)
-+static void set_trust(GDBusPendingPropertySet id, gboolean value, void *data)
- {
- 	struct btd_device *device = data;
- 	struct btd_adapter *adapter = device->adapter;
- 	char srcaddr[18], dstaddr[18];
- 	int err;
- 
--	if (device->trusted == value)
--		return dbus_message_new_method_return(msg);
-+	if (device->trusted == value) {
-+		g_dbus_pending_property_success(btd_get_dbus_connection(), id);
-+		return;
-+	}
- 
- 	ba2str(adapter_get_address(adapter), srcaddr);
- 	ba2str(&device->bdaddr, dstaddr);
- 
- 	err = write_trust(srcaddr, dstaddr, device->bdaddr_type, value);
--	if (err < 0)
--		return btd_error_failed(msg, strerror(-err));
-+	if (err < 0) {
-+		g_dbus_pending_property_error(btd_get_dbus_connection(),
-+				id, ERROR_INTERFACE ".Failed", strerror(-err));
-+		return;
-+	}
- 
- 	device->trusted = value;
- 
--	emit_property_changed(dbus_message_get_path(msg),
--				DEVICE_INTERFACE, "Trusted",
--				DBUS_TYPE_BOOLEAN, &value);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+				device->path, DEVICE_INTERFACE, "Trusted");
- 
--	return dbus_message_new_method_return(msg);
-+	g_dbus_pending_property_success(btd_get_dbus_connection(), id);
- }
- 
- static void profile_remove(struct btd_profile *profile,
-@@ -743,9 +813,8 @@ int device_block(struct btd_device *device, gboolean update_only)
- 
- 	device_set_temporary(device, FALSE);
- 
--	emit_property_changed(device->path,
--				DEVICE_INTERFACE, "Blocked",
--				DBUS_TYPE_BOOLEAN, &device->blocked);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), device->path,
-+						DEVICE_INTERFACE, "Blocked");
- 
- 	return 0;
- }
-@@ -773,16 +842,16 @@ int device_unblock(struct btd_device *device, gboolean silent,
- 		error("write_blocked(): %s (%d)", strerror(-err), -err);
- 
- 	if (!silent) {
--		emit_property_changed(device->path,
--					DEVICE_INTERFACE, "Blocked",
--					DBUS_TYPE_BOOLEAN, &device->blocked);
-+		g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+						device->path, DEVICE_INTERFACE,
-+						"Blocked");
- 		device_probe_profiles(device, device->uuids);
- 	}
- 
- 	return 0;
- }
- 
--static DBusMessage *set_blocked(DBusMessage *msg, gboolean value, void *data)
-+static void set_blocked(GDBusPendingPropertySet id, gboolean value, void *data)
- {
- 	struct btd_device *device = data;
- 	int err;
-@@ -794,61 +863,19 @@ static DBusMessage *set_blocked(DBusMessage *msg, gboolean value, void *data)
- 
- 	switch (-err) {
- 	case 0:
--		return dbus_message_new_method_return(msg);
-+		g_dbus_pending_property_success(btd_get_dbus_connection(), id);
-+		break;
- 	case EINVAL:
--		return btd_error_failed(msg, "Kernel lacks blacklist support");
-+		g_dbus_pending_property_error(btd_get_dbus_connection(), id,
-+					ERROR_INTERFACE ".Failed",
-+					"Kernel lacks blacklist support");
-+		break;
- 	default:
--		return btd_error_failed(msg, strerror(-err));
--	}
--}
--
--static DBusMessage *set_property(DBusConnection *conn,
--				DBusMessage *msg, void *data)
--{
+-	struct btd_device *device = user_data;
+-	struct btd_adapter *adapter = device->adapter;
+-	DBusMessage *reply;
 -	DBusMessageIter iter;
--	DBusMessageIter sub;
--	const char *property;
--
--	if (!dbus_message_iter_init(msg, &iter))
--		return btd_error_invalid_args(msg);
--
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
--		return btd_error_invalid_args(msg);
--
--	dbus_message_iter_get_basic(&iter, &property);
--	dbus_message_iter_next(&iter);
--
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_VARIANT)
--		return btd_error_invalid_args(msg);
--	dbus_message_iter_recurse(&iter, &sub);
--
--	if (g_str_equal("Trusted", property)) {
--		dbus_bool_t value;
--		if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_BOOLEAN)
--			return btd_error_invalid_args(msg);
--		dbus_message_iter_get_basic(&sub, &value);
--
--		return set_trust(msg, value, data);
--	} else if (g_str_equal("Alias", property)) {
--		const char *alias;
--
--		if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_STRING)
--			return btd_error_invalid_args(msg);
--		dbus_message_iter_get_basic(&sub, &alias);
--
--		return set_alias(msg, alias, data);
--	} else if (g_str_equal("Blocked", property)) {
--		dbus_bool_t value;
--
--		if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_BOOLEAN)
--			return btd_error_invalid_args(msg);
--
--		dbus_message_iter_get_basic(&sub, &value);
--
--		return set_blocked(msg, value, data);
-+		g_dbus_pending_property_error(btd_get_dbus_connection(), id,
-+					ERROR_INTERFACE ".Failed",
-+					strerror(-err));
-+		break;
+-	DBusMessageIter dict;
++	struct btd_device *device = data;
+ 	char dstaddr[18];
+-	char **str;
+-	const char *ptr, *icon = NULL;
+-	dbus_bool_t boolean;
+-	uint32_t class;
+-	uint16_t app;
+-	int i;
+-	GSList *l;
++	const char *ptr = dstaddr;
+ 
+ 	ba2str(&device->bdaddr, dstaddr);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &ptr);
+ 
+-	reply = dbus_message_new_method_return(msg);
+-	if (!reply)
+-		return NULL;
++	return TRUE;
++}
+ 
+-	dbus_message_iter_init_append(reply, &iter);
++static gboolean dev_property_get_name(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *device = data;
++	const char *empty = "", *ptr;
+ 
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++	ptr = device->name ?: empty;
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &ptr);
+ 
+-	/* Address */
+-	ptr = dstaddr;
+-	dict_append_entry(&dict, "Address", DBUS_TYPE_STRING, &ptr);
++	return TRUE;
++}
+ 
+-	/* Name */
+-	ptr = device->name;
+-	dict_append_entry(&dict, "Name", DBUS_TYPE_STRING, &ptr);
++static gboolean dev_property_get_alias(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *device = data;
++	char dstaddr[18];
++	const char *ptr;
+ 
+ 	/* Alias (fallback to name or address) */
+ 	if (device->alias != NULL)
+ 		ptr = device->alias;
+-	else if (strlen(ptr) == 0) {
++	else if (strlen(device->name) > 0) {
++		ptr = device->name;
++	} else {
++		ba2str(&device->bdaddr, dstaddr);
+ 		g_strdelimit(dstaddr, ":", '-');
+ 		ptr = dstaddr;
  	}
--
--	return btd_error_invalid_args(msg);
+ 
+-	dict_append_entry(&dict, "Alias", DBUS_TYPE_STRING, &ptr);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &ptr);
++
++	return TRUE;
++}
++
++static gboolean get_class(const GDBusPropertyTable *property, void *data,
++							uint32_t *class)
++{
++	struct btd_device *device = data;
++
++	if (read_remote_class(adapter_get_address(device->adapter),
++						&device->bdaddr, class) == 0)
++		return TRUE;
++
++	return FALSE;
++}
++
++static gboolean dev_property_exists_class(const GDBusPropertyTable *property,
++								void *data)
++{
++	uint32_t class;
++
++	return get_class(property, data, &class);
++}
++
++static gboolean dev_property_get_class(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	uint32_t class;
++
++	if (!get_class(property, data, &class))
++		return FALSE;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT32, &class);
++
++	return TRUE;
++}
++
++static gboolean get_appearance(const GDBusPropertyTable *property, void *data,
++							uint16_t *appearance)
++{
++	struct btd_device *device = data;
++
++	if (dev_property_exists_class(property, data))
++		return FALSE;
++
++	if (read_remote_appearance(adapter_get_address(device->adapter),
++					&device->bdaddr, device->bdaddr_type,
++					appearance) == 0)
++		return TRUE;
++
++	return FALSE;
++}
++
++static gboolean dev_property_exists_appearance(
++			const GDBusPropertyTable *property, void *data)
++{
++	uint16_t appearance;
++
++	return get_appearance(property, data, &appearance);
++}
++
++static gboolean dev_property_get_appearance(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	uint16_t appearance;
++
++	if (!get_appearance(property, data, &appearance))
++		return FALSE;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &appearance);
++
++	return TRUE;
++}
++
++static const char *get_icon(const GDBusPropertyTable *property, void *data)
++{
++	const char *icon = NULL;
++	uint32_t class;
++	uint16_t appearance;
+ 
+-	/* Class */
+-	if (read_remote_class(adapter_get_address(adapter),
+-				&device->bdaddr, &class) == 0) {
++	if (get_class(property, data, &class))
+ 		icon = class_to_icon(class);
++	else if (get_appearance(property, data, &appearance))
++		icon = gap_appearance_to_icon(appearance);
+ 
+-		dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32, &class);
+-	} else if (read_remote_appearance(adapter_get_address(adapter),
+-			&device->bdaddr, device->bdaddr_type, &app) == 0) {
+-		/* Appearance */
+-		icon = gap_appearance_to_icon(app);
++	return icon;
++}
+ 
+-		dict_append_entry(&dict, "Appearance", DBUS_TYPE_UINT16, &app);
+-	}
++static gboolean dev_property_exists_icon(
++			const GDBusPropertyTable *property, void *data)
++{
++	return get_icon(property, data) != NULL;
++}
++
++static gboolean dev_property_get_icon(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	const char *icon;
++
++	icon = get_icon(property, data);
++	if (icon == NULL)
++		return FALSE;
+ 
+-	if (icon != NULL)
+-		dict_append_entry(&dict, "Icon", DBUS_TYPE_STRING, &icon);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &icon);
+ 
+-	/* Vendor */
+-	if (device->vendor)
+-		dict_append_entry(&dict, "Vendor", DBUS_TYPE_UINT16,
++	return TRUE;
++}
++
++static gboolean dev_property_exists_vendor(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct btd_device *device = data;
++
++	return !!device->vendor;
++}
++
++static gboolean dev_property_get_vendor(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *device = data;
++
++	if (!device->vendor)
++		return FALSE;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
+ 							&device->vendor);
++	return TRUE;
++}
++
++static gboolean dev_property_exists_vendor_src(
++				const GDBusPropertyTable *property, void *data)
++{
++	struct btd_device *device = data;
++
++	return !!device->vendor_src;
++}
++
++static gboolean dev_property_get_vendor_src(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *device = data;
++
++	if (!device->vendor_src)
++		return FALSE;
+ 
+-	/* Vendor Source*/
+-	if (device->vendor_src)
+-		dict_append_entry(&dict, "VendorSource", DBUS_TYPE_UINT16,
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
+ 							&device->vendor_src);
++	return TRUE;
++}
++
++static gboolean dev_property_exists_product(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct btd_device *device = data;
++
++	return !!device->product;
++}
++
++static gboolean dev_property_get_product(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *device = data;
++
++	if (!device->product)
++		return FALSE;
++
++	return TRUE;
++}
++
++static gboolean dev_property_exists_version(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct btd_device *device = data;
++
++	return !!device->version;
++}
++
++static gboolean dev_property_get_version(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *device = data;
+ 
+-	/* Product */
+-	if (device->product)
+-		dict_append_entry(&dict, "Product", DBUS_TYPE_UINT16,
+-							&device->product);
++	if (!device->version)
++		return FALSE;
+ 
+-	/* Version */
+-	if (device->version)
+-		dict_append_entry(&dict, "Version", DBUS_TYPE_UINT16,
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
+ 							&device->version);
++	return TRUE;
++}
++
++static gboolean dev_property_get_paired(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *device = data;
++	gboolean val = device_is_paired(device);
+ 
+-	/* Paired */
+-	boolean = device_is_paired(device);
+-	dict_append_entry(&dict, "Paired", DBUS_TYPE_BOOLEAN, &boolean);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &val);
+ 
+-	/* Trusted */
+-	boolean = device_is_trusted(device);
+-	dict_append_entry(&dict, "Trusted", DBUS_TYPE_BOOLEAN, &boolean);
++	return TRUE;
++}
++
++static gboolean dev_property_get_trusted(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *device = data;
++	gboolean val = device_is_trusted(device);
+ 
+-	/* Blocked */
+-	boolean = device->blocked;
+-	dict_append_entry(&dict, "Blocked", DBUS_TYPE_BOOLEAN, &boolean);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &val);
+ 
+-	/* Connected */
+-	dict_append_entry(&dict, "Connected", DBUS_TYPE_BOOLEAN,
++	return TRUE;
++}
++
++static gboolean dev_property_get_blocked(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *device = data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN,
++							&device->blocked);
++
++	return TRUE;
++}
++
++static gboolean dev_property_get_connected(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *device = data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN,
+ 							&device->connected);
+ 
+-	/* UUIDs */
+-	str = g_new0(char *, g_slist_length(device->uuids) + 1);
+-	for (i = 0, l = device->uuids; l; l = l->next, i++)
+-		str[i] = l->data;
+-	dict_append_array(&dict, "UUIDs", DBUS_TYPE_STRING, &str, i);
+-	g_free(str);
++	return TRUE;
++}
+ 
+-	/* Services */
+-	str = g_new0(char *, g_slist_length(device->services) + 1);
+-	for (i = 0, l = device->services; l; l = l->next, i++)
+-		str[i] = l->data;
+-	dict_append_array(&dict, "Services", DBUS_TYPE_OBJECT_PATH, &str, i);
+-	g_free(str);
++static gboolean dev_property_get_uuids(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *device = data;
++	DBusMessageIter entry;
++	GSList *l;
+ 
+-	/* Adapter */
+-	ptr = adapter_get_path(adapter);
+-	dict_append_entry(&dict, "Adapter", DBUS_TYPE_OBJECT_PATH, &ptr);
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++				DBUS_TYPE_STRING_AS_STRING, &entry);
+ 
+-	dbus_message_iter_close_container(&iter, &dict);
++	for (l = device->uuids; l != NULL; l = l->next)
++		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
++							&l->data);
++
++	dbus_message_iter_close_container(iter, &entry);
+ 
+-	return reply;
++	return TRUE;
++}
++
++static gboolean dev_property_get_services(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *device = data;
++	DBusMessageIter entry;
++	GSList *l;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++				DBUS_TYPE_OBJECT_PATH_AS_STRING, &entry);
++
++	for (l = device->services; l != NULL; l = l->next)
++		dbus_message_iter_append_basic(&entry, DBUS_TYPE_OBJECT_PATH,
++							&l->data);
++
++	dbus_message_iter_close_container(iter, &entry);
++
++	return TRUE;
++}
++
++
++static gboolean dev_property_get_adapter(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *device = data;
++	const char *str = adapter_get_path(device->adapter);
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &str);
++
++	return TRUE;
  }
  
- static void discover_services_req_exit(DBusConnection *conn, void *user_data)
-@@ -1158,9 +1185,6 @@ static DBusMessage *dev_connect(DBusConnection *conn, DBusMessage *msg,
+ static DBusMessage *set_alias(DBusMessage *msg, const char *alias, void *data)
+@@ -954,9 +1158,6 @@ static DBusMessage *dev_connect(DBusConnection *conn, DBusMessage *msg,
  }
  
  static const GDBusMethodTable device_methods[] = {
--	{ GDBUS_METHOD("SetProperty",
--			GDBUS_ARGS({ "name", "s" }, { "value", "v" }), NULL,
--			set_property) },
- 	{ GDBUS_ASYNC_METHOD("DiscoverServices",
- 			GDBUS_ARGS({ "pattern", "s" }),
- 			GDBUS_ARGS({ "services", "a{us}" }),
-@@ -1172,8 +1196,6 @@ static const GDBusMethodTable device_methods[] = {
- };
- 
- static const GDBusSignalTable device_signals[] = {
--	{ GDBUS_SIGNAL("PropertyChanged",
--			GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
- 	{ GDBUS_SIGNAL("DisconnectRequested", NULL) },
+-	{ GDBUS_METHOD("GetProperties",
+-				NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
+-				get_properties) },
+ 	{ GDBUS_METHOD("SetProperty",
+ 			GDBUS_ARGS({ "name", "s" }, { "value", "v" }), NULL,
+ 			set_property) },
+@@ -977,6 +1178,35 @@ static const GDBusSignalTable device_signals[] = {
  	{ }
  };
-@@ -1182,7 +1204,7 @@ static const GDBusSignalTable device_signals[] = {
- static const GDBusPropertyTable device_properties[] = {
- 	{ "Address", "s", dev_property_get_address },
- 	{ "Name", "s", dev_property_get_name },
--	{ "Alias", "s", dev_property_get_alias },
-+	{ "Alias", "s", dev_property_get_alias, dev_property_set_alias },
- 	{ "Class", "u", dev_property_get_class, NULL,
- 					dev_property_exists_class },
- 	{ "Appearance", "q", dev_property_get_appearance, NULL,
-@@ -1198,8 +1220,8 @@ static const GDBusPropertyTable device_properties[] = {
- 	{ "Version", "q", dev_property_get_version, NULL,
- 					dev_property_exists_version },
- 	{ "Paired", "b", dev_property_get_paired },
--	{ "Trusted", "b", dev_property_get_trusted },
--	{ "Blocked", "b", dev_property_get_blocked },
-+	{ "Trusted", "b", dev_property_get_trusted, dev_property_set_trusted },
-+	{ "Blocked", "b", dev_property_get_blocked, dev_property_set_blocked },
- 	{ "Connected", "b", dev_property_get_connected },
- 	{ "UUIDs", "as", dev_property_get_uuids },
- 	{ "Services", "ao", dev_property_get_services },
-@@ -1223,9 +1245,8 @@ void device_add_connection(struct btd_device *device)
  
- 	device->connected = TRUE;
- 
--	emit_property_changed(device->path,
--					DEVICE_INTERFACE, "Connected",
--					DBUS_TYPE_BOOLEAN, &device->connected);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), device->path,
-+						DEVICE_INTERFACE, "Connected");
- }
- 
- void device_remove_connection(struct btd_device *device)
-@@ -1257,9 +1278,8 @@ void device_remove_connection(struct btd_device *device)
- 	if (device_is_paired(device) && !device_is_bonded(device))
- 		device_set_paired(device, FALSE);
- 
--	emit_property_changed(device->path,
--				DEVICE_INTERFACE, "Connected",
--				DBUS_TYPE_BOOLEAN, &device->connected);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), device->path,
-+						DEVICE_INTERFACE, "Connected");
- }
- 
- guint device_add_disconnect_watch(struct btd_device *device,
-@@ -1305,9 +1325,8 @@ static void device_set_vendor(struct btd_device *device, uint16_t value)
- 
- 	device->vendor = value;
- 
--	emit_property_changed(device->path,
--				DEVICE_INTERFACE, "Vendor",
--				DBUS_TYPE_UINT16, &value);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), device->path,
-+						DEVICE_INTERFACE, "Vendor");
- }
- 
- static void device_set_vendor_src(struct btd_device *device, uint16_t value)
-@@ -1317,9 +1336,8 @@ static void device_set_vendor_src(struct btd_device *device, uint16_t value)
- 
- 	device->vendor_src = value;
- 
--	emit_property_changed(device->path,
--				DEVICE_INTERFACE, "VendorSource",
--				DBUS_TYPE_UINT16, &value);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), device->path,
-+					DEVICE_INTERFACE, "VendorSource");
- }
- 
- static void device_set_product(struct btd_device *device, uint16_t value)
-@@ -1329,9 +1347,8 @@ static void device_set_product(struct btd_device *device, uint16_t value)
- 
- 	device->product = value;
- 
--	emit_property_changed(device->path,
--				DEVICE_INTERFACE, "Product",
--				DBUS_TYPE_UINT16, &value);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), device->path,
-+						DEVICE_INTERFACE, "Product");
- }
- 
- static void device_set_version(struct btd_device *device, uint16_t value)
-@@ -1341,9 +1358,8 @@ static void device_set_version(struct btd_device *device, uint16_t value)
- 
- 	device->version = value;
- 
--	emit_property_changed(device->path,
--				DEVICE_INTERFACE, "Version",
--				DBUS_TYPE_UINT16, &value);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), device->path,
-+						DEVICE_INTERFACE, "Version");
- }
- 
- struct btd_device *device_create(struct btd_adapter *adapter,
-@@ -1420,16 +1436,14 @@ void device_set_name(struct btd_device *device, const char *name)
- 
- 	strncpy(device->name, name, MAX_NAME_LENGTH);
- 
--	emit_property_changed(device->path,
--				DEVICE_INTERFACE, "Name",
--				DBUS_TYPE_STRING, &name);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), device->path,
-+						DEVICE_INTERFACE, "Name");
- 
- 	if (device->alias != NULL)
- 		return;
- 
--	emit_property_changed(device->path,
--				DEVICE_INTERFACE, "Alias",
--				DBUS_TYPE_STRING, &name);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), device->path,
-+						DEVICE_INTERFACE, "Alias");
- }
- 
- void device_get_name(struct btd_device *device, char *name, size_t len)
-@@ -2703,9 +2717,8 @@ void device_set_paired(struct btd_device *device, gboolean value)
- 
- 	device->paired = value;
- 
--	emit_property_changed(device->path,
--				DEVICE_INTERFACE, "Paired",
--				DBUS_TYPE_BOOLEAN, &value);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), device->path,
-+						DEVICE_INTERFACE, "Paired");
- }
- 
- static void device_agent_removed(struct agent *agent, void *user_data)
-@@ -3379,14 +3392,12 @@ void device_set_class(struct btd_device *device, uint32_t value)
++
++static const GDBusPropertyTable device_properties[] = {
++	{ "Address", "s", dev_property_get_address },
++	{ "Name", "s", dev_property_get_name },
++	{ "Alias", "s", dev_property_get_alias },
++	{ "Class", "u", dev_property_get_class, NULL,
++					dev_property_exists_class },
++	{ "Appearance", "q", dev_property_get_appearance, NULL,
++					dev_property_exists_appearance },
++	{ "Icon", "s", dev_property_get_icon, NULL,
++					dev_property_exists_icon },
++	{ "Vendor", "q", dev_property_get_vendor, NULL,
++					dev_property_exists_vendor },
++	{ "VendorSource", "q", dev_property_get_vendor_src, NULL,
++					dev_property_exists_vendor_src },
++	{ "Product", "q", dev_property_get_product, NULL,
++					dev_property_exists_product },
++	{ "Version", "q", dev_property_get_version, NULL,
++					dev_property_exists_version },
++	{ "Paired", "b", dev_property_get_paired },
++	{ "Trusted", "b", dev_property_get_trusted },
++	{ "Blocked", "b", dev_property_get_blocked },
++	{ "Connected", "b", dev_property_get_connected },
++	{ "UUIDs", "as", dev_property_get_uuids },
++	{ "Services", "ao", dev_property_get_services },
++	{ "Adapter", "o", dev_property_get_adapter },
++	{ }
++};
++
+ gboolean device_is_connected(struct btd_device *device)
  {
- 	const char *icon = class_to_icon(value);
+ 	return device->connected;
+@@ -1139,8 +1369,9 @@ struct btd_device *device_create(struct btd_adapter *adapter,
  
--	emit_property_changed(device->path,
--				DEVICE_INTERFACE, "Class",
--				DBUS_TYPE_UINT32, &value);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), device->path,
-+						DEVICE_INTERFACE, "Class");
- 
- 	if (icon)
--		emit_property_changed(device->path,
--					DEVICE_INTERFACE, "Icon",
--					DBUS_TYPE_STRING, &icon);
-+		g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+				device->path, DEVICE_INTERFACE, "Icon");
- }
- 
- int device_get_appearance(struct btd_device *device, uint16_t *value)
-@@ -3410,14 +3421,12 @@ void device_set_appearance(struct btd_device *device, uint16_t value)
- {
- 	const char *icon = gap_appearance_to_icon(value);
- 
--	emit_property_changed(device->path,
--				DEVICE_INTERFACE, "Appearance",
--				DBUS_TYPE_UINT16, &value);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), device->path,
-+					DEVICE_INTERFACE, "Appearance");
- 
- 	if (icon)
--		emit_property_changed(device->path,
--					DEVICE_INTERFACE, "Icon",
--					DBUS_TYPE_STRING, &icon);
-+		g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+				device->path, DEVICE_INTERFACE, "Icon");
- 
- 	write_remote_appearance(adapter_get_address(device->adapter),
- 				&device->bdaddr, device->bdaddr_type, value);
+ 	if (g_dbus_register_interface(btd_get_dbus_connection(),
+ 					device->path, DEVICE_INTERFACE,
+-					device_methods, device_signals, NULL,
+-					device, device_free) == FALSE) {
++					device_methods, device_signals,
++					device_properties, device,
++					device_free) == FALSE) {
+ 		device_free(device);
+ 		return NULL;
+ 	}
 -- 
 1.7.12.2
 
