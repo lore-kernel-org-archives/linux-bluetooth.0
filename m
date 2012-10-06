@@ -1,29 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1349530857.27233.45.camel@aeonflux>
-Subject: Re: [PATCH BlueZ 1/9] gdbus: Remove connection from
- g_dbus_remove_watch
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Sat, 06 Oct 2012 15:40:57 +0200
-In-Reply-To: <1349472050-25928-1-git-send-email-luiz.dentz@gmail.com>
-References: <1349472050-25928-1-git-send-email-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Sat, 6 Oct 2012 09:43:17 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org,
+	Lucas De Marchi <lucas.de.marchi@gmail.com>
+Subject: Re: [PATCH BlueZ 1/6] gdbus: Fix up Properties.Set() code path
+Message-ID: <20121006074317.GA25765@x220.c.hospitality.swisscom.com>
+References: <1349507448-9595-1-git-send-email-lucas.demarchi@profusion.mobi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1349507448-9595-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Lucas,
 
-> The connection is not really needed since the list of listeners is
-> global not per connection, besides it is more convenient this way as
-> only the id is needed.
+On Sat, Oct 06, 2012, Lucas De Marchi wrote:
+> Minor fixes to make setter actually work:
+> 
+> 	- Add propdata in pending_property_set
+> 	- Break loop when we are removing propdata from list and we
+> 	  found it
+> 	- in_args and out_args were swapped
+> 	- interface and method name arguments were swapped
+> ---
+>  gdbus/object.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
 
-they are not global, they are per connection. That we do not fully
-implement this correctly is another story. That should be fixed here.
+All patches from this set have been applied. Thanks.
 
-Regards
-
-Marcel
-
-
+Johan
