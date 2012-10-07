@@ -1,146 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v2 6/6] bt tool: add cmd 'adapter'
-Date: Mon,  8 Oct 2012 06:49:57 +0800
-Message-Id: <1349650197-18751-6-git-send-email-gustavo@padovan.org>
+Cc: Travis Reitter <travis.reitter@collabora.co.uk>
+Subject: [PATCH -v2 5/6] bt tool: add cmd 'remove'
+Date: Mon,  8 Oct 2012 06:49:56 +0800
+Message-Id: <1349650197-18751-5-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1349650197-18751-1-git-send-email-gustavo@padovan.org>
 References: <1349650197-18751-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+From: Travis Reitter <travis.reitter@collabora.co.uk>
 
-'bt adapter' sets adapter properties Powered, Name, Pairable,
-PairableTimeout, Discoverable, DiscoverableTimeout.
+'bt remove <device address>' will remove a previous paired device
 ---
- client/main.c | 185 +++++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 178 insertions(+), 7 deletions(-)
+ client/main.c | 136 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 136 insertions(+)
 
 diff --git a/client/main.c b/client/main.c
-index aeb47e4..115d7ed 100644
+index 11d26c5..aeb47e4 100644
 --- a/client/main.c
 +++ b/client/main.c
-@@ -74,6 +74,12 @@ struct cmd_struct {
- 	GSourceFunc	fn;
- };
- 
-+struct subcmd_methods {
-+	const char	*subcmd;
-+	const char	*dbus_name;
-+	int		dbus_type;
-+};
-+
- struct find_adapter_cb_data {
- 	GSourceFunc		fn;
- 	struct cmd_param	*param;
-@@ -94,15 +100,22 @@ static void show_help()
- 	printf("usage: %s [-i interface] <command> [<args>]\n"
- 	"\n"
- 	"options:\n"
--	"	-i <hci dev>, --interface <hci dev>	HCI device\n"
--	"	--help					This help\n"
--	"	--version				Version\n"
-+	"	-i <dev>, --interface <dev>	HCI device\n"
-+	"	--help				This help\n"
-+	"	--version			Version\n"
- 	"\n"
- 	"commands:\n"
--	"	discover				Scan for devices\n"
--	"	pair <device address>			Start pairing\n"
--	"	agent					Run BlueZ agent\n"
--	"	remove					Remove a paired device\n"
-+	"	discove				Scan for devices\n"
-+	"	pair <device address>		Start pairing\n"
-+	"	agent				Run BlueZ agent\n"
-+	"	remove				Remove a paired device\n"
-+	"	adapter\n"
-+	"		powered			Set adapter's powered state\n"
-+	"		name			Set adapter's name\n"
-+	"		discoverable		Set adapter's discoverable state\n"
-+	"		discoverabletimeout	Set adapter's discoverable timeout\n"
-+	"		pairable		Set adapter's pairable state\n"
-+	"		pairabletimeout		Set adapter's pairable timeout\n"
+@@ -102,6 +102,7 @@ static void show_help()
+ 	"	discover				Scan for devices\n"
+ 	"	pair <device address>			Start pairing\n"
+ 	"	agent					Run BlueZ agent\n"
++	"	remove					Remove a paired device\n"
  							"\n", program_name);
  
  	if(mainloop != NULL)
-@@ -283,6 +296,67 @@ static gboolean send_with_reply_and_set_notify(DBusMessage *msg,
- 	return TRUE;
+@@ -740,6 +741,94 @@ static gboolean stop_discovery_cb(gpointer data)
+ 	return FALSE;
  }
  
-+static void bluetooth_property_append_basic(DBusMessageIter *iter,
-+					const char *key, int type, void *val)
++/* Handle the D-Bus method reply for RemoveDevice. See comments on
++ * get_adapter_reply() for more details */
++static void remove_device_reply(DBusPendingCall *pending, void *user_data)
 +{
-+	DBusMessageIter value;
-+	const char *signature;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &key);
-+
-+	switch (type) {
-+	case DBUS_TYPE_BOOLEAN:
-+		signature = DBUS_TYPE_BOOLEAN_AS_STRING;
-+		break;
-+	case DBUS_TYPE_STRING:
-+		signature = DBUS_TYPE_STRING_AS_STRING;
-+		break;
-+	case DBUS_TYPE_UINT32:
-+		signature = DBUS_TYPE_UINT32_AS_STRING;
-+		break;
-+	default:
-+		signature = DBUS_TYPE_VARIANT_AS_STRING;
-+		break;
-+	}
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT,
-+							signature, &value);
-+	dbus_message_iter_append_basic(&value, type, val);
-+	dbus_message_iter_close_container(iter, &value);
-+}
-+
-+static gboolean bluetooth_append_args(DBusMessage *msg,
-+					struct subcmd_methods *m, char *param)
-+{
-+	DBusMessageIter iter;
-+	unsigned int value;
-+
-+	dbus_message_iter_init_append(msg, &iter);
-+
-+	switch (m->dbus_type) {
-+	case DBUS_TYPE_STRING:
-+		bluetooth_property_append_basic(&iter, m->dbus_name,
-+							m->dbus_type, &param);
-+	case DBUS_TYPE_UINT32:
-+		value = atol(param);
-+		bluetooth_property_append_basic(&iter, m->dbus_name,
-+						m->dbus_type, &value);
-+	case DBUS_TYPE_BOOLEAN:
-+		if (g_str_equal(param, "yes"))
-+			value = TRUE;
-+		else if (g_str_equal(param, "no"))
-+			value = FALSE;
-+		else
-+			return FALSE;
-+
-+		bluetooth_property_append_basic(&iter, m->dbus_name,
-+						m->dbus_type, &value);
-+		break;
-+	}
-+
-+	return TRUE;
-+}
-+
- static DBusMessage *agent_request_confirmation(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
- {
-@@ -829,6 +903,42 @@ static void find_device_reply(DBusPendingCall *pending, void *user_data)
- 	dbus_pending_call_unref(pending);
- }
- 
-+static void set_property_reply(DBusPendingCall *pending, void *user_data)
-+{
++	const char *device_path = user_data;
 +	DBusMessage *reply;
-+	DBusError err;
++
++	reply = dbus_pending_call_steal_reply(pending);
++	if (!reply) {
++		ERR("Failed to get RemoveDevice reply");
++		exit(1);
++	}
++
++	if (dbus_message_get_type(reply) == DBUS_MESSAGE_TYPE_ERROR) {
++		ERR("Remove device failed.");
++		exit(1);
++	}
++
++	printf("Device %s successfully removed.\n", device_path);
++	g_main_loop_quit(mainloop);
++}
++
++static int remove_device(DBusConnection *conn, const char *adapter_path,
++							const char *device_path)
++{
++	DBusMessage *msg;
++	int retval = 0;
++
++	if (!(msg = create_method_call(adapter_path, BLUEZ_ADAPTER,
++							"RemoveDevice")))
++		return -1;
++
++	dbus_message_append_args(msg, DBUS_TYPE_OBJECT_PATH, &device_path,
++							DBUS_TYPE_INVALID);
++
++	if (!send_with_reply_and_set_notify(msg, remove_device_reply,
++						g_strdup(device_path), g_free))
++		retval = -1;
++
++	dbus_message_unref(msg);
++
++	return retval;
++}
++
++/* Handle the D-Bus method reply for FindDevice. See comments on
++ * get_adapter_reply() for more details */
++static void find_device_reply(DBusPendingCall *pending, void *user_data)
++{
++	const char *adapter_path = user_data;
++	DBusMessage *reply;
++	const char *device_path;
 +
 +	if (!pending)
 +		return;
@@ -149,105 +92,96 @@ index aeb47e4..115d7ed 100644
 +
 +	reply = dbus_pending_call_steal_reply(pending);
 +	if (!reply) {
-+		ERR("Failed to find SetProperty() reply");
-+		exit(1);
-+	}
-+
-+	dbus_error_init(&err);
-+	if (!dbus_message_get_args(reply, &err, DBUS_TYPE_INVALID)) {
-+		if (dbus_error_is_set(&err)) {
-+			ERR("Failed to set property: %s", err.message);
-+			dbus_error_free(&err);
-+		}
++		ERR("Failed to get FindDevice() reply");
 +		exit(1);
 +	}
 +
 +	if (dbus_message_get_type(reply) == DBUS_MESSAGE_TYPE_ERROR) {
-+		ERR("SetProperty() failed");
++		ERR("Failed to find device.");
 +		exit(1);
++	} else {
++		struct DBusError err;
++		dbus_error_init(&err);
++
++		if (!dbus_message_get_args(reply, &err,
++					DBUS_TYPE_OBJECT_PATH, &device_path,
++					DBUS_TYPE_INVALID)) {
++			if (dbus_error_is_set(&err)) {
++				ERR("Failed to find device %s", err.message);
++				dbus_error_free(&err);
++			}
++			exit(1);
++		}
 +	}
++
++	if (remove_device(conn, adapter_path, device_path) < 0)
++		exit(1);
 +
 +	dbus_message_unref(reply);
 +	dbus_pending_call_unref(pending);
-+
-+	g_main_loop_quit(mainloop);
 +}
 +
  /* Listen for Bluetooth devices broadcasting their availability, then display
   * the results */
  static gboolean cmd_discover(gpointer data)
-@@ -964,6 +1074,66 @@ static gboolean cmd_remove(gpointer data)
- 	return retval;
+@@ -829,6 +918,52 @@ static gboolean cmd_agent(gpointer data)
+ 	return FALSE;
  }
  
-+static struct subcmd_methods adapter_m[] = {
-+	{ "powered",		 "Powered",		DBUS_TYPE_BOOLEAN},
-+	{ "name",                "Name",		DBUS_TYPE_STRING},
-+	{ "discoverable",        "Discoverable",	DBUS_TYPE_BOOLEAN},
-+	{ "discoverabletimeout", "DiscoverableTimeout",	DBUS_TYPE_UINT32},
-+	{ "pairable",	         "Pairable",		DBUS_TYPE_BOOLEAN},
-+	{ "pairabletimeout",     "PairableTimeout",	DBUS_TYPE_UINT32},
-+	{  NULL,                 NULL,                  DBUS_TYPE_INVALID},
-+};
-+
-+static gboolean cmd_adapter(gpointer data)
++/* Remove a pairing with a given Bluetooth device */
++static gboolean cmd_remove(gpointer data)
 +{
-+	struct cmd_param *p = data;
-+	char *subcmd, *param;
-+	struct subcmd_methods *m;
++	struct cmd_param *param = data;
++	char *device_addr;
 +	DBusMessage *msg;
-+	int i;
++	gboolean retval = FALSE;
 +
-+	subcmd = p->argv[0];
-+	p->argc--;
-+	if (!subcmd) {
-+		ERR("%s: missing command paramenter", program_name);
++	device_addr = param->argv[0];
++	if (!device_addr) {
++		ERR("%s: missing device address paramenter", program_name);
 +		show_help();
 +		exit(1);
 +	}
 +
-+	param = p->argv[1];
-+
-+	for (i = 0; i < ARRAY_SIZE(adapter_m); i++) {
-+		m = adapter_m+i;
-+		if (!m->subcmd) {
-+			ERR("%s: command not found", program_name);
-+			show_help();
-+			exit(1);
-+		}
-+
-+		if (g_str_equal(m->subcmd, subcmd))
-+			break;
-+	}
-+
-+	if (!(msg = create_method_call(p->path, BLUEZ_ADAPTER, "SetProperty")))
-+		return FALSE;
-+
-+	if (!bluetooth_append_args(msg, m, param)) {
-+		ERR("%s: parameter not understood", program_name);
-+		show_help();
-+		exit(1);
-+	}
-+
-+	if (!send_with_reply_and_set_notify(msg, set_property_reply, NULL,
++	/* Register a D-Bus interface for our agent to handle our removal
++	 * request */
++	if (!g_dbus_register_interface(conn, "/tool/agent", BLUEZ_AGENT,
++					agent_methods, NULL, NULL, NULL,
 +									NULL)) {
-+		ERR("Not enough memory for message send");
++		ERR("Adapter interface init failed for path %s", param->path);
 +		return FALSE;
 +	}
++
++	device_addr = param->argv[0];
++
++	if (!(msg = create_method_call(param->path, BLUEZ_ADAPTER,
++								"FindDevice")))
++		return FALSE;
++
++	dbus_message_append_args(msg, DBUS_TYPE_STRING, &device_addr,
++							DBUS_TYPE_INVALID);
++
++	/* Set up our notify function and provide it both the extra data it
++	 * requires and another function to free this data when our notify
++	 * function is done with it */
++	if (!send_with_reply_and_set_notify(msg, find_device_reply,
++							g_strdup(param->path),
++							g_free))
++		retval = FALSE;
 +
 +	dbus_message_unref(msg);
 +
-+	return FALSE;
++	return retval;
 +}
 +
  static void run_func(const char *adapter_path, GSourceFunc fn,
  							struct cmd_param *param)
  {
-@@ -1096,6 +1266,7 @@ static struct cmd_struct commands[] = {
+@@ -960,6 +1095,7 @@ static struct cmd_struct commands[] = {
+ 	{ "discover", cmd_discover},
  	{ "pair", cmd_pair},
  	{ "agent", cmd_agent},
- 	{ "remove", cmd_remove},
-+	{ "adapter", cmd_adapter},
++	{ "remove", cmd_remove},
  };
  
  /* Returns FALSE in case the command could not be parsed. Any failures during
