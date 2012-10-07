@@ -1,392 +1,294 @@
 Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v2 3/6] bt tool: add cmd 'agent'
-Date: Mon,  8 Oct 2012 06:49:54 +0800
-Message-Id: <1349650197-18751-3-git-send-email-gustavo@padovan.org>
+Cc: Travis Reitter <travis.reitter@collabora.co.uk>
+Subject: [PATCH -v2 2/6] bt tool: add cmd 'discover'
+Date: Mon,  8 Oct 2012 06:49:53 +0800
+Message-Id: <1349650197-18751-2-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1349650197-18751-1-git-send-email-gustavo@padovan.org>
 References: <1349650197-18751-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+From: Travis Reitter <travis.reitter@collabora.co.uk>
 
-'bt agent' command register a agent in BlueZ that will loop waiting for
-pairing and incoming connection requests.
+ $ bt discover
+
+will start a discovery for devices nearby and display them. We display
+the device when we receive its first Device Found signal. If the
+DeviceFound signal doesn't contains the device's name it will not be
+displayed.
+
+Steal bluetooth_parse_properties() from oFono code.
 ---
- client/main.c | 352 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 352 insertions(+)
+ client/main.c | 242 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 241 insertions(+), 1 deletion(-)
 
 diff --git a/client/main.c b/client/main.c
-index 48521fd..6035eda 100644
+index 4edc255..48521fd 100644
 --- a/client/main.c
 +++ b/client/main.c
-@@ -82,6 +82,8 @@ struct find_adapter_cb_data {
- static GMainLoop *mainloop = NULL;
- static gchar *program_name = NULL;
- 
-+static gboolean exit_on_release = TRUE;
-+
+@@ -5,6 +5,7 @@
+  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  Copyright (C) 2011 Bruno Dilly <bdilly@profusion.mobi>
+  *  Copyright (C) 2011 Gustavo Padovan <gustavo@padovan.org>
++ *  Copyright (C) 2011 Intel Corporation. All rights reserved.
+  *  Copyright (C) 2012 Collabora Limited.
+  *
+  *  This program is free software; you can redistribute it and/or modify
+@@ -84,6 +85,8 @@ static gchar *program_name = NULL;
  static bdaddr_t bdaddr;
  static DBusConnection *conn;
  
-@@ -280,6 +282,334 @@ static gboolean send_with_reply_and_set_notify(DBusMessage *msg,
++static GHashTable *device_addrs = NULL;
++
+ static void show_help()
+ {
+ 	printf("usage: %s [-i interface] <command> [<args>]\n"
+@@ -115,6 +118,127 @@ static struct find_adapter_cb_data *find_adapter_cb_data_new(GSourceFunc fn,
+ 	return cb_data;
+ }
+ 
++static void parse_bool(DBusMessageIter *iter, gpointer user_data)
++{
++	gboolean *boolean = user_data;
++	int arg_type = dbus_message_iter_get_arg_type(iter);
++
++	if (arg_type != DBUS_TYPE_BOOLEAN)
++		return;
++
++	dbus_message_iter_get_basic(iter, boolean);
++}
++
++static void parse_string(DBusMessageIter *iter, gpointer user_data)
++{
++	char **str = user_data;
++	int arg_type = dbus_message_iter_get_arg_type(iter);
++
++	if (arg_type != DBUS_TYPE_OBJECT_PATH && arg_type != DBUS_TYPE_STRING)
++		return;
++
++	dbus_message_iter_get_basic(iter, str);
++}
++
++typedef void (*PropertyHandler)(DBusMessageIter *iter, gpointer user_data);
++
++struct property_handler {
++	const char *property;
++	PropertyHandler callback;
++	gpointer user_data;
++};
++
++static gint property_handler_compare(gconstpointer a, gconstpointer b)
++{
++	const struct property_handler *handler = a;
++	const char *property = b;
++
++	return strcmp(handler->property, property);
++}
++
++/* Demarshall the content of a D-Bus message reply for a given property.
++ *
++ * After the first argument, all arguments must be triplets of:
++ *
++ *   const char* property_name,
++ *   void (parse_func*) (DBusMessageIter *iter, gpointer user_data),
++ *   void** result,
++ *
++ * result must be large enough to store the type of data corresponding to
++ * property_name.
++ *
++ * Finally, a NULL must be appended as the last argument.
++ */
++static void bluetooth_parse_properties(DBusMessage *reply,
++						const char *property, ...)
++{
++	va_list args;
++	GSList *prop_handlers = NULL;
++	DBusMessageIter array, dict;
++
++	va_start(args, property);
++
++	while (property != NULL) {
++		struct property_handler *handler = g_new0(struct property_handler, 1);
++
++		handler->property = property;
++		handler->callback = va_arg(args, PropertyHandler);
++		handler->user_data = va_arg(args, gpointer);
++
++		property = va_arg(args, const char *);
++
++		prop_handlers = g_slist_prepend(prop_handlers, handler);
++	}
++
++	va_end(args);
++
++	if (dbus_message_iter_init(reply, &array) == FALSE)
++		goto done;
++
++	if (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_STRING)
++		dbus_message_iter_next(&array);
++
++	if (dbus_message_iter_get_arg_type(&array) != DBUS_TYPE_ARRAY)
++		goto done;
++
++	dbus_message_iter_recurse(&array, &dict);
++
++	while (dbus_message_iter_get_arg_type(&dict) == DBUS_TYPE_DICT_ENTRY) {
++		DBusMessageIter entry, value;
++		const char *key;
++		GSList *l;
++
++		dbus_message_iter_recurse(&dict, &entry);
++
++		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_STRING)
++			goto done;
++
++		dbus_message_iter_get_basic(&entry, &key);
++
++		dbus_message_iter_next(&entry);
++
++		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_VARIANT)
++			goto done;
++
++		dbus_message_iter_recurse(&entry, &value);
++
++		l = g_slist_find_custom(prop_handlers, key,
++					property_handler_compare);
++
++		if (l) {
++			struct property_handler *handler = l->data;
++
++			handler->callback(&value, handler->user_data);
++		}
++
++		dbus_message_iter_next(&dict);
++	}
++
++done:
++	g_slist_foreach(prop_handlers, (GFunc) g_free, NULL);
++	g_slist_free(prop_handlers);
++}
++
+ static DBusMessage* create_method_call(const char *adapter_path,
+ 							const char *interface,
+ 							const char *method_name)
+@@ -156,6 +280,122 @@ static gboolean send_with_reply_and_set_notify(DBusMessage *msg,
  	return TRUE;
  }
  
-+static DBusMessage *agent_request_confirmation(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
++/* Handle BlueZ's DeviceFound signal */
++static gboolean device_found(DBusConnection *conn, DBusMessage *message,
++							void *user_data)
 +{
-+	DBusMessage *reply;
-+	const char *path;
-+	unsigned int passkey;
-+	char conf[16];
-+	int ret;
++	const char *alias = NULL;
++	const char *address = NULL;
++	gboolean paired, trusted;
++	DBusMessageIter array;
 +
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+						DBUS_TYPE_UINT32, &passkey,
-+						DBUS_TYPE_INVALID)) {
-+		ERR("Invalid arguments for RequestConfirmation method");
-+		reply = dbus_message_new_error(msg,
-+					BLUEZ_ERROR".InvalidArguments", "");
-+		goto send;
++	if (dbus_message_iter_init(message, &array) == FALSE)
++		return TRUE;
++
++	if (dbus_message_iter_get_arg_type(&array) != DBUS_TYPE_STRING)
++		return TRUE;
++
++	bluetooth_parse_properties(message, "Alias", parse_string, &alias,
++				"Address", parse_string, &address,
++				"Paired", parse_bool, &paired,
++				"Trusted", parse_bool, &trusted,
++				NULL);
++
++	/* Only list new devices if we have not yet listed them. BlueZ will emit
++	 * this signal multiple times for the same device because it may receive
++	 * additional information from the device in subsequent transmissions */
++	if (!g_hash_table_contains(device_addrs, address)) {
++		gint alias_len;
++		const char *alias_status_gap = " ";
++
++		/* Make sure everything aligns under each header; this assumes
++		 * 8-character tabs and 17-character BT address */
++		alias_len = (alias == NULL ? 0 : strlen(alias));
++		if (FALSE) { }
++		else if (alias_len < 3)
++			alias_status_gap = "\t\t\t\t";
++		else if (alias_len < 11)
++			alias_status_gap = "\t\t\t";
++		else if (alias_len < 19)
++			alias_status_gap = "\t\t";
++		else
++			alias_status_gap = "\t";
++
++		g_hash_table_insert(device_addrs, g_strdup (address), NULL);
++		printf("%s    %s%s%s%s\n", address, alias, alias_status_gap,
++						paired ? "paired": "unpaired",
++						trusted ? ", trusted" : "");
 +	}
 +
-+	printf("Pairing request confirmation for %s.\n"
-+		"Confirm the passkey %6.6d (yes/no): ", path, passkey);
-+	ret = scanf("%3s", conf);
-+	if (!ret)
-+		return NULL;
-+
-+	if (g_str_equal(conf, "yes"))
-+		reply = dbus_message_new_method_return(msg);
-+	else
-+		reply = dbus_message_new_error(msg, BLUEZ_ERROR".Rejected",
-+						"Passkey doesn't match");
-+
-+	if (!reply) {
-+		ERR("Can't create reply message");
-+		return NULL;
-+	}
-+
-+send:
-+	dbus_connection_send(conn, reply, NULL);
-+
-+	dbus_message_unref(reply);
-+
-+	return NULL;
++	return TRUE;
 +}
 +
-+static DBusMessage *agent_request_pincode(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
++static void stop_discovery_reply(DBusPendingCall *pending, void *user_data)
 +{
-+	DBusMessage *reply;
-+	const char *path;
-+	char pin[64];
-+	char *str;
-+	int ret;
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+						DBUS_TYPE_INVALID)) {
-+		ERR("Invalid arguments for RequestPinCode method");
-+		reply = dbus_message_new_error(msg,
-+					BLUEZ_ERROR".InvalidArguments", "");
-+		goto send;
-+	}
-+
-+	printf("Pairing request for  %s.\nType the PIN code: ", path);
-+	ret = scanf("%s", pin);
-+	if (!ret)
-+		return NULL;
-+
-+	if (!(reply = dbus_message_new_method_return(msg))) {
-+		ERR("Not enough memory to construct message");
-+		return NULL;
-+	}
-+
-+	str = pin;
-+	dbus_message_append_args(reply, DBUS_TYPE_STRING, &str,
-+							DBUS_TYPE_INVALID);
-+
-+send:
-+	dbus_connection_send(conn, reply, NULL);
-+
-+	dbus_message_unref(reply);
-+
-+	return NULL;
-+}
-+
-+static DBusMessage *agent_request_passkey(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
-+{
-+	DBusMessage *reply;
-+	const char *path;
-+	unsigned int passkey;
-+	int ret;
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+						DBUS_TYPE_INVALID)) {
-+		ERR("Invalid arguments for RequestPasskey method");
-+		reply = dbus_message_new_error(msg,
-+					BLUEZ_ERROR".InvalidArguments", "");
-+		goto send;
-+	}
-+
-+	printf("Pairing request for  %s.\nType the Passkey: ", path);
-+	ret = scanf("%u", &passkey);
-+	if (!ret)
-+		return NULL;
-+
-+	reply = dbus_message_new_method_return(msg);
-+
-+	dbus_message_append_args(reply, DBUS_TYPE_STRING, passkey,
-+							DBUS_TYPE_INVALID);
-+
-+send:
-+	if (!dbus_connection_send(conn, reply, NULL))
-+		ERR("Not enough memory to send message");
-+
-+	dbus_message_unref(reply);
-+
-+	return NULL;
-+}
-+
-+static DBusMessage *agent_authorize(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	DBusMessage *reply;
-+	const char *path, *uuid;
-+	char conf[16];
-+	int ret;
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+						DBUS_TYPE_STRING, &uuid,
-+						DBUS_TYPE_INVALID)) {
-+		ERR("Invalid arguments for Authorize method");
-+		reply = dbus_message_new_error(msg,
-+					BLUEZ_ERROR".InvalidArguments", "");
-+		goto send;
-+	}
-+
-+	printf("Incoming connection request for %s (%s).\n"
-+		"Authorize (yes/no): ", path, uuid);
-+	ret = scanf("%3s", conf);
-+	if (!ret)
-+		return NULL;
-+
-+	if (g_str_equal(conf, "yes"))
-+		reply = dbus_message_new_method_return(msg);
-+	else
-+		reply = dbus_message_new_error(msg, BLUEZ_ERROR".Rejected",
-+						"Connection Rejected");
-+
-+	if (!reply) {
-+		ERR("Can't create reply message");
-+		return NULL;
-+	}
-+
-+send:
-+	dbus_connection_send(conn, reply, NULL);
-+
-+	dbus_message_unref(reply);
-+
-+	return NULL;
-+}
-+
-+static DBusMessage *agent_confirm_mode_change(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
-+{
-+	DBusMessage *reply;
-+	const char *mode;
-+	char conf[16];
-+	int ret;
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &mode,
-+							DBUS_TYPE_INVALID)) {
-+		ERR("Invalid arguments for ConfirmModeChange");
-+		reply = dbus_message_new_error(msg,
-+					BLUEZ_ERROR".InvalidArguments", "");
-+		goto send;
-+	}
-+
-+	printf("Authorize mode change to %s (yes/no): ", mode);
-+	ret = scanf("%3s", conf);
-+	if (!ret)
-+		return NULL;
-+
-+	if (g_str_equal(conf, "yes"))
-+		reply = dbus_message_new_method_return(msg);
-+	else
-+		reply = dbus_message_new_error(msg, BLUEZ_ERROR".Rejected",
-+						"Mode Change Rejected");
-+
-+	if (!reply) {
-+		ERR("Can't create reply message");
-+		return NULL;
-+	}
-+
-+send:
-+	dbus_connection_send(conn, reply, NULL);
-+
-+	dbus_message_unref(reply);
-+
-+	return NULL;
-+}
-+
-+static DBusMessage *agent_cancel(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	DBusMessage *reply;
-+
-+	printf("Request canceled\n");
-+
-+	reply = dbus_message_new_method_return(msg);
-+	if (!reply) {
-+		ERR("Can't create reply message");
-+		return NULL;
-+	}
-+
-+	dbus_connection_send(conn, reply, NULL);
-+
-+	dbus_message_unref(reply);
-+
++	/* Once we're done discovering and displaying devices, exit gracefully
++	 */
 +	g_main_loop_quit(mainloop);
-+
-+	return NULL;
 +}
 +
-+static DBusMessage *agent_release(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
++static gboolean stop_discovery_cb(gpointer data)
 +{
-+	DBusMessage *reply;
-+
-+	printf("Agent released\n");
-+
-+	reply = dbus_message_new_method_return(msg);
-+	if (!reply) {
-+		ERR("Can't create reply message");
-+		return NULL;
-+	}
-+
-+	dbus_connection_send(conn, reply, NULL);
-+
-+	dbus_message_unref(reply);
-+
-+	/* Only exit the mainloop in case there are no other D-Bus methods, such
-+	 * as CreatePairedDevice, pending */
-+	if (exit_on_release)
-+		g_main_loop_quit(mainloop);
-+
-+	return NULL;
-+}
-+
-+/* Handle the D-Bus method reply for RegisterAgent. See comments on
-+ * get_adapter_reply() for more details */
-+static void register_agent_reply(DBusPendingCall *pending, void *user_data)
-+{
-+	DBusMessage *reply;
-+
-+	reply = dbus_pending_call_steal_reply(pending);
-+
-+	if (dbus_message_get_type(reply) == DBUS_MESSAGE_TYPE_ERROR) {
-+		ERR("Agent Registration failed.");
-+		exit(1);
-+	}
-+
-+	printf("Agent registered\n");
-+}
-+
-+static int register_agent(DBusConnection *conn, const char *adapter_path,
-+						const char *agent_path,
-+						const char *capabilities)
-+{
-+	dbus_bool_t success;
++	const char *path = data;
 +	DBusMessage *msg;
-+	DBusPendingCall *pending;
 +
-+	if (!(msg = create_method_call(adapter_path, BLUEZ_ADAPTER,
-+							"RegisterAgent")))
-+		return -1;
-+
-+	dbus_message_append_args(msg, DBUS_TYPE_OBJECT_PATH, &agent_path,
-+					DBUS_TYPE_STRING, &capabilities,
-+					DBUS_TYPE_INVALID);
-+
-+	success = dbus_connection_send_with_reply(conn, msg, &pending, -1);
-+	if (pending)
-+		dbus_pending_call_set_notify(pending, register_agent_reply,
-+								NULL, NULL);
++	if (!(msg = create_method_call(path, BLUEZ_ADAPTER, "StopDiscovery")))
++		return FALSE;
++	send_with_reply_and_set_notify(msg, stop_discovery_reply, NULL, NULL);
 +
 +	dbus_message_unref(msg);
 +
-+	if (!success) {
-+		ERR("Not enough memory for message send");
-+		return -1;
-+	}
-+
-+	return 0;
++	return FALSE;
 +}
 +
-+/* This is the table of methods that our agent supports, including their name,
-+ * and arguments (including their D-Bus types). See the D-Bus documentation for
-+ * details on the type notation */
-+static const GDBusMethodTable agent_methods[] = {
-+	{ GDBUS_ASYNC_METHOD("RequestConfirmation",
-+			GDBUS_ARGS({ "device", "o" }, { "passkey", "u" }),
-+			NULL,
-+			agent_request_confirmation) },
-+	{ GDBUS_ASYNC_METHOD("RequestPinCode",
-+			GDBUS_ARGS({ "device", "o" }),
-+			GDBUS_ARGS({"pincode", "s"}),
-+			agent_request_pincode) },
-+	{ GDBUS_ASYNC_METHOD("RequestPasskey",
-+			GDBUS_ARGS({ "device", "o" }),
-+			GDBUS_ARGS({"passkey", "u"}),
-+			agent_request_passkey) },
-+	{ GDBUS_ASYNC_METHOD("Authorize",
-+			GDBUS_ARGS({ "device", "o" }, { "uuid", "s" }),
-+			NULL,
-+			agent_authorize) },
-+	{ GDBUS_ASYNC_METHOD("ConfirmModeChange",
-+			GDBUS_ARGS( { "mode", "s" }),
-+			NULL,
-+			agent_confirm_mode_change) },
-+	{ GDBUS_ASYNC_METHOD("Cancel",
-+			NULL,
-+			NULL,
-+			agent_cancel) },
-+	{ GDBUS_ASYNC_METHOD("Release",
-+			NULL,
-+			NULL,
-+			agent_release) },
-+	{ }
-+};
-+
- /* Handle BlueZ's DeviceFound signal */
- static gboolean device_found(DBusConnection *conn, DBusMessage *message,
- 							void *user_data)
-@@ -396,6 +726,27 @@ static gboolean cmd_discover(gpointer data)
- 	return FALSE;
- }
- 
-+/* Register this program as an agent itself, to handle other BlueZ clients'
-+ * requests */
-+static gboolean cmd_agent(gpointer data)
++/* Listen for Bluetooth devices broadcasting their availability, then display
++ * the results */
++static gboolean cmd_discover(gpointer data)
 +{
 +	struct cmd_param *param = data;
++	dbus_bool_t success;
++	DBusMessage *msg;
 +
-+	if (!g_dbus_register_interface(conn, "/tool/agent", BLUEZ_AGENT,
-+					agent_methods, NULL, NULL, NULL,
-+									NULL)) {
-+		ERR("Agent interface init failed");
++	/* We may recieve multiple messages for each device, because BlueZ
++	 * notifies us any time it gets additional information for a given
++	 * device, we need to prevent printing duplicate information.
++	 *
++	 * So, we use this hash table as a (unique) set to avoid displaying
++	 * information about a single device more than once. */
++	device_addrs = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
++									NULL);
++
++	g_dbus_add_signal_watch(conn, BLUEZ_SERVICE, NULL, BLUEZ_ADAPTER,
++				"DeviceFound", device_found, NULL, NULL);
++
++	if (!(msg = create_method_call(param->path, BLUEZ_ADAPTER,
++							"StartDiscovery")))
 +		return FALSE;
-+	}
 +
-+	if (register_agent(conn, param->path, "/tool/agent", "DisplayYesNo")
-+									< 0) {
-+		exit(1);
-+	}
++	printf("Device Address       Name\t\t\tStatus\n");
++	printf("--------------       ----\t\t\t------\n");
++
++	/* Send the message without registering a notify function. This means we
++	 * won't recieve indication of any errors (which may be acceptable in
++	 * certain instances, such as when discovering visible devices) */
++	success = dbus_connection_send(conn, msg, NULL);
++
++	/* We can't know for sure when we've heard back from all Bluetooth
++	 * devices within range, so we need to wait some number of seconds and
++	 * print details as they come in */
++	if (success)
++		g_timeout_add_seconds(12, stop_discovery_cb, param->path);
++	else
++		ERR("Not enough memory to send message");
++
++	dbus_message_unref(msg);
 +
 +	return FALSE;
 +}
@@ -394,11 +296,12 @@ index 48521fd..6035eda 100644
  static void run_func(const char *adapter_path, GSourceFunc fn,
  							struct cmd_param *param)
  {
-@@ -525,6 +876,7 @@ static void bluetoothd_disconnect(DBusConnection *conn, void *user_data)
+@@ -284,7 +524,7 @@ static void bluetoothd_disconnect(DBusConnection *conn, void *user_data)
+ }
  
  static struct cmd_struct commands[] = {
- 	{ "discover", cmd_discover},
-+	{ "agent", cmd_agent},
+-	{ NULL, NULL},
++	{ "discover", cmd_discover},
  };
  
  /* Returns FALSE in case the command could not be parsed. Any failures during
