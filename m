@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [WORKAROUND BlueZ 3/3] gdbus: Add fallback to PropertyChanged
-Date: Mon,  8 Oct 2012 10:11:24 +0200
-Message-Id: <1349683884-22251-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [WORKAROUND BlueZ 2/3] gdbus: Add fallback to SetProperty
+Date: Mon,  8 Oct 2012 10:11:23 +0200
+Message-Id: <1349683884-22251-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1349683884-22251-1-git-send-email-luiz.dentz@gmail.com>
 References: <1349683884-22251-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,66 +11,141 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds a fallback for PropertyChanged signal when it is not implemented.
+This adds a fallback for SetProperty method when it is not implemented.
 ---
- gdbus/object.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ gdbus/object.c | 94 +++++++++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 67 insertions(+), 27 deletions(-)
 
 diff --git a/gdbus/object.c b/gdbus/object.c
-index 8f6cbed..609378c 100644
+index e7a4cc3..8f6cbed 100644
 --- a/gdbus/object.c
 +++ b/gdbus/object.c
-@@ -1587,6 +1587,41 @@ gboolean g_dbus_emit_signal_valist(DBusConnection *connection,
- 							name, type, args);
+@@ -827,15 +827,47 @@ static DBusMessage *properties_get_all(DBusConnection *connection,
+ 	return reply;
  }
  
-+static void fallback_property_changed(struct generic_data *data,
-+						struct interface_data *iface,
-+						GDBusPropertyTable *p)
++static DBusMessage *property_set(struct interface_data *iface,
++				DBusMessage *message, const char *name,
++				DBusMessageIter *iter)
 +{
-+	DBusMessage *signal;
-+	DBusMessageIter iter, value;
-+	const GDBusSignalTable *s;
++	const GDBusPropertyTable *property;
++	struct property_data *propdata;
 +
-+	for (s = iface->signals; s && s->name; s++) {
-+		/* Skip if PropertyChanged is present in the signals */
-+		if (g_str_equal(s->name, "PropertyChanged") == 0)
-+			return;
-+	}
++	property = find_property(iface->properties, name);
++	if (property == NULL)
++		return g_dbus_create_error(message,
++						DBUS_ERROR_UNKNOWN_PROPERTY,
++						"No such property '%s'", name);
 +
-+	signal = dbus_message_new_signal(data->path, iface->name,
-+							"PropertyChanged");
-+	if (signal == NULL) {
-+		error("Unable to allocate new %s.PropertyChanged signal",
-+								iface->name);
-+		return;
-+	}
++	if (property->set == NULL)
++		return g_dbus_create_error(message,
++					DBUS_ERROR_PROPERTY_READ_ONLY,
++					"Property '%s' is not writable", name);
 +
-+	dbus_message_iter_init_append(signal, &iter);
++	if (property->exists != NULL &&
++			!property->exists(property, iface->user_data))
++		return g_dbus_create_error(message,
++						DBUS_ERROR_UNKNOWN_PROPERTY,
++						"No such property '%s'", name);
 +
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &p->name);
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_VARIANT, p->type,
-+								&value);
++	propdata = g_new(struct property_data, 1);
++	propdata->id = next_pending_property++;
++	propdata->message = dbus_message_ref(message);
++	pending_property_set = g_slist_prepend(pending_property_set, propdata);
 +
-+	p->get(p, &value, iface->user_data);
++	property->set(property, iter, propdata->id, iface->user_data);
 +
-+	dbus_message_iter_close_container(&iter, &value);
-+
-+	g_dbus_send_message(data->conn, signal);
++	return NULL;
 +}
 +
- static void process_properties_from_interface(struct generic_data *data,
- 						struct interface_data *iface)
+ static DBusMessage *properties_set(DBusConnection *connection,
+ 					DBusMessage *message, void *user_data)
  {
-@@ -1624,6 +1659,8 @@ static void process_properties_from_interface(struct generic_data *data,
- 			continue;
+ 	struct generic_data *data = user_data;
+ 	DBusMessageIter iter, sub;
+ 	struct interface_data *iface;
+-	const GDBusPropertyTable *property;
+ 	const char *name, *interface;
+-	struct property_data *propdata;
  
- 		append_property(iface, p, &dict);
+ 	if (!dbus_message_iter_init(message, &iter))
+ 		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
+@@ -869,31 +901,7 @@ static DBusMessage *properties_set(DBusConnection *connection,
+ 		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
+ 					"No such interface '%s'", interface);
+ 
+-	property = find_property(iface->properties, name);
+-	if (property == NULL)
+-		return g_dbus_create_error(message,
+-						DBUS_ERROR_UNKNOWN_PROPERTY,
+-						"No such property '%s'", name);
+-
+-	if (property->set == NULL)
+-		return g_dbus_create_error(message,
+-					DBUS_ERROR_PROPERTY_READ_ONLY,
+-					"Property '%s' is not writable", name);
+-
+-	if (property->exists != NULL &&
+-			!property->exists(property, iface->user_data))
+-		return g_dbus_create_error(message,
+-						DBUS_ERROR_UNKNOWN_PROPERTY,
+-						"No such property '%s'", name);
+-
+-	propdata = g_new(struct property_data, 1);
+-	propdata->id = next_pending_property++;
+-	propdata->message = dbus_message_ref(message);
+-	pending_property_set = g_slist_prepend(pending_property_set, propdata);
+-
+-	property->set(property, &sub, propdata->id, iface->user_data);
+-
+-	return NULL;
++	return property_set(iface, message, name, &sub);
+ }
+ 
+ static const GDBusMethodTable properties_methods[] = {
+@@ -1022,10 +1030,42 @@ static DBusMessage *get_properties(DBusConnection *connection,
+ 	return reply;
+ }
+ 
++static DBusMessage *set_property(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
++{
++	struct interface_data *iface = user_data;
++	DBusMessageIter iter, sub;
++	const char *name;
 +
-+		fallback_property_changed(data, iface, p);
- 	}
++	if (!dbus_message_iter_init(message, &iter))
++		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
++							"No arguments given");
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
++		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
++					"Invalid argument type: '%c'",
++					dbus_message_iter_get_arg_type(&iter));
++
++	dbus_message_iter_get_basic(&iter, &name);
++	dbus_message_iter_next(&iter);
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_VARIANT)
++		return g_dbus_create_error(message, DBUS_ERROR_INVALID_ARGS,
++					"Invalid argument type: '%c'",
++					dbus_message_iter_get_arg_type(&iter));
++
++	dbus_message_iter_recurse(&iter, &sub);
++
++	return property_set(iface, message, name, &sub);
++}
++
+ static const GDBusMethodTable fallback_methods[] = {
+ 	{ GDBUS_METHOD("GetProperties",
+ 			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
+ 			get_properties) },
++	{ GDBUS_ASYNC_METHOD("SetProperty",
++			GDBUS_ARGS({ "name", "s" }, { "value", "v" }), NULL,
++			set_property) },
+ 	{ }
+ };
  
- 	dbus_message_iter_close_container(&iter, &dict);
 -- 
 1.7.11.4
 
