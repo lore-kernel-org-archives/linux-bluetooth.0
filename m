@@ -1,47 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <506B4479.3050105@globaledgesoft.com>
-Date: Wed, 03 Oct 2012 01:16:01 +0530
-From: Ajay <ajay.kv@globaledgesoft.com>
-MIME-Version: 1.0
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: L2CAP Flush_Timeout  Error
-References: <506B3010.6060606@globaledgesoft.com> <20121008091144.GF2456@aemeltch-MOBL1>
-In-Reply-To: <20121008091144.GF2456@aemeltch-MOBL1>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: chanyeol.park@samsung.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 2/2] audio: Remove redundant procedure when a2dp connect
+Date: Mon, 08 Oct 2012 18:30:53 +0900
+Message-id: <1349688653-20335-2-git-send-email-chanyeol.park@samsung.com>
+In-reply-to: <1349688653-20335-1-git-send-email-chanyeol.park@samsung.com>
+References: <1349688653-20335-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 08 October 2012 02:41 PM, Andrei Emeltchenko wrote:
-> On Tue, Oct 02, 2012 at 11:48:56PM +0530, Ajay wrote:
->> Hi,
->>      Im currently working in an A2DP stuff, where i noticed an error.
->> Here i wanted to monitor the flushed packets due to timeout.
->>
->>   I used the  l2test code for my testing purpose
->>
->>                On client side   "l2test  -R  -S <bdadddr> "
->>                and i set the flush timeout as 100 (opts.flush_to = 100)
->>
->>         But  later  when i print the getsockopt value of flush_to, it
->> was showing some default value (65532)  harcoded at kernel side.
->
-> Try the patch in this thread.
->
-> Best regards
-> Andrei Emeltchenko
->
+From: Chan-yeol Park <chanyeol.park@samsung.com>
 
-    Thanks for your patch , its working fine. Now even  if i set the 
-flush_timeout = 5 , i couldnt  able to see any packets missing at the 
-receiver side . Here in the sender  side  im giving proper sequence 
-number, and these same sequence is getting at the receiver side . i 
-doubted even though its flushing , controller is doing some 
-retransmission job...please help . My kernel is 2.6.39 , and im using 
-BASIC MODE of transmission. so shall i change it to STEAMING MODE ????
+This patch fixes the bug that when remote host is down a2dp connection failure
+is handled like XCASE
+---
+ audio/avdtp.c |   13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
+diff --git a/audio/avdtp.c b/audio/avdtp.c
+index d905db3..ae1ab7b 100644
+--- a/audio/avdtp.c
++++ b/audio/avdtp.c
+@@ -2411,9 +2411,10 @@ static void avdtp_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ {
+ 	struct avdtp *session = user_data;
+ 	char address[18];
+-	GError *gerr = NULL;
++	int err_no = EIO;
+ 
+ 	if (err) {
++		err_no = err->code;
+ 		error("%s", err->message);
+ 		goto failed;
+ 	}
+@@ -2421,13 +2422,13 @@ static void avdtp_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 	if (!session->io)
+ 		session->io = g_io_channel_ref(chan);
+ 
+-	bt_io_get(chan, &gerr,
++	bt_io_get(chan, &err,
+ 			BT_IO_OPT_OMTU, &session->omtu,
+ 			BT_IO_OPT_IMTU, &session->imtu,
+ 			BT_IO_OPT_INVALID);
+-	if (gerr) {
+-		error("%s", gerr->message);
+-		g_error_free(gerr);
++	if (err) {
++		err_no = err->code;
++		error("%s", err->message);
+ 		goto failed;
+ 	}
+ 
+@@ -2481,7 +2482,7 @@ failed:
+ 			avdtp_sep_set_state(session, stream->lsep,
+ 						AVDTP_STATE_IDLE);
+ 	} else
+-		connection_lost(session, EIO);
++		connection_lost(session, err_no);
+ }
+ 
+ static void auth_cb(DBusError *derr, void *user_data)
 -- 
-  Thanks & regards
+1.7.9.5
 
-AJAY KV
-8892753703
