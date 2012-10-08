@@ -1,79 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] service: Fix passing stack variable as reference value
-Date: Mon,  8 Oct 2012 22:08:24 +0200
-Message-Id: <1349726904-5381-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFCv1 4/6] Bluetooth: Handle number of compl blocks for AMP_LINK
+Date: Mon,  8 Oct 2012 17:52:10 +0300
+Message-Id: <1349707932-10006-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1349707932-10006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1349707932-10006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-BDADDR_ANY cannot be return as it uses stack allocation:
+Add handling blocks count for AMP link.
 
-Conditional jump or move depends on uninitialised value(s)
-   at 0x170E47: sdp_record_remove (sdpd-database.c:269)
-   by 0x17071A: remove_record_from_server (sdpd-service.c:290)
-   by 0x14D416: exit_callback (service.c:131)
-   by 0x124396: service_filter (watch.c:486)
-   by 0x12405A: message_filter (watch.c:554)
-   by 0x4F63A35: dbus_connection_dispatch (in /usr/lib64/libdbus-1.so.3.5.6)
-   by 0x122EE7: message_dispatch (mainloop.c:76)
-   by 0x4C7B3BA: ??? (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x4C7A824: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x4C7AB57: ??? (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x4C7AF51: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x1225B1: main (main.c:551)
- Uninitialised value was created by a stack allocation
-   at 0x1705B0: add_record_to_server (sdpd-service.c:235)
-
-Conditional jump or move depends on uninitialised value(s)
-   at 0x4A0AD21: bcmp (mc_replace_strmem.c:889)
-   by 0x4C959E0: g_slist_find_custom (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x17C059: manager_find_adapter (manager.c:291)
-   by 0x170E8F: sdp_record_remove (sdpd-database.c:270)
-   by 0x17071A: remove_record_from_server (sdpd-service.c:290)
-   by 0x14D416: exit_callback (service.c:131)
-   by 0x124396: service_filter (watch.c:486)
-   by 0x12405A: message_filter (watch.c:554)
-   by 0x4F63A35: dbus_connection_dispatch (in /usr/lib64/libdbus-1.so.3.5.6)
-   by 0x122EE7: message_dispatch (mainloop.c:76)
-   by 0x4C7B3BA: ??? (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x4C7A824: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3200.4)
- Uninitialised value was created by a stack allocation
-   at 0x1705B0: add_record_to_server (sdpd-service.c:235)
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- plugins/service.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+ net/bluetooth/hci_event.c |   12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/plugins/service.c b/plugins/service.c
-index cea36e0..eebacc5 100644
---- a/plugins/service.c
-+++ b/plugins/service.c
-@@ -45,6 +45,8 @@
- #include "log.h"
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 82e478a..c479732 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2698,13 +2698,21 @@ static void hci_num_comp_blocks_evt(struct hci_dev *hdev, struct sk_buff *skb)
  
- #define SERVICE_INTERFACE "org.bluez.Service"
-+#define get_address(adp) \
-+	(adp->adapter ? adapter_get_address(adp->adapter) : BDADDR_ANY)
+ 	for (i = 0; i < ev->num_hndl; i++) {
+ 		struct hci_comp_blocks_info *info = &ev->handles[i];
+-		struct hci_conn *conn;
++		struct hci_conn *conn = NULL;
++		struct hci_chan *chan;
+ 		__u16  handle, block_count;
  
- struct record_data {
- 	uint32_t handle;
-@@ -134,14 +136,6 @@ static void exit_callback(DBusConnection *conn, void *user_data)
- 	g_free(user_record);
- }
+ 		handle = __le16_to_cpu(info->handle);
+ 		block_count = __le16_to_cpu(info->blocks);
  
--static const bdaddr_t *get_address(struct service_adapter *serv_adapter)
--{
--	if (serv_adapter->adapter)
--		return adapter_get_address(serv_adapter->adapter);
--
--	return BDADDR_ANY;
--}
--
- static int add_xml_record(const char *sender,
- 			struct service_adapter *serv_adapter,
- 			const char *record, dbus_uint32_t *handle)
+-		conn = hci_conn_hash_lookup_handle(hdev, handle);
++		if (hdev->dev_type == HCI_BREDR) {
++			conn = hci_conn_hash_lookup_handle(hdev, handle);
++		} else {
++			chan = hci_chan_lookup_handle_all(hdev, handle);
++			if (chan)
++				conn = chan->conn;
++		}
++
+ 		if (!conn)
+ 			continue;
+ 
 -- 
-1.7.11.4
+1.7.9.5
 
