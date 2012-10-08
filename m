@@ -1,125 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 8 Oct 2012 10:56:05 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [PATCH 4/8] Bluetooth: Add chan->ops->defer()
-Message-ID: <20121008075603.GC2456@aemeltch-MOBL1>
-References: <1349651981-6251-1-git-send-email-gustavo@padovan.org>
- <1349651981-6251-4-git-send-email-gustavo@padovan.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1349651981-6251-4-git-send-email-gustavo@padovan.org>
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: [PATCH -v4 1/2] rctest: add automated test
+Date: Mon,  8 Oct 2012 11:50:02 +0800
+Message-Id: <1349668203-10782-1-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1346446228-11105-1-git-send-email-gustavo@padovan.org>
+References: <1346446228-11105-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-On Mon, Oct 08, 2012 at 07:19:37AM +0800, Gustavo Padovan wrote:
-> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> 
-> When DEFER_SETUP is set defer() will trigger an authorization
-> request to the userspace.
-> 
-> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> ---
->  include/net/bluetooth/l2cap.h |  1 +
->  net/bluetooth/l2cap_core.c    | 10 +++-------
->  net/bluetooth/l2cap_sock.c    | 13 +++++++++++++
->  3 files changed, 17 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 7002f0d..eef7146 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -540,6 +540,7 @@ struct l2cap_ops {
->  	void			(*state_change) (struct l2cap_chan *chan,
->  						 int state);
->  	void			(*ready) (struct l2cap_chan *chan);
-> +	void			(*defer) (struct l2cap_chan *chan);
->  	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
->  					       unsigned long len, int nb);
->  };
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 9e166ce..02a66fb 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -1123,11 +1123,9 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
->  				lock_sock(sk);
->  				if (test_bit(BT_SK_DEFER_SETUP,
->  					     &bt_sk(sk)->flags)) {
-> -					struct sock *parent = bt_sk(sk)->parent;
->  					rsp.result = __constant_cpu_to_le16(L2CAP_CR_PEND);
->  					rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
-> -					if (parent)
-> -						parent->sk_data_ready(parent, 0);
-> +					chan->ops->defer(chan);
->  
->  				} else {
->  					__l2cap_state_change(chan, BT_CONFIG);
-> @@ -3459,7 +3457,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn,
->  				__l2cap_state_change(chan, BT_CONNECT2);
->  				result = L2CAP_CR_PEND;
->  				status = L2CAP_CS_AUTHOR_PEND;
-> -				parent->sk_data_ready(parent, 0);
-> +				chan->ops->defer(chan);
->  			} else {
->  				__l2cap_state_change(chan, BT_CONFIG);
->  				result = L2CAP_CR_SUCCESS;
-> @@ -5520,11 +5518,9 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
->  			if (!status) {
->  				if (test_bit(BT_SK_DEFER_SETUP,
->  					     &bt_sk(sk)->flags)) {
-> -					struct sock *parent = bt_sk(sk)->parent;
->  					res = L2CAP_CR_PEND;
->  					stat = L2CAP_CS_AUTHOR_PEND;
-> -					if (parent)
-> -						parent->sk_data_ready(parent, 0);
-> +					chan->ops->defer(chan);
->  				} else {
->  					__l2cap_state_change(chan, BT_CONFIG);
->  					res = L2CAP_CR_SUCCESS;
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 0feb8f8..f0e4410 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -955,6 +955,7 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
->  
->  	bt_accept_enqueue(parent, sk);
->  
-> +
->  	release_sock(parent);
->  
->  	return l2cap_pi(sk)->chan;
-> @@ -1087,6 +1088,17 @@ static void l2cap_sock_ready_cb(struct l2cap_chan *chan)
->  	release_sock(sk);
->  }
->  
-> +static void l2cap_sock_defer_cb(struct l2cap_chan *chan)
-> +{
-> +	struct sock *sk = chan->data;
-> +	struct sock *parent;
-> +
-> +	parent = bt_sk(sk)->parent;
-> +
-> +	if (parent)
-> +		parent->sk_data_ready(parent, 0);
-> +}
-> +
->  static struct l2cap_ops l2cap_chan_ops = {
->  	.name		= "L2CAP Socket Interface",
->  	.new_connection	= l2cap_sock_new_connection_cb,
-> @@ -1095,6 +1107,7 @@ static struct l2cap_ops l2cap_chan_ops = {
->  	.teardown	= l2cap_sock_teardown_cb,
->  	.state_change	= l2cap_sock_state_change_cb,
->  	.ready		= l2cap_sock_ready_cb,
-> +	.defer		= l2cap_sock_defer_cb,
->  	.alloc_skb	= l2cap_sock_alloc_skb_cb,
->  };
+adds -a option to enable automated tests. We use the -i option to define
+the receiving side and the -a define the sending side:
 
-I think we might add just in case no_defer in  a2mp_chan_ops
+./rctest -i hci0 -a hci1
+---
+ test/rctest.c | 46 ++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 42 insertions(+), 4 deletions(-)
 
-Best regards 
-Andrei Emeltchenko 
+diff --git a/test/rctest.c b/test/rctest.c
+index 2dd54de..d19e096 100644
+--- a/test/rctest.c
++++ b/test/rctest.c
+@@ -55,7 +55,8 @@ enum {
+ 	DUMP,
+ 	CONNECT,
+ 	CRECV,
+-	LSEND
++	LSEND,
++	AUTO,
+ };
+ 
+ static unsigned char *buf;
+@@ -72,6 +73,7 @@ static unsigned long delay = 0;
+ 
+ /* Default addr and channel */
+ static bdaddr_t bdaddr;
++static bdaddr_t auto_bdaddr;
+ static uint16_t uuid = 0x0000;
+ static uint8_t channel = 10;
+ 
+@@ -162,7 +164,11 @@ static int do_connect(const char *svr)
+ 	/* Bind to local address */
+ 	memset(&addr, 0, sizeof(addr));
+ 	addr.rc_family = AF_BLUETOOTH;
+-	bacpy(&addr.rc_bdaddr, &bdaddr);
++
++	if (bacmp(&auto_bdaddr, BDADDR_ANY))
++		bacpy(&addr.rc_bdaddr, &auto_bdaddr);
++	else
++		bacpy(&addr.rc_bdaddr, &bdaddr);
+ 
+ 	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+ 		syslog(LOG_ERR, "Can't bind socket: %s (%d)",
+@@ -592,6 +598,23 @@ static void multi_connect_mode(int argc, char *argv[])
+ 	}
+ }
+ 
++static void automated_send_recv()
++{
++	int sk;
++	char device[18];
++
++	if (fork()) {
++		do_listen(recv_mode);
++	} else {
++		ba2str(&bdaddr, device);
++
++		sk = do_connect(device);
++		if (sk < 0)
++			exit(1);
++		send_mode(sk);
++	}
++}
++
+ static void usage(void)
+ {
+ 	printf("rctest - RFCOMM testing\n"
+@@ -605,7 +628,8 @@ static void usage(void)
+ 		"\t-u connect and receive\n"
+ 		"\t-n connect and be silent\n"
+ 		"\t-c connect, disconnect, connect, ...\n"
+-		"\t-m multiple connects\n");
++		"\t-m multiple connects\n"
++		"\t-a automated test (receive hcix as parameter)\n");
+ 
+ 	printf("Options:\n"
+ 		"\t[-b bytes] [-i device] [-P channel] [-U uuid]\n"
+@@ -629,8 +653,9 @@ int main(int argc, char *argv[])
+ 	int opt, sk, mode = RECV, need_addr = 0;
+ 
+ 	bacpy(&bdaddr, BDADDR_ANY);
++	bacpy(&auto_bdaddr, BDADDR_ANY);
+ 
+-	while ((opt=getopt(argc,argv,"rdscuwmnb:i:P:U:B:N:MAESL:W:C:D:Y:T")) != EOF) {
++	while ((opt=getopt(argc,argv,"rdscuwmna:b:i:P:U:B:N:MAESL:W:C:D:Y:T")) != EOF) {
+ 		switch (opt) {
+ 		case 'r':
+ 			mode = RECV;
+@@ -669,6 +694,15 @@ int main(int argc, char *argv[])
+ 			need_addr = 1;
+ 			break;
+ 
++		case 'a':
++			mode = AUTO;
++
++			if (!strncasecmp(optarg, "hci", 3))
++				hci_devba(atoi(optarg + 3), &auto_bdaddr);
++			else
++				str2ba(optarg, &auto_bdaddr);
++			break;
++
+ 		case 'b':
+ 			data_size = atoi(optarg);
+ 			break;
+@@ -805,6 +839,10 @@ int main(int argc, char *argv[])
+ 				exit(1);
+ 			dump_mode(sk);
+ 			break;
++
++		case AUTO:
++			automated_send_recv();
++			break;
+ 	}
+ 
+ 	syslog(LOG_INFO, "Exit");
+-- 
+1.7.11.4
 
