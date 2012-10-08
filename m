@@ -1,79 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1349706394.27233.71.camel@aeonflux>
-Subject: Re: Wireshark
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Michal.Labedzki@tieto.com
-Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
-Date: Mon, 08 Oct 2012 16:26:34 +0200
-In-Reply-To: <E50901D4F2CF69428D43141B7C8586793514C59580@EXMB03.eu.tieto.com>
-References: <E50901D4F2CF69428D43141B7C8586792CFACCF505@EXMB03.eu.tieto.com>
-	 <20120928135747.GD8184@aemeltch-MOBL1>
-	 <E50901D4F2CF69428D43141B7C8586792CFACCF507@EXMB03.eu.tieto.com>
-	,<20121003080438.GA11960@x220>
-	 <E50901D4F2CF69428D43141B7C8586793514C59580@EXMB03.eu.tieto.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1349703809.27233.65.camel@aeonflux>
+References: <1349683884-22251-1-git-send-email-luiz.dentz@gmail.com>
+	<1349703809.27233.65.camel@aeonflux>
+Date: Mon, 8 Oct 2012 16:25:13 +0200
+Message-ID: <CABBYNZL9LaALwQzL7Ca3E=K8OewpTNX4ySSc2OZ2CM3jv0O_cA@mail.gmail.com>
+Subject: Re: [WORKAROUND BlueZ 1/3] gdbus: Add fallback to GetProperties
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+Hi Marcel,
 
-> > I think you must have misunderstood what I was trying to say. Did you
-> > actually look into what the monitor socket we talked about is? I wasn't
-> > trying to say wireshark shouldn't be used (so no point in iterating it's
-> > benefits - you've already convinced me) but that its Bluetooth decoding
-> > support be ported from traditional HCI sockets to use monitor sockets
-> > instead. This wouldn't give us any new decoders to wireshark but it
-> > would allow early HCI traffic decoding (e.g. on plugged in USB dongles)
-> 
-> Hmm... Do you mean something like: 
-> https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=5032
+On Mon, Oct 8, 2012 at 3:43 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
+>
+>> This adds a fallback for GetProperties method when it is not
+>> implemented.
+>> ---
+>> This set of patches are workarounds to old properties interface to be able to
+>> test new code until other components are ported.
+>
+> I am not sure I want this at all. This is a nasty hack.
+>
+> Especially since interfaces that previously had neither or only some of
+> these methods get these methods. Bad idea. It might work inside BlueZ
+> where we always added these methods, but in other projects some of these
+> methods had been left out since the properties where send via signals
+> with the object path being announced.
 
-that is Bluetooth HCI data inside USB traffic captured via usbmon
-interfaces. Would work as well, but you need a lot of filtering to get
-the right data that you are looking for. Especially problematic if the
-device is not on USB or split across multiple USB busses. Which is
-possible with Bluetooth 3.0 HighSpeed.
+Yep, I fully agree this is not meant to be upstream (only perhaps
+behind a compilation flag or something like that), also this does not
+work with clients which do use the introspection data like dbus-python
+because the fallback methods are not part of it the python scripts
+will just fail.
 
-The Bluetooth monitor socket would give all at once. And will also give
-you some extra data in case you missed the initial packets when the
-adapter was plugged in. Like type (BR/EDR vs AMP) and address.
+The purpose of these patches is for testing the new code with
+components such as PulseAudio, oFono, Connman and gnome-shell as we
+move forward and finish the changes they should no longer be
+necessary.
 
-> I will look at that and I this is on my TODO list. But please note that my first goal is add
-> full Bluetooth stack support to Wireshark (profiles and protocols). When this will be done I want to and other stuff like BToverUSB, etc.
-
-You will never be done with all profiles and protocols. I have been
-working with Bluetooth for over 11 years, they will always come with
-another protocol or profile.
-
-> The purpose of my visit here is fetch some needed logs for testing new dissectors and present this new tool to all Bluetooth developers here.
-> And of course I very like new idea.
-> 
-> New monitor sockets is not very important for now, I focus on decoding dump files (I do not have any real devices to live-capture testing). 
-> It is ok for future. By the way, this sounds like task for libpcap, not really Wireshark (by I am not familiar with internals yet)
-
-Maybe it should be added to libpcap, but nevertheless it needs to be
-done. It is the only way to get reliable data from the system these
-days. The kernel is taking more and more control. And that becomes hard
-to capture from userspace since it will be by definition too late.
-
-> > which isn't possible with current wireshark or hcidump and context
-> > discovery when tracing is started after there already exists
-> > connections.
-> 
-> > Considering these benefits monitor sockets compared to HCI ones is it
-> > something you might be interested in implementing?
-> 
-> Is that stable? 
-
-Yes, it is stable.
-
-> Hmmm... Has anyone logs? :)
-
-It is like HCI with an extra header. Look at hci_mon.h.
-
-Regards
-
-Marcel
-
-
+-- 
+Luiz Augusto von Dentz
