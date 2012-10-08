@@ -1,33 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5072C9EF.8040605@tieto.com>
-Date: Mon, 8 Oct 2012 14:41:19 +0200
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
+From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v3] Cycling Speed and Cadence profile (CSCP) API
-References: <1349084621-25284-1-git-send-email-andrzej.kaczmarek@tieto.com> <1349084621-25284-2-git-send-email-andrzej.kaczmarek@tieto.com> <20121005174348.GA8074@x220>
-In-Reply-To: <20121005174348.GA8074@x220>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+CC: Szymon Janc <szymon@janc.net.pl>
+Subject: [PATCH] event: Remove not used btd_event_remote_class
+Date: Mon, 8 Oct 2012 14:11:28 +0200
+Message-ID: <1349698288-15112-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Szymon Janc <szymon@janc.net.pl>
 
-On 10/05/2012 07:43 PM, Johan Hedberg wrote:
-> Hi Andrzej,
->
-> On Mon, Oct 01, 2012, Andrzej Kaczmarek wrote:
->> ---
->>   doc/cycling-api.txt | 118 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 118 insertions(+)
->>   create mode 100644 doc/cycling-api.txt
->
-> Applied. Thanks.
->
-> Do you already have some corresponding code too?
+This was used in hciops only. With mgmt interface remote CoD is
+received in EIR from Device Found/Connected events.
 
-I'm working on it. Will send patches once it's completed and tested.
+---
+ src/event.c |   22 ----------------------
+ src/event.h |    1 -
+ 2 files changed, 23 deletions(-)
 
-BR,
-Andrzej
+diff --git a/src/event.c b/src/event.c
+index 84c7f88..0ebab19 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -280,28 +280,6 @@ void btd_event_set_legacy_pairing(bdaddr_t *local, bdaddr_t *peer,
+ 		dev->legacy = legacy;
+ }
+ 
+-void btd_event_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class)
+-{
+-	struct btd_adapter *adapter;
+-	struct btd_device *device;
+-	uint32_t old_class = 0;
+-
+-	read_remote_class(local, peer, &old_class);
+-
+-	if (old_class == class)
+-		return;
+-
+-	write_remote_class(local, peer, class);
+-
+-	if (!get_adapter_and_device(local, peer, &adapter, &device, FALSE))
+-		return;
+-
+-	if (!device)
+-		return;
+-
+-	device_set_class(device, class);
+-}
+-
+ void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name)
+ {
+ 	struct btd_adapter *adapter;
+diff --git a/src/event.h b/src/event.h
+index 6d001dd..6adf1f5 100644
+--- a/src/event.h
++++ b/src/event.h
+@@ -27,7 +27,6 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type
+ 					int8_t rssi, uint8_t confirm_name,
+ 					uint8_t *data, uint8_t data_len);
+ void btd_event_set_legacy_pairing(bdaddr_t *local, bdaddr_t *peer, gboolean legacy);
+-void btd_event_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class);
+ void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name);
+ void btd_event_conn_complete(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
+ 						char *name, uint32_t class);
+-- 
+1.7.9.5
 
