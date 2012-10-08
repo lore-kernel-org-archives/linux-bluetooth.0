@@ -1,34 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 8 Oct 2012 20:41:50 +0800
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: L2CAP: Fix using default Flush Timeout for EFS
-Message-ID: <20121008124150.GA14724@joana>
-References: <20121007214800.GB13325@joana>
- <1349684082-12928-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <5072C9EF.8040605@tieto.com>
+Date: Mon, 8 Oct 2012 14:41:19 +0200
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1349684082-12928-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v3] Cycling Speed and Cadence profile (CSCP) API
+References: <1349084621-25284-1-git-send-email-andrzej.kaczmarek@tieto.com> <1349084621-25284-2-git-send-email-andrzej.kaczmarek@tieto.com> <20121005174348.GA8074@x220>
+In-Reply-To: <20121005174348.GA8074@x220>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Johan,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-10-08 11:14:41 +0300]:
+On 10/05/2012 07:43 PM, Johan Hedberg wrote:
+> Hi Andrzej,
+>
+> On Mon, Oct 01, 2012, Andrzej Kaczmarek wrote:
+>> ---
+>>   doc/cycling-api.txt | 118 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 118 insertions(+)
+>>   create mode 100644 doc/cycling-api.txt
+>
+> Applied. Thanks.
+>
+> Do you already have some corresponding code too?
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> There are two Flush Timeouts: one is old Flush Timeot Option
-> which is 2 octets and the second is Flush Timeout inside EFS
-> which is 4 octets long.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  include/net/bluetooth/l2cap.h |    3 ++-
->  net/bluetooth/l2cap_core.c    |    6 +++---
->  2 files changed, 5 insertions(+), 4 deletions(-)
+I'm working on it. Will send patches once it's completed and tested.
 
-Applied, thanks.
+BR,
+Andrzej
 
-	Gustavo
