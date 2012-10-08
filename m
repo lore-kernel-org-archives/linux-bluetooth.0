@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 2/6] Bluetooth: AMP: Handle AMP_LINK timeout
-Date: Mon,  8 Oct 2012 17:52:08 +0300
-Message-Id: <1349707932-10006-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 3/6] Bluetooth: AMP: Add handle to hci_chan structure
+Date: Mon,  8 Oct 2012 17:52:09 +0300
+Message-Id: <1349707932-10006-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1349707932-10006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1349707932-10006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,78 +11,81 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When AMP_LINK timeouts execute HCI_OP_DISCONN_PHY_LINK as analog to
-HCI_OP_DISCONNECT for ACL_LINK.
+hci_chan will be identified by handle used in logical link creation
+process. This handle is used in AMP ACL-U packet handle field.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/hci_conn.c |   35 ++++++++++++++++++++++++++++++++---
- 1 file changed, 32 insertions(+), 3 deletions(-)
+ include/net/bluetooth/hci_core.h |    6 ++++--
+ net/bluetooth/hci_conn.c         |   34 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+), 2 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 90ae4f0..951f604 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -348,7 +348,7 @@ struct hci_conn {
+ 
+ struct hci_chan {
+ 	struct list_head list;
+-
++	__u16 handle;
+ 	struct hci_conn *conn;
+ 	struct sk_buff_head data_q;
+ 	unsigned int	sent;
+@@ -565,7 +565,9 @@ void hci_conn_check_pending(struct hci_dev *hdev);
+ struct hci_chan *hci_chan_create(struct hci_conn *conn);
+ void hci_chan_del(struct hci_chan *chan);
+ void hci_chan_list_flush(struct hci_conn *conn);
+-
++struct hci_chan *hci_chan_lookup_handle(struct hci_conn *hcon, __u16 handle);
++struct hci_chan *hci_chan_lookup_handle_all(struct hci_dev *hdev,
++					    __u16 handle);
+ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 			     __u8 dst_type, __u8 sec_level, __u8 auth_type);
+ int hci_conn_check_link_mode(struct hci_conn *conn);
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 53202f6..3584f58 100644
+index 3584f58..7387516 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -130,6 +130,20 @@ void hci_acl_disconn(struct hci_conn *conn, __u8 reason)
- 	hci_send_cmd(conn->hdev, HCI_OP_DISCONNECT, sizeof(cp), &cp);
+@@ -992,3 +992,37 @@ void hci_chan_list_flush(struct hci_conn *conn)
+ 	list_for_each_entry_safe(chan, n, &conn->chan_list, list)
+ 		hci_chan_del(chan);
  }
- 
-+static void hci_amp_disconn(struct hci_conn *conn, __u8 reason)
++
++struct hci_chan *hci_chan_lookup_handle(struct hci_conn *hcon, __u16 handle)
 +{
-+	struct hci_cp_disconn_phy_link cp;
++	struct hci_chan *hchan;
 +
-+	BT_DBG("hcon %p", conn);
-+
-+	conn->state = BT_DISCONN;
-+
-+	cp.phy_handle = (u8) conn->handle;
-+	cp.reason = reason;
-+	hci_send_cmd(conn->hdev, HCI_OP_DISCONN_PHY_LINK,
-+		     sizeof(cp), &cp);
-+}
-+
- static void hci_add_sco(struct hci_conn *conn, __u16 handle)
- {
- 	struct hci_dev *hdev = conn->hdev;
-@@ -230,11 +244,27 @@ void hci_sco_setup(struct hci_conn *conn, __u8 status)
- 	}
- }
- 
-+static void hci_conn_disconnect(struct hci_conn *conn)
-+{
-+	u8 reason;
-+
-+	reason = hci_proto_disconn_ind(conn);
-+
-+	switch (conn->type) {
-+	case ACL_LINK:
-+		hci_acl_disconn(conn, reason);
-+		break;
-+
-+	case AMP_LINK:
-+		hci_amp_disconn(conn, reason);
-+		break;
++	list_for_each_entry(hchan, &hcon->chan_list, list) {
++		if (hchan->handle == handle)
++			return hchan;
 +	}
++
++	return NULL;
 +}
 +
- static void hci_conn_timeout(struct work_struct *work)
- {
- 	struct hci_conn *conn = container_of(work, struct hci_conn,
- 					     disc_work.work);
--	__u8 reason;
- 
- 	BT_DBG("hcon %p state %s", conn, state_to_string(conn->state));
- 
-@@ -253,8 +283,7 @@ static void hci_conn_timeout(struct work_struct *work)
- 		break;
- 	case BT_CONFIG:
- 	case BT_CONNECTED:
--		reason = hci_proto_disconn_ind(conn);
--		hci_acl_disconn(conn, reason);
-+		hci_conn_disconnect(conn);
- 		break;
- 	default:
- 		conn->state = BT_CLOSED;
++struct hci_chan *hci_chan_lookup_handle_all(struct hci_dev *hdev, __u16 handle)
++{
++	struct hci_conn_hash *h = &hdev->conn_hash;
++	struct hci_conn *hcon;
++
++	rcu_read_lock();
++
++	list_for_each_entry_rcu(hcon, &h->list, list) {
++		struct hci_chan *hchan;
++
++		hchan = hci_chan_lookup_handle(hcon, handle);
++		if (hchan) {
++			rcu_read_unlock();
++			return hchan;
++		}
++	}
++
++	rcu_read_unlock();
++
++	return NULL;
++}
 -- 
 1.7.9.5
 
