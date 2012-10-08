@@ -1,34 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 1/6] Bluetooth: Allow to set flush timeout
-Date: Mon,  8 Oct 2012 17:52:07 +0300
-Message-Id: <1349707932-10006-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1349707932-10006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1349707932-10006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZL9LaALwQzL7Ca3E=K8OewpTNX4ySSc2OZ2CM3jv0O_cA@mail.gmail.com>
+References: <1349683884-22251-1-git-send-email-luiz.dentz@gmail.com>
+	<1349703809.27233.65.camel@aeonflux>
+	<CABBYNZL9LaALwQzL7Ca3E=K8OewpTNX4ySSc2OZ2CM3jv0O_cA@mail.gmail.com>
+Date: Mon, 8 Oct 2012 16:29:09 +0200
+Message-ID: <CABBYNZLa68rSJfFEy=bnnFfi1Z7rok3jm_wWh9Ykz=zb_YYXaA@mail.gmail.com>
+Subject: Re: [WORKAROUND BlueZ 1/3] gdbus: Add fallback to GetProperties
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi,
 
+On Mon, Oct 8, 2012 at 4:25 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Marcel,
+>
+> On Mon, Oct 8, 2012 at 3:43 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Hi Luiz,
+>>
+>>> This adds a fallback for GetProperties method when it is not
+>>> implemented.
+>>> ---
+>>> This set of patches are workarounds to old properties interface to be able to
+>>> test new code until other components are ported.
+>>
+>> I am not sure I want this at all. This is a nasty hack.
+>>
+>> Especially since interfaces that previously had neither or only some of
+>> these methods get these methods. Bad idea. It might work inside BlueZ
+>> where we always added these methods, but in other projects some of these
+>> methods had been left out since the properties where send via signals
+>> with the object path being announced.
+>
+> Yep, I fully agree this is not meant to be upstream (only perhaps
+> behind a compilation flag or something like that), also this does not
+> work with clients which do use the introspection data like dbus-python
+> because the fallback methods are not part of it the python scripts
+> will just fail.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/l2cap_sock.c |    1 +
- 1 file changed, 1 insertion(+)
+Actually it does work with our test scripts for some reason.
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index a71c408..b0014d5 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -529,6 +529,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
- 		chan->fcs  = opts.fcs;
- 		chan->max_tx = opts.max_tx;
- 		chan->tx_win = opts.txwin_size;
-+		chan->flush_to = opts.flush_to;
- 		break;
- 
- 	case L2CAP_LM:
 -- 
-1.7.9.5
-
+Luiz Augusto von Dentz
