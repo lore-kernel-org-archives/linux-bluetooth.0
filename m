@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 08/15] thermometer: Change string properties to lower-case
-Date: Tue, 9 Oct 2012 13:19:51 +0200
-Message-ID: <1349781598-22580-9-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3 15/15] thermometer: Fix missing braces
+Date: Tue, 9 Oct 2012 13:19:58 +0200
+Message-ID: <1349781598-22580-16-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1349781598-22580-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1349781598-22580-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -13,97 +13,65 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- doc/thermometer-api.txt            | 10 +++++-----
- profiles/thermometer/thermometer.c | 26 +++++++++++++-------------
- 2 files changed, 18 insertions(+), 18 deletions(-)
+ profiles/thermometer/thermometer.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/doc/thermometer-api.txt b/doc/thermometer-api.txt
-index a1da2e6..5bbd4bf 100644
---- a/doc/thermometer-api.txt
-+++ b/doc/thermometer-api.txt
-@@ -125,7 +125,7 @@ Methods		void MeasurementReceived(dict measurement)
- 
- 				string Unit:
- 
--					Possible values: "Celsius" or "Fahrenheit"
-+					Possible values: "celsius" or "fahrenheit"
- 
- 				uint64 Time (optional):
- 
-@@ -136,10 +136,10 @@ Methods		void MeasurementReceived(dict measurement)
- 
- 					Only present if measurement type is known.
- 
--					Possible values: "Armpit", "Body", "Ear",
--						"Finger", "Intestines", "Mouth",
--						"Rectum", "Toe", "Tympanum"
-+					Possible values: "armpit", "body", "ear",
-+						"finger", "intestines", "mouth",
-+						"rectum", "toe", "tympanum"
- 
- 				string Measurement:
- 
--					Possible values: "Final" or "Intermediate"
-+					Possible values: "final" or "intermediate"
 diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
-index 64029b2..dc716b4 100644
+index ae4081e..3e71ede 100644
 --- a/profiles/thermometer/thermometer.c
 +++ b/profiles/thermometer/thermometer.c
-@@ -120,15 +120,15 @@ static GSList *thermometer_adapters = NULL;
+@@ -335,8 +335,9 @@ static void change_property(struct thermometer *t, const char *name,
+ 		emit_property_changed(device_get_path(t->dev),
+ 					THERMOMETER_INTERFACE, name,
+ 					DBUS_TYPE_UINT16, &t->min);
+-	} else
++	} else {
+ 		DBG("%s is not a thermometer property", name);
++	}
+ }
  
- const char *temp_type[] = {
- 	"<reserved>",
--	"Armpit",
--	"Body",
--	"Ear",
--	"Finger",
--	"Intestines",
--	"Mouth",
--	"Rectum",
--	"Toe",
--	"Tympanum"
-+	"armpit",
-+	"body",
-+	"ear",
-+	"finger",
-+	"intestines",
-+	"mouth",
-+	"rectum",
-+	"toe",
-+	"tympanum"
- };
+ static void valid_range_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+@@ -421,8 +422,9 @@ static void process_thermometer_desc(struct descriptor *desc)
+ 			val = GATT_CLIENT_CHARAC_CFG_IND_BIT;
+ 			msg = g_strdup("Enable Measurement Interval "
+ 								"indication");
+-		} else
++		} else {
+ 			goto done;
++		}
  
- static const gchar *temptype2str(uint8_t value)
-@@ -1070,7 +1070,7 @@ static void recv_measurement(struct thermometer *t, struct measurement *m)
+ 		att_put_u16(val, atval);
+ 		gatt_write_char(ch->t->attrib, desc->handle, atval, 2,
+@@ -548,12 +550,13 @@ static void process_thermometer_char(struct characteristic *ch)
+ 		gboolean intermediate = TRUE;
+ 		change_property(ch->t, "Intermediate", &intermediate);
+ 		return;
+-	} else if (g_strcmp0(ch->attr.uuid, TEMPERATURE_TYPE_UUID) == 0)
++	} else if (g_strcmp0(ch->attr.uuid, TEMPERATURE_TYPE_UUID) == 0) {
+ 		gatt_read_char(ch->t->attrib, ch->attr.value_handle,
+ 							read_temp_type_cb, ch);
+-	else if (g_strcmp0(ch->attr.uuid, MEASUREMENT_INTERVAL_UUID) == 0)
++	} else if (g_strcmp0(ch->attr.uuid, MEASUREMENT_INTERVAL_UUID) == 0) {
+ 		gatt_read_char(ch->t->attrib, ch->attr.value_handle,
+ 							read_interval_cb, ch);
++	}
+ }
  
- 	m->t = t;
+ static void configure_thermometer_cb(GSList *characteristics, guint8 status,
+@@ -591,10 +594,11 @@ static void configure_thermometer_cb(GSList *characteristics, guint8 status,
+ 			if (start == c->handle)
+ 				continue;
+ 			end = c->handle - 1;
+-		} else if (c->value_handle != t->svc_range->end)
++		} else if (c->value_handle != t->svc_range->end) {
+ 			end = t->svc_range->end;
+-		else
++		} else {
+ 			continue;
++		}
  
--	if (g_strcmp0(m->value, "Intermediate") == 0)
-+	if (g_strcmp0(m->value, "intermediate") == 0)
- 		wlist = t->tadapter->iwatchers;
- 	else
- 		wlist = t->tadapter->fwatchers;
-@@ -1093,9 +1093,9 @@ static void proc_measurement(struct thermometer *t, const uint8_t *pdu,
- 
- 	flags = pdu[3];
- 	if (flags & TEMP_UNITS)
--		m.unit = "Fahrenheit";
-+		m.unit = "fahrenheit";
- 	else
--		m.unit = "Celsius";
-+		m.unit = "celsius";
- 
- 	if (len < 8) {
- 		DBG("Temperature measurement value is not provided");
-@@ -1153,7 +1153,7 @@ static void proc_measurement(struct thermometer *t, const uint8_t *pdu,
- 		type = NULL;
- 
- 	m.type = type ? g_strdup(type) : NULL;
--	m.value = final ? "Final" : "Intermediate";
-+	m.value = final ? "final" : "intermediate";
- 
- 	recv_measurement(t, &m);
- 	g_free(m.type);
+ 		gatt_find_info(t->attrib, start, end, discover_desc_cb, ch);
+ 	}
 -- 
 1.7.11.3
 
