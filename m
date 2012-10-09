@@ -1,123 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
+Date: Tue, 9 Oct 2012 14:22:26 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ] core: fix stop scanning after GCEP
-Date: Tue,  9 Oct 2012 14:38:27 -0300
-Message-Id: <1349804307-20318-1-git-send-email-jprvita@openbossa.org>
+Subject: Re: [RFC BlueZ 3/5] hog: Use the per handle GATT event notifier
+Message-ID: <20121009172226.GB2148@samus>
+References: <1349742372-18420-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1349742372-18420-4-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1349742372-18420-4-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The session type identification on struct session req (commit 328661a0)
-broke the stop condition of the LE Genereal Connection Establishment
-Procedure. This commit creates new identificators for discovery sessions
-and makes their naming a bit more clear.
----
- src/adapter.c | 26 +++++++++++++++-----------
- 1 file changed, 15 insertions(+), 11 deletions(-)
+Hi,
 
-diff --git a/src/adapter.c b/src/adapter.c
-index b6c1213..ad8ee06 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -87,8 +87,10 @@
- static GSList *adapter_drivers = NULL;
- 
- enum session_req_type {
--	SESSION_REQ_TYPE_GLOBAL = 0,
--	SESSION_REQ_TYPE_SESSION,
-+	SESSION_TYPE_MODE_GLOBAL = 0,
-+	SESSION_TYPE_MODE_SESSION,
-+	SESSION_TYPE_DISC_INTERLEAVED,
-+	SESSION_TYPE_DISC_LE_SCAN
- };
- 
- struct session_req {
-@@ -345,7 +347,7 @@ static void set_session_pending_mode(struct btd_adapter *adapter,
- 		session_ref(req);
- 	} else
- 		adapter->pending_mode = create_session(adapter, msg, new_mode,
--					SESSION_REQ_TYPE_SESSION, NULL);
-+					SESSION_TYPE_MODE_SESSION, NULL);
- }
- 
- static void set_discoverable(struct btd_adapter *adapter,
-@@ -369,7 +371,7 @@ static void set_discoverable(struct btd_adapter *adapter,
- 						strerror(-err));
- 
- 	adapter->pending_mode = create_session(adapter, NULL, mode,
--						SESSION_REQ_TYPE_GLOBAL, NULL);
-+					SESSION_TYPE_MODE_GLOBAL, NULL);
- 	adapter->pending_mode->prop_id = id;
- }
- 
-@@ -400,7 +402,7 @@ static void set_powered(struct btd_adapter *adapter, gboolean powered,
- 						strerror(-err));
- 
- 	adapter->pending_mode = create_session(adapter, NULL, mode,
--						SESSION_REQ_TYPE_GLOBAL, NULL);
-+					SESSION_TYPE_MODE_GLOBAL, NULL);
- 	adapter->pending_mode->prop_id = id;
- }
- 
-@@ -560,7 +562,7 @@ static void session_remove(struct session_req *req)
- 	struct btd_adapter *adapter = req->adapter;
- 
- 	/* Ignore global requests */
--	if (req->type == SESSION_REQ_TYPE_GLOBAL)
-+	if (req->type == SESSION_TYPE_MODE_GLOBAL)
- 		return;
- 
- 	DBG("%s session %p with %s deactivated",
-@@ -1072,7 +1074,7 @@ static DBusMessage *adapter_start_discovery(DBusConnection *conn,
- 		return btd_error_failed(msg, strerror(-err));
- 
- done:
--	req = create_session(adapter, msg, 0, SESSION_REQ_TYPE_GLOBAL,
-+	req = create_session(adapter, msg, 0, SESSION_TYPE_DISC_INTERLEAVED,
- 							session_owner_exit);
- 
- 	adapter->disc_sessions = g_slist_append(adapter->disc_sessions, req);
-@@ -1385,7 +1387,7 @@ static DBusMessage *request_session(DBusConnection *conn,
- 		return dbus_message_new_method_return(msg);
- 	} else {
- 		req = create_session(adapter, msg, new_mode,
--				SESSION_REQ_TYPE_SESSION, session_owner_exit);
-+				SESSION_TYPE_MODE_SESSION, session_owner_exit);
- 		adapter->mode_sessions = g_slist_append(adapter->mode_sessions,
- 							req);
- 	}
-@@ -2381,7 +2383,8 @@ void adapter_connect_list_add(struct btd_adapter *adapter,
- 	if (adapter->disc_sessions == NULL)
- 		adapter->discov_id = g_idle_add(discovery_cb, adapter);
- 
--	req = create_session(adapter, NULL, 0, SESSION_REQ_TYPE_GLOBAL, NULL);
-+	req = create_session(adapter, NULL, 0, SESSION_TYPE_DISC_LE_SCAN,
-+									NULL);
- 	adapter->disc_sessions = g_slist_append(adapter->disc_sessions, req);
- 	adapter->scanning_session = req;
- }
-@@ -2431,7 +2434,8 @@ void btd_adapter_start(struct btd_adapter *adapter)
- 					adapter->disc_sessions != NULL)
- 		return;
- 
--	req = create_session(adapter, NULL, 0, SESSION_REQ_TYPE_GLOBAL, NULL);
-+	req = create_session(adapter, NULL, 0, SESSION_TYPE_DISC_LE_SCAN,
-+									NULL);
- 	adapter->disc_sessions = g_slist_append(adapter->disc_sessions, req);
- 	adapter->scanning_session = req;
- 
-@@ -2509,7 +2513,7 @@ static void set_mode_complete(struct btd_adapter *adapter)
- 
- 	err = (pending->mode != adapter->mode) ? -EINVAL : 0;
- 
--	if (pending->type == SESSION_REQ_TYPE_GLOBAL) {
-+	if (pending->type == SESSION_TYPE_MODE_GLOBAL) {
- 		if (err < 0)
- 			g_dbus_pending_property_error(conn, pending->prop_id,
- 						ERROR_INTERFACE ".Failed",
+On 21:26 Mon 08 Oct, Vinicius Costa Gomes wrote:
+> ---
+>  profiles/input/hog_device.c | 66 ++++++++++++++++++++++++---------------------
+>  1 file changed, 36 insertions(+), 30 deletions(-)
+> 
+> diff --git a/profiles/input/hog_device.c b/profiles/input/hog_device.c
+> index 52ebd95..34f4a41 100644
+> --- a/profiles/input/hog_device.c
+> +++ b/profiles/input/hog_device.c
+> @@ -154,22 +134,31 @@ static void report_value_cb(const uint8_t *pdu, uint16_t len,
+>  static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
+>  					guint16 plen, gpointer user_data)
+>  {
+> +	struct report *report = user_data;
+> +	struct hog_device *hogdev = report->hogdev;
+> +
+>  	if (status != 0) {
+>  		error("Write report characteristic descriptor failed: %s",
+>  							att_ecode2str(status));
+>  		return;
+>  	}
+>  
+> +	report->notifyid = g_attrib_register(hogdev->attrib,
+> +					ATT_OP_HANDLE_NOTIFY,
+> +					report->decl->value_handle,
+> +					report_value_cb, report, NULL);
+> +
+>  	DBG("Report characteristic descriptor written: notifications enabled");
+>  }
+>  
+>  static void write_ccc(uint16_t handle, gpointer user_data)
+>  {
+> -	struct hog_device *hogdev = user_data;
+> +	struct report *report = user_data;
+> +	struct hog_device *hogdev = report->hogdev;
+>  	uint8_t value[] = { 0x01, 0x00 };
+>  
+>  	gatt_write_char(hogdev->attrib, handle, value, sizeof(value),
+> -					report_ccc_written_cb, hogdev);
+> +					report_ccc_written_cb, report);
+>  }
+
+There's a bug in this patch. So please consider it just as a proof of
+concept.
+
+
+Cheers,
 -- 
-1.7.11.4
-
+Vinicius
