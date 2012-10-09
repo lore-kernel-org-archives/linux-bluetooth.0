@@ -1,36 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1349798318-12689-8-git-send-email-frederic.danis@linux.intel.com>
-References: <1349798318-12689-1-git-send-email-frederic.danis@linux.intel.com>
-	<1349798318-12689-8-git-send-email-frederic.danis@linux.intel.com>
-Date: Tue, 9 Oct 2012 13:04:36 -0400
-Message-ID: <CAJdJm_N5G+qpH8XLav0VA8t1h+PAROB4g9PaOnxSR+NPAjEhAw@mail.gmail.com>
-Subject: Re: [PATCH 7/7] adapter: Move saved config to ini-file format
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Danis?=
-	<frederic.danis@linux.intel.com>
+Date: Tue, 9 Oct 2012 18:47:14 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] build: Add missing documentation files to EXTRA_DIST
+Message-ID: <20121009164714.GC11843@x220.c.hospitality.swisscom.com>
+References: <1349790707-8464-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1349790707-8464-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+Hi Andrzej,
 
-On Tue, Oct 9, 2012 at 11:58 AM, Frédéric Danis
-<frederic.danis@linux.intel.com> wrote:
-> +       if (read_pairable_timeout(address, &timeout) == 0)
-> +               g_key_file_set_integer(key_file, "General",
-> +                                               "PairableTimeout", timeout);
-> +
-> +       if (read_pairable_timeout(address, &timeout) == 0)
-> +               g_key_file_set_integer(key_file, "General",
-> +                                               "DiscoverableTimeout", timeout);
-> +
+On Tue, Oct 09, 2012, Andrzej Kaczmarek wrote:
+> This patch adds missing documentation files to EXTRA_DIST variable so they
+> are included when creating tarball.
+> ---
+>  Makefile.am | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
-This second if() should use read_discoverable_timeout().
+Applied. Thanks.
 
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
