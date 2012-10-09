@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 3/9] event: Don't store EIR in btd_event_device_found
-Date: Tue, 9 Oct 2012 14:11:56 +0200
-Message-ID: <1349784722-14578-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 2/9] Pass confirm name as gboolean value
+Date: Tue, 9 Oct 2012 14:11:55 +0200
+Message-ID: <1349784722-14578-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1349784722-14578-1-git-send-email-szymon.janc@tieto.com>
 References: <1349784722-14578-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,74 +12,82 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It is never read and was usefull only to gather EIR data for testing
-which can also be done with hcidump etc.
+confirm_name is a boolean value and can be pass as such instead of
+uint8_t.
 
 ---
- src/event.c   |    3 ---
- src/storage.c |   21 ---------------------
- src/storage.h |    2 --
- 3 files changed, 26 deletions(-)
+ src/adapter.c |    2 +-
+ src/adapter.h |    2 +-
+ src/event.c   |    2 +-
+ src/event.h   |    2 +-
+ src/mgmt.c    |    2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index abb9691..f3e381b 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3141,7 +3141,7 @@ static gboolean connect_pending_cb(gpointer user_data)
+ void adapter_update_found_devices(struct btd_adapter *adapter,
+ 					const bdaddr_t *bdaddr,
+ 					uint8_t bdaddr_type, int8_t rssi,
+-					uint8_t confirm_name, gboolean legacy,
++					gboolean confirm_name, gboolean legacy,
+ 					uint8_t *data, uint8_t data_len)
+ {
+ 	struct remote_dev_info *dev;
+diff --git a/src/adapter.h b/src/adapter.h
+index a089075..9fd034d 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -128,7 +128,7 @@ struct remote_dev_info *adapter_search_found_devices(struct btd_adapter *adapter
+ void adapter_update_found_devices(struct btd_adapter *adapter,
+ 					const bdaddr_t *bdaddr,
+ 					uint8_t bdaddr_type, int8_t rssi,
+-					uint8_t confirm_name, gboolean legacy,
++					gboolean confirm_name, gboolean legacy,
+ 					uint8_t *data, uint8_t data_len);
+ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 						struct remote_dev_info *dev);
 diff --git a/src/event.c b/src/event.c
-index ac7140c..bd5ee1e 100644
+index d552a0f..ac7140c 100644
 --- a/src/event.c
 +++ b/src/event.c
-@@ -257,9 +257,6 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type
- 
- 	update_lastseen(local, peer, bdaddr_type);
- 
--	if (data)
--		write_remote_eir(local, peer, bdaddr_type, data, data_len);
--
- 	adapter_update_found_devices(adapter, peer, bdaddr_type, rssi,
- 					confirm_name, legacy, data, data_len);
- }
-diff --git a/src/storage.c b/src/storage.c
-index df6b0aa..55dc591 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -435,27 +435,6 @@ done:
- 	return 0;
+@@ -243,7 +243,7 @@ static void update_lastused(bdaddr_t *sba, bdaddr_t *dba, uint8_t dba_type)
  }
  
--int write_remote_eir(const bdaddr_t *local, const bdaddr_t *peer,
--					uint8_t peer_type, uint8_t *data,
--					uint8_t data_len)
--{
--	char filename[PATH_MAX + 1], key[20], str[481];
--	int i;
--
--	memset(str, 0, sizeof(str));
--	for (i = 0; i < data_len; i++)
--		sprintf(str + (i * 2), "%2.2X", data[i]);
--
--	create_filename(filename, PATH_MAX, local, "eir");
--
--	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
--
--	ba2str(peer, key);
--	sprintf(&key[17], "#%hhu", peer_type);
--
--	return textfile_put(filename, key, str);
--}
--
- int read_remote_eir(const bdaddr_t *local, const bdaddr_t *peer,
- 					uint8_t peer_type, uint8_t *data)
+ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
+-					int8_t rssi, uint8_t confirm_name,
++					int8_t rssi, gboolean confirm_name,
+ 					gboolean legacy, uint8_t *data,
+ 					uint8_t data_len)
  {
-diff --git a/src/storage.h b/src/storage.h
-index 741b8a7..d6aa8ec 100644
---- a/src/storage.h
-+++ b/src/storage.h
-@@ -50,8 +50,6 @@ int write_device_name(const bdaddr_t *local, const bdaddr_t *peer,
- 					uint8_t peer_type, const char *name);
- int read_device_name(const char *src, const char *dst, uint8_t dst_type,
- 								char *name);
--int write_remote_eir(const bdaddr_t *local, const bdaddr_t *peer,
--			uint8_t peer_type, uint8_t *data, uint8_t data_len);
- int read_remote_eir(const bdaddr_t *local, const bdaddr_t *peer,
- 					uint8_t peer_type, uint8_t *data);
- int write_version_info(const bdaddr_t *local, const bdaddr_t *peer,
+diff --git a/src/event.h b/src/event.h
+index a9afa1e..a7c3ce2 100644
+--- a/src/event.h
++++ b/src/event.h
+@@ -24,7 +24,7 @@
+ 
+ int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba, gboolean secure);
+ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
+-					int8_t rssi, uint8_t confirm_name,
++					int8_t rssi, gboolean confirm_name,
+ 					gboolean legacy, uint8_t *data,
+ 					uint8_t data_len);
+ void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name);
+diff --git a/src/mgmt.c b/src/mgmt.c
+index 9353c7d..719af06 100644
+--- a/src/mgmt.c
++++ b/src/mgmt.c
+@@ -1667,7 +1667,7 @@ static void mgmt_device_found(int sk, uint16_t index, void *buf, size_t len)
+ 	DBG("hci%u addr %s, rssi %d flags 0x%04x eir_len %u",
+ 			index, addr, ev->rssi, flags, eir_len);
+ 
+-	confirm_name = (flags & MGMT_DEV_FOUND_CONFIRM_NAME);
++	confirm_name = (flags & MGMT_DEV_FOUND_CONFIRM_NAME) ? TRUE : FALSE;
+ 	legacy = (flags & MGMT_DEV_FOUND_LEGACY_PAIRING) ? TRUE : FALSE;
+ 
+ 	btd_event_device_found(&info->bdaddr, &ev->addr.bdaddr,
 -- 
 1.7.9.5
 
