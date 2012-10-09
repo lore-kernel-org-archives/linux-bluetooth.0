@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: [PATCH BlueZ 8/8] adapter: Emit signals through DBus.Properties
-Date: Tue,  9 Oct 2012 04:59:56 -0300
-Message-Id: <1349769596-6050-8-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ 7/8] adapter: Port remaining properties to DBus.Properties
+Date: Tue,  9 Oct 2012 04:59:55 -0300
+Message-Id: <1349769596-6050-7-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1349769596-6050-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1349769596-6050-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,291 +12,349 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Lucas De Marchi <lucas.de.marchi@gmail.com>
 
+Remaining properties ported to DBus.Properties:
+	- Pairable
+	- Discoverable
+	- Powered
 ---
- src/adapter.c | 142 +++++++++++++++++++---------------------------------------
- 1 file changed, 47 insertions(+), 95 deletions(-)
+ src/adapter.c | 197 +++++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 107 insertions(+), 90 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 18689c6..6b28651 100644
+index a6593b2..18689c6 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -470,9 +470,8 @@ void btd_adapter_pairable_changed(struct btd_adapter *adapter,
- 
- 	write_device_pairable(&adapter->bdaddr, pairable);
- 
--	emit_property_changed(adapter->path,
--				ADAPTER_INTERFACE, "Pairable",
--				DBUS_TYPE_BOOLEAN, &pairable);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), adapter->path,
-+					ADAPTER_INTERFACE, "Pairable");
- 
- 	if (pairable && adapter->pairable_timeout)
- 		adapter_set_pairable_timeout(adapter,
-@@ -736,9 +735,8 @@ void btd_adapter_class_changed(struct btd_adapter *adapter, uint8_t *new_class)
- 		attrib_gap_set(adapter, GATT_CHARAC_APPEARANCE, cls, 2);
- 	}
- 
--	emit_property_changed(adapter->path,
--				ADAPTER_INTERFACE, "Class",
--				DBUS_TYPE_UINT32, &class);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), adapter->path,
-+						ADAPTER_INTERFACE, "Class");
+@@ -95,6 +95,7 @@ struct session_req {
+ 	struct btd_adapter	*adapter;
+ 	enum session_req_type	type;
+ 	DBusMessage		*msg;		/* Unreplied message ref */
++	GDBusPendingPropertySet prop_id;	/* Pending Properties.Set() */
+ 	char			*owner;		/* Bus name of the owner */
+ 	guint			id;		/* Listener id */
+ 	uint8_t			mode;		/* Requested mode */
+@@ -347,10 +348,10 @@ static void set_session_pending_mode(struct btd_adapter *adapter,
+ 					SESSION_REQ_TYPE_SESSION, NULL);
  }
  
- void adapter_name_changed(struct btd_adapter *adapter, const char *name)
-@@ -830,52 +828,6 @@ struct btd_device *adapter_find_device(struct btd_adapter *adapter,
- 	return device;
- }
- 
--static void adapter_update_devices(struct btd_adapter *adapter)
--{
--	char **devices;
--	int i;
--	GSList *l;
--
--	/* Devices */
--	devices = g_new0(char *, g_slist_length(adapter->devices) + 1);
--	for (i = 0, l = adapter->devices; l; l = l->next, i++) {
--		struct btd_device *dev = l->data;
--		devices[i] = (char *) device_get_path(dev);
--	}
--
--	emit_array_property_changed(adapter->path,
--					ADAPTER_INTERFACE, "Devices",
--					DBUS_TYPE_OBJECT_PATH, &devices, i);
--	g_free(devices);
--}
--
--static void adapter_emit_uuids_updated(struct btd_adapter *adapter)
--{
--	char **uuids;
--	int i;
--	sdp_list_t *list;
--
--	if (!adapter->initialized)
--		return;
--
--	uuids = g_new0(char *, sdp_list_len(adapter->services) + 1);
--
--	for (i = 0, list = adapter->services; list; list = list->next) {
--		char *uuid;
--		sdp_record_t *rec = list->data;
--
--		uuid = bt_uuid2string(&rec->svclass);
--		if (uuid)
--			uuids[i++] = uuid;
--	}
--
--	emit_array_property_changed(adapter->path,
--					ADAPTER_INTERFACE, "UUIDs",
--					DBUS_TYPE_STRING, &uuids, i);
--
--	g_strfreev(uuids);
--}
--
- static uint8_t get_uuid_mask(uuid_t *uuid)
+-static DBusMessage *set_discoverable(DBusMessage *msg,
+-					gboolean discoverable, void *data)
++static void set_discoverable(struct btd_adapter *adapter,
++			gboolean discoverable, GDBusPendingPropertySet id)
  {
- 	if (uuid->type != SDP_UUID16)
-@@ -947,7 +899,9 @@ void adapter_service_insert(struct btd_adapter *adapter, void *r)
- 		mgmt_add_uuid(adapter->dev_id, &rec->svclass, svc_hint);
- 	}
- 
--	adapter_emit_uuids_updated(adapter);
-+	if (adapter->initialized)
-+		g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+				adapter->path, ADAPTER_INTERFACE, "UUIDs");
- }
- 
- void adapter_service_remove(struct btd_adapter *adapter, void *r)
-@@ -959,7 +913,9 @@ void adapter_service_remove(struct btd_adapter *adapter, void *r)
- 	if (sdp_list_find(adapter->services, &rec->svclass, uuid_cmp) == NULL)
- 		mgmt_remove_uuid(adapter->dev_id, &rec->svclass);
- 
--	adapter_emit_uuids_updated(adapter);
-+	if (adapter->initialized)
-+		g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+				adapter->path, ADAPTER_INTERFACE, "UUIDs");
- }
- 
- static struct btd_device *adapter_create_device(struct btd_adapter *adapter,
-@@ -985,7 +941,8 @@ static struct btd_device *adapter_create_device(struct btd_adapter *adapter,
- 			DBUS_TYPE_OBJECT_PATH, &path,
- 			DBUS_TYPE_INVALID);
- 
--	adapter_update_devices(adapter);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+				adapter->path, ADAPTER_INTERFACE, "Devices");
- 
- 	return device;
- }
-@@ -1033,7 +990,8 @@ void adapter_remove_device(struct btd_adapter *adapter,
- 		service_auth_cancel(auth);
- 	}
- 
--	adapter_update_devices(adapter);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+				adapter->path, ADAPTER_INTERFACE, "Devices");
- 
- 	g_dbus_emit_signal(btd_get_dbus_connection(), adapter->path,
- 			ADAPTER_INTERFACE, "DeviceRemoved",
-@@ -1807,8 +1765,6 @@ static const GDBusMethodTable adapter_methods[] = {
- };
- 
- static const GDBusSignalTable adapter_signals[] = {
--	{ GDBUS_SIGNAL("PropertyChanged",
--			GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
- 	{ GDBUS_SIGNAL("DeviceCreated",
- 			GDBUS_ARGS({ "device", "o" })) },
- 	{ GDBUS_SIGNAL("DeviceRemoved",
-@@ -2449,7 +2405,6 @@ void btd_adapter_start(struct btd_adapter *adapter)
- {
- 	struct session_req *req;
- 	char address[18];
--	gboolean powered;
- 
- 	ba2str(&adapter->bdaddr, address);
- 
-@@ -2465,10 +2420,8 @@ void btd_adapter_start(struct btd_adapter *adapter)
- 	else
- 		adapter->mode = MODE_CONNECTABLE;
- 
--	powered = TRUE;
--	emit_property_changed(adapter->path,
--				ADAPTER_INTERFACE, "Powered",
--				DBUS_TYPE_BOOLEAN, &powered);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), adapter->path,
-+						ADAPTER_INTERFACE, "Powered");
- 
- 	call_adapter_powered_callbacks(adapter, TRUE);
- 
-@@ -2586,7 +2539,9 @@ static void set_mode_complete(struct btd_adapter *adapter)
- 
- int btd_adapter_stop(struct btd_adapter *adapter)
- {
--	gboolean prop_false = FALSE;
+-	struct btd_adapter *adapter = data;
 +	DBusConnection *conn = btd_get_dbus_connection();
-+	bool emit_discoverable = false, emit_pairable = false;
-+	bool emit_discovering = false;
+ 	uint8_t mode;
+ 	int err;
  
- 	/* check pending requests */
- 	reply_pending_requests(adapter);
-@@ -2606,29 +2561,33 @@ int btd_adapter_stop(struct btd_adapter *adapter)
+@@ -358,55 +359,61 @@ static DBusMessage *set_discoverable(DBusMessage *msg,
+ 
+ 	if (mode == adapter->mode) {
+ 		adapter->global_mode = mode;
+-		return dbus_message_new_method_return(msg);
++		return g_dbus_pending_property_success(conn, id);
  	}
  
- 	if (adapter->scan_mode == (SCAN_PAGE | SCAN_INQUIRY))
--		emit_property_changed(adapter->path,
--					ADAPTER_INTERFACE, "Discoverable",
--					DBUS_TYPE_BOOLEAN, &prop_false);
-+		emit_discoverable = true;
+ 	err = set_mode(adapter, mode);
+ 	if (err < 0)
+-		return btd_error_failed(msg, strerror(-err));
++		return g_dbus_pending_property_error(conn, id,
++						ERROR_INTERFACE ".Failed",
++						strerror(-err));
  
- 	if ((adapter->scan_mode & SCAN_PAGE) && adapter->pairable == TRUE)
--		emit_property_changed(adapter->path,
--					ADAPTER_INTERFACE, "Pairable",
--					DBUS_TYPE_BOOLEAN, &prop_false);
-+		emit_pairable = true;
- 
- 	if (adapter->discovering)
--		emit_property_changed(adapter->path,
--					ADAPTER_INTERFACE, "Discovering",
--					DBUS_TYPE_BOOLEAN, &prop_false);
+-	adapter->pending_mode = create_session(adapter, msg, mode,
++	adapter->pending_mode = create_session(adapter, NULL, mode,
+ 						SESSION_REQ_TYPE_GLOBAL, NULL);
 -
--	emit_property_changed(adapter->path,
--				ADAPTER_INTERFACE, "Powered",
--				DBUS_TYPE_BOOLEAN, &prop_false);
-+		emit_discovering = true;
- 
- 	adapter->discovering = FALSE;
- 	adapter->scan_mode = SCAN_DISABLED;
- 	adapter->mode = MODE_OFF;
- 	adapter->off_requested = FALSE;
- 
-+	if (emit_discoverable)
-+		g_dbus_emit_property_changed(conn, adapter->path,
-+					ADAPTER_INTERFACE, "Discoverable");
-+	if (emit_pairable)
-+		g_dbus_emit_property_changed(conn, adapter->path,
-+					ADAPTER_INTERFACE, "Pairable");
-+
-+	if (emit_discovering)
-+		g_dbus_emit_property_changed(conn, adapter->path,
-+					ADAPTER_INTERFACE, "Discovering");
-+
-+	g_dbus_emit_property_changed(conn, adapter->path, ADAPTER_INTERFACE,
-+								"Powered");
-+
- 	call_adapter_powered_callbacks(adapter, FALSE);
- 
- 	info("Adapter %s has been disabled", adapter->path);
-@@ -2818,14 +2777,12 @@ void adapter_set_allow_name_changes(struct btd_adapter *adapter,
- void adapter_set_discovering(struct btd_adapter *adapter,
- 						gboolean discovering)
- {
--	const char *path = adapter->path;
- 	guint connect_list_len;
- 
- 	adapter->discovering = discovering;
- 
--	emit_property_changed(path,
--				ADAPTER_INTERFACE, "Discovering",
--				DBUS_TYPE_BOOLEAN, &discovering);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), adapter->path,
-+					ADAPTER_INTERFACE, "Discovering");
- 
- 	if (discovering)
- 		return;
-@@ -3319,7 +3276,7 @@ done:
- 
- void adapter_mode_changed(struct btd_adapter *adapter, uint8_t scan_mode)
- {
--	gboolean discoverable, pairable;
-+	bool emit_pairable = false;
- 
- 	DBG("old 0x%02x new 0x%02x", adapter->scan_mode, scan_mode);
- 
-@@ -3329,18 +3286,12 @@ void adapter_mode_changed(struct btd_adapter *adapter, uint8_t scan_mode)
- 	switch (scan_mode) {
- 	case SCAN_DISABLED:
- 		adapter->mode = MODE_OFF;
--		discoverable = FALSE;
--		pairable = FALSE;
- 		break;
- 	case SCAN_PAGE:
- 		adapter->mode = MODE_CONNECTABLE;
--		discoverable = FALSE;
--		pairable = adapter->pairable;
- 		break;
- 	case (SCAN_PAGE | SCAN_INQUIRY):
- 		adapter->mode = MODE_DISCOVERABLE;
--		discoverable = TRUE;
--		pairable = adapter->pairable;
- 		break;
- 	default:
- 		/* ignore, reserved */
-@@ -3349,16 +3300,17 @@ void adapter_mode_changed(struct btd_adapter *adapter, uint8_t scan_mode)
- 
- 	/* If page scanning gets toggled emit the Pairable property */
- 	if ((adapter->scan_mode & SCAN_PAGE) != (scan_mode & SCAN_PAGE))
--		emit_property_changed(adapter->path,
--					ADAPTER_INTERFACE, "Pairable",
--					DBUS_TYPE_BOOLEAN, &pairable);
--
--	emit_property_changed(adapter->path,
--				ADAPTER_INTERFACE, "Discoverable",
--				DBUS_TYPE_BOOLEAN, &discoverable);
-+		emit_pairable = true;
- 
- 	adapter->scan_mode = scan_mode;
- 
-+	if (emit_pairable)
-+		g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+				adapter->path, ADAPTER_INTERFACE, "Pairable");
-+
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), adapter->path,
-+					ADAPTER_INTERFACE, "Discoverable");
-+
- 	set_mode_complete(adapter);
+-	return NULL;
++	adapter->pending_mode->prop_id = id;
  }
  
+-static DBusMessage *set_powered(DBusMessage *msg, gboolean powered, void *data)
++static void set_powered(struct btd_adapter *adapter, gboolean powered,
++						GDBusPendingPropertySet id)
+ {
+-	struct btd_adapter *adapter = data;
++	DBusConnection *conn = btd_get_dbus_connection();
+ 	uint8_t mode;
+ 	int err;
+ 
+ 	if (powered) {
+ 		mode = get_mode(&adapter->bdaddr, "on");
+-		return set_discoverable(msg, mode == MODE_DISCOVERABLE, data);
++		return set_discoverable(adapter, mode == MODE_DISCOVERABLE,
++									id);
+ 	}
+ 
+ 	mode = MODE_OFF;
+ 
+ 	if (mode == adapter->mode) {
+ 		adapter->global_mode = mode;
+-		return dbus_message_new_method_return(msg);
++		return g_dbus_pending_property_success(conn, id);
+ 	}
+ 
+ 	err = set_mode(adapter, mode);
+ 	if (err < 0)
+-		return btd_error_failed(msg, strerror(-err));
++		return g_dbus_pending_property_error(conn, id,
++						ERROR_INTERFACE ".Failed",
++						strerror(-err));
+ 
+-	adapter->pending_mode = create_session(adapter, msg, mode,
++	adapter->pending_mode = create_session(adapter, NULL, mode,
+ 						SESSION_REQ_TYPE_GLOBAL, NULL);
+-
+-	return NULL;
++	adapter->pending_mode->prop_id = id;
+ }
+ 
+-static DBusMessage *set_pairable(DBusMessage *msg,
+-						gboolean pairable, void *data)
++static void set_pairable(struct btd_adapter *adapter, gboolean pairable,
++				bool reply, GDBusPendingPropertySet id)
+ {
+-	struct btd_adapter *adapter = data;
++	DBusConnection *conn = btd_get_dbus_connection();
+ 	int err;
+ 
+ 	if (adapter->scan_mode == SCAN_DISABLED)
+-		return btd_error_not_ready(msg);
++		return g_dbus_pending_property_error(conn, id,
++						ERROR_INTERFACE ".NotReady",
++						"Resource Not Ready");
+ 
+ 	if (pairable == adapter->pairable)
+ 		goto done;
+@@ -416,22 +423,26 @@ static DBusMessage *set_pairable(DBusMessage *msg,
+ 
+ 	err = set_mode(adapter, MODE_DISCOVERABLE);
+ 	if (err < 0) {
+-		if (msg != NULL)
+-			return btd_error_failed(msg, strerror(-err));
+-
+-		return NULL;
++		if (reply)
++			g_dbus_pending_property_error(conn, id,
++						ERROR_INTERFACE ".Failed",
++						strerror(-err));
++		return;
+ 	}
+ 
+ store:
+ 	mgmt_set_pairable(adapter->dev_id, pairable);
+ 
+ done:
+-	return msg ? dbus_message_new_method_return(msg) : NULL;
++	if (reply)
++		g_dbus_pending_property_success(conn, id);
+ }
+ 
++
++
+ static gboolean pairable_timeout_handler(void *data)
+ {
+-	set_pairable(NULL, FALSE, data);
++	set_pairable(data, FALSE, false, 0);
+ 
+ 	return FALSE;
+ }
+@@ -1201,6 +1212,23 @@ static gboolean adapter_property_get_powered(
+ 	return TRUE;
+ }
+ 
++static void adapter_property_set_powered(
++				const GDBusPropertyTable *property,
++				DBusMessageIter *value,
++				GDBusPendingPropertySet id, void *data)
++{
++	dbus_bool_t powered;
++
++	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_BOOLEAN)
++		return g_dbus_pending_property_error(btd_get_dbus_connection(),
++				id, ERROR_INTERFACE ".InvalidArguments",
++				"Invalid arguments in method call");
++
++	dbus_message_iter_get_basic(value, &powered);
++
++	set_powered(data, powered, id);
++}
++
+ static gboolean adapter_property_get_discoverable(
+ 					const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+@@ -1214,6 +1242,23 @@ static gboolean adapter_property_get_discoverable(
+ 	return TRUE;
+ }
+ 
++static void adapter_property_set_discoverable(
++				const GDBusPropertyTable *property,
++				DBusMessageIter *value,
++				GDBusPendingPropertySet id, void *data)
++{
++	dbus_bool_t discoverable;
++
++	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_BOOLEAN)
++		return g_dbus_pending_property_error(btd_get_dbus_connection(),
++				id, ERROR_INTERFACE ".InvalidArguments",
++				"Invalid arguments in method call");
++
++	dbus_message_iter_get_basic(value, &discoverable);
++
++	set_discoverable(data, discoverable, id);
++}
++
+ static gboolean adapter_property_get_pairable(
+ 					const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+@@ -1225,6 +1270,22 @@ static gboolean adapter_property_get_pairable(
+ 	return TRUE;
+ }
+ 
++static void adapter_property_set_pairable(const GDBusPropertyTable *property,
++		DBusMessageIter *value,
++		GDBusPendingPropertySet id, void *data)
++{
++	dbus_bool_t pairable;
++
++	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_BOOLEAN)
++		return g_dbus_pending_property_error(btd_get_dbus_connection(),
++				id, ERROR_INTERFACE ".InvalidArguments",
++				"Invalid arguments in method call");
++
++	dbus_message_iter_get_basic(value, &pairable);
++
++	set_pairable(data, pairable, true, id);
++}
++
+ static gboolean adapter_property_get_discoverable_timeout(
+ 					const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+@@ -1342,58 +1403,6 @@ static gboolean adapter_property_get_uuids(const GDBusPropertyTable *property,
+ 
+ 	return TRUE;
+ }
+-static DBusMessage *set_property(DBusConnection *conn,
+-					DBusMessage *msg, void *data)
+-{
+-	DBusMessageIter iter;
+-	DBusMessageIter sub;
+-	const char *property;
+-
+-	if (!dbus_message_iter_init(msg, &iter))
+-		return btd_error_invalid_args(msg);
+-
+-	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
+-		return btd_error_invalid_args(msg);
+-
+-	dbus_message_iter_get_basic(&iter, &property);
+-	dbus_message_iter_next(&iter);
+-
+-	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_VARIANT)
+-		return btd_error_invalid_args(msg);
+-	dbus_message_iter_recurse(&iter, &sub);
+-
+-
+-	if (g_str_equal("Powered", property)) {
+-		gboolean powered;
+-
+-		if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_BOOLEAN)
+-			return btd_error_invalid_args(msg);
+-
+-		dbus_message_iter_get_basic(&sub, &powered);
+-
+-		return set_powered(msg, powered, data);
+-	} else if (g_str_equal("Discoverable", property)) {
+-		gboolean discoverable;
+-
+-		if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_BOOLEAN)
+-			return btd_error_invalid_args(msg);
+-
+-		dbus_message_iter_get_basic(&sub, &discoverable);
+-
+-		return set_discoverable(msg, discoverable, data);
+-	} else if (g_str_equal("Pairable", property)) {
+-		gboolean pairable;
+-
+-		if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_BOOLEAN)
+-			return btd_error_invalid_args(msg);
+-
+-		dbus_message_iter_get_basic(&sub, &pairable);
+-
+-		return set_pairable(msg, pairable, data);
+-	}
+-
+-	return btd_error_invalid_args(msg);
+-}
+ 
+ static DBusMessage *request_session(DBusConnection *conn,
+ 					DBusMessage *msg, void *data)
+@@ -1760,9 +1769,6 @@ static DBusMessage *unregister_agent(DBusConnection *conn, DBusMessage *msg,
+ }
+ 
+ static const GDBusMethodTable adapter_methods[] = {
+-	{ GDBUS_ASYNC_METHOD("SetProperty",
+-			GDBUS_ARGS({ "name", "s" }, { "value", "v" }), NULL,
+-			set_property) },
+ 	{ GDBUS_ASYNC_METHOD("RequestSession", NULL, NULL,
+ 			request_session) },
+ 	{ GDBUS_METHOD("ReleaseSession", NULL, NULL,
+@@ -1819,9 +1825,12 @@ static const GDBusPropertyTable adapter_properties[] = {
+ 	{ "Address", "s", adapter_property_get_address },
+ 	{ "Name", "s", adapter_property_get_name, adapter_property_set_name },
+ 	{ "Class", "u", adapter_property_get_class },
+-	{ "Powered", "b", adapter_property_get_powered },
+-	{ "Discoverable", "b", adapter_property_get_discoverable },
+-	{ "Pairable", "b", adapter_property_get_pairable },
++	{ "Powered", "b", adapter_property_get_powered,
++					adapter_property_set_powered },
++	{ "Discoverable", "b", adapter_property_get_discoverable,
++					adapter_property_set_discoverable },
++	{ "Pairable", "b", adapter_property_get_pairable,
++					adapter_property_set_pairable },
+ 	{ "DiscoverableTimeout", "u",
+ 			adapter_property_get_discoverable_timeout,
+ 			adapter_property_set_discoverable_timeout },
+@@ -2524,6 +2533,7 @@ static void unload_drivers(struct btd_adapter *adapter)
+ 
+ static void set_mode_complete(struct btd_adapter *adapter)
+ {
++	DBusConnection *conn = btd_get_dbus_connection();
+ 	struct session_req *pending;
+ 	const char *modestr;
+ 	int err;
+@@ -2546,19 +2556,26 @@ static void set_mode_complete(struct btd_adapter *adapter)
+ 
+ 	err = (pending->mode != adapter->mode) ? -EINVAL : 0;
+ 
+-	if (pending->msg != NULL) {
++	if (pending->type == SESSION_REQ_TYPE_GLOBAL) {
++		if (err < 0)
++			g_dbus_pending_property_error(conn, pending->prop_id,
++						ERROR_INTERFACE ".Failed",
++						strerror(-err));
++		else {
++			adapter->global_mode = adapter->mode;
++			g_dbus_pending_property_success(conn,
++							pending->prop_id);
++		}
++	} else if (pending->msg != NULL) {
+ 		DBusMessage *msg = pending->msg;
+ 		DBusMessage *reply;
+ 
+ 		if (err < 0)
+ 			reply = btd_error_failed(msg, strerror(-err));
+-		else {
+-			if (pending->type == SESSION_REQ_TYPE_GLOBAL)
+-				adapter->global_mode = adapter->mode;
++		else
+ 			reply = g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+-		}
+ 
+-		g_dbus_send_message(btd_get_dbus_connection(), reply);
++		g_dbus_send_message(conn, reply);
+ 	}
+ 
+ 	if (err != 0)
 -- 
 1.7.12.2
 
