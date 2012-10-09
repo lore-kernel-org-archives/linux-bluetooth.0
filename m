@@ -1,108 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1349793574.27233.85.camel@aeonflux>
-Subject: Re: [RFCv1 2/6] Bluetooth: AMP: Handle AMP_LINK timeout
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 9 Oct 2012 11:30:12 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 09 Oct 2012 16:39:34 +0200
-In-Reply-To: <1349707932-10006-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1349707932-10006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1349707932-10006-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: Re: [PATCH 0/9] Remove some old code
+Message-ID: <20121009143011.GA2148@samus>
+References: <1349784722-14578-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1349784722-14578-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Szymon,
 
-> When AMP_LINK timeouts execute HCI_OP_DISCONN_PHY_LINK as analog to
-> HCI_OP_DISCONNECT for ACL_LINK.
+On 14:11 Tue 09 Oct, Szymon Janc wrote:
+> This removes some unused or not needed old code.
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/hci_conn.c |   35 ++++++++++++++++++++++++++++++++---
->  1 file changed, 32 insertions(+), 3 deletions(-)
+> Szymon Janc (9):
+>   Simplify checking if found device is legacy
+>   Pass confirm name as gboolean value
+>   event: Don't store EIR in btd_event_device_found
+>   storage: Remove not used read_remote_eir
+>   storage: Remove not used write_version_info
+>   storage: Remove not used write_features_info
+>   storage: Remove not used read_remote_features
+>   adapter: Remove not used btd_adapter_switch_{online,offline}
+>     functions
+>   device: Remove not used device_set_class function
 > 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 53202f6..3584f58 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -130,6 +130,20 @@ void hci_acl_disconn(struct hci_conn *conn, __u8 reason)
->  	hci_send_cmd(conn->hdev, HCI_OP_DISCONNECT, sizeof(cp), &cp);
->  }
->  
-> +static void hci_amp_disconn(struct hci_conn *conn, __u8 reason)
-> +{
-> +	struct hci_cp_disconn_phy_link cp;
-> +
-> +	BT_DBG("hcon %p", conn);
-> +
-> +	conn->state = BT_DISCONN;
-> +
-> +	cp.phy_handle = (u8) conn->handle;
+>  src/adapter.c |   95 +++++------------------------------
+>  src/adapter.h |    8 ++-
+>  src/device.c  |   12 -----
+>  src/device.h  |    1 -
+>  src/event.c   |   27 ++--------
+>  src/event.h   |    6 +--
+>  src/mgmt.c    |   13 ++---
+>  src/storage.c |  156 ---------------------------------------------------------
+>  src/storage.h |   11 ----
+>  9 files changed, 26 insertions(+), 303 deletions(-)
 
-I rather not do this cast. Maybe having conn->phy_handle is cleaner or
-some helper macro like HCI_PHY_HANDLE(conn->handle) or something. Or
-just do conn->handle & 0xff.
+Ack.
 
-> +	cp.reason = reason;
-> +	hci_send_cmd(conn->hdev, HCI_OP_DISCONN_PHY_LINK,
-> +		     sizeof(cp), &cp);
-> +}
-> +
->  static void hci_add_sco(struct hci_conn *conn, __u16 handle)
->  {
->  	struct hci_dev *hdev = conn->hdev;
-> @@ -230,11 +244,27 @@ void hci_sco_setup(struct hci_conn *conn, __u8 status)
->  	}
->  }
->  
-> +static void hci_conn_disconnect(struct hci_conn *conn)
-> +{
-> +	u8 reason;
-> +
-> +	reason = hci_proto_disconn_ind(conn);
-
-Please keep using __u8 and in this case just make it one line.
-
-	__u8 reason = hci_proto_disconn_ind(conn);
-
-> +
-> +	switch (conn->type) {
-> +	case ACL_LINK:
-> +		hci_acl_disconn(conn, reason);
-> +		break;
-> +
-
-Don't bother with this empty line.
-
-> +	case AMP_LINK:
-> +		hci_amp_disconn(conn, reason);
-> +		break;
-> +	}
-> +}
-> +
->  static void hci_conn_timeout(struct work_struct *work)
->  {
->  	struct hci_conn *conn = container_of(work, struct hci_conn,
->  					     disc_work.work);
-> -	__u8 reason;
->  
->  	BT_DBG("hcon %p state %s", conn, state_to_string(conn->state));
->  
-> @@ -253,8 +283,7 @@ static void hci_conn_timeout(struct work_struct *work)
->  		break;
->  	case BT_CONFIG:
->  	case BT_CONNECTED:
-> -		reason = hci_proto_disconn_ind(conn);
-> -		hci_acl_disconn(conn, reason);
-> +		hci_conn_disconnect(conn);
->  		break;
->  	default:
->  		conn->state = BT_CLOSED;
-
-Regards
-
-Marcel
+> 
+> -- 
+> 1.7.9.5
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
+Cheers,
+-- 
+Vinicius
