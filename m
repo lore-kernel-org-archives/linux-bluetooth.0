@@ -1,305 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: [PATCH BlueZ 1/8] adapter: Add DBus.Properties getters
-Date: Tue,  9 Oct 2012 04:59:49 -0300
-Message-Id: <1349769596-6050-1-git-send-email-lucas.demarchi@profusion.mobi>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [RFC BlueZ 5/5] gas: Add the per handle GATT event notifier
+Date: Mon,  8 Oct 2012 21:26:12 -0300
+Message-Id: <1349742372-18420-6-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1349742372-18420-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1349742372-18420-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Lucas De Marchi <lucas.de.marchi@gmail.com>
-
 ---
- src/adapter.c | 221 +++++++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 149 insertions(+), 72 deletions(-)
+ profiles/gatt/gas.c | 72 +++++++++++++++++++++++++----------------------------
+ 1 file changed, 34 insertions(+), 38 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 2f8c8a3..eb5fc83 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1113,106 +1113,169 @@ static DBusMessage *adapter_stop_discovery(DBusConnection *conn,
- 	return dbus_message_new_method_return(msg);
+diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
+index 35a9152..d913df5 100644
+--- a/profiles/gatt/gas.c
++++ b/profiles/gatt/gas.c
+@@ -166,39 +166,10 @@ done:
+ 	att_data_list_free(list);
  }
  
--static DBusMessage *get_properties(DBusConnection *conn,
--					DBusMessage *msg, void *data)
-+static gboolean adapter_property_get_address(
-+					const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
- {
- 	struct btd_adapter *adapter = data;
--	const char *property;
--	DBusMessage *reply;
--	DBusMessageIter iter;
--	DBusMessageIter dict;
- 	char srcaddr[18];
--	gboolean value;
--	char **devices, **uuids;
--	int i;
--	GSList *l;
--	sdp_list_t *list;
-+	const char *ptr;
- 
- 	ba2str(&adapter->bdaddr, srcaddr);
-+	ptr = srcaddr;
- 
--	if (check_address(srcaddr) < 0)
--		return btd_error_invalid_args(msg);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &ptr);
- 
--	reply = dbus_message_new_method_return(msg);
--	if (!reply)
--		return NULL;
-+	return TRUE;
-+}
- 
--	dbus_message_iter_init_append(reply, &iter);
-+static gboolean adapter_property_get_name(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_adapter *adapter = data;
-+	const char *ptr;
- 
--	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
--			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
--			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
--			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
-+	ptr = adapter->name ?: "";
- 
--	/* Address */
--	property = srcaddr;
--	dict_append_entry(&dict, "Address", DBUS_TYPE_STRING, &property);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &ptr);
- 
--	/* Name */
--	property = adapter->name ? : "";
-+	return TRUE;
-+}
- 
--	dict_append_entry(&dict, "Name", DBUS_TYPE_STRING, &property);
-+static gboolean adapter_property_get_class(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_adapter *adapter = data;
- 
--	/* Class */
--	dict_append_entry(&dict, "Class",
--				DBUS_TYPE_UINT32, &adapter->dev_class);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT32,
-+							&adapter->dev_class);
-+
-+	return TRUE;
-+}
-+
-+static gboolean adapter_property_get_powered(
-+					const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_adapter *adapter = data;
-+	dbus_bool_t value;
- 
--	/* Powered */
- 	value = (adapter->up && !adapter->off_requested) ? TRUE : FALSE;
--	dict_append_entry(&dict, "Powered", DBUS_TYPE_BOOLEAN, &value);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
-+
-+	return TRUE;
-+}
-+
-+static gboolean adapter_property_get_discoverable(
-+					const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_adapter *adapter = data;
-+	dbus_bool_t value;
- 
--	/* Discoverable */
- 	value = adapter->scan_mode & SCAN_INQUIRY ? TRUE : FALSE;
--	dict_append_entry(&dict, "Discoverable", DBUS_TYPE_BOOLEAN, &value);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
- 
--	/* Pairable */
--	dict_append_entry(&dict, "Pairable", DBUS_TYPE_BOOLEAN,
--				&adapter->pairable);
-+	return TRUE;
-+}
- 
--	/* DiscoverableTimeout */
--	dict_append_entry(&dict, "DiscoverableTimeout",
--				DBUS_TYPE_UINT32, &adapter->discov_timeout);
-+static gboolean adapter_property_get_pairable(
-+					const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_adapter *adapter = data;
- 
--	/* PairableTimeout */
--	dict_append_entry(&dict, "PairableTimeout",
--				DBUS_TYPE_UINT32, &adapter->pairable_timeout);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN,
-+							&adapter->pairable);
-+	return TRUE;
-+}
- 
-+static gboolean adapter_property_get_discoverable_timeout(
-+					const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_adapter *adapter = data;
- 
--	/* Discovering */
--	dict_append_entry(&dict, "Discovering", DBUS_TYPE_BOOLEAN,
--							&adapter->discovering);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT32,
-+						&adapter->discov_timeout);
- 
--	/* Devices */
--	devices = g_new0(char *, g_slist_length(adapter->devices) + 1);
--	for (i = 0, l = adapter->devices; l; l = l->next, i++) {
--		struct btd_device *dev = l->data;
--		devices[i] = (char *) device_get_path(dev);
-+	return TRUE;
-+}
-+
-+static gboolean adapter_property_get_pairable_timeout(
-+					const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_adapter *adapter = data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT32,
-+						&adapter->pairable_timeout);
-+
-+	return TRUE;
-+}
-+
-+static gboolean adapter_property_get_discovering(
-+					const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_adapter *adapter = data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN,
-+						&adapter->discovering);
-+
-+	return TRUE;
-+}
-+
-+static gboolean adapter_property_get_devices(
-+					const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_adapter *adapter = data;
-+	DBusMessageIter entry;
-+	GSList *l;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+				DBUS_TYPE_OBJECT_PATH_AS_STRING, &entry);
-+
-+	for (l = adapter->devices; l != NULL; l = l->next) {
-+		const char *path = device_get_path(l->data);
-+
-+		dbus_message_iter_append_basic(&entry, DBUS_TYPE_OBJECT_PATH,
-+								&path);
- 	}
--	dict_append_array(&dict, "Devices", DBUS_TYPE_OBJECT_PATH,
--								&devices, i);
--	g_free(devices);
- 
--	/* UUIDs */
--	uuids = g_new0(char *, sdp_list_len(adapter->services) + 1);
-+	dbus_message_iter_close_container(iter, &entry);
- 
--	for (i = 0, list = adapter->services; list; list = list->next) {
--		sdp_record_t *rec = list->data;
-+	return TRUE;
-+}
-+
-+static gboolean adapter_property_get_uuids(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_adapter *adapter = data;
-+	DBusMessageIter entry;
-+	sdp_list_t *l;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_TYPE_STRING_AS_STRING, &entry);
-+
-+	for (l = adapter->services; l != NULL; l = l->next) {
-+		sdp_record_t *rec = l->data;
- 		char *uuid;
- 
- 		uuid = bt_uuid2string(&rec->svclass);
--		if (uuid)
--			uuids[i++] = uuid;
+-static void ccc_written_cb(guint8 status, const guint8 *pdu, guint16 plen,
+-							gpointer user_data)
+-{
+-	struct gas *gas = user_data;
+-
+-	if (status) {
+-		error("Write Service Changed CCC failed: %s",
+-						att_ecode2str(status));
+-		return;
 -	}
 -
--	dict_append_array(&dict, "UUIDs", DBUS_TYPE_STRING, &uuids, i);
-+		if (uuid == NULL)
-+			continue;
- 
--	g_strfreev(uuids);
-+		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
-+								&uuid);
-+		g_free(uuid);
-+	}
- 
--	dbus_message_iter_close_container(&iter, &dict);
-+	dbus_message_iter_close_container(iter, &entry);
- 
--	return reply;
-+	return TRUE;
- }
+-	DBG("Service Changed indications enabled");
 -
- static DBusMessage *set_property(DBusConnection *conn,
- 					DBusMessage *msg, void *data)
+-	write_ctp_handle(adapter_get_address(device_get_adapter(gas->device)),
+-					device_get_address(gas->device),
+-					device_get_addr_type(gas->device),
+-					GATT_CHARAC_SERVICE_CHANGED,
+-					gas->changed_handle);
+-}
+-
+-static void write_ccc(GAttrib *attrib, uint16_t handle, gpointer user_data)
+-{
+-	uint8_t value[2];
+-
+-	att_put_u16(GATT_CLIENT_CHARAC_CFG_IND_BIT, value);
+-	gatt_write_char(attrib, handle, value, sizeof(value), ccc_written_cb,
+-								user_data);
+-}
+-
+ static void indication_cb(const uint8_t *pdu, uint16_t len, gpointer user_data)
  {
-@@ -1656,9 +1719,6 @@ static DBusMessage *unregister_agent(DBusConnection *conn, DBusMessage *msg,
+ 	struct gas *gas = user_data;
+-	uint16_t handle, start, end, olen;
++	uint16_t start, end, olen;
+ 	size_t plen;
+ 	uint8_t *opdu;
+ 
+@@ -207,13 +178,9 @@ static void indication_cb(const uint8_t *pdu, uint16_t len, gpointer user_data)
+ 		return;
+ 	}
+ 
+-	handle = att_get_u16(&pdu[1]);
+ 	start = att_get_u16(&pdu[3]);
+ 	end = att_get_u16(&pdu[5]);
+ 
+-	if (handle != gas->changed_handle)
+-		return;
+-
+ 	DBG("Service Changed start: 0x%04X end: 0x%04X", start, end);
+ 
+ 	if (device_is_bonded(gas->device) == FALSE) {
+@@ -229,6 +196,39 @@ static void indication_cb(const uint8_t *pdu, uint16_t len, gpointer user_data)
+ 	btd_device_gatt_set_service_changed(gas->device, start, end);
  }
  
- static const GDBusMethodTable adapter_methods[] = {
--	{ GDBUS_METHOD("GetProperties",
--			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
--			get_properties) },
- 	{ GDBUS_ASYNC_METHOD("SetProperty",
- 			GDBUS_ARGS({ "name", "s" }, { "value", "v" }), NULL,
- 			set_property) },
-@@ -1714,6 +1774,22 @@ static const GDBusSignalTable adapter_signals[] = {
- 	{ }
- };
- 
-+static const GDBusPropertyTable adapter_properties[] = {
-+	{ "Address", "s", adapter_property_get_address },
-+	{ "Name", "s", adapter_property_get_name },
-+	{ "Class", "u", adapter_property_get_class },
-+	{ "Powered", "b", adapter_property_get_powered },
-+	{ "Discoverable", "b", adapter_property_get_discoverable },
-+	{ "Pairable", "b", adapter_property_get_pairable },
-+	{ "DiscoverableTimeout", "u",
-+			adapter_property_get_discoverable_timeout },
-+	{ "PairableTimeout", "u", adapter_property_get_pairable_timeout },
-+	{ "Discovering", "b", adapter_property_get_discovering },
-+	{ "Devices", "ao", adapter_property_get_devices },
-+	{ "UUIDs", "as", adapter_property_get_uuids },
-+	{ }
-+};
++static void ccc_written_cb(guint8 status, const guint8 *pdu, guint16 plen,
++							gpointer user_data)
++{
++	struct gas *gas = user_data;
 +
- static void create_stored_device_from_profiles(char *key, char *value,
- 						void *user_data)
++	if (status) {
++		error("Write Service Changed CCC failed: %s",
++						att_ecode2str(status));
++		return;
++	}
++
++	DBG("Service Changed indications enabled");
++
++	gas->changed_ind = g_attrib_register(gas->attrib, ATT_OP_HANDLE_IND,
++						gas->changed_handle,
++						indication_cb, gas, NULL);
++
++	write_ctp_handle(adapter_get_address(device_get_adapter(gas->device)),
++					device_get_address(gas->device),
++					device_get_addr_type(gas->device),
++					GATT_CHARAC_SERVICE_CHANGED,
++					gas->changed_handle);
++}
++
++static void write_ccc(GAttrib *attrib, uint16_t handle, gpointer user_data)
++{
++	uint8_t value[2];
++
++	att_put_u16(GATT_CLIENT_CHARAC_CFG_IND_BIT, value);
++	gatt_write_char(attrib, handle, value, sizeof(value), ccc_written_cb,
++								user_data);
++}
++
+ static void gatt_descriptors_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 							gpointer user_data)
  {
-@@ -2624,8 +2700,9 @@ struct btd_adapter *adapter_create(int id)
+@@ -332,10 +332,6 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ 		DBG("MTU Exchange: Requesting %d", imtu);
+ 	}
  
- 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
- 					path, ADAPTER_INTERFACE,
--					adapter_methods, adapter_signals, NULL,
--					adapter, adapter_free)) {
-+					adapter_methods, adapter_signals,
-+					adapter_properties, adapter,
-+					adapter_free)) {
- 		error("Adapter interface init failed on path %s", path);
- 		adapter_free(adapter);
- 		return NULL;
+-	gas->changed_ind = g_attrib_register(gas->attrib, ATT_OP_HANDLE_IND,
+-						GATTRIB_ALL_HANDLES,
+-						indication_cb, gas, NULL);
+-
+ 	if (device_get_appearance(gas->device, &app) < 0) {
+ 		bt_uuid_t uuid;
+ 
 -- 
 1.7.12.2
 
