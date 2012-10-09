@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 07/15] thermometer: Reformat MeasurementReceived description
-Date: Tue, 9 Oct 2012 13:19:50 +0200
-Message-ID: <1349781598-22580-8-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3 06/15] thermometer: Update test script
+Date: Tue, 9 Oct 2012 13:19:49 +0200
+Message-ID: <1349781598-22580-7-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1349781598-22580-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1349781598-22580-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,100 +12,56 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-MeasurementReceived method description is reformatted to be more
-readable and consistent with other API documents.
-
-Special values for Exponent and Mantissa fields specify now only NaN
-value as this is only special value defined by HTS specification for
-measurement.
 ---
- doc/thermometer-api.txt | 76 ++++++++++++++++++++++++++++++-------------------
- 1 file changed, 46 insertions(+), 30 deletions(-)
+ test/test-thermometer | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/doc/thermometer-api.txt b/doc/thermometer-api.txt
-index 1828811..a1da2e6 100644
---- a/doc/thermometer-api.txt
-+++ b/doc/thermometer-api.txt
-@@ -97,33 +97,49 @@ Service		unique name
- Interface	org.bluez.ThermometerWatcher
- Object path	freely definable
+diff --git a/test/test-thermometer b/test/test-thermometer
+index 9216264..2ca260f 100755
+--- a/test/test-thermometer
++++ b/test/test-thermometer
+@@ -16,9 +16,9 @@ from optparse import OptionParser, make_option
  
--Methods		void MeasurementReceived(dict measure)
+ class Watcher(dbus.service.Object):
+ 	@dbus.service.method("org.bluez.ThermometerWatcher",
+-					in_signature="a{sv}", out_signature="")
+-	def MeasurementReceived(self, measure):
+-		print(measure["Measurement"], " measurement received")
++					in_signature="oa{sv}", out_signature="")
++	def MeasurementReceived(self, device, measure):
++		print("%s measurement received from %s" % (measure["Measurement"], device))
+ 		print("Exponent: ", measure["Exponent"])
+ 		print("Mantissa: ", measure["Mantissa"])
+ 		print("Unit: ", measure["Unit"])
+@@ -66,23 +66,23 @@ if __name__ == "__main__":
+ 	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
+ 							"org.bluez.Adapter")
+ 
++	thermometer_manager = dbus.Interface(bus.get_object("org.bluez",
++				adapter_path), "org.bluez.ThermometerManager")
++
+ 	device_path = adapter.FindDevice(options.address)
+ 
+ 	bus.add_signal_receiver(property_changed, bus_name="org.bluez",
+ 				dbus_interface="org.bluez.Thermometer",
+ 				signal_name="PropertyChanged")
+ 
+-	thermometer = dbus.Interface(bus.get_object("org.bluez",
+-					device_path), "org.bluez.Thermometer")
 -
--			This callback gets called when a measure has been
--			scanned	in the thermometer. The Time entry in the dict
--			will be only present if the device supports storing of
--			data. The time value is expressed in seconds since epoch.
--			The value represented is (mantissa) x (10**exponent)
--			See foot note for special values when treating with
--			health devices. The Type entry is only present if the
--			measurement type is known. Otherwise, it is undefined.
--
--			Dict is defined as below:
--			{
--				"Exponent" : int8,
--				"Mantissa" : int32,
--				"Unit" : ("Celsius" or "Fahrenheit"),
--				"Time" : uint64,
--				"Type" : ("Armpit", "Body", "Ear", "Finger",
--					"Intestines", "Mouth", "Rectum", "Toe",
--					"Tympanum"),
--				"Measurement" : ("Final" or "Intermediate"),
--			}
--
--			For special cases, the exponent shall always be zero and
--			the mantissa should be one of following values:
--
--			NRes = -(2**23)
--			NaN = +(2**23-1)
--			INFINITY = (2**23-2)
--			-INFINITY = -(2**23-2)
-+Methods		void MeasurementReceived(dict measurement)
-+
-+			This callback gets called when a measurement has been
-+			scanned in the thermometer.
-+
-+			Measurement:
-+
-+				int16 Exponent:
-+				int32 Mantissa:
-+
-+					Exponent and Mantissa values as
-+					extracted from float value defined by
-+					IEEE-11073-20601.
-+
-+					Measurement value is calculated as
-+					(Mantissa) * (10^Exponent)
-+
-+					For special cases Exponent is set to 0
-+					and Mantissa is set to one of following
-+					values:
-+
-+					+(2^23 - 1)	NaN (invalid or missing data)
-+					-(2^23)		NRes
-+					+(2^23 - 2)	+Infinity
-+					-(2^23 - 2)	-Infinity
-+
-+				string Unit:
-+
-+					Possible values: "Celsius" or "Fahrenheit"
-+
-+				uint64 Time (optional):
-+
-+					Time of measurement, if supported by device.
-+					Expressed in seconds since epoch.
-+
-+				string Type (optional):
-+
-+					Only present if measurement type is known.
-+
-+					Possible values: "Armpit", "Body", "Ear",
-+						"Finger", "Intestines", "Mouth",
-+						"Rectum", "Toe", "Tympanum"
-+
-+				string Measurement:
-+
-+					Possible values: "Final" or "Intermediate"
+ 	path = "/test/watcher"
+ 	watcher = Watcher(bus, path)
+ 
+-	thermometer.RegisterWatcher(path)
++	thermometer_manager.RegisterWatcher(path)
+ 
+ 	if len(args) > 0:
+ 		if args[0] == "EnableIntermediateMeasurement":
+-			thermometer.EnableIntermediateMeasurement(path)
++			thermometer_manager.EnableIntermediateMeasurement(path)
+ 		else:
+ 			print("unknown command")
+ 			sys.exit(1)
 -- 
 1.7.11.3
 
