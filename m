@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 7/9] storage: Remove not used read_remote_features
-Date: Tue, 9 Oct 2012 14:12:00 +0200
-Message-ID: <1349784722-14578-8-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 8/9] adapter: Remove not used btd_adapter_switch_{online,offline} functions
+Date: Tue, 9 Oct 2012 14:12:01 +0200
+Message-ID: <1349784722-14578-9-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1349784722-14578-1-git-send-email-szymon.janc@tieto.com>
 References: <1349784722-14578-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,82 +12,80 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It was only usefull with hciops.
+Were used only in Maemo plugin which is now removed.
 
 ---
- src/storage.c |   45 ---------------------------------------------
- src/storage.h |    2 --
- 2 files changed, 47 deletions(-)
+ src/adapter.c |   43 -------------------------------------------
+ src/adapter.h |    2 --
+ 2 files changed, 45 deletions(-)
 
-diff --git a/src/storage.c b/src/storage.c
-index 297aba7..ac66021 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -435,51 +435,6 @@ done:
- 	return 0;
+diff --git a/src/adapter.c b/src/adapter.c
+index f3e381b..e6cb3e9 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3582,49 +3582,6 @@ int btd_adapter_restore_powered(struct btd_adapter *adapter)
+ 	return mgmt_set_powered(adapter->dev_id, TRUE);
  }
  
--static int decode_bytes(const char *str, unsigned char *bytes, size_t len)
+-static gboolean switch_off_timeout(gpointer user_data)
 -{
--	unsigned int i;
+-	struct btd_adapter *adapter = user_data;
 -
--	for (i = 0; i < len; i++) {
--		if (sscanf(str + (i * 2), "%02hhX", &bytes[i]) != 1)
--			return -EINVAL;
--	}
+-	mgmt_set_powered(adapter->dev_id, FALSE);
+-	adapter->off_timer = 0;
+-
+-	return FALSE;
+-}
+-
+-int btd_adapter_switch_online(struct btd_adapter *adapter)
+-{
+-	if (adapter->up)
+-		return -EALREADY;
+-
+-	if (adapter->off_timer)
+-		off_timer_remove(adapter);
+-
+-	return mgmt_set_powered(adapter->dev_id, TRUE);
+-}
+-
+-int btd_adapter_switch_offline(struct btd_adapter *adapter)
+-{
+-	if (!adapter->up)
+-		return -EALREADY;
+-
+-	if (adapter->off_timer)
+-		return 0;
+-
+-	adapter->global_mode = MODE_OFF;
+-
+-	if (adapter->connections == NULL)
+-		return mgmt_set_powered(adapter->dev_id, FALSE);
+-
+-	g_slist_foreach(adapter->connections,
+-				(GFunc) device_request_disconnect, NULL);
+-
+-	adapter->off_timer = g_timeout_add_seconds(OFF_TIMER,
+-						switch_off_timeout, adapter);
 -
 -	return 0;
 -}
 -
--int read_remote_features(const bdaddr_t *local, const bdaddr_t *peer,
--				unsigned char *page1, unsigned char *page2)
--{
--	char filename[PATH_MAX + 1], addr[18], *str;
--	size_t len;
--	int err;
--
--	if (page1 == NULL && page2 == NULL)
--		return -EINVAL;
--
--	create_filename(filename, PATH_MAX, local, "features");
--
--	ba2str(peer, addr);
--
--	str = textfile_get(filename, addr);
--	if (!str)
--		return -ENOENT;
--
--	len = strlen(str);
--
--	err = -ENOENT;
--
--	if (page1 && len >= 16)
--		err = decode_bytes(str, page1, 8);
--
--	if (page2 && len >= 33)
--		err = decode_bytes(str + 17, page2, 8);
--
--	free(str);
--
--	return err;
--}
--
- int write_lastseen_info(const bdaddr_t *local, const bdaddr_t *peer,
- 					uint8_t peer_type, struct tm *tm)
+ static gboolean disable_auto(gpointer user_data)
  {
-diff --git a/src/storage.h b/src/storage.h
-index 8293ba8..e334828 100644
---- a/src/storage.h
-+++ b/src/storage.h
-@@ -50,8 +50,6 @@ int write_device_name(const bdaddr_t *local, const bdaddr_t *peer,
- 					uint8_t peer_type, const char *name);
- int read_device_name(const char *src, const char *dst, uint8_t dst_type,
- 								char *name);
--int read_remote_features(const bdaddr_t *local, const bdaddr_t *peer,
--				unsigned char *page1, unsigned char *page2);
- int write_lastseen_info(const bdaddr_t *local, const bdaddr_t *peer,
- 					uint8_t peer_type, struct tm *tm);
- int write_lastused_info(const bdaddr_t *local, const bdaddr_t *peer,
+ 	struct btd_adapter *adapter = user_data;
+diff --git a/src/adapter.h b/src/adapter.h
+index 9fd034d..cef59d2 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -178,8 +178,6 @@ void btd_adapter_any_release_path(void);
+ gboolean adapter_powering_down(struct btd_adapter *adapter);
+ 
+ int btd_adapter_restore_powered(struct btd_adapter *adapter);
+-int btd_adapter_switch_online(struct btd_adapter *adapter);
+-int btd_adapter_switch_offline(struct btd_adapter *adapter);
+ void btd_adapter_enable_auto_connect(struct btd_adapter *adapter);
+ 
+ typedef ssize_t (*btd_adapter_pin_cb_t) (struct btd_adapter *adapter,
 -- 
 1.7.9.5
 
