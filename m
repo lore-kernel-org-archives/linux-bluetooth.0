@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: chanyeol.park@samsung.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 3/5] avinfo: Print a2dp vendor codec info
-Date: Tue, 09 Oct 2012 20:35:46 +0900
-Message-id: <1349782548-27923-3-git-send-email-chanyeol.park@samsung.com>
+Subject: [PATCH v3 4/5] audio: Fix audio driver is not probed
+Date: Tue, 09 Oct 2012 20:35:47 +0900
+Message-id: <1349782548-27923-4-git-send-email-chanyeol.park@samsung.com>
 In-reply-to: <1349782548-27923-1-git-send-email-chanyeol.park@samsung.com>
 References: <1349782548-27923-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,43 +11,26 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chan-yeol Park <chanyeol.park@samsung.com>
 
+This patch fix the bugs that when handling an AVDTP incoming connection,
+audio-a2dp driver is not probed because advanced audio UUID is missed.
 ---
- tools/avinfo.c |   15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ audio/manager.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tools/avinfo.c b/tools/avinfo.c
-index 78a1544..f036cf8 100644
---- a/tools/avinfo.c
-+++ b/tools/avinfo.c
-@@ -158,6 +158,18 @@ struct getcap_resp {
- 	uint8_t caps[0];
- } __attribute__ ((packed));
+diff --git a/audio/manager.c b/audio/manager.c
+index 26cd9bf..b052009 100644
+--- a/audio/manager.c
++++ b/audio/manager.c
+@@ -1093,7 +1093,8 @@ static struct btd_profile gateway_profile = {
+ static struct btd_profile a2dp_profile = {
+ 	.name		= "audio-a2dp",
  
-+static void print_vendor(a2dp_vendor_codec_t *vendor)
-+{
-+	printf("\tMedia Codec: Vendor Specific A2DP Codec");
-+
-+	printf("\n\t\tVendor ID 0x%02x%02x%02x%02x", vendor->vendor_id[0],
-+		vendor->vendor_id[1], vendor->vendor_id[2],
-+		vendor->vendor_id[3]);
-+
-+	printf("\n\t\tVendor Specific Codec ID 0x%02x%02x\n",
-+			vendor->codec_id[0], vendor->codec_id[1]);
-+}
-+
+-	.remote_uuids	= BTD_UUIDS(A2DP_SOURCE_UUID, A2DP_SINK_UUID),
++	.remote_uuids	= BTD_UUIDS(A2DP_SOURCE_UUID, A2DP_SINK_UUID,
++							ADVANCED_AUDIO_UUID),
+ 	.device_probe	= a2dp_probe,
+ 	.device_remove	= audio_remove,
  
- static void print_mpeg12(a2dp_mpeg_t *mpeg)
- {
-@@ -292,6 +304,9 @@ static void print_media_codec(struct avdtp_media_codec_capability *cap)
- 	case A2DP_CODEC_MPEG12:
- 		print_mpeg12((void *) cap->data);
- 		break;
-+	case A2DP_CODEC_VENDOR:
-+		print_vendor((void *) cap->data);
-+		break;
- 	default:
- 		printf("\tMedia Codec: Unknown\n");
- 	}
 -- 
 1.7.9.5
 
