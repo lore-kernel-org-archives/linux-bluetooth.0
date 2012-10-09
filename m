@@ -1,28 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 9 Oct 2012 23:15:26 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@openbossa.org>
+Message-ID: <1349807669.27233.103.camel@aeonflux>
+Subject: Re: [RFC obexd 02/11] build: Add --enable-fuse for gobexfuse
+From: Marcel Holtmann <marcel@holtmann.org>
+To: =?UTF-8?Q?Micha=C5=82?= Poczwardowski <dmp0x7c5@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] core: fix stop scanning after GCEP
-Message-ID: <20121009211526.GA21303@x220.c.hospitality.swisscom.com>
-References: <1349804307-20318-1-git-send-email-jprvita@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1349804307-20318-1-git-send-email-jprvita@openbossa.org>
+Date: Tue, 09 Oct 2012 20:34:29 +0200
+In-Reply-To: <1349806556-1978-2-git-send-email-dmp0x7c5@gmail.com>
+References: <1349806556-1978-1-git-send-email-dmp0x7c5@gmail.com>
+	 <1349806556-1978-2-git-send-email-dmp0x7c5@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi João Paulo,
+Hi Michal,
 
-On Tue, Oct 09, 2012, João Paulo Rechi Vita wrote:
-> The session type identification on struct session req (commit 328661a0)
-> broke the stop condition of the LE Genereal Connection Establishment
-> Procedure. This commit creates new identificators for discovery sessions
-> and makes their naming a bit more clear.
-> ---
->  src/adapter.c | 26 +++++++++++++++-----------
->  1 file changed, 15 insertions(+), 11 deletions(-)
+>  Makefile.am  |    9 +++++++++
+>  configure.ac |   15 +++++++++++++++
+>  2 files changed, 24 insertions(+), 0 deletions(-)
+> 
+> diff --git a/Makefile.am b/Makefile.am
+> index 724dd5d..95b99a6 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -132,6 +132,15 @@ client_obex_client_SOURCES = $(gdbus_sources) $(gobex_sources) \
+>  client_obex_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ @BLUEZ_LIBS@
+>  endif
+>  
+> +if FUSE
+> +bin_PROGRAMS = fuse/gobexfuse
 
-Applied. Thanks.
+I rather call this obexfuse or similar. I don't want to have any "g"
+prefixes in the future anymore.
 
-Johan
+Regards
+
+Marcel
+
+
