@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 06/15] thermometer: Update test script
-Date: Tue, 9 Oct 2012 13:19:49 +0200
-Message-ID: <1349781598-22580-7-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3 04/15] thermometer: Include remote device information in MeasurementReceived
+Date: Tue, 9 Oct 2012 13:19:47 +0200
+Message-ID: <1349781598-22580-5-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1349781598-22580-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1349781598-22580-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,56 +12,67 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- test/test-thermometer | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+Since watchers are now registered per-adapter it's necessary to include
+remote device information in MeasurementReceived callback.
 
-diff --git a/test/test-thermometer b/test/test-thermometer
-index 9216264..2ca260f 100755
---- a/test/test-thermometer
-+++ b/test/test-thermometer
-@@ -16,9 +16,9 @@ from optparse import OptionParser, make_option
+This patch adds parameter to MeasurementReceived method which is an
+object path to remote device object.
+---
+ profiles/thermometer/thermometer.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
+index c2d0529..64029b2 100644
+--- a/profiles/thermometer/thermometer.c
++++ b/profiles/thermometer/thermometer.c
+@@ -101,13 +101,14 @@ struct watcher {
+ };
  
- class Watcher(dbus.service.Object):
- 	@dbus.service.method("org.bluez.ThermometerWatcher",
--					in_signature="a{sv}", out_signature="")
--	def MeasurementReceived(self, measure):
--		print(measure["Measurement"], " measurement received")
-+					in_signature="oa{sv}", out_signature="")
-+	def MeasurementReceived(self, device, measure):
-+		print("%s measurement received from %s" % (measure["Measurement"], device))
- 		print("Exponent: ", measure["Exponent"])
- 		print("Mantissa: ", measure["Mantissa"])
- 		print("Unit: ", measure["Unit"])
-@@ -66,23 +66,23 @@ if __name__ == "__main__":
- 	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
- 							"org.bluez.Adapter")
+ struct measurement {
+-	int16_t		exp;
+-	int32_t		mant;
+-	uint64_t	time;
+-	gboolean	suptime;
+-	char		*unit;
+-	char		*type;
+-	char		*value;
++	struct thermometer	*t;
++	int16_t			exp;
++	int32_t			mant;
++	uint64_t		time;
++	gboolean		suptime;
++	char			*unit;
++	char			*type;
++	char			*value;
+ };
  
-+	thermometer_manager = dbus.Interface(bus.get_object("org.bluez",
-+				adapter_path), "org.bluez.ThermometerManager")
+ struct tmp_interval_data {
+@@ -1027,6 +1028,7 @@ static void update_watcher(gpointer data, gpointer user_data)
+ {
+ 	struct watcher *w = data;
+ 	struct measurement *m = user_data;
++	const gchar *path = device_get_path(m->t->dev);
+ 	DBusMessageIter iter;
+ 	DBusMessageIter dict;
+ 	DBusMessage *msg;
+@@ -1039,6 +1041,8 @@ static void update_watcher(gpointer data, gpointer user_data)
+ 
+ 	dbus_message_iter_init_append(msg, &iter);
+ 
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH , &path);
 +
- 	device_path = adapter.FindDevice(options.address)
+ 	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+ 			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+ 			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+@@ -1064,6 +1068,8 @@ static void recv_measurement(struct thermometer *t, struct measurement *m)
+ {
+ 	GSList *wlist;
  
- 	bus.add_signal_receiver(property_changed, bus_name="org.bluez",
- 				dbus_interface="org.bluez.Thermometer",
- 				signal_name="PropertyChanged")
- 
--	thermometer = dbus.Interface(bus.get_object("org.bluez",
--					device_path), "org.bluez.Thermometer")
--
- 	path = "/test/watcher"
- 	watcher = Watcher(bus, path)
- 
--	thermometer.RegisterWatcher(path)
-+	thermometer_manager.RegisterWatcher(path)
- 
- 	if len(args) > 0:
- 		if args[0] == "EnableIntermediateMeasurement":
--			thermometer.EnableIntermediateMeasurement(path)
-+			thermometer_manager.EnableIntermediateMeasurement(path)
- 		else:
- 			print("unknown command")
- 			sys.exit(1)
++	m->t = t;
++
+ 	if (g_strcmp0(m->value, "Intermediate") == 0)
+ 		wlist = t->tadapter->iwatchers;
+ 	else
 -- 
 1.7.11.3
 
