@@ -1,115 +1,267 @@
 Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [PATCH v4 BlueZ 2/4] gatttool: Add "included" command
-Date: Mon,  8 Oct 2012 21:17:36 -0300
-Message-Id: <1349741858-18325-2-git-send-email-vinicius.gomes@openbossa.org>
-In-Reply-To: <1349741858-18325-1-git-send-email-vinicius.gomes@openbossa.org>
-References: <1349741858-18325-1-git-send-email-vinicius.gomes@openbossa.org>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH v4 BlueZ 1/4] gatt: Add support for find included services
+Date: Mon,  8 Oct 2012 21:17:35 -0300
+Message-Id: <1349741858-18325-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Some services like HID over LE can reference another service using
+included services.
 
-New command to find included services in interactive mode.
+See Vol 3, Part G, section 2.6.3 of Core specification for more
+details.
 ---
-This produces a warning when applying, but the warning can be ignored for that
-particular string.
+ attrib/gatt.c | 192 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ attrib/gatt.h |   9 +++
+ 2 files changed, 201 insertions(+)
 
-WARNING:SPLIT_STRING: quoted string split across lines
-#36: FILE: attrib/interactive.c:233:
-+		printf("handle: 0x%04x, start handle: 0x%04x, "
-+					"end handle: 0x%04x uuid: %s\n",
-
- attrib/interactive.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
-
-diff --git a/attrib/interactive.c b/attrib/interactive.c
-index 8d9531f..85f72ad 100644
---- a/attrib/interactive.c
-+++ b/attrib/interactive.c
-@@ -211,6 +211,34 @@ static void primary_by_uuid_cb(GSList *ranges, guint8 status,
- 	rl_forced_update_display();
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index 882f3c1..d55e7fe 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -45,6 +45,22 @@ struct discover_primary {
+ 	void *user_data;
+ };
+ 
++/* Used for the Included Services Discovery (ISD) procedure */
++struct included_discovery {
++	GAttrib		*attrib;
++	int		refs;
++	int		err;
++	uint16_t	end_handle;
++	GSList		*includes;
++	gatt_cb_t	cb;
++	void		*user_data;
++};
++
++struct included_uuid_query {
++	struct included_discovery	*isd;
++	struct gatt_included		*included;
++};
++
+ struct discover_char {
+ 	GAttrib *attrib;
+ 	bt_uuid_t *uuid;
+@@ -61,6 +77,25 @@ static void discover_primary_free(struct discover_primary *dp)
+ 	g_free(dp);
  }
  
-+static void included_cb(GSList *includes, guint8 status, gpointer user_data)
++static struct included_discovery *isd_ref(struct included_discovery *isd)
 +{
-+	GSList *l;
++	g_atomic_int_inc(&isd->refs);
 +
-+	if (status) {
-+		printf("Find included services failed: %s\n",
-+							att_ecode2str(status));
++	return isd;
++}
++
++static void isd_unref(struct included_discovery *isd)
++{
++	if (g_atomic_int_dec_and_test(&isd->refs) == FALSE)
++		return;
++
++	isd->cb(isd->includes, isd->err, isd->user_data);
++
++	g_slist_free_full(isd->includes, g_free);
++	g_attrib_unref(isd->attrib);
++	g_free(isd);
++}
++
+ static void discover_char_free(struct discover_char *dc)
+ {
+ 	g_slist_free_full(dc->characteristics, g_free);
+@@ -248,6 +283,163 @@ guint gatt_discover_primary(GAttrib *attrib, bt_uuid_t *uuid, gatt_cb_t func,
+ 	return g_attrib_send(attrib, 0, buf[0], buf, plen, cb, dp, NULL);
+ }
+ 
++static void resolve_included_uuid_cb(uint8_t status, const uint8_t *pdu,
++					uint16_t len, gpointer user_data)
++{
++	struct included_uuid_query *query = user_data;
++	struct included_discovery *isd = query->isd;
++	struct gatt_included *incl = query->included;
++	unsigned int err = status;
++	bt_uuid_t uuid;
++	size_t buflen;
++	uint8_t *buf;
++
++	if (err)
++		goto done;
++
++	buf = g_attrib_get_buffer(isd->attrib, &buflen);
++	if (dec_read_resp(pdu, len, buf, buflen) != 16) {
++		err = ATT_ECODE_IO;
 +		goto done;
 +	}
 +
-+	if (includes == NULL) {
-+		printf("No included services found for this range\n");
-+		goto done;
-+	}
-+
-+	printf("\n");
-+	for (l = includes; l; l = l->next) {
-+		struct gatt_included *incl = l->data;
-+		printf("handle: 0x%04x, start handle: 0x%04x, "
-+					"end handle: 0x%04x uuid: %s\n",
-+					incl->handle, incl->range.start,
-+					incl->range.end, incl->uuid);
-+	}
++	uuid = att_get_uuid128(buf);
++	bt_uuid_to_string(&uuid, incl->uuid, sizeof(incl->uuid));
++	isd->includes = g_slist_append(isd->includes, incl);
 +
 +done:
-+	rl_forced_update_display();
++	if (err)
++		g_free(incl);
++
++	if (isd->err == 0)
++		isd->err = err;
++
++	isd_unref(isd);
++
++	g_free(query);
 +}
 +
- static void char_cb(GSList *characteristics, guint8 status, gpointer user_data)
- {
- 	GSList *l;
-@@ -431,6 +459,36 @@ static int strtohandle(const char *src)
- 	return dst;
- }
- 
-+static void cmd_included(int argcp, char **argvp)
++static guint resolve_included_uuid(struct included_discovery *isd,
++					struct gatt_included *incl)
 +{
-+	int start = 0x0001;
-+	int end = 0xffff;
++	struct included_uuid_query *query;
++	size_t buflen;
++	uint8_t *buf = g_attrib_get_buffer(isd->attrib, &buflen);
++	guint16 oplen = enc_read_req(incl->range.start, buf, buflen);
 +
-+	if (conn_state != STATE_CONNECTED) {
-+		printf("Command failed: disconnected\n");
-+		return;
-+	}
++	query = g_new0(struct included_uuid_query, 1);
++	query->isd = isd_ref(isd);
++	query->included = incl;
 +
-+	if (argcp > 1) {
-+		start = strtohandle(argvp[1]);
-+		if (start < 0) {
-+			printf("Invalid start handle: %s\n", argvp[1]);
-+			return;
-+		}
-+		end = start;
-+	}
-+
-+	if (argcp > 2) {
-+		end = strtohandle(argvp[2]);
-+		if (end < 0) {
-+			printf("Invalid end handle: %s\n", argvp[2]);
-+			return;
-+		}
-+	}
-+
-+	gatt_find_included(attrib, start, end, included_cb, NULL);
++	return g_attrib_send(isd->attrib, 0, buf[0], buf, oplen,
++				resolve_included_uuid_cb, query, NULL);
 +}
 +
- static void cmd_char(int argcp, char **argvp)
++static struct gatt_included *included_from_buf(const uint8_t *buf, gsize len)
++{
++	struct gatt_included *incl = g_new0(struct gatt_included, 1);
++
++	incl->handle = att_get_u16(&buf[0]);
++	incl->range.start = att_get_u16(&buf[2]);
++	incl->range.end = att_get_u16(&buf[4]);
++
++	if (len == 8) {
++		bt_uuid_t uuid128;
++		bt_uuid_t uuid16 = att_get_uuid16(&buf[6]);
++
++		bt_uuid_to_uuid128(&uuid16, &uuid128);
++		bt_uuid_to_string(&uuid128, incl->uuid, sizeof(incl->uuid));
++	}
++
++	return incl;
++}
++
++static void find_included_cb(uint8_t status, const uint8_t *pdu, uint16_t len,
++							gpointer user_data);
++
++static guint find_included(struct included_discovery *isd, uint16_t start)
++{
++	bt_uuid_t uuid;
++	size_t buflen;
++	uint8_t *buf = g_attrib_get_buffer(isd->attrib, &buflen);
++	guint16 oplen;
++
++	bt_uuid16_create(&uuid, GATT_INCLUDE_UUID);
++	oplen = enc_read_by_type_req(start, isd->end_handle, &uuid,
++							buf, buflen);
++
++	return g_attrib_send(isd->attrib, 0, buf[0], buf, oplen,
++					find_included_cb, isd_ref(isd), NULL);
++}
++
++static void find_included_cb(uint8_t status, const uint8_t *pdu, uint16_t len,
++							gpointer user_data)
++{
++	struct included_discovery *isd = user_data;
++	uint16_t last_handle = isd->end_handle;
++	unsigned int err = status;
++	struct att_data_list *list;
++	int i;
++
++	if (err == ATT_ECODE_ATTR_NOT_FOUND)
++		err = 0;
++
++	if (status)
++		goto done;
++
++	list = dec_read_by_type_resp(pdu, len);
++	if (list == NULL) {
++		err = ATT_ECODE_IO;
++		goto done;
++	}
++
++	if (list->len != 6 && list->len != 8) {
++		err = ATT_ECODE_IO;
++		att_data_list_free(list);
++		goto done;
++	}
++
++	for (i = 0; i < list->num; i++) {
++		struct gatt_included *incl;
++
++		incl = included_from_buf(list->data[i], list->len);
++		last_handle = incl->handle;
++
++		/* 128 bit UUID, needs resolving */
++		if (list->len == 6) {
++			resolve_included_uuid(isd, incl);
++			continue;
++		}
++
++		isd->includes = g_slist_append(isd->includes, incl);
++	}
++
++	att_data_list_free(list);
++
++	if (last_handle < isd->end_handle)
++		find_included(isd, last_handle + 1);
++
++done:
++	if (isd->err == 0)
++		isd->err = err;
++
++	isd_unref(isd);
++}
++
++unsigned int gatt_find_included(GAttrib *attrib, uint16_t start, uint16_t end,
++					gatt_cb_t func, gpointer user_data)
++{
++	struct included_discovery *isd;
++
++	isd = g_new0(struct included_discovery, 1);
++	isd->attrib = g_attrib_ref(attrib);
++	isd->end_handle = end;
++	isd->cb = func;
++	isd->user_data = user_data;
++
++	return find_included(isd, start);
++}
++
+ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+ 							gpointer user_data)
  {
- 	int start = 0x0001;
-@@ -743,6 +801,8 @@ static struct {
- 		"Disconnect from a remote device" },
- 	{ "primary",		cmd_primary,	"[UUID]",
- 		"Primary Service Discovery" },
-+	{ "included",		cmd_included,	"[start hnd [end hnd]]",
-+		"Find Included Services" },
- 	{ "characteristics",	cmd_char,	"[start hnd [end hnd [UUID]]]",
- 		"Characteristics Discovery" },
- 	{ "char-desc",		cmd_char_desc,	"[start hnd] [end hnd]",
+diff --git a/attrib/gatt.h b/attrib/gatt.h
+index 3862011..305b4c6 100644
+--- a/attrib/gatt.h
++++ b/attrib/gatt.h
+@@ -61,6 +61,12 @@ struct gatt_primary {
+ 	struct att_range range;
+ };
+ 
++struct gatt_included {
++	char uuid[MAX_LEN_UUID_STR + 1];
++	uint16_t handle;
++	struct att_range range;
++};
++
+ struct gatt_char {
+ 	char uuid[MAX_LEN_UUID_STR + 1];
+ 	uint16_t handle;
+@@ -71,6 +77,9 @@ struct gatt_char {
+ guint gatt_discover_primary(GAttrib *attrib, bt_uuid_t *uuid, gatt_cb_t func,
+ 							gpointer user_data);
+ 
++unsigned int gatt_find_included(GAttrib *attrib, uint16_t start, uint16_t end,
++					gatt_cb_t func, gpointer user_data);
++
+ guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
+ 					bt_uuid_t *uuid, gatt_cb_t func,
+ 					gpointer user_data);
 -- 
 1.7.12.2
 
