@@ -1,31 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH] build: Add missing documentation files to EXTRA_DIST
+Date: Tue, 9 Oct 2012 15:51:47 +0200
+Message-ID: <1349790707-8464-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1349781598-22580-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1349781598-22580-1-git-send-email-andrzej.kaczmarek@tieto.com>
-Date: Tue, 9 Oct 2012 10:15:36 -0400
-Message-ID: <CAJdJm_OyXnCunC0OfiGACQMTdaN0LJj+3FXXTtcz5Qtgzka5hg@mail.gmail.com>
-Subject: Re: [PATCH v3 00/15] Thermometer watchers API change + fixes
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+This patch adds missing documentation files to EXTRA_DIST variable so they
+are included when creating tarball.
+---
+ Makefile.am | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-On Tue, Oct 9, 2012 at 7:19 AM, Andrzej Kaczmarek
-<andrzej.kaczmarek@tieto.com> wrote:
-> Also this was tested with PTS 4.5.3 and works fine now after memset fix,
-> except for TP/THF/CO/BI-07-I which seems to have issue in PTS (there should
-> be reserved value for temperature type but PTS sends 0x02 which is
-> perfectly valid value thus it won't be discarded on our side).
-
-BTW, you can open a ticket for fixing this in PTS. They are usually
-fast in fixing things (but not so fast on delivering new releases).
-
-Regards,
+diff --git a/Makefile.am b/Makefile.am
+index 3b08f9a..dbbd794 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -401,7 +401,9 @@ EXTRA_DIST += doc/manager-api.txt \
+ 		doc/network-api.txt doc/input-api.txt doc/audio-api.txt \
+ 		doc/control-api.txt doc/hfp-api.txt doc/health-api.txt \
+ 		doc/sap-api.txt doc/media-api.txt doc/assigned-numbers.txt \
+-		doc/supported-features.txt doc/alert-api.txt
++		doc/supported-features.txt doc/alert-api.txt doc/mgmt-api.txt \
++		doc/oob-api.txt doc/proximity-api.txt doc/heartrate-api.txt \
++		doc/thermometer-api.txt
+ 
+ AM_YFLAGS = -d
+ 
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.11.3
+
