@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 03/15] thermometer: Move watcher logic to adapter interface
-Date: Tue, 9 Oct 2012 13:19:46 +0200
-Message-ID: <1349781598-22580-4-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3 01/15] thermometer: Store thermometer devices per-adapter
+Date: Tue, 9 Oct 2012 13:19:44 +0200
+Message-ID: <1349781598-22580-2-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1349781598-22580-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1349781598-22580-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,376 +12,236 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch moves watcher related methods to ThermometerManager interface
-so watchers can be registered per-adapter instead of per-device.
-
-Final measurement notifications are now enabled on all devices connected
-to given adapter when first watcher is registered and disabled when last
-watcher is unregistered.
-
-Intermediate measurement notifications are enabled for all devices
-connected to given adapter which support this feature.
+This patch replaces global list of thermometer devices with per-adapter
+lists.
 ---
- profiles/thermometer/thermometer.c | 134 +++++++++++++++++++------------------
- 1 file changed, 70 insertions(+), 64 deletions(-)
+ profiles/thermometer/manager.c     |  16 +++++-
+ profiles/thermometer/thermometer.c | 114 ++++++++++++++++++++++++++++++-------
+ profiles/thermometer/thermometer.h |   2 +
+ 3 files changed, 110 insertions(+), 22 deletions(-)
 
+diff --git a/profiles/thermometer/manager.c b/profiles/thermometer/manager.c
+index d965976..86e3a0f 100644
+--- a/profiles/thermometer/manager.c
++++ b/profiles/thermometer/manager.c
+@@ -66,11 +66,25 @@ static void thermometer_driver_remove(struct btd_profile *p,
+ 	thermometer_unregister(device);
+ }
+ 
++static int thermometer_adapter_probe(struct btd_profile *p,
++						struct btd_adapter *adapter)
++{
++	return thermometer_adapter_register(adapter);
++}
++
++static void thermometer_adapter_remove(struct btd_profile *p,
++						struct btd_adapter *adapter)
++{
++	thermometer_adapter_unregister(adapter);
++}
++
+ static struct btd_profile thermometer_profile = {
+ 	.name		= "thermometer-device-driver",
+ 	.remote_uuids	= BTD_UUIDS(HEALTH_THERMOMETER_UUID),
+ 	.device_probe	= thermometer_driver_probe,
+-	.device_remove	= thermometer_driver_remove
++	.device_remove	= thermometer_driver_remove,
++	.adapter_probe	= thermometer_adapter_probe,
++	.adapter_remove	= thermometer_adapter_remove
+ };
+ 
+ int thermometer_manager_init(void)
 diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
-index cc5f23f..c2d0529 100644
+index 3506ba7..e98be94 100644
 --- a/profiles/thermometer/thermometer.c
 +++ b/profiles/thermometer/thermometer.c
-@@ -59,6 +59,8 @@
- struct thermometer_adapter {
- 	struct btd_adapter	*adapter;
- 	GSList			*devices;
-+	GSList			*fwatchers;	/* Final measurements */
-+	GSList			*iwatchers;	/* Intermediate measurements */
- };
+@@ -55,23 +55,29 @@
+ #define TEMPERATURE_TYPE_SIZE	1
+ #define MEASUREMENT_INTERVAL_SIZE	2
  
- struct thermometer {
-@@ -70,8 +72,6 @@ struct thermometer {
- 	guint				attindid;	/* Att incications id */
- 	guint				attnotid;	/* Att notif id */
- 	GSList				*chars;		/* Characteristics */
--	GSList				*fwatchers;     /* Final measurements */
--	GSList				*iwatchers;     /* Intermediate meas  */
- 	gboolean			intermediate;
- 	uint8_t				type;
- 	uint16_t			interval;
-@@ -94,10 +94,10 @@ struct descriptor {
- };
- 
- struct watcher {
--	struct thermometer	*t;
--	guint			id;
--	char			*srv;
--	char			*path;
-+	struct thermometer_adapter	*tadapter;
-+	guint				id;
-+	char				*srv;
-+	char				*path;
- };
- 
- struct measurement {
-@@ -182,9 +182,6 @@ static void destroy_thermometer(gpointer user_data)
- 	if (t->chars != NULL)
- 		g_slist_free_full(t->chars, destroy_char);
- 
--	if (t->fwatchers != NULL)
--		g_slist_free_full(t->fwatchers, remove_watcher);
--
- 	btd_device_unref(t->dev);
- 	g_free(t->svc_range);
- 	g_free(t);
-@@ -197,6 +194,9 @@ static void destroy_thermometer_adapter(gpointer user_data)
- 	if (tadapter->devices != NULL)
- 		g_slist_free_full(tadapter->devices, destroy_thermometer);
- 
-+	if (tadapter->fwatchers != NULL)
-+		g_slist_free_full(tadapter->fwatchers, remove_watcher);
++struct thermometer_adapter {
++	struct btd_adapter	*adapter;
++	GSList			*devices;
++};
 +
- 	g_free(tadapter);
+ struct thermometer {
+-	struct btd_device	*dev;		/* Device reference */
+-	GAttrib			*attrib;	/* GATT connection */
+-	struct att_range	*svc_range;	/* Thermometer range */
+-	guint			attioid;	/* Att watcher id */
+-	guint			attindid;	/* Att incications id */
+-	guint			attnotid;	/* Att notifications id */
+-	GSList			*chars;		/* Characteristics */
+-	GSList			*fwatchers;     /* Final measurements */
+-	GSList			*iwatchers;     /* Intermediate measurements */
+-	gboolean		intermediate;
+-	uint8_t			type;
+-	uint16_t		interval;
+-	uint16_t		max;
+-	uint16_t		min;
+-	gboolean		has_type;
+-	gboolean		has_interval;
++	struct btd_device		*dev;		/* Device reference */
++	struct thermometer_adapter	*tadapter;
++	GAttrib				*attrib;	/* GATT connection */
++	struct att_range		*svc_range;	/* Thermometer range */
++	guint				attioid;	/* Att watcher id */
++	guint				attindid;	/* Att incications id */
++	guint				attnotid;	/* Att notif id */
++	GSList				*chars;		/* Characteristics */
++	GSList				*fwatchers;     /* Final measurements */
++	GSList				*iwatchers;     /* Intermediate meas  */
++	gboolean			intermediate;
++	uint8_t				type;
++	uint16_t			interval;
++	uint16_t			max;
++	uint16_t			min;
++	gboolean			has_type;
++	gboolean			has_interval;
+ };
+ 
+ struct characteristic {
+@@ -108,7 +114,7 @@ struct tmp_interval_data {
+ 	uint16_t		interval;
+ };
+ 
+-static GSList *thermometers = NULL;
++static GSList *thermometer_adapters = NULL;
+ 
+ const char *temp_type[] = {
+ 	"<reserved>",
+@@ -183,6 +189,17 @@ static void destroy_thermometer(gpointer user_data)
+ 	g_free(t);
  }
  
-@@ -400,7 +400,7 @@ static void process_thermometer_desc(struct descriptor *desc)
- 
- 		if (g_strcmp0(ch->attr.uuid,
- 					TEMPERATURE_MEASUREMENT_UUID) == 0) {
--			if (g_slist_length(ch->t->fwatchers) == 0)
-+			if (g_slist_length(ch->t->tadapter->fwatchers) == 0)
- 				return;
- 
- 			val = GATT_CLIENT_CHARAC_CFG_IND_BIT;
-@@ -408,7 +408,7 @@ static void process_thermometer_desc(struct descriptor *desc)
- 								"indication");
- 		} else if (g_strcmp0(ch->attr.uuid,
- 					INTERMEDIATE_TEMPERATURE_UUID) == 0) {
--			if (g_slist_length(ch->t->iwatchers) == 0)
-+			if (g_slist_length(ch->t->tadapter->iwatchers) == 0)
- 				return;
- 
- 			val = GATT_CLIENT_CHARAC_CFG_NOTIF_BIT;
-@@ -718,8 +718,9 @@ static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
- 	return write_attr_interval(t, msg, value);
- }
- 
--static void enable_final_measurement(struct thermometer *t)
-+static void enable_final_measurement(gpointer data, gpointer user_data)
++static gint cmp_adapter(gconstpointer a, gconstpointer b)
++{
++	const struct thermometer_adapter *tadapter = a;
++	const struct btd_adapter *adapter = b;
++
++	if (adapter == tadapter->adapter)
++		return 0;
++
++	return -1;
++}
++
+ static gint cmp_device(gconstpointer a, gconstpointer b)
  {
-+	struct thermometer *t = data;
- 	struct characteristic *ch;
- 	struct descriptor *desc;
- 	bt_uuid_t btuuid;
-@@ -748,15 +749,16 @@ static void enable_final_measurement(struct thermometer *t)
- 	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
+ 	const struct thermometer *t = a;
+@@ -231,6 +248,17 @@ static gint cmp_descriptor(gconstpointer a, gconstpointer b)
+ 	return bt_uuid_cmp(&desc->uuid, uuid);
  }
  
--static void enable_intermediate_measurement(struct thermometer *t)
-+static void enable_intermediate_measurement(gpointer data, gpointer user_data)
++static struct thermometer_adapter *
++find_thermometer_adapter(struct btd_adapter *adapter)
++{
++	GSList *l = g_slist_find_custom(thermometer_adapters, adapter,
++								cmp_adapter);
++	if (!l)
++		return NULL;
++
++	return l->data;
++}
++
+ static struct characteristic *get_characteristic(struct thermometer *t,
+ 							const char *uuid)
  {
-+	struct thermometer *t = data;
- 	struct characteristic *ch;
- 	struct descriptor *desc;
- 	bt_uuid_t btuuid;
- 	uint8_t atval[2];
- 	char *msg;
- 
--	if (t->attrib == NULL)
-+	if (t->attrib == NULL || !t->intermediate)
- 		return;
- 
- 	ch = get_characteristic(t, INTERMEDIATE_TEMPERATURE_UUID);
-@@ -778,8 +780,9 @@ static void enable_intermediate_measurement(struct thermometer *t)
- 	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
- }
- 
--static void disable_final_measurement(struct thermometer *t)
-+static void disable_final_measurement(gpointer data, gpointer user_data)
+@@ -1233,13 +1261,25 @@ int thermometer_register(struct btd_device *device, struct gatt_primary *tattr)
  {
-+	struct thermometer *t = data;
- 	struct characteristic *ch;
- 	struct descriptor *desc;
- 	bt_uuid_t btuuid;
-@@ -808,8 +811,9 @@ static void disable_final_measurement(struct thermometer *t)
- 	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
- }
+ 	const gchar *path = device_get_path(device);
+ 	struct thermometer *t;
++	struct btd_adapter *adapter;
++	struct thermometer_adapter *tadapter;
++
++	adapter = device_get_adapter(device);
++
++	tadapter = find_thermometer_adapter(adapter);
++
++	if (tadapter == NULL)
++		return -1;
  
--static void disable_intermediate_measurement(struct thermometer *t)
-+static void disable_intermediate_measurement(gpointer data, gpointer user_data)
- {
-+	struct thermometer *t = data;
- 	struct characteristic *ch;
- 	struct descriptor *desc;
- 	bt_uuid_t btuuid;
-@@ -838,31 +842,34 @@ static void disable_intermediate_measurement(struct thermometer *t)
- 	gatt_write_char(t->attrib, desc->handle, atval, 2, measurement_cb, msg);
- }
+ 	t = g_new0(struct thermometer, 1);
+ 	t->dev = btd_device_ref(device);
++	t->tadapter = tadapter;
+ 	t->svc_range = g_new0(struct att_range, 1);
+ 	t->svc_range->start = tattr->range.start;
+ 	t->svc_range->end = tattr->range.end;
  
--static void remove_int_watcher(struct thermometer *t, struct watcher *w)
-+static void remove_int_watcher(struct thermometer_adapter *tadapter,
-+							struct watcher *w)
- {
--	if (!g_slist_find(t->iwatchers, w))
-+	if (!g_slist_find(tadapter->iwatchers, w))
- 		return;
++	tadapter->devices = g_slist_prepend(tadapter->devices, t);
++
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+ 				path, THERMOMETER_INTERFACE,
+ 				thermometer_methods, thermometer_signals,
+@@ -1250,8 +1290,6 @@ int thermometer_register(struct btd_device *device, struct gatt_primary *tattr)
+ 		return -EIO;
+ 	}
  
--	t->iwatchers = g_slist_remove(t->iwatchers, w);
-+	tadapter->iwatchers = g_slist_remove(tadapter->iwatchers, w);
- 
--	if (g_slist_length(t->iwatchers) == 0)
--		disable_intermediate_measurement(t);
-+	if (g_slist_length(tadapter->iwatchers) == 0)
-+		g_slist_foreach(tadapter->devices,
-+					disable_intermediate_measurement, 0);
- }
- 
- static void watcher_exit(DBusConnection *conn, void *user_data)
- {
- 	struct watcher *watcher = user_data;
--	struct thermometer *t = watcher->t;
-+	struct thermometer_adapter *tadapter = watcher->tadapter;
- 
- 	DBG("Thermometer watcher %s disconnected", watcher->path);
- 
--	remove_int_watcher(t, watcher);
-+	remove_int_watcher(tadapter, watcher);
- 
--	t->fwatchers = g_slist_remove(t->fwatchers, watcher);
-+	tadapter->fwatchers = g_slist_remove(tadapter->fwatchers, watcher);
- 	g_dbus_remove_watch(btd_get_dbus_connection(), watcher->id);
- 
--	if (g_slist_length(t->fwatchers) == 0)
--		disable_final_measurement(t);
-+	if (g_slist_length(tadapter->fwatchers) == 0)
-+		g_slist_foreach(tadapter->devices,
-+					disable_final_measurement, 0);
- }
- 
- static struct watcher *find_watcher(GSList *list, const char *sender,
-@@ -888,7 +895,7 @@ static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
- 								void *data)
- {
- 	const char *sender = dbus_message_get_sender(msg);
--	struct thermometer *t = data;
-+	struct thermometer_adapter *tadapter = data;
- 	struct watcher *watcher;
- 	char *path;
- 
-@@ -896,7 +903,7 @@ static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
- 							DBUS_TYPE_INVALID))
- 		return btd_error_invalid_args(msg);
- 
--	watcher = find_watcher(t->fwatchers, sender, path);
-+	watcher = find_watcher(tadapter->fwatchers, sender, path);
- 	if (watcher != NULL)
- 		return btd_error_already_exists(msg);
- 
-@@ -905,14 +912,14 @@ static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
- 	watcher = g_new0(struct watcher, 1);
- 	watcher->srv = g_strdup(sender);
- 	watcher->path = g_strdup(path);
--	watcher->t = t;
-+	watcher->tadapter = tadapter;
- 	watcher->id = g_dbus_add_disconnect_watch(conn, sender, watcher_exit,
- 						watcher, destroy_watcher);
- 
--	if (g_slist_length(t->fwatchers) == 0)
--		enable_final_measurement(t);
-+	if (g_slist_length(tadapter->fwatchers) == 0)
-+		g_slist_foreach(tadapter->devices, enable_final_measurement, 0);
- 
--	t->fwatchers = g_slist_prepend(t->fwatchers, watcher);
-+	tadapter->fwatchers = g_slist_prepend(tadapter->fwatchers, watcher);
- 
- 	return dbus_message_new_method_return(msg);
- }
-@@ -921,7 +928,7 @@ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
- 								void *data)
- {
- 	const char *sender = dbus_message_get_sender(msg);
--	struct thermometer *t = data;
-+	struct thermometer_adapter *tadapter = data;
- 	struct watcher *watcher;
- 	char *path;
- 
-@@ -929,19 +936,20 @@ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
- 							DBUS_TYPE_INVALID))
- 		return btd_error_invalid_args(msg);
- 
--	watcher = find_watcher(t->fwatchers, sender, path);
-+	watcher = find_watcher(tadapter->fwatchers, sender, path);
- 	if (watcher == NULL)
- 		return btd_error_does_not_exist(msg);
- 
- 	DBG("Thermometer watcher %s unregistered", path);
- 
--	remove_int_watcher(t, watcher);
-+	remove_int_watcher(tadapter, watcher);
- 
--	t->fwatchers = g_slist_remove(t->fwatchers, watcher);
-+	tadapter->fwatchers = g_slist_remove(tadapter->fwatchers, watcher);
- 	g_dbus_remove_watch(btd_get_dbus_connection(), watcher->id);
- 
--	if (g_slist_length(t->fwatchers) == 0)
--		disable_final_measurement(t);
-+	if (g_slist_length(tadapter->fwatchers) == 0)
-+		g_slist_foreach(tadapter->devices,
-+					disable_final_measurement, 0);
- 
- 	return dbus_message_new_method_return(msg);
- }
-@@ -950,30 +958,28 @@ static DBusMessage *enable_intermediate(DBusConnection *conn, DBusMessage *msg,
- 								void *data)
- {
- 	const char *sender = dbus_message_get_sender(msg);
--	struct thermometer *t = data;
-+	struct thermometer_adapter *ta = data;
- 	struct watcher *watcher;
- 	char *path;
- 
--	if (!t->intermediate)
--		return btd_error_not_supported(msg);
+-	thermometers = g_slist_prepend(thermometers, t);
 -
- 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
- 							DBUS_TYPE_INVALID))
- 		return btd_error_invalid_args(msg);
- 
--	watcher = find_watcher(t->fwatchers, sender, path);
-+	watcher = find_watcher(ta->fwatchers, sender, path);
- 	if (watcher == NULL)
- 		return btd_error_does_not_exist(msg);
- 
--	if (find_watcher(t->iwatchers, sender, path))
-+	if (find_watcher(ta->iwatchers, sender, path))
- 		return btd_error_already_exists(msg);
- 
- 	DBG("Intermediate measurement watcher %s registered", path);
- 
--	if (g_slist_length(t->iwatchers) == 0)
--		enable_intermediate_measurement(t);
-+	if (g_slist_length(ta->iwatchers) == 0)
-+		g_slist_foreach(ta->devices,
-+					enable_intermediate_measurement, 0);
- 
--	t->iwatchers = g_slist_prepend(t->iwatchers, watcher);
-+	ta->iwatchers = g_slist_prepend(ta->iwatchers, watcher);
- 
- 	return dbus_message_new_method_return(msg);
- }
-@@ -982,7 +988,7 @@ static DBusMessage *disable_intermediate(DBusConnection *conn, DBusMessage *msg,
- 								void *data)
+ 	t->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
+ 						attio_disconnected_cb, t);
+ 	return 0;
+@@ -1260,14 +1298,48 @@ int thermometer_register(struct btd_device *device, struct gatt_primary *tattr)
+ void thermometer_unregister(struct btd_device *device)
  {
- 	const char *sender = dbus_message_get_sender(msg);
--	struct thermometer *t = data;
-+	struct thermometer_adapter *ta = data;
- 	struct watcher *watcher;
- 	char *path;
+ 	struct thermometer *t;
++	struct btd_adapter *adapter;
++	struct thermometer_adapter *tadapter;
+ 	GSList *l;
  
-@@ -990,13 +996,13 @@ static DBusMessage *disable_intermediate(DBusConnection *conn, DBusMessage *msg,
- 							DBUS_TYPE_INVALID))
- 		return btd_error_invalid_args(msg);
+-	l = g_slist_find_custom(thermometers, device, cmp_device);
++	adapter = device_get_adapter(device);
++
++	tadapter = find_thermometer_adapter(adapter);
++
++	if (tadapter == NULL)
++		return;
++
++	l = g_slist_find_custom(tadapter->devices, device, cmp_device);
+ 	if (l == NULL)
+ 		return;
  
--	watcher = find_watcher(t->iwatchers, sender, path);
-+	watcher = find_watcher(ta->iwatchers, sender, path);
- 	if (watcher == NULL)
- 		return btd_error_does_not_exist(msg);
- 
- 	DBG("Intermediate measurement %s unregistered", path);
- 
--	remove_int_watcher(t, watcher);
-+	remove_int_watcher(ta, watcher);
- 
- 	return dbus_message_new_method_return(msg);
+ 	t = l->data;
+-	thermometers = g_slist_remove(thermometers, t);
++
++	tadapter->devices = g_slist_remove(tadapter->devices, t);
++
+ 	g_dbus_unregister_interface(btd_get_dbus_connection(),
+ 				device_get_path(t->dev), THERMOMETER_INTERFACE);
  }
-@@ -1008,18 +1014,6 @@ static const GDBusMethodTable thermometer_methods[] = {
- 	{ GDBUS_ASYNC_METHOD("SetProperty",
- 			GDBUS_ARGS({ "name", "s" }, { "value", "v" }), NULL,
- 			set_property) },
--	{ GDBUS_METHOD("RegisterWatcher",
--			GDBUS_ARGS({ "agent", "o" }), NULL,
--			register_watcher) },
--	{ GDBUS_METHOD("UnregisterWatcher",
--			GDBUS_ARGS({ "agent", "o" }), NULL,
--			unregister_watcher) },
--	{ GDBUS_METHOD("EnableIntermediateMeasurement",
--			GDBUS_ARGS({ "agent", "o" }), NULL,
--			enable_intermediate) },
--	{ GDBUS_METHOD("DisableIntermediateMeasurement",
--			GDBUS_ARGS({ "agent", "o" }), NULL,
--			disable_intermediate) },
- 	{ }
- };
++
++int thermometer_adapter_register(struct btd_adapter *adapter)
++{
++	struct thermometer_adapter *tadapter;
++
++	tadapter = g_new0(struct thermometer_adapter, 1);
++	tadapter->adapter = adapter;
++
++	thermometer_adapters = g_slist_prepend(thermometer_adapters, tadapter);
++
++	return 0;
++}
++
++void thermometer_adapter_unregister(struct btd_adapter *adapter)
++{
++	struct thermometer_adapter *tadapter;
++
++	tadapter = find_thermometer_adapter(adapter);
++	if (tadapter == NULL)
++		return;
++
++	thermometer_adapters = g_slist_remove(thermometer_adapters, tadapter);
++}
+diff --git a/profiles/thermometer/thermometer.h b/profiles/thermometer/thermometer.h
+index 2744ed6..ca83c31 100644
+--- a/profiles/thermometer/thermometer.h
++++ b/profiles/thermometer/thermometer.h
+@@ -22,3 +22,5 @@
  
-@@ -1071,9 +1065,9 @@ static void recv_measurement(struct thermometer *t, struct measurement *m)
- 	GSList *wlist;
- 
- 	if (g_strcmp0(m->value, "Intermediate") == 0)
--		wlist = t->iwatchers;
-+		wlist = t->tadapter->iwatchers;
- 	else
--		wlist = t->fwatchers;
-+		wlist = t->tadapter->fwatchers;
- 
- 	g_slist_foreach(wlist, update_watcher, m);
- }
-@@ -1333,6 +1327,18 @@ void thermometer_unregister(struct btd_device *device)
- }
- 
- static const GDBusMethodTable thermometer_manager_methods[] = {
-+	{ GDBUS_METHOD("RegisterWatcher",
-+			GDBUS_ARGS({ "agent", "o" }), NULL,
-+			register_watcher) },
-+	{ GDBUS_METHOD("UnregisterWatcher",
-+			GDBUS_ARGS({ "agent", "o" }), NULL,
-+			unregister_watcher) },
-+	{ GDBUS_METHOD("EnableIntermediateMeasurement",
-+			GDBUS_ARGS({ "agent", "o" }), NULL,
-+			enable_intermediate) },
-+	{ GDBUS_METHOD("DisableIntermediateMeasurement",
-+			GDBUS_ARGS({ "agent", "o" }), NULL,
-+			disable_intermediate) },
- 	{ }
- };
- 
+ int thermometer_register(struct btd_device *device, struct gatt_primary *tattr);
+ void thermometer_unregister(struct btd_device *device);
++int thermometer_adapter_register(struct btd_adapter *adapter);
++void thermometer_adapter_unregister(struct btd_adapter *adapter);
 -- 
 1.7.11.3
 
