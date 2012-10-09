@@ -2,147 +2,334 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
-Subject: [RFC obexd 07/11] fuse: Add open and read operations plus location helpers
-Date: Tue,  9 Oct 2012 20:15:52 +0200
-Message-Id: <1349806556-1978-7-git-send-email-dmp0x7c5@gmail.com>
+Subject: [RFC obexd 03/11] fuse: Add gobexhlp_connect/disconnect functions with helpers
+Date: Tue,  9 Oct 2012 20:15:48 +0200
+Message-Id: <1349806556-1978-3-git-send-email-dmp0x7c5@gmail.com>
 In-Reply-To: <1349806556-1978-1-git-send-email-dmp0x7c5@gmail.com>
 References: <1349806556-1978-1-git-send-email-dmp0x7c5@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- fuse/gobexfuse.c |   32 ++++++++++++++++++++++++++++
- fuse/helpers.c   |   61 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- fuse/helpers.h   |    3 +-
- 3 files changed, 95 insertions(+), 1 deletions(-)
+ fuse/gobexfuse.c |   40 ++++++++++
+ fuse/helpers.c   |  220 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fuse/helpers.h   |    5 +
+ 3 files changed, 265 insertions(+), 0 deletions(-)
 
 diff --git a/fuse/gobexfuse.c b/fuse/gobexfuse.c
-index c886176..446a757 100644
+index d9709fd..cc5fedb 100644
 --- a/fuse/gobexfuse.c
 +++ b/fuse/gobexfuse.c
-@@ -144,9 +144,41 @@ static int gobexfuse_getattr(const char *path, struct stat *stbuf)
- 	return res;
- }
+@@ -33,6 +33,10 @@
  
-+static int gobexfuse_open(const char *path, struct fuse_file_info *fi)
+ #include "helpers.h"
+ 
++struct gobexhlp_session* session = NULL;
++static GMainLoop *main_loop;
++static GThread *main_gthread;
++
+ struct options {
+ 	char* dststr;
+ 	char* srcstr;
+@@ -60,7 +64,34 @@ static struct fuse_opt gobexfuse_opts[] =
+ 	FUSE_OPT_END
+ };
+ 
++gpointer main_loop_func(gpointer user_data)
 +{
-+	struct gobexhlp_buffer *file_buffer;
++	main_loop = g_main_loop_new(NULL, FALSE);
++	g_main_loop_run(main_loop);
 +
-+	file_buffer = gobexhlp_get(session, path);
-+
-+	if (file_buffer == NULL)
-+		return -ENOENT;
-+
-+	fi->fh = (uint64_t)file_buffer;
-+
-+	return session->status;
++	return 0;
 +}
 +
-+static int gobexfuse_read(const char *path, char *buf, size_t size,
-+			off_t offset, struct fuse_file_info *fi)
++void* gobexfuse_init(struct fuse_conn_info *conn)
 +{
-+	gsize asize;
-+	struct gobexhlp_buffer *file_buffer = (struct gobexhlp_buffer*)fi->fh;
++	main_gthread = g_thread_create(main_loop_func, NULL, TRUE, NULL);
 +
-+	asize = file_buffer->size - offset;
++	conn->async_read = 0;
++	conn->want &= ~FUSE_CAP_ASYNC_READ;
 +
-+	if (asize > size)
-+		asize = size;
++	return 0;
++}
 +
-+	memcpy(buf, file_buffer->data + offset, asize);
-+
-+	return asize;
++void gobexfuse_destroy()
++{
++	gobexhlp_disconnect(session);
++	g_main_loop_quit(main_loop);
++	g_thread_join(main_gthread);
 +}
 +
  static struct fuse_operations gobexfuse_oper = {
- 	.readdir = gobexfuse_readdir,
- 	.getattr = gobexfuse_getattr,
-+	.open = gobexfuse_open,
-+	.read = gobexfuse_read,
- 	.init = gobexfuse_init,
- 	.destroy = gobexfuse_destroy,
++	.init = gobexfuse_init,
++	.destroy = gobexfuse_destroy,
  };
+ 
+ static int gobexfuse_opt_proc(void *data, const char *arg, int key,
+@@ -111,6 +142,15 @@ int main(int argc, char *argv[])
+ 
+ 	g_thread_init(NULL);
+ 
++	session = gobexhlp_connect(options.srcstr, options.dststr);
++	if (session == NULL || session->io == NULL) {
++		g_printerr("Connection to %s failed\n", options.dststr);
++		gobexhlp_disconnect(session);
++		return -EHOSTUNREACH;
++	} else {
++		g_print("Connected\nMounting %s\n", options.dststr);
++	}
++
+ 	fuse_opt_add_arg(&args, "-s"); /* force single threaded mode */
+ 	retfuse = fuse_main(args.argc, args.argv, &gobexfuse_oper, NULL);
+ 
 diff --git a/fuse/helpers.c b/fuse/helpers.c
-index 249d0c9..9b453e0 100644
+index 53bba57..856e1d5 100644
 --- a/fuse/helpers.c
 +++ b/fuse/helpers.c
-@@ -516,3 +516,64 @@ struct stat *gobexhlp_getattr(struct gobexhlp_session* session,
- 	return g_hash_table_lookup(session->file_stat, path);
- }
+@@ -43,6 +43,9 @@
  
-+static struct gobexhlp_location *get_location(const char *path)
+ #define OBEX_FTP_LS "x-obex/folder-listing"
+ 
++static GCond *gobexhlp_cond;
++static GMutex *gobexhlp_mutex;
++
+ struct gobexhlp_request {
+ 	gchar *name;
+ 	gboolean complete;
+@@ -53,3 +56,220 @@ struct gobexhlp_location {
+ 	gchar *file;
+ };
+ 
++static uint16_t find_rfcomm_uuid(void *user_data)
 +{
-+	struct gobexhlp_location *location;
-+	gchar **directories;
-+	guint i, len, fid = 0;
++	sdp_list_t *pds = (sdp_list_t*) user_data;
++	uint16_t channel = 0;
 +
-+	location = g_malloc0(sizeof(*location));
-+	directories = g_strsplit(path, "/", -1);
-+	len = g_strv_length(directories);
-+
-+	for (i = 0; i < len; i++)
-+		if (directories[i][0] != '\0') /* protect multi slashes */
-+			fid = i; /* last nonempty is a file */
-+
-+	location->file = g_strdup(directories[fid]);
-+	directories[fid][0] = '\0'; /* remove file */
-+	location->dir = g_strjoinv("/", directories);
-+
-+	g_strfreev(directories);
-+
-+	return location;
++	for (;pds;pds = pds->next) {
++		sdp_data_t *d = (sdp_data_t*)pds->data;
++		int proto = 0;
++		for (; d; d = d->next) {
++			switch(d->dtd) {
++			case SDP_UUID16:
++			case SDP_UUID32:
++			case SDP_UUID128:
++				proto = sdp_uuid_to_proto(&d->val.uuid);
++			break;
++			case SDP_UINT8:
++				if (proto == RFCOMM_UUID)
++					channel = d->val.int8;
++				break;
++			}
++		}
++	}
++	return channel;
 +}
 +
-+void free_location(struct gobexhlp_location *location)
++static uint16_t get_ftp_channel(bdaddr_t *src, bdaddr_t *dst)
 +{
-+	g_free(location->file);
-+	g_free(location->dir);
-+	g_free(location);
++	sdp_session_t *sdp;
++	sdp_list_t *r, *search_list, *attrid_list;
++	sdp_list_t *response_list = NULL;
++	uuid_t uuid;
++
++	/* FTP_SDP_UUID "00001106-0000-1000-8000-00805f9b34fb" */
++	uint8_t uuid_int[] = {0, 0, 0x11, 0x06, 0, 0, 0x10, 0, 0x80,
++					0, 0, 0x80, 0x5f, 0x9b, 0x34, 0xfb};
++	uint32_t range = 0x0000ffff;
++	uint16_t channel = 0;
++
++	sdp = sdp_connect(src, dst, SDP_RETRY_IF_BUSY );
++	if (sdp == NULL)
++		return channel;
++
++	sdp_uuid128_create(&uuid, uuid_int);
++	search_list = sdp_list_append(NULL, &uuid);
++	attrid_list = sdp_list_append(NULL, &range);
++	sdp_service_search_attr_req(sdp, search_list, SDP_ATTR_REQ_RANGE,
++					attrid_list, &response_list);
++	r = response_list;
++
++	for (; r;r = r->next) {
++		sdp_record_t *rec = (sdp_record_t*) r->data;
++		sdp_list_t *proto_list;
++
++		if (sdp_get_access_protos(rec, &proto_list ) == 0) {
++			sdp_list_t *p = proto_list;
++			for (; p; p = p->next) {
++				sdp_list_t *pds = (sdp_list_t*) p->data;
++				channel = find_rfcomm_uuid(pds);
++				sdp_list_free((sdp_list_t*) p->data, 0);
++			}
++			sdp_list_free(proto_list, 0);
++		}
++		sdp_record_free(rec);
++	}
++	sdp_close(sdp);
++
++	g_free(search_list);
++	g_free(attrid_list);
++	g_free(response_list);
++
++	return channel;
 +}
 +
-+struct gobexhlp_buffer *gobexhlp_get(struct gobexhlp_session* session,
-+						const char *path)
++/* taken from client/bluetooth.c - bluetooth_getpacketopt */
++static int get_packet_opt(GIOChannel *io, int *tx_mtu, int *rx_mtu)
 +{
-+	struct gobexhlp_location *l;
-+	struct gobexhlp_buffer *buffer;
-+	struct stat *stfile;
-+	l = get_location(path);
++	int sk = g_io_channel_unix_get_fd(io);
++	int type;
++	int omtu = -1;
++	int imtu = -1;
++	socklen_t len = sizeof(int);
 +
-+	g_print("gobexhlp_get(%s%s)\n", l->dir, l->file);
++	if (getsockopt(sk, SOL_SOCKET, SO_TYPE, &type, &len) < 0)
++		return -errno;
 +
-+	stfile = gobexhlp_getattr(session, path);
-+	if (stfile == NULL)
++	if (type != SOCK_SEQPACKET)
++		return -EINVAL;
++
++	if (!bt_io_get(io, BT_IO_L2CAP, NULL, BT_IO_OPT_OMTU, &omtu,
++						BT_IO_OPT_IMTU, &imtu,
++						BT_IO_OPT_INVALID))
++		return -EINVAL;
++
++	if (tx_mtu)
++		*tx_mtu = omtu;
++
++	if (rx_mtu)
++		*rx_mtu = imtu;
++
++	return 0;
++}
++
++static void obex_callback(GObex *obex, GError *err, GObexPacket *rsp,
++							gpointer user_data)
++{
++	if (err != NULL) {
++		g_debug("Connect failed: %s\n", err->message);
++		g_error_free(err);
++	} else {
++		g_debug("Connect succeeded\n");
++	}
++}
++
++static void bt_io_callback(GIOChannel *io, GError *err, gpointer user_data)
++{
++	struct gobexhlp_session *session = user_data;
++	GObexTransportType type;
++	int tx_mtu = -1;
++	int rx_mtu = -1;
++
++	if (err != NULL) {
++		g_printerr("%s\n", err->message);
++		g_error_free(err);
++		return;
++	}
++
++	g_debug("Bluetooth socket connected\n");
++
++	g_io_channel_set_flags(session->io, G_IO_FLAG_NONBLOCK, NULL);
++	g_io_channel_set_close_on_unref(session->io, TRUE);
++
++	if (get_packet_opt(session->io, &tx_mtu, &rx_mtu) == 0) {
++		type = G_OBEX_TRANSPORT_PACKET;
++		g_debug("PACKET transport tx:%d rx:%d\n", tx_mtu, rx_mtu);
++	} else {
++		type = G_OBEX_TRANSPORT_STREAM;
++		g_debug("STREAM transport\n");
++	}
++
++	session->obex = g_obex_new(io, type, tx_mtu, rx_mtu);
++	g_obex_connect(session->obex, obex_callback, session, NULL,
++				G_OBEX_HDR_TARGET, OBEX_FTP_UUID,
++				OBEX_FTP_UUID_LEN, G_OBEX_HDR_INVALID);
++}
++
++struct gobexhlp_session* gobexhlp_connect(const char *srcstr,
++						const char *dststr)
++{
++	struct gobexhlp_session *session;
++	uint16_t channel;
++	bdaddr_t src, dst;
++
++	session = g_try_malloc0(sizeof(struct gobexhlp_session));
++	if (session == NULL)
 +		return NULL;
 +
-+	buffer = g_malloc0(sizeof(*buffer));
++	if (srcstr == NULL)
++		bacpy(&src, BDADDR_ANY);
++	else
++		str2ba(srcstr, &src);
 +
-+	if (stfile->st_size == 0)
-+		return buffer;
++	str2ba(dststr, &dst);
++	channel = get_ftp_channel(&src, &dst);
 +
-+	gobexhlp_setpath(session, l->dir);
-+	request_new(session, g_strdup_printf("get %s", path));
-+	session->buffer = buffer;
-+	g_obex_get_req(session->obex, async_get_consumer,
-+					complete_func, session, &session->err,
-+					G_OBEX_HDR_NAME, l->file,
-+					G_OBEX_HDR_INVALID);
-+	free_location(l);
-+	request_wait_free(session);
++	if (channel == 0)
++		return NULL;
 +
-+	return buffer;
++	if (channel > 31)
++		session->io = bt_io_connect(BT_IO_L2CAP, bt_io_callback,
++				session, NULL, &session->err,
++				BT_IO_OPT_SOURCE_BDADDR, &src,
++				BT_IO_OPT_DEST_BDADDR, &dst,
++				BT_IO_OPT_PSM, channel,
++				BT_IO_OPT_MODE, BT_IO_MODE_ERTM,
++				BT_IO_OPT_OMTU, BT_TX_MTU,
++				BT_IO_OPT_IMTU, BT_RX_MTU,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++				BT_IO_OPT_INVALID);
++	else
++		session->io = bt_io_connect(BT_IO_RFCOMM, bt_io_callback,
++				session, NULL, &session->err,
++				BT_IO_OPT_SOURCE_BDADDR, &src,
++				BT_IO_OPT_DEST_BDADDR, &dst,
++				BT_IO_OPT_CHANNEL, channel,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++				BT_IO_OPT_INVALID);
++
++	if (session->err != NULL)
++		return NULL;
++
++	session->file_stat = g_hash_table_new_full( g_str_hash, g_str_equal,
++					g_free, g_free);
++	session->setpath = g_strdup("/");
++
++	gobexhlp_mutex = g_mutex_new();
++	gobexhlp_cond = g_cond_new();
++
++	return session;
++}
++
++void gobexhlp_disconnect(struct gobexhlp_session* session)
++{
++	if (session == NULL)
++		return;
++
++	g_obex_unref(session->obex);
++	g_free(session->io);
++
++	g_hash_table_remove_all(session->file_stat);
++	g_list_free_full(session->lsfiles, g_free);
++	g_free(session->setpath);
++
++	g_mutex_free(gobexhlp_mutex);
++	g_cond_free(gobexhlp_cond);
++
++	g_free(session);
 +}
 diff --git a/fuse/helpers.h b/fuse/helpers.h
-index 0a0f366..50c750d 100644
+index 21972b2..f1d787b 100644
 --- a/fuse/helpers.h
 +++ b/fuse/helpers.h
-@@ -54,5 +54,6 @@ void gobexhlp_disconnect(struct gobexhlp_session* session);
- GList *gobexhlp_listfolder(struct gobexhlp_session* session, const char *path);
- struct stat *gobexhlp_getattr(struct gobexhlp_session* session,
- 					const char *path);
--
-+struct gobexhlp_buffer *gobexhlp_get(struct gobexhlp_session* session,
-+					const char *path);
+@@ -47,3 +47,8 @@ struct gobexhlp_session {
+ 	GError *err;
+ };
  
++struct gobexhlp_session* gobexhlp_connect(const char *srcstr,
++						const char *dstsrc);
++void gobexhlp_disconnect(struct gobexhlp_session* session);
++
++
 -- 
 1.7.8.6
 
