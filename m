@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 09/15] thermometer: Update driver naming style
-Date: Tue, 9 Oct 2012 13:19:52 +0200
-Message-ID: <1349781598-22580-10-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3 07/15] thermometer: Reformat MeasurementReceived description
+Date: Tue, 9 Oct 2012 13:19:50 +0200
+Message-ID: <1349781598-22580-8-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1349781598-22580-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1349781598-22580-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,52 +12,100 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch changes device probe and remove functions name to include
-'device' rather than 'driver' name as it better describes what both
-do.
+MeasurementReceived method description is reformatted to be more
+readable and consistent with other API documents.
 
-Also profile driver name is changed to better describe that it's now
-profile driver rather than device driver only.
+Special values for Exponent and Mantissa fields specify now only NaN
+value as this is only special value defined by HTS specification for
+measurement.
 ---
- profiles/thermometer/manager.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ doc/thermometer-api.txt | 76 ++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 46 insertions(+), 30 deletions(-)
 
-diff --git a/profiles/thermometer/manager.c b/profiles/thermometer/manager.c
-index 86e3a0f..6057633 100644
---- a/profiles/thermometer/manager.c
-+++ b/profiles/thermometer/manager.c
-@@ -41,7 +41,7 @@ static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
- 	return g_strcmp0(prim->uuid, uuid);
- }
+diff --git a/doc/thermometer-api.txt b/doc/thermometer-api.txt
+index 1828811..a1da2e6 100644
+--- a/doc/thermometer-api.txt
++++ b/doc/thermometer-api.txt
+@@ -97,33 +97,49 @@ Service		unique name
+ Interface	org.bluez.ThermometerWatcher
+ Object path	freely definable
  
--static int thermometer_driver_probe(struct btd_profile *p,
-+static int thermometer_device_probe(struct btd_profile *p,
- 					struct btd_device *device,
- 					GSList *uuids)
- {
-@@ -60,7 +60,7 @@ static int thermometer_driver_probe(struct btd_profile *p,
- 	return thermometer_register(device, tattr);
- }
- 
--static void thermometer_driver_remove(struct btd_profile *p,
-+static void thermometer_device_remove(struct btd_profile *p,
- 						struct btd_device *device)
- {
- 	thermometer_unregister(device);
-@@ -79,10 +79,10 @@ static void thermometer_adapter_remove(struct btd_profile *p,
- }
- 
- static struct btd_profile thermometer_profile = {
--	.name		= "thermometer-device-driver",
-+	.name		= "Health Thermometer GATT driver",
- 	.remote_uuids	= BTD_UUIDS(HEALTH_THERMOMETER_UUID),
--	.device_probe	= thermometer_driver_probe,
--	.device_remove	= thermometer_driver_remove,
-+	.device_probe	= thermometer_device_probe,
-+	.device_remove	= thermometer_device_remove,
- 	.adapter_probe	= thermometer_adapter_probe,
- 	.adapter_remove	= thermometer_adapter_remove
- };
+-Methods		void MeasurementReceived(dict measure)
+-
+-			This callback gets called when a measure has been
+-			scanned	in the thermometer. The Time entry in the dict
+-			will be only present if the device supports storing of
+-			data. The time value is expressed in seconds since epoch.
+-			The value represented is (mantissa) x (10**exponent)
+-			See foot note for special values when treating with
+-			health devices. The Type entry is only present if the
+-			measurement type is known. Otherwise, it is undefined.
+-
+-			Dict is defined as below:
+-			{
+-				"Exponent" : int8,
+-				"Mantissa" : int32,
+-				"Unit" : ("Celsius" or "Fahrenheit"),
+-				"Time" : uint64,
+-				"Type" : ("Armpit", "Body", "Ear", "Finger",
+-					"Intestines", "Mouth", "Rectum", "Toe",
+-					"Tympanum"),
+-				"Measurement" : ("Final" or "Intermediate"),
+-			}
+-
+-			For special cases, the exponent shall always be zero and
+-			the mantissa should be one of following values:
+-
+-			NRes = -(2**23)
+-			NaN = +(2**23-1)
+-			INFINITY = (2**23-2)
+-			-INFINITY = -(2**23-2)
++Methods		void MeasurementReceived(dict measurement)
++
++			This callback gets called when a measurement has been
++			scanned in the thermometer.
++
++			Measurement:
++
++				int16 Exponent:
++				int32 Mantissa:
++
++					Exponent and Mantissa values as
++					extracted from float value defined by
++					IEEE-11073-20601.
++
++					Measurement value is calculated as
++					(Mantissa) * (10^Exponent)
++
++					For special cases Exponent is set to 0
++					and Mantissa is set to one of following
++					values:
++
++					+(2^23 - 1)	NaN (invalid or missing data)
++					-(2^23)		NRes
++					+(2^23 - 2)	+Infinity
++					-(2^23 - 2)	-Infinity
++
++				string Unit:
++
++					Possible values: "Celsius" or "Fahrenheit"
++
++				uint64 Time (optional):
++
++					Time of measurement, if supported by device.
++					Expressed in seconds since epoch.
++
++				string Type (optional):
++
++					Only present if measurement type is known.
++
++					Possible values: "Armpit", "Body", "Ear",
++						"Finger", "Intestines", "Mouth",
++						"Rectum", "Toe", "Tympanum"
++
++				string Measurement:
++
++					Possible values: "Final" or "Intermediate"
 -- 
 1.7.11.3
 
