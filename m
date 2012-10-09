@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 8/9] adapter: Remove not used btd_adapter_switch_{online,offline} functions
-Date: Tue, 9 Oct 2012 14:12:01 +0200
-Message-ID: <1349784722-14578-9-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 4/9] storage: Remove not used read_remote_eir
+Date: Tue, 9 Oct 2012 14:11:57 +0200
+Message-ID: <1349784722-14578-5-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1349784722-14578-1-git-send-email-szymon.janc@tieto.com>
 References: <1349784722-14578-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,80 +12,79 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Were used only in Maemo plugin which is now removed.
+This function is not used. Previously it was used to determine if
+remote device is legacy or not.
 
 ---
- src/adapter.c |   43 -------------------------------------------
- src/adapter.h |    2 --
- 2 files changed, 45 deletions(-)
+ src/storage.c |   41 -----------------------------------------
+ src/storage.h |    2 --
+ 2 files changed, 43 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index f3e381b..e6cb3e9 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3582,49 +3582,6 @@ int btd_adapter_restore_powered(struct btd_adapter *adapter)
- 	return mgmt_set_powered(adapter->dev_id, TRUE);
+diff --git a/src/storage.c b/src/storage.c
+index 55dc591..d4189c5 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -435,47 +435,6 @@ done:
+ 	return 0;
  }
  
--static gboolean switch_off_timeout(gpointer user_data)
+-int read_remote_eir(const bdaddr_t *local, const bdaddr_t *peer,
+-					uint8_t peer_type, uint8_t *data)
 -{
--	struct btd_adapter *adapter = user_data;
+-	char filename[PATH_MAX + 1], key[18], *str;
+-	int i;
 -
--	mgmt_set_powered(adapter->dev_id, FALSE);
--	adapter->off_timer = 0;
+-	create_filename(filename, PATH_MAX, local, "eir");
 -
--	return FALSE;
--}
+-	ba2str(peer, key);
+-	sprintf(&key[17], "#%hhu", peer_type);
 -
--int btd_adapter_switch_online(struct btd_adapter *adapter)
--{
--	if (adapter->up)
--		return -EALREADY;
+-	str = textfile_get(filename, key);
+-	if (str != NULL)
+-		goto done;
 -
--	if (adapter->off_timer)
--		off_timer_remove(adapter);
+-	/* Try old format (address only) */
+-	key[17] = '\0';
 -
--	return mgmt_set_powered(adapter->dev_id, TRUE);
--}
+-	str = textfile_get(filename, key);
+-	if (!str)
+-		return -ENOENT;
 -
--int btd_adapter_switch_offline(struct btd_adapter *adapter)
--{
--	if (!adapter->up)
--		return -EALREADY;
--
--	if (adapter->off_timer)
+-done:
+-	if (!data) {
+-		free(str);
 -		return 0;
+-	}
 -
--	adapter->global_mode = MODE_OFF;
+-	if (strlen(str) < 480) {
+-		free(str);
+-		return -EIO;
+-	}
 -
--	if (adapter->connections == NULL)
--		return mgmt_set_powered(adapter->dev_id, FALSE);
+-	for (i = 0; i < HCI_MAX_EIR_LENGTH; i++)
+-		sscanf(str + (i * 2), "%02hhX", &data[i]);
 -
--	g_slist_foreach(adapter->connections,
--				(GFunc) device_request_disconnect, NULL);
--
--	adapter->off_timer = g_timeout_add_seconds(OFF_TIMER,
--						switch_off_timeout, adapter);
+-	free(str);
 -
 -	return 0;
 -}
 -
- static gboolean disable_auto(gpointer user_data)
- {
- 	struct btd_adapter *adapter = user_data;
-diff --git a/src/adapter.h b/src/adapter.h
-index 9fd034d..cef59d2 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -178,8 +178,6 @@ void btd_adapter_any_release_path(void);
- gboolean adapter_powering_down(struct btd_adapter *adapter);
- 
- int btd_adapter_restore_powered(struct btd_adapter *adapter);
--int btd_adapter_switch_online(struct btd_adapter *adapter);
--int btd_adapter_switch_offline(struct btd_adapter *adapter);
- void btd_adapter_enable_auto_connect(struct btd_adapter *adapter);
- 
- typedef ssize_t (*btd_adapter_pin_cb_t) (struct btd_adapter *adapter,
+ int write_version_info(const bdaddr_t *local, const bdaddr_t *peer,
+ 					uint16_t manufacturer, uint8_t lmp_ver,
+ 					uint16_t lmp_subver)
+diff --git a/src/storage.h b/src/storage.h
+index d6aa8ec..0a91d47 100644
+--- a/src/storage.h
++++ b/src/storage.h
+@@ -50,8 +50,6 @@ int write_device_name(const bdaddr_t *local, const bdaddr_t *peer,
+ 					uint8_t peer_type, const char *name);
+ int read_device_name(const char *src, const char *dst, uint8_t dst_type,
+ 								char *name);
+-int read_remote_eir(const bdaddr_t *local, const bdaddr_t *peer,
+-					uint8_t peer_type, uint8_t *data);
+ int write_version_info(const bdaddr_t *local, const bdaddr_t *peer,
+ 				uint16_t manufacturer, uint8_t lmp_ver,
+ 				uint16_t lmp_subver);
 -- 
 1.7.9.5
 
