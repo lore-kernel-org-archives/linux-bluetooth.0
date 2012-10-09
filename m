@@ -1,57 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 9 Oct 2012 11:30:12 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/9] Remove some old code
-Message-ID: <20121009143011.GA2148@samus>
-References: <1349784722-14578-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1349784722-14578-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1349781598-22580-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1349781598-22580-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Tue, 9 Oct 2012 10:15:36 -0400
+Message-ID: <CAJdJm_OyXnCunC0OfiGACQMTdaN0LJj+3FXXTtcz5Qtgzka5hg@mail.gmail.com>
+Subject: Re: [PATCH v3 00/15] Thermometer watchers API change + fixes
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Andrzej,
 
-On 14:11 Tue 09 Oct, Szymon Janc wrote:
-> This removes some unused or not needed old code.
-> 
-> Szymon Janc (9):
->   Simplify checking if found device is legacy
->   Pass confirm name as gboolean value
->   event: Don't store EIR in btd_event_device_found
->   storage: Remove not used read_remote_eir
->   storage: Remove not used write_version_info
->   storage: Remove not used write_features_info
->   storage: Remove not used read_remote_features
->   adapter: Remove not used btd_adapter_switch_{online,offline}
->     functions
->   device: Remove not used device_set_class function
-> 
->  src/adapter.c |   95 +++++------------------------------
->  src/adapter.h |    8 ++-
->  src/device.c  |   12 -----
->  src/device.h  |    1 -
->  src/event.c   |   27 ++--------
->  src/event.h   |    6 +--
->  src/mgmt.c    |   13 ++---
->  src/storage.c |  156 ---------------------------------------------------------
->  src/storage.h |   11 ----
->  9 files changed, 26 insertions(+), 303 deletions(-)
+On Tue, Oct 9, 2012 at 7:19 AM, Andrzej Kaczmarek
+<andrzej.kaczmarek@tieto.com> wrote:
+> Also this was tested with PTS 4.5.3 and works fine now after memset fix,
+> except for TP/THF/CO/BI-07-I which seems to have issue in PTS (there should
+> be reserved value for temperature type but PTS sends 0x02 which is
+> perfectly valid value thus it won't be discarded on our side).
 
-Ack.
+BTW, you can open a ticket for fixing this in PTS. They are usually
+fast in fixing things (but not so fast on delivering new releases).
 
-> 
-> -- 
-> 1.7.9.5
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Cheers,
+Regards,
 -- 
-Vinicius
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
