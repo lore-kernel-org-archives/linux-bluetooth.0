@@ -1,49 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50744EB5.90900@linux.intel.com>
-Date: Tue, 09 Oct 2012 18:20:05 +0200
-From: Frederic Danis <frederic.danis@linux.intel.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/7] Move adapter config file to ini-file format
-References: <1349798318-12689-1-git-send-email-frederic.danis@linux.intel.com> <1349798898.27233.97.camel@aeonflux>
-In-Reply-To: <1349798898.27233.97.camel@aeonflux>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Message-ID: <1349799144.27233.100.camel@aeonflux>
+Subject: Re: [PATCH 2/9] Pass confirm name as gboolean value
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: Szymon Janc <szymon.janc@tieto.com>,
+	linux-bluetooth@vger.kernel.org
+Date: Tue, 09 Oct 2012 18:12:24 +0200
+In-Reply-To: <CAMOw1v51MT6AsyCB5X7GVRzbdDsXFJL=Gr5EO9ctJBT=vsBPHA@mail.gmail.com>
+References: <1349784722-14578-1-git-send-email-szymon.janc@tieto.com>
+	 <1349784722-14578-3-git-send-email-szymon.janc@tieto.com>
+	 <1349794286.27233.95.camel@aeonflux>
+	 <CAMOw1v51MT6AsyCB5X7GVRzbdDsXFJL=Gr5EO9ctJBT=vsBPHA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Marcel,
+Hi Lucas,
 
-On 09/10/2012 18:08, Marcel Holtmann wrote:
-> Hi Fred,
->
->> Adapter saved configuration will be saved to /var/lib/bluetooth/<adapter address>/adapter
->> in ini-file format for BlueZ 5.
->> If this file does not exist, we try to convert old config file to it.
->
-> since we are already using /config as file name, I propose we convert
-> this to /settings. I do not like the file name /adapter.
+> >> confirm_name is a boolean value and can be pass as such instead of
+> >> uint8_t.
+> >
+> > actually long term I want to move to bool usage. So maybe this is a good
+> > start to get this going.
+> 
+> agreed... on new code that I'm adding I'm using bool.
+> 
+> Btw, could we already use bool in gdbus/ ?
 
-OK, I will change it.
+actually that one is heavily GLib specific. However if you are willing
+to also clean up things like guint32, I have no problem with actually
+converting that as well.
 
-> We need to make sure that once the new file exists, that we do not keep
-> converting over and over again.
-
-/config file is converted only if loading of new /settings file failed.
-
-> I would also propose to add an extra entry to the old file that marks it
-> as converted. Then we can at some point in the future, start cleaning
-> out the leftovers.
-
-OK, I will add "converted yes" at end of /config file after conversion.
-
-Btw, should not we remove /config file after conversion ?
+Getting rid of #include <glib/glib.h> in gdbus.h might be actually nice.
 
 Regards
 
-Fred
+Marcel
 
--- 
-Frederic Danis                            Open Source Technology Center
-frederic.danis@intel.com                              Intel Corporation
 
