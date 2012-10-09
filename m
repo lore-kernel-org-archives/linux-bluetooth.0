@@ -1,39 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/7] Move adapter config file to ini-file format
-Date: Tue,  9 Oct 2012 17:58:31 +0200
-Message-Id: <1349798318-12689-1-git-send-email-frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1349794286.27233.95.camel@aeonflux>
+References: <1349784722-14578-1-git-send-email-szymon.janc@tieto.com>
+ <1349784722-14578-3-git-send-email-szymon.janc@tieto.com> <1349794286.27233.95.camel@aeonflux>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Tue, 9 Oct 2012 12:49:09 -0300
+Message-ID: <CAMOw1v51MT6AsyCB5X7GVRzbdDsXFJL=Gr5EO9ctJBT=vsBPHA@mail.gmail.com>
+Subject: Re: [PATCH 2/9] Pass confirm name as gboolean value
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Szymon Janc <szymon.janc@tieto.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adapter saved configuration will be saved to /var/lib/bluetooth/<adapter address>/adapter
-in ini-file format for BlueZ 5.
-If this file does not exist, we try to convert old config file to it.
+On Tue, Oct 9, 2012 at 11:51 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Szymon,
+>
+>> confirm_name is a boolean value and can be pass as such instead of
+>> uint8_t.
+>
+> actually long term I want to move to bool usage. So maybe this is a good
+> start to get this going.
 
-Access to variables during run-time is performed in adapter structure which is populated by loading saved configuration during initialization.
+agreed... on new code that I'm adding I'm using bool.
 
-First 6 patches remove access to config file from run-time.
-Last patch move to ini-file format style (load, save and convert).
+Btw, could we already use bool in gdbus/ ?
 
-Frédéric Danis (7):
-  adapter: Read name in storage at init
-  adapter: Read device class in storage at init
-  adapter: Move pairable read to load_config()
-  adapter: Read pairable timeout in storage at init
-  adapter: Read discoverable timeout in storage at init
-  adapter: Read mode in storage at init
-  adapter: Move saved config to ini-file format
 
- plugins/adaptername.c |    9 +-
- src/adapter.c         |  313 +++++++++++++++++++++++++++++++++++++------------
- src/adapter.h         |    1 +
- 3 files changed, 245 insertions(+), 78 deletions(-)
-
--- 
-1.7.9.5
-
+Lucas De Marchi
