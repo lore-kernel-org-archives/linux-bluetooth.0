@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 6/7] adapter: Read mode in storage at init
-Date: Wed, 10 Oct 2012 10:58:39 +0200
-Message-Id: <1349859520-8824-7-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v2 2/7] adapter: Read device class in storage at init
+Date: Wed, 10 Oct 2012 10:58:35 +0200
+Message-Id: <1349859520-8824-3-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1349859520-8824-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1349859520-8824-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -12,162 +12,62 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/adapter.c |   61 ++++++++++++++++++++++++++++++++-------------------------
- 1 file changed, 34 insertions(+), 27 deletions(-)
+ src/adapter.c |   21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 40df4a1..85c5da9 100644
+index 8b9af28..93dc0fb 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -118,6 +118,8 @@ struct service_auth {
+@@ -117,6 +117,7 @@ struct service_auth {
+ 
  struct btd_adapter_config {
  	char *name;
- 	uint8_t class[3];
-+	uint8_t mode;
-+	uint8_t on_mode;
++	uint8_t class[3];
  };
  
  struct btd_adapter {
-@@ -210,7 +212,7 @@ static const char *mode2str(uint8_t mode)
- 	}
- }
+@@ -729,6 +730,10 @@ void btd_adapter_class_changed(struct btd_adapter *adapter, uint8_t *new_class)
+ 	if (class == adapter->dev_class)
+ 		return;
  
--static uint8_t get_mode(const bdaddr_t *bdaddr, const char *mode)
-+static uint8_t get_mode(const char *mode)
- {
- 	if (strcasecmp("off", mode) == 0)
- 		return MODE_OFF;
-@@ -218,15 +220,7 @@ static uint8_t get_mode(const bdaddr_t *bdaddr, const char *mode)
- 		return MODE_CONNECTABLE;
- 	else if (strcasecmp("discoverable", mode) == 0)
- 		return MODE_DISCOVERABLE;
--	else if (strcasecmp("on", mode) == 0) {
--		char onmode[14], srcaddr[18];
--
--		ba2str(bdaddr, srcaddr);
--		if (read_on_mode(srcaddr, onmode, sizeof(onmode)) < 0)
--			return MODE_CONNECTABLE;
--
--		return get_mode(bdaddr, onmode);
--	} else
-+	else
- 		return MODE_UNKNOWN;
- }
- 
-@@ -331,6 +325,10 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode)
- 		return err;
- 
- done:
-+	adapter->config.mode = new_mode;
-+	if (new_mode != MODE_OFF)
-+		adapter->config.on_mode = new_mode;
++	adapter->config.class[0] = new_class[0];
++	adapter->config.class[1] = new_class[1];
++	adapter->config.class[2] = new_class[2];
 +
- 	modestr = mode2str(new_mode);
- 	write_device_mode(&adapter->bdaddr, modestr);
+ 	write_local_class(&adapter->bdaddr, new_class);
  
-@@ -390,7 +388,7 @@ static void set_powered(struct btd_adapter *adapter, gboolean powered,
- 	int err;
- 
- 	if (powered) {
--		mode = get_mode(&adapter->bdaddr, "on");
-+		mode = adapter->config.on_mode;
- 		return set_discoverable(adapter, mode == MODE_DISCOVERABLE,
- 									id);
- 	}
-@@ -1403,7 +1401,7 @@ static DBusMessage *request_session(DBusConnection *conn,
- 	if (!adapter->mode_sessions)
- 		adapter->global_mode = adapter->mode;
- 
--	new_mode = get_mode(&adapter->bdaddr, "on");
-+	new_mode = adapter->config.on_mode;
- 
- 	req = find_session(adapter->mode_sessions, sender);
- 	if (req) {
-@@ -2312,21 +2310,15 @@ void btd_adapter_get_mode(struct btd_adapter *adapter, uint8_t *mode,
- 						uint16_t *discoverable_timeout,
- 						gboolean *pairable)
+ 	adapter->dev_class = class;
+@@ -2353,15 +2358,8 @@ void btd_adapter_get_mode(struct btd_adapter *adapter, uint8_t *mode,
+ void btd_adapter_read_class(struct btd_adapter *adapter, uint8_t *major,
+ 								uint8_t *minor)
  {
--	char str[14], address[18];
-+	char address[18];
- 
- 	ba2str(&adapter->bdaddr, address);
- 
--	if (mode) {
--		if (main_opts.remember_powered == FALSE)
--			*mode = main_opts.mode;
--		else if (read_device_mode(address, str, sizeof(str)) == 0)
--			*mode = get_mode(&adapter->bdaddr, str);
--		else
--			*mode = main_opts.mode;
+-	uint8_t cls[3];
+-
+-	if (read_local_class(&adapter->bdaddr, cls) < 0) {
+-		uint32_t class = htobl(main_opts.class);
+-		memcpy(cls, &class, 3);
 -	}
-+	if (mode)
-+		*mode = adapter->config.mode;
+-
+-	*major = cls[1];
+-	*minor = cls[0];
++	*major = adapter->config.class[1];
++	*minor = adapter->config.class[0];
+ }
  
- 	if (on_mode)
--		*on_mode = get_mode(&adapter->bdaddr, "on");
-+		*on_mode = adapter->config.on_mode;
- 
- 	if (discoverable_timeout)
- 		*discoverable_timeout = adapter->discov_timeout;
-@@ -2490,6 +2482,10 @@ static void set_mode_complete(struct btd_adapter *adapter)
- 	const char *modestr;
- 	int err;
- 
-+	adapter->config.mode = adapter->mode;
-+	if (adapter->mode != MODE_OFF)
-+		adapter->config.on_mode = adapter->mode;
-+
- 	modestr = mode2str(adapter->mode);
- 	write_device_mode(&adapter->bdaddr, modestr);
- 
-@@ -2664,6 +2660,7 @@ static void load_config(struct btd_adapter *adapter)
- {
- 	char name[MAX_NAME_LENGTH + 1];
- 	char address[18];
-+	char mode[14];
- 	int timeout;
- 
- 	ba2str(&adapter->bdaddr, address);
-@@ -2695,6 +2692,20 @@ static void load_config(struct btd_adapter *adapter)
- 		adapter->discov_timeout = main_opts.discovto;
+ uint32_t btd_adapter_get_class(struct btd_adapter *adapter)
+@@ -2694,6 +2692,11 @@ static void load_config(struct btd_adapter *adapter)
  	else
- 		adapter->discov_timeout = timeout;
-+
-+	/* Get mode */
-+	if (main_opts.remember_powered == FALSE)
-+		adapter->config.mode = main_opts.mode;
-+	else if (read_device_mode(address, mode, sizeof(mode)) == 0)
-+		adapter->config.mode = get_mode(mode);
-+	else
-+		adapter->config.mode = main_opts.mode;
-+
-+	/* Get on mode */
-+	if (read_on_mode(address, mode, sizeof(mode)) == 0)
-+		adapter->config.on_mode = get_mode(mode);
-+	else
-+		adapter->config.on_mode = MODE_CONNECTABLE;
+ 		adapter->config.name = g_strdup(name);
+ 
++	/* Get class */
++	if (read_local_class(&adapter->bdaddr, adapter->config.class) < 0) {
++		uint32_t class = htobl(main_opts.class);
++		memcpy(adapter->config.class, &class, 3);
++	}
  }
  
  gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
-@@ -3601,17 +3612,13 @@ gboolean adapter_powering_down(struct btd_adapter *adapter)
- 
- int btd_adapter_restore_powered(struct btd_adapter *adapter)
- {
--	char mode[14], address[18];
--
- 	if (!main_opts.remember_powered)
- 		return -EINVAL;
- 
- 	if (adapter->up)
- 		return 0;
- 
--	ba2str(&adapter->bdaddr, address);
--	if (read_device_mode(address, mode, sizeof(mode)) == 0 &&
--						g_str_equal(mode, "off"))
-+	if (adapter->config.mode == MODE_OFF)
- 		return 0;
- 
- 	return mgmt_set_powered(adapter->dev_id, TRUE);
 -- 
 1.7.9.5
 
