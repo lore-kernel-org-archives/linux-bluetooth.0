@@ -2,72 +2,48 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 06/10] adapter: Read pairable timeout in storage at init
-Date: Wed, 10 Oct 2012 18:23:27 +0200
-Message-Id: <1349886211-18920-7-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v4 03/10] adaptername: Retrieve config name from adapter
+Date: Wed, 10 Oct 2012 18:23:24 +0200
+Message-Id: <1349886211-18920-4-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1349886211-18920-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1349886211-18920-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Retrieve saved config name using adapter_get_config_name() instead
+of reading it from storage file.
 ---
- src/adapter.c |   21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
+ plugins/adaptername.c |    9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 357b717..b869d81 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2278,16 +2278,6 @@ static int get_discoverable_timeout(const char *src)
- 	return main_opts.discovto;
- }
- 
--static int get_pairable_timeout(const char *src)
--{
--	int timeout;
--
--	if (read_pairable_timeout(src, &timeout) == 0)
--		return timeout;
--
--	return main_opts.pairto;
--}
--
- static void set_auto_connect(gpointer data, gpointer user_data)
+diff --git a/plugins/adaptername.c b/plugins/adaptername.c
+index f58fb0f..46dbbe8 100644
+--- a/plugins/adaptername.c
++++ b/plugins/adaptername.c
+@@ -198,7 +198,8 @@ static void set_pretty_name(struct btd_adapter *adapter,
+ static int adaptername_probe(struct btd_adapter *adapter)
  {
- 	struct btd_device *device = data;
-@@ -2432,7 +2422,6 @@ void btd_adapter_start(struct btd_adapter *adapter)
- 	adapter->off_requested = FALSE;
- 	adapter->up = TRUE;
- 	adapter->discov_timeout = get_discoverable_timeout(address);
--	adapter->pairable_timeout = get_pairable_timeout(address);
- 	adapter->off_timer = 0;
+ 	int current_id;
+-	char name[MAX_NAME_LENGTH + 1];
++	char *name;
++	char str[MAX_NAME_LENGTH + 1];
+ 	char *pretty_hostname;
  
- 	if (adapter->scan_mode & SCAN_INQUIRY)
-@@ -2685,6 +2674,10 @@ void btd_adapter_unref(struct btd_adapter *adapter)
- static void load_config(struct btd_adapter *adapter)
- {
- 	char name[MAX_NAME_LENGTH + 1];
-+	char address[18];
-+	int timeout;
-+
-+	ba2str(&adapter->bdaddr, address);
+ 	pretty_hostname = read_pretty_host_name();
+@@ -211,8 +212,10 @@ static int adaptername_probe(struct btd_adapter *adapter)
+ 	adapter_set_allow_name_changes(adapter, TRUE);
+ 	current_id = adapter_get_dev_id(adapter);
  
- 	/* Get name */
- 	if (read_local_name(&adapter->bdaddr, name) < 0)
-@@ -2701,6 +2694,12 @@ static void load_config(struct btd_adapter *adapter)
- 	/* Get pairable mode */
- 	if (read_device_pairable(&adapter->bdaddr, &adapter->pairable) < 0)
- 		adapter->pairable = TRUE;
-+
-+	/* Get pairable timeout */
-+	if (read_pairable_timeout(address, &timeout) < 0)
-+		adapter->pairable_timeout = main_opts.pairto;
-+	else
-+		adapter->pairable_timeout = timeout;
- }
+-	if (read_local_name(adapter_get_address(adapter), name) < 0)
+-		expand_name(name, MAX_NAME_LENGTH, main_opts.name, current_id);
++	if (adapter_get_config_name(adapter, &name) < 0) {
++		expand_name(str, MAX_NAME_LENGTH, main_opts.name, current_id);
++		name = str;
++	}
  
- gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
+ 	DBG("Setting name '%s' for device 'hci%d'", name, current_id);
+ 	adapter_set_name(adapter, name);
 -- 
 1.7.9.5
 
