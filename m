@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 02/10] adapter: Read name in storage at init
-Date: Wed, 10 Oct 2012 16:10:11 +0200
-Message-Id: <1349878219-14359-3-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v3 01/10] doc: Add settings storage documentation
+Date: Wed, 10 Oct 2012 16:10:10 +0200
+Message-Id: <1349878219-14359-2-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1349878219-14359-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1349878219-14359-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -12,107 +12,118 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/adapter.c |   34 ++++++++++++++++++++++++++++++++++
- src/adapter.h |    1 +
- 2 files changed, 35 insertions(+)
+ doc/settings-storage.txt |  102 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 102 insertions(+)
+ create mode 100644 doc/settings-storage.txt
 
-diff --git a/src/adapter.c b/src/adapter.c
-index ad8ee06..8b9af28 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -115,6 +115,10 @@ struct service_auth {
- 	struct agent *agent;		/* NULL for queued auths */
- };
- 
-+struct btd_adapter_config {
-+	char *name;
-+};
+diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
+new file mode 100644
+index 0000000..51d2220
+--- /dev/null
++++ b/doc/settings-storage.txt
+@@ -0,0 +1,102 @@
++Information related to local adapters and remote devices are stored in storage
++directory (default: /var/lib/bluetooth).
++Files are in ini-file format.
 +
- struct btd_adapter {
- 	uint16_t dev_id;
- 	gboolean up;
-@@ -155,6 +159,8 @@ struct btd_adapter {
- 	gboolean pairable;		/* pairable state */
- 	gboolean initialized;
- 
-+	struct btd_adapter_config config;
++There is one directory per adapter, named by its bluetooth address, which
++contains:
++ - a settings file for the local adapter
++ - an attribute_db file containing attributes of supported LE services
++ - names file containing names of all devices already seen
++ - one directory per remote device, named by remote device address, which
++   contains:
++    - a settings file
++    - a key file accessible only by root
++    - an attribute_db file containing attributes of remote LE services
 +
- 	gboolean off_requested;		/* DEVDOWN ioctl was called */
- 
- 	gint ref;
-@@ -780,11 +786,24 @@ int adapter_set_name(struct btd_adapter *adapter, const char *name)
- 		adapter->name = g_strdup(maxname);
- 	}
- 
-+	g_free(adapter->config.name);
-+	adapter->config.name = g_strdup(maxname);
++So the directory structure should be:
++    /var/lib/bluetooth/<adapter address>/
++        ./settings
++        ./attribute_db
++        ./names
++        ./<remote device address>/
++            ./settings
++            ./keys
++            ./attribute_db
++        ./<remote device address>/
++            ./settings
++            ./keys
++            ./attribute_db
++        ...
 +
- 	write_local_name(&adapter->bdaddr, maxname);
- 
- 	return 0;
- }
- 
-+int adapter_get_config_name(struct btd_adapter *adapter, char **name)
-+{
-+	if (adapter->config.name == NULL)
-+		return -EINVAL;
++Adapter directory files
++=======================
 +
-+	*name = adapter->config.name;
++Settings file contains 1 [General] group with adapter info:
++  [General]
++  Name=
++  Class=0x000000
++  Pairable=<true|false>
++  PairableTimeout=0
++  DiscoverableTimeout=0
++  Mode=<off|connectable|discoverable>
++  OnMode=<connectable|discoverable>
 +
-+	return 0;
-+}
++The attribute_db file is a list of handles (group name) with UUID and Value as
++keys, for example:
++  [0x0001]
++  UUID=00002800-0000-1000-8000-00805f9b34fb
++  Value=0018
 +
- static void set_name(struct btd_adapter *adapter, const char *name,
- 						GDBusPendingPropertySet id)
- {
-@@ -2665,6 +2684,18 @@ void btd_adapter_unref(struct btd_adapter *adapter)
- 	g_free(path);
- }
- 
-+static void load_config(struct btd_adapter *adapter)
-+{
-+	char name[MAX_NAME_LENGTH + 1];
++  [0x0004]
++  UUID=00002803-0000-1000-8000-00805f9b34fb
++  Value=020600002A
 +
-+	/* Get name */
-+	if (read_local_name(&adapter->bdaddr, name) < 0)
-+		adapter->config.name = NULL;
-+	else
-+		adapter->config.name = g_strdup(name);
++  [0x0006]
++  UUID=00002a00-0000-1000-8000-00805f9b34fb
++  Value=4578616D706C6520446576696365
 +
-+}
++Names file contains 1 [Names] group with device address as key:
++  [Names]
++  <nn:nn:nn:nn:nn:nn>=device name a
++  <mm:mm:mm:mm:mm:mm>=device name b
 +
- gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
- {
- 	adapter->up = up;
-@@ -2684,6 +2715,7 @@ gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
- 	if (main_opts.gatt_enabled)
- 		btd_adapter_gatt_server_start(adapter);
- 
-+	load_config(adapter);
- 	load_drivers(adapter);
- 	btd_profile_foreach(probe_profile, adapter);
- 	clear_blocked(adapter);
-@@ -2752,6 +2784,8 @@ void adapter_remove(struct btd_adapter *adapter)
- 	/* Return adapter to down state if it was not up on init */
- 	if (!adapter->already_up && adapter->up)
- 		mgmt_set_powered(adapter->dev_id, FALSE);
++Device directory files
++======================
 +
-+	g_free(adapter->config.name);
- }
- 
- uint16_t adapter_get_dev_id(struct btd_adapter *adapter)
-diff --git a/src/adapter.h b/src/adapter.h
-index b5bff10..b575c1b 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -133,6 +133,7 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- void adapter_emit_device_found(struct btd_adapter *adapter,
- 						struct remote_dev_info *dev);
- void adapter_mode_changed(struct btd_adapter *adapter, uint8_t scan_mode);
-+int adapter_get_config_name(struct btd_adapter *adapter, char **name);
- int adapter_set_name(struct btd_adapter *adapter, const char *name);
- void adapter_name_changed(struct btd_adapter *adapter, const char *name);
- void adapter_service_insert(struct btd_adapter *adapter, void *rec);
++Remote device settings file will include a [General] group with device infos
++and a [DeviceID] group with related infos:
++  [General]
++  Alias=
++  Class=0x000000
++  Manufacturer=0
++  LmpVersion=
++  LmpSubversion=
++  Features=0000000000000000
++  AddressType=<BR/EDR|LE>
++  LEAddressType=<public|random>
++  LastSeen=yyyy-mm-dd hh:mm:ss GMT
++  LastUsed=yyyy-mm-dd hh:mm:ss GMT
++  Trusted=<true|false>
++  Profiles=<128 bits UUID of profile 1>;<128 bits UUID of profile 2>;...
++
++  [DeviceID]
++  Assigner=0
++  Vendor=0
++  Product=0
++  Version=0
++
++Keys file includes informations related to link key or long term link key:
++  [LinkKey]
++  Key=
++  Type=0
++  PINLength=0
++
++  [LongTermKey]
++  Key=
++  Authenticated=<true|false>
++  EncSize=0
++  EDiv=0
++  Rand=0
++
++The attribute_db file is a list of handles (group name) with UUID and Value as
++keys (cf. attribute_db in adapter directory).
 -- 
 1.7.9.5
 
