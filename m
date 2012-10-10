@@ -1,31 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1349863073.27233.111.camel@aeonflux>
-Subject: Re: [PATCH v2 1/7] adapter: Read name in storage at init
-From: Marcel Holtmann <marcel@holtmann.org>
-To: =?ISO-8859-1?Q?Fr=E9d=E9ric?= Danis
-	<frederic.danis@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 10 Oct 2012 11:57:53 +0200
-In-Reply-To: <1349859520-8824-2-git-send-email-frederic.danis@linux.intel.com>
-References: <1349859520-8824-1-git-send-email-frederic.danis@linux.intel.com>
-	 <1349859520-8824-2-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 2/9] Pass confirm name as gboolean value
+Date: Wed, 10 Oct 2012 11:57:58 +0200
+Message-ID: <1505997.4TGEV3eNyH@uw000953>
+In-Reply-To: <1349794286.27233.95.camel@aeonflux>
+References: <1349784722-14578-1-git-send-email-szymon.janc@tieto.com> <1349784722-14578-3-git-send-email-szymon.janc@tieto.com> <1349794286.27233.95.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
+On Tuesday 09 of October 2012 17:51:26 Marcel Holtmann wrote:
+> Hi Szymon,
+> 
+> > confirm_name is a boolean value and can be pass as such instead of
+> > uint8_t.
+> 
+> actually long term I want to move to bool usage. So maybe this is a good
+> start to get this going.
 
-> ---
->  plugins/adaptername.c |    9 ++++++---
->  src/adapter.c         |   34 ++++++++++++++++++++++++++++++++++
->  src/adapter.h         |    1 +
->  3 files changed, 41 insertions(+), 3 deletions(-)
+OK, will send v2 with bool.
+Do you also want to stop introducing other glib types like gchar, gint etc?
+(at least for code that don't inherit this due to glib calls)
 
-split this into two, one for the core, one for the plugin.
-
-Regards
-
-Marcel
-
-
+-- 
+BR
+Szymon Janc
