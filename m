@@ -1,31 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marti Raudsepp <marti@juffo.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marti Raudsepp <marti@juffo.org>
-Subject: [PATCH] systemd: prevent duplicate logging messages in journal
-Date: Wed, 10 Oct 2012 18:59:29 +0300
-Message-Id: <1349884769-5157-1-git-send-email-marti@juffo.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 10 Oct 2012 11:18:55 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Michal Kazior <michal.kazior@tieto.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>,
+	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"alexander.smirnov@siemens.com" <alexander.smirnov@siemens.com>
+Subject: Re: Agenda for Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
+ 2012 (Barcelona!)
+Message-ID: <20121010151854.GA6247@tuxdriver.com>
+References: <20120822201930.GC14913@tuxdriver.com>
+ <1345667975.8786.0.camel@jlt3.sipsolutions.net>
+ <20120822204122.GA2196@tuxdriver.com>
+ <507561C8.7080601@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <507561C8.7080601@tieto.com>
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-By default, both stdout and syslog messages go to the systemd journal,
-which results in duplicate messages being logged.
----
- src/bluetooth.service.in | 1 +
- 1 file changed, 1 insertion(+)
+On Wed, Oct 10, 2012 at 01:53:44PM +0200, Michal Kazior wrote:
+> On 22/08/12 22:41, John W. Linville wrote:
+> >On Wed, Aug 22, 2012 at 10:39:35PM +0200, Johannes Berg wrote:
+> >>On Wed, 2012-08-22 at 16:19 -0400, John W. Linville wrote:
+> >>
+> >>>With that said, there are still a number of slots available for
+> >>>presentations or discussion topics.  This is especially true for the
+> >>>802.11 group...  Please step-up with some suggested topics!
+> >>
+> >>Anyone want to carefully review & present Michal's and my work on
+> >>multi-channel in mac80211? :-)
+> >
+> >I would _really_ like to see this.  Anyone (smarter than me) that is
+> >willing to do this for the group?
+> >
+> >John
+> >
+> 
+> Hi,
+> 
+> I'd like to do it. I'll update the wiki and put myself in a free
+> timeslot if that's okay.
+> 
+> 
+> -- Pozdrawiam / Best regards, Michal Kazior.
 
-diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
-index 2a576a3..a8442a9 100644
---- a/src/bluetooth.service.in
-+++ b/src/bluetooth.service.in
-@@ -5,6 +5,7 @@ Description=Bluetooth service
- Type=dbus
- BusName=org.bluez
- ExecStart=@prefix@/sbin/bluetoothd -n
-+StandardOutput=null
- 
- [Install]
- WantedBy=bluetooth.target
+That sounds great to me!
+
+Thanks,
+
+John
+
 -- 
-1.7.12.2
-
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
