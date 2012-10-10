@@ -1,76 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 10 Oct 2012 11:34:40 +0300
+Date: Wed, 10 Oct 2012 11:22:27 +0300
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv1 3/6] Bluetooth: AMP: Add handle to hci_chan structure
-Message-ID: <20121010083438.GB7620@aemeltch-MOBL1>
+Subject: Re: [RFCv1 4/6] Bluetooth: Handle number of compl blocks for AMP_LINK
+Message-ID: <20121010082225.GA7620@aemeltch-MOBL1>
 References: <1349707932-10006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1349707932-10006-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1349793991.27233.91.camel@aeonflux>
+ <1349707932-10006-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1349794158.27233.94.camel@aeonflux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1349793991.27233.91.camel@aeonflux>
+In-Reply-To: <1349794158.27233.94.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Tue, Oct 09, 2012 at 04:46:31PM +0200, Marcel Holtmann wrote:
-...
-> > -
-> > +struct hci_chan *hci_chan_lookup_handle(struct hci_conn *hcon, __u16 handle);
-> > +struct hci_chan *hci_chan_lookup_handle_all(struct hci_dev *hdev,
-> > +					    __u16 handle);
+On Tue, Oct 09, 2012 at 04:49:18PM +0200, Marcel Holtmann wrote:
+> Hi Andrei,
 > 
-> this naming is pretty bad. I have no idea what one function does
-> different compared to the other. Especially since none of them take a
-> hci_chan as argument, but start with that prefix.
+> > Add handling blocks count for AMP link.
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  net/bluetooth/hci_event.c |   12 ++++++++++--
+> >  1 file changed, 10 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index 82e478a..c479732 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -2698,13 +2698,21 @@ static void hci_num_comp_blocks_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> >  
+> >  	for (i = 0; i < ev->num_hndl; i++) {
+> >  		struct hci_comp_blocks_info *info = &ev->handles[i];
+> > -		struct hci_conn *conn;
+> > +		struct hci_conn *conn = NULL;
+> > +		struct hci_chan *chan;
+> >  		__u16  handle, block_count;
+> >  
+> >  		handle = __le16_to_cpu(info->handle);
+> >  		block_count = __le16_to_cpu(info->blocks);
+> >  
+> > -		conn = hci_conn_hash_lookup_handle(hdev, handle);
+> > +		if (hdev->dev_type == HCI_BREDR) {
+> > +			conn = hci_conn_hash_lookup_handle(hdev, handle);
+> > +		} else {
+> > +			chan = hci_chan_lookup_handle_all(hdev, handle);
+> > +			if (chan)
+> > +				conn = chan->conn;
 > 
-> Would be the naming hci_conn_lookup_chan be a lot clearer? Or maybe
-> hci_chan_lookup_from_dev or similar.
-
-So are names like:
-
-hci_conn_lookup_hchan_by_handle
-hci_conn_lookup_hchan_from_hdev
-
-better?
-
-...
-> > +struct hci_chan *hci_chan_lookup_handle(struct hci_conn *hcon, __u16 handle)
-> > +{
-> > +	struct hci_chan *hchan;
-> > +
-> > +	list_for_each_entry(hchan, &hcon->chan_list, list) {
-> > +		if (hchan->handle == handle)
-> > +			return hchan;
-> > +	}
-> > +
-> > +	return NULL;
-> > +}
+> Just in case, we better use a switch statement here.
 > 
-> Since this function is unprotected, you better make this __hci_....
+> And now coming to think about it, do we ever need the hci_chan anyway.
+
+For AMP hchan represents logical link so it is needed.
+
+> Then why not have a function that looks up the hci_conn.
 > 
-> And on a different note. It is not used at all. So why is this public
-> anyway?
+> Maybe introduce a new hci_conn_lookup_handle(hdev, handle) and it will
+> do the right thing depending on what the device type is.
 
-I will make it static.
-
-...
-> > +	rcu_read_lock();
-> > +
-> > +	list_for_each_entry_rcu(hcon, &h->list, list) {
-> > +		struct hci_chan *hchan;
-> > +
-> > +		hchan = hci_chan_lookup_handle(hcon, handle);
-> > +		if (hchan) {
-> > +			rcu_read_unlock();
-> > +			return hchan;
-> 
-> Please use break here. Have a global hchan variable assigned to NULL and
-> just break here.
-
-OK.
+This looks good, will do this way.
 
 Best regards 
 Andrei Emeltchenko 
