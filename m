@@ -2,72 +2,48 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 04/10] adapter: Read device class in storage at init
-Date: Wed, 10 Oct 2012 16:10:13 +0200
-Message-Id: <1349878219-14359-5-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v3 03/10] adaptername: Retrieve config name from adapter
+Date: Wed, 10 Oct 2012 16:10:12 +0200
+Message-Id: <1349878219-14359-4-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1349878219-14359-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1349878219-14359-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Retrieve saved config name using adapter_get_config_name() instead
+of reading it from storage file.
 ---
- src/adapter.c |   21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ plugins/adaptername.c |    9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 8b9af28..93dc0fb 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -117,6 +117,7 @@ struct service_auth {
- 
- struct btd_adapter_config {
- 	char *name;
-+	uint8_t class[3];
- };
- 
- struct btd_adapter {
-@@ -729,6 +730,10 @@ void btd_adapter_class_changed(struct btd_adapter *adapter, uint8_t *new_class)
- 	if (class == adapter->dev_class)
- 		return;
- 
-+	adapter->config.class[0] = new_class[0];
-+	adapter->config.class[1] = new_class[1];
-+	adapter->config.class[2] = new_class[2];
-+
- 	write_local_class(&adapter->bdaddr, new_class);
- 
- 	adapter->dev_class = class;
-@@ -2353,15 +2358,8 @@ void btd_adapter_get_mode(struct btd_adapter *adapter, uint8_t *mode,
- void btd_adapter_read_class(struct btd_adapter *adapter, uint8_t *major,
- 								uint8_t *minor)
+diff --git a/plugins/adaptername.c b/plugins/adaptername.c
+index f58fb0f..46dbbe8 100644
+--- a/plugins/adaptername.c
++++ b/plugins/adaptername.c
+@@ -198,7 +198,8 @@ static void set_pretty_name(struct btd_adapter *adapter,
+ static int adaptername_probe(struct btd_adapter *adapter)
  {
--	uint8_t cls[3];
--
--	if (read_local_class(&adapter->bdaddr, cls) < 0) {
--		uint32_t class = htobl(main_opts.class);
--		memcpy(cls, &class, 3);
--	}
--
--	*major = cls[1];
--	*minor = cls[0];
-+	*major = adapter->config.class[1];
-+	*minor = adapter->config.class[0];
- }
+ 	int current_id;
+-	char name[MAX_NAME_LENGTH + 1];
++	char *name;
++	char str[MAX_NAME_LENGTH + 1];
+ 	char *pretty_hostname;
  
- uint32_t btd_adapter_get_class(struct btd_adapter *adapter)
-@@ -2694,6 +2692,11 @@ static void load_config(struct btd_adapter *adapter)
- 	else
- 		adapter->config.name = g_strdup(name);
+ 	pretty_hostname = read_pretty_host_name();
+@@ -211,8 +212,10 @@ static int adaptername_probe(struct btd_adapter *adapter)
+ 	adapter_set_allow_name_changes(adapter, TRUE);
+ 	current_id = adapter_get_dev_id(adapter);
  
-+	/* Get class */
-+	if (read_local_class(&adapter->bdaddr, adapter->config.class) < 0) {
-+		uint32_t class = htobl(main_opts.class);
-+		memcpy(adapter->config.class, &class, 3);
+-	if (read_local_name(adapter_get_address(adapter), name) < 0)
+-		expand_name(name, MAX_NAME_LENGTH, main_opts.name, current_id);
++	if (adapter_get_config_name(adapter, &name) < 0) {
++		expand_name(str, MAX_NAME_LENGTH, main_opts.name, current_id);
++		name = str;
 +	}
- }
  
- gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
+ 	DBG("Setting name '%s' for device 'hci%d'", name, current_id);
+ 	adapter_set_name(adapter, name);
 -- 
 1.7.9.5
 
