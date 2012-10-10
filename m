@@ -1,56 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 10 Oct 2012 11:18:55 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Michal Kazior <michal.kazior@tieto.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"alexander.smirnov@siemens.com" <alexander.smirnov@siemens.com>
-Subject: Re: Agenda for Linux Wireless (802.11/Bluetooth/NFC) Mini-Summit
- 2012 (Barcelona!)
-Message-ID: <20121010151854.GA6247@tuxdriver.com>
-References: <20120822201930.GC14913@tuxdriver.com>
- <1345667975.8786.0.camel@jlt3.sipsolutions.net>
- <20120822204122.GA2196@tuxdriver.com>
- <507561C8.7080601@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <507561C8.7080601@tieto.com>
-Sender: linux-wireless-owner@vger.kernel.org
+Message-ID: <1349882925.27233.130.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: btmrv: Use %*ph specifier instead of
+ print_hex_dump_bytes
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, bzhao@marvell.com
+Date: Wed, 10 Oct 2012 17:28:45 +0200
+In-Reply-To: <1349880093-23728-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1349880093-23728-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Oct 10, 2012 at 01:53:44PM +0200, Michal Kazior wrote:
-> On 22/08/12 22:41, John W. Linville wrote:
-> >On Wed, Aug 22, 2012 at 10:39:35PM +0200, Johannes Berg wrote:
-> >>On Wed, 2012-08-22 at 16:19 -0400, John W. Linville wrote:
-> >>
-> >>>With that said, there are still a number of slots available for
-> >>>presentations or discussion topics.  This is especially true for the
-> >>>802.11 group...  Please step-up with some suggested topics!
-> >>
-> >>Anyone want to carefully review & present Michal's and my work on
-> >>multi-channel in mac80211? :-)
-> >
-> >I would _really_ like to see this.  Anyone (smarter than me) that is
-> >willing to do this for the group?
-> >
-> >John
-> >
-> 
-> Hi,
-> 
-> I'd like to do it. I'll update the wiki and put myself in a free
-> timeslot if that's okay.
-> 
-> 
-> -- Pozdrawiam / Best regards, Michal Kazior.
+Hi Andrei,
 
-That sounds great to me!
+> Use standard print specifier and remove print_hex_dump_bytes call.
+> Makes output more sensible:
+> 
+> ...
+> [18809.401218] 00000000: 0b 00 00 fe 5b fc 01 f2 00 00 00    ....[......
+> ...
+> 
+> would be changed to
+> 
+> ...
+> [18809.401218] Bluetooth: hex: 0b 00 00 fe 5b fc 01 f2 00 00 00
+> ...
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  drivers/bluetooth/btmrvl_sdio.c |    6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
 
-Thanks,
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-John
+Regards
 
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Marcel
+
+
