@@ -1,34 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
 From: Syam Sidhardhan <s.syam@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/4] Bluetooth: Use __constant modifier for L2CAP SMP CID
-Date: Wed, 10 Oct 2012 22:09:28 +0530
-Message-id: <1349887169-20880-3-git-send-email-s.syam@samsung.com>
+Subject: [PATCH 2/4] Bluetooth: Fix RFCOMM bind issue
+Date: Wed, 10 Oct 2012 22:09:27 +0530
+Message-id: <1349887169-20880-2-git-send-email-s.syam@samsung.com>
 In-reply-to: <1349887169-20880-1-git-send-email-s.syam@samsung.com>
 References: <1349887169-20880-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since the L2CAP_CID_SMP is constant, __constant_cpu_to_le16() is
-the right go here.
+Problem: If we bind a particular RFCOMM channel with source address as
+BDADDR_ANY, then we are able to bind the same RFCOMM channel with the
+adapter address, which is incorrect.
+
+Solution: Add check for comparing the stored source address and
+given source address against BDADDR_ANY, so that irrespective of
+BADADDR_ANY or any adapter address, a particular RFCOMM channel will
+be allowed to bind only once.
+
+Details:
+Here given the steps to reproduce this issue:
+Bind to a RFCOMM channel without the device address.
+-sh-4.1# rctest -w -P 5
+rctest[2920]: Waiting for connection on channel 5 ...
+
+In another terminal, bind to same RFCOMM channel with a device address
+-sh-4.1# rctest -w -P 5 -i hci0
+rctest[2922]: Waiting for connection on channel 5 ...
+
+Here we can see the binding is successful for both cases for the same
+RFCOMM channel. After this fix, the binding for a particular RFCOMM
+channel is allowed only once.
 
 Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
 ---
- net/bluetooth/smp.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/rfcomm/sock.c |   12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 8c225ef..9b54fea 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -165,7 +165,7 @@ static struct sk_buff *smp_build_cmd(struct l2cap_conn *conn, u8 code,
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 867a065..4add776 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -110,8 +110,16 @@ static struct sock *__rfcomm_get_sock_by_addr(u8 channel, bdaddr_t *src)
+ 	struct hlist_node *node;
  
- 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
- 	lh->len = cpu_to_le16(sizeof(code) + dlen);
--	lh->cid = cpu_to_le16(L2CAP_CID_SMP);
-+	lh->cid = __constant_cpu_to_le16(L2CAP_CID_SMP);
- 
- 	memcpy(skb_put(skb, sizeof(code)), &code, sizeof(code));
+ 	sk_for_each(sk, node, &rfcomm_sk_list.head) {
+-		if (rfcomm_pi(sk)->channel == channel &&
+-				!bacmp(&bt_sk(sk)->src, src))
++		if (rfcomm_pi(sk)->channel != channel)
++			continue;
++
++		/* Exact match */
++		if (!bacmp(&bt_sk(sk)->src, src))
++			break;
++
++		/* BDADDR_ANY match */
++		if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY) ||
++		    !bacmp(src, BDADDR_ANY))
+ 			break;
+ 	}
  
 -- 
 1.7.9.5
