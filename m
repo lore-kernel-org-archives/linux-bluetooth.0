@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 01/10] doc: Add settings storage documentation
-Date: Wed, 10 Oct 2012 18:23:22 +0200
-Message-Id: <1349886211-18920-2-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v4 07/10] adapter: Read discoverable timeout in storage at init
+Date: Wed, 10 Oct 2012 18:23:28 +0200
+Message-Id: <1349886211-18920-8-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1349886211-18920-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1349886211-18920-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -12,118 +12,60 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- doc/settings-storage.txt |  102 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 102 insertions(+)
- create mode 100644 doc/settings-storage.txt
+ src/adapter.c |   19 +++++++------------
+ 1 file changed, 7 insertions(+), 12 deletions(-)
 
-diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
-new file mode 100644
-index 0000000..0a3f90e
---- /dev/null
-+++ b/doc/settings-storage.txt
-@@ -0,0 +1,102 @@
-+Information related to local adapters and remote devices are stored in storage
-+directory (default: /var/lib/bluetooth).
-+Files are in ini-file format.
+diff --git a/src/adapter.c b/src/adapter.c
+index b869d81..40df4a1 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2268,16 +2268,6 @@ static void load_connections(struct btd_adapter *adapter)
+ 	g_slist_free_full(conns, g_free);
+ }
+ 
+-static int get_discoverable_timeout(const char *src)
+-{
+-	int timeout;
+-
+-	if (read_discoverable_timeout(src, &timeout) == 0)
+-		return timeout;
+-
+-	return main_opts.discovto;
+-}
+-
+ static void set_auto_connect(gpointer data, gpointer user_data)
+ {
+ 	struct btd_device *device = data;
+@@ -2339,7 +2329,7 @@ void btd_adapter_get_mode(struct btd_adapter *adapter, uint8_t *mode,
+ 		*on_mode = get_mode(&adapter->bdaddr, "on");
+ 
+ 	if (discoverable_timeout)
+-		*discoverable_timeout = get_discoverable_timeout(address);
++		*discoverable_timeout = adapter->discov_timeout;
+ 
+ 	if (pairable)
+ 		*pairable = adapter->pairable;
+@@ -2421,7 +2411,6 @@ void btd_adapter_start(struct btd_adapter *adapter)
+ 	adapter->dev_class = 0;
+ 	adapter->off_requested = FALSE;
+ 	adapter->up = TRUE;
+-	adapter->discov_timeout = get_discoverable_timeout(address);
+ 	adapter->off_timer = 0;
+ 
+ 	if (adapter->scan_mode & SCAN_INQUIRY)
+@@ -2700,6 +2689,12 @@ static void load_config(struct btd_adapter *adapter)
+ 		adapter->pairable_timeout = main_opts.pairto;
+ 	else
+ 		adapter->pairable_timeout = timeout;
 +
-+There is one directory per adapter, named by its bluetooth address, which
-+contains:
-+ - a settings file for the local adapter
-+ - an attribute_db file containing attributes of supported LE services
-+ - names file containing names of all devices already seen
-+ - one directory per remote device, named by remote device address, which
-+   contains:
-+    - a settings file
-+    - a key file accessible only by root
-+    - an attribute_db file containing attributes of remote LE services
-+
-+So the directory structure should be:
-+    /var/lib/bluetooth/<adapter address>/
-+        ./settings
-+        ./attribute_db
-+        ./names
-+        ./<remote device address>/
-+            ./settings
-+            ./keys
-+            ./attribute_db
-+        ./<remote device address>/
-+            ./settings
-+            ./keys
-+            ./attribute_db
-+        ...
-+
-+Adapter directory files
-+=======================
-+
-+Settings file contains 1 [General] group with adapter info:
-+  [General]
-+  Name=
-+  Class=0x000000
-+  Pairable=<true|false>
-+  PairableTimeout=0
-+  DiscoverableTimeout=0
-+  Mode=<off|connectable|discoverable>
-+  OnMode=<connectable|discoverable>
-+
-+The attribute_db file is a list of handles (group name) with UUID and Value as
-+keys, for example:
-+  [0x0001]
-+  UUID=00002800-0000-1000-8000-00805f9b34fb
-+  Value=0018
-+
-+  [0x0004]
-+  UUID=00002803-0000-1000-8000-00805f9b34fb
-+  Value=020600002A
-+
-+  [0x0006]
-+  UUID=00002a00-0000-1000-8000-00805f9b34fb
-+  Value=4578616D706C6520446576696365
-+
-+Names file contains 1 [Names] group with device address as key:
-+  [Names]
-+  <nn:nn:nn:nn:nn:nn>=device name a
-+  <mm:mm:mm:mm:mm:mm>=device name b
-+
-+Device directory files
-+======================
-+
-+Remote device settings file will include a [General] group with device infos
-+and a [DeviceID] group with related infos:
-+  [General]
-+  Alias=
-+  Class=0x000000
-+  Manufacturer=0
-+  LmpVersion=
-+  LmpSubversion=
-+  Features=0000000000000000
-+  SupportedTechnologies=<BR/EDR|LE>;<BR/EDR|LE>
-+  AddressType=<static|public>
-+  LastSeen=yyyy-mm-dd hh:mm:ss GMT
-+  LastUsed=yyyy-mm-dd hh:mm:ss GMT
-+  Trusted=<true|false>
-+  Profiles=<128 bits UUID of profile 1>;<128 bits UUID of profile 2>;...
-+
-+  [DeviceID]
-+  Assigner=0
-+  Vendor=0
-+  Product=0
-+  Version=0
-+
-+Keys file includes informations related to link key or long term link key:
-+  [LinkKey]
-+  Key=
-+  Type=0
-+  PINLength=0
-+
-+  [LongTermKey]
-+  Key=
-+  Authenticated=<true|false>
-+  EncSize=0
-+  EDiv=0
-+  Rand=0
-+
-+The attribute_db file is a list of handles (group name) with UUID and Value as
-+keys (cf. attribute_db in adapter directory).
++	/* Get discoverable timeout */
++	if (read_discoverable_timeout(address, &timeout) < 0)
++		adapter->discov_timeout = main_opts.discovto;
++	else
++		adapter->discov_timeout = timeout;
+ }
+ 
+ gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
 -- 
 1.7.9.5
 
