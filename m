@@ -2,35 +2,33 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ 4/6] att: Fix sending pdu's with invalid data
-Date: Wed, 10 Oct 2012 20:35:01 -0300
-Message-Id: <1349912103-663-4-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ 3/6] att: Replace ATT_MAX_MTU with ATT_MAX_VALUE_LEN
+Date: Wed, 10 Oct 2012 20:35:00 -0300
+Message-Id: <1349912103-663-3-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1349912103-663-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1349912103-663-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When encoding an att_data_list we need to make sure that each element
-lenght of the data list will not exceed 255, because that information
-will be encoded as a octet later.
+ATT has the concept that an attribute value has a maximum length and we
+weren't keeping track of this.
 ---
- attrib/att.c | 3 +++
- 1 file changed, 3 insertions(+)
+ attrib/att.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/attrib/att.c b/attrib/att.c
-index fc510f4..f262bb6 100644
---- a/attrib/att.c
-+++ b/attrib/att.c
-@@ -101,6 +101,9 @@ struct att_data_list *att_data_list_alloc(uint16_t num, uint16_t len)
- 	struct att_data_list *list;
- 	int i;
+diff --git a/attrib/att.h b/attrib/att.h
+index a563255..ebdb98e 100644
+--- a/attrib/att.h
++++ b/attrib/att.h
+@@ -85,7 +85,7 @@
+ #define ATT_CHAR_PROPER_AUTH			0x40
+ #define ATT_CHAR_PROPER_EXT_PROPER		0x80
  
-+	if (len > UINT8_MAX)
-+		return NULL;
-+
- 	list = g_new0(struct att_data_list, 1);
- 	list->len = len;
- 	list->num = num;
+-#define ATT_MAX_MTU				256
++#define ATT_MAX_VALUE_LEN			512
+ #define ATT_DEFAULT_L2CAP_MTU			48
+ #define ATT_DEFAULT_LE_MTU			23
+ 
 -- 
 1.7.12.3
 
