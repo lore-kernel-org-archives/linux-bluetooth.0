@@ -1,35 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
+	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 1/6] Bluetooth: Allow to set flush timeout
-Date: Wed, 10 Oct 2012 17:38:26 +0300
-Message-Id: <1349879912-23633-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1349879912-23633-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1349707932-10006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1349879912-23633-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH v3 10/10] TODO: Add entry to remove storage convertion function
+Date: Wed, 10 Oct 2012 16:10:19 +0200
+Message-Id: <1349878219-14359-11-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1349878219-14359-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1349878219-14359-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_sock.c |    1 +
- 1 file changed, 1 insertion(+)
+ TODO |    6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index af467ce..ed2dfc9 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -529,6 +529,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
- 		chan->fcs  = opts.fcs;
- 		chan->max_tx = opts.max_tx;
- 		chan->tx_win = opts.txwin_size;
-+		chan->flush_to = opts.flush_to;
- 		break;
+diff --git a/TODO b/TODO
+index 384d428..c6787cc 100644
+--- a/TODO
++++ b/TODO
+@@ -30,6 +30,12 @@ General
+   Priority: Low
+   Complexity: C1
  
- 	case L2CAP_LM:
++- Function in src/adapter.c to convert old storage files to new ini-file format
++  should be removed 6-8 months after first BlueZ 5 release.
++
++  Priority: Low
++  Complexity: C1
++
+ BlueZ 5
+ =======
+ 
 -- 
 1.7.9.5
 
