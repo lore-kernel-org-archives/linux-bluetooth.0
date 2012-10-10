@@ -1,33 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1349863451.27233.116.camel@aeonflux>
-Subject: Re: [PATCH 2/9] Pass confirm name as gboolean value
+Message-ID: <1349863391.27233.115.camel@aeonflux>
+Subject: Re: [PATCH v2 0/7] Move adapter config file to ini-file format
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 10 Oct 2012 12:04:11 +0200
-In-Reply-To: <1505997.4TGEV3eNyH@uw000953>
-References: <1349784722-14578-1-git-send-email-szymon.janc@tieto.com>
-	 <1349784722-14578-3-git-send-email-szymon.janc@tieto.com>
-	 <1349794286.27233.95.camel@aeonflux> <1505997.4TGEV3eNyH@uw000953>
+To: =?ISO-8859-1?Q?Fr=E9d=E9ric?= Danis
+	<frederic.danis@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 10 Oct 2012 12:03:11 +0200
+In-Reply-To: <1349859520-8824-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1349859520-8824-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Fred,
 
-> > > confirm_name is a boolean value and can be pass as such instead of
-> > > uint8_t.
-> > 
-> > actually long term I want to move to bool usage. So maybe this is a good
-> > start to get this going.
+> Adapter saved configuration will be saved to /var/lib/bluetooth/<adapter address>/settings
+> in ini-file format for BlueZ 5.
+> If this file does not exist, we try to convert legacy config file to it.
 > 
-> OK, will send v2 with bool.
-> Do you also want to stop introducing other glib types like gchar, gint etc?
-> (at least for code that don't inherit this due to glib calls)
+> Access to variables during run-time is performed in adapter structure which is populated by loading saved configuration during initialization.
+> 
+> First 6 patches remove access to config file from run-time.
+> Last patch move to ini-file format style (load, save and convert).
 
-yes, please no more gchar and gint. These are horrible. We were young
-and naive when we thought they were a good idea ;)
+I am fine with the first 6 patches (7 in the end). Lets have Johan a
+second look at it.
+
+For the actual change to the new format, can you first create a document
+describing the new format. Something like doc/settings-storage.txt or
+similar (if anyone can think of a better name).
 
 Regards
 
