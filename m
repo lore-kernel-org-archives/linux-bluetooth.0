@@ -2,128 +2,44 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 01/10] doc: Add settings storage documentation
-Date: Wed, 10 Oct 2012 16:10:10 +0200
-Message-Id: <1349878219-14359-2-git-send-email-frederic.danis@linux.intel.com>
-In-Reply-To: <1349878219-14359-1-git-send-email-frederic.danis@linux.intel.com>
-References: <1349878219-14359-1-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v3 00/10] Move adapter config file to ini-file format
+Date: Wed, 10 Oct 2012 16:10:09 +0200
+Message-Id: <1349878219-14359-1-git-send-email-frederic.danis@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/settings-storage.txt |  102 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 102 insertions(+)
+Adapter saved configuration will be saved to /var/lib/bluetooth/<adapter address>/settings
+in ini-file format for BlueZ 5.
+If this file does not exist, we try to convert legacy config file to it.
+
+Access to variables during run-time is performed in adapter structure which is populated by loading saved configuration during initialization.
+
+First 6 patches remove access to config file from run-time.
+Last patch move to ini-file format style (load, save and convert).
+
+Frédéric Danis (10):
+  doc: Add settings storage documentation
+  adapter: Read name in storage at init
+  adaptername: Retrieve config name from adapter
+  adapter: Read device class in storage at init
+  adapter: Move pairable read to load_config()
+  adapter: Read pairable timeout in storage at init
+  adapter: Read discoverable timeout in storage at init
+  adapter: Read mode in storage at init
+  adapter: Move saved config to ini-file format
+  TODO: Add entry to remove storage convertion function
+
+ TODO                     |    6 +
+ doc/settings-storage.txt |  102 ++++++++++++++
+ plugins/adaptername.c    |    9 +-
+ src/adapter.c            |  330 +++++++++++++++++++++++++++++++++++-----------
+ src/adapter.h            |    1 +
+ 5 files changed, 370 insertions(+), 78 deletions(-)
  create mode 100644 doc/settings-storage.txt
 
-diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
-new file mode 100644
-index 0000000..51d2220
---- /dev/null
-+++ b/doc/settings-storage.txt
-@@ -0,0 +1,102 @@
-+Information related to local adapters and remote devices are stored in storage
-+directory (default: /var/lib/bluetooth).
-+Files are in ini-file format.
-+
-+There is one directory per adapter, named by its bluetooth address, which
-+contains:
-+ - a settings file for the local adapter
-+ - an attribute_db file containing attributes of supported LE services
-+ - names file containing names of all devices already seen
-+ - one directory per remote device, named by remote device address, which
-+   contains:
-+    - a settings file
-+    - a key file accessible only by root
-+    - an attribute_db file containing attributes of remote LE services
-+
-+So the directory structure should be:
-+    /var/lib/bluetooth/<adapter address>/
-+        ./settings
-+        ./attribute_db
-+        ./names
-+        ./<remote device address>/
-+            ./settings
-+            ./keys
-+            ./attribute_db
-+        ./<remote device address>/
-+            ./settings
-+            ./keys
-+            ./attribute_db
-+        ...
-+
-+Adapter directory files
-+=======================
-+
-+Settings file contains 1 [General] group with adapter info:
-+  [General]
-+  Name=
-+  Class=0x000000
-+  Pairable=<true|false>
-+  PairableTimeout=0
-+  DiscoverableTimeout=0
-+  Mode=<off|connectable|discoverable>
-+  OnMode=<connectable|discoverable>
-+
-+The attribute_db file is a list of handles (group name) with UUID and Value as
-+keys, for example:
-+  [0x0001]
-+  UUID=00002800-0000-1000-8000-00805f9b34fb
-+  Value=0018
-+
-+  [0x0004]
-+  UUID=00002803-0000-1000-8000-00805f9b34fb
-+  Value=020600002A
-+
-+  [0x0006]
-+  UUID=00002a00-0000-1000-8000-00805f9b34fb
-+  Value=4578616D706C6520446576696365
-+
-+Names file contains 1 [Names] group with device address as key:
-+  [Names]
-+  <nn:nn:nn:nn:nn:nn>=device name a
-+  <mm:mm:mm:mm:mm:mm>=device name b
-+
-+Device directory files
-+======================
-+
-+Remote device settings file will include a [General] group with device infos
-+and a [DeviceID] group with related infos:
-+  [General]
-+  Alias=
-+  Class=0x000000
-+  Manufacturer=0
-+  LmpVersion=
-+  LmpSubversion=
-+  Features=0000000000000000
-+  AddressType=<BR/EDR|LE>
-+  LEAddressType=<public|random>
-+  LastSeen=yyyy-mm-dd hh:mm:ss GMT
-+  LastUsed=yyyy-mm-dd hh:mm:ss GMT
-+  Trusted=<true|false>
-+  Profiles=<128 bits UUID of profile 1>;<128 bits UUID of profile 2>;...
-+
-+  [DeviceID]
-+  Assigner=0
-+  Vendor=0
-+  Product=0
-+  Version=0
-+
-+Keys file includes informations related to link key or long term link key:
-+  [LinkKey]
-+  Key=
-+  Type=0
-+  PINLength=0
-+
-+  [LongTermKey]
-+  Key=
-+  Authenticated=<true|false>
-+  EncSize=0
-+  EDiv=0
-+  Rand=0
-+
-+The attribute_db file is a list of handles (group name) with UUID and Value as
-+keys (cf. attribute_db in adapter directory).
 -- 
 1.7.9.5
 
