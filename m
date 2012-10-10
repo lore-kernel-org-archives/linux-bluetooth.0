@@ -1,49 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1349863676.27233.120.camel@aeonflux>
-Subject: Re: [RFCv1 3/6] Bluetooth: AMP: Add handle to hci_chan structure
+Message-ID: <1349863451.27233.116.camel@aeonflux>
+Subject: Re: [PATCH 2/9] Pass confirm name as gboolean value
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 10 Oct 2012 12:07:56 +0200
-In-Reply-To: <20121010083438.GB7620@aemeltch-MOBL1>
-References: <1349707932-10006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1349707932-10006-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1349793991.27233.91.camel@aeonflux> <20121010083438.GB7620@aemeltch-MOBL1>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 10 Oct 2012 12:04:11 +0200
+In-Reply-To: <1505997.4TGEV3eNyH@uw000953>
+References: <1349784722-14578-1-git-send-email-szymon.janc@tieto.com>
+	 <1349784722-14578-3-git-send-email-szymon.janc@tieto.com>
+	 <1349794286.27233.95.camel@aeonflux> <1505997.4TGEV3eNyH@uw000953>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Szymon,
 
-> > > -
-> > > +struct hci_chan *hci_chan_lookup_handle(struct hci_conn *hcon, __u16 handle);
-> > > +struct hci_chan *hci_chan_lookup_handle_all(struct hci_dev *hdev,
-> > > +					    __u16 handle);
+> > > confirm_name is a boolean value and can be pass as such instead of
+> > > uint8_t.
 > > 
-> > this naming is pretty bad. I have no idea what one function does
-> > different compared to the other. Especially since none of them take a
-> > hci_chan as argument, but start with that prefix.
-> > 
-> > Would be the naming hci_conn_lookup_chan be a lot clearer? Or maybe
-> > hci_chan_lookup_from_dev or similar.
+> > actually long term I want to move to bool usage. So maybe this is a good
+> > start to get this going.
 > 
-> So are names like:
-> 
-> hci_conn_lookup_hchan_by_handle
+> OK, will send v2 with bool.
+> Do you also want to stop introducing other glib types like gchar, gint etc?
+> (at least for code that don't inherit this due to glib calls)
 
-since this one is only internal, you better have a shortcut version as
-just a static helper inside that code.
-
-> hci_conn_lookup_hchan_from_hdev
-
-If we follow our naming convention then hci_chan_lookup_from_dev would
-come closest. However since you only need one of these, then
-hci_chan_lookup_handle would be fine and in sync with how we named
-everything else.
-
-I rather not have the prefixing h everywhere that we use in variable
-names. That should be really only for variable names.
+yes, please no more gchar and gint. These are horrible. We were young
+and naive when we thought they were a good idea ;)
 
 Regards
 
