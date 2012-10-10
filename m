@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1349890472.27233.142.camel@aeonflux>
-Subject: Re: [PATCH v3 02/10] adapter: Read name in storage at init
+Message-ID: <1349890310.27233.140.camel@aeonflux>
+Subject: Re: [PATCH v3 01/10] doc: Add settings storage documentation
 From: Marcel Holtmann <marcel@holtmann.org>
 To: =?ISO-8859-1?Q?Fr=E9d=E9ric?= Danis
 	<frederic.danis@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 10 Oct 2012 19:34:32 +0200
-In-Reply-To: <1349878219-14359-3-git-send-email-frederic.danis@linux.intel.com>
+Date: Wed, 10 Oct 2012 19:31:50 +0200
+In-Reply-To: <1349878219-14359-2-git-send-email-frederic.danis@linux.intel.com>
 References: <1349878219-14359-1-git-send-email-frederic.danis@linux.intel.com>
-	 <1349878219-14359-3-git-send-email-frederic.danis@linux.intel.com>
+	 <1349878219-14359-2-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,114 +16,167 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Fred,
 
->  src/adapter.c |   34 ++++++++++++++++++++++++++++++++++
->  src/adapter.h |    1 +
->  2 files changed, 35 insertions(+)
+>  doc/settings-storage.txt |  102 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 102 insertions(+)
+>  create mode 100644 doc/settings-storage.txt
 > 
-> diff --git a/src/adapter.c b/src/adapter.c
-> index ad8ee06..8b9af28 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -115,6 +115,10 @@ struct service_auth {
->  	struct agent *agent;		/* NULL for queued auths */
->  };
->  
-> +struct btd_adapter_config {
-> +	char *name;
-> +};
+> diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
+> new file mode 100644
+> index 0000000..51d2220
+> --- /dev/null
+> +++ b/doc/settings-storage.txt
+> @@ -0,0 +1,102 @@
+> +Information related to local adapters and remote devices are stored in storage
+> +directory (default: /var/lib/bluetooth).
+> +Files are in ini-file format.
 > +
+> +There is one directory per adapter, named by its bluetooth address, which
+> +contains:
+> + - a settings file for the local adapter
+> + - an attribute_db file containing attributes of supported LE services
+> + - names file containing names of all devices already seen
+> + - one directory per remote device, named by remote device address, which
+> +   contains:
+> +    - a settings file
+> +    - a key file accessible only by root
+> +    - an attribute_db file containing attributes of remote LE services
+> +
+> +So the directory structure should be:
+> +    /var/lib/bluetooth/<adapter address>/
+> +        ./settings
+> +        ./attribute_db
 
-why are we bothering we a separate config here? I think that should be
-just put into btd_adapter.
+not sure this is a good name.
 
->  struct btd_adapter {
->  	uint16_t dev_id;
->  	gboolean up;
-> @@ -155,6 +159,8 @@ struct btd_adapter {
->  	gboolean pairable;		/* pairable state */
->  	gboolean initialized;
->  
-> +	struct btd_adapter_config config;
-> +
->  	gboolean off_requested;		/* DEVDOWN ioctl was called */
->  
->  	gint ref;
-> @@ -780,11 +786,24 @@ int adapter_set_name(struct btd_adapter *adapter, const char *name)
->  		adapter->name = g_strdup(maxname);
->  	}
->  
-> +	g_free(adapter->config.name);
-> +	adapter->config.name = g_strdup(maxname);
-> +
->  	write_local_name(&adapter->bdaddr, maxname);
->  
->  	return 0;
->  }
->  
-> +int adapter_get_config_name(struct btd_adapter *adapter, char **name)
-> +{
-> +	if (adapter->config.name == NULL)
-> +		return -EINVAL;
-> +
-> +	*name = adapter->config.name;
-> +
-> +	return 0;
-> +}
-> +
+> +        ./names
 
-Who is the user of this. And why not just return const char *.
+Lets call this one "cache". Since we could throw it away and it will be
+just rediscovered. And we can also stuff other cacheable details in
+there.
 
->  static void set_name(struct btd_adapter *adapter, const char *name,
->  						GDBusPendingPropertySet id)
->  {
-> @@ -2665,6 +2684,18 @@ void btd_adapter_unref(struct btd_adapter *adapter)
->  	g_free(path);
->  }
->  
-> +static void load_config(struct btd_adapter *adapter)
-> +{
-> +	char name[MAX_NAME_LENGTH + 1];
+> +        ./<remote device address>/
+> +            ./settings
+
+Besides the Alias, are they really settings. You can not configure much
+anyway.
+
+> +            ./keys
+
+Not sure that I want the keys separated. That seems like a waste.
+
+> +            ./attribute_db
+> +        ./<remote device address>/
+> +            ./settings
+> +            ./keys
+> +            ./attribute_db
+> +        ...
+
+Why did we want directories for remote devices again? Can we not just
+put all in one big file with the name of the remote address?
+
 > +
-> +	/* Get name */
-> +	if (read_local_name(&adapter->bdaddr, name) < 0)
-> +		adapter->config.name = NULL;
-> +	else
-> +		adapter->config.name = g_strdup(name);
+> +Adapter directory files
+> +=======================
 > +
-> +}
+> +Settings file contains 1 [General] group with adapter info:
+> +  [General]
+> +  Name=
+> +  Class=0x000000
+> +  Pairable=<true|false>
+> +  PairableTimeout=0
+> +  DiscoverableTimeout=0
+> +  Mode=<off|connectable|discoverable>
+> +  OnMode=<connectable|discoverable>
+
+Actually with management interface now being used, we can be a bit
+smarter here. The mode can be programmed even if the controller is not
+powered.
+
+So this might be better as Discoverable, Connectable, Pairable and
+Powered boolean options.
+
+Also Pairable has no timeout in the kernel API anymore. Do we still need
+this?
+
+> +The attribute_db file is a list of handles (group name) with UUID and Value as
+> +keys, for example:
+> +  [0x0001]
+> +  UUID=00002800-0000-1000-8000-00805f9b34fb
+> +  Value=0018
 > +
->  gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
->  {
->  	adapter->up = up;
-> @@ -2684,6 +2715,7 @@ gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
->  	if (main_opts.gatt_enabled)
->  		btd_adapter_gatt_server_start(adapter);
->  
-> +	load_config(adapter);
->  	load_drivers(adapter);
->  	btd_profile_foreach(probe_profile, adapter);
->  	clear_blocked(adapter);
-> @@ -2752,6 +2784,8 @@ void adapter_remove(struct btd_adapter *adapter)
->  	/* Return adapter to down state if it was not up on init */
->  	if (!adapter->already_up && adapter->up)
->  		mgmt_set_powered(adapter->dev_id, FALSE);
+> +  [0x0004]
+> +  UUID=00002803-0000-1000-8000-00805f9b34fb
+> +  Value=020600002A
 > +
-> +	g_free(adapter->config.name);
->  }
->  
->  uint16_t adapter_get_dev_id(struct btd_adapter *adapter)
-> diff --git a/src/adapter.h b/src/adapter.h
-> index b5bff10..b575c1b 100644
-> --- a/src/adapter.h
-> +++ b/src/adapter.h
-> @@ -133,6 +133,7 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
->  void adapter_emit_device_found(struct btd_adapter *adapter,
->  						struct remote_dev_info *dev);
->  void adapter_mode_changed(struct btd_adapter *adapter, uint8_t scan_mode);
-> +int adapter_get_config_name(struct btd_adapter *adapter, char **name);
->  int adapter_set_name(struct btd_adapter *adapter, const char *name);
->  void adapter_name_changed(struct btd_adapter *adapter, const char *name);
->  void adapter_service_insert(struct btd_adapter *adapter, void *rec);
+> +  [0x0006]
+> +  UUID=00002a00-0000-1000-8000-00805f9b34fb
+> +  Value=4578616D706C6520446576696365
+
+Is this our primary key, the handle?
+
+> +
+> +Names file contains 1 [Names] group with device address as key:
+> +  [Names]
+> +  <nn:nn:nn:nn:nn:nn>=device name a
+> +  <mm:mm:mm:mm:mm:mm>=device name b
+
+I am not sure this is the best idea this way. Maybe just creating files
+for each address we ever see is a better idea. Details like LastSeen
+could be useful for unpaired devices.
+
+> +
+> +Device directory files
+> +======================
+> +
+> +Remote device settings file will include a [General] group with device infos
+> +and a [DeviceID] group with related infos:
+> +  [General]
+> +  Alias=
+> +  Class=0x000000
+> +  Manufacturer=0
+> +  LmpVersion=
+> +  LmpSubversion=
+
+Take these 3 our. We were just storing them for statistic purposes.
+
+> +  Features=0000000000000000
+> +  AddressType=<BR/EDR|LE>
+> +  LEAddressType=<public|random>
+
+That is not needed. It is encoded in the address itself.
+
+> +  LastSeen=yyyy-mm-dd hh:mm:ss GMT
+> +  LastUsed=yyyy-mm-dd hh:mm:ss GMT
+> +  Trusted=<true|false>
+> +  Profiles=<128 bits UUID of profile 1>;<128 bits UUID of profile 2>;...
+> +
+> +  [DeviceID]
+> +  Assigner=0
+
+This is called Source.
+
+> +  Vendor=0
+> +  Product=0
+> +  Version=0
+> +
+> +Keys file includes informations related to link key or long term link key:
+> +  [LinkKey]
+> +  Key=
+> +  Type=0
+> +  PINLength=0
+> +
+> +  [LongTermKey]
+> +  Key=
+> +  Authenticated=<true|false>
+> +  EncSize=0
+> +  EDiv=0
+> +  Rand=0
+
+Can be both in the same file about the device information.
+
+> +
+> +The attribute_db file is a list of handles (group name) with UUID and Value as
+> +keys (cf. attribute_db in adapter directory).
 
 Regards
 
