@@ -1,57 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: bzhao@marvell.com
-Subject: [PATCH] Bluetooth: btmrv: Use %*ph specifier instead of print_hex_dump_bytes
-Date: Wed, 10 Oct 2012 17:41:33 +0300
-Message-Id: <1349880093-23728-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 2/6] Bluetooth: AMP: Handle AMP_LINK timeout
+Date: Wed, 10 Oct 2012 17:38:27 +0300
+Message-Id: <1349879912-23633-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1349879912-23633-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1349707932-10006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1349879912-23633-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Use standard print specifier and remove print_hex_dump_bytes call.
-Makes output more sensible:
-
-...
-[18809.401218] 00000000: 0b 00 00 fe 5b fc 01 f2 00 00 00    ....[......
-...
-
-would be changed to
-
-...
-[18809.401218] Bluetooth: hex: 0b 00 00 fe 5b fc 01 f2 00 00 00
-...
+When AMP_LINK timeouts execute HCI_OP_DISCONN_PHY_LINK as analog to
+HCI_OP_DISCONNECT for ACL_LINK.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- drivers/bluetooth/btmrvl_sdio.c |    6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 ++
+ net/bluetooth/hci_conn.c         |   32 +++++++++++++++++++++++++++++---
+ 2 files changed, 31 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 90b3a75..49494ae 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -597,8 +597,7 @@ static int btmrvl_sdio_card_to_host(struct btmrvl_private *priv)
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 90ae4f0..dfa108c 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -285,6 +285,8 @@ struct hci_dev {
+ 	int (*ioctl)(struct hci_dev *hdev, unsigned int cmd, unsigned long arg);
+ };
  
++#define HCI_PHY_HANDLE(handle)	(handle & 0xff)
++
+ struct hci_conn {
+ 	struct list_head list;
+ 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 53202f6..6487579 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -130,6 +130,20 @@ void hci_acl_disconn(struct hci_conn *conn, __u8 reason)
+ 	hci_send_cmd(conn->hdev, HCI_OP_DISCONNECT, sizeof(cp), &cp);
+ }
+ 
++static void hci_amp_disconn(struct hci_conn *conn, __u8 reason)
++{
++	struct hci_cp_disconn_phy_link cp;
++
++	BT_DBG("hcon %p", conn);
++
++	conn->state = BT_DISCONN;
++
++	cp.phy_handle = HCI_PHY_HANDLE(conn->handle);
++	cp.reason = reason;
++	hci_send_cmd(conn->hdev, HCI_OP_DISCONN_PHY_LINK,
++		     sizeof(cp), &cp);
++}
++
+ static void hci_add_sco(struct hci_conn *conn, __u16 handle)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+@@ -230,11 +244,24 @@ void hci_sco_setup(struct hci_conn *conn, __u8 status)
+ 	}
+ }
+ 
++static void hci_conn_disconnect(struct hci_conn *conn)
++{
++	__u8 reason = hci_proto_disconn_ind(conn);
++
++	switch (conn->type) {
++	case ACL_LINK:
++		hci_acl_disconn(conn, reason);
++		break;
++	case AMP_LINK:
++		hci_amp_disconn(conn, reason);
++		break;
++	}
++}
++
+ static void hci_conn_timeout(struct work_struct *work)
+ {
+ 	struct hci_conn *conn = container_of(work, struct hci_conn,
+ 					     disc_work.work);
+-	__u8 reason;
+ 
+ 	BT_DBG("hcon %p state %s", conn, state_to_string(conn->state));
+ 
+@@ -253,8 +280,7 @@ static void hci_conn_timeout(struct work_struct *work)
+ 		break;
+ 	case BT_CONFIG:
+ 	case BT_CONNECTED:
+-		reason = hci_proto_disconn_ind(conn);
+-		hci_acl_disconn(conn, reason);
++		hci_conn_disconnect(conn);
+ 		break;
  	default:
- 		BT_ERR("Unknown packet type:%d", type);
--		print_hex_dump_bytes("", DUMP_PREFIX_OFFSET, payload,
--				     blksz * num_blocks);
-+		BT_ERR("hex: %*ph", blksz * num_blocks, payload);
- 
- 		kfree_skb(skb);
- 		skb = NULL;
-@@ -857,8 +856,7 @@ static int btmrvl_sdio_host_to_card(struct btmrvl_private *priv,
- 		if (ret < 0) {
- 			i++;
- 			BT_ERR("i=%d writesb failed: %d", i, ret);
--			print_hex_dump_bytes("", DUMP_PREFIX_OFFSET,
--						payload, nb);
-+			BT_ERR("hex: %*ph", nb, payload);
- 			ret = -EIO;
- 			if (i > MAX_WRITE_IOMEM_RETRY)
- 				goto exit;
+ 		conn->state = BT_CLOSED;
 -- 
 1.7.9.5
 
