@@ -1,65 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
 From: Syam Sidhardhan <s.syam@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/4] Bluetooth: Fix RFCOMM bind issue
-Date: Wed, 10 Oct 2012 22:09:27 +0530
-Message-id: <1349887169-20880-2-git-send-email-s.syam@samsung.com>
-In-reply-to: <1349887169-20880-1-git-send-email-s.syam@samsung.com>
-References: <1349887169-20880-1-git-send-email-s.syam@samsung.com>
+Subject: [PATCH 1/4] Bluetooth: Fix L2CAP PSM bind issue
+Date: Wed, 10 Oct 2012 22:09:26 +0530
+Message-id: <1349887169-20880-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Problem: If we bind a particular RFCOMM channel with source address as
-BDADDR_ANY, then we are able to bind the same RFCOMM channel with the
-adapter address, which is incorrect.
+Problem: If we bind a particular PSM with source address as BDADDR_ANY,
+then we are able to bind the same PSM with adapter address(or any other
+address), which is incorrect.
 
-Solution: Add check for comparing the stored source address and
+Solution: Added check for comparing the stored source address and
 given source address against BDADDR_ANY, so that irrespective of
-BADADDR_ANY or any adapter address, a particular RFCOMM channel will
-be allowed to bind only once.
+BADADDR_ANY or any adapter address, a particular PSM will be allowed
+to bind only once.
 
-Details:
-Here given the steps to reproduce this issue:
-Bind to a RFCOMM channel without the device address.
--sh-4.1# rctest -w -P 5
-rctest[2920]: Waiting for connection on channel 5 ...
+Details: After successful binding, both the PSM and the source device
+address are stored in a global list. Before binding to a new PSM, the
+old PSM and the source address from the gobal list are compared against
+the new PSM and source device address for make the PSM binding unique.
 
-In another terminal, bind to same RFCOMM channel with a device address
--sh-4.1# rctest -w -P 5 -i hci0
-rctest[2922]: Waiting for connection on channel 5 ...
+Before this fix, If we pass the different device addresses, for the same
+PSM, both the binding are successful. Further an incoming connection to
+that particular PSM goes to incorrect profile (first binded). This PSM
+binding issues can be easily reproducible using the l2test utility as
+shown below.
+
+Bind to a PSM without the device address
+-sh-4.1# l2test -w -P 4097
+l2test[2792]: Waiting for connection on psm 4097 ...
+
+In another terminal, bind to same PSM with device address
+-sh-4.1# l2test -w -P 4097 -i hci0
+l2test[2787]: Waiting for connection on psm 4097 ...
 
 Here we can see the binding is successful for both cases for the same
-RFCOMM channel. After this fix, the binding for a particular RFCOMM
-channel is allowed only once.
+PSM. After this fix the binding for a particular PSM is allowed only
+once.
 
 Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
 ---
- net/bluetooth/rfcomm/sock.c |   12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+This patch resolves the HDP incoming connection issue when Obexd is
+running in background. Both uses dynamic PSM range. Obex over l2cap
+bind with source address as BDADDR_ANY and HDP binds with source address
+as the adapter address. Both bindings for the same PSM are getting
+success.
 
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index 867a065..4add776 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -110,8 +110,16 @@ static struct sock *__rfcomm_get_sock_by_addr(u8 channel, bdaddr_t *src)
- 	struct hlist_node *node;
+ net/bluetooth/l2cap_core.c |   11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index d42cdb1..ace7cd8 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -113,7 +113,16 @@ static struct l2cap_chan *__l2cap_global_chan_by_addr(__le16 psm, bdaddr_t *src)
+ 	struct l2cap_chan *c;
  
- 	sk_for_each(sk, node, &rfcomm_sk_list.head) {
--		if (rfcomm_pi(sk)->channel == channel &&
--				!bacmp(&bt_sk(sk)->src, src))
-+		if (rfcomm_pi(sk)->channel != channel)
+ 	list_for_each_entry(c, &chan_list, global_l) {
+-		if (c->sport == psm && !bacmp(&bt_sk(c->sk)->src, src))
++		if (c->sport != psm)
 +			continue;
 +
 +		/* Exact match */
-+		if (!bacmp(&bt_sk(sk)->src, src))
-+			break;
++		if (!bacmp(&bt_sk(c->sk)->src, src))
++			return c;
 +
 +		/* BDADDR_ANY match */
-+		if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY) ||
++		if (!bacmp(&bt_sk(c->sk)->src, BDADDR_ANY) ||
 +		    !bacmp(src, BDADDR_ANY))
- 			break;
+ 			return c;
  	}
- 
+ 	return NULL;
 -- 
 1.7.9.5
 
