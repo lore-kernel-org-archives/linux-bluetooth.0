@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v2 4/8] Bluetooth: Add chan->ops->defer()
-Date: Thu, 11 Oct 2012 14:51:47 +0800
-Message-Id: <1349938311-25101-4-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v2 3/8] Bluetooth: Remove parent socket usage from l2cap_core.c
+Date: Thu, 11 Oct 2012 14:51:46 +0800
+Message-Id: <1349938311-25101-3-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1349938311-25101-1-git-send-email-gustavo@padovan.org>
 References: <1349938311-25101-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,128 +12,113 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-When DEFER_SETUP is set defer() will trigger an authorization
-request to the userspace.
+We can lock the parent lock only inside the new_connection() call,
+then we just use the l2cap_chan_lock() in core code.
 
 Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 ---
- include/net/bluetooth/l2cap.h |  5 +++++
- net/bluetooth/a2mp.c          |  1 +
- net/bluetooth/l2cap_core.c    | 10 +++-------
- net/bluetooth/l2cap_sock.c    | 13 +++++++++++++
- 4 files changed, 22 insertions(+), 7 deletions(-)
+ net/bluetooth/l2cap_core.c | 16 ++++++----------
+ net/bluetooth/l2cap_sock.c |  9 ++++++++-
+ 2 files changed, 14 insertions(+), 11 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index caab98c..6e23afd 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -541,6 +541,7 @@ struct l2cap_ops {
- 	void			(*state_change) (struct l2cap_chan *chan,
- 						 int state);
- 	void			(*ready) (struct l2cap_chan *chan);
-+	void			(*defer) (struct l2cap_chan *chan);
- 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
- 					       unsigned long len, int nb);
- };
-@@ -748,6 +749,10 @@ static inline void l2cap_chan_no_ready(struct l2cap_chan *chan)
- {
- }
- 
-+static inline void l2cap_chan_no_defer(struct l2cap_chan *chan)
-+{
-+}
-+
- extern bool disable_ertm;
- 
- int l2cap_init_sockets(void);
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 3ff4dc9..7bf9a10 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -699,6 +699,7 @@ static struct l2cap_ops a2mp_chan_ops = {
- 	.new_connection = l2cap_chan_no_new_connection,
- 	.teardown = l2cap_chan_no_teardown,
- 	.ready = l2cap_chan_no_ready,
-+	.defer = l2cap_chan_no_defer,
- };
- 
- static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn, bool locked)
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 91d312b..a2f945d 100644
+index e10a1a3..91d312b 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1123,11 +1123,9 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 				lock_sock(sk);
- 				if (test_bit(BT_SK_DEFER_SETUP,
- 					     &bt_sk(sk)->flags)) {
--					struct sock *parent = bt_sk(sk)->parent;
- 					rsp.result = __constant_cpu_to_le16(L2CAP_CR_PEND);
- 					rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
--					if (parent)
--						parent->sk_data_ready(parent, 0);
-+					chan->ops->defer(chan);
+@@ -1206,7 +1206,7 @@ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid,
  
- 				} else {
- 					__l2cap_state_change(chan, BT_CONFIG);
-@@ -3459,7 +3457,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn,
- 				__l2cap_state_change(chan, BT_CONNECT2);
- 				result = L2CAP_CR_PEND;
- 				status = L2CAP_CS_AUTHOR_PEND;
--				parent->sk_data_ready(parent, 0);
-+				chan->ops->defer(chan);
- 			} else {
- 				__l2cap_state_change(chan, BT_CONFIG);
- 				result = L2CAP_CR_SUCCESS;
-@@ -5520,11 +5518,9 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 			if (!status) {
- 				if (test_bit(BT_SK_DEFER_SETUP,
- 					     &bt_sk(sk)->flags)) {
--					struct sock *parent = bt_sk(sk)->parent;
- 					res = L2CAP_CR_PEND;
- 					stat = L2CAP_CS_AUTHOR_PEND;
--					if (parent)
--						parent->sk_data_ready(parent, 0);
-+					chan->ops->defer(chan);
- 				} else {
- 					__l2cap_state_change(chan, BT_CONFIG);
- 					res = L2CAP_CR_SUCCESS;
+ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ {
+-	struct sock *parent, *sk;
++	struct sock *sk;
+ 	struct l2cap_chan *chan, *pchan;
+ 
+ 	BT_DBG("");
+@@ -1217,9 +1217,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 	if (!pchan)
+ 		return;
+ 
+-	parent = pchan->sk;
+-
+-	lock_sock(parent);
++	l2cap_chan_lock(pchan);
+ 
+ 	chan = pchan->ops->new_connection(pchan);
+ 	if (!chan)
+@@ -1238,7 +1236,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 	l2cap_chan_ready(chan);
+ 
+ clean:
+-	release_sock(parent);
++	l2cap_chan_unlock(pchan);
+ }
+ 
+ static void l2cap_conn_ready(struct l2cap_conn *conn)
+@@ -3402,7 +3400,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn,
+ 	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
+ 	struct l2cap_conn_rsp rsp;
+ 	struct l2cap_chan *chan = NULL, *pchan;
+-	struct sock *parent, *sk = NULL;
++	struct sock *sk = NULL;
+ 	int result, status = L2CAP_CS_NO_INFO;
+ 
+ 	u16 dcid = 0, scid = __le16_to_cpu(req->scid);
+@@ -3417,10 +3415,8 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn,
+ 		goto sendresp;
+ 	}
+ 
+-	parent = pchan->sk;
+-
+ 	mutex_lock(&conn->chan_lock);
+-	lock_sock(parent);
++	l2cap_chan_lock(pchan);
+ 
+ 	/* Check if the ACL is secure enough (if not SDP) */
+ 	if (psm != __constant_cpu_to_le16(L2CAP_PSM_SDP) &&
+@@ -3481,7 +3477,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn,
+ 	}
+ 
+ response:
+-	release_sock(parent);
++	l2cap_chan_unlock(pchan);
+ 	mutex_unlock(&conn->chan_lock);
+ 
+ sendresp:
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 45c81e1..efcb914 100644
+index d5093b8..45c81e1 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -956,6 +956,7 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+@@ -934,16 +934,21 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+ {
+ 	struct sock *sk, *parent = chan->data;
+ 
++	lock_sock(parent);
++
+ 	/* Check for backlog size */
+ 	if (sk_acceptq_is_full(parent)) {
+ 		BT_DBG("backlog full %d", parent->sk_ack_backlog);
++		release_sock(parent);
+ 		return NULL;
+ 	}
+ 
+ 	sk = l2cap_sock_alloc(sock_net(parent), NULL, BTPROTO_L2CAP,
+ 			      GFP_ATOMIC);
+-	if (!sk)
++	if (!sk) {
++		release_sock(parent);
+ 		return NULL;
++	}
+ 
+ 	bt_sock_reclassify_lock(sk, BTPROTO_L2CAP);
+ 
+@@ -951,6 +956,8 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
  
  	bt_accept_enqueue(parent, sk);
  
++	release_sock(parent);
 +
- 	release_sock(parent);
- 
  	return l2cap_pi(sk)->chan;
-@@ -1088,6 +1089,17 @@ static void l2cap_sock_ready_cb(struct l2cap_chan *chan)
- 	release_sock(sk);
  }
- 
-+static void l2cap_sock_defer_cb(struct l2cap_chan *chan)
-+{
-+	struct sock *sk = chan->data;
-+	struct sock *parent;
-+
-+	parent = bt_sk(sk)->parent;
-+
-+	if (parent)
-+		parent->sk_data_ready(parent, 0);
-+}
-+
- static struct l2cap_ops l2cap_chan_ops = {
- 	.name		= "L2CAP Socket Interface",
- 	.new_connection	= l2cap_sock_new_connection_cb,
-@@ -1096,6 +1108,7 @@ static struct l2cap_ops l2cap_chan_ops = {
- 	.teardown	= l2cap_sock_teardown_cb,
- 	.state_change	= l2cap_sock_state_change_cb,
- 	.ready		= l2cap_sock_ready_cb,
-+	.defer		= l2cap_sock_defer_cb,
- 	.alloc_skb	= l2cap_sock_alloc_skb_cb,
- };
  
 -- 
 1.7.11.4
