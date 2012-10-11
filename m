@@ -1,60 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1349963810.27233.178.camel@aeonflux>
-References: <1349887169-20880-1-git-send-email-s.syam@samsung.com>
-	<1349891245.27233.153.camel@aeonflux>
-	<E3660838E8D64186924BA81A32F30682@sisodomain.com>
-	<1349963810.27233.178.camel@aeonflux>
-Date: Thu, 11 Oct 2012 16:29:26 +0200
-Message-ID: <CABBYNZ+rGP0cirHDexU49+SJnSn2hRd+GVH0sVOFU53DfNnq0g@mail.gmail.com>
-Subject: Re: [PATCH 1/4] Bluetooth: Fix L2CAP PSM bind issue
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Syam Sidhardhan <s.syam@samsung.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: SMP: Fix setting unknown auth_req bits
+Date: Thu, 11 Oct 2012 16:26:06 +0200
+Message-Id: <1349965566-29482-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Thu, Oct 11, 2012 at 3:56 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Syam,
->
->> >> Problem: If we bind a particular PSM with source address as BDADDR_ANY,
->> >> then we are able to bind the same PSM with adapter address(or any other
->> >> address), which is incorrect.
->> >
->> > why is this incorrect? Explain that to me.
->> >
->>
->> Here there is a correction required in the commit message.
->>
->> As per my understanding the a particular PSM can be binded only once
->> for a single adapter address. Kindly correct me if I'm wrong here.
->
-> a PSM can be bound once per adapter address. And of course once per
-> BDADDR_ANY.
->
-> So you can bind PSM 23 to BDADDR_ANY and 11:22:33:44:55:66. An incoming
-> connection to 11:22:33:44:55:66 will arrive to that specific socket, but
-> an incoming to all others will be handled by the BDADDR_ANY.
->
-> The BDADDR_ANY is special. Consider it a wildcard bound with lower
-> priority. If overwritten with a specific address bound, that will be
-> considered first of course.
->
-> If we are not doing it that way, than that is a bug.
->
-> Outgoing connections should behave the same btw. If a specific address
-> is bound, than that will be used. If not available, then you can not
-> connect. If BDADDR_ANY is used, then the next available adapter will be
-> used.
+When sending a pairing request or response we should not just blindly
+copy the value that the remote device sent. Instead we should at least
+make sure to mask out any unknown bits. This is particularly critical
+from the upcoming LE Secure Connections feature perspective as
+incorrectly indicating support for it (by copying the remote value)
+would cause a failure to pair with devices that support it.
 
-The real problem is by giving psm 0 the kernel should return the first
-available psm in the non-reserved space, but since we reuse the same
-code to do the matching it end up given both obexd and hdp the same
-psm, IMO in this case we should consider using Syam code and not
-__l2cap_global_chan_by_addr as the userspace is probably asking for a
-psm not in use which should  exclude those in use by BDADDR_ANY.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Cc: stable@kernel.org
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/smp.c |    6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 9b54fea..9176bc1 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -32,6 +32,8 @@
+ 
+ #define SMP_TIMEOUT	msecs_to_jiffies(30000)
+ 
++#define AUTH_REQ_MASK   0x07
++
+ static inline void swap128(u8 src[16], u8 dst[16])
+ {
+ 	int i;
+@@ -230,7 +232,7 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
+ 		req->max_key_size = SMP_MAX_ENC_KEY_SIZE;
+ 		req->init_key_dist = 0;
+ 		req->resp_key_dist = dist_keys;
+-		req->auth_req = authreq;
++		req->auth_req = (authreq & AUTH_REQ_MASK);
+ 		return;
+ 	}
+ 
+@@ -239,7 +241,7 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
+ 	rsp->max_key_size = SMP_MAX_ENC_KEY_SIZE;
+ 	rsp->init_key_dist = 0;
+ 	rsp->resp_key_dist = req->resp_key_dist & dist_keys;
+-	rsp->auth_req = authreq;
++	rsp->auth_req = (authreq & AUTH_REQ_MASK);
+ }
+ 
+ static u8 check_enc_key_size(struct l2cap_conn *conn, __u8 max_key_size)
 -- 
-Luiz Augusto von Dentz
+1.7.10.4
+
