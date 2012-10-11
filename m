@@ -1,60 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 11 Oct 2012 14:36:54 +0800
 From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v2 2/8] Bluetooth: Move bt_accept_enqueue() to l2cap_sock.c
-Date: Thu, 11 Oct 2012 14:51:45 +0800
-Message-Id: <1349938311-25101-2-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1349938311-25101-1-git-send-email-gustavo@padovan.org>
-References: <1349938311-25101-1-git-send-email-gustavo@padovan.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv1 6/6] Bluetooth: AMP: Hanlde AMP_LINK case in conn_put
+Message-ID: <20121011063654.GC15051@joana>
+References: <1349707932-10006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1349879912-23633-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1349879912-23633-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1349879912-23633-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Hi Andrei,
 
-This is move the parent socket usage to l2cap_sock.c
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-10-10 17:38:31 +0300]:
 
-Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
----
- net/bluetooth/l2cap_core.c | 4 ----
- net/bluetooth/l2cap_sock.c | 2 ++
- 2 files changed, 2 insertions(+), 4 deletions(-)
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Handle AMP link when setting up disconnect timeout.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  include/net/bluetooth/hci_core.h |   17 ++++++++++++++---
+>  1 file changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b382631..e10a1a3 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1233,8 +1233,6 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
- 	bacpy(&bt_sk(sk)->src, conn->src);
- 	bacpy(&bt_sk(sk)->dst, conn->dst);
- 
--	bt_accept_enqueue(parent, sk);
--
- 	l2cap_chan_add(conn, chan);
- 
- 	l2cap_chan_ready(chan);
-@@ -3451,8 +3449,6 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn,
- 	chan->psm  = psm;
- 	chan->dcid = scid;
- 
--	bt_accept_enqueue(parent, sk);
--
- 	__l2cap_chan_add(conn, chan);
- 
- 	dcid = chan->scid;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index f95fc7e..d5093b8 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -949,6 +949,8 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
- 
- 	l2cap_sock_init(sk, parent);
- 
-+	bt_accept_enqueue(parent, sk);
-+
- 	return l2cap_pi(sk)->chan;
- }
- 
--- 
-1.7.11.4
+All 6 patches have been applied to bluetooth-next. Thanks.
 
+	Gustavo
