@@ -1,50 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Oct 2012 16:24:30 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis@linux.intel.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 01/10] doc: Add settings storage documentation
-Message-ID: <20121011142430.GA29271@x220.example.org>
-References: <1349878219-14359-1-git-send-email-frederic.danis@linux.intel.com>
- <1349878219-14359-2-git-send-email-frederic.danis@linux.intel.com>
- <1349890310.27233.140.camel@aeonflux>
- <20121010184103.GA23441@x220.ger.corp.intel.com>
- <1349962908.27233.164.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1349962908.27233.164.camel@aeonflux>
+Message-ID: <1349963810.27233.178.camel@aeonflux>
+Subject: Re: [PATCH 1/4] Bluetooth: Fix L2CAP PSM bind issue
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Syam Sidhardhan <s.syam@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 11 Oct 2012 15:56:50 +0200
+In-Reply-To: <E3660838E8D64186924BA81A32F30682@sisodomain.com>
+References: <1349887169-20880-1-git-send-email-s.syam@samsung.com>
+	 <1349891245.27233.153.camel@aeonflux>
+	 <E3660838E8D64186924BA81A32F30682@sisodomain.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Syam,
 
-On Thu, Oct 11, 2012, Marcel Holtmann wrote:
-> > > > +  Features=0000000000000000
-> > > > +  AddressType=<BR/EDR|LE>
-> > > > +  LEAddressType=<public|random>
-> > > 
-> > > That is not needed. It is encoded in the address itself.
-> > 
-> > Not quite true. You cannot distinguish between public and random. But
-> > once you do know that it's random you *can* figure out what kind of
-> > random it is from the two most significant bits of the address.
-> > 
-> > What we discussed on #bluez was that this could simply be a reference to
-> > what address is indicated by the directory (or filename, if that's what
-> > we go with) for the device storage, e.g. AddressType=<static|public> and
-> > for private resolvable addresses (for which we'd have the public address
-> > in storage) we'd need to check if we have any IRK's to know if we need
-> > to look for a private address to connect to them. Additionally we could
-> > have a SupportedTechnologies list like "BR/EDR,LE", "LE", etc (feel free
-> > to suggest a better name if you want).
+> >> Problem: If we bind a particular PSM with source address as BDADDR_ANY,
+> >> then we are able to bind the same PSM with adapter address(or any other
+> >> address), which is incorrect.
+> >
+> > why is this incorrect? Explain that to me.
+> >
 > 
-> Since we will not store private random addresses, and we turn static
-> random addresses into a cache. So why do we still need this?
+> Here there is a correction required in the commit message.
+> 
+> As per my understanding the a particular PSM can be binded only once
+> for a single adapter address. Kindly correct me if I'm wrong here.
 
-We will need to store exactly the same information for static random
-addresses as for public ones, and not just the "core" data but also
-profile-specific data. So why would you want to do it in two different
-ways? Sounds like that just complicates the implementation for no
-particular gain.
+a PSM can be bound once per adapter address. And of course once per
+BDADDR_ANY.
 
-Johan
+So you can bind PSM 23 to BDADDR_ANY and 11:22:33:44:55:66. An incoming
+connection to 11:22:33:44:55:66 will arrive to that specific socket, but
+an incoming to all others will be handled by the BDADDR_ANY.
+
+The BDADDR_ANY is special. Consider it a wildcard bound with lower
+priority. If overwritten with a specific address bound, that will be
+considered first of course.
+
+If we are not doing it that way, than that is a bug.
+
+Outgoing connections should behave the same btw. If a specific address
+is bound, than that will be used. If not available, then you can not
+connect. If BDADDR_ANY is used, then the next available adapter will be
+used.
+
+Regards
+
+Marcel
+
+
