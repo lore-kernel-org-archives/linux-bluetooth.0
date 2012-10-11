@@ -1,64 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 12 Oct 2012 10:25:15 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 1/6] Bluetooth: Add new l2cap_chan struct members for high
- speed channels
-Message-ID: <20121012072513.GB28051@aemeltch-MOBL1>
-References: <1349966905-32336-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <alpine.DEB.2.02.1210110858010.26189@mathewm-linux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.DEB.2.02.1210110858010.26189@mathewm-linux>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ] input: Convert to DBus.Properties
+Date: Thu, 11 Oct 2012 15:57:48 -0300
+Message-Id: <1349981868-1263-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+---
+ profiles/input/device.c | 44 +++++++++++++-------------------------------
+ 1 file changed, 13 insertions(+), 31 deletions(-)
 
-On Thu, Oct 11, 2012 at 08:58:40AM -0700, Mat Martineau wrote:
-> 
-> Andrei -
-> 
-> On Thu, 11 Oct 2012, Andrei Emeltchenko wrote:
-> 
-> >From: Mat Martineau <mathewm@codeaurora.org>
-> >
-> >An L2CAP channel using high speed continues to be associated with a
-> >BR/EDR l2cap_conn, while also tracking an additional hci_conn
-> >(representing a physical link on a high speed controller) and hci_chan
-> >(representing a logical link).  There may only be one physical link
-> >between two high speed controllers.  Each physical link may contain
-> >several logical links, with each logical link representing a channel
-> >with specific quality of service.
-> >
-> >During a channel move, the destination channel id, current move state,
-> >and role (initiator vs. responder) are tracked and used by the channel
-> >move state machine.  The ident value associated with a move request
-> >must also be stored in order to use it in later move responses.
-> >
-> >The active channel is stored in local_amp_id.
-> >
-> >Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> >Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> >---
-> >include/net/bluetooth/l2cap.h |   29 +++++++++++++++++++++++++++++
-> >net/bluetooth/l2cap_core.c    |    5 +++++
-> >2 files changed, 34 insertions(+)
-> 
-> Did you have to do anything other than rebase these 6 patches?
-
-I would wish to, but I am stuck with dependencies :(
-
-At least I need chan pointers to hs_hchan and hs_hcon ...
-
-Best regards 
-Andrei Emeltchenko 
-
-> I can post a PATCHv1 set tomorrow or Monday.
-
-This sounds good. I will also send my patches later today.
-
-Best regards 
-Andrei Emeltchenko 
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index 92e1fa9..997235b 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -729,33 +729,18 @@ static void device_unregister(void *data)
+ 	input_device_free(idev);
+ }
+ 
+-static DBusMessage *input_device_get_properties(DBusConnection *conn,
+-					DBusMessage *msg, void *data)
+-{
+-	struct input_device *idev = data;
+-	DBusMessage *reply;
+-	DBusMessageIter iter;
+-	DBusMessageIter dict;
+-	dbus_bool_t connected;
+ 
+-	reply = dbus_message_new_method_return(msg);
+-	if (!reply)
+-		return NULL;
+ 
+-	dbus_message_iter_init_append(reply, &iter);
+-
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+-
+-	/* Connected */
+-	connected = is_connected(idev);
+-	dict_append_entry(&dict, "Connected", DBUS_TYPE_BOOLEAN, &connected);
++static gboolean input_device_property_get_connected(
++					const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct input_device *idev = data;
++	dbus_bool_t connected = is_connected(idev);
+ 
+-	dbus_message_iter_close_container(&iter, &dict);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &connected);
+ 
+-	return reply;
++	return TRUE;
+ }
+ 
+ static const GDBusMethodTable device_methods[] = {
+@@ -763,15 +748,11 @@ static const GDBusMethodTable device_methods[] = {
+ 				NULL, NULL, local_connect) },
+ 	{ GDBUS_METHOD("Disconnect",
+ 				NULL, NULL, input_device_disconnect) },
+-	{ GDBUS_METHOD("GetProperties",
+-			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
+-			input_device_get_properties) },
+ 	{ }
+ };
+ 
+-static const GDBusSignalTable device_signals[] = {
+-	{ GDBUS_SIGNAL("PropertyChanged",
+-			GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
++static const GDBusPropertyTable device_properties[] = {
++	{ "Connected", "b", input_device_property_get_connected },
+ 	{ }
+ };
+ 
+@@ -800,8 +781,9 @@ static struct input_device *input_device_new(struct btd_device *device,
+ 
+ 	if (g_dbus_register_interface(btd_get_dbus_connection(),
+ 					idev->path, INPUT_DEVICE_INTERFACE,
+-					device_methods, device_signals, NULL,
+-					idev, device_unregister) == FALSE) {
++					device_methods, NULL,
++					device_properties, idev,
++					device_unregister) == FALSE) {
+ 		error("Failed to register interface %s on path %s",
+ 			INPUT_DEVICE_INTERFACE, path);
+ 		input_device_free(idev);
+-- 
+1.7.12.2
 
