@@ -4,109 +4,133 @@ From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ 2/2] hog: Fix requested range for descriptor discovery
-Date: Thu, 11 Oct 2012 02:31:23 -0300
-Message-Id: <1349933483-10436-2-git-send-email-jprvita@openbossa.org>
-In-Reply-To: <1349933483-10436-1-git-send-email-jprvita@openbossa.org>
-References: <1349933483-10436-1-git-send-email-jprvita@openbossa.org>
+Subject: [PATCH BlueZ 1/2] hog: Fix characteristic descriptor discovery
+Date: Thu, 11 Oct 2012 02:31:22 -0300
+Message-Id: <1349933483-10436-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When discovering descriptors of the last characteristic of a service the
-discovery range was exceeding the service limits. This commit keeps the
-discovery within the limits of the HoG service.
+The discover descriptors sub-procedure is complete when the error
+response is received and the error code is set to "Attribute Not Found"
+or the find information response has an attribute handle that is equal
+to the last handle in the request. This commit fixes the stop condition
+for characteristic descriptor discovery.
 ---
- profiles/input/hog_device.c | 23 ++++++++++++++---------
- 1 file changed, 14 insertions(+), 9 deletions(-)
+ profiles/input/hog_device.c | 46 ++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 37 insertions(+), 9 deletions(-)
 
 diff --git a/profiles/input/hog_device.c b/profiles/input/hog_device.c
-index a25b8c2..1694b32 100644
+index a8cc568..a25b8c2 100644
 --- a/profiles/input/hog_device.c
 +++ b/profiles/input/hog_device.c
-@@ -271,15 +271,11 @@ done:
- 		g_free(ddcb_data);
+@@ -96,6 +96,11 @@ struct report {
+ 	struct hog_device	*hogdev;
+ };
+ 
++struct disc_desc_cb_data {
++	uint16_t end;
++	gpointer data;
++};
++
+ static gint report_handle_cmp(gconstpointer a, gconstpointer b)
+ {
+ 	const struct report *report = a;
+@@ -199,16 +204,25 @@ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
+ static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
+ 					guint16 len, gpointer user_data)
+ {
++	struct disc_desc_cb_data *ddcb_data = user_data;
+ 	struct report *report;
+ 	struct hog_device *hogdev;
+-	struct att_data_list *list;
++	struct att_data_list *list = NULL;
++	GAttrib *attrib = NULL;
+ 	uint8_t format;
++	uint16_t handle = 0xffff;
++	uint16_t end = ddcb_data->end;
+ 	int i;
+ 
++	if (status == ATT_ECODE_ATTR_NOT_FOUND) {
++		DBG("Discover all characteristic descriptors finished");
++		goto done;
++	}
++
+ 	if (status != 0) {
+ 		error("Discover all characteristic descriptors failed: %s",
+ 							att_ecode2str(status));
+-		return;
++		goto done;
+ 	}
+ 
+ 	list = dec_find_info_resp(pdu, len, &format);
+@@ -219,7 +233,7 @@ static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
+ 		goto done;
+ 
+ 	for (i = 0; i < list->num; i++) {
+-		uint16_t uuid16, handle;
++		uint16_t uuid16;
+ 		uint8_t *value;
+ 
+ 		value = list->data[i];
+@@ -228,17 +242,20 @@ static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
+ 
+ 		switch (uuid16) {
+ 		case GATT_CLIENT_CHARAC_CFG_UUID:
+-			report = user_data;
++			report = ddcb_data->data;
++			attrib = report->hogdev->attrib;
+ 			write_ccc(handle, report->hogdev);
+ 			break;
+ 		case GATT_REPORT_REFERENCE:
+-			report = user_data;
+-			gatt_read_char(report->hogdev->attrib, handle,
++			report = ddcb_data->data;
++			attrib = report->hogdev->attrib;
++			gatt_read_char(attrib, handle,
+ 						report_reference_cb, report);
+ 			break;
+ 		case GATT_EXTERNAL_REPORT_REFERENCE:
+-			hogdev = user_data;
+-			gatt_read_char(hogdev->attrib, handle,
++			hogdev = ddcb_data->data;
++			attrib = hogdev->attrib;
++			gatt_read_char(attrib, handle,
+ 					external_report_reference_cb, hogdev);
+ 			break;
+ 		}
+@@ -246,12 +263,19 @@ static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
+ 
+ done:
+ 	att_data_list_free(list);
++
++	if (handle != 0xffff && handle < end)
++		gatt_find_info(attrib, handle + 1, end, discover_descriptor_cb,
++								ddcb_data);
++	else
++		g_free(ddcb_data);
  }
  
--static void discover_descriptor(GAttrib *attrib, struct gatt_char *chr,
--				struct gatt_char *next, gpointer user_data)
-+static void discover_descriptor(GAttrib *attrib, uint16_t start, uint16_t end,
-+							gpointer user_data)
+ static void discover_descriptor(GAttrib *attrib, struct gatt_char *chr,
+ 				struct gatt_char *next, gpointer user_data)
  {
--	uint16_t start, end;
- 	struct disc_desc_cb_data *ddcb_data;
+ 	uint16_t start, end;
++	struct disc_desc_cb_data *ddcb_data;
  
--	start = chr->value_handle + 1;
--	end = (next ? next->handle - 1 : 0xffff);
--
+ 	start = chr->value_handle + 1;
+ 	end = (next ? next->handle - 1 : 0xffff);
+@@ -259,7 +283,11 @@ static void discover_descriptor(GAttrib *attrib, struct gatt_char *chr,
  	if (start > end)
  		return;
  
-@@ -294,6 +290,7 @@ static void external_service_char_cb(GSList *chars, guint8 status,
- 							gpointer user_data)
- {
- 	struct hog_device *hogdev = user_data;
-+	struct gatt_primary *prim = hogdev->hog_primary;
- 	struct report *report;
- 	GSList *l;
- 
-@@ -305,6 +302,7 @@ static void external_service_char_cb(GSList *chars, guint8 status,
- 
- 	for (l = chars; l; l = g_slist_next(l)) {
- 		struct gatt_char *chr, *next;
-+		uint16_t start, end;
- 
- 		chr = l->data;
- 		next = l->next ? l->next->data : NULL;
-@@ -316,7 +314,9 @@ static void external_service_char_cb(GSList *chars, guint8 status,
- 		report->hogdev = hogdev;
- 		report->decl = g_memdup(chr, sizeof(*chr));
- 		hogdev->reports = g_slist_append(hogdev->reports, report);
--		discover_descriptor(hogdev->attrib, chr, next, report);
-+		start = chr->value_handle + 1;
-+		end = (next ? next->handle - 1 : prim->range.end);
-+		discover_descriptor(hogdev->attrib, start, end, report);
- 	}
+-	gatt_find_info(attrib, start, end, discover_descriptor_cb, user_data);
++	ddcb_data = g_new0(struct disc_desc_cb_data, 1);
++	ddcb_data->end = end;
++	ddcb_data->data = user_data;
++
++	gatt_find_info(attrib, start, end, discover_descriptor_cb, ddcb_data);
  }
  
-@@ -469,6 +469,7 @@ static void proto_mode_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
- {
- 	struct hog_device *hogdev = user_data;
-+	struct gatt_primary *prim = hogdev->hog_primary;
- 	bt_uuid_t report_uuid, report_map_uuid, info_uuid, proto_mode_uuid,
- 		  ctrlpt_uuid;
- 	struct report *report;
-@@ -490,6 +491,7 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
- 	for (l = chars; l; l = g_slist_next(l)) {
- 		struct gatt_char *chr, *next;
- 		bt_uuid_t uuid;
-+		uint16_t start, end;
- 
- 		chr = l->data;
- 		next = l->next ? l->next->data : NULL;
-@@ -499,17 +501,20 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
- 
- 		bt_string_to_uuid(&uuid, chr->uuid);
- 
-+		start = chr->value_handle + 1;
-+		end = (next ? next->handle - 1 : prim->range.end);
-+
- 		if (bt_uuid_cmp(&uuid, &report_uuid) == 0) {
- 			report = g_new0(struct report, 1);
- 			report->hogdev = hogdev;
- 			report->decl = g_memdup(chr, sizeof(*chr));
- 			hogdev->reports = g_slist_append(hogdev->reports,
- 								report);
--			discover_descriptor(hogdev->attrib, chr, next, report);
-+			discover_descriptor(hogdev->attrib, start, end, report);
- 		} else if (bt_uuid_cmp(&uuid, &report_map_uuid) == 0) {
- 			gatt_read_char(hogdev->attrib, chr->value_handle,
- 						report_map_read_cb, hogdev);
--			discover_descriptor(hogdev->attrib, chr, next, hogdev);
-+			discover_descriptor(hogdev->attrib, start, end, hogdev);
- 		} else if (bt_uuid_cmp(&uuid, &info_uuid) == 0)
- 			info_handle = chr->value_handle;
- 		else if (bt_uuid_cmp(&uuid, &proto_mode_uuid) == 0)
+ static void external_service_char_cb(GSList *chars, guint8 status,
 -- 
 1.7.11.4
 
