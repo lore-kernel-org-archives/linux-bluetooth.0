@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v2 7/8] Bluetooth: Use locked l2cap_state_change()
-Date: Thu, 11 Oct 2012 14:51:50 +0800
-Message-Id: <1349938311-25101-7-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v2 6/8] Bluetooth: use l2cap_chan_set_err()
+Date: Thu, 11 Oct 2012 14:51:49 +0800
+Message-Id: <1349938311-25101-6-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1349938311-25101-1-git-send-email-gustavo@padovan.org>
 References: <1349938311-25101-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,7 +12,8 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-No one was protecting the state set in l2cap_send_disconn_req()
+l2cap_conn_unreliable() doesn't take the sk lock, so we need to take it
+using l2cap_chan_set_err().
 
 Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 ---
@@ -20,18 +21,18 @@ Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index bf089ae..4c83157 100644
+index 2cad770..bf089ae 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1062,7 +1062,7 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
+@@ -1293,7 +1293,7 @@ static void l2cap_conn_unreliable(struct l2cap_conn *conn, int err)
+ 
+ 	list_for_each_entry(chan, &conn->chan_l, list) {
+ 		if (test_bit(FLAG_FORCE_RELIABLE, &chan->flags))
+-			__l2cap_chan_set_err(chan, err);
++			l2cap_chan_set_err(chan, err);
  	}
  
- 	if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP) {
--		__l2cap_state_change(chan, BT_DISCONN);
-+		l2cap_state_change(chan, BT_DISCONN);
- 		return;
- 	}
- 
+ 	mutex_unlock(&conn->chan_lock);
 -- 
 1.7.11.4
 
