@@ -1,32 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Oct 2012 14:36:54 +0800
+Date: Thu, 11 Oct 2012 14:27:07 +0800
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Syam Sidhardhan <s.syam@samsung.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv1 6/6] Bluetooth: AMP: Hanlde AMP_LINK case in conn_put
-Message-ID: <20121011063654.GC15051@joana>
-References: <1349707932-10006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1349879912-23633-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1349879912-23633-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH 4/4] Bluetooth: Use __constant modifier for RFCOMM PSM
+Message-ID: <20121011062707.GB15051@joana>
+References: <1349887169-20880-1-git-send-email-s.syam@samsung.com>
+ <1349887169-20880-4-git-send-email-s.syam@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1349879912-23633-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1349887169-20880-4-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Syam,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-10-10 17:38:31 +0300]:
+* Syam Sidhardhan <s.syam@samsung.com> [2012-10-10 22:09:29 +0530]:
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Since the RFCOMM_PSM is constant, __constant_cpu_to_le16() is
+> the right go here.
 > 
-> Handle AMP link when setting up disconnect timeout.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
 > ---
->  include/net/bluetooth/hci_core.h |   17 ++++++++++++++---
->  1 file changed, 14 insertions(+), 3 deletions(-)
+>  net/bluetooth/rfcomm/core.c |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-All 6 patches have been applied to bluetooth-next. Thanks.
+Patch 3 and 4 have been applied to bluetooth-next. Thanks.
 
 	Gustavo
