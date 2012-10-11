@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1349963540.27233.173.camel@aeonflux>
-Subject: Re: [PATCH -v2 7/8] Bluetooth: Use locked l2cap_state_change()
+Message-ID: <1349963512.27233.172.camel@aeonflux>
+Subject: Re: [PATCH -v2 6/8] Bluetooth: use l2cap_chan_set_err()
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Gustavo Padovan <gustavo@padovan.org>
 Cc: linux-bluetooth@vger.kernel.org,
 	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Date: Thu, 11 Oct 2012 15:52:20 +0200
-In-Reply-To: <1349938311-25101-7-git-send-email-gustavo@padovan.org>
+Date: Thu, 11 Oct 2012 15:51:52 +0200
+In-Reply-To: <1349938311-25101-6-git-send-email-gustavo@padovan.org>
 References: <1349938311-25101-1-git-send-email-gustavo@padovan.org>
-	 <1349938311-25101-7-git-send-email-gustavo@padovan.org>
+	 <1349938311-25101-6-git-send-email-gustavo@padovan.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,7 +16,8 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Gustavo,
 
-> No one was protecting the state set in l2cap_send_disconn_req()
+> l2cap_conn_unreliable() doesn't take the sk lock, so we need to take it
+> using l2cap_chan_set_err().
 > 
 > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 > ---
