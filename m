@@ -1,30 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Oct 2012 14:27:07 +0800
+Date: Thu, 11 Oct 2012 14:22:16 +0800
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Syam Sidhardhan <s.syam@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/4] Bluetooth: Use __constant modifier for RFCOMM PSM
-Message-ID: <20121011062707.GB15051@joana>
-References: <1349887169-20880-1-git-send-email-s.syam@samsung.com>
- <1349887169-20880-4-git-send-email-s.syam@samsung.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, bzhao@marvell.com
+Subject: Re: [PATCH] Bluetooth: btmrv: Use %*ph specifier instead of
+ print_hex_dump_bytes
+Message-ID: <20121011062216.GA15051@joana>
+References: <1349880093-23728-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1349887169-20880-4-git-send-email-s.syam@samsung.com>
+In-Reply-To: <1349880093-23728-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+Hi Andrei,
 
-* Syam Sidhardhan <s.syam@samsung.com> [2012-10-10 22:09:29 +0530]:
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-10-10 17:41:33 +0300]:
 
-> Since the RFCOMM_PSM is constant, __constant_cpu_to_le16() is
-> the right go here.
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+> Use standard print specifier and remove print_hex_dump_bytes call.
+> Makes output more sensible:
+> 
+> ...
+> [18809.401218] 00000000: 0b 00 00 fe 5b fc 01 f2 00 00 00    ....[......
+> ...
+> 
+> would be changed to
+> 
+> ...
+> [18809.401218] Bluetooth: hex: 0b 00 00 fe 5b fc 01 f2 00 00 00
+> ...
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  net/bluetooth/rfcomm/core.c |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  drivers/bluetooth/btmrvl_sdio.c |    6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
 
-Patch 3 and 4 have been applied to bluetooth-next. Thanks.
+Patch has been applied to bluetooth-next. Thanks.
 
 	Gustavo
