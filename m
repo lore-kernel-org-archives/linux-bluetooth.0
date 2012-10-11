@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v2 8/8] Bluetooth: Call ops->teardown() without checking for NULL
-Date: Thu, 11 Oct 2012 14:51:51 +0800
-Message-Id: <1349938311-25101-8-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v2 7/8] Bluetooth: Use locked l2cap_state_change()
+Date: Thu, 11 Oct 2012 14:51:50 +0800
+Message-Id: <1349938311-25101-7-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1349938311-25101-1-git-send-email-gustavo@padovan.org>
 References: <1349938311-25101-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,47 +12,26 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-Users that don't implement teardown() should use l2cap_chan_no_teardown()
+No one was protecting the state set in l2cap_send_disconn_req()
 
 Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 ---
- net/bluetooth/l2cap_core.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ net/bluetooth/l2cap_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 4c83157..c3a2c1c 100644
+index bf089ae..4c83157 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -542,8 +542,7 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 			hci_conn_put(conn->hcon);
+@@ -1062,7 +1062,7 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
  	}
  
--	if (chan->ops->teardown)
--		chan->ops->teardown(chan, err);
-+	chan->ops->teardown(chan, err);
- 
- 	if (test_bit(CONF_NOT_COMPLETE, &chan->conf_state))
+ 	if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP) {
+-		__l2cap_state_change(chan, BT_DISCONN);
++		l2cap_state_change(chan, BT_DISCONN);
  		return;
-@@ -582,8 +581,7 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
- 
- 	switch (chan->state) {
- 	case BT_LISTEN:
--		if (chan->ops->teardown)
--			chan->ops->teardown(chan, 0);
-+		chan->ops->teardown(chan, 0);
- 		break;
- 
- 	case BT_CONNECTED:
-@@ -625,8 +623,7 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
- 		break;
- 
- 	default:
--		if (chan->ops->teardown)
--			chan->ops->teardown(chan, 0);
-+		chan->ops->teardown(chan, 0);
- 		break;
  	}
- }
+ 
 -- 
 1.7.11.4
 
