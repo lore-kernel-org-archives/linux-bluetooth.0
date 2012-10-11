@@ -1,59 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 11 Oct 2012 16:24:30 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: SMP: Fix setting unknown auth_req bits
-Date: Thu, 11 Oct 2012 16:26:06 +0200
-Message-Id: <1349965566-29482-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis@linux.intel.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 01/10] doc: Add settings storage documentation
+Message-ID: <20121011142430.GA29271@x220.example.org>
+References: <1349878219-14359-1-git-send-email-frederic.danis@linux.intel.com>
+ <1349878219-14359-2-git-send-email-frederic.danis@linux.intel.com>
+ <1349890310.27233.140.camel@aeonflux>
+ <20121010184103.GA23441@x220.ger.corp.intel.com>
+ <1349962908.27233.164.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1349962908.27233.164.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Marcel,
 
-When sending a pairing request or response we should not just blindly
-copy the value that the remote device sent. Instead we should at least
-make sure to mask out any unknown bits. This is particularly critical
-from the upcoming LE Secure Connections feature perspective as
-incorrectly indicating support for it (by copying the remote value)
-would cause a failure to pair with devices that support it.
+On Thu, Oct 11, 2012, Marcel Holtmann wrote:
+> > > > +  Features=0000000000000000
+> > > > +  AddressType=<BR/EDR|LE>
+> > > > +  LEAddressType=<public|random>
+> > > 
+> > > That is not needed. It is encoded in the address itself.
+> > 
+> > Not quite true. You cannot distinguish between public and random. But
+> > once you do know that it's random you *can* figure out what kind of
+> > random it is from the two most significant bits of the address.
+> > 
+> > What we discussed on #bluez was that this could simply be a reference to
+> > what address is indicated by the directory (or filename, if that's what
+> > we go with) for the device storage, e.g. AddressType=<static|public> and
+> > for private resolvable addresses (for which we'd have the public address
+> > in storage) we'd need to check if we have any IRK's to know if we need
+> > to look for a private address to connect to them. Additionally we could
+> > have a SupportedTechnologies list like "BR/EDR,LE", "LE", etc (feel free
+> > to suggest a better name if you want).
+> 
+> Since we will not store private random addresses, and we turn static
+> random addresses into a cache. So why do we still need this?
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-Cc: stable@kernel.org
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/smp.c |    6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+We will need to store exactly the same information for static random
+addresses as for public ones, and not just the "core" data but also
+profile-specific data. So why would you want to do it in two different
+ways? Sounds like that just complicates the implementation for no
+particular gain.
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 9b54fea..9176bc1 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -32,6 +32,8 @@
- 
- #define SMP_TIMEOUT	msecs_to_jiffies(30000)
- 
-+#define AUTH_REQ_MASK   0x07
-+
- static inline void swap128(u8 src[16], u8 dst[16])
- {
- 	int i;
-@@ -230,7 +232,7 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
- 		req->max_key_size = SMP_MAX_ENC_KEY_SIZE;
- 		req->init_key_dist = 0;
- 		req->resp_key_dist = dist_keys;
--		req->auth_req = authreq;
-+		req->auth_req = (authreq & AUTH_REQ_MASK);
- 		return;
- 	}
- 
-@@ -239,7 +241,7 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
- 	rsp->max_key_size = SMP_MAX_ENC_KEY_SIZE;
- 	rsp->init_key_dist = 0;
- 	rsp->resp_key_dist = req->resp_key_dist & dist_keys;
--	rsp->auth_req = authreq;
-+	rsp->auth_req = (authreq & AUTH_REQ_MASK);
- }
- 
- static u8 check_enc_key_size(struct l2cap_conn *conn, __u8 max_key_size)
--- 
-1.7.10.4
-
+Johan
