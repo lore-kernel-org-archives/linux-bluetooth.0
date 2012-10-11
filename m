@@ -2,42 +2,37 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: mathewm@codeaurora.org
-Subject: [RFC 4/6] Bluetooth: Ignore BR/EDR packet size constraints when fragmenting for AMP
-Date: Thu, 11 Oct 2012 17:48:23 +0300
-Message-Id: <1349966905-32336-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC 6/6] Bluetooth: Fix error code byte order
+Date: Thu, 11 Oct 2012 17:48:25 +0300
+Message-Id: <1349966905-32336-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1349966905-32336-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1349966905-32336-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mat Martineau <mathewm@codeaurora.org>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When operating over BR/EDR, ERTM accounts for the maximum over-the-air
-packet size when setting the PDU size.  AMP controllers do not use the
-same over-the-air packets, so the PDU size should only be based on the
-HCI MTU of the AMP controller.
 
-Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |    4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ net/bluetooth/l2cap_core.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index d56cc57..e4de81c 100644
+index 62b1d3a..cefac95 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -2141,7 +2141,9 @@ static int l2cap_segment_sdu(struct l2cap_chan *chan,
- 	/* PDU size is derived from the HCI MTU */
- 	pdu_len = chan->conn->mtu;
+@@ -4057,8 +4057,8 @@ static int l2cap_create_channel_req(struct l2cap_conn *conn,
  
--	pdu_len = min_t(size_t, pdu_len, L2CAP_BREDR_MAX_PAYLOAD);
-+	/* Constrain PDU size for BR/EDR connections */
-+	if (!chan->hs_hcon)
-+		pdu_len = min_t(size_t, pdu_len, L2CAP_BREDR_MAX_PAYLOAD);
+ 			rsp.dcid = 0;
+ 			rsp.scid = cpu_to_le16(scid);
+-			rsp.result = L2CAP_CR_BAD_AMP;
+-			rsp.status = L2CAP_CS_NO_INFO;
++			rsp.result = __constant_cpu_to_le16(L2CAP_CR_BAD_AMP);
++			rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
  
- 	/* Adjust for largest possible L2CAP overhead. */
- 	if (chan->fcs)
+ 			l2cap_send_cmd(conn, cmd->ident, L2CAP_CREATE_CHAN_RSP,
+ 				       sizeof(rsp), &rsp);
 -- 
 1.7.9.5
 
