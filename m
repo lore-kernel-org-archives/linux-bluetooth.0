@@ -1,15 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1349963153.27233.167.camel@aeonflux>
-Subject: Re: [PATCH -v2 3/8] Bluetooth: Remove parent socket usage from
- l2cap_core.c
+Message-ID: <1349963078.27233.166.camel@aeonflux>
+Subject: Re: [PATCH -v2 2/8] Bluetooth: Move bt_accept_enqueue() to
+ l2cap_sock.c
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Gustavo Padovan <gustavo@padovan.org>
 Cc: linux-bluetooth@vger.kernel.org,
 	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Date: Thu, 11 Oct 2012 15:45:53 +0200
-In-Reply-To: <1349938311-25101-3-git-send-email-gustavo@padovan.org>
+Date: Thu, 11 Oct 2012 15:44:38 +0200
+In-Reply-To: <1349938311-25101-2-git-send-email-gustavo@padovan.org>
 References: <1349938311-25101-1-git-send-email-gustavo@padovan.org>
-	 <1349938311-25101-3-git-send-email-gustavo@padovan.org>
+	 <1349938311-25101-2-git-send-email-gustavo@padovan.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -17,19 +17,52 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Gustavo,
 
-> We can lock the parent lock only inside the new_connection() call,
-> then we just use the l2cap_chan_lock() in core code.
+> This is move the parent socket usage to l2cap_sock.c
 > 
 > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 > ---
->  net/bluetooth/l2cap_core.c | 16 ++++++----------
->  net/bluetooth/l2cap_sock.c |  9 ++++++++-
->  2 files changed, 14 insertions(+), 11 deletions(-)
+>  net/bluetooth/l2cap_core.c | 4 ----
+>  net/bluetooth/l2cap_sock.c | 2 ++
+>  2 files changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index b382631..e10a1a3 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1233,8 +1233,6 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+>  	bacpy(&bt_sk(sk)->src, conn->src);
+>  	bacpy(&bt_sk(sk)->dst, conn->dst);
+>  
+> -	bt_accept_enqueue(parent, sk);
+> -
+>  	l2cap_chan_add(conn, chan);
+>  
+>  	l2cap_chan_ready(chan);
+> @@ -3451,8 +3449,6 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn,
+>  	chan->psm  = psm;
+>  	chan->dcid = scid;
+>  
+> -	bt_accept_enqueue(parent, sk);
+> -
+>  	__l2cap_chan_add(conn, chan);
+>  
+>  	dcid = chan->scid;
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index f95fc7e..d5093b8 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -949,6 +949,8 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+>  
+>  	l2cap_sock_init(sk, parent);
+>  
+> +	bt_accept_enqueue(parent, sk);
+> +
+>  	return l2cap_pi(sk)->chan;
+>  }
+>  
 
-I am fine with this patch under the premise that 2/8 is properly
-explained. And here you need to also get into a bit more detail. With
-any kind of locking changes, I expect a proper commit message explaining
-why this is safe.
+and this has no side effect with adding during this window. Your commit
+message is not really explaining why this is fine. Please fix that.
 
 Regards
 
