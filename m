@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v2 5/8] Bluetooth: Remove GFP_ATOMIC usage from l2cap_core.c
-Date: Thu, 11 Oct 2012 14:51:48 +0800
-Message-Id: <1349938311-25101-5-git-send-email-gustavo@padovan.org>
+Subject: [PATCH -v2 4/8] Bluetooth: Add chan->ops->defer()
+Date: Thu, 11 Oct 2012 14:51:47 +0800
+Message-Id: <1349938311-25101-4-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1349938311-25101-1-git-send-email-gustavo@padovan.org>
 References: <1349938311-25101-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,75 +12,128 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-Since we change the Bluetooth core to run in process context we don't need
-to use GFP_ATOMIC in many of places we were using it. The we just replace
-by GFP_KERNEL.
+When DEFER_SETUP is set defer() will trigger an authorization
+request to the userspace.
 
 Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 ---
- net/bluetooth/l2cap_core.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ include/net/bluetooth/l2cap.h |  5 +++++
+ net/bluetooth/a2mp.c          |  1 +
+ net/bluetooth/l2cap_core.c    | 10 +++-------
+ net/bluetooth/l2cap_sock.c    | 13 +++++++++++++
+ 4 files changed, 22 insertions(+), 7 deletions(-)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index caab98c..6e23afd 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -541,6 +541,7 @@ struct l2cap_ops {
+ 	void			(*state_change) (struct l2cap_chan *chan,
+ 						 int state);
+ 	void			(*ready) (struct l2cap_chan *chan);
++	void			(*defer) (struct l2cap_chan *chan);
+ 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
+ 					       unsigned long len, int nb);
+ };
+@@ -748,6 +749,10 @@ static inline void l2cap_chan_no_ready(struct l2cap_chan *chan)
+ {
+ }
+ 
++static inline void l2cap_chan_no_defer(struct l2cap_chan *chan)
++{
++}
++
+ extern bool disable_ertm;
+ 
+ int l2cap_init_sockets(void);
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 3ff4dc9..7bf9a10 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -699,6 +699,7 @@ static struct l2cap_ops a2mp_chan_ops = {
+ 	.new_connection = l2cap_chan_no_new_connection,
+ 	.teardown = l2cap_chan_no_teardown,
+ 	.ready = l2cap_chan_no_ready,
++	.defer = l2cap_chan_no_defer,
+ };
+ 
+ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn, bool locked)
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index a2f945d..2cad770 100644
+index 91d312b..a2f945d 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1378,7 +1378,7 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
- 	if (!hchan)
- 		return NULL;
+@@ -1123,11 +1123,9 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 				lock_sock(sk);
+ 				if (test_bit(BT_SK_DEFER_SETUP,
+ 					     &bt_sk(sk)->flags)) {
+-					struct sock *parent = bt_sk(sk)->parent;
+ 					rsp.result = __constant_cpu_to_le16(L2CAP_CR_PEND);
+ 					rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
+-					if (parent)
+-						parent->sk_data_ready(parent, 0);
++					chan->ops->defer(chan);
  
--	conn = kzalloc(sizeof(struct l2cap_conn), GFP_ATOMIC);
-+	conn = kzalloc(sizeof(struct l2cap_conn), GFP_KERNEL);
- 	if (!conn) {
- 		hci_chan_del(hchan);
- 		return NULL;
-@@ -1830,9 +1830,9 @@ static void l2cap_ertm_resend(struct l2cap_chan *chan)
- 			/* Cloned sk_buffs are read-only, so we need a
- 			 * writeable copy
- 			 */
--			tx_skb = skb_copy(skb, GFP_ATOMIC);
-+			tx_skb = skb_copy(skb, GFP_KERNEL);
- 		} else {
--			tx_skb = skb_clone(skb, GFP_ATOMIC);
-+			tx_skb = skb_clone(skb, GFP_KERNEL);
- 		}
+ 				} else {
+ 					__l2cap_state_change(chan, BT_CONFIG);
+@@ -3459,7 +3457,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn,
+ 				__l2cap_state_change(chan, BT_CONNECT2);
+ 				result = L2CAP_CR_PEND;
+ 				status = L2CAP_CS_AUTHOR_PEND;
+-				parent->sk_data_ready(parent, 0);
++				chan->ops->defer(chan);
+ 			} else {
+ 				__l2cap_state_change(chan, BT_CONFIG);
+ 				result = L2CAP_CR_SUCCESS;
+@@ -5520,11 +5518,9 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 			if (!status) {
+ 				if (test_bit(BT_SK_DEFER_SETUP,
+ 					     &bt_sk(sk)->flags)) {
+-					struct sock *parent = bt_sk(sk)->parent;
+ 					res = L2CAP_CR_PEND;
+ 					stat = L2CAP_CS_AUTHOR_PEND;
+-					if (parent)
+-						parent->sk_data_ready(parent, 0);
++					chan->ops->defer(chan);
+ 				} else {
+ 					__l2cap_state_change(chan, BT_CONFIG);
+ 					res = L2CAP_CR_SUCCESS;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 45c81e1..efcb914 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -956,6 +956,7 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
  
- 		if (!tx_skb) {
-@@ -2578,7 +2578,7 @@ static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
- 		/* Don't send frame to the socket it came from */
- 		if (skb->sk == sk)
- 			continue;
--		nskb = skb_clone(skb, GFP_ATOMIC);
-+		nskb = skb_clone(skb, GFP_KERNEL);
- 		if (!nskb)
- 			continue;
+ 	bt_accept_enqueue(parent, sk);
  
-@@ -2604,7 +2604,7 @@ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn, u8 code,
- 	len = L2CAP_HDR_SIZE + L2CAP_CMD_HDR_SIZE + dlen;
- 	count = min_t(unsigned int, conn->mtu, len);
++
+ 	release_sock(parent);
  
--	skb = bt_skb_alloc(count, GFP_ATOMIC);
-+	skb = bt_skb_alloc(count, GFP_KERNEL);
- 	if (!skb)
- 		return NULL;
+ 	return l2cap_pi(sk)->chan;
+@@ -1088,6 +1089,17 @@ static void l2cap_sock_ready_cb(struct l2cap_chan *chan)
+ 	release_sock(sk);
+ }
  
-@@ -2634,7 +2634,7 @@ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn, u8 code,
- 	while (len) {
- 		count = min_t(unsigned int, conn->mtu, len);
- 
--		*frag = bt_skb_alloc(count, GFP_ATOMIC);
-+		*frag = bt_skb_alloc(count, GFP_KERNEL);
- 		if (!*frag)
- 			goto fail;
- 
-@@ -5612,7 +5612,7 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 		}
- 
- 		/* Allocate skb for the complete frame (with header) */
--		conn->rx_skb = bt_skb_alloc(len, GFP_ATOMIC);
-+		conn->rx_skb = bt_skb_alloc(len, GFP_KERNEL);
- 		if (!conn->rx_skb)
- 			goto drop;
++static void l2cap_sock_defer_cb(struct l2cap_chan *chan)
++{
++	struct sock *sk = chan->data;
++	struct sock *parent;
++
++	parent = bt_sk(sk)->parent;
++
++	if (parent)
++		parent->sk_data_ready(parent, 0);
++}
++
+ static struct l2cap_ops l2cap_chan_ops = {
+ 	.name		= "L2CAP Socket Interface",
+ 	.new_connection	= l2cap_sock_new_connection_cb,
+@@ -1096,6 +1108,7 @@ static struct l2cap_ops l2cap_chan_ops = {
+ 	.teardown	= l2cap_sock_teardown_cb,
+ 	.state_change	= l2cap_sock_state_change_cb,
+ 	.ready		= l2cap_sock_ready_cb,
++	.defer		= l2cap_sock_defer_cb,
+ 	.alloc_skb	= l2cap_sock_alloc_skb_cb,
+ };
  
 -- 
 1.7.11.4
