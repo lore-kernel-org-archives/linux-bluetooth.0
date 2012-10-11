@@ -1,56 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Oct 2012 08:58:40 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
+Message-ID: <1349968394.27233.184.camel@aeonflux>
+Subject: Re: [RFC 5/6] Bluetooth: Add L2CAP create channel request handling
+From: Marcel Holtmann <marcel@holtmann.org>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 1/6] Bluetooth: Add new l2cap_chan struct members for high
- speed channels
-In-Reply-To: <1349966905-32336-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Message-ID: <alpine.DEB.2.02.1210110858010.26189@mathewm-linux>
+Cc: linux-bluetooth@vger.kernel.org, mathewm@codeaurora.org
+Date: Thu, 11 Oct 2012 17:13:14 +0200
+In-Reply-To: <1349966905-32336-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1349966905-32336-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+	 <1349966905-32336-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Andrei,
 
-Andrei -
-
-On Thu, 11 Oct 2012, Andrei Emeltchenko wrote:
-
-> From: Mat Martineau <mathewm@codeaurora.org>
->
-> An L2CAP channel using high speed continues to be associated with a
-> BR/EDR l2cap_conn, while also tracking an additional hci_conn
-> (representing a physical link on a high speed controller) and hci_chan
-> (representing a logical link).  There may only be one physical link
-> between two high speed controllers.  Each physical link may contain
-> several logical links, with each logical link representing a channel
-> with specific quality of service.
->
-> During a channel move, the destination channel id, current move state,
-> and role (initiator vs. responder) are tracked and used by the channel
-> move state machine.  The ident value associated with a move request
-> must also be stored in order to use it in later move responses.
->
-> The active channel is stored in local_amp_id.
->
+> The L2CAP create channel request is very similar to an L2CAP connect
+> request, but it has an additional parameter for the controller ID.  If
+> the controller id is 0, the channel is set up on the BR/EDR controller
+> (just like a connect request).  Using a valid high speed controller ID
+> will cause the channel to be initially created on that high speed
+> controller.  While the L2CAP data will be initially routed over the
+> AMP controller, the L2CAP fixed signaling channel only uses BR/EDR.
+> 
+> When a create channel request is received for a high speed controller,
+> a pending response is always sent first.  After the high speed
+> physical and logical links are complete a success response will be
+> sent.
+> 
 > Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
-> include/net/bluetooth/l2cap.h |   29 +++++++++++++++++++++++++++++
-> net/bluetooth/l2cap_core.c    |    5 +++++
-> 2 files changed, 34 insertions(+)
+>  net/bluetooth/l2cap_core.c |   70 ++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 54 insertions(+), 16 deletions(-)
 
-Did you have to do anything other than rebase these 6 patches?
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-I can post a PATCHv1 set tomorrow or Monday.
+Regards
 
-
---
-Mat Martineau
-
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, hosted by The Linux Foundation
+Marcel
 
 
