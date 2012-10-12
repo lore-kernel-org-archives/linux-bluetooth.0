@@ -1,24 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 13 Oct 2012 12:20:54 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Message-ID: <1350086072.19673.16.camel@aeonflux>
+Subject: Re: [RFCv1 7/7] Bluetooth: Zero bredr pointer when chan is deleted
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] input: Convert to DBus.Properties
-Message-ID: <20121013092054.GA12290@x220.P-661HNU-F1>
-References: <1349981868-1263-1-git-send-email-lucas.demarchi@profusion.mobi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1349981868-1263-1-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Sat, 13 Oct 2012 01:54:32 +0200
+In-Reply-To: <1350051005-6015-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1350051005-6015-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1350051005-6015-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Andrei,
 
-On Thu, Oct 11, 2012, Lucas De Marchi wrote:
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  profiles/input/device.c | 44 +++++++++++++-------------------------------
->  1 file changed, 13 insertions(+), 31 deletions(-)
+>  net/bluetooth/l2cap_core.c |    4 ++++
+>  1 file changed, 4 insertions(+)
 
-Applied. Thanks.
+same here. Please write a commit message.
 
-Johan
+Regards
+
+Marcel
+
+
