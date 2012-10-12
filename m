@@ -1,48 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 1/7] Bluetooth: AMP: Use Loglink handle in ACL Handle field
-Date: Fri, 12 Oct 2012 17:09:59 +0300
-Message-Id: <1350051005-6015-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 12 Oct 2012 15:04:17 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [PATCH] Bluetooth: Rename __l2cap_connect() to l2cap_connect()
+Message-ID: <20121012120416.GD28051@aemeltch-MOBL1>
+References: <1350042040-1908-1-git-send-email-gustavo@padovan.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1350042040-1908-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Gustavo,
 
-For AMP HCI controller use Logical Link handle in HCI ACL
-Handle field.
+On Fri, Oct 12, 2012 at 07:40:40PM +0800, Gustavo Padovan wrote:
+> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> 
+> Use of "__" usually means we need to call the function with a lock held,
+> which is not the case here.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/hci_core.c |   15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+I think it is OK to leave the function as is. We do not have such a strong
+convention and we have too many locks anyway.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 2e72c41..32c4dbe 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2162,7 +2162,20 @@ static void hci_queue_acl(struct hci_chan *chan, struct sk_buff_head *queue,
- 	skb->data_len = 0;
- 
- 	bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
--	hci_add_acl_hdr(skb, conn->handle, flags);
-+
-+	switch (hdev->dev_type) {
-+	case HCI_BREDR:
-+		hci_add_acl_hdr(skb, conn->handle, flags);
-+		break;
-+
-+	case HCI_AMP:
-+		hci_add_acl_hdr(skb, chan->handle, flags);
-+		break;
-+
-+	default:
-+		BT_ERR("%s unknown dev_type %d", hdev->name, hdev->dev_type);
-+		return;
-+	}
- 
- 	list = skb_shinfo(skb)->frag_list;
- 	if (!list) {
--- 
-1.7.9.5
+Best regards 
+Andrei Emeltchenko 
 
