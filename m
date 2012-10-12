@@ -1,36 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 12 Oct 2012 18:20:45 +0800
+Date: Fri, 12 Oct 2012 17:56:09 +0800
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [PATCH -v2 5/8] Bluetooth: Remove GFP_ATOMIC usage from
- l2cap_core.c
-Message-ID: <20121012102045.GD10739@joana>
-References: <1349938311-25101-1-git-send-email-gustavo@padovan.org>
- <1349938311-25101-5-git-send-email-gustavo@padovan.org>
- <1349963436.27233.171.camel@aeonflux>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: SMP: Fix setting unknown auth_req bits
+Message-ID: <20121012095609.GC10739@joana>
+References: <1349965566-29482-1-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1349963436.27233.171.camel@aeonflux>
+In-Reply-To: <1349965566-29482-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-* Marcel Holtmann <marcel@holtmann.org> [2012-10-11 15:50:36 +0200]:
+* Johan Hedberg <johan.hedberg@gmail.com> [2012-10-11 16:26:06 +0200]:
 
-> Hi Gustavo,
+> From: Johan Hedberg <johan.hedberg@intel.com>
 > 
-> > Since we change the Bluetooth core to run in process context we don't need
-> > to use GFP_ATOMIC in many of places we were using it. The we just replace
-> > by GFP_KERNEL.
+> When sending a pairing request or response we should not just blindly
+> copy the value that the remote device sent. Instead we should at least
+> make sure to mask out any unknown bits. This is particularly critical
+> from the upcoming LE Secure Connections feature perspective as
+> incorrectly indicating support for it (by copying the remote value)
+> would cause a failure to pair with devices that support it.
 > 
-> I assume you double-checked that we nowhere hold a lock or the caller
-> holds a lock.
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Cc: stable@kernel.org
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/smp.c |    6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 
-Yes, I did double-check this. The code is running pretty fine as well.
-I pushed this to bluetooth-next btw.
+Patch has been applied to bluetooth.git. Thanks.
 
 	Gustavo
-> 
-> 
