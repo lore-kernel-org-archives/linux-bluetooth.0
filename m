@@ -1,31 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 12 Oct 2012 17:46:33 +0800
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, mathewm@codeaurora.org
-Subject: Re: [RFC 2/6] Bluetooth: Process create response and connect
- response identically
-Message-ID: <20121012094633.GA10739@joana>
+Date: Fri, 12 Oct 2012 10:25:15 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 1/6] Bluetooth: Add new l2cap_chan struct members for high
+ speed channels
+Message-ID: <20121012072513.GB28051@aemeltch-MOBL1>
 References: <1349966905-32336-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1349966905-32336-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <alpine.DEB.2.02.1210110858010.26189@mathewm-linux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1349966905-32336-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <alpine.DEB.2.02.1210110858010.26189@mathewm-linux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Mat,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-10-11 17:48:21 +0300]:
-
-> From: Mat Martineau <mathewm@codeaurora.org>
+On Thu, Oct 11, 2012 at 08:58:40AM -0700, Mat Martineau wrote:
 > 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/l2cap_core.c |   13 +------------
->  1 file changed, 1 insertion(+), 12 deletions(-)
+> Andrei -
+> 
+> On Thu, 11 Oct 2012, Andrei Emeltchenko wrote:
+> 
+> >From: Mat Martineau <mathewm@codeaurora.org>
+> >
+> >An L2CAP channel using high speed continues to be associated with a
+> >BR/EDR l2cap_conn, while also tracking an additional hci_conn
+> >(representing a physical link on a high speed controller) and hci_chan
+> >(representing a logical link).  There may only be one physical link
+> >between two high speed controllers.  Each physical link may contain
+> >several logical links, with each logical link representing a channel
+> >with specific quality of service.
+> >
+> >During a channel move, the destination channel id, current move state,
+> >and role (initiator vs. responder) are tracked and used by the channel
+> >move state machine.  The ident value associated with a move request
+> >must also be stored in order to use it in later move responses.
+> >
+> >The active channel is stored in local_amp_id.
+> >
+> >Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> >Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> >---
+> >include/net/bluetooth/l2cap.h |   29 +++++++++++++++++++++++++++++
+> >net/bluetooth/l2cap_core.c    |    5 +++++
+> >2 files changed, 34 insertions(+)
+> 
+> Did you have to do anything other than rebase these 6 patches?
 
-Patch has been applied to bluetooth-next, thanks.
+I would wish to, but I am stuck with dependencies :(
 
-	Gustavo
+At least I need chan pointers to hs_hchan and hs_hcon ...
+
+Best regards 
+Andrei Emeltchenko 
+
+> I can post a PATCHv1 set tomorrow or Monday.
+
+This sounds good. I will also send my patches later today.
+
+Best regards 
+Andrei Emeltchenko 
+
