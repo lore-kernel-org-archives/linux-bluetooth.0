@@ -1,29 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 12 Oct 2012 15:04:17 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [PATCH] Bluetooth: Rename __l2cap_connect() to l2cap_connect()
-Message-ID: <20121012120416.GD28051@aemeltch-MOBL1>
-References: <1350042040-1908-1-git-send-email-gustavo@padovan.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1350042040-1908-1-git-send-email-gustavo@padovan.org>
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: [PATCH] Bluetooth: Rename __l2cap_connect() to l2cap_connect()
+Date: Fri, 12 Oct 2012 19:40:40 +0800
+Message-Id: <1350042040-1908-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-On Fri, Oct 12, 2012 at 07:40:40PM +0800, Gustavo Padovan wrote:
-> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> 
-> Use of "__" usually means we need to call the function with a lock held,
-> which is not the case here.
+Use of "__" usually means we need to call the function with a lock held,
+which is not the case here.
 
-I think it is OK to leave the function as is. We do not have such a strong
-convention and we have too many locks anyway.
+Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+---
+ net/bluetooth/l2cap_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Best regards 
-Andrei Emeltchenko 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 1d773b9..9060eec 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -3389,7 +3389,7 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn,
+ 	return 0;
+ }
+ 
+-static void __l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
++static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
+ 			    u8 *data, u8 rsp_code, u8 amp_id)
+ {
+ 	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
+@@ -3508,7 +3508,7 @@ sendresp:
+ static int l2cap_connect_req(struct l2cap_conn *conn,
+ 			     struct l2cap_cmd_hdr *cmd, u8 *data)
+ {
+-	__l2cap_connect(conn, cmd, data, L2CAP_CONN_RSP, 0);
++	l2cap_connect(conn, cmd, data, L2CAP_CONN_RSP, 0);
+ 	return 0;
+ }
+ 
+-- 
+1.7.11.4
 
