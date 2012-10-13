@@ -1,28 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <507ADA75.9040204@fisher-privat.net>
-Date: Sun, 14 Oct 2012 17:29:57 +0200
-From: Oleksij Rempel <bug-track@fisher-privat.net>
+Date: Sat, 13 Oct 2012 22:31:06 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] heartrate: Convert to DBus.Properties
+Message-ID: <20121013193106.GA13162@x220.P-661HNU-F1>
+References: <1350147379-10912-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-To: pulseaudio-discuss@lists.freedesktop.org,
-	linux-bluetooth@vger.kernel.org
-Subject: how to troubleshoot bluetooth audio issues?
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1350147379-10912-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hallo all, (Pulseaudio and Bluetooth devs)
+H Andrzej,
 
-i have Samsung HS3000 bluetooth headset. Mostly it works but there are 
-different issue with it:
+On Sat, Oct 13, 2012, Andrzej Kaczmarek wrote:
+> ---
+>  doc/heartrate-api.txt          |  7 +---
+>  profiles/heartrate/heartrate.c | 73 ++++++++++++++++++++++++------------------
+>  test/test-heartrate            |  5 ++-
+>  3 files changed, 46 insertions(+), 39 deletions(-)
 
-- volume level seems to be set to max (at really uncomfortable level)
-- at the moment i trying to change volume with pavucontrol or after it i 
-get bad sound. Some times sort of cracky or trashy sound, some times 
-just white noise.
-- play/stop key do not works with linux (not pulse issue)
+Applied. Thanks.
 
-how to troubleshoot this issues? what tools should i use and where 
-should it start?
--- 
-Regards,
-Oleksij
+Johan
