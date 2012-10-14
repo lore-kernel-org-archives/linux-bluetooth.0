@@ -1,54 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 15 Oct 2012 11:31:16 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv1 5/7] Bluetooth: AMP: Get amp_mgr reference in HS hci_conn
-Message-ID: <20121015083114.GA2584@aemeltch-MOBL1>
-References: <1350051005-6015-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1350051005-6015-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1350086005.19673.14.camel@aeonflux>
+Message-ID: <507AF555.7080400@fisher-privat.net>
+Date: Sun, 14 Oct 2012 19:24:37 +0200
+From: Oleksij Rempel <bug-track@fisher-privat.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1350086005.19673.14.camel@aeonflux>
+To: Tanu Kaskinen <tanuk@iki.fi>
+CC: pulseaudio-discuss@lists.freedesktop.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [pulseaudio-discuss] how to troubleshoot bluetooth audio issues?
+References: <507ADA75.9040204@fisher-privat.net> <1350230390.30695.22.camel@x230>
+In-Reply-To: <1350230390.30695.22.camel@x230>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Am 14.10.2012 17:59, schrieb Tanu Kaskinen:
+> On Sun, 2012-10-14 at 17:29 +0200, Oleksij Rempel wrote:
+>> Hallo all, (Pulseaudio and Bluetooth devs)
+>>
+>> i have Samsung HS3000 bluetooth headset. Mostly it works but there are
+>> different issue with it:
+>>
+>> - volume level seems to be set to max (at really uncomfortable level)
+>> - at the moment i trying to change volume with pavucontrol or after it i
+>> get bad sound. Some times sort of cracky or trashy sound, some times
+>> just white noise.
+>> - play/stop key do not works with linux (not pulse issue)
+>>
+>> how to troubleshoot this issues? what tools should i use and where
+>> should it start?
+>
+> Regarding the broken audio: I would suspect that the headset is buggy,
 
-On Sat, Oct 13, 2012 at 01:53:25AM +0200, Marcel Holtmann wrote:
-> Hi Andrei,
-> 
-> > When assigning amp_mgr in hci_conn (type AMP_LINK) get also reference.
-> > In hci_conn_del those references would be put for both types.
-> > 
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > ---
-> >  net/bluetooth/amp.c |    4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> 
-> > diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-> > index 59da0f1..e525e23 100644
-> > --- a/net/bluetooth/amp.c
-> > +++ b/net/bluetooth/amp.c
-> > @@ -123,9 +123,11 @@ struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
-> >  	hcon->attempt++;
-> >  	hcon->handle = __next_handle(mgr);
-> >  	hcon->remote_id = remote_id;
-> > -	hcon->amp_mgr = mgr;
-> >  	hcon->out = out;
-> >  
-> > +	hcon->amp_mgr = mgr;
-> > +	amp_mgr_get(mgr);
-> > +
-> 
-> We could discuss that amp_mgt_get(mgr) should just return mgr and you
-> can write this like this:
-> 
-> 	hcon->amp_mgr = amp_mgr_get(mgr);
+hehe, nice try :) This headset works perfectly with my 
+smartphone/cyanogenmod.
 
-Good idea. I will make it in the following patches.
+> because the volume handling code should be pretty well tested in
+> pulseaudio,  and I don't think bluetoothd touches the audio signal at
+> all. To confirm that, I think it's somehow possible to capture the audio
+> that is sent to the headset, but I don't know how. Maybe the bluez
+> people can answer that (I'm a pulseaudio guy myself).
+>
+> Are you using the headset in the HSP or A2DP mode, btw? If A2DP, then
+> that would suggest a pulseaudio bug, since I don't think the headset
+> will get any notification via A2DP when you change the volume in
+> pavucontrol.
 
-Best regards 
-Andrei Emeltchenko 
+You right, i played with different profiles. HSP controls volume on 
+pulse, but minimal volume is still too loud. A2DP use internal volume 
+control and i can set it as silent as i need.
+
+
+I made some more tests with different kernels. It looks more like kernel 
+issue. I get different oopses and it looks like 3.5.0 sounds better then 
+current master git.
+
+-- 
+Regards,
+Oleksij
