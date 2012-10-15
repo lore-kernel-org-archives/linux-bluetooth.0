@@ -1,65 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 15 Oct 2012 12:27:38 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 5/6] Bluetooth: AMP: Get amp_mgr reference in HS
- hci_conn
-Message-ID: <20121015152738.GC6498@joana>
-References: <1350051005-6015-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1350291524-13258-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1350291524-13258-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20121015124903.GA6498@joana>
- <20121015132114.GC2584@aemeltch-MOBL1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20121015132114.GC2584@aemeltch-MOBL1>
+In-Reply-To: <CACKG3XmHwTgbsWBwsckZ-tA5M9xBD0TBRme7mCJo7shd90L4=Q@mail.gmail.com>
+References: <CACKG3XmHwTgbsWBwsckZ-tA5M9xBD0TBRme7mCJo7shd90L4=Q@mail.gmail.com>
+Date: Mon, 15 Oct 2012 23:01:48 +0800
+Message-ID: <CACKG3X=Jky7m=gU7b=rPYOO1ZqQR_79fgoL-EQCYgog6wNZsLQ@mail.gmail.com>
+Subject: Is it incorrect in checking of "NO_RESET" bit in hci_core.c:hci_dev_do_close()?
+From: chen kris <bluefrog2012@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+static int hci_dev_do_close(struct hci_dev *hdev)
+{
+    ...
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-10-15 16:21:21 +0300]:
+    /* Reset device */
+    skb_queue_purge(&hdev->cmd_q);
+    atomic_set(&hdev->cmd_cnt, 1);
+    if (!test_bit(HCI_RAW, &hdev->flags) &&
+                test_bit(HCI_QUIRK_NO_RESET, &hdev->quirks)) {
+        set_bit(HCI_INIT, &hdev->flags);
+        __hci_request(hdev, hci_reset_req, 0,
+                    msecs_to_jiffies(250));
+        clear_bit(HCI_INIT, &hdev->flags);
+    }
+    ...
+}
 
-> Hi Gustavo,
-> 
-> On Mon, Oct 15, 2012 at 09:49:03AM -0300, Gustavo Padovan wrote:
-> > Hi Andrei,
-> > 
-> > * Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-10-15 11:58:43 +0300]:
-> > 
-> > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > 
-> > > When assigning amp_mgr in hci_conn (type AMP_LINK) get also reference.
-> > > In hci_conn_del those references would be put for both types.
-> > > 
-> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> > > ---
-> > >  net/bluetooth/amp.c |    4 +++-
-> > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-> > > index 59da0f1..e525e23 100644
-> > > --- a/net/bluetooth/amp.c
-> > > +++ b/net/bluetooth/amp.c
-> > > @@ -123,9 +123,11 @@ struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
-> > >  	hcon->attempt++;
-> > >  	hcon->handle = __next_handle(mgr);
-> > >  	hcon->remote_id = remote_id;
-> > > -	hcon->amp_mgr = mgr;
-> > >  	hcon->out = out;
-> > >  
-> > > +	hcon->amp_mgr = mgr;
-> > > +	amp_mgr_get(mgr);
-> > 
-> > You did not take the comments from Marcel in this patch, please make the
-> > change to amp_mgr_get() before sending this patch.
-> 
-> I was thinking of making separate patch since this might be used in
-> several places so I would change it once instead of splitting this change
-> to several patches.
+I guess the condition should be as following:
 
-Sure, but just send that patch before this one.
+    if (!test_bit(HCI_RAW, &hdev->flags) &&
+                *! *test_bit(HCI_QUIRK_NO_RESET, &hdev->quirks))
 
-	Gustavo
+it means the code should sent HCI_RESET, only if both of the following
+conditions are met:
+1. HCI_RAW is NOT set;
+2. HCI_QUIRK_NO_RESET is *NOT* set.
+
+thanks!
+
+Bluefrog2012
