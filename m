@@ -1,86 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 2/6] Bluetooth: AMP: Handle complete frames in l2cap
-Date: Mon, 15 Oct 2012 11:58:40 +0300
-Message-Id: <1350291524-13258-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1350291524-13258-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 0/6] AMP link fixes
+Date: Mon, 15 Oct 2012 11:58:38 +0300
+Message-Id: <1350291524-13258-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1350051005-6015-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1350051005-6015-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1350291524-13258-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Check flags type in switch statement and handle new frame
-type ACL_COMPLETE used for High Speed data over AMP.
+Set of patches handling AMP link fixes
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
----
+Changelog:
+	* v2: Removed patch "AMP: Zero amp_mgr pointer..", taken Marcel's
+	comments.
+
+Andrei Emeltchenko (6):
+  Bluetooth: AMP: Use Loglink handle in ACL Handle field
+  Bluetooth: AMP: Handle complete frames in l2cap
+  Bluetooth: AMP: Drop packets when no l2cap conn exist
+  Bluetooth: Send EFS Conf Rsp only for BR/EDR chan
+  Bluetooth: AMP: Get amp_mgr reference in HS hci_conn
+  Bluetooth: Zero bredr pointer when chan is deleted
+
  include/net/bluetooth/hci.h |    1 +
- net/bluetooth/l2cap_core.c  |   15 ++++++++++-----
- 2 files changed, 11 insertions(+), 5 deletions(-)
+ net/bluetooth/amp.c         |    4 +++-
+ net/bluetooth/hci_core.c    |   13 ++++++++++++-
+ net/bluetooth/l2cap_core.c  |   35 ++++++++++++++++++++++++++++-------
+ 4 files changed, 44 insertions(+), 9 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 77b6a19..88cbbda 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -198,6 +198,7 @@ enum {
- #define ACL_START_NO_FLUSH	0x00
- #define ACL_CONT		0x01
- #define ACL_START		0x02
-+#define ACL_COMPLETE		0x03
- #define ACL_ACTIVE_BCAST	0x04
- #define ACL_PICO_BCAST		0x08
- 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2fb37de..5fd236f 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5576,6 +5576,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- {
- 	struct l2cap_conn *conn = hcon->l2cap_data;
-+	struct l2cap_hdr *hdr;
-+	int len;
- 
- 	if (!conn)
- 		conn = l2cap_conn_add(hcon, 0);
-@@ -5585,10 +5587,10 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 
- 	BT_DBG("conn %p len %d flags 0x%x", conn, skb->len, flags);
- 
--	if (!(flags & ACL_CONT)) {
--		struct l2cap_hdr *hdr;
--		int len;
--
-+	switch (flags) {
-+	case ACL_START:
-+	case ACL_START_NO_FLUSH:
-+	case ACL_COMPLETE:
- 		if (conn->rx_len) {
- 			BT_ERR("Unexpected start frame (len %d)", skb->len);
- 			kfree_skb(conn->rx_skb);
-@@ -5630,7 +5632,9 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
- 					  skb->len);
- 		conn->rx_len = len - skb->len;
--	} else {
-+		break;
-+
-+	case ACL_CONT:
- 		BT_DBG("Cont: frag len %d (expecting %d)", skb->len, conn->rx_len);
- 
- 		if (!conn->rx_len) {
-@@ -5658,6 +5662,7 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 			l2cap_recv_frame(conn, conn->rx_skb);
- 			conn->rx_skb = NULL;
- 		}
-+		break;
- 	}
- 
- drop:
 -- 
 1.7.9.5
 
