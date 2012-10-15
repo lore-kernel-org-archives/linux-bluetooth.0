@@ -1,166 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1350325078.26318.6.camel@aeonflux>
-Subject: Re: [PATCH 05/19] Bluetooth: Channel move request handling
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	sunnyk@codeaurora.org
-Date: Mon, 15 Oct 2012 20:17:58 +0200
-In-Reply-To: <1350315248-7690-6-git-send-email-mathewm@codeaurora.org>
-References: <1350315248-7690-1-git-send-email-mathewm@codeaurora.org>
-	 <1350315248-7690-6-git-send-email-mathewm@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-id: <86CE592A523D405C836834BA532840DA@sisodomain.com>
+From: Syam Sidhardhan <s.syam@samsung.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+References: <1349887169-20880-1-git-send-email-s.syam@samsung.com>
+ <1349891245.27233.153.camel@aeonflux>
+ <E3660838E8D64186924BA81A32F30682@sisodomain.com>
+ <1349963810.27233.178.camel@aeonflux>
+ <CABBYNZ+rGP0cirHDexU49+SJnSn2hRd+GVH0sVOFU53DfNnq0g@mail.gmail.com>
+Subject: Re: [PATCH 1/4] Bluetooth: Fix L2CAP PSM bind issue
+Date: Mon, 15 Oct 2012 23:46:58 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi Marcel, Luiz,
 
-> On receipt of a channel move request, the request must be validated
-> based on the L2CAP mode, connection state, and controller
-> capabilities.  ERTM channels must have their state machines cleared
-> and transmission paused while the channel move takes place.
-> 
-> If the channel is being moved to an AMP controller then
-> an AMP physical link must be prepared.  Moving the channel back to
-> BR/EDR proceeds immediately.
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  net/bluetooth/l2cap_core.c | 98 +++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 97 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index a55644f..649c06b 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -995,6 +995,41 @@ void l2cap_send_conn_req(struct l2cap_chan *chan)
->  	l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_REQ, sizeof(req), &req);
->  }
->  
-> +static void l2cap_move_setup(struct l2cap_chan *chan)
-> +{
-> +	struct sk_buff *skb;
-> +
-> +	BT_DBG("chan %p", chan);
-> +
-> +	if (chan->mode != L2CAP_MODE_ERTM)
-> +		return;
-> +
-> +	__clear_retrans_timer(chan);
-> +	__clear_monitor_timer(chan);
-> +	__clear_ack_timer(chan);
-> +
-> +	chan->retry_count = 0;
-> +	skb_queue_walk(&chan->tx_q, skb) {
-> +		if (bt_cb(skb)->control.retries)
-> +			bt_cb(skb)->control.retries = 1;
-> +		else
-> +			break;
-> +	}
-> +
-> +	chan->expected_tx_seq = chan->buffer_seq;
-> +
-> +	clear_bit(CONN_REJ_ACT, &chan->conn_state);
-> +	clear_bit(CONN_SREJ_ACT, &chan->conn_state);
-> +	l2cap_seq_list_clear(&chan->retrans_list);
-> +	l2cap_seq_list_clear(&chan->srej_list);
-> +	skb_queue_purge(&chan->srej_q);
-> +
-> +	chan->tx_state = L2CAP_TX_STATE_XMIT;
-> +	chan->rx_state = L2CAP_RX_STATE_MOVE;
-> +
-> +	set_bit(CONN_REMOTE_BUSY, &chan->conn_state);
-> +}
-> +
->  static void l2cap_chan_ready(struct l2cap_chan *chan)
->  {
->  	/* This clears all conf flags, including CONF_NOT_COMPLETE */
-> @@ -4171,7 +4206,68 @@ static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
->  
->  	chan = l2cap_get_chan_by_dcid(conn, icid);
->  
-> -	/* Placeholder: Always refuse */
-> +	if (!chan || chan->scid < L2CAP_CID_DYN_START ||
-> +	    (chan->mode != L2CAP_MODE_ERTM &&
-> +	     chan->mode != L2CAP_MODE_STREAMING)) {
-> +		result = L2CAP_MR_NOT_ALLOWED;
-> +		goto send_move_response;
-> +	}
-> +
-> +	if (chan->local_amp_id == req->dest_amp_id) {
-> +		result = L2CAP_MR_SAME_ID;
-> +		goto send_move_response;
-> +	}
-> +
-> +	if (req->dest_amp_id) {
-> +		struct hci_dev *hdev;
-> +		hdev = hci_dev_get(req->dest_amp_id);
-> +		if (!hdev || hdev->dev_type != HCI_AMP ||
-> +		    !test_bit(HCI_UP, &hdev->flags)) {
-> +			if (hdev)
-> +				hci_dev_put(hdev);
-> +
-> +			result = L2CAP_MR_BAD_ID;
-> +			goto send_move_response;
-> +		}
-> +		hci_dev_put(hdev);
-> +	}
-> +
-> +	if (((chan->move_state != L2CAP_MOVE_STABLE &&
-> +	    chan->move_state != L2CAP_MOVE_WAIT_PREPARE) ||
-> +	    chan->move_role != L2CAP_MOVE_ROLE_NONE) &&
-> +	    bacmp(conn->src, conn->dst) > 0) {
-
-This one needs a comment on top of it.
-
-> +		result = L2CAP_MR_COLLISION;
-> +		goto send_move_response;
-> +	}
-> +
-> +	if (chan->chan_policy == BT_CHANNEL_POLICY_BREDR_ONLY) {
-> +		result = L2CAP_MR_NOT_ALLOWED;
-> +		goto send_move_response;
-> +	}
-> +
-> +	chan->ident = cmd->ident;
-> +	chan->move_role = L2CAP_MOVE_ROLE_RESPONDER;
-> +	l2cap_move_setup(chan);
-> +	chan->move_id = req->dest_amp_id;
-> +	icid = chan->dcid;
-> +
-> +	if (req->dest_amp_id == 0) {
-> +		/* Moving to BR/EDR */
-> +		if (test_bit(CONN_LOCAL_BUSY, &chan->conn_state)) {
-> +			chan->move_state = L2CAP_MOVE_WAIT_LOCAL_BUSY;
-> +			result = L2CAP_MR_PEND;
-> +		} else {
-> +			chan->move_state = L2CAP_MOVE_WAIT_CONFIRM;
-> +			result = L2CAP_MR_SUCCESS;
-> +		}
-> +	} else {
-> +		chan->move_state = L2CAP_MOVE_WAIT_PREPARE;
-> +		/* Placeholder - uncomment when amp functions are available */
-> +		/*amp_accept_physical(chan, req->dest_amp_id);*/
-> +		result = L2CAP_MR_PEND;
-> +	}
-> +
-> +send_move_response:
->  	l2cap_send_move_chan_rsp(conn, cmd->ident, icid, result);
->  
->  	if (chan)
-
-Otherwise this looks fine to me.
-
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
-I do realize my question from before, but I think it is still valid. If
-we don't have (!chan), we can just refuse. Make the initial if statement
-a bit simpler and split this down for people to follow. Anyway, the
-general way is fine. It is just sugar to make this read easier.
-
-Regards
-
-Marcel
+----- Original Message ----- 
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Cc: "Syam Sidhardhan" <s.syam@samsung.com>; 
+<linux-bluetooth@vger.kernel.org>
+Sent: Thursday, October 11, 2012 7:59 PM
+Subject: Re: [PATCH 1/4] Bluetooth: Fix L2CAP PSM bind issue
 
 
+> Hi Marcel,
+>
+> On Thu, Oct 11, 2012 at 3:56 PM, Marcel Holtmann <marcel@holtmann.org> 
+> wrote:
+>> Hi Syam,
+>>
+>>> >> Problem: If we bind a particular PSM with source address as 
+>>> >> BDADDR_ANY,
+>>> >> then we are able to bind the same PSM with adapter address(or any 
+>>> >> other
+>>> >> address), which is incorrect.
+>>> >
+>>> > why is this incorrect? Explain that to me.
+>>> >
+>>>
+>>> Here there is a correction required in the commit message.
+>>>
+>>> As per my understanding the a particular PSM can be binded only once
+>>> for a single adapter address. Kindly correct me if I'm wrong here.
+>>
+>> a PSM can be bound once per adapter address. And of course once per
+>> BDADDR_ANY.
+>>
+>> So you can bind PSM 23 to BDADDR_ANY and 11:22:33:44:55:66. An incoming
+>> connection to 11:22:33:44:55:66 will arrive to that specific socket, but
+>> an incoming to all others will be handled by the BDADDR_ANY.
+>>
+>> The BDADDR_ANY is special. Consider it a wildcard bound with lower
+>> priority. If overwritten with a specific address bound, that will be
+>> considered first of course.
+>>
+>> If we are not doing it that way, than that is a bug.
+>>
+>> Outgoing connections should behave the same btw. If a specific address
+>> is bound, than that will be used. If not available, then you can not
+>> connect. If BDADDR_ANY is used, then the next available adapter will be
+>> used.
+>
+> The real problem is by giving psm 0 the kernel should return the first
+> available psm in the non-reserved space, but since we reuse the same
+> code to do the matching it end up given both obexd and hdp the same
+> psm, IMO in this case we should consider using Syam code and not
+> __l2cap_global_chan_by_addr as the userspace is probably asking for a
+> psm not in use which should  exclude those in use by BDADDR_ANY.
+>
+
+It seems there is a bug.
+I tried to listen first using BDADDR_ANY and then again listen
+using the adapter address for a particular PSM. If I try to connect
+on that particular PSM from the remote device, then the incoming
+connection follows the order of the listen rather than the priority.
+
+Ex:
+1) Listen
+-sh-4.1# /opt/l2test -d -P 11
+l2test[3450]: Waiting for connection on psm 11 ...
+
+2) Listen
+-sh-4.1# /opt/l2test -w -P 11 -i hci0
+l2test[3451]: Waiting for connection on psm 11 ...
+
+If we try to connect from the remote device, then the connection goes to 
+First listen
+-sh-4.1# /opt/l2test -n -P 11 00:02:4B:28:2C:48
+
+Similarly if we swap the order of the listen 1 & 2, then connection goes to 
+hci0 one.
+
+The following diff resolves the issue for me. I'm not sure its correct or 
+not.
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 33b5d34..12f9b52 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1499,7 +1499,7 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int 
+state, __le16 psm,
+                        src_any = !bacmp(&bt_sk(sk)->src, BDADDR_ANY);
+                        dst_any = !bacmp(&bt_sk(sk)->dst, BDADDR_ANY);
+                        if ((src_match && dst_any) || (src_any && dst_match) 
+||
+-                           (src_any && dst_any))
++                           (!c1 && src_any && dst_any))
+                                c1 = c;
+                }
+        }
+
+Regards,
+Syam 
