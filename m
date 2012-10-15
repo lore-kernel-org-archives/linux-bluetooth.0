@@ -1,45 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 15 Oct 2012 17:37:17 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 04/16] AVRCP: Don't respond with errors when no
+ player is registered
+Message-ID: <20121015143717.GA3393@x220.P-661HNU-F1>
+References: <1350309936-31588-1-git-send-email-luiz.dentz@gmail.com>
+ <1350309936-31588-4-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1349807669.27233.103.camel@aeonflux>
-References: <1349806556-1978-1-git-send-email-dmp0x7c5@gmail.com>
-	<1349806556-1978-2-git-send-email-dmp0x7c5@gmail.com>
-	<1349807669.27233.103.camel@aeonflux>
-Date: Mon, 15 Oct 2012 16:43:07 +0200
-Message-ID: <CABBYNZLYHpWzEOKfv8wKE4s1Yzsd8cZCv38na707yf5XmktXGg@mail.gmail.com>
-Subject: Re: [RFC obexd 02/11] build: Add --enable-fuse for gobexfuse
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: =?ISO-8859-2?Q?Micha=B3_Poczwardowski?= <dmp0x7c5@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1350309936-31588-4-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+Hi Luiz,
 
-On Tue, Oct 9, 2012 at 8:34 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Michal,
->
->>  Makefile.am  |    9 +++++++++
->>  configure.ac |   15 +++++++++++++++
->>  2 files changed, 24 insertions(+), 0 deletions(-)
->>
->> diff --git a/Makefile.am b/Makefile.am
->> index 724dd5d..95b99a6 100644
->> --- a/Makefile.am
->> +++ b/Makefile.am
->> @@ -132,6 +132,15 @@ client_obex_client_SOURCES = $(gdbus_sources) $(gobex_sources) \
->>  client_obex_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ @BLUEZ_LIBS@
->>  endif
->>
->> +if FUSE
->> +bin_PROGRAMS = fuse/gobexfuse
->
-> I rather call this obexfuse or similar. I don't want to have any "g"
-> prefixes in the future anymore.
+On Mon, Oct 15, 2012, Luiz Augusto von Dentz wrote:
+> +static void *player_get_metadata(struct avrcp_player *player, uint32_t attr)
+> +{
+> +	if (player != NULL)
+> +		return player->cb->get_metadata(attr, player->user_data);
+> +
+> +	if (attr == AVRCP_MEDIA_ATTRIBUTE_TITLE)
+> +		return "";
 
-Are you looking into this? I will probably need more time to look in
-detail what you have done, but at least the binary name should be
-changed as Marcel suggested.
+This is quite messed up. Using void pointers like that just obfuscates
+what the code is doing. After a quick look at current git it seems to me
+like struct metadata_value from media.c should be made public and that
+should be the return type of this function instead of doing void pointer
+magic.
 
--- 
-Luiz Augusto von Dentz
+Johan
