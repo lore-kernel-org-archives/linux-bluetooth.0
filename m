@@ -1,53 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZLYHpWzEOKfv8wKE4s1Yzsd8cZCv38na707yf5XmktXGg@mail.gmail.com>
-References: <1349806556-1978-1-git-send-email-dmp0x7c5@gmail.com>
-	<1349806556-1978-2-git-send-email-dmp0x7c5@gmail.com>
-	<1349807669.27233.103.camel@aeonflux>
-	<CABBYNZLYHpWzEOKfv8wKE4s1Yzsd8cZCv38na707yf5XmktXGg@mail.gmail.com>
-Date: Mon, 15 Oct 2012 17:37:04 +0200
-Message-ID: <CAKZqhqdB3asmr1D9pf9BFgQ8mD+qRw+FyC+5AfyJsTG3vQYahQ@mail.gmail.com>
-Subject: Re: [RFC obexd 02/11] build: Add --enable-fuse for gobexfuse
-From: =?UTF-8?Q?Micha=C5=82_Poczwardowski?= <dmp0x7c5@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org,
+	gustavo@padovan.org
+Cc: sunnyk@codeaurora.org,
+	marcel@holtmann.org
+Subject: [PATCH 18/19] Bluetooth: Do not retransmit data during a channel move
+Date: Mon, 15 Oct 2012 08:34:07 -0700
+Message-Id: <1350315248-7690-19-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1350315248-7690-1-git-send-email-mathewm@codeaurora.org>
+References: <1350315248-7690-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I will change that :)
+Do not retransmit previously-sent data when a "receiver ready" s-frame
+with the "final" flag is received during a move.
 
-On 15 October 2012 16:43, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> Hi Michal,
->
-> On Tue, Oct 9, 2012 at 8:34 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
->> Hi Michal,
->>
->>>  Makefile.am  |    9 +++++++++
->>>  configure.ac |   15 +++++++++++++++
->>>  2 files changed, 24 insertions(+), 0 deletions(-)
->>>
->>> diff --git a/Makefile.am b/Makefile.am
->>> index 724dd5d..95b99a6 100644
->>> --- a/Makefile.am
->>> +++ b/Makefile.am
->>> @@ -132,6 +132,15 @@ client_obex_client_SOURCES = $(gdbus_sources) $(gobex_sources) \
->>>  client_obex_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ @BLUEZ_LIBS@
->>>  endif
->>>
->>> +if FUSE
->>> +bin_PROGRAMS = fuse/gobexfuse
->>
->> I rather call this obexfuse or similar. I don't want to have any "g"
->> prefixes in the future anymore.
->
-> Are you looking into this? I will probably need more time to look in
-> detail what you have done, but at least the binary name should be
-> changed as Marcel suggested.
->
-> --
-> Luiz Augusto von Dentz
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+The ERTM state machines will resynchronize at the end of a channel
+move, and the state machine needs to avoid state changes during a
+move.
+
+Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+---
+ net/bluetooth/l2cap_core.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 57b1b02..d7819c1 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5615,8 +5615,9 @@ static int l2cap_rx_state_recv(struct l2cap_chan *chan,
+ 		if (control->final) {
+ 			clear_bit(CONN_REMOTE_BUSY, &chan->conn_state);
+ 
+-			if (!test_and_clear_bit(CONN_REJ_ACT,
+-						&chan->conn_state)) {
++			if (!test_and_clear_bit(CONN_REJ_ACT, &chan->conn_state)
++			    && (chan->move_state == L2CAP_MOVE_STABLE ||
++				chan->move_state == L2CAP_MOVE_WAIT_PREPARE)) {
+ 				control->final = 0;
+ 				l2cap_retransmit_all(chan, control);
+ 			}
+-- 
+1.7.12.3
+
+--
+Mat Martineau
+
+Employee of Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, hosted by The Linux Foundation
