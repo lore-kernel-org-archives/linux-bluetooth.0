@@ -1,99 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
 From: Mat Martineau <mathewm@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org,
-	gustavo@padovan.org
-Cc: sunnyk@codeaurora.org,
-	marcel@holtmann.org
-Subject: [PATCH 15/19] Bluetooth: Configure appropriate timeouts for AMP controllers
-Date: Mon, 15 Oct 2012 08:34:04 -0700
-Message-Id: <1350315248-7690-16-git-send-email-mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
+Cc: sunnyk@codeaurora.org, marcel@holtmann.org
+Subject: [PATCH 19/19] Bluetooth: Start channel move when socket option is changed
+Date: Mon, 15 Oct 2012 08:34:08 -0700
+Message-Id: <1350315248-7690-20-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1350315248-7690-1-git-send-email-mathewm@codeaurora.org>
 References: <1350315248-7690-1-git-send-email-mathewm@codeaurora.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The L2CAP spec recommends specific retransmit and monitor timeouts for
-ERTM channels that are on AMP controllers.  These timeouts are
-calculated from the AMP controller's best effort flush timeout.
+Channel moves are triggered by changes to the BT_CHANNEL_POLICY
+sockopt when an ERTM or streaming-mode channel is connected.
 
-BR/EDR controllers use the default retransmit and monitor timeouts.
+Moves are only started if enable_hs is true.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c | 47 ++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 41 insertions(+), 6 deletions(-)
+ include/net/bluetooth/l2cap.h |  1 +
+ net/bluetooth/l2cap_core.c    | 20 ++++++++++++++++++++
+ net/bluetooth/l2cap_sock.c    |  5 +++++
+ 3 files changed, 26 insertions(+)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index b4c3c65..49783e9 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -809,5 +809,6 @@ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ void l2cap_chan_del(struct l2cap_chan *chan, int err);
+ void l2cap_send_conn_req(struct l2cap_chan *chan);
++void l2cap_move_start(struct l2cap_chan *chan);
+ 
+ #endif /* __L2CAP_H */
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index cf1dc4e..dbcd1e3 100644
+index d7819c1..c23cfd8 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -2965,6 +2965,44 @@ static inline bool __l2cap_efs_supported(struct l2cap_chan *chan)
- 	return enable_hs && chan->conn->feat_mask & L2CAP_FEAT_EXT_FLOW;
+@@ -4467,6 +4467,26 @@ static void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
+ 	}
  }
  
-+static void __l2cap_set_ertm_timeouts(struct l2cap_chan *chan,
-+				      struct l2cap_conf_rfc *rfc)
++void l2cap_move_start(struct l2cap_chan *chan)
 +{
-+	if (chan->local_amp_id && chan->hs_hcon) {
-+		u64 ertm_to = chan->hs_hcon->hdev->amp_be_flush_to;
++	BT_DBG("chan %p", chan);
 +
-+		/* Class 1 devices have must have ERTM timeouts
-+		 * exceeding the Link Supervision Timeout.  The
-+		 * default Link Supervision Timeout for AMP
-+		 * controllers is 10 seconds.
-+		 *
-+		 * Class 1 devices use 0xffffffff for their
-+		 * best-effort flush timeout, so the clamping logic
-+		 * will result in a timeout that meets the above
-+		 * requirement.  ERTM timeouts are 16-bit values, so
-+		 * the maximum timeout is 65.535 seconds.
-+		 */
-+
-+		/* Convert timeout to milliseconds and round */
-+		ertm_to = div_u64(ertm_to + 999, 1000);
-+
-+		/* This is the recommended formula for class 2 devices
-+		 * that start ERTM timers when packets are sent to the
-+		 * controller.
-+		 */
-+		ertm_to = 3 * ertm_to + 500;
-+
-+		if (ertm_to > 0xffff)
-+			ertm_to = 0xffff;
-+
-+		rfc->retrans_timeout = cpu_to_le16((u16) ertm_to);
-+		rfc->monitor_timeout = rfc->retrans_timeout;
++	if (chan->local_amp_id == 0) {
++		if (chan->chan_policy != BT_CHANNEL_POLICY_AMP_PREFERRED)
++			return;
++		chan->move_role = L2CAP_MOVE_ROLE_INITIATOR;
++		chan->move_state = L2CAP_MOVE_WAIT_PREPARE;
++		/* Placeholder - start physical link setup */
 +	} else {
-+		rfc->retrans_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
-+		rfc->monitor_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
++		chan->move_role = L2CAP_MOVE_ROLE_INITIATOR;
++		chan->move_state = L2CAP_MOVE_WAIT_RSP_SUCCESS;
++		chan->move_id = 0;
++		l2cap_move_start(chan);
++		l2cap_send_move_chan_req(chan, 0);
++		__set_chan_timer(chan, L2CAP_MOVE_TIMEOUT);
 +	}
 +}
 +
- static inline void l2cap_txwin_setup(struct l2cap_chan *chan)
+ static void l2cap_do_create(struct l2cap_chan *chan, int result,
+ 			    u8 local_amp_id, u8 remote_amp_id)
  {
- 	if (chan->tx_win > L2CAP_DEFAULT_TX_WINDOW &&
-@@ -3031,8 +3069,8 @@ done:
- 	case L2CAP_MODE_ERTM:
- 		rfc.mode            = L2CAP_MODE_ERTM;
- 		rfc.max_transmit    = chan->max_tx;
--		rfc.retrans_timeout = 0;
--		rfc.monitor_timeout = 0;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 5fae2bd..7cb4d73 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -735,6 +735,11 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 		}
+ 
+ 		chan->chan_policy = (u8) opt;
 +
-+		__l2cap_set_ertm_timeouts(chan, &rfc);
++		if (sk->sk_state == BT_CONNECTED &&
++		    chan->move_role == L2CAP_MOVE_ROLE_NONE)
++			l2cap_move_start(chan);
++
+ 		break;
  
- 		size = min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->conn->mtu -
- 			     L2CAP_EXT_HDR_SIZE - L2CAP_SDULEN_SIZE -
-@@ -3260,10 +3298,7 @@ done:
- 			rfc.max_pdu_size = cpu_to_le16(size);
- 			chan->remote_mps = size;
- 
--			rfc.retrans_timeout =
--				__constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
--			rfc.monitor_timeout =
--				__constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
-+			__l2cap_set_ertm_timeouts(chan, &rfc);
- 
- 			set_bit(CONF_MODE_DONE, &chan->conf_state);
- 
+ 	default:
 -- 
 1.7.12.3
 
