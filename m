@@ -1,36 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 15 Oct 2012 11:31:16 +0300
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 0/6] AMP link fixes
-Date: Mon, 15 Oct 2012 11:58:38 +0300
-Message-Id: <1350291524-13258-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1350051005-6015-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv1 5/7] Bluetooth: AMP: Get amp_mgr reference in HS hci_conn
+Message-ID: <20121015083114.GA2584@aemeltch-MOBL1>
 References: <1350051005-6015-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+ <1350051005-6015-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1350086005.19673.14.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1350086005.19673.14.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Marcel,
 
-Set of patches handling AMP link fixes
+On Sat, Oct 13, 2012 at 01:53:25AM +0200, Marcel Holtmann wrote:
+> Hi Andrei,
+> 
+> > When assigning amp_mgr in hci_conn (type AMP_LINK) get also reference.
+> > In hci_conn_del those references would be put for both types.
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  net/bluetooth/amp.c |    4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> 
+> > diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+> > index 59da0f1..e525e23 100644
+> > --- a/net/bluetooth/amp.c
+> > +++ b/net/bluetooth/amp.c
+> > @@ -123,9 +123,11 @@ struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
+> >  	hcon->attempt++;
+> >  	hcon->handle = __next_handle(mgr);
+> >  	hcon->remote_id = remote_id;
+> > -	hcon->amp_mgr = mgr;
+> >  	hcon->out = out;
+> >  
+> > +	hcon->amp_mgr = mgr;
+> > +	amp_mgr_get(mgr);
+> > +
+> 
+> We could discuss that amp_mgt_get(mgr) should just return mgr and you
+> can write this like this:
+> 
+> 	hcon->amp_mgr = amp_mgr_get(mgr);
 
-Changelog:
-	* v2: Removed patch "AMP: Zero amp_mgr pointer..", taken Marcel's
-	comments.
+Good idea. I will make it in the following patches.
 
-Andrei Emeltchenko (6):
-  Bluetooth: AMP: Use Loglink handle in ACL Handle field
-  Bluetooth: AMP: Handle complete frames in l2cap
-  Bluetooth: AMP: Drop packets when no l2cap conn exist
-  Bluetooth: Send EFS Conf Rsp only for BR/EDR chan
-  Bluetooth: AMP: Get amp_mgr reference in HS hci_conn
-  Bluetooth: Zero bredr pointer when chan is deleted
-
- include/net/bluetooth/hci.h |    1 +
- net/bluetooth/amp.c         |    4 +++-
- net/bluetooth/hci_core.c    |   13 ++++++++++++-
- net/bluetooth/l2cap_core.c  |   35 ++++++++++++++++++++++++++++-------
- 4 files changed, 44 insertions(+), 9 deletions(-)
-
--- 
-1.7.9.5
-
+Best regards 
+Andrei Emeltchenko 
