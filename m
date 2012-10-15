@@ -4,113 +4,96 @@ To: linux-bluetooth@vger.kernel.org,
 	gustavo@padovan.org
 Cc: sunnyk@codeaurora.org,
 	marcel@holtmann.org
-Subject: [PATCH 17/19] Bluetooth: Send create channel request instead of connect for AMP
-Date: Mon, 15 Oct 2012 08:34:06 -0700
-Message-Id: <1350315248-7690-18-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 15/19] Bluetooth: Configure appropriate timeouts for AMP controllers
+Date: Mon, 15 Oct 2012 08:34:04 -0700
+Message-Id: <1350315248-7690-16-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1350315248-7690-1-git-send-email-mathewm@codeaurora.org>
 References: <1350315248-7690-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the channel policy is set to prefer AMP, then an L2CAP channel is
-set up using the "create channel" command rather than the "connect"
-command.  A physical link is also set up before sending "create
-channel".
+The L2CAP spec recommends specific retransmit and monitor timeouts for
+ERTM channels that are on AMP controllers.  These timeouts are
+calculated from the AMP controller's best effort flush timeout.
 
-Behavior is unchanged if enable_hs is false.
+BR/EDR controllers use the default retransmit and monitor timeouts.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ net/bluetooth/l2cap_core.c | 47 ++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 41 insertions(+), 6 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 3b142a0..57b1b02 100644
+index cf1dc4e..dbcd1e3 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -58,6 +58,9 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
- static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
- 		     struct sk_buff_head *skbs, u8 event);
+@@ -2965,6 +2965,44 @@ static inline bool __l2cap_efs_supported(struct l2cap_chan *chan)
+ 	return enable_hs && chan->conn->feat_mask & L2CAP_FEAT_EXT_FLOW;
+ }
  
-+static void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
-+			      u8 status);
++static void __l2cap_set_ertm_timeouts(struct l2cap_chan *chan,
++				      struct l2cap_conf_rfc *rfc)
++{
++	if (chan->local_amp_id && chan->hs_hcon) {
++		u64 ertm_to = chan->hs_hcon->hdev->amp_be_flush_to;
 +
- /* ---- L2CAP channels ---- */
- 
- static struct l2cap_chan *__l2cap_get_chan_by_dcid(struct l2cap_conn *conn,
-@@ -562,6 +565,13 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 			mgr->bredr_chan = NULL;
- 	}
- 
-+	if (chan->hs_hchan) {
-+		chan->hs_hchan = NULL;
-+		chan->hs_hcon = NULL;
++		/* Class 1 devices have must have ERTM timeouts
++		 * exceeding the Link Supervision Timeout.  The
++		 * default Link Supervision Timeout for AMP
++		 * controllers is 10 seconds.
++		 *
++		 * Class 1 devices use 0xffffffff for their
++		 * best-effort flush timeout, so the clamping logic
++		 * will result in a timeout that meets the above
++		 * requirement.  ERTM timeouts are 16-bit values, so
++		 * the maximum timeout is 65.535 seconds.
++		 */
 +
-+		/* Placeholder - free logical link */
++		/* Convert timeout to milliseconds and round */
++		ertm_to = div_u64(ertm_to + 999, 1000);
++
++		/* This is the recommended formula for class 2 devices
++		 * that start ERTM timers when packets are sent to the
++		 * controller.
++		 */
++		ertm_to = 3 * ertm_to + 500;
++
++		if (ertm_to > 0xffff)
++			ertm_to = 0xffff;
++
++		rfc->retrans_timeout = cpu_to_le16((u16) ertm_to);
++		rfc->monitor_timeout = rfc->retrans_timeout;
++	} else {
++		rfc->retrans_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
++		rfc->monitor_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
 +	}
++}
 +
- 	chan->ops->teardown(chan, err);
- 
- 	if (test_bit(CONF_NOT_COMPLETE, &chan->conf_state))
-@@ -1108,6 +1118,7 @@ static void l2cap_start_connection(struct l2cap_chan *chan)
+ static inline void l2cap_txwin_setup(struct l2cap_chan *chan)
  {
- 	if (__amp_capable(chan)) {
- 		BT_DBG("chan %p AMP capable: discover AMPs", chan);
-+		set_bit(CONF_CONNECT_PEND, &chan->conf_state);
- 		a2mp_discover_amp(chan);
- 	} else {
- 		l2cap_send_conn_req(chan);
-@@ -1253,6 +1264,16 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 				rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHEN_PEND);
- 			}
+ 	if (chan->tx_win > L2CAP_DEFAULT_TX_WINDOW &&
+@@ -3031,8 +3069,8 @@ done:
+ 	case L2CAP_MODE_ERTM:
+ 		rfc.mode            = L2CAP_MODE_ERTM;
+ 		rfc.max_transmit    = chan->max_tx;
+-		rfc.retrans_timeout = 0;
+-		rfc.monitor_timeout = 0;
++
++		__l2cap_set_ertm_timeouts(chan, &rfc);
  
-+			if (rsp.result == __constant_cpu_to_le16(L2CAP_CR_SUCCESS) &&
-+			    chan->local_amp_id) {
-+				/* Placeholder - uncomment when amp functions
-+				 * are available
-+				amp_accept_physical(chan, chan->local_amp_id);
-+				 */
-+				l2cap_chan_unlock(chan);
-+				continue;
-+			}
-+
- 			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP,
- 				       sizeof(rsp), &rsp);
+ 		size = min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->conn->mtu -
+ 			     L2CAP_EXT_HDR_SIZE - L2CAP_SDULEN_SIZE -
+@@ -3260,10 +3298,7 @@ done:
+ 			rfc.max_pdu_size = cpu_to_le16(size);
+ 			chan->remote_mps = size;
  
-@@ -3344,6 +3365,18 @@ done:
- 			rfc.mode = chan->mode;
- 		}
+-			rfc.retrans_timeout =
+-				__constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
+-			rfc.monitor_timeout =
+-				__constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
++			__l2cap_set_ertm_timeouts(chan, &rfc);
  
-+		if (test_bit(CONF_LOC_CONF_PEND, &chan->conf_state) &&
-+		    chan->local_amp_id) {
-+			struct hci_chan *hchan = NULL;
-+
-+			/* Placeholder - get hci_chan for logical link */
-+
-+			if (hchan && hchan->state == BT_CONNECTED) {
-+				l2cap_logical_cfm(chan, hchan,
-+						  L2CAP_MR_SUCCESS);
-+			}
-+		}
-+
- 		if (result == L2CAP_CONF_SUCCESS)
- 			set_bit(CONF_OUTPUT_DONE, &chan->conf_state);
- 	}
-@@ -6354,6 +6387,15 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 					stat = L2CAP_CS_AUTHOR_PEND;
- 					chan->ops->defer(chan);
- 				} else {
-+					if (chan->local_amp_id) {
-+						/* Placeholder - accept physical
-+						 * link
-+						amp_accept_physical(chan,
-+							chan->local_amp_id);
-+						*/
-+						continue;
-+					}
-+
- 					__l2cap_state_change(chan, BT_CONFIG);
- 					res = L2CAP_CR_SUCCESS;
- 					stat = L2CAP_CS_NO_INFO;
+ 			set_bit(CONF_MODE_DONE, &chan->conf_state);
+ 
 -- 
 1.7.12.3
 
