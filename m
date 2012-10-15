@@ -1,33 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] media: Fix leaking endpoint in case of failure to register SEP
-Date: Mon, 15 Oct 2012 11:51:27 +0200
-Message-Id: <1350294687-20718-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCHv2 4/6] Bluetooth: Send EFS Conf Rsp only for BR/EDR chan
+Date: Mon, 15 Oct 2012 11:58:42 +0300
+Message-Id: <1350291524-13258-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1350291524-13258-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1350051005-6015-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1350291524-13258-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This can happen in case of AudioSink and/or AudioSource are disabled in
-audio.conf.
+Do not send EFS Configuration Response for High Speed channel yet.
+It will be sent after receiving Logical Link Complete event.
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- audio/media.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/l2cap_core.c |   12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/audio/media.c b/audio/media.c
-index 5c26035..f2b5b2f 100644
---- a/audio/media.c
-+++ b/audio/media.c
-@@ -769,7 +769,7 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index e7bec6c..978b203 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -3715,7 +3715,11 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
+ 
+ 		/* check compatibility */
+ 
+-		l2cap_send_efs_conf_rsp(chan, rsp, cmd->ident, flags);
++		/* Send rsp for BR/EDR channel */
++		if (!chan->ctrl_id)
++			l2cap_send_efs_conf_rsp(chan, rsp, cmd->ident, flags);
++		else
++			chan->ident = cmd->ident;
  	}
  
- 	if (!succeeded) {
--		g_free(endpoint);
-+		media_endpoint_destroy(endpoint);
- 		return NULL;
- 	}
+ unlock:
+@@ -3764,7 +3768,11 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
+ 
+ 			/* check compatibility */
+ 
+-			l2cap_send_efs_conf_rsp(chan, buf, cmd->ident, 0);
++			if (!chan->ctrl_id)
++				l2cap_send_efs_conf_rsp(chan, buf, cmd->ident,
++							0);
++			else
++				chan->ident = cmd->ident;
+ 		}
+ 		goto done;
  
 -- 
-1.7.11.4
+1.7.9.5
 
