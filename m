@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 16/16] control: Add Control.Disconnect method
-Date: Mon, 15 Oct 2012 16:05:36 +0200
-Message-Id: <1350309936-31588-16-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 12/16] AVRCP: Fix handling TG PDUs as they were CT PDUs
+Date: Mon, 15 Oct 2012 16:05:32 +0200
+Message-Id: <1350309936-31588-12-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1350309936-31588-1-git-send-email-luiz.dentz@gmail.com>
 References: <1350309936-31588-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,97 +11,169 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This method can be used to disconnect AVRCP.
+PDU handling needs to different depending on the acting role.
 ---
- audio/control.c     | 31 +++++++++++++++++++++++++++++++
- doc/control-api.txt |  4 ++++
- 2 files changed, 35 insertions(+)
+ audio/avrcp.c | 81 +++++++++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 57 insertions(+), 24 deletions(-)
 
-diff --git a/audio/control.c b/audio/control.c
-index e15e9ba..8bb085a 100644
---- a/audio/control.c
-+++ b/audio/control.c
-@@ -62,6 +62,7 @@ struct control {
- 	struct avctp *session;
- 	gboolean target;
- 	DBusMessage *connect;
-+	DBusMessage *disconnect;
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index 8abb426..85dd241 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -188,6 +188,10 @@ struct avrcp {
+ 	uint16_t version;
+ 	int features;
+ 
++	void (*init) (struct avrcp *session);
++
++	const struct control_pdu_handler *control_handlers;
++
+ 	unsigned int control_id;
+ 	unsigned int browsing_id;
+ 	uint16_t registered_events;
+@@ -196,6 +200,13 @@ struct avrcp {
+ 	struct pending_pdu *pending_pdu;
  };
  
- static void state_changed(struct audio_device *dev, avctp_state_t old_state,
-@@ -83,6 +84,13 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
- 			control->connect = NULL;
- 		}
- 
-+		if (control->disconnect) {
-+			g_dbus_send_reply(conn, control->disconnect,
-+							DBUS_TYPE_INVALID);
-+			dbus_message_unref(control->disconnect);
-+			control->disconnect = NULL;
-+		}
++struct control_pdu_handler {
++	uint8_t pdu_id;
++	uint8_t code;
++	uint8_t (*func) (struct avrcp *session, struct avrcp_header *pdu,
++							uint8_t transaction);
++};
 +
- 		if (old_state != AVCTP_STATE_CONNECTED)
- 			break;
+ static GSList *servers = NULL;
+ static unsigned int avctp_id = 0;
  
-@@ -164,6 +172,25 @@ static DBusMessage *control_connect(DBusConnection *conn, DBusMessage *msg,
+@@ -1128,12 +1139,7 @@ err:
+ 	return AVC_CTYPE_REJECTED;
+ }
+ 
+-static struct control_pdu_handler {
+-	uint8_t pdu_id;
+-	uint8_t code;
+-	uint8_t (*func) (struct avrcp *session, struct avrcp_header *pdu,
+-							uint8_t transaction);
+-} control_handlers[] = {
++static const struct control_pdu_handler tg_control_handlers[] = {
+ 		{ AVRCP_GET_CAPABILITIES, AVC_CTYPE_STATUS,
+ 					avrcp_handle_get_capabilities },
+ 		{ AVRCP_LIST_PLAYER_ATTRIBUTES, AVC_CTYPE_STATUS,
+@@ -1165,6 +1171,10 @@ static struct control_pdu_handler {
+ 		{ },
+ };
+ 
++static const struct control_pdu_handler ct_control_handlers[] = {
++		{ },
++};
++
+ /* handle vendordep pdu inside an avctp packet */
+ static size_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
+ 					uint8_t *code, uint8_t *subunit,
+@@ -1172,7 +1182,7 @@ static size_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
+ 					void *user_data)
+ {
+ 	struct avrcp *session = user_data;
+-	struct control_pdu_handler *handler;
++	const struct control_pdu_handler *handler;
+ 	struct avrcp_header *pdu = (void *) operands;
+ 	uint32_t company_id = get_company_id(pdu->company_id);
+ 
+@@ -1192,7 +1202,7 @@ static size_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
+ 		goto err_metadata;
+ 	}
+ 
+-	for (handler = control_handlers; handler->pdu_id; handler++) {
++	for (handler = session->control_handlers; handler->pdu_id; handler++) {
+ 		if (handler->pdu_id == pdu->pdu_id)
+ 			break;
+ 	}
+@@ -1356,6 +1366,39 @@ static struct avrcp *find_session(GSList *list, struct audio_device *dev)
  	return NULL;
  }
  
-+static DBusMessage *control_disconnect(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
++static void session_tg_init(struct avrcp *session)
 +{
-+	struct audio_device *device = data;
-+	struct control *control = device->control;
++	struct avrcp_server *server = session->server;
 +
-+	if (!control->session)
-+		return btd_error_not_connected(msg);
++	session->player = g_slist_nth_data(server->players, 0);
++	session->control_handlers = tg_control_handlers;
 +
-+	if (control->disconnect)
-+		return btd_error_in_progress(msg);
++	if (session->version >= 0x0104) {
++		register_volume_notification(session);
++		if (session->features & AVRCP_FEATURE_BROWSING)
++			avctp_connect_browsing(session->conn);
++	}
 +
-+	avctp_disconnect(control->session);
-+
-+	control->disconnect = dbus_message_ref(msg);
-+
-+	return NULL;
++	session->control_id = avctp_register_pdu_handler(session->conn,
++							AVC_OP_VENDORDEP,
++							handle_vendordep_pdu,
++							session);
++	session->browsing_id = avctp_register_browsing_pdu_handler(
++							session->conn,
++							handle_browsing_pdu,
++							session);
 +}
 +
- static DBusMessage *key_pressed(DBusConnection *conn, DBusMessage *msg,
- 						uint8_t op, void *data)
++static void session_ct_init(struct avrcp *session)
++{
++	session->control_handlers = ct_control_handlers;
++
++	session->control_id = avctp_register_pdu_handler(session->conn,
++							AVC_OP_VENDORDEP,
++							handle_vendordep_pdu,
++							session);
++}
++
+ static struct avrcp *session_create(struct avrcp_server *server,
+ 						struct audio_device *dev)
  {
-@@ -243,6 +270,7 @@ static const GDBusMethodTable control_methods[] = {
- 				NULL, GDBUS_ARGS({ "connected", "b" }),
- 				control_is_connected) },
- 	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, control_connect) },
-+	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL, control_disconnect) },
- 	{ GDBUS_METHOD("Play", NULL, NULL, control_play) },
- 	{ GDBUS_METHOD("Pause", NULL, NULL, control_pause) },
- 	{ GDBUS_METHOD("Stop", NULL, NULL, control_stop) },
-@@ -278,6 +306,9 @@ static void path_unregister(void *data)
- 	if (control->connect)
- 		dbus_message_unref(control->connect);
+@@ -1368,7 +1411,6 @@ static struct avrcp *session_create(struct avrcp_server *server,
+ 	session->server = server;
+ 	session->conn = avctp_connect(&dev->src, &dev->dst);
+ 	session->dev = dev;
+-	session->player = g_slist_nth_data(server->players, 0);
  
-+	if (control->disconnect)
-+		dbus_message_unref(control->disconnect);
-+
- 	g_free(control);
- 	dev->control = NULL;
- }
-diff --git a/doc/control-api.txt b/doc/control-api.txt
-index 61069ea..5391a8a 100644
---- a/doc/control-api.txt
-+++ b/doc/control-api.txt
-@@ -25,6 +25,10 @@ Methods		boolean IsConnected() {deprecated}
+ 	server->sessions = g_slist_append(server->sessions, session);
  
- 			Connect to remote device.
+@@ -1381,10 +1423,13 @@ static struct avrcp *session_create(struct avrcp_server *server,
+ 	else
+ 		session->target = FALSE;
  
-+		void Disconnect()
-+
-+			Disconnect from remote device.
-+
- 		void Play()
+-	if (session->target)
++	if (session->target) {
++		session->init = session_tg_init;
+ 		rec = btd_device_get_record(dev->btd_dev, AVRCP_REMOTE_UUID);
+-	else
++	} else {
++		session->init = session_ct_init;
+ 		rec = btd_device_get_record(dev->btd_dev, AVRCP_TARGET_UUID);
++	}
  
- 			Resume playback.
+ 	if (rec == NULL)
+ 		return session;
+@@ -1451,20 +1496,8 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
+ 		if (session == NULL)
+ 			break;
+ 
+-		if (session->version >= 0x0104) {
+-			register_volume_notification(session);
+-			if (session->features & AVRCP_FEATURE_BROWSING)
+-				avctp_connect_browsing(session->conn);
+-		}
++		session->init(session);
+ 
+-		session->control_id = avctp_register_pdu_handler(session->conn,
+-							AVC_OP_VENDORDEP,
+-							handle_vendordep_pdu,
+-							session);
+-		session->browsing_id = avctp_register_browsing_pdu_handler(
+-							session->conn,
+-							handle_browsing_pdu,
+-							session);
+ 	default:
+ 		return;
+ 	}
 -- 
 1.7.11.4
 
