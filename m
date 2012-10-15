@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 12/16] AVRCP: Fix handling TG PDUs as they were CT PDUs
-Date: Mon, 15 Oct 2012 16:05:32 +0200
-Message-Id: <1350309936-31588-12-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 14/16] control: Add basic support for AVRCP 1.0 controller
+Date: Mon, 15 Oct 2012 16:05:34 +0200
+Message-Id: <1350309936-31588-14-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1350309936-31588-1-git-send-email-luiz.dentz@gmail.com>
 References: <1350309936-31588-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,169 +11,144 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-PDU handling needs to different depending on the acting role.
 ---
- audio/avrcp.c | 81 +++++++++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 57 insertions(+), 24 deletions(-)
+ audio/control.c     | 61 ++++++++++++++++++++++++++++++++++++++---------------
+ doc/control-api.txt | 24 +++++++++++++++++++++
+ 2 files changed, 68 insertions(+), 17 deletions(-)
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 8abb426..85dd241 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -188,6 +188,10 @@ struct avrcp {
- 	uint16_t version;
- 	int features;
- 
-+	void (*init) (struct avrcp *session);
-+
-+	const struct control_pdu_handler *control_handlers;
-+
- 	unsigned int control_id;
- 	unsigned int browsing_id;
- 	uint16_t registered_events;
-@@ -196,6 +200,13 @@ struct avrcp {
- 	struct pending_pdu *pending_pdu;
- };
- 
-+struct control_pdu_handler {
-+	uint8_t pdu_id;
-+	uint8_t code;
-+	uint8_t (*func) (struct avrcp *session, struct avrcp_header *pdu,
-+							uint8_t transaction);
-+};
-+
- static GSList *servers = NULL;
- static unsigned int avctp_id = 0;
- 
-@@ -1128,12 +1139,7 @@ err:
- 	return AVC_CTYPE_REJECTED;
+diff --git a/audio/control.c b/audio/control.c
+index 926bdfb..b77c4cb 100644
+--- a/audio/control.c
++++ b/audio/control.c
+@@ -123,8 +123,8 @@ static DBusMessage *control_is_connected(DBusConnection *conn,
+ 	return reply;
  }
  
--static struct control_pdu_handler {
--	uint8_t pdu_id;
--	uint8_t code;
--	uint8_t (*func) (struct avrcp *session, struct avrcp_header *pdu,
--							uint8_t transaction);
--} control_handlers[] = {
-+static const struct control_pdu_handler tg_control_handlers[] = {
- 		{ AVRCP_GET_CAPABILITIES, AVC_CTYPE_STATUS,
- 					avrcp_handle_get_capabilities },
- 		{ AVRCP_LIST_PLAYER_ATTRIBUTES, AVC_CTYPE_STATUS,
-@@ -1165,6 +1171,10 @@ static struct control_pdu_handler {
- 		{ },
- };
- 
-+static const struct control_pdu_handler ct_control_handlers[] = {
-+		{ },
-+};
-+
- /* handle vendordep pdu inside an avctp packet */
- static size_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
- 					uint8_t *code, uint8_t *subunit,
-@@ -1172,7 +1182,7 @@ static size_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
- 					void *user_data)
+-static DBusMessage *volume_up(DBusConnection *conn, DBusMessage *msg,
+-								void *data)
++static DBusMessage *key_pressed(DBusConnection *conn, DBusMessage *msg,
++						uint8_t op, void *data)
  {
- 	struct avrcp *session = user_data;
--	struct control_pdu_handler *handler;
-+	const struct control_pdu_handler *handler;
- 	struct avrcp_header *pdu = (void *) operands;
- 	uint32_t company_id = get_company_id(pdu->company_id);
+ 	struct audio_device *device = data;
+ 	struct control *control = device->control;
+@@ -136,31 +136,53 @@ static DBusMessage *volume_up(DBusConnection *conn, DBusMessage *msg,
+ 	if (!control->target)
+ 		return btd_error_not_supported(msg);
  
-@@ -1192,7 +1202,7 @@ static size_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
- 		goto err_metadata;
- 	}
+-	err = avctp_send_passthrough(control->session, AVC_VOLUME_UP);
++	err = avctp_send_passthrough(control->session, op);
+ 	if (err < 0)
+ 		return btd_error_failed(msg, strerror(-err));
  
--	for (handler = control_handlers; handler->pdu_id; handler++) {
-+	for (handler = session->control_handlers; handler->pdu_id; handler++) {
- 		if (handler->pdu_id == pdu->pdu_id)
- 			break;
- 	}
-@@ -1356,6 +1366,39 @@ static struct avrcp *find_session(GSList *list, struct audio_device *dev)
- 	return NULL;
+ 	return dbus_message_new_method_return(msg);
  }
  
-+static void session_tg_init(struct avrcp *session)
-+{
-+	struct avrcp_server *server = session->server;
-+
-+	session->player = g_slist_nth_data(server->players, 0);
-+	session->control_handlers = tg_control_handlers;
-+
-+	if (session->version >= 0x0104) {
-+		register_volume_notification(session);
-+		if (session->features & AVRCP_FEATURE_BROWSING)
-+			avctp_connect_browsing(session->conn);
-+	}
-+
-+	session->control_id = avctp_register_pdu_handler(session->conn,
-+							AVC_OP_VENDORDEP,
-+							handle_vendordep_pdu,
-+							session);
-+	session->browsing_id = avctp_register_browsing_pdu_handler(
-+							session->conn,
-+							handle_browsing_pdu,
-+							session);
-+}
-+
-+static void session_ct_init(struct avrcp *session)
-+{
-+	session->control_handlers = ct_control_handlers;
-+
-+	session->control_id = avctp_register_pdu_handler(session->conn,
-+							AVC_OP_VENDORDEP,
-+							handle_vendordep_pdu,
-+							session);
-+}
-+
- static struct avrcp *session_create(struct avrcp_server *server,
- 						struct audio_device *dev)
+-static DBusMessage *volume_down(DBusConnection *conn, DBusMessage *msg,
++static DBusMessage *control_volume_up(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
  {
-@@ -1368,7 +1411,6 @@ static struct avrcp *session_create(struct avrcp_server *server,
- 	session->server = server;
- 	session->conn = avctp_connect(&dev->src, &dev->dst);
- 	session->dev = dev;
--	session->player = g_slist_nth_data(server->players, 0);
+-	struct audio_device *device = data;
+-	struct control *control = device->control;
+-	int err;
++	return key_pressed(conn, msg, AVC_VOLUME_UP, data);
++}
  
- 	server->sessions = g_slist_append(server->sessions, session);
+-	if (!control->session)
+-		return btd_error_not_connected(msg);
++static DBusMessage *control_volume_down(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	return key_pressed(conn, msg, AVC_VOLUME_DOWN, data);
++}
  
-@@ -1381,10 +1423,13 @@ static struct avrcp *session_create(struct avrcp_server *server,
- 	else
- 		session->target = FALSE;
+-	if (!control->target)
+-		return btd_error_not_supported(msg);
++static DBusMessage *control_play(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	return key_pressed(conn, msg, AVC_PLAY, data);
++}
  
--	if (session->target)
-+	if (session->target) {
-+		session->init = session_tg_init;
- 		rec = btd_device_get_record(dev->btd_dev, AVRCP_REMOTE_UUID);
--	else
-+	} else {
-+		session->init = session_ct_init;
- 		rec = btd_device_get_record(dev->btd_dev, AVRCP_TARGET_UUID);
-+	}
+-	err = avctp_send_passthrough(control->session, AVC_VOLUME_DOWN);
+-	if (err < 0)
+-		return btd_error_failed(msg, strerror(-err));
++static DBusMessage *control_pause(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	return key_pressed(conn, msg, AVC_PAUSE, data);
++}
  
- 	if (rec == NULL)
- 		return session;
-@@ -1451,20 +1496,8 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
- 		if (session == NULL)
- 			break;
+-	return dbus_message_new_method_return(msg);
++static DBusMessage *control_stop(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	return key_pressed(conn, msg, AVC_STOP, data);
++}
++
++static DBusMessage *control_next(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	return key_pressed(conn, msg, AVC_FORWARD, data);
++}
++
++static DBusMessage *control_previous(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	return key_pressed(conn, msg, AVC_BACKWARD, data);
+ }
  
--		if (session->version >= 0x0104) {
--			register_volume_notification(session);
--			if (session->features & AVRCP_FEATURE_BROWSING)
--				avctp_connect_browsing(session->conn);
--		}
-+		session->init(session);
+ static gboolean control_property_get_connected(
+@@ -179,8 +201,13 @@ static const GDBusMethodTable control_methods[] = {
+ 	{ GDBUS_DEPRECATED_METHOD("IsConnected",
+ 				NULL, GDBUS_ARGS({ "connected", "b" }),
+ 				control_is_connected) },
+-	{ GDBUS_METHOD("VolumeUp", NULL, NULL, volume_up) },
+-	{ GDBUS_METHOD("VolumeDown", NULL, NULL, volume_down) },
++	{ GDBUS_METHOD("Play", NULL, NULL, control_play) },
++	{ GDBUS_METHOD("Pause", NULL, NULL, control_pause) },
++	{ GDBUS_METHOD("Stop", NULL, NULL, control_stop) },
++	{ GDBUS_METHOD("Next", NULL, NULL, control_next) },
++	{ GDBUS_METHOD("Previous", NULL, NULL, control_previous) },
++	{ GDBUS_METHOD("VolumeUp", NULL, NULL, control_volume_up) },
++	{ GDBUS_METHOD("VolumeDown", NULL, NULL, control_volume_down) },
+ 	{ }
+ };
  
--		session->control_id = avctp_register_pdu_handler(session->conn,
--							AVC_OP_VENDORDEP,
--							handle_vendordep_pdu,
--							session);
--		session->browsing_id = avctp_register_browsing_pdu_handler(
--							session->conn,
--							handle_browsing_pdu,
--							session);
- 	default:
- 		return;
- 	}
+diff --git a/doc/control-api.txt b/doc/control-api.txt
+index eacfbcd..3792dfa 100644
+--- a/doc/control-api.txt
++++ b/doc/control-api.txt
+@@ -21,6 +21,30 @@ Methods		boolean IsConnected() {deprecated}
+ 			Returns all properties for the interface. See the
+ 			properties section for available properties.
+ 
++		void Play()
++
++			Resume playback.
++
++		void Pause()
++
++			Pause playback.
++
++		void Stop()
++
++			Stop playback.
++
++		void Next()
++
++			Next item.
++
++		void Previous()
++
++			Previous item.
++
++		void VolumeDown()
++
++			Adjust remote volume one step down
++
+ 		void VolumeUp()
+ 
+ 			Adjust remote volume one step up
 -- 
 1.7.11.4
 
