@@ -1,34 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 15 Oct 2012 17:37:17 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 04/16] AVRCP: Don't respond with errors when no
- player is registered
-Message-ID: <20121015143717.GA3393@x220.P-661HNU-F1>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 08/16] AVCTP: Wait confirmation to send button release
+Date: Mon, 15 Oct 2012 16:05:28 +0200
+Message-Id: <1350309936-31588-8-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1350309936-31588-1-git-send-email-luiz.dentz@gmail.com>
 References: <1350309936-31588-1-git-send-email-luiz.dentz@gmail.com>
- <1350309936-31588-4-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1350309936-31588-4-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Oct 15, 2012, Luiz Augusto von Dentz wrote:
-> +static void *player_get_metadata(struct avrcp_player *player, uint32_t attr)
-> +{
-> +	if (player != NULL)
-> +		return player->cb->get_metadata(attr, player->user_data);
-> +
-> +	if (attr == AVRCP_MEDIA_ATTRIBUTE_TITLE)
-> +		return "";
+---
+ audio/avctp.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 46 insertions(+), 12 deletions(-)
 
-This is quite messed up. Using void pointers like that just obfuscates
-what the code is doing. After a quick look at current git it seems to me
-like struct metadata_value from media.c should be made public and that
-should be the return type of this function instead of doing void pointer
-magic.
+diff --git a/audio/avctp.c b/audio/avctp.c
+index 9a62bc0..c72d2d5 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -1114,26 +1114,60 @@ static int avctp_send(struct avctp *session, uint8_t transaction, uint8_t cr,
+ 	return err;
+ }
+ 
+-int avctp_send_passthrough(struct avctp *session, uint8_t op)
++static int avctp_send_req(struct avctp *session, uint8_t code,
++				uint8_t subunit, uint8_t opcode,
++				uint8_t *operands, size_t operand_count,
++				avctp_rsp_cb func, void *user_data)
+ {
+-	uint8_t operands[2];
+-	int ret;
++	struct avctp_rsp_handler *handler;
++	int err;
+ 
+-	operands[0] = op & 0x7f;
+-	operands[1] = 0;
++	err = avctp_send(session, id, AVCTP_COMMAND, code, subunit,
++				opcode, operands, operand_count);
++	if (err < 0)
++		return err;
+ 
+-	ret = avctp_send(session, id, AVCTP_COMMAND, AVC_CTYPE_CONTROL,
+-					AVC_SUBUNIT_PANEL, AVC_OP_PASSTHROUGH,
+-					operands, sizeof(operands));
+-	if (ret < 0)
+-		return ret;
++	handler = g_new0(struct avctp_rsp_handler, 1);
++	handler->id = id;
++	handler->func = func;
++	handler->user_data = user_data;
++
++	session->handlers = g_slist_prepend(session->handlers, handler);
++
++	id++;
++
++	return 0;
++}
++
++static gboolean avctp_passthrough_rsp(struct avctp *session, uint8_t code,
++					uint8_t subunit, uint8_t *operands,
++					size_t operand_count, void *user_data)
++{
++	if (code != AVC_CTYPE_ACCEPTED)
++		return FALSE;
+ 
+ 	/* Button release */
+ 	operands[0] |= 0x80;
+ 
+-	return avctp_send(session, id, AVCTP_COMMAND, AVC_CTYPE_CONTROL,
++	avctp_send(session, id, AVCTP_COMMAND, AVC_CTYPE_CONTROL,
+ 					AVC_SUBUNIT_PANEL, AVC_OP_PASSTHROUGH,
+-					operands, sizeof(operands));
++					operands, sizeof(operand_count));
++
++	return FALSE;
++}
++
++int avctp_send_passthrough(struct avctp *session, uint8_t op)
++{
++	uint8_t operands[2];
++
++	/* Button pressed */
++	operands[0] = op & 0x7f;
++	operands[1] = 0;
++
++	return avctp_send_req(session, AVC_CTYPE_CONTROL,
++				AVC_SUBUNIT_PANEL, AVC_OP_PASSTHROUGH,
++				operands, sizeof(operands),
++				avctp_passthrough_rsp, NULL);
+ }
+ 
+ int avctp_send_vendordep(struct avctp *session, uint8_t transaction,
+-- 
+1.7.11.4
 
-Johan
