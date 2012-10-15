@@ -1,59 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mat Martineau <mathewm@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
-Cc: sunnyk@codeaurora.org, marcel@holtmann.org
-Subject: [PATCH 00/19] L2CAP signaling for AMP channel create/move
-Date: Mon, 15 Oct 2012 08:33:49 -0700
-Message-Id: <1350315248-7690-1-git-send-email-mathewm@codeaurora.org>
+Date: Mon, 15 Oct 2012 12:27:38 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 5/6] Bluetooth: AMP: Get amp_mgr reference in HS
+ hci_conn
+Message-ID: <20121015152738.GC6498@joana>
+References: <1350051005-6015-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1350291524-13258-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1350291524-13258-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20121015124903.GA6498@joana>
+ <20121015132114.GC2584@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20121015132114.GC2584@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Here are the changes that process commands on the L2CAP signaling
-channel for setting up AMP channels.  There's still a lot of
-integration to do as other AMP functionality is implemented.  I've
-marked places that require this integration with "Placeholder"
-comments (look for that string).
+Hi Andrei,
 
-Changes:
-  * PATCHv1 - Rebased after AMP physical link patch set, incorporated
-              mailing list feedback.
-  * RFCv1 - Finished commit messages, fixed formatting/style issues
-  * RFCv0 - Initial post
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-10-15 16:21:21 +0300]:
 
-Mat Martineau (19):
-  Bluetooth: Add new l2cap_chan struct members for high speed channels
-  Bluetooth: Add L2CAP create channel request handling
-  Bluetooth: Remove unnecessary intermediate function
-  Bluetooth: Lookup channel structure based on DCID
-  Bluetooth: Channel move request handling
-  Bluetooth: Add new ERTM receive states for channel move
-  Bluetooth: Add move channel confirm handling
-  Bluetooth: Add state to hci_chan
-  Bluetooth: Move channel response
-  Bluetooth: Add logical link confirm
-  Bluetooth: Add move confirm response handling
-  Bluetooth: Handle physical link completion
-  Bluetooth: Flag ACL frames as complete for AMP controllers
-  Bluetooth: Do not send data during channel move
-  Bluetooth: Configure appropriate timeouts for AMP controllers
-  Bluetooth: Ignore BR/EDR packet size constraints when fragmenting for
-    AMP
-  Bluetooth: Send create channel request instead of connect for AMP
-  Bluetooth: Do not retransmit data during a channel move
-  Bluetooth: Start channel move when socket option is changed
+> Hi Gustavo,
+> 
+> On Mon, Oct 15, 2012 at 09:49:03AM -0300, Gustavo Padovan wrote:
+> > Hi Andrei,
+> > 
+> > * Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-10-15 11:58:43 +0300]:
+> > 
+> > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > 
+> > > When assigning amp_mgr in hci_conn (type AMP_LINK) get also reference.
+> > > In hci_conn_del those references would be put for both types.
+> > > 
+> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> > > ---
+> > >  net/bluetooth/amp.c |    4 +++-
+> > >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+> > > index 59da0f1..e525e23 100644
+> > > --- a/net/bluetooth/amp.c
+> > > +++ b/net/bluetooth/amp.c
+> > > @@ -123,9 +123,11 @@ struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
+> > >  	hcon->attempt++;
+> > >  	hcon->handle = __next_handle(mgr);
+> > >  	hcon->remote_id = remote_id;
+> > > -	hcon->amp_mgr = mgr;
+> > >  	hcon->out = out;
+> > >  
+> > > +	hcon->amp_mgr = mgr;
+> > > +	amp_mgr_get(mgr);
+> > 
+> > You did not take the comments from Marcel in this patch, please make the
+> > change to amp_mgr_get() before sending this patch.
+> 
+> I was thinking of making separate patch since this might be used in
+> several places so I would change it once instead of splitting this change
+> to several patches.
 
- include/net/bluetooth/hci_core.h |   1 +
- include/net/bluetooth/l2cap.h    |  32 ++
- net/bluetooth/hci_conn.c         |   1 +
- net/bluetooth/l2cap_core.c       | 954 +++++++++++++++++++++++++++++++++++++--
- net/bluetooth/l2cap_sock.c       |   5 +
- 5 files changed, 956 insertions(+), 37 deletions(-)
+Sure, but just send that patch before this one.
 
--- 
-1.7.12.3
-
---
-Mat Martineau
-
-Employee of Qualcomm Innovation Center, Inc.
-The Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, hosted by The Linux Foundation
+	Gustavo
