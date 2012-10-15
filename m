@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 3/6] Bluetooth: AMP: Drop packets when no l2cap conn exist
-Date: Mon, 15 Oct 2012 11:58:41 +0300
-Message-Id: <1350291524-13258-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 6/6] Bluetooth: Zero bredr pointer when chan is deleted
+Date: Mon, 15 Oct 2012 11:58:44 +0300
+Message-Id: <1350291524-13258-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1350291524-13258-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1350051005-6015-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1350291524-13258-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,29 +12,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-High Speed hci_conn should always have l2cap_conn associated with it.
+If BREDR L2CAP chan is deleted and this chan is the channel through
+which High Speed traffic is routed to AMP then zero pointer to
+the chan in amp_mgr to prevent accessing it.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
  net/bluetooth/l2cap_core.c |    4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 5fd236f..e7bec6c 100644
+index 978b203..32b3fae 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -5579,6 +5579,10 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 	struct l2cap_hdr *hdr;
- 	int len;
+@@ -531,6 +531,7 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 	BT_DBG("chan %p, conn %p, err %d", chan, conn, err);
  
-+	/* For AMP controller do not create l2cap conn */
-+	if (!conn && hcon->hdev->dev_type != HCI_BREDR)
-+		goto drop;
+ 	if (conn) {
++		struct amp_mgr *mgr = conn->hcon->amp_mgr;
+ 		/* Delete from channel list */
+ 		list_del(&chan->list);
+ 
+@@ -540,6 +541,9 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 
+ 		if (chan->chan_type != L2CAP_CHAN_CONN_FIX_A2MP)
+ 			hci_conn_put(conn->hcon);
 +
- 	if (!conn)
- 		conn = l2cap_conn_add(hcon, 0);
++		if (mgr && mgr->bredr_chan == chan)
++			mgr->bredr_chan = NULL;
+ 	}
  
+ 	chan->ops->teardown(chan, err);
 -- 
 1.7.9.5
 
