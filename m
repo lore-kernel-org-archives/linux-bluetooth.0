@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 13/16] AVRCP: Add proper role init procedure
-Date: Mon, 15 Oct 2012 16:05:33 +0200
-Message-Id: <1350309936-31588-13-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 16/16] control: Add Control.Disconnect method
+Date: Mon, 15 Oct 2012 16:05:36 +0200
+Message-Id: <1350309936-31588-16-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1350309936-31588-1-git-send-email-luiz.dentz@gmail.com>
 References: <1350309936-31588-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,201 +11,97 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This method can be used to disconnect AVRCP.
 ---
- audio/avrcp.c | 113 ++++++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 103 insertions(+), 10 deletions(-)
+ audio/control.c     | 31 +++++++++++++++++++++++++++++++
+ doc/control-api.txt |  4 ++++
+ 2 files changed, 35 insertions(+)
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 85dd241..8336831 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -104,6 +104,7 @@
- #define CAP_EVENTS_SUPPORTED	0x03
- 
- #define AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH 5
-+#define AVRCP_GET_CAPABILITIES_PARAM_LENGTH 1
- 
- #define AVRCP_FEATURE_CATEGORY_1	0x0001
- #define AVRCP_FEATURE_CATEGORY_2	0x0002
-@@ -215,7 +216,7 @@ static uint32_t company_ids[] = {
- 	IEEEID_BTSIG,
+diff --git a/audio/control.c b/audio/control.c
+index e15e9ba..8bb085a 100644
+--- a/audio/control.c
++++ b/audio/control.c
+@@ -62,6 +62,7 @@ struct control {
+ 	struct avctp *session;
+ 	gboolean target;
+ 	DBusMessage *connect;
++	DBusMessage *disconnect;
  };
  
--static void register_volume_notification(struct avrcp *session);
-+static void register_notification(struct avrcp *session, uint8_t event);
+ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
+@@ -83,6 +84,13 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
+ 			control->connect = NULL;
+ 		}
  
- static sdp_record_t *avrcp_ct_record(void)
- {
-@@ -1306,7 +1307,7 @@ static struct avrcp_server *find_server(GSList *list, const bdaddr_t *src)
++		if (control->disconnect) {
++			g_dbus_send_reply(conn, control->disconnect,
++							DBUS_TYPE_INVALID);
++			dbus_message_unref(control->disconnect);
++			control->disconnect = NULL;
++		}
++
+ 		if (old_state != AVCTP_STATE_CONNECTED)
+ 			break;
+ 
+@@ -164,6 +172,25 @@ static DBusMessage *control_connect(DBusConnection *conn, DBusMessage *msg,
  	return NULL;
  }
  
--static gboolean avrcp_handle_volume_changed(struct avctp *conn,
-+static gboolean avrcp_handle_event(struct avctp *conn,
- 					uint8_t code, uint8_t subunit,
- 					uint8_t *operands, size_t operand_count,
- 					void *user_data)
-@@ -1314,26 +1315,34 @@ static gboolean avrcp_handle_volume_changed(struct avctp *conn,
- 	struct avrcp *session = user_data;
- 	struct avrcp_player *player = session->player;
- 	struct avrcp_header *pdu = (void *) operands;
-+	uint8_t event;
- 	uint8_t volume;
- 
- 	if (code != AVC_CTYPE_INTERIM && code != AVC_CTYPE_CHANGED)
- 		return FALSE;
- 
--	volume = pdu->params[1] & 0x7F;
-+	event = pdu->params[0];
- 
--	if (player)
--		player->cb->set_volume(volume, session->dev,
-+	switch (event) {
-+	case AVRCP_EVENT_VOLUME_CHANGED:
-+		volume = pdu->params[1] & 0x7F;
++static DBusMessage *control_disconnect(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	struct audio_device *device = data;
++	struct control *control = device->control;
 +
-+		if (player)
-+			player->cb->set_volume(volume, session->dev,
- 							player->user_data);
- 
-+		break;
-+	}
++	if (!control->session)
++		return btd_error_not_connected(msg);
 +
- 	if (code == AVC_CTYPE_CHANGED) {
--		register_volume_notification(session);
-+		register_notification(session, event);
- 		return FALSE;
- 	}
++	if (control->disconnect)
++		return btd_error_in_progress(msg);
++
++	avctp_disconnect(control->session);
++
++	control->disconnect = dbus_message_ref(msg);
++
++	return NULL;
++}
++
+ static DBusMessage *key_pressed(DBusConnection *conn, DBusMessage *msg,
+ 						uint8_t op, void *data)
+ {
+@@ -243,6 +270,7 @@ static const GDBusMethodTable control_methods[] = {
+ 				NULL, GDBUS_ARGS({ "connected", "b" }),
+ 				control_is_connected) },
+ 	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, control_connect) },
++	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL, control_disconnect) },
+ 	{ GDBUS_METHOD("Play", NULL, NULL, control_play) },
+ 	{ GDBUS_METHOD("Pause", NULL, NULL, control_pause) },
+ 	{ GDBUS_METHOD("Stop", NULL, NULL, control_stop) },
+@@ -278,6 +306,9 @@ static void path_unregister(void *data)
+ 	if (control->connect)
+ 		dbus_message_unref(control->connect);
  
- 	return TRUE;
++	if (control->disconnect)
++		dbus_message_unref(control->disconnect);
++
+ 	g_free(control);
+ 	dev->control = NULL;
  }
+diff --git a/doc/control-api.txt b/doc/control-api.txt
+index 61069ea..5391a8a 100644
+--- a/doc/control-api.txt
++++ b/doc/control-api.txt
+@@ -25,6 +25,10 @@ Methods		boolean IsConnected() {deprecated}
  
--static void register_volume_notification(struct avrcp *session)
-+static void register_notification(struct avrcp *session, uint8_t event)
- {
- 	uint8_t buf[AVRCP_HEADER_LENGTH + AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH];
- 	struct avrcp_header *pdu = (void *) buf;
-@@ -1344,14 +1353,89 @@ static void register_volume_notification(struct avrcp *session)
- 	set_company_id(pdu->company_id, IEEEID_BTSIG);
- 	pdu->pdu_id = AVRCP_REGISTER_NOTIFICATION;
- 	pdu->packet_type = AVRCP_PACKET_TYPE_SINGLE;
--	pdu->params[0] = AVRCP_EVENT_VOLUME_CHANGED;
-+	pdu->params[0] = event;
- 	pdu->params_len = htons(AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH);
+ 			Connect to remote device.
  
- 	length = AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
++		void Disconnect()
++
++			Disconnect from remote device.
++
+ 		void Play()
  
- 	avctp_send_vendordep_req(session->conn, AVC_CTYPE_NOTIFY,
- 					AVC_SUBUNIT_PANEL, buf, length,
--					avrcp_handle_volume_changed, session);
-+					avrcp_handle_event, session);
-+}
-+
-+static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
-+					uint8_t code, uint8_t subunit,
-+					uint8_t *operands, size_t operand_count,
-+					void *user_data)
-+{
-+	struct avrcp *session = user_data;
-+	struct avrcp_header *pdu = (void *) operands;
-+	uint8_t count;
-+
-+	if (pdu->params[0] != CAP_EVENTS_SUPPORTED)
-+		return FALSE;
-+
-+	count = pdu->params[1];
-+
-+	for (; count > 0; count--) {
-+		uint8_t event = pdu->params[1 + count];
-+
-+		switch (event) {
-+		case AVRCP_EVENT_STATUS_CHANGED:
-+		case AVRCP_EVENT_TRACK_CHANGED:
-+			register_notification(session, event);
-+			break;
-+		}
-+	}
-+
-+	return FALSE;
-+}
-+
-+static void avrcp_get_capabilities(struct avrcp *session)
-+{
-+	uint8_t buf[AVRCP_HEADER_LENGTH + AVRCP_GET_CAPABILITIES_PARAM_LENGTH];
-+	struct avrcp_header *pdu = (void *) buf;
-+	uint8_t length;
-+
-+	memset(buf, 0, sizeof(buf));
-+
-+	set_company_id(pdu->company_id, IEEEID_BTSIG);
-+	pdu->pdu_id = AVRCP_GET_CAPABILITIES;
-+	pdu->packet_type = AVRCP_PACKET_TYPE_SINGLE;
-+	pdu->params[0] = CAP_EVENTS_SUPPORTED;
-+	pdu->params_len = htons(AVRCP_GET_CAPABILITIES_PARAM_LENGTH);
-+
-+	length = AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
-+
-+	avctp_send_vendordep_req(session->conn, AVC_CTYPE_STATUS,
-+					AVC_SUBUNIT_PANEL, buf, length,
-+					avrcp_get_capabilities_resp,
-+					session);
-+}
-+
-+static gboolean avrcp_get_play_status_rsp(struct avctp *conn,
-+					uint8_t code, uint8_t subunit,
-+					uint8_t *operands, size_t operand_count,
-+					void *user_data)
-+{
-+	return FALSE;
-+}
-+
-+static void avrcp_get_play_status(struct avrcp *session)
-+{
-+	uint8_t buf[AVRCP_HEADER_LENGTH];
-+	struct avrcp_header *pdu = (void *) buf;
-+
-+	memset(buf, 0, sizeof(buf));
-+
-+	set_company_id(pdu->company_id, IEEEID_BTSIG);
-+	pdu->pdu_id = AVRCP_GET_PLAY_STATUS;
-+	pdu->packet_type = AVRCP_PACKET_TYPE_SINGLE;
-+
-+	avctp_send_vendordep_req(session->conn, AVC_CTYPE_STATUS,
-+					AVC_SUBUNIT_PANEL, buf, sizeof(buf),
-+					avrcp_get_play_status_rsp,
-+					session);
- }
- 
- static struct avrcp *find_session(GSList *list, struct audio_device *dev)
-@@ -1370,11 +1454,13 @@ static void session_tg_init(struct avrcp *session)
- {
- 	struct avrcp_server *server = session->server;
- 
-+	DBG("%p version 0x%04x", session, session->version);
-+
- 	session->player = g_slist_nth_data(server->players, 0);
- 	session->control_handlers = tg_control_handlers;
- 
- 	if (session->version >= 0x0104) {
--		register_volume_notification(session);
-+		register_notification(session, AVRCP_EVENT_VOLUME_CHANGED);
- 		if (session->features & AVRCP_FEATURE_BROWSING)
- 			avctp_connect_browsing(session->conn);
- 	}
-@@ -1393,6 +1479,13 @@ static void session_ct_init(struct avrcp *session)
- {
- 	session->control_handlers = ct_control_handlers;
- 
-+	DBG("%p version 0x%04x", session, session->version);
-+
-+	if (session->version >= 0x0103) {
-+		avrcp_get_capabilities(session);
-+		avrcp_get_play_status(session);
-+	}
-+
- 	session->control_id = avctp_register_pdu_handler(session->conn,
- 							AVC_OP_VENDORDEP,
- 							handle_vendordep_pdu,
+ 			Resume playback.
 -- 
 1.7.11.4
 
