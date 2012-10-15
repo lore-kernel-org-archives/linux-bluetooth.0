@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 07/16] AVCTP: Make use of allocate buffer to send data
-Date: Mon, 15 Oct 2012 16:05:27 +0200
-Message-Id: <1350309936-31588-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 06/16] AVRCP: Simplify state_changed callback
+Date: Mon, 15 Oct 2012 16:05:26 +0200
+Message-Id: <1350309936-31588-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1350309936-31588-1-git-send-email-luiz.dentz@gmail.com>
 References: <1350309936-31588-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,136 +11,132 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-There is no need to use the stack as the channel now have proper buffer
-which can be used to store data to be send.
-
-In addition to that make avctp_send_passthrough to use avctp_send.
+Move session creation and destroy to their own functions
 ---
- audio/avctp.c | 83 ++++++++++++++++++++++++-----------------------------------
- 1 file changed, 34 insertions(+), 49 deletions(-)
+ audio/avrcp.c | 91 ++++++++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 53 insertions(+), 38 deletions(-)
 
-diff --git a/audio/avctp.c b/audio/avctp.c
-index 228d5b7..9a62bc0 100644
---- a/audio/avctp.c
-+++ b/audio/avctp.c
-@@ -1066,51 +1066,11 @@ void avctp_unregister(const bdaddr_t *src)
- 	g_free(server);
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index f31372b..7188039 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -1352,15 +1352,63 @@ static struct avrcp *find_session(GSList *list, struct audio_device *dev)
+ 	return NULL;
  }
  
--int avctp_send_passthrough(struct avctp *session, uint8_t op)
--{
--	unsigned char buf[AVCTP_HEADER_LENGTH + AVC_HEADER_LENGTH + 2];
--	struct avctp_header *avctp = (void *) buf;
--	struct avc_header *avc = (void *) &buf[AVCTP_HEADER_LENGTH];
--	uint8_t *operands = &buf[AVCTP_HEADER_LENGTH + AVC_HEADER_LENGTH];
--	int sk;
--
--	if (session->state != AVCTP_STATE_CONNECTED)
--		return -ENOTCONN;
--
--	memset(buf, 0, sizeof(buf));
--
--	avctp->transaction = id++;
--	avctp->packet_type = AVCTP_PACKET_SINGLE;
--	avctp->cr = AVCTP_COMMAND;
--	avctp->pid = htons(AV_REMOTE_SVCLASS_ID);
--
--	avc->code = AVC_CTYPE_CONTROL;
--	avc->subunit_type = AVC_SUBUNIT_PANEL;
--	avc->opcode = AVC_OP_PASSTHROUGH;
--
--	operands[0] = op & 0x7f;
--	operands[1] = 0;
--
--	sk = g_io_channel_unix_get_fd(session->control->io);
--
--	if (write(sk, buf, sizeof(buf)) < 0)
--		return -errno;
--
--	/* Button release */
--	avctp->transaction = id++;
--	operands[0] |= 0x80;
--
--	if (write(sk, buf, sizeof(buf)) < 0)
--		return -errno;
--
--	return 0;
--}
--
- static int avctp_send(struct avctp *session, uint8_t transaction, uint8_t cr,
- 				uint8_t code, uint8_t subunit, uint8_t opcode,
- 				uint8_t *operands, size_t operand_count)
+-static void state_changed(struct audio_device *dev, avctp_state_t old_state,
+-				avctp_state_t new_state, void *user_data)
++static struct avrcp *session_create(struct avrcp_server *server,
++						struct audio_device *dev)
  {
--	uint8_t buf[AVCTP_HEADER_LENGTH + AVC_HEADER_LENGTH];
-+	struct avctp_channel *control = session->control;
- 	struct avctp_header *avctp;
- 	struct avc_header *avc;
- 	struct msghdr msg;
-@@ -1120,12 +1080,20 @@ static int avctp_send(struct avctp *session, uint8_t transaction, uint8_t cr,
- 	if (session->state != AVCTP_STATE_CONNECTED)
- 		return -ENOTCONN;
+-	struct avrcp_server *server;
+ 	struct avrcp *session;
+ 	const sdp_record_t *rec;
+ 	sdp_list_t *list;
+ 	sdp_profile_desc_t *desc;
  
-+	iov[0].iov_base = control->buffer;
-+	iov[0].iov_len  = sizeof(*avctp) + sizeof(*avc);
-+	iov[1].iov_base = operands;
-+	iov[1].iov_len  = operand_count;
++	session = g_new0(struct avrcp, 1);
++	session->server = server;
++	session->conn = avctp_connect(&dev->src, &dev->dst);
++	session->dev = dev;
++	session->player = g_slist_nth_data(server->players, 0);
 +
-+	if (control->omtu < (iov[0].iov_len + iov[1].iov_len))
-+		return -EOVERFLOW;
++	server->sessions = g_slist_append(server->sessions, session);
 +
- 	sk = g_io_channel_unix_get_fd(session->control->io);
- 
--	memset(buf, 0, sizeof(buf));
-+	memset(control->buffer, 0, iov[0].iov_len);
- 
--	avctp = (void *) buf;
--	avc = (void *) &buf[AVCTP_HEADER_LENGTH];
-+	avctp = (void *) control->buffer;
-+	avc = (void *) avctp + sizeof(*avctp);
- 
- 	avctp->transaction = transaction;
- 	avctp->packet_type = AVCTP_PACKET_SINGLE;
-@@ -1136,11 +1104,6 @@ static int avctp_send(struct avctp *session, uint8_t transaction, uint8_t cr,
- 	avc->subunit_type = subunit;
- 	avc->opcode = opcode;
- 
--	iov[0].iov_base = buf;
--	iov[0].iov_len  = sizeof(buf);
--	iov[1].iov_base = operands;
--	iov[1].iov_len  = operand_count;
--
- 	memset(&msg, 0, sizeof(msg));
- 	msg.msg_iov = iov;
- 	msg.msg_iovlen = 2;
-@@ -1151,6 +1114,28 @@ static int avctp_send(struct avctp *session, uint8_t transaction, uint8_t cr,
- 	return err;
- }
- 
-+int avctp_send_passthrough(struct avctp *session, uint8_t op)
-+{
-+	uint8_t operands[2];
-+	int ret;
++	rec = btd_device_get_record(dev->btd_dev, AVRCP_TARGET_UUID);
++	if (rec == NULL)
++		return session;
 +
-+	operands[0] = op & 0x7f;
-+	operands[1] = 0;
++	if (sdp_get_profile_descs(rec, &list) < 0)
++		return session;
 +
-+	ret = avctp_send(session, id, AVCTP_COMMAND, AVC_CTYPE_CONTROL,
-+					AVC_SUBUNIT_PANEL, AVC_OP_PASSTHROUGH,
-+					operands, sizeof(operands));
-+	if (ret < 0)
-+		return ret;
++	desc = list->data;
++	session->version = desc->version;
++	sdp_get_int_attr(rec, SDP_ATTR_SUPPORTED_FEATURES, &session->features);
 +
-+	/* Button release */
-+	operands[0] |= 0x80;
++	sdp_list_free(list, free);
 +
-+	return avctp_send(session, id, AVCTP_COMMAND, AVC_CTYPE_CONTROL,
-+					AVC_SUBUNIT_PANEL, AVC_OP_PASSTHROUGH,
-+					operands, sizeof(operands));
++	return session;
 +}
 +
- int avctp_send_vendordep(struct avctp *session, uint8_t transaction,
- 				uint8_t code, uint8_t subunit,
- 				uint8_t *operands, size_t operand_count)
++static void session_destroy(struct avrcp *session)
++{
++	struct avrcp_server *server = session->server;
++	struct avrcp_player *player = session->player;
++
++	server->sessions = g_slist_remove(server->sessions, session);
++
++	if (session->control_id > 0)
++		avctp_unregister_pdu_handler(session->control_id);
++
++	if (session->browsing_id > 0)
++		avctp_unregister_browsing_pdu_handler(session->browsing_id);
++
++	if (player != NULL)
++		player->sessions = g_slist_remove(player->sessions, session);
++
++	g_free(session);
++}
++
++static void state_changed(struct audio_device *dev, avctp_state_t old_state,
++				avctp_state_t new_state, void *user_data)
++{
++	struct avrcp_server *server;
++	struct avrcp *session;
++
+ 	server = find_server(servers, &dev->src);
+ 	if (!server)
+ 		return;
+@@ -1372,47 +1420,14 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
+ 		if (session == NULL)
+ 			break;
+ 
+-		server->sessions = g_slist_remove(server->sessions, session);
++		session_destroy(session);
+ 
+-		if (session->control_id > 0)
+-			avctp_unregister_pdu_handler(session->control_id);
+-
+-		if (session->browsing_id > 0)
+-			avctp_unregister_browsing_pdu_handler(
+-							session->browsing_id);
+-
+-		if (session->player != NULL)
+-			session->player->sessions = g_slist_remove(
+-						session->player->sessions,
+-						session);
+-
+-		g_free(session);
+ 		break;
+ 	case AVCTP_STATE_CONNECTING:
+ 		if (session != NULL)
+ 			break;
+ 
+-		session = g_new0(struct avrcp, 1);
+-		session->server = server;
+-		session->conn = avctp_connect(&dev->src, &dev->dst);
+-		session->dev = dev;
+-		session->player = g_slist_nth_data(server->players, 0);
+-
+-		server->sessions = g_slist_append(server->sessions, session);
+-
+-		rec = btd_device_get_record(dev->btd_dev, AVRCP_TARGET_UUID);
+-		if (rec == NULL)
+-			return;
+-
+-		if (sdp_get_profile_descs(rec, &list) < 0)
+-			return;
+-
+-		desc = list->data;
+-		session->version = desc->version;
+-		sdp_get_int_attr(rec, SDP_ATTR_SUPPORTED_FEATURES,
+-							&session->features);
+-
+-		sdp_list_free(list, free);
++		session_create(server, dev);
+ 
+ 		break;
+ 	case AVCTP_STATE_CONNECTED:
 -- 
 1.7.11.4
 
