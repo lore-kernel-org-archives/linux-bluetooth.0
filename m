@@ -1,31 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 15 Oct 2012 15:36:49 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: REMINDER: Linux wireless networking summit, Barcelona 8-9 November
-Message-ID: <20121015193648.GF16817@tuxdriver.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Message-ID: <1350326868.26318.23.camel@aeonflux>
+Subject: Re: [PATCH 19/19] Bluetooth: Start channel move when socket option
+ is changed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	sunnyk@codeaurora.org
+Date: Mon, 15 Oct 2012 20:47:48 +0200
+In-Reply-To: <1350315248-7690-20-git-send-email-mathewm@codeaurora.org>
+References: <1350315248-7690-1-git-send-email-mathewm@codeaurora.org>
+	 <1350315248-7690-20-git-send-email-mathewm@codeaurora.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Just a reminder...there will be a Linux wireless networking mini-summit
-event coming soon.  It will be on 8-9 November in Barcelona, just
-after LinuxCon Europe.  If you haven't already made plans, you had
-better get moving!
+Hi Mat,
 
-Attendees of the wireless mini-summit must also register for LinuxCon
-Europe.  More information is available here:
+> Channel moves are triggered by changes to the BT_CHANNEL_POLICY
+> sockopt when an ERTM or streaming-mode channel is connected.
+> 
+> Moves are only started if enable_hs is true.
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  include/net/bluetooth/l2cap.h |  1 +
+>  net/bluetooth/l2cap_core.c    | 20 ++++++++++++++++++++
+>  net/bluetooth/l2cap_sock.c    |  5 +++++
+>  3 files changed, 26 insertions(+)
 
-	http://wireless.kernel.org/en/developers/Summits/Barcelona-2012
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Please notice that there is a wiki there with schedules for discussion
-topics.  If you have suggestions or want other changes, please make
-them and/or let us know here.
+Regards
 
-I hope to see you in Barcelona!
+Marcel
 
-John
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+
