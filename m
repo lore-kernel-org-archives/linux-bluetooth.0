@@ -1,53 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1350324127.26318.0.camel@aeonflux>
-Subject: Re: Is it incorrect in checking of "NO_RESET" bit in
- hci_core.c:hci_dev_do_close()?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: chen kris <bluefrog2012@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 15 Oct 2012 20:02:07 +0200
-In-Reply-To: <CACKG3X=Jky7m=gU7b=rPYOO1ZqQR_79fgoL-EQCYgog6wNZsLQ@mail.gmail.com>
-References: <CACKG3XmHwTgbsWBwsckZ-tA5M9xBD0TBRme7mCJo7shd90L4=Q@mail.gmail.com>
-	 <CACKG3X=Jky7m=gU7b=rPYOO1ZqQR_79fgoL-EQCYgog6wNZsLQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLYHpWzEOKfv8wKE4s1Yzsd8cZCv38na707yf5XmktXGg@mail.gmail.com>
+References: <1349806556-1978-1-git-send-email-dmp0x7c5@gmail.com>
+	<1349806556-1978-2-git-send-email-dmp0x7c5@gmail.com>
+	<1349807669.27233.103.camel@aeonflux>
+	<CABBYNZLYHpWzEOKfv8wKE4s1Yzsd8cZCv38na707yf5XmktXGg@mail.gmail.com>
+Date: Mon, 15 Oct 2012 17:37:04 +0200
+Message-ID: <CAKZqhqdB3asmr1D9pf9BFgQ8mD+qRw+FyC+5AfyJsTG3vQYahQ@mail.gmail.com>
+Subject: Re: [RFC obexd 02/11] build: Add --enable-fuse for gobexfuse
+From: =?UTF-8?Q?Micha=C5=82_Poczwardowski?= <dmp0x7c5@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+I will change that :)
 
-> static int hci_dev_do_close(struct hci_dev *hdev)
-> {
->     ...
-> 
->     /* Reset device */
->     skb_queue_purge(&hdev->cmd_q);
->     atomic_set(&hdev->cmd_cnt, 1);
->     if (!test_bit(HCI_RAW, &hdev->flags) &&
->                 test_bit(HCI_QUIRK_NO_RESET, &hdev->quirks)) {
->         set_bit(HCI_INIT, &hdev->flags);
->         __hci_request(hdev, hci_reset_req, 0,
->                     msecs_to_jiffies(250));
->         clear_bit(HCI_INIT, &hdev->flags);
->     }
->     ...
-> }
-> 
-> I guess the condition should be as following:
-> 
->     if (!test_bit(HCI_RAW, &hdev->flags) &&
->                 *! *test_bit(HCI_QUIRK_NO_RESET, &hdev->quirks))
-> 
-> it means the code should sent HCI_RESET, only if both of the following
-> conditions are met:
-> 1. HCI_RAW is NOT set;
-> 2. HCI_QUIRK_NO_RESET is *NOT* set.
-
-the name is confusing, when closing the device and NO_RESET is set, then
-it needs to send the HCI Reset.
-
-Regards
-
-Marcel
-
-
+On 15 October 2012 16:43, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Michal,
+>
+> On Tue, Oct 9, 2012 at 8:34 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Hi Michal,
+>>
+>>>  Makefile.am  |    9 +++++++++
+>>>  configure.ac |   15 +++++++++++++++
+>>>  2 files changed, 24 insertions(+), 0 deletions(-)
+>>>
+>>> diff --git a/Makefile.am b/Makefile.am
+>>> index 724dd5d..95b99a6 100644
+>>> --- a/Makefile.am
+>>> +++ b/Makefile.am
+>>> @@ -132,6 +132,15 @@ client_obex_client_SOURCES = $(gdbus_sources) $(gobex_sources) \
+>>>  client_obex_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ @BLUEZ_LIBS@
+>>>  endif
+>>>
+>>> +if FUSE
+>>> +bin_PROGRAMS = fuse/gobexfuse
+>>
+>> I rather call this obexfuse or similar. I don't want to have any "g"
+>> prefixes in the future anymore.
+>
+> Are you looking into this? I will probably need more time to look in
+> detail what you have done, but at least the binary name should be
+> changed as Marcel suggested.
+>
+> --
+> Luiz Augusto von Dentz
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
