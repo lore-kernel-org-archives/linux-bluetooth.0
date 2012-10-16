@@ -4,113 +4,41 @@ To: linux-bluetooth@vger.kernel.org,
 	gustavo@padovan.org
 Cc: sunnyk@codeaurora.org,
 	marcel@holtmann.org
-Subject: [PATCHv2 17/19] Bluetooth: Send create channel request instead of connect for AMP
-Date: Tue, 16 Oct 2012 16:36:31 -0700
-Message-Id: <1350430593-23565-18-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv2 18/19] Bluetooth: Do not retransmit data during a channel move
+Date: Tue, 16 Oct 2012 16:36:32 -0700
+Message-Id: <1350430593-23565-19-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1350430593-23565-1-git-send-email-mathewm@codeaurora.org>
 References: <1350430593-23565-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the channel policy is set to prefer AMP, then an L2CAP channel is
-set up using the "create channel" command rather than the "connect"
-command.  A physical link is also set up before sending "create
-channel".
+Do not retransmit previously-sent data when a "receiver ready" s-frame
+with the "final" flag is received during a move.
 
-Behavior is unchanged if enable_hs is false.
+The ERTM state machines will resynchronize at the end of a channel
+move, and the state machine needs to avoid state changes during a
+move.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ net/bluetooth/l2cap_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 7e8fe84..17d917b 100644
+index 17d917b..2263c1d 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -58,6 +58,9 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
- static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
- 		     struct sk_buff_head *skbs, u8 event);
+@@ -5636,8 +5636,8 @@ static int l2cap_rx_state_recv(struct l2cap_chan *chan,
+ 		if (control->final) {
+ 			clear_bit(CONN_REMOTE_BUSY, &chan->conn_state);
  
-+static void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
-+			      u8 status);
-+
- /* ---- L2CAP channels ---- */
- 
- static struct l2cap_chan *__l2cap_get_chan_by_dcid(struct l2cap_conn *conn,
-@@ -576,6 +579,13 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 			mgr->bredr_chan = NULL;
- 	}
- 
-+	if (chan->hs_hchan) {
-+		chan->hs_hchan = NULL;
-+		chan->hs_hcon = NULL;
-+
-+		/* Placeholder - free logical link */
-+	}
-+
- 	chan->ops->teardown(chan, err);
- 
- 	if (test_bit(CONF_NOT_COMPLETE, &chan->conf_state))
-@@ -1126,6 +1136,7 @@ static void l2cap_start_connection(struct l2cap_chan *chan)
- {
- 	if (__amp_capable(chan)) {
- 		BT_DBG("chan %p AMP capable: discover AMPs", chan);
-+		set_bit(CONF_CONNECT_PEND, &chan->conf_state);
- 		a2mp_discover_amp(chan);
- 	} else {
- 		l2cap_send_conn_req(chan);
-@@ -1271,6 +1282,16 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 				rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHEN_PEND);
+-			if (!test_and_clear_bit(CONN_REJ_ACT,
+-						&chan->conn_state)) {
++			if (!test_and_clear_bit(CONN_REJ_ACT, &chan->conn_state) &&
++			    !__chan_is_moving(chan)) {
+ 				control->final = 0;
+ 				l2cap_retransmit_all(chan, control);
  			}
- 
-+			if (rsp.result == __constant_cpu_to_le16(L2CAP_CR_SUCCESS) &&
-+			    chan->local_amp_id) {
-+				/* Placeholder - uncomment when amp functions
-+				 * are available
-+				amp_accept_physical(chan, chan->local_amp_id);
-+				 */
-+				l2cap_chan_unlock(chan);
-+				continue;
-+			}
-+
- 			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP,
- 				       sizeof(rsp), &rsp);
- 
-@@ -3359,6 +3380,18 @@ done:
- 			rfc.mode = chan->mode;
- 		}
- 
-+		if (test_bit(CONF_LOC_CONF_PEND, &chan->conf_state) &&
-+		    chan->local_amp_id) {
-+			struct hci_chan *hchan = NULL;
-+
-+			/* Placeholder - get hci_chan for logical link */
-+
-+			if (hchan && hchan->state == BT_CONNECTED) {
-+				l2cap_logical_cfm(chan, hchan,
-+						  L2CAP_MR_SUCCESS);
-+			}
-+		}
-+
- 		if (result == L2CAP_CONF_SUCCESS)
- 			set_bit(CONF_OUTPUT_DONE, &chan->conf_state);
- 	}
-@@ -6367,6 +6400,15 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 					stat = L2CAP_CS_AUTHOR_PEND;
- 					chan->ops->defer(chan);
- 				} else {
-+					if (chan->local_amp_id) {
-+						/* Placeholder - accept physical
-+						 * link
-+						amp_accept_physical(chan,
-+							chan->local_amp_id);
-+						*/
-+						continue;
-+					}
-+
- 					__l2cap_state_change(chan, BT_CONFIG);
- 					res = L2CAP_CR_SUCCESS;
- 					stat = L2CAP_CS_NO_INFO;
 -- 
 1.7.12.3
 
