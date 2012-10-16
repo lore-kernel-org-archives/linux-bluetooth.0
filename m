@@ -3,164 +3,115 @@ From: Mat Martineau <mathewm@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org,
 	gustavo@padovan.org
 Cc: sunnyk@codeaurora.org,
-	marcel@holtmann.org
-Subject: [PATCHv2 10/19] Bluetooth: Add logical link confirm
-Date: Tue, 16 Oct 2012 16:36:24 -0700
-Message-Id: <1350430593-23565-11-git-send-email-mathewm@codeaurora.org>
+	marcel@holtmann.org,
+	Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Subject: [PATCHv2 01/19] Bluetooth: Add new l2cap_chan struct members for high speed channels
+Date: Tue, 16 Oct 2012 16:36:15 -0700
+Message-Id: <1350430593-23565-2-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1350430593-23565-1-git-send-email-mathewm@codeaurora.org>
 References: <1350430593-23565-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The logical link confirm callback is executed when the AMP controller
-completes its logical link setup.  During a channel move, a newly
-formed logical link allows a move responder to send a move channel
-response.  A move initiator will send a move channel confirm.  A
-failed logical link will end the channel move and send an appropriate
-response or confirm command indicating a failure.
+An L2CAP channel using high speed continues to be associated with a
+BR/EDR l2cap_conn, while also tracking an additional hci_conn
+(representing a physical link on a high speed controller) and hci_chan
+(representing a logical link).  There may only be one physical link
+between two high speed controllers.  Each physical link may contain
+several logical links, with each logical link representing a channel
+with specific quality of service.
 
-If the channel is being created on an AMP controller, L2CAP
-configuration is started after the logical link is set up.
+During a channel move, the destination channel id, current move state,
+and role (initiator vs. responder) are tracked and used by the channel
+move state machine.  The ident value associated with a move request
+must also be stored in order to use it in later move responses.
+
+The active channel is stored in local_amp_id.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c | 114 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 112 insertions(+), 2 deletions(-)
+ include/net/bluetooth/l2cap.h | 29 +++++++++++++++++++++++++++++
+ net/bluetooth/l2cap_core.c    |  5 +++++
+ 2 files changed, 34 insertions(+)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 6e23afd..6d3615e 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -434,6 +434,8 @@ struct l2cap_chan {
+ 	struct sock *sk;
+ 
+ 	struct l2cap_conn	*conn;
++	struct hci_conn		*hs_hcon;
++	struct hci_chan		*hs_hchan;
+ 	struct kref	kref;
+ 
+ 	__u8		state;
+@@ -477,6 +479,11 @@ struct l2cap_chan {
+ 	unsigned long	conn_state;
+ 	unsigned long	flags;
+ 
++	__u8		local_amp_id;
++	__u8		move_id;
++	__u8		move_state;
++	__u8		move_role;
++
+ 	__u16		next_tx_seq;
+ 	__u16		expected_ack_seq;
+ 	__u16		expected_tx_seq;
+@@ -644,6 +651,9 @@ enum {
+ enum {
+ 	L2CAP_RX_STATE_RECV,
+ 	L2CAP_RX_STATE_SREJ_SENT,
++	L2CAP_RX_STATE_MOVE,
++	L2CAP_RX_STATE_WAIT_P,
++	L2CAP_RX_STATE_WAIT_F,
+ };
+ 
+ enum {
+@@ -674,6 +684,25 @@ enum {
+ 	L2CAP_EV_RECV_FRAME,
+ };
+ 
++enum {
++	L2CAP_MOVE_ROLE_NONE,
++	L2CAP_MOVE_ROLE_INITIATOR,
++	L2CAP_MOVE_ROLE_RESPONDER,
++};
++
++enum {
++	L2CAP_MOVE_STABLE,
++	L2CAP_MOVE_WAIT_REQ,
++	L2CAP_MOVE_WAIT_RSP,
++	L2CAP_MOVE_WAIT_RSP_SUCCESS,
++	L2CAP_MOVE_WAIT_CONFIRM,
++	L2CAP_MOVE_WAIT_CONFIRM_RSP,
++	L2CAP_MOVE_WAIT_LOGICAL_COMP,
++	L2CAP_MOVE_WAIT_LOGICAL_CFM,
++	L2CAP_MOVE_WAIT_LOCAL_BUSY,
++	L2CAP_MOVE_WAIT_PREPARE,
++};
++
+ void l2cap_chan_hold(struct l2cap_chan *c);
+ void l2cap_chan_put(struct l2cap_chan *c);
+ 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 5e4796c..ddd8c72 100644
+index f873619..f8d78f5 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -3799,6 +3799,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
- 		goto unlock;
- 	}
+@@ -2788,6 +2788,11 @@ int l2cap_ertm_init(struct l2cap_chan *chan)
  
-+	chan->ident = cmd->ident;
- 	l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP, len, rsp);
- 	chan->num_conf_rsp++;
+ 	skb_queue_head_init(&chan->tx_q);
  
-@@ -4241,11 +4242,120 @@ static void l2cap_send_move_chan_cfm_rsp(struct l2cap_conn *conn, u8 ident,
- 	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM_RSP, sizeof(rsp), &rsp);
- }
++	chan->local_amp_id = 0;
++	chan->move_id = 0;
++	chan->move_state = L2CAP_MOVE_STABLE;
++	chan->move_role = L2CAP_MOVE_ROLE_NONE;
++
+ 	if (chan->mode != L2CAP_MODE_ERTM)
+ 		return 0;
  
-+/* Call with chan locked */
- static void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
- 			      u8 status)
- {
--	/* Placeholder */
--	return;
-+	BT_DBG("chan %p, hchan %p, status %d", chan, hchan, status);
-+
-+	if (status) {
-+		/* Logical link setup failed */
-+		if (chan->state != BT_CONNECTED) {
-+			/* Create channel failure, disconnect */
-+			l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
-+		} else if (chan->move_role == L2CAP_MOVE_ROLE_RESPONDER) {
-+			l2cap_move_revert(chan);
-+			chan->move_role = L2CAP_MOVE_ROLE_NONE;
-+			chan->move_state = L2CAP_MOVE_STABLE;
-+			l2cap_send_move_chan_rsp(chan->conn, chan->ident,
-+						 chan->dcid, L2CAP_MR_NOT_SUPP);
-+		} else if (chan->move_role == L2CAP_MOVE_ROLE_INITIATOR) {
-+			if (chan->move_state == L2CAP_MOVE_WAIT_LOGICAL_COMP ||
-+			    chan->move_state == L2CAP_MOVE_WAIT_LOGICAL_CFM) {
-+				/* Remote has only sent pending or
-+				 * success responses, clean up
-+				 */
-+				l2cap_move_revert(chan);
-+				chan->move_role = L2CAP_MOVE_ROLE_NONE;
-+				chan->move_state = L2CAP_MOVE_STABLE;
-+			}
-+
-+			/* Other amp move states imply that the move
-+			 * has already aborted
-+			 */
-+			l2cap_send_move_chan_cfm(chan->conn, chan, chan->scid,
-+						 L2CAP_MC_UNCONFIRMED);
-+			__set_chan_timer(chan, L2CAP_MOVE_TIMEOUT);
-+		}
-+
-+		chan->hs_hchan = NULL;
-+		chan->hs_hcon = NULL;
-+
-+		/* Placeholder - free logical link */
-+
-+	} else if (chan->state != BT_CONNECTED) {
-+		struct l2cap_conf_rsp rsp;
-+		u8 code;
-+
-+		/* Create channel complete */
-+
-+		/* Ignore logical link if channel is on BR/EDR */
-+		if (!chan->local_amp_id)
-+			return;
-+
-+		chan->hs_hcon = hchan->conn;
-+		chan->hs_hcon->l2cap_data = chan->conn;
-+
-+		code = l2cap_build_conf_rsp(chan, &rsp,
-+					    L2CAP_CONF_SUCCESS, 0);
-+		l2cap_send_cmd(chan->conn, chan->ident, L2CAP_CONF_RSP, code,
-+			       &rsp);
-+		set_bit(CONF_OUTPUT_DONE, &chan->conf_state);
-+
-+		if (test_bit(CONF_INPUT_DONE, &chan->conf_state)) {
-+			int err = 0;
-+
-+			set_default_fcs(chan);
-+
-+			err = l2cap_ertm_init(chan);
-+			if (err < 0)
-+				l2cap_send_disconn_req(chan->conn, chan, -err);
-+			else
-+				l2cap_chan_ready(chan);
-+		}
-+	} else {
-+		/* Channel move */
-+		chan->hs_hcon = hchan->conn;
-+		chan->hs_hcon->l2cap_data = chan->conn;
-+
-+		BT_DBG("move_state %d", chan->move_state);
-+
-+		switch (chan->move_state) {
-+		case L2CAP_MOVE_WAIT_LOGICAL_COMP:
-+			/* Move confirm will be sent after a success
-+			 * response is received
-+			 */
-+			chan->move_state = L2CAP_MOVE_WAIT_RSP_SUCCESS;
-+			break;
-+		case L2CAP_MOVE_WAIT_LOGICAL_CFM:
-+			if (test_bit(CONN_LOCAL_BUSY, &chan->conn_state)) {
-+				chan->move_state = L2CAP_MOVE_WAIT_LOCAL_BUSY;
-+			} else if (chan->move_role ==
-+				   L2CAP_MOVE_ROLE_INITIATOR) {
-+				chan->move_state = L2CAP_MOVE_WAIT_CONFIRM_RSP;
-+				l2cap_send_move_chan_cfm(chan->conn, chan,
-+							 chan->scid,
-+							 L2CAP_MR_SUCCESS);
-+				__set_chan_timer(chan, L2CAP_MOVE_TIMEOUT);
-+			} else if (chan->move_role ==
-+				   L2CAP_MOVE_ROLE_RESPONDER) {
-+				chan->move_state = L2CAP_MOVE_WAIT_CONFIRM;
-+				l2cap_send_move_chan_rsp(chan->conn,
-+							 chan->ident,
-+							 chan->dcid,
-+							 L2CAP_MR_SUCCESS);
-+			}
-+			break;
-+		default:
-+			/* Move was not in expected state, free the channel */
-+			chan->hs_hchan = NULL;
-+			chan->hs_hcon = NULL;
-+
-+			/* Placeholder - free the logical link */
-+
-+			chan->move_state = L2CAP_MOVE_STABLE;
-+		}
-+	}
- }
- 
- static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
 -- 
 1.7.12.3
 
