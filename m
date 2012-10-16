@@ -4,60 +4,53 @@ To: linux-bluetooth@vger.kernel.org,
 	gustavo@padovan.org
 Cc: sunnyk@codeaurora.org,
 	marcel@holtmann.org
-Subject: [PATCHv2 03/19] Bluetooth: Remove unnecessary intermediate function
-Date: Tue, 16 Oct 2012 16:36:17 -0700
-Message-Id: <1350430593-23565-4-git-send-email-mathewm@codeaurora.org>
-In-Reply-To: <1350430593-23565-1-git-send-email-mathewm@codeaurora.org>
-References: <1350430593-23565-1-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv2 00/19] L2CAP signaling for AMP channel create/move
+Date: Tue, 16 Oct 2012 16:36:14 -0700
+Message-Id: <1350430593-23565-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Resolves a conflict resolution issue in "Bluetooth: Fix L2CAP coding
-style".
+Here are the changes that process commands on the L2CAP signaling
+channel for setting up AMP channels.  There's still a lot of
+integration to do as other AMP functionality is implemented.  I've
+marked places that require this integration with "Placeholder"
+comments (look for that string).
 
-Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/l2cap_core.c | 13 ++-----------
- 1 file changed, 2 insertions(+), 11 deletions(-)
+Changes:
+  * PATCHv2 - Fixed formatting and style issues, added acks
+  * PATCHv1 - Rebased after AMP physical link patch set, incorporated
+              mailing list feedback.
+  * RFCv1 - Finished commit messages, fixed formatting/style issues
+  * RFCv0 - Initial post
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 73ce337..ec2b4d9 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3537,7 +3537,7 @@ static int l2cap_connect_req(struct l2cap_conn *conn,
- 	return 0;
- }
- 
--static inline int l2cap_connect_rsp(struct l2cap_conn *conn,
-+static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
- 				    struct l2cap_cmd_hdr *cmd, u8 *data)
- {
- 	struct l2cap_conn_rsp *rsp = (struct l2cap_conn_rsp *) data;
-@@ -4091,15 +4091,6 @@ static int l2cap_create_channel_req(struct l2cap_conn *conn,
- 	return 0;
- }
- 
--static inline int l2cap_create_channel_rsp(struct l2cap_conn *conn,
--					   struct l2cap_cmd_hdr *cmd,
--					   void *data)
--{
--	BT_DBG("conn %p", conn);
--
--	return l2cap_connect_rsp(conn, cmd, data);
--}
--
- static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
- 				     u16 icid, u16 result)
- {
-@@ -4306,7 +4297,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 
- 	case L2CAP_CONN_RSP:
- 	case L2CAP_CREATE_CHAN_RSP:
--		err = l2cap_connect_rsp(conn, cmd, data);
-+		err = l2cap_connect_create_rsp(conn, cmd, data);
- 		break;
- 
- 	case L2CAP_CONF_REQ:
+Mat Martineau (19):
+  Bluetooth: Add new l2cap_chan struct members for high speed channels
+  Bluetooth: Add L2CAP create channel request handling
+  Bluetooth: Remove unnecessary intermediate function
+  Bluetooth: Lookup channel structure based on DCID
+  Bluetooth: Channel move request handling
+  Bluetooth: Add new ERTM receive states for channel move
+  Bluetooth: Add move channel confirm handling
+  Bluetooth: Add state to hci_chan
+  Bluetooth: Move channel response
+  Bluetooth: Add logical link confirm
+  Bluetooth: Add move confirm response handling
+  Bluetooth: Handle physical link completion
+  Bluetooth: Flag ACL frames as complete for AMP controllers
+  Bluetooth: Do not send data during channel move
+  Bluetooth: Configure appropriate timeouts for AMP controllers
+  Bluetooth: Ignore BR/EDR packet size constraints when fragmenting for
+    AMP
+  Bluetooth: Send create channel request instead of connect for AMP
+  Bluetooth: Do not retransmit data during a channel move
+  Bluetooth: Start channel move when socket option is changed
+
+ include/net/bluetooth/hci_core.h |   1 +
+ include/net/bluetooth/l2cap.h    |  32 ++
+ net/bluetooth/hci_conn.c         |   1 +
+ net/bluetooth/l2cap_core.c       | 973 +++++++++++++++++++++++++++++++++++++--
+ net/bluetooth/l2cap_sock.c       |   5 +
+ 5 files changed, 972 insertions(+), 40 deletions(-)
+
 -- 
 1.7.12.3
 
