@@ -4,121 +4,56 @@ To: linux-bluetooth@vger.kernel.org,
 	gustavo@padovan.org
 Cc: sunnyk@codeaurora.org,
 	marcel@holtmann.org
-Subject: [PATCHv2 07/19] Bluetooth: Add move channel confirm handling
-Date: Tue, 16 Oct 2012 16:36:21 -0700
-Message-Id: <1350430593-23565-8-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv2 04/19] Bluetooth: Lookup channel structure based on DCID
+Date: Tue, 16 Oct 2012 16:36:18 -0700
+Message-Id: <1350430593-23565-5-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1350430593-23565-1-git-send-email-mathewm@codeaurora.org>
 References: <1350430593-23565-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-After sending a move channel response, a move responder waits for a
-move channel confirm command.  If the received command has a
-"confirmed" result the move is proceeding, and "unconfirmed" means the
-move has failed and the channel will not change controllers.
+Processing a move channel request involves getting the channel
+structure using the destination channel ID.  Previous code could only
+look up using the source channel ID.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c | 70 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 67 insertions(+), 3 deletions(-)
+ net/bluetooth/l2cap_core.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 9663292..ed2c23f 100644
+index ec2b4d9..b5b849b 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1036,6 +1036,42 @@ static void l2cap_move_setup(struct l2cap_chan *chan)
- 	set_bit(CONN_REMOTE_BUSY, &chan->conn_state);
+@@ -100,6 +100,22 @@ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn,
+ 	return c;
  }
  
-+static void l2cap_move_success(struct l2cap_chan *chan)
++/* Find channel with given DCID.
++ * Returns locked channel. */
++static struct l2cap_chan *l2cap_get_chan_by_dcid(struct l2cap_conn *conn,
++						 u16 cid)
 +{
-+	BT_DBG("chan %p", chan);
++	struct l2cap_chan *c;
 +
-+	if (chan->mode != L2CAP_MODE_ERTM)
-+		return;
++	mutex_lock(&conn->chan_lock);
++	c = __l2cap_get_chan_by_dcid(conn, cid);
++	if (c)
++		l2cap_chan_lock(c);
++	mutex_unlock(&conn->chan_lock);
 +
-+	switch (chan->move_role) {
-+	case L2CAP_MOVE_ROLE_INITIATOR:
-+		l2cap_tx(chan, NULL, NULL, L2CAP_EV_EXPLICIT_POLL);
-+		chan->rx_state = L2CAP_RX_STATE_WAIT_F;
-+		break;
-+	case L2CAP_MOVE_ROLE_RESPONDER:
-+		chan->rx_state = L2CAP_RX_STATE_WAIT_P;
-+		break;
-+	}
++	return c;
 +}
 +
-+static void l2cap_move_revert(struct l2cap_chan *chan)
-+{
-+	BT_DBG("chan %p", chan);
-+
-+	if (chan->mode != L2CAP_MODE_ERTM)
-+		return;
-+
-+	switch (chan->move_role) {
-+	case L2CAP_MOVE_ROLE_INITIATOR:
-+		l2cap_tx(chan, NULL, NULL, L2CAP_EV_EXPLICIT_POLL);
-+		chan->rx_state = L2CAP_RX_STATE_WAIT_F;
-+		break;
-+	case L2CAP_MOVE_ROLE_RESPONDER:
-+		chan->rx_state = L2CAP_RX_STATE_WAIT_P;
-+		break;
-+	}
-+}
-+
- static void l2cap_chan_ready(struct l2cap_chan *chan)
+ static struct l2cap_chan *__l2cap_get_chan_by_ident(struct l2cap_conn *conn,
+ 						    u8 ident)
  {
- 	/* This clears all conf flags, including CONF_NOT_COMPLETE */
-@@ -4302,11 +4338,12 @@ static inline int l2cap_move_channel_rsp(struct l2cap_conn *conn,
- 	return 0;
- }
- 
--static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
--					     struct l2cap_cmd_hdr *cmd,
--					     u16 cmd_len, void *data)
-+static int l2cap_move_channel_confirm(struct l2cap_conn *conn,
-+				      struct l2cap_cmd_hdr *cmd,
-+				      u16 cmd_len, void *data)
+@@ -4139,6 +4155,7 @@ static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
+ 					 u16 cmd_len, void *data)
  {
- 	struct l2cap_move_chan_cfm *cfm = data;
+ 	struct l2cap_move_chan_req *req = data;
 +	struct l2cap_chan *chan;
- 	u16 icid, result;
- 
- 	if (cmd_len != sizeof(*cfm))
-@@ -4317,8 +4354,35 @@ static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
- 
- 	BT_DBG("icid 0x%4.4x, result 0x%4.4x", icid, result);
- 
-+	chan = l2cap_get_chan_by_dcid(conn, icid);
-+	if (!chan)
-+		goto send_move_confirm_response;
-+
-+	if (chan->move_state == L2CAP_MOVE_WAIT_CONFIRM) {
-+		chan->move_state = L2CAP_MOVE_STABLE;
-+		if (result == L2CAP_MC_CONFIRMED) {
-+			chan->local_amp_id = chan->move_id;
-+			if (!chan->local_amp_id) {
-+				/* Have moved off of AMP, free the channel */
-+				chan->hs_hchan = NULL;
-+				chan->hs_hcon = NULL;
-+
-+				/* Placeholder - free the logical link */
-+			}
-+			l2cap_move_success(chan);
-+		} else {
-+			chan->move_id = chan->local_amp_id;
-+			l2cap_move_revert(chan);
-+		}
-+		chan->move_role = L2CAP_MOVE_ROLE_NONE;
-+	}
-+
-+send_move_confirm_response:
- 	l2cap_send_move_chan_cfm_rsp(conn, cmd->ident, icid);
- 
-+	if (chan)
-+		l2cap_chan_unlock(chan);
-+
- 	return 0;
- }
+ 	u16 icid = 0;
+ 	u16 result = L2CAP_MR_NOT_ALLOWED;
  
 -- 
 1.7.12.3
