@@ -4,84 +4,113 @@ To: linux-bluetooth@vger.kernel.org,
 	gustavo@padovan.org
 Cc: sunnyk@codeaurora.org,
 	marcel@holtmann.org
-Subject: [PATCHv2 19/19] Bluetooth: Start channel move when socket option is changed
-Date: Tue, 16 Oct 2012 16:36:33 -0700
-Message-Id: <1350430593-23565-20-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv2 17/19] Bluetooth: Send create channel request instead of connect for AMP
+Date: Tue, 16 Oct 2012 16:36:31 -0700
+Message-Id: <1350430593-23565-18-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1350430593-23565-1-git-send-email-mathewm@codeaurora.org>
 References: <1350430593-23565-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Channel moves are triggered by changes to the BT_CHANNEL_POLICY
-sockopt when an ERTM or streaming-mode channel is connected.
+When the channel policy is set to prefer AMP, then an L2CAP channel is
+set up using the "create channel" command rather than the "connect"
+command.  A physical link is also set up before sending "create
+channel".
 
-Moves are only started if enable_hs is true.
+Behavior is unchanged if enable_hs is false.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/l2cap.h |  1 +
- net/bluetooth/l2cap_core.c    | 20 ++++++++++++++++++++
- net/bluetooth/l2cap_sock.c    |  5 +++++
- 3 files changed, 26 insertions(+)
+ net/bluetooth/l2cap_core.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index b4c3c65..49783e9 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -809,5 +809,6 @@ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
- void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
- void l2cap_chan_del(struct l2cap_chan *chan, int err);
- void l2cap_send_conn_req(struct l2cap_chan *chan);
-+void l2cap_move_start(struct l2cap_chan *chan);
- 
- #endif /* __L2CAP_H */
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2263c1d..3f6410b 100644
+index 7e8fe84..17d917b 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -4479,6 +4479,26 @@ static void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
- 	}
- }
+@@ -58,6 +58,9 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
+ static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+ 		     struct sk_buff_head *skbs, u8 event);
  
-+void l2cap_move_start(struct l2cap_chan *chan)
-+{
-+	BT_DBG("chan %p", chan);
++static void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
++			      u8 status);
 +
-+	if (chan->local_amp_id == 0) {
-+		if (chan->chan_policy != BT_CHANNEL_POLICY_AMP_PREFERRED)
-+			return;
-+		chan->move_role = L2CAP_MOVE_ROLE_INITIATOR;
-+		chan->move_state = L2CAP_MOVE_WAIT_PREPARE;
-+		/* Placeholder - start physical link setup */
-+	} else {
-+		chan->move_role = L2CAP_MOVE_ROLE_INITIATOR;
-+		chan->move_state = L2CAP_MOVE_WAIT_RSP_SUCCESS;
-+		chan->move_id = 0;
-+		l2cap_move_start(chan);
-+		l2cap_send_move_chan_req(chan, 0);
-+		__set_chan_timer(chan, L2CAP_MOVE_TIMEOUT);
+ /* ---- L2CAP channels ---- */
+ 
+ static struct l2cap_chan *__l2cap_get_chan_by_dcid(struct l2cap_conn *conn,
+@@ -576,6 +579,13 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 			mgr->bredr_chan = NULL;
+ 	}
+ 
++	if (chan->hs_hchan) {
++		chan->hs_hchan = NULL;
++		chan->hs_hcon = NULL;
++
++		/* Placeholder - free logical link */
 +	}
-+}
 +
- static void l2cap_do_create(struct l2cap_chan *chan, int result,
- 			    u8 local_amp_id, u8 remote_amp_id)
+ 	chan->ops->teardown(chan, err);
+ 
+ 	if (test_bit(CONF_NOT_COMPLETE, &chan->conf_state))
+@@ -1126,6 +1136,7 @@ static void l2cap_start_connection(struct l2cap_chan *chan)
  {
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 5fae2bd..7cb4d73 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -735,6 +735,11 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 	if (__amp_capable(chan)) {
+ 		BT_DBG("chan %p AMP capable: discover AMPs", chan);
++		set_bit(CONF_CONNECT_PEND, &chan->conf_state);
+ 		a2mp_discover_amp(chan);
+ 	} else {
+ 		l2cap_send_conn_req(chan);
+@@ -1271,6 +1282,16 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 				rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHEN_PEND);
+ 			}
+ 
++			if (rsp.result == __constant_cpu_to_le16(L2CAP_CR_SUCCESS) &&
++			    chan->local_amp_id) {
++				/* Placeholder - uncomment when amp functions
++				 * are available
++				amp_accept_physical(chan, chan->local_amp_id);
++				 */
++				l2cap_chan_unlock(chan);
++				continue;
++			}
++
+ 			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP,
+ 				       sizeof(rsp), &rsp);
+ 
+@@ -3359,6 +3380,18 @@ done:
+ 			rfc.mode = chan->mode;
  		}
  
- 		chan->chan_policy = (u8) opt;
++		if (test_bit(CONF_LOC_CONF_PEND, &chan->conf_state) &&
++		    chan->local_amp_id) {
++			struct hci_chan *hchan = NULL;
 +
-+		if (sk->sk_state == BT_CONNECTED &&
-+		    chan->move_role == L2CAP_MOVE_ROLE_NONE)
-+			l2cap_move_start(chan);
++			/* Placeholder - get hci_chan for logical link */
 +
- 		break;
- 
- 	default:
++			if (hchan && hchan->state == BT_CONNECTED) {
++				l2cap_logical_cfm(chan, hchan,
++						  L2CAP_MR_SUCCESS);
++			}
++		}
++
+ 		if (result == L2CAP_CONF_SUCCESS)
+ 			set_bit(CONF_OUTPUT_DONE, &chan->conf_state);
+ 	}
+@@ -6367,6 +6400,15 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 					stat = L2CAP_CS_AUTHOR_PEND;
+ 					chan->ops->defer(chan);
+ 				} else {
++					if (chan->local_amp_id) {
++						/* Placeholder - accept physical
++						 * link
++						amp_accept_physical(chan,
++							chan->local_amp_id);
++						*/
++						continue;
++					}
++
+ 					__l2cap_state_change(chan, BT_CONFIG);
+ 					res = L2CAP_CR_SUCCESS;
+ 					stat = L2CAP_CS_NO_INFO;
 -- 
 1.7.12.3
 
