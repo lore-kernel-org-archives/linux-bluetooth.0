@@ -1,30 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 16 Oct 2012 13:37:54 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/8] audio: Move btd_device unref after last use in
- device_free
-Message-ID: <20121016103754.GA509@x220>
-References: <1350382379-30489-1-git-send-email-szymon.janc@tieto.com>
+Date: Tue, 16 Oct 2012 13:27:27 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	sunnyk@codeaurora.org, marcel@holtmann.org
+Subject: Re: [PATCH 07/19] Bluetooth: Add move channel confirm handling
+Message-ID: <20121016102726.GG14036@aemeltch-MOBL1>
+References: <1350315248-7690-1-git-send-email-mathewm@codeaurora.org>
+ <1350315248-7690-8-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1350382379-30489-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1350315248-7690-8-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Mat,
 
-On Tue, Oct 16, 2012, Szymon Janc wrote:
-> btd_device should not be used after local reference was dropped.
+On Mon, Oct 15, 2012 at 08:33:56AM -0700, Mat Martineau wrote:
+> After sending a move channel response, a move responder waits for a
+> move channel confirm command.  If the received command has a
+> "confirmed" result the move is proceeding, and "unconfirmed" means the
+> move has failed and the channel will not change controllers.
 > 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 > ---
->  audio/device.c |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  net/bluetooth/l2cap_core.c | 70 ++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 67 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index aab7f79..ef744a9 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1030,6 +1030,42 @@ static void l2cap_move_setup(struct l2cap_chan *chan)
+>  	set_bit(CONN_REMOTE_BUSY, &chan->conn_state);
+>  }
+>  
+> +static void l2cap_move_success(struct l2cap_chan *chan)
+> +{
+> +	BT_DBG("chan %p", chan);
+> +
+> +	if (chan->mode != L2CAP_MODE_ERTM)
+> +		return;
+> +
+> +	switch (chan->move_role) {
+> +	case L2CAP_MOVE_ROLE_INITIATOR:
+> +		l2cap_tx(chan, NULL, NULL, L2CAP_EV_EXPLICIT_POLL);
+> +		chan->rx_state = L2CAP_RX_STATE_WAIT_F;
+> +		break;
+> +	case L2CAP_MOVE_ROLE_RESPONDER:
+> +		chan->rx_state = L2CAP_RX_STATE_WAIT_P;
+> +		break;
+> +	}
+> +}
+> +
+> +static void l2cap_move_revert(struct l2cap_chan *chan)
+> +{
+> +	BT_DBG("chan %p", chan);
+> +
+> +	if (chan->mode != L2CAP_MODE_ERTM)
+> +		return;
 
-All patches in this set have been applied. Thanks.
+Not sure that all those function need to check for ERTM. Can it be done
+before calling them (for example in l2cap_move_channel_confirm)?
 
-As a note for future commit messages please prefix lib/* changes with
-"lib: ..". I fixed it manually this time.
-
-Johan
+Best regards 
+Andrei Emeltchenko 
