@@ -1,149 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 16 Oct 2012 10:30:06 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	sunnyk@codeaurora.org
-Subject: Re: [PATCH 07/19] Bluetooth: Add move channel confirm handling
-In-Reply-To: <1350325523.26318.10.camel@aeonflux>
-Message-ID: <alpine.DEB.2.02.1210161020250.13129@mathewm-linux>
-References: <1350315248-7690-1-git-send-email-mathewm@codeaurora.org>  <1350315248-7690-8-git-send-email-mathewm@codeaurora.org> <1350325523.26318.10.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFCv0 6/8] Bluetooth: AMP: Remove hci_conn receiving error command status
+Date: Tue, 16 Oct 2012 18:01:08 +0300
+Message-Id: <1350399670-12418-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1350399670-12418-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1350399670-12418-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Hi Marcel -
+When receiving HCI Event: Command Status for Create Physical Link
+with Error code remove AMP hcon.
 
-On Mon, 15 Oct 2012, Marcel Holtmann wrote:
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/hci_event.c |   17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-> Hi Mat,
->
->> After sending a move channel response, a move responder waits for a
->> move channel confirm command.  If the received command has a
->> "confirmed" result the move is proceeding, and "unconfirmed" means the
->> move has failed and the channel will not change controllers.
->>
->> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
->> ---
->>  net/bluetooth/l2cap_core.c | 70 ++++++++++++++++++++++++++++++++++++++++++++--
->>  1 file changed, 67 insertions(+), 3 deletions(-)
->>
->> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
->> index aab7f79..ef744a9 100644
->> --- a/net/bluetooth/l2cap_core.c
->> +++ b/net/bluetooth/l2cap_core.c
->> @@ -1030,6 +1030,42 @@ static void l2cap_move_setup(struct l2cap_chan *chan)
->>  	set_bit(CONN_REMOTE_BUSY, &chan->conn_state);
->>  }
->>
->> +static void l2cap_move_success(struct l2cap_chan *chan)
->> +{
->> +	BT_DBG("chan %p", chan);
->> +
->> +	if (chan->mode != L2CAP_MODE_ERTM)
->> +		return;
->> +
->> +	switch (chan->move_role) {
->> +	case L2CAP_MOVE_ROLE_INITIATOR:
->> +		l2cap_tx(chan, NULL, NULL, L2CAP_EV_EXPLICIT_POLL);
->> +		chan->rx_state = L2CAP_RX_STATE_WAIT_F;
->> +		break;
->> +	case L2CAP_MOVE_ROLE_RESPONDER:
->> +		chan->rx_state = L2CAP_RX_STATE_WAIT_P;
->> +		break;
->> +	}
->> +}
->> +
->> +static void l2cap_move_revert(struct l2cap_chan *chan)
->> +{
->> +	BT_DBG("chan %p", chan);
->> +
->> +	if (chan->mode != L2CAP_MODE_ERTM)
->> +		return;
->> +
->> +	switch (chan->move_role) {
->> +	case L2CAP_MOVE_ROLE_INITIATOR:
->> +		l2cap_tx(chan, NULL, NULL, L2CAP_EV_EXPLICIT_POLL);
->> +		chan->rx_state = L2CAP_RX_STATE_WAIT_F;
->> +		break;
->> +	case L2CAP_MOVE_ROLE_RESPONDER:
->> +		chan->rx_state = L2CAP_RX_STATE_WAIT_P;
->> +		break;
->> +	}
->> +}
->> +
->>  static void l2cap_chan_ready(struct l2cap_chan *chan)
->>  {
->>  	/* This clears all conf flags, including CONF_NOT_COMPLETE */
->> @@ -4297,11 +4333,12 @@ static inline int l2cap_move_channel_rsp(struct l2cap_conn *conn,
->>  	return 0;
->>  }
->>
->> -static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
->> -					     struct l2cap_cmd_hdr *cmd,
->> -					     u16 cmd_len, void *data)
->> +static int l2cap_move_channel_confirm(struct l2cap_conn *conn,
->> +				      struct l2cap_cmd_hdr *cmd,
->> +				      u16 cmd_len, void *data)
->>  {
->>  	struct l2cap_move_chan_cfm *cfm = data;
->> +	struct l2cap_chan *chan;
->>  	u16 icid, result;
->>
->>  	if (cmd_len != sizeof(*cfm))
->> @@ -4312,8 +4349,35 @@ static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
->>
->>  	BT_DBG("icid 0x%4.4x, result 0x%4.4x", icid, result);
->>
->> +	chan = l2cap_get_chan_by_dcid(conn, icid);
->> +	if (!chan)
->> +		goto send_move_confirm_response;
->> +
->> +	if (chan->move_state == L2CAP_MOVE_WAIT_CONFIRM) {
->> +		chan->move_state = L2CAP_MOVE_STABLE;
->> +		if (result == L2CAP_MC_CONFIRMED) {
->> +			chan->local_amp_id = chan->move_id;
->> +			if (!chan->local_amp_id) {
->> +				/* Have moved off of AMP, free the channel */
->> +				chan->hs_hchan = NULL;
->> +				chan->hs_hcon = NULL;
->> +
->> +				/* Placeholder - free the logical link */
->> +			}
->> +			l2cap_move_success(chan);
->> +		} else {
->> +			chan->move_id = chan->local_amp_id;
->> +			l2cap_move_revert(chan);
->> +		}
->> +		chan->move_role = L2CAP_MOVE_ROLE_NONE;
->> +	}
->> +
->> +send_move_confirm_response:
->>  	l2cap_send_move_chan_cfm_rsp(conn, cmd->ident, icid);
->>
->> +	if (chan)
->> +		l2cap_chan_unlock(chan);
->> +
->>  	return 0;
->>  }
->>
->
-> the more I read into this one, can we not have a clean exit when (!chan)
-> for this one. Or am I missing something.
-
-Are you thinking this should send a COMMAND_REJ if it can't find the 
-matching channel?
-
-I think sending the confirm response is the appropriate thing to do. 
-The spec says "When a device receives a Move Channel Confirmation 
-packet it shall send a Move Channel Confirmation response packet".
-Sending this response doesn't indicate that the move was successful.
-
---
-Mat Martineau
-
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, hosted by The Linux Foundation
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 3440e52..e534209 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1718,14 +1718,23 @@ static void hci_cs_create_phylink(struct hci_dev *hdev, u8 status)
+ 
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+ 
+-	if (status)
+-		return;
+-
+ 	cp = hci_sent_cmd_data(hdev, HCI_OP_CREATE_PHY_LINK);
+ 	if (!cp)
+ 		return;
+ 
+-	amp_write_remote_assoc(hdev, cp->phy_handle);
++	hci_dev_lock(hdev);
++
++	if (status) {
++		struct hci_conn *hcon;
++
++		hcon = hci_conn_hash_lookup_handle(hdev, cp->phy_handle);
++		if (hcon)
++			hci_conn_del(hcon);
++	} else {
++		amp_write_remote_assoc(hdev, cp->phy_handle);
++	}
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cs_accept_phylink(struct hci_dev *hdev, u8 status)
+-- 
+1.7.9.5
 
