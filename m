@@ -3,42 +3,98 @@ From: Mat Martineau <mathewm@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org,
 	gustavo@padovan.org
 Cc: sunnyk@codeaurora.org,
-	marcel@holtmann.org,
-	Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Subject: [PATCHv2 16/19] Bluetooth: Ignore BR/EDR packet size constraints when fragmenting for AMP
-Date: Tue, 16 Oct 2012 16:36:30 -0700
-Message-Id: <1350430593-23565-17-git-send-email-mathewm@codeaurora.org>
+	marcel@holtmann.org
+Subject: [PATCHv2 15/19] Bluetooth: Configure appropriate timeouts for AMP controllers
+Date: Tue, 16 Oct 2012 16:36:29 -0700
+Message-Id: <1350430593-23565-16-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1350430593-23565-1-git-send-email-mathewm@codeaurora.org>
 References: <1350430593-23565-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When operating over BR/EDR, ERTM accounts for the maximum over-the-air
-packet size when setting the PDU size.  AMP controllers do not use the
-same over-the-air packets, so the PDU size should only be based on the
-HCI MTU of the AMP controller.
+The L2CAP spec recommends specific retransmit and monitor timeouts for
+ERTM channels that are on AMP controllers.  These timeouts are
+calculated from the AMP controller's best effort flush timeout.
+
+BR/EDR controllers use the default retransmit and monitor timeouts.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ net/bluetooth/l2cap_core.c | 47 ++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 41 insertions(+), 6 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 14991d8..7e8fe84 100644
+index 5c7681d..14991d8 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -2285,7 +2285,9 @@ static int l2cap_segment_sdu(struct l2cap_chan *chan,
- 	/* PDU size is derived from the HCI MTU */
- 	pdu_len = chan->conn->mtu;
+@@ -2980,6 +2980,44 @@ static inline bool __l2cap_efs_supported(struct l2cap_chan *chan)
+ 	return enable_hs && chan->conn->feat_mask & L2CAP_FEAT_EXT_FLOW;
+ }
  
--	pdu_len = min_t(size_t, pdu_len, L2CAP_BREDR_MAX_PAYLOAD);
-+	/* Constrain PDU size for BR/EDR connections */
-+	if (!chan->hs_hcon)
-+		pdu_len = min_t(size_t, pdu_len, L2CAP_BREDR_MAX_PAYLOAD);
++static void __l2cap_set_ertm_timeouts(struct l2cap_chan *chan,
++				      struct l2cap_conf_rfc *rfc)
++{
++	if (chan->local_amp_id && chan->hs_hcon) {
++		u64 ertm_to = chan->hs_hcon->hdev->amp_be_flush_to;
++
++		/* Class 1 devices have must have ERTM timeouts
++		 * exceeding the Link Supervision Timeout.  The
++		 * default Link Supervision Timeout for AMP
++		 * controllers is 10 seconds.
++		 *
++		 * Class 1 devices use 0xffffffff for their
++		 * best-effort flush timeout, so the clamping logic
++		 * will result in a timeout that meets the above
++		 * requirement.  ERTM timeouts are 16-bit values, so
++		 * the maximum timeout is 65.535 seconds.
++		 */
++
++		/* Convert timeout to milliseconds and round */
++		ertm_to = DIV_ROUND_UP_ULL(ertm_to, 1000);
++
++		/* This is the recommended formula for class 2 devices
++		 * that start ERTM timers when packets are sent to the
++		 * controller.
++		 */
++		ertm_to = 3 * ertm_to + 500;
++
++		if (ertm_to > 0xffff)
++			ertm_to = 0xffff;
++
++		rfc->retrans_timeout = cpu_to_le16((u16) ertm_to);
++		rfc->monitor_timeout = rfc->retrans_timeout;
++	} else {
++		rfc->retrans_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
++		rfc->monitor_timeout = __constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
++	}
++}
++
+ static inline void l2cap_txwin_setup(struct l2cap_chan *chan)
+ {
+ 	if (chan->tx_win > L2CAP_DEFAULT_TX_WINDOW &&
+@@ -3046,8 +3084,8 @@ done:
+ 	case L2CAP_MODE_ERTM:
+ 		rfc.mode            = L2CAP_MODE_ERTM;
+ 		rfc.max_transmit    = chan->max_tx;
+-		rfc.retrans_timeout = 0;
+-		rfc.monitor_timeout = 0;
++
++		__l2cap_set_ertm_timeouts(chan, &rfc);
  
- 	/* Adjust for largest possible L2CAP overhead. */
- 	if (chan->fcs)
+ 		size = min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->conn->mtu -
+ 			     L2CAP_EXT_HDR_SIZE - L2CAP_SDULEN_SIZE -
+@@ -3275,10 +3313,7 @@ done:
+ 			rfc.max_pdu_size = cpu_to_le16(size);
+ 			chan->remote_mps = size;
+ 
+-			rfc.retrans_timeout =
+-				__constant_cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
+-			rfc.monitor_timeout =
+-				__constant_cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
++			__l2cap_set_ertm_timeouts(chan, &rfc);
+ 
+ 			set_bit(CONF_MODE_DONE, &chan->conf_state);
+ 
 -- 
 1.7.12.3
 
