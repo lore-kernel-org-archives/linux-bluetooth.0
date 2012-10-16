@@ -1,99 +1,237 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] avdtp: Fix crash on connection lost
-Date: Tue, 16 Oct 2012 14:37:16 +0200
-Message-ID: <1350391036-29997-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2] AVRCP: Don't respond with errors when no player is registered
+Date: Tue, 16 Oct 2012 14:58:12 +0300
+Message-Id: <1350388692-15239-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1350388692-15239-1-git-send-email-luiz.dentz@gmail.com>
+References: <1350388692-15239-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fix avdtp session reference counting. avdtp_unref has a special
-case when ref==1 and due to nested calls session could be free in
-consecutive call resulting in accesing already freed memory.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Instead of having extra free lock keep extra local reference. This also
-make avdtp_unref easier to undertand as there is no double ref
-decrement inside one unref call.
-
-avdtp_unref will set session state to disconnected when reference count
-drops to 1 so there is no need to explicite set it in connection_lost.
-
-bluetoothd[29474]: audio/avdtp.c:avdtp_ref() 0x555555856aa0: ref=2
-bluetoothd[29474]: audio/source.c:source_connect() stream creation in progress
-bluetoothd[29474]: src/mgmt.c:mgmt_event() cond 1
-bluetoothd[29474]: src/mgmt.c:mgmt_event() Received 31 bytes from management socket
-bluetoothd[29474]: src/mgmt.c:mgmt_device_connected() hci0 device 84:00:D2:DB:F7:8C connected eir_len 12
-bluetoothd[29474]: src/adapter.c:adapter_get_device() 84:00:D2:DB:F7:8C
-bluetoothd[29474]: src/mgmt.c:mgmt_event() cond 1
-bluetoothd[29474]: src/mgmt.c:mgmt_event() Received 14 bytes from management socket
-bluetoothd[29474]: src/mgmt.c:mgmt_auth_failed() hci0 auth failed status 6
-bluetoothd[29474]: src/device.c:device_bonding_complete() bonding (nil) status 0x06
-bluetoothd[29474]: connect error: Invalid exchange (52)
-bluetoothd[29474]: audio/avdtp.c:connection_lost() Disconnected from 84:00:D2:DB:F7:8C
-bluetoothd[29474]: audio/avdtp.c:avdtp_unref() 0x555555856aa0: ref=1
-bluetoothd[29474]: audio/avdtp.c:avdtp_unref() 0x555555856aa0: ref=0
-bluetoothd[29474]: audio/avdtp.c:avdtp_unref() 0x555555856aa0: freeing session and removing from list
-bluetoothd[29474]: audio/avdtp.c:avdtp_unref() 0x555555856aa0: freeing session and removing from list
-
-Program received signal SIGSEGV, Segmentation fault.
-avdtp_unref (session=0x555555856aa0) at audio/avdtp.c:1239
-1239            server->sessions = g_slist_remove(server->sessions, session);
-
+Some devices w.g. Sony MW600 will stop using certain commands if an
+error happen, so the code now just fake a player and once a real
+player is registered it takes place of the fake one.
 ---
- audio/avdtp.c |   10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+ audio/avrcp.c | 91 ++++++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 74 insertions(+), 17 deletions(-)
 
-diff --git a/audio/avdtp.c b/audio/avdtp.c
-index bd91cb6..4109be9 100644
---- a/audio/avdtp.c
-+++ b/audio/avdtp.c
-@@ -388,7 +388,6 @@ struct avdtp_stream {
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index 5a18cb4..cd57358 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -493,6 +493,28 @@ void avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data)
+ 	return;
+ }
  
- struct avdtp {
- 	int ref;
--	int free_lock;
++static const char *player_get_string(struct avrcp_player *player, uint32_t attr)
++{
++	if (player != NULL)
++		return player->cb->get_string(attr, player->user_data);
++
++	if (attr == AVRCP_MEDIA_ATTRIBUTE_TITLE)
++		return "";
++
++	return NULL;
++}
++
++static uint32_t player_get_uint32(struct avrcp_player *player, uint32_t attr)
++{
++	if (player != NULL)
++		return player->cb->get_uint32(attr, player->user_data);
++
++	if (attr == AVRCP_MEDIA_ATTRIBUTE_DURATION)
++		return UINT32_MAX;
++
++	return 0;
++}
++
+ static uint16_t player_write_media_attribute(struct avrcp_player *player,
+ 						uint32_t id, uint8_t *buf,
+ 						uint16_t *pos,
+@@ -510,7 +532,7 @@ static uint16_t player_write_media_attribute(struct avrcp_player *player,
+ 	case AVRCP_MEDIA_ATTRIBUTE_TRACK:
+ 	case AVRCP_MEDIA_ATTRIBUTE_N_TRACKS:
+ 	case AVRCP_MEDIA_ATTRIBUTE_DURATION:
+-		num = player->cb->get_uint32(id, player->user_data);
++		num = player_get_uint32(player, id);
+ 		if (num == 0)
+ 			break;
  
- 	uint16_t version;
- 
-@@ -1158,14 +1157,14 @@ static void connection_lost(struct avdtp *session, int err)
- 	if (err != EACCES)
- 		avdtp_cancel_authorization(session);
- 
--	session->free_lock = 1;
-+	avdtp_ref(session);
- 
- 	finalize_discovery(session, err);
- 
- 	g_slist_foreach(session->streams, (GFunc) release_stream, session);
- 	session->streams = NULL;
- 
--	session->free_lock = 0;
-+	avdtp_unref(session);
- 
- 	if (session->io) {
- 		g_io_channel_shutdown(session->io, FALSE, NULL);
-@@ -1173,8 +1172,6 @@ static void connection_lost(struct avdtp *session, int err)
- 		session->io = NULL;
+@@ -518,7 +540,7 @@ static uint16_t player_write_media_attribute(struct avrcp_player *player,
+ 		value = valstr;
+ 		break;
+ 	default:
+-		value = player->cb->get_string(id, player->user_data);
++		value = player_get_string(player, id);
  	}
  
--	avdtp_set_state(session, AVDTP_SESSION_STATE_DISCONNECTED);
--
- 	if (session->io_id) {
- 		g_source_remove(session->io_id);
- 		session->io_id = 0;
-@@ -1221,9 +1218,6 @@ void avdtp_unref(struct avdtp *session)
+ 	if (value == NULL) {
+@@ -610,6 +632,9 @@ static int player_set_attribute(struct avrcp_player *player,
+ {
+ 	DBG("Change attribute: %u %u", attr, val);
  
- 		if (session->io)
- 			set_disconnect_timer(session);
--		else if (!session->free_lock) /* Drop the local ref if we
--						 aren't connected */
--			session->ref--;
++	if (player == NULL)
++		return -ENOENT;
++
+ 	return player->cb->set_setting(attr, val, player->user_data);
+ }
+ 
+@@ -619,6 +644,9 @@ static int player_get_attribute(struct avrcp_player *player, uint8_t attr)
+ 
+ 	DBG("attr %u", attr);
+ 
++	if (player == NULL)
++		return -ENOENT;
++
+ 	value = player->cb->get_setting(attr, player->user_data);
+ 	if (value < 0)
+ 		DBG("attr %u not supported by player", attr);
+@@ -675,7 +703,7 @@ static uint8_t avrcp_handle_list_player_attributes(struct avrcp *session,
+ 	uint16_t len = ntohs(pdu->params_len);
+ 	unsigned int i;
+ 
+-	if (len != 0 || player == NULL) {
++	if (len != 0) {
+ 		pdu->params_len = htons(1);
+ 		pdu->params[0] = AVRCP_STATUS_INVALID_PARAM;
+ 		return AVC_CTYPE_REJECTED;
+@@ -707,7 +735,7 @@ static uint8_t avrcp_handle_list_player_values(struct avrcp *session,
+ 	uint16_t len = ntohs(pdu->params_len);
+ 	unsigned int i;
+ 
+-	if (len != 1 || player == NULL)
++	if (len != 1)
+ 		goto err;
+ 
+ 	if (player_get_attribute(player, pdu->params[0]) < 0)
+@@ -729,6 +757,15 @@ err:
+ 	return AVC_CTYPE_REJECTED;
+ }
+ 
++static GList *player_list_metadata(struct avrcp_player *player)
++{
++	if (player != NULL)
++		return player->cb->list_metadata(player->user_data);
++
++	return g_list_prepend(NULL,
++				GUINT_TO_POINTER(AVRCP_MEDIA_ATTRIBUTE_TITLE));
++}
++
+ static uint8_t avrcp_handle_get_element_attributes(struct avrcp *session,
+ 						struct avrcp_header *pdu,
+ 						uint8_t transaction)
+@@ -741,7 +778,7 @@ static uint8_t avrcp_handle_get_element_attributes(struct avrcp *session,
+ 	GList *attr_ids;
+ 	uint16_t offset;
+ 
+-	if (len < 9 || identifier != 0 || player == NULL)
++	if (len < 9 || identifier != 0)
+ 		goto err;
+ 
+ 	nattr = pdu->params[8];
+@@ -754,7 +791,7 @@ static uint8_t avrcp_handle_get_element_attributes(struct avrcp *session,
+ 		 * Return all available information, at least
+ 		 * title must be returned if there's a track selected.
+ 		 */
+-		attr_ids = player->cb->list_metadata(player->user_data);
++		attr_ids = player_list_metadata(player);
+ 		len = g_list_length(attr_ids);
+ 	} else {
+ 		unsigned int i;
+@@ -810,8 +847,7 @@ static uint8_t avrcp_handle_get_current_player_value(struct avrcp *session,
+ 	uint8_t *settings;
+ 	unsigned int i;
+ 
+-	if (player == NULL || len <= 1 || pdu->params[0] != len - 1 ||
+-							player == NULL)
++	if (len <= 1 || pdu->params[0] != len - 1)
+ 		goto err;
+ 
+ 	/*
+@@ -944,6 +980,14 @@ err:
+ 	return AVC_CTYPE_REJECTED;
+ }
+ 
++static uint32_t player_get_position(struct avrcp_player *player)
++{
++	if (player == NULL)
++		return 0;
++
++	return player->cb->get_position(player->user_data);
++}
++
+ static uint8_t avrcp_handle_get_play_status(struct avrcp *session,
+ 						struct avrcp_header *pdu,
+ 						uint8_t transaction)
+@@ -953,17 +997,14 @@ static uint8_t avrcp_handle_get_play_status(struct avrcp *session,
+ 	uint32_t position;
+ 	uint32_t duration;
+ 
+-	if (len != 0 || player == NULL) {
++	if (len != 0) {
+ 		pdu->params_len = htons(1);
+ 		pdu->params[0] = AVRCP_STATUS_INVALID_PARAM;
+ 		return AVC_CTYPE_REJECTED;
  	}
  
- 	if (session->ref > 0)
+-	position = player->cb->get_position(player->user_data);
+-	duration = player->cb->get_uint32(AVRCP_MEDIA_ATTRIBUTE_DURATION,
+-							player->user_data);
+-	if (duration == 0)
+-		duration = UINT32_MAX;
++	position = player_get_position(player);
++	duration = player_get_uint32(player, AVRCP_MEDIA_ATTRIBUTE_DURATION);
+ 
+ 	position = htonl(position);
+ 	duration = htonl(duration);
+@@ -977,6 +1018,22 @@ static uint8_t avrcp_handle_get_play_status(struct avrcp *session,
+ 	return AVC_CTYPE_STABLE;
+ }
+ 
++static uint64_t player_get_uid(struct avrcp_player *player)
++{
++	if (player == NULL)
++		return UINT64_MAX;
++
++	return player->cb->get_status(player->user_data);
++}
++
++static uint8_t player_get_status(struct avrcp_player *player)
++{
++	if (player == NULL)
++		return AVRCP_PLAY_STATUS_STOPPED;
++
++	return player->cb->get_status(player->user_data);
++}
++
+ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+ 						struct avrcp_header *pdu,
+ 						uint8_t transaction)
+@@ -990,18 +1047,18 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+ 	 * one is applicable only for EVENT_PLAYBACK_POS_CHANGED. See AVRCP
+ 	 * 1.3 spec, section 5.4.2.
+ 	 */
+-	if (len != 5 || player == NULL)
++	if (len != 5)
+ 		goto err;
+ 
+ 	switch (pdu->params[0]) {
+ 	case AVRCP_EVENT_STATUS_CHANGED:
+ 		len = 2;
+-		pdu->params[1] = player->cb->get_status(player->user_data);
++		pdu->params[1] = player_get_status(player);
+ 
+ 		break;
+ 	case AVRCP_EVENT_TRACK_CHANGED:
+ 		len = 9;
+-		uid = player->cb->get_uid(player->user_data);
++		uid = player_get_uid(player);
+ 		memcpy(&pdu->params[1], &uid, sizeof(uint64_t));
+ 
+ 		break;
 -- 
-1.7.9.5
+1.7.11.4
 
