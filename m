@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 7/8] Bluetooth: Disconnect logical link when deleteing chan
-Date: Tue, 16 Oct 2012 18:01:09 +0300
-Message-Id: <1350399670-12418-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv0 5/8] Bluetooth: AMP: Process Disc Physical Link complete evt
+Date: Tue, 16 Oct 2012 18:01:07 +0300
+Message-Id: <1350399670-12418-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1350399670-12418-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1350399670-12418-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,71 +11,57 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Disconnect logical link for high speed channel hs_hchan
-associated with L2CAP channel chan.
+Add processing for HCI Disconnection Physical Link Complete Event.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/amp.h |    1 +
- net/bluetooth/amp.c         |   14 ++++++++++++++
- net/bluetooth/l2cap_core.c  |    7 +++++++
- 3 files changed, 22 insertions(+)
+ net/bluetooth/hci_event.c |   26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
-index 405fb9c..f1c0017 100644
---- a/include/net/bluetooth/amp.h
-+++ b/include/net/bluetooth/amp.h
-@@ -47,6 +47,7 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
- void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle);
- void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle);
- void amp_create_logical_link(struct l2cap_chan *chan);
-+void amp_disconnect_logical_link(struct hci_chan *hchan);
- void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason);
- 
- #endif /* __AMP_H */
-diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index 40c5d95..0cbc325 100644
---- a/net/bluetooth/amp.c
-+++ b/net/bluetooth/amp.c
-@@ -421,6 +421,20 @@ done:
- 	hci_dev_put(hdev);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index dc24489..3440e52 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3663,6 +3663,28 @@ unlock:
+ 	hci_dev_unlock(hdev);
  }
  
-+void amp_disconnect_logical_link(struct hci_chan *hchan)
++static void hci_disconn_phylink_complete_evt(struct hci_dev *hdev,
++					     struct sk_buff *skb)
 +{
-+	struct hci_conn *hcon = hchan->conn;
-+	struct hci_cp_disconn_logical_link cp;
++	struct hci_ev_disconn_phy_link_complete *ev = (void *) skb->data;
++	struct hci_conn *hcon;
 +
-+	if (hcon->state != BT_CONNECTED) {
-+		BT_DBG("hchan %p not connected", hchan);
++	BT_DBG("%s status %d", hdev->name, ev->status);
++
++	if (ev->status)
 +		return;
++
++	hci_dev_lock(hdev);
++
++	hcon = hci_conn_hash_lookup_handle(hdev, ev->phy_handle);
++	if (hcon) {
++		hcon->state = BT_CLOSED;
++		hci_conn_del(hcon);
 +	}
 +
-+	cp.log_handle = cpu_to_le16(hchan->handle);
-+	hci_send_cmd(hcon->hdev, HCI_OP_DISCONN_LOGICAL_LINK, sizeof(cp), &cp);
++	hci_dev_unlock(hdev);
 +}
 +
- void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason)
+ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
  {
- 	BT_DBG("hchan %p", hchan);
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 382d92a..748f022 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -547,6 +547,13 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 			mgr->bredr_chan = NULL;
- 	}
+ 	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
+@@ -4002,6 +4024,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_disconn_loglink_complete_evt(hdev, skb);
+ 		break;
  
-+	if (chan->hs_hchan) {
-+		struct hci_chan *hs_hchan = chan->hs_hchan;
++	case HCI_EV_DISCONN_PHY_LINK_COMPLETE:
++		hci_disconn_phylink_complete_evt(hdev, skb);
++		break;
 +
-+		BT_DBG("chan %p disconnect hs_hchan %p", chan, hs_hchan);
-+		amp_disconnect_logical_link(hs_hchan);
-+	}
-+
- 	chan->ops->teardown(chan, err);
- 
- 	if (test_bit(CONF_NOT_COMPLETE, &chan->conf_state))
+ 	case HCI_EV_NUM_COMP_BLOCKS:
+ 		hci_num_comp_blocks_evt(hdev, skb);
+ 		break;
 -- 
 1.7.9.5
 
