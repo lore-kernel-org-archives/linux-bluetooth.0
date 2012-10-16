@@ -1,112 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 16 Oct 2012 10:30:06 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	sunnyk@codeaurora.org
+Subject: Re: [PATCH 07/19] Bluetooth: Add move channel confirm handling
+In-Reply-To: <1350325523.26318.10.camel@aeonflux>
+Message-ID: <alpine.DEB.2.02.1210161020250.13129@mathewm-linux>
+References: <1350315248-7690-1-git-send-email-mathewm@codeaurora.org>  <1350315248-7690-8-git-send-email-mathewm@codeaurora.org> <1350325523.26318.10.camel@aeonflux>
 MIME-Version: 1.0
-In-Reply-To: <1350391036-29997-1-git-send-email-szymon.janc@tieto.com>
-References: <1350391036-29997-1-git-send-email-szymon.janc@tieto.com>
-Date: Tue, 16 Oct 2012 19:34:47 +0200
-Message-ID: <CABBYNZLbX__mxzwvZMOd3noCeoJTRrXshFTEovM9Tco4bziLRg@mail.gmail.com>
-Subject: Re: [PATCH] avdtp: Fix crash on connection lost
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
 
-On Tue, Oct 16, 2012 at 2:37 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> This fix avdtp session reference counting. avdtp_unref has a special
-> case when ref==1 and due to nested calls session could be free in
-> consecutive call resulting in accesing already freed memory.
->
-> Instead of having extra free lock keep extra local reference. This also
-> make avdtp_unref easier to undertand as there is no double ref
-> decrement inside one unref call.
->
-> avdtp_unref will set session state to disconnected when reference count
-> drops to 1 so there is no need to explicite set it in connection_lost.
->
-> bluetoothd[29474]: audio/avdtp.c:avdtp_ref() 0x555555856aa0: ref=2
-> bluetoothd[29474]: audio/source.c:source_connect() stream creation in progress
-> bluetoothd[29474]: src/mgmt.c:mgmt_event() cond 1
-> bluetoothd[29474]: src/mgmt.c:mgmt_event() Received 31 bytes from management socket
-> bluetoothd[29474]: src/mgmt.c:mgmt_device_connected() hci0 device 84:00:D2:DB:F7:8C connected eir_len 12
-> bluetoothd[29474]: src/adapter.c:adapter_get_device() 84:00:D2:DB:F7:8C
-> bluetoothd[29474]: src/mgmt.c:mgmt_event() cond 1
-> bluetoothd[29474]: src/mgmt.c:mgmt_event() Received 14 bytes from management socket
-> bluetoothd[29474]: src/mgmt.c:mgmt_auth_failed() hci0 auth failed status 6
-> bluetoothd[29474]: src/device.c:device_bonding_complete() bonding (nil) status 0x06
-> bluetoothd[29474]: connect error: Invalid exchange (52)
-> bluetoothd[29474]: audio/avdtp.c:connection_lost() Disconnected from 84:00:D2:DB:F7:8C
-> bluetoothd[29474]: audio/avdtp.c:avdtp_unref() 0x555555856aa0: ref=1
-> bluetoothd[29474]: audio/avdtp.c:avdtp_unref() 0x555555856aa0: ref=0
-> bluetoothd[29474]: audio/avdtp.c:avdtp_unref() 0x555555856aa0: freeing session and removing from list
-> bluetoothd[29474]: audio/avdtp.c:avdtp_unref() 0x555555856aa0: freeing session and removing from list
->
-> Program received signal SIGSEGV, Segmentation fault.
-> avdtp_unref (session=0x555555856aa0) at audio/avdtp.c:1239
-> 1239            server->sessions = g_slist_remove(server->sessions, session);
->
-> ---
->  audio/avdtp.c |   10 ++--------
->  1 file changed, 2 insertions(+), 8 deletions(-)
->
-> diff --git a/audio/avdtp.c b/audio/avdtp.c
-> index bd91cb6..4109be9 100644
-> --- a/audio/avdtp.c
-> +++ b/audio/avdtp.c
-> @@ -388,7 +388,6 @@ struct avdtp_stream {
->
->  struct avdtp {
->         int ref;
-> -       int free_lock;
->
->         uint16_t version;
->
-> @@ -1158,14 +1157,14 @@ static void connection_lost(struct avdtp *session, int err)
->         if (err != EACCES)
->                 avdtp_cancel_authorization(session);
->
-> -       session->free_lock = 1;
-> +       avdtp_ref(session);
->
->         finalize_discovery(session, err);
->
->         g_slist_foreach(session->streams, (GFunc) release_stream, session);
->         session->streams = NULL;
->
-> -       session->free_lock = 0;
-> +       avdtp_unref(session);
->
->         if (session->io) {
->                 g_io_channel_shutdown(session->io, FALSE, NULL);
-> @@ -1173,8 +1172,6 @@ static void connection_lost(struct avdtp *session, int err)
->                 session->io = NULL;
->         }
->
-> -       avdtp_set_state(session, AVDTP_SESSION_STATE_DISCONNECTED);
+Hi Marcel -
 
-This is actually the one that we need in case we got disconnect by
-remote after discovery completes. avctp.c has a similar structure to
-handler such states, but without the refcounting all is much simpler.
+On Mon, 15 Oct 2012, Marcel Holtmann wrote:
 
->         if (session->io_id) {
->                 g_source_remove(session->io_id);
->                 session->io_id = 0;
-> @@ -1221,9 +1218,6 @@ void avdtp_unref(struct avdtp *session)
+> Hi Mat,
 >
->                 if (session->io)
->                         set_disconnect_timer(session);
-> -               else if (!session->free_lock) /* Drop the local ref if we
-> -                                                aren't connected */
-> -                       session->ref--;
->         }
+>> After sending a move channel response, a move responder waits for a
+>> move channel confirm command.  If the received command has a
+>> "confirmed" result the move is proceeding, and "unconfirmed" means the
+>> move has failed and the channel will not change controllers.
+>>
+>> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+>> ---
+>>  net/bluetooth/l2cap_core.c | 70 ++++++++++++++++++++++++++++++++++++++++++++--
+>>  1 file changed, 67 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>> index aab7f79..ef744a9 100644
+>> --- a/net/bluetooth/l2cap_core.c
+>> +++ b/net/bluetooth/l2cap_core.c
+>> @@ -1030,6 +1030,42 @@ static void l2cap_move_setup(struct l2cap_chan *chan)
+>>  	set_bit(CONN_REMOTE_BUSY, &chan->conn_state);
+>>  }
+>>
+>> +static void l2cap_move_success(struct l2cap_chan *chan)
+>> +{
+>> +	BT_DBG("chan %p", chan);
+>> +
+>> +	if (chan->mode != L2CAP_MODE_ERTM)
+>> +		return;
+>> +
+>> +	switch (chan->move_role) {
+>> +	case L2CAP_MOVE_ROLE_INITIATOR:
+>> +		l2cap_tx(chan, NULL, NULL, L2CAP_EV_EXPLICIT_POLL);
+>> +		chan->rx_state = L2CAP_RX_STATE_WAIT_F;
+>> +		break;
+>> +	case L2CAP_MOVE_ROLE_RESPONDER:
+>> +		chan->rx_state = L2CAP_RX_STATE_WAIT_P;
+>> +		break;
+>> +	}
+>> +}
+>> +
+>> +static void l2cap_move_revert(struct l2cap_chan *chan)
+>> +{
+>> +	BT_DBG("chan %p", chan);
+>> +
+>> +	if (chan->mode != L2CAP_MODE_ERTM)
+>> +		return;
+>> +
+>> +	switch (chan->move_role) {
+>> +	case L2CAP_MOVE_ROLE_INITIATOR:
+>> +		l2cap_tx(chan, NULL, NULL, L2CAP_EV_EXPLICIT_POLL);
+>> +		chan->rx_state = L2CAP_RX_STATE_WAIT_F;
+>> +		break;
+>> +	case L2CAP_MOVE_ROLE_RESPONDER:
+>> +		chan->rx_state = L2CAP_RX_STATE_WAIT_P;
+>> +		break;
+>> +	}
+>> +}
+>> +
+>>  static void l2cap_chan_ready(struct l2cap_chan *chan)
+>>  {
+>>  	/* This clears all conf flags, including CONF_NOT_COMPLETE */
+>> @@ -4297,11 +4333,12 @@ static inline int l2cap_move_channel_rsp(struct l2cap_conn *conn,
+>>  	return 0;
+>>  }
+>>
+>> -static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
+>> -					     struct l2cap_cmd_hdr *cmd,
+>> -					     u16 cmd_len, void *data)
+>> +static int l2cap_move_channel_confirm(struct l2cap_conn *conn,
+>> +				      struct l2cap_cmd_hdr *cmd,
+>> +				      u16 cmd_len, void *data)
+>>  {
+>>  	struct l2cap_move_chan_cfm *cfm = data;
+>> +	struct l2cap_chan *chan;
+>>  	u16 icid, result;
+>>
+>>  	if (cmd_len != sizeof(*cfm))
+>> @@ -4312,8 +4349,35 @@ static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
+>>
+>>  	BT_DBG("icid 0x%4.4x, result 0x%4.4x", icid, result);
+>>
+>> +	chan = l2cap_get_chan_by_dcid(conn, icid);
+>> +	if (!chan)
+>> +		goto send_move_confirm_response;
+>> +
+>> +	if (chan->move_state == L2CAP_MOVE_WAIT_CONFIRM) {
+>> +		chan->move_state = L2CAP_MOVE_STABLE;
+>> +		if (result == L2CAP_MC_CONFIRMED) {
+>> +			chan->local_amp_id = chan->move_id;
+>> +			if (!chan->local_amp_id) {
+>> +				/* Have moved off of AMP, free the channel */
+>> +				chan->hs_hchan = NULL;
+>> +				chan->hs_hcon = NULL;
+>> +
+>> +				/* Placeholder - free the logical link */
+>> +			}
+>> +			l2cap_move_success(chan);
+>> +		} else {
+>> +			chan->move_id = chan->local_amp_id;
+>> +			l2cap_move_revert(chan);
+>> +		}
+>> +		chan->move_role = L2CAP_MOVE_ROLE_NONE;
+>> +	}
+>> +
+>> +send_move_confirm_response:
+>>  	l2cap_send_move_chan_cfm_rsp(conn, cmd->ident, icid);
+>>
+>> +	if (chan)
+>> +		l2cap_chan_unlock(chan);
+>> +
+>>  	return 0;
+>>  }
+>>
 >
->         if (session->ref > 0)
-> --
-> 1.7.9.5
+> the more I read into this one, can we not have a clean exit when (!chan)
+> for this one. Or am I missing something.
 
-We should probably get rid of the free_lock as well.
+Are you thinking this should send a COMMAND_REJ if it can't find the 
+matching channel?
 
--- 
-Luiz Augusto von Dentz
+I think sending the confirm response is the appropriate thing to do. 
+The spec says "When a device receives a Move Channel Confirmation 
+packet it shall send a Move Channel Confirmation response packet".
+Sending this response doesn't indicate that the move was successful.
+
+--
+Mat Martineau
+
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, hosted by The Linux Foundation
+
