@@ -1,15 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1350494669.26318.123.camel@aeonflux>
-Subject: Re: [PATCHv2 17/19] Bluetooth: Send create channel request instead
- of connect for AMP
+Message-ID: <1350494529.26318.121.camel@aeonflux>
+Subject: Re: [PATCHv2 10/19] Bluetooth: Add logical link confirm
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Mat Martineau <mathewm@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
 	sunnyk@codeaurora.org
-Date: Wed, 17 Oct 2012 10:24:29 -0700
-In-Reply-To: <1350430593-23565-18-git-send-email-mathewm@codeaurora.org>
+Date: Wed, 17 Oct 2012 10:22:09 -0700
+In-Reply-To: <1350430593-23565-11-git-send-email-mathewm@codeaurora.org>
 References: <1350430593-23565-1-git-send-email-mathewm@codeaurora.org>
-	 <1350430593-23565-18-git-send-email-mathewm@codeaurora.org>
+	 <1350430593-23565-11-git-send-email-mathewm@codeaurora.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -17,115 +16,159 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mat,
 
-> When the channel policy is set to prefer AMP, then an L2CAP channel is
-> set up using the "create channel" command rather than the "connect"
-> command.  A physical link is also set up before sending "create
-> channel".
+> The logical link confirm callback is executed when the AMP controller
+> completes its logical link setup.  During a channel move, a newly
+> formed logical link allows a move responder to send a move channel
+> response.  A move initiator will send a move channel confirm.  A
+> failed logical link will end the channel move and send an appropriate
+> response or confirm command indicating a failure.
 > 
-> Behavior is unchanged if enable_hs is false.
+> If the channel is being created on an AMP controller, L2CAP
+> configuration is started after the logical link is set up.
 > 
 > Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 > ---
->  net/bluetooth/l2cap_core.c | 42 ++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 42 insertions(+)
+>  net/bluetooth/l2cap_core.c | 114 ++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 112 insertions(+), 2 deletions(-)
 > 
 > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 7e8fe84..17d917b 100644
+> index 5e4796c..ddd8c72 100644
 > --- a/net/bluetooth/l2cap_core.c
 > +++ b/net/bluetooth/l2cap_core.c
-> @@ -58,6 +58,9 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
->  static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
->  		     struct sk_buff_head *skbs, u8 event);
->  
-> +static void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
-> +			      u8 status);
-> +
-
-any chance to avoid this forward declaration by moving some functions
-around?
-
->  /* ---- L2CAP channels ---- */
->  
->  static struct l2cap_chan *__l2cap_get_chan_by_dcid(struct l2cap_conn *conn,
-> @@ -576,6 +579,13 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
->  			mgr->bredr_chan = NULL;
+> @@ -3799,6 +3799,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
+>  		goto unlock;
 >  	}
 >  
-> +	if (chan->hs_hchan) {
+> +	chan->ident = cmd->ident;
+>  	l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP, len, rsp);
+>  	chan->num_conf_rsp++;
+>  
+> @@ -4241,11 +4242,120 @@ static void l2cap_send_move_chan_cfm_rsp(struct l2cap_conn *conn, u8 ident,
+>  	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM_RSP, sizeof(rsp), &rsp);
+>  }
+>  
+> +/* Call with chan locked */
+>  static void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
+>  			      u8 status)
+>  {
+> -	/* Placeholder */
+> -	return;
+> +	BT_DBG("chan %p, hchan %p, status %d", chan, hchan, status);
+> +
+> +	if (status) {
+> +		/* Logical link setup failed */
+> +		if (chan->state != BT_CONNECTED) {
+> +			/* Create channel failure, disconnect */
+> +			l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
+> +		} else if (chan->move_role == L2CAP_MOVE_ROLE_RESPONDER) {
+> +			l2cap_move_revert(chan);
+> +			chan->move_role = L2CAP_MOVE_ROLE_NONE;
+> +			chan->move_state = L2CAP_MOVE_STABLE;
+> +			l2cap_send_move_chan_rsp(chan->conn, chan->ident,
+> +						 chan->dcid, L2CAP_MR_NOT_SUPP);
+> +		} else if (chan->move_role == L2CAP_MOVE_ROLE_INITIATOR) {
+> +			if (chan->move_state == L2CAP_MOVE_WAIT_LOGICAL_COMP ||
+> +			    chan->move_state == L2CAP_MOVE_WAIT_LOGICAL_CFM) {
+> +				/* Remote has only sent pending or
+> +				 * success responses, clean up
+> +				 */
+> +				l2cap_move_revert(chan);
+> +				chan->move_role = L2CAP_MOVE_ROLE_NONE;
+> +				chan->move_state = L2CAP_MOVE_STABLE;
+> +			}
+> +
+> +			/* Other amp move states imply that the move
+> +			 * has already aborted
+> +			 */
+> +			l2cap_send_move_chan_cfm(chan->conn, chan, chan->scid,
+> +						 L2CAP_MC_UNCONFIRMED);
+> +			__set_chan_timer(chan, L2CAP_MOVE_TIMEOUT);
+> +		}
+> +
 > +		chan->hs_hchan = NULL;
 > +		chan->hs_hcon = NULL;
 > +
 > +		/* Placeholder - free logical link */
-> +	}
 > +
->  	chan->ops->teardown(chan, err);
->  
->  	if (test_bit(CONF_NOT_COMPLETE, &chan->conf_state))
-> @@ -1126,6 +1136,7 @@ static void l2cap_start_connection(struct l2cap_chan *chan)
->  {
->  	if (__amp_capable(chan)) {
->  		BT_DBG("chan %p AMP capable: discover AMPs", chan);
-> +		set_bit(CONF_CONNECT_PEND, &chan->conf_state);
->  		a2mp_discover_amp(chan);
->  	} else {
->  		l2cap_send_conn_req(chan);
-> @@ -1271,6 +1282,16 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
->  				rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHEN_PEND);
->  			}
->  
-> +			if (rsp.result == __constant_cpu_to_le16(L2CAP_CR_SUCCESS) &&
-> +			    chan->local_amp_id) {
-> +				/* Placeholder - uncomment when amp functions
-> +				 * are available
-> +				amp_accept_physical(chan, chan->local_amp_id);
-> +				 */
-> +				l2cap_chan_unlock(chan);
-> +				continue;
-> +			}
+> +	} else if (chan->state != BT_CONNECTED) {
+> +		struct l2cap_conf_rsp rsp;
+> +		u8 code;
 > +
->  			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP,
->  				       sizeof(rsp), &rsp);
->  
-> @@ -3359,6 +3380,18 @@ done:
->  			rfc.mode = chan->mode;
->  		}
->  
-> +		if (test_bit(CONF_LOC_CONF_PEND, &chan->conf_state) &&
-> +		    chan->local_amp_id) {
-> +			struct hci_chan *hchan = NULL;
+> +		/* Create channel complete */
 > +
-> +			/* Placeholder - get hci_chan for logical link */
+> +		/* Ignore logical link if channel is on BR/EDR */
+> +		if (!chan->local_amp_id)
+> +			return;
 > +
-> +			if (hchan && hchan->state == BT_CONNECTED) {
-> +				l2cap_logical_cfm(chan, hchan,
-> +						  L2CAP_MR_SUCCESS);
-> +			}
+> +		chan->hs_hcon = hchan->conn;
+> +		chan->hs_hcon->l2cap_data = chan->conn;
+> +
+> +		code = l2cap_build_conf_rsp(chan, &rsp,
+> +					    L2CAP_CONF_SUCCESS, 0);
+> +		l2cap_send_cmd(chan->conn, chan->ident, L2CAP_CONF_RSP, code,
+> +			       &rsp);
+> +		set_bit(CONF_OUTPUT_DONE, &chan->conf_state);
+> +
+> +		if (test_bit(CONF_INPUT_DONE, &chan->conf_state)) {
+> +			int err = 0;
+> +
+> +			set_default_fcs(chan);
+> +
+> +			err = l2cap_ertm_init(chan);
+> +			if (err < 0)
+> +				l2cap_send_disconn_req(chan->conn, chan, -err);
+> +			else
+> +				l2cap_chan_ready(chan);
 > +		}
+> +	} else {
+> +		/* Channel move */
+> +		chan->hs_hcon = hchan->conn;
+> +		chan->hs_hcon->l2cap_data = chan->conn;
 > +
->  		if (result == L2CAP_CONF_SUCCESS)
->  			set_bit(CONF_OUTPUT_DONE, &chan->conf_state);
->  	}
-> @@ -6367,6 +6400,15 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
->  					stat = L2CAP_CS_AUTHOR_PEND;
->  					chan->ops->defer(chan);
->  				} else {
-> +					if (chan->local_amp_id) {
-> +						/* Placeholder - accept physical
-> +						 * link
-> +						amp_accept_physical(chan,
-> +							chan->local_amp_id);
-> +						*/
-> +						continue;
-> +					}
+> +		BT_DBG("move_state %d", chan->move_state);
 > +
->  					__l2cap_state_change(chan, BT_CONFIG);
->  					res = L2CAP_CR_SUCCESS;
->  					stat = L2CAP_CS_NO_INFO;
+> +		switch (chan->move_state) {
+> +		case L2CAP_MOVE_WAIT_LOGICAL_COMP:
+> +			/* Move confirm will be sent after a success
+> +			 * response is received
+> +			 */
+> +			chan->move_state = L2CAP_MOVE_WAIT_RSP_SUCCESS;
+> +			break;
+> +		case L2CAP_MOVE_WAIT_LOGICAL_CFM:
+> +			if (test_bit(CONN_LOCAL_BUSY, &chan->conn_state)) {
+> +				chan->move_state = L2CAP_MOVE_WAIT_LOCAL_BUSY;
+> +			} else if (chan->move_role ==
+> +				   L2CAP_MOVE_ROLE_INITIATOR) {
+> +				chan->move_state = L2CAP_MOVE_WAIT_CONFIRM_RSP;
+> +				l2cap_send_move_chan_cfm(chan->conn, chan,
+> +							 chan->scid,
+> +							 L2CAP_MR_SUCCESS);
+> +				__set_chan_timer(chan, L2CAP_MOVE_TIMEOUT);
+> +			} else if (chan->move_role ==
+> +				   L2CAP_MOVE_ROLE_RESPONDER) {
+> +				chan->move_state = L2CAP_MOVE_WAIT_CONFIRM;
+> +				l2cap_send_move_chan_rsp(chan->conn,
+> +							 chan->ident,
+> +							 chan->dcid,
+> +							 L2CAP_MR_SUCCESS);
+> +			}
+> +			break;
+> +		default:
+> +			/* Move was not in expected state, free the channel */
+> +			chan->hs_hchan = NULL;
+> +			chan->hs_hcon = NULL;
+> +
+> +			/* Placeholder - free the logical link */
+> +
+> +			chan->move_state = L2CAP_MOVE_STABLE;
+> +		}
+> +	}
+>  }
+>  
 
-Check the forward declaration and fix it if possible. Otherwise this is
-fine.
-
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+I find this this function still a little bit too complex. Any chance we
+can split into more logical pieces. It is fine if not, but we should at
+least give it another try.
 
 Regards
 
