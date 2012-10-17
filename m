@@ -1,24 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 17 Oct 2012 14:49:31 +0200
-From: Ludek Finstrle <luf@pzkagis.cz>
-To: linux-bluetooth@vger.kernel.org
-Subject: Memory leak introduced in commit
- f8619bef3406a2134082dc41c208105fe028c09f
-Message-ID: <20121017124931.GA32194@pzkagis.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20121017113515.GA16879@x220.ger.corp.intel.com>
+References: <507D6F26.8040306@schulz.dk>
+	<CAJdJm_NZwNbLwAHNj7JVPVKK2eBe90AeqPRFfqD0Rqr9=bWpNg@mail.gmail.com>
+	<507D7480.6040205@schulz.dk>
+	<005601cdac45$e1ee8ac0$a5cba040$@dk>
+	<CAJdJm_P+udqJta3K-FhzYEO4bOm+W=u9koV953etN8TmO=eo4w@mail.gmail.com>
+	<20121017113515.GA16879@x220.ger.corp.intel.com>
+Date: Wed, 17 Oct 2012 10:02:44 -0300
+Message-ID: <CAJdJm_Mv7rEaeYYoipWgmF0VQ-69GA=MqipEtxDgKQ1mT5ukfA@mail.gmail.com>
+Subject: Re: gatttool and multiple devices connected
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	Kim Schulz <kim@schulz.dk>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Johan,
 
-  I see memory leak which was introduced in commit f8619bef3406a2134082dc41c208105fe028c09f:
-attrib: Fix not checking if att_data_list_alloc fails
+On Wed, Oct 17, 2012 at 8:35 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>> This kernel is actually not that old (as long as it is based on the
+>> official 3.4.0 one). Did you have hcidump logs for the attempt to
+>> discover primary services on device B while connected to device A?
+>
+> Actually I'd say that it is too old for LE usage. E.g. the address type
+> field to the L2CAP socket address was introduced in 3.5 which is quite
+> important from an LE standpoint.
 
-It returns (in src/attrib-server.c) from functions when adl local variable is NULL but 
-it doesn't free local variables (read_by_group: group; read_by_type: type; find_info: info).
+Ok, my mistake. I thought it was introduced still on 3.4.0. In this
+case, Better use the latest mainline (3.6.*).
 
-The patch is very easy but I can't test it with head so I don't want to send possible
-crapy patch.
-
-Luf
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
