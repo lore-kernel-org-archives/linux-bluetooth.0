@@ -1,44 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 17 Oct 2012 11:03:20 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Ludek Finstrle <luf@pzkagis.cz>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Memory leak introduced in commit
- f8619bef3406a2134082dc41c208105fe028c09f
-Message-ID: <20121017140320.GA30533@samus>
-References: <20121017124931.GA32194@pzkagis.cz>
+Message-ID: <507EB186.40506@monom.org>
+Date: Wed, 17 Oct 2012 15:24:22 +0200
+From: Daniel Wagner <wagi@monom.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20121017124931.GA32194@pzkagis.cz>
+To: "John W. Linville" <linville@tuxdriver.com>
+CC: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: REMINDER: Linux wireless networking summit, Barcelona 8-9 November
+References: <20121015193648.GF16817@tuxdriver.com>
+In-Reply-To: <20121015193648.GF16817@tuxdriver.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luf,
+Hi John,
 
-On 14:49 Wed 17 Oct, Ludek Finstrle wrote:
-> Hello,
-> 
->   I see memory leak which was introduced in commit f8619bef3406a2134082dc41c208105fe028c09f:
-> attrib: Fix not checking if att_data_list_alloc fails
-> 
-> It returns (in src/attrib-server.c) from functions when adl local variable is NULL but 
-> it doesn't free local variables (read_by_group: group; read_by_type: type; find_info: info).
+On 10/15/2012 09:36 PM, John W. Linville wrote:
+> Just a reminder...there will be a Linux wireless networking mini-summit
+> event coming soon.  It will be on 8-9 November in Barcelona, just
+> after LinuxCon Europe.  If you haven't already made plans, you had
+> better get moving!
+>
+> Attendees of the wireless mini-summit must also register for LinuxCon
+> Europe.  More information is available here:
+>
+> 	http://wireless.kernel.org/en/developers/Summits/Barcelona-2012
+>
+> Please notice that there is a wiki there with schedules for discussion
+> topics.  If you have suggestions or want other changes, please make
+> them and/or let us know here.
 
-Thanks a lot for the report.
+I changed the "a short overview what we do in ConnMan" to "ConnMan and 
+wpa_supplicant" which is probably a more attractive title. 
+Unfortunately, Patrik Flykt wont be there.
 
-Ugh, I will fix it.
+cheers,
+daniel
 
-> 
-> The patch is very easy but I can't test it with head so I don't want to send possible
-> crapy patch.
-> 
-> Luf
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Cheers,
--- 
-Vinicius
