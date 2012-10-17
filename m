@@ -1,35 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 17 Oct 2012 13:42:36 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [PATCH] device: Fix modifying list while iterating
+Message-ID: <20121017104236.GA12356@x220.ger.corp.intel.com>
+References: <1350468429-30882-1-git-send-email-mikel.astiz.oss@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <005601cdac45$e1ee8ac0$a5cba040$@dk>
-References: <507D6F26.8040306@schulz.dk>
-	<CAJdJm_NZwNbLwAHNj7JVPVKK2eBe90AeqPRFfqD0Rqr9=bWpNg@mail.gmail.com>
-	<507D7480.6040205@schulz.dk>
-	<005601cdac45$e1ee8ac0$a5cba040$@dk>
-Date: Wed, 17 Oct 2012 08:21:02 -0300
-Message-ID: <CAJdJm_P+udqJta3K-FhzYEO4bOm+W=u9koV953etN8TmO=eo4w@mail.gmail.com>
-Subject: Re: gatttool and multiple devices connected
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Kim Schulz <kim@schulz.dk>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1350468429-30882-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kim,
+Hi Mikel,
 
-On Wed, Oct 17, 2012 at 6:00 AM, Kim Schulz <kim@schulz.dk> wrote:
-> Turns out that the guy compiling our kernel choose a version
-> 3.4.0.030400 so not really the
-> bleeding edge version.
-> Do you have any recommendation on what version of the kernel we should
-> aim for?
+On Wed, Oct 17, 2012, Mikel Astiz wrote:
+> A list should not be modified while iterating on it, and in this case
+> the solution is trivial: the code is just trying to free the whole list
+> with a previous call to profile->device_remove() per list item.
+> ---
+>  src/device.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-This kernel is actually not that old (as long as it is based on the
-official 3.4.0 one). Did you have hcidump logs for the attempt to
-discover primary services on device B while connected to device A?
+Applied. Thanks.
 
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
