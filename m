@@ -1,38 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <507EB186.40506@monom.org>
-Date: Wed, 17 Oct 2012 15:24:22 +0200
-From: Daniel Wagner <wagi@monom.org>
+Date: Wed, 17 Oct 2012 14:49:31 +0200
+From: Ludek Finstrle <luf@pzkagis.cz>
+To: linux-bluetooth@vger.kernel.org
+Subject: Memory leak introduced in commit
+ f8619bef3406a2134082dc41c208105fe028c09f
+Message-ID: <20121017124931.GA32194@pzkagis.cz>
 MIME-Version: 1.0
-To: "John W. Linville" <linville@tuxdriver.com>
-CC: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: REMINDER: Linux wireless networking summit, Barcelona 8-9 November
-References: <20121015193648.GF16817@tuxdriver.com>
-In-Reply-To: <20121015193648.GF16817@tuxdriver.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hello,
 
-On 10/15/2012 09:36 PM, John W. Linville wrote:
-> Just a reminder...there will be a Linux wireless networking mini-summit
-> event coming soon.  It will be on 8-9 November in Barcelona, just
-> after LinuxCon Europe.  If you haven't already made plans, you had
-> better get moving!
->
-> Attendees of the wireless mini-summit must also register for LinuxCon
-> Europe.  More information is available here:
->
-> 	http://wireless.kernel.org/en/developers/Summits/Barcelona-2012
->
-> Please notice that there is a wiki there with schedules for discussion
-> topics.  If you have suggestions or want other changes, please make
-> them and/or let us know here.
+  I see memory leak which was introduced in commit f8619bef3406a2134082dc41c208105fe028c09f:
+attrib: Fix not checking if att_data_list_alloc fails
 
-I changed the "a short overview what we do in ConnMan" to "ConnMan and 
-wpa_supplicant" which is probably a more attractive title. 
-Unfortunately, Patrik Flykt wont be there.
+It returns (in src/attrib-server.c) from functions when adl local variable is NULL but 
+it doesn't free local variables (read_by_group: group; read_by_type: type; find_info: info).
 
-cheers,
-daniel
+The patch is very easy but I can't test it with head so I don't want to send possible
+crapy patch.
 
+Luf
