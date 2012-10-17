@@ -1,52 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] avdtp: Fix crash on connection lost
-Date: Wed, 17 Oct 2012 12:17:26 +0200
-Message-ID: <5925869.iVRXt7vIOW@uw000953>
-In-Reply-To: <CABBYNZKQWy2CmM2FLZyw24UXEo202SsHymK-jzGF+k2dmg6brw@mail.gmail.com>
-References: <1350391036-29997-1-git-send-email-szymon.janc@tieto.com> <15890511.ludKIz2NbJ@uw000953> <CABBYNZKQWy2CmM2FLZyw24UXEo202SsHymK-jzGF+k2dmg6brw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH] device: Fix modifying list while iterating
+Date: Wed, 17 Oct 2012 12:07:09 +0200
+Message-Id: <1350468429-30882-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday 17 of October 2012 11:48:36 Luiz Augusto von Dentz wrote:
-> Hi Szymon,
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Hi Luiz,
+A list should not be modified while iterating on it, and in this case
+the solution is trivial: the code is just trying to free the whole list
+with a previous call to profile->device_remove() per list item.
+---
+ src/device.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/device.c b/src/device.c
+index f48faba..bb0f890 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -872,8 +872,6 @@ static void profile_remove(struct btd_profile *profile,
+ 						struct btd_device *device)
+ {
+ 	profile->device_remove(profile, device);
+-
+-	device->profiles = g_slist_remove(device->profiles, profile);
+ }
  
-> >> We should probably get rid of the free_lock as well.
-> >
-> > Well, this is what this patch does, doesn't it?:)
-> 
-> What about the attached patch, it should fix the references for good
-> by using the dc_timer when the reference drops to 0, I just need to
-> check if 1 second is enough to cover all cases including the ones
-> where the remote device connects but doesn't setup any stream, with
-> the devices I have 1 second seems enough.
-
-Yeap, this fix crash I've observed.
-
-However, avdtp_get_internal() now returns newly created session with ref=0
-and in avdtp_confirm_cb() there is unref called when btd_request_authorization
-failed. Due to ref being signed int (why?) this could lead to not-nice-to-debug
-bug if that session is reclaimed before dc timer fires (ref would go from -1 to
-0).
-
-Also I'm having trouble with tracking lifetime of session object.. I think
-only avdtp_ref/unref function should really care about ref count. That would
-require other function to only use ref/unref to get/free session object.
-e.g. avdtp_free should be only called from disconnect_timeout() and
-connection_lost() should only trigger other session users to drop their
-references. Same goes to set_disconnect_timer() which should only be called
-from avdtp_unref. There should be no need to call connection_lost from
-disconnect_timeout as this timer should only run when there is no references
-held to that session, right?
-
-Or do I miss something?:)
+ static gboolean do_disconnect(gpointer user_data)
+@@ -899,6 +897,8 @@ int device_block(struct btd_device *device, gboolean update_only)
+ 		do_disconnect(device);
+ 
+ 	g_slist_foreach(device->profiles, (GFunc) profile_remove, device);
++	g_slist_free(device->profiles);
++	device->profiles = NULL;
+ 
+ 	if (!update_only)
+ 		err = btd_adapter_block_address(device->adapter,
 -- 
-BR
-Szymon Janc
+1.7.11.7
 
