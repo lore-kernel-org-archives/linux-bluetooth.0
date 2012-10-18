@@ -1,53 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 From: Mat Martineau <mathewm@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org,
-	gustavo@padovan.org
-Cc: sunnyk@codeaurora.org,
-	marcel@holtmann.org,
+To: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
+Cc: sunnyk@codeaurora.org, marcel@holtmann.org,
 	andrei.emeltchenko.news@gmail.com
-Subject: [PATCHv3 08/18] Bluetooth: Add state to hci_chan
-Date: Thu, 18 Oct 2012 10:58:40 -0700
-Message-Id: <1350583130-3241-9-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv3 04/18] Bluetooth: Lookup channel structure based on DCID
+Date: Thu, 18 Oct 2012 10:58:36 -0700
+Message-Id: <1350583130-3241-5-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1350583130-3241-1-git-send-email-mathewm@codeaurora.org>
 References: <1350583130-3241-1-git-send-email-mathewm@codeaurora.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On an AMP controller, hci_chan maps to a logical link.  When a channel
-is being moved, the logical link may or may not be connected already.
-The hci_chan->state is used to determine the existance of a useable
-logical link so the link can be either used or requested.
+Processing a move channel request involves getting the channel
+structure using the destination channel ID.  Previous code could only
+look up using the source channel ID.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h | 1 +
- net/bluetooth/hci_conn.c         | 1 +
- 2 files changed, 2 insertions(+)
+ net/bluetooth/l2cap_core.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 9fe8e2d..00abc52 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -355,6 +355,7 @@ struct hci_chan {
- 	struct hci_conn *conn;
- 	struct sk_buff_head data_q;
- 	unsigned int	sent;
-+	__u8		state;
- };
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index ec2b4d9..e826420 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -100,6 +100,22 @@ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn,
+ 	return c;
+ }
  
- extern struct list_head hci_dev_list;
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index fe64621..6dcf452 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -959,6 +959,7 @@ struct hci_chan *hci_chan_create(struct hci_conn *conn)
- 
- 	chan->conn = conn;
- 	skb_queue_head_init(&chan->data_q);
-+	chan->state = BT_CONNECTED;
- 
- 	list_add_rcu(&chan->list, &conn->chan_list);
- 
++/* Find channel with given DCID.
++ * Returns locked channel. */
++static struct l2cap_chan *l2cap_get_chan_by_dcid(struct l2cap_conn *conn,
++						 u16 cid)
++{
++	struct l2cap_chan *c;
++
++	mutex_lock(&conn->chan_lock);
++	c = __l2cap_get_chan_by_dcid(conn, cid);
++	if (c)
++		l2cap_chan_lock(c);
++	mutex_unlock(&conn->chan_lock);
++
++	return c;
++}
++
+ static struct l2cap_chan *__l2cap_get_chan_by_ident(struct l2cap_conn *conn,
+ 						    u8 ident)
+ {
 -- 
 1.7.12.3
 
