@@ -1,75 +1,397 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 18 Oct 2012 08:51:26 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-    sunnyk@codeaurora.org, marcel@holtmann.org
-Subject: Re: [PATCHv2 04/19] Bluetooth: Lookup channel structure based on
- DCID
-In-Reply-To: <20121018073050.GC13545@aemeltch-MOBL1>
-Message-ID: <alpine.DEB.2.02.1210180850270.25318@mathewm-linux>
-References: <1350430593-23565-1-git-send-email-mathewm@codeaurora.org> <1350430593-23565-5-git-send-email-mathewm@codeaurora.org> <20121018073050.GC13545@aemeltch-MOBL1>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+In-Reply-To: <20121018142011.GA13482@pzkagis.cz>
+References: <1350474572-29066-1-git-send-email-luiz.dentz@gmail.com>
+	<20121018142011.GA13482@pzkagis.cz>
+Date: Thu, 18 Oct 2012 17:57:19 +0300
+Message-ID: <CABBYNZ+DmqpB8-eAan8EcX-0=QWfHCaBh=j96M5zv1vGWt84JA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] AVDTP: Do not keep a internal reference
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ludek Finstrle <luf@pzkagis.cz>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Ludek,
 
-Andrei -
-
-On Thu, 18 Oct 2012, Andrei Emeltchenko wrote:
-
-> Hi Mat,
+On Thu, Oct 18, 2012 at 5:20 PM, Ludek Finstrle <luf@pzkagis.cz> wrote:
+> Hello Luiz,
 >
-> On Tue, Oct 16, 2012 at 04:36:18PM -0700, Mat Martineau wrote:
->> Processing a move channel request involves getting the channel
->> structure using the destination channel ID.  Previous code could only
->> look up using the source channel ID.
+> Wed, Oct 17, 2012 at 02:49:32PM +0300, Luiz Augusto von Dentz napsal(a):
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >>
->> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+>> Don't initialize reference with 1, instead always start disconnect timer
+>> when reference drops to 0, so in case nobody reclaims the session it
+>> automatically disconnect after 1 second and frees the memory.
 >> ---
->>  net/bluetooth/l2cap_core.c | 17 +++++++++++++++++
->>  1 file changed, 17 insertions(+)
+>>  audio/avdtp.c | 220 ++++++++++++++++++++++++++--------------------------------
+>>  1 file changed, 97 insertions(+), 123 deletions(-)
 >>
->> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
->> index ec2b4d9..b5b849b 100644
->> --- a/net/bluetooth/l2cap_core.c
->> +++ b/net/bluetooth/l2cap_core.c
->> @@ -100,6 +100,22 @@ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn,
->>  	return c;
+>> diff --git a/audio/avdtp.c b/audio/avdtp.c
+>> index bd91cb6..6bfeb9b 100644
+>> --- a/audio/avdtp.c
+>> +++ b/audio/avdtp.c
+>> @@ -387,8 +387,7 @@ struct avdtp_stream {
+>>  /* Structure describing an AVDTP connection between two devices */
+>>
+>>  struct avdtp {
+>> -     int ref;
+>> -     int free_lock;
+>> +     unsigned int ref;
+>>
+>>       uint16_t version;
+>>
+>> @@ -657,50 +656,6 @@ static gboolean stream_open_timeout(gpointer user_data)
+>>       return FALSE;
 >>  }
 >>
->> +/* Find channel with given DCID.
->> + * Returns locked channel. */
->> +static struct l2cap_chan *l2cap_get_chan_by_dcid(struct l2cap_conn *conn,
->> +						 u16 cid)
->> +{
->> +	struct l2cap_chan *c;
->> +
->> +	mutex_lock(&conn->chan_lock);
->> +	c = __l2cap_get_chan_by_dcid(conn, cid);
->> +	if (c)
->> +		l2cap_chan_lock(c);
->> +	mutex_unlock(&conn->chan_lock);
->> +
->> +	return c;
+>> -static gboolean disconnect_timeout(gpointer user_data)
+>> -{
+>> -     struct avdtp *session = user_data;
+>> -     struct audio_device *dev;
+>> -     gboolean stream_setup;
+>> -
+>> -     session->dc_timer = 0;
+>> -     stream_setup = session->stream_setup;
+>> -     session->stream_setup = FALSE;
+>> -
+>> -     dev = manager_get_device(&session->server->src, &session->dst, FALSE);
+>> -
+>> -     if (dev && dev->sink && stream_setup)
+>> -             sink_setup_stream(dev->sink, session);
+>> -     else if (dev && dev->source && stream_setup)
+>> -             source_setup_stream(dev->source, session);
+>> -     else
+>> -             connection_lost(session, ETIMEDOUT);
+>> -
+>> -     return FALSE;
+>> -}
+>> -
+>> -static void remove_disconnect_timer(struct avdtp *session)
+>> -{
+>> -     g_source_remove(session->dc_timer);
+>> -     session->dc_timer = 0;
+>> -     session->stream_setup = FALSE;
+>> -}
+>> -
+>> -static void set_disconnect_timer(struct avdtp *session)
+>> -{
+>> -     if (session->dc_timer)
+>> -             remove_disconnect_timer(session);
+>> -
+>> -     if (session->device_disconnect) {
+>> -             session->dc_timer = g_idle_add(disconnect_timeout, session);
+>> -             return;
+>> -     }
+>> -
+>> -     session->dc_timer = g_timeout_add_seconds(DISCONNECT_TIMEOUT,
+>> -                                             disconnect_timeout,
+>> -                                             session);
+>> -}
+>> -
+>>  void avdtp_error_init(struct avdtp_error *err, uint8_t category, int id)
+>>  {
+>>       err->category = category;
+>> @@ -780,8 +735,9 @@ static void avdtp_set_state(struct avdtp *session,
+>>       }
+>>  }
+>>
+>> -static void stream_free(struct avdtp_stream *stream)
+>> +static void stream_free(void *data)
+>>  {
+>> +     struct avdtp_stream *stream = data;
+>>       struct avdtp_remote_sep *rsep;
+>>
+>>       stream->lsep->info.inuse = 0;
+>> @@ -1144,37 +1100,42 @@ static int avdtp_cancel_authorization(struct avdtp *session)
+>>               return err;
+>>
+>>       session->auth_id = 0;
+>> +     avdtp_unref(session);
+>>
+>>       return 0;
+>>  }
+>>
+>> -static void connection_lost(struct avdtp *session, int err)
+>> +static void sep_free(gpointer data)
+>>  {
+>> -     char address[18];
+>> +     struct avdtp_remote_sep *sep = data;
+>>
+>> -     ba2str(&session->dst, address);
+>> -     DBG("Disconnected from %s", address);
+>> +     g_slist_free_full(sep->caps, g_free);
+>> +     g_free(sep);
 >> +}
+>>
+>> -     if (err != EACCES)
+>> -             avdtp_cancel_authorization(session);
+>> +static void remove_disconnect_timer(struct avdtp *session)
+>> +{
+>> +     g_source_remove(session->dc_timer);
+>> +     session->dc_timer = 0;
+>> +     session->stream_setup = FALSE;
+>> +}
+>>
+>> -     session->free_lock = 1;
+>> +static void avdtp_free(void *data)
+>> +{
+>> +     struct avdtp *session = data;
+>>
+>> -     finalize_discovery(session, err);
+>> +     DBG("%p", session);
+>>
+>> -     g_slist_foreach(session->streams, (GFunc) release_stream, session);
+>> -     session->streams = NULL;
+>> +     g_slist_free_full(session->streams, stream_free);
+>>
+>> -     session->free_lock = 0;
+>> +     if (session->state != AVDTP_SESSION_STATE_DISCONNECTED)
+>> +             avdtp_set_state(session, AVDTP_SESSION_STATE_DISCONNECTED);
+>>
+>>       if (session->io) {
+>>               g_io_channel_shutdown(session->io, FALSE, NULL);
+>>               g_io_channel_unref(session->io);
+>> -             session->io = NULL;
+>>       }
+>>
+>> -     avdtp_set_state(session, AVDTP_SESSION_STATE_DISCONNECTED);
+>> -
+>>       if (session->io_id) {
+>>               g_source_remove(session->io_id);
+>>               session->io_id = 0;
+>> @@ -1183,69 +1144,95 @@ static void connection_lost(struct avdtp *session, int err)
+>>       if (session->dc_timer)
+>>               remove_disconnect_timer(session);
+>>
+>> -     if (session->ref != 1)
+>> -             error("connection_lost: ref count not 1 after all callbacks");
+>> -     else
+>> -             avdtp_unref(session);
+>> +     avdtp_cancel_authorization(session);
 >> +
->>  static struct l2cap_chan *__l2cap_get_chan_by_ident(struct l2cap_conn *conn,
->>  						    u8 ident)
+>> +     if (session->req)
+>> +             pending_req_free(session->req);
+>> +
+>> +     g_slist_free_full(session->seps, sep_free);
+>> +
+>> +     g_free(session->buf);
+>> +
+>> +     g_free(session);
+>>  }
+>>
+>> -static void sep_free(gpointer data)
+>> +static gboolean disconnect_timeout(gpointer user_data)
 >>  {
->> @@ -4139,6 +4155,7 @@ static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
->>  					 u16 cmd_len, void *data)
+>> -     struct avdtp_remote_sep *sep = data;
+>> +     struct avdtp *session = user_data;
+>> +     struct audio_device *dev;
+>> +     gboolean stream_setup;
+>>
+>> -     g_slist_free_full(sep->caps, g_free);
+>> -     g_free(sep);
+>> +     session->dc_timer = 0;
+>> +
+>> +     if (session->ref == 0) {
+>> +             struct avdtp_server *server = session->server;
+>> +
+>> +             server->sessions = g_slist_remove(server->sessions, session);
+>> +             avdtp_free(session);
+>> +             return FALSE;
+>> +     }
+>> +
+>> +     stream_setup = session->stream_setup;
+>> +     session->stream_setup = FALSE;
+>> +
+>> +     dev = manager_get_device(&session->server->src, &session->dst, FALSE);
+>> +
+>> +     if (dev && dev->sink && stream_setup)
+>> +             sink_setup_stream(dev->sink, session);
+>> +     else if (dev && dev->source && stream_setup)
+>> +             source_setup_stream(dev->source, session);
+>> +     else
+>> +             connection_lost(session, ETIMEDOUT);
+>> +
+>> +     return FALSE;
+>>  }
+>>
+>> -void avdtp_unref(struct avdtp *session)
+>> +static void set_disconnect_timer(struct avdtp *session)
 >>  {
->>  	struct l2cap_move_chan_req *req = data;
->> +	struct l2cap_chan *chan;
+>> -     struct avdtp_server *server;
+>> +     if (session->dc_timer)
+>> +             remove_disconnect_timer(session);
+>>
+>> -     if (!session)
+>> +     if (session->device_disconnect) {
+>> +             session->dc_timer = g_idle_add(disconnect_timeout, session);
+>>               return;
+>> +     }
+>>
+>> -     session->ref--;
+>> -
+>> -     DBG("%p: ref=%d", session, session->ref);
+>> +     session->dc_timer = g_timeout_add_seconds(DISCONNECT_TIMEOUT,
+>> +                                             disconnect_timeout,
+>> +                                             session);
+>> +}
+>>
+>> -     if (session->ref == 1) {
+>> -             if (session->state == AVDTP_SESSION_STATE_CONNECTING &&
+>> -                                                             session->io) {
+>> -                     avdtp_cancel_authorization(session);
+>> -                     g_io_channel_shutdown(session->io, TRUE, NULL);
+>> -                     g_io_channel_unref(session->io);
+>> -                     session->io = NULL;
+>> -                     avdtp_set_state(session,
+>> -                                     AVDTP_SESSION_STATE_DISCONNECTED);
+>> -             }
+>> +static void connection_lost(struct avdtp *session, int err)
+>> +{
+>> +     char address[18];
+>>
+>> -             if (session->io)
+>> -                     set_disconnect_timer(session);
+>> -             else if (!session->free_lock) /* Drop the local ref if we
+>> -                                              aren't connected */
+>> -                     session->ref--;
+>> -     }
+>> +     ba2str(&session->dst, address);
+>> +     DBG("Disconnected from %s", address);
+>>
+>> -     if (session->ref > 0)
+>> -             return;
+>> +     if (err != EACCES)
+>> +             avdtp_cancel_authorization(session);
+>>
+>> -     server = session->server;
+>> +     g_slist_foreach(session->streams, (GFunc) release_stream, session);
+>> +     session->streams = NULL;
+>>
+>> -     DBG("%p: freeing session and removing from list", session);
+>> +     finalize_discovery(session, err);
+>>
+>> -     if (session->dc_timer)
+>> -             remove_disconnect_timer(session);
+>> +     avdtp_set_state(session, AVDTP_SESSION_STATE_DISCONNECTED);
+>> +}
+>>
+>> -     server->sessions = g_slist_remove(server->sessions, session);
+>> +void avdtp_unref(struct avdtp *session)
+>> +{
+>> +     if (!session)
+>> +             return;
+>>
+>> -     if (session->req)
+>> -             pending_req_free(session->req);
+>> +     session->ref--;
+>>
+>> -     g_slist_free_full(session->seps, sep_free);
+>> +     DBG("%p: ref=%d", session, session->ref);
+>>
+>> -     g_free(session->buf);
+>> +     if (session->ref > 0)
+>> +             return;
+>>
+>> -     g_free(session);
+>> +     set_disconnect_timer(session);
+>>  }
+>>
+>>  struct avdtp *avdtp_ref(struct avdtp *session)
+>> @@ -2231,12 +2218,6 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+>>                       goto failed;
+>>               }
+>>
+>> -             if (session->ref == 1 && !session->streams && !session->req)
+>> -                     set_disconnect_timer(session);
+>> -
+>> -             if (session->streams && session->dc_timer)
+>> -                     remove_disconnect_timer(session);
+>> -
+>>               if (session->req && session->req->collided) {
+>>                       DBG("Collision detected");
+>>                       goto next;
+>> @@ -2383,7 +2364,7 @@ static struct avdtp *avdtp_get_internal(const bdaddr_t *src, const bdaddr_t *dst
+>>
+>>       session->server = server;
+>>       bacpy(&session->dst, dst);
+>> -     session->ref = 1;
+>> +     set_disconnect_timer(session);
+>>       /* We don't use avdtp_set_state() here since this isn't a state change
+>>        * but just setting of the initial state */
+>>       session->state = AVDTP_SESSION_STATE_DISCONNECTED;
+>> @@ -2490,6 +2471,8 @@ static void auth_cb(DBusError *derr, void *user_data)
+>>       struct avdtp *session = user_data;
+>>       GError *err = NULL;
+>>
+>> +     avdtp_unref(session);
+>> +
+>>       if (derr && dbus_error_is_set(derr)) {
+>>               error("Access denied: %s", derr->message);
+>>               connection_lost(session, EACCES);
+>> @@ -2578,10 +2561,12 @@ static void avdtp_confirm_cb(GIOChannel *chan, gpointer data)
+>>                                                       auth_cb, session);
+>>       if (session->auth_id == 0) {
+>>               avdtp_set_state(session, AVDTP_SESSION_STATE_DISCONNECTED);
+>> -             avdtp_unref(session);
+>>               goto drop;
+>>       }
+>>
+>> +     /* Disable disconnect timer while authorizing */
+>> +     avdtp_ref(session);
+>> +
+>>       dev->auto_connect = auto_connect;
+>>
+>>       return;
+>> @@ -3949,23 +3934,12 @@ proceed:
+>>  void avdtp_exit(const bdaddr_t *src)
+>>  {
+>>       struct avdtp_server *server;
+>> -     GSList *l;
+>>
+>>       server = find_server(servers, src);
+>>       if (!server)
+>>               return;
+>>
+>> -     l = server->sessions;
+>> -     while (l) {
+>> -             struct avdtp *session = l->data;
+>> -
+>> -             l = l->next;
+>> -             /* value of l pointer should be updated before invoking
+>> -              * connection_lost since it internally uses avdtp_unref
+>> -              * which operates on server->session list as well
+>> -              */
+>> -             connection_lost(session, -ECONNABORTED);
+>> -     }
+>> +     g_slist_free_full(server->sessions, avdtp_free);
+>>
+>>       servers = g_slist_remove(servers, server);
+>>
+>> --
+>> 1.7.11.4
 >
-> This line seems do not belong to the patch.
+> I tried this patch (againist patched 4.99) and it contains bug.
+>
+> What happens:
+> I try to connect from N900 bluez-4.99 to RHEL 6 bleuz-4.66 using:
+> dbus-send --system --print-reply --dest=org.bluez /org/bluez/`pidof bluetoothd`/hci0/dev_<BT ID> org.bluez.AudioSource.Connect
+>
+> Until first first successful connect the RHEL machine asked me to Grant/Reject the conneciton.
+> But after first connect/disconnect it stop asking me and the connection failed.
+>
+> I could connect/disconnect several times prior applying the patch (if it doesn't crash bluetoothd).
+>
+> I'll try to find the reason. I just want to give you the info.
 
-Yes, this line should be moved to patch 5 with the other changes to 
-this function.
+We would need to know the PulseAudio version as well, in fact this
+could be because the old unix socket IPC is in use in N900 and that
+may take much more time to PulseAudio to notice the connection so I
+don't think this is a valid use case, things have changed quite a bit
+since N900 times. In the other hand with Media API we got PA involved
+pretty early and once the transport object is create it will keep a
+reference to the AVDTP session.
 
---
-Mat Martineau
-
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, hosted by The Linux Foundation
+-- 
+Luiz Augusto von Dentz
