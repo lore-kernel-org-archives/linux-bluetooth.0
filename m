@@ -1,63 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAGXs5wXpovbxBH6OY_VwL4-cYbaBQgrkKK95QWf1cY1bo0DZdA@mail.gmail.com>
-References: <CAGXs5wXpovbxBH6OY_VwL4-cYbaBQgrkKK95QWf1cY1bo0DZdA@mail.gmail.com>
-Date: Thu, 18 Oct 2012 14:29:29 +0530
-Message-ID: <CAOKqjLYzVy1j+7Ka0y6UJchLCX_8n_kPVKQyKj858_xxG9PQBQ@mail.gmail.com>
-Subject: Re: a short question: what are BREDR and AMP?
-From: Anand Anand <anand.sinha85@gmail.com>
-To: Kevin Wilson <wkevils@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=windows-1252
+From: Ludek Finstrle <luf@pzkagis.cz>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ludek Finstrle <luf@pzkagis.cz>
+Subject: [RFC] attrib: Fix memleak if att_data_list_alloc fails
+Date: Thu, 18 Oct 2012 10:39:21 +0200
+Message-Id: <1350549561-16424-1-git-send-email-luf@pzkagis.cz>
+In-Reply-To: <CAJdJm_NiL522WPLrV-RiaJKBZeOBBgo_vSzQCwTdZwLZLTw88A@mail.gmail.com>
+References: <CAJdJm_NiL522WPLrV-RiaJKBZeOBBgo_vSzQCwTdZwLZLTw88A@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kevin,
+Fix for memory leak which was introduced in commit f8619bef3406a2134082dc41c208105fe028c09f.
+I tested it with older bluez and rebase for git. Please review it.
 
-In short :-
+---
+ src/attrib-server.c |   12 +++++++++---
+ 1 files changed, 9 insertions(+), 3 deletions(-)
 
-BREDR would stand for basic rate enhanced data rate controllers and
-AMP would stand for Alternate MAC/PHY(AMP) controllers.
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index ea27b13..4489edc 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -490,9 +490,11 @@ static uint16_t read_by_group(struct gatt_channel *channel, uint16_t start,
+ 	length = g_slist_length(groups);
+ 
+ 	adl = att_data_list_alloc(length, last_size + 4);
+-	if (adl == NULL)
++	if (adl == NULL) {
++		g_slist_free_full(groups, g_free);
+ 		return enc_error_resp(ATT_OP_READ_BY_GROUP_REQ, start,
+ 					ATT_ECODE_UNLIKELY, pdu, len);
++	}
+ 
+ 	for (i = 0, l = groups; l; l = l->next, i++) {
+ 		uint8_t *value;
+@@ -577,9 +579,11 @@ static uint16_t read_by_type(struct gatt_channel *channel, uint16_t start,
+ 	length += 2;
+ 
+ 	adl = att_data_list_alloc(num, length);
+-	if (adl == NULL)
++	if (adl == NULL) {
++		g_slist_free(types);
+ 		return enc_error_resp(ATT_OP_READ_BY_TYPE_REQ, start,
+ 					ATT_ECODE_UNLIKELY, pdu, len);
++	}
+ 
+ 	for (i = 0, l = types; l; i++, l = l->next) {
+ 		uint8_t *value;
+@@ -655,9 +659,11 @@ static uint16_t find_info(struct gatt_channel *channel, uint16_t start,
+ 	}
+ 
+ 	adl = att_data_list_alloc(num, length + 2);
+-	if (adl == NULL)
++	if (adl == NULL) {
++		g_slist_free(info);
+ 		return enc_error_resp(ATT_OP_FIND_INFO_REQ, start,
+ 					ATT_ECODE_UNLIKELY, pdu, len);
++	}
+ 
+ 	for (i = 0, l = info; l; i++, l = l->next) {
+ 		uint8_t *value;
+-- 
+1.7.1
 
-Kindly go through the specification document-
-BLUETOOTH SPECIFICATION Version 4.0 for better understanding.
-
-Some excerpts from the spec say :-
-
-Core has two components :-
-a)Host
-b)Controllers
-
-"An implementation of the Bluetooth Core has only one Primary Controller
-which may be one of the following configurations:
-• BR/EDR Controller including the Radio, Baseband, Link Manager and
-optionally HCI.
-• an LE Controller including the LE PHY, Link Layer and optionally HCI.
-• a combined BR/EDR Controller portion and LE controller portion (as identified
-in the previous two bullets) into a single Controller. This configuration
-has only one Bluetooth device address shared by the combination in the
-combined Controller.
-A Bluetooth core system may additionally have one or more Secondary Controllers
-described by the following configuration:
-• an Alternate MAC/PHY (AMP) Controller including an 802.11 PAL (Protocol
-Adaptation Layer), 802.11 MAC and PHY, and optionally HCI
-"
-quoted from Bluetooth core documentation.
-
-Hope it helped.
-Regards,
-Anand
-
-On Thu, Oct 18, 2012 at 1:56 PM, Kevin Wilson <wkevils@gmail.com> wrote:
-> Hi,
-> I see that the device type of hci_dev can be HCI_BREDR or HCI_AMP.
-> (hci_register_dev() in net/bluetooth/hci_core.c).
->
-> I have a question if I may: what are these two types?
->
-> rgs,
-> Kevin
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
