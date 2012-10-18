@@ -4,145 +4,114 @@ To: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
 Cc: sunnyk@codeaurora.org, marcel@holtmann.org,
 	andrei.emeltchenko.news@gmail.com,
 	Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Subject: [PATCHv3 02/18] Bluetooth: Add L2CAP create channel request handling
-Date: Thu, 18 Oct 2012 10:58:34 -0700
-Message-Id: <1350583130-3241-3-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv3 01/18] Bluetooth: Add new l2cap_chan struct members for high speed channels
+Date: Thu, 18 Oct 2012 10:58:33 -0700
+Message-Id: <1350583130-3241-2-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1350583130-3241-1-git-send-email-mathewm@codeaurora.org>
 References: <1350583130-3241-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The L2CAP create channel request is very similar to an L2CAP connect
-request, but it has an additional parameter for the controller ID.  If
-the controller id is 0, the channel is set up on the BR/EDR controller
-(just like a connect request).  Using a valid high speed controller ID
-will cause the channel to be initially created on that high speed
-controller.  While the L2CAP data will be initially routed over the
-AMP controller, the L2CAP fixed signaling channel only uses BR/EDR.
+An L2CAP channel using high speed continues to be associated with a
+BR/EDR l2cap_conn, while also tracking an additional hci_conn
+(representing a physical link on a high speed controller) and hci_chan
+(representing a logical link).  There may only be one physical link
+between two high speed controllers.  Each physical link may contain
+several logical links, with each logical link representing a channel
+with specific quality of service.
 
-When a create channel request is received for a high speed controller,
-a pending response is always sent first.  After the high speed
-physical and logical links are complete a success response will be
-sent.
+During a channel move, the destination channel id, current move state,
+and role (initiator vs. responder) are tracked and used by the channel
+move state machine.  The ident value associated with a move request
+must also be stored in order to use it in later move responses.
+
+The active channel is stored in local_amp_id.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c | 62 +++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 47 insertions(+), 15 deletions(-)
+ include/net/bluetooth/l2cap.h | 29 +++++++++++++++++++++++++++++
+ net/bluetooth/l2cap_core.c    |  5 +++++
+ 2 files changed, 34 insertions(+)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 6e23afd..6d3615e 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -434,6 +434,8 @@ struct l2cap_chan {
+ 	struct sock *sk;
+ 
+ 	struct l2cap_conn	*conn;
++	struct hci_conn		*hs_hcon;
++	struct hci_chan		*hs_hchan;
+ 	struct kref	kref;
+ 
+ 	__u8		state;
+@@ -477,6 +479,11 @@ struct l2cap_chan {
+ 	unsigned long	conn_state;
+ 	unsigned long	flags;
+ 
++	__u8		local_amp_id;
++	__u8		move_id;
++	__u8		move_state;
++	__u8		move_role;
++
+ 	__u16		next_tx_seq;
+ 	__u16		expected_ack_seq;
+ 	__u16		expected_tx_seq;
+@@ -644,6 +651,9 @@ enum {
+ enum {
+ 	L2CAP_RX_STATE_RECV,
+ 	L2CAP_RX_STATE_SREJ_SENT,
++	L2CAP_RX_STATE_MOVE,
++	L2CAP_RX_STATE_WAIT_P,
++	L2CAP_RX_STATE_WAIT_F,
+ };
+ 
+ enum {
+@@ -674,6 +684,25 @@ enum {
+ 	L2CAP_EV_RECV_FRAME,
+ };
+ 
++enum {
++	L2CAP_MOVE_ROLE_NONE,
++	L2CAP_MOVE_ROLE_INITIATOR,
++	L2CAP_MOVE_ROLE_RESPONDER,
++};
++
++enum {
++	L2CAP_MOVE_STABLE,
++	L2CAP_MOVE_WAIT_REQ,
++	L2CAP_MOVE_WAIT_RSP,
++	L2CAP_MOVE_WAIT_RSP_SUCCESS,
++	L2CAP_MOVE_WAIT_CONFIRM,
++	L2CAP_MOVE_WAIT_CONFIRM_RSP,
++	L2CAP_MOVE_WAIT_LOGICAL_COMP,
++	L2CAP_MOVE_WAIT_LOGICAL_CFM,
++	L2CAP_MOVE_WAIT_LOCAL_BUSY,
++	L2CAP_MOVE_WAIT_PREPARE,
++};
++
+ void l2cap_chan_hold(struct l2cap_chan *c);
+ void l2cap_chan_put(struct l2cap_chan *c);
+ 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f8d78f5..73ce337 100644
+index f873619..f8d78f5 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -3400,8 +3400,9 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn,
- 	return 0;
- }
+@@ -2788,6 +2788,11 @@ int l2cap_ertm_init(struct l2cap_chan *chan)
  
--static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
--			  u8 *data, u8 rsp_code, u8 amp_id)
-+static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
-+					struct l2cap_cmd_hdr *cmd,
-+					u8 *data, u8 rsp_code, u8 amp_id)
- {
- 	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
- 	struct l2cap_conn_rsp rsp;
-@@ -3452,6 +3453,7 @@ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
- 	bacpy(&bt_sk(sk)->dst, conn->dst);
- 	chan->psm  = psm;
- 	chan->dcid = scid;
-+	chan->local_amp_id = amp_id;
+ 	skb_queue_head_init(&chan->tx_q);
  
- 	__l2cap_chan_add(conn, chan);
- 
-@@ -3469,8 +3471,16 @@ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
- 				status = L2CAP_CS_AUTHOR_PEND;
- 				chan->ops->defer(chan);
- 			} else {
--				__l2cap_state_change(chan, BT_CONFIG);
--				result = L2CAP_CR_SUCCESS;
-+				/* Force pending result for AMP controllers.
-+				 * The connection will succeed after the
-+				 * physical link is up. */
-+				if (amp_id) {
-+					__l2cap_state_change(chan, BT_CONNECT2);
-+					result = L2CAP_CR_PEND;
-+				} else {
-+					__l2cap_state_change(chan, BT_CONFIG);
-+					result = L2CAP_CR_SUCCESS;
-+				}
- 				status = L2CAP_CS_NO_INFO;
- 			}
- 		} else {
-@@ -3516,6 +3526,8 @@ sendresp:
- 			       l2cap_build_conf_req(chan, buf), buf);
- 		chan->num_conf_req++;
- 	}
++	chan->local_amp_id = 0;
++	chan->move_id = 0;
++	chan->move_state = L2CAP_MOVE_STABLE;
++	chan->move_role = L2CAP_MOVE_ROLE_NONE;
 +
-+	return chan;
- }
+ 	if (chan->mode != L2CAP_MODE_ERTM)
+ 		return 0;
  
- static int l2cap_connect_req(struct l2cap_conn *conn,
-@@ -4028,12 +4040,12 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn,
- 	return 0;
- }
- 
--static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
--					   struct l2cap_cmd_hdr *cmd,
--					   u16 cmd_len, void *data)
-+static int l2cap_create_channel_req(struct l2cap_conn *conn,
-+				    struct l2cap_cmd_hdr *cmd,
-+				    u16 cmd_len, void *data)
- {
- 	struct l2cap_create_chan_req *req = data;
--	struct l2cap_create_chan_rsp rsp;
-+	struct l2cap_chan *chan;
- 	u16 psm, scid;
- 
- 	if (cmd_len != sizeof(*req))
-@@ -4047,14 +4059,34 @@ static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
- 
- 	BT_DBG("psm 0x%2.2x, scid 0x%4.4x, amp_id %d", psm, scid, req->amp_id);
- 
--	/* Placeholder: Always reject */
--	rsp.dcid = 0;
--	rsp.scid = cpu_to_le16(scid);
--	rsp.result = __constant_cpu_to_le16(L2CAP_CR_NO_MEM);
--	rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
-+	if (req->amp_id) {
-+		struct hci_dev *hdev;
- 
--	l2cap_send_cmd(conn, cmd->ident, L2CAP_CREATE_CHAN_RSP,
--		       sizeof(rsp), &rsp);
-+		/* Validate AMP controller id */
-+		hdev = hci_dev_get(req->amp_id);
-+		if (!hdev || hdev->dev_type != HCI_AMP ||
-+		    !test_bit(HCI_UP, &hdev->flags)) {
-+			struct l2cap_create_chan_rsp rsp;
-+
-+			rsp.dcid = 0;
-+			rsp.scid = cpu_to_le16(scid);
-+			rsp.result = __constant_cpu_to_le16(L2CAP_CR_BAD_AMP);
-+			rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
-+
-+			l2cap_send_cmd(conn, cmd->ident, L2CAP_CREATE_CHAN_RSP,
-+				       sizeof(rsp), &rsp);
-+
-+			if (hdev)
-+				hci_dev_put(hdev);
-+
-+			return 0;
-+		}
-+
-+		hci_dev_put(hdev);
-+	}
-+
-+	chan = l2cap_connect(conn, cmd, data, L2CAP_CREATE_CHAN_RSP,
-+			     req->amp_id);
- 
- 	return 0;
- }
 -- 
 1.7.12.3
 
