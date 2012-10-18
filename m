@@ -1,182 +1,198 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 18 Oct 2012 19:00:13 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next 2012-10-18
-Message-ID: <20121018220013.GA7833@joana>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="tThc/1wpZn/ma/RB"
+Message-ID: <1350594530.2026.18.camel@aeonflux>
+Subject: Re: [PATCHv3 10/18] Bluetooth: Add logical link confirm
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	sunnyk@codeaurora.org, andrei.emeltchenko.news@gmail.com
+Date: Thu, 18 Oct 2012 14:08:50 -0700
+In-Reply-To: <1350583130-3241-11-git-send-email-mathewm@codeaurora.org>
+References: <1350583130-3241-1-git-send-email-mathewm@codeaurora.org>
+	 <1350583130-3241-11-git-send-email-mathewm@codeaurora.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Mat,
 
---tThc/1wpZn/ma/RB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> The logical link confirm callback is executed when the AMP controller
+> completes its logical link setup.  During a channel move, a newly
+> formed logical link allows a move responder to send a move channel
+> response.  A move initiator will send a move channel confirm.  A
+> failed logical link will end the channel move and send an appropriate
+> response or confirm command indicating a failure.
+> 
+> If the channel is being created on an AMP controller, L2CAP
+> configuration is started after the logical link is set up.
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  net/bluetooth/l2cap_core.c | 120 ++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 118 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 7e50aa4..8e50685 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -3799,6 +3799,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
+>  		goto unlock;
+>  	}
+>  
+> +	chan->ident = cmd->ident;
+>  	l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP, len, rsp);
+>  	chan->num_conf_rsp++;
+>  
+> @@ -4241,11 +4242,126 @@ static void l2cap_send_move_chan_cfm_rsp(struct l2cap_conn *conn, u8 ident,
+>  	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM_RSP, sizeof(rsp), &rsp);
+>  }
+>  
+> +static void l2cap_logical_fail(struct l2cap_chan *chan)
+> +{
+> +	/* Logical link setup failed */
+> +	if (chan->state != BT_CONNECTED) {
+> +		/* Create channel failure, disconnect */
+> +		l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
 
-Hi John,
+		goto done;
 
-These are the Bluetooth bits for inclusion in 3.8, there is basically one big
-thing here which is the High Speed patches from Andrei, he did a lot of work on
-A2MP and management of AMP devices. The rest are mostly clean up and bug
-fixes.
+And then the chan->move_role as switch statement?
 
-Please pull or let me know any concerns you have! Thanks.
+> +	} else if (chan->move_role == L2CAP_MOVE_ROLE_RESPONDER) {
+> +		l2cap_move_revert(chan);
+> +		chan->move_role = L2CAP_MOVE_ROLE_NONE;
+> +		chan->move_state = L2CAP_MOVE_STABLE;
+> +		l2cap_send_move_chan_rsp(chan->conn, chan->ident, chan->dcid,
+> +					 L2CAP_MR_NOT_SUPP);
+> +	} else if (chan->move_role == L2CAP_MOVE_ROLE_INITIATOR) {
+> +		if (chan->move_state == L2CAP_MOVE_WAIT_LOGICAL_COMP ||
+> +		    chan->move_state == L2CAP_MOVE_WAIT_LOGICAL_CFM) {
+> +			/* Remote has only sent pending or
+> +			 * success responses, clean up
+> +			 */
+> +			l2cap_move_revert(chan);
+> +			chan->move_role = L2CAP_MOVE_ROLE_NONE;
+> +			chan->move_state = L2CAP_MOVE_STABLE;
+> +		}
+> +
+> +		/* Other amp move states imply that the move
+> +		 * has already aborted
+> +		 */
+> +		l2cap_send_move_chan_cfm(chan->conn, chan, chan->scid,
+> +					 L2CAP_MC_UNCONFIRMED);
+> +		__set_chan_timer(chan, L2CAP_MOVE_TIMEOUT);
+> +	}
+> +
 
-	Gustavo
----
+done:
 
-The following changes since commit 90e6274d2ecf3bcb44e3727a395e56b7ef467218:
+	/* cleanup ... */
 
-  ath5k: disable HW crypto in management frame (2012-09-24 15:02:08 -0400)
+> +	chan->hs_hchan = NULL;
+> +	chan->hs_hcon = NULL;
+> +
+> +	/* Placeholder - free logical link */
+> +}
+> +
+> +static void l2cap_logical_create_channel(struct l2cap_chan *chan,
+> +					 struct hci_chan *hchan)
+> +{
+> +	struct l2cap_conf_rsp rsp;
+> +	u8 code;
+> +
+> +	chan->hs_hcon = hchan->conn;
+> +	chan->hs_hcon->l2cap_data = chan->conn;
+> +
+> +	code = l2cap_build_conf_rsp(chan, &rsp,
+> +				    L2CAP_CONF_SUCCESS, 0);
+> +	l2cap_send_cmd(chan->conn, chan->ident, L2CAP_CONF_RSP, code,
+> +		       &rsp);
+> +	set_bit(CONF_OUTPUT_DONE, &chan->conf_state);
+> +
+> +	if (test_bit(CONF_INPUT_DONE, &chan->conf_state)) {
+> +		int err = 0;
+> +
+> +		set_default_fcs(chan);
+> +
+> +		err = l2cap_ertm_init(chan);
+> +		if (err < 0)
+> +			l2cap_send_disconn_req(chan->conn, chan, -err);
+> +		else
+> +			l2cap_chan_ready(chan);
+> +	}
+> +}
+> +
+> +static void l2cap_logical_move_channel(struct l2cap_chan *chan,
+> +				       struct hci_chan *hchan)
+> +{
+> +	chan->hs_hcon = hchan->conn;
+> +	chan->hs_hcon->l2cap_data = chan->conn;
+> +
+> +	BT_DBG("move_state %d", chan->move_state);
+> +
+> +	switch (chan->move_state) {
+> +	case L2CAP_MOVE_WAIT_LOGICAL_COMP:
+> +		/* Move confirm will be sent after a success
+> +		 * response is received
+> +		 */
+> +		chan->move_state = L2CAP_MOVE_WAIT_RSP_SUCCESS;
+> +		break;
+> +	case L2CAP_MOVE_WAIT_LOGICAL_CFM:
+> +		if (test_bit(CONN_LOCAL_BUSY, &chan->conn_state)) {
+> +			chan->move_state = L2CAP_MOVE_WAIT_LOCAL_BUSY;
+> +		} else if (chan->move_role == L2CAP_MOVE_ROLE_INITIATOR) {
+> +			chan->move_state = L2CAP_MOVE_WAIT_CONFIRM_RSP;
+> +			l2cap_send_move_chan_cfm(chan->conn, chan, chan->scid,
+> +						 L2CAP_MR_SUCCESS);
+> +			__set_chan_timer(chan, L2CAP_MOVE_TIMEOUT);
+> +		} else if (chan->move_role == L2CAP_MOVE_ROLE_RESPONDER) {
+> +			chan->move_state = L2CAP_MOVE_WAIT_CONFIRM;
+> +			l2cap_send_move_chan_rsp(chan->conn, chan->ident,
+> +						 chan->dcid, L2CAP_MR_SUCCESS);
 
-are available in the git repository at:
+Is the any chance to create a generic helper for the send_move_chan_*
+for both roles. I have seen this snipped a few times.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next master
+> +		}
+> +		break;
+> +	default:
+> +		/* Move was not in expected state, free the channel */
+> +		chan->hs_hchan = NULL;
+> +		chan->hs_hcon = NULL;
+> +
+> +		/* Placeholder - free the logical link */
 
-for you to fetch changes up to f706adfeade767d2194c9f39c0f75e944b0bdd23:
+Maybe centralizing this is a helper function. Or do we expect something
+different here.
 
-  Bluetooth: AMP: Get amp_mgr reference in HS hci_conn (2012-10-18 07:27:20 -0300)
+> +
+> +		chan->move_state = L2CAP_MOVE_STABLE;
+> +	}
+> +}
+> +
+> +/* Call with chan locked */
+>  static void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
+>  			      u8 status)
+>  {
+> -	/* Placeholder */
+> -	return;
+> +	BT_DBG("chan %p, hchan %p, status %d", chan, hchan, status);
+> +
+> +	if (status) {
+> +		l2cap_logical_fail(chan);
+> +	} else if (chan->state != BT_CONNECTED) {
+> +		/* Ignore logical link if channel is on BR/EDR */
+> +		if (chan->local_amp_id)
+> +			l2cap_logical_create_channel(chan, hchan);
+> +	} else {
+> +		l2cap_logical_move_channel(chan, hchan);
+> +	}
+>  }
+>  
+>  static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
 
-----------------------------------------------------------------
-Andrei Emeltchenko (50):
-      Bluetooth: Add HCI logical link cmds definitions
-      Bluetooth: A2MP: Create amp_mgr global list
-      Bluetooth: AMP: Use HCI cmd to Read AMP Info
-      Bluetooth: AMP: Use HCI cmd to Read Loc AMP Assoc
-      Bluetooth: A2MP: Process Discover Response
-      Bluetooth: AMP: Physical link struct and helpers
-      Bluetooth: AMP: Remote AMP ctrl definitions
-      Bluetooth: AMP: Handle create / disc phylink req
-      Bluetooth: A2MP: Process A2MP Getinfo Rsp
-      Bluetooth: A2MP: Process A2MP Get AMP Assoc Rsp
-      Bluetooth: Choose connection based on capabilities
-      Bluetooth: AMP: Add AMP key calculation
-      Bluetooth: AMP: Create Physical Link
-      Bluetooth: AMP: Write remote AMP Assoc
-      Bluetooth: A2MP: Add fallback to normal l2cap init sequence
-      Bluetooth: AMP: Process Chan Selected event
-      Bluetooth: AMP: Accept Physical Link
-      Bluetooth: AMP: Handle Accept phylink command status evt
-      Bluetooth: Use %pMR in debug instead of batostr
-      Bluetooth: Use %pMR in sprintf/seq_printf instead of batostr
-      Bluetooth: Use %pMR instead of baswap in seq_show
-      bluetooth: Remove unneeded batostr function
-      Bluetooth: Factor out hci_queue_acl
-      Bluetooth: Factor out Create Configuration Response
-      Bluetooth: Use %zu print specifier for size_t type
-      Bluetooth: A2MP: Correct assoc_len size
-      Bluetooth: btmrvl: Correct num_block name
-      Bluetooth: btmrvl: Use DIV_ROUND_UP macro
-      Bluetooth: btmrvl: Fix skb buffer overflow
-      Bluetooth: A2MP: Fix potential NULL dereference
-      Bluetooth: AMP: Fix possible NULL dereference
-      Bluetooth: Fix dereference after NULL check
-      Bluetooth: AMP: Factor out amp_ctrl_add
-      Bluetooth: AMP: Factor out phylink_add
-      Bluetooth: AMP: Use block_mtu for AMP controller
-      Bluetooth: Adjust L2CAP Max PDU size for AMP packets
-      Bluetooth: L2CAP: Fix using default Flush Timeout for EFS
-      Bluetooth: btmrv: Use %*ph specifier instead of print_hex_dump_bytes
-      Bluetooth: Allow to set flush timeout
-      Bluetooth: AMP: Handle AMP_LINK timeout
-      Bluetooth: AMP: Add handle to hci_chan structure
-      Bluetooth: AMP: Handle number of compl blocks for AMP_LINK
-      Bluetooth: AMP: Handle AMP_LINK connection
-      Bluetooth: AMP: Hanlde AMP_LINK case in conn_put
-      Bluetooth: AMP: Use Loglink handle in ACL Handle field
-      Bluetooth: AMP: Handle complete frames in l2cap
-      Bluetooth: AMP: Drop packets when no l2cap conn exist
-      Bluetooth: Send EFS Conf Rsp only for BR/EDR chan
-      Bluetooth: Zero bredr pointer when chan is deleted
-      Bluetooth: AMP: Get amp_mgr reference in HS hci_conn
+Regards
 
-Dmitry Kasatkin (1):
-      Bluetooth: Add function to derive AMP key using hmac
-
-Gustavo Padovan (9):
-      Bluetooth: Fix two warnings in BT_DBG
-      Bluetooth: Fix L2CAP coding style
-      Bluetooth: Remove GFP_ATOMIC usage from l2cap_core.c
-      Bluetooth: use l2cap_chan_set_err()
-      Bluetooth: Use locked l2cap_state_change()
-      Bluetooth: Call ops->teardown() without checking for NULL
-      Bluetooth: Move bt_accept_enqueue() to l2cap_sock.c
-      Bluetooth: Add chan->ops->defer()
-      Bluetooth: Rename __l2cap_connect() to l2cap_connect()
-
-Jefferson Delfes (1):
-      Bluetooth: Force the process of unpair command if disconnect failed
-
-Mat Martineau (2):
-      Bluetooth: Process create response and connect response identically
-      Bluetooth: Factor out common L2CAP connection code
-
-Rami Rosen (1):
-      Bluetooth: remove unused member of hci_dev.
-
-Sasha Levin (1):
-      Bluetooth: don't attempt to free a channel that wasn't created
-
-Syam Sidhardhan (2):
-      Bluetooth: Use __constant modifier for L2CAP SMP CID
-      Bluetooth: Use __constant modifier for RFCOMM PSM
-
- drivers/bluetooth/btmrvl_sdio.c   |  28 ++-
- include/net/bluetooth/a2mp.h      |  24 +-
- include/net/bluetooth/amp.h       |  50 ++++
- include/net/bluetooth/bluetooth.h |   1 -
- include/net/bluetooth/hci.h       |  40 +++-
- include/net/bluetooth/hci_core.h  |  48 +++-
- include/net/bluetooth/l2cap.h     |  14 +-
- net/bluetooth/Kconfig             |   1 +
- net/bluetooth/Makefile            |   2 +-
- net/bluetooth/a2mp.c              | 459 +++++++++++++++++++++++++++++++++---
- net/bluetooth/af_bluetooth.c      |  10 +-
- net/bluetooth/amp.c               | 374 +++++++++++++++++++++++++++++
- net/bluetooth/bnep/core.c         |   3 +-
- net/bluetooth/cmtp/core.c         |   2 +-
- net/bluetooth/hci_conn.c          |  70 +++++-
- net/bluetooth/hci_core.c          |  65 ++++--
- net/bluetooth/hci_event.c         | 167 ++++++++++++-
- net/bluetooth/hci_sysfs.c         |  10 +-
- net/bluetooth/hidp/core.c         |   8 +-
- net/bluetooth/l2cap_core.c        | 503 +++++++++++++++++++++++-----------------
- net/bluetooth/l2cap_sock.c        |  89 ++++---
- net/bluetooth/lib.c               |  14 --
- net/bluetooth/mgmt.c              |   5 +-
- net/bluetooth/rfcomm/core.c       |  19 +-
- net/bluetooth/rfcomm/sock.c       |   9 +-
- net/bluetooth/rfcomm/tty.c        |   6 +-
- net/bluetooth/sco.c               |  12 +-
- net/bluetooth/smp.c               |   2 +-
- 28 files changed, 1641 insertions(+), 394 deletions(-)
- create mode 100644 include/net/bluetooth/amp.h
- create mode 100644 net/bluetooth/amp.c
+Marcel
 
 
---tThc/1wpZn/ma/RB
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIcBAEBAgAGBQJQgHvtAAoJEPs3PUX4s20oDskP/AmpwJnSXiqRG72HxkCtyf6J
-cMeSbuEwR5OUSML4P0Hg2SVn6lZnz65rDt8Dfcz7yDK/TP4nlTK689StXJDYcA/X
-A2TzJhZG+BM5QfiNt7LKj8NPR5rjRO0SMutzBuaxvAgn0VpCssM64Pkta+YMr0ct
-ZSeVO7VkKxfSqYz5PyMlGY0IqTcpvmiy2ZwrscVaoq8tTTCHgkNyqtN1HoWeSJe2
-2rgv6lkmtYU3A+vqAQgElEhjzcRodtjd/Vrqo2ivLmX2SzqlmZj1kQ2hRkfyaz38
-dYgv+YKhF1hXRZ1lj5z69fFlNNziY58NRmAiHUxDfQYtIveqIQW+3LfUaVJUphDd
-9y6H2MVD0tEFXlYwdayEl33GiPkNwvJbp7FuHTWni1cs/2K7qfiVRfqwjXKuoQlJ
-NfJBE3o6yUYf0e0nemPltSeMVg/Y5LX9Nr0EaVhnLk9GCyaooeeoVNfqhgTwOwdF
-B8MgbqqPTc7dNHIKAit35LSFKQ26K5HTvaWNie+S/d9LTCE1ojTBXLW6T4Ly3bBh
-idrUxoFwekXqcouFJiWnhXnhGRyLlxot4lS8AP6m92SSFQZEOT5liB+9qO6K9h/n
-wVnLtr+ROjkiY5YRe8QidSlpmM15DZw0tKe6/FjNjzUR5yjoXJzZv6dF6EgPqmDx
-VKAkoQo0xvRwS1v9WB0/
-=y25X
------END PGP SIGNATURE-----
-
---tThc/1wpZn/ma/RB--
