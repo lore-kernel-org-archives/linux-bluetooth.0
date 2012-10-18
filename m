@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 05/15] adapter: Move pairable read to load_config()
-Date: Thu, 18 Oct 2012 11:00:48 +0200
-Message-Id: <1350550858-12239-6-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v5 02/15] adapter: Read name in storage at init
+Date: Thu, 18 Oct 2012 11:00:45 +0200
+Message-Id: <1350550858-12239-3-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1350550858-12239-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1350550858-12239-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -12,35 +12,40 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/adapter.c |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ src/adapter.c |   13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index dd06d46..74c36ec 100644
+index 3b24816..233527a 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -2515,6 +2515,10 @@ static void load_config(struct btd_adapter *adapter)
- 					(class[2] << 16);
- 	else
- 		adapter->dev_class = main_opts.class;
-+
-+	/* Get pairable mode */
-+	if (read_device_pairable(&adapter->bdaddr, &adapter->pairable) < 0)
-+		adapter->pairable = TRUE;
+@@ -2506,6 +2506,18 @@ void btd_adapter_unref(struct btd_adapter *adapter)
+ 	g_free(path);
  }
  
++static void load_config(struct btd_adapter *adapter)
++{
++	char name[MAX_NAME_LENGTH + 1];
++
++	/* Get name */
++	if (read_local_name(&adapter->bdaddr, name) < 0)
++		adapter->name = NULL;
++	else
++		adapter->name = g_strdup(name);
++
++}
++
  gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
-@@ -2542,10 +2546,6 @@ gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
- 	clear_blocked(adapter);
- 	load_devices(adapter);
+ {
+ 	adapter->up = up;
+@@ -2525,6 +2537,7 @@ gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
+ 	if (main_opts.gatt_enabled)
+ 		btd_adapter_gatt_server_start(adapter);
  
--	/* Set pairable mode */
--	if (read_device_pairable(&adapter->bdaddr, &adapter->pairable) < 0)
--		adapter->pairable = TRUE;
--
- 	/* retrieve the active connections: address the scenario where
- 	 * the are active connections before the daemon've started */
- 	load_connections(adapter);
++	load_config(adapter);
+ 	load_drivers(adapter);
+ 	btd_profile_foreach(probe_profile, adapter);
+ 	clear_blocked(adapter);
 -- 
 1.7.9.5
 
