@@ -5,65 +5,70 @@ To: linux-bluetooth@vger.kernel.org,
 Cc: sunnyk@codeaurora.org,
 	marcel@holtmann.org,
 	andrei.emeltchenko.news@gmail.com
-Subject: [PATCHv3 11/18] Bluetooth: Add move confirm response handling
-Date: Thu, 18 Oct 2012 10:58:43 -0700
-Message-Id: <1350583130-3241-12-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv3 14/18] Bluetooth: Do not send data during channel move
+Date: Thu, 18 Oct 2012 10:58:46 -0700
+Message-Id: <1350583130-3241-15-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1350583130-3241-1-git-send-email-mathewm@codeaurora.org>
 References: <1350583130-3241-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The move confirm response concludes the channel move command sequence.
-Receipt of this command indicates that data may begin to flow again.
+Outgoing ERTM data is queued during a channel move.  The ERTM state
+machine is partially reset at the start of a move, and must be
+resynchronized with the remote state machine at the end of the move.
+Data is not sent so that there are no state transitions between the
+partial reset and the resync.
+
+Streaming mode frames are dropped during a move.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ net/bluetooth/l2cap_core.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 8e50685..f315530 100644
+index a8fc10d..ab2bfc8 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -4661,6 +4661,7 @@ static inline int l2cap_move_channel_confirm_rsp(struct l2cap_conn *conn,
- 						 u16 cmd_len, void *data)
- {
- 	struct l2cap_move_chan_cfm_rsp *rsp = data;
-+	struct l2cap_chan *chan;
- 	u16 icid;
+@@ -946,6 +946,9 @@ static void l2cap_send_sframe(struct l2cap_chan *chan,
+ 	if (!control->sframe)
+ 		return;
  
- 	if (cmd_len != sizeof(*rsp))
-@@ -4670,6 +4671,31 @@ static inline int l2cap_move_channel_confirm_rsp(struct l2cap_conn *conn,
++	if (__chan_is_moving(chan))
++		return;
++
+ 	if (test_and_clear_bit(CONN_SEND_FBIT, &chan->conn_state) &&
+ 	    !control->poll)
+ 		control->final = 1;
+@@ -1824,6 +1827,9 @@ static void l2cap_streaming_send(struct l2cap_chan *chan,
  
- 	BT_DBG("icid 0x%4.4x", icid);
+ 	BT_DBG("chan %p, skbs %p", chan, skbs);
  
-+	chan = l2cap_get_chan_by_scid(conn, icid);
-+	if (!chan)
++	if (__chan_is_moving(chan))
++		return;
++
+ 	skb_queue_splice_tail_init(skbs, &chan->tx_q);
+ 
+ 	while (!skb_queue_empty(&chan->tx_q)) {
+@@ -1866,6 +1872,9 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
+ 	if (test_bit(CONN_REMOTE_BUSY, &chan->conn_state))
+ 		return 0;
+ 
++	if (__chan_is_moving(chan))
 +		return 0;
 +
-+	__clear_chan_timer(chan);
+ 	while (chan->tx_send_head &&
+ 	       chan->unacked_frames < chan->remote_tx_win &&
+ 	       chan->tx_state == L2CAP_TX_STATE_XMIT) {
+@@ -1931,6 +1940,9 @@ static void l2cap_ertm_resend(struct l2cap_chan *chan)
+ 	if (test_bit(CONN_REMOTE_BUSY, &chan->conn_state))
+ 		return;
+ 
++	if (__chan_is_moving(chan))
++		return;
 +
-+	if (chan->move_state == L2CAP_MOVE_WAIT_CONFIRM_RSP) {
-+		chan->move_state = L2CAP_MOVE_STABLE;
-+		chan->local_amp_id = chan->move_id;
-+
-+		if (!chan->local_amp_id && chan->hs_hchan) {
-+			/* Have moved off of AMP, free the channel */
-+			chan->hs_hchan = NULL;
-+			chan->hs_hcon = NULL;
-+
-+			/* Placeholder - free the logical link */
-+		}
-+
-+		l2cap_move_success(chan);
-+
-+		chan->move_role = L2CAP_MOVE_ROLE_NONE;
-+	}
-+
-+	l2cap_chan_unlock(chan);
-+
- 	return 0;
- }
+ 	while (chan->retrans_list.head != L2CAP_SEQ_LIST_CLEAR) {
+ 		seq = l2cap_seq_list_pop(&chan->retrans_list);
  
 -- 
 1.7.12.3
