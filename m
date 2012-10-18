@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 14/15] input: Retrieve device name from cache directory
-Date: Thu, 18 Oct 2012 11:00:57 +0200
-Message-Id: <1350550858-12239-15-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v5 12/15] device: Retrieve name from cache directory
+Date: Thu, 18 Oct 2012 11:00:55 +0200
+Message-Id: <1350550858-12239-13-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1350550858-12239-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1350550858-12239-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -12,60 +12,52 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- profiles/input/device.c |   26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
+ src/device.c |   25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index 997235b..f4f4f65 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -37,6 +37,7 @@
- #include <bluetooth/sdp_lib.h>
- #include <bluetooth/uuid.h>
- 
-+#include <glib.h>
- #include <gdbus.h>
- 
- #include "log.h"
-@@ -762,7 +763,9 @@ static struct input_device *input_device_new(struct btd_device *device,
- {
- 	struct btd_adapter *adapter = device_get_adapter(device);
- 	struct input_device *idev;
--	char name[249], src_addr[18], dst_addr[18];
-+	char src_addr[18], dst_addr[18];
+diff --git a/src/device.c b/src/device.c
+index bb0f890..5eecbb3 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1589,6 +1589,8 @@ struct btd_device *device_create(struct btd_adapter *adapter,
+ 	const bdaddr_t *src;
+ 	char srcaddr[18], alias[MAX_NAME_LENGTH + 1];
+ 	uint16_t vendor, product, version;
 +	char filename[PATH_MAX + 1];
 +	GKeyFile *key_file;
  
- 	idev = g_new0(struct input_device, 1);
- 	bacpy(&idev->src, adapter_get_address(adapter));
-@@ -775,9 +778,24 @@ static struct input_device *input_device_new(struct btd_device *device,
- 	ba2str(&idev->src, src_addr);
- 	ba2str(&idev->dst, dst_addr);
+ 	device = g_try_malloc0(sizeof(struct btd_device));
+ 	if (device == NULL)
+@@ -1616,7 +1618,28 @@ struct btd_device *device_create(struct btd_adapter *adapter,
+ 	src = adapter_get_address(adapter);
+ 	ba2str(src, srcaddr);
  
--	if (read_device_name(src_addr, dst_addr, device_get_addr_type(device),
--				name) == 0)
--		idev->name = g_strdup(name);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s", src_addr,
-+			dst_addr);
+-	read_device_name(srcaddr, address, bdaddr_type, device->name);
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s", srcaddr,
++			address);
 +	filename[PATH_MAX] = '\0';
 +	key_file = g_key_file_new();
 +
 +	if (g_key_file_load_from_file(key_file, filename, 0, NULL)) {
++		char *str;
 +		int len;
 +
-+		idev->name = g_key_file_get_string(key_file, "General",
-+								"Name", NULL);
-+		if (idev->name) {
-+			len = strlen(idev->name);
++		str = g_key_file_get_string(key_file, "General", "Name", NULL);
++		if (str) {
++			len = strlen(str);
 +			if (len > HCI_MAX_NAME_LENGTH)
-+				idev->name[HCI_MAX_NAME_LENGTH] = '\0';
++				str[HCI_MAX_NAME_LENGTH] = '\0';
++
++			strcpy(device->name, str);
++			g_free(str);
 +		}
 +	}
 +
 +	g_key_file_free(key_file);
- 
- 	if (g_dbus_register_interface(btd_get_dbus_connection(),
- 					idev->path, INPUT_DEVICE_INTERFACE,
++
+ 	if (read_device_alias(srcaddr, address, bdaddr_type, alias,
+ 							sizeof(alias)) == 0)
+ 		device->alias = g_strdup(alias);
 -- 
 1.7.9.5
 
