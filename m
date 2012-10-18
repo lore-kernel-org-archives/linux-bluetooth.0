@@ -1,63 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 00/15] Move storage config and names files to ini-file format
-Date: Thu, 18 Oct 2012 11:00:43 +0200
-Message-Id: <1350550858-12239-1-git-send-email-frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAGXs5wXpovbxBH6OY_VwL4-cYbaBQgrkKK95QWf1cY1bo0DZdA@mail.gmail.com>
+References: <CAGXs5wXpovbxBH6OY_VwL4-cYbaBQgrkKK95QWf1cY1bo0DZdA@mail.gmail.com>
+Date: Thu, 18 Oct 2012 14:29:29 +0530
+Message-ID: <CAOKqjLYzVy1j+7Ka0y6UJchLCX_8n_kPVKQyKj858_xxG9PQBQ@mail.gmail.com>
+Subject: Re: a short question: what are BREDR and AMP?
+From: Anand Anand <anand.sinha85@gmail.com>
+To: Kevin Wilson <wkevils@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adapter saved configuration will be saved to /var/lib/bluetooth/<adapter address>/settings
-in ini-file format for BlueZ 5.
-Devices name cache will be saved in 1 file per device (named by device address)
-under /var/lib/bluetooth/<adapter address>/cache/ directory.
-If this files does not exist, we try to convert legacy files to this new format.
+Hi Kevin,
 
-Access to variables during run-time is performed in adapter structure which is
-populated by loading saved configuration during initialization.
+In short :-
 
-Patches 2 to 8 remove access to config file from run-time.
-Patch 9 moves to ini-file format style (load, save and convert).
-Patches 10 to 15 move devices name cache to new files (read, write and convert).
+BREDR would stand for basic rate enhanced data rate controllers and
+AMP would stand for Alternate MAC/PHY(AMP) controllers.
 
-Fr√©d√©ric Danis (15):
-  doc: Add settings storage documentation
-  adapter: Read name in storage at init
-  adaptername: Retrieve config name from adapter
-  adapter: Read device class in storage at init
-  adapter: Move pairable read to load_config()
-  adapter: Read pairable timeout in storage at init
-  adapter: Read discoverable timeout in storage at init
-  adapter: Read mode in storage at init
-  adapter: Move saved config to ini-file format
-  TODO: Add entry to remove storage convertion function
-  adapter: Move storage names to cache directory
-  device: Retrieve name from cache directory
-  dbusoob: Store device name in cache directory
-  input: Retrieve device name from cache directory
-  hcitool: Retrieve names from cache directory
+Kindly go through the specification document-
+BLUETOOTH SPECIFICATION Version 4.0 for better understanding.
 
- Makefile.tools           |    2 +-
- TODO                     |    6 +
- doc/settings-storage.txt |  106 ++++++++++++
- plugins/adaptername.c    |    6 +-
- plugins/dbusoob.c        |   26 ++-
- plugins/neard.c          |    2 +-
- profiles/input/device.c  |   26 ++-
- src/adapter.c            |  433 ++++++++++++++++++++++++++++++++++++----------
- src/adapter.h            |    3 +-
- src/device.c             |   25 ++-
- src/event.c              |   51 +++++-
- src/mgmt.c               |   19 +-
- src/mgmt.h               |    1 +
- tools/hcitool.c          |   31 +++-
- 14 files changed, 610 insertions(+), 127 deletions(-)
- create mode 100644 doc/settings-storage.txt
+Some excerpts from the spec say :-
 
--- 
-1.7.9.5
+Core has two components :-
+a)Host
+b)Controllers
 
+"An implementation of the Bluetooth Core has only one Primary Controller
+which may be one of the following configurations:
+ï BR/EDR Controller including the Radio, Baseband, Link Manager and
+optionally HCI.
+ï an LE Controller including the LE PHY, Link Layer and optionally HCI.
+ï a combined BR/EDR Controller portion and LE controller portion (as identified
+in the previous two bullets) into a single Controller. This configuration
+has only one Bluetooth device address shared by the combination in the
+combined Controller.
+A Bluetooth core system may additionally have one or more Secondary Controllers
+described by the following configuration:
+ï an Alternate MAC/PHY (AMP) Controller including an 802.11 PAL (Protocol
+Adaptation Layer), 802.11 MAC and PHY, and optionally HCI
+"
+quoted from Bluetooth core documentation.
+
+Hope it helped.
+Regards,
+Anand
+
+On Thu, Oct 18, 2012 at 1:56 PM, Kevin Wilson <wkevils@gmail.com> wrote:
+> Hi,
+> I see that the device type of hci_dev can be HCI_BREDR or HCI_AMP.
+> (hci_register_dev() in net/bluetooth/hci_core.c).
+>
+> I have a question if I may: what are these two types?
+>
+> rgs,
+> Kevin
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
