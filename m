@@ -2,289 +2,121 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: =?UTF-8?q?=5BRFC=206/6=5D=20doc=3A=20Update=20Health=20to=20BlueZ=205?=
-Date: Thu, 18 Oct 2012 19:03:51 -0300
-Message-Id: <1350597831-28380-7-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [RFC 5/6] health: Convert HealthDevice to DBus.Properties
+Date: Thu, 18 Oct 2012 19:03:50 -0300
+Message-Id: <1350597831-28380-6-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1350597831-28380-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1350597831-28380-1-git-send-email-lucas.demarchi@profusion.mobi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Lucas De Marchi <lucas.de.marchi@gmail.com>
 
-Adapt to the new DBus.Properties and cleanup the format used in this
-documentation to be similar to the other profiles.
 ---
- doc/health-api.txt | 198 ++++++++++++++++++++++++++---------------------------
- 1 file changed, 98 insertions(+), 100 deletions(-)
+ profiles/health/hdp.c | 56 ++++++++++++++++++++++++---------------------------
+ 1 file changed, 26 insertions(+), 30 deletions(-)
 
-diff --git a/doc/health-api.txt b/doc/health-api.txt
-index 7a000cb..728280a 100644
---- a/doc/health-api.txt
-+++ b/doc/health-api.txt
-@@ -5,162 +5,160 @@ BlueZ D-Bus Health API description
- 	José Antonio Santos-Cadenas <santoscadenas@gmail.com>
- 	Elvis Pfützenreuter <epx@signove.com>
+diff --git a/profiles/health/hdp.c b/profiles/health/hdp.c
+index 845155e..0692d43 100644
+--- a/profiles/health/hdp.c
++++ b/profiles/health/hdp.c
+@@ -968,9 +968,9 @@ static void hdp_mcap_mdl_connected_cb(struct mcap_mdl *mdl, void *data)
  
--Health Device Profile hierarchy
--===============================
-+HealthManager hierarchy
-+=======================
+ 	dev->fr = hdp_channel_ref(chan);
  
- Service		org.bluez
- Interface	org.bluez.HealthManager
- Object path	/org/bluez/
+-	emit_property_changed(device_get_path(dev->dev),
+-				HEALTH_DEVICE, "MainChannel",
+-				DBUS_TYPE_OBJECT_PATH, &dev->fr->path);
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++				device_get_path(dev->dev), HEALTH_DEVICE,
++				"MainChannel");
  
--Methods:
-+Methods		object CreateApplication(dict config)
+ end:
+ 	hdp_channel_unref(dev->ndc);
+@@ -1690,9 +1690,9 @@ static void hdp_mdl_conn_cb(struct mcap_mdl *mdl, GError *err, gpointer data)
  
--	object	CreateApplication(dict config)
-+			Returns the path of the new registered application.
-+			Application will be closed by the call or implicitly
-+			when the programs leaves the bus.
+ 	dev->fr = hdp_channel_ref(hdp_chann);
  
--		Returns the path of the new registered application.
-+			config:
-+				uint16 DataType:
+-	emit_property_changed(device_get_path(dev->dev),
+-				HEALTH_DEVICE, "MainChannel",
+-				DBUS_TYPE_OBJECT_PATH, &dev->fr->path);
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++				device_get_path(dev->dev), HEALTH_DEVICE,
++				"MainChannel");
+ }
  
--		Dict is defined as below:
--		{
--			"DataType": uint16, (mandatory)
--			"Role" : ("Source" or "Sink"), (mandatory)
--			"Description" : string, (optional)
--			"ChannelType" : ("Reliable" or "Streaming")
--						(just for Sources, optional)
--		}
-+					Mandatory
+ static void device_create_mdl_cb(struct mcap_mdl *mdl, uint8_t conf,
+@@ -2049,31 +2049,26 @@ fail:
+ 	return reply;
+ }
  
--		Application will be closed by the call or implicitly when the
--		programs leaves the bus.
-+				string Role:
+-static DBusMessage *device_get_properties(DBusConnection *conn,
+-					DBusMessage *msg, void *user_data)
++static gboolean dev_property_exists_main_channel(
++				const GDBusPropertyTable *property, void *data)
+ {
+-	struct hdp_device *device = user_data;
+-	DBusMessageIter iter, dict;
+-	DBusMessage *reply;
+-
+-	reply = dbus_message_new_method_return(msg);
+-	if (reply == NULL)
+-		return NULL;
++	struct hdp_device *device = data;
++	return device->fr != NULL;
++}
  
--		Possible errors: org.bluez.Error.InvalidArguments
-+					Mandatory. Possible values: "Source",
-+									"Sink"
+-	dbus_message_iter_init_append(reply, &iter);
++static gboolean dev_property_get_main_channel(
++					const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct hdp_device *device = data;
  
--	void	DestroyApplication(object application)
-+				string Description:
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++	if (device->fr == NULL)
++		return FALSE;
  
--		Closes the HDP application identified by the object path. Also
--		application will be closed if the process that started it leaves
--		the bus. Only the creator of the application will be able to
--		destroy it.
-+					Optional
+-	if (device->fr != NULL)
+-		dict_append_entry(&dict, "MainChannel", DBUS_TYPE_OBJECT_PATH,
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH,
+ 							&device->fr->path);
  
--		Possible errors: org.bluez.Error.InvalidArguments
--				org.bluez.Error.NotFound
--				org.bluez.Error.NotAllowed
-+				ChannelType:
+-	dbus_message_iter_close_container(&iter, &dict);
+-
+-	return reply;
++	return TRUE;
+ }
  
----------------------------------------------------------------------------------
-+					Optional, just for sources. Possible
-+					values: "Reliable", "Streaming"
+ static void health_device_destroy(void *data)
+@@ -2104,9 +2099,6 @@ static const GDBusMethodTable health_device_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("DestroyChannel",
+ 			GDBUS_ARGS({ "channel", "o" }), NULL,
+ 			device_destroy_channel) },
+-	{ GDBUS_METHOD("GetProperties",
+-			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
+-			device_get_properties) },
+ 	{ }
+ };
  
--Service		org.bluez
--Interface	org.bluez.HealthDevice
--Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-+			Possible Errors: org.bluez.Error.InvalidArguments
+@@ -2115,8 +2107,12 @@ static const GDBusSignalTable health_device_signals[] = {
+ 			GDBUS_ARGS({ "channel", "o" })) },
+ 	{ GDBUS_SIGNAL("ChannelDeleted",
+ 			GDBUS_ARGS({ "channel", "o" })) },
+-	{ GDBUS_SIGNAL("PropertyChanged",
+-			GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
++	{ }
++};
 +
-+		void DestroyApplication(object application)
++static const GDBusPropertyTable health_device_properties[] = {
++	{ "MainChannel", "o", dev_property_get_main_channel, NULL,
++					dev_property_exists_main_channel },
+ 	{ }
+ };
  
--Methods:
-+			Closes the HDP application identified by the object
-+			path. Also application will be closed if the process
-+			that started it leaves the bus. Only the creator of the
-+			application will be able to destroy it.
- 
--	dict GetProperties()
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.NotFound
-+					 org.bluez.Error.NotAllowed
- 
--		Returns all properties for the interface. See the properties
--		section for available properties.
-+HealthDevice hierarchy
-+======================
- 
--		Posible errors: org.bluez.Error.NotAllowed
-+Service		org.bluez
-+Interface	org.bluez.HealthDevice
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
- 
--	Boolean Echo()
-+Methods		dict GetProperties()
- 
--		Sends an echo petition to the remote service. Returns True if
--		response matches with the buffer sent. If some error is detected
--		False value is returned.
-+			Returns all properties for the interface. See the
-+			properties section for available properties.
- 
--		Possible errors: org.bluez.Error.InvalidArguments
--				org.bluez.Error.OutOfRange
-+			Posible errors: org.bluez.Error.NotAllowed
- 
--	object CreateChannel(object application, string configuration)
-+		boolean Echo()
- 
--		Creates a new data channel.
--		The configuration should indicate the channel quality of
--		service using one of this values "Reliable", "Streaming", "Any".
-+			Sends an echo petition to the remote service. Returns
-+			True if response matches with the buffer sent. If some
-+			error is detected False value is returned.
- 
--		Returns the object path that identifies the data channel that
--		is already connected.
-+			Possible errors: org.bluez.Error.InvalidArguments
-+			org.bluez.Error.OutOfRange
- 
--		Possible errors: org.bluez.Error.InvalidArguments
--				org.bluez.Error.HealthError
-+		object CreateChannel(object application, string configuration)
- 
--	void DestroyChannel(object channel)
-+			Creates a new data channel.  The configuration should
-+			indicate the channel quality of service using one of
-+			this values "Reliable", "Streaming", "Any".
- 
--		Destroys the data channel object. Only the creator of the
--		channel or the creator of the HealthApplication that received
--		the data channel will be able to destroy it.
-+			Returns the object path that identifies the data
-+			channel that is already connected.
- 
--		Possible errors: org.bluez.Error.InvalidArguments
--				org.bluez.Error.NotFound
--				org.bluez.Error.NotAllowed
-+			Possible errors: org.bluez.Error.InvalidArguments
-+			org.bluez.Error.HealthError
- 
--Signals:
-+		void DestroyChannel(object channel)
- 
--	void ChannelConnected(object channel)
-+			Destroys the data channel object. Only the creator of
-+			the channel or the creator of the HealthApplication
-+			that received the data channel will be able to destroy
-+			it.
- 
--		This signal is launched when a new data channel is created or
--		when a known data channel is reconnected.
-+			Possible errors: org.bluez.Error.InvalidArguments
-+			org.bluez.Error.NotFound org.bluez.Error.NotAllowed
- 
--	void ChannelDeleted(object channel)
-+Signals		void ChannelConnected(object channel)
- 
--		This signal is launched when a data channel is deleted.
-+			This signal is launched when a new data channel is
-+			created or when a known data channel is reconnected.
- 
--		After this signal the data channel path will not be valid and
--		its path can be reused for future data channels.
-+		void ChannelDeleted(object channel)
- 
--	void PropertyChanged(string name, variant value)
-+			This signal is launched when a data channel is deleted.
- 
--		This signal indicates a changed value of the given property.
-+			After this signal the data channel path will not be
-+			valid and its path can be reused for future data
-+			channels.
- 
--Properties:
-+		void PropertyChanged(string name, variant value)
- 
--	object MainChannel [readonly]
-+			This signal indicates a changed value of the given
-+			property.
- 
--		The first reliable channel opened. It is needed by upper
--		applications in order to send specific protocol data units. The
--		first reliable can change after a reconnection.
-+Properties	object MainChannel [readonly]
- 
----------------------------------------------------------------------------------
-+			The first reliable channel opened. It is needed by
-+			upper applications in order to send specific protocol
-+			data units. The first reliable can change after a
-+			reconnection.
-+
-+HealthChannel hierarchy
-+=======================
- 
- Service		org.bluez
- Interface	org.bluez.HealthChannel
- Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/chanZZZ
- 
- Only the process that created the data channel or the creator of the
--HealthApplication that received it will be able to call this methods.
--
--Methods:
--
--	dict GetProperties()
--
--		Returns all properties for the interface. See the properties
--		section for available properties.
--
--		Possible errors: org.bluez.Error.NotAllowed
--
--	fd Acquire()
-+HealthApplication that received it will be able to call these methods.
- 
--		Returns the file descriptor for this data channel. If the data
--		channel is not connected it will also reconnect.
-+Methods		fd Acquire()
- 
--		Possible errors: org.bluez.Error.NotConnected
--				org.bluez.Error.NotAllowed
-+			Returns the file descriptor for this data channel. If
-+			the data channel is not connected it will also
-+			reconnect.
- 
--	void Release()
-+			Possible Errors: org.bluez.Error.NotConnected
-+					 org.bluez.Error.NotAllowed
- 
--		Releases the fd. Application should also need to close() it.
-+		void Release()
- 
--		Possible errors: org.bluez.Error.NotAcquired
--				org.bluez.Error.NotAllowed
-+			Releases the fd. Application should also need to
-+			close() it.
- 
--Properties:
-+			Possible Errors: org.bluez.Error.NotAcquired
-+					 org.bluez.Error.NotAllowed
- 
--	string Type [readonly]
-+Properties	string Type [readonly]
- 
--		The quality of service of the data channel. ("Reliable" or
--		"Streaming")
-+			The quality of service of the data channel. ("Reliable"
-+			or "Streaming")
- 
--	object Device [readonly]
-+		object Device [readonly]
- 
--		Identifies the Remote Device that is connected with. Maps with
--		a HealthDevice object.
-+			Identifies the Remote Device that is connected with.
-+			Maps with a HealthDevice object.
- 
--	object Application [readonly]
-+		object Application [readonly]
- 
--		Identifies the HealthApplication to which this channel is
--		related to (which indirectly defines its role and data type).
-+			Identifies the HealthApplication to which this channel
-+			is related to (which indirectly defines its role and
-+			data type).
 -- 
 1.7.12.3
 
