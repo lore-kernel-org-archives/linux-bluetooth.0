@@ -1,224 +1,143 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH 01/11] Pass encoder_state to process input functions
-Date: Thu, 18 Oct 2012 18:15:01 +0200
-Message-Id: <1350576911-14678-2-git-send-email-frederic.dalleau@linux.intel.com>
-In-Reply-To: <1350576911-14678-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1350576911-14678-1-git-send-email-frederic.dalleau@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 18 Oct 2012 09:04:07 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+    sunnyk@codeaurora.org, marcel@holtmann.org
+Subject: Re: [PATCHv2 17/19] Bluetooth: Send create channel request instead
+ of connect for AMP
+In-Reply-To: <20121018094027.GG13545@aemeltch-MOBL1>
+Message-ID: <alpine.DEB.2.02.1210180859110.25318@mathewm-linux>
+References: <1350430593-23565-1-git-send-email-mathewm@codeaurora.org> <1350430593-23565-18-git-send-email-mathewm@codeaurora.org> <20121018094027.GG13545@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- sbc/sbc.c                 |    4 ++--
- sbc/sbc_primitives.c      |   30 ++++++++++++++++--------------
- sbc/sbc_primitives.h      |    8 ++++----
- sbc/sbc_primitives_neon.c |   32 ++++++++++++++++----------------
- 4 files changed, 38 insertions(+), 36 deletions(-)
 
-diff --git a/sbc/sbc.c b/sbc/sbc.c
-index f0c77c7..76acf43 100644
---- a/sbc/sbc.c
-+++ b/sbc/sbc.c
-@@ -1034,7 +1034,7 @@ SBC_EXPORT ssize_t sbc_encode(sbc_t *sbc, const void *input, size_t input_len,
- 	struct sbc_priv *priv;
- 	int samples;
- 	ssize_t framelen;
--	int (*sbc_enc_process_input)(int position,
-+	int (*sbc_enc_process_input)(struct sbc_encoder_state *state,
- 			const uint8_t *pcm, int16_t X[2][SBC_X_BUFFER_SIZE],
- 			int nsamples, int nchannels);
- 
-@@ -1092,7 +1092,7 @@ SBC_EXPORT ssize_t sbc_encode(sbc_t *sbc, const void *input, size_t input_len,
- 	}
- 
- 	priv->enc_state.position = sbc_enc_process_input(
--		priv->enc_state.position, (const uint8_t *) input,
-+		&priv->enc_state, (const uint8_t *) input,
- 		priv->enc_state.X, priv->frame.subbands * priv->frame.blocks,
- 		priv->frame.channels);
- 
-diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
-index ad780d0..e137604 100644
---- a/sbc/sbc_primitives.c
-+++ b/sbc/sbc_primitives.c
-@@ -227,10 +227,11 @@ static inline int16_t unaligned16_le(const uint8_t *ptr)
-  */
- 
- static SBC_ALWAYS_INLINE int sbc_encoder_process_input_s4_internal(
--	int position,
-+	struct sbc_encoder_state *state,
- 	const uint8_t *pcm, int16_t X[2][SBC_X_BUFFER_SIZE],
- 	int nsamples, int nchannels, int big_endian)
- {
-+	int position = state->position;
- 	/* handle X buffer wraparound */
- 	if (position < nsamples) {
- 		if (nchannels > 0)
-@@ -278,10 +279,11 @@ static SBC_ALWAYS_INLINE int sbc_encoder_process_input_s4_internal(
- }
- 
- static SBC_ALWAYS_INLINE int sbc_encoder_process_input_s8_internal(
--	int position,
-+	struct sbc_encoder_state *state,
- 	const uint8_t *pcm, int16_t X[2][SBC_X_BUFFER_SIZE],
- 	int nsamples, int nchannels, int big_endian)
- {
-+	int position = state->position;
- 	/* handle X buffer wraparound */
- 	if (position < nsamples) {
- 		if (nchannels > 0)
-@@ -356,52 +358,52 @@ static SBC_ALWAYS_INLINE int sbc_encoder_process_input_s8_internal(
-  * to the top of the buffer on buffer wraparound.
-  */
- 
--static int sbc_enc_process_input_4s_le(int position,
-+static int sbc_enc_process_input_4s_le(struct sbc_encoder_state *state,
- 		const uint8_t *pcm, int16_t X[2][SBC_X_BUFFER_SIZE],
- 		int nsamples, int nchannels)
- {
- 	if (nchannels > 1)
- 		return sbc_encoder_process_input_s4_internal(
--			position, pcm, X, nsamples, 2, 0);
-+			state, pcm, X, nsamples, 2, 0);
- 	else
- 		return sbc_encoder_process_input_s4_internal(
--			position, pcm, X, nsamples, 1, 0);
-+			state, pcm, X, nsamples, 1, 0);
- }
- 
--static int sbc_enc_process_input_4s_be(int position,
-+static int sbc_enc_process_input_4s_be(struct sbc_encoder_state *state,
- 		const uint8_t *pcm, int16_t X[2][SBC_X_BUFFER_SIZE],
- 		int nsamples, int nchannels)
- {
- 	if (nchannels > 1)
- 		return sbc_encoder_process_input_s4_internal(
--			position, pcm, X, nsamples, 2, 1);
-+			state, pcm, X, nsamples, 2, 1);
- 	else
- 		return sbc_encoder_process_input_s4_internal(
--			position, pcm, X, nsamples, 1, 1);
-+			state, pcm, X, nsamples, 1, 1);
- }
- 
--static int sbc_enc_process_input_8s_le(int position,
-+static int sbc_enc_process_input_8s_le(struct sbc_encoder_state *state,
- 		const uint8_t *pcm, int16_t X[2][SBC_X_BUFFER_SIZE],
- 		int nsamples, int nchannels)
- {
- 	if (nchannels > 1)
- 		return sbc_encoder_process_input_s8_internal(
--			position, pcm, X, nsamples, 2, 0);
-+			state, pcm, X, nsamples, 2, 0);
- 	else
- 		return sbc_encoder_process_input_s8_internal(
--			position, pcm, X, nsamples, 1, 0);
-+			state, pcm, X, nsamples, 1, 0);
- }
- 
--static int sbc_enc_process_input_8s_be(int position,
-+static int sbc_enc_process_input_8s_be(struct sbc_encoder_state *state,
- 		const uint8_t *pcm, int16_t X[2][SBC_X_BUFFER_SIZE],
- 		int nsamples, int nchannels)
- {
- 	if (nchannels > 1)
- 		return sbc_encoder_process_input_s8_internal(
--			position, pcm, X, nsamples, 2, 1);
-+			state, pcm, X, nsamples, 2, 1);
- 	else
- 		return sbc_encoder_process_input_s8_internal(
--			position, pcm, X, nsamples, 1, 1);
-+			state, pcm, X, nsamples, 1, 1);
- }
- 
- /* Supplementary function to count the number of leading zeros */
-diff --git a/sbc/sbc_primitives.h b/sbc/sbc_primitives.h
-index 17ad4f7..c80337e 100644
---- a/sbc/sbc_primitives.h
-+++ b/sbc/sbc_primitives.h
-@@ -47,16 +47,16 @@ struct sbc_encoder_state {
- 	void (*sbc_analyze_4b_8s)(int16_t *x, int32_t *out, int out_stride);
- 	/* Process input data (deinterleave, endian conversion, reordering),
- 	 * depending on the number of subbands and input data byte order */
--	int (*sbc_enc_process_input_4s_le)(int position,
-+	int (*sbc_enc_process_input_4s_le)(struct sbc_encoder_state *state,
- 			const uint8_t *pcm, int16_t X[2][SBC_X_BUFFER_SIZE],
- 			int nsamples, int nchannels);
--	int (*sbc_enc_process_input_4s_be)(int position,
-+	int (*sbc_enc_process_input_4s_be)(struct sbc_encoder_state *state,
- 			const uint8_t *pcm, int16_t X[2][SBC_X_BUFFER_SIZE],
- 			int nsamples, int nchannels);
--	int (*sbc_enc_process_input_8s_le)(int position,
-+	int (*sbc_enc_process_input_8s_le)(struct sbc_encoder_state *state,
- 			const uint8_t *pcm, int16_t X[2][SBC_X_BUFFER_SIZE],
- 			int nsamples, int nchannels);
--	int (*sbc_enc_process_input_8s_be)(int position,
-+	int (*sbc_enc_process_input_8s_be)(struct sbc_encoder_state *state,
- 			const uint8_t *pcm, int16_t X[2][SBC_X_BUFFER_SIZE],
- 			int nsamples, int nchannels);
- 	/* Scale factors calculation */
-diff --git a/sbc/sbc_primitives_neon.c b/sbc/sbc_primitives_neon.c
-index 5d4d0e3..83277ae 100644
---- a/sbc/sbc_primitives_neon.c
-+++ b/sbc/sbc_primitives_neon.c
-@@ -845,36 +845,36 @@ static SBC_ALWAYS_INLINE int sbc_enc_process_input_8s_neon_internal(
- #undef PERM_BE
- #undef PERM_LE
- 
--static int sbc_enc_process_input_4s_be_neon(int position, const uint8_t *pcm,
--					int16_t X[2][SBC_X_BUFFER_SIZE],
--					int nsamples, int nchannels)
-+static int sbc_enc_process_input_4s_be_neon(struct sbc_encoder_state *state,
-+		const uint8_t *pcm, int16_t X[2][SBC_X_BUFFER_SIZE],
-+		int nsamples, int nchannels)
- {
- 	return sbc_enc_process_input_4s_neon_internal(
--		position, pcm, X, nsamples, nchannels, 1);
-+		state->position, pcm, X, nsamples, nchannels, 1);
- }
- 
--static int sbc_enc_process_input_4s_le_neon(int position, const uint8_t *pcm,
--					int16_t X[2][SBC_X_BUFFER_SIZE],
--					int nsamples, int nchannels)
-+static int sbc_enc_process_input_4s_le_neon(struct sbc_encoder_state *state,
-+		const uint8_t *pcm, int16_t X[2][SBC_X_BUFFER_SIZE],
-+		int nsamples, int nchannels)
- {
- 	return sbc_enc_process_input_4s_neon_internal(
--		position, pcm, X, nsamples, nchannels, 0);
-+		state->position, pcm, X, nsamples, nchannels, 0);
- }
- 
--static int sbc_enc_process_input_8s_be_neon(int position, const uint8_t *pcm,
--					int16_t X[2][SBC_X_BUFFER_SIZE],
--					int nsamples, int nchannels)
-+static int sbc_enc_process_input_8s_be_neon(struct sbc_encoder_state *state,
-+		const uint8_t *pcm, int16_t X[2][SBC_X_BUFFER_SIZE],
-+		int nsamples, int nchannels)
- {
- 	return sbc_enc_process_input_8s_neon_internal(
--		position, pcm, X, nsamples, nchannels, 1);
-+		state->position, pcm, X, nsamples, nchannels, 1);
- }
- 
--static int sbc_enc_process_input_8s_le_neon(int position, const uint8_t *pcm,
--					int16_t X[2][SBC_X_BUFFER_SIZE],
--					int nsamples, int nchannels)
-+static int sbc_enc_process_input_8s_le_neon(struct sbc_encoder_state *state,
-+		const uint8_t *pcm, int16_t X[2][SBC_X_BUFFER_SIZE],
-+		int nsamples, int nchannels)
- {
- 	return sbc_enc_process_input_8s_neon_internal(
--		position, pcm, X, nsamples, nchannels, 0);
-+		state->position, pcm, X, nsamples, nchannels, 0);
- }
- 
- void sbc_init_primitives_neon(struct sbc_encoder_state *state)
--- 
-1.7.9.5
+Andrei -
 
+On Thu, 18 Oct 2012, Andrei Emeltchenko wrote:
+
+> On Tue, Oct 16, 2012 at 04:36:31PM -0700, Mat Martineau wrote:
+>> When the channel policy is set to prefer AMP, then an L2CAP channel is
+>> set up using the "create channel" command rather than the "connect"
+>> command.  A physical link is also set up before sending "create
+>> channel".
+>
+> I feel that this patch doing something else that commit message implies.
+> So it is better to skip it for now.
+
+I think you're right and we should skip this patch in this series. 
+The logical and physical link handling has changed a bit, so some of 
+these changes might not fit any more.
+
+>>
+>> Behavior is unchanged if enable_hs is false.
+>>
+>> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+>> ---
+>>  net/bluetooth/l2cap_core.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 42 insertions(+)
+>>
+>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>> index 7e8fe84..17d917b 100644
+>> --- a/net/bluetooth/l2cap_core.c
+>> +++ b/net/bluetooth/l2cap_core.c
+>> @@ -58,6 +58,9 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
+>>  static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+>>  		     struct sk_buff_head *skbs, u8 event);
+>>
+>> +static void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
+>> +			      u8 status);
+>> +
+>>  /* ---- L2CAP channels ---- */
+>>
+>>  static struct l2cap_chan *__l2cap_get_chan_by_dcid(struct l2cap_conn *conn,
+>> @@ -576,6 +579,13 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+>>  			mgr->bredr_chan = NULL;
+>>  	}
+>>
+>> +	if (chan->hs_hchan) {
+>> +		chan->hs_hchan = NULL;
+>> +		chan->hs_hcon = NULL;
+>> +
+>> +		/* Placeholder - free logical link */
+>> +	}
+>> +
+>
+> Here we free logical link
+>
+>>  	chan->ops->teardown(chan, err);
+>>
+>>  	if (test_bit(CONF_NOT_COMPLETE, &chan->conf_state))
+>> @@ -1126,6 +1136,7 @@ static void l2cap_start_connection(struct l2cap_chan *chan)
+>>  {
+>>  	if (__amp_capable(chan)) {
+>>  		BT_DBG("chan %p AMP capable: discover AMPs", chan);
+>> +		set_bit(CONF_CONNECT_PEND, &chan->conf_state);
+>>  		a2mp_discover_amp(chan);
+>>  	} else {
+>>  		l2cap_send_conn_req(chan);
+>> @@ -1271,6 +1282,16 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+>>  				rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHEN_PEND);
+>>  			}
+>>
+>> +			if (rsp.result == __constant_cpu_to_le16(L2CAP_CR_SUCCESS) &&
+>> +			    chan->local_amp_id) {
+>> +				/* Placeholder - uncomment when amp functions
+>> +				 * are available
+>> +				amp_accept_physical(chan, chan->local_amp_id);
+>> +				 */
+>> +				l2cap_chan_unlock(chan);
+>> +				continue;
+>> +			}
+>> +
+>>  			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP,
+>>  				       sizeof(rsp), &rsp);
+>>
+>> @@ -3359,6 +3380,18 @@ done:
+>>  			rfc.mode = chan->mode;
+>>  		}
+>>
+>> +		if (test_bit(CONF_LOC_CONF_PEND, &chan->conf_state) &&
+>> +		    chan->local_amp_id) {
+>> +			struct hci_chan *hchan = NULL;
+>> +
+>> +			/* Placeholder - get hci_chan for logical link */
+>> +
+>> +			if (hchan && hchan->state == BT_CONNECTED) {
+>> +				l2cap_logical_cfm(chan, hchan,
+>> +						  L2CAP_MR_SUCCESS);
+>> +			}
+>> +		}
+>> +
+>
+> this is configuration phase which is happening after channel is created
+>
+>
+>>  		if (result == L2CAP_CONF_SUCCESS)
+>>  			set_bit(CONF_OUTPUT_DONE, &chan->conf_state);
+>>  	}
+>> @@ -6367,6 +6400,15 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+>>  					stat = L2CAP_CS_AUTHOR_PEND;
+>>  					chan->ops->defer(chan);
+>>  				} else {
+>> +					if (chan->local_amp_id) {
+>> +						/* Placeholder - accept physical
+>> +						 * link
+>> +						amp_accept_physical(chan,
+>> +							chan->local_amp_id);
+>> +						*/
+>> +						continue;
+>> +					}
+>> +
+>
+> here is accept physical link
+
+Regards,
+
+--
+Mat Martineau
+
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, hosted by The Linux Foundation
