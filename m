@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1350579545.2026.12.camel@aeonflux>
-Subject: Re: [PATCH 10/11] update sbcinfo for msbc
+Message-ID: <1350579380.2026.11.camel@aeonflux>
+Subject: Re: [PATCH 06/11] Add support for mSBC frame header
 From: Marcel Holtmann <marcel@holtmann.org>
 To: =?ISO-8859-1?Q?Fr=E9d=E9ric?= Dalleau
 	<frederic.dalleau@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 18 Oct 2012 09:59:05 -0700
-In-Reply-To: <1350576911-14678-11-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Thu, 18 Oct 2012 09:56:20 -0700
+In-Reply-To: <1350576911-14678-7-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1350576911-14678-1-git-send-email-frederic.dalleau@linux.intel.com>
-	 <1350576911-14678-11-git-send-email-frederic.dalleau@linux.intel.com>
+	 <1350576911-14678-7-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,147 +16,345 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Fred,
 
->  src/sbcinfo.c |   51 ++++++++++++++++++++++++++++++++++++---------------
->  1 file changed, 36 insertions(+), 15 deletions(-)
+> ---
+>  sbc/sbc.c |  225 ++++++++++++++++++++++++++++++++++++-------------------------
+>  1 file changed, 135 insertions(+), 90 deletions(-)
 > 
-> diff --git a/src/sbcinfo.c b/src/sbcinfo.c
-> index 8cfb54a..52ca458 100644
-> --- a/src/sbcinfo.c
-> +++ b/src/sbcinfo.c
-> @@ -61,12 +61,11 @@ struct sbc_frame_hdr {
->  #error "Unknown byte order"
->  #endif
->  
-> -static int calc_frame_len(struct sbc_frame_hdr *hdr)
-> +static int calc_frame_len(struct sbc_frame_hdr *hdr, int nrof_blocks)
+> diff --git a/sbc/sbc.c b/sbc/sbc.c
+> index fa90e07..8539bc6 100644
+> --- a/sbc/sbc.c
+> +++ b/sbc/sbc.c
+> @@ -377,8 +377,8 @@ static void sbc_calculate_bits(const struct sbc_frame *frame, int (*bits)[8])
+>   *  -3   CRC8 incorrect
+>   *  -4   Bitpool value out of bounds
+>   */
+> -static int sbc_unpack_frame(const uint8_t *data, struct sbc_frame *frame,
+> -								size_t len)
+> +static int sbc_unpack_frame_internal(const uint8_t *data,
+> +		struct sbc_frame *frame, size_t len)
 >  {
-> -	int tmp, nrof_subbands, nrof_blocks;
-> +	int tmp, nrof_subbands;
+>  	unsigned int consumed;
+>  	/* Will copy the parts of the header that are relevant to crc
+> @@ -393,59 +393,6 @@ static int sbc_unpack_frame(const uint8_t *data, struct sbc_frame *frame,
+>  	int bits[2][8];		/* bits distribution */
+>  	uint32_t levels[2][8];	/* levels derived from that */
 >  
->  	nrof_subbands = (hdr->subbands + 1) * 4;
-> -	nrof_blocks = (hdr->blocks + 1) * 4;
+> -	if (len < 4)
+> -		return -1;
+> -
+> -	if (data[0] != SBC_SYNCWORD)
+> -		return -2;
+> -
+> -	frame->frequency = (data[1] >> 6) & 0x03;
+> -
+> -	frame->block_mode = (data[1] >> 4) & 0x03;
+> -	switch (frame->block_mode) {
+> -	case SBC_BLK_4:
+> -		frame->blocks = 4;
+> -		break;
+> -	case SBC_BLK_8:
+> -		frame->blocks = 8;
+> -		break;
+> -	case SBC_BLK_12:
+> -		frame->blocks = 12;
+> -		break;
+> -	case SBC_BLK_16:
+> -		frame->blocks = 16;
+> -		break;
+> -	}
+> -
+> -	frame->mode = (data[1] >> 2) & 0x03;
+> -	switch (frame->mode) {
+> -	case MONO:
+> -		frame->channels = 1;
+> -		break;
+> -	case DUAL_CHANNEL:	/* fall-through */
+> -	case STEREO:
+> -	case JOINT_STEREO:
+> -		frame->channels = 2;
+> -		break;
+> -	}
+> -
+> -	frame->allocation = (data[1] >> 1) & 0x01;
+> -
+> -	frame->subband_mode = (data[1] & 0x01);
+> -	frame->subbands = frame->subband_mode ? 8 : 4;
+> -
+> -	frame->bitpool = data[2];
+> -
+> -	if ((frame->mode == MONO || frame->mode == DUAL_CHANNEL) &&
+> -			frame->bitpool > 16 * frame->subbands)
+> -		return -4;
+> -
+> -	if ((frame->mode == STEREO || frame->mode == JOINT_STEREO) &&
+> -			frame->bitpool > 32 * frame->subbands)
+> -		return -4;
+> -
+> -	/* data[3] is crc, we're checking it later */
+> -
+>  	consumed = 32;
 >  
->  	switch (hdr->channel_mode) {
->  	case 0x00:
-> @@ -89,13 +88,12 @@ static int calc_frame_len(struct sbc_frame_hdr *hdr)
->  	return (nrof_subbands + ((tmp + 7) / 8));
+>  	crc_header[0] = data[1];
+> @@ -546,6 +493,88 @@ static int sbc_unpack_frame(const uint8_t *data, struct sbc_frame *frame,
+>  	return consumed >> 3;
 >  }
 >  
-> -static double calc_bit_rate(struct sbc_frame_hdr *hdr)
-> +static double calc_bit_rate(struct sbc_frame_hdr *hdr, int nrof_blocks)
->  {
-> -	int nrof_subbands, nrof_blocks;
-> +	int nrof_subbands;
->  	double f;
->  
->  	nrof_subbands = (hdr->subbands + 1) * 4;
-> -	nrof_blocks = (hdr->blocks + 1) * 4;
->  
->  	switch (hdr->sampling_frequency) {
->  	case 0:
-> @@ -114,7 +112,7 @@ static double calc_bit_rate(struct sbc_frame_hdr *hdr)
->  		return 0;
->  	}
->  
-> -	return ((8 * (calc_frame_len(hdr) + 4) * f) /
-> +	return ((8 * (calc_frame_len(hdr, nrof_blocks) + 4) * f) /
->  			(nrof_subbands * nrof_blocks));
->  }
->  
-> @@ -175,7 +173,7 @@ static int analyze_file(char *filename)
->  	double rate;
->  	int bitpool[SIZE], frame_len[SIZE];
->  	int subbands, blocks, freq, method;
-> -	int n, p1, p2, fd, size, num;
-> +	int n, p1, p2, fd, size, num, msbc;
->  	ssize_t len;
->  	unsigned int count;
->  
-> @@ -191,17 +189,30 @@ static int analyze_file(char *filename)
->  		fd = fileno(stdin);
->  
->  	len = __read(fd, &hdr, sizeof(hdr));
-> -	if (len != sizeof(hdr) || hdr.syncword != 0x9c) {
-> +	if (len != sizeof(hdr) || !(hdr.syncword == 0x9c ||
-> +			hdr.syncword == 0xad)) {
->  		fprintf(stderr, "Not a SBC audio file\n");
->  		return -1;
->  	}
-> +	msbc = (hdr.syncword == 0xad) ? 1 : 0;
+> +static int sbc_unpack_frame(const uint8_t *data,
+> +		struct sbc_frame *frame, size_t len)
+> +{
+> +	if (len < 4)
+> +		return -1;
+
+empty line here.
+
+> +	if (data[0] != SBC_SYNCWORD)
+> +		return -2;
 > +
-> +	if (msbc) {
-> +		hdr.subbands = 1; /* 8 */
-> +		hdr.sampling_frequency = 0x00; /* 16000 */
-> +		hdr.allocation_method = 0; /* Loudness */
-> +		hdr.bitpool = 26;
-> +		hdr.channel_mode = 0x00; /* Mono */
+> +	frame->frequency = (data[1] >> 6) & 0x03;
+> +	frame->block_mode = (data[1] >> 4) & 0x03;
 > +
-> +		blocks = 15;
-> +	} else {
-> +		blocks = (hdr.blocks + 1) * 4;
+> +	switch (frame->block_mode) {
+> +	case SBC_BLK_4:
+> +		frame->blocks = 4;
+> +		break;
+> +	case SBC_BLK_8:
+> +		frame->blocks = 8;
+> +		break;
+> +	case SBC_BLK_12:
+> +		frame->blocks = 12;
+> +		break;
+> +	case SBC_BLK_16:
+> +		frame->blocks = 16;
+> +		break;
 > +	}
->  
->  	subbands = (hdr.subbands + 1) * 4;
-> -	blocks = (hdr.blocks + 1) * 4;
->  	freq = hdr.sampling_frequency;
->  	method = hdr.allocation_method;
->  
-> -	count = calc_frame_len(&hdr);
-> +	count = calc_frame_len(&hdr, blocks);
->  
->  	bitpool[0] = hdr.bitpool;
->  	frame_len[0] = count + 4;
-> @@ -213,7 +224,7 @@ static int analyze_file(char *filename)
->  
->  	if (lseek(fd, 0, SEEK_SET) < 0) {
->  		num = 1;
-> -		rate = calc_bit_rate(&hdr);
-> +		rate = calc_bit_rate(&hdr, blocks);
->  		while (count) {
->  			size = count > sizeof(buf) ? sizeof(buf) : count;
->  			len = __read(fd, buf, size);
-> @@ -237,14 +248,23 @@ static int analyze_file(char *filename)
->  		if (len == 0)
->  			break;
->  
-> -		if ((size_t) len < sizeof(hdr) || hdr.syncword != 0x9c) {
-> +		if ((size_t) len < sizeof(hdr) || !(hdr.syncword == 0x9c ||
-> +				hdr.syncword == 0xad)) {
->  			fprintf(stderr, "Corrupted SBC stream "
->  					"(len %zd syncword 0x%02x)\n",
->  					len, hdr.syncword);
->  			break;
->  		}
->  
-> -		count = calc_frame_len(&hdr);
-> +		if (msbc) {
-> +			hdr.subbands = 1; /* 8 */
-> +			hdr.sampling_frequency = 0x00; /* 16000 */
-> +			hdr.allocation_method = 0; /* Loudness */
-> +			hdr.bitpool = 26;
-> +			hdr.channel_mode = 0x00; /* Mono */
-> +		}
 > +
-> +		count = calc_frame_len(&hdr, blocks);
->  		len = count + 4;
+> +	frame->mode = (data[1] >> 2) & 0x03;
+
+another empty line.
+
+> +	switch (frame->mode) {
+> +	case MONO:
+> +		frame->channels = 1;
+> +		break;
+> +	case DUAL_CHANNEL:	/* fall-through */
+> +	case STEREO:
+> +	case JOINT_STEREO:
+> +		frame->channels = 2;
+> +		break;
+> +	}
+> +
+> +	frame->allocation = (data[1] >> 1) & 0x01;
+> +
+> +	frame->subband_mode = (data[1] & 0x01);
+> +	frame->subbands = frame->subband_mode ? 8 : 4;
+> +
+> +	frame->bitpool = data[2];
+> +
+> +	if ((frame->mode == MONO || frame->mode == DUAL_CHANNEL) &&
+> +			frame->bitpool > 16 * frame->subbands)
+> +		return -4;
+> +
+> +	if ((frame->mode == STEREO || frame->mode == JOINT_STEREO) &&
+> +			frame->bitpool > 32 * frame->subbands)
+> +		return -4;
+> +
+> +	return sbc_unpack_frame_internal(data, frame, len);
+> +}
+> +
+> +static int msbc_unpack_frame(const uint8_t *data,
+> +		struct sbc_frame *frame, size_t len)
+> +{
+> +	if (len < 4)
+> +		return -1;
+> +
+> +	if (data[0] != MSBC_SYNCWORD)
+> +		return -2;
+> +	if (data[1] != 0)
+> +		return -5;
+> +	if (data[2] != 0)
+> +		return -6;
+
+We have these newly invented error return code, why?
+
+> +
+> +	frame->frequency = SBC_FREQ_16000;
+> +	frame->block_mode = SBC_BLK_4;
+> +	frame->blocks = MSBC_BLOCKS;
+> +	frame->allocation = LOUDNESS;
+> +	frame->mode = MONO;
+> +	frame->channels = 1;
+> +	frame->subband_mode = 1;
+> +	frame->subbands = 8;
+> +	frame->bitpool = 26;
+> +
+> +	return sbc_unpack_frame_internal(data, frame, len);
+> +}
+> +
+>  static void sbc_decoder_init(struct sbc_decoder_state *state,
+>  					const struct sbc_frame *frame)
+>  {
+> @@ -792,38 +821,6 @@ static SBC_ALWAYS_INLINE ssize_t sbc_pack_frame_internal(uint8_t *data,
+>  	uint32_t levels[2][8];	/* levels are derived from that */
+>  	uint32_t sb_sample_delta[2][8];
 >  
->  		p1 = -1;
-> @@ -273,10 +293,11 @@ static int analyze_file(char *filename)
->  			count -= len;
->  		}
+> -	data[0] = SBC_SYNCWORD;
+> -
+> -	data[1] = (frame->frequency & 0x03) << 6;
+> -
+> -	data[1] |= (frame->block_mode & 0x03) << 4;
+> -
+> -	data[1] |= (frame->mode & 0x03) << 2;
+> -
+> -	data[1] |= (frame->allocation & 0x01) << 1;
+> -
+> -	switch (frame_subbands) {
+> -	case 4:
+> -		/* Nothing to do */
+> -		break;
+> -	case 8:
+> -		data[1] |= 0x01;
+> -		break;
+> -	default:
+> -		return -4;
+> -		break;
+> -	}
+> -
+> -	data[2] = frame->bitpool;
+> -
+> -	if ((frame->mode == MONO || frame->mode == DUAL_CHANNEL) &&
+> -			frame->bitpool > frame_subbands << 4)
+> -		return -5;
+> -
+> -	if ((frame->mode == STEREO || frame->mode == JOINT_STEREO) &&
+> -			frame->bitpool > frame_subbands << 5)
+> -		return -5;
+> -
+>  	/* Can't fill in crc yet */
 >  
-> -		rate += calc_bit_rate(&hdr);
-> +		rate += calc_bit_rate(&hdr, blocks);
->  		num++;
+>  	crc_header[0] = data[1];
+> @@ -891,6 +888,28 @@ static SBC_ALWAYS_INLINE ssize_t sbc_pack_frame_internal(uint8_t *data,
+>  static ssize_t sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len,
+>  								int joint)
+>  {
+> +	int frame_subbands = 4;
+> +
+> +	data[0] = SBC_SYNCWORD;
+> +
+> +	data[1] = (frame->frequency & 0x03) << 6;
+> +	data[1] |= (frame->block_mode & 0x03) << 4;
+> +	data[1] |= (frame->mode & 0x03) << 2;
+> +	data[1] |= (frame->allocation & 0x01) << 1;
+> +
+> +	data[2] = frame->bitpool;
+> +
+> +	if (frame->subbands != 4)
+> +		frame_subbands = 8;
+> +
+> +	if ((frame->mode == MONO || frame->mode == DUAL_CHANNEL) &&
+> +			frame->bitpool > frame_subbands << 4)
+> +		return -5;
+> +
+> +	if ((frame->mode == STEREO || frame->mode == JOINT_STEREO) &&
+> +			frame->bitpool > frame_subbands << 5)
+> +		return -5;
+> +
+>  	if (frame->subbands == 4) {
+>  		if (frame->channels == 1)
+>  			return sbc_pack_frame_internal(
+> @@ -899,6 +918,7 @@ static ssize_t sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len
+>  			return sbc_pack_frame_internal(
+>  				data, frame, len, 4, 2, joint);
+>  	} else {
+> +		data[1] |= 0x01;
+>  		if (frame->channels == 1)
+>  			return sbc_pack_frame_internal(
+>  				data, frame, len, 8, 1, joint);
+> @@ -908,6 +928,17 @@ static ssize_t sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len
+>  	}
+>  }
+>  
+> +static ssize_t msbc_pack_frame(uint8_t *data, struct sbc_frame *frame,
+> +		size_t len, int joint)
+
+Indent this further to the back so it does not overlap with the function
+name.
+
+> +{
+> +	data[0] = MSBC_SYNCWORD;
+> +	data[1] = 0;
+> +	data[2] = 0;
+> +
+> +	return sbc_pack_frame_internal(
+> +		data, frame, len, 8, 1, joint);
+
+Don't start the second line with no argument in the first one. Break
+this up a little bit nicer.
+
+> +}
+> +
+>  static void sbc_encoder_init(int msbc, struct sbc_encoder_state *state,
+>  					const struct sbc_frame *frame)
+>  {
+> @@ -924,10 +955,22 @@ struct sbc_priv {
+>  	struct SBC_ALIGNED sbc_frame frame;
+>  	struct SBC_ALIGNED sbc_decoder_state dec_state;
+>  	struct SBC_ALIGNED sbc_encoder_state enc_state;
+> +	int (*sbc_unpack_frame)(const uint8_t *data, struct sbc_frame *frame,
+> +			size_t len);
+> +	ssize_t (*sbc_pack_frame)(uint8_t *data, struct sbc_frame *frame,
+> +			size_t len, int joint);
+
+No need for a sbc_ prefix here. Just call it unpack_frame and
+pack_frame.
+
+>  };
+>  
+>  static void sbc_set_defaults(sbc_t *sbc, unsigned long flags)
+>  {
+> +	struct sbc_priv *priv = sbc->priv;
+
+empty line,
+
+> +	if (flags & SBC_MSBC) {
+> +		priv->sbc_pack_frame = msbc_pack_frame;
+> +		priv->sbc_unpack_frame = msbc_unpack_frame;
+> +	} else {
+> +		priv->sbc_pack_frame = sbc_pack_frame;
+> +		priv->sbc_unpack_frame = sbc_unpack_frame;
+> +	}
+
+and here.
+
+>  	sbc->flags = flags;
+>  	sbc->frequency = SBC_FREQ_44100;
+>  	sbc->mode = SBC_MODE_STEREO;
+> @@ -981,7 +1024,7 @@ SBC_EXPORT ssize_t sbc_decode(sbc_t *sbc, const void *input, size_t input_len,
+>  
+>  	priv = sbc->priv;
+>  
+> -	framelen = sbc_unpack_frame(input, &priv->frame, input_len);
+> +	framelen = priv->sbc_unpack_frame(input, &priv->frame, input_len);
+>  
+>  	if (!priv->init) {
+>  		sbc_decoder_init(&priv->dec_state, &priv->frame);
+> @@ -1117,13 +1160,15 @@ SBC_EXPORT ssize_t sbc_encode(sbc_t *sbc, const void *input, size_t input_len,
+>  		int j = priv->enc_state.sbc_calc_scalefactors_j(
+>  			priv->frame.sb_sample_f, priv->frame.scale_factor,
+>  			priv->frame.blocks, priv->frame.subbands);
+> -		framelen = sbc_pack_frame(output, &priv->frame, output_len, j);
+> +		framelen = priv->sbc_pack_frame(output,
+> +				&priv->frame, output_len, j);
+>  	} else {
+>  		priv->enc_state.sbc_calc_scalefactors(
+>  			priv->frame.sb_sample_f, priv->frame.scale_factor,
+>  			priv->frame.blocks, priv->frame.channels,
+>  			priv->frame.subbands);
+> -		framelen = sbc_pack_frame(output, &priv->frame, output_len, 0);
+> +		framelen = priv->sbc_pack_frame(output,
+> +				&priv->frame, output_len, 0);
 >  	}
 >  
-> +	printf("mSBC    \t\t%d\n", msbc);
-
-please use tabs for all of it and not just spaces.
-
->  	printf("Subbands\t\t%d\n", subbands);
->  	printf("Block length\t\t%d\n", blocks);
->  	printf("Sampling frequency\t%s\n", freq2str(freq));
+>  	if (written)
 
 Regards
 
