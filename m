@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH 10/11] update sbcinfo for msbc
-Date: Thu, 18 Oct 2012 18:15:10 +0200
-Message-Id: <1350576911-14678-11-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH 07/11] Add mmx primitive for 1b 8s analyse
+Date: Thu, 18 Oct 2012 18:15:07 +0200
+Message-Id: <1350576911-14678-8-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1350576911-14678-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1350576911-14678-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -14,144 +14,42 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/sbcinfo.c |   51 ++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 36 insertions(+), 15 deletions(-)
+ sbc/sbc_primitives_mmx.c |   15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/src/sbcinfo.c b/src/sbcinfo.c
-index 8cfb54a..52ca458 100644
---- a/src/sbcinfo.c
-+++ b/src/sbcinfo.c
-@@ -61,12 +61,11 @@ struct sbc_frame_hdr {
- #error "Unknown byte order"
- #endif
- 
--static int calc_frame_len(struct sbc_frame_hdr *hdr)
-+static int calc_frame_len(struct sbc_frame_hdr *hdr, int nrof_blocks)
- {
--	int tmp, nrof_subbands, nrof_blocks;
-+	int tmp, nrof_subbands;
- 
- 	nrof_subbands = (hdr->subbands + 1) * 4;
--	nrof_blocks = (hdr->blocks + 1) * 4;
- 
- 	switch (hdr->channel_mode) {
- 	case 0x00:
-@@ -89,13 +88,12 @@ static int calc_frame_len(struct sbc_frame_hdr *hdr)
- 	return (nrof_subbands + ((tmp + 7) / 8));
+diff --git a/sbc/sbc_primitives_mmx.c b/sbc/sbc_primitives_mmx.c
+index cbacb4e..6a18c5e 100644
+--- a/sbc/sbc_primitives_mmx.c
++++ b/sbc/sbc_primitives_mmx.c
+@@ -276,6 +276,19 @@ static inline void sbc_analyze_4b_8s_mmx(struct sbc_encoder_state *state,
+ 	__asm__ volatile ("emms\n");
  }
  
--static double calc_bit_rate(struct sbc_frame_hdr *hdr)
-+static double calc_bit_rate(struct sbc_frame_hdr *hdr, int nrof_blocks)
- {
--	int nrof_subbands, nrof_blocks;
-+	int nrof_subbands;
- 	double f;
- 
- 	nrof_subbands = (hdr->subbands + 1) * 4;
--	nrof_blocks = (hdr->blocks + 1) * 4;
- 
- 	switch (hdr->sampling_frequency) {
- 	case 0:
-@@ -114,7 +112,7 @@ static double calc_bit_rate(struct sbc_frame_hdr *hdr)
- 		return 0;
- 	}
- 
--	return ((8 * (calc_frame_len(hdr) + 4) * f) /
-+	return ((8 * (calc_frame_len(hdr, nrof_blocks) + 4) * f) /
- 			(nrof_subbands * nrof_blocks));
- }
- 
-@@ -175,7 +173,7 @@ static int analyze_file(char *filename)
- 	double rate;
- 	int bitpool[SIZE], frame_len[SIZE];
- 	int subbands, blocks, freq, method;
--	int n, p1, p2, fd, size, num;
-+	int n, p1, p2, fd, size, num, msbc;
- 	ssize_t len;
- 	unsigned int count;
- 
-@@ -191,17 +189,30 @@ static int analyze_file(char *filename)
- 		fd = fileno(stdin);
- 
- 	len = __read(fd, &hdr, sizeof(hdr));
--	if (len != sizeof(hdr) || hdr.syncword != 0x9c) {
-+	if (len != sizeof(hdr) || !(hdr.syncword == 0x9c ||
-+			hdr.syncword == 0xad)) {
- 		fprintf(stderr, "Not a SBC audio file\n");
- 		return -1;
- 	}
-+	msbc = (hdr.syncword == 0xad) ? 1 : 0;
++static inline void sbc_analyze_1b_8s_mmx(struct sbc_encoder_state *state,
++		int16_t *x, int32_t *out, int out_stride)
++{
++	if (state->odd)
++		sbc_analyze_eight_mmx(x, out, analysis_consts_fixed8_simd_odd);
++	else
++		sbc_analyze_eight_mmx(x, out, analysis_consts_fixed8_simd_even);
 +
-+	if (msbc) {
-+		hdr.subbands = 1; /* 8 */
-+		hdr.sampling_frequency = 0x00; /* 16000 */
-+		hdr.allocation_method = 0; /* Loudness */
-+		hdr.bitpool = 26;
-+		hdr.channel_mode = 0x00; /* Mono */
++	state->odd = !state->odd;
 +
-+		blocks = 15;
-+	} else {
-+		blocks = (hdr.blocks + 1) * 4;
-+	}
- 
- 	subbands = (hdr.subbands + 1) * 4;
--	blocks = (hdr.blocks + 1) * 4;
- 	freq = hdr.sampling_frequency;
- 	method = hdr.allocation_method;
- 
--	count = calc_frame_len(&hdr);
-+	count = calc_frame_len(&hdr, blocks);
- 
- 	bitpool[0] = hdr.bitpool;
- 	frame_len[0] = count + 4;
-@@ -213,7 +224,7 @@ static int analyze_file(char *filename)
- 
- 	if (lseek(fd, 0, SEEK_SET) < 0) {
- 		num = 1;
--		rate = calc_bit_rate(&hdr);
-+		rate = calc_bit_rate(&hdr, blocks);
- 		while (count) {
- 			size = count > sizeof(buf) ? sizeof(buf) : count;
- 			len = __read(fd, buf, size);
-@@ -237,14 +248,23 @@ static int analyze_file(char *filename)
- 		if (len == 0)
- 			break;
- 
--		if ((size_t) len < sizeof(hdr) || hdr.syncword != 0x9c) {
-+		if ((size_t) len < sizeof(hdr) || !(hdr.syncword == 0x9c ||
-+				hdr.syncword == 0xad)) {
- 			fprintf(stderr, "Corrupted SBC stream "
- 					"(len %zd syncword 0x%02x)\n",
- 					len, hdr.syncword);
- 			break;
- 		}
- 
--		count = calc_frame_len(&hdr);
-+		if (msbc) {
-+			hdr.subbands = 1; /* 8 */
-+			hdr.sampling_frequency = 0x00; /* 16000 */
-+			hdr.allocation_method = 0; /* Loudness */
-+			hdr.bitpool = 26;
-+			hdr.channel_mode = 0x00; /* Mono */
-+		}
++	__asm__ volatile ("emms\n");
++}
 +
-+		count = calc_frame_len(&hdr, blocks);
- 		len = count + 4;
- 
- 		p1 = -1;
-@@ -273,10 +293,11 @@ static int analyze_file(char *filename)
- 			count -= len;
- 		}
- 
--		rate += calc_bit_rate(&hdr);
-+		rate += calc_bit_rate(&hdr, blocks);
- 		num++;
+ static void sbc_calc_scalefactors_mmx(
+ 	int32_t sb_sample_f[16][2][8],
+ 	uint32_t scale_factor[2][8],
+@@ -367,6 +380,8 @@ void sbc_init_primitives_mmx(struct sbc_encoder_state *state)
+ 	if (check_mmx_support()) {
+ 		state->sbc_analyze_4b_4s = sbc_analyze_4b_4s_mmx;
+ 		state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_mmx;
++		if (state->inc == 1)
++			state->sbc_analyze_4b_8s = sbc_analyze_1b_8s_mmx;
+ 		state->sbc_calc_scalefactors = sbc_calc_scalefactors_mmx;
+ 		state->implementation_info = "MMX";
  	}
- 
-+	printf("mSBC    \t\t%d\n", msbc);
- 	printf("Subbands\t\t%d\n", subbands);
- 	printf("Block length\t\t%d\n", blocks);
- 	printf("Sampling frequency\t%s\n", freq2str(freq));
 -- 
 1.7.9.5
 
