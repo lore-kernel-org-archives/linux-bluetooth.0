@@ -1,64 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v6 00/16] Move storage config and names files to ini-file format
-Date: Thu, 18 Oct 2012 15:01:35 +0200
-Message-Id: <1350565311-18330-1-git-send-email-frederic.danis@linux.intel.com>
+Date: Thu, 18 Oct 2012 13:44:46 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv0 0/8] Handling physical and logical link
+Message-ID: <20121018104444.GH13545@aemeltch-MOBL1>
+References: <1350399670-12418-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1350493622.26318.114.camel@aeonflux>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1350493622.26318.114.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adapter saved configuration will be saved to /var/lib/bluetooth/<adapter address>/settings
-in ini-file format for BlueZ 5.
-Devices name cache will be saved in 1 file per device (named by device address)
-under /var/lib/bluetooth/<adapter address>/cache/ directory.
-If this files does not exist, we try to convert legacy files to this new format.
+Hi
 
-Access to variables during run-time is performed in adapter structure which is
-populated by loading saved configuration during initialization.
+On Wed, Oct 17, 2012 at 10:07:02AM -0700, Marcel Holtmann wrote:
+> Hi Andrei,
+> 
+> > Set of patches adding handling for physical and logical link
+> > complete events.
 
-Patches 2 to 8 remove access to config file from run-time.
-Patch 9 moves to ini-file format style (load, save and convert).
-Patches 11 to 16 move devices name cache to new files (read, write and convert).
+Those patches depends on 1st patch from Mat last series.
 
-Frédéric Danis (16):
-  doc: Add settings storage documentation
-  adapter: Read name in storage at init
-  adaptername: Retrieve config name from adapter
-  adapter: Read device class in storage at init
-  adapter: Move pairable read to load_config()
-  adapter: Read pairable timeout in storage at init
-  adapter: Read discoverable timeout in storage at init
-  adapter: Read mode in storage at init
-  adapter: Move saved config to ini-file format
-  TODO: Add entry to remove storage convertion function
-  adapter: Move storage names to cache directory
-  event: Remove write of LastSeen info
-  device: Retrieve name from cache directory
-  dbusoob: Store device name in cache directory
-  input: Retrieve device name from cache directory
-  hcitool: Retrieve names from cache directory
+> > Andrei Emeltchenko (8):
+> >   Bluetooth: AMP: Process Physical Link Complete evt
+> >   Bluetooth: AMP: Process Logical Link complete evt
+> >   Bluetooth: Add logical link create function
+> >   Bluetooth: AMP: Process Disc Logical Link
+> >   Bluetooth: AMP: Process Disc Physical Link complete evt
+> >   Bluetooth: AMP: Remove hci_conn receiving error command status
+> >   Bluetooth: Disconnect logical link when deleteing chan
+> >   Bluetooth: Add put(hcon) when deleting hchan
+> 
+> I looked over the patches and the look fine to me.
+> 
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
- Makefile.tools           |    2 +-
- TODO                     |    6 +
- doc/settings-storage.txt |   99 +++++++++++
- plugins/adaptername.c    |    6 +-
- plugins/dbusoob.c        |   26 ++-
- plugins/neard.c          |    2 +-
- profiles/input/device.c  |   26 ++-
- src/adapter.c            |  408 ++++++++++++++++++++++++++++++++++++----------
- src/adapter.h            |    3 +-
- src/device.c             |   25 ++-
- src/event.c              |   37 +++--
- src/mgmt.c               |   19 +--
- src/mgmt.h               |    1 +
- tools/hcitool.c          |   31 +++-
- 14 files changed, 552 insertions(+), 139 deletions(-)
- create mode 100644 doc/settings-storage.txt
+Marcel, I will keep you ack even with some rather cosmetic change.
 
--- 
-1.7.9.5
-
+Best regards 
+Andrei Emeltchenko 
