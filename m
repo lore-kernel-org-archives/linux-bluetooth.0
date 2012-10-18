@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: [RFC 4/6] health: Convert HealthChannel to DBus.Properties
-Date: Thu, 18 Oct 2012 19:03:49 -0300
-Message-Id: <1350597831-28380-5-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [RFC 3/6] sap: Convert to DBus.Properties
+Date: Thu, 18 Oct 2012 19:03:48 -0300
+Message-Id: <1350597831-28380-4-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1350597831-28380-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1350597831-28380-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,122 +12,149 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Lucas De Marchi <lucas.de.marchi@gmail.com>
 
-Also remove a needless strdup to send type property.
 ---
- profiles/health/hdp.c | 68 +++++++++++++++++++++++++++------------------------
- 1 file changed, 36 insertions(+), 32 deletions(-)
+ doc/sap-api.txt       | 12 -----------
+ profiles/sap/server.c | 58 ++++++++++++++++-----------------------------------
+ 2 files changed, 18 insertions(+), 52 deletions(-)
 
-diff --git a/profiles/health/hdp.c b/profiles/health/hdp.c
-index fd21a23..845155e 100644
---- a/profiles/health/hdp.c
-+++ b/profiles/health/hdp.c
-@@ -418,44 +418,43 @@ static const GDBusMethodTable health_manager_methods[] = {
- 	{ }
- };
+diff --git a/doc/sap-api.txt b/doc/sap-api.txt
+index b8b7253..92bdd9e 100644
+--- a/doc/sap-api.txt
++++ b/doc/sap-api.txt
+@@ -17,18 +17,6 @@ Methods		void Disconnect()
  
--static DBusMessage *channel_get_properties(DBusConnection *conn,
--					DBusMessage *msg, void *user_data)
-+static gboolean channel_property_get_device(const GDBusPropertyTable *property,
+ 			Possible errors: org.bluez.Error.Failed
+ 
+-		dict GetProperties()
+-
+-			Return all properties for the interface. See the
+-			properties section for available properties.
+-
+-			Possible Errors: org.bluez.Error.Failed
+-
+-Signals		PropertyChanged(string name, variant value)
+-
+-			This signal indicates a changed value of the given
+-			property.
+-
+ Properties	boolean Connected [readonly]
+ 
+ 			Indicates if SAP client is connected to the server.
+diff --git a/profiles/sap/server.c b/profiles/sap/server.c
+index cbe00b9..530f994 100644
+--- a/profiles/sap/server.c
++++ b/profiles/sap/server.c
+@@ -618,13 +618,10 @@ static gboolean guard_timeout(gpointer data)
+ 
+ static void sap_set_connected(struct sap_server *server)
+ {
+-	gboolean connected = TRUE;
+-
+-	emit_property_changed(server->path,
+-				SAP_SERVER_INTERFACE, "Connected",
+-				DBUS_TYPE_BOOLEAN, &connected);
+-
+ 	server->conn->state = SAP_STATE_CONNECTED;
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(), server->path,
++					SAP_SERVER_INTERFACE, "Connected");
+ }
+ 
+ int sap_connect_rsp(void *sap_device, uint8_t status)
+@@ -1136,7 +1133,6 @@ static void sap_io_destroy(void *data)
+ {
+ 	struct sap_server *server = data;
+ 	struct sap_connection *conn = server->conn;
+-	gboolean connected = FALSE;
+ 
+ 	DBG("conn %p", conn);
+ 
+@@ -1146,10 +1142,10 @@ static void sap_io_destroy(void *data)
+ 	stop_guard_timer(server);
+ 
+ 	if (conn->state != SAP_STATE_CONNECT_IN_PROGRESS &&
+-			conn->state != SAP_STATE_CONNECT_MODEM_BUSY)
+-		emit_property_changed(server->path,
+-					SAP_SERVER_INTERFACE, "Connected",
+-					DBUS_TYPE_BOOLEAN, &connected);
++				conn->state != SAP_STATE_CONNECT_MODEM_BUSY)
++		g_dbus_emit_property_changed(btd_get_dbus_connection(),
++					server->path, SAP_SERVER_INTERFACE,
++					"Connected");
+ 
+ 	if (conn->state == SAP_STATE_CONNECT_IN_PROGRESS ||
+ 			conn->state == SAP_STATE_CONNECT_MODEM_BUSY ||
+@@ -1291,50 +1287,31 @@ static DBusMessage *disconnect(DBusConnection *conn, DBusMessage *msg,
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
+-static DBusMessage *get_properties(DBusConnection *c,
+-				DBusMessage *msg, void *data)
++static gboolean server_property_get_connected(
++					const GDBusPropertyTable *property,
 +					DBusMessageIter *iter, void *data)
  {
--	struct hdp_channel *chan = user_data;
--	DBusMessageIter iter, dict;
+ 	struct sap_server *server = data;
+ 	struct sap_connection *conn = server->conn;
 -	DBusMessage *reply;
--	const char *path;
--	char *type;
-+	struct hdp_channel *chan = data;
-+	const char *path = device_get_path(chan->dev->dev);
+-	DBusMessageIter iter;
+-	DBusMessageIter dict;
+ 	dbus_bool_t connected;
  
+ 	if (!conn)
+-		return message_failed(msg, "Server internal error.");
+-
 -	reply = dbus_message_new_method_return(msg);
--	if (reply == NULL)
+-	if (!reply)
 -		return NULL;
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
- 
+-
 -	dbus_message_iter_init_append(reply, &iter);
-+	return TRUE;
-+}
- 
+-
 -	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
 -			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
 -			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
 -			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
-+static gboolean channel_property_get_application(
-+					const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct hdp_channel *chan = data;
-+	const char *path = chan->app->path;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
++		return FALSE;
  
--	path = device_get_path(chan->dev->dev);
--	dict_append_entry(&dict, "Device", DBUS_TYPE_OBJECT_PATH, &path);
-+	return TRUE;
-+}
- 
--	path = chan->app->path;
--	dict_append_entry(&dict, "Application", DBUS_TYPE_OBJECT_PATH, &path);
-+static gboolean channel_property_get_type(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct hdp_channel *chan = data;
-+	const char *type;
- 
- 	if (chan->config == HDP_RELIABLE_DC)
--		type = g_strdup("Reliable");
-+		type = "Reliable";
- 	else
--		type = g_strdup("Streaming");
+ 	connected = (conn->state == SAP_STATE_CONNECTED ||
+ 				conn->state == SAP_STATE_GRACEFUL_DISCONNECT);
+-	dict_append_entry(&dict, "Connected", DBUS_TYPE_BOOLEAN, &connected);
 -
--	dict_append_entry(&dict, "Type", DBUS_TYPE_STRING, &type);
--
--	g_free(type);
-+		type = "Streaming";
- 
 -	dbus_message_iter_close_container(&iter, &dict);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &type);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &connected);
  
 -	return reply;
 +	return TRUE;
  }
  
- static void hdp_tmp_dc_data_destroy(gpointer data)
-@@ -720,9 +719,6 @@ end:
- }
- 
- static const GDBusMethodTable health_channels_methods[] = {
+ static const GDBusMethodTable server_methods[] = {
 -	{ GDBUS_METHOD("GetProperties",
 -			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
--			channel_get_properties) },
- 	{ GDBUS_ASYNC_METHOD("Acquire",
- 			NULL, GDBUS_ARGS({ "fd", "h" }),
- 			channel_acquire) },
-@@ -730,6 +726,13 @@ static const GDBusMethodTable health_channels_methods[] = {
+-			get_properties) },
+ 	{ GDBUS_METHOD("Disconnect", NULL, NULL, disconnect) },
  	{ }
  };
  
-+static const GDBusPropertyTable health_channels_properties[] = {
-+	{ "Device", "o",  channel_property_get_device },
-+	{ "Application", "o", channel_property_get_application },
-+	{ "Type", "s", channel_property_get_type },
-+	{ }
-+};
-+
- static struct hdp_channel *create_channel(struct hdp_device *dev,
- 						uint8_t config,
- 						struct mcap_mdl *mdl,
-@@ -768,8 +771,9 @@ static struct hdp_channel *create_channel(struct hdp_device *dev,
+-static const GDBusSignalTable server_signals[] = {
+-	{ GDBUS_SIGNAL("PropertyChanged",
+-			GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
++static const GDBusPropertyTable server_properties[] = {
++	{ "Connected", "b", server_property_get_connected },
+ 	{ }
+ };
+ 
+@@ -1411,8 +1388,9 @@ int sap_server_register(const char *path, const bdaddr_t *src)
  
  	if (!g_dbus_register_interface(btd_get_dbus_connection(),
- 					hdp_chann->path, HEALTH_CHANNEL,
--					health_channels_methods, NULL, NULL,
--					hdp_chann, health_channel_destroy)) {
-+					health_channels_methods, NULL,
-+					health_channels_properties, hdp_chann,
-+					health_channel_destroy)) {
- 		g_set_error(err, HDP_ERROR, HDP_UNSPECIFIED_ERROR,
- 					"Can't register the channel interface");
- 		health_channel_destroy(hdp_chann);
+ 					server->path, SAP_SERVER_INTERFACE,
+-					server_methods, server_signals, NULL,
+-					server, destroy_sap_interface)) {
++					server_methods, NULL,
++					server_properties, server,
++					destroy_sap_interface)) {
+ 		error("D-Bus failed to register %s interface",
+ 							SAP_SERVER_INTERFACE);
+ 		goto server_err;
 -- 
 1.7.12.3
 
