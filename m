@@ -1,54 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 18 Oct 2012 20:20:43 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Ludek Finstrle <luf@pzkagis.cz>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] attrib: Fix memleak if att_data_list_alloc fails
+Message-ID: <20121018232043.GA29752@samus>
+References: <CAJdJm_NiL522WPLrV-RiaJKBZeOBBgo_vSzQCwTdZwLZLTw88A@mail.gmail.com>
+ <1350549561-16424-1-git-send-email-luf@pzkagis.cz>
 MIME-Version: 1.0
-In-Reply-To: <1350602001.2026.35.camel@aeonflux>
-References: <1350565311-18330-1-git-send-email-frederic.danis@linux.intel.com>
-	<1350565311-18330-2-git-send-email-frederic.danis@linux.intel.com>
-	<1350602001.2026.35.camel@aeonflux>
-Date: Thu, 18 Oct 2012 21:41:11 -0300
-Message-ID: <CAJdJm_NxX6qJYiRrotGroBAJUne9OrwKSiuxF2aukPaUSt9k=A@mail.gmail.com>
-Subject: Re: [PATCH v6 01/16] doc: Add settings storage documentation
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: =?ISO-8859-1?Q?Fr=E9d=E9ric_Danis?= <frederic.danis@linux.intel.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1350549561-16424-1-git-send-email-luf@pzkagis.cz>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel/Fr=E9d=E9ric,
+Hi,
 
-On Thu, Oct 18, 2012 at 8:13 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
->> +  [0x0001]
->> +  UUID=3D00002800-0000-1000-8000-00805f9b34fb
->> +  Value=3D0018
->> +
->> +  [0x0004]
->> +  UUID=3D00002803-0000-1000-8000-00805f9b34fb
->> +  Value=3D020600002A
->> +
->> +  [0x0006]
->> +  UUID=3D00002a00-0000-1000-8000-00805f9b34fb
->> +  Value=3D4578616D706C6520446576696365
->
-> You need to mention that values are hex encoded strings. Just to be
-> clear here.
->
-> I am not 100% convinced that we want to keep the sections/handles in hex
-> value notation. Is that really a good idea?
+On 10:39 Thu 18 Oct, Ludek Finstrle wrote:
+> Fix for memory leak which was introduced in commit f8619bef3406a2134082dc41c208105fe028c09f.
+> I tested it with older bluez and rebase for git. Please review it.
 
-Alternatively, we could have:
+Patch looks good. I would just re-send it without the last line in the
+commit message.
 
-[Attribute<N>]
-UUID=3D...
-Value=3D...
+But anyway, here's my Ack.
 
-where "<N>" is the attribute value handle (in decimal). The section
-name could then be easily parsed to extract the handle from it.
+> 
+> ---
+>  src/attrib-server.c |   12 +++++++++---
+>  1 files changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/src/attrib-server.c b/src/attrib-server.c
+> index ea27b13..4489edc 100644
+> --- a/src/attrib-server.c
+> +++ b/src/attrib-server.c
+> @@ -490,9 +490,11 @@ static uint16_t read_by_group(struct gatt_channel *channel, uint16_t start,
+>  	length = g_slist_length(groups);
+>  
+>  	adl = att_data_list_alloc(length, last_size + 4);
+> -	if (adl == NULL)
+> +	if (adl == NULL) {
+> +		g_slist_free_full(groups, g_free);
+>  		return enc_error_resp(ATT_OP_READ_BY_GROUP_REQ, start,
+>  					ATT_ECODE_UNLIKELY, pdu, len);
+> +	}
+>  
+>  	for (i = 0, l = groups; l; l = l->next, i++) {
+>  		uint8_t *value;
+> @@ -577,9 +579,11 @@ static uint16_t read_by_type(struct gatt_channel *channel, uint16_t start,
+>  	length += 2;
+>  
+>  	adl = att_data_list_alloc(num, length);
+> -	if (adl == NULL)
+> +	if (adl == NULL) {
+> +		g_slist_free(types);
+>  		return enc_error_resp(ATT_OP_READ_BY_TYPE_REQ, start,
+>  					ATT_ECODE_UNLIKELY, pdu, len);
+> +	}
+>  
+>  	for (i = 0, l = types; l; i++, l = l->next) {
+>  		uint8_t *value;
+> @@ -655,9 +659,11 @@ static uint16_t find_info(struct gatt_channel *channel, uint16_t start,
+>  	}
+>  
+>  	adl = att_data_list_alloc(num, length + 2);
+> -	if (adl == NULL)
+> +	if (adl == NULL) {
+> +		g_slist_free(info);
+>  		return enc_error_resp(ATT_OP_FIND_INFO_REQ, start,
+>  					ATT_ECODE_UNLIKELY, pdu, len);
+> +	}
+>  
+>  	for (i = 0, l = info; l; i++, l = l->next) {
+>  		uint8_t *value;
+> -- 
+> 1.7.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-What do you think?
-
-Regards,
---=20
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Cheers,
+-- 
+Vinicius
