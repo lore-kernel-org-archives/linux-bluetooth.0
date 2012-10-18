@@ -1,43 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 18 Oct 2012 10:33:24 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC BlueZ] adapter: Fix memory leak on discovery cleanup
-Message-ID: <20121018073324.GA2031@x220>
-References: <1350515709-30389-1-git-send-email-anderson.lizardo@openbossa.org>
+Date: Thu, 18 Oct 2012 10:30:56 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	sunnyk@codeaurora.org, marcel@holtmann.org
+Subject: Re: [PATCHv2 04/19] Bluetooth: Lookup channel structure based on DCID
+Message-ID: <20121018073050.GC13545@aemeltch-MOBL1>
+References: <1350430593-23565-1-git-send-email-mathewm@codeaurora.org>
+ <1350430593-23565-5-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1350515709-30389-1-git-send-email-anderson.lizardo@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1350430593-23565-5-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Mat,
 
-On Wed, Oct 17, 2012, Anderson Lizardo wrote:
-> During discovery cleanup, it was attempted to send a DevicesFound()
-> D-Bus signal for pending found devices, but adapter->discovery was set
-> to NULL before calling send_devices_found(), therefore it never sent any
-> signal (and there was a leak of discovery->pending list).
+On Tue, Oct 16, 2012 at 04:36:18PM -0700, Mat Martineau wrote:
+> Processing a move channel request involves getting the channel
+> structure using the destination channel ID.  Previous code could only
+> look up using the source channel ID.
 > 
-> Fixes this memory leak when pairing two LE devices:
-> 
-> ==1822== 8 bytes in 1 blocks are definitely lost in loss record 42 of
-> 246
-> ==1822==    at 0x482BE68: malloc (in
-> /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
-> ==1822==    by 0x48869AA: standard_malloc (gmem.c:85)
-> ==1822==    by 0x4886E42: g_malloc (gmem.c:159)
-> ==1822==    by 0x489B26D: g_slice_alloc (gslice.c:1003)
-> ==1822==    by 0x489C10A: g_slist_prepend (gslist.c:265)
-> ==1822==    by 0x1855AE: adapter_update_found_devices (adapter.c:2846)
-> ==1822==    by 0x191431: btd_event_device_found (event.c:260)
-> ==1822==    by 0xBC01001A: ???
-> ==1822==
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 > ---
->  src/adapter.c |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  net/bluetooth/l2cap_core.c | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index ec2b4d9..b5b849b 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -100,6 +100,22 @@ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn,
+>  	return c;
+>  }
+>  
+> +/* Find channel with given DCID.
+> + * Returns locked channel. */
+> +static struct l2cap_chan *l2cap_get_chan_by_dcid(struct l2cap_conn *conn,
+> +						 u16 cid)
+> +{
+> +	struct l2cap_chan *c;
+> +
+> +	mutex_lock(&conn->chan_lock);
+> +	c = __l2cap_get_chan_by_dcid(conn, cid);
+> +	if (c)
+> +		l2cap_chan_lock(c);
+> +	mutex_unlock(&conn->chan_lock);
+> +
+> +	return c;
+> +}
+> +
+>  static struct l2cap_chan *__l2cap_get_chan_by_ident(struct l2cap_conn *conn,
+>  						    u8 ident)
+>  {
+> @@ -4139,6 +4155,7 @@ static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
+>  					 u16 cmd_len, void *data)
+>  {
+>  	struct l2cap_move_chan_req *req = data;
+> +	struct l2cap_chan *chan;
 
-Applied. Thanks.
+This line seems do not belong to the patch.
 
-Johan
+Best regards 
+Andrei Emeltchenko 
+
+>  	u16 icid = 0;
+>  	u16 result = L2CAP_MR_NOT_ALLOWED;
