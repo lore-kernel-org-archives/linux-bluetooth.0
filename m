@@ -1,58 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jiri Slaby <jslaby@suse.cz>
-To: gregkh@linuxfoundation.org
-Cc: alan@linux.intel.com,
-	linux-kernel@vger.kernel.org,
-	jirislaby@gmail.com,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH 08/21] TTY: hci_ldisc, remove invalid check in open
-Date: Thu, 18 Oct 2012 22:26:34 +0200
-Message-Id: <1350592007-9216-9-git-send-email-jslaby@suse.cz>
-In-Reply-To: <1350592007-9216-1-git-send-email-jslaby@suse.cz>
-References: <1350592007-9216-1-git-send-email-jslaby@suse.cz>
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org,
+	gustavo@padovan.org
+Cc: sunnyk@codeaurora.org,
+	marcel@holtmann.org,
+	andrei.emeltchenko.news@gmail.com
+Subject: [PATCHv3 18/18] Bluetooth: Start channel move when socket option is changed
+Date: Thu, 18 Oct 2012 10:58:50 -0700
+Message-Id: <1350583130-3241-19-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1350583130-3241-1-git-send-email-mathewm@codeaurora.org>
+References: <1350583130-3241-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hci_ldisc's open checks if tty_struct->disc_data is set. And if so it
-returns with an error. But nothing ensures disc_data to be NULL. And
-since ld->ops->open shall be called only once, we do not need the
-check at all. So remove it.
+Channel moves are triggered by changes to the BT_CHANNEL_POLICY
+sockopt when an ERTM or streaming-mode channel is connected.
 
-Note that this is not an issue now, but n_tty will start using the
-disc_data pointer and this invalid 'if' would trigger then rendering
-TTYs over BT unusable.
+Moves are only started if enable_hs is true.
 
-Signed-off-by: Jiri Slaby <jslaby@suse.cz>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/hci_ldisc.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+ include/net/bluetooth/l2cap.h |  1 +
+ net/bluetooth/l2cap_core.c    | 20 ++++++++++++++++++++
+ net/bluetooth/l2cap_sock.c    |  5 +++++
+ 3 files changed, 26 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index c8abce3..ed0fade 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -270,15 +270,10 @@ static int hci_uart_send_frame(struct sk_buff *skb)
-  */
- static int hci_uart_tty_open(struct tty_struct *tty)
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index b4c3c65..49783e9 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -809,5 +809,6 @@ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ void l2cap_chan_del(struct l2cap_chan *chan, int err);
+ void l2cap_send_conn_req(struct l2cap_chan *chan);
++void l2cap_move_start(struct l2cap_chan *chan);
+ 
+ #endif /* __L2CAP_H */
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 8fa46de..b3d3f4f 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4452,6 +4452,26 @@ static void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
+ 	}
+ }
+ 
++void l2cap_move_start(struct l2cap_chan *chan)
++{
++	BT_DBG("chan %p", chan);
++
++	if (chan->local_amp_id == 0) {
++		if (chan->chan_policy != BT_CHANNEL_POLICY_AMP_PREFERRED)
++			return;
++		chan->move_role = L2CAP_MOVE_ROLE_INITIATOR;
++		chan->move_state = L2CAP_MOVE_WAIT_PREPARE;
++		/* Placeholder - start physical link setup */
++	} else {
++		chan->move_role = L2CAP_MOVE_ROLE_INITIATOR;
++		chan->move_state = L2CAP_MOVE_WAIT_RSP_SUCCESS;
++		chan->move_id = 0;
++		l2cap_move_start(chan);
++		l2cap_send_move_chan_req(chan, 0);
++		__set_chan_timer(chan, L2CAP_MOVE_TIMEOUT);
++	}
++}
++
+ static void l2cap_do_create(struct l2cap_chan *chan, int result,
+ 			    u8 local_amp_id, u8 remote_amp_id)
  {
--	struct hci_uart *hu = (void *) tty->disc_data;
-+	struct hci_uart *hu;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 5fae2bd..7cb4d73 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -735,6 +735,11 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 		}
  
- 	BT_DBG("tty %p", tty);
+ 		chan->chan_policy = (u8) opt;
++
++		if (sk->sk_state == BT_CONNECTED &&
++		    chan->move_role == L2CAP_MOVE_ROLE_NONE)
++			l2cap_move_start(chan);
++
+ 		break;
  
--	/* FIXME: This btw is bogus, nothing requires the old ldisc to clear
--	   the pointer */
--	if (hu)
--		return -EEXIST;
--
- 	/* Error if the tty has no write op instead of leaving an exploitable
- 	   hole */
- 	if (tty->ops->write == NULL)
+ 	default:
 -- 
 1.7.12.3
+
+--
+Mat Martineau
+
+Employee of Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, hosted by The Linux Foundation
