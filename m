@@ -5,158 +5,49 @@ To: linux-bluetooth@vger.kernel.org,
 Cc: sunnyk@codeaurora.org,
 	marcel@holtmann.org,
 	andrei.emeltchenko.news@gmail.com
-Subject: [PATCHv3 06/18] Bluetooth: Add new ERTM receive states for channel move
-Date: Thu, 18 Oct 2012 10:58:38 -0700
-Message-Id: <1350583130-3241-7-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv3 08/18] Bluetooth: Add state to hci_chan
+Date: Thu, 18 Oct 2012 10:58:40 -0700
+Message-Id: <1350583130-3241-9-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1350583130-3241-1-git-send-email-mathewm@codeaurora.org>
 References: <1350583130-3241-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Two new states are required to implement channel moves with the ERTM
-receive state machine.
-
-The "WAIT_P" state is used by a move responder to wait for a "poll"
-flag after a move is completed (success or failure).  "WAIT_F" is
-similarly used by a move initiator to wait for a "final" flag when the
-move is completing.  In either state, the reqseq value in the
-poll/final frame tells the state machine exactly which frame should be
-expected next.
+On an AMP controller, hci_chan maps to a logical link.  When a channel
+is being moved, the logical link may or may not be connected already.
+The hci_chan->state is used to determine the existance of a useable
+logical link so the link can be either used or requested.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c | 104 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 104 insertions(+)
+ include/net/bluetooth/hci_core.h | 1 +
+ net/bluetooth/hci_conn.c         | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 42e20ee..ff25bf4 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4706,6 +4706,12 @@ static int l2cap_reassemble_sdu(struct l2cap_chan *chan, struct sk_buff *skb,
- 	return err;
- }
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 9fe8e2d..00abc52 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -355,6 +355,7 @@ struct hci_chan {
+ 	struct hci_conn *conn;
+ 	struct sk_buff_head data_q;
+ 	unsigned int	sent;
++	__u8		state;
+ };
  
-+static int l2cap_resegment(struct l2cap_chan *chan)
-+{
-+	/* Placeholder */
-+	return 0;
-+}
-+
- void l2cap_chan_busy(struct l2cap_chan *chan, int busy)
- {
- 	u8 event;
-@@ -5211,6 +5217,98 @@ static int l2cap_rx_state_srej_sent(struct l2cap_chan *chan,
- 	return err;
- }
+ extern struct list_head hci_dev_list;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index fe64621..6dcf452 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -959,6 +959,7 @@ struct hci_chan *hci_chan_create(struct hci_conn *conn)
  
-+static int l2cap_finish_move(struct l2cap_chan *chan)
-+{
-+	BT_DBG("chan %p", chan);
-+
-+	chan->move_role = L2CAP_MOVE_ROLE_NONE;
-+	chan->rx_state = L2CAP_RX_STATE_RECV;
-+
-+	if (chan->hs_hcon)
-+		chan->conn->mtu = chan->hs_hcon->hdev->block_mtu;
-+	else
-+		chan->conn->mtu = chan->conn->hcon->hdev->acl_mtu;
-+
-+	return l2cap_resegment(chan);
-+}
-+
-+static int l2cap_rx_state_wait_p(struct l2cap_chan *chan,
-+				 struct l2cap_ctrl *control,
-+				 struct sk_buff *skb, u8 event)
-+{
-+	int err;
-+
-+	BT_DBG("chan %p, control %p, skb %p, event %d", chan, control, skb,
-+	       event);
-+
-+	if (!control->poll)
-+		return -EPROTO;
-+
-+	l2cap_process_reqseq(chan, control->reqseq);
-+
-+	if (!skb_queue_empty(&chan->tx_q))
-+		chan->tx_send_head = skb_peek(&chan->tx_q);
-+	else
-+		chan->tx_send_head = NULL;
-+
-+	/* Rewind next_tx_seq to the point expected
-+	 * by the receiver.
-+	 */
-+	chan->next_tx_seq = control->reqseq;
-+	chan->unacked_frames = 0;
-+
-+	err = l2cap_finish_move(chan);
-+	if (err)
-+		return err;
-+
-+	set_bit(CONN_SEND_FBIT, &chan->conn_state);
-+	l2cap_send_i_or_rr_or_rnr(chan);
-+
-+	if (event == L2CAP_EV_RECV_IFRAME)
-+		return -EPROTO;
-+
-+	return l2cap_rx_state_recv(chan, control, NULL, event);
-+}
-+
-+static int l2cap_rx_state_wait_f(struct l2cap_chan *chan,
-+				 struct l2cap_ctrl *control,
-+				 struct sk_buff *skb, u8 event)
-+{
-+	int err;
-+
-+	if (!control->final)
-+		return -EPROTO;
-+
-+	clear_bit(CONN_REMOTE_BUSY, &chan->conn_state);
-+	chan->move_role = L2CAP_MOVE_ROLE_NONE;
-+
-+	chan->rx_state = L2CAP_RX_STATE_RECV;
-+	l2cap_process_reqseq(chan, control->reqseq);
-+
-+	if (!skb_queue_empty(&chan->tx_q))
-+		chan->tx_send_head = skb_peek(&chan->tx_q);
-+	else
-+		chan->tx_send_head = NULL;
-+
-+	/* Rewind next_tx_seq to the point expected
-+	 * by the receiver.
-+	 */
-+	chan->next_tx_seq = control->reqseq;
-+	chan->unacked_frames = 0;
-+
-+	if (chan->hs_hcon)
-+		chan->conn->mtu = chan->hs_hcon->hdev->block_mtu;
-+	else
-+		chan->conn->mtu = chan->conn->hcon->hdev->acl_mtu;
-+
-+	err = l2cap_resegment(chan);
-+
-+	if (!err)
-+		err = l2cap_rx_state_recv(chan, control, skb, event);
-+
-+	return err;
-+}
-+
- static bool __valid_reqseq(struct l2cap_chan *chan, u16 reqseq)
- {
- 	/* Make sure reqseq is for a packet that has been sent but not acked */
-@@ -5237,6 +5335,12 @@ static int l2cap_rx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
- 			err = l2cap_rx_state_srej_sent(chan, control, skb,
- 						       event);
- 			break;
-+		case L2CAP_RX_STATE_WAIT_P:
-+			err = l2cap_rx_state_wait_p(chan, control, skb, event);
-+			break;
-+		case L2CAP_RX_STATE_WAIT_F:
-+			err = l2cap_rx_state_wait_f(chan, control, skb, event);
-+			break;
- 		default:
- 			/* shut it down */
- 			break;
+ 	chan->conn = conn;
+ 	skb_queue_head_init(&chan->data_q);
++	chan->state = BT_CONNECTED;
+ 
+ 	list_add_rcu(&chan->list, &conn->chan_list);
+ 
 -- 
 1.7.12.3
 
