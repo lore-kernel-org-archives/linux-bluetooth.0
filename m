@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH 09/11] update sbcenc for msbc
-Date: Thu, 18 Oct 2012 18:15:09 +0200
-Message-Id: <1350576911-14678-10-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH 08/11] update sbcdec for msbc
+Date: Thu, 18 Oct 2012 18:15:08 +0200
+Message-Id: <1350576911-14678-9-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1350576911-14678-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1350576911-14678-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -14,60 +14,61 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/sbcenc.c |   25 ++++++++++++++++++++-----
- 1 file changed, 20 insertions(+), 5 deletions(-)
+ src/sbcdec.c |   17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/src/sbcenc.c b/src/sbcenc.c
-index a723b03..71ad6bb 100644
---- a/src/sbcenc.c
-+++ b/src/sbcenc.c
-@@ -45,7 +45,7 @@ static int verbose = 0;
- static unsigned char input[BUF_SIZE], output[BUF_SIZE + BUF_SIZE / 4];
+diff --git a/src/sbcdec.c b/src/sbcdec.c
+index 0077a82..37d2e98 100644
+--- a/src/sbcdec.c
++++ b/src/sbcdec.c
+@@ -44,7 +44,7 @@
  
- static void encode(char *filename, int subbands, int bitpool, int joint,
--					int dualchannel, int snr, int blocks)
-+				int dualchannel, int snr, int blocks, int msbc)
+ static int verbose = 0;
+ 
+-static void decode(char *filename, char *output, int tofile)
++static void decode(char *filename, char *output, int tofile, int msbc)
  {
- 	struct au_header au_hdr;
- 	sbc_t sbc;
-@@ -87,7 +87,7 @@ static void encode(char *filename, int subbands, int bitpool, int joint,
- 		goto done;
+ 	unsigned char buf[BUF_SIZE], *stream;
+ 	struct stat st;
+@@ -98,7 +98,7 @@ static void decode(char *filename, char *output, int tofile)
+ 		goto free;
  	}
  
 -	sbc_init(&sbc, 0L);
 +	sbc_init(&sbc, msbc ? SBC_MSBC : 0L);
+ 	sbc.endian = SBC_BE;
  
- 	switch (BE_INT(au_hdr.sample_rate)) {
- 	case 16000:
-@@ -215,6 +215,7 @@ static void usage(void)
+ 	framelen = sbc_decode(&sbc, stream, streamlen, buf, sizeof(buf), &len);
+@@ -228,14 +228,16 @@ static void usage(void)
+ 
  	printf("Options:\n"
  		"\t-h, --help           Display help\n"
- 		"\t-v, --verbose        Verbose mode\n"
+-		"\t-v, --verbose        Verbose mode\n"
+ 		"\t-d, --device <dsp>   Sound device\n"
++		"\t-v, --verbose        Verbose mode\n"
 +		"\t-m, --msbc           mSBC codec\n"
- 		"\t-s, --subbands       Number of subbands to use (4 or 8)\n"
- 		"\t-b, --bitpool        Bitpool value (default is 32)\n"
- 		"\t-j, --joint          Joint stereo\n"
-@@ -227,6 +228,7 @@ static void usage(void)
+ 		"\t-f, --file <file>    Decode to a file\n"
+ 		"\n");
+ }
+ 
  static struct option main_options[] = {
  	{ "help",	0, 0, 'h' },
- 	{ "verbose",	0, 0, 'v' },
 +	{ "msbc",	0, 0, 'm' },
- 	{ "subbands",	1, 0, 's' },
- 	{ "bitpool",	1, 0, 'b' },
- 	{ "joint",	0, 0, 'j' },
-@@ -239,9 +241,9 @@ static struct option main_options[] = {
- int main(int argc, char *argv[])
+ 	{ "device",	1, 0, 'd' },
+ 	{ "verbose",	0, 0, 'v' },
+ 	{ "file",	1, 0, 'f' },
+@@ -246,8 +248,9 @@ int main(int argc, char *argv[])
  {
- 	int i, opt, subbands = 8, bitpool = 32, joint = 0, dualchannel = 0;
--	int snr = 0, blocks = 16;
-+	int snr = 0, blocks = 16, msbc = 0;
+ 	char *output = NULL;
+ 	int i, opt, tofile = 0;
++	int msbc = 0;
  
--	while ((opt = getopt_long(argc, argv, "+hvs:b:jdSB:",
-+	while ((opt = getopt_long(argc, argv, "+hmvs:b:jdSB:",
+-	while ((opt = getopt_long(argc, argv, "+hvd:f:",
++	while ((opt = getopt_long(argc, argv, "+hmvd:f:",
  						main_options, NULL)) != -1) {
  		switch(opt) {
  		case 'h':
-@@ -252,6 +254,10 @@ int main(int argc, char *argv[])
+@@ -258,6 +261,10 @@ int main(int argc, char *argv[])
  			verbose = 1;
  			break;
  
@@ -75,29 +76,18 @@ index a723b03..71ad6bb 100644
 +			msbc = 1;
 +			break;
 +
- 		case 's':
- 			subbands = atoi(optarg);
- 			if (subbands != 8 && subbands != 4) {
-@@ -300,9 +306,18 @@ int main(int argc, char *argv[])
- 		exit(1);
+ 		case 'd':
+ 			free(output);
+ 			output = strdup(optarg);
+@@ -285,7 +292,7 @@ int main(int argc, char *argv[])
  	}
  
-+	if (msbc) {
-+		subbands = 8;
-+		bitpool = 26;
-+		joint = 0;
-+		dualchannel = 0;
-+		snr = 0;
-+		blocks = 15;
-+	}
-+
  	for (i = 0; i < argc; i++)
- 		encode(argv[i], subbands, bitpool, joint, dualchannel,
--								snr, blocks);
-+							snr, blocks, msbc);
+-		decode(argv[i], output ? output : "/dev/dsp", tofile);
++		decode(argv[i], output ? output : "/dev/dsp", tofile, msbc);
  
- 	return 0;
- }
+ 	free(output);
+ 
 -- 
 1.7.9.5
 
