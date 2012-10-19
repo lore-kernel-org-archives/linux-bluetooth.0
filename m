@@ -5,61 +5,49 @@ To: linux-bluetooth@vger.kernel.org,
 Cc: sunnyk@codeaurora.org,
 	marcel@holtmann.org,
 	andrei.emeltchenko.news@gmail.com
-Subject: [PATCHv4 11/18] Bluetooth: Add move confirm response handling
-Date: Fri, 19 Oct 2012 14:34:02 -0700
-Message-Id: <1350682449-24818-12-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv4 08/18] Bluetooth: Add state to hci_chan
+Date: Fri, 19 Oct 2012 14:33:59 -0700
+Message-Id: <1350682449-24818-9-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1350682449-24818-1-git-send-email-mathewm@codeaurora.org>
 References: <1350682449-24818-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The move confirm response concludes the channel move command sequence.
-Receipt of this command indicates that data may begin to flow again.
+On an AMP controller, hci_chan maps to a logical link.  When a channel
+is being moved, the logical link may or may not be connected already.
+The hci_chan->state is used to determine the existance of a useable
+logical link so the link can be either used or requested.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ include/net/bluetooth/hci_core.h | 1 +
+ net/bluetooth/hci_conn.c         | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 0edc955..71afb03 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4658,6 +4658,7 @@ static inline int l2cap_move_channel_confirm_rsp(struct l2cap_conn *conn,
- 						 u16 cmd_len, void *data)
- {
- 	struct l2cap_move_chan_cfm_rsp *rsp = data;
-+	struct l2cap_chan *chan;
- 	u16 icid;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 9fe8e2d..00abc52 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -355,6 +355,7 @@ struct hci_chan {
+ 	struct hci_conn *conn;
+ 	struct sk_buff_head data_q;
+ 	unsigned int	sent;
++	__u8		state;
+ };
  
- 	if (cmd_len != sizeof(*rsp))
-@@ -4667,6 +4668,26 @@ static inline int l2cap_move_channel_confirm_rsp(struct l2cap_conn *conn,
+ extern struct list_head hci_dev_list;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index fe64621..6dcf452 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -959,6 +959,7 @@ struct hci_chan *hci_chan_create(struct hci_conn *conn)
  
- 	BT_DBG("icid 0x%4.4x", icid);
+ 	chan->conn = conn;
+ 	skb_queue_head_init(&chan->data_q);
++	chan->state = BT_CONNECTED;
  
-+	chan = l2cap_get_chan_by_scid(conn, icid);
-+	if (!chan)
-+		return 0;
-+
-+	__clear_chan_timer(chan);
-+
-+	if (chan->move_state == L2CAP_MOVE_WAIT_CONFIRM_RSP) {
-+		chan->move_state = L2CAP_MOVE_STABLE;
-+		chan->local_amp_id = chan->move_id;
-+
-+		if (!chan->local_amp_id && chan->hs_hchan)
-+			__release_logical_link(chan);
-+
-+		l2cap_move_success(chan);
-+
-+		chan->move_role = L2CAP_MOVE_ROLE_NONE;
-+	}
-+
-+	l2cap_chan_unlock(chan);
-+
- 	return 0;
- }
+ 	list_add_rcu(&chan->list, &conn->chan_list);
  
 -- 
 1.7.12.3
