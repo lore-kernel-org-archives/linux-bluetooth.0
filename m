@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v0 13/15] profile: Rename org.bluez.Profile->ProfileAgent
-Date: Fri, 19 Oct 2012 17:39:30 +0200
-Message-Id: <1350661172-18125-14-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v0 08/15] source: Expose internal connection API
+Date: Fri, 19 Oct 2012 17:39:25 +0200
+Message-Id: <1350661172-18125-9-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1350661172-18125-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1350661172-18125-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,249 +12,336 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The interface represents an external component supporting a specific
-profile by implementing an agent. Therefore ProfileAgent is a more
-accurate name for the D-Bus interface.
+Separate the D-Bus code from the internal connection handling code,
+exposing an internal API in case some internal codepath/plugin is
+interested in using it.
 ---
- doc/manager-api.txt      |  3 ++-
- doc/profile-api.txt      | 53 ------------------------------------------------
- doc/profileagent-api.txt | 53 ++++++++++++++++++++++++++++++++++++++++++++++++
- src/bluetooth.conf       |  2 +-
- src/manager.c            |  2 +-
- src/profile.c            | 11 +++++-----
- test/test-profile        |  8 ++++----
- 7 files changed, 67 insertions(+), 65 deletions(-)
- delete mode 100644 doc/profile-api.txt
- create mode 100644 doc/profileagent-api.txt
+ audio/device.h |   3 ++
+ audio/source.c | 146 ++++++++++++++++++++++++++++++++-------------------------
+ audio/source.h |   2 +
+ 3 files changed, 88 insertions(+), 63 deletions(-)
 
-diff --git a/doc/manager-api.txt b/doc/manager-api.txt
-index fe50556..16fe4ee 100644
---- a/doc/manager-api.txt
-+++ b/doc/manager-api.txt
-@@ -29,7 +29,8 @@ Object path	/
- 			Possible errors: org.bluez.Error.InvalidArguments
- 					 org.bluez.Error.NoSuchAdapter
+diff --git a/audio/device.h b/audio/device.h
+index 1e2cac1..41e5635 100644
+--- a/audio/device.h
++++ b/audio/device.h
+@@ -22,6 +22,7 @@
+  *
+  */
  
--		void RegisterProfile(object profile, string uuid, dict options)
-+		void RegisterProfileAgent(object profile, string uuid,
-+								dict options)
++struct audio_device;
+ struct source;
+ struct control;
+ struct target;
+@@ -30,6 +31,8 @@ struct headset;
+ struct gateway;
+ struct dev_priv;
  
- 			This registers a profile implementation.
++typedef void (*audio_device_cb) (struct audio_device *dev, int err, void *data);
++
+ struct audio_device {
+ 	struct btd_device *btd_dev;
  
-diff --git a/doc/profile-api.txt b/doc/profile-api.txt
-deleted file mode 100644
-index 639202f..0000000
---- a/doc/profile-api.txt
-+++ /dev/null
-@@ -1,53 +0,0 @@
--BlueZ D-Bus Profile API description
--***********************************
--
--Copyright (C) 2012  Intel Corporation. All rights reserved.
--
--
--Profile hierarchy
--=================
--
--Service		unique name
--Interface	org.bluez.Profile
--Object path	freely definable
--
--Methods		void Release()
--
--			This method gets called when the service daemon
--			unregisters the profile. A profile can use it to do
--			cleanup tasks. There is no need to unregister the
--			profile, because when this method gets called it has
--			already been unregistered.
--
--		void NewConnection(object device, fd)
--
--			This method gets called when a new service level
--			connection has been made and authorized.
--
--			Possible errors: org.bluez.Error.Rejected
--			                 org.bluez.Error.Canceled
--
--		void RequestDisconnection(object device)
--
--			This method gets called when a profile gets
--			disconnected.
--
--			The file descriptor is no longer owned by the service
--			daemon and the profile implementation needs to take
--			care of cleaning up all connections.
--
--			If multiple file descriptors are indicated via
--			NewConnection, it is expected that all of them
--			are disconnected before returning from this
--			method call.
--
--			Possible errors: org.bluez.Error.Rejected
--			                 org.bluez.Error.Canceled
--
--		void Cancel()
--
--			This method gets called to indicate that the profile
--			request failed before a reply was returned.
--
--			All request are queued and there will be only one
--			pending pequest at a time per profile.
-diff --git a/doc/profileagent-api.txt b/doc/profileagent-api.txt
-new file mode 100644
-index 0000000..8a27a01
---- /dev/null
-+++ b/doc/profileagent-api.txt
-@@ -0,0 +1,53 @@
-+BlueZ D-Bus Profile API description
-+***********************************
-+
-+Copyright (C) 2012  Intel Corporation. All rights reserved.
-+
-+
-+Profile hierarchy
-+=================
-+
-+Service		unique name
-+Interface	org.bluez.ProfileAgent
-+Object path	freely definable
-+
-+Methods		void Release()
-+
-+			This method gets called when the service daemon
-+			unregisters the profile. A profile can use it to do
-+			cleanup tasks. There is no need to unregister the
-+			profile, because when this method gets called it has
-+			already been unregistered.
-+
-+		void NewConnection(object device, fd)
-+
-+			This method gets called when a new service level
-+			connection has been made and authorized.
-+
-+			Possible errors: org.bluez.Error.Rejected
-+			                 org.bluez.Error.Canceled
-+
-+		void RequestDisconnection(object device)
-+
-+			This method gets called when a profile gets
-+			disconnected.
-+
-+			The file descriptor is no longer owned by the service
-+			daemon and the profile implementation needs to take
-+			care of cleaning up all connections.
-+
-+			If multiple file descriptors are indicated via
-+			NewConnection, it is expected that all of them
-+			are disconnected before returning from this
-+			method call.
-+
-+			Possible errors: org.bluez.Error.Rejected
-+			                 org.bluez.Error.Canceled
-+
-+		void Cancel()
-+
-+			This method gets called to indicate that the profile
-+			request failed before a reply was returned.
-+
-+			All request are queued and there will be only one
-+			pending pequest at a time per profile.
-diff --git a/src/bluetooth.conf b/src/bluetooth.conf
-index 2db43d9..49dafc8 100644
---- a/src/bluetooth.conf
-+++ b/src/bluetooth.conf
-@@ -17,7 +17,7 @@
-     <allow send_interface="org.bluez.Watcher"/>
-     <allow send_interface="org.bluez.ThermometerWatcher"/>
-     <allow send_interface="org.bluez.AlertAgent"/>
--    <allow send_interface="org.bluez.Profile"/>
-+    <allow send_interface="org.bluez.ProfileAgent"/>
-     <allow send_interface="org.bluez.HeartRateWatcher"/>
-   </policy>
+diff --git a/audio/source.c b/audio/source.c
+index 04971d9..e48e308 100644
+--- a/audio/source.c
++++ b/audio/source.c
+@@ -53,7 +53,8 @@
+ #define STREAM_SETUP_RETRY_TIMER 2
  
-diff --git a/src/manager.c b/src/manager.c
-index a96115b..1dc1c54 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -163,7 +163,7 @@ static const GDBusMethodTable manager_methods[] = {
- 			GDBUS_ARGS({ "pattern", "s" }),
- 			GDBUS_ARGS({ "adapter", "o" }),
- 			find_adapter) },
--	{ GDBUS_METHOD("RegisterProfile",
-+	{ GDBUS_METHOD("RegisterProfileAgent",
- 			GDBUS_ARGS({ "profile", "o"}, { "UUID", "s" },
- 						{ "options", "a{sv}" }),
- 			NULL, btd_profile_reg_ext) },
-diff --git a/src/profile.c b/src/profile.c
-index eb63e1e..7e7c945 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -157,7 +157,8 @@ static void ext_cancel(struct ext_profile *ext)
- 	DBusMessage *msg;
+ struct pending_request {
+-	DBusMessage *msg;
++	audio_device_cb cb;
++	void *cb_data;
+ 	unsigned int id;
+ };
  
- 	msg = dbus_message_new_method_call(ext->owner, ext->path,
--						"org.bluez.Profile", "Cancel");
-+						"org.bluez.ProfileAgent",
-+						"Cancel");
- 	if (msg)
- 		g_dbus_send_message(btd_get_dbus_connection(), msg);
+@@ -152,10 +153,12 @@ static void avdtp_state_callback(struct audio_device *dev,
  }
-@@ -274,8 +275,8 @@ static bool send_new_connection(struct ext_profile *ext, struct ext_io *conn,
- 	int fd;
  
- 	msg = dbus_message_new_method_call(ext->owner, ext->path,
--							"org.bluez.Profile",
--							"NewConnection");
-+						"org.bluez.ProfileAgent",
-+						"NewConnection");
- 	if (!msg) {
- 		error("Unable to create NewConnection call for %s", ext->name);
- 		return false;
-@@ -1108,8 +1109,8 @@ void btd_profile_cleanup(void)
- 		ext->conns = NULL;
+ static void pending_request_free(struct audio_device *dev,
+-					struct pending_request *pending)
++					struct pending_request *pending,
++					int err)
+ {
+-	if (pending->msg)
+-		dbus_message_unref(pending->msg);
++	if (pending->cb)
++		pending->cb(dev, err, pending->cb_data);
++
+ 	if (pending->id)
+ 		a2dp_cancel(dev, pending->id);
  
- 		msg = dbus_message_new_method_call(ext->owner, ext->path,
--							"org.bluez.Profile",
--							"Release");
-+						"org.bluez.ProfileAgent",
-+						"Release");
- 		if (msg)
- 			g_dbus_send_message(conn, msg);
+@@ -177,15 +180,12 @@ static void stream_state_changed(struct avdtp_stream *stream,
+ 	switch (new_state) {
+ 	case AVDTP_STATE_IDLE:
+ 		if (source->disconnect) {
+-			DBusMessage *reply;
+ 			struct pending_request *p;
  
-diff --git a/test/test-profile b/test/test-profile
-index 2d66444..cfc9331 100755
---- a/test/test-profile
-+++ b/test/test-profile
-@@ -12,18 +12,18 @@ import dbus.mainloop.glib
- from optparse import OptionParser, make_option
+ 			p = source->disconnect;
+ 			source->disconnect = NULL;
  
- class Profile(dbus.service.Object):
--	@dbus.service.method("org.bluez.Profile",
-+	@dbus.service.method("org.bluez.ProfileAgent",
- 					in_signature="", out_signature="")
- 	def Release(self):
- 		print("Release")
- 		mainloop.quit()
+-			reply = dbus_message_new_method_return(p->msg);
+-			g_dbus_send_message(btd_get_dbus_connection(), reply);
+-			pending_request_free(dev, p);
++			pending_request_free(dev, p, 0);
+ 		}
  
--	@dbus.service.method("org.bluez.Profile",
-+	@dbus.service.method("org.bluez.ProfileAgent",
- 					in_signature="", out_signature="")
- 	def Cancel(self):
- 		print("Cancel")
+ 		if (source->session) {
+@@ -211,35 +211,24 @@ static void stream_state_changed(struct avdtp_stream *stream,
+ 	source->stream_state = new_state;
+ }
  
--	@dbus.service.method("org.bluez.Profile",
-+	@dbus.service.method("org.bluez.ProfileAgent",
- 					in_signature="oh", out_signature="")
- 	def NewConnection(self, path, fd):
- 		fd = fd.take()
-@@ -84,6 +84,6 @@ if __name__ == '__main__':
- 	if (options.channel):
- 		opts["Channel"] = dbus.UInt16(options.channel)
+-static void error_failed(DBusMessage *msg,
+-							const char *desc)
+-{
+-	DBusMessage *reply = btd_error_failed(msg, desc);
+-	g_dbus_send_message(btd_get_dbus_connection(), reply);
+-}
+-
+ static gboolean stream_setup_retry(gpointer user_data)
+ {
+ 	struct source *source = user_data;
+ 	struct pending_request *pending = source->connect;
++	int err;
  
--	manager.RegisterProfile(options.path, options.uuid, opts)
-+	manager.RegisterProfileAgent(options.path, options.uuid, opts)
+ 	source->retry_id = 0;
  
- 	mainloop.run()
+ 	if (source->stream_state >= AVDTP_STATE_OPEN) {
+ 		DBG("Stream successfully created, after XCASE connect:connect");
+-		if (pending->msg) {
+-			DBusMessage *reply;
+-			reply = dbus_message_new_method_return(pending->msg);
+-			g_dbus_send_message(btd_get_dbus_connection(), reply);
+-		}
++		err = 0;
+ 	} else {
+ 		DBG("Stream setup failed, after XCASE connect:connect");
+-		if (pending->msg)
+-			error_failed(pending->msg, "Stream setup failed");
++		err = -EIO;
+ 	}
+ 
+ 	source->connect = NULL;
+-	pending_request_free(source->dev, pending);
++	pending_request_free(source->dev, pending, err);
+ 
+ 	return FALSE;
+ }
+@@ -258,14 +247,8 @@ static void stream_setup_complete(struct avdtp *session, struct a2dp_sep *sep,
+ 	if (stream) {
+ 		DBG("Stream successfully created");
+ 
+-		if (pending->msg) {
+-			DBusMessage *reply;
+-			reply = dbus_message_new_method_return(pending->msg);
+-			g_dbus_send_message(btd_get_dbus_connection(), reply);
+-		}
+-
+ 		source->connect = NULL;
+-		pending_request_free(source->dev, pending);
++		pending_request_free(source->dev, pending, 0);
+ 
+ 		return;
+ 	}
+@@ -279,10 +262,8 @@ static void stream_setup_complete(struct avdtp *session, struct a2dp_sep *sep,
+ 							stream_setup_retry,
+ 							source);
+ 	} else {
+-		if (pending->msg)
+-			error_failed(pending->msg, "Stream setup failed");
+ 		source->connect = NULL;
+-		pending_request_free(source->dev, pending);
++		pending_request_free(source->dev, pending, -EIO);
+ 		DBG("Stream setup failed : %s", avdtp_strerror(err));
+ 	}
+ }
+@@ -309,9 +290,7 @@ static void select_complete(struct avdtp *session, struct a2dp_sep *sep,
+ 	return;
+ 
+ failed:
+-	if (pending->msg)
+-		error_failed(pending->msg, "Stream setup failed");
+-	pending_request_free(source->dev, pending);
++	pending_request_free(source->dev, pending, -EIO);
+ 	source->connect = NULL;
+ 	avdtp_unref(source->session);
+ 	source->session = NULL;
+@@ -352,9 +331,7 @@ static void discovery_complete(struct avdtp *session, GSList *seps, struct avdtp
+ 	return;
+ 
+ failed:
+-	if (pending->msg)
+-		error_failed(pending->msg, "Stream setup failed");
+-	pending_request_free(source->dev, pending);
++	pending_request_free(source->dev, pending, -EIO);
+ 	source->connect = NULL;
+ 	avdtp_unref(source->session);
+ 	source->session = NULL;
+@@ -379,71 +356,114 @@ gboolean source_setup_stream(struct source *source, struct avdtp *session)
+ 	return TRUE;
+ }
+ 
++static void generic_cb(struct audio_device *dev, int err, void *data)
++{
++	DBusMessage *msg = data;
++	DBusMessage *reply;
++
++	if (err < 0) {
++		reply = btd_error_failed(msg, strerror(-err));
++		g_dbus_send_message(btd_get_dbus_connection(), reply);
++		dbus_message_unref(msg);
++		return;
++	}
++
++	g_dbus_send_reply(btd_get_dbus_connection(), msg, DBUS_TYPE_INVALID);
++
++	dbus_message_unref(msg);
++}
++
+ static DBusMessage *local_connect(DBusConnection *conn,
+ 				DBusMessage *msg, void *data)
+ {
+ 	struct audio_device *dev = data;
++	int err;
++
++	err = source_connect(dev, generic_cb, msg);
++	if (err < 0)
++		return btd_error_failed(msg, strerror(-err));
++
++	dbus_message_ref(msg);
++
++	return NULL;
++}
++
++int source_connect(struct audio_device *dev, audio_device_cb cb, void *data)
++{
+ 	struct source *source = dev->source;
+ 	struct pending_request *pending;
+ 
+ 	if (!source->session)
+ 		source->session = avdtp_get(&dev->src, &dev->dst);
+ 
+-	if (!source->session)
+-		return btd_error_failed(msg, "Unable to get a session");
++	if (!source->session) {
++		DBG("Unable to get a session");
++		return -EIO;
++	}
+ 
+ 	if (source->connect || source->disconnect)
+-		return btd_error_busy(msg);
++		return -EBUSY;
+ 
+ 	if (source->stream_state >= AVDTP_STATE_OPEN)
+-		return btd_error_already_connected(msg);
++		return -EALREADY;
+ 
+-	if (!source_setup_stream(source, NULL))
+-		return btd_error_failed(msg, "Failed to create a stream");
++	if (!source_setup_stream(source, NULL)) {
++		DBG("Failed to create a stream");
++		return -EIO;
++	}
+ 
+ 	dev->auto_connect = FALSE;
+ 
+ 	pending = source->connect;
+-
+-	pending->msg = dbus_message_ref(msg);
++	pending->cb = cb;
++	pending->cb_data = data;
+ 
+ 	DBG("stream creation in progress");
+ 
+-	return NULL;
++	return 0;
+ }
+ 
+ static DBusMessage *local_disconnect(DBusConnection *conn,
+ 					DBusMessage *msg, void *data)
+ {
++	struct audio_device *dev = data;
++	int err;
++
++	err = source_disconnect(dev, generic_cb, msg);
++	if (err < 0)
++		return btd_error_failed(msg, strerror(-err));
++
++	dbus_message_ref(msg);
++
++	return NULL;
++}
++
++int source_disconnect(struct audio_device *dev, audio_device_cb cb, void *data)
++{
+ 	struct audio_device *device = data;
+ 	struct source *source = device->source;
+ 	struct pending_request *pending;
+ 	int err;
+ 
+ 	if (!source->session)
+-		return btd_error_not_connected(msg);
++		return -ENOTCONN;
+ 
+ 	if (source->connect || source->disconnect)
+-		return btd_error_busy(msg);
++		return -EBUSY;
+ 
+-	if (source->stream_state < AVDTP_STATE_OPEN) {
+-		DBusMessage *reply = dbus_message_new_method_return(msg);
+-		if (!reply)
+-			return NULL;
+-		avdtp_unref(source->session);
+-		source->session = NULL;
+-		return reply;
+-	}
++	if (source->stream_state < AVDTP_STATE_OPEN)
++		return -ENOTCONN;
+ 
+ 	err = avdtp_close(source->session, source->stream, FALSE);
+ 	if (err < 0)
+-		return btd_error_failed(msg, strerror(-err));
++		return err;
+ 
+ 	pending = g_new0(struct pending_request, 1);
+-	pending->msg = dbus_message_ref(msg);
++	pending->cb = cb;
++	pending->cb_data = data;
+ 	source->disconnect = pending;
+ 
+-	return NULL;
++	return 0;
+ }
+ 
+ static DBusMessage *local_get_properties(DBusConnection *conn,
+@@ -504,10 +524,10 @@ static void source_free(struct audio_device *dev)
+ 		avdtp_unref(source->session);
+ 
+ 	if (source->connect)
+-		pending_request_free(dev, source->connect);
++		pending_request_free(dev, source->connect, -ECANCELED);
+ 
+ 	if (source->disconnect)
+-		pending_request_free(dev, source->disconnect);
++		pending_request_free(dev, source->disconnect, -ECANCELED);
+ 
+ 	if (source->retry_id)
+ 		g_source_remove(source->retry_id);
+diff --git a/audio/source.h b/audio/source.h
+index 695bded..dadb392 100644
+--- a/audio/source.h
++++ b/audio/source.h
+@@ -44,6 +44,8 @@ struct source *source_init(struct audio_device *dev);
+ void source_unregister(struct audio_device *dev);
+ gboolean source_is_active(struct audio_device *dev);
+ source_state_t source_get_state(struct audio_device *dev);
++int source_connect(struct audio_device *dev, audio_device_cb cb, void *data);
++int source_disconnect(struct audio_device *dev, audio_device_cb cb, void *data);
+ gboolean source_new_stream(struct audio_device *dev, struct avdtp *session,
+ 				struct avdtp_stream *stream);
+ gboolean source_setup_stream(struct source *source, struct avdtp *session);
 -- 
 1.7.11.7
 
