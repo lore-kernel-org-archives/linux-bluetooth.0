@@ -4,146 +4,57 @@ To: linux-bluetooth@vger.kernel.org,
 	gustavo@padovan.org
 Cc: sunnyk@codeaurora.org,
 	marcel@holtmann.org,
-	andrei.emeltchenko.news@gmail.com,
-	Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Subject: [PATCHv4 02/18] Bluetooth: Add L2CAP create channel request handling
-Date: Fri, 19 Oct 2012 14:33:53 -0700
-Message-Id: <1350682449-24818-3-git-send-email-mathewm@codeaurora.org>
-In-Reply-To: <1350682449-24818-1-git-send-email-mathewm@codeaurora.org>
-References: <1350682449-24818-1-git-send-email-mathewm@codeaurora.org>
+	andrei.emeltchenko.news@gmail.com
+Subject: [PATCHv4 00/18] L2CAP signaling for AMP channel create/move
+Date: Fri, 19 Oct 2012 14:33:51 -0700
+Message-Id: <1350682449-24818-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The L2CAP create channel request is very similar to an L2CAP connect
-request, but it has an additional parameter for the controller ID.  If
-the controller id is 0, the channel is set up on the BR/EDR controller
-(just like a connect request).  Using a valid high speed controller ID
-will cause the channel to be initially created on that high speed
-controller.  While the L2CAP data will be initially routed over the
-AMP controller, the L2CAP fixed signaling channel only uses BR/EDR.
+Here are the changes that process commands on the L2CAP signaling
+channel for setting up AMP channels.  There's still a lot of
+integration to do as other AMP functionality is implemented.  I've
+marked places that require this integration with "Placeholder"
+comments (look for that string).
 
-When a create channel request is received for a high speed controller,
-a pending response is always sent first.  After the high speed
-physical and logical links are complete a success response will be
-sent.
+Changes:
+  * PATCHv4 - More acks, several code organization fixups to patch 10.
+              send_move_chan_* helper functions are now more helpful.
+  * PATCHv3 - Dropped patch 17, fixed style issues in 5, 7, and 9.
+              Split up a large function in patch 10.
+  * PATCHv2 - Fixed formatting and style issues, added acks
+  * PATCHv1 - Rebased after AMP physical link patch set, incorporated
+              mailing list feedback.
+  * RFCv1 - Finished commit messages, fixed formatting/style issues
+  * RFCv0 - Initial post
 
-Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/l2cap_core.c | 62 +++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 47 insertions(+), 15 deletions(-)
+Mat Martineau (18):
+  Bluetooth: Add new l2cap_chan struct members for high speed channels
+  Bluetooth: Add L2CAP create channel request handling
+  Bluetooth: Remove unnecessary intermediate function
+  Bluetooth: Lookup channel structure based on DCID
+  Bluetooth: Channel move request handling
+  Bluetooth: Add new ERTM receive states for channel move
+  Bluetooth: Add move channel confirm handling
+  Bluetooth: Add state to hci_chan
+  Bluetooth: Move channel response
+  Bluetooth: Add logical link confirm
+  Bluetooth: Add move confirm response handling
+  Bluetooth: Handle physical link completion
+  Bluetooth: Flag ACL frames as complete for AMP controllers
+  Bluetooth: Do not send data during channel move
+  Bluetooth: Configure appropriate timeouts for AMP controllers
+  Bluetooth: Ignore BR/EDR packet size constraints when fragmenting for
+    AMP
+  Bluetooth: Do not retransmit data during a channel move
+  Bluetooth: Start channel move when socket option is changed
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f8d78f5..73ce337 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3400,8 +3400,9 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn,
- 	return 0;
- }
- 
--static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
--			  u8 *data, u8 rsp_code, u8 amp_id)
-+static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
-+					struct l2cap_cmd_hdr *cmd,
-+					u8 *data, u8 rsp_code, u8 amp_id)
- {
- 	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
- 	struct l2cap_conn_rsp rsp;
-@@ -3452,6 +3453,7 @@ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
- 	bacpy(&bt_sk(sk)->dst, conn->dst);
- 	chan->psm  = psm;
- 	chan->dcid = scid;
-+	chan->local_amp_id = amp_id;
- 
- 	__l2cap_chan_add(conn, chan);
- 
-@@ -3469,8 +3471,16 @@ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
- 				status = L2CAP_CS_AUTHOR_PEND;
- 				chan->ops->defer(chan);
- 			} else {
--				__l2cap_state_change(chan, BT_CONFIG);
--				result = L2CAP_CR_SUCCESS;
-+				/* Force pending result for AMP controllers.
-+				 * The connection will succeed after the
-+				 * physical link is up. */
-+				if (amp_id) {
-+					__l2cap_state_change(chan, BT_CONNECT2);
-+					result = L2CAP_CR_PEND;
-+				} else {
-+					__l2cap_state_change(chan, BT_CONFIG);
-+					result = L2CAP_CR_SUCCESS;
-+				}
- 				status = L2CAP_CS_NO_INFO;
- 			}
- 		} else {
-@@ -3516,6 +3526,8 @@ sendresp:
- 			       l2cap_build_conf_req(chan, buf), buf);
- 		chan->num_conf_req++;
- 	}
-+
-+	return chan;
- }
- 
- static int l2cap_connect_req(struct l2cap_conn *conn,
-@@ -4028,12 +4040,12 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn,
- 	return 0;
- }
- 
--static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
--					   struct l2cap_cmd_hdr *cmd,
--					   u16 cmd_len, void *data)
-+static int l2cap_create_channel_req(struct l2cap_conn *conn,
-+				    struct l2cap_cmd_hdr *cmd,
-+				    u16 cmd_len, void *data)
- {
- 	struct l2cap_create_chan_req *req = data;
--	struct l2cap_create_chan_rsp rsp;
-+	struct l2cap_chan *chan;
- 	u16 psm, scid;
- 
- 	if (cmd_len != sizeof(*req))
-@@ -4047,14 +4059,34 @@ static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
- 
- 	BT_DBG("psm 0x%2.2x, scid 0x%4.4x, amp_id %d", psm, scid, req->amp_id);
- 
--	/* Placeholder: Always reject */
--	rsp.dcid = 0;
--	rsp.scid = cpu_to_le16(scid);
--	rsp.result = __constant_cpu_to_le16(L2CAP_CR_NO_MEM);
--	rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
-+	if (req->amp_id) {
-+		struct hci_dev *hdev;
- 
--	l2cap_send_cmd(conn, cmd->ident, L2CAP_CREATE_CHAN_RSP,
--		       sizeof(rsp), &rsp);
-+		/* Validate AMP controller id */
-+		hdev = hci_dev_get(req->amp_id);
-+		if (!hdev || hdev->dev_type != HCI_AMP ||
-+		    !test_bit(HCI_UP, &hdev->flags)) {
-+			struct l2cap_create_chan_rsp rsp;
-+
-+			rsp.dcid = 0;
-+			rsp.scid = cpu_to_le16(scid);
-+			rsp.result = __constant_cpu_to_le16(L2CAP_CR_BAD_AMP);
-+			rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
-+
-+			l2cap_send_cmd(conn, cmd->ident, L2CAP_CREATE_CHAN_RSP,
-+				       sizeof(rsp), &rsp);
-+
-+			if (hdev)
-+				hci_dev_put(hdev);
-+
-+			return 0;
-+		}
-+
-+		hci_dev_put(hdev);
-+	}
-+
-+	chan = l2cap_connect(conn, cmd, data, L2CAP_CREATE_CHAN_RSP,
-+			     req->amp_id);
- 
- 	return 0;
- }
+ include/net/bluetooth/hci_core.h |   1 +
+ include/net/bluetooth/l2cap.h    |  32 ++
+ net/bluetooth/hci_conn.c         |   1 +
+ net/bluetooth/l2cap_core.c       | 960 ++++++++++++++++++++++++++++++++++++---
+ net/bluetooth/l2cap_sock.c       |   5 +
+ 5 files changed, 943 insertions(+), 56 deletions(-)
+
 -- 
 1.7.12.3
 
