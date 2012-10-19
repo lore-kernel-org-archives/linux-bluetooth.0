@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/6] Bluetooth: Fix HCI command sending when powering on LE-only adapters
-Date: Fri, 19 Oct 2012 20:15:10 +0300
-Message-Id: <1350666911-6334-6-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 4/6] Bluetooth: Add setting of the LE event mask
+Date: Fri, 19 Oct 2012 20:15:09 +0300
+Message-Id: <1350666911-6334-5-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1350666911-6334-1-git-send-email-johan.hedberg@gmail.com>
 References: <1350666911-6334-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,67 +11,60 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch makes sure that we don't send BR/EDR-only commands for
-LE-only adapters when they get powered on. Doing this would just cause
-command errors.
+This patch adds setting of the LE event mask to the HCI init procedure
+for LE-capable controllers. Right now we only set the default mask which
+is good enough for the events available in the 4.0 core specification.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |   34 +++++++++++++++++++++-------------
- 1 file changed, 21 insertions(+), 13 deletions(-)
+ net/bluetooth/hci_event.c |   20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index e6d8f73..3fe74f4 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2872,6 +2872,21 @@ static void settings_rsp(struct pending_cmd *cmd, void *data)
- 	mgmt_pending_free(cmd);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index f4f0b8b..78f1af5 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -550,6 +550,13 @@ static void hci_setup_event_mask(struct hci_dev *hdev)
+ 		events[7] |= 0x20;	/* LE Meta-Event */
+ 
+ 	hci_send_cmd(hdev, HCI_OP_SET_EVENT_MASK, sizeof(events), events);
++
++	if (lmp_le_capable(hdev)) {
++		memset(events, 0, sizeof(events));
++		events[0] = 0x1f;
++		hci_send_cmd(hdev, HCI_OP_LE_SET_EVENT_MASK,
++			     sizeof(events), events);
++	}
  }
  
-+static int set_bredr_scan(struct hci_dev *hdev)
+ static void bredr_init(struct hci_dev *hdev)
+@@ -1066,6 +1073,15 @@ static void hci_cc_le_read_buffer_size(struct hci_dev *hdev,
+ 	hci_req_complete(hdev, HCI_OP_LE_READ_BUFFER_SIZE, rp->status);
+ }
+ 
++static void hci_cc_le_set_event_mask(struct hci_dev *hdev, struct sk_buff *skb)
 +{
-+	u8 scan = 0;
++	__u8 status = *((__u8 *) skb->data);
 +
-+	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
-+		scan |= SCAN_PAGE;
-+	if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
-+		scan |= SCAN_INQUIRY;
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
 +
-+	if (!scan)
-+		return 0;
-+
-+	return hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
++	hci_req_complete(hdev, HCI_OP_LE_SET_EVENT_MASK, status);
 +}
 +
- int mgmt_powered(struct hci_dev *hdev, u8 powered)
+ static void hci_cc_user_confirm_reply(struct hci_dev *hdev, struct sk_buff *skb)
  {
- 	struct cmd_lookup match = { NULL, hdev };
-@@ -2883,19 +2898,12 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
- 	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
+ 	struct hci_rp_user_confirm_reply *rp = (void *) skb->data;
+@@ -2489,6 +2505,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cc_le_read_buffer_size(hdev, skb);
+ 		break;
  
- 	if (powered) {
--		u8 scan = 0;
--
--		if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
--			scan |= SCAN_PAGE;
--		if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
--			scan |= SCAN_INQUIRY;
--
--		if (scan)
--			hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
--
--		update_class(hdev);
--		update_name(hdev, hdev->dev_name);
--		update_eir(hdev);
-+		if (lmp_bredr_capable(hdev)) {
-+			set_bredr_scan(hdev);
-+			update_class(hdev);
-+			update_name(hdev, hdev->dev_name);
-+			update_eir(hdev);
-+		}
- 	} else {
- 		u8 status = MGMT_STATUS_NOT_POWERED;
- 		mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
++	case HCI_OP_LE_SET_EVENT_MASK:
++		hci_cc_le_set_event_mask(hdev, skb);
++		break;
++
+ 	case HCI_OP_USER_CONFIRM_REPLY:
+ 		hci_cc_user_confirm_reply(hdev, skb);
+ 		break;
 -- 
 1.7.10.4
 
