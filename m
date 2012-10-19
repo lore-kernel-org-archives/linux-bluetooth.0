@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/5 v2] Bluetooth: Fix HCI command sending when powering on LE-only adapters
-Date: Fri, 19 Oct 2012 20:57:48 +0300
-Message-Id: <1350669469-7719-5-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/5 v2] Bluetooth: Fix LE MTU reporting for HCIGETDEVINFO
+Date: Fri, 19 Oct 2012 20:57:46 +0300
+Message-Id: <1350669469-7719-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1350669469-7719-1-git-send-email-johan.hedberg@gmail.com>
 References: <1350669469-7719-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,68 +11,40 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch makes sure that we don't send BR/EDR-only commands for
-LE-only adapters when they get powered on. Doing this would just cause
-command errors.
+This patch fixes the use of le_mtu and le_pkts values in the
+HCIGETDEVINFO ioctl for LE-only controllers.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c |   34 +++++++++++++++++++++-------------
- 1 file changed, 21 insertions(+), 13 deletions(-)
+ net/bluetooth/hci_core.c |   15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index e6d8f73..3fe74f4 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2872,6 +2872,21 @@ static void settings_rsp(struct pending_cmd *cmd, void *data)
- 	mgmt_pending_free(cmd);
- }
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index dd05ed0..487308b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -990,10 +990,17 @@ int hci_get_dev_info(void __user *arg)
+ 	di.type     = (hdev->bus & 0x0f) | (hdev->dev_type << 4);
+ 	di.flags    = hdev->flags;
+ 	di.pkt_type = hdev->pkt_type;
+-	di.acl_mtu  = hdev->acl_mtu;
+-	di.acl_pkts = hdev->acl_pkts;
+-	di.sco_mtu  = hdev->sco_mtu;
+-	di.sco_pkts = hdev->sco_pkts;
++	if (lmp_bredr_capable(hdev)) {
++		di.acl_mtu  = hdev->acl_mtu;
++		di.acl_pkts = hdev->acl_pkts;
++		di.sco_mtu  = hdev->sco_mtu;
++		di.sco_pkts = hdev->sco_pkts;
++	} else {
++		di.acl_mtu  = hdev->le_mtu;
++		di.acl_pkts = hdev->le_pkts;
++		di.sco_mtu  = 0;
++		di.sco_pkts = 0;
++	}
+ 	di.link_policy = hdev->link_policy;
+ 	di.link_mode   = hdev->link_mode;
  
-+static int set_bredr_scan(struct hci_dev *hdev)
-+{
-+	u8 scan = 0;
-+
-+	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
-+		scan |= SCAN_PAGE;
-+	if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
-+		scan |= SCAN_INQUIRY;
-+
-+	if (!scan)
-+		return 0;
-+
-+	return hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
-+}
-+
- int mgmt_powered(struct hci_dev *hdev, u8 powered)
- {
- 	struct cmd_lookup match = { NULL, hdev };
-@@ -2883,19 +2898,12 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
- 	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
- 
- 	if (powered) {
--		u8 scan = 0;
--
--		if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
--			scan |= SCAN_PAGE;
--		if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
--			scan |= SCAN_INQUIRY;
--
--		if (scan)
--			hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
--
--		update_class(hdev);
--		update_name(hdev, hdev->dev_name);
--		update_eir(hdev);
-+		if (lmp_bredr_capable(hdev)) {
-+			set_bredr_scan(hdev);
-+			update_class(hdev);
-+			update_name(hdev, hdev->dev_name);
-+			update_eir(hdev);
-+		}
- 	} else {
- 		u8 status = MGMT_STATUS_NOT_POWERED;
- 		mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
 -- 
 1.7.10.4
 
