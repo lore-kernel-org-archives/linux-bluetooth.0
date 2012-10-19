@@ -1,265 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
-Subject: =?UTF-8?q?=5BRFC=20v1=20obexd=2001/11=5D=20fuse=3A=20Add=20initial=20obexfuse=20files=2C=20fuse=20main=20and=20options=20parse?=
-Date: Sun, 21 Oct 2012 19:05:21 +0200
-Message-Id: <1350839131-12042-1-git-send-email-dmp0x7c5@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org,
+	gustavo@padovan.org
+Cc: sunnyk@codeaurora.org,
+	marcel@holtmann.org,
+	andrei.emeltchenko.news@gmail.com
+Subject: [PATCHv4 18/18] Bluetooth: Start channel move when socket option is changed
+Date: Fri, 19 Oct 2012 14:34:09 -0700
+Message-Id: <1350682449-24818-19-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1350682449-24818-1-git-send-email-mathewm@codeaurora.org>
+References: <1350682449-24818-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Channel moves are triggered by changes to the BT_CHANNEL_POLICY
+sockopt when an ERTM or streaming-mode channel is connected.
+
+Moves are only started if enable_hs is true.
+
+Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- fuse/helpers.c  |   55 +++++++++++++++++++++++++
- fuse/helpers.h  |   49 ++++++++++++++++++++++
- fuse/obexfuse.c |  119 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 223 insertions(+), 0 deletions(-)
- create mode 100644 fuse/helpers.c
- create mode 100644 fuse/helpers.h
- create mode 100644 fuse/obexfuse.c
+ include/net/bluetooth/l2cap.h |  1 +
+ net/bluetooth/l2cap_core.c    | 19 +++++++++++++++++++
+ net/bluetooth/l2cap_sock.c    |  5 +++++
+ 3 files changed, 25 insertions(+)
 
-diff --git a/fuse/helpers.c b/fuse/helpers.c
-new file mode 100644
-index 0000000..53bba57
---- /dev/null
-+++ b/fuse/helpers.c
-@@ -0,0 +1,55 @@
-+/*
-+ *  OBEX Filesystem in Userspace
-+ *
-+ *  Copyright (C) 2012  Michał Poczwardowski <dmp0x7c5@gmail.com>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <gobex/gobex.h>
-+#include <btio/btio.h>
-+
-+#include <glib.h>
-+#include <fcntl.h>
-+#include <errno.h>
-+
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/rfcomm.h>
-+#include <bluetooth/sdp.h>
-+#include <bluetooth/sdp_lib.h>
-+
-+#define BT_RX_MTU 32767
-+#define BT_TX_MTU 32767
-+
-+#include "helpers.h"
-+
-+#define OBEX_FTP_UUID \
-+	"\xF9\xEC\x7B\xC4\x95\x3C\x11\xD2\x98\x4E\x52\x54\x00\xDC\x9E\x09"
-+#define OBEX_FTP_UUID_LEN 16
-+
-+#define OBEX_FTP_LS "x-obex/folder-listing"
-+
-+struct gobexhlp_request {
-+	gchar *name;
-+	gboolean complete;
-+};
-+
-+struct gobexhlp_location {
-+	gchar *dir;
-+	gchar *file;
-+};
-+
-diff --git a/fuse/helpers.h b/fuse/helpers.h
-new file mode 100644
-index 0000000..21972b2
---- /dev/null
-+++ b/fuse/helpers.h
-@@ -0,0 +1,49 @@
-+/*
-+ *  OBEX Filesystem in Userspace
-+ *
-+ *  Copyright (C) 2012  Michał Poczwardowski <dmp0x7c5@gmail.com>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <gobex/gobex.h>
-+#include <glib.h>
-+
-+struct gobexhlp_request;
-+
-+struct gobexhlp_buffer {
-+	void *data;
-+	gsize tmpsize;
-+	gsize size;
-+	gboolean edited;
-+};
-+
-+struct gobexhlp_session {
-+	GObex *obex;
-+	GList *lsfiles;
-+	GIOChannel *io;
-+	GHashTable *file_stat;
-+	gchar *setpath;
-+	struct gobexhlp_request *request;
-+	struct gobexhlp_buffer *buffer;
-+	gboolean vtouch;
-+	gchar *vtouch_path;
-+	gboolean rtouch;
-+	int status;
-+	GError *err;
-+};
-+
-diff --git a/fuse/obexfuse.c b/fuse/obexfuse.c
-new file mode 100644
-index 0000000..fe4f4da
---- /dev/null
-+++ b/fuse/obexfuse.c
-@@ -0,0 +1,119 @@
-+/*
-+ *  OBEX Filesystem in Userspace
-+ *
-+ *  Copyright (C) 2012  Michał Poczwardowski <dmp0x7c5@gmail.com>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#define FUSE_USE_VERSION 26
-+
-+#include <stdio.h>
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <stdlib.h>
-+#include <string.h>
-+
-+#include <fuse.h>
-+#include <fuse/fuse_opt.h>
-+
-+#include "helpers.h"
-+
-+struct options {
-+	char* dststr;
-+	char* srcstr;
-+} options;
-+
-+#define GOBEXFUSE_OPT_KEY(t, p, v) { t, offsetof(struct options, p), v }
-+
-+enum
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index b4c3c65..49783e9 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -809,5 +809,6 @@ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ void l2cap_chan_del(struct l2cap_chan *chan, int err);
+ void l2cap_send_conn_req(struct l2cap_chan *chan);
++void l2cap_move_start(struct l2cap_chan *chan);
+ 
+ #endif /* __L2CAP_H */
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index d6fe7bf..88c5743 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4461,6 +4461,25 @@ static void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
+ 	}
+ }
+ 
++void l2cap_move_start(struct l2cap_chan *chan)
 +{
-+   KEY_VERSION,
-+   KEY_HELP,
-+};
++	BT_DBG("chan %p", chan);
 +
-+static struct fuse_opt obexfuse_opts[] =
-+{
-+	GOBEXFUSE_OPT_KEY("--target=%s",dststr, 0),
-+	GOBEXFUSE_OPT_KEY("-t %s",	dststr, 0),
-+	GOBEXFUSE_OPT_KEY("--source=%s",srcstr, 0),
-+	GOBEXFUSE_OPT_KEY("-s %s",	srcstr, 0),
-+
-+	FUSE_OPT_KEY("-V",             KEY_VERSION),
-+	FUSE_OPT_KEY("--version",      KEY_VERSION),
-+	FUSE_OPT_KEY("-h",             KEY_HELP),
-+	FUSE_OPT_KEY("--help",         KEY_HELP),
-+	FUSE_OPT_END
-+};
-+
-+static struct fuse_operations obexfuse_oper = {
-+};
-+
-+static int obexfuse_opt_proc(void *data, const char *arg, int key,
-+					struct fuse_args *outargs)
-+{
-+	switch (key) {
-+	case KEY_HELP:
-+		g_printerr("Usage: %s mountpoint [options]\n"
-+				"\n"
-+				"general options:\n"
-+				"    -o opt,[opt...]  mount options\n"
-+				"    -h   --help      print help\n"
-+				"    -V   --version   print version\n"
-+				"\n"
-+				"obexfuse options:\n"
-+				"    -t   --target    target btaddr "
-+				"(mandatory)\n"
-+				"    -s   --source    source btaddr\n"
-+				"\n"
-+				, outargs->argv[0]);
-+		fuse_opt_add_arg(outargs, "-ho");
-+		fuse_main(outargs->argc, outargs->argv, &obexfuse_oper, NULL);
-+		exit(1);
-+	case KEY_VERSION:
-+		g_print("obexfuse upon:\n");
-+		fuse_opt_add_arg(outargs, "--version");
-+		fuse_main(outargs->argc, outargs->argv, &obexfuse_oper, NULL);
-+		exit(0);
++	if (chan->local_amp_id == HCI_BREDR_ID) {
++		if (chan->chan_policy != BT_CHANNEL_POLICY_AMP_PREFERRED)
++			return;
++		chan->move_role = L2CAP_MOVE_ROLE_INITIATOR;
++		chan->move_state = L2CAP_MOVE_WAIT_PREPARE;
++		/* Placeholder - start physical link setup */
++	} else {
++		chan->move_role = L2CAP_MOVE_ROLE_INITIATOR;
++		chan->move_state = L2CAP_MOVE_WAIT_RSP_SUCCESS;
++		chan->move_id = 0;
++		l2cap_move_setup(chan);
++		l2cap_send_move_chan_req(chan, 0);
 +	}
-+	return 1;
 +}
 +
-+int main(int argc, char *argv[])
-+{
-+	int retfuse;
-+	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
+ static void l2cap_do_create(struct l2cap_chan *chan, int result,
+ 			    u8 local_amp_id, u8 remote_amp_id)
+ {
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 5fae2bd..7cb4d73 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -735,6 +735,11 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 		}
+ 
+ 		chan->chan_policy = (u8) opt;
 +
-+	memset(&options, 0, sizeof(struct options));
++		if (sk->sk_state == BT_CONNECTED &&
++		    chan->move_role == L2CAP_MOVE_ROLE_NONE)
++			l2cap_move_start(chan);
 +
-+	if (fuse_opt_parse(&args, &options, obexfuse_opts,
-+				obexfuse_opt_proc) == -1)
-+		return -EINVAL;
-+
-+	if (options.dststr == NULL) {
-+		g_printerr("Target not specified\n");
-+		return -EINVAL;
-+	}
-+
-+	g_thread_init(NULL);
-+
-+	fuse_opt_add_arg(&args, "-s"); /* force single threaded mode */
-+	retfuse = fuse_main(args.argc, args.argv, &obexfuse_oper, NULL);
-+
-+	fuse_opt_free_args(&args);
-+	return retfuse;
-+}
+ 		break;
+ 
+ 	default:
 -- 
-1.7.8.6
+1.7.12.3
 
+--
+Mat Martineau
+
+Employee of Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, hosted by The Linux Foundation
