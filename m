@@ -5,131 +5,167 @@ To: linux-bluetooth@vger.kernel.org,
 Cc: sunnyk@codeaurora.org,
 	marcel@holtmann.org,
 	andrei.emeltchenko.news@gmail.com
-Subject: [PATCHv4 07/18] Bluetooth: Add move channel confirm handling
-Date: Fri, 19 Oct 2012 14:33:58 -0700
-Message-Id: <1350682449-24818-8-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv4 05/18] Bluetooth: Channel move request handling
+Date: Fri, 19 Oct 2012 14:33:56 -0700
+Message-Id: <1350682449-24818-6-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1350682449-24818-1-git-send-email-mathewm@codeaurora.org>
 References: <1350682449-24818-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-After sending a move channel response, a move responder waits for a
-move channel confirm command.  If the received command has a
-"confirmed" result the move is proceeding, and "unconfirmed" means the
-move has failed and the channel will not change controllers.
+On receipt of a channel move request, the request must be validated
+based on the L2CAP mode, connection state, and controller
+capabilities.  ERTM channels must have their state machines cleared
+and transmission paused while the channel move takes place.
+
+If the channel is being moved to an AMP controller then
+an AMP physical link must be prepared.  Moving the channel back to
+BR/EDR proceeds immediately.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 74 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 71 insertions(+), 3 deletions(-)
+ net/bluetooth/l2cap_core.c | 108 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 107 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index ff25bf4..d860a73 100644
+index e826420..42e20ee 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1036,6 +1036,42 @@ static void l2cap_move_setup(struct l2cap_chan *chan)
- 	set_bit(CONN_REMOTE_BUSY, &chan->conn_state);
+@@ -734,6 +734,12 @@ static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len,
+ 	hci_send_acl(conn->hchan, skb, flags);
  }
  
-+static void l2cap_move_success(struct l2cap_chan *chan)
++static bool __chan_is_moving(struct l2cap_chan *chan)
 +{
-+	BT_DBG("chan %p", chan);
-+
-+	if (chan->mode != L2CAP_MODE_ERTM)
-+		return;
-+
-+	switch (chan->move_role) {
-+	case L2CAP_MOVE_ROLE_INITIATOR:
-+		l2cap_tx(chan, NULL, NULL, L2CAP_EV_EXPLICIT_POLL);
-+		chan->rx_state = L2CAP_RX_STATE_WAIT_F;
-+		break;
-+	case L2CAP_MOVE_ROLE_RESPONDER:
-+		chan->rx_state = L2CAP_RX_STATE_WAIT_P;
-+		break;
-+	}
++	return chan->move_state != L2CAP_MOVE_STABLE &&
++	       chan->move_state != L2CAP_MOVE_WAIT_PREPARE;
 +}
 +
-+static void l2cap_move_revert(struct l2cap_chan *chan)
+ static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
+ {
+ 	struct hci_conn *hcon = chan->conn->hcon;
+@@ -995,6 +1001,41 @@ void l2cap_send_conn_req(struct l2cap_chan *chan)
+ 	l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_REQ, sizeof(req), &req);
+ }
+ 
++static void l2cap_move_setup(struct l2cap_chan *chan)
 +{
++	struct sk_buff *skb;
++
 +	BT_DBG("chan %p", chan);
 +
 +	if (chan->mode != L2CAP_MODE_ERTM)
 +		return;
 +
-+	switch (chan->move_role) {
-+	case L2CAP_MOVE_ROLE_INITIATOR:
-+		l2cap_tx(chan, NULL, NULL, L2CAP_EV_EXPLICIT_POLL);
-+		chan->rx_state = L2CAP_RX_STATE_WAIT_F;
-+		break;
-+	case L2CAP_MOVE_ROLE_RESPONDER:
-+		chan->rx_state = L2CAP_RX_STATE_WAIT_P;
-+		break;
++	__clear_retrans_timer(chan);
++	__clear_monitor_timer(chan);
++	__clear_ack_timer(chan);
++
++	chan->retry_count = 0;
++	skb_queue_walk(&chan->tx_q, skb) {
++		if (bt_cb(skb)->control.retries)
++			bt_cb(skb)->control.retries = 1;
++		else
++			break;
 +	}
++
++	chan->expected_tx_seq = chan->buffer_seq;
++
++	clear_bit(CONN_REJ_ACT, &chan->conn_state);
++	clear_bit(CONN_SREJ_ACT, &chan->conn_state);
++	l2cap_seq_list_clear(&chan->retrans_list);
++	l2cap_seq_list_clear(&chan->srej_list);
++	skb_queue_purge(&chan->srej_q);
++
++	chan->tx_state = L2CAP_TX_STATE_XMIT;
++	chan->rx_state = L2CAP_RX_STATE_MOVE;
++
++	set_bit(CONN_REMOTE_BUSY, &chan->conn_state);
 +}
 +
  static void l2cap_chan_ready(struct l2cap_chan *chan)
  {
  	/* This clears all conf flags, including CONF_NOT_COMPLETE */
-@@ -4191,6 +4227,14 @@ static void l2cap_send_move_chan_cfm_rsp(struct l2cap_conn *conn, u8 ident,
- 	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM_RSP, sizeof(rsp), &rsp);
- }
- 
-+static void __release_logical_link(struct l2cap_chan *chan)
-+{
-+	chan->hs_hchan = NULL;
-+	chan->hs_hcon = NULL;
-+
-+	/* Placeholder - release the logical link */
-+}
-+
- static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
- 					 struct l2cap_cmd_hdr *cmd,
+@@ -4155,6 +4196,7 @@ static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
  					 u16 cmd_len, void *data)
-@@ -4301,11 +4345,12 @@ static inline int l2cap_move_channel_rsp(struct l2cap_conn *conn,
- 	return 0;
- }
- 
--static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
--					     struct l2cap_cmd_hdr *cmd,
--					     u16 cmd_len, void *data)
-+static int l2cap_move_channel_confirm(struct l2cap_conn *conn,
-+				      struct l2cap_cmd_hdr *cmd,
-+				      u16 cmd_len, void *data)
  {
- 	struct l2cap_move_chan_cfm *cfm = data;
+ 	struct l2cap_move_chan_req *req = data;
 +	struct l2cap_chan *chan;
- 	u16 icid, result;
+ 	u16 icid = 0;
+ 	u16 result = L2CAP_MR_NOT_ALLOWED;
  
- 	if (cmd_len != sizeof(*cfm))
-@@ -4316,8 +4361,31 @@ static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
+@@ -4168,9 +4210,73 @@ static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
+ 	if (!enable_hs)
+ 		return -EINVAL;
  
- 	BT_DBG("icid 0x%4.4x, result 0x%4.4x", icid, result);
- 
+-	/* Placeholder: Always refuse */
 +	chan = l2cap_get_chan_by_dcid(conn, icid);
-+	if (!chan) {
-+		/* Spec requires a response even if the icid was not found */
-+		l2cap_send_move_chan_cfm_rsp(conn, cmd->ident, icid);
-+		return 0;
++	if (!chan || chan->scid < L2CAP_CID_DYN_START ||
++	    chan->chan_policy == BT_CHANNEL_POLICY_BREDR_ONLY ||
++	    (chan->mode != L2CAP_MODE_ERTM &&
++	     chan->mode != L2CAP_MODE_STREAMING)) {
++		result = L2CAP_MR_NOT_ALLOWED;
++		goto send_move_response;
 +	}
 +
-+	if (chan->move_state == L2CAP_MOVE_WAIT_CONFIRM) {
-+		chan->move_state = L2CAP_MOVE_STABLE;
-+		if (result == L2CAP_MC_CONFIRMED) {
-+			chan->local_amp_id = chan->move_id;
-+			if (!chan->local_amp_id)
-+				__release_logical_link(chan);
-+			l2cap_move_success(chan);
-+		} else {
-+			chan->move_id = chan->local_amp_id;
-+			l2cap_move_revert(chan);
++	if (chan->local_amp_id == req->dest_amp_id) {
++		result = L2CAP_MR_SAME_ID;
++		goto send_move_response;
++	}
++
++	if (req->dest_amp_id) {
++		struct hci_dev *hdev;
++		hdev = hci_dev_get(req->dest_amp_id);
++		if (!hdev || hdev->dev_type != HCI_AMP ||
++		    !test_bit(HCI_UP, &hdev->flags)) {
++			if (hdev)
++				hci_dev_put(hdev);
++
++			result = L2CAP_MR_BAD_ID;
++			goto send_move_response;
 +		}
-+		chan->move_role = L2CAP_MOVE_ROLE_NONE;
++		hci_dev_put(hdev);
 +	}
 +
- 	l2cap_send_move_chan_cfm_rsp(conn, cmd->ident, icid);
++	/* Detect a move collision.  Only send a collision response
++	 * if this side has "lost", otherwise proceed with the move.
++	 * The winner has the larger bd_addr.
++	 */
++	if ((__chan_is_moving(chan) ||
++	     chan->move_role != L2CAP_MOVE_ROLE_NONE) &&
++	    bacmp(conn->src, conn->dst) > 0) {
++		result = L2CAP_MR_COLLISION;
++		goto send_move_response;
++	}
++
++	chan->ident = cmd->ident;
++	chan->move_role = L2CAP_MOVE_ROLE_RESPONDER;
++	l2cap_move_setup(chan);
++	chan->move_id = req->dest_amp_id;
++	icid = chan->dcid;
++
++	if (!req->dest_amp_id) {
++		/* Moving to BR/EDR */
++		if (test_bit(CONN_LOCAL_BUSY, &chan->conn_state)) {
++			chan->move_state = L2CAP_MOVE_WAIT_LOCAL_BUSY;
++			result = L2CAP_MR_PEND;
++		} else {
++			chan->move_state = L2CAP_MOVE_WAIT_CONFIRM;
++			result = L2CAP_MR_SUCCESS;
++		}
++	} else {
++		chan->move_state = L2CAP_MOVE_WAIT_PREPARE;
++		/* Placeholder - uncomment when amp functions are available */
++		/*amp_accept_physical(chan, req->dest_amp_id);*/
++		result = L2CAP_MR_PEND;
++	}
++
++send_move_response:
+ 	l2cap_send_move_chan_rsp(conn, cmd->ident, icid, result);
  
-+	l2cap_chan_unlock(chan);
++	if (chan)
++		l2cap_chan_unlock(chan);
 +
  	return 0;
  }
