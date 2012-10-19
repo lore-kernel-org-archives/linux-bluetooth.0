@@ -1,29 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 19 Oct 2012 10:42:27 +0300
+Date: Fri, 19 Oct 2012 10:40:22 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Ludek Finstrle <luf@pzkagis.cz>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] attrib: Fix memleak if att_data_list_alloc fails
-Message-ID: <20121019074227.GC2243@x220>
-References: <CAJdJm_NiL522WPLrV-RiaJKBZeOBBgo_vSzQCwTdZwLZLTw88A@mail.gmail.com>
- <1350549561-16424-1-git-send-email-luf@pzkagis.cz>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org,
+	Lucas De Marchi <lucas.de.marchi@gmail.com>
+Subject: Re: [RFC 0/6] DBus.Properties: Converting SAP, HEALTH and fix to
+ input
+Message-ID: <20121019074022.GB2243@x220>
+References: <1350597831-28380-1-git-send-email-lucas.demarchi@profusion.mobi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1350549561-16424-1-git-send-email-luf@pzkagis.cz>
+In-Reply-To: <1350597831-28380-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ludek,
+Hi Lucas,
 
-On Thu, Oct 18, 2012, Ludek Finstrle wrote:
-> Fix for memory leak which was introduced in commit
-> f8619bef3406a2134082dc41c208105fe028c09f.
-> I tested it with older bluez and rebase for git. Please review it.
-> ---
->  src/attrib-server.c |   12 +++++++++---
->  1 files changed, 9 insertions(+), 3 deletions(-)
+On Thu, Oct 18, 2012, Lucas De Marchi wrote:
+> Here is a patch set to convert SAP and HEALTH profiles to
+> DBus.Properties. It's only compile-tested.
+> 
+> Patch 0002 contains a fix to sap server. Unless I'm blind,
+> GetProperties() callback was doing random things using that pointer.
+> 
+> Patch 0001 adds the missing update to PropertiesChanged signal in
+> INPUT profile.
+> 
+> Finally last patch convert HEALTH's documentation to a format similar
+> to what we have in other profiles.
+> 
+> Lucas De Marchi (6):
+>   input: Fix not sending PropertiesChanged signal
+>   sap: Fix usage of wrong struct in get_properties()
+>   sap: Convert to DBus.Properties
+>   health: Convert HealthChannel to DBus.Properties
+>   health: Convert HealthDevice to DBus.Properties
+>   doc: Update Health to BlueZ 5
+> 
+>  doc/health-api.txt      | 198 ++++++++++++++++++++++++------------------------
+>  doc/sap-api.txt         |  12 ---
+>  profiles/health/hdp.c   | 124 +++++++++++++++---------------
+>  profiles/input/device.c |  13 +---
+>  profiles/sap/server.c   |  61 +++++----------
+>  5 files changed, 184 insertions(+), 224 deletions(-)
 
-Applied (with the last commit message line removed as suggested by
-Vinicius). Thanks.
+I didn't see any major issues so I went ahead and pushed this set. I
+didn't see any updates to the test scripts though. Is it so that they
+don't use the old properties interfaces?
 
 Johan
