@@ -1,23 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/6] Bluetooth: Add basic support for single-mode controllers
-Date: Fri, 19 Oct 2012 20:15:05 +0300
-Message-Id: <1350666911-6334-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] Bluetooth: Fix having bogus entries in mgmt_read_index_list reply
+Date: Fri, 19 Oct 2012 20:10:46 +0300
+Message-Id: <1350666646-6276-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch set adds initial support for single-mode controllers. I
-haven't tested it yet with bluetoothd running but at least I'm able to
-initialize and do some basic things with the virtual single-mode
-controllers provided by b1ee.com (you can use emulator/b1ee to test
-this).
+The mgmt_read_index_list uses one loop to calculate the max needed size
+of its response with the help of an upper-bound of the controller count.
+The second loop is more strict as it checks for HCI_SETUP (which might
+have gotten set after the first loop) and could result in some indexes
+being skipped. Because of this the function needs to readjust the event
+length and index count after filling in the response array.
 
-FWIW, I've also tested that this doesn't break anything with the init
-sequence for various other controllers that I have (includes 1.1, 1.2,
-2.0, 2.1 and 4.0 controllers from several manufacturers).
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Cc: stable@vger.kernel.org
+---
+ net/bluetooth/mgmt.c |   11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-Johan
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index b127b88..e6d8f73 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -326,7 +326,7 @@ static int read_index_list(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	struct hci_dev *d;
+ 	size_t rp_len;
+ 	u16 count;
+-	int i, err;
++	int err;
+ 
+ 	BT_DBG("sock %p", sk);
+ 
+@@ -347,9 +347,7 @@ static int read_index_list(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		return -ENOMEM;
+ 	}
+ 
+-	rp->num_controllers = cpu_to_le16(count);
+-
+-	i = 0;
++	count = 0;
+ 	list_for_each_entry(d, &hci_dev_list, list) {
+ 		if (test_bit(HCI_SETUP, &d->dev_flags))
+ 			continue;
+@@ -357,10 +355,13 @@ static int read_index_list(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		if (!mgmt_valid_hdev(d))
+ 			continue;
+ 
+-		rp->index[i++] = cpu_to_le16(d->id);
++		rp->index[count++] = cpu_to_le16(d->id);
+ 		BT_DBG("Added hci%u", d->id);
+ 	}
+ 
++	rp->num_controllers = cpu_to_le16(count);
++	rp_len = sizeof(*rp) + (2 * count);
++
+ 	read_unlock(&hci_dev_list_lock);
+ 
+ 	err = cmd_complete(sk, MGMT_INDEX_NONE, MGMT_OP_READ_INDEX_LIST, 0, rp,
+-- 
+1.7.10.4
 
