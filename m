@@ -1,134 +1,170 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 19 Oct 2012 11:07:20 +0300
+Date: Fri, 19 Oct 2012 11:06:02 +0300
 From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 To: Mat Martineau <mathewm@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
 	sunnyk@codeaurora.org, marcel@holtmann.org
-Subject: Re: [PATCHv3 07/18] Bluetooth: Add move channel confirm handling
-Message-ID: <20121019080719.GF4249@aemeltch-MOBL1>
+Subject: Re: [PATCHv3 06/18] Bluetooth: Add new ERTM receive states for
+ channel move
+Message-ID: <20121019080601.GE4249@aemeltch-MOBL1>
 References: <1350583130-3241-1-git-send-email-mathewm@codeaurora.org>
- <1350583130-3241-8-git-send-email-mathewm@codeaurora.org>
+ <1350583130-3241-7-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1350583130-3241-8-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1350583130-3241-7-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mat,
 
-On Thu, Oct 18, 2012 at 10:58:39AM -0700, Mat Martineau wrote:
-> After sending a move channel response, a move responder waits for a
-> move channel confirm command.  If the received command has a
-> "confirmed" result the move is proceeding, and "unconfirmed" means the
-> move has failed and the channel will not change controllers.
+On Thu, Oct 18, 2012 at 10:58:38AM -0700, Mat Martineau wrote:
+> Two new states are required to implement channel moves with the ERTM
+> receive state machine.
+> 
+> The "WAIT_P" state is used by a move responder to wait for a "poll"
+> flag after a move is completed (success or failure).  "WAIT_F" is
+> similarly used by a move initiator to wait for a "final" flag when the
+> move is completing.  In either state, the reqseq value in the
+> poll/final frame tells the state machine exactly which frame should be
+> expected next.
 > 
 > Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com> 
 
 > ---
->  net/bluetooth/l2cap_core.c | 71 ++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 68 insertions(+), 3 deletions(-)
+>  net/bluetooth/l2cap_core.c | 104 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 104 insertions(+)
 > 
 > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index ff25bf4..2fa1bb5 100644
+> index 42e20ee..ff25bf4 100644
 > --- a/net/bluetooth/l2cap_core.c
 > +++ b/net/bluetooth/l2cap_core.c
-> @@ -1036,6 +1036,42 @@ static void l2cap_move_setup(struct l2cap_chan *chan)
->  	set_bit(CONN_REMOTE_BUSY, &chan->conn_state);
+> @@ -4706,6 +4706,12 @@ static int l2cap_reassemble_sdu(struct l2cap_chan *chan, struct sk_buff *skb,
+>  	return err;
 >  }
 >  
-> +static void l2cap_move_success(struct l2cap_chan *chan)
+> +static int l2cap_resegment(struct l2cap_chan *chan)
+> +{
+> +	/* Placeholder */
+> +	return 0;
+> +}
+> +
+>  void l2cap_chan_busy(struct l2cap_chan *chan, int busy)
+>  {
+>  	u8 event;
+> @@ -5211,6 +5217,98 @@ static int l2cap_rx_state_srej_sent(struct l2cap_chan *chan,
+>  	return err;
+>  }
+>  
+> +static int l2cap_finish_move(struct l2cap_chan *chan)
 > +{
 > +	BT_DBG("chan %p", chan);
 > +
-> +	if (chan->mode != L2CAP_MODE_ERTM)
-> +		return;
+> +	chan->move_role = L2CAP_MOVE_ROLE_NONE;
+> +	chan->rx_state = L2CAP_RX_STATE_RECV;
 > +
-> +	switch (chan->move_role) {
-> +	case L2CAP_MOVE_ROLE_INITIATOR:
-> +		l2cap_tx(chan, NULL, NULL, L2CAP_EV_EXPLICIT_POLL);
-> +		chan->rx_state = L2CAP_RX_STATE_WAIT_F;
-> +		break;
-> +	case L2CAP_MOVE_ROLE_RESPONDER:
-> +		chan->rx_state = L2CAP_RX_STATE_WAIT_P;
-> +		break;
-> +	}
+> +	if (chan->hs_hcon)
+> +		chan->conn->mtu = chan->hs_hcon->hdev->block_mtu;
+> +	else
+> +		chan->conn->mtu = chan->conn->hcon->hdev->acl_mtu;
+> +
+> +	return l2cap_resegment(chan);
 > +}
 > +
-> +static void l2cap_move_revert(struct l2cap_chan *chan)
+> +static int l2cap_rx_state_wait_p(struct l2cap_chan *chan,
+> +				 struct l2cap_ctrl *control,
+> +				 struct sk_buff *skb, u8 event)
 > +{
-> +	BT_DBG("chan %p", chan);
+> +	int err;
 > +
-> +	if (chan->mode != L2CAP_MODE_ERTM)
-> +		return;
+> +	BT_DBG("chan %p, control %p, skb %p, event %d", chan, control, skb,
+> +	       event);
 > +
-> +	switch (chan->move_role) {
-> +	case L2CAP_MOVE_ROLE_INITIATOR:
-> +		l2cap_tx(chan, NULL, NULL, L2CAP_EV_EXPLICIT_POLL);
-> +		chan->rx_state = L2CAP_RX_STATE_WAIT_F;
-> +		break;
-> +	case L2CAP_MOVE_ROLE_RESPONDER:
-> +		chan->rx_state = L2CAP_RX_STATE_WAIT_P;
-> +		break;
-> +	}
+> +	if (!control->poll)
+> +		return -EPROTO;
+> +
+> +	l2cap_process_reqseq(chan, control->reqseq);
+> +
+> +	if (!skb_queue_empty(&chan->tx_q))
+> +		chan->tx_send_head = skb_peek(&chan->tx_q);
+> +	else
+> +		chan->tx_send_head = NULL;
+> +
+> +	/* Rewind next_tx_seq to the point expected
+> +	 * by the receiver.
+> +	 */
+> +	chan->next_tx_seq = control->reqseq;
+> +	chan->unacked_frames = 0;
+> +
+> +	err = l2cap_finish_move(chan);
+> +	if (err)
+> +		return err;
+> +
+> +	set_bit(CONN_SEND_FBIT, &chan->conn_state);
+> +	l2cap_send_i_or_rr_or_rnr(chan);
+> +
+> +	if (event == L2CAP_EV_RECV_IFRAME)
+> +		return -EPROTO;
+> +
+> +	return l2cap_rx_state_recv(chan, control, NULL, event);
 > +}
 > +
->  static void l2cap_chan_ready(struct l2cap_chan *chan)
+> +static int l2cap_rx_state_wait_f(struct l2cap_chan *chan,
+> +				 struct l2cap_ctrl *control,
+> +				 struct sk_buff *skb, u8 event)
+> +{
+> +	int err;
+> +
+> +	if (!control->final)
+> +		return -EPROTO;
+> +
+> +	clear_bit(CONN_REMOTE_BUSY, &chan->conn_state);
+> +	chan->move_role = L2CAP_MOVE_ROLE_NONE;
+> +
+> +	chan->rx_state = L2CAP_RX_STATE_RECV;
+> +	l2cap_process_reqseq(chan, control->reqseq);
+> +
+> +	if (!skb_queue_empty(&chan->tx_q))
+> +		chan->tx_send_head = skb_peek(&chan->tx_q);
+> +	else
+> +		chan->tx_send_head = NULL;
+> +
+> +	/* Rewind next_tx_seq to the point expected
+> +	 * by the receiver.
+> +	 */
+> +	chan->next_tx_seq = control->reqseq;
+> +	chan->unacked_frames = 0;
+> +
+> +	if (chan->hs_hcon)
+> +		chan->conn->mtu = chan->hs_hcon->hdev->block_mtu;
+> +	else
+> +		chan->conn->mtu = chan->conn->hcon->hdev->acl_mtu;
+> +
+> +	err = l2cap_resegment(chan);
+> +
+> +	if (!err)
+> +		err = l2cap_rx_state_recv(chan, control, skb, event);
+> +
+> +	return err;
+> +}
+> +
+>  static bool __valid_reqseq(struct l2cap_chan *chan, u16 reqseq)
 >  {
->  	/* This clears all conf flags, including CONF_NOT_COMPLETE */
-> @@ -4301,11 +4337,12 @@ static inline int l2cap_move_channel_rsp(struct l2cap_conn *conn,
->  	return 0;
->  }
->  
-> -static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
-> -					     struct l2cap_cmd_hdr *cmd,
-> -					     u16 cmd_len, void *data)
-> +static int l2cap_move_channel_confirm(struct l2cap_conn *conn,
-> +				      struct l2cap_cmd_hdr *cmd,
-> +				      u16 cmd_len, void *data)
->  {
->  	struct l2cap_move_chan_cfm *cfm = data;
-> +	struct l2cap_chan *chan;
->  	u16 icid, result;
->  
->  	if (cmd_len != sizeof(*cfm))
-> @@ -4316,8 +4353,36 @@ static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
->  
->  	BT_DBG("icid 0x%4.4x, result 0x%4.4x", icid, result);
->  
-> +	chan = l2cap_get_chan_by_dcid(conn, icid);
-> +	if (!chan) {
-> +		/* Spec requires a response even if the icid was not found */
-> +		l2cap_send_move_chan_cfm_rsp(conn, cmd->ident, icid);
-> +		return 0;
-> +	}
-> +
-> +	if (chan->move_state == L2CAP_MOVE_WAIT_CONFIRM) {
-> +		chan->move_state = L2CAP_MOVE_STABLE;
-> +		if (result == L2CAP_MC_CONFIRMED) {
-> +			chan->local_amp_id = chan->move_id;
-> +			if (!chan->local_amp_id) {
-> +				/* Have moved off of AMP, free the channel */
-> +				chan->hs_hchan = NULL;
-> +				chan->hs_hcon = NULL;
-> +
-> +				/* Placeholder - free the logical link */
-> +			}
-> +			l2cap_move_success(chan);
-> +		} else {
-> +			chan->move_id = chan->local_amp_id;
-> +			l2cap_move_revert(chan);
-> +		}
-> +		chan->move_role = L2CAP_MOVE_ROLE_NONE;
-> +	}
-> +
->  	l2cap_send_move_chan_cfm_rsp(conn, cmd->ident, icid);
->  
-> +	l2cap_chan_unlock(chan);
-> +
->  	return 0;
->  }
->  
+>  	/* Make sure reqseq is for a packet that has been sent but not acked */
+> @@ -5237,6 +5335,12 @@ static int l2cap_rx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+>  			err = l2cap_rx_state_srej_sent(chan, control, skb,
+>  						       event);
+>  			break;
+> +		case L2CAP_RX_STATE_WAIT_P:
+> +			err = l2cap_rx_state_wait_p(chan, control, skb, event);
+> +			break;
+> +		case L2CAP_RX_STATE_WAIT_F:
+> +			err = l2cap_rx_state_wait_f(chan, control, skb, event);
+> +			break;
+>  		default:
+>  			/* shut it down */
+>  			break;
 > -- 
 > 1.7.12.3
 > 
