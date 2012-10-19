@@ -1,33 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 19 Oct 2012 10:34:38 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] gdbus: Remove connection from pending_property
- functions
-Message-ID: <20121019073438.GA2243@x220>
-References: <1350486869-5020-1-git-send-email-lucas.demarchi@profusion.mobi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1350486869-5020-1-git-send-email-lucas.demarchi@profusion.mobi>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1350602001.2026.35.camel@aeonflux>
+References: <1350565311-18330-1-git-send-email-frederic.danis@linux.intel.com>
+	<1350565311-18330-2-git-send-email-frederic.danis@linux.intel.com>
+	<1350602001.2026.35.camel@aeonflux>
+Date: Thu, 18 Oct 2012 21:41:11 -0300
+Message-ID: <CAJdJm_NxX6qJYiRrotGroBAJUne9OrwKSiuxF2aukPaUSt9k=A@mail.gmail.com>
+Subject: Re: [PATCH v6 01/16] doc: Add settings storage documentation
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: =?ISO-8859-1?Q?Fr=E9d=E9ric_Danis?= <frederic.danis@linux.intel.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Marcel/Fr=E9d=E9ric,
 
-On Wed, Oct 17, 2012, Lucas De Marchi wrote:
-> The reply to a DBus.Properties.Set() method call should go through the
-> same D-Bus connection. Thus remove the DBusConnection parameter from the
-> following functions:
-> 
->     - g_dbus_pending_property_success()
->     - g_dbus_pending_property_error_valist()
->     - g_dbus_pending_property_error()
-> ---
->  gdbus/gdbus.h  | 13 +++++--------
->  gdbus/object.c | 24 ++++++++++++------------
->  2 files changed, 17 insertions(+), 20 deletions(-)
+On Thu, Oct 18, 2012 at 8:13 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+>> +  [0x0001]
+>> +  UUID=3D00002800-0000-1000-8000-00805f9b34fb
+>> +  Value=3D0018
+>> +
+>> +  [0x0004]
+>> +  UUID=3D00002803-0000-1000-8000-00805f9b34fb
+>> +  Value=3D020600002A
+>> +
+>> +  [0x0006]
+>> +  UUID=3D00002a00-0000-1000-8000-00805f9b34fb
+>> +  Value=3D4578616D706C6520446576696365
+>
+> You need to mention that values are hex encoded strings. Just to be
+> clear here.
+>
+> I am not 100% convinced that we want to keep the sections/handles in hex
+> value notation. Is that really a good idea?
 
-Both patches have been applied. Thanks.
+Alternatively, we could have:
 
-Johan
+[Attribute<N>]
+UUID=3D...
+Value=3D...
+
+where "<N>" is the attribute value handle (in decimal). The section
+name could then be easily parsed to extract the handle from it.
+
+What do you think?
+
+Regards,
+--=20
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
