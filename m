@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 6/6] Bluetooth: Read adversiting channel TX power during init sequence
-Date: Fri, 19 Oct 2012 20:15:11 +0300
-Message-Id: <1350666911-6334-7-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 5/6] Bluetooth: Fix HCI command sending when powering on LE-only adapters
+Date: Fri, 19 Oct 2012 20:15:10 +0300
+Message-Id: <1350666911-6334-6-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1350666911-6334-1-git-send-email-johan.hedberg@gmail.com>
 References: <1350666911-6334-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,93 +11,67 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds the reading of the LE advertising channel TX power to
-the HCI init sequence of LE-capable controllers. This data will be used
-e.g. for inclusion in the advertising data packets when advertising is
-enabled.
+This patch makes sure that we don't send BR/EDR-only commands for
+LE-only adapters when they get powered on. Doing this would just cause
+command errors.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci.h      |    6 ++++++
- include/net/bluetooth/hci_core.h |    2 ++
- net/bluetooth/hci_event.c        |   20 ++++++++++++++++++++
- 3 files changed, 28 insertions(+)
+ net/bluetooth/mgmt.c |   34 +++++++++++++++++++++-------------
+ 1 file changed, 21 insertions(+), 13 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 88cbbda..348f4bf 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -932,6 +932,12 @@ struct hci_rp_le_read_buffer_size {
- 	__u8     le_max_pkt;
- } __packed;
- 
-+#define HCI_OP_LE_READ_ADV_TX_POWER	0x2007
-+struct hci_rp_le_read_adv_tx_power {
-+	__u8	status;
-+	__s8	tx_power;
-+} __packed;
-+
- #define HCI_OP_LE_SET_SCAN_PARAM	0x200b
- struct hci_cp_le_set_scan_param {
- 	__u8    type;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 9fe8e2d..8260bf2 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -278,6 +278,8 @@ struct hci_dev {
- 	struct work_struct	le_scan;
- 	struct le_scan_params	le_scan_params;
- 
-+	__s8			adv_tx_power;
-+
- 	int (*open)(struct hci_dev *hdev);
- 	int (*close)(struct hci_dev *hdev);
- 	int (*flush)(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 78f1af5..fd5a51c 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -594,6 +594,9 @@ static void le_init(struct hci_dev *hdev)
- {
- 	/* Read LE Buffer Size */
- 	hci_send_cmd(hdev, HCI_OP_LE_READ_BUFFER_SIZE, 0, NULL);
-+
-+	/* Read LE Advertising Channel TX Power */
-+	hci_send_cmd(hdev, HCI_OP_LE_READ_ADV_TX_POWER, 0, NULL);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index e6d8f73..3fe74f4 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2872,6 +2872,21 @@ static void settings_rsp(struct pending_cmd *cmd, void *data)
+ 	mgmt_pending_free(cmd);
  }
  
- static void hci_setup(struct hci_dev *hdev)
-@@ -1073,6 +1076,19 @@ static void hci_cc_le_read_buffer_size(struct hci_dev *hdev,
- 	hci_req_complete(hdev, HCI_OP_LE_READ_BUFFER_SIZE, rp->status);
- }
- 
-+static void hci_cc_le_read_adv_tx_power(struct hci_dev *hdev,
-+					struct sk_buff *skb)
++static int set_bredr_scan(struct hci_dev *hdev)
 +{
-+	struct hci_rp_le_read_adv_tx_power *rp = (void *) skb->data;
++	u8 scan = 0;
 +
-+	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
++	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
++		scan |= SCAN_PAGE;
++	if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
++		scan |= SCAN_INQUIRY;
 +
-+	if (!rp->status)
-+		hdev->adv_tx_power = rp->tx_power;
++	if (!scan)
++		return 0;
 +
-+	hci_req_complete(hdev, HCI_OP_LE_READ_ADV_TX_POWER, rp->status);
++	return hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
 +}
 +
- static void hci_cc_le_set_event_mask(struct hci_dev *hdev, struct sk_buff *skb)
+ int mgmt_powered(struct hci_dev *hdev, u8 powered)
  {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -2505,6 +2521,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_le_read_buffer_size(hdev, skb);
- 		break;
+ 	struct cmd_lookup match = { NULL, hdev };
+@@ -2883,19 +2898,12 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
+ 	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
  
-+	case HCI_OP_LE_READ_ADV_TX_POWER:
-+		hci_cc_le_read_adv_tx_power(hdev, skb);
-+		break;
-+
- 	case HCI_OP_LE_SET_EVENT_MASK:
- 		hci_cc_le_set_event_mask(hdev, skb);
- 		break;
+ 	if (powered) {
+-		u8 scan = 0;
+-
+-		if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
+-			scan |= SCAN_PAGE;
+-		if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
+-			scan |= SCAN_INQUIRY;
+-
+-		if (scan)
+-			hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
+-
+-		update_class(hdev);
+-		update_name(hdev, hdev->dev_name);
+-		update_eir(hdev);
++		if (lmp_bredr_capable(hdev)) {
++			set_bredr_scan(hdev);
++			update_class(hdev);
++			update_name(hdev, hdev->dev_name);
++			update_eir(hdev);
++		}
+ 	} else {
+ 		u8 status = MGMT_STATUS_NOT_POWERED;
+ 		mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
 -- 
 1.7.10.4
 
