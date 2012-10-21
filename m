@@ -2,130 +2,84 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
-Subject: [RFC v1 obexd 08/11] fuse: Add write operation
-Date: Sun, 21 Oct 2012 19:05:28 +0200
-Message-Id: <1350839131-12042-8-git-send-email-dmp0x7c5@gmail.com>
+Subject: [RFC v1 obexd 10/11] fuse: Add unlink/rmdir operation
+Date: Sun, 21 Oct 2012 19:05:30 +0200
+Message-Id: <1350839131-12042-10-git-send-email-dmp0x7c5@gmail.com>
 In-Reply-To: <1350839131-12042-1-git-send-email-dmp0x7c5@gmail.com>
 References: <1350839131-12042-1-git-send-email-dmp0x7c5@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- fuse/helpers.c  |   45 +++++++++++++++++++++++++++++++++++++++++++++
- fuse/helpers.h  |    3 +++
- fuse/obexfuse.c |   44 ++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 92 insertions(+), 0 deletions(-)
+ fuse/helpers.c  |   28 ++++++++++++++++++++++++++++
+ fuse/helpers.h  |    1 +
+ fuse/obexfuse.c |    9 +++++++++
+ 3 files changed, 38 insertions(+), 0 deletions(-)
 
 diff --git a/fuse/helpers.c b/fuse/helpers.c
-index 9b453e0..b807f15 100644
+index 05948be..0ad8cbb 100644
 --- a/fuse/helpers.c
 +++ b/fuse/helpers.c
-@@ -577,3 +577,48 @@ struct gobexhlp_buffer *gobexhlp_get(struct gobexhlp_session* session,
+@@ -618,6 +618,16 @@ void gobexhlp_put(struct gobexhlp_session* session,
  
- 	return buffer;
+ 	g_print("gobexhlp_put(%s%s)\n", l->dir, l->file);
+ 
++	if (g_strcmp0(path, session->vtouch_path) == 0 &&
++				session->vtouch == TRUE) {
++		session->vtouch = FALSE;
++		g_free(session->vtouch_path);
++	} else {
++		/* delete existing file */
++		if (session->rtouch == FALSE)
++			gobexhlp_delete(session, path);
++	}
++
+ 	gobexhlp_setpath(session, l->dir);
+ 	buffer->tmpsize = 0;
+ 	session->buffer = buffer;
+@@ -662,3 +672,21 @@ void gobexhlp_touch_real(struct gobexhlp_session* session, gchar *path)
+ 	session->buffer = tmpbuf;
  }
-+
-+static gssize async_put_producer(void *buf, gsize len, gpointer user_data)
-+{
-+	gssize size;
-+	struct gobexhlp_session *session = user_data;
-+	struct gobexhlp_buffer *buffer = session->buffer;
-+
-+	size = buffer->size - buffer->tmpsize;
-+
-+	if (size > len)
-+		size = len;
-+
-+	g_obex_suspend(session->obex);
-+	g_obex_resume(session->obex);
-+
-+	if (size == 0)
-+		return 0;
-+
-+	memcpy(buf, buffer->data + buffer->tmpsize, size);
-+	buffer->tmpsize += size;
-+
-+	return size;
-+}
-+
-+void gobexhlp_put(struct gobexhlp_session* session,
-+				struct gobexhlp_buffer *buffer,
-+				const char *path)
+ 
++void gobexhlp_delete(struct gobexhlp_session* session, const char *path)
 +{
 +	struct gobexhlp_location *l;
 +	l = get_location(path);
 +
-+	g_print("gobexhlp_put(%s%s)\n", l->dir, l->file);
++	g_print("gobexhlp_delete(%s)\n", l->file);
 +
 +	gobexhlp_setpath(session, l->dir);
-+	buffer->tmpsize = 0;
-+	session->buffer = buffer;
-+	request_new(session, g_strdup_printf("put %s", path));
-+	g_obex_put_req(session->obex, async_put_producer,
-+					complete_func, session, &session->err,
-+					G_OBEX_HDR_NAME, l->file,
-+					G_OBEX_HDR_INVALID);
++	request_new(session, g_strdup_printf("delete %s", path));
++	g_obex_delete(session->obex, l->file, response_func, session,
++							&session->err);
++
++	g_hash_table_remove(session->file_stat, path);
++
 +	free_location(l);
 +	request_wait_free(session);
 +}
 +
 diff --git a/fuse/helpers.h b/fuse/helpers.h
-index 50c750d..95987c4 100644
+index da5f96c..baa6bf1 100644
 --- a/fuse/helpers.h
 +++ b/fuse/helpers.h
-@@ -56,4 +56,7 @@ struct stat *gobexhlp_getattr(struct gobexhlp_session* session,
+@@ -60,4 +60,5 @@ void gobexhlp_put(struct gobexhlp_session* session,
+ 					struct gobexhlp_buffer *buffer,
  					const char *path);
- struct gobexhlp_buffer *gobexhlp_get(struct gobexhlp_session* session,
- 					const char *path);
-+void gobexhlp_put(struct gobexhlp_session* session,
-+					struct gobexhlp_buffer *buffer,
-+					const char *path);
+ void gobexhlp_touch(struct gobexhlp_session* session, const char *path);
++void gobexhlp_delete(struct gobexhlp_session* session, const char *path);
  
 diff --git a/fuse/obexfuse.c b/fuse/obexfuse.c
-index 9fe2dea..900e6d7 100644
+index b4599d8..2a6ee11 100644
 --- a/fuse/obexfuse.c
 +++ b/fuse/obexfuse.c
-@@ -174,11 +174,55 @@ static int obexfuse_read(const char *path, char *buf, size_t size,
- 	return asize;
+@@ -230,6 +230,13 @@ static int obexfuse_mknod(const char *path, mode_t mode, dev_t dev)
+ 	return 0;
  }
  
-+static int obexfuse_write(const char *path, const char *buf, size_t size,
-+				off_t offset, struct fuse_file_info *fi)
++static int obexfuse_unlink(const char *path)
 +{
-+	gsize nsize;
-+	struct gobexhlp_buffer *file_buffer = (struct gobexhlp_buffer*)fi->fh;
-+
-+	if (file_buffer->size < offset + size) {
-+		nsize = offset + size;
-+		file_buffer->data = g_realloc(file_buffer->data, nsize);
-+		file_buffer->size = nsize;
-+	} else {
-+		nsize = file_buffer->size;
-+	}
-+
-+	file_buffer->edited = TRUE;
-+	memcpy(file_buffer->data + offset, buf, size);
-+
-+	return size;
-+}
-+
-+static int obexfuse_truncate(const char *path, off_t offset)
-+{
-+	/*
-+	 *  Allow to change the size of a file.
-+	 */
-+	return 0;
-+}
-+
-+static int obexfuse_release(const char *path, struct fuse_file_info *fi)
-+{
-+	struct gobexhlp_buffer *file_buffer = (struct gobexhlp_buffer*)fi->fh;
-+
-+	if (file_buffer->edited == TRUE)
-+		gobexhlp_put(session, file_buffer, path); /* send to device */
-+
-+	g_free(file_buffer->data);
-+	g_free(file_buffer);
++	gobexhlp_delete(session, path);
 +
 +	return session->status;
 +}
@@ -133,11 +87,12 @@ index 9fe2dea..900e6d7 100644
  static struct fuse_operations obexfuse_oper = {
  	.readdir = obexfuse_readdir,
  	.getattr = obexfuse_getattr,
- 	.open = obexfuse_open,
- 	.read = obexfuse_read,
-+	.write = obexfuse_write,
-+	.truncate = obexfuse_truncate,
-+	.release = obexfuse_release,
+@@ -240,6 +247,8 @@ static struct fuse_operations obexfuse_oper = {
+ 	.release = obexfuse_release,
+ 	.utimens = obexfuse_utimens,
+ 	.mknod = obexfuse_mknod,
++	.unlink = obexfuse_unlink,
++	.rmdir = obexfuse_unlink,
  	.init = obexfuse_init,
  	.destroy = obexfuse_destroy,
  };
