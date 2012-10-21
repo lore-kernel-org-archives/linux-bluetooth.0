@@ -1,106 +1,148 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1350882145.55725.YahooMailNeo@web125403.mail.ne1.yahoo.com>
-References: <1350882145.55725.YahooMailNeo@web125403.mail.ne1.yahoo.com>
-From: Julian Calaby <julian.calaby@gmail.com>
-Date: Mon, 22 Oct 2012 16:26:27 +1100
-Message-ID: <CAGRGNgUkDAQaHXuBxR+uu=uoB0j=qfdHpXOtOTP2ZnU89mN1oA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Add support for Atheros [04ca:3004]
-To: Dwaine Garden VE3GIF <dwainegarden@rogers.com>
-Cc: "linville@redhat.com" <linville@redhat.com>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	"mcgrof@qca.qualcomm.com" <mcgrof@qca.qualcomm.com>,
-	linux-bluetooth@vger.kernel.org, gustavo@padovan.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
+Subject: [RFC v1 obexd 07/11] fuse: Add open and read operations plus location helpers
+Date: Sun, 21 Oct 2012 19:05:27 +0200
+Message-Id: <1350839131-12042-7-git-send-email-dmp0x7c5@gmail.com>
+In-Reply-To: <1350839131-12042-1-git-send-email-dmp0x7c5@gmail.com>
+References: <1350839131-12042-1-git-send-email-dmp0x7c5@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dwaine,
+---
+ fuse/helpers.c  |   61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fuse/helpers.h  |    3 +-
+ fuse/obexfuse.c |   32 ++++++++++++++++++++++++++++
+ 3 files changed, 95 insertions(+), 1 deletions(-)
 
-Firstly, you should really send this to the linux-bluetooth list and
-Gustavo not to linux-wireless and John.
-
-While linux-wireless is the catch-all place for everything relating to
-wireless technology in Linux, bluetooth has it's own mailing list, and
-bluetooth patches should be sent there first.
-
-On Mon, Oct 22, 2012 at 4:02 PM, Dwaine Garden VE3GIF
-<dwainegarden@rogers.com> wrote:
->
->
-> Add another vendor specific ID for Atheros AR3012 device.
-> This chip is wrapped by Lite-On Technology Corp.
->
-> output of usb-devices:
-> Bus 001 Device 008: ID 04ca:3004 Lite-On Technology Corp.
-> Device Descriptor:
->   bLength                18
->
->  bDescriptorType         1
->   bcdUSB               1.10
->   bDeviceClass          224 Wireless
->   bDeviceSubClass         1 Radio Frequency
->   bDeviceProtocol         1 Bluetooth
->   bMaxPacketSize0        64
->   idVendor           0x04ca Lite-On Technology Corp.
->   idProduct          0x3004
->   bcdDevice            0.02
->   iManufacturer           1 Atheros Communications
->
->  iProduct                2 Bluetooth USB Host Controller
->   iSerial                 3 Alaska Day 2006
->   bNumConfigurations      1
->
->
-> Signed-off-by: Dwaine Garden <DwaineGarden@rogers.com>  ---
-
-Secondly, while your patch looks correct to me (I'm no expert on the
-hardware or drivers involved) it seems to be severely whitespace
-damaged. You should read the Email Clients document under the
-Documentation directory in your kernel tree (or read it online here:
-http://stuff.mit.edu/afs/sipb/contrib/linux/Documentation/email-clients.txt
-) and ensure that your email client is set up correctly to send
-patches without damaging them.
-
-> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-> index fc2de55..1486f15 100644
-> --- a/drivers/bluetooth/ath3k.c
-> +++ b/drivers/bluetooth/ath3k.c
-> @@ -75,6 +75,7 @@ static struct usb_device_id ath3k_table[] = {
-> { USB_DEVICE(0x0CF3, 0x3004) },
-> { USB_DEVICE(0x0CF3, 0x311D) },
-> { USB_DEVICE(0x13d3, 0x3375) },
-> +       { USB_DEVICE(0x04CA, 0x3004) },
-> { USB_DEVICE(0x04CA, 0x3005) },
-> { USB_DEVICE(0x13d3, 0x3362) },
-> { USB_DEVICE(0x0CF3, 0xE004) },
-> @@ -102,6 +103,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
-> { USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-> { USB_DEVICE(0x0cf3, 0x311D), .driver_info = BTUSB_ATH3012 },
-> { USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
-> +       { USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
-> { USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
-> {
->  USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
-> { USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index debda27..0529cee 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -132,6 +132,7 @@ static struct usb_device_id blacklist_table[] = {
-> { USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-> { USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
-> { USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
-> +       { USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
-> { USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
-> { USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
-> { USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
-
-Thanks,
-
+diff --git a/fuse/helpers.c b/fuse/helpers.c
+index 249d0c9..9b453e0 100644
+--- a/fuse/helpers.c
++++ b/fuse/helpers.c
+@@ -516,3 +516,64 @@ struct stat *gobexhlp_getattr(struct gobexhlp_session* session,
+ 	return g_hash_table_lookup(session->file_stat, path);
+ }
+ 
++static struct gobexhlp_location *get_location(const char *path)
++{
++	struct gobexhlp_location *location;
++	gchar **directories;
++	guint i, len, fid = 0;
++
++	location = g_malloc0(sizeof(*location));
++	directories = g_strsplit(path, "/", -1);
++	len = g_strv_length(directories);
++
++	for (i = 0; i < len; i++)
++		if (directories[i][0] != '\0') /* protect multi slashes */
++			fid = i; /* last nonempty is a file */
++
++	location->file = g_strdup(directories[fid]);
++	directories[fid][0] = '\0'; /* remove file */
++	location->dir = g_strjoinv("/", directories);
++
++	g_strfreev(directories);
++
++	return location;
++}
++
++void free_location(struct gobexhlp_location *location)
++{
++	g_free(location->file);
++	g_free(location->dir);
++	g_free(location);
++}
++
++struct gobexhlp_buffer *gobexhlp_get(struct gobexhlp_session* session,
++						const char *path)
++{
++	struct gobexhlp_location *l;
++	struct gobexhlp_buffer *buffer;
++	struct stat *stfile;
++	l = get_location(path);
++
++	g_print("gobexhlp_get(%s%s)\n", l->dir, l->file);
++
++	stfile = gobexhlp_getattr(session, path);
++	if (stfile == NULL)
++		return NULL;
++
++	buffer = g_malloc0(sizeof(*buffer));
++
++	if (stfile->st_size == 0)
++		return buffer;
++
++	gobexhlp_setpath(session, l->dir);
++	request_new(session, g_strdup_printf("get %s", path));
++	session->buffer = buffer;
++	g_obex_get_req(session->obex, async_get_consumer,
++					complete_func, session, &session->err,
++					G_OBEX_HDR_NAME, l->file,
++					G_OBEX_HDR_INVALID);
++	free_location(l);
++	request_wait_free(session);
++
++	return buffer;
++}
+diff --git a/fuse/helpers.h b/fuse/helpers.h
+index 0a0f366..50c750d 100644
+--- a/fuse/helpers.h
++++ b/fuse/helpers.h
+@@ -54,5 +54,6 @@ void gobexhlp_disconnect(struct gobexhlp_session* session);
+ GList *gobexhlp_listfolder(struct gobexhlp_session* session, const char *path);
+ struct stat *gobexhlp_getattr(struct gobexhlp_session* session,
+ 					const char *path);
+-
++struct gobexhlp_buffer *gobexhlp_get(struct gobexhlp_session* session,
++					const char *path);
+ 
+diff --git a/fuse/obexfuse.c b/fuse/obexfuse.c
+index f4e85fa..9fe2dea 100644
+--- a/fuse/obexfuse.c
++++ b/fuse/obexfuse.c
+@@ -144,9 +144,41 @@ static int obexfuse_getattr(const char *path, struct stat *stbuf)
+ 	return res;
+ }
+ 
++static int obexfuse_open(const char *path, struct fuse_file_info *fi)
++{
++	struct gobexhlp_buffer *file_buffer;
++
++	file_buffer = gobexhlp_get(session, path);
++
++	if (file_buffer == NULL)
++		return -ENOENT;
++
++	fi->fh = (uint64_t)file_buffer;
++
++	return session->status;
++}
++
++static int obexfuse_read(const char *path, char *buf, size_t size,
++			off_t offset, struct fuse_file_info *fi)
++{
++	gsize asize;
++	struct gobexhlp_buffer *file_buffer = (struct gobexhlp_buffer*)fi->fh;
++
++	asize = file_buffer->size - offset;
++
++	if (asize > size)
++		asize = size;
++
++	memcpy(buf, file_buffer->data + offset, asize);
++
++	return asize;
++}
++
+ static struct fuse_operations obexfuse_oper = {
+ 	.readdir = obexfuse_readdir,
+ 	.getattr = obexfuse_getattr,
++	.open = obexfuse_open,
++	.read = obexfuse_read,
+ 	.init = obexfuse_init,
+ 	.destroy = obexfuse_destroy,
+ };
 -- 
-Julian Calaby
+1.7.8.6
 
-Email: julian.calaby@gmail.com
-Profile: http://www.google.com/profiles/julian.calaby/
-.Plan: http://sites.google.com/site/juliancalaby/
