@@ -2,127 +2,134 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
-Subject: [RFC v1 obexd 09/11] fuse: Add touch operation
-Date: Sun, 21 Oct 2012 19:05:29 +0200
-Message-Id: <1350839131-12042-9-git-send-email-dmp0x7c5@gmail.com>
+Subject: [RFC v1 obexd 04/11] fuse: Add request helpers and setpath operation
+Date: Sun, 21 Oct 2012 19:05:24 +0200
+Message-Id: <1350839131-12042-4-git-send-email-dmp0x7c5@gmail.com>
 In-Reply-To: <1350839131-12042-1-git-send-email-dmp0x7c5@gmail.com>
 References: <1350839131-12042-1-git-send-email-dmp0x7c5@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- fuse/helpers.c  |   40 ++++++++++++++++++++++++++++++++++++++++
- fuse/helpers.h  |    1 +
- fuse/obexfuse.c |   17 +++++++++++++++++
- 3 files changed, 58 insertions(+), 0 deletions(-)
+ fuse/helpers.c |  108 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 108 insertions(+), 0 deletions(-)
 
 diff --git a/fuse/helpers.c b/fuse/helpers.c
-index b807f15..05948be 100644
+index 856e1d5..1b8082f 100644
 --- a/fuse/helpers.c
 +++ b/fuse/helpers.c
-@@ -56,6 +56,8 @@ struct gobexhlp_location {
- 	gchar *file;
- };
+@@ -273,3 +273,111 @@ void gobexhlp_disconnect(struct gobexhlp_session* session)
  
-+void gobexhlp_touch_real(struct gobexhlp_session* session, gchar *path);
+ 	g_free(session);
+ }
 +
- static uint16_t find_rfcomm_uuid(void *user_data)
- {
- 	sdp_list_t *pds = (sdp_list_t*) user_data;
-@@ -279,6 +281,12 @@ void request_new(struct gobexhlp_session *session,
- {
- 	g_print("REQUEST %s\n", name);
- 
-+	if (session->vtouch == TRUE) {
-+		session->vtouch = FALSE;
-+		gobexhlp_touch_real(session, session->vtouch_path);
-+		g_free(session->vtouch_path);
++void request_new(struct gobexhlp_session *session,
++					gchar *name)
++{
++	g_print("REQUEST %s\n", name);
++
++	if (session->request != NULL)
++		g_error("Another request (%s) active!\n",
++					session->request->name);
++
++	session->status = 0;
++	session->request = g_malloc0(sizeof(struct gobexhlp_request));
++	session->request->name = name;
++
++	/*
++	 * suspend/resume operations recreates g_io_add_watch(),
++	 * it fixes obex->io freeze during transfer
++	 */
++	g_obex_suspend(session->obex);
++	g_obex_resume(session->obex);
++}
++
++void request_wait_free(struct gobexhlp_session *session)
++{
++	g_print("WAIT for %s\n", session->request->name);
++
++	g_obex_suspend(session->obex);
++	g_obex_resume(session->obex);
++
++	if (session->err != NULL) {
++		g_print("ERROR: %s (%d)\n", session->err->message,
++						session->err->code);
++		g_error_free(session->err);
++		raise(SIGTERM);
++		return;
 +	}
 +
- 	if (session->request != NULL)
- 		g_error("Another request (%s) active!\n",
- 					session->request->name);
-@@ -622,3 +630,35 @@ void gobexhlp_put(struct gobexhlp_session* session,
- 	request_wait_free(session);
- }
- 
-+/* virtual file creation */
-+void gobexhlp_touch(struct gobexhlp_session* session, const char *path)
-+{
-+	struct stat *stbuf;
++	g_mutex_lock(gobexhlp_mutex);
 +
-+	g_print("gobexhlp_touch(%s)\n", path);
++	while (session->request->complete != TRUE)
++		g_cond_wait(gobexhlp_cond, gobexhlp_mutex);
 +
-+	stbuf = g_malloc0(sizeof(struct stat));
-+	stbuf->st_mode = S_IFREG;
-+	g_hash_table_replace(session->file_stat, g_strdup(path), stbuf);
++	g_mutex_unlock(gobexhlp_mutex);
 +
-+	session->vtouch = TRUE;
-+	session->vtouch_path = g_strdup(path);
++	g_free(session->request->name);
++	g_free(session->request);
++	session->request = NULL;
 +}
 +
-+void gobexhlp_touch_real(struct gobexhlp_session* session, gchar *path)
++static void complete_func(GObex *obex, GError *err,
++				gpointer user_data)
 +{
-+	struct gobexhlp_buffer *buffer, *tmpbuf;
++	struct gobexhlp_session *session = user_data;
 +
-+	g_print("gobexhlp_touch_real(%s)\n", path);
++	if (err != NULL) {
++		g_print("ERROR: %s\n", err->message);
++		session->status = -ECANCELED;
++		g_error_free(err);
++	} else {
++		g_print("COMPLETE %s\n", session->request->name);
++	}
 +
-+	tmpbuf = session->buffer; /* save buffer state */
-+
-+	buffer = g_malloc0(sizeof(struct gobexhlp_buffer));
-+	session->rtouch = TRUE;
-+	gobexhlp_put(session, buffer, path);
-+	session->rtouch = FALSE;
-+	g_free(buffer);
-+
-+	session->buffer = tmpbuf;
++	g_mutex_lock(gobexhlp_mutex);
++	session->request->complete = TRUE;
++	g_cond_signal(gobexhlp_cond);
++	g_mutex_unlock(gobexhlp_mutex);
 +}
 +
-diff --git a/fuse/helpers.h b/fuse/helpers.h
-index 95987c4..da5f96c 100644
---- a/fuse/helpers.h
-+++ b/fuse/helpers.h
-@@ -59,4 +59,5 @@ struct gobexhlp_buffer *gobexhlp_get(struct gobexhlp_session* session,
- void gobexhlp_put(struct gobexhlp_session* session,
- 					struct gobexhlp_buffer *buffer,
- 					const char *path);
-+void gobexhlp_touch(struct gobexhlp_session* session, const char *path);
- 
-diff --git a/fuse/obexfuse.c b/fuse/obexfuse.c
-index 900e6d7..b4599d8 100644
---- a/fuse/obexfuse.c
-+++ b/fuse/obexfuse.c
-@@ -215,6 +215,21 @@ static int obexfuse_release(const char *path, struct fuse_file_info *fi)
- 	return session->status;
- }
- 
-+static int obexfuse_utimens(const char *path, const struct timespec tv[2])
++static void response_func(GObex *obex, GError *err, GObexPacket *rsp,
++							gpointer user_data)
 +{
-+	/*
-+	 * Important for mknod (touch) operation
-+	 */
-+	return 0;
++	complete_func(obex, err, user_data);
 +}
 +
-+static int obexfuse_mknod(const char *path, mode_t mode, dev_t dev)
++void gobexhlp_setpath(struct gobexhlp_session *session, const char *path)
 +{
-+	gobexhlp_touch(session, path);
++	guint i = 0, split = 0;
++	gchar **path_v;
++	gsize len;
 +
-+	return 0;
++	g_print("gobexhlp_setpath(%s)\n", path);
++
++	if (g_str_has_prefix(path, session->setpath)) {
++		split = strlen(session->setpath);
++	} else {
++		request_new(session, g_strdup_printf("setpath root"));
++		g_obex_setpath(session->obex, "", response_func,
++						session, &session->err);
++		request_wait_free(session);
++	}
++
++	path_v = g_strsplit(path+split, "/", -1);
++	len = g_strv_length(path_v);
++
++	for (i = 0; i < len; i++)
++		if (path_v[i][0] != '\0') {
++			request_new(session,
++				g_strdup_printf("setpath %s", path_v[i]));
++			g_obex_setpath(session->obex, path_v[i],
++					response_func, session, &session->err);
++			request_wait_free(session);
++		}
++
++	g_free(session->setpath);
++	session->setpath = g_strdup(path);
++
++	g_strfreev(path_v);
 +}
-+
- static struct fuse_operations obexfuse_oper = {
- 	.readdir = obexfuse_readdir,
- 	.getattr = obexfuse_getattr,
-@@ -223,6 +238,8 @@ static struct fuse_operations obexfuse_oper = {
- 	.write = obexfuse_write,
- 	.truncate = obexfuse_truncate,
- 	.release = obexfuse_release,
-+	.utimens = obexfuse_utimens,
-+	.mknod = obexfuse_mknod,
- 	.init = obexfuse_init,
- 	.destroy = obexfuse_destroy,
- };
 -- 
 1.7.8.6
 
