@@ -1,93 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Denis Kirjanov <kirjanov@gmail.com>
-To: davem@davemloft.net
-CC: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Denis Kirjanov <kirjanov@gmail.com>
-Subject: [PATCH RESEND net-next] bluetooth: hci_core: Replace list_for_each with list_for_each_entry() helper
-Date: Mon, 22 Oct 2012 17:22:01 +0400
-Message-ID: <1350912121-24171-1-git-send-email-kirjanov@gmail.com>
+Date: Mon, 22 Oct 2012 13:08:47 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/5 v2] Bluetooth: Add initial support for LE-only
+ controllers
+Message-ID: <20121022100845.GA14263@aemeltch-MOBL1>
+References: <1350669469-7719-1-git-send-email-johan.hedberg@gmail.com>
+ <1350669469-7719-2-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1350669469-7719-2-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Replace list_for_each with list_for_each_entry() helper
+Hi Johan,
 
-Signed-off-by: Denis Kirjanov <kirjanov@gmail.com>
----
- include/net/bluetooth/hci_core.h |   20 ++++++++------------
- 1 files changed, 8 insertions(+), 12 deletions(-)
+On Fri, Oct 19, 2012 at 08:57:45PM +0300, Johan Hedberg wrote:
+> From: Johan Hedberg <johan.hedberg@intel.com>
+> 
+> This patch splits off most the HCI init sequence commands from a fixed
+> set into a conditional one that is sent once the HCI_Read_Local_Features
+> and HCI_Read_Local_Version_Information commands complete. This is
+> necessary since many of the current fixed commands are not allowed for
+> LE-only controllers.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/hci_core.c  |   47 ------------------------------------
+>  net/bluetooth/hci_event.c |   58 +++++++++++++++++++++++++++++++++++++++++----
+>  2 files changed, 53 insertions(+), 52 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 0ec776a..dd05ed0 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -178,48 +178,13 @@ static void hci_reset_req(struct hci_dev *hdev, unsigned long opt)
+>  
+>  static void bredr_init(struct hci_dev *hdev)
+>  {
+> -	struct hci_cp_delete_stored_link_key cp;
+> -	__le16 param;
+> -	__u8 flt_type;
+> -
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 475b8c0..fcf839f 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -852,7 +852,7 @@ struct hci_cb {
- 
- static inline void hci_auth_cfm(struct hci_conn *conn, __u8 status)
- {
--	struct list_head *p;
-+	struct hci_cb *cb;
- 	__u8 encrypt;
- 
- 	hci_proto_auth_cfm(conn, status);
-@@ -863,8 +863,7 @@ static inline void hci_auth_cfm(struct hci_conn *conn, __u8 status)
- 	encrypt = (conn->link_mode & HCI_LM_ENCRYPT) ? 0x01 : 0x00;
- 
- 	read_lock(&hci_cb_list_lock);
--	list_for_each(p, &hci_cb_list) {
--		struct hci_cb *cb = list_entry(p, struct hci_cb, list);
-+	list_for_each_entry(cb, &hci_cb_list, list) {
- 		if (cb->security_cfm)
- 			cb->security_cfm(conn, status, encrypt);
- 	}
-@@ -874,7 +873,7 @@ static inline void hci_auth_cfm(struct hci_conn *conn, __u8 status)
- static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status,
- 								__u8 encrypt)
- {
--	struct list_head *p;
-+	struct hci_cb *cb;
- 
- 	if (conn->sec_level == BT_SECURITY_SDP)
- 		conn->sec_level = BT_SECURITY_LOW;
-@@ -885,8 +884,7 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status,
- 	hci_proto_encrypt_cfm(conn, status, encrypt);
- 
- 	read_lock(&hci_cb_list_lock);
--	list_for_each(p, &hci_cb_list) {
--		struct hci_cb *cb = list_entry(p, struct hci_cb, list);
-+	list_for_each_entry(cb, &hci_cb_list, list) {
- 		if (cb->security_cfm)
- 			cb->security_cfm(conn, status, encrypt);
- 	}
-@@ -895,11 +893,10 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status,
- 
- static inline void hci_key_change_cfm(struct hci_conn *conn, __u8 status)
- {
--	struct list_head *p;
-+	struct hci_cb *cb;
- 
- 	read_lock(&hci_cb_list_lock);
--	list_for_each(p, &hci_cb_list) {
--		struct hci_cb *cb = list_entry(p, struct hci_cb, list);
-+	list_for_each_entry(cb, &hci_cb_list, list) {
- 		if (cb->key_change_cfm)
- 			cb->key_change_cfm(conn, status);
- 	}
-@@ -909,11 +906,10 @@ static inline void hci_key_change_cfm(struct hci_conn *conn, __u8 status)
- static inline void hci_role_switch_cfm(struct hci_conn *conn, __u8 status,
- 								__u8 role)
- {
--	struct list_head *p;
-+	struct hci_cb *cb;
- 
- 	read_lock(&hci_cb_list_lock);
--	list_for_each(p, &hci_cb_list) {
--		struct hci_cb *cb = list_entry(p, struct hci_cb, list);
-+	list_for_each_entry(cb, &hci_cb_list, list) {
- 		if (cb->role_switch_cfm)
- 			cb->role_switch_cfm(conn, status, role);
- 	}
--- 
-1.7.1
+...
 
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 0383635..f4f0b8b 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+
+...
+
+> +static void bredr_init(struct hci_dev *hdev)
+> +{
+
+Is this a good idea to have two functions with the same names? Even static
+ones.
+
+Best regards 
+Andrei Emeltchenko 
