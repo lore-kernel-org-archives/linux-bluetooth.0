@@ -1,104 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	Peter Olson <peter.olson@gmail.com>,
-	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH bluez] wiimote: add Wii-Remote-Plus ID and name detection
-Date: Mon, 22 Oct 2012 10:31:20 +0200
-Message-Id: <1350894680-3947-1-git-send-email-dh.herrmann@googlemail.com>
+MIME-Version: 1.0
+In-Reply-To: <1350882145.55725.YahooMailNeo@web125403.mail.ne1.yahoo.com>
+References: <1350882145.55725.YahooMailNeo@web125403.mail.ne1.yahoo.com>
+From: Julian Calaby <julian.calaby@gmail.com>
+Date: Mon, 22 Oct 2012 16:26:27 +1100
+Message-ID: <CAGRGNgUkDAQaHXuBxR+uu=uoB0j=qfdHpXOtOTP2ZnU89mN1oA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Add support for Atheros [04ca:3004]
+To: Dwaine Garden VE3GIF <dwainegarden@rogers.com>
+Cc: "linville@redhat.com" <linville@redhat.com>,
+	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+	"mcgrof@qca.qualcomm.com" <mcgrof@qca.qualcomm.com>,
+	linux-bluetooth@vger.kernel.org, gustavo@padovan.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Nintendo Wii Remote Plus uses a new product ID and name. To detect
-them properly, we need to add them to the wiimote-module.
+Hi Dwaine,
 
-To avoid an overlong "if" statement, this converts the match-function to
-walk over an array and check all VID/PID pairs and device-names. This
-makes adding new devices much easier.
----
-Hi Johan
+Firstly, you should really send this to the linux-bluetooth list and
+Gustavo not to linux-wireless and John.
 
-I am actually not sure why Nintendo changed the VID/PID for the new revisions of
-the WiimotePlus. I have a WiimotePlus which still uses the old numbers and works
-here quite well. However, I have now got multiple requests from people with the
-new device name and IDs. Unfortunately, I cannot test these so I'd like to have
-a "Tested-by" by Peter (CC'ed) before this is applied.
+While linux-wireless is the catch-all place for everything relating to
+wireless technology in Linux, bluetooth has it's own mailing list, and
+bluetooth patches should be sent there first.
 
-Thanks
-David
+On Mon, Oct 22, 2012 at 4:02 PM, Dwaine Garden VE3GIF
+<dwainegarden@rogers.com> wrote:
+>
+>
+> Add another vendor specific ID for Atheros AR3012 device.
+> This chip is wrapped by Lite-On Technology Corp.
+>
+> output of usb-devices:
+> Bus 001 Device 008: ID 04ca:3004 Lite-On Technology Corp.
+> Device Descriptor:
+>   bLength                18
+>
+>  bDescriptorType         1
+>   bcdUSB               1.10
+>   bDeviceClass          224 Wireless
+>   bDeviceSubClass         1 Radio Frequency
+>   bDeviceProtocol         1 Bluetooth
+>   bMaxPacketSize0        64
+>   idVendor           0x04ca Lite-On Technology Corp.
+>   idProduct          0x3004
+>   bcdDevice            0.02
+>   iManufacturer           1 Atheros Communications
+>
+>  iProduct                2 Bluetooth USB Host Controller
+>   iSerial                 3 Alaska Day 2006
+>   bNumConfigurations      1
+>
+>
+> Signed-off-by: Dwaine Garden <DwaineGarden@rogers.com>  ---
 
- plugins/wiimote.c | 35 ++++++++++++++++++++++++++++-------
- 1 file changed, 28 insertions(+), 7 deletions(-)
+Secondly, while your patch looks correct to me (I'm no expert on the
+hardware or drivers involved) it seems to be severely whitespace
+damaged. You should read the Email Clients document under the
+Documentation directory in your kernel tree (or read it online here:
+http://stuff.mit.edu/afs/sipb/contrib/linux/Documentation/email-clients.txt
+) and ensure that your email client is set up correctly to send
+patches without damaging them.
 
-diff --git a/plugins/wiimote.c b/plugins/wiimote.c
-index 5708bf8..f506ed6 100644
---- a/plugins/wiimote.c
-+++ b/plugins/wiimote.c
-@@ -2,7 +2,7 @@
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-  *
-- *  Copyright (C) 2011  David Herrmann <dh.herrmann@googlemail.com>
-+ *  Copyright (C) 2011-2012 David Herrmann <dh.herrmann@googlemail.com>
-  *
-  *
-  *  This program is free software; you can redistribute it and/or modify
-@@ -58,11 +58,23 @@
-  * is pressed.
-  */
- 
-+static uint16_t wii_ids[][2] = {
-+	{ 0x057e, 0x0306 },
-+	{ 0x057e, 0x0330 },
-+};
-+
-+static const char *wii_names[] = {
-+	"Nintendo RVL-CNT-01",
-+	"Nintendo RVL-CNT-01-TR",
-+	"Nintendo RVL-WBC-01",
-+};
-+
- static ssize_t wii_pincb(struct btd_adapter *adapter, struct btd_device *device,
- 						char *pinbuf, gboolean *display)
- {
- 	uint16_t vendor, product;
- 	char addr[18], name[25];
-+	unsigned int i, len;
- 
- 	ba2str(device_get_address(device), addr);
- 
-@@ -72,15 +84,24 @@ static ssize_t wii_pincb(struct btd_adapter *adapter, struct btd_device *device,
- 	device_get_name(device, name, sizeof(name));
- 	name[sizeof(name) - 1] = 0;
- 
--	if (g_str_equal(name, "Nintendo RVL-CNT-01") ||
--				g_str_equal(name, "Nintendo RVL-WBC-01") ||
--				(vendor == 0x057e && product == 0x0306)) {
--		DBG("Forcing fixed pin on detected wiimote %s", addr);
--		memcpy(pinbuf, adapter_get_address(adapter), 6);
--		return 6;
-+	len = sizeof(wii_ids) / sizeof(wii_ids[0]);
-+	for (i = 0; i < len; ++i) {
-+		if (vendor == wii_ids[i][0] && product == wii_ids[i][1])
-+			goto found;
-+	}
-+
-+	len = sizeof(wii_names) / sizeof(wii_names[0]);
-+	for (i = 0; i < len; ++i) {
-+		if (g_str_equal(name, wii_names[i]))
-+			goto found;
- 	}
- 
- 	return 0;
-+
-+found:
-+	DBG("Forcing fixed pin on detected wiimote %s", addr);
-+	memcpy(pinbuf, adapter_get_address(adapter), 6);
-+	return 6;
- }
- 
- static int wii_probe(struct btd_adapter *adapter)
+> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> index fc2de55..1486f15 100644
+> --- a/drivers/bluetooth/ath3k.c
+> +++ b/drivers/bluetooth/ath3k.c
+> @@ -75,6 +75,7 @@ static struct usb_device_id ath3k_table[] = {
+> { USB_DEVICE(0x0CF3, 0x3004) },
+> { USB_DEVICE(0x0CF3, 0x311D) },
+> { USB_DEVICE(0x13d3, 0x3375) },
+> +       { USB_DEVICE(0x04CA, 0x3004) },
+> { USB_DEVICE(0x04CA, 0x3005) },
+> { USB_DEVICE(0x13d3, 0x3362) },
+> { USB_DEVICE(0x0CF3, 0xE004) },
+> @@ -102,6 +103,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+> { USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
+> { USB_DEVICE(0x0cf3, 0x311D), .driver_info = BTUSB_ATH3012 },
+> { USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+> +       { USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
+> { USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+> {
+>  USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
+> { USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index debda27..0529cee 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -132,6 +132,7 @@ static struct usb_device_id blacklist_table[] = {
+> { USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
+> { USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
+> { USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+> +       { USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
+> { USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+> { USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
+> { USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+
+Thanks,
+
 -- 
-1.7.12.4
+Julian Calaby
 
+Email: julian.calaby@gmail.com
+Profile: http://www.google.com/profiles/julian.calaby/
+.Plan: http://sites.google.com/site/juliancalaby/
