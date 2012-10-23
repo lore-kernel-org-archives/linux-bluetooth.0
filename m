@@ -1,63 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1351003333.1785.26.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Add support for Atheros [04ca:3004]
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Dwaine Garden VE3GIF <dwainegarden@rogers.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 23 Oct 2012 07:42:13 -0700
-In-Reply-To: <1350995487.13036.YahooMailNeo@web125402.mail.ne1.yahoo.com>
-References: <1350995487.13036.YahooMailNeo@web125402.mail.ne1.yahoo.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Syam Sidhardhan <s.syam@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2] gdbus: Replace leading spaces with tabs
+Date: Tue, 23 Oct 2012 19:27:06 +0530
+Message-id: <1351000626-22632-2-git-send-email-s.syam@samsung.com>
+In-reply-to: <1351000626-22632-1-git-send-email-s.syam@samsung.com>
+References: <1351000626-22632-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dwaine,
+Trivial formatting fix.
+---
+ gdbus/object.c |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
 
-> Add another vendor specific ID for Atheros AR3012 device.
-> This chip is wrapped by Lite-On Technology Corp.
-> 
-> output of usb-devices:
-> Bus 001 Device 008: ID 04ca:3004 Lite-On Technology Corp. 
-> Device Descriptor:
->   bLength                18
-> 
-> bDescriptorType         1
->   bcdUSB               1.10
->   bDeviceClass          224 Wireless
->   bDeviceSubClass         1 Radio Frequency
->   bDeviceProtocol         1 Bluetooth
->   bMaxPacketSize0        64
->   idVendor           0x04ca Lite-On Technology Corp.
->   idProduct          0x3004 
->   bcdDevice            0.02
->   iManufacturer           1 Atheros Communications
-> 
-> iProduct                2 Bluetooth USB Host Controller
->   iSerial                 3 Alaska Day 2006
->   bNumConfigurations      1
-
-I prefer /sys/kernel/debug/usb/devices output here.
-
-> 
-> 
-> Signed-off-by: Dwaine Garden <DwaineGarden@rogers.com>  ---
-> 
-> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-> index fc2de55..1486f15 100644
-> --- a/drivers/bluetooth/ath3k.c
-> +++ b/drivers/bluetooth/ath3k.c
-> @@ -75,6 +75,7 @@ static struct usb_device_id ath3k_table[] = {
-> { USB_DEVICE(0x0CF3, 0x3004) },
-> { USB_DEVICE(0x0CF3, 0x311D) },
-> { USB_DEVICE(0x13d3, 0x3375) },
-> +    { USB_DEVICE(0x04CA, 0x3004) },
-
-And you need to use an email client that does not mess up the tabs vs
-white spaces.
-
-Regards
-
-Marcel
-
+diff --git a/gdbus/object.c b/gdbus/object.c
+index 9689006..d58a1a8 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -226,7 +226,7 @@ void g_dbus_pending_success(DBusConnection *connection,
+ {
+ 	GSList *list;
+ 
+-        for (list = pending_security; list; list = list->next) {
++	for (list = pending_security; list; list = list->next) {
+ 		struct security_data *secdata = list->data;
+ 
+ 		if (secdata->pending != pending)
+@@ -240,7 +240,7 @@ void g_dbus_pending_success(DBusConnection *connection,
+ 		dbus_message_unref(secdata->message);
+ 		g_free(secdata);
+ 		return;
+-        }
++	}
+ }
+ 
+ void g_dbus_pending_error_valist(DBusConnection *connection,
+@@ -249,7 +249,7 @@ void g_dbus_pending_error_valist(DBusConnection *connection,
+ {
+ 	GSList *list;
+ 
+-        for (list = pending_security; list; list = list->next) {
++	for (list = pending_security; list; list = list->next) {
+ 		struct security_data *secdata = list->data;
+ 		DBusMessage *reply;
+ 
+@@ -268,7 +268,7 @@ void g_dbus_pending_error_valist(DBusConnection *connection,
+ 		dbus_message_unref(secdata->message);
+ 		g_free(secdata);
+ 		return;
+-        }
++	}
+ }
+ 
+ void g_dbus_pending_error(DBusConnection *connection,
+-- 
+1.7.4.1
 
