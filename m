@@ -1,59 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
 From: Syam Sidhardhan <s.syam@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] audio: Fix headset NULL pointer dereference during
- AT+BLDN response
-Date: Tue, 23 Oct 2012 19:27:05 +0530
-Message-id: <1351000626-22632-1-git-send-email-s.syam@samsung.com>
+Subject: [PATCH v1 5/5] Bluetooth: Fix L2CAP dynamic PSM bind issue
+Date: Tue, 23 Oct 2012 19:02:20 +0530
+Message-id: <1350999140-7481-5-git-send-email-s.syam@samsung.com>
+In-reply-to: <1350999140-7481-1-git-send-email-s.syam@samsung.com>
+References: <1350999140-7481-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-While waiting for the AT+BLDN asynchronous response, if RFCOMM got
-disconnected, then respose will cause NULL pointer dereference.
+Dynamic PSM choosen by the kernel should bound to either BDADDR_ANY
+or the same adapter address(not both) for a particular adapter.
 
-During headset disconnection, the headset state changes from
-HEADSET_STATE_CONNECTED to HEADSET_STATE_DISCONNECTED along with
-freeing the dev->headset. During the response, in telephony_generic_rsp
-its dereferencing.
+The problem here is by giving PSM 0, the kernel should return the first
+available PSM in the non-reserverd space, but since we reuse the same
+code to do the matching it end up given both Obexd and HDP the same
+PSM.
 
-Log:
-bluetoothd[5573]: audio/headset.c:handle_event() Received AT+BLDN
-bluetoothd[5573]: audio/telephony.c:telephony_last_dialed_number_req()
- telephony-tizen: last dialed number request
-bluetoothd[5573]: audio/telephony.c:dbus_method_call_send() +
-bluetoothd[5573]: audio/telephony.c:dbus_method_call_send() -
-bluetoothd[5573]: Endpoint replied with an error: org.freedesktop.DBus\
- .Error.NoReply
-bluetoothd[5573]: audio/telephony.c:telephony_device_disconnected()
- telephony-tizen: device 0x40439b60 disconnected
-bluetoothd[5573]: audio/headset.c:headset_set_state() State changed
- /org/bluez/5573/hci0/dev_BC_47_60_F5_88_89:
- HEADSET_STATE_CONNECTED -> HEADSET_STATE_DISCONNECTED
-bluetoothd[5573]: audio/media.c:headset_state_changed()
-bluetoothd[5573]: audio/media.c:headset_state_changed() Clear endpoint
- 0x40430620
-bluetoothd[5573]: audio/telephony.c:telephony_dial_number_reply()
- redial_reply
-bluetoothd[5573]: audio/telephony.c:telephony_dial_number_reply()
- dial_reply reply: No Call log
+Provid a helper function to handle the dymanic PSM auto selection.
+
+Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
 ---
- audio/headset.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ net/bluetooth/l2cap_core.c |   55 ++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 46 insertions(+), 9 deletions(-)
 
-diff --git a/audio/headset.c b/audio/headset.c
-index bd83a65..30d24cf 100644
---- a/audio/headset.c
-+++ b/audio/headset.c
-@@ -689,6 +689,9 @@ static int telephony_generic_rsp(struct audio_device *device, cme_error_t err)
- 	struct headset *hs = device->headset;
- 	struct headset_slc *slc = hs->slc;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index d42cdb1..33b5d34 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -119,6 +119,43 @@ static struct l2cap_chan *__l2cap_global_chan_by_addr(__le16 psm, bdaddr_t *src)
+ 	return NULL;
+ }
  
-+	if (!slc)
-+		return -EIO;
++/* Returns free dynamic PSM */
++static u16 __l2cap_global_get_dyna_chan_by_addr(bdaddr_t *src)
++{
++	struct l2cap_chan *c;
++	u16 p;
++	bool found;
 +
- 	if ((err != CME_ERROR_NONE) && slc->cme_enabled)
- 		return headset_send(hs, "\r\n+CME ERROR: %d\r\n", err);
++	for (p = 0x1001; p < 0x1100; p += 2) {
++		found = false;
++
++		list_for_each_entry(c, &chan_list, global_l) {
++			if (c->sport != p)
++				continue;
++
++			/* PSM match found */
++			found = true;
++
++			/* Exact match */
++			if (!bacmp(&bt_sk(c->sk)->src, src))
++				break;
++
++			/* BDADDR_ANY match */
++			if (!bacmp(&bt_sk(c->sk)->src, BDADDR_ANY) ||
++			    !bacmp(src, BDADDR_ANY))
++				break;
++
++			/* Match found only for other adapter address */
++			return p;
++		}
++
++		if (!found)
++			return p;
++	}
++
++	return 0;
++}
++
+ int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm)
+ {
+ 	int err;
+@@ -135,16 +172,16 @@ int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm)
+ 		chan->sport = psm;
+ 		err = 0;
+ 	} else {
+-		u16 p;
+-
++		/* No PSM given by user space */
++		u16 dpsm;
+ 		err = -EINVAL;
+-		for (p = 0x1001; p < 0x1100; p += 2)
+-			if (!__l2cap_global_chan_by_addr(cpu_to_le16(p), src)) {
+-				chan->psm   = cpu_to_le16(p);
+-				chan->sport = cpu_to_le16(p);
+-				err = 0;
+-				break;
+-			}
++
++		dpsm = __l2cap_global_get_dyna_chan_by_addr(src);
++		if (dpsm) {
++			chan->psm = dpsm;
++			chan->sport = dpsm;
++			err = 0;
++		}
+ 	}
  
+ done:
 -- 
-1.7.4.1
+1.7.9.5
 
