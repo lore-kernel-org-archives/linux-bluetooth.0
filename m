@@ -1,39 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 23 Oct 2012 23:59:23 +0300
+Date: Tue, 23 Oct 2012 23:48:09 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/7] Bluetooth: Disallow LE scanning and connecting in
- peripheral mode
-Message-ID: <20121023205923.GA15410@x220.ger.corp.intel.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/7] Bluetooth: mgmt: Restrict BR/EDR settings to
+ BR/EDR-only adapters
+Message-ID: <20121023204809.GB12042@x220.ger.corp.intel.com>
 References: <1351011241-32515-1-git-send-email-johan.hedberg@gmail.com>
- <1351011241-32515-4-git-send-email-johan.hedberg@gmail.com>
- <CAJdJm_PXwxZ1cyCd=2g170AYx7yjx24cHmksJCTbkxtxyOV4-g@mail.gmail.com>
+ <1351011241-32515-3-git-send-email-johan.hedberg@gmail.com>
+ <1351018956.1785.45.camel@aeonflux>
+ <CAJdJm_OLBgRVBFLD4sEp+OK-qkF_-CXXzuZOCAyiaD+TVMOYKQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAJdJm_PXwxZ1cyCd=2g170AYx7yjx24cHmksJCTbkxtxyOV4-g@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <CAJdJm_OLBgRVBFLD4sEp+OK-qkF_-CXXzuZOCAyiaD+TVMOYKQ@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Lizardo,
 
 On Tue, Oct 23, 2012, Anderson Lizardo wrote:
-> This will conflict with an Observer role running on the same device.
-> Multiple roles are allowed to run concurrently if supported by the
-> controller. From Core spec page 1639:
-> 
-> A device may operate in multiple GAP roles concurrently if supported
-> by the Controller. The Host should read the supported Link Layer
-> States and State combinations from the Controller before any
-> procedures or modes are used.
-> 
-> Do you propose SET_LE to become a bitfield to support concurrent
-> roles?  I.e. Broadcaster/Observer.
+> Johan: do you have further plans on improving LE peripheral support
+> after these patches? If yes, please keep in mind that we still have
+> ongoing plans to push broadcaster/observer roles upstream, which also
+> requires hability to enable/disable advertising and set advertising
+> data/parameters.
 
-See the other email I sent about this. If peripheral mode is enabled I
-don't see how we could simultaneously allow another LE GAP mode based on
-the restrictions of the core spec. And yes, we could make set_le a bit
-field, but peripheral will probably still remain mutually exclusive with
-any other LE GAP mode.
+Looking through the various "shall" and "shall not" clauses in the core
+spec it seems to me that only Central, Observer and Broadcaster roles
+are compatible with each other, and Peripheral is mutually exclusive
+with anything else. E.g. section 9.2.4.2 (page 1700):
+
+"While a device is in the Broadcaster, Observer or Central role the
+device shall not support the general discoverable mode."
+
+and section 9.3.4.2 (page 1709):
+
+"While a device is in the Broadcaster, Observer, or the Central role
+the device shall not support the undirected connectable mode."
+
+Both general discoverable and undirected connectable are needed by
+Peripheral role, i.e. essentially excluding the other roles.
+
+Extending the other roles could indeed be a matter of interpreting the
+mgmt_set_le parameter as a bit mask and then returning an error if an
+incompatible combination of roles is attempted. Also, once support for
+new roles is added it should be easy to extend the current state checks
+to make a distinction on exactly what kind of scanning/advertising is
+done instead of just looking at "advertising or not" on a general level.
 
 Johan
