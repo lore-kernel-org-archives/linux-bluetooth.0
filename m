@@ -1,39 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1351011241-32515-5-git-send-email-johan.hedberg@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 6/7] Bluetooth: Sort feature test macros by bitmask location
+Date: Tue, 23 Oct 2012 19:54:00 +0300
+Message-Id: <1351011241-32515-7-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1351011241-32515-1-git-send-email-johan.hedberg@gmail.com>
 References: <1351011241-32515-1-git-send-email-johan.hedberg@gmail.com>
-	<1351011241-32515-5-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 23 Oct 2012 14:30:03 -0400
-Message-ID: <CAJdJm_MhB79eQSAHUqOa7Xwf+ujrnQZtG_jqEgMfEFzuoqB9-w@mail.gmail.com>
-Subject: Re: [PATCH 4/7] Bluetooth: Add support for setting LE advertising data
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Tue, Oct 23, 2012 at 12:53 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> +       if (hdev->adv_tx_power) {
-> +               ptr[0] = 2;
-> +               ptr[1] = EIR_TX_POWER;
-> +               ptr[2] = (u8) hdev->adv_tx_power;
-> +
-> +               ad_len += 3;
-> +               ptr += 3;
-> +       }
+This patch sorts the feature test marcos according to the location of
+each feature bit in the features bit mask. This helps easy lookup when
+adding new marcos and wanting to check if there already is a macro
 
-0dBm is a valid TX power. Not sure the if() clause is valid here.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci_core.h |   10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Also, I'm worried how we are going to put other advertising data here,
-i.e. Manufacturer Specific data or Service Data. On last BlueZ meeting
-we proposed (and have been implementing) the Set Controller Data mgmt
-command to set them. Is this still an acceptable approach?
-
-Regards,
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 3ad3281..006aca7 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -751,16 +751,16 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ #define SET_HCIDEV_DEV(hdev, pdev) ((hdev)->dev.parent = (pdev))
+ 
+ /* ----- LMP capabilities ----- */
+-#define lmp_rswitch_capable(dev)   ((dev)->features[0] & LMP_RSWITCH)
+ #define lmp_encrypt_capable(dev)   ((dev)->features[0] & LMP_ENCRYPT)
++#define lmp_rswitch_capable(dev)   ((dev)->features[0] & LMP_RSWITCH)
+ #define lmp_sniff_capable(dev)     ((dev)->features[0] & LMP_SNIFF)
+-#define lmp_sniffsubr_capable(dev) ((dev)->features[5] & LMP_SNIFF_SUBR)
+ #define lmp_esco_capable(dev)      ((dev)->features[3] & LMP_ESCO)
+-#define lmp_ssp_capable(dev)       ((dev)->features[6] & LMP_SIMPLE_PAIR)
+-#define lmp_no_flush_capable(dev)  ((dev)->features[6] & LMP_NO_FLUSH)
+-#define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
+ #define lmp_bredr_capable(dev)     (!((dev)->features[4] & LMP_NO_BREDR))
++#define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
++#define lmp_sniffsubr_capable(dev) ((dev)->features[5] & LMP_SNIFF_SUBR)
+ #define lmp_le_br_capable(dev)     ((dev)->features[6] & LMP_SIMUL_LE_BR)
++#define lmp_ssp_capable(dev)       ((dev)->features[6] & LMP_SIMPLE_PAIR)
++#define lmp_no_flush_capable(dev)  ((dev)->features[6] & LMP_NO_FLUSH)
+ 
+ /* ----- Extended LMP capabilities ----- */
+ #define lmp_host_le_capable(dev)   ((dev)->host_features[0] & LMP_HOST_LE)
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.10.4
+
