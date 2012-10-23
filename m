@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/7] Bluetooth: Disallow LE scanning and connecting in peripheral mode
-Date: Tue, 23 Oct 2012 19:53:57 +0300
-Message-Id: <1351011241-32515-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/7] Bluetooth: mgmt: Restrict BR/EDR settings to BR/EDR-only adapters
+Date: Tue, 23 Oct 2012 19:53:56 +0300
+Message-Id: <1351011241-32515-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1351011241-32515-1-git-send-email-johan.hedberg@gmail.com>
 References: <1351011241-32515-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,44 +11,83 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-When an adapter is in the LE peripheral mode scanning for other devices
-or initiating connections to them is not allowed. This patch makes sure
-that such attempts will result in appropriate error returns.
+This patch makes sure that settings which are specific for BR/EDR
+capable adapters are not allowed for non-BR/EDR (e.g. LE-only) adapters.
+Instead, a "not supported" error is returned of such a setting is
+attempted to be set for a non-BR/EDR adapter.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_conn.c |    3 +++
- net/bluetooth/hci_core.c |    3 +++
- 2 files changed, 6 insertions(+)
+ net/bluetooth/mgmt.c |   22 +++++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index fe64621..a75b30e 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -502,6 +502,9 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- {
- 	struct hci_conn *le;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 1d79979..eaa6fdc 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -377,15 +377,15 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+ 	u32 settings = 0;
  
-+	if (test_bit(HCI_LE_PERIPHERAL, &hdev->flags))
-+		return ERR_PTR(-ENOTSUPP);
+ 	settings |= MGMT_SETTING_POWERED;
+-	settings |= MGMT_SETTING_CONNECTABLE;
+-	settings |= MGMT_SETTING_FAST_CONNECTABLE;
+-	settings |= MGMT_SETTING_DISCOVERABLE;
+ 	settings |= MGMT_SETTING_PAIRABLE;
+ 
+ 	if (lmp_ssp_capable(hdev))
+ 		settings |= MGMT_SETTING_SSP;
+ 
+ 	if (lmp_bredr_capable(hdev)) {
++		settings |= MGMT_SETTING_CONNECTABLE;
++		settings |= MGMT_SETTING_FAST_CONNECTABLE;
++		settings |= MGMT_SETTING_DISCOVERABLE;
+ 		settings |= MGMT_SETTING_BREDR;
+ 		settings |= MGMT_SETTING_LINK_SECURITY;
+ 	}
+@@ -874,6 +874,10 @@ static int set_discoverable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	BT_DBG("request for %s", hdev->name);
+ 
++	if (!lmp_bredr_capable(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_DISCOVERABLE,
++				 MGMT_STATUS_NOT_SUPPORTED);
 +
- 	le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
- 	if (!le) {
- 		le = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 487308b..b2adef4 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1575,6 +1575,9 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
+ 	timeout = __le16_to_cpu(cp->timeout);
+ 	if (!cp->val && timeout > 0)
+ 		return cmd_status(sk, hdev->id, MGMT_OP_SET_DISCOVERABLE,
+@@ -969,6 +973,10 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	BT_DBG("request for %s", hdev->name);
+ 
++	if (!lmp_bredr_capable(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_CONNECTABLE,
++				  MGMT_STATUS_NOT_SUPPORTED);
++
+ 	hci_dev_lock(hdev);
+ 
+ 	if (!hdev_is_powered(hdev)) {
+@@ -1067,6 +1075,10 @@ static int set_link_security(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	BT_DBG("request for %s", hdev->name);
+ 
++	if (!lmp_bredr_capable(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_LINK_SECURITY,
++				  MGMT_STATUS_NOT_SUPPORTED);
++
+ 	hci_dev_lock(hdev);
+ 
+ 	if (!hdev_is_powered(hdev)) {
+@@ -2647,6 +2659,10 @@ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
  
  	BT_DBG("%s", hdev->name);
  
-+	if (test_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags))
-+		return -ENOTSUPP;
++	if (!lmp_bredr_capable(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
++				  MGMT_STATUS_NOT_SUPPORTED);
 +
- 	if (work_busy(&hdev->le_scan))
- 		return -EINPROGRESS;
- 
+ 	if (!hdev_is_powered(hdev))
+ 		return cmd_status(sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
+ 				  MGMT_STATUS_NOT_POWERED);
 -- 
 1.7.10.4
 
