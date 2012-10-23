@@ -5,62 +5,52 @@ To: linux-bluetooth@vger.kernel.org,
 Cc: sunnyk@codeaurora.org,
 	marcel@holtmann.org,
 	andrei.emeltchenko.news@gmail.com
-Subject: [PATCHv5 03/18] Bluetooth: Remove unnecessary intermediate function
-Date: Tue, 23 Oct 2012 15:24:08 -0700
-Message-Id: <1351031063-11791-4-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv5 04/18] Bluetooth: Lookup channel structure based on DCID
+Date: Tue, 23 Oct 2012 15:24:09 -0700
+Message-Id: <1351031063-11791-5-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1351031063-11791-1-git-send-email-mathewm@codeaurora.org>
 References: <1351031063-11791-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Resolves a conflict resolution issue in "Bluetooth: Fix L2CAP coding
-style".  The remaining connect and create channel response handler is
-renamed to better reflect its use for both response types.
+Processing a move channel request involves getting the channel
+structure using the destination channel ID.  Previous code could only
+look up using the source channel ID.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 Acked-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 13 ++-----------
- 1 file changed, 2 insertions(+), 11 deletions(-)
+ net/bluetooth/l2cap_core.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2b3eef7..3175094 100644
+index 3175094..03daae8 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -3538,7 +3538,7 @@ static int l2cap_connect_req(struct l2cap_conn *conn,
- 	return 0;
+@@ -100,6 +100,23 @@ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn,
+ 	return c;
  }
  
--static inline int l2cap_connect_rsp(struct l2cap_conn *conn,
-+static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
- 				    struct l2cap_cmd_hdr *cmd, u8 *data)
++/* Find channel with given DCID.
++ * Returns locked channel.
++ */
++static struct l2cap_chan *l2cap_get_chan_by_dcid(struct l2cap_conn *conn,
++						 u16 cid)
++{
++	struct l2cap_chan *c;
++
++	mutex_lock(&conn->chan_lock);
++	c = __l2cap_get_chan_by_dcid(conn, cid);
++	if (c)
++		l2cap_chan_lock(c);
++	mutex_unlock(&conn->chan_lock);
++
++	return c;
++}
++
+ static struct l2cap_chan *__l2cap_get_chan_by_ident(struct l2cap_conn *conn,
+ 						    u8 ident)
  {
- 	struct l2cap_conn_rsp *rsp = (struct l2cap_conn_rsp *) data;
-@@ -4092,15 +4092,6 @@ static int l2cap_create_channel_req(struct l2cap_conn *conn,
- 	return 0;
- }
- 
--static inline int l2cap_create_channel_rsp(struct l2cap_conn *conn,
--					   struct l2cap_cmd_hdr *cmd,
--					   void *data)
--{
--	BT_DBG("conn %p", conn);
--
--	return l2cap_connect_rsp(conn, cmd, data);
--}
--
- static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
- 				     u16 icid, u16 result)
- {
-@@ -4307,7 +4298,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 
- 	case L2CAP_CONN_RSP:
- 	case L2CAP_CREATE_CHAN_RSP:
--		err = l2cap_connect_rsp(conn, cmd, data);
-+		err = l2cap_connect_create_rsp(conn, cmd, data);
- 		break;
- 
- 	case L2CAP_CONF_REQ:
 -- 
 1.8.0
 
