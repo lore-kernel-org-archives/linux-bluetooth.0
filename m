@@ -1,58 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1351054633.13513.YahooMailNeo@web125402.mail.ne1.yahoo.com>
-Date: Tue, 23 Oct 2012 21:57:13 -0700 (PDT)
-From: Dwaine Garden VE3GIF <dwainegarden@rogers.com>
-Reply-To: Dwaine Garden VE3GIF <dwainegarden@rogers.com>
-Subject: [PATCH] Bluetooth: Add support for Atheros [04ca:3004] 
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1351031906.1785.64.camel@aeonflux>
+References: <1351031063-11791-1-git-send-email-mathewm@codeaurora.org>
+	<1351031906.1785.64.camel@aeonflux>
+Date: Wed, 24 Oct 2012 07:58:58 +0300
+Message-ID: <CAMXE1-oL202a=T5EyR8Tm98oMHRsr8=XZZuTwiMnSCZFaLs5ww@mail.gmail.com>
+Subject: Re: [PATCHv5 00/18] L2CAP signaling for AMP channel create/move
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: sunnyk@codeaurora.org, gustavo@padovan.org,
+	linux-bluetooth@vger.kernel.org, Mat Martineau <mathewm@codeaurora.org>
+Content-Type: multipart/alternative; boundary=f46d04308570c3dc2104ccc6f1dd
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add another vendor specific ID for Atheros AR3012 device.
-This chip is wrapped by Lite-On Technology Corp.
+--f46d04308570c3dc2104ccc6f1dd
+Content-Type: text/plain; charset=ISO-8859-1
 
-output of usb-devices:T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=04ca ProdID=3004 Rev= 0.02
-S:  Manufacturer=Atheros Communications
-S:  Product=Bluetooth USB Host Controller
-S:  SerialNumber=Alaska Day 2006
+Hi Marcel,
 
-Signed-off-by: Dwaine Garden <DwaineGarden@rogers.com>  ---
+> > Here are the changes that process commands on the L2CAP signaling
+> > channel for setting up AMP channels.  There's still a lot of
+> > integration to do as other AMP functionality is implemented.  I've
+> > marked places that require this integration with "Placeholder"
+> > comments (look for that string).
+>
+> this looks fine to me now.
+>
+> Andrei, what is left to do on your side?
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index fc2de55..1486f15 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -75,6 +75,7 @@ static struct usb_device_id ath3k_table[] = {
-{ USB_DEVICE(0x0CF3, 0x3004) },
-{ USB_DEVICE(0x0CF3, 0x311D) },
-{ USB_DEVICE(0x13d3, 0x3375) },
-+	{ USB_DEVICE(0x04CA, 0x3004) },
-{ USB_DEVICE(0x04CA, 0x3005) },
-{ USB_DEVICE(0x13d3, 0x3362) },
-{ USB_DEVICE(0x0CF3, 0xE004) },
-@@ -102,6 +103,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
-{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-{ USB_DEVICE(0x0cf3, 0x311D), .driver_info = BTUSB_ATH3012 },
-{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
-{ USB_DEVICE(0x04ca, 0x3005), .driver_info =
- BTUSB_ATH3012 },
-{
- USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
-{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index debda27..0529cee 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -132,6 +132,7 @@ static struct usb_device_id blacklist_table[] = {
-{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-{ USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
-{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
-{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
-{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
-{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+Looks OK now.
+
+Regards,
+Andrei
+
+--f46d04308570c3dc2104ccc6f1dd
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<p>Hi Marcel, <br></p>
+<p>&gt; &gt; Here are the changes that process commands on the L2CAP signal=
+ing<br>
+&gt; &gt; channel for setting up AMP channels. =A0There&#39;s still a lot o=
+f<br>
+&gt; &gt; integration to do as other AMP functionality is implemented. =A0I=
+&#39;ve<br>
+&gt; &gt; marked places that require this integration with &quot;Placeholde=
+r&quot;<br>
+&gt; &gt; comments (look for that string).<br>
+&gt;<br>
+&gt; this looks fine to me now.<br>
+&gt;<br>
+&gt; Andrei, what is left to do on your side?<br></p>
+<p>Looks OK now.</p>
+<p>Regards,<br>
+Andrei</p>
+
+--f46d04308570c3dc2104ccc6f1dd--
