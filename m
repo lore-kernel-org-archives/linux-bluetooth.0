@@ -1,40 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Oct 2012 11:26:01 -0200
+Date: Wed, 24 Oct 2012 11:22:34 -0200
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 5/5 v2] Bluetooth: Read adversiting channel TX power
- during init sequence
-Message-ID: <20121024132601.GH13884@joana>
-References: <1350669469-7719-1-git-send-email-johan.hedberg@gmail.com>
- <1350669469-7719-6-git-send-email-johan.hedberg@gmail.com>
+To: Denis Kirjanov <kirjanov@gmail.com>
+Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RESEND net-next] bluetooth: hci_core: Replace
+ list_for_each with list_for_each_entry() helper
+Message-ID: <20121024132234.GG13884@joana>
+References: <1350912121-24171-1-git-send-email-kirjanov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1350669469-7719-6-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1350912121-24171-1-git-send-email-kirjanov@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Denis,
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2012-10-19 20:57:49 +0300]:
+* Denis Kirjanov <kirjanov@gmail.com> [2012-10-22 17:22:01 +0400]:
 
-> From: Johan Hedberg <johan.hedberg@intel.com>
+> Replace list_for_each with list_for_each_entry() helper
 > 
-> This patch adds the reading of the LE advertising channel TX power to
-> the HCI init sequence of LE-capable controllers. This data will be used
-> e.g. for inclusion in the advertising data packets when advertising is
-> enabled.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Denis Kirjanov <kirjanov@gmail.com>
 > ---
->  include/net/bluetooth/hci.h      |    6 ++++++
->  include/net/bluetooth/hci_core.h |    2 ++
->  net/bluetooth/hci_event.c        |   20 ++++++++++++++++++++
->  3 files changed, 28 insertions(+)
+>  include/net/bluetooth/hci_core.h |   20 ++++++++------------
+>  1 files changed, 8 insertions(+), 12 deletions(-)
 
-All patches but patch 4 were applied to bluetooth-next. Patch 4 doesn't apply
-on current bluetooth-next. I also change functions on patch 1 to use _setup().
-Thanks.
+Patch has been applied to bluetooth-next. Thanks.
 
 	Gustavo
