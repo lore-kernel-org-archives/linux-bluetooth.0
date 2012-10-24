@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v7 15/16] input: Retrieve device name from cache directory
-Date: Wed, 24 Oct 2012 16:34:17 +0200
-Message-Id: <1351089258-25179-16-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v7 14/16] dbusoob: Store device name in cache directory
+Date: Wed, 24 Oct 2012 16:34:16 +0200
+Message-Id: <1351089258-25179-15-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1351089258-25179-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1351089258-25179-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -12,60 +12,60 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- profiles/input/device.c |   26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
+ plugins/dbusoob.c |   26 +++++++++++++++++++++++---
+ 1 file changed, 23 insertions(+), 3 deletions(-)
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index 9dd8002..41b7a5c 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -37,6 +37,7 @@
- #include <bluetooth/sdp_lib.h>
- #include <bluetooth/uuid.h>
+diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
+index 5c5b6ef..82d512c 100644
+--- a/plugins/dbusoob.c
++++ b/plugins/dbusoob.c
+@@ -31,6 +31,7 @@
  
-+#include <glib.h>
+ #include <errno.h>
  #include <gdbus.h>
++#include <sys/stat.h>
  
- #include "log.h"
-@@ -757,7 +758,9 @@ static struct input_device *input_device_new(struct btd_device *device,
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/hci.h>
+@@ -194,6 +195,11 @@ static gboolean parse_data(DBusMessageIter *data, struct oob_data *remote_data)
+ static gboolean store_data(struct btd_adapter *adapter, struct oob_data *data)
  {
- 	struct btd_adapter *adapter = device_get_adapter(device);
- 	struct input_device *idev;
--	char name[249], src_addr[18], dst_addr[18];
-+	char src_addr[18], dst_addr[18];
+ 	bdaddr_t bdaddr;
 +	char filename[PATH_MAX + 1];
++	char s_addr[18];
 +	GKeyFile *key_file;
++	char *str;
++	gsize length = 0;
  
- 	idev = g_new0(struct input_device, 1);
- 	bacpy(&idev->src, adapter_get_address(adapter));
-@@ -770,9 +773,24 @@ static struct input_device *input_device_new(struct btd_device *device,
- 	ba2str(&idev->src, src_addr);
- 	ba2str(&idev->dst, dst_addr);
+ 	str2ba(data->addr, &bdaddr);
  
--	if (read_device_name(src_addr, dst_addr, device_get_addr_type(device),
--				name) == 0)
--		idev->name = g_strdup(name);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s", src_addr,
-+			dst_addr);
-+	filename[PATH_MAX] = '\0';
-+	key_file = g_key_file_new();
+@@ -207,9 +213,23 @@ static gboolean store_data(struct btd_adapter *adapter, struct oob_data *data)
+ 		write_remote_class(adapter_get_address(adapter), &bdaddr,
+ 								data->class);
+ 
+-	if (data->name)
+-		write_device_name(adapter_get_address(adapter), &bdaddr, 0,
+-								data->name);
++	if (data->name) {
++		ba2str(adapter_get_address(adapter), s_addr);
++		snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s",
++				s_addr, data->addr);
++		filename[PATH_MAX] = '\0';
++		create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 +
-+	if (g_key_file_load_from_file(key_file, filename, 0, NULL)) {
-+		int len;
++		key_file = g_key_file_new();
++		g_key_file_load_from_file(key_file, filename, 0, NULL);
++		g_key_file_set_string(key_file, "General", "Name", data->name);
 +
-+		idev->name = g_key_file_get_string(key_file, "General",
-+								"Name", NULL);
-+		if (idev->name) {
-+			len = strlen(idev->name);
-+			if (len > HCI_MAX_NAME_LENGTH)
-+				idev->name[HCI_MAX_NAME_LENGTH] = '\0';
-+		}
++		str = g_key_file_to_data(key_file, &length, NULL);
++		g_file_set_contents(filename, str, length, NULL);
++		g_free(str);
++
++		g_key_file_free(key_file);
 +	}
-+
-+	g_key_file_free(key_file);
  
- 	if (g_dbus_register_interface(btd_get_dbus_connection(),
- 					idev->path, INPUT_DEVICE_INTERFACE,
+ 	return TRUE;
+ }
 -- 
 1.7.9.5
 
