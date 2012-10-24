@@ -1,37 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Oct 2012 11:04:17 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix having bogus entries in
- mgmt_read_index_list reply
-Message-ID: <20121024130417.GF13884@joana>
-References: <1350666646-6276-1-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1350666646-6276-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1350661172-18125-6-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1350661172-18125-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1350661172-18125-6-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Wed, 24 Oct 2012 08:28:23 -0400
+Message-ID: <CAJdJm_NfFbRfLg9Jp_id3_z74P5A-Rg0VPnHvvD-6NopJWTB=Q@mail.gmail.com>
+Subject: Re: [RFC v0 05/15] network: Add network .connect and .disconnect
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Mikel,
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2012-10-19 20:10:46 +0300]:
+On Fri, Oct 19, 2012 at 11:39 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> +static void connect_profile_cb(struct btd_device *device, int err,
+> +                                               const char *pdev, void *data)
+> +{
+> +       struct connect_req *req = data;
+> +
+> +       req->cb(req->profile, req->device, err);
+> +
+> +       g_free(req);
+> +}
+> +
+> +static int connect_profile(struct btd_device *dev, struct btd_profile *profile,
+> +                                               uint16_t id, btd_profile_cb cb)
+> +{
+> +       struct connect_req *req;
+> +       int err;
+> +
+> +       DBG("path %s id %u", device_get_path(dev), id);
+> +
+> +       req  = g_new0(struct connect_req, 1);
+> +       req->device = dev;
 
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> The mgmt_read_index_list uses one loop to calculate the max needed size
-> of its response with the help of an upper-bound of the controller count.
-> The second loop is more strict as it checks for HCI_SETUP (which might
-> have gotten set after the first loop) and could result in some indexes
-> being skipped. Because of this the function needs to readjust the event
-> length and index count after filling in the response array.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> Cc: stable@vger.kernel.org
-> ---
->  net/bluetooth/mgmt.c |   11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
+Isn't btd_device_ref() required here?
 
-Patch has been applied to bluetooth.git. Thanks.
+> +       req->profile = profile;
+> +       req->cb = cb;
+> +
+> +       err = connection_connect(dev, BNEP_SVC_PANU, NULL, connect_profile_cb,
+> +                                                                       req);
+> +       if (err < 0) {
+> +               g_free(req);
+> +               return err;
+> +       }
+> +
+> +       return 0;
+> +}
 
-	Gustavo
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
