@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/7] Bluetooth: Fix updating host feature bits for LE
-Date: Wed, 24 Oct 2012 21:11:59 +0300
-Message-Id: <1351102323-4654-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/7] Bluetooth: mgmt: Restrict BR/EDR settings to BR/EDR-only adapters
+Date: Wed, 24 Oct 2012 21:11:58 +0300
+Message-Id: <1351102323-4654-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1351102323-4654-1-git-send-email-johan.hedberg@gmail.com>
 References: <1351102323-4654-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,32 +11,84 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-When LE has been enabled with the simultaneous BR/EDR & LE parameter set
-to true we should also update the host features stored in struct hci_dev
-accordingly.
+This patch makes sure that settings which are specific for BR/EDR
+capable adapters are not allowed for non-BR/EDR (e.g. LE-only) adapters.
+Instead, a "not supported" error is returned of such a setting is
+attempted to be set for a non-BR/EDR adapter.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_event.c |    5 +++++
- 1 file changed, 5 insertions(+)
+ net/bluetooth/mgmt.c |   22 +++++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 0b9e646..aa325ee 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1287,6 +1287,11 @@ static void hci_cc_write_le_host_supported(struct hci_dev *hdev,
- 			hdev->host_features[0] |= LMP_HOST_LE;
- 		else
- 			hdev->host_features[0] &= ~LMP_HOST_LE;
-+
-+		if (sent->simul)
-+			hdev->host_features[0] |= LMP_HOST_LE_BREDR;
-+		else
-+			hdev->host_features[0] &= ~LMP_HOST_LE_BREDR;
- 	}
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 19cb899..6215c97 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -377,15 +377,15 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+ 	u32 settings = 0;
  
- 	if (test_bit(HCI_MGMT, &hdev->dev_flags) &&
+ 	settings |= MGMT_SETTING_POWERED;
+-	settings |= MGMT_SETTING_CONNECTABLE;
+-	settings |= MGMT_SETTING_FAST_CONNECTABLE;
+-	settings |= MGMT_SETTING_DISCOVERABLE;
+ 	settings |= MGMT_SETTING_PAIRABLE;
+ 
+ 	if (lmp_ssp_capable(hdev))
+ 		settings |= MGMT_SETTING_SSP;
+ 
+ 	if (lmp_bredr_capable(hdev)) {
++		settings |= MGMT_SETTING_CONNECTABLE;
++		settings |= MGMT_SETTING_FAST_CONNECTABLE;
++		settings |= MGMT_SETTING_DISCOVERABLE;
+ 		settings |= MGMT_SETTING_BREDR;
+ 		settings |= MGMT_SETTING_LINK_SECURITY;
+ 	}
+@@ -868,6 +868,10 @@ static int set_discoverable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	BT_DBG("request for %s", hdev->name);
+ 
++	if (!lmp_bredr_capable(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_DISCOVERABLE,
++				 MGMT_STATUS_NOT_SUPPORTED);
++
+ 	timeout = __le16_to_cpu(cp->timeout);
+ 	if (!cp->val && timeout > 0)
+ 		return cmd_status(sk, hdev->id, MGMT_OP_SET_DISCOVERABLE,
+@@ -963,6 +967,10 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	BT_DBG("request for %s", hdev->name);
+ 
++	if (!lmp_bredr_capable(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_CONNECTABLE,
++				  MGMT_STATUS_NOT_SUPPORTED);
++
+ 	hci_dev_lock(hdev);
+ 
+ 	if (!hdev_is_powered(hdev)) {
+@@ -1061,6 +1069,10 @@ static int set_link_security(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	BT_DBG("request for %s", hdev->name);
+ 
++	if (!lmp_bredr_capable(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_LINK_SECURITY,
++				  MGMT_STATUS_NOT_SUPPORTED);
++
+ 	hci_dev_lock(hdev);
+ 
+ 	if (!hdev_is_powered(hdev)) {
+@@ -2595,6 +2607,10 @@ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
++	if (!lmp_bredr_capable(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
++				  MGMT_STATUS_NOT_SUPPORTED);
++
+ 	if (!hdev_is_powered(hdev))
+ 		return cmd_status(sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
+ 				  MGMT_STATUS_NOT_POWERED);
 -- 
 1.7.10.4
 
