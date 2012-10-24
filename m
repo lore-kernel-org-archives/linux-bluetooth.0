@@ -1,51 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Oct 2012 00:26:37 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Date: Wed, 24 Oct 2012 19:13:41 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/7] Bluetooth: Add support for setting LE advertising
- data
-Message-ID: <20121023212637.GA17404@x220.ger.corp.intel.com>
-References: <1351011241-32515-1-git-send-email-johan.hedberg@gmail.com>
- <1351011241-32515-5-git-send-email-johan.hedberg@gmail.com>
- <CAJdJm_MhB79eQSAHUqOa7Xwf+ujrnQZtG_jqEgMfEFzuoqB9-w@mail.gmail.com>
+Subject: Re: [PATCH 5/6] Bluetooth: mgmt: Add support for switching to LE
+ peripheral mode
+Message-ID: <20121024221341.GA22764@samus>
+References: <1351112996-9597-1-git-send-email-johan.hedberg@gmail.com>
+ <1351112996-9597-6-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAJdJm_MhB79eQSAHUqOa7Xwf+ujrnQZtG_jqEgMfEFzuoqB9-w@mail.gmail.com>
+In-Reply-To: <1351112996-9597-6-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Johan,
 
-On Tue, Oct 23, 2012, Anderson Lizardo wrote:
-> On Tue, Oct 23, 2012 at 12:53 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> > +       if (hdev->adv_tx_power) {
-> > +               ptr[0] = 2;
-> > +               ptr[1] = EIR_TX_POWER;
-> > +               ptr[2] = (u8) hdev->adv_tx_power;
-> > +
-> > +               ad_len += 3;
-> > +               ptr += 3;
-> > +       }
-> 
-> 0dBm is a valid TX power. Not sure the if() clause is valid here.
+On 00:09 Thu 25 Oct, Johan Hedberg wrote:
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index dc60d31..ed6b1e2 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -790,9 +790,24 @@ static void hci_set_le_support(struct hci_dev *hdev)
+>  		cp.simul = !!lmp_le_br_capable(hdev);
+>  	}
+>  
+> +	/* If the host features don't reflect the desired state for LE
+> +	 * then send the write_le_host_supported command. The command
+> +	 * complete handler for it will take care of any necessary
+> +	 * subsequent commands like set_adv_enable.
+> +	 *
+> +	 * If the host features for LE are already correct and
+> +	 * peripheral mode is enabled directly send the le_set_adv
+> +	 * command. The value of &cp.le is used so that advertising will
+> +	 * not be enabled in the exceptional case that LE for some
+> +	 * reason isn't enabled - something that should only be possible
+> +	 * if someone is doing direct raw access to HCI.
+> +	 */
+>  	if (cp.le != !!lmp_host_le_capable(hdev))
+>  		hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED, sizeof(cp),
+>  			     &cp);
+> +	else if (test_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags))
+> +		hci_send_cmd(hdev, HCI_OP_LE_SET_ADV_ENABLE, sizeof(cp.le),
+> +			     &cp.le);
+>  }
 
-If it's not, we'd need to extend the storage size of hdev->adv_tx_power
-(to have some invalid value) or add another variable to hdev to indicate
-that we know the tx_power. FWIW, create_eir also uses the same test for
-including the inq_tx_power, so either both or neither should be fixed.
-For simplicity I'd just keep the 0-test unless 0 is a really common
-value.
+I agree with Marcel, and one point that worried me was this
+unconditional advertising, I feel that we should be smarter about when
+to start advertising, for example, here we are not taking into account
+the user's visiblity settings.
 
-> Also, I'm worried how we are going to put other advertising data here,
-> i.e. Manufacturer Specific data or Service Data. On last BlueZ meeting
-> we proposed (and have been implementing) the Set Controller Data mgmt
-> command to set them. Is this still an acceptable approach?
 
-Yes, though we only have 31 bytes to play with here which is quite
-little. Also, we might want to make this dependent on the LE GAP role.
-E.g. we might be more interested in manufacturer specific data for
-broadcaster role than for peripheral role (maybe a user space
-application *only* wants its data for broadcaster role).
-
-Johan
+Cheers,
+-- 
+Vinicius
