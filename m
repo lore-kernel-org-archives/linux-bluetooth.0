@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/6] Bluetooth: Fix sending unnecessary HCI_Write_SSP_Mode command
-Date: Thu, 25 Oct 2012 00:09:52 +0300
-Message-Id: <1351112996-9597-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/6] Bluetooth: Fix setting host feature bits for SSP
+Date: Thu, 25 Oct 2012 00:09:51 +0300
+Message-Id: <1351112996-9597-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1351112996-9597-1-git-send-email-johan.hedberg@gmail.com>
 References: <1351112996-9597-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,42 +11,47 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch fixes sending an unnecessary HCI_Write_SSP_Mode command if
-the command has already been sent as part of the default HCI init
-sequence.
+When we get a successful command complete for HCI_Write_SSP_Mode we need
+to update the host feature bits for the hdev struct accordingly.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/mgmt.c             |    3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_event.c |   13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 6642b3c..b3490c6 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -770,6 +770,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define lmp_ext_feat_capable(dev)  ((dev)->features[7] & LMP_EXTFEATURES)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index aae8053..dc60d31 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -440,7 +440,7 @@ static void hci_cc_host_buffer_size(struct hci_dev *hdev, struct sk_buff *skb)
+ static void hci_cc_write_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	__u8 status = *((__u8 *) skb->data);
+-	void *sent;
++	struct hci_cp_write_ssp_mode *sent;
  
- /* ----- Extended LMP capabilities ----- */
-+#define lmp_host_ssp_capable(dev)  ((dev)->host_features[0] & LMP_HOST_SSP)
- #define lmp_host_le_capable(dev)   ((dev)->host_features[0] & LMP_HOST_LE)
- #define lmp_host_le_br_capable(dev) ((dev)->host_features[0] & LMP_HOST_LE_BREDR)
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
  
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 0ee150e..02dc5f8 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2914,7 +2914,8 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
- 	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
+@@ -448,10 +448,17 @@ static void hci_cc_write_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!sent)
+ 		return;
  
- 	if (powered) {
--		if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags)) {
-+		if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
-+		    !lmp_host_ssp_capable(hdev)) {
- 			u8 ssp = 1;
- 
- 			hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
++	if (!status) {
++		if (sent->mode)
++			hdev->host_features[0] |= LMP_HOST_SSP;
++		else
++			hdev->host_features[0] &= ~LMP_HOST_SSP;
++	}
++
+ 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
+-		mgmt_ssp_enable_complete(hdev, *((u8 *) sent), status);
++		mgmt_ssp_enable_complete(hdev, sent->mode, status);
+ 	else if (!status) {
+-		if (*((u8 *) sent))
++		if (sent->mode)
+ 			set_bit(HCI_SSP_ENABLED, &hdev->dev_flags);
+ 		else
+ 			clear_bit(HCI_SSP_ENABLED, &hdev->dev_flags);
 -- 
 1.7.10.4
 
