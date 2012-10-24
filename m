@@ -1,28 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Oct 2012 00:46:49 -0200
+Date: Wed, 24 Oct 2012 00:45:21 -0200
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Syam Sidhardhan <s.syam@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/5] Bluetooth: trivial: Remove newline before EOF
-Message-ID: <20121024024649.GB13884@joana>
-References: <1350999140-7481-1-git-send-email-s.syam@samsung.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, sunnyk@codeaurora.org,
+	marcel@holtmann.org, andrei.emeltchenko.news@gmail.com
+Subject: Re: [PATCHv5 18/18] Bluetooth: Start channel move when socket option
+ is changed
+Message-ID: <20121024024521.GA13884@joana>
+References: <1351031063-11791-1-git-send-email-mathewm@codeaurora.org>
+ <1351031063-11791-19-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1350999140-7481-1-git-send-email-s.syam@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1351031063-11791-19-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+Hi Mat,
 
-* Syam Sidhardhan <s.syam@samsung.com> [2012-10-23 19:02:16 +0530]:
+* Mat Martineau <mathewm@codeaurora.org> [2012-10-23 15:24:23 -0700]:
 
-> Trivial fix.
+> Channel moves are triggered by changes to the BT_CHANNEL_POLICY
+> sockopt when an ERTM or streaming-mode channel is connected.
 > 
-> Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+> Moves are only started if enable_hs is true.
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  net/bluetooth/Kconfig |    1 -
->  1 file changed, 1 deletion(-)
+>  include/net/bluetooth/l2cap.h |  1 +
+>  net/bluetooth/l2cap_core.c    | 19 +++++++++++++++++++
+>  net/bluetooth/l2cap_sock.c    |  5 +++++
+>  3 files changed, 25 insertions(+)
 
-Patch has been applied to bluetooth-next. Thanks.
+all 18 patches have been applied upstream. Thanks.
 
 	Gustavo
