@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v7 05/16] adapter: Move pairable read to load_config()
-Date: Wed, 24 Oct 2012 16:34:07 +0200
-Message-Id: <1351089258-25179-6-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v7 01/16] doc: Add settings storage documentation
+Date: Wed, 24 Oct 2012 16:34:03 +0200
+Message-Id: <1351089258-25179-2-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1351089258-25179-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1351089258-25179-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -12,35 +12,199 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/adapter.c |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ doc/settings-storage.txt |  183 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 183 insertions(+)
+ create mode 100644 doc/settings-storage.txt
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 310d1cf..d0a8404 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2499,6 +2499,10 @@ static void load_config(struct btd_adapter *adapter)
- 
- 	/* Set class */
- 	adapter->dev_class = main_opts.class;
+diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
+new file mode 100644
+index 0000000..a9ff260
+--- /dev/null
++++ b/doc/settings-storage.txt
+@@ -0,0 +1,183 @@
++BlueZ settings storage
++**********************
 +
-+	/* Get pairable mode */
-+	if (read_device_pairable(&adapter->bdaddr, &adapter->pairable) < 0)
-+		adapter->pairable = TRUE;
- }
- 
- gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
-@@ -2526,10 +2530,6 @@ gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
- 	clear_blocked(adapter);
- 	load_devices(adapter);
- 
--	/* Set pairable mode */
--	if (read_device_pairable(&adapter->bdaddr, &adapter->pairable) < 0)
--		adapter->pairable = TRUE;
--
- 	/* retrieve the active connections: address the scenario where
- 	 * the are active connections before the daemon've started */
- 	load_connections(adapter);
++Purpose
++=======
++
++The purpose of this document is to describe the directory structure of BlueZ
++settings storage. In effect, this document will serve as the primary, up to
++date source of BlueZ storage information.  It is intended for developers,
++managers and users needing to understand the storage directory.
++
++Adapter and remote device info are read form the storage during object
++initialization.
++Write to storage is performed immediately on every value change.
++
++Default storage directory is /var/lib/bluetooth.
++
++All files are in ini-file format.
++
++Storage directory structure
++===========================
++
++There is one directory per adapter, named by its bluetooth address, which
++contains:
++ - a settings file for the local adapter
++ - an attributes file containing attributes of supported LE services
++ - a cache directory containing:
++    - one file per device, named by remote device address, which contains
++    device name
++ - one directory per remote device, named by remote device address, which
++   contains:
++    - an info file
++    - an attributes file containing attributes of remote LE services
++
++So the directory structure is:
++    /var/lib/bluetooth/<adapter address>/
++        ./settings
++        ./attributes
++        ./cache/
++            ./<remote device address>
++            ./<remote device address>
++            ...
++        ./<remote device address>/
++            ./info
++            ./attributes
++        ./<remote device address>/
++            ./info
++            ./attributes
++        ...
++
++Settings file format
++====================
++
++Settings file contains one [General] group with adapter info like:
++
++  Name			String		Friendly name advertised for
++					this adapter
++
++  Discoverable		Boolean		Discoverability of the adapter
++
++  Connectable		Boolean 	Connectability of the adapter
++
++  Pairable		Boolean 	Can the adapter accept pairing
++					request ?
++
++  Powered		Boolean 	Is the adapter powered ?
++
++  PairableTimeout	Integer		How long to stay in pairable mode
++					before going back to non-pairable.
++					The value is in seconds.
++					0 = disable timer, i.e. stay
++					pairable forever
++
++  DiscoverableTimeout	Integer		How long to stay in discoverable mode
++					before going back to non-discoverable.
++					The value is in seconds.
++					0 = disable timer, i.e. stay
++					discoverable forever
++
++Sample:
++  [General]
++  Name=My PC
++  Discoverable=false
++  Connectable=true
++  Pairable=true
++  Powered=true
++  DiscoverableTimeout=0
++
++Attributes file format
++======================
++
++The attributes file lists all attributes supported by the local adapter or
++remote device.
++
++Attributes are stored using their handle as group name (decimal format).
++
++Each group contains:
++
++  UUID		String		128-bit UUID of the attribute
++
++  Value		String		Value of the attribute as hexadecimal encoded
++				string
++
++Sample:
++  [1]
++  UUID=00002800-0000-1000-8000-00805f9b34fb
++  Value=0018
++
++  [4]
++  UUID=00002803-0000-1000-8000-00805f9b34fb
++  Value=020600002A
++
++  [6]
++  UUID=00002a00-0000-1000-8000-00805f9b34fb
++  Value=4578616D706C6520446576696365
++
++Cache directory file format
++============================
++
++Each file, named by remote device address, contains one [General] group.
++This general group contains:
++
++  Name		String		Remote device friendly name
++
++  ShortName	String		Remote device shortened name
++
++Info file format
++================
++
++Info file may includes multiple groups (General, Device ID, Link key and
++Long term key) related to a remote device.
++
++[General] group contains:
++
++  Alias			String		Alias name
++
++  Class			String		Device class in hexadecimal,
++  					i.e. 0x000000
++
++  Features		String		Bluetooth device features in
++  					hexadecimal, i.e. 0x0000000000000000
++
++  AddressType		String		An address can be "static" or "public"
++
++  Trusted		Boolean		True if the remote device is trusted
++
++  Profiles		List of		List of profiles advertised by remote,
++  			strings		in 128-bits UUID format, separated by
++  					";"
++
++
++[DeviceID] group contains:
++
++  Source		Integer		Assigner of Device ID
++
++  Vendor		Integer		Device vendor
++
++  Product		Integer		Device product
++
++  Version		Integer		Device version
++
++
++[LinkKey] group contains:
++
++  Key			String		Key in hexadecimal format
++
++  Type			Integer		Type of link key
++
++  PINLength		Integer		Length of PIN
++
++
++[LongTermKey] group contains:
++
++  Key			String		Long term key in hexadecimal format
++
++  Authenticated		Boolean		True if remote device has been
++  					authenticated
++
++  EncSize		Integer		Encrypted size
++
++  EDiv			Integer		Encrypted diversifier
++
++  Rand			Integer		Randomizer
 -- 
 1.7.9.5
 
