@@ -1,64 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v7 00/16] Move storage config and names files to ini-file format
-Date: Wed, 24 Oct 2012 16:34:02 +0200
-Message-Id: <1351089258-25179-1-git-send-email-frederic.danis@linux.intel.com>
+Date: Wed, 24 Oct 2012 11:26:01 -0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 5/5 v2] Bluetooth: Read adversiting channel TX power
+ during init sequence
+Message-ID: <20121024132601.GH13884@joana>
+References: <1350669469-7719-1-git-send-email-johan.hedberg@gmail.com>
+ <1350669469-7719-6-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1350669469-7719-6-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adapter saved configuration will be saved to /var/lib/bluetooth/<adapter address>/settings
-in ini-file format for BlueZ 5.
-Devices name cache will be saved in 1 file per device (named by device address)
-under /var/lib/bluetooth/<adapter address>/cache/ directory.
-If this files does not exist, we try to convert legacy files to this new format.
+Hi Johan,
 
-Access to variables during run-time is performed in adapter structure which is
-populated by loading saved configuration during initialization.
+* Johan Hedberg <johan.hedberg@gmail.com> [2012-10-19 20:57:49 +0300]:
 
-Patches 2 to 8 remove access to config file from run-time.
-Patch 9 moves to ini-file format style (load, save and convert).
-Patches 11 to 16 move devices name cache to new files (read, write and convert).
+> From: Johan Hedberg <johan.hedberg@intel.com>
+> 
+> This patch adds the reading of the LE advertising channel TX power to
+> the HCI init sequence of LE-capable controllers. This data will be used
+> e.g. for inclusion in the advertising data packets when advertising is
+> enabled.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  include/net/bluetooth/hci.h      |    6 ++++++
+>  include/net/bluetooth/hci_core.h |    2 ++
+>  net/bluetooth/hci_event.c        |   20 ++++++++++++++++++++
+>  3 files changed, 28 insertions(+)
 
-Frédéric Danis (16):
-  doc: Add settings storage documentation
-  adapter: Read name in storage at init
-  adaptername: Retrieve config name from adapter
-  adapter: Remove device class storage
-  adapter: Move pairable read to load_config()
-  adapter: Read pairable timeout in storage at init
-  adapter: Read discoverable timeout in storage at init
-  adapter: Read mode in storage at init
-  adapter: Move saved config to ini-file format
-  TODO: Add entry to remove storage convertion function
-  adapter: Move storage names to cache directory
-  event: Remove write of LastSeen info
-  device: Retrieve name from cache directory
-  dbusoob: Store device name in cache directory
-  input: Retrieve device name from cache directory
-  hcitool: Retrieve names from cache directory
+All patches but patch 4 were applied to bluetooth-next. Patch 4 doesn't apply
+on current bluetooth-next. I also change functions on patch 1 to use _setup().
+Thanks.
 
- Makefile.tools           |    2 +-
- TODO                     |    6 +
- doc/settings-storage.txt |  183 ++++++++++++++++++++++
- plugins/adaptername.c    |    6 +-
- plugins/dbusoob.c        |   26 +++-
- plugins/neard.c          |    2 +-
- profiles/input/device.c  |   26 +++-
- src/adapter.c            |  387 +++++++++++++++++++++++++++++++++++-----------
- src/adapter.h            |    3 +-
- src/device.c             |   25 ++-
- src/event.c              |   37 +++--
- src/mgmt.c               |   19 +--
- src/mgmt.h               |    1 +
- tools/hcitool.c          |   31 +++-
- 14 files changed, 615 insertions(+), 139 deletions(-)
- create mode 100644 doc/settings-storage.txt
-
--- 
-1.7.9.5
-
+	Gustavo
