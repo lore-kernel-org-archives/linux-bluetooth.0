@@ -1,85 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/7] Bluetooth: Fix HCI command sending when powering on LE-only adapters
-Date: Wed, 24 Oct 2012 21:11:57 +0300
-Message-Id: <1351102323-4654-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1351102323-4654-1-git-send-email-johan.hedberg@gmail.com>
-References: <1351102323-4654-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 0/7 v2] Bluetooth: LE single-mode & peripheral role fixes
+Date: Wed, 24 Oct 2012 21:11:56 +0300
+Message-Id: <1351102323-4654-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-This patch makes sure that we don't send BR/EDR-only commands for
-LE-only adapters when they get powered on. Doing this would just cause
-command errors.
+This is a combination of one patch from my very first set that had
+conflicts (1/7 here) as well as a re-sorted set of patches from my
+second set that I got an ack on. There's still two missing patches from
+my second set that are not here (AD data writing and mgmt_set_le support
+for the peripheral mode) which I'll send in a separate set probably
+later tonight.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/mgmt.c |   34 +++++++++++++++++++++-------------
- 1 file changed, 21 insertions(+), 13 deletions(-)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index b41f3bc..19cb899 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2872,6 +2872,21 @@ static void settings_rsp(struct pending_cmd *cmd, void *data)
- 	mgmt_pending_free(cmd);
- }
- 
-+static int set_bredr_scan(struct hci_dev *hdev)
-+{
-+	u8 scan = 0;
-+
-+	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
-+		scan |= SCAN_PAGE;
-+	if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
-+		scan |= SCAN_INQUIRY;
-+
-+	if (!scan)
-+		return 0;
-+
-+	return hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
-+}
-+
- int mgmt_powered(struct hci_dev *hdev, u8 powered)
- {
- 	struct cmd_lookup match = { NULL, hdev };
-@@ -2883,16 +2898,6 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
- 	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
- 
- 	if (powered) {
--		u8 scan = 0;
--
--		if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
--			scan |= SCAN_PAGE;
--		if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
--			scan |= SCAN_INQUIRY;
--
--		if (scan)
--			hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
--
- 		if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags)) {
- 			u8 ssp = 1;
- 
-@@ -2909,9 +2914,12 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
- 				     sizeof(cp), &cp);
- 		}
- 
--		update_class(hdev);
--		update_name(hdev, hdev->dev_name);
--		update_eir(hdev);
-+		if (lmp_bredr_capable(hdev)) {
-+			set_bredr_scan(hdev);
-+			update_class(hdev);
-+			update_name(hdev, hdev->dev_name);
-+			update_eir(hdev);
-+		}
- 	} else {
- 		u8 status = MGMT_STATUS_NOT_POWERED;
- 		mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
--- 
-1.7.10.4
+Johan
 
