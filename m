@@ -1,59 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1350661172-18125-6-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1350661172-18125-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1350661172-18125-6-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Wed, 24 Oct 2012 08:28:23 -0400
-Message-ID: <CAJdJm_NfFbRfLg9Jp_id3_z74P5A-Rg0VPnHvvD-6NopJWTB=Q@mail.gmail.com>
-Subject: Re: [RFC v0 05/15] network: Add network .connect and .disconnect
+In-Reply-To: <5087B517.9090703@deserettechnology.com>
+References: <5087B517.9090703@deserettechnology.com>
+Date: Wed, 24 Oct 2012 08:20:59 -0400
+Message-ID: <CAJdJm_NrmfU17aQDmO0hbihV673Of0iFnLqk4=-sPh=g44eixA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Add support for BCM20702A0 [0b05, 17b5]
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
+To: jeff@deserettechnology.com
+Cc: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Jeff,
 
-On Fri, Oct 19, 2012 at 11:39 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> +static void connect_profile_cb(struct btd_device *device, int err,
-> +                                               const char *pdev, void *data)
-> +{
-> +       struct connect_req *req = data;
-> +
-> +       req->cb(req->profile, req->device, err);
-> +
-> +       g_free(req);
-> +}
-> +
-> +static int connect_profile(struct btd_device *dev, struct btd_profile *profile,
-> +                                               uint16_t id, btd_profile_cb cb)
-> +{
-> +       struct connect_req *req;
-> +       int err;
-> +
-> +       DBG("path %s id %u", device_get_path(dev), id);
-> +
-> +       req  = g_new0(struct connect_req, 1);
-> +       req->device = dev;
+On Wed, Oct 24, 2012 at 5:29 AM, Jeff Cook <jeff@deserettechnology.com> wrote:
+> Hello all,
+>
+> Please see included patch. First-time submitter so let me know if I did
+> something wrong.
 
-Isn't btd_device_ref() required here?
+Just one more suggestion (adding to Gustavo's comments), you may want to read:
 
-> +       req->profile = profile;
-> +       req->cb = cb;
-> +
-> +       err = connection_connect(dev, BNEP_SVC_PANU, NULL, connect_profile_cb,
-> +                                                                       req);
-> +       if (err < 0) {
-> +               g_free(req);
-> +               return err;
-> +       }
-> +
-> +       return 0;
-> +}
+http://www.kernel.org/doc/Documentation/SubmittingPatches
 
-Regards,
+Specially sections 12 and 15.
+
+Best Regards,
 -- 
 Anderson Lizardo
 Instituto Nokia de Tecnologia - INdT
