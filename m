@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/7] Bluetooth: mgmt: Restrict BR/EDR settings to BR/EDR-only adapters
-Date: Wed, 24 Oct 2012 21:11:58 +0300
-Message-Id: <1351102323-4654-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/7] Bluetooth: Fix HCI command sending when powering on LE-only adapters
+Date: Wed, 24 Oct 2012 21:11:57 +0300
+Message-Id: <1351102323-4654-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1351102323-4654-1-git-send-email-johan.hedberg@gmail.com>
 References: <1351102323-4654-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,84 +11,75 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch makes sure that settings which are specific for BR/EDR
-capable adapters are not allowed for non-BR/EDR (e.g. LE-only) adapters.
-Instead, a "not supported" error is returned of such a setting is
-attempted to be set for a non-BR/EDR adapter.
+This patch makes sure that we don't send BR/EDR-only commands for
+LE-only adapters when they get powered on. Doing this would just cause
+command errors.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c |   22 +++++++++++++++++++---
- 1 file changed, 19 insertions(+), 3 deletions(-)
+ net/bluetooth/mgmt.c |   34 +++++++++++++++++++++-------------
+ 1 file changed, 21 insertions(+), 13 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 19cb899..6215c97 100644
+index b41f3bc..19cb899 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -377,15 +377,15 @@ static u32 get_supported_settings(struct hci_dev *hdev)
- 	u32 settings = 0;
+@@ -2872,6 +2872,21 @@ static void settings_rsp(struct pending_cmd *cmd, void *data)
+ 	mgmt_pending_free(cmd);
+ }
  
- 	settings |= MGMT_SETTING_POWERED;
--	settings |= MGMT_SETTING_CONNECTABLE;
--	settings |= MGMT_SETTING_FAST_CONNECTABLE;
--	settings |= MGMT_SETTING_DISCOVERABLE;
- 	settings |= MGMT_SETTING_PAIRABLE;
- 
- 	if (lmp_ssp_capable(hdev))
- 		settings |= MGMT_SETTING_SSP;
- 
- 	if (lmp_bredr_capable(hdev)) {
-+		settings |= MGMT_SETTING_CONNECTABLE;
-+		settings |= MGMT_SETTING_FAST_CONNECTABLE;
-+		settings |= MGMT_SETTING_DISCOVERABLE;
- 		settings |= MGMT_SETTING_BREDR;
- 		settings |= MGMT_SETTING_LINK_SECURITY;
- 	}
-@@ -868,6 +868,10 @@ static int set_discoverable(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	BT_DBG("request for %s", hdev->name);
- 
-+	if (!lmp_bredr_capable(hdev))
-+		return cmd_status(sk, hdev->id, MGMT_OP_SET_DISCOVERABLE,
-+				 MGMT_STATUS_NOT_SUPPORTED);
++static int set_bredr_scan(struct hci_dev *hdev)
++{
++	u8 scan = 0;
 +
- 	timeout = __le16_to_cpu(cp->timeout);
- 	if (!cp->val && timeout > 0)
- 		return cmd_status(sk, hdev->id, MGMT_OP_SET_DISCOVERABLE,
-@@ -963,6 +967,10 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	BT_DBG("request for %s", hdev->name);
- 
-+	if (!lmp_bredr_capable(hdev))
-+		return cmd_status(sk, hdev->id, MGMT_OP_SET_CONNECTABLE,
-+				  MGMT_STATUS_NOT_SUPPORTED);
++	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
++		scan |= SCAN_PAGE;
++	if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
++		scan |= SCAN_INQUIRY;
 +
- 	hci_dev_lock(hdev);
- 
- 	if (!hdev_is_powered(hdev)) {
-@@ -1061,6 +1069,10 @@ static int set_link_security(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	BT_DBG("request for %s", hdev->name);
- 
-+	if (!lmp_bredr_capable(hdev))
-+		return cmd_status(sk, hdev->id, MGMT_OP_SET_LINK_SECURITY,
-+				  MGMT_STATUS_NOT_SUPPORTED);
++	if (!scan)
++		return 0;
 +
- 	hci_dev_lock(hdev);
- 
- 	if (!hdev_is_powered(hdev)) {
-@@ -2595,6 +2607,10 @@ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
- 
- 	BT_DBG("%s", hdev->name);
- 
-+	if (!lmp_bredr_capable(hdev))
-+		return cmd_status(sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
-+				  MGMT_STATUS_NOT_SUPPORTED);
++	return hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
++}
 +
- 	if (!hdev_is_powered(hdev))
- 		return cmd_status(sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
- 				  MGMT_STATUS_NOT_POWERED);
+ int mgmt_powered(struct hci_dev *hdev, u8 powered)
+ {
+ 	struct cmd_lookup match = { NULL, hdev };
+@@ -2883,16 +2898,6 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
+ 	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
+ 
+ 	if (powered) {
+-		u8 scan = 0;
+-
+-		if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
+-			scan |= SCAN_PAGE;
+-		if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
+-			scan |= SCAN_INQUIRY;
+-
+-		if (scan)
+-			hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
+-
+ 		if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags)) {
+ 			u8 ssp = 1;
+ 
+@@ -2909,9 +2914,12 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
+ 				     sizeof(cp), &cp);
+ 		}
+ 
+-		update_class(hdev);
+-		update_name(hdev, hdev->dev_name);
+-		update_eir(hdev);
++		if (lmp_bredr_capable(hdev)) {
++			set_bredr_scan(hdev);
++			update_class(hdev);
++			update_name(hdev, hdev->dev_name);
++			update_eir(hdev);
++		}
+ 	} else {
+ 		u8 status = MGMT_STATUS_NOT_POWERED;
+ 		mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
 -- 
 1.7.10.4
 
