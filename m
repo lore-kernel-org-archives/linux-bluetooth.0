@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1351115283.1785.73.camel@aeonflux>
-Subject: Re: [PATCH 2/6] Bluetooth: Fix sending unnecessary
- HCI_Write_SSP_Mode command
+Message-ID: <1351115154.1785.71.camel@aeonflux>
+Subject: Re: [PATCH 1/6] Bluetooth: Fix setting host feature bits for SSP
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 24 Oct 2012 14:48:03 -0700
-In-Reply-To: <1351112996-9597-3-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 24 Oct 2012 14:45:54 -0700
+In-Reply-To: <1351112996-9597-2-git-send-email-johan.hedberg@gmail.com>
 References: <1351112996-9597-1-git-send-email-johan.hedberg@gmail.com>
-	 <1351112996-9597-3-git-send-email-johan.hedberg@gmail.com>
+	 <1351112996-9597-2-git-send-email-johan.hedberg@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,15 +15,13 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> This patch fixes sending an unnecessary HCI_Write_SSP_Mode command if
-> the command has already been sent as part of the default HCI init
-> sequence.
+> When we get a successful command complete for HCI_Write_SSP_Mode we need
+> to update the host feature bits for the hdev struct accordingly.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  include/net/bluetooth/hci_core.h |    1 +
->  net/bluetooth/mgmt.c             |    3 ++-
->  2 files changed, 3 insertions(+), 1 deletion(-)
+>  net/bluetooth/hci_event.c |   13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
 
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
