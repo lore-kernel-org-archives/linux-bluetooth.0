@@ -2,229 +2,276 @@ Return-Path: <cyrus@holtmann.org>
 From: Aloisio Almeida Jr <aloisio.almeida@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Aloisio Almeida Jr <aloisio.almeida@openbossa.org>
-Subject: [RFC 8/9] Bluetooth: Refactor le scan helpers to enable observer support
-Date: Wed, 24 Oct 2012 12:58:14 -0300
-Message-Id: <1351094295-10418-9-git-send-email-aloisio.almeida@openbossa.org>
+Subject: [RFC 7/9] Bluetooth: Add set broadcaster MGMT command
+Date: Wed, 24 Oct 2012 12:58:13 -0300
+Message-Id: <1351094295-10418-8-git-send-email-aloisio.almeida@openbossa.org>
 In-Reply-To: <1351094295-10418-1-git-send-email-aloisio.almeida@openbossa.org>
 References: <1351094295-10418-1-git-send-email-aloisio.almeida@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It was added a parameter called 'reason' to le scan helpers (hci_do_le_scan and
-hci_cancel_le_scan). Distinguishing the reason to enbale/disable le scan will be
-important when both discovery and observer are implemented.
+This command will enable or disable broadcaster mode. Data can be added
+with set_controller_data command.
 
-'reason' was also added do hdev structure (hdev.le_scan_req_reason) in order
-to make hci_cc_le_set_scan_enable behave correctly.
+If LE_ENABLED is set, the HCI_OP_LE_SET_ADV_ENABLE command will be sent.
+
+This command is available on the powered off state.
 
 Signed-off-by: Aloisio Almeida Jr <aloisio.almeida@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |   11 +++++--
- net/bluetooth/hci_core.c         |   63 +++++++++++++++++++++++---------------
- net/bluetooth/mgmt.c             |   10 +++---
- 3 files changed, 54 insertions(+), 30 deletions(-)
+ include/net/bluetooth/hci.h      |    1 +
+ include/net/bluetooth/hci_core.h |    1 +
+ include/net/bluetooth/mgmt.h     |    3 +
+ net/bluetooth/hci_event.c        |   21 +++++++
+ net/bluetooth/mgmt.c             |  116 ++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 142 insertions(+)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 1dadf3d..591450c 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -120,6 +120,7 @@ enum {
+ 	HCI_LINK_SECURITY,
+ 	HCI_PENDING_CLASS,
+ 	HCI_PERIODIC_INQ,
++	HCI_BROADCASTER,
+ };
+ 
+ /* HCI ioctl defines */
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index fc26210..6ef8660 100644
+index d5d4dc4..fc26210 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -121,6 +121,7 @@ struct le_scan_params {
- 	u16 interval;
- 	u16 window;
- 	int timeout;
-+	u8 reason;
- };
+@@ -1088,6 +1088,7 @@ int mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status);
+ int mgmt_read_local_oob_data_reply_complete(struct hci_dev *hdev, u8 *hash,
+ 					    u8 *randomizer, u8 status);
+ int mgmt_le_enable_complete(struct hci_dev *hdev, u8 enable, u8 status);
++int mgmt_set_broadcaster_complete(struct hci_dev *hdev, u8 enable, u8 status);
+ int mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		      u8 addr_type, u8 *dev_class, s8 rssi, u8 cfm_name,
+ 		      u8 ssp, u8 *eir, u16 eir_len);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index bbb4b4a..bd64816 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -92,6 +92,7 @@ struct mgmt_rp_read_index_list {
+ #define MGMT_SETTING_BREDR		0x00000080
+ #define MGMT_SETTING_HS			0x00000100
+ #define MGMT_SETTING_LE			0x00000200
++#define MGMT_SETTING_BROADCASTER	0x00000400
  
- struct controller_data {
-@@ -131,6 +132,10 @@ struct controller_data {
- 	u8 data[0];
- };
+ #define MGMT_OP_READ_INFO		0x0004
+ #define MGMT_READ_INFO_SIZE		0
+@@ -365,6 +366,8 @@ struct mgmt_cp_unset_controller_data {
+ } __packed;
+ #define MGMT_UNSET_CONTROLLER_DATA_SIZE	1
  
-+enum {
-+	LE_SCAN_REQ_REASON_DISCOVERY,
-+};
++#define MGMT_OP_SET_BROADCASTER		0x002B
 +
- #define HCI_MAX_SHORT_NAME_LENGTH	10
- 
- struct amp_assoc {
-@@ -285,6 +290,7 @@ struct hci_dev {
- 
- 	struct work_struct	le_scan;
- 	struct le_scan_params	le_scan_params;
-+	__u8			le_scan_req_reason;
- 
- 	__s8			adv_tx_power;
- 
-@@ -1139,9 +1145,10 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
- 							__u8 ltk[16]);
- int hci_do_inquiry(struct hci_dev *hdev, u8 length);
- int hci_cancel_inquiry(struct hci_dev *hdev);
-+
- int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
--		int timeout);
--int hci_cancel_le_scan(struct hci_dev *hdev);
-+		int timeout, u8 reason);
-+int hci_cancel_le_scan(struct hci_dev *hdev, u8 reason);
- 
- u8 bdaddr_to_le(u8 bdaddr_type);
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 2c2f3aa..fbf0ba1 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1538,20 +1538,20 @@ static void le_scan_param_req(struct hci_dev *hdev, unsigned long opt)
- 
- static void le_scan_enable_req(struct hci_dev *hdev, unsigned long opt)
- {
--	struct hci_cp_le_set_scan_enable cp;
-+	struct hci_cp_le_set_scan_enable *cp;
- 
--	memset(&cp, 0, sizeof(cp));
--	cp.enable = 1;
--	cp.filter_dup = 1;
-+	cp = (struct hci_cp_le_set_scan_enable *) opt;
- 
--	hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-+	hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE,
-+		     sizeof(struct hci_cp_le_set_scan_enable), cp);
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 3df6e67..7ad2b0d 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1330,6 +1330,23 @@ static void hci_cc_le_set_adv_params(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hci_req_complete(hdev, HCI_OP_LE_SET_ADV_PARAMS, status);
  }
  
- static int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval,
--			  u16 window, int timeout)
-+			  u16 window, int timeout, u8 reason)
- {
- 	long timeo = msecs_to_jiffies(3000);
- 	struct le_scan_params param;
-+	struct hci_cp_le_set_scan_enable cp;
- 	int err;
- 
- 	BT_DBG("%s", hdev->name);
-@@ -1563,38 +1563,52 @@ static int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval,
- 	param.interval = interval;
- 	param.window = window;
- 
-+	memset(&cp, 0, sizeof(cp));
-+	cp.enable = 1;
-+	if (reason == LE_SCAN_REQ_REASON_DISCOVERY)
-+		cp.filter_dup = 1;
++static void hci_cc_le_set_adv_enable(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	__u8 status = *((__u8 *) skb->data);
++	__u8 enable;
++	void *sent;
 +
-+	hci_dev_lock(hdev);
-+	hdev->le_scan_req_reason = reason;
-+	hci_dev_unlock(hdev);
++	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_ADV_ENABLE);
++	if (!sent)
++		return;
 +
- 	hci_req_lock(hdev);
- 
- 	err = __hci_request(hdev, le_scan_param_req, (unsigned long) &param,
- 			    timeo);
--	if (!err)
--		err = __hci_request(hdev, le_scan_enable_req, 0, timeo);
-+	if (err)
-+		goto unlock;
- 
--	hci_req_unlock(hdev);
--
--	if (err < 0)
--		return err;
-+	err = __hci_request(hdev, le_scan_enable_req, (unsigned long) &cp,
-+			    timeo);
-+	if (err)
-+		goto unlock;
- 
--	schedule_delayed_work(&hdev->le_scan_disable,
--			      msecs_to_jiffies(timeout));
-+	if (timeout > 0)
-+		schedule_delayed_work(&hdev->le_scan_disable,
-+				      msecs_to_jiffies(timeout));
- 
--	return 0;
-+unlock:
-+	hci_req_unlock(hdev);
-+	return err;
- }
- 
--int hci_cancel_le_scan(struct hci_dev *hdev)
-+int hci_cancel_le_scan(struct hci_dev *hdev, u8 reason)
- {
-+	struct hci_cp_le_set_scan_enable cp;
++	enable = *((__u8 *) sent);
 +
- 	BT_DBG("%s", hdev->name);
- 
- 	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
- 		return -EALREADY;
- 
--	if (cancel_delayed_work(&hdev->le_scan_disable)) {
--		struct hci_cp_le_set_scan_enable cp;
-+	if (reason == LE_SCAN_REQ_REASON_DISCOVERY)
-+		if (!cancel_delayed_work(&hdev->le_scan_disable))
-+			return 0;
- 
--		/* Send HCI command to disable LE Scan */
--		memset(&cp, 0, sizeof(cp));
--		hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
--	}
-+	/* Send HCI command to disable LE Scan */
-+	memset(&cp, 0, sizeof(cp));
-+	hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
- 
- 	return 0;
- }
-@@ -1620,11 +1634,11 @@ static void le_scan_work(struct work_struct *work)
- 	BT_DBG("%s", hdev->name);
- 
- 	hci_do_le_scan(hdev, param->type, param->interval, param->window,
--		       param->timeout);
-+		       param->timeout, param->reason);
- }
- 
- int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
--		int timeout)
-+		int timeout, u8 reason)
++	if (test_bit(HCI_MGMT, &hdev->dev_flags) &&
++	    !test_bit(HCI_INIT, &hdev->flags))
++		mgmt_set_broadcaster_complete(hdev, enable, status);
++}
++
+ static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
  {
- 	struct le_scan_params *param = &hdev->le_scan_params;
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+@@ -2593,6 +2610,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cc_le_set_adv_params(hdev, skb);
+ 		break;
  
-@@ -1637,6 +1651,7 @@ int hci_le_scan(struct hci_dev *hdev, u8 type, u16 interval, u16 window,
- 	param->interval = interval;
- 	param->window = window;
- 	param->timeout = timeout;
-+	param->reason = reason;
- 
- 	queue_work(system_long_wq, &hdev->le_scan);
- 
++	case HCI_OP_LE_SET_ADV_ENABLE:
++		hci_cc_le_set_adv_enable(hdev, skb);
++		break;
++
+ 	default:
+ 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
+ 		break;
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 705859f..46a45e7 100644
+index a094ef3..705859f 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -2364,7 +2364,8 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 	case DISCOV_TYPE_LE:
- 		if (lmp_host_le_capable(hdev))
- 			err = hci_le_scan(hdev, LE_SCAN_TYPE, LE_SCAN_INT,
--					  LE_SCAN_WIN, LE_SCAN_TIMEOUT_LE_ONLY);
-+					  LE_SCAN_WIN, LE_SCAN_TIMEOUT_LE_ONLY,
-+					  LE_SCAN_REQ_REASON_DISCOVERY);
- 		else
- 			err = -ENOTSUPP;
- 		break;
-@@ -2372,8 +2373,8 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 	case DISCOV_TYPE_INTERLEAVED:
- 		if (lmp_host_le_capable(hdev) && lmp_bredr_capable(hdev))
- 			err = hci_le_scan(hdev, LE_SCAN_TYPE, LE_SCAN_INT,
--					  LE_SCAN_WIN,
--					  LE_SCAN_TIMEOUT_BREDR_LE);
-+					  LE_SCAN_WIN, LE_SCAN_TIMEOUT_BREDR_LE,
-+					  LE_SCAN_REQ_REASON_DISCOVERY);
- 		else
- 			err = -ENOTSUPP;
- 		break;
-@@ -2430,7 +2431,8 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
- 		if (test_bit(HCI_INQUIRY, &hdev->flags))
- 			err = hci_cancel_inquiry(hdev);
- 		else
--			err = hci_cancel_le_scan(hdev);
-+			err = hci_cancel_le_scan(hdev,
-+						 LE_SCAN_REQ_REASON_DISCOVERY);
+@@ -380,6 +380,7 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+ 	settings |= MGMT_SETTING_FAST_CONNECTABLE;
+ 	settings |= MGMT_SETTING_DISCOVERABLE;
+ 	settings |= MGMT_SETTING_PAIRABLE;
++	settings |= MGMT_SETTING_BROADCASTER;
  
- 		break;
+ 	if (lmp_ssp_capable(hdev))
+ 		settings |= MGMT_SETTING_SSP;
+@@ -420,6 +421,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
+ 	if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags))
+ 		settings |= MGMT_SETTING_LE;
  
++	if (test_bit(HCI_BROADCASTER, &hdev->dev_flags))
++		settings |= MGMT_SETTING_BROADCASTER;
++
+ 	if (test_bit(HCI_LINK_SECURITY, &hdev->dev_flags))
+ 		settings |= MGMT_SETTING_LINK_SECURITY;
+ 
+@@ -2776,6 +2780,74 @@ static int unset_controller_data(struct sock *sk, struct hci_dev *hdev,
+ 			    NULL, 0);
+ }
+ 
++static int set_broadcaster_le(struct sock *sk, struct hci_dev *hdev, u8 enable)
++{
++	struct pending_cmd *cmd;
++	int err;
++
++	BT_DBG("%s enable:%i", hdev->name, enable);
++
++	hci_dev_lock(hdev);
++
++	if (!hdev_is_powered(hdev)) {
++		bool changed = false;
++
++		if (enable != test_bit(HCI_BROADCASTER, &hdev->dev_flags)) {
++			change_bit(HCI_BROADCASTER, &hdev->dev_flags);
++			changed = true;
++		}
++
++		err = send_settings_rsp(sk, MGMT_OP_SET_BROADCASTER, hdev);
++		if (err < 0)
++			goto unlock;
++
++		if (changed)
++			err = new_settings(hdev, sk);
++
++		goto unlock;
++	}
++
++	if (enable == test_bit(HCI_BROADCASTER, &hdev->dev_flags)) {
++		err = send_settings_rsp(sk, MGMT_OP_SET_BROADCASTER, hdev);
++		goto unlock;
++	}
++
++	if (mgmt_pending_find(MGMT_OP_SET_BROADCASTER, hdev)) {
++		err = cmd_status(sk, hdev->id, MGMT_OP_SET_BROADCASTER,
++				 MGMT_STATUS_BUSY);
++		goto unlock;
++	}
++
++	cmd = mgmt_pending_add(sk, MGMT_OP_SET_BROADCASTER, hdev, NULL, 0);
++	if (!cmd) {
++		err = -ENOMEM;
++		goto unlock;
++	}
++
++	err = hci_send_cmd(hdev, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable),
++			   &enable);
++	if (err < 0)
++		mgmt_pending_remove(cmd);
++
++unlock:
++	hci_dev_unlock(hdev);
++	return err;
++}
++
++static int set_broadcaster(struct sock *sk, struct hci_dev *hdev, void *data,
++			   u16 len)
++{
++	struct mgmt_mode *cp = data;
++
++	BT_DBG("%s val:%i", hdev->name, cp->val);
++
++	if (!test_bit(HCI_LE_ENABLED, &hdev->dev_flags))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_BROADCASTER,
++				  MGMT_STATUS_NOT_SUPPORTED);
++
++	return set_broadcaster_le(sk, hdev, cp->val);
++}
++
+ static const struct mgmt_handler {
+ 	int (*func) (struct sock *sk, struct hci_dev *hdev, void *data,
+ 		     u16 data_len);
+@@ -2825,6 +2897,7 @@ static const struct mgmt_handler {
+ 	{ set_device_id,          false, MGMT_SET_DEVICE_ID_SIZE },
+ 	{ set_controller_data,    true,  MGMT_SET_CONTROLLER_DATA_SIZE },
+ 	{ unset_controller_data,  false, MGMT_UNSET_CONTROLLER_DATA_SIZE },
++	{ set_broadcaster,        false, MGMT_SETTING_SIZE },
+ };
+ 
+ 
+@@ -3007,6 +3080,14 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
+ 
+ 		if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags))
+ 			update_adv_data(hdev);
++
++		if (test_bit(HCI_BROADCASTER, &hdev->dev_flags) &&
++		    test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
++			u8 enable = 1;
++			hci_send_cmd(hdev, HCI_OP_LE_SET_ADV_ENABLE,
++				     sizeof(enable), &enable);
++		}
++
+ 	} else {
+ 		u8 status = MGMT_STATUS_NOT_POWERED;
+ 		mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
+@@ -3664,6 +3745,41 @@ int mgmt_le_enable_complete(struct hci_dev *hdev, u8 enable, u8 status)
+ 	return err;
+ }
+ 
++int mgmt_set_broadcaster_complete(struct hci_dev *hdev, u8 enable, u8 status)
++{
++	struct cmd_lookup match = { NULL, hdev };
++	bool changed = false;
++	int err = 0;
++
++	if (status) {
++		u8 mgmt_err = mgmt_status(status);
++
++		mgmt_pending_foreach(MGMT_OP_SET_BROADCASTER, hdev,
++				     cmd_status_rsp, &mgmt_err);
++
++		return err;
++	}
++
++	if (enable) {
++		if (!test_and_set_bit(HCI_BROADCASTER, &hdev->dev_flags))
++			changed = true;
++	} else {
++		if (test_and_clear_bit(HCI_BROADCASTER, &hdev->dev_flags))
++			changed = true;
++	}
++
++	mgmt_pending_foreach(MGMT_OP_SET_BROADCASTER, hdev, settings_rsp,
++			     &match);
++
++	if (changed)
++		err = new_settings(hdev, match.sk);
++
++	if (match.sk)
++		sock_put(match.sk);
++
++	return err;
++}
++
+ int mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		      u8 addr_type, u8 *dev_class, s8 rssi, u8 cfm_name, u8
+ 		      ssp, u8 *eir, u16 eir_len)
 -- 
 1.7.10.4
 
