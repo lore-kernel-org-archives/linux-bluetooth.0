@@ -2,50 +2,63 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v7 02/16] adapter: Read name in storage at init
-Date: Wed, 24 Oct 2012 16:34:04 +0200
-Message-Id: <1351089258-25179-3-git-send-email-frederic.danis@linux.intel.com>
-In-Reply-To: <1351089258-25179-1-git-send-email-frederic.danis@linux.intel.com>
-References: <1351089258-25179-1-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v7 00/16] Move storage config and names files to ini-file format
+Date: Wed, 24 Oct 2012 16:34:02 +0200
+Message-Id: <1351089258-25179-1-git-send-email-frederic.danis@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/adapter.c |   13 +++++++++++++
- 1 file changed, 13 insertions(+)
+Adapter saved configuration will be saved to /var/lib/bluetooth/<adapter address>/settings
+in ini-file format for BlueZ 5.
+Devices name cache will be saved in 1 file per device (named by device address)
+under /var/lib/bluetooth/<adapter address>/cache/ directory.
+If this files does not exist, we try to convert legacy files to this new format.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 9ed8af2..6333837 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2497,6 +2497,18 @@ void btd_adapter_unref(struct btd_adapter *adapter)
- 	g_free(path);
- }
- 
-+static void load_config(struct btd_adapter *adapter)
-+{
-+	char name[MAX_NAME_LENGTH + 1];
-+
-+	/* Get name */
-+	if (read_local_name(&adapter->bdaddr, name) < 0)
-+		adapter->name = NULL;
-+	else
-+		adapter->name = g_strdup(name);
-+
-+}
-+
- gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
- {
- 	adapter->up = up;
-@@ -2516,6 +2528,7 @@ gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
- 	if (main_opts.gatt_enabled)
- 		btd_adapter_gatt_server_start(adapter);
- 
-+	load_config(adapter);
- 	load_drivers(adapter);
- 	btd_profile_foreach(probe_profile, adapter);
- 	clear_blocked(adapter);
+Access to variables during run-time is performed in adapter structure which is
+populated by loading saved configuration during initialization.
+
+Patches 2 to 8 remove access to config file from run-time.
+Patch 9 moves to ini-file format style (load, save and convert).
+Patches 11 to 16 move devices name cache to new files (read, write and convert).
+
+Frédéric Danis (16):
+  doc: Add settings storage documentation
+  adapter: Read name in storage at init
+  adaptername: Retrieve config name from adapter
+  adapter: Remove device class storage
+  adapter: Move pairable read to load_config()
+  adapter: Read pairable timeout in storage at init
+  adapter: Read discoverable timeout in storage at init
+  adapter: Read mode in storage at init
+  adapter: Move saved config to ini-file format
+  TODO: Add entry to remove storage convertion function
+  adapter: Move storage names to cache directory
+  event: Remove write of LastSeen info
+  device: Retrieve name from cache directory
+  dbusoob: Store device name in cache directory
+  input: Retrieve device name from cache directory
+  hcitool: Retrieve names from cache directory
+
+ Makefile.tools           |    2 +-
+ TODO                     |    6 +
+ doc/settings-storage.txt |  183 ++++++++++++++++++++++
+ plugins/adaptername.c    |    6 +-
+ plugins/dbusoob.c        |   26 +++-
+ plugins/neard.c          |    2 +-
+ profiles/input/device.c  |   26 +++-
+ src/adapter.c            |  387 +++++++++++++++++++++++++++++++++++-----------
+ src/adapter.h            |    3 +-
+ src/device.c             |   25 ++-
+ src/event.c              |   37 +++--
+ src/mgmt.c               |   19 +--
+ src/mgmt.h               |    1 +
+ tools/hcitool.c          |   31 +++-
+ 14 files changed, 615 insertions(+), 139 deletions(-)
+ create mode 100644 doc/settings-storage.txt
+
 -- 
 1.7.9.5
 
