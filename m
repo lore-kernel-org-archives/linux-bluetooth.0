@@ -1,55 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: Jeff Cook <cookiecaper@gmail.com>
-Message-ID: <5087B517.9090703@deserettechnology.com>
-Date: Wed, 24 Oct 2012 03:29:59 -0600
-From: Jeff Cook <jeff@deserettechnology.com>
-Reply-To: jeff@deserettechnology.com
 MIME-Version: 1.0
-To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com
-CC: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add support for BCM20702A0 [0b05, 17b5]
+In-Reply-To: <20121023131633.GA12443@pzkagis.cz>
+References: <1350640763-24186-1-git-send-email-luiz.dentz@gmail.com>
+	<20121023131633.GA12443@pzkagis.cz>
+Date: Wed, 24 Oct 2012 10:51:07 +0200
+Message-ID: <CABBYNZKDsz=Go0gOPJXTReqk=8NnHtFF3=zSmR58B+m2KhEkVQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2] AVDTP: Do not keep a internal reference
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ludek Finstrle <luf@pzkagis.cz>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello all,
+Hi Ludek,
 
-Please see included patch. First-time submitter so let me know if I did 
-something wrong.
+On Tue, Oct 23, 2012 at 3:16 PM, Ludek Finstrle <luf@pzkagis.cz> wrote:
+>> +     avdtp_cancel_authorization(session);
+>
+> Why do you call avdtp_cancel_authorization here? It's useless as above you have
+> in the same function:
+>         if (session->state != AVDTP_SESSION_STATE_DISCONNECTED)
+>                 avdtp_set_state(session, AVDTP_SESSION_STATE_DISCONNECTED);
+>
+> and the first if statement inf avdtp_cancel_authorization is to check if the
+> state is AVDTP_SESSION_STATE_CONNECTING (otherwise return).
 
-Thanks,
-Jeff
---------------------
+Right, that could be removed then.
 
-Vendor-specific ID for BCM20702A0.
-Support for bluetooth over Asus Wi-Fi GO!, included with Asus P8Z77-V
-Deluxe.
+> See below. Why you deinitialize the session different way for ref=0?
+>
+>> +     else if (session->ref > 0)
+>> +             connection_lost(session, ETIMEDOUT);
+>> +     else {
+>> +             struct avdtp_server *server = session->server;
+>> +
+>> +             server->sessions = g_slist_remove(server->sessions, session);
+>> +             avdtp_free(session);
+>> +     }
 
-T:  Bus=07 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0b05 ProdID=17b5 Rev=01.12
-S:  Manufacturer=Broadcom Corp
-S:  Product=BCM20702A0
-S:  SerialNumber=94DBC98AC113
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
----
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+The reason is simple, if there is nobody holding a reference it is
+useless to call connection_lost.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 654e248..1d7b126 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -96,6 +96,7 @@ static struct usb_device_id btusb_table[] = {
- 	{ USB_DEVICE(0x0c10, 0x0000) },
- 
- 	/* Broadcom BCM20702A0 */
-+	{ USB_DEVICE(0x0b05, 0x17b5) },
- 	{ USB_DEVICE(0x0489, 0xe042) },
- 	{ USB_DEVICE(0x413c, 0x8197) },
- 
+> If I change whole block above (starting else if ((session->ref > 0)) this
+> way it works with N900 as expected:
+>
+>         else {
+>                 connection_lost(session, ETIMEDOUT);
+>
+>                 if (session->ref <= 0) {
+>                         struct avdtp_server *server = session->server;
+>
+>                         server->sessions = g_slist_remove(server->sessions, session);
+>                         avdtp_free(session);
+>                 }
+>         }
+
+hmm, that actually make sense if the caller releases its reference on
+connection_lost then we can free immediately but the mystery here is
+how you end up in disconnect_timeout if there are still a reference
+being held.
+
 -- 
-1.8.0
+Luiz Augusto von Dentz
