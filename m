@@ -1,74 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [RFC 00/18] CSCP plugin
-Date: Thu, 25 Oct 2012 16:43:30 +0200
-Message-ID: <1351176228-5789-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Thu, 25 Oct 2012 11:31:38 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 5/6] Bluetooth: mgmt: Add support for switching to LE
+ peripheral mode
+Message-ID: <20121025143138.GA27907@samus>
+References: <1351112996-9597-6-git-send-email-johan.hedberg@gmail.com>
+ <20121024221341.GA22764@samus>
+ <20121024223635.GA11976@x220.P-661HNU-F1>
+ <20121025005842.GB22764@samus>
+ <1351130085.1785.84.camel@aeonflux>
+ <20121025045605.GB12303@echo>
+ <20121025075045.GA22397@x220>
+ <CAJdJm_Odk8_8dLjcYw9kfr+CCD0Q0bNgu9duhRo6oKXYAo9cKA@mail.gmail.com>
+ <20121025114817.GA2197@x220>
+ <20121025120407.GA3274@x220>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20121025120407.GA3274@x220>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-Here are patches to add cyclingspeed plugin which is CSC profile
-implementation. All features for Collector Role are implemented.
+On 15:04 Thu 25 Oct, Johan Hedberg wrote:
+> Hi,
+> 
+> On Thu, Oct 25, 2012, Johan Hedberg wrote:
+> > This will need some more thinking. We could add a new mgmt command for
+> > that, or if you wanna go crazy why not map this to the L2CAP socket
+> > interface's connect() system call. I.e. if LE GAP is in peripheral mode
+> > instead of doing HCI_LE_Create_Connection or just failing with "not
+> > allowed" a socket connect() would simply trigger directed advertising to
+> > the device in question and deliver the successful connection in the same
+> > way as a central role triggered connect would do (unless we time out
+> > waiting for the remote device to connect). Now that I think of this
+> > second option it actually sounds quite natural and not so crazy after
+> > all :)
+> 
+> There's on problem with this though: we'd still be undirected
+> connectable between doing mgmt_set_le(peripheral) and issuing the socket
+> connect(). So maybe we might need to introduce a mgmt_set_le_connectable
+> command and a "le-connectable" setting after all (that could only be set
+> in peripheral mode).
 
-It's not yet fully tested so sending this as RFC. Reason for this
-is that PTS testcases for CSCP are buggy and I'm not able to verify
-my implementation reliably. I already filled few issues and hopefully
-they will be addressed soon.
 
-Anyway, it works fine with Wahoo BlueSC (but it does not support all
-features).
+Why not sending undirected connectable events when there's an active
+listen()?
 
-Comments are welcome.
+> 
+> Johan
 
 
-Andrzej Kaczmarek (18):
-  cyclingspeed: Add CSC profile plugin skeleton
-  cyclingspeed: Add attio callbacks
-  cyclingspeed: Discover CSCS characteristics
-  cyclingspeed: Discover characteristics CCC
-  cyclingspeed: Read CSC Feature characteristic value
-  cyclingspeed: Read Sensor Location characteristic value
-  cyclingspeed: Add CyclingSpeedManager interface
-  cyclingspeed: Add support to enable measurement notifications
-  cyclingspeed: Process measurement notifications
-  cyclingspeed: Add DBus.Properties for org.bluez.CyclingSpeed
-    interface
-  doc: Remove Get-/SetProperties from CSC API document
-  cyclingspeed: Add stub to use SC Control Point
-  cyclingspeed: Add support for Request Supported Sensor Locations
-  cyclingspeed: Add support for Update Sensor Location
-  cyclingspeed: Add support for Set Cumulative Value
-  core: Add CyclingSpeedWatcher interface to default policy
-  test: Add cyclingspeed test script
-  doc: Rename cycling API to cyclingspeed
-
- Makefile.am                          |    9 +-
- Makefile.tools                       |    2 +-
- doc/cycling-api.txt                  |  118 ----
- doc/cyclingspeed-api.txt             |  100 +++
- lib/uuid.h                           |    6 +
- profiles/cyclingspeed/cyclingspeed.c | 1225 ++++++++++++++++++++++++++++++++++
- profiles/cyclingspeed/cyclingspeed.h |   26 +
- profiles/cyclingspeed/main.c         |   53 ++
- profiles/cyclingspeed/manager.c      |   96 +++
- profiles/cyclingspeed/manager.h      |   24 +
- src/bluetooth.conf                   |    1 +
- test/test-cyclingspeed               |  115 ++++
- 12 files changed, 1654 insertions(+), 121 deletions(-)
- delete mode 100644 doc/cycling-api.txt
- create mode 100644 doc/cyclingspeed-api.txt
- create mode 100644 profiles/cyclingspeed/cyclingspeed.c
- create mode 100644 profiles/cyclingspeed/cyclingspeed.h
- create mode 100644 profiles/cyclingspeed/main.c
- create mode 100644 profiles/cyclingspeed/manager.c
- create mode 100644 profiles/cyclingspeed/manager.h
- create mode 100755 test/test-cyclingspeed
-
+Cheers,
 -- 
-1.8.0
-
+Vinicius
