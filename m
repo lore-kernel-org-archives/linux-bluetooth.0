@@ -1,49 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Paulo=20S=C3=A9rgio?= <paulo.sergio@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Paulo=20S=C3=A9rgio?= <paulo.sergio@openbossa.org>
-Subject: [PATCH] Bluetooth: Fix error message when pairing fails
-Date: Thu, 25 Oct 2012 16:08:55 -0300
-Message-Id: <1351192136-6925-1-git-send-email-paulo.sergio@openbossa.org>
-In-Reply-To: <y>
-References: <y>
+Date: Thu, 25 Oct 2012 15:48:50 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 5/6] Bluetooth: mgmt: Add support for switching to LE
+ peripheral mode
+Message-ID: <20121025184850.GA9284@samus>
+References: <20121024223635.GA11976@x220.P-661HNU-F1>
+ <20121025005842.GB22764@samus>
+ <1351130085.1785.84.camel@aeonflux>
+ <20121025045605.GB12303@echo>
+ <20121025075045.GA22397@x220>
+ <CAJdJm_Odk8_8dLjcYw9kfr+CCD0Q0bNgu9duhRo6oKXYAo9cKA@mail.gmail.com>
+ <20121025114817.GA2197@x220>
+ <20121025120407.GA3274@x220>
+ <20121025143138.GA27907@samus>
+ <20121025150754.GA5845@x220>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20121025150754.GA5845@x220>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When pairing fails due to wrong confirm value, the management layer
-doesn't report a proper error message. It sends a
-MGMT_STATUS_CONNECT_FAILED instead of a MGMT_STATUS_AUTH_FAILED.
+Hi Johan,
 
-Most of management functions that receive a status as a parameter
-expects for it to be encoded as a HCI status. But when a SMP pairing
-fails, the SMP layer sends the SMP reason as the error status to the
-management layer.
+On 18:07 Thu 25 Oct, Johan Hedberg wrote:
+> Hi Vinicius,
+> 
+> On Thu, Oct 25, 2012, Vinicius Costa Gomes wrote:
+> > > On Thu, Oct 25, 2012, Johan Hedberg wrote:
+> > > > This will need some more thinking. We could add a new mgmt command for
+> > > > that, or if you wanna go crazy why not map this to the L2CAP socket
+> > > > interface's connect() system call. I.e. if LE GAP is in peripheral mode
+> > > > instead of doing HCI_LE_Create_Connection or just failing with "not
+> > > > allowed" a socket connect() would simply trigger directed advertising to
+> > > > the device in question and deliver the successful connection in the same
+> > > > way as a central role triggered connect would do (unless we time out
+> > > > waiting for the remote device to connect). Now that I think of this
+> > > > second option it actually sounds quite natural and not so crazy after
+> > > > all :)
+> > > 
+> > > There's on problem with this though: we'd still be undirected
+> > > connectable between doing mgmt_set_le(peripheral) and issuing the socket
+> > > connect(). So maybe we might need to introduce a mgmt_set_le_connectable
+> > > command and a "le-connectable" setting after all (that could only be set
+> > > in peripheral mode).
+> > 
+> > Why not sending undirected connectable events when there's an active
+> > listen()?
+> 
+> But we always have that, don't we? (the GATT server socket). Or are you
+> saying that bluetoothd could close its GATT server socket before
+> switching to peripheral mode and that would ensure that the kernel
+> doesn't enable connectable advertising?
 
-This commit maps all SMP reasons to HCI_ERROR_AUTH_FAILURE, which will
-be converted to MGMT_STATUS_AUTH_FAILED in the management layer.
+Right now bluetoothd always has a listen() active, yes. But remember
+that that listen() was added only to help testing, in the case that
+BlueZ always initiates connections that listen() is not needed.
 
-Reported-by: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Reviewed-by: João Paulo Rechi Vita <jprvita@openbossa.org>
-Signed-off-by: Paulo Sérgio <paulo.sergio@openbossa.org>
----
- net/bluetooth/smp.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+What I am thinking is having more control about when to advertise, for
+example, each profile that needs the peripheral role would increase the
+reference of a listener, when all the references are dropped I stop
+advertising.
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index b542c5d..b3b7cc0 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -266,7 +266,7 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason, u8 send)
- 
- 	clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->hcon->flags);
- 	mgmt_auth_failed(conn->hcon->hdev, conn->dst, hcon->type,
--			 hcon->dst_type, reason);
-+			 hcon->dst_type, HCI_ERROR_AUTH_FAILURE);
- 
- 	cancel_delayed_work_sync(&conn->security_timer);
- 
+> 
+> Johan
+
+
+Cheers,
 -- 
-1.7.9.5
-
+Vinicius
