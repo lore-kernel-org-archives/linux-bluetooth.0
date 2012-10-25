@@ -1,45 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 00/11] Handling physical and logical link
-Date: Thu, 25 Oct 2012 15:20:41 +0300
-Message-Id: <1351167652-12346-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1350493622.26318.114.camel@aeonflux>
-References: <1350493622.26318.114.camel@aeonflux>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 25 Oct 2012 15:04:07 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 5/6] Bluetooth: mgmt: Add support for switching to LE
+ peripheral mode
+Message-ID: <20121025120407.GA3274@x220>
+References: <1351112996-9597-1-git-send-email-johan.hedberg@gmail.com>
+ <1351112996-9597-6-git-send-email-johan.hedberg@gmail.com>
+ <20121024221341.GA22764@samus>
+ <20121024223635.GA11976@x220.P-661HNU-F1>
+ <20121025005842.GB22764@samus>
+ <1351130085.1785.84.camel@aeonflux>
+ <20121025045605.GB12303@echo>
+ <20121025075045.GA22397@x220>
+ <CAJdJm_Odk8_8dLjcYw9kfr+CCD0Q0bNgu9duhRo6oKXYAo9cKA@mail.gmail.com>
+ <20121025114817.GA2197@x220>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20121025114817.GA2197@x220>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi,
 
-Set of patches adding handling for physical and logical link
-complete events.
+On Thu, Oct 25, 2012, Johan Hedberg wrote:
+> This will need some more thinking. We could add a new mgmt command for
+> that, or if you wanna go crazy why not map this to the L2CAP socket
+> interface's connect() system call. I.e. if LE GAP is in peripheral mode
+> instead of doing HCI_LE_Create_Connection or just failing with "not
+> allowed" a socket connect() would simply trigger directed advertising to
+> the device in question and deliver the successful connection in the same
+> way as a central role triggered connect would do (unless we time out
+> waiting for the remote device to connect). Now that I think of this
+> second option it actually sounds quite natural and not so crazy after
+> all :)
 
-Changes:
-	* rfcv1: Rebased on top of Mat's patches, preserve Marcel's ack for
-	not-changed-much patches only.
-	* rfcv0: original 
+There's on problem with this though: we'd still be undirected
+connectable between doing mgmt_set_le(peripheral) and issuing the socket
+connect(). So maybe we might need to introduce a mgmt_set_le_connectable
+command and a "le-connectable" setting after all (that could only be set
+in peripheral mode).
 
-Andrei Emeltchenko (11):
-  Bluetooth: trivial: Remove unneeded assignment
-  Bluetooth: Use helper function sending EFS conf rsp
-  Bluetooth: AMP: Process Physical Link Complete evt
-  Bluetooth: AMP: Process Logical Link complete evt
-  Bluetooth: AMP: Add Logical Link Create function
-  Bluetooth: AMP: Process Disc Logical Link
-  Bluetooth: AMP: Process Disc Physical Link Complete evt
-  Bluetooth: AMP: Remove hci_conn receiving error command status
-  Bluetooth: Disconnect logical link when deleteing chan
-  Bluetooth: Add put(hcon) when deleting hchan
-  Bluetooth: AMP: Check for hs_hcon instead of ctrl_id
-
- include/net/bluetooth/amp.h   |    3 +
- include/net/bluetooth/l2cap.h |    2 +
- net/bluetooth/amp.c           |   70 ++++++++++++++++
- net/bluetooth/hci_conn.c      |    2 +
- net/bluetooth/hci_event.c     |  177 ++++++++++++++++++++++++++++++++++++++++-
- net/bluetooth/l2cap_core.c    |   41 ++++++----
- 6 files changed, 276 insertions(+), 19 deletions(-)
-
--- 
-1.7.9.5
-
+Johan
