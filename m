@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [RFC 18/18] doc: Rename cycling API to cyclingspeed
-Date: Thu, 25 Oct 2012 16:43:48 +0200
-Message-ID: <1351176228-5789-19-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [RFC 08/18] cyclingspeed: Add support to enable measurement notifications
+Date: Thu, 25 Oct 2012 16:43:38 +0200
+Message-ID: <1351176228-5789-9-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1351176228-5789-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1351176228-5789-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -13,224 +13,129 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- doc/cycling-api.txt      | 100 -----------------------------------------------
- doc/cyclingspeed-api.txt | 100 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 100 insertions(+), 100 deletions(-)
- delete mode 100644 doc/cycling-api.txt
- create mode 100644 doc/cyclingspeed-api.txt
+ profiles/cyclingspeed/cyclingspeed.c | 72 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 71 insertions(+), 1 deletion(-)
 
-diff --git a/doc/cycling-api.txt b/doc/cycling-api.txt
-deleted file mode 100644
-index 08e11c8..0000000
---- a/doc/cycling-api.txt
-+++ /dev/null
-@@ -1,100 +0,0 @@
--Cycling Speed and Cadence API description
--*****************************************
--
--Copyright (C) 2012	Tieto Poland
--
--Cycling Speed and Cadence Manager hierarchy
--===========================================
--
--Service		org.bluez
--Interface	org.bluez.CyclingSpeedManager
--Object path	[variable prefix]/{hci0,hci1,...}
--
--Methods		RegisterWatcher(object agent)
--
--			Registers a watcher to monitor cycling speed and
--			cadence measurements.
--
--			Possible Errors: org.bluez.Error.InvalidArguments
--
--		UnregisterWatcher(object agent)
--
--			Unregisters a watcher.
--
--Cycling Speed and Cadence Profile hierarchy
--===========================================
--
--Service		org.bluez
--Interface	org.bluez.CyclingSpeed
--Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
--
--Methods		SetCumulativeWheelRevolutions(uint32 value)
--
--			Sets cumulative wheel revolutions value if
--			Cumulative Wheel Revolutions feature is supported.
--
--			Possible Errors: org.bluez.Error.NotSupported
--
--Properties	string Location (optional) [readwrite]
--
--			Current sensor location, if supported.
--			If Multiple Sensor Locations feature is supported,
--			this property can be set to one of values read from
--			SupportedLocations property.
--
--			Possible values: "other", "top-of-shoe", "in-shoe",
--					"hip", "front-wheel", "left-crank",
--					"right-crank", "left-pedal",
--					"right-pedal", "front-hub",
--					"rear-dropout", "chainstay",
--					"rear-wheel", "rear-hub"
--
--		array{string} SupportedLocations (optional) [readonly]
--
--			List of locations supported by sensor, only present
--			if Multiple Sensor Locations feature is supported.
--
--		boolean WheelRevolutionDataSupported [readonly]
--
--			true if sensor can read and set Cumulative Wheel
--			Revolutions value, false otherwise.
--
--		boolean MultipleSensorLocationsSupported [readonly]
--
--			true if sensor supports Multiple Sensor Locations
--			feature and can set Location, false otherwise.
--
--Cycling Speed and Cadence Watcher hierarchy
--===========================================
--
--Service		unique name
--Interface	org.bluez.CyclingSpeedWatcher
--Object path	freely definable
--
--Methods		void MeasurementReceived(object device, dict measurement)
--
--			This callback is called whenever wheel and/or crank
--			revolutions measurement is received from sensor.
--
--			Measurement:
--
--				uint32 WheelRevolutions (optional):
--
--					Cumulative number of wheel revolutions.
--
--				uint16 LastWheelEventTime (optional):
--
--					Time of last event from wheel sensor.
--					Value is expressed in 1/1024 second
--					units and can roll over during a ride.
--
--				uint16 CrankRevolutions (optional):
--
--					Cumulative number of crank revolutions.
--					This value can occasionally roll over.
--
--				uint16 LastCrankEventTime (optional):
--
--					Time of last event from crank sensor.
--					Value is expressed in 1/1024 second
--					units and can roll over during a ride.
-diff --git a/doc/cyclingspeed-api.txt b/doc/cyclingspeed-api.txt
-new file mode 100644
-index 0000000..08e11c8
---- /dev/null
-+++ b/doc/cyclingspeed-api.txt
-@@ -0,0 +1,100 @@
-+Cycling Speed and Cadence API description
-+*****************************************
+diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
+index 0b3742a..53fbb02 100644
+--- a/profiles/cyclingspeed/cyclingspeed.c
++++ b/profiles/cyclingspeed/cyclingspeed.c
+@@ -184,6 +184,17 @@ static void destroy_csc(gpointer user_data)
+ 	g_free(csc);
+ }
+ 
++static void char_write_cb(guint8 status, const guint8 *pdu, guint16 len,
++							gpointer user_data)
++{
++	char *msg = user_data;
 +
-+Copyright (C) 2012	Tieto Poland
++	if (status != 0)
++		error("%s failed", msg);
 +
-+Cycling Speed and Cadence Manager hierarchy
-+===========================================
++	g_free(msg);
++}
 +
-+Service		org.bluez
-+Interface	org.bluez.CyclingSpeedManager
-+Object path	[variable prefix]/{hci0,hci1,...}
+ static void read_feature_cb(guint8 status, const guint8 *pdu,
+ 						guint16 len, gpointer user_data)
+ {
+@@ -269,9 +280,25 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu,
+ 		if (uuid != GATT_CLIENT_CHARAC_CFG_UUID)
+ 			continue;
+ 
+-		if (g_strcmp0(ch->uuid, CSC_MEASUREMENT_UUID) == 0)
++		if (g_strcmp0(ch->uuid, CSC_MEASUREMENT_UUID) == 0) {
++			char *msg;
++			uint8_t attr_val[2];
 +
-+Methods		RegisterWatcher(object agent)
+ 			ch->csc->measurement_ccc_handle = handle;
+ 
++			if (g_slist_length(ch->csc->cadapter->watchers) == 0) {
++				att_put_u16(0x0000, attr_val);
++				msg = g_strdup("Disable measurement");
++			} else {
++				att_put_u16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT,
++								attr_val);
++				msg = g_strdup("Enable measurement");
++			}
 +
-+			Registers a watcher to monitor cycling speed and
-+			cadence measurements.
++			gatt_write_char(ch->csc->attrib, handle, attr_val,
++					sizeof(attr_val), char_write_cb, msg);
++		}
 +
-+			Possible Errors: org.bluez.Error.InvalidArguments
+ 		/* We only want CCC, can break here */
+ 		break;
+ 	}
+@@ -343,6 +370,40 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ 							read_feature_cb, csc);
+ }
+ 
++static void enable_measurement(gpointer data, gpointer user_data)
++{
++	struct csc *csc = data;
++	uint16_t handle = csc->measurement_ccc_handle;
++	uint8_t value[2];
++	char *msg;
 +
-+		UnregisterWatcher(object agent)
++	if (csc->attrib == NULL || !handle)
++		return;
 +
-+			Unregisters a watcher.
++	att_put_u16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
++	msg = g_strdup("Enable measurement");
 +
-+Cycling Speed and Cadence Profile hierarchy
-+===========================================
++	gatt_write_char(csc->attrib, handle, value, sizeof(value),
++							char_write_cb, msg);
++}
 +
-+Service		org.bluez
-+Interface	org.bluez.CyclingSpeed
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
++static void disable_measurement(gpointer data, gpointer user_data)
++{
++	struct csc *csc = data;
++	uint16_t handle = csc->measurement_ccc_handle;
++	uint8_t value[2];
++	char *msg;
 +
-+Methods		SetCumulativeWheelRevolutions(uint32 value)
++	if (csc->attrib == NULL || !handle)
++		return;
 +
-+			Sets cumulative wheel revolutions value if
-+			Cumulative Wheel Revolutions feature is supported.
++	att_put_u16(0x0000, value);
++	msg = g_strdup("Disable measurement");
 +
-+			Possible Errors: org.bluez.Error.NotSupported
++	gatt_write_char(csc->attrib, handle, value, sizeof(value),
++							char_write_cb, msg);
++}
 +
-+Properties	string Location (optional) [readwrite]
+ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ {
+ 	struct csc *csc = user_data;
+@@ -375,6 +436,9 @@ static void watcher_exit_cb(DBusConnection *conn, void *user_data)
+ 
+ 	cadapter->watchers = g_slist_remove(cadapter->watchers, watcher);
+ 	g_dbus_remove_watch(conn, watcher->id);
 +
-+			Current sensor location, if supported.
-+			If Multiple Sensor Locations feature is supported,
-+			this property can be set to one of values read from
-+			SupportedLocations property.
++	if (g_slist_length(cadapter->watchers) == 0)
++		g_slist_foreach(cadapter->devices, disable_measurement, 0);
+ }
+ 
+ static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
+@@ -400,6 +464,9 @@ static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
+ 	watcher->srv = g_strdup(sender);
+ 	watcher->path = g_strdup(path);
+ 
++	if (g_slist_length(cadapter->watchers) == 0)
++		g_slist_foreach(cadapter->devices, enable_measurement, 0);
 +
-+			Possible values: "other", "top-of-shoe", "in-shoe",
-+					"hip", "front-wheel", "left-crank",
-+					"right-crank", "left-pedal",
-+					"right-pedal", "front-hub",
-+					"rear-dropout", "chainstay",
-+					"rear-wheel", "rear-hub"
+ 	cadapter->watchers = g_slist_prepend(cadapter->watchers, watcher);
+ 
+ 	DBG("cycling watcher [%s] registered", path);
+@@ -426,6 +493,9 @@ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
+ 	cadapter->watchers = g_slist_remove(cadapter->watchers, watcher);
+ 	g_dbus_remove_watch(conn, watcher->id);
+ 
++	if (g_slist_length(cadapter->watchers) == 0)
++		g_slist_foreach(cadapter->devices, disable_measurement, 0);
 +
-+		array{string} SupportedLocations (optional) [readonly]
-+
-+			List of locations supported by sensor, only present
-+			if Multiple Sensor Locations feature is supported.
-+
-+		boolean WheelRevolutionDataSupported [readonly]
-+
-+			true if sensor can read and set Cumulative Wheel
-+			Revolutions value, false otherwise.
-+
-+		boolean MultipleSensorLocationsSupported [readonly]
-+
-+			true if sensor supports Multiple Sensor Locations
-+			feature and can set Location, false otherwise.
-+
-+Cycling Speed and Cadence Watcher hierarchy
-+===========================================
-+
-+Service		unique name
-+Interface	org.bluez.CyclingSpeedWatcher
-+Object path	freely definable
-+
-+Methods		void MeasurementReceived(object device, dict measurement)
-+
-+			This callback is called whenever wheel and/or crank
-+			revolutions measurement is received from sensor.
-+
-+			Measurement:
-+
-+				uint32 WheelRevolutions (optional):
-+
-+					Cumulative number of wheel revolutions.
-+
-+				uint16 LastWheelEventTime (optional):
-+
-+					Time of last event from wheel sensor.
-+					Value is expressed in 1/1024 second
-+					units and can roll over during a ride.
-+
-+				uint16 CrankRevolutions (optional):
-+
-+					Cumulative number of crank revolutions.
-+					This value can occasionally roll over.
-+
-+				uint16 LastCrankEventTime (optional):
-+
-+					Time of last event from crank sensor.
-+					Value is expressed in 1/1024 second
-+					units and can roll over during a ride.
+ 	DBG("cycling watcher [%s] unregistered", path);
+ 
+ 	return dbus_message_new_method_return(msg);
 -- 
 1.8.0
 
