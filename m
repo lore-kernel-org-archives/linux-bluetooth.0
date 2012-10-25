@@ -1,32 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 25 Oct 2012 10:50:45 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 5/6] Bluetooth: mgmt: Add support for switching to LE
- peripheral mode
-Message-ID: <20121025075045.GA22397@x220>
-References: <1351112996-9597-1-git-send-email-johan.hedberg@gmail.com>
- <1351112996-9597-6-git-send-email-johan.hedberg@gmail.com>
- <20121024221341.GA22764@samus>
- <20121024223635.GA11976@x220.P-661HNU-F1>
- <20121025005842.GB22764@samus>
- <1351130085.1785.84.camel@aeonflux>
- <20121025045605.GB12303@echo>
+Date: Thu, 25 Oct 2012 10:13:09 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Fengguang Wu <fengguang.wu@intel.com>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Mat Martineau <mathewm@codeaurora.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: l2cap_physical_cfm() can be static
+Message-ID: <20121025071307.GA2502@aemeltch-MOBL1>
+References: <508863c1.QTbySMnQ9kj6jDZz%fengguang.wu@intel.com>
+ <20121024220131.GB3030@joana>
+ <20121025002608.GA10418@localhost>
+ <1351130134.1785.85.camel@aeonflux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20121025045605.GB12303@echo>
+In-Reply-To: <1351130134.1785.85.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi,
 
-On Thu, Oct 25, 2012, Vinicius Costa Gomes wrote:
-> So, what information will we use to set the advertising type and the
-> Flags field in the advertising event (think general/limited
-> discoverable modes)?
+On Wed, Oct 24, 2012 at 06:55:34PM -0700, Marcel Holtmann wrote:
+> Hi Fengguang,
+> 
+> > Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
+> > ---
+> >  net/bluetooth/l2cap_core.c |    2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > --- linux-next.orig/net/bluetooth/l2cap_core.c	2012-10-25 08:23:52.456742699 +0800
+> > +++ linux-next/net/bluetooth/l2cap_core.c	2012-10-25 08:23:55.056742760 +0800
+> > @@ -4569,7 +4569,7 @@ static void l2cap_do_move_cancel(struct
+> >  	l2cap_ertm_send(chan);
+> >  }
+> >  
+> > -void l2cap_physical_cfm(struct l2cap_chan *chan, int result, u8 local_amp_id,
+> > +static void l2cap_physical_cfm(struct l2cap_chan *chan, int result, u8 local_amp_id,
+> >  			u8 remote_amp_id)
+> 
+> I rather wait for Mat to ACK or NACK this one. Maybe it is an oversight
+> or we need that later on to be actually public.
 
-Take a look at the create_ad() function in the last patch of this set.
-Setting the right flags value is really quite simple. The advertising
-type could be selected in a similar way, i.e. through hdev->dev_flags.
+Agree with Marcel here. This shall be public.
 
-Johan
+Best regards 
+Andrei Emeltchenko 
