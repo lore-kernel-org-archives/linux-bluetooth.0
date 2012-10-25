@@ -1,88 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Oct 2012 21:58:42 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 5/6] Bluetooth: mgmt: Add support for switching to LE
- peripheral mode
-Message-ID: <20121025005842.GB22764@samus>
-References: <1351112996-9597-1-git-send-email-johan.hedberg@gmail.com>
- <1351112996-9597-6-git-send-email-johan.hedberg@gmail.com>
- <20121024221341.GA22764@samus>
- <20121024223635.GA11976@x220.P-661HNU-F1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20121024223635.GA11976@x220.P-661HNU-F1>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20120816051056.GA25290@joana>
+References: <1344757304-11555-1-git-send-email-7aborigines7@gmail.com>
+ <20120815044111.GG3344@joana> <CA+iwHK1VYJ+G-9aVgkzvAV4C3Unhyz-sqC+_SkUmPhffs1_=CQ@mail.gmail.com>
+ <20120816051056.GA25290@joana>
+From: koko Aborigines <7aborigines7@gmail.com>
+Date: Thu, 25 Oct 2012 07:57:01 +0700
+Message-ID: <CA+iwHK3-HxsFX8eNkF=xmy0VBD=tuc6WzVm+Sti8hF3=bU38Eg@mail.gmail.com>
+Subject: Re: [PATCH] add support bluetooth usb 0489:e046 Foxconn / Hon Hai
+To: Gustavo Padovan <gustavo@padovan.org>, koko Aborigines <7aborigines7@gmail.com>, marcel@holtmann.org,
+	padovan@profusion.mobi, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Content-Type: multipart/alternative; boundary=f46d042ef67185bebe04ccd7af0d
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+--f46d042ef67185bebe04ccd7af0d
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On 01:36 Thu 25 Oct, Johan Hedberg wrote:
-> Hi Vinicius,
-> 
-> On Wed, Oct 24, 2012, Vinicius Costa Gomes wrote:
-> > On 00:09 Thu 25 Oct, Johan Hedberg wrote:
-> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > > index dc60d31..ed6b1e2 100644
-> > > --- a/net/bluetooth/hci_event.c
-> > > +++ b/net/bluetooth/hci_event.c
-> > > @@ -790,9 +790,24 @@ static void hci_set_le_support(struct hci_dev *hdev)
-> > >  		cp.simul = !!lmp_le_br_capable(hdev);
-> > >  	}
-> > >  
-> > > +	/* If the host features don't reflect the desired state for LE
-> > > +	 * then send the write_le_host_supported command. The command
-> > > +	 * complete handler for it will take care of any necessary
-> > > +	 * subsequent commands like set_adv_enable.
-> > > +	 *
-> > > +	 * If the host features for LE are already correct and
-> > > +	 * peripheral mode is enabled directly send the le_set_adv
-> > > +	 * command. The value of &cp.le is used so that advertising will
-> > > +	 * not be enabled in the exceptional case that LE for some
-> > > +	 * reason isn't enabled - something that should only be possible
-> > > +	 * if someone is doing direct raw access to HCI.
-> > > +	 */
-> > >  	if (cp.le != !!lmp_host_le_capable(hdev))
-> > >  		hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED, sizeof(cp),
-> > >  			     &cp);
-> > > +	else if (test_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags))
-> > > +		hci_send_cmd(hdev, HCI_OP_LE_SET_ADV_ENABLE, sizeof(cp.le),
-> > > +			     &cp.le);
-> > >  }
-> > 
-> > I agree with Marcel, and one point that worried me was this
-> > unconditional advertising, I feel that we should be smarter about when
-> > to start advertising, for example, here we are not taking into account
-> > the user's visiblity settings.
-> 
-> If you're a peripheral and you're not connectable/discoverable then what
-> good does it do to have Bluetooth enabled at all? Since a peripheral
-> can't scan or initiate connections you can't really do anything. So if a
-> higher layer doesn't want us advertising it could either set LE to off
-> or central role or even power off the adapter completely.
+Hi,
+On ubuntu 12.10 Base Kernel 3.5.5
+Your Patch is work
 
-And what about the device that receive these advertising events? It
-won't be able to do anything with them. And we would be increasing the
-risk of interfering with the communication of others.
+Thank You.
 
-For me, the LE peripheral mode setting has a longer lifetime than (and is
-orthogonal to) the Discoverable/Connectable settings. So, I would enable
-Peripheral mode once during the lifetime of my session, and control the
-type and whether I am advertising using the Connectable/Discoverable
-settings (perhaps even from the Apps that are listening for connections).
+ref https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1030233
 
-Having to change the role of the device to the Central role or turning
-the controller off (which would mean to re-do a lot of the
-initialization when I turn it on again) to stop advertising seems, at
-least, not intuitive.
+On Thu, Aug 16, 2012 at 12:10 PM, Gustavo Padovan <gustavo@padovan.org>wrot=
+e:
 
-Then, the only way to send not Discoverable nor Connectable advertising
-events would be with the Broadcaster role.
+> Hi,
+>
+> * koko Aborigines <7aborigines7@gmail.com> [2012-08-16 10:12:44 +0700]:
+>
+> > Hi, Gustavo
+> >
+> > i have error with your patch
+> >
+> >  CC [M]  drivers/bluetooth/btusb.o
+> > drivers/bluetooth/btusb.c:113:2: error: implicit declaration of functio=
+n
+> > =E2=80=98USB_VENDOR_AND_INTERFACE_INFO=E2=80=99 [-Werror=3Dimplicit-fun=
+ction-declaration]
+> > drivers/bluetooth/btusb.c:113:2: error: initializer element is not
+> constant
+> > drivers/bluetooth/btusb.c:113:2: error: (near initialization for
+> > =E2=80=98btusb_table[22].match_flags=E2=80=99)
+>
+> You need to apply it against the bluetooth-next tree (or linux-next).
+>
+>         Gustavo
+>
 
-> 
-> Johan
+--f46d042ef67185bebe04ccd7af0d
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
+Hi, <br>On ubuntu 12.10 Base Kernel 3.5.5<br>Your Patch is work<br><br>Than=
+k You.<br><br>ref <a href=3D"https://bugs.launchpad.net/ubuntu/+source/linu=
+x/+bug/1030233">https://bugs.launchpad.net/ubuntu/+source/linux/+bug/103023=
+3</a><br>
 
-Cheers,
--- 
-Vinicius
+<br><div class=3D"gmail_quote">On Thu, Aug 16, 2012 at 12:10 PM, Gustavo Pa=
+dovan <span dir=3D"ltr">&lt;<a href=3D"mailto:gustavo@padovan.org" target=
+=3D"_blank">gustavo@padovan.org</a>&gt;</span> wrote:<br><blockquote class=
+=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
+ing-left:1ex">
+
+Hi,<br>
+<br>
+* koko Aborigines &lt;<a href=3D"mailto:7aborigines7@gmail.com">7aborigines=
+7@gmail.com</a>&gt; [2012-08-16 10:12:44 +0700]:<br>
+<div class=3D"im"><br>
+&gt; Hi, Gustavo<br>
+&gt;<br>
+&gt; i have error with your patch<br>
+&gt;<br>
+&gt; =C2=A0CC [M] =C2=A0drivers/bluetooth/btusb.o<br>
+&gt; drivers/bluetooth/btusb.c:113:2: error: implicit declaration of functi=
+on<br>
+&gt; =E2=80=98USB_VENDOR_AND_INTERFACE_INFO=E2=80=99 [-Werror=3Dimplicit-fu=
+nction-declaration]<br>
+&gt; drivers/bluetooth/btusb.c:113:2: error: initializer element is not con=
+stant<br>
+&gt; drivers/bluetooth/btusb.c:113:2: error: (near initialization for<br>
+&gt; =E2=80=98btusb_table[22].match_flags=E2=80=99)<br>
+<br>
+</div>You need to apply it against the bluetooth-next tree (or linux-next).=
+<br>
+<span class=3D"HOEnZb"><font color=3D"#888888"><br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 Gustavo<br>
+</font></span></blockquote></div><br>
+
+--f46d042ef67185bebe04ccd7af0d--
