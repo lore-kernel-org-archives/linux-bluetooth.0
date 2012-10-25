@@ -1,112 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ho, Albert O" <albert.o.ho@intel.com>
+Date: Thu, 25 Oct 2012 01:56:05 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>, "Hedberg, Johan"
-	<johan.hedberg@intel.com>, "tedd.hj.an@gmail.com" <tedd.hj.an@gmail.com>,
-	"An, Tedd" <tedd.an@intel.com>
-Subject: RE: [RFC 1/2] Bluetooth: Add driver extension for vendor specific
- init
-Date: Thu, 25 Oct 2012 06:38:52 +0000
-Message-ID: <95EBF2BD638BE24EB7C4104AF2911E3945F4D373@ORSMSX101.amr.corp.intel.com>
-References: <39660287.XHkFNqYcyS@tedd-ubuntu>
-	 <1349346013.27233.28.camel@aeonflux>
-	 <95EBF2BD638BE24EB7C4104AF2911E3945F4C895@ORSMSX101.amr.corp.intel.com>
- <1351091899.1785.69.camel@aeonflux>
-In-Reply-To: <1351091899.1785.69.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 5/6] Bluetooth: mgmt: Add support for switching to LE
+ peripheral mode
+Message-ID: <20121025045605.GB12303@echo>
+References: <1351112996-9597-1-git-send-email-johan.hedberg@gmail.com>
+ <1351112996-9597-6-git-send-email-johan.hedberg@gmail.com>
+ <20121024221341.GA22764@samus>
+ <20121024223635.GA11976@x220.P-661HNU-F1>
+ <20121025005842.GB22764@samus>
+ <1351130085.1785.84.camel@aeonflux>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1351130085.1785.84.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-QWNrbm93bGVkZ2VkLg0KDQpSZWdhcmRzLA0KQWxiZXJ0DQoNCg0KLS0tLS1PcmlnaW5hbCBNZXNz
-YWdlLS0tLS0NCkZyb206IE1hcmNlbCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5v
-cmddIA0KU2VudDogV2VkbmVzZGF5LCBPY3RvYmVyIDI0LCAyMDEyIDg6MTggQU0NClRvOiBIbywg
-QWxiZXJ0IE8NCkNjOiBsaW51eC1ibHVldG9vdGg7IEhlZGJlcmcsIEpvaGFuOyB0ZWRkLmhqLmFu
-QGdtYWlsLmNvbTsgQW4sIFRlZGQNClN1YmplY3Q6IFJlOiBbUkZDIDEvMl0gQmx1ZXRvb3RoOiBB
-ZGQgZHJpdmVyIGV4dGVuc2lvbiBmb3IgdmVuZG9yIHNwZWNpZmljIGluaXQNCg0KSGkgQWxiZXJ0
-LA0KDQo+ID4gVGhpcyBwYXRjaCBwcm92aWRlcyBhbiBleHRlbnNpb24gb2YgYnR1c2IgdG8gc3Vw
-cG9ydCBkZXZpY2UgdmVuZG9yIA0KPiA+IGNhbiBpbXBsZW1lbnQgdGhlaXIgb3duIG1vZHVsZSB0
-byBleGVjdXRlIHRoZSB2ZW5kb3Igc3BlY2lmaWMgZGV2aWNlIA0KPiA+IGluaXRpYWxpemF0aW9u
-IGJlZm9yZSB0aGUgc3RhY2sgc2VuZHMgZ2VuZXJpYyBCVCBkZXZpY2UgDQo+ID4gaW5pdGlhbGl6
-YXRpb24uDQo+ID4gDQo+ID4gU2lnbmVkLW9mZi1ieTogVGVkZCBIby1KZW9uZyBBbiA8dGVkZC5h
-bkBpbnRlbC5jb20+DQo+ID4gLS0tDQo+ID4gIGRyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgICAg
-ICAgIHwgIDE5MSArKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLQ0KPiA+ICBk
-cml2ZXJzL2JsdWV0b290aC9idHVzYi5oICAgICAgICB8ICAgNTMgKysrKysrKysrKysNCj4gPiAg
-aW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmggfCAgIDEwICsrDQo+ID4gIG5ldC9ibHVl
-dG9vdGgvaGNpX2NvcmUuYyAgICAgICAgIHwgICAxNSArKy0NCj4gPiAgNCBmaWxlcyBjaGFuZ2Vk
-LCAyMDQgaW5zZXJ0aW9ucygrKSwgNjUgZGVsZXRpb25zKC0pICBjcmVhdGUgbW9kZQ0KPiA+IDEw
-MDY0NCBkcml2ZXJzL2JsdWV0b290aC9idHVzYi5oDQo+ID4gDQo+ID4gZGlmZiAtLWdpdCBhL2Ry
-aXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgYi9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jIA0KPiA+
-IGluZGV4IGY2MzdjMjUuLmFmYTE1NTggMTAwNjQ0DQo+ID4gLS0tIGEvZHJpdmVycy9ibHVldG9v
-dGgvYnR1c2IuYw0KPiA+ICsrKyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMNCj4gPiBAQCAt
-MjYsNiArMjYsNyBAQA0KPiA+ICANCj4gPiAgI2luY2x1ZGUgPG5ldC9ibHVldG9vdGgvYmx1ZXRv
-b3RoLmg+ICAjaW5jbHVkZSANCj4gPiA8bmV0L2JsdWV0b290aC9oY2lfY29yZS5oPg0KPiA+ICsj
-aW5jbHVkZSAiYnR1c2IuaCINCj4gPiAgDQo+ID4gICNkZWZpbmUgVkVSU0lPTiAiMC42Ig0KPiA+
-ICANCj4gPiBAQCAtMzksMTQgKzQwLDU5IEBAIHN0YXRpYyBib29sIHJlc2V0ID0gMTsNCj4gPiAg
-DQo+ID4gIHN0YXRpYyBzdHJ1Y3QgdXNiX2RyaXZlciBidHVzYl9kcml2ZXI7DQo+ID4gIA0KPiA+
-IC0jZGVmaW5lIEJUVVNCX0lHTk9SRQkJMHgwMQ0KPiA+IC0jZGVmaW5lIEJUVVNCX0RJR0lBTlNX
-RVIJMHgwMg0KPiA+IC0jZGVmaW5lIEJUVVNCX0NTUgkJMHgwNA0KPiA+IC0jZGVmaW5lIEJUVVNC
-X1NOSUZGRVIJCTB4MDgNCj4gPiAtI2RlZmluZSBCVFVTQl9CQ005MjAzNQkJMHgxMA0KPiA+IC0j
-ZGVmaW5lIEJUVVNCX0JST0tFTl9JU09DCTB4MjANCj4gPiAtI2RlZmluZSBCVFVTQl9XUk9OR19T
-Q09fTVRVCTB4NDANCj4gPiAtI2RlZmluZSBCVFVTQl9BVEgzMDEyCQkweDgwDQo+ID4gKy8qDQo+
-ID4gKyAqIENyZWF0ZSBidHVzYl9kcml2ZXJfaW5mbyBzdHJ1Y3QgZm9yIGVhY2ggZHJpdmVyX2lu
-Zm8gZmxhZ3MgdXNlZCANCj4gPiArYnkNCj4gPiArICogYmxhY2tsaXN0IHNpbmNlIHZlbmRvcidz
-IGJ0dXNiIGRyaXZlciB3aWxsIHJldHVybiBidHVzYl9kcml2ZXJfaW5mbyBzdHJ1Y3QuDQo+ID4g
-KyAqLw0KPiA+ICsNCj4gPiArLyoNCj4gPiArICogaWYgdGhlIGRldmljZSBpcyBzZXQgdG8gdGhp
-cywgdGhpcyBtZW5hcyB0aGF0IHRoZSBkZXZpY2UgaXMgDQo+ID4gK2dlbmVyaWMgYW5kDQo+ID4g
-KyAqIGRvZXNuJ3QgcmVxdWlyZSBhbnkgdmVuZG9yIHNwZWNpZmljIGhhbmRsaW5nICAqLyBzdGF0
-aWMgY29uc3QgDQo+ID4gK3N0cnVjdCBidHVzYl9kcml2ZXJfaW5mbyBnZW5lcmljID0gew0KPiA+
-ICsJLmRlc2NyaXB0aW9uCT0gIkJUVVNCIEdlbmVyaWMiLA0KPiA+ICsJLmZsYWdzCQk9IEJUVVNC
-X0dFTkVSSUMsDQo+ID4gK307DQo+ID4gKw0KPiA+ICtzdGF0aWMgY29uc3Qgc3RydWN0IGJ0dXNi
-X2RyaXZlcl9pbmZvIGlnbm9yZSA9IHsNCj4gPiArCS5kZXNjcmlwdGlvbgk9ICJCVFVTQiBJZ25v
-cmUiLA0KPiA+ICsJLmZsYWdzCQk9IEJUVVNCX0lHTk9SRSwNCj4gPiArfTsNCj4gDQo+ID4+IEkg
-bGlrZSB0aGUgZWZmb3J0LCBidXQgSSB0aGluayB5b3Ugd2VudCBhIGxpdHRsZSBiaXQgdG9vIGZh
-ciBoZXJlLiBGb3IgdGhlc2Ugc2ltcGxlIG9uZXMsIHdlIGNhbiBlYXNpbHkga2VlcCBvdXIgc2lt
-cGxlIGJsYWNrbGlzdC4gSXQga2VlcHMgdGhlIGNvZGUgbW9yZSByZWFkYWJsZSB0aGFuIHRoaXMg
-cGFydC4gQnV0IEkgZG8gYXBwcmVjaWF0ZSB0aGUgYXR0ZW1wdCBpbiB1bmlmeWluZyB0aGlzLg0K
-PiANCj4gDQo+ID4gKw0KPiA+ICtzdGF0aWMgY29uc3Qgc3RydWN0IGJ0dXNiX2RyaXZlcl9pbmZv
-IGRpZ2lhbnN3ZXIgPSB7DQo+ID4gKwkuZGVzY3JpcHRpb24JPSAiQlRVU0IgRElHSUFOU1dFUiIs
-DQo+ID4gKwkuZmxhZ3MJCT0gQlRVU0JfRElHSUFOU1dFUiwNCj4gPiArfTsNCj4gPiArDQo+ID4g
-K3N0YXRpYyBjb25zdCBzdHJ1Y3QgYnR1c2JfZHJpdmVyX2luZm8gY3NyID0gew0KPiA+ICsJLmRl
-c2NyaXB0aW9uCT0gIkJUVVNCIENTUiIsDQo+ID4gKwkuZmxhZ3MJCT0gQlRVU0JfQ1NSLA0KPiA+
-ICt9Ow0KPiA+ICsNCj4gPiArc3RhdGljIGNvbnN0IHN0cnVjdCBidHVzYl9kcml2ZXJfaW5mbyBz
-bmlmZmVyID0gew0KPiA+ICsJLmRlc2NyaXB0aW9uCT0gIkJUVVNCIFNuaWZmZXIiLA0KPiA+ICsJ
-LmZsYWdzCQk9IEJUVVNCX1NOSUZGRVIsDQo+ID4gK307DQo+ID4gKw0KPiA+ICtzdGF0aWMgY29u
-c3Qgc3RydWN0IGJ0dXNiX2RyaXZlcl9pbmZvIGJjbTkyMDM1ID0gew0KPiA+ICsJLmRlc2NyaXB0
-aW9uCT0gIkJUVVNCIEJDTTkyMDM1IiwNCj4gPiArCS5mbGFncwkJPSBCVFVTQl9CQ005MjAzNSwN
-Cj4gPiArfTsNCj4gPiArDQo+ID4gK3N0YXRpYyBjb25zdCBzdHJ1Y3QgYnR1c2JfZHJpdmVyX2lu
-Zm8gYnJva2VuX2lzb2MgPSB7DQo+ID4gKwkuZGVzY3JpcHRpb24JPSAiQlRVU0IgQnJva2VuIElT
-T0MiLA0KPiA+ICsJLmZsYWdzCQk9IEJUVVNCX0JST0tFTl9JU09DLA0KPiA+ICt9Ow0KPiA+ICsN
-Cj4gPiArc3RhdGljIGNvbnN0IHN0cnVjdCBidHVzYl9kcml2ZXJfaW5mbyB3cm9uZ19zY29fbXR1
-ID0gew0KPiA+ICsJLmRlc2NyaXB0aW9uCT0gIkJUVVNCIFdyb25nIFNDTyBNVFUiLA0KPiA+ICsJ
-LmZsYWdzCQk9IEJUVVNCX1dST05HX1NDT19NVFUsDQo+ID4gK307DQo+ID4gKw0KPiA+ICtzdGF0
-aWMgY29uc3Qgc3RydWN0IGJ0dXNiX2RyaXZlcl9pbmZvIGF0aDMwMTIgPSB7DQo+ID4gKwkuZGVz
-Y3JpcHRpb24JPSAiQlRVU0IgQXRoMzAxMiIsDQo+ID4gKwkuZmxhZ3MJCT0gQlRVU0JfQVRIMzAx
-MiwNCj4gPiArfTsNCj4gPiAgDQo+ID4gIHN0YXRpYyBzdHJ1Y3QgdXNiX2RldmljZV9pZCBidHVz
-Yl90YWJsZVtdID0gew0KPiA+ICAJLyogR2VuZXJpYyBCbHVldG9vdGggVVNCIGRldmljZSAqLyBA
-QCAtMTA1LDkwICsxNTEsODkgQEAgc3RhdGljIA0KPiA+IHN0cnVjdCB1c2JfZGV2aWNlX2lkIGJ0
-dXNiX3RhYmxlW10gPSB7DQo+ID4gIA0KPiA+ICAJeyB9CS8qIFRlcm1pbmF0aW5nIGVudHJ5ICov
-DQo+ID4gIH07DQo+ID4gLQ0KPiA+ICBNT0RVTEVfREVWSUNFX1RBQkxFKHVzYiwgYnR1c2JfdGFi
-bGUpOw0KPiA+ICANCj4gPiAgc3RhdGljIHN0cnVjdCB1c2JfZGV2aWNlX2lkIGJsYWNrbGlzdF90
-YWJsZVtdID0gew0KPiA+ICAJLyogQ1NSIEJsdWVDb3JlIGRldmljZXMgKi8NCj4gPiAtCXsgVVNC
-X0RFVklDRSgweDBhMTIsIDB4MDAwMSksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0NTUiB9LA0KPiA+
-ICsJeyBVU0JfREVWSUNFKDB4MGExMiwgMHgwMDAxKSwgLmRyaXZlcl9pbmZvID0gKHVuc2lnbmVk
-IGxvbmcpICZjc3IgDQo+ID4gK30sDQo+IA0KPiA+PiBLZWVwIHRoZSBibGFja2xpc3RfdGFibGUg
-YXMgaXQgaXMuIFRoZSBpbXBvcnRhbnQgdGFibGUgdG8gbW9kaWZ5IGlzIGJ0dXNiX3RhYmxlIGFu
-ZCB1c2UgYSBjb21tb24gZHJpdmVyX2luZm8gdGhhdCB3aWxsIGJlIHNoYXJlZCBiZXR3ZWVuIGRy
-aXZlcnMuDQo+IA0KPiA+PiBUaGF0IHdvdWxkIGFsc28gbWFrZSBpdCBzaW1wbGUgdG8ganVzdCBh
-ZGQgQlRVU0JfSUdOT1JFIG9yIGEgbmV3IEJUVVNCX1ZFTkRPUiBmbGFnIHRvIGNhbGwgb3V0IHRo
-ZSBkcml2ZXJzIHRoYXQgaGF2ZSBhIHNlcGFyYXRlIGRyaXZlciB3aXRoIGEgdmVuZG9yIGluaXQg
-ZnVuY3Rpb24sIGJ1dCB3b3VsZCBtYXRjaCA+PiB0aGUgQmx1ZXRvb3RoIGdlbmVyYWwgVVNCIGRl
-c2NyaXB0b3JzLg0KPiANCj4gSSBsb29rZWQgYXQgdXNibmV0IG1pbmlkcml2ZXIgYXMgeW91IHN1
-Z2dlc3RlZC4gIElmIHdlIGRvIGEgc2ltaWxhciBzY2hlbWUgc3VjaCB0aGF0IGJ0dXNiX3Byb2Jl
-KCkgaW52b2tlcyB0aGUgbWluaV9kcml2ZXIncyBiaW5kKCkvdW5iaW5kKCkgdGhlbiBidHVzYidz
-IHVzYWdlIG9mIGRyaXZlcl9pbmZvIHdpbGwgbmVlZCB0byBjaGFuZ2UgZnJvbSBzdG9yaW5nIGZs
-YWdzIChleDogQlRVU0JfSUdOT1JFKSBhbmQgY2hhbmdlIHRvIHN0b3JlICJzdGF0aWMgY29uc3Qg
-c3RydWN0IiB3aGVyZSBpdCBob2xkcyBhIHN0cnVjdCBjb250YWluaW5nIHRoZSBtaW5pLWRyaXZl
-cidzIGJpbmQvdW5iaW5kIGZ1bmN0aW9ucyAoanVzdCBsaWtlIHVzYm5ldCBtaW5pZHJpdmVyKS4g
-ICBBcmUgeW91IGdvb2Qgd2l0aCB0aGlzIGNoYW5nZT8gIEkgYWxzbyB3YW50IHRvIG1lbnRpb24g
-dGhhdCBpbiB0aGUgcGF0Y2ggY29udGFpbmluZyB0aGUgQlQgVVNCIG1pbmkgZHJpdmVyIHRlbXBs
-YXRlLCBpdCBhbHJlYWR5IGhhcyBpdHMgb3duIG1vZHVsZV91c2JfZHJpdmVyKCkgc2VjdGlvbiB3
-aXRoIGl0cyBWSUQvUElEIGxpc3RlZC4NCg0KeW91IGtub3cgd2hhdC4gSnVzdCBzZW5kIGFyb3Vu
-ZCB3aGF0IHlvdSBoYXZlIHJpZ2h0IG5vdyBhZnRlciB0aGUgY2xlYW51cCBhbmQgdGhlbiBJIGNh
-biB0YWtlIGFub3RoZXIgbG9vayBhdCBpdC4NCg0KUmVnYXJkcw0KDQpNYXJjZWwNCg0KDQo=
+Hi Marcel,
+
+On 18:54 Wed 24 Oct, Marcel Holtmann wrote:
+> Hi Vinicius,
+> 
+> > > > On 00:09 Thu 25 Oct, Johan Hedberg wrote:
+> > > > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > > > > index dc60d31..ed6b1e2 100644
+> > > > > --- a/net/bluetooth/hci_event.c
+> > > > > +++ b/net/bluetooth/hci_event.c
+> > > > > @@ -790,9 +790,24 @@ static void hci_set_le_support(struct hci_dev *hdev)
+> > > > >  		cp.simul = !!lmp_le_br_capable(hdev);
+> > > > >  	}
+> > > > >  
+> > > > > +	/* If the host features don't reflect the desired state for LE
+> > > > > +	 * then send the write_le_host_supported command. The command
+> > > > > +	 * complete handler for it will take care of any necessary
+> > > > > +	 * subsequent commands like set_adv_enable.
+> > > > > +	 *
+> > > > > +	 * If the host features for LE are already correct and
+> > > > > +	 * peripheral mode is enabled directly send the le_set_adv
+> > > > > +	 * command. The value of &cp.le is used so that advertising will
+> > > > > +	 * not be enabled in the exceptional case that LE for some
+> > > > > +	 * reason isn't enabled - something that should only be possible
+> > > > > +	 * if someone is doing direct raw access to HCI.
+> > > > > +	 */
+> > > > >  	if (cp.le != !!lmp_host_le_capable(hdev))
+> > > > >  		hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED, sizeof(cp),
+> > > > >  			     &cp);
+> > > > > +	else if (test_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags))
+> > > > > +		hci_send_cmd(hdev, HCI_OP_LE_SET_ADV_ENABLE, sizeof(cp.le),
+> > > > > +			     &cp.le);
+> > > > >  }
+> > > > 
+> > > > I agree with Marcel, and one point that worried me was this
+> > > > unconditional advertising, I feel that we should be smarter about when
+> > > > to start advertising, for example, here we are not taking into account
+> > > > the user's visiblity settings.
+> > > 
+> > > If you're a peripheral and you're not connectable/discoverable then what
+> > > good does it do to have Bluetooth enabled at all? Since a peripheral
+> > > can't scan or initiate connections you can't really do anything. So if a
+> > > higher layer doesn't want us advertising it could either set LE to off
+> > > or central role or even power off the adapter completely.
+> > 
+> > And what about the device that receive these advertising events? It
+> > won't be able to do anything with them. And we would be increasing the
+> > risk of interfering with the communication of others.
+> > 
+> > For me, the LE peripheral mode setting has a longer lifetime than (and is
+> > orthogonal to) the Discoverable/Connectable settings. So, I would enable
+> > Peripheral mode once during the lifetime of my session, and control the
+> > type and whether I am advertising using the Connectable/Discoverable
+> > settings (perhaps even from the Apps that are listening for connections).
+> > 
+> > Having to change the role of the device to the Central role or turning
+> > the controller off (which would mean to re-do a lot of the
+> > initialization when I turn it on again) to stop advertising seems, at
+> > least, not intuitive.
+> > 
+> > Then, the only way to send not Discoverable nor Connectable advertising
+> > events would be with the Broadcaster role.
+> 
+> that is actually not my worries. That is something that bluetoothd will
+> handle for the applications. And I do not want to intermix connectable
+> and discoverable from BR/EDR. These are two different things.
+
+Ok. This is new to me. So, what information will we use to set the
+advertising type and the Flags field in the advertising event (think
+general/limited discoverable modes)?
+
+> 
+> The way I see it currently is that peripheral mode is tight to an
+> application that is current providing a service. Or even a plugin inside
+> bluetoothd.
+
+Makes total sense.
+
+> 
+> I am currently almost leading with Johan here that once peripheral mode
+> is enabled, we should just advertise. If you do not want to advertise,
+> then just disable peripheral mode.
+
+Ok. I think I got it. I was with the impression that the Peripheral bit was
+something like a capability, something that I would set and forget. In
+reality, it is something meant to be more transient. I would argue that
+this confusion alone is a point in favor of having a separate command for it.
+But I guess it is too late now.
+
+So, my worry of not sending useless advertising events would be addressed by
+bluetoothd. Sounds good enough.
+
+> 
+> The one thing I want to have figured out before we go ahead with
+> peripheral support is of course broadcaster and observer support.
+>
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+
+
+Cheers,
+-- 
+Vinicius
