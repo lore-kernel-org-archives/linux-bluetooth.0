@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [RFC 03/18] cyclingspeed: Discover CSCS characteristics
-Date: Thu, 25 Oct 2012 16:43:33 +0200
-Message-ID: <1351176228-5789-4-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [RFC 04/18] cyclingspeed: Discover characteristics CCC
+Date: Thu, 25 Oct 2012 16:43:34 +0200
+Message-ID: <1351176228-5789-5-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1351176228-5789-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1351176228-5789-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -13,160 +13,128 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- lib/uuid.h                           |  4 ++++
- profiles/cyclingspeed/cyclingspeed.c | 43 +++++++++++++++++++++++++++++++++++-
- profiles/cyclingspeed/cyclingspeed.h |  2 +-
- profiles/cyclingspeed/manager.c      | 19 +++++++++++++++-
- 4 files changed, 65 insertions(+), 3 deletions(-)
+ profiles/cyclingspeed/cyclingspeed.c | 82 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 80 insertions(+), 2 deletions(-)
 
-diff --git a/lib/uuid.h b/lib/uuid.h
-index ebc6d27..def4fea 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -75,6 +75,10 @@ extern "C" {
- #define MEASUREMENT_INTERVAL_UUID	"00002a21-0000-1000-8000-00805f9b34fb"
- 
- #define CYCLING_SC_UUID		"00001816-0000-1000-8000-00805f9b34fb"
-+#define CSC_MEASUREMENT_UUID	"00002a5b-0000-1000-8000-00805f9b34fb"
-+#define CSC_FEATURE_UUID	"00002a5c-0000-1000-8000-00805f9b34fb"
-+#define SENSOR_LOCATION_UUID	"00002a5d-0000-1000-8000-00805f9b34fb"
-+#define SC_CONTROL_POINT_UUID	"00002a55-0000-1000-8000-00805f9b34fb"
- 
- #define RFCOMM_UUID_STR		"00000003-0000-1000-8000-00805f9b34fb"
- 
 diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
-index 4d98810..5744891 100644
+index 5744891..0191f1b 100644
 --- a/profiles/cyclingspeed/cyclingspeed.c
 +++ b/profiles/cyclingspeed/cyclingspeed.c
-@@ -49,6 +49,10 @@ struct csc {
+@@ -52,9 +52,15 @@ struct csc {
  
- 	GAttrib			*attrib;
- 	guint			attioid;
-+
-+	struct att_range	*svc_range;
-+
-+	uint16_t		controlpoint_val_handle;
+ 	struct att_range	*svc_range;
+ 
++	uint16_t		measurement_ccc_handle;
+ 	uint16_t		controlpoint_val_handle;
  };
  
++struct characteristic {
++	struct csc	*csc;
++	char		uuid[MAX_LEN_UUID_STR + 1];
++};
++
  static GSList *csc_adapters = NULL;
-@@ -103,9 +107,38 @@ static void destroy_csc(gpointer user_data)
- 		g_attrib_unref(csc->attrib);
  
- 	btd_device_unref(csc->dev);
-+	g_free(csc->svc_range);
+ static gint cmp_adapter(gconstpointer a, gconstpointer b)
+@@ -111,6 +117,76 @@ static void destroy_csc(gpointer user_data)
  	g_free(csc);
  }
  
-+static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
++static void discover_desc_cb(guint8 status, const guint8 *pdu,
++					guint16 len, gpointer user_data)
 +{
-+	struct csc *csc = user_data;
++	struct characteristic *ch = user_data;
++	struct att_data_list *list = NULL;
++	uint8_t format;
++	int i;
 +
-+	if (status) {
-+		error("Discover CSCS characteristics: %s",
++	if (status != 0) {
++		error("Discover %s descriptors failed: %s", ch->uuid,
 +							att_ecode2str(status));
++		goto done;
++	}
++
++	list = dec_find_info_resp(pdu, len, &format);
++	if (list == NULL)
++		goto done;
++
++	if (format != ATT_FIND_INFO_RESP_FMT_16BIT)
++		goto done;
++
++	for (i = 0; i < list->num; i++) {
++		uint8_t *value;
++		uint16_t handle, uuid;
++
++		value = list->data[i];
++		handle = att_get_u16(value);
++		uuid = att_get_u16(value + 2);
++
++		if (uuid != GATT_CLIENT_CHARAC_CFG_UUID)
++			continue;
++
++		if (g_strcmp0(ch->uuid, CSC_MEASUREMENT_UUID) == 0)
++			ch->csc->measurement_ccc_handle = handle;
++
++		/* We only want CCC, can break here */
++		break;
++	}
++
++done:
++	if (list)
++		att_data_list_free(list);
++	g_free(ch);
++}
++
++static void discover_desc(struct csc *csc, struct gatt_char *c,
++						struct gatt_char *c_next)
++{
++	struct characteristic *ch;
++	uint16_t start, end;
++
++	start = c->value_handle + 1;
++
++	if (c_next != NULL) {
++		if (start == c_next->handle)
++			return;
++		end = c_next->handle - 1;
++	} else if (c->value_handle != csc->svc_range->end) {
++		end = csc->svc_range->end;
++	} else {
 +		return;
 +	}
 +
-+	for (; chars; chars = chars->next) {
-+		struct gatt_char *c = chars->data;
++	ch = g_new0(struct characteristic, 1);
++	ch->csc = csc;
++	memcpy(ch->uuid, c->uuid, sizeof(c->uuid));
 +
-+		if (g_strcmp0(c->uuid, CSC_MEASUREMENT_UUID) == 0) {
-+			/* TODO: discover CCC handle */
-+		} else if (g_strcmp0(c->uuid, CSC_FEATURE_UUID) == 0) {
-+			/* TODO: read characterictic value */
-+		} else if (g_strcmp0(c->uuid, SENSOR_LOCATION_UUID) == 0) {
-+			DBG("Sensor Location supported");
-+			/* TODO: read characterictic value */
-+		} else if (g_strcmp0(c->uuid, SC_CONTROL_POINT_UUID) == 0) {
-+			DBG("SC Control Point supported");
-+			csc->controlpoint_val_handle = c->value_handle;
-+			/* TODO: discover CCC handle */
-+		}
-+	}
++	gatt_find_info(csc->attrib, start, end, discover_desc_cb, ch);
 +}
 +
- static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
  {
  	struct csc *csc = user_data;
-@@ -113,6 +146,10 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
- 	DBG("");
+@@ -123,9 +199,11 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
  
- 	csc->attrib = g_attrib_ref(attrib);
-+
-+	gatt_discover_char(csc->attrib, csc->svc_range->start,
-+				csc->svc_range->end, NULL,
-+				discover_char_cb, csc);
+ 	for (; chars; chars = chars->next) {
+ 		struct gatt_char *c = chars->data;
++		struct gatt_char *c_next =
++				(chars->next ? chars->next->data : NULL);
+ 
+ 		if (g_strcmp0(c->uuid, CSC_MEASUREMENT_UUID) == 0) {
+-			/* TODO: discover CCC handle */
++			discover_desc(csc, c, c_next);
+ 		} else if (g_strcmp0(c->uuid, CSC_FEATURE_UUID) == 0) {
+ 			/* TODO: read characterictic value */
+ 		} else if (g_strcmp0(c->uuid, SENSOR_LOCATION_UUID) == 0) {
+@@ -134,7 +212,7 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ 		} else if (g_strcmp0(c->uuid, SC_CONTROL_POINT_UUID) == 0) {
+ 			DBG("SC Control Point supported");
+ 			csc->controlpoint_val_handle = c->value_handle;
+-			/* TODO: discover CCC handle */
++			discover_desc(csc, c, c_next);
+ 		}
+ 	}
  }
- 
- static void attio_disconnected_cb(gpointer user_data)
-@@ -150,7 +187,7 @@ void csc_adapter_unregister(struct btd_adapter *adapter)
- 	destroy_csc_adapter(cadapter);
- }
- 
--int csc_device_register(struct btd_device *device)
-+int csc_device_register(struct btd_device *device, struct gatt_primary *prim)
- {
- 	struct btd_adapter *adapter;
- 	struct csc_adapter *cadapter;
-@@ -166,6 +203,10 @@ int csc_device_register(struct btd_device *device)
- 	csc->dev = btd_device_ref(device);
- 	csc->cadapter = cadapter;
- 
-+	csc->svc_range = g_new0(struct att_range, 1);
-+	csc->svc_range->start = prim->range.start;
-+	csc->svc_range->end = prim->range.end;
-+
- 	cadapter->devices = g_slist_prepend(cadapter->devices, csc);
- 
- 	csc->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
-diff --git a/profiles/cyclingspeed/cyclingspeed.h b/profiles/cyclingspeed/cyclingspeed.h
-index b83fa9e..3400d5f 100644
---- a/profiles/cyclingspeed/cyclingspeed.h
-+++ b/profiles/cyclingspeed/cyclingspeed.h
-@@ -22,5 +22,5 @@
- 
- int csc_adapter_register(struct btd_adapter *adapter);
- void csc_adapter_unregister(struct btd_adapter *adapter);
--int csc_device_register(struct btd_device *device);
-+int csc_device_register(struct btd_device *device, struct gatt_primary *prim);
- void csc_device_unregister(struct btd_device *device);
-diff --git a/profiles/cyclingspeed/manager.c b/profiles/cyclingspeed/manager.c
-index e5f7553..c147af2 100644
---- a/profiles/cyclingspeed/manager.c
-+++ b/profiles/cyclingspeed/manager.c
-@@ -34,6 +34,14 @@
- #include "cyclingspeed.h"
- #include "manager.h"
- 
-+static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
-+{
-+	const struct gatt_primary *prim = a;
-+	const char *uuid = b;
-+
-+	return g_strcmp0(prim->uuid, uuid);
-+}
-+
- static int csc_adapter_probe(struct btd_profile *p, struct btd_adapter *adapter)
- {
- 	return csc_adapter_register(adapter);
-@@ -48,7 +56,16 @@ static void csc_adapter_remove(struct btd_profile *p,
- static int csc_device_probe(struct btd_profile *p,
- 				struct btd_device *device, GSList *uuids)
- {
--	return csc_device_register(device);
-+	GSList *primaries;
-+	GSList *l;
-+
-+	primaries = btd_device_get_primaries(device);
-+
-+	l = g_slist_find_custom(primaries, CYCLING_SC_UUID, primary_uuid_cmp);
-+	if (l == NULL)
-+		return -EINVAL;
-+
-+	return csc_device_register(device, l->data);
- }
- 
- static void csc_device_remove(struct btd_profile *p,
 -- 
 1.8.0
 
