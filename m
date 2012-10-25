@@ -1,98 +1,307 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1351130085.1785.84.camel@aeonflux>
-Subject: Re: [PATCH 5/6] Bluetooth: mgmt: Add support for switching to LE
- peripheral mode
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 24 Oct 2012 18:54:45 -0700
-In-Reply-To: <20121025005842.GB22764@samus>
-References: <1351112996-9597-1-git-send-email-johan.hedberg@gmail.com>
-	 <1351112996-9597-6-git-send-email-johan.hedberg@gmail.com>
-	 <20121024221341.GA22764@samus> <20121024223635.GA11976@x220.P-661HNU-F1>
-	 <20121025005842.GB22764@samus>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Message-ID: <1351129589.50995.YahooMailNeo@web125405.mail.ne1.yahoo.com>
+Date: Wed, 24 Oct 2012 18:46:29 -0700 (PDT)
+From: Dwaine Garden VE3GIF <dwainegarden@rogers.com>
+Reply-To: Dwaine Garden VE3GIF <dwainegarden@rogers.com>
+Subject: [PATCH] Bluetooth: Add support for Atheros [04ca:3004]
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: Dwaine Garden <dwainegarden@rogers.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
 
-> > > On 00:09 Thu 25 Oct, Johan Hedberg wrote:
-> > > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > > > index dc60d31..ed6b1e2 100644
-> > > > --- a/net/bluetooth/hci_event.c
-> > > > +++ b/net/bluetooth/hci_event.c
-> > > > @@ -790,9 +790,24 @@ static void hci_set_le_support(struct hci_dev *hdev)
-> > > >  		cp.simul = !!lmp_le_br_capable(hdev);
-> > > >  	}
-> > > >  
-> > > > +	/* If the host features don't reflect the desired state for LE
-> > > > +	 * then send the write_le_host_supported command. The command
-> > > > +	 * complete handler for it will take care of any necessary
-> > > > +	 * subsequent commands like set_adv_enable.
-> > > > +	 *
-> > > > +	 * If the host features for LE are already correct and
-> > > > +	 * peripheral mode is enabled directly send the le_set_adv
-> > > > +	 * command. The value of &cp.le is used so that advertising will
-> > > > +	 * not be enabled in the exceptional case that LE for some
-> > > > +	 * reason isn't enabled - something that should only be possible
-> > > > +	 * if someone is doing direct raw access to HCI.
-> > > > +	 */
-> > > >  	if (cp.le != !!lmp_host_le_capable(hdev))
-> > > >  		hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED, sizeof(cp),
-> > > >  			     &cp);
-> > > > +	else if (test_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags))
-> > > > +		hci_send_cmd(hdev, HCI_OP_LE_SET_ADV_ENABLE, sizeof(cp.le),
-> > > > +			     &cp.le);
-> > > >  }
-> > > 
-> > > I agree with Marcel, and one point that worried me was this
-> > > unconditional advertising, I feel that we should be smarter about when
-> > > to start advertising, for example, here we are not taking into account
-> > > the user's visiblity settings.
-> > 
-> > If you're a peripheral and you're not connectable/discoverable then what
-> > good does it do to have Bluetooth enabled at all? Since a peripheral
-> > can't scan or initiate connections you can't really do anything. So if a
-> > higher layer doesn't want us advertising it could either set LE to off
-> > or central role or even power off the adapter completely.
-> 
-> And what about the device that receive these advertising events? It
-> won't be able to do anything with them. And we would be increasing the
-> risk of interfering with the communication of others.
-> 
-> For me, the LE peripheral mode setting has a longer lifetime than (and is
-> orthogonal to) the Discoverable/Connectable settings. So, I would enable
-> Peripheral mode once during the lifetime of my session, and control the
-> type and whether I am advertising using the Connectable/Discoverable
-> settings (perhaps even from the Apps that are listening for connections).
-> 
-> Having to change the role of the device to the Central role or turning
-> the controller off (which would mean to re-do a lot of the
-> initialization when I turn it on again) to stop advertising seems, at
-> least, not intuitive.
-> 
-> Then, the only way to send not Discoverable nor Connectable advertising
-> events would be with the Broadcaster role.
+Add another vendor specific ID for Atheros AR3012 device.
+This chip is wrapped by Lite-On Technology Corp.
 
-that is actually not my worries. That is something that bluetoothd will
-handle for the applications. And I do not want to intermix connectable
-and discoverable from BR/EDR. These are two different things.
+output of usb-devices:
 
-The way I see it currently is that peripheral mode is tight to an
-application that is current providing a service. Or even a plugin inside
-bluetoothd.
+Bus 001 Device 008: ID 04ca:3004 Lite-On Technology Corp. 
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               1.10
+  bDeviceClass          224 Wireless
+  bDeviceSubClass         1 Radio Frequency
+  bDeviceProtocol         1 Bluetooth
+  bMaxPacketSize0        64
+  idVendor           0x04ca Lite-On Technology Corp.
+  idProduct          0x3004 
+  bcdDevice            0.02
+  iManufacturer           1 Atheros Communications
+  iProduct                2 Bluetooth USB Host Controller
+  iSerial                 3 Alaska Day 2006
+  bNumConfigurations      1
+  Configuration Descriptor:
+    bLength                 9
+    bDescriptorType         2
+    wTotalLength          177
+    bNumInterfaces          2
+    bConfigurationValue     1
+    iConfiguration          4 BT HCI
+    bmAttributes         0xe0
+      Self Powered
+      Remote Wakeup
+    MaxPower              100mA
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        0
+      bAlternateSetting       0
+      bNumEndpoints           3
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x81  EP 1 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0010  1x 16 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x82  EP 2 IN
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x02  EP 2 OUT
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       0
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0000  1x 0 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0000  1x 0 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       1
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0009  1x 9 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0009  1x 9 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       2
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0011  1x 17 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0011  1x 17 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       3
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0019  1x 25 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0019  1x 25 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       4
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0021  1x 33 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0021  1x 33 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       5
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0031  1x 49 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0031  1x 49 bytes
+        bInterval               1
+Device Status:     0x0003
+  Self Powered
+  Remote Wakeup Enabled
 
-I am currently almost leading with Johan here that once peripheral mode
-is enabled, we should just advertise. If you do not want to advertise,
-then just disable peripheral mode.
 
-The one thing I want to have figured out before we go ahead with
-peripheral support is of course broadcaster and observer support.
+Signed-off-by: Dwaine Garden <DwaineGarden@rogers.com>  
 
-Regards
+---
 
-Marcel
-
-
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index fc2de55..1486f15 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -75,6 +75,7 @@ static struct usb_device_id ath3k_table[] = {
+        { USB_DEVICE(0x0CF3, 0x3004) },
+        { USB_DEVICE(0x0CF3, 0x311D) },
+        { USB_DEVICE(0x13d3, 0x3375) },
++      { USB_DEVICE(0x04CA, 0x3004) },
+        { USB_DEVICE(0x04CA, 0x3005) },
+        { USB_DEVICE(0x13d3, 0x3362) },
+        { USB_DEVICE(0x0CF3, 0xE004) },
+@@ -102,6 +103,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+        { USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
+        { USB_DEVICE(0x0cf3, 0x311D), .driver_info = BTUSB_ATH3012 },
+        { USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
++      { USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
+        { USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+        { USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
+        { USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index debda27..0529cee 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -132,6 +132,7 @@ static struct usb_device_id blacklist_table[] = {
+        { USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
+        { USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
+        { USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
++      { USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
+        { USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+        { USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
+        { USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
