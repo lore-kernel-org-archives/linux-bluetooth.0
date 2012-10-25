@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [RFC 15/18] cyclingspeed: Add support for Set Cumulative Value
-Date: Thu, 25 Oct 2012 16:43:45 +0200
-Message-ID: <1351176228-5789-16-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [RFC 17/18] test: Add cyclingspeed test script
+Date: Thu, 25 Oct 2012 16:43:47 +0200
+Message-ID: <1351176228-5789-18-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1351176228-5789-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1351176228-5789-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -13,154 +13,142 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- profiles/cyclingspeed/cyclingspeed.c | 92 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 91 insertions(+), 1 deletion(-)
+ Makefile.tools         |   2 +-
+ test/test-cyclingspeed | 115 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 116 insertions(+), 1 deletion(-)
+ create mode 100755 test/test-cyclingspeed
 
-diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
-index bf8ea46..7b5c3f5 100644
---- a/profiles/cyclingspeed/cyclingspeed.c
-+++ b/profiles/cyclingspeed/cyclingspeed.c
-@@ -75,6 +75,7 @@ struct controlpoint_req {
- 	uint8_t			opcode;
- 	guint			timeout;
- 	GDBusPendingReply	reply_id;
-+	DBusMessage		*msg;
- };
- 
- struct csc_adapter {
-@@ -287,6 +288,15 @@ static gboolean controlpoint_timeout(gpointer user_data)
- 		g_dbus_pending_property_error(req->reply_id,
- 				ERROR_INTERFACE ".Failed",
- 				"Operation failed (timeout)");
-+	} else if (req->opcode == SET_CUMULATIVE_VALUE) {
-+		DBusMessage *reply;
+diff --git a/Makefile.tools b/Makefile.tools
+index ec79cea..9168be9 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -215,4 +215,4 @@ EXTRA_DIST += test/sap_client.py test/hsplay test/hsmicro \
+ 		test/test-health test/test-health-sink test/service-record.dtd \
+ 		test/service-did.xml test/service-spp.xml test/service-opp.xml \
+ 		test/service-ftp.xml test/simple-player test/test-nap \
+-		test/test-heartrate test/test-alert
++		test/test-heartrate test/test-alert test/test-cycling
+diff --git a/test/test-cyclingspeed b/test/test-cyclingspeed
+new file mode 100755
+index 0000000..f3771d3
+--- /dev/null
++++ b/test/test-cyclingspeed
+@@ -0,0 +1,115 @@
++#!/usr/bin/python
 +
-+		reply = btd_error_failed(req->msg,
-+						"Operation failed (timeout)");
++from __future__ import absolute_import, print_function, unicode_literals
 +
-+		g_dbus_send_message(btd_get_dbus_connection(), reply);
++'''
++Cycling Speed and Cadence test script
++'''
 +
-+		dbus_message_unref(req->msg);
- 	}
- 
- 	req->csc->pending_req = NULL;
-@@ -307,6 +317,15 @@ static void controlpoint_write_cb(guint8 status, const guint8 *pdu, guint16 len,
- 			g_dbus_pending_property_error(req->reply_id,
- 					ERROR_INTERFACE ".Failed",
- 					"Operation failed (%d)", status);
-+		} else if  (req->opcode == SET_CUMULATIVE_VALUE) {
-+			DBusMessage *reply;
++import gobject
 +
-+			reply = btd_error_failed(req->msg,
-+						"Operation failed");
++import sys
++import dbus
++import dbus.service
++import dbus.mainloop.glib
++from optparse import OptionParser, make_option
 +
-+			g_dbus_send_message(btd_get_dbus_connection(), reply);
++class Watcher(dbus.service.Object):
++	@dbus.service.method("org.bluez.CyclingSpeedWatcher",
++					in_signature="oa{sv}", out_signature="")
++	def MeasurementReceived(self, device, measure):
++		print("Measurement received from %s" % device)
 +
-+			dbus_message_unref(req->msg);
- 		}
- 
- 		req->csc->pending_req = NULL;
-@@ -616,6 +635,34 @@ static void controlpoint_property_reply(struct controlpoint_req *req,
- 	}
- }
- 
-+static void controlpoint_method_reply(struct controlpoint_req *req,
-+								uint8_t code)
-+{
-+	DBusMessage *reply;
++		if "WheelRevolutions" in measure:
++			print("WheelRevolutions: ", measure["WheelRevolutions"])
 +
-+	switch (code) {
-+	case RSP_SUCCESS:
-+		reply = dbus_message_new_method_return(req->msg);
-+		break;
-+	case RSP_NOT_SUPPORTED:
-+		reply = btd_error_not_supported(req->msg);
-+		break;
-+	case RSP_INVALID_PARAM:
-+		reply = btd_error_invalid_args(req->msg);
-+		break;
-+	case RSP_FAILED:
-+		reply = btd_error_failed(req->msg, "Failed");
-+		break;
-+	default:
-+		reply = btd_error_failed(req->msg, "Unknown error");
-+		break;
-+	}
++		if "LastWheelEventTime" in measure:
++			print("LastWheelEventTime: ", measure["LastWheelEventTime"])
 +
-+	g_dbus_send_message(btd_get_dbus_connection(), reply);
++		if "CrankRevolutions" in measure:
++			print("CrankRevolutions: ", measure["CrankRevolutions"])
 +
-+	dbus_message_unref(req->msg);
-+}
++		if "LastCrankEventTime" in measure:
++			print("LastCrankEventTime: ", measure["LastCrankEventTime"])
 +
- static void controlpoint_ind_handler(const uint8_t *pdu, uint16_t len,
- 							gpointer user_data)
- {
-@@ -667,6 +714,10 @@ static void controlpoint_ind_handler(const uint8_t *pdu, uint16_t len,
- 	}
- 
- 	switch (req->opcode) {
-+	case SET_CUMULATIVE_VALUE:
-+		controlpoint_method_reply(req, rsp_code);
-+		break;
++if __name__ == "__main__":
++	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 +
- 	case REQUEST_SUPPORTED_SENSOR_LOC:
- 		if (rsp_code == RSP_SUCCESS) {
- 			csc->num_locations = len;
-@@ -1069,6 +1120,44 @@ static const GDBusPropertyTable cyclingspeed_device_properties[] = {
- 	{ }
- };
- 
-+static DBusMessage *set_cumulative_wheel_rev(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
-+{
-+	struct csc *csc = data;
-+	dbus_uint32_t value;
-+	struct controlpoint_req *req;
-+	uint8_t att_val[5]; /* uint8 opcode + uint32 value */
++	bus = dbus.SystemBus()
 +
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT32, &value,
-+							DBUS_TYPE_INVALID))
-+		return btd_error_invalid_args(msg);
++	option_list = [
++		make_option("-i", "--adapter", action="store",
++			type="string", dest="adapter"),
++		make_option("-b", "--device", action="store",
++			type="string", dest="address"),
++		]
 +
-+	if (csc->pending_req != NULL)
-+		return btd_error_in_progress(msg);
++	parser = OptionParser(option_list=option_list)
 +
-+	req = g_new(struct controlpoint_req, 1);
-+	req->csc = csc;
-+	req->opcode = SET_CUMULATIVE_VALUE;
-+	req->msg = dbus_message_ref(msg);
++	(options, args) = parser.parse_args()
 +
-+	csc->pending_req = req;
++	if not options.address:
++		print("Usage: %s [-i <adapter>] -b <bdaddr> [-c <value>] [cmd]" % (sys.argv[0]))
++		print("Possible commands:")
++		print("\tShowSupportedLocations")
++		print("\tSetLocation <location>")
++		print("\tSetCumulativeWheelRevolutions <value>")
++		sys.exit(1)
 +
-+	att_val[0] = SET_CUMULATIVE_VALUE;
-+	att_put_u32(value, att_val + 1);
++	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
++					"org.bluez.Manager")
++	if options.adapter:
++		adapter_path = manager.FindAdapter(options.adapter)
++	else:
++		adapter_path = manager.DefaultAdapter()
 +
-+	gatt_write_char(csc->attrib, csc->controlpoint_val_handle, att_val,
-+		sizeof(att_val), controlpoint_write_cb, req);
++	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
++							"org.bluez.Adapter")
 +
-+	return NULL;
-+}
++	device_path = adapter.FindDevice(options.address)
 +
-+static const GDBusMethodTable cyclingspeed_device_methods[] = {
-+	{ GDBUS_ASYNC_METHOD("SetCumulativeWheelRevolutions",
-+			GDBUS_ARGS({ "value", "u" }), NULL,
-+			set_cumulative_wheel_rev) },
-+	{ }
-+};
++	cscmanager = dbus.Interface(bus.get_object("org.bluez", adapter_path),
++						"org.bluez.CyclingSpeedManager")
 +
- int csc_device_register(struct btd_device *device, struct gatt_primary *prim)
- {
- 	struct btd_adapter *adapter;
-@@ -1088,7 +1177,8 @@ int csc_device_register(struct btd_device *device, struct gatt_primary *prim)
- 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
- 						device_get_path(device),
- 						CYCLINGSPEED_INTERFACE,
--						NULL, NULL,
-+						cyclingspeed_device_methods,
-+						NULL,
- 						cyclingspeed_device_properties,
- 						csc, destroy_csc)) {
- 		error("D-Bus failed to register %s interface",
++	watcher_path = "/test/watcher"
++	watcher = Watcher(bus, watcher_path)
++	cscmanager.RegisterWatcher(watcher_path)
++
++	csc = dbus.Interface(bus.get_object("org.bluez", device_path),
++						"org.bluez.CyclingSpeed")
++
++	device_prop = dbus.Interface(bus.get_object("org.bluez", device_path),
++					"org.freedesktop.DBus.Properties")
++
++	properties = device_prop.GetAll("org.bluez.CyclingSpeed")
++
++	if "Location" in properties:
++		print("Sensor location: %s" % properties["Location"])
++	else:
++		print("Sensor location is not supported")
++
++	if len(args) > 0:
++		if args[0] == "ShowSupportedLocations":
++			if properties["MultipleSensorLocationsSupported"]:
++				print("Supported locations: ", properties["SupportedLocations"])
++			else:
++				print("Multiple sensor locations not supported")
++
++		elif args[0] == "SetLocation":
++			if properties["MultipleSensorLocationsSupported"]:
++				device_prop.Set("org.bluez.CyclingSpeed", "Location", args[1])
++			else:
++				print("Multiple sensor locations not supported")
++
++		elif args[0] == "SetCumulativeWheelRevolutions":
++			if properties["WheelRevolutionDataSupported"]:
++				csc.SetCumulativeWheelRevolutions(dbus.UInt32(args[1]))
++			else:
++				print("Wheel revolution data not supported")
++
++		else:
++			print("Unknown command")
++			sys.exit(1)
++
++	mainloop = gobject.MainLoop()
++	mainloop.run()
 -- 
 1.8.0
 
