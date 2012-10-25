@@ -1,55 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 25 Oct 2012 18:07:54 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 5/6] Bluetooth: mgmt: Add support for switching to LE
- peripheral mode
-Message-ID: <20121025150754.GA5845@x220>
-References: <20121024221341.GA22764@samus>
- <20121024223635.GA11976@x220.P-661HNU-F1>
- <20121025005842.GB22764@samus>
- <1351130085.1785.84.camel@aeonflux>
- <20121025045605.GB12303@echo>
- <20121025075045.GA22397@x220>
- <CAJdJm_Odk8_8dLjcYw9kfr+CCD0Q0bNgu9duhRo6oKXYAo9cKA@mail.gmail.com>
- <20121025114817.GA2197@x220>
- <20121025120407.GA3274@x220>
- <20121025143138.GA27907@samus>
+Date: Thu, 25 Oct 2012 13:05:20 -0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/6] Bluetooth: Fix sending unnecessary HCI_LE_Host_Enable
+Message-ID: <20121025150520.GA1764@joana>
+References: <1351112996-9597-1-git-send-email-johan.hedberg@gmail.com>
+ <1351112996-9597-4-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20121025143138.GA27907@samus>
+In-Reply-To: <1351112996-9597-4-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Johan,
 
-On Thu, Oct 25, 2012, Vinicius Costa Gomes wrote:
-> > On Thu, Oct 25, 2012, Johan Hedberg wrote:
-> > > This will need some more thinking. We could add a new mgmt command for
-> > > that, or if you wanna go crazy why not map this to the L2CAP socket
-> > > interface's connect() system call. I.e. if LE GAP is in peripheral mode
-> > > instead of doing HCI_LE_Create_Connection or just failing with "not
-> > > allowed" a socket connect() would simply trigger directed advertising to
-> > > the device in question and deliver the successful connection in the same
-> > > way as a central role triggered connect would do (unless we time out
-> > > waiting for the remote device to connect). Now that I think of this
-> > > second option it actually sounds quite natural and not so crazy after
-> > > all :)
-> > 
-> > There's on problem with this though: we'd still be undirected
-> > connectable between doing mgmt_set_le(peripheral) and issuing the socket
-> > connect(). So maybe we might need to introduce a mgmt_set_le_connectable
-> > command and a "le-connectable" setting after all (that could only be set
-> > in peripheral mode).
+* Johan Hedberg <johan.hedberg@gmail.com> [2012-10-25 00:09:53 +0300]:
+
+> From: Johan Hedberg <johan.hedberg@intel.com>
 > 
-> Why not sending undirected connectable events when there's an active
-> listen()?
+> This patch fixes sending an unnecessary HCI_LE_Host_Enable command if
+> the command has already been sent as part of the default HCI init
+> sequence.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/mgmt.c |   10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 02dc5f8..03dc176 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -2927,8 +2927,14 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
+>  			cp.le = 1;
+>  			cp.simul = !!lmp_le_br_capable(hdev);
+>  
+> -			hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED,
+> -				     sizeof(cp), &cp);
+> +			/* Check first if we already have the right
+> +			 * host state (host features set)
+> +			 */
+> +			if (cp.le != !!lmp_host_le_capable(hdev) ||
+> +			    cp.simul != !!lmp_host_le_br_capable(hdev))
 
-But we always have that, don't we? (the GATT server socket). Or are you
-saying that bluetoothd could close its GATT server socket before
-switching to peripheral mode and that would ensure that the kernel
-doesn't enable connectable advertising?
+Shouldn't the !! be part of the macro itself? Looks we will be using !! always
+with these macros.
 
-Johan
+	Gustavo
