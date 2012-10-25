@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 08/11] Bluetooth: AMP: Remove hci_conn receiving error command status
-Date: Thu, 25 Oct 2012 15:20:49 +0300
-Message-Id: <1351167652-12346-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 11/11] Bluetooth: AMP: Check for hs_hcon instead of ctrl_id
+Date: Thu, 25 Oct 2012 15:20:52 +0300
+Message-Id: <1351167652-12346-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1351167652-12346-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1350493622.26318.114.camel@aeonflux>
  <1351167652-12346-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,47 +12,38 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When receiving HCI Event: Command Status for Create Physical Link
-with Error code remove AMP hcon.
+When deciding whether to send EFS configuration response with success,
+check rather for existence of High Speed physical link hs_hcon then
+ctrl_id. There might be cases when there is ctrl_id but high speed link
+is not established yet.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_event.c |   17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+ net/bluetooth/l2cap_core.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 14c5f3f..827243d 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1803,14 +1803,23 @@ static void hci_cs_create_phylink(struct hci_dev *hdev, u8 status)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index e46fd56..ac44365 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -3912,7 +3912,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
+ 		/* check compatibility */
  
- 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+ 		/* Send rsp for BR/EDR channel */
+-		if (!chan->ctrl_id)
++		if (!chan->hs_hcon)
+ 			l2cap_send_efs_conf_rsp(chan, rsp, cmd->ident, flags);
+ 		else
+ 			chan->ident = cmd->ident;
+@@ -3962,7 +3962,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
+ 				goto done;
+ 			}
  
--	if (status)
--		return;
--
- 	cp = hci_sent_cmd_data(hdev, HCI_OP_CREATE_PHY_LINK);
- 	if (!cp)
- 		return;
- 
--	amp_write_remote_assoc(hdev, cp->phy_handle);
-+	hci_dev_lock(hdev);
-+
-+	if (status) {
-+		struct hci_conn *hcon;
-+
-+		hcon = hci_conn_hash_lookup_handle(hdev, cp->phy_handle);
-+		if (hcon)
-+			hci_conn_del(hcon);
-+	} else {
-+		amp_write_remote_assoc(hdev, cp->phy_handle);
-+	}
-+
-+	hci_dev_unlock(hdev);
- }
- 
- static void hci_cs_accept_phylink(struct hci_dev *hdev, u8 status)
+-			if (!chan->ctrl_id)
++			if (!chan->hs_hcon)
+ 				l2cap_send_efs_conf_rsp(chan, buf, cmd->ident,
+ 							0);
+ 			else {
 -- 
 1.7.9.5
 
