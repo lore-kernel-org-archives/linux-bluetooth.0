@@ -1,40 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: Jeff Cook <cookiecaper@gmail.com>
-Message-ID: <5089902E.9020204@deserettechnology.com>
-Date: Thu, 25 Oct 2012 13:17:02 -0600
-From: Jeff Cook <jeff@deserettechnology.com>
-Reply-To: jeff@deserettechnology.com
+From: =?UTF-8?q?Paulo=20S=C3=A9rgio?= <paulo.sergio@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Paulo=20S=C3=A9rgio?= <paulo.sergio@openbossa.org>
+Subject: [PATCH] Bluetooth: Fix error message when pairing fails
+Date: Thu, 25 Oct 2012 16:08:55 -0300
+Message-Id: <1351192136-6925-1-git-send-email-paulo.sergio@openbossa.org>
+In-Reply-To: <y>
+References: <y>
 MIME-Version: 1.0
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
- gustavo@padovan.org
-CC: marcel@holtmann.org, johan.hedberg@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Add support for BCM20702A0 [0b05, 17b5]
-References: <5087B517.9090703@deserettechnology.com> <CAJdJm_NrmfU17aQDmO0hbihV673Of0iFnLqk4=-sPh=g44eixA@mail.gmail.com>
-In-Reply-To: <CAJdJm_NrmfU17aQDmO0hbihV673Of0iFnLqk4=-sPh=g44eixA@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 10/24/2012 06:20 AM, Anderson Lizardo wrote:
-> Hi Jeff,
-> 
-> On Wed, Oct 24, 2012 at 5:29 AM, Jeff Cook <jeff@deserettechnology.com> wrote:
->> Hello all,
->>
->> Please see included patch. First-time submitter so let me know if I did
->> something wrong.
-> 
-> Just one more suggestion (adding to Gustavo's comments), you may want to read:
-> 
-> http://www.kernel.org/doc/Documentation/SubmittingPatches
-> 
-> Specially sections 12 and 15.
+When pairing fails due to wrong confirm value, the management layer
+doesn't report a proper error message. It sends a
+MGMT_STATUS_CONNECT_FAILED instead of a MGMT_STATUS_AUTH_FAILED.
 
-Thanks for the help everyone. I did skim SubmittingPatches prior to
-submission, but dropped off before sections 12 and 15; the information
-seemed outdated since it made no mention of git by the time I stopped
-reading (around section 9 or so), so I looked elsewhere.
+Most of management functions that receive a status as a parameter
+expects for it to be encoded as a HCI status. But when a SMP pairing
+fails, the SMP layer sends the SMP reason as the error status to the
+management layer.
 
-I will resubmit according to the information in Section 15. Do I need to
-add something like "try 2" to the patch's subject line, or is it okay
-without that?
+This commit maps all SMP reasons to HCI_ERROR_AUTH_FAILURE, which will
+be converted to MGMT_STATUS_AUTH_FAILED in the management layer.
+
+Reported-by: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Reviewed-by: João Paulo Rechi Vita <jprvita@openbossa.org>
+Signed-off-by: Paulo Sérgio <paulo.sergio@openbossa.org>
+---
+ net/bluetooth/smp.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index b542c5d..b3b7cc0 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -266,7 +266,7 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason, u8 send)
+ 
+ 	clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->hcon->flags);
+ 	mgmt_auth_failed(conn->hcon->hdev, conn->dst, hcon->type,
+-			 hcon->dst_type, reason);
++			 hcon->dst_type, HCI_ERROR_AUTH_FAILURE);
+ 
+ 	cancel_delayed_work_sync(&conn->security_timer);
+ 
+-- 
+1.7.9.5
+
