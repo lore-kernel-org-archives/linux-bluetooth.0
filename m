@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [RFC 10/18] cyclingspeed: Add DBus.Properties for org.bluez.CyclingSpeed interface
-Date: Thu, 25 Oct 2012 16:43:40 +0200
-Message-ID: <1351176228-5789-11-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [RFC 14/18] cyclingspeed: Add support for Update Sensor Location
+Date: Thu, 25 Oct 2012 16:43:44 +0200
+Message-ID: <1351176228-5789-15-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1351176228-5789-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1351176228-5789-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -13,145 +13,199 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- profiles/cyclingspeed/cyclingspeed.c | 99 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 98 insertions(+), 1 deletion(-)
+ profiles/cyclingspeed/cyclingspeed.c | 116 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 114 insertions(+), 2 deletions(-)
 
 diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
-index f7ffd2e..4f48121 100644
+index 164a525..bf8ea46 100644
 --- a/profiles/cyclingspeed/cyclingspeed.c
 +++ b/profiles/cyclingspeed/cyclingspeed.c
-@@ -43,6 +43,7 @@
+@@ -74,6 +74,7 @@ struct controlpoint_req {
+ 	struct csc		*csc;
+ 	uint8_t			opcode;
+ 	guint			timeout;
++	GDBusPendingReply	reply_id;
+ };
  
- #define CYCLINGSPEED_MANAGER_INTERFACE	"org.bluez.CyclingSpeedManager"
- #define CYCLINGSPEED_WATCHER_INTERFACE	"org.bluez.CyclingSpeedWatcher"
-+#define CYCLINGSPEED_INTERFACE		"org.bluez.CyclingSpeed"
+ struct csc_adapter {
+@@ -148,6 +149,17 @@ static const gchar *location2str(uint8_t value)
+ 	return location_enum[0];
+ }
  
- #define WHEEL_REV_SUPPORT		0x01
- #define CRANK_REV_SUPPORT		0x02
-@@ -102,6 +103,21 @@ struct characteristic {
- 
- static GSList *csc_adapters = NULL;
- 
-+static const char * const location_enum[] = {
-+	"other", "top-of-shoe", "in-shoe", "hip", "front-wheel", "left-crank",
-+	"right-crank", "left-pedal", "right-pedal", "front-hub",
-+	"rear-dropout", "chainstay", "rear-wheel", "rear-hub"
-+};
-+
-+static const gchar *location2str(uint8_t value)
++static int str2location(const char *location)
 +{
-+	if (value < G_N_ELEMENTS(location_enum))
-+		return location_enum[value];
++	size_t i;
 +
-+	info("Body Sensor Location [%d] is RFU", value);
-+	return location_enum[0];
++	for (i = 0; i < G_N_ELEMENTS(location_enum); i++)
++		if (!strcmp(location_enum[i], location))
++			return i;
++
++	return -1;
 +}
 +
  static gint cmp_adapter(gconstpointer a, gconstpointer b)
  {
  	const struct csc_adapter *cadapter = a;
-@@ -687,6 +703,74 @@ void csc_adapter_unregister(struct btd_adapter *adapter)
- 					CYCLINGSPEED_MANAGER_INTERFACE);
+@@ -271,6 +283,12 @@ static gboolean controlpoint_timeout(gpointer user_data)
+ {
+ 	struct controlpoint_req *req = user_data;
+ 
++	if (req->opcode == UPDATE_SENSOR_LOC) {
++		g_dbus_pending_property_error(req->reply_id,
++				ERROR_INTERFACE ".Failed",
++				"Operation failed (timeout)");
++	}
++
+ 	req->csc->pending_req = NULL;
+ 	g_free(req);
+ 
+@@ -285,6 +303,12 @@ static void controlpoint_write_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 	if (status != 0) {
+ 		error("SC Control Point write failed (opcode=%d)", req->opcode);
+ 
++		if (req->opcode == UPDATE_SENSOR_LOC) {
++			g_dbus_pending_property_error(req->reply_id,
++					ERROR_INTERFACE ".Failed",
++					"Operation failed (%d)", status);
++		}
++
+ 		req->csc->pending_req = NULL;
+ 		g_free(req);
+ 
+@@ -558,6 +582,40 @@ static void measurement_notify_handler(const uint8_t *pdu, uint16_t len,
+ 	process_measurement(csc, pdu + 3, len - 3);
  }
  
-+static gboolean property_get_location(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
++static void controlpoint_property_reply(struct controlpoint_req *req,
++								uint8_t code)
++{
++	switch (code) {
++	case RSP_SUCCESS:
++		g_dbus_pending_property_success(req->reply_id);
++		break;
++
++	case RSP_NOT_SUPPORTED:
++		g_dbus_pending_property_error(req->reply_id,
++					ERROR_INTERFACE ".NotSupported",
++					"Feature is not supported");
++		break;
++
++	case RSP_INVALID_PARAM:
++		g_dbus_pending_property_error(req->reply_id,
++					ERROR_INTERFACE ".InvalidArguments",
++					"Invalid arguments in method call");
++		break;
++
++	case RSP_FAILED:
++		g_dbus_pending_property_error(req->reply_id,
++					ERROR_INTERFACE ".Failed",
++					"Operation failed");
++		break;
++
++	default:
++		g_dbus_pending_property_error(req->reply_id,
++					ERROR_INTERFACE ".Failed",
++					"Operation failed (%d)", code);
++		break;
++	}
++}
++
+ static void controlpoint_ind_handler(const uint8_t *pdu, uint16_t len,
+ 							gpointer user_data)
+ {
+@@ -565,6 +623,7 @@ static void controlpoint_ind_handler(const uint8_t *pdu, uint16_t len,
+ 	struct controlpoint_req *req = csc->pending_req;
+ 	uint8_t opcode;
+ 	uint8_t req_opcode;
++	uint8_t rsp_code;
+ 	uint8_t *opdu;
+ 	uint16_t olen;
+ 	size_t plen;
+@@ -598,7 +657,7 @@ static void controlpoint_ind_handler(const uint8_t *pdu, uint16_t len,
+ 	}
+ 
+ 	req_opcode = *pdu;
+-	/* skip response code for now */
++	rsp_code = *(pdu + 1);
+ 	pdu += 2;
+ 	len -= 2;
+ 
+@@ -616,6 +675,10 @@ static void controlpoint_ind_handler(const uint8_t *pdu, uint16_t len,
+ 			error("Failed to read Supported Sendor Locations");
+ 		}
+ 		break;
++
++	case UPDATE_SENSOR_LOC:
++		controlpoint_property_reply(req, rsp_code);
++		break;
+ 	}
+ 
+ 	csc->pending_req = NULL;
+@@ -884,6 +947,55 @@ static gboolean property_get_location(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++static void property_set_location(const GDBusPropertyTable *property,
++					DBusMessageIter *iter,
++					GDBusPendingPropertySet id, void *data)
 +{
 +	struct csc *csc = data;
 +	char *loc;
++	int loc_val;
++	uint8_t att_val[2];
++	struct controlpoint_req *req;
 +
-+	if (!csc->has_location)
-+		return FALSE;
++	if (csc->pending_req != NULL)
++		return g_dbus_pending_property_error(id,
++					ERROR_INTERFACE ".InProgress",
++					"Operation already in progress");
 +
-+	loc = g_strdup(location2str(csc->location));
++	if (!(csc->feature & MULTI_SENSOR_LOC_SUPPORT))
++		return g_dbus_pending_property_error(id,
++					ERROR_INTERFACE ".NotSupported",
++					"Feature is not supported");
 +
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &loc);
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
++		return g_dbus_pending_property_error(id,
++					ERROR_INTERFACE ".InvalidArguments",
++					"Invalid arguments in method call");
 +
-+	g_free(loc);
++	dbus_message_iter_get_basic(iter, &loc);
 +
-+	return TRUE;
++	loc_val = str2location(loc);
++
++	if (loc_val < 0)
++		return g_dbus_pending_property_error(id,
++					ERROR_INTERFACE ".InvalidArguments",
++					"Invalid arguments in method call");
++
++	req = g_new(struct controlpoint_req, 1);
++	req->csc = csc;
++	req->reply_id = id;
++	req->opcode = UPDATE_SENSOR_LOC;
++
++	csc->pending_req = req;
++
++	att_val[0] = UPDATE_SENSOR_LOC;
++	att_val[1] = loc_val;
++
++	gatt_write_char(csc->attrib, csc->controlpoint_val_handle, att_val,
++		sizeof(att_val), controlpoint_write_cb, req);
++
 +}
 +
-+static gboolean property_exists_location(const GDBusPropertyTable *property,
-+								void *data)
-+{
-+	struct csc *csc = data;
-+
-+	return csc->has_location;
-+}
-+
-+static gboolean property_exists_locations(const GDBusPropertyTable *property,
-+								void *data)
-+{
-+	struct csc *csc = data;
-+
-+	return !!(csc->feature & MULTI_SENSOR_LOC_SUPPORT);
-+}
-+
-+static gboolean property_get_wheel_rev_sup(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct csc *csc = data;
-+	dbus_bool_t val;
-+
-+	val = !!(csc->feature & WHEEL_REV_SUPPORT);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &val);
-+
-+	return TRUE;
-+}
-+
-+static gboolean property_get_multi_loc_sup(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct csc *csc = data;
-+	dbus_bool_t val;
-+
-+	val = !!(csc->feature & MULTI_SENSOR_LOC_SUPPORT);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &val);
-+
-+	return TRUE;
-+}
-+
-+static const GDBusPropertyTable cyclingspeed_device_properties[] = {
-+	{ "Location", "s", property_get_location, NULL,
-+						property_exists_location },
-+	{ "SupportedLocations", "as", NULL, NULL,
-+						property_exists_locations },
-+	{ "WheelRevolutionDataSupported", "b", property_get_wheel_rev_sup },
-+	{ "MultipleLocationsSupported", "b", property_get_multi_loc_sup },
-+	{ }
-+};
-+
- int csc_device_register(struct btd_device *device, struct gatt_primary *prim)
+ static gboolean property_exists_location(const GDBusPropertyTable *property,
+ 								void *data)
  {
- 	struct btd_adapter *adapter;
-@@ -703,6 +787,18 @@ int csc_device_register(struct btd_device *device, struct gatt_primary *prim)
- 	csc->dev = btd_device_ref(device);
- 	csc->cadapter = cadapter;
- 
-+	if (!g_dbus_register_interface(btd_get_dbus_connection(),
-+						device_get_path(device),
-+						CYCLINGSPEED_INTERFACE,
-+						NULL, NULL,
-+						cyclingspeed_device_properties,
-+						csc, destroy_csc)) {
-+		error("D-Bus failed to register %s interface",
-+						CYCLINGSPEED_INTERFACE);
-+		destroy_csc(csc);
-+		return -EIO;
-+	}
-+
- 	csc->svc_range = g_new0(struct att_range, 1);
- 	csc->svc_range->start = prim->range.start;
- 	csc->svc_range->end = prim->range.end;
-@@ -736,5 +832,6 @@ void csc_device_unregister(struct btd_device *device)
- 
- 	cadapter->devices = g_slist_remove(cadapter->devices, csc);
- 
--	destroy_csc(csc);
-+	g_dbus_unregister_interface(btd_get_dbus_connection(),
-+			device_get_path(device), CYCLINGSPEED_INTERFACE);
+@@ -948,7 +1060,7 @@ static gboolean property_get_multi_loc_sup(const GDBusPropertyTable *property,
  }
+ 
+ static const GDBusPropertyTable cyclingspeed_device_properties[] = {
+-	{ "Location", "s", property_get_location, NULL,
++	{ "Location", "s", property_get_location, property_set_location,
+ 						property_exists_location },
+ 	{ "SupportedLocations", "as", property_get_locations, NULL,
+ 						property_exists_locations },
 -- 
 1.8.0
 
