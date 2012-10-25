@@ -1,34 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 25 Oct 2012 13:08:19 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/6] Bluetooth: Fix unnecessary EIR update during
- powering on
-Message-ID: <20121025150819.GB1764@joana>
+Message-ID: <1351177676.1785.94.camel@aeonflux>
+Subject: Re: [PATCH 3/6] Bluetooth: Fix sending unnecessary
+ HCI_LE_Host_Enable
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Date: Thu, 25 Oct 2012 08:07:56 -0700
+In-Reply-To: <20121025150520.GA1764@joana>
 References: <1351112996-9597-1-git-send-email-johan.hedberg@gmail.com>
- <1351112996-9597-5-git-send-email-johan.hedberg@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1351112996-9597-5-git-send-email-johan.hedberg@gmail.com>
+	 <1351112996-9597-4-git-send-email-johan.hedberg@gmail.com>
+	 <20121025150520.GA1764@joana>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Gustavo,
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2012-10-25 00:09:54 +0300]:
-
-> From: Johan Hedberg <johan.hedberg@intel.com>
+> > From: Johan Hedberg <johan.hedberg@intel.com>
+> > 
+> > This patch fixes sending an unnecessary HCI_LE_Host_Enable command if
+> > the command has already been sent as part of the default HCI init
+> > sequence.
+> > 
+> > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> > ---
+> >  net/bluetooth/mgmt.c |   10 ++++++++--
+> >  1 file changed, 8 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> > index 02dc5f8..03dc176 100644
+> > --- a/net/bluetooth/mgmt.c
+> > +++ b/net/bluetooth/mgmt.c
+> > @@ -2927,8 +2927,14 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
+> >  			cp.le = 1;
+> >  			cp.simul = !!lmp_le_br_capable(hdev);
+> >  
+> > -			hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED,
+> > -				     sizeof(cp), &cp);
+> > +			/* Check first if we already have the right
+> > +			 * host state (host features set)
+> > +			 */
+> > +			if (cp.le != !!lmp_host_le_capable(hdev) ||
+> > +			    cp.simul != !!lmp_host_le_br_capable(hdev))
 > 
-> When powered on the EIR data gets updated as the last step by mgmt.
-> Therefore avoid an update when getting a local name update as that's
-> part of the normal HCI init sequence.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  net/bluetooth/mgmt.c |    7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+> Shouldn't the !! be part of the macro itself? Looks we will be using !! always
+> with these macros.
 
-Patch 1, 2 and 4 have been applied to bluetooth-next. Thanks.
+we could do that actually. However I prefer to do that with a separate
+patch.
 
-	Gustavo
+Regards
+
+Marcel
+
+
