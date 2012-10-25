@@ -1,55 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Oct 2012 23:12:36 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Marti Raudsepp <marti@juffo.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] systemd: prevent duplicate logging messages in journal
-Message-ID: <20121025021236.GA12303@echo>
-References: <1349884769-5157-1-git-send-email-marti@juffo.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1349884769-5157-1-git-send-email-marti@juffo.org>
+Message-ID: <1351130193.1785.86.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Add support for Atheros [04ca:3004]
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Dwaine Garden VE3GIF <dwainegarden@rogers.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 24 Oct 2012 18:56:33 -0700
+In-Reply-To: <1351129589.50995.YahooMailNeo@web125405.mail.ne1.yahoo.com>
+References: <1351129589.50995.YahooMailNeo@web125405.mail.ne1.yahoo.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marti,
+Hi Dwaine,
 
-On 18:59 Wed 10 Oct, Marti Raudsepp wrote:
-> By default, both stdout and syslog messages go to the systemd journal,
-> which results in duplicate messages being logged.
-> ---
-
-Patch looks good.
-
-Ack.
-
-On a side note: seems that connman and ofono have the same problem, would you
-be interested on sending the respective fixes?
-
->  src/bluetooth.service.in | 1 +
->  1 file changed, 1 insertion(+)
+> Add another vendor specific ID for Atheros AR3012 device.
+> This chip is wrapped by Lite-On Technology Corp.
 > 
-> diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
-> index 2a576a3..a8442a9 100644
-> --- a/src/bluetooth.service.in
-> +++ b/src/bluetooth.service.in
-> @@ -5,6 +5,7 @@ Description=Bluetooth service
->  Type=dbus
->  BusName=org.bluez
->  ExecStart=@prefix@/sbin/bluetoothd -n
-> +StandardOutput=null
->  
->  [Install]
->  WantedBy=bluetooth.target
-> -- 
-> 1.7.12.2
+> output of usb-devices:
 > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Bus 001 Device 008: ID 04ca:3004 Lite-On Technology Corp. 
+> Device Descriptor:
+>   bLength                18
+>   bDescriptorType         1
+>   bcdUSB               1.10
+>   bDeviceClass          224 Wireless
+>   bDeviceSubClass         1 Radio Frequency
+>   bDeviceProtocol         1 Bluetooth
+
+I want /sys/kernel/debug/usb/devices for this device and nothing else.
+
+> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> index fc2de55..1486f15 100644
+> --- a/drivers/bluetooth/ath3k.c
+> +++ b/drivers/bluetooth/ath3k.c
+> @@ -75,6 +75,7 @@ static struct usb_device_id ath3k_table[] = {
+>         { USB_DEVICE(0x0CF3, 0x3004) },
+>         { USB_DEVICE(0x0CF3, 0x311D) },
+>         { USB_DEVICE(0x13d3, 0x3375) },
+> +      { USB_DEVICE(0x04CA, 0x3004) },
+>         { USB_DEVICE(0x04CA, 0x3005) },
+
+This is still broken.
+
+Regards
+
+Marcel
 
 
-Cheers,
--- 
-Vinicius
