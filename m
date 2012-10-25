@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [RFC 14/18] cyclingspeed: Add support for Update Sensor Location
-Date: Thu, 25 Oct 2012 16:43:44 +0200
-Message-ID: <1351176228-5789-15-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [RFC 15/18] cyclingspeed: Add support for Set Cumulative Value
+Date: Thu, 25 Oct 2012 16:43:45 +0200
+Message-ID: <1351176228-5789-16-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1351176228-5789-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1351176228-5789-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -13,199 +13,154 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- profiles/cyclingspeed/cyclingspeed.c | 116 ++++++++++++++++++++++++++++++++++-
- 1 file changed, 114 insertions(+), 2 deletions(-)
+ profiles/cyclingspeed/cyclingspeed.c | 92 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 91 insertions(+), 1 deletion(-)
 
 diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
-index 164a525..bf8ea46 100644
+index bf8ea46..7b5c3f5 100644
 --- a/profiles/cyclingspeed/cyclingspeed.c
 +++ b/profiles/cyclingspeed/cyclingspeed.c
-@@ -74,6 +74,7 @@ struct controlpoint_req {
- 	struct csc		*csc;
+@@ -75,6 +75,7 @@ struct controlpoint_req {
  	uint8_t			opcode;
  	guint			timeout;
-+	GDBusPendingReply	reply_id;
+ 	GDBusPendingReply	reply_id;
++	DBusMessage		*msg;
  };
  
  struct csc_adapter {
-@@ -148,6 +149,17 @@ static const gchar *location2str(uint8_t value)
- 	return location_enum[0];
- }
+@@ -287,6 +288,15 @@ static gboolean controlpoint_timeout(gpointer user_data)
+ 		g_dbus_pending_property_error(req->reply_id,
+ 				ERROR_INTERFACE ".Failed",
+ 				"Operation failed (timeout)");
++	} else if (req->opcode == SET_CUMULATIVE_VALUE) {
++		DBusMessage *reply;
++
++		reply = btd_error_failed(req->msg,
++						"Operation failed (timeout)");
++
++		g_dbus_send_message(btd_get_dbus_connection(), reply);
++
++		dbus_message_unref(req->msg);
+ 	}
  
-+static int str2location(const char *location)
-+{
-+	size_t i;
-+
-+	for (i = 0; i < G_N_ELEMENTS(location_enum); i++)
-+		if (!strcmp(location_enum[i], location))
-+			return i;
-+
-+	return -1;
-+}
-+
- static gint cmp_adapter(gconstpointer a, gconstpointer b)
- {
- 	const struct csc_adapter *cadapter = a;
-@@ -271,6 +283,12 @@ static gboolean controlpoint_timeout(gpointer user_data)
- {
- 	struct controlpoint_req *req = user_data;
- 
-+	if (req->opcode == UPDATE_SENSOR_LOC) {
-+		g_dbus_pending_property_error(req->reply_id,
-+				ERROR_INTERFACE ".Failed",
-+				"Operation failed (timeout)");
-+	}
-+
  	req->csc->pending_req = NULL;
- 	g_free(req);
- 
-@@ -285,6 +303,12 @@ static void controlpoint_write_cb(guint8 status, const guint8 *pdu, guint16 len,
- 	if (status != 0) {
- 		error("SC Control Point write failed (opcode=%d)", req->opcode);
- 
-+		if (req->opcode == UPDATE_SENSOR_LOC) {
-+			g_dbus_pending_property_error(req->reply_id,
-+					ERROR_INTERFACE ".Failed",
-+					"Operation failed (%d)", status);
-+		}
+@@ -307,6 +317,15 @@ static void controlpoint_write_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 			g_dbus_pending_property_error(req->reply_id,
+ 					ERROR_INTERFACE ".Failed",
+ 					"Operation failed (%d)", status);
++		} else if  (req->opcode == SET_CUMULATIVE_VALUE) {
++			DBusMessage *reply;
 +
- 		req->csc->pending_req = NULL;
- 		g_free(req);
++			reply = btd_error_failed(req->msg,
++						"Operation failed");
++
++			g_dbus_send_message(btd_get_dbus_connection(), reply);
++
++			dbus_message_unref(req->msg);
+ 		}
  
-@@ -558,6 +582,40 @@ static void measurement_notify_handler(const uint8_t *pdu, uint16_t len,
- 	process_measurement(csc, pdu + 3, len - 3);
+ 		req->csc->pending_req = NULL;
+@@ -616,6 +635,34 @@ static void controlpoint_property_reply(struct controlpoint_req *req,
+ 	}
  }
  
-+static void controlpoint_property_reply(struct controlpoint_req *req,
++static void controlpoint_method_reply(struct controlpoint_req *req,
 +								uint8_t code)
 +{
++	DBusMessage *reply;
++
 +	switch (code) {
 +	case RSP_SUCCESS:
-+		g_dbus_pending_property_success(req->reply_id);
++		reply = dbus_message_new_method_return(req->msg);
 +		break;
-+
 +	case RSP_NOT_SUPPORTED:
-+		g_dbus_pending_property_error(req->reply_id,
-+					ERROR_INTERFACE ".NotSupported",
-+					"Feature is not supported");
++		reply = btd_error_not_supported(req->msg);
 +		break;
-+
 +	case RSP_INVALID_PARAM:
-+		g_dbus_pending_property_error(req->reply_id,
-+					ERROR_INTERFACE ".InvalidArguments",
-+					"Invalid arguments in method call");
++		reply = btd_error_invalid_args(req->msg);
 +		break;
-+
 +	case RSP_FAILED:
-+		g_dbus_pending_property_error(req->reply_id,
-+					ERROR_INTERFACE ".Failed",
-+					"Operation failed");
++		reply = btd_error_failed(req->msg, "Failed");
 +		break;
-+
 +	default:
-+		g_dbus_pending_property_error(req->reply_id,
-+					ERROR_INTERFACE ".Failed",
-+					"Operation failed (%d)", code);
++		reply = btd_error_failed(req->msg, "Unknown error");
 +		break;
 +	}
++
++	g_dbus_send_message(btd_get_dbus_connection(), reply);
++
++	dbus_message_unref(req->msg);
 +}
 +
  static void controlpoint_ind_handler(const uint8_t *pdu, uint16_t len,
  							gpointer user_data)
  {
-@@ -565,6 +623,7 @@ static void controlpoint_ind_handler(const uint8_t *pdu, uint16_t len,
- 	struct controlpoint_req *req = csc->pending_req;
- 	uint8_t opcode;
- 	uint8_t req_opcode;
-+	uint8_t rsp_code;
- 	uint8_t *opdu;
- 	uint16_t olen;
- 	size_t plen;
-@@ -598,7 +657,7 @@ static void controlpoint_ind_handler(const uint8_t *pdu, uint16_t len,
+@@ -667,6 +714,10 @@ static void controlpoint_ind_handler(const uint8_t *pdu, uint16_t len,
  	}
  
- 	req_opcode = *pdu;
--	/* skip response code for now */
-+	rsp_code = *(pdu + 1);
- 	pdu += 2;
- 	len -= 2;
- 
-@@ -616,6 +675,10 @@ static void controlpoint_ind_handler(const uint8_t *pdu, uint16_t len,
- 			error("Failed to read Supported Sendor Locations");
- 		}
- 		break;
-+
-+	case UPDATE_SENSOR_LOC:
-+		controlpoint_property_reply(req, rsp_code);
+ 	switch (req->opcode) {
++	case SET_CUMULATIVE_VALUE:
++		controlpoint_method_reply(req, rsp_code);
 +		break;
- 	}
++
+ 	case REQUEST_SUPPORTED_SENSOR_LOC:
+ 		if (rsp_code == RSP_SUCCESS) {
+ 			csc->num_locations = len;
+@@ -1069,6 +1120,44 @@ static const GDBusPropertyTable cyclingspeed_device_properties[] = {
+ 	{ }
+ };
  
- 	csc->pending_req = NULL;
-@@ -884,6 +947,55 @@ static gboolean property_get_location(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
-+static void property_set_location(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter,
-+					GDBusPendingPropertySet id, void *data)
++static DBusMessage *set_cumulative_wheel_rev(DBusConnection *conn,
++						DBusMessage *msg, void *data)
 +{
 +	struct csc *csc = data;
-+	char *loc;
-+	int loc_val;
-+	uint8_t att_val[2];
++	dbus_uint32_t value;
 +	struct controlpoint_req *req;
++	uint8_t att_val[5]; /* uint8 opcode + uint32 value */
++
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT32, &value,
++							DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
 +
 +	if (csc->pending_req != NULL)
-+		return g_dbus_pending_property_error(id,
-+					ERROR_INTERFACE ".InProgress",
-+					"Operation already in progress");
-+
-+	if (!(csc->feature & MULTI_SENSOR_LOC_SUPPORT))
-+		return g_dbus_pending_property_error(id,
-+					ERROR_INTERFACE ".NotSupported",
-+					"Feature is not supported");
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
-+		return g_dbus_pending_property_error(id,
-+					ERROR_INTERFACE ".InvalidArguments",
-+					"Invalid arguments in method call");
-+
-+	dbus_message_iter_get_basic(iter, &loc);
-+
-+	loc_val = str2location(loc);
-+
-+	if (loc_val < 0)
-+		return g_dbus_pending_property_error(id,
-+					ERROR_INTERFACE ".InvalidArguments",
-+					"Invalid arguments in method call");
++		return btd_error_in_progress(msg);
 +
 +	req = g_new(struct controlpoint_req, 1);
 +	req->csc = csc;
-+	req->reply_id = id;
-+	req->opcode = UPDATE_SENSOR_LOC;
++	req->opcode = SET_CUMULATIVE_VALUE;
++	req->msg = dbus_message_ref(msg);
 +
 +	csc->pending_req = req;
 +
-+	att_val[0] = UPDATE_SENSOR_LOC;
-+	att_val[1] = loc_val;
++	att_val[0] = SET_CUMULATIVE_VALUE;
++	att_put_u32(value, att_val + 1);
 +
 +	gatt_write_char(csc->attrib, csc->controlpoint_val_handle, att_val,
 +		sizeof(att_val), controlpoint_write_cb, req);
 +
++	return NULL;
 +}
 +
- static gboolean property_exists_location(const GDBusPropertyTable *property,
- 								void *data)
++static const GDBusMethodTable cyclingspeed_device_methods[] = {
++	{ GDBUS_ASYNC_METHOD("SetCumulativeWheelRevolutions",
++			GDBUS_ARGS({ "value", "u" }), NULL,
++			set_cumulative_wheel_rev) },
++	{ }
++};
++
+ int csc_device_register(struct btd_device *device, struct gatt_primary *prim)
  {
-@@ -948,7 +1060,7 @@ static gboolean property_get_multi_loc_sup(const GDBusPropertyTable *property,
- }
- 
- static const GDBusPropertyTable cyclingspeed_device_properties[] = {
--	{ "Location", "s", property_get_location, NULL,
-+	{ "Location", "s", property_get_location, property_set_location,
- 						property_exists_location },
- 	{ "SupportedLocations", "as", property_get_locations, NULL,
- 						property_exists_locations },
+ 	struct btd_adapter *adapter;
+@@ -1088,7 +1177,8 @@ int csc_device_register(struct btd_device *device, struct gatt_primary *prim)
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+ 						device_get_path(device),
+ 						CYCLINGSPEED_INTERFACE,
+-						NULL, NULL,
++						cyclingspeed_device_methods,
++						NULL,
+ 						cyclingspeed_device_properties,
+ 						csc, destroy_csc)) {
+ 		error("D-Bus failed to register %s interface",
 -- 
 1.8.0
 
