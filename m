@@ -1,33 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 25 Oct 2012 13:39:22 +0300
+Date: Thu, 25 Oct 2012 12:55:53 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [RFC v0 12/15] input: Add profile .disconnect
-Message-ID: <20121025103922.GA30500@x220>
-References: <1350661172-18125-1-git-send-email-mikel.astiz.oss@gmail.com>
- <1350661172-18125-13-git-send-email-mikel.astiz.oss@gmail.com>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
+	<frederic.danis@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v7 16/16] hcitool: Retrieve names from cache directory
+Message-ID: <20121025095553.GD24756@x220>
+References: <1351089258-25179-1-git-send-email-frederic.danis@linux.intel.com>
+ <1351089258-25179-17-git-send-email-frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1350661172-18125-13-git-send-email-mikel.astiz.oss@gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1351089258-25179-17-git-send-email-frederic.danis@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Frédéric,
 
-On Fri, Oct 19, 2012, Mikel Astiz wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
-> 
-> Add the disconnect hook to the btd_profile.
-> ---
->  profiles/input/manager.c | 1 +
->  1 file changed, 1 insertion(+)
+On Wed, Oct 24, 2012, Frédéric Danis wrote:
+>  static char *get_device_name(const bdaddr_t *local, const bdaddr_t *peer)
+>  {
+> -	char filename[PATH_MAX + 1], addr[18];
+> +	char filename[PATH_MAX + 1];
+> +	char local_addr[18], peer_addr[18];
+> +	GKeyFile *key_file;
+> +	char *str = NULL;
+> +	int len;
+> +
+> +	ba2str(local, local_addr);
+> +	ba2str(peer, peer_addr);
+> +
+> +	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s", local_addr,
+> +			peer_addr);
+> +	filename[PATH_MAX] = '\0';
+> +	key_file = g_key_file_new();
+> +
+> +	if (g_key_file_load_from_file(key_file, filename, 0, NULL)) {
+> +		str = g_key_file_get_string(key_file, "General", "Name", NULL);
+> +		if (str) {
+> +			len = strlen(str);
+> +			if (len > HCI_MAX_NAME_LENGTH)
+> +				str[HCI_MAX_NAME_LENGTH] = '\0';
+> +		}
+> +	}
+>  
+> -	ba2str(local, addr);
+> -	create_name(filename, PATH_MAX, STORAGEDIR, addr, "names");
+> +	g_key_file_free(key_file);
+>  
+> -	ba2str(peer, addr);
+> -	return textfile_get(filename, addr);
+> +	return str;
+>  }
 
-I've applied the patches up until this one with the exception of the
-audio ones which I'll let Luiz to look at and sync up with the work he's
-doing for audio right now. The last three will still need some
-discussion as I'm not convinced that it's a good idea to have these
-generic profile objects instead or Adapter.Connect/DisconnectProfile.
+This is the one exception where it's ok to directly go digging in the
+cache, as we don't have the concept of btd_device in hcitool.
 
 Johan
