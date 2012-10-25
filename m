@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 05/11] Bluetooth: AMP: Add Logical Link Create function
-Date: Thu, 25 Oct 2012 15:20:46 +0300
-Message-Id: <1351167652-12346-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 09/11] Bluetooth: Disconnect logical link when deleteing chan
+Date: Thu, 25 Oct 2012 15:20:50 +0300
+Message-Id: <1351167652-12346-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1351167652-12346-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1350493622.26318.114.camel@aeonflux>
  <1351167652-12346-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,159 +12,72 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-After physical link is created logical link needs to be created.
-The process starts after L2CAP channel is created and L2CAP
-Configuration Response with result PENDING is received.
+Disconnect logical link for high speed channel hs_hchan
+associated with L2CAP channel chan.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
  include/net/bluetooth/amp.h |    1 +
- net/bluetooth/amp.c         |   49 +++++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c   |    9 ++++++++
- net/bluetooth/l2cap_core.c  |   17 +++++++++++----
- 4 files changed, 72 insertions(+), 4 deletions(-)
+ net/bluetooth/amp.c         |   14 ++++++++++++++
+ net/bluetooth/l2cap_core.c  |    7 +++++++
+ 3 files changed, 22 insertions(+)
 
 diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
-index 2e7c79e..70d5c15 100644
+index 405fb9c..f1c0017 100644
 --- a/include/net/bluetooth/amp.h
 +++ b/include/net/bluetooth/amp.h
-@@ -46,5 +46,6 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
- 			struct hci_conn *hcon);
+@@ -47,6 +47,7 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
  void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle);
  void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle);
-+void amp_create_logical_link(struct l2cap_chan *chan);
+ void amp_create_logical_link(struct l2cap_chan *chan);
++void amp_disconnect_logical_link(struct hci_chan *hchan);
+ void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason);
  
  #endif /* __AMP_H */
 diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index 231d7ef..fbb6360 100644
+index 0f3fef3..917e034 100644
 --- a/net/bluetooth/amp.c
 +++ b/net/bluetooth/amp.c
-@@ -372,3 +372,52 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
- 
- 	hci_send_cmd(hdev, HCI_OP_ACCEPT_PHY_LINK, sizeof(cp), &cp);
- }
-+
-+void amp_create_logical_link(struct l2cap_chan *chan)
-+{
-+	struct hci_cp_create_accept_logical_link cp;
-+	struct hci_conn *hcon;
-+	struct hci_dev *hdev;
-+
-+	BT_DBG("chan %p", chan);
-+
-+	if (!chan->hs_hcon)
-+		return;
-+
-+	hdev = hci_dev_hold(chan->hs_hcon->hdev);
-+	if (!hdev)
-+		return;
-+
-+	BT_DBG("chan %p ctrl_id %d dst %pMR", chan, chan->ctrl_id,
-+	       chan->conn->dst);
-+
-+	hcon = hci_conn_hash_lookup_ba(hdev, AMP_LINK, chan->conn->dst);
-+	if (!hcon)
-+		goto done;
-+
-+	cp.phy_handle = hcon->handle;
-+
-+	cp.tx_flow_spec.id = chan->local_id;
-+	cp.tx_flow_spec.stype = chan->local_stype;
-+	cp.tx_flow_spec.msdu = cpu_to_le16(chan->local_msdu);
-+	cp.tx_flow_spec.sdu_itime = cpu_to_le32(chan->local_sdu_itime);
-+	cp.tx_flow_spec.acc_lat = cpu_to_le32(chan->local_acc_lat);
-+	cp.tx_flow_spec.flush_to = cpu_to_le32(chan->local_flush_to);
-+
-+	cp.rx_flow_spec.id = chan->remote_id;
-+	cp.rx_flow_spec.stype = chan->remote_stype;
-+	cp.rx_flow_spec.msdu = cpu_to_le16(chan->remote_msdu);
-+	cp.rx_flow_spec.sdu_itime = cpu_to_le32(chan->remote_sdu_itime);
-+	cp.rx_flow_spec.acc_lat = cpu_to_le32(chan->remote_acc_lat);
-+	cp.rx_flow_spec.flush_to = cpu_to_le32(chan->remote_flush_to);
-+
-+	if (hcon->out)
-+		hci_send_cmd(hdev, HCI_OP_CREATE_LOGICAL_LINK, sizeof(cp),
-+			     &cp);
-+	else
-+		hci_send_cmd(hdev, HCI_OP_ACCEPT_LOGICAL_LINK, sizeof(cp),
-+			     &cp);
-+
-+done:
-+	hci_dev_put(hdev);
-+}
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 00021cb..2c562a7 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1829,6 +1829,11 @@ static void hci_cs_accept_phylink(struct hci_dev *hdev, u8 status)
- 	amp_write_remote_assoc(hdev, cp->phy_handle);
+@@ -422,6 +422,20 @@ done:
+ 	hci_dev_put(hdev);
  }
  
-+static void hci_cs_create_logical_link(struct hci_dev *hdev, u8 status)
++void amp_disconnect_logical_link(struct hci_chan *hchan)
 +{
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++	struct hci_conn *hcon = hchan->conn;
++	struct hci_cp_disconn_logical_link cp;
++
++	if (hcon->state != BT_CONNECTED) {
++		BT_DBG("hchan %p not connected", hchan);
++		return;
++	}
++
++	cp.log_handle = cpu_to_le16(hchan->handle);
++	hci_send_cmd(hcon->hdev, HCI_OP_DISCONN_LOGICAL_LINK, sizeof(cp), &cp);
 +}
 +
- static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason)
  {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -2663,6 +2668,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cs_accept_phylink(hdev, ev->status);
- 		break;
- 
-+	case HCI_OP_CREATE_LOGICAL_LINK:
-+		hci_cs_create_logical_link(hdev, ev->status);
-+		break;
-+
- 	default:
- 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
- 		break;
+ 	BT_DBG("hchan %p", hchan);
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index d1728af..8e1525f 100644
+index 8e1525f..e46fd56 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -38,6 +38,7 @@
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/smp.h>
- #include <net/bluetooth/a2mp.h>
-+#include <net/bluetooth/amp.h>
+@@ -578,6 +578,13 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 			mgr->bredr_chan = NULL;
+ 	}
  
- bool disable_ertm;
- 
-@@ -1013,6 +1014,12 @@ static bool __amp_capable(struct l2cap_chan *chan)
- 		return false;
- }
- 
-+static bool l2cap_check_efs(struct l2cap_chan *chan)
-+{
-+	/* Check EFS parameters */
-+	return true;
-+}
++	if (chan->hs_hchan) {
++		struct hci_chan *hs_hchan = chan->hs_hchan;
 +
- void l2cap_send_conn_req(struct l2cap_chan *chan)
- {
- 	struct l2cap_conn *conn = chan->conn;
-@@ -3948,13 +3955,15 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
- 				goto done;
- 			}
++		BT_DBG("chan %p disconnect hs_hchan %p", chan, hs_hchan);
++		amp_disconnect_logical_link(hs_hchan);
++	}
++
+ 	chan->ops->teardown(chan, err);
  
--			/* check compatibility */
--
- 			if (!chan->ctrl_id)
- 				l2cap_send_efs_conf_rsp(chan, buf, cmd->ident,
- 							0);
--			else
--				chan->ident = cmd->ident;
-+			else {
-+				if (l2cap_check_efs(chan)) {
-+					amp_create_logical_link(chan);
-+					chan->ident = cmd->ident;
-+				}
-+			}
- 		}
- 		goto done;
- 
+ 	if (test_bit(CONF_NOT_COMPLETE, &chan->conf_state))
 -- 
 1.7.9.5
 
