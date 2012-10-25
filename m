@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 06/11] AVRCP: Add support for settings changed event
-Date: Thu, 25 Oct 2012 16:59:09 +0300
-Message-Id: <1351173554-28039-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 05/11] AVCTP: Reduce verbosity of PDU parsing
+Date: Thu, 25 Oct 2012 16:59:08 +0300
+Message-Id: <1351173554-28039-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1351173554-28039-1-git-send-email-luiz.dentz@gmail.com>
 References: <1351173554-28039-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,216 +11,88 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This event can be registered by the CT to get notified when any setting
-is changed.
-
-Per spec every single setting must be sent so the CT can track settings
-being added or removed.
+This information is not really useful as debug and there are better
+tools for sniffing traffic such as hcidump and wireshark.
 ---
- audio/avrcp.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- audio/avrcp.h |  2 ++
- audio/media.c | 26 ++++++++++++++++++++++++-
- 3 files changed, 88 insertions(+), 2 deletions(-)
+ audio/avctp.c | 23 -----------------------
+ 1 file changed, 23 deletions(-)
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 88ba3aa..02e4581 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -431,12 +431,29 @@ static void set_company_id(uint8_t cid[3], const uint32_t cid_in)
- 	cid[2] = cid_in;
- }
+diff --git a/audio/avctp.c b/audio/avctp.c
+index 0db6031..5f6a677 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -471,8 +471,6 @@ static int avctp_send(struct avctp_channel *control, uint8_t transaction,
+ 	struct iovec iov[2];
+ 	int sk, err = 0;
  
-+static int player_get_attribute(struct avrcp_player *player, uint8_t attr)
-+{
-+	int value;
-+
-+	DBG("attr %u", attr);
-+
-+	if (player == NULL)
-+		return -ENOENT;
-+
-+	value = player->cb->get_setting(attr, player->user_data);
-+	if (value < 0)
-+		DBG("attr %u not supported by player", attr);
-+
-+	return value;
-+}
-+
- void avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data)
+-	DBG("transaction %u", transaction);
+-
+ 	iov[0].iov_base = control->buffer;
+ 	iov[0].iov_len  = sizeof(*avctp) + sizeof(*avc);
+ 	iov[1].iov_base = operands;
+@@ -637,10 +635,6 @@ static gboolean session_browsing_cb(GIOChannel *chan, GIOCondition cond,
+ 		goto failed;
+ 
+ 	avctp = (struct avctp_header *) buf;
+-	DBG("AVCTP transaction %u, packet type %u, C/R %u, IPID %u, "
+-				"PID 0x%04X",
+-				avctp->transaction, avctp->packet_type,
+-				avctp->cr, avctp->ipid, ntohs(avctp->pid));
+ 
+ 	if (avctp->packet_type != AVCTP_PACKET_SINGLE)
+ 		goto failed;
+@@ -698,8 +692,6 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 	if (ret <= 0)
+ 		goto failed;
+ 
+-	DBG("Got %d bytes of data for AVCTP session %p", ret, session);
+-
+ 	if ((unsigned int) ret < sizeof(struct avctp_header)) {
+ 		error("Too small AVCTP packet");
+ 		goto failed;
+@@ -707,11 +699,6 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 
+ 	avctp = (struct avctp_header *) buf;
+ 
+-	DBG("AVCTP transaction %u, packet type %u, C/R %u, IPID %u, "
+-			"PID 0x%04X",
+-			avctp->transaction, avctp->packet_type,
+-			avctp->cr, avctp->ipid, ntohs(avctp->pid));
+-
+ 	ret -= sizeof(struct avctp_header);
+ 	if ((unsigned int) ret < sizeof(struct avc_header)) {
+ 		error("Too small AVCTP packet");
+@@ -725,12 +712,6 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 	operands = buf + sizeof(struct avctp_header) + sizeof(struct avc_header);
+ 	operand_count = ret;
+ 
+-	DBG("AV/C %s 0x%01X, subunit_type 0x%02X, subunit_id 0x%01X, "
+-			"opcode 0x%02X, %d operands",
+-			avctp->cr ? "response" : "command",
+-			avc->code, avc->subunit_type, avc->subunit_id,
+-			avc->opcode, operand_count);
+-
+ 	if (avctp->cr == AVCTP_RESPONSE) {
+ 		control_response(control, avctp, avc, operands, operand_count);
+ 		return TRUE;
+@@ -1295,8 +1276,6 @@ static gboolean avctp_passthrough_rsp(struct avctp *session, uint8_t code,
+ 					uint8_t subunit, uint8_t *operands,
+ 					size_t operand_count, void *user_data)
  {
- 	uint8_t buf[AVRCP_HEADER_LENGTH + 9];
- 	struct avrcp_header *pdu = (void *) buf;
- 	uint16_t size;
- 	GSList *l;
-+	GList *settings;
- 
- 	if (player->sessions == NULL)
- 		return;
-@@ -465,6 +482,22 @@ void avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data)
- 	case AVRCP_EVENT_TRACK_REACHED_START:
- 		size = 1;
- 		break;
-+	case AVRCP_EVENT_SETTINGS_CHANGED:
-+		size = 2;
-+		settings = data;
-+		pdu->params[1] = g_list_length(settings);
-+		for (; settings; settings = settings->next) {
-+			uint8_t attr = GPOINTER_TO_UINT(settings->data);
-+			int val;
-+
-+			val = player_get_attribute(player, attr);
-+			if (val < 0)
-+				continue;
-+
-+			pdu->params[++size] = attr;
-+			pdu->params[++size] = val;
-+		}
-+		break;
- 	default:
- 		error("Unknown event %u", id);
- 		return;
-@@ -641,11 +674,12 @@ static uint8_t avrcp_handle_get_capabilities(struct avrcp *session,
- 
- 		return AVC_CTYPE_STABLE;
- 	case CAP_EVENTS_SUPPORTED:
--		pdu->params[1] = 4;
-+		pdu->params[1] = 5;
- 		pdu->params[2] = AVRCP_EVENT_STATUS_CHANGED;
- 		pdu->params[3] = AVRCP_EVENT_TRACK_CHANGED;
- 		pdu->params[4] = AVRCP_EVENT_TRACK_REACHED_START;
- 		pdu->params[5] = AVRCP_EVENT_TRACK_REACHED_END;
-+		pdu->params[6] = AVRCP_EVENT_SETTINGS_CHANGED;
- 
- 		pdu->params_len = htons(2 + pdu->params[1]);
- 		return AVC_CTYPE_STABLE;
-@@ -1011,6 +1045,14 @@ static uint64_t player_get_uid(struct avrcp_player *player)
- 	return player->cb->get_uid(player->user_data);
- }
- 
-+static GList *player_list_settings(struct avrcp_player *player)
-+{
-+	if (player == NULL)
-+		return NULL;
-+
-+	return player->cb->list_settings(player->user_data);
-+}
-+
- static uint8_t avrcp_handle_register_notification(struct avrcp *session,
- 						struct avrcp_header *pdu,
- 						uint8_t transaction)
-@@ -1018,6 +1060,7 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
- 	struct avrcp_player *player = session->player;
- 	uint16_t len = ntohs(pdu->params_len);
- 	uint64_t uid;
-+	GList *settings;
- 
- 	/*
- 	 * 1 byte for EventID, 4 bytes for Playback interval but the latest
-@@ -1043,6 +1086,23 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
- 	case AVRCP_EVENT_TRACK_REACHED_START:
- 		len = 1;
- 		break;
-+	case AVRCP_EVENT_SETTINGS_CHANGED:
-+		settings = player_list_settings(player);
-+
-+		pdu->params[++len] = g_list_length(settings);
-+		for (; settings; settings = settings->next) {
-+			uint8_t attr = GPOINTER_TO_UINT(settings->data);
-+			int val;
-+
-+			val = player_get_attribute(player, attr);
-+			if (val < 0)
-+				continue;
-+
-+			pdu->params[++len] = attr;
-+			pdu->params[++len] = val;
-+		}
-+
-+		break;
- 	default:
- 		/* All other events are not supported yet */
- 		goto err;
-diff --git a/audio/avrcp.h b/audio/avrcp.h
-index 31fdf8d..7f54adb 100644
---- a/audio/avrcp.h
-+++ b/audio/avrcp.h
-@@ -73,10 +73,12 @@
- #define AVRCP_EVENT_TRACK_CHANGED	0x02
- #define AVRCP_EVENT_TRACK_REACHED_END	0x03
- #define AVRCP_EVENT_TRACK_REACHED_START	0x04
-+#define AVRCP_EVENT_SETTINGS_CHANGED	0x08
- #define AVRCP_EVENT_VOLUME_CHANGED	0x0d
- #define AVRCP_EVENT_LAST		AVRCP_EVENT_VOLUME_CHANGED
- 
- struct avrcp_player_cb {
-+	GList *(*list_settings) (void *user_data);
- 	int (*get_setting) (uint8_t attr, void *user_data);
- 	int (*set_setting) (uint8_t attr, uint8_t value, void *user_data);
- 	uint64_t (*get_uid) (void *user_data);
-diff --git a/audio/media.c b/audio/media.c
-index 28ed942..7abf077 100644
---- a/audio/media.c
-+++ b/audio/media.c
-@@ -1194,6 +1194,18 @@ static const char *metadata_to_str(uint32_t id)
- 	return NULL;
- }
- 
-+static GList *list_settings(void *user_data)
-+{
-+	struct media_player *mp = user_data;
-+
-+	DBG("");
-+
-+	if (mp->settings == NULL)
-+		return NULL;
-+
-+	return g_hash_table_get_keys(mp->settings);
-+}
-+
- static int get_setting(uint8_t attr, void *user_data)
- {
- 	struct media_player *mp = user_data;
-@@ -1344,6 +1356,7 @@ static void set_volume(uint8_t volume, struct audio_device *dev, void *user_data
- }
- 
- static struct avrcp_player_cb player_cb = {
-+	.list_settings = list_settings,
- 	.get_setting = get_setting,
- 	.set_setting = set_setting,
- 	.list_metadata = list_metadata,
-@@ -1427,8 +1440,9 @@ static gboolean set_player_property(struct media_player *mp, const char *key,
- 							DBusMessageIter *entry)
- {
- 	DBusMessageIter var;
--	const char *value;
-+	const char *value, *curval;
- 	int attr, val;
-+	GList *settings;
- 
- 	if (dbus_message_iter_get_arg_type(entry) != DBUS_TYPE_VARIANT)
- 		return FALSE;
-@@ -1454,11 +1468,21 @@ static gboolean set_player_property(struct media_player *mp, const char *key,
- 	if (val < 0)
+-	DBG("code %u", code);
+-
+ 	if (code != AVC_CTYPE_ACCEPTED)
  		return FALSE;
  
-+	curval = g_hash_table_lookup(mp->settings, GUINT_TO_POINTER(attr));
-+	if (g_strcmp0(curval, value) == 0)
-+		return TRUE;
-+
- 	DBG("%s=%s", key, value);
+@@ -1315,8 +1294,6 @@ int avctp_send_passthrough(struct avctp *session, uint8_t op)
+ {
+ 	uint8_t operands[2];
  
- 	g_hash_table_replace(mp->settings, GUINT_TO_POINTER(attr),
- 						GUINT_TO_POINTER(val));
- 
-+	settings = list_settings(mp);
-+
-+	avrcp_player_event(mp->player, AVRCP_EVENT_SETTINGS_CHANGED, settings);
-+
-+	g_list_free(settings);
-+
- 	return TRUE;
- }
- 
+-	DBG("");
+-
+ 	/* Button pressed */
+ 	operands[0] = op & 0x7f;
+ 	operands[1] = 0;
 -- 
 1.7.11.7
 
