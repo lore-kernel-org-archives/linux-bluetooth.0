@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 07/11] Bluetooth: AMP: Process Disc Physical Link Complete evt
-Date: Thu, 25 Oct 2012 15:20:48 +0300
-Message-Id: <1351167652-12346-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 08/11] Bluetooth: AMP: Remove hci_conn receiving error command status
+Date: Thu, 25 Oct 2012 15:20:49 +0300
+Message-Id: <1351167652-12346-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1351167652-12346-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1350493622.26318.114.camel@aeonflux>
  <1351167652-12346-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,58 +12,47 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add processing for HCI Disconnection Physical Link Complete Event.
+When receiving HCI Event: Command Status for Create Physical Link
+with Error code remove AMP hcon.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_event.c |   26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ net/bluetooth/hci_event.c |   17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 3dae3ac..14c5f3f 100644
+index 14c5f3f..827243d 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -3759,6 +3759,28 @@ unlock:
- 	hci_dev_unlock(hdev);
- }
+@@ -1803,14 +1803,23 @@ static void hci_cs_create_phylink(struct hci_dev *hdev, u8 status)
  
-+static void hci_disconn_phylink_complete_evt(struct hci_dev *hdev,
-+					     struct sk_buff *skb)
-+{
-+	struct hci_ev_disconn_phy_link_complete *ev = (void *) skb->data;
-+	struct hci_conn *hcon;
-+
-+	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
-+
-+	if (ev->status)
-+		return;
-+
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+ 
+-	if (status)
+-		return;
+-
+ 	cp = hci_sent_cmd_data(hdev, HCI_OP_CREATE_PHY_LINK);
+ 	if (!cp)
+ 		return;
+ 
+-	amp_write_remote_assoc(hdev, cp->phy_handle);
 +	hci_dev_lock(hdev);
 +
-+	hcon = hci_conn_hash_lookup_handle(hdev, ev->phy_handle);
-+	if (hcon) {
-+		hcon->state = BT_CLOSED;
-+		hci_conn_del(hcon);
++	if (status) {
++		struct hci_conn *hcon;
++
++		hcon = hci_conn_hash_lookup_handle(hdev, cp->phy_handle);
++		if (hcon)
++			hci_conn_del(hcon);
++	} else {
++		amp_write_remote_assoc(hdev, cp->phy_handle);
 +	}
 +
 +	hci_dev_unlock(hdev);
-+}
-+
- static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
-@@ -4098,6 +4120,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_disconn_loglink_complete_evt(hdev, skb);
- 		break;
+ }
  
-+	case HCI_EV_DISCONN_PHY_LINK_COMPLETE:
-+		hci_disconn_phylink_complete_evt(hdev, skb);
-+		break;
-+
- 	case HCI_EV_NUM_COMP_BLOCKS:
- 		hci_num_comp_blocks_evt(hdev, skb);
- 		break;
+ static void hci_cs_accept_phylink(struct hci_dev *hdev, u8 status)
 -- 
 1.7.9.5
 
