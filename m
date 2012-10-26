@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v9 1/5] doc: Update settings-storage.txt
-Date: Fri, 26 Oct 2012 12:08:13 +0200
-Message-Id: <1351246097-22285-1-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v8 1/5] doc: Update settings-storage.txt
+Date: Fri, 26 Oct 2012 11:25:01 +0200
+Message-Id: <1351243505-20702-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
