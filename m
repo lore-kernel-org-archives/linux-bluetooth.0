@@ -1,187 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 26 Oct 2012 10:01:01 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv1 05/11] Bluetooth: AMP: Add Logical Link Create function
-In-Reply-To: <1351167652-12346-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Message-ID: <alpine.DEB.2.02.1210260958240.2459@mathewm-linux>
-References: <1350493622.26318.114.camel@aeonflux> <1351167652-12346-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1351167652-12346-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: vinicius.gomes@openbossa.org, claudio.takahasi@openbossa.org,
+	=?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+Subject: [PATCH BlueZ] hog: Fix selecting suspend backend
+Date: Fri, 26 Oct 2012 12:05:33 -0300
+Message-Id: <1351263933-21676-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+The dummy backend was always being compiled and the --with-hog-suspend
+option was not being accepted by configure. Now the backend can be
+selected with --with-hog-suspend and the suspend implementation file is
+generated during compile time.
+---
+ .gitignore   | 1 +
+ Makefile.am  | 5 ++++-
+ acinclude.m4 | 2 +-
+ 3 files changed, 6 insertions(+), 2 deletions(-)
 
-Hi Andrei -
+diff --git a/.gitignore b/.gitignore
+index b5c7356..27c4687 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -35,6 +35,7 @@ scripts/bluetooth.rules
+ scripts/97-bluetooth.rules
+ scripts/97-bluetooth-hid2hci.rules
+ 
++profiles/input/suspend.c
+ profiles/sap/sap.c
+ profiles/cups/bluetooth
+ 
+diff --git a/Makefile.am b/Makefile.am
+index 35b1520..f4bc96f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -184,7 +184,10 @@ if HOGPLUGIN
+ builtin_modules += hog
+ builtin_sources += profiles/input/hog_manager.c profiles/input/hog_device.h \
+ 			profiles/input/hog_device.c profiles/input/uhid_copy.h \
+-			profiles/input/suspend-dummy.c profiles/input/suspend.h
++			profiles/input/suspend.h
++builtin_nodist += profiles/input/suspend.c
++
++EXTRA_DIST += profiles/input/suspend-dummy.c
+ endif
+ 
+ if NETWORKPLUGIN
+diff --git a/acinclude.m4 b/acinclude.m4
+index 4bac3f0..ddc8183 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -290,7 +290,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 		wiimote_enable=${enableval}
+ 	])
+ 
+-	AC_ARG_WITH(gatt, AC_HELP_STRING([--with-hog-suspend=DRIVER], [select HoG suspend driver]), [
++	AC_ARG_WITH(hog_suspend, AC_HELP_STRING([--with-hog-suspend=DRIVER], [select HoG suspend driver]), [
+ 		hog_suspend_driver=${withval}
+ 	])
+ 
+-- 
+1.7.11.7
 
-On Thu, 25 Oct 2012, Andrei Emeltchenko wrote:
-
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> After physical link is created logical link needs to be created.
-> The process starts after L2CAP channel is created and L2CAP
-> Configuration Response with result PENDING is received.
->
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
-> include/net/bluetooth/amp.h |    1 +
-> net/bluetooth/amp.c         |   49 +++++++++++++++++++++++++++++++++++++++++++
-> net/bluetooth/hci_event.c   |    9 ++++++++
-> net/bluetooth/l2cap_core.c  |   17 +++++++++++----
-> 4 files changed, 72 insertions(+), 4 deletions(-)
->
-> diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
-> index 2e7c79e..70d5c15 100644
-> --- a/include/net/bluetooth/amp.h
-> +++ b/include/net/bluetooth/amp.h
-> @@ -46,5 +46,6 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
-> 			struct hci_conn *hcon);
-> void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle);
-> void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle);
-> +void amp_create_logical_link(struct l2cap_chan *chan);
->
-> #endif /* __AMP_H */
-> diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-> index 231d7ef..fbb6360 100644
-> --- a/net/bluetooth/amp.c
-> +++ b/net/bluetooth/amp.c
-> @@ -372,3 +372,52 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
->
-> 	hci_send_cmd(hdev, HCI_OP_ACCEPT_PHY_LINK, sizeof(cp), &cp);
-> }
-> +
-> +void amp_create_logical_link(struct l2cap_chan *chan)
-> +{
-> +	struct hci_cp_create_accept_logical_link cp;
-> +	struct hci_conn *hcon;
-> +	struct hci_dev *hdev;
-> +
-> +	BT_DBG("chan %p", chan);
-> +
-> +	if (!chan->hs_hcon)
-> +		return;
-> +
-> +	hdev = hci_dev_hold(chan->hs_hcon->hdev);
-> +	if (!hdev)
-> +		return;
-> +
-> +	BT_DBG("chan %p ctrl_id %d dst %pMR", chan, chan->ctrl_id,
-> +	       chan->conn->dst);
-> +
-> +	hcon = hci_conn_hash_lookup_ba(hdev, AMP_LINK, chan->conn->dst);
-> +	if (!hcon)
-> +		goto done;
-> +
-> +	cp.phy_handle = hcon->handle;
-> +
-> +	cp.tx_flow_spec.id = chan->local_id;
-> +	cp.tx_flow_spec.stype = chan->local_stype;
-> +	cp.tx_flow_spec.msdu = cpu_to_le16(chan->local_msdu);
-> +	cp.tx_flow_spec.sdu_itime = cpu_to_le32(chan->local_sdu_itime);
-> +	cp.tx_flow_spec.acc_lat = cpu_to_le32(chan->local_acc_lat);
-> +	cp.tx_flow_spec.flush_to = cpu_to_le32(chan->local_flush_to);
-> +
-> +	cp.rx_flow_spec.id = chan->remote_id;
-> +	cp.rx_flow_spec.stype = chan->remote_stype;
-> +	cp.rx_flow_spec.msdu = cpu_to_le16(chan->remote_msdu);
-> +	cp.rx_flow_spec.sdu_itime = cpu_to_le32(chan->remote_sdu_itime);
-> +	cp.rx_flow_spec.acc_lat = cpu_to_le32(chan->remote_acc_lat);
-> +	cp.rx_flow_spec.flush_to = cpu_to_le32(chan->remote_flush_to);
-> +
-> +	if (hcon->out)
-> +		hci_send_cmd(hdev, HCI_OP_CREATE_LOGICAL_LINK, sizeof(cp),
-> +			     &cp);
-> +	else
-> +		hci_send_cmd(hdev, HCI_OP_ACCEPT_LOGICAL_LINK, sizeof(cp),
-> +			     &cp);
-> +
-> +done:
-> +	hci_dev_put(hdev);
-> +}
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 00021cb..2c562a7 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -1829,6 +1829,11 @@ static void hci_cs_accept_phylink(struct hci_dev *hdev, u8 status)
-> 	amp_write_remote_assoc(hdev, cp->phy_handle);
-> }
->
-> +static void hci_cs_create_logical_link(struct hci_dev *hdev, u8 status)
-> +{
-> +	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-> +}
-> +
-> static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> {
-> 	__u8 status = *((__u8 *) skb->data);
-> @@ -2663,6 +2668,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> 		hci_cs_accept_phylink(hdev, ev->status);
-> 		break;
->
-> +	case HCI_OP_CREATE_LOGICAL_LINK:
-> +		hci_cs_create_logical_link(hdev, ev->status);
-> +		break;
-> +
-> 	default:
-> 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
-> 		break;
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index d1728af..8e1525f 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -38,6 +38,7 @@
-> #include <net/bluetooth/l2cap.h>
-> #include <net/bluetooth/smp.h>
-> #include <net/bluetooth/a2mp.h>
-> +#include <net/bluetooth/amp.h>
->
-> bool disable_ertm;
->
-> @@ -1013,6 +1014,12 @@ static bool __amp_capable(struct l2cap_chan *chan)
-> 		return false;
-> }
->
-> +static bool l2cap_check_efs(struct l2cap_chan *chan)
-> +{
-> +	/* Check EFS parameters */
-> +	return true;
-> +}
-> +
-> void l2cap_send_conn_req(struct l2cap_chan *chan)
-> {
-> 	struct l2cap_conn *conn = chan->conn;
-> @@ -3948,13 +3955,15 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
-> 				goto done;
-> 			}
->
-> -			/* check compatibility */
-> -
-> 			if (!chan->ctrl_id)
-> 				l2cap_send_efs_conf_rsp(chan, buf, cmd->ident,
-> 							0);
-> -			else
-> -				chan->ident = cmd->ident;
-> +			else {
-> +				if (l2cap_check_efs(chan)) {
-> +					amp_create_logical_link(chan);
-> +					chan->ident = cmd->ident;
-> +				}
-> +			}
-
-Minor style issue - if one block of an if/else needs braces, then they 
-all get braces.
-
-> 		}
-> 		goto done;
->
-> -- 
-> 1.7.9.5
-
-
---
-Mat Martineau
-
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, hosted by The Linux Foundation
