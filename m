@@ -2,161 +2,62 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v8 2/5] device: Retrieve name from storage
-Date: Fri, 26 Oct 2012 11:25:02 +0200
-Message-Id: <1351243505-20702-2-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v8 3/5] dbusoob: Set device name in device object
+Date: Fri, 26 Oct 2012 11:25:03 +0200
+Message-Id: <1351243505-20702-3-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1351243505-20702-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1351243505-20702-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Try to retrieve name from device info file.
-If that fails fall back to the cache and save it to device info file.
-
-When device name is updated, save it.
 ---
- src/device.c |   99 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 98 insertions(+), 1 deletion(-)
+ plugins/dbusoob.c |   11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index bc7f8dd..d27fd31 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -76,6 +76,9 @@
- #define DISCONNECT_TIMER	2
- #define DISCOVERY_TIMER		2
- 
-+#define INFO_PATH STORAGEDIR "/%s/%s/info"
-+#define CACHE_PATH STORAGEDIR "/%s/cache/%s"
-+
- struct btd_disconnect_data {
- 	guint id;
- 	disconnect_watch watch;
-@@ -202,6 +205,33 @@ static uint16_t uuid_list[] = {
- 	0
- };
- 
-+static void store_device_info(struct btd_device *device)
-+{
-+	GKeyFile *key_file;
-+	char filename[PATH_MAX + 1];
-+	char adapter_addr[18];
-+	char device_addr[18];
-+	char *str;
-+	gsize length = 0;
-+
-+	key_file = g_key_file_new();
-+
-+	g_key_file_set_string(key_file, "General", "Name", device->name);
-+
-+	ba2str(adapter_get_address(device->adapter), adapter_addr);
-+	ba2str(&device->bdaddr, device_addr);
-+	snprintf(filename, PATH_MAX, INFO_PATH, adapter_addr, device_addr);
-+	filename[PATH_MAX] = '\0';
-+
-+	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-+
-+	str = g_key_file_to_data(key_file, &length, NULL);
-+	g_file_set_contents(filename, str, length, NULL);
-+	g_free(str);
-+
-+	g_key_file_free(key_file);
-+}
-+
- static void browse_request_free(struct browse_req *req)
- {
- 	if (req->listener_id)
-@@ -1564,6 +1594,70 @@ static void device_set_version(struct btd_device *device, uint16_t value)
- 						DEVICE_INTERFACE, "Version");
+diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
+index 5c5b6ef..82cd304 100644
+--- a/plugins/dbusoob.c
++++ b/plugins/dbusoob.c
+@@ -191,9 +191,11 @@ static gboolean parse_data(DBusMessageIter *data, struct oob_data *remote_data)
+ 	return TRUE;
  }
  
-+static char *load_cached_name(struct btd_device *device, const char *local,
-+				const gchar *peer)
-+{
-+	char filename[PATH_MAX + 1];
-+	GKeyFile *key_file;
-+	char *str = NULL;
-+	int len;
-+
-+	snprintf(filename, PATH_MAX, CACHE_PATH, local, peer);
-+	filename[PATH_MAX] = '\0';
-+
-+	key_file = g_key_file_new();
-+
-+	if (!g_key_file_load_from_file(key_file, filename, 0, NULL))
-+		goto failed;
-+
-+	str = g_key_file_get_string(key_file, "General", "Name", NULL);
-+	if (str) {
-+		len = strlen(str);
-+		if (len > HCI_MAX_NAME_LENGTH)
-+			str[HCI_MAX_NAME_LENGTH] = '\0';
-+	}
-+
-+failed:
-+	g_key_file_free(key_file);
-+
-+	return str;
-+}
-+
-+static void load_info(struct btd_device *device, const gchar *local,
-+			const gchar *peer)
-+{
-+	char filename[PATH_MAX + 1];
-+	GKeyFile *key_file;
-+	char *str;
-+	gboolean store_needed = FALSE;
-+
-+	snprintf(filename, PATH_MAX, INFO_PATH, local, peer);
-+	filename[PATH_MAX] = '\0';
-+
-+	key_file = g_key_file_new();
-+	g_key_file_load_from_file(key_file, filename, 0, NULL);
-+
-+	/* Load device name from storage info file, if that fails fall back to
-+	 * the cache.
-+	 */
-+	str = g_key_file_get_string(key_file, "General", "Name", NULL);
-+	if (str == NULL) {
-+		str = load_cached_name(device, local, peer);
-+		if (str)
-+			store_needed = TRUE;
-+	}
-+
-+	if (str) {
-+		strcpy(device->name, str);
-+		g_free(str);
-+	}
-+
-+	if (store_needed)
-+		store_device_info(device);
-+
-+	g_key_file_free(key_file);
-+}
-+
- struct btd_device *device_create(struct btd_adapter *adapter,
- 				const gchar *address, uint8_t bdaddr_type)
+-static gboolean store_data(struct btd_adapter *adapter, struct oob_data *data)
++static gboolean store_data(struct btd_adapter *adapter, const char *address,
++				struct oob_data *data)
  {
-@@ -1600,7 +1694,8 @@ struct btd_device *device_create(struct btd_adapter *adapter,
- 	src = adapter_get_address(adapter);
- 	ba2str(src, srcaddr);
+ 	bdaddr_t bdaddr;
++	struct btd_device *device;
  
--	read_device_name(srcaddr, address, bdaddr_type, device->name);
-+	load_info(device, srcaddr, address);
+ 	str2ba(data->addr, &bdaddr);
+ 
+@@ -203,13 +205,14 @@ static gboolean store_data(struct btd_adapter *adapter, struct oob_data *data)
+ 			return FALSE;
+ 	}
+ 
++	device = adapter_get_device(adapter, address);
 +
- 	if (read_device_alias(srcaddr, address, bdaddr_type, alias,
- 							sizeof(alias)) == 0)
- 		device->alias = g_strdup(alias);
-@@ -1640,6 +1735,8 @@ void device_set_name(struct btd_device *device, const char *name)
+ 	if (data->class)
+ 		write_remote_class(adapter_get_address(adapter), &bdaddr,
+ 								data->class);
  
- 	strncpy(device->name, name, MAX_NAME_LENGTH);
+ 	if (data->name)
+-		write_device_name(adapter_get_address(adapter), &bdaddr, 0,
+-								data->name);
++		device_set_name(device, data->name);
  
-+	store_device_info(device);
-+
- 	g_dbus_emit_property_changed(btd_get_dbus_connection(), device->path,
- 						DEVICE_INTERFACE, "Name");
+ 	return TRUE;
+ }
+@@ -245,7 +248,7 @@ static DBusMessage *add_remote_data(DBusConnection *conn, DBusMessage *msg,
+ 	if (!parse_data(&data, &remote_data))
+ 		return btd_error_invalid_args(msg);
  
+-	if (!store_data(adapter, &remote_data))
++	if (!store_data(adapter, remote_data.addr, &remote_data))
+ 		return btd_error_failed(msg, "Request failed");
+ 
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
 -- 
 1.7.9.5
 
