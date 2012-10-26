@@ -1,58 +1,121 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v3 00/10] mSBC tests
-Date: Fri, 26 Oct 2012 19:20:26 +0200
-Message-Id: <1351272036-4875-1-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Fri, 26 Oct 2012 10:16:53 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv1 03/11] Bluetooth: AMP: Process Physical Link Complete
+ evt
+In-Reply-To: <1351167652-12346-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <alpine.DEB.2.02.1210261012440.2459@mathewm-linux>
+References: <1350493622.26318.114.camel@aeonflux> <1351167652-12346-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1351167652-12346-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
 
-v3 integrate latest comments from Marcel, hope it is fine now!
+Andrei -
 
-How to use:
-sample.au should be an .au audio file 16000hz 16bits 1 channel pcm.
-$ src/sbcenc  -m -b26 -B16 -s8   sample.au > sample.au.msbc
-$ src/sbcinfo sample.au.msbc
-$ src/sbcdec  -m -f sample.au.msbc.au sample.au.msbc
-$ mplayer sample.au.msbc.au
+On Thu, 25 Oct 2012, Andrei Emeltchenko wrote:
 
-Regards,
-Frederic
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> Add processing for HCI Physical Link Complete event. Upon
+> successful status received start L2CAP create channel process.
+>
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+> net/bluetooth/hci_event.c |   55 +++++++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 55 insertions(+)
+>
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index aae8053..183d8bd 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -3637,6 +3637,57 @@ unlock:
+> 	hci_dev_unlock(hdev);
+> }
+>
+> +static void hci_phy_link_complete_evt(struct hci_dev *hdev,
+> +				      struct sk_buff *skb)
+> +{
+> +	struct hci_ev_phy_link_complete *ev = (void *) skb->data;
+> +	struct hci_conn *hcon, *bredr_hcon;
+> +
+> +	BT_DBG("%s handle 0x%2.2x status 0x%2.2x", hdev->name, ev->phy_handle,
+> +	       ev->status);
+> +
+> +	hci_dev_lock(hdev);
+> +
+> +	hcon = hci_conn_hash_lookup_handle(hdev, ev->phy_handle);
+> +	if (!hcon) {
+> +		hci_dev_unlock(hdev);
+> +		return;
+> +	}
+> +
+> +	if (ev->status) {
+> +		hci_conn_del(hcon);
+> +		hci_dev_unlock(hdev);
+> +		return;
+> +	}
+> +
+> +	bredr_hcon = hcon->amp_mgr->l2cap_conn->hcon;
+> +
+> +	hcon->state = BT_CONNECTED;
+> +	bacpy(&hcon->dst, &bredr_hcon->dst);
+> +
+> +	hci_conn_hold(hcon);
+> +	hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
+> +	hci_conn_put(hcon);
+> +
+> +	hci_conn_hold_device(hcon);
+> +	hci_conn_add_sysfs(hcon);
+> +
+> +	hci_dev_unlock(hdev);
+> +
+> +	if (hcon->out) {
+> +		struct hci_dev *bredr_hdev = hci_dev_hold(bredr_hcon->hdev);
+> +
+> +		if (!bredr_hdev)
+> +			return;
+> +
+> +		/* Placeholder - create chan req
+> +		l2cap_chan_create_cfm(bredr_hcon, hcon->remote_id);
+> +		*/
+
+I think this is where you would call l2cap_physical_cfm(), but that 
+function requires more information.  Is there enough context in hcon 
+to get the local amp ID and l2cap_chan, or does the AMP manager need 
+to be notified of the physical link so it can match up the physical 
+link with other information?
+
+> +
+> +		hci_dev_put(bredr_hdev);
+> +	}
+> +}
+> +
+> static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> {
+> 	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
+> @@ -3964,6 +4015,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+> 		hci_remote_oob_data_request_evt(hdev, skb);
+> 		break;
+>
+> +	case HCI_EV_PHY_LINK_COMPLETE:
+> +		hci_phy_link_complete_evt(hdev, skb);
+> +		break;
+> +
+> 	case HCI_EV_NUM_COMP_BLOCKS:
+> 		hci_num_comp_blocks_evt(hdev, skb);
+> 		break;
+> -- 
+> 1.7.9.5
 
 
-Frédéric Dalleau (10):
-  sbc: Add encoder_state to process input functions
-  sbc: Add encoder_state to analysis functions
-  sbc: Break 4 blocks processing to variable steps
-  sbc: Add msbc flag and generic C primitive
-  sbc: Add support for mSBC frame header
-  sbc: Add mmx primitive for 1b 8s analyse
-  sbc: Update sbcdec for msbc
-  sbc: Update sbcenc for msbc
-  sbc: Update sbcinfo for msbc
-  sbc: Update copyrights
+--
+Mat Martineau
 
- sbc/sbc.c                   |  275 ++++++++++++++++++++++++++-----------------
- sbc/sbc.h                   |    3 +
- sbc/sbc_primitives.c        |  105 +++++++++++++----
- sbc/sbc_primitives.h        |   23 ++--
- sbc/sbc_primitives_armv6.c  |    6 +-
- sbc/sbc_primitives_iwmmxt.c |    8 +-
- sbc/sbc_primitives_mmx.c    |   27 ++++-
- sbc/sbc_primitives_neon.c   |   40 +++----
- src/sbcdec.c                |   18 ++-
- src/sbcenc.c                |   26 +++-
- src/sbcinfo.c               |   52 +++++---
- 11 files changed, 392 insertions(+), 191 deletions(-)
-
--- 
-1.7.9.5
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, hosted by The Linux Foundation
 
