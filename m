@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v9 4/5] input: Retrieve device name from device object
-Date: Fri, 26 Oct 2012 12:08:16 +0200
-Message-Id: <1351246097-22285-4-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v9 3/5] dbusoob: Set device name in device object
+Date: Fri, 26 Oct 2012 12:08:15 +0200
+Message-Id: <1351246097-22285-3-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1351246097-22285-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1351246097-22285-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -12,36 +12,52 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- profiles/input/device.c |    9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ plugins/dbusoob.c |   11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index fbc3d6f..108be39 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -777,7 +777,7 @@ static struct input_device *input_device_new(struct btd_device *device,
+diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
+index 5c5b6ef..82cd304 100644
+--- a/plugins/dbusoob.c
++++ b/plugins/dbusoob.c
+@@ -191,9 +191,11 @@ static gboolean parse_data(DBusMessageIter *data, struct oob_data *remote_data)
+ 	return TRUE;
+ }
+ 
+-static gboolean store_data(struct btd_adapter *adapter, struct oob_data *data)
++static gboolean store_data(struct btd_adapter *adapter, const char *address,
++				struct oob_data *data)
  {
- 	struct btd_adapter *adapter = device_get_adapter(device);
- 	struct input_device *idev;
--	char name[249], src_addr[18], dst_addr[18];
-+	char name[HCI_MAX_NAME_LENGTH + 1];
+ 	bdaddr_t bdaddr;
++	struct btd_device *device;
  
- 	idev = g_new0(struct input_device, 1);
- 	bacpy(&idev->src, adapter_get_address(adapter));
-@@ -787,11 +787,8 @@ static struct input_device *input_device_new(struct btd_device *device,
- 	idev->handle = handle;
- 	idev->disable_sdp = disable_sdp;
+ 	str2ba(data->addr, &bdaddr);
  
--	ba2str(&idev->src, src_addr);
--	ba2str(&idev->dst, dst_addr);
--
--	if (read_device_name(src_addr, dst_addr, device_get_addr_type(device),
--				name) == 0)
-+	device_get_name(device, name, HCI_MAX_NAME_LENGTH);
-+	if (strlen(name) > 0)
- 		idev->name = g_strdup(name);
+@@ -203,13 +205,14 @@ static gboolean store_data(struct btd_adapter *adapter, struct oob_data *data)
+ 			return FALSE;
+ 	}
  
- 	if (g_dbus_register_interface(btd_get_dbus_connection(),
++	device = adapter_get_device(adapter, address);
++
+ 	if (data->class)
+ 		write_remote_class(adapter_get_address(adapter), &bdaddr,
+ 								data->class);
+ 
+ 	if (data->name)
+-		write_device_name(adapter_get_address(adapter), &bdaddr, 0,
+-								data->name);
++		device_set_name(device, data->name);
+ 
+ 	return TRUE;
+ }
+@@ -245,7 +248,7 @@ static DBusMessage *add_remote_data(DBusConnection *conn, DBusMessage *msg,
+ 	if (!parse_data(&data, &remote_data))
+ 		return btd_error_invalid_args(msg);
+ 
+-	if (!store_data(adapter, &remote_data))
++	if (!store_data(adapter, remote_data.addr, &remote_data))
+ 		return btd_error_failed(msg, "Request failed");
+ 
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
 -- 
 1.7.9.5
 
