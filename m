@@ -1,60 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH v0] network: Remove unnecessary field from connect_req
-Date: Fri, 26 Oct 2012 07:55:29 +0200
-Message-Id: <1351230929-4484-1-git-send-email-mikel.astiz.oss@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1351176228-5789-11-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1351176228-5789-1-git-send-email-andrzej.kaczmarek@tieto.com> <1351176228-5789-11-git-send-email-andrzej.kaczmarek@tieto.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Fri, 26 Oct 2012 02:49:35 -0200
+Message-ID: <CAMOw1v5iCL5j=m7n1PnyrCTXKeDES2uecuBw+gvzvCZ4WS1=WA@mail.gmail.com>
+Subject: Re: [RFC 10/18] cyclingspeed: Add DBus.Properties for
+ org.bluez.CyclingSpeed interface
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+On Thu, Oct 25, 2012 at 12:43 PM, Andrzej Kaczmarek
+<andrzej.kaczmarek@tieto.com> wrote:
+> ---
+>  profiles/cyclingspeed/cyclingspeed.c | 99 +++++++++++++++++++++++++++++++++++-
+>  1 file changed, 98 insertions(+), 1 deletion(-)
+>
+> diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
+> index f7ffd2e..4f48121 100644
+> --- a/profiles/cyclingspeed/cyclingspeed.c
+> +++ b/profiles/cyclingspeed/cyclingspeed.c
+> @@ -43,6 +43,7 @@
+>
+>  #define CYCLINGSPEED_MANAGER_INTERFACE "org.bluez.CyclingSpeedManager"
+>  #define CYCLINGSPEED_WATCHER_INTERFACE "org.bluez.CyclingSpeedWatcher"
+> +#define CYCLINGSPEED_INTERFACE         "org.bluez.CyclingSpeed"
+>
+>  #define WHEEL_REV_SUPPORT              0x01
+>  #define CRANK_REV_SUPPORT              0x02
+> @@ -102,6 +103,21 @@ struct characteristic {
+>
+>  static GSList *csc_adapters = NULL;
+>
+> +static const char * const location_enum[] = {
+> +       "other", "top-of-shoe", "in-shoe", "hip", "front-wheel", "left-crank",
+> +       "right-crank", "left-pedal", "right-pedal", "front-hub",
+> +       "rear-dropout", "chainstay", "rear-wheel", "rear-hub"
+> +};
+> +
+> +static const gchar *location2str(uint8_t value)
+> +{
+> +       if (value < G_N_ELEMENTS(location_enum))
+> +               return location_enum[value];
+> +
+> +       info("Body Sensor Location [%d] is RFU", value);
+> +       return location_enum[0];
+> +}
+> +
+>  static gint cmp_adapter(gconstpointer a, gconstpointer b)
+>  {
+>         const struct csc_adapter *cadapter = a;
+> @@ -687,6 +703,74 @@ void csc_adapter_unregister(struct btd_adapter *adapter)
+>                                         CYCLINGSPEED_MANAGER_INTERFACE);
+>  }
+>
+> +static gboolean property_get_location(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data)
+> +{
+> +       struct csc *csc = data;
+> +       char *loc;
+> +
+> +       if (!csc->has_location)
+> +               return FALSE;
+> +
+> +       loc = g_strdup(location2str(csc->location));
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &loc);
+> +
+> +       g_free(loc);
 
-The device pointer in struct connect_req can be completely removed since
-the callback already receives such pointer, and the network_peer takes
-care of the device refcounting.
----
- profiles/network/manager.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+you don't need to dup/free the string
 
-diff --git a/profiles/network/manager.c b/profiles/network/manager.c
-index ad52885..8d0dc4d 100644
---- a/profiles/network/manager.c
-+++ b/profiles/network/manager.c
-@@ -48,7 +48,6 @@
- static gboolean conf_security = TRUE;
- 
- struct connect_req {
--	struct btd_device	*device;
- 	struct btd_profile	*profile;
- 	btd_profile_cb		cb;
- };
-@@ -84,9 +83,7 @@ static void connect_profile_cb(struct btd_device *device, int err,
- {
- 	struct connect_req *req = data;
- 
--	req->cb(req->profile, req->device, err);
--
--	btd_device_unref(req->device);
-+	req->cb(req->profile, device, err);
- 
- 	g_free(req);
- }
-@@ -100,14 +97,12 @@ static int connect_profile(struct btd_device *dev, struct btd_profile *profile,
- 	DBG("path %s id %u", device_get_path(dev), id);
- 
- 	req  = g_new0(struct connect_req, 1);
--	req->device = btd_device_ref(dev);
- 	req->profile = profile;
- 	req->cb = cb;
- 
- 	err = connection_connect(dev, BNEP_SVC_PANU, NULL, connect_profile_cb,
- 									req);
- 	if (err < 0) {
--		btd_device_unref(req->device);
- 		g_free(req);
- 		return err;
- 	}
--- 
-1.7.11.7
-
+Lucas De Marchi
