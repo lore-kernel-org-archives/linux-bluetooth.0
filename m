@@ -1,44 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core: Fix memory leak
-Date: Fri, 26 Oct 2012 10:56:56 +0300
-Message-Id: <1351238216-7583-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 26 Oct 2012 10:44:36 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 07/11] AVRCP: Add initial support for controller
+ player
+Message-ID: <20121026074436.GA16896@x220>
+References: <1351173554-28039-1-git-send-email-luiz.dentz@gmail.com>
+ <1351173554-28039-7-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1351173554-28039-7-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-1,262 (64 direct, 1,198 indirect) bytes in 1 blocks are definitely lost in loss record 280 of 290
-   at 0x4A0881C: malloc (vg_replace_malloc.c:270)
-   by 0x4C813FE: g_malloc (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x4C95801: g_slice_alloc (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x4C95D55: g_slice_alloc0 (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x4C746AA: g_key_file_new (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x18136C: load_config (adapter.c:2620)
-   by 0x18353B: adapter_init (adapter.c:2708)
-   by 0x17E62E: btd_manager_register_adapter (manager.c:337)
-   by 0x191171: mgmt_event.part.36 (mgmt.c:1081)
-   by 0x4C7B824: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x4C7BB57: ??? (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x4C7BF51: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3200.4)
----
- src/adapter.c | 2 ++
- 1 file changed, 2 insertions(+)
+On Thu, Oct 25, 2012, Luiz Augusto von Dentz wrote:
+> This also bump controller record to 1.3.
+> ---
+>  Makefile.am    |   1 +
+>  audio/avrcp.c  | 686 +++++++++++++++++++++++++++++++++++++++++++++++++--------
+>  audio/player.c | 404 +++++++++++++++++++++++++++++++++
+>  audio/player.h |  46 ++++
+>  4 files changed, 1047 insertions(+), 90 deletions(-)
+>  create mode 100644 audio/player.c
+>  create mode 100644 audio/player.h
 
-diff --git a/src/adapter.c b/src/adapter.c
-index c7b8c7f..54b1a64 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2684,6 +2684,8 @@ static void load_config(struct btd_adapter *adapter)
- 	mgmt_set_connectable(adapter->dev_id, TRUE);
- 	mgmt_set_discoverable(adapter->dev_id, adapter->discoverable,
- 				adapter->discov_timeout);
-+
-+	g_key_file_free(key_file);
- }
- 
- gboolean adapter_init(struct btd_adapter *adapter, gboolean up)
--- 
-1.7.11.7
+I've applied patches 1-6 but this one is just huge. Isn't there some
+easy way you could split it up a bit? Also, the necessary D-Bus API
+documentation changes seem to be missing.
 
+Johan
