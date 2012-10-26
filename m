@@ -1,58 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
+	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core: Do not call the callback on btd_cancel_authorization
-Date: Fri, 26 Oct 2012 14:48:09 +0300
-Message-Id: <1351252089-19329-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH v9 5/5] hcitool: Retrieve names from cache directory
+Date: Fri, 26 Oct 2012 12:08:17 +0200
+Message-Id: <1351246097-22285-5-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1351246097-22285-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1351246097-22285-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-btd_cancel_authorization should work like g_source_remove and not attempt
-to reach the callback as its maybe already invalid or lead to double free
-situations such as this:
-
-Invalid write of size 4
-   at 0x13D480: connection_lost (avdtp.c:1102)
-   by 0x13F37A: session_cb (avdtp.c:2281)
-   by 0x4C7B824: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x4C7BB57: ??? (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x4C7BF51: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x122B21: main (main.c:551)
- Address 0x6512ac0 is 32 bytes inside a block of size 1,184 free'd
-   at 0x4A07786: free (vg_replace_malloc.c:446)
-   by 0x4C8150E: g_free (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x13D4A9: connection_lost (avdtp.c:1216)
-   by 0x13D55E: auth_cb (avdtp.c:2471)
-   by 0x17E99A: service_auth_cancel (adapter.c:1021)
-   by 0x183C67: btd_cancel_authorization (adapter.c:3358)
-   by 0x13D477: connection_lost (avdtp.c:1098)
-   by 0x13F37A: session_cb (avdtp.c:2281)
-   by 0x4C7B824: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x4C7BB57: ??? (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x4C7BF51: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3200.4)
-   by 0x122B21: main (main.c:551)
 ---
- src/adapter.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ Makefile.tools  |    2 +-
+ tools/hcitool.c |   31 ++++++++++++++++++++++++++-----
+ 2 files changed, 27 insertions(+), 6 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 54b1a64..32cc0a2 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3355,7 +3355,10 @@ int btd_cancel_authorization(guint id)
+diff --git a/Makefile.tools b/Makefile.tools
+index ec79cea..f7c85ef 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -28,7 +28,7 @@ tools_hciconfig_LDADD = lib/libbluetooth-private.la
  
- 	g_queue_remove(auth->adapter->auths, auth);
+ tools_hcitool_SOURCES = tools/hcitool.c src/oui.h src/oui.c \
+ 						src/textfile.h src/textfile.c
+-tools_hcitool_LDADD = lib/libbluetooth-private.la
++tools_hcitool_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@
  
--	service_auth_cancel(auth);
-+	if (auth->agent != NULL)
-+		agent_cancel(auth->agent);
+ tools_sdptool_SOURCES = tools/sdptool.c src/sdp-xml.h src/sdp-xml.c
+ tools_sdptool_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@
+diff --git a/tools/hcitool.c b/tools/hcitool.c
+index aefbd68..a05e31f 100644
+--- a/tools/hcitool.c
++++ b/tools/hcitool.c
+@@ -40,6 +40,8 @@
+ #include <sys/socket.h>
+ #include <signal.h>
+ 
++#include <glib.h>
 +
-+	g_free(auth);
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/hci.h>
+ #include <bluetooth/hci_lib.h>
+@@ -409,13 +411,32 @@ static char *major_classes[] = {
  
- 	return 0;
+ static char *get_device_name(const bdaddr_t *local, const bdaddr_t *peer)
+ {
+-	char filename[PATH_MAX + 1], addr[18];
++	char filename[PATH_MAX + 1];
++	char local_addr[18], peer_addr[18];
++	GKeyFile *key_file;
++	char *str = NULL;
++	int len;
++
++	ba2str(local, local_addr);
++	ba2str(peer, peer_addr);
++
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s", local_addr,
++			peer_addr);
++	filename[PATH_MAX] = '\0';
++	key_file = g_key_file_new();
++
++	if (g_key_file_load_from_file(key_file, filename, 0, NULL)) {
++		str = g_key_file_get_string(key_file, "General", "Name", NULL);
++		if (str) {
++			len = strlen(str);
++			if (len > HCI_MAX_NAME_LENGTH)
++				str[HCI_MAX_NAME_LENGTH] = '\0';
++		}
++	}
+ 
+-	ba2str(local, addr);
+-	create_name(filename, PATH_MAX, STORAGEDIR, addr, "names");
++	g_key_file_free(key_file);
+ 
+-	ba2str(peer, addr);
+-	return textfile_get(filename, addr);
++	return str;
  }
+ 
+ /* Display local devices */
 -- 
-1.7.11.7
+1.7.9.5
 
