@@ -1,142 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1351380893.25783.15.camel@aeonflux>
-Subject: Re: [RFC v2 1/2] Bluetooth: Add driver extension for vendor device
- setup
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Tedd Ho-Jeong An <tedd.an@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, albert.o.ho@intel.com,
-	johan.hedberg@intel.com, tedd.hj.an@gmail.com
-Date: Sat, 27 Oct 2012 16:34:53 -0700
-In-Reply-To: <2721081.2F6GJ3v4qE@tedd-ubuntu>
-References: <2721081.2F6GJ3v4qE@tedd-ubuntu>
-Content-Type: text/plain; charset="UTF-8"
+Date: Sun, 28 Oct 2012 02:29:42 +0300
+From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+To: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+Cc: =?UTF-8?B?RnLDqWTDqXJpYw==?= Dalleau
+	<frederic.dalleau@linux.intel.com>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 06/10] sbc: Add mmx primitive for 1b 8s analyse
+Message-ID: <20121028022942.3bcd1bd7@i7>
+In-Reply-To: <20121028020621.3653ac8e@i7>
+References: <1351272036-4875-1-git-send-email-frederic.dalleau@linux.intel.com>
+	<1351272036-4875-7-git-send-email-frederic.dalleau@linux.intel.com>
+	<20121028020621.3653ac8e@i7>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tedd,
+On Sun, 28 Oct 2012 02:06:21 +0300
+Siarhei Siamashka <siarhei.siamashka@gmail.com> wrote:
 
-> This patch provides an extension of btusb to support device vendor
-> can implement their own module like mini driver to execute device
-> specific setup before the BT stack sends generic BT device
-> initialization.
+> On Fri, 26 Oct 2012 19:20:32 +0200
+> Frédéric Dalleau  <frederic.dalleau@linux.intel.com> wrote:
 > 
-> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
-> ---
->  drivers/bluetooth/btusb.c        |  194 +++++++++++++++++++++++++-------------
->  drivers/bluetooth/btusb.h        |   53 +++++++++++
->  include/net/bluetooth/hci.h      |    2 +
->  include/net/bluetooth/hci_core.h |    8 ++
->  net/bluetooth/hci_core.c         |   28 +++++-
->  5 files changed, 220 insertions(+), 65 deletions(-)
->  create mode 100644 drivers/bluetooth/btusb.h
+> > ---
+> >  sbc/sbc_primitives_mmx.c |   18 +++++++++++++++++-
+> >  1 file changed, 17 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index f637c25..d3f8e7d 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -26,6 +26,7 @@
->  
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
-> +#include "btusb.h"
->  
->  #define VERSION "0.6"
->  
-> @@ -39,14 +40,52 @@ static bool reset = 1;
->  
->  static struct usb_driver btusb_driver;
->  
-> -#define BTUSB_IGNORE		0x01
-> -#define BTUSB_DIGIANSWER	0x02
-> -#define BTUSB_CSR		0x04
-> -#define BTUSB_SNIFFER		0x08
-> -#define BTUSB_BCM92035		0x10
-> -#define BTUSB_BROKEN_ISOC	0x20
-> -#define BTUSB_WRONG_SCO_MTU	0x40
-> -#define BTUSB_ATH3012		0x80
-> +/* CHECKME: supporting mini-driver requires changing usage of driver_info from
-> + * flags to static const struct. */
-> +static const struct btusb_driver_info generic = {
-> +	.description	= "BTUSB Generic",
-> +	.flags		= BTUSB_GENERIC,
-> +};
+> In the previous patches you are changing the behaviour of C
+> implementation to support mSBC configuration. By still allowing
+> assembly optimized implementations to override C functions, mSBC
+> does not work correctly for the architectures which support these
+> optimizations.
+> 
+> With this particular patch you are fixing MMX. The other
+> implementations (ARM NEON) are still broken.
+> 
+> It would be better if we could shape out this patch series so that
+> the code is always correct after every commit, preferably as:
+> 1. SBC still works and uses assembly optimizations after
+>    every commit
+> 2. mSBC works correctly after the commit where SBC_MSBC feature
+>    is advertised in the public header "sbc.h"
+> 3. mSBC gets assembly optimizations enabled. Unsupported architectures
+>    use C implementation.
+
+Just to make this work, your "[PATCH v3 04/10] sbc: Add msbc flag and
+generic C primitive" patch could update "sbc_init_primitives" in a
+bit different way.
+
+You changed it as:
+
+>  void sbc_init_primitives(struct sbc_encoder_state *state)
+>  {
+> +	state->pending = -1;
+> +	state->odd = 1;
 > +
-> +static const struct btusb_driver_info ignore = {
-> +	.description	= "BTUSB Ignore",
-> +	.flags		= BTUSB_IGNORE,
-> +};
+>  	/* Default implementation for analyze functions */
+>  	state->sbc_analyze_4b_4s = sbc_analyze_4b_4s_simd;
+> -	state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_simd;
 > +
-> +static const struct btusb_driver_info digianswer = {
-> +	.description	= "BTUSB DIGIANSWER",
-> +	.flags		= BTUSB_DIGIANSWER,
-> +};
-> +
-> +static const struct btusb_driver_info csr = {
-> +	.description	= "BTUSB CSR",
-> +	.flags		= BTUSB_CSR,
-> +};
-> +
-> +static const struct btusb_driver_info sniffer = {
-> +	.description	= "BTUSB Sniffer",
-> +	.flags		= BTUSB_SNIFFER,
-> +};
-> +
-> +static const struct btusb_driver_info bcm92035 = {
-> +	.description	= "BTUSB BCM92035",
-> +	.flags		= BTUSB_BCM92035,
-> +};
-> +
-> +static const struct btusb_driver_info broken_isoc = {
-> +	.description	= "BTUSB Broken ISOC",
-> +	.flags		= BTUSB_BROKEN_ISOC,
-> +};
-> +
-> +static const struct btusb_driver_info wrong_sco_mtu = {
-> +	.description	= "BTUSB Wrong SCO MTU",
-> +	.flags		= BTUSB_WRONG_SCO_MTU,
-> +};
-> +
-> +static const struct btusb_driver_info ath3012 = {
-> +	.description	= "BTUSB Ath3012",
-> +	.flags		= BTUSB_ATH3012,
-> +};
+> +	if (state->increment == 1)
+> +		state->sbc_analyze_4b_8s = sbc_analyze_1b_8s_simd;
+> +	else
+> +		state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_simd;
 
-I do not get why are you doing this. Didn't I mention last time to not
-touch the blacklist handling?
+But it might be better to move "if (state->increment == 1)" check to
+the very end of the function after
 
-You do realize that the exported btusb_probe() does not have to be the
-same one as what btusb.ko itself provides as probe callback. Trying to
-squeeze the usb_device_id from btusb.ko and eventual external drivers
-into the same structure is just bloating the code.
+	/* X86/AMD64 optimizations */
+#ifdef SBC_BUILD_WITH_MMX_SUPPORT
+	sbc_init_primitives_mmx(state);
+#endif
 
-Keep in mind that due to the USB_DEVICE_INFO(0xe0, 0x01, 0x01) matching
-rule we need to actually blacklist all vendor drivers in btusb.ko anyway
-and thus a simple BTUSB_IGNORE now turns into something nasty like
-declaring a btusb_driver_info struct. I rather avoid that.
-
-It is actually pretty important that a public exported btusb_probe()
-really only does what we would expect from a default H:2 probe handler
-and not any quirk handling. The existing quirks are internal to btusb.ko
-and should not be inherited by any vendor driver.
-
-So btusb_driver struct can easily use a btusb_probe_one() function that
-does the quirk handling and then call btusb_probe(). Or just something
-similar to that extend.
-
-Bottom line, please do not make the code more complicated because it
-looks easy now. It will backfire at some point. We need to make handling
-vendor drivers easier by keeping the core H:2 driver simple.
-
-Another option here is to have some convenience macros like
-BTUSB_DEVICE_IGNORE(0x0a5c, 0x2033) that turn the code readable again.
-
-And while you are at it, please split the mini-driver support changes
-from actually modifying the HCI core. I like to have this as two
-patches.
-
-Regards
-
-Marcel
+	/* ARM optimizations */
+#ifdef SBC_BUILD_WITH_ARMV6_SUPPORT
+	sbc_init_primitives_armv6(state);
+#endif
+#ifdef SBC_BUILD_WITH_IWMMXT_SUPPORT
+	sbc_init_primitives_iwmmxt(state);
+#endif
+#ifdef SBC_BUILD_WITH_NEON_SUPPORT
+	sbc_init_primitives_neon(state);
+#endif
 
 
+So that the C implementation overrides the function pointers for
+mSBC configuration after the initialization of mSBC-unaware assembly
+implementations.
+
+As soon as some assembly implementation gets mSBC support (MMX for
+example), the initialization order in "sbc_init_primitives" can be
+changed appropriately.
+
+-- 
+Best regards,
+Siarhei Siamashka
