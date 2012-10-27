@@ -1,424 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Cc: albert.o.ho@intel.com, johan.hedberg@intel.com, tedd.an@intel.com, tedd.hj.an@gmail.com
-Subject: [RFC v2 1/2] Bluetooth: Add driver extension for vendor device setup
-Date: Fri, 26 Oct 2012 18:23:13 -0700
-Message-ID: <2721081.2F6GJ3v4qE@tedd-ubuntu>
+Cc: albert.o.ho@intel.com, johan.hedberg@intel.com, tedd.hj.an@gmail.com, tedd.an@intel.com
+Subject: [RFC v2 2/2] Bluetooth: Add sample BT USB mini-driver
+Date: Fri, 26 Oct 2012 18:23:15 -0700
+Message-ID: <1642639.GigJRhv1iv@tedd-ubuntu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This patch provides an extension of btusb to support device vendor
-can implement their own module like mini driver to execute device
-specific setup before the BT stack sends generic BT device
-initialization.
+This patch adds sample BT USB mini-driver
 
 Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 ---
- drivers/bluetooth/btusb.c        |  194 +++++++++++++++++++++++++-------------
- drivers/bluetooth/btusb.h        |   53 +++++++++++
- include/net/bluetooth/hci.h      |    2 +
- include/net/bluetooth/hci_core.h |    8 ++
- net/bluetooth/hci_core.c         |   28 +++++-
- 5 files changed, 220 insertions(+), 65 deletions(-)
- create mode 100644 drivers/bluetooth/btusb.h
+ drivers/bluetooth/btusb.c        |    3 +
+ drivers/bluetooth/btusb_sample.c |  189 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 192 insertions(+)
+ create mode 100644 drivers/bluetooth/btusb_sample.c
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f637c25..d3f8e7d 100644
+index d3f8e7d..53024f0 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -26,6 +26,7 @@
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-+#include "btusb.h"
- 
- #define VERSION "0.6"
- 
-@@ -39,14 +40,52 @@ static bool reset = 1;
- 
- static struct usb_driver btusb_driver;
- 
--#define BTUSB_IGNORE		0x01
--#define BTUSB_DIGIANSWER	0x02
--#define BTUSB_CSR		0x04
--#define BTUSB_SNIFFER		0x08
--#define BTUSB_BCM92035		0x10
--#define BTUSB_BROKEN_ISOC	0x20
--#define BTUSB_WRONG_SCO_MTU	0x40
--#define BTUSB_ATH3012		0x80
-+/* CHECKME: supporting mini-driver requires changing usage of driver_info from
-+ * flags to static const struct. */
-+static const struct btusb_driver_info generic = {
-+	.description	= "BTUSB Generic",
-+	.flags		= BTUSB_GENERIC,
-+};
-+
-+static const struct btusb_driver_info ignore = {
-+	.description	= "BTUSB Ignore",
-+	.flags		= BTUSB_IGNORE,
-+};
-+
-+static const struct btusb_driver_info digianswer = {
-+	.description	= "BTUSB DIGIANSWER",
-+	.flags		= BTUSB_DIGIANSWER,
-+};
-+
-+static const struct btusb_driver_info csr = {
-+	.description	= "BTUSB CSR",
-+	.flags		= BTUSB_CSR,
-+};
-+
-+static const struct btusb_driver_info sniffer = {
-+	.description	= "BTUSB Sniffer",
-+	.flags		= BTUSB_SNIFFER,
-+};
-+
-+static const struct btusb_driver_info bcm92035 = {
-+	.description	= "BTUSB BCM92035",
-+	.flags		= BTUSB_BCM92035,
-+};
-+
-+static const struct btusb_driver_info broken_isoc = {
-+	.description	= "BTUSB Broken ISOC",
-+	.flags		= BTUSB_BROKEN_ISOC,
-+};
-+
-+static const struct btusb_driver_info wrong_sco_mtu = {
-+	.description	= "BTUSB Wrong SCO MTU",
-+	.flags		= BTUSB_WRONG_SCO_MTU,
-+};
-+
-+static const struct btusb_driver_info ath3012 = {
-+	.description	= "BTUSB Ath3012",
-+	.flags		= BTUSB_ATH3012,
-+};
- 
- static struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-@@ -105,90 +144,89 @@ static struct usb_device_id btusb_table[] = {
- 
- 	{ }	/* Terminating entry */
- };
--
- MODULE_DEVICE_TABLE(usb, btusb_table);
- 
- static struct usb_device_id blacklist_table[] = {
- 	/* CSR BlueCore devices */
--	{ USB_DEVICE(0x0a12, 0x0001), .driver_info = BTUSB_CSR },
-+	{ USB_DEVICE(0x0a12, 0x0001), .driver_info = (unsigned long) &csr },
- 
- 	/* Broadcom BCM2033 without firmware */
--	{ USB_DEVICE(0x0a5c, 0x2033), .driver_info = BTUSB_IGNORE },
-+	{ USB_DEVICE(0x0a5c, 0x2033), .driver_info = (unsigned long) &ignore },
- 
- 	/* Atheros 3011 with sflash firmware */
--	{ USB_DEVICE(0x0cf3, 0x3002), .driver_info = BTUSB_IGNORE },
--	{ USB_DEVICE(0x0cf3, 0xe019), .driver_info = BTUSB_IGNORE },
--	{ USB_DEVICE(0x13d3, 0x3304), .driver_info = BTUSB_IGNORE },
--	{ USB_DEVICE(0x0930, 0x0215), .driver_info = BTUSB_IGNORE },
--	{ USB_DEVICE(0x0489, 0xe03d), .driver_info = BTUSB_IGNORE },
-+	{ USB_DEVICE(0x0cf3, 0x3002), .driver_info = (unsigned long) &ignore },
-+	{ USB_DEVICE(0x0cf3, 0xe019), .driver_info = (unsigned long) &ignore },
-+	{ USB_DEVICE(0x13d3, 0x3304), .driver_info = (unsigned long) &ignore },
-+	{ USB_DEVICE(0x0930, 0x0215), .driver_info = (unsigned long) &ignore },
-+	{ USB_DEVICE(0x0489, 0xe03d), .driver_info = (unsigned long) &ignore },
- 
- 	/* Atheros AR9285 Malbec with sflash firmware */
--	{ USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
-+	{ USB_DEVICE(0x03f0, 0x311d), .driver_info = (unsigned long) &ignore },
- 
- 	/* Atheros 3012 with sflash firmware */
--	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
--	{ USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
--	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
--	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
--	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
--	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
--	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = (unsigned long) &ath3012 },
-+	{ USB_DEVICE(0x0cf3, 0x311d), .driver_info = (unsigned long) &ath3012 },
-+	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = (unsigned long) &ath3012 },
-+	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = (unsigned long) &ath3012 },
-+	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = (unsigned long) &ath3012 },
-+	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = (unsigned long) &ath3012 },
-+	{ USB_DEVICE(0x0930, 0x0219), .driver_info = (unsigned long) &ath3012 },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
--	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
-+	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = (unsigned long) &ignore },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
--	{ USB_DEVICE(0x0489, 0xe03c), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0489, 0xe03c), .driver_info = (unsigned long) &ath3012 },
- 
- 	/* Broadcom BCM2035 */
--	{ USB_DEVICE(0x0a5c, 0x2035), .driver_info = BTUSB_WRONG_SCO_MTU },
--	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
--	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
-+	{ USB_DEVICE(0x0a5c, 0x2035), .driver_info = (unsigned long) &wrong_sco_mtu },
-+	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = (unsigned long) &wrong_sco_mtu },
-+	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = (unsigned long) &bcm92035 },
- 
- 	/* Broadcom BCM2045 */
--	{ USB_DEVICE(0x0a5c, 0x2039), .driver_info = BTUSB_WRONG_SCO_MTU },
--	{ USB_DEVICE(0x0a5c, 0x2101), .driver_info = BTUSB_WRONG_SCO_MTU },
-+	{ USB_DEVICE(0x0a5c, 0x2039), .driver_info = (unsigned long) &wrong_sco_mtu },
-+	{ USB_DEVICE(0x0a5c, 0x2101), .driver_info = (unsigned long) &wrong_sco_mtu },
- 
- 	/* IBM/Lenovo ThinkPad with Broadcom chip */
--	{ USB_DEVICE(0x0a5c, 0x201e), .driver_info = BTUSB_WRONG_SCO_MTU },
--	{ USB_DEVICE(0x0a5c, 0x2110), .driver_info = BTUSB_WRONG_SCO_MTU },
-+	{ USB_DEVICE(0x0a5c, 0x201e), .driver_info = (unsigned long) &wrong_sco_mtu },
-+	{ USB_DEVICE(0x0a5c, 0x2110), .driver_info = (unsigned long) &wrong_sco_mtu },
- 
- 	/* HP laptop with Broadcom chip */
--	{ USB_DEVICE(0x03f0, 0x171d), .driver_info = BTUSB_WRONG_SCO_MTU },
-+	{ USB_DEVICE(0x03f0, 0x171d), .driver_info = (unsigned long) &wrong_sco_mtu },
- 
- 	/* Dell laptop with Broadcom chip */
--	{ USB_DEVICE(0x413c, 0x8126), .driver_info = BTUSB_WRONG_SCO_MTU },
-+	{ USB_DEVICE(0x413c, 0x8126), .driver_info = (unsigned long) &wrong_sco_mtu },
- 
- 	/* Dell Wireless 370 and 410 devices */
--	{ USB_DEVICE(0x413c, 0x8152), .driver_info = BTUSB_WRONG_SCO_MTU },
--	{ USB_DEVICE(0x413c, 0x8156), .driver_info = BTUSB_WRONG_SCO_MTU },
-+	{ USB_DEVICE(0x413c, 0x8152), .driver_info = (unsigned long) &wrong_sco_mtu },
-+	{ USB_DEVICE(0x413c, 0x8156), .driver_info = (unsigned long) &wrong_sco_mtu },
- 
- 	/* Belkin F8T012 and F8T013 devices */
--	{ USB_DEVICE(0x050d, 0x0012), .driver_info = BTUSB_WRONG_SCO_MTU },
--	{ USB_DEVICE(0x050d, 0x0013), .driver_info = BTUSB_WRONG_SCO_MTU },
-+	{ USB_DEVICE(0x050d, 0x0012), .driver_info = (unsigned long) &wrong_sco_mtu },
-+	{ USB_DEVICE(0x050d, 0x0013), .driver_info = (unsigned long) &wrong_sco_mtu },
- 
- 	/* Asus WL-BTD202 device */
--	{ USB_DEVICE(0x0b05, 0x1715), .driver_info = BTUSB_WRONG_SCO_MTU },
-+	{ USB_DEVICE(0x0b05, 0x1715), .driver_info = (unsigned long) &wrong_sco_mtu },
- 
- 	/* Kensington Bluetooth USB adapter */
--	{ USB_DEVICE(0x047d, 0x105e), .driver_info = BTUSB_WRONG_SCO_MTU },
-+	{ USB_DEVICE(0x047d, 0x105e), .driver_info = (unsigned long) &wrong_sco_mtu },
- 
- 	/* RTX Telecom based adapters with buggy SCO support */
--	{ USB_DEVICE(0x0400, 0x0807), .driver_info = BTUSB_BROKEN_ISOC },
--	{ USB_DEVICE(0x0400, 0x080a), .driver_info = BTUSB_BROKEN_ISOC },
-+	{ USB_DEVICE(0x0400, 0x0807), .driver_info = (unsigned long) &broken_isoc },
-+	{ USB_DEVICE(0x0400, 0x080a), .driver_info = (unsigned long) &broken_isoc },
- 
- 	/* CONWISE Technology based adapters with buggy SCO support */
--	{ USB_DEVICE(0x0e5e, 0x6622), .driver_info = BTUSB_BROKEN_ISOC },
-+	{ USB_DEVICE(0x0e5e, 0x6622), .driver_info = (unsigned long) &broken_isoc },
- 
- 	/* Digianswer devices */
--	{ USB_DEVICE(0x08fd, 0x0001), .driver_info = BTUSB_DIGIANSWER },
--	{ USB_DEVICE(0x08fd, 0x0002), .driver_info = BTUSB_IGNORE },
-+	{ USB_DEVICE(0x08fd, 0x0001), .driver_info = (unsigned long) &digianswer },
-+	{ USB_DEVICE(0x08fd, 0x0002), .driver_info = (unsigned long) &ignore },
- 
- 	/* CSR BlueCore Bluetooth Sniffer */
--	{ USB_DEVICE(0x0a12, 0x0002), .driver_info = BTUSB_SNIFFER },
-+	{ USB_DEVICE(0x0a12, 0x0002), .driver_info = (unsigned long) &sniffer },
- 
+@@ -228,6 +228,9 @@ static struct usb_device_id blacklist_table[] = {
  	/* Frontline ComProbe Bluetooth Sniffer */
--	{ USB_DEVICE(0x16d3, 0x0002), .driver_info = BTUSB_SNIFFER },
-+	{ USB_DEVICE(0x16d3, 0x0002), .driver_info = (unsigned long) &sniffer },
+ 	{ USB_DEVICE(0x16d3, 0x0002), .driver_info = (unsigned long) &sniffer },
  
++	/* BT USB mini driver sample */
++	{ USB_DEVICE(0x1234, 0x5678), .driver_info = (unsigned long) &ignore },
++
  	{ }	/* Terminating entry */
  };
-@@ -207,6 +245,9 @@ struct btusb_data {
- 	struct usb_interface *intf;
- 	struct usb_interface *isoc;
  
-+	/* thsi is needed by the mini-driver */
-+	struct btusb_driver_info *driver_info;
-+
- 	spinlock_t lock;
- 
- 	unsigned long flags;
-@@ -910,12 +951,12 @@ static void btusb_waker(struct work_struct *work)
- 	usb_autopm_put_interface(data->intf);
- }
- 
--static int btusb_probe(struct usb_interface *intf,
--				const struct usb_device_id *id)
-+int btusb_probe(struct usb_interface *intf, const struct usb_device_id *id)
- {
- 	struct usb_endpoint_descriptor *ep_desc;
- 	struct btusb_data *data;
- 	struct hci_dev *hdev;
-+	struct btusb_driver_info *info;
- 	int i, err;
- 
- 	BT_DBG("intf %p id %p", intf, id);
-@@ -931,19 +972,25 @@ static int btusb_probe(struct usb_interface *intf,
- 			id = match;
- 	}
- 
--	if (id->driver_info == BTUSB_IGNORE)
-+	/* if the driver_info is not set, then assign default driver_info */
-+	if (!id->driver_info)
-+		info = (struct btusb_driver_info *) &generic;
-+	else
-+		info = (struct btusb_driver_info *) id->driver_info;
-+
-+	if (info->flags == BTUSB_IGNORE)
- 		return -ENODEV;
- 
--	if (ignore_dga && id->driver_info & BTUSB_DIGIANSWER)
-+	if (ignore_dga && (info->flags & BTUSB_DIGIANSWER))
- 		return -ENODEV;
- 
--	if (ignore_csr && id->driver_info & BTUSB_CSR)
-+	if (ignore_csr && (info->flags & BTUSB_CSR))
- 		return -ENODEV;
- 
--	if (ignore_sniffer && id->driver_info & BTUSB_SNIFFER)
-+	if (ignore_sniffer && (info->flags & BTUSB_SNIFFER))
- 		return -ENODEV;
- 
--	if (id->driver_info & BTUSB_ATH3012) {
-+	if (info->flags & BTUSB_ATH3012) {
- 		struct usb_device *udev = interface_to_usbdev(intf);
- 
- 		/* Old firmware would otherwise let ath3k driver load
-@@ -982,6 +1029,7 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 	data->udev = interface_to_usbdev(intf);
- 	data->intf = intf;
-+	data->driver_info = info;
- 
- 	spin_lock_init(&data->lock);
- 
-@@ -1012,26 +1060,35 @@ static int btusb_probe(struct usb_interface *intf,
- 	hdev->send     = btusb_send_frame;
- 	hdev->notify   = btusb_notify;
- 
-+	/* bind the vendor specific mini-driver */
-+	if (info->bind) {
-+		err = info->bind(hdev);
-+		if (err < 0) {
-+			hci_free_dev(hdev);
-+			return err;
-+		}
-+	}
-+
- 	/* Interface numbers are hardcoded in the specification */
- 	data->isoc = usb_ifnum_to_if(data->udev, 1);
- 
- 	if (!reset)
- 		set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
- 
--	if (force_scofix || id->driver_info & BTUSB_WRONG_SCO_MTU) {
-+	if (force_scofix || (info->flags & BTUSB_WRONG_SCO_MTU)) {
- 		if (!disable_scofix)
- 			set_bit(HCI_QUIRK_FIXUP_BUFFER_SIZE, &hdev->quirks);
- 	}
- 
--	if (id->driver_info & BTUSB_BROKEN_ISOC)
-+	if (info->flags & BTUSB_BROKEN_ISOC)
- 		data->isoc = NULL;
- 
--	if (id->driver_info & BTUSB_DIGIANSWER) {
-+	if (info->flags & BTUSB_DIGIANSWER) {
- 		data->cmdreq_type = USB_TYPE_VENDOR;
- 		set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
- 	}
- 
--	if (id->driver_info & BTUSB_CSR) {
-+	if (info->flags & BTUSB_CSR) {
- 		struct usb_device *udev = data->udev;
- 
- 		/* Old firmware would otherwise execute USB reset */
-@@ -1039,7 +1096,7 @@ static int btusb_probe(struct usb_interface *intf,
- 			set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
- 	}
- 
--	if (id->driver_info & BTUSB_SNIFFER) {
-+	if (info->flags & BTUSB_SNIFFER) {
- 		struct usb_device *udev = data->udev;
- 
- 		/* New sniffer firmware has crippled HCI interface */
-@@ -1049,7 +1106,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		data->isoc = NULL;
- 	}
- 
--	if (id->driver_info & BTUSB_BCM92035) {
-+	if (info->flags & BTUSB_BCM92035) {
- 		unsigned char cmd[] = { 0x3b, 0xfc, 0x01, 0x00 };
- 		struct sk_buff *skb;
- 
-@@ -1079,8 +1136,9 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(btusb_probe);
- 
--static void btusb_disconnect(struct usb_interface *intf)
-+void btusb_disconnect(struct usb_interface *intf)
- {
- 	struct btusb_data *data = usb_get_intfdata(intf);
- 	struct hci_dev *hdev;
-@@ -1103,11 +1161,16 @@ static void btusb_disconnect(struct usb_interface *intf)
- 	else if (data->isoc)
- 		usb_driver_release_interface(&btusb_driver, data->isoc);
- 
-+	/* unbind the vendor specific mini-driver */
-+	if (data->driver_info->unbind)
-+		data->driver_info->unbind(hdev);
-+
- 	hci_free_dev(hdev);
- }
-+EXPORT_SYMBOL_GPL(btusb_disconnect);
- 
- #ifdef CONFIG_PM
--static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
-+int btusb_suspend(struct usb_interface *intf, pm_message_t message)
- {
- 	struct btusb_data *data = usb_get_intfdata(intf);
- 
-@@ -1133,6 +1196,7 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(btusb_suspend);
- 
- static void play_deferred(struct btusb_data *data)
- {
-@@ -1149,7 +1213,7 @@ static void play_deferred(struct btusb_data *data)
- 	usb_scuttle_anchored_urbs(&data->deferred);
- }
- 
--static int btusb_resume(struct usb_interface *intf)
-+int btusb_resume(struct usb_interface *intf)
- {
- 	struct btusb_data *data = usb_get_intfdata(intf);
- 	struct hci_dev *hdev = data->hdev;
-@@ -1205,8 +1269,10 @@ done:
- 
- 	return err;
- }
-+EXPORT_SYMBOL_GPL(btusb_resume);
- #endif
- 
-+
- static struct usb_driver btusb_driver = {
- 	.name		= "btusb",
- 	.probe		= btusb_probe,
-diff --git a/drivers/bluetooth/btusb.h b/drivers/bluetooth/btusb.h
+diff --git a/drivers/bluetooth/btusb_sample.c b/drivers/bluetooth/btusb_sample.c
 new file mode 100644
-index 0000000..7331a11
+index 0000000..0462b4e
 --- /dev/null
-+++ b/drivers/bluetooth/btusb.h
-@@ -0,0 +1,53 @@
++++ b/drivers/bluetooth/btusb_sample.c
+@@ -0,0 +1,189 @@
 +/*
 + *
-+ *  Generic Bluetooth USB driver
++ *  Bluetooth USB Mini Driver - Sample
 + *
-+ *  Copyright (C) 2005-2008  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2012  Intel Corporation
 + *
 + *
 + *  This program is free software; you can redistribute it and/or modify
@@ -436,122 +62,172 @@ index 0000000..7331a11
 + *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + *
 + */
-+#ifndef _BTUSB_H
-+#define _BTUSB_H
++#include <linux/module.h>
++#include <linux/usb.h>
 +
-+struct btusb_driver_info {
-+	char	*description;
-+	int	flags;
-+#define BTUSB_GENERIC		0x00
-+#define BTUSB_IGNORE		0x01
-+#define BTUSB_DIGIANSWER	0x02
-+#define BTUSB_CSR		0x04
-+#define BTUSB_SNIFFER		0x08
-+#define BTUSB_BCM92035		0x10
-+#define BTUSB_BROKEN_ISOC	0x20
-+#define BTUSB_WRONG_SCO_MTU	0x40
-+#define BTUSB_ATH3012		0x80
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
 +
-+	/* initialize the vendor setup routines */
-+	int	(*bind)(struct hci_dev *);
++#include "btusb.h"
 +
-+	/* clean up */
-+	void	(*unbind)(struct hci_dev *);
++/*
++ * This is sample BT USB mini-driver to demonstrate how a vendor can execute
++ * the vendor specific device initialization routine and handle vendor specific
++ * events.
++ *
++ * In this sample, it will send one vendor HCI command (but not limited to 1)
++ * as an example.
++ */
++
++#define VENDOR_HCI_SAMPLE_CMD_1   0xfc01
++
++/* mini-driver context */
++struct btusb_sample_data {
++	struct hci_dev		*hdev;
++
++	/* for synchronization */
++	struct completion	wait_evt_complete;
 +};
 +
-+extern int btusb_probe(struct usb_interface *, const struct usb_device_id *);
-+extern void btusb_disconnect(struct usb_interface *);
-+#ifdef CONFIG_PM
-+extern int btusb_suspend(struct usb_interface *, pm_message_t);
-+extern int btusb_resume(struct usb_interface *);
-+#endif
++/*
++ * Entry point for device setup.
++ */
++int btusb_sample_setup(struct hci_dev *hdev)
++{
++	int ret;
++	struct btusb_sample_data *data;
 +
-+#endif /* _BTUSB_H */
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 0f28f70..3e9949b 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -117,7 +117,9 @@ enum {
- 	HCI_DISCOVERABLE,
- 	HCI_LINK_SECURITY,
- 	HCI_PENDING_CLASS,
++	/* initialize the sample data */
++	data = kmalloc(sizeof(*data), GFP_KERNEL);
++	if (!data) {
++		BT_ERR("failed to allocate the memory for data");
++		return -ENOMEM;
++	}
 +
- 	HCI_PERIODIC_INQ,
-+	HCI_VENDOR,		/* for mini-driver vendor specific setup */
- };
- 
- /* HCI ioctl defines */
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 6a3337e..654c17e 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -275,6 +275,14 @@ struct hci_dev {
- 	int (*send)(struct sk_buff *skb);
- 	void (*notify)(struct hci_dev *hdev, unsigned int evt);
- 	int (*ioctl)(struct hci_dev *hdev, unsigned int cmd, unsigned long arg);
++	hdev->vendor_data = data;
++	data->hdev = hdev;
 +
-+/* CHECKME: Added following members for vendor specific setup in order to make
-+ * the bluetooth.ko transparent to the interface below.
-+ * These members are set/used by the vendor provided mini-driver. */
-+	void			*vendor_data;
-+	int (*vendor_setup)(struct hci_dev *hdev);
-+	void (*vendor_event)(struct hci_dev *hdev, struct sk_buff *skb);
++	init_completion(&data->wait_evt_complete);
 +
- };
- 
- struct hci_conn {
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e407051..55a6362 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -685,6 +685,21 @@ int hci_dev_open(__u16 dev)
- 		set_bit(HCI_INIT, &hdev->flags);
- 		hdev->init_last_cmd = 0;
- 
-+/* CHECKME: this is the required spot for executing the vendor setup code.
-+ * We need btusb_open() to complete so HCI event can be received and
-+ * processed by vendor_event() handler. vendor_setup() must be done first
-+ * before hci_init_req.
-+ * vendor_setup() runs once only.*/
-+		if (hdev->vendor_setup) {
-+			set_bit(HCI_VENDOR, &hdev->dev_flags);
-+			ret = hdev->vendor_setup(hdev);
-+			hdev->vendor_event = NULL;
-+			hdev->vendor_setup = NULL;
-+			clear_bit(HCI_VENDOR, &hdev->dev_flags);
-+			if (ret < 0)
-+				goto done;
-+		}
++	/* send command */
++	ret = hci_send_cmd(hdev, VENDOR_HCI_SAMPLE_CMD_1, 0, NULL);
++	if (ret < 0) {
++		BT_ERR("failed to send command: %d", ret);
++		kfree(data);
++		return ret;
++	}
 +
- 		ret = __hci_request(hdev, hci_init_req, 0, HCI_INIT_TIMEOUT);
- 
- 		if (lmp_host_le_capable(hdev))
-@@ -2119,6 +2134,7 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL(hci_send_cmd);
- 
- /* Get data from the previously sent command */
- void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
-@@ -2800,7 +2816,17 @@ static void hci_rx_work(struct work_struct *work)
- 		switch (bt_cb(skb)->pkt_type) {
- 		case HCI_EVENT_PKT:
- 			BT_DBG("%s Event packet", hdev->name);
--			hci_event_packet(hdev, skb);
++	/* waiting for event */
++	ret = wait_for_completion_interruptible(&data->wait_evt_complete);
++	if (ret < 0) {
++		BT_ERR("wait completion error: %d", ret);
++		kfree(data);
++		return ret;
++	}
 +
-+/* CHECKME: If we are in vendor mode, all HCI events are handled by
-+ * vendor_event() and not handled by normal stack flows. vendor_event() shall
-+ * also be responsible for handling flow control.
++
++	/* done */
++	kfree(data);
++
++	return 0;
++}
++
++/*
++ * Vendor specific event handler
 + *
-+ * Please see the mini-driver sample code. */
-+			if (test_bit(HCI_VENDOR, &hdev->dev_flags)
-+					&& hdev->vendor_event)
-+				hdev->vendor_event(hdev, skb);
-+			else
-+				hci_event_packet(hdev, skb);
- 			break;
- 
- 		case HCI_ACLDATA_PKT:
++ * During the vendor setup mode, this function is responsible for handling all
++ * received HCI events.
++ */
++void btusb_sample_event(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct btusb_sample_data *data;
++	struct hci_event_hdr *hdr;
++	struct hci_ev_cmd_complete *cc;
++	u16 opcode;
++
++	data = hdev->vendor_data;
++
++	/* event header */
++	hdr = (void *)skb->data;
++	if (hdr->evt != HCI_EV_CMD_COMPLETE) {
++		BT_ERR("invalid event code: %02x", hdr->evt);
++		goto exit_error;
++	}
++	skb_pull(skb, sizeof(*hdr));
++
++	/* command complete event */
++	cc = (void *)skb->data;
++	opcode =le16_to_cpu(cc->opcode);
++	if (opcode != VENDOR_HCI_SAMPLE_CMD_1) {
++		BT_ERR("invalid opcode: %04x", opcode);
++		goto exit_error;
++	}
++	skb_pull(skb, sizeof(*cc));
++
++	/* check status */
++	if ((u8)skb->data[0]) {
++		BT_ERR("evt status failed: %02x", (u8)skb->data[0]);
++		goto exit_error;
++	}
++
++exit_error:
++	/* this is for handling the flow control */
++	del_timer(&hdev->cmd_timer);
++	atomic_set(&hdev->cmd_cnt, 1);
++
++	/* consume the event here */
++	kfree_skb(skb);
++
++	/* complete the wait */
++	complete(&data->wait_evt_complete);
++}
++
++/*
++ * Bind this mini-driver to btusb.ko
++ */
++int btusb_sample_bind(struct hci_dev *hdev)
++{
++	/* set the vendor_setup and vendor_event handlers */
++	hdev->vendor_setup = btusb_sample_setup;
++	hdev->vendor_event = btusb_sample_event;
++
++	return 0;
++}
++
++/*
++ * Unbind this mini-driver to btusb.ko
++ */
++void btusb_sample_unbind(struct hci_dev *hdev)
++{
++
++	return;
++}
++
++static const struct btusb_driver_info sample_info = {
++	.description	= "BT USB mini driver sample",
++	.bind		= btusb_sample_bind,
++	.unbind		= btusb_sample_unbind,
++};
++
++static const struct usb_device_id products[] = {
++	{
++		USB_DEVICE(0x1234, 0x5678),
++		.driver_info = (unsigned long) &sample_info,
++	},
++	{},	/* END */
++};
++MODULE_DEVICE_TABLE(usb, products);
++
++static struct usb_driver btusb_sample_minidriver = {
++	.name		= "btusb sample mini-driver",
++	.probe		= btusb_probe,
++	.disconnect	= btusb_disconnect,
++	.id_table	= products,
++};
++module_usb_driver(btusb_sample_minidriver);
++
++MODULE_AUTHOR("Tedd Ho-Jeong An <tedd.an@intel.com>");
++MODULE_DESCRIPTION("BT USB sample mini driver");
++MODULE_LICENSE("GPL");
 -- 
 1.7.9.5
