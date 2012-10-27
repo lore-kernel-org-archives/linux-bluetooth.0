@@ -1,263 +1,142 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
-Subject: =?UTF-8?q?=5BRFC=20v2=20obexd=2001/11=5D=20fuse=3A=20Add=20initial=20obexfuse=20files=2C=20fuse=20main=20and=20options=20parse?=
-Date: Sun, 28 Oct 2012 02:29:16 +0200
-Message-Id: <1351384166-15586-1-git-send-email-dmp0x7c5@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <1351380893.25783.15.camel@aeonflux>
+Subject: Re: [RFC v2 1/2] Bluetooth: Add driver extension for vendor device
+ setup
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Tedd Ho-Jeong An <tedd.an@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, albert.o.ho@intel.com,
+	johan.hedberg@intel.com, tedd.hj.an@gmail.com
+Date: Sat, 27 Oct 2012 16:34:53 -0700
+In-Reply-To: <2721081.2F6GJ3v4qE@tedd-ubuntu>
+References: <2721081.2F6GJ3v4qE@tedd-ubuntu>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- fuse/helpers.c  |   54 +++++++++++++++++++++++++
- fuse/helpers.h  |   48 ++++++++++++++++++++++
- fuse/obexfuse.c |  119 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 221 insertions(+), 0 deletions(-)
- create mode 100644 fuse/helpers.c
- create mode 100644 fuse/helpers.h
- create mode 100644 fuse/obexfuse.c
+Hi Tedd,
 
-diff --git a/fuse/helpers.c b/fuse/helpers.c
-new file mode 100644
-index 0000000..c36072d
---- /dev/null
-+++ b/fuse/helpers.c
-@@ -0,0 +1,54 @@
-+/*
-+ *  OBEX Filesystem in Userspace
-+ *
-+ *  Copyright (C) 2012  Michał Poczwardowski <dmp0x7c5@gmail.com>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <gobex/gobex.h>
-+#include <btio/btio.h>
-+
-+#include <glib.h>
-+#include <fcntl.h>
-+#include <errno.h>
-+
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/rfcomm.h>
-+#include <bluetooth/sdp.h>
-+#include <bluetooth/sdp_lib.h>
-+
-+#define BT_RX_MTU 32767
-+#define BT_TX_MTU 32767
-+
-+#include "helpers.h"
-+
-+#define OBEX_FTP_UUID \
-+	"\xF9\xEC\x7B\xC4\x95\x3C\x11\xD2\x98\x4E\x52\x54\x00\xDC\x9E\x09"
-+#define OBEX_FTP_UUID_LEN 16
-+
-+#define OBEX_FTP_LS "x-obex/folder-listing"
-+
-+struct gobexhlp_request {
-+	gchar *name;
-+	gboolean complete;
-+};
-+
-+struct gobexhlp_location {
-+	gchar *dir;
-+	gchar *file;
-+};
-diff --git a/fuse/helpers.h b/fuse/helpers.h
-new file mode 100644
-index 0000000..142403f
---- /dev/null
-+++ b/fuse/helpers.h
-@@ -0,0 +1,48 @@
-+/*
-+ *  OBEX Filesystem in Userspace
-+ *
-+ *  Copyright (C) 2012  Michał Poczwardowski <dmp0x7c5@gmail.com>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <gobex/gobex.h>
-+#include <glib.h>
-+
-+struct gobexhlp_request;
-+
-+struct gobexhlp_buffer {
-+	void *data;
-+	gsize tmpsize;
-+	gsize size;
-+	gboolean edited;
-+};
-+
-+struct gobexhlp_session {
-+	GObex *obex;
-+	GList *lsfiles;
-+	GIOChannel *io;
-+	GHashTable *file_stat;
-+	gchar *setpath;
-+	struct gobexhlp_request *request;
-+	struct gobexhlp_buffer *buffer;
-+	gboolean vtouch;
-+	gchar *vtouch_path;
-+	gboolean rtouch;
-+	int status;
-+	GError *err;
-+};
-diff --git a/fuse/obexfuse.c b/fuse/obexfuse.c
-new file mode 100644
-index 0000000..fe4f4da
---- /dev/null
-+++ b/fuse/obexfuse.c
-@@ -0,0 +1,119 @@
-+/*
-+ *  OBEX Filesystem in Userspace
-+ *
-+ *  Copyright (C) 2012  Michał Poczwardowski <dmp0x7c5@gmail.com>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#define FUSE_USE_VERSION 26
-+
-+#include <stdio.h>
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <stdlib.h>
-+#include <string.h>
-+
-+#include <fuse.h>
-+#include <fuse/fuse_opt.h>
-+
-+#include "helpers.h"
-+
-+struct options {
-+	char* dststr;
-+	char* srcstr;
-+} options;
-+
-+#define GOBEXFUSE_OPT_KEY(t, p, v) { t, offsetof(struct options, p), v }
-+
-+enum
-+{
-+   KEY_VERSION,
-+   KEY_HELP,
-+};
-+
-+static struct fuse_opt obexfuse_opts[] =
-+{
-+	GOBEXFUSE_OPT_KEY("--target=%s",dststr, 0),
-+	GOBEXFUSE_OPT_KEY("-t %s",	dststr, 0),
-+	GOBEXFUSE_OPT_KEY("--source=%s",srcstr, 0),
-+	GOBEXFUSE_OPT_KEY("-s %s",	srcstr, 0),
-+
-+	FUSE_OPT_KEY("-V",             KEY_VERSION),
-+	FUSE_OPT_KEY("--version",      KEY_VERSION),
-+	FUSE_OPT_KEY("-h",             KEY_HELP),
-+	FUSE_OPT_KEY("--help",         KEY_HELP),
-+	FUSE_OPT_END
-+};
-+
-+static struct fuse_operations obexfuse_oper = {
-+};
-+
-+static int obexfuse_opt_proc(void *data, const char *arg, int key,
-+					struct fuse_args *outargs)
-+{
-+	switch (key) {
-+	case KEY_HELP:
-+		g_printerr("Usage: %s mountpoint [options]\n"
-+				"\n"
-+				"general options:\n"
-+				"    -o opt,[opt...]  mount options\n"
-+				"    -h   --help      print help\n"
-+				"    -V   --version   print version\n"
-+				"\n"
-+				"obexfuse options:\n"
-+				"    -t   --target    target btaddr "
-+				"(mandatory)\n"
-+				"    -s   --source    source btaddr\n"
-+				"\n"
-+				, outargs->argv[0]);
-+		fuse_opt_add_arg(outargs, "-ho");
-+		fuse_main(outargs->argc, outargs->argv, &obexfuse_oper, NULL);
-+		exit(1);
-+	case KEY_VERSION:
-+		g_print("obexfuse upon:\n");
-+		fuse_opt_add_arg(outargs, "--version");
-+		fuse_main(outargs->argc, outargs->argv, &obexfuse_oper, NULL);
-+		exit(0);
-+	}
-+	return 1;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	int retfuse;
-+	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
-+
-+	memset(&options, 0, sizeof(struct options));
-+
-+	if (fuse_opt_parse(&args, &options, obexfuse_opts,
-+				obexfuse_opt_proc) == -1)
-+		return -EINVAL;
-+
-+	if (options.dststr == NULL) {
-+		g_printerr("Target not specified\n");
-+		return -EINVAL;
-+	}
-+
-+	g_thread_init(NULL);
-+
-+	fuse_opt_add_arg(&args, "-s"); /* force single threaded mode */
-+	retfuse = fuse_main(args.argc, args.argv, &obexfuse_oper, NULL);
-+
-+	fuse_opt_free_args(&args);
-+	return retfuse;
-+}
--- 
-1.7.8.6
+> This patch provides an extension of btusb to support device vendor
+> can implement their own module like mini driver to execute device
+> specific setup before the BT stack sends generic BT device
+> initialization.
+> 
+> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+> ---
+>  drivers/bluetooth/btusb.c        |  194 +++++++++++++++++++++++++-------------
+>  drivers/bluetooth/btusb.h        |   53 +++++++++++
+>  include/net/bluetooth/hci.h      |    2 +
+>  include/net/bluetooth/hci_core.h |    8 ++
+>  net/bluetooth/hci_core.c         |   28 +++++-
+>  5 files changed, 220 insertions(+), 65 deletions(-)
+>  create mode 100644 drivers/bluetooth/btusb.h
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index f637c25..d3f8e7d 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -26,6 +26,7 @@
+>  
+>  #include <net/bluetooth/bluetooth.h>
+>  #include <net/bluetooth/hci_core.h>
+> +#include "btusb.h"
+>  
+>  #define VERSION "0.6"
+>  
+> @@ -39,14 +40,52 @@ static bool reset = 1;
+>  
+>  static struct usb_driver btusb_driver;
+>  
+> -#define BTUSB_IGNORE		0x01
+> -#define BTUSB_DIGIANSWER	0x02
+> -#define BTUSB_CSR		0x04
+> -#define BTUSB_SNIFFER		0x08
+> -#define BTUSB_BCM92035		0x10
+> -#define BTUSB_BROKEN_ISOC	0x20
+> -#define BTUSB_WRONG_SCO_MTU	0x40
+> -#define BTUSB_ATH3012		0x80
+> +/* CHECKME: supporting mini-driver requires changing usage of driver_info from
+> + * flags to static const struct. */
+> +static const struct btusb_driver_info generic = {
+> +	.description	= "BTUSB Generic",
+> +	.flags		= BTUSB_GENERIC,
+> +};
+> +
+> +static const struct btusb_driver_info ignore = {
+> +	.description	= "BTUSB Ignore",
+> +	.flags		= BTUSB_IGNORE,
+> +};
+> +
+> +static const struct btusb_driver_info digianswer = {
+> +	.description	= "BTUSB DIGIANSWER",
+> +	.flags		= BTUSB_DIGIANSWER,
+> +};
+> +
+> +static const struct btusb_driver_info csr = {
+> +	.description	= "BTUSB CSR",
+> +	.flags		= BTUSB_CSR,
+> +};
+> +
+> +static const struct btusb_driver_info sniffer = {
+> +	.description	= "BTUSB Sniffer",
+> +	.flags		= BTUSB_SNIFFER,
+> +};
+> +
+> +static const struct btusb_driver_info bcm92035 = {
+> +	.description	= "BTUSB BCM92035",
+> +	.flags		= BTUSB_BCM92035,
+> +};
+> +
+> +static const struct btusb_driver_info broken_isoc = {
+> +	.description	= "BTUSB Broken ISOC",
+> +	.flags		= BTUSB_BROKEN_ISOC,
+> +};
+> +
+> +static const struct btusb_driver_info wrong_sco_mtu = {
+> +	.description	= "BTUSB Wrong SCO MTU",
+> +	.flags		= BTUSB_WRONG_SCO_MTU,
+> +};
+> +
+> +static const struct btusb_driver_info ath3012 = {
+> +	.description	= "BTUSB Ath3012",
+> +	.flags		= BTUSB_ATH3012,
+> +};
+
+I do not get why are you doing this. Didn't I mention last time to not
+touch the blacklist handling?
+
+You do realize that the exported btusb_probe() does not have to be the
+same one as what btusb.ko itself provides as probe callback. Trying to
+squeeze the usb_device_id from btusb.ko and eventual external drivers
+into the same structure is just bloating the code.
+
+Keep in mind that due to the USB_DEVICE_INFO(0xe0, 0x01, 0x01) matching
+rule we need to actually blacklist all vendor drivers in btusb.ko anyway
+and thus a simple BTUSB_IGNORE now turns into something nasty like
+declaring a btusb_driver_info struct. I rather avoid that.
+
+It is actually pretty important that a public exported btusb_probe()
+really only does what we would expect from a default H:2 probe handler
+and not any quirk handling. The existing quirks are internal to btusb.ko
+and should not be inherited by any vendor driver.
+
+So btusb_driver struct can easily use a btusb_probe_one() function that
+does the quirk handling and then call btusb_probe(). Or just something
+similar to that extend.
+
+Bottom line, please do not make the code more complicated because it
+looks easy now. It will backfire at some point. We need to make handling
+vendor drivers easier by keeping the core H:2 driver simple.
+
+Another option here is to have some convenience macros like
+BTUSB_DEVICE_IGNORE(0x0a5c, 0x2033) that turn the code readable again.
+
+And while you are at it, please split the mini-driver support changes
+from actually modifying the HCI core. I like to have this as two
+patches.
+
+Regards
+
+Marcel
+
 
