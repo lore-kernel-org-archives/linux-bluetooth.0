@@ -1,51 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: Jeff Cook <cookiecaper@gmail.com>
-From: Jeff Cook <jeff@deserettechnology.com>
-To: linux-bluetooth@vger.kernel.org,
-	marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com
-Cc: linux-kernel@vger.kernel.org,
-	Jeff Cook <jeff@deserettechnology.com>
-Subject: [PATCH] Bluetooth: Add support for BCM20702A0 [0b05, 17b5]
-Date: Sat, 27 Oct 2012 05:01:28 -0600
-Message-Id: <1351335688-17936-1-git-send-email-jeff@deserettechnology.com>
-In-Reply-To: <5087B517.9090703@deserettechnology.com>
-References: <5087B517.9090703@deserettechnology.com>
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>, marcel@holtmann.org
+Cc: albert.o.ho@intel.com, tedd.hj.an@gmail.com, tedd.an@intel.com, johan.hedberg@intel.com
+Subject: [RFC v2 0/2] Add driver extension for vendor device setup
+Date: Fri, 26 Oct 2012 18:23:09 -0700
+Message-ID: <1634868.4dWAuDVddg@tedd-ubuntu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Vendor-specific ID for BCM20702A0.
-Support for bluetooth over Asus Wi-Fi GO!, included with Asus P8Z77-V
-Deluxe.
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-T:  Bus=07 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0b05 ProdID=17b5 Rev=01.12
-S:  Manufacturer=Broadcom Corp
-S:  Product=BCM20702A0
-S:  SerialNumber=94DBC98AC113
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+These RFC patches adds drvier extension which allows vendors to execute
+vendor specific device initialization (i.e. ROM patching) via vendor
+supplied mini-driver.
 
-Signed-off-by: Jeff Cook <jeff@deserettechnology.com>
----
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+It also includes a sample mini-driver.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 654e248..1d7b126 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -96,6 +96,7 @@ static struct usb_device_id btusb_table[] = {
- 	{ USB_DEVICE(0x0c10, 0x0000) },
- 
- 	/* Broadcom BCM20702A0 */
-+	{ USB_DEVICE(0x0b05, 0x17b5) },
- 	{ USB_DEVICE(0x0489, 0xe042) },
- 	{ USB_DEVICE(0x413c, 0x8197) },
- 
+Tedd Ho-Jeong An (2):
+  Bluetooth: Add driver extension for vendor device setup
+  Bluetooth: Add sample BT USB mini-driver
+
+ drivers/bluetooth/btusb.c        |  197 +++++++++++++++++++++++++-------------
+ drivers/bluetooth/btusb.h        |   53 ++++++++++
+ drivers/bluetooth/btusb_sample.c |  189 ++++++++++++++++++++++++++++++++++++
+ include/net/bluetooth/hci.h      |    2 +
+ include/net/bluetooth/hci_core.h |    8 ++
+ net/bluetooth/hci_core.c         |   28 +++++-
+ 6 files changed, 412 insertions(+), 65 deletions(-)
+ create mode 100644 drivers/bluetooth/btusb.h
+ create mode 100644 drivers/bluetooth/btusb_sample.c
+
 -- 
-1.8.0
+1.7.9.5
