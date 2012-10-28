@@ -2,63 +2,91 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
-Subject: [RFC v2 obexd 02/11] build: Add --enable-fuse for obexfuse
-Date: Sun, 28 Oct 2012 02:29:17 +0200
-Message-Id: <1351384166-15586-2-git-send-email-dmp0x7c5@gmail.com>
+Subject: [RFC v2 obexd 06/11] fuse: Add getattr operation
+Date: Sun, 28 Oct 2012 02:29:21 +0200
+Message-Id: <1351384166-15586-6-git-send-email-dmp0x7c5@gmail.com>
 In-Reply-To: <1351384166-15586-1-git-send-email-dmp0x7c5@gmail.com>
 References: <1351384166-15586-1-git-send-email-dmp0x7c5@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- Makefile.am  |    9 +++++++++
- configure.ac |   15 +++++++++++++++
- 2 files changed, 24 insertions(+), 0 deletions(-)
+ fuse/helpers.c  |    6 ++++++
+ fuse/helpers.h  |    2 ++
+ fuse/obexfuse.c |   34 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 42 insertions(+), 0 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 724dd5d..01441dc 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -132,6 +132,15 @@ client_obex_client_SOURCES = $(gdbus_sources) $(gobex_sources) \
- client_obex_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ @BLUEZ_LIBS@
- endif
+diff --git a/fuse/helpers.c b/fuse/helpers.c
+index cb0b51d..a10b706 100644
+--- a/fuse/helpers.c
++++ b/fuse/helpers.c
+@@ -509,3 +509,9 @@ GList *gobexhlp_listfolder(struct gobexhlp_session* session,
  
-+if FUSE
-+bin_PROGRAMS = fuse/obexfuse
+ 	return session->lsfiles;
+ }
 +
-+fuse_obexfuse_SOURCES = $(gobex_sources) $(btio_sources) \
-+		fuse/helpers.c fuse/obexfuse.c
-+
-+fuse_obexfuse_LDADD = @GLIB_LIBS@ @GTHREAD_LIBS@ @BLUEZ_LIBS@ @FUSE_LIBS@
-+endif
-+
- service_DATA = $(service_in_files:.service.in=.service)
++struct stat *gobexhlp_getattr(struct gobexhlp_session* session,
++					const char *path)
++{
++	return g_hash_table_lookup(session->file_stat, path);
++}
+diff --git a/fuse/helpers.h b/fuse/helpers.h
+index 546d79c..047abae 100644
+--- a/fuse/helpers.h
++++ b/fuse/helpers.h
+@@ -52,3 +52,5 @@ struct gobexhlp_session* gobexhlp_connect(const char *srcstr,
+ void gobexhlp_disconnect(struct gobexhlp_session* session);
  
- AM_CFLAGS = @BLUEZ_CFLAGS@ @EBOOK_CFLAGS@ @GTHREAD_CFLAGS@ @GLIB_CFLAGS@ \
-diff --git a/configure.ac b/configure.ac
-index c8e61ac..f380481 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -180,4 +180,19 @@ AM_CONDITIONAL(CLIENT, test "${enable_client}" != "no")
+ GList *gobexhlp_listfolder(struct gobexhlp_session* session, const char *path);
++struct stat *gobexhlp_getattr(struct gobexhlp_session* session,
++					const char *path);
+diff --git a/fuse/obexfuse.c b/fuse/obexfuse.c
+index 5de82ec..f4e85fa 100644
+--- a/fuse/obexfuse.c
++++ b/fuse/obexfuse.c
+@@ -111,8 +111,42 @@ static int obexfuse_readdir(const char *path, void *buf,
+ 	return session->status;
+ }
  
- AM_CONDITIONAL(READLINE, test "${readline_found}" = "yes")
- 
-+AC_ARG_ENABLE(fuse, AC_HELP_STRING([--enable-fuse],
-+			[Build obexfuse]), [
-+	PKG_CHECK_MODULES(FUSE, fuse, dummy=yes,
-+				      AC_MSG_ERROR(FUSE is required))
-+	AC_SUBST(FUSE_CFLAGS)
-+	AC_SUBST(FUSE_LIBS)
-+	enable_fuse=${enableval}
++static int obexfuse_getattr(const char *path, struct stat *stbuf)
++{
++	int res = 0;
++	struct stat *stfile;
 +
-+	PKG_CHECK_MODULES(GTHREAD, gthread-2.0, dummy=yes,
-+					AC_MSG_ERROR(libgthread is required))
-+	AC_SUBST(GTHREAD_CFLAGS)
-+	AC_SUBST(GTHREAD_LIBS)
-+])
-+AM_CONDITIONAL(FUSE, test "${enable_fuse}" != "no")
++	memset(stbuf, 0, sizeof(struct stat));
 +
- AC_OUTPUT(Makefile)
++	if (strcmp(path, "/") == 0) {
++		stbuf->st_mode = S_IFDIR | 0755;
++		stbuf->st_nlink = 2;
++	} else {
++		stfile = gobexhlp_getattr(session, path);
++
++		if (stfile == NULL)
++			return -ENOENT;
++
++		if (stfile->st_mode == S_IFREG)
++			stbuf->st_mode = stfile->st_mode | 0666;
++		else /* S_IFDIR */
++			stbuf->st_mode = stfile->st_mode | 0755;
++
++		stbuf->st_nlink = 1;
++		stbuf->st_size = stfile->st_size;
++		stbuf->st_mtime = stbuf->st_atime = stbuf->st_ctime =
++						stfile->st_mtime;
++		stbuf->st_blksize = 512;
++		stbuf->st_blocks = (stbuf->st_size + stbuf->st_blksize)
++						/ stbuf->st_blksize;
++	}
++
++	return res;
++}
++
+ static struct fuse_operations obexfuse_oper = {
+ 	.readdir = obexfuse_readdir,
++	.getattr = obexfuse_getattr,
+ 	.init = obexfuse_init,
+ 	.destroy = obexfuse_destroy,
+ };
 -- 
 1.7.8.6
 
