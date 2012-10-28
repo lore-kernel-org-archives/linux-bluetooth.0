@@ -1,323 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed; delsp=yes
+From: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Date: Sun, 28 Oct 2012 20:46:49 +0200
-Subject: Crashing bluetoothd when keyboard enters sleep mode / stand-by
-MIME-Version: 1.0
-From: "Patkos Csaba" <patkoscsaba@gmail.com>
-Message-ID: <op.wmwjsbelgqbfom@localhost>
+Cc: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
+Subject: [RFC v2 obexd 11/11] fuse: Add rename operation
+Date: Sun, 28 Oct 2012 02:29:26 +0200
+Message-Id: <1351384166-15586-11-git-send-email-dmp0x7c5@gmail.com>
+In-Reply-To: <1351384166-15586-1-git-send-email-dmp0x7c5@gmail.com>
+References: <1351384166-15586-1-git-send-email-dmp0x7c5@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ fuse/helpers.c  |   46 ++++++++++++++++++++++++++++++++++++++++++++++
+ fuse/helpers.h  |    3 +++
+ fuse/obexfuse.c |   16 ++++++++++++++++
+ 3 files changed, 65 insertions(+), 0 deletions(-)
 
-When my keyboard enters stand-by and disconnects from the computer I see  
-high cpu usage by bluetoothd. Sometimes, not always, if I don't wake up  
-the keyboard, bluetoothd will crash leaving this in /var/log/messages:
-
-Oct 28 18:04:49 localhost kernel: [27658.431018] hid-generic  
-0005:045E:077C.0013: unknown main item tag 0x0
-Oct 28 18:04:49 localhost kernel: [27658.431243] input: Microsoft Sculpt  
-Touch Mouse as  
-/devices/pci0000:00/0000:00:1d.1/usb3/3-1/3-1:1.0/bluetooth/hci0/hci0:45/input32
-Oct 28 18:04:49 localhost kernel: [27658.431438] hid-generic  
-0005:045E:077C.0013: input,hidraw3: BLUETOOTH HID v1.1e Mouse [Microsoft  
-Sculpt Touch Mouse] on 00:15:83:3D:0A:57
-
-
-There are no such problems with the mouse, which, as well as the keyboard,  
-enters stand-by if not used. I have bluez 4.101 provided by Sabayon Linux.
-
-I don't know if it is related, but there is also a problem with the  
-keyboard state after starting bluetoothd. The initial state of the  
-keyboard is "disconnected" which is correct. After hitting a key the  
-keyboard tries to connect, state changes to "connected" but keyboard  
-doesn't work and nothing is printed in the logs. If I do a disconnect from  
-the KDE's bluedevil interface, or from the console by running "hcitool dc  
-7C:1E:52:A8:47:74" and than hit a key again, the keyboard is correctly  
-detected and working.
-
-I have this bluetooth keyboard:
-
-Oct 28 18:04:49 localhost kernel: [27658.427978] hid-generic  
-0005:045E:0762.0012: unknown main item tag 0x0
-Oct 28 18:04:49 localhost kernel: [27658.428887] input: Microsoft  
-Bluetooth Mobile Keyboard 6000 as  
-/devices/pci0000:00/0000:00:1d.1/usb3/3-1/3-1:1.0/bluetooth/hci0/hci0:42/input31
-Oct 28 18:04:49 localhost kernel: [27658.429030] hid-generic  
-0005:045E:0762.0012: input,hidraw2: BLUETOOTH HID v0.13 Keyboard  
-[Microsoft Bluetooth Mobile Keyboard 6000] on 00:15:83:3D:0A:57
-
-With this bluetooth mouse:
-
-Oct 28 18:04:49 localhost kernel: [27658.431018] hid-generic  
-0005:045E:077C.0013: unknown main item tag 0x0
-Oct 28 18:04:49 localhost kernel: [27658.431243] input: Microsoft Sculpt  
-Touch Mouse as  
-/devices/pci0000:00/0000:00:1d.1/usb3/3-1/3-1:1.0/bluetooth/hci0/hci0:45/input32
-Oct 28 18:04:49 localhost kernel: [27658.431438] hid-generic  
-0005:045E:077C.0013: input,hidraw3: BLUETOOTH HID v1.1e Mouse [Microsoft  
-Sculpt Touch Mouse] on 00:15:83:3D:0A:57
-
-Running on this usb-bluetooth adapter:
-
-localhost ~ # lsusb -v
-Bus 003 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth  
-Dongle (HCI mode)
-Device Descriptor:
-   bLength                18
-   bDescriptorType         1
-   bcdUSB               2.00
-   bDeviceClass          224 Wireless
-   bDeviceSubClass         1 Radio Frequency
-   bDeviceProtocol         1 Bluetooth
-   bMaxPacketSize0        64
-   idVendor           0x0a12 Cambridge Silicon Radio, Ltd
-   idProduct          0x0001 Bluetooth Dongle (HCI mode)
-   bcdDevice           31.64
-   iManufacturer           0
-   iProduct                0
-   iSerial                 0
-   bNumConfigurations      1
-   Configuration Descriptor:
-     bLength                 9
-     bDescriptorType         2
-     wTotalLength          177
-     bNumInterfaces          2
-     bConfigurationValue     1
-     iConfiguration          0
-     bmAttributes         0xc0
-       Self Powered
-     MaxPower                0mA
-     Interface Descriptor:
-       bLength                 9
-       bDescriptorType         4
-       bInterfaceNumber        0
-       bAlternateSetting       0
-       bNumEndpoints           3
-       bInterfaceClass       224 Wireless
-       bInterfaceSubClass      1 Radio Frequency
-       bInterfaceProtocol      1 Bluetooth
-       iInterface              0
-       Endpoint Descriptor:
-         bLength                 7
-         bDescriptorType         5
-         bEndpointAddress     0x81  EP 1 IN
-         bmAttributes            3
-           Transfer Type            Interrupt
-           Synch Type               None
-           Usage Type               Data
-         wMaxPacketSize     0x0010  1x 16 bytes
-         bInterval               1
-       Endpoint Descriptor:
-         bLength                 7
-         bDescriptorType         5
-         bEndpointAddress     0x02  EP 2 OUT
-         bmAttributes            2
-           Transfer Type            Bulk
-           Synch Type               None
-           Usage Type               Data
-         wMaxPacketSize     0x0040  1x 64 bytes
-         bInterval               1
-       Endpoint Descriptor:
-         bLength                 7
-         bDescriptorType         5
-         bEndpointAddress     0x82  EP 2 IN
-         bmAttributes            2
-           Transfer Type            Bulk
-           Synch Type               None
-           Usage Type               Data
-         wMaxPacketSize     0x0040  1x 64 bytes
-         bInterval               1
-     Interface Descriptor:
-       bLength                 9
-       bDescriptorType         4
-       bInterfaceNumber        1
-       bAlternateSetting       0
-       bNumEndpoints           2
-       bInterfaceClass       224 Wireless
-       bInterfaceSubClass      1 Radio Frequency
-       bInterfaceProtocol      1 Bluetooth
-       iInterface              0
-       Endpoint Descriptor:
-         bLength                 7
-         bDescriptorType         5
-         bEndpointAddress     0x03  EP 3 OUT
-         bmAttributes            1
-           Transfer Type            Isochronous
-           Synch Type               None
-           Usage Type               Data
-         wMaxPacketSize     0x0000  1x 0 bytes
-         bInterval               1
-       Endpoint Descriptor:
-         bLength                 7
-         bDescriptorType         5
-         bEndpointAddress     0x83  EP 3 IN
-         bmAttributes            1
-           Transfer Type            Isochronous
-           Synch Type               None
-           Usage Type               Data
-         wMaxPacketSize     0x0000  1x 0 bytes
-         bInterval               1
-     Interface Descriptor:
-       bLength                 9
-       bDescriptorType         4
-       bInterfaceNumber        1
-       bAlternateSetting       1
-       bNumEndpoints           2
-       bInterfaceClass       224 Wireless
-       bInterfaceSubClass      1 Radio Frequency
-       bInterfaceProtocol      1 Bluetooth
-       iInterface              0
-       Endpoint Descriptor:
-         bLength                 7
-         bDescriptorType         5
-         bEndpointAddress     0x03  EP 3 OUT
-         bmAttributes            1
-           Transfer Type            Isochronous
-           Synch Type               None
-           Usage Type               Data
-         wMaxPacketSize     0x0009  1x 9 bytes
-         bInterval               1
-       Endpoint Descriptor:
-         bLength                 7
-         bDescriptorType         5
-         bEndpointAddress     0x83  EP 3 IN
-         bmAttributes            1
-           Transfer Type            Isochronous
-           Synch Type               None
-           Usage Type               Data
-         wMaxPacketSize     0x0009  1x 9 bytes
-         bInterval               1
-     Interface Descriptor:
-       bLength                 9
-       bDescriptorType         4
-       bInterfaceNumber        1
-       bAlternateSetting       2
-       bNumEndpoints           2
-       bInterfaceClass       224 Wireless
-       bInterfaceSubClass      1 Radio Frequency
-       bInterfaceProtocol      1 Bluetooth
-       iInterface              0
-       Endpoint Descriptor:
-         bLength                 7
-         bDescriptorType         5
-         bEndpointAddress     0x03  EP 3 OUT
-         bmAttributes            1
-           Transfer Type            Isochronous
-           Synch Type               None
-           Usage Type               Data
-         wMaxPacketSize     0x0011  1x 17 bytes
-         bInterval               1
-       Endpoint Descriptor:
-         bLength                 7
-         bDescriptorType         5
-         bEndpointAddress     0x83  EP 3 IN
-         bmAttributes            1
-           Transfer Type            Isochronous
-           Synch Type               None
-           Usage Type               Data
-         wMaxPacketSize     0x0011  1x 17 bytes
-         bInterval               1
-     Interface Descriptor:
-       bLength                 9
-       bDescriptorType         4
-       bInterfaceNumber        1
-       bAlternateSetting       3
-       bNumEndpoints           2
-       bInterfaceClass       224 Wireless
-       bInterfaceSubClass      1 Radio Frequency
-       bInterfaceProtocol      1 Bluetooth
-       iInterface              0
-       Endpoint Descriptor:
-         bLength                 7
-         bDescriptorType         5
-         bEndpointAddress     0x03  EP 3 OUT
-         bmAttributes            1
-           Transfer Type            Isochronous
-           Synch Type               None
-           Usage Type               Data
-         wMaxPacketSize     0x0019  1x 25 bytes
-         bInterval               1
-       Endpoint Descriptor:
-         bLength                 7
-         bDescriptorType         5
-         bEndpointAddress     0x83  EP 3 IN
-         bmAttributes            1
-           Transfer Type            Isochronous
-           Synch Type               None
-           Usage Type               Data
-         wMaxPacketSize     0x0019  1x 25 bytes
-         bInterval               1
-     Interface Descriptor:
-       bLength                 9
-       bDescriptorType         4
-       bInterfaceNumber        1
-       bAlternateSetting       4
-       bNumEndpoints           2
-       bInterfaceClass       224 Wireless
-       bInterfaceSubClass      1 Radio Frequency
-       bInterfaceProtocol      1 Bluetooth
-       iInterface              0
-       Endpoint Descriptor:
-         bLength                 7
-         bDescriptorType         5
-         bEndpointAddress     0x03  EP 3 OUT
-         bmAttributes            1
-           Transfer Type            Isochronous
-           Synch Type               None
-           Usage Type               Data
-         wMaxPacketSize     0x0021  1x 33 bytes
-         bInterval               1
-       Endpoint Descriptor:
-         bLength                 7
-         bDescriptorType         5
-         bEndpointAddress     0x83  EP 3 IN
-         bmAttributes            1
-           Transfer Type            Isochronous
-           Synch Type               None
-           Usage Type               Data
-         wMaxPacketSize     0x0021  1x 33 bytes
-         bInterval               1
-     Interface Descriptor:
-       bLength                 9
-       bDescriptorType         4
-       bInterfaceNumber        1
-       bAlternateSetting       5
-       bNumEndpoints           2
-       bInterfaceClass       224 Wireless
-       bInterfaceSubClass      1 Radio Frequency
-       bInterfaceProtocol      1 Bluetooth
-       iInterface              0
-       Endpoint Descriptor:
-         bLength                 7
-         bDescriptorType         5
-         bEndpointAddress     0x03  EP 3 OUT
-         bmAttributes            1
-           Transfer Type            Isochronous
-           Synch Type               None
-           Usage Type               Data
-         wMaxPacketSize     0x0031  1x 49 bytes
-         bInterval               1
-       Endpoint Descriptor:
-         bLength                 7
-         bDescriptorType         5
-         bEndpointAddress     0x83  EP 3 IN
-         bmAttributes            1
-           Transfer Type            Isochronous
-           Synch Type               None
-           Usage Type               Data
-         wMaxPacketSize     0x0031  1x 49 bytes
-         bInterval               1
-Device Status:     0x0001
-   Self Powered
-
-
-
-
+diff --git a/fuse/helpers.c b/fuse/helpers.c
+index d0580c2..2487d09 100644
+--- a/fuse/helpers.c
++++ b/fuse/helpers.c
+@@ -689,3 +689,49 @@ void gobexhlp_delete(struct gobexhlp_session* session, const char *path)
+ 	free_location(l);
+ 	request_wait_free(session);
+ }
++
++void gobexhlp_mkdir(struct gobexhlp_session* session, const char *path)
++{
++	struct gobexhlp_location *l;
++	struct stat *stbuf;
++
++	g_print("gobexhlp_mkdir(%s)\n", path);
++
++	l = get_location(path);
++	gobexhlp_setpath(session, l->dir);
++
++	request_new(session, g_strdup_printf("mkdir %s", path));
++	/* g_obex_mkdir also sets path, to new folder */
++	g_obex_mkdir(session->obex, l->file, response_func, session,
++							&session->err);
++	g_free(session->setpath);
++	session->setpath = g_strdup(path);
++
++	stbuf = g_malloc0(sizeof(struct stat));
++	stbuf->st_mode = S_IFDIR;
++	stbuf->st_mtime = time(NULL);
++	g_hash_table_replace(session->file_stat, g_strdup(path), stbuf);
++
++	free_location(l);
++	request_wait_free(session);
++}
++
++void gobexhlp_move(struct gobexhlp_session* session, const char *oldpath,
++						const char* newpath)
++{
++	struct gobexhlp_location *l_from, *l_to;
++
++	l_to = get_location(newpath);
++	l_from = get_location(oldpath);
++	gobexhlp_setpath(session, l_from->dir);
++
++	g_print("gobexhlp_move(%s to %s)\n", l_from->file, l_to->file);
++
++	request_new(session, g_strdup_printf("move %s:%s",
++					oldpath, newpath));
++	g_obex_move(session->obex, l_from->file, l_to->file, response_func,
++						session, &session->err);
++	free_location(l_to);
++	free_location(l_from);
++	request_wait_free(session);
++}
+diff --git a/fuse/helpers.h b/fuse/helpers.h
+index 803cb59..80e3aa8 100644
+--- a/fuse/helpers.h
++++ b/fuse/helpers.h
+@@ -61,3 +61,6 @@ void gobexhlp_put(struct gobexhlp_session* session,
+ 					const char *path);
+ void gobexhlp_touch(struct gobexhlp_session* session, const char *path);
+ void gobexhlp_delete(struct gobexhlp_session* session, const char *path);
++void gobexhlp_mkdir(struct gobexhlp_session* session, const char *path);
++void gobexhlp_move(struct gobexhlp_session* session, const char *oldpath,
++					const char* newpath);
+diff --git a/fuse/obexfuse.c b/fuse/obexfuse.c
+index 2a6ee11..f9f9d0e 100644
+--- a/fuse/obexfuse.c
++++ b/fuse/obexfuse.c
+@@ -237,6 +237,20 @@ static int obexfuse_unlink(const char *path)
+ 	return session->status;
+ }
+ 
++static int obexfuse_mkdir(const char *path, mode_t mode)
++{
++	gobexhlp_mkdir(session, path);
++
++	return session->status;
++}
++
++static int obexfuse_rename(const char *from, const char *to)
++{
++	gobexhlp_move(session, from, to);
++
++	return session->status;
++}
++
+ static struct fuse_operations obexfuse_oper = {
+ 	.readdir = obexfuse_readdir,
+ 	.getattr = obexfuse_getattr,
+@@ -249,6 +263,8 @@ static struct fuse_operations obexfuse_oper = {
+ 	.mknod = obexfuse_mknod,
+ 	.unlink = obexfuse_unlink,
+ 	.rmdir = obexfuse_unlink,
++	.mkdir = obexfuse_mkdir,
++	.rename = obexfuse_rename,
+ 	.init = obexfuse_init,
+ 	.destroy = obexfuse_destroy,
+ };
 -- 
-ing. Patkós Csaba
-Software Developer @ Syneto SRL (http://www.syneto.net)
-Member of The Romanian Mandriva Users Group (http://www.mandrivausrs.ro)
-----
-I use Dropbox. Do you? http://db.tt/IqeKInu
+1.7.8.6
+
