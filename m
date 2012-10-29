@@ -1,33 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 29 Oct 2012 13:07:12 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v4] AVDTP: Do not keep a internal reference
-Message-ID: <20121029110712.GA10204@x220>
-References: <1351259069-21516-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 29 Oct 2012 11:47:13 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Tejun Heo <tj@kernel.org>, Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Cc: Dan Magenheimer <dan.magenheimer@oracle.com>,
+	linux-kernel@vger.kernel.org, Konrad Wilk <konrad.wilk@oracle.com>
+Subject: Re: [PATCH] workqueue: cancel_delayed_work() should return %NULL if
+ work item is idle
+Message-ID: <20121029094707.GC9314@aemeltch-MOBL1>
+References: <444a6439-b1a4-4740-9e7e-bc37267cfe73@default>
+ <20121018233928.GY13370@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1351259069-21516-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <20121018233928.GY13370@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Gustavo, could you apply the patch below to bluetooth-next tree, otherwise
+it is deadly broken.
 
-On Fri, Oct 26, 2012, Luiz Augusto von Dentz wrote:
-> Don't initialize reference with 1, instead always start disconnect timer
-> when reference drops to 0, so in case nobody reclaims the session it
-> automatically disconnect after 1 second and frees the memory.
-> ---
-> v2: Fix with stream_setup flag being ignored in disconnect_timeout
-> v3: Do avrcp_free on connection_lost to avoid having dangling sessions in
-> disconnected state waiting the timeout to be freed.
-> v4: Remove unnecessary reference when authorizing, disconnect timer is only
-> started when the session is really connected.
+Best regards 
+Andrei Emeltchenko 
+
+On Thu, Oct 18, 2012 at 04:39:28PM -0700, Tejun Heo wrote:
+> From e65120fcfc1cb9697655d29ecd7982451c05d3c2 Mon Sep 17 00:00:00 2001
+> From: Dan Magenheimer <dan.magenheimer@oracle.com>
+> Date: Thu, 18 Oct 2012 16:31:37 -0700
 > 
->  audio/avdtp.c | 204 +++++++++++++++++++++++-----------------------------------
->  1 file changed, 82 insertions(+), 122 deletions(-)
-
-Applied. Thanks.
-
-Johan
+> 57b30ae77b ("workqueue: reimplement cancel_delayed_work() using
+> try_to_grab_pending()") made cancel_delayed_work() always return %true
+> unless someone else is also trying to cancel the work item, which is
+> broken - if the target work item is idle, the return value should be
+> %false.
+> 
+> try_to_grab_pending() indicates that the target work item was idle by
+> zero return value.  Use it for return.  Note that this brings
+> cancel_delayed_work() in line with __cancel_work_timer() in return
+> value handling.
+> 
+> Signed-off-by: Dan Magenheimer <dan.magenheimer@oracle.com>
+> Signed-off-by: Tejun Heo <tj@kernel.org>
+> LKML-Reference: <444a6439-b1a4-4740-9e7e-bc37267cfe73@default>
+> ---
+>  kernel/workqueue.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/kernel/workqueue.c b/kernel/workqueue.c
+> index d951daa..042d221 100644
+> --- a/kernel/workqueue.c
+> +++ b/kernel/workqueue.c
+> @@ -2982,7 +2982,7 @@ bool cancel_delayed_work(struct delayed_work *dwork)
+>  
+>  	set_work_cpu_and_clear_pending(&dwork->work, work_cpu(&dwork->work));
+>  	local_irq_restore(flags);
+> -	return true;
+> +	return ret;
+>  }
+>  EXPORT_SYMBOL(cancel_delayed_work);
+>  
+> -- 
+> 1.7.7.3
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
