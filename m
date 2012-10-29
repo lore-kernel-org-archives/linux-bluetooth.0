@@ -1,37 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 29 Oct 2012 13:21:19 +0200
+Date: Mon, 29 Oct 2012 13:07:12 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Patkos Csaba <patkoscsaba@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Crashing bluetoothd when keyboard enters sleep mode / stand-by
-Message-ID: <20121029112119.GA11037@x220>
-References: <op.wmwjsbelgqbfom@localhost>
+Subject: Re: [PATCH BlueZ v4] AVDTP: Do not keep a internal reference
+Message-ID: <20121029110712.GA10204@x220>
+References: <1351259069-21516-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <op.wmwjsbelgqbfom@localhost>
+In-Reply-To: <1351259069-21516-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-On Sun, Oct 28, 2012, Patkos Csaba wrote:
-> When my keyboard enters stand-by and disconnects from the computer I
-> see high cpu usage by bluetoothd. Sometimes, not always, if I don't
-> wake up the keyboard, bluetoothd will crash
+On Fri, Oct 26, 2012, Luiz Augusto von Dentz wrote:
+> Don't initialize reference with 1, instead always start disconnect timer
+> when reference drops to 0, so in case nobody reclaims the session it
+> automatically disconnect after 1 second and frees the memory.
+> ---
+> v2: Fix with stream_setup flag being ignored in disconnect_timeout
+> v3: Do avrcp_free on connection_lost to avoid having dangling sessions in
+> disconnected state waiting the timeout to be freed.
+> v4: Remove unnecessary reference when authorizing, disconnect timer is only
+> started when the session is really connected.
+> 
+>  audio/avdtp.c | 204 +++++++++++++++++++++++-----------------------------------
+>  1 file changed, 82 insertions(+), 122 deletions(-)
 
-Could you please try to get a proper backtrace of what's happening.
-I.e. run bluetoothd with valgrind or gdb, e.g.:
-
-sudo killall bluetoothd
-sudo valgrind /usr/sbin/bluetoothd -nd
-
-If this doesn't give useful info because of missing debug symbols either
-try to install them (no idea how to do that with your distro though) or
-compile and run 4.101 from the source tree (no need to install the
-custom compilation on your system).
-
-The HCI-level log would also be helpful in addition to the bluetoothd
-debug logs, so please run "hcidump -X" in a separate terminal while
-reproducing the issue. Thanks.
+Applied. Thanks.
 
 Johan
