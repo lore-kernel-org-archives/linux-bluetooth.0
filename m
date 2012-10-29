@@ -1,46 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <508DDCE7.6030708@globaledgesoft.com>
+Date: Mon, 29 Oct 2012 07:03:27 +0530
+From: Ajay <ajay.kv@globaledgesoft.com>
 MIME-Version: 1.0
-In-Reply-To: <508DDCE7.6030708@globaledgesoft.com>
-References: <508D6672.8000009@globaledgesoft.com>
-	<CAJdJm_MXB71MTcbrViLh486RtpWpx+a7SDvUPdSj2VdOa1fWvw@mail.gmail.com>
-	<CAJdJm_NHaBzobi=k3cMaM-J_3d6R7FCEvfrSJWbkiKxKpjKHWA@mail.gmail.com>
-	<508DCE10.40801@globaledgesoft.com>
-	<CAJdJm_P=USyDO5op7_7ynOT8Qe7dOifyN=notezK1HGCxOe8bA@mail.gmail.com>
-	<508DDCE7.6030708@globaledgesoft.com>
-Date: Tue, 30 Oct 2012 10:15:37 -0400
-Message-ID: <CAJdJm_PLSAZBc+ef_YXsmQ+VE5aW3aD_CPs3x2Y7gY+8zY19Bw@mail.gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+CC: linux-bluetooth@vger.kernel.org
 Subject: Re: BLE issue: Start_LE_Encryption fails
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Ajay <ajay.kv@globaledgesoft.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+References: <508D6672.8000009@globaledgesoft.com> <CAJdJm_MXB71MTcbrViLh486RtpWpx+a7SDvUPdSj2VdOa1fWvw@mail.gmail.com> <CAJdJm_NHaBzobi=k3cMaM-J_3d6R7FCEvfrSJWbkiKxKpjKHWA@mail.gmail.com> <508DCE10.40801@globaledgesoft.com> <CAJdJm_P=USyDO5op7_7ynOT8Qe7dOifyN=notezK1HGCxOe8bA@mail.gmail.com>
+In-Reply-To: <CAJdJm_P=USyDO5op7_7ynOT8Qe7dOifyN=notezK1HGCxOe8bA@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ajay,
+On Tuesday 30 October 2012 06:42 PM, Anderson Lizardo wrote:
+> Hi Ajay,
+>
+> On Sun, Oct 28, 2012 at 8:30 PM, Ajay <ajay.kv@globaledgesoft.com> wrote:
+>> Thanks, but "sudo hcitool -i hci0 cmd 0x08 0x0008 03 02 01 06 " ,   this
+>> command only sets the advertising data to zero right . so how do i set the
+>> adv flag as 0x06 . Which hci command is used for this  purpose .
+>
+> No, this sets adv. data to have "Flags" AD set to 0x06. But you missed
+> the second line of the command:
+>
+> sudo hcitool -i hci0 cmd 0x08 0x0008 03 02 01 06 \
+>      $(perl -e 'print "00 " x 28')
+>
+> The second line is important because it fills the other bytes with
+> zero (which some controllers require).
+>
+> Regards,
+>
+  ya , i got your point ,advertiser is informing the remote device  , 
+that it is not BR/EDR capable .That is done and device is connecting now.
+	But  still i dont know, how to do le specific pairing and 
+start_encryption enable(part of le pairing) . Is there any tool in bluez 
+  providing LE pairing before connecting the devices (want to try with 2 
+ubuntu pc's ).
 
-On Sun, Oct 28, 2012 at 9:33 PM, Ajay <ajay.kv@globaledgesoft.com> wrote:
->  ya , i got your point ,advertiser is informing the remote device  , that it
-> is not BR/EDR capable .That is done and device is connecting now.
->         But  still i dont know, how to do le specific pairing and
-> start_encryption enable(part of le pairing) . Is there any tool in bluez
-> providing LE pairing before connecting the devices (want to try with 2
-> ubuntu pc's ).
-
-We use the "simple-agent" script from test/ directory in BlueZ for pairing.
-
-On the slave side run:
-
-test/simple-agent hci0
-
-on the master side, after "hcitool lescan", run:
-
-test/simple-agent hci0 <slave-address>
-
-This should trigger Just Works SMP pairing.
-
-Regards,
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Thanks & regards
+
+  AJAY KV
+  GlobalEdge software Ltd
+  8892753703
