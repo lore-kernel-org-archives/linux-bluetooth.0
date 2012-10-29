@@ -1,68 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 29 Oct 2012 11:47:13 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Tejun Heo <tj@kernel.org>, Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Cc: Dan Magenheimer <dan.magenheimer@oracle.com>,
-	linux-kernel@vger.kernel.org, Konrad Wilk <konrad.wilk@oracle.com>
-Subject: Re: [PATCH] workqueue: cancel_delayed_work() should return %NULL if
- work item is idle
-Message-ID: <20121029094707.GC9314@aemeltch-MOBL1>
-References: <444a6439-b1a4-4740-9e7e-bc37267cfe73@default>
- <20121018233928.GY13370@google.com>
+Date: Mon, 29 Oct 2012 11:24:57 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv1 05/11] Bluetooth: AMP: Add Logical Link Create function
+Message-ID: <20121029092456.GB9314@aemeltch-MOBL1>
+References: <1350493622.26318.114.camel@aeonflux>
+ <1351167652-12346-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1351167652-12346-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <alpine.DEB.2.02.1210260958240.2459@mathewm-linux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20121018233928.GY13370@google.com>
+In-Reply-To: <alpine.DEB.2.02.1210260958240.2459@mathewm-linux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Gustavo, could you apply the patch below to bluetooth-next tree, otherwise
-it is deadly broken.
+Hi Mat,
+
+On Fri, Oct 26, 2012 at 10:01:01AM -0700, Mat Martineau wrote:
+
+...
+
+> >@@ -3948,13 +3955,15 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
+> >				goto done;
+> >			}
+> >
+> >-			/* check compatibility */
+> >-
+> >			if (!chan->ctrl_id)
+> >				l2cap_send_efs_conf_rsp(chan, buf, cmd->ident,
+> >							0);
+> >-			else
+> >-				chan->ident = cmd->ident;
+> >+			else {
+> >+				if (l2cap_check_efs(chan)) {
+> >+					amp_create_logical_link(chan);
+> >+					chan->ident = cmd->ident;
+> >+				}
+> >+			}
+> 
+> Minor style issue - if one block of an if/else needs braces, then
+> they all get braces.
+
+Sure. Will fix this.
 
 Best regards 
 Andrei Emeltchenko 
 
-On Thu, Oct 18, 2012 at 04:39:28PM -0700, Tejun Heo wrote:
-> From e65120fcfc1cb9697655d29ecd7982451c05d3c2 Mon Sep 17 00:00:00 2001
-> From: Dan Magenheimer <dan.magenheimer@oracle.com>
-> Date: Thu, 18 Oct 2012 16:31:37 -0700
-> 
-> 57b30ae77b ("workqueue: reimplement cancel_delayed_work() using
-> try_to_grab_pending()") made cancel_delayed_work() always return %true
-> unless someone else is also trying to cancel the work item, which is
-> broken - if the target work item is idle, the return value should be
-> %false.
-> 
-> try_to_grab_pending() indicates that the target work item was idle by
-> zero return value.  Use it for return.  Note that this brings
-> cancel_delayed_work() in line with __cancel_work_timer() in return
-> value handling.
-> 
-> Signed-off-by: Dan Magenheimer <dan.magenheimer@oracle.com>
-> Signed-off-by: Tejun Heo <tj@kernel.org>
-> LKML-Reference: <444a6439-b1a4-4740-9e7e-bc37267cfe73@default>
-> ---
->  kernel/workqueue.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-> index d951daa..042d221 100644
-> --- a/kernel/workqueue.c
-> +++ b/kernel/workqueue.c
-> @@ -2982,7 +2982,7 @@ bool cancel_delayed_work(struct delayed_work *dwork)
->  
->  	set_work_cpu_and_clear_pending(&dwork->work, work_cpu(&dwork->work));
->  	local_irq_restore(flags);
-> -	return true;
-> +	return ret;
->  }
->  EXPORT_SYMBOL(cancel_delayed_work);
->  
-> -- 
-> 1.7.7.3
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
