@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 06/12] Bluetooth: AMP: Process Disc Logical Link
-Date: Tue, 30 Oct 2012 17:52:58 +0200
-Message-Id: <1351612384-12392-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 11/12] Bluetooth: AMP: Use l2cap_physical_cfm in phylink complete evt
+Date: Tue, 30 Oct 2012 17:53:03 +0200
+Message-Id: <1351612384-12392-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1351612384-12392-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1350493622.26318.114.camel@aeonflux>
  <1351612384-12392-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,89 +12,104 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add processing for HCI Disconnection Logical Link Complete
-Event.
+When receiving HCI Phylink Complete event run amp_physical_cfm
+which initialize BR/EDR L2CAP channel associated with High Speed
+link and run l2cap_physical_cfm which shall send L2CAP Create
+Chan Request.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/amp.h |    1 +
- net/bluetooth/amp.c         |    7 +++++++
- net/bluetooth/hci_event.c   |   28 ++++++++++++++++++++++++++++
- 3 files changed, 36 insertions(+)
+ include/net/bluetooth/amp.h   |    1 +
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/amp.c           |   24 ++++++++++++++++++++++++
+ net/bluetooth/hci_event.c     |   15 ++-------------
+ 4 files changed, 28 insertions(+), 13 deletions(-)
 
 diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
-index 70d5c15..405fb9c 100644
+index f1c0017..7ea3db7 100644
 --- a/include/net/bluetooth/amp.h
 +++ b/include/net/bluetooth/amp.h
-@@ -47,5 +47,6 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+@@ -46,6 +46,7 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+ 			struct hci_conn *hcon);
  void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle);
  void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle);
++void amp_physical_cfm(struct hci_conn *bredr_hcon, struct hci_conn *hs_hcon);
  void amp_create_logical_link(struct l2cap_chan *chan);
-+void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason);
+ void amp_disconnect_logical_link(struct hci_chan *hchan);
+ void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason);
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 24c61ef..18149c8 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -812,5 +812,6 @@ void l2cap_send_conn_req(struct l2cap_chan *chan);
+ void l2cap_move_start(struct l2cap_chan *chan);
+ void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
+ 		       u8 status);
++void l2cap_physical_cfm(struct l2cap_chan *chan, int result);
  
- #endif /* __AMP_H */
+ #endif /* __L2CAP_H */
 diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index fbb6360..0f3fef3 100644
+index 917e034..650bb8d 100644
 --- a/net/bluetooth/amp.c
 +++ b/net/bluetooth/amp.c
-@@ -421,3 +421,10 @@ void amp_create_logical_link(struct l2cap_chan *chan)
- done:
- 	hci_dev_put(hdev);
- }
-+
-+void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason)
-+{
-+	BT_DBG("hchan %p", hchan);
-+
-+	hci_chan_del(hchan);
-+}
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 9963ec9..036cd8d 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3742,6 +3742,30 @@ static void hci_loglink_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	}
+@@ -373,6 +373,30 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+ 	hci_send_cmd(hdev, HCI_OP_ACCEPT_PHY_LINK, sizeof(cp), &cp);
  }
  
-+static void hci_disconn_loglink_complete_evt(struct hci_dev *hdev,
-+					     struct sk_buff *skb)
++void amp_physical_cfm(struct hci_conn *bredr_hcon, struct hci_conn *hs_hcon)
 +{
-+	struct hci_ev_disconn_logical_link_complete *ev = (void *) skb->data;
-+	struct hci_chan *hchan;
++	struct hci_dev *bredr_hdev = hci_dev_hold(bredr_hcon->hdev);
++	struct amp_mgr *mgr = hs_hcon->amp_mgr;
++	struct l2cap_chan *bredr_chan;
 +
-+	BT_DBG("%s log handle 0x%4.4x status 0x%2.2x", hdev->name,
-+	       le16_to_cpu(ev->handle), ev->status);
++	BT_DBG("bredr_hcon %p hs_hcon %p mgr %p", bredr_hcon, hs_hcon, mgr);
 +
-+	if (ev->status)
++	if (!bredr_hdev || !mgr || !mgr->bredr_chan)
 +		return;
 +
-+	hci_dev_lock(hdev);
++	bredr_chan = mgr->bredr_chan;
 +
-+	hchan = hci_chan_lookup_handle(hdev, le16_to_cpu(ev->handle));
-+	if (!hchan)
-+		goto unlock;
++	set_bit(FLAG_EFS_ENABLE, &bredr_chan->flags);
++	bredr_chan->ctrl_id = hs_hcon->remote_id;
++	bredr_chan->hs_hcon = hs_hcon;
++	bredr_chan->conn->mtu = hs_hcon->hdev->block_mtu;
++	bredr_chan->fcs = L2CAP_FCS_NONE;
 +
-+	amp_destroy_logical_link(hchan, ev->reason);
++	l2cap_physical_cfm(bredr_chan, 0);
 +
-+unlock:
-+	hci_dev_unlock(hdev);
++	hci_dev_put(bredr_hdev);
 +}
 +
- static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ void amp_create_logical_link(struct l2cap_chan *chan)
  {
- 	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
-@@ -4077,6 +4101,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_loglink_complete_evt(hdev, skb);
- 		break;
+ 	struct hci_cp_create_accept_logical_link cp;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 03d51a1..0b37f55 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3697,20 +3697,9 @@ static void hci_phy_link_complete_evt(struct hci_dev *hdev,
+ 	hci_conn_hold_device(hcon);
+ 	hci_conn_add_sysfs(hcon);
  
-+	case HCI_EV_DISCONN_LOGICAL_LINK_COMPLETE:
-+		hci_disconn_loglink_complete_evt(hdev, skb);
-+		break;
-+
- 	case HCI_EV_NUM_COMP_BLOCKS:
- 		hci_num_comp_blocks_evt(hdev, skb);
- 		break;
+-	hci_dev_unlock(hdev);
+-
+-	if (hcon->out) {
+-		struct hci_dev *bredr_hdev = hci_dev_hold(bredr_hcon->hdev);
+-
+-		if (!bredr_hdev)
+-			return;
++	amp_physical_cfm(bredr_hcon, hcon);
+ 
+-		/* Placeholder - create chan req
+-		l2cap_chan_create_cfm(bredr_hcon, hcon->remote_id);
+-		*/
+-
+-		hci_dev_put(bredr_hdev);
+-	}
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_loglink_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
 -- 
 1.7.9.5
 
