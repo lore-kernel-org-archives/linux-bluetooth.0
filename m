@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 10/12] Bluetooth: AMP: Check for hs_hcon instead of ctrl_id
-Date: Tue, 30 Oct 2012 17:53:02 +0200
-Message-Id: <1351612384-12392-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 04/12] Bluetooth: Derive remote and local amp id from chan struct
+Date: Tue, 30 Oct 2012 17:52:56 +0200
+Message-Id: <1351612384-12392-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1351612384-12392-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1350493622.26318.114.camel@aeonflux>
  <1351612384-12392-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,38 +12,31 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When deciding whether to send EFS configuration response with success,
-check rather for existence of High Speed physical link hs_hcon then
-ctrl_id. There might be cases when there is ctrl_id but high speed link
-is not established yet.
+l2cap_chan already keeps information about *_amp_id.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/bluetooth/l2cap_core.c |    6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index bb2cd9e..bdffc4c 100644
+index d51741f..782e49c 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -3921,7 +3921,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
- 		/* check compatibility */
+@@ -4573,9 +4573,11 @@ static void l2cap_do_move_cancel(struct l2cap_chan *chan, int result)
+ 	l2cap_ertm_send(chan);
+ }
  
- 		/* Send rsp for BR/EDR channel */
--		if (!chan->ctrl_id)
-+		if (!chan->hs_hcon)
- 			l2cap_send_efs_conf_rsp(chan, rsp, cmd->ident, flags);
- 		else
- 			chan->ident = cmd->ident;
-@@ -3971,7 +3971,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
- 				goto done;
- 			}
+-void l2cap_physical_cfm(struct l2cap_chan *chan, int result, u8 local_amp_id,
+-			u8 remote_amp_id)
++void l2cap_physical_cfm(struct l2cap_chan *chan, int result)
+ {
++	u8 local_amp_id = chan->local_amp_id;
++	u8 remote_amp_id = chan->ctrl_id;
++
+ 	BT_DBG("chan %p, result %d, local_amp_id %d, remote_amp_id %d",
+ 	       chan, result, local_amp_id, remote_amp_id);
  
--			if (!chan->ctrl_id) {
-+			if (!chan->hs_hcon) {
- 				l2cap_send_efs_conf_rsp(chan, buf, cmd->ident,
- 							0);
- 			} else {
 -- 
 1.7.9.5
 
