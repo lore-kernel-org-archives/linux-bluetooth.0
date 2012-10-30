@@ -1,364 +1,340 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1351384166-15586-3-git-send-email-dmp0x7c5@gmail.com>
-References: <1351384166-15586-1-git-send-email-dmp0x7c5@gmail.com>
-	<1351384166-15586-3-git-send-email-dmp0x7c5@gmail.com>
-Date: Tue, 30 Oct 2012 10:08:01 +0100
-Message-ID: <CABBYNZLoiM=-f3D5mUc_t96P=vbU2i__Cw3eBxskjComBxS27g@mail.gmail.com>
-Subject: Re: [RFC v2 obexd 03/11] fuse: Add obexhlp_connect/disconnect
- functions with helpers
+In-Reply-To: <CAMOw1v4xDW3fRjjb=i=nOhc3oYuv_A4M7pctdFvpC7rPHHgyiA@mail.gmail.com>
+References: <1351521709-4063-1-git-send-email-luiz.dentz@gmail.com>
+	<1351521709-4063-3-git-send-email-luiz.dentz@gmail.com>
+	<CAMOw1v4xDW3fRjjb=i=nOhc3oYuv_A4M7pctdFvpC7rPHHgyiA@mail.gmail.com>
+Date: Tue, 30 Oct 2012 09:49:12 +0100
+Message-ID: <CABBYNZJwfxgk97mygi-oqCsGzHGTz6Xrw0UMa6vtN7R5D153+A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/7] player: Add support for SetProperty
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?ISO-8859-2?Q?Micha=B3_Poczwardowski?= <dmp0x7c5@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+Hi Lucas,
 
-On Sun, Oct 28, 2012 at 2:29 AM, Michał Poczwardowski
-<dmp0x7c5@gmail.com> wrote:
-> ---
->  fuse/helpers.c  |  221 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  fuse/helpers.h  |    4 +
->  fuse/obexfuse.c |   40 ++++++++++
->  3 files changed, 265 insertions(+), 0 deletions(-)
+On Mon, Oct 29, 2012 at 4:41 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> On Mon, Oct 29, 2012 at 12:41 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> Properties Equalizer, Repeat, Shuffle and Scan can be set by user
+>> application.
+>> ---
+>>  audio/avrcp.c  | 129 ++++++++++++++++++++++++++++++++++++++++++++++-
+>>  audio/player.c | 154 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>>  audio/player.h |   9 ++++
+>>  3 files changed, 288 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/audio/avrcp.c b/audio/avrcp.c
+>> index 7c26491..724e139 100644
+>> --- a/audio/avrcp.c
+>> +++ b/audio/avrcp.c
+>> @@ -449,6 +449,60 @@ static const char *attr_to_str(uint8_t attr)
+>>         return NULL;
+>>  }
+>>
+>> +static int attrval_to_val(uint8_t attr, const char *value)
+>> +{
+>> +       int ret;
+>> +
+>> +       switch (attr) {
+>> +       case AVRCP_ATTRIBUTE_EQUALIZER:
+>> +               if (!strcmp(value, "off"))
+>> +                       ret = AVRCP_EQUALIZER_OFF;
+>> +               else if (!strcmp(value, "on"))
+>> +                       ret = AVRCP_EQUALIZER_ON;
+>> +               else
+>> +                       ret = -EINVAL;
+>> +
+>> +               return ret;
+>> +       case AVRCP_ATTRIBUTE_REPEAT_MODE:
+>> +               if (!strcmp(value, "off"))
+>> +                       ret = AVRCP_REPEAT_MODE_OFF;
+>> +               else if (!strcmp(value, "singletrack"))
+>> +                       ret = AVRCP_REPEAT_MODE_SINGLE;
+>> +               else if (!strcmp(value, "alltracks"))
+>> +                       ret = AVRCP_REPEAT_MODE_ALL;
+>> +               else if (!strcmp(value, "group"))
+>> +                       ret = AVRCP_REPEAT_MODE_GROUP;
+>> +               else
+>> +                       ret = -EINVAL;
+>> +
+>> +               return ret;
+>> +       case AVRCP_ATTRIBUTE_SHUFFLE:
+>> +               if (!strcmp(value, "off"))
+>> +                       ret = AVRCP_SHUFFLE_OFF;
+>> +               else if (!strcmp(value, "alltracks"))
+>> +                       ret = AVRCP_SHUFFLE_ALL;
+>> +               else if (!strcmp(value, "group"))
+>> +                       ret = AVRCP_SHUFFLE_GROUP;
+>> +               else
+>> +                       ret = -EINVAL;
+>> +
+>> +               return ret;
+>> +       case AVRCP_ATTRIBUTE_SCAN:
+>> +               if (!strcmp(value, "off"))
+>> +                       ret = AVRCP_SCAN_OFF;
+>> +               else if (!strcmp(value, "alltracks"))
+>> +                       ret = AVRCP_SCAN_ALL;
+>> +               else if (!strcmp(value, "group"))
+>> +                       ret = AVRCP_SCAN_GROUP;
+>> +               else
+>> +                       ret = -EINVAL;
+>> +
+>> +               return ret;
+>> +       }
+>> +
+>> +       return -EINVAL;
+>> +}
+>> +
+>>  static int attr_to_val(const char *str)
+>>  {
+>>         if (!strcasecmp(str, "Equalizer"))
+>> @@ -1528,6 +1582,22 @@ static void avrcp_get_play_status(struct avrcp *session)
+>>                                         session);
+>>  }
+>>
+>> +static const char *status_to_str(uint8_t status)
+>> +{
+>> +       switch (status) {
+>> +       case AVRCP_STATUS_INVALID_COMMAND:
+>> +               return "Invalid Command";
+>> +       case AVRCP_STATUS_INVALID_PARAM:
+>> +               return "Invalid Parameter";
+>> +       case AVRCP_STATUS_INTERNAL_ERROR:
+>> +               return "Internal Error";
+>> +       case AVRCP_STATUS_SUCCESS:
+>> +               return "Success";
+>> +       default:
+>> +               return "Unknown";
+>> +       }
+>> +}
+>> +
+>>  static gboolean avrcp_player_value_rsp(struct avctp *conn,
+>>                                         uint8_t code, uint8_t subunit,
+>>                                         uint8_t *operands, size_t operand_count,
+>> @@ -1540,8 +1610,11 @@ static gboolean avrcp_player_value_rsp(struct avctp *conn,
+>>         uint8_t count;
+>>         int i;
+>>
+>> -       if (code == AVC_CTYPE_REJECTED)
+>> +       if (code == AVC_CTYPE_REJECTED) {
+>> +               media_player_set_setting(mp, "Error",
+>> +                                       status_to_str(pdu->params[0]));
+>>                 return FALSE;
+>> +       }
+>>
+>>         count = pdu->params[0];
+>>
+>> @@ -1811,6 +1884,59 @@ static void avrcp_register_notification(struct avrcp *session, uint8_t event)
+>>                                         avrcp_handle_event, session);
+>>  }
+>>
+>> +static void avrcp_set_player_value(struct avrcp *session, uint8_t attr,
+>> +                                                               uint8_t val)
+>> +{
+>> +       uint8_t buf[AVRCP_HEADER_LENGTH + 3];
+>> +       struct avrcp_header *pdu = (void *) buf;
+>> +       uint8_t length;
+>> +
+>> +       memset(buf, 0, sizeof(buf));
+>> +
+>> +       set_company_id(pdu->company_id, IEEEID_BTSIG);
+>> +       pdu->pdu_id = AVRCP_SET_PLAYER_VALUE;
+>> +       pdu->packet_type = AVRCP_PACKET_TYPE_SINGLE;
+>> +       pdu->params[0] = 1;
+>> +       pdu->params[1] = attr;
+>> +       pdu->params[2] = val;
+>> +       pdu->params_len = htons(3);
+>> +
+>> +       length = AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
+>> +
+>> +       avctp_send_vendordep_req(session->conn, AVC_CTYPE_NOTIFY,
+>> +                                       AVC_SUBUNIT_PANEL, buf, length,
+>> +                                       avrcp_player_value_rsp, session);
+>> +}
+>> +
+>> +static bool ct_set_setting(struct media_player *mp, const char *key,
+>> +                                       const char *value, void *user_data)
+>> +{
+>> +       struct avrcp_player *player = user_data;
+>> +       int attr = attr_to_val(key);
+>> +       int val = attrval_to_val(attr, value);
+>> +       struct avrcp *session;
+>> +
+>> +       session = player->sessions->data;
+>> +       if (session == NULL)
+>> +               return false;
+>> +
+>> +       attr = attr_to_val(key);
+>> +       if (attr < 0)
+>> +               return false;
+>> +
+>> +       val = attrval_to_val(attr, value);
+>> +       if (val < 0)
+>> +               return false;
+>> +
+>> +       avrcp_set_player_value(session, attr, val);
+>> +
+>> +       return true;
+>> +}
+>> +
+>> +static const struct media_player_callback ct_cbs = {
+>> +       .set_setting = ct_set_setting,
+>> +};
+>> +
+>>  static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
+>>                                         uint8_t code, uint8_t subunit,
+>>                                         uint8_t *operands, size_t operand_count,
+>> @@ -1845,6 +1971,7 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
+>>
+>>         path = device_get_path(session->dev->btd_dev);
+>>         mp = media_player_controller_create(path);
+>> +       media_player_set_callbacks(mp, &ct_cbs, player);
+>>         player->user_data = mp;
+>>         player->destroy = (GDestroyNotify) media_player_destroy;
+>>
+>> diff --git a/audio/player.c b/audio/player.c
+>> index 1957594..e83b761 100644
+>> --- a/audio/player.c
+>> +++ b/audio/player.c
+>> @@ -49,6 +49,12 @@ struct player_callback {
+>>         void *user_data;
+>>  };
+>>
+>> +struct pending_req {
+>> +       DBusMessage *msg;
+>> +       const char *key;
+>> +       const char *value;
+>> +};
+>> +
+>>  struct media_player {
+>>         char                    *path;          /* Player object path */
+>>         GHashTable              *settings;      /* Player settings */
+>> @@ -58,6 +64,7 @@ struct media_player {
+>>         GTimer                  *progress;
+>>         guint                   process_id;
+>>         struct player_callback  *cb;
+>> +       GSList                  *pending;
+>>  };
+>>
+>>  static void append_settings(void *key, void *value, void *user_data)
+>> @@ -142,10 +149,96 @@ static DBusMessage *media_player_get_track(DBusConnection *conn,
+>>         return reply;
+>>  }
+>>
+>> +static struct pending_req *find_pending(struct media_player *mp,
+>> +                                                       const char *key)
+>> +{
+>> +       GSList *l;
+>> +
+>> +       for (l = mp->pending; l; l = l->next) {
+>> +               struct pending_req *p = l->data;
+>> +
+>> +               if (strcasecmp(key, p->key) == 0)
+>> +                       return p;
+>> +       }
+>> +
+>> +       return NULL;
+>> +}
+>> +
+>> +static struct pending_req *pending_new(DBusMessage *msg, const char *key,
+>> +                                                       const char *value)
+>> +{
+>> +       struct pending_req *p;
+>> +
+>> +       p = g_new0(struct pending_req, 1);
+>> +       p->msg = dbus_message_ref(msg);
+>> +       p->key = key;
+>> +       p->value = value;
+>> +
+>> +       return p;
+>> +}
+>> +
+>> +static DBusMessage *player_set_setting(struct media_player *mp,
+>> +                                       DBusMessage *msg, const char *key,
+>> +                                       const char *value)
+>> +{
+>> +       struct player_callback *cb = mp->cb;
+>> +       struct pending_req *p;
+>> +
+>> +       if (cb == NULL || cb->cbs->set_setting == NULL)
+>> +               return btd_error_not_supported(msg);
+>> +
+>> +       p = find_pending(mp, key);
+>> +       if (p != NULL)
+>> +               return btd_error_in_progress(msg);
+>> +
+>> +       if (!cb->cbs->set_setting(mp, key, value, cb->user_data))
+>> +               return btd_error_invalid_args(msg);
+>> +
+>> +       p = pending_new(msg, key, value);
+>> +
+>> +       mp->pending = g_slist_append(mp->pending, p);
+>> +
+>> +       return NULL;
+>> +}
+>> +
+>>  static DBusMessage *media_player_set_property(DBusConnection *conn,
+>>                                                 DBusMessage *msg, void *data)
+>>  {
+>> -       return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+>> +       struct media_player *mp = data;
+>> +       DBusMessageIter iter;
+>> +       DBusMessageIter var;
+>> +       const char *key, *value, *curval;
+>> +
+>> +       if (!dbus_message_iter_init(msg, &iter))
+>> +               return btd_error_invalid_args(msg);
+>> +
+>> +       if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
+>> +               return btd_error_invalid_args(msg);
+>> +
+>> +       dbus_message_iter_get_basic(&iter, &key);
+>> +       dbus_message_iter_next(&iter);
+>> +
+>> +       if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_VARIANT)
+>> +               return btd_error_invalid_args(msg);
+>> +
+>> +       dbus_message_iter_recurse(&iter, &var);
+>> +
+>> +       if (dbus_message_iter_get_arg_type(&var) != DBUS_TYPE_STRING)
+>> +               return btd_error_invalid_args(msg);
+>> +
+>> +       dbus_message_iter_get_basic(&var, &value);
+>> +
+>> +       if (g_strcmp0(key, "Equalizer") != 0 &&
+>> +                               g_strcmp0(key, "Repeat") != 0 &&
+>> +                               g_strcmp0(key, "Shuffle") != 0 &&
+>> +                               g_strcmp0(key, "Scan") != 0)
+>> +               return btd_error_invalid_args(msg);
+>> +
+>> +       curval = g_hash_table_lookup(mp->settings, key);
+>> +       if (g_strcmp0(curval, value) == 0)
+>> +               return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+>> +
+>> +       return player_set_setting(mp, msg, key, value);
+>>  }
+>>
+>>  static const GDBusMethodTable media_player_methods[] = {
+>> @@ -155,7 +248,7 @@ static const GDBusMethodTable media_player_methods[] = {
+>>         { GDBUS_METHOD("GetTrack",
+>>                         NULL, GDBUS_ARGS({ "metadata", "a{sv}" }),
+>>                         media_player_get_track) },
+>> -       { GDBUS_METHOD("SetProperty",
+>> +       { GDBUS_ASYNC_METHOD("SetProperty",
 >
-> diff --git a/fuse/helpers.c b/fuse/helpers.c
-> index c36072d..856e1d5 100644
-> --- a/fuse/helpers.c
-> +++ b/fuse/helpers.c
-> @@ -43,6 +43,9 @@
->
->  #define OBEX_FTP_LS "x-obex/folder-listing"
->
-> +static GCond *gobexhlp_cond;
-> +static GMutex *gobexhlp_mutex;
-> +
->  struct gobexhlp_request {
->         gchar *name;
->         gboolean complete;
-> @@ -52,3 +55,221 @@ struct gobexhlp_location {
->         gchar *dir;
->         gchar *file;
->  };
-> +
-> +static uint16_t find_rfcomm_uuid(void *user_data)
-> +{
-> +       sdp_list_t *pds = (sdp_list_t*) user_data;
-> +       uint16_t channel = 0;
-> +
-> +       for (;pds;pds = pds->next) {
-> +               sdp_data_t *d = (sdp_data_t*)pds->data;
-> +               int proto = 0;
-> +               for (; d; d = d->next) {
-> +                       switch(d->dtd) {
-> +                       case SDP_UUID16:
-> +                       case SDP_UUID32:
-> +                       case SDP_UUID128:
-> +                               proto = sdp_uuid_to_proto(&d->val.uuid);
-> +                       break;
-> +                       case SDP_UINT8:
-> +                               if (proto == RFCOMM_UUID)
-> +                                       channel = d->val.int8;
-> +                               break;
-> +                       }
-> +               }
-> +       }
-> +       return channel;
-> +}
-> +
-> +static uint16_t get_ftp_channel(bdaddr_t *src, bdaddr_t *dst)
-> +{
-> +       sdp_session_t *sdp;
-> +       sdp_list_t *r, *search_list, *attrid_list;
-> +       sdp_list_t *response_list = NULL;
-> +       uuid_t uuid;
-> +
-> +       /* FTP_SDP_UUID "00001106-0000-1000-8000-00805f9b34fb" */
-> +       uint8_t uuid_int[] = {0, 0, 0x11, 0x06, 0, 0, 0x10, 0, 0x80,
-> +                                       0, 0, 0x80, 0x5f, 0x9b, 0x34, 0xfb};
-> +       uint32_t range = 0x0000ffff;
-> +       uint16_t channel = 0;
-> +
-> +       sdp = sdp_connect(src, dst, SDP_RETRY_IF_BUSY );
-> +       if (sdp == NULL)
-> +               return channel;
-> +
-> +       sdp_uuid128_create(&uuid, uuid_int);
-> +       search_list = sdp_list_append(NULL, &uuid);
-> +       attrid_list = sdp_list_append(NULL, &range);
-> +       sdp_service_search_attr_req(sdp, search_list, SDP_ATTR_REQ_RANGE,
-> +                                       attrid_list, &response_list);
-> +       r = response_list;
-> +
-> +       for (; r;r = r->next) {
-> +               sdp_record_t *rec = (sdp_record_t*) r->data;
-> +               sdp_list_t *proto_list;
-> +
-> +               if (sdp_get_access_protos(rec, &proto_list ) == 0) {
-> +                       sdp_list_t *p = proto_list;
-> +                       for (; p; p = p->next) {
-> +                               sdp_list_t *pds = (sdp_list_t*) p->data;
-> +                               channel = find_rfcomm_uuid(pds);
-> +                               sdp_list_free((sdp_list_t*) p->data, 0);
+> Why not using the DBus.Properties interface?
 
-You dont really need to iterate in the list of protos there exist a
-function that does that for you take a look at sdp_get_proto_port, btw
-there exist a similar code in client/bluetooth.c
-
-> +                       }
-> +                       sdp_list_free(proto_list, 0);
-> +               }
-> +               sdp_record_free(rec);
-> +       }
-> +       sdp_close(sdp);
-> +
-> +       g_free(search_list);
-> +       g_free(attrid_list);
-> +       g_free(response_list);
-> +
-> +       return channel;
-> +}
-> +
-> +/* taken from client/bluetooth.c - bluetooth_getpacketopt */
-> +static int get_packet_opt(GIOChannel *io, int *tx_mtu, int *rx_mtu)
-> +{
-> +       int sk = g_io_channel_unix_get_fd(io);
-> +       int type;
-> +       int omtu = -1;
-> +       int imtu = -1;
-> +       socklen_t len = sizeof(int);
-> +
-> +       if (getsockopt(sk, SOL_SOCKET, SO_TYPE, &type, &len) < 0)
-> +               return -errno;
-> +
-> +       if (type != SOCK_SEQPACKET)
-> +               return -EINVAL;
-> +
-> +       if (!bt_io_get(io, BT_IO_L2CAP, NULL, BT_IO_OPT_OMTU, &omtu,
-> +                                               BT_IO_OPT_IMTU, &imtu,
-> +                                               BT_IO_OPT_INVALID))
-> +               return -EINVAL;
-> +
-> +       if (tx_mtu)
-> +               *tx_mtu = omtu;
-> +
-> +       if (rx_mtu)
-> +               *rx_mtu = imtu;
-> +
-> +       return 0;
-> +}
-> +
-> +static void obex_callback(GObex *obex, GError *err, GObexPacket *rsp,
-> +                                                       gpointer user_data)
-> +{
-> +       if (err != NULL) {
-> +               g_debug("Connect failed: %s\n", err->message);
-> +               g_error_free(err);
-> +       } else {
-> +               g_debug("Connect succeeded\n");
-> +       }
-> +}
-> +
-> +static void bt_io_callback(GIOChannel *io, GError *err, gpointer user_data)
-> +{
-> +       struct gobexhlp_session *session = user_data;
-> +       GObexTransportType type;
-> +       int tx_mtu = -1;
-> +       int rx_mtu = -1;
-> +
-> +       if (err != NULL) {
-> +               g_printerr("%s\n", err->message);
-> +               g_error_free(err);
-> +               return;
-> +       }
-> +
-> +       g_debug("Bluetooth socket connected\n");
-> +
-> +       g_io_channel_set_flags(session->io, G_IO_FLAG_NONBLOCK, NULL);
-> +       g_io_channel_set_close_on_unref(session->io, TRUE);
-> +
-> +       if (get_packet_opt(session->io, &tx_mtu, &rx_mtu) == 0) {
-> +               type = G_OBEX_TRANSPORT_PACKET;
-> +               g_debug("PACKET transport tx:%d rx:%d\n", tx_mtu, rx_mtu);
-> +       } else {
-> +               type = G_OBEX_TRANSPORT_STREAM;
-> +               g_debug("STREAM transport\n");
-> +       }
-> +
-> +       session->obex = g_obex_new(io, type, tx_mtu, rx_mtu);
-> +       g_obex_connect(session->obex, obex_callback, session, NULL,
-> +                               G_OBEX_HDR_TARGET, OBEX_FTP_UUID,
-> +                               OBEX_FTP_UUID_LEN, G_OBEX_HDR_INVALID);
-> +}
-> +
-> +struct gobexhlp_session* gobexhlp_connect(const char *srcstr,
-> +                                               const char *dststr)
-> +{
-> +       struct gobexhlp_session *session;
-> +       uint16_t channel;
-> +       bdaddr_t src, dst;
-> +
-> +       session = g_try_malloc0(sizeof(struct gobexhlp_session));
-> +       if (session == NULL)
-> +               return NULL;
-> +
-> +       if (srcstr == NULL)
-> +               bacpy(&src, BDADDR_ANY);
-> +       else
-> +               str2ba(srcstr, &src);
-> +
-> +       str2ba(dststr, &dst);
-> +       channel = get_ftp_channel(&src, &dst);
-> +
-> +       if (channel == 0)
-> +               return NULL;
-
-Currently you are not checking for L2CAP psm just RFCOMM channel so
-the code bellow would never be used.
-
-> +       if (channel > 31)
-> +               session->io = bt_io_connect(BT_IO_L2CAP, bt_io_callback,
-> +                               session, NULL, &session->err,
-> +                               BT_IO_OPT_SOURCE_BDADDR, &src,
-> +                               BT_IO_OPT_DEST_BDADDR, &dst,
-> +                               BT_IO_OPT_PSM, channel,
-> +                               BT_IO_OPT_MODE, BT_IO_MODE_ERTM,
-> +                               BT_IO_OPT_OMTU, BT_TX_MTU,
-> +                               BT_IO_OPT_IMTU, BT_RX_MTU,
-> +                               BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-> +                               BT_IO_OPT_INVALID);
-> +       else
-> +               session->io = bt_io_connect(BT_IO_RFCOMM, bt_io_callback,
-> +                               session, NULL, &session->err,
-> +                               BT_IO_OPT_SOURCE_BDADDR, &src,
-> +                               BT_IO_OPT_DEST_BDADDR, &dst,
-> +                               BT_IO_OPT_CHANNEL, channel,
-> +                               BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-> +                               BT_IO_OPT_INVALID);
-> +
-> +       if (session->err != NULL)
-> +               return NULL;
-> +
-> +       session->file_stat = g_hash_table_new_full( g_str_hash, g_str_equal,
-> +                                       g_free, g_free);
-> +       session->setpath = g_strdup("/");
-> +
-> +       gobexhlp_mutex = g_mutex_new();
-> +       gobexhlp_cond = g_cond_new();
-> +
-> +       return session;
-> +}
-> +
-> +void gobexhlp_disconnect(struct gobexhlp_session* session)
-> +{
-> +       if (session == NULL)
-> +               return;
-> +
-> +       g_obex_unref(session->obex);
-> +       g_free(session->io);
-> +
-> +       g_hash_table_remove_all(session->file_stat);
-> +       g_list_free_full(session->lsfiles, g_free);
-> +       g_free(session->setpath);
-> +
-> +       g_mutex_free(gobexhlp_mutex);
-> +       g_cond_free(gobexhlp_cond);
-> +
-> +       g_free(session);
-> +}
-> diff --git a/fuse/helpers.h b/fuse/helpers.h
-> index 142403f..29dc6cf 100644
-> --- a/fuse/helpers.h
-> +++ b/fuse/helpers.h
-> @@ -46,3 +46,7 @@ struct gobexhlp_session {
->         int status;
->         GError *err;
->  };
-> +
-> +struct gobexhlp_session* gobexhlp_connect(const char *srcstr,
-> +                                               const char *dstsrc);
-> +void gobexhlp_disconnect(struct gobexhlp_session* session);
-> diff --git a/fuse/obexfuse.c b/fuse/obexfuse.c
-> index fe4f4da..79eb990 100644
-> --- a/fuse/obexfuse.c
-> +++ b/fuse/obexfuse.c
-> @@ -33,6 +33,10 @@
->
->  #include "helpers.h"
->
-> +struct gobexhlp_session* session = NULL;
-> +static GMainLoop *main_loop;
-> +static GThread *main_gthread;
-> +
->  struct options {
->         char* dststr;
->         char* srcstr;
-> @@ -60,7 +64,34 @@ static struct fuse_opt obexfuse_opts[] =
->         FUSE_OPT_END
->  };
->
-> +gpointer main_loop_func(gpointer user_data)
-> +{
-> +       main_loop = g_main_loop_new(NULL, FALSE);
-> +       g_main_loop_run(main_loop);
-> +
-> +       return 0;
-> +}
-> +
-> +void* obexfuse_init(struct fuse_conn_info *conn)
-> +{
-> +       main_gthread = g_thread_create(main_loop_func, NULL, TRUE, NULL);
-> +
-> +       conn->async_read = 0;
-> +       conn->want &= ~FUSE_CAP_ASYNC_READ;
-> +
-> +       return 0;
-> +}
-> +
-> +void obexfuse_destroy()
-> +{
-> +       gobexhlp_disconnect(session);
-> +       g_main_loop_quit(main_loop);
-> +       g_thread_join(main_gthread);
-> +}
-> +
->  static struct fuse_operations obexfuse_oper = {
-> +       .init = obexfuse_init,
-> +       .destroy = obexfuse_destroy,
->  };
->
->  static int obexfuse_opt_proc(void *data, const char *arg, int key,
-> @@ -111,6 +142,15 @@ int main(int argc, char *argv[])
->
->         g_thread_init(NULL);
->
-
-I would suggest not mixing gobex prefix with your helper functions, in
-fact it is probably fine to just use obexfuse e.g. obexfuse_connect.
-
-> +       session = gobexhlp_connect(options.srcstr, options.dststr);
-> +       if (session == NULL || session->io == NULL) {
-> +               g_printerr("Connection to %s failed\n", options.dststr);
-> +               gobexhlp_disconnect(session);
-> +               return -EHOSTUNREACH;
-> +       } else {
-> +               g_print("Connected\nMounting %s\n", options.dststr);
-> +       }
-> +
->         fuse_opt_add_arg(&args, "-s"); /* force single threaded mode */
->         retfuse = fuse_main(args.argc, args.argv, &obexfuse_oper, NULL);
->
-> --
-> 1.7.8.6
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
+This is to align with what we currently have for target players, Im
+planning to move everything related to MediaPlayer interface to
+player.c then we can convert to use proper properties and change the
+related tools such as mpris-player/simple-player.
 
 -- 
 Luiz Augusto von Dentz
