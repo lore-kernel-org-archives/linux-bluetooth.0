@@ -1,58 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 08/12] Bluetooth: AMP: Remove hci_conn receiving error command status
-Date: Tue, 30 Oct 2012 17:53:00 +0200
-Message-Id: <1351612384-12392-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1351612384-12392-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 00/12] Handling physical and logical link
+Date: Tue, 30 Oct 2012 17:52:52 +0200
+Message-Id: <1351612384-12392-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1350493622.26318.114.camel@aeonflux>
 References: <1350493622.26318.114.camel@aeonflux>
- <1351612384-12392-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When receiving HCI Event: Command Status for Create Physical Link
-with Error code remove AMP hcon.
+Set of patches adding handling for physical and logical link
+complete events.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_event.c |   17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+Changes:
+	* rfcv2: Added several new patches, fixing style issues.
+	* rfcv1: Rebased on top of Mat's patches, preserve Marcel's ack for
+	not-changed-much patches only.
+	* rfcv0: original 
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 7ca98b9..03d51a1 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1810,14 +1810,23 @@ static void hci_cs_create_phylink(struct hci_dev *hdev, u8 status)
- 
- 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
- 
--	if (status)
--		return;
--
- 	cp = hci_sent_cmd_data(hdev, HCI_OP_CREATE_PHY_LINK);
- 	if (!cp)
- 		return;
- 
--	amp_write_remote_assoc(hdev, cp->phy_handle);
-+	hci_dev_lock(hdev);
-+
-+	if (status) {
-+		struct hci_conn *hcon;
-+
-+		hcon = hci_conn_hash_lookup_handle(hdev, cp->phy_handle);
-+		if (hcon)
-+			hci_conn_del(hcon);
-+	} else {
-+		amp_write_remote_assoc(hdev, cp->phy_handle);
-+	}
-+
-+	hci_dev_unlock(hdev);
- }
- 
- static void hci_cs_accept_phylink(struct hci_dev *hdev, u8 status)
+Andrei Emeltchenko (12):
+  Bluetooth: trivial: Fix braces style and remove empty line
+  Bluetooth: Save hs_hchan instead of hs_hcon in loglink complete
+  Bluetooth: Return correct L2CAP response type
+  Bluetooth: Derive remote and local amp id from chan struct
+  Bluetooth: AMP: Add Logical Link Create function
+  Bluetooth: AMP: Process Disc Logical Link
+  Bluetooth: AMP: Process Disc Physical Link Complete evt
+  Bluetooth: AMP: Remove hci_conn receiving error command status
+  Bluetooth: Disconnect logical link when deleteing chan
+  Bluetooth: AMP: Check for hs_hcon instead of ctrl_id
+  Bluetooth: AMP: Use l2cap_physical_cfm in phylink complete evt
+  Bluetooth: Process Create Chan Request
+
+ include/net/bluetooth/amp.h   |    4 ++
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/amp.c           |   94 ++++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c     |   95 +++++++++++++++++++++++++++++++++--------
+ net/bluetooth/l2cap_core.c    |   82 ++++++++++++++++++++++++++---------
+ 5 files changed, 238 insertions(+), 38 deletions(-)
+
 -- 
 1.7.9.5
 
