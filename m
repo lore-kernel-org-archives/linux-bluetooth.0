@@ -1,31 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1351615546.1828.1.camel@aeonflux>
-Subject: Re: [RFCv2 01/12] Bluetooth: trivial: Fix braces style and remove
- empty line
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 30 Oct 2012 09:45:46 -0700
-In-Reply-To: <1351612384-12392-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFCv2 01/12] Bluetooth: trivial: Fix braces style and remove empty line
+Date: Tue, 30 Oct 2012 17:52:53 +0200
+Message-Id: <1351612384-12392-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1351612384-12392-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1350493622.26318.114.camel@aeonflux>
-	 <1351612384-12392-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1351612384-12392-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ <1351612384-12392-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/l2cap_core.c |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index d1728af..c2fbaf9 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -6252,9 +6252,9 @@ void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 		conn = l2cap_conn_add(hcon, status);
+ 		if (conn)
+ 			l2cap_conn_ready(conn);
+-	} else
++	} else {
+ 		l2cap_conn_del(hcon, bt_to_errno(status));
+-
++	}
+ }
+ 
+ int l2cap_disconn_ind(struct hci_conn *hcon)
+-- 
+1.7.9.5
 
