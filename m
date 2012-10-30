@@ -1,46 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 00/12] Handling physical and logical link
-Date: Tue, 30 Oct 2012 17:52:52 +0200
-Message-Id: <1351612384-12392-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1350493622.26318.114.camel@aeonflux>
+Subject: [RFCv2 02/12] Bluetooth: Save hs_hchan instead of hs_hcon in loglink complete
+Date: Tue, 30 Oct 2012 17:52:54 +0200
+Message-Id: <1351612384-12392-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1351612384-12392-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1350493622.26318.114.camel@aeonflux>
+ <1351612384-12392-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Set of patches adding handling for physical and logical link
-complete events.
+When logical link creation is completed we need to save hs_hchan
+which represents logical link instead of hs_hcon representing
+physical link. hs_hcon shall be saved when receiving physical link
+complete event.
 
-Changes:
-	* rfcv2: Added several new patches, fixing style issues.
-	* rfcv1: Rebased on top of Mat's patches, preserve Marcel's ack for
-	not-changed-much patches only.
-	* rfcv0: original 
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Andrei Emeltchenko (12):
-  Bluetooth: trivial: Fix braces style and remove empty line
-  Bluetooth: Save hs_hchan instead of hs_hcon in loglink complete
-  Bluetooth: Return correct L2CAP response type
-  Bluetooth: Derive remote and local amp id from chan struct
-  Bluetooth: AMP: Add Logical Link Create function
-  Bluetooth: AMP: Process Disc Logical Link
-  Bluetooth: AMP: Process Disc Physical Link Complete evt
-  Bluetooth: AMP: Remove hci_conn receiving error command status
-  Bluetooth: Disconnect logical link when deleteing chan
-  Bluetooth: AMP: Check for hs_hcon instead of ctrl_id
-  Bluetooth: AMP: Use l2cap_physical_cfm in phylink complete evt
-  Bluetooth: Process Create Chan Request
-
- include/net/bluetooth/amp.h   |    4 ++
- include/net/bluetooth/l2cap.h |    1 +
- net/bluetooth/amp.c           |   94 ++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c     |   95 +++++++++++++++++++++++++++++++++--------
- net/bluetooth/l2cap_core.c    |   82 ++++++++++++++++++++++++++---------
- 5 files changed, 238 insertions(+), 38 deletions(-)
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index c2fbaf9..4ef85d2 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4375,7 +4375,7 @@ static void l2cap_logical_finish_create(struct l2cap_chan *chan,
+ {
+ 	struct l2cap_conf_rsp rsp;
+ 
+-	chan->hs_hcon = hchan->conn;
++	chan->hs_hchan = hchan;
+ 	chan->hs_hcon->l2cap_data = chan->conn;
+ 
+ 	l2cap_send_efs_conf_rsp(chan, &rsp, chan->ident, 0);
 -- 
 1.7.9.5
 
