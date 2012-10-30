@@ -1,65 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 30 Oct 2012 19:16:18 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv2 03/12] Bluetooth: Return correct L2CAP response type
-Message-ID: <20121030171611.GA28901@aemeltch-MOBL1>
-References: <1350493622.26318.114.camel@aeonflux>
- <1351612384-12392-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1351612384-12392-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1351615743.1828.4.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1351615743.1828.4.camel@aeonflux>
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
+	<frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v10 6/6] hcitool: Retrieve names from cache directory
+Date: Tue, 30 Oct 2012 18:05:28 +0100
+Message-Id: <1351616728-10075-6-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1351616728-10075-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1351616728-10075-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+---
+ Makefile.tools  |    2 +-
+ tools/hcitool.c |   31 ++++++++++++++++++++++++++-----
+ 2 files changed, 27 insertions(+), 6 deletions(-)
 
-On Tue, Oct 30, 2012 at 09:49:03AM -0700, Marcel Holtmann wrote:
-> Hi Andrei,
-> 
-> > Return L2CAP_CREATE_CHAN_RSP for Create Channel Request and
-> > L2CAP_CONN_RSP for Create Connection Request.
-> > 
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > ---
-> >  net/bluetooth/l2cap_core.c |   11 ++++++++++-
-> >  1 file changed, 10 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index 4ef85d2..d51741f 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -3478,12 +3478,21 @@ void __l2cap_connect_rsp_defer(struct l2cap_chan *chan)
-> >  	struct l2cap_conn_rsp rsp;
-> >  	struct l2cap_conn *conn = chan->conn;
-> >  	u8 buf[128];
-> > +	u8 rsp_code;
-> >  
-> >  	rsp.scid   = cpu_to_le16(chan->dcid);
-> >  	rsp.dcid   = cpu_to_le16(chan->scid);
-> >  	rsp.result = __constant_cpu_to_le16(L2CAP_CR_SUCCESS);
-> >  	rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
-> > -	l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP, sizeof(rsp), &rsp);
-> > +
-> > +	if (chan->hs_hcon)
-> > +		rsp_code = L2CAP_CREATE_CHAN_RSP;
-> > +	else
-> > +		rsp_code = L2CAP_CONN_RSP;
-> > +
-> > +	BT_DBG("chan %p rsp_code %u", chan, rsp_code);
-> > +
-> > +	l2cap_send_cmd(conn, chan->ident, rsp_code, sizeof(rsp), &rsp);
-> 
-> looks a bit hackish to me, but seems to work since both responses are
-> essentially identical. Separate functions might be better, but that can
-> be also fixed later on.
-
-I have continued to use method proposed by Mat. Do you think it shall be
-changed?
-
-Best regards 
-Andrei Emeltchenko 
+diff --git a/Makefile.tools b/Makefile.tools
+index ec79cea..f7c85ef 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -28,7 +28,7 @@ tools_hciconfig_LDADD = lib/libbluetooth-private.la
+ 
+ tools_hcitool_SOURCES = tools/hcitool.c src/oui.h src/oui.c \
+ 						src/textfile.h src/textfile.c
+-tools_hcitool_LDADD = lib/libbluetooth-private.la
++tools_hcitool_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@
+ 
+ tools_sdptool_SOURCES = tools/sdptool.c src/sdp-xml.h src/sdp-xml.c
+ tools_sdptool_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@
+diff --git a/tools/hcitool.c b/tools/hcitool.c
+index aefbd68..a05e31f 100644
+--- a/tools/hcitool.c
++++ b/tools/hcitool.c
+@@ -40,6 +40,8 @@
+ #include <sys/socket.h>
+ #include <signal.h>
+ 
++#include <glib.h>
++
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/hci.h>
+ #include <bluetooth/hci_lib.h>
+@@ -409,13 +411,32 @@ static char *major_classes[] = {
+ 
+ static char *get_device_name(const bdaddr_t *local, const bdaddr_t *peer)
+ {
+-	char filename[PATH_MAX + 1], addr[18];
++	char filename[PATH_MAX + 1];
++	char local_addr[18], peer_addr[18];
++	GKeyFile *key_file;
++	char *str = NULL;
++	int len;
++
++	ba2str(local, local_addr);
++	ba2str(peer, peer_addr);
++
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s", local_addr,
++			peer_addr);
++	filename[PATH_MAX] = '\0';
++	key_file = g_key_file_new();
++
++	if (g_key_file_load_from_file(key_file, filename, 0, NULL)) {
++		str = g_key_file_get_string(key_file, "General", "Name", NULL);
++		if (str) {
++			len = strlen(str);
++			if (len > HCI_MAX_NAME_LENGTH)
++				str[HCI_MAX_NAME_LENGTH] = '\0';
++		}
++	}
+ 
+-	ba2str(local, addr);
+-	create_name(filename, PATH_MAX, STORAGEDIR, addr, "names");
++	g_key_file_free(key_file);
+ 
+-	ba2str(peer, addr);
+-	return textfile_get(filename, addr);
++	return str;
+ }
+ 
+ /* Display local devices */
+-- 
+1.7.9.5
 
