@@ -1,64 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v4 00/16] mSBC tests
-Date: Tue, 30 Oct 2012 10:39:19 +0100
-Message-Id: <1351589975-22640-1-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
+In-Reply-To: <1351384166-15586-4-git-send-email-dmp0x7c5@gmail.com>
+References: <1351384166-15586-1-git-send-email-dmp0x7c5@gmail.com>
+	<1351384166-15586-4-git-send-email-dmp0x7c5@gmail.com>
+Date: Tue, 30 Oct 2012 10:35:10 +0100
+Message-ID: <CABBYNZJorono572HhGqRrxNT2uDvz2PV1n4rdHs0mWJ8CRKqSg@mail.gmail.com>
+Subject: Re: [RFC v2 obexd 04/11] fuse: Add request helpers and setpath operation
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: =?ISO-8859-2?Q?Micha=B3_Poczwardowski?= <dmp0x7c5@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Michal,
 
-v4 integrate latest comments from Siarhei:
- - remove state->pending field from sbc_encoder_state
- - add armv6 and iwmmxt primitives
- - use simd primitive instead of neon
- - reorder patches so that the SBC_MSBC flag is exposed to users only when
-implementation is complete.
+On Sun, Oct 28, 2012 at 2:29 AM, Michał Poczwardowski
+<dmp0x7c5@gmail.com> wrote:
+> ---
+>  fuse/helpers.c |  108 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 108 insertions(+), 0 deletions(-)
+>
+> diff --git a/fuse/helpers.c b/fuse/helpers.c
+> index 856e1d5..1b8082f 100644
+> --- a/fuse/helpers.c
+> +++ b/fuse/helpers.c
+> @@ -273,3 +273,111 @@ void gobexhlp_disconnect(struct gobexhlp_session* session)
+>
+>         g_free(session);
+>  }
+> +
+> +void request_new(struct gobexhlp_session *session,
+> +                                       gchar *name)
+> +{
+> +       g_print("REQUEST %s\n", name);
+> +
+> +       if (session->request != NULL)
+> +               g_error("Another request (%s) active!\n",
+> +                                       session->request->name);
+> +
+> +       session->status = 0;
+> +       session->request = g_malloc0(sizeof(struct gobexhlp_request));
+> +       session->request->name = name;
+> +
+> +       /*
+> +        * suspend/resume operations recreates g_io_add_watch(),
+> +        * it fixes obex->io freeze during transfer
+> +        */
+> +       g_obex_suspend(session->obex);
+> +       g_obex_resume(session->obex);
 
-I could only build armv6 code.
-
-Regards,
-Frederic
-
-
-Frédéric Dalleau (16):
-  sbc: Add encoder_state to analysis functions
-  sbc: Break 4 blocks processing to variable steps
-  sbc: Rename sbc_analyze_4b_xx to sbc_analyze_xx
-  sbc: add odd member variable to sbc_encoder_state
-  sbc: Add mmx primitive for 1b 8s analysis
-  sbc: Add armv6 primitive for 1b 8s analysis
-  sbc: Add iwmmxt primitive for 1b 8s encoding
-  sbc: Add simd primitive for 1b 8s analysis
-  sbc: Use simd primitive if doing msbc on neon
-  sbc: simd support for 8 multiples block size
-  sbc: Add SBC_MSBC flag to enable 15 block encoding
-  sbc: Add support for mSBC frame header
-  sbc: Update sbcdec for msbc
-  sbc: Update sbcenc for msbc
-  sbc: Update sbcinfo for msbc
-  sbc: Update copyrights
-
- sbc/sbc.c                   |  277 ++++++++++++++++++++++++++-----------------
- sbc/sbc.h                   |    3 +
- sbc/sbc_primitives.c        |   71 +++++++++--
- sbc/sbc_primitives.h        |   14 ++-
- sbc/sbc_primitives_armv6.c  |   26 +++-
- sbc/sbc_primitives_iwmmxt.c |   28 ++++-
- sbc/sbc_primitives_mmx.c    |   29 ++++-
- sbc/sbc_primitives_neon.c   |   12 +-
- src/sbcdec.c                |   18 ++-
- src/sbcenc.c                |   26 +++-
- src/sbcinfo.c               |   52 +++++---
- 11 files changed, 389 insertions(+), 167 deletions(-)
+It seems the issue here is that the mainloop is blocked then you have
+to force the io checking by doing g_io_add_watch in a different
+thread, we have dealt with this kind of problem before using
+g_main_context_iteration. I would have been better if fuse supported
+async io, but apparently all operations are blocking.
 
 -- 
-1.7.9.5
-
+Luiz Augusto von Dentz
