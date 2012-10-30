@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v4 11/16] sbc: Add SBC_MSBC flag to enable 15 block encoding
-Date: Tue, 30 Oct 2012 10:39:30 +0100
-Message-Id: <1351589975-22640-12-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v4 14/16] sbc: Update sbcenc for msbc
+Date: Tue, 30 Oct 2012 10:39:33 +0100
+Message-Id: <1351589975-22640-15-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1351589975-22640-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1351589975-22640-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -14,107 +14,90 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- sbc/sbc.c |   23 +++++++++++++++--------
- sbc/sbc.h |    3 +++
- 2 files changed, 18 insertions(+), 8 deletions(-)
+ src/sbcenc.c |   25 ++++++++++++++++++++-----
+ 1 file changed, 20 insertions(+), 5 deletions(-)
 
-diff --git a/sbc/sbc.c b/sbc/sbc.c
-index ffdf05d..22fa898 100644
---- a/sbc/sbc.c
-+++ b/sbc/sbc.c
-@@ -52,6 +52,9 @@
+diff --git a/src/sbcenc.c b/src/sbcenc.c
+index a723b03..71ad6bb 100644
+--- a/src/sbcenc.c
++++ b/src/sbcenc.c
+@@ -45,7 +45,7 @@ static int verbose = 0;
+ static unsigned char input[BUF_SIZE], output[BUF_SIZE + BUF_SIZE / 4];
  
- #define SBC_SYNCWORD	0x9C
- 
-+#define MSBC_SYNCWORD       0xAD
-+#define MSBC_BLOCKS         15
-+
- /* This structure contains an unpacked SBC frame.
-    Yes, there is probably quite some unused space herein */
- struct sbc_frame {
-@@ -903,12 +906,12 @@ static ssize_t sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len
+ static void encode(char *filename, int subbands, int bitpool, int joint,
+-					int dualchannel, int snr, int blocks)
++				int dualchannel, int snr, int blocks, int msbc)
+ {
+ 	struct au_header au_hdr;
+ 	sbc_t sbc;
+@@ -87,7 +87,7 @@ static void encode(char *filename, int subbands, int bitpool, int joint,
+ 		goto done;
  	}
- }
  
--static void sbc_encoder_init(struct sbc_encoder_state *state,
--					const struct sbc_frame *frame)
-+static void sbc_encoder_init(unsigned long flags,
-+		struct sbc_encoder_state *state, const struct sbc_frame *frame)
+-	sbc_init(&sbc, 0L);
++	sbc_init(&sbc, msbc ? SBC_MSBC : 0L);
+ 
+ 	switch (BE_INT(au_hdr.sample_rate)) {
+ 	case 16000:
+@@ -215,6 +215,7 @@ static void usage(void)
+ 	printf("Options:\n"
+ 		"\t-h, --help           Display help\n"
+ 		"\t-v, --verbose        Verbose mode\n"
++		"\t-m, --msbc           mSBC codec\n"
+ 		"\t-s, --subbands       Number of subbands to use (4 or 8)\n"
+ 		"\t-b, --bitpool        Bitpool value (default is 32)\n"
+ 		"\t-j, --joint          Joint stereo\n"
+@@ -227,6 +228,7 @@ static void usage(void)
+ static struct option main_options[] = {
+ 	{ "help",	0, 0, 'h' },
+ 	{ "verbose",	0, 0, 'v' },
++	{ "msbc",	0, 0, 'm' },
+ 	{ "subbands",	1, 0, 's' },
+ 	{ "bitpool",	1, 0, 'b' },
+ 	{ "joint",	0, 0, 'j' },
+@@ -239,9 +241,9 @@ static struct option main_options[] = {
+ int main(int argc, char *argv[])
  {
- 	memset(&state->X, 0, sizeof(state->X));
- 	state->position = (SBC_X_BUFFER_SIZE - frame->subbands * 9) & ~7;
--	state->increment = 4;
-+	state->increment = flags & SBC_MSBC ? 1 : 4;
+ 	int i, opt, subbands = 8, bitpool = 32, joint = 0, dualchannel = 0;
+-	int snr = 0, blocks = 16;
++	int snr = 0, blocks = 16, msbc = 0;
  
- 	sbc_init_primitives(state);
- }
-@@ -922,6 +925,7 @@ struct sbc_priv {
+-	while ((opt = getopt_long(argc, argv, "+hvs:b:jdSB:",
++	while ((opt = getopt_long(argc, argv, "+hmvs:b:jdSB:",
+ 						main_options, NULL)) != -1) {
+ 		switch(opt) {
+ 		case 'h':
+@@ -252,6 +254,10 @@ int main(int argc, char *argv[])
+ 			verbose = 1;
+ 			break;
  
- static void sbc_set_defaults(sbc_t *sbc, unsigned long flags)
- {
-+	sbc->flags = flags;
- 	sbc->frequency = SBC_FREQ_44100;
- 	sbc->mode = SBC_MODE_STEREO;
- 	sbc->subbands = SBC_SB_8;
-@@ -1057,12 +1061,13 @@ SBC_EXPORT ssize_t sbc_encode(sbc_t *sbc, const void *input, size_t input_len,
- 		priv->frame.subband_mode = sbc->subbands;
- 		priv->frame.subbands = sbc->subbands ? 8 : 4;
- 		priv->frame.block_mode = sbc->blocks;
--		priv->frame.blocks = 4 + (sbc->blocks * 4);
-+		priv->frame.blocks = sbc->flags & SBC_MSBC ?
-+					MSBC_BLOCKS : 4 + (sbc->blocks * 4);
- 		priv->frame.bitpool = sbc->bitpool;
- 		priv->frame.codesize = sbc_get_codesize(sbc);
- 		priv->frame.length = sbc_get_frame_length(sbc);
- 
--		sbc_encoder_init(&priv->enc_state, &priv->frame);
-+		sbc_encoder_init(sbc->flags, &priv->enc_state, &priv->frame);
- 		priv->init = 1;
- 	} else if (priv->frame.bitpool != sbc->bitpool) {
- 		priv->frame.length = sbc_get_frame_length(sbc);
-@@ -1141,7 +1146,7 @@ SBC_EXPORT size_t sbc_get_frame_length(sbc_t *sbc)
- 		return priv->frame.length;
- 
- 	subbands = sbc->subbands ? 8 : 4;
--	blocks = 4 + (sbc->blocks * 4);
-+	blocks = sbc->flags & SBC_MSBC ? MSBC_BLOCKS : 4 + (sbc->blocks * 4);
- 	channels = sbc->mode == SBC_MODE_MONO ? 1 : 2;
- 	joint = sbc->mode == SBC_MODE_JOINT_STEREO ? 1 : 0;
- 	bitpool = sbc->bitpool;
-@@ -1165,7 +1170,8 @@ SBC_EXPORT unsigned sbc_get_frame_duration(sbc_t *sbc)
- 	priv = sbc->priv;
- 	if (!priv->init) {
- 		subbands = sbc->subbands ? 8 : 4;
--		blocks = 4 + (sbc->blocks * 4);
-+		blocks = sbc->flags & SBC_MSBC ?
-+					MSBC_BLOCKS : 4 + (sbc->blocks * 4);
- 	} else {
- 		subbands = priv->frame.subbands;
- 		blocks = priv->frame.blocks;
-@@ -1202,7 +1208,8 @@ SBC_EXPORT size_t sbc_get_codesize(sbc_t *sbc)
- 	priv = sbc->priv;
- 	if (!priv->init) {
- 		subbands = sbc->subbands ? 8 : 4;
--		blocks = 4 + (sbc->blocks * 4);
-+		blocks = sbc->flags & SBC_MSBC ?
-+					MSBC_BLOCKS : 4 + (sbc->blocks * 4);
- 		channels = sbc->mode == SBC_MODE_MONO ? 1 : 2;
- 	} else {
- 		subbands = priv->frame.subbands;
-diff --git a/sbc/sbc.h b/sbc/sbc.h
-index bbd45da..3511119 100644
---- a/sbc/sbc.h
-+++ b/sbc/sbc.h
-@@ -64,6 +64,9 @@ extern "C" {
- #define SBC_LE			0x00
- #define SBC_BE			0x01
- 
-+/* Additional features */
-+#define SBC_MSBC		0x01
++		case 'm':
++			msbc = 1;
++			break;
 +
- struct sbc_struct {
- 	unsigned long flags;
+ 		case 's':
+ 			subbands = atoi(optarg);
+ 			if (subbands != 8 && subbands != 4) {
+@@ -300,9 +306,18 @@ int main(int argc, char *argv[])
+ 		exit(1);
+ 	}
  
++	if (msbc) {
++		subbands = 8;
++		bitpool = 26;
++		joint = 0;
++		dualchannel = 0;
++		snr = 0;
++		blocks = 15;
++	}
++
+ 	for (i = 0; i < argc; i++)
+ 		encode(argv[i], subbands, bitpool, joint, dualchannel,
+-								snr, blocks);
++							snr, blocks, msbc);
+ 
+ 	return 0;
+ }
 -- 
 1.7.9.5
 
