@@ -1,132 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 30 Oct 2012 04:18:50 +0200
+Date: Tue, 30 Oct 2012 03:46:33 +0200
 From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: =?UTF-8?B?RnLDqWTDqXJpYw==?= Dalleau <frederic.dalleau@linux.intel.com>,
- linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/5] mSBC tests
-Message-ID: <20121030041850.2bda32b0@i7>
-In-Reply-To: <1348844742.13371.38.camel@aeonflux>
-References: <1348757068-31048-1-git-send-email-frederic.dalleau@linux.intel.com>
-	<20120927233420.3441f14e@i7>
-	<1348844742.13371.38.camel@aeonflux>
+To: "Dalleau, Frederic" <frederic.dalleau@intel.com>
+Cc: =?UTF-8?B?RnLDqWTDqXJpYw==?= Dalleau
+	<frederic.dalleau@linux.intel.com>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 06/10] sbc: Add mmx primitive for 1b 8s analyse
+Message-ID: <20121030034633.2242d317@i7>
+In-Reply-To: <CA+QXtDvsWoQd+JVxKC0HVRGZxUKg-JeN7_V+MfHXotg_N6EBKQ@mail.gmail.com>
+References: <1351272036-4875-1-git-send-email-frederic.dalleau@linux.intel.com>
+	<1351272036-4875-7-git-send-email-frederic.dalleau@linux.intel.com>
+	<20121028020621.3653ac8e@i7>
+	<20121028022942.3bcd1bd7@i7>
+	<CA+QXtDvsWoQd+JVxKC0HVRGZxUKg-JeN7_V+MfHXotg_N6EBKQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 28 Sep 2012 17:05:42 +0200
-Marcel Holtmann <marcel@holtmann.org> wrote:
+On Mon, 29 Oct 2012 08:42:08 +0100
+"Dalleau, Frederic" <frederic.dalleau@intel.com> wrote:
 
-> > > Work done from the spec, not tested with any reference encoder.
-> > 
-> > Does a reference mSBC encoder exist somewhere? Or any ideas how to test
-> > the new code with something other than bluez just to be sure that it's
-> > correct?
+> Hi Siarhei,
 > 
-> I looked at the Bluetooth SIG website and couldn't find a reference
-> encoder or sample files. The old SBC reference encoder and decoder don't
-> seem to support other block sizes.
+> Since only neon is concerned by this, I'd rather add a one liner like this :
 > 
-> SBC Encoder LIB Version 1.5
-> Copyright (c) 2002  Philips Consumer Electronics, ASA Labs
+> #ifdef SBC_BUILD_WITH_NEON_SUPPORT
+>        sbc_init_primitives_neon(state);
+> +
+> +     if (state->increment == 1)
+> +             state->sbc_analyze_4b_8s = sbc_analyze_1b_8s_simd;
+> #endif
 > 
-> Usage:
-> sbc_encoder [-jsv] [-lblk_len] [-nsubbands] [-p] [-rrate] [-ooutputfile] inputfile
->             [-s] use the stereo mode for stereo signals
->             [-v] verbose mode
->             [-j] allow the use of joint coding for stereo signals
->             [-lblk_len] blk_len specifies the APCM block length, out of [4,8,12,16]
->             [-nsubbands] subbands specifies the number of subbands, out of [4,8]
->             [-p] a simple psycho acoustic model is used
->             [-rrate] specifies the bit rate in bps
->             [-ooutputfile] specifies the name of the bitstream output file
->             inputfile specifies the audio input file, the major audio formats are supported
-> 
-> 
-> SBC Decoder LIB Version 1.5
-> Copyright (c) 2002  Philips Consumer Electronics, ASA Labs
-> 
-> Usage:
-> sbc_decoder [-v] [-ooutputfile] [-pstartpos] inputfile
->             [-v] verbose mode
->             [-pstartpos] startpos specifies the byte offset to start with decoding
->             [-ooutputfile] specifies the name of the audio output file
->             inputfile specifies the name of the bitstream input file
-> 
-> And the sample files are all from 2001. We might have to create our own
-> ones and our own naive and stupid reference encoder/decoder.
+> It is more explicit, doesn't change priority and doesn't add needless code
+> to other implementations.
 
-Hi Marcel,
+It's not just neon, but armv6 and iwmmxt are affected too. Additionally,
+neon code also provides optimized "sbc_enc_process_input_*" functions,
+which are not going to work correctly for mSBC:
 
-As the first step, some sort of automated testing ("make check") for
-verifying sbc encoding/decoding correctness might be useful.
+	state->sbc_enc_process_input_8s_le = sbc_enc_process_input_8s_le_neon;
+	state->sbc_enc_process_input_8s_be = sbc_enc_process_input_8s_be_neon;
 
-So far I have been using the following quickly hacked script. It just
-takes a directory with *.au files, encodes them using different
-settings and provides a log with md5 hashes which can be compared with
-the reference log:
+So I still think that it is safer and cleaner to have
+"sbc_init_primitives" function performing the following in order:
+1. Initialize function pointers with C implementations.
+2. Allow to override them with various platform specific
+implementations (which would work fine for old SBC formats).
+3. At the end of the function have a check if we are actually dealing
+with mSBC format and restore all the function pointers back to C
+implementations in this case.
 
-#!/usr/bin/env ruby
+So SBC is accelerated, and mSBC at least works correctly.
 
-testfiles = []
-Dir.new("testsamples").each {|file|
-    next if not file =~ /\.au$/
-    testfiles.push("testsamples/" + file)
-}
+Then for the follow up patches just review/fix all the assembly
+optimized implementations one at a time, make sure that they do work
+with mSBC and move their initialization to the end of the
+"sbc_init_primitives" function.
 
-if File.exists?("sbc-test.ok") then
-    fh = File.open("sbc-test.ok", "r")
-    okdata = fh.read()
-    fh.close()
-end
+This allows to first take care of C implementation without MMX
+getting in the way. Then fix and enable mSBC support for MMX in the
+last patch from your series. Later somebody could take care of the
+ARM implementations in a similar way.
 
-outstring = ""
+> And what about sbc_analyze_8s?
 
-testfiles.sort!
+Renaming "sbc_analyze_4b_8s" -> "sbc_analyze_8s" in a separate patch
+prior to other changes is IMHO better than keeping the old misleading
+name.
 
-testfiles.each {|file|
+> Regarding point 2, this is the reason why patch 4 was a bit bigger, the simd
+> implementation is complete.
 
-    ["-b32", "-b64", "-b128", "-b255"].each {|br|
-    ["-s4", "-s8"].each {|sb|
-    ["-S", ""].each {|snr|
-    ["-j", ""].each {|j|
-    ["-d", ""].each {|d|
-    ["-B4", "-B8", "-B12", "-B16"].each {|blk|
-        outstring += sprintf("%s #{file} (#{br} #{sb} #{snr} #{j} #{d} #{blk})\n",
-            `./sbcenc #{br} #{sb} #{snr} #{j} #{d} #{blk} #{file} 2>/dev/null | md5sum`.strip).gsub(/[ ]+/, " ")
-    }
-    }
-    }
-    }
-    }
-    }
-}
+Well, I just don't quite like that after the patches
+    [PATCH 04/10] sbc: Add msbc flag and generic C primitive
+    [PATCH 05/10] sbc: Add support for mSBC frame header
+we already have a complete mSBC support in C code, which is still
+unusable (as in buggy) if run on mmx, iwmmxt, armv6 or arm neon capable
+systems.
 
-if not okdata then
-    printf("no reference ok data\n")
-end
+And having another look at it, we actually may have one more problem.
+The sbc-1.0 library is already starting to get packaged in some linux
+distributions. If somebody tries to run some application to do mSBC
+encoding/decoding, but happens to have an old sbc-1.0 library in his
+system, then it would not be able to handle the new SBC flag
+gracefully. The comment about returning error code "-3 Unsupported
+number of blocks" is not quite true after
+    http://git.kernel.org/?p=bluetooth/bluez.git;a=commit;h=ce342bf2524b
 
-if outstring != okdata then
-    printf("test failed!\n")
-else
-    printf("test ok\n")
-end
+Having a proper standalone sbc library, we might want to be nicer to the
+users and minimize any possible ABI related issues on the upgrade path.
+>From this point of view, even introducing new msbc_encode/msbc_decode
+functions might be safer. We may not go so far for the first library
+update (after all, what would be the purpose of the flags argument in
+this case?). But eventually making error checking code more sane
+certainly looks like a good idea to me.
 
-fh = File.open("sbc-test.results", "w")
-fh.write(outstring)
-fh.close()
-
-############################
-
-Though I see this scripts as a dead end, because my media files are a
-bit too large for adding to a git repository and these files are
-all copyrighted. Some of them have a permissive license (big buck
-bunny soundtrack), some of them do not.
-
-Anyway, based on the fact that we use a fixed point encoder for sbc and
-its output is deterministic, we can just encode some pseudo random noise
-data and compare the checksums/hashes of the encoded results with some
-reference values.
+Regarding ABI stability in general, there is an interesting project,
+which is tracking many open source libraries including bluez:
+    http://upstream-tracker.org/versions/bluez.html
 
 -- 
 Best regards,
