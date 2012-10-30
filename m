@@ -1,61 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: =?ISO-8859-1?Q?Fr=E9d=E9ric?= Danis
-	<frederic.danis@linux.intel.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v10 4/6] dbusoob: Set device name in device object
-Date: Wed, 31 Oct 2012 08:22:04 +0100
-Message-ID: <14230948.4LRRcOUNYX@uw000953>
-In-Reply-To: <1351616728-10075-4-git-send-email-frederic.danis@linux.intel.com>
-References: <1351616728-10075-1-git-send-email-frederic.danis@linux.intel.com> <1351616728-10075-4-git-send-email-frederic.danis@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <1351619299.1828.10.camel@aeonflux>
+Subject: Re: [RFCv2 03/12] Bluetooth: Return correct L2CAP response type
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 30 Oct 2012 10:48:19 -0700
+In-Reply-To: <20121030171611.GA28901@aemeltch-MOBL1>
+References: <1350493622.26318.114.camel@aeonflux>
+	 <1351612384-12392-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1351612384-12392-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1351615743.1828.4.camel@aeonflux> <20121030171611.GA28901@aemeltch-MOBL1>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+Hi Andrei,
 
-On Tuesday 30 of October 2012 19:05:26 Frédéric Danis wrote:
-> ---
->  plugins/dbusoob.c |   11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+> > > Return L2CAP_CREATE_CHAN_RSP for Create Channel Request and
+> > > L2CAP_CONN_RSP for Create Connection Request.
+> > > 
+> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > ---
+> > >  net/bluetooth/l2cap_core.c |   11 ++++++++++-
+> > >  1 file changed, 10 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > > index 4ef85d2..d51741f 100644
+> > > --- a/net/bluetooth/l2cap_core.c
+> > > +++ b/net/bluetooth/l2cap_core.c
+> > > @@ -3478,12 +3478,21 @@ void __l2cap_connect_rsp_defer(struct l2cap_chan *chan)
+> > >  	struct l2cap_conn_rsp rsp;
+> > >  	struct l2cap_conn *conn = chan->conn;
+> > >  	u8 buf[128];
+> > > +	u8 rsp_code;
+> > >  
+> > >  	rsp.scid   = cpu_to_le16(chan->dcid);
+> > >  	rsp.dcid   = cpu_to_le16(chan->scid);
+> > >  	rsp.result = __constant_cpu_to_le16(L2CAP_CR_SUCCESS);
+> > >  	rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
+> > > -	l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP, sizeof(rsp), &rsp);
+> > > +
+> > > +	if (chan->hs_hcon)
+> > > +		rsp_code = L2CAP_CREATE_CHAN_RSP;
+> > > +	else
+> > > +		rsp_code = L2CAP_CONN_RSP;
+> > > +
+> > > +	BT_DBG("chan %p rsp_code %u", chan, rsp_code);
+> > > +
+> > > +	l2cap_send_cmd(conn, chan->ident, rsp_code, sizeof(rsp), &rsp);
+> > 
+> > looks a bit hackish to me, but seems to work since both responses are
+> > essentially identical. Separate functions might be better, but that can
+> > be also fixed later on.
 > 
-> diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
-> index 5c5b6ef..0278941 100644
-> --- a/plugins/dbusoob.c
-> +++ b/plugins/dbusoob.c
-> @@ -193,6 +193,7 @@ static gboolean parse_data(DBusMessageIter *data, struct oob_data *remote_data)
->  
->  static gboolean store_data(struct btd_adapter *adapter, struct oob_data *data)
->  {
-> +	bdaddr_t local = *adapter_get_address(adapter);
->  	bdaddr_t bdaddr;
->  
->  	str2ba(data->addr, &bdaddr);
-> @@ -207,9 +208,13 @@ static gboolean store_data(struct btd_adapter *adapter, struct oob_data *data)
->  		write_remote_class(adapter_get_address(adapter), &bdaddr,
->  								data->class);
->  
-> -	if (data->name)
-> -		write_device_name(adapter_get_address(adapter), &bdaddr, 0,
-> -								data->name);
-> +	if (data->name) {
-> +		char *str;
-> +
-> +		str = g_strdup(data->name);
-> +		btd_event_remote_name(&local, &bdaddr, str);
-> +		g_free(str);
+> I have continued to use method proposed by Mat. Do you think it shall be
+> changed?
 
-Is this g_strdup needed? Why not just pass data->name directly?
+I think at some point we should change this. However for now I am
+actually fine keeping this in favor of making progress. You do need to
+get back at some point and do some cleanups. Just make a note of it.
 
-> +	}
->  
->  	return TRUE;
->  }
-> -- 
-> 1.7.9.5
-> 
+Regards
 
--- 
-BR
-Szymon Janc
+Marcel
+
+
