@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 04/12] Bluetooth: Derive remote and local amp id from chan struct
-Date: Tue, 30 Oct 2012 17:52:56 +0200
-Message-Id: <1351612384-12392-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 08/12] Bluetooth: AMP: Remove hci_conn receiving error command status
+Date: Tue, 30 Oct 2012 17:53:00 +0200
+Message-Id: <1351612384-12392-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1351612384-12392-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1350493622.26318.114.camel@aeonflux>
  <1351612384-12392-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,31 +12,47 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-l2cap_chan already keeps information about *_amp_id.
+When receiving HCI Event: Command Status for Create Physical Link
+with Error code remove AMP hcon.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c |    6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_event.c |   17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index d51741f..782e49c 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4573,9 +4573,11 @@ static void l2cap_do_move_cancel(struct l2cap_chan *chan, int result)
- 	l2cap_ertm_send(chan);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7ca98b9..03d51a1 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1810,14 +1810,23 @@ static void hci_cs_create_phylink(struct hci_dev *hdev, u8 status)
+ 
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+ 
+-	if (status)
+-		return;
+-
+ 	cp = hci_sent_cmd_data(hdev, HCI_OP_CREATE_PHY_LINK);
+ 	if (!cp)
+ 		return;
+ 
+-	amp_write_remote_assoc(hdev, cp->phy_handle);
++	hci_dev_lock(hdev);
++
++	if (status) {
++		struct hci_conn *hcon;
++
++		hcon = hci_conn_hash_lookup_handle(hdev, cp->phy_handle);
++		if (hcon)
++			hci_conn_del(hcon);
++	} else {
++		amp_write_remote_assoc(hdev, cp->phy_handle);
++	}
++
++	hci_dev_unlock(hdev);
  }
  
--void l2cap_physical_cfm(struct l2cap_chan *chan, int result, u8 local_amp_id,
--			u8 remote_amp_id)
-+void l2cap_physical_cfm(struct l2cap_chan *chan, int result)
- {
-+	u8 local_amp_id = chan->local_amp_id;
-+	u8 remote_amp_id = chan->ctrl_id;
-+
- 	BT_DBG("chan %p, result %d, local_amp_id %d, remote_amp_id %d",
- 	       chan, result, local_amp_id, remote_amp_id);
- 
+ static void hci_cs_accept_phylink(struct hci_dev *hdev, u8 status)
 -- 
 1.7.9.5
 
