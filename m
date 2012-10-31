@@ -1,24 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 31 Oct 2012 21:09:07 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Notify about device registration before power
+ on
+Message-ID: <20121031190907.GA3631@x220.P-661HNU-F1>
+References: <1351586140-30708-1-git-send-email-marcel@holtmann.org>
+ <20121031181801.GB1679@joana>
 MIME-Version: 1.0
-Date: Wed, 31 Oct 2012 12:25:29 -0700
-Message-ID: <CACUGKYNaeyTq-1+5=4DNhb6hc0jVCp=xsh705qXLCtgJ37z6Nw@mail.gmail.com>
-Subject: BLE kernel supported
-From: John Tobias <john.tobias.ph@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20121031181801.GB1679@joana>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello all,
+Hi Gustavo,
 
-I am evaluating a dev board based on iMX6 chipset from freescale with
-Bluetooth LE in the next few days or so. The stable kernel for the
-said chipset is based on linux kernel 3.0.35.x and I am not sure if
-the Bluetooth "Low Energy" support is already part of the linux kernel
-3.0.35.x.
+On Wed, Oct 31, 2012, Gustavo Padovan wrote:
+> > It is important that the monitor interface gets notified about
+> > a new device before its power on procedure has been started.
+> > 
+> > For some reason that is no longer working as expected and the power
+> > on procedure runs first. It is safe to just notify about device
+> > registration and trigger the power on procedure afterwards.
+> > 
+> > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> > ---
+> >  net/bluetooth/hci_core.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> Patch has been applied to bluetooth-next. Thanks.
 
-Anyone could give me some input?.
+I guess you mean bluetooth.git? (that's where the patch is right now -
+not bluetooth-next). Also, I don't think the Cc: stable addition was
+necessary since this scheduling behavior seems to be something only
+introduced for 3.7 (not 100% sure about this though).
 
-Regards,
-
-john
+Johan
