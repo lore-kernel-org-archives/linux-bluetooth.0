@@ -1,58 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 31 Oct 2012 16:15:02 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Jeff Cook <jeff@deserettechnology.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	johan.hedberg@gmail.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Add support for BCM20702A0 [0b05, 17b5]
-Message-ID: <20121031181502.GA1679@joana>
-References: <5087B517.9090703@deserettechnology.com>
- <1351335688-17936-1-git-send-email-jeff@deserettechnology.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1351335688-17936-1-git-send-email-jeff@deserettechnology.com>
+Message-ID: <1351700642.1828.13.camel@aeonflux>
+Subject: Re: [PATCHv1 12/12] Bluetooth: Process Create Chan Request
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 31 Oct 2012 09:24:02 -0700
+In-Reply-To: <1351691197-8394-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1350493622.26318.114.camel@aeonflux>
+	 <1351691197-8394-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1351691197-8394-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jeff,
+Hi Andrei,
 
-* Jeff Cook <jeff@deserettechnology.com> [2012-10-27 05:01:28 -0600]:
-
-> Vendor-specific ID for BCM20702A0.
-> Support for bluetooth over Asus Wi-Fi GO!, included with Asus P8Z77-V
-> Deluxe.
+> Add processing L2CAP Create Chan Request. When channel is created
+> save associated high speed link hs_hcon.
 > 
-> T:  Bus=07 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0b05 ProdID=17b5 Rev=01.12
-> S:  Manufacturer=Broadcom Corp
-> S:  Product=BCM20702A0
-> S:  SerialNumber=94DBC98AC113
-> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-> 
-> Signed-off-by: Jeff Cook <jeff@deserettechnology.com>
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  drivers/bluetooth/btusb.c | 1 +
->  1 file changed, 1 insertion(+)
+>  net/bluetooth/l2cap_core.c |   63 ++++++++++++++++++++++++++++++--------------
+>  1 file changed, 43 insertions(+), 20 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 654e248..1d7b126 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -96,6 +96,7 @@ static struct usb_device_id btusb_table[] = {
->  	{ USB_DEVICE(0x0c10, 0x0000) },
->  
->  	/* Broadcom BCM20702A0 */
-> +	{ USB_DEVICE(0x0b05, 0x17b5) },
->  	{ USB_DEVICE(0x0489, 0xe042) },
->  	{ USB_DEVICE(0x413c, 0x8197) },
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index bdffc4c..783ffae 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -4237,7 +4237,9 @@ static int l2cap_create_channel_req(struct l2cap_conn *conn,
+>  				    u16 cmd_len, void *data)
+>  {
+>  	struct l2cap_create_chan_req *req = data;
+> +	struct l2cap_create_chan_rsp rsp;
+>  	struct l2cap_chan *chan;
+> +	struct hci_dev *hdev = NULL;
 
-This patch doesn't apply on bluetooth.git can you please rebase it on of it.
-You can find the bluetooth.git tree at:
+why is this one set to NULL. Can we avoid that please.
 
-http://git.kernel.org/?p=linux/kernel/git/bluetooth/bluetooth.git;a=summary
+Regards
 
-	Gustavo
+Marcel
+
+
