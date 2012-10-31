@@ -1,33 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 31 Oct 2012 16:18:01 -0200
+Date: Wed, 31 Oct 2012 16:15:02 -0200
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Notify about device registration before power
- on
-Message-ID: <20121031181801.GB1679@joana>
-References: <1351586140-30708-1-git-send-email-marcel@holtmann.org>
+To: Jeff Cook <jeff@deserettechnology.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	johan.hedberg@gmail.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Add support for BCM20702A0 [0b05, 17b5]
+Message-ID: <20121031181502.GA1679@joana>
+References: <5087B517.9090703@deserettechnology.com>
+ <1351335688-17936-1-git-send-email-jeff@deserettechnology.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1351586140-30708-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1351335688-17936-1-git-send-email-jeff@deserettechnology.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Jeff,
 
-* Marcel Holtmann <marcel@holtmann.org> [2012-10-30 01:35:40 -0700]:
+* Jeff Cook <jeff@deserettechnology.com> [2012-10-27 05:01:28 -0600]:
 
-> It is important that the monitor interface gets notified about
-> a new device before its power on procedure has been started.
+> Vendor-specific ID for BCM20702A0.
+> Support for bluetooth over Asus Wi-Fi GO!, included with Asus P8Z77-V
+> Deluxe.
 > 
-> For some reason that is no longer working as expected and the power
-> on procedure runs first. It is safe to just notify about device
-> registration and trigger the power on procedure afterwards.
+> T:  Bus=07 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0b05 ProdID=17b5 Rev=01.12
+> S:  Manufacturer=Broadcom Corp
+> S:  Product=BCM20702A0
+> S:  SerialNumber=94DBC98AC113
+> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Jeff Cook <jeff@deserettechnology.com>
 > ---
->  net/bluetooth/hci_core.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  drivers/bluetooth/btusb.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 654e248..1d7b126 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -96,6 +96,7 @@ static struct usb_device_id btusb_table[] = {
+>  	{ USB_DEVICE(0x0c10, 0x0000) },
+>  
+>  	/* Broadcom BCM20702A0 */
+> +	{ USB_DEVICE(0x0b05, 0x17b5) },
+>  	{ USB_DEVICE(0x0489, 0xe042) },
+>  	{ USB_DEVICE(0x413c, 0x8197) },
 
-Patch has been applied to bluetooth-next. Thanks.
+This patch doesn't apply on bluetooth.git can you please rebase it on of it.
+You can find the bluetooth.git tree at:
+
+http://git.kernel.org/?p=linux/kernel/git/bluetooth/bluetooth.git;a=summary
 
 	Gustavo
