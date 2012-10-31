@@ -1,57 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] AVCTP: Fix scope of transactions to be per channel
-Date: Wed, 31 Oct 2012 12:04:57 +0200
-Message-Id: <1351677897-2580-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 31 Oct 2012 11:07:58 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
+	<frederic.danis@linux.intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v10 4/6] dbusoob: Set device name in device object
+Message-ID: <20121031090758.GB20722@x220>
+References: <1351616728-10075-1-git-send-email-frederic.danis@linux.intel.com>
+ <1351616728-10075-4-git-send-email-frederic.danis@linux.intel.com>
+ <14230948.4LRRcOUNYX@uw000953>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <14230948.4LRRcOUNYX@uw000953>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Szymon,
 
-As per AVRCP spec:
+On Wed, Oct 31, 2012, Szymon Janc wrote:
+> > --- a/plugins/dbusoob.c
+> > +++ b/plugins/dbusoob.c
+> > @@ -193,6 +193,7 @@ static gboolean parse_data(DBusMessageIter *data, struct oob_data *remote_data)
+> >  
+> >  static gboolean store_data(struct btd_adapter *adapter, struct oob_data *data)
+> >  {
+> > +	bdaddr_t local = *adapter_get_address(adapter);
+> >  	bdaddr_t bdaddr;
+> >  
+> >  	str2ba(data->addr, &bdaddr);
+> > @@ -207,9 +208,13 @@ static gboolean store_data(struct btd_adapter *adapter, struct oob_data *data)
+> >  		write_remote_class(adapter_get_address(adapter), &bdaddr,
+> >  								data->class);
+> >  
+> > -	if (data->name)
+> > -		write_device_name(adapter_get_address(adapter), &bdaddr, 0,
+> > -								data->name);
+> > +	if (data->name) {
+> > +		char *str;
+> > +
+> > +		str = g_strdup(data->name);
+> > +		btd_event_remote_name(&local, &bdaddr, str);
+> > +		g_free(str);
+> 
+> Is this g_strdup needed? Why not just pass data->name directly?
 
-  "It should be noted that transaction labels are scoped to an AVCTP
-  channel, so an AVRCP specific AV/C command and an AVRCP specific
-  browsing command may be outstanding at the same time with the same
-  transaction label."
----
- audio/avctp.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+This was because of missing const declarations in the event.h API. I
+fixed this up and removed the extra strdup from this patch.
 
-diff --git a/audio/avctp.c b/audio/avctp.c
-index 5f6a677..6ba25e4 100644
---- a/audio/avctp.c
-+++ b/audio/avctp.c
-@@ -150,6 +150,7 @@ struct avctp_pending_req {
- struct avctp_channel {
- 	struct avctp *session;
- 	GIOChannel *io;
-+	uint8_t transaction;
- 	guint watch;
- 	uint16_t imtu;
- 	uint16_t omtu;
-@@ -1224,17 +1225,16 @@ static struct avctp_pending_req *pending_create(struct avctp_channel *chan,
- 						GDestroyNotify destroy)
- {
- 	struct avctp_pending_req *p;
--	static uint8_t transaction = 0;
- 
- 	p = g_new0(struct avctp_pending_req, 1);
- 	p->chan = chan;
--	p->transaction = transaction;
-+	p->transaction = chan->transaction;
- 	p->process = process;
- 	p->data = data;
- 	p->destroy = destroy;
- 
--	transaction++;
--	transaction %= 16;
-+	chan->transaction++;
-+	chan->transaction %= 16;
- 
- 	return p;
- }
--- 
-1.7.11.7
-
+Johan
