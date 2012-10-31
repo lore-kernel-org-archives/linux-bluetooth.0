@@ -1,45 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1351700642.1828.13.camel@aeonflux>
-Subject: Re: [PATCHv1 12/12] Bluetooth: Process Create Chan Request
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 31 Oct 2012 09:24:02 -0700
-In-Reply-To: <1351691197-8394-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv1 11/12] Bluetooth: AMP: Use l2cap_physical_cfm in phylink complete evt
+Date: Wed, 31 Oct 2012 15:46:36 +0200
+Message-Id: <1351691197-8394-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1351691197-8394-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1350493622.26318.114.camel@aeonflux>
-	 <1351691197-8394-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1351691197-8394-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ <1351691197-8394-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> Add processing L2CAP Create Chan Request. When channel is created
-> save associated high speed link hs_hcon.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/l2cap_core.c |   63 ++++++++++++++++++++++++++++++--------------
->  1 file changed, 43 insertions(+), 20 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index bdffc4c..783ffae 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -4237,7 +4237,9 @@ static int l2cap_create_channel_req(struct l2cap_conn *conn,
->  				    u16 cmd_len, void *data)
->  {
->  	struct l2cap_create_chan_req *req = data;
-> +	struct l2cap_create_chan_rsp rsp;
->  	struct l2cap_chan *chan;
-> +	struct hci_dev *hdev = NULL;
+When receiving HCI Phylink Complete event run amp_physical_cfm
+which initialize BR/EDR L2CAP channel associated with High Speed
+link and run l2cap_physical_cfm which shall send L2CAP Create
+Chan Request.
 
-why is this one set to NULL. Can we avoid that please.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/amp.h   |    1 +
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/amp.c           |   24 ++++++++++++++++++++++++
+ net/bluetooth/hci_event.c     |   15 ++-------------
+ 4 files changed, 28 insertions(+), 13 deletions(-)
 
-Regards
-
-Marcel
-
+diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
+index f1c0017..7ea3db7 100644
+--- a/include/net/bluetooth/amp.h
++++ b/include/net/bluetooth/amp.h
+@@ -46,6 +46,7 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+ 			struct hci_conn *hcon);
+ void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle);
+ void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle);
++void amp_physical_cfm(struct hci_conn *bredr_hcon, struct hci_conn *hs_hcon);
+ void amp_create_logical_link(struct l2cap_chan *chan);
+ void amp_disconnect_logical_link(struct hci_chan *hchan);
+ void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason);
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 24c61ef..18149c8 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -812,5 +812,6 @@ void l2cap_send_conn_req(struct l2cap_chan *chan);
+ void l2cap_move_start(struct l2cap_chan *chan);
+ void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
+ 		       u8 status);
++void l2cap_physical_cfm(struct l2cap_chan *chan, int result);
+ 
+ #endif /* __L2CAP_H */
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index 917e034..650bb8d 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -373,6 +373,30 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+ 	hci_send_cmd(hdev, HCI_OP_ACCEPT_PHY_LINK, sizeof(cp), &cp);
+ }
+ 
++void amp_physical_cfm(struct hci_conn *bredr_hcon, struct hci_conn *hs_hcon)
++{
++	struct hci_dev *bredr_hdev = hci_dev_hold(bredr_hcon->hdev);
++	struct amp_mgr *mgr = hs_hcon->amp_mgr;
++	struct l2cap_chan *bredr_chan;
++
++	BT_DBG("bredr_hcon %p hs_hcon %p mgr %p", bredr_hcon, hs_hcon, mgr);
++
++	if (!bredr_hdev || !mgr || !mgr->bredr_chan)
++		return;
++
++	bredr_chan = mgr->bredr_chan;
++
++	set_bit(FLAG_EFS_ENABLE, &bredr_chan->flags);
++	bredr_chan->ctrl_id = hs_hcon->remote_id;
++	bredr_chan->hs_hcon = hs_hcon;
++	bredr_chan->conn->mtu = hs_hcon->hdev->block_mtu;
++	bredr_chan->fcs = L2CAP_FCS_NONE;
++
++	l2cap_physical_cfm(bredr_chan, 0);
++
++	hci_dev_put(bredr_hdev);
++}
++
+ void amp_create_logical_link(struct l2cap_chan *chan)
+ {
+ 	struct hci_cp_create_accept_logical_link cp;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 03d51a1..0b37f55 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3697,20 +3697,9 @@ static void hci_phy_link_complete_evt(struct hci_dev *hdev,
+ 	hci_conn_hold_device(hcon);
+ 	hci_conn_add_sysfs(hcon);
+ 
+-	hci_dev_unlock(hdev);
+-
+-	if (hcon->out) {
+-		struct hci_dev *bredr_hdev = hci_dev_hold(bredr_hcon->hdev);
+-
+-		if (!bredr_hdev)
+-			return;
++	amp_physical_cfm(bredr_hcon, hcon);
+ 
+-		/* Placeholder - create chan req
+-		l2cap_chan_create_cfm(bredr_hcon, hcon->remote_id);
+-		*/
+-
+-		hci_dev_put(bredr_hdev);
+-	}
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_loglink_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+-- 
+1.7.9.5
 
