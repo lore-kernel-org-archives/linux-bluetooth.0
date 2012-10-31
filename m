@@ -1,39 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 31 Oct 2012 21:09:07 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Notify about device registration before power
- on
-Message-ID: <20121031190907.GA3631@x220.P-661HNU-F1>
-References: <1351586140-30708-1-git-send-email-marcel@holtmann.org>
- <20121031181801.GB1679@joana>
+Date: Wed, 31 Oct 2012 16:51:36 -0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv1 11/12] Bluetooth: AMP: Use l2cap_physical_cfm in
+ phylink complete evt
+Message-ID: <20121031185136.GF1679@joana>
+References: <1350493622.26318.114.camel@aeonflux>
+ <1351691197-8394-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1351691197-8394-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20121031181801.GB1679@joana>
+In-Reply-To: <1351691197-8394-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Andrei,
 
-On Wed, Oct 31, 2012, Gustavo Padovan wrote:
-> > It is important that the monitor interface gets notified about
-> > a new device before its power on procedure has been started.
-> > 
-> > For some reason that is no longer working as expected and the power
-> > on procedure runs first. It is safe to just notify about device
-> > registration and trigger the power on procedure afterwards.
-> > 
-> > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> > ---
-> >  net/bluetooth/hci_core.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-10-31 15:46:36 +0200]:
+
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Patch has been applied to bluetooth-next. Thanks.
+> When receiving HCI Phylink Complete event run amp_physical_cfm
+> which initialize BR/EDR L2CAP channel associated with High Speed
+> link and run l2cap_physical_cfm which shall send L2CAP Create
+> Chan Request.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  include/net/bluetooth/amp.h   |    1 +
+>  include/net/bluetooth/l2cap.h |    1 +
+>  net/bluetooth/amp.c           |   24 ++++++++++++++++++++++++
+>  net/bluetooth/hci_event.c     |   15 ++-------------
+>  4 files changed, 28 insertions(+), 13 deletions(-)
 
-I guess you mean bluetooth.git? (that's where the patch is right now -
-not bluetooth-next). Also, I don't think the Cc: stable addition was
-necessary since this scheduling behavior seems to be something only
-introduced for 3.7 (not 100% sure about this though).
+Patches 1-11 have been applied to bluetooth-next. Thanks.
 
-Johan
+	Gustavo
