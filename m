@@ -1,40 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 31 Oct 2012 16:51:36 -0200
+Date: Wed, 31 Oct 2012 16:27:46 -0200
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Syam Sidhardhan <s.syam@samsung.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv1 11/12] Bluetooth: AMP: Use l2cap_physical_cfm in
- phylink complete evt
-Message-ID: <20121031185136.GF1679@joana>
-References: <1350493622.26318.114.camel@aeonflux>
- <1351691197-8394-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1351691197-8394-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH 4/5 v1] Bluetooth: mgmt: Use __constant when dealing with
+ constants
+Message-ID: <20121031182746.GE1679@joana>
+References: <1351530456-11873-1-git-send-email-s.syam@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1351691197-8394-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1351530456-11873-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Syam,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-10-31 15:46:36 +0200]:
+* Syam Sidhardhan <s.syam@samsung.com> [2012-10-29 22:37:36 +0530]:
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> __constant_cpu_to_le*() is the right go here.
 > 
-> When receiving HCI Phylink Complete event run amp_physical_cfm
-> which initialize BR/EDR L2CAP channel associated with High Speed
-> link and run l2cap_physical_cfm which shall send L2CAP Create
-> Chan Request.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
 > ---
->  include/net/bluetooth/amp.h   |    1 +
->  include/net/bluetooth/l2cap.h |    1 +
->  net/bluetooth/amp.c           |   24 ++++++++++++++++++++++++
->  net/bluetooth/hci_event.c     |   15 ++-------------
->  4 files changed, 28 insertions(+), 13 deletions(-)
+> v1-> Improve readability by breaking 80 chars rule.
+> 
+>  net/bluetooth/mgmt.c |   10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 
-Patches 1-11 have been applied to bluetooth-next. Thanks.
+Patch has been applied to bluetooth-next. Thanks
 
 	Gustavo
