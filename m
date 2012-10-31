@@ -1,45 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 31 Oct 2012 16:25:32 -0200
+Date: Wed, 31 Oct 2012 16:21:57 -0200
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Marcos Chaparro <marcos@mrkindustries.com.ar>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Add bluetooth support for VAIO VPCEH [0489:e027]
-Message-ID: <20121031182532.GD1679@joana>
-References: <201210291009.12913.marcos@mrkindustries.com.ar>
+To: Syam Sidhardhan <s.syam@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/5] Bluetooth: Remove unnecessary include export.h
+Message-ID: <20121031182157.GC1679@joana>
+References: <1350999140-7481-1-git-send-email-s.syam@samsung.com>
+ <1350999140-7481-2-git-send-email-s.syam@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <201210291009.12913.marcos@mrkindustries.com.ar>
+In-Reply-To: <1350999140-7481-2-git-send-email-s.syam@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcos,
+Hi Syam,
 
-* Marcos Chaparro <marcos@mrkindustries.com.ar> [2012-10-29 10:09:12 -0300]:
+* Syam Sidhardhan <s.syam@samsung.com> [2012-10-23 19:02:17 +0530]:
 
-> Hi,
-> this patch against 3.7-rc3 identifies my Atheros AR3011 internal bluetooth 
-> device, I just transferred some files from my phone to this debian PC using 
-> bluetooth and it works fine (btw, it needs atheros-firmware package).
+> For files only using THIS_MODULE and/or EXPORT_SYMBOL, map
+> them onto including export.h -- or if the file isn't even
+> using those, then just delete the include.
 > 
-> Before changing this, lsusb was identifying it as a Foxconn / Hon Hai device, 
-> which is wrong, and it probably loaded a different firmware to the bluetooth 
-> module.
+> Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+> ---
+>  net/bluetooth/bnep/netdev.c |    1 -
+>  net/bluetooth/hci_event.c   |    1 -
+>  2 files changed, 2 deletions(-)
 > 
-> The patches solves the following discussions:
-> https://answers.launchpad.net/ubuntu/+source/bluez/+question/168992 
-> http://ubuntuforums.org/showthread.php?t=1867214 
-> http://linux-unix-open-source.1053819.n5.nabble.com/Atheros-AR9285-on-
-> Ubuntu-11-10-Sony-Vaio-VPCEH-wifi-does-t-works-td4931321.html 
-> http://www.vivaolinux.com.br/topico/Rede-Wireless/Bluetooth-vaio-VPCEH-
-> desabilitado 
-> 
-> Please tell me if you won't add it to mainstream for some reason.
+> diff --git a/net/bluetooth/bnep/netdev.c b/net/bluetooth/bnep/netdev.c
+> index 98f86f9..e58c8b3 100644
+> --- a/net/bluetooth/bnep/netdev.c
+> +++ b/net/bluetooth/bnep/netdev.c
+> @@ -25,7 +25,6 @@
+>     SOFTWARE IS DISCLAIMED.
+>  */
+>  
+> -#include <linux/export.h>
+>  #include <linux/etherdevice.h>
+>  
+>  #include <net/bluetooth/bluetooth.h>
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 82e478a..110006a 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -24,7 +24,6 @@
+>  
+>  /* Bluetooth HCI event handling. */
+>  
+> -#include <linux/export.h>
+>  #include <asm/unaligned.h>
+>  
+>  #include <net/bluetooth/bluetooth.h>
 
-Can you please send me a git formatted patch with your Signed-off-by line in
-it. See Documentation/SubmittingPatches in the kernel source for more info.
-
-Also add the output of /sys/kernel/debug/usb/devices for this specific device
-to the commit message. Thanks.
+I don't see any build failure coming from this, patch is applied to
+bluetooth-next. Thanks.
 
 	Gustavo
