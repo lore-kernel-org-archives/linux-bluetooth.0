@@ -1,25 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 31 Oct 2012 11:07:07 +0200
+Date: Wed, 31 Oct 2012 10:39:37 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
-	<frederic.danis@linux.intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v10 1/6] adapter: Simplify cached name storage
-Message-ID: <20121031090707.GA20722@x220>
-References: <1351616728-10075-1-git-send-email-frederic.danis@linux.intel.com>
+Subject: Re: [PATCH BlueZ 1/7] AVRCP: Add initial support for controller
+ player
+Message-ID: <20121031083937.GA18714@x220>
+References: <1351521709-4063-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1351616728-10075-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1351521709-4063-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+Hi Luiz,
 
-On Tue, Oct 30, 2012, Frédéric Danis wrote:
+On Mon, Oct 29, 2012, Luiz Augusto von Dentz wrote:
+> This also bump controller record to 1.3.
 > ---
->  src/adapter.c |   75 +++++++++++++++++++++++++--------------------------------
->  1 file changed, 33 insertions(+), 42 deletions(-)
+>  audio/avrcp.c | 531 ++++++++++++++++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 441 insertions(+), 90 deletions(-)
 
-All patches in this set have been applied. Thanks.
+This patch set has been applied. Thanks.
 
 Johan
