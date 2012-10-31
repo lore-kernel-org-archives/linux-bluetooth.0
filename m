@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 12/12] Bluetooth: Process Create Chan Request
-Date: Wed, 31 Oct 2012 15:46:37 +0200
-Message-Id: <1351691197-8394-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 10/12] Bluetooth: AMP: Check for hs_hcon instead of ctrl_id
+Date: Wed, 31 Oct 2012 15:46:35 +0200
+Message-Id: <1351691197-8394-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1351691197-8394-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1350493622.26318.114.camel@aeonflux>
  <1351691197-8394-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,106 +12,39 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add processing L2CAP Create Chan Request. When channel is created
-save associated high speed link hs_hcon.
+When deciding whether to send EFS configuration response with success,
+check rather for existence of High Speed physical link hs_hcon then
+ctrl_id. There might be cases when there is ctrl_id but high speed link
+is not established yet.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c |   63 ++++++++++++++++++++++++++++++--------------
- 1 file changed, 43 insertions(+), 20 deletions(-)
+ net/bluetooth/l2cap_core.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index bdffc4c..783ffae 100644
+index bb2cd9e..bdffc4c 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -4237,7 +4237,9 @@ static int l2cap_create_channel_req(struct l2cap_conn *conn,
- 				    u16 cmd_len, void *data)
- {
- 	struct l2cap_create_chan_req *req = data;
-+	struct l2cap_create_chan_rsp rsp;
- 	struct l2cap_chan *chan;
-+	struct hci_dev *hdev = NULL;
- 	u16 psm, scid;
+@@ -3921,7 +3921,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
+ 		/* check compatibility */
  
- 	if (cmd_len != sizeof(*req))
-@@ -4251,36 +4253,57 @@ static int l2cap_create_channel_req(struct l2cap_conn *conn,
+ 		/* Send rsp for BR/EDR channel */
+-		if (!chan->ctrl_id)
++		if (!chan->hs_hcon)
+ 			l2cap_send_efs_conf_rsp(chan, rsp, cmd->ident, flags);
+ 		else
+ 			chan->ident = cmd->ident;
+@@ -3971,7 +3971,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
+ 				goto done;
+ 			}
  
- 	BT_DBG("psm 0x%2.2x, scid 0x%4.4x, amp_id %d", psm, scid, req->amp_id);
- 
--	if (req->amp_id) {
--		struct hci_dev *hdev;
--
--		/* Validate AMP controller id */
--		hdev = hci_dev_get(req->amp_id);
--		if (!hdev || hdev->dev_type != HCI_AMP ||
--		    !test_bit(HCI_UP, &hdev->flags)) {
--			struct l2cap_create_chan_rsp rsp;
-+	/* BR/EDR connection */
-+	if (req->amp_id == HCI_BREDR_ID) {
-+		l2cap_connect(conn, cmd, data, L2CAP_CREATE_CHAN_RSP,
-+			      req->amp_id);
-+		return 0;
-+	}
- 
--			rsp.dcid = 0;
--			rsp.scid = cpu_to_le16(scid);
--			rsp.result = __constant_cpu_to_le16(L2CAP_CR_BAD_AMP);
--			rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
-+	/* Validate AMP controller id */
-+	hdev = hci_dev_get(req->amp_id);
-+	if (!hdev)
-+		goto error;
- 
--			l2cap_send_cmd(conn, cmd->ident, L2CAP_CREATE_CHAN_RSP,
--				       sizeof(rsp), &rsp);
-+	if (hdev->dev_type != HCI_AMP || !test_bit(HCI_UP, &hdev->flags)) {
-+		hci_dev_put(hdev);
-+		goto error;
-+	}
- 
--			if (hdev)
--				hci_dev_put(hdev);
-+	chan = l2cap_connect(conn, cmd, data, L2CAP_CREATE_CHAN_RSP,
-+			     req->amp_id);
-+	if (chan) {
-+		struct amp_mgr *mgr = conn->hcon->amp_mgr;
-+		struct hci_conn *hs_hcon;
- 
--			return 0;
-+		hs_hcon = hci_conn_hash_lookup_ba(hdev, AMP_LINK, conn->dst);
-+		if (!hs_hcon) {
-+			hci_dev_put(hdev);
-+			return -EFAULT;
- 		}
- 
--		hci_dev_put(hdev);
-+		BT_DBG("mgr %p bredr_chan %p hs_hcon %p", mgr, chan, hs_hcon);
-+
-+		chan->local_amp_id = req->amp_id;
-+		mgr->bredr_chan = chan;
-+		chan->hs_hcon = hs_hcon;
-+		conn->mtu = hdev->block_mtu;
- 	}
- 
--	chan = l2cap_connect(conn, cmd, data, L2CAP_CREATE_CHAN_RSP,
--			     req->amp_id);
-+	hci_dev_put(hdev);
- 
- 	return 0;
-+
-+error:
-+	rsp.dcid = 0;
-+	rsp.scid = cpu_to_le16(scid);
-+	rsp.result = __constant_cpu_to_le16(L2CAP_CR_BAD_AMP);
-+	rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
-+
-+	l2cap_send_cmd(conn, cmd->ident, L2CAP_CREATE_CHAN_RSP,
-+		       sizeof(rsp), &rsp);
-+
-+	return -EFAULT;
- }
- 
- static void l2cap_send_move_chan_req(struct l2cap_chan *chan, u8 dest_amp_id)
+-			if (!chan->ctrl_id) {
++			if (!chan->hs_hcon) {
+ 				l2cap_send_efs_conf_rsp(chan, buf, cmd->ident,
+ 							0);
+ 			} else {
 -- 
 1.7.9.5
 
