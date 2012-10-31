@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 06/12] Bluetooth: AMP: Process Disc Logical Link
-Date: Wed, 31 Oct 2012 15:46:31 +0200
-Message-Id: <1351691197-8394-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 02/12] Bluetooth: Save hs_hchan instead of hs_hcon in loglink complete
+Date: Wed, 31 Oct 2012 15:46:27 +0200
+Message-Id: <1351691197-8394-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1351691197-8394-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1350493622.26318.114.camel@aeonflux>
  <1351691197-8394-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,89 +12,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add processing for HCI Disconnection Logical Link Complete
-Event.
+When logical link creation is completed we need to save hs_hchan
+which represents logical link instead of hs_hcon representing
+physical link. hs_hcon shall be saved when receiving physical link
+complete event.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/amp.h |    1 +
- net/bluetooth/amp.c         |    7 +++++++
- net/bluetooth/hci_event.c   |   28 ++++++++++++++++++++++++++++
- 3 files changed, 36 insertions(+)
+ net/bluetooth/l2cap_core.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
-index 70d5c15..405fb9c 100644
---- a/include/net/bluetooth/amp.h
-+++ b/include/net/bluetooth/amp.h
-@@ -47,5 +47,6 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
- void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle);
- void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle);
- void amp_create_logical_link(struct l2cap_chan *chan);
-+void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason);
- 
- #endif /* __AMP_H */
-diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index fbb6360..0f3fef3 100644
---- a/net/bluetooth/amp.c
-+++ b/net/bluetooth/amp.c
-@@ -421,3 +421,10 @@ void amp_create_logical_link(struct l2cap_chan *chan)
- done:
- 	hci_dev_put(hdev);
- }
-+
-+void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason)
-+{
-+	BT_DBG("hchan %p", hchan);
-+
-+	hci_chan_del(hchan);
-+}
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 9963ec9..036cd8d 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3742,6 +3742,30 @@ static void hci_loglink_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	}
- }
- 
-+static void hci_disconn_loglink_complete_evt(struct hci_dev *hdev,
-+					     struct sk_buff *skb)
-+{
-+	struct hci_ev_disconn_logical_link_complete *ev = (void *) skb->data;
-+	struct hci_chan *hchan;
-+
-+	BT_DBG("%s log handle 0x%4.4x status 0x%2.2x", hdev->name,
-+	       le16_to_cpu(ev->handle), ev->status);
-+
-+	if (ev->status)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	hchan = hci_chan_lookup_handle(hdev, le16_to_cpu(ev->handle));
-+	if (!hchan)
-+		goto unlock;
-+
-+	amp_destroy_logical_link(hchan, ev->reason);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+}
-+
- static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index c2fbaf9..4ef85d2 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4375,7 +4375,7 @@ static void l2cap_logical_finish_create(struct l2cap_chan *chan,
  {
- 	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
-@@ -4077,6 +4101,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_loglink_complete_evt(hdev, skb);
- 		break;
+ 	struct l2cap_conf_rsp rsp;
  
-+	case HCI_EV_DISCONN_LOGICAL_LINK_COMPLETE:
-+		hci_disconn_loglink_complete_evt(hdev, skb);
-+		break;
-+
- 	case HCI_EV_NUM_COMP_BLOCKS:
- 		hci_num_comp_blocks_evt(hdev, skb);
- 		break;
+-	chan->hs_hcon = hchan->conn;
++	chan->hs_hchan = hchan;
+ 	chan->hs_hcon->l2cap_data = chan->conn;
+ 
+ 	l2cap_send_efs_conf_rsp(chan, &rsp, chan->ident, 0);
 -- 
 1.7.9.5
 
