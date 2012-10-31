@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 08/12] Bluetooth: AMP: Remove hci_conn receiving error command status
-Date: Wed, 31 Oct 2012 15:46:33 +0200
-Message-Id: <1351691197-8394-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 05/12] Bluetooth: AMP: Add Logical Link Create function
+Date: Wed, 31 Oct 2012 15:46:30 +0200
+Message-Id: <1351691197-8394-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1351691197-8394-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1350493622.26318.114.camel@aeonflux>
  <1351691197-8394-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,47 +12,160 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When receiving HCI Event: Command Status for Create Physical Link
-with Error code remove AMP hcon.
+After physical link is created logical link needs to be created.
+The process starts after L2CAP channel is created and L2CAP
+Configuration Response with result PENDING is received.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_event.c |   17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+ include/net/bluetooth/amp.h |    1 +
+ net/bluetooth/amp.c         |   49 +++++++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c   |    9 ++++++++
+ net/bluetooth/l2cap_core.c  |   19 ++++++++++++-----
+ 4 files changed, 73 insertions(+), 5 deletions(-)
 
+diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
+index 2e7c79e..70d5c15 100644
+--- a/include/net/bluetooth/amp.h
++++ b/include/net/bluetooth/amp.h
+@@ -46,5 +46,6 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+ 			struct hci_conn *hcon);
+ void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle);
+ void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle);
++void amp_create_logical_link(struct l2cap_chan *chan);
+ 
+ #endif /* __AMP_H */
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index 231d7ef..fbb6360 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -372,3 +372,52 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+ 
+ 	hci_send_cmd(hdev, HCI_OP_ACCEPT_PHY_LINK, sizeof(cp), &cp);
+ }
++
++void amp_create_logical_link(struct l2cap_chan *chan)
++{
++	struct hci_cp_create_accept_logical_link cp;
++	struct hci_conn *hcon;
++	struct hci_dev *hdev;
++
++	BT_DBG("chan %p", chan);
++
++	if (!chan->hs_hcon)
++		return;
++
++	hdev = hci_dev_hold(chan->hs_hcon->hdev);
++	if (!hdev)
++		return;
++
++	BT_DBG("chan %p ctrl_id %d dst %pMR", chan, chan->ctrl_id,
++	       chan->conn->dst);
++
++	hcon = hci_conn_hash_lookup_ba(hdev, AMP_LINK, chan->conn->dst);
++	if (!hcon)
++		goto done;
++
++	cp.phy_handle = hcon->handle;
++
++	cp.tx_flow_spec.id = chan->local_id;
++	cp.tx_flow_spec.stype = chan->local_stype;
++	cp.tx_flow_spec.msdu = cpu_to_le16(chan->local_msdu);
++	cp.tx_flow_spec.sdu_itime = cpu_to_le32(chan->local_sdu_itime);
++	cp.tx_flow_spec.acc_lat = cpu_to_le32(chan->local_acc_lat);
++	cp.tx_flow_spec.flush_to = cpu_to_le32(chan->local_flush_to);
++
++	cp.rx_flow_spec.id = chan->remote_id;
++	cp.rx_flow_spec.stype = chan->remote_stype;
++	cp.rx_flow_spec.msdu = cpu_to_le16(chan->remote_msdu);
++	cp.rx_flow_spec.sdu_itime = cpu_to_le32(chan->remote_sdu_itime);
++	cp.rx_flow_spec.acc_lat = cpu_to_le32(chan->remote_acc_lat);
++	cp.rx_flow_spec.flush_to = cpu_to_le32(chan->remote_flush_to);
++
++	if (hcon->out)
++		hci_send_cmd(hdev, HCI_OP_CREATE_LOGICAL_LINK, sizeof(cp),
++			     &cp);
++	else
++		hci_send_cmd(hdev, HCI_OP_ACCEPT_LOGICAL_LINK, sizeof(cp),
++			     &cp);
++
++done:
++	hci_dev_put(hdev);
++}
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 7ca98b9..03d51a1 100644
+index aa79ed2..9963ec9 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -1810,14 +1810,23 @@ static void hci_cs_create_phylink(struct hci_dev *hdev, u8 status)
- 
- 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
- 
--	if (status)
--		return;
--
- 	cp = hci_sent_cmd_data(hdev, HCI_OP_CREATE_PHY_LINK);
- 	if (!cp)
- 		return;
- 
--	amp_write_remote_assoc(hdev, cp->phy_handle);
-+	hci_dev_lock(hdev);
-+
-+	if (status) {
-+		struct hci_conn *hcon;
-+
-+		hcon = hci_conn_hash_lookup_handle(hdev, cp->phy_handle);
-+		if (hcon)
-+			hci_conn_del(hcon);
-+	} else {
-+		amp_write_remote_assoc(hdev, cp->phy_handle);
-+	}
-+
-+	hci_dev_unlock(hdev);
+@@ -1836,6 +1836,11 @@ static void hci_cs_accept_phylink(struct hci_dev *hdev, u8 status)
+ 	amp_write_remote_assoc(hdev, cp->phy_handle);
  }
  
- static void hci_cs_accept_phylink(struct hci_dev *hdev, u8 status)
++static void hci_cs_create_logical_link(struct hci_dev *hdev, u8 status)
++{
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++}
++
+ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	__u8 status = *((__u8 *) skb->data);
+@@ -2670,6 +2675,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cs_accept_phylink(hdev, ev->status);
+ 		break;
+ 
++	case HCI_OP_CREATE_LOGICAL_LINK:
++		hci_cs_create_logical_link(hdev, ev->status);
++		break;
++
+ 	default:
+ 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
+ 		break;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 782e49c..ecc5020 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -38,6 +38,7 @@
+ #include <net/bluetooth/l2cap.h>
+ #include <net/bluetooth/smp.h>
+ #include <net/bluetooth/a2mp.h>
++#include <net/bluetooth/amp.h>
+ 
+ bool disable_ertm;
+ 
+@@ -1013,6 +1014,12 @@ static bool __amp_capable(struct l2cap_chan *chan)
+ 		return false;
+ }
+ 
++static bool l2cap_check_efs(struct l2cap_chan *chan)
++{
++	/* Check EFS parameters */
++	return true;
++}
++
+ void l2cap_send_conn_req(struct l2cap_chan *chan)
+ {
+ 	struct l2cap_conn *conn = chan->conn;
+@@ -3957,13 +3964,15 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
+ 				goto done;
+ 			}
+ 
+-			/* check compatibility */
+-
+-			if (!chan->ctrl_id)
++			if (!chan->ctrl_id) {
+ 				l2cap_send_efs_conf_rsp(chan, buf, cmd->ident,
+ 							0);
+-			else
+-				chan->ident = cmd->ident;
++			} else {
++				if (l2cap_check_efs(chan)) {
++					amp_create_logical_link(chan);
++					chan->ident = cmd->ident;
++				}
++			}
+ 		}
+ 		goto done;
+ 
 -- 
 1.7.9.5
 
