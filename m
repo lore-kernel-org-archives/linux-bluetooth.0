@@ -1,87 +1,162 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcos Chaparro <marcos@mrkindustries.com.ar>
-To: Gustavo Padovan <gustavo@padovan.org>
-Subject: Re: [PATCH] ath3k: Add support for VAIO VPCEH [0489:e027]
-Date: Thu, 1 Nov 2012 19:40:45 -0300
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <201210291009.12913.marcos@mrkindustries.com.ar> <20121031182532.GD1679@joana>
-In-Reply-To: <20121031182532.GD1679@joana>
+Date: Thu, 1 Nov 2012 20:37:50 -0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth-next 2012-11-01
+Message-ID: <20121101223750.GA1915@joana>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Message-Id: <201211011940.45569.marcos@mrkindustries.com.ar>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="VS++wcV0S1rZb1Fb"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added Atheros AR3011 internal bluetooth device found in Sony VAIO VPCEH to the 
-devices list.
-Before this, the bluetooth module was identified as an Foxconn / Hai bluetooth 
-device [0489:e027], now it claims to be an AtherosAR3011 Bluetooth 
-[0cf3:3005].
 
-# cat /sys/kernel/debug/usb/devices
-T:  Bus=01 Lev=02 Prnt=02 Port=04 Cnt=02 Dev#= 11 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0cf3 ProdID=3005 Rev= 0.01
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+--VS++wcV0S1rZb1Fb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off by: Marcos A Chaparro <marcos@mrkindustries.com.ar>
+Hi John,
+
+Another set of patches for integration in wireless-next. There are two big =
+set
+of changes in it: Andrei Emeltchenko and Mat Martineau added more patches
+towards a full Bluetooth High Speed support and Johan Hedberg improve the
+single mode support for Bluetooth dongles. Apart from that we have small fi=
+xes
+and improvements.=20
+
+Please pull. Thanks a lot.
+
+	Gustavo
 ---
 
-Thanks Gustavo for pointing me out to the SubmittingPatches help file. Please 
-let me know if the patch is actually merged to the mainstream.
+The following changes since commit 9917c85b06c2eb9d61c0f2dadd2d5d8788f7e563:
 
+  brcm80211: remove some truely barftastic code (2012-10-19 16:20:56 -0400)
 
-diff --git a/linux-3.7-rc3.orig/drivers/bluetooth/ath3k.c b/linux-3.7-
-rc3.new/drivers/bluetooth/ath3k.c
-index fc2de55..b00000e 100644
---- a/linux-3.7-rc3.orig/drivers/bluetooth/ath3k.c
-+++ b/linux-3.7-rc3.new/drivers/bluetooth/ath3k.c
-@@ -67,6 +67,7 @@ static struct usb_device_id ath3k_table[] = {
-        { USB_DEVICE(0x13d3, 0x3304) },
-        { USB_DEVICE(0x0930, 0x0215) },
-        { USB_DEVICE(0x0489, 0xE03D) },
-+       { USB_DEVICE(0x0489, 0xE027) },
- 
-        /* Atheros AR9285 Malbec with sflash firmware */
-        { USB_DEVICE(0x03F0, 0x311D) },
-diff --git a/linux-3.7-rc3.orig/drivers/bluetooth/btusb.c b/linux-3.7-
-rc3.new/drivers/bluetooth/btusb.c
-index debda27..ee82f2f 100644
---- a/linux-3.7-rc3.orig/drivers/bluetooth/btusb.c
-+++ b/linux-3.7-rc3.new/drivers/bluetooth/btusb.c
-@@ -124,6 +124,7 @@ static struct usb_device_id blacklist_table[] = {
-        { USB_DEVICE(0x13d3, 0x3304), .driver_info = BTUSB_IGNORE },
-        { USB_DEVICE(0x0930, 0x0215), .driver_info = BTUSB_IGNORE },
-        { USB_DEVICE(0x0489, 0xe03d), .driver_info = BTUSB_IGNORE },
-+       { USB_DEVICE(0x0489, 0xe027), .driver_info = BTUSB_IGNORE },
- 
-        /* Atheros AR9285 Malbec with sflash firmware */
-        { USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
+are available in the git repository at:
 
---
-Marcos
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next fo=
+r-upstream
+
+for you to fetch changes up to 0c0afedf55ff409be9db0b0aeeaa1c6fe0f3cd3c:
+
+  Bluetooth: Fix parameter order of hci_get_route (2012-11-01 20:27:11 -020=
+0)
+
+----------------------------------------------------------------
+Andrei Emeltchenko (18):
+      Bluetooth: trivial: Remove unneeded assignment
+      Bluetooth: Use helper function sending EFS conf rsp
+      Bluetooth: AMP: Process Physical Link Complete evt
+      Bluetooth: AMP: Process Logical Link complete evt
+      Bluetooth: Add put(hcon) when deleting hchan
+      Bluetooth: trivial: Fix braces style and remove empty line
+      Bluetooth: Save hs_hchan instead of hs_hcon in loglink complete
+      Bluetooth: Return correct L2CAP response type
+      Bluetooth: Derive remote and local amp id from chan struct
+      Bluetooth: AMP: Add Logical Link Create function
+      Bluetooth: AMP: Process Disc Logical Link
+      Bluetooth: AMP: Process Disc Physical Link Complete evt
+      Bluetooth: AMP: Remove hci_conn receiving error command status
+      Bluetooth: Disconnect logical link when deleting chan
+      Bluetooth: AMP: Check for hs_hcon instead of ctrl_id
+      Bluetooth: AMP: Use l2cap_physical_cfm in phylink complete evt
+      Bluetooth: Process Create Chan Request
+      Bluetooth: Rename ctrl_id to remote_amp_id
+
+Denis Kirjanov (1):
+      Bluetooth:Replace list_for_each with list_for_each_entry() helper
+
+Gustavo Padovan (1):
+      Bluetooth: Replace *_init() for *_setup()
+
+Johan Hedberg (16):
+      Bluetooth: Add initial support for LE-only controllers
+      Bluetooth: Fix LE MTU reporting for HCIGETDEVINFO
+      Bluetooth: Add setting of the LE event mask
+      Bluetooth: Read adversiting channel TX power during init sequence
+      Bluetooth: Fix HCI command sending when powering on LE-only adapters
+      Bluetooth: mgmt: Restrict BR/EDR settings to BR/EDR-only adapters
+      Bluetooth: Fix updating host feature bits for LE
+      Bluetooth: Add missing feature test macros
+      Bluetooth: Make use feature test macros
+      Bluetooth: Add flag for LE GAP Peripheral role
+      Bluetooth: Disallow LE scanning and connecting in peripheral role
+      Bluetooth: Fix setting host feature bits for SSP
+      Bluetooth: Fix sending unnecessary HCI_Write_SSP_Mode command
+      Bluetooth: Fix unnecessary EIR update during powering on
+      Bluetooth: Fix sending unnecessary HCI_LE_Host_Enable
+      Bluetooth: Fix parameter order of hci_get_route
+
+Mat Martineau (18):
+      Bluetooth: Add new l2cap_chan struct members for high speed channels
+      Bluetooth: Add L2CAP create channel request handling
+      Bluetooth: Remove unnecessary intermediate function
+      Bluetooth: Lookup channel structure based on DCID
+      Bluetooth: Channel move request handling
+      Bluetooth: Add new ERTM receive states for channel move
+      Bluetooth: Add move channel confirm handling
+      Bluetooth: Add state to hci_chan
+      Bluetooth: Move channel response
+      Bluetooth: Add logical link confirm
+      Bluetooth: Add move confirm response handling
+      Bluetooth: Handle physical link completion
+      Bluetooth: Flag ACL frames as complete for AMP controllers
+      Bluetooth: Do not send data during channel move
+      Bluetooth: Configure appropriate timeouts for AMP controllers
+      Bluetooth: Ignore BR/EDR packet size constraints when fragmenting for=
+ AMP
+      Bluetooth: Do not retransmit data during a channel move
+      Bluetooth: Start channel move when socket option is changed
+
+Syam Sidhardhan (4):
+      Bluetooth: trivial: Remove newline before EOF
+      Bluetooth: Replace include linux/module.h with linux/export.h
+      Bluetooth: Remove unnecessary include export.h
+      Bluetooth: mgmt: Use __constant when dealing with constants
+
+ include/net/bluetooth/amp.h      |    4 +
+ include/net/bluetooth/hci.h      |    7 +
+ include/net/bluetooth/hci_core.h |   44 +-
+ include/net/bluetooth/l2cap.h    |   38 +-
+ net/bluetooth/Kconfig            |    1 -
+ net/bluetooth/a2mp.c             |    4 +-
+ net/bluetooth/amp.c              |   93 ++++
+ net/bluetooth/bnep/netdev.c      |    1 -
+ net/bluetooth/cmtp/capi.c        |    2 +-
+ net/bluetooth/cmtp/sock.c        |    2 +-
+ net/bluetooth/hci_conn.c         |    6 +
+ net/bluetooth/hci_core.c         |   65 +--
+ net/bluetooth/hci_event.c        |  309 +++++++++++--
+ net/bluetooth/l2cap_core.c       | 1000 ++++++++++++++++++++++++++++++++++=
++++---
+ net/bluetooth/l2cap_sock.c       |    5 +
+ net/bluetooth/mgmt.c             |   98 ++--
+ 16 files changed, 1486 insertions(+), 193 deletions(-)
+
+--VS++wcV0S1rZb1Fb
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBAgAGBQJQkvm+AAoJEPs3PUX4s20oh48QAKc0Cb9KUsMnnZOie6+OYa6i
+HbsF/4mnsU9TsDft2Bwm3ejinqcEyN+n85U9qCuVqe/tlbkqfMTPwYqe25Ny2gBq
+oMIRnQgG0Hq10yx9Hq2QGffMlaCx3WmuVrrWhKwTo8k/ZoiKuGnjaMUubJQJw2wy
+Nr97i7OS5eUuvWP++BrGW0CXZHmKenqA5L9+IlfpeEQj3STRmPA9nLas0Cdp7j1P
+nErse6ol1yXsaik8yBSSmBVOK5NzHhe/XN7R11nd1DO1GDopMMlfJyR+x+0VSEFp
++hYPTs81RndLZv2W29PGdPnZy2JrGURYjIGEbEkorJ95iZprBoqMAOzHT3O+lGf4
+ILoewAy/0nTMaaPOf0057hXPgkQ4pBO+k1AWZUMTOlQoYUfDRzL5E5/VC9/EyABD
+FPEvP7jOp2bKPi6DFnHZpJfrEQETcGlxWwmCVzCgCdDSyrEWlvbdIUCyOt2xvoMh
+vdyufs9iPnHYYp9aXEfs+eYymxuiFOXwgu4OqDFkHvVNekIqX3Wzttq0gjw2OtwY
+rE2M8UEzgIc9OLcvhn1v1CDj8PkWlNRWME1dE0YfazTRhw9GlnE0W4wEluNU0hxw
+wxKO72UUF9rNngRdp24haau0X4qLO8bBogQSsqE9Z1kvLIeWjqexeJGKh3tqLcy/
+PtXnX/mwteuvsEwiBa+z
+=orX4
+-----END PGP SIGNATURE-----
+
+--VS++wcV0S1rZb1Fb--
