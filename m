@@ -1,162 +1,390 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 1 Nov 2012 20:37:50 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next 2012-11-01
-Message-ID: <20121101223750.GA1915@joana>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="VS++wcV0S1rZb1Fb"
+In-Reply-To: <CABBYNZLoiM=-f3D5mUc_t96P=vbU2i__Cw3eBxskjComBxS27g@mail.gmail.com>
+References: <1351384166-15586-1-git-send-email-dmp0x7c5@gmail.com>
+	<1351384166-15586-3-git-send-email-dmp0x7c5@gmail.com>
+	<CABBYNZLoiM=-f3D5mUc_t96P=vbU2i__Cw3eBxskjComBxS27g@mail.gmail.com>
+Date: Thu, 1 Nov 2012 23:33:31 +0100
+Message-ID: <CAKZqhqe9-L9okK+NPvypUt-Dyw8N9=jSGnSuG_MNRXGPm+KcyA@mail.gmail.com>
+Subject: Re: [RFC v2 obexd 03/11] fuse: Add obexhlp_connect/disconnect
+ functions with helpers
+From: =?UTF-8?Q?Micha=C5=82_Poczwardowski?= <dmp0x7c5@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Luiz,
 
---VS++wcV0S1rZb1Fb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 30 October 2012 10:08, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Michal,
+>
+> On Sun, Oct 28, 2012 at 2:29 AM, Michał Poczwardowski
+> <dmp0x7c5@gmail.com> wrote:
+>> ---
+>>  fuse/helpers.c  |  221 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  fuse/helpers.h  |    4 +
+>>  fuse/obexfuse.c |   40 ++++++++++
+>>  3 files changed, 265 insertions(+), 0 deletions(-)
+>>
+>> diff --git a/fuse/helpers.c b/fuse/helpers.c
+>> index c36072d..856e1d5 100644
+>> --- a/fuse/helpers.c
+>> +++ b/fuse/helpers.c
+>> @@ -43,6 +43,9 @@
+>>
+>>  #define OBEX_FTP_LS "x-obex/folder-listing"
+>>
+>> +static GCond *gobexhlp_cond;
+>> +static GMutex *gobexhlp_mutex;
+>> +
+>>  struct gobexhlp_request {
+>>         gchar *name;
+>>         gboolean complete;
+>> @@ -52,3 +55,221 @@ struct gobexhlp_location {
+>>         gchar *dir;
+>>         gchar *file;
+>>  };
+>> +
+>> +static uint16_t find_rfcomm_uuid(void *user_data)
+>> +{
+>> +       sdp_list_t *pds = (sdp_list_t*) user_data;
+>> +       uint16_t channel = 0;
+>> +
+>> +       for (;pds;pds = pds->next) {
+>> +               sdp_data_t *d = (sdp_data_t*)pds->data;
+>> +               int proto = 0;
+>> +               for (; d; d = d->next) {
+>> +                       switch(d->dtd) {
+>> +                       case SDP_UUID16:
+>> +                       case SDP_UUID32:
+>> +                       case SDP_UUID128:
+>> +                               proto = sdp_uuid_to_proto(&d->val.uuid);
+>> +                       break;
+>> +                       case SDP_UINT8:
+>> +                               if (proto == RFCOMM_UUID)
+>> +                                       channel = d->val.int8;
+>> +                               break;
+>> +                       }
+>> +               }
+>> +       }
+>> +       return channel;
+>> +}
+>> +
+>> +static uint16_t get_ftp_channel(bdaddr_t *src, bdaddr_t *dst)
+>> +{
+>> +       sdp_session_t *sdp;
+>> +       sdp_list_t *r, *search_list, *attrid_list;
+>> +       sdp_list_t *response_list = NULL;
+>> +       uuid_t uuid;
+>> +
+>> +       /* FTP_SDP_UUID "00001106-0000-1000-8000-00805f9b34fb" */
+>> +       uint8_t uuid_int[] = {0, 0, 0x11, 0x06, 0, 0, 0x10, 0, 0x80,
+>> +                                       0, 0, 0x80, 0x5f, 0x9b, 0x34, 0xfb};
+>> +       uint32_t range = 0x0000ffff;
+>> +       uint16_t channel = 0;
+>> +
+>> +       sdp = sdp_connect(src, dst, SDP_RETRY_IF_BUSY );
+>> +       if (sdp == NULL)
+>> +               return channel;
+>> +
+>> +       sdp_uuid128_create(&uuid, uuid_int);
+>> +       search_list = sdp_list_append(NULL, &uuid);
+>> +       attrid_list = sdp_list_append(NULL, &range);
+>> +       sdp_service_search_attr_req(sdp, search_list, SDP_ATTR_REQ_RANGE,
+>> +                                       attrid_list, &response_list);
+>> +       r = response_list;
+>> +
+>> +       for (; r;r = r->next) {
+>> +               sdp_record_t *rec = (sdp_record_t*) r->data;
+>> +               sdp_list_t *proto_list;
+>> +
+>> +               if (sdp_get_access_protos(rec, &proto_list ) == 0) {
+>> +                       sdp_list_t *p = proto_list;
+>> +                       for (; p; p = p->next) {
+>> +                               sdp_list_t *pds = (sdp_list_t*) p->data;
+>> +                               channel = find_rfcomm_uuid(pds);
+>> +                               sdp_list_free((sdp_list_t*) p->data, 0);
+>
+> You dont really need to iterate in the list of protos there exist a
+> function that does that for you take a look at sdp_get_proto_port, btw
+> there exist a similar code in client/bluetooth.c
+>
 
-Hi John,
+I didn't notice sdp_get_proto_port when I was reading client/bluetooth.c code :)
 
-Another set of patches for integration in wireless-next. There are two big =
-set
-of changes in it: Andrei Emeltchenko and Mat Martineau added more patches
-towards a full Bluetooth High Speed support and Johan Hedberg improve the
-single mode support for Bluetooth dongles. Apart from that we have small fi=
-xes
-and improvements.=20
+>> +                       }
+>> +                       sdp_list_free(proto_list, 0);
+>> +               }
+>> +               sdp_record_free(rec);
+>> +       }
+>> +       sdp_close(sdp);
+>> +
+>> +       g_free(search_list);
+>> +       g_free(attrid_list);
+>> +       g_free(response_list);
+>> +
+>> +       return channel;
+>> +}
+>> +
+>> +/* taken from client/bluetooth.c - bluetooth_getpacketopt */
+>> +static int get_packet_opt(GIOChannel *io, int *tx_mtu, int *rx_mtu)
+>> +{
+>> +       int sk = g_io_channel_unix_get_fd(io);
+>> +       int type;
+>> +       int omtu = -1;
+>> +       int imtu = -1;
+>> +       socklen_t len = sizeof(int);
+>> +
+>> +       if (getsockopt(sk, SOL_SOCKET, SO_TYPE, &type, &len) < 0)
+>> +               return -errno;
+>> +
+>> +       if (type != SOCK_SEQPACKET)
+>> +               return -EINVAL;
+>> +
+>> +       if (!bt_io_get(io, BT_IO_L2CAP, NULL, BT_IO_OPT_OMTU, &omtu,
+>> +                                               BT_IO_OPT_IMTU, &imtu,
+>> +                                               BT_IO_OPT_INVALID))
+>> +               return -EINVAL;
+>> +
+>> +       if (tx_mtu)
+>> +               *tx_mtu = omtu;
+>> +
+>> +       if (rx_mtu)
+>> +               *rx_mtu = imtu;
+>> +
+>> +       return 0;
+>> +}
+>> +
+>> +static void obex_callback(GObex *obex, GError *err, GObexPacket *rsp,
+>> +                                                       gpointer user_data)
+>> +{
+>> +       if (err != NULL) {
+>> +               g_debug("Connect failed: %s\n", err->message);
+>> +               g_error_free(err);
+>> +       } else {
+>> +               g_debug("Connect succeeded\n");
+>> +       }
+>> +}
+>> +
+>> +static void bt_io_callback(GIOChannel *io, GError *err, gpointer user_data)
+>> +{
+>> +       struct gobexhlp_session *session = user_data;
+>> +       GObexTransportType type;
+>> +       int tx_mtu = -1;
+>> +       int rx_mtu = -1;
+>> +
+>> +       if (err != NULL) {
+>> +               g_printerr("%s\n", err->message);
+>> +               g_error_free(err);
+>> +               return;
+>> +       }
+>> +
+>> +       g_debug("Bluetooth socket connected\n");
+>> +
+>> +       g_io_channel_set_flags(session->io, G_IO_FLAG_NONBLOCK, NULL);
+>> +       g_io_channel_set_close_on_unref(session->io, TRUE);
+>> +
+>> +       if (get_packet_opt(session->io, &tx_mtu, &rx_mtu) == 0) {
+>> +               type = G_OBEX_TRANSPORT_PACKET;
+>> +               g_debug("PACKET transport tx:%d rx:%d\n", tx_mtu, rx_mtu);
+>> +       } else {
+>> +               type = G_OBEX_TRANSPORT_STREAM;
+>> +               g_debug("STREAM transport\n");
+>> +       }
+>> +
+>> +       session->obex = g_obex_new(io, type, tx_mtu, rx_mtu);
+>> +       g_obex_connect(session->obex, obex_callback, session, NULL,
+>> +                               G_OBEX_HDR_TARGET, OBEX_FTP_UUID,
+>> +                               OBEX_FTP_UUID_LEN, G_OBEX_HDR_INVALID);
+>> +}
+>> +
+>> +struct gobexhlp_session* gobexhlp_connect(const char *srcstr,
+>> +                                               const char *dststr)
+>> +{
+>> +       struct gobexhlp_session *session;
+>> +       uint16_t channel;
+>> +       bdaddr_t src, dst;
+>> +
+>> +       session = g_try_malloc0(sizeof(struct gobexhlp_session));
+>> +       if (session == NULL)
+>> +               return NULL;
+>> +
+>> +       if (srcstr == NULL)
+>> +               bacpy(&src, BDADDR_ANY);
+>> +       else
+>> +               str2ba(srcstr, &src);
+>> +
+>> +       str2ba(dststr, &dst);
+>> +       channel = get_ftp_channel(&src, &dst);
+>> +
+>> +       if (channel == 0)
+>> +               return NULL;
+>
+> Currently you are not checking for L2CAP psm just RFCOMM channel so
+> the code bellow would never be used.
+>
 
-Please pull. Thanks a lot.
+In client/bluetooth.c these lines (in search_callback):
 
-	Gustavo
----
+		data = sdp_data_get(rec, 0x0200);
+		/* PSM must be odd and lsb of upper byte must be 0 */
+		if (data != NULL && (data->val.uint16 & 0x0101) == 0x0001)
+			ch = data->val.uint16;
 
-The following changes since commit 9917c85b06c2eb9d61c0f2dadd2d5d8788f7e563:
+Are responsible for L2CAP psm, right?
 
-  brcm80211: remove some truely barftastic code (2012-10-19 16:20:56 -0400)
+>> +       if (channel > 31)
+>> +               session->io = bt_io_connect(BT_IO_L2CAP, bt_io_callback,
+>> +                               session, NULL, &session->err,
+>> +                               BT_IO_OPT_SOURCE_BDADDR, &src,
+>> +                               BT_IO_OPT_DEST_BDADDR, &dst,
+>> +                               BT_IO_OPT_PSM, channel,
+>> +                               BT_IO_OPT_MODE, BT_IO_MODE_ERTM,
+>> +                               BT_IO_OPT_OMTU, BT_TX_MTU,
+>> +                               BT_IO_OPT_IMTU, BT_RX_MTU,
+>> +                               BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+>> +                               BT_IO_OPT_INVALID);
+>> +       else
+>> +               session->io = bt_io_connect(BT_IO_RFCOMM, bt_io_callback,
+>> +                               session, NULL, &session->err,
+>> +                               BT_IO_OPT_SOURCE_BDADDR, &src,
+>> +                               BT_IO_OPT_DEST_BDADDR, &dst,
+>> +                               BT_IO_OPT_CHANNEL, channel,
+>> +                               BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+>> +                               BT_IO_OPT_INVALID);
+>> +
+>> +       if (session->err != NULL)
+>> +               return NULL;
+>> +
+>> +       session->file_stat = g_hash_table_new_full( g_str_hash, g_str_equal,
+>> +                                       g_free, g_free);
+>> +       session->setpath = g_strdup("/");
+>> +
+>> +       gobexhlp_mutex = g_mutex_new();
+>> +       gobexhlp_cond = g_cond_new();
+>> +
+>> +       return session;
+>> +}
+>> +
+>> +void gobexhlp_disconnect(struct gobexhlp_session* session)
+>> +{
+>> +       if (session == NULL)
+>> +               return;
+>> +
+>> +       g_obex_unref(session->obex);
+>> +       g_free(session->io);
+>> +
+>> +       g_hash_table_remove_all(session->file_stat);
+>> +       g_list_free_full(session->lsfiles, g_free);
+>> +       g_free(session->setpath);
+>> +
+>> +       g_mutex_free(gobexhlp_mutex);
+>> +       g_cond_free(gobexhlp_cond);
+>> +
+>> +       g_free(session);
+>> +}
+>> diff --git a/fuse/helpers.h b/fuse/helpers.h
+>> index 142403f..29dc6cf 100644
+>> --- a/fuse/helpers.h
+>> +++ b/fuse/helpers.h
+>> @@ -46,3 +46,7 @@ struct gobexhlp_session {
+>>         int status;
+>>         GError *err;
+>>  };
+>> +
+>> +struct gobexhlp_session* gobexhlp_connect(const char *srcstr,
+>> +                                               const char *dstsrc);
+>> +void gobexhlp_disconnect(struct gobexhlp_session* session);
+>> diff --git a/fuse/obexfuse.c b/fuse/obexfuse.c
+>> index fe4f4da..79eb990 100644
+>> --- a/fuse/obexfuse.c
+>> +++ b/fuse/obexfuse.c
+>> @@ -33,6 +33,10 @@
+>>
+>>  #include "helpers.h"
+>>
+>> +struct gobexhlp_session* session = NULL;
+>> +static GMainLoop *main_loop;
+>> +static GThread *main_gthread;
+>> +
+>>  struct options {
+>>         char* dststr;
+>>         char* srcstr;
+>> @@ -60,7 +64,34 @@ static struct fuse_opt obexfuse_opts[] =
+>>         FUSE_OPT_END
+>>  };
+>>
+>> +gpointer main_loop_func(gpointer user_data)
+>> +{
+>> +       main_loop = g_main_loop_new(NULL, FALSE);
+>> +       g_main_loop_run(main_loop);
+>> +
+>> +       return 0;
+>> +}
+>> +
+>> +void* obexfuse_init(struct fuse_conn_info *conn)
+>> +{
+>> +       main_gthread = g_thread_create(main_loop_func, NULL, TRUE, NULL);
+>> +
+>> +       conn->async_read = 0;
+>> +       conn->want &= ~FUSE_CAP_ASYNC_READ;
+>> +
+>> +       return 0;
+>> +}
+>> +
+>> +void obexfuse_destroy()
+>> +{
+>> +       gobexhlp_disconnect(session);
+>> +       g_main_loop_quit(main_loop);
+>> +       g_thread_join(main_gthread);
+>> +}
+>> +
+>>  static struct fuse_operations obexfuse_oper = {
+>> +       .init = obexfuse_init,
+>> +       .destroy = obexfuse_destroy,
+>>  };
+>>
+>>  static int obexfuse_opt_proc(void *data, const char *arg, int key,
+>> @@ -111,6 +142,15 @@ int main(int argc, char *argv[])
+>>
+>>         g_thread_init(NULL);
+>>
+>
+> I would suggest not mixing gobex prefix with your helper functions, in
+> fact it is probably fine to just use obexfuse e.g. obexfuse_connect.
+>
 
-are available in the git repository at:
+Right, when I was removing 'g' from gobexfuse I forgot to change
+gobexhlp to obexhlp.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next fo=
-r-upstream
+I'll send RFC v3 after LinuxCon :)
 
-for you to fetch changes up to 0c0afedf55ff409be9db0b0aeeaa1c6fe0f3cd3c:
+>> +       session = gobexhlp_connect(options.srcstr, options.dststr);
+>> +       if (session == NULL || session->io == NULL) {
+>> +               g_printerr("Connection to %s failed\n", options.dststr);
+>> +               gobexhlp_disconnect(session);
+>> +               return -EHOSTUNREACH;
+>> +       } else {
+>> +               g_print("Connected\nMounting %s\n", options.dststr);
+>> +       }
+>> +
+>>         fuse_opt_add_arg(&args, "-s"); /* force single threaded mode */
+>>         retfuse = fuse_main(args.argc, args.argv, &obexfuse_oper, NULL);
+>>
+>> --
+>> 1.7.8.6
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-  Bluetooth: Fix parameter order of hci_get_route (2012-11-01 20:27:11 -020=
-0)
-
-----------------------------------------------------------------
-Andrei Emeltchenko (18):
-      Bluetooth: trivial: Remove unneeded assignment
-      Bluetooth: Use helper function sending EFS conf rsp
-      Bluetooth: AMP: Process Physical Link Complete evt
-      Bluetooth: AMP: Process Logical Link complete evt
-      Bluetooth: Add put(hcon) when deleting hchan
-      Bluetooth: trivial: Fix braces style and remove empty line
-      Bluetooth: Save hs_hchan instead of hs_hcon in loglink complete
-      Bluetooth: Return correct L2CAP response type
-      Bluetooth: Derive remote and local amp id from chan struct
-      Bluetooth: AMP: Add Logical Link Create function
-      Bluetooth: AMP: Process Disc Logical Link
-      Bluetooth: AMP: Process Disc Physical Link Complete evt
-      Bluetooth: AMP: Remove hci_conn receiving error command status
-      Bluetooth: Disconnect logical link when deleting chan
-      Bluetooth: AMP: Check for hs_hcon instead of ctrl_id
-      Bluetooth: AMP: Use l2cap_physical_cfm in phylink complete evt
-      Bluetooth: Process Create Chan Request
-      Bluetooth: Rename ctrl_id to remote_amp_id
-
-Denis Kirjanov (1):
-      Bluetooth:Replace list_for_each with list_for_each_entry() helper
-
-Gustavo Padovan (1):
-      Bluetooth: Replace *_init() for *_setup()
-
-Johan Hedberg (16):
-      Bluetooth: Add initial support for LE-only controllers
-      Bluetooth: Fix LE MTU reporting for HCIGETDEVINFO
-      Bluetooth: Add setting of the LE event mask
-      Bluetooth: Read adversiting channel TX power during init sequence
-      Bluetooth: Fix HCI command sending when powering on LE-only adapters
-      Bluetooth: mgmt: Restrict BR/EDR settings to BR/EDR-only adapters
-      Bluetooth: Fix updating host feature bits for LE
-      Bluetooth: Add missing feature test macros
-      Bluetooth: Make use feature test macros
-      Bluetooth: Add flag for LE GAP Peripheral role
-      Bluetooth: Disallow LE scanning and connecting in peripheral role
-      Bluetooth: Fix setting host feature bits for SSP
-      Bluetooth: Fix sending unnecessary HCI_Write_SSP_Mode command
-      Bluetooth: Fix unnecessary EIR update during powering on
-      Bluetooth: Fix sending unnecessary HCI_LE_Host_Enable
-      Bluetooth: Fix parameter order of hci_get_route
-
-Mat Martineau (18):
-      Bluetooth: Add new l2cap_chan struct members for high speed channels
-      Bluetooth: Add L2CAP create channel request handling
-      Bluetooth: Remove unnecessary intermediate function
-      Bluetooth: Lookup channel structure based on DCID
-      Bluetooth: Channel move request handling
-      Bluetooth: Add new ERTM receive states for channel move
-      Bluetooth: Add move channel confirm handling
-      Bluetooth: Add state to hci_chan
-      Bluetooth: Move channel response
-      Bluetooth: Add logical link confirm
-      Bluetooth: Add move confirm response handling
-      Bluetooth: Handle physical link completion
-      Bluetooth: Flag ACL frames as complete for AMP controllers
-      Bluetooth: Do not send data during channel move
-      Bluetooth: Configure appropriate timeouts for AMP controllers
-      Bluetooth: Ignore BR/EDR packet size constraints when fragmenting for=
- AMP
-      Bluetooth: Do not retransmit data during a channel move
-      Bluetooth: Start channel move when socket option is changed
-
-Syam Sidhardhan (4):
-      Bluetooth: trivial: Remove newline before EOF
-      Bluetooth: Replace include linux/module.h with linux/export.h
-      Bluetooth: Remove unnecessary include export.h
-      Bluetooth: mgmt: Use __constant when dealing with constants
-
- include/net/bluetooth/amp.h      |    4 +
- include/net/bluetooth/hci.h      |    7 +
- include/net/bluetooth/hci_core.h |   44 +-
- include/net/bluetooth/l2cap.h    |   38 +-
- net/bluetooth/Kconfig            |    1 -
- net/bluetooth/a2mp.c             |    4 +-
- net/bluetooth/amp.c              |   93 ++++
- net/bluetooth/bnep/netdev.c      |    1 -
- net/bluetooth/cmtp/capi.c        |    2 +-
- net/bluetooth/cmtp/sock.c        |    2 +-
- net/bluetooth/hci_conn.c         |    6 +
- net/bluetooth/hci_core.c         |   65 +--
- net/bluetooth/hci_event.c        |  309 +++++++++++--
- net/bluetooth/l2cap_core.c       | 1000 ++++++++++++++++++++++++++++++++++=
-+++---
- net/bluetooth/l2cap_sock.c       |    5 +
- net/bluetooth/mgmt.c             |   98 ++--
- 16 files changed, 1486 insertions(+), 193 deletions(-)
-
---VS++wcV0S1rZb1Fb
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIcBAEBAgAGBQJQkvm+AAoJEPs3PUX4s20oh48QAKc0Cb9KUsMnnZOie6+OYa6i
-HbsF/4mnsU9TsDft2Bwm3ejinqcEyN+n85U9qCuVqe/tlbkqfMTPwYqe25Ny2gBq
-oMIRnQgG0Hq10yx9Hq2QGffMlaCx3WmuVrrWhKwTo8k/ZoiKuGnjaMUubJQJw2wy
-Nr97i7OS5eUuvWP++BrGW0CXZHmKenqA5L9+IlfpeEQj3STRmPA9nLas0Cdp7j1P
-nErse6ol1yXsaik8yBSSmBVOK5NzHhe/XN7R11nd1DO1GDopMMlfJyR+x+0VSEFp
-+hYPTs81RndLZv2W29PGdPnZy2JrGURYjIGEbEkorJ95iZprBoqMAOzHT3O+lGf4
-ILoewAy/0nTMaaPOf0057hXPgkQ4pBO+k1AWZUMTOlQoYUfDRzL5E5/VC9/EyABD
-FPEvP7jOp2bKPi6DFnHZpJfrEQETcGlxWwmCVzCgCdDSyrEWlvbdIUCyOt2xvoMh
-vdyufs9iPnHYYp9aXEfs+eYymxuiFOXwgu4OqDFkHvVNekIqX3Wzttq0gjw2OtwY
-rE2M8UEzgIc9OLcvhn1v1CDj8PkWlNRWME1dE0YfazTRhw9GlnE0W4wEluNU0hxw
-wxKO72UUF9rNngRdp24haau0X4qLO8bBogQSsqE9Z1kvLIeWjqexeJGKh3tqLcy/
-PtXnX/mwteuvsEwiBa+z
-=orX4
------END PGP SIGNATURE-----
-
---VS++wcV0S1rZb1Fb--
+Thanks,
+Michal
