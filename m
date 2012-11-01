@@ -1,36 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix parameter order of hci_get_route
-Date: Thu,  1 Nov 2012 13:27:26 +0200
-Message-Id: <1351769246-28854-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 1 Nov 2012 10:55:06 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv1 12/12] Bluetooth: Process Create Chan Request
+Message-ID: <20121101085500.GA17693@aemeltch-MOBL1>
+References: <1350493622.26318.114.camel@aeonflux>
+ <1351691197-8394-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1351691197-8394-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1351700642.1828.13.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1351700642.1828.13.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Marcel,
 
-The actual parameter order of hci_get_route is (dst, src) and not (src,
-dst). All current callers use the right order but the header file shows
-the parameters in the wrong order.
+On Wed, Oct 31, 2012 at 09:24:02AM -0700, Marcel Holtmann wrote:
+> Hi Andrei,
+> 
+> > Add processing L2CAP Create Chan Request. When channel is created
+> > save associated high speed link hs_hcon.
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  net/bluetooth/l2cap_core.c |   63 ++++++++++++++++++++++++++++++--------------
+> >  1 file changed, 43 insertions(+), 20 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index bdffc4c..783ffae 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -4237,7 +4237,9 @@ static int l2cap_create_channel_req(struct l2cap_conn *conn,
+> >  				    u16 cmd_len, void *data)
+> >  {
+> >  	struct l2cap_create_chan_req *req = data;
+> > +	struct l2cap_create_chan_rsp rsp;
+> >  	struct l2cap_chan *chan;
+> > +	struct hci_dev *hdev = NULL;
+> 
+> why is this one set to NULL. Can we avoid that please.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci_core.h |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Sorry, forgot to clean this up from the previous patch. With the new patch
+we do not need to set this NULL.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index b3490c6..ce6dbeb 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -685,7 +685,7 @@ static inline uint8_t __hci_num_ctrl(void)
- }
- 
- struct hci_dev *hci_dev_get(int index);
--struct hci_dev *hci_get_route(bdaddr_t *src, bdaddr_t *dst);
-+struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src);
- 
- struct hci_dev *hci_alloc_dev(void);
- void hci_free_dev(struct hci_dev *hdev);
--- 
-1.7.10.4
-
+Best regards 
+Andrei Emeltchenko 
