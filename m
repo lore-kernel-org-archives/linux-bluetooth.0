@@ -1,108 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Rename ctrl_id to remote_amp_id
-Date: Thu,  1 Nov 2012 15:37:03 +0200
-Message-Id: <1351777023-10018-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1351777023-10018-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1351700642.1828.13.camel@aeonflux>
- <1351777023-10018-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] Bluetooth: Fix parameter order of hci_get_route
+Date: Thu,  1 Nov 2012 13:27:26 +0200
+Message-Id: <1351769246-28854-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Since we have started to use local_amp_id for local AMP
-Controller Id it makes sense to rename ctrl_id to remote_amp_id
-since it represents remote AMP controller Id.
+The actual parameter order of hci_get_route is (dst, src) and not (src,
+dst). All current callers use the right order but the header file shows
+the parameters in the wrong order.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/l2cap.h |    3 +--
- net/bluetooth/a2mp.c          |    4 ++--
- net/bluetooth/amp.c           |    5 ++---
- net/bluetooth/l2cap_core.c    |    2 +-
- 4 files changed, 6 insertions(+), 8 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 18149c8..d65db45 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -481,6 +481,7 @@ struct l2cap_chan {
- 	unsigned long	conn_state;
- 	unsigned long	flags;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index b3490c6..ce6dbeb 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -685,7 +685,7 @@ static inline uint8_t __hci_num_ctrl(void)
+ }
  
-+	__u8		remote_amp_id;
- 	__u8		local_amp_id;
- 	__u8		move_id;
- 	__u8		move_state;
-@@ -518,8 +519,6 @@ struct l2cap_chan {
- 	__u32		remote_acc_lat;
- 	__u32		remote_flush_to;
+ struct hci_dev *hci_dev_get(int index);
+-struct hci_dev *hci_get_route(bdaddr_t *src, bdaddr_t *dst);
++struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src);
  
--	__u8		ctrl_id;
--
- 	struct delayed_work	chan_timer;
- 	struct delayed_work	retrans_timer;
- 	struct delayed_work	monitor_timer;
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index d5136cf..2f67d5e 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -423,7 +423,7 @@ static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 
- 	BT_DBG("Created hcon %p: loc:%d -> rem:%d", hcon, hdev->id, rsp->id);
- 
--	mgr->bredr_chan->ctrl_id = rsp->id;
-+	mgr->bredr_chan->remote_amp_id = rsp->id;
- 
- 	amp_create_phylink(hdev, mgr, hcon);
- 
-@@ -939,7 +939,7 @@ void a2mp_send_create_phy_link_req(struct hci_dev *hdev, u8 status)
- 		goto clean;
- 
- 	req->local_id = hdev->id;
--	req->remote_id = bredr_chan->ctrl_id;
-+	req->remote_id = bredr_chan->remote_amp_id;
- 	memcpy(req->amp_assoc, loc_assoc->data, loc_assoc->len);
- 
- 	a2mp_send(mgr, A2MP_CREATEPHYSLINK_REQ, __next_ident(mgr), len, req);
-diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index 650bb8d..4b2fea6 100644
---- a/net/bluetooth/amp.c
-+++ b/net/bluetooth/amp.c
-@@ -387,7 +387,7 @@ void amp_physical_cfm(struct hci_conn *bredr_hcon, struct hci_conn *hs_hcon)
- 	bredr_chan = mgr->bredr_chan;
- 
- 	set_bit(FLAG_EFS_ENABLE, &bredr_chan->flags);
--	bredr_chan->ctrl_id = hs_hcon->remote_id;
-+	bredr_chan->remote_amp_id = hs_hcon->remote_id;
- 	bredr_chan->hs_hcon = hs_hcon;
- 	bredr_chan->conn->mtu = hs_hcon->hdev->block_mtu;
- 	bredr_chan->fcs = L2CAP_FCS_NONE;
-@@ -412,8 +412,7 @@ void amp_create_logical_link(struct l2cap_chan *chan)
- 	if (!hdev)
- 		return;
- 
--	BT_DBG("chan %p ctrl_id %d dst %pMR", chan, chan->ctrl_id,
--	       chan->conn->dst);
-+	BT_DBG("chan %p dst %pMR", chan, chan->conn->dst);
- 
- 	hcon = hci_conn_hash_lookup_ba(hdev, AMP_LINK, chan->conn->dst);
- 	if (!hcon)
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2f0e165..a1faaab 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4615,7 +4615,7 @@ static void l2cap_do_move_cancel(struct l2cap_chan *chan, int result)
- void l2cap_physical_cfm(struct l2cap_chan *chan, int result)
- {
- 	u8 local_amp_id = chan->local_amp_id;
--	u8 remote_amp_id = chan->ctrl_id;
-+	u8 remote_amp_id = chan->remote_amp_id;
- 
- 	BT_DBG("chan %p, result %d, local_amp_id %d, remote_amp_id %d",
- 	       chan, result, local_amp_id, remote_amp_id);
+ struct hci_dev *hci_alloc_dev(void);
+ void hci_free_dev(struct hci_dev *hdev);
 -- 
-1.7.9.5
+1.7.10.4
 
