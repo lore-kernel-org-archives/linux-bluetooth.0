@@ -1,70 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 1 Nov 2012 20:53:31 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Marcos Chaparro <marcos@mrkindustries.com.ar>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Marcos Chaparro <marcos@mrkindustries.com.ar>
+To: Gustavo Padovan <gustavo@padovan.org>
 Subject: Re: [PATCH] ath3k: Add support for VAIO VPCEH [0489:e027]
-Message-ID: <20121101225331.GB1915@joana>
-References: <201210291009.12913.marcos@mrkindustries.com.ar>
- <20121031182532.GD1679@joana>
- <201211011940.45569.marcos@mrkindustries.com.ar>
+Date: Thu, 1 Nov 2012 19:40:45 -0300
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <201210291009.12913.marcos@mrkindustries.com.ar> <20121031182532.GD1679@joana>
+In-Reply-To: <20121031182532.GD1679@joana>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="LyciRD1jyfeSSjG0"
-In-Reply-To: <201211011940.45569.marcos@mrkindustries.com.ar>
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201211011940.45569.marcos@mrkindustries.com.ar>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Added Atheros AR3011 internal bluetooth device found in Sony VAIO VPCEH to the 
+devices list.
+Before this, the bluetooth module was identified as an Foxconn / Hai bluetooth 
+device [0489:e027], now it claims to be an AtherosAR3011 Bluetooth 
+[0cf3:3005].
 
---LyciRD1jyfeSSjG0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+# cat /sys/kernel/debug/usb/devices
+T:  Bus=01 Lev=02 Prnt=02 Port=04 Cnt=02 Dev#= 11 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cf3 ProdID=3005 Rev= 0.01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-Hi Marcos,
+Signed-off by: Marcos A Chaparro <marcos@mrkindustries.com.ar>
+---
 
-* Marcos Chaparro <marcos@mrkindustries.com.ar> [2012-11-01 19:40:45 -0300]:
+Thanks Gustavo for pointing me out to the SubmittingPatches help file. Please 
+let me know if the patch is actually merged to the mainstream.
 
-> Added Atheros AR3011 internal bluetooth device found in Sony VAIO VPCEH t=
-o the=20
-> devices list.
-> Before this, the bluetooth module was identified as an Foxconn / Hai blue=
-tooth=20
-> device [0489:e027], now it claims to be an AtherosAR3011 Bluetooth=20
-> [0cf3:3005].
->=20
-> # cat /sys/kernel/debug/usb/devices
-> T:  Bus=3D01 Lev=3D02 Prnt=3D02 Port=3D04 Cnt=3D02 Dev#=3D 11 Spd=3D12   =
-MxCh=3D 0
-> D:  Ver=3D 1.10 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
-> P:  Vendor=3D0cf3 ProdID=3D3005 Rev=3D 0.01
 
-I actually need the output without the patch in, showing the 0x0489 vendor =
-id.
-Sorry, but we like to document the devices we add support properly.
+diff --git a/linux-3.7-rc3.orig/drivers/bluetooth/ath3k.c b/linux-3.7-
+rc3.new/drivers/bluetooth/ath3k.c
+index fc2de55..b00000e 100644
+--- a/linux-3.7-rc3.orig/drivers/bluetooth/ath3k.c
++++ b/linux-3.7-rc3.new/drivers/bluetooth/ath3k.c
+@@ -67,6 +67,7 @@ static struct usb_device_id ath3k_table[] = {
+        { USB_DEVICE(0x13d3, 0x3304) },
+        { USB_DEVICE(0x0930, 0x0215) },
+        { USB_DEVICE(0x0489, 0xE03D) },
++       { USB_DEVICE(0x0489, 0xE027) },
+ 
+        /* Atheros AR9285 Malbec with sflash firmware */
+        { USB_DEVICE(0x03F0, 0x311D) },
+diff --git a/linux-3.7-rc3.orig/drivers/bluetooth/btusb.c b/linux-3.7-
+rc3.new/drivers/bluetooth/btusb.c
+index debda27..ee82f2f 100644
+--- a/linux-3.7-rc3.orig/drivers/bluetooth/btusb.c
++++ b/linux-3.7-rc3.new/drivers/bluetooth/btusb.c
+@@ -124,6 +124,7 @@ static struct usb_device_id blacklist_table[] = {
+        { USB_DEVICE(0x13d3, 0x3304), .driver_info = BTUSB_IGNORE },
+        { USB_DEVICE(0x0930, 0x0215), .driver_info = BTUSB_IGNORE },
+        { USB_DEVICE(0x0489, 0xe03d), .driver_info = BTUSB_IGNORE },
++       { USB_DEVICE(0x0489, 0xe027), .driver_info = BTUSB_IGNORE },
+ 
+        /* Atheros AR9285 Malbec with sflash firmware */
+        { USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
 
-	Gustavo
-
---LyciRD1jyfeSSjG0
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIcBAEBAgAGBQJQkv1rAAoJEPs3PUX4s20oDNMP+wZbeZ9I/rPD5hOmowrG8W0y
-5Y4u/x1a/IEGA4txbVh9RiPRarjW0Lj5vRektzPubxkJkGzd5cVdlmxMUwM6FSx1
-7O2SfEWPd4ToT9UyIusNx5+7yjVGQT8EYo1XBaypAqRpgdj4DhDnfGQ2q3sR31EP
-g0XwE/fpdaInTQDP08/khOR5dZpXSzbLIVr0ohuXjO+NgG1qJZVDwcVTgh1bqufb
-d6hWtP5IxWpj/vW90DU8yXW8uiqmNmXjPEbc6WmCbNyOb1houIhKfvMk9+1+zzzD
-g+Zjz8Rtz7qxInFEhzpKB801YHHDNLAZz48v43ida034lYgA4Ugm6PUAM9WHRJ8v
-hDX3DzUURYsYhXdWumJDCTcsYTmnTX60qEEmj7zV3bwAAWW3CLwhKamtvAWV8wNC
-WvMA+P8u+usR0a3n4iSflfth+3PFEQIwwMBzBwsm/IYLEkRMHzOAyt1gNyK+yt1Y
-okyiTjB20EPdGHEUfcxBJn0MEj6QE/PVhgIwMwTCh7xgChMBNTuAJ3BDx4qjJydG
-mL1OZYs0AAxvuHTUmz39C842O32G8AXwUuP7qyT7O9gqbLghPmJQ7nVhB5GUdqTJ
-ipO6e1J3mZhR2keZl18JlLNEMZgLE6/UYk2wyZz4oEr1Mt0co1/ADQHdZ1Jce0QM
-ZMujIxbmH++WCrY8KLrB
-=7LkB
------END PGP SIGNATURE-----
-
---LyciRD1jyfeSSjG0--
+--
+Marcos
