@@ -1,44 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcos Chaparro <marcos@mrkindustries.com.ar>
-To: Gustavo Padovan <gustavo@padovan.org>
-Subject: Re: [PATCH] ath3k: Add support for VAIO VPCEH [0489:e027]
-Date: Thu, 1 Nov 2012 20:19:38 -0300
+Date: Thu, 1 Nov 2012 20:53:31 -0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Marcos Chaparro <marcos@mrkindustries.com.ar>
 Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <201210291009.12913.marcos@mrkindustries.com.ar> <201211011940.45569.marcos@mrkindustries.com.ar> <20121101225331.GB1915@joana>
-In-Reply-To: <20121101225331.GB1915@joana>
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ath3k: Add support for VAIO VPCEH [0489:e027]
+Message-ID: <20121101225331.GB1915@joana>
+References: <201210291009.12913.marcos@mrkindustries.com.ar>
+ <20121031182532.GD1679@joana>
+ <201211011940.45569.marcos@mrkindustries.com.ar>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Message-Id: <201211012019.38950.marcos@mrkindustries.com.ar>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="LyciRD1jyfeSSjG0"
+In-Reply-To: <201211011940.45569.marcos@mrkindustries.com.ar>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thursday, November 01, 2012 19:53:31 Gustavo Padovan wrote:
-> > # cat /sys/kernel/debug/usb/devices
-> > T:  Bus=01 Lev=02 Prnt=02 Port=04 Cnt=02 Dev#= 11 Spd=12   MxCh= 0
-> > D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> > P:  Vendor=0cf3 ProdID=3005 Rev= 0.01
-> 
-> I actually need the output without the patch in, showing the 0x0489 vendor
-> id. Sorry, but we like to document the devices we add support properly.
 
-I rebooted with an old (3.2.0-3-amd64) kernel and I still have the correct ID 
-0cf3:3005, I can't see the old usb ID.
+--LyciRD1jyfeSSjG0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I tried reloading all the bluetooth related modules but it still gets 
-identified as an 0cf3:3005.
+Hi Marcos,
 
-Do you know how can I delete the device firmware to revert it to the original 
-state?
+* Marcos Chaparro <marcos@mrkindustries.com.ar> [2012-11-01 19:40:45 -0300]:
 
-Apparently its keeping the firmware from my patched kernel.
+> Added Atheros AR3011 internal bluetooth device found in Sony VAIO VPCEH t=
+o the=20
+> devices list.
+> Before this, the bluetooth module was identified as an Foxconn / Hai blue=
+tooth=20
+> device [0489:e027], now it claims to be an AtherosAR3011 Bluetooth=20
+> [0cf3:3005].
+>=20
+> # cat /sys/kernel/debug/usb/devices
+> T:  Bus=3D01 Lev=3D02 Prnt=3D02 Port=3D04 Cnt=3D02 Dev#=3D 11 Spd=3D12   =
+MxCh=3D 0
+> D:  Ver=3D 1.10 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
+> P:  Vendor=3D0cf3 ProdID=3D3005 Rev=3D 0.01
 
-root@bluestreak:/home/marcos# lsusb
-Bus 001 Device 004: ID 0cf3:3005 Atheros Communications, Inc. AR3011 Bluetooth
+I actually need the output without the patch in, showing the 0x0489 vendor =
+id.
+Sorry, but we like to document the devices we add support properly.
 
-Best regards
+	Gustavo
 
---
-Marcos
+--LyciRD1jyfeSSjG0
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBAgAGBQJQkv1rAAoJEPs3PUX4s20oDNMP+wZbeZ9I/rPD5hOmowrG8W0y
+5Y4u/x1a/IEGA4txbVh9RiPRarjW0Lj5vRektzPubxkJkGzd5cVdlmxMUwM6FSx1
+7O2SfEWPd4ToT9UyIusNx5+7yjVGQT8EYo1XBaypAqRpgdj4DhDnfGQ2q3sR31EP
+g0XwE/fpdaInTQDP08/khOR5dZpXSzbLIVr0ohuXjO+NgG1qJZVDwcVTgh1bqufb
+d6hWtP5IxWpj/vW90DU8yXW8uiqmNmXjPEbc6WmCbNyOb1houIhKfvMk9+1+zzzD
+g+Zjz8Rtz7qxInFEhzpKB801YHHDNLAZz48v43ida034lYgA4Ugm6PUAM9WHRJ8v
+hDX3DzUURYsYhXdWumJDCTcsYTmnTX60qEEmj7zV3bwAAWW3CLwhKamtvAWV8wNC
+WvMA+P8u+usR0a3n4iSflfth+3PFEQIwwMBzBwsm/IYLEkRMHzOAyt1gNyK+yt1Y
+okyiTjB20EPdGHEUfcxBJn0MEj6QE/PVhgIwMwTCh7xgChMBNTuAJ3BDx4qjJydG
+mL1OZYs0AAxvuHTUmz39C842O32G8AXwUuP7qyT7O9gqbLghPmJQ7nVhB5GUdqTJ
+ipO6e1J3mZhR2keZl18JlLNEMZgLE6/UYk2wyZz4oEr1Mt0co1/ADQHdZ1Jce0QM
+ZMujIxbmH++WCrY8KLrB
+=7LkB
+-----END PGP SIGNATURE-----
+
+--LyciRD1jyfeSSjG0--
