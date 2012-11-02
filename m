@@ -1,220 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
-To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Cc: albert.o.ho@intel.com, johan.hedberg@intel.com, tedd.hj.an@gmail.com
-Subject: [RFCv3 1/3] Bluetooth: Add support BT mini-driver
-Date: Fri, 02 Nov 2012 13:54:26 -0700
-Message-ID: <1385742.8V9Ax1uMxF@tedd-ubuntu>
+Date: Fri, 2 Nov 2012 08:39:09 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv1 11/12] Bluetooth: AMP: Use l2cap_physical_cfm in phylink
+ complete evt
+In-Reply-To: <20121102074844.GA4171@aemeltch-MOBL1>
+Message-ID: <alpine.DEB.2.02.1211020808010.29427@mathewm-linux>
+References: <1350493622.26318.114.camel@aeonflux> <1351691197-8394-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1351691197-8394-12-git-send-email-Andrei.Emeltchenko.news@gmail.com> <alpine.DEB.2.02.1211011045260.9973@mathewm-linux>
+ <20121102074844.GA4171@aemeltch-MOBL1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This patch add mini-driver support in BTUSB
+Andrei -
 
-Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
----
- drivers/bluetooth/btusb.c |   68 +++++++++++++++++++++++++++++++++++++++++----
- drivers/bluetooth/btusb.h |   44 +++++++++++++++++++++++++++++
- 2 files changed, 106 insertions(+), 6 deletions(-)
- create mode 100644 drivers/bluetooth/btusb.h
+On Fri, 2 Nov 2012, Andrei Emeltchenko wrote:
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f637c25..39a1e6c 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -27,6 +27,8 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
- 
-+#include "btusb.h"
-+
- #define VERSION "0.6"
- 
- static bool ignore_dga;
-@@ -47,6 +49,7 @@ static struct usb_driver btusb_driver;
- #define BTUSB_BROKEN_ISOC	0x20
- #define BTUSB_WRONG_SCO_MTU	0x40
- #define BTUSB_ATH3012		0x80
-+#define BTUSB_VENDOR		0x100
- 
- static struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-@@ -206,6 +209,7 @@ struct btusb_data {
- 	struct usb_device    *udev;
- 	struct usb_interface *intf;
- 	struct usb_interface *isoc;
-+	struct btusb_driver_info *driver_info;
- 
- 	spinlock_t lock;
- 
-@@ -952,9 +956,15 @@ static int btusb_probe(struct usb_interface *intf,
- 			return -ENODEV;
- 	}
- 
--	data = devm_kzalloc(&intf->dev, sizeof(*data), GFP_KERNEL);
--	if (!data)
--		return -ENOMEM;
-+/* CHECKME: if mini-driver invokes btusb_probe, btusb_data already has been
-+ * allocated. If btusb_probe is directly invoked by usb core, then allocate
-+ * here. */
-+	data = usb_get_intfdata(intf);
-+	if (!data) {
-+		data = devm_kzalloc(&intf->dev, sizeof(*data), GFP_KERNEL);
-+		if (!data)
-+			return -ENOMEM;
-+	}
- 
- 	for (i = 0; i < intf->cur_altsetting->desc.bNumEndpoints; i++) {
- 		ep_desc = &intf->cur_altsetting->endpoint[i].desc;
-@@ -1012,6 +1022,17 @@ static int btusb_probe(struct usb_interface *intf,
- 	hdev->send     = btusb_send_frame;
- 	hdev->notify   = btusb_notify;
- 
-+	/* bind the vendor specific mini-driver */
-+	if ((id->driver_info & BTUSB_VENDOR) && data->driver_info) {
-+		if (data->driver_info->bind) {
-+			err = data->driver_info->bind(hdev);
-+			if (err < 0) {
-+				hci_free_dev(hdev);
-+				return err;
-+			}
-+		}
-+	}
-+
- 	/* Interface numbers are hardcoded in the specification */
- 	data->isoc = usb_ifnum_to_if(data->udev, 1);
- 
-@@ -1080,7 +1101,35 @@ static int btusb_probe(struct usb_interface *intf,
- 	return 0;
- }
- 
--static void btusb_disconnect(struct usb_interface *intf)
-+/*
-+ * CHECKME: vendor's mini-driver should call this function to setup
-+ * the vendor specific btusb_driver_info struct
-+ */
-+int btusb_probe_one(struct usb_interface *intf,
-+			const struct usb_device_id *id)
-+{
-+	struct usb_device_id *vendor_id = (struct usb_device_id *)id;
-+	struct btusb_data *data;
-+
-+	data = devm_kzalloc(&intf->dev, sizeof(*data), GFP_KERNEL);
-+	if (!data)
-+		return -ENOMEM;
-+
-+	if (vendor_id->driver_info) {
-+/* CHECKME: store the driver_info (btusb_driver_info struct) from mini-driver
-+ * to btusb_data for later use and change it to BTUSB_VENDOR flag. */
-+		data->driver_info =
-+			(struct btusb_driver_info *)vendor_id->driver_info;
-+		vendor_id->driver_info = BTUSB_VENDOR;
-+	}
-+
-+	usb_set_intfdata(intf, data);
-+
-+	return btusb_probe(intf, vendor_id);
-+}
-+EXPORT_SYMBOL(btusb_probe_one);
-+
-+void btusb_disconnect(struct usb_interface *intf)
- {
- 	struct btusb_data *data = usb_get_intfdata(intf);
- 	struct hci_dev *hdev;
-@@ -1103,11 +1152,16 @@ static void btusb_disconnect(struct usb_interface *intf)
- 	else if (data->isoc)
- 		usb_driver_release_interface(&btusb_driver, data->isoc);
- 
-+	/* unbind the vendor specific mini-driver */
-+	if (data->driver_info && data->driver_info->unbind)
-+		data->driver_info->unbind(hdev);
-+
- 	hci_free_dev(hdev);
- }
-+EXPORT_SYMBOL(btusb_disconnect);
- 
- #ifdef CONFIG_PM
--static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
-+int btusb_suspend(struct usb_interface *intf, pm_message_t message)
- {
- 	struct btusb_data *data = usb_get_intfdata(intf);
- 
-@@ -1133,6 +1187,7 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL(btusb_suspend);
- 
- static void play_deferred(struct btusb_data *data)
- {
-@@ -1149,7 +1204,7 @@ static void play_deferred(struct btusb_data *data)
- 	usb_scuttle_anchored_urbs(&data->deferred);
- }
- 
--static int btusb_resume(struct usb_interface *intf)
-+int btusb_resume(struct usb_interface *intf)
- {
- 	struct btusb_data *data = usb_get_intfdata(intf);
- 	struct hci_dev *hdev = data->hdev;
-@@ -1205,6 +1260,7 @@ done:
- 
- 	return err;
- }
-+EXPORT_SYMBOL(btusb_resume);
- #endif
- 
- static struct usb_driver btusb_driver = {
-diff --git a/drivers/bluetooth/btusb.h b/drivers/bluetooth/btusb.h
-new file mode 100644
-index 0000000..35bcfa9
---- /dev/null
-+++ b/drivers/bluetooth/btusb.h
-@@ -0,0 +1,44 @@
-+/*
-+ *
-+ *  Generic Bluetooth USB driver
-+ *
-+ *  Copyright (C) 2005-2008  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-+ *
-+ */
-+#ifndef _BTUSB_H
-+#define _BTUSB_H
-+
-+struct btusb_driver_info {
-+	char	*description;
-+
-+	/* initialize the vendor setup routines */
-+	int	(*bind)(struct hci_dev *);
-+
-+	/* clean up */
-+	void	(*unbind)(struct hci_dev *);
-+};
-+
-+extern int btusb_probe_one(struct usb_interface *,
-+				const struct usb_device_id *);
-+extern void btusb_disconnect(struct usb_interface *);
-+#ifdef CONFIG_PM
-+extern int btusb_suspend(struct usb_interface *, pm_message_t);
-+extern int btusb_resume(struct usb_interface *);
-+#endif
-+
-+#endif /* _BTUSB_H */
--- 
-1.7.9.5
+> Hi Mat,
+>
+> On Thu, Nov 01, 2012 at 10:51:19AM -0700, Mat Martineau wrote:
+>>
+>> Andrei -
+>>
+>> On Wed, 31 Oct 2012, Andrei Emeltchenko wrote:
+>>
+>>> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>>>
+>>> When receiving HCI Phylink Complete event run amp_physical_cfm
+>>> which initialize BR/EDR L2CAP channel associated with High Speed
+>>> link and run l2cap_physical_cfm which shall send L2CAP Create
+>>> Chan Request.
+>>>
+>>> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>>> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+>>> ---
+>>> include/net/bluetooth/amp.h   |    1 +
+>>> include/net/bluetooth/l2cap.h |    1 +
+>>> net/bluetooth/amp.c           |   24 ++++++++++++++++++++++++
+>>> net/bluetooth/hci_event.c     |   15 ++-------------
+>>> 4 files changed, 28 insertions(+), 13 deletions(-)
+>>>
+>>> diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
+>>> index f1c0017..7ea3db7 100644
+>>> --- a/include/net/bluetooth/amp.h
+>>> +++ b/include/net/bluetooth/amp.h
+>>> @@ -46,6 +46,7 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+>>> 			struct hci_conn *hcon);
+>>> void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle);
+>>> void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle);
+>>> +void amp_physical_cfm(struct hci_conn *bredr_hcon, struct hci_conn *hs_hcon);
+>>> void amp_create_logical_link(struct l2cap_chan *chan);
+>>> void amp_disconnect_logical_link(struct hci_chan *hchan);
+>>> void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason);
+>>> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+>>> index 24c61ef..18149c8 100644
+>>> --- a/include/net/bluetooth/l2cap.h
+>>> +++ b/include/net/bluetooth/l2cap.h
+>>> @@ -812,5 +812,6 @@ void l2cap_send_conn_req(struct l2cap_chan *chan);
+>>> void l2cap_move_start(struct l2cap_chan *chan);
+>>> void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
+>>> 		       u8 status);
+>>> +void l2cap_physical_cfm(struct l2cap_chan *chan, int result);
+>>>
+>>> #endif /* __L2CAP_H */
+>>> diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+>>> index 917e034..650bb8d 100644
+>>> --- a/net/bluetooth/amp.c
+>>> +++ b/net/bluetooth/amp.c
+>>> @@ -373,6 +373,30 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+>>> 	hci_send_cmd(hdev, HCI_OP_ACCEPT_PHY_LINK, sizeof(cp), &cp);
+>>> }
+>>>
+>>> +void amp_physical_cfm(struct hci_conn *bredr_hcon, struct hci_conn *hs_hcon)
+>>> +{
+>>> +	struct hci_dev *bredr_hdev = hci_dev_hold(bredr_hcon->hdev);
+>>> +	struct amp_mgr *mgr = hs_hcon->amp_mgr;
+>>> +	struct l2cap_chan *bredr_chan;
+>>> +
+>>> +	BT_DBG("bredr_hcon %p hs_hcon %p mgr %p", bredr_hcon, hs_hcon, mgr);
+>>> +
+>>> +	if (!bredr_hdev || !mgr || !mgr->bredr_chan)
+>>> +		return;
+>>> +
+>>> +	bredr_chan = mgr->bredr_chan;
+>>> +
+>>> +	set_bit(FLAG_EFS_ENABLE, &bredr_chan->flags);
+>>> +	bredr_chan->ctrl_id = hs_hcon->remote_id;
+>>> +	bredr_chan->hs_hcon = hs_hcon;
+>>> +	bredr_chan->conn->mtu = hs_hcon->hdev->block_mtu;
+>>> +	bredr_chan->fcs = L2CAP_FCS_NONE;
+
+Changing FCS requires L2CAP reconfiguration for the channel, and 
+chan->fcs shouldn't be modified until reconfiguration happens.  While 
+it doesn't make much sense to do so, the remote device may want to 
+keep FCS enabled.  The move may also fail and you don't want to forget 
+the original FCS setting in that case.
+
+>>
+>> Sorry I missed this earlier: bredr_chan needs to be locked before
+>> changing it.  I suggest passing the information to
+>> l2cap_physical_cfm and letting that function update the structure
+>> members while it holds the lock.
+>
+> what about locking here and changing l2cap_physical_cfm to unlocked
+> __l2cap_physical_cfm ?
+
+My preference is to not manipulate l2cap_chan too much outside of 
+l2cap_core, and to keep the channel move or channel create state 
+machines inside l2cap_core.  l2cap_physical_cfm checks the channel 
+state before modifying it.  The move or new connection may have been 
+canceled or be in the wrong state, in which case the structure should 
+not be modified even though the physical link was completed.
+
+>
+>>
+>>
+>>> +
+>>> +	l2cap_physical_cfm(bredr_chan, 0);
+>>> +
+>>> +	hci_dev_put(bredr_hdev);
+>>> +}
+
+Regards,
+
+--
+Mat Martineau
+
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, hosted by The Linux Foundation
+
