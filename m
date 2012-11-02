@@ -2,108 +2,232 @@ Return-Path: <cyrus@holtmann.org>
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
 Cc: albert.o.ho@intel.com, johan.hedberg@intel.com, tedd.hj.an@gmail.com
-Subject: [RFCv3 2/3] Bluetooth: Add support vendor specific device setup
-Date: Fri, 02 Nov 2012 13:54:29 -0700
-Message-ID: <1731055.pboutxBfre@tedd-ubuntu>
+Subject: [RFCv3 3/3] Bluetooth: Add sample BT USB mini-driver
+Date: Fri, 02 Nov 2012 13:54:31 -0700
+Message-ID: <3643102.0sb8ltOP1V@tedd-ubuntu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This patch adds support vendors to execute their specific device
-setup before the BT stack sends generic BT device initialization.
+This patch adds sample BT USB mini-driver
 
 Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 ---
- include/net/bluetooth/hci.h      |    2 ++
- include/net/bluetooth/hci_core.h |    7 +++++++
- net/bluetooth/hci_core.c         |   27 ++++++++++++++++++++++++++-
- 3 files changed, 35 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btusb.c        |    3 +
+ drivers/bluetooth/btusb_sample.c |  189 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 192 insertions(+)
+ create mode 100644 drivers/bluetooth/btusb_sample.c
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 0f28f70..3e9949b 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -117,7 +117,9 @@ enum {
- 	HCI_DISCOVERABLE,
- 	HCI_LINK_SECURITY,
- 	HCI_PENDING_CLASS,
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 39a1e6c..630d938 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -193,6 +193,9 @@ static struct usb_device_id blacklist_table[] = {
+ 	/* Frontline ComProbe Bluetooth Sniffer */
+ 	{ USB_DEVICE(0x16d3, 0x0002), .driver_info = BTUSB_SNIFFER },
+ 
++	/* BT USB sample mini-driver */
++	{ USB_DEVICE(0x1234, 0x5678), .driver_info = BTUSB_IGNORE },
 +
- 	HCI_PERIODIC_INQ,
-+	HCI_VENDOR,		/* for mini-driver vendor specific setup */
+ 	{ }	/* Terminating entry */
  };
  
- /* HCI ioctl defines */
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 6a3337e..ad4a099 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -275,6 +275,13 @@ struct hci_dev {
- 	int (*send)(struct sk_buff *skb);
- 	void (*notify)(struct hci_dev *hdev, unsigned int evt);
- 	int (*ioctl)(struct hci_dev *hdev, unsigned int cmd, unsigned long arg);
-+
-+/* CHECKME: Added following members for vendor specific setup in order to make
-+ * the bluetooth.ko transparent to the interface below.
-+ * These members are set/used by the vendor provided mini-driver. */
-+	void			*vendor_data;
-+	int (*vendor_setup)(struct hci_dev *hdev);
-+	void (*vendor_event)(struct hci_dev *hdev, struct sk_buff *skb);
- };
- 
- struct hci_conn {
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e407051..09e7fa2 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -685,6 +685,21 @@ int hci_dev_open(__u16 dev)
- 		set_bit(HCI_INIT, &hdev->flags);
- 		hdev->init_last_cmd = 0;
- 
-+/* CHECKME: this is the required spot for executing the vendor setup code.
-+ * We need btusb_open() to complete so HCI event can be received and
-+ * processed by vendor_event() handler. vendor_setup() must be done first
-+ * before hci_init_req.
-+ * vendor_setup() runs once only.*/
-+		if (hdev->vendor_setup) {
-+			set_bit(HCI_VENDOR, &hdev->dev_flags);
-+			ret = hdev->vendor_setup(hdev);
-+			hdev->vendor_event = NULL;
-+			hdev->vendor_setup = NULL;
-+			clear_bit(HCI_VENDOR, &hdev->dev_flags);
-+			if (ret < 0)
-+				goto done;
-+		}
-+
- 		ret = __hci_request(hdev, hci_init_req, 0, HCI_INIT_TIMEOUT);
- 
- 		if (lmp_host_le_capable(hdev))
-@@ -2119,6 +2134,7 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL(hci_send_cmd);
- 
- /* Get data from the previously sent command */
- void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
-@@ -2800,7 +2816,16 @@ static void hci_rx_work(struct work_struct *work)
- 		switch (bt_cb(skb)->pkt_type) {
- 		case HCI_EVENT_PKT:
- 			BT_DBG("%s Event packet", hdev->name);
--			hci_event_packet(hdev, skb);
-+/* CHECKME: If we are in vendor mode, all HCI events are handled by
-+ * vendor_event() and not handled by normal stack flows. vendor_event() shall
-+ * also be responsible for handling flow control.
+diff --git a/drivers/bluetooth/btusb_sample.c b/drivers/bluetooth/btusb_sample.c
+new file mode 100644
+index 0000000..6f4a9e0
+--- /dev/null
++++ b/drivers/bluetooth/btusb_sample.c
+@@ -0,0 +1,189 @@
++/*
 + *
-+ * Please see the mini-driver sample code. */
-+			if (test_bit(HCI_VENDOR, &hdev->dev_flags)
-+					&& hdev->vendor_event)
-+				hdev->vendor_event(hdev, skb);
-+			else
-+				hci_event_packet(hdev, skb);
- 			break;
- 
- 		case HCI_ACLDATA_PKT:
++ *  Bluetooth USB Mini Driver - Sample
++ *
++ *  Copyright (C) 2012  Intel Corporation
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ */
++#include <linux/module.h>
++#include <linux/usb.h>
++
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++
++#include "btusb.h"
++
++/*
++ * This is sample BT USB mini-driver to demonstrate how a vendor can execute
++ * the vendor specific device initialization routine and handle vendor specific
++ * events.
++ *
++ * In this sample, it will send one vendor HCI command (but not limited to 1)
++ * as an example.
++ */
++
++#define VENDOR_HCI_SAMPLE_CMD_1   0xfc01
++
++/* mini-driver context */
++struct btusb_sample_data {
++	struct hci_dev		*hdev;
++
++	/* for synchronization */
++	struct completion	wait_evt_complete;
++};
++
++/*
++ * Entry point for device setup.
++ */
++int btusb_sample_setup(struct hci_dev *hdev)
++{
++	int ret;
++	struct btusb_sample_data *data;
++
++	/* initialize the sample data */
++	data = kmalloc(sizeof(*data), GFP_KERNEL);
++	if (!data) {
++		BT_ERR("failed to allocate the memory for data");
++		return -ENOMEM;
++	}
++
++	hdev->vendor_data = data;
++	data->hdev = hdev;
++
++	init_completion(&data->wait_evt_complete);
++
++	/* send command */
++	ret = hci_send_cmd(hdev, VENDOR_HCI_SAMPLE_CMD_1, 0, NULL);
++	if (ret < 0) {
++		BT_ERR("failed to send command: %d", ret);
++		kfree(data);
++		return ret;
++	}
++
++	/* waiting for event */
++	ret = wait_for_completion_interruptible(&data->wait_evt_complete);
++	if (ret < 0) {
++		BT_ERR("wait completion error: %d", ret);
++		kfree(data);
++		return ret;
++	}
++
++
++	/* done */
++	kfree(data);
++
++	return 0;
++}
++
++/*
++ * Vendor specific event handler
++ *
++ * During the vendor setup mode, this function is responsible for handling all
++ * received HCI events.
++ */
++void btusb_sample_event(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct btusb_sample_data *data;
++	struct hci_event_hdr *hdr;
++	struct hci_ev_cmd_complete *cc;
++	u16 opcode;
++
++	data = hdev->vendor_data;
++
++	/* event header */
++	hdr = (void *)skb->data;
++	if (hdr->evt != HCI_EV_CMD_COMPLETE) {
++		BT_ERR("invalid event code: %02x", hdr->evt);
++		goto exit_error;
++	}
++	skb_pull(skb, sizeof(*hdr));
++
++	/* command complete event */
++	cc = (void *)skb->data;
++	opcode =le16_to_cpu(cc->opcode);
++	if (opcode != VENDOR_HCI_SAMPLE_CMD_1) {
++		BT_ERR("invalid opcode: %04x", opcode);
++		goto exit_error;
++	}
++	skb_pull(skb, sizeof(*cc));
++
++	/* check status */
++	if ((u8)skb->data[0]) {
++		BT_ERR("evt status failed: %02x", (u8)skb->data[0]);
++		goto exit_error;
++	}
++
++exit_error:
++	/* this is for handling the flow control */
++	del_timer(&hdev->cmd_timer);
++	atomic_set(&hdev->cmd_cnt, 1);
++
++	/* consume the event here */
++	kfree_skb(skb);
++
++	/* complete the wait */
++	complete(&data->wait_evt_complete);
++}
++
++/*
++ * Bind this mini-driver to btusb.ko
++ */
++int btusb_sample_bind(struct hci_dev *hdev)
++{
++	/* set the vendor_setup and vendor_event handlers */
++	hdev->vendor_setup = btusb_sample_setup;
++	hdev->vendor_event = btusb_sample_event;
++
++	return 0;
++}
++
++/*
++ * Unbind this mini-driver to btusb.ko
++ */
++void btusb_sample_unbind(struct hci_dev *hdev)
++{
++
++	return;
++}
++
++static const struct btusb_driver_info sample_info = {
++	.description	= "BT USB mini driver sample",
++	.bind		= btusb_sample_bind,
++	.unbind		= btusb_sample_unbind,
++};
++
++static const struct usb_device_id products[] = {
++	{
++		USB_DEVICE(0x1234, 0x5678),
++		.driver_info = (unsigned long) &sample_info,
++	},
++	{},	/* END */
++};
++MODULE_DEVICE_TABLE(usb, products);
++
++static struct usb_driver btusb_sample_minidriver = {
++	.name		= "btusb sample mini-driver",
++	.probe		= btusb_probe_one,
++	.disconnect	= btusb_disconnect,
++	.id_table	= products,
++};
++module_usb_driver(btusb_sample_minidriver);
++
++MODULE_AUTHOR("Tedd Ho-Jeong An <tedd.an@intel.com>");
++MODULE_DESCRIPTION("BT USB sample mini driver");
++MODULE_LICENSE("GPL");
 -- 
 1.7.9.5
