@@ -1,84 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-To: Gustavo Padovan <gustavo@padovan.org>
-Subject: Re: [PATCH] ath3k: Add support for VAIO VPCEH [0489:e027]
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org
-From: Marcos Chaparro <marcos@mrkindustries.com.ar>
-Date: Thu, 1 Nov 2012 21:38:20 -0300
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201211012138.20988.marcos@mrkindustries.com.ar>
+Message-ID: <1351816363.1828.22.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: Fix parameter order of hci_get_route
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Fri, 02 Nov 2012 01:32:43 +0100
+In-Reply-To: <1351769246-28854-1-git-send-email-johan.hedberg@gmail.com>
+References: <1351769246-28854-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added Atheros AR3011 internal bluetooth device found in Sony VAIO VPCEH to the 
-devices list.
-Before this, the bluetooth module was identified as an Foxconn / Hai bluetooth 
-device [0489:e027], now it claims to be an AtherosAR3011 Bluetooth 
-[0cf3:3005].
+Hi Johan,
 
-# cat /sys/kernel/debug/usb/devices
-T:  Bus=01 Lev=02 Prnt=02 Port=04 Cnt=02 Dev#=  4 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e027 Rev= 0.01
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> The actual parameter order of hci_get_route is (dst, src) and not (src,
+> dst). All current callers use the right order but the header file shows
+> the parameters in the wrong order.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  include/net/bluetooth/hci_core.h |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Signed-off by: Marcos A Chaparro <marcos@mrkindustries.com.ar>
----
+I trust you that you triple checked this.
 
-Updated usb /sys/kernel/debug/usb/devices output. A complete powercycle flushed 
-the device firmware.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-diff --git a/linux-3.7-rc3.orig/drivers/bluetooth/ath3k.c b/linux-3.7-
-rc3.new/drivers/bluetooth/ath3k.c
-index fc2de55..b00000e 100644
---- a/linux-3.7-rc3.orig/drivers/bluetooth/ath3k.c
-+++ b/linux-3.7-rc3.new/drivers/bluetooth/ath3k.c
-@@ -67,6 +67,7 @@ static struct usb_device_id ath3k_table[] = {
-        { USB_DEVICE(0x13d3, 0x3304) },
-        { USB_DEVICE(0x0930, 0x0215) },
-        { USB_DEVICE(0x0489, 0xE03D) },
-+       { USB_DEVICE(0x0489, 0xE027) },
- 
-        /* Atheros AR9285 Malbec with sflash firmware */
-        { USB_DEVICE(0x03F0, 0x311D) },
-diff --git a/linux-3.7-rc3.orig/drivers/bluetooth/btusb.c b/linux-3.7-
-rc3.new/drivers/bluetooth/btusb.c
-index debda27..ee82f2f 100644
---- a/linux-3.7-rc3.orig/drivers/bluetooth/btusb.c
-+++ b/linux-3.7-rc3.new/drivers/bluetooth/btusb.c
-@@ -124,6 +124,7 @@ static struct usb_device_id blacklist_table[] = {
-        { USB_DEVICE(0x13d3, 0x3304), .driver_info = BTUSB_IGNORE },
-        { USB_DEVICE(0x0930, 0x0215), .driver_info = BTUSB_IGNORE },
-        { USB_DEVICE(0x0489, 0xe03d), .driver_info = BTUSB_IGNORE },
-+       { USB_DEVICE(0x0489, 0xe027), .driver_info = BTUSB_IGNORE },
- 
-        /* Atheros AR9285 Malbec with sflash firmware */
-        { USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
+Regards
 
---
-Marcos
+Marcel
+
+
