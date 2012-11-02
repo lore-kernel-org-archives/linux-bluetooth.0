@@ -1,134 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Nov 2012 08:39:09 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv1 11/12] Bluetooth: AMP: Use l2cap_physical_cfm in phylink
- complete evt
-In-Reply-To: <20121102074844.GA4171@aemeltch-MOBL1>
-Message-ID: <alpine.DEB.2.02.1211020808010.29427@mathewm-linux>
-References: <1350493622.26318.114.camel@aeonflux> <1351691197-8394-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1351691197-8394-12-git-send-email-Andrei.Emeltchenko.news@gmail.com> <alpine.DEB.2.02.1211011045260.9973@mathewm-linux>
- <20121102074844.GA4171@aemeltch-MOBL1>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+From: Yegor Yefremov <yegorslists@googlemail.com>
+Date: Fri, 2 Nov 2012 10:55:22 +0100
+Message-ID: <CAGm1_kva5xN1K0aDwvhaLBqW0qNCtdpQxp-ipzVRpLUD7XBVYw@mail.gmail.com>
+Subject: Cybertan MM230-M issue
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+I'm using this WLAN-BT-combo card with linux 3.2 and TI am335x based
+board. WLAN (88W8686/B1 (Marvell) ) is working, but Bluetooth
+(BC4ROM/21e (CSR)) only partly.
 
-Andrei -
+I can connect to the card via hciattach ttyO5 bcsp and then I can
+bring it up and enable pscan. But hcitool scan delivers nothing.
 
-On Fri, 2 Nov 2012, Andrei Emeltchenko wrote:
+I get following values via bccmd:
 
-> Hi Mat,
->
-> On Thu, Nov 01, 2012 at 10:51:19AM -0700, Mat Martineau wrote:
->>
->> Andrei -
->>
->> On Wed, 31 Oct 2012, Andrei Emeltchenko wrote:
->>
->>> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->>>
->>> When receiving HCI Phylink Complete event run amp_physical_cfm
->>> which initialize BR/EDR L2CAP channel associated with High Speed
->>> link and run l2cap_physical_cfm which shall send L2CAP Create
->>> Chan Request.
->>>
->>> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->>> Acked-by: Marcel Holtmann <marcel@holtmann.org>
->>> ---
->>> include/net/bluetooth/amp.h   |    1 +
->>> include/net/bluetooth/l2cap.h |    1 +
->>> net/bluetooth/amp.c           |   24 ++++++++++++++++++++++++
->>> net/bluetooth/hci_event.c     |   15 ++-------------
->>> 4 files changed, 28 insertions(+), 13 deletions(-)
->>>
->>> diff --git a/include/net/bluetooth/amp.h b/include/net/bluetooth/amp.h
->>> index f1c0017..7ea3db7 100644
->>> --- a/include/net/bluetooth/amp.h
->>> +++ b/include/net/bluetooth/amp.h
->>> @@ -46,6 +46,7 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
->>> 			struct hci_conn *hcon);
->>> void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle);
->>> void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle);
->>> +void amp_physical_cfm(struct hci_conn *bredr_hcon, struct hci_conn *hs_hcon);
->>> void amp_create_logical_link(struct l2cap_chan *chan);
->>> void amp_disconnect_logical_link(struct hci_chan *hchan);
->>> void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason);
->>> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
->>> index 24c61ef..18149c8 100644
->>> --- a/include/net/bluetooth/l2cap.h
->>> +++ b/include/net/bluetooth/l2cap.h
->>> @@ -812,5 +812,6 @@ void l2cap_send_conn_req(struct l2cap_chan *chan);
->>> void l2cap_move_start(struct l2cap_chan *chan);
->>> void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
->>> 		       u8 status);
->>> +void l2cap_physical_cfm(struct l2cap_chan *chan, int result);
->>>
->>> #endif /* __L2CAP_H */
->>> diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
->>> index 917e034..650bb8d 100644
->>> --- a/net/bluetooth/amp.c
->>> +++ b/net/bluetooth/amp.c
->>> @@ -373,6 +373,30 @@ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
->>> 	hci_send_cmd(hdev, HCI_OP_ACCEPT_PHY_LINK, sizeof(cp), &cp);
->>> }
->>>
->>> +void amp_physical_cfm(struct hci_conn *bredr_hcon, struct hci_conn *hs_hcon)
->>> +{
->>> +	struct hci_dev *bredr_hdev = hci_dev_hold(bredr_hcon->hdev);
->>> +	struct amp_mgr *mgr = hs_hcon->amp_mgr;
->>> +	struct l2cap_chan *bredr_chan;
->>> +
->>> +	BT_DBG("bredr_hcon %p hs_hcon %p mgr %p", bredr_hcon, hs_hcon, mgr);
->>> +
->>> +	if (!bredr_hdev || !mgr || !mgr->bredr_chan)
->>> +		return;
->>> +
->>> +	bredr_chan = mgr->bredr_chan;
->>> +
->>> +	set_bit(FLAG_EFS_ENABLE, &bredr_chan->flags);
->>> +	bredr_chan->ctrl_id = hs_hcon->remote_id;
->>> +	bredr_chan->hs_hcon = hs_hcon;
->>> +	bredr_chan->conn->mtu = hs_hcon->hdev->block_mtu;
->>> +	bredr_chan->fcs = L2CAP_FCS_NONE;
+Chip revision: 0x0030 (BC4-ROM)
+Build name: odj_4hci_rom_bt2.0_21e_0604241634_encr128 2006-04-24
 
-Changing FCS requires L2CAP reconfiguration for the channel, and 
-chan->fcs shouldn't be modified until reconfiguration happens.  While 
-it doesn't make much sense to do so, the remote device may want to 
-keep FCS enabled.  The move may also fail and you don't want to forget 
-the original FCS setting in that case.
+bccmd -t BCSP -d /dev/ttyO5 -b 115200 enabletx returns with error:
+Can't execute command: No such device or address (6)
 
->>
->> Sorry I missed this earlier: bredr_chan needs to be locked before
->> changing it.  I suggest passing the information to
->> l2cap_physical_cfm and letting that function update the structure
->> members while it holds the lock.
->
-> what about locking here and changing l2cap_physical_cfm to unlocked
-> __l2cap_physical_cfm ?
-
-My preference is to not manipulate l2cap_chan too much outside of 
-l2cap_core, and to keep the channel move or channel create state 
-machines inside l2cap_core.  l2cap_physical_cfm checks the channel 
-state before modifying it.  The move or new connection may have been 
-canceled or be in the wrong state, in which case the structure should 
-not be modified even though the physical link was completed.
-
->
->>
->>
->>> +
->>> +	l2cap_physical_cfm(bredr_chan, 0);
->>> +
->>> +	hci_dev_put(bredr_hdev);
->>> +}
+Any idea how to get the card working?
 
 Regards,
-
---
-Mat Martineau
-
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, hosted by The Linux Foundation
-
+Yegor
