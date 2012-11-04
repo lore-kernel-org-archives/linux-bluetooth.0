@@ -1,26 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 5 Nov 2012 08:49:21 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH hcidump] Change maximum pkt size for High Speed max pkt
-Message-ID: <20121105064921.GA17622@x220.P-661HNU-F1>
-References: <1351689401-3650-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1351689401-3650-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] Enable reconnection in Proximity monitor
+Date: Sun,  4 Nov 2012 17:31:47 -0300
+Message-Id: <1352061107-23757-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+According to Proximity Profile spec, when a connection is terminated
+due to link loss a Proximity Monitor should attempt to reconnect.
+---
+ profiles/proximity/monitor.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On Wed, Oct 31, 2012, Andrei Emeltchenko wrote:
-> For AMP, L2CAP packets might be of bigger size, up to 1492 bytes.
-> Without the change hcidump cuts AMP data packets.
-> ---
->  lib/hci.h |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+diff --git a/profiles/proximity/monitor.c b/profiles/proximity/monitor.c
+index 1a14265..e45fa4a 100644
+--- a/profiles/proximity/monitor.c
++++ b/profiles/proximity/monitor.c
+@@ -652,6 +652,8 @@ int monitor_register(struct btd_device *device,
+ 							attio_disconnected_cb,
+ 							monitor);
+ 
++	device_set_auto_connect(device, TRUE);
++
+ 	return 0;
+ }
+ 
+-- 
+1.8.0
 
-Applied to bluez-hcidump.git and bluez.git. Thanks.
-
-Johan
