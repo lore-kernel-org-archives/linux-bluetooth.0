@@ -1,52 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5098D41F.4080902@rug.nl>
-Date: Tue, 06 Nov 2012 10:10:55 +0100
-From: Sietse Achterop <s.achterop@rug.nl>
+Date: Mon, 5 Nov 2012 15:52:24 +0100
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Kim Schulz <kim@schulz.dk>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 0/3] LE Connection parameter tuning (first step)
+Message-ID: <20121105145224.GA18358@echo>
+References: <1352121943-18001-1-git-send-email-vinicius.gomes@openbossa.org>
+ <2375c7de623938c6e2f1fe8e7687db7d@server1.devteam.dk>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Multiple adapters do not work
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <2375c7de623938c6e2f1fe8e7687db7d@server1.devteam.dk>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-     Dear list,
+Hi,
 
-I am trying to use multiple adapters to	control	multiple bluetooth devices.
-But it doesn't work. I already mailed it to this list but got no replay.
-I know that normally this isn't	the way	to do this, but I am trying to avoid another
-problem.
+On 14:42 Mon 05 Nov, Kim Schulz wrote:
+> Den 2012-11-05 14:25, Vinicius Costa Gomes skrev:
+> >Hi,
+> >
+> >Right now, we are using only one set of (hardcoded) connection
+> >parameters for LE.  I guess the first step to have different
+> >connection parameters classes for different Profiles requirements
+> >(think "Low Latency", "Low Power", etc.) is to have a nice set of
+> >parameters. For that we need to measure and see which are the sweet
+> >spots, This series aims to help the measuring part.
+> >
+> >This is an idea so we can easily change the connection parameters
+> >without need for recompiling the kernel side, so tests can be more
+> >practical.
+> >
+> [snip]
+> 
+> 
+> Good idea to split them out as every single profile defines their
+> own. Have you
+> concidered what should happen if two LE connections to two different
+> profils should
+> happen at the same time and the connection parameters are different?
+> i.e. should bluez
+> maybe have a per-profile set of connection parameters?
 
-I bind 4 devices to 4 adapters as follows:
+The current plan is to have the most restrictive (in terms of latency)
+set of parameters to prevail over the others.
 
-  rfcomm -i hci0 bind rfcomm1 10:00:E8:6C:D8:14 1
-  rfcomm -i hci1 bind rfcomm2 10:00:E8:6C:D8:1D 1
-  rfcomm -i hci2 bind rfcomm3 10:00:E8:6C:EC:98 1
-  rfcomm -i hci3 bind rfcomm4 10:00:E8:6C:D7:D9 1
+> Also make room in the struct for Preferred Connection Paramters (the
+> values read
+> from the peer DB after connection) as these can differ from the ones
+> the profile proposes.
 
-But, using minicom, I can only connect to the first device,
-the others give	either
-   cannot open /dev/rfcomm3: Connection refused
-or
-   cannot open /dev/rfcomm4: No such file or directory
+I don't think that this information should be in the kernel side, but thank
+you for reminding me of this. About the problem, that could be dealt with
+having that as another set of parameters (perhaps with a higher priority). 
 
-All devices are available:
-  crw-rw---- 1 root dialout 216, 1 Nov  6 09:49 /dev/rfcomm1
-  crw-rw---- 1 root dialout 216, 2 Nov  6 09:46 /dev/rfcomm2
-  crw-rw---- 1 root dialout 216, 3 Nov  6 09:46 /dev/rfcomm3
-  crw-rw---- 1 root dialout 216, 4 Nov  6 09:46 /dev/rfcomm4
-
-What am I doing wrong?
- (Using	Ubuntu 12.04 with bluez-4.101 install from source.)
-
-   Regards,
-     Sietse
+> 
+> -- 
+> Kim Schulz
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
-PS On a side note: I think there is a bug in the rfcomm manual page.
-
-   I don't understand the desciption of	the -i parameter, but it is the	same for years,	The desciption looks mangled.
-     -i <hciX> | <bdaddr>
-              The command is applied to device -A Enable authentication.  -E Enable encryption.  -S Secure connection.  -M Become the master of a piconet.  hciX , which must be the
-name or
-              the address of an installed Bluetooth device. If not specified, the command will be use the first available Bluetooth device.
-   The mentioning of -A	to -M should be	removed	I guess.
+Cheers,
+-- 
+Vinicius
