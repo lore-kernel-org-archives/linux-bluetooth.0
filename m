@@ -1,44 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [RFC 0/3] LE Connection parameter tuning (first step)
-Date: Mon,  5 Nov 2012 14:25:40 +0100
-Message-Id: <1352121943-18001-1-git-send-email-vinicius.gomes@openbossa.org>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 02/20] cyclingspeed: Add attio callbacks
+Date: Mon, 5 Nov 2012 09:54:47 +0100
+Message-ID: <1352105705-13988-3-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1352105705-13988-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1352105705-13988-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ profiles/cyclingspeed/cyclingspeed.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-Right now, we are using only one set of (hardcoded) connection
-parameters for LE.  I guess the first step to have different
-connection parameters classes for different Profiles requirements
-(think "Low Latency", "Low Power", etc.) is to have a nice set of
-parameters. For that we need to measure and see which are the sweet
-spots, This series aims to help the measuring part.
-
-This is an idea so we can easily change the connection parameters
-without need for recompiling the kernel side, so tests can be more
-practical.
-
-It works, but just lightly tested. This is more to get some feedback
-on how to proceed with the LE connection parameters thing.
-
-Cheers,
-
-
-Vinicius Costa Gomes (3):
-  Bluetooth: Keep the LE connection parameters in its own structure
-  Bluetooth: Add LE connection parameters to debugfs
-  Bluetooth: Add support for setting LE connection parameters via
-    debugfs
-
- include/net/bluetooth/hci_core.h | 10 ++++++
- net/bluetooth/hci_conn.c         | 11 +++---
- net/bluetooth/hci_event.c        | 10 ++++++
- net/bluetooth/hci_sysfs.c        | 77 ++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 103 insertions(+), 5 deletions(-)
-
+diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
+index 9674a94..4d98810 100644
+--- a/profiles/cyclingspeed/cyclingspeed.c
++++ b/profiles/cyclingspeed/cyclingspeed.c
+@@ -31,6 +31,11 @@
+ 
+ #include "adapter.h"
+ #include "device.h"
++#include "gattrib.h"
++#include "att.h"
++#include "gatt.h"
++#include "attio.h"
++#include "log.h"
+ #include "cyclingspeed.h"
+ 
+ struct csc_adapter {
+@@ -41,6 +46,9 @@ struct csc_adapter {
+ struct csc {
+ 	struct btd_device	*dev;
+ 	struct csc_adapter	*cadapter;
++
++	GAttrib			*attrib;
++	guint			attioid;
+ };
+ 
+ static GSList *csc_adapters = NULL;
+@@ -88,10 +96,35 @@ static void destroy_csc(gpointer user_data)
+ {
+ 	struct csc *csc = user_data;
+ 
++	if (csc->attioid > 0)
++		btd_device_remove_attio_callback(csc->dev, csc->attioid);
++
++	if (csc->attrib != NULL)
++		g_attrib_unref(csc->attrib);
++
+ 	btd_device_unref(csc->dev);
+ 	g_free(csc);
+ }
+ 
++static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
++{
++	struct csc *csc = user_data;
++
++	DBG("");
++
++	csc->attrib = g_attrib_ref(attrib);
++}
++
++static void attio_disconnected_cb(gpointer user_data)
++{
++	struct csc *csc = user_data;
++
++	DBG("");
++
++	g_attrib_unref(csc->attrib);
++	csc->attrib = NULL;
++}
++
+ int csc_adapter_register(struct btd_adapter *adapter)
+ {
+ 	struct csc_adapter *cadapter;
+@@ -135,6 +168,9 @@ int csc_device_register(struct btd_device *device)
+ 
+ 	cadapter->devices = g_slist_prepend(cadapter->devices, csc);
+ 
++	csc->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
++						attio_disconnected_cb, csc);
++
+ 	return 0;
+ }
+ 
 -- 
-1.7.12.4
+1.8.0
 
