@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 07/20] cyclingspeed: Add CyclingSpeedManager interface
-Date: Mon, 5 Nov 2012 09:54:52 +0100
-Message-ID: <1352105705-13988-8-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 04/20] cyclingspeed: Discover characteristics CCC
+Date: Mon, 5 Nov 2012 09:54:49 +0100
+Message-ID: <1352105705-13988-5-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1352105705-13988-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1352105705-13988-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,231 +12,129 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch registers org.bluez.CyclingSpeedManager interface for each
-adapter to allow registration and deregistration of measurement watchers.
 ---
- profiles/cyclingspeed/cyclingspeed.c | 151 ++++++++++++++++++++++++++++++++++-
- 1 file changed, 150 insertions(+), 1 deletion(-)
+ profiles/cyclingspeed/cyclingspeed.c | 82 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 80 insertions(+), 2 deletions(-)
 
 diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
-index 95e3b98..deae8a9 100644
+index 5744891..0191f1b 100644
 --- a/profiles/cyclingspeed/cyclingspeed.c
 +++ b/profiles/cyclingspeed/cyclingspeed.c
-@@ -33,6 +33,7 @@
- #include "adapter.h"
- #include "device.h"
- #include "dbus-common.h"
-+#include "error.h"
- #include "gattrib.h"
- #include "att.h"
- #include "gatt.h"
-@@ -41,10 +42,12 @@
- #include "cyclingspeed.h"
+@@ -52,9 +52,15 @@ struct csc {
  
- #define CYCLINGSPEED_INTERFACE		"org.bluez.CyclingSpeed"
-+#define CYCLINGSPEED_MANAGER_INTERFACE	"org.bluez.CyclingSpeedManager"
+ 	struct att_range	*svc_range;
  
- struct csc_adapter {
- 	struct btd_adapter	*adapter;
- 	GSList			*devices;	/* list of registered devices */
-+	GSList			*watchers;
++	uint16_t		measurement_ccc_handle;
+ 	uint16_t		controlpoint_val_handle;
  };
  
- struct csc {
-@@ -64,6 +67,13 @@ struct csc {
- 	uint8_t			location;
- };
- 
-+struct watcher {
-+	struct csc_adapter	*cadapter;
-+	guint			id;
-+	char			*srv;
-+	char			*path;
++struct characteristic {
++	struct csc	*csc;
++	char		uuid[MAX_LEN_UUID_STR + 1];
 +};
 +
- struct characteristic {
- 	struct csc	*csc;
- 	char		uuid[MAX_LEN_UUID_STR + 1];
-@@ -93,6 +103,19 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
- 	return -1;
+ static GSList *csc_adapters = NULL;
+ 
+ static gint cmp_adapter(gconstpointer a, gconstpointer b)
+@@ -111,6 +117,76 @@ static void destroy_csc(gpointer user_data)
+ 	g_free(csc);
  }
  
-+static gint cmp_watcher(gconstpointer a, gconstpointer b)
++static void discover_desc_cb(guint8 status, const guint8 *pdu,
++					guint16 len, gpointer user_data)
 +{
-+	const struct watcher *watcher = a;
-+	const struct watcher *match = b;
-+	int ret;
++	struct characteristic *ch = user_data;
++	struct att_data_list *list = NULL;
++	uint8_t format;
++	int i;
 +
-+	ret = g_strcmp0(watcher->srv, match->srv);
-+	if (ret != 0)
-+		return ret;
-+
-+	return g_strcmp0(watcher->path, match->path);
-+}
-+
- static struct csc_adapter *find_csc_adapter(struct btd_adapter *adapter)
- {
- 	GSList *l = g_slist_find_custom(csc_adapters, adapter, cmp_adapter);
-@@ -103,10 +126,47 @@ static struct csc_adapter *find_csc_adapter(struct btd_adapter *adapter)
- 	return l->data;
- }
- 
-+static void destroy_watcher(gpointer user_data)
-+{
-+	struct watcher *watcher = user_data;
-+
-+	g_free(watcher->path);
-+	g_free(watcher->srv);
-+	g_free(watcher);
-+}
-+
-+static struct watcher *find_watcher(GSList *list, const char *sender,
-+							const char *path)
-+{
-+	struct watcher *match;
-+	GSList *l;
-+
-+	match = g_new0(struct watcher, 1);
-+	match->srv = g_strdup(sender);
-+	match->path = g_strdup(path);
-+
-+	l = g_slist_find_custom(list, match, cmp_watcher);
-+	destroy_watcher(match);
-+
-+	if (l != NULL)
-+		return l->data;
-+
-+	return NULL;
-+}
-+
-+static void remove_watcher(gpointer user_data)
-+{
-+	struct watcher *watcher = user_data;
-+
-+	g_dbus_remove_watch(btd_get_dbus_connection(), watcher->id);
-+}
-+
- static void destroy_csc_adapter(gpointer user_data)
- {
- 	struct csc_adapter *cadapter = user_data;
- 
-+	g_slist_free_full(cadapter->watchers, remove_watcher);
-+
- 	g_free(cadapter);
- }
- 
-@@ -311,6 +371,81 @@ static void attio_disconnected_cb(gpointer user_data)
- 	csc->attrib = NULL;
- }
- 
-+static void watcher_exit_cb(DBusConnection *conn, void *user_data)
-+{
-+	struct watcher *watcher = user_data;
-+	struct csc_adapter *cadapter = watcher->cadapter;
-+
-+	DBG("cycling watcher [%s] disconnected", watcher->path);
-+
-+	cadapter->watchers = g_slist_remove(cadapter->watchers, watcher);
-+	g_dbus_remove_watch(conn, watcher->id);
-+}
-+
-+static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	struct csc_adapter *cadapter = data;
-+	struct watcher *watcher;
-+	const char *sender = dbus_message_get_sender(msg);
-+	char *path;
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+							DBUS_TYPE_INVALID))
-+		return btd_error_invalid_args(msg);
-+
-+	watcher = find_watcher(cadapter->watchers, sender, path);
-+	if (watcher != NULL)
-+		return btd_error_already_exists(msg);
-+
-+	watcher = g_new0(struct watcher, 1);
-+	watcher->cadapter = cadapter;
-+	watcher->id = g_dbus_add_disconnect_watch(conn, sender, watcher_exit_cb,
-+						watcher, destroy_watcher);
-+	watcher->srv = g_strdup(sender);
-+	watcher->path = g_strdup(path);
-+
-+	cadapter->watchers = g_slist_prepend(cadapter->watchers, watcher);
-+
-+	DBG("cycling watcher [%s] registered", path);
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	struct csc_adapter *cadapter = data;
-+	struct watcher *watcher;
-+	const char *sender = dbus_message_get_sender(msg);
-+	char *path;
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+							DBUS_TYPE_INVALID))
-+		return btd_error_invalid_args(msg);
-+
-+	watcher = find_watcher(cadapter->watchers, sender, path);
-+	if (watcher == NULL)
-+		return btd_error_does_not_exist(msg);
-+
-+	cadapter->watchers = g_slist_remove(cadapter->watchers, watcher);
-+	g_dbus_remove_watch(conn, watcher->id);
-+
-+	DBG("cycling watcher [%s] unregistered", path);
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static const GDBusMethodTable cyclingspeed_manager_methods[] = {
-+	{ GDBUS_METHOD("RegisterWatcher",
-+			GDBUS_ARGS({ "agent", "o" }), NULL,
-+			register_watcher) },
-+	{ GDBUS_METHOD("UnregisterWatcher",
-+			GDBUS_ARGS({ "agent", "o" }), NULL,
-+			unregister_watcher) },
-+	{ }
-+};
-+
- int csc_adapter_register(struct btd_adapter *adapter)
- {
- 	struct csc_adapter *cadapter;
-@@ -320,6 +455,18 @@ int csc_adapter_register(struct btd_adapter *adapter)
- 
- 	csc_adapters = g_slist_prepend(csc_adapters, cadapter);
- 
-+	if (!g_dbus_register_interface(btd_get_dbus_connection(),
-+						adapter_get_path(adapter),
-+						CYCLINGSPEED_MANAGER_INTERFACE,
-+						cyclingspeed_manager_methods,
-+						NULL, NULL, cadapter,
-+						destroy_csc_adapter)) {
-+		error("D-Bus failed to register %s interface",
-+						CYCLINGSPEED_MANAGER_INTERFACE);
-+		destroy_csc_adapter(cadapter);
-+		return -EIO;
++	if (status != 0) {
++		error("Discover %s descriptors failed: %s", ch->uuid,
++							att_ecode2str(status));
++		goto done;
 +	}
 +
- 	return 0;
++	list = dec_find_info_resp(pdu, len, &format);
++	if (list == NULL)
++		goto done;
++
++	if (format != ATT_FIND_INFO_RESP_FMT_16BIT)
++		goto done;
++
++	for (i = 0; i < list->num; i++) {
++		uint8_t *value;
++		uint16_t handle, uuid;
++
++		value = list->data[i];
++		handle = att_get_u16(value);
++		uuid = att_get_u16(value + 2);
++
++		if (uuid != GATT_CLIENT_CHARAC_CFG_UUID)
++			continue;
++
++		if (g_strcmp0(ch->uuid, CSC_MEASUREMENT_UUID) == 0)
++			ch->csc->measurement_ccc_handle = handle;
++
++		/* We only want CCC, can break here */
++		break;
++	}
++
++done:
++	if (list)
++		att_data_list_free(list);
++	g_free(ch);
++}
++
++static void discover_desc(struct csc *csc, struct gatt_char *c,
++						struct gatt_char *c_next)
++{
++	struct characteristic *ch;
++	uint16_t start, end;
++
++	start = c->value_handle + 1;
++
++	if (c_next != NULL) {
++		if (start == c_next->handle)
++			return;
++		end = c_next->handle - 1;
++	} else if (c->value_handle != csc->svc_range->end) {
++		end = csc->svc_range->end;
++	} else {
++		return;
++	}
++
++	ch = g_new0(struct characteristic, 1);
++	ch->csc = csc;
++	memcpy(ch->uuid, c->uuid, sizeof(c->uuid));
++
++	gatt_find_info(csc->attrib, start, end, discover_desc_cb, ch);
++}
++
+ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ {
+ 	struct csc *csc = user_data;
+@@ -123,9 +199,11 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ 
+ 	for (; chars; chars = chars->next) {
+ 		struct gatt_char *c = chars->data;
++		struct gatt_char *c_next =
++				(chars->next ? chars->next->data : NULL);
+ 
+ 		if (g_strcmp0(c->uuid, CSC_MEASUREMENT_UUID) == 0) {
+-			/* TODO: discover CCC handle */
++			discover_desc(csc, c, c_next);
+ 		} else if (g_strcmp0(c->uuid, CSC_FEATURE_UUID) == 0) {
+ 			/* TODO: read characterictic value */
+ 		} else if (g_strcmp0(c->uuid, SENSOR_LOCATION_UUID) == 0) {
+@@ -134,7 +212,7 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ 		} else if (g_strcmp0(c->uuid, SC_CONTROL_POINT_UUID) == 0) {
+ 			DBG("SC Control Point supported");
+ 			csc->controlpoint_val_handle = c->value_handle;
+-			/* TODO: discover CCC handle */
++			discover_desc(csc, c, c_next);
+ 		}
+ 	}
  }
- 
-@@ -333,7 +480,9 @@ void csc_adapter_unregister(struct btd_adapter *adapter)
- 
- 	csc_adapters = g_slist_remove(csc_adapters, cadapter);
- 
--	destroy_csc_adapter(cadapter);
-+	g_dbus_unregister_interface(btd_get_dbus_connection(),
-+					adapter_get_path(cadapter->adapter),
-+					CYCLINGSPEED_MANAGER_INTERFACE);
- }
- 
- int csc_device_register(struct btd_device *device, struct gatt_primary *prim)
 -- 
 1.8.0
 
