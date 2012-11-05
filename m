@@ -1,45 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-To: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC 0/3] LE Connection parameter tuning (first step)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Mon, 05 Nov 2012 14:42:27 +0100
-From: Kim Schulz <kim@schulz.dk>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [RFC 3/3] Bluetooth: Add support for setting LE connection parameters via debugfs
+Date: Mon,  5 Nov 2012 14:25:43 +0100
+Message-Id: <1352121943-18001-4-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1352121943-18001-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1352121943-18001-1-git-send-email-vinicius.gomes@openbossa.org>
-Message-ID: <2375c7de623938c6e2f1fe8e7687db7d@server1.devteam.dk>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Den 2012-11-05 14:25, Vinicius Costa Gomes skrev:
-> Hi,
->
-> Right now, we are using only one set of (hardcoded) connection
-> parameters for LE.  I guess the first step to have different
-> connection parameters classes for different Profiles requirements
-> (think "Low Latency", "Low Power", etc.) is to have a nice set of
-> parameters. For that we need to measure and see which are the sweet
-> spots, This series aims to help the measuring part.
->
-> This is an idea so we can easily change the connection parameters
-> without need for recompiling the kernel side, so tests can be more
-> practical.
->
-[snip]
+This will allow for much more pratical measures of the impact of
+different connection parameters in different scenarios.
 
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ net/bluetooth/hci_sysfs.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-Good idea to split them out as every single profile defines their own. 
-Have you
-concidered what should happen if two LE connections to two different 
-profils should
-happen at the same time and the connection parameters are different? 
-i.e. should bluez
-maybe have a per-profile set of connection parameters?
-Also make room in the struct for Preferred Connection Paramters (the 
-values read
-from the peer DB after connection) as these can differ from the ones 
-the profile proposes.
-
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index a9554ec..8474d02 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -550,6 +550,48 @@ static int le_conn_parameters_show(struct seq_file *f, void *p)
+ 	return 0;
+ }
+ 
++static ssize_t le_conn_parameters_write(struct file *filp,
++					const char __user *ubuf,
++					size_t cnt, loff_t *ppos)
++{
++	struct seq_file *seqf = filp->private_data;
++	struct hci_dev *hdev = seqf->private;
++	struct le_conn_params params;
++	char buffer[36];
++	int n;
++
++	/* No partial writes */
++	if (*ppos != 0)
++		return 0;
++
++	/* Format: '0x0000 0x0000 0x0000 0x0000 0x0000' length 35 */
++	if (cnt != 35)
++		return -ENOSPC;
++
++	memset(buffer, 0, sizeof(buffer));
++
++	n = copy_from_user(buffer, ubuf, cnt);
++	if (n < 0)
++		return n;
++
++	memset(&params, 0, sizeof(params));
++
++	n = sscanf(buffer, "%hx %hx %hx %hx %hx", &params.scan_interval,
++		   &params.scan_window, &params.conn_interval_min,
++		   &params.conn_interval_max, &params.supervision_timeout);
++
++	if (n < 5)
++		return -EINVAL;
++
++	hci_dev_lock(hdev);
++
++	memcpy(&hdev->le_conn_params, &params, sizeof(params));
++
++	hci_dev_unlock(hdev);
++
++	return cnt;
++}
++
+ static int le_conn_parameters_open(struct inode *inode, struct file *file)
+ {
+ 	return single_open(file, le_conn_parameters_show, inode->i_private);
+@@ -557,6 +599,7 @@ static int le_conn_parameters_open(struct inode *inode, struct file *file)
+ 
+ static const struct file_operations le_conn_parameters_fops = {
+ 	.open		= le_conn_parameters_open,
++	.write		= le_conn_parameters_write,
+ 	.read		= seq_read,
+ 	.llseek		= seq_lseek,
+ 	.release	= single_release,
 -- 
-Kim Schulz
+1.7.12.4
+
