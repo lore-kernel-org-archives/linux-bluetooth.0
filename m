@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 03/20] cyclingspeed: Discover CSCS characteristics
-Date: Mon, 5 Nov 2012 09:54:48 +0100
-Message-ID: <1352105705-13988-4-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 20/20] test: Enable speed and cadence calculation in test-cyclingspeed
+Date: Mon, 5 Nov 2012 09:55:05 +0100
+Message-ID: <1352105705-13988-21-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1352105705-13988-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1352105705-13988-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,161 +12,129 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- lib/uuid.h                           |  4 ++++
- profiles/cyclingspeed/cyclingspeed.c | 43 +++++++++++++++++++++++++++++++++++-
- profiles/cyclingspeed/cyclingspeed.h |  2 +-
- profiles/cyclingspeed/manager.c      | 19 +++++++++++++++-
- 4 files changed, 65 insertions(+), 3 deletions(-)
+This patch allows to enable instantenous speed and cadence calculation
+based on measurement received from remote device.
 
-diff --git a/lib/uuid.h b/lib/uuid.h
-index ebc6d27..def4fea 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -75,6 +75,10 @@ extern "C" {
- #define MEASUREMENT_INTERVAL_UUID	"00002a21-0000-1000-8000-00805f9b34fb"
+To enable calculations additional parameter "--circumference <value>"
+needs to be used when calling script which sets wheel circumference in mm.
+
+Both speed and cadence are enabled at the same time. Speed is calculated
+in km/h and cadence in rpm.
+---
+ test/test-cyclingspeed | 71 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 69 insertions(+), 2 deletions(-)
+
+diff --git a/test/test-cyclingspeed b/test/test-cyclingspeed
+index 92fe935..841456c 100755
+--- a/test/test-cyclingspeed
++++ b/test/test-cyclingspeed
+@@ -14,23 +14,86 @@ import dbus.service
+ import dbus.mainloop.glib
+ from optparse import OptionParser, make_option
  
- #define CYCLING_SC_UUID		"00001816-0000-1000-8000-00805f9b34fb"
-+#define CSC_MEASUREMENT_UUID	"00002a5b-0000-1000-8000-00805f9b34fb"
-+#define CSC_FEATURE_UUID	"00002a5c-0000-1000-8000-00805f9b34fb"
-+#define SENSOR_LOCATION_UUID	"00002a5d-0000-1000-8000-00805f9b34fb"
-+#define SC_CONTROL_POINT_UUID	"00002a55-0000-1000-8000-00805f9b34fb"
- 
- #define RFCOMM_UUID_STR		"00000003-0000-1000-8000-00805f9b34fb"
- 
-diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
-index 4d98810..5744891 100644
---- a/profiles/cyclingspeed/cyclingspeed.c
-+++ b/profiles/cyclingspeed/cyclingspeed.c
-@@ -49,6 +49,10 @@ struct csc {
- 
- 	GAttrib			*attrib;
- 	guint			attioid;
++class MeasurementQ:
++	def __init__(self, wrap_v):
++		self._now = [None, None]
++		self._prev = [None, None]
++		self._wrap_v = wrap_v
 +
-+	struct att_range	*svc_range;
++	def can_calc(self):
++		return ((self._now[0] is not None)
++			and (self._now[1] is not None)
++			and (self._prev[0] is not None)
++			and (self._prev[1] is not None))
 +
-+	uint16_t		controlpoint_val_handle;
- };
++	def delta_v(self):
++		delta = self._now[0] - self._prev[0]
++		if (delta < 0) and (self._wrap_v):
++			delta = delta + 65536
++		return delta
++
++	def delta_t(self):
++		delta = self._now[1] - self._prev[1]
++		if delta < 0:
++			delta = delta + 65536
++		return delta
++
++	def put(self, data):
++		self._prev = self._now
++		self._now = data
++
+ class Watcher(dbus.service.Object):
++	_wheel = MeasurementQ(False)
++	_crank = MeasurementQ(True)
++	_circumference = None
++
++	def enable_calc(self, v):
++		self._circumference = v
++
+ 	@dbus.service.method("org.bluez.CyclingSpeedWatcher",
+ 					in_signature="oa{sv}", out_signature="")
+ 	def MeasurementReceived(self, device, measure):
+ 		print("Measurement received from %s" % device)
  
- static GSList *csc_adapters = NULL;
-@@ -103,9 +107,38 @@ static void destroy_csc(gpointer user_data)
- 		g_attrib_unref(csc->attrib);
++		rev = None
++		evt = None
+ 		if "WheelRevolutions" in measure:
++			rev = measure["WheelRevolutions"]
+ 			print("WheelRevolutions: ", measure["WheelRevolutions"])
+-
+ 		if "LastWheelEventTime" in measure:
++			evt = measure["LastWheelEventTime"]
+ 			print("LastWheelEventTime: ", measure["LastWheelEventTime"])
++		self._wheel.put( [rev, evt] )
  
- 	btd_device_unref(csc->dev);
-+	g_free(csc->svc_range);
- 	g_free(csc);
- }
++		rev = None
++		evt = None
+ 		if "CrankRevolutions" in measure:
++			rev = measure["CrankRevolutions"]
+ 			print("CrankRevolutions: ", measure["CrankRevolutions"])
+-
+ 		if "LastCrankEventTime" in measure:
++			evt = measure["LastCrankEventTime"]
+ 			print("LastCrankEventTime: ", measure["LastCrankEventTime"])
++		self._crank.put( [rev, evt] )
++
++		if self._circumference is None:
++			return
++
++		if self._wheel.can_calc():
++			delta_v = self._wheel.delta_v()
++			delta_t = self._wheel.delta_t()
++
++			if (delta_v >= 0) and (delta_t > 0):
++				speed = delta_v * self._circumference * 1024 / delta_t # mm/s
++				speed = speed * 0.0036 # mm/s -> km/h
++				print("(calculated) Speed: %.2f km/h" % speed)
++
++		if self._crank.can_calc():
++			delta_v = self._crank.delta_v()
++			delta_t = self._crank.delta_t()
++
++			if delta_t > 0:
++				cadence = delta_v * 1024 / delta_t
++				print("(calculated) Cadence: %d rpm" % cadence)
  
-+static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
-+{
-+	struct csc *csc = user_data;
-+
-+	if (status) {
-+		error("Discover CSCS characteristics: %s",
-+							att_ecode2str(status));
-+		return;
-+	}
-+
-+	for (; chars; chars = chars->next) {
-+		struct gatt_char *c = chars->data;
-+
-+		if (g_strcmp0(c->uuid, CSC_MEASUREMENT_UUID) == 0) {
-+			/* TODO: discover CCC handle */
-+		} else if (g_strcmp0(c->uuid, CSC_FEATURE_UUID) == 0) {
-+			/* TODO: read characterictic value */
-+		} else if (g_strcmp0(c->uuid, SENSOR_LOCATION_UUID) == 0) {
-+			DBG("Sensor Location supported");
-+			/* TODO: read characterictic value */
-+		} else if (g_strcmp0(c->uuid, SC_CONTROL_POINT_UUID) == 0) {
-+			DBG("SC Control Point supported");
-+			csc->controlpoint_val_handle = c->value_handle;
-+			/* TODO: discover CCC handle */
-+		}
-+	}
-+}
-+
- static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
- {
- 	struct csc *csc = user_data;
-@@ -113,6 +146,10 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
- 	DBG("");
+ def properties_changed(interface, changed, invalidated):
+ 	if "Location" in changed:
+@@ -46,6 +109,8 @@ if __name__ == "__main__":
+ 			type="string", dest="adapter"),
+ 		make_option("-b", "--device", action="store",
+ 			type="string", dest="address"),
++		make_option("-c", "--circumference", action="store",
++			type="int", dest="circumference"),
+ 		]
  
- 	csc->attrib = g_attrib_ref(attrib);
-+
-+	gatt_discover_char(csc->attrib, csc->svc_range->start,
-+				csc->svc_range->end, NULL,
-+				discover_char_cb, csc);
- }
+ 	parser = OptionParser(option_list=option_list)
+@@ -77,6 +142,8 @@ if __name__ == "__main__":
  
- static void attio_disconnected_cb(gpointer user_data)
-@@ -150,7 +187,7 @@ void csc_adapter_unregister(struct btd_adapter *adapter)
- 	destroy_csc_adapter(cadapter);
- }
+ 	watcher_path = "/test/watcher"
+ 	watcher = Watcher(bus, watcher_path)
++	if options.circumference:
++		watcher.enable_calc(options.circumference)
+ 	cscmanager.RegisterWatcher(watcher_path)
  
--int csc_device_register(struct btd_device *device)
-+int csc_device_register(struct btd_device *device, struct gatt_primary *prim)
- {
- 	struct btd_adapter *adapter;
- 	struct csc_adapter *cadapter;
-@@ -166,6 +203,10 @@ int csc_device_register(struct btd_device *device)
- 	csc->dev = btd_device_ref(device);
- 	csc->cadapter = cadapter;
- 
-+	csc->svc_range = g_new0(struct att_range, 1);
-+	csc->svc_range->start = prim->range.start;
-+	csc->svc_range->end = prim->range.end;
-+
- 	cadapter->devices = g_slist_prepend(cadapter->devices, csc);
- 
- 	csc->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
-diff --git a/profiles/cyclingspeed/cyclingspeed.h b/profiles/cyclingspeed/cyclingspeed.h
-index b83fa9e..3400d5f 100644
---- a/profiles/cyclingspeed/cyclingspeed.h
-+++ b/profiles/cyclingspeed/cyclingspeed.h
-@@ -22,5 +22,5 @@
- 
- int csc_adapter_register(struct btd_adapter *adapter);
- void csc_adapter_unregister(struct btd_adapter *adapter);
--int csc_device_register(struct btd_device *device);
-+int csc_device_register(struct btd_device *device, struct gatt_primary *prim);
- void csc_device_unregister(struct btd_device *device);
-diff --git a/profiles/cyclingspeed/manager.c b/profiles/cyclingspeed/manager.c
-index e5f7553..c147af2 100644
---- a/profiles/cyclingspeed/manager.c
-+++ b/profiles/cyclingspeed/manager.c
-@@ -34,6 +34,14 @@
- #include "cyclingspeed.h"
- #include "manager.h"
- 
-+static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
-+{
-+	const struct gatt_primary *prim = a;
-+	const char *uuid = b;
-+
-+	return g_strcmp0(prim->uuid, uuid);
-+}
-+
- static int csc_adapter_probe(struct btd_profile *p, struct btd_adapter *adapter)
- {
- 	return csc_adapter_register(adapter);
-@@ -48,7 +56,16 @@ static void csc_adapter_remove(struct btd_profile *p,
- static int csc_device_probe(struct btd_profile *p,
- 				struct btd_device *device, GSList *uuids)
- {
--	return csc_device_register(device);
-+	GSList *primaries;
-+	GSList *l;
-+
-+	primaries = btd_device_get_primaries(device);
-+
-+	l = g_slist_find_custom(primaries, CYCLING_SC_UUID, primary_uuid_cmp);
-+	if (l == NULL)
-+		return -EINVAL;
-+
-+	return csc_device_register(device, l->data);
- }
- 
- static void csc_device_remove(struct btd_profile *p,
+ 	csc = dbus.Interface(bus.get_object("org.bluez", device_path),
 -- 
 1.8.0
 
