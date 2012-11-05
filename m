@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 11/20] cyclingspeed: Add stub to use SC Control Point
-Date: Mon, 5 Nov 2012 09:54:56 +0100
-Message-ID: <1352105705-13988-12-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 03/20] cyclingspeed: Discover CSCS characteristics
+Date: Mon, 5 Nov 2012 09:54:48 +0100
+Message-ID: <1352105705-13988-4-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1352105705-13988-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1352105705-13988-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,247 +12,161 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements common functions to use SC Control Point.
-Individual procedures will be implemented in subsequent patches.
 ---
- profiles/cyclingspeed/cyclingspeed.c | 145 +++++++++++++++++++++++++++++++++--
- 1 file changed, 140 insertions(+), 5 deletions(-)
+ lib/uuid.h                           |  4 ++++
+ profiles/cyclingspeed/cyclingspeed.c | 43 +++++++++++++++++++++++++++++++++++-
+ profiles/cyclingspeed/cyclingspeed.h |  2 +-
+ profiles/cyclingspeed/manager.c      | 19 +++++++++++++++-
+ 4 files changed, 65 insertions(+), 3 deletions(-)
 
+diff --git a/lib/uuid.h b/lib/uuid.h
+index ebc6d27..def4fea 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -75,6 +75,10 @@ extern "C" {
+ #define MEASUREMENT_INTERVAL_UUID	"00002a21-0000-1000-8000-00805f9b34fb"
+ 
+ #define CYCLING_SC_UUID		"00001816-0000-1000-8000-00805f9b34fb"
++#define CSC_MEASUREMENT_UUID	"00002a5b-0000-1000-8000-00805f9b34fb"
++#define CSC_FEATURE_UUID	"00002a5c-0000-1000-8000-00805f9b34fb"
++#define SENSOR_LOCATION_UUID	"00002a5d-0000-1000-8000-00805f9b34fb"
++#define SC_CONTROL_POINT_UUID	"00002a55-0000-1000-8000-00805f9b34fb"
+ 
+ #define RFCOMM_UUID_STR		"00000003-0000-1000-8000-00805f9b34fb"
+ 
 diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
-index 5a65507..ffef6ae 100644
+index 4d98810..5744891 100644
 --- a/profiles/cyclingspeed/cyclingspeed.c
 +++ b/profiles/cyclingspeed/cyclingspeed.c
-@@ -41,6 +41,11 @@
- #include "log.h"
- #include "cyclingspeed.h"
+@@ -49,6 +49,10 @@ struct csc {
  
-+/* min length for ATT indication or notification: opcode (1b) + handle (2b) */
-+#define ATT_HDR_LEN 3
-+
-+#define ATT_TIMEOUT 30
-+
- #define CYCLINGSPEED_INTERFACE		"org.bluez.CyclingSpeed"
- #define CYCLINGSPEED_MANAGER_INTERFACE	"org.bluez.CyclingSpeedManager"
- #define CYCLINGSPEED_WATCHER_INTERFACE	"org.bluez.CyclingSpeedWatcher"
-@@ -52,6 +57,25 @@
- #define WHEEL_REV_PRESENT	0x01
- #define CRANK_REV_PRESENT	0x02
- 
-+#define SET_CUMULATIVE_VALUE		0x01
-+#define START_SENSOR_CALIBRATION	0x02
-+#define UPDATE_SENSOR_LOC		0x03
-+#define REQUEST_SUPPORTED_SENSOR_LOC	0x04
-+#define RESPONSE_CODE			0x10
-+
-+#define RSP_SUCCESS		0x01
-+#define RSP_NOT_SUPPORTED	0x02
-+#define RSP_INVALID_PARAM	0x03
-+#define RSP_FAILED		0x04
-+
-+struct csc;
-+
-+struct controlpoint_req {
-+	struct csc		*csc;
-+	uint8_t			opcode;
-+	guint			timeout;
-+};
-+
- struct csc_adapter {
- 	struct btd_adapter	*adapter;
- 	GSList			*devices;	/* list of registered devices */
-@@ -66,6 +90,8 @@ struct csc {
+ 	GAttrib			*attrib;
  	guint			attioid;
- 	/* attio id for measurement characteristics value notifications */
- 	guint			attio_measurement_id;
-+	/* attio id for SC Control Point characteristics value indications */
-+	guint			attio_controlpoint_id;
- 
- 	struct att_range	*svc_range;
- 
-@@ -75,6 +101,8 @@ struct csc {
- 	uint16_t		feature;
- 	gboolean		has_location;
- 	uint8_t			location;
 +
-+	struct controlpoint_req	*pending_req;
++	struct att_range	*svc_range;
++
++	uint16_t		controlpoint_val_handle;
  };
  
- struct watcher {
-@@ -216,6 +244,7 @@ static void destroy_csc(gpointer user_data)
- 
- 	if (csc->attrib != NULL) {
- 		g_attrib_unregister(csc->attrib, csc->attio_measurement_id);
-+		g_attrib_unregister(csc->attrib, csc->attio_controlpoint_id);
+ static GSList *csc_adapters = NULL;
+@@ -103,9 +107,38 @@ static void destroy_csc(gpointer user_data)
  		g_attrib_unref(csc->attrib);
- 	}
  
-@@ -235,6 +264,35 @@ static void char_write_cb(guint8 status, const guint8 *pdu, guint16 len,
- 	g_free(msg);
+ 	btd_device_unref(csc->dev);
++	g_free(csc->svc_range);
+ 	g_free(csc);
  }
  
-+static gboolean controlpoint_timeout(gpointer user_data)
-+{
-+	struct controlpoint_req *req = user_data;
-+
-+	req->csc->pending_req = NULL;
-+	g_free(req);
-+
-+	return FALSE;
-+}
-+
-+__attribute__((unused)) /* TODO: remove once controlpoint ops are implemented */
-+static void controlpoint_write_cb(guint8 status, const guint8 *pdu, guint16 len,
-+							gpointer user_data)
-+{
-+	struct controlpoint_req *req = user_data;
-+
-+	if (status != 0) {
-+		error("SC Control Point write failed (opcode=%d)", req->opcode);
-+
-+		req->csc->pending_req = NULL;
-+		g_free(req);
-+
-+		return;
-+	}
-+
-+	req->timeout = g_timeout_add_seconds(ATT_TIMEOUT, controlpoint_timeout,
-+									req);
-+}
-+
- static void read_feature_cb(guint8 status, const guint8 *pdu,
- 						guint16 len, gpointer user_data)
- {
-@@ -316,6 +374,8 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu,
- 	for (i = 0; i < list->num; i++) {
- 		uint8_t *value;
- 		uint16_t handle, uuid;
-+		uint8_t attr_val[2];
-+		char *msg;
- 
- 		value = list->data[i];
- 		handle = att_get_u16(value);
-@@ -325,9 +385,6 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu,
- 			continue;
- 
- 		if (g_strcmp0(ch->uuid, CSC_MEASUREMENT_UUID) == 0) {
--			char *msg;
--			uint8_t attr_val[2];
--
- 			ch->csc->measurement_ccc_handle = handle;
- 
- 			if (g_slist_length(ch->csc->cadapter->watchers) == 0) {
-@@ -339,10 +396,16 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu,
- 				msg = g_strdup("Enable measurement");
- 			}
- 
--			gatt_write_char(ch->csc->attrib, handle, attr_val,
--					sizeof(attr_val), char_write_cb, msg);
-+		} else if (g_strcmp0(ch->uuid, SC_CONTROL_POINT_UUID) == 0) {
-+			att_put_u16(GATT_CLIENT_CHARAC_CFG_IND_BIT, attr_val);
-+			msg = g_strdup("Enable SC Control Point indications");
-+		} else {
-+			break;
- 		}
- 
-+		gatt_write_char(ch->csc->attrib, handle, attr_val,
-+					sizeof(attr_val), char_write_cb, msg);
-+
- 		/* We only want CCC, can break here */
- 		break;
- 	}
-@@ -480,6 +543,67 @@ static void measurement_notify_handler(const uint8_t *pdu, uint16_t len,
- 	process_measurement(csc, pdu + 3, len - 3);
- }
- 
-+static void controlpoint_ind_handler(const uint8_t *pdu, uint16_t len,
-+							gpointer user_data)
++static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
 +{
 +	struct csc *csc = user_data;
-+	struct controlpoint_req *req = csc->pending_req;
-+	uint8_t opcode;
-+	uint8_t req_opcode;
-+	uint8_t *opdu;
-+	uint16_t olen;
-+	size_t plen;
 +
-+	if (len < ATT_HDR_LEN) {
-+		error("Invalid PDU received");
++	if (status) {
++		error("Discover CSCS characteristics: %s",
++							att_ecode2str(status));
 +		return;
 +	}
 +
-+	/* skip ATT header */
-+	pdu += ATT_HDR_LEN;
-+	len -= ATT_HDR_LEN;
++	for (; chars; chars = chars->next) {
++		struct gatt_char *c = chars->data;
 +
-+	if (len < 1) {
-+		error("Op Code missing");
-+		goto done;
++		if (g_strcmp0(c->uuid, CSC_MEASUREMENT_UUID) == 0) {
++			/* TODO: discover CCC handle */
++		} else if (g_strcmp0(c->uuid, CSC_FEATURE_UUID) == 0) {
++			/* TODO: read characterictic value */
++		} else if (g_strcmp0(c->uuid, SENSOR_LOCATION_UUID) == 0) {
++			DBG("Sensor Location supported");
++			/* TODO: read characterictic value */
++		} else if (g_strcmp0(c->uuid, SC_CONTROL_POINT_UUID) == 0) {
++			DBG("SC Control Point supported");
++			csc->controlpoint_val_handle = c->value_handle;
++			/* TODO: discover CCC handle */
++		}
 +	}
-+
-+	opcode = *pdu;
-+	pdu++;
-+	len--;
-+
-+	if (opcode != RESPONSE_CODE) {
-+		DBG("Unsupported Op Code received (%d)", opcode);
-+		goto done;
-+	}
-+
-+	if (len < 2) {
-+		error("Invalid Response Code PDU received");
-+		goto done;
-+	}
-+
-+	req_opcode = *pdu;
-+	/* skip response code for now */
-+	pdu += 2;
-+	len -= 2;
-+
-+	if (req == NULL || req->opcode != req_opcode) {
-+		DBG("Indication received without pending request");
-+		goto done;
-+	}
-+
-+	/* TODO: handle response */
-+
-+	csc->pending_req = NULL;
-+	g_source_remove(req->timeout);
-+	g_free(req);
-+
-+done:
-+	opdu = g_attrib_get_buffer(csc->attrib, &plen);
-+	olen = enc_confirmation(opdu, plen);
-+	if (olen > 0)
-+		g_attrib_send(csc->attrib, 0, opdu, olen, NULL, NULL, NULL);
 +}
- 
- static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
++
+ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
  {
-@@ -513,6 +637,12 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
- 		} else if (g_strcmp0(c->uuid, SC_CONTROL_POINT_UUID) == 0) {
- 			DBG("SC Control Point supported");
- 			csc->controlpoint_val_handle = c->value_handle;
-+
-+			csc->attio_controlpoint_id = g_attrib_register(
-+					csc->attrib, ATT_OP_HANDLE_IND,
-+					c->value_handle,
-+					controlpoint_ind_handler, csc, NULL);
-+
- 			discover_desc(csc, c, c_next);
- 		}
- 	}
-@@ -580,6 +710,11 @@ static void attio_disconnected_cb(gpointer user_data)
- 		csc->attio_measurement_id = 0;
- 	}
+ 	struct csc *csc = user_data;
+@@ -113,6 +146,10 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ 	DBG("");
  
-+	if (csc->attio_controlpoint_id > 0) {
-+		g_attrib_unregister(csc->attrib, csc->attio_controlpoint_id);
-+		csc->attio_controlpoint_id = 0;
-+	}
+ 	csc->attrib = g_attrib_ref(attrib);
 +
- 	g_attrib_unref(csc->attrib);
- 	csc->attrib = NULL;
++	gatt_discover_char(csc->attrib, csc->svc_range->start,
++				csc->svc_range->end, NULL,
++				discover_char_cb, csc);
  }
+ 
+ static void attio_disconnected_cb(gpointer user_data)
+@@ -150,7 +187,7 @@ void csc_adapter_unregister(struct btd_adapter *adapter)
+ 	destroy_csc_adapter(cadapter);
+ }
+ 
+-int csc_device_register(struct btd_device *device)
++int csc_device_register(struct btd_device *device, struct gatt_primary *prim)
+ {
+ 	struct btd_adapter *adapter;
+ 	struct csc_adapter *cadapter;
+@@ -166,6 +203,10 @@ int csc_device_register(struct btd_device *device)
+ 	csc->dev = btd_device_ref(device);
+ 	csc->cadapter = cadapter;
+ 
++	csc->svc_range = g_new0(struct att_range, 1);
++	csc->svc_range->start = prim->range.start;
++	csc->svc_range->end = prim->range.end;
++
+ 	cadapter->devices = g_slist_prepend(cadapter->devices, csc);
+ 
+ 	csc->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
+diff --git a/profiles/cyclingspeed/cyclingspeed.h b/profiles/cyclingspeed/cyclingspeed.h
+index b83fa9e..3400d5f 100644
+--- a/profiles/cyclingspeed/cyclingspeed.h
++++ b/profiles/cyclingspeed/cyclingspeed.h
+@@ -22,5 +22,5 @@
+ 
+ int csc_adapter_register(struct btd_adapter *adapter);
+ void csc_adapter_unregister(struct btd_adapter *adapter);
+-int csc_device_register(struct btd_device *device);
++int csc_device_register(struct btd_device *device, struct gatt_primary *prim);
+ void csc_device_unregister(struct btd_device *device);
+diff --git a/profiles/cyclingspeed/manager.c b/profiles/cyclingspeed/manager.c
+index e5f7553..c147af2 100644
+--- a/profiles/cyclingspeed/manager.c
++++ b/profiles/cyclingspeed/manager.c
+@@ -34,6 +34,14 @@
+ #include "cyclingspeed.h"
+ #include "manager.h"
+ 
++static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
++{
++	const struct gatt_primary *prim = a;
++	const char *uuid = b;
++
++	return g_strcmp0(prim->uuid, uuid);
++}
++
+ static int csc_adapter_probe(struct btd_profile *p, struct btd_adapter *adapter)
+ {
+ 	return csc_adapter_register(adapter);
+@@ -48,7 +56,16 @@ static void csc_adapter_remove(struct btd_profile *p,
+ static int csc_device_probe(struct btd_profile *p,
+ 				struct btd_device *device, GSList *uuids)
+ {
+-	return csc_device_register(device);
++	GSList *primaries;
++	GSList *l;
++
++	primaries = btd_device_get_primaries(device);
++
++	l = g_slist_find_custom(primaries, CYCLING_SC_UUID, primary_uuid_cmp);
++	if (l == NULL)
++		return -EINVAL;
++
++	return csc_device_register(device, l->data);
+ }
+ 
+ static void csc_device_remove(struct btd_profile *p,
 -- 
 1.8.0
 
