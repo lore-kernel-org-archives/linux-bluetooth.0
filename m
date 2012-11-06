@@ -1,63 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] AVRCP: Add supported events field to session structure
-Date: Wed,  7 Nov 2012 12:34:01 +0200
-Message-Id: <1352284442-6855-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 6 Nov 2012 23:29:28 +0100
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Pacho Ramos <pacho@gentoo.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: About a newer bluez version
+Message-ID: <20121106222928.GA6787@x220.colubris.lan>
+References: <1352233126.15613.19.camel@belkin4>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1352233126.15613.19.camel@belkin4>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Pacho,
 
-This simplify detecting which events are available depending on the role
-and version of the session.
----
- audio/avrcp.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+On Tue, Nov 06, 2012, Pacho Ramos wrote:
+> Looks like there are a lot of fixed committed to git since bluez-4.101,
+> do you plan to release a new tarball including them soon?
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 3d9ecc7..ab9ffbf 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -197,6 +197,7 @@ struct avrcp {
- 
- 	unsigned int control_id;
- 	unsigned int browsing_id;
-+	uint16_t supported_events;
- 	uint16_t registered_events;
- 	uint8_t transaction;
- 	uint8_t transaction_events[AVRCP_EVENT_LAST + 1];
-@@ -858,12 +859,12 @@ static uint8_t avrcp_handle_get_capabilities(struct avrcp *session,
- 
- 		return AVC_CTYPE_STABLE;
- 	case CAP_EVENTS_SUPPORTED:
--		pdu->params[1] = 5;
--		pdu->params[2] = AVRCP_EVENT_STATUS_CHANGED;
--		pdu->params[3] = AVRCP_EVENT_TRACK_CHANGED;
--		pdu->params[4] = AVRCP_EVENT_TRACK_REACHED_START;
--		pdu->params[5] = AVRCP_EVENT_TRACK_REACHED_END;
--		pdu->params[6] = AVRCP_EVENT_SETTINGS_CHANGED;
-+		for (i = 0; i <= AVRCP_EVENT_LAST; i++) {
-+			if (session->supported_events & (1 << i)) {
-+				pdu->params[1]++;
-+				pdu->params[pdu->params[1] + 1] = i;
-+			}
-+		}
- 
- 		pdu->params_len = htons(2 + pdu->params[1]);
- 		return AVC_CTYPE_STABLE;
-@@ -2064,6 +2065,11 @@ static void session_tg_init(struct avrcp *session)
- 	}
- 
- 	session->control_handlers = tg_control_handlers;
-+	session->supported_events = (1 << AVRCP_EVENT_STATUS_CHANGED) |
-+				(1 << AVRCP_EVENT_TRACK_CHANGED) |
-+				(1 << AVRCP_EVENT_TRACK_REACHED_START) |
-+				(1 << AVRCP_EVENT_TRACK_REACHED_END) |
-+				(1 << AVRCP_EVENT_SETTINGS_CHANGED);
- 
- 	if (session->version >= 0x0104) {
- 		avrcp_register_notification(session,
--- 
-1.7.11.7
+The reason why there has been a longer delay is that we're busy
+preparing BlueZ 5. The target is to have 5.0 out still this year.
 
+Johan
