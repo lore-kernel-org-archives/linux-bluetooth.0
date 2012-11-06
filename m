@@ -1,89 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: Fix updating advertising state flags and data
-Date: Tue,  6 Nov 2012 23:06:40 +0100
-Message-Id: <1352239600-5840-3-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1352239600-5840-1-git-send-email-johan.hedberg@gmail.com>
-References: <1352239600-5840-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/3] Bluetooth: Use proper invalid value for tx_power
+Date: Tue,  6 Nov 2012 23:06:38 +0100
+Message-Id: <1352239600-5840-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds a callback for the HCI_LE_Set_Advertise_Enable command.
-The callback is responsible for updating the HCI_LE_PERIPHERAL flag
-updating as well as updating the advertising data flags field to
-indicate undirected connectable advertising.
+The core specification defines 127 as the "not available" value (well,
+"reserved" for BR/EDR and "not available" for LE - but essentially the
+same). Therefore, instead of testing for 0 (which is in fact a valid
+value) we should be using this invalid value to test if the tx_power is
+available.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci.h |    2 ++
- net/bluetooth/hci_event.c   |   31 +++++++++++++++++++++++++++++++
- 2 files changed, 33 insertions(+)
+ include/net/bluetooth/hci.h |    3 +++
+ net/bluetooth/hci_core.c    |    2 ++
+ net/bluetooth/hci_event.c   |    2 ++
+ net/bluetooth/mgmt.c        |    2 +-
+ 4 files changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 705e2f0..a7ed8fe 100644
+index 6c414f4..344fea0 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -957,6 +957,8 @@ struct hci_cp_le_set_adv_data {
- 	__u8		data[HCI_MAX_AD_LENGTH];
- } __packed;
+@@ -319,6 +319,9 @@ enum {
+ #define HCI_FLOW_CTL_MODE_PACKET_BASED	0x00
+ #define HCI_FLOW_CTL_MODE_BLOCK_BASED	0x01
  
-+#define HCI_OP_LE_SET_ADV_ENABLE	0x200a
++/* The core spec defines 127 as the "not available" value */
++#define HCI_TX_POWER_INVALID	127
 +
- #define HCI_OP_LE_SET_SCAN_PARAM	0x200b
- struct hci_cp_le_set_scan_param {
- 	__u8    type;
+ /* Extended Inquiry Response field types */
+ #define EIR_FLAGS		0x01 /* flags */
+ #define EIR_UUID16_SOME		0x02 /* 16-bit UUID, more available */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index c68c409..0af08f3 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1606,6 +1606,8 @@ struct hci_dev *hci_alloc_dev(void)
+ 	hdev->esco_type = (ESCO_HV1);
+ 	hdev->link_mode = (HCI_LM_ACCEPT);
+ 	hdev->io_capability = 0x03; /* No Input No Output */
++	hdev->inq_tx_power = HCI_TX_POWER_INVALID;
++	hdev->adv_tx_power = HCI_TX_POWER_INVALID;
+ 
+ 	hdev->sniff_max_interval = 800;
+ 	hdev->sniff_min_interval = 80;
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 7caea1a..9f5c5f2 100644
+index c08ac7c..09c6571 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -1190,6 +1190,33 @@ static void hci_cc_read_local_oob_data_reply(struct hci_dev *hdev,
- 	hci_dev_unlock(hdev);
+@@ -202,6 +202,8 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
+ 			     BIT(HCI_PERIODIC_INQ));
+ 
+ 	hdev->discovery.state = DISCOVERY_STOPPED;
++	hdev->inq_tx_power = HCI_TX_POWER_INVALID;
++	hdev->adv_tx_power = HCI_TX_POWER_INVALID;
  }
  
-+static void hci_cc_le_set_adv_enable(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	__u8 *sent, status = *((__u8 *) skb->data);
-+
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+
-+	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_ADV_ENABLE);
-+	if (!sent)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	if (!status) {
-+		if (*sent)
-+			set_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags);
-+		else
-+			clear_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags);
-+	}
-+
-+	hci_dev_unlock(hdev);
-+
-+	if (!test_bit(HCI_INIT, &hdev->flags))
-+		hci_update_ad(hdev);
-+
-+	hci_req_complete(hdev, HCI_OP_LE_SET_ADV_ENABLE, status);
-+}
-+
- static void hci_cc_le_set_scan_param(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -2585,6 +2612,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_le_set_scan_param(hdev, skb);
- 		break;
+ static void hci_cc_write_local_name(struct hci_dev *hdev, struct sk_buff *skb)
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 26a0984..ad1054f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -485,7 +485,7 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
+ 		ptr += (name_len + 2);
+ 	}
  
-+	case HCI_OP_LE_SET_ADV_ENABLE:
-+		hci_cc_le_set_adv_enable(hdev, skb);
-+		break;
-+
- 	case HCI_OP_LE_SET_SCAN_ENABLE:
- 		hci_cc_le_set_scan_enable(hdev, skb);
- 		break;
+-	if (hdev->inq_tx_power) {
++	if (hdev->inq_tx_power != HCI_TX_POWER_INVALID) {
+ 		ptr[0] = 2;
+ 		ptr[1] = EIR_TX_POWER;
+ 		ptr[2] = (u8) hdev->inq_tx_power;
 -- 
 1.7.10.4
 
