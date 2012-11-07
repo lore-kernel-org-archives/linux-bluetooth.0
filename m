@@ -1,74 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1352284442-6855-1-git-send-email-luiz.dentz@gmail.com>
-References: <1352284442-6855-1-git-send-email-luiz.dentz@gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Wed, 7 Nov 2012 12:15:53 -0200
-Message-ID: <CAMOw1v6dSy9Nrswh3oYDncF7Dy1a9xpsSD4HLPwFQkdYWAnBjg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] AVRCP: Add supported events field to session structure
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
+	<frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] neard: Set device name in cache and device object
+Date: Wed,  7 Nov 2012 12:02:02 +0100
+Message-Id: <1352286123-12992-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Nov 7, 2012 at 8:34 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This simplify detecting which events are available depending on the role
-> and version of the session.
-> ---
->  audio/avrcp.c | 18 ++++++++++++------
->  1 file changed, 12 insertions(+), 6 deletions(-)
->
-> diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index 3d9ecc7..ab9ffbf 100644
-> --- a/audio/avrcp.c
-> +++ b/audio/avrcp.c
-> @@ -197,6 +197,7 @@ struct avrcp {
->
->         unsigned int control_id;
->         unsigned int browsing_id;
-> +       uint16_t supported_events;
->         uint16_t registered_events;
->         uint8_t transaction;
->         uint8_t transaction_events[AVRCP_EVENT_LAST + 1];
-> @@ -858,12 +859,12 @@ static uint8_t avrcp_handle_get_capabilities(struct avrcp *session,
->
->                 return AVC_CTYPE_STABLE;
->         case CAP_EVENTS_SUPPORTED:
-> -               pdu->params[1] = 5;
-> -               pdu->params[2] = AVRCP_EVENT_STATUS_CHANGED;
-> -               pdu->params[3] = AVRCP_EVENT_TRACK_CHANGED;
-> -               pdu->params[4] = AVRCP_EVENT_TRACK_REACHED_START;
-> -               pdu->params[5] = AVRCP_EVENT_TRACK_REACHED_END;
-> -               pdu->params[6] = AVRCP_EVENT_SETTINGS_CHANGED;
-> +               for (i = 0; i <= AVRCP_EVENT_LAST; i++) {
-> +                       if (session->supported_events & (1 << i)) {
-> +                               pdu->params[1]++;
-> +                               pdu->params[pdu->params[1] + 1] = i;
-> +                       }
-> +               }
->
->                 pdu->params_len = htons(2 + pdu->params[1]);
->                 return AVC_CTYPE_STABLE;
-> @@ -2064,6 +2065,11 @@ static void session_tg_init(struct avrcp *session)
->         }
->
->         session->control_handlers = tg_control_handlers;
-> +       session->supported_events = (1 << AVRCP_EVENT_STATUS_CHANGED) |
-> +                               (1 << AVRCP_EVENT_TRACK_CHANGED) |
-> +                               (1 << AVRCP_EVENT_TRACK_REACHED_START) |
-> +                               (1 << AVRCP_EVENT_TRACK_REACHED_END) |
-> +                               (1 << AVRCP_EVENT_SETTINGS_CHANGED);
->
->         if (session->version >= 0x0104) {
->                 avrcp_register_notification(session,
-> --
-> 1.7.11.7
->
+---
+ plugins/neard.c |    5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Ack
+diff --git a/plugins/neard.c b/plugins/neard.c
+index 8018977..8f8381c 100644
+--- a/plugins/neard.c
++++ b/plugins/neard.c
+@@ -42,6 +42,7 @@
+ #include "storage.h"
+ #include "agent.h"
+ #include "hcid.h"
++#include "event.h"
+ 
+ #define NEARD_NAME "org.neard"
+ #define NEARD_PATH "/"
+@@ -293,8 +294,8 @@ static int process_eir(struct btd_adapter *adapter, uint8_t *eir, size_t size,
+ 
+ 	/* TODO handle incomplete name? */
+ 	if (eir_data.name)
+-		write_device_name(adapter_get_address(adapter), &eir_data.addr,
+-						BDADDR_BREDR, eir_data.name);
++		btd_event_remote_name(adapter_get_address(adapter),
++					&eir_data.addr, eir_data.name);
+ 
+ 	if (eir_data.hash)
+ 		btd_adapter_add_remote_oob_data(adapter, &eir_data.addr,
+-- 
+1.7.9.5
 
-Lucas De Marchi
