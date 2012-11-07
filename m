@@ -1,61 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Wed, 7 Nov 2012 17:20:46 -0200
-Message-ID: <CAMOw1v5q7eP2O4h6KtKNv0himHKA4pmg9STrxUczL_frYgECZA@mail.gmail.com>
-Subject: DBus.Properties: help for remaining convertions
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <1352303814.16204.3.camel@aeonflux>
+Subject: Re: [PATCH 3/3] Bluetooth: Fix updating advertising state flags and
+ data
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 07 Nov 2012 16:56:54 +0100
+In-Reply-To: <1352239600-5840-3-git-send-email-johan.hedberg@gmail.com>
+References: <1352239600-5840-1-git-send-email-johan.hedberg@gmail.com>
+	 <1352239600-5840-3-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey!
+Hi Johan,
 
-I stopped converting profiles to DBus.Properties due to some reasons
-like 1) lack of time; 2) I don't use or can't test the conversion or
-3) I'm seeing a lots of patches to that profile and my changes would
-conflict.
+> This patch adds a callback for the HCI_LE_Set_Advertise_Enable command.
+> The callback is responsible for updating the HCI_LE_PERIPHERAL flag
+> updating as well as updating the advertising data flags field to
+> indicate undirected connectable advertising.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  include/net/bluetooth/hci.h |    2 ++
+>  net/bluetooth/hci_event.c   |   31 +++++++++++++++++++++++++++++++
+>  2 files changed, 33 insertions(+)
 
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Here is a list of missing profiles (except audio):
-└ bluez ➤ git grep -l GetProperties | grep -e " | grep -v -e "^audio"
-attrib/client.c
-profiles/cups/main.c
-profiles/network/connection.c
-profiles/proximity/monitor.c
-profiles/proximity/reporter.c
-profiles/thermometer/thermometer.c
+Regards
 
-
-Most of them are trivial and mostly a manual conversion job. These
-fall in categories (1) and (2) above. If no one interested in that
-profiles does the conversion,  I'll try my best to convert them, but
-I'd like they to at least check/ack the changes.
-
-And the audio ones, in category (1) and (3) above:
-
-└ bluez ➤ git grep -l GetProperties | grep -e " | grep -v -e "^audio"
-audio/device.c
-audio/gateway.c
-audio/gstavdtpsink.c
-audio/headset.c
-audio/player.c
-audio/sink.c
-audio/source.c
-audio/telephony-ofono.c
-audio/transport.c
+Marcel
 
 
-Luiz, do you plan to convert to DBus.Properties after you finish the
-pending features you are doing? I think audio/transport.c is the only
-one still requiring a feature in gdbus:  security check for the sender
-as discussed previously.  I can add this when we are converting audio.
-
-
-Anyone to step up and help to finish the conversions? The sooner these
-are finished, the sooner other projects can adapt themselves to the
-upcoming API.
-
-
-Lucas De Marchi
