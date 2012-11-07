@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1352303814.16204.3.camel@aeonflux>
-Subject: Re: [PATCH 3/3] Bluetooth: Fix updating advertising state flags and
+Message-ID: <1352303722.16204.2.camel@aeonflux>
+Subject: Re: [PATCH 2/3] Bluetooth: Add support for setting LE advertising
  data
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 07 Nov 2012 16:56:54 +0100
-In-Reply-To: <1352239600-5840-3-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 07 Nov 2012 16:55:22 +0100
+In-Reply-To: <1352239600-5840-2-git-send-email-johan.hedberg@gmail.com>
 References: <1352239600-5840-1-git-send-email-johan.hedberg@gmail.com>
-	 <1352239600-5840-3-git-send-email-johan.hedberg@gmail.com>
+	 <1352239600-5840-2-git-send-email-johan.hedberg@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,18 +16,232 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> This patch adds a callback for the HCI_LE_Set_Advertise_Enable command.
-> The callback is responsible for updating the HCI_LE_PERIPHERAL flag
-> updating as well as updating the advertising data flags field to
-> indicate undirected connectable advertising.
+> This patch adds support for setting basing LE advertising data. The
+> three elements supported for now are the advertising flags, the TX power
+> and the friendly name.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  include/net/bluetooth/hci.h |    2 ++
->  net/bluetooth/hci_event.c   |   31 +++++++++++++++++++++++++++++++
->  2 files changed, 33 insertions(+)
+>  include/net/bluetooth/hci.h      |   15 ++++++
+>  include/net/bluetooth/hci_core.h |    4 ++
+>  net/bluetooth/hci_core.c         |   97 ++++++++++++++++++++++++++++++++++++++
+>  net/bluetooth/hci_event.c        |   11 ++++-
+>  4 files changed, 126 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 344fea0..705e2f0 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -338,6 +338,13 @@ enum {
+>  #define EIR_SSP_RAND_R		0x0F /* Simple Pairing Randomizer R */
+>  #define EIR_DEVICE_ID		0x10 /* device ID */
+>  
+> +/* Low Energy Advertising Flags */
+> +#define LE_AD_LIMITED		0x01 /* Limited Discoverable */
+> +#define LE_AD_GENERAL		0x02 /* General Discoverable */
+> +#define LE_AD_NO_BREDR		0x04 /* BR/EDR not supported */
+> +#define LE_AD_SIM_LE_BREDR_CTRL	0x08 /* Simultaneous LE & BR/EDR Controller */
+> +#define LE_AD_SIM_LE_BREDR_HOST	0x10 /* Simultaneous LE & BR/EDR Host */
+> +
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+is this bad formatting in the email client and they are actually
+aligned.
+
+>  /* -----  HCI Commands ---- */
+>  #define HCI_OP_NOP			0x0000
+>  
+> @@ -942,6 +949,14 @@ struct hci_rp_le_read_adv_tx_power {
+>  	__s8	tx_power;
+>  } __packed;
+>  
+> +#define HCI_MAX_AD_LENGTH		31
+> +
+> +#define HCI_OP_LE_SET_ADV_DATA		0x2008
+> +struct hci_cp_le_set_adv_data {
+> +	__u8		length;
+> +	__u8		data[HCI_MAX_AD_LENGTH];
+> +} __packed;
+> +
+
+This indentation looks weird.
+
+>  #define HCI_OP_LE_SET_SCAN_PARAM	0x200b
+>  struct hci_cp_le_set_scan_param {
+>  	__u8    type;
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index ce6dbeb..ef5b85d 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -279,6 +279,8 @@ struct hci_dev {
+>  	struct le_scan_params	le_scan_params;
+>  
+>  	__s8			adv_tx_power;
+> +	__u8			adv_data[HCI_MAX_AD_LENGTH];
+> +	__u8			adv_data_len;
+>  
+>  	int (*open)(struct hci_dev *hdev);
+>  	int (*close)(struct hci_dev *hdev);
+> @@ -734,6 +736,8 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
+>  								u8 *randomizer);
+>  int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr);
+>  
+> +int hci_update_ad(struct hci_dev *hdev);
+> +
+>  void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
+>  
+>  int hci_recv_frame(struct sk_buff *skb);
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 0af08f3..0af3ea8 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -594,6 +594,102 @@ done:
+>  	return err;
+>  }
+>  
+> +static u16 create_ad(struct hci_dev *hdev, u8 *data)
+> +{
+> +	u8 *ptr = data;
+> +	u16 ad_len = 0;
+> +	size_t name_len;
+> +	u8 flags = 0;
+> +
+> +	if (test_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags))
+> +		flags |= LE_AD_GENERAL;
+> +
+> +	if (!lmp_bredr_capable(hdev))
+> +		flags |= LE_AD_NO_BREDR;
+> +
+> +	if (lmp_le_br_capable(hdev))
+> +		flags |= LE_AD_SIM_LE_BREDR_CTRL;
+> +
+> +	if (lmp_host_le_br_capable(hdev))
+> +		flags |= LE_AD_SIM_LE_BREDR_HOST;
+> +
+> +	if (flags) {
+> +		BT_DBG("adv flags 0x%02x", flags);
+> +
+> +		ptr[0] = 2;
+> +		ptr[1] = EIR_FLAGS;
+> +		ptr[2] = flags;
+> +
+> +		ad_len += 3;
+> +		ptr += 3;
+> +	}
+> +
+> +	if (hdev->adv_tx_power != HCI_TX_POWER_INVALID) {
+> +		ptr[0] = 2;
+> +		ptr[1] = EIR_TX_POWER;
+> +		ptr[2] = (u8) hdev->adv_tx_power;
+> +
+> +		ad_len += 3;
+> +		ptr += 3;
+> +	}
+> +
+> +	name_len = strlen(hdev->dev_name);
+> +	if (name_len > 0) {
+> +		size_t max_len = HCI_MAX_AD_LENGTH - ad_len - 2;
+> +
+> +		if (name_len > max_len) {
+> +			name_len = max_len;
+> +			ptr[1] = EIR_NAME_SHORT;
+> +		} else
+> +			ptr[1] = EIR_NAME_COMPLETE;
+> +
+> +		ptr[0] = name_len + 1;
+> +
+> +		memcpy(ptr + 2, hdev->dev_name, name_len);
+> +
+> +		ad_len += (name_len + 2);
+> +		ptr += (name_len + 2);
+> +	}
+> +
+> +	return ad_len;
+> +}
+> +
+> +int hci_update_ad(struct hci_dev *hdev)
+> +{
+> +	struct hci_cp_le_set_adv_data cp;
+> +	u16 len;
+> +	int err;
+> +
+> +	hci_dev_lock(hdev);
+> +
+> +	if (!lmp_le_capable(hdev)) {
+> +		err = -EINVAL;
+> +		goto unlock;
+> +	}
+> +
+> +	memset(&cp, 0, sizeof(cp));
+> +
+> +	len = create_ad(hdev, cp.data);
+> +
+> +	if (hdev->adv_data_len == len &&
+> +	    memcmp(cp.data, hdev->adv_data, len) == 0) {
+> +		err = 0;
+> +		goto unlock;
+> +	}
+> +
+> +	memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
+> +	hdev->adv_data_len = len;
+> +
+> +	cp.length = cpu_to_le16(len);
+> +
+> +	err = hci_send_cmd(hdev, HCI_OP_LE_SET_ADV_DATA, sizeof(cp), &cp);
+> +
+> +unlock:
+> +	hci_dev_unlock(hdev);
+> +
+> +	return err;
+> +}
+> +
+>  /* ---- HCI ioctl helpers ---- */
+>  
+>  int hci_dev_open(__u16 dev)
+> @@ -651,6 +747,7 @@ int hci_dev_open(__u16 dev)
+>  		hci_dev_hold(hdev);
+>  		set_bit(HCI_UP, &hdev->flags);
+>  		hci_notify(hdev, HCI_DEV_UP);
+> +		hci_update_ad(hdev);
+>  		if (!test_bit(HCI_SETUP, &hdev->dev_flags) &&
+>  		    mgmt_valid_hdev(hdev)) {
+>  			hci_dev_lock(hdev);
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 09c6571..7caea1a 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -204,6 +204,9 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
+>  	hdev->discovery.state = DISCOVERY_STOPPED;
+>  	hdev->inq_tx_power = HCI_TX_POWER_INVALID;
+>  	hdev->adv_tx_power = HCI_TX_POWER_INVALID;
+> +
+> +	memset(hdev->adv_data, 0, sizeof(hdev->adv_data));
+> +	hdev->adv_data_len = 0;
+>  }
+>  
+>  static void hci_cc_write_local_name(struct hci_dev *hdev, struct sk_buff *skb)
+> @@ -226,6 +229,9 @@ static void hci_cc_write_local_name(struct hci_dev *hdev, struct sk_buff *skb)
+>  
+>  	hci_dev_unlock(hdev);
+>  
+> +	if (!status && !test_bit(HCI_INIT, &hdev->flags))
+> +		hci_update_ad(hdev);
+> +
+>  	hci_req_complete(hdev, HCI_OP_WRITE_LOCAL_NAME, status);
+>  }
+>  
+> @@ -1091,8 +1097,11 @@ static void hci_cc_le_read_adv_tx_power(struct hci_dev *hdev,
+>  
+>  	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
+>  
+> -	if (!rp->status)
+> +	if (!rp->status) {
+>  		hdev->adv_tx_power = rp->tx_power;
+> +		if (!test_bit(HCI_INIT, &hdev->flags))
+> +			hci_update_ad(hdev);
+> +	}
+>  
+>  	hci_req_complete(hdev, HCI_OP_LE_READ_ADV_TX_POWER, rp->status);
+>  }
 
 Regards
 
