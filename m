@@ -2,53 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Sunil Kumar Behera <sunil.behera@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sunil Kumar Behera <sunil.behera@samsung.com>
-Subject: [PATCH obexd v1 2/3] MAP: Add MSETime application parameter
-Date: Thu, 08 Nov 2012 16:34:27 +0530
-Message-id: <1352372667-18288-1-git-send-email-sunil.behera@samsung.com>
+Subject: [PATCH obexd v1 1/3] MAP: Add get_next_header() in message listing
+Date: Thu, 08 Nov 2012 16:32:58 +0530
+Message-id: <1352372578-18252-1-git-send-email-sunil.behera@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-MSETime application parameter shall be used in the response
-to report the Local Time basis of the MSE.
+In case of message listing we need to send application
+parameters in response and also it is required for sending
+response to message listing size request.
 ---
- plugins/mas.c      |    4 +++-
- plugins/messages.h |    1 +
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ plugins/mas.c |    1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/plugins/mas.c b/plugins/mas.c
-index 319c87f..bdf2b6b 100644
+index 186d267..319c87f 100644
 --- a/plugins/mas.c
 +++ b/plugins/mas.c
-@@ -284,7 +284,7 @@ static const char *yesorno(gboolean a)
- }
- 
- static void get_messages_listing_cb(void *session, int err, uint16_t size,
--					gboolean newmsg,
-+					gboolean newmsg, gchar *msetime,
- 					const struct messages_message *entry,
- 					void *user_data)
- {
-@@ -403,6 +403,8 @@ proceed:
- 		mas->outparams = g_obex_apparam_set_uint8(mas->outparams,
- 						MAP_AP_NEWMESSAGE,
- 						newmsg ? 1 : 0);
-+		mas->outparams = g_obex_apparam_set_string(mas->outparams,
-+						MAP_AP_MSETIME, msetime);
- 	}
- 
- 	if (err != -EAGAIN)
-diff --git a/plugins/messages.h b/plugins/messages.h
-index 00a16b1..2ab4ba1 100644
---- a/plugins/messages.h
-+++ b/plugins/messages.h
-@@ -226,6 +226,7 @@ int messages_get_folder_listing(void *session, const char *name, uint16_t max,
-  */
- typedef void (*messages_get_messages_listing_cb)(void *session, int err,
- 					uint16_t size, gboolean newmsg,
-+					gchar *msetime,
- 					const struct messages_message *message,
- 					void *user_data);
- 
+@@ -810,6 +810,7 @@ static struct obex_mime_type_driver mime_msg_listing = {
+ 	.target = MAS_TARGET,
+ 	.target_size = TARGET_SIZE,
+ 	.mimetype = "x-bt/MAP-msg-listing",
++	.get_next_header = any_get_next_header,
+ 	.open = msg_listing_open,
+ 	.close = any_close,
+ 	.read = any_read,
 -- 
 1.7.9.5
 
