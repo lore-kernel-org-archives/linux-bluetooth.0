@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH v1 4/4] source: Add profile .connect and .disconnect
-Date: Thu,  8 Nov 2012 16:16:25 +0100
-Message-Id: <1352387785-20002-5-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH v1 2/4] audio: Trivial function rename
+Date: Thu,  8 Nov 2012 16:16:23 +0100
+Message-Id: <1352387785-20002-3-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1352387785-20002-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1352387785-20002-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,117 +12,103 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Add the connection and disconnection hooks to the a2dp_source
-btd_profile.
+Use the local_ name prefix for local functions implementing the D-Bus
+API.
 ---
- audio/manager.c | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 82 insertions(+)
+ audio/sink.c   | 12 ++++++------
+ audio/source.c | 12 ++++++------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/audio/manager.c b/audio/manager.c
-index c5d295e..77e3540 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -83,6 +83,12 @@ struct audio_adapter {
- 	gint ref;
- };
- 
-+struct profile_req {
-+	struct btd_device	*device;
-+	struct btd_profile	*profile;
-+	btd_profile_cb		cb;
-+};
-+
- static gboolean auto_connect = TRUE;
- static int max_connected_headsets = 1;
- static GKeyFile *config = NULL;
-@@ -776,6 +782,79 @@ static int avrcp_probe(struct btd_profile *p, struct btd_device *device,
- 	return 0;
+diff --git a/audio/sink.c b/audio/sink.c
+index 2e63579..b9e4fe0 100644
+--- a/audio/sink.c
++++ b/audio/sink.c
+@@ -390,7 +390,7 @@ gboolean sink_setup_stream(struct sink *sink, struct avdtp *session)
+ 	return TRUE;
  }
  
-+static struct profile_req *new_profile_request(struct btd_device *dev,
-+						struct btd_profile *profile,
-+						btd_profile_cb cb)
-+{
-+	struct profile_req *req;
-+
-+	req  = g_new0(struct profile_req, 1);
-+	req->device = dev;
-+	req->profile = profile;
-+	req->cb = cb;
-+
-+	return req;
-+}
-+
-+static void profile_cb(struct audio_device *dev, int err, void *data)
-+{
-+	struct profile_req *req = data;
-+
-+	req->cb(req->profile, req->device, err);
-+
-+	g_free(req);
-+}
-+
-+static int a2dp_source_connect(struct btd_device *dev,
-+						struct btd_profile *profile,
-+						btd_profile_cb cb)
-+{
-+	struct audio_device *audio_dev;
-+	struct profile_req *req;
-+	int err;
-+
-+	audio_dev = get_audio_dev(dev);
-+	if (!audio_dev) {
-+		DBG("unable to get a device object");
-+		return -1;
-+	}
-+
-+	req = new_profile_request(dev, profile, cb);
-+
-+	err = source_connect(audio_dev, profile_cb, req);
-+	if (err < 0) {
-+		g_free(req);
-+		return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static int a2dp_source_disconnect(struct btd_device *dev,
-+						struct btd_profile *profile,
-+						btd_profile_cb cb)
-+{
-+	struct audio_device *audio_dev;
-+	struct profile_req *req;
-+	int err;
-+
-+	audio_dev = get_audio_dev(dev);
-+	if (!audio_dev) {
-+		DBG("unable to get a device object");
-+		return -1;
-+	}
-+
-+	req = new_profile_request(dev, profile, cb);
-+
-+	err = source_disconnect(audio_dev, profile_cb, req);
-+	if (err < 0) {
-+		g_free(req);
-+		return err;
-+	}
-+
-+	return 0;
-+}
-+
- static struct audio_adapter *audio_adapter_ref(struct audio_adapter *adp)
+-static DBusMessage *sink_connect(DBusConnection *conn,
++static DBusMessage *local_connect(DBusConnection *conn,
+ 				DBusMessage *msg, void *data)
  {
- 	adp->ref++;
-@@ -1150,6 +1229,9 @@ static struct btd_profile a2dp_source_profile = {
- 	.device_probe	= a2dp_source_probe,
- 	.device_remove	= audio_remove,
+ 	struct audio_device *dev = data;
+@@ -423,7 +423,7 @@ static DBusMessage *sink_connect(DBusConnection *conn,
+ 	return NULL;
+ }
  
-+	.connect	= a2dp_source_connect,
-+	.disconnect	= a2dp_source_disconnect,
-+
- 	.adapter_probe	= a2dp_source_server_probe,
+-static DBusMessage *sink_disconnect(DBusConnection *conn,
++static DBusMessage *local_disconnect(DBusConnection *conn,
+ 					DBusMessage *msg, void *data)
+ {
+ 	struct audio_device *device = data;
+@@ -457,7 +457,7 @@ static DBusMessage *sink_disconnect(DBusConnection *conn,
+ 	return NULL;
+ }
+ 
+-static DBusMessage *sink_get_properties(DBusConnection *conn,
++static DBusMessage *local_get_properties(DBusConnection *conn,
+ 					DBusMessage *msg, void *data)
+ {
+ 	struct audio_device *device = data;
+@@ -489,11 +489,11 @@ static DBusMessage *sink_get_properties(DBusConnection *conn,
+ }
+ 
+ static const GDBusMethodTable sink_methods[] = {
+-	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, sink_connect) },
+-	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL, sink_disconnect) },
++	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, local_connect) },
++	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL, local_disconnect) },
+ 	{ GDBUS_METHOD("GetProperties",
+ 				NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
+-				sink_get_properties) },
++				local_get_properties) },
+ 	{ }
+ };
+ 
+diff --git a/audio/source.c b/audio/source.c
+index 1d0c74a..04971d9 100644
+--- a/audio/source.c
++++ b/audio/source.c
+@@ -379,7 +379,7 @@ gboolean source_setup_stream(struct source *source, struct avdtp *session)
+ 	return TRUE;
+ }
+ 
+-static DBusMessage *source_connect(DBusConnection *conn,
++static DBusMessage *local_connect(DBusConnection *conn,
+ 				DBusMessage *msg, void *data)
+ {
+ 	struct audio_device *dev = data;
+@@ -412,7 +412,7 @@ static DBusMessage *source_connect(DBusConnection *conn,
+ 	return NULL;
+ }
+ 
+-static DBusMessage *source_disconnect(DBusConnection *conn,
++static DBusMessage *local_disconnect(DBusConnection *conn,
+ 					DBusMessage *msg, void *data)
+ {
+ 	struct audio_device *device = data;
+@@ -446,7 +446,7 @@ static DBusMessage *source_disconnect(DBusConnection *conn,
+ 	return NULL;
+ }
+ 
+-static DBusMessage *source_get_properties(DBusConnection *conn,
++static DBusMessage *local_get_properties(DBusConnection *conn,
+ 					DBusMessage *msg, void *data)
+ {
+ 	struct audio_device *device = data;
+@@ -478,11 +478,11 @@ static DBusMessage *source_get_properties(DBusConnection *conn,
+ }
+ 
+ static const GDBusMethodTable source_methods[] = {
+-	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, source_connect) },
+-	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL, source_disconnect) },
++	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, local_connect) },
++	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL, local_disconnect) },
+ 	{ GDBUS_METHOD("GetProperties",
+ 				NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
+-				source_get_properties) },
++				local_get_properties) },
+ 	{ }
  };
  
 -- 
