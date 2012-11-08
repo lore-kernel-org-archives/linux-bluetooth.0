@@ -1,36 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZK_W7q=cc4m4W2QwWdAp8+JEe7NkFGhwSjFPcyRzqN=OA@mail.gmail.com>
+References: <CAMOw1v5q7eP2O4h6KtKNv0himHKA4pmg9STrxUczL_frYgECZA@mail.gmail.com>
+	<CABBYNZK_W7q=cc4m4W2QwWdAp8+JEe7NkFGhwSjFPcyRzqN=OA@mail.gmail.com>
+Date: Thu, 8 Nov 2012 16:04:26 +0100
+Message-ID: <CANT-zCWwUkjSuJ79etrBhY6Ta+-PSX2_6_WRq4rZ5J9-Ywj=Qg@mail.gmail.com>
+Subject: Re: DBus.Properties: help for remaining convertions
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH v1 0/4] Adopt btd_profile for A2DP
-Date: Thu,  8 Nov 2012 16:16:21 +0100
-Message-Id: <1352387785-20002-1-git-send-email-mikel.astiz.oss@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi,
 
-I resend the patches which were previously part of RFC v0 "WIP: btd_profile connect and disconnect", focusing now on the audio-related patches.
+On Wed, Nov 7, 2012 at 11:34 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Lucas,
+>
+> On Wed, Nov 7, 2012 at 9:20 PM, Lucas De Marchi
+> <lucas.demarchi@profusion.mobi> wrote:
+>> Luiz, do you plan to convert to DBus.Properties after you finish the
+>> pending features you are doing? I think audio/transport.c is the only
+>> one still requiring a feature in gdbus:  security check for the sender
+>> as discussed previously.  I can add this when we are converting audio.
+>
+> I can take care of converting the audio after we move it to profiles,
+> and yes we need the sender check for in gdbus, but that can come
+> latter.
 
-The proposal is to split A2DP roles into different btd_profile instances, in order to expose .connect and .disconnect.
+I agree that we need to move to the new profile infrastructure first.
+Some of these D-Bus interfaces might even disappear completely
+(Headset, AudioSink, etc.), to be replaced by the generic
+profile-handling API.
 
-The implementation includes the Source role only (patches 3 and 4), but you can imagine that the Sink would be analogous.
+I sent some related patches in a previous RFC, which I will resend now
+focusing on the audio part only.
 
-Mikel Astiz (4):
-  audio: Split A2DP into three btd_profile
-  audio: Trivial function rename
-  source: Expose internal connection API
-  source: Add profile .connect and .disconnect
-
- audio/a2dp.c    |  88 +++++++++++++-------------
- audio/a2dp.h    |   4 +-
- audio/device.h  |   3 +
- audio/manager.c | 187 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
- audio/sink.c    |  12 ++--
- audio/source.c  | 158 ++++++++++++++++++++++++++---------------------
- audio/source.h  |   2 +
- 7 files changed, 315 insertions(+), 139 deletions(-)
-
--- 
-1.7.11.7
-
+Cheers,
+Mikel
