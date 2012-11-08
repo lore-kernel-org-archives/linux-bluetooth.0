@@ -1,43 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZK_W7q=cc4m4W2QwWdAp8+JEe7NkFGhwSjFPcyRzqN=OA@mail.gmail.com>
-References: <CAMOw1v5q7eP2O4h6KtKNv0himHKA4pmg9STrxUczL_frYgECZA@mail.gmail.com>
-	<CABBYNZK_W7q=cc4m4W2QwWdAp8+JEe7NkFGhwSjFPcyRzqN=OA@mail.gmail.com>
-Date: Thu, 8 Nov 2012 16:04:26 +0100
-Message-ID: <CANT-zCWwUkjSuJ79etrBhY6Ta+-PSX2_6_WRq4rZ5J9-Ywj=Qg@mail.gmail.com>
-Subject: Re: DBus.Properties: help for remaining convertions
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [RFC v0 7/7] adapter: Remove FindDevice method from D-Bus API
+Date: Thu,  8 Nov 2012 15:30:15 +0100
+Message-Id: <1352385015-2127-8-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1352385015-2127-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1352385015-2127-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-On Wed, Nov 7, 2012 at 11:34 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Lucas,
->
-> On Wed, Nov 7, 2012 at 9:20 PM, Lucas De Marchi
-> <lucas.demarchi@profusion.mobi> wrote:
->> Luiz, do you plan to convert to DBus.Properties after you finish the
->> pending features you are doing? I think audio/transport.c is the only
->> one still requiring a feature in gdbus:  security check for the sender
->> as discussed previously.  I can add this when we are converting audio.
->
-> I can take care of converting the audio after we move it to profiles,
-> and yes we need the sender check for in gdbus, but that can come
-> latter.
+ObjectManager.GetManagedObjects() returns all devices and their
+corresponding properties to any interested client. The device address is
+included in the property dictionary and therefore having such a
+FindDevice method is an unnecessary duplication.
+---
+ doc/adapter-api.txt |  7 -------
+ src/adapter.c       | 38 --------------------------------------
+ 2 files changed, 45 deletions(-)
 
-I agree that we need to move to the new profile infrastructure first.
-Some of these D-Bus interfaces might even disappear completely
-(Headset, AudioSink, etc.), to be replaced by the generic
-profile-handling API.
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 98a3919..f976992 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -64,13 +64,6 @@ Methods		void RequestSession()
+ 					 org.bluez.Error.Failed
+ 					 org.bluez.Error.NotAuthorized
+ 
+-		object FindDevice(string address)
+-
+-			Returns the object path of device for given address.
+-
+-			Possible Errors: org.bluez.Error.DoesNotExist
+-					 org.bluez.Error.InvalidArguments
+-
+ 		void RemoveDevice(object device)
+ 
+ 			This removes the remote device object at the given
+diff --git a/src/adapter.c b/src/adapter.c
+index 4d9820f..2be01d6 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1472,40 +1472,6 @@ static DBusMessage *remove_device(DBusConnection *conn, DBusMessage *msg,
+ 	return NULL;
+ }
+ 
+-static DBusMessage *find_device(DBusConnection *conn, DBusMessage *msg,
+-								void *data)
+-{
+-	struct btd_adapter *adapter = data;
+-	struct btd_device *device;
+-	DBusMessage *reply;
+-	const gchar *address;
+-	GSList *l;
+-	const gchar *dev_path;
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &address,
+-						DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	l = g_slist_find_custom(adapter->devices,
+-			address, (GCompareFunc) device_address_cmp);
+-	if (!l)
+-		return btd_error_does_not_exist(msg);
+-
+-	device = l->data;
+-
+-	reply = dbus_message_new_method_return(msg);
+-	if (!reply)
+-		return NULL;
+-
+-	dev_path = device_get_path(device);
+-
+-	dbus_message_append_args(reply,
+-				DBUS_TYPE_OBJECT_PATH, &dev_path,
+-				DBUS_TYPE_INVALID);
+-
+-	return reply;
+-}
+-
+ static void agent_removed(struct agent *agent, struct btd_adapter *adapter)
+ {
+ 	mgmt_set_io_capability(adapter->dev_id, IO_CAPABILITY_NOINPUTNOOUTPUT);
+@@ -1577,10 +1543,6 @@ static const GDBusMethodTable adapter_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("RemoveDevice",
+ 			GDBUS_ARGS({ "device", "o" }), NULL,
+ 			remove_device) },
+-	{ GDBUS_METHOD("FindDevice",
+-			GDBUS_ARGS({ "address", "s" }),
+-			GDBUS_ARGS({ "device", "o" }),
+-			find_device) },
+ 	{ GDBUS_METHOD("RegisterAgent",
+ 			GDBUS_ARGS({ "agent", "o" },
+ 					{ "capability", "s" }), NULL,
+-- 
+1.7.11.7
 
-I sent some related patches in a previous RFC, which I will resend now
-focusing on the audio part only.
-
-Cheers,
-Mikel
