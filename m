@@ -1,57 +1,335 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <509BD103.2040808@elbrys.com>
-Date: Thu, 08 Nov 2012 10:34:27 -0500
-From: Bart Westgeest <bart@elbrys.com>
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Feedback on potential fix for issue while advertising Feature List
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [PATCH BlueZ 2/2] audio: Move to profiles directory
+Date: Thu,  8 Nov 2012 17:25:50 +0200
+Message-Id: <1352388350-29194-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1352388350-29194-1-git-send-email-luiz.dentz@gmail.com>
+References: <1352388350-29194-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi folks,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-I've tracked down the root cause of an issue, and am looking for 
-input/feedback on what the acceptable/preferred fix is.
+In addiction fix the include path to profiles and change avinfo to use
+audio path when including a2dp-codecs.h
+---
+ Makefile.am                                  | 52 +++++++++++++++-------------
+ {audio => profiles/audio}/a2dp-codecs.h      |  0
+ {audio => profiles/audio}/a2dp.c             |  0
+ {audio => profiles/audio}/a2dp.h             |  0
+ {audio => profiles/audio}/audio.conf         |  0
+ {audio => profiles/audio}/avctp.c            |  0
+ {audio => profiles/audio}/avctp.h            |  0
+ {audio => profiles/audio}/avdtp.c            |  0
+ {audio => profiles/audio}/avdtp.h            |  0
+ {audio => profiles/audio}/avrcp.c            |  0
+ {audio => profiles/audio}/avrcp.h            |  0
+ {audio => profiles/audio}/control.c          |  0
+ {audio => profiles/audio}/control.h          |  0
+ {audio => profiles/audio}/device.c           |  0
+ {audio => profiles/audio}/device.h           |  0
+ {audio => profiles/audio}/gateway.c          |  0
+ {audio => profiles/audio}/gateway.h          |  0
+ {audio => profiles/audio}/headset.c          |  0
+ {audio => profiles/audio}/headset.h          |  0
+ {audio => profiles/audio}/main.c             |  0
+ {audio => profiles/audio}/manager.c          |  0
+ {audio => profiles/audio}/manager.h          |  0
+ {audio => profiles/audio}/media.c            |  0
+ {audio => profiles/audio}/media.h            |  0
+ {audio => profiles/audio}/player.c           |  0
+ {audio => profiles/audio}/player.h           |  0
+ {audio => profiles/audio}/rtp.h              |  0
+ {audio => profiles/audio}/sink.c             |  0
+ {audio => profiles/audio}/sink.h             |  0
+ {audio => profiles/audio}/source.c           |  0
+ {audio => profiles/audio}/source.h           |  0
+ {audio => profiles/audio}/telephony-dummy.c  |  0
+ {audio => profiles/audio}/telephony-maemo5.c |  0
+ {audio => profiles/audio}/telephony-maemo6.c |  0
+ {audio => profiles/audio}/telephony-ofono.c  |  0
+ {audio => profiles/audio}/telephony.h        |  0
+ {audio => profiles/audio}/transport.c        |  0
+ {audio => profiles/audio}/transport.h        |  0
+ tools/avinfo.c                               |  2 +-
+ 39 files changed, 28 insertions(+), 26 deletions(-)
+ rename {audio => profiles/audio}/a2dp-codecs.h (100%)
+ rename {audio => profiles/audio}/a2dp.c (100%)
+ rename {audio => profiles/audio}/a2dp.h (100%)
+ rename {audio => profiles/audio}/audio.conf (100%)
+ rename {audio => profiles/audio}/avctp.c (100%)
+ rename {audio => profiles/audio}/avctp.h (100%)
+ rename {audio => profiles/audio}/avdtp.c (100%)
+ rename {audio => profiles/audio}/avdtp.h (100%)
+ rename {audio => profiles/audio}/avrcp.c (100%)
+ rename {audio => profiles/audio}/avrcp.h (100%)
+ rename {audio => profiles/audio}/control.c (100%)
+ rename {audio => profiles/audio}/control.h (100%)
+ rename {audio => profiles/audio}/device.c (100%)
+ rename {audio => profiles/audio}/device.h (100%)
+ rename {audio => profiles/audio}/gateway.c (100%)
+ rename {audio => profiles/audio}/gateway.h (100%)
+ rename {audio => profiles/audio}/headset.c (100%)
+ rename {audio => profiles/audio}/headset.h (100%)
+ rename {audio => profiles/audio}/main.c (100%)
+ rename {audio => profiles/audio}/manager.c (100%)
+ rename {audio => profiles/audio}/manager.h (100%)
+ rename {audio => profiles/audio}/media.c (100%)
+ rename {audio => profiles/audio}/media.h (100%)
+ rename {audio => profiles/audio}/player.c (100%)
+ rename {audio => profiles/audio}/player.h (100%)
+ rename {audio => profiles/audio}/rtp.h (100%)
+ rename {audio => profiles/audio}/sink.c (100%)
+ rename {audio => profiles/audio}/sink.h (100%)
+ rename {audio => profiles/audio}/source.c (100%)
+ rename {audio => profiles/audio}/source.h (100%)
+ rename {audio => profiles/audio}/telephony-dummy.c (100%)
+ rename {audio => profiles/audio}/telephony-maemo5.c (100%)
+ rename {audio => profiles/audio}/telephony-maemo6.c (100%)
+ rename {audio => profiles/audio}/telephony-ofono.c (100%)
+ rename {audio => profiles/audio}/telephony.h (100%)
+ rename {audio => profiles/audio}/transport.c (100%)
+ rename {audio => profiles/audio}/transport.h (100%)
 
-The code of interest is in sdp_set_supp_feat. The bug is exposed by 
-registering a feature list (SDP_ATTR_SUPPORTED_FEATURES_LIST) of a 
-length greater than 256. The attribute sequence type in one of the 
-resulting attribute sequences is hard-coded to be SDP_SEQ8. When the 
-list grows beyond 256 bytes, the size descriptor type is not corrected 
-to SDP_SEQ16.
+diff --git a/Makefile.am b/Makefile.am
+index b069c03..47c24ed 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -105,29 +105,31 @@ endif
+ 
+ if AUDIOPLUGIN
+ builtin_modules += audio
+-builtin_sources += audio/main.c \
+-			audio/manager.h audio/manager.c \
+-			audio/gateway.h audio/gateway.c \
+-			audio/headset.h audio/headset.c \
+-			audio/control.h audio/control.c \
+-			audio/avctp.h audio/avctp.c \
+-			audio/avrcp.h audio/avrcp.c \
+-			audio/device.h audio/device.c \
+-			audio/source.h audio/source.c \
+-			audio/sink.h audio/sink.c \
+-			audio/a2dp.h audio/a2dp.c \
+-			audio/avdtp.h audio/avdtp.c \
+-			audio/media.h audio/media.c \
+-			audio/transport.h audio/transport.c \
+-			audio/player.h audio/player.c \
+-			audio/telephony.h audio/a2dp-codecs.h
+-builtin_nodist += audio/telephony.c
+-
+-noinst_LIBRARIES += audio/libtelephony.a
+-
+-audio_libtelephony_a_SOURCES = audio/telephony.h audio/telephony-dummy.c \
+-				audio/telephony-maemo5.c audio/telephony-ofono.c \
+-				audio/telephony-maemo6.c
++builtin_sources += profiles/audio/main.c \
++			profiles/audio/manager.h profiles/audio/manager.c \
++			profiles/audio/gateway.h profiles/audio/gateway.c \
++			profiles/audio/headset.h profiles/audio/headset.c \
++			profiles/audio/control.h profiles/audio/control.c \
++			profiles/audio/avctp.h profiles/audio/avctp.c \
++			profiles/audio/avrcp.h profiles/audio/avrcp.c \
++			profiles/audio/device.h profiles/audio/device.c \
++			profiles/audio/source.h profiles/audio/source.c \
++			profiles/audio/sink.h profiles/audio/sink.c \
++			profiles/audio/a2dp.h profiles/audio/a2dp.c \
++			profiles/audio/avdtp.h profiles/audio/avdtp.c \
++			profiles/audio/media.h profiles/audio/media.c \
++			profiles/audio/transport.h profiles/audio/transport.c \
++			profiles/audio/player.h profiles/audio/player.c \
++			profiles/audio/telephony.h profiles/audio/a2dp-codecs.h
++builtin_nodist += profiles/audio/telephony.c
++
++noinst_LIBRARIES += profiles/audio/libtelephony.a
++
++profiles_audio_libtelephony_a_SOURCES = profiles/audio/telephony.h
++				profiles/audio/telephony-dummy.c \
++				profiles/audio/telephony-maemo5.c \
++				profiles/audio/telephony-ofono.c \
++				profiles/audio/telephony-maemo6.c
+ endif
+ 
+ if SAPPLUGIN
+@@ -360,7 +362,7 @@ EXTRA_DIST += doc/manager-api.txt \
+ AM_CFLAGS += @DBUS_CFLAGS@ @GLIB_CFLAGS@
+ 
+ AM_CPPFLAGS = -I$(builddir)/lib -I$(builddir)/src -I$(srcdir)/src \
+-				-I$(srcdir)/audio -I$(srcdir)/gdbus \
++				-I$(srcdir)/profiles -I$(srcdir)/gdbus \
+ 				-I$(srcdir)/attrib -I$(srcdir)/btio \
+ 				-I$(srcdir)/tools -I$(builddir)/tools \
+ 				-I$(srcdir)/monitor
+@@ -401,7 +403,7 @@ MAINTAINERCLEANFILES = Makefile.in \
+ src/builtin.h: src/genbuiltin $(builtin_sources)
+ 	$(AM_V_GEN)$(srcdir)/src/genbuiltin $(builtin_modules) > $@
+ 
+-audio/telephony.c: audio/@TELEPHONY_DRIVER@
++profiles/audio/telephony.c: profiles/audio/@TELEPHONY_DRIVER@
+ 	$(AM_V_GEN)$(LN_S) $(abs_top_builddir)/$< $@
+ 
+ profiles/sap/sap.c: profiles/sap/@SAP_DRIVER@
+diff --git a/audio/a2dp-codecs.h b/profiles/audio/a2dp-codecs.h
+similarity index 100%
+rename from audio/a2dp-codecs.h
+rename to profiles/audio/a2dp-codecs.h
+diff --git a/audio/a2dp.c b/profiles/audio/a2dp.c
+similarity index 100%
+rename from audio/a2dp.c
+rename to profiles/audio/a2dp.c
+diff --git a/audio/a2dp.h b/profiles/audio/a2dp.h
+similarity index 100%
+rename from audio/a2dp.h
+rename to profiles/audio/a2dp.h
+diff --git a/audio/audio.conf b/profiles/audio/audio.conf
+similarity index 100%
+rename from audio/audio.conf
+rename to profiles/audio/audio.conf
+diff --git a/audio/avctp.c b/profiles/audio/avctp.c
+similarity index 100%
+rename from audio/avctp.c
+rename to profiles/audio/avctp.c
+diff --git a/audio/avctp.h b/profiles/audio/avctp.h
+similarity index 100%
+rename from audio/avctp.h
+rename to profiles/audio/avctp.h
+diff --git a/audio/avdtp.c b/profiles/audio/avdtp.c
+similarity index 100%
+rename from audio/avdtp.c
+rename to profiles/audio/avdtp.c
+diff --git a/audio/avdtp.h b/profiles/audio/avdtp.h
+similarity index 100%
+rename from audio/avdtp.h
+rename to profiles/audio/avdtp.h
+diff --git a/audio/avrcp.c b/profiles/audio/avrcp.c
+similarity index 100%
+rename from audio/avrcp.c
+rename to profiles/audio/avrcp.c
+diff --git a/audio/avrcp.h b/profiles/audio/avrcp.h
+similarity index 100%
+rename from audio/avrcp.h
+rename to profiles/audio/avrcp.h
+diff --git a/audio/control.c b/profiles/audio/control.c
+similarity index 100%
+rename from audio/control.c
+rename to profiles/audio/control.c
+diff --git a/audio/control.h b/profiles/audio/control.h
+similarity index 100%
+rename from audio/control.h
+rename to profiles/audio/control.h
+diff --git a/audio/device.c b/profiles/audio/device.c
+similarity index 100%
+rename from audio/device.c
+rename to profiles/audio/device.c
+diff --git a/audio/device.h b/profiles/audio/device.h
+similarity index 100%
+rename from audio/device.h
+rename to profiles/audio/device.h
+diff --git a/audio/gateway.c b/profiles/audio/gateway.c
+similarity index 100%
+rename from audio/gateway.c
+rename to profiles/audio/gateway.c
+diff --git a/audio/gateway.h b/profiles/audio/gateway.h
+similarity index 100%
+rename from audio/gateway.h
+rename to profiles/audio/gateway.h
+diff --git a/audio/headset.c b/profiles/audio/headset.c
+similarity index 100%
+rename from audio/headset.c
+rename to profiles/audio/headset.c
+diff --git a/audio/headset.h b/profiles/audio/headset.h
+similarity index 100%
+rename from audio/headset.h
+rename to profiles/audio/headset.h
+diff --git a/audio/main.c b/profiles/audio/main.c
+similarity index 100%
+rename from audio/main.c
+rename to profiles/audio/main.c
+diff --git a/audio/manager.c b/profiles/audio/manager.c
+similarity index 100%
+rename from audio/manager.c
+rename to profiles/audio/manager.c
+diff --git a/audio/manager.h b/profiles/audio/manager.h
+similarity index 100%
+rename from audio/manager.h
+rename to profiles/audio/manager.h
+diff --git a/audio/media.c b/profiles/audio/media.c
+similarity index 100%
+rename from audio/media.c
+rename to profiles/audio/media.c
+diff --git a/audio/media.h b/profiles/audio/media.h
+similarity index 100%
+rename from audio/media.h
+rename to profiles/audio/media.h
+diff --git a/audio/player.c b/profiles/audio/player.c
+similarity index 100%
+rename from audio/player.c
+rename to profiles/audio/player.c
+diff --git a/audio/player.h b/profiles/audio/player.h
+similarity index 100%
+rename from audio/player.h
+rename to profiles/audio/player.h
+diff --git a/audio/rtp.h b/profiles/audio/rtp.h
+similarity index 100%
+rename from audio/rtp.h
+rename to profiles/audio/rtp.h
+diff --git a/audio/sink.c b/profiles/audio/sink.c
+similarity index 100%
+rename from audio/sink.c
+rename to profiles/audio/sink.c
+diff --git a/audio/sink.h b/profiles/audio/sink.h
+similarity index 100%
+rename from audio/sink.h
+rename to profiles/audio/sink.h
+diff --git a/audio/source.c b/profiles/audio/source.c
+similarity index 100%
+rename from audio/source.c
+rename to profiles/audio/source.c
+diff --git a/audio/source.h b/profiles/audio/source.h
+similarity index 100%
+rename from audio/source.h
+rename to profiles/audio/source.h
+diff --git a/audio/telephony-dummy.c b/profiles/audio/telephony-dummy.c
+similarity index 100%
+rename from audio/telephony-dummy.c
+rename to profiles/audio/telephony-dummy.c
+diff --git a/audio/telephony-maemo5.c b/profiles/audio/telephony-maemo5.c
+similarity index 100%
+rename from audio/telephony-maemo5.c
+rename to profiles/audio/telephony-maemo5.c
+diff --git a/audio/telephony-maemo6.c b/profiles/audio/telephony-maemo6.c
+similarity index 100%
+rename from audio/telephony-maemo6.c
+rename to profiles/audio/telephony-maemo6.c
+diff --git a/audio/telephony-ofono.c b/profiles/audio/telephony-ofono.c
+similarity index 100%
+rename from audio/telephony-ofono.c
+rename to profiles/audio/telephony-ofono.c
+diff --git a/audio/telephony.h b/profiles/audio/telephony.h
+similarity index 100%
+rename from audio/telephony.h
+rename to profiles/audio/telephony.h
+diff --git a/audio/transport.c b/profiles/audio/transport.c
+similarity index 100%
+rename from audio/transport.c
+rename to profiles/audio/transport.c
+diff --git a/audio/transport.h b/profiles/audio/transport.h
+similarity index 100%
+rename from audio/transport.h
+rename to profiles/audio/transport.h
+diff --git a/tools/avinfo.c b/tools/avinfo.c
+index f036cf8..b01068d 100644
+--- a/tools/avinfo.c
++++ b/tools/avinfo.c
+@@ -39,7 +39,7 @@
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+ 
+-#include <a2dp-codecs.h>
++#include <audio/a2dp-codecs.h>
+ 
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/hci.h>
+-- 
+1.7.11.7
 
-Henceforth, the indicated size of this attribute sequence in an SDP 
-response PDU is whatever the lower byte of the feature list size is. 
-However, the complete list data is written in the SDP response, hence 
-forming a corrupted PDU.
-
-This bug can easily be reproduced by registering a number of Health 
-Applications (including a description string) such that the size of the 
-advertised feature list attribute is greater than 256 bytes. 
-Subsequently querying for this SDP record with sdptool, will result in 
-indicated errors about unknown data due to parsing errors.
-
-The quick and dirty fix is to change the return statement in 
-sdp_seq_alloc (lib/sdp.c:563) from:
-	return sdp_data_alloc(SDP_SEQ8, seq);
-to
-	return sdp_data_alloc(SDP_SEQ16, seq);
-
-However, it really looks like the data type should be determined 
-dynamically, or perhaps (a more involved fix,) instead of using nested 
-data sequences for the outer data type, perhaps it should be changed to 
-a list i.e. to use sdp_list_t instead sdp_data_t for the feature list.
-
-In addition, this problem (hard coded sequence length for a variable 
-length list) seems be repeated at various places throughout the code, so 
-this problem does not appear to be isolated to sdp_set_supp_feat/HDP. 
-For example sdp_set_lang_attr, sdp_set_uuidseq_attr, and 
-sdp_set_profile_descs all appear to form corrupted PDU if their 
-specified list grows beyond 256.
-
-I appreciate any input from anybody more familiar with the SDP code on 
-what the accepted/preferred approach is to get this issue fixed.
-
-Thanks,
-Bart
