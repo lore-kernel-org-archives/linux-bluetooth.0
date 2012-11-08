@@ -1,32 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <509BB56A.80609@samsung.com>
-Date: Thu, 08 Nov 2012 14:36:42 +0100
-From: Michael Knudsen <m.knudsen@samsung.com>
-MIME-version: 1.0
+From: Sunil Kumar Behera <sunil.behera@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: CSA2:  User space aspect
-Content-type: text/plain; charset=ISO-8859-1
+Cc: Sunil Kumar Behera <sunil.behera@samsung.com>
+Subject: [PATCH obexd v1 3/3] MAP: Reset ap_sent variable
+Date: Thu, 08 Nov 2012 16:36:26 +0530
+Message-id: <1352372786-18324-1-git-send-email-sunil.behera@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I'm currently looking into CSA2 and how it should be exposed to user
-space applications, so I want to make sure I am not duplicating any
-existing effort in this area.
+For multiple subsequent request for message listing
+we need to reset this variable to FALSE, so that each
+time the get next header function is executed properly.
+---
+ plugins/mas.c |    1 +
+ 1 file changed, 1 insertion(+)
 
-I've been doing some prestudying and my current thought is to expose
-this as socket options for the following parameters:
+diff --git a/plugins/mas.c b/plugins/mas.c
+index bdf2b6b..459df87 100644
+--- a/plugins/mas.c
++++ b/plugins/mas.c
+@@ -162,6 +162,7 @@ static void reset_request(struct mas_session *mas)
+ 
+ 	mas->nth_call = FALSE;
+ 	mas->finished = FALSE;
++	mas->ap_sent = FALSE;
+ }
+ 
+ static void mas_clean(struct mas_session *mas)
+-- 
+1.7.9.5
 
-	Transmit_Coding_Format
-	Receive_Coding_Format
-
-	Input_Coding_Format
-	Output_Coding_Format
-
-	Input_Data_Path
-	Output_Data_Path
-
-If anyone else has an ideas or opinions about this, please speak up,
-otherwise I'll try coming up with an interface specification with
-more details.
-
--m.
