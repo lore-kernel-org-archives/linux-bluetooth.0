@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v0 7/7] adapter: Remove FindDevice method from D-Bus API
-Date: Thu,  8 Nov 2012 15:30:15 +0100
-Message-Id: <1352385015-2127-8-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v0 6/7] adapter: Remove redundant Devices property
+Date: Thu,  8 Nov 2012 15:30:14 +0100
+Message-Id: <1352385015-2127-7-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1352385015-2127-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1352385015-2127-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,89 +12,90 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-ObjectManager.GetManagedObjects() returns all devices and their
-corresponding properties to any interested client. The device address is
-included in the property dictionary and therefore having such a
-FindDevice method is an unnecessary duplication.
+The ObjectManager interface already reports the list of devices, so the
+the property can be entirely removed.
 ---
- doc/adapter-api.txt |  7 -------
- src/adapter.c       | 38 --------------------------------------
- 2 files changed, 45 deletions(-)
+ doc/adapter-api.txt |  4 ----
+ src/adapter.c       | 30 ------------------------------
+ 2 files changed, 34 deletions(-)
 
 diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 98a3919..f976992 100644
+index 13941c9..98a3919 100644
 --- a/doc/adapter-api.txt
 +++ b/doc/adapter-api.txt
-@@ -64,13 +64,6 @@ Methods		void RequestSession()
- 					 org.bluez.Error.Failed
- 					 org.bluez.Error.NotAuthorized
+@@ -171,10 +171,6 @@ Properties	string Address [readonly]
  
--		object FindDevice(string address)
--
--			Returns the object path of device for given address.
--
--			Possible Errors: org.bluez.Error.DoesNotExist
--					 org.bluez.Error.InvalidArguments
--
- 		void RemoveDevice(object device)
+ 			Indicates that a device discovery procedure is active.
  
- 			This removes the remote device object at the given
+-		array{object} Devices [readonly]
+-
+-			List of device object paths.
+-
+ 		array{string} UUIDs [readonly]
+ 
+ 			List of 128-bit UUIDs that represents the available
 diff --git a/src/adapter.c b/src/adapter.c
-index 4d9820f..2be01d6 100644
+index 9c4765e..4d9820f 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -1472,40 +1472,6 @@ static DBusMessage *remove_device(DBusConnection *conn, DBusMessage *msg,
- 	return NULL;
+@@ -974,9 +974,6 @@ static struct btd_device *adapter_create_device(struct btd_adapter *adapter,
+ 
+ 	adapter->devices = g_slist_append(adapter->devices, device);
+ 
+-	g_dbus_emit_property_changed(btd_get_dbus_connection(),
+-				adapter->path, ADAPTER_INTERFACE, "Devices");
+-
+ 	return device;
  }
  
--static DBusMessage *find_device(DBusConnection *conn, DBusMessage *msg,
--								void *data)
+@@ -1027,9 +1024,6 @@ void adapter_remove_device(struct btd_adapter *adapter,
+ 		service_auth_cancel(auth);
+ 	}
+ 
+-	g_dbus_emit_property_changed(btd_get_dbus_connection(),
+-				adapter->path, ADAPTER_INTERFACE, "Devices");
+-
+ 	device_remove(dev, remove_storage);
+ }
+ 
+@@ -1335,29 +1329,6 @@ static gboolean adapter_property_get_discovering(
+ 	return TRUE;
+ }
+ 
+-static gboolean adapter_property_get_devices(
+-					const GDBusPropertyTable *property,
+-					DBusMessageIter *iter, void *data)
 -{
 -	struct btd_adapter *adapter = data;
--	struct btd_device *device;
--	DBusMessage *reply;
--	const gchar *address;
+-	DBusMessageIter entry;
 -	GSList *l;
--	const gchar *dev_path;
 -
--	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &address,
--						DBUS_TYPE_INVALID))
--		return btd_error_invalid_args(msg);
+-	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+-				DBUS_TYPE_OBJECT_PATH_AS_STRING, &entry);
 -
--	l = g_slist_find_custom(adapter->devices,
--			address, (GCompareFunc) device_address_cmp);
--	if (!l)
--		return btd_error_does_not_exist(msg);
+-	for (l = adapter->devices; l != NULL; l = l->next) {
+-		const char *path = device_get_path(l->data);
 -
--	device = l->data;
+-		dbus_message_iter_append_basic(&entry, DBUS_TYPE_OBJECT_PATH,
+-								&path);
+-	}
 -
--	reply = dbus_message_new_method_return(msg);
--	if (!reply)
--		return NULL;
+-	dbus_message_iter_close_container(iter, &entry);
 -
--	dev_path = device_get_path(device);
--
--	dbus_message_append_args(reply,
--				DBUS_TYPE_OBJECT_PATH, &dev_path,
--				DBUS_TYPE_INVALID);
--
--	return reply;
+-	return TRUE;
 -}
 -
- static void agent_removed(struct agent *agent, struct btd_adapter *adapter)
+ static gboolean adapter_property_get_uuids(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
  {
- 	mgmt_set_io_capability(adapter->dev_id, IO_CAPABILITY_NOINPUTNOOUTPUT);
-@@ -1577,10 +1543,6 @@ static const GDBusMethodTable adapter_methods[] = {
- 	{ GDBUS_ASYNC_METHOD("RemoveDevice",
- 			GDBUS_ARGS({ "device", "o" }), NULL,
- 			remove_device) },
--	{ GDBUS_METHOD("FindDevice",
--			GDBUS_ARGS({ "address", "s" }),
--			GDBUS_ARGS({ "device", "o" }),
--			find_device) },
- 	{ GDBUS_METHOD("RegisterAgent",
- 			GDBUS_ARGS({ "agent", "o" },
- 					{ "capability", "s" }), NULL,
+@@ -1636,7 +1607,6 @@ static const GDBusPropertyTable adapter_properties[] = {
+ 	{ "PairableTimeout", "u", adapter_property_get_pairable_timeout,
+ 				adapter_property_set_pairable_timeout },
+ 	{ "Discovering", "b", adapter_property_get_discovering },
+-	{ "Devices", "ao", adapter_property_get_devices },
+ 	{ "UUIDs", "as", adapter_property_get_uuids },
+ 	{ }
+ };
 -- 
 1.7.11.7
 
