@@ -2,31 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Sunil Kumar Behera <sunil.behera@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sunil Kumar Behera <sunil.behera@samsung.com>
-Subject: [PATCH obexd v1 1/3] MAP: Add get_next_header() in message listing
-Date: Thu, 08 Nov 2012 16:32:58 +0530
-Message-id: <1352372578-18252-1-git-send-email-sunil.behera@samsung.com>
+Subject: [PATCH obexd 3/3] Reset ap_sent variable
+Date: Thu, 08 Nov 2012 16:16:14 +0530
+Message-id: <1352371574-18110-1-git-send-email-sunil.behera@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In case of message listing we need to send application
-parameters in response and also it is required for sending
-response to message listing size request.
+For multiple subsequent request for message listing
+we need to reset this variable to FALSE. So that each
+time the get next header function is executed properly.
 ---
  plugins/mas.c |    1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/plugins/mas.c b/plugins/mas.c
-index 186d267..319c87f 100644
+index bdf2b6b..459df87 100644
 --- a/plugins/mas.c
 +++ b/plugins/mas.c
-@@ -810,6 +810,7 @@ static struct obex_mime_type_driver mime_msg_listing = {
- 	.target = MAS_TARGET,
- 	.target_size = TARGET_SIZE,
- 	.mimetype = "x-bt/MAP-msg-listing",
-+	.get_next_header = any_get_next_header,
- 	.open = msg_listing_open,
- 	.close = any_close,
- 	.read = any_read,
+@@ -162,6 +162,7 @@ static void reset_request(struct mas_session *mas)
+ 
+ 	mas->nth_call = FALSE;
+ 	mas->finished = FALSE;
++	mas->ap_sent = FALSE;
+ }
+ 
+ static void mas_clean(struct mas_session *mas)
 -- 
 1.7.9.5
 
