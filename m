@@ -1,39 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1352388729.7910.11.camel@zingle>
-Subject: Re: Moving bluetooth plugin to gstreamer
-From: Tim-Philipp =?ISO-8859-1?Q?M=FCller?= <t.i.m@zen.co.uk>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Discussion of the development of and with GStreamer
-	<gstreamer-devel@lists.freedesktop.org>,
-	linux-bluetooth@vger.kernel.org,
-	Thiago Sousa Santos <thiagossantos@gmail.com>
-Date: Thu, 08 Nov 2012 15:32:09 +0000
-In-Reply-To: <CABBYNZ+vGYoj+0VpAb_9HAbCSRZ+F_-5zbd+WODG4_Qrz_vcaw@mail.gmail.com>
-References: <CABBYNZJ16G7zOEm+AJwmb8SeEtRyGzfiKFf+QsK8NdQGUUGqDA@mail.gmail.com>
-	 <1345136955.28588.5.camel@zingle> <1345173220.13726.31.camel@aeonflux>
-	 <CAD2+Bb1+32YKBTNnG93dchn9SNU0ur4ZKCZtKV80ohc3bkwsYg@mail.gmail.com>
-	 <CABBYNZ+vGYoj+0VpAb_9HAbCSRZ+F_-5zbd+WODG4_Qrz_vcaw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Message-ID: <509BD103.2040808@elbrys.com>
+Date: Thu, 08 Nov 2012 10:34:27 -0500
+From: Bart Westgeest <bart@elbrys.com>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: Feedback on potential fix for issue while advertising Feature List
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2012-11-08 at 17:20 +0200, Luiz Augusto von Dentz wrote:
+Hi folks,
 
-Hi Luiz,
+I've tracked down the root cause of an issue, and am looking for 
+input/feedback on what the acceptable/preferred fix is.
 
-> Im about to send a patch to remove this from BlueZ, I hope somebody
-> from gstreamer community can step up and take the task to move this to
-> gstreamer tree, if nobody does I will eventually do it but this might
-> take some time for me since Im quite busy with upcoming BlueZ 5.0
-> (which is also the reason why we are cleaning up the tree).
+The code of interest is in sdp_set_supp_feat. The bug is exposed by 
+registering a feature list (SDP_ATTR_SUPPORTED_FEATURES_LIST) of a 
+length greater than 256. The attribute sequence type in one of the 
+resulting attribute sequences is hard-coded to be SDP_SEQ8. When the 
+list grows beyond 256 bytes, the size descriptor type is not corrected 
+to SDP_SEQ16.
 
-This is the plan for the current GStreamer dev cycle (1.1.x) [0], so
-should happen really soon now. (I'll do it if no one else is faster.)
+Henceforth, the indicated size of this attribute sequence in an SDP 
+response PDU is whatever the lower byte of the feature list size is. 
+However, the complete list data is written in the SDP response, hence 
+forming a corrupted PDU.
 
-Cheers
- -Tim
+This bug can easily be reproduced by registering a number of Health 
+Applications (including a description string) such that the size of the 
+advertised feature list attribute is greater than 256 bytes. 
+Subsequently querying for this SDP record with sdptool, will result in 
+indicated errors about unknown data due to parsing errors.
 
-[0] http://gstreamer.freedesktop.org/wiki/ReleasePlanning/RoadMap
+The quick and dirty fix is to change the return statement in 
+sdp_seq_alloc (lib/sdp.c:563) from:
+	return sdp_data_alloc(SDP_SEQ8, seq);
+to
+	return sdp_data_alloc(SDP_SEQ16, seq);
 
+However, it really looks like the data type should be determined 
+dynamically, or perhaps (a more involved fix,) instead of using nested 
+data sequences for the outer data type, perhaps it should be changed to 
+a list i.e. to use sdp_list_t instead sdp_data_t for the feature list.
 
+In addition, this problem (hard coded sequence length for a variable 
+length list) seems be repeated at various places throughout the code, so 
+this problem does not appear to be isolated to sdp_set_supp_feat/HDP. 
+For example sdp_set_lang_attr, sdp_set_uuidseq_attr, and 
+sdp_set_profile_descs all appear to form corrupted PDU if their 
+specified list grows beyond 256.
+
+I appreciate any input from anybody more familiar with the SDP code on 
+what the accepted/preferred approach is to get this issue fixed.
+
+Thanks,
+Bart
