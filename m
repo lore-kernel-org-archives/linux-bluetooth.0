@@ -2,31 +2,53 @@ Return-Path: <cyrus@holtmann.org>
 From: Sunil Kumar Behera <sunil.behera@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sunil Kumar Behera <sunil.behera@samsung.com>
-Subject: [PATCH obexd v1 3/3] MAP: Reset ap_sent variable
-Date: Thu, 08 Nov 2012 16:36:26 +0530
-Message-id: <1352372786-18324-1-git-send-email-sunil.behera@samsung.com>
+Subject: [PATCH obexd v1 2/3] MAP: Add MSETime application parameter
+Date: Thu, 08 Nov 2012 16:34:27 +0530
+Message-id: <1352372667-18288-1-git-send-email-sunil.behera@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For multiple subsequent request for message listing
-we need to reset this variable to FALSE, so that each
-time the get next header function is executed properly.
+MSETime application parameter shall be used in the response
+to report the Local Time basis of the MSE.
 ---
- plugins/mas.c |    1 +
- 1 file changed, 1 insertion(+)
+ plugins/mas.c      |    4 +++-
+ plugins/messages.h |    1 +
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/plugins/mas.c b/plugins/mas.c
-index bdf2b6b..459df87 100644
+index 319c87f..bdf2b6b 100644
 --- a/plugins/mas.c
 +++ b/plugins/mas.c
-@@ -162,6 +162,7 @@ static void reset_request(struct mas_session *mas)
- 
- 	mas->nth_call = FALSE;
- 	mas->finished = FALSE;
-+	mas->ap_sent = FALSE;
+@@ -284,7 +284,7 @@ static const char *yesorno(gboolean a)
  }
  
- static void mas_clean(struct mas_session *mas)
+ static void get_messages_listing_cb(void *session, int err, uint16_t size,
+-					gboolean newmsg,
++					gboolean newmsg, gchar *msetime,
+ 					const struct messages_message *entry,
+ 					void *user_data)
+ {
+@@ -403,6 +403,8 @@ proceed:
+ 		mas->outparams = g_obex_apparam_set_uint8(mas->outparams,
+ 						MAP_AP_NEWMESSAGE,
+ 						newmsg ? 1 : 0);
++		mas->outparams = g_obex_apparam_set_string(mas->outparams,
++						MAP_AP_MSETIME, msetime);
+ 	}
+ 
+ 	if (err != -EAGAIN)
+diff --git a/plugins/messages.h b/plugins/messages.h
+index 00a16b1..2ab4ba1 100644
+--- a/plugins/messages.h
++++ b/plugins/messages.h
+@@ -226,6 +226,7 @@ int messages_get_folder_listing(void *session, const char *name, uint16_t max,
+  */
+ typedef void (*messages_get_messages_listing_cb)(void *session, int err,
+ 					uint16_t size, gboolean newmsg,
++					gchar *msetime,
+ 					const struct messages_message *message,
+ 					void *user_data);
+ 
 -- 
 1.7.9.5
 
