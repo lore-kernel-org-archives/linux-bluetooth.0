@@ -1,58 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 00/15] thermometer plugin updates
-Date: Fri, 9 Nov 2012 09:55:42 +0100
-Message-ID: <1352451357-22097-1-git-send-email-andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Syam Sidhardhan <s.syam@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Syam Sidhardhan <s.syam@samsung.com>
+Subject: [PATCH BlueZ 2/2] l2test: Add support to test auto select PSM
+Date: Fri, 09 Nov 2012 14:01:29 +0530
+Message-id: <1352449889-5149-2-git-send-email-s.syam@samsung.com>
+In-reply-to: <1352449889-5149-1-git-send-email-s.syam@samsung.com>
+References: <1352449889-5149-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This patch enable us to test the auto select PSM by passing
+PSM value as 0.
 
-Here are few patches to update thermometer plugin with features already
-implemented in other plugins:
-- store attributes handles directly in thermometer structure instead of
-  nested lists of structures which we need to traverse later (and we
-  only need 3 handles stored to support all use cases)
-- register attio handlers for specific handles instead of one ind and
-  notif handler globally
-- change properties handling to DBus.Properties
-- and some minor fixes
+Ex: l2test -d -P 0
+l2test[2585]: Waiting for connection on psm 4099 ...
+---
+ test/l2test.c |    4 +---
+ 1 files changed, 1 insertions(+), 3 deletions(-)
 
-This is tested with PTS 4.5.3. There's only problem with patch #9 which
-"breaks" testcase TP/THF/CO/BV-09-I - this is because PTS sends invalid
-properties for Measurement Interval characteristic (it does not have
-indicate property so we do not register ind handler for it). I already
-filled issue on PTS.
-
-Comments are welcome.
-
-
-Andrzej Kaczmarek (15):
-  thermometer: Store Temperature Measurement CCC handle in struct
-  thermometer: Store Intermediate Temperature CCC handle in struct
-  thermometer: Store Measurement Interval value handle in struct
-  thermometer: Use dedicated handler for Intermediate Temperature
-  thermometer: Use dedicated handler for Temperature Measurement
-  thermometer: Use dedicated handler for Measurement Interval
-  thermometer: Remove descriptor structure
-  thermometer: Remove storage of all discovered characteristics
-  thermometer: Discover Measurement Interval descriptors only if needed
-  thermometer: Always write CCC value when connecting
-  thermometer: Make temp_type array static
-  thermometer: Add DBus.Properties support
-  thermometer: Remove legacy properties code
-  doc: Update thermometer API document
-  test: Update test-thermometer for DBus.Properties
-
- doc/thermometer-api.txt            |   18 -
- profiles/thermometer/thermometer.c | 1008 +++++++++++++++++-------------------
- test/test-thermometer              |   13 +-
- 3 files changed, 478 insertions(+), 561 deletions(-)
-
+diff --git a/test/l2test.c b/test/l2test.c
+index 7645681..72ad4ba 100644
+--- a/test/l2test.c
++++ b/test/l2test.c
+@@ -87,7 +87,7 @@ static long buffer_size = 2048;
+ 
+ /* Default addr and psm and cid */
+ static bdaddr_t bdaddr;
+-static unsigned short psm = 0x1011;
++static unsigned short psm = 0;
+ static unsigned short cid = 0;
+ 
+ /* Default number of frames to send (-1 = infinite) */
+@@ -375,8 +375,6 @@ static int do_connect(char *svr)
+ 		addr.l2_cid = htobs(cid);
+ 	else if (psm)
+ 		addr.l2_psm = htobs(psm);
+-	else
+-		goto error;
+ 
+ 	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0 ) {
+ 		syslog(LOG_ERR, "Can't connect: %s (%d)",
 -- 
-1.8.0
+1.7.4.1
 
