@@ -1,38 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1352457867.16204.9.camel@aeonflux>
-Subject: Re: [PATCH BlueZ 1/2] build: Require D-Bus 1.5 or later
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Syam Sidhardhan <s.syam@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <1352372786-18324-1-git-send-email-sunil.behera@samsung.com>
+References: <1352372786-18324-1-git-send-email-sunil.behera@samsung.com>
+Date: Fri, 9 Nov 2012 12:22:38 +0200
+Message-ID: <CABBYNZLfEr=NcZNV6m67FtEFPE6EP3tOwOCcNveTvAhGK2iEkw@mail.gmail.com>
+Subject: Re: [PATCH obexd v1 3/3] MAP: Reset ap_sent variable
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Sunil Kumar Behera <sunil.behera@samsung.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Fri, 09 Nov 2012 11:44:27 +0100
-In-Reply-To: <1352449889-5149-1-git-send-email-s.syam@samsung.com>
-References: <1352449889-5149-1-git-send-email-s.syam@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+Hi Sunil,
 
-> The gdbus require D-Bus 1.5 version.
-> 
-> Log:
->   CC     gdbus/object.o
-> gdbus/object.c: In function ‘properties_set’:
-> gdbus/object.c:876:7: error: ‘DBUS_ERROR_UNKNOWN_PROPERTY’ undeclared
->  (first use in this function)
-> gdbus/object.c:876:7: note: each undeclared identifier is reported
->  only once for each function it appears in
-> gdbus/object.c:881:6: error: ‘DBUS_ERROR_PROPERTY_READ_ONLY’
->  undeclared (first use in this function)
-> make[1]: *** [gdbus/object.o] Error 1
-> make: *** [all] Error 2
+On Thu, Nov 8, 2012 at 1:06 PM, Sunil Kumar Behera
+<sunil.behera@samsung.com> wrote:
+> For multiple subsequent request for message listing
+> we need to reset this variable to FALSE, so that each
+> time the get next header function is executed properly.
+> ---
+>  plugins/mas.c |    1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/plugins/mas.c b/plugins/mas.c
+> index bdf2b6b..459df87 100644
+> --- a/plugins/mas.c
+> +++ b/plugins/mas.c
+> @@ -162,6 +162,7 @@ static void reset_request(struct mas_session *mas)
+>
+>         mas->nth_call = FALSE;
+>         mas->finished = FALSE;
+> +       mas->ap_sent = FALSE;
+>  }
+>
+>  static void mas_clean(struct mas_session *mas)
+> --
+> 1.7.9.5
 
-if they are still simple defines, then lets just #ifndef them and define
-them in gdbus/object.c
-
-Regards
-
-Marcel
+I went ahead and pushed this upstream, the other 2 patches Im waiting
+your reply.
 
 
+-- 
+Luiz Augusto von Dentz
