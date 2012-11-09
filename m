@@ -1,47 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
-From: Syam Sidhardhan <s.syam@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Syam Sidhardhan <s.syam@samsung.com>
-Subject: [PATCH BlueZ 1/2] build: Require D-Bus 1.5 or later
-Date: Fri, 09 Nov 2012 14:01:28 +0530
-Message-id: <1352449889-5149-1-git-send-email-s.syam@samsung.com>
+Date: Fri, 9 Nov 2012 09:11:53 +0100
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Ajay <ajay.kv@globaledgesoft.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: BLE issue - Reusing  Existing LE physical link
+Message-ID: <20121109081153.GA29180@echo>
+References: <509A8FD4.1080800@globaledgesoft.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <509A8FD4.1080800@globaledgesoft.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The gdbus require D-Bus 1.5 version.
+Hi,
 
-Log:
-  CC     gdbus/object.o
-gdbus/object.c: In function ‘properties_set’:
-gdbus/object.c:876:7: error: ‘DBUS_ERROR_UNKNOWN_PROPERTY’ undeclared
- (first use in this function)
-gdbus/object.c:876:7: note: each undeclared identifier is reported
- only once for each function it appears in
-gdbus/object.c:881:6: error: ‘DBUS_ERROR_PROPERTY_READ_ONLY’
- undeclared (first use in this function)
-make[1]: *** [gdbus/object.o] Error 1
-make: *** [all] Error 2
----
- acinclude.m4 |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+On 22:14 Wed 07 Nov, Ajay wrote:
+>  Hi ,
+> 	 I came across an issue as part of my "BLE test tool project"  .
+> After the first successful connection of BLE l2cap connection
+> (client server) , we just retains the physical link  without calling
+> le_connection cancel() (logical link is closed) (patch has been
+> added).  But second time   i wanted to use the existing connection ,
+> without calling hci_le_connect() . but  here l2cap connect fails . I
+> noticed in normal acl link , the same scenario is working on
+> existing link.  so  can  we do the same  working on BLE link .
+> (ubuntu 11.10  and kernel 3.2.5)
 
-diff --git a/acinclude.m4 b/acinclude.m4
-index ddc8183..1ae402c 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -92,8 +92,8 @@ AC_DEFUN([AC_INIT_BLUEZ], [
- ])
- 
- AC_DEFUN([AC_PATH_DBUS], [
--	PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.4, dummy=yes,
--				AC_MSG_ERROR(D-Bus >= 1.4 is required))
-+	PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.5, dummy=yes,
-+				AC_MSG_ERROR(D-Bus >= 1.5 is required))
- 	AC_SUBST(DBUS_CFLAGS)
- 	AC_SUBST(DBUS_LIBS)
- ])
+Could you please test with a recent kernel, 3.6.x preferably. LE support has
+improved a lot in recent kernels.
+
+> -- 
+> Thanks & regards
+> 
+>  AJAY KV
+>  GlobalEdge software Ltd
+>  8892753703
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+Cheers,
 -- 
-1.7.4.1
-
+Vinicius
