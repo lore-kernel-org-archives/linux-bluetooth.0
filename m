@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 04/15] thermometer: Use dedicated handler for Intermediate Temperature
-Date: Fri, 9 Nov 2012 09:55:46 +0100
-Message-ID: <1352451357-22097-5-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 08/15] thermometer: Remove storage of all discovered characteristics
+Date: Fri, 9 Nov 2012 09:55:50 +0100
+Message-ID: <1352451357-22097-9-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1352451357-22097-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1352451357-22097-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,420 +12,276 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch replaces global notifications handler with one registered only
-for Intermediate Temperature value notifications.
+This patch removes structures used to keep all discovered characteristics
+in thermometer structure. Useful values are already stored directly in
+this structure.
+
+characteristic structure is now only used as temporary user data when
+discovering descriptors for particular characteristic.
 ---
- profiles/thermometer/thermometer.c | 345 ++++++++++++++++++-------------------
- 1 file changed, 168 insertions(+), 177 deletions(-)
+ profiles/thermometer/thermometer.c | 138 +++++++++++++++++--------------------
+ 1 file changed, 65 insertions(+), 73 deletions(-)
 
 diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
-index d65fc0d..5ed0553 100644
+index 462173d..63d9c1e 100644
 --- a/profiles/thermometer/thermometer.c
 +++ b/profiles/thermometer/thermometer.c
-@@ -71,7 +71,8 @@ struct thermometer {
- 	struct att_range		*svc_range;	/* Thermometer range */
- 	guint				attioid;	/* Att watcher id */
- 	guint				attindid;	/* Att incications id */
--	guint				attnotid;	/* Att notif id */
-+	/* attio id for Intermediate Temperature value notifications */
-+	guint				attio_intermediate_id;
- 	GSList				*chars;		/* Characteristics */
+@@ -76,7 +76,6 @@ struct thermometer {
+ 	guint				attio_intermediate_id;
+ 	/* attio id for Measurement Interval value indications */
+ 	guint				attio_interval_id;
+-	GSList				*chars;		/* Characteristics */
  	gboolean			intermediate;
  	uint8_t				type;
-@@ -179,8 +180,7 @@ static void destroy_thermometer(gpointer user_data)
- 	if (t->attindid > 0)
- 		g_attrib_unregister(t->attrib, t->attindid);
- 
--	if (t->attnotid > 0)
--		g_attrib_unregister(t->attrib, t->attnotid);
-+	g_attrib_unregister(t->attrib, t->attio_intermediate_id);
- 
- 	if (t->attrib != NULL)
- 		g_attrib_unref(t->attrib);
-@@ -304,6 +304,162 @@ static void change_property(struct thermometer *t, const char *name,
- 	}
- }
- 
-+static void update_watcher(gpointer data, gpointer user_data)
-+{
-+	struct watcher *w = data;
-+	struct measurement *m = user_data;
-+	const gchar *path = device_get_path(m->t->dev);
-+	DBusMessageIter iter;
-+	DBusMessageIter dict;
-+	DBusMessage *msg;
-+
-+	msg = dbus_message_new_method_call(w->srv, w->path,
-+				THERMOMETER_WATCHER_INTERFACE,
-+				"MeasurementReceived");
-+	if (msg == NULL)
-+		return;
-+
-+	dbus_message_iter_init_append(msg, &iter);
-+
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH , &path);
-+
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
-+			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
-+			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
-+
-+	dict_append_entry(&dict, "Exponent", DBUS_TYPE_INT16, &m->exp);
-+	dict_append_entry(&dict, "Mantissa", DBUS_TYPE_INT32, &m->mant);
-+	dict_append_entry(&dict, "Unit", DBUS_TYPE_STRING, &m->unit);
-+
-+	if (m->suptime)
-+		dict_append_entry(&dict, "Time", DBUS_TYPE_UINT64, &m->time);
-+
-+	dict_append_entry(&dict, "Type", DBUS_TYPE_STRING, &m->type);
-+	dict_append_entry(&dict, "Measurement", DBUS_TYPE_STRING, &m->value);
-+
-+	dbus_message_iter_close_container(&iter, &dict);
-+
-+	dbus_message_set_no_reply(msg, TRUE);
-+	g_dbus_send_message(btd_get_dbus_connection(), msg);
-+}
-+
-+static void recv_measurement(struct thermometer *t, struct measurement *m)
-+{
-+	GSList *wlist;
-+
-+	m->t = t;
-+
-+	if (g_strcmp0(m->value, "intermediate") == 0)
-+		wlist = t->tadapter->iwatchers;
-+	else
-+		wlist = t->tadapter->fwatchers;
-+
-+	g_slist_foreach(wlist, update_watcher, m);
-+}
-+
-+static void proc_measurement(struct thermometer *t, const uint8_t *pdu,
-+						uint16_t len, gboolean final)
-+{
-+	struct measurement m;
-+	const char *type = NULL;
-+	uint8_t flags;
-+	uint32_t raw;
-+
-+	/* skip opcode and handle */
-+	pdu += 3;
-+	len -= 3;
-+
-+	if (len < 1) {
-+		DBG("Mandatory flags are not provided");
-+		return;
-+	}
-+
-+	memset(&m, 0, sizeof(m));
-+
-+	flags = *pdu;
-+
-+	if (flags & TEMP_UNITS)
-+		m.unit = "fahrenheit";
-+	else
-+		m.unit = "celsius";
-+
-+	pdu++;
-+	len--;
-+
-+	if (len < 4) {
-+		DBG("Mandatory temperature measurement value is not provided");
-+		return;
-+	}
-+
-+	raw = att_get_u32(pdu);
-+	m.mant = raw & 0x00FFFFFF;
-+	m.exp = ((int32_t) raw) >> 24;
-+
-+	if (m.mant & 0x00800000) {
-+		/* convert to C2 negative value */
-+		m.mant = m.mant - FLOAT_MAX_MANTISSA;
-+	}
-+
-+	pdu += 4;
-+	len -= 4;
-+
-+	if (flags & TEMP_TIME_STAMP) {
-+		struct tm ts;
-+		time_t time;
-+
-+		if (len < 7) {
-+			DBG("Time stamp is not provided");
-+			return;
-+		}
-+
-+		ts.tm_year = att_get_u16(pdu) - 1900;
-+		ts.tm_mon = *(pdu + 2) - 1;
-+		ts.tm_mday = *(pdu + 3);
-+		ts.tm_hour = *(pdu + 4);
-+		ts.tm_min = *(pdu + 5);
-+		ts.tm_sec = *(pdu + 6);
-+		ts.tm_isdst = -1;
-+
-+		time = mktime(&ts);
-+		m.time = (uint64_t) time;
-+		m.suptime = TRUE;
-+
-+		pdu += 7;
-+		len -= 7;
-+	}
-+
-+	if (flags & TEMP_TYPE) {
-+		if (len < 1) {
-+			DBG("Temperature type is not provided");
-+			return;
-+		}
-+
-+		type = temptype2str(*pdu);
-+	} else if (t->has_type) {
-+		type = temptype2str(t->type);
-+	}
-+
-+	m.type = g_strdup(type);
-+	m.value = final ? "final" : "intermediate";
-+
-+	recv_measurement(t, &m);
-+	g_free(m.type);
-+}
-+
-+static void intermediate_notify_handler(const uint8_t *pdu, uint16_t len,
-+							gpointer user_data)
-+{
-+	struct thermometer *t = user_data;
-+
-+	if (len < 3) {
-+		DBG("Bad pdu received");
-+		return;
-+	}
-+
-+	proc_measurement(t, pdu, len, FALSE);
-+}
-+
- static void valid_range_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
- 							gpointer user_data)
- {
-@@ -514,10 +670,15 @@ static void read_interval_cb(guint8 status, const guint8 *pdu, guint16 len,
- 
- static void process_thermometer_char(struct characteristic *ch)
- {
-+	struct thermometer *t = ch->t;
-+
- 	if (g_strcmp0(ch->attr.uuid, INTERMEDIATE_TEMPERATURE_UUID) == 0) {
- 		gboolean intermediate = TRUE;
- 		change_property(ch->t, "Intermediate", &intermediate);
--		return;
-+
-+		t->attio_intermediate_id = g_attrib_register(t->attrib,
-+				ATT_OP_HANDLE_NOTIFY, ch->attr.value_handle,
-+				intermediate_notify_handler, t, NULL);
- 	} else if (g_strcmp0(ch->attr.uuid, TEMPERATURE_TYPE_UUID) == 0) {
- 		gatt_read_char(ch->t->attrib, ch->attr.value_handle,
- 							read_temp_type_cb, ch);
-@@ -941,149 +1102,6 @@ static const GDBusSignalTable thermometer_signals[] = {
- 	{ }
+ 	uint16_t			interval;
+@@ -91,8 +90,8 @@ struct thermometer {
  };
  
--static void update_watcher(gpointer data, gpointer user_data)
--{
--	struct watcher *w = data;
--	struct measurement *m = user_data;
--	const gchar *path = device_get_path(m->t->dev);
--	DBusMessageIter iter;
--	DBusMessageIter dict;
--	DBusMessage *msg;
--
--	msg = dbus_message_new_method_call(w->srv, w->path,
--				THERMOMETER_WATCHER_INTERFACE,
--				"MeasurementReceived");
--	if (msg == NULL)
--		return;
--
--	dbus_message_iter_init_append(msg, &iter);
--
--	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH , &path);
--
--	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
--			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
--			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
--			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
--
--	dict_append_entry(&dict, "Exponent", DBUS_TYPE_INT16, &m->exp);
--	dict_append_entry(&dict, "Mantissa", DBUS_TYPE_INT32, &m->mant);
--	dict_append_entry(&dict, "Unit", DBUS_TYPE_STRING, &m->unit);
--
--	if (m->suptime)
--		dict_append_entry(&dict, "Time", DBUS_TYPE_UINT64, &m->time);
--
--	dict_append_entry(&dict, "Type", DBUS_TYPE_STRING, &m->type);
--	dict_append_entry(&dict, "Measurement", DBUS_TYPE_STRING, &m->value);
--
--	dbus_message_iter_close_container(&iter, &dict);
--
--	dbus_message_set_no_reply(msg, TRUE);
--	g_dbus_send_message(btd_get_dbus_connection(), msg);
--}
--
--static void recv_measurement(struct thermometer *t, struct measurement *m)
--{
--	GSList *wlist;
--
--	m->t = t;
--
--	if (g_strcmp0(m->value, "intermediate") == 0)
--		wlist = t->tadapter->iwatchers;
--	else
--		wlist = t->tadapter->fwatchers;
--
--	g_slist_foreach(wlist, update_watcher, m);
--}
--
--static void proc_measurement(struct thermometer *t, const uint8_t *pdu,
--						uint16_t len, gboolean final)
--{
--	struct measurement m;
--	const char *type = NULL;
--	uint8_t flags;
--	uint32_t raw;
--
--	/* skip opcode and handle */
--	pdu += 3;
--	len -= 3;
--
--	if (len < 1) {
--		DBG("Mandatory flags are not provided");
--		return;
--	}
--
--	memset(&m, 0, sizeof(m));
--
--	flags = *pdu;
--
--	if (flags & TEMP_UNITS)
--		m.unit = "fahrenheit";
--	else
--		m.unit = "celsius";
--
--	pdu++;
--	len--;
--
--	if (len < 4) {
--		DBG("Mandatory temperature measurement value is not provided");
--		return;
--	}
--
--	raw = att_get_u32(pdu);
--	m.mant = raw & 0x00FFFFFF;
--	m.exp = ((int32_t) raw) >> 24;
--
--	if (m.mant & 0x00800000) {
--		/* convert to C2 negative value */
--		m.mant = m.mant - FLOAT_MAX_MANTISSA;
--	}
--
--	pdu += 4;
--	len -= 4;
--
--	if (flags & TEMP_TIME_STAMP) {
--		struct tm ts;
--		time_t time;
--
--		if (len < 7) {
--			DBG("Time stamp is not provided");
--			return;
--		}
--
--		ts.tm_year = att_get_u16(pdu) - 1900;
--		ts.tm_mon = *(pdu + 2) - 1;
--		ts.tm_mday = *(pdu + 3);
--		ts.tm_hour = *(pdu + 4);
--		ts.tm_min = *(pdu + 5);
--		ts.tm_sec = *(pdu + 6);
--		ts.tm_isdst = -1;
--
--		time = mktime(&ts);
--		m.time = (uint64_t) time;
--		m.suptime = TRUE;
--
--		pdu += 7;
--		len -= 7;
--	}
--
--	if (flags & TEMP_TYPE) {
--		if (len < 1) {
--			DBG("Temperature type is not provided");
--			return;
--		}
--
--		type = temptype2str(*pdu);
--	} else if (t->has_type) {
--		type = temptype2str(t->type);
--	}
--
--	m.type = g_strdup(type);
--	m.value = final ? "final" : "intermediate";
--
--	recv_measurement(t, &m);
--	g_free(m.type);
--}
--
- static void proc_measurement_interval(struct thermometer *t, const uint8_t *pdu,
- 								uint16_t len)
- {
-@@ -1134,30 +1152,6 @@ static void ind_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
- 		g_attrib_send(t->attrib, 0, opdu, olen, NULL, NULL, NULL);
+ struct characteristic {
+-	struct gatt_char	attr;	/* Characteristic */
+ 	struct thermometer	*t;	/* Thermometer where the char belongs */
++	char			uuid[MAX_LEN_UUID_STR + 1];
+ };
+ 
+ struct watcher {
+@@ -158,13 +157,6 @@ static void remove_watcher(gpointer user_data)
+ 	g_dbus_remove_watch(btd_get_dbus_connection(), watcher->id);
  }
  
--static void notif_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
+-static void destroy_char(gpointer user_data)
 -{
--	struct thermometer *t = user_data;
--	const struct characteristic *ch;
--	uint16_t handle;
--	GSList *l;
+-	struct characteristic *c = user_data;
 -
--	if (len < 3) {
--		DBG("Bad pdu received");
--		return;
--	}
--
--	handle = att_get_u16(&pdu[1]);
--	l = g_slist_find_custom(t->chars, &handle, cmp_char_val_handle);
--	if (l == NULL) {
--		DBG("Unexpected handle: 0x%04x", handle);
--		return;
--	}
--
--	ch = l->data;
--	if (g_strcmp0(ch->attr.uuid, INTERMEDIATE_TEMPERATURE_UUID) == 0)
--		proc_measurement(t, pdu, len, FALSE);
+-	g_free(c);
 -}
 -
- static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ static void destroy_thermometer(gpointer user_data)
  {
  	struct thermometer *t = user_data;
-@@ -1167,9 +1161,6 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
- 	t->attindid = g_attrib_register(t->attrib, ATT_OP_HANDLE_IND,
- 							GATTRIB_ALL_HANDLES,
- 							ind_handler, t, NULL);
--	t->attnotid = g_attrib_register(t->attrib, ATT_OP_HANDLE_NOTIFY,
--							GATTRIB_ALL_HANDLES,
--							notif_handler, t, NULL);
- 	gatt_discover_char(t->attrib, t->svc_range->start, t->svc_range->end,
- 					NULL, configure_thermometer_cb, t);
+@@ -179,9 +171,6 @@ static void destroy_thermometer(gpointer user_data)
+ 	if (t->attrib != NULL)
+ 		g_attrib_unref(t->attrib);
+ 
+-	if (t->chars != NULL)
+-		g_slist_free_full(t->chars, destroy_char);
+-
+ 	btd_device_unref(t->dev);
+ 	g_free(t->svc_range);
+ 	g_free(t);
+@@ -549,7 +538,7 @@ static void process_thermometer_desc(struct characteristic *ch, uint16_t uuid,
+ 	char *msg;
+ 
+ 	if (uuid == GATT_CHARAC_VALID_RANGE_UUID) {
+-		if (g_strcmp0(ch->attr.uuid, MEASUREMENT_INTERVAL_UUID) == 0)
++		if (g_strcmp0(ch->uuid, MEASUREMENT_INTERVAL_UUID) == 0)
+ 			gatt_read_char(ch->t->attrib, handle,
+ 						valid_range_desc_cb, ch->t);
+ 		return;
+@@ -558,7 +547,7 @@ static void process_thermometer_desc(struct characteristic *ch, uint16_t uuid,
+ 	if (uuid != GATT_CLIENT_CHARAC_CFG_UUID)
+ 		return;
+ 
+-	if (g_strcmp0(ch->attr.uuid, TEMPERATURE_MEASUREMENT_UUID) == 0) {
++	if (g_strcmp0(ch->uuid, TEMPERATURE_MEASUREMENT_UUID) == 0) {
+ 		ch->t->measurement_ccc_handle = handle;
+ 
+ 		if (g_slist_length(ch->t->tadapter->fwatchers) == 0)
+@@ -566,8 +555,7 @@ static void process_thermometer_desc(struct characteristic *ch, uint16_t uuid,
+ 
+ 		val = GATT_CLIENT_CHARAC_CFG_IND_BIT;
+ 		msg = g_strdup("Enable Temperature Measurement indication");
+-	} else if (g_strcmp0(ch->attr.uuid,
+-					INTERMEDIATE_TEMPERATURE_UUID) == 0) {
++	} else if (g_strcmp0(ch->uuid, INTERMEDIATE_TEMPERATURE_UUID) == 0) {
+ 		ch->t->intermediate_ccc_handle = handle;
+ 
+ 		if (g_slist_length(ch->t->tadapter->iwatchers) == 0)
+@@ -575,7 +563,7 @@ static void process_thermometer_desc(struct characteristic *ch, uint16_t uuid,
+ 
+ 		val = GATT_CLIENT_CHARAC_CFG_NOTIF_BIT;
+ 		msg = g_strdup("Enable Intermediate Temperature notification");
+-	} else if (g_strcmp0(ch->attr.uuid, MEASUREMENT_INTERVAL_UUID) == 0) {
++	} else if (g_strcmp0(ch->uuid, MEASUREMENT_INTERVAL_UUID) == 0) {
+ 		val = GATT_CLIENT_CHARAC_CFG_IND_BIT;
+ 		msg = g_strdup("Enable Measurement Interval indication");
+ 	} else {
+@@ -591,19 +579,19 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 							gpointer user_data)
+ {
+ 	struct characteristic *ch = user_data;
+-	struct att_data_list *list;
++	struct att_data_list *list = NULL;
+ 	uint8_t format;
+ 	int i;
+ 
+ 	if (status != 0) {
+ 		error("Discover all characteristic descriptors failed [%s]: %s",
+-					ch->attr.uuid, att_ecode2str(status));
+-		return;
++					ch->uuid, att_ecode2str(status));
++		goto done;
+ 	}
+ 
+ 	list = dec_find_info_resp(pdu, len, &format);
+ 	if (list == NULL)
+-		return;
++		goto done;
+ 
+ 	if (format != ATT_FIND_INFO_RESP_FMT_16BIT)
+ 		goto done;
+@@ -620,14 +608,40 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 	}
+ 
+ done:
+-	att_data_list_free(list);
++	if (list != NULL)
++		att_data_list_free(list);
++	g_free(ch);
++}
++
++static void discover_desc(struct thermometer *t, struct gatt_char *c,
++						struct gatt_char *c_next)
++{
++	struct characteristic *ch;
++	uint16_t start, end;
++
++	start = c->value_handle + 1;
++
++	if (c_next != NULL) {
++		if (start == c_next->handle)
++			return;
++		end = c_next->handle - 1;
++	} else if (c->value_handle != t->svc_range->end) {
++		end = t->svc_range->end;
++	} else {
++		return;
++	}
++
++	ch = g_new0(struct characteristic, 1);
++	ch->t = t;
++	memcpy(ch->uuid, c->uuid, sizeof(c->uuid));
++
++	gatt_find_info(t->attrib, start, end, discover_desc_cb, ch);
  }
-@@ -1185,9 +1176,9 @@ static void attio_disconnected_cb(gpointer user_data)
- 		t->attindid = 0;
+ 
+ static void read_temp_type_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 							gpointer user_data)
+ {
+-	struct characteristic *ch = user_data;
+-	struct thermometer *t = ch->t;
++	struct thermometer *t = user_data;
+ 	uint8_t value[TEMPERATURE_TYPE_SIZE];
+ 	ssize_t vlen;
+ 
+@@ -655,7 +669,7 @@ static void read_temp_type_cb(guint8 status, const guint8 *pdu, guint16 len,
+ static void read_interval_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 							gpointer user_data)
+ {
+-	struct characteristic *ch = user_data;
++	struct thermometer *t = user_data;
+ 	uint8_t value[MEASUREMENT_INTERVAL_SIZE];
+ 	uint16_t interval;
+ 	ssize_t vlen;
+@@ -678,38 +692,41 @@ static void read_interval_cb(guint8 status, const guint8 *pdu, guint16 len,
  	}
  
--	if (t->attnotid > 0) {
--		g_attrib_unregister(t->attrib, t->attnotid);
--		t->attnotid = 0;
-+	if (t->attio_intermediate_id > 0) {
-+		g_attrib_unregister(t->attrib, t->attio_intermediate_id);
-+		t->attio_intermediate_id = 0;
- 	}
+ 	interval = att_get_u16(&value[0]);
+-	change_property(ch->t, "Interval", &interval);
++	change_property(t, "Interval", &interval);
+ }
  
- 	g_attrib_unref(t->attrib);
+-static void process_thermometer_char(struct characteristic *ch)
++static void process_thermometer_char(struct thermometer *t,
++				struct gatt_char *c, struct gatt_char *c_next)
+ {
+-	struct thermometer *t = ch->t;
+-
+-	if (g_strcmp0(ch->attr.uuid, INTERMEDIATE_TEMPERATURE_UUID) == 0) {
++	if (g_strcmp0(c->uuid, INTERMEDIATE_TEMPERATURE_UUID) == 0) {
+ 		gboolean intermediate = TRUE;
+-		change_property(ch->t, "Intermediate", &intermediate);
++		change_property(t, "Intermediate", &intermediate);
+ 
+ 		t->attio_intermediate_id = g_attrib_register(t->attrib,
+-				ATT_OP_HANDLE_NOTIFY, ch->attr.value_handle,
+-				intermediate_notify_handler, t, NULL);
+-	} else if (g_strcmp0(ch->attr.uuid,
+-					TEMPERATURE_MEASUREMENT_UUID) == 0) {
++					ATT_OP_HANDLE_NOTIFY, c->value_handle,
++					intermediate_notify_handler, t, NULL);
++
++		discover_desc(t, c, c_next);
++	} else if (g_strcmp0(c->uuid, TEMPERATURE_MEASUREMENT_UUID) == 0) {
+ 
+ 		t->attio_measurement_id = g_attrib_register(t->attrib,
+-				ATT_OP_HANDLE_IND, ch->attr.value_handle,
+-				measurement_ind_handler, t, NULL);
+-	} else if (g_strcmp0(ch->attr.uuid, TEMPERATURE_TYPE_UUID) == 0) {
+-		gatt_read_char(ch->t->attrib, ch->attr.value_handle,
+-							read_temp_type_cb, ch);
+-	} else if (g_strcmp0(ch->attr.uuid, MEASUREMENT_INTERVAL_UUID) == 0) {
+-		ch->t->interval_val_handle = ch->attr.value_handle;
++					ATT_OP_HANDLE_IND, c->value_handle,
++					measurement_ind_handler, t, NULL);
+ 
+-		gatt_read_char(ch->t->attrib, ch->attr.value_handle,
+-							read_interval_cb, ch);
++		discover_desc(t, c, c_next);
++	} else if (g_strcmp0(c->uuid, TEMPERATURE_TYPE_UUID) == 0) {
++		gatt_read_char(t->attrib, c->value_handle,
++							read_temp_type_cb, t);
++	} else if (g_strcmp0(c->uuid, MEASUREMENT_INTERVAL_UUID) == 0) {
++		gatt_read_char(t->attrib, c->value_handle, read_interval_cb, t);
++
++		t->interval_val_handle = c->value_handle;
+ 
+ 		t->attio_interval_id = g_attrib_register(t->attrib,
+-				ATT_OP_HANDLE_IND, ch->attr.value_handle,
+-				interval_ind_handler, t, NULL);
++					ATT_OP_HANDLE_IND, c->value_handle,
++					interval_ind_handler, t, NULL);
++
++		discover_desc(t, c, c_next);
+ 	}
+ }
+ 
+@@ -727,34 +744,9 @@ static void configure_thermometer_cb(GSList *characteristics, guint8 status,
+ 
+ 	for (l = characteristics; l; l = l->next) {
+ 		struct gatt_char *c = l->data;
+-		struct characteristic *ch;
+-		uint16_t start, end;
+-
+-		ch = g_new0(struct characteristic, 1);
+-		ch->attr.handle = c->handle;
+-		ch->attr.properties = c->properties;
+-		ch->attr.value_handle = c->value_handle;
+-		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
+-		ch->t = t;
+-
+-		t->chars = g_slist_append(t->chars, ch);
+-
+-		process_thermometer_char(ch);
+-
+-		start = c->value_handle + 1;
+-
+-		if (l->next != NULL) {
+-			struct gatt_char *c = l->next->data;
+-			if (start == c->handle)
+-				continue;
+-			end = c->handle - 1;
+-		} else if (c->value_handle != t->svc_range->end) {
+-			end = t->svc_range->end;
+-		} else {
+-			continue;
+-		}
++		struct gatt_char *c_next = (l->next ? l->next->data : NULL);
+ 
+-		gatt_find_info(t->attrib, start, end, discover_desc_cb, ch);
++		process_thermometer_char(t, c, c_next);
+ 	}
+ }
+ 
 -- 
 1.8.0
 
