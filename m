@@ -1,56 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 9 Nov 2012 17:16:49 +0200
-From: Johan Hedberg <johan.hedberg@intel.com>
-To: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [bluetooth:master 60/61] net/bluetooth/hci_core.c:683:19:
- sparse: incorrect type in assignment (different base types)
-Message-ID: <20121109151649.GA27541@x220.P-661HNU-F1>
-References: <509ce8e0.fhFHxG5k0tIvGjwr%fengguang.wu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <509ce8e0.fhFHxG5k0tIvGjwr%fengguang.wu@intel.com>
+In-Reply-To: <2CF57A644018A745B8FE029C7223E16E0FE3E843@SHSMSX102.ccr.corp.intel.com>
+References: <2CF57A644018A745B8FE029C7223E16E0FE3E843@SHSMSX102.ccr.corp.intel.com>
+Date: Fri, 9 Nov 2012 17:13:05 +0200
+Message-ID: <CABBYNZJzd-DxwBMHvwFTAfP0W2=oWG2=4G5aa7_wEfVUPE345w@mail.gmail.com>
+Subject: Re: HFP can't work well and sound can't be heard
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Zheng, Wu" <wu.zheng@intel.com>
+Cc: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Fri, Nov 09, 2012, kbuild test robot wrote:
-> tree:   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-> head:   108777e09bbe7874dc5224173a1e3f3ee4ac6471
-> commit: c82263e2cfbf6d5c030d0e424ecc91402910e46e [60/61] Bluetooth: Add support for setting LE advertising data
-> 
-> 
-> sparse warnings:
-> 
-> + net/bluetooth/hci_core.c:683:19: sparse: incorrect type in assignment (different base types)
-> net/bluetooth/hci_core.c:683:19:    expected unsigned char [unsigned] [addressable] [usertype] length
-> net/bluetooth/hci_core.c:683:19:    got restricted __le16 [usertype] <noident>
-> 
-> vim +683 net/bluetooth/hci_core.c
-> 
-> c82263e2 Johan Hedberg 2012-11-08  667  		goto unlock;
-> c82263e2 Johan Hedberg 2012-11-08  668  	}
-> c82263e2 Johan Hedberg 2012-11-08  669  
-> c82263e2 Johan Hedberg 2012-11-08  670  	memset(&cp, 0, sizeof(cp));
-> c82263e2 Johan Hedberg 2012-11-08  671  
-> c82263e2 Johan Hedberg 2012-11-08  672  	len = create_ad(hdev, cp.data);
-> c82263e2 Johan Hedberg 2012-11-08  673  
-> c82263e2 Johan Hedberg 2012-11-08  674  	if (hdev->adv_data_len == len &&
-> c82263e2 Johan Hedberg 2012-11-08  675  	    memcmp(cp.data, hdev->adv_data, len) == 0) {
-> c82263e2 Johan Hedberg 2012-11-08  676  		err = 0;
-> c82263e2 Johan Hedberg 2012-11-08  677  		goto unlock;
-> c82263e2 Johan Hedberg 2012-11-08  678  	}
-> c82263e2 Johan Hedberg 2012-11-08  679  
-> c82263e2 Johan Hedberg 2012-11-08  680  	memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
-> c82263e2 Johan Hedberg 2012-11-08  681  	hdev->adv_data_len = len;
-> c82263e2 Johan Hedberg 2012-11-08  682  
-> c82263e2 Johan Hedberg 2012-11-08 @683  	cp.length = cpu_to_le16(len);
+On Thu, Nov 8, 2012 at 11:41 AM, Zheng, Wu <wu.zheng@intel.com> wrote:
+> Hi Luiz,
+>
+> The GetProperties methods of "org.bluez.manager", "org.bluez.Adapter" and so on have been converted to some methods of "org.freedesktop.DBus.Properties".
+>
+> It results in pulseaudio can't communicate with bluez well and sound can't be heard when using HFP.
+>
+> What do upstream plan for it? Thanks.
 
-This is actually a real bug which would show up at least on big endian
-systems: cp.length is just one byte so no byte order conversion should
-be attempted. Gustavo, do you want me to send a patch to fix it or will
-you remove this patch from the current tree and let me send a revised
-version?
+Obviously we need to port PulseAudio to work with BlueZ 5, this should
+not take long but first we need a release, if you still want to test
+there are patches that I send to the list not long ago just search the
+archives, but note that they are workaround so they are not meant to
+go upstream it is just to be able to run bluetoothd with tools that
+have not been ported yet.
 
-Johan
+-- 
+Luiz Augusto von Dentz
