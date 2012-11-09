@@ -1,144 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 1/4] proximity: Convert reporter properties to DBus.Properties
-Date: Fri, 9 Nov 2012 13:33:18 +0100
-Message-ID: <1352464401-12702-1-git-send-email-andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Message-id: <1F1B79404D1345F5B0892E4441A11BA5@sisodomain.com>
+From: Sunil Kumar Behera <sunil.behera@samsung.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Sunil Kumar Behera <sunil.behera@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <1352372667-18288-1-git-send-email-sunil.behera@samsung.com>
+ <CABBYNZ+K+R_i6ofgCP9rgsOPP2rBVk_9RKG=Q1v4BVRO_RCRCw@mail.gmail.com>
+In-reply-to: <CABBYNZ+K+R_i6ofgCP9rgsOPP2rBVk_9RKG=Q1v4BVRO_RCRCw@mail.gmail.com>
+Subject: Re: [PATCH obexd v1 2/3] MAP: Add MSETime application parameter
+Date: Fri, 09 Nov 2012 16:59:03 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- profiles/proximity/immalert.c |  5 ++--
- profiles/proximity/linkloss.c |  5 ++--
- profiles/proximity/reporter.c | 62 +++++++++++++++----------------------------
- 3 files changed, 25 insertions(+), 47 deletions(-)
+Hi Luiz,
 
-diff --git a/profiles/proximity/immalert.c b/profiles/proximity/immalert.c
-index 77b4966..ff40bdf 100644
---- a/profiles/proximity/immalert.c
-+++ b/profiles/proximity/immalert.c
-@@ -137,9 +137,8 @@ static void imm_alert_emit_alert_signal(struct connected_device *condev,
- 
- 	DBG("alert %s remote %s", alert_level_str, path);
- 
--	emit_property_changed(path,
--			PROXIMITY_REPORTER_INTERFACE, "ImmediateAlertLevel",
--			DBUS_TYPE_STRING, &alert_level_str);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), path,
-+			PROXIMITY_REPORTER_INTERFACE, "ImmediateAlertLevel");
- }
- 
- static void imm_alert_remove_condev(struct connected_device *condev)
-diff --git a/profiles/proximity/linkloss.c b/profiles/proximity/linkloss.c
-index 40510d8..de92be7 100644
---- a/profiles/proximity/linkloss.c
-+++ b/profiles/proximity/linkloss.c
-@@ -138,9 +138,8 @@ static void link_loss_emit_alert_signal(struct connected_device *condev)
- 
- 	DBG("alert %s remote %s", alert_level_str, path);
- 
--	emit_property_changed(path,
--			PROXIMITY_REPORTER_INTERFACE, "LinkLossAlertLevel",
--			DBUS_TYPE_STRING, &alert_level_str);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), path,
-+			PROXIMITY_REPORTER_INTERFACE, "LinkLossAlertLevel");
- }
- 
- static uint8_t link_loss_alert_lvl_read(struct attribute *a,
-diff --git a/profiles/proximity/reporter.c b/profiles/proximity/reporter.c
-index 6ec5f73..1d98ba9 100644
---- a/profiles/proximity/reporter.c
-+++ b/profiles/proximity/reporter.c
-@@ -139,56 +139,36 @@ static void register_tx_power(struct btd_adapter *adapter)
- 	g_assert(h - start_handle == svc_size);
- }
- 
--static DBusMessage *get_properties(DBusConnection *conn,
--						DBusMessage *msg, void *data)
-+static gboolean property_get_link_loss_level(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
- {
--	DBusMessageIter iter;
--	DBusMessageIter dict;
--	DBusMessage *reply = NULL;
--	const char *linkloss_level, *immalert_level;
- 	struct btd_device *device = data;
-+	const char *level;
- 
--	reply = dbus_message_new_method_return(msg);
--	if (!reply)
--		return NULL;
--
--	linkloss_level = link_loss_get_alert_level(device);
--	immalert_level = imm_alert_get_level(device);
-+	level = link_loss_get_alert_level(device);
- 
--	dbus_message_iter_init_append(reply, &iter);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &level);
- 
--	if (!dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
--			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
--			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
--			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict))
--		goto err;
-+	return TRUE;
-+}
- 
--	dict_append_entry(&dict, "LinkLossAlertLevel", DBUS_TYPE_STRING,
--							&linkloss_level);
--	dict_append_entry(&dict, "ImmediateAlertLevel", DBUS_TYPE_STRING,
--							&immalert_level);
-+static gboolean property_get_immediate_alert_level(
-+					const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_device *device = data;
-+	const char *level;
- 
--	if (!dbus_message_iter_close_container(&iter, &dict))
--		goto err;
-+	level = imm_alert_get_level(device);
- 
--	return reply;
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &level);
- 
--err:
--	if (reply)
--		dbus_message_unref(reply);
--	return btd_error_failed(msg, "not enough memory");
-+	return TRUE;
- }
- 
--static const GDBusMethodTable reporter_methods[] = {
--	{ GDBUS_METHOD("GetProperties",
--			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
--			get_properties) },
--	{ }
--};
--
--static const GDBusSignalTable reporter_signals[] = {
--	{ GDBUS_SIGNAL("PropertyChanged",
--			GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
-+static const GDBusPropertyTable reporter_device_properties[] = {
-+	{ "LinkLossAlertLevel", "s", property_get_link_loss_level },
-+	{ "ImmediateAlertLevel", "s", property_get_immediate_alert_level },
- 	{ }
- };
- 
-@@ -216,8 +196,8 @@ static void register_reporter_device(struct btd_device *device,
- 
- 	g_dbus_register_interface(btd_get_dbus_connection(), path,
- 					PROXIMITY_REPORTER_INTERFACE,
--					reporter_methods, reporter_signals,
--					NULL, device, NULL);
-+					NULL, NULL, reporter_device_properties,
-+					device, NULL);
- 
- 	btd_device_ref(device);
- 	radapter->devices = g_slist_prepend(radapter->devices, device);
--- 
-1.8.0
+--------------------------------------------------
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Sent: Friday, November 09, 2012 3:33 PM
+To: "Sunil Kumar Behera" <sunil.behera@samsung.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH obexd v1 2/3] MAP: Add MSETime application parameter
+
+> Hi Sunil,
+>
+> On Thu, Nov 8, 2012 at 1:04 PM, Sunil Kumar Behera
+> <sunil.behera@samsung.com> wrote:
+>> MSETime application parameter shall be used in the response
+>> to report the Local Time basis of the MSE.
+>> ---
+>>  plugins/mas.c      |    4 +++-
+>>  plugins/messages.h |    1 +
+>>  2 files changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/plugins/mas.c b/plugins/mas.c
+>> index 319c87f..bdf2b6b 100644
+>> --- a/plugins/mas.c
+>> +++ b/plugins/mas.c
+>> @@ -284,7 +284,7 @@ static const char *yesorno(gboolean a)
+>>  }
+>>
+>>  static void get_messages_listing_cb(void *session, int err, uint16_t 
+>> size,
+>> -                                       gboolean newmsg,
+>> +                                       gboolean newmsg, gchar *msetime,
+>>                                         const struct messages_message 
+>> *entry,
+>>                                         void *user_data)
+>>  {
+>> @@ -403,6 +403,8 @@ proceed:
+>>                 mas->outparams = g_obex_apparam_set_uint8(mas->outparams,
+>>                                                 MAP_AP_NEWMESSAGE,
+>>                                                 newmsg ? 1 : 0);
+>> +               mas->outparams = 
+>> g_obex_apparam_set_string(mas->outparams,
+>> +                                               MAP_AP_MSETIME, msetime);
+>>         }
+>>
+>>         if (err != -EAGAIN)
+>> diff --git a/plugins/messages.h b/plugins/messages.h
+>> index 00a16b1..2ab4ba1 100644
+>> --- a/plugins/messages.h
+>> +++ b/plugins/messages.h
+>> @@ -226,6 +226,7 @@ int messages_get_folder_listing(void *session, const 
+>> char *name, uint16_t max,
+>>   */
+>>  typedef void (*messages_get_messages_listing_cb)(void *session, int err,
+>>                                         uint16_t size, gboolean newmsg,
+>> +                                       gchar *msetime,
+>>                                         const struct messages_message 
+>> *message,
+>>                                         void *user_data);
+>
+> Do we really need to do this in the backend? We could possible
+> generate the timestamp on get_messages_listing_cb and which should
+> avoid having duplicate code doing the same for each backend.
+>
+
+The data for application parameter MSETime is string with current time basis
+and UTC-offset of the MSE. Since the UTC value depends on the location of 
+the device
+so I think it is better left to backend on deciding the UTC value.
+
+Best regards,
+Sunil Kumar Behera 
 
