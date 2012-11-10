@@ -1,95 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 10 Nov 2012 19:24:27 +0100
+Date: Sat, 10 Nov 2012 19:23:01 +0100
 From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth 2012-11-09
-Message-ID: <20121110182427.GA7523@joana>
-References: <20121012110142.GF10739@joana>
+To: Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [bluetooth:master 60/61] net/bluetooth/hci_core.c:683:19:
+ sparse: incorrect type in assignment (different base types)
+Message-ID: <20121110182301.GA11192@joana>
+References: <509ce8e0.fhFHxG5k0tIvGjwr%fengguang.wu@intel.com>
+ <20121109151649.GA27541@x220.P-661HNU-F1>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="GvXjxJ+pjyke8COw"
-In-Reply-To: <20121012110142.GF10739@joana>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20121109151649.GA27541@x220.P-661HNU-F1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
---GvXjxJ+pjyke8COw
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+* Johan Hedberg <johan.hedberg@intel.com> [2012-11-09 17:16:49 +0200]:
 
-Hi John,
+> Hi,
+> 
+> On Fri, Nov 09, 2012, kbuild test robot wrote:
+> > tree:   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+> > head:   108777e09bbe7874dc5224173a1e3f3ee4ac6471
+> > commit: c82263e2cfbf6d5c030d0e424ecc91402910e46e [60/61] Bluetooth: Add support for setting LE advertising data
+> > 
+> > 
+> > sparse warnings:
+> > 
+> > + net/bluetooth/hci_core.c:683:19: sparse: incorrect type in assignment (different base types)
+> > net/bluetooth/hci_core.c:683:19:    expected unsigned char [unsigned] [addressable] [usertype] length
+> > net/bluetooth/hci_core.c:683:19:    got restricted __le16 [usertype] <noident>
+> > 
+> > vim +683 net/bluetooth/hci_core.c
+> > 
+> > c82263e2 Johan Hedberg 2012-11-08  667  		goto unlock;
+> > c82263e2 Johan Hedberg 2012-11-08  668  	}
+> > c82263e2 Johan Hedberg 2012-11-08  669  
+> > c82263e2 Johan Hedberg 2012-11-08  670  	memset(&cp, 0, sizeof(cp));
+> > c82263e2 Johan Hedberg 2012-11-08  671  
+> > c82263e2 Johan Hedberg 2012-11-08  672  	len = create_ad(hdev, cp.data);
+> > c82263e2 Johan Hedberg 2012-11-08  673  
+> > c82263e2 Johan Hedberg 2012-11-08  674  	if (hdev->adv_data_len == len &&
+> > c82263e2 Johan Hedberg 2012-11-08  675  	    memcmp(cp.data, hdev->adv_data, len) == 0) {
+> > c82263e2 Johan Hedberg 2012-11-08  676  		err = 0;
+> > c82263e2 Johan Hedberg 2012-11-08  677  		goto unlock;
+> > c82263e2 Johan Hedberg 2012-11-08  678  	}
+> > c82263e2 Johan Hedberg 2012-11-08  679  
+> > c82263e2 Johan Hedberg 2012-11-08  680  	memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
+> > c82263e2 Johan Hedberg 2012-11-08  681  	hdev->adv_data_len = len;
+> > c82263e2 Johan Hedberg 2012-11-08  682  
+> > c82263e2 Johan Hedberg 2012-11-08 @683  	cp.length = cpu_to_le16(len);
+> 
+> This is actually a real bug which would show up at least on big endian
+> systems: cp.length is just one byte so no byte order conversion should
+> be attempted. Gustavo, do you want me to send a patch to fix it or will
+> you remove this patch from the current tree and let me send a revised
+> version?
 
-A few important fixes to go into 3.7. There is a new hw support by Marcos
-Chaparro. Johan added a memory leak fix and hci device index list fix.
-Also Marcel fixed a race condition in the device set up that was prevent the
-bt monitor to work properly. Last, Paulo S=E9rgio added a fix to the error
-status when pairing for LE fails. This was prevent userspace to work to han=
-dle
-the failure properly.
-
-Please pull! or let me know of any issues. Thanks.
+I fixed this patch and pushed a new version to bluetooth-next. Should be all
+good now.
 
 	Gustavo
-
----
-The following changes since commit 6fe7cc71bbf3a0bc28c9cec3c00bc11e81344412:
-
-  ath9k: Test for TID only in BlockAcks while checking tx status (2012-10-3=
-0 15:58:54 -0400)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
-
-for you to fetch changes up to 482049f75750d73358e65236b933417b69f9cc25:
-
-  Bluetooth: Fix memory leak when removing a UUID (2012-11-09 16:45:37 +010=
-0)
-
-----------------------------------------------------------------
-Johan Hedberg (2):
-      Bluetooth: Fix having bogus entries in mgmt_read_index_list reply
-      Bluetooth: Fix memory leak when removing a UUID
-
-Marcel Holtmann (1):
-      Bluetooth: Notify about device registration before power on
-
-Marcos Chaparro (1):
-      Bluetooth: ath3k: Add support for VAIO VPCEH [0489:e027]
-
-Paulo S=E9rgio (1):
-      Bluetooth: Fix error status when pairing fails
-
- drivers/bluetooth/ath3k.c |  1 +
- drivers/bluetooth/btusb.c |  1 +
- net/bluetooth/hci_core.c  |  4 ++--
- net/bluetooth/mgmt.c      | 12 +++++++-----
- net/bluetooth/smp.c       |  2 +-
- 5 files changed, 12 insertions(+), 8 deletions(-)
-
-
---GvXjxJ+pjyke8COw
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIcBAEBAgAGBQJQnpvbAAoJEPs3PUX4s20oz2gP/1stWZnrYAP8XCuXv+9FYhwI
-i4CMHyR32Qf4QfSwaCMZXfoNFTMOPb8jXJKTTxslffEWMQ0DCPTQnga3FuQazhx5
-jFvU4DAe4F2SMJUuSfI03b+Mkp+AhoZAcle3zL3fjx0sJY0kzbbClwzMWL33jIVJ
-BCXAk8q56HII/8AcAlEgECqXbjVT6yDgxapHWzIMcUH46hta2pqxhS7/hYKPRWrB
-1JRAkSLpi6xXd4pMk2pqt8a/bW8s0UCh200O9VY6Pmo/H/cVnOphZCLBuRcIbqUm
-oGBxhtRVaVyokcvy2ayXem/uzM57eiHFSzx5T0mh8VonVwaS6YovBZUZZ86tCktW
-xZbHr8pspTpHrebMM1ofk91EsTzeHmL4wwPzOyzyPyBWm+rYN0uDKX6bXBu/aMk9
-R+6jTapeA/H/tDAec7mXUUuvmHqevIMVMTend54JI9fJE1B3EJjgySer3JCPXEEv
-2yeUVhhD40QmEg4admfQq5cMedcG/zRXfETsJo/UzKWZjmCa5Jh8SdRGKDfvRUkT
-RmKHT8cBaHrKi+2fmpE86Jj1Z4WD2CMssx3+aGJKsf0uWEWNs1hL17S0wojYEJnS
-B8KrkQ73oVzKYlqbm8SJtB+Z38X+CQcaGVy3H4NfzJ/zFs1f0wMAhxRMd5iNQW2Z
-/FEriSD7fTpUgwM/gcmW
-=BFkS
------END PGP SIGNATURE-----
-
---GvXjxJ+pjyke8COw--
