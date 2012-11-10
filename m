@@ -1,36 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 10 Nov 2012 14:30:52 +0200
+Date: Sat, 10 Nov 2012 14:25:35 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [PATCH] Add =?iso-8859-1?B?Sm/j?= =?iso-8859-1?Q?o?= Paulo to
- the AUTHORS file
-Message-ID: <20121110123052.GA26577@x220.P-661HNU-F1>
-References: <1352473571-7939-1-git-send-email-gustavo@padovan.org>
+To: Bart Westgeest <bart@elbrys.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Feedback on potential fix for issue while advertising Feature
+ List
+Message-ID: <20121110122535.GA26532@x220.P-661HNU-F1>
+References: <509BD103.2040808@elbrys.com>
+ <509D879C.1080205@elbrys.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1352473571-7939-1-git-send-email-gustavo@padovan.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <509D879C.1080205@elbrys.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Bart,
 
-On Fri, Nov 09, 2012, Gustavo Padovan wrote:
-> ---
->  AUTHORS | 1 +
->  1 file changed, 1 insertion(+)
+On Fri, Nov 09, 2012, Bart Westgeest wrote:
+> > I appreciate any input from anybody more familiar with the SDP
+> > code on what the accepted/preferred approach is to get this
+> > issue fixed.
 > 
-> diff --git a/AUTHORS b/AUTHORS
-> index 4b2d123..944ada2 100644
-> --- a/AUTHORS
-> +++ b/AUTHORS
-> @@ -65,3 +65,4 @@ Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
->  Eder Ruiz Maria <eder.ruiz@openbossa.org>
->  Mikel Astiz <mikel.astiz@bmw-carit.de>
->  Chan-yeol Park <chanyeol.park@samsung.com>
-> +João Paulo Rechi Vita <jprvita@gmail.com>
+> Anybody? Again, I've already root caused the problem and have a fix.
+> 
+> I am Just looking for input to see if what I have is acceptable, or
+> if something else is preferred.
 
-Applied. Thanks.
+Have a bit more patience, sometimes it can take a few days to get
+feedback. I think the option of looking at the length and using the old
+type for < 256 and a 16-bit type for greater lengths would be the
+safest. This way old code will still produce the same result for < 256
+lengths.
 
 Johan
