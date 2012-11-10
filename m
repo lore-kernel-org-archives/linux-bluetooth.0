@@ -1,64 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 10 Nov 2012 19:23:01 +0100
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [bluetooth:master 60/61] net/bluetooth/hci_core.c:683:19:
- sparse: incorrect type in assignment (different base types)
-Message-ID: <20121110182301.GA11192@joana>
-References: <509ce8e0.fhFHxG5k0tIvGjwr%fengguang.wu@intel.com>
- <20121109151649.GA27541@x220.P-661HNU-F1>
+Date: Sat, 10 Nov 2012 14:30:52 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [PATCH] Add =?iso-8859-1?B?Sm/j?= =?iso-8859-1?Q?o?= Paulo to
+ the AUTHORS file
+Message-ID: <20121110123052.GA26577@x220.P-661HNU-F1>
+References: <1352473571-7939-1-git-send-email-gustavo@padovan.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20121109151649.GA27541@x220.P-661HNU-F1>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1352473571-7939-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Gustavo,
 
-* Johan Hedberg <johan.hedberg@intel.com> [2012-11-09 17:16:49 +0200]:
-
-> Hi,
+On Fri, Nov 09, 2012, Gustavo Padovan wrote:
+> ---
+>  AUTHORS | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> On Fri, Nov 09, 2012, kbuild test robot wrote:
-> > tree:   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-> > head:   108777e09bbe7874dc5224173a1e3f3ee4ac6471
-> > commit: c82263e2cfbf6d5c030d0e424ecc91402910e46e [60/61] Bluetooth: Add support for setting LE advertising data
-> > 
-> > 
-> > sparse warnings:
-> > 
-> > + net/bluetooth/hci_core.c:683:19: sparse: incorrect type in assignment (different base types)
-> > net/bluetooth/hci_core.c:683:19:    expected unsigned char [unsigned] [addressable] [usertype] length
-> > net/bluetooth/hci_core.c:683:19:    got restricted __le16 [usertype] <noident>
-> > 
-> > vim +683 net/bluetooth/hci_core.c
-> > 
-> > c82263e2 Johan Hedberg 2012-11-08  667  		goto unlock;
-> > c82263e2 Johan Hedberg 2012-11-08  668  	}
-> > c82263e2 Johan Hedberg 2012-11-08  669  
-> > c82263e2 Johan Hedberg 2012-11-08  670  	memset(&cp, 0, sizeof(cp));
-> > c82263e2 Johan Hedberg 2012-11-08  671  
-> > c82263e2 Johan Hedberg 2012-11-08  672  	len = create_ad(hdev, cp.data);
-> > c82263e2 Johan Hedberg 2012-11-08  673  
-> > c82263e2 Johan Hedberg 2012-11-08  674  	if (hdev->adv_data_len == len &&
-> > c82263e2 Johan Hedberg 2012-11-08  675  	    memcmp(cp.data, hdev->adv_data, len) == 0) {
-> > c82263e2 Johan Hedberg 2012-11-08  676  		err = 0;
-> > c82263e2 Johan Hedberg 2012-11-08  677  		goto unlock;
-> > c82263e2 Johan Hedberg 2012-11-08  678  	}
-> > c82263e2 Johan Hedberg 2012-11-08  679  
-> > c82263e2 Johan Hedberg 2012-11-08  680  	memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
-> > c82263e2 Johan Hedberg 2012-11-08  681  	hdev->adv_data_len = len;
-> > c82263e2 Johan Hedberg 2012-11-08  682  
-> > c82263e2 Johan Hedberg 2012-11-08 @683  	cp.length = cpu_to_le16(len);
-> 
-> This is actually a real bug which would show up at least on big endian
-> systems: cp.length is just one byte so no byte order conversion should
-> be attempted. Gustavo, do you want me to send a patch to fix it or will
-> you remove this patch from the current tree and let me send a revised
-> version?
+> diff --git a/AUTHORS b/AUTHORS
+> index 4b2d123..944ada2 100644
+> --- a/AUTHORS
+> +++ b/AUTHORS
+> @@ -65,3 +65,4 @@ Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+>  Eder Ruiz Maria <eder.ruiz@openbossa.org>
+>  Mikel Astiz <mikel.astiz@bmw-carit.de>
+>  Chan-yeol Park <chanyeol.park@samsung.com>
+> +João Paulo Rechi Vita <jprvita@gmail.com>
 
-I fixed this patch and pushed a new version to bluetooth-next. Should be all
-good now.
+Applied. Thanks.
 
-	Gustavo
+Johan
