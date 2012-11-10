@@ -1,106 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1352594070.16204.15.camel@aeonflux>
-Subject: Re: [RFCv3 1/3] Bluetooth: Add support BT mini-driver
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Tedd Ho-Jeong An <tedd.an@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, albert.o.ho@intel.com,
-	johan.hedberg@intel.com, tedd.hj.an@gmail.com
-Date: Sun, 11 Nov 2012 01:34:30 +0100
-In-Reply-To: <1385742.8V9Ax1uMxF@tedd-ubuntu>
-References: <1385742.8V9Ax1uMxF@tedd-ubuntu>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Sat, 10 Nov 2012 19:24:27 +0100
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth 2012-11-09
+Message-ID: <20121110182427.GA7523@joana>
+References: <20121012110142.GF10739@joana>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="GvXjxJ+pjyke8COw"
+In-Reply-To: <20121012110142.GF10739@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tedd,
 
-> This patch add mini-driver support in BTUSB
-> 
-> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
-> ---
->  drivers/bluetooth/btusb.c |   68 +++++++++++++++++++++++++++++++++++++++++----
->  drivers/bluetooth/btusb.h |   44 +++++++++++++++++++++++++++++
->  2 files changed, 106 insertions(+), 6 deletions(-)
->  create mode 100644 drivers/bluetooth/btusb.h
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index f637c25..39a1e6c 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -27,6 +27,8 @@
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
->  
-> +#include "btusb.h"
-> +
->  #define VERSION "0.6"
->  
->  static bool ignore_dga;
-> @@ -47,6 +49,7 @@ static struct usb_driver btusb_driver;
->  #define BTUSB_BROKEN_ISOC	0x20
->  #define BTUSB_WRONG_SCO_MTU	0x40
->  #define BTUSB_ATH3012		0x80
-> +#define BTUSB_VENDOR		0x100
->  
->  static struct usb_device_id btusb_table[] = {
->  	/* Generic Bluetooth USB device */
-> @@ -206,6 +209,7 @@ struct btusb_data {
->  	struct usb_device    *udev;
->  	struct usb_interface *intf;
->  	struct usb_interface *isoc;
-> +	struct btusb_driver_info *driver_info;
->  
->  	spinlock_t lock;
->  
-> @@ -952,9 +956,15 @@ static int btusb_probe(struct usb_interface *intf,
->  			return -ENODEV;
->  	}
->  
-> -	data = devm_kzalloc(&intf->dev, sizeof(*data), GFP_KERNEL);
-> -	if (!data)
-> -		return -ENOMEM;
-> +/* CHECKME: if mini-driver invokes btusb_probe, btusb_data already has been
-> + * allocated. If btusb_probe is directly invoked by usb core, then allocate
-> + * here. */
-> +	data = usb_get_intfdata(intf);
-> +	if (!data) {
-> +		data = devm_kzalloc(&intf->dev, sizeof(*data), GFP_KERNEL);
-> +		if (!data)
-> +			return -ENOMEM;
-> +	}
->  
->  	for (i = 0; i < intf->cur_altsetting->desc.bNumEndpoints; i++) {
->  		ep_desc = &intf->cur_altsetting->endpoint[i].desc;
-> @@ -1012,6 +1022,17 @@ static int btusb_probe(struct usb_interface *intf,
->  	hdev->send     = btusb_send_frame;
->  	hdev->notify   = btusb_notify;
->  
-> +	/* bind the vendor specific mini-driver */
-> +	if ((id->driver_info & BTUSB_VENDOR) && data->driver_info) {
-> +		if (data->driver_info->bind) {
-> +			err = data->driver_info->bind(hdev);
-> +			if (err < 0) {
-> +				hci_free_dev(hdev);
-> +				return err;
-> +			}
-> +		}
-> +	}
-> +
+--GvXjxJ+pjyke8COw
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I think we can make this even simpler. Had a 12 hours flight to Tokyo
-and ran out of movies to watch ;)
+Hi John,
 
-So I have a set of patches that add a real hdev->setup() stage to
-Bluetooth core. So it can be used from any driver. I also have an
-immediate use for it by one of the Broadcom drivers that need to send
-one extra HCI command for the HID switching.
+A few important fixes to go into 3.7. There is a new hw support by Marcos
+Chaparro. Johan added a memory leak fix and hci device index list fix.
+Also Marcel fixed a race condition in the device set up that was prevent the
+bt monitor to work properly. Last, Paulo S=E9rgio added a fix to the error
+status when pairing for LE fails. This was prevent userspace to work to han=
+dle
+the failure properly.
 
-Need to refactor the patches a bit in better order and will post them
-then.
+Please pull! or let me know of any issues. Thanks.
 
-Regards
+	Gustavo
 
-Marcel
+---
+The following changes since commit 6fe7cc71bbf3a0bc28c9cec3c00bc11e81344412:
+
+  ath9k: Test for TID only in BlockAcks while checking tx status (2012-10-3=
+0 15:58:54 -0400)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
+
+for you to fetch changes up to 482049f75750d73358e65236b933417b69f9cc25:
+
+  Bluetooth: Fix memory leak when removing a UUID (2012-11-09 16:45:37 +010=
+0)
+
+----------------------------------------------------------------
+Johan Hedberg (2):
+      Bluetooth: Fix having bogus entries in mgmt_read_index_list reply
+      Bluetooth: Fix memory leak when removing a UUID
+
+Marcel Holtmann (1):
+      Bluetooth: Notify about device registration before power on
+
+Marcos Chaparro (1):
+      Bluetooth: ath3k: Add support for VAIO VPCEH [0489:e027]
+
+Paulo S=E9rgio (1):
+      Bluetooth: Fix error status when pairing fails
+
+ drivers/bluetooth/ath3k.c |  1 +
+ drivers/bluetooth/btusb.c |  1 +
+ net/bluetooth/hci_core.c  |  4 ++--
+ net/bluetooth/mgmt.c      | 12 +++++++-----
+ net/bluetooth/smp.c       |  2 +-
+ 5 files changed, 12 insertions(+), 8 deletions(-)
 
 
+--GvXjxJ+pjyke8COw
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBAgAGBQJQnpvbAAoJEPs3PUX4s20oz2gP/1stWZnrYAP8XCuXv+9FYhwI
+i4CMHyR32Qf4QfSwaCMZXfoNFTMOPb8jXJKTTxslffEWMQ0DCPTQnga3FuQazhx5
+jFvU4DAe4F2SMJUuSfI03b+Mkp+AhoZAcle3zL3fjx0sJY0kzbbClwzMWL33jIVJ
+BCXAk8q56HII/8AcAlEgECqXbjVT6yDgxapHWzIMcUH46hta2pqxhS7/hYKPRWrB
+1JRAkSLpi6xXd4pMk2pqt8a/bW8s0UCh200O9VY6Pmo/H/cVnOphZCLBuRcIbqUm
+oGBxhtRVaVyokcvy2ayXem/uzM57eiHFSzx5T0mh8VonVwaS6YovBZUZZ86tCktW
+xZbHr8pspTpHrebMM1ofk91EsTzeHmL4wwPzOyzyPyBWm+rYN0uDKX6bXBu/aMk9
+R+6jTapeA/H/tDAec7mXUUuvmHqevIMVMTend54JI9fJE1B3EJjgySer3JCPXEEv
+2yeUVhhD40QmEg4admfQq5cMedcG/zRXfETsJo/UzKWZjmCa5Jh8SdRGKDfvRUkT
+RmKHT8cBaHrKi+2fmpE86Jj1Z4WD2CMssx3+aGJKsf0uWEWNs1hL17S0wojYEJnS
+B8KrkQ73oVzKYlqbm8SJtB+Z38X+CQcaGVy3H4NfzJ/zFs1f0wMAhxRMd5iNQW2Z
+/FEriSD7fTpUgwM/gcmW
+=BFkS
+-----END PGP SIGNATURE-----
+
+--GvXjxJ+pjyke8COw--
