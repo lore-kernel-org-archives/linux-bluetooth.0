@@ -1,52 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 11 Nov 2012 15:19:21 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [RFC v0 5/7] adapter: Remove DevicesFound signal
-Message-ID: <20121111131921.GA4405@x220>
-References: <1352385015-2127-1-git-send-email-mikel.astiz.oss@gmail.com>
- <1352385015-2127-6-git-send-email-mikel.astiz.oss@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1352385015-2127-6-git-send-email-mikel.astiz.oss@gmail.com>
+Message-ID: <1352594676.16204.25.camel@aeonflux>
+Subject: Re: [RFCv3 3/3] Bluetooth: Add sample BT USB mini-driver
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Tedd Ho-Jeong An <tedd.an@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, albert.o.ho@intel.com,
+	johan.hedberg@intel.com, tedd.hj.an@gmail.com
+Date: Sun, 11 Nov 2012 01:44:36 +0100
+In-Reply-To: <3643102.0sb8ltOP1V@tedd-ubuntu>
+References: <3643102.0sb8ltOP1V@tedd-ubuntu>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Tedd,
 
-On Thu, Nov 08, 2012, Mikel Astiz wrote:
-> ObjectManager reports the D-Bus interfaces of all known devices,
-> including the ones detected during discovery. Therefore this signal is
-> not required.
+> This patch adds sample BT USB mini-driver
+> 
+> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 > ---
->  doc/adapter-api.txt |  13 ++-----
->  src/adapter.c       | 102 ++--------------------------------------------------
->  2 files changed, 4 insertions(+), 111 deletions(-)
+>  drivers/bluetooth/btusb.c        |    3 +
+>  drivers/bluetooth/btusb_sample.c |  189 ++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 192 insertions(+)
+>  create mode 100644 drivers/bluetooth/btusb_sample.c
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 39a1e6c..630d938 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -193,6 +193,9 @@ static struct usb_device_id blacklist_table[] = {
+>  	/* Frontline ComProbe Bluetooth Sniffer */
+>  	{ USB_DEVICE(0x16d3, 0x0002), .driver_info = BTUSB_SNIFFER },
+>  
+> +	/* BT USB sample mini-driver */
+> +	{ USB_DEVICE(0x1234, 0x5678), .driver_info = BTUSB_IGNORE },
+> +
+>  	{ }	/* Terminating entry */
+>  };
 
-If you look at the commit history you'll see that this signal was added
-after the introduction of object manager and was part of the patches
-that removed the old DeviceFound signal.
+we should convert BCM92035 into a mini-driver for demo purposes. It is
+the perfect candidate and as a nice extra result, I can remove the
+stupid hdev->driver_init queue.
 
-You're right in that our original plan was to replace the device
-discovery completely with ObjectManager signals but that turned out to
-be infeasible in practice. Even the python script for doing discovery
-ended up being quite complex (meaning most other languages would be even
-worse) and we didn't get any signals for discovered devices that already
-existed in the bluetoothd object hierarchy (since nothing changes for
-them from an ObjectManager perspective).
+Regards
 
-Due to these issues we decided to reintroduce a dedicated signal for
-device discovery and at the same time fix the bottle neck we've seen
-during the past years where the high frequency of signals in a busy
-environment (e.g. UPF) consumes a lot of resources.
+Marcel
 
-The DevicesFound signal is emitted once a second and contains all
-devices found since the last period. If no device was found during the
-last period the signal is sent as soon as the first device is found.
-There's also an (adjustable through a define, right now 5) maximum size
-for the list length which forces the signal to be sent as soon as the
-limit is reached.
 
-Johan
