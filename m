@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1352594558.16204.23.camel@aeonflux>
-Subject: Re: [RFCv3 2/3] Bluetooth: Add support vendor specific device setup
+Message-ID: <1352594070.16204.15.camel@aeonflux>
+Subject: Re: [RFCv3 1/3] Bluetooth: Add support BT mini-driver
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Tedd Ho-Jeong An <tedd.an@intel.com>
 Cc: linux-bluetooth@vger.kernel.org, albert.o.ho@intel.com,
 	johan.hedberg@intel.com, tedd.hj.an@gmail.com
-Date: Sun, 11 Nov 2012 01:42:38 +0100
-In-Reply-To: <1731055.pboutxBfre@tedd-ubuntu>
-References: <1731055.pboutxBfre@tedd-ubuntu>
+Date: Sun, 11 Nov 2012 01:34:30 +0100
+In-Reply-To: <1385742.8V9Ax1uMxF@tedd-ubuntu>
+References: <1385742.8V9Ax1uMxF@tedd-ubuntu>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,131 +15,89 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Tedd,
 
-> This patch adds support vendors to execute their specific device
-> setup before the BT stack sends generic BT device initialization.
+> This patch add mini-driver support in BTUSB
 > 
 > Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 > ---
->  include/net/bluetooth/hci.h      |    2 ++
->  include/net/bluetooth/hci_core.h |    7 +++++++
->  net/bluetooth/hci_core.c         |   27 ++++++++++++++++++++++++++-
->  3 files changed, 35 insertions(+), 1 deletion(-)
+>  drivers/bluetooth/btusb.c |   68 +++++++++++++++++++++++++++++++++++++++++----
+>  drivers/bluetooth/btusb.h |   44 +++++++++++++++++++++++++++++
+>  2 files changed, 106 insertions(+), 6 deletions(-)
+>  create mode 100644 drivers/bluetooth/btusb.h
 > 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 0f28f70..3e9949b 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -117,7 +117,9 @@ enum {
->  	HCI_DISCOVERABLE,
->  	HCI_LINK_SECURITY,
->  	HCI_PENDING_CLASS,
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index f637c25..39a1e6c 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -27,6 +27,8 @@
+>  #include <net/bluetooth/bluetooth.h>
+>  #include <net/bluetooth/hci_core.h>
+>  
+> +#include "btusb.h"
 > +
->  	HCI_PERIODIC_INQ,
-> +	HCI_VENDOR,		/* for mini-driver vendor specific setup */
->  };
+>  #define VERSION "0.6"
 >  
->  /* HCI ioctl defines */
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 6a3337e..ad4a099 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -275,6 +275,13 @@ struct hci_dev {
->  	int (*send)(struct sk_buff *skb);
->  	void (*notify)(struct hci_dev *hdev, unsigned int evt);
->  	int (*ioctl)(struct hci_dev *hdev, unsigned int cmd, unsigned long arg);
-> +
-> +/* CHECKME: Added following members for vendor specific setup in order to make
-> + * the bluetooth.ko transparent to the interface below.
-> + * These members are set/used by the vendor provided mini-driver. */
-> +	void			*vendor_data;
-> +	int (*vendor_setup)(struct hci_dev *hdev);
-> +	void (*vendor_event)(struct hci_dev *hdev, struct sk_buff *skb);
->  };
+>  static bool ignore_dga;
+> @@ -47,6 +49,7 @@ static struct usb_driver btusb_driver;
+>  #define BTUSB_BROKEN_ISOC	0x20
+>  #define BTUSB_WRONG_SCO_MTU	0x40
+>  #define BTUSB_ATH3012		0x80
+> +#define BTUSB_VENDOR		0x100
 >  
->  struct hci_conn {
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index e407051..09e7fa2 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -685,6 +685,21 @@ int hci_dev_open(__u16 dev)
->  		set_bit(HCI_INIT, &hdev->flags);
->  		hdev->init_last_cmd = 0;
+>  static struct usb_device_id btusb_table[] = {
+>  	/* Generic Bluetooth USB device */
+> @@ -206,6 +209,7 @@ struct btusb_data {
+>  	struct usb_device    *udev;
+>  	struct usb_interface *intf;
+>  	struct usb_interface *isoc;
+> +	struct btusb_driver_info *driver_info;
 >  
-> +/* CHECKME: this is the required spot for executing the vendor setup code.
-> + * We need btusb_open() to complete so HCI event can be received and
-> + * processed by vendor_event() handler. vendor_setup() must be done first
-> + * before hci_init_req.
-> + * vendor_setup() runs once only.*/
-> +		if (hdev->vendor_setup) {
-> +			set_bit(HCI_VENDOR, &hdev->dev_flags);
-
-the HCI_VENDOR is actually not needed since we do already have the
-HCI_SETUP stage that is executed exactly one time.
-
-> +			ret = hdev->vendor_setup(hdev);
-> +			hdev->vendor_event = NULL;
-> +			hdev->vendor_setup = NULL;
-> +			clear_bit(HCI_VENDOR, &hdev->dev_flags);
-> +			if (ret < 0)
-> +				goto done;
-
-This goto is actually wrong. You are not cleaning up the transport
-setup. This means you leave a half broken setup around in case it
-returns an error.
-
-What I really want is that the hdev->setup() can just abort the setup
-and fail gracefully. Reason for this might be simple like the firmware
-is not present. The next time you try it should go through and succeed.
-
+>  	spinlock_t lock;
+>  
+> @@ -952,9 +956,15 @@ static int btusb_probe(struct usb_interface *intf,
+>  			return -ENODEV;
+>  	}
+>  
+> -	data = devm_kzalloc(&intf->dev, sizeof(*data), GFP_KERNEL);
+> -	if (!data)
+> -		return -ENOMEM;
+> +/* CHECKME: if mini-driver invokes btusb_probe, btusb_data already has been
+> + * allocated. If btusb_probe is directly invoked by usb core, then allocate
+> + * here. */
+> +	data = usb_get_intfdata(intf);
+> +	if (!data) {
+> +		data = devm_kzalloc(&intf->dev, sizeof(*data), GFP_KERNEL);
+> +		if (!data)
+> +			return -ENOMEM;
+> +	}
+>  
+>  	for (i = 0; i < intf->cur_altsetting->desc.bNumEndpoints; i++) {
+>  		ep_desc = &intf->cur_altsetting->endpoint[i].desc;
+> @@ -1012,6 +1022,17 @@ static int btusb_probe(struct usb_interface *intf,
+>  	hdev->send     = btusb_send_frame;
+>  	hdev->notify   = btusb_notify;
+>  
+> +	/* bind the vendor specific mini-driver */
+> +	if ((id->driver_info & BTUSB_VENDOR) && data->driver_info) {
+> +		if (data->driver_info->bind) {
+> +			err = data->driver_info->bind(hdev);
+> +			if (err < 0) {
+> +				hci_free_dev(hdev);
+> +				return err;
+> +			}
 > +		}
+> +	}
 > +
->  		ret = __hci_request(hdev, hci_init_req, 0, HCI_INIT_TIMEOUT);
->  
->  		if (lmp_host_le_capable(hdev))
-> @@ -2119,6 +2134,7 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
->  
->  	return 0;
->  }
-> +EXPORT_SYMBOL(hci_send_cmd);
->  
->  /* Get data from the previously sent command */
->  void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
-> @@ -2800,7 +2816,16 @@ static void hci_rx_work(struct work_struct *work)
->  		switch (bt_cb(skb)->pkt_type) {
->  		case HCI_EVENT_PKT:
->  			BT_DBG("%s Event packet", hdev->name);
-> -			hci_event_packet(hdev, skb);
-> +/* CHECKME: If we are in vendor mode, all HCI events are handled by
-> + * vendor_event() and not handled by normal stack flows. vendor_event() shall
-> + * also be responsible for handling flow control.
-> + *
-> + * Please see the mini-driver sample code. */
-> +			if (test_bit(HCI_VENDOR, &hdev->dev_flags)
-> +					&& hdev->vendor_event)
-> +				hdev->vendor_event(hdev, skb);
-> +			else
-> +				hci_event_packet(hdev, skb);
->  			break;
 
-Having spent some time with this problem and actually playing with it, I
-want to do this two-fold. First get the proper handling of the HCI_SETUP
-stage and hdev->setup() integrated. That by itself is already useful for
-really simple drivers.
+I think we can make this even simpler. Had a 12 hours flight to Tokyo
+and ran out of movies to watch ;)
 
-The next is that we need a hci_request equivalent that also returns the
-results of a command or maybe simple just its events. I am fine with
-them being duplicated actually.
+So I have a set of patches that add a real hdev->setup() stage to
+Bluetooth core. So it can be used from any driver. I also have an
+immediate use for it by one of the Broadcom drivers that need to send
+one extra HCI command for the HID switching.
 
-For a first step it might be simple enough to just use hci_request and
-allow to provide a event callback when triggering it. The hci_request is
-already serialized with a lock. So you will only have one caller at a
-time.
-
-In addition this will make the mini-driver a lot simpler. hci_request is
-already handling all the waiting for you.
-
-As mentioned, I do have patches for the hdev->setup() stage, but I have
-not gotten to the hci_request part (despite a 12 hours flights).
+Need to refactor the patches a bit in better order and will post them
+then.
 
 Regards
 
