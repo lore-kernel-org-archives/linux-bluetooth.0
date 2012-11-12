@@ -1,19 +1,22 @@
 Return-Path: <cyrus@holtmann.org>
-From: Kris Chen <chongc@qca.qualcomm.com>
-To: <dwmw2@infradead.org>
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] Update rampatch file for AR9565
-Date: Mon, 12 Nov 2012 14:53:32 +0800
-Message-ID: <1352703212-3660-1-git-send-email-chongc@qca.qualcomm.com>
+From: Peng Chen <pengchen@qca.qualcomm.com>
+To: <ben@decadent.org.uk>
+CC: <linux-bluetooth@vger.kernel.org>,
+	Peng Chen <pengchen@qca.qualcomm.com>
+Subject: [PATCH] Update patch and syscfg files for QCA9564.
+Date: Mon, 12 Nov 2012 13:24:10 +0800
+Message-ID: <1352697850-27915-1-git-send-email-pengchen@qca.qualcomm.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Signed-off-by: Kris Chen <chongc@qca.qualcomm.com>
+
+Signed-off-by: Peng Chen <pengchen@qca.qualcomm.com>
 ---
- ar3k/AthrBT_0x31010000.dfu |  Bin 38916 -> 40652 bytes
- 1 file changed, 0 insertions(+), 0 deletions(-)
+ ar3k/AthrBT_0x31010000.dfu   |  Bin 38916 -> 40652 bytes
+ ar3k/ramps_0x31010000_40.dfu |  Bin 1434 -> 1926 bytes
+ 2 files changed, 0 insertions(+), 0 deletions(-)
 
 diff --git a/ar3k/AthrBT_0x31010000.dfu b/ar3k/AthrBT_0x31010000.dfu
 index 3bd76c02ecf2e433d640e1215e2253cebbed730d..935beb392a53979668bf7da5e4acb62ea7db80fe 100644
@@ -683,6 +686,43 @@ z4EBJjR4n*vI*te7&kg2co?-!<vtm9S$%VVFIahsdIR#B*G$G(DSCtPNSXgEL=sGRQ
 z6%@S+n^?w4L_1rx@Xk4MU(AzVBgJ2dBzQ9FTeR?;!^S?8G`_~{jWusThaT4{_7WLS
 zBdEw#$(XHC1{H_*?t76l50vwfJehovys$9rvO0&<pq8L^UJLgfi=aSRkOhvnwR}-t
 r0$+k&3$Ei~aFZxg5-kCuJXscV(8OvJd)P(}hrRwD933+ffSLaX;h4*q
+
+diff --git a/ar3k/ramps_0x31010000_40.dfu b/ar3k/ramps_0x31010000_40.dfu
+index 1da3631ff2783264bce6d737f7c539373c75f9f8..ef3d79dce757751b47507074d9ef9da1b0ad35ed 100644
+GIT binary patch
+delta 1281
+zcmXZcZ%7+=7zgm@%stN?CfcyY&AKFY;MRYkYe!k7w2d1Mit|MgUt}&VePK&$J6A?u
+zxFNk0($$GCEb)beIP${LtahW)!h9i%FC2{$igdonL?tiMt=sGf!xyr~-oE)|ciiWm
+z=l6T=cX#>acM11byN*%o$K+u9+#t2p!0-Qk{@8=_#sAxgqGr?xX@Aqq%q#Q;zkK=h
+z_OYSY?A=5y8tP2DW{;^;tR|Q1^xl4)(5B;;wRcZ-eKa#b8(%~yN*ejJc2s(cF*;fL
+zMW3fJEktXSZxb4(u1`<akJI}?WK(l8OQZB)aWVd@_LkLbR>mi8{E$fJ2t1^f$mH5y
+zA`f>!FONVUFTqBxy+GvW4%o~iu!Wn@zK?rgh!gNIufn6;gx*%}fhRZt+jteWvp+_3
+znxn9jlNL^AxM_;0n|ok{6EMm_c%IL}Uj7DN;thC}gWnQe<NXUn*ZDFW;P2od{{e08
+zgE77fhxt!9$_IWX8sk1V&d1R*!3T;&N$!IwzFV}2ruYhycktF}o<?+!|AP1V;8UW9
+zd<D+(G@Rqf--zaU9WHPfHCeV`jx%tX9k{|_ROZ=&Yn*`vc3_dixat{OaFa8z#17oD
+zIQ%=&He0aF8A$TAA5$TV(3D!}kq+n;H}r`IHcBV-OC4;MCfFi9aGxY#NIrpw#Sf24
+z0Jh3mctR#&o2<ij2?S81StU9xXAySFBs?RB(Ah2hFd{#|s04$U3ONURr5`ny<P_Sk
+z$_;o;euCGfAH4&TK|Cm7)YxLdm}KCvIB-<Ls2LLrj!Onkh!Z4>k`ms7xeyCZNd~6H
+zf%la6l@FD($~on{azU9@=9J6I6=hzzrYtCn$|Kq;JyX%9Se09qRI;VqR+g0$bn(4`
+z8%c`k^$jWN3ib9)QR(=XTAB`Gp8Td4&Ke((+nzJ>jQ@slA?<N57+CD#tTLxuuGqSw
+z;=FQASuh+E9YtgBQg{5O>rG9I-*Fw`0G9uc@paeU&rI5MY<wdAc~Q0G6mH>hUsT<4
+zQU;cNx$3rK-_oh0T(#_IMjhQOSH<s(EQQL7I@x#XXsKM)MAo3PhWL>Fwl)+`>;C<Y
+z3*Ri4lY2E+vwPO<qY-+2S7E2RM|ONWl_RUsd2jr=9;i<}s*Hz`9#uw)H}art1T^oH
+GC;tI5i+zv)
+
+delta 791
+zcmXZZPe@cj90%~<?7r{1u9{|BnYgsUf}!i5EKs6a4-z3AI&|2?g9i^~nnE2!toI7j
+zhz{E8AktxjpeW6ZAP?et5ENM?B>E!}9t5S-mhd3CI(?tpJl<z!zQ38rW2QHED63j(
+zu83yqh3qvK9r?RHpUuAOe<sr5=|EU*$k<rEyfb!p9}iUDJtPGpA;ooG%M}qrdR&z!
+zZ&nV>52>hqO;r^yG>mo1kFKaRiW0x7<I23{9*HDZj4A0?VVM@|^F6mcp$hCp6*2|&
+zMIr_sQZMFcxk^eld;xAmJ@uoIX#pB&5r$|Gi!_8nR*$2BhEc+#5-s!;UeOx-q-RjV
+zYAsr59Zoa3fKqx9*Xbp^HrZXqFB(ND7d4`hHX+QU8LjjxhG{DT%sWuV@h!B`PK?lQ
+ztWyhRtoERdKEPQfk8qpz;|+a+4LXQ&R-fVqjo}=V=eSd3ioC=mClzW|hEc)MTeQ>n
+z7^UO*O(#&nO;c#6(-@_*i1T0*(5!w$g!l0YCjE*y{SHl+5aGQp!^{_1MV#X`XqrUC
+zEwTxdZut;rmx6YSZQ_^``x#E)18;lM{(@pNQ&zQ=A@XNC?V7gw_=)YbNo~#Wf>LQW
+zwe`Y~`c&F2)?9L*HOG{;R@@RxrR9mOcw~+<M?<WPLT9$8SFFCH&dkwn_k_+%EH@@q
+z;_~{MgF&AT26bY8LMffdPh={;3<`f<Yqw4uNVtxSXC2O2+DSjr9siE=@~A}YZ=S%u
+YrkNZLy;3`K(20zUZqIx`<t;4y1CD#!NB{r;
 
 -- 
 1.7.9.5
