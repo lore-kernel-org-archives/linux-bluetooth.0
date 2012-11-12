@@ -1,78 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: Remove driver init queue from core
-Date: Mon, 12 Nov 2012 14:02:16 +0900
-Message-Id: <1352696536-13937-3-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 2/3] Bluetooth: Convert BCM92035 support  to driver setup callback
+Date: Mon, 12 Nov 2012 14:02:15 +0900
+Message-Id: <1352696536-13937-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The driver init queue is no longer needed. This can be all handled
-inside the drivers now. So remove it.
+With the early init stage during setup, this quirk can be simplified
+and kept fully inside the driver.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h |  2 --
- net/bluetooth/hci_core.c         | 15 ---------------
- 2 files changed, 17 deletions(-)
+ drivers/bluetooth/btusb.c | 28 +++++++++++++++++-----------
+ 1 file changed, 17 insertions(+), 11 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index c14d52e..4e007db 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -261,8 +261,6 @@ struct hci_dev {
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index debda27..5b43b0d 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -234,6 +234,7 @@ struct btusb_data {
+ 	struct usb_endpoint_descriptor *isoc_rx_ep;
  
- 	struct hci_dev_stats	stat;
+ 	__u8 cmdreq_type;
++	unsigned long driver_info;
  
--	struct sk_buff_head	driver_init;
--
- 	atomic_t		promisc;
- 
- 	struct dentry		*debugfs;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 52acfee..50066f3 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -203,22 +203,10 @@ static void amp_init(struct hci_dev *hdev)
- 
- static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
- {
--	struct sk_buff *skb;
--
- 	BT_DBG("%s %ld", hdev->name, opt);
- 
- 	/* Driver initialization */
- 
--	/* Special commands */
--	while ((skb = skb_dequeue(&hdev->driver_init))) {
--		bt_cb(skb)->pkt_type = HCI_COMMAND_PKT;
--		skb->dev = (void *) hdev;
--
--		skb_queue_tail(&hdev->cmd_q, skb);
--		queue_work(hdev->workqueue, &hdev->cmd_work);
--	}
--	skb_queue_purge(&hdev->driver_init);
--
- 	/* Reset */
- 	if (!test_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks))
- 		hci_reset_req(hdev, 0);
-@@ -1735,7 +1723,6 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
- 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
- 
--	skb_queue_head_init(&hdev->driver_init);
- 	skb_queue_head_init(&hdev->rx_q);
- 	skb_queue_head_init(&hdev->cmd_q);
- 	skb_queue_head_init(&hdev->raw_q);
-@@ -1754,8 +1741,6 @@ EXPORT_SYMBOL(hci_alloc_dev);
- /* Free HCI device */
- void hci_free_dev(struct hci_dev *hdev)
- {
--	skb_queue_purge(&hdev->driver_init);
--
- 	/* will free via device release */
- 	put_device(&hdev->dev);
+ 	unsigned int sco_num;
+ 	int isoc_altsetting;
+@@ -687,6 +688,20 @@ static int btusb_flush(struct hci_dev *hdev)
+ 	return 0;
  }
+ 
++static int btusb_setup(struct hci_dev *hdev)
++{
++	struct btusb_data *data = hci_get_drvdata(hdev);
++
++	BT_DBG("%s", hdev->name);
++
++	if (data->driver_info & BTUSB_BCM92035) {
++		__u8 val = 0x00;
++		hci_send_cmd(hdev, 0xfc3b, 1, &val);
++	}
++
++	return 0;
++}
++
+ static int btusb_send_frame(struct sk_buff *skb)
+ {
+ 	struct hci_dev *hdev = (struct hci_dev *) skb->dev;
+@@ -984,6 +999,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 		return -ENODEV;
+ 
+ 	data->cmdreq_type = USB_TYPE_CLASS;
++	data->driver_info = id->driver_info;
+ 
+ 	data->udev = interface_to_usbdev(intf);
+ 	data->intf = intf;
+@@ -1014,6 +1030,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 	hdev->open     = btusb_open;
+ 	hdev->close    = btusb_close;
+ 	hdev->flush    = btusb_flush;
++	hdev->setup    = btusb_setup;
+ 	hdev->send     = btusb_send_frame;
+ 	hdev->notify   = btusb_notify;
+ 
+@@ -1054,17 +1071,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 		data->isoc = NULL;
+ 	}
+ 
+-	if (id->driver_info & BTUSB_BCM92035) {
+-		unsigned char cmd[] = { 0x3b, 0xfc, 0x01, 0x00 };
+-		struct sk_buff *skb;
+-
+-		skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
+-		if (skb) {
+-			memcpy(skb_put(skb, sizeof(cmd)), cmd, sizeof(cmd));
+-			skb_queue_tail(&hdev->driver_init, skb);
+-		}
+-	}
+-
+ 	if (data->isoc) {
+ 		err = usb_driver_claim_interface(&btusb_driver,
+ 							data->isoc, data);
 -- 
 1.7.11.7
 
