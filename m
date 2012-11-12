@@ -1,76 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 12 Nov 2012 11:26:43 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv1 11/12] Bluetooth: AMP: Use l2cap_physical_cfm in
- phylink complete evt
-Message-ID: <20121112092641.GA10008@aemeltch-MOBL1>
-References: <1350493622.26318.114.camel@aeonflux>
- <1351691197-8394-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1351691197-8394-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <alpine.DEB.2.02.1211011045260.9973@mathewm-linux>
- <20121102074844.GA4171@aemeltch-MOBL1>
- <alpine.DEB.2.02.1211020808010.29427@mathewm-linux>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.DEB.2.02.1211020808010.29427@mathewm-linux>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1352458100.16204.11.camel@aeonflux>
+References: <1352455094-17992-1-git-send-email-luiz.dentz@gmail.com>
+	<1352458100.16204.11.camel@aeonflux>
+Date: Mon, 12 Nov 2012 11:08:12 +0200
+Message-ID: <CABBYNZJXYGaROMPTh02Pc3bu00pB0ZFkrj-9BXx8SF+BQ8MzpA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2] audio: Move to profiles directory
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi Marcel,
 
-On Fri, Nov 02, 2012 at 08:39:09AM -0700, Mat Martineau wrote:
-...
-> >>>+void amp_physical_cfm(struct hci_conn *bredr_hcon, struct hci_conn *hs_hcon)
-> >>>+{
-> >>>+	struct hci_dev *bredr_hdev = hci_dev_hold(bredr_hcon->hdev);
-> >>>+	struct amp_mgr *mgr = hs_hcon->amp_mgr;
-> >>>+	struct l2cap_chan *bredr_chan;
-> >>>+
-> >>>+	BT_DBG("bredr_hcon %p hs_hcon %p mgr %p", bredr_hcon, hs_hcon, mgr);
-> >>>+
-> >>>+	if (!bredr_hdev || !mgr || !mgr->bredr_chan)
-> >>>+		return;
-> >>>+
-> >>>+	bredr_chan = mgr->bredr_chan;
-> >>>+
-> >>>+	set_bit(FLAG_EFS_ENABLE, &bredr_chan->flags);
-> >>>+	bredr_chan->ctrl_id = hs_hcon->remote_id;
-> >>>+	bredr_chan->hs_hcon = hs_hcon;
-> >>>+	bredr_chan->conn->mtu = hs_hcon->hdev->block_mtu;
-> >>>+	bredr_chan->fcs = L2CAP_FCS_NONE;
-> 
-> Changing FCS requires L2CAP reconfiguration for the channel, and
-> chan->fcs shouldn't be modified until reconfiguration happens.
-> While it doesn't make much sense to do so, the remote device may
-> want to keep FCS enabled.  The move may also fail and you don't want
-> to forget the original FCS setting in that case.
+On Fri, Nov 9, 2012 at 12:48 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
+>
+>> ---
+>> v2: Rebase after changes to remove gstreamer and SBC code
+>>
+>>  Makefile.am                                  | 64 +++++++++++++++-------------
+>>  {audio => profiles/audio}/a2dp-codecs.h      |  0
+>
+> this one is used from avinfo.c as well. We might move that one better
+> into lib/ or some place else.
+>
+>>  {audio => profiles/audio}/a2dp.c             |  0
+>>  {audio => profiles/audio}/a2dp.h             |  0
+>>  {audio => profiles/audio}/audio.conf         |  0
+>>  {audio => profiles/audio}/avctp.c            |  0
+>>  {audio => profiles/audio}/avctp.h            |  0
+>>  {audio => profiles/audio}/avdtp.c            |  0
+>>  {audio => profiles/audio}/avdtp.h            |  0
+>>  {audio => profiles/audio}/avrcp.c            |  0
+>>  {audio => profiles/audio}/avrcp.h            |  0
+>>  {audio => profiles/audio}/control.c          |  0
+>>  {audio => profiles/audio}/control.h          |  0
+>>  {audio => profiles/audio}/device.c           |  0
+>>  {audio => profiles/audio}/device.h           |  0
+>>  {audio => profiles/audio}/gateway.c          |  0
+>>  {audio => profiles/audio}/gateway.h          |  0
+>>  {audio => profiles/audio}/headset.c          |  0
+>>  {audio => profiles/audio}/headset.h          |  0
+>>  {audio => profiles/audio}/main.c             |  0
+>>  {audio => profiles/audio}/manager.c          |  0
+>>  {audio => profiles/audio}/manager.h          |  0
+>>  {audio => profiles/audio}/media.c            |  0
+>>  {audio => profiles/audio}/media.h            |  0
+>>  {audio => profiles/audio}/player.c           |  0
+>>  {audio => profiles/audio}/player.h           |  0
+>>  {audio => profiles/audio}/rtp.h              |  0
+>>  {audio => profiles/audio}/sink.c             |  0
+>>  {audio => profiles/audio}/sink.h             |  0
+>>  {audio => profiles/audio}/source.c           |  0
+>>  {audio => profiles/audio}/source.h           |  0
+>>  {audio => profiles/audio}/telephony-dummy.c  |  0
+>>  {audio => profiles/audio}/telephony-maemo5.c |  0
+>>  {audio => profiles/audio}/telephony-maemo6.c |  0
+>>  {audio => profiles/audio}/telephony-ofono.c  |  0
+>>  {audio => profiles/audio}/telephony.h        |  0
+>>  {audio => profiles/audio}/transport.c        |  0
+>>  {audio => profiles/audio}/transport.h        |  0
+>>  38 files changed, 35 insertions(+), 29 deletions(-)
+>>  rename {audio => profiles/audio}/a2dp-codecs.h (100%)
+>>  rename {audio => profiles/audio}/a2dp.c (100%)
+>>  rename {audio => profiles/audio}/a2dp.h (100%)
+>>  rename {audio => profiles/audio}/audio.conf (100%)
+>>  rename {audio => profiles/audio}/avctp.c (100%)
+>>  rename {audio => profiles/audio}/avctp.h (100%)
+>>  rename {audio => profiles/audio}/avdtp.c (100%)
+>>  rename {audio => profiles/audio}/avdtp.h (100%)
+>>  rename {audio => profiles/audio}/avrcp.c (100%)
+>>  rename {audio => profiles/audio}/avrcp.h (100%)
+>>  rename {audio => profiles/audio}/control.c (100%)
+>>  rename {audio => profiles/audio}/control.h (100%)
+>>  rename {audio => profiles/audio}/device.c (100%)
+>>  rename {audio => profiles/audio}/device.h (100%)
+>>  rename {audio => profiles/audio}/gateway.c (100%)
+>>  rename {audio => profiles/audio}/gateway.h (100%)
+>>  rename {audio => profiles/audio}/headset.c (100%)
+>>  rename {audio => profiles/audio}/headset.h (100%)
+>>  rename {audio => profiles/audio}/main.c (100%)
+>>  rename {audio => profiles/audio}/manager.c (100%)
+>>  rename {audio => profiles/audio}/manager.h (100%)
+>>  rename {audio => profiles/audio}/media.c (100%)
+>>  rename {audio => profiles/audio}/media.h (100%)
+>>  rename {audio => profiles/audio}/player.c (100%)
+>>  rename {audio => profiles/audio}/player.h (100%)
+>>  rename {audio => profiles/audio}/rtp.h (100%)
+>>  rename {audio => profiles/audio}/sink.c (100%)
+>>  rename {audio => profiles/audio}/sink.h (100%)
+>>  rename {audio => profiles/audio}/source.c (100%)
+>>  rename {audio => profiles/audio}/source.h (100%)
+>>  rename {audio => profiles/audio}/telephony-dummy.c (100%)
+>>  rename {audio => profiles/audio}/telephony-maemo5.c (100%)
+>>  rename {audio => profiles/audio}/telephony-maemo6.c (100%)
+>>  rename {audio => profiles/audio}/telephony-ofono.c (100%)
+>>  rename {audio => profiles/audio}/telephony.h (100%)
+>>  rename {audio => profiles/audio}/transport.c (100%)
+>>  rename {audio => profiles/audio}/transport.h (100%)
+>
+> Before we do this, lets take the telephony stuff out first. We do not
+> want to keep it anyway.
 
-So we agree that FCS shall not be used for High Speed channels. I was
-thinking more about the case where we start sending data right over HS
-channel. The configuration should be just started.
+That probably means audio/headset.c and audio/gateway.c should be
+removed as well and no btd_profiles should be registered for those
+profiles. This will leave us without any HFP profiles support for now,
+but I guess this is okay as they will be external profiles.
 
-What would be the better place to init FCS? l2cap_physical_cfm after
-checking channel moving status?
-
-> >>Sorry I missed this earlier: bredr_chan needs to be locked before
-> >>changing it.  I suggest passing the information to
-> >>l2cap_physical_cfm and letting that function update the structure
-> >>members while it holds the lock.
-> >
-> >what about locking here and changing l2cap_physical_cfm to unlocked
-> >__l2cap_physical_cfm ?
-> 
-> My preference is to not manipulate l2cap_chan too much outside of
-> l2cap_core, and to keep the channel move or channel create state
-> machines inside l2cap_core.  l2cap_physical_cfm checks the channel
-> state before modifying it.  The move or new connection may have been
-> canceled or be in the wrong state, in which case the structure
-> should not be modified even though the physical link was completed.
-
-so maybe we shall move some code to l2cap_physical_cfm ?
-
-Best regards 
-Andrei Emeltchenko 
-
+-- 
+Luiz Augusto von Dentz
