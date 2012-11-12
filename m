@@ -1,87 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Convert BCM92035 support  to driver setup callback
-Date: Mon, 12 Nov 2012 14:02:15 +0900
-Message-Id: <1352696536-13937-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/3] Bluetooth: Add driver setup stage for early init
+Date: Mon, 12 Nov 2012 14:02:14 +0900
+Message-Id: <1352696536-13937-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With the early init stage during setup, this quirk can be simplified
-and kept fully inside the driver.
+Some drivers require a special stage for their early init. This is always
+specific to the driver or transport. So call back into driver to allow
+bringing up the device.
+
+The advantage with this stage is that the Bluetooth core is actually
+handling the HCI layer now. This means that command and event processing
+is available.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/btusb.c | 28 +++++++++++++++++-----------
- 1 file changed, 17 insertions(+), 11 deletions(-)
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         | 36 ++++++++++++++++++++++--------------
+ 2 files changed, 23 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index debda27..5b43b0d 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -234,6 +234,7 @@ struct btusb_data {
- 	struct usb_endpoint_descriptor *isoc_rx_ep;
- 
- 	__u8 cmdreq_type;
-+	unsigned long driver_info;
- 
- 	unsigned int sco_num;
- 	int isoc_altsetting;
-@@ -687,6 +688,20 @@ static int btusb_flush(struct hci_dev *hdev)
- 	return 0;
- }
- 
-+static int btusb_setup(struct hci_dev *hdev)
-+{
-+	struct btusb_data *data = hci_get_drvdata(hdev);
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	if (data->driver_info & BTUSB_BCM92035) {
-+		__u8 val = 0x00;
-+		hci_send_cmd(hdev, 0xfc3b, 1, &val);
-+	}
-+
-+	return 0;
-+}
-+
- static int btusb_send_frame(struct sk_buff *skb)
- {
- 	struct hci_dev *hdev = (struct hci_dev *) skb->dev;
-@@ -984,6 +999,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		return -ENODEV;
- 
- 	data->cmdreq_type = USB_TYPE_CLASS;
-+	data->driver_info = id->driver_info;
- 
- 	data->udev = interface_to_usbdev(intf);
- 	data->intf = intf;
-@@ -1014,6 +1030,7 @@ static int btusb_probe(struct usb_interface *intf,
- 	hdev->open     = btusb_open;
- 	hdev->close    = btusb_close;
- 	hdev->flush    = btusb_flush;
-+	hdev->setup    = btusb_setup;
- 	hdev->send     = btusb_send_frame;
- 	hdev->notify   = btusb_notify;
- 
-@@ -1054,17 +1071,6 @@ static int btusb_probe(struct usb_interface *intf,
- 		data->isoc = NULL;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index ef5b85d..c14d52e 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -285,6 +285,7 @@ struct hci_dev {
+ 	int (*open)(struct hci_dev *hdev);
+ 	int (*close)(struct hci_dev *hdev);
+ 	int (*flush)(struct hci_dev *hdev);
++	int (*setup)(struct hci_dev *hdev);
+ 	int (*send)(struct sk_buff *skb);
+ 	void (*notify)(struct hci_dev *hdev, unsigned int evt);
+ 	int (*ioctl)(struct hci_dev *hdev, unsigned int cmd, unsigned long arg);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e3a49db..52acfee 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -717,29 +717,37 @@ int hci_dev_open(__u16 dev)
+ 		goto done;
  	}
  
--	if (id->driver_info & BTUSB_BCM92035) {
--		unsigned char cmd[] = { 0x3b, 0xfc, 0x01, 0x00 };
--		struct sk_buff *skb;
+-	if (test_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks))
+-		set_bit(HCI_RAW, &hdev->flags);
 -
--		skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
--		if (skb) {
--			memcpy(skb_put(skb, sizeof(cmd)), cmd, sizeof(cmd));
--			skb_queue_tail(&hdev->driver_init, skb);
--		}
--	}
+-	/* Treat all non BR/EDR controllers as raw devices if
+-	   enable_hs is not set */
+-	if (hdev->dev_type != HCI_BREDR && !enable_hs)
+-		set_bit(HCI_RAW, &hdev->flags);
 -
- 	if (data->isoc) {
- 		err = usb_driver_claim_interface(&btusb_driver,
- 							data->isoc, data);
+ 	if (hdev->open(hdev)) {
+ 		ret = -EIO;
+ 		goto done;
+ 	}
+ 
+-	if (!test_bit(HCI_RAW, &hdev->flags)) {
+-		atomic_set(&hdev->cmd_cnt, 1);
+-		set_bit(HCI_INIT, &hdev->flags);
+-		hdev->init_last_cmd = 0;
++	atomic_set(&hdev->cmd_cnt, 1);
++	set_bit(HCI_INIT, &hdev->flags);
+ 
+-		ret = __hci_request(hdev, hci_init_req, 0, HCI_INIT_TIMEOUT);
++	if (hdev->setup && test_bit(HCI_SETUP, &hdev->dev_flags)) {
++		hdev->init_last_cmd = 0;
++		ret = hdev->setup(hdev);
++	}
+ 
+-		clear_bit(HCI_INIT, &hdev->flags);
++	if (!ret) {
++		/* Treat all non BR/EDR controllers as raw devices if
++		 * enable_hs is not set */
++		if (hdev->dev_type != HCI_BREDR && !enable_hs)
++			set_bit(HCI_RAW, &hdev->flags);
++
++		if (test_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks))
++			set_bit(HCI_RAW, &hdev->flags);
++
++		if (!test_bit(HCI_RAW, &hdev->flags)) {
++			hdev->init_last_cmd = 0;
++			ret = __hci_request(hdev, hci_init_req, 0,
++					    HCI_INIT_TIMEOUT);
++		}
+ 	}
+ 
++	clear_bit(HCI_INIT, &hdev->flags);
++
+ 	if (!ret) {
+ 		hci_dev_hold(hdev);
+ 		set_bit(HCI_UP, &hdev->flags);
 -- 
 1.7.11.7
 
