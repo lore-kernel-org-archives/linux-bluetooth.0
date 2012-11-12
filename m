@@ -1,46 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] build: Fix make distcheck for input plugin
-Date: Mon, 12 Nov 2012 17:03:41 -0400
-Message-Id: <1352754221-29672-1-git-send-email-anderson.lizardo@openbossa.org>
+Message-ID: <50A14FAE.2020405@elbrys.com>
+Date: Mon, 12 Nov 2012 14:36:14 -0500
+From: Bart Westgeest <bart@elbrys.com>
+MIME-Version: 1.0
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Feedback on potential fix for issue while advertising Feature
+ List
+References: <509BD103.2040808@elbrys.com> <509D879C.1080205@elbrys.com> <20121110122535.GA26532@x220.P-661HNU-F1>
+In-Reply-To: <20121110122535.GA26532@x220.P-661HNU-F1>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-suspend.c is a symlink generated at build time, therefore it should be
-created on build directory. Additionally, it is necessary to add
--I$(srcdir)/profiles/input to CPPFLAGS so suspend.h can be found (the
-compiler does not follow symlinks prior to resolving #include
-directives).
----
- Makefile.am |    6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+> I think the option of looking at the length and using the old
+> type for < 256 and a 16-bit type for greater lengths would be the
+> safest.
 
-diff --git a/Makefile.am b/Makefile.am
-index d49e8a0..c398e74 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -366,6 +366,10 @@ if MCAP
- AM_CPPFLAGS += -I$(builddir)/health
- endif
- 
-+if HOGPLUGIN
-+AM_CPPFLAGS += -I$(srcdir)/profiles/input
-+endif
-+
- unit_objects =
- 
- if TEST
-@@ -405,7 +409,7 @@ profiles/sap/sap.c: profiles/sap/@SAP_DRIVER@
- 	$(AM_V_GEN)$(LN_S) $(abs_top_srcdir)/$< $@
- 
- profiles/input/suspend.c: profiles/input/@HOG_SUSPEND_DRIVER@
--	$(AM_V_GEN)$(LN_S) $(abs_top_srcdir)/$< $@
-+	$(AM_V_GEN)$(LN_S) $(abs_top_builddir)/$< $@
- 
- scripts/%.rules:
- 	$(AM_V_GEN)cp $(subst 97-,,$@) $@
--- 
-1.7.9.5
-
+Thanks for the feedback. I'll start working on a patch.
