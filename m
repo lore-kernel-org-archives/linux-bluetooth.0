@@ -1,113 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1352458100.16204.11.camel@aeonflux>
-References: <1352455094-17992-1-git-send-email-luiz.dentz@gmail.com>
-	<1352458100.16204.11.camel@aeonflux>
-Date: Mon, 12 Nov 2012 11:08:12 +0200
-Message-ID: <CABBYNZJXYGaROMPTh02Pc3bu00pB0ZFkrj-9BXx8SF+BQ8MzpA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2] audio: Move to profiles directory
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20121111131921.GA4405@x220>
+References: <1352385015-2127-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1352385015-2127-6-git-send-email-mikel.astiz.oss@gmail.com>
+	<20121111131921.GA4405@x220>
+Date: Mon, 12 Nov 2012 09:45:44 +0100
+Message-ID: <CANT-zCU0mUgMRoNxO3Gg_jOb3ivzUqvoN6PyrGsbWvuWKbvFOQ@mail.gmail.com>
+Subject: Re: [RFC v0 5/7] adapter: Remove DevicesFound signal
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Fri, Nov 9, 2012 at 12:48 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Luiz,
+On Sun, Nov 11, 2012 at 2:19 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Mikel,
 >
+> On Thu, Nov 08, 2012, Mikel Astiz wrote:
+>> ObjectManager reports the D-Bus interfaces of all known devices,
+>> including the ones detected during discovery. Therefore this signal is
+>> not required.
 >> ---
->> v2: Rebase after changes to remove gstreamer and SBC code
->>
->>  Makefile.am                                  | 64 +++++++++++++++-------------
->>  {audio => profiles/audio}/a2dp-codecs.h      |  0
+>>  doc/adapter-api.txt |  13 ++-----
+>>  src/adapter.c       | 102 ++--------------------------------------------------
+>>  2 files changed, 4 insertions(+), 111 deletions(-)
 >
-> this one is used from avinfo.c as well. We might move that one better
-> into lib/ or some place else.
->
->>  {audio => profiles/audio}/a2dp.c             |  0
->>  {audio => profiles/audio}/a2dp.h             |  0
->>  {audio => profiles/audio}/audio.conf         |  0
->>  {audio => profiles/audio}/avctp.c            |  0
->>  {audio => profiles/audio}/avctp.h            |  0
->>  {audio => profiles/audio}/avdtp.c            |  0
->>  {audio => profiles/audio}/avdtp.h            |  0
->>  {audio => profiles/audio}/avrcp.c            |  0
->>  {audio => profiles/audio}/avrcp.h            |  0
->>  {audio => profiles/audio}/control.c          |  0
->>  {audio => profiles/audio}/control.h          |  0
->>  {audio => profiles/audio}/device.c           |  0
->>  {audio => profiles/audio}/device.h           |  0
->>  {audio => profiles/audio}/gateway.c          |  0
->>  {audio => profiles/audio}/gateway.h          |  0
->>  {audio => profiles/audio}/headset.c          |  0
->>  {audio => profiles/audio}/headset.h          |  0
->>  {audio => profiles/audio}/main.c             |  0
->>  {audio => profiles/audio}/manager.c          |  0
->>  {audio => profiles/audio}/manager.h          |  0
->>  {audio => profiles/audio}/media.c            |  0
->>  {audio => profiles/audio}/media.h            |  0
->>  {audio => profiles/audio}/player.c           |  0
->>  {audio => profiles/audio}/player.h           |  0
->>  {audio => profiles/audio}/rtp.h              |  0
->>  {audio => profiles/audio}/sink.c             |  0
->>  {audio => profiles/audio}/sink.h             |  0
->>  {audio => profiles/audio}/source.c           |  0
->>  {audio => profiles/audio}/source.h           |  0
->>  {audio => profiles/audio}/telephony-dummy.c  |  0
->>  {audio => profiles/audio}/telephony-maemo5.c |  0
->>  {audio => profiles/audio}/telephony-maemo6.c |  0
->>  {audio => profiles/audio}/telephony-ofono.c  |  0
->>  {audio => profiles/audio}/telephony.h        |  0
->>  {audio => profiles/audio}/transport.c        |  0
->>  {audio => profiles/audio}/transport.h        |  0
->>  38 files changed, 35 insertions(+), 29 deletions(-)
->>  rename {audio => profiles/audio}/a2dp-codecs.h (100%)
->>  rename {audio => profiles/audio}/a2dp.c (100%)
->>  rename {audio => profiles/audio}/a2dp.h (100%)
->>  rename {audio => profiles/audio}/audio.conf (100%)
->>  rename {audio => profiles/audio}/avctp.c (100%)
->>  rename {audio => profiles/audio}/avctp.h (100%)
->>  rename {audio => profiles/audio}/avdtp.c (100%)
->>  rename {audio => profiles/audio}/avdtp.h (100%)
->>  rename {audio => profiles/audio}/avrcp.c (100%)
->>  rename {audio => profiles/audio}/avrcp.h (100%)
->>  rename {audio => profiles/audio}/control.c (100%)
->>  rename {audio => profiles/audio}/control.h (100%)
->>  rename {audio => profiles/audio}/device.c (100%)
->>  rename {audio => profiles/audio}/device.h (100%)
->>  rename {audio => profiles/audio}/gateway.c (100%)
->>  rename {audio => profiles/audio}/gateway.h (100%)
->>  rename {audio => profiles/audio}/headset.c (100%)
->>  rename {audio => profiles/audio}/headset.h (100%)
->>  rename {audio => profiles/audio}/main.c (100%)
->>  rename {audio => profiles/audio}/manager.c (100%)
->>  rename {audio => profiles/audio}/manager.h (100%)
->>  rename {audio => profiles/audio}/media.c (100%)
->>  rename {audio => profiles/audio}/media.h (100%)
->>  rename {audio => profiles/audio}/player.c (100%)
->>  rename {audio => profiles/audio}/player.h (100%)
->>  rename {audio => profiles/audio}/rtp.h (100%)
->>  rename {audio => profiles/audio}/sink.c (100%)
->>  rename {audio => profiles/audio}/sink.h (100%)
->>  rename {audio => profiles/audio}/source.c (100%)
->>  rename {audio => profiles/audio}/source.h (100%)
->>  rename {audio => profiles/audio}/telephony-dummy.c (100%)
->>  rename {audio => profiles/audio}/telephony-maemo5.c (100%)
->>  rename {audio => profiles/audio}/telephony-maemo6.c (100%)
->>  rename {audio => profiles/audio}/telephony-ofono.c (100%)
->>  rename {audio => profiles/audio}/telephony.h (100%)
->>  rename {audio => profiles/audio}/transport.c (100%)
->>  rename {audio => profiles/audio}/transport.h (100%)
->
-> Before we do this, lets take the telephony stuff out first. We do not
-> want to keep it anyway.
+> If you look at the commit history you'll see that this signal was added
+> after the introduction of object manager and was part of the patches
+> that removed the old DeviceFound signal.
 
-That probably means audio/headset.c and audio/gateway.c should be
-removed as well and no btd_profiles should be registered for those
-profiles. This will leave us without any HFP profiles support for now,
-but I guess this is okay as they will be external profiles.
+I didn't realize this was such a late addition. I guess I should have
+opened the discussion before, sorry for that.
 
--- 
-Luiz Augusto von Dentz
+> You're right in that our original plan was to replace the device
+> discovery completely with ObjectManager signals but that turned out to
+> be infeasible in practice. Even the python script for doing discovery
+> ended up being quite complex (meaning most other languages would be even
+
+The ObjectManager approach might make our clients more complex but I
+don't think this should be very strong argument to introduce
+duplication in our APIs. I would suggest we consider compensating this
+using utility libraries, since you have very similar problems
+everywhere in the D-Bus API, for example with Adapter.FindDevice.
+
+Unless there is some performance gain, we should IMO keep our APIs as
+compact as possible, specially for the 5.0 release, where we could
+extend the API in later versions.
+
+> worse) and we didn't get any signals for discovered devices that already
+> existed in the bluetoothd object hierarchy (since nothing changes for
+> them from an ObjectManager perspective).
+
+I agree this second point would be a strong enough argument. However,
+can't we solve this problem in a nicer and more orthogonal
+property-oriented way?
+
+I can think of a solution that might fit and would also be useful for
+other use-cases: we could add a property to each device which holds a
+timestamp representing when this particular devices was "seen"
+(discovered or connected-to) for the last time. A discovery client
+would have to check the timestamp range he is interested in. I could
+write some code if there is any interest.
+
+Having said that, I'm not completely against the DevicesFound
+approach, but I guess this would be the moment to consider other
+approaches as well.
+
+> Due to these issues we decided to reintroduce a dedicated signal for
+> device discovery and at the same time fix the bottle neck we've seen
+> during the past years where the high frequency of signals in a busy
+> environment (e.g. UPF) consumes a lot of resources.
+
+I can't imagine how DevicesFound could remove any D-Bus bottleneck
+since it's a duplicated signal. As I understand, ObjectManager would
+emit the InterfaceAdded signals in any case, so I don't see any real
+benefit here.
+
+> The DevicesFound signal is emitted once a second and contains all
+> devices found since the last period. If no device was found during the
+> last period the signal is sent as soon as the first device is found.
+> There's also an (adjustable through a define, right now 5) maximum size
+> for the list length which forces the signal to be sent as soon as the
+> limit is reached.
+
+The only gain I can think of is in case we had a client that listens
+to DevicesAdded but is not interested in ObjectManager/Properties
+signals. However this seems unlikely and even insignificant, since
+most of the clients would anyway be waking up every time an interface
+is added, right?
+
+Cheers,
+Mikel
