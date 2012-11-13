@@ -1,73 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 13 Nov 2012 17:40:19 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Syam Sidhardhan <syamsidhardh@gmail.com>
-Cc: Syam Sidhardhan <s.syam@samsung.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] audio: Fix headset NULL pointer dereference
- during AT+BLDN response
-Message-ID: <20121113154019.GA29811@x220>
-References: <1351000626-22632-1-git-send-email-s.syam@samsung.com>
- <CAFBvHifFX-8vcQciLktVhUgjN7Z-QaQmST2Jbi=gKtz96iHLvg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAFBvHifFX-8vcQciLktVhUgjN7Z-QaQmST2Jbi=gKtz96iHLvg@mail.gmail.com>
+In-Reply-To: <20121113141639.GA28578@x220>
+References: <1352812880-7306-1-git-send-email-luiz.dentz@gmail.com>
+	<20121113141639.GA28578@x220>
+Date: Tue, 13 Nov 2012 17:39:55 +0200
+Message-ID: <CABBYNZJaxNf-EJDa6oKTYhrQj8ZWDyFiwsqSNJ0ewtovgTyC7Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 00/13] Remove HFP implementation
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+Hi Johan,
 
-On Fri, Nov 09, 2012, Syam Sidhardhan wrote:
-> On Tue, Oct 23, 2012 at 7:27 PM, Syam Sidhardhan <s.syam@samsung.com> wrote:
-> > While waiting for the AT+BLDN asynchronous response, if RFCOMM got
-> > disconnected, then respose will cause NULL pointer dereference.
-> >
-> > During headset disconnection, the headset state changes from
-> > HEADSET_STATE_CONNECTED to HEADSET_STATE_DISCONNECTED along with
-> > freeing the dev->headset. During the response, in telephony_generic_rsp
-> > its dereferencing.
-> >
-> > Log:
-> > bluetoothd[5573]: audio/headset.c:handle_event() Received AT+BLDN
-> > bluetoothd[5573]: audio/telephony.c:telephony_last_dialed_number_req()
-> >  telephony-tizen: last dialed number request
-> > bluetoothd[5573]: audio/telephony.c:dbus_method_call_send() +
-> > bluetoothd[5573]: audio/telephony.c:dbus_method_call_send() -
-> > bluetoothd[5573]: Endpoint replied with an error: org.freedesktop.DBus\
-> >  .Error.NoReply
-> > bluetoothd[5573]: audio/telephony.c:telephony_device_disconnected()
-> >  telephony-tizen: device 0x40439b60 disconnected
-> > bluetoothd[5573]: audio/headset.c:headset_set_state() State changed
-> >  /org/bluez/5573/hci0/dev_BC_47_60_F5_88_89:
-> >  HEADSET_STATE_CONNECTED -> HEADSET_STATE_DISCONNECTED
-> > bluetoothd[5573]: audio/media.c:headset_state_changed()
-> > bluetoothd[5573]: audio/media.c:headset_state_changed() Clear endpoint
-> >  0x40430620
-> > bluetoothd[5573]: audio/telephony.c:telephony_dial_number_reply()
-> >  redial_reply
-> > bluetoothd[5573]: audio/telephony.c:telephony_dial_number_reply()
-> >  dial_reply reply: No Call log
-> > ---
-> >  audio/headset.c |    3 +++
-> >  1 files changed, 3 insertions(+), 0 deletions(-)
-> >
-> > diff --git a/audio/headset.c b/audio/headset.c
-> > index bd83a65..30d24cf 100644
-> > --- a/audio/headset.c
-> > +++ b/audio/headset.c
-> > @@ -689,6 +689,9 @@ static int telephony_generic_rsp(struct audio_device *device, cme_error_t err)
-> >         struct headset *hs = device->headset;
-> >         struct headset_slc *slc = hs->slc;
-> >
-> > +       if (!slc)
-> > +               return -EIO;
-> > +
-> >         if ((err != CME_ERROR_NONE) && slc->cme_enabled)
-> >                 return headset_send(hs, "\r\n+CME ERROR: %d\r\n", err);
-> >
-> 
-> ping.
+On Tue, Nov 13, 2012 at 4:16 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Tue, Nov 13, 2012, Luiz Augusto von Dentz wrote:
+>> These changes remove HFP implemention from audio plugin and move audio
+>> under profiles directory.
+>>
+>> HFP can be emulated by test-profile -u hfp, all the telephony backends
+>> are gone as well since this is now suppose to be a external profile
+>> probably done inside the telephony stack e.g. oFono in use in the
+>> platform.
+>>
+>> Luiz Augusto von Dentz (13):
+>>   audio: Remove HFP and HSP headset role support
+>>   audio: Remove HFP option from audio.conf
+>>   audio: Remove code using headset
+>>   build: Remove telephony-maemo5.c
+>>   build: Remove telephony-maemo6.c
+>>   build: Remove telephony-ofono.c
+>>   build: Remove telephony-dummy.c
+>>   build: Remove telephony.h
+>>   build: Remove headset.c and headset.h
+>>   audio: Remove code HFP and HS gateway role
+>>   build: Remove gateway.c and gateway.h
+>>   audio: Move to profiles directory
+>>   audio: Add support for passing endpoints as custom property
+>>
+>>  Makefile.am                             |   48 +-
+>>  audio/gateway.c                         | 1048 ------------
+>>  audio/gateway.h                         |   75 -
+>>  audio/headset.c                         | 2825 -------------------------------
+>>  audio/headset.h                         |  112 --
+>>  audio/manager.c                         | 1387 ---------------
+>>  audio/telephony-dummy.c                 |  444 -----
+>>  audio/telephony-maemo5.c                | 2102 -----------------------
+>>  audio/telephony-maemo6.c                | 2196 ------------------------
+>>  audio/telephony-ofono.c                 | 1636 ------------------
+>>  audio/telephony.h                       |  244 ---
+>>  {audio => profiles/audio}/a2dp-codecs.h |    0
+>>  {audio => profiles/audio}/a2dp.c        |    0
+>>  {audio => profiles/audio}/a2dp.h        |    0
+>>  {audio => profiles/audio}/audio.conf    |    4 -
+>>  {audio => profiles/audio}/avctp.c       |    0
+>>  {audio => profiles/audio}/avctp.h       |    0
+>>  {audio => profiles/audio}/avdtp.c       |    0
+>>  {audio => profiles/audio}/avdtp.h       |    0
+>>  {audio => profiles/audio}/avrcp.c       |    0
+>>  {audio => profiles/audio}/avrcp.h       |    0
+>>  {audio => profiles/audio}/control.c     |    0
+>>  {audio => profiles/audio}/control.h     |    0
+>>  {audio => profiles/audio}/device.c      |  198 +--
+>>  {audio => profiles/audio}/device.h      |    2 -
+>>  {audio => profiles/audio}/main.c        |   98 +-
+>>  profiles/audio/manager.c                |  552 ++++++
+>>  {audio => profiles/audio}/manager.h     |    7 +-
+>>  {audio => profiles/audio}/media.c       |  245 ++-
+>>  {audio => profiles/audio}/media.h       |    0
+>>  {audio => profiles/audio}/player.c      |    0
+>>  {audio => profiles/audio}/player.h      |    0
+>>  {audio => profiles/audio}/rtp.h         |    0
+>>  {audio => profiles/audio}/sink.c        |    0
+>>  {audio => profiles/audio}/sink.h        |    0
+>>  {audio => profiles/audio}/source.c      |    0
+>>  {audio => profiles/audio}/source.h      |    0
+>>  {audio => profiles/audio}/transport.c   |  380 -----
+>>  {audio => profiles/audio}/transport.h   |    0
+>>  39 files changed, 673 insertions(+), 12930 deletions(-)
+>>  delete mode 100644 audio/gateway.c
+>>  delete mode 100644 audio/gateway.h
+>>  delete mode 100644 audio/headset.c
+>>  delete mode 100644 audio/headset.h
+>>  delete mode 100644 audio/manager.c
+>>  delete mode 100644 audio/telephony-dummy.c
+>>  delete mode 100644 audio/telephony-maemo5.c
+>>  delete mode 100644 audio/telephony-maemo6.c
+>>  delete mode 100644 audio/telephony-ofono.c
+>>  delete mode 100644 audio/telephony.h
+>>  rename {audio => profiles/audio}/a2dp-codecs.h (100%)
+>>  rename {audio => profiles/audio}/a2dp.c (100%)
+>>  rename {audio => profiles/audio}/a2dp.h (100%)
+>>  rename {audio => profiles/audio}/audio.conf (93%)
+>>  rename {audio => profiles/audio}/avctp.c (100%)
+>>  rename {audio => profiles/audio}/avctp.h (100%)
+>>  rename {audio => profiles/audio}/avdtp.c (100%)
+>>  rename {audio => profiles/audio}/avdtp.h (100%)
+>>  rename {audio => profiles/audio}/avrcp.c (100%)
+>>  rename {audio => profiles/audio}/avrcp.h (100%)
+>>  rename {audio => profiles/audio}/control.c (100%)
+>>  rename {audio => profiles/audio}/control.h (100%)
+>>  rename {audio => profiles/audio}/device.c (69%)
+>>  rename {audio => profiles/audio}/device.h (96%)
+>>  rename {audio => profiles/audio}/main.c (53%)
+>>  create mode 100644 profiles/audio/manager.c
+>>  rename {audio => profiles/audio}/manager.h (89%)
+>>  rename {audio => profiles/audio}/media.c (91%)
+>>  rename {audio => profiles/audio}/media.h (100%)
+>>  rename {audio => profiles/audio}/player.c (100%)
+>>  rename {audio => profiles/audio}/player.h (100%)
+>>  rename {audio => profiles/audio}/rtp.h (100%)
+>>  rename {audio => profiles/audio}/sink.c (100%)
+>>  rename {audio => profiles/audio}/sink.h (100%)
+>>  rename {audio => profiles/audio}/source.c (100%)
+>>  rename {audio => profiles/audio}/source.h (100%)
+>>  rename {audio => profiles/audio}/transport.c (72%)
+>>  rename {audio => profiles/audio}/transport.h (100%)
+>
+> Looks good to me. Feel free to apply.
 
-This file doesn't exist in bluez.git anymore.
+Pushed upstream.
 
-Johan
+-- 
+Luiz Augusto von Dentz
