@@ -1,24 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 13 Nov 2012 10:12:51 +0200
+Date: Tue, 13 Nov 2012 10:11:39 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
+	<frederic.danis@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] gatt: Update characteristic names translation table
-Message-ID: <20121113081251.GD2206@x220>
-References: <1352722128-12100-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: Re: [PATCH] device: Defer write to storage
+Message-ID: <20121113081139.GC2206@x220>
+References: <1352735024-2733-1-git-send-email-frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1352722128-12100-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1352735024-2733-1-git-send-email-frederic.danis@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi Frederic,
 
-On Mon, Nov 12, 2012, Andrzej Kaczmarek wrote:
+On Mon, Nov 12, 2012, Frédéric Danis wrote:
+> Defere write to storage using g_idle_add() to avoid multiple
+> open/write/close operations when device properties are changed
+> in sequence.
 > ---
->  attrib/client.c | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
+>  src/device.c |   24 +++++++++++++++++++++---
+>  1 file changed, 21 insertions(+), 3 deletions(-)
 
-Applied. Thanks.
+Applied after a couple of cosmetic fixes (we try to use > 0 for testing
+for valid GSource IDs). Thanks.
 
 Johan
