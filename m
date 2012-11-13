@@ -1,29 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 13 Nov 2012 10:11:39 +0200
+Date: Tue, 13 Nov 2012 10:09:28 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
-	<frederic.danis@linux.intel.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] device: Defer write to storage
-Message-ID: <20121113081139.GC2206@x220>
-References: <1352735024-2733-1-git-send-email-frederic.danis@linux.intel.com>
+Subject: Re: [PATCH] Update dbusoob API
+Message-ID: <20121113080928.GB2206@x220>
+References: <1352735596-731-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1352735024-2733-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1352735596-731-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frederic,
+Hi Szymon,
 
-On Mon, Nov 12, 2012, Frédéric Danis wrote:
-> Defere write to storage using g_idle_add() to avoid multiple
-> open/write/close operations when device properties are changed
-> in sequence.
-> ---
->  src/device.c |   24 +++++++++++++++++++++---
->  1 file changed, 21 insertions(+), 3 deletions(-)
+On Mon, Nov 12, 2012, Szymon Janc wrote:
+> This updates AddRemoteData method to create and return device object path.
+> 
+> With recent change on how new device objects are created it is no
+> longer possible to create device object from string with
+> org.bluez.Adapter interface. When adding OOB data for specified
+> address device object is created if it was not yet existing.
+> 
+> Path to object is returned in AddRemoteData to avoid need for extra
+> FindDevice() call on org.bluez.Adapter to get object maching specified
+> address.
+> 
+> Question:
+> Should RemoveRemoteData be updated to accept device path instead of address?
+> (and therefore require existing object, this method doesn't remove object or
+> any storage data but only deletes hash/rand kept in kernel).
 
-Applied after a couple of cosmetic fixes (we try to use > 0 for testing
-for valid GSource IDs). Thanks.
+I'm not sure about this one. Usually passing object paths as a parameter
+means you should be instead having the method on top of the object path
+itself. Maybe we just keep this symmetric for now by using the address
+instead.
+
+Anyway, I went ahead and applied the AddRemoteData patch (after removing
+the Change-Id tag - please remember to remove those in the future).
 
 Johan
