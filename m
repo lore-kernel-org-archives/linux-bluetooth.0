@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 11/13] build: Remove gateway.c and gateway.h
-Date: Tue, 13 Nov 2012 15:21:18 +0200
-Message-Id: <1352812880-7306-15-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 12/13] audio: Move to profiles directory
+Date: Tue, 13 Nov 2012 15:21:19 +0200
+Message-Id: <1352812880-7306-16-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1352812880-7306-1-git-send-email-luiz.dentz@gmail.com>
 References: <1352812880-7306-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,1173 +12,234 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- Makefile.am     |    1 -
- audio/device.h  |    1 -
- audio/gateway.c | 1048 -------------------------------------------------------
- audio/gateway.h |   75 ----
- 4 files changed, 1125 deletions(-)
- delete mode 100644 audio/gateway.c
- delete mode 100644 audio/gateway.h
+ Makefile.am                             | 32 ++++++++++++++++----------------
+ {audio => profiles/audio}/a2dp-codecs.h |  0
+ {audio => profiles/audio}/a2dp.c        |  0
+ {audio => profiles/audio}/a2dp.h        |  0
+ {audio => profiles/audio}/audio.conf    |  0
+ {audio => profiles/audio}/avctp.c       |  0
+ {audio => profiles/audio}/avctp.h       |  0
+ {audio => profiles/audio}/avdtp.c       |  0
+ {audio => profiles/audio}/avdtp.h       |  0
+ {audio => profiles/audio}/avrcp.c       |  0
+ {audio => profiles/audio}/avrcp.h       |  0
+ {audio => profiles/audio}/control.c     |  0
+ {audio => profiles/audio}/control.h     |  0
+ {audio => profiles/audio}/device.c      |  0
+ {audio => profiles/audio}/device.h      |  0
+ {audio => profiles/audio}/main.c        |  0
+ {audio => profiles/audio}/manager.c     |  0
+ {audio => profiles/audio}/manager.h     |  0
+ {audio => profiles/audio}/media.c       |  0
+ {audio => profiles/audio}/media.h       |  0
+ {audio => profiles/audio}/player.c      |  0
+ {audio => profiles/audio}/player.h      |  0
+ {audio => profiles/audio}/rtp.h         |  0
+ {audio => profiles/audio}/sink.c        |  0
+ {audio => profiles/audio}/sink.h        |  0
+ {audio => profiles/audio}/source.c      |  0
+ {audio => profiles/audio}/source.h      |  0
+ {audio => profiles/audio}/transport.c   |  0
+ {audio => profiles/audio}/transport.h   |  0
+ 29 files changed, 16 insertions(+), 16 deletions(-)
+ rename {audio => profiles/audio}/a2dp-codecs.h (100%)
+ rename {audio => profiles/audio}/a2dp.c (100%)
+ rename {audio => profiles/audio}/a2dp.h (100%)
+ rename {audio => profiles/audio}/audio.conf (100%)
+ rename {audio => profiles/audio}/avctp.c (100%)
+ rename {audio => profiles/audio}/avctp.h (100%)
+ rename {audio => profiles/audio}/avdtp.c (100%)
+ rename {audio => profiles/audio}/avdtp.h (100%)
+ rename {audio => profiles/audio}/avrcp.c (100%)
+ rename {audio => profiles/audio}/avrcp.h (100%)
+ rename {audio => profiles/audio}/control.c (100%)
+ rename {audio => profiles/audio}/control.h (100%)
+ rename {audio => profiles/audio}/device.c (100%)
+ rename {audio => profiles/audio}/device.h (100%)
+ rename {audio => profiles/audio}/main.c (100%)
+ rename {audio => profiles/audio}/manager.c (100%)
+ rename {audio => profiles/audio}/manager.h (100%)
+ rename {audio => profiles/audio}/media.c (100%)
+ rename {audio => profiles/audio}/media.h (100%)
+ rename {audio => profiles/audio}/player.c (100%)
+ rename {audio => profiles/audio}/player.h (100%)
+ rename {audio => profiles/audio}/rtp.h (100%)
+ rename {audio => profiles/audio}/sink.c (100%)
+ rename {audio => profiles/audio}/sink.h (100%)
+ rename {audio => profiles/audio}/source.c (100%)
+ rename {audio => profiles/audio}/source.h (100%)
+ rename {audio => profiles/audio}/transport.c (100%)
+ rename {audio => profiles/audio}/transport.h (100%)
 
 diff --git a/Makefile.am b/Makefile.am
-index 7f8ff26..84ae237 100644
+index 84ae237..10c811a 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -107,7 +107,6 @@ if AUDIOPLUGIN
+@@ -105,20 +105,20 @@ endif
+ 
+ if AUDIOPLUGIN
  builtin_modules += audio
- builtin_sources += audio/main.c \
- 			audio/manager.h audio/manager.c \
--			audio/gateway.h audio/gateway.c \
- 			audio/control.h audio/control.c \
- 			audio/avctp.h audio/avctp.c \
- 			audio/avrcp.h audio/avrcp.c \
-diff --git a/audio/device.h b/audio/device.h
-index 89916be..f0d178d 100644
---- a/audio/device.h
-+++ b/audio/device.h
-@@ -38,7 +38,6 @@ struct audio_device {
+-builtin_sources += audio/main.c \
+-			audio/manager.h audio/manager.c \
+-			audio/control.h audio/control.c \
+-			audio/avctp.h audio/avctp.c \
+-			audio/avrcp.h audio/avrcp.c \
+-			audio/device.h audio/device.c \
+-			audio/source.h audio/source.c \
+-			audio/sink.h audio/sink.c \
+-			audio/a2dp.h audio/a2dp.c \
+-			audio/avdtp.h audio/avdtp.c \
+-			audio/media.h audio/media.c \
+-			audio/transport.h audio/transport.c \
+-			audio/player.h audio/player.c \
+-			audio/a2dp-codecs.h
++builtin_sources += profiles/audio/main.c \
++			profiles/audio/manager.h profiles/audio/manager.c \
++			profiles/audio/control.h profiles/audio/control.c \
++			profiles/audio/avctp.h profiles/audio/avctp.c \
++			profiles/audio/avrcp.h profiles/audio/avrcp.c \
++			profiles/audio/device.h profiles/audio/device.c \
++			profiles/audio/source.h profiles/audio/source.c \
++			profiles/audio/sink.h profiles/audio/sink.c \
++			profiles/audio/a2dp.h profiles/audio/a2dp.c \
++			profiles/audio/avdtp.h profiles/audio/avdtp.c \
++			profiles/audio/media.h profiles/audio/media.c \
++			profiles/audio/transport.h profiles/audio/transport.c \
++			profiles/audio/player.h profiles/audio/player.c \
++			profiles/audio/a2dp-codecs.h
+ endif
  
- 	gboolean auto_connect;
+ if SAPPLUGIN
+@@ -305,7 +305,7 @@ endif
+ EXTRA_DIST += src/genbuiltin src/bluetooth.conf src/org.bluez.service \
+ 			src/main.conf profiles/network/network.conf \
+ 			profiles/input/input.conf profiles/proximity/proximity.conf \
+-			audio/audio.conf \
++			profiles/audio/audio.conf \
+ 			profiles/sap/sap-dummy.c profiles/sap/sap-u8500.c
  
--	struct gateway *gateway;
- 	struct sink *sink;
- 	struct source *source;
- 	struct control *control;
-diff --git a/audio/gateway.c b/audio/gateway.c
-deleted file mode 100644
-index 1b1164c..0000000
---- a/audio/gateway.c
-+++ /dev/null
-@@ -1,1048 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2006-2010  Nokia Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *  Copyright (C) 2008-2009  Leonid Movshovich <event.riga@gmail.org>
-- *  Copyright (C) 2010  ProFUSION embedded systems
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stdint.h>
--#include <stdlib.h>
--#include <string.h>
--#include <fcntl.h>
--#include <errno.h>
--
--#include <glib.h>
--#include <dbus/dbus.h>
--#include <gdbus.h>
--
--#include <bluetooth/bluetooth.h>
--#include <bluetooth/sdp.h>
--#include <bluetooth/sdp_lib.h>
--
--#include "../src/adapter.h"
--#include "../src/device.h"
--
--#include "sdp-client.h"
--#include "device.h"
--#include "gateway.h"
--#include "log.h"
--#include "error.h"
--#include "btio.h"
--#include "dbus-common.h"
--
--struct hf_agent {
--	char *name;	/* Bus id */
--	char *path;	/* D-Bus path */
--	guint watch;	/* Disconnect watch */
--	DBusPendingCall *call;
--};
--
--struct connect_cb {
--	unsigned int id;
--	gateway_stream_cb_t cb;
--	void *cb_data;
--};
--
--struct gateway {
--	gateway_state_t state;
--	GIOChannel *rfcomm;
--	GIOChannel *sco;
--	GIOChannel *incoming;
--	guint rfcomm_id;
--	guint sco_id;
--	GSList *callbacks;
--	struct hf_agent *agent;
--	DBusMessage *msg;
--	int version;
--	gateway_lock_t lock;
--};
--
--struct gateway_state_callback {
--	gateway_state_cb cb;
--	void *user_data;
--	unsigned int id;
--};
--
--static GSList *gateway_callbacks = NULL;
--
--int gateway_close(struct audio_device *device);
--
--GQuark gateway_error_quark(void)
--{
--	return g_quark_from_static_string("gateway-error-quark");
--}
--
--static const char *state2str(gateway_state_t state)
--{
--	switch (state) {
--	case GATEWAY_STATE_DISCONNECTED:
--		return "disconnected";
--	case GATEWAY_STATE_CONNECTING:
--		return "connecting";
--	case GATEWAY_STATE_CONNECTED:
--		return "connected";
--	case GATEWAY_STATE_PLAYING:
--		return "playing";
--	default:
--		return "";
--	}
--}
--
--static void agent_free(struct hf_agent *agent)
--{
--	if (!agent)
--		return;
--
--	if (agent->call)
--		dbus_pending_call_unref(agent->call);
--
--	g_dbus_remove_watch(agent->watch);
--
--	g_free(agent->name);
--	g_free(agent->path);
--	g_free(agent);
--}
--
--static void change_state(struct audio_device *dev, gateway_state_t new_state)
--{
--	struct gateway *gw = dev->gateway;
--	const char *val;
--	GSList *l;
--	gateway_state_t old_state;
--
--	if (gw->state == new_state)
--		return;
--
--	val = state2str(new_state);
--	old_state = gw->state;
--	gw->state = new_state;
--
--	emit_property_changed(device_get_path(dev->btd_dev),
--				AUDIO_GATEWAY_INTERFACE, "State",
--				DBUS_TYPE_STRING, &val);
--
--	for (l = gateway_callbacks; l != NULL; l = l->next) {
--		struct gateway_state_callback *cb = l->data;
--		cb->cb(dev, old_state, new_state, cb->user_data);
--	}
--}
--
--void gateway_set_state(struct audio_device *dev, gateway_state_t new_state)
--{
--	switch (new_state) {
--	case GATEWAY_STATE_DISCONNECTED:
--		gateway_close(dev);
--		break;
--	case GATEWAY_STATE_CONNECTING:
--	case GATEWAY_STATE_CONNECTED:
--	case GATEWAY_STATE_PLAYING:
--		break;
--	}
--}
--
--static void agent_cancel(struct hf_agent *agent)
--{
--	if (!agent->call)
--		return;
--
--	dbus_pending_call_cancel(agent->call);
--	dbus_pending_call_unref(agent->call);
--	agent->call = NULL;
--}
--
--static void agent_disconnect(struct audio_device *dev, struct hf_agent *agent)
--{
--	DBusMessage *msg;
--
--	msg = dbus_message_new_method_call(agent->name, agent->path,
--			"org.bluez.HandsfreeAgent", "Release");
--
--	g_dbus_send_message(btd_get_dbus_connection(), msg);
--
--	agent_cancel(agent);
--}
--
--static gboolean agent_sendfd(struct hf_agent *agent, int fd,
--		DBusPendingCallNotifyFunction notify, void *data)
--{
--	struct audio_device *dev = data;
--	struct gateway *gw = dev->gateway;
--	DBusMessage *msg;
--
--	if (agent->call)
--		return FALSE;
--
--	msg = dbus_message_new_method_call(agent->name, agent->path,
--			"org.bluez.HandsfreeAgent", "NewConnection");
--
--	dbus_message_append_args(msg, DBUS_TYPE_UNIX_FD, &fd,
--					DBUS_TYPE_UINT16, &gw->version,
--					DBUS_TYPE_INVALID);
--
--	if (dbus_connection_send_with_reply(btd_get_dbus_connection(), msg,
--						&agent->call, -1) == FALSE) {
--		dbus_message_unref(msg);
--		return FALSE;
--	}
--
--	dbus_pending_call_set_notify(agent->call, notify, dev, NULL);
--	dbus_message_unref(msg);
--
--	return TRUE;
--}
--
--static unsigned int connect_cb_new(struct gateway *gw,
--					gateway_stream_cb_t func,
--					void *user_data)
--{
--	struct connect_cb *cb;
--	static unsigned int free_cb_id = 1;
--
--	if (!func)
--		return 0;
--
--	cb = g_new(struct connect_cb, 1);
--
--	cb->cb = func;
--	cb->cb_data = user_data;
--	cb->id = free_cb_id++;
--
--	gw->callbacks = g_slist_append(gw->callbacks, cb);
--
--	return cb->id;
--}
--
--static void run_connect_cb(struct audio_device *dev, GError *err)
--{
--	struct gateway *gw = dev->gateway;
--	GSList *l;
--
--	for (l = gw->callbacks; l != NULL; l = l->next) {
--		struct connect_cb *cb = l->data;
--		cb->cb(dev, err, cb->cb_data);
--	}
--
--	g_slist_free_full(gw->callbacks, g_free);
--	gw->callbacks = NULL;
--}
--
--static gboolean sco_io_cb(GIOChannel *chan, GIOCondition cond,
--			struct audio_device *dev)
--{
--	struct gateway *gw = dev->gateway;
--
--	if (cond & G_IO_NVAL)
--		return FALSE;
--
--	DBG("sco connection is released");
--
--	g_source_remove(gw->sco_id);
--	gw->sco_id = 0;
--
--	g_io_channel_shutdown(gw->sco, TRUE, NULL);
--	g_io_channel_unref(gw->sco);
--	gw->sco = NULL;
--	change_state(dev, GATEWAY_STATE_CONNECTED);
--
--	return FALSE;
--}
--
--static void sco_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
--{
--	struct audio_device *dev = (struct audio_device *) user_data;
--	struct gateway *gw = dev->gateway;
--
--	DBG("at the begin of sco_connect_cb() in gateway.c");
--
--	gw->sco = g_io_channel_ref(chan);
--
--	gw->sco_id = g_io_add_watch(gw->sco, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
--						(GIOFunc) sco_io_cb, dev);
--
--	if (err) {
--		error("sco_connect_cb(): %s", err->message);
--		gateway_suspend_stream(dev);
--		return;
--	}
--
--	change_state(dev, GATEWAY_STATE_PLAYING);
--	run_connect_cb(dev, NULL);
--}
--
--static gboolean rfcomm_disconnect_cb(GIOChannel *chan, GIOCondition cond,
--			struct audio_device *dev)
--{
--	if (cond & G_IO_NVAL)
--		return FALSE;
--
--	gateway_close(dev);
--
--	return FALSE;
--}
--
--static void newconnection_reply(DBusPendingCall *call, void *data)
--{
--	struct audio_device *dev = data;
--	struct gateway *gw = dev->gateway;
--	struct hf_agent *agent = gw->agent;
--	DBusMessage *reply = dbus_pending_call_steal_reply(call);
--	DBusError derr;
--
--	dbus_pending_call_unref(agent->call);
--	agent->call = NULL;
--
--	dbus_error_init(&derr);
--	if (!dbus_set_error_from_message(&derr, reply)) {
--		DBG("Agent reply: file descriptor passed successfully");
--		gw->rfcomm_id = g_io_add_watch(gw->rfcomm,
--						G_IO_ERR | G_IO_HUP | G_IO_NVAL,
--						(GIOFunc) rfcomm_disconnect_cb,
--						dev);
--		change_state(dev, GATEWAY_STATE_CONNECTED);
--		goto done;
--	}
--
--	DBG("Agent reply: %s", derr.message);
--
--	dbus_error_free(&derr);
--	gateway_close(dev);
--
--done:
--	dbus_message_unref(reply);
--}
--
--static void rfcomm_connect_cb(GIOChannel *chan, GError *err,
--				gpointer user_data)
--{
--	DBusConnection *conn = btd_get_dbus_connection();
--	struct audio_device *dev = user_data;
--	struct gateway *gw = dev->gateway;
--	DBusMessage *reply;
--	int sk, ret;
--
--	if (err) {
--		error("connect(): %s", err->message);
--		goto fail;
--	}
--
--	if (!gw->agent) {
--		error("Handsfree Agent not registered");
--		goto fail;
--	}
--
--	sk = g_io_channel_unix_get_fd(chan);
--
--	if (gw->rfcomm == NULL)
--		gw->rfcomm = g_io_channel_ref(chan);
--
--	ret = agent_sendfd(gw->agent, sk, newconnection_reply, dev);
--
--	if (!gw->msg)
--		return;
--
--	if (ret)
--		reply = dbus_message_new_method_return(gw->msg);
--	else
--		reply = btd_error_failed(gw->msg, "Can't pass file descriptor");
--
--	g_dbus_send_message(conn, reply);
--
--	return;
--
--fail:
--	if (gw->msg) {
--		DBusMessage *reply;
--		reply = btd_error_failed(gw->msg, "Connect failed");
--		g_dbus_send_message(conn, reply);
--	}
--
--	gateway_close(dev);
--}
--
--static int get_remote_profile_version(sdp_record_t *rec)
--{
--	uuid_t uuid;
--	sdp_list_t *profiles;
--	sdp_profile_desc_t *desc;
--	int ver = 0;
--
--	sdp_uuid16_create(&uuid, HANDSFREE_PROFILE_ID);
--
--	sdp_get_profile_descs(rec, &profiles);
--	if (profiles == NULL)
--		goto done;
--
--	desc = profiles->data;
--
--	if (sdp_uuid16_cmp(&desc->uuid, &uuid) == 0)
--		ver = desc->version;
--
--	sdp_list_free(profiles, free);
--
--done:
--	return ver;
--}
--
--static void get_incoming_record_cb(sdp_list_t *recs, int err,
--					gpointer user_data)
--{
--	struct audio_device *dev = user_data;
--	struct gateway *gw = dev->gateway;
--	GError *gerr = NULL;
--
--	if (err < 0) {
--		error("Unable to get service record: %s (%d)", strerror(-err),
--					-err);
--		goto fail;
--	}
--
--	if (!recs || !recs->data) {
--		error("No records found");
--		goto fail;
--	}
--
--	gw->version = get_remote_profile_version(recs->data);
--	if (gw->version == 0)
--		goto fail;
--
--	rfcomm_connect_cb(gw->incoming, gerr, dev);
--	return;
--
--fail:
--	gateway_close(dev);
--}
--
--static void unregister_incoming(gpointer user_data)
--{
--	struct audio_device *dev = user_data;
--	struct gateway *gw = dev->gateway;
--
--	if (gw->incoming) {
--		g_io_channel_unref(gw->incoming);
--		gw->incoming = NULL;
--	}
--}
--
--static void rfcomm_incoming_cb(GIOChannel *chan, GError *err,
--				gpointer user_data)
--{
--	struct audio_device *dev = user_data;
--	struct gateway *gw = dev->gateway;
--	uuid_t uuid;
--
--	gw->incoming = g_io_channel_ref(chan);
--
--	sdp_uuid16_create(&uuid, HANDSFREE_AGW_SVCLASS_ID);
--	if (bt_search_service(&dev->src, &dev->dst, &uuid,
--						get_incoming_record_cb, dev,
--						unregister_incoming) == 0)
--		return;
--
--	unregister_incoming(dev);
--	gateway_close(dev);
--}
--
--static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
--{
--	struct audio_device *dev = user_data;
--	struct gateway *gw = dev->gateway;
--	int ch;
--	sdp_list_t *protos, *classes;
--	uuid_t uuid;
--	GIOChannel *io;
--	GError *gerr = NULL;
--
--	if (err < 0) {
--		error("Unable to get service record: %s (%d)", strerror(-err),
--					-err);
--		goto fail;
--	}
--
--	if (!recs || !recs->data) {
--		error("No records found");
--		err = -EIO;
--		goto fail;
--	}
--
--	if (sdp_get_service_classes(recs->data, &classes) < 0) {
--		error("Unable to get service classes from record");
--		err = -EINVAL;
--		goto fail;
--	}
--
--	if (sdp_get_access_protos(recs->data, &protos) < 0) {
--		error("Unable to get access protocols from record");
--		err = -ENODATA;
--		goto fail;
--	}
--
--	gw->version = get_remote_profile_version(recs->data);
--	if (gw->version == 0) {
--		error("Unable to get profile version from record");
--		err = -EINVAL;
--		goto fail;
--	}
--
--	memcpy(&uuid, classes->data, sizeof(uuid));
--	sdp_list_free(classes, free);
--
--	if (!sdp_uuid128_to_uuid(&uuid) || uuid.type != SDP_UUID16 ||
--			uuid.value.uuid16 != HANDSFREE_AGW_SVCLASS_ID) {
--		sdp_list_free(protos, NULL);
--		error("Invalid service record or not HFP");
--		err = -EIO;
--		goto fail;
--	}
--
--	ch = sdp_get_proto_port(protos, RFCOMM_UUID);
--	sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free, NULL);
--	sdp_list_free(protos, NULL);
--	if (ch <= 0) {
--		error("Unable to extract RFCOMM channel from service record");
--		err = -EIO;
--		goto fail;
--	}
--
--	io = bt_io_connect(rfcomm_connect_cb, dev, NULL, &gerr,
--				BT_IO_OPT_SOURCE_BDADDR, &dev->src,
--				BT_IO_OPT_DEST_BDADDR, &dev->dst,
--				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
--				BT_IO_OPT_CHANNEL, ch,
--				BT_IO_OPT_INVALID);
--	if (!io) {
--		error("Unable to connect: %s", gerr->message);
--		goto fail;
--	}
--
--	g_io_channel_unref(io);
--	return;
--
--fail:
--	if (gw->msg) {
--		DBusMessage *reply = btd_error_failed(gw->msg,
--					gerr ? gerr->message : strerror(-err));
--		g_dbus_send_message(btd_get_dbus_connection(), reply);
--	}
--
--	gateway_close(dev);
--
--	if (gerr)
--		g_error_free(gerr);
--}
--
--static int get_records(struct audio_device *device)
--{
--	uuid_t uuid;
--	int err;
--
--	sdp_uuid16_create(&uuid, HANDSFREE_AGW_SVCLASS_ID);
--
--	err = bt_search_service(&device->src, &device->dst, &uuid,
--						get_record_cb, device, NULL);
--	if (err < 0)
--		return err;
--
--	change_state(device, GATEWAY_STATE_CONNECTING);
--
--	return 0;
--}
--
--static DBusMessage *ag_connect(DBusConnection *conn, DBusMessage *msg,
--				void *data)
--{
--	struct audio_device *au_dev = (struct audio_device *) data;
--	struct gateway *gw = au_dev->gateway;
--	int err;
--
--	if (gw->state == GATEWAY_STATE_CONNECTING)
--		return btd_error_in_progress(msg);
--	else if (gw->state > GATEWAY_STATE_CONNECTING)
--		return btd_error_already_connected(msg);
--
--	if (!gw->agent)
--		return btd_error_agent_not_available(msg);
--
--	err = get_records(au_dev);
--	if (err < 0)
--		return btd_error_failed(msg, strerror(-err));
--
--	gw->msg = dbus_message_ref(msg);
--
--	return NULL;
--}
--
--int gateway_close(struct audio_device *device)
--{
--	GError *gerr = NULL;
--	struct gateway *gw = device->gateway;
--	int sock;
--
--	if (gw->rfcomm_id != 0) {
--		g_source_remove(gw->rfcomm_id);
--		gw->rfcomm_id = 0;
--	}
--
--	if (gw->sco_id != 0) {
--		g_source_remove(gw->sco_id);
--		gw->sco_id = 0;
--	}
--
--	if (gw->rfcomm) {
--		sock = g_io_channel_unix_get_fd(gw->rfcomm);
--		shutdown(sock, SHUT_RDWR);
--
--		g_io_channel_shutdown(gw->rfcomm, TRUE, NULL);
--		g_io_channel_unref(gw->rfcomm);
--		gw->rfcomm = NULL;
--	}
--
--	if (gw->sco) {
--		g_io_channel_shutdown(gw->sco, TRUE, NULL);
--		g_io_channel_unref(gw->sco);
--		gw->sco = NULL;
--	}
--
--	if (gw->agent)
--		agent_cancel(gw->agent);
--
--	change_state(device, GATEWAY_STATE_DISCONNECTED);
--	g_set_error(&gerr, GATEWAY_ERROR,
--			GATEWAY_ERROR_DISCONNECTED, "Disconnected");
--	run_connect_cb(device, gerr);
--	g_error_free(gerr);
--
--	return 0;
--}
--
--static DBusMessage *ag_disconnect(DBusConnection *conn, DBusMessage *msg,
--					void *data)
--{
--	struct audio_device *device = data;
--	struct gateway *gw = device->gateway;
--	DBusMessage *reply = NULL;
--	char gw_addr[18];
--
--	if (!gw->rfcomm)
--		return btd_error_not_connected(msg);
--
--	reply = dbus_message_new_method_return(msg);
--	if (!reply)
--		return NULL;
--
--	gateway_close(device);
--	ba2str(&device->dst, gw_addr);
--	DBG("Disconnected from %s, %s", gw_addr,
--					device_get_path(device->btd_dev));
--
--	return reply;
--}
--
--static void agent_exited(DBusConnection *conn, void *data)
--{
--	struct gateway *gateway = data;
--	struct hf_agent *agent = gateway->agent;
--
--	DBG("Agent %s exited", agent->name);
--
--	agent_free(agent);
--	gateway->agent = NULL;
--}
--
--static DBusMessage *ag_get_properties(DBusConnection *conn, DBusMessage *msg,
--					void *data)
--{
--	struct audio_device *device = data;
--	struct gateway *gw = device->gateway;
--	DBusMessage *reply;
--	DBusMessageIter iter;
--	DBusMessageIter dict;
--	const char *value;
--
--
--	reply = dbus_message_new_method_return(msg);
--	if (!reply)
--		return NULL;
--
--	dbus_message_iter_init_append(reply, &iter);
--
--	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
--			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
--			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
--			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
--
--	value = state2str(gw->state);
--	dict_append_entry(&dict, "State",
--			DBUS_TYPE_STRING, &value);
--
--	dbus_message_iter_close_container(&iter, &dict);
--
--	return reply;
--}
--
--static DBusMessage *register_agent(DBusConnection *conn,
--					DBusMessage *msg, void *data)
--{
--	struct audio_device *device = data;
--	struct gateway *gw = device->gateway;
--	struct hf_agent *agent;
--	const char *path, *name;
--
--	if (gw->agent)
--		return btd_error_already_exists(msg);
--
--	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
--						DBUS_TYPE_INVALID))
--		return btd_error_invalid_args(msg);
--
--	name = dbus_message_get_sender(msg);
--	agent = g_new0(struct hf_agent, 1);
--
--	agent->name = g_strdup(name);
--	agent->path = g_strdup(path);
--
--	agent->watch = g_dbus_add_disconnect_watch(conn, name,
--						agent_exited, gw, NULL);
--
--	gw->agent = agent;
--
--	return dbus_message_new_method_return(msg);
--}
--
--static DBusMessage *unregister_agent(DBusConnection *conn,
--				DBusMessage *msg, void *data)
--{
--	struct audio_device *device = data;
--	struct gateway *gw = device->gateway;
--	const char *path;
--
--	if (!gw->agent)
--		goto done;
--
--	if (strcmp(gw->agent->name, dbus_message_get_sender(msg)) != 0)
--		return btd_error_not_authorized(msg);
--
--	if (!dbus_message_get_args(msg, NULL,
--				DBUS_TYPE_OBJECT_PATH, &path,
--				DBUS_TYPE_INVALID))
--		return btd_error_invalid_args(msg);
--
--	if (strcmp(gw->agent->path, path) != 0)
--		return btd_error_does_not_exist(msg);
--
--	agent_free(gw->agent);
--	gw->agent = NULL;
--
--done:
--	return dbus_message_new_method_return(msg);
--}
--
--static const GDBusMethodTable gateway_methods[] = {
--	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, ag_connect) },
--	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL, ag_disconnect) },
--	{ GDBUS_METHOD("GetProperties",
--			NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
--			ag_get_properties) },
--	{ GDBUS_METHOD("RegisterAgent",
--			GDBUS_ARGS({ "agent", "o" }), NULL, register_agent) },
--	{ GDBUS_METHOD("UnregisterAgent",
--			GDBUS_ARGS({ "agent", "o" }), NULL, unregister_agent) },
--	{ }
--};
--
--static const GDBusSignalTable gateway_signals[] = {
--	{ GDBUS_SIGNAL("PropertyChanged",
--			GDBUS_ARGS({ "name", "s" }, { "value", "v" })) },
--	{ }
--};
--
--static void path_unregister(void *data)
--{
--	struct audio_device *dev = data;
--
--	DBG("Unregistered interface %s on path %s",
--		AUDIO_GATEWAY_INTERFACE, device_get_path(dev->btd_dev));
--
--	gateway_close(dev);
--
--	if (dev->gateway->agent)
--		agent_free(dev->gateway->agent);
--
--	g_free(dev->gateway);
--	dev->gateway = NULL;
--}
--
--void gateway_unregister(struct audio_device *dev)
--{
--	if (dev->gateway->agent)
--		agent_disconnect(dev, dev->gateway->agent);
--
--	g_dbus_unregister_interface(btd_get_dbus_connection(),
--						device_get_path(dev->btd_dev),
--						AUDIO_GATEWAY_INTERFACE);
--}
--
--struct gateway *gateway_init(struct audio_device *dev)
--{
--	if (!g_dbus_register_interface(btd_get_dbus_connection(),
--					device_get_path(dev->btd_dev),
--					AUDIO_GATEWAY_INTERFACE,
--					gateway_methods, gateway_signals,
--					NULL, dev, path_unregister))
--		return NULL;
--
--	return g_new0(struct gateway, 1);
--}
--
--gboolean gateway_is_connected(struct audio_device *dev)
--{
--	struct gateway *gw = dev->gateway;
--
--	if (gw->state == GATEWAY_STATE_CONNECTED)
--		return TRUE;
--
--	return FALSE;
--}
--
--gboolean gateway_is_active(struct audio_device *dev)
--{
--	struct gateway *gw = dev->gateway;
--
--	if (gw->state != GATEWAY_STATE_DISCONNECTED)
--		return TRUE;
--
--	return FALSE;
--}
--
--gateway_state_t gateway_get_state(struct audio_device *dev)
--{
--	struct gateway *gw = dev->gateway;
--
--	return gw->state;
--}
--
--int gateway_connect_rfcomm(struct audio_device *dev, GIOChannel *io)
--{
--	if (!io)
--		return -EINVAL;
--
--	dev->gateway->rfcomm = g_io_channel_ref(io);
--
--	change_state(dev, GATEWAY_STATE_CONNECTING);
--
--	return 0;
--}
--
--int gateway_connect_sco(struct audio_device *dev, GIOChannel *io)
--{
--	struct gateway *gw = dev->gateway;
--
--	if (gw->sco)
--		return -EISCONN;
--
--	gw->sco = g_io_channel_ref(io);
--
--	gw->sco_id = g_io_add_watch(gw->sco, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
--						(GIOFunc) sco_io_cb, dev);
--
--	change_state(dev, GATEWAY_STATE_PLAYING);
--
--	return 0;
--}
--
--void gateway_start_service(struct audio_device *dev)
--{
--	struct gateway *gw = dev->gateway;
--	GError *err = NULL;
--
--	if (gw->rfcomm == NULL)
--		return;
--
--	if (!bt_io_accept(gw->rfcomm, rfcomm_incoming_cb, dev, NULL, &err)) {
--		error("bt_io_accept: %s", err->message);
--		g_error_free(err);
--		gateway_close(dev);
--	}
--}
--
--static gboolean request_stream_cb(gpointer data)
--{
--	run_connect_cb(data, NULL);
--	return FALSE;
--}
--
--/* These are functions to be called from unix.c for audio system
-- * ifaces (alsa, gstreamer, etc.) */
--unsigned int gateway_request_stream(struct audio_device *dev,
--				gateway_stream_cb_t cb, void *user_data)
--{
--	struct gateway *gw = dev->gateway;
--	GError *err = NULL;
--	GIOChannel *io;
--
--	if (!gw->rfcomm) {
--		if (get_records(dev) < 0)
--			return 0;
--	} else if (!gw->sco) {
--		io = bt_io_connect(sco_connect_cb, dev, NULL, &err,
--				BT_IO_OPT_SOURCE_BDADDR, &dev->src,
--				BT_IO_OPT_DEST_BDADDR, &dev->dst,
--				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
--				BT_IO_OPT_INVALID);
--		if (!io) {
--			error("%s", err->message);
--			g_error_free(err);
--			return 0;
--		}
--	} else
--		g_idle_add(request_stream_cb, dev);
--
--	return connect_cb_new(gw, cb, user_data);
--}
--
--gboolean gateway_cancel_stream(struct audio_device *dev, unsigned int id)
--{
--	struct gateway *gw = dev->gateway;
--	GSList *l;
--	struct connect_cb *cb = NULL;
--
--	for (l = gw->callbacks; l != NULL; l = l->next) {
--		struct connect_cb *tmp = l->data;
--
--		if (tmp->id == id) {
--			cb = tmp;
--			break;
--		}
--	}
--
--	if (!cb)
--		return FALSE;
--
--	gw->callbacks = g_slist_remove(gw->callbacks, cb);
--	g_free(cb);
--
--	gateway_suspend_stream(dev);
--
--	return TRUE;
--}
--
--int gateway_get_sco_fd(struct audio_device *dev)
--{
--	struct gateway *gw = dev->gateway;
--
--	if (!gw || !gw->sco)
--		return -1;
--
--	return g_io_channel_unix_get_fd(gw->sco);
--}
--
--void gateway_suspend_stream(struct audio_device *dev)
--{
--	GError *gerr = NULL;
--	struct gateway *gw = dev->gateway;
--
--	if (!gw || !gw->sco)
--		return;
--
--	g_source_remove(gw->sco_id);
--	gw->sco_id = 0;
--
--	g_io_channel_shutdown(gw->sco, TRUE, NULL);
--	g_io_channel_unref(gw->sco);
--	gw->sco = NULL;
--	g_set_error(&gerr, GATEWAY_ERROR, GATEWAY_ERROR_SUSPENDED, "Suspended");
--	run_connect_cb(dev, gerr);
--	g_error_free(gerr);
--	change_state(dev, GATEWAY_STATE_CONNECTED);
--}
--
--unsigned int gateway_add_state_cb(gateway_state_cb cb, void *user_data)
--{
--	struct gateway_state_callback *state_cb;
--	static unsigned int id = 0;
--
--	state_cb = g_new(struct gateway_state_callback, 1);
--	state_cb->cb = cb;
--	state_cb->user_data = user_data;
--	state_cb->id = ++id;
--
--	gateway_callbacks = g_slist_append(gateway_callbacks, state_cb);
--
--	return state_cb->id;
--}
--
--gboolean gateway_remove_state_cb(unsigned int id)
--{
--	GSList *l;
--
--	for (l = gateway_callbacks; l != NULL; l = l->next) {
--		struct gateway_state_callback *cb = l->data;
--		if (cb && cb->id == id) {
--			gateway_callbacks = g_slist_remove(gateway_callbacks,
--									cb);
--			g_free(cb);
--			return TRUE;
--		}
--	}
--
--	return FALSE;
--}
--
--gateway_lock_t gateway_get_lock(struct audio_device *dev)
--{
--	struct gateway *gw = dev->gateway;
--
--	return gw->lock;
--}
--
--gboolean gateway_lock(struct audio_device *dev, gateway_lock_t lock)
--{
--	struct gateway *gw = dev->gateway;
--
--	if (gw->lock & lock)
--		return FALSE;
--
--	gw->lock |= lock;
--
--	return TRUE;
--}
--
--gboolean gateway_unlock(struct audio_device *dev, gateway_lock_t lock)
--{
--	struct gateway *gw = dev->gateway;
--
--	if (!(gw->lock & lock))
--		return FALSE;
--
--	gw->lock &= ~lock;
--
--	if (gw->lock)
--		return TRUE;
--
--	if (gw->state == GATEWAY_STATE_PLAYING)
--		gateway_suspend_stream(dev);
--
--	return TRUE;
--}
-diff --git a/audio/gateway.h b/audio/gateway.h
-deleted file mode 100644
-index d87d76a..0000000
---- a/audio/gateway.h
-+++ /dev/null
-@@ -1,75 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2006-2010  Nokia Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#define AUDIO_GATEWAY_INTERFACE "org.bluez.HandsfreeGateway"
--
--#define DEFAULT_HFP_HS_CHANNEL 7
--
--typedef enum {
--	GATEWAY_STATE_DISCONNECTED,
--	GATEWAY_STATE_CONNECTING,
--	GATEWAY_STATE_CONNECTED,
--	GATEWAY_STATE_PLAYING,
--} gateway_state_t;
--
--typedef enum {
--	GATEWAY_LOCK_READ = 1,
--	GATEWAY_LOCK_WRITE = 1 << 1,
--} gateway_lock_t;
--
--typedef enum {
--	GATEWAY_ERROR_DISCONNECTED,
--	GATEWAY_ERROR_SUSPENDED,
--} gateway_error_t;
--
--#define GATEWAY_ERROR gateway_error_quark()
--
--GQuark gateway_error_quark(void);
--
--typedef void (*gateway_state_cb) (struct audio_device *dev,
--					gateway_state_t old_state,
--					gateway_state_t new_state,
--					void *user_data);
--typedef void (*gateway_stream_cb_t) (struct audio_device *dev, GError *err,
--		void *user_data);
--
--void gateway_set_state(struct audio_device *dev, gateway_state_t new_state);
--void gateway_unregister(struct audio_device *dev);
--struct gateway *gateway_init(struct audio_device *dev);
--gboolean gateway_is_active(struct audio_device *dev);
--gboolean gateway_is_connected(struct audio_device *dev);
--gateway_state_t gateway_get_state(struct audio_device *dev);
--int gateway_connect_rfcomm(struct audio_device *dev, GIOChannel *io);
--int gateway_connect_sco(struct audio_device *dev, GIOChannel *chan);
--void gateway_start_service(struct audio_device *device);
--unsigned int gateway_request_stream(struct audio_device *dev,
--			gateway_stream_cb_t cb, void *user_data);
--gboolean gateway_cancel_stream(struct audio_device *dev, unsigned int id);
--int gateway_get_sco_fd(struct audio_device *dev);
--void gateway_suspend_stream(struct audio_device *dev);
--unsigned int gateway_add_state_cb(gateway_state_cb cb, void *user_data);
--gboolean gateway_remove_state_cb(unsigned int id);
--gateway_lock_t gateway_get_lock(struct audio_device *dev);
--gboolean gateway_lock(struct audio_device *dev, gateway_lock_t lock);
--gboolean gateway_unlock(struct audio_device *dev, gateway_lock_t lock);
+ include Makefile.tools
+@@ -347,7 +347,7 @@ EXTRA_DIST += doc/manager-api.txt \
+ AM_CFLAGS += @DBUS_CFLAGS@ @GLIB_CFLAGS@
+ 
+ AM_CPPFLAGS = -I$(builddir)/lib -I$(builddir)/src -I$(srcdir)/src \
+-			-I$(srcdir)/audio -I$(srcdir)/gdbus \
++			-I$(srcdir)/profiles/audio -I$(srcdir)/gdbus \
+ 			-I$(srcdir)/attrib -I$(srcdir)/btio -I$(srcdir)/tools \
+ 			-I$(builddir)/tools -I$(srcdir)/monitor
+ 
+diff --git a/audio/a2dp-codecs.h b/profiles/audio/a2dp-codecs.h
+similarity index 100%
+rename from audio/a2dp-codecs.h
+rename to profiles/audio/a2dp-codecs.h
+diff --git a/audio/a2dp.c b/profiles/audio/a2dp.c
+similarity index 100%
+rename from audio/a2dp.c
+rename to profiles/audio/a2dp.c
+diff --git a/audio/a2dp.h b/profiles/audio/a2dp.h
+similarity index 100%
+rename from audio/a2dp.h
+rename to profiles/audio/a2dp.h
+diff --git a/audio/audio.conf b/profiles/audio/audio.conf
+similarity index 100%
+rename from audio/audio.conf
+rename to profiles/audio/audio.conf
+diff --git a/audio/avctp.c b/profiles/audio/avctp.c
+similarity index 100%
+rename from audio/avctp.c
+rename to profiles/audio/avctp.c
+diff --git a/audio/avctp.h b/profiles/audio/avctp.h
+similarity index 100%
+rename from audio/avctp.h
+rename to profiles/audio/avctp.h
+diff --git a/audio/avdtp.c b/profiles/audio/avdtp.c
+similarity index 100%
+rename from audio/avdtp.c
+rename to profiles/audio/avdtp.c
+diff --git a/audio/avdtp.h b/profiles/audio/avdtp.h
+similarity index 100%
+rename from audio/avdtp.h
+rename to profiles/audio/avdtp.h
+diff --git a/audio/avrcp.c b/profiles/audio/avrcp.c
+similarity index 100%
+rename from audio/avrcp.c
+rename to profiles/audio/avrcp.c
+diff --git a/audio/avrcp.h b/profiles/audio/avrcp.h
+similarity index 100%
+rename from audio/avrcp.h
+rename to profiles/audio/avrcp.h
+diff --git a/audio/control.c b/profiles/audio/control.c
+similarity index 100%
+rename from audio/control.c
+rename to profiles/audio/control.c
+diff --git a/audio/control.h b/profiles/audio/control.h
+similarity index 100%
+rename from audio/control.h
+rename to profiles/audio/control.h
+diff --git a/audio/device.c b/profiles/audio/device.c
+similarity index 100%
+rename from audio/device.c
+rename to profiles/audio/device.c
+diff --git a/audio/device.h b/profiles/audio/device.h
+similarity index 100%
+rename from audio/device.h
+rename to profiles/audio/device.h
+diff --git a/audio/main.c b/profiles/audio/main.c
+similarity index 100%
+rename from audio/main.c
+rename to profiles/audio/main.c
+diff --git a/audio/manager.c b/profiles/audio/manager.c
+similarity index 100%
+rename from audio/manager.c
+rename to profiles/audio/manager.c
+diff --git a/audio/manager.h b/profiles/audio/manager.h
+similarity index 100%
+rename from audio/manager.h
+rename to profiles/audio/manager.h
+diff --git a/audio/media.c b/profiles/audio/media.c
+similarity index 100%
+rename from audio/media.c
+rename to profiles/audio/media.c
+diff --git a/audio/media.h b/profiles/audio/media.h
+similarity index 100%
+rename from audio/media.h
+rename to profiles/audio/media.h
+diff --git a/audio/player.c b/profiles/audio/player.c
+similarity index 100%
+rename from audio/player.c
+rename to profiles/audio/player.c
+diff --git a/audio/player.h b/profiles/audio/player.h
+similarity index 100%
+rename from audio/player.h
+rename to profiles/audio/player.h
+diff --git a/audio/rtp.h b/profiles/audio/rtp.h
+similarity index 100%
+rename from audio/rtp.h
+rename to profiles/audio/rtp.h
+diff --git a/audio/sink.c b/profiles/audio/sink.c
+similarity index 100%
+rename from audio/sink.c
+rename to profiles/audio/sink.c
+diff --git a/audio/sink.h b/profiles/audio/sink.h
+similarity index 100%
+rename from audio/sink.h
+rename to profiles/audio/sink.h
+diff --git a/audio/source.c b/profiles/audio/source.c
+similarity index 100%
+rename from audio/source.c
+rename to profiles/audio/source.c
+diff --git a/audio/source.h b/profiles/audio/source.h
+similarity index 100%
+rename from audio/source.h
+rename to profiles/audio/source.h
+diff --git a/audio/transport.c b/profiles/audio/transport.c
+similarity index 100%
+rename from audio/transport.c
+rename to profiles/audio/transport.c
+diff --git a/audio/transport.h b/profiles/audio/transport.h
+similarity index 100%
+rename from audio/transport.h
+rename to profiles/audio/transport.h
 -- 
 1.7.11.7
 
