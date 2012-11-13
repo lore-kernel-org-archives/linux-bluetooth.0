@@ -1,47 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [RFC] sco: BT_DEFER_SETUP for SCO sockets
-Date: Tue, 13 Nov 2012 19:20:24 +0100
-Message-Id: <1352830825-13987-1-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Tue, 13 Nov 2012 19:42:20 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/2] TODO: Add entry for runtime selection of
+ drivers
+Message-ID: <20121113174220.GA4517@x220.P-661HNU-F1>
+References: <1352821786-20230-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1352821786-20230-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lizardo,
 
-This is a first draft about what can be done to implement DEFER_SETUP on SCO
-sockets.  I couldn't test it today I just pulled bluetooth-next and build
-failed, so I plan to go further tomorrow.
+On Tue, Nov 13, 2012, Anderson Lizardo wrote:
+> This will allow to drop usage of symlinks to C files, which require
+> messing with CPPFLAGS so headers can be found by the preprocessor.
+> 
+> It also allows for easier testing, because it is not necessary to
+> rebuild BlueZ to test different drivers.
+> ---
+>  TODO |    9 +++++++++
+>  1 file changed, 9 insertions(+)
 
-hci layer get some changes since previous behavior was to accept all SCO
-connections.
+Both patches have been applied. Thanks.
 
-Some questions are open :
-Should we be able to defer non eSCO capable devices? This would remove a few
-lines of code.
-hci_proto_defered is ugly: What about a flag similar to LM_ACCEPT called
-LM_DEFER that would indicate that accepting is defered.
-
-Let me know what you think.
-
-Best regards,
-Frédéric
-
-
-Frédéric Dalleau (1):
-  Bluetooth: Add BT_DEFER_SETUP option to sco socket
-
- include/net/bluetooth/hci_core.h |   15 +++++++
- net/bluetooth/hci_event.c        |   47 +++++++++++++++++++-
- net/bluetooth/sco.c              |   88 ++++++++++++++++++++++++++++++++++++--
- 3 files changed, 145 insertions(+), 5 deletions(-)
-
--- 
-1.7.9.5
-
+Johan
