@@ -1,49 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 3/3] network: Fix dead assignment in connect_cb
-Date: Tue, 13 Nov 2012 13:52:40 +0100
-Message-ID: <1352811160-12722-3-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1352811160-12722-1-git-send-email-szymon.janc@tieto.com>
-References: <1352811160-12722-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CAMOw1v4h9wfcFLL-j5+fmEUNF=ShHZryw93aOC+_8d2NsbMFag@mail.gmail.com>
+References: <1352754221-29672-1-git-send-email-anderson.lizardo@openbossa.org>
+	<CAMOw1v4h9wfcFLL-j5+fmEUNF=ShHZryw93aOC+_8d2NsbMFag@mail.gmail.com>
+Date: Tue, 13 Nov 2012 08:52:43 -0400
+Message-ID: <CAJdJm_NsCEmcjhtfSNh8mN5keoLzTtJsdN4+bpmdtJVzPgf4-Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] build: Fix make distcheck for input plugin
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Value stored to err_msg is never read in case err was not NULL.
-Simply remove err_msg and pass strerror() directly where it is used.
+Hi Lucas,
 
----
- profiles/network/connection.c |    5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+On Tue, Nov 13, 2012 at 8:21 AM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> On Mon, Nov 12, 2012 at 7:03 PM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+>> suspend.c is a symlink generated at build time, therefore it should be
+>> created on build directory. Additionally, it is necessary to add
+>> -I$(srcdir)/profiles/input to CPPFLAGS so suspend.h can be found (the
+>> compiler does not follow symlinks prior to resolving #include
+>> directives).
+>> ---
+>>  Makefile.am |    6 +++++-
+>>  1 file changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/Makefile.am b/Makefile.am
+>> index d49e8a0..c398e74 100644
+>> --- a/Makefile.am
+>> +++ b/Makefile.am
+>> @@ -366,6 +366,10 @@ if MCAP
+>>  AM_CPPFLAGS += -I$(builddir)/health
+>>  endif
+>>
+>> +if HOGPLUGIN
+>> +AM_CPPFLAGS += -I$(srcdir)/profiles/input
+>> +endif
+>
+> Humn... maybe we need to review these CPPFLAGS for plugins. Appending
+> it to AM_CPPFLAGS means that every single source file has
+> "-I$(srcdir)/profiles/input". Even those sources not at all related to
+> HOGPLUGIN.
+>
+> However the only way I can think to fix it is by creating convenience
+> libs since autofoo doesn't support CPPFLAGS per source file.
 
-diff --git a/profiles/network/connection.c b/profiles/network/connection.c
-index abcbee8..1a1fb4d 100644
---- a/profiles/network/connection.c
-+++ b/profiles/network/connection.c
-@@ -371,19 +371,16 @@ static int bnep_connect(struct network_conn *nc)
- static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
- {
- 	struct network_conn *nc = data;
--	const char *err_msg;
- 	int perr;
- 
- 	if (err) {
- 		error("%s", err->message);
--		err_msg = err->message;
- 		goto failed;
- 	}
- 
- 	perr = bnep_connect(nc);
- 	if (perr < 0) {
--		err_msg = strerror(-perr);
--		error("bnep connect(): %s (%d)", err_msg, -perr);
-+		error("bnep connect(): %s (%d)", strerror(-perr), -perr);
- 		goto failed;
- 	}
- 
+I agree it is not the best solution. Actually, I think we can overcome
+the problem completely by getting rid of symlinks for "drivers" (like
+sap-{u8500,dummy}.c, suspend-dummy.c,
+telephony-{dummy,maemo5,maemo6,ofono}.c) and having everything
+built-in and enabled/disabled based on which D-Bus services are
+running on the system (or, if not possible, by using config options).
+This would also help with spotting build breakages, since all BlueZ
+code could be compiled by a single "./bootstrap-configure && make"
+call.
+
+This was suggested by Marcel sometime ago on the mailing list, but no
+one has come up with actually implementing this.
+
+This commit for now will fix make distcheck breakage, and in my tests
+it did not break anything else.
+
+I will propose a TODO entry for this, so someone can work on it.
+
+Best Regards,
 -- 
-1.7.9.5
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
