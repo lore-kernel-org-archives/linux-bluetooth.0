@@ -1,73 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 1/3] avctp: Fix dead assignment in control_response
+Date: Tue, 13 Nov 2012 13:52:38 +0100
+Message-ID: <1352811160-12722-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <CAMOw1v4h9wfcFLL-j5+fmEUNF=ShHZryw93aOC+_8d2NsbMFag@mail.gmail.com>
-References: <1352754221-29672-1-git-send-email-anderson.lizardo@openbossa.org>
-	<CAMOw1v4h9wfcFLL-j5+fmEUNF=ShHZryw93aOC+_8d2NsbMFag@mail.gmail.com>
-Date: Tue, 13 Nov 2012 08:52:43 -0400
-Message-ID: <CAJdJm_NsCEmcjhtfSNh8mN5keoLzTtJsdN4+bpmdtJVzPgf4-Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] build: Fix make distcheck for input plugin
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Value stored to req is never read before writing it again.
 
-On Tue, Nov 13, 2012 at 8:21 AM, Lucas De Marchi
-<lucas.demarchi@profusion.mobi> wrote:
-> On Mon, Nov 12, 2012 at 7:03 PM, Anderson Lizardo
-> <anderson.lizardo@openbossa.org> wrote:
->> suspend.c is a symlink generated at build time, therefore it should be
->> created on build directory. Additionally, it is necessary to add
->> -I$(srcdir)/profiles/input to CPPFLAGS so suspend.h can be found (the
->> compiler does not follow symlinks prior to resolving #include
->> directives).
->> ---
->>  Makefile.am |    6 +++++-
->>  1 file changed, 5 insertions(+), 1 deletion(-)
->>
->> diff --git a/Makefile.am b/Makefile.am
->> index d49e8a0..c398e74 100644
->> --- a/Makefile.am
->> +++ b/Makefile.am
->> @@ -366,6 +366,10 @@ if MCAP
->>  AM_CPPFLAGS += -I$(builddir)/health
->>  endif
->>
->> +if HOGPLUGIN
->> +AM_CPPFLAGS += -I$(srcdir)/profiles/input
->> +endif
->
-> Humn... maybe we need to review these CPPFLAGS for plugins. Appending
-> it to AM_CPPFLAGS means that every single source file has
-> "-I$(srcdir)/profiles/input". Even those sources not at all related to
-> HOGPLUGIN.
->
-> However the only way I can think to fix it is by creating convenience
-> libs since autofoo doesn't support CPPFLAGS per source file.
+---
+ audio/avctp.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I agree it is not the best solution. Actually, I think we can overcome
-the problem completely by getting rid of symlinks for "drivers" (like
-sap-{u8500,dummy}.c, suspend-dummy.c,
-telephony-{dummy,maemo5,maemo6,ofono}.c) and having everything
-built-in and enabled/disabled based on which D-Bus services are
-running on the system (or, if not possible, by using config options).
-This would also help with spotting build breakages, since all BlueZ
-code could be compiled by a single "./bootstrap-configure && make"
-call.
-
-This was suggested by Marcel sometime ago on the mailing list, but no
-one has come up with actually implementing this.
-
-This commit for now will fix make distcheck breakage, and in my tests
-it did not break anything else.
-
-I will propose a TODO entry for this, so someone can work on it.
-
-Best Regards,
+diff --git a/audio/avctp.c b/audio/avctp.c
+index 6ba25e4..29756f6 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -577,7 +577,7 @@ static void control_response(struct avctp_channel *control,
+ 					size_t operand_count)
+ {
+ 	struct avctp_pending_req *p = control->p;
+-	struct avctp_control_req *req = p->data;
++	struct avctp_control_req *req;
+ 	GSList *l;
+ 
+ 	if (p && p->transaction == avctp->transaction) {
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.9.5
+
