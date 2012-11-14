@@ -1,33 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50A37388.7050607@invoxia.com>
-Date: Wed, 14 Nov 2012 11:33:44 +0100
-From: Arnaud Mouiche <arnaud.mouiche@invoxia.com>
-MIME-Version: 1.0
-To: frederic.dalleau@linux.intel.com
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: Add BT_DEFER_SETUP option to sco socket
-References: <1352830825-13987-1-git-send-email-frederic.dalleau@linux.intel.com> <1352830825-13987-2-git-send-email-frederic.dalleau@linux.intel.com> <50A36DD1.1080507@invoxia.com> <50A3700C.6090801@linux.intel.com>
-In-Reply-To: <50A3700C.6090801@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Reply-to: m.knudsen@samsung.com
+From: Michael Knudsen <m.knudsen@samsung.com>
+To: 'Arnaud Mouiche' <arnaud.mouiche@invoxia.com>,
+	=?utf-8?Q?'Fr=C3=A9d=C3=A9ric_Dalleau'?=
+	<frederic.dalleau@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <1352830825-13987-1-git-send-email-frederic.dalleau@linux.intel.com>
+ <1352830825-13987-2-git-send-email-frederic.dalleau@linux.intel.com>
+ <50A36DD1.1080507@invoxia.com>
+In-reply-to: <50A36DD1.1080507@invoxia.com>
+Subject: RE: [RFC] Bluetooth: Add BT_DEFER_SETUP option to sco socket
+Date: Wed, 14 Nov 2012 11:21:07 +0100
+Message-id: <001c01cdc251$c38a9070$4a9fb150$%knudsen@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-What is your plan once the kernel will gain the defer capability.
-- is it up to bluetoothd/audio to accept and configure ?
-- is it the external HFP apps (for the HFP case) to do the job ?
+> - can't we take the opportunity to configure the whole set
+> of eSCO parameters (bandwith / latency / retransmission effort)
+> instead of only getting the possibility to change the voice
+> settings
 
-arnaud
+I am currently looking into this as mentioned in my mail last
+week:
 
-On 11/14/2012 11:18 AM, Frédéric Dalleau wrote:
-> Hi Arnaud,
->
-> On 11/14/2012 11:09 AM, Arnaud Mouiche wrote:
->> Hello,
->> I will try to find some time to try your patch.
->
-> It is a bit early since I haven't tested it myself, should be in much
-> better shape before end of the week.
->
-> Regards,
-> Frédéric
+	<509BB56A.80609@samsung.com>
+
+If anyone has any input for this, I'm all ears.
+
+-m.
+
 
