@@ -1,15 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1352904577.20338.10.camel@aeonflux>
-Subject: Re: [PATCH v4 11/16] sbc: Add SBC_MSBC flag to enable 15 block
- encoding
+Message-ID: <1352903987.20338.8.camel@aeonflux>
+Subject: Re: [RFC] Bluetooth: Add BT_DEFER_SETUP option to sco socket
 From: Marcel Holtmann <marcel@holtmann.org>
-To: =?ISO-8859-1?Q?Fr=E9d=E9ric?= Dalleau
-	<frederic.dalleau@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 14 Nov 2012 23:49:37 +0900
-In-Reply-To: <1351589975-22640-12-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1351589975-22640-1-git-send-email-frederic.dalleau@linux.intel.com>
-	 <1351589975-22640-12-git-send-email-frederic.dalleau@linux.intel.com>
+To: frederic.dalleau@linux.intel.com
+Cc: Michael Knudsen <m.knudsen@samsung.com>,
+	linux-bluetooth@vger.kernel.org
+Date: Wed, 14 Nov 2012 23:39:47 +0900
+In-Reply-To: <50A36E06.2060206@linux.intel.com>
+References: <1352830825-13987-1-git-send-email-frederic.dalleau@linux.intel.com>
+	 <1352830825-13987-2-git-send-email-frederic.dalleau@linux.intel.com>
+	 <50A355CF.4030809@samsung.com> <50A36E06.2060206@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -17,123 +17,20 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Fred,
 
-> ---
->  sbc/sbc.c |   23 +++++++++++++++--------
->  sbc/sbc.h |    3 +++
->  2 files changed, 18 insertions(+), 8 deletions(-)
+> > My idea is to define (I'm not sure if this is exactly the same as what you
+> > suggested yourself) a bit, LM_DEFER, that e.g. sco_connect_ind() may return
+> > and propagate this bit to hci_conn_request_evt().  This way all policing of
+> > accepting SCO connections is handled from a single entry point into sco.c.
 > 
-> diff --git a/sbc/sbc.c b/sbc/sbc.c
-> index ffdf05d..22fa898 100644
-> --- a/sbc/sbc.c
-> +++ b/sbc/sbc.c
-> @@ -52,6 +52,9 @@
->  
->  #define SBC_SYNCWORD	0x9C
->  
-> +#define MSBC_SYNCWORD       0xAD
-> +#define MSBC_BLOCKS         15
-> +
->  /* This structure contains an unpacked SBC frame.
->     Yes, there is probably quite some unused space herein */
->  struct sbc_frame {
-> @@ -903,12 +906,12 @@ static ssize_t sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len
->  	}
->  }
->  
-> -static void sbc_encoder_init(struct sbc_encoder_state *state,
-> -					const struct sbc_frame *frame)
-> +static void sbc_encoder_init(unsigned long flags,
-> +		struct sbc_encoder_state *state, const struct sbc_frame *frame)
->  {
->  	memset(&state->X, 0, sizeof(state->X));
->  	state->position = (SBC_X_BUFFER_SIZE - frame->subbands * 9) & ~7;
-> -	state->increment = 4;
-> +	state->increment = flags & SBC_MSBC ? 1 : 4;
+> You detailed it much further than I did, but yes it is the same idea. I 
+> fully support it! If everybody agrees, then I can update the patch.
+> 
+> hci.h would receive the folowing line:
+> 
+> + #define HCI_LM_DEFER   0x4000
 
-just for pure cosmetics, use an if statement.
-
->  
->  	sbc_init_primitives(state);
->  }
-> @@ -922,6 +925,7 @@ struct sbc_priv {
->  
->  static void sbc_set_defaults(sbc_t *sbc, unsigned long flags)
->  {
-> +	sbc->flags = flags;
->  	sbc->frequency = SBC_FREQ_44100;
->  	sbc->mode = SBC_MODE_STEREO;
->  	sbc->subbands = SBC_SB_8;
-> @@ -1057,12 +1061,13 @@ SBC_EXPORT ssize_t sbc_encode(sbc_t *sbc, const void *input, size_t input_len,
->  		priv->frame.subband_mode = sbc->subbands;
->  		priv->frame.subbands = sbc->subbands ? 8 : 4;
->  		priv->frame.block_mode = sbc->blocks;
-> -		priv->frame.blocks = 4 + (sbc->blocks * 4);
-> +		priv->frame.blocks = sbc->flags & SBC_MSBC ?
-> +					MSBC_BLOCKS : 4 + (sbc->blocks * 4);
-
-Same here.
-
->  		priv->frame.bitpool = sbc->bitpool;
->  		priv->frame.codesize = sbc_get_codesize(sbc);
->  		priv->frame.length = sbc_get_frame_length(sbc);
->  
-> -		sbc_encoder_init(&priv->enc_state, &priv->frame);
-> +		sbc_encoder_init(sbc->flags, &priv->enc_state, &priv->frame);
->  		priv->init = 1;
->  	} else if (priv->frame.bitpool != sbc->bitpool) {
->  		priv->frame.length = sbc_get_frame_length(sbc);
-> @@ -1141,7 +1146,7 @@ SBC_EXPORT size_t sbc_get_frame_length(sbc_t *sbc)
->  		return priv->frame.length;
->  
->  	subbands = sbc->subbands ? 8 : 4;
-> -	blocks = 4 + (sbc->blocks * 4);
-> +	blocks = sbc->flags & SBC_MSBC ? MSBC_BLOCKS : 4 + (sbc->blocks * 4);
-
-And for this one as well.
-
->  	channels = sbc->mode == SBC_MODE_MONO ? 1 : 2;
->  	joint = sbc->mode == SBC_MODE_JOINT_STEREO ? 1 : 0;
->  	bitpool = sbc->bitpool;
-> @@ -1165,7 +1170,8 @@ SBC_EXPORT unsigned sbc_get_frame_duration(sbc_t *sbc)
->  	priv = sbc->priv;
->  	if (!priv->init) {
->  		subbands = sbc->subbands ? 8 : 4;
-> -		blocks = 4 + (sbc->blocks * 4);
-> +		blocks = sbc->flags & SBC_MSBC ?
-> +					MSBC_BLOCKS : 4 + (sbc->blocks * 4);
-
-Even here it is better cosmetics.
-
->  	} else {
->  		subbands = priv->frame.subbands;
->  		blocks = priv->frame.blocks;
-> @@ -1202,7 +1208,8 @@ SBC_EXPORT size_t sbc_get_codesize(sbc_t *sbc)
->  	priv = sbc->priv;
->  	if (!priv->init) {
->  		subbands = sbc->subbands ? 8 : 4;
-> -		blocks = 4 + (sbc->blocks * 4);
-> +		blocks = sbc->flags & SBC_MSBC ?
-> +					MSBC_BLOCKS : 4 + (sbc->blocks * 4);
-
-Here as well.
-
->  		channels = sbc->mode == SBC_MODE_MONO ? 1 : 2;
->  	} else {
->  		subbands = priv->frame.subbands;
-> diff --git a/sbc/sbc.h b/sbc/sbc.h
-> index bbd45da..3511119 100644
-> --- a/sbc/sbc.h
-> +++ b/sbc/sbc.h
-> @@ -64,6 +64,9 @@ extern "C" {
->  #define SBC_LE			0x00
->  #define SBC_BE			0x01
->  
-> +/* Additional features */
-> +#define SBC_MSBC		0x01
-> +
-
-I am debating to actually call this SBC_FLAG_MSBC instead of just
-SBC_MSBC. Anyone any comments?
+can we actually not that that. This is an old public API and I rather
+not extend it.
 
 Regards
 
