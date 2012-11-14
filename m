@@ -1,30 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50A3B9FC.3070009@linux.intel.com>
-Date: Wed, 14 Nov 2012 16:34:20 +0100
-From: =?UTF-8?B?RnLDqWTDqXJpYyBEYWxsZWF1?=
- <frederic.dalleau@linux.intel.com>
-Reply-To: frederic.dalleau@linux.intel.com
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 11/16] sbc: Add SBC_MSBC flag to enable 15 block encoding
-References: <1351589975-22640-1-git-send-email-frederic.dalleau@linux.intel.com>  <1351589975-22640-12-git-send-email-frederic.dalleau@linux.intel.com> <1352904577.20338.10.camel@aeonflux>
-In-Reply-To: <1352904577.20338.10.camel@aeonflux>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <1352898430-3383-1-git-send-email-s.syam@samsung.com>
+References: <1352898430-3383-1-git-send-email-s.syam@samsung.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Wed, 14 Nov 2012 13:13:23 -0200
+Message-ID: <CAMOw1v6O4rLDGqsu_aAmWD4bLGe2WEkRQF-2Oub6CM6OFqEgZw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/1] gdbus: Fix compilation error due to missing #defines
+To: Syam Sidhardhan <s.syam@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-On 11/14/2012 03:49 PM, Marcel Holtmann wrote:
-> I am debating to actually call this SBC_FLAG_MSBC instead of just
-> SBC_MSBC. Anyone any comments?
+On Wed, Nov 14, 2012 at 11:07 AM, Syam Sidhardhan <s.syam@samsung.com> wrote:
+> Since these are simple #define strings, we are defining it here
+> instead of upgrading to D-Bus 1.5 or later.
+>
+> Log:
+>   CC     gdbus/object.o
+> gdbus/object.c: In function ëproperties_setí:
+> gdbus/object.c:876:7: error: ëDBUS_ERROR_UNKNOWN_PROPERTYí undeclared
+>  (first use in this function)
+> gdbus/object.c:876:7: note: each undeclared identifier is reported
+>  only once for each function it appears in
+> gdbus/object.c:881:6: error: ëDBUS_ERROR_PROPERTY_READ_ONLYí
+>  undeclared (first use in this function)
+> make[1]: *** [gdbus/object.o] Error 1
+> make: *** [all] Error 2
+> ---
+>  gdbus/object.c |    8 ++++++++
+>  1 files changed, 8 insertions(+), 0 deletions(-)
+>
+> diff --git a/gdbus/object.c b/gdbus/object.c
+> index e3ad067..3101ca6 100644
+> --- a/gdbus/object.c
+> +++ b/gdbus/object.c
+> @@ -39,6 +39,14 @@
+>
+>  #define DBUS_INTERFACE_OBJECT_MANAGER "org.freedesktop.DBus.ObjectManager"
+>
+> +#ifndef DBUS_ERROR_UNKNOWN_PROPERTY
+> +#define DBUS_ERROR_UNKNOWN_PROPERTY "org.freedesktop.DBus.Error.UnknownProperty"
+> +#endif
+> +
+> +#ifndef DBUS_ERROR_PROPERTY_READ_ONLY
+> +#define DBUS_ERROR_PROPERTY_READ_ONLY "org.freedesktop.DBus.Error.PropertyReadOnly"
+> +#endif
+> +
+>  struct generic_data {
+>         unsigned int refcount;
+>         DBusConnection *conn;
+> --
+> 1.7.4.1
 
-The use of the flag may not be the most elegant API. As an alternative,
-maybe we could have a specific function for msbc initialization. Then,
-instead of sbc_init(), sbc_encode() sbc_decode(), we could have
-msbc_init(), sbc_encode(), sbc_decode().
-The biggest advantage is that parameters like bitpool, subbands,
-allocation, and other parts could be specified inside this function
-instead of being given from the application.
 
-Regards,
-Fr√©d√©ric
+Ack
+Lucas De Marchi
