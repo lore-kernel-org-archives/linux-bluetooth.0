@@ -1,29 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 14 Nov 2012 12:45:53 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
-	<frederic.danis@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] adapter: Convert storage aliases
-Message-ID: <20121114104553.GA6519@x220>
-References: <1352888166-7391-1-git-send-email-frederic.danis@linux.intel.com>
+Message-ID: <50A37388.7050607@invoxia.com>
+Date: Wed, 14 Nov 2012 11:33:44 +0100
+From: Arnaud Mouiche <arnaud.mouiche@invoxia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1352888166-7391-1-git-send-email-frederic.danis@linux.intel.com>
+To: frederic.dalleau@linux.intel.com
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] Bluetooth: Add BT_DEFER_SETUP option to sco socket
+References: <1352830825-13987-1-git-send-email-frederic.dalleau@linux.intel.com> <1352830825-13987-2-git-send-email-frederic.dalleau@linux.intel.com> <50A36DD1.1080507@invoxia.com> <50A3700C.6090801@linux.intel.com>
+In-Reply-To: <50A3700C.6090801@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frederic,
+What is your plan once the kernel will gain the defer capability.
+- is it up to bluetoothd/audio to accept and configure ?
+- is it the external HFP apps (for the HFP case) to do the job ?
 
-On Wed, Nov 14, 2012, Fr�d�ric Danis wrote:
->  #define SETTINGS_PATH STORAGEDIR "/%s/settings"
->  #define CACHE_PATH STORAGEDIR "/%s/cache/%s"
-> +#define DEVICE_INFO_PATH STORAGEDIR "/%s/%s/info"
+arnaud
 
-Why do you have these separate defines? Do you need them in multiple
-places? The define names are longer than the actual values and you're
-just obfuscating the actual call that uses them (since you need to look
-in two places to figure out of the format parameters are actually
-matching the format string). So please don't use these.
+On 11/14/2012 11:18 AM, Frédéric Dalleau wrote:
+> Hi Arnaud,
+>
+> On 11/14/2012 11:09 AM, Arnaud Mouiche wrote:
+>> Hello,
+>> I will try to find some time to try your patch.
+>
+> It is a bit early since I haven't tested it myself, should be in much
+> better shape before end of the week.
+>
+> Regards,
+> Frédéric
 
-Johan
