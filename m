@@ -1,105 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH v2 2/8] sink: Generalize disconnection function
-Date: Thu, 15 Nov 2012 08:27:34 +0100
-Message-Id: <1352964460-8531-3-git-send-email-mikel.astiz.oss@gmail.com>
-In-Reply-To: <1352964460-8531-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1352964460-8531-1-git-send-email-mikel.astiz.oss@gmail.com>
+Message-ID: <1352935032.20338.19.camel@aeonflux>
+Subject: Re: CSA2:  User space aspect
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Michael Knudsen <m.knudsen@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 15 Nov 2012 08:17:12 +0900
+In-Reply-To: <50A3B0D5.9030107@samsung.com>
+References: <509BB56A.80609@samsung.com> <50A3B0D5.9030107@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Michael,
 
-Extend the function for a more general usage other than full device
-disconnection. Besides, return error code instead of a boolean.
----
- profiles/audio/device.c |  4 ++--
- profiles/audio/sink.c   | 20 ++++++++++----------
- profiles/audio/sink.h   |  2 +-
- 3 files changed, 13 insertions(+), 13 deletions(-)
+> > If anyone else has an ideas or opinions about this, please speak up,
+> > otherwise I'll try coming up with an interface specification with
+> > more details.
+> 
+> This diff shows the direction I'm heading:
+> 
+> diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
+> index 1e35c43..a565a4d 100644
+> --- a/include/net/bluetooth/sco.h
+> +++ b/include/net/bluetooth/sco.h
+> @@ -51,6 +51,42 @@ struct sco_conninfo {
+>  	__u8  dev_class[3];
+>  };
+>  
+> +/* Audio format setting */
+> +#define SCO_HOST_FORMAT	0x04
+> +#define SCO_AIR_FORMAT	0x05
+> +
+> +#define SCO_FORMAT_ULAW		0x00
+> +#define SCO_FORMAT_ALAW		0x01
+> +#define SCO_FORMAT_CVSD		0x02
+> +#define SCO_FORMAT_TRANSPARENT	0x03 
+> +#define SCO_FORMAT_PCM		0x05 
+> +#define SCO_FORMAT_MSBC		0x05 
+> +#define SCO_FORMAT_VENDOR	0xff
+> +struct sco_format_vendor {
+> +	__u16 vendor;
+> +	__u16 codec;
+> +};
+> +
+> +struct sco_format {
+> +	__u8                     in_format;
+> +	struct sco_format_vendor in_vendor;
+> +
+> +	__u8                     out_format;
+> +	struct sco_format_vendor out_vendor;
+> +};
+> +
+> +#define SCO_CODECS		0x06
+> +struct sco_codecs {
+> +	__u8  count;
+> +	__u8 *codec;
+> +};
+> +
+> +#define SCO_CODECS_VENDOR	0x07
+> +struct sco_codecs_vendor {
+> +	__u8                      count;
+> +	struct sco_format_vendor *format;
+> +};
+> +
+>  /* ---- SCO connections ---- */
+>  struct sco_conn {
+>  	struct hci_conn	*hcon;
+> @@ -74,6 +110,8 @@ struct sco_pinfo {
+>  	struct bt_sock	bt;
+>  	__u32		flags;
+>  	struct sco_conn	*conn;
+> +	struct sco_format host_format;
+> +	struct sco_format air_format;
+>  };
+>  
+>  #endif /* __SCO_H */
+> 
+> Basically, this adds four socket options (I'll do the audio path
+> stuff as well once this is done):
+> 
+> 	SCO_AIR_FORMAT
+> 	SCO_HOST_FORMAT
+> 	SCO_CODECS (ro)
+> 	SCO_CODECS_VENDOR (ro)
+> 
+> The SCO_CODECS ones provide the application with a list of codecs
+> supported by the hdev as indicated in the HCI_Read_Local_Supported_Codecs
+> command response, and if the hdev does not support this command a
+> default of linear PCM, CVSD, and transparent will be provided.
 
-diff --git a/profiles/audio/device.c b/profiles/audio/device.c
-index 811ed75..09a1ed7 100644
---- a/profiles/audio/device.c
-+++ b/profiles/audio/device.c
-@@ -203,7 +203,7 @@ static void disconnect_cb(struct btd_device *btd_dev, gboolean removal,
- 		avrcp_disconnect(dev);
- 
- 	if (dev->sink && priv->sink_state != SINK_STATE_DISCONNECTED)
--		sink_disconnect(dev->sink);
-+		sink_disconnect(dev, TRUE);
- 	else
- 		priv->disconnecting = FALSE;
- }
-@@ -390,7 +390,7 @@ static DBusMessage *dev_disconnect(DBusConnection *conn, DBusMessage *msg,
- 	}
- 
- 	if (dev->sink && priv->sink_state != SINK_STATE_DISCONNECTED)
--		sink_disconnect(dev->sink);
-+		sink_disconnect(dev, TRUE);
- 	else {
- 		dbus_message_unref(priv->dc_req);
- 		priv->dc_req = NULL;
-diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
-index e769917..7a08960 100644
---- a/profiles/audio/sink.c
-+++ b/profiles/audio/sink.c
-@@ -604,12 +604,15 @@ gboolean sink_new_stream(struct audio_device *dev, struct avdtp *session,
- 	return TRUE;
- }
- 
--gboolean sink_disconnect(struct sink *sink)
-+int sink_disconnect(struct audio_device *dev, gboolean shutdown)
- {
-+	struct sink *sink = dev->sink;
-+
- 	if (!sink->session)
--		return FALSE;
-+		return -ENOTCONN;
- 
--	avdtp_set_device_disconnect(sink->session, TRUE);
-+	if (shutdown)
-+		avdtp_set_device_disconnect(sink->session, TRUE);
- 
- 	/* cancel pending connect */
- 	if (sink->connect) {
-@@ -623,20 +626,17 @@ gboolean sink_disconnect(struct sink *sink)
- 		avdtp_unref(sink->session);
- 		sink->session = NULL;
- 
--		return TRUE;
-+		return 0;
- 	}
- 
- 	/* disconnect already ongoing */
- 	if (sink->disconnect)
--		return TRUE;
-+		return -EBUSY;
- 
- 	if (!sink->stream)
--		return FALSE;
--
--	if (avdtp_close(sink->session, sink->stream, FALSE) < 0)
--		return FALSE;
-+		return -ENOTCONN;
- 
--	return TRUE;
-+	return avdtp_close(sink->session, sink->stream, FALSE);
- }
- 
- unsigned int sink_add_state_cb(sink_state_cb cb, void *user_data)
-diff --git a/profiles/audio/sink.h b/profiles/audio/sink.h
-index edac364..426d83f 100644
---- a/profiles/audio/sink.h
-+++ b/profiles/audio/sink.h
-@@ -46,4 +46,4 @@ sink_state_t sink_get_state(struct audio_device *dev);
- gboolean sink_new_stream(struct audio_device *dev, struct avdtp *session,
- 				struct avdtp_stream *stream);
- gboolean sink_setup_stream(struct sink *sink, struct avdtp *session);
--gboolean sink_disconnect(struct sink *sink);
-+int sink_disconnect(struct audio_device *dev, gboolean shutdown);
--- 
-1.7.11.7
+please to not attempt to use socket options as ioctl. They are called
+options for a reason.
+
+Getting the list of supported codecs should be done via mgmt interface
+command and it should be only done once.
+
+> Because the result length is variable, the idea is that the application-
+> provided structure is modified by the kernel to hold the actual number
+> of results so the application can allocate a buffer accordingly, e.g.:
+> 
+> 	struct sco_codecs sc;
+> 	
+> 	memset(&sc, 0, sizeof(sc));
+> 	getsockopt(sk, SOL_SCO, SCO_CODECS, &sk);
+> 
+> 	sk.codecs = malloc(sk.count);
+> 	getsockopt(sk, SOL_SCO, SCO_CODECS, &sk);
+
+We are not doing that. I have no intention to map kernel memory to
+userspace memory and back with socket options.
+
+> The SCO_*_FORMAT ones allows the application to set the parameters that
+> are to be used on host-controller and controller-controller paths.  While
+> the spec requires the pairs (host input/output, air input/output) to be
+> identical, I don't see a reason to enforce this in the API, thus all are
+> set independently.
+> 
+> So, before I spend any more time on this.. comments?
+
+Please ask yourself the question when and how the SCO data from the
+socket is actually affected. I still have not seen you provide the
+semantics of how the socket would be used afterwards. Especially on
+impact for the application establishing the SCO socket.
+
+In a more important question, is this static one time fits all selection
+or is this actually to be dynamic on every new connection establishment.
+
+Regards
+
+Marcel
+
 
