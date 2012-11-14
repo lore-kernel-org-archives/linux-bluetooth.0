@@ -1,49 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 14 Nov 2012 21:57:20 +0200
-From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: frederic.dalleau@linux.intel.com
-Subject: Re: [PATCH v4 00/16] mSBC tests
-Message-ID: <20121114215720.4ac04e24@i7>
-In-Reply-To: <1352904655.20338.11.camel@aeonflux>
-References: <1351589975-22640-1-git-send-email-frederic.dalleau@linux.intel.com>
-	<50A36BAC.4090604@linux.intel.com>
-	<1352904655.20338.11.camel@aeonflux>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 14 Nov 2012 14:18:12 -0500
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth 2012-11-09
+Message-ID: <20121114191811.GD6128@tuxdriver.com>
+References: <20121012110142.GF10739@joana>
+ <20121110182427.GA7523@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20121110182427.GA7523@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 14 Nov 2012 23:50:55 +0900
-Marcel Holtmann <marcel@holtmann.org> wrote:
-
-> Hi Fred,
+On Sat, Nov 10, 2012 at 07:24:27PM +0100, Gustavo Padovan wrote:
+> Hi John,
 > 
-> > > v4 integrate latest comments from Siarhei:
-> > >   - remove state->pending field from sbc_encoder_state
-> > >   - add armv6 and iwmmxt primitives
-> > >   - use simd primitive instead of neon
-> > >   - reorder patches so that the SBC_MSBC flag is exposed to users only when
-> > > implementation is complete.
-> > 
-> > Any feedback ?
+> A few important fixes to go into 3.7. There is a new hw support by Marcos
+> Chaparro. Johan added a memory leak fix and hci device index list fix.
+> Also Marcel fixed a race condition in the device set up that was prevent the
+> bt monitor to work properly. Last, Paulo Sérgio added a fix to the error
+> status when pairing for LE fails. This was prevent userspace to work to handle
+> the failure properly.
 > 
-> beside a tiny cosmetic comment, I have nothing. However I am not the
-> expert here. If Siarhei looks over this and is fine with it, I will be
-> as well.
+> Please pull! or let me know of any issues. Thanks.
+> 
+> 	Gustavo
+> 
+> ---
+> The following changes since commit 6fe7cc71bbf3a0bc28c9cec3c00bc11e81344412:
+> 
+>   ath9k: Test for TID only in BlockAcks while checking tx status (2012-10-30 15:58:54 -0400)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
 
-Hi,
+Pulled...
+ 
+> for you to fetch changes up to 482049f75750d73358e65236b933417b69f9cc25:
+> 
+>   Bluetooth: Fix memory leak when removing a UUID (2012-11-09 16:45:37 +0100)
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (2):
+>       Bluetooth: Fix having bogus entries in mgmt_read_index_list reply
+>       Bluetooth: Fix memory leak when removing a UUID
+> 
+> Marcel Holtmann (1):
+>       Bluetooth: Notify about device registration before power on
+> 
+> Marcos Chaparro (1):
+>       Bluetooth: ath3k: Add support for VAIO VPCEH [0489:e027]
+> 
+> Paulo Sérgio (1):
+>       Bluetooth: Fix error status when pairing fails
+> 
+>  drivers/bluetooth/ath3k.c |  1 +
+>  drivers/bluetooth/btusb.c |  1 +
+>  net/bluetooth/hci_core.c  |  4 ++--
+>  net/bluetooth/mgmt.c      | 12 +++++++-----
+>  net/bluetooth/smp.c       |  2 +-
+>  5 files changed, 12 insertions(+), 8 deletions(-)
+> 
 
-My biggest concern is the way how we handle the mSBC API/ABI extension.
-Because once the new version of sbc library is out, we can't
-(easily/painlessly) change it any more. Everything else is fixable.
 
-Anyway, as far as I can see, there are no regressions in the existing
-SBC functionality, which is the most important requirement.
-
-I personally would prefer a bit more verbose commit messages. But let
-me know if these demands are unreasonable :)
 
 -- 
-Best regards,
-Siarhei Siamashka
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
