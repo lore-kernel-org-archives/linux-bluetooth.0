@@ -1,80 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
-Message-id: <50A355CF.4030809@samsung.com>
-Date: Wed, 14 Nov 2012 09:26:55 +0100
-From: Michael Knudsen <m.knudsen@samsung.com>
-To: =?UTF-8?B?RnLDqWTDqXJpYyBEYWxsZWF1?=
-	<frederic.dalleau@linux.intel.com>
+MIME-Version: 1.0
+In-Reply-To: <1352105705-13988-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1352105705-13988-1-git-send-email-andrzej.kaczmarek@tieto.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Tue, 13 Nov 2012 22:35:56 -0200
+Message-ID: <CAMOw1v7zHJZP2nssumkkqqVkDCie5rwMTrS830iS3MbK1RrP+Q@mail.gmail.com>
+Subject: Re: [PATCH v2 00/20] CSCP plugin
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: Add BT_DEFER_SETUP option to sco socket
-References: <1352830825-13987-1-git-send-email-frederic.dalleau@linux.intel.com>
- <1352830825-13987-2-git-send-email-frederic.dalleau@linux.intel.com>
-In-reply-to: <1352830825-13987-2-git-send-email-frederic.dalleau@linux.intel.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 2012-11-13 19:20, Frédéric Dalleau wrote:
-> In order to authenticate and later configure an incoming SCO connection, the
-> BT_DEFER_SETUP option is added.
-> When an connection is requested, the listening socket is unblocked but the
-> effective connection setup happens only on first recv.
-> Any send between accept and recv fails with -ENOTCONN.
+On Mon, Nov 5, 2012 at 6:54 AM, Andrzej Kaczmarek
+<andrzej.kaczmarek@tieto.com> wrote:
+> Hi,
+>
+> Here are v2 patches for CSC profile implementation (cyclingspeed plugin).
+>
+> Changes since v1:
+> - signal is emited when Location property is changed
+> - supported locations CP procedure is done only once (see notes below)
+> - test script can now calculate instantenous speed and cadence
+> - few minor fixes found during testing and review
+>
+> It's now also tested with PTS - can pass all CSCP testcases but there are
+> few things to remember if someone want to retest:
+> - testcases in 4.5.3 are broken, look into erratas for updated ets file
+> - TP/SPL/CO/BV-01-I shall be run after device is removed because Request
+>   Supported Sensor Location procedure is done only once and then result
+>   is cached - this is because running it every time device is connected
+>   will make other testcases using SC Control Point fail due to unexpected
+>   opcode written (and CSCP spec requires this value to be cached anyway)
+> - as for now watcher shall be registered before running testcases using
+>   SC Control Point to make them work - this is because PTS expects that
+>   measurement notifications are enabled before control point indications,
+>   otherwise it will wait for writing control point CCC even though it
+>   was written before. Errata for this is already accepted and TS will be
+>   changed so both CCC can be written in any order.
+> - TP/SPS/CO/BV-02-I seems to be broken as it expected different value to
+>   be written than what is displayed to tester - issue in PTS for this is
+>   in progress
+>
+>
+> Comments are welcome.
 
-I have a few comments, please see below.
+I reviewed mainly the gdbus calls, particularly the DBus.Properties
+ones. It looks good for me.
 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index ef5b85d..2ee0ecb 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -377,6 +377,7 @@ extern int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb,
->  			      u16 flags);
->  
->  extern int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr);
-> +extern int sco_defer(struct hci_dev *hdev, bdaddr_t *bdaddr);
 
-I would prefer to make sco_defer() static and call it from sco_connect_ind()
-instead of as a separate step.  More on this below.
-
-> +static inline int hci_proto_defered(struct hci_dev *hdev, bdaddr_t *bdaddr,
-> +								__u8 type)
-> +{
-> +	switch (type) {
-> +	case SCO_LINK:
-> +	case ESCO_LINK:
-> +		return sco_defer(hdev, bdaddr);
-> +
-> +	default:
-> +		return 0;
-> +	}
-> +}
-
-My idea is to define (I'm not sure if this is exactly the same as what you
-suggested yourself) a bit, LM_DEFER, that e.g. sco_connect_ind() may return
-and propagate this bit to hci_conn_request_evt().  This way all policing of
-accepting SCO connections is handled from a single entry point into sco.c.
-
->  static inline void hci_proto_connect_cfm(struct hci_conn *conn, __u8 status)
->  {
->  	switch (conn->type) {
-
->  static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
->  {
->  	struct hci_ev_conn_request *ev = (void *) skb->data;
->  	int mask = hdev->link_mode;
-> +	int defered;
->  
->  	BT_DBG("%s bdaddr %pMR type 0x%x", hdev->name, &ev->bdaddr,
->  	       ev->link_type);
->  
->  	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, ev->link_type);
-> +	defered = hci_proto_defered(hdev, &ev->bdaddr, ev->link_type);
-
-Given that these two take exactly the same parameters, I would much
-rather see hci_proto_defered() folded into hci_proto_connect_ind()
-and set (LM_ACCEPT | LM_DEFERRED) for deferred cases.  This would
-also make sure we only do one iteration over the SCO socket list and
-that the same SCO sockets are taken into account.  With your approach
-there is a risk that one of the loops is changed and not the other.
-
--m.
+Lucas De Marchi
