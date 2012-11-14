@@ -1,52 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
-From: Syam Sidhardhan <s.syam@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Syam Sidhardhan <s.syam@samsung.com>
-Subject: [PATCH BlueZ 1/1] gdbus: Fix compilation error due to missing #defines
-Date: Wed, 14 Nov 2012 18:37:10 +0530
-Message-id: <1352898430-3383-1-git-send-email-s.syam@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CAFBvHif+xS12ywGEUdpycTtU--TVZSTgAb4mJuN_O5NKJSz36w@mail.gmail.com>
+References: <1352449889-5149-1-git-send-email-s.syam@samsung.com>
+	<1352457867.16204.9.camel@aeonflux>
+	<CAFBvHif+xS12ywGEUdpycTtU--TVZSTgAb4mJuN_O5NKJSz36w@mail.gmail.com>
+Date: Wed, 14 Nov 2012 18:33:51 +0530
+Message-ID: <CAFBvHidHO27JLpwJRs1mbieSqbKFJ88PVt1jL_CCON_zURDozg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] build: Require D-Bus 1.5 or later
+From: Syam Sidhardhan <syamsidhardh@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since these are simple #define strings, we are defining it here
-instead of upgrading to D-Bus 1.5 or later.
+Hi,
 
-Log:
-  CC     gdbus/object.o
-gdbus/object.c: In function ‘properties_set’:
-gdbus/object.c:876:7: error: ‘DBUS_ERROR_UNKNOWN_PROPERTY’ undeclared
- (first use in this function)
-gdbus/object.c:876:7: note: each undeclared identifier is reported
- only once for each function it appears in
-gdbus/object.c:881:6: error: ‘DBUS_ERROR_PROPERTY_READ_ONLY’
- undeclared (first use in this function)
-make[1]: *** [gdbus/object.o] Error 1
-make: *** [all] Error 2
----
- gdbus/object.c |    8 ++++++++
- 1 files changed, 8 insertions(+), 0 deletions(-)
+On Tue, Nov 13, 2012 at 10:01 PM, Syam Sidhardhan
+<syamsidhardh@gmail.com> wrote:
+> Hi Marcel,
+>
+> On Fri, Nov 9, 2012 at 4:14 PM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+>> Hi Syam,
+>>
+>>> The gdbus require D-Bus 1.5 version.
+>>>
+>>> Log:
+>>>   CC     gdbus/object.o
+>>> gdbus/object.c: In function =E2=80=98properties_set=E2=80=99:
+>>> gdbus/object.c:876:7: error: =E2=80=98DBUS_ERROR_UNKNOWN_PROPERTY=E2=80=
+=99 undeclared
+>>>  (first use in this function)
+>>> gdbus/object.c:876:7: note: each undeclared identifier is reported
+>>>  only once for each function it appears in
+>>> gdbus/object.c:881:6: error: =E2=80=98DBUS_ERROR_PROPERTY_READ_ONLY=E2=
+=80=99
+>>>  undeclared (first use in this function)
+>>> make[1]: *** [gdbus/object.o] Error 1
+>>> make: *** [all] Error 2
+>>
+>> if they are still simple defines, then lets just #ifndef them and define
+>> them in gdbus/object.c
+>>
+>
+> Yes, those are simple defines. I'll send a patch according to your sugges=
+tion.
+>
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index e3ad067..3101ca6 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -39,6 +39,14 @@
- 
- #define DBUS_INTERFACE_OBJECT_MANAGER "org.freedesktop.DBus.ObjectManager"
- 
-+#ifndef DBUS_ERROR_UNKNOWN_PROPERTY
-+#define DBUS_ERROR_UNKNOWN_PROPERTY "org.freedesktop.DBus.Error.UnknownProperty"
-+#endif
-+
-+#ifndef DBUS_ERROR_PROPERTY_READ_ONLY
-+#define DBUS_ERROR_PROPERTY_READ_ONLY "org.freedesktop.DBus.Error.PropertyReadOnly"
-+#endif
-+
- struct generic_data {
- 	unsigned int refcount;
- 	DBusConnection *conn;
--- 
-1.7.4.1
+Missing the mailing list in my earlier reply. CC-ing here.
 
+Regards,
+Syam.
