@@ -1,48 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50A3BC30.8060209@linux.intel.com>
-Date: Wed, 14 Nov 2012 16:43:44 +0100
-From: =?UTF-8?B?RnLDqWTDqXJpYyBEYWxsZWF1?=
-	<frederic.dalleau@linux.intel.com>
-Reply-To: frederic.dalleau@linux.intel.com
-MIME-Version: 1.0
-To: =?UTF-8?B?RnLDqWTDqXJpYyBEYWxsZWF1?=
-	<frederic.dalleau@linux.intel.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 05/16] sbc: Add mmx primitive for 1b 8s analysis
-References: <1351589975-22640-1-git-send-email-frederic.dalleau@linux.intel.com> <1351589975-22640-6-git-send-email-frederic.dalleau@linux.intel.com>
-In-Reply-To: <1351589975-22640-6-git-send-email-frederic.dalleau@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFCv1 3/3] Bluetooth: trivial: Use __constant for constants
+Date: Wed, 14 Nov 2012 17:39:32 +0200
+Message-Id: <1352907572-7113-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1352907572-7113-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1352907572-7113-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Since I'm gonna resend a new series, I'll comment myself ;)
 
-On 10/30/2012 10:39 AM, Frédéric Dalleau wrote:
-> +static inline void sbc_analyze_1b_8s_mmx(struct sbc_encoder_state *state,
-> +		int16_t *x, int32_t *out, int out_stride)
-> +{
-> +	if (state->odd)
-> +		sbc_analyze_eight_mmx(x, out, analysis_consts_fixed8_simd_odd);
-> +	else
-> +		sbc_analyze_eight_mmx(x, out, analysis_consts_fixed8_simd_even);
-> +
-> +	state->odd = !state->odd;
-> +
-> +	__asm__ volatile ("emms\n");
-> +}
-> +
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-One thing bother me about this patch : the emms instruction is called
-after every block, instead of every four blocks until now. I have very
-little knowledge about this, but I read that emms instruction is
-somewhat expensive.
-Some quick tests haven't shown differences, but it is possible to add a
-post analyze callback to overcome this. In this case, emms instruction
-could be run every 15 blocks or whatever is defined.
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 10b3062..4a635f1 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4529,12 +4529,12 @@ static void l2cap_do_create(struct l2cap_chan *chan, int result,
+ 		/* Incoming channel on AMP */
+ 		if (result == L2CAP_CR_SUCCESS) {
+ 			/* Send successful response */
+-			rsp.result = cpu_to_le16(L2CAP_CR_SUCCESS);
+-			rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
++			rsp.result = __constant_cpu_to_le16(L2CAP_CR_SUCCESS);
++			rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
+ 		} else {
+ 			/* Send negative response */
+-			rsp.result = cpu_to_le16(L2CAP_CR_NO_MEM);
+-			rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
++			rsp.result = __constant_cpu_to_le16(L2CAP_CR_NO_MEM);
++			rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
+ 		}
+ 
+ 		l2cap_send_cmd(chan->conn, chan->ident, L2CAP_CREATE_CHAN_RSP,
+-- 
+1.7.10.4
 
-Is it worth it?
-
-Thanks,
-Frédéric
