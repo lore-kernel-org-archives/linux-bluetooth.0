@@ -1,39 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1352903987.20338.8.camel@aeonflux>
-Subject: Re: [RFC] Bluetooth: Add BT_DEFER_SETUP option to sco socket
-From: Marcel Holtmann <marcel@holtmann.org>
-To: frederic.dalleau@linux.intel.com
-Cc: Michael Knudsen <m.knudsen@samsung.com>,
-	linux-bluetooth@vger.kernel.org
-Date: Wed, 14 Nov 2012 23:39:47 +0900
-In-Reply-To: <50A36E06.2060206@linux.intel.com>
-References: <1352830825-13987-1-git-send-email-frederic.dalleau@linux.intel.com>
-	 <1352830825-13987-2-git-send-email-frederic.dalleau@linux.intel.com>
-	 <50A355CF.4030809@samsung.com> <50A36E06.2060206@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
+From: Syam Sidhardhan <s.syam@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Syam Sidhardhan <s.syam@samsung.com>
+Subject: [PATCH BlueZ 1/1] gdbus: Fix compilation error due to missing #defines
+Date: Wed, 14 Nov 2012 18:37:10 +0530
+Message-id: <1352898430-3383-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
+Since these are simple #define strings, we are defining it here
+instead of upgrading to D-Bus 1.5 or later.
 
-> > My idea is to define (I'm not sure if this is exactly the same as what you
-> > suggested yourself) a bit, LM_DEFER, that e.g. sco_connect_ind() may return
-> > and propagate this bit to hci_conn_request_evt().  This way all policing of
-> > accepting SCO connections is handled from a single entry point into sco.c.
-> 
-> You detailed it much further than I did, but yes it is the same idea. I 
-> fully support it! If everybody agrees, then I can update the patch.
-> 
-> hci.h would receive the folowing line:
-> 
-> + #define HCI_LM_DEFER   0x4000
+Log:
+  CC     gdbus/object.o
+gdbus/object.c: In function ‘properties_set’:
+gdbus/object.c:876:7: error: ‘DBUS_ERROR_UNKNOWN_PROPERTY’ undeclared
+ (first use in this function)
+gdbus/object.c:876:7: note: each undeclared identifier is reported
+ only once for each function it appears in
+gdbus/object.c:881:6: error: ‘DBUS_ERROR_PROPERTY_READ_ONLY’
+ undeclared (first use in this function)
+make[1]: *** [gdbus/object.o] Error 1
+make: *** [all] Error 2
+---
+ gdbus/object.c |    8 ++++++++
+ 1 files changed, 8 insertions(+), 0 deletions(-)
 
-can we actually not that that. This is an old public API and I rather
-not extend it.
-
-Regards
-
-Marcel
-
+diff --git a/gdbus/object.c b/gdbus/object.c
+index e3ad067..3101ca6 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -39,6 +39,14 @@
+ 
+ #define DBUS_INTERFACE_OBJECT_MANAGER "org.freedesktop.DBus.ObjectManager"
+ 
++#ifndef DBUS_ERROR_UNKNOWN_PROPERTY
++#define DBUS_ERROR_UNKNOWN_PROPERTY "org.freedesktop.DBus.Error.UnknownProperty"
++#endif
++
++#ifndef DBUS_ERROR_PROPERTY_READ_ONLY
++#define DBUS_ERROR_PROPERTY_READ_ONLY "org.freedesktop.DBus.Error.PropertyReadOnly"
++#endif
++
+ struct generic_data {
+ 	unsigned int refcount;
+ 	DBusConnection *conn;
+-- 
+1.7.4.1
 
