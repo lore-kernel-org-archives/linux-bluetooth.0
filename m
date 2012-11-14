@@ -2,62 +2,81 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 5/5] adapter: Remove storage path #defines
-Date: Wed, 14 Nov 2012 12:28:53 +0100
-Message-Id: <1352892533-15154-5-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v2 4/5] device: Use new storage for device trust
+Date: Wed, 14 Nov 2012 12:28:52 +0100
+Message-Id: <1352892533-15154-4-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1352892533-15154-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1352892533-15154-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SETTINGS_PATH and CACHE_PATH will be static for the
-entire 5.x series
+As set_trust() changes value in device structure and write to
+storage is deferred, property set could not return failure.
 ---
- src/adapter.c |    9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ src/device.c |   22 +++++++++-------------
+ 1 file changed, 9 insertions(+), 13 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index bdea378..3f09295 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -84,9 +84,6 @@
- #define REMOVE_TEMP_TIMEOUT (3 * 60)
- #define PENDING_FOUND_MAX 5
+diff --git a/src/device.c b/src/device.c
+index c508d18..792fe3d 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -226,6 +226,9 @@ static gboolean store_device_info_cb(gpointer user_data)
+ 		g_key_file_set_string(key_file, "General", "Alias",
+ 					device->alias);
  
--#define SETTINGS_PATH STORAGEDIR "/%s/settings"
--#define CACHE_PATH STORAGEDIR "/%s/cache/%s"
++	g_key_file_set_boolean(key_file, "General", "Trusted",
++				device->trusted);
++
+ 	ba2str(adapter_get_address(device->adapter), adapter_addr);
+ 	ba2str(&device->bdaddr, device_addr);
+ 	snprintf(filename, PATH_MAX, INFO_PATH, adapter_addr, device_addr);
+@@ -713,23 +716,14 @@ static gboolean dev_property_get_trusted(const GDBusPropertyTable *property,
+ static void set_trust(GDBusPendingPropertySet id, gboolean value, void *data)
+ {
+ 	struct btd_device *device = data;
+-	struct btd_adapter *adapter = device->adapter;
+-	char srcaddr[18], dstaddr[18];
+-	int err;
+ 
+ 	if (device->trusted == value)
+ 		return g_dbus_pending_property_success(id);
+ 
+-	ba2str(adapter_get_address(adapter), srcaddr);
+-	ba2str(&device->bdaddr, dstaddr);
 -
- static GSList *adapter_drivers = NULL;
+-	err = write_trust(srcaddr, dstaddr, device->bdaddr_type, value);
+-	if (err < 0)
+-		return g_dbus_pending_property_error(id,
+-				ERROR_INTERFACE ".Failed", strerror(-err));
+-
+ 	device->trusted = value;
  
- enum session_req_type {
-@@ -244,7 +241,7 @@ static void store_adapter_info(struct btd_adapter *adapter)
- 					adapter->discov_timeout);
++	store_device_info(device);
++
+ 	g_dbus_emit_property_changed(btd_get_dbus_connection(),
+ 				device->path, DEVICE_INTERFACE, "Trusted");
  
- 	ba2str(&adapter->bdaddr, address);
--	snprintf(filename, PATH_MAX, SETTINGS_PATH, address);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/settings", address);
- 	filename[PATH_MAX] = '\0';
+@@ -1743,6 +1737,10 @@ static void load_info(struct btd_device *device, const gchar *local,
+ 	device->alias = g_key_file_get_string(key_file, "General", "Alias",
+ 						NULL);
  
- 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-@@ -267,7 +264,7 @@ static void store_cached_name(const bdaddr_t *local, const bdaddr_t *peer,
++	/* Load trust */
++	device->trusted = g_key_file_get_boolean(key_file, "General",
++							"Trusted", NULL);
++
+ 	if (store_needed)
+ 		store_device_info(device);
  
- 	ba2str(local, s_addr);
- 	ba2str(peer, d_addr);
--	snprintf(filename, PATH_MAX, CACHE_PATH, s_addr, d_addr);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s", s_addr, d_addr);
- 	filename[PATH_MAX] = '\0';
- 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+@@ -1787,8 +1785,6 @@ struct btd_device *device_create(struct btd_adapter *adapter,
  
-@@ -2703,7 +2700,7 @@ static void load_config(struct btd_adapter *adapter)
+ 	load_info(device, srcaddr, address);
  
- 	key_file = g_key_file_new();
+-	device->trusted = read_trust(src, address, device->bdaddr_type);
+-
+ 	if (read_blocked(src, &device->bdaddr, device->bdaddr_type))
+ 		device_block(device, FALSE);
  
--	snprintf(filename, PATH_MAX, SETTINGS_PATH, address);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/settings", address);
- 	filename[PATH_MAX] = '\0';
- 
- 	if (!g_key_file_load_from_file(key_file, filename, 0, NULL))
 -- 
 1.7.9.5
 
