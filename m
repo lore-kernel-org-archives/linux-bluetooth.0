@@ -1,35 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 14 Nov 2012 11:17:41 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
+Message-id: <50A355CF.4030809@samsung.com>
+Date: Wed, 14 Nov 2012 09:26:55 +0100
+From: Michael Knudsen <m.knudsen@samsung.com>
+To: =?UTF-8?B?RnLDqWTDqXJpYyBEYWxsZWF1?=
 	<frederic.dalleau@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: [RFC] Bluetooth: Add BT_DEFER_SETUP option to sco socket
-Message-ID: <20121114091739.GB9443@aemeltch-MOBL1>
 References: <1352830825-13987-1-git-send-email-frederic.dalleau@linux.intel.com>
  <1352830825-13987-2-git-send-email-frederic.dalleau@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1352830825-13987-2-git-send-email-frederic.dalleau@linux.intel.com>
+In-reply-to: <1352830825-13987-2-git-send-email-frederic.dalleau@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
-
-On Tue, Nov 13, 2012 at 07:20:25PM +0100, Frédéric Dalleau wrote:
+On 2012-11-13 19:20, FrÃ©dÃ©ric Dalleau wrote:
 > In order to authenticate and later configure an incoming SCO connection, the
 > BT_DEFER_SETUP option is added.
 > When an connection is requested, the listening socket is unblocked but the
 > effective connection setup happens only on first recv.
 > Any send between accept and recv fails with -ENOTCONN.
-> ---
 
-Apart from other comments..
+I have a few comments, please see below.
+
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index ef5b85d..2ee0ecb 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -377,6 +377,7 @@ extern int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb,
+>  			      u16 flags);
+>  
+>  extern int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr);
+> +extern int sco_defer(struct hci_dev *hdev, bdaddr_t *bdaddr);
+
+I would prefer to make sco_defer() static and call it from sco_connect_ind()
+instead of as a separate step.  More on this below.
 
 > +static inline int hci_proto_defered(struct hci_dev *hdev, bdaddr_t *bdaddr,
-
-I think we do not use "inline" anymore.
-
 > +								__u8 type)
 > +{
 > +	switch (type) {
@@ -41,115 +48,33 @@ I think we do not use "inline" anymore.
 > +		return 0;
 > +	}
 > +}
-> +
+
+My idea is to define (I'm not sure if this is exactly the same as what you
+suggested yourself) a bit, LM_DEFER, that e.g. sco_connect_ind() may return
+and propagate this bit to hci_conn_request_evt().  This way all policing of
+accepting SCO connections is handled from a single entry point into sco.c.
+
 >  static inline void hci_proto_connect_cfm(struct hci_conn *conn, __u8 status)
 >  {
 >  	switch (conn->type) {
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 9f5c5f2..167eca0 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2047,15 +2047,54 @@ unlock:
->  	hci_conn_check_pending(hdev);
->  }
->  
-> +void hci_conn_accept(struct hci_conn *conn, int mask)
-> +{
-> +	struct hci_dev *hdev = conn->hdev;
-> +
-> +	BT_DBG("conn %p", conn);
-> +
-> +	if (!lmp_esco_capable(hdev)) {
-> +		struct hci_cp_accept_conn_req cp;
-> +
-> +		conn->state = BT_CONNECT;
-> +		bacpy(&cp.bdaddr, &conn->dst);
-> +
-> +		if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
-> +			cp.role = 0x00; /* Become master */
-> +		else
-> +			cp.role = 0x01; /* Remain slave */
-> +
-> +		hci_send_cmd(hdev, HCI_OP_ACCEPT_CONN_REQ, sizeof(cp),
-> +			     &cp);
-> +	} else /* lmp_esco_capable(hdev)) */ {
-> +		struct hci_cp_accept_sync_conn_req cp;
-> +
-> +		conn->state = BT_CONNECT;
-> +		bacpy(&cp.bdaddr, &conn->dst);
-> +		cp.pkt_type = cpu_to_le16(conn->pkt_type);
-> +
-> +		cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
-> +		cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
-> +		cp.max_latency    = __constant_cpu_to_le16(0xffff);
 
-maybe some comments about those numbers
-
-> +		cp.content_format = cpu_to_le16(hdev->voice_setting);
-> +		cp.retrans_effort = 0xff;
-> +
-> +		hci_send_cmd(hdev, HCI_OP_ACCEPT_SYNC_CONN_REQ,
-> +			     sizeof(cp), &cp);
-> +	}
-> +}
-> +
-
-...
-
->  static int sco_sock_setsockopt(struct socket *sock, int level, int optname, char __user *optval, unsigned int optlen)
+>  static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
 >  {
->  	struct sock *sk = sock->sk;
->  	int err = 0;
-> +	u32 opt;
+>  	struct hci_ev_conn_request *ev = (void *) skb->data;
+>  	int mask = hdev->link_mode;
+> +	int defered;
 >  
->  	BT_DBG("sk %p", sk);
+>  	BT_DBG("%s bdaddr %pMR type 0x%x", hdev->name, &ev->bdaddr,
+>  	       ev->link_type);
 >  
->  	lock_sock(sk);
->  
->  	switch (optname) {
-> +
-> +	case BT_DEFER_SETUP:
-> +		if (sk->sk_state != BT_BOUND && sk->sk_state != BT_LISTEN) {
-> +			err = -EINVAL;
-> +			break;
-> +		}
-> +
-> +		if (get_user(opt, (u32 __user *) optval)) {
-> +			err = -EFAULT;
-> +			break;
-> +		}
-> +
-> +		if (opt)
-> +			set_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
-> +		else
-> +			clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
-> +		break;
-> +
->  	default:
->  		err = -ENOPROTOOPT;
->  		break;
-> @@ -753,6 +794,19 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname, char
->  	lock_sock(sk);
->  
->  	switch (optname) {
-> +
-> +	case BT_DEFER_SETUP:
-> +		if (sk->sk_state != BT_BOUND && sk->sk_state != BT_LISTEN) {
-> +			err = -EINVAL;
-> +			break;
-> +		}
-> +
-> +		if (put_user(test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags),
-> +			     (u32 __user *) optval))
-> +			err = -EFAULT;
-> +
-> +		break;
-> +
+>  	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, ev->link_type);
+> +	defered = hci_proto_defered(hdev, &ev->bdaddr, ev->link_type);
 
-I think set/get sockopt might be implemented in a separate patch.
-Maybe you can also break even into more logical chunks so this would be
-easier to understand.
+Given that these two take exactly the same parameters, I would much
+rather see hci_proto_defered() folded into hci_proto_connect_ind()
+and set (LM_ACCEPT | LM_DEFERRED) for deferred cases.  This would
+also make sure we only do one iteration over the SCO socket list and
+that the same SCO sockets are taken into account.  With your approach
+there is a risk that one of the loops is changed and not the other.
 
-Best regards 
-Andrei Emeltchenko 
-
+-m.
