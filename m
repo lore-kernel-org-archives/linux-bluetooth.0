@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 3/4] Bluetooth: Remove unneeded local_amp_id initialization
-Date: Thu, 15 Nov 2012 18:14:55 +0200
-Message-Id: <1352996096-27374-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC 2/4] Bluetooth: Fix sending L2CAP Create Chan Req
+Date: Thu, 15 Nov 2012 18:14:54 +0200
+Message-Id: <1352996096-27374-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1352996096-27374-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1352996096-27374-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,26 +11,72 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-local_amp_id is already set in l2cap_connect() which is called several
-lines above.
+When receiving Physical Link Completed event we need to create L2CAP
+channel with L2CAP Create Chan Request. Current code was sending
+this command only if connection was pending (which is probably
+needed in channel move case). If channel is not moved but created
+Create Chan should be sent for outgoing channel which is checked
+with BT_CONNECT flag.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |    1 -
- 1 file changed, 1 deletion(-)
+ net/bluetooth/l2cap_core.c |   29 ++++++++++++++++++-----------
+ 1 file changed, 18 insertions(+), 11 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f6a8960..33eb3f4 100644
+index 751d8a7..f6a8960 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -4360,7 +4360,6 @@ static int l2cap_create_channel_req(struct l2cap_conn *conn,
+@@ -4594,15 +4594,31 @@ void l2cap_move_start(struct l2cap_chan *chan)
+ static void l2cap_do_create(struct l2cap_chan *chan, int result,
+ 			    u8 local_amp_id, u8 remote_amp_id)
+ {
++	BT_DBG("chan %p state %s %u -> %u", chan, state_to_string(chan->state),
++	       local_amp_id, remote_amp_id);
++
+ 	chan->fcs = L2CAP_FCS_NONE;
  
- 		BT_DBG("mgr %p bredr_chan %p hs_hcon %p", mgr, chan, hs_hcon);
+-	if (!test_bit(CONF_CONNECT_PEND, &chan->conf_state)) {
++	/* Outgoing channel on AMP */
++	if (chan->state == BT_CONNECT) {
++		if (result == L2CAP_CR_SUCCESS) {
++			chan->local_amp_id = local_amp_id;
++			l2cap_send_create_chan_req(chan, remote_amp_id);
++		} else {
++			/* Revert to BR/EDR connect */
++			l2cap_send_conn_req(chan);
++		}
++
++		return;
++	}
++
++	/* Incoming channel on AMP */
++	if (__l2cap_no_conn_pending(chan)) {
+ 		struct l2cap_conn_rsp rsp;
+ 		char buf[128];
+ 		rsp.scid = cpu_to_le16(chan->dcid);
+ 		rsp.dcid = cpu_to_le16(chan->scid);
  
--		chan->local_amp_id = req->amp_id;
- 		mgr->bredr_chan = chan;
- 		chan->hs_hcon = hs_hcon;
- 		conn->mtu = hdev->block_mtu;
+-		/* Incoming channel on AMP */
+ 		if (result == L2CAP_CR_SUCCESS) {
+ 			/* Send successful response */
+ 			rsp.result = __constant_cpu_to_le16(L2CAP_CR_SUCCESS);
+@@ -4624,15 +4640,6 @@ static void l2cap_do_create(struct l2cap_chan *chan, int result,
+ 				       l2cap_build_conf_req(chan, buf), buf);
+ 			chan->num_conf_req++;
+ 		}
+-	} else {
+-		/* Outgoing channel on AMP */
+-		if (result == L2CAP_CR_SUCCESS) {
+-			chan->local_amp_id = local_amp_id;
+-			l2cap_send_create_chan_req(chan, remote_amp_id);
+-		} else {
+-			/* Revert to BR/EDR connect */
+-			l2cap_send_conn_req(chan);
+-		}
+ 	}
+ }
+ 
 -- 
 1.7.10.4
 
