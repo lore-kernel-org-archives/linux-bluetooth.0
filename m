@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v1 14/16] adapter: Remove redundant Devices property
-Date: Thu, 15 Nov 2012 16:09:17 +0100
-Message-Id: <1352992159-11559-15-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v1 12/16] test: Use ObjectManager instead of Adapters property
+Date: Thu, 15 Nov 2012 16:09:15 +0100
+Message-Id: <1352992159-11559-13-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1352992159-11559-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1352992159-11559-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,90 +12,60 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The ObjectManager interface already reports the list of devices, so the
-the property can be entirely removed.
+Use the objects and interfaces reported by the ObjectManager in order
+to list the available adapters.
 ---
- doc/adapter-api.txt |  4 ----
- src/adapter.c       | 30 ------------------------------
- 2 files changed, 34 deletions(-)
+ test/test-health      | 11 ++++++++---
+ test/test-health-sink | 12 +++++++++---
+ 2 files changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 132e60f..3582793 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -180,10 +180,6 @@ Properties	string Address [readonly]
+diff --git a/test/test-health b/test/test-health
+index 21d1776..9d2f62f 100755
+--- a/test/test-health
++++ b/test/test-health
+@@ -131,10 +131,15 @@ if not con:
+ 	enter_mainloop()
+ 	sys.exit()
  
- 			Indicates that a device discovery procedure is active.
+-manager = dbus.Interface(bus.get_object("org.bluez", "/org/bluez"),
+-						"org.bluez.Manager")
++manager = dbus.Interface(bus.get_object("org.bluez", "/"),
++					"org.freedesktop.DBus.ObjectManager")
  
--		array{object} Devices [readonly]
--
--			List of device object paths.
--
- 		array{string} UUIDs [readonly]
+-adapters = manager.GetProperties()["Adapters"]
++objects = manager.GetManagedObjects()
++adapters = []
++
++for path, ifaces in objects.iteritems():
++	if ifaces.has_key("org.bluez.Adapter"):
++		adapters.append(path)
  
- 			List of 128-bit UUIDs that represents the available
-diff --git a/src/adapter.c b/src/adapter.c
-index aa93785..eb82102 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1018,9 +1018,6 @@ static struct btd_device *adapter_create_device(struct btd_adapter *adapter,
+ i = 1
+ for ad in adapters:
+diff --git a/test/test-health-sink b/test/test-health-sink
+index 7bf1af4..a886d85 100755
+--- a/test/test-health-sink
++++ b/test/test-health-sink
+@@ -21,10 +21,16 @@ app_path = hdp_manager.CreateApplication({"DataType": dbus.types.UInt16(4103),
  
- 	adapter->devices = g_slist_append(adapter->devices, device);
+ print(app_path)
  
--	g_dbus_emit_property_changed(btd_get_dbus_connection(),
--				adapter->path, ADAPTER_INTERFACE, "Devices");
--
- 	return device;
- }
+-manager = dbus.Interface(bus.get_object("org.bluez", "/org/bluez"),
+-						"org.bluez.Manager")
++manager = dbus.Interface(bus.get_object("org.bluez", "/"),
++					"org.freedesktop.DBus.ObjectManager")
++
++objects = manager.GetManagedObjects()
++adapters = []
++
++for path, ifaces in objects.iteritems():
++	if ifaces.has_key("org.bluez.Adapter"):
++		adapters.append(path)
  
-@@ -1073,9 +1070,6 @@ void adapter_remove_device(struct btd_adapter *adapter,
- 		service_auth_cancel(auth);
- 	}
- 
--	g_dbus_emit_property_changed(btd_get_dbus_connection(),
--				adapter->path, ADAPTER_INTERFACE, "Devices");
--
- 	device_remove(dev, remove_storage);
- }
- 
-@@ -1381,29 +1375,6 @@ static gboolean adapter_property_get_discovering(
- 	return TRUE;
- }
- 
--static gboolean adapter_property_get_devices(
--					const GDBusPropertyTable *property,
--					DBusMessageIter *iter, void *data)
--{
--	struct btd_adapter *adapter = data;
--	DBusMessageIter entry;
--	GSList *l;
--
--	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
--				DBUS_TYPE_OBJECT_PATH_AS_STRING, &entry);
--
--	for (l = adapter->devices; l != NULL; l = l->next) {
--		const char *path = device_get_path(l->data);
--
--		dbus_message_iter_append_basic(&entry, DBUS_TYPE_OBJECT_PATH,
--								&path);
--	}
--
--	dbus_message_iter_close_container(iter, &entry);
--
--	return TRUE;
--}
--
- static gboolean adapter_property_get_uuids(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data)
- {
-@@ -1688,7 +1659,6 @@ static const GDBusPropertyTable adapter_properties[] = {
- 	{ "PairableTimeout", "u", adapter_property_get_pairable_timeout,
- 				adapter_property_set_pairable_timeout },
- 	{ "Discovering", "b", adapter_property_get_discovering },
--	{ "Devices", "ao", adapter_property_get_devices },
- 	{ "UUIDs", "as", adapter_property_get_uuids },
- 	{ }
- };
+-adapters = manager.GetProperties()["Adapters"]
+ i = 1
+ for ad in adapters:
+ 	print("%d. %s" % (i, ad))
 -- 
 1.7.11.7
 
