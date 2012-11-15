@@ -1,64 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Reply-to: m.knudsen@samsung.com
-From: Michael Knudsen <m.knudsen@samsung.com>
-To: 'Marcel Holtmann' <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-References: <509BB56A.80609@samsung.com> <50A3B0D5.9030107@samsung.com>
- <1352935032.20338.19.camel@aeonflux>
-In-reply-to: <1352935032.20338.19.camel@aeonflux>
-Subject: RE: CSA2:  User space aspect
-Date: Thu, 15 Nov 2012 12:34:48 +0100
-Message-id: <000001cdc325$38d657f0$aa8307d0$%knudsen@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
+Message-ID: <50A4C2BF.3050807@linux.intel.com>
+Date: Thu, 15 Nov 2012 11:23:59 +0100
+From: =?UTF-8?B?RnLDqWTDqXJpYyBEYWxsZWF1?=
+	<frederic.dalleau@linux.intel.com>
+Reply-To: frederic.dalleau@linux.intel.com
+MIME-Version: 1.0
+To: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v4 09/16] sbc: Use simd primitive if doing msbc on neon
+References: <1351589975-22640-1-git-send-email-frederic.dalleau@linux.intel.com> <1351589975-22640-10-git-send-email-frederic.dalleau@linux.intel.com> <20121114212703.0d8bf8cd@i7>
+In-Reply-To: <20121114212703.0d8bf8cd@i7>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> please to not attempt to use socket options as ioctl. They are
-> called options for a reason.
-> 
-> Getting the list of supported codecs should be done via mgmt
-> interface command and it should be only done once.
+Hi,
+On 11/14/2012 08:27 PM, Siarhei Siamashka wrote:
+> On Tue, 30 Oct 2012 10:39:28 +0100
+>> +	if (state->increment == 1)
+>> +		state->sbc_analyze_8s = sbc_analyze_1b_8s_simd;
+>>   #endif
+>>   }
+>
+> This is not enough. As I commented earlier in
+>      http://permalink.gmane.org/gmane.linux.bluez.kernel/31567
+>
+> "neon code also provides optimized "sbc_enc_process_input_*" functions,
+> which are not going to work correctly for mSBC:
+>
+> 	state->sbc_enc_process_input_8s_le = sbc_enc_process_input_8s_le_neon;
+> 	state->sbc_enc_process_input_8s_be = sbc_enc_process_input_8s_be_neon;"
 
-Okay, I'll take a stab at this, then.
+Indeed, this is a mistake :
+I wanted to use the neon analysis in conjonction with simd input processing.
 
-I expect that socket options are still fine for actually
-setting the configuration? 
+Instead, the patch would look like this :
++ if (state->increment == 1) {
++ 	state->sbc_enc_process_input_8s_be = 	
++					sbc_enc_process_input_8s_be;
++	state->sbc_enc_process_input_8s_le =
++					sbc_enc_process_input_8s_le;
++ }
+Damned it is 82 chars long!
 
-> Please ask yourself the question when and how the SCO data from the
-> socket is actually affected. I still have not seen you provide the
-> semantics of how the socket would be used afterwards. Especially on
-> impact for the application establishing the SCO socket.
+Unfortunately I can't test this one. I can't even build it. I could but 
+that's gonna take a lot of time.
 
-There are two cases, connect() and accept().
-
-For connect(), this is pretty simple:
-
-	sk = socket(..);
-	setsockopt(sk, SOL_SCO, SCO_AIR_FORMAT, ...);
-	connect(sk, ..);
-
-For accept(), it is the intention that this will be used in
-conjunction with BT_DEFER_SETUP such that we can set the codecs
-as per how we just negotiated with the peer:
-
-	sk = socket(..);
-	bind(sk, ..);
-	setsockopt(sk, SOL_SCO, BT_DEFER_SETUP, 1);
-	listen(sk, ..);
-	peer = accept(sk, ..);
-	setsockopt(peer, SOL_SCO, SCO_AIR_FORMAT, SCO_FORMAT_MSBC);
-	recvmsg(peer, ..);
-
-> In a more important question, is this static one time fits all
-> selection or is this actually to be dynamic on every new connection
-> establishment.
-
-Both (defer/non-defer).  The socket options will set the parameters
-that are used by the stack whenever it sets up or accepts a connection.
-
-Did this answer your questions?
-
--m.
-
-
+Regards,
+Frédéric
