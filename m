@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v1 11/16] manager: Remove redundant Adapters property
-Date: Thu, 15 Nov 2012 16:09:14 +0100
-Message-Id: <1352992159-11559-12-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v1 10/16] manager: Remove AdapterAdded/AdapterRemoved signals
+Date: Thu, 15 Nov 2012 16:09:13 +0100
+Message-Id: <1352992159-11559-11-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1352992159-11559-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1352992159-11559-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,91 +12,92 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The ObjectManager interface already reports the available adapters, so
-the property can be entirely removed.
+The Manager interface already reports changes in the adapter list in
+form of property changes, so there is no need to keep these two signals
+any more.
 ---
- doc/manager-api.txt |  6 +-----
- src/manager.c       | 30 ------------------------------
- 2 files changed, 1 insertion(+), 35 deletions(-)
+ doc/manager-api.txt |  8 --------
+ src/manager.c       | 20 +-------------------
+ 2 files changed, 1 insertion(+), 27 deletions(-)
 
 diff --git a/doc/manager-api.txt b/doc/manager-api.txt
-index 693a981..a8f570b 100644
+index b89ab68..693a981 100644
 --- a/doc/manager-api.txt
 +++ b/doc/manager-api.txt
-@@ -25,10 +25,6 @@ Object path	/org/bluez
+@@ -25,14 +25,6 @@ Object path	/org/bluez
  			Possible errors: org.bluez.Error.InvalidArguments
  					 org.bluez.Error.NoSuchAdapter
  
--Properties	array{object} Adapters [readonly]
+-Signals		AdapterAdded(object adapter)
 -
--			List of adapter object paths.
+-			Parameter is object path of added adapter.
 -
--		object DefaultAdapter [readonly, optional]
-+Properties	object DefaultAdapter [readonly, optional]
+-		AdapterRemoved(object adapter)
+-
+-			Parameter is object path of removed adapter.
+-
+ Properties	array{object} Adapters [readonly]
  
- 			Object path for the default adapter, if any.
+ 			List of adapter object paths.
 diff --git a/src/manager.c b/src/manager.c
-index 954ab8a..d861031 100644
+index 08d6625..954ab8a 100644
 --- a/src/manager.c
 +++ b/src/manager.c
-@@ -111,29 +111,6 @@ done:
- 	return reply;
- }
- 
--static gboolean manager_property_get_adapters(
--					const GDBusPropertyTable *property,
--					DBusMessageIter *iter, void *data)
--{
--	DBusMessageIter entry;
--	GSList *l;
--
--	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
--				DBUS_TYPE_OBJECT_PATH_AS_STRING, &entry);
--
--	for (l = adapters; l != NULL; l = l->next) {
--		struct btd_adapter *adapter = l->data;
--		const char *path = adapter_get_path(adapter);
--
--		dbus_message_iter_append_basic(&entry, DBUS_TYPE_OBJECT_PATH,
--								&path);
--	}
--
--	dbus_message_iter_close_container(iter, &entry);
--
--	return TRUE;
--}
--
- static gboolean manager_property_get_default_adapter(
- 					const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data)
-@@ -168,7 +145,6 @@ static const GDBusMethodTable manager_methods[] = {
+@@ -167,14 +167,6 @@ static const GDBusMethodTable manager_methods[] = {
+ 	{ }
  };
  
+-static const GDBusSignalTable manager_signals[] = {
+-	{ GDBUS_SIGNAL("AdapterAdded",
+-			GDBUS_ARGS({ "adapter", "o" })) },
+-	{ GDBUS_SIGNAL("AdapterRemoved",
+-			GDBUS_ARGS({ "adapter", "o" })) },
+-	{ }
+-};
+-
  static const GDBusPropertyTable manager_properties[] = {
--	{ "Adapters", "ao", manager_property_get_adapters },
+ 	{ "Adapters", "ao", manager_property_get_adapters },
  	{ "DefaultAdapter", "o", manager_property_get_default_adapter, NULL,
- 				manager_property_exists_default_adapter },
- 	{ }
-@@ -209,9 +185,6 @@ static void manager_remove_adapter(struct btd_adapter *adapter)
+@@ -186,7 +178,7 @@ bool manager_init(const char *path)
+ {
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+ 					base_path, MANAGER_INTERFACE,
+-					manager_methods, manager_signals,
++					manager_methods, NULL,
+ 					manager_properties, NULL, NULL))
+ 		return false;
+ 
+@@ -214,7 +206,6 @@ struct btd_adapter *manager_get_default_adapter(void)
+ static void manager_remove_adapter(struct btd_adapter *adapter)
+ {
+ 	uint16_t dev_id = adapter_get_dev_id(adapter);
+-	const gchar *path = adapter_get_path(adapter);
  
  	adapters = g_slist_remove(adapters, adapter);
  
--	g_dbus_emit_property_changed(btd_get_dbus_connection(), base_path,
--					MANAGER_INTERFACE, "Adapters");
--
- 	if (default_adapter_id == dev_id || default_adapter_id < 0) {
- 		int new_default = hci_get_route(NULL);
+@@ -227,11 +218,6 @@ static void manager_remove_adapter(struct btd_adapter *adapter)
+ 		manager_set_default_adapter(new_default);
+ 	}
  
-@@ -318,9 +291,6 @@ struct btd_adapter *btd_manager_register_adapter(int id, gboolean up)
+-	g_dbus_emit_signal(btd_get_dbus_connection(), base_path,
+-				MANAGER_INTERFACE, "AdapterRemoved",
+-				DBUS_TYPE_OBJECT_PATH, &path,
+-				DBUS_TYPE_INVALID);
+-
+ 	adapter_remove(adapter);
+ 	btd_adapter_unref(adapter);
+ 
+@@ -331,10 +317,6 @@ struct btd_adapter *btd_manager_register_adapter(int id, gboolean up)
+ 	}
  
  	path = adapter_get_path(adapter);
+-	g_dbus_emit_signal(btd_get_dbus_connection(), base_path,
+-				MANAGER_INTERFACE, "AdapterAdded",
+-				DBUS_TYPE_OBJECT_PATH, &path,
+-				DBUS_TYPE_INVALID);
  
--	g_dbus_emit_property_changed(btd_get_dbus_connection(),  base_path,
--					MANAGER_INTERFACE, "Adapters");
--
- 	btd_stop_exit_timer();
- 
- 	if (default_adapter_id < 0)
+ 	g_dbus_emit_property_changed(btd_get_dbus_connection(),  base_path,
+ 					MANAGER_INTERFACE, "Adapters");
 -- 
 1.7.11.7
 
