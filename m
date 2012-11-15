@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/5] gdbus: Fix having multiple path exporting ObjectManager
-Date: Thu, 15 Nov 2012 16:05:23 +0200
-Message-Id: <1352988325-10782-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 5/5] core: Make use of g_dbus_disconnect
+Date: Thu, 15 Nov 2012 16:05:25 +0200
+Message-Id: <1352988325-10782-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1352988325-10782-1-git-send-email-luiz.dentz@gmail.com>
 References: <1352988325-10782-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,94 +11,23 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-ObjectManager should only be available on the root path so if the
-current is a child of the object being registered the root should be
-changed.
 ---
- gdbus/object.c | 35 ++++++++++++++++++++++-------------
- 1 file changed, 22 insertions(+), 13 deletions(-)
+ src/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 214fd84..1f0ea39 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -84,6 +84,8 @@ struct property_data {
- 	DBusMessage *message;
- };
+diff --git a/src/main.c b/src/main.c
+index 414849a..c180e09 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -383,7 +383,7 @@ static void disconnect_dbus(void)
  
-+static struct generic_data *root = NULL;
-+
- static gboolean process_changes(gpointer user_data);
- static void process_properties_from_interface(struct generic_data *data,
- 						struct interface_data *iface);
-@@ -574,11 +576,7 @@ static void emit_interfaces_added(struct generic_data *data)
- 	if (parent == NULL)
- 		return;
+ 	set_dbus_connection(NULL);
  
--	/* Find root data */
--	while (parent->parent)
--		parent = parent->parent;
--
--	signal = dbus_message_new_signal(parent->path,
-+	signal = dbus_message_new_signal(root->path,
- 					DBUS_INTERFACE_OBJECT_MANAGER,
- 					"InterfacesAdded");
- 	if (signal == NULL)
-@@ -948,11 +946,7 @@ static void emit_interfaces_removed(struct generic_data *data)
- 	if (parent == NULL)
- 		return;
- 
--	/* Find root data */
--	while (parent->parent)
--		parent = parent->parent;
--
--	signal = dbus_message_new_signal(parent->path,
-+	signal = dbus_message_new_signal(root->path,
- 					DBUS_INTERFACE_OBJECT_MANAGER,
- 					"InterfacesRemoved");
- 	if (signal == NULL)
-@@ -1008,6 +1002,9 @@ static void generic_unregister(DBusConnection *connection, void *user_data)
- 	g_slist_foreach(data->objects, reset_parent, data->parent);
- 	g_slist_free(data->objects);
- 
-+	if (root == data)
-+		root = NULL;
-+
- 	dbus_connection_unref(data->conn);
- 	g_free(data->introspect);
- 	g_free(data->path);
-@@ -1175,6 +1172,20 @@ static void add_interface(struct generic_data *data,
- 	data->process_id = g_idle_add(process_changes, data);
+-	dbus_connection_unref(conn);
++	g_dbus_disconnect(conn);
  }
  
-+static void set_root(struct generic_data *data)
-+{
-+	if (root != NULL) {
-+		data->objects = g_slist_prepend(data->objects, root);
-+		root->parent = data;
-+		remove_interface(root, DBUS_INTERFACE_OBJECT_MANAGER);
-+	}
-+
-+	add_interface(data, DBUS_INTERFACE_OBJECT_MANAGER,
-+					manager_methods, manager_signals,
-+					NULL, data, NULL);
-+	root = data;
-+}
-+
- static struct generic_data *object_path_ref(DBusConnection *connection,
- 							const char *path)
- {
-@@ -1209,9 +1220,7 @@ static struct generic_data *object_path_ref(DBusConnection *connection,
- 
- 	/* Only root path export ObjectManager interface */
- 	if (data->parent == NULL)
--		add_interface(data, DBUS_INTERFACE_OBJECT_MANAGER,
--					manager_methods, manager_signals,
--					NULL, data, NULL);
-+		set_root(data);
- 
- 	add_interface(data, DBUS_INTERFACE_PROPERTIES, properties_methods,
- 					properties_signals, NULL, data, NULL);
+ static void disconnected_dbus(DBusConnection *conn, void *data)
 -- 
 1.7.11.7
 
