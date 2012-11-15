@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v1 10/16] manager: Remove AdapterAdded/AdapterRemoved signals
-Date: Thu, 15 Nov 2012 16:09:13 +0100
-Message-Id: <1352992159-11559-11-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v1 09/16] test: Update test-manager script to ObjectManager
+Date: Thu, 15 Nov 2012 16:09:12 +0100
+Message-Id: <1352992159-11559-10-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1352992159-11559-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1352992159-11559-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,92 +12,70 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The Manager interface already reports changes in the adapter list in
-form of property changes, so there is no need to keep these two signals
-any more.
+Make the script compatible with the new API provided by the
+ObjectManager and Properties interfaces.
 ---
- doc/manager-api.txt |  8 --------
- src/manager.c       | 20 +-------------------
- 2 files changed, 1 insertion(+), 27 deletions(-)
+ test/test-manager | 33 +++++++++++++++++++++++----------
+ 1 file changed, 23 insertions(+), 10 deletions(-)
 
-diff --git a/doc/manager-api.txt b/doc/manager-api.txt
-index b89ab68..693a981 100644
---- a/doc/manager-api.txt
-+++ b/doc/manager-api.txt
-@@ -25,14 +25,6 @@ Object path	/org/bluez
- 			Possible errors: org.bluez.Error.InvalidArguments
- 					 org.bluez.Error.NoSuchAdapter
+diff --git a/test/test-manager b/test/test-manager
+index 2a9c1e9..e35db83 100755
+--- a/test/test-manager
++++ b/test/test-manager
+@@ -7,14 +7,20 @@ from gi.repository import GObject
+ import dbus
+ import dbus.mainloop.glib
  
--Signals		AdapterAdded(object adapter)
--
--			Parameter is object path of added adapter.
--
--		AdapterRemoved(object adapter)
--
--			Parameter is object path of removed adapter.
--
- Properties	array{object} Adapters [readonly]
+-def adapter_added(path):
+-	print("Adapter with path %s added" % (path))
++def property_changed(interface, changed, invalidated, path):
++	if interface != "org.bluez.Manager":
++		return
++	path = changed.get("DefaultAdapter")
++	if path != None:
++		print("Default adapter is now at path %s" % (path))
  
- 			List of adapter object paths.
-diff --git a/src/manager.c b/src/manager.c
-index 08d6625..954ab8a 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -167,14 +167,6 @@ static const GDBusMethodTable manager_methods[] = {
- 	{ }
- };
+-def adapter_removed(path):
+-	print("Adapter with path %s removed" % (path))
++def interfaces_added(path, interfaces):
++	if interfaces.get("org.bluez.Adapter") != None:
++		print("Adapter with path %s added" % (path))
  
--static const GDBusSignalTable manager_signals[] = {
--	{ GDBUS_SIGNAL("AdapterAdded",
--			GDBUS_ARGS({ "adapter", "o" })) },
--	{ GDBUS_SIGNAL("AdapterRemoved",
--			GDBUS_ARGS({ "adapter", "o" })) },
--	{ }
--};
--
- static const GDBusPropertyTable manager_properties[] = {
- 	{ "Adapters", "ao", manager_property_get_adapters },
- 	{ "DefaultAdapter", "o", manager_property_get_default_adapter, NULL,
-@@ -186,7 +178,7 @@ bool manager_init(const char *path)
- {
- 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
- 					base_path, MANAGER_INTERFACE,
--					manager_methods, manager_signals,
-+					manager_methods, NULL,
- 					manager_properties, NULL, NULL))
- 		return false;
+-def default_changed(path):
+-	print("Default adapter is now at path %s" % (path))
++def interfaces_removed(path, interfaces):
++	if "org.bluez.Adapter" in interfaces:
++		print("Adapter with path %s removed" % (path))
  
-@@ -214,7 +206,6 @@ struct btd_adapter *manager_get_default_adapter(void)
- static void manager_remove_adapter(struct btd_adapter *adapter)
- {
- 	uint16_t dev_id = adapter_get_dev_id(adapter);
--	const gchar *path = adapter_get_path(adapter);
+ if __name__ == "__main__":
+ 	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+@@ -24,15 +30,22 @@ if __name__ == "__main__":
+ 	manager = dbus.Interface(bus.get_object('org.bluez', '/org/bluez'),
+ 							'org.bluez.Manager')
  
- 	adapters = g_slist_remove(adapters, adapter);
+-	manager.connect_to_signal("AdapterAdded", adapter_added)
++	bus.add_signal_receiver(property_changed, bus_name="org.bluez",
++			dbus_interface="org.freedesktop.DBus.Properties",
++			signal_name="PropertiesChanged",
++			path_keyword="path")
  
-@@ -227,11 +218,6 @@ static void manager_remove_adapter(struct btd_adapter *adapter)
- 		manager_set_default_adapter(new_default);
- 	}
+-	manager.connect_to_signal("AdapterRemoved", adapter_removed)
++	bus.add_signal_receiver(interfaces_added, bus_name="org.bluez",
++			dbus_interface="org.freedesktop.DBus.ObjectManager",
++			signal_name="InterfacesAdded")
  
--	g_dbus_emit_signal(btd_get_dbus_connection(), base_path,
--				MANAGER_INTERFACE, "AdapterRemoved",
--				DBUS_TYPE_OBJECT_PATH, &path,
--				DBUS_TYPE_INVALID);
--
- 	adapter_remove(adapter);
- 	btd_adapter_unref(adapter);
+-	manager.connect_to_signal("DefaultAdapterChanged", default_changed)
++	bus.add_signal_receiver(interfaces_removed, bus_name="org.bluez",
++			dbus_interface="org.freedesktop.DBus.ObjectManager",
++			signal_name="InterfacesRemoved")
  
-@@ -331,10 +317,6 @@ struct btd_adapter *btd_manager_register_adapter(int id, gboolean up)
- 	}
+ 	try:
+ 		path = manager.FindAdapter("default")
+-		default_changed(path)
++		print("Default adapter is now at path %s" % (path))
+ 	except:
+ 		pass
  
- 	path = adapter_get_path(adapter);
--	g_dbus_emit_signal(btd_get_dbus_connection(), base_path,
--				MANAGER_INTERFACE, "AdapterAdded",
--				DBUS_TYPE_OBJECT_PATH, &path,
--				DBUS_TYPE_INVALID);
- 
- 	g_dbus_emit_property_changed(btd_get_dbus_connection(),  base_path,
- 					MANAGER_INTERFACE, "Adapters");
 -- 
 1.7.11.7
 
