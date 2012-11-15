@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v1 02/16] doc: Add missing documentation in FindAdapter
-Date: Thu, 15 Nov 2012 16:09:05 +0100
-Message-Id: <1352992159-11559-3-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v1 01/16] cups: Remove unnecessary code
+Date: Thu, 15 Nov 2012 16:09:04 +0100
+Message-Id: <1352992159-11559-2-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1352992159-11559-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1352992159-11559-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,27 +12,52 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The method supports the string "any" to return the any adapter object,
-so update the documentation accordingly.
+The adapter is always known so the code to handle the NULL case is not
+needed.
 ---
- doc/manager-api.txt | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ profiles/cups/main.c | 22 ++--------------------
+ 1 file changed, 2 insertions(+), 20 deletions(-)
 
-diff --git a/doc/manager-api.txt b/doc/manager-api.txt
-index 3add587..8497141 100644
---- a/doc/manager-api.txt
-+++ b/doc/manager-api.txt
-@@ -24,7 +24,9 @@ Object path	/
- 		object FindAdapter(string pattern)
+diff --git a/profiles/cups/main.c b/profiles/cups/main.c
+index 5aa927f..977c057 100644
+--- a/profiles/cups/main.c
++++ b/profiles/cups/main.c
+@@ -31,6 +31,7 @@
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <assert.h>
+ #include <signal.h>
+ #include <sys/socket.h>
+ #include <glib.h>
+@@ -338,26 +339,7 @@ static void remote_device_found(const char *adapter, const char *bdaddr,
  
- 			Returns object path for the specified adapter. Valid
--			patterns are "hci0" or "00:11:22:33:44:55".
-+			patterns are "hci0" or "00:11:22:33:44:55". Other
-+			supported values are:
-+				"any"
+ 	adapter_reply = NULL;
  
- 			Possible errors: org.bluez.Error.InvalidArguments
- 					 org.bluez.Error.NoSuchAdapter
+-	if (adapter == NULL) {
+-		message = dbus_message_new_method_call("org.bluez", "/",
+-							"org.bluez.Manager",
+-							"DefaultAdapter");
+-
+-		adapter_reply = dbus_connection_send_with_reply_and_block(conn,
+-							message, -1, NULL);
+-
+-		dbus_message_unref(message);
+-
+-		if (!adapter_reply)
+-			return;
+-
+-		if (dbus_message_get_args(adapter_reply, NULL,
+-					DBUS_TYPE_OBJECT_PATH, &adapter,
+-					DBUS_TYPE_INVALID) == FALSE) {
+-			dbus_message_unref(adapter_reply);
+-			return;
+-		}
+-	}
++	assert(adapter != NULL);
+ 
+ 	message = dbus_message_new_method_call("org.bluez", adapter,
+ 							"org.bluez.Adapter",
 -- 
 1.7.11.7
 
