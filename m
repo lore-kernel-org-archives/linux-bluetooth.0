@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v1 12/16] test: Use ObjectManager instead of Adapters property
-Date: Thu, 15 Nov 2012 16:09:15 +0100
-Message-Id: <1352992159-11559-13-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v1 11/16] manager: Remove redundant Adapters property
+Date: Thu, 15 Nov 2012 16:09:14 +0100
+Message-Id: <1352992159-11559-12-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1352992159-11559-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1352992159-11559-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,60 +12,91 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Use the objects and interfaces reported by the ObjectManager in order
-to list the available adapters.
+The ObjectManager interface already reports the available adapters, so
+the property can be entirely removed.
 ---
- test/test-health      | 11 ++++++++---
- test/test-health-sink | 12 +++++++++---
- 2 files changed, 17 insertions(+), 6 deletions(-)
+ doc/manager-api.txt |  6 +-----
+ src/manager.c       | 30 ------------------------------
+ 2 files changed, 1 insertion(+), 35 deletions(-)
 
-diff --git a/test/test-health b/test/test-health
-index 21d1776..9d2f62f 100755
---- a/test/test-health
-+++ b/test/test-health
-@@ -131,10 +131,15 @@ if not con:
- 	enter_mainloop()
- 	sys.exit()
+diff --git a/doc/manager-api.txt b/doc/manager-api.txt
+index 693a981..a8f570b 100644
+--- a/doc/manager-api.txt
++++ b/doc/manager-api.txt
+@@ -25,10 +25,6 @@ Object path	/org/bluez
+ 			Possible errors: org.bluez.Error.InvalidArguments
+ 					 org.bluez.Error.NoSuchAdapter
  
--manager = dbus.Interface(bus.get_object("org.bluez", "/org/bluez"),
--						"org.bluez.Manager")
-+manager = dbus.Interface(bus.get_object("org.bluez", "/"),
-+					"org.freedesktop.DBus.ObjectManager")
+-Properties	array{object} Adapters [readonly]
+-
+-			List of adapter object paths.
+-
+-		object DefaultAdapter [readonly, optional]
++Properties	object DefaultAdapter [readonly, optional]
  
--adapters = manager.GetProperties()["Adapters"]
-+objects = manager.GetManagedObjects()
-+adapters = []
-+
-+for path, ifaces in objects.iteritems():
-+	if ifaces.has_key("org.bluez.Adapter"):
-+		adapters.append(path)
+ 			Object path for the default adapter, if any.
+diff --git a/src/manager.c b/src/manager.c
+index 954ab8a..d861031 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -111,29 +111,6 @@ done:
+ 	return reply;
+ }
  
- i = 1
- for ad in adapters:
-diff --git a/test/test-health-sink b/test/test-health-sink
-index 7bf1af4..a886d85 100755
---- a/test/test-health-sink
-+++ b/test/test-health-sink
-@@ -21,10 +21,16 @@ app_path = hdp_manager.CreateApplication({"DataType": dbus.types.UInt16(4103),
+-static gboolean manager_property_get_adapters(
+-					const GDBusPropertyTable *property,
+-					DBusMessageIter *iter, void *data)
+-{
+-	DBusMessageIter entry;
+-	GSList *l;
+-
+-	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+-				DBUS_TYPE_OBJECT_PATH_AS_STRING, &entry);
+-
+-	for (l = adapters; l != NULL; l = l->next) {
+-		struct btd_adapter *adapter = l->data;
+-		const char *path = adapter_get_path(adapter);
+-
+-		dbus_message_iter_append_basic(&entry, DBUS_TYPE_OBJECT_PATH,
+-								&path);
+-	}
+-
+-	dbus_message_iter_close_container(iter, &entry);
+-
+-	return TRUE;
+-}
+-
+ static gboolean manager_property_get_default_adapter(
+ 					const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+@@ -168,7 +145,6 @@ static const GDBusMethodTable manager_methods[] = {
+ };
  
- print(app_path)
+ static const GDBusPropertyTable manager_properties[] = {
+-	{ "Adapters", "ao", manager_property_get_adapters },
+ 	{ "DefaultAdapter", "o", manager_property_get_default_adapter, NULL,
+ 				manager_property_exists_default_adapter },
+ 	{ }
+@@ -209,9 +185,6 @@ static void manager_remove_adapter(struct btd_adapter *adapter)
  
--manager = dbus.Interface(bus.get_object("org.bluez", "/org/bluez"),
--						"org.bluez.Manager")
-+manager = dbus.Interface(bus.get_object("org.bluez", "/"),
-+					"org.freedesktop.DBus.ObjectManager")
-+
-+objects = manager.GetManagedObjects()
-+adapters = []
-+
-+for path, ifaces in objects.iteritems():
-+	if ifaces.has_key("org.bluez.Adapter"):
-+		adapters.append(path)
+ 	adapters = g_slist_remove(adapters, adapter);
  
--adapters = manager.GetProperties()["Adapters"]
- i = 1
- for ad in adapters:
- 	print("%d. %s" % (i, ad))
+-	g_dbus_emit_property_changed(btd_get_dbus_connection(), base_path,
+-					MANAGER_INTERFACE, "Adapters");
+-
+ 	if (default_adapter_id == dev_id || default_adapter_id < 0) {
+ 		int new_default = hci_get_route(NULL);
+ 
+@@ -318,9 +291,6 @@ struct btd_adapter *btd_manager_register_adapter(int id, gboolean up)
+ 
+ 	path = adapter_get_path(adapter);
+ 
+-	g_dbus_emit_property_changed(btd_get_dbus_connection(),  base_path,
+-					MANAGER_INTERFACE, "Adapters");
+-
+ 	btd_stop_exit_timer();
+ 
+ 	if (default_adapter_id < 0)
 -- 
 1.7.11.7
 
