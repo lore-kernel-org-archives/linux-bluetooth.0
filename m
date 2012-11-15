@@ -1,62 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/8] device: Remove storage path #defines
-Date: Thu, 15 Nov 2012 18:31:34 +0100
-Message-Id: <1353000701-16605-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+Subject: [RFC 3/4] Bluetooth: Remove unneeded local_amp_id initialization
+Date: Thu, 15 Nov 2012 18:14:55 +0200
+Message-Id: <1352996096-27374-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1352996096-27374-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1352996096-27374-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-INFO_PATH and CACHE_PATH will be static for the
-entire 5.x series
----
- src/device.c |   10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/src/device.c b/src/device.c
-index 4ca375b..e3570cb 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -76,9 +76,6 @@
- #define DISCONNECT_TIMER	2
- #define DISCOVERY_TIMER		2
+local_amp_id is already set in l2cap_connect() which is called several
+lines above.
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |    1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index f6a8960..33eb3f4 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4360,7 +4360,6 @@ static int l2cap_create_channel_req(struct l2cap_conn *conn,
  
--#define INFO_PATH STORAGEDIR "/%s/%s/info"
--#define CACHE_PATH STORAGEDIR "/%s/cache/%s"
--
- struct btd_disconnect_data {
- 	guint id;
- 	disconnect_watch watch;
-@@ -231,7 +228,8 @@ static gboolean store_device_info_cb(gpointer user_data)
+ 		BT_DBG("mgr %p bredr_chan %p hs_hcon %p", mgr, chan, hs_hcon);
  
- 	ba2str(adapter_get_address(device->adapter), adapter_addr);
- 	ba2str(&device->bdaddr, device_addr);
--	snprintf(filename, PATH_MAX, INFO_PATH, adapter_addr, device_addr);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info", adapter_addr,
-+			device_addr);
- 	filename[PATH_MAX] = '\0';
- 
- 	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-@@ -1693,7 +1691,7 @@ static char *load_cached_name(struct btd_device *device, const char *local,
- 	char *str = NULL;
- 	int len;
- 
--	snprintf(filename, PATH_MAX, CACHE_PATH, local, peer);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s", local, peer);
- 	filename[PATH_MAX] = '\0';
- 
- 	key_file = g_key_file_new();
-@@ -1722,7 +1720,7 @@ static void load_info(struct btd_device *device, const gchar *local,
- 	char *str;
- 	gboolean store_needed = FALSE;
- 
--	snprintf(filename, PATH_MAX, INFO_PATH, local, peer);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info", local, peer);
- 	filename[PATH_MAX] = '\0';
- 
- 	key_file = g_key_file_new();
+-		chan->local_amp_id = req->amp_id;
+ 		mgr->bredr_chan = chan;
+ 		chan->hs_hcon = hs_hcon;
+ 		conn->mtu = hdev->block_mtu;
 -- 
-1.7.9.5
+1.7.10.4
 
