@@ -1,73 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
+Date: Fri, 16 Nov 2012 10:24:49 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
 	<frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] neard: Set device class in device object
-Date: Fri, 16 Nov 2012 10:35:48 +0100
-Message-Id: <1353058548-8698-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 8/8] neard: Set device class in device object
+Message-ID: <20121116082449.GA10952@x220>
+References: <1353000701-16605-1-git-send-email-frederic.danis@linux.intel.com>
+ <1353000701-16605-8-git-send-email-frederic.danis@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1353000701-16605-8-git-send-email-frederic.danis@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As soon as we have info related to a new device,
-device object will be created if it does not exist yet.
-So removing adapter_remove_device().
----
- plugins/neard.c |   19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+Hi Frédéric,
 
-diff --git a/plugins/neard.c b/plugins/neard.c
-index 8f8381c..ff754c3 100644
---- a/plugins/neard.c
-+++ b/plugins/neard.c
-@@ -39,7 +39,6 @@
- #include "manager.h"
- #include "device.h"
- #include "eir.h"
--#include "storage.h"
- #include "agent.h"
- #include "hcid.h"
- #include "event.h"
-@@ -267,30 +266,30 @@ static int process_eir(struct btd_adapter *adapter, uint8_t *eir, size_t size,
- 
- 	DBG("hci%u remote:%s", adapter_get_dev_id(adapter), remote_address);
- 
--	device = adapter_find_device(adapter, remote_address);
-+	device = adapter_get_device(adapter, remote_address);
-+	if (!device) {
-+		DBG("failed to create device object");
-+		eir_data_free(&eir_data);
-+		return -ENOMEM;
-+	}
- 
- 	/* If already paired do nothing */
--	if (device && device_is_paired(device)) {
-+	if (device_is_paired(device)) {
- 		DBG("already paired");
- 		eir_data_free(&eir_data);
- 		return 1;
- 	}
- 
- 	/* Pairing in progress... */
--	if (device && device_is_bonding(device, NULL)) {
-+	if (device_is_bonding(device, NULL)) {
- 		DBG("pairing in progress");
- 		eir_data_free(&eir_data);
- 		return -EINPROGRESS;
- 	}
- 
--	/* If we have unpaired device hanging around, purge it */
--	if (device)
--		adapter_remove_device(adapter, device, TRUE);
--
- 	/* store OOB data */
- 	if (eir_data.class != 0)
--		write_remote_class(adapter_get_address(adapter),
--					&eir_data.addr, eir_data.class);
-+		device_set_class(device, eir_data.class);
- 
- 	/* TODO handle incomplete name? */
- 	if (eir_data.name)
--- 
-1.7.9.5
+On Thu, Nov 15, 2012, Frédéric Danis wrote:
+> This will create a new device object and generate DeviceCreated signal
+> ---
+>  plugins/neard.c |    5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 
+Your commit message doesn't explain why the old object needs to be
+removed (imo it shouldn't need to be removed).
+
+The other patches in this set have been applied.
+
+> +	device = adapter_get_device(adapter, remote_address);
+> +
+>  	/* store OOB data */
+
+Missing check for failed adapter_get_device() return (NULL).
+
+Johan
