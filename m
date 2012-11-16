@@ -1,30 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50A62D36.4070006@linux.intel.com>
-Date: Fri, 16 Nov 2012 13:10:30 +0100
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Reply-To: frederic.dalleau@linux.intel.com
-MIME-Version: 1.0
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: Add BT_DEFER_SETUP option to sco socket
-References: <1352830825-13987-1-git-send-email-frederic.dalleau@linux.intel.com> <1352830825-13987-2-git-send-email-frederic.dalleau@linux.intel.com> <20121115203029.GA2026@joana>
-In-Reply-To: <20121115203029.GA2026@joana>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
+	<frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] neard: Set device class in device object
+Date: Fri, 16 Nov 2012 10:35:48 +0100
+Message-Id: <1353058548-8698-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+As soon as we have info related to a new device,
+device object will be created if it does not exist yet.
+So removing adapter_remove_device().
+---
+ plugins/neard.c |   19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-On 11/15/2012 09:30 PM, Gustavo Padovan wrote:
->>   	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, ev->link_type);
->> +	defered = hci_proto_defered(hdev, &ev->bdaddr, ev->link_type);
->
-> I'm not really happy with this hci_proto thing. Weed need to think more on
-> this.
+diff --git a/plugins/neard.c b/plugins/neard.c
+index 8f8381c..ff754c3 100644
+--- a/plugins/neard.c
++++ b/plugins/neard.c
+@@ -39,7 +39,6 @@
+ #include "manager.h"
+ #include "device.h"
+ #include "eir.h"
+-#include "storage.h"
+ #include "agent.h"
+ #include "hcid.h"
+ #include "event.h"
+@@ -267,30 +266,30 @@ static int process_eir(struct btd_adapter *adapter, uint8_t *eir, size_t size,
+ 
+ 	DBG("hci%u remote:%s", adapter_get_dev_id(adapter), remote_address);
+ 
+-	device = adapter_find_device(adapter, remote_address);
++	device = adapter_get_device(adapter, remote_address);
++	if (!device) {
++		DBG("failed to create device object");
++		eir_data_free(&eir_data);
++		return -ENOMEM;
++	}
+ 
+ 	/* If already paired do nothing */
+-	if (device && device_is_paired(device)) {
++	if (device_is_paired(device)) {
+ 		DBG("already paired");
+ 		eir_data_free(&eir_data);
+ 		return 1;
+ 	}
+ 
+ 	/* Pairing in progress... */
+-	if (device && device_is_bonding(device, NULL)) {
++	if (device_is_bonding(device, NULL)) {
+ 		DBG("pairing in progress");
+ 		eir_data_free(&eir_data);
+ 		return -EINPROGRESS;
+ 	}
+ 
+-	/* If we have unpaired device hanging around, purge it */
+-	if (device)
+-		adapter_remove_device(adapter, device, TRUE);
+-
+ 	/* store OOB data */
+ 	if (eir_data.class != 0)
+-		write_remote_class(adapter_get_address(adapter),
+-					&eir_data.addr, eir_data.class);
++		device_set_class(device, eir_data.class);
+ 
+ 	/* TODO handle incomplete name? */
+ 	if (eir_data.name)
+-- 
+1.7.9.5
 
-Since hci_proto_connect_ind returns an int, what about using 16 bits for
-HCI_LM_* flags, and 16 bits for additional flags (from hci_core.h), 
-including one to indicate deferred setup.
-
-Frédéric
