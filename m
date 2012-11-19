@@ -1,50 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 19 Nov 2012 19:57:16 -0200
+Date: Mon, 19 Nov 2012 19:41:01 -0200
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] bluetooth: Increase HCI command tx timeout
-Message-ID: <20121119215716.GE14006@joana>
-References: <1352714465-17015-1-git-send-email-szymon.janc@tieto.com>
+To: Jeff Cook <jeff@deserettechnology.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	johan.hedberg@gmail.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv2] Bluetooth: Add support for BCM20702A0 [0b05, 17b5]
+Message-ID: <20121119214101.GD14006@joana>
+References: <5087B517.9090703@deserettechnology.com>
+ <1352504388-28965-1-git-send-email-jeff@deserettechnology.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1352714465-17015-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1352504388-28965-1-git-send-email-jeff@deserettechnology.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Jeff,
 
-* Szymon Janc <szymon.janc@tieto.com> [2012-11-12 11:01:05 +0100]:
+* Jeff Cook <jeff@deserettechnology.com> [2012-11-09 16:39:48 -0700]:
 
-> Read Local OOB Data command can take more than 1 second on some chips.
-> e.g. on CSR 0a12:0001 first call to Read Local OOB Data after reset
-> takes about 1300ms resulting in tx timeout error.
+> Vendor-specific ID for BCM20702A0.
+> Support for bluetooth over Asus Wi-Fi GO!, included with Asus P8Z77-V
+> Deluxe.
 > 
-> [27698.368655] Bluetooth: hci0 command 0x0c57 tx timeout
+> T:  Bus=07 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0b05 ProdID=17b5 Rev=01.12
+> S:  Manufacturer=Broadcom Corp
+> S:  Product=BCM20702A0
+> S:  SerialNumber=94DBC98AC113
+> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 > 
-> 2012-10-31 15:53:36.178585 < HCI Command: Read Local OOB Data (0x03|0x0057) plen 0
-> 2012-10-31 15:53:37.496996 > HCI Event: Command Complete (0x0e) plen 36
->     Read Local OOB Data (0x03|0x0057) ncmd 1
->     status 0x00
->     hash 0x92219d9b447f2aa9dc12dda2ae7bae6a
->     randomizer 0xb1948d0febe4ea38ce85c4e66313beba
-> 
-> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+> Signed-off-by: Jeff Cook <jeff@deserettechnology.com>
 > ---
-> 
-> Spec doesn't seem to be posing any restrictions on how fast should HCI response...
-> I've increased timeout to 2 secs as this seems to fix this for me, but maybe this
-> could be increased to something more, like 5 secs or sth to minimize tx timeout
-> chance for other slow chips?  If chip doesn't response for command it is FUBAR
-> anyway and having longer timeout would not make things that much worse (and
-> could even improve things on slow chips..).
-> 
-> 
->  include/net/bluetooth/hci.h |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/bluetooth/btusb.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-This patch is now on bluetooth-next. Thanks. Moreover there was never a real
-reason to have the timeout with a 1 second value, it just proved to be enough
-at the time we added the timeout mechanism for hci commands.
+Patch has been applied to bluetooth-next. Thanks.
 
 	Gustavo
