@@ -1,60 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1353351872-10628-3-git-send-email-bart@elbrys.com>
-References: <1353351872-10628-1-git-send-email-bart@elbrys.com>
-	<1353351872-10628-3-git-send-email-bart@elbrys.com>
-Date: Mon, 19 Nov 2012 16:24:04 -0400
-Message-ID: <CAJdJm_MSAw2EWV=Tp-ycdfhUi1wJdcdXdH+4YAdfGx1LRpWs-g@mail.gmail.com>
-Subject: Re: [PATCH 2/3] sdp: Limit side effects of sdp_get_data_type and sdp_get_data_size
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Bart Westgeest <bart@elbrys.com>
+Date: Mon, 19 Nov 2012 18:19:58 -0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
+	<frederic.dalleau@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 0/2] sco: BT_DEFER_SETUP for SCO sockets
+Message-ID: <20121119201958.GA14006@joana>
+References: <1353342958-25303-1-git-send-email-frederic.dalleau@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1353342958-25303-1-git-send-email-frederic.dalleau@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bart,
+Hi Frédéric,
 
-On Mon, Nov 19, 2012 at 3:04 PM, Bart Westgeest <bart@elbrys.com> wrote:
-> @@ -762,9 +757,6 @@ static int sdp_get_data_size(sdp_buf_t *buf, sdp_data_t *d)
->                 break;
->         }
->
-> -       if (!buf->data)
-> -               buf->buf_size += data_size;
-> -
->         return data_size;
->  }
->
-> @@ -783,8 +775,8 @@ static int sdp_gen_buffer(sdp_buf_t *buf, sdp_data_t *d)
->         /* attribute length */
->         buf->buf_size += sizeof(uint8_t) + sizeof(uint16_t);
->
-> -       sdp_get_data_type(buf, d->dtd);
-> -       sdp_get_data_size(buf, d);
-> +       buf->buf_size += sdp_get_data_type_size(d->dtd);
-> +       buf->buf_size += sdp_get_data_size(buf, d);
+* Frédéric Dalleau <frederic.dalleau@linux.intel.com> [2012-11-19 17:35:55 +0100]:
 
-No need to check for "if (!buf->data)" like in the original code?
+> Hi,
+> 
+> This is a better view about what can be done to implement DEFER_SETUP on SCO
+> sockets. hci layer get some changes since previous behavior was to accept all
+> SCO connections.
+> The ugly hci_proto_defer has been removed and replaced by an additional flag
+> parameter to hci_proto_connect_ind.
+> Regarding testing, I'm still stuck by a txt timeout issue however, if the
+> delay between accept and recv is set to 0, then the connection is working fine.
+> And I even managed to get the sco connection established correctly once. So I
+> believed this emulator problem.
 
->
->         if (buf->buf_size > UCHAR_MAX && d->dtd == SDP_SEQ8)
->                 buf->buf_size += sizeof(uint8_t);
-> @@ -803,7 +795,7 @@ int sdp_gen_pdu(sdp_buf_t *buf, sdp_data_t *d)
->         uint128_t u128;
->         uint8_t *seqp = buf->data + buf->data_size;
->
-> -       pdu_size = sdp_get_data_type(buf, dtd);
-> +       pdu_size = sdp_get_data_type_size(dtd);
+You are telling me that your patch is not really working, I suggest you call
+this series RFC before you get everything sorted out. The approach in general
+is good, but I'd need confirmation that it works for actual defer delays, 3
+seconds for example, and not 0.
 
-Same here. Additionally, buf->buf_size is not being updated.
-
->         buf->data_size += pdu_size;
->
->         data_size = sdp_get_data_size(buf, d);
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+	Gustavo
