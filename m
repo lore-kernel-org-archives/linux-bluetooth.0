@@ -1,49 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50AAA596.3030509@elbrys.com>
-Date: Mon, 19 Nov 2012 16:33:10 -0500
-From: Bart Westgeest <bart@elbrys.com>
+Date: Mon, 19 Nov 2012 19:28:12 -0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 4/4] Bluetooth: Set local_amp_id after getting Phylink
+ Completed evt
+Message-ID: <20121119212812.GB14006@joana>
+References: <1352996096-27374-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1352996096-27374-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] sdp: Upgrade datatype SEQ8 to SEQ16 when data size
- is greater than 256
-References: <1353351872-10628-1-git-send-email-bart@elbrys.com> <1353351872-10628-4-git-send-email-bart@elbrys.com> <CAJdJm_N1hJkdEqvOrgD8ErAzDT56wzPEYAiA+7KDR0Pah4P6sA@mail.gmail.com>
-In-Reply-To: <CAJdJm_N1hJkdEqvOrgD8ErAzDT56wzPEYAiA+7KDR0Pah4P6sA@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1352996096-27374-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Andrei,
 
->> +recalculate:
->> +       pdu_size = sdp_get_data_type_size(d->dtd);
->>          buf->data_size += pdu_size;
->>
->>          data_size = sdp_get_data_size(buf, d);
->> +       if (data_size > UCHAR_MAX && d->dtd == SDP_SEQ8) {
->> +               buf->data_size = orig_data_size;
->> +               d->dtd = SDP_SEQ16;
->> +               goto recalculate;
->
-> IMHO, using "goto" here is too complicated for 3 lines of code that
-> will just be run at most twice. So I would simply duplicate them
-> inside the if(). But others may have different opinion on this regard.
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-11-15 18:14:56 +0200]:
 
-I don't have strong feelings about this. I can change it.
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> local_amp_id is used in l2cap_physical_cfm and shall be set up
+> before calling it.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/amp.c |    1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+> index eb61aaa..ac9e8fe 100644
+> --- a/net/bluetooth/amp.c
+> +++ b/net/bluetooth/amp.c
+> @@ -392,6 +392,7 @@ void amp_physical_cfm(struct hci_conn *bredr_hcon, struct hci_conn *hs_hcon)
+>  
+>  	set_bit(FLAG_EFS_ENABLE, &bredr_chan->flags);
+>  	bredr_chan->remote_amp_id = hs_hcon->remote_id;
+> +	bredr_chan->local_amp_id = hs_hcon->hdev->id;
+>  	bredr_chan->hs_hcon = hs_hcon;
+>  	bredr_chan->conn->mtu = hs_hcon->hdev->block_mtu;
 
-One could argue that the way I did it shows that the *same* code needs 
-to be executed again. (It the same code can also be moved into a 
-do-while) - this, as well what I have currently, would allow for a data 
-upgrade to SDP_SEQ16 -> SDP_SEQ32, and SDP_ALT8 -> SDP_ALT16-> SDP_ALT32 
-as well, which theoretically are also needed as far as I can tell.
+I was able to apply patches 1 and 3 to bluetooth-next. The other 2 doesn't
+apply for some reason, please rebase. Thanks.
 
-For the record, in any regard, I think the fix is rather ugly, goto 
-statement or not. This problem is now 'fixed' in two places (the other 
-one in sdp_append_to_buf, with the corresponding data length increase in 
-sdp_gen_buffer). IMHO, the code requires a bigger cleanup. I actually 
-made an attempt at it, but the fix got too big, and I opted for what I 
-submitted instead.
-
-To get back on topic, let me know if you or others want me to re-submit.
-
-Bart
+	Gustavo
