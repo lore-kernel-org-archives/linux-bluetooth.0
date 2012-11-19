@@ -1,29 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bart Westgeest <bart@elbrys.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bart Westgeest <bart@elbrys.com>
-Subject: [PATCH 0/3] Fix corrupted SDP response for sequence size > 256
-Date: Mon, 19 Nov 2012 14:04:29 -0500
-Message-Id: <1353351872-10628-1-git-send-email-bart@elbrys.com>
+Date: Mon, 19 Nov 2012 20:32:46 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/5] adapter: Remove not needed variable from
+ btd_adapter_get_mode
+Message-ID: <20121119183246.GA2708@x220.P-661HNU-F1>
+References: <1353337366-21590-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1353337366-21590-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchset includes minor refactoring and a bug fix. The bug
-is exposed when a data sequence grows beyond 256 bytes, in this case the
-complete sequence data is written, but the size is truncated to one
-byte, resulting in a corrupted SDP response.
+Hi Szymon,
 
-RE: Feedback on potential fix for issue while advertising Feature List
+On Mon, Nov 19, 2012, Szymon Janc wrote:
+> address is no longer used and can be removed.
+> ---
+>  src/adapter.c |    4 ----
+>  1 file changed, 4 deletions(-)
 
-Bart Westgeest (3):
-  sdp: Inlined single use of function sdp_set_data_type
-  sdp: Limit side effects of sdp_get_data_type and sdp_get_data_size
-  sdp: Upgrade datatype SEQ8 to SEQ16 when data size is greater than
-    256
+All five patches have been applied. Thanks.
 
- lib/sdp.c |   56 +++++++++++++++++++++++---------------------------------
- 1 file changed, 23 insertions(+), 33 deletions(-)
-
--- 
-1.7.10.4
-
+Johan
