@@ -1,30 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 19 Nov 2012 19:36:04 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv1 3/3] Bluetooth: trivial: Use __constant for constants
-Message-ID: <20121119213604.GC14006@joana>
-References: <1352907572-7113-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1352907572-7113-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <50AAA596.3030509@elbrys.com>
+Date: Mon, 19 Nov 2012 16:33:10 -0500
+From: Bart Westgeest <bart@elbrys.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1352907572-7113-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/3] sdp: Upgrade datatype SEQ8 to SEQ16 when data size
+ is greater than 256
+References: <1353351872-10628-1-git-send-email-bart@elbrys.com> <1353351872-10628-4-git-send-email-bart@elbrys.com> <CAJdJm_N1hJkdEqvOrgD8ErAzDT56wzPEYAiA+7KDR0Pah4P6sA@mail.gmail.com>
+In-Reply-To: <CAJdJm_N1hJkdEqvOrgD8ErAzDT56wzPEYAiA+7KDR0Pah4P6sA@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Anderson,
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-11-14 17:39:32 +0200]:
+>> +recalculate:
+>> +       pdu_size = sdp_get_data_type_size(d->dtd);
+>>          buf->data_size += pdu_size;
+>>
+>>          data_size = sdp_get_data_size(buf, d);
+>> +       if (data_size > UCHAR_MAX && d->dtd == SDP_SEQ8) {
+>> +               buf->data_size = orig_data_size;
+>> +               d->dtd = SDP_SEQ16;
+>> +               goto recalculate;
+>
+> IMHO, using "goto" here is too complicated for 3 lines of code that
+> will just be run at most twice. So I would simply duplicate them
+> inside the if(). But others may have different opinion on this regard.
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/l2cap_core.c |    8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+I don't have strong feelings about this. I can change it.
 
-All 3 patches have been applied to bluetooth-next. Thanks.
+One could argue that the way I did it shows that the *same* code needs 
+to be executed again. (It the same code can also be moved into a 
+do-while) - this, as well what I have currently, would allow for a data 
+upgrade to SDP_SEQ16 -> SDP_SEQ32, and SDP_ALT8 -> SDP_ALT16-> SDP_ALT32 
+as well, which theoretically are also needed as far as I can tell.
 
-	Gustavo
+For the record, in any regard, I think the fix is rather ugly, goto 
+statement or not. This problem is now 'fixed' in two places (the other 
+one in sdp_append_to_buf, with the corresponding data length increase in 
+sdp_gen_buffer). IMHO, the code requires a bigger cleanup. I actually 
+made an attempt at it, but the fix got too big, and I opted for what I 
+submitted instead.
+
+To get back on topic, let me know if you or others want me to re-submit.
+
+Bart
