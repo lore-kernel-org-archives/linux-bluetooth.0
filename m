@@ -1,114 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: Remove device OOB data if it was discovered in band
+Date: Mon, 19 Nov 2012 16:17:43 +0100
+Message-ID: <2151735.anmcCOIMjp@uw000953>
+In-Reply-To: <20121119150537.GA10702@x220>
+References: <1353336407-10863-1-git-send-email-szymon.janc@tieto.com> <20121119150537.GA10702@x220>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+oP-2YarvFndGCrUeGAqb=Nt7CxQ=1ULasaRXqvRy68A@mail.gmail.com>
-References: <1353314786-11427-1-git-send-email-luiz.dentz@gmail.com>
- <1353314786-11427-2-git-send-email-luiz.dentz@gmail.com> <CAMOw1v7Y3EORhpSyydjhieG4Owx=0d5QAp=G66RweF7-cCshXQ@mail.gmail.com>
- <CABBYNZJ79UfsU9=ejGSEBGueca1FJouKt15LpukEy6TtK+QFYg@mail.gmail.com>
- <CAMOw1v43vHHseyKKXK6t2sooS6dFkQdwbF4nOcCUGojpgbmGzQ@mail.gmail.com> <CABBYNZ+oP-2YarvFndGCrUeGAqb=Nt7CxQ=1ULasaRXqvRy68A@mail.gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 19 Nov 2012 13:38:03 -0200
-Message-ID: <CAMOw1v4wXywKcjgNOJ+THM4SX6nwWs31GzSXhFA7V5USMzd_sg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/4] gdbus: Automatically register '/' path
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Nov 19, 2012 at 1:08 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Lucas,
->
-> On Mon, Nov 19, 2012 at 3:18 PM, Lucas De Marchi
-> <lucas.demarchi@profusion.mobi> wrote:
->> On Mon, Nov 19, 2012 at 10:49 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi Lucas,
->>>
->>> On Mon, Nov 19, 2012 at 2:06 PM, Lucas De Marchi
->>> <lucas.demarchi@profusion.mobi> wrote:
->>>> Hi Luiz,
->>>>
->>>> On Mon, Nov 19, 2012 at 6:46 AM, Luiz Augusto von Dentz
->>>> <luiz.dentz@gmail.com> wrote:
->>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>>>
->>>>> This makes g_dbus_setup_bus to automatically register '/' path so
->>>>> user application that don't export any interface on '/' will have it
->>>>> registered for ObjectManager.
->>>>>
->>>>> Note that it is now required to call g_dbus_close before exit.
->>>>
->>>> I'm no really fan of this. Why do we need to register '/' now?  If we
->>>> are not going to support ObjectManager interfaces in subtrees, it
->>>> would be easier to just move the ObjectManager to the shortest path
->>>> registered rather than always registering '/'.
->>>
->>> Maybe I should have made clear this in the description, if you look at
->>> the spec it suggest that each sub-tree root should implement
->>> ObjectManager, the current implementation does that but if you think
->>> about it probably doesn't make sense to have sub-trees because that
->>> would creates extra round trips that ObjectManager was meant to
->>
->> HUmn... I think you are a bit confused now.
->>
->> 1 entire tree can be managed by a single ObjectManager, or multiple
->> ones if there are objects that are not interesting to everybody and
->> only a few types of clients would be interested in the objects changed
->> beyond that path.
->>
->> Example:
->>
->> /org/bluez
->>   - ObjectManager
->> /org/bluez/adapter/bla/bli
->>   - MyInterfaceWithLotsOfObjects
->>
->> If you put only 1 ObjectManager it means you get called for each
->> change in /org/bluez/adapter/bla/bli even though most of the clients
->> will not be interested in that. Therefore the spec allows you to
->> attach another ObjectManager in /org/bluez/adapter/[...]  so the first
->> ObjectManager only send updates and "manage" the objects until the
->> path containing another ObjectManager.
->>
->> I do think we don't really need that feature right now. I think we are
->> fine with a single ObjectManager in "/", but always registering "/"
->> IMO is not the right solution.
->
-> As far I know /org/bluez/adapter/bla/bli is a child of /org/bluez thus
-> you don't need another ObjectManager, anyway the point is that
+On Monday 19 of November 2012 17:05:37 Johan Hedberg wrote:
+> Hi Szymon,
 
-Sure we don't need it, but it was made that way so projects could
-actually use multiple object managers for the reasons pointed out in
-the previous email. Projects could even have separate ObjectManagers
-for completely different things, like one in /org/bluez/bla and
-another in /org/bluez/bli instead of 1 in /org/bluez. But it's an
-application decision where to put the ObjectManager.
+Hi Johan,
 
-If all projects using gdbus decide to have a single ObjectManager on
-"/" because it's simpler and fit the needs for everybody, then fine.
-I'd suggest to even register it earlier than it is. Otherwise we might
-choose to let the application (bluez, connman, ofono, etc) decide
-where to put it, by adding a "g_dbus_attach_object_manager(conn,
-path)" or the like.
+> 
+> On Mon, Nov 19, 2012, Szymon Janc wrote:
+> > OOB authentication mechanism should be used only if pairing process
+> > has been activated by previous OOB information exchange (Core Spec
+> > 4.0 , vol. 1, Part A, 5.1.4.3). Stored OOB data for specific device
+> > should be removed if that device was discovered in band later on.
+> > 
+> > Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+> > ---
+> > 
+> > This could also be done by userspace but would require calling remove remote
+> > OOB data mgmt command for every device found. Userspace could also track for
+> > which devices OOB data were added but this could be problematic as OOB data
+> > persists userspace restart. Doing it in kernel seems better.
+> > 
+> > 
+> >  net/bluetooth/hci_event.c |    2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index 9f5c5f2..cda5bac 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -1946,6 +1946,8 @@ static void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> >  	for (; num_rsp; num_rsp--, info++) {
+> >  		bool name_known, ssp;
+> >  
+> > +		hci_remove_remote_oob_data(hdev, &info->bdaddr);
+> > +
+> >  		bacpy(&data.bdaddr, &info->bdaddr);
+> >  		data.pscan_rep_mode	= info->pscan_rep_mode;
+> >  		data.pscan_period_mode	= info->pscan_period_mode;
+> 
+> Why would you do this only in hci_inquiry_result_evt? What about
+> hci_extended_inquiry_result_evt and hci_inquiry_result_with_rssi_evt?
+> Maybe hci_inquiry_cache_update would be a better function to put this
+> into.
 
+Yes, I guess hci_inquiry_cache_update will be the right place to put this.
+Will send V2. 
 
-> multiple ObjectManagers for the same connection might not make sense
-> as it will create more round trips to discover the object tree e.g:
-> /org/bluez vs /org/somethingelse
+Thx!
 
-I'm not arguing about one object manager per object path component.
+> Johan
 
->
-> There is also the problem of supporting changing the root, the spec
-> doesn't mention anything about that even though it says it can support
-> sub-trees thus the application could in theory register a new root
-> e.g. /org at any point which basically invalidates the entire
-> sub-trees which I don't think would be convenient for anyone watching
-> it.
-
-then it's a misuse of object manager by the application, not a problem
-with the spec. We need to define in the API where the object
-manager(s) will be and not randomly adding/removing them.
-
-Lucas De Marchi
+-- 
+BR
+Szymon Janc
