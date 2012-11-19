@@ -1,37 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 19 Nov 2012 18:19:58 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
-	<frederic.dalleau@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/2] sco: BT_DEFER_SETUP for SCO sockets
-Message-ID: <20121119201958.GA14006@joana>
-References: <1353342958-25303-1-git-send-email-frederic.dalleau@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1353342958-25303-1-git-send-email-frederic.dalleau@linux.intel.com>
+From: Bart Westgeest <bart@elbrys.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bart Westgeest <bart@elbrys.com>
+Subject: [PATCH 3/3] sdp: Upgrade datatype SEQ8 to SEQ16 when data size is greater than 256
+Date: Mon, 19 Nov 2012 14:04:32 -0500
+Message-Id: <1353351872-10628-4-git-send-email-bart@elbrys.com>
+In-Reply-To: <1353351872-10628-1-git-send-email-bart@elbrys.com>
+References: <1353351872-10628-1-git-send-email-bart@elbrys.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+Fixes a bug where the complete sequence data is written, but the size
+is truncated to one byte.
+---
+ lib/sdp.c |   18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-* Frédéric Dalleau <frederic.dalleau@linux.intel.com> [2012-11-19 17:35:55 +0100]:
+diff --git a/lib/sdp.c b/lib/sdp.c
+index 026163e..ceb1192 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -786,23 +786,29 @@ static int sdp_gen_buffer(sdp_buf_t *buf, sdp_data_t *d)
+ 
+ int sdp_gen_pdu(sdp_buf_t *buf, sdp_data_t *d)
+ {
+-	uint32_t pdu_size = 0, data_size = 0;
++	uint32_t pdu_size, data_size;
+ 	unsigned char *src = NULL, is_seq = 0, is_alt = 0;
+-	uint8_t dtd = d->dtd;
+ 	uint16_t u16;
+ 	uint32_t u32;
+ 	uint64_t u64;
+ 	uint128_t u128;
+ 	uint8_t *seqp = buf->data + buf->data_size;
++	uint32_t orig_data_size = buf->data_size;
+ 
+-	pdu_size = sdp_get_data_type_size(dtd);
++recalculate:
++	pdu_size = sdp_get_data_type_size(d->dtd);
+ 	buf->data_size += pdu_size;
+ 
+ 	data_size = sdp_get_data_size(buf, d);
++	if (data_size > UCHAR_MAX && d->dtd == SDP_SEQ8) {
++		buf->data_size = orig_data_size;
++		d->dtd = SDP_SEQ16;
++		goto recalculate;
++	}
+ 
+-	*seqp = dtd;
++	*seqp = d->dtd;
+ 
+-	switch (dtd) {
++	switch (d->dtd) {
+ 	case SDP_DATA_NIL:
+ 		break;
+ 	case SDP_UINT8:
+@@ -884,7 +890,7 @@ int sdp_gen_pdu(sdp_buf_t *buf, sdp_data_t *d)
+ 		if (src && buf->buf_size >= buf->data_size + data_size) {
+ 			memcpy(buf->data + buf->data_size, src, data_size);
+ 			buf->data_size += data_size;
+-		} else if (dtd != SDP_DATA_NIL) {
++		} else if (d->dtd != SDP_DATA_NIL) {
+ 			SDPDBG("Gen PDU : Can't copy from invalid source or dest\n");
+ 		}
+ 	}
+-- 
+1.7.10.4
 
-> Hi,
-> 
-> This is a better view about what can be done to implement DEFER_SETUP on SCO
-> sockets. hci layer get some changes since previous behavior was to accept all
-> SCO connections.
-> The ugly hci_proto_defer has been removed and replaced by an additional flag
-> parameter to hci_proto_connect_ind.
-> Regarding testing, I'm still stuck by a txt timeout issue however, if the
-> delay between accept and recv is set to 0, then the connection is working fine.
-> And I even managed to get the sco connection established correctly once. So I
-> believed this emulator problem.
-
-You are telling me that your patch is not really working, I suggest you call
-this series RFC before you get everything sorted out. The approach in general
-is good, but I'd need confirmation that it works for actual defer delays, 3
-seconds for example, and not 0.
-
-	Gustavo
