@@ -1,53 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50AA9F55.8030709@elbrys.com>
-Date: Mon, 19 Nov 2012 16:06:29 -0500
-From: Bart Westgeest <bart@elbrys.com>
 MIME-Version: 1.0
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/3] sdp: Limit side effects of sdp_get_data_type and
- sdp_get_data_size
-References: <1353351872-10628-1-git-send-email-bart@elbrys.com> <1353351872-10628-3-git-send-email-bart@elbrys.com> <CAJdJm_MSAw2EWV=Tp-ycdfhUi1wJdcdXdH+4YAdfGx1LRpWs-g@mail.gmail.com>
-In-Reply-To: <CAJdJm_MSAw2EWV=Tp-ycdfhUi1wJdcdXdH+4YAdfGx1LRpWs-g@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <1353351872-10628-4-git-send-email-bart@elbrys.com>
+References: <1353351872-10628-1-git-send-email-bart@elbrys.com>
+	<1353351872-10628-4-git-send-email-bart@elbrys.com>
+Date: Mon, 19 Nov 2012 16:38:07 -0400
+Message-ID: <CAJdJm_N1hJkdEqvOrgD8ErAzDT56wzPEYAiA+7KDR0Pah4P6sA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] sdp: Upgrade datatype SEQ8 to SEQ16 when data size is
+ greater than 256
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Bart Westgeest <bart@elbrys.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Bart,
 
->> -       sdp_get_data_type(buf, d->dtd);
->> -       sdp_get_data_size(buf, d);
->> +       buf->buf_size += sdp_get_data_type_size(d->dtd);
->> +       buf->buf_size += sdp_get_data_size(buf, d);
+On Mon, Nov 19, 2012 at 3:04 PM, Bart Westgeest <bart@elbrys.com> wrote:
+> Fixes a bug where the complete sequence data is written, but the size
+> is truncated to one byte.
+> ---
+>  lib/sdp.c |   18 ++++++++++++------
+>  1 file changed, 12 insertions(+), 6 deletions(-)
 >
-> No need to check for "if (!buf->data)" like in the original code?
-
-I do not think there's a need for it, this modification is in 
-sdp_gen_buffer. sdp_gen_buffer is called three times from the following 
-functions: (1) sdp_attr_size, (2) sdp_append_to_pdu, and (3) 
-gen_dataseq_pdu.
-
-For (2) & (3), buf is memset to 0 prior to calling sdp_gen_buffer, thus 
-buf->data is always NULL.
-
-For (1), buf is also memset to 0 for the first call to sdp_attr_size, 
-which is called repetitively in a foreach statement. Repetitive calls to 
-sdp_gen_buffer on the same buffer will not (ever) result in an 
-allocation of buf->data as far as I can tell.
-
->> -       pdu_size = sdp_get_data_type(buf, dtd);
->> +       pdu_size = sdp_get_data_type_size(dtd);
+> diff --git a/lib/sdp.c b/lib/sdp.c
+> index 026163e..ceb1192 100644
+> --- a/lib/sdp.c
+> +++ b/lib/sdp.c
+> @@ -786,23 +786,29 @@ static int sdp_gen_buffer(sdp_buf_t *buf, sdp_data_t *d)
 >
-> Same here. Additionally, buf->buf_size is not being updated.
+>  int sdp_gen_pdu(sdp_buf_t *buf, sdp_data_t *d)
+>  {
+> -       uint32_t pdu_size = 0, data_size = 0;
+> +       uint32_t pdu_size, data_size;
+>         unsigned char *src = NULL, is_seq = 0, is_alt = 0;
+> -       uint8_t dtd = d->dtd;
+>         uint16_t u16;
+>         uint32_t u32;
+>         uint64_t u64;
+>         uint128_t u128;
+>         uint8_t *seqp = buf->data + buf->data_size;
+> +       uint32_t orig_data_size = buf->data_size;
+>
+> -       pdu_size = sdp_get_data_type_size(dtd);
+> +recalculate:
+> +       pdu_size = sdp_get_data_type_size(d->dtd);
+>         buf->data_size += pdu_size;
+>
+>         data_size = sdp_get_data_size(buf, d);
+> +       if (data_size > UCHAR_MAX && d->dtd == SDP_SEQ8) {
+> +               buf->data_size = orig_data_size;
+> +               d->dtd = SDP_SEQ16;
+> +               goto recalculate;
 
-This modification is in sdp_gen_pdu. sdp_gen_pdu is never called with 
-buf->data == NULL. If it would, then the initialization of seqp in 
-sdp_gen_pdu is erroneous, since it uses buf->data without verifying it.
+IMHO, using "goto" here is too complicated for 3 lines of code that
+will just be run at most twice. So I would simply duplicate them
+inside the if(). But others may have different opinion on this regard.
 
-In addition, in the current code, sdp_gen_pdu is only called from three 
-locations: (1) get_data_size, (2) sdp_append_to_pdu, (3) 
-gen_dataseq_pdu. In all cases the buf->data is either allocated prior to 
-calling (2 & 3), or (1) there's an if statement preventing sdp_gen_pdu 
-from being called when buf->data == NULL.
+> +       }
+>
+> -       *seqp = dtd;
+> +       *seqp = d->dtd;
+>
+> -       switch (dtd) {
+> +       switch (d->dtd) {
+>         case SDP_DATA_NIL:
+>                 break;
+>         case SDP_UINT8:
 
-Bart
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
