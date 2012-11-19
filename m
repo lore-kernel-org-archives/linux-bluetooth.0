@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1353351872-10628-4-git-send-email-bart@elbrys.com>
+In-Reply-To: <1353351872-10628-3-git-send-email-bart@elbrys.com>
 References: <1353351872-10628-1-git-send-email-bart@elbrys.com>
-	<1353351872-10628-4-git-send-email-bart@elbrys.com>
-Date: Mon, 19 Nov 2012 16:38:07 -0400
-Message-ID: <CAJdJm_N1hJkdEqvOrgD8ErAzDT56wzPEYAiA+7KDR0Pah4P6sA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] sdp: Upgrade datatype SEQ8 to SEQ16 when data size is
- greater than 256
+	<1353351872-10628-3-git-send-email-bart@elbrys.com>
+Date: Mon, 19 Nov 2012 16:24:04 -0400
+Message-ID: <CAJdJm_MSAw2EWV=Tp-ycdfhUi1wJdcdXdH+4YAdfGx1LRpWs-g@mail.gmail.com>
+Subject: Re: [PATCH 2/3] sdp: Limit side effects of sdp_get_data_type and sdp_get_data_size
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: Bart Westgeest <bart@elbrys.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -17,58 +16,44 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Hi Bart,
 
 On Mon, Nov 19, 2012 at 3:04 PM, Bart Westgeest <bart@elbrys.com> wrote:
-> Fixes a bug where the complete sequence data is written, but the size
-> is truncated to one byte.
-> ---
->  lib/sdp.c |   18 ++++++++++++------
->  1 file changed, 12 insertions(+), 6 deletions(-)
+> @@ -762,9 +757,6 @@ static int sdp_get_data_size(sdp_buf_t *buf, sdp_data_t *d)
+>                 break;
+>         }
 >
-> diff --git a/lib/sdp.c b/lib/sdp.c
-> index 026163e..ceb1192 100644
-> --- a/lib/sdp.c
-> +++ b/lib/sdp.c
-> @@ -786,23 +786,29 @@ static int sdp_gen_buffer(sdp_buf_t *buf, sdp_data_t *d)
+> -       if (!buf->data)
+> -               buf->buf_size += data_size;
+> -
+>         return data_size;
+>  }
 >
->  int sdp_gen_pdu(sdp_buf_t *buf, sdp_data_t *d)
->  {
-> -       uint32_t pdu_size = 0, data_size = 0;
-> +       uint32_t pdu_size, data_size;
->         unsigned char *src = NULL, is_seq = 0, is_alt = 0;
-> -       uint8_t dtd = d->dtd;
->         uint16_t u16;
->         uint32_t u32;
->         uint64_t u64;
+> @@ -783,8 +775,8 @@ static int sdp_gen_buffer(sdp_buf_t *buf, sdp_data_t *d)
+>         /* attribute length */
+>         buf->buf_size += sizeof(uint8_t) + sizeof(uint16_t);
+>
+> -       sdp_get_data_type(buf, d->dtd);
+> -       sdp_get_data_size(buf, d);
+> +       buf->buf_size += sdp_get_data_type_size(d->dtd);
+> +       buf->buf_size += sdp_get_data_size(buf, d);
+
+No need to check for "if (!buf->data)" like in the original code?
+
+>
+>         if (buf->buf_size > UCHAR_MAX && d->dtd == SDP_SEQ8)
+>                 buf->buf_size += sizeof(uint8_t);
+> @@ -803,7 +795,7 @@ int sdp_gen_pdu(sdp_buf_t *buf, sdp_data_t *d)
 >         uint128_t u128;
 >         uint8_t *seqp = buf->data + buf->data_size;
-> +       uint32_t orig_data_size = buf->data_size;
 >
-> -       pdu_size = sdp_get_data_type_size(dtd);
-> +recalculate:
-> +       pdu_size = sdp_get_data_type_size(d->dtd);
+> -       pdu_size = sdp_get_data_type(buf, dtd);
+> +       pdu_size = sdp_get_data_type_size(dtd);
+
+Same here. Additionally, buf->buf_size is not being updated.
+
 >         buf->data_size += pdu_size;
 >
 >         data_size = sdp_get_data_size(buf, d);
-> +       if (data_size > UCHAR_MAX && d->dtd == SDP_SEQ8) {
-> +               buf->data_size = orig_data_size;
-> +               d->dtd = SDP_SEQ16;
-> +               goto recalculate;
 
-IMHO, using "goto" here is too complicated for 3 lines of code that
-will just be run at most twice. So I would simply duplicate them
-inside the if(). But others may have different opinion on this regard.
-
-> +       }
->
-> -       *seqp = dtd;
-> +       *seqp = d->dtd;
->
-> -       switch (dtd) {
-> +       switch (d->dtd) {
->         case SDP_DATA_NIL:
->                 break;
->         case SDP_UINT8:
-
-Best Regards,
+Regards,
 -- 
 Anderson Lizardo
 Instituto Nokia de Tecnologia - INdT
