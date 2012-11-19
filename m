@@ -1,45 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] Bluetooth: Remove device OOB data if it was discovered in band
-Date: Mon, 19 Nov 2012 15:46:47 +0100
-Message-ID: <1353336407-10863-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20121116080528.GA9653@x220>
+References: <1352449889-5149-1-git-send-email-s.syam@samsung.com>
+	<1352449889-5149-2-git-send-email-s.syam@samsung.com>
+	<20121116080528.GA9653@x220>
+Date: Mon, 19 Nov 2012 19:39:23 +0530
+Message-ID: <CAFBvHifhvPU_Ho+LtL0=E8WrSMvJUwMbivCodDnM8yY3iWpeJg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] l2test: Add support to test auto select PSM
+From: Syam Sidhardhan <syamsidhardh@gmail.com>
+To: Syam Sidhardhan <s.syam@samsung.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-OOB authentication mechanism should be used only if pairing process
-has been activated by previous OOB information exchange (Core Spec
-4.0 , vol. 1, Part A, 5.1.4.3). Stored OOB data for specific device
-should be removed if that device was discovered in band later on.
+Hi Johan,
 
-Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
----
+On Fri, Nov 16, 2012 at 1:35 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Syam,
+>
+> On Fri, Nov 09, 2012, Syam Sidhardhan wrote:
+>> This patch enable us to test the auto select PSM by passing
+>> PSM value as 0.
+>>
+>> Ex: l2test -d -P 0
+>> l2test[2585]: Waiting for connection on psm 4099 ...
+>> ---
+>>  test/l2test.c |    4 +---
+>>  1 files changed, 1 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/test/l2test.c b/test/l2test.c
+>> index 7645681..72ad4ba 100644
+>> --- a/test/l2test.c
+>> +++ b/test/l2test.c
+>> @@ -87,7 +87,7 @@ static long buffer_size = 2048;
+>>
+>>  /* Default addr and psm and cid */
+>>  static bdaddr_t bdaddr;
+>> -static unsigned short psm = 0x1011;
+>> +static unsigned short psm = 0;
+>>  static unsigned short cid = 0;
+>>
+>>  /* Default number of frames to send (-1 = infinite) */
+>> @@ -375,8 +375,6 @@ static int do_connect(char *svr)
+>>               addr.l2_cid = htobs(cid);
+>>       else if (psm)
+>>               addr.l2_psm = htobs(psm);
+>> -     else
+>> -             goto error;
+>>
+>>       if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0 ) {
+>>               syslog(LOG_ERR, "Can't connect: %s (%d)",
+>
+> At least the second chunk is for the initiating (client) part, not the
+> server (which the commit message implies you're dealing with). There's
+> no "auto select" for the client.
+>
 
-This could also be done by userspace but would require calling remove remote
-OOB data mgmt command for every device found. Userspace could also track for
-which devices OOB data were added but this could be problematic as OOB data
-persists userspace restart. Doing it in kernel seems better.
+True. While preparing the patch it got misplaced.
+I'll send an updated version.
 
-
- net/bluetooth/hci_event.c |    2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 9f5c5f2..cda5bac 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1946,6 +1946,8 @@ static void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	for (; num_rsp; num_rsp--, info++) {
- 		bool name_known, ssp;
- 
-+		hci_remove_remote_oob_data(hdev, &info->bdaddr);
-+
- 		bacpy(&data.bdaddr, &info->bdaddr);
- 		data.pscan_rep_mode	= info->pscan_rep_mode;
- 		data.pscan_period_mode	= info->pscan_period_mode;
--- 
-1.7.9.5
-
+Thanks,
+Syam.
