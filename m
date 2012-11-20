@@ -1,42 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 20 Nov 2012 14:57:39 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bart Westgeest <bart@elbrys.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/3] Fix corrupted SDP response for sequence size > 256
-Message-ID: <20121120125739.GA15617@x220.ger.corp.intel.com>
-References: <1353351872-10628-1-git-send-email-bart@elbrys.com>
+Message-ID: <50AB7833.2070808@ahsoftware.de>
+Date: Tue, 20 Nov 2012 13:31:47 +0100
+From: Alexander Holler <holler@ahsoftware.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1353351872-10628-1-git-send-email-bart@elbrys.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] hid2hci: change subsystem in udev rule from usb to usb*
+References: <50AB6B96.20209@ahsoftware.de> <1353412028-5677-1-git-send-email-holler@ahsoftware.de> <20121120122345.GA14255@x220.ger.corp.intel.com>
+In-Reply-To: <20121120122345.GA14255@x220.ger.corp.intel.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bart,
+Am 20.11.2012 13:23, schrieb Johan Hedberg:
 
-On Mon, Nov 19, 2012, Bart Westgeest wrote:
-> This patchset includes minor refactoring and a bug fix. The bug
-> is exposed when a data sequence grows beyond 256 bytes, in this case the
-> complete sequence data is written, but the size is truncated to one
-> byte, resulting in a corrupted SDP response.
-> 
-> RE: Feedback on potential fix for issue while advertising Feature List
-> 
-> Bart Westgeest (3):
->   sdp: Inlined single use of function sdp_set_data_type
->   sdp: Limit side effects of sdp_get_data_type and sdp_get_data_size
->   sdp: Upgrade datatype SEQ8 to SEQ16 when data size is greater than
->     256
-> 
->  lib/sdp.c |   56 +++++++++++++++++++++++---------------------------------
->  1 file changed, 23 insertions(+), 33 deletions(-)
+> Thanks. The patch has been applied (after fixing up the commit message
+> to not include the signed-off-by and to have sensible line widths).
 
-I'm happy with these as well as your responses to the feedback you got,
-so the patches are now pushed upstream.
+Thanks and sorry for the long lines. I've used to use the comments as 
+reference (when invoking git commit), but unfortunately they got longer
+since they recently got translated (to german) when using LANG != C.
 
-Regarding the SDP code needing cleanups/fixing/rewriting in general, we
-know :) This is one of the oldest pieces of code in the stack which
-could definitely use a rewrite. However, no one has come along with the
-time to do it yet.
+Regards,
 
-Johan
+Alexander
