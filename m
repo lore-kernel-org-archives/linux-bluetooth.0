@@ -1,35 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 20 Nov 2012 14:24:08 +0200
+Date: Tue, 20 Nov 2012 14:23:45 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+To: Alexander Holler <holler@ahsoftware.de>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Remove OOB data if device was discovered
- in band
-Message-ID: <20121120122408.GB14255@x220.ger.corp.intel.com>
-References: <1353407934-17831-1-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [PATCH] hid2hci: change subsystem in udev rule from usb to usb*
+Message-ID: <20121120122345.GA14255@x220.ger.corp.intel.com>
+References: <50AB6B96.20209@ahsoftware.de>
+ <1353412028-5677-1-git-send-email-holler@ahsoftware.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1353407934-17831-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1353412028-5677-1-git-send-email-holler@ahsoftware.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Alexander,
 
-On Tue, Nov 20, 2012, Szymon Janc wrote:
-> OOB authentication mechanism should be used only if pairing process
-> has been activated by previous OOB information exchange (Core Spec
-> 4.0 , vol. 1, Part A, 5.1.4.3). Stored OOB data for specific device
-> should be removed if that device was discovered in band later on.
+On Tue, Nov 20, 2012, Alexander Holler wrote:
+> With kernel 3.6 (commit 7e97243c2080ecae7129e83635227fdebd4feef6) the class for some
+> devices (e.g. dongles from Logitech) were changed from usb to usbmisc. As consequence
+> the udev rule for hid2hci didn't work anymore with kernels >= 3.6.
 > 
-> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+> Changing the subsystem from "usb" to "usb*" matches both "usb" and "usbmisc" and works
+> with all kernels.
+> 
+> Signed-off-by: Alexander Holler <holler@ahsoftware.de>
 > ---
-> V2:
-> Move OOB data removal to hci_inquiry_cache_update to cover all inquiry
-> events (ext/rssi) in one place.
-> 
->  net/bluetooth/hci_core.c |    2 ++
->  1 file changed, 2 insertions(+)
+>  scripts/bluetooth-hid2hci.rules | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+Thanks. The patch has been applied (after fixing up the commit message
+to not include the signed-off-by and to have sensible line widths).
 
 Johan
