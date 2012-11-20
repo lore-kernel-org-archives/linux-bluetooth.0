@@ -1,46 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-From: Syam Sidhardhan <s.syam@samsung.com>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Syam Sidhardhan <s.syam@samsung.com>
-Subject: [PATCH BlueZ 2/2 v1] l2test: Add support to test auto select PSM
-Date: Tue, 20 Nov 2012 21:45:51 +0530
-Message-id: <1353428151-11925-1-git-send-email-s.syam@samsung.com>
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH v3 3/3] sink: Add profile .connect and .disconnect
+Date: Tue, 20 Nov 2012 17:10:51 +0100
+Message-Id: <1353427851-4165-4-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1353427851-4165-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1353427851-4165-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch enable us to test the auto select PSM for server by passing
-PSM value as 0.
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Ex: l2test -d -P 0
-l2test[2585]: Waiting for connection on psm 4097 ...
+Add the connection and disconnection hooks to the a2dp_sink btd_profile.
 ---
-v1-> Corrected the misplaced code
+ profiles/audio/manager.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
- test/l2test.c |    4 +---
- 1 files changed, 1 insertions(+), 3 deletions(-)
-
-diff --git a/test/l2test.c b/test/l2test.c
-index 7645681..485887f 100644
---- a/test/l2test.c
-+++ b/test/l2test.c
-@@ -87,7 +87,7 @@ static long buffer_size = 2048;
+diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
+index 64df824..38e3c2b 100644
+--- a/profiles/audio/manager.c
++++ b/profiles/audio/manager.c
+@@ -261,6 +261,56 @@ static int a2dp_source_disconnect(struct btd_device *dev,
+ 	return 0;
+ }
  
- /* Default addr and psm and cid */
- static bdaddr_t bdaddr;
--static unsigned short psm = 0x1011;
-+static unsigned short psm = 0;
- static unsigned short cid = 0;
++static int a2dp_sink_connect(struct btd_device *dev,
++						struct btd_profile *profile,
++						btd_profile_cb cb)
++{
++	struct audio_device *audio_dev;
++	struct profile_req *req;
++	int err;
++
++	audio_dev = get_audio_dev(dev);
++	if (!audio_dev) {
++		DBG("unable to get a device object");
++		return -1;
++	}
++
++	req = new_profile_request(dev, profile, cb);
++
++	err = sink_connect(audio_dev, profile_cb, req);
++	if (err < 0) {
++		g_free(req);
++		return err;
++	}
++
++	return 0;
++}
++
++static int a2dp_sink_disconnect(struct btd_device *dev,
++						struct btd_profile *profile,
++						btd_profile_cb cb)
++{
++	struct audio_device *audio_dev;
++	struct profile_req *req;
++	int err;
++
++	audio_dev = get_audio_dev(dev);
++	if (!audio_dev) {
++		DBG("unable to get a device object");
++		return -1;
++	}
++
++	req = new_profile_request(dev, profile, cb);
++
++	err = sink_disconnect(audio_dev, FALSE, profile_cb, req);
++	if (err < 0) {
++		g_free(req);
++		return err;
++	}
++
++	return 0;
++}
++
+ static struct audio_adapter *audio_adapter_ref(struct audio_adapter *adp)
+ {
+ 	adp->ref++;
+@@ -480,6 +530,9 @@ static struct btd_profile a2dp_sink_profile = {
+ 	.device_probe	= a2dp_sink_probe,
+ 	.device_remove	= audio_remove,
  
- /* Default number of frames to send (-1 = infinite) */
-@@ -458,8 +458,6 @@ static void do_listen(void (*handler)(int sk))
- 		addr.l2_cid = htobs(cid);
- 	else if (psm)
- 		addr.l2_psm = htobs(psm);
--	else
--		goto error;
++	.connect	= a2dp_sink_connect,
++	.disconnect	= a2dp_sink_disconnect,
++
+ 	.adapter_probe	= a2dp_sink_server_probe,
+ };
  
- 	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
- 		syslog(LOG_ERR, "Can't bind socket: %s (%d)",
 -- 
-1.7.4.1
+1.7.11.7
 
