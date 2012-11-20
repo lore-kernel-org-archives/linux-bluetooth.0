@@ -1,30 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50ABC41B.8030802@linux.intel.com>
-Date: Tue, 20 Nov 2012 18:55:39 +0100
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Reply-To: frederic.dalleau@linux.intel.com
+Date: Tue, 20 Nov 2012 15:56:53 -0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 4/4] Bluetooth: AMP: Set no FCS for incoming L2CAP chan
+Message-ID: <20121120175653.GI14006@joana>
+References: <20121119212812.GB14006@joana>
+ <1353424582-26042-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1353424582-26042-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: Implement deferred sco socket setup
-References: <1353342958-25303-1-git-send-email-frederic.dalleau@linux.intel.com> <1353342958-25303-3-git-send-email-frederic.dalleau@linux.intel.com> <20121120173734.GG14006@joana>
-In-Reply-To: <20121120173734.GG14006@joana>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1353424582-26042-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Andrei,
 
-I'm taking your remarks into account asap
+* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-11-20 17:16:22 +0200]:
 
-On 11/20/2012 06:37 PM, Gustavo Padovan wrote:
-> Where do you set sk_state to BT_CONNECTED. Doesn't it need to be here?
-The state is set to BT_CONNECTED in hci_sync_conn_complete_evt. ie when
-the connection is effectively created.
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> When receiving L2CAP Create Channel Request set the channel as
+> L2CAP_FCS_NONE. Then in "L2CAP Config req" following field will
+> be set: "FCS Option 0x00 (No FCS)". So by default High Speed
+> channels have no FCS.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/l2cap_core.c |    1 +
+>  1 file changed, 1 insertion(+)
 
-My understanding is that BT_CONFIG state indicate the configuration has
-been requested, in case recvmsg() is called twice.
+All 4 patches have been applied to bluetooth-next. Thanks.
 
-Regards,
-Frédéric
+	Gustavo
