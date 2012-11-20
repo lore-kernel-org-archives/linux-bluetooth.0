@@ -1,25 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50AB7833.2070808@ahsoftware.de>
-Date: Tue, 20 Nov 2012 13:31:47 +0100
-From: Alexander Holler <holler@ahsoftware.de>
+Date: Tue, 20 Nov 2012 14:24:08 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: Remove OOB data if device was discovered
+ in band
+Message-ID: <20121120122408.GB14255@x220.ger.corp.intel.com>
+References: <1353407934-17831-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] hid2hci: change subsystem in udev rule from usb to usb*
-References: <50AB6B96.20209@ahsoftware.de> <1353412028-5677-1-git-send-email-holler@ahsoftware.de> <20121120122345.GA14255@x220.ger.corp.intel.com>
-In-Reply-To: <20121120122345.GA14255@x220.ger.corp.intel.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1353407934-17831-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am 20.11.2012 13:23, schrieb Johan Hedberg:
+Hi Szymon,
 
-> Thanks. The patch has been applied (after fixing up the commit message
-> to not include the signed-off-by and to have sensible line widths).
+On Tue, Nov 20, 2012, Szymon Janc wrote:
+> OOB authentication mechanism should be used only if pairing process
+> has been activated by previous OOB information exchange (Core Spec
+> 4.0 , vol. 1, Part A, 5.1.4.3). Stored OOB data for specific device
+> should be removed if that device was discovered in band later on.
+> 
+> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+> ---
+> V2:
+> Move OOB data removal to hci_inquiry_cache_update to cover all inquiry
+> events (ext/rssi) in one place.
+> 
+>  net/bluetooth/hci_core.c |    2 ++
+>  1 file changed, 2 insertions(+)
 
-Thanks and sorry for the long lines. I've used to use the comments as 
-reference (when invoking git commit), but unfortunately they got longer
-since they recently got translated (to german) when using LANG != C.
+Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 
-Regards,
-
-Alexander
+Johan
