@@ -1,40 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50AB5DD7.3080108@linux.intel.com>
-Date: Tue, 20 Nov 2012 11:39:19 +0100
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Reply-To: frederic.dalleau@linux.intel.com
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2] Bluetooth: Remove OOB data if device was discovered in band
+Date: Tue, 20 Nov 2012 11:38:54 +0100
+Message-ID: <1353407934-17831-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/2] sco: BT_DEFER_SETUP for SCO sockets
-References: <1353342958-25303-1-git-send-email-frederic.dalleau@linux.intel.com> <20121119201958.GA14006@joana>
-In-Reply-To: <20121119201958.GA14006@joana>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+OOB authentication mechanism should be used only if pairing process
+has been activated by previous OOB information exchange (Core Spec
+4.0 , vol. 1, Part A, 5.1.4.3). Stored OOB data for specific device
+should be removed if that device was discovered in band later on.
 
-On 11/19/2012 09:19 PM, Gustavo Padovan wrote:
-> Hi Frédéric,
->
-> * Frédéric Dalleau <frederic.dalleau@linux.intel.com> [2012-11-19 17:35:55 +0100]:
->> Regarding testing, I'm still stuck by a txt timeout issue however, if the
->> delay between accept and recv is set to 0, then the connection is working fine.
->> And I even managed to get the sco connection established correctly once. So I
->> believed this emulator problem.
->
-> You are telling me that your patch is not really working, I suggest you call
-> this series RFC before you get everything sorted out. The approach in general
-> is good, but I'd need confirmation that it works for actual defer delays, 3
-> seconds for example, and not 0.
+Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+---
+V2:
+Move OOB data removal to hci_inquiry_cache_update to cover all inquiry
+events (ext/rssi) in one place.
 
-Sorry, I have been a bit premature, but for the reason explained
-above I was confident.
-So now I'm quite happy to say I successfully tested this series this 
-morning, based on bluetooth-next, using delays from 0 to 35 secs several 
-times in a row.
+ net/bluetooth/hci_core.c |    2 ++
+ 1 file changed, 2 insertions(+)
 
-Regards,
-Frédéric
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e3a49db..81f4bac 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -434,6 +434,8 @@ bool hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data,
+ 
+ 	BT_DBG("cache %p, %pMR", cache, &data->bdaddr);
+ 
++	hci_remove_remote_oob_data(hdev, &data->bdaddr);
++
+ 	if (ssp)
+ 		*ssp = data->ssp_mode;
+ 
+-- 
+1.7.9.5
+
