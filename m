@@ -1,27 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50AB6B96.20209@ahsoftware.de>
-Date: Tue, 20 Nov 2012 12:37:58 +0100
-From: Alexander Holler <holler@ahsoftware.de>
+Message-ID: <50AB5DD7.3080108@linux.intel.com>
+Date: Tue, 20 Nov 2012 11:39:19 +0100
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Reply-To: frederic.dalleau@linux.intel.com
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: udev rule for hid2hci and Logitech dongles doesn't work with kernels
- >= 3.6
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/2] sco: BT_DEFER_SETUP for SCO sockets
+References: <1353342958-25303-1-git-send-email-frederic.dalleau@linux.intel.com> <20121119201958.GA14006@joana>
+In-Reply-To: <20121119201958.GA14006@joana>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Gustavo,
 
-I've recently noticed that the udev rule for hid2hci with Logitech 
-dongles doesn't work anymore. The reason is commit 
-7e97243c2080ecae7129e83635227fdebd4feef6 which changes the class 
-(subsystem) for those dongles from usb to usbmisc. I've already filed a 
-bug for Fedora (https://bugzilla.redhat.com/show_bug.cgi?id=877998) but 
-I thought I should write a note here too, to inform non-Fedora users too.
+On 11/19/2012 09:19 PM, Gustavo Padovan wrote:
+> Hi Frédéric,
+>
+> * Frédéric Dalleau <frederic.dalleau@linux.intel.com> [2012-11-19 17:35:55 +0100]:
+>> Regarding testing, I'm still stuck by a txt timeout issue however, if the
+>> delay between accept and recv is set to 0, then the connection is working fine.
+>> And I even managed to get the sco connection established correctly once. So I
+>> believed this emulator problem.
+>
+> You are telling me that your patch is not really working, I suggest you call
+> this series RFC before you get everything sorted out. The approach in general
+> is good, but I'd need confirmation that it works for actual defer delays, 3
+> seconds for example, and not 0.
 
-My suggestion is to use "usb*" instead of "usb" for the subsystem, this 
-works with all kernels regardless if the subsystem is "usb" or "usbmisc".
+Sorry, I have been a bit premature, but for the reason explained
+above I was confident.
+So now I'm quite happy to say I successfully tested this series this 
+morning, based on bluetooth-next, using delays from 0 to 35 secs several 
+times in a row.
 
 Regards,
-
-Alexander
+Frédéric
