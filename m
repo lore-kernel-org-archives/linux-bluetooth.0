@@ -1,35 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 20 Nov 2012 12:22:00 +0200
+Date: Tue, 20 Nov 2012 11:23:32 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
-	<frederic.dalleau@linux.intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/2] Add support for SCO defered setup in test
-Message-ID: <20121120102200.GA6570@x220.ger.corp.intel.com>
-References: <1353340244-16443-1-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: Re: [PATCH BlueZ] audio: Auto connect AVRCP in case of A2DP source
+ is connected
+Message-ID: <20121120092332.GA4273@x220>
+References: <1353402781-21791-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1353340244-16443-1-git-send-email-frederic.dalleau@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1353402781-21791-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frederic,
+Hi Luiz,
 
-On Mon, Nov 19, 2012, Frédéric Dalleau wrote:
-> This adds support for deferred setup in userspace test tools for SCO
-> connections.
+On Tue, Nov 20, 2012, Luiz Augusto von Dentz wrote:
+> This enables the same logic used for A2DP sink, so it attempt to
+> connect AVRCP if remote device support it.
 > 
-> Regards,
-> Frédéric
-> 
-> Frédéric Dalleau (2):
->   scotest: Add deferred setup option
->   btiotest: Enable deferred setup for sco sockets
-> 
->  test/btiotest.c |   22 +++++++++++++++-----
->  test/scotest.c  |   60 ++++++++++++++++++++++++++++++++++++++++++++++++++-----
->  2 files changed, 72 insertions(+), 10 deletions(-)
+> Note this is necessary for some devices e.g. WP7 that don't connect
+> even when being the initiator because it is not mandatory for target
+> to do so even though it is recommended to avoid collisions while trying
+> to estabilish the connection.
+> ---
+>  profiles/audio/device.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Both patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
