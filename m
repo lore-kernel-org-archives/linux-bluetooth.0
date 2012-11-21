@@ -1,45 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
+From: Michael Knudsen <michaelknudsendk@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/5] doc: Update settings-storage.txt
-Date: Wed, 21 Nov 2012 14:49:47 +0100
-Message-Id: <1353505791-21134-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+Cc: Michael Knudsen <m.knudsen@samsung.com>
+Subject: [PATCH] Bluetooth:  Provide definitions for CSA2 audio commands
+Date: Wed, 21 Nov 2012 14:22:00 +0100
+Message-Id: <1353504120-5208-1-git-send-email-m.knudsen@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remote features are not available from user space,
-so replace Features entry by SupportedTechnologies.
-
-Device blocked should be saved in device info file.
 ---
- doc/settings-storage.txt |    7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ lib/hci.c |    9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
-index 1174d44..3fdcb03 100644
---- a/doc/settings-storage.txt
-+++ b/doc/settings-storage.txt
-@@ -139,13 +139,16 @@ Long term key) related to a remote device.
-   Class			String		Device class in hexadecimal,
- 					i.e. 0x000000
+diff --git a/lib/hci.c b/lib/hci.c
+index 66b2d5f..fd27f1a 100644
+--- a/lib/hci.c
++++ b/lib/hci.c
+@@ -590,6 +590,15 @@ static hci_map commands_map[] = {
+ 	{ "LE Test End",				230 },
+ 	{ "Reserved",					231 },
  
--  Features		String		Bluetooth device features in
--					hexadecimal, i.e. 0x0000000000000000
-+  SupportedTechnologies	List of		List of technologies supported by
-+			strings		device, separated by ";"
-+					Technologies can be BR/EDR or LE
- 
-   AddressType		String		An address can be "static" or "public"
- 
-   Trusted		Boolean		True if the remote device is trusted
- 
-+  Blocked		Boolean		True if the remote device is blocked
++	{ "Reserved",						232 },
++	{ "Reserved",						233 },
++	{ "Reserved",						234 },
++	{ "Enhanced Setup Synchronous Connection",		235 },
++	{ "Enhanced Accept Synchronous Connection Request",	236 },
++	{ "Read Local Supported Codecs",			237 },
++	{ "Reserved",						238 },
++	{ "Reserved",						239 },
 +
-   Profiles		List of		List of profiles advertised by remote,
- 			strings		in 128-bits UUID format, separated by
- 					";"
+ 	{ NULL }
+ };
+ 
 -- 
 1.7.9.5
 
