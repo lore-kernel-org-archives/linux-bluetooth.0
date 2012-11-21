@@ -1,75 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jefferson Delfes <jefferson.delfes@openbossa.org>
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
+	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [PATCH BlueZ] hciconfig: Add an option to set which advertise type will be on
-Date: Wed, 21 Nov 2012 10:09:52 -0400
-Message-Id: <1353506992-3371-1-git-send-email-jefferson.delfes@openbossa.org>
+Subject: [PATCH 5/5] device: Retrieve device pnp ids from storage
+Date: Wed, 21 Nov 2012 14:49:51 +0100
+Message-Id: <1353505791-21134-5-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1353505791-21134-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1353505791-21134-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There are some advertise types that can be used, so we need a way to
-tell which one we want. The default one is ADV_IND.
+When device pnp ids are updated, save them and emit property
+changed signals.
 ---
- tools/hciconfig.c | 30 ++++++++++++++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
+ src/device.c |   51 ++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 34 insertions(+), 17 deletions(-)
 
-diff --git a/tools/hciconfig.c b/tools/hciconfig.c
-index 64f2650..e107bff 100644
---- a/tools/hciconfig.c
-+++ b/tools/hciconfig.c
-@@ -254,8 +254,31 @@ static void cmd_le_adv(int ctl, int hdev, char *opt)
- 		exit(1);
- 	}
+diff --git a/src/device.c b/src/device.c
+index d4a553d..4559674 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -236,6 +236,17 @@ static gboolean store_device_info_cb(gpointer user_data)
+ 	g_key_file_set_boolean(key_file, "General", "Blocked",
+ 							device->blocked);
  
-+	if (opt == NULL || strcmp(opt, "noleadv")) {
-+		le_set_advertising_parameters_cp adv_params_cp;
-+
-+		memset(&adv_params_cp, 0, sizeof(adv_params_cp));
-+		adv_params_cp.min_interval = 0x0800;
-+		adv_params_cp.max_interval = 0x0800;
-+		if (opt)
-+			adv_params_cp.advtype = atoi(opt);
-+		adv_params_cp.chan_map = 7;
-+
-+		memset(&rq, 0, sizeof(rq));
-+		rq.ogf = OGF_LE_CTL;
-+		rq.ocf = OCF_LE_SET_ADVERTISING_PARAMETERS;
-+		rq.cparam = &adv_params_cp;
-+		rq.clen = LE_SET_ADVERTISING_PARAMETERS_CP_SIZE;
-+		rq.rparam = &status;
-+		rq.rlen = 1;
-+
-+		ret = hci_send_req(dd, &rq, 1000);
-+		if (ret < 0)
-+			goto done;
++	if (device->vendor_src) {
++		g_key_file_set_integer(key_file, "DeviceID", "Source",
++					device->vendor_src);
++		g_key_file_set_integer(key_file, "DeviceID", "Vendor",
++					device->vendor);
++		g_key_file_set_integer(key_file, "DeviceID", "Product",
++					device->product);
++		g_key_file_set_integer(key_file, "DeviceID", "Version",
++					device->version);
 +	}
 +
- 	memset(&advertise_cp, 0, sizeof(advertise_cp));
--	if (strcmp(opt, "noleadv") == 0)
-+	if (opt && strcmp(opt, "noleadv") == 0)
- 		advertise_cp.enable = 0x00;
- 	else
- 		advertise_cp.enable = 0x01;
-@@ -270,6 +293,7 @@ static void cmd_le_adv(int ctl, int hdev, char *opt)
+ 	ba2str(adapter_get_address(device->adapter), adapter_addr);
+ 	ba2str(&device->bdaddr, device_addr);
+ 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info", adapter_addr,
+@@ -1766,6 +1777,7 @@ static void load_info(struct btd_device *device, const gchar *local,
+ 	char *str;
+ 	gboolean store_needed = FALSE;
+ 	gboolean blocked;
++	int source, vendor, product, version;
  
- 	ret = hci_send_req(dd, &rq, 1000);
+ 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info", local, peer);
+ 	filename[PATH_MAX] = '\0';
+@@ -1811,6 +1823,24 @@ static void load_info(struct btd_device *device, const gchar *local,
+ 	if (blocked)
+ 		device_block(device, FALSE);
  
-+done:
- 	hci_close_dev(dd);
++	/* Load device id */
++	source = g_key_file_get_integer(key_file, "DeviceID", "Source", NULL);
++	if (source) {
++		device_set_vendor_src(device, source);
++
++		vendor = g_key_file_get_integer(key_file, "DeviceID",
++							"Vendor", NULL);
++		device_set_vendor(device, vendor);
++
++		product = g_key_file_get_integer(key_file, "DeviceID",
++							"Product", NULL);
++		device_set_product(device, product);
++
++		version = g_key_file_get_integer(key_file, "DeviceID",
++							"Version", NULL);
++		device_set_version(device, version);
++	}
++
+ 	if (store_needed)
+ 		store_device_info(device);
  
- 	if (ret < 0) {
-@@ -1932,7 +1956,9 @@ static struct {
- 	{ "block",	cmd_block,	"<bdaddr>",	"Add a device to the blacklist" },
- 	{ "unblock",	cmd_unblock,	"<bdaddr>",	"Remove a device from the blacklist" },
- 	{ "lerandaddr", cmd_le_addr,	"<bdaddr>",	"Set LE Random Address" },
--	{ "leadv",	cmd_le_adv,	0,		"Enable LE advertising" },
-+	{ "leadv",	cmd_le_adv,	"[type]",	"Enable LE advertising"
-+		"\n\t\t\t0 - Connectable undirected advertising (default)"
-+		"\n\t\t\t3 - Non connectable undirected advertising"},
- 	{ "noleadv",	cmd_le_adv,	0,		"Disable LE advertising" },
- 	{ "lestates",	cmd_le_states,	0,		"Display the supported LE states" },
- 	{ NULL, NULL, 0 }
+@@ -1825,7 +1855,6 @@ struct btd_device *device_create(struct btd_adapter *adapter,
+ 	const gchar *adapter_path = adapter_get_path(adapter);
+ 	const bdaddr_t *src;
+ 	char srcaddr[18];
+-	uint16_t vendor, product, version;
+ 
+ 	device = g_try_malloc0(sizeof(struct btd_device));
+ 	if (device == NULL)
+@@ -1867,13 +1896,6 @@ struct btd_device *device_create(struct btd_adapter *adapter,
+ 		device_set_bonded(device, TRUE);
+ 	}
+ 
+-	if (read_device_id(srcaddr, address, bdaddr_type, NULL, &vendor,
+-						&product, &version) == 0) {
+-		device_set_vendor(device, vendor);
+-		device_set_product(device, product);
+-		device_set_version(device, version);
+-	}
+-
+ 	return btd_device_ref(device);
+ }
+ 
+@@ -2320,22 +2342,15 @@ static void update_bredr_services(struct browse_req *req, sdp_list_t *recs)
+ 			pdlist = sdp_data_get(rec, SDP_ATTR_VENDOR_ID);
+ 			vendor = pdlist ? pdlist->val.uint16 : 0x0000;
+ 
+-			device_set_vendor(device, vendor);
+-
+ 			pdlist = sdp_data_get(rec, SDP_ATTR_PRODUCT_ID);
+ 			product = pdlist ? pdlist->val.uint16 : 0x0000;
+ 
+-			device_set_product(device, product);
+-
+ 			pdlist = sdp_data_get(rec, SDP_ATTR_VERSION);
+ 			version = pdlist ? pdlist->val.uint16 : 0x0000;
+ 
+-			device_set_version(device, version);
+-
+ 			if (source || vendor || product || version)
+-				store_device_id(srcaddr, dstaddr,
+-						device->bdaddr_type, source,
+-						vendor, product, version);
++				device_set_pnpid(device, source, vendor,
++							product, version);
+ 		}
+ 
+ 		/* Check for duplicates */
+@@ -4094,4 +4109,6 @@ void device_set_pnpid(struct btd_device *device, uint8_t vendor_id_src,
+ 	device_set_vendor_src(device, vendor_id_src);
+ 	device_set_product(device, product_id);
+ 	device_set_version(device, product_ver);
++
++	store_device_info(device);
+ }
 -- 
-1.8.0
+1.7.9.5
 
