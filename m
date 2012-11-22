@@ -2,30 +2,49 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Knudsen <michaelknudsendk@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Knudsen <m.knudsen@samsung.com>
-Subject: [RFC 1/3] Bluetooth:  Add HCI feature bit definition for transparent SCO
-Date: Thu, 22 Nov 2012 13:05:06 +0100
-Message-Id: <1353585909-28400-2-git-send-email-m.knudsen@samsung.com>
-In-Reply-To: <1353585909-28400-1-git-send-email-m.knudsen@samsung.com>
-References: <1353585909-28400-1-git-send-email-m.knudsen@samsung.com>
+Subject: [PATCH 3/3] Doco:  List the read codecs operation
+Date: Thu, 22 Nov 2012 13:47:48 +0100
+Message-Id: <1353588468-28711-4-git-send-email-m.knudsen@samsung.com>
+In-Reply-To: <1353588468-28711-1-git-send-email-m.knudsen@samsung.com>
+References: <1353588468-28711-1-git-send-email-m.knudsen@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- include/net/bluetooth/hci.h |    1 +
- 1 file changed, 1 insertion(+)
+ doc/mgmt-api.txt |   20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 45eee08..45ec1de 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -233,6 +233,7 @@ enum {
- #define LMP_CVSD	0x01
- #define LMP_PSCHEME	0x02
- #define LMP_PCONTROL	0x04
-+#define LMP_TRSP_SCO	0x08
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 202c055..42af2d6 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -847,6 +847,26 @@ Set Device ID Command
+ 	a Command Status event on failure.
  
- #define LMP_RSSI_INQ	0x40
- #define LMP_ESCO	0x80
+ 
++Read Codecs Command
++====================
++
++	Command Code:		0x0029
++	Controller Index:	<controller id>
++	Command Parameters:
++	Return Parameters:
++				Num_Of_Codecs (1 Octet)
++				Codec1 (1 Octet)
++				Codec2 (1 Octet)
++				...
++
++	This command is used to read out the list of codecs that are
++	supported by the given controller.
++
++	This command generates a Command Complete event on success
++	or failure.
++
++
++
+ Command Complete Event
+ ======================
+ 
 -- 
 1.7.9.5
 
