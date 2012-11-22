@@ -1,35 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 23 Nov 2012 09:27:42 +0000 (GMT)
-From: JAGANATH KANAKKASSERY <jaganath.k@samsung.com>
-Subject: Query regarding device discovery
+From: Michael Knudsen <michaelknudsendk@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Reply-to: jaganath.k@samsung.com
-MIME-version: 1.0
-Content-type: text/plain; charset=windows-1252
-MIME-version: 1.0
-Message-id: <2254742.168381353662862601.JavaMail.weblogic@epml01>
+Cc: Michael Knudsen <m.knudsen@samsung.com>
+Subject: [PATCH 0/3] mgmt:  read supported codecs
+Date: Thu, 22 Nov 2012 13:47:45 +0100
+Message-Id: <1353588468-28711-1-git-send-email-m.knudsen@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGVsbG8sIA0KIA0KSSBoYXZlIGEgZG91YnQgd2l0aCBjdXJyZW50IGRpc2NvdmVyeSBtZWNoYW5p
-c20uIA0KIA0KU3VwcG9zZSBhcHBsaWNhdGlvbiAxIGNhbGxzICJTdGFydERpc2NvdmVyeSIuIGZv
-ciB3aGljaCAiRGlzY292ZXJpbmcgPSBUUlVFIiBjb21lcw0KYW5kIHRoZW4gZGV2aWNlRm91bmQg
-c2lnbmFscyBzdGFydHMgY29taW5nLg0KSW4gdGhlIG1lYW4gdGltZSBhcHBsaWNhdGlvbiAyIGNh
-bGxzICJTdGFydERpc2NvdmVyeSIgd2hpY2ggd2lsbCBiZSBxdWV1ZWQgaW4gQmx1ZVouDQpUaGVu
-ICJkaXNjb3ZlcmluZyA9IEZBTFNFIiBjb21lcyBmb3IgdGhlIGRpc2NvdmVyeSBpbml0aWF0ZWQg
-ZnJvbSBhcHBsaWNhdGlvbiAxLg0KVGhlbiBhcyBwZXIgQmx1ZVogZGVzaWduLCBpdCB3aWxsIHJl
-c3RhcnQgZGlzY292ZXJ5IGZvciBhcHBsaWNhdGlvbiAxIHNpbmNlIGl0IGhhcyBub3QNCmNhbGxl
-ZCAiU3RvcERpc2NvdmVyeSIgeWV0LiBTbyAiZGlzY292ZXJpbmcgPSBUUlVFIiBjb21lcyBhZ2Fp
-biwgd2hpY2ggYXBwbGljYXRpb24gMg0KdGhpbmtzIHRoYXQgaXQgYmVsb25ncyB0byBoaW0uIA0K
-VGhlbiBpZiBhcHBsaWNhdGlvbiAxIGNhbGxzICJTdG9wRGlzY292ZXJ5IiBpbW1lZGlhdGVseSwg
-ZGlzY292ZXJ5IHdpbGwgYmUgc3RvcHBlZA0KYW5kICJEaXNjb3ZlcmluZyA9IEZBTFNFIiBjb21l
-cyB3aXRoIHdoaWNoIGFwcGxpY2F0aW9uIDIgdG9vIHRoaW5rcyB0aGF0IGRpc2NvdmVyeQ0KaW5p
-dGlhdGVkIGJ5IGhpbSBpcyBhbHNvIGRvbmUuDQpTbyBldmVudHVhbGx5IGFwcGxpY2F0aW9uIDIg
-d2lsbCBub3QgZ2V0IGFueSBkZXZpY2VzLg0KU28gSSB0aGluayB3aXRoIGN1cnJlbnQgZGVzaWdu
-LCBhcHBsaWNhdGlvbnMgdGhhdCBhcmUgaW50ZXJlc3RlZCBvbmx5IGluIG9uZSBjb21wbGV0ZQ0K
-aW5xdWlyeSBzZXNzaW9uIHdpbGwgYmUgaW4gdHJvdWJsZS4gDQogDQpTbyBjYW4gd2UgZGlzYWJs
-ZSB0aGUgYXV0b21hdGljIHJlaW5pdGlhdGluZyBvZiBkZXZpY2UgZGlzY292ZXJ5Pw0KT3IgaXMg
-dGhlcmUgYW55IHdheSB0byBoYW5kbGUgdGhpcyBzY2VuYXJpbz8gDQogDQpUaGFua3MsDQpKYWdh
-bmF0aA==
+This implements the user space side of the read codecs command.
 
+Michael Knudsen (3):
+  Bluetooth:  Add HCI Coding Format definitions
+  Bluetooth:  Support the read codecs operation
+  Doco:  List the read codecs operation
+
+ doc/mgmt-api.txt |   20 +++++++++++++++
+ lib/hci.h        |    9 +++++++
+ lib/mgmt.h       |    8 ++++++
+ tools/btmgmt.c   |   74 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 111 insertions(+)
+
+-- 
+1.7.9.5
 
