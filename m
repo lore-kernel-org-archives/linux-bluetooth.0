@@ -1,62 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/4] sap-u8500: Fix build errors due to unaligned memory access
-Date: Fri, 23 Nov 2012 11:09:11 +0100
-Message-ID: <1353665354-32178-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <2254742.168381353662862601.JavaMail.weblogic@epml01>
+References: <2254742.168381353662862601.JavaMail.weblogic@epml01>
+Date: Fri, 23 Nov 2012 11:54:02 +0200
+Message-ID: <CABBYNZ+-2YWROExMEoMxSfYTyXT1oeOpHjJECNs-xA7vtaAx_g@mail.gmail.com>
+Subject: Re: Query regarding device discovery
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jaganath <jaganath.k@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fix following compilation error on ARM.
+Hi,
 
-  CC     profiles/sap/sap-u8500.o
-profiles/sap/sap-u8500.c: In function recv_card_status:
-profiles/sap/sap-u8500.c:323:16: error: cast increases required
-	alignment of target type [-Werror=cast-align]
-profiles/sap/sap-u8500.c: In function recv_response:
-profiles/sap/sap-u8500.c:423:12: error: cast increases required
-	alignment of target type [-Werror=cast-align]
-cc1: all warnings being treated as errors
----
- profiles/sap/sap-u8500.c |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+On Fri, Nov 23, 2012 at 11:27 AM, JAGANATH KANAKKASSERY
+<jaganath.k@samsung.com> wrote:
+> Hello,
+>
+> I have a doubt with current discovery mechanism.
+>
+> Suppose application 1 calls "StartDiscovery". for which "Discovering = TRUE" comes
+> and then deviceFound signals starts coming.
+> In the mean time application 2 calls "StartDiscovery" which will be queued in BlueZ.
+> Then "discovering = FALSE" comes for the discovery initiated from application 1.
+> Then as per BlueZ design, it will restart discovery for application 1 since it has not
+> called "StopDiscovery" yet. So "discovering = TRUE" comes again, which application 2
+> thinks that it belongs to him.
+> Then if application 1 calls "StopDiscovery" immediately, discovery will be stopped
+> and "Discovering = FALSE" comes with which application 2 too thinks that discovery
+> initiated by him is also done.
+> So eventually application 2 will not get any devices.
+> So I think with current design, applications that are interested only in one complete
+> inquiry session will be in trouble.
+>
+> So can we disable the automatic reinitiating of device discovery?
+> Or is there any way to handle this scenario?
 
-diff --git a/profiles/sap/sap-u8500.c b/profiles/sap/sap-u8500.c
-index f07209d..b1aee57 100644
---- a/profiles/sap/sap-u8500.c
-+++ b/profiles/sap/sap-u8500.c
-@@ -313,16 +313,16 @@ static void recv_status(uint32_t status)
- 
- static void recv_card_status(uint32_t status, uint8_t *param)
- {
--	uint32_t *card_status;
-+	uint32_t card_status;
- 	uint8_t result;
- 	uint8_t iccrs;
- 
- 	if (status != STE_STATUS_OK)
- 		return;
- 
--	card_status = (uint32_t *)param;
-+	memcpy(&card_status, param, sizeof(card_status));
- 
--	if (get_sap_reader_status(*card_status, &iccrs) < 0)
-+	if (get_sap_reader_status(card_status, &iccrs) < 0)
- 		result = SAP_RESULT_ERROR_NO_REASON;
- 	else
- 		result = get_sap_result(STE_GET_STATUS_MSG, status);
-@@ -420,7 +420,7 @@ static void recv_response(struct ste_message *msg)
- 	}
- 
- 	param = msg->payload;
--	status = *(uint32_t *)param;
-+	memcpy(&status, param, sizeof(status));
- 	param += sizeof(status);
- 
- 	SAP_VDBG("status 0x%x", status);
--- 
-1.7.9.5
 
+StartDiscovery doesn't queue the sessions, it actually increase the
+reference to the same discovery session which became shared between
+the callers, it should not interfere with the ongoing discovery nor
+change how we emit Discovering. That being said the concept of one
+shot inquiry is flawed since it can miss devices, with addition of LE
+this is even more visible because each inquiry is only 5.12 sec., you
+can still detect when an inquiry is active just check when Discovering
+is TRUE and nope it should not matter if there is 1 or 20 application
+listening to it once Discovery switch to TRUE we are inquiring/scan
+when it switch to FALSE it has stopped and is probably doing name
+resolving.
+
+--
+Luiz Augusto von Dentz
