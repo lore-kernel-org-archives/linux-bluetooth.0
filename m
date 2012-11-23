@@ -1,37 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-To: Michael Knudsen <michaelknudsendk@gmail.com>
-Subject: Re: [PATCH 0/3] mgmt:  read supported codecs
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 4/4] sdpd-request: Fix build errors due to unaligned memory access
+Date: Fri, 23 Nov 2012 11:09:14 +0100
+Message-ID: <1353665354-32178-4-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1353665354-32178-1-git-send-email-szymon.janc@tieto.com>
+References: <1353665354-32178-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Fri, 23 Nov 2012 11:10:36 +0100
-From: Kim Schulz <kim@schulz.dk>
-Cc: <linux-bluetooth@vger.kernel.org>,
-	Michael Knudsen <m.knudsen@samsung.com>
-In-Reply-To: <1353588468-28711-1-git-send-email-m.knudsen@samsung.com>
-References: <1353588468-28711-1-git-send-email-m.knudsen@samsung.com>
-Message-ID: <1fa0fe72a57870c1ac3dbf97e54bca19@server1.devteam.dk>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Den 2012-11-22 13:47, Michael Knudsen skrev:
-> This implements the user space side of the read codecs command.
->
-> Michael Knudsen (3):
->   Bluetooth:  Add HCI Coding Format definitions
->   Bluetooth:  Support the read codecs operation
->   Doco:  List the read codecs operation
->
->  doc/mgmt-api.txt |   20 +++++++++++++++
->  lib/hci.h        |    9 +++++++
->  lib/mgmt.h       |    8 ++++++
->  tools/btmgmt.c   |   74
-> ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 111 insertions(+)
+This fix following compilation errors on ARM.
 
+  CC     src/bluetoothd-sdpd-request.o
+src/sdpd-request.c: In function ‘extract_des’:
+src/sdpd-request.c:186:17: error: cast increases required alignment of
+	target type [-Werror=cast-align]
+src/sdpd-request.c:186:17: error: cast increases required alignment of
+	target type [-Werror=cast-align]
+src/sdpd-request.c:210:17: error: cast increases required alignment of
+	target type [-Werror=cast-align]
+src/sdpd-request.c:210:17: error: cast increases required alignment of
+	target type [-Werror=cast-align]
+cc1: all warnings being treated as errors
+make[1]: *** [src/bluetoothd-sdpd-request.o] Error 1
+---
+ src/sdpd-request.c |   12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-
-Looks like the codein these patches have some indentation problems 
-(mixes tab and spaces).
+diff --git a/src/sdpd-request.c b/src/sdpd-request.c
+index 2af743e..a79efc7 100644
+--- a/src/sdpd-request.c
++++ b/src/sdpd-request.c
+@@ -182,8 +182,12 @@ static int extract_des(uint8_t *buf, int len, sdp_list_t **svcReqSeq, uint8_t *p
+ 				aid->uint16 = bt_get_be16(p);
+ 				pElem = (char *) aid;
+ 			} else {
++				uint16_t tmp;
++
++				memcpy(&tmp, p, sizeof(tmp));
++
+ 				pElem = malloc(sizeof(uint16_t));
+-				bt_put_be16(bt_get_unaligned((uint16_t *)p), pElem);
++				bt_put_be16(tmp, pElem);
+ 			}
+ 			p += sizeof(uint16_t);
+ 			seqlen += sizeof(uint16_t);
+@@ -206,8 +210,12 @@ static int extract_des(uint8_t *buf, int len, sdp_list_t **svcReqSeq, uint8_t *p
+ 
+ 				pElem = (char *) aid;
+ 			} else {
++				uint32_t tmp;
++
++				memcpy(&tmp, p, sizeof(tmp));
++
+ 				pElem = malloc(sizeof(uint32_t));
+-				bt_put_be32(bt_get_unaligned((uint32_t *)p), pElem);
++				bt_put_be32(tmp, pElem);
+ 			}
+ 			p += sizeof(uint32_t);
+ 			seqlen += sizeof(uint32_t);
 -- 
-Kim Schulz
+1.7.9.5
+
