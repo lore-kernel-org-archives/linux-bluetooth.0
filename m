@@ -1,42 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Bluefrog" <bluefrog2012@gmail.com>
-To: "'Deepthi'" <deepthi.pv@globaledgesoft.com>,
-	<linux-bluetooth@vger.kernel.org>
-References: <50AB739F.4080202@globaledgesoft.com>
-In-Reply-To: <50AB739F.4080202@globaledgesoft.com>
-Subject: RE: Sco issue:iogear dongle
-Date: Sun, 25 Nov 2012 19:07:12 +0800
-Message-ID: <0ba001cdcafd$09279ca0$1b76d5e0$@gmail.com>
+Date: Fri, 23 Nov 2012 23:28:48 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/2] hog: Fix potencial segfault when sending a
+ output report
+Message-ID: <20121123212848.GA5061@x220.P-661HNU-F1>
+References: <1353697709-6497-1-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="gb2312"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1353697709-6497-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Well, firstly, u should provide HCIDump log, with "-X -t" option. 
+Hi Vinicius,
 
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org
-[mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Deepthi
-Sent: 2012Äê11ÔÂ20ÈÕ 20:12
-To: linux-bluetooth@vger.kernel.org
-Subject: Sco issue:iogear dongle
+On Fri, Nov 23, 2012, Vinicius Costa Gomes wrote:
+> As UHID is not notified when the device is disconnected, it may be
+> possible that an output report is forwarded when the device is not
+> connected, one example, would be when the caps lock key is pressed on
+> another keyboard.
+> ---
+>  profiles/input/hog_device.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-Hello,
+Both patches have been applied. Thanks.
 
-I 'm   facing an issue regarding the sco data transfer in iogear dongle 
-4.0 in linux-3.2.5 kernel version. sco is connected with sco handle as 1,
-but i could see  no sco data transfer .
-
-Please help,
-
-
---
-Thanks & Regards,
-Deepthi Elizabeth P V
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in the body of a message to majordomo@vger.kernel.org More majordomo info at
-http://vger.kernel.org/majordomo-info.html
-
+Johan
