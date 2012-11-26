@@ -1,32 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 26 Nov 2012 13:56:46 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Michael Knudsen <michaelknudsendk@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Michael Knudsen <m.knudsen@samsung.com>
-Subject: Re: [PATCH v2 0/3] mgmt:  read supported codecs
-Message-ID: <20121126115646.GA27165@x220>
-References: <1353679170-3738-1-git-send-email-m.knudsen@samsung.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 2/2] formfactor: Remove not needed empty remove callback
+Date: Mon, 26 Nov 2012 12:48:44 +0100
+Message-ID: <1353930524-22701-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1353930524-22701-1-git-send-email-szymon.janc@tieto.com>
+References: <1353930524-22701-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1353679170-3738-1-git-send-email-m.knudsen@samsung.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+Remove callback is called only if it is not NULL so there is no need to
+register empty callback function.
+---
+ plugins/formfactor.c |    5 -----
+ 1 file changed, 5 deletions(-)
 
-On Fri, Nov 23, 2012, Michael Knudsen wrote:
->   Bluetooth:  Add HCI Coding Format definitions
->   Bluetooth:  Support the read codecs operation
+diff --git a/plugins/formfactor.c b/plugins/formfactor.c
+index 0e19ac6..1978f03 100644
+--- a/plugins/formfactor.c
++++ b/plugins/formfactor.c
+@@ -124,14 +124,9 @@ static int formfactor_probe(struct btd_adapter *adapter)
+ 	return 0;
+ }
+ 
+-static void formfactor_remove(struct btd_adapter *adapter)
+-{
+-}
+-
+ static struct btd_adapter_driver formfactor_driver = {
+ 	.name	= "formfactor",
+ 	.probe	= formfactor_probe,
+-	.remove	= formfactor_remove,
+ };
+ 
+ static int formfactor_init(void)
+-- 
+1.7.9.5
 
-Since these are user space patches they should not be prefixed with
-"Bluetooth". Also please just use one space after the colon. The
-appropriate prefix for the first patch would be "lib" and for the second
-one "mgmt".
-
->   Doco:  List the read codecs operation
-
-The prefix should be "doc". And please remove the double spaces here as
-well.
-
-Johan
