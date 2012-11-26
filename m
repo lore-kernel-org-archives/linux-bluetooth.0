@@ -1,36 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 26 Nov 2012 11:11:08 -0500 (EST)
-From: Alan Stern <stern@rowland.harvard.edu>
-To: naveen yadav <yad.naveen@gmail.com>
-cc: linux-kernel@vger.kernel.org, <linux-usb@vger.kernel.org>,
-	<marcel@holtmann.org>, <padovan@profusion.mobi>,
-	<linux-bluetooth@vger.kernel.org>,
-	vivek bhagat <vivek.bhagat89@gmail.com>
-Subject: Re: USB 2.0: No giveback comes for one submitted URB
-In-Reply-To: <CAJ8eaTxC1EiTwn-KSjW32WKi-4LsVt0YPrTn+xjtYEA9h0Dgdg@mail.gmail.com>
-Message-ID: <Pine.LNX.4.44L0.1211261109360.2168-100000@iolanthe.rowland.org>
+Date: Mon, 26 Nov 2012 16:43:53 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 01/11] audio: Remove AudioSink interface
+Message-ID: <20121126144353.GA7319@x220>
+References: <1353935362-8666-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1353935362-8666-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 26 Nov 2012, naveen yadav wrote:
+Hi Luiz,
 
-> Dear Alan,
-> 
-> Thanks for your reply ,
-> 
-> We check on 3.2.34 and 3.6.7 on X86 host machine. and result is same
-> without connecting Bluetooth device.
-> I am attaching log
+On Mon, Nov 26, 2012, Luiz Augusto von Dentz wrote:
+> This interface is no longer needed as Device interface can now connect
+> the profiles and the state can be tracked using MediaTransport interface.
+> ---
+>  doc/audio-api.txt     |  53 -------------------
+>  profiles/audio/sink.c | 141 ++------------------------------------------------
+>  2 files changed, 3 insertions(+), 191 deletions(-)
 
-Yes, very good.  But you still have to do what I mentioned in my
-earlier email:
+All patches in this set have been applied. Thanks.
 
-> On Thu, Nov 22, 2012 at 9:08 PM, Alan Stern <stern@rowland.harvard.edu> wrote:
-
-> > Now you need to find out what other code has changed urb->use_count and
-> > fix it.
-
-Alan Stern
-
+Johan
