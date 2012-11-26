@@ -1,40 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 1/2] adaptername: Remove not needed empty remove callback
-Date: Mon, 26 Nov 2012 12:48:43 +0100
-Message-ID: <1353930524-22701-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1353926791-8769-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1353926791-8769-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Mon, 26 Nov 2012 13:40:14 +0200
+Message-ID: <CABBYNZKqKYocn48dNMACddq+a6SfS7pddo2eLRc9Fy3FBUJoug@mail.gmail.com>
+Subject: Re: [RFC] doc: Split media transport volume into two parts
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remove callback is called only if it is not NULL so there is no need to
-register empty callback function.
----
- plugins/adaptername.c |    5 -----
- 1 file changed, 5 deletions(-)
+Hi Mikel,
 
-diff --git a/plugins/adaptername.c b/plugins/adaptername.c
-index 353f11c..2013b7b 100644
---- a/plugins/adaptername.c
-+++ b/plugins/adaptername.c
-@@ -261,14 +261,9 @@ fail:
- 	return FALSE;
- }
- 
--static void adaptername_remove(struct btd_adapter *adapter)
--{
--}
--
- static struct btd_adapter_driver adaptername_driver = {
- 	.name	= "adaptername",
- 	.probe	= adaptername_probe,
--	.remove	= adaptername_remove,
- };
- 
- static int adaptername_init(void)
--- 
-1.7.9.5
+On Mon, Nov 26, 2012 at 12:46 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>
+> Separate the input and output audio volumes in two independent
+> properties in order to control both speaker and microphone gains while
+> doing HSP/HFP.
+> ---
+> This property was introduced quite recently but never implemented. Shouldn't we split it into two separate properties?
+>
+> It wouldn't do much harm for the A2DP transports and it would be needed for HSP/HFP.
+>
+>  doc/media-api.txt | 16 ++++++++++++----
+>  1 file changed, 12 insertions(+), 4 deletions(-)
+>
+> diff --git a/doc/media-api.txt b/doc/media-api.txt
+> index b4f2fc6..6515e5f 100644
+> --- a/doc/media-api.txt
+> +++ b/doc/media-api.txt
+> @@ -375,10 +375,18 @@ Properties        object Device [readonly]
+>
+>                         Possible Values: "HCI" or "PCM"
+>
+> -               uint16 Volume [readwrite]
+> +               uint16 InputVolume [readwrite] [optional]
+>
+> -                       Optional. Indicates volume level of the transport,
+> -                       this property is only writeable when the transport was
+> -                       acquired by the sender.
+> +                       Indicates volume level of the transport's incoming
+> +                       audio stream, if any. This property is only writeable
+> +                       when the transport was acquired by the sender.
+> +
+> +                       Possible Values: 0-127
+> +
+> +               uint16 OutputVolume [readwrite] [optional]
+> +
+> +                       Indicates volume level of the transport's outgoing
+> +                       audio stream, if any. This property is only writeable
+> +                       when the transport was acquired by the sender.
+>
+>                         Possible Values: 0-127
+> --
+> 1.7.11.7
 
+We could do this way or have specific property for each profile, e.g.
+SpeakerGain/MicrophoneGain for HFP, because the scale is different
+(0-15). If we do this generic then I think the value should be a
+percentage (0-100%), iirc companies have some table mapping the volume
+level to percentage due to volume not being linear but I guess we can
+came up with something similar.
+
+
+--
+Luiz Augusto von Dentz
