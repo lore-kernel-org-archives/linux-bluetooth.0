@@ -1,53 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.von.dentz@intel.com, Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC] doc: Split media transport volume into two parts
-Date: Mon, 26 Nov 2012 11:46:31 +0100
-Message-Id: <1353926791-8769-1-git-send-email-mikel.astiz.oss@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 1/5] service: Fix not unreferencing adapter in case of error
+Date: Mon, 26 Nov 2012 10:07:36 +0100
+Message-ID: <1353920860-14912-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
-
-Separate the input and output audio volumes in two independent
-properties in order to control both speaker and microphone gains while
-doing HSP/HFP.
+If g_dbus_register_interface failed adapter reference was not dropped.
+Move getting reference after succesful g_dbus_register_interface call.
 ---
-This property was introduced quite recently but never implemented. Shouldn't we split it into two separate properties?
+ plugins/service.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-It wouldn't do much harm for the A2DP transports and it would be needed for HSP/HFP.
-
- doc/media-api.txt | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
-
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index b4f2fc6..6515e5f 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -375,10 +375,18 @@ Properties	object Device [readonly]
+diff --git a/plugins/service.c b/plugins/service.c
+index ba7a693..d70c515 100644
+--- a/plugins/service.c
++++ b/plugins/service.c
+@@ -509,9 +509,6 @@ static int register_interface(const char *path, struct btd_adapter *adapter)
+ 	if (serv_adapter == NULL)
+ 		return -ENOMEM;
  
- 			Possible Values: "HCI" or "PCM"
+-	if (adapter != NULL)
+-		serv_adapter->adapter = btd_adapter_ref(adapter);
+-
+ 	serv_adapter->pending_list = NULL;
  
--		uint16 Volume [readwrite]
-+		uint16 InputVolume [readwrite] [optional]
- 
--			Optional. Indicates volume level of the transport,
--			this property is only writeable when the transport was
--			acquired by the sender.
-+			Indicates volume level of the transport's incoming
-+			audio stream, if any. This property is only writeable
-+			when the transport was acquired by the sender.
+ 	if (g_dbus_register_interface(btd_get_dbus_connection(),
+@@ -520,13 +517,16 @@ static int register_interface(const char *path, struct btd_adapter *adapter)
+ 						path_unregister) == FALSE) {
+ 		error("D-Bus failed to register %s interface",
+ 							SERVICE_INTERFACE);
 +
-+			Possible Values: 0-127
-+
-+		uint16 OutputVolume [readwrite] [optional]
-+
-+			Indicates volume level of the transport's outgoing
-+			audio stream, if any. This property is only writeable
-+			when the transport was acquired by the sender.
+ 		g_free(serv_adapter);
+ 		return -EIO;
+ 	}
  
- 			Possible Values: 0-127
+ 	DBG("Registered interface %s on path %s", SERVICE_INTERFACE, path);
+ 
+-	if (serv_adapter->adapter == NULL)
++	if (adapter != NULL)
++		serv_adapter->adapter = btd_adapter_ref(adapter);
++	else
+ 		serv_adapter_any = serv_adapter;
+ 
+ 	return 0;
 -- 
-1.7.11.7
+1.7.9.5
 
