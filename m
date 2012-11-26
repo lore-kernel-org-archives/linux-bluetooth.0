@@ -1,72 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 26 Nov 2012 13:26:15 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 4/5] adaptername: Remove not needed empty remove callback
+Message-ID: <20121126112615.GA25303@x220>
+References: <1353920860-14912-1-git-send-email-szymon.janc@tieto.com>
+ <1353920860-14912-4-git-send-email-szymon.janc@tieto.com>
+ <CAJdJm_OLsmmxvLddeT2T=Xg427=ADNNdmfSRre5+jB-inTiGBw@mail.gmail.com>
+ <7243377.vN3q5Zuh5I@uw000953>
 MIME-Version: 1.0
-In-Reply-To: <1353926791-8769-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1353926791-8769-1-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Mon, 26 Nov 2012 13:40:14 +0200
-Message-ID: <CABBYNZKqKYocn48dNMACddq+a6SfS7pddo2eLRc9Fy3FBUJoug@mail.gmail.com>
-Subject: Re: [RFC] doc: Split media transport volume into two parts
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <7243377.vN3q5Zuh5I@uw000953>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Szymon,
 
-On Mon, Nov 26, 2012 at 12:46 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> Separate the input and output audio volumes in two independent
-> properties in order to control both speaker and microphone gains while
-> doing HSP/HFP.
-> ---
-> This property was introduced quite recently but never implemented. Shouldn't we split it into two separate properties?
->
-> It wouldn't do much harm for the A2DP transports and it would be needed for HSP/HFP.
->
->  doc/media-api.txt | 16 ++++++++++++----
->  1 file changed, 12 insertions(+), 4 deletions(-)
->
-> diff --git a/doc/media-api.txt b/doc/media-api.txt
-> index b4f2fc6..6515e5f 100644
-> --- a/doc/media-api.txt
-> +++ b/doc/media-api.txt
-> @@ -375,10 +375,18 @@ Properties        object Device [readonly]
->
->                         Possible Values: "HCI" or "PCM"
->
-> -               uint16 Volume [readwrite]
-> +               uint16 InputVolume [readwrite] [optional]
->
-> -                       Optional. Indicates volume level of the transport,
-> -                       this property is only writeable when the transport was
-> -                       acquired by the sender.
-> +                       Indicates volume level of the transport's incoming
-> +                       audio stream, if any. This property is only writeable
-> +                       when the transport was acquired by the sender.
-> +
-> +                       Possible Values: 0-127
-> +
-> +               uint16 OutputVolume [readwrite] [optional]
-> +
-> +                       Indicates volume level of the transport's outgoing
-> +                       audio stream, if any. This property is only writeable
-> +                       when the transport was acquired by the sender.
->
->                         Possible Values: 0-127
-> --
-> 1.7.11.7
+On Mon, Nov 26, 2012, Szymon Janc wrote:
+> On Monday 26 of November 2012 12:45:30 Anderson Lizardo wrote:
+> > Hi Szymon,
+> 
+> Hi Anderson,
+> 
+> > 
+> > On Mon, Nov 26, 2012 at 5:07 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> > >  static struct btd_adapter_driver adaptername_driver = {
+> > >         .name   = "adaptername",
+> > >         .probe  = adaptername_probe,
+> > > -       .remove = adaptername_remove,
+> > > +       .remove = NULL,
+> > >  };
+> > 
+> > This variable is static, so not explicitly initialized members will be NULL.
+> 
+> Yes, yet according to code style for bluez statics should be initialized
+> explicitly, right? Or this does not count for struct members?
 
-We could do this way or have specific property for each profile, e.g.
-SpeakerGain/MicrophoneGain for HFP, because the scale is different
-(0-15). If we do this generic then I think the value should be a
-percentage (0-100%), iirc companies have some table mapping the volume
-level to percentage due to volume not being linear but I guess we can
-came up with something similar.
+I've left this out for struct members at least in new code so I'd say
+that it's not needed.
 
-
---
-Luiz Augusto von Dentz
+Johan
