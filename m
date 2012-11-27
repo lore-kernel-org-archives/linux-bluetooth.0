@@ -1,46 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Nov 2012 13:03:32 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 7/7] event: Store link key infos in new keys file
-Message-ID: <20121127110332.GA23883@x220>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 7/7] event: Store link key infos in new keys file
+Date: Tue, 27 Nov 2012 09:49:53 +0100
+Message-Id: <1354006193-7199-7-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1354006193-7199-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1354006193-7199-1-git-send-email-frederic.danis@linux.intel.com>
- <1354006193-7199-7-git-send-email-frederic.danis@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1354006193-7199-7-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frederic,
+---
+ src/event.c |   59 +++++++++++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 47 insertions(+), 12 deletions(-)
 
-On Tue, Nov 27, 2012, Frédéric Danis wrote:
-> ---
->  src/event.c |   59 +++++++++++++++++++++++++++++++++++++++++++++++------------
->  1 file changed, 47 insertions(+), 12 deletions(-)
+diff --git a/src/event.c b/src/event.c
+index 7fc8f02..59da740 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -354,33 +354,68 @@ static int store_longtermkey(bdaddr_t *local, bdaddr_t *peer,
+ 	return err;
+ }
+ 
++static void store_link_key(struct btd_adapter *adapter,
++				struct btd_device *device, uint8_t *key,
++				uint8_t type, uint8_t pin_length)
++{
++	char adapter_addr[18];
++	char device_addr[18];
++	char filename[PATH_MAX + 1];
++	GKeyFile *key_file;
++	char key_str[35];
++	char *str;
++	int i;
++	gsize length = 0;
++
++	ba2str(adapter_get_address(adapter), adapter_addr);
++	ba2str(device_get_address(device), device_addr);
++
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/keys", adapter_addr,
++								device_addr);
++	filename[PATH_MAX] = '\0';
++
++	key_file = g_key_file_new();
++	g_key_file_load_from_file(key_file, filename, 0, NULL);
++
++	key_str[0] = '0';
++	key_str[1] = 'x';
++	for (i = 0; i < 16; i++)
++		sprintf(key_str + 2 + (i * 2), "%2.2X", key[i]);
++
++	g_key_file_set_string(key_file, "LinkKey", "Key", key_str);
++
++	g_key_file_set_integer(key_file, "LinkKey", "Type", type);
++	g_key_file_set_integer(key_file, "LinkKey", "PINLength", pin_length);
++
++	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
++
++	str = g_key_file_to_data(key_file, &length, NULL);
++	g_file_set_contents(filename, str, length, NULL);
++	g_free(str);
++
++	g_key_file_free(key_file);
++}
++
+ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
+ 				uint8_t *key, uint8_t key_type,
+ 				uint8_t pin_length)
+ {
+ 	struct btd_adapter *adapter;
+ 	struct btd_device *device;
+-	uint8_t peer_type;
+-	int ret;
+ 
+ 	if (!get_adapter_and_device(local, peer, &adapter, &device, TRUE))
+ 		return -ENODEV;
+ 
+ 	DBG("storing link key of type 0x%02x", key_type);
+ 
+-	peer_type = device_get_addr_type(device);
++	store_link_key(adapter, device, key, key_type, pin_length);
+ 
+-	ret = write_link_key(local, peer, peer_type, key, key_type,
+-								pin_length);
++	device_set_bonded(device, TRUE);
+ 
+-	if (ret == 0) {
+-		device_set_bonded(device, TRUE);
+-
+-		if (device_is_temporary(device))
+-			device_set_temporary(device, FALSE);
+-	}
++	if (device_is_temporary(device))
++		device_set_temporary(device, FALSE);
+ 
+-	return ret;
++	return 0;
+ }
+ 
+ int btd_event_ltk_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
+-- 
+1.7.9.5
 
-After these patches there's the following leak:
-
-==23252== 32,808 bytes in 1 blocks are definitely lost in loss record 210 of 210
-==23252==    at 0x4A0883C: malloc (vg_replace_malloc.c:270)
-==23252==    by 0x565E25F: __alloc_dir (opendir.c:199)
-==23252==    by 0x175382: load_devices (adapter.c:2005)
-==23252==    by 0x178E50: adapter_init (adapter.c:2896)
-==23252==    by 0x17391E: btd_manager_register_adapter (manager.c:334)
-==23252==    by 0x1883E1: mgmt_event.part.36 (mgmt.c:1081)
-==23252==    by 0x4C78A74: g_main_context_dispatch (gmain.c:2715)
-==23252==    by 0x4C78DA7: g_main_context_iterate.isra.24 (gmain.c:3290)
-==23252==    by 0x4C791A1: g_main_loop_run (gmain.c:3484)
-==23252==    by 0x121640: main (main.c:544)
-
-That seems to be simple missing closedir() call. Didn't I already tell
-you to always use valgrind?
-
-Another problem with these is that I'm getting over a hundred unexpected
-device objects which I didn't have before. It seems that this is because
-you convert the classes file into the device storage instead of the
-cache. It might be due to some other info as well though.
-
-Johan
