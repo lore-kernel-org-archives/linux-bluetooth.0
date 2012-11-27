@@ -1,75 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/6] gdbus: Add g_dbus_add_properties_watch function
-Date: Tue, 27 Nov 2012 14:51:20 +0200
-Message-Id: <1354020685-17028-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 27 Nov 2012 13:12:41 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Arnaud Mouiche <arnaud.mouiche@invoxia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: eSCO latency configuration
+Message-ID: <20121127111241.GA24125@x220>
+References: <4E64AD1D.6000609@invoxia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4E64AD1D.6000609@invoxia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Arnaud,
 
-Convenient function to create watches for D-Bus properties.
----
- gdbus/gdbus.h |  5 +++++
- gdbus/watch.c | 28 ++++++++++++++++++++++++++++
- 2 files changed, 33 insertions(+)
+On Mon, Sep 05, 2011, Arnaud Mouiche wrote:
+> What could be a way to add the feature without breaking any API
+> 1) use the MTU of the socket or hdev ?
+> 2) add hdev entry for sco latency (which can be configured with
+> hciconfig like voice settings)
+> 3) something else ...
+> or
+> 4) no one cares about latency...
+> 
+> PS: the same way, the retransmit effort is not configurable today.
 
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index ba49621..8b6dfe5 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -243,6 +243,11 @@ guint g_dbus_add_signal_watch(DBusConnection *connection,
- 				const char *interface, const char *member,
- 				GDBusSignalFunction function, void *user_data,
- 				GDBusDestroyFunction destroy);
-+guint g_dbus_add_properties_watch(DBusConnection *connection,
-+				const char *sender, const char *path,
-+				const char *interface,
-+				GDBusSignalFunction function, void *user_data,
-+				GDBusDestroyFunction destroy);
- gboolean g_dbus_remove_watch(DBusConnection *connection, guint tag);
- void g_dbus_remove_all_watches(DBusConnection *connection);
- 
-diff --git a/gdbus/watch.c b/gdbus/watch.c
-index 1cd1211..9e4f994 100644
---- a/gdbus/watch.c
-+++ b/gdbus/watch.c
-@@ -752,6 +752,34 @@ guint g_dbus_add_signal_watch(DBusConnection *connection,
- 	return cb->id;
- }
- 
-+guint g_dbus_add_properties_watch(DBusConnection *connection,
-+				const char *sender, const char *path,
-+				const char *interface,
-+				GDBusSignalFunction function, void *user_data,
-+				GDBusDestroyFunction destroy)
-+{
-+	struct filter_data *data;
-+	struct filter_callback *cb;
-+
-+	data = filter_data_get(connection, signal_filter, sender, path,
-+				DBUS_INTERFACE_PROPERTIES, "PropertiesChanged",
-+				interface);
-+	if (data == NULL)
-+		return 0;
-+
-+	cb = filter_data_add_callback(data, NULL, NULL, function, destroy,
-+					user_data);
-+	if (cb == NULL)
-+		return 0;
-+
-+	if (data->name != NULL && data->name_watch == 0)
-+		data->name_watch = g_dbus_add_service_watch(connection,
-+							data->name, NULL,
-+							NULL, NULL, NULL);
-+
-+	return cb->id;
-+}
-+
- gboolean g_dbus_remove_watch(DBusConnection *connection, guint id)
- {
- 	struct filter_data *data;
--- 
-1.7.11.7
+I'm assuming this is for HFP or HSP? At least I'm not aware of other
+significant profiles using (e)SCO. Since the HFP specification defines a
+set of recommended parameter combinations I don't think we necessarily
+need any user-space facing interface for this (with the exception of the
+mSBC/CVSD codec selection which is needed for HFP 1.6).
 
+Instead, the kernel could simply start with the S3 settings and fall
+back to S2 and finally S1 if failures are encountered during the
+connection setup. For mSBC the starting point would be T2 with a
+fallback to T1 in case of failure. Do you agree that this would be an
+acceptable solution?
+
+Johan
