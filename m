@@ -2,104 +2,198 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 7/7] event: Store link key infos in new keys file
-Date: Tue, 27 Nov 2012 09:49:53 +0100
-Message-Id: <1354006193-7199-7-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH 6/7] adapter: Upload link keys from new storage
+Date: Tue, 27 Nov 2012 09:49:52 +0100
+Message-Id: <1354006193-7199-6-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1354006193-7199-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1354006193-7199-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Remove read_link_key() from device_create, this moves to load_devices.
 ---
- src/event.c |   59 +++++++++++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 47 insertions(+), 12 deletions(-)
+ src/adapter.c |  109 +++++++++++++++++++++++++--------------------------------
+ src/device.c  |    6 ----
+ 2 files changed, 48 insertions(+), 67 deletions(-)
 
-diff --git a/src/event.c b/src/event.c
-index 7fc8f02..59da740 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -354,33 +354,68 @@ static int store_longtermkey(bdaddr_t *local, bdaddr_t *peer,
- 	return err;
+diff --git a/src/adapter.c b/src/adapter.c
+index 32d3930..d473508 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1765,31 +1765,35 @@ static int str2buf(const char *str, uint8_t *buf, size_t blen)
+ 	return 0;
  }
  
-+static void store_link_key(struct btd_adapter *adapter,
-+				struct btd_device *device, uint8_t *key,
-+				uint8_t type, uint8_t pin_length)
-+{
-+	char adapter_addr[18];
-+	char device_addr[18];
+-static struct link_key_info *get_key_info(const char *addr, const char *value)
++static struct link_key_info *get_key_info(const char *local,
++						const char *peer)
+ {
+-	struct link_key_info *info;
+-	char tmp[3];
+-	long int l;
++	struct link_key_info *info = NULL;
 +	char filename[PATH_MAX + 1];
 +	GKeyFile *key_file;
-+	char key_str[35];
 +	char *str;
-+	int i;
-+	gsize length = 0;
-+
-+	ba2str(adapter_get_address(adapter), adapter_addr);
-+	ba2str(device_get_address(device), device_addr);
-+
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/keys", adapter_addr,
-+								device_addr);
-+	filename[PATH_MAX] = '\0';
-+
+ 
+-	if (strlen(value) < 36) {
+-		error("Unexpectedly short (%zu) link key line", strlen(value));
+-		return NULL;
+-	}
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/keys", local, peer);
+ 
+-	info = g_new0(struct link_key_info, 1);
 +	key_file = g_key_file_new();
 +	g_key_file_load_from_file(key_file, filename, 0, NULL);
+ 
+-	str2ba(addr, &info->bdaddr);
++	str = g_key_file_get_string(key_file, "LinkKey", "Key", NULL);
++	if (!str || strlen(str) != 34)
++		goto failed;
+ 
+-	str2buf(value, info->key, sizeof(info->key));
++	info = g_new0(struct link_key_info, 1);
 +
-+	key_str[0] = '0';
-+	key_str[1] = 'x';
-+	for (i = 0; i < 16; i++)
-+		sprintf(key_str + 2 + (i * 2), "%2.2X", key[i]);
-+
-+	g_key_file_set_string(key_file, "LinkKey", "Key", key_str);
-+
-+	g_key_file_set_integer(key_file, "LinkKey", "Type", type);
-+	g_key_file_set_integer(key_file, "LinkKey", "PINLength", pin_length);
-+
-+	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-+
-+	str = g_key_file_to_data(key_file, &length, NULL);
-+	g_file_set_contents(filename, str, length, NULL);
++	str2ba(peer, &info->bdaddr);
++	str2buf(&str[2], info->key, sizeof(info->key));
+ 
+-	memcpy(tmp, value + 33, 2);
+-	info->type = (uint8_t) strtol(tmp, NULL, 10);
++	info->type = g_key_file_get_integer(key_file, "LinkKey", "Type", NULL);
++	info->pin_len = g_key_file_get_integer(key_file, "LinkKey", "PINLength",
++						NULL);
+ 
+-	memcpy(tmp, value + 35, 2);
+-	l = strtol(tmp, NULL, 10);
+-	if (l < 0)
+-		l = 0;
+-	info->pin_len = l;
++failed:
 +	g_free(str);
-+
 +	g_key_file_free(key_file);
-+}
-+
- int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
- 				uint8_t *key, uint8_t key_type,
- 				uint8_t pin_length)
- {
- 	struct btd_adapter *adapter;
- 	struct btd_device *device;
--	uint8_t peer_type;
--	int ret;
  
- 	if (!get_adapter_and_device(local, peer, &adapter, &device, TRUE))
- 		return -ENODEV;
- 
- 	DBG("storing link key of type 0x%02x", key_type);
- 
--	peer_type = device_get_addr_type(device);
-+	store_link_key(adapter, device, key, key_type, pin_length);
- 
--	ret = write_link_key(local, peer, peer_type, key, key_type,
--								pin_length);
-+	device_set_bonded(device, TRUE);
- 
--	if (ret == 0) {
--		device_set_bonded(device, TRUE);
--
--		if (device_is_temporary(device))
--			device_set_temporary(device, FALSE);
--	}
-+	if (device_is_temporary(device))
-+		device_set_temporary(device, FALSE);
- 
--	return ret;
-+	return 0;
+ 	return info;
+ }
+@@ -1830,34 +1834,6 @@ static struct smp_ltk_info *get_ltk_info(const char *addr, uint8_t bdaddr_type,
+ 	return ltk;
  }
  
- int btd_event_ltk_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
+-static void create_stored_device_from_linkkeys(char *key, char *value,
+-							void *user_data)
+-{
+-	char address[18];
+-	uint8_t bdaddr_type;
+-	struct adapter_keys *keys = user_data;
+-	struct btd_adapter *adapter = keys->adapter;
+-	struct btd_device *device;
+-	struct link_key_info *info;
+-
+-	if (sscanf(key, "%17s#%hhu", address, &bdaddr_type) < 2)
+-		bdaddr_type = BDADDR_BREDR;
+-
+-	info = get_key_info(address, value);
+-	if (info)
+-		keys->keys = g_slist_append(keys->keys, info);
+-
+-	if (g_slist_find_custom(adapter->devices, address,
+-					(GCompareFunc) device_address_cmp))
+-		return;
+-
+-	device = device_create(adapter, address, bdaddr_type);
+-	if (device) {
+-		device_set_temporary(device, FALSE);
+-		adapter->devices = g_slist_append(adapter->devices, device);
+-	}
+-}
+-
+ static void create_stored_device_from_ltks(char *key, char *value,
+ 							void *user_data)
+ {
+@@ -2010,18 +1986,6 @@ static void load_devices(struct btd_adapter *adapter)
+ 	textfile_foreach(filename, create_stored_device_from_primaries,
+ 								adapter);
+ 
+-	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "linkkeys");
+-	textfile_foreach(filename, create_stored_device_from_linkkeys, &keys);
+-
+-	err = mgmt_load_link_keys(adapter->dev_id, keys.keys,
+-							main_opts.debug_keys);
+-	if (err < 0)
+-		error("Unable to load link keys: %s (%d)",
+-							strerror(-err), -err);
+-
+-	g_slist_free_full(keys.keys, g_free);
+-	keys.keys = NULL;
+-
+ 	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "longtermkeys");
+ 	textfile_foreach(filename, create_stored_device_from_ltks, &keys);
+ 
+@@ -2046,13 +2010,22 @@ static void load_devices(struct btd_adapter *adapter)
+ 
+ 	while ((entry = readdir(dir)) != NULL) {
+ 		struct btd_device *device;
++		struct link_key_info *key_info;
++		GSList *l;
+ 
+ 		if (entry->d_type != DT_DIR || bachk(entry->d_name) < 0)
+ 			continue;
+ 
+-		if (g_slist_find_custom(adapter->devices, entry->d_name,
+-					(GCompareFunc) device_address_cmp))
+-			continue;
++		key_info = get_key_info(srcaddr, entry->d_name);
++		if (key_info)
++			keys.keys = g_slist_append(keys.keys, key_info);
++
++		l = g_slist_find_custom(adapter->devices, entry->d_name,
++					(GCompareFunc) device_address_cmp);
++		if (l) {
++			device = l->data;
++			goto device_exist;
++		}
+ 
+ 		device = device_create(adapter, entry->d_name, BDADDR_BREDR);
+ 		if (!device)
+@@ -2060,7 +2033,21 @@ static void load_devices(struct btd_adapter *adapter)
+ 
+ 		device_set_temporary(device, FALSE);
+ 		adapter->devices = g_slist_append(adapter->devices, device);
++
++device_exist:
++		if (key_info) {
++			device_set_paired(device, TRUE);
++			device_set_bonded(device, TRUE);
++		}
+ 	}
++
++	err = mgmt_load_link_keys(adapter->dev_id, keys.keys,
++							main_opts.debug_keys);
++	if (err < 0)
++		error("Unable to load link keys: %s (%d)",
++							strerror(-err), -err);
++
++	g_slist_free_full(keys.keys, g_free);
+ }
+ 
+ int btd_adapter_block_address(struct btd_adapter *adapter,
+diff --git a/src/device.c b/src/device.c
+index 6b64c5d..d6780ee 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1897,12 +1897,6 @@ struct btd_device *device_create(struct btd_adapter *adapter,
+ 
+ 	load_info(device, srcaddr, address);
+ 
+-	if (read_link_key(src, &device->bdaddr, device->bdaddr_type, NULL,
+-								NULL) == 0) {
+-		device_set_paired(device, TRUE);
+-		device_set_bonded(device, TRUE);
+-	}
+-
+ 	if (device_is_le(device) && has_longtermkeys(src, &device->bdaddr,
+ 							device->bdaddr_type)) {
+ 		device_set_paired(device, TRUE);
 -- 
 1.7.9.5
 
