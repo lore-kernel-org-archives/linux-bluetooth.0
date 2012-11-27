@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 6/6] test: Convert simple-player to use DBus properties interface
-Date: Tue, 27 Nov 2012 14:51:25 +0200
-Message-Id: <1354020685-17028-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 5/6] test: Convert mpris-player to use DBus properties interface
+Date: Tue, 27 Nov 2012 14:51:24 +0200
+Message-Id: <1354020685-17028-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1354020685-17028-1-git-send-email-luiz.dentz@gmail.com>
 References: <1354020685-17028-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,89 +12,91 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- test/simple-player | 40 ++++++++++++++++++++++------------------
- 1 file changed, 22 insertions(+), 18 deletions(-)
+ test/mpris-player.c | 32 +++++++++++++++++++++++---------
+ 1 file changed, 23 insertions(+), 9 deletions(-)
 
-diff --git a/test/simple-player b/test/simple-player
-index 9e72f3e..0037f3a 100755
---- a/test/simple-player
-+++ b/test/simple-player
-@@ -17,14 +17,16 @@ class Player(dbus.service.Object):
- 			bus = dbus.SystemBus()
- 			mp = dbus.Interface(bus.get_object("org.bluez", obj),
- 						"org.bluez.MediaPlayer")
-+			prop = dbus.Interface(bus.get_object("org.bluez", obj),
-+						"org.freedesktop.DBus.Properties")
+diff --git a/test/mpris-player.c b/test/mpris-player.c
+index 13f5c85..7985cdd 100644
+--- a/test/mpris-player.c
++++ b/test/mpris-player.c
+@@ -114,17 +114,18 @@ static void dict_append_entry(DBusMessageIter *dict, const char *key, int type,
+ 	dbus_message_iter_close_container(dict, &entry);
+ }
  
--			self.properties = mp.GetProperties()
-+			self.properties = prop.GetAll("org.bluez.MediaPlayer")
- 			self.metadata = mp.GetTrack()
+-static dbus_bool_t emit_property_changed(DBusConnection *conn,
++static dbus_bool_t emit_properties_changed(DBusConnection *conn,
+ 					const char *path,
+ 					const char *interface,
+ 					const char *name,
+ 					int type, void *value)
+ {
+ 	DBusMessage *signal;
+-	DBusMessageIter iter;
++	DBusMessageIter iter, dict, entry, array;
+ 	dbus_bool_t result;
  
--			bus.add_signal_receiver(self.property_changed,
-+			bus.add_signal_receiver(self.properties_changed,
- 				path = obj,
--				dbus_interface = "org.bluez.MediaPlayer",
--				signal_name = "PropertyChanged")
-+				dbus_interface = "org.freedesktop.DBus.Properties",
-+				signal_name = "PropertiesChanged")
+-	signal = dbus_message_new_signal(path, interface, "PropertyChanged");
++	signal = dbus_message_new_signal(path, DBUS_INTERFACE_PROPERTIES,
++							"PropertiesChanged");
  
- 			bus.add_signal_receiver(self.track_changed,
- 				path = obj,
-@@ -59,18 +61,20 @@ class Player(dbus.service.Object):
- 		print("Release")
- 		mainloop.quit()
+ 	if (!signal) {
+ 		fprintf(stderr, "Unable to allocate new %s.PropertyChanged"
+@@ -133,10 +134,23 @@ static dbus_bool_t emit_property_changed(DBusConnection *conn,
+ 	}
  
--	@dbus.service.method("org.bluez.MediaPlayer",
--					in_signature="sv", out_signature="")
--	def SetProperty(self, key, value):
--		print("SetProperty (%s, %s)" % (key, value), file=sys.stderr)
-+	@dbus.service.method("org.freedesktop.DBus.Properties",
-+					in_signature="ssv", out_signature="")
-+	def Set(self, interface, key, value):
-+		print("Set (%s, %s)" % (key, value), file=sys.stderr)
- 		return
+ 	dbus_message_iter_init_append(signal, &iter);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &interface);
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	dbus_message_iter_open_container(&dict, DBUS_TYPE_DICT_ENTRY, NULL,
++								&entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &name);
++	append_variant(&entry, type, value);
++	dbus_message_iter_close_container(&dict, &entry);
  
--	@dbus.service.signal("org.bluez.MediaPlayer", signature="sv")
--	def PropertyChanged(self, setting, value):
--		"""PropertyChanged(setting, value)
-+	@dbus.service.signal("org.freedesktop.DBus.Properties",
-+							signature="sa{sv}as")
-+	def PropertiesChanged(self, interface, properties,
-+						invalidated = dbus.Array()):
-+		"""PropertiesChanged(interface, properties, invalidated)
+-	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &name);
++	dbus_message_iter_close_container(&iter, &dict);
  
--		Send a PropertyChanged signal. 'setting' and 'value' are
--		string parameters as specified in doc/media-api.txt.
-+		Send a PropertiesChanged signal. 'properties' is a dictionary
-+		containing string parameters as specified in doc/media-api.txt.
- 		"""
- 		pass
+-	append_variant(&iter, type, value);
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++				DBUS_TYPE_STRING_AS_STRING, &array);
++	dbus_message_iter_close_container(&iter, &array);
  
-@@ -86,10 +90,10 @@ class Player(dbus.service.Object):
- 	def help(self, func):
- 		help(self.__class__.__dict__[func])
+ 	result = dbus_connection_send(conn, signal, NULL);
+ 	dbus_message_unref(signal);
+@@ -171,7 +185,7 @@ static int parse_property(DBusConnection *conn, const char *path,
+ 			dict_append_entry(properties, "Status",
+ 						DBUS_TYPE_STRING, &value);
+ 		else
+-			emit_property_changed(sys, path,
++			emit_properties_changed(sys, path,
+ 					"org.bluez.MediaPlayer", "Status",
+ 					DBUS_TYPE_STRING, &value);
+ 	} else if (strcasecmp(key, "Position") == 0) {
+@@ -188,7 +202,7 @@ static int parse_property(DBusConnection *conn, const char *path,
+ 			dict_append_entry(properties, "Position",
+ 						DBUS_TYPE_UINT32, &msec);
+ 		else
+-			emit_property_changed(sys, path,
++			emit_properties_changed(sys, path,
+ 					"org.bluez.MediaPlayer", "Position",
+ 					DBUS_TYPE_UINT32, &msec);
+ 	} else if (strcasecmp(key, "Shuffle") == 0) {
+@@ -206,9 +220,9 @@ static int parse_property(DBusConnection *conn, const char *path,
+ 			dict_append_entry(properties, "Shuffle",
+ 						DBUS_TYPE_STRING, &str);
+ 		else
+-			emit_property_changed(sys, path,
++			emit_properties_changed(sys, path,
+ 					"org.bluez.MediaPlayer", "Shuffle",
+-					DBUS_TYPE_UINT32, &str);
++					DBUS_TYPE_STRING, &str);
+ 	}
  
--	def property_changed(self, setting, value):
--		print("property_changed(%s, %s)" % (setting, value))
-+	def properties_changed(self, interface, properties, invalidated):
-+		print("properties_changed(%s, %s)" % (properties, invalidated))
- 
--		self.PropertyChanged(setting, value)
-+		self.PropertiesChanged(interface, properties, invalidated)
- 
- 	def track_changed(self, metadata):
- 		print("track_changed(%s)" % (metadata))
-@@ -98,8 +102,8 @@ class Player(dbus.service.Object):
- 
- class InputHandler:
- 	commands = { 'TrackChanged': '(metadata)',
--					'PropertyChanged': '(key, value)',
--					'help': '(cmd)' }
-+			'PropertiesChanged': '(interface, properties)',
-+			'help': '(cmd)' }
- 	def __init__(self, player):
- 		self.player = player
- 		print('\n\nAvailable commands:')
+ 	return 0;
 -- 
 1.7.11.7
 
