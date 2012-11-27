@@ -1,40 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Nov 2012 13:12:41 +0200
+Date: Tue, 27 Nov 2012 13:03:32 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Arnaud Mouiche <arnaud.mouiche@invoxia.com>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
+	<frederic.danis@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: eSCO latency configuration
-Message-ID: <20121127111241.GA24125@x220>
-References: <4E64AD1D.6000609@invoxia.com>
+Subject: Re: [PATCH 7/7] event: Store link key infos in new keys file
+Message-ID: <20121127110332.GA23883@x220>
+References: <1354006193-7199-1-git-send-email-frederic.danis@linux.intel.com>
+ <1354006193-7199-7-git-send-email-frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4E64AD1D.6000609@invoxia.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1354006193-7199-7-git-send-email-frederic.danis@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arnaud,
+Hi Frederic,
 
-On Mon, Sep 05, 2011, Arnaud Mouiche wrote:
-> What could be a way to add the feature without breaking any API
-> 1) use the MTU of the socket or hdev ?
-> 2) add hdev entry for sco latency (which can be configured with
-> hciconfig like voice settings)
-> 3) something else ...
-> or
-> 4) no one cares about latency...
-> 
-> PS: the same way, the retransmit effort is not configurable today.
+On Tue, Nov 27, 2012, Frédéric Danis wrote:
+> ---
+>  src/event.c |   59 +++++++++++++++++++++++++++++++++++++++++++++++------------
+>  1 file changed, 47 insertions(+), 12 deletions(-)
 
-I'm assuming this is for HFP or HSP? At least I'm not aware of other
-significant profiles using (e)SCO. Since the HFP specification defines a
-set of recommended parameter combinations I don't think we necessarily
-need any user-space facing interface for this (with the exception of the
-mSBC/CVSD codec selection which is needed for HFP 1.6).
+After these patches there's the following leak:
 
-Instead, the kernel could simply start with the S3 settings and fall
-back to S2 and finally S1 if failures are encountered during the
-connection setup. For mSBC the starting point would be T2 with a
-fallback to T1 in case of failure. Do you agree that this would be an
-acceptable solution?
+==23252== 32,808 bytes in 1 blocks are definitely lost in loss record 210 of 210
+==23252==    at 0x4A0883C: malloc (vg_replace_malloc.c:270)
+==23252==    by 0x565E25F: __alloc_dir (opendir.c:199)
+==23252==    by 0x175382: load_devices (adapter.c:2005)
+==23252==    by 0x178E50: adapter_init (adapter.c:2896)
+==23252==    by 0x17391E: btd_manager_register_adapter (manager.c:334)
+==23252==    by 0x1883E1: mgmt_event.part.36 (mgmt.c:1081)
+==23252==    by 0x4C78A74: g_main_context_dispatch (gmain.c:2715)
+==23252==    by 0x4C78DA7: g_main_context_iterate.isra.24 (gmain.c:3290)
+==23252==    by 0x4C791A1: g_main_loop_run (gmain.c:3484)
+==23252==    by 0x121640: main (main.c:544)
+
+That seems to be simple missing closedir() call. Didn't I already tell
+you to always use valgrind?
+
+Another problem with these is that I'm getting over a hundred unexpected
+device objects which I didn't have before. It seems that this is because
+you convert the classes file into the device storage instead of the
+cache. It might be due to some other info as well though.
 
 Johan
