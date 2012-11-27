@@ -1,126 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50B5D6A5.8070806@invoxia.com>
-Date: Wed, 28 Nov 2012 10:17:25 +0100
-From: Arnaud Mouiche <arnaud.mouiche@invoxia.com>
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: eSCO latency configuration
-References: <4E64AD1D.6000609@invoxia.com> <20121127111241.GA24125@x220>
-In-Reply-To: <20121127111241.GA24125@x220>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [PATCH BlueZ 6/6] test: Convert simple-player to use DBus properties interface
+Date: Tue, 27 Nov 2012 14:51:25 +0200
+Message-Id: <1354020685-17028-6-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1354020685-17028-1-git-send-email-luiz.dentz@gmail.com>
+References: <1354020685-17028-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On 11/27/2012 12:12 PM, Johan Hedberg wrote:
-> Hi Arnaud,
->
-> On Mon, Sep 05, 2011, Arnaud Mouiche wrote:
->> What could be a way to add the feature without breaking any API
->> 1) use the MTU of the socket or hdev ?
->> 2) add hdev entry for sco latency (which can be configured with
->> hciconfig like voice settings)
->> 3) something else ...
->> or
->> 4) no one cares about latency...
->>
->> PS: the same way, the retransmit effort is not configurable today.
-> I'm assuming this is for HFP or HSP? At least I'm not aware of other
-> significant profiles using (e)SCO. Since the HFP specification defines a
-> set of recommended parameter combinations I don't think we necessarily
-> need any user-space facing interface for this (with the exception of the
-> mSBC/CVSD codec selection which is needed for HFP 1.6).
->
-> Instead, the kernel could simply start with the S3 settings and fall
-> back to S2 and finally S1 if failures are encountered during the
-> connection setup. For mSBC the starting point would be T2 with a
-> fallback to T1 in case of failure. Do you agree that this would be an
-> acceptable solution?
-> Johan
+---
+ test/simple-player | 40 ++++++++++++++++++++++------------------
+ 1 file changed, 22 insertions(+), 18 deletions(-)
 
-yes, I'm concerned by the HFP with mSBC/CVSD case, with multiple 
-concurrent HFP sessions. So there is a need to avoid race conditions of 
-the configuration (ie no configuration at the adapter level).
-
-I found the BT_DEFER_SETUP feature from Frédéric to be a nice solution, 
-since it gives more flexibility to the userland for this kind of 
-configuration.
-(up to now for my tests, I'm doing ugly things like forcing the kernel 
-to not respond the eSCO setup, and do the response from userland.... )
-
-I'm pretty busy at this time, but my goal may be to propose a way to 
-configure the eSCO response on top of the BT_DEFER_SETUP.
-With BT_DEFER_SETUP, accepting is done on the first 'recvmsg'. May be we 
-can configure the socket (setsockopt, ioctl...) just before this first 
-'recvmsg' to tell the kernel the real purpose of the socket.
-For example, userland can provide the expected set of configuration 
-(latency, bandwith, retransmissions, packets, voice settings). But I 
-don't have a clear of how handling fallback indeed.
-
-I'll be also interested to be able to reject the connection_request for 
-"Limited Resources" reasons. The scenario using this feature is when 
-multiple active calls are already managed by the device, and
-routing a new voice stream is simply not possible (for the hardware 
-and/or for the user).
-(note: one limitation of the HFP specs is that the routing is not really 
-agreed before opening the link. only the codec selection is negociated, 
-but specifications are clear that we can't reject the CVSD codec, so a 
-real rejection of the route is not possible)
-
-
-just a [raw] idea I just have:
-
-Module   --------------- Kernel --------------------------------- Userland
-
-setsockopt( DEFER )
-listen()
-
-                            <-- socket in listen mode with DEFER option ---
-
-   -- Connection_request -->
-                             --- socket accept available ----------------->
-
-A) [ accept case ] 
-.............................................................
-accept()
-
-send() or
-ioctl() or
-setsockopt() or
-better
-                             <-------- provide the set of configuration 
-items
-
-recv()
-  <-- Accept_synchronous_connection
--- Synchronous Connection Complete (OK or rjected) -->
--------------------------------> in case of failure
-need to know the reason
-for selecting a fallback
-on next connection_request
-attempt.
-
-
-
-
-B) [ userland reject case ] 
-.............................................................
-
-accept()
-close()
-
-  <-- Reject_synchronous_connection (Limited Resources)
-
-
-
-
-
-Note: Michael Knudsen seems to want to push also things concerning CSA2 
-for codec configuration. I'm not really aware of what it imply and why 
-it should be managed by the kernel. So I don't know how to put those 
-things in the picture.
-
-
-Arnaud
+diff --git a/test/simple-player b/test/simple-player
+index 9e72f3e..0037f3a 100755
+--- a/test/simple-player
++++ b/test/simple-player
+@@ -17,14 +17,16 @@ class Player(dbus.service.Object):
+ 			bus = dbus.SystemBus()
+ 			mp = dbus.Interface(bus.get_object("org.bluez", obj),
+ 						"org.bluez.MediaPlayer")
++			prop = dbus.Interface(bus.get_object("org.bluez", obj),
++						"org.freedesktop.DBus.Properties")
+ 
+-			self.properties = mp.GetProperties()
++			self.properties = prop.GetAll("org.bluez.MediaPlayer")
+ 			self.metadata = mp.GetTrack()
+ 
+-			bus.add_signal_receiver(self.property_changed,
++			bus.add_signal_receiver(self.properties_changed,
+ 				path = obj,
+-				dbus_interface = "org.bluez.MediaPlayer",
+-				signal_name = "PropertyChanged")
++				dbus_interface = "org.freedesktop.DBus.Properties",
++				signal_name = "PropertiesChanged")
+ 
+ 			bus.add_signal_receiver(self.track_changed,
+ 				path = obj,
+@@ -59,18 +61,20 @@ class Player(dbus.service.Object):
+ 		print("Release")
+ 		mainloop.quit()
+ 
+-	@dbus.service.method("org.bluez.MediaPlayer",
+-					in_signature="sv", out_signature="")
+-	def SetProperty(self, key, value):
+-		print("SetProperty (%s, %s)" % (key, value), file=sys.stderr)
++	@dbus.service.method("org.freedesktop.DBus.Properties",
++					in_signature="ssv", out_signature="")
++	def Set(self, interface, key, value):
++		print("Set (%s, %s)" % (key, value), file=sys.stderr)
+ 		return
+ 
+-	@dbus.service.signal("org.bluez.MediaPlayer", signature="sv")
+-	def PropertyChanged(self, setting, value):
+-		"""PropertyChanged(setting, value)
++	@dbus.service.signal("org.freedesktop.DBus.Properties",
++							signature="sa{sv}as")
++	def PropertiesChanged(self, interface, properties,
++						invalidated = dbus.Array()):
++		"""PropertiesChanged(interface, properties, invalidated)
+ 
+-		Send a PropertyChanged signal. 'setting' and 'value' are
+-		string parameters as specified in doc/media-api.txt.
++		Send a PropertiesChanged signal. 'properties' is a dictionary
++		containing string parameters as specified in doc/media-api.txt.
+ 		"""
+ 		pass
+ 
+@@ -86,10 +90,10 @@ class Player(dbus.service.Object):
+ 	def help(self, func):
+ 		help(self.__class__.__dict__[func])
+ 
+-	def property_changed(self, setting, value):
+-		print("property_changed(%s, %s)" % (setting, value))
++	def properties_changed(self, interface, properties, invalidated):
++		print("properties_changed(%s, %s)" % (properties, invalidated))
+ 
+-		self.PropertyChanged(setting, value)
++		self.PropertiesChanged(interface, properties, invalidated)
+ 
+ 	def track_changed(self, metadata):
+ 		print("track_changed(%s)" % (metadata))
+@@ -98,8 +102,8 @@ class Player(dbus.service.Object):
+ 
+ class InputHandler:
+ 	commands = { 'TrackChanged': '(metadata)',
+-					'PropertyChanged': '(key, value)',
+-					'help': '(cmd)' }
++			'PropertiesChanged': '(interface, properties)',
++			'help': '(cmd)' }
+ 	def __init__(self, player):
+ 		self.player = player
+ 		print('\n\nAvailable commands:')
+-- 
+1.7.11.7
 
