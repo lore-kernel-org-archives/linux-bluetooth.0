@@ -2,74 +2,67 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/7] adapter: Load devices from new storage architecture
-Date: Tue, 27 Nov 2012 09:49:48 +0100
-Message-Id: <1354006193-7199-2-git-send-email-frederic.danis@linux.intel.com>
-In-Reply-To: <1354006193-7199-1-git-send-email-frederic.danis@linux.intel.com>
-References: <1354006193-7199-1-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH 1/7] doc: Update settings-storage.txt
+Date: Tue, 27 Nov 2012 09:49:47 +0100
+Message-Id: <1354006193-7199-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Link key and Long term key for a device should be saved in
+keys file under storage device directory
 ---
- src/adapter.c |   30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ doc/settings-storage.txt |   13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 163360f..3f184fc 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -34,6 +34,7 @@
- #include <stdbool.h>
- #include <sys/ioctl.h>
- #include <sys/file.h>
-+#include <dirent.h>
+diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
+index 3fdcb03..c0171e9 100644
+--- a/doc/settings-storage.txt
++++ b/doc/settings-storage.txt
+@@ -30,6 +30,7 @@ contains:
+  - one directory per remote device, named by remote device address, which
+    contains:
+     - an info file
++    - a keys file
+     - an attributes file containing attributes of remote LE services
  
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/uuid.h>
-@@ -1996,6 +1997,8 @@ static void load_devices(struct btd_adapter *adapter)
- 	char srcaddr[18];
- 	struct adapter_keys keys = { adapter, NULL };
- 	int err;
-+	DIR *dir;
-+	struct dirent *entry;
+ So the directory structure is:
+@@ -42,9 +43,11 @@ So the directory structure is:
+             ...
+         ./<remote device address>/
+             ./info
++            ./keys
+             ./attributes
+         ./<remote device address>/
+             ./info
++            ./keys
+             ./attributes
+         ...
  
- 	ba2str(&adapter->bdaddr, srcaddr);
+@@ -127,8 +130,8 @@ This general group contains:
+ Info file format
+ ================
  
-@@ -2031,6 +2034,33 @@ static void load_devices(struct btd_adapter *adapter)
+-Info file may includes multiple groups (General, Device ID, Link key and
+-Long term key) related to a remote device.
++Info file may includes multiple groups (General and Device ID) related to
++a remote device.
  
- 	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "blocked");
- 	textfile_foreach(filename, create_stored_device_from_blocked, adapter);
-+
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s", srcaddr);
-+	filename[PATH_MAX] = '\0';
-+
-+	dir = opendir(filename);
-+	if (!dir) {
-+		error("Unable to open adapter storage directory: %s", filename);
-+		return;
-+	}
-+
-+	while ((entry = readdir(dir)) != NULL) {
-+		struct btd_device *device;
-+
-+		if (entry->d_type != DT_DIR || bachk(entry->d_name) < 0)
-+			continue;
-+
-+		if (g_slist_find_custom(adapter->devices, entry->d_name,
-+					(GCompareFunc) device_address_cmp))
-+			continue;
-+
-+		device = device_create(adapter, entry->d_name, BDADDR_BREDR);
-+		if (!device)
-+			continue;
-+
-+		device_set_temporary(device, FALSE);
-+		adapter->devices = g_slist_append(adapter->devices, device);
-+	}
- }
+ [General] group contains:
  
- int btd_adapter_block_address(struct btd_adapter *adapter,
+@@ -165,6 +168,12 @@ Long term key) related to a remote device.
+   Version		Integer		Device version
+ 
+ 
++Keys file format
++================
++
++Keys file may includes multiple groups (Link key and Long term key) related
++to a remote device.
++
+ [LinkKey] group contains:
+ 
+   Key			String		Key in hexadecimal format
 -- 
 1.7.9.5
 
