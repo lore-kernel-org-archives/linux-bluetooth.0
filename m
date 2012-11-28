@@ -1,44 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Nov 2012 14:50:41 +0200
+Date: Wed, 28 Nov 2012 14:23:18 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Peter Olson <peter.olson@gmail.com>
-Subject: Re: [PATCH bluez] wiimote: add Wii-Remote-Plus ID and name detection
-Message-ID: <20121128125041.GA995@x220.ger.corp.intel.com>
-References: <1350894680-3947-1-git-send-email-dh.herrmann@googlemail.com>
+To: Tomasz Bursztyka <tomasz.bursztyka@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] gdbus: Fix crash error when calling
+ g_dbus_remove_all_watches
+Message-ID: <20121128122318.GA30710@x220.ger.corp.intel.com>
+References: <1345802959-11774-1-git-send-email-tomasz.bursztyka@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1350894680-3947-1-git-send-email-dh.herrmann@googlemail.com>
+In-Reply-To: <1345802959-11774-1-git-send-email-tomasz.bursztyka@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Thomasz,
 
-On Mon, Oct 22, 2012, David Herrmann wrote:
-> The Nintendo Wii Remote Plus uses a new product ID and name. To detect
-> them properly, we need to add them to the wiimote-module.
-> 
-> To avoid an overlong "if" statement, this converts the match-function to
-> walk over an array and check all VID/PID pairs and device-names. This
-> makes adding new devices much easier.
+On Fri, Aug 24, 2012, Tomasz Bursztyka wrote:
 > ---
-> Hi Johan
+> Hi,
 > 
-> I am actually not sure why Nintendo changed the VID/PID for the new revisions of
-> the WiimotePlus. I have a WiimotePlus which still uses the old numbers and works
-> here quite well. However, I have now got multiple requests from people with the
-> new device name and IDs. Unfortunately, I cannot test these so I'd like to have
-> a "Tested-by" by Peter (CC'ed) before this is applied.
+> While using gdbus on some other code, I found out that bug around g_dbus_remove_all_watches() usage.
 > 
-> Thanks
-> David
+> Tomasz
 > 
->  plugins/wiimote.c | 35 ++++++++++++++++++++++++++++-------
->  1 file changed, 28 insertions(+), 7 deletions(-)
+>  gdbus/watch.c |    3 +++
+>  1 files changed, 3 insertions(+), 0 deletions(-)
+> 
+> diff --git a/gdbus/watch.c b/gdbus/watch.c
+> index d749176..968a38a 100644
+> --- a/gdbus/watch.c
+> +++ b/gdbus/watch.c
+> @@ -298,6 +298,9 @@ static void filter_data_call_and_free(struct filter_data *data)
+>  		g_free(cb);
+>  	}
+>  
+> +	g_slist_free(data->callbacks);
+> +	data->callbacks = NULL;
+> +
+>  	filter_data_free(data);
+>  }
 
-Well, the Tested-by never came, but since the patch looks ok to me I
-went ahead and applied it anyway (with a minor fix to use G_N_ELEMENTS()
-instead of your custom array length calculation).
+It seems this patch never got applied. Is it so that no-one else has
+seen the issue. Could someone (through basic static analysis) confirm if
+the patch is correct? It'd be nice if we could also have a back trace of
+the crash in the commit message.
 
 Johan
