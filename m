@@ -1,62 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 1/5] Bluetooth: AMP: Check that AMP is present and active
-Date: Wed, 28 Nov 2012 17:59:38 +0200
-Message-Id: <1354118382-25571-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 2/2] adapter: Fix improper freeing with g_free in convert_config
+Date: Wed, 28 Nov 2012 16:17:36 +0100
+Message-ID: <1354115856-29301-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1354115856-29301-1-git-send-email-szymon.janc@tieto.com>
+References: <1354115856-29301-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-Before starting quering remote AMP controllers make sure
-that there is local active AMP controller.
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Memory in textfile_get is allocated with malloc and it should be freed
+with free not g_free.
 ---
- include/net/bluetooth/hci_core.h |   16 ++++++++++++++++
- net/bluetooth/l2cap_core.c       |    1 +
- 2 files changed, 17 insertions(+)
+ src/adapter.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 2f2b743..014a2ea 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -779,6 +779,22 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define lmp_host_le_capable(dev)   !!((dev)->host_features[0] & LMP_HOST_LE)
- #define lmp_host_le_br_capable(dev) !!((dev)->host_features[0] & LMP_HOST_LE_BREDR)
+diff --git a/src/adapter.c b/src/adapter.c
+index d6f8a37..f134dfe 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2702,7 +2702,7 @@ static void convert_config(struct btd_adapter *adapter, const char *filename,
+ 			return;
+ 		}
  
-+/* returns true if at least one AMP active */
-+static inline bool hci_amp_capable(void)
-+{
-+	struct hci_dev *hdev;
-+	bool ret = false;
-+
-+	read_lock(&hci_dev_list_lock);
-+	list_for_each_entry(hdev, &hci_dev_list, list)
-+		if (hdev->amp_type == HCI_AMP &&
-+		    test_bit(HCI_UP, &hdev->flags))
-+			ret = true;
-+	read_unlock(&hci_dev_list_lock);
-+
-+	return ret;
-+}
-+
- /* ----- HCI protocols ----- */
- #define HCI_PROTO_DEFER             0x01
+-		g_free(converted);
++		free(converted);
+ 	}
  
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b52f66d..39e144f 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1014,6 +1014,7 @@ static bool __amp_capable(struct l2cap_chan *chan)
- 	struct l2cap_conn *conn = chan->conn;
- 
- 	if (enable_hs &&
-+	    hci_amp_capable() &&
- 	    chan->chan_policy == BT_CHANNEL_POLICY_AMP_PREFERRED &&
- 	    conn->fixed_chan_mask & L2CAP_FC_A2MP)
- 		return true;
+ 	if (read_local_name(&adapter->bdaddr, str) == 0)
 -- 
-1.7.10.4
+1.7.9.5
 
