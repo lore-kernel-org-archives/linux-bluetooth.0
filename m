@@ -1,263 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/8] doc: Add valgrind.suppressions
-Date: Fri, 30 Nov 2012 12:24:56 +0100
-Message-ID: <1354274703-15604-1-git-send-email-szymon.janc@tieto.com>
+Message-ID: <50B681C7.1030207@globaledgesoft.com>
+Date: Thu, 29 Nov 2012 02:57:35 +0530
+From: Ajay <ajay.kv@globaledgesoft.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+To: linux-bluetooth@vger.kernel.org
+Subject: BLE : SMP pairing + LE_Start_encryption
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Shamelessly copied from connman.
----
- doc/valgrind.suppressions |  236 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 236 insertions(+)
- create mode 100644 doc/valgrind.suppressions
 
-diff --git a/doc/valgrind.suppressions b/doc/valgrind.suppressions
-new file mode 100644
-index 0000000..5967a15
---- /dev/null
-+++ b/doc/valgrind.suppressions
-@@ -0,0 +1,236 @@
-+{
-+   <syslog error>
-+   Memcheck:Cond
-+   obj:/lib/libc-*.so
-+   ...
-+   fun:localtime_r
-+   fun:__vsyslog_chk
-+   fun:__syslog_chk
-+   fun:__connman_log_init
-+   ...
-+}
-+{
-+   <iconv open>
-+   Memcheck:Addr4
-+   obj:/lib/libc-*.so
-+   obj:/lib/libglib-2.0.so*
-+   fun:g_iconv_open
-+   ...
-+   fun:g_convert
-+   fun:g_locale_to_utf8
-+   fun:g_strerror
-+   fun:g_key_file_load_from_file
-+   ...
-+}
-+{
-+   <ioctl ADDRT/DELRT>
-+   Memcheck:Param
-+   ioctl(SIOCADDRT/DELRT)
-+   obj:/lib/ld-*.so
-+   ...
-+}
-+{
-+   <g_main_loop>
-+   Memcheck:Leak
-+   fun:memalign
-+   ...
-+   fun:g_slice_alloc
-+   ...
-+   fun:g_main_loop_new
-+   ...
-+}
-+{
-+   <g_option_context_parse>
-+   Memcheck:Leak
-+   ...
-+   fun:g_slice_alloc
-+   ...
-+   fun:g_option_context_parse
-+   ...
-+}
-+{
-+   <g_key_file_load_from_data>
-+   Memcheck:Leak
-+   ...
-+   fun:g_slice_alloc
-+   ...
-+   fun:g_key_file_load_from_data
-+   ...
-+}
-+{
-+   <g_key_file_new 1>
-+   Memcheck:Leak
-+   ...
-+   fun:g_slice_alloc
-+   ...
-+   fun:g_key_file_new
-+   ...
-+}
-+{
-+   <g_key_file_new 2>
-+   Memcheck:Leak
-+   fun:*alloc
-+   ...
-+   fun:g_key_file_new
-+   fun:main
-+}
-+{
-+   <connman plugin cleanup>
-+   Memcheck:Leak
-+   ...
-+   fun:__connman_plugin_cleanup
-+   ...
-+}
-+{
-+   <cmd line option parsing>
-+   Memcheck:Leak
-+   fun:malloc
-+   fun:g_malloc
-+   fun:g_strdup
-+   fun:g_set_prgname
-+   fun:g_option_context_parse
-+   fun:main
-+}
-+{
-+   <dbus system bus setup 1>
-+   Memcheck:Leak
-+   ...
-+   fun:dbus_malloc*
-+   ...
-+   fun:g_dbus_setup_bus
-+   fun:main
-+}
-+{
-+   <dbus system bus setup 2>
-+   Memcheck:Leak
-+   ...
-+   fun:g_malloc*
-+   ...
-+   fun:dbus_connection_set_watch_functions
-+   fun:setup_bus
-+   ...
-+}
-+{
-+   <key file get charset>
-+   Memcheck:Leak
-+   ...
-+   fun:g_*alloc*
-+   ...
-+   fun:g_strerror
-+   fun:g_key_file_load_from_file
-+   fun:main
-+}
-+{
-+   <dbus disconnect func set>
-+   Memcheck:Leak
-+   ...
-+   fun:filter_data_get
-+   fun:g_dbus_add_signal_watch
-+   fun:g_dbus_set_disconnect_function
-+   fun:main
-+}
-+{
-+   <plugin dlopen>
-+   Memcheck:Leak
-+   ...
-+   fun:dlopen
-+   fun:__connman_plugin_init
-+   fun:main
-+}
-+{
-+   <dbus system bus setup 3>
-+   Memcheck:Leak
-+   ...
-+   fun:dbus_malloc0
-+   ...
-+   fun:dbus_parse_address
-+   ...
-+   fun:g_dbus_setup_bus
-+   fun:main
-+}
-+{
-+   <libdbus internals 1>
-+   Memcheck:Leak
-+   fun:*malloc
-+   ...
-+   obj:/lib/libdbus-1.so.3.5.3
-+}
-+{
-+   <dbus system bus setup 4>
-+   Memcheck:Leak
-+   fun:*alloc
-+   ...
-+   fun:dbus_*alloc*
-+   ...
-+   fun:g_dbus_setup_bus
-+   fun:main
-+}
-+{
-+   <dbus system bus setup 5>
-+   Memcheck:Leak
-+   fun:calloc
-+   fun:g_malloc0
-+   ...
-+   fun:g_dbus_set_disconnect_function
-+   fun:main
-+}
-+{
-+   <dbus bus remove match>
-+   Memcheck:Leak
-+   fun:malloc
-+   fun:g_malloc
-+   fun:g_source_set_callback
-+   fun:g_timeout_add_full
-+   fun:g_timeout_add
-+   ...
-+   fun:dbus_pending_call_block
-+   fun:dbus_connection_send_with_reply_and_block
-+   ...
-+   fun:dbus_bus_remove_match
-+}
-+{
-+   <g_main_loop_run/new>
-+   Memcheck:Leak
-+   fun:*alloc
-+   ...
-+   fun:g_main_loop_*
-+   fun:main
-+}
-+{
-+   <g_main_context_dispatch>
-+   Memcheck:Leak
-+   fun:*alloc
-+   ...
-+   fun:g_main_context_dispatch
-+}
-+{
-+   <libdbus internals 2>
-+   Memcheck:Leak
-+   fun:realloc
-+   fun:dbus_realloc
-+   ...
-+   fun:dbus_message_set_reply_serial
-+   fun:dbus_message_new_error
-+   ...
-+}
-+{
-+   <libdbus internals 3>
-+   Memcheck:Leak
-+   fun:realloc
-+   fun:dbus_realloc
-+   ...
-+   fun:dbus_message_new_signal
-+   ...
-+}
-+{
-+   <dbus_bus_register>
-+   Memcheck:Leak
-+   fun:malloc
-+   fun:realloc
-+   fun:dbus_realloc
-+   ...
-+   fun:dbus_pending_call_block
-+   fun:dbus_connection_send_with_reply_and_block
-+   fun:dbus_bus_register
-+}
-+
+Hi,
+	how do i do smp pairing and ltk key distribution using l2cap socket 
+connection?  does bluez provide any tools for LE pairing . my ultimate 
+result should be enabling LE_start_encryption , which requires ltk key 
+distribution (which is a part of LE_pairing).
+
+	spec 4.0  says we can use l2cap cid 0x06 , defined for this purpose 
+(smp pairing) . But when i used cid =0x06 , l2cap connect  creates an 
+normal acl connection with cid = 40 , which doesnt trigger any smp 
+modules at remote side.
+
+	please look into this issue.
 -- 
-1.7.9.5
+Thanks & regards
 
+  AJAY KV
+  GlobalEdge software Ltd
+  8892753703
