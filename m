@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 4/5] Bluetooth: Process receiving FCS_NONE in L2CAP Conf Rsp
-Date: Wed, 28 Nov 2012 17:59:41 +0200
-Message-Id: <1354118382-25571-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC 5/5] Bluetooth: AMP: Mark controller radio powered down after HCIDEVDOWN
+Date: Wed, 28 Nov 2012 17:59:42 +0200
+Message-Id: <1354118382-25571-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1354118382-25571-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1354118382-25571-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,57 +11,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Process L2CAP Config rsp Pending with FCS Option 0x00 (No FCS)
-which is sent by Motorola Windows 7 Bluetooth stack. The trace
-is shown below (all other options are skipped).
-
-...
-< ACL data: handle 1 flags 0x00 dlen 48
-    L2CAP(s): Config req: dcid 0x0043 flags 0x00 clen 36
-      ...
-      FCS Option 0x00 (No FCS)
-> ACL data: handle 1 flags 0x02 dlen 48
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 36
-      ...
-      FCS Option 0x01 (CRC16 Check)
-< ACL data: handle 1 flags 0x00 dlen 47
-    L2CAP(s): Config rsp: scid 0x0043 flags 0x00 result 4 clen 33
-      Pending
-      ...
-> ACL data: handle 1 flags 0x02 dlen 50
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 4 clen 36
-      Pending
-      ...
-      FCS Option 0x00 (No FCS)
-< ACL data: handle 1 flags 0x00 dlen 14
-    L2CAP(s): Config rsp: scid 0x0043 flags 0x00 result 0 clen 0
-      Success
-> ACL data: handle 1 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 0
-      Success
-...
+After getting HCIDEVDOWN controller did not mark itself as 0x00 which
+means: "The Controller radio is available but is currently physically
+powered down". The result was even if the hdev was down we return
+in controller list value 0x01 "status 0x01 (Bluetooth only)".
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |    6 ++++++
- 1 file changed, 6 insertions(+)
+ net/bluetooth/hci_core.c |    3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f10e4be..d30978b 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3429,6 +3429,12 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
- 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS, sizeof(efs),
- 					   (unsigned long) &efs);
- 			break;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 69eb644..ec7d3a7 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -861,6 +861,9 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 	/* Clear flags */
+ 	hdev->flags = 0;
+ 
++	/* Controller radio is available but is currently powered down */
++	hdev->amp_status = 0;
 +
-+		case L2CAP_CONF_FCS:
-+			if (*result == L2CAP_CONF_PENDING)
-+				if (val == L2CAP_FCS_NONE)
-+					set_bit(CONF_NO_FCS_RECV, &chan->conf_state);
-+			break;
- 		}
- 	}
+ 	memset(hdev->eir, 0, sizeof(hdev->eir));
+ 	memset(hdev->dev_class, 0, sizeof(hdev->dev_class));
  
 -- 
 1.7.10.4
