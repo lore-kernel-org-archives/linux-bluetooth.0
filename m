@@ -1,40 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 5/5] Bluetooth: AMP: Mark controller radio powered down after HCIDEVDOWN
-Date: Wed, 28 Nov 2012 17:59:42 +0200
-Message-Id: <1354118382-25571-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1354118382-25571-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1354118382-25571-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC 1/5] Bluetooth: AMP: Check that AMP is present and active
+Date: Wed, 28 Nov 2012 17:59:38 +0200
+Message-Id: <1354118382-25571-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-After getting HCIDEVDOWN controller did not mark itself as 0x00 which
-means: "The Controller radio is available but is currently physically
-powered down". The result was even if the hdev was down we return
-in controller list value 0x01 "status 0x01 (Bluetooth only)".
+Before starting quering remote AMP controllers make sure
+that there is local active AMP controller.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/hci_core.c |    3 +++
- 1 file changed, 3 insertions(+)
+ include/net/bluetooth/hci_core.h |   16 ++++++++++++++++
+ net/bluetooth/l2cap_core.c       |    1 +
+ 2 files changed, 17 insertions(+)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 69eb644..ec7d3a7 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -861,6 +861,9 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	/* Clear flags */
- 	hdev->flags = 0;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 2f2b743..014a2ea 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -779,6 +779,22 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ #define lmp_host_le_capable(dev)   !!((dev)->host_features[0] & LMP_HOST_LE)
+ #define lmp_host_le_br_capable(dev) !!((dev)->host_features[0] & LMP_HOST_LE_BREDR)
  
-+	/* Controller radio is available but is currently powered down */
-+	hdev->amp_status = 0;
++/* returns true if at least one AMP active */
++static inline bool hci_amp_capable(void)
++{
++	struct hci_dev *hdev;
++	bool ret = false;
 +
- 	memset(hdev->eir, 0, sizeof(hdev->eir));
- 	memset(hdev->dev_class, 0, sizeof(hdev->dev_class));
++	read_lock(&hci_dev_list_lock);
++	list_for_each_entry(hdev, &hci_dev_list, list)
++		if (hdev->amp_type == HCI_AMP &&
++		    test_bit(HCI_UP, &hdev->flags))
++			ret = true;
++	read_unlock(&hci_dev_list_lock);
++
++	return ret;
++}
++
+ /* ----- HCI protocols ----- */
+ #define HCI_PROTO_DEFER             0x01
  
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b52f66d..39e144f 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1014,6 +1014,7 @@ static bool __amp_capable(struct l2cap_chan *chan)
+ 	struct l2cap_conn *conn = chan->conn;
+ 
+ 	if (enable_hs &&
++	    hci_amp_capable() &&
+ 	    chan->chan_policy == BT_CHANNEL_POLICY_AMP_PREFERRED &&
+ 	    conn->fixed_chan_mask & L2CAP_FC_A2MP)
+ 		return true;
 -- 
 1.7.10.4
 
