@@ -4,82 +4,66 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [RFC 2/4] Bluetooth: Add option for SCO socket socket
-Date: Wed, 28 Nov 2012 19:28:34 +0100
-Message-Id: <1354127316-17431-3-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [RFC 1/4] Bluetooth: Add option for SCO socket codec
+Date: Wed, 28 Nov 2012 19:28:33 +0100
+Message-Id: <1354127316-17431-2-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1354127316-17431-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1354127316-17431-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements setsockopt().
+This patch extends the current SCO socket option to add a codec field. This
+field is intended to choose between mSBC and CVSD codec at runtime. Incoming
+connections will be setup during defered setup. Outgoing connections have to
+be setup before connect(). The selected codec is stored in the sco socket info.
+This patch declares needed members and implements getsockopt().
 ---
- net/bluetooth/sco.c |   44 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+ include/net/bluetooth/sco.h |    2 ++
+ net/bluetooth/sco.c         |    3 +++
+ 2 files changed, 5 insertions(+)
 
+diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
+index 1e35c43..c283de0 100644
+--- a/include/net/bluetooth/sco.h
++++ b/include/net/bluetooth/sco.h
+@@ -43,6 +43,7 @@ struct sockaddr_sco {
+ #define SCO_OPTIONS	0x01
+ struct sco_options {
+ 	__u16 mtu;
++	__u8 codec;
+ };
+ 
+ #define SCO_CONNINFO	0x02
+@@ -73,6 +74,7 @@ struct sco_conn {
+ struct sco_pinfo {
+ 	struct bt_sock	bt;
+ 	__u32		flags;
++	__u8		codec;
+ 	struct sco_conn	*conn;
+ };
+ 
 diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index c2c0c13..b363712 100644
+index eea17cd..c2c0c13 100644
 --- a/net/bluetooth/sco.c
 +++ b/net/bluetooth/sco.c
-@@ -687,6 +687,47 @@ static int sco_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
- 	return bt_sock_recvmsg(iocb, sock, msg, len, flags);
- }
+@@ -427,6 +427,8 @@ static struct sock *sco_sock_alloc(struct net *net, struct socket *sock, int pro
+ 	sk->sk_protocol = proto;
+ 	sk->sk_state    = BT_OPEN;
  
-+static int sco_sock_setsockopt_old(struct socket *sock, int optname,
-+				   char __user *optval, unsigned int optlen)
-+{
-+	struct sock *sk = sock->sk;
-+	struct sco_options opts;
-+	int len, err = 0;
++	sco_pi(sk)->codec = 0;
 +
-+	BT_DBG("sk %p", sk);
-+
-+	lock_sock(sk);
-+
-+	switch (optname) {
-+	case SCO_OPTIONS:
-+		if (sk->sk_state != BT_OPEN &&
-+		    sk->sk_state != BT_BOUND &&
-+		    sk->sk_state != BT_CONNECT2) {
-+			err = -EINVAL;
-+			break;
-+		}
-+
-+		opts.codec = 0;
-+
-+		len = min_t(unsigned int, sizeof(opts), optlen);
-+		if (copy_from_user((char *) &opts, optval, len)) {
-+			err = -EFAULT;
-+			break;
-+		}
-+
-+		sco_pi(sk)->codec = opts.codec;
-+		BT_DBG("codec %d", opts.codec);
-+		break;
-+
-+	default:
-+		err = -ENOPROTOOPT;
-+		break;
-+	}
-+
-+	release_sock(sk);
-+	return err;
-+}
-+
- static int sco_sock_setsockopt(struct socket *sock, int level, int optname, char __user *optval, unsigned int optlen)
- {
- 	struct sock *sk = sock->sk;
-@@ -695,6 +736,9 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname, char
+ 	setup_timer(&sk->sk_timer, sco_sock_timeout, (unsigned long)sk);
  
- 	BT_DBG("sk %p", sk);
+ 	bt_sock_link(&sco_sk_list, sk);
+@@ -745,6 +747,7 @@ static int sco_sock_getsockopt_old(struct socket *sock, int optname, char __user
+ 		}
  
-+	if (level == SOL_SCO)
-+		return sco_sock_setsockopt_old(sock, optname, optval, optlen);
-+
- 	lock_sock(sk);
+ 		opts.mtu = sco_pi(sk)->conn->mtu;
++		opts.codec = sco_pi(sk)->codec;
  
- 	switch (optname) {
+ 		BT_DBG("mtu %d", opts.mtu);
+ 
 -- 
 1.7.9.5
 
