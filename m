@@ -1,25 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Nov 2012 19:08:49 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] adapter: Fix memory leak in convert_config
-Message-ID: <20121128170849.GA13329@x220.P-661HNU-F1>
-References: <1354115856-29301-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1354115856-29301-1-git-send-email-szymon.janc@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC 3/5] Bluetooth: Fix missing L2CAP EWS Conf parameter
+Date: Wed, 28 Nov 2012 17:59:40 +0200
+Message-Id: <1354118382-25571-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1354118382-25571-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1354118382-25571-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Wed, Nov 28, 2012, Szymon Janc wrote:
-> 'converted' was not freed if config file was already converted.
-> ---
->  src/adapter.c |    1 +
->  1 file changed, 1 insertion(+)
+If L2CAP_FEAT_FCS is not supported we sould miss EWS option
+configuration because of break. Make code more readable by
+combining FCS configuration in the single block.
 
-Both patches have been applied. Thanks.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |   30 +++++++++++++-----------------
+ 1 file changed, 13 insertions(+), 17 deletions(-)
 
-Johan
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index d8cffdb..f10e4be 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -3106,18 +3106,16 @@ done:
+ 		if (test_bit(FLAG_EFS_ENABLE, &chan->flags))
+ 			l2cap_add_opt_efs(&ptr, chan);
+ 
+-		if (!(chan->conn->feat_mask & L2CAP_FEAT_FCS))
+-			break;
+-
+-		if (chan->fcs == L2CAP_FCS_NONE ||
+-		    test_bit(CONF_NO_FCS_RECV, &chan->conf_state)) {
+-			chan->fcs = L2CAP_FCS_NONE;
+-			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
+-		}
+-
+ 		if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+ 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EWS, 2,
+ 					   chan->tx_win);
++
++		if (chan->conn->feat_mask & L2CAP_FEAT_FCS)
++			if (chan->fcs == L2CAP_FCS_NONE ||
++			    test_bit(CONF_NO_FCS_RECV, &chan->conf_state)) {
++				chan->fcs = L2CAP_FCS_NONE;
++				l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
++			}
+ 		break;
+ 
+ 	case L2CAP_MODE_STREAMING:
+@@ -3139,14 +3137,12 @@ done:
+ 		if (test_bit(FLAG_EFS_ENABLE, &chan->flags))
+ 			l2cap_add_opt_efs(&ptr, chan);
+ 
+-		if (!(chan->conn->feat_mask & L2CAP_FEAT_FCS))
+-			break;
+-
+-		if (chan->fcs == L2CAP_FCS_NONE ||
+-		    test_bit(CONF_NO_FCS_RECV, &chan->conf_state)) {
+-			chan->fcs = L2CAP_FCS_NONE;
+-			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
+-		}
++		if (chan->conn->feat_mask & L2CAP_FEAT_FCS)
++			if (chan->fcs == L2CAP_FCS_NONE ||
++			    test_bit(CONF_NO_FCS_RECV, &chan->conf_state)) {
++				chan->fcs = L2CAP_FCS_NONE;
++				l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
++			}
+ 		break;
+ 	}
+ 
+-- 
+1.7.10.4
+
