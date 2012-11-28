@@ -1,187 +1,162 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50B6F8A3.7040908@globaledgesoft.com>
-Date: Thu, 29 Nov 2012 11:24:43 +0530
-From: Deepthi <deepthi.pv@globaledgesoft.com>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org, bluefrog2012@gmail.com
-Subject: Sco issue:iogear dongle
-Content-Type: multipart/mixed;
- boundary="------------030502000906030901090500"
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Subject: [RFC 4/4] Bluetooth: Set link parameters for outgoing connections
+Date: Wed, 28 Nov 2012 19:28:36 +0100
+Message-Id: <1354127316-17431-5-git-send-email-frederic.dalleau@linux.intel.com>
+In-Reply-To: <1354127316-17431-1-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1354127316-17431-1-git-send-email-frederic.dalleau@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------030502000906030901090500
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+In order to establish the connection, the outgoing connection must also
+request the codec. Here we need to set a bit in ACL connection flag to set up
+the correct parameters if the ACL connection is not up yet.
+---
+ include/net/bluetooth/hci_core.h |    4 +++-
+ net/bluetooth/hci_conn.c         |   24 +++++++++++++++++++-----
+ net/bluetooth/l2cap_core.c       |    4 ++--
+ net/bluetooth/mgmt.c             |    4 ++--
+ net/bluetooth/sco.c              |    2 +-
+ 5 files changed, 27 insertions(+), 11 deletions(-)
 
-Hi,
-Thank you for the reply. Here I have attached  the hcidump logs from 
-both sides (server & client side).
-
-Please help,
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index cb41552..e286196 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -438,6 +438,7 @@ enum {
+ 	HCI_CONN_SSP_ENABLED,
+ 	HCI_CONN_POWER_SAVE,
+ 	HCI_CONN_REMOTE_OOB,
++	HCI_CONN_SCO_TRANSP_DATA,
+ };
+ 
+ static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
+@@ -585,7 +586,8 @@ void hci_chan_list_flush(struct hci_conn *conn);
+ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle);
+ 
+ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+-			     __u8 dst_type, __u8 sec_level, __u8 auth_type);
++			     __u8 dst_type, __u8 sec_level,
++			     __u8 auth_type, __u8 codec);
+ int hci_conn_check_link_mode(struct hci_conn *conn);
+ int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
+ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 25bfce0..1636dd5 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -179,9 +179,16 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle)
+ 
+ 	cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
+ 	cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
+-	cp.max_latency    = __constant_cpu_to_le16(0xffff);
+ 	cp.voice_setting  = cpu_to_le16(hdev->voice_setting);
+-	cp.retrans_effort = 0xff;
++
++	if (test_and_clear_bit(HCI_CONN_SCO_TRANSP_DATA, &conn->flags)) {
++		cp.voice_setting |= 3;
++		cp.max_latency    = __constant_cpu_to_le16(0x000d);
++		cp.retrans_effort = 0x02;
++	} else {
++		cp.max_latency    = __constant_cpu_to_le16(0xffff);
++		cp.retrans_effort = 0xff;
++	}
+ 
+ 	hci_send_cmd(hdev, HCI_OP_SETUP_SYNC_CONN, sizeof(cp), &cp);
+ }
+@@ -552,7 +559,8 @@ static struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
+ }
+ 
+ static struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type,
+-				bdaddr_t *dst, u8 sec_level, u8 auth_type)
++					bdaddr_t *dst, u8 sec_level,
++					u8 auth_type, u8 codec)
+ {
+ 	struct hci_conn *acl;
+ 	struct hci_conn *sco;
+@@ -575,6 +583,10 @@ static struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type,
+ 
+ 	hci_conn_hold(sco);
+ 
++	if (codec)
++		set_bit(HCI_CONN_SCO_TRANSP_DATA, &sco->flags);
++
++
+ 	if (acl->state == BT_CONNECTED &&
+ 	    (sco->state == BT_OPEN || sco->state == BT_CLOSED)) {
+ 		set_bit(HCI_CONN_POWER_SAVE, &acl->flags);
+@@ -594,7 +606,8 @@ static struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type,
+ 
+ /* Create SCO, ACL or LE connection. */
+ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+-			     __u8 dst_type, __u8 sec_level, __u8 auth_type)
++			     __u8 dst_type, __u8 sec_level, __u8 auth_type,
++			     __u8 codec)
+ {
+ 	BT_DBG("%s dst %pMR type 0x%x", hdev->name, dst, type);
+ 
+@@ -605,7 +618,8 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 		return hci_connect_acl(hdev, dst, sec_level, auth_type);
+ 	case SCO_LINK:
+ 	case ESCO_LINK:
+-		return hci_connect_sco(hdev, type, dst, sec_level, auth_type);
++		return hci_connect_sco(hdev, type, dst, sec_level, auth_type,
++				       codec);
+ 	}
+ 
+ 	return ERR_PTR(-EINVAL);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b52f66d..2ca70a4 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1690,10 +1690,10 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 
+ 	if (chan->dcid == L2CAP_CID_LE_DATA)
+ 		hcon = hci_connect(hdev, LE_LINK, dst, dst_type,
+-				   chan->sec_level, auth_type);
++				   chan->sec_level, auth_type, 0);
+ 	else
+ 		hcon = hci_connect(hdev, ACL_LINK, dst, dst_type,
+-				   chan->sec_level, auth_type);
++				   chan->sec_level, auth_type, 0);
+ 
+ 	if (IS_ERR(hcon)) {
+ 		err = PTR_ERR(hcon);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 5d0ef75..d03405d 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1917,10 +1917,10 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	if (cp->addr.type == BDADDR_BREDR)
+ 		conn = hci_connect(hdev, ACL_LINK, &cp->addr.bdaddr,
+-				   cp->addr.type, sec_level, auth_type);
++				   cp->addr.type, sec_level, auth_type, 0);
+ 	else
+ 		conn = hci_connect(hdev, LE_LINK, &cp->addr.bdaddr,
+-				   cp->addr.type, sec_level, auth_type);
++				   cp->addr.type, sec_level, auth_type, 0);
+ 
+ 	memset(&rp, 0, sizeof(rp));
+ 	bacpy(&rp.addr.bdaddr, &cp->addr.bdaddr);
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index be3e0b2..e86ae29 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -186,7 +186,7 @@ static int sco_connect(struct sock *sk)
+ 		type = SCO_LINK;
+ 
+ 	hcon = hci_connect(hdev, type, dst, BDADDR_BREDR, BT_SECURITY_LOW,
+-			   HCI_AT_NO_BONDING);
++			   HCI_AT_NO_BONDING, sco_pi(sk)->codec);
+ 	if (IS_ERR(hcon)) {
+ 		err = PTR_ERR(hcon);
+ 		goto done;
 -- 
-Thanks & Regards,
-Deepthi Elizabeth P V
+1.7.9.5
 
-
---------------030502000906030901090500
-Content-Type: text/plain;
- name="sco_connreq_hcidump.txt"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="sco_connreq_hcidump.txt"
-
-
-2012-11-29 11:05:11.821785 > ACL data: handle 12 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-      Connection successful
-2012-11-29 11:05:11.821803 < ACL data: handle 12 flags 0x00 dlen 23
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 11
-      RFC 0x00 (Basic) 
-2012-11-29 11:05:11.825534 > ACL data: handle 12 flags 0x02 dlen 23
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 11
-      RFC 0x00 (Basic) 
-2012-11-29 11:05:11.825545 < ACL data: handle 12 flags 0x00 dlen 18
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-      MTU 672 
-2012-11-29 11:05:11.830534 > ACL data: handle 12 flags 0x02 dlen 18
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-      MTU 672 
-2012-11-29 11:05:11.831286 > HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 12 packets 2
-2012-11-29 11:05:12.002285 > HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 12 packets 1
-2012-11-29 11:05:12.100652 < HCI Command: Read RSSI (0x05|0x0005) plen 2
-    handle 12
-2012-11-29 11:05:12.102283 > HCI Event: Command Complete (0x0e) plen 7
-    Read RSSI (0x05|0x0005) ncmd 1
-    status 0x00 handle 12 rssi -15
-2012-11-29 11:05:12.102317 < HCI Command: Read Link Quality (0x05|0x0003) plen 2
-    handle 12
-2012-11-29 11:05:12.103284 > HCI Event: Command Complete (0x0e) plen 7
-    Read Link Quality (0x05|0x0003) ncmd 1
-    status 0x00 handle 12 lq 255
-2012-11-29 11:05:12.103314 < HCI Command: Read Transmit Power Level (0x03|0x002d) plen 3
-    handle 12 type 0 (current)
-2012-11-29 11:05:12.104285 > HCI Event: Command Complete (0x0e) plen 7
-    Read Transmit Power Level (0x03|0x002d) ncmd 1
-    status 0x00 handle 12 level 3
-2012-11-29 11:05:12.830703 < ACL data: handle 12 flags 0x00 dlen 132
-    L2CAP(d): cid 0x0040 len 128 [psm 4113]
-      0000: 52 49 46 46 e2 0f 00 00  57 41 56 45 66 6d 74 20  RIFF....WAVEfmt 
-      0010: 10 00 00 00 01 00 01 00  44 ac 00 00 88 58 01 00  ........D....X..
-      0020: 02 00 10 00 64 61 74 61  b8 0f 00 00 00 00 00 00  ....data........
-      0030: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-      0040: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-      0050: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-      0060: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-      0070: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-2012-11-29 11:05:12.850154 > ACL data: handle 12 flags 0x02 dlen 132
-    L2CAP(d): cid 0x0040 len 128 [psm 4113]
-      0000: 52 49 46 46 e2 0f 00 00  57 41 56 45 66 6d 74 20  RIFF....WAVEfmt 
-      0010: 10 00 00 00 01 00 01 00  44 ac 00 00 88 58 01 00  ........D....X..
-      0020: 02 00 10 00 64 61 74 61  b8 0f 00 00 00 00 00 00  ....data........
-      0030: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-      0040: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-      0050: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-      0060: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-      0070: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-2012-11-29 11:05:12.850236 < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
-    handle 12 voice setting 0x0060 ptype 0x0008
-2012-11-29 11:05:12.851279 > HCI Event: Command Status (0x0f) plen 4
-    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
-2012-11-29 11:05:12.874279 > HCI Event: Synchronous Connect Complete (0x2c) plen 17
-    status 0x00 handle 6 bdaddr 00:02:72:D6:AB:AD type eSCO
-    Air mode: CVSD
-
-
---------------030502000906030901090500
-Content-Type: text/plain;
- name="sco_connaccept_hcidump.txt"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="sco_connaccept_hcidump.txt"
-
-1354166949.194632 > HCI Event: Number of Completed Packets (0x13) plen 5
-  0000: 01 0b 00 02 00                                    .....
-1354166949.194637 > ACL data: handle 11 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 4113 scid 0x0040
-1354166949.194654 < ACL data: handle 11 flags 0x00 dlen 16
-    0000: 0c 00 01 00 03 03 08 00  40 00 40 00 01 00 00 00  ........@.@.....
-1354166949.194656 < ACL data: handle 11 flags 0x00 dlen 10
-    0000: 06 00 01 00 0a 01 02 00  02 00                    ..........
-1354166949.230631 > HCI Event: Number of Completed Packets (0x13) plen 5
-  0000: 01 0b 00 02 00                                    .....
-1354166949.231632 > ACL data: handle 11 flags 0x02 dlen 16
-    L2CAP(s): Info rsp: type 2 result 0
-      Extended feature mask 0x00b8
-1354166949.231641 < ACL data: handle 11 flags 0x00 dlen 10
-    0000: 06 00 01 00 0a 02 02 00  03 00                    ..........
-1354166949.247632 > ACL data: handle 11 flags 0x02 dlen 20
-    L2CAP(s): Info rsp: type 3 result 0
-      Unknown (len 8)
-1354166949.247642 < ACL data: handle 11 flags 0x00 dlen 16
-    0000: 0c 00 01 00 03 03 08 00  40 00 40 00 00 00 00 00  ........@.@.....
-1354166949.247645 < ACL data: handle 11 flags 0x00 dlen 23
-    0000: 13 00 01 00 04 03 0f 00  40 00 00 00 04 09 00 00  ........@.......
-    0010: 00 00 00 00 00 00 00                              .......
-1354166949.298632 > HCI Event: Number of Completed Packets (0x13) plen 5
-  0000: 01 0b 00 02 00                                    .....
-1354166949.298636 > ACL data: handle 11 flags 0x02 dlen 23
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 11
-      RFC 0x00 (Basic) 
-1354166949.298647 < ACL data: handle 11 flags 0x00 dlen 18
-    0000: 0e 00 01 00 05 04 0a 00  40 00 00 00 00 00 01 02  ........@.......
-    0010: a0 02                                             ..
-1354166949.306632 > ACL data: handle 11 flags 0x02 dlen 18
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-      MTU 672 
-1354166949.307631 > HCI Event: Number of Completed Packets (0x13) plen 5
-  0000: 01 0b 00 02 00                                    .....
-1354166949.566793 < HCI Command: Read RSSI (0x05|0x0005) plen 2
-  0000: 0b 00                                             ..
-1354166949.568632 > HCI Event: Command Complete (0x0e) plen 7
-  0000: 01 05 14 00 0b 00 f0                              .......
-1354166949.568729 < HCI Command: Read Link Quality (0x05|0x0003) plen 2
-  0000: 0b 00                                             ..
-1354166949.570631 > HCI Event: Command Complete (0x0e) plen 7
-  0000: 01 03 14 00 0b 00 ff                              .......
-1354166949.570661 < HCI Command: Read Transmit Power Level (0x03|0x002d) plen 3
-  0000: 0b 00 00                                          ...
-1354166949.572631 > HCI Event: Command Complete (0x0e) plen 7
-  0000: 01 2d 0c 00 0b 00 03                              .-.....
-1354166950.319635 > ACL data: handle 11 flags 0x02 dlen 132
-    L2CAP(d): cid 0x0040 len 128 [psm 0]
-      0000: 52 49 46 46 e2 0f 00 00  57 41 56 45 66 6d 74 20  RIFF....WAVEfmt 
-      0010: 10 00 00 00 01 00 01 00  44 ac 00 00 88 58 01 00  ........D....X..
-      0020: 02 00 10 00 64 61 74 61  b8 0f 00 00 00 00 00 00  ....data........
-      0030: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-      0040: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-      0050: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-      0060: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-      0070: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-1354166950.319679 < ACL data: handle 11 flags 0x00 dlen 132
-    0000: 80 00 40 00 52 49 46 46  e2 0f 00 00 57 41 56 45  ..@.RIFF....WAVE
-    0010: 66 6d 74 20 10 00 00 00  01 00 01 00 44 ac 00 00  fmt ........D...
-    0020: 88 58 01 00 02 00 10 00  64 61 74 61 b8 0f 00 00  .X......data....
-    0030: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-    0040: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-    0050: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-    0060: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-    0070: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-    0080: 00 00 00 00                                       ....
-1354166950.329632 > HCI Event: Connect Request (0x04) plen 10
-  0000: 79 97 d6 72 02 00 00 01  18 02                    y..r......
-1354166950.329660 < HCI Command: Accept Synchronous Connection (0x01|0x0029) plen 21
-  0000: 79 97 d6 72 02 00 40 1f  00 00 40 1f 00 00 ff ff  y..r..@...@.....
-  0010: 60 00 ff 08 00                                    `....
-1354166950.331633 > HCI Event: Command Status (0x0f) plen 4
-  0000: 00 01 29 04                                       ..).
-1354166950.350635 > HCI Event: Synchronous Connect Complete (0x2c) plen 17
-  0000: 00 06 00 79 97 d6 72 02  00 02 22 00 aa 00 aa 00  ...y..r...".....
-  0010: 02                                                .
-
-
---------------030502000906030901090500--
