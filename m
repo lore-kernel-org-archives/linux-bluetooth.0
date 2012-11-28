@@ -4,66 +4,59 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [RFC 1/4] Bluetooth: Add option for SCO socket codec
-Date: Wed, 28 Nov 2012 19:28:33 +0100
-Message-Id: <1354127316-17431-2-git-send-email-frederic.dalleau@linux.intel.com>
-In-Reply-To: <1354127316-17431-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1354127316-17431-1-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [RFC 0/4] sco: Another SCO socket option :)
+Date: Wed, 28 Nov 2012 19:28:32 +0100
+Message-Id: <1354127316-17431-1-git-send-email-frederic.dalleau@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch extends the current SCO socket option to add a codec field. This
-field is intended to choose between mSBC and CVSD codec at runtime. Incoming
-connections will be setup during defered setup. Outgoing connections have to
-be setup before connect(). The selected codec is stored in the sco socket info.
-This patch declares needed members and implements getsockopt().
----
- include/net/bluetooth/sco.h |    2 ++
- net/bluetooth/sco.c         |    3 +++
- 2 files changed, 5 insertions(+)
+Hi,
 
-diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
-index 1e35c43..c283de0 100644
---- a/include/net/bluetooth/sco.h
-+++ b/include/net/bluetooth/sco.h
-@@ -43,6 +43,7 @@ struct sockaddr_sco {
- #define SCO_OPTIONS	0x01
- struct sco_options {
- 	__u16 mtu;
-+	__u8 codec;
- };
- 
- #define SCO_CONNINFO	0x02
-@@ -73,6 +74,7 @@ struct sco_conn {
- struct sco_pinfo {
- 	struct bt_sock	bt;
- 	__u32		flags;
-+	__u8		codec;
- 	struct sco_conn	*conn;
- };
- 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index eea17cd..c2c0c13 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -427,6 +427,8 @@ static struct sock *sco_sock_alloc(struct net *net, struct socket *sock, int pro
- 	sk->sk_protocol = proto;
- 	sk->sk_state    = BT_OPEN;
- 
-+	sco_pi(sk)->codec = 0;
-+
- 	setup_timer(&sk->sk_timer, sco_sock_timeout, (unsigned long)sk);
- 
- 	bt_sock_link(&sco_sk_list, sk);
-@@ -745,6 +747,7 @@ static int sco_sock_getsockopt_old(struct socket *sock, int optname, char __user
- 		}
- 
- 		opts.mtu = sco_pi(sk)->conn->mtu;
-+		opts.codec = sco_pi(sk)->codec;
- 
- 		BT_DBG("mtu %d", opts.mtu);
- 
+This patch implements codec socket option on SCO sockets.
+Currently it proposes T2 codec settins (see HFP 1.6 p.102)
+
+
+How to test:
+$ scotest -W 1 -C 1
+
+on another machine with same patches run:
+$ scotest -n $ADDR -C 1
+
+Check result with btmon.
+
+This took more time than I expected for I met the following issues :
+* bluetooth-next branch crashed in apparmor after login.
+* At some point, unplugging my usb dongle would also crash the kernel. It is
+possible this one was a mix between different versions of kernel modules.
+* if the connection request is not accepted, the initiator gets in timeout, and
+there is a crash. I think this one will need be fixed.
+
+Next step is to implement fallback between T2 and T1. I'm thinking about using
+another bit in hconn->flags to store current settings selection.
+
+Let me know what you think.
+Best regards,
+Frédéric
+
+
+Frédéric Dalleau (4):
+  Bluetooth: Add option for SCO socket codec
+  Bluetooth: Add option for SCO socket socket
+  Bluetooth: Use codec to create SCO connection
+  Bluetooth: Set link parameters for outgoing connections
+
+ include/net/bluetooth/hci_core.h |    6 +++--
+ include/net/bluetooth/sco.h      |    2 ++
+ net/bluetooth/hci_conn.c         |   24 ++++++++++++++----
+ net/bluetooth/hci_event.c        |   23 ++++++++++++++---
+ net/bluetooth/l2cap_core.c       |    4 +--
+ net/bluetooth/mgmt.c             |    4 +--
+ net/bluetooth/sco.c              |   51 ++++++++++++++++++++++++++++++++++++--
+ 7 files changed, 97 insertions(+), 17 deletions(-)
+
 -- 
 1.7.9.5
 
