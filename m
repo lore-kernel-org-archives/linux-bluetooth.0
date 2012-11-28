@@ -1,173 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <50B62135.7080507@gmail.com>
-Date: Wed, 28 Nov 2012 23:35:33 +0900
-From: Chan-yeol Park <chanyeol.park@gmail.com>
-MIME-version: 1.0
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: Fix possible deadlock in SCO code
-References: <1339738863-6407-1-git-send-email-gustavo@padovan.org>
-In-reply-to: <1339738863-6407-1-git-send-email-gustavo@padovan.org>
-Content-type: text/plain; charset=ISO-8859-1; format=flowed
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
+	<frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 8/8] event: Store link key infos in new keys file
+Date: Wed, 28 Nov 2012 14:39:27 +0100
+Message-Id: <1354109967-6238-8-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1354109967-6238-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1354109967-6238-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo
+---
+ src/event.c |   59 +++++++++++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 47 insertions(+), 12 deletions(-)
 
-If we use the below patch, we face crash or circular locking dependency 
-detected.
-*It's very easily reproduced(about 100%)
-
-I guess once sco_sock_shutdown() is called,"sk" would be destructed.
-but due to response from remote side, sco_disconn_cfm(),sco_conn_del() 
-would be called in order.
-and finally in sco_conn_del() crash or circular locking dependency is 
-happened.
-because it access "sk" that is already destructed.
-
-I think in sco_chan_del(), based on conn info, the relation between sk 
-and conn should be cleaned
-like the original code before you commit.
-
-[  104.889622] Bluetooth: [sco_sock_shutdown] sock e8856000, sk eb695000
-[  104.894666] Bluetooth: [sco_sock_clear_timer] sock eb695000 state 1
-[  104.900869] Bluetooth: [__sco_sock_close] sk eb695000 state 1 socket 
-e8856000
-[  104.907976] Bluetooth: [sco_sock_set_timer] sock eb695000 state 8 
-timeout 400
-[  104.915106] Bluetooth: [sco_sock_release] sock e8856000, sk eb695000
-[  104.921439] Bluetooth: [sco_sock_clear_timer] sock eb695000 state 8
-[  104.927875] Bluetooth: [__sco_sock_close] sk eb695000 state 8 socket 
-e8856000
-[  104.938762] Bluetooth: [sco_chan_del] sk eb695000, conn ed38da60, err 104
-[  104.956861] Bluetooth: [sco_sock_kill] sk eb695000 state 9
-[  104.962321] Bluetooth: [sco_sock_destruct] sk eb695000
-[  105.071125] Bluetooth: [sco_disconn_cfm] hcon ed376000 reason 22
-[  105.075875] Bluetooth: [sco_conn_del] hcon ed376000 conn ed38da60, 
-err 103
-[  105.082848] Bluetooth: [sco_conn_del] before bh_lock_sock () sk eb695000
-
-Could you give me your opinion?
-
-regards
-chanyeol
-
-On 06/15/2012 02:41 PM, Gustavo Padovan wrote:
-> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
->
-> sco_chan_del() only has conn != NULL when called from sco_conn_del() so
-> just move the code from it that deal with conn to sco_conn_del().
->
-> [  120.765529]
-> [  120.765529] ======================================================
-> [  120.766529] [ INFO: possible circular locking dependency detected ]
-> [  120.766529] 3.5.0-rc1-10292-g3701f94-dirty #70 Tainted: G        W
-> [  120.766529] -------------------------------------------------------
-> [  120.766529] kworker/u:3/1497 is trying to acquire lock:
-> [  120.766529]  (&(&conn->lock)->rlock#2){+.+...}, at:
-> [<ffffffffa00b7ecc>] sco_chan_del+0x4c/0x170 [bluetooth]
-> [  120.766529]
-> [  120.766529] but task is already holding lock:
-> [  120.766529]  (slock-AF_BLUETOOTH-BTPROTO_SCO){+.+...}, at:
-> [<ffffffffa00b8401>] sco_conn_del+0x61/0xe0 [bluetooth]
-> [  120.766529]
-> [  120.766529] which lock already depends on the new lock.
-> [  120.766529]
-> [  120.766529]
-> [  120.766529] the existing dependency chain (in reverse order) is:
-> [  120.766529]
-> [  120.766529] -> #1 (slock-AF_BLUETOOTH-BTPROTO_SCO){+.+...}:
-> [  120.766529]        [<ffffffff8107980e>] lock_acquire+0x8e/0xb0
-> [  120.766529]        [<ffffffff813c19e0>] _raw_spin_lock+0x40/0x80
-> [  120.766529]        [<ffffffffa00b85e9>] sco_connect_cfm+0x79/0x300
-> [bluetooth]
-> [  120.766529]        [<ffffffffa0094b13>]
-> hci_sync_conn_complete_evt.isra.90+0x343/0x400 [bluetooth]
-> [  120.766529]        [<ffffffffa009d447>] hci_event_packet+0x317/0xfb0
-> [bluetooth]
-> [  120.766529]        [<ffffffffa008aa68>] hci_rx_work+0x2c8/0x890
-> [bluetooth]
-> [  120.766529]        [<ffffffff81047db7>] process_one_work+0x197/0x460
-> [  120.766529]        [<ffffffff810489d6>] worker_thread+0x126/0x2d0
-> [  120.766529]        [<ffffffff8104ee4d>] kthread+0x9d/0xb0
-> [  120.766529]        [<ffffffff813c4294>] kernel_thread_helper+0x4/0x10
-> [  120.766529]
-> [  120.766529] -> #0 (&(&conn->lock)->rlock#2){+.+...}:
-> [  120.766529]        [<ffffffff81078a8a>] __lock_acquire+0x154a/0x1d30
-> [  120.766529]        [<ffffffff8107980e>] lock_acquire+0x8e/0xb0
-> [  120.766529]        [<ffffffff813c19e0>] _raw_spin_lock+0x40/0x80
-> [  120.766529]        [<ffffffffa00b7ecc>] sco_chan_del+0x4c/0x170
-> [bluetooth]
-> [  120.766529]        [<ffffffffa00b8414>] sco_conn_del+0x74/0xe0
-> [bluetooth]
-> [  120.766529]        [<ffffffffa00b88a2>] sco_disconn_cfm+0x32/0x60
-> [bluetooth]
-> [  120.766529]        [<ffffffffa0093a82>]
-> hci_disconn_complete_evt.isra.53+0x242/0x390 [bluetooth]
-> [  120.766529]        [<ffffffffa009d747>] hci_event_packet+0x617/0xfb0
-> [bluetooth]
-> [  120.766529]        [<ffffffffa008aa68>] hci_rx_work+0x2c8/0x890
-> [bluetooth]
-> [  120.766529]        [<ffffffff81047db7>] process_one_work+0x197/0x460
-> [  120.766529]        [<ffffffff810489d6>] worker_thread+0x126/0x2d0
-> [  120.766529]        [<ffffffff8104ee4d>] kthread+0x9d/0xb0
-> [  120.766529]        [<ffffffff813c4294>] kernel_thread_helper+0x4/0x10
-> [  120.766529]
-> [  120.766529] other info that might help us debug this:
-> [  120.766529]
-> [  120.766529]  Possible unsafe locking scenario:
-> [  120.766529]
-> [  120.766529]        CPU0                    CPU1
-> [  120.766529]        ----                    ----
-> [  120.766529]   lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
-> [  120.766529]
-> lock(&(&conn->lock)->rlock#2);
-> [  120.766529]
-> lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
-> [  120.766529]   lock(&(&conn->lock)->rlock#2);
-> [  120.766529]
-> [  120.766529]  *** DEADLOCK ***
->
-> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> ---
->   net/bluetooth/sco.c |   19 +++++++++----------
->   1 file changed, 9 insertions(+), 10 deletions(-)
->
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index cbdd313..596fdc8 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -149,6 +149,15 @@ static int sco_conn_del(struct hci_conn *hcon, int err)
->   		sco_sock_clear_timer(sk);
->   		sco_chan_del(sk, err);
->   		bh_unlock_sock(sk);
-> +
-> +		sco_conn_lock(conn);
-> +		conn->sk = NULL;
-> +		sco_pi(sk)->conn = NULL;
-> +		sco_conn_unlock(conn);
-> +
-> +		if (conn->hcon)
-> +			hci_conn_put(conn->hcon);
-> +
->   		sco_sock_kill(sk);
->   	}
->   
-> @@ -838,16 +847,6 @@ static void sco_chan_del(struct sock *sk, int err)
->   
->   	BT_DBG("sk %p, conn %p, err %d", sk, conn, err);
->   
-> -	if (conn) {
-> -		sco_conn_lock(conn);
-> -		conn->sk = NULL;
-> -		sco_pi(sk)->conn = NULL;
-> -		sco_conn_unlock(conn);
-> -
-> -		if (conn->hcon)
-> -			hci_conn_put(conn->hcon);
-> -	}
-> -
->   	sk->sk_state = BT_CLOSED;
->   	sk->sk_err   = err;
->   	sk->sk_state_change(sk);
+diff --git a/src/event.c b/src/event.c
+index 7fc8f02..59da740 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -354,33 +354,68 @@ static int store_longtermkey(bdaddr_t *local, bdaddr_t *peer,
+ 	return err;
+ }
+ 
++static void store_link_key(struct btd_adapter *adapter,
++				struct btd_device *device, uint8_t *key,
++				uint8_t type, uint8_t pin_length)
++{
++	char adapter_addr[18];
++	char device_addr[18];
++	char filename[PATH_MAX + 1];
++	GKeyFile *key_file;
++	char key_str[35];
++	char *str;
++	int i;
++	gsize length = 0;
++
++	ba2str(adapter_get_address(adapter), adapter_addr);
++	ba2str(device_get_address(device), device_addr);
++
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/keys", adapter_addr,
++								device_addr);
++	filename[PATH_MAX] = '\0';
++
++	key_file = g_key_file_new();
++	g_key_file_load_from_file(key_file, filename, 0, NULL);
++
++	key_str[0] = '0';
++	key_str[1] = 'x';
++	for (i = 0; i < 16; i++)
++		sprintf(key_str + 2 + (i * 2), "%2.2X", key[i]);
++
++	g_key_file_set_string(key_file, "LinkKey", "Key", key_str);
++
++	g_key_file_set_integer(key_file, "LinkKey", "Type", type);
++	g_key_file_set_integer(key_file, "LinkKey", "PINLength", pin_length);
++
++	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
++
++	str = g_key_file_to_data(key_file, &length, NULL);
++	g_file_set_contents(filename, str, length, NULL);
++	g_free(str);
++
++	g_key_file_free(key_file);
++}
++
+ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
+ 				uint8_t *key, uint8_t key_type,
+ 				uint8_t pin_length)
+ {
+ 	struct btd_adapter *adapter;
+ 	struct btd_device *device;
+-	uint8_t peer_type;
+-	int ret;
+ 
+ 	if (!get_adapter_and_device(local, peer, &adapter, &device, TRUE))
+ 		return -ENODEV;
+ 
+ 	DBG("storing link key of type 0x%02x", key_type);
+ 
+-	peer_type = device_get_addr_type(device);
++	store_link_key(adapter, device, key, key_type, pin_length);
+ 
+-	ret = write_link_key(local, peer, peer_type, key, key_type,
+-								pin_length);
++	device_set_bonded(device, TRUE);
+ 
+-	if (ret == 0) {
+-		device_set_bonded(device, TRUE);
+-
+-		if (device_is_temporary(device))
+-			device_set_temporary(device, FALSE);
+-	}
++	if (device_is_temporary(device))
++		device_set_temporary(device, FALSE);
+ 
+-	return ret;
++	return 0;
+ }
+ 
+ int btd_event_ltk_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
+-- 
+1.7.9.5
 
