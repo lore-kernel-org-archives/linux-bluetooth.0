@@ -1,64 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 1/4] Bluetooth: AMP: Check that AMP is present and active
-Date: Thu, 29 Nov 2012 17:46:05 +0200
-Message-Id: <1354203968-1335-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <20121129103405.GC26707@joana>
+Subject: [PATCHv2 2/4] Bluetooth: Fix missing L2CAP EWS Conf parameter
+Date: Thu, 29 Nov 2012 17:46:06 +0200
+Message-Id: <1354203968-1335-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1354203968-1335-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <20121129103405.GC26707@joana>
+ <1354203968-1335-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Before starting quering remote AMP controllers make sure
-that there is local active AMP controller.
+If L2CAP_FEAT_FCS is not supported we sould miss EWS option
+configuration because of break. Make code more readable by
+combining FCS configuration in the single block.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci_core.h |   16 ++++++++++++++++
- net/bluetooth/l2cap_core.c       |    1 +
- 2 files changed, 17 insertions(+)
+ net/bluetooth/l2cap_core.c |   32 +++++++++++++++-----------------
+ 1 file changed, 15 insertions(+), 17 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 2f2b743..014a2ea 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -779,6 +779,22 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define lmp_host_le_capable(dev)   !!((dev)->host_features[0] & LMP_HOST_LE)
- #define lmp_host_le_br_capable(dev) !!((dev)->host_features[0] & LMP_HOST_LE_BREDR)
- 
-+/* returns true if at least one AMP active */
-+static inline bool hci_amp_capable(void)
-+{
-+	struct hci_dev *hdev;
-+	bool ret = false;
-+
-+	read_lock(&hci_dev_list_lock);
-+	list_for_each_entry(hdev, &hci_dev_list, list)
-+		if (hdev->amp_type == HCI_AMP &&
-+		    test_bit(HCI_UP, &hdev->flags))
-+			ret = true;
-+	read_unlock(&hci_dev_list_lock);
-+
-+	return ret;
-+}
-+
- /* ----- HCI protocols ----- */
- #define HCI_PROTO_DEFER             0x01
- 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f7ee037..d8cffdb 100644
+index d8cffdb..d22d183 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1013,6 +1013,7 @@ static bool __amp_capable(struct l2cap_chan *chan)
- 	struct l2cap_conn *conn = chan->conn;
+@@ -3106,18 +3106,17 @@ done:
+ 		if (test_bit(FLAG_EFS_ENABLE, &chan->flags))
+ 			l2cap_add_opt_efs(&ptr, chan);
  
- 	if (enable_hs &&
-+	    hci_amp_capable() &&
- 	    chan->chan_policy == BT_CHANNEL_POLICY_AMP_PREFERRED &&
- 	    conn->fixed_chan_mask & L2CAP_FC_A2MP)
- 		return true;
+-		if (!(chan->conn->feat_mask & L2CAP_FEAT_FCS))
+-			break;
+-
+-		if (chan->fcs == L2CAP_FCS_NONE ||
+-		    test_bit(CONF_NO_FCS_RECV, &chan->conf_state)) {
+-			chan->fcs = L2CAP_FCS_NONE;
+-			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
+-		}
+-
+ 		if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+ 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EWS, 2,
+ 					   chan->tx_win);
++
++		if (chan->conn->feat_mask & L2CAP_FEAT_FCS)
++			if (chan->fcs == L2CAP_FCS_NONE ||
++			    test_bit(CONF_NO_FCS_RECV, &chan->conf_state)) {
++				chan->fcs = L2CAP_FCS_NONE;
++				l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1,
++						   chan->fcs);
++			}
+ 		break;
+ 
+ 	case L2CAP_MODE_STREAMING:
+@@ -3139,14 +3138,13 @@ done:
+ 		if (test_bit(FLAG_EFS_ENABLE, &chan->flags))
+ 			l2cap_add_opt_efs(&ptr, chan);
+ 
+-		if (!(chan->conn->feat_mask & L2CAP_FEAT_FCS))
+-			break;
+-
+-		if (chan->fcs == L2CAP_FCS_NONE ||
+-		    test_bit(CONF_NO_FCS_RECV, &chan->conf_state)) {
+-			chan->fcs = L2CAP_FCS_NONE;
+-			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
+-		}
++		if (chan->conn->feat_mask & L2CAP_FEAT_FCS)
++			if (chan->fcs == L2CAP_FCS_NONE ||
++			    test_bit(CONF_NO_FCS_RECV, &chan->conf_state)) {
++				chan->fcs = L2CAP_FCS_NONE;
++				l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1,
++						   chan->fcs);
++			}
+ 		break;
+ 	}
+ 
 -- 
 1.7.10.4
 
