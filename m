@@ -1,26 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 30 Nov 2012 10:31:32 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/6] gdbus: Add g_dbus_add_properties_watch function
-Message-ID: <20121130083132.GA5492@x220.ger.corp.intel.com>
-References: <1354020685-17028-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1354020685-17028-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1354193256-30610-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1354193256-30610-1-git-send-email-mikel.astiz.oss@gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Thu, 29 Nov 2012 16:12:37 -0200
+Message-ID: <CAMOw1v4hsQa3VNT+qaF9eZPiu88G7cyd0jwTR=Bd1Pnj3yyQWw@mail.gmail.com>
+Subject: Re: [RFC v2 00/15] Manager/Adapter transition to ObjectManager
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+On Thu, Nov 29, 2012 at 10:47 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>
+> Note that this patchset requires the gdbus fix affecting were the ObjectManager gets registered, as submitted by Luiz.
 
-On Tue, Nov 27, 2012, Luiz Augusto von Dentz wrote:
-> Convenient function to create watches for D-Bus properties.
-> ---
->  gdbus/gdbus.h |  5 +++++
->  gdbus/watch.c | 28 ++++++++++++++++++++++++++++
->  2 files changed, 33 insertions(+)
+Those were replaced with my patches today.  Do my patches do what you need?
 
-All patches in this set have been applied. Thanks.
-
-Johan
+Lucas De Marchi
