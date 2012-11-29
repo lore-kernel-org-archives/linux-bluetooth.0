@@ -1,79 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 2/4] Bluetooth: Fix missing L2CAP EWS Conf parameter
-Date: Thu, 29 Nov 2012 17:46:06 +0200
-Message-Id: <1354203968-1335-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1354203968-1335-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <20121129103405.GC26707@joana>
- <1354203968-1335-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZJVfiD36XrnNyn-5i5MqcOi-LKJ3QMREC6E+XpC9+1CyQ@mail.gmail.com>
+References: <1354195173-12750-1-git-send-email-lucas.demarchi@profusion.mobi>
+	<CABBYNZJVfiD36XrnNyn-5i5MqcOi-LKJ3QMREC6E+XpC9+1CyQ@mail.gmail.com>
+Date: Thu, 29 Nov 2012 16:37:37 +0200
+Message-ID: <CABBYNZ+WDVUJz1y7JZPhw=nd=7gLmfzycDEA=vcsL4FLxym4KA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/3] gdbus: Don't register DBus.Properties with no properties
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Lucas,
 
-If L2CAP_FEAT_FCS is not supported we sould miss EWS option
-configuration because of break. Make code more readable by
-combining FCS configuration in the single block.
+On Thu, Nov 29, 2012 at 3:33 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Lucas,
+>
+> On Thu, Nov 29, 2012 at 3:19 PM, Lucas De Marchi
+> <lucas.demarchi@profusion.mobi> wrote:
+>> Delay registering DBus.Properties interface until the moment there are
+>> properties on that path. This is needed for objects that currently don't
+>> expose any property to not export the interface.
+>> ---
+>>  gdbus/object.c | 9 ++++++---
+>>  1 file changed, 6 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/gdbus/object.c b/gdbus/object.c
+>> index 3101ca6..47116bd 100644
+>> --- a/gdbus/object.c
+>> +++ b/gdbus/object.c
+>> @@ -1213,9 +1213,6 @@ static struct generic_data *object_path_ref(DBusConnection *connection,
+>>                                         manager_methods, manager_signals,
+>>                                         NULL, data, NULL);
+>>
+>> -       add_interface(data, DBUS_INTERFACE_PROPERTIES, properties_methods,
+>> -                                       properties_signals, NULL, data, NULL);
+>> -
+>>         return data;
+>>  }
+>>
+>> @@ -1336,6 +1333,12 @@ gboolean g_dbus_register_interface(DBusConnection *connection,
+>>                 return FALSE;
+>>         }
+>>
+>> +       if (properties != NULL && !find_interface(data->interfaces,
+>> +                                               DBUS_INTERFACE_PROPERTIES))
+>> +               add_interface(data, DBUS_INTERFACE_PROPERTIES,
+>> +                               properties_methods, properties_signals, NULL,
+>> +                               data, NULL);
+>> +
+>>         add_interface(data, name, methods, signals, properties, user_data,
+>>                                                                 destroy);
+>>
+>> --
+>> 1.8.0.1
+>
+> Ack
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/l2cap_core.c |   32 +++++++++++++++-----------------
- 1 file changed, 15 insertions(+), 17 deletions(-)
+Patches pushed to BlueZ and obexd. Thanks.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index d8cffdb..d22d183 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3106,18 +3106,17 @@ done:
- 		if (test_bit(FLAG_EFS_ENABLE, &chan->flags))
- 			l2cap_add_opt_efs(&ptr, chan);
- 
--		if (!(chan->conn->feat_mask & L2CAP_FEAT_FCS))
--			break;
--
--		if (chan->fcs == L2CAP_FCS_NONE ||
--		    test_bit(CONF_NO_FCS_RECV, &chan->conf_state)) {
--			chan->fcs = L2CAP_FCS_NONE;
--			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
--		}
--
- 		if (test_bit(FLAG_EXT_CTRL, &chan->flags))
- 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EWS, 2,
- 					   chan->tx_win);
-+
-+		if (chan->conn->feat_mask & L2CAP_FEAT_FCS)
-+			if (chan->fcs == L2CAP_FCS_NONE ||
-+			    test_bit(CONF_NO_FCS_RECV, &chan->conf_state)) {
-+				chan->fcs = L2CAP_FCS_NONE;
-+				l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1,
-+						   chan->fcs);
-+			}
- 		break;
- 
- 	case L2CAP_MODE_STREAMING:
-@@ -3139,14 +3138,13 @@ done:
- 		if (test_bit(FLAG_EFS_ENABLE, &chan->flags))
- 			l2cap_add_opt_efs(&ptr, chan);
- 
--		if (!(chan->conn->feat_mask & L2CAP_FEAT_FCS))
--			break;
--
--		if (chan->fcs == L2CAP_FCS_NONE ||
--		    test_bit(CONF_NO_FCS_RECV, &chan->conf_state)) {
--			chan->fcs = L2CAP_FCS_NONE;
--			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
--		}
-+		if (chan->conn->feat_mask & L2CAP_FEAT_FCS)
-+			if (chan->fcs == L2CAP_FCS_NONE ||
-+			    test_bit(CONF_NO_FCS_RECV, &chan->conf_state)) {
-+				chan->fcs = L2CAP_FCS_NONE;
-+				l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1,
-+						   chan->fcs);
-+			}
- 		break;
- 	}
- 
--- 
-1.7.10.4
 
+--
+Luiz Augusto von Dentz
