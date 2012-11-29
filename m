@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 4/4] Bluetooth: trivial: Change NO_FCS_RECV to RECV_NO_FCS
-Date: Thu, 29 Nov 2012 17:46:08 +0200
-Message-Id: <1354203968-1335-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 3/4] Bluetooth: Process receiving FCS_NONE in L2CAP Conf Rsp
+Date: Thu, 29 Nov 2012 17:46:07 +0200
+Message-Id: <1354203968-1335-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1354203968-1335-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <20121129103405.GC26707@joana>
  <1354203968-1335-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,78 +12,58 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Make code more readable by changing CONF_NO_FCS_RECV which is read
-as "No L2CAP FCS option received" to CONF_RECV_NO_FCS which means
-"Received L2CAP option NO_FCS". This flag really means that we have
-received L2CAP FRAME CHECK SEQUENCE (FCS) OPTION with value "No FCS".
+Process L2CAP Config rsp Pending with FCS Option 0x00 (No FCS)
+which is sent by Motorola Windows 7 Bluetooth stack. The trace
+is shown below (all other options are skipped).
+
+...
+< ACL data: handle 1 flags 0x00 dlen 48
+    L2CAP(s): Config req: dcid 0x0043 flags 0x00 clen 36
+      ...
+      FCS Option 0x00 (No FCS)
+> ACL data: handle 1 flags 0x02 dlen 48
+    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 36
+      ...
+      FCS Option 0x01 (CRC16 Check)
+< ACL data: handle 1 flags 0x00 dlen 47
+    L2CAP(s): Config rsp: scid 0x0043 flags 0x00 result 4 clen 33
+      Pending
+      ...
+> ACL data: handle 1 flags 0x02 dlen 50
+    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 4 clen 36
+      Pending
+      ...
+      FCS Option 0x00 (No FCS)
+< ACL data: handle 1 flags 0x00 dlen 14
+    L2CAP(s): Config rsp: scid 0x0043 flags 0x00 result 0 clen 0
+      Success
+> ACL data: handle 1 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 0
+      Success
+...
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |    2 +-
- net/bluetooth/l2cap_core.c    |   10 +++++-----
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ net/bluetooth/l2cap_core.c |    7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index f57fab0..7588ef4 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -611,7 +611,7 @@ enum {
- 	CONF_MTU_DONE,
- 	CONF_MODE_DONE,
- 	CONF_CONNECT_PEND,
--	CONF_NO_FCS_RECV,
-+	CONF_RECV_NO_FCS,
- 	CONF_STATE2_DEVICE,
- 	CONF_EWS_RECV,
- 	CONF_LOC_CONF_PEND,
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 8c43277..2c78208 100644
+index d22d183..8c43277 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -3112,7 +3112,7 @@ done:
- 
- 		if (chan->conn->feat_mask & L2CAP_FEAT_FCS)
- 			if (chan->fcs == L2CAP_FCS_NONE ||
--			    test_bit(CONF_NO_FCS_RECV, &chan->conf_state)) {
-+			    test_bit(CONF_RECV_NO_FCS, &chan->conf_state)) {
- 				chan->fcs = L2CAP_FCS_NONE;
- 				l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1,
- 						   chan->fcs);
-@@ -3140,7 +3140,7 @@ done:
- 
- 		if (chan->conn->feat_mask & L2CAP_FEAT_FCS)
- 			if (chan->fcs == L2CAP_FCS_NONE ||
--			    test_bit(CONF_NO_FCS_RECV, &chan->conf_state)) {
-+			    test_bit(CONF_RECV_NO_FCS, &chan->conf_state)) {
- 				chan->fcs = L2CAP_FCS_NONE;
- 				l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1,
- 						   chan->fcs);
-@@ -3196,7 +3196,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
- 
- 		case L2CAP_CONF_FCS:
- 			if (val == L2CAP_FCS_NONE)
--				set_bit(CONF_NO_FCS_RECV, &chan->conf_state);
-+				set_bit(CONF_RECV_NO_FCS, &chan->conf_state);
+@@ -3431,6 +3431,13 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
+ 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS, sizeof(efs),
+ 					   (unsigned long) &efs);
  			break;
- 
- 		case L2CAP_CONF_EFS:
-@@ -3435,7 +3435,7 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
- 		case L2CAP_CONF_FCS:
- 			if (*result == L2CAP_CONF_PENDING)
- 				if (val == L2CAP_FCS_NONE)
--					set_bit(CONF_NO_FCS_RECV,
-+					set_bit(CONF_RECV_NO_FCS,
- 						&chan->conf_state);
- 			break;
++
++		case L2CAP_CONF_FCS:
++			if (*result == L2CAP_CONF_PENDING)
++				if (val == L2CAP_FCS_NONE)
++					set_bit(CONF_NO_FCS_RECV,
++						&chan->conf_state);
++			break;
  		}
-@@ -3807,7 +3807,7 @@ static inline void set_default_fcs(struct l2cap_chan *chan)
- 	 */
- 	if (chan->mode != L2CAP_MODE_ERTM && chan->mode != L2CAP_MODE_STREAMING)
- 		chan->fcs = L2CAP_FCS_NONE;
--	else if (!test_bit(CONF_NO_FCS_RECV, &chan->conf_state))
-+	else if (!test_bit(CONF_RECV_NO_FCS, &chan->conf_state))
- 		chan->fcs = L2CAP_FCS_CRC16;
- }
+ 	}
  
 -- 
 1.7.10.4
