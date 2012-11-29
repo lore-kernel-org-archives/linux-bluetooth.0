@@ -1,60 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 29 Nov 2012 15:31:48 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Koustuv Ghosh <koustuvg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: OPP test program
+Message-ID: <20121129133148.GA30257@x220.ger.corp.intel.com>
+References: <CAB6wy+b4GD8XSNHceEPm-UFdcm4=4nrrZtoPMr+aABu2D7tOvw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1354195173-12750-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1354195173-12750-1-git-send-email-lucas.demarchi@profusion.mobi>
-Date: Thu, 29 Nov 2012 15:33:03 +0200
-Message-ID: <CABBYNZJVfiD36XrnNyn-5i5MqcOi-LKJ3QMREC6E+XpC9+1CyQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] gdbus: Don't register DBus.Properties with no properties
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAB6wy+b4GD8XSNHceEPm-UFdcm4=4nrrZtoPMr+aABu2D7tOvw@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Koustuv,
 
-On Thu, Nov 29, 2012 at 3:19 PM, Lucas De Marchi
-<lucas.demarchi@profusion.mobi> wrote:
-> Delay registering DBus.Properties interface until the moment there are
-> properties on that path. This is needed for objects that currently don't
-> expose any property to not export the interface.
-> ---
->  gdbus/object.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
->
-> diff --git a/gdbus/object.c b/gdbus/object.c
-> index 3101ca6..47116bd 100644
-> --- a/gdbus/object.c
-> +++ b/gdbus/object.c
-> @@ -1213,9 +1213,6 @@ static struct generic_data *object_path_ref(DBusConnection *connection,
->                                         manager_methods, manager_signals,
->                                         NULL, data, NULL);
->
-> -       add_interface(data, DBUS_INTERFACE_PROPERTIES, properties_methods,
-> -                                       properties_signals, NULL, data, NULL);
-> -
->         return data;
->  }
->
-> @@ -1336,6 +1333,12 @@ gboolean g_dbus_register_interface(DBusConnection *connection,
->                 return FALSE;
->         }
->
-> +       if (properties != NULL && !find_interface(data->interfaces,
-> +                                               DBUS_INTERFACE_PROPERTIES))
-> +               add_interface(data, DBUS_INTERFACE_PROPERTIES,
-> +                               properties_methods, properties_signals, NULL,
-> +                               data, NULL);
-> +
->         add_interface(data, name, methods, signals, properties, user_data,
->                                                                 destroy);
->
-> --
-> 1.8.0.1
+On Thu, Nov 29, 2012, Koustuv Ghosh wrote:
+> I have seen there is no OPP client or server,  test program in bluez
+> release. Although obxd projects provides it separately using python
+> script+ dbus mechanism.
+> 
+> In my case , I have developed a simple command line OPP client
+> program( takes the remote BD Address and path of the file as arguments
+> ) which gets compilied with bluez itself. This test progrm can also be
+> interfaced with Dbus.
+> 
+> Is it allowable that if I want to contribute this test program to
+> community , obviously by flowing community protocol.
 
-Ack
+BlueZ hasn't traditionally had any OBEX code. This has been taken care
+of by a separate project called obexd and you can find both release
+announcements of it as well as its git tree in the same place you can
+find BlueZ. The obexd project has both client and server implementations
+for most of the known OBEX-based profiles, including OPP. It's worth
+noting thought that starting with BlueZ 5 will will merge the obexd tree
+into the BlueZ one any new obexd releases will come together with the
+usual BlueZ 5.x releases.
 
-
---
-Luiz Augusto von Dentz
+Johan
