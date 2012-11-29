@@ -1,27 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 29 Nov 2012 18:54:41 +0530
-Message-ID: <CAB6wy+b4GD8XSNHceEPm-UFdcm4=4nrrZtoPMr+aABu2D7tOvw@mail.gmail.com>
-Subject: OPP test program
-From: Koustuv Ghosh <koustuvg@gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
+Subject: [PATCH BlueZ 3/3] core: Attach and detach object manager
+Date: Thu, 29 Nov 2012 11:19:33 -0200
+Message-Id: <1354195173-12750-3-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1354195173-12750-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1354195173-12750-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+From: Lucas De Marchi <lucas.de.marchi@gmail.com>
 
-I have seen there is no OPP client or server,  test program in bluez
-release. Although obxd projects provides it separately using python
-script+ dbus mechanism.
+---
+ src/main.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-In my case , I have developed a simple command line OPP client
-program( takes the remote BD Address and path of the file as arguments
-) which gets compilied with bluez itself. This test progrm can also be
-interfaced with Dbus.
+diff --git a/src/main.c b/src/main.c
+index 414849a..ccb5fa5 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -381,6 +381,7 @@ static void disconnect_dbus(void)
+ 	if (!conn || !dbus_connection_get_is_connected(conn))
+ 		return;
+ 
++	g_dbus_detach_object_manager(conn);
+ 	set_dbus_connection(NULL);
+ 
+ 	dbus_connection_unref(conn);
+@@ -412,6 +413,7 @@ static int connect_dbus(void)
+ 	set_dbus_connection(conn);
+ 
+ 	g_dbus_set_disconnect_function(conn, disconnected_dbus, NULL, NULL);
++	g_dbus_attach_object_manager(conn);
+ 
+ 	return 0;
+ }
+-- 
+1.8.0.1
 
-Is it allowable that if I want to contribute this test program to
-community , obviously by flowing community protocol.
-
-rgds
-Koustuv
