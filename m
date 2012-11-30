@@ -1,62 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1354280264-19036-7-git-send-email-szymon.janc@tieto.com>
-References: <1354280264-19036-1-git-send-email-szymon.janc@tieto.com>
-	<1354280264-19036-7-git-send-email-szymon.janc@tieto.com>
-Date: Fri, 30 Nov 2012 09:22:09 -0400
-Message-ID: <CAJdJm_Md2jo=nUUD=xj+bDCO0i4f3Wxr1U32DjsGgMq8ATCJ2w@mail.gmail.com>
-Subject: Re: [PATCH v2 7/8] adaptername: Refactor adaptername_init/exit to fix
- exit path
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Szymon Janc <szymon.janc@tieto.com>
+Date: Fri, 30 Nov 2012 15:06:38 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 00/15] thermometer plugin updates
+Message-ID: <20121130130638.GA12405@x220.ger.corp.intel.com>
+References: <1352451357-22097-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1352451357-22097-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Andrzej,
 
-On Fri, Nov 30, 2012 at 8:57 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
->         inot_fd = inotify_init();
->         if (inot_fd < 0) {
-> -               error("Failed to setup inotify");
-> -               return 0;
-> +               int err = errno;
-> +               error("Failed to setup inotify: %s (%d)", strerror(-err), -err);
-> +               return -err;
+On Fri, Nov 09, 2012, Andrzej Kaczmarek wrote:
+> Here are few patches to update thermometer plugin with features already
+> implemented in other plugins:
+> - store attributes handles directly in thermometer structure instead of
+>   nested lists of structures which we need to traverse later (and we
+>   only need 3 handles stored to support all use cases)
+> - register attio handlers for specific handles instead of one ind and
+>   notif handler globally
+> - change properties handling to DBus.Properties
+> - and some minor fixes
+> 
+> This is tested with PTS 4.5.3. There's only problem with patch #9 which
+> "breaks" testcase TP/THF/CO/BV-09-I - this is because PTS sends invalid
+> properties for Measurement Interval characteristic (it does not have
+> indicate property so we do not register ind handler for it). I already
+> filled issue on PTS.
+> 
+> Comments are welcome.
+> 
+> 
+> Andrzej Kaczmarek (15):
+>   thermometer: Store Temperature Measurement CCC handle in struct
+>   thermometer: Store Intermediate Temperature CCC handle in struct
+>   thermometer: Store Measurement Interval value handle in struct
+>   thermometer: Use dedicated handler for Intermediate Temperature
+>   thermometer: Use dedicated handler for Temperature Measurement
+>   thermometer: Use dedicated handler for Measurement Interval
+>   thermometer: Remove descriptor structure
+>   thermometer: Remove storage of all discovered characteristics
+>   thermometer: Discover Measurement Interval descriptors only if needed
+>   thermometer: Always write CCC value when connecting
+>   thermometer: Make temp_type array static
+>   thermometer: Add DBus.Properties support
+>   thermometer: Remove legacy properties code
+>   doc: Update thermometer API document
+>   test: Update test-thermometer for DBus.Properties
+> 
+>  doc/thermometer-api.txt            |   18 -
+>  profiles/thermometer/thermometer.c | 1008 +++++++++++++++++-------------------
+>  test/test-thermometer              |   13 +-
+>  3 files changed, 478 insertions(+), 561 deletions(-)
 
-Now it is broken :) By convention, "err" should be always negative, so use:
+All patches in this set have been applied. Thanks.
 
-int err = -errno;
-
-when printing the error, you need to make it positive, like above:
-
-error("Failed to setup inotify: %s (%d)", strerror(-err), -err);
-
-then when returning, use:
-
-return err;
-
-See other examples on the bluez code if you have doubts.
-
-> @@ -290,30 +301,38 @@ static int adaptername_init(void)
->
->         watch_d = inotify_add_watch(inot_fd, MACHINE_INFO_DIR, mask);
->         if (watch_d < 0) {
-> -               error("Failed to setup watch for '%s'", MACHINE_INFO_DIR);
-> +               int err = errno;
-> +               error("Failed to setup watch for '%s': %s (%d)",
-> +                               MACHINE_INFO_DIR, strerror(-err), -err);
->                 close(inot_fd);
-> -               return 0;
-> +               return -err;
->         }
-
-Same problem here, please fix. (you can send just a v3 of this patch,
-it should not conflict with others).
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
