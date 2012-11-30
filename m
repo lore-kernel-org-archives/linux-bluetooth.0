@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 8/8] hog: Fix unregistering profile on exit
-Date: Fri, 30 Nov 2012 13:57:44 +0100
-Message-ID: <1354280264-19036-8-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2 6/8] core: Free parsed options
+Date: Fri, 30 Nov 2012 13:57:42 +0100
+Message-ID: <1354280264-19036-6-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1354280264-19036-1-git-send-email-szymon.janc@tieto.com>
 References: <1354280264-19036-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,43 +12,66 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On exit should call btd_profile_unregister instead of
-btd_profile_register. Fixes following:
+There is no need to keep already parsed options in memory. This also
+fix not freeing options at all.
 
-16 bytes in 1 blocks are still reachable in loss record 54 of 215
+2 bytes in 1 blocks are still reachable in loss record 1 of 153
    at 0x4C2B6CD: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
    by 0x4E7FA78: g_malloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.3)
-   by 0x4E92CA2: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.3)
-   by 0x4E93FC2: g_slist_append (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.3)
-   by 0x17F6C2: btd_profile_register (profile.c:533)
-   by 0x171456: plugin_cleanup (plugin.c:242)
-   by 0x12164F: main (main.c:563)
+   by 0x4E942DD: g_strdup (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.3)
+   by 0x167333: parse_debug (main.c:425)
+   by 0x4E839D8: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.3)
+   by 0x4E8403F: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.3)
+   by 0x4E85233: g_option_context_parse (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.3)
+   by 0x121084: main (main.c:462)
 
-16 bytes in 1 blocks are still reachable in loss record 37 of 215
+16 bytes in 2 blocks are still reachable in loss record 39 of 153
    at 0x4C2B6CD: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
    by 0x4E7FA78: g_malloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.3)
-   by 0x4E92CA2: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.3)
-   by 0x4E93FC2: g_slist_append (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.3)
-   by 0x17F6C2: btd_profile_register (profile.c:533)
-   by 0x1712EB: plugin_init (plugin.c:217)
-   by 0x1215D2: main (main.c:544)
+   by 0x4E5D68B: g_convert_with_iconv (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.3)
+   by 0x4E5D94B: g_convert (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.3)
+   by 0x4E5DFBA: g_locale_to_utf8 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.3)
+   by 0x4E837C7: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.3)
+   by 0x4E8403F: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.3)
+   by 0x4E85233: g_option_context_parse (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.3)
+   by 0x121084: main (main.c:462)
 ---
- profiles/input/hog_manager.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/main.c |   15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/profiles/input/hog_manager.c b/profiles/input/hog_manager.c
-index 21ceb79..595b160 100644
---- a/profiles/input/hog_manager.c
-+++ b/profiles/input/hog_manager.c
-@@ -144,7 +144,7 @@ static void hog_manager_exit(void)
- 	if (suspend_supported)
- 		suspend_exit();
+diff --git a/src/main.c b/src/main.c
+index ccb5fa5..bc53a8e 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -344,6 +344,18 @@ static gboolean option_detach = TRUE;
+ static gboolean option_version = FALSE;
+ static gboolean option_udev = FALSE;
  
--	btd_profile_register(&hog_profile);
-+	btd_profile_unregister(&hog_profile);
- }
++static void free_options(void)
++{
++	g_free(option_debug);
++	option_debug = NULL;
++
++	g_free(option_plugin);
++	option_plugin = NULL;
++
++	g_free(option_noplugin);
++	option_noplugin = NULL;
++}
++
+ static guint last_adapter_timeout = 0;
  
- static int hog_init(void)
+ static gboolean exit_timeout(gpointer data)
+@@ -533,6 +545,9 @@ int main(int argc, char *argv[])
+ 	 * daemon needs to be re-worked. */
+ 	plugin_init(config, option_plugin, option_noplugin);
+ 
++	/* no need to keep parsed option in memory */
++	free_options();
++
+ 	mgmt_err = mgmt_setup();
+ 	if (mgmt_err < 0) {
+ 		error("mgmt setup failed: %s", strerror(-mgmt_err));
 -- 
 1.7.9.5
 
