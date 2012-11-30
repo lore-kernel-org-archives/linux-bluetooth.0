@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC V3 10/12] adapter: Convert storage longtermkeys file
-Date: Fri, 30 Nov 2012 15:47:04 +0100
-Message-Id: <1354286826-24016-10-git-send-email-frederic.danis@linux.intel.com>
+Subject: [RFC V3 09/12] event: Store link key infos in device info file
+Date: Fri, 30 Nov 2012 15:47:03 +0100
+Message-Id: <1354286826-24016-9-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1354286826-24016-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1354286826-24016-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -12,70 +12,94 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/adapter.c |   43 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ src/event.c |   59 +++++++++++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 47 insertions(+), 12 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 17f478c..ff9d2e7 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2655,6 +2655,46 @@ static void convert_linkkey_entry(GKeyFile *key_file, void *value)
- 	g_key_file_set_integer(key_file, "LinkKey", "PINLength", val);
+diff --git a/src/event.c b/src/event.c
+index 7fc8f02..5e83c09 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -354,33 +354,68 @@ static int store_longtermkey(bdaddr_t *local, bdaddr_t *peer,
+ 	return err;
  }
  
-+static void convert_ltk_entry(GKeyFile *key_file, void *value)
++static void store_link_key(struct btd_adapter *adapter,
++				struct btd_device *device, uint8_t *key,
++				uint8_t type, uint8_t pin_length)
 +{
-+	char *auth_str, *rand_str, *str;
-+	int i, ret;
-+	unsigned char auth, master, enc_size;
-+	unsigned short ediv;
++	char adapter_addr[18];
++	char device_addr[18];
++	char filename[PATH_MAX + 1];
++	GKeyFile *key_file;
++	char key_str[35];
++	char *str;
++	int i;
++	gsize length = 0;
 +
-+	auth_str = strchr(value, ' ');
-+	if (!auth_str)
-+		return;
++	ba2str(adapter_get_address(adapter), adapter_addr);
++	ba2str(device_get_address(device), device_addr);
 +
-+	*(auth_str++) = 0;
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info", adapter_addr,
++								device_addr);
++	filename[PATH_MAX] = '\0';
 +
-+	for (i = 0, rand_str = auth_str; i < 4; i++) {
-+		rand_str = strchr(rand_str, ' ');
-+		if (!rand_str || rand_str[1] == '\0')
-+			return;
++	key_file = g_key_file_new();
++	g_key_file_load_from_file(key_file, filename, 0, NULL);
 +
-+		rand_str++;
-+	}
++	key_str[0] = '0';
++	key_str[1] = 'x';
++	for (i = 0; i < 16; i++)
++		sprintf(key_str + 2 + (i * 2), "%2.2X", key[i]);
 +
-+	ret = sscanf(auth_str, " %hhd %hhd %hhd %hd", &auth, &master,
-+							&enc_size, &ediv);
-+	if (ret < 4)
-+		return;
++	g_key_file_set_string(key_file, "LinkKey", "Key", key_str);
 +
-+	str = g_strconcat("0x", value, NULL);
-+	g_key_file_set_string(key_file, "LongTermKey", "Key", str);
++	g_key_file_set_integer(key_file, "LinkKey", "Type", type);
++	g_key_file_set_integer(key_file, "LinkKey", "PINLength", pin_length);
++
++	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
++
++	str = g_key_file_to_data(key_file, &length, NULL);
++	g_file_set_contents(filename, str, length, NULL);
 +	g_free(str);
 +
-+	g_key_file_set_integer(key_file, "LongTermKey", "Authenticated", auth);
-+	g_key_file_set_integer(key_file, "LongTermKey", "Master", master);
-+	g_key_file_set_integer(key_file, "LongTermKey", "EncSize", enc_size);
-+	g_key_file_set_integer(key_file, "LongTermKey", "EDiv", ediv);
-+
-+	str = g_strconcat("0x", rand_str, NULL);
-+	g_key_file_set_string(key_file, "LongTermKey", "Rand", str);
-+	g_free(str);
++	g_key_file_free(key_file);
 +}
 +
- static void convert_entry(char *key, char *value, void *user_data)
+ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
+ 				uint8_t *key, uint8_t key_type,
+ 				uint8_t pin_length)
  {
- 	struct device_converter *converter = user_data;
-@@ -2766,6 +2806,9 @@ static void convert_device_storage(struct btd_adapter *adapter)
- 	/* Convert linkkeys */
- 	convert_file("linkkeys", address, convert_linkkey_entry, TRUE);
+ 	struct btd_adapter *adapter;
+ 	struct btd_device *device;
+-	uint8_t peer_type;
+-	int ret;
  
-+	/* Convert longtermkeys */
-+	convert_file("longtermkeys", address, convert_ltk_entry, TRUE);
-+
- 	/* Convert classes */
- 	convert_file("classes", address, convert_classes_entry, FALSE);
+ 	if (!get_adapter_and_device(local, peer, &adapter, &device, TRUE))
+ 		return -ENODEV;
  
+ 	DBG("storing link key of type 0x%02x", key_type);
+ 
+-	peer_type = device_get_addr_type(device);
++	store_link_key(adapter, device, key, key_type, pin_length);
+ 
+-	ret = write_link_key(local, peer, peer_type, key, key_type,
+-								pin_length);
++	device_set_bonded(device, TRUE);
+ 
+-	if (ret == 0) {
+-		device_set_bonded(device, TRUE);
+-
+-		if (device_is_temporary(device))
+-			device_set_temporary(device, FALSE);
+-	}
++	if (device_is_temporary(device))
++		device_set_temporary(device, FALSE);
+ 
+-	return ret;
++	return 0;
+ }
+ 
+ int btd_event_ltk_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t bdaddr_type,
 -- 
 1.7.9.5
 
