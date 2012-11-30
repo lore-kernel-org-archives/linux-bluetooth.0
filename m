@@ -1,37 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 30 Nov 2012 15:50:05 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 4/4] Bluetooth: trivial: Change NO_FCS_RECV to
- RECV_NO_FCS
-Message-ID: <20121130175005.GA3881@joana>
-References: <20121129103405.GC26707@joana>
- <1354203968-1335-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1354203968-1335-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1354203968-1335-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix using locked state_change for A2MP chan
+Date: Fri, 30 Nov 2012 16:51:04 +0200
+Message-Id: <1354287064-30727-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-* Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2012-11-29 17:46:08 +0200]:
+A2MP channel do not have sk associated so use unlocked version
+of state_change. chan is already locked.
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Make code more readable by changing CONF_NO_FCS_RECV which is read
-> as "No L2CAP FCS option received" to CONF_RECV_NO_FCS which means
-> "Received L2CAP option NO_FCS". This flag really means that we have
-> received L2CAP FRAME CHECK SEQUENCE (FCS) OPTION with value "No FCS".
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  include/net/bluetooth/l2cap.h |    2 +-
->  net/bluetooth/l2cap_core.c    |   10 +++++-----
->  2 files changed, 6 insertions(+), 6 deletions(-)
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-All patches have been applied to bluetooth-next. Thanks.
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 2414cff..6de4287 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1276,7 +1276,7 @@ static void l2cap_send_disconn_req(struct l2cap_chan *chan, int err)
+ 	}
+ 
+ 	if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP) {
+-		l2cap_state_change(chan, BT_DISCONN);
++		__l2cap_state_change(chan, BT_DISCONN);
+ 		return;
+ 	}
+ 
+-- 
+1.7.10.4
 
-	Gustavo
