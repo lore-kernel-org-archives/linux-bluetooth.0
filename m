@@ -1,61 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 30 Nov 2012 15:06:38 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 00/15] thermometer plugin updates
-Message-ID: <20121130130638.GA12405@x220.ger.corp.intel.com>
-References: <1352451357-22097-1-git-send-email-andrzej.kaczmarek@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 5/8] attrib: Fix possible use after free
+Date: Fri, 30 Nov 2012 13:57:41 +0100
+Message-ID: <1354280264-19036-5-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1354280264-19036-1-git-send-email-szymon.janc@tieto.com>
+References: <1354280264-19036-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1352451357-22097-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Move io channels unrefs after last use of channels.
+---
+ src/attrib-server.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Fri, Nov 09, 2012, Andrzej Kaczmarek wrote:
-> Here are few patches to update thermometer plugin with features already
-> implemented in other plugins:
-> - store attributes handles directly in thermometer structure instead of
->   nested lists of structures which we need to traverse later (and we
->   only need 3 handles stored to support all use cases)
-> - register attio handlers for specific handles instead of one ind and
->   notif handler globally
-> - change properties handling to DBus.Properties
-> - and some minor fixes
-> 
-> This is tested with PTS 4.5.3. There's only problem with patch #9 which
-> "breaks" testcase TP/THF/CO/BV-09-I - this is because PTS sends invalid
-> properties for Measurement Interval characteristic (it does not have
-> indicate property so we do not register ind handler for it). I already
-> filled issue on PTS.
-> 
-> Comments are welcome.
-> 
-> 
-> Andrzej Kaczmarek (15):
->   thermometer: Store Temperature Measurement CCC handle in struct
->   thermometer: Store Intermediate Temperature CCC handle in struct
->   thermometer: Store Measurement Interval value handle in struct
->   thermometer: Use dedicated handler for Intermediate Temperature
->   thermometer: Use dedicated handler for Temperature Measurement
->   thermometer: Use dedicated handler for Measurement Interval
->   thermometer: Remove descriptor structure
->   thermometer: Remove storage of all discovered characteristics
->   thermometer: Discover Measurement Interval descriptors only if needed
->   thermometer: Always write CCC value when connecting
->   thermometer: Make temp_type array static
->   thermometer: Add DBus.Properties support
->   thermometer: Remove legacy properties code
->   doc: Update thermometer API document
->   test: Update test-thermometer for DBus.Properties
-> 
->  doc/thermometer-api.txt            |   18 -
->  profiles/thermometer/thermometer.c | 1008 +++++++++++++++++-------------------
->  test/test-thermometer              |   13 +-
->  3 files changed, 478 insertions(+), 561 deletions(-)
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 8e20903..1a9bd69 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -127,13 +127,13 @@ static void gatt_server_free(struct gatt_server *server)
+ 	g_list_free_full(server->database, attrib_free);
+ 
+ 	if (server->l2cap_io != NULL) {
+-		g_io_channel_unref(server->l2cap_io);
+ 		g_io_channel_shutdown(server->l2cap_io, FALSE, NULL);
++		g_io_channel_unref(server->l2cap_io);
+ 	}
+ 
+ 	if (server->le_io != NULL) {
+-		g_io_channel_unref(server->le_io);
+ 		g_io_channel_shutdown(server->le_io, FALSE, NULL);
++		g_io_channel_unref(server->le_io);
+ 	}
+ 
+ 	g_slist_free_full(server->clients, (GDestroyNotify) channel_free);
+-- 
+1.7.9.5
 
-All patches in this set have been applied. Thanks.
-
-Johan
