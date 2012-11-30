@@ -1,30 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50B681C7.1030207@globaledgesoft.com>
-Date: Thu, 29 Nov 2012 02:57:35 +0530
-From: Ajay <ajay.kv@globaledgesoft.com>
+Date: Fri, 30 Nov 2012 10:31:32 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/6] gdbus: Add g_dbus_add_properties_watch function
+Message-ID: <20121130083132.GA5492@x220.ger.corp.intel.com>
+References: <1354020685-17028-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: BLE : SMP pairing + LE_Start_encryption
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1354020685-17028-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Luiz,
 
-Hi,
-	how do i do smp pairing and ltk key distribution using l2cap socket 
-connection?  does bluez provide any tools for LE pairing . my ultimate 
-result should be enabling LE_start_encryption , which requires ltk key 
-distribution (which is a part of LE_pairing).
+On Tue, Nov 27, 2012, Luiz Augusto von Dentz wrote:
+> Convenient function to create watches for D-Bus properties.
+> ---
+>  gdbus/gdbus.h |  5 +++++
+>  gdbus/watch.c | 28 ++++++++++++++++++++++++++++
+>  2 files changed, 33 insertions(+)
 
-	spec 4.0  says we can use l2cap cid 0x06 , defined for this purpose 
-(smp pairing) . But when i used cid =0x06 , l2cap connect  creates an 
-normal acl connection with cid = 40 , which doesnt trigger any smp 
-modules at remote side.
+All patches in this set have been applied. Thanks.
 
-	please look into this issue.
--- 
-Thanks & regards
-
-  AJAY KV
-  GlobalEdge software Ltd
-  8892753703
+Johan
