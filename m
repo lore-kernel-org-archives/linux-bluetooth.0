@@ -1,27 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 1 Dec 2012 11:13:45 +0200
+Date: Sat, 1 Dec 2012 11:11:58 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Paulo Borges <paulo.borges@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v2 1/2] input: Fix emitting a signal for a
- non-existant interface
-Message-ID: <20121201091345.GB2501@x220.P-661HNU-F1>
-References: <1354322217-11219-1-git-send-email-vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH 1/4] gas: Fix memory leak at gas struct removal
+Message-ID: <20121201091158.GA2501@x220.P-661HNU-F1>
+References: <1354300294-9105-1-git-send-email-paulo.borges@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1354322217-11219-1-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1354300294-9105-1-git-send-email-paulo.borges@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Paulo,
 
-On Fri, Nov 30, 2012, Vinicius Costa Gomes wrote:
-> When the 'org.bluez.Input' interface was removed, this should have been
-> removed as well, now it is causing a segmentation fault.
+On Fri, Nov 30, 2012, Paulo Borges wrote:
 > ---
->  profiles/input/device.c | 6 ------
->  1 file changed, 6 deletions(-)
+>  profiles/gatt/gas.c |    1 +
+>  1 file changed, 1 insertion(+)
 
-Both patches have been applied. Thanks.
+All four patches have been applied. Thanks.
 
 Johan
