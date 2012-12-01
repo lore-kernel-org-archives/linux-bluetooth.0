@@ -2,143 +2,198 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Micha=C5=82=20Poczwardowski?= <dmp0x7c5@gmail.com>
-Subject: [RFC v3 obexd 07/10] fuse: Add open and read operations plus location helpers
-Date: Sun,  2 Dec 2012 00:14:52 +0100
-Message-Id: <1354403695-18985-7-git-send-email-dmp0x7c5@gmail.com>
+Subject: [RFC v3 obexd 05/10] fuse: Add readdir operation
+Date: Sun,  2 Dec 2012 00:14:50 +0100
+Message-Id: <1354403695-18985-5-git-send-email-dmp0x7c5@gmail.com>
 In-Reply-To: <1354403695-18985-1-git-send-email-dmp0x7c5@gmail.com>
 References: <1354403695-18985-1-git-send-email-dmp0x7c5@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- fuse/helpers.c  |   62 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fuse/helpers.c  |  128 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
  fuse/helpers.h  |    2 +
- fuse/obexfuse.c |   32 ++++++++++++++++++++++++++++
- 3 files changed, 96 insertions(+), 0 deletions(-)
+ fuse/obexfuse.c |   23 ++++++++++
+ 3 files changed, 153 insertions(+), 0 deletions(-)
 
 diff --git a/fuse/helpers.c b/fuse/helpers.c
-index 4e4747d..72b0b3e 100644
+index d3e70ff..42a0e21 100644
 --- a/fuse/helpers.c
 +++ b/fuse/helpers.c
-@@ -562,3 +562,65 @@ struct stat *obexhlp_getattr(struct obexhlp_session* session,
- {
- 	return g_hash_table_lookup(session->file_stat, path);
+@@ -428,3 +428,131 @@ void obexhlp_setpath(struct obexhlp_session *session, const char *path)
+ 
+ 	g_strfreev(path_v);
  }
 +
-+static struct obexhlp_location *get_location(const char *path)
++static void listfolder_xml_element(GMarkupParseContext *ctxt,
++			const gchar *element, const gchar **names,
++			const gchar **values, gpointer user_data,
++			GError **gerr)
 +{
-+	struct obexhlp_location *location;
-+	gchar **directories;
-+	guint i, len, fid = 0;
++	gchar *key, *pathname, *name = NULL;
++	struct obexhlp_session *session = user_data;
++	struct stat *stbuf;
++	gint i = 0;
 +
-+	location = g_malloc0(sizeof(*location));
-+	directories = g_strsplit(path, "/", -1);
-+	len = g_strv_length(directories);
++	stbuf = g_malloc0(sizeof(struct stat));
 +
-+	for (i = 0; i < len; i++)
-+		if (directories[i][0] != '\0') /* protect multi slashes */
-+			fid = i; /* last nonempty is a file */
++	if ((strcasecmp("file", element) == 0)) {
++		stbuf->st_mode = S_IFREG;
++	} else if ((strcasecmp("folder", element)) == 0) {
++		stbuf->st_mode = S_IFDIR;
++		stbuf->st_mtime = time(NULL);
++	} else {
++		g_free(stbuf);
++		return;
++	}
 +
-+	location->file = g_strdup(directories[fid]);
-+	directories[fid][0] = '\0'; /* remove file */
-+	location->dir = g_strjoinv("/", directories);
++	for (key = (gchar *) names[i]; key; key = (gchar *) names[++i]) {
++		if (g_str_equal("name", key) == TRUE) {
++			session->lsfiles = g_list_append(session->lsfiles,
++						g_strdup(values[i]));
++			name = g_strdup(values[i]);
 +
-+	g_strfreev(directories);
++		} else if (g_str_equal("size", key) == TRUE) {
++			guint64 size;
++			size = g_ascii_strtoll(values[i], NULL, 10);
++			stbuf->st_size = size;
 +
-+	return location;
++		} else if (g_str_equal("created", key) == TRUE) {
++			GTimeVal time;
++			GDateTime *datetime;
++			g_time_val_from_iso8601(values[i], &time);
++			datetime = g_date_time_new_from_timeval_utc(&time);
++			stbuf->st_mtime = g_date_time_to_unix(datetime);
++		}
++	}
++
++	if (g_str_equal("/", session->setpath) == TRUE)
++		pathname = g_strdup_printf("/%s", name);
++	else
++		pathname = g_strdup_printf("%s/%s", session->setpath, name);
++
++	g_hash_table_replace(session->file_stat, pathname, stbuf);
++	g_free(name);
 +}
 +
-+void free_location(struct obexhlp_location *location)
++static const GMarkupParser parser = {
++	listfolder_xml_element,
++	NULL, NULL, NULL, NULL
++};
++
++static void complete_listfolder_func(GObex *obex, GError *err,
++				gpointer user_data)
 +{
-+	g_free(location->file);
-+	g_free(location->dir);
-+	g_free(location);
++	GMarkupParseContext *ctxt;
++	struct obexhlp_session *session = user_data;
++	struct obexhlp_buffer *buffer = session->buffer;
++
++	if (err == NULL) {
++		ctxt = g_markup_parse_context_new(&parser, 0, session, NULL);
++		g_markup_parse_context_parse(ctxt, buffer->data, buffer->size,
++							NULL);
++		g_markup_parse_context_free(ctxt);
++	}
++
++	complete_func(obex, err, user_data);
 +}
 +
-+struct obexhlp_buffer *obexhlp_get(struct obexhlp_session* session,
-+						const char *path)
++static gboolean async_get_consumer(const void *buf, gsize len,
++							gpointer user_data)
 +{
-+	struct obexhlp_location *l;
++	struct obexhlp_session *session = user_data;
++	struct obexhlp_buffer *buffer = session->buffer;
++
++	if (buffer->size == 0)
++		buffer->data = g_malloc0(sizeof(char) * len);
++	else
++		buffer->data = g_realloc(buffer->data, buffer->size + len);
++
++	memcpy(buffer->data + buffer->size, buf, len);
++	buffer->size += len;
++
++	g_obex_suspend(session->obex);
++	g_obex_resume(session->obex);
++
++	return TRUE;
++}
++
++GList *obexhlp_listfolder(struct obexhlp_session* session,
++					const char *path)
++{
 +	struct obexhlp_buffer *buffer;
-+	struct stat *stfile;
-+	l = get_location(path);
++	GObexPacket *req;
++	guint reqpkt;
 +
-+	g_print("obexhlp_get(%s%s)\n", l->dir, l->file);
++	obexhlp_setpath(session, path);
 +
-+	stfile = obexhlp_getattr(session, path);
-+	if (stfile == NULL)
-+		return NULL;
++	g_print("obexhlp_listfolder(%s)\n", path);
 +
-+	buffer = g_malloc0(sizeof(*buffer));
++	if (session->lsfiles != NULL) {
++		g_list_free_full(session->lsfiles, g_free);
++		session->lsfiles = NULL;
++	}
 +
-+	if (stfile->st_size == 0)
-+		return buffer;
-+
-+	obexhlp_setpath(session, l->dir);
-+	request_new(session, g_strdup_printf("get %s", path));
++	session->lsfiles = g_list_alloc();
++	buffer = g_malloc0(sizeof(struct obexhlp_buffer));
 +	session->buffer = buffer;
-+	g_obex_get_req(session->obex, async_get_consumer,
-+					complete_func, session, &session->err,
-+					G_OBEX_HDR_NAME, l->file,
-+					G_OBEX_HDR_INVALID);
-+	free_location(l);
-+	request_wait_free(session);
 +
-+	return buffer;
++	request_new(session, g_strdup_printf("listfolder %s", path));
++	req = g_obex_packet_new(G_OBEX_OP_GET, TRUE, G_OBEX_HDR_INVALID);
++	g_obex_packet_add_bytes(req, G_OBEX_HDR_TYPE, OBEX_FTP_LS,
++						strlen(OBEX_FTP_LS) + 1);
++	reqpkt = g_obex_get_req_pkt(session->obex, req,
++				async_get_consumer,
++				complete_listfolder_func,
++				session, &session->err);
++	request_wait_free(session);
++	g_free(buffer->data);
++	g_free(buffer);
++
++	return session->lsfiles;
 +}
 diff --git a/fuse/helpers.h b/fuse/helpers.h
-index 0435317..9080590 100644
+index 3ef924e..832f856 100644
 --- a/fuse/helpers.h
 +++ b/fuse/helpers.h
-@@ -55,3 +55,5 @@ void obexhlp_disconnect(struct obexhlp_session* session);
- GList *obexhlp_listfolder(struct obexhlp_session* session, const char *path);
- struct stat *obexhlp_getattr(struct obexhlp_session* session,
- 					const char *path);
-+struct obexhlp_buffer *obexhlp_get(struct obexhlp_session* session,
-+					const char *path);
+@@ -51,3 +51,5 @@ struct obexhlp_session {
+ struct obexhlp_session* obexhlp_connect(const char *srcstr,
+ 						const char *dstsrc);
+ void obexhlp_disconnect(struct obexhlp_session* session);
++
++GList *obexhlp_listfolder(struct obexhlp_session* session, const char *path);
 diff --git a/fuse/obexfuse.c b/fuse/obexfuse.c
-index 5270293..e185250 100644
+index d6a87f3..0560031 100644
 --- a/fuse/obexfuse.c
 +++ b/fuse/obexfuse.c
-@@ -144,9 +144,41 @@ static int obexfuse_getattr(const char *path, struct stat *stbuf)
- 	return res;
+@@ -89,7 +89,30 @@ void obexfuse_destroy()
+ 	g_thread_join(main_gthread);
  }
  
-+static int obexfuse_open(const char *path, struct fuse_file_info *fi)
++static int obexfuse_readdir(const char *path, void *buf,
++			fuse_fill_dir_t filler, off_t offset,
++				struct fuse_file_info *fi)
 +{
-+	struct obexhlp_buffer *file_buffer;
++	int len, i;
++	gchar *string;
++	GList *files;
 +
-+	file_buffer = obexhlp_get(session, path);
++	filler(buf, ".", NULL, 0);
++	filler(buf, "..", NULL, 0);
 +
-+	if (file_buffer == NULL)
-+		return -ENOENT;
++	files = obexhlp_listfolder(session, path);
++	len = g_list_length(files);
 +
-+	fi->fh = (uint64_t)file_buffer;
++	for (i = 1; i < len; i++) { /* element for i==0 is NULL */
++		string = g_list_nth_data(files, i);
++		filler(buf, string, NULL, 0);
++	}
 +
 +	return session->status;
 +}
 +
-+static int obexfuse_read(const char *path, char *buf, size_t size,
-+			off_t offset, struct fuse_file_info *fi)
-+{
-+	gsize asize;
-+	struct obexhlp_buffer *file_buffer = (struct obexhlp_buffer*)fi->fh;
-+
-+	asize = file_buffer->size - offset;
-+
-+	if (asize > size)
-+		asize = size;
-+
-+	memcpy(buf, file_buffer->data + offset, asize);
-+
-+	return asize;
-+}
-+
  static struct fuse_operations obexfuse_oper = {
- 	.readdir = obexfuse_readdir,
- 	.getattr = obexfuse_getattr,
-+	.open = obexfuse_open,
-+	.read = obexfuse_read,
++	.readdir = obexfuse_readdir,
  	.init = obexfuse_init,
  	.destroy = obexfuse_destroy,
  };
