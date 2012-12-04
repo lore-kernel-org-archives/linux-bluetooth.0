@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 20/20] test: Enable speed and cadence calculation in test-cyclingspeed
-Date: Tue, 4 Dec 2012 13:43:46 +0100
-Message-ID: <1354625026-29358-21-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3 10/20] cyclingspeed: Add DBus.Properties for org.bluez.CyclingSpeed interface
+Date: Tue, 4 Dec 2012 13:43:36 +0100
+Message-ID: <1354625026-29358-11-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1354625026-29358-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1354625026-29358-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,129 +12,138 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch allows to enable instantenous speed and cadence calculation
-based on measurement received from remote device.
-
-To enable calculations additional parameter "--circumference <value>"
-needs to be used when calling script which sets wheel circumference in mm.
-
-Both speed and cadence are enabled at the same time. Speed is calculated
-in km/h and cadence in rpm.
 ---
- test/test-cyclingspeed | 71 ++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 69 insertions(+), 2 deletions(-)
+ profiles/cyclingspeed/cyclingspeed.c | 96 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 95 insertions(+), 1 deletion(-)
 
-diff --git a/test/test-cyclingspeed b/test/test-cyclingspeed
-index 92fe935..841456c 100755
---- a/test/test-cyclingspeed
-+++ b/test/test-cyclingspeed
-@@ -14,23 +14,86 @@ import dbus.service
- import dbus.mainloop.glib
- from optparse import OptionParser, make_option
+diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
+index a3e2d61..eace558 100644
+--- a/profiles/cyclingspeed/cyclingspeed.c
++++ b/profiles/cyclingspeed/cyclingspeed.c
+@@ -104,6 +104,21 @@ struct characteristic {
  
-+class MeasurementQ:
-+	def __init__(self, wrap_v):
-+		self._now = [None, None]
-+		self._prev = [None, None]
-+		self._wrap_v = wrap_v
-+
-+	def can_calc(self):
-+		return ((self._now[0] is not None)
-+			and (self._now[1] is not None)
-+			and (self._prev[0] is not None)
-+			and (self._prev[1] is not None))
-+
-+	def delta_v(self):
-+		delta = self._now[0] - self._prev[0]
-+		if (delta < 0) and (self._wrap_v):
-+			delta = delta + 65536
-+		return delta
-+
-+	def delta_t(self):
-+		delta = self._now[1] - self._prev[1]
-+		if delta < 0:
-+			delta = delta + 65536
-+		return delta
-+
-+	def put(self, data):
-+		self._prev = self._now
-+		self._now = data
-+
- class Watcher(dbus.service.Object):
-+	_wheel = MeasurementQ(False)
-+	_crank = MeasurementQ(True)
-+	_circumference = None
-+
-+	def enable_calc(self, v):
-+		self._circumference = v
-+
- 	@dbus.service.method("org.bluez.CyclingSpeedWatcher",
- 					in_signature="oa{sv}", out_signature="")
- 	def MeasurementReceived(self, device, measure):
- 		print("Measurement received from %s" % device)
+ static GSList *csc_adapters = NULL;
  
-+		rev = None
-+		evt = None
- 		if "WheelRevolutions" in measure:
-+			rev = measure["WheelRevolutions"]
- 			print("WheelRevolutions: ", measure["WheelRevolutions"])
--
- 		if "LastWheelEventTime" in measure:
-+			evt = measure["LastWheelEventTime"]
- 			print("LastWheelEventTime: ", measure["LastWheelEventTime"])
-+		self._wheel.put( [rev, evt] )
- 
-+		rev = None
-+		evt = None
- 		if "CrankRevolutions" in measure:
-+			rev = measure["CrankRevolutions"]
- 			print("CrankRevolutions: ", measure["CrankRevolutions"])
--
- 		if "LastCrankEventTime" in measure:
-+			evt = measure["LastCrankEventTime"]
- 			print("LastCrankEventTime: ", measure["LastCrankEventTime"])
-+		self._crank.put( [rev, evt] )
++static const char * const location_enum[] = {
++	"other", "top-of-shoe", "in-shoe", "hip", "front-wheel", "left-crank",
++	"right-crank", "left-pedal", "right-pedal", "front-hub",
++	"rear-dropout", "chainstay", "rear-wheel", "rear-hub"
++};
 +
-+		if self._circumference is None:
-+			return
++static const gchar *location2str(uint8_t value)
++{
++	if (value < G_N_ELEMENTS(location_enum))
++		return location_enum[value];
 +
-+		if self._wheel.can_calc():
-+			delta_v = self._wheel.delta_v()
-+			delta_t = self._wheel.delta_t()
++	info("Body Sensor Location [%d] is RFU", value);
++	return location_enum[0];
++}
 +
-+			if (delta_v >= 0) and (delta_t > 0):
-+				speed = delta_v * self._circumference * 1024 / delta_t # mm/s
-+				speed = speed * 0.0036 # mm/s -> km/h
-+				print("(calculated) Speed: %.2f km/h" % speed)
+ static gint cmp_adapter(gconstpointer a, gconstpointer b)
+ {
+ 	const struct csc_adapter *cadapter = a;
+@@ -694,6 +709,72 @@ static void csc_adapter_remove(struct btd_profile *p,
+ 					CYCLINGSPEED_MANAGER_INTERFACE);
+ }
+ 
++static gboolean property_get_location(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct csc *csc = data;
++	const char *loc;
 +
-+		if self._crank.can_calc():
-+			delta_v = self._crank.delta_v()
-+			delta_t = self._crank.delta_t()
++	if (!csc->has_location)
++		return FALSE;
 +
-+			if delta_t > 0:
-+				cadence = delta_v * 1024 / delta_t
-+				print("(calculated) Cadence: %d rpm" % cadence)
++	loc = location2str(csc->location);
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &loc);
++
++	return TRUE;
++}
++
++static gboolean property_exists_location(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct csc *csc = data;
++
++	return csc->has_location;
++}
++
++static gboolean property_exists_locations(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct csc *csc = data;
++
++	return !!(csc->feature & MULTI_SENSOR_LOC_SUPPORT);
++}
++
++static gboolean property_get_wheel_rev_sup(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct csc *csc = data;
++	dbus_bool_t val;
++
++	val = !!(csc->feature & WHEEL_REV_SUPPORT);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &val);
++
++	return TRUE;
++}
++
++static gboolean property_get_multi_loc_sup(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct csc *csc = data;
++	dbus_bool_t val;
++
++	val = !!(csc->feature & MULTI_SENSOR_LOC_SUPPORT);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &val);
++
++	return TRUE;
++}
++
++static const GDBusPropertyTable cyclingspeed_device_properties[] = {
++	{ "Location", "s", property_get_location, NULL,
++						property_exists_location },
++	{ "SupportedLocations", "as", NULL, NULL,
++						property_exists_locations },
++	{ "WheelRevolutionDataSupported", "b", property_get_wheel_rev_sup },
++	{ "MultipleLocationsSupported", "b", property_get_multi_loc_sup },
++	{ }
++};
++
+ static gint cmp_primary_uuid(gconstpointer a, gconstpointer b)
+ {
+ 	const struct gatt_primary *prim = a;
+@@ -730,6 +811,18 @@ static int csc_device_probe(struct btd_profile *p,
+ 	csc->dev = btd_device_ref(device);
+ 	csc->cadapter = cadapter;
  
- def properties_changed(interface, changed, invalidated):
- 	if "Location" in changed:
-@@ -46,6 +109,8 @@ if __name__ == "__main__":
- 			type="string", dest="adapter"),
- 		make_option("-b", "--device", action="store",
- 			type="string", dest="address"),
-+		make_option("-c", "--circumference", action="store",
-+			type="int", dest="circumference"),
- 		]
++	if (!g_dbus_register_interface(btd_get_dbus_connection(),
++						device_get_path(device),
++						CYCLINGSPEED_INTERFACE,
++						NULL, NULL,
++						cyclingspeed_device_properties,
++						csc, destroy_csc)) {
++		error("D-Bus failed to register %s interface",
++						CYCLINGSPEED_INTERFACE);
++		destroy_csc(csc);
++		return -EIO;
++	}
++
+ 	csc->svc_range = g_new0(struct att_range, 1);
+ 	csc->svc_range->start = prim->range.start;
+ 	csc->svc_range->end = prim->range.end;
+@@ -764,7 +857,8 @@ static void csc_device_remove(struct btd_profile *p,
  
- 	parser = OptionParser(option_list=option_list)
-@@ -77,6 +142,8 @@ if __name__ == "__main__":
+ 	cadapter->devices = g_slist_remove(cadapter->devices, csc);
  
- 	watcher_path = "/test/watcher"
- 	watcher = Watcher(bus, watcher_path)
-+	if options.circumference:
-+		watcher.enable_calc(options.circumference)
- 	cscmanager.RegisterWatcher(watcher_path)
+-	destroy_csc(csc);
++	g_dbus_unregister_interface(btd_get_dbus_connection(),
++			device_get_path(device), CYCLINGSPEED_INTERFACE);
+ }
  
- 	csc = dbus.Interface(bus.get_object("org.bluez", device_path),
+ static struct btd_profile cscp_profile = {
 -- 
 1.8.0
 
