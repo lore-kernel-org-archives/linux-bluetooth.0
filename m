@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 04/20] cyclingspeed: Discover characteristics CCC
-Date: Tue, 4 Dec 2012 13:43:30 +0100
-Message-ID: <1354625026-29358-5-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3 01/20] cyclingspeed: Add CSC profile plugin skeleton
+Date: Tue, 4 Dec 2012 13:43:27 +0100
+Message-ID: <1354625026-29358-2-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1354625026-29358-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1354625026-29358-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,129 +12,248 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This patch adds stub profile driver plugin for CSC profile.
 ---
- profiles/cyclingspeed/cyclingspeed.c | 82 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 80 insertions(+), 2 deletions(-)
+ Makefile.am                          |   5 +-
+ lib/uuid.h                           |   2 +
+ profiles/cyclingspeed/cyclingspeed.c | 192 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 197 insertions(+), 2 deletions(-)
+ create mode 100644 profiles/cyclingspeed/cyclingspeed.c
 
+diff --git a/Makefile.am b/Makefile.am
+index e95ba1a..d009828 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -178,7 +178,7 @@ builtin_sources += profiles/health/hdp_main.c profiles/health/hdp_types.h \
+ endif
+ 
+ builtin_modules += thermometer alert time gatt_example proximity deviceinfo \
+-			gatt scanparam heartrate
++			gatt scanparam heartrate cyclingspeed
+ builtin_sources += profiles/thermometer/main.c \
+ 			profiles/thermometer/manager.h \
+ 			profiles/thermometer/manager.c \
+@@ -217,7 +217,8 @@ builtin_sources += profiles/thermometer/main.c \
+ 			profiles/heartrate/manager.c \
+ 			profiles/heartrate/manager.h \
+ 			profiles/heartrate/heartrate.c \
+-			profiles/heartrate/heartrate.h
++			profiles/heartrate/heartrate.h \
++			profiles/cyclingspeed/cyclingspeed.c
+ 
+ 
+ builtin_modules += formfactor
+diff --git a/lib/uuid.h b/lib/uuid.h
+index f85abbe..a9a3b13 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -74,6 +74,8 @@ extern "C" {
+ #define INTERMEDIATE_TEMPERATURE_UUID	"00002a1e-0000-1000-8000-00805f9b34fb"
+ #define MEASUREMENT_INTERVAL_UUID	"00002a21-0000-1000-8000-00805f9b34fb"
+ 
++#define CYCLING_SC_UUID		"00001816-0000-1000-8000-00805f9b34fb"
++
+ #define RFCOMM_UUID_STR		"00000003-0000-1000-8000-00805f9b34fb"
+ 
+ #define HDP_UUID		"00001400-0000-1000-8000-00805f9b34fb"
 diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
-index 862383a..32a088d 100644
---- a/profiles/cyclingspeed/cyclingspeed.c
+new file mode 100644
+index 0000000..025b09a
+--- /dev/null
 +++ b/profiles/cyclingspeed/cyclingspeed.c
-@@ -53,9 +53,15 @@ struct csc {
- 
- 	struct att_range	*svc_range;
- 
-+	uint16_t		measurement_ccc_handle;
- 	uint16_t		controlpoint_val_handle;
- };
- 
-+struct characteristic {
-+	struct csc	*csc;
-+	char		uuid[MAX_LEN_UUID_STR + 1];
+@@ -0,0 +1,192 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012 Tieto Poland
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <errno.h>
++#include <stdbool.h>
++#include <glib.h>
++#include <bluetooth/uuid.h>
++
++#include "plugin.h"
++#include "adapter.h"
++#include "device.h"
++#include "profile.h"
++
++struct csc_adapter {
++	struct btd_adapter	*adapter;
++	GSList			*devices;	/* list of registered devices */
 +};
 +
- static GSList *csc_adapters = NULL;
- 
- static gint cmp_adapter(gconstpointer a, gconstpointer b)
-@@ -112,6 +118,76 @@ static void destroy_csc(gpointer user_data)
- 	g_free(csc);
- }
- 
-+static void discover_desc_cb(guint8 status, const guint8 *pdu,
-+					guint16 len, gpointer user_data)
++struct csc {
++	struct btd_device	*dev;
++	struct csc_adapter	*cadapter;
++};
++
++static GSList *csc_adapters = NULL;
++
++static gint cmp_adapter(gconstpointer a, gconstpointer b)
 +{
-+	struct characteristic *ch = user_data;
-+	struct att_data_list *list = NULL;
-+	uint8_t format;
-+	int i;
++	const struct csc_adapter *cadapter = a;
++	const struct btd_adapter *adapter = b;
 +
-+	if (status != 0) {
-+		error("Discover %s descriptors failed: %s", ch->uuid,
-+							att_ecode2str(status));
-+		goto done;
-+	}
++	if (adapter == cadapter->adapter)
++		return 0;
 +
-+	list = dec_find_info_resp(pdu, len, &format);
-+	if (list == NULL)
-+		goto done;
-+
-+	if (format != ATT_FIND_INFO_RESP_FMT_16BIT)
-+		goto done;
-+
-+	for (i = 0; i < list->num; i++) {
-+		uint8_t *value;
-+		uint16_t handle, uuid;
-+
-+		value = list->data[i];
-+		handle = att_get_u16(value);
-+		uuid = att_get_u16(value + 2);
-+
-+		if (uuid != GATT_CLIENT_CHARAC_CFG_UUID)
-+			continue;
-+
-+		if (g_strcmp0(ch->uuid, CSC_MEASUREMENT_UUID) == 0)
-+			ch->csc->measurement_ccc_handle = handle;
-+
-+		/* We only want CCC, can break here */
-+		break;
-+	}
-+
-+done:
-+	if (list)
-+		att_data_list_free(list);
-+	g_free(ch);
++	return -1;
 +}
 +
-+static void discover_desc(struct csc *csc, struct gatt_char *c,
-+						struct gatt_char *c_next)
++static gint cmp_device(gconstpointer a, gconstpointer b)
 +{
-+	struct characteristic *ch;
-+	uint16_t start, end;
++	const struct csc *csc = a;
++	const struct btd_device *dev = b;
 +
-+	start = c->value_handle + 1;
++	if (dev == csc->dev)
++		return 0;
 +
-+	if (c_next != NULL) {
-+		if (start == c_next->handle)
-+			return;
-+		end = c_next->handle - 1;
-+	} else if (c->value_handle != csc->svc_range->end) {
-+		end = csc->svc_range->end;
-+	} else {
++	return -1;
++}
++
++static struct csc_adapter *find_csc_adapter(struct btd_adapter *adapter)
++{
++	GSList *l = g_slist_find_custom(csc_adapters, adapter, cmp_adapter);
++
++	if (!l)
++		return NULL;
++
++	return l->data;
++}
++
++static void destroy_csc_adapter(gpointer user_data)
++{
++	struct csc_adapter *cadapter = user_data;
++
++	g_free(cadapter);
++}
++
++static void destroy_csc(gpointer user_data)
++{
++	struct csc *csc = user_data;
++
++	btd_device_unref(csc->dev);
++	g_free(csc);
++}
++
++static int csc_adapter_probe(struct btd_profile *p, struct btd_adapter *adapter)
++{
++	struct csc_adapter *cadapter;
++
++	cadapter = g_new0(struct csc_adapter, 1);
++	cadapter->adapter = adapter;
++
++	csc_adapters = g_slist_prepend(csc_adapters, cadapter);
++
++	return 0;
++}
++
++static void csc_adapter_remove(struct btd_profile *p,
++						struct btd_adapter *adapter)
++{
++	struct csc_adapter *cadapter;
++
++	cadapter = find_csc_adapter(adapter);
++	if (cadapter == NULL)
 +		return;
-+	}
 +
-+	ch = g_new0(struct characteristic, 1);
-+	ch->csc = csc;
-+	memcpy(ch->uuid, c->uuid, sizeof(c->uuid));
++	csc_adapters = g_slist_remove(csc_adapters, cadapter);
 +
-+	gatt_find_info(csc->attrib, start, end, discover_desc_cb, ch);
++	destroy_csc_adapter(cadapter);
 +}
 +
- static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
- {
- 	struct csc *csc = user_data;
-@@ -124,9 +200,11 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
- 
- 	for (; chars; chars = chars->next) {
- 		struct gatt_char *c = chars->data;
-+		struct gatt_char *c_next =
-+				(chars->next ? chars->next->data : NULL);
- 
- 		if (g_strcmp0(c->uuid, CSC_MEASUREMENT_UUID) == 0) {
--			/* TODO: discover CCC handle */
-+			discover_desc(csc, c, c_next);
- 		} else if (g_strcmp0(c->uuid, CSC_FEATURE_UUID) == 0) {
- 			/* TODO: read characterictic value */
- 		} else if (g_strcmp0(c->uuid, SENSOR_LOCATION_UUID) == 0) {
-@@ -135,7 +213,7 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
- 		} else if (g_strcmp0(c->uuid, SC_CONTROL_POINT_UUID) == 0) {
- 			DBG("SC Control Point supported");
- 			csc->controlpoint_val_handle = c->value_handle;
--			/* TODO: discover CCC handle */
-+			discover_desc(csc, c, c_next);
- 		}
- 	}
- }
++static int csc_device_probe(struct btd_profile *p,
++				struct btd_device *device, GSList *uuids)
++{
++	struct btd_adapter *adapter;
++	struct csc_adapter *cadapter;
++	struct csc *csc;
++
++	adapter = device_get_adapter(device);
++
++	cadapter = find_csc_adapter(adapter);
++	if (cadapter == NULL)
++		return -1;
++
++	csc = g_new0(struct csc, 1);
++	csc->dev = btd_device_ref(device);
++	csc->cadapter = cadapter;
++
++	cadapter->devices = g_slist_prepend(cadapter->devices, csc);
++
++	return 0;
++}
++
++static void csc_device_remove(struct btd_profile *p,
++						struct btd_device *device)
++{
++	struct btd_adapter *adapter;
++	struct csc_adapter *cadapter;
++	struct csc *csc;
++	GSList *l;
++
++	adapter = device_get_adapter(device);
++
++	cadapter = find_csc_adapter(adapter);
++	if (cadapter == NULL)
++		return;
++
++	l = g_slist_find_custom(cadapter->devices, device, cmp_device);
++	if (l == NULL)
++		return;
++
++	csc = l->data;
++
++	cadapter->devices = g_slist_remove(cadapter->devices, csc);
++
++	destroy_csc(csc);
++}
++
++static struct btd_profile cscp_profile = {
++	.name		= "Cycling Speed and Cadence GATT Driver",
++	.remote_uuids	= BTD_UUIDS(CYCLING_SC_UUID),
++
++	.adapter_probe	= csc_adapter_probe,
++	.adapter_remove	= csc_adapter_remove,
++
++	.device_probe	= csc_device_probe,
++	.device_remove	= csc_device_remove,
++};
++
++static int cyclingspeed_init(void)
++{
++	return btd_profile_register(&cscp_profile);
++}
++
++static void cyclingspeed_exit(void)
++{
++	btd_profile_unregister(&cscp_profile);
++}
++
++BLUETOOTH_PLUGIN_DEFINE(cyclingspeed, VERSION,
++					BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++					cyclingspeed_init, cyclingspeed_exit)
 -- 
 1.8.0
 
