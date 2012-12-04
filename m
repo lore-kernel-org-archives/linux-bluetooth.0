@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 05/20] cyclingspeed: Read CSC Feature characteristic value
-Date: Tue, 4 Dec 2012 13:43:31 +0100
-Message-ID: <1354625026-29358-6-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3 04/20] cyclingspeed: Discover characteristics CCC
+Date: Tue, 4 Dec 2012 13:43:30 +0100
+Message-ID: <1354625026-29358-5-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1354625026-29358-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1354625026-29358-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -13,83 +13,128 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- profiles/cyclingspeed/cyclingspeed.c | 35 ++++++++++++++++++++++++++++++++++-
- 1 file changed, 34 insertions(+), 1 deletion(-)
+ profiles/cyclingspeed/cyclingspeed.c | 82 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 80 insertions(+), 2 deletions(-)
 
 diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
-index 32a088d..7f79116 100644
+index 862383a..32a088d 100644
 --- a/profiles/cyclingspeed/cyclingspeed.c
 +++ b/profiles/cyclingspeed/cyclingspeed.c
-@@ -55,6 +55,8 @@ struct csc {
+@@ -53,9 +53,15 @@ struct csc {
  
- 	uint16_t		measurement_ccc_handle;
+ 	struct att_range	*svc_range;
+ 
++	uint16_t		measurement_ccc_handle;
  	uint16_t		controlpoint_val_handle;
-+
-+	uint16_t		feature;
  };
  
- struct characteristic {
-@@ -118,6 +120,32 @@ static void destroy_csc(gpointer user_data)
++struct characteristic {
++	struct csc	*csc;
++	char		uuid[MAX_LEN_UUID_STR + 1];
++};
++
+ static GSList *csc_adapters = NULL;
+ 
+ static gint cmp_adapter(gconstpointer a, gconstpointer b)
+@@ -112,6 +118,76 @@ static void destroy_csc(gpointer user_data)
  	g_free(csc);
  }
  
-+static void read_feature_cb(guint8 status, const guint8 *pdu,
-+						guint16 len, gpointer user_data)
++static void discover_desc_cb(guint8 status, const guint8 *pdu,
++					guint16 len, gpointer user_data)
 +{
-+	struct csc *csc = user_data;
-+	uint8_t value[2];
-+	ssize_t vlen;
++	struct characteristic *ch = user_data;
++	struct att_data_list *list = NULL;
++	uint8_t format;
++	int i;
 +
-+	if (status) {
-+		error("CSC Feature read failed: %s", att_ecode2str(status));
-+		return;
++	if (status != 0) {
++		error("Discover %s descriptors failed: %s", ch->uuid,
++							att_ecode2str(status));
++		goto done;
 +	}
 +
-+	vlen = dec_read_resp(pdu, len, value, sizeof(value));
-+	if (vlen < 0) {
-+		error("Protocol error");
-+		return;
++	list = dec_find_info_resp(pdu, len, &format);
++	if (list == NULL)
++		goto done;
++
++	if (format != ATT_FIND_INFO_RESP_FMT_16BIT)
++		goto done;
++
++	for (i = 0; i < list->num; i++) {
++		uint8_t *value;
++		uint16_t handle, uuid;
++
++		value = list->data[i];
++		handle = att_get_u16(value);
++		uuid = att_get_u16(value + 2);
++
++		if (uuid != GATT_CLIENT_CHARAC_CFG_UUID)
++			continue;
++
++		if (g_strcmp0(ch->uuid, CSC_MEASUREMENT_UUID) == 0)
++			ch->csc->measurement_ccc_handle = handle;
++
++		/* We only want CCC, can break here */
++		break;
 +	}
 +
-+	if (vlen != sizeof(value)) {
-+		error("Invalid value length for CSC Feature");
-+		return;
-+	}
-+
-+	csc->feature = att_get_u16(value);
++done:
++	if (list)
++		att_data_list_free(list);
++	g_free(ch);
 +}
 +
- static void discover_desc_cb(guint8 status, const guint8 *pdu,
- 					guint16 len, gpointer user_data)
- {
-@@ -191,6 +219,7 @@ static void discover_desc(struct csc *csc, struct gatt_char *c,
++static void discover_desc(struct csc *csc, struct gatt_char *c,
++						struct gatt_char *c_next)
++{
++	struct characteristic *ch;
++	uint16_t start, end;
++
++	start = c->value_handle + 1;
++
++	if (c_next != NULL) {
++		if (start == c_next->handle)
++			return;
++		end = c_next->handle - 1;
++	} else if (c->value_handle != csc->svc_range->end) {
++		end = csc->svc_range->end;
++	} else {
++		return;
++	}
++
++	ch = g_new0(struct characteristic, 1);
++	ch->csc = csc;
++	memcpy(ch->uuid, c->uuid, sizeof(c->uuid));
++
++	gatt_find_info(csc->attrib, start, end, discover_desc_cb, ch);
++}
++
  static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
  {
  	struct csc *csc = user_data;
-+	uint16_t feature_val_handle = 0;
+@@ -124,9 +200,11 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
  
- 	if (status) {
- 		error("Discover CSCS characteristics: %s",
-@@ -206,7 +235,7 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ 	for (; chars; chars = chars->next) {
+ 		struct gatt_char *c = chars->data;
++		struct gatt_char *c_next =
++				(chars->next ? chars->next->data : NULL);
+ 
  		if (g_strcmp0(c->uuid, CSC_MEASUREMENT_UUID) == 0) {
- 			discover_desc(csc, c, c_next);
+-			/* TODO: discover CCC handle */
++			discover_desc(csc, c, c_next);
  		} else if (g_strcmp0(c->uuid, CSC_FEATURE_UUID) == 0) {
--			/* TODO: read characterictic value */
-+			feature_val_handle = c->value_handle;
- 		} else if (g_strcmp0(c->uuid, SENSOR_LOCATION_UUID) == 0) {
- 			DBG("Sensor Location supported");
  			/* TODO: read characterictic value */
-@@ -216,6 +245,10 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
- 			discover_desc(csc, c, c_next);
+ 		} else if (g_strcmp0(c->uuid, SENSOR_LOCATION_UUID) == 0) {
+@@ -135,7 +213,7 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ 		} else if (g_strcmp0(c->uuid, SC_CONTROL_POINT_UUID) == 0) {
+ 			DBG("SC Control Point supported");
+ 			csc->controlpoint_val_handle = c->value_handle;
+-			/* TODO: discover CCC handle */
++			discover_desc(csc, c, c_next);
  		}
  	}
-+
-+	if (feature_val_handle > 0)
-+		gatt_read_char(csc->attrib, feature_val_handle,
-+							read_feature_cb, csc);
  }
- 
- static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
 -- 
 1.8.0
 
