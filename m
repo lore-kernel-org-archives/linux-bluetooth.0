@@ -1,26 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 4 Dec 2012 10:18:40 +0200
+Date: Tue, 4 Dec 2012 07:56:50 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
-	<frederic.danis@linux.intel.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC V3 01/12] doc: Update settings-storage.txt
-Message-ID: <20121204081840.GA18456@x220>
-References: <1354286826-24016-1-git-send-email-frederic.danis@linux.intel.com>
+Subject: Re: [PATCH BlueZ] test: Add a HFP HF endpoint to simple-endpoint
+Message-ID: <20121204055650.GA2738@x220>
+References: <1354578148-9089-1-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1354286826-24016-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1354578148-9089-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frederic,
+Hi Vinicius,
 
-On Fri, Nov 30, 2012, Frédéric Danis wrote:
-> Add missing Master key to LongTermKey group
+On Mon, Dec 03, 2012, Vinicius Costa Gomes wrote:
 > ---
->  doc/settings-storage.txt |    2 ++
->  1 file changed, 2 insertions(+)
+>  test/simple-endpoint | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 
-All patches in this set have been applied. Thanks.
+Applied. Thanks.
 
 Johan
