@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 11/20] cyclingspeed: Add stub to use SC Control Point
-Date: Tue, 4 Dec 2012 13:43:37 +0100
-Message-ID: <1354625026-29358-12-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3 12/20] cyclingspeed: Add support for Request Supported Sensor Locations
+Date: Tue, 4 Dec 2012 13:43:38 +0100
+Message-ID: <1354625026-29358-13-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1354625026-29358-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1354625026-29358-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,247 +12,145 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements common functions to use SC Control Point.
-Individual procedures will be implemented in subsequent patches.
 ---
- profiles/cyclingspeed/cyclingspeed.c | 145 +++++++++++++++++++++++++++++++++--
- 1 file changed, 140 insertions(+), 5 deletions(-)
+ profiles/cyclingspeed/cyclingspeed.c | 61 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 57 insertions(+), 4 deletions(-)
 
 diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
-index eace558..866fac8 100644
+index 866fac8..8283894 100644
 --- a/profiles/cyclingspeed/cyclingspeed.c
 +++ b/profiles/cyclingspeed/cyclingspeed.c
-@@ -42,6 +42,11 @@
- #include "attio.h"
- #include "log.h"
- 
-+/* min length for ATT indication or notification: opcode (1b) + handle (2b) */
-+#define ATT_HDR_LEN 3
-+
-+#define ATT_TIMEOUT 30
-+
- #define CYCLINGSPEED_INTERFACE		"org.bluez.CyclingSpeed"
- #define CYCLINGSPEED_MANAGER_INTERFACE	"org.bluez.CyclingSpeedManager"
- #define CYCLINGSPEED_WATCHER_INTERFACE	"org.bluez.CyclingSpeedWatcher"
-@@ -53,6 +58,25 @@
- #define WHEEL_REV_PRESENT	0x01
- #define CRANK_REV_PRESENT	0x02
- 
-+#define SET_CUMULATIVE_VALUE		0x01
-+#define START_SENSOR_CALIBRATION	0x02
-+#define UPDATE_SENSOR_LOC		0x03
-+#define REQUEST_SUPPORTED_SENSOR_LOC	0x04
-+#define RESPONSE_CODE			0x10
-+
-+#define RSP_SUCCESS		0x01
-+#define RSP_NOT_SUPPORTED	0x02
-+#define RSP_INVALID_PARAM	0x03
-+#define RSP_FAILED		0x04
-+
-+struct csc;
-+
-+struct controlpoint_req {
-+	struct csc		*csc;
-+	uint8_t			opcode;
-+	guint			timeout;
-+};
-+
- struct csc_adapter {
- 	struct btd_adapter	*adapter;
- 	GSList			*devices;	/* list of registered devices */
-@@ -67,6 +91,8 @@ struct csc {
- 	guint			attioid;
- 	/* attio id for measurement characteristics value notifications */
- 	guint			attio_measurement_id;
-+	/* attio id for SC Control Point characteristics value indications */
-+	guint			attio_controlpoint_id;
- 
- 	struct att_range	*svc_range;
- 
-@@ -76,6 +102,8 @@ struct csc {
+@@ -102,6 +102,8 @@ struct csc {
  	uint16_t		feature;
  	gboolean		has_location;
  	uint8_t			location;
-+
-+	struct controlpoint_req	*pending_req;
++	uint8_t			num_locations;
++	uint8_t			*locations;
+ 
+ 	struct controlpoint_req	*pending_req;
  };
+@@ -251,6 +253,7 @@ static void destroy_csc(gpointer user_data)
  
- struct watcher {
-@@ -217,6 +245,7 @@ static void destroy_csc(gpointer user_data)
- 
- 	if (csc->attrib != NULL) {
- 		g_attrib_unregister(csc->attrib, csc->attio_measurement_id);
-+		g_attrib_unregister(csc->attrib, csc->attio_controlpoint_id);
- 		g_attrib_unref(csc->attrib);
- 	}
- 
-@@ -236,6 +265,35 @@ static void char_write_cb(guint8 status, const guint8 *pdu, guint16 len,
- 	g_free(msg);
+ 	btd_device_unref(csc->dev);
+ 	g_free(csc->svc_range);
++	g_free(csc->locations);
+ 	g_free(csc);
  }
  
-+static gboolean controlpoint_timeout(gpointer user_data)
+@@ -275,7 +278,6 @@ static gboolean controlpoint_timeout(gpointer user_data)
+ 	return FALSE;
+ }
+ 
+-__attribute__((unused)) /* TODO: remove once controlpoint ops are implemented */
+ static void controlpoint_write_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 							gpointer user_data)
+ {
+@@ -294,6 +296,20 @@ static void controlpoint_write_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 									req);
+ }
+ 
++static void read_supported_locations(struct csc *csc)
 +{
-+	struct controlpoint_req *req = user_data;
++	struct controlpoint_req *req;
 +
-+	req->csc->pending_req = NULL;
-+	g_free(req);
++	req = g_new0(struct controlpoint_req, 1);
++	req->csc = csc;
++	req->opcode = REQUEST_SUPPORTED_SENSOR_LOC;
 +
-+	return FALSE;
-+}
++	csc->pending_req = req;
 +
-+__attribute__((unused)) /* TODO: remove once controlpoint ops are implemented */
-+static void controlpoint_write_cb(guint8 status, const guint8 *pdu, guint16 len,
-+							gpointer user_data)
-+{
-+	struct controlpoint_req *req = user_data;
-+
-+	if (status != 0) {
-+		error("SC Control Point write failed (opcode=%d)", req->opcode);
-+
-+		req->csc->pending_req = NULL;
-+		g_free(req);
-+
-+		return;
-+	}
-+
-+	req->timeout = g_timeout_add_seconds(ATT_TIMEOUT, controlpoint_timeout,
-+									req);
++	gatt_write_char(csc->attrib, csc->controlpoint_val_handle, &req->opcode,
++			sizeof(req->opcode), controlpoint_write_cb, req);
 +}
 +
  static void read_feature_cb(guint8 status, const guint8 *pdu,
  						guint16 len, gpointer user_data)
  {
-@@ -317,6 +375,8 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu,
- 	for (i = 0; i < list->num; i++) {
- 		uint8_t *value;
- 		uint16_t handle, uuid;
-+		uint8_t attr_val[2];
-+		char *msg;
+@@ -318,6 +334,10 @@ static void read_feature_cb(guint8 status, const guint8 *pdu,
+ 	}
  
- 		value = list->data[i];
- 		handle = att_get_u16(value);
-@@ -326,9 +386,6 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu,
- 			continue;
+ 	csc->feature = att_get_u16(value);
++
++	if ((csc->feature & MULTI_SENSOR_LOC_SUPPORT)
++						&& (csc->locations == NULL))
++		read_supported_locations(csc);
+ }
  
- 		if (g_strcmp0(ch->uuid, CSC_MEASUREMENT_UUID) == 0) {
--			char *msg;
--			uint8_t attr_val[2];
--
- 			ch->csc->measurement_ccc_handle = handle;
+ static void read_location_cb(guint8 status, const guint8 *pdu,
+@@ -551,6 +571,7 @@ static void controlpoint_ind_handler(const uint8_t *pdu, uint16_t len,
+ 	struct controlpoint_req *req = csc->pending_req;
+ 	uint8_t opcode;
+ 	uint8_t req_opcode;
++	uint8_t rsp_code;
+ 	uint8_t *opdu;
+ 	uint16_t olen;
+ 	size_t plen;
+@@ -584,7 +605,7 @@ static void controlpoint_ind_handler(const uint8_t *pdu, uint16_t len,
+ 	}
  
- 			if (g_slist_length(ch->csc->cadapter->watchers) == 0) {
-@@ -340,10 +397,16 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu,
- 				msg = g_strdup("Enable measurement");
- 			}
+ 	req_opcode = *pdu;
+-	/* skip response code for now */
++	rsp_code = *(pdu + 1);
+ 	pdu += 2;
+ 	len -= 2;
  
--			gatt_write_char(ch->csc->attrib, handle, attr_val,
--					sizeof(attr_val), char_write_cb, msg);
-+		} else if (g_strcmp0(ch->uuid, SC_CONTROL_POINT_UUID) == 0) {
-+			att_put_u16(GATT_CLIENT_CHARAC_CFG_IND_BIT, attr_val);
-+			msg = g_strdup("Enable SC Control Point indications");
+@@ -593,7 +614,16 @@ static void controlpoint_ind_handler(const uint8_t *pdu, uint16_t len,
+ 		goto done;
+ 	}
+ 
+-	/* TODO: handle response */
++	switch (req->opcode) {
++	case REQUEST_SUPPORTED_SENSOR_LOC:
++		if (rsp_code == RSP_SUCCESS) {
++			csc->num_locations = len;
++			csc->locations = g_memdup(pdu, len);
 +		} else {
-+			break;
- 		}
++			error("Failed to read Supported Sendor Locations");
++		}
++		break;
++	}
  
-+		gatt_write_char(ch->csc->attrib, handle, attr_val,
-+					sizeof(attr_val), char_write_cb, msg);
-+
- 		/* We only want CCC, can break here */
- 		break;
- 	}
-@@ -481,6 +544,67 @@ static void measurement_notify_handler(const uint8_t *pdu, uint16_t len,
- 	process_measurement(csc, pdu + 3, len - 3);
+ 	csc->pending_req = NULL;
+ 	g_source_remove(req->timeout);
+@@ -868,6 +898,29 @@ static gboolean property_exists_location(const GDBusPropertyTable *property,
+ 	return csc->has_location;
  }
  
-+static void controlpoint_ind_handler(const uint8_t *pdu, uint16_t len,
-+							gpointer user_data)
++static gboolean property_get_locations(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
 +{
-+	struct csc *csc = user_data;
-+	struct controlpoint_req *req = csc->pending_req;
-+	uint8_t opcode;
-+	uint8_t req_opcode;
-+	uint8_t *opdu;
-+	uint16_t olen;
-+	size_t plen;
++	struct csc *csc = data;
++	DBusMessageIter entry;
++	int i;
 +
-+	if (len < ATT_HDR_LEN) {
-+		error("Invalid PDU received");
-+		return;
++	if (!(csc->feature & MULTI_SENSOR_LOC_SUPPORT))
++		return FALSE;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++					DBUS_TYPE_STRING_AS_STRING, &entry);
++	for (i = 0; i < csc->num_locations; i++) {
++		char *loc = g_strdup(location2str(csc->locations[i]));
++		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &loc);
++		g_free(loc);
 +	}
 +
-+	/* skip ATT header */
-+	pdu += ATT_HDR_LEN;
-+	len -= ATT_HDR_LEN;
++	dbus_message_iter_close_container(iter, &entry);
 +
-+	if (len < 1) {
-+		error("Op Code missing");
-+		goto done;
-+	}
-+
-+	opcode = *pdu;
-+	pdu++;
-+	len--;
-+
-+	if (opcode != RESPONSE_CODE) {
-+		DBG("Unsupported Op Code received (%d)", opcode);
-+		goto done;
-+	}
-+
-+	if (len < 2) {
-+		error("Invalid Response Code PDU received");
-+		goto done;
-+	}
-+
-+	req_opcode = *pdu;
-+	/* skip response code for now */
-+	pdu += 2;
-+	len -= 2;
-+
-+	if (req == NULL || req->opcode != req_opcode) {
-+		DBG("Indication received without pending request");
-+		goto done;
-+	}
-+
-+	/* TODO: handle response */
-+
-+	csc->pending_req = NULL;
-+	g_source_remove(req->timeout);
-+	g_free(req);
-+
-+done:
-+	opdu = g_attrib_get_buffer(csc->attrib, &plen);
-+	olen = enc_confirmation(opdu, plen);
-+	if (olen > 0)
-+		g_attrib_send(csc->attrib, 0, opdu, olen, NULL, NULL, NULL);
++	return TRUE;
 +}
- 
- static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
++
+ static gboolean property_exists_locations(const GDBusPropertyTable *property,
+ 								void *data)
  {
-@@ -514,6 +638,12 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
- 		} else if (g_strcmp0(c->uuid, SC_CONTROL_POINT_UUID) == 0) {
- 			DBG("SC Control Point supported");
- 			csc->controlpoint_val_handle = c->value_handle;
-+
-+			csc->attio_controlpoint_id = g_attrib_register(
-+					csc->attrib, ATT_OP_HANDLE_IND,
-+					c->value_handle,
-+					controlpoint_ind_handler, csc, NULL);
-+
- 			discover_desc(csc, c, c_next);
- 		}
- 	}
-@@ -581,6 +711,11 @@ static void attio_disconnected_cb(gpointer user_data)
- 		csc->attio_measurement_id = 0;
- 	}
- 
-+	if (csc->attio_controlpoint_id > 0) {
-+		g_attrib_unregister(csc->attrib, csc->attio_controlpoint_id);
-+		csc->attio_controlpoint_id = 0;
-+	}
-+
- 	g_attrib_unref(csc->attrib);
- 	csc->attrib = NULL;
- }
+@@ -903,7 +956,7 @@ static gboolean property_get_multi_loc_sup(const GDBusPropertyTable *property,
+ static const GDBusPropertyTable cyclingspeed_device_properties[] = {
+ 	{ "Location", "s", property_get_location, NULL,
+ 						property_exists_location },
+-	{ "SupportedLocations", "as", NULL, NULL,
++	{ "SupportedLocations", "as", property_get_locations, NULL,
+ 						property_exists_locations },
+ 	{ "WheelRevolutionDataSupported", "b", property_get_wheel_rev_sup },
+ 	{ "MultipleLocationsSupported", "b", property_get_multi_loc_sup },
 -- 
 1.8.0
 
