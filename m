@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 10/20] cyclingspeed: Add DBus.Properties for org.bluez.CyclingSpeed interface
-Date: Tue, 4 Dec 2012 13:43:36 +0100
-Message-ID: <1354625026-29358-11-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3 19/20] test: Add cyclingspeed test script
+Date: Tue, 4 Dec 2012 13:43:45 +0100
+Message-ID: <1354625026-29358-20-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1354625026-29358-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1354625026-29358-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -13,137 +13,152 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- profiles/cyclingspeed/cyclingspeed.c | 96 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 95 insertions(+), 1 deletion(-)
+ Makefile.tools         |   3 +-
+ test/test-cyclingspeed | 124 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 126 insertions(+), 1 deletion(-)
+ create mode 100755 test/test-cyclingspeed
 
-diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
-index a3e2d61..eace558 100644
---- a/profiles/cyclingspeed/cyclingspeed.c
-+++ b/profiles/cyclingspeed/cyclingspeed.c
-@@ -104,6 +104,21 @@ struct characteristic {
- 
- static GSList *csc_adapters = NULL;
- 
-+static const char * const location_enum[] = {
-+	"other", "top-of-shoe", "in-shoe", "hip", "front-wheel", "left-crank",
-+	"right-crank", "left-pedal", "right-pedal", "front-hub",
-+	"rear-dropout", "chainstay", "rear-wheel", "rear-hub"
-+};
+diff --git a/Makefile.tools b/Makefile.tools
+index 689b4d2..ded9faf 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -209,4 +209,5 @@ EXTRA_DIST += test/sap_client.py test/hsplay test/hsmicro \
+ 		test/test-health-sink test/service-record.dtd \
+ 		test/service-did.xml test/service-spp.xml test/service-opp.xml \
+ 		test/service-ftp.xml test/simple-player test/test-nap \
+-		test/test-heartrate test/test-alert test/test-hfp
++		test/test-heartrate test/test-alert test/test-hfp \
++		test/test-cycling
+diff --git a/test/test-cyclingspeed b/test/test-cyclingspeed
+new file mode 100755
+index 0000000..92fe935
+--- /dev/null
++++ b/test/test-cyclingspeed
+@@ -0,0 +1,124 @@
++#!/usr/bin/python
 +
-+static const gchar *location2str(uint8_t value)
-+{
-+	if (value < G_N_ELEMENTS(location_enum))
-+		return location_enum[value];
++from __future__ import absolute_import, print_function, unicode_literals
 +
-+	info("Body Sensor Location [%d] is RFU", value);
-+	return location_enum[0];
-+}
++'''
++Cycling Speed and Cadence test script
++'''
 +
- static gint cmp_adapter(gconstpointer a, gconstpointer b)
- {
- 	const struct csc_adapter *cadapter = a;
-@@ -694,6 +709,72 @@ static void csc_adapter_remove(struct btd_profile *p,
- 					CYCLINGSPEED_MANAGER_INTERFACE);
- }
- 
-+static gboolean property_get_location(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct csc *csc = data;
-+	const char *loc;
++import gobject
 +
-+	if (!csc->has_location)
-+		return FALSE;
++import sys
++import dbus
++import dbus.service
++import dbus.mainloop.glib
++from optparse import OptionParser, make_option
 +
-+	loc = location2str(csc->location);
++class Watcher(dbus.service.Object):
++	@dbus.service.method("org.bluez.CyclingSpeedWatcher",
++					in_signature="oa{sv}", out_signature="")
++	def MeasurementReceived(self, device, measure):
++		print("Measurement received from %s" % device)
 +
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &loc);
++		if "WheelRevolutions" in measure:
++			print("WheelRevolutions: ", measure["WheelRevolutions"])
 +
-+	return TRUE;
-+}
++		if "LastWheelEventTime" in measure:
++			print("LastWheelEventTime: ", measure["LastWheelEventTime"])
 +
-+static gboolean property_exists_location(const GDBusPropertyTable *property,
-+								void *data)
-+{
-+	struct csc *csc = data;
++		if "CrankRevolutions" in measure:
++			print("CrankRevolutions: ", measure["CrankRevolutions"])
 +
-+	return csc->has_location;
-+}
++		if "LastCrankEventTime" in measure:
++			print("LastCrankEventTime: ", measure["LastCrankEventTime"])
 +
-+static gboolean property_exists_locations(const GDBusPropertyTable *property,
-+								void *data)
-+{
-+	struct csc *csc = data;
++def properties_changed(interface, changed, invalidated):
++	if "Location" in changed:
++		print("Sensor location: %s" % changed["Location"])
 +
-+	return !!(csc->feature & MULTI_SENSOR_LOC_SUPPORT);
-+}
++if __name__ == "__main__":
++	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 +
-+static gboolean property_get_wheel_rev_sup(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct csc *csc = data;
-+	dbus_bool_t val;
++	bus = dbus.SystemBus()
 +
-+	val = !!(csc->feature & WHEEL_REV_SUPPORT);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &val);
++	option_list = [
++		make_option("-i", "--adapter", action="store",
++			type="string", dest="adapter"),
++		make_option("-b", "--device", action="store",
++			type="string", dest="address"),
++		]
 +
-+	return TRUE;
-+}
++	parser = OptionParser(option_list=option_list)
 +
-+static gboolean property_get_multi_loc_sup(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct csc *csc = data;
-+	dbus_bool_t val;
++	(options, args) = parser.parse_args()
 +
-+	val = !!(csc->feature & MULTI_SENSOR_LOC_SUPPORT);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &val);
++	if not options.address:
++		print("Usage: %s [-i <adapter>] -b <bdaddr> [-c <value>] [cmd]" % (sys.argv[0]))
++		print("Possible commands:")
++		print("\tShowSupportedLocations")
++		print("\tSetLocation <location>")
++		print("\tSetCumulativeWheelRevolutions <value>")
++		sys.exit(1)
 +
-+	return TRUE;
-+}
++	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
++					"org.bluez.Manager")
++	if options.adapter:
++		adapter_path = manager.FindAdapter(options.adapter)
++	else:
++		adapter_path = manager.DefaultAdapter()
 +
-+static const GDBusPropertyTable cyclingspeed_device_properties[] = {
-+	{ "Location", "s", property_get_location, NULL,
-+						property_exists_location },
-+	{ "SupportedLocations", "as", NULL, NULL,
-+						property_exists_locations },
-+	{ "WheelRevolutionDataSupported", "b", property_get_wheel_rev_sup },
-+	{ "MultipleLocationsSupported", "b", property_get_multi_loc_sup },
-+	{ }
-+};
++	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
++							"org.bluez.Adapter")
 +
- static gint cmp_primary_uuid(gconstpointer a, gconstpointer b)
- {
- 	const struct gatt_primary *prim = a;
-@@ -730,6 +811,18 @@ static int csc_device_probe(struct btd_profile *p,
- 	csc->dev = btd_device_ref(device);
- 	csc->cadapter = cadapter;
- 
-+	if (!g_dbus_register_interface(btd_get_dbus_connection(),
-+						device_get_path(device),
-+						CYCLINGSPEED_INTERFACE,
-+						NULL, NULL,
-+						cyclingspeed_device_properties,
-+						csc, destroy_csc)) {
-+		error("D-Bus failed to register %s interface",
-+						CYCLINGSPEED_INTERFACE);
-+		destroy_csc(csc);
-+		return -EIO;
-+	}
++	device_path = adapter.FindDevice(options.address)
 +
- 	csc->svc_range = g_new0(struct att_range, 1);
- 	csc->svc_range->start = prim->range.start;
- 	csc->svc_range->end = prim->range.end;
-@@ -764,7 +857,8 @@ static void csc_device_remove(struct btd_profile *p,
- 
- 	cadapter->devices = g_slist_remove(cadapter->devices, csc);
- 
--	destroy_csc(csc);
-+	g_dbus_unregister_interface(btd_get_dbus_connection(),
-+			device_get_path(device), CYCLINGSPEED_INTERFACE);
- }
- 
- static struct btd_profile cscp_profile = {
++	cscmanager = dbus.Interface(bus.get_object("org.bluez", adapter_path),
++						"org.bluez.CyclingSpeedManager")
++
++	watcher_path = "/test/watcher"
++	watcher = Watcher(bus, watcher_path)
++	cscmanager.RegisterWatcher(watcher_path)
++
++	csc = dbus.Interface(bus.get_object("org.bluez", device_path),
++						"org.bluez.CyclingSpeed")
++
++	bus.add_signal_receiver(properties_changed, bus_name="org.bluez",
++				path=device_path,
++				dbus_interface="org.freedesktop.DBus.Properties",
++				signal_name="PropertiesChanged")
++
++	device_prop = dbus.Interface(bus.get_object("org.bluez", device_path),
++					"org.freedesktop.DBus.Properties")
++
++	properties = device_prop.GetAll("org.bluez.CyclingSpeed")
++
++	if "Location" in properties:
++		print("Sensor location: %s" % properties["Location"])
++	else:
++		print("Sensor location is not supported")
++
++	if len(args) > 0:
++		if args[0] == "ShowSupportedLocations":
++			if properties["MultipleSensorLocationsSupported"]:
++				print("Supported locations: ", properties["SupportedLocations"])
++			else:
++				print("Multiple sensor locations not supported")
++
++		elif args[0] == "SetLocation":
++			if properties["MultipleSensorLocationsSupported"]:
++				device_prop.Set("org.bluez.CyclingSpeed", "Location", args[1])
++			else:
++				print("Multiple sensor locations not supported")
++
++		elif args[0] == "SetCumulativeWheelRevolutions":
++			if properties["WheelRevolutionDataSupported"]:
++				csc.SetCumulativeWheelRevolutions(dbus.UInt32(args[1]))
++			else:
++				print("Wheel revolution data not supported")
++
++		else:
++			print("Unknown command")
++			sys.exit(1)
++
++	mainloop = gobject.MainLoop()
++	mainloop.run()
 -- 
 1.8.0
 
