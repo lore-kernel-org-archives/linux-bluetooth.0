@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 08/20] cyclingspeed: Add support to enable measurement notifications
-Date: Tue, 4 Dec 2012 13:43:34 +0100
-Message-ID: <1354625026-29358-9-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3 09/20] cyclingspeed: Process measurement notifications
+Date: Tue, 4 Dec 2012 13:43:35 +0100
+Message-ID: <1354625026-29358-10-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1354625026-29358-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1354625026-29358-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -13,129 +13,202 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- profiles/cyclingspeed/cyclingspeed.c | 72 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 71 insertions(+), 1 deletion(-)
+ profiles/cyclingspeed/cyclingspeed.c | 139 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 138 insertions(+), 1 deletion(-)
 
 diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
-index cf58a22..5cb4ffd 100644
+index 5cb4ffd..a3e2d61 100644
 --- a/profiles/cyclingspeed/cyclingspeed.c
 +++ b/profiles/cyclingspeed/cyclingspeed.c
-@@ -186,6 +186,17 @@ static void destroy_csc(gpointer user_data)
- 	g_free(csc);
+@@ -44,6 +44,14 @@
+ 
+ #define CYCLINGSPEED_INTERFACE		"org.bluez.CyclingSpeed"
+ #define CYCLINGSPEED_MANAGER_INTERFACE	"org.bluez.CyclingSpeedManager"
++#define CYCLINGSPEED_WATCHER_INTERFACE	"org.bluez.CyclingSpeedWatcher"
++
++#define WHEEL_REV_SUPPORT		0x01
++#define CRANK_REV_SUPPORT		0x02
++#define MULTI_SENSOR_LOC_SUPPORT	0x04
++
++#define WHEEL_REV_PRESENT	0x01
++#define CRANK_REV_PRESENT	0x02
+ 
+ struct csc_adapter {
+ 	struct btd_adapter	*adapter;
+@@ -57,6 +65,8 @@ struct csc {
+ 
+ 	GAttrib			*attrib;
+ 	guint			attioid;
++	/* attio id for measurement characteristics value notifications */
++	guint			attio_measurement_id;
+ 
+ 	struct att_range	*svc_range;
+ 
+@@ -75,6 +85,18 @@ struct watcher {
+ 	char			*path;
+ };
+ 
++struct measurement {
++	struct csc	*csc;
++
++	bool		has_wheel_rev;
++	uint32_t	wheel_rev;
++	uint16_t	last_wheel_time;
++
++	bool		has_crank_rev;
++	uint16_t	crank_rev;
++	uint16_t	last_crank_time;
++};
++
+ struct characteristic {
+ 	struct csc	*csc;
+ 	char		uuid[MAX_LEN_UUID_STR + 1];
+@@ -178,8 +200,10 @@ static void destroy_csc(gpointer user_data)
+ 	if (csc->attioid > 0)
+ 		btd_device_remove_attio_callback(csc->dev, csc->attioid);
+ 
+-	if (csc->attrib != NULL)
++	if (csc->attrib != NULL) {
++		g_attrib_unregister(csc->attrib, csc->attio_measurement_id);
+ 		g_attrib_unref(csc->attrib);
++	}
+ 
+ 	btd_device_unref(csc->dev);
+ 	g_free(csc->svc_range);
+@@ -340,6 +364,109 @@ static void discover_desc(struct csc *csc, struct gatt_char *c,
+ 	gatt_find_info(csc->attrib, start, end, discover_desc_cb, ch);
  }
  
-+static void char_write_cb(guint8 status, const guint8 *pdu, guint16 len,
-+							gpointer user_data)
++static void update_watcher(gpointer data, gpointer user_data)
 +{
-+	char *msg = user_data;
++	struct watcher *w = data;
++	struct measurement *m = user_data;
++	struct csc *csc = m->csc;
++	const gchar *path = device_get_path(csc->dev);
++	DBusMessageIter iter;
++	DBusMessageIter dict;
++	DBusMessage *msg;
 +
-+	if (status != 0)
-+		error("%s failed", msg);
++	msg = dbus_message_new_method_call(w->srv, w->path,
++			CYCLINGSPEED_WATCHER_INTERFACE, "MeasurementReceived");
++	if (msg == NULL)
++		return;
 +
-+	g_free(msg);
++	dbus_message_iter_init_append(msg, &iter);
++
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH , &path);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	if (m->has_wheel_rev) {
++		dict_append_entry(&dict, "WheelRevolutions",
++					DBUS_TYPE_UINT32, &m->wheel_rev);
++		dict_append_entry(&dict, "LastWheelEventTime",
++					DBUS_TYPE_UINT16, &m->last_wheel_time);
++	}
++
++	if (m->has_crank_rev) {
++		dict_append_entry(&dict, "CrankRevolutions",
++					DBUS_TYPE_UINT16, &m->crank_rev);
++		dict_append_entry(&dict, "LastCrankEventTime",
++					DBUS_TYPE_UINT16, &m->last_crank_time);
++	}
++
++	dbus_message_iter_close_container(&iter, &dict);
++
++	dbus_message_set_no_reply(msg, TRUE);
++	g_dbus_send_message(btd_get_dbus_connection(), msg);
 +}
 +
- static void read_feature_cb(guint8 status, const guint8 *pdu,
- 						guint16 len, gpointer user_data)
- {
-@@ -275,9 +286,25 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu,
- 		if (uuid != GATT_CLIENT_CHARAC_CFG_UUID)
- 			continue;
- 
--		if (g_strcmp0(ch->uuid, CSC_MEASUREMENT_UUID) == 0)
-+		if (g_strcmp0(ch->uuid, CSC_MEASUREMENT_UUID) == 0) {
-+			char *msg;
-+			uint8_t attr_val[2];
++static void process_measurement(struct csc *csc, const uint8_t *pdu,
++								uint16_t len)
++{
++	struct measurement m;
++	uint8_t flags;
 +
- 			ch->csc->measurement_ccc_handle = handle;
- 
-+			if (g_slist_length(ch->csc->cadapter->watchers) == 0) {
-+				att_put_u16(0x0000, attr_val);
-+				msg = g_strdup("Disable measurement");
-+			} else {
-+				att_put_u16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT,
-+								attr_val);
-+				msg = g_strdup("Enable measurement");
-+			}
++	flags = *pdu;
 +
-+			gatt_write_char(ch->csc->attrib, handle, attr_val,
-+					sizeof(attr_val), char_write_cb, msg);
++	pdu++;
++	len--;
++
++	memset(&m, 0, sizeof(m));
++
++	if ((flags & WHEEL_REV_PRESENT) && (csc->feature & WHEEL_REV_SUPPORT)) {
++		if (len < 6) {
++			error("Wheel revolutions data fields missing");
++			return;
 +		}
 +
- 		/* We only want CCC, can break here */
- 		break;
- 	}
-@@ -349,6 +376,40 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
- 							read_feature_cb, csc);
- }
- 
-+static void enable_measurement(gpointer data, gpointer user_data)
-+{
-+	struct csc *csc = data;
-+	uint16_t handle = csc->measurement_ccc_handle;
-+	uint8_t value[2];
-+	char *msg;
++		m.has_wheel_rev = true;
++		m.wheel_rev = att_get_u32(pdu);
++		m.last_wheel_time = att_get_u16(pdu + 4);
++		pdu += 6;
++		len -= 6;
++	}
 +
-+	if (csc->attrib == NULL || !handle)
-+		return;
++	if ((flags & CRANK_REV_PRESENT) && (csc->feature & CRANK_REV_SUPPORT)) {
++		if (len < 4) {
++			error("Crank revolutions data fields missing");
++			return;
++		}
 +
-+	att_put_u16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
-+	msg = g_strdup("Enable measurement");
++		m.has_crank_rev = true;
++		m.crank_rev = att_get_u16(pdu);
++		m.last_crank_time = att_get_u16(pdu + 2);
++		pdu += 4;
++		len -= 4;
++	}
 +
-+	gatt_write_char(csc->attrib, handle, value, sizeof(value),
-+							char_write_cb, msg);
++	/* Notify all registered watchers */
++	m.csc = csc;
++	g_slist_foreach(csc->cadapter->watchers, update_watcher, &m);
 +}
 +
-+static void disable_measurement(gpointer data, gpointer user_data)
++static void measurement_notify_handler(const uint8_t *pdu, uint16_t len,
++							gpointer user_data)
 +{
-+	struct csc *csc = data;
-+	uint16_t handle = csc->measurement_ccc_handle;
-+	uint8_t value[2];
-+	char *msg;
++	struct csc *csc = user_data;
 +
-+	if (csc->attrib == NULL || !handle)
++	/* should be at least opcode (1b) + handle (2b) */
++	if (len < 3) {
++		error("Invalid PDU received");
 +		return;
++	}
 +
-+	att_put_u16(0x0000, value);
-+	msg = g_strdup("Disable measurement");
-+
-+	gatt_write_char(csc->attrib, handle, value, sizeof(value),
-+							char_write_cb, msg);
++	process_measurement(csc, pdu + 3, len - 3);
 +}
 +
- static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
++
+ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
  {
  	struct csc *csc = user_data;
-@@ -381,6 +442,9 @@ static void watcher_exit_cb(DBusConnection *conn, void *user_data)
+@@ -357,6 +484,11 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ 				(chars->next ? chars->next->data : NULL);
  
- 	cadapter->watchers = g_slist_remove(cadapter->watchers, watcher);
- 	g_dbus_remove_watch(conn, watcher->id);
+ 		if (g_strcmp0(c->uuid, CSC_MEASUREMENT_UUID) == 0) {
++			csc->attio_measurement_id =
++				g_attrib_register(csc->attrib,
++					ATT_OP_HANDLE_NOTIFY, c->value_handle,
++					measurement_notify_handler, csc, NULL);
 +
-+	if (g_slist_length(cadapter->watchers) == 0)
-+		g_slist_foreach(cadapter->devices, disable_measurement, 0);
+ 			discover_desc(csc, c, c_next);
+ 		} else if (g_strcmp0(c->uuid, CSC_FEATURE_UUID) == 0) {
+ 			feature_val_handle = c->value_handle;
+@@ -429,6 +561,11 @@ static void attio_disconnected_cb(gpointer user_data)
+ 
+ 	DBG("");
+ 
++	if (csc->attio_measurement_id > 0) {
++		g_attrib_unregister(csc->attrib, csc->attio_measurement_id);
++		csc->attio_measurement_id = 0;
++	}
++
+ 	g_attrib_unref(csc->attrib);
+ 	csc->attrib = NULL;
  }
- 
- static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
-@@ -406,6 +470,9 @@ static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
- 	watcher->srv = g_strdup(sender);
- 	watcher->path = g_strdup(path);
- 
-+	if (g_slist_length(cadapter->watchers) == 0)
-+		g_slist_foreach(cadapter->devices, enable_measurement, 0);
-+
- 	cadapter->watchers = g_slist_prepend(cadapter->watchers, watcher);
- 
- 	DBG("cycling watcher [%s] registered", path);
-@@ -432,6 +499,9 @@ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
- 	cadapter->watchers = g_slist_remove(cadapter->watchers, watcher);
- 	g_dbus_remove_watch(conn, watcher->id);
- 
-+	if (g_slist_length(cadapter->watchers) == 0)
-+		g_slist_foreach(cadapter->devices, disable_measurement, 0);
-+
- 	DBG("cycling watcher [%s] unregistered", path);
- 
- 	return dbus_message_new_method_return(msg);
 -- 
 1.8.0
 
