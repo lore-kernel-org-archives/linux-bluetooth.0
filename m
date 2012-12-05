@@ -1,46 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 From: chanyeol.park@samsung.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] build: Include bluetooth lib folder for obexd
-Date: Wed, 05 Dec 2012 11:27:57 +0900
-Message-id: <1354674477-25835-2-git-send-email-chanyeol.park@samsung.com>
-In-reply-to: <1354674477-25835-1-git-send-email-chanyeol.park@samsung.com>
-References: <1354674477-25835-1-git-send-email-chanyeol.park@samsung.com>
+Subject: [PATCH 1/2] audio: Remove left over of HFP removal
+Date: Wed, 05 Dec 2012 11:27:56 +0900
+Message-id: <1354674477-25835-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chan-yeol Park <chanyeol.park@samsung.com>
 
-Because obexd is included in bluez repo, obexd should refer to local
-lib folder before system's one.
 ---
- Makefile.obexd |    7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ profiles/audio/main.c |    8 --------
+ 1 file changed, 8 deletions(-)
 
-diff --git a/Makefile.obexd b/Makefile.obexd
-index 1ed423b..cbcd65d 100644
---- a/Makefile.obexd
-+++ b/Makefile.obexd
-@@ -29,7 +29,7 @@ obexd_src_obexd_CFLAGS = @GLIB_CFLAGS@ @DBUS_CFLAGS@ \
- 					-DPLUGINDIR=\""$(obex_plugindir)"\" \
- 					-fPIC -D_FILE_OFFSET_BITS=64
+diff --git a/profiles/audio/main.c b/profiles/audio/main.c
+index ce060fc..c5d1426 100644
+--- a/profiles/audio/main.c
++++ b/profiles/audio/main.c
+@@ -44,8 +44,6 @@
+ #include "device.h"
+ #include "manager.h"
  
--obexd_src_obexd_CPPFLAGS = -I$(builddir)/obexd/src \
-+obexd_src_obexd_CPPFLAGS = -I$(builddir)/lib -I$(builddir)/obexd/src  \
- 				-I$(srcdir)/obexd/src -I$(srcdir)/btio \
- 				-I$(srcdir)/gobex -I$(srcdir)/gdbus
+-static GIOChannel *sco_server = NULL;
+-
+ static GKeyFile *load_config_file(const char *file)
+ {
+ 	GError *err = NULL;
+@@ -81,12 +79,6 @@ static int audio_init(void)
  
-@@ -76,7 +76,8 @@ obexd_client_obex_client_LDADD = lib/libbluetooth-private.la \
- obexd_client_obex_client_CFLAGS = @GLIB_CFLAGS@ @DBUS_CFLAGS@ \
- 						-fPIC -D_FILE_OFFSET_BITS=64
+ static void audio_exit(void)
+ {
+-	if (sco_server) {
+-		g_io_channel_shutdown(sco_server, TRUE, NULL);
+-		g_io_channel_unref(sco_server);
+-		sco_server = NULL;
+-	}
+-
+ 	audio_manager_exit();
+ }
  
--obexd_client_obex_client_CPPFLAGS = -I$(srcdir)/obexd/src -I$(srcdir)/btio \
--					-I$(srcdir)/gobex -I$(srcdir)/gdbus
-+obexd_client_obex_client_CPPFLAGS = -I$(builddir)/lib -I$(srcdir)/obexd/src \
-+				-I$(srcdir)/btio -I$(srcdir)/gobex \
-+				-I$(srcdir)/gdbus
- 
- obexd_client_obex_client_SHORTNAME = obex-client
 -- 
 1.7.9.5
 
