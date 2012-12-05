@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/9] avdtp: Convert avdtp_is_connected to accept audio_device
-Date: Wed, 5 Dec 2012 11:10:17 +0100
-Message-ID: <1354702224-15895-3-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 1/9] avdtp: Convert avdtp_get to accept audio_device
+Date: Wed, 5 Dec 2012 11:10:16 +0100
+Message-ID: <1354702224-15895-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1354702224-15895-1-git-send-email-szymon.janc@tieto.com>
 References: <1354702224-15895-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -15,23 +15,24 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Use addresses taken from btd_dev reference in audio_device to get
 session source and destination.
 ---
- profiles/audio/avdtp.c  |    7 ++++++-
- profiles/audio/avdtp.h  |    2 +-
- profiles/audio/device.c |    7 +++----
- 3 files changed, 10 insertions(+), 6 deletions(-)
+ profiles/audio/avdtp.c     |    7 ++++++-
+ profiles/audio/avdtp.h     |    2 +-
+ profiles/audio/sink.c      |    2 +-
+ profiles/audio/source.c    |    2 +-
+ profiles/audio/transport.c |    3 +--
+ 5 files changed, 10 insertions(+), 6 deletions(-)
 
 diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 9ff2168..deb8d26 100644
+index e38c95b..9ff2168 100644
 --- a/profiles/audio/avdtp.c
 +++ b/profiles/audio/avdtp.c
-@@ -3201,10 +3201,15 @@ static gboolean avdtp_parse_rej(struct avdtp *session,
- 	}
+@@ -2363,9 +2363,14 @@ static struct avdtp *avdtp_get_internal(const bdaddr_t *src, const bdaddr_t *dst
+ 	return session;
  }
  
--gboolean avdtp_is_connected(const bdaddr_t *src, const bdaddr_t *dst)
-+gboolean avdtp_is_connected(struct audio_device *device)
+-struct avdtp *avdtp_get(bdaddr_t *src, bdaddr_t *dst)
++struct avdtp *avdtp_get(struct audio_device *device)
  {
- 	struct avdtp_server *server;
  	struct avdtp *session;
 +	const bdaddr_t *src;
 +	const bdaddr_t *dst;
@@ -39,43 +40,64 @@ index 9ff2168..deb8d26 100644
 +	src = adapter_get_address(device_get_adapter(device->btd_dev));
 +	dst = device_get_address(device->btd_dev);
  
- 	server = find_server(servers, src);
- 	if (!server)
+ 	session = avdtp_get_internal(src, dst);
+ 
 diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
-index 9117e89..e014623 100644
+index cdf39bf..9117e89 100644
 --- a/profiles/audio/avdtp.h
 +++ b/profiles/audio/avdtp.h
-@@ -218,7 +218,7 @@ struct avdtp *avdtp_get(struct audio_device *device);
+@@ -213,7 +213,7 @@ struct avdtp_sep_ind {
+ typedef void (*avdtp_discover_cb_t) (struct avdtp *session, GSList *seps,
+ 					struct avdtp_error *err, void *user_data);
+ 
+-struct avdtp *avdtp_get(bdaddr_t *src, bdaddr_t *dst);
++struct avdtp *avdtp_get(struct audio_device *device);
+ 
  void avdtp_unref(struct avdtp *session);
  struct avdtp *avdtp_ref(struct avdtp *session);
+diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
+index 466c0a8..d964c3c 100644
+--- a/profiles/audio/sink.c
++++ b/profiles/audio/sink.c
+@@ -348,7 +348,7 @@ int sink_connect(struct audio_device *dev, audio_device_cb cb, void *data)
+ 	struct pending_request *pending;
  
--gboolean avdtp_is_connected(const bdaddr_t *src, const bdaddr_t *dst);
-+gboolean avdtp_is_connected(struct audio_device *device);
+ 	if (!sink->session)
+-		sink->session = avdtp_get(&dev->src, &dev->dst);
++		sink->session = avdtp_get(dev);
  
- struct avdtp_service_capability *avdtp_service_cap_new(uint8_t category,
- 							void *data, int size);
-diff --git a/profiles/audio/device.c b/profiles/audio/device.c
-index fef2bea..ba1efec 100644
---- a/profiles/audio/device.c
-+++ b/profiles/audio/device.c
-@@ -323,14 +323,13 @@ gboolean audio_device_is_active(struct audio_device *dev,
- 						const char *interface)
+ 	if (!sink->session) {
+ 		DBG("Unable to get a session");
+diff --git a/profiles/audio/source.c b/profiles/audio/source.c
+index 157a4e8..eea2661 100644
+--- a/profiles/audio/source.c
++++ b/profiles/audio/source.c
+@@ -348,7 +348,7 @@ int source_connect(struct audio_device *dev, audio_device_cb cb, void *data)
+ 	struct pending_request *pending;
+ 
+ 	if (!source->session)
+-		source->session = avdtp_get(&dev->src, &dev->dst);
++		source->session = avdtp_get(dev);
+ 
+ 	if (!source->session) {
+ 		DBG("Unable to get a session");
+diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+index 610aca3..859900d 100644
+--- a/profiles/audio/transport.c
++++ b/profiles/audio/transport.c
+@@ -381,11 +381,10 @@ static guint resume_a2dp(struct media_transport *transport,
  {
- 	if (!interface) {
--		if ((dev->sink || dev->source) &&
--				avdtp_is_connected(&dev->src, &dev->dst))
-+		if ((dev->sink || dev->source) && avdtp_is_connected(dev))
- 			return TRUE;
- 	} else if (!strcmp(interface, AUDIO_SINK_INTERFACE) && dev->sink &&
--				avdtp_is_connected(&dev->src, &dev->dst))
-+				avdtp_is_connected(dev))
- 		return TRUE;
- 	else if (!strcmp(interface, AUDIO_SOURCE_INTERFACE) && dev->source &&
--				avdtp_is_connected(&dev->src, &dev->dst))
-+				avdtp_is_connected(dev))
- 		return TRUE;
- 	else if (!strcmp(interface, AUDIO_CONTROL_INTERFACE) && dev->control &&
- 				control_is_active(dev))
+ 	struct a2dp_transport *a2dp = transport->data;
+ 	struct media_endpoint *endpoint = transport->endpoint;
+-	struct audio_device *device = transport->device;
+ 	struct a2dp_sep *sep = media_endpoint_get_sep(endpoint);
+ 
+ 	if (a2dp->session == NULL) {
+-		a2dp->session = avdtp_get(&device->src, &device->dst);
++		a2dp->session = avdtp_get(transport->device);
+ 		if (a2dp->session == NULL)
+ 			return 0;
+ 	}
 -- 
 1.7.9.5
 
