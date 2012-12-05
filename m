@@ -1,87 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH v3 00/15] Manager/Adapter transition to ObjectManager
-Date: Wed,  5 Dec 2012 13:51:27 +0100
-Message-Id: <1354711902-16390-1-git-send-email-mikel.astiz.oss@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] adapter: Always write address type when converting to new storage
+Date: Wed, 5 Dec 2012 13:32:55 +0100
+Message-ID: <1354710775-2670-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <20121205111430.GA5233@x220.ger.corp.intel.com>
+References: <20121205111430.GA5233@x220.ger.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+When address type is not present in legacy storage assume BDADDR_BREDR
+type and store it.
 
-Main changes from v2 include the suggestions from Lizardo:
-- Python style improved.
-- Utility library renamed to bluezutils.py to avoid collisions in distros.
-- Recently added test-cyclingspeed also considered in the patchset.
+This also fix following compilation error on ARM:
 
->From previous cover-letter:
+  CC     src/bluetoothd-adapter.o
+src/adapter.c: In function ‘convert_entry’:
+src/adapter.c:2710:2: error: comparison is always true due to limited
+	range of data type [-Werror=type-limits]
+cc1: all warnings being treated as errors
+make[1]: *** [src/bluetoothd-adapter.o] Error 1
+---
+ src/adapter.c |    7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-This proposal completely removes org.bluez.Manager, with two main consequences:
-1. Clients have a harder time to find adapters. Therefore, some helper function have been added to be used by test scripts.
-2. The concept of "default adapter" disappears.
-
-All test scripts have been updated here but not all of them were tested, so apoligies if this breaks your script (some of them are already broken, by the way).
-
-Regarding the testing code written in C, they haven't been updated. The idea is to address these once the python part has been agreed.
-
-Mikel Astiz (15):
-  cups: Remove unnecessary code
-  test: Add utility library for python scripts
-  test: Avoid using DefaultAdapter()
-  test: Update monitor script to ObjectManager
-  test: Update test-manager script to ObjectManager
-  test: Use ObjectManager instead of Adapters property
-  dbus: Remove org.bluez.Manager
-  test: Use ObjectManager instead of Devices property
-  test: Add helper function to find devices
-  adapter: Remove DeviceCreated/DeviceRemoved signals
-  adapter: Remove redundant Devices property
-  test: Avoid using Adapter.FindDevice()
-  adapter: Remove FindDevice method from D-Bus API
-  dbus: Rename to org.bluez.Device1
-  dbus: Rename to org.bluez.Adapter1
-
- Makefile.am            |   3 +-
- Makefile.tools         |   2 +-
- doc/adapter-api.txt    |  23 +------
- doc/bluez-docs.xml     |   7 ---
- doc/device-api.txt     |   2 +-
- doc/manager-api.txt    |  51 ----------------
- doc/oob-api.txt        |   2 +-
- profiles/cups/main.c   |  46 +++++---------
- src/adapter.c          |  89 +--------------------------
- src/adapter.h          |   2 +-
- src/device.h           |   2 +-
- src/manager.c          | 163 -------------------------------------------------
- src/manager.h          |   3 -
- test/agent.c           |   7 ++-
- test/bluezutils.py     |  47 ++++++++++++++
- test/dbusdef.py        |   5 +-
- test/list-devices      |  20 +++---
- test/monitor-bluetooth |  68 ++++++++++-----------
- test/simple-agent      |  22 +++----
- test/simple-endpoint   |   7 +--
- test/simple-player     |   7 +--
- test/simple-service    |   7 +--
- test/test-adapter      |  41 ++++++-------
- test/test-attrib       |  18 ++----
- test/test-cyclingspeed |  20 +++---
- test/test-device       |  84 ++++++++++++-------------
- test/test-discovery    |  15 ++---
- test/test-health       |  11 +++-
- test/test-health-sink  |  12 +++-
- test/test-heartrate    |  23 +++----
- test/test-manager      |  33 +++++-----
- test/test-nap          |  10 +--
- test/test-oob          |  33 +++++-----
- test/test-proximity    |  17 +-----
- test/test-service      |   8 +--
- test/test-thermometer  |  20 +++---
- 36 files changed, 288 insertions(+), 642 deletions(-)
- delete mode 100644 doc/manager-api.txt
- create mode 100644 test/bluezutils.py
-
+diff --git a/src/adapter.c b/src/adapter.c
+index 3c5d277..9bef239 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2673,7 +2673,7 @@ static void convert_ltk_entry(GKeyFile *key_file, void *value)
+ static void convert_entry(char *key, char *value, void *user_data)
+ {
+ 	struct device_converter *converter = user_data;
+-	char device_type = -1;
++	char type = BDADDR_BREDR;
+ 	char filename[PATH_MAX + 1];
+ 	GKeyFile *key_file;
+ 	char *data;
+@@ -2681,7 +2681,7 @@ static void convert_entry(char *key, char *value, void *user_data)
+ 
+ 	if (key[17] == '#') {
+ 		key[17] = '\0';
+-		device_type = key[18] - '0';
++		type = key[18] - '0';
+ 	}
+ 
+ 	if (bachk(key) != 0)
+@@ -2707,8 +2707,7 @@ static void convert_entry(char *key, char *value, void *user_data)
+ 	key_file = g_key_file_new();
+ 	g_key_file_load_from_file(key_file, filename, 0, NULL);
+ 
+-	if (device_type >= 0)
+-		set_device_type(key_file, device_type);
++	set_device_type(key_file, type);
+ 
+ 	converter->cb(key_file, value);
+ 
 -- 
-1.7.11.7
+1.7.9.5
 
