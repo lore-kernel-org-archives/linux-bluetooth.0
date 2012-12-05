@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 5/9] avctp: Don't use audio_device src and dst in avctp_control_confirm
-Date: Wed, 5 Dec 2012 11:10:20 +0100
-Message-ID: <1354702224-15895-6-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 9/9] audio: Remove src and dst from struct audio_device
+Date: Wed, 5 Dec 2012 11:10:24 +0100
+Message-ID: <1354702224-15895-10-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1354702224-15895-1-git-send-email-szymon.janc@tieto.com>
 References: <1354702224-15895-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,37 +12,76 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use src and dst addresses from btd_dev reference.
+Those are not used anymore as addresses are takes from btd_device
+reference.
 ---
- profiles/audio/avctp.c |    8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ profiles/audio/device.c  |    6 +-----
+ profiles/audio/device.h  |    7 +------
+ profiles/audio/manager.c |    2 +-
+ 3 files changed, 3 insertions(+), 12 deletions(-)
 
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index a7daef3..e29527f 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -1055,6 +1055,9 @@ static struct avctp *avctp_get_internal(const bdaddr_t *src,
- static void avctp_control_confirm(struct avctp *session, GIOChannel *chan,
- 						struct audio_device *dev)
- {
-+	const bdaddr_t *src;
-+	const bdaddr_t *dst;
-+
- 	if (session->control != NULL) {
- 		error("Control: Refusing unexpected connect");
- 		g_io_channel_shutdown(chan, TRUE, NULL);
-@@ -1064,7 +1067,10 @@ static void avctp_control_confirm(struct avctp *session, GIOChannel *chan,
- 	avctp_set_state(session, AVCTP_STATE_CONNECTING);
- 	session->control = avctp_channel_create(session, chan);
+diff --git a/profiles/audio/device.c b/profiles/audio/device.c
+index ba1efec..d135ce9 100644
+--- a/profiles/audio/device.c
++++ b/profiles/audio/device.c
+@@ -292,9 +292,7 @@ static void device_avctp_cb(struct audio_device *dev,
+ 	}
+ }
  
--	session->auth_id = btd_request_authorization(&dev->src, &dev->dst,
-+	src = adapter_get_address(device_get_adapter(dev->btd_dev));
-+	dst = device_get_address(dev->btd_dev);
-+
-+	session->auth_id = btd_request_authorization(src, dst,
- 							AVRCP_TARGET_UUID,
- 							auth_cb, session);
- 	if (session->auth_id == 0)
+-struct audio_device *audio_device_register(struct btd_device *device,
+-							const bdaddr_t *src,
+-							const bdaddr_t *dst)
++struct audio_device *audio_device_register(struct btd_device *device)
+ {
+ 	struct audio_device *dev;
+ 
+@@ -303,8 +301,6 @@ struct audio_device *audio_device_register(struct btd_device *device,
+ 	dev = g_new0(struct audio_device, 1);
+ 
+ 	dev->btd_dev = btd_device_ref(device);
+-	bacpy(&dev->dst, dst);
+-	bacpy(&dev->src, src);
+ 	dev->priv = g_new0(struct dev_priv, 1);
+ 	dev->priv->state = AUDIO_STATE_DISCONNECTED;
+ 
+diff --git a/profiles/audio/device.h b/profiles/audio/device.h
+index 0801cda..e3dc519 100644
+--- a/profiles/audio/device.h
++++ b/profiles/audio/device.h
+@@ -36,9 +36,6 @@ typedef void (*audio_device_cb) (struct audio_device *dev, int err, void *data);
+ struct audio_device {
+ 	struct btd_device *btd_dev;
+ 
+-	bdaddr_t src;
+-	bdaddr_t dst;
+-
+ 	gboolean auto_connect;
+ 
+ 	struct sink *sink;
+@@ -52,9 +49,7 @@ struct audio_device {
+ 	struct dev_priv *priv;
+ };
+ 
+-struct audio_device *audio_device_register(struct btd_device *device,
+-							const bdaddr_t *src,
+-							const bdaddr_t *dst);
++struct audio_device *audio_device_register(struct btd_device *device);
+ 
+ void audio_device_unregister(struct audio_device *device);
+ 
+diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
+index 98ae694..0c21287 100644
+--- a/profiles/audio/manager.c
++++ b/profiles/audio/manager.c
+@@ -761,7 +761,7 @@ struct audio_device *manager_get_device(const bdaddr_t *src,
+ 		return NULL;
+ 	}
+ 
+-	dev = audio_device_register(device, src, dst);
++	dev = audio_device_register(device);
+ 	if (!dev)
+ 		return NULL;
+ 
 -- 
 1.7.9.5
 
