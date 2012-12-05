@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH v1 2/6] media: Remove internal transport locks
-Date: Wed,  5 Dec 2012 17:15:30 +0100
-Message-Id: <1354724134-7354-3-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH v1 3/6] media: Remove transport owner list
+Date: Wed,  5 Dec 2012 17:15:31 +0100
+Message-Id: <1354724134-7354-4-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1354724134-7354-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1354724134-7354-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,253 +12,207 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The internal transport_lock_t is not needed any more since transports
-are now always acquired with read and write permissions.
+Transports now have zero or one owners, so there is no need to maintain
+a list any more.
 ---
- profiles/audio/transport.c | 130 ++++++++++-----------------------------------
- 1 file changed, 28 insertions(+), 102 deletions(-)
+ profiles/audio/transport.c | 79 ++++++++++++----------------------------------
+ 1 file changed, 21 insertions(+), 58 deletions(-)
 
 diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index a76481c..4bb54f6 100644
+index 4bb54f6..1064098 100644
 --- a/profiles/audio/transport.c
 +++ b/profiles/audio/transport.c
-@@ -51,11 +51,6 @@
- #define MEDIA_TRANSPORT_INTERFACE "org.bluez.MediaTransport"
- 
- typedef enum {
--	TRANSPORT_LOCK_READ = 1,
--	TRANSPORT_LOCK_WRITE = 1 << 1,
--} transport_lock_t;
--
--typedef enum {
- 	TRANSPORT_STATE_IDLE,		/* Not acquired and suspended */
- 	TRANSPORT_STATE_PENDING,	/* Playing but not acquired */
- 	TRANSPORT_STATE_REQUESTING,	/* Acquire in progress */
-@@ -80,7 +75,6 @@ struct media_owner {
- 	struct media_transport	*transport;
- 	struct media_request	*pending;
- 	char			*name;
--	transport_lock_t	lock;
- 	guint			watch;
- };
- 
-@@ -100,7 +94,6 @@ struct media_transport {
+@@ -88,7 +88,7 @@ struct media_transport {
+ 	char			*path;		/* Transport object path */
+ 	struct audio_device	*device;	/* Transport device */
+ 	struct media_endpoint	*endpoint;	/* Transport endpoint */
+-	GSList			*owners;	/* Transport owners */
++	struct media_owner	*owner;		/* Transport owner */
+ 	uint8_t			*configuration; /* Transport configuration */
+ 	int			size;		/* Transport configuration size */
  	int			fd;		/* Transport file descriptor */
- 	uint16_t		imtu;		/* Transport input mtu */
- 	uint16_t		omtu;		/* Transport output mtu */
--	transport_lock_t	lock;
- 	transport_state_t	state;
- 	guint			hs_watch;
- 	guint			source_watch;
-@@ -115,18 +108,6 @@ struct media_transport {
- 	void			*data;
- };
- 
--static const char *lock2str(transport_lock_t lock)
--{
--	if (lock == 0)
--		return "";
--	else if (lock == TRANSPORT_LOCK_READ)
--		return "r";
--	else if (lock == TRANSPORT_LOCK_WRITE)
--		return "w";
--	else
--		return "rw";
--}
--
- static const char *state2str(transport_state_t state)
- {
- 	switch (state) {
-@@ -229,20 +210,6 @@ static void media_request_reply(struct media_request *req, int err)
- 	g_dbus_send_message(btd_get_dbus_connection(), reply);
+@@ -241,24 +241,24 @@ static void media_owner_free(struct media_owner *owner)
+ 	g_free(owner);
  }
  
--static gboolean media_transport_release(struct media_transport *transport,
--							transport_lock_t lock)
--{
--	transport->lock &= ~lock;
--
--	if (lock & TRANSPORT_LOCK_READ)
--		DBG("Transport %s: read lock released", transport->path);
--
--	if (lock & TRANSPORT_LOCK_WRITE)
--		DBG("Transport %s: write lock released", transport->path);
--
--	return TRUE;
--}
--
- static void media_owner_remove(struct media_owner *owner)
+-static void media_transport_remove(struct media_transport *transport,
+-						struct media_owner *owner)
++static void media_transport_remove_owner(struct media_transport *transport)
  {
- 	struct media_transport *transport = owner->transport;
-@@ -279,8 +246,6 @@ static void media_transport_remove(struct media_transport *transport,
- {
++	struct media_owner *owner = transport->owner;
++
  	DBG("Transport %s Owner %s", transport->path, owner->name);
  
--	media_transport_release(transport, owner->lock);
--
  	/* Reply if owner has a pending request */
  	if (owner->pending)
  		media_request_reply(owner->pending, EIO);
-@@ -339,12 +304,6 @@ static void a2dp_resume_complete(struct avdtp *session,
  
- 	media_transport_set_fd(transport, fd, imtu, omtu);
+-	transport->owners = g_slist_remove(transport->owners, owner);
++	transport->owner = NULL;
  
--	if ((owner->lock & TRANSPORT_LOCK_READ) == 0)
--		imtu = 0;
--
--	if ((owner->lock & TRANSPORT_LOCK_WRITE) == 0)
--		omtu = 0;
--
- 	ret = g_dbus_send_reply(btd_get_dbus_connection(), req->msg,
- 						DBUS_TYPE_UNIX_FD, &fd,
- 						DBUS_TYPE_UINT16, &imtu,
-@@ -443,24 +402,6 @@ static void media_owner_exit(DBusConnection *connection, void *user_data)
- 	media_transport_remove(owner->transport, owner);
+ 	if (owner->watch)
+ 		g_dbus_remove_watch(btd_get_dbus_connection(), owner->watch);
+ 
+ 	media_owner_free(owner);
+ 
+-	/* Suspend if there is no longer any owner */
+-	if (transport->owners == NULL && state_in_use(transport->state))
++	if (state_in_use(transport->state))
+ 		transport->suspend(transport, NULL);
  }
  
--static gboolean media_transport_acquire(struct media_transport *transport,
--							transport_lock_t lock)
--{
--	if (transport->lock & lock)
--		return FALSE;
--
--	transport->lock |= lock;
--
--	if (lock & TRANSPORT_LOCK_READ)
--		DBG("Transport %s: read lock acquired", transport->path);
--
--	if (lock & TRANSPORT_LOCK_WRITE)
--		DBG("Transport %s: write lock acquired", transport->path);
--
--
--	return TRUE;
--}
--
- static void media_transport_add(struct media_transport *transport,
+@@ -319,7 +319,7 @@ static void a2dp_resume_complete(struct avdtp *session,
+ 	return;
+ 
+ fail:
+-	media_transport_remove(transport, owner);
++	media_transport_remove_owner(transport);
+ }
+ 
+ static guint resume_a2dp(struct media_transport *transport,
+@@ -366,7 +366,7 @@ static void a2dp_suspend_complete(struct avdtp *session,
+ 
+ 	a2dp_sep_unlock(sep, a2dp->session);
+ 	transport_set_state(transport, TRANSPORT_STATE_IDLE);
+-	media_transport_remove(transport, owner);
++	media_transport_remove_owner(transport);
+ }
+ 
+ static guint suspend_a2dp(struct media_transport *transport,
+@@ -399,14 +399,14 @@ static void media_owner_exit(DBusConnection *connection, void *user_data)
+ 
+ 	media_owner_remove(owner);
+ 
+-	media_transport_remove(owner->transport, owner);
++	media_transport_remove_owner(owner->transport);
+ }
+ 
+-static void media_transport_add(struct media_transport *transport,
++static void media_transport_set_owner(struct media_transport *transport,
  					struct media_owner *owner)
  {
-@@ -473,17 +414,14 @@ static void media_transport_add(struct media_transport *transport,
- 							owner, NULL);
+ 	DBG("Transport %s Owner %s", transport->path, owner->name);
+-	transport->owners = g_slist_append(transport->owners, owner);
++	transport->owner = owner;
+ 	owner->transport = transport;
+ 	owner->watch = g_dbus_add_disconnect_watch(btd_get_dbus_connection(),
+ 							owner->name,
+@@ -435,35 +435,15 @@ static void media_owner_add(struct media_owner *owner,
+ 	owner->pending = req;
  }
  
--static struct media_owner *media_owner_create(DBusMessage *msg,
--						transport_lock_t lock)
-+static struct media_owner *media_owner_create(DBusMessage *msg)
+-static struct media_owner *media_transport_find_owner(
+-					struct media_transport *transport,
+-					const char *name)
+-{
+-	GSList *l;
+-
+-	for (l = transport->owners; l; l = l->next) {
+-		struct media_owner *owner = l->data;
+-
+-		if (g_strcmp0(owner->name, name) == 0)
+-			return owner;
+-	}
+-
+-	return NULL;
+-}
+-
+ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
+ 					void *data)
  {
+ 	struct media_transport *transport = data;
  	struct media_owner *owner;
- 
- 	owner = g_new0(struct media_owner, 1);
- 	owner->name = g_strdup(dbus_message_get_sender(msg));
--	owner->lock = lock;
- 
--	DBG("Owner created: sender=%s accesstype=%s", owner->name,
--							lock2str(lock));
-+	DBG("Owner created: sender=%s", owner->name);
- 
- 	return owner;
- }
-@@ -521,7 +459,6 @@ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
  	struct media_request *req;
- 	const char *sender;
+-	const char *sender;
  	guint id;
--	transport_lock_t lock = TRANSPORT_LOCK_READ | TRANSPORT_LOCK_WRITE;
  
- 	sender = dbus_message_get_sender(msg);
- 
-@@ -529,13 +466,12 @@ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
- 	if (owner != NULL)
+-	sender = dbus_message_get_sender(msg);
+-
+-	owner = media_transport_find_owner(transport, sender);
+-	if (owner != NULL)
++	if (transport->owner != NULL)
  		return btd_error_not_authorized(msg);
  
--	if (media_transport_acquire(transport, lock) == FALSE)
-+	if (transport->state >= TRANSPORT_STATE_REQUESTING)
- 		return btd_error_not_authorized(msg);
+ 	if (transport->state >= TRANSPORT_STATE_REQUESTING)
+@@ -478,7 +458,7 @@ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
  
--	owner = media_owner_create(msg, lock);
-+	owner = media_owner_create(msg);
- 	id = transport->resume(transport, owner);
- 	if (id == 0) {
--		media_transport_release(transport, lock);
- 		media_owner_free(owner);
- 		return btd_error_not_authorized(msg);
- 	}
-@@ -554,7 +490,7 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
- 	struct media_owner *owner;
+ 	req = media_request_create(msg, id);
+ 	media_owner_add(owner, req);
+-	media_transport_add(transport, owner);
++	media_transport_set_owner(transport, owner);
+ 
+ 	return NULL;
+ }
+@@ -487,23 +467,16 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
+ 					void *data)
+ {
+ 	struct media_transport *transport = data;
+-	struct media_owner *owner;
++	struct media_owner *owner = transport->owner;
  	const char *sender;
  	struct media_request *req;
--	transport_lock_t lock = TRANSPORT_LOCK_READ | TRANSPORT_LOCK_WRITE;
-+	guint id;
+ 	guint id;
  
  	sender = dbus_message_get_sender(msg);
  
-@@ -562,45 +498,35 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
- 	if (owner == NULL)
+-	owner = media_transport_find_owner(transport, sender);
+-	if (owner == NULL)
++	if (owner == NULL || g_strcmp0(owner->name, sender) != 0)
  		return btd_error_not_authorized(msg);
  
--	if (owner->lock == lock) {
--		guint id;
+-	/* Not the last owner, no need to suspend */
+-	if (g_slist_length(transport->owners) != 1) {
+-		media_transport_remove(transport, owner);
+-		return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+-	}
 -
--		/* Not the last owner, no need to suspend */
--		if (g_slist_length(transport->owners) != 1) {
--			media_transport_remove(transport, owner);
--			return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
--		}
+ 	if (owner->pending) {
+ 		const char *member;
+ 
+@@ -519,7 +492,7 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
+ 
+ 	id = transport->suspend(transport, owner);
+ 	if (id == 0) {
+-		media_transport_remove(transport, owner);
++		media_transport_remove_owner(transport);
+ 		return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ 	}
+ 
+@@ -689,15 +662,9 @@ static void destroy_a2dp(void *data)
+ static void media_transport_free(void *data)
+ {
+ 	struct media_transport *transport = data;
+-	GSList *l = transport->owners;
+ 
+-	while (l) {
+-		struct media_owner *owner = l->data;
+-		l = l->next;
+-		media_transport_remove(transport, owner);
+-	}
 -
--		if (owner->pending) {
--			const char *member;
-+	/* Not the last owner, no need to suspend */
-+	if (g_slist_length(transport->owners) != 1) {
-+		media_transport_remove(transport, owner);
-+		return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
-+	}
+-	g_slist_free(transport->owners);
++	if (transport->owner)
++		media_transport_remove_owner(transport);
  
--			member = dbus_message_get_member(owner->pending->msg);
--			/* Cancel Acquire request if that exist */
--			if (g_str_equal(member, "Acquire"))
--				media_owner_remove(owner);
--			else
--				return btd_error_in_progress(msg);
--		}
-+	if (owner->pending) {
-+		const char *member;
- 
--		transport_set_state(transport, TRANSPORT_STATE_SUSPENDING);
-+		member = dbus_message_get_member(owner->pending->msg);
-+		/* Cancel Acquire request if that exist */
-+		if (g_str_equal(member, "Acquire"))
-+			media_owner_remove(owner);
-+		else
-+			return btd_error_in_progress(msg);
-+	}
- 
--		id = transport->suspend(transport, owner);
--		if (id == 0) {
--			media_transport_remove(transport, owner);
--			return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
--		}
-+	transport_set_state(transport, TRANSPORT_STATE_SUSPENDING);
- 
--		req = media_request_create(msg, id);
--		media_owner_add(owner, req);
-+	id = transport->suspend(transport, owner);
-+	if (id == 0) {
-+		media_transport_remove(transport, owner);
-+		return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
-+	}
- 
--		return NULL;
--	} else if ((owner->lock & lock) == lock) {
--		media_transport_release(transport, lock);
--		owner->lock &= ~lock;
--	} else
--		return btd_error_not_authorized(msg);
-+	req = media_request_create(msg, id);
-+	media_owner_add(owner, req);
- 
--	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
-+	return NULL;
- }
- 
- static gboolean get_device(const GDBusPropertyTable *property,
+ 	if (transport->destroy != NULL)
+ 		transport->destroy(transport->data);
+@@ -717,13 +684,9 @@ static void transport_update_playing(struct media_transport *transport,
+ 		if (transport->state == TRANSPORT_STATE_PENDING)
+ 			transport_set_state(transport, TRANSPORT_STATE_IDLE);
+ 		else if (transport->state == TRANSPORT_STATE_ACTIVE) {
+-			/* Remove all owners */
+-			while (transport->owners != NULL) {
+-				struct media_owner *owner;
+-
+-				owner = transport->owners->data;
+-				media_transport_remove(transport, owner);
+-			}
++			/* Remove owner */
++			if (transport->owner != NULL)
++				media_transport_remove_owner(transport);
+ 		}
+ 	} else if (transport->state == TRANSPORT_STATE_IDLE)
+ 		transport_set_state(transport, TRANSPORT_STATE_PENDING);
 -- 
 1.7.11.7
 
