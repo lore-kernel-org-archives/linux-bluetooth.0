@@ -1,64 +1,121 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] adapter: Always write address type when converting to new storage
-Date: Wed, 5 Dec 2012 13:32:55 +0100
-Message-ID: <1354710775-2670-1-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <20121205111430.GA5233@x220.ger.corp.intel.com>
-References: <20121205111430.GA5233@x220.ger.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
+	<frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3] hciconfig: Remove putkey command
+Date: Wed,  5 Dec 2012 12:43:54 +0100
+Message-Id: <1354707834-30972-1-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1354705606.1815.6.camel@aeonflux>
+References: <1354705606.1815.6.camel@aeonflux>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When address type is not present in legacy storage assume BDADDR_BREDR
-type and store it.
-
-This also fix following compilation error on ARM:
-
-  CC     src/bluetoothd-adapter.o
-src/adapter.c: In function ‘convert_entry’:
-src/adapter.c:2710:2: error: comparison is always true due to limited
-	range of data type [-Werror=type-limits]
-cc1: all warnings being treated as errors
-make[1]: *** [src/bluetoothd-adapter.o] Error 1
+With new storage architecture legacy storage "linkkeys"
+file doesn't exist anymore.
 ---
- src/adapter.c |    7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ tools/hciconfig.8 |    5 -----
+ tools/hciconfig.c |   64 -----------------------------------------------------
+ 2 files changed, 69 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 3c5d277..9bef239 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2673,7 +2673,7 @@ static void convert_ltk_entry(GKeyFile *key_file, void *value)
- static void convert_entry(char *key, char *value, void *user_data)
- {
- 	struct device_converter *converter = user_data;
--	char device_type = -1;
-+	char type = BDADDR_BREDR;
- 	char filename[PATH_MAX + 1];
- 	GKeyFile *key_file;
- 	char *data;
-@@ -2681,7 +2681,7 @@ static void convert_entry(char *key, char *value, void *user_data)
- 
- 	if (key[17] == '#') {
- 		key[17] = '\0';
--		device_type = key[18] - '0';
-+		type = key[18] - '0';
+diff --git a/tools/hciconfig.8 b/tools/hciconfig.8
+index 6397427..897d820 100644
+--- a/tools/hciconfig.8
++++ b/tools/hciconfig.8
+@@ -212,11 +212,6 @@ bytes and SCO buffer size to
+ .I pkt
+ packets.
+ .TP
+-.BI putkey " <bdaddr>"
+-This command stores the link key for
+-.I bdaddr
+-on the device.
+-.TP
+ .BI delkey " <bdaddr>"
+ This command deletes the stored link key for
+ .I bdaddr
+diff --git a/tools/hciconfig.c b/tools/hciconfig.c
+index 045e9a8..6b18c4f 100644
+--- a/tools/hciconfig.c
++++ b/tools/hciconfig.c
+@@ -1015,69 +1015,6 @@ static void cmd_voice(int ctl, int hdev, char *opt)
  	}
+ }
  
- 	if (bachk(key) != 0)
-@@ -2707,8 +2707,7 @@ static void convert_entry(char *key, char *value, void *user_data)
- 	key_file = g_key_file_new();
- 	g_key_file_load_from_file(key_file, filename, 0, NULL);
- 
--	if (device_type >= 0)
--		set_device_type(key_file, device_type);
-+	set_device_type(key_file, type);
- 
- 	converter->cb(key_file, value);
- 
+-static int get_link_key(const bdaddr_t *local, const bdaddr_t *peer,
+-			uint8_t *key)
+-{
+-	char filename[PATH_MAX + 1], addr[18], tmp[3], *str;
+-	int i;
+-
+-	ba2str(local, addr);
+-	create_name(filename, PATH_MAX, STORAGEDIR, addr, "linkkeys");
+-
+-	ba2str(peer, addr);
+-	str = textfile_get(filename, addr);
+-	if (!str)
+-		return -EIO;
+-
+-	memset(tmp, 0, sizeof(tmp));
+-	for (i = 0; i < 16; i++) {
+-		memcpy(tmp, str + (i * 2), 2);
+-		key[i] = (uint8_t) strtol(tmp, NULL, 16);
+-	}
+-
+-	free(str);
+-
+-	return 0;
+-}
+-
+-static void cmd_putkey(int ctl, int hdev, char *opt)
+-{
+-	struct hci_dev_info di;
+-	bdaddr_t bdaddr;
+-	uint8_t key[16];
+-	int dd;
+-
+-	if (!opt)
+-		return;
+-
+-	dd = hci_open_dev(hdev);
+-	if (dd < 0) {
+-		fprintf(stderr, "Can't open device hci%d: %s (%d)\n",
+-						hdev, strerror(errno), errno);
+-		exit(1);
+-	}
+-
+-	if (hci_devinfo(hdev, &di) < 0) {
+-		fprintf(stderr, "Can't get device info for hci%d: %s (%d)\n",
+-						hdev, strerror(errno), errno);
+-		exit(1);
+-	}
+-
+-	str2ba(opt, &bdaddr);
+-	if (get_link_key(&di.bdaddr, &bdaddr, key) < 0) {
+-		fprintf(stderr, "Can't find link key for %s on hci%d\n", opt, hdev);
+-		exit(1);
+-	}
+-
+-	if (hci_write_stored_link_key(dd, &bdaddr, key, 1000) < 0) {
+-		fprintf(stderr, "Can't write stored link key on hci%d: %s (%d)\n",
+-						hdev, strerror(errno), errno);
+-		exit(1);
+-	}
+-
+-	hci_close_dev(dd);
+-}
+-
+ static void cmd_delkey(int ctl, int hdev, char *opt)
+ {
+ 	bdaddr_t bdaddr;
+@@ -1984,7 +1921,6 @@ static struct {
+ 	{ "sspmode",	cmd_ssp_mode,	"[mode]",	"Get/Set Simple Pairing Mode" },
+ 	{ "aclmtu",	cmd_aclmtu,	"<mtu:pkt>",	"Set ACL MTU and number of packets" },
+ 	{ "scomtu",	cmd_scomtu,	"<mtu:pkt>",	"Set SCO MTU and number of packets" },
+-	{ "putkey",	cmd_putkey,	"<bdaddr>",	"Store link key on the device" },
+ 	{ "delkey",	cmd_delkey,	"<bdaddr>",	"Delete link key from the device" },
+ 	{ "oobdata",	cmd_oob_data,	0,		"Get local OOB data" },
+ 	{ "commands",	cmd_commands,	0,		"Display supported commands" },
 -- 
 1.7.9.5
 
