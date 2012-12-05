@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH v1 3/6] media: Remove transport owner list
-Date: Wed,  5 Dec 2012 17:15:31 +0100
-Message-Id: <1354724134-7354-4-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH v1 6/6] media: Add version suffix to all media interfaces
+Date: Wed,  5 Dec 2012 17:15:34 +0100
+Message-Id: <1354724134-7354-7-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1354724134-7354-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1354724134-7354-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,207 +12,210 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Transports now have zero or one owners, so there is no need to maintain
-a list any more.
+Append the version number to all D-Bus interface names in the Media API.
 ---
- profiles/audio/transport.c | 79 ++++++++++++----------------------------------
- 1 file changed, 21 insertions(+), 58 deletions(-)
+ doc/audio-telephony-design.txt |  4 ++--
+ doc/media-api.txt              | 20 ++++++++++----------
+ profiles/audio/media.c         |  8 ++++----
+ profiles/audio/player.c        |  2 +-
+ profiles/audio/transport.c     |  2 +-
+ test/mpris-player.c            | 14 +++++++-------
+ 6 files changed, 25 insertions(+), 25 deletions(-)
 
+diff --git a/doc/audio-telephony-design.txt b/doc/audio-telephony-design.txt
+index ec575f2..308986b 100644
+--- a/doc/audio-telephony-design.txt
++++ b/doc/audio-telephony-design.txt
+@@ -35,9 +35,9 @@ When a new device is connected, NewConnection method of Profile1 agent
+ is called with informations related to connecting profile (like RFCOMM
+ client file descriptor, version, features, media end point path, ...).
+ 
+-The telephony application is in charge to implement a MediaTransport for
++The telephony application is in charge to implement a MediaTransport1 for
+ its audio connection with remote device and interact with the
+-MediaTransport of the audio component (i.e. PulseAudio).
++MediaTransport1 of the audio component (i.e. PulseAudio).
+ 
+ Flow charts
+ ===========
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index 5e052b4..ce7502a 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -5,7 +5,7 @@ Media hierarchy
+ ===============
+ 
+ Service		org.bluez
+-Interface	org.bluez.Media
++Interface	org.bluez.Media1
+ Object path	[variable prefix]/{hci0,hci1,...}
+ 
+ Methods		void RegisterEndpoint(object endpoint, dict properties)
+@@ -123,12 +123,12 @@ Methods		void RegisterEndpoint(object endpoint, dict properties)
+ 
+ 			Unregister sender media player.
+ 
+-MediaPlayer hierarchy
+-=====================
++MediaPlayer1 hierarchy
++======================
+ 
+ Service		unique name (Target role)
+ 		org.bluez (Controller role)
+-Interface	org.bluez.MediaPlayer
++Interface	org.bluez.Media1Player1
+ Object path	freely definable (Target role)
+ 		[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/playerX
+ 		(Controller role)
+@@ -219,11 +219,11 @@ Properties	string Equalizer [readwrite]
+ 			possible to signal its end by setting position to the
+ 			maximum uint32 value.
+ 
+-MediaEndpoint hierarchy
+-=======================
++MediaEndpoint1 hierarchy
++========================
+ 
+ Service		unique name
+-Interface	org.bluez.MediaEndpoint
++Interface	org.bluez.Media1Endpoint1
+ Object path	freely definable
+ 
+ Methods		void SetConfiguration(object transport, dict properties)
+@@ -254,11 +254,11 @@ Methods		void SetConfiguration(object transport, dict properties)
+ 			endpoint, because when this method gets called it has
+ 			already been unregistered.
+ 
+-MediaTransport hierarchy
+-========================
++MediaTransport1 hierarchy
++=========================
+ 
+ Service		org.bluez
+-Interface	org.bluez.MediaTransport
++Interface	org.bluez.MediaTransport1
+ Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/fdX
+ 
+ Methods		fd, uint16, uint16 Acquire()
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 2041d23..7c0bc0a 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -50,9 +50,9 @@
+ #include "avrcp.h"
+ #include "manager.h"
+ 
+-#define MEDIA_INTERFACE "org.bluez.Media"
+-#define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint"
+-#define MEDIA_PLAYER_INTERFACE "org.bluez.MediaPlayer"
++#define MEDIA_INTERFACE "org.bluez.Media1"
++#define MEDIA_ENDPOINT_INTERFACE "org.bluez.Media1Endpoint1"
++#define MEDIA_PLAYER_INTERFACE "org.bluez.MediaPlayer1"
+ 
+ #define REQUEST_TIMEOUT (3 * 1000)		/* 3 seconds */
+ 
+@@ -402,7 +402,7 @@ static gboolean set_configuration(struct media_endpoint *endpoint,
+ 	path = media_transport_get_path(transport);
+ 	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH, &path);
+ 
+-	g_dbus_get_properties(conn, path, "org.bluez.MediaTransport", &iter);
++	g_dbus_get_properties(conn, path, "org.bluez.MediaTransport1", &iter);
+ 
+ 	return media_endpoint_async_call(msg, endpoint, cb, user_data, destroy);
+ }
+diff --git a/profiles/audio/player.c b/profiles/audio/player.c
+index 34b1f20..368bfa8 100644
+--- a/profiles/audio/player.c
++++ b/profiles/audio/player.c
+@@ -42,7 +42,7 @@
+ #include "dbus-common.h"
+ #include "error.h"
+ 
+-#define MEDIA_PLAYER_INTERFACE "org.bluez.MediaPlayer"
++#define MEDIA_PLAYER_INTERFACE "org.bluez.MediaPlayer1"
+ 
+ struct player_callback {
+ 	const struct media_player_callback *cbs;
 diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 4bb54f6..1064098 100644
+index 666f68a..165ebd3 100644
 --- a/profiles/audio/transport.c
 +++ b/profiles/audio/transport.c
-@@ -88,7 +88,7 @@ struct media_transport {
- 	char			*path;		/* Transport object path */
- 	struct audio_device	*device;	/* Transport device */
- 	struct media_endpoint	*endpoint;	/* Transport endpoint */
--	GSList			*owners;	/* Transport owners */
-+	struct media_owner	*owner;		/* Transport owner */
- 	uint8_t			*configuration; /* Transport configuration */
- 	int			size;		/* Transport configuration size */
- 	int			fd;		/* Transport file descriptor */
-@@ -241,24 +241,24 @@ static void media_owner_free(struct media_owner *owner)
- 	g_free(owner);
- }
+@@ -48,7 +48,7 @@
+ #include "source.h"
+ #include "avrcp.h"
  
--static void media_transport_remove(struct media_transport *transport,
--						struct media_owner *owner)
-+static void media_transport_remove_owner(struct media_transport *transport)
- {
-+	struct media_owner *owner = transport->owner;
-+
- 	DBG("Transport %s Owner %s", transport->path, owner->name);
+-#define MEDIA_TRANSPORT_INTERFACE "org.bluez.MediaTransport"
++#define MEDIA_TRANSPORT_INTERFACE "org.bluez.MediaTransport1"
  
- 	/* Reply if owner has a pending request */
- 	if (owner->pending)
- 		media_request_reply(owner->pending, EIO);
- 
--	transport->owners = g_slist_remove(transport->owners, owner);
-+	transport->owner = NULL;
- 
- 	if (owner->watch)
- 		g_dbus_remove_watch(btd_get_dbus_connection(), owner->watch);
- 
- 	media_owner_free(owner);
- 
--	/* Suspend if there is no longer any owner */
--	if (transport->owners == NULL && state_in_use(transport->state))
-+	if (state_in_use(transport->state))
- 		transport->suspend(transport, NULL);
- }
- 
-@@ -319,7 +319,7 @@ static void a2dp_resume_complete(struct avdtp *session,
- 	return;
- 
- fail:
--	media_transport_remove(transport, owner);
-+	media_transport_remove_owner(transport);
- }
- 
- static guint resume_a2dp(struct media_transport *transport,
-@@ -366,7 +366,7 @@ static void a2dp_suspend_complete(struct avdtp *session,
- 
- 	a2dp_sep_unlock(sep, a2dp->session);
- 	transport_set_state(transport, TRANSPORT_STATE_IDLE);
--	media_transport_remove(transport, owner);
-+	media_transport_remove_owner(transport);
- }
- 
- static guint suspend_a2dp(struct media_transport *transport,
-@@ -399,14 +399,14 @@ static void media_owner_exit(DBusConnection *connection, void *user_data)
- 
- 	media_owner_remove(owner);
- 
--	media_transport_remove(owner->transport, owner);
-+	media_transport_remove_owner(owner->transport);
- }
- 
--static void media_transport_add(struct media_transport *transport,
-+static void media_transport_set_owner(struct media_transport *transport,
- 					struct media_owner *owner)
- {
- 	DBG("Transport %s Owner %s", transport->path, owner->name);
--	transport->owners = g_slist_append(transport->owners, owner);
-+	transport->owner = owner;
- 	owner->transport = transport;
- 	owner->watch = g_dbus_add_disconnect_watch(btd_get_dbus_connection(),
- 							owner->name,
-@@ -435,35 +435,15 @@ static void media_owner_add(struct media_owner *owner,
- 	owner->pending = req;
- }
- 
--static struct media_owner *media_transport_find_owner(
--					struct media_transport *transport,
--					const char *name)
--{
--	GSList *l;
--
--	for (l = transport->owners; l; l = l->next) {
--		struct media_owner *owner = l->data;
--
--		if (g_strcmp0(owner->name, name) == 0)
--			return owner;
--	}
--
--	return NULL;
--}
--
- static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
- 					void *data)
- {
- 	struct media_transport *transport = data;
- 	struct media_owner *owner;
- 	struct media_request *req;
--	const char *sender;
- 	guint id;
- 
--	sender = dbus_message_get_sender(msg);
--
--	owner = media_transport_find_owner(transport, sender);
--	if (owner != NULL)
-+	if (transport->owner != NULL)
- 		return btd_error_not_authorized(msg);
- 
- 	if (transport->state >= TRANSPORT_STATE_REQUESTING)
-@@ -478,7 +458,7 @@ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
- 
- 	req = media_request_create(msg, id);
- 	media_owner_add(owner, req);
--	media_transport_add(transport, owner);
-+	media_transport_set_owner(transport, owner);
- 
- 	return NULL;
- }
-@@ -487,23 +467,16 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
- 					void *data)
- {
- 	struct media_transport *transport = data;
--	struct media_owner *owner;
-+	struct media_owner *owner = transport->owner;
- 	const char *sender;
- 	struct media_request *req;
- 	guint id;
- 
- 	sender = dbus_message_get_sender(msg);
- 
--	owner = media_transport_find_owner(transport, sender);
--	if (owner == NULL)
-+	if (owner == NULL || g_strcmp0(owner->name, sender) != 0)
- 		return btd_error_not_authorized(msg);
- 
--	/* Not the last owner, no need to suspend */
--	if (g_slist_length(transport->owners) != 1) {
--		media_transport_remove(transport, owner);
--		return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
--	}
--
- 	if (owner->pending) {
- 		const char *member;
- 
-@@ -519,7 +492,7 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
- 
- 	id = transport->suspend(transport, owner);
- 	if (id == 0) {
--		media_transport_remove(transport, owner);
-+		media_transport_remove_owner(transport);
- 		return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ typedef enum {
+ 	TRANSPORT_STATE_IDLE,		/* Not acquired and suspended */
+diff --git a/test/mpris-player.c b/test/mpris-player.c
+index 7985cdd..90c87aa 100644
+--- a/test/mpris-player.c
++++ b/test/mpris-player.c
+@@ -186,7 +186,7 @@ static int parse_property(DBusConnection *conn, const char *path,
+ 						DBUS_TYPE_STRING, &value);
+ 		else
+ 			emit_properties_changed(sys, path,
+-					"org.bluez.MediaPlayer", "Status",
++					"org.bluez.MediaPlayer1", "Status",
+ 					DBUS_TYPE_STRING, &value);
+ 	} else if (strcasecmp(key, "Position") == 0) {
+ 		int64_t usec, msec;
+@@ -203,7 +203,7 @@ static int parse_property(DBusConnection *conn, const char *path,
+ 						DBUS_TYPE_UINT32, &msec);
+ 		else
+ 			emit_properties_changed(sys, path,
+-					"org.bluez.MediaPlayer", "Position",
++					"org.bluez.MediaPlayer1", "Position",
+ 					DBUS_TYPE_UINT32, &msec);
+ 	} else if (strcasecmp(key, "Shuffle") == 0) {
+ 		dbus_bool_t value;
+@@ -221,7 +221,7 @@ static int parse_property(DBusConnection *conn, const char *path,
+ 						DBUS_TYPE_STRING, &str);
+ 		else
+ 			emit_properties_changed(sys, path,
+-					"org.bluez.MediaPlayer", "Shuffle",
++					"org.bluez.MediaPlayer1", "Shuffle",
+ 					DBUS_TYPE_STRING, &str);
  	}
  
-@@ -689,15 +662,9 @@ static void destroy_a2dp(void *data)
- static void media_transport_free(void *data)
+@@ -446,7 +446,7 @@ static char *sender2path(const char *sender)
+ static DBusHandlerResult player_message(DBusConnection *conn,
+ 						DBusMessage *msg, void *data)
  {
- 	struct media_transport *transport = data;
--	GSList *l = transport->owners;
+-	if (dbus_message_is_method_call(msg, "org.bluez.MediaPlayer",
++	if (dbus_message_is_method_call(msg, "org.bluez.MediaPlayer1",
+ 								"Release")) {
+ 		printf("Release\n");
+ 		exit(1);
+@@ -472,7 +472,7 @@ static void add_player(DBusConnection *conn, const char *name,
+ 		return;
  
--	while (l) {
--		struct media_owner *owner = l->data;
--		l = l->next;
--		media_transport_remove(transport, owner);
--	}
--
--	g_slist_free(transport->owners);
-+	if (transport->owner)
-+		media_transport_remove_owner(transport);
+ 	msg = dbus_message_new_method_call("org.bluez", adapter,
+-					"org.bluez.Media",
++					"org.bluez.Media1",
+ 					"RegisterPlayer");
+ 	if (!msg) {
+ 		fprintf(stderr, "Can't allocate new method call\n");
+@@ -539,7 +539,7 @@ static void remove_player(DBusConnection *conn, const char *sender)
+ 	char *path;
  
- 	if (transport->destroy != NULL)
- 		transport->destroy(transport->data);
-@@ -717,13 +684,9 @@ static void transport_update_playing(struct media_transport *transport,
- 		if (transport->state == TRANSPORT_STATE_PENDING)
- 			transport_set_state(transport, TRANSPORT_STATE_IDLE);
- 		else if (transport->state == TRANSPORT_STATE_ACTIVE) {
--			/* Remove all owners */
--			while (transport->owners != NULL) {
--				struct media_owner *owner;
--
--				owner = transport->owners->data;
--				media_transport_remove(transport, owner);
--			}
-+			/* Remove owner */
-+			if (transport->owner != NULL)
-+				media_transport_remove_owner(transport);
- 		}
- 	} else if (transport->state == TRANSPORT_STATE_IDLE)
- 		transport_set_state(transport, TRANSPORT_STATE_PENDING);
+ 	msg = dbus_message_new_method_call("org.bluez", adapter,
+-					"org.bluez.Media",
++					"org.bluez.Media1",
+ 					"UnregisterPlayer");
+ 	if (!msg) {
+ 		fprintf(stderr, "Can't allocate new method call\n");
+@@ -578,7 +578,7 @@ static DBusHandlerResult properties_changed(DBusConnection *conn,
+ 	path = sender2path(dbus_message_get_sender(msg));
+ 	parse_properties(conn, path, &iter, NULL);
+ 
+-	signal = dbus_message_new_signal(path, "org.bluez.MediaPlayer",
++	signal = dbus_message_new_signal(path, "org.bluez.MediaPlayer1",
+ 							"TrackChanged");
+ 	if (!signal) {
+ 		fprintf(stderr, "Unable to allocate new PropertyChanged"
 -- 
 1.7.11.7
 
