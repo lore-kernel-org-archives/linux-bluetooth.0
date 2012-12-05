@@ -1,46 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 5 Dec 2012 19:25:41 +0200
+Date: Wed, 5 Dec 2012 19:22:55 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [PATCH v1 0/6] Remove access rights from MediaTransport
-Message-ID: <20121205172541.GB18564@x220.P-661HNU-F1>
-References: <1354724134-7354-1-git-send-email-mikel.astiz.oss@gmail.com>
+To: Syam Sidhardhan <s.syam@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v2] l2test: Add support to test auto select PSM
+Message-ID: <20121205172255.GA18564@x220.P-661HNU-F1>
+References: <1354724501-5368-1-git-send-email-s.syam@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1354724134-7354-1-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1354724501-5368-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Syam,
 
-On Wed, Dec 05, 2012, Mikel Astiz wrote:
-> v1 proposes TryAcquire() instead of Acquire(TRUE), as suggested by
-> Johan.
+On Wed, Dec 05, 2012, Syam Sidhardhan wrote:
+> This patch enable us to test the auto select PSM by passing
+> PSM value as 0.
 > 
-> From original cover-letter:
-> 
-> The accessrights used in the Acquire() method are not very useful and
-> can thus be removed. This simplifies both the D-Bus API and the
-> internal implementation significantly.
-> 
-> Mikel Astiz (6):
->   media: Remove transport access type from D-Bus API
->   media: Remove internal transport locks
->   media: Remove transport owner list
->   media: Add MediaTransport.TryAcquire()
->   media: Trivial style fix
->   media: Add version suffix to all media interfaces
-> 
->  doc/audio-telephony-design.txt |   4 +-
->  doc/media-api.txt              |  46 +++----
->  profiles/audio/media.c         |   8 +-
->  profiles/audio/player.c        |   2 +-
->  profiles/audio/transport.c     | 264 ++++++++++++-----------------------------
->  test/mpris-player.c            |  14 +--
->  6 files changed, 108 insertions(+), 230 deletions(-)
+> Ex: l2test -d -P 0
+> l2test[2585]: Waiting for connection on psm 4099 ...
+> ---
+> v2 -> Retain the interoperability issue mentioned by Gustavo.
 
-All patches in this set have been applied. Thanks.
+Applied. Thanks.
 
 Johan
