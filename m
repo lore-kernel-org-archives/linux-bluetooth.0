@@ -2,63 +2,30 @@ Return-Path: <cyrus@holtmann.org>
 From: Jaganath Kanakkassery <jaganath.k@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH 2/3 v1] Bluetooth: Move discovery state check inside
- hci_dev_lock()
-Date: Thu, 06 Dec 2012 16:35:57 +0530
-Message-id: <1354791958-28334-3-git-send-email-jaganath.k@samsung.com>
-In-reply-to: <1354791958-28334-1-git-send-email-jaganath.k@samsung.com>
-References: <1354791958-28334-1-git-send-email-jaganath.k@samsung.com>
+Subject: [PATCH 0/3 v1] Fix stop discovery not handled if discovery state is
+ STARTING
+Date: Thu, 06 Dec 2012 16:35:55 +0530
+Message-id: <1354791958-28334-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
----
- net/bluetooth/hci_event.c |    9 ++++-----
- net/bluetooth/mgmt.c      |    4 ----
- 2 files changed, 4 insertions(+), 9 deletions(-)
+If user calls stop_discovery when the discovery state is STARTING, then it fails.
+In this scenario discovery will continue. 
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index e859851..1fadba5 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1106,14 +1106,13 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 
- 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
- 
-+		hci_dev_lock(hdev);
- 		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
--		    hdev->discovery.state == DISCOVERY_FINDING) {
-+		    hdev->discovery.state == DISCOVERY_FINDING)
- 			mgmt_interleaved_discovery(hdev);
--		} else {
--			hci_dev_lock(hdev);
-+		else
- 			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
--			hci_dev_unlock(hdev);
--		}
-+		hci_dev_unlock(hdev);
- 
- 		break;
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index b4bba68..332152b 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2291,14 +2291,10 @@ int mgmt_interleaved_discovery(struct hci_dev *hdev)
- 
- 	BT_DBG("%s", hdev->name);
- 
--	hci_dev_lock(hdev);
--
- 	err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR_LE);
- 	if (err < 0)
- 		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
- 
--	hci_dev_unlock(hdev);
--
- 	return err;
- }
- 
+This patch handles stop_discovery even if state is STARTING
+
+Jaganath Kanakkassery (3):
+  Bluetooth: Rename stop_discovery_failed() to
+    stop_discovery_complete()
+  Bluetooth: Move discovery state check inside hci_dev_lock()
+  Bluetooth: Fix stop discovery while in STARTING state
+
+ include/net/bluetooth/hci_core.h |    3 ++-
+ net/bluetooth/hci_core.c         |    9 ++++++++-
+ net/bluetooth/hci_event.c        |   28 +++++++++++++++++++---------
+ net/bluetooth/mgmt.c             |   15 ++++++++++-----
+ 4 files changed, 39 insertions(+), 16 deletions(-)
+
 -- 
 1.7.9.5
 
