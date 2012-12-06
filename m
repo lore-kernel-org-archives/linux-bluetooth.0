@@ -1,44 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+From: Elvis Pfutzenreuter <epx@signove.com>
+Content-Type: text/plain; charset=us-ascii
+Subject: CC2540 LE thermometer sample code
+Date: Thu, 6 Dec 2012 16:17:44 -0200
+Message-Id: <6C87FB22-C975-4E38-97E6-B5045BF67D53@signove.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>, johan.hedberg@gmail.com
-Subject: [PATCH BlueZ] test: Fix syntax in bluezutils.py
-Date: Thu,  6 Dec 2012 17:13:00 -0300
-Message-Id: <1354824780-21903-1-git-send-email-vinicius.gomes@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0 (Apple Message framework v1283)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Frédéric Danis <frederic.danis@linux.intel.com>
+I hammered the thermometer sample code that comes with CC2540 SDK until
+it worked marginally with BlueZ.
 
-Traceback (most recent call last):
-  File "./simple-agent", line 12, in <module>
-    import bluezutils
-  File "/home/fdanis/src/bluez/test/bluezutils.py", line 22
-    if not pattern or pattern == adapter["Address"] or
-                                                     ^
-SyntaxError: invalid syntax
----
- test/bluezutils.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+FWIW, in case someone wants to use it for testing:
 
-diff --git a/test/bluezutils.py b/test/bluezutils.py
-index d0c4773..de08cbd 100644
---- a/test/bluezutils.py
-+++ b/test/bluezutils.py
-@@ -19,8 +19,8 @@ def find_adapter_in_objects(objects, pattern=None):
- 		adapter = ifaces.get(ADAPTER_INTERFACE)
- 		if adapter is None:
- 			continue
--		if not pattern or pattern == adapter["Address"] or
--							path.endswith(pattern)):
-+		if not pattern or pattern == adapter["Address"] or \
-+							path.endswith(pattern):
- 			obj = bus.get_object(SERVICE_NAME, path)
- 			return dbus.Interface(obj, ADAPTER_INTERFACE)
- 	raise Exception("Bluetooth adapter not found")
--- 
-1.8.0.1
-
+http://oss.signove.com/index.php/CC2540Thermometer
