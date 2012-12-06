@@ -2,73 +2,63 @@ Return-Path: <cyrus@holtmann.org>
 From: Jaganath Kanakkassery <jaganath.k@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH 1/3 v1] Bluetooth: Rename stop_discovery_failed() to
- stop_discovery_complete()
-Date: Thu, 06 Dec 2012 16:35:56 +0530
-Message-id: <1354791958-28334-2-git-send-email-jaganath.k@samsung.com>
+Subject: [PATCH 2/3 v1] Bluetooth: Move discovery state check inside
+ hci_dev_lock()
+Date: Thu, 06 Dec 2012 16:35:57 +0530
+Message-id: <1354791958-28334-3-git-send-email-jaganath.k@samsung.com>
 In-reply-to: <1354791958-28334-1-git-send-email-jaganath.k@samsung.com>
 References: <1354791958-28334-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This renaming has done since in success case also this function can
-be used to send complete event
-
 Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
 ---
- include/net/bluetooth/hci_core.h |    2 +-
- net/bluetooth/hci_event.c        |    4 ++--
- net/bluetooth/mgmt.c             |    2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ net/bluetooth/hci_event.c |    9 ++++-----
+ net/bluetooth/mgmt.c      |    4 ----
+ 2 files changed, 4 insertions(+), 9 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 119fcb6..bd63a9f 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1066,7 +1066,7 @@ int mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- int mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		     u8 addr_type, s8 rssi, u8 *name, u8 name_len);
- int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status);
--int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status);
-+int mgmt_stop_discovery_complete(struct hci_dev *hdev, u8 status);
- int mgmt_discovering(struct hci_dev *hdev, u8 discovering);
- int mgmt_interleaved_discovery(struct hci_dev *hdev);
- int mgmt_device_blocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 9fb656b..e859851 100644
+index e859851..1fadba5 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -40,7 +40,7 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -1106,14 +1106,13 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
  
- 	if (status) {
- 		hci_dev_lock(hdev);
--		mgmt_stop_discovery_failed(hdev, status);
-+		mgmt_stop_discovery_complete(hdev, status);
- 		hci_dev_unlock(hdev);
- 		return;
- 	}
-@@ -1099,7 +1099,7 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 	case LE_SCANNING_DISABLED:
- 		if (status) {
- 			hci_dev_lock(hdev);
--			mgmt_stop_discovery_failed(hdev, status);
-+			mgmt_stop_discovery_complete(hdev, status);
- 			hci_dev_unlock(hdev);
- 			return;
- 		}
+ 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
+ 
++		hci_dev_lock(hdev);
+ 		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
+-		    hdev->discovery.state == DISCOVERY_FINDING) {
++		    hdev->discovery.state == DISCOVERY_FINDING)
+ 			mgmt_interleaved_discovery(hdev);
+-		} else {
+-			hci_dev_lock(hdev);
++		else
+ 			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+-			hci_dev_unlock(hdev);
+-		}
++		hci_dev_unlock(hdev);
+ 
+ 		break;
+ 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index dc5698c..b4bba68 100644
+index b4bba68..332152b 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -3630,7 +3630,7 @@ int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
+@@ -2291,14 +2291,10 @@ int mgmt_interleaved_discovery(struct hci_dev *hdev)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
+-	hci_dev_lock(hdev);
+-
+ 	err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR_LE);
+ 	if (err < 0)
+ 		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+ 
+-	hci_dev_unlock(hdev);
+-
  	return err;
  }
  
--int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status)
-+int mgmt_stop_discovery_complete(struct hci_dev *hdev, u8 status)
- {
- 	struct pending_cmd *cmd;
- 	int err;
 -- 
 1.7.9.5
 
