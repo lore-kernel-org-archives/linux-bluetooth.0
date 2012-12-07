@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 2/5] Bluetooth: AMP: Send A2MP Create Phylink Rsp after Assoc write
-Date: Fri,  7 Dec 2012 14:59:05 +0200
-Message-Id: <1354885148-4677-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC 5/5] Bluetooth: AMP: Use set_bit / test_bit for amp_mgr state
+Date: Fri,  7 Dec 2012 14:59:08 +0200
+Message-Id: <1354885148-4677-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1354885148-4677-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1354885148-4677-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,108 +11,82 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Postpone sending A2MP Create Phylink Response till we got successful
-HCI Command Complete after HCI Write Remote AMP Assoc.
+Using bit operations solves problems with multiple requests
+and clearing state.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/a2mp.h |    2 ++
- net/bluetooth/a2mp.c         |   38 ++++++++++++++++++++++++++++++++++++--
- net/bluetooth/amp.c          |    6 +++++-
- 3 files changed, 43 insertions(+), 3 deletions(-)
+ include/net/bluetooth/a2mp.h |    2 +-
+ net/bluetooth/a2mp.c         |    6 +++---
+ net/bluetooth/amp.c          |    4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/include/net/bluetooth/a2mp.h b/include/net/bluetooth/a2mp.h
-index 42f2176..8b39327 100644
+index 8b39327..487b54c 100644
 --- a/include/net/bluetooth/a2mp.h
 +++ b/include/net/bluetooth/a2mp.h
-@@ -23,6 +23,7 @@ enum amp_mgr_state {
- 	READ_LOC_AMP_INFO,
- 	READ_LOC_AMP_ASSOC,
- 	READ_LOC_AMP_ASSOC_FINAL,
-+	WRITE_REMOTE_AMP_ASSOC,
- };
+@@ -34,7 +34,7 @@ struct amp_mgr {
+ 	struct kref		kref;
+ 	__u8			ident;
+ 	__u8			handle;
+-	enum amp_mgr_state	state;
++	unsigned long		state;
+ 	unsigned long		flags;
  
- struct amp_mgr {
-@@ -144,5 +145,6 @@ void a2mp_discover_amp(struct l2cap_chan *chan);
- void a2mp_send_getinfo_rsp(struct hci_dev *hdev);
- void a2mp_send_getampassoc_rsp(struct hci_dev *hdev, u8 status);
- void a2mp_send_create_phy_link_req(struct hci_dev *hdev, u8 status);
-+void a2mp_send_create_phy_link_rsp(struct hci_dev *hdev, u8 status);
- 
- #endif /* __A2MP_H */
+ 	struct list_head	amp_ctrls;
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 2f67d5e..c960c20 100644
+index c960c20..50d2771 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -499,8 +499,16 @@ send_rsp:
- 	if (hdev)
- 		hci_dev_put(hdev);
+@@ -290,7 +290,7 @@ static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 		goto done;
+ 	}
  
--	a2mp_send(mgr, A2MP_CREATEPHYSLINK_RSP, hdr->ident, sizeof(rsp),
--		  &rsp);
-+	/* Reply error now and succes after HCI Write Remote AMP Assoc
-+	   command complete with success status
-+	 */
-+	if (rsp.status != A2MP_STATUS_SUCCESS) {
-+		a2mp_send(mgr, A2MP_CREATEPHYSLINK_RSP, hdr->ident,
-+			  sizeof(rsp), &rsp);
-+	} else {
-+		mgr->state = WRITE_REMOTE_AMP_ASSOC;
-+		mgr->ident = hdr->ident;
-+	}
+-	mgr->state = READ_LOC_AMP_INFO;
++	set_bit(READ_LOC_AMP_INFO, &mgr->state);
+ 	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL);
  
- 	skb_pull(skb, le16_to_cpu(hdr->len));
- 	return 0;
-@@ -949,6 +957,32 @@ clean:
- 	kfree(req);
- }
+ done:
+@@ -506,7 +506,7 @@ send_rsp:
+ 		a2mp_send(mgr, A2MP_CREATEPHYSLINK_RSP, hdr->ident,
+ 			  sizeof(rsp), &rsp);
+ 	} else {
+-		mgr->state = WRITE_REMOTE_AMP_ASSOC;
++		set_bit(WRITE_REMOTE_AMP_ASSOC, &mgr->state);
+ 		mgr->ident = hdr->ident;
+ 	}
  
-+void a2mp_send_create_phy_link_rsp(struct hci_dev *hdev, u8 status)
-+{
-+	struct amp_mgr *mgr;
-+	struct a2mp_physlink_rsp rsp;
-+	struct hci_conn *hs_hcon;
-+
-+	mgr = amp_mgr_lookup_by_state(WRITE_REMOTE_AMP_ASSOC);
-+	if (!mgr)
-+		return;
-+
-+	hs_hcon = hci_conn_hash_lookup_state(hdev, AMP_LINK, BT_CONNECT);
-+	if (!hs_hcon) {
-+		rsp.status = A2MP_STATUS_UNABLE_START_LINK_CREATION;
-+	} else {
-+		rsp.remote_id = hs_hcon->remote_id;
-+		rsp.status = A2MP_STATUS_SUCCESS;
-+	}
-+
-+	BT_DBG("%s mgr %p hs_hcon %p status %u", hdev->name, mgr, hs_hcon,
-+	       status);
-+
-+	rsp.local_id = hdev->id;
-+	a2mp_send(mgr, A2MP_CREATEPHYSLINK_RSP, mgr->ident, sizeof(rsp), &rsp);
-+	amp_mgr_put(mgr);
-+}
-+
- void a2mp_discover_amp(struct l2cap_chan *chan)
- {
- 	struct l2cap_conn *conn = chan->conn;
+@@ -848,7 +848,7 @@ struct amp_mgr *amp_mgr_lookup_by_state(u8 state)
+ 
+ 	mutex_lock(&amp_mgr_list_lock);
+ 	list_for_each_entry(mgr, &amp_mgr_list, list) {
+-		if (mgr->state == state) {
++		if (test_and_clear_bit(state, &mgr->state)) {
+ 			amp_mgr_get(mgr);
+ 			mutex_unlock(&amp_mgr_list_lock);
+ 			return mgr;
 diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index 1b0d92c..88720e8 100644
+index f55d3f2..1bbb59d 100644
 --- a/net/bluetooth/amp.c
 +++ b/net/bluetooth/amp.c
-@@ -317,7 +317,11 @@ void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle)
- 	if (!hcon)
- 		return;
+@@ -236,7 +236,7 @@ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
  
--	amp_write_rem_assoc_frag(hdev, hcon);
-+	/* Send A2MP create phylink rsp whan all fragments are
-+	   written
-+	 */
-+	if (amp_write_rem_assoc_frag(hdev, hcon))
-+		a2mp_send_create_phy_link_rsp(hdev, 0);
+ 	cp.max_len = cpu_to_le16(hdev->amp_assoc_size);
+ 
+-	mgr->state = READ_LOC_AMP_ASSOC;
++	set_bit(READ_LOC_AMP_ASSOC, &mgr->state);
+ 	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp);
  }
  
- void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle)
+@@ -250,7 +250,7 @@ void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
+ 	cp.len_so_far = cpu_to_le16(0);
+ 	cp.max_len = cpu_to_le16(hdev->amp_assoc_size);
+ 
+-	mgr->state = READ_LOC_AMP_ASSOC_FINAL;
++	set_bit(READ_LOC_AMP_ASSOC_FINAL, &mgr->state);
+ 
+ 	/* Read Local AMP Assoc final link information data */
+ 	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp);
 -- 
 1.7.10.4
 
