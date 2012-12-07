@@ -1,47 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 4/5] Bluetooth: AMP: Remove dead code
-Date: Fri,  7 Dec 2012 14:59:07 +0200
-Message-Id: <1354885148-4677-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1354885148-4677-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1354885148-4677-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 7 Dec 2012 11:21:02 +0100 (CET)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: "Lamarque V. Souza" <lamarque@gmail.com>,
+	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fixes kernel oops when turning bluetooth mouse on
+In-Reply-To: <20121206202448.GA11409@joana>
+Message-ID: <alpine.LNX.2.00.1212071120410.28002@pobox.suse.cz>
+References: <201212061239.55610.lamarque@gmail.com> <alpine.LNX.2.00.1212061548430.28002@pobox.suse.cz> <20121206202448.GA11409@joana>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Thu, 6 Dec 2012, Gustavo Padovan wrote:
 
-Remove code which cannot execute. l2cap_conn_add for AMP_LINK
-might only be invoked when receiving data in l2cap_recv_acldata.
-But this case is checked in the first statement there.
+> > > diff -Nrup a/drivers/hid/hid-core.c b/drivers/hid/hid-core.c
+> > > --- a/drivers/hid/hid-core.c	2012-12-05 01:43:45.000000000 -0200
+> > > +++ b/drivers/hid/hid-core.c	2012-12-05 01:26:57.000000000 -0200
+> > > @@ -2150,8 +2150,13 @@ static const struct hid_device_id hid_mo
+> > >  	{ }
+> > >  };
+> > >  
+> > > -static bool hid_ignore(struct hid_device *hdev)
+> > > +bool hid_ignore(struct hid_device *hdev)
+> > >  {
+> > > +	if (hdev->quirks & HID_QUIRK_NO_IGNORE)
+> > > +		return false;
+> > > +	if (hdev->quirks & HID_QUIRK_IGNORE)
+> > > +		return true;
+> > > +
+> > >  	switch (hdev->vendor) {
+> > >  	case USB_VENDOR_ID_CODEMERCS:
+> > >  		/* ignore all Code Mercenaries IOWarrior devices */
+> > > @@ -2197,6 +2202,7 @@ static bool hid_ignore(struct hid_device
+> > >  
+> > >  	return !!hid_match_id(hdev, hid_ignore_list);
+> > >  }
+> > > +EXPORT_SYMBOL_GPL(hid_ignore);
+> > >  
+> > >  int hid_add_device(struct hid_device *hdev)
+> > >  {
+> > > @@ -2208,8 +2214,7 @@ int hid_add_device(struct hid_device *hd
+> > >  
+> > >  	/* we need to kill them here, otherwise they will stay allocated to
+> > >  	 * wait for coming driver */
+> > > -	if (!(hdev->quirks & HID_QUIRK_NO_IGNORE)
+> > > -            && (hid_ignore(hdev) || (hdev->quirks & HID_QUIRK_IGNORE)))
+> > > +	if (hid_ignore(hdev))
+> > >  		return -ENODEV;
+> > >  
+> > >  	/*
+> > > diff -Nrup a/include/linux/hid.h b/include/linux/hid.h
+> > > --- a/include/linux/hid.h	2012-12-05 01:44:14.000000000 -0200
+> > > +++ b/include/linux/hid.h	2012-12-05 01:26:57.000000000 -0200
+> > > @@ -684,6 +684,7 @@ struct hid_ll_driver {
+> > >  
+> > >  extern int hid_debug;
+> > >  
+> > > +extern bool hid_ignore(struct hid_device *);
+> > >  extern int hid_add_device(struct hid_device *);
+> > >  extern void hid_destroy_device(struct hid_device *);
+> > >  
+> > > diff -Nrup a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+> > > --- a/net/bluetooth/hidp/core.c	2012-12-05 01:43:15.000000000 -0200
+> > > +++ b/net/bluetooth/hidp/core.c	2012-12-05 02:29:49.000000000 -0200
+> > > @@ -941,6 +941,13 @@ static int hidp_setup_hid(struct hidp_se
+> > >  	hid->hid_get_raw_report = hidp_get_raw_report;
+> > >  	hid->hid_output_raw_report = hidp_output_raw_report;
+> > >  
+> > > +	/* True if device is blacklisted in drivers/hid/hid-core.c */
+> > > +	if (hid_ignore(hid)) {
+> > > +		hid_destroy_device(session->hid);
+> > > +		session->hid = NULL;
+> > > +		return -ENODEV;
+> > > +	}
+> > > +
+> > >  	return 0;
+> > >  
+> > >  fault:
+> > > @@ -1013,7 +1020,7 @@ int hidp_add_connection(struct hidp_conn
+> > >  
+> > >  	if (req->rd_size > 0) {
+> > >  		err = hidp_setup_hid(session, req);
+> > > -		if (err)
+> > > +		if (err && err != -ENODEV)
+> > >  			goto purge;
+> > >  	}
+> 
+> Acked-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/l2cap_core.c |    5 -----
- 1 file changed, 5 deletions(-)
+Queuing in hid.git, thanks.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index d4a44dc..4976d12 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1527,17 +1527,12 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
- 	BT_DBG("hcon %p conn %p hchan %p", hcon, conn, hchan);
- 
- 	switch (hcon->type) {
--	case AMP_LINK:
--		conn->mtu = hcon->hdev->block_mtu;
--		break;
--
- 	case LE_LINK:
- 		if (hcon->hdev->le_mtu) {
- 			conn->mtu = hcon->hdev->le_mtu;
- 			break;
- 		}
- 		/* fall through */
--
- 	default:
- 		conn->mtu = hcon->hdev->acl_mtu;
- 		break;
 -- 
-1.7.10.4
-
+Jiri Kosina
+SUSE Labs
