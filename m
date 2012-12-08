@@ -1,25 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 8 Dec 2012 13:45:49 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] gitignore: Add test/bluezutils.pyc
-Message-ID: <20121208114549.GA26312@x220.P-661HNU-F1>
-References: <1354873361-13940-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1354873361-13940-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Rami Rosen <ramirose@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	Rami Rosen <ramirose@gmail.com>
+Subject: [PATCH ] Bluetooth: Remove unnecessary include l2cap.h.
+Date: Sat,  8 Dec 2012 07:08:25 +0200
+Message-Id: <1354943305-7069-1-git-send-email-ramirose@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+This patch removes unnecessary include of <net/bluetooth/l2cap.h>
+in bluetooth/bnep/core.c.
 
-On Fri, Dec 07, 2012, Szymon Janc wrote:
-> Python generates compiled module file when py module is used.
-> ---
->  .gitignore |    1 +
->  1 file changed, 1 insertion(+)
+Signed-off-by: Rami Rosen <ramirose@gmail.com>
+---
+ net/bluetooth/bnep/core.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Applied. Thanks.
-
-Johan
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index a5b6397..e430b1a 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -33,7 +33,6 @@
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+-#include <net/bluetooth/l2cap.h>
+ 
+ #include "bnep.h"
+ 
+-- 
+1.7.11.7
