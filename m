@@ -1,61 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] hog: Rename prepend_id variable
-Date: Mon, 10 Dec 2012 17:54:26 -0300
-Message-Id: <1355172866-3144-1-git-send-email-andre.guedes@openbossa.org>
+Date: Mon, 10 Dec 2012 22:39:55 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v2] build: Fix 'hcitool' and 'bdaddr' compilation
+Message-ID: <20121210203955.GB15853@x220.P-661HNU-F1>
+References: <1355171052-9218-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1355171052-9218-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch renames the hog_device prepend_id field by has_report_id
-as long as it is more suitable.
+Hi Vinicius,
 
-This variable indicates if we should consider the report id (adding
-or removing it) before sending it to device or uhid driver.
----
- profiles/input/hog_device.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+On Mon, Dec 10, 2012, Vinicius Costa Gomes wrote:
+> Now with the addition of src/oui.c that depends on udev, these tools
+> should also be linked against libudev, in case libudev includes the
+> function udev_hwdb_new().
+> 
+> Build error:
+>   CCLD     tools/hcitool
+>   CCLD     tools/sdptool
+>   CCLD     tools/ciptool
+>   CCLD     tools/bccmd
+> src/oui.o: In function `batocomp':
+> /home/vinicius/work/bluez/src/oui.c:42: undefined reference to `udev_new'
+> /home/vinicius/work/bluez/src/oui.c:46: undefined reference to `udev_hwdb_new'
+> /home/vinicius/work/bluez/src/oui.c:50: undefined reference to `udev_hwdb_get_properties_list_entry'
+> /home/vinicius/work/bluez/src/oui.c:53: undefined reference to `udev_list_entry_get_name'
+> /home/vinicius/work/bluez/src/oui.c:52: undefined reference to `udev_list_entry_get_next'
+> /home/vinicius/work/bluez/src/oui.c:61: undefined reference to `udev_hwdb_unref'
+> /home/vinicius/work/bluez/src/oui.c:64: undefined reference to `udev_unref'
+> /home/vinicius/work/bluez/src/oui.c:56: undefined reference to `udev_list_entry_get_value'
+> collect2: error: ld returned 1 exit status
+> make[1]: *** [tools/hcitool] Error 1
+> make[1]: *** Waiting for unfinished jobs....
+> make: *** [all] Error 2
+> ---
+>  Makefile.tools | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/profiles/input/hog_device.c b/profiles/input/hog_device.c
-index a873eac..06dab6d 100644
---- a/profiles/input/hog_device.c
-+++ b/profiles/input/hog_device.c
-@@ -79,7 +79,7 @@ struct hog_device {
- 	struct gatt_primary	*hog_primary;
- 	GSList			*reports;
- 	int			uhid_fd;
--	gboolean		prepend_id;
-+	gboolean		has_report_id;
- 	guint			uhid_watch_id;
- 	uint16_t		bcdhid;
- 	uint8_t			bcountrycode;
-@@ -120,7 +120,7 @@ static void report_value_cb(const uint8_t *pdu, uint16_t len,
- 	ev.u.input.size = MIN(report_size, UHID_DATA_MAX);
- 
- 	buf = ev.u.input.data;
--	if (hogdev->prepend_id) {
-+	if (hogdev->has_report_id) {
- 		*buf = report->id;
- 		buf++;
- 		ev.u.input.size++;
-@@ -362,7 +362,7 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 		case 0x85:
- 		case 0x86:
- 		case 0x87:
--			hogdev->prepend_id = TRUE;
-+			hogdev->has_report_id = TRUE;
- 		}
- 
- 		if (i % 2 == 0) {
-@@ -549,7 +549,7 @@ static void forward_report(struct hog_device *hogdev,
- 	int size;
- 	guint type;
- 
--	if (hogdev->prepend_id) {
-+	if (hogdev->has_report_id) {
- 		data = ev->u.output.data + 1;
- 		size = ev->u.output.size - 1;
- 	} else {
--- 
-1.8.0.1
+Applied. Thanks.
 
+Johan
