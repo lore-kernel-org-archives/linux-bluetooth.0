@@ -1,49 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/4] sap-u8500: Fix build errors due to unaligned memory access
+Date: Mon, 10 Dec 2012 15:12:42 +0100
+Message-ID: <1614369.eQZKrof3SG@uw000953>
+In-Reply-To: <1353665354-32178-1-git-send-email-szymon.janc@tieto.com>
+References: <1353665354-32178-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <50C3F088.2090203@globaledgesoft.com>
-References: <508D6672.8000009@globaledgesoft.com>
-	<CAJdJm_MXB71MTcbrViLh486RtpWpx+a7SDvUPdSj2VdOa1fWvw@mail.gmail.com>
-	<CAJdJm_NHaBzobi=k3cMaM-J_3d6R7FCEvfrSJWbkiKxKpjKHWA@mail.gmail.com>
-	<508DCE10.40801@globaledgesoft.com>
-	<CAJdJm_P=USyDO5op7_7ynOT8Qe7dOifyN=notezK1HGCxOe8bA@mail.gmail.com>
-	<508DDCE7.6030708@globaledgesoft.com>
-	<CAJdJm_PLSAZBc+ef_YXsmQ+VE5aW3aD_CPs3x2Y7gY+8zY19Bw@mail.gmail.com>
-	<50BE45BB.409@globaledgesoft.com>
-	<CAJdJm_Miiidw08Tk2-6mtoDFQ0uhyez=H+NKRK-2UYjyTQ9d1A@mail.gmail.com>
-	<50C3F088.2090203@globaledgesoft.com>
-Date: Mon, 10 Dec 2012 11:18:16 -0400
-Message-ID: <CAJdJm_P1hjsh2UXYcmbNHD71idPHvgDj+WpLOnSkvkQ+FZYAMg@mail.gmail.com>
-Subject: Re: BLE issue: Start_LE_Encryption fails
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Ajay <ajay.kv@globaledgesoft.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Friday 23 of November 2012 12:09:11 Janc Szymon wrote:
+> This fix following compilation error on ARM.
+> 
+>   CC     profiles/sap/sap-u8500.o
+> profiles/sap/sap-u8500.c: In function recv_card_status:
+> profiles/sap/sap-u8500.c:323:16: error: cast increases required
+> 	alignment of target type [-Werror=cast-align]
+> profiles/sap/sap-u8500.c: In function recv_response:
+> profiles/sap/sap-u8500.c:423:12: error: cast increases required
+> 	alignment of target type [-Werror=cast-align]
+> cc1: all warnings being treated as errors
+> ---
+>  profiles/sap/sap-u8500.c |    8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/profiles/sap/sap-u8500.c b/profiles/sap/sap-u8500.c
+> index f07209d..b1aee57 100644
+> --- a/profiles/sap/sap-u8500.c
+> +++ b/profiles/sap/sap-u8500.c
+> @@ -313,16 +313,16 @@ static void recv_status(uint32_t status)
+>  
+>  static void recv_card_status(uint32_t status, uint8_t *param)
+>  {
+> -	uint32_t *card_status;
+> +	uint32_t card_status;
+>  	uint8_t result;
+>  	uint8_t iccrs;
+>  
+>  	if (status != STE_STATUS_OK)
+>  		return;
+>  
+> -	card_status = (uint32_t *)param;
+> +	memcpy(&card_status, param, sizeof(card_status));
+>  
+> -	if (get_sap_reader_status(*card_status, &iccrs) < 0)
+> +	if (get_sap_reader_status(card_status, &iccrs) < 0)
+>  		result = SAP_RESULT_ERROR_NO_REASON;
+>  	else
+>  		result = get_sap_result(STE_GET_STATUS_MSG, status);
+> @@ -420,7 +420,7 @@ static void recv_response(struct ste_message *msg)
+>  	}
+>  
+>  	param = msg->payload;
+> -	status = *(uint32_t *)param;
+> +	memcpy(&status, param, sizeof(status));
+>  	param += sizeof(status);
+>  
+>  	SAP_VDBG("status 0x%x", status);
+> 
 
-On Sat, Dec 8, 2012 at 9:59 PM, Ajay <ajay.kv@globaledgesoft.com> wrote:
->     I tried  "gatttool  -i hci0 -b <remote bdaddr> --primary " on master
-> side  ,which creates   LE link and very next moment disconnects . How can i
-> change the security level  of the link to medium?. still struggling to pair
-> the device  (atleast "smp just works") ) . Is my kernel supportive (3.2.5)
-
-You can try using the --sec-level medium option.
-
->         Every time on LE create connection  process     i
-> ,smp_conn_security() getting called from hci layer .
->   But  if(host_le_capable(hcon->hdev))
->                 return 1;
-> condition returns without even checking the security level . so kindly show
-> me the right way..
-
-I suspect this check has been added recently to the kernel. Try
-running bluetoothd oh the master side as well, it should then enable
-host LE support through mgmt API and this check should pass.
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+ping
