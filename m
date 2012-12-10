@@ -2,67 +2,49 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC] HCI commands flow fix
-Date: Mon, 10 Dec 2012 15:08:44 +0100
-Message-ID: <1355148525-29379-1-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC] Bluetooth: Don't send new commands before CC for reset is received
+Date: Mon, 10 Dec 2012 15:08:45 +0100
+Message-ID: <1355148525-29379-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1355148525-29379-1-git-send-email-szymon.janc@tieto.com>
+References: <1355148525-29379-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+After sending reset command wait for its command complete event before
+sending next command. Some chips sends CC event for command received
+before reset if reset was send before chip replied with CC.
 
-I'm seeing issues with some of BT dongles. With mgmt interface this results
-in not being able to further communicate with chip due to state mismatch in
-kernel e.g. kernel is replying busy for every command that could update CoD.
-This can be quite easy reproduced by quickly restarting bluetoothd.
-
-This patch fix 1 issue noticed: sending new commands before CC for reset
-is received.
-
-This makes things better on my PC but...
-
-There is still a window for getting stuck: when closing device kernel is not
-waiting for last command to complete and (depending on command) this sometimes
-(but less frequent comparing to command-reply mismatch without this patch)
-result in getting into wrong state and chip stops responding (or maybe commands
-don't get to chip..?):
-
-< HCI Command: Write Extended Inquiry Response (0x03|0x0052) plen 241  [hci0] 2078.141360
-        FEC: Not required (0x00)
-        Name (complete): uw000953
-        16-bit Service UUIDs (complete): 0x1801 0x1800 
-> HCI Event: Command Complete (0x0e) plen 4                            [hci0] 2078.143329
+< HCI Command: Reset (0x03|0x0003) plen 0                              [hci0] 18.404612
+> HCI Event: Command Complete (0x0e) plen 4                            [hci0] 18.405850
       Write Extended Inquiry Response (0x03|0x0052) ncmd 1
         Status: Success (0x00)
-< HCI Command: Write Extended Inquiry Response (0x03|0x0052) plen 241  [hci0] 2078.188088
-        FEC: Not required (0x00)
-        Name (complete): uw000953
-        16-bit Service UUIDs (complete): 0x1800 
-@ New Settings: 0x00d2
-            connectable pairable ssp br/edr 
-@ Local Name Changed: uw000953 ()
-< HCI Command: Reset (0x03|0x0003) plen 0                              [hci0] 2078.445154
-@ Local Name Changed: uw000953 ()
-@ Local Name Changed: uw000953 ()
+< HCI Command: Read Local Supported Features (0x04|0x0003) plen 0      [hci0] 18.406079
+> HCI Event: Command Complete (0x0e) plen 4                            [hci0] 18.407864
+      Reset (0x03|0x0003) ncmd 1
+        Status: Success (0x00)
+< HCI Command: Read Local Supported Features (0x04|0x0003) plen 0      [hci0] 18.408062
+> HCI Event: Command Complete (0x0e) plen 12                           [hci0] 18.408835
 
-bluetoothd[28619]: Bluetooth Management interface initialized
-bluetoothd[28619]: hci0: Set Powered (0x0005) failed: Busy (0x0a)
-
-hciconfig hci0 up
-Can't init device hci0: Connection timed out (110)
-
-So, maybe (along with this patch) kernel should not discard last sent command on close but
-wait for CC (or tx TO)?
-
-Any comments on how this could be solved are welcome.
-
-Szymon Janc (1):
-  Bluetooth: Don't send new commands before CC for reset is received
-
+Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+---
  net/bluetooth/hci_event.c |    2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 705078a..81b4448 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2688,7 +2688,7 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (ev->opcode != HCI_OP_NOP)
+ 		del_timer(&hdev->cmd_timer);
+ 
+-	if (ev->ncmd) {
++	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags)) {
+ 		atomic_set(&hdev->cmd_cnt, 1);
+ 		if (!skb_queue_empty(&hdev->cmd_q))
+ 			queue_work(hdev->workqueue, &hdev->cmd_work);
 -- 
 1.7.9.5
 
