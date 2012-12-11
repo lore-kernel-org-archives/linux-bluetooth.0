@@ -1,98 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAEoLCeYkpmXysL5M-2RW=MYaGcAt3Maqa-qbhzumtczNmPqewg@mail.gmail.com>
-References: <CAEoLCeYkpmXysL5M-2RW=MYaGcAt3Maqa-qbhzumtczNmPqewg@mail.gmail.com>
-From: XIAN PAN <panxian1212@gmail.com>
-Date: Tue, 11 Dec 2012 16:56:15 -0500
-Message-ID: <CAEoLCebGz+pE0fV_558prbY=5SODYrrKMHP-B7cqHLR1+gfjBQ@mail.gmail.com>
-Subject: Problem on setting up l2cap connection on different version of Bluez
+Message-ID: <1355256325.6074.0.camel@dellpc>
+Subject: Re: hidp bug concerning ctrl_sk sock
+From: Karl Relton <karllinuxtest.relton@ntlworld.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Content-Type: multipart/alternative; boundary=f46d042ef46f708e6804d09ac1d8
+Date: Tue, 11 Dec 2012 20:05:25 +0000
+In-Reply-To: <1354828992.3394.7.camel@dellpc>
+References: <1354828992.3394.7.camel@dellpc>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---f46d042ef46f708e6804d09ac1d8
-Content-Type: text/plain; charset=ISO-8859-1
+On Thu, 2012-12-06 at 21:23 +0000, Karl Relton wrote:
+> With reference to bug https://bugzilla.kernel.org/show_bug.cgi?id=50541
+> it seems to me that the hidp driver has a problem in the hidp_session()
+> function.
+> 
+> The sock structure pointed to by ctrl_sk is being freed from under the
+> functions feet (as far as I can see), causing this function to crash.
+> Shouldn't a lock_sock or sock_hold be necessary to keep the sock
+> structure around until hidp_session has finished with it?
+> 
+> 
+A bit more testing, and a bit more accurate diagnosis to report. The
+ctrl_sk is being orphaned in the l2cap bluetooth driver code. The
+orphaning sets the sk_wq to null, leading to the OOPS in the
+wait_event_timeout() call in hidp_session.
 
-Hi,
-
-My question is about the Bluetooth HID device simulation, for example, let
-a computer working as a faked Bluetooth HID device. I study the l2test.c
-file. My simulation program first finish hid service record registration,
-and then calls l2cap_listen function (similar to the do_listen function in
-l2test.c) to wait a connection request. If there is a connection
-requirement, the simulation program calls the l2cap_accept function to set
-up a connection.
-
-My problem is: the simulation program only can work on Ubuntu 8.04 (kernel
-2.6.24.29 and bluez 2.25). I try it on other OS such as Ubuntu 10.04,
-Fedora 13, Opensuse 11.1 (kernel 2.6x and bluez 4.8), none of them can
-work. It looks like no l2cap requirement coming that my program always wait
-for accepting l2cap requirement. That seems I miss something in the program
-that it cannot work with the latest Bluez. In fact, I search a lot on
-Internet and read other similar programs, such as hidclient program (
-http://anselm.hoffmeister.be/computer/hidclient/index.html.en) and
-xkbdbthid (http://www.mulliner.org/bluetooth/xkbdbthid.php). Unfortunately,
-those programs have the same problem as I meet: Only can work on old Bluez.
-I really have not clue for this problem.
-
-The simulation program first finish HID Mouse Service Record registration,
-and then calls l2cap_listen function to wait a connection. If there is a
-connection requirement, the simulation program calls the l2cap_accept
-function. Those functions are taken from bluez and bluez-utils. (for
-convenience, the simulation program is in the attachment). If the
-simulation program runs on Ubuntu 10.04 or Fedora 13, it will wait there
-forever, even if another computer already sends a connection requirement.
-It looks like that the simulation program stops on l2cap_listen and never
-wakes up to call the l2cap_accept function. What I miss in this process???
-
-Thanks for your kind help.
-
-Sincerely,
-Xian
-
---f46d042ef46f708e6804d09ac1d8
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-
-<div class=3D"gmail_quote"><div>Hi,</div><div>=A0</div><div>My question is =
-about=A0the Bluetooth HID device simulation, for example, let a computer wo=
-rking=A0as a faked Bluetooth HID device. I study the l2test.c file. My simu=
-lation program first finish=A0hid service record registration, and then cal=
-ls l2cap_listen function (similar to the do_listen function in l2test.c) to=
- wait a connection request. If there is a connection requirement, the simul=
-ation program calls the l2cap_accept function to set up a=A0connection.=A0 =
-</div>
+Is there some way of marking the sock as in use so that l2cap doesn't
+orphan it straight away?
 
 
-<div>=A0</div><div>My problem is: the simulation program only can work on U=
-buntu 8.04 (kernel 2.6.24.29 and bluez 2.25). I try it on other OS such as =
-Ubuntu 10.04, Fedora 13, Opensuse 11.1 (kernel 2.6x and bluez 4.8), none of=
- them can work. It looks like no l2cap requirement coming that my program a=
-lways wait for=A0accepting=A0l2cap requirement.=A0That seems I miss somethi=
-ng in the program that it cannot work with the latest Bluez. In fact, I sea=
-rch a lot on Internet and read other similar programs, such as hidclient pr=
-ogram (<a href=3D"http://anselm.hoffmeister.be/computer/hidclient/index.htm=
-l.en" target=3D"_blank">http://anselm.hoffmeister.be/computer/hidclient/ind=
-ex.html.en</a>) and xkbdbthid (<a href=3D"http://www.mulliner.org/bluetooth=
-/xkbdbthid.php" target=3D"_blank">http://www.mulliner.org/bluetooth/xkbdbth=
-id.php</a>). Unfortunately, those programs have the same problem as I meet:=
- Only can work on old Bluez. I really have not clue for this problem.<br>
 
-
-<br>The simulation program first finish HID Mouse Service Record registrati=
-on, and then calls l2cap_listen function to wait a connection. If there is =
-a connection requirement, the simulation program calls the l2cap_accept fun=
-ction. Those functions are taken from bluez and bluez-utils. (for convenien=
-ce, the simulation program is in the attachment). If the simulation program=
- runs on Ubuntu 10.04 or Fedora 13, it will wait there forever, even if ano=
-ther computer already sends a connection requirement. It looks like that th=
-e simulation program stops on l2cap_listen and never wakes up to call the l=
-2cap_accept function. What I miss in this process??? </div>
-
-
-<div>=A0</div><div>Thanks for your kind help.</div><div>=A0</div><div>Since=
-rely,</div><div>Xian<br>
-</div></div>
-
---f46d042ef46f708e6804d09ac1d8--
