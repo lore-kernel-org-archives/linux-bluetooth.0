@@ -4,93 +4,82 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [RFC v2 3/5] Bluetooth: Use codec to create SCO connection
-Date: Tue, 11 Dec 2012 17:53:50 +0100
-Message-Id: <1355244832-2729-4-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [RFC v2 2/5] Bluetooth: Add setsockopt for SCO socket mode
+Date: Tue, 11 Dec 2012 17:53:49 +0100
+Message-Id: <1355244832-2729-3-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1355244832-2729-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1355244832-2729-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When an incoming SCO connection is requested, check the selected codec, and
-reply appropriately. Codec should have been negotiated previously.
-Note that this patch only changes replies for defered setup.
+This patch implements setsockopt().
 ---
- include/net/bluetooth/hci_core.h |    2 +-
- net/bluetooth/hci_event.c        |   21 +++++++++++++++++----
- net/bluetooth/sco.c              |    2 +-
- 3 files changed, 19 insertions(+), 6 deletions(-)
+ net/bluetooth/sco.c |   44 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 014a2ea..cb5d131 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -577,7 +577,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst);
- int hci_conn_del(struct hci_conn *conn);
- void hci_conn_hash_flush(struct hci_dev *hdev);
- void hci_conn_check_pending(struct hci_dev *hdev);
--void hci_conn_accept(struct hci_conn *conn, int mask);
-+void hci_conn_accept(struct hci_conn *conn, int mask, int mode);
- 
- struct hci_chan *hci_chan_create(struct hci_conn *conn);
- void hci_chan_del(struct hci_chan *chan);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 705078a..175d23d 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2047,7 +2047,7 @@ unlock:
- 	hci_conn_check_pending(hdev);
- }
- 
--void hci_conn_accept(struct hci_conn *conn, int mask)
-+void hci_conn_accept(struct hci_conn *conn, int mask, int mode)
- {
- 	struct hci_dev *hdev = conn->hdev;
- 
-@@ -2070,13 +2070,26 @@ void hci_conn_accept(struct hci_conn *conn, int mask)
- 		struct hci_cp_accept_sync_conn_req cp;
- 
- 		bacpy(&cp.bdaddr, &conn->dst);
--		cp.pkt_type = cpu_to_le16(conn->pkt_type);
- 
-+		cp.pkt_type       = cpu_to_le16(conn->pkt_type);
- 		cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
- 		cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
--		cp.max_latency    = __constant_cpu_to_le16(0xffff);
- 		cp.content_format = cpu_to_le16(hdev->voice_setting);
--		cp.retrans_effort = 0xff;
-+
-+		switch (mode) {
-+		case 0:
-+			cp.max_latency    = __constant_cpu_to_le16(0xffff);
-+			cp.retrans_effort = 0xff;
-+			break;
-+		case 1:
-+			cp.content_format |= cpu_to_le16(3);
-+			if (conn->pkt_type & ESCO_2EV3)
-+				cp.max_latency = __constant_cpu_to_le16(0x0008);
-+			else
-+				cp.max_latency = __constant_cpu_to_le16(0x000D);
-+			cp.retrans_effort = 0x02;
-+			break;
-+		}
- 
- 		hci_send_cmd(hdev, HCI_OP_ACCEPT_SYNC_CONN_REQ,
- 			     sizeof(cp), &cp);
 diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 22ad5fa..6a957a3 100644
+index bdb21b2..22ad5fa 100644
 --- a/net/bluetooth/sco.c
 +++ b/net/bluetooth/sco.c
-@@ -666,7 +666,7 @@ static int sco_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
+@@ -678,6 +678,47 @@ static int sco_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
+ 	return bt_sock_recvmsg(iocb, sock, msg, len, flags);
+ }
  
- 	if (sk->sk_state == BT_CONNECT2 &&
- 	    test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
--		hci_conn_accept(pi->conn->hcon, 0);
-+		hci_conn_accept(pi->conn->hcon, 0, pi->mode);
- 		sk->sk_state = BT_CONFIG;
++static int sco_sock_setsockopt_old(struct socket *sock, int optname,
++				   char __user *optval, unsigned int optlen)
++{
++	struct sock *sk = sock->sk;
++	struct sco_options opts;
++	int len, err = 0;
++
++	BT_DBG("sk %p", sk);
++
++	lock_sock(sk);
++
++	switch (optname) {
++	case SCO_OPTIONS:
++		if (sk->sk_state != BT_OPEN &&
++		    sk->sk_state != BT_BOUND &&
++		    sk->sk_state != BT_CONNECT2) {
++			err = -EINVAL;
++			break;
++		}
++
++		opts.mode = SCO_MODE_CVSD;
++
++		len = min_t(unsigned int, sizeof(opts), optlen);
++		if (copy_from_user((char *) &opts, optval, len)) {
++			err = -EFAULT;
++			break;
++		}
++
++		sco_pi(sk)->mode = opts.mode;
++		BT_DBG("mode %d", opts.mode);
++		break;
++
++	default:
++		err = -ENOPROTOOPT;
++		break;
++	}
++
++	release_sock(sk);
++	return err;
++}
++
+ static int sco_sock_setsockopt(struct socket *sock, int level, int optname, char __user *optval, unsigned int optlen)
+ {
+ 	struct sock *sk = sock->sk;
+@@ -686,6 +727,9 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname, char
  
- 		release_sock(sk);
+ 	BT_DBG("sk %p", sk);
+ 
++	if (level == SOL_SCO)
++		return sco_sock_setsockopt_old(sock, optname, optval, optlen);
++
+ 	lock_sock(sk);
+ 
+ 	switch (optname) {
 -- 
 1.7.9.5
 
