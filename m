@@ -1,180 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 11 Dec 2012 20:15:34 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3 v1] Bluetooth: Fix stop discovery while in STARTING
- state
-Message-ID: <20121211221534.GA7912@joana>
-References: <1354791958-28334-1-git-send-email-jaganath.k@samsung.com>
- <1354791958-28334-4-git-send-email-jaganath.k@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1354791958-28334-4-git-send-email-jaganath.k@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <CAEoLCeYkpmXysL5M-2RW=MYaGcAt3Maqa-qbhzumtczNmPqewg@mail.gmail.com>
+References: <CAEoLCeYkpmXysL5M-2RW=MYaGcAt3Maqa-qbhzumtczNmPqewg@mail.gmail.com>
+From: XIAN PAN <panxian1212@gmail.com>
+Date: Tue, 11 Dec 2012 16:56:15 -0500
+Message-ID: <CAEoLCebGz+pE0fV_558prbY=5SODYrrKMHP-B7cqHLR1+gfjBQ@mail.gmail.com>
+Subject: Problem on setting up l2cap connection on different version of Bluez
+To: linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Content-Type: multipart/alternative; boundary=f46d042ef46f708e6804d09ac1d8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+--f46d042ef46f708e6804d09ac1d8
+Content-Type: text/plain; charset=ISO-8859-1
 
-* Jaganath Kanakkassery <jaganath.k@samsung.com> [2012-12-06 16:35:58 +0530]:
+Hi,
 
-> If stop_discovery() is called when discovery state is STARTING, it
-> will be failed currently. This patch fixes this.
-> 
-> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
-> ---
->  include/net/bluetooth/hci_core.h |    1 +
->  net/bluetooth/hci_core.c         |    9 ++++++++-
->  net/bluetooth/hci_event.c        |   15 +++++++++++++--
->  net/bluetooth/mgmt.c             |    9 +++++++++
->  4 files changed, 31 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index bd63a9f..d09777a 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -64,6 +64,7 @@ struct discovery_state {
->  		DISCOVERY_RESOLVING,
->  		DISCOVERY_STOPPING,
->  	} state;
-> +	int prev_state;
->  	struct list_head	all;	/* All devices found during inquiry */
->  	struct list_head	unknown;	/* Name state not known */
->  	struct list_head	resolve;	/* Name needs to be resolved */
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index c6c67b2..93d0261 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -391,7 +391,13 @@ void hci_discovery_set_state(struct hci_dev *hdev, int state)
->  
->  	switch (state) {
->  	case DISCOVERY_STOPPED:
-> -		if (hdev->discovery.state != DISCOVERY_STARTING)
-> +		if (hdev->discovery.state == DISCOVERY_STARTING)
-> +			break;
-> +
-> +		if (hdev->discovery.state == DISCOVERY_STOPPING &&
-> +		    hdev->discovery.prev_state == DISCOVERY_STARTING)
-> +			mgmt_stop_discovery_complete(hdev, 0);
-> +		else
->  			mgmt_discovering(hdev, 0);
+My question is about the Bluetooth HID device simulation, for example, let
+a computer working as a faked Bluetooth HID device. I study the l2test.c
+file. My simulation program first finish hid service record registration,
+and then calls l2cap_listen function (similar to the do_listen function in
+l2test.c) to wait a connection request. If there is a connection
+requirement, the simulation program calls the l2cap_accept function to set
+up a connection.
 
-I don't think we need to be this complicated here, I don't think that add
-discovery.prev_state is a good a idea. I would prefer if you add
-discovery.discovering that will tell if we are discovering or not, then check
-inside mgmt_discovering() if the value is the same and return right away.
-You would just need to add the mgmt_stop_discovery_complete() in case state is
-DISCOVERY_STOPPING.
+My problem is: the simulation program only can work on Ubuntu 8.04 (kernel
+2.6.24.29 and bluez 2.25). I try it on other OS such as Ubuntu 10.04,
+Fedora 13, Opensuse 11.1 (kernel 2.6x and bluez 4.8), none of them can
+work. It looks like no l2cap requirement coming that my program always wait
+for accepting l2cap requirement. That seems I miss something in the program
+that it cannot work with the latest Bluez. In fact, I search a lot on
+Internet and read other similar programs, such as hidclient program (
+http://anselm.hoffmeister.be/computer/hidclient/index.html.en) and
+xkbdbthid (http://www.mulliner.org/bluetooth/xkbdbthid.php). Unfortunately,
+those programs have the same problem as I meet: Only can work on old Bluez.
+I really have not clue for this problem.
 
->  		break;
->  	case DISCOVERY_STARTING:
-> @@ -405,6 +411,7 @@ void hci_discovery_set_state(struct hci_dev *hdev, int state)
->  		break;
->  	}
->  
-> +	hdev->discovery.prev_state = hdev->discovery.state;
->  	hdev->discovery.state = state;
->  }
->  
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 1fadba5..3f9f317 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -1085,6 +1085,8 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
->  		if (status) {
->  			hci_dev_lock(hdev);
->  			mgmt_start_discovery_failed(hdev, status);
-> +			if (hdev->discovery.state == DISCOVERY_STOPPING)
-> +				mgmt_stop_discovery_complete(hdev, status);
+The simulation program first finish HID Mouse Service Record registration,
+and then calls l2cap_listen function to wait a connection. If there is a
+connection requirement, the simulation program calls the l2cap_accept
+function. Those functions are taken from bluez and bluez-utils. (for
+convenience, the simulation program is in the attachment). If the
+simulation program runs on Ubuntu 10.04 or Fedora 13, it will wait there
+forever, even if another computer already sends a connection requirement.
+It looks like that the simulation program stops on l2cap_listen and never
+wakes up to call the l2cap_accept function. What I miss in this process???
 
-I think this case will be handled by hci_discovery_set_state(), and you could
-just remove this from here. And why you return the set_scan_enable status
-error to the stop discovery command?
+Thanks for your kind help.
 
->  			hci_dev_unlock(hdev);
->  			return;
->  		}
-> @@ -1092,7 +1094,10 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
->  		set_bit(HCI_LE_SCAN, &hdev->dev_flags);
->  
->  		hci_dev_lock(hdev);
-> -		hci_discovery_set_state(hdev, DISCOVERY_FINDING);
-> +		if (hdev->discovery.state == DISCOVERY_STOPPING)
-> +			hci_cancel_le_scan(hdev);
-> +		else
-> +			hci_discovery_set_state(hdev, DISCOVERY_FINDING);
->  		hci_dev_unlock(hdev);
->  		break;
->  
-> @@ -1180,8 +1185,11 @@ static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
->  		hci_req_complete(hdev, HCI_OP_INQUIRY, status);
->  		hci_conn_check_pending(hdev);
->  		hci_dev_lock(hdev);
-> -		if (test_bit(HCI_MGMT, &hdev->dev_flags))
-> +		if (test_bit(HCI_MGMT, &hdev->dev_flags)) {
->  			mgmt_start_discovery_failed(hdev, status);
-> +			if (hdev->discovery.state == DISCOVERY_STOPPING)
-> +				mgmt_stop_discovery_complete(hdev, status);
-> +		}
+Sincerely,
+Xian
 
-Saome thing as the previous comment, you don't need this.
-mgmt_start_discovery_failed() calls hci_discovery_set_state().
+--f46d042ef46f708e6804d09ac1d8
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
->  		hci_dev_unlock(hdev);
->  		return;
->  	}
-> @@ -1189,6 +1197,9 @@ static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
->  	set_bit(HCI_INQUIRY, &hdev->flags);
->  
->  	hci_dev_lock(hdev);
-> +	if (hdev->discovery.state == DISCOVERY_STOPPING)
-> +		hci_cancel_inquiry(hdev);
-> +	else
->  	hci_discovery_set_state(hdev, DISCOVERY_FINDING);
-
-Wrong indentation level inside the else.
-
->  	hci_dev_unlock(hdev);
->  }
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 332152b..a645494 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -2387,6 +2387,11 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
->  
->  	hci_dev_lock(hdev);
->  
-> +	if (hdev->discovery.state == DISCOVERY_STARTING) {
-> +		err = 0;
-> +		goto proceed;
-> +	}
-> +
->  	if (!hci_discovery_active(hdev)) {
-
-I would do something like this instead:
-
-        if (hdev->discovery.state != DISCOVERY_STARTING &&
-	            !hci_discovery_active(hdev)) {
+<div class=3D"gmail_quote"><div>Hi,</div><div>=A0</div><div>My question is =
+about=A0the Bluetooth HID device simulation, for example, let a computer wo=
+rking=A0as a faked Bluetooth HID device. I study the l2test.c file. My simu=
+lation program first finish=A0hid service record registration, and then cal=
+ls l2cap_listen function (similar to the do_listen function in l2test.c) to=
+ wait a connection request. If there is a connection requirement, the simul=
+ation program calls the l2cap_accept function to set up a=A0connection.=A0 =
+</div>
 
 
-And remove the label jump from here...
+<div>=A0</div><div>My problem is: the simulation program only can work on U=
+buntu 8.04 (kernel 2.6.24.29 and bluez 2.25). I try it on other OS such as =
+Ubuntu 10.04, Fedora 13, Opensuse 11.1 (kernel 2.6x and bluez 4.8), none of=
+ them can work. It looks like no l2cap requirement coming that my program a=
+lways wait for=A0accepting=A0l2cap requirement.=A0That seems I miss somethi=
+ng in the program that it cannot work with the latest Bluez. In fact, I sea=
+rch a lot on Internet and read other similar programs, such as hidclient pr=
+ogram (<a href=3D"http://anselm.hoffmeister.be/computer/hidclient/index.htm=
+l.en" target=3D"_blank">http://anselm.hoffmeister.be/computer/hidclient/ind=
+ex.html.en</a>) and xkbdbthid (<a href=3D"http://www.mulliner.org/bluetooth=
+/xkbdbthid.php" target=3D"_blank">http://www.mulliner.org/bluetooth/xkbdbth=
+id.php</a>). Unfortunately, those programs have the same problem as I meet:=
+ Only can work on old Bluez. I really have not clue for this problem.<br>
 
->  		err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY,
->  				   MGMT_STATUS_REJECTED, &mgmt_cp->type,
-> @@ -2401,6 +2406,7 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
->  		goto unlock;
->  	}
->  
-> +proceed:
->  	cmd = mgmt_pending_add(sk, MGMT_OP_STOP_DISCOVERY, hdev, NULL, 0);
->  	if (!cmd) {
->  		err = -ENOMEM;
-> @@ -2435,6 +2441,9 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
->  
->  		break;
->  
-> +	case DISCOVERY_STARTING:
 
-and add err = 0 here.
+<br>The simulation program first finish HID Mouse Service Record registrati=
+on, and then calls l2cap_listen function to wait a connection. If there is =
+a connection requirement, the simulation program calls the l2cap_accept fun=
+ction. Those functions are taken from bluez and bluez-utils. (for convenien=
+ce, the simulation program is in the attachment). If the simulation program=
+ runs on Ubuntu 10.04 or Fedora 13, it will wait there forever, even if ano=
+ther computer already sends a connection requirement. It looks like that th=
+e simulation program stops on l2cap_listen and never wakes up to call the l=
+2cap_accept function. What I miss in this process??? </div>
 
-	Gustavo
+
+<div>=A0</div><div>Thanks for your kind help.</div><div>=A0</div><div>Since=
+rely,</div><div>Xian<br>
+</div></div>
+
+--f46d042ef46f708e6804d09ac1d8--
