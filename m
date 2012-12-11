@@ -1,35 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 11 Dec 2012 07:43:56 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] sap-u8500: Fix build errors due to unaligned memory
- access
-Message-ID: <20121211054356.GA19828@x220.P-661HNU-F1>
-References: <1353665354-32178-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1353665354-32178-1-git-send-email-szymon.janc@tieto.com>
+From: AceLan Kao <acelan.kao@canonical.com>
+To: linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Subject: [PATCH] Bluetooth: Add support for IMC Networks [13d3:3393]
+Date: Tue, 11 Dec 2012 11:41:20 +0800
+Message-Id: <1355197280-18742-1-git-send-email-acelan.kao@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Add support for the AR9462 chip
 
-On Fri, Nov 23, 2012, Szymon Janc wrote:
-> This fix following compilation error on ARM.
-> 
->   CC     profiles/sap/sap-u8500.o
-> profiles/sap/sap-u8500.c: In function recv_card_status:
-> profiles/sap/sap-u8500.c:323:16: error: cast increases required
-> 	alignment of target type [-Werror=cast-align]
-> profiles/sap/sap-u8500.c: In function recv_response:
-> profiles/sap/sap-u8500.c:423:12: error: cast increases required
-> 	alignment of target type [-Werror=cast-align]
-> cc1: all warnings being treated as errors
-> ---
->  profiles/sap/sap-u8500.c |    8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+T:  Bus=02 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=13d3 ProdID=3393 Rev=00.01
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-Sorry about the delay with these. All four are now upstream.
+Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+---
+ drivers/bluetooth/ath3k.c |    2 ++
+ drivers/bluetooth/btusb.c |    1 +
+ 2 files changed, 3 insertions(+)
 
-Johan
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index fc2de55..73b1c30 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -80,6 +80,7 @@ static struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x0CF3, 0xE004) },
+ 	{ USB_DEVICE(0x0930, 0x0219) },
+ 	{ USB_DEVICE(0x0489, 0xe057) },
++	{ USB_DEVICE(0x13d3, 0x3393) },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE02C) },
+@@ -107,6 +108,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe057), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU22 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE03C), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 5693b9b..171d42f 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -138,6 +138,7 @@ static struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe057), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+-- 
+1.7.10.4
+
