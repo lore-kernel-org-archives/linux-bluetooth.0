@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [RFC 14/16] Bluetooth: Create l2cap->ops->resume()
-Date: Wed, 12 Dec 2012 02:13:42 -0200
-Message-Id: <1355285624-25811-15-git-send-email-gustavo@padovan.org>
+Subject: [RFC 08/16] Bluetooth: Improving locking in l2cap_conn_start()
+Date: Wed, 12 Dec 2012 02:13:36 -0200
+Message-Id: <1355285624-25811-9-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1355285624-25811-1-git-send-email-gustavo@padovan.org>
 References: <1355285624-25811-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,100 +12,74 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-resume() will isolate the code the code to get a socket back from the
-suspended state when a security elevation happens.
+Since we don't read bt_sk(sk) in here anymore we can remove the lock from
+the block and only use it when calling l2cap_state_change().
 
 Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 ---
- include/net/bluetooth/l2cap.h |  5 +++++
- net/bluetooth/a2mp.c          |  1 +
- net/bluetooth/l2cap_core.c    |  6 +-----
- net/bluetooth/l2cap_sock.c    | 13 +++++++++++++
- 4 files changed, 20 insertions(+), 5 deletions(-)
+ net/bluetooth/l2cap_core.c | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 9673ef4..04dd8cd 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -556,6 +556,7 @@ struct l2cap_ops {
- 	void			(*defer) (struct l2cap_chan *chan);
- 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
- 					       unsigned long len, int nb);
-+	void			(*resume) (struct l2cap_chan *chan);
- };
- 
- struct l2cap_conn {
-@@ -790,6 +791,10 @@ static inline void l2cap_chan_no_defer(struct l2cap_chan *chan)
- {
- }
- 
-+static inline void l2cap_chan_no_resume(struct l2cap_chan *chan)
-+{
-+}
-+
- extern bool disable_ertm;
- 
- int l2cap_init_sockets(void);
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 2b6faae..23265d9 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -700,6 +700,7 @@ static struct l2cap_ops a2mp_chan_ops = {
- 	.teardown = l2cap_chan_no_teardown,
- 	.ready = l2cap_chan_no_ready,
- 	.defer = l2cap_chan_no_defer,
-+	.resume = l2cap_chan_no_resume,
- };
- 
- static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn, bool locked)
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 68faff8..a294422 100644
+index aacf202..3d96c3b 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -6320,11 +6320,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+@@ -1252,7 +1252,6 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 			rsp.dcid = cpu_to_le16(chan->scid);
  
- 		if (!status && (chan->state == BT_CONNECTED ||
- 				chan->state == BT_CONFIG)) {
+ 			if (l2cap_chan_check_security(chan)) {
+-				lock_sock(sk);
+ 				if (test_bit(CONN_DEFER_SETUP,
+ 					     &chan->conn_state)) {
+ 					rsp.result = __constant_cpu_to_le16(L2CAP_CR_PEND);
+@@ -1260,11 +1259,10 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 					chan->ops->defer(chan);
+ 
+ 				} else {
+-					__l2cap_state_change(chan, BT_CONFIG);
++					l2cap_state_change(chan, BT_CONFIG);
+ 					rsp.result = __constant_cpu_to_le16(L2CAP_CR_SUCCESS);
+ 					rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
+ 				}
+-				release_sock(sk);
+ 			} else {
+ 				rsp.result = __constant_cpu_to_le16(L2CAP_CR_PEND);
+ 				rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHEN_PEND);
+@@ -6398,12 +6396,9 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 				__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
+ 			}
+ 		} else if (chan->state == BT_CONNECT2) {
 -			struct sock *sk = chan->sk;
--
--			clear_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
--			sk->sk_state_change(sk);
--
-+			chan->ops->resume(chan);
- 			l2cap_check_encryption(chan, encrypt);
- 			l2cap_chan_unlock(chan);
- 			continue;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 51fbc98..f89e558 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1146,6 +1146,18 @@ static void l2cap_sock_defer_cb(struct l2cap_chan *chan)
- 	release_sock(sk);
- }
+ 			struct l2cap_conn_rsp rsp;
+ 			__u16 res, stat;
  
-+static void l2cap_sock_resume_cb(struct l2cap_chan *chan)
-+{
-+	struct sock *sk = chan->data;
-+
-+	lock_sock(sk);
-+
-+	clear_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
-+	sk->sk_state_change(sk);
-+
-+	release_sock(sk);
-+}
-+
- static struct l2cap_ops l2cap_chan_ops = {
- 	.name		= "L2CAP Socket Interface",
- 	.new_connection	= l2cap_sock_new_connection_cb,
-@@ -1156,6 +1168,7 @@ static struct l2cap_ops l2cap_chan_ops = {
- 	.ready		= l2cap_sock_ready_cb,
- 	.defer		= l2cap_sock_defer_cb,
- 	.alloc_skb	= l2cap_sock_alloc_skb_cb,
-+	.resume		= l2cap_sock_resume_cb,
- };
+-			lock_sock(sk);
+-
+ 			if (!status) {
+ 				if (test_bit(CONN_DEFER_SETUP,
+ 					     &chan->conn_state)) {
+@@ -6411,19 +6406,17 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 					stat = L2CAP_CS_AUTHOR_PEND;
+ 					chan->ops->defer(chan);
+ 				} else {
+-					__l2cap_state_change(chan, BT_CONFIG);
++					l2cap_state_change(chan, BT_CONFIG);
+ 					res = L2CAP_CR_SUCCESS;
+ 					stat = L2CAP_CS_NO_INFO;
+ 				}
+ 			} else {
+-				__l2cap_state_change(chan, BT_DISCONN);
++				l2cap_state_change(chan, BT_DISCONN);
+ 				__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
+ 				res = L2CAP_CR_SEC_BLOCK;
+ 				stat = L2CAP_CS_NO_INFO;
+ 			}
  
- static void l2cap_sock_destruct(struct sock *sk)
+-			release_sock(sk);
+-
+ 			rsp.scid   = cpu_to_le16(chan->dcid);
+ 			rsp.dcid   = cpu_to_le16(chan->scid);
+ 			rsp.result = cpu_to_le16(res);
 -- 
 1.7.11.7
 
