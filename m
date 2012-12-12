@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 07/11] opp: Remove record details
-Date: Wed, 12 Dec 2012 13:52:12 +0200
-Message-Id: <1355313136-7891-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 06/11] obexd: Add support for custom records
+Date: Wed, 12 Dec 2012 13:52:11 +0200
+Message-Id: <1355313136-7891-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1355313136-7891-1-git-send-email-luiz.dentz@gmail.com>
 References: <1355313136-7891-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,85 +11,56 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Standart service records are already supported by bluetoothd
+Services such as pcsuite and syncml use custom records not defined by
+Bluetooth SIG so they have to be registered using ServiceRecord entry.
 ---
- obexd/plugins/opp.c | 56 -----------------------------------------------------
- 1 file changed, 56 deletions(-)
+ obexd/plugins/bluetooth.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/obexd/plugins/opp.c b/obexd/plugins/opp.c
-index c7ddc63..faa4437 100644
---- a/obexd/plugins/opp.c
-+++ b/obexd/plugins/opp.c
-@@ -44,59 +44,6 @@
- #define VCARD_TYPE "text/x-vcard"
- #define VCARD_FILE CONFIGDIR "/vcard.vcf"
+diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
+index 8a9e190..cbc42f3 100644
+--- a/obexd/plugins/bluetooth.c
++++ b/obexd/plugins/bluetooth.c
+@@ -253,6 +253,7 @@ static int register_profile(struct bluetooth_profile *profile)
+ 	DBusMessageIter iter, opt;
+ 	DBusPendingCall *call;
+ 	dbus_bool_t auto_connect = FALSE;
++	char *xml;
+ 	int ret = 0;
  
--#define OPP_CHANNEL	9
--#define OPP_RECORD "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>	\
--<record>							\
--  <attribute id=\"0x0001\">					\
--    <sequence>							\
--      <uuid value=\"0x1105\"/>					\
--    </sequence>							\
--  </attribute>							\
--								\
--  <attribute id=\"0x0004\">					\
--    <sequence>							\
--      <sequence>						\
--        <uuid value=\"0x0100\"/>				\
--      </sequence>						\
--      <sequence>						\
--        <uuid value=\"0x0003\"/>				\
--        <uint8 value=\"%u\" name=\"channel\"/>			\
--      </sequence>						\
--      <sequence>						\
--        <uuid value=\"0x0008\"/>				\
--      </sequence>						\
--    </sequence>							\
--  </attribute>							\
--								\
--  <attribute id=\"0x0009\">					\
--    <sequence>							\
--      <sequence>						\
--        <uuid value=\"0x1105\"/>				\
--        <uint16 value=\"0x0102\" name=\"version\"/>		\
--      </sequence>						\
--    </sequence>							\
--  </attribute>							\
--								\
--  <attribute id=\"0x0100\">					\
--    <text value=\"%s\" name=\"name\"/>				\
--  </attribute>							\
--								\
--  <attribute id=\"0x0303\">					\
--    <sequence>							\
--      <uint8 value=\"0x01\"/>					\
--      <uint8 value=\"0x02\"/>					\
--      <uint8 value=\"0x03\"/>					\
--      <uint8 value=\"0x04\"/>					\
--      <uint8 value=\"0x05\"/>					\
--      <uint8 value=\"0x06\"/>					\
--      <uint8 value=\"0xff\"/>					\
--    </sequence>							\
--  </attribute>							\
--  <attribute id=\"0x0200\">					\
--    <uint16 value=\"%u\" name=\"psm\"/>				\
--  </attribute>							\
--</record>"
--
- static void *opp_connect(struct obex_session *os, int *err)
- {
- 	manager_register_transfer(os);
-@@ -219,9 +166,6 @@ static void opp_reset(struct obex_session *os, void *user_data)
- static struct obex_service_driver driver = {
- 	.name = "Object Push server",
- 	.service = OBEX_OPP,
--	.channel = OPP_CHANNEL,
--	.port = OBEX_PORT_RANDOM,
--	.record = OPP_RECORD,
- 	.connect = opp_connect,
- 	.progress = opp_progress,
- 	.disconnect = opp_disconnect,
+ 	profile->path = g_strconcat("/org/bluez/obex/", profile->uuid, NULL);
+@@ -286,6 +287,20 @@ static int register_profile(struct bluetooth_profile *profile)
+ 					&opt);
+ 	dict_append_entry(&opt, "AutoConnect", DBUS_TYPE_BOOLEAN,
+ 								&auto_connect);
++	if (profile->driver->record) {
++		if (profile->driver->port != 0)
++			xml = g_markup_printf_escaped(profile->driver->record,
++						profile->driver->channel,
++						profile->driver->name,
++						profile->driver->port);
++		else
++			xml = g_markup_printf_escaped(profile->driver->record,
++						profile->driver->channel,
++						profile->driver->name);
++		dict_append_entry(&opt, "ServiceRecord", DBUS_TYPE_STRING,
++								&xml);
++		g_free(xml);
++	}
+ 	dbus_message_iter_close_container(&iter, &opt);
+ 
+ 	if (!dbus_connection_send_with_reply(connection, msg, &call, -1)) {
+@@ -314,6 +329,10 @@ static const char *service2uuid(uint16_t service)
+ 		return OBEX_PSE_UUID;
+ 	case OBEX_IRMC:
+ 		return OBEX_SYNC_UUID;
++	case OBEX_PCSUITE:
++		return "00005005-0000-1000-8000-0002ee000001";
++	case OBEX_SYNCEVOLUTION:
++		return "00000002-0000-1000-8000-0002ee000002";
+ 	case OBEX_MAS:
+ 		return OBEX_MAS_UUID;
+ 	}
 -- 
 1.7.11.7
 
