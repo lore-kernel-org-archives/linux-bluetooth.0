@@ -1,45 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20121212120236.GA11264@x220.ger.corp.intel.com>
-References: <1355313136-7891-1-git-send-email-luiz.dentz@gmail.com>
-	<20121212120236.GA11264@x220.ger.corp.intel.com>
-Date: Wed, 12 Dec 2012 17:38:15 +0100
-Message-ID: <CANT-zCWrF=xz-ud=tKbds9Fag5uH+ryLL3ZiQG=APqcZgEq0ug@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 01/11] obexd: Port bluetooth plugin to use external
- profile support
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
+	<frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 05/14] adapter: Probe profiles after device creation
+Date: Wed, 12 Dec 2012 16:47:54 +0100
+Message-Id: <1355327283-1558-5-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1355327283-1558-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1355327283-1558-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan, Luiz,
+---
+ src/adapter.c |   40 ++++------------------------------------
+ 1 file changed, 4 insertions(+), 36 deletions(-)
 
-On Wed, Dec 12, 2012 at 1:02 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Luiz,
->
-> On Wed, Dec 12, 2012, Luiz Augusto von Dentz wrote:
->> This changes obexd to use ProfileManager.RegisterProfile
->> ---
->>  obexd/plugins/bluetooth.c | 696 ++++++++++++++--------------------------------
->>  1 file changed, 212 insertions(+), 484 deletions(-)
->
-> All patches in this set have been applied. I also removed the service
-> plugin in the same go as now all known users of it are gone.
+diff --git a/src/adapter.c b/src/adapter.c
+index 7ab2389..10aacbf 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1631,38 +1631,6 @@ static const GDBusPropertyTable adapter_properties[] = {
+ 	{ }
+ };
+ 
+-static void create_stored_device_from_profiles(char *key, char *value,
+-						void *user_data)
+-{
+-	char address[18];
+-	uint8_t bdaddr_type;
+-	struct btd_adapter *adapter = user_data;
+-	GSList *list, *uuids = bt_string2list(value);
+-	struct btd_device *device;
+-
+-	if (sscanf(key, "%17s#%hhu", address, &bdaddr_type) < 2)
+-		bdaddr_type = BDADDR_BREDR;
+-
+-	if (g_slist_find_custom(adapter->devices,
+-				address, (GCompareFunc) device_address_cmp))
+-		return;
+-
+-	device = device_create(adapter, address, bdaddr_type);
+-	if (!device)
+-		return;
+-
+-	device_set_temporary(device, FALSE);
+-	adapter->devices = g_slist_append(adapter->devices, device);
+-
+-	list = device_services_from_record(device, uuids);
+-	if (list)
+-		device_register_services(device, list, ATT_PSM);
+-
+-	device_probe_profiles(device, uuids);
+-
+-	g_slist_free_full(uuids, g_free);
+-}
+-
+ struct adapter_keys {
+ 	struct btd_adapter *adapter;
+ 	GSList *keys;
+@@ -1846,10 +1814,6 @@ static void load_devices(struct btd_adapter *adapter)
+ 
+ 	ba2str(&adapter->bdaddr, srcaddr);
+ 
+-	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "profiles");
+-	textfile_foreach(filename, create_stored_device_from_profiles,
+-								adapter);
+-
+ 	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "primaries");
+ 	textfile_foreach(filename, create_stored_device_from_primaries,
+ 								adapter);
+@@ -1903,6 +1867,10 @@ static void load_devices(struct btd_adapter *adapter)
+ 		device_set_temporary(device, FALSE);
+ 		adapter->devices = g_slist_append(adapter->devices, device);
+ 
++		l = device_get_uuids(device);
++		if (l)
++			device_probe_profiles(device, l);
++
+ device_exist:
+ 		if (key_info || ltk_info) {
+ 			device_set_paired(device, TRUE);
+-- 
+1.7.9.5
 
-I'm a bit confused with these recent changes. I haven't been following
-this closely so I guess I'm missing the Big Plan but let me start with
-the basics: both bluetoothd and obexd repositories were merged but I
-believe both daemons are still going to be separate daemons, is this
-correct?
-
-If yes, it makes sense that obexd makes use of the "external profile"
-infrastructure.
-
-But in that case, why would we add any obex-specific code into
-bluetoothd? My understanding was that, if a profile is implemented as
-an external profile, the bluetoothd core would not be aware of it.
-
-Cheers,
-Mikel
