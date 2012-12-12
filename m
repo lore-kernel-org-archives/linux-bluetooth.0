@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [RFC 08/16] Bluetooth: Improving locking in l2cap_conn_start()
-Date: Wed, 12 Dec 2012 02:13:36 -0200
-Message-Id: <1355285624-25811-9-git-send-email-gustavo@padovan.org>
+Subject: [RFC 12/16] Bluetooth: Use abstract chan->data in comparison
+Date: Wed, 12 Dec 2012 02:13:40 -0200
+Message-Id: <1355285624-25811-13-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1355285624-25811-1-git-send-email-gustavo@padovan.org>
 References: <1355285624-25811-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,74 +12,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-Since we don't read bt_sk(sk) in here anymore we can remove the lock from
-the block and only use it when calling l2cap_state_change().
+If the L2CAP user is l2cap_sock.c chan->data is a pointer to the l2cap
+socket so chan->sk and chan->data are the same thing. Then we can just
+compare with chan->data instead.
+
+Non-socket users will have skb->sk = NULL, thus this change does not
+interfere in other users.
 
 Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 ---
- net/bluetooth/l2cap_core.c | 13 +++----------
- 1 file changed, 3 insertions(+), 10 deletions(-)
+ net/bluetooth/l2cap_core.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index aacf202..3d96c3b 100644
+index 934ac1b..92936db 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1252,7 +1252,6 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 			rsp.dcid = cpu_to_le16(chan->scid);
+@@ -2682,12 +2682,11 @@ static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	mutex_lock(&conn->chan_lock);
  
- 			if (l2cap_chan_check_security(chan)) {
--				lock_sock(sk);
- 				if (test_bit(CONN_DEFER_SETUP,
- 					     &chan->conn_state)) {
- 					rsp.result = __constant_cpu_to_le16(L2CAP_CR_PEND);
-@@ -1260,11 +1259,10 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 					chan->ops->defer(chan);
+ 	list_for_each_entry(chan, &conn->chan_l, list) {
+-		struct sock *sk = chan->sk;
+ 		if (chan->chan_type != L2CAP_CHAN_RAW)
+ 			continue;
  
- 				} else {
--					__l2cap_state_change(chan, BT_CONFIG);
-+					l2cap_state_change(chan, BT_CONFIG);
- 					rsp.result = __constant_cpu_to_le16(L2CAP_CR_SUCCESS);
- 					rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
- 				}
--				release_sock(sk);
- 			} else {
- 				rsp.result = __constant_cpu_to_le16(L2CAP_CR_PEND);
- 				rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHEN_PEND);
-@@ -6398,12 +6396,9 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 				__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
- 			}
- 		} else if (chan->state == BT_CONNECT2) {
--			struct sock *sk = chan->sk;
- 			struct l2cap_conn_rsp rsp;
- 			__u16 res, stat;
- 
--			lock_sock(sk);
--
- 			if (!status) {
- 				if (test_bit(CONN_DEFER_SETUP,
- 					     &chan->conn_state)) {
-@@ -6411,19 +6406,17 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 					stat = L2CAP_CS_AUTHOR_PEND;
- 					chan->ops->defer(chan);
- 				} else {
--					__l2cap_state_change(chan, BT_CONFIG);
-+					l2cap_state_change(chan, BT_CONFIG);
- 					res = L2CAP_CR_SUCCESS;
- 					stat = L2CAP_CS_NO_INFO;
- 				}
- 			} else {
--				__l2cap_state_change(chan, BT_DISCONN);
-+				l2cap_state_change(chan, BT_DISCONN);
- 				__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
- 				res = L2CAP_CR_SEC_BLOCK;
- 				stat = L2CAP_CS_NO_INFO;
- 			}
- 
--			release_sock(sk);
--
- 			rsp.scid   = cpu_to_le16(chan->dcid);
- 			rsp.dcid   = cpu_to_le16(chan->scid);
- 			rsp.result = cpu_to_le16(res);
+ 		/* Don't send frame to the socket it came from */
+-		if (skb->sk == sk)
++		if (skb->sk && skb->sk == chan->data)
+ 			continue;
+ 		nskb = skb_clone(skb, GFP_KERNEL);
+ 		if (!nskb)
 -- 
 1.7.11.7
 
