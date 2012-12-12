@@ -1,59 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 12 Dec 2012 10:20:11 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [RFC 12/16] Bluetooth: Use abstract chan->data in comparison
-Message-ID: <20121212082009.GA7034@aemeltch-MOBL1>
-References: <1355285624-25811-1-git-send-email-gustavo@padovan.org>
- <1355285624-25811-13-git-send-email-gustavo@padovan.org>
+Date: Wed, 12 Dec 2012 09:52:01 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Ting Chou <Ting.Chou@iaSolution.net>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [BLE] org.bluez.Device1.Connect() returns
+ org.bluez.Error.NotAvailable
+Message-ID: <20121212075201.GA14256@x220>
+References: <ADCBF04BB97EBF4AAE65663F8478B61CA99E65AB92@Luna.iaSolution.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1355285624-25811-13-git-send-email-gustavo@padovan.org>
+In-Reply-To: <ADCBF04BB97EBF4AAE65663F8478B61CA99E65AB92@Luna.iaSolution.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Ting,
 
-On Wed, Dec 12, 2012 at 02:13:40AM -0200, Gustavo Padovan wrote:
-> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+On Wed, Dec 12, 2012, Ting Chou wrote:
+> I Found
+> -------
 > 
-> If the L2CAP user is l2cap_sock.c chan->data is a pointer to the l2cap
-> socket so chan->sk and chan->data are the same thing. Then we can just
-> compare with chan->data instead.
+> - I checked /var/log/syslog and src/device.c, and found connect_profiles() is
+>   called twice at the first time calling org.bluez.Device.Connect():
 > 
-> Non-socket users will have skb->sk = NULL, thus this change does not
-> interfere in other users.
+>   - 1st time
+>     dev->svc_resolved==FALSE, device_resolve_svc() is invoked.
 > 
-> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> ---
->  net/bluetooth/l2cap_core.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>   - 2nd time
+>     dev->svc_resolved==TRUE
+>     In the for loop of iterating device profiles, there're two profiles:
 > 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 934ac1b..92936db 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -2682,12 +2682,11 @@ static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
->  	mutex_lock(&conn->chan_lock);
->  
->  	list_for_each_entry(chan, &conn->chan_l, list) {
-> -		struct sock *sk = chan->sk;
->  		if (chan->chan_type != L2CAP_CHAN_RAW)
->  			continue;
->  
->  		/* Don't send frame to the socket it came from */
-> -		if (skb->sk == sk)
-> +		if (skb->sk && skb->sk == chan->data)
+>       a) p->auto_connect==FALSE, p->name==deviceinfo, p->local_uuid==NULL
+>       b) p->auto_connect==FALSE, p->name==Health Thermometer GATT driver, p->local_uuid==NULL
+> 
+>     Since none of them have auto_connect TRUE, dev->pending==NULL, and
+>     btd_error_not_available() is called.
+> 
+> - I tried org.bluez.Device1.ConnectProfile() as well, but since all the profiles
+>   have local_uuid NULL, find_connectable_profile() return NULL and
+>   btd_error_invalid_args() is called.
 
-In the other patch you delete chan->sk pointer and then we have only
-chan->data which points to sk. What is the reason for that? This would
-confuse people reading chan->data guessing what the hell is this.
+It's not actually local_uuid that is so important but that p->connect is
+set. Also, it'd make much more sense to pass the remote UUID to
+ConnectProfile than the local one and we'll still do this change before
+releasing 5.0. The main thing that needs to be done before that is to
+convert profile->remote_uuids list to a single profile->remote_uuid
+which is a bit of work since some profiles still declare multiple UUIDs.
 
-I really think we can leave chan->sk if it is needed and it is better to
-remove chan->data.
+So far no LE profile is hooked up to Device.Connect and I'm not sure
+exactly how that should be done since LE device are connected through
+the general connection establishment procedure which requires scanning
+first. Since we already have Device.Pair doing the same as
+CreatePairedDevice in BlueZ 4 (and this should work btw, did you try
+it?) maybe Device.Connect should be roughly the same for LE devices as
+Adapter.CreateDevice is in BlueZ 4? For BR/EDR devices it already serves
+this purpose. The main question is what should be done if Device.Connect
+is called subsequent times as bluetoothd should anyway already be doing
+passive scanning and trying to connect to devices that have supported
+profiles.
 
-Best regards 
-Andrei Emeltchenko 
-
+Johan
