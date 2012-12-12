@@ -1,57 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 00/16] audio: Use device/adapter reference instead of bdaddr_t
-Date: Wed, 12 Dec 2012 11:27:52 +0100
-Message-ID: <1355308088-9080-1-git-send-email-szymon.janc@tieto.com>
+From: Ting Chou <Ting.Chou@iaSolution.net>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 12 Dec 2012 18:21:46 +0800
+Subject: RE: [BLE] org.bluez.Device1.Connect() returns
+ org.bluez.Error.NotAvailable
+Message-ID: <ADCBF04BB97EBF4AAE65663F8478B61CA99E65ABED@Luna.iaSolution.net>
+References: <ADCBF04BB97EBF4AAE65663F8478B61CA99E65AB92@Luna.iaSolution.net>
+ <20121212075201.GA14256@x220>
+ <ADCBF04BB97EBF4AAE65663F8478B61CA99E65ABCC@Luna.iaSolution.net>
+ <20121212092537.GA5371@x220>
+ <ADCBF04BB97EBF4AAE65663F8478B61CA99E65ABDA@Luna.iaSolution.net>
+ <20121212100737.GA6620@x220>
+In-Reply-To: <20121212100737.GA6620@x220>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This remove use of bdaddr_t in favour of using references to struct btd_adapter
-and struct btd_device.
+Hello Johan,
 
-note:
-This patch triggers a bug introduced when a2dp was splitted into two
-btd_profile resulting in a2dp_unregister() is never called (so adapter
-ref is not dropped properly). This is not fixed in this patch set.
+> -----Original Message-----
+> From: Johan Hedberg [mailto:johan.hedberg@gmail.com]
+> Sent: Wednesday, December 12, 2012 6:08 PM
+> To: Ting Chou
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: [BLE] org.bluez.Device1.Connect() returns
+> org.bluez.Error.NotAvailable
+> 
+> Hi Ting,
+> 
+> On Wed, Dec 12, 2012, Ting Chou wrote:
+> > > That means that the profiles that are supposed to be supported with
+> > > this device are not calling either device_set_auto_connect() or
+> > > btd_device_add_attio_callback(). Both of those functions should
+> > > cause bluetoothd to start doing passive scanning and try to connect
+> > > to the device. Btw, which kernel version are you using. IIRC you'll
+> > > need something like 3.5 or newer for LE passive scanning to work.
+> > >
+> >
+> > I tried to let btd_device_add_attio_callback() get called by
+> >
+> >   Characterisitc.DiscoverCharacteristics()
+> 
+> I thought you said some internally supported profiles get detected? Why
+> then do you need to use the ATT D-Bus interface? FWIW, since
+> attrib/client.c implementation doesn't match what's documented and
+> since there hasn't been anyone stepping up to update the code to use D-
+> Bus properties we'll probably not have the entire Characteristic D-Bus
+> interface in the 5.0 release. Instead, there's a plan to have a more
+> comprehensive and generic GATT D-Bus API for both peripheral and
+> central roles, which will probably land in 5.1 or one of the subsequent
+> releases.
+> 
+> > But still the Device1.Connect() after Device1.Disconnect() does not
+> > establish the connection. connect_profiles() returns
+> > btd_error_not_available() since
+> > !dev->pending:
+> 
+> It seems you've misunderstood this part. If the functions I mentioned
+> are used correctly you will not need to use Device.Connect at all.
+> Instead bluetoothd will start doing passive scanning and automatically
+> establish a connection to any device doing connectable advertising.
+> 
 
-Szymon Janc (16):
-  a2dp: Remove bogus '\' at the end of line
-  a2dp: Remove useless return
-  a2dp: Remove not used macros definitions
-  a2dp: Convert sink/source register to accept btd_adapter
-  a2dp: Convert a2dp_unregister to accept btd_adapter
-  media: Convert register/unregister to accept btd_adapter
-  a2dp: Convert a2dp_add_sep to accept struct btd_adapter
-  avdtp: Use refs to adapter and device instead of bdaddr_t
-  a2dp: Use btd_adapter ref in a2dp_server instead of bdaddr_t
-  avrcp: Convert to accept btd_adapter instead of bdaddr_t
-  avctp: Convert register/unregister to accept btd_adapter
-  avdtp: Replace avdtp_get_peers with adapter and device getters
-  audio: Use manager_get_device to get device object
-  audio: Make manager_get_device accept btd_device
-  audio: Simplify manager_find_device
-  avctp: Remove double looking for audio device
+Do you mean once a LE device with internally supported profiles is discovered,
+it will be connected automatically? Which means I cannot connect manually, at
+the timing I prefer?
 
- profiles/audio/a2dp.c    |  75 +++++++++++---------------
- profiles/audio/a2dp.h    |   8 +--
- profiles/audio/avctp.c   |  96 +++++++++++++++-------------------
- profiles/audio/avctp.h   |   4 +-
- profiles/audio/avdtp.c   | 119 ++++++++++++++++++------------------------
- profiles/audio/avdtp.h   |  10 ++--
- profiles/audio/avrcp.c   |  37 ++++++-------
- profiles/audio/avrcp.h   |   6 +--
- profiles/audio/manager.c | 133 +++++++++--------------------------------------
- profiles/audio/manager.h |  17 +-----
- profiles/audio/media.c   |  35 ++++++-------
- profiles/audio/media.h   |   4 +-
- profiles/audio/sink.c    |   5 +-
- profiles/audio/source.c  |   5 +-
- 14 files changed, 206 insertions(+), 348 deletions(-)
+Since with my BT 4.0 dongle, Adpater.StartDiscovery discover also LE devices, I
+thought I should use Device.Connect to connect to the device.
 
--- 
-1.8.0
+Thanks,
+Ting
 
