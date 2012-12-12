@@ -1,61 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 12 Dec 2012 09:52:01 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Ting Chou <Ting.Chou@iaSolution.net>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [BLE] org.bluez.Device1.Connect() returns
- org.bluez.Error.NotAvailable
-Message-ID: <20121212075201.GA14256@x220>
-References: <ADCBF04BB97EBF4AAE65663F8478B61CA99E65AB92@Luna.iaSolution.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <ADCBF04BB97EBF4AAE65663F8478B61CA99E65AB92@Luna.iaSolution.net>
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: [RFC 14/16] Bluetooth: Create l2cap->ops->resume()
+Date: Wed, 12 Dec 2012 02:13:42 -0200
+Message-Id: <1355285624-25811-15-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1355285624-25811-1-git-send-email-gustavo@padovan.org>
+References: <1355285624-25811-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ting,
+From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-On Wed, Dec 12, 2012, Ting Chou wrote:
-> I Found
-> -------
-> 
-> - I checked /var/log/syslog and src/device.c, and found connect_profiles() is
->   called twice at the first time calling org.bluez.Device.Connect():
-> 
->   - 1st time
->     dev->svc_resolved==FALSE, device_resolve_svc() is invoked.
-> 
->   - 2nd time
->     dev->svc_resolved==TRUE
->     In the for loop of iterating device profiles, there're two profiles:
-> 
->       a) p->auto_connect==FALSE, p->name==deviceinfo, p->local_uuid==NULL
->       b) p->auto_connect==FALSE, p->name==Health Thermometer GATT driver, p->local_uuid==NULL
-> 
->     Since none of them have auto_connect TRUE, dev->pending==NULL, and
->     btd_error_not_available() is called.
-> 
-> - I tried org.bluez.Device1.ConnectProfile() as well, but since all the profiles
->   have local_uuid NULL, find_connectable_profile() return NULL and
->   btd_error_invalid_args() is called.
+resume() will isolate the code the code to get a socket back from the
+suspended state when a security elevation happens.
 
-It's not actually local_uuid that is so important but that p->connect is
-set. Also, it'd make much more sense to pass the remote UUID to
-ConnectProfile than the local one and we'll still do this change before
-releasing 5.0. The main thing that needs to be done before that is to
-convert profile->remote_uuids list to a single profile->remote_uuid
-which is a bit of work since some profiles still declare multiple UUIDs.
+Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+---
+ include/net/bluetooth/l2cap.h |  5 +++++
+ net/bluetooth/a2mp.c          |  1 +
+ net/bluetooth/l2cap_core.c    |  6 +-----
+ net/bluetooth/l2cap_sock.c    | 13 +++++++++++++
+ 4 files changed, 20 insertions(+), 5 deletions(-)
 
-So far no LE profile is hooked up to Device.Connect and I'm not sure
-exactly how that should be done since LE device are connected through
-the general connection establishment procedure which requires scanning
-first. Since we already have Device.Pair doing the same as
-CreatePairedDevice in BlueZ 4 (and this should work btw, did you try
-it?) maybe Device.Connect should be roughly the same for LE devices as
-Adapter.CreateDevice is in BlueZ 4? For BR/EDR devices it already serves
-this purpose. The main question is what should be done if Device.Connect
-is called subsequent times as bluetoothd should anyway already be doing
-passive scanning and trying to connect to devices that have supported
-profiles.
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 9673ef4..04dd8cd 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -556,6 +556,7 @@ struct l2cap_ops {
+ 	void			(*defer) (struct l2cap_chan *chan);
+ 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
+ 					       unsigned long len, int nb);
++	void			(*resume) (struct l2cap_chan *chan);
+ };
+ 
+ struct l2cap_conn {
+@@ -790,6 +791,10 @@ static inline void l2cap_chan_no_defer(struct l2cap_chan *chan)
+ {
+ }
+ 
++static inline void l2cap_chan_no_resume(struct l2cap_chan *chan)
++{
++}
++
+ extern bool disable_ertm;
+ 
+ int l2cap_init_sockets(void);
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 2b6faae..23265d9 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -700,6 +700,7 @@ static struct l2cap_ops a2mp_chan_ops = {
+ 	.teardown = l2cap_chan_no_teardown,
+ 	.ready = l2cap_chan_no_ready,
+ 	.defer = l2cap_chan_no_defer,
++	.resume = l2cap_chan_no_resume,
+ };
+ 
+ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn, bool locked)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 68faff8..a294422 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -6320,11 +6320,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 
+ 		if (!status && (chan->state == BT_CONNECTED ||
+ 				chan->state == BT_CONFIG)) {
+-			struct sock *sk = chan->sk;
+-
+-			clear_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
+-			sk->sk_state_change(sk);
+-
++			chan->ops->resume(chan);
+ 			l2cap_check_encryption(chan, encrypt);
+ 			l2cap_chan_unlock(chan);
+ 			continue;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 51fbc98..f89e558 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1146,6 +1146,18 @@ static void l2cap_sock_defer_cb(struct l2cap_chan *chan)
+ 	release_sock(sk);
+ }
+ 
++static void l2cap_sock_resume_cb(struct l2cap_chan *chan)
++{
++	struct sock *sk = chan->data;
++
++	lock_sock(sk);
++
++	clear_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
++	sk->sk_state_change(sk);
++
++	release_sock(sk);
++}
++
+ static struct l2cap_ops l2cap_chan_ops = {
+ 	.name		= "L2CAP Socket Interface",
+ 	.new_connection	= l2cap_sock_new_connection_cb,
+@@ -1156,6 +1168,7 @@ static struct l2cap_ops l2cap_chan_ops = {
+ 	.ready		= l2cap_sock_ready_cb,
+ 	.defer		= l2cap_sock_defer_cb,
+ 	.alloc_skb	= l2cap_sock_alloc_skb_cb,
++	.resume		= l2cap_sock_resume_cb,
+ };
+ 
+ static void l2cap_sock_destruct(struct sock *sk)
+-- 
+1.7.11.7
 
-Johan
