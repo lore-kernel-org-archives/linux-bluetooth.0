@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [RFC 01/16] Bluetooth: Add src and dst info to struct l2cap_chan
-Date: Wed, 12 Dec 2012 02:13:29 -0200
-Message-Id: <1355285624-25811-2-git-send-email-gustavo@padovan.org>
+Subject: [RFC 13/16] Bluetooth: Move l2cap_wait_ack() to l2cap_sock.c
+Date: Wed, 12 Dec 2012 02:13:41 -0200
+Message-Id: <1355285624-25811-14-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1355285624-25811-1-git-send-email-gustavo@padovan.org>
 References: <1355285624-25811-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,216 +12,124 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-Adding these two info to l2cap_chan makes the l2cap_core.c a little more
-independent of the struct sock.
+The wait_ack code has a heavy dependency on the socket data structures
+and, as of now, it won't be worthless change it to use non-socket
+structures as the only user of such feature is a socket.
 
 Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 ---
- include/net/bluetooth/l2cap.h |  3 +++
- net/bluetooth/l2cap_core.c    | 46 ++++++++++++++++++-------------------------
- net/bluetooth/l2cap_sock.c    |  6 +++---
- 3 files changed, 25 insertions(+), 30 deletions(-)
+ include/net/bluetooth/l2cap.h |  3 ++-
+ net/bluetooth/l2cap_core.c    | 32 --------------------------------
+ net/bluetooth/l2cap_sock.c    | 32 ++++++++++++++++++++++++++++++++
+ 3 files changed, 34 insertions(+), 33 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 7588ef4..445b71e 100644
+index b1cc286..9673ef4 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -435,6 +435,9 @@ struct l2cap_seq_list {
- struct l2cap_chan {
- 	struct sock *sk;
+@@ -758,6 +758,8 @@ static inline bool l2cap_clear_timer(struct l2cap_chan *chan,
+ 		msecs_to_jiffies(L2CAP_DEFAULT_ACK_TO));
+ #define __clear_ack_timer(c) l2cap_clear_timer(c, &c->ack_timer)
  
-+	bdaddr_t	src;
-+	bdaddr_t	dst;
++#define __missing_ack(c) (c->unacked_frames > 0 && c->conn)
 +
- 	struct l2cap_conn	*conn;
- 	struct hci_conn		*hs_hcon;
- 	struct hci_chan		*hs_hchan;
+ static inline int __seq_offset(struct l2cap_chan *chan, __u16 seq1, __u16 seq2)
+ {
+ 	if (seq1 >= seq2)
+@@ -794,7 +796,6 @@ int l2cap_init_sockets(void);
+ void l2cap_cleanup_sockets(void);
+ 
+ void __l2cap_connect_rsp_defer(struct l2cap_chan *chan);
+-int __l2cap_wait_ack(struct sock *sk);
+ 
+ int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm);
+ int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2c78208..4a06959 100644
+index 92936db..68faff8 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -148,7 +148,7 @@ static struct l2cap_chan *__l2cap_global_chan_by_addr(__le16 psm, bdaddr_t *src)
- 	struct l2cap_chan *c;
+@@ -1711,38 +1711,6 @@ done:
+ 	return err;
+ }
  
- 	list_for_each_entry(c, &chan_list, global_l) {
--		if (c->sport == psm && !bacmp(&bt_sk(c->sk)->src, src))
-+		if (c->sport == psm && !bacmp(&c->src, src))
- 			return c;
- 	}
- 	return NULL;
-@@ -1305,7 +1305,6 @@ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid,
- 	read_lock(&chan_list_lock);
- 
- 	list_for_each_entry(c, &chan_list, global_l) {
--		struct sock *sk = c->sk;
- 
- 		if (state && c->state != state)
- 			continue;
-@@ -1315,16 +1314,16 @@ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid,
- 			int src_any, dst_any;
- 
- 			/* Exact match. */
--			src_match = !bacmp(&bt_sk(sk)->src, src);
--			dst_match = !bacmp(&bt_sk(sk)->dst, dst);
-+			src_match = !bacmp(&c->src, src);
-+			dst_match = !bacmp(&c->dst, dst);
- 			if (src_match && dst_match) {
- 				read_unlock(&chan_list_lock);
- 				return c;
- 			}
- 
- 			/* Closest match */
--			src_any = !bacmp(&bt_sk(sk)->src, BDADDR_ANY);
--			dst_any = !bacmp(&bt_sk(sk)->dst, BDADDR_ANY);
-+			src_any = !bacmp(&c->src, BDADDR_ANY);
-+			dst_any = !bacmp(&c->dst, BDADDR_ANY);
- 			if ((src_match && dst_any) || (src_any && dst_match) ||
- 			    (src_any && dst_any))
- 				c1 = c;
-@@ -1338,7 +1337,7 @@ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid,
- 
- static void l2cap_le_conn_ready(struct l2cap_conn *conn)
- {
--	struct sock *parent, *sk;
-+	struct sock *parent;
- 	struct l2cap_chan *chan, *pchan;
- 
- 	BT_DBG("");
-@@ -1357,13 +1356,11 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
- 	if (!chan)
- 		goto clean;
- 
--	sk = chan->sk;
+-int __l2cap_wait_ack(struct sock *sk)
+-{
+-	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+-	DECLARE_WAITQUEUE(wait, current);
+-	int err = 0;
+-	int timeo = HZ/5;
 -
- 	hci_conn_hold(conn->hcon);
- 	conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
- 
--	bacpy(&bt_sk(sk)->src, conn->src);
--	bacpy(&bt_sk(sk)->dst, conn->dst);
-+	bacpy(&chan->src, conn->src);
-+	bacpy(&chan->dst, conn->dst);
- 
- 	l2cap_chan_add(conn, chan);
- 
-@@ -1577,7 +1574,6 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
- 	read_lock(&chan_list_lock);
- 
- 	list_for_each_entry(c, &chan_list, global_l) {
--		struct sock *sk = c->sk;
- 
- 		if (state && c->state != state)
- 			continue;
-@@ -1587,16 +1583,16 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
- 			int src_any, dst_any;
- 
- 			/* Exact match. */
--			src_match = !bacmp(&bt_sk(sk)->src, src);
--			dst_match = !bacmp(&bt_sk(sk)->dst, dst);
-+			src_match = !bacmp(&c->src, src);
-+			dst_match = !bacmp(&c->dst, dst);
- 			if (src_match && dst_match) {
- 				read_unlock(&chan_list_lock);
- 				return c;
- 			}
- 
- 			/* Closest match */
--			src_any = !bacmp(&bt_sk(sk)->src, BDADDR_ANY);
--			dst_any = !bacmp(&bt_sk(sk)->dst, BDADDR_ANY);
-+			src_any = !bacmp(&c->src, BDADDR_ANY);
-+			dst_any = !bacmp(&c->dst, BDADDR_ANY);
- 			if ((src_match && dst_any) || (src_any && dst_match) ||
- 			    (src_any && dst_any))
- 				c1 = c;
-@@ -1612,7 +1608,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 		       bdaddr_t *dst, u8 dst_type)
+-	add_wait_queue(sk_sleep(sk), &wait);
+-	set_current_state(TASK_INTERRUPTIBLE);
+-	while (chan->unacked_frames > 0 && chan->conn) {
+-		if (!timeo)
+-			timeo = HZ/5;
+-
+-		if (signal_pending(current)) {
+-			err = sock_intr_errno(timeo);
+-			break;
+-		}
+-
+-		release_sock(sk);
+-		timeo = schedule_timeout(timeo);
+-		lock_sock(sk);
+-		set_current_state(TASK_INTERRUPTIBLE);
+-
+-		err = sock_error(sk);
+-		if (err)
+-			break;
+-	}
+-	set_current_state(TASK_RUNNING);
+-	remove_wait_queue(sk_sleep(sk), &wait);
+-	return err;
+-}
+-
+ static void l2cap_monitor_timeout(struct work_struct *work)
  {
- 	struct sock *sk = chan->sk;
--	bdaddr_t *src = &bt_sk(sk)->src;
-+	bdaddr_t *src = &chan->src;
- 	struct l2cap_conn *conn;
- 	struct hci_conn *hcon;
- 	struct hci_dev *hdev;
-@@ -1679,9 +1675,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 	}
- 
- 	/* Set destination address and psm */
--	lock_sock(sk);
--	bacpy(&bt_sk(sk)->dst, dst);
--	release_sock(sk);
-+	bacpy(&chan->dst, dst);
- 
- 	chan->psm = psm;
- 	chan->dcid = cid;
-@@ -3642,8 +3636,8 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
- 
- 	hci_conn_hold(conn->hcon);
- 
--	bacpy(&bt_sk(sk)->src, conn->src);
--	bacpy(&bt_sk(sk)->dst, conn->dst);
-+	bacpy(&chan->src, conn->src);
-+	bacpy(&chan->dst, conn->dst);
- 	chan->psm  = psm;
- 	chan->dcid = scid;
- 	chan->local_amp_id = amp_id;
-@@ -6279,17 +6273,16 @@ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
- 	/* Find listening sockets and check their link_mode */
- 	read_lock(&chan_list_lock);
- 	list_for_each_entry(c, &chan_list, global_l) {
--		struct sock *sk = c->sk;
- 
- 		if (c->state != BT_LISTEN)
- 			continue;
- 
--		if (!bacmp(&bt_sk(sk)->src, &hdev->bdaddr)) {
-+		if (!bacmp(&c->src, &hdev->bdaddr)) {
- 			lm1 |= HCI_LM_ACCEPT;
- 			if (test_bit(FLAG_ROLE_SWITCH, &c->flags))
- 				lm1 |= HCI_LM_MASTER;
- 			exact++;
--		} else if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY)) {
-+		} else if (!bacmp(&c->src, BDADDR_ANY)) {
- 			lm2 |= HCI_LM_ACCEPT;
- 			if (test_bit(FLAG_ROLE_SWITCH, &c->flags))
- 				lm2 |= HCI_LM_MASTER;
-@@ -6573,10 +6566,9 @@ static int l2cap_debugfs_show(struct seq_file *f, void *p)
- 	read_lock(&chan_list_lock);
- 
- 	list_for_each_entry(c, &chan_list, global_l) {
--		struct sock *sk = c->sk;
- 
- 		seq_printf(f, "%pMR %pMR %d %d 0x%4.4x 0x%4.4x %d %d %d %d\n",
--			   &bt_sk(sk)->src, &bt_sk(sk)->dst,
-+			   &c->src, &c->dst,
- 			   c->state, __le16_to_cpu(c->psm),
- 			   c->scid, c->dcid, c->imtu, c->omtu,
- 			   c->sec_level, c->mode);
+ 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 1bcfb84..0977966 100644
+index e4fcbde..51fbc98 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -97,7 +97,7 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 	    __le16_to_cpu(la.l2_psm) == L2CAP_PSM_RFCOMM)
- 		chan->sec_level = BT_SECURITY_SDP;
+@@ -853,6 +853,38 @@ static void l2cap_sock_kill(struct sock *sk)
+ 	sock_put(sk);
+ }
  
--	bacpy(&bt_sk(sk)->src, &la.l2_bdaddr);
-+	bacpy(&chan->src, &la.l2_bdaddr);
- 
- 	chan->state = BT_BOUND;
- 	sk->sk_state = BT_BOUND;
-@@ -259,11 +259,11 @@ static int l2cap_sock_getname(struct socket *sock, struct sockaddr *addr,
- 
- 	if (peer) {
- 		la->l2_psm = chan->psm;
--		bacpy(&la->l2_bdaddr, &bt_sk(sk)->dst);
-+		bacpy(&la->l2_bdaddr, &chan->dst);
- 		la->l2_cid = cpu_to_le16(chan->dcid);
- 	} else {
- 		la->l2_psm = chan->sport;
--		bacpy(&la->l2_bdaddr, &bt_sk(sk)->src);
-+		bacpy(&la->l2_bdaddr, &chan->src);
- 		la->l2_cid = cpu_to_le16(chan->scid);
- 	}
- 
++static int __l2cap_wait_ack(struct sock *sk)
++{
++	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
++	DECLARE_WAITQUEUE(wait, current);
++	int err = 0;
++	int timeo = HZ/5;
++
++	add_wait_queue(sk_sleep(sk), &wait);
++	set_current_state(TASK_INTERRUPTIBLE);
++	while (__missing_ack(chan)) {
++		if (!timeo)
++			timeo = HZ/5;
++
++		if (signal_pending(current)) {
++			err = sock_intr_errno(timeo);
++			break;
++		}
++
++		release_sock(sk);
++		timeo = schedule_timeout(timeo);
++		lock_sock(sk);
++		set_current_state(TASK_INTERRUPTIBLE);
++
++		err = sock_error(sk);
++		if (err)
++			break;
++	}
++	set_current_state(TASK_RUNNING);
++	remove_wait_queue(sk_sleep(sk), &wait);
++	return err;
++}
++
+ static int l2cap_sock_shutdown(struct socket *sock, int how)
+ {
+ 	struct sock *sk = sock->sk;
 -- 
 1.7.11.7
 
