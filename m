@@ -1,90 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [RFC 02/16] Bluetooth: Remove sk_sndtimeo from l2cap_core.c
-Date: Wed, 12 Dec 2012 02:13:30 -0200
-Message-Id: <1355285624-25811-3-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1355285624-25811-1-git-send-email-gustavo@padovan.org>
-References: <1355285624-25811-1-git-send-email-gustavo@padovan.org>
+From: Ting Chou <Ting.Chou@iaSolution.net>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 12 Dec 2012 11:57:38 +0800
+Subject: [BLE] org.bluez.Device1.Connect() returns
+ org.bluez.Error.NotAvailable
+Message-ID: <ADCBF04BB97EBF4AAE65663F8478B61CA99E65AB92@Luna.iaSolution.net>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Hello,
 
-We now have a new struct member in l2cap_chan to store this value for
-access inside l2cap_core.c
+The Problem
+-----------
 
-Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
----
- include/net/bluetooth/l2cap.h | 1 +
- net/bluetooth/l2cap_core.c    | 7 +++----
- net/bluetooth/l2cap_sock.c    | 1 +
- 3 files changed, 5 insertions(+), 4 deletions(-)
+I am trying to connect to a BLE device (thermometer) by the D-Bus API with
+following steps:
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 445b71e..0aee196 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -480,6 +480,7 @@ struct l2cap_chan {
- 	__u8		tx_state;
- 	__u8		rx_state;
- 
-+	unsigned long	sndtimeo;
- 	unsigned long	conf_state;
- 	unsigned long	conn_state;
- 	unsigned long	flags;
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 4a06959..1fbaf63 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -630,7 +630,7 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
- 	case BT_CONFIG:
- 		if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED &&
- 		    conn->hcon->type == ACL_LINK) {
--			__set_chan_timer(chan, sk->sk_sndtimeo);
-+			__set_chan_timer(chan, chan->sndtimeo);
- 			l2cap_send_disconn_req(chan, reason);
- 		} else
- 			l2cap_chan_del(chan, reason);
-@@ -1607,7 +1607,6 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
- int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 		       bdaddr_t *dst, u8 dst_type)
- {
--	struct sock *sk = chan->sk;
- 	bdaddr_t *src = &chan->src;
- 	struct l2cap_conn *conn;
- 	struct hci_conn *hcon;
-@@ -1721,7 +1720,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 	l2cap_chan_lock(chan);
- 
- 	l2cap_state_change(chan, BT_CONNECT);
--	__set_chan_timer(chan, sk->sk_sndtimeo);
-+	__set_chan_timer(chan, chan->sndtimeo);
- 
- 	if (hcon->state == BT_CONNECTED) {
- 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
-@@ -3646,7 +3645,7 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
- 
- 	dcid = chan->scid;
- 
--	__set_chan_timer(chan, sk->sk_sndtimeo);
-+	__set_chan_timer(chan, chan->sndtimeo);
- 
- 	chan->ident = cmd->ident;
- 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 0977966..221aef9 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1178,6 +1178,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
- 
- 	/* Default config options */
- 	chan->flush_to = L2CAP_DEFAULT_FLUSH_TO;
-+	chan->sndtimeo = sk->sk_sndtimeo;
- 
- 	chan->data = sk;
- 	chan->ops = &l2cap_chan_ops;
--- 
-1.7.11.7
+  1. Call org.bluez.Device1.Connect(), got org.bluez.Error.NotAvailable. But
+     from the log of hcidump, the device is connected.
+  2. Invoke org.bluez.Device1.Disconnect(), hcidump shows it is disconnected.
+  3. Connect again, org.bluez.Device1.Connect() still throws
+     org.bluez.Error.NotAvailable, but this time, there's nothing from hcidump,
+     i.e., the device is not connected.
 
+I'm not sure is this expected or it is a bug. If this is a bug, and you don't
+have time to fix it, I'd love to help, but I may need a mentor.
+
+Reproduce Steps
+---------------
+
+1. ting@user-OptiPlex-755:~/w/bluez$ sudo test/test-discovery -i hci0
+   [ 00:07:80:4C:5F:17 ]
+       Name = DKBLE112 thermometer
+       Paired = 0
+       Adapter = /org/bluez/hci0
+       LegacyPairing = 0
+       Alias = DKBLE112 thermometer
+       Connected = 0
+       Address = 00:07:80:4C:5F:17
+       RSSI = -66
+       Trusted = 0
+       Blocked = 0
+   ting@user-OptiPlex-755:~/w/bluez$ sudo test/test-device connect 00:07:80:4C:5F:17
+   Traceback (most recent call last):
+     File "test/test-device", line 104, in <module>
+       device.ConnectProfile(args[2])
+     File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 70, in __call__
+       return self._proxy_method(*args, **keywords)
+     File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 145, in __call__
+       **keywords)
+     File "/usr/lib/python2.7/dist-packages/dbus/connection.py", line 651, in call_blocking
+       message, timeout)
+   dbus.exceptions.DBusException: org.bluez.Error.NotAvailable: Operation currently not available
+
+2. ting@user-OptiPlex-755:~/w/bluez$ sudo test/test-device disconnect 00:1C:4D:00:09:02
+
+3. ting@user-OptiPlex-755:~/w/bluez$ sudo test/test-device connect 00:07:80:4C:5F:17
+   Traceback (most recent call last):
+     File "test/test-device", line 104, in <module>
+       device.ConnectProfile(args[2])
+     File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 70, in __call__
+       return self._proxy_method(*args, **keywords)
+     File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 145, in __call__
+       **keywords)
+     File "/usr/lib/python2.7/dist-packages/dbus/connection.py", line 651, in call_blocking
+       message, timeout)
+   dbus.exceptions.DBusException: org.bluez.Error.NotAvailable: Operation currently not available
+
+I Found
+-------
+
+- I checked /var/log/syslog and src/device.c, and found connect_profiles() is
+  called twice at the first time calling org.bluez.Device.Connect():
+
+  - 1st time
+    dev->svc_resolved==FALSE, device_resolve_svc() is invoked.
+
+  - 2nd time
+    dev->svc_resolved==TRUE
+    In the for loop of iterating device profiles, there're two profiles:
+
+      a) p->auto_connect==FALSE, p->name==deviceinfo, p->local_uuid==NULL
+      b) p->auto_connect==FALSE, p->name==Health Thermometer GATT driver, p->local_uuid==NULL
+
+    Since none of them have auto_connect TRUE, dev->pending==NULL, and
+    btd_error_not_available() is called.
+
+- I tried org.bluez.Device1.ConnectProfile() as well, but since all the profiles
+  have local_uuid NULL, find_connectable_profile() return NULL and
+  btd_error_invalid_args() is called.
+
+Regards,
+Ting
