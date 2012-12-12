@@ -1,63 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ting Chou <Ting.Chou@iaSolution.net>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: Johan Hedberg <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 13 Dec 2012 10:33:49 +0800
-Subject: RE: [BLE] org.bluez.Device1.Connect() returns
- org.bluez.Error.NotAvailable
-Message-ID: <ADCBF04BB97EBF4AAE65663F8478B61CA99E65AC43@Luna.iaSolution.net>
-References: <ADCBF04BB97EBF4AAE65663F8478B61CA99E65AB92@Luna.iaSolution.net>
-	<20121212075201.GA14256@x220>
-	<ADCBF04BB97EBF4AAE65663F8478B61CA99E65ABCC@Luna.iaSolution.net>
-	<20121212092537.GA5371@x220>
-	<ADCBF04BB97EBF4AAE65663F8478B61CA99E65ABDA@Luna.iaSolution.net>
-	<20121212100737.GA6620@x220>
-	<ADCBF04BB97EBF4AAE65663F8478B61CA99E65ABED@Luna.iaSolution.net>
-	<CAJdJm_Nb-W=ua7aUr7O578jJwLDGaC2-uC=vv0P2zdZOaXWUPg@mail.gmail.com>
-	<ADCBF04BB97EBF4AAE65663F8478B61CA99E65ABFC@Luna.iaSolution.net>
- <CAJdJm_PPnSmEV0nmjeka6vLa9qG9-FvZTvhypi9mfVyw+KxH+Q@mail.gmail.com>
-In-Reply-To: <CAJdJm_PPnSmEV0nmjeka6vLa9qG9-FvZTvhypi9mfVyw+KxH+Q@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Wed, 12 Dec 2012 17:57:25 -0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [RFC 12/16] Bluetooth: Use abstract chan->data in comparison
+Message-ID: <20121212195725.GB5554@joana>
+References: <1355285624-25811-1-git-send-email-gustavo@padovan.org>
+ <1355285624-25811-13-git-send-email-gustavo@padovan.org>
+ <20121212082009.GA7034@aemeltch-MOBL1>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20121212082009.GA7034@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Andrei,
 
-> > I'm not sure if I understand correctly. But do you mean the GCEP you
-> > mentioned above is applied while "reconnecting" to a supported device?
+* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2012-12-12 10:20:11 +0200]:
+
+> Hi Gustavo,
 > 
-> Yes, all GAP connection procedures are applicable for re-connection.
-> There is no "reconnection" procedure as per GAP (as far as I know).
-> But note that each GATT profile can specify reconnection procedures in
-> case of disconnection due to link loss (most of those that I read have
-> this). For instance, in HTP:
+> On Wed, Dec 12, 2012 at 02:13:40AM -0200, Gustavo Padovan wrote:
+> > From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> > 
+> > If the L2CAP user is l2cap_sock.c chan->data is a pointer to the l2cap
+> > socket so chan->sk and chan->data are the same thing. Then we can just
+> > compare with chan->data instead.
+> > 
+> > Non-socket users will have skb->sk = NULL, thus this change does not
+> > interfere in other users.
+> > 
+> > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> > ---
+> >  net/bluetooth/l2cap_core.c | 3 +--
+> >  1 file changed, 1 insertion(+), 2 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index 934ac1b..92936db 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -2682,12 +2682,11 @@ static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
+> >  	mutex_lock(&conn->chan_lock);
+> >  
+> >  	list_for_each_entry(chan, &conn->chan_l, list) {
+> > -		struct sock *sk = chan->sk;
+> >  		if (chan->chan_type != L2CAP_CHAN_RAW)
+> >  			continue;
+> >  
+> >  		/* Don't send frame to the socket it came from */
+> > -		if (skb->sk == sk)
+> > +		if (skb->sk && skb->sk == chan->data)
 > 
-> "5.2.4 Link Loss Reconnection Procedure
-> When a connection is terminated due to link loss, a Collector should
-> attempt to reconnect to the Thermometer using any of the GAP connection
-> procedures with the parameters in Table 5.2."
+> In the other patch you delete chan->sk pointer and then we have only
+> chan->data which points to sk. What is the reason for that? This would
+> confuse people reading chan->data guessing what the hell is this.
 > 
-> This is what BlueZ is doing for profiles implemented internally, except
-> that the parameters we use are not the ones recommended on the profile
-> specs (that could be implemented in future, but for now GCEP uses fixed
-> connection parameters).
-> 
+> I really think we can leave chan->sk if it is needed and it is better to
+> remove chan->data.
 
-So I should exercise the D-Bus API like following for LE device:
+chan->data is the generic data pointer for l2cap users, l2cap_sock.c puts an
+struct sock while a2mp.c puts struct amp_mgr there. I'll better add a comment
+to struct l2cap_chan saying what it is for instead of re-adding struct sock.
 
-  Adapter1.StartDiscovery
-  Device1.Pair
-  ...
-  ...
-  // link loss
-  ...
-  // auto reconnect
-  ...
-  Adapter1.RemoveDevice
-
-Is my understanding correct?
-
-Thank you,
-Ting
+	Gustavo
