@@ -1,96 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 02/11] core: Add MAS record
-Date: Wed, 12 Dec 2012 13:52:07 +0200
-Message-Id: <1355313136-7891-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1355313136-7891-1-git-send-email-luiz.dentz@gmail.com>
-References: <1355313136-7891-1-git-send-email-luiz.dentz@gmail.com>
+From: Ting Chou <Ting.Chou@iaSolution.net>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+CC: Johan Hedberg <johan.hedberg@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 12 Dec 2012 19:30:59 +0800
+Subject: RE: [BLE] org.bluez.Device1.Connect() returns
+ org.bluez.Error.NotAvailable
+Message-ID: <ADCBF04BB97EBF4AAE65663F8478B61CA99E65ABFC@Luna.iaSolution.net>
+References: <ADCBF04BB97EBF4AAE65663F8478B61CA99E65AB92@Luna.iaSolution.net>
+	<20121212075201.GA14256@x220>
+	<ADCBF04BB97EBF4AAE65663F8478B61CA99E65ABCC@Luna.iaSolution.net>
+	<20121212092537.GA5371@x220>
+	<ADCBF04BB97EBF4AAE65663F8478B61CA99E65ABDA@Luna.iaSolution.net>
+	<20121212100737.GA6620@x220>
+	<ADCBF04BB97EBF4AAE65663F8478B61CA99E65ABED@Luna.iaSolution.net>
+ <CAJdJm_Nb-W=ua7aUr7O578jJwLDGaC2-uC=vv0P2zdZOaXWUPg@mail.gmail.com>
+In-Reply-To: <CAJdJm_Nb-W=ua7aUr7O578jJwLDGaC2-uC=vv0P2zdZOaXWUPg@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Anderson,
 
-This adds MAS record to detault settings
----
- src/profile.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+> -----Original Message-----
+> From: Anderson Lizardo [mailto:anderson.lizardo@openbossa.org]
+> Sent: Wednesday, December 12, 2012 6:53 PM
+> To: Ting Chou
+> Cc: Johan Hedberg; linux-bluetooth@vger.kernel.org
+> Subject: Re: [BLE] org.bluez.Device1.Connect() returns
+> org.bluez.Error.NotAvailable
+> 
+> Hi Ting,
+> 
+> On Wed, Dec 12, 2012 at 6:21 AM, Ting Chou <Ting.Chou@iasolution.net>
+> wrote:
+> > Do you mean once a LE device with internally supported profiles is
+> > discovered, it will be connected automatically? Which means I cannot
+> > connect manually, at the timing I prefer?
+> >
+> > Since with my BT 4.0 dongle, Adpater.StartDiscovery discover also LE
+> > devices, I thought I should use Device.Connect to connect to the
+> device.
+> 
+> According to the General Connection Establishment procedure (GCEP, see
+> Core spec page 1716 for details), the host shall start scanning and:
+> 
+> "When the Host discovers a device to which the Host may attempt to
+> connect, the Host shall stop the scanning, and initiate a connection
+> using the direct con- nection establishment procedure."
+> 
+> That's exactly what BlueZ does for LE devices. For paired devices whose
+> profile is supported internally by BlueZ (e.g. a LE thermometer), the
+> GCEP will keep trying to connect to them, where "connect" means using
+> LE active/passive scan, followed by the procedure above.
+> 
 
-diff --git a/src/profile.c b/src/profile.c
-index fba894c..a3dd372 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -395,6 +395,47 @@
- 		</attribute>						\
- 	</record>"
- 
-+#define MAS_RECORD							\
-+	"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>			\
-+	<record>							\
-+		<attribute id=\"0x0001\">				\
-+			<sequence>					\
-+				<uuid value=\"0x1132\"/>		\
-+			</sequence>					\
-+		</attribute>						\
-+		<attribute id=\"0x0004\">				\
-+			<sequence>					\
-+				<sequence>				\
-+					<uuid value=\"0x0100\"/>	\
-+				</sequence>				\
-+				<sequence>				\
-+					<uuid value=\"0x0003\"/>	\
-+					<uint8 value=\"0x%02x\"/>	\
-+				</sequence>				\
-+				<sequence>				\
-+					<uuid value=\"0x0008\"/>	\
-+				</sequence>				\
-+			</sequence>					\
-+		</attribute>						\
-+		<attribute id=\"0x0009\">				\
-+			<sequence>					\
-+				<sequence>				\
-+					<uuid value=\"0x1134\"/>	\
-+					<uint16 value=\"0x%04x\" />	\
-+				</sequence>				\
-+			</sequence>					\
-+		</attribute>						\
-+		<attribute id=\"0x0100\">				\
-+			<text value=\"%s\"/>				\
-+		</attribute>						\
-+		<attribute id=\"0x0315\">				\
-+			<uint8 value=\"0x00\"/>				\
-+		</attribute>						\
-+		<attribute id=\"0x0316\">				\
-+			<uint8 value=\"0x0F\"/>				\
-+		</attribute>						\
-+	</record>"
-+
- #define GENERIC_RECORD							\
- 	"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>			\
- 	<record>							\
-@@ -1570,6 +1611,13 @@ static char *get_pse_record(struct ext_profile *ext, struct ext_io *l2cap,
- 								ext->name);
- }
- 
-+static char *get_mas_record(struct ext_profile *ext, struct ext_io *l2cap,
-+							struct ext_io *rfcomm)
-+{
-+	return g_strdup_printf(MAS_RECORD, rfcomm->chan, ext->version,
-+								ext->name);
-+}
-+
- static char *get_opp_record(struct ext_profile *ext, struct ext_io *l2cap,
- 							struct ext_io *rfcomm)
- {
-@@ -1745,6 +1793,8 @@ static struct default_settings {
- 		.uuid		= OBEX_MAS_UUID,
- 		.name		= "Message Access",
- 		.channel	= MAS_DEFAULT_CHANNEL,
-+		.get_record	= get_mas_record,
-+		.version	= 0x0100
- 	}, {
- 		.uuid		= OBEX_MNS_UUID,
- 		.name		= "Message Notification",
--- 
-1.7.11.7
+Does this mean the "User selects a device to connect" in Figure 9.6 (Page 1715,
+Flow chart for a device performing the general connection establishment
+procedure) is not needed for supported devices?
 
+> For unsupported devices, IIRC there will be not attempt to keep re-
+> connecting to it (or even keep the connection up after service
+> discovery). This should be addressed by the generic GATT API in
+> attrib/client.c, but the current implementation has several limitations
+> and is not implementing a consistent API, therefore it will probably be
+> removed for first BlueZ 5.0 release, and a replacement (which should
+> probably address reconnection for external/proprietary GATT services)
+> will be implemented.
+> 
+
+I'm not sure if I understand correctly. But do you mean the GCEP you mentioned
+above is applied while "reconnecting" to a supported device?
+
+Thanks,
+Ting
