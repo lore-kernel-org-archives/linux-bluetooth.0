@@ -2,186 +2,191 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 02/14] device: Add device_create_from_storage() function
-Date: Wed, 12 Dec 2012 16:47:51 +0100
-Message-Id: <1355327283-1558-2-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH 11/14] adapter: Register services after device creation
+Date: Wed, 12 Dec 2012 16:48:00 +0100
+Message-Id: <1355327283-1558-11-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1355327283-1558-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1355327283-1558-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This function is used from load_devices() of adapter.c
-during bluetoothd start-up to re-load known devices from
-storage key file.
+Add device_register_services_from_primaries() to device.c to allow
+to register from device->primaries pre-loaded during device creation
+from storage.
 
-device_create() is used to create new devices for which
-no storage exists, but until all device load during start-up
-has been converted we should continue to call load_info().
+As all device load during start-up has been converted, we can remove
+temporary hack in device_create().
 ---
- src/adapter.c |   10 +++++----
- src/device.c  |   69 ++++++++++++++++++++++++++++++++++++++++++++-------------
- src/device.h  |    2 ++
- 3 files changed, 61 insertions(+), 20 deletions(-)
+ src/adapter.c |   80 ++-------------------------------------------------------
+ src/device.c  |   28 +++++++++-----------
+ src/device.h  |    1 +
+ 3 files changed, 15 insertions(+), 94 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 34af063..7fcd42c 100644
+index 754bc2a..1a220cf 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -1888,8 +1888,6 @@ static void load_devices(struct btd_adapter *adapter)
- 		if (ltk_info)
- 			ltks.keys = g_slist_append(ltks.keys, ltk_info);
+@@ -1728,80 +1728,6 @@ failed:
+ 	return ltk;
+ }
  
--		g_key_file_free(key_file);
+-static GSList *string_to_primary_list(char *str)
+-{
+-	GSList *l = NULL;
+-	char **services;
+-	int i;
 -
- 		l = g_slist_find_custom(adapter->devices, entry->d_name,
- 					(GCompareFunc) device_address_cmp);
- 		if (l) {
-@@ -1897,9 +1895,10 @@ static void load_devices(struct btd_adapter *adapter)
- 			goto device_exist;
- 		}
- 
--		device = device_create(adapter, entry->d_name, BDADDR_BREDR);
-+		device = device_create_from_storage(adapter, entry->d_name,
-+							key_file);
- 		if (!device)
+-	if (str == NULL)
+-		return NULL;
+-
+-	services = g_strsplit(str, " ", 0);
+-	if (services == NULL)
+-		return NULL;
+-
+-	for (i = 0; services[i]; i++) {
+-		struct gatt_primary *prim;
+-		int ret;
+-
+-		prim = g_new0(struct gatt_primary, 1);
+-
+-		ret = sscanf(services[i], "%04hX#%04hX#%s", &prim->range.start,
+-							&prim->range.end, prim->uuid);
+-
+-		if (ret < 3) {
+-			g_free(prim);
 -			continue;
-+			goto free;
+-		}
+-
+-		l = g_slist_append(l, prim);
+-	}
+-
+-	g_strfreev(services);
+-
+-	return l;
+-}
+-
+-static void create_stored_device_from_primaries(char *key, char *value,
+-							void *user_data)
+-{
+-	struct btd_adapter *adapter = user_data;
+-	struct btd_device *device;
+-	GSList *services, *uuids, *l;
+-	char address[18];
+-	uint8_t bdaddr_type;
+-
+-	if (sscanf(key, "%17s#%hhu", address, &bdaddr_type) < 2)
+-		return;
+-
+-	if (g_slist_find_custom(adapter->devices,
+-			address, (GCompareFunc) device_address_cmp))
+-		return;
+-
+-	device = device_create(adapter, address, bdaddr_type);
+-	if (!device)
+-		return;
+-
+-	device_set_temporary(device, FALSE);
+-	adapter->devices = g_slist_append(adapter->devices, device);
+-
+-	services = string_to_primary_list(value);
+-	if (services == NULL)
+-		return;
+-
+-	for (l = services, uuids = NULL; l; l = l->next) {
+-		struct gatt_primary *prim = l->data;
+-		uuids = g_slist_append(uuids, prim->uuid);
+-	}
+-
+-	device_register_services(device, services, -1);
+-
+-	device_probe_profiles(device, uuids);
+-
+-	g_slist_free(uuids);
+-}
+-
+ static void load_devices(struct btd_adapter *adapter)
+ {
+ 	char filename[PATH_MAX + 1];
+@@ -1814,10 +1740,6 @@ static void load_devices(struct btd_adapter *adapter)
  
+ 	ba2str(&adapter->bdaddr, srcaddr);
+ 
+-	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "primaries");
+-	textfile_foreach(filename, create_stored_device_from_primaries,
+-								adapter);
+-
+ 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s", srcaddr);
+ 	filename[PATH_MAX] = '\0';
+ 
+@@ -1867,6 +1789,8 @@ static void load_devices(struct btd_adapter *adapter)
  		device_set_temporary(device, FALSE);
  		adapter->devices = g_slist_append(adapter->devices, device);
-@@ -1909,6 +1908,9 @@ device_exist:
- 			device_set_paired(device, TRUE);
- 			device_set_bonded(device, TRUE);
- 		}
-+
-+free:
-+		g_key_file_free(key_file);
- 	}
  
- 	closedir(dir);
++		device_register_services_from_primaries(device);
++
+ 		l = device_get_uuids(device);
+ 		if (l)
+ 			device_probe_profiles(device, l);
 diff --git a/src/device.c b/src/device.c
-index d6f8a9a..99ef77c 100644
+index 6c3d5e8..9c3211c 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -1923,10 +1923,8 @@ failed:
- }
- 
- static void load_info(struct btd_device *device, const gchar *local,
--			const gchar *peer)
-+			const gchar *peer, GKeyFile *key_file)
- {
+@@ -2202,8 +2202,7 @@ struct btd_device *device_create(struct btd_adapter *adapter,
+ 	struct btd_device *device;
+ 	const bdaddr_t *src;
+ 	char srcaddr[18];
 -	char filename[PATH_MAX + 1];
 -	GKeyFile *key_file;
- 	char *str;
- 	gboolean store_needed = FALSE;
- 	gboolean blocked;
-@@ -1935,12 +1933,6 @@ static void load_info(struct btd_device *device, const gchar *local,
- 	gboolean bredr = FALSE;
- 	gboolean le = FALSE;
++	char *str;
  
--	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info", local, peer);
--	filename[PATH_MAX] = '\0';
--
--	key_file = g_key_file_new();
--	g_key_file_load_from_file(key_file, filename, 0, NULL);
--
- 	/* Load device name from storage info file, if that fails fall back to
- 	 * the cache.
- 	 */
-@@ -2035,18 +2027,14 @@ next:
- 
- 	if (store_needed)
- 		store_device_info(device);
--
--	g_key_file_free(key_file);
- }
- 
--struct btd_device *device_create(struct btd_adapter *adapter,
--				const gchar *address, uint8_t bdaddr_type)
-+static struct btd_device *device_new(struct btd_adapter *adapter,
-+				const gchar *address)
- {
- 	gchar *address_up;
- 	struct btd_device *device;
- 	const gchar *adapter_path = adapter_get_path(adapter);
--	const bdaddr_t *src;
--	char srcaddr[18];
- 
- 	device = g_try_malloc0(sizeof(struct btd_device));
+ 	device = device_new(adapter, address);
  	if (device == NULL)
-@@ -2070,11 +2058,60 @@ struct btd_device *device_create(struct btd_adapter *adapter,
- 
- 	str2ba(address, &device->bdaddr);
- 	device->adapter = adapter;
-+
-+	return btd_device_ref(device);
-+}
-+
-+struct btd_device *device_create_from_storage(struct btd_adapter *adapter,
-+				const char *address, GKeyFile *key_file)
-+{
-+	struct btd_device *device;
-+	const bdaddr_t *src;
-+	char srcaddr[18];
-+
-+	device = device_new(adapter, address);
-+	if (device == NULL)
-+		return NULL;
-+
-+	src = adapter_get_address(adapter);
-+	ba2str(src, srcaddr);
-+
-+	load_info(device, srcaddr, address, key_file);
-+
-+	return device;
-+}
-+
-+struct btd_device *device_create(struct btd_adapter *adapter,
-+				const gchar *address, uint8_t bdaddr_type)
-+{
-+	struct btd_device *device;
-+	const bdaddr_t *src;
-+	char srcaddr[18];
-+	char filename[PATH_MAX + 1];
-+	GKeyFile *key_file;
-+
-+	device = device_new(adapter, address);
-+	if (device == NULL)
-+		return NULL;
-+
- 	device->bdaddr_type = bdaddr_type;
+@@ -2213,24 +2212,21 @@ struct btd_device *device_create(struct btd_adapter *adapter,
  	src = adapter_get_address(adapter);
  	ba2str(src, srcaddr);
  
--	load_info(device, srcaddr, address);
-+	/*TODO: after all device load during start-up has been converted to
-+	 * new key file structure, this should be replaced by :
-+	 *	str = load_cached_name(device, srcaddr, address);
-+	 *	if (str) {
-+	 *		strcpy(device->name, str);
-+	 *		g_free(str);
-+	 *	}
-+	 */
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info", srcaddr,
-+			address);
-+	key_file = g_key_file_new();
-+	g_key_file_load_from_file(key_file, filename, 0, NULL);
-+	load_info(device, srcaddr, address, key_file);
-+	g_key_file_free(key_file);
+-	/*TODO: after all device load during start-up has been converted to
+-	 * new key file structure, this should be replaced by :
+-	 *	str = load_cached_name(device, srcaddr, address);
+-	 *	if (str) {
+-	 *		strcpy(device->name, str);
+-	 *		g_free(str);
+-	 *	}
+-	 */
+-	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info", srcaddr,
+-			address);
+-	key_file = g_key_file_new();
+-	g_key_file_load_from_file(key_file, filename, 0, NULL);
+-	load_info(device, srcaddr, address, key_file);
+-	g_key_file_free(key_file);
++	str = load_cached_name(device, srcaddr, address);
++	if (str) {
++		strcpy(device->name, str);
++		g_free(str);
++	}
  
  	return btd_device_ref(device);
  }
+ 
++void device_register_services_from_primaries(struct btd_device *device)
++{
++	device->services = attrib_client_register(device, -1, NULL,
++							device->primaries);
++}
++
+ void device_set_name(struct btd_device *device, const char *name)
+ {
+ 	if (strncmp(name, device->name, MAX_NAME_LENGTH) == 0)
 diff --git a/src/device.h b/src/device.h
-index 1987a80..5c55b35 100644
+index 1785a75..750b1ea 100644
 --- a/src/device.h
 +++ b/src/device.h
-@@ -28,6 +28,8 @@ struct btd_device;
- 
- struct btd_device *device_create(struct btd_adapter *adapter,
+@@ -30,6 +30,7 @@ struct btd_device *device_create(struct btd_adapter *adapter,
  				const char *address, uint8_t bdaddr_type);
-+struct btd_device *device_create_from_storage(struct btd_adapter *adapter,
-+				const char *address, GKeyFile *key_file);
+ struct btd_device *device_create_from_storage(struct btd_adapter *adapter,
+ 				const char *address, GKeyFile *key_file);
++void device_register_services_from_primaries(struct btd_device *device);
  
  void device_set_name(struct btd_device *device, const char *name);
  void device_get_name(struct btd_device *device, char *name, size_t len);
