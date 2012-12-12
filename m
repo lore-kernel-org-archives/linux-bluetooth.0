@@ -2,174 +2,116 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 07/14] adapter: Convert device sdp file
-Date: Wed, 12 Dec 2012 16:47:56 +0100
-Message-Id: <1355327283-1558-7-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH 08/14] device: Load services from storage
+Date: Wed, 12 Dec 2012 16:47:57 +0100
+Message-Id: <1355327283-1558-8-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1355327283-1558-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1355327283-1558-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Parse sdp file to retrieve services, i.e. sdp records with attribute
-uuid.
-Create device attributes file based on this.
+Parse device attributes file for primary services, then add UUID service
+to device pimaries list.
 ---
- src/adapter.c |  134 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 134 insertions(+)
+ src/device.c |   77 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 77 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 10aacbf..baeae79 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2607,6 +2607,127 @@ static void convert_file(char *file, char *address,
- 	free(str);
+diff --git a/src/device.c b/src/device.c
+index da868b8..a515266 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2067,6 +2067,82 @@ next:
+ 		store_device_info(device);
  }
  
-+static gboolean record_has_uuid(const sdp_record_t *rec,
-+				const char *profile_uuid)
++static void load_att_info(struct btd_device *device, const gchar *local,
++				const gchar *peer)
 +{
-+	sdp_list_t *pat;
-+
-+	for (pat = rec->pattern; pat != NULL; pat = pat->next) {
-+		char *uuid;
-+		int ret;
-+
-+		uuid = bt_uuid2string(pat->data);
-+		if (!uuid)
-+			continue;
-+
-+		ret = strcasecmp(uuid, profile_uuid);
-+
-+		g_free(uuid);
-+
-+		if (ret == 0)
-+			return TRUE;
-+	}
-+
-+	return FALSE;
-+}
-+
-+static void store_attribute_uuid(GKeyFile *key_file, uint16_t start,
-+					char *att_uuid, uuid_t uuid)
-+{
-+	char handle[6], uuid_str[33];
-+	int i;
-+
-+	switch (uuid.type) {
-+	case SDP_UUID16:
-+		sprintf(uuid_str, "%4.4X", uuid.value.uuid16);
-+		break;
-+	case SDP_UUID32:
-+		sprintf(uuid_str, "%8.8X", uuid.value.uuid32);
-+		break;
-+	case SDP_UUID128:
-+		for (i = 0; i < 16; i++)
-+			sprintf(uuid_str + (i * 2), "%2.2X",
-+					uuid.value.uuid128.data[i]);
-+		break;
-+	default:
-+		uuid_str[0] = '\0';
-+	}
-+
-+	sprintf(handle, "%hd", start);
-+	g_key_file_set_string(key_file, handle, "UUID", att_uuid);
-+	g_key_file_set_string(key_file, handle, "Value", uuid_str);
-+}
-+
-+static void convert_sdp_entry(char *key, char *value, void *user_data)
-+{
-+	char *address = user_data;
 +	char filename[PATH_MAX + 1];
 +	GKeyFile *key_file;
-+	struct stat st;
-+	sdp_record_t *rec;
++	char *prim_uuid, *str;
++	char **groups, **handle, *service_uuid;
++	struct gatt_primary *prim;
 +	uuid_t uuid;
-+	char *att_uuid, *prim_uuid;
-+	uint16_t start = 0, end = 0, psm = 0;
-+	char *str;
-+	gsize length = 0;
-+	int err;
-+
-+	if (key[17] == '#')
-+		key[17] = '\0';
-+
-+	if (bachk(key) != 0)
-+		return;
-+
-+	/* Check if the device directory has been created as records should
-+	 * only be converted for known devices */
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s", address, key);
-+	filename[PATH_MAX] = '\0';
-+
-+	err = stat(filename, &st);
-+	if (err || !S_ISDIR(st.st_mode))
-+		return;
-+
-+	sdp_uuid16_create(&uuid, ATT_UUID);
-+	att_uuid = bt_uuid2string(&uuid);
++	char tmp[3];
++	int i;
 +
 +	sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
 +	prim_uuid = bt_uuid2string(&uuid);
 +
-+	/* Retrieve device record and check if there is an
-+	 * attribute entry in it */
-+	rec = record_from_string(value);
-+
-+	if (!record_has_uuid(rec, att_uuid))
-+		goto failed;
-+
-+	if (!gatt_parse_record(rec, &uuid, &psm, &start, &end))
-+		goto failed;
-+
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/attributes", address,
-+									key);
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/attributes", local,
++			peer);
 +	filename[PATH_MAX] = '\0';
 +
 +	key_file = g_key_file_new();
 +	g_key_file_load_from_file(key_file, filename, 0, NULL);
++	groups = g_key_file_get_groups(key_file, NULL);
 +
-+	store_attribute_uuid(key_file, start, prim_uuid, uuid);
++	for (handle = groups; *handle; handle++) {
++		str = g_key_file_get_string(key_file, *handle, "UUID", NULL);
++		if (!str)
++			continue;
 +
-+	str = g_key_file_to_data(key_file, &length, NULL);
-+	if (length > 0) {
-+		create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-+		g_file_set_contents(filename, str, length, NULL);
++		if (!g_str_equal(str, prim_uuid))
++			continue;
++
++		g_free(str);
++
++		prim = g_new0(struct gatt_primary, 1);
++		prim->range.start = atoi(*handle);
++		str = g_key_file_get_string(key_file, *handle, "Value", NULL);
++		if (!str) {
++			g_free(prim);
++			continue;
++		}
++
++		switch (strlen(str)) {
++		case 4:
++			uuid.type = SDP_UUID16;
++			sscanf(str, "%04hx", &uuid.value.uuid16);
++		break;
++		case 8:
++			uuid.type = SDP_UUID32;
++			sscanf(str, "%08x", &uuid.value.uuid32);
++			break;
++		case 32:
++			uuid.type = SDP_UUID128;
++			memset(tmp, 0, sizeof(tmp));
++			for (i = 0; i < 16; i++) {
++				memcpy(tmp, str + (i * 2), 2);
++				uuid.value.uuid128.data[i] =
++						(uint8_t) strtol(tmp, NULL, 16);
++			}
++			break;
++		default:
++			continue;
++		}
++
++		service_uuid = bt_uuid2string(&uuid);
++		memcpy(prim->uuid, service_uuid, MAX_LEN_UUID_STR + 1);
++		g_free(service_uuid);
++		g_free(str);
++
++		device->primaries = g_slist_append(device->primaries, prim);
 +	}
 +
-+	g_free(str);
-+
++	g_strfreev(groups);
 +	g_key_file_free(key_file);
-+
-+failed:
-+	sdp_record_free(rec);
 +	g_free(prim_uuid);
-+	g_free(att_uuid);
 +}
 +
- static void convert_device_storage(struct btd_adapter *adapter)
+ static struct btd_device *device_new(struct btd_adapter *adapter,
+ 				const gchar *address)
  {
- 	char filename[PATH_MAX + 1];
-@@ -2651,6 +2772,19 @@ static void convert_device_storage(struct btd_adapter *adapter)
+@@ -2115,6 +2191,7 @@ struct btd_device *device_create_from_storage(struct btd_adapter *adapter,
+ 	ba2str(src, srcaddr);
  
- 	/* Convert device ids */
- 	convert_file("did", address, convert_did_entry, FALSE);
-+
-+	/* Convert sdp */
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/sdp", address);
-+	filename[PATH_MAX] = '\0';
-+
-+	str = textfile_get(filename, "converted");
-+	if (str && strcmp(str, "yes") == 0) {
-+		DBG("Legacy %s file already converted", filename);
-+	} else {
-+		textfile_foreach(filename, convert_sdp_entry, address);
-+		textfile_put(filename, "converted", "yes");
-+	}
-+	free(str);
+ 	load_info(device, srcaddr, address, key_file);
++	load_att_info(device, srcaddr, address);
+ 
+ 	return device;
  }
- 
- static void convert_config(struct btd_adapter *adapter, const char *filename,
 -- 
 1.7.9.5
 
