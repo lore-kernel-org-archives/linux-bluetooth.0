@@ -1,36 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 16/16] avctp: Remove double looking for audio device
+Date: Wed, 12 Dec 2012 14:24:17 +0100
+Message-ID: <12216041.cC5xxHztGE@uw000953>
+In-Reply-To: <CAJdJm_PqVbJTQKuqor7-2Dz+gRKTu+Bca7mSMW8PsFj8qW6itw@mail.gmail.com>
+References: <1355308088-9080-1-git-send-email-szymon.janc@tieto.com> <1355308088-9080-17-git-send-email-szymon.janc@tieto.com> <CAJdJm_PqVbJTQKuqor7-2Dz+gRKTu+Bca7mSMW8PsFj8qW6itw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1355285624-25811-4-git-send-email-gustavo@padovan.org>
-References: <1355285624-25811-1-git-send-email-gustavo@padovan.org>
-	<1355285624-25811-4-git-send-email-gustavo@padovan.org>
-Date: Wed, 12 Dec 2012 09:25:37 -0400
-Message-ID: <CAJdJm_O=vhQ3fBDtbUS_UZ2uKATEBZjZ1LQfzQYyz2koMjv+pg@mail.gmail.com>
-Subject: Re: [RFC 03/16] Bluetooth: extend state_change() call to report
- errors too
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Padovan,
+On Wednesday 12 of December 2012 15:19:44 Anderson Lizardo wrote:
+> Hi Szymon,
 
-On Wed, Dec 12, 2012 at 12:13 AM, Gustavo Padovan <gustavo@padovan.org> wrote:
-> @@ -230,9 +230,7 @@ static void l2cap_state_change(struct l2cap_chan *chan, int state)
->
->  static inline void __l2cap_chan_set_err(struct l2cap_chan *chan, int err)
->  {
-> -       struct sock *sk = chan->sk;
-> -
-> -       sk->sk_err = err;
-> +       chan->ops->state_change(chan, chan->state, 0);
+Hi Anderson,
 
-Shouldn't it be "chan->ops->state_change(chan, chan->state, err);" here?
+> 
+> On Wed, Dec 12, 2012 at 6:28 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> > There is no need to double call for manager_get_audio_device with
+> > toggled create flag. manager_get_audio_device with create set to true
+> > will only create new audio device if matching one was not found.
+> 
+> What's the difference between "manager_get_audio_device(device,
+> FALSE)" and "manager_find_device(device)" ? Also, would be better to
+> rename manager_find_device() to manager_find_audio_device()?
 
-Regards,
+No difference, please see patch 13/16, manager_find_device{s} are made
+static there.
+
+
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+BR
+Szymon Janc
