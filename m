@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [RFC 10/16] Bluetooth: Remove socket lock from state_change() in l2cap_core
-Date: Wed, 12 Dec 2012 02:13:38 -0200
-Message-Id: <1355285624-25811-11-git-send-email-gustavo@padovan.org>
+Subject: [RFC 05/16] Bluetooth: Add missing braces to an "else if"
+Date: Wed, 12 Dec 2012 02:13:33 -0200
+Message-Id: <1355285624-25811-6-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1355285624-25811-1-git-send-email-gustavo@padovan.org>
 References: <1355285624-25811-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,142 +12,28 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-This simplifies a lot the state change handling inside l2cap_core.c,
-we got rid of __l2cap_state_change() and l2cap_state_change() doesn't lock
-the socket anymore, instead the socket is locked inside the ops user code
-in l2cap_sock.c.
-
-In some places we were not using the locked version, and now we are using
-it. There is no side effect in locking the socket in these places.
-
-Handle the operation of lock the socket to ops user benefit A2MP, since
-there is no socket lock there it doesn't need any special function in
-l2cap work without touching socket locks.
+Trivial change in the coding style.
 
 Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 ---
- net/bluetooth/l2cap_core.c | 32 +++++++-------------------------
- net/bluetooth/l2cap_sock.c |  4 ++++
- 2 files changed, 11 insertions(+), 25 deletions(-)
+ net/bluetooth/l2cap_core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 3d96c3b..a69976b 100644
+index 91e12b6..a035f7a 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -210,7 +210,7 @@ static u16 l2cap_alloc_cid(struct l2cap_conn *conn)
- 	return 0;
- }
+@@ -1406,8 +1406,9 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+ 			sk->sk_state_change(sk);
+ 			release_sock(sk);
  
--static void __l2cap_state_change(struct l2cap_chan *chan, int state)
-+static void l2cap_state_change(struct l2cap_chan *chan, int state)
- {
- 	BT_DBG("chan %p %s -> %s", chan, state_to_string(chan->state),
- 	       state_to_string(state));
-@@ -219,33 +219,16 @@ static void __l2cap_state_change(struct l2cap_chan *chan, int state)
- 	chan->ops->state_change(chan, state, 0);
- }
+-		} else if (chan->state == BT_CONNECT)
++		} else if (chan->state == BT_CONNECT) {
+ 			l2cap_do_start(chan);
++		}
  
--static void l2cap_state_change(struct l2cap_chan *chan, int state)
--{
--	struct sock *sk = chan->sk;
--
--	lock_sock(sk);
--	__l2cap_state_change(chan, state);
--	release_sock(sk);
--}
--
- static void l2cap_state_change_and_error(struct l2cap_chan *chan, int state,
- 					 int err)
- {
--	struct sock *sk = chan->sk;
--
--	lock_sock(sk);
- 	chan->state = state;
- 	chan->ops->state_change(chan, state, err);
--	release_sock(sk);
- }
- 
- static inline void l2cap_chan_set_err(struct l2cap_chan *chan, int err)
- {
--	struct sock *sk = chan->sk;
--
--	lock_sock(sk);
- 	chan->ops->state_change(chan, chan->state, 0);
--	release_sock(sk);
- }
- 
- static void __set_retrans_timer(struct l2cap_chan *chan)
-@@ -1219,7 +1202,6 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 	mutex_lock(&conn->chan_lock);
- 
- 	list_for_each_entry_safe(chan, tmp, &conn->chan_l, list) {
--		struct sock *sk = chan->sk;
- 
- 		l2cap_chan_lock(chan);
- 
-@@ -3644,7 +3626,7 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
- 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE) {
- 		if (l2cap_chan_check_security(chan)) {
- 			if (test_bit(CONN_DEFER_SETUP, &chan->conn_state)) {
--				__l2cap_state_change(chan, BT_CONNECT2);
-+				l2cap_state_change(chan, BT_CONNECT2);
- 				result = L2CAP_CR_PEND;
- 				status = L2CAP_CS_AUTHOR_PEND;
- 				chan->ops->defer(chan);
-@@ -3654,21 +3636,21 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
- 				 * physical link is up.
- 				 */
- 				if (amp_id) {
--					__l2cap_state_change(chan, BT_CONNECT2);
-+					l2cap_state_change(chan, BT_CONNECT2);
- 					result = L2CAP_CR_PEND;
- 				} else {
--					__l2cap_state_change(chan, BT_CONFIG);
-+					l2cap_state_change(chan, BT_CONFIG);
- 					result = L2CAP_CR_SUCCESS;
- 				}
- 				status = L2CAP_CS_NO_INFO;
- 			}
- 		} else {
--			__l2cap_state_change(chan, BT_CONNECT2);
-+			l2cap_state_change(chan, BT_CONNECT2);
- 			result = L2CAP_CR_PEND;
- 			status = L2CAP_CS_AUTHEN_PEND;
- 		}
- 	} else {
--		__l2cap_state_change(chan, BT_CONNECT2);
-+		l2cap_state_change(chan, BT_CONNECT2);
- 		result = L2CAP_CR_PEND;
- 		status = L2CAP_CS_NO_INFO;
+ 		l2cap_chan_unlock(chan);
  	}
-@@ -4547,7 +4529,7 @@ static void l2cap_do_create(struct l2cap_chan *chan, int result,
- 			       sizeof(rsp), &rsp);
- 
- 		if (result == L2CAP_CR_SUCCESS) {
--			__l2cap_state_change(chan, BT_CONFIG);
-+			l2cap_state_change(chan, BT_CONFIG);
- 			set_bit(CONF_REQ_SENT, &chan->conf_state);
- 			l2cap_send_cmd(chan->conn, l2cap_get_ident(chan->conn),
- 				       L2CAP_CONF_REQ,
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index c8bbe4e..4ab3adc 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1051,10 +1051,14 @@ static void l2cap_sock_state_change_cb(struct l2cap_chan *chan, int state, int e
- {
- 	struct sock *sk = chan->data;
- 
-+	lock_sock(sk);
-+
- 	sk->sk_state = state;
- 
- 	if (err)
- 		sk->sk_err = err;
-+
-+	release_sock(sk);
- }
- 
- static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
 -- 
 1.7.11.7
 
