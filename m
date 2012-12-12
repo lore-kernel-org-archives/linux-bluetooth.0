@@ -1,27 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Wojciech Kazubski <wk@ire.pw.edu.pl>
-To: linux-bluetooth@vger.kernel.org
-Subject: Rayson BTM-112 support
-Date: Wed, 12 Dec 2012 17:49:10 +0100
-Message-ID: <sig.2693732bf1.14420488.tY2tksoHfc@jawor.ire.pw.edu.pl>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+In-Reply-To: <20121212120236.GA11264@x220.ger.corp.intel.com>
+References: <1355313136-7891-1-git-send-email-luiz.dentz@gmail.com>
+	<20121212120236.GA11264@x220.ger.corp.intel.com>
+Date: Wed, 12 Dec 2012 17:38:15 +0100
+Message-ID: <CANT-zCWrF=xz-ud=tKbds9Fag5uH+ryLL3ZiQG=APqcZgEq0ug@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 01/11] obexd: Port bluetooth plugin to use external
+ profile support
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello
+Hi Johan, Luiz,
 
-I am trying to make Rayson BTM-112 module working with Linux. This is the BT 
-module designed to use with microcontolers  and supports SPP profile. It works 
-out of the box with Windows (creating two seriarial ports - COM8 and COM 9 or 
-so) and I can pair it under Linux but no serial port is created.
+On Wed, Dec 12, 2012 at 1:02 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Wed, Dec 12, 2012, Luiz Augusto von Dentz wrote:
+>> This changes obexd to use ProfileManager.RegisterProfile
+>> ---
+>>  obexd/plugins/bluetooth.c | 696 ++++++++++++++--------------------------------
+>>  1 file changed, 212 insertions(+), 484 deletions(-)
+>
+> All patches in this set have been applied. I also removed the service
+> plugin in the same go as now all known users of it are gone.
 
-Have I missed anything? (any bluez modules that have to be installed 
-separately? modprobe entries?)
+I'm a bit confused with these recent changes. I haven't been following
+this closely so I guess I'm missing the Big Plan but let me start with
+the basics: both bluetoothd and obexd repositories were merged but I
+believe both daemons are still going to be separate daemons, is this
+correct?
 
-I am using Fedora 17 and openSUSE 12.2 and the module is not working in both 
-distributions. 
+If yes, it makes sense that obexd makes use of the "external profile"
+infrastructure.
 
-Wojciech Kazubski
+But in that case, why would we add any obex-specific code into
+bluetoothd? My understanding was that, if a profile is implemented as
+an external profile, the bluetoothd core would not be aware of it.
 
-
+Cheers,
+Mikel
