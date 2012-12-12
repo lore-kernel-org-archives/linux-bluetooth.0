@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 11/11] irmc: Remove record details
-Date: Wed, 12 Dec 2012 13:52:16 +0200
-Message-Id: <1355313136-7891-11-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 10/11] mas: Remove record details
+Date: Wed, 12 Dec 2012 13:52:15 +0200
+Message-Id: <1355313136-7891-10-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1355313136-7891-1-git-send-email-luiz.dentz@gmail.com>
 References: <1355313136-7891-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,24 +13,25 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 Standart service records are already supported by bluetoothd
 ---
- obexd/plugins/irmc.c | 49 -------------------------------------------------
- 1 file changed, 49 deletions(-)
+ obexd/plugins/mas.c | 51 ---------------------------------------------------
+ 1 file changed, 51 deletions(-)
 
-diff --git a/obexd/plugins/irmc.c b/obexd/plugins/irmc.c
-index c9c3521..d343977 100644
---- a/obexd/plugins/irmc.c
-+++ b/obexd/plugins/irmc.c
-@@ -46,52 +46,6 @@
- #include "filesystem.h"
- #include "manager.h"
+diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
+index 1b18059..3270edd 100644
+--- a/obexd/plugins/mas.c
++++ b/obexd/plugins/mas.c
+@@ -49,54 +49,6 @@
+ #define READ_STATUS_REQ 0
+ #define DELETE_STATUS_REQ 1
  
--#define IRMC_CHANNEL	14
+-/* Channel number according to bluez doc/assigned-numbers.txt */
+-#define MAS_CHANNEL	16
 -
--#define IRMC_RECORD "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>	\
+-#define MAS_RECORD "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>		\
 -<record>								\
 -  <attribute id=\"0x0001\">						\
 -    <sequence>								\
--      <uuid value=\"0x1104\"/>						\
+-      <uuid value=\"0x1132\"/>						\
 -    </sequence>								\
 -  </attribute>								\
 -									\
@@ -52,7 +53,7 @@ index c9c3521..d343977 100644
 -  <attribute id=\"0x0009\">						\
 -    <sequence>								\
 -      <sequence>							\
--        <uuid value=\"0x1104\"/>					\
+-        <uuid value=\"0x1134\"/>					\
 -        <uint16 value=\"0x0100\" name=\"version\"/>			\
 -      </sequence>							\
 -    </sequence>								\
@@ -62,27 +63,28 @@ index c9c3521..d343977 100644
 -    <text value=\"%s\" name=\"name\"/>					\
 -  </attribute>								\
 -									\
--  <attribute id=\"0x0301\">						\
--    <sequence>								\
--      <uint8 value=\"0x01\"/>						\
--    </sequence>								\
+-  <attribute id=\"0x0315\">						\
+-    <uint8 value=\"0x00\"/>						\
+-  </attribute>								\
+-									\
+-  <attribute id=\"0x0316\">						\
+-    <uint8 value=\"0x0F\"/>						\
 -  </attribute>								\
 -</record>"
 -
--
- struct aparam_header {
- 	uint8_t tag;
- 	uint8_t len;
-@@ -488,9 +442,6 @@ static struct obex_mime_type_driver irmc_driver = {
- static struct obex_service_driver irmc = {
- 	.name = "IRMC Sync server",
- 	.service = OBEX_IRMC,
--	.channel = IRMC_CHANNEL,
+ #define XML_DECL "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+ 
+ /* Building blocks for x-obex/folder-listing */
+@@ -764,9 +716,6 @@ static int any_close(void *obj)
+ static struct obex_service_driver mas = {
+ 	.name = "Message Access server",
+ 	.service = OBEX_MAS,
+-	.channel = MAS_CHANNEL,
 -	.secure = TRUE,
--	.record = IRMC_RECORD,
- 	.target = IRMC_TARGET,
- 	.target_size = IRMC_TARGET_SIZE,
- 	.connect = irmc_connect,
+-	.record = MAS_RECORD,
+ 	.target = MAS_TARGET,
+ 	.target_size = TARGET_SIZE,
+ 	.connect = mas_connect,
 -- 
 1.7.11.7
 
