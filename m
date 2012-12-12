@@ -2,33 +2,56 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 01/16] a2dp: Remove bogus '\' at the end of line
-Date: Wed, 12 Dec 2012 11:27:53 +0100
-Message-ID: <1355308088-9080-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1355308088-9080-1-git-send-email-szymon.janc@tieto.com>
-References: <1355308088-9080-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 00/16] audio: Use device/adapter reference instead of bdaddr_t
+Date: Wed, 12 Dec 2012 11:27:52 +0100
+Message-ID: <1355308088-9080-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- profiles/audio/a2dp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This remove use of bdaddr_t in favour of using references to struct btd_adapter
+and struct btd_device.
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 177f653..8e9f626 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -1337,7 +1337,7 @@ struct a2dp_sep *a2dp_add_sep(const bdaddr_t *src, uint8_t type,
- 	}
- 
- 	if (add_record_to_server(&server->src, record) < 0) {
--		error("Unable to register A2DP service record");\
-+		error("Unable to register A2DP service record");
- 		sdp_record_free(record);
- 		avdtp_unregister_sep(sep->lsep);
- 		g_free(sep);
+note:
+This patch triggers a bug introduced when a2dp was splitted into two
+btd_profile resulting in a2dp_unregister() is never called (so adapter
+ref is not dropped properly). This is not fixed in this patch set.
+
+Szymon Janc (16):
+  a2dp: Remove bogus '\' at the end of line
+  a2dp: Remove useless return
+  a2dp: Remove not used macros definitions
+  a2dp: Convert sink/source register to accept btd_adapter
+  a2dp: Convert a2dp_unregister to accept btd_adapter
+  media: Convert register/unregister to accept btd_adapter
+  a2dp: Convert a2dp_add_sep to accept struct btd_adapter
+  avdtp: Use refs to adapter and device instead of bdaddr_t
+  a2dp: Use btd_adapter ref in a2dp_server instead of bdaddr_t
+  avrcp: Convert to accept btd_adapter instead of bdaddr_t
+  avctp: Convert register/unregister to accept btd_adapter
+  avdtp: Replace avdtp_get_peers with adapter and device getters
+  audio: Use manager_get_device to get device object
+  audio: Make manager_get_device accept btd_device
+  audio: Simplify manager_find_device
+  avctp: Remove double looking for audio device
+
+ profiles/audio/a2dp.c    |  75 +++++++++++---------------
+ profiles/audio/a2dp.h    |   8 +--
+ profiles/audio/avctp.c   |  96 +++++++++++++++-------------------
+ profiles/audio/avctp.h   |   4 +-
+ profiles/audio/avdtp.c   | 119 ++++++++++++++++++------------------------
+ profiles/audio/avdtp.h   |  10 ++--
+ profiles/audio/avrcp.c   |  37 ++++++-------
+ profiles/audio/avrcp.h   |   6 +--
+ profiles/audio/manager.c | 133 +++++++++--------------------------------------
+ profiles/audio/manager.h |  17 +-----
+ profiles/audio/media.c   |  35 ++++++-------
+ profiles/audio/media.h   |   4 +-
+ profiles/audio/sink.c    |   5 +-
+ profiles/audio/source.c  |   5 +-
+ 14 files changed, 206 insertions(+), 348 deletions(-)
+
 -- 
 1.8.0
 
