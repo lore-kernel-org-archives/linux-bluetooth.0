@@ -2,189 +2,46 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 02/15] device: Add device_create_from_storage() function
-Date: Thu, 13 Dec 2012 21:39:17 +0100
-Message-Id: <1355431170-12897-2-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v2 03/15] adapter: Convert device profiles list
+Date: Thu, 13 Dec 2012 21:39:18 +0100
+Message-Id: <1355431170-12897-3-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1355431170-12897-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1355431170-12897-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This function is used from load_devices() of adapter.c
-during bluetoothd start-up to re-load known devices from
-storage key file.
-
-device_create() is used to create new devices for which
-no storage exists, but until all device load during start-up
-has been converted we should continue to call load_info().
 ---
- src/adapter.c |   10 +++++----
- src/device.c  |   69 ++++++++++++++++++++++++++++++++++++++++++++-------------
- src/device.h  |    2 ++
- 3 files changed, 61 insertions(+), 20 deletions(-)
+ src/adapter.c |    9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 15db015..940cc0a 100644
+index 940cc0a..3bb1ea6 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -1885,8 +1885,6 @@ static void load_devices(struct btd_adapter *adapter)
- 		if (ltk_info)
- 			ltks.keys = g_slist_append(ltks.keys, ltk_info);
- 
--		g_key_file_free(key_file);
--
- 		l = g_slist_find_custom(adapter->devices, entry->d_name,
- 					(GCompareFunc) device_address_cmp);
- 		if (l) {
-@@ -1894,9 +1892,10 @@ static void load_devices(struct btd_adapter *adapter)
- 			goto device_exist;
- 		}
- 
--		device = device_create(adapter, entry->d_name, BDADDR_BREDR);
-+		device = device_create_from_storage(adapter, entry->d_name,
-+							key_file);
- 		if (!device)
--			continue;
-+			goto free;
- 
- 		device_set_temporary(device, FALSE);
- 		adapter->devices = g_slist_append(adapter->devices, device);
-@@ -1906,6 +1905,9 @@ device_exist:
- 			device_set_paired(device, TRUE);
- 			device_set_bonded(device, TRUE);
- 		}
-+
-+free:
-+		g_key_file_free(key_file);
- 	}
- 
- 	closedir(dir);
-diff --git a/src/device.c b/src/device.c
-index 515ee61..e07e7b8 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1735,10 +1735,8 @@ failed:
+@@ -2553,6 +2553,12 @@ static void convert_ltk_entry(GKeyFile *key_file, void *value)
+ 	g_free(str);
  }
  
- static void load_info(struct btd_device *device, const gchar *local,
--			const gchar *peer)
-+			const gchar *peer, GKeyFile *key_file)
- {
--	char filename[PATH_MAX + 1];
--	GKeyFile *key_file;
- 	char *str;
- 	gboolean store_needed = FALSE;
- 	gboolean blocked;
-@@ -1747,12 +1745,6 @@ static void load_info(struct btd_device *device, const gchar *local,
- 	gboolean bredr = FALSE;
- 	gboolean le = FALSE;
- 
--	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info", local, peer);
--	filename[PATH_MAX] = '\0';
--
--	key_file = g_key_file_new();
--	g_key_file_load_from_file(key_file, filename, 0, NULL);
--
- 	/* Load device name from storage info file, if that fails fall back to
- 	 * the cache.
- 	 */
-@@ -1847,18 +1839,14 @@ next:
- 
- 	if (store_needed)
- 		store_device_info(device);
--
--	g_key_file_free(key_file);
- }
- 
--struct btd_device *device_create(struct btd_adapter *adapter,
--				const gchar *address, uint8_t bdaddr_type)
-+static struct btd_device *device_new(struct btd_adapter *adapter,
-+				const gchar *address)
- {
- 	gchar *address_up;
- 	struct btd_device *device;
- 	const gchar *adapter_path = adapter_get_path(adapter);
--	const bdaddr_t *src;
--	char srcaddr[18];
- 
- 	device = g_try_malloc0(sizeof(struct btd_device));
- 	if (device == NULL)
-@@ -1882,11 +1870,60 @@ struct btd_device *device_create(struct btd_adapter *adapter,
- 
- 	str2ba(address, &device->bdaddr);
- 	device->adapter = adapter;
-+
-+	return btd_device_ref(device);
++static void convert_profiles_entry(GKeyFile *key_file, void *value)
++{
++	g_strdelimit(value, " ", ';');
++	g_key_file_set_string(key_file, "General", "Profiles", value);
 +}
 +
-+struct btd_device *device_create_from_storage(struct btd_adapter *adapter,
-+				const char *address, GKeyFile *key_file)
-+{
-+	struct btd_device *device;
-+	const bdaddr_t *src;
-+	char srcaddr[18];
-+
-+	device = device_new(adapter, address);
-+	if (device == NULL)
-+		return NULL;
-+
-+	src = adapter_get_address(adapter);
-+	ba2str(src, srcaddr);
-+
-+	load_info(device, srcaddr, address, key_file);
-+
-+	return device;
-+}
-+
-+struct btd_device *device_create(struct btd_adapter *adapter,
-+				const gchar *address, uint8_t bdaddr_type)
-+{
-+	struct btd_device *device;
-+	const bdaddr_t *src;
-+	char srcaddr[18];
-+	char filename[PATH_MAX + 1];
-+	GKeyFile *key_file;
-+
-+	device = device_new(adapter, address);
-+	if (device == NULL)
-+		return NULL;
-+
- 	device->bdaddr_type = bdaddr_type;
- 	src = adapter_get_address(adapter);
- 	ba2str(src, srcaddr);
+ static void convert_entry(char *key, char *value, void *user_data)
+ {
+ 	struct device_converter *converter = user_data;
+@@ -2660,6 +2666,9 @@ static void convert_device_storage(struct btd_adapter *adapter)
+ 	/* Convert blocked */
+ 	convert_file("blocked", address, convert_blocked_entry, TRUE);
  
--	load_info(device, srcaddr, address);
-+	/*TODO: after all device load during start-up has been converted to
-+	 * new key file structure, this should be replaced by :
-+	 *	str = load_cached_name(device, srcaddr, address);
-+	 *	if (str) {
-+	 *		strcpy(device->name, str);
-+	 *		g_free(str);
-+	 *	}
-+	 */
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info", srcaddr,
-+			address);
-+	key_file = g_key_file_new();
-+	g_key_file_load_from_file(key_file, filename, 0, NULL);
-+	load_info(device, srcaddr, address, key_file);
-+	g_key_file_free(key_file);
++	/* Convert profiles */
++	convert_file("profiles", address, convert_profiles_entry, TRUE);
++
+ 	/* Convert linkkeys */
+ 	convert_file("linkkeys", address, convert_linkkey_entry, TRUE);
  
- 	return btd_device_ref(device);
- }
-diff --git a/src/device.h b/src/device.h
-index b569a71..a207a4f 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -28,6 +28,8 @@ struct btd_device;
- 
- struct btd_device *device_create(struct btd_adapter *adapter,
- 				const char *address, uint8_t bdaddr_type);
-+struct btd_device *device_create_from_storage(struct btd_adapter *adapter,
-+				const char *address, GKeyFile *key_file);
- 
- void device_set_name(struct btd_device *device, const char *name);
- void device_get_name(struct btd_device *device, char *name, size_t len);
 -- 
 1.7.9.5
 
