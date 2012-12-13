@@ -2,169 +2,132 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
 	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 13/15] adapter: Remove create_stored_device_from_primaries
-Date: Thu, 13 Dec 2012 21:39:28 +0100
-Message-Id: <1355431170-12897-13-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v2 12/15] adapter: Convert device primaries list
+Date: Thu, 13 Dec 2012 21:39:27 +0100
+Message-Id: <1355431170-12897-12-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1355431170-12897-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1355431170-12897-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Loading of primaries list is done by device_create_from_storage().
-
-As all device load during start-up has been converted, we can remove
-temporary hack in device_create().
 ---
- src/adapter.c |   80 ++-------------------------------------------------------
- src/device.c  |   22 +++++-----------
- 2 files changed, 8 insertions(+), 94 deletions(-)
+ src/adapter.c |   95 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 95 insertions(+)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 64d8ed3..80dbc77 100644
+index 02d54a3..64d8ed3 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -1725,80 +1725,6 @@ failed:
- 	return ltk;
+@@ -2762,6 +2762,88 @@ failed:
+ 	g_free(att_uuid);
  }
  
--static GSList *string_to_primary_list(char *str)
--{
--	GSList *l = NULL;
--	char **services;
--	int i;
--
--	if (str == NULL)
--		return NULL;
--
--	services = g_strsplit(str, " ", 0);
--	if (services == NULL)
--		return NULL;
--
--	for (i = 0; services[i]; i++) {
--		struct gatt_primary *prim;
--		int ret;
--
--		prim = g_new0(struct gatt_primary, 1);
--
--		ret = sscanf(services[i], "%04hX#%04hX#%s", &prim->range.start,
--							&prim->range.end, prim->uuid);
--
--		if (ret < 3) {
--			g_free(prim);
--			continue;
--		}
--
--		l = g_slist_append(l, prim);
--	}
--
--	g_strfreev(services);
--
--	return l;
--}
--
--static void create_stored_device_from_primaries(char *key, char *value,
--							void *user_data)
--{
--	struct btd_adapter *adapter = user_data;
--	struct btd_device *device;
--	GSList *services, *uuids, *l;
--	char address[18];
--	uint8_t bdaddr_type;
--
--	if (sscanf(key, "%17s#%hhu", address, &bdaddr_type) < 2)
--		return;
--
--	if (g_slist_find_custom(adapter->devices,
--			address, (GCompareFunc) device_address_cmp))
--		return;
--
--	device = device_create(adapter, address, bdaddr_type);
--	if (!device)
--		return;
--
--	device_set_temporary(device, FALSE);
--	adapter->devices = g_slist_append(adapter->devices, device);
--
--	services = string_to_primary_list(value);
--	if (services == NULL)
--		return;
--
--	for (l = services, uuids = NULL; l; l = l->next) {
--		struct gatt_primary *prim = l->data;
--		uuids = g_slist_append(uuids, prim->uuid);
--	}
--
--	device_register_primaries(device, services, -1);
--
--	device_probe_profiles(device, uuids);
--
--	g_slist_free(uuids);
--}
--
- static void load_devices(struct btd_adapter *adapter)
++static void convert_primaries_entry(char *key, char *value, void *user_data)
++{
++	char *address = user_data;
++	char device_type = -1;
++	uuid_t uuid;
++	char **services, **service, *prim_uuid;
++	char filename[PATH_MAX + 1];
++	GKeyFile *key_file;
++	int ret;
++	uint16_t start, end;
++	char uuid_str[MAX_LEN_UUID_STR + 1];
++	char *data;
++	gsize length = 0;
++
++	if (key[17] == '#') {
++		key[17] = '\0';
++		device_type = key[18] - '0';
++	}
++
++	if (bachk(key) != 0)
++		return;
++
++	services = g_strsplit(value, " ", 0);
++	if (services == NULL)
++		return;
++
++	sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
++	prim_uuid = bt_uuid2string(&uuid);
++
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/attributes", address,
++									key);
++	filename[PATH_MAX] = '\0';
++
++	key_file = g_key_file_new();
++	g_key_file_load_from_file(key_file, filename, 0, NULL);
++
++	for (service = services; *service; service++) {
++		ret = sscanf(*service, "%04hX#%04hX#%s", &start, &end,
++								uuid_str);
++		if (ret < 3)
++			continue;
++
++		bt_string2uuid(&uuid, uuid_str);
++		sdp_uuid128_to_uuid(&uuid);
++
++		store_attribute_uuid(key_file, start, prim_uuid, uuid);
++	}
++
++	g_strfreev(services);
++
++	data = g_key_file_to_data(key_file, &length, NULL);
++	if (length == 0)
++		goto end;
++
++	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
++	g_file_set_contents(filename, data, length, NULL);
++
++	if (device_type < 0)
++		goto end;
++
++	g_free(data);
++	g_key_file_free(key_file);
++
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info", address, key);
++	filename[PATH_MAX] = '\0';
++
++	key_file = g_key_file_new();
++	g_key_file_load_from_file(key_file, filename, 0, NULL);
++	set_device_type(key_file, device_type);
++
++	data = g_key_file_to_data(key_file, &length, NULL);
++	if (length > 0) {
++		create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
++		g_file_set_contents(filename, data, length, NULL);
++	}
++
++end:
++	g_free(data);
++	g_free(prim_uuid);
++	g_key_file_free(key_file);
++}
++
+ static void convert_device_storage(struct btd_adapter *adapter)
  {
  	char filename[PATH_MAX + 1];
-@@ -1811,10 +1737,6 @@ static void load_devices(struct btd_adapter *adapter)
+@@ -2795,6 +2877,19 @@ static void convert_device_storage(struct btd_adapter *adapter)
+ 	/* Convert profiles */
+ 	convert_file("profiles", address, convert_profiles_entry, TRUE);
  
- 	ba2str(&adapter->bdaddr, srcaddr);
- 
--	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "primaries");
--	textfile_foreach(filename, create_stored_device_from_primaries,
--								adapter);
--
- 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s", srcaddr);
- 	filename[PATH_MAX] = '\0';
- 
-@@ -1864,6 +1786,8 @@ static void load_devices(struct btd_adapter *adapter)
- 		device_set_temporary(device, FALSE);
- 		adapter->devices = g_slist_append(adapter->devices, device);
- 
-+		/* TODO: register services from pre-loaded list of primaries */
++	/* Convert primaries */
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/primaries", address);
++	filename[PATH_MAX] = '\0';
 +
- 		l = device_get_uuids(device);
- 		if (l)
- 			device_probe_profiles(device, l);
-diff --git a/src/device.c b/src/device.c
-index d49b397..fc37e51 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2013,8 +2013,7 @@ struct btd_device *device_create(struct btd_adapter *adapter,
- 	struct btd_device *device;
- 	const bdaddr_t *src;
- 	char srcaddr[18];
--	char filename[PATH_MAX + 1];
--	GKeyFile *key_file;
-+	char *str;
- 
- 	device = device_new(adapter, address);
- 	if (device == NULL)
-@@ -2024,20 +2023,11 @@ struct btd_device *device_create(struct btd_adapter *adapter,
- 	src = adapter_get_address(adapter);
- 	ba2str(src, srcaddr);
- 
--	/*TODO: after all device load during start-up has been converted to
--	 * new key file structure, this should be replaced by :
--	 *	str = load_cached_name(device, srcaddr, address);
--	 *	if (str) {
--	 *		strcpy(device->name, str);
--	 *		g_free(str);
--	 *	}
--	 */
--	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info", srcaddr,
--			address);
--	key_file = g_key_file_new();
--	g_key_file_load_from_file(key_file, filename, 0, NULL);
--	load_info(device, srcaddr, address, key_file);
--	g_key_file_free(key_file);
-+	str = load_cached_name(device, srcaddr, address);
-+	if (str) {
-+		strcpy(device->name, str);
-+		g_free(str);
++	str = textfile_get(filename, "converted");
++	if (str && strcmp(str, "yes") == 0) {
++		DBG("Legacy %s file already converted", filename);
++	} else {
++		textfile_foreach(filename, convert_primaries_entry, address);
++		textfile_put(filename, "converted", "yes");
 +	}
++	free(str);
++
+ 	/* Convert linkkeys */
+ 	convert_file("linkkeys", address, convert_linkkey_entry, TRUE);
  
- 	return btd_device_ref(device);
- }
 -- 
 1.7.9.5
 
