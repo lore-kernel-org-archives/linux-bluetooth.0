@@ -1,27 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 13 Dec 2012 22:15:27 +0200
+Date: Thu, 13 Dec 2012 22:15:06 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] core: Remove RequestSession and ReleaseSession
-Message-ID: <20121213201527.GB19914@x220.P-661HNU-F1>
-References: <1355428840-27065-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH] mgmt-api: Remove not needed restriction on add/remove
+ OOB data
+Message-ID: <20121213201506.GA19914@x220.P-661HNU-F1>
+References: <1355407852-22047-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1355428840-27065-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1355407852-22047-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Szymon,
 
-On Thu, Dec 13, 2012, Luiz Augusto von Dentz wrote:
-> Sessions is no longer used by obexd and the concept is probably not
-> relevant anymore since BlueZ 5 don't remember powered state anymore.
+On Thu, Dec 13, 2012, Szymon Janc wrote:
+> Those commands don't send any HCI commands to controller so there is no
+> need to restrict them to only powered up controller. This also clarify
+> that provided OOB data is persistent over power down/up toggles.
 > ---
->  doc/adapter-api.txt |  26 +---------
->  src/adapter.c       | 134 ----------------------------------------------------
->  2 files changed, 1 insertion(+), 159 deletions(-)
+>  doc/mgmt-api.txt | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 
-Both patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
