@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 06/13] alert: Append version to Alert interfaces
-Date: Fri, 14 Dec 2012 11:13:00 +0200
-Message-Id: <1355476387-2165-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 05/13] thermometer: Append version to Thermometer interfaces
+Date: Fri, 14 Dec 2012 11:12:59 +0200
+Message-Id: <1355476387-2165-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1355476387-2165-1-git-send-email-luiz.dentz@gmail.com>
 References: <1355476387-2165-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,77 +12,120 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- doc/alert-api.txt       | 4 ++--
- profiles/alert/server.c | 4 ++--
- src/bluetooth.conf      | 2 +-
- test/test-alert         | 4 ++--
- 4 files changed, 7 insertions(+), 7 deletions(-)
+ doc/thermometer-api.txt            |  6 +++---
+ profiles/thermometer/thermometer.c |  6 +++---
+ src/bluetooth.conf                 |  2 +-
+ test/test-thermometer              | 15 ++++++++++-----
+ 4 files changed, 17 insertions(+), 12 deletions(-)
 
-diff --git a/doc/alert-api.txt b/doc/alert-api.txt
-index bcaaaf3..65c065e 100644
---- a/doc/alert-api.txt
-+++ b/doc/alert-api.txt
-@@ -19,7 +19,7 @@ Alert hierarchy
- ===============
+diff --git a/doc/thermometer-api.txt b/doc/thermometer-api.txt
+index cab115f..c7c8a5d 100644
+--- a/doc/thermometer-api.txt
++++ b/doc/thermometer-api.txt
+@@ -7,7 +7,7 @@ Health Thermometer Manager hierarchy
+ ====================================
  
  Service		org.bluez
--Interface	org.bluez.Alert
-+Interface	org.bluez.Alert1
- Object path	/org/bluez
+-Interface	org.bluez.ThermometerManager
++Interface	org.bluez.ThermometerManager1
+ Object path	[variable prefix]/{hci0,hci1,...}
  
- Methods		void RegisterAlert(string category, object agent)
-@@ -79,7 +79,7 @@ Alert Agent hierarchy
- =====================
+ Methods		RegisterWatcher(object agent)
+@@ -44,7 +44,7 @@ Health Thermometer Profile hierarchy
+ ====================================
  
  Service		org.bluez
--Interface	org.bluez.AlertAgent
-+Interface	org.bluez.AlertAgent1
+-Interface	org.bluez.Thermometer
++Interface	org.bluez.Thermometer1
+ Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+ 
+ 
+@@ -77,7 +77,7 @@ Health Thermometer Watcher hierarchy
+ ====================================
+ 
+ Service		unique name
+-Interface	org.bluez.ThermometerWatcher
++Interface	org.bluez.ThermometerWatcher1
  Object path	freely definable
  
- Methods		void MuteOnce()
-diff --git a/profiles/alert/server.c b/profiles/alert/server.c
-index 20eb5fc..2e8c452 100644
---- a/profiles/alert/server.c
-+++ b/profiles/alert/server.c
-@@ -63,8 +63,8 @@
- #define SUPP_UNREAD_ALERT_CAT_CHR_UUID	0x2A48
+ Methods		void MeasurementReceived(dict measurement)
+diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
+index 537db99..15db33e 100644
+--- a/profiles/thermometer/thermometer.c
++++ b/profiles/thermometer/thermometer.c
+@@ -42,9 +42,9 @@
+ #include "attrib/gatt.h"
+ #include "thermometer.h"
  
- #define ALERT_OBJECT_PATH		"/org/bluez"
--#define ALERT_INTERFACE			"org.bluez.Alert"
--#define ALERT_AGENT_INTERFACE		"org.bluez.AlertAgent"
-+#define ALERT_INTERFACE			"org.bluez.Alert1"
-+#define ALERT_AGENT_INTERFACE		"org.bluez.AlertAgent1"
+-#define THERMOMETER_INTERFACE		"org.bluez.Thermometer"
+-#define THERMOMETER_MANAGER_INTERFACE	"org.bluez.ThermometerManager"
+-#define THERMOMETER_WATCHER_INTERFACE	"org.bluez.ThermometerWatcher"
++#define THERMOMETER_INTERFACE		"org.bluez.Thermometer1"
++#define THERMOMETER_MANAGER_INTERFACE	"org.bluez.ThermometerManager1"
++#define THERMOMETER_WATCHER_INTERFACE	"org.bluez.ThermometerWatcher1"
  
- /* Maximum length for "Text String Information" */
- #define NEW_ALERT_MAX_INFO_SIZE		18
+ /* Temperature measurement flag fields */
+ #define TEMP_UNITS		0x01
 diff --git a/src/bluetooth.conf b/src/bluetooth.conf
-index 5750f49..0e45935 100644
+index 137e4e4..5750f49 100644
 --- a/src/bluetooth.conf
 +++ b/src/bluetooth.conf
-@@ -16,7 +16,7 @@
+@@ -15,7 +15,7 @@
+     <allow send_interface="org.bluez.MediaEndpoint1"/>
      <allow send_interface="org.bluez.MediaPlayer1"/>
      <allow send_interface="org.bluez.Watcher"/>
-     <allow send_interface="org.bluez.ThermometerWatcher1"/>
--    <allow send_interface="org.bluez.AlertAgent"/>
-+    <allow send_interface="org.bluez.AlertAgent1"/>
+-    <allow send_interface="org.bluez.ThermometerWatcher"/>
++    <allow send_interface="org.bluez.ThermometerWatcher1"/>
+     <allow send_interface="org.bluez.AlertAgent"/>
      <allow send_interface="org.bluez.Profile1"/>
      <allow send_interface="org.bluez.HeartRateWatcher1"/>
-     <allow send_interface="org.bluez.CyclingSpeedWatcher1"/>
-diff --git a/test/test-alert b/test/test-alert
-index 1e241a3..066e537 100755
---- a/test/test-alert
-+++ b/test/test-alert
-@@ -9,8 +9,8 @@ import sys
- import os
+diff --git a/test/test-thermometer b/test/test-thermometer
+index fdb772f..6c143be 100755
+--- a/test/test-thermometer
++++ b/test/test-thermometer
+@@ -15,8 +15,13 @@ import dbus.mainloop.glib
+ from optparse import OptionParser, make_option
+ import bluezutils
  
- BUS_NAME = 'org.bluez'
--ALERT_INTERFACE = 'org.bluez.Alert'
--ALERT_AGENT_INTERFACE = 'org.bluez.AlertAgent'
-+ALERT_INTERFACE = 'org.bluez.Alert1'
-+ALERT_AGENT_INTERFACE = 'org.bluez.AlertAgent1'
- BLUEZ_OBJECT_PATH = '/org/bluez'
- TEST_OBJECT_PATH = '/org/bluez/test'
++BUS_NAME = 'org.bluez'
++THERMOMETER_MANAGER_INTERFACE = 'org.bluez.ThermometerManager1'
++THERMOMETER_WATCHER_INTERFACE = 'org.bluez.ThermometerWatcher1'
++THERMOMETER_INTERFACE = 'org.bluez.Thermometer1'
++
+ class Watcher(dbus.service.Object):
+-	@dbus.service.method("org.bluez.ThermometerWatcher",
++	@dbus.service.method(THERMOMETER_WATCHER_INTERFACE,
+ 					in_signature="oa{sv}", out_signature="")
+ 	def MeasurementReceived(self, device, measure):
+ 		print("%s measurement received from %s" % (measure["Measurement"], device))
+@@ -31,7 +36,7 @@ class Watcher(dbus.service.Object):
+ 			print("Type: ", measure["Type"])
  
+ def properties_changed(interface, changed, invalidated):
+-	if interface != "org.bluez.Thermometer":
++	if interface != THERMOMETER_INTERFACE:
+ 		return
+ 	for name, value in changed.iteritems():
+ 		print("Property %s changed:  %s" % (name, str(value)))
+@@ -63,15 +68,15 @@ if __name__ == "__main__":
+ 								options.adapter)
+ 	adapter_path = adapter.object_path
+ 
+-	thermometer_manager = dbus.Interface(bus.get_object("org.bluez",
+-				adapter_path), "org.bluez.ThermometerManager")
++	thermometer_manager = dbus.Interface(bus.get_object(BUS_NAME,
++				adapter_path), THERMOMETER_MANAGER_INTERFACE)
+ 
+ 	device = bluezutils.find_device_in_objects(managed_objects,
+ 								options.address,
+ 								options.adapter)
+ 	device_path = device.object_path
+ 
+-	bus.add_signal_receiver(properties_changed, bus_name="org.bluez",
++	bus.add_signal_receiver(properties_changed, bus_name=BUS_NAME,
+ 			path=device_path,
+ 			dbus_interface="org.freedesktop.DBus.Properties",
+ 			signal_name="PropertiesChanged")
 -- 
 1.7.11.7
 
