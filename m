@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 07/13] core: Append version to Agent interface
-Date: Fri, 14 Dec 2012 11:13:01 +0200
-Message-Id: <1355476387-2165-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 06/13] alert: Append version to Alert interfaces
+Date: Fri, 14 Dec 2012 11:13:00 +0200
+Message-Id: <1355476387-2165-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1355476387-2165-1-git-send-email-luiz.dentz@gmail.com>
 References: <1355476387-2165-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,229 +12,77 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- doc/agent-api.txt  |  2 +-
- src/agent.c        | 19 ++++++++++---------
- src/bluetooth.conf |  2 +-
- test/simple-agent  | 24 ++++++++++++++----------
- 4 files changed, 26 insertions(+), 21 deletions(-)
+ doc/alert-api.txt       | 4 ++--
+ profiles/alert/server.c | 4 ++--
+ src/bluetooth.conf      | 2 +-
+ test/test-alert         | 4 ++--
+ 4 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/doc/agent-api.txt b/doc/agent-api.txt
-index caed7f8..a1a8969 100644
---- a/doc/agent-api.txt
-+++ b/doc/agent-api.txt
-@@ -9,7 +9,7 @@ Agent hierarchy
+diff --git a/doc/alert-api.txt b/doc/alert-api.txt
+index bcaaaf3..65c065e 100644
+--- a/doc/alert-api.txt
++++ b/doc/alert-api.txt
+@@ -19,7 +19,7 @@ Alert hierarchy
  ===============
  
- Service		unique name
--Interface	org.bluez.Agent
-+Interface	org.bluez.Agent1
+ Service		org.bluez
+-Interface	org.bluez.Alert
++Interface	org.bluez.Alert1
+ Object path	/org/bluez
+ 
+ Methods		void RegisterAlert(string category, object agent)
+@@ -79,7 +79,7 @@ Alert Agent hierarchy
+ =====================
+ 
+ Service		org.bluez
+-Interface	org.bluez.AlertAgent
++Interface	org.bluez.AlertAgent1
  Object path	freely definable
  
- Methods		void Release()
-diff --git a/src/agent.c b/src/agent.c
-index ec183c0..b36738d 100644
---- a/src/agent.c
-+++ b/src/agent.c
-@@ -48,6 +48,7 @@
- #include "agent.h"
+ Methods		void MuteOnce()
+diff --git a/profiles/alert/server.c b/profiles/alert/server.c
+index 20eb5fc..2e8c452 100644
+--- a/profiles/alert/server.c
++++ b/profiles/alert/server.c
+@@ -63,8 +63,8 @@
+ #define SUPP_UNREAD_ALERT_CAT_CHR_UUID	0x2A48
  
- #define REQUEST_TIMEOUT (60 * 1000)		/* 60 seconds */
-+#define AGENT_INTERFACE "org.bluez.Agent1"
+ #define ALERT_OBJECT_PATH		"/org/bluez"
+-#define ALERT_INTERFACE			"org.bluez.Alert"
+-#define ALERT_AGENT_INTERFACE		"org.bluez.AlertAgent"
++#define ALERT_INTERFACE			"org.bluez.Alert1"
++#define ALERT_AGENT_INTERFACE		"org.bluez.AlertAgent1"
  
- typedef enum {
- 	AGENT_REQUEST_PASSKEY,
-@@ -91,7 +92,7 @@ static void agent_release(struct agent *agent)
- 		agent_cancel(agent);
- 
- 	message = dbus_message_new_method_call(agent->name, agent->path,
--			"org.bluez.Agent", "Release");
-+						AGENT_INTERFACE, "Release");
- 	if (message == NULL) {
- 		error("Couldn't allocate D-Bus message");
- 		return;
-@@ -108,7 +109,7 @@ static int send_cancel_request(struct agent_request *req)
- 							req->agent->path);
- 
- 	message = dbus_message_new_method_call(req->agent->name, req->agent->path,
--						"org.bluez.Agent", "Cancel");
-+						AGENT_INTERFACE, "Cancel");
- 	if (message == NULL) {
- 		error("Couldn't allocate D-Bus message");
- 		return -ENOMEM;
-@@ -301,7 +302,7 @@ static int agent_call_authorize_service(struct agent_request *req,
- 	struct agent *agent = req->agent;
- 
- 	req->msg = dbus_message_new_method_call(agent->name, agent->path,
--				"org.bluez.Agent", "AuthorizeService");
-+					AGENT_INTERFACE, "AuthorizeService");
- 	if (!req->msg) {
- 		error("Couldn't allocate D-Bus message");
- 		return -ENOMEM;
-@@ -413,7 +414,7 @@ static int pincode_request_new(struct agent_request *req, const char *device_pat
- 		secure pin. */
- 
- 	req->msg = dbus_message_new_method_call(agent->name, agent->path,
--					"org.bluez.Agent", "RequestPinCode");
-+					AGENT_INTERFACE, "RequestPinCode");
- 	if (req->msg == NULL) {
- 		error("Couldn't allocate D-Bus message");
- 		return -ENOMEM;
-@@ -507,7 +508,7 @@ static int passkey_request_new(struct agent_request *req,
- 	struct agent *agent = req->agent;
- 
- 	req->msg = dbus_message_new_method_call(agent->name, agent->path,
--					"org.bluez.Agent", "RequestPasskey");
-+					AGENT_INTERFACE, "RequestPasskey");
- 	if (req->msg == NULL) {
- 		error("Couldn't allocate D-Bus message");
- 		return -ENOMEM;
-@@ -563,7 +564,7 @@ static int confirmation_request_new(struct agent_request *req,
- 	struct agent *agent = req->agent;
- 
- 	req->msg = dbus_message_new_method_call(agent->name, agent->path,
--				"org.bluez.Agent", "RequestConfirmation");
-+				AGENT_INTERFACE, "RequestConfirmation");
- 	if (req->msg == NULL) {
- 		error("Couldn't allocate D-Bus message");
- 		return -ENOMEM;
-@@ -621,7 +622,7 @@ static int authorization_request_new(struct agent_request *req,
- 	struct agent *agent = req->agent;
- 
- 	req->msg = dbus_message_new_method_call(agent->name, agent->path,
--				"org.bluez.Agent", "RequestAuthorization");
-+				AGENT_INTERFACE, "RequestAuthorization");
- 	if (req->msg == NULL) {
- 		error("Couldn't allocate D-Bus message");
- 		return -ENOMEM;
-@@ -679,7 +680,7 @@ int agent_display_passkey(struct agent *agent, struct btd_device *device,
- 	const gchar *dev_path = device_get_path(device);
- 
- 	message = dbus_message_new_method_call(agent->name, agent->path,
--				"org.bluez.Agent", "DisplayPasskey");
-+					AGENT_INTERFACE, "DisplayPasskey");
- 	if (!message) {
- 		error("Couldn't allocate D-Bus message");
- 		return -1;
-@@ -754,7 +755,7 @@ static int display_pincode_request_new(struct agent_request *req,
- 	struct agent *agent = req->agent;
- 
- 	req->msg = dbus_message_new_method_call(agent->name, agent->path,
--					"org.bluez.Agent", "DisplayPinCode");
-+					AGENT_INTERFACE, "DisplayPinCode");
- 	if (req->msg == NULL) {
- 		error("Couldn't allocate D-Bus message");
- 		return -ENOMEM;
+ /* Maximum length for "Text String Information" */
+ #define NEW_ALERT_MAX_INFO_SIZE		18
 diff --git a/src/bluetooth.conf b/src/bluetooth.conf
-index 0e45935..8dfdc77 100644
+index 5750f49..0e45935 100644
 --- a/src/bluetooth.conf
 +++ b/src/bluetooth.conf
-@@ -10,7 +10,7 @@
-   <policy user="root">
-     <allow own="org.bluez"/>
-     <allow send_destination="org.bluez"/>
--    <allow send_interface="org.bluez.Agent"/>
-+    <allow send_interface="org.bluez.Agent1"/>
-     <allow send_interface="org.bluez.HandsfreeAgent"/>
-     <allow send_interface="org.bluez.MediaEndpoint1"/>
+@@ -16,7 +16,7 @@
      <allow send_interface="org.bluez.MediaPlayer1"/>
-diff --git a/test/simple-agent b/test/simple-agent
-index 15f2a32..312202a 100755
---- a/test/simple-agent
-+++ b/test/simple-agent
-@@ -11,6 +11,10 @@ import dbus.mainloop.glib
- from optparse import OptionParser
- import bluezutils
+     <allow send_interface="org.bluez.Watcher"/>
+     <allow send_interface="org.bluez.ThermometerWatcher1"/>
+-    <allow send_interface="org.bluez.AlertAgent"/>
++    <allow send_interface="org.bluez.AlertAgent1"/>
+     <allow send_interface="org.bluez.Profile1"/>
+     <allow send_interface="org.bluez.HeartRateWatcher1"/>
+     <allow send_interface="org.bluez.CyclingSpeedWatcher1"/>
+diff --git a/test/test-alert b/test/test-alert
+index 1e241a3..066e537 100755
+--- a/test/test-alert
++++ b/test/test-alert
+@@ -9,8 +9,8 @@ import sys
+ import os
  
-+BUS_NAME = 'org.bluez'
-+AGENT_INTERFACE = 'org.bluez.Agent1'
-+AGENT_PATH = "/test/agent"
-+
- bus = None
- device_obj = None
- dev_path = None
-@@ -40,14 +44,14 @@ class Agent(dbus.service.Object):
- 	def set_exit_on_release(self, exit_on_release):
- 		self.exit_on_release = exit_on_release
+ BUS_NAME = 'org.bluez'
+-ALERT_INTERFACE = 'org.bluez.Alert'
+-ALERT_AGENT_INTERFACE = 'org.bluez.AlertAgent'
++ALERT_INTERFACE = 'org.bluez.Alert1'
++ALERT_AGENT_INTERFACE = 'org.bluez.AlertAgent1'
+ BLUEZ_OBJECT_PATH = '/org/bluez'
+ TEST_OBJECT_PATH = '/org/bluez/test'
  
--	@dbus.service.method("org.bluez.Agent",
-+	@dbus.service.method(AGENT_INTERFACE,
- 					in_signature="", out_signature="")
- 	def Release(self):
- 		print("Release")
- 		if self.exit_on_release:
- 			mainloop.quit()
- 
--	@dbus.service.method("org.bluez.Agent",
-+	@dbus.service.method(AGENT_INTERFACE,
- 					in_signature="os", out_signature="")
- 	def AuthorizeService(self, device, uuid):
- 		print("AuthorizeService (%s, %s)" % (device, uuid))
-@@ -56,14 +60,14 @@ class Agent(dbus.service.Object):
- 			return
- 		raise Rejected("Connection rejected by user")
- 
--	@dbus.service.method("org.bluez.Agent",
-+	@dbus.service.method(AGENT_INTERFACE,
- 					in_signature="o", out_signature="s")
- 	def RequestPinCode(self, device):
- 		print("RequestPinCode (%s)" % (device))
- 		set_trusted(device)
- 		return ask("Enter PIN Code: ")
- 
--	@dbus.service.method("org.bluez.Agent",
-+	@dbus.service.method(AGENT_INTERFACE,
- 					in_signature="o", out_signature="u")
- 	def RequestPasskey(self, device):
- 		print("RequestPasskey (%s)" % (device))
-@@ -71,18 +75,18 @@ class Agent(dbus.service.Object):
- 		passkey = ask("Enter passkey: ")
- 		return dbus.UInt32(passkey)
- 
--	@dbus.service.method("org.bluez.Agent",
-+	@dbus.service.method(AGENT_INTERFACE,
- 					in_signature="ouq", out_signature="")
- 	def DisplayPasskey(self, device, passkey, entered):
- 		print("DisplayPasskey (%s, %06u entered %u)" %
- 						(device, passkey, entered))
- 
--	@dbus.service.method("org.bluez.Agent",
-+	@dbus.service.method(AGENT_INTERFACE,
- 					in_signature="os", out_signature="")
- 	def DisplayPinCode(self, device, pincode):
- 		print("DisplayPinCode (%s, %s)" % (device, pincode))
- 
--	@dbus.service.method("org.bluez.Agent",
-+	@dbus.service.method(AGENT_INTERFACE,
- 					in_signature="ou", out_signature="")
- 	def RequestConfirmation(self, device, passkey):
- 		print("RequestConfirmation (%s, %06d)" % (device, passkey))
-@@ -92,7 +96,7 @@ class Agent(dbus.service.Object):
- 			return
- 		raise Rejected("Passkey doesn't match")
- 
--	@dbus.service.method("org.bluez.Agent",
-+	@dbus.service.method(AGENT_INTERFACE,
- 					in_signature="o", out_signature="")
- 	def RequestAuthorization(self, device):
- 		print("RequestAuthorization (%s)" % (device))
-@@ -101,7 +105,7 @@ class Agent(dbus.service.Object):
- 			return
- 		raise Rejected("Pairing rejected")
- 
--	@dbus.service.method("org.bluez.Agent",
-+	@dbus.service.method(AGENT_INTERFACE,
- 					in_signature="s", out_signature="")
- 	def ConfirmModeChange(self, mode):
- 		print("ConfirmModeChange (%s)" % (mode))
-@@ -110,7 +114,7 @@ class Agent(dbus.service.Object):
- 			return
- 		raise Rejected("Mode change by user")
- 
--	@dbus.service.method("org.bluez.Agent",
-+	@dbus.service.method(AGENT_INTERFACE,
- 					in_signature="", out_signature="")
- 	def Cancel(self):
- 		print("Cancel")
 -- 
 1.7.11.7
 
