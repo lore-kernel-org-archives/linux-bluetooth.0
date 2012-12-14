@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v5 05/16] sbc: Add mmx primitive for 1b 8s analysis
-Date: Fri, 14 Dec 2012 16:03:26 +0100
-Message-Id: <1355497417-10357-6-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v5 13/16] sbc: Update sbcdec for msbc
+Date: Fri, 14 Dec 2012 16:03:34 +0100
+Message-Id: <1355497417-10357-14-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1355497417-10357-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1355497417-10357-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -14,45 +14,80 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- sbc/sbc_primitives_mmx.c |   18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ src/sbcdec.c |   17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/sbc/sbc_primitives_mmx.c b/sbc/sbc_primitives_mmx.c
-index 03070f5..21d7b74 100644
---- a/sbc/sbc_primitives_mmx.c
-+++ b/sbc/sbc_primitives_mmx.c
-@@ -276,6 +276,19 @@ static inline void sbc_analyze_4b_8s_mmx(struct sbc_encoder_state *state,
- 	__asm__ volatile ("emms\n");
+diff --git a/src/sbcdec.c b/src/sbcdec.c
+index 0077a82..37d2e98 100644
+--- a/src/sbcdec.c
++++ b/src/sbcdec.c
+@@ -44,7 +44,7 @@
+ 
+ static int verbose = 0;
+ 
+-static void decode(char *filename, char *output, int tofile)
++static void decode(char *filename, char *output, int tofile, int msbc)
+ {
+ 	unsigned char buf[BUF_SIZE], *stream;
+ 	struct stat st;
+@@ -98,7 +98,7 @@ static void decode(char *filename, char *output, int tofile)
+ 		goto free;
+ 	}
+ 
+-	sbc_init(&sbc, 0L);
++	sbc_init(&sbc, msbc ? SBC_MSBC : 0L);
+ 	sbc.endian = SBC_BE;
+ 
+ 	framelen = sbc_decode(&sbc, stream, streamlen, buf, sizeof(buf), &len);
+@@ -228,14 +228,16 @@ static void usage(void)
+ 
+ 	printf("Options:\n"
+ 		"\t-h, --help           Display help\n"
+-		"\t-v, --verbose        Verbose mode\n"
+ 		"\t-d, --device <dsp>   Sound device\n"
++		"\t-v, --verbose        Verbose mode\n"
++		"\t-m, --msbc           mSBC codec\n"
+ 		"\t-f, --file <file>    Decode to a file\n"
+ 		"\n");
  }
  
-+static inline void sbc_analyze_1b_8s_mmx(struct sbc_encoder_state *state,
-+		int16_t *x, int32_t *out, int out_stride)
-+{
-+	if (state->odd)
-+		sbc_analyze_eight_mmx(x, out, analysis_consts_fixed8_simd_odd);
-+	else
-+		sbc_analyze_eight_mmx(x, out, analysis_consts_fixed8_simd_even);
-+
-+	state->odd = !state->odd;
-+
-+	__asm__ volatile ("emms\n");
-+}
-+
- static void sbc_calc_scalefactors_mmx(
- 	int32_t sb_sample_f[16][2][8],
- 	uint32_t scale_factor[2][8],
-@@ -366,7 +379,10 @@ void sbc_init_primitives_mmx(struct sbc_encoder_state *state)
+ static struct option main_options[] = {
+ 	{ "help",	0, 0, 'h' },
++	{ "msbc",	0, 0, 'm' },
+ 	{ "device",	1, 0, 'd' },
+ 	{ "verbose",	0, 0, 'v' },
+ 	{ "file",	1, 0, 'f' },
+@@ -246,8 +248,9 @@ int main(int argc, char *argv[])
  {
- 	if (check_mmx_support()) {
- 		state->sbc_analyze_4s = sbc_analyze_4b_4s_mmx;
--		state->sbc_analyze_8s = sbc_analyze_4b_8s_mmx;
-+		if (state->increment == 1)
-+			state->sbc_analyze_8s = sbc_analyze_1b_8s_mmx;
-+		else
-+			state->sbc_analyze_8s = sbc_analyze_4b_8s_mmx;
- 		state->sbc_calc_scalefactors = sbc_calc_scalefactors_mmx;
- 		state->implementation_info = "MMX";
+ 	char *output = NULL;
+ 	int i, opt, tofile = 0;
++	int msbc = 0;
+ 
+-	while ((opt = getopt_long(argc, argv, "+hvd:f:",
++	while ((opt = getopt_long(argc, argv, "+hmvd:f:",
+ 						main_options, NULL)) != -1) {
+ 		switch(opt) {
+ 		case 'h':
+@@ -258,6 +261,10 @@ int main(int argc, char *argv[])
+ 			verbose = 1;
+ 			break;
+ 
++		case 'm':
++			msbc = 1;
++			break;
++
+ 		case 'd':
+ 			free(output);
+ 			output = strdup(optarg);
+@@ -285,7 +292,7 @@ int main(int argc, char *argv[])
  	}
+ 
+ 	for (i = 0; i < argc; i++)
+-		decode(argv[i], output ? output : "/dev/dsp", tofile);
++		decode(argv[i], output ? output : "/dev/dsp", tofile, msbc);
+ 
+ 	free(output);
+ 
 -- 
 1.7.9.5
 
