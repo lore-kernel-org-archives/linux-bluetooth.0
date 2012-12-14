@@ -1,38 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20121214092515.GA1521@x220>
-References: <1355476387-2165-1-git-send-email-luiz.dentz@gmail.com>
-	<20121214092515.GA1521@x220>
-Date: Fri, 14 Dec 2012 11:18:29 +0100
-Message-ID: <CACLukzKV27rWzLNo9BeNYqBxBgZ2jW_x6z4dRZbAMZBk3ehVPA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 01/13] network: Append version to Network and
- NetworkServer interfaces
-From: Santiago Carot <sancane@gmail.com>
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
+	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH] device: Fix memory leak in load_att_info()
+Date: Fri, 14 Dec 2012 10:43:22 +0100
+Message-Id: <1355478202-10022-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ src/device.c |   11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-2012/12/14 Johan Hedberg <johan.hedberg@gmail.com>:
-> Hi Luiz,
->
-> On Fri, Dec 14, 2012, Luiz Augusto von Dentz wrote:
->> ---
->>  doc/network-api.txt           | 4 ++--
->>  profiles/network/connection.c | 2 +-
->>  profiles/network/server.c     | 2 +-
->>  3 files changed, 4 insertions(+), 4 deletions(-)
->
-> All patches in this set have been applied. Thanks.
->
+diff --git a/src/device.c b/src/device.c
+index 7bde970..bb0db30 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1903,15 +1903,18 @@ static void load_att_info(struct btd_device *device, const gchar *local,
+ 	groups = g_key_file_get_groups(key_file, NULL);
+ 
+ 	for (handle = groups; *handle; handle++) {
++		gboolean uuid_ok;
++
+ 		str = g_key_file_get_string(key_file, *handle, "UUID", NULL);
+ 		if (!str)
+ 			continue;
+ 
+-		if (!g_str_equal(str, prim_uuid))
+-			continue;
+-
++		uuid_ok = g_str_equal(str, prim_uuid);
+ 		g_free(str);
+ 
++		if (!uuid_ok)
++			continue;
++
+ 		str = g_key_file_get_string(key_file, *handle, "Value", NULL);
+ 		if (!str)
+ 			continue;
+@@ -1938,6 +1941,8 @@ static void load_att_info(struct btd_device *device, const gchar *local,
+ 			}
+ 			break;
+ 		default:
++			g_free(str);
++			g_free(prim);
+ 			continue;
+ 		}
+ 
+-- 
+1.7.9.5
 
-just a few comments, Wouldn't it have been better to add an
-API_VERSION macro and stick it besides each interface?, I haven't gone
-deept through each patch but it just looks like you are only adding
-the version number to each interface. In the future it could be
-annoying to have to go through all the source code to increment just
-the version number.
-
-Regards.
