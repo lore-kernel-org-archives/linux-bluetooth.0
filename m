@@ -2,71 +2,76 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ 2/2] core: Remove unused emit_array_property_changed function
-Date: Fri, 14 Dec 2012 12:13:30 -0200
-Message-Id: <1355494410-24627-2-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1355494410-24627-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1355494410-24627-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ 1/2] core: Fix leftover signal for UUIDs property
+Date: Fri, 14 Dec 2012 12:13:29 -0200
+Message-Id: <1355494410-24627-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/dbus-common.c | 25 -------------------------
- src/dbus-common.h |  5 -----
- 2 files changed, 30 deletions(-)
+ src/device.c | 28 ++++++++--------------------
+ 1 file changed, 8 insertions(+), 20 deletions(-)
 
-diff --git a/src/dbus-common.c b/src/dbus-common.c
-index 42afa55..d466a8f 100644
---- a/src/dbus-common.c
-+++ b/src/dbus-common.c
-@@ -118,31 +118,6 @@ void dict_append_array(DBusMessageIter *dict, const char *key, int type,
- 	dbus_message_iter_close_container(dict, &entry);
+diff --git a/src/device.c b/src/device.c
+index 01c40a7..714fc72 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2442,23 +2442,6 @@ static void device_remove_profiles(struct btd_device *device, GSList *uuids)
+ 	}
  }
  
--dbus_bool_t emit_array_property_changed(const char *path,
--					const char *interface,
--					const char *name,
--					int type, void *value, int num)
+-static void uuids_changed(struct btd_device *device)
 -{
--	DBusMessage *signal;
--	DBusMessageIter iter;
+-	char **uuids;
+-	GSList *l;
+-	int i;
 -
--	signal = dbus_message_new_signal(path, interface, "PropertyChanged");
+-	uuids = g_new0(char *, g_slist_length(device->uuids) + 1);
+-	for (i = 0, l = device->uuids; l; l = l->next, i++)
+-		uuids[i] = l->data;
 -
--	if (!signal) {
--		error("Unable to allocate new %s.PropertyChanged signal",
--				interface);
--		return FALSE;
--	}
+-	emit_array_property_changed(device->path,
+-					DEVICE_INTERFACE, "UUIDs",
+-					DBUS_TYPE_STRING, &uuids, i);
 -
--	dbus_message_iter_init_append(signal, &iter);
--
--	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &name);
--
--	append_array_variant(&iter, type, value, num);
--
--	return g_dbus_send_message(connection, signal);
+-	g_free(uuids);
 -}
 -
- void set_dbus_connection(DBusConnection *conn)
+ static void store_sdp_record(GKeyFile *key_file, sdp_record_t *rec)
  {
- 	connection = conn;
-diff --git a/src/dbus-common.h b/src/dbus-common.h
-index 825560d..e2ea365 100644
---- a/src/dbus-common.h
-+++ b/src/dbus-common.h
-@@ -29,11 +29,6 @@ void dict_append_entry(DBusMessageIter *dict,
- void dict_append_array(DBusMessageIter *dict, const char *key, int type,
- 			void *val, int n_elements);
+ 	char handle_str[11];
+@@ -2803,7 +2786,9 @@ static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
+ 		device_remove_profiles(device, req->profiles_removed);
  
--dbus_bool_t emit_array_property_changed(const char *path,
--					const char *interface,
--					const char *name,
--					int type, void *value, int num);
--
- void set_dbus_connection(DBusConnection *conn);
- DBusConnection *btd_get_dbus_connection(void);
+ 	/* Propagate services changes */
+-	uuids_changed(req->device);
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++					req->device->path, DEVICE_INTERFACE,
++					"UUIDs");
  
+ send_reply:
+ 	device_svc_resolved(device, err);
+@@ -2966,7 +2951,8 @@ static void register_all_services(struct browse_req *req, GSList *services)
+ 	if (device->attios == NULL && device->attios_offline == NULL)
+ 		attio_cleanup(device);
+ 
+-	uuids_changed(device);
++	g_dbus_emit_property_changed(btd_get_dbus_connection(), device->path,
++						DEVICE_INTERFACE, "UUIDs");
+ 
+ 	device_svc_resolved(device, 0);
+ 
+@@ -4057,7 +4043,9 @@ void btd_device_add_uuid(struct btd_device *device, const char *uuid)
+ 	g_slist_free(uuid_list);
+ 
+ 	store_device_info(device);
+-	uuids_changed(device);
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(), device->path,
++						DEVICE_INTERFACE, "UUIDs");
+ }
+ 
+ static sdp_list_t *read_device_records(struct btd_device *device)
 -- 
 1.8.0.2
 
