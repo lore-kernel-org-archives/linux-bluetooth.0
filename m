@@ -1,49 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>,
-	Aloisio Almeida Jr <aloisio.almeida@openbossa.org>
-Subject: [PATCH 01/12] Bluetooth: Add HCI command to set advertising parameters
-Date: Fri, 14 Dec 2012 14:51:27 -0400
-Message-Id: <1355511098-10190-2-git-send-email-jefferson.delfes@openbossa.org>
-In-Reply-To: <1355511098-10190-1-git-send-email-jefferson.delfes@openbossa.org>
-References: <1355511098-10190-1-git-send-email-jefferson.delfes@openbossa.org>
+Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Subject: [PATCH 00/12] Add LE broadcaster and observer functionality
+Date: Fri, 14 Dec 2012 14:51:26 -0400
+Message-Id: <1355511098-10190-1-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add command to set advertising parameters before enable it.
+This patch series adds broadcaster and observer functionality.
 
-Signed-off-by: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Signed-off-by: Aloisio Almeida Jr <aloisio.almeida@openbossa.org>
----
- include/net/bluetooth/hci.h | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+For the userspace, we are updating our branch and we will send it in s few
+days.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 45eee08..e89311d 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -959,6 +959,20 @@ struct hci_cp_le_set_adv_data {
- 
- #define HCI_OP_LE_SET_ADV_ENABLE	0x200a
- 
-+#define ADV_USE_ALL_CHANNELS		0x07
-+
-+#define HCI_OP_LE_SET_ADV_PARAMS	0x2006
-+struct hci_cp_le_set_adv_params {
-+	__le16   interval_min;
-+	__le16   interval_max;
-+	__u8     type;
-+	__u8     own_address_type;
-+	__u8     direct_address_type;
-+	__u8     direct_address[6];
-+	__u8     channel_map;
-+	__u8     filter_policy;
-+} __packed;
-+
- #define HCI_OP_LE_SET_SCAN_PARAM	0x200b
- struct hci_cp_le_set_scan_param {
- 	__u8    type;
+Aloisio Almeida Jr (10):
+  Bluetooth: Set advertising parameters on LE setup
+  Bluetooth: Add set controller data MGMT command
+  Bluetooth: Add set broadcaster MGMT command
+  Bluetooth: Advertise controller data in broadcaster mode
+  Bluetooth: Stop to acquire hdev lock inside hci_update_ad
+  Bluetooth: Enable on-the-fly update of broadcast data
+  Bluetooth: Enable support for broadcaster mode when powered off.
+  Bluetooth: Refactor le scan helpers to enable observer support
+  Bluetooth: Add set observer MGMT command
+  Bluetooth: Enable support for observer mode when powered off.
+
+Jefferson Delfes (2):
+  Bluetooth: Add HCI command to set advertising parameters
+  Bluetooth: Add unset controller data MGMT command
+
+ include/net/bluetooth/hci.h      |  19 +++
+ include/net/bluetooth/hci_core.h |  42 ++++-
+ include/net/bluetooth/mgmt.h     |  21 +++
+ net/bluetooth/hci_core.c         | 183 ++++++++++++++++-----
+ net/bluetooth/hci_event.c        | 121 +++++++++-----
+ net/bluetooth/mgmt.c             | 335 +++++++++++++++++++++++++++++++++++++--
+ 6 files changed, 628 insertions(+), 93 deletions(-)
+
 -- 
 1.8.0.2
 
