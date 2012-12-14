@@ -1,64 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v5 00/16] mSBC tests
-Date: Fri, 14 Dec 2012 16:03:21 +0100
-Message-Id: <1355497417-10357-1-git-send-email-frederic.dalleau@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ 2/2] core: Remove unused emit_array_property_changed function
+Date: Fri, 14 Dec 2012 12:13:30 -0200
+Message-Id: <1355494410-24627-2-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1355494410-24627-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1355494410-24627-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ src/dbus-common.c | 25 -------------------------
+ src/dbus-common.h |  5 -----
+ 2 files changed, 30 deletions(-)
 
-v5 shoudl fix the few remaining issues.  I could test neon and armv6
-and raised verbosity of commit messages.
-
-However, before releasing a new version of the library, I believe we should
-write some sort of automated testing and test against another implementation.
-Siarhei shared a script some time ago, it could be a good start.
-But where could we store some decent audio materials? Should we use generators
-like sine wave, or just record ambient sound??
-
-Regards,
-Frederic
-
-
-Frédéric Dalleau (16):
-  sbc: Add encoder_state to analysis functions
-  sbc: Break 4 blocks processing to variable steps
-  sbc: Rename sbc_analyze_4b_xx to sbc_analyze_xx
-  sbc: add odd member variable to sbc_encoder_state
-  sbc: Add mmx primitive for 1b 8s analysis
-  sbc: Add armv6 primitive for 1b 8s analysis
-  sbc: Add iwmmxt primitive for 1b 8s encoding
-  sbc: Add plain C primitive for 1b 8s analysis
-  sbc: Use plain C primitive if doing msbc on neon
-  sbc: Fix input reordering for 15 blocks case
-  sbc: Add SBC_MSBC flag to enable 15 block encoding
-  sbc: Add support for mSBC frame header
-  sbc: Update sbcdec for msbc
-  sbc: Update sbcenc for msbc
-  sbc: Update sbcinfo for msbc
-  sbc: Update copyrights
-
- sbc/sbc.c                   |  289 +++++++++++++++++++++++++++----------------
- sbc/sbc.h                   |    3 +
- sbc/sbc_primitives.c        |   97 +++++++++++++--
- sbc/sbc_primitives.h        |   14 ++-
- sbc/sbc_primitives_armv6.c  |   26 +++-
- sbc/sbc_primitives_iwmmxt.c |   28 ++++-
- sbc/sbc_primitives_mmx.c    |   29 ++++-
- sbc/sbc_primitives_neon.c   |   12 +-
- src/sbcdec.c                |   18 ++-
- src/sbcenc.c                |   26 +++-
- src/sbcinfo.c               |   52 +++++---
- 11 files changed, 427 insertions(+), 167 deletions(-)
-
+diff --git a/src/dbus-common.c b/src/dbus-common.c
+index 42afa55..d466a8f 100644
+--- a/src/dbus-common.c
++++ b/src/dbus-common.c
+@@ -118,31 +118,6 @@ void dict_append_array(DBusMessageIter *dict, const char *key, int type,
+ 	dbus_message_iter_close_container(dict, &entry);
+ }
+ 
+-dbus_bool_t emit_array_property_changed(const char *path,
+-					const char *interface,
+-					const char *name,
+-					int type, void *value, int num)
+-{
+-	DBusMessage *signal;
+-	DBusMessageIter iter;
+-
+-	signal = dbus_message_new_signal(path, interface, "PropertyChanged");
+-
+-	if (!signal) {
+-		error("Unable to allocate new %s.PropertyChanged signal",
+-				interface);
+-		return FALSE;
+-	}
+-
+-	dbus_message_iter_init_append(signal, &iter);
+-
+-	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &name);
+-
+-	append_array_variant(&iter, type, value, num);
+-
+-	return g_dbus_send_message(connection, signal);
+-}
+-
+ void set_dbus_connection(DBusConnection *conn)
+ {
+ 	connection = conn;
+diff --git a/src/dbus-common.h b/src/dbus-common.h
+index 825560d..e2ea365 100644
+--- a/src/dbus-common.h
++++ b/src/dbus-common.h
+@@ -29,11 +29,6 @@ void dict_append_entry(DBusMessageIter *dict,
+ void dict_append_array(DBusMessageIter *dict, const char *key, int type,
+ 			void *val, int n_elements);
+ 
+-dbus_bool_t emit_array_property_changed(const char *path,
+-					const char *interface,
+-					const char *name,
+-					int type, void *value, int num);
+-
+ void set_dbus_connection(DBusConnection *conn);
+ DBusConnection *btd_get_dbus_connection(void);
+ 
 -- 
-1.7.9.5
+1.8.0.2
 
