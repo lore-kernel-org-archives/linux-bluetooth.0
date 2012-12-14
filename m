@@ -1,27 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 14 Dec 2012 11:25:15 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 01/13] network: Append version to Network and
- NetworkServer interfaces
-Message-ID: <20121214092515.GA1521@x220>
-References: <1355476387-2165-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 13/13] core: Remove org.bluez.Watcher from bluetooth.conf
+Date: Fri, 14 Dec 2012 11:13:07 +0200
+Message-Id: <1355476387-2165-13-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1355476387-2165-1-git-send-email-luiz.dentz@gmail.com>
+References: <1355476387-2165-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Dec 14, 2012, Luiz Augusto von Dentz wrote:
-> ---
->  doc/network-api.txt           | 4 ++--
->  profiles/network/connection.c | 2 +-
->  profiles/network/server.c     | 2 +-
->  3 files changed, 4 insertions(+), 4 deletions(-)
+This interface is not used anywhere
+---
+ src/bluetooth.conf | 1 -
+ 1 file changed, 1 deletion(-)
 
-All patches in this set have been applied. Thanks.
+diff --git a/src/bluetooth.conf b/src/bluetooth.conf
+index e5da643..0495200 100644
+--- a/src/bluetooth.conf
++++ b/src/bluetooth.conf
+@@ -13,7 +13,6 @@
+     <allow send_interface="org.bluez.Agent1"/>
+     <allow send_interface="org.bluez.MediaEndpoint1"/>
+     <allow send_interface="org.bluez.MediaPlayer1"/>
+-    <allow send_interface="org.bluez.Watcher"/>
+     <allow send_interface="org.bluez.ThermometerWatcher1"/>
+     <allow send_interface="org.bluez.AlertAgent1"/>
+     <allow send_interface="org.bluez.Profile1"/>
+-- 
+1.7.11.7
 
-Johan
