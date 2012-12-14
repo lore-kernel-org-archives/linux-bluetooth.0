@@ -1,47 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 02/13] audio: Append version to Control interface
-Date: Fri, 14 Dec 2012 11:12:56 +0200
-Message-Id: <1355476387-2165-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1355476387-2165-1-git-send-email-luiz.dentz@gmail.com>
-References: <1355476387-2165-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 01/13] network: Append version to Network and NetworkServer interfaces
+Date: Fri, 14 Dec 2012 11:12:55 +0200
+Message-Id: <1355476387-2165-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- doc/control-api.txt      | 2 +-
- profiles/audio/control.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ doc/network-api.txt           | 4 ++--
+ profiles/network/connection.c | 2 +-
+ profiles/network/server.c     | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/doc/control-api.txt b/doc/control-api.txt
-index 55cebe8..5fc8991 100644
---- a/doc/control-api.txt
-+++ b/doc/control-api.txt
-@@ -9,7 +9,7 @@ Control hierarchy
+diff --git a/doc/network-api.txt b/doc/network-api.txt
+index b640b9a..1c9d889 100644
+--- a/doc/network-api.txt
++++ b/doc/network-api.txt
+@@ -8,7 +8,7 @@ Network hierarchy
  =================
  
  Service		org.bluez
--Interface	org.bluez.Control
-+Interface	org.bluez.Control1
+-Interface	org.bluez.Network
++Interface	org.bluez.Network1
  Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
  
- Methods		void Play()
-diff --git a/profiles/audio/control.h b/profiles/audio/control.h
-index 800a151..878dd1e 100644
---- a/profiles/audio/control.h
-+++ b/profiles/audio/control.h
-@@ -22,7 +22,7 @@
-  *
-  */
+ Properties	boolean Connected [readonly]
+@@ -28,7 +28,7 @@ Network server hierarchy
+ ========================
  
--#define AUDIO_CONTROL_INTERFACE "org.bluez.Control"
-+#define AUDIO_CONTROL_INTERFACE "org.bluez.Control1"
+ Service		org.bluez
+-Interface	org.bluez.NetworkServer
++Interface	org.bluez.NetworkServer1
+ Object path	/org/bluez/{hci0,hci1,...}
  
- struct control *control_init(struct audio_device *dev, GSList *uuids);
- void control_update(struct control *control, GSList *uuids);
+ Methods		void Register(string uuid, string bridge)
+diff --git a/profiles/network/connection.c b/profiles/network/connection.c
+index 3157e31..5fa3e1b 100644
+--- a/profiles/network/connection.c
++++ b/profiles/network/connection.c
+@@ -49,7 +49,7 @@
+ #include "manager.h"
+ #include "connection.h"
+ 
+-#define NETWORK_PEER_INTERFACE "org.bluez.Network"
++#define NETWORK_PEER_INTERFACE "org.bluez.Network1"
+ #define CON_SETUP_RETRIES      3
+ #define CON_SETUP_TO           9
+ 
+diff --git a/profiles/network/server.c b/profiles/network/server.c
+index e32e51d..2869c28 100644
+--- a/profiles/network/server.c
++++ b/profiles/network/server.c
+@@ -51,7 +51,7 @@
+ #include "common.h"
+ #include "server.h"
+ 
+-#define NETWORK_SERVER_INTERFACE "org.bluez.NetworkServer"
++#define NETWORK_SERVER_INTERFACE "org.bluez.NetworkServer1"
+ #define SETUP_TIMEOUT		1
+ 
+ /* Pending Authorization */
 -- 
 1.7.11.7
 
