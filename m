@@ -4,55 +4,42 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v5 08/16] sbc: Add plain C primitive for 1b 8s analysis
-Date: Fri, 14 Dec 2012 16:03:29 +0100
-Message-Id: <1355497417-10357-9-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v5 09/16] sbc: Use plain C primitive if doing msbc on neon
+Date: Fri, 14 Dec 2012 16:03:30 +0100
+Message-Id: <1355497417-10357-10-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1355497417-10357-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1355497417-10357-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+neon has it's own optimized input reordering. Until this code gets optimized,
+the neon assembly code will not work with the mSBC input reordering.
+However, the plain C version of mSBC can be used in this case.
+This patch makes use of plain C code if the block increment is 1 which is
+typical for mSBC.
 ---
- sbc/sbc_primitives.c |   18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ sbc/sbc_primitives.c |    8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
-index 0b48ddb..a4767ef 100644
+index a4767ef..319e625 100644
 --- a/sbc/sbc_primitives.c
 +++ b/sbc/sbc_primitives.c
-@@ -209,6 +209,19 @@ static inline void sbc_analyze_4b_8s_simd(struct sbc_encoder_state *state,
- 	sbc_analyze_eight_simd(x + 0, out, analysis_consts_fixed8_simd_even);
- }
- 
-+static inline void sbc_analyze_1b_8s_simd(struct sbc_encoder_state *state,
-+		int16_t *x, int32_t *out, int out_stride)
-+{
-+	if (state->odd)
-+		sbc_analyze_eight_simd(x, out,
-+					analysis_consts_fixed8_simd_odd);
-+	else
-+		sbc_analyze_eight_simd(x, out,
-+					analysis_consts_fixed8_simd_even);
+@@ -568,5 +568,13 @@ void sbc_init_primitives(struct sbc_encoder_state *state)
+ #endif
+ #ifdef SBC_BUILD_WITH_NEON_SUPPORT
+ 	sbc_init_primitives_neon(state);
 +
-+	state->odd = !state->odd;
-+}
-+
- static inline int16_t unaligned16_be(const uint8_t *ptr)
- {
- 	return (int16_t) ((ptr[0] << 8) | ptr[1]);
-@@ -525,7 +538,10 @@ void sbc_init_primitives(struct sbc_encoder_state *state)
- 
- 	/* Default implementation for analyze functions */
- 	state->sbc_analyze_4s = sbc_analyze_4b_4s_simd;
--	state->sbc_analyze_8s = sbc_analyze_4b_8s_simd;
-+	if (state->increment == 1)
++	if (state->increment == 1) {
 +		state->sbc_analyze_8s = sbc_analyze_1b_8s_simd;
-+	else
-+		state->sbc_analyze_8s = sbc_analyze_4b_8s_simd;
- 
- 	/* Default implementation for input reordering / deinterleaving */
- 	state->sbc_enc_process_input_4s_le = sbc_enc_process_input_4s_le;
++		state->sbc_enc_process_input_4s_le = sbc_enc_process_input_4s_le;
++		state->sbc_enc_process_input_4s_be = sbc_enc_process_input_4s_be;
++		state->sbc_enc_process_input_8s_le = sbc_enc_process_input_8s_le;
++		state->sbc_enc_process_input_8s_be = sbc_enc_process_input_8s_be;
++	}
+ #endif
+ }
 -- 
 1.7.9.5
 
