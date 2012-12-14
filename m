@@ -1,42 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jefferson Delfes <jefferson.delfes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [PATCH 00/12] Add LE broadcaster and observer functionality
-Date: Fri, 14 Dec 2012 14:51:26 -0400
-Message-Id: <1355511098-10190-1-git-send-email-jefferson.delfes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1355503519-26573-3-git-send-email-frederic.danis@linux.intel.com>
+References: <1355503519-26573-1-git-send-email-frederic.danis@linux.intel.com>
+	<1355503519-26573-3-git-send-email-frederic.danis@linux.intel.com>
+Date: Fri, 14 Dec 2012 13:31:04 -0400
+Message-ID: <CAJdJm_M+6CbRr-uyfsqZtfvPtKiPYxq9H2bf1D0E5zot4TUHNw@mail.gmail.com>
+Subject: Re: [PATCH 3/5] adapter: Convert ccc file
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Danis?=
+	<frederic.danis@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch series adds broadcaster and observer functionality.
+Hi Frédéric,
 
-For the userspace, we are updating our branch and we will send it in s few
-days.
+On Fri, Dec 14, 2012 at 12:45 PM, Frédéric Danis
+<frederic.danis@linux.intel.com> wrote:
+> ---
+>  doc/settings-storage.txt |   14 +++++++++++
+>  src/adapter.c            |   63 ++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 77 insertions(+)
+>
+> diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
+> index 11b127f..ced51d9 100644
+> --- a/doc/settings-storage.txt
+> +++ b/doc/settings-storage.txt
+> @@ -31,6 +31,7 @@ contains:
+>     contains:
+>      - an info file
+>      - an attributes file containing attributes of remote LE services
+> +    - a ccc file containing CCC info of remote LE services
 
-Aloisio Almeida Jr (10):
-  Bluetooth: Set advertising parameters on LE setup
-  Bluetooth: Add set controller data MGMT command
-  Bluetooth: Add set broadcaster MGMT command
-  Bluetooth: Advertise controller data in broadcaster mode
-  Bluetooth: Stop to acquire hdev lock inside hci_update_ad
-  Bluetooth: Enable on-the-fly update of broadcast data
-  Bluetooth: Enable support for broadcaster mode when powered off.
-  Bluetooth: Refactor le scan helpers to enable observer support
-  Bluetooth: Add set observer MGMT command
-  Bluetooth: Enable support for observer mode when powered off.
+Just a few textual improvements:
 
-Jefferson Delfes (2):
-  Bluetooth: Add HCI command to set advertising parameters
-  Bluetooth: Add unset controller data MGMT command
+"- a ccc file containing persistent Client Characteristic
+Configuration (CCC) descriptor information for GATT characteristics"
 
- include/net/bluetooth/hci.h      |  19 +++
- include/net/bluetooth/hci_core.h |  42 ++++-
- include/net/bluetooth/mgmt.h     |  21 +++
- net/bluetooth/hci_core.c         | 183 ++++++++++++++++-----
- net/bluetooth/hci_event.c        | 121 +++++++++-----
- net/bluetooth/mgmt.c             | 335 +++++++++++++++++++++++++++++++++++++--
- 6 files changed, 628 insertions(+), 93 deletions(-)
+> +CCC file format
+> +======================
+> +
+> +The ccc file stores CCC  informations related to remote device.
+> +
+> +Informations are stored using their handle as group name (decimal format).
 
+"""
+The ccc file stores the current CCC descriptor values for GATT
+characteristics which have notification/indication enabled by the
+remote device.
+
+Information is stored using CCC attribute handle as group name (in
+decimal format).
+"""
+
+> +
+> +Each group contains:
+> +
+> +  Value                        String          Value of the CCC as hexadecimal encoded
+
+"CCC descriptor value encoded in hexadecimal"
+
+> +                                       string
+> +
+
+Everything else looks good as per my review.
+
+Best Regards,
 -- 
-1.8.0.2
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
