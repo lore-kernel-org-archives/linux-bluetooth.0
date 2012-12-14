@@ -1,157 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/5] device: Store services in device's attributes file
-Date: Sat, 15 Dec 2012 09:59:48 +0100
-Message-Id: <1355561991-7906-2-git-send-email-frederic.danis@linux.intel.com>
-In-Reply-To: <1355561991-7906-1-git-send-email-frederic.danis@linux.intel.com>
-References: <1355561991-7906-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+Subject: [PATCH BlueZ 2/4] obex-client: Port session code to use D-Bus properties interface
+Date: Fri, 14 Dec 2012 23:31:58 +0200
+Message-Id: <1355520720-11731-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1355520720-11731-1-git-send-email-luiz.dentz@gmail.com>
+References: <1355520720-11731-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remove no more used write_device_primaries() from storage.[ch].
----
- src/device.c  |   73 +++++++++++++++++++++++++++++++++++++++++----------------
- src/storage.c |   15 ------------
- src/storage.h |    2 --
- 3 files changed, 53 insertions(+), 37 deletions(-)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/src/device.c b/src/device.c
-index 780a496..d6a6f04 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2872,37 +2872,70 @@ static void init_browse(struct browse_req *req, gboolean reverse)
- 						l->data);
+---
+ doc/obex-client-api.txt |  6 +---
+ obexd/client/session.c  | 86 ++++++++++++++++++++++++++++---------------------
+ 2 files changed, 51 insertions(+), 41 deletions(-)
+
+diff --git a/doc/obex-client-api.txt b/doc/obex-client-api.txt
+index 19c8541..f516760 100644
+--- a/doc/obex-client-api.txt
++++ b/doc/obex-client-api.txt
+@@ -43,11 +43,7 @@ Service		org.bluez.obex.client
+ Interface	org.bluez.obex.Session
+ Object path	[variable prefix]/{session0,session1,...}
+ 
+-Methods		dict GetProperties()
+-
+-			Returns all properties for the session.
+-
+-		string GetCapabilities()
++Methods		string GetCapabilities()
+ 
+ 			Get remote device capabilities.
+ 
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index 2bac229..40d6c9c 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -524,39 +524,6 @@ void obc_session_shutdown(struct obc_session *session)
+ 	obc_session_unref(session);
  }
  
--static char *primary_list_to_string(GSList *primary_list)
-+static void store_services(struct btd_device *device)
- {
--	GString *services;
-+	struct btd_adapter *adapter = device->adapter;
-+	char filename[PATH_MAX + 1];
-+	char src_addr[18], dst_addr[18];
-+	uuid_t uuid;
-+	char *prim_uuid;
-+	GKeyFile *key_file;
- 	GSList *l;
-+	char *data;
-+	gsize length = 0;
- 
--	services = g_string_new(NULL);
-+	sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
-+	prim_uuid = bt_uuid2string(&uuid);
- 
--	for (l = primary_list; l; l = l->next) {
--		struct gatt_primary *primary = l->data;
--		char service[64];
-+	ba2str(adapter_get_address(adapter), src_addr);
-+	ba2str(&device->bdaddr, dst_addr);
- 
--		memset(service, 0, sizeof(service));
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/attributes", src_addr,
-+								dst_addr);
-+	filename[PATH_MAX] = '\0';
- 
--		snprintf(service, sizeof(service), "%04X#%04X#%s ",
--				primary->range.start, primary->range.end, primary->uuid);
-+	key_file = g_key_file_new();
- 
--		services = g_string_append(services, service);
--	}
-+	for (l = device->primaries; l; l = l->next) {
-+		struct gatt_primary *primary = l->data;
-+		char handle[6], uuid_str[33];
-+		int i;
- 
--	return g_string_free(services, FALSE);
--}
-+		sprintf(handle, "%hu", primary->range.start);
- 
--static void store_services(struct btd_device *device)
+-static DBusMessage *session_get_properties(DBusConnection *connection,
+-				DBusMessage *message, void *user_data)
 -{
--	struct btd_adapter *adapter = device->adapter;
--	char *str = primary_list_to_string(device->primaries);
-+		bt_string2uuid(&uuid, primary->uuid);
-+		sdp_uuid128_to_uuid(&uuid);
- 
--	write_device_primaries(adapter_get_address(adapter), &device->bdaddr,
--						device->bdaddr_type, str);
-+		switch (uuid.type) {
-+		case SDP_UUID16:
-+			sprintf(uuid_str, "%4.4X", uuid.value.uuid16);
-+			break;
-+		case SDP_UUID32:
-+			sprintf(uuid_str, "%8.8X", uuid.value.uuid32);
-+			break;
-+		case SDP_UUID128:
-+			for (i = 0; i < 16; i++)
-+				sprintf(uuid_str + (i * 2), "%2.2X",
-+						uuid.value.uuid128.data[i]);
-+			break;
-+		default:
-+			uuid_str[0] = '\0';
-+		}
- 
--	g_free(str);
-+		g_key_file_set_string(key_file, handle, "UUID", prim_uuid);
-+		g_key_file_set_string(key_file, handle, "Value", uuid_str);
-+		g_key_file_set_integer(key_file, handle, "EndGroupHandle",
-+					primary->range.end);
-+	}
-+
-+	data = g_key_file_to_data(key_file, &length, NULL);
-+	if (length > 0) {
-+		create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-+		g_file_set_contents(filename, data, length, NULL);
-+	}
-+
-+	g_free(data);
-+	g_key_file_free(key_file);
- }
- 
- static void attio_connected(gpointer data, gpointer user_data)
-diff --git a/src/storage.c b/src/storage.c
-index 713a421..02ac1f3 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -273,21 +273,6 @@ int read_device_pairable(const bdaddr_t *bdaddr, gboolean *mode)
- 	return 0;
- }
- 
--int write_device_primaries(const bdaddr_t *sba, const bdaddr_t *dba,
--			  uint8_t bdaddr_type, const char *services)
--{
--	char filename[PATH_MAX + 1], key[20];
+-	struct obc_session *session = user_data;
+-	DBusMessage *reply;
+-	DBusMessageIter iter, dict;
 -
--	create_filename(filename, PATH_MAX, sba, "primaries");
+-	reply = dbus_message_new_method_return(message);
+-	if (!reply)
+-		return NULL;
 -
--	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+-	dbus_message_iter_init_append(reply, &iter);
 -
--	ba2str(dba, key);
--	sprintf(&key[17], "#%hhu", bdaddr_type);
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
 -
--	return textfile_put(filename, key, services);
+-	if (session->source != NULL)
+-		obex_dbus_dict_append(&dict, "Source", DBUS_TYPE_STRING,
+-							&session->source);
+-
+-	obex_dbus_dict_append(&dict, "Destination", DBUS_TYPE_STRING,
+-							&session->destination);
+-
+-	obex_dbus_dict_append(&dict, "Channel", DBUS_TYPE_BYTE,
+-							&session->channel);
+-
+-	dbus_message_iter_close_container(&iter, &dict);
+-
+-	return reply;
 -}
 -
- static void filter_keys(char *key, char *value, void *data)
+ static void capabilities_complete_callback(struct obc_session *session,
+ 						struct obc_transfer *transfer,
+ 						GError *err, void *user_data)
+@@ -621,16 +588,63 @@ fail:
+ 
+ }
+ 
++static gboolean get_source(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct obc_session *session = data;
++
++	if (session->source == NULL)
++		return FALSE;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
++							&session->source);
++
++	return TRUE;
++}
++
++static gboolean source_exists(const GDBusPropertyTable *property, void *data)
++{
++	struct obc_session *session = data;
++
++	return session->source != NULL;
++}
++
++static gboolean get_destination(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct obc_session *session = data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
++							&session->destination);
++
++	return TRUE;
++}
++
++static gboolean get_channel(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct obc_session *session = data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
++							&session->channel);
++
++	return TRUE;
++}
++
+ static const GDBusMethodTable session_methods[] = {
+-	{ GDBUS_METHOD("GetProperties",
+-				NULL, GDBUS_ARGS({ "properties", "a{sv}" }),
+-				session_get_properties) },
+ 	{ GDBUS_ASYNC_METHOD("GetCapabilities",
+ 				NULL, GDBUS_ARGS({ "capabilities", "s" }),
+ 				get_capabilities) },
+ 	{ }
+ };
+ 
++static const GDBusPropertyTable session_properties[] = {
++	{ "Source", "s", get_source, NULL, source_exists },
++	{ "Destination", "s", get_destination },
++	{ "Channel", "y", get_channel },
++	{ }
++};
++
+ static gboolean session_queue_complete(gpointer data)
  {
- 	struct match *match = data;
-diff --git a/src/storage.h b/src/storage.h
-index d150f15..682523a 100644
---- a/src/storage.h
-+++ b/src/storage.h
-@@ -35,8 +35,6 @@ ssize_t read_pin_code(const bdaddr_t *local, const bdaddr_t *peer, char *pin);
- sdp_record_t *record_from_string(const gchar *str);
- sdp_record_t *find_record_in_list(sdp_list_t *recs, const char *uuid);
- int read_device_pairable(const bdaddr_t *local, gboolean *mode);
--int write_device_primaries(const bdaddr_t *sba, const bdaddr_t *dba,
--				uint8_t bdaddr_type, const char *services);
- int read_device_ccc(const bdaddr_t *local, const bdaddr_t *peer,
- 			uint8_t bdaddr_type, uint16_t handle, uint16_t *value);
- int write_device_ccc(const bdaddr_t *local, const bdaddr_t *peer,
+ 	struct obc_session *session = data;
 -- 
-1.7.9.5
+1.7.11.7
 
