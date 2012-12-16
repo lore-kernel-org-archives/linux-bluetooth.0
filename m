@@ -1,29 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 16 Dec 2012 13:33:49 +0200
+Date: Sun, 16 Dec 2012 13:28:18 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
-	<frederic.danis@linux.intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/5] device : Add EndGroupHandle key in attributes
- storage
-Message-ID: <20121216113349.GC19264@x220.Elisa>
-References: <1355561991-7906-1-git-send-email-frederic.danis@linux.intel.com>
+Subject: Re: [PATCH BlueZ 1/4] obex-client: Port MAP module to use D-Bus
+ properties interface
+Message-ID: <20121216112818.GB19264@x220.Elisa>
+References: <1355520720-11731-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1355561991-7906-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1355520720-11731-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+Hi Luiz,
 
-On Sat, Dec 15, 2012, Frédéric Danis wrote:
-> End group handle should also be converted/saved for each
-> group in device's attributes file.
+On Fri, Dec 14, 2012, Luiz Augusto von Dentz wrote:
 > ---
->  doc/settings-storage.txt |    8 +++++---
->  src/adapter.c            |    8 +++++---
->  src/device.c             |   10 ++++++++++
->  3 files changed, 20 insertions(+), 6 deletions(-)
+>  obexd/client/map.c | 315 ++++++++++++++++++++++++++++++-----------------------
+>  1 file changed, 178 insertions(+), 137 deletions(-)
 
 All patches in this set have been applied. Thanks.
 
