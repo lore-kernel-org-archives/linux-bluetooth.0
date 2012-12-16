@@ -1,25 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 16 Dec 2012 13:28:18 +0200
+Date: Sun, 16 Dec 2012 13:25:44 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/4] obex-client: Port MAP module to use D-Bus
- properties interface
-Message-ID: <20121216112818.GB19264@x220.Elisa>
-References: <1355520720-11731-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] core: Fix leftover signal for UUIDs property
+Message-ID: <20121216112544.GA19264@x220.Elisa>
+References: <1355494410-24627-1-git-send-email-lucas.demarchi@profusion.mobi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1355520720-11731-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1355494410-24627-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Lucas,
 
-On Fri, Dec 14, 2012, Luiz Augusto von Dentz wrote:
+On Fri, Dec 14, 2012, Lucas De Marchi wrote:
 > ---
->  obexd/client/map.c | 315 ++++++++++++++++++++++++++++++-----------------------
->  1 file changed, 178 insertions(+), 137 deletions(-)
+>  src/device.c | 28 ++++++++--------------------
+>  1 file changed, 8 insertions(+), 20 deletions(-)
 
-All patches in this set have been applied. Thanks.
+Both patches have been applied. Thanks.
 
 Johan
