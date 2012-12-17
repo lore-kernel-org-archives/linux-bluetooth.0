@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 5/5] TODO: Mark Convert obexd & obex-client to ObjectManager/Properties as done
-Date: Mon, 17 Dec 2012 13:50:07 +0200
-Message-Id: <1355745007-1493-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/5] obexd: Remove SessionCreated and SessionRemoved signals
+Date: Mon, 17 Dec 2012 13:50:05 +0200
+Message-Id: <1355745007-1493-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1355745007-1493-1-git-send-email-luiz.dentz@gmail.com>
 References: <1355745007-1493-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,32 +11,72 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+With ObjectManager these signals no longer are necessary.
 ---
- TODO | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ doc/obexd-api.txt   | 12 +-----------
+ obexd/src/manager.c | 12 ------------
+ 2 files changed, 1 insertion(+), 23 deletions(-)
 
-diff --git a/TODO b/TODO
-index d9a708b..5a70e40 100644
---- a/TODO
-+++ b/TODO
-@@ -60,8 +60,6 @@ BlueZ 5
- Priority/Complexity omitted as all items are required before 5.0 is
- released.
+diff --git a/doc/obexd-api.txt b/doc/obexd-api.txt
+index 53e61f5..822157d 100644
+--- a/doc/obexd-api.txt
++++ b/doc/obexd-api.txt
+@@ -29,17 +29,7 @@ Methods
  
--- Convert obexd & obex-client to ObjectManager/Properties
+ 			Possible errors: org.bluez.obex.Error.DoesNotExist
+ 
+-Signals		SessionCreated(object session)
 -
- - [pending] Convert storage to user per-remote device directories and
-   ini-file format
+-			Signal sent when OBEX connection has been accepted.
+-			(FTP only)
+-
+-		SessionRemoved(object session)
+-
+-			Sent when the transport is disconnected
+-			(FTP only)
+-
+-		TransferStarted(object transfer)
++Signals		TransferStarted(object transfer)
  
-@@ -87,6 +85,8 @@ Completed items:
+ 			Signal sent when an object push operation starts.
+ 			(OPP only)
+diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+index 034f6ab..c585aa1 100644
+--- a/obexd/src/manager.c
++++ b/obexd/src/manager.c
+@@ -310,8 +310,6 @@ static const GDBusSignalTable manager_signals[] = {
+ 	{ GDBUS_SIGNAL("TransferStarted", GDBUS_ARGS({ "transfer", "o"})) },
+ 	{ GDBUS_SIGNAL("TransferCompleted", GDBUS_ARGS({ "transfer", "o" },
+ 							{ "success", "b" })) },
+-	{ GDBUS_SIGNAL("SessionCreated", GDBUS_ARGS({ "session", "o" })) },
+-	{ GDBUS_SIGNAL("SessionRemoved", GDBUS_ARGS({ "session", "o" })) },
+ 	{ }
+ };
  
- - Convert obexd to use org.bluez.Profile
+@@ -606,11 +604,6 @@ void manager_register_session(struct obex_session *os)
+ 		goto done;
+ 	}
  
-+- Convert obexd & obex-client to ObjectManager/Properties
-+
- - Remove org.bluez.Service interface (it has become unnecessary thanks
-   to org.bluez.Profile). obexd needs to be converted to use the new
-   interface first.
+-	g_dbus_emit_signal(connection, OBEX_MANAGER_PATH,
+-			OBEX_MANAGER_INTERFACE, "SessionCreated",
+-			DBUS_TYPE_OBJECT_PATH, &path,
+-			DBUS_TYPE_INVALID);
+-
+ done:
+ 	g_free(path);
+ }
+@@ -619,11 +612,6 @@ void manager_unregister_session(struct obex_session *os)
+ {
+ 	char *path = g_strdup_printf("/session%u", GPOINTER_TO_UINT(os));
+ 
+-	g_dbus_emit_signal(connection, OBEX_MANAGER_PATH,
+-			OBEX_MANAGER_INTERFACE, "SessionRemoved",
+-			DBUS_TYPE_OBJECT_PATH, &path,
+-			DBUS_TYPE_INVALID);
+-
+ 	g_dbus_unregister_interface(connection, path,
+ 				SESSION_INTERFACE);
+ 
 -- 
 1.7.11.7
 
