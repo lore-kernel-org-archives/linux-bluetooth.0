@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 08/11] adapter: Remove scan_mode member
-Date: Mon, 17 Dec 2012 15:44:55 +0100
-Message-ID: <1355755498-2700-8-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 09/11] core: Remove mode option form main_opts
+Date: Mon, 17 Dec 2012 15:44:56 +0100
+Message-ID: <1355755498-2700-9-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1355755498-2700-1-git-send-email-szymon.janc@tieto.com>
 References: <1355755498-2700-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,123 +12,65 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is not needed anymore as boolean flags can be used instead.
+Config option is removed so this is no longer needed.
 ---
- src/adapter.c | 68 +++++++++++++++--------------------------------------------
- 1 file changed, 17 insertions(+), 51 deletions(-)
+ src/adapter.c | 9 ++-------
+ src/hcid.h    | 2 --
+ src/main.c    | 1 -
+ 3 files changed, 2 insertions(+), 10 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 2af0d4f..e97e9bb 100644
+index e97e9bb..035a4ca 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -130,8 +130,6 @@ struct btd_adapter {
- 	uint32_t discov_timeout;	/* discoverable time(sec) */
- 	guint pairable_timeout_id;	/* pairable timeout id */
- 	uint32_t pairable_timeout;	/* pairable time(sec) */
--	uint8_t scan_mode;		/* scan mode: SCAN_DISABLED, SCAN_PAGE,
--					 * SCAN_INQUIRY */
- 	uint8_t mode;			/* off, connectable, discoverable,
- 					 * limited */
- 	uint8_t global_mode;		/* last valid global mode */
-@@ -1778,16 +1776,6 @@ void btd_adapter_start(struct btd_adapter *adapter)
- 	adapter->off_requested = FALSE;
- 	adapter->powered = TRUE;
+@@ -2746,12 +2746,7 @@ static void load_config(struct btd_adapter *adapter)
  
--	if (adapter->scan_mode & SCAN_INQUIRY) {
--		adapter->mode = MODE_DISCOVERABLE;
--		adapter->discoverable = TRUE;
--	} else {
--		adapter->mode = MODE_CONNECTABLE;
--		adapter->discoverable = FALSE;
+ 	/* Get discoverable mode */
+ 	adapter->discoverable = g_key_file_get_boolean(key_file, "General",
+-							"Discoverable", &gerr);
+-	if (gerr) {
+-		adapter->discoverable = (main_opts.mode == MODE_DISCOVERABLE);
+-		g_error_free(gerr);
+-		gerr = NULL;
 -	}
++							"Discoverable", NULL);
+ 
+ 	/* Get discoverable timeout */
+ 	adapter->discov_timeout = g_key_file_get_integer(key_file, "General",
+@@ -2762,7 +2757,7 @@ static void load_config(struct btd_adapter *adapter)
+ 		gerr = NULL;
+ 	}
+ 
+-	adapter->mode = main_opts.mode;
++	adapter->mode = MODE_OFF;
+ 
+ 	mgmt_set_connectable(adapter->dev_id, TRUE);
+ 	mgmt_set_discoverable(adapter->dev_id, adapter->discoverable,
+diff --git a/src/hcid.h b/src/hcid.h
+index 1c3af7d..aa563dc 100644
+--- a/src/hcid.h
++++ b/src/hcid.h
+@@ -38,8 +38,6 @@ struct main_opts {
+ 	gboolean	name_resolv;
+ 	gboolean	debug_keys;
+ 
+-	uint8_t		mode;
 -
--	adapter->connectable = true;
--
- 	g_dbus_emit_property_changed(btd_get_dbus_connection(), adapter->path,
- 						ADAPTER_INTERFACE, "Powered");
- 
-@@ -1934,7 +1922,7 @@ int btd_adapter_stop(struct btd_adapter *adapter)
- 	if (adapter->connectable && adapter->pairable == TRUE)
- 		emit_pairable = true;
- 
--	adapter->scan_mode = SCAN_DISABLED;
-+	adapter->discoverable = FALSE;
- 	adapter->connectable = false;
- 
- 	adapter->mode = MODE_OFF;
-@@ -3155,56 +3143,34 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
- 
- static uint8_t create_mode(bool connectable, bool discoverable)
+ 	uint16_t	did_source;
+ 	uint16_t	did_vendor;
+ 	uint16_t	did_product;
+diff --git a/src/main.c b/src/main.c
+index 290a0eb..59a0ad9 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -230,7 +230,6 @@ static void init_defaults(void)
  {
--	uint8_t mode = 0;
--
--	if (connectable)
--		mode |= SCAN_PAGE;
-+	if (connectable && discoverable)
-+		return MODE_DISCOVERABLE;
- 
--	if (discoverable)
--		mode |= SCAN_INQUIRY;
-+	if (connectable && !discoverable)
-+		return MODE_CONNECTABLE;
- 
--	return mode;
-+	return MODE_OFF;
- }
- 
- void adapter_mode_changed(struct btd_adapter *adapter, bool connectable,
- 							bool discoverable)
- {
--	bool emit_pairable = false;
--	uint8_t scan_mode;
--
--	scan_mode = create_mode(connectable, discoverable);
-+	bool emit_pairable;
- 
--	DBG("old 0x%02x new 0x%02x", adapter->scan_mode, scan_mode);
-+	DBG("connectable %u (old %u) discoverable %u (old %u)",
-+					connectable, adapter->connectable,
-+					discoverable, adapter->discoverable);
- 
--	if (adapter->scan_mode == scan_mode)
-+	if (connectable == adapter->connectable &&
-+			discoverable == adapter->discoverable)
- 		return;
- 
--	switch (scan_mode) {
--	case SCAN_DISABLED:
--		adapter->mode = MODE_OFF;
--		adapter->connectable = false;
--		adapter->discoverable = FALSE;
--		break;
--	case SCAN_PAGE:
--		adapter->mode = MODE_CONNECTABLE;
--		adapter->discoverable = FALSE;
--		adapter->connectable = true;
--		break;
--	case (SCAN_PAGE | SCAN_INQUIRY):
--		adapter->mode = MODE_DISCOVERABLE;
--		adapter->discoverable = TRUE;
--		adapter->connectable = true;
--		break;
--	default:
--		/* ignore, reserved */
--		return;
--	}
--
--	/* If page scanning gets toggled emit the Pairable property */
--	if ((adapter->scan_mode & SCAN_PAGE) != (scan_mode & SCAN_PAGE))
--		emit_pairable = true;
-+	/* If connectable gets toggled emit the Pairable property */
-+	emit_pairable = adapter->connectable != connectable;
- 
--	adapter->scan_mode = scan_mode;
-+	adapter->connectable = connectable;
-+	adapter->discoverable = discoverable;
-+	adapter->mode = create_mode(connectable, discoverable);
- 
- 	if (emit_pairable)
- 		g_dbus_emit_property_changed(btd_get_dbus_connection(),
+ 	/* Default HCId settings */
+ 	memset(&main_opts, 0, sizeof(main_opts));
+-	main_opts.mode	= MODE_OFF;
+ 	main_opts.name	= g_strdup("BlueZ");
+ 	main_opts.discovto	= DEFAULT_DISCOVERABLE_TIMEOUT;
+ 	main_opts.autoto = DEFAULT_AUTO_CONNECT_TIMEOUT;
 -- 
 1.8.0
 
