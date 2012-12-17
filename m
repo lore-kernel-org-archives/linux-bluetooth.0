@@ -1,54 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
+	<frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/5] core: Fix set_discoverable to not attempt to power on the adapter
-Date: Mon, 17 Dec 2012 17:45:52 +0200
-Message-Id: <1355759155-27921-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1355759155-27921-1-git-send-email-luiz.dentz@gmail.com>
-References: <1355759155-27921-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 13/13] TODO: Mark convert storage to ini-file item as done
+Date: Mon, 17 Dec 2012 16:09:54 +0100
+Message-Id: <1355756994-18953-13-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1355756994-18953-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1355756994-18953-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-Discoverable flag is completely independent flag for the kernel so we
-can reflect this in the D-Bus API.
 ---
- src/adapter.c | 21 ++-------------------
- 1 file changed, 2 insertions(+), 19 deletions(-)
+ TODO |    5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 375bff4..ce4e44e 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -366,25 +366,8 @@ done:
- static void set_discoverable(struct btd_adapter *adapter,
- 			gboolean discoverable, GDBusPendingPropertySet id)
- {
--	uint8_t mode;
--	int err;
--
--	mode = discoverable ? MODE_DISCOVERABLE : MODE_CONNECTABLE;
--
--	if (mode == adapter->mode) {
--		adapter->global_mode = mode;
--		return g_dbus_pending_property_success(id);
--	}
--
--	err = set_mode(adapter, mode);
--	if (err < 0)
--		return g_dbus_pending_property_error(id,
--						ERROR_INTERFACE ".Failed",
--						strerror(-err));
--
--	adapter->pending_mode = create_session(adapter, NULL, mode,
--					SESSION_TYPE_MODE_GLOBAL, NULL);
--	adapter->pending_mode->prop_id = id;
-+	mgmt_set_discoverable(adapter->dev_id, discoverable, 0);
-+	g_dbus_pending_property_success(id);
- }
+diff --git a/TODO b/TODO
+index 5a70e40..f0e494f 100644
+--- a/TODO
++++ b/TODO
+@@ -60,11 +60,10 @@ BlueZ 5
+ Priority/Complexity omitted as all items are required before 5.0 is
+ released.
  
- static void set_powered(struct btd_adapter *adapter, gboolean powered,
+-- [pending] Convert storage to user per-remote device directories and
+-  ini-file format
+-
+ Completed items:
+ 
++- Convert storage to user per-remote device directories and ini-file format
++
+ - Don't install libbluetooth by default (put it behind a configure switch)
+ 
+ - Switch plugins to standard D-Bus properties interface
 -- 
-1.7.11.7
+1.7.9.5
 
