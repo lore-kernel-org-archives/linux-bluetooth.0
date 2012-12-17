@@ -1,65 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] hog: Fix removing HoG device bug
-Date: Mon, 17 Dec 2012 16:03:23 -0300
-Message-Id: <1355771003-2518-1-git-send-email-andre.guedes@openbossa.org>
+Date: Mon, 17 Dec 2012 20:30:57 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 3/5] core: Simplify set_powered to not use set_mode
+Message-ID: <20121217183057.GA22883@x220.P-661HNU-F1>
+References: <1355759155-27921-1-git-send-email-luiz.dentz@gmail.com>
+ <1355759155-27921-3-git-send-email-luiz.dentz@gmail.com>
+ <CAJdJm_N+5_wcvGw7wkgx+Ryr3EkB-Mcd0hfGmK4u=42LL9=fHg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAJdJm_N+5_wcvGw7wkgx+Ryr3EkB-Mcd0hfGmK4u=42LL9=fHg@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We should remove only hog_devices from the given btd_device.
-Otherwise, all hog_devices will be removed.
----
- profiles/input/hog_device.c  | 5 +++++
- profiles/input/hog_device.h  | 1 +
- profiles/input/hog_manager.c | 5 ++++-
- 3 files changed, 10 insertions(+), 1 deletion(-)
+Hi Lizardo,
 
-diff --git a/profiles/input/hog_device.c b/profiles/input/hog_device.c
-index 06dab6d..cc68080 100644
---- a/profiles/input/hog_device.c
-+++ b/profiles/input/hog_device.c
-@@ -789,3 +789,8 @@ int hog_device_set_control_point(struct hog_device *hogdev, gboolean suspend)
- 
- 	return 0;
- }
-+
-+struct btd_device *hog_device_get_device(struct hog_device *hogdev)
-+{
-+	return hogdev->device;
-+}
-diff --git a/profiles/input/hog_device.h b/profiles/input/hog_device.h
-index d1bfc08..60c4f12 100644
---- a/profiles/input/hog_device.h
-+++ b/profiles/input/hog_device.h
-@@ -31,3 +31,4 @@ struct hog_device *hog_device_register(struct btd_device *device,
- 						struct gatt_primary *prim);
- int hog_device_unregister(struct hog_device *hogdev);
- int hog_device_set_control_point(struct hog_device *hogdev, gboolean suspend);
-+struct btd_device *hog_device_get_device(struct hog_device *hogdev);
-diff --git a/profiles/input/hog_manager.c b/profiles/input/hog_manager.c
-index 595b160..c7b98c5 100644
---- a/profiles/input/hog_manager.c
-+++ b/profiles/input/hog_manager.c
-@@ -106,6 +106,9 @@ static int hog_device_probe(struct btd_profile *p, struct btd_device *device,
- 
- static void remove_device(gpointer hogdev, gpointer b)
- {
-+	if (hog_device_get_device(hogdev) != b)
-+		return;
-+
- 	devices = g_slist_remove(devices, hogdev);
- 	hog_device_unregister(hogdev);
- }
-@@ -116,7 +119,7 @@ static void hog_device_remove(struct btd_profile *p, struct btd_device *device)
- 
- 	DBG("path %s", path);
- 
--	g_slist_foreach(devices, remove_device, NULL);
-+	g_slist_foreach(devices, remove_device, device);
- }
- 
- static struct btd_profile hog_profile = {
--- 
-1.8.0.1
+On Mon, Dec 17, 2012, Anderson Lizardo wrote:
+> On Mon, Dec 17, 2012 at 11:45 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> > -       err = set_mode(adapter, mode);
+> > +       err = mgmt_set_powered(adapter->dev_id, powered);
+> >         if (err < 0)
+> >                 return g_dbus_pending_property_error(id,
+> >                                                 ERROR_INTERFACE ".Failed",
+> > -                                               strerror(-err));
+> > +                                               strerror(err));
+> 
+> Looks like you changed the line above by mistake, err is negative and
+> thus need to be made positive to pass to strerror().
 
+Since I missed this one and already pushed the patch set I went ahead
+and applied a separate fix for it.
+
+Johan
