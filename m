@@ -1,59 +1,142 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <50CE38D1.8010303@linux.intel.com>
-References: <CAGXs5wWXOLpn1O77RMiQ-Cvp3vXEKm3KCbRvz07dN6jJwFoe-A@mail.gmail.com>
-	<50CE38D1.8010303@linux.intel.com>
-Date: Mon, 17 Dec 2012 05:37:09 +0200
-Message-ID: <CAGXs5wXfwHME+XpVUq4rMmK_u=Sw2qG_snCC6iLEbKBYeZ0VTA@mail.gmail.com>
-Subject: Re: PSCAN and ISCAN flags in hciconfig
-From: Kevin Wilson <wkevils@gmail.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>
+Date: Mon, 17 Dec 2012 02:33:24 +0200
+From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+To: =?UTF-8?B?RnLDqWTDqXJpYw==?= Dalleau
+	<frederic.dalleau@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH v5 00/16] mSBC tests
+Message-ID: <20121217023324.4b1a294b@i7>
+In-Reply-To: <1355497417-10357-1-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1355497417-10357-1-git-send-email-frederic.dalleau@linux.intel.com>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="MP_/jBFIs1y99YN8MfKLuDM3KmI"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-Thanks Frederic.
-Ok, so I rebooted the machine and still
-hciconfig shows:
-UP RUNNING PSCAN
-and also after 'hciconfig hci0 reset"
-It stays "UP RUNNING PSCAN".
+--MP_/jBFIs1y99YN8MfKLuDM3KmI
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-So what sould I do to make the ISCAN flag set ?
+On Fri, 14 Dec 2012 16:03:21 +0100
+Fr=C3=A9d=C3=A9ric Dalleau  <frederic.dalleau@linux.intel.com> wrote:
 
- systemctl status bluetooth.service
-shows that it is "active (running)"
+> Hi,
+>=20
+> v5 shoudl fix the few remaining issues.  I could test neon and armv6
+> and raised verbosity of commit messages.
 
-rgs,
-Kevin
+Thanks for the update. The verbose commit messages make a really big
+difference.
 
+> However, before releasing a new version of the library, I believe we shou=
+ld
+> write some sort of automated testing and test against another implementat=
+ion.
+> Siarhei shared a script some time ago, it could be a good start.
+> But where could we store some decent audio materials? Should we use gener=
+ators
+> like sine wave, or just record ambient sound??
 
-On Sun, Dec 16, 2012 at 11:10 PM, Frederic Danis
-<frederic.danis@linux.intel.com> wrote:
-> On 16/12/2012 18:58, Kevin Wilson wrote:
->>
->> Hello,
->> I have 2 PC with Linux which once used to recognize each other by
->> "hcitool scan" and  to create
->> a PAND-based connection.
->>
->> Now I fail to see each other with "hcitool scan".
->> My question is :
->> I see now only the PSCAN flag when running "hciconfig" on both of then.
->> Is the ISCAN flag (inquiry) mandatory so that a device will be
->> discoverable ?
->
->
-> Yes, ISCAN means that your adapter will respond to inquiry scan, so it will
-> be discoverable.
->
-> Regards
->
-> Fred
->
-> --
-> Frederic Danis                            Open Source Technology Center
-> frederic.danis@intel.com                              Intel Corporation
->
+It is a good idea to make use of autotools test framework (a simple
+one, not dejagnu based):
+    http://www.gnu.org/software/automake/manual/html_node/Tests.html
+
+The tests could generate some deterministic pseudorandom data and
+encode it with the sbc encoder.
+
+Testing for potential overflows and the other bugs in the code is quite
+effective with the plain uniformly distributed random data. The
+checksums (CRC32 or some cryptographic hashes) can be calculated for
+the encoded data and compared with the reference values. This test
+ensures that the code works exactly as it used to work before (no
+regressions, no improvements).
+
+Additionally some sine waves (or more complex signals consisting
+of multiple pseudorandom sine waves) can be used for one more test,
+which could check the errors accumulated for the encoding/decoding
+roundtrip.
+
+And finally, an integrated benchmark would be also useful in this
+sbc test framework. Compressing/decompressing white noise may not
+provide relevant results, but maybe some sine waves can be selected
+which represent more "realistic" audio data. Or one can be compared
+to each other, and if there are no significant differences in
+performance for different data, then it's easier for us.
+
+An example of an autotools based test framework employing pseudorandom
+data generation and checksums verification can be found in the pixman
+library:
+    http://cgit.freedesktop.org/pixman
+Coincidentally, I looked into pseudorandom number generators recently
+and found this one to be quite good:
+    http://burtleburtle.net/bob/rand/smallprng.html
+
+As for comparing with the reference sbc encoder/decoder (win32
+binary), I used to have one more script. It is attached.
+
+--=20
+Best regards,
+Siarhei Siamashka
+
+--MP_/jBFIs1y99YN8MfKLuDM3KmI
+Content-Type: application/x-ruby
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=sbc_encode_test.rb
+
+IyEvdXNyL2Jpbi9lbnYgcnVieQoKIyBlbmNvZGluZyBzZXR0aW5ncwokbnJvZl9zdWJiYW5kcyA9
+IDgKJG5yb2ZfYmxvY2tzID0gMTYKJHNiY19qb2luID0gMQokYml0cG9vbCA9IDUzCgppZiBub3Qg
+QVJHVlswXQogICAgcHJpbnRmKCJQbGVhc2UgcHJvdmlkZSBhIHNvdXJjZSBhdWRpbyBmaWxlIGlu
+IHRoZSBjb21tYW5kIGxpbmVcbiIpCiAgICBleGl0KDEpCmVuZAoKIyBGSVhNRTogcHJvcGVybHkg
+ZXNjYXBlIGZpbGUgbmFtZQpkZWYgZ2V0X2ZpbGVfaW5mbyhmaWxlbmFtZSkKICAgIHggPSBgc294
+IC1WICN7ZmlsZW5hbWV9IC1uIDI+JjFgCiAgICBjaGFubmVscyA9IG5pbAogICAgaWYgeCA9fiAv
+XkNoYW5uZWxzICAgICAgIDogKFxkKykkLyB0aGVuCiAgICAgICAgY2hhbm5lbHMgPSAkMS50b19p
+CiAgICBlbmQKICAgIHNhbXBsZXJhdGUgPSBuaWwKICAgIGlmIHggPX4gL15TYW1wbGUgUmF0ZSAg
+ICA6IChcZCspJC8gdGhlbgogICAgICAgIHNhbXBsZXJhdGUgPSAkMS50b19pCiAgICBlbmQKICAg
+IGlmIG5vdCBjaGFubmVscyB0aGVuIGVycm9yKCJzc3MiKSBlbmQKICAgIHJldHVybiBbY2hhbm5l
+bHMsIHNhbXBsZXJhdGVdCmVuZAoKZGVmIGdldF9yZWNvbW1lbmRlZF9ocV9lbmNvZGVfY21kbGlu
+ZShmaWxlbmFtZSkKICAgIGZpbGVpbmZvID0gZ2V0X2ZpbGVfaW5mbyhmaWxlbmFtZSkKICAgIHAg
+ZmlsZWluZm8KICAgIG5yb2ZfY2hhbm5lbHMgPSBmaWxlaW5mb1swXQogICAgZnMgPSBmaWxlaW5m
+b1sxXQoKICAgIGJpdHBvb2xfbGltaXQgPSBucm9mX2NoYW5uZWxzICogMTYgKiAkbnJvZl9zdWJi
+YW5kcwogICAgYml0cG9vbF9saW1pdCA9IDI1NSBpZiBiaXRwb29sX2xpbWl0ID4gMjU1CiAgICAk
+Yml0cG9vbCA9IGJpdHBvb2xfbGltaXQgaWYgJGJpdHBvb2wgPiBiaXRwb29sX2xpbWl0CgogICAg
+ZnJhbWVfbGVuZ3RoID0gNCArICg0ICogJG5yb2Zfc3ViYmFuZHMgKiBucm9mX2NoYW5uZWxzKSAv
+IDgKICAgIGlmIG5yb2ZfY2hhbm5lbHMgPT0gMSB0aGVuCiAgICAgICAgZnJhbWVfbGVuZ3RoICs9
+ICRucm9mX2Jsb2NrcyAqIG5yb2ZfY2hhbm5lbHMgKiAkYml0cG9vbCAvIDgKICAgIGVsc2UKICAg
+ICAgICBmcmFtZV9sZW5ndGggKz0gKCRzYmNfam9pbiAqICRucm9mX3N1YmJhbmRzICsgJG5yb2Zf
+YmxvY2tzICogJGJpdHBvb2wpIC8gOAogICAgZW5kCiAgICBiaXRfcmF0ZSA9ICg4ICogZnJhbWVf
+bGVuZ3RoICogZnMgKyAkbnJvZl9zdWJiYW5kcyAqICRucm9mX2Jsb2NrcyAtIDEpIC8gKCRucm9m
+X3N1YmJhbmRzICogJG5yb2ZfYmxvY2tzKQogICAgaWYgbnJvZl9jaGFubmVscyA9PSAxIHRoZW4K
+ICAgICAgICByZXR1cm4gWyItUyAtcyN7JG5yb2Zfc3ViYmFuZHN9IC1CI3skbnJvZl9ibG9ja3N9
+IC1iI3skYml0cG9vbH0iLAogICAgICAgICAgICAgICAgIi1sI3skbnJvZl9ibG9ja3N9IC1uI3sk
+bnJvZl9zdWJiYW5kc30gLXIje2JpdF9yYXRlfSJdCiAgICBlbHNpZiAkc2JjX2pvaW4gPT0gMSB0
+aGVuCiAgICAgICAgcmV0dXJuIFsiLWogLVMgLXMjeyRucm9mX3N1YmJhbmRzfSAtQiN7JG5yb2Zf
+YmxvY2tzfSAtYiN7JGJpdHBvb2x9IiwKICAgICAgICAgICAgICAgICItaiAtbCN7JG5yb2ZfYmxv
+Y2tzfSAtbiN7JG5yb2Zfc3ViYmFuZHN9IC1yI3tiaXRfcmF0ZX0iXQogICAgZWxzZQogICAgICAg
+IHJldHVybiBbIi1TIC1zI3skbnJvZl9zdWJiYW5kc30gLUIjeyRucm9mX2Jsb2Nrc30gLWIjeyRi
+aXRwb29sfSIsCiAgICAgICAgICAgICAgICAiLWwjeyRucm9mX2Jsb2Nrc30gLW4jeyRucm9mX3N1
+YmJhbmRzfSAtciN7Yml0X3JhdGV9Il0KICAgIGVuZAplbmQKCnggPSBnZXRfcmVjb21tZW5kZWRf
+aHFfZW5jb2RlX2NtZGxpbmUoQVJHVlswXSkKcCB4CmBzb3ggI3tBUkdWWzBdfSAtLWVuZGlhbiBi
+aWcgLXMgLTIgLXQgYXUgdG1wLmF1YApgc294ICN7QVJHVlswXX0gLS1lbmRpYW4gbGl0dGxlIC1z
+IC0yIC10IHdhdiB0bXAud2F2YApgLi9zYmNlbmMgI3t4WzBdfSB0bXAuYXUgPiB0bXBfc2JjZW5j
+LnNiY2AKYHdpbmUgLi9zYmNfZW5jb2Rlci5leGUgI3t4WzFdfSAtb3RtcF9yZWYuc2JjIHRtcC53
+YXYgMj4gL2Rldi9udWxsYAoKYC4vc2JjZGVjIC1mIHRtcF9zYmNkZWMuYXUgdG1wX3NiY2VuYy5z
+YmNgCmBzb3ggdG1wX3NiY2RlYy5hdSAtLWVuZGlhbiBsaXR0bGUgLXMgLTIgLXQgd2F2IHRtcF9z
+YmNkZWMud2F2YApgLi9zYmNkZWMgLWYgdG1wX3JzLmF1IHRtcF9yZWYuc2JjYApgc294IHRtcF9y
+cy5hdSAtLWVuZGlhbiBsaXR0bGUgLXMgLTIgLXQgd2F2IHRtcF9ycy53YXZgCmB3aW5lIC4vc2Jj
+X2RlY29kZXIuZXhlIC1vdG1wX3JlZi53YXYgdG1wX3JlZi5zYmMgMj4gL2Rldi9udWxsYApgd2lu
+ZSAuL3NiY19kZWNvZGVyLmV4ZSAtb3RtcF9zYmNlbmMud2F2IHRtcF9zYmNlbmMuc2JjICAyPiAv
+ZGV2L251bGxgCnByaW50ZigiLS0tIGNvbXBhcmluZyBvcmlnaW5hbCAvIHNiY2VuYyArIHNiY2Rl
+YyAtLS1cbiVzXG4iLCBgLi90aW55X3BzbnIgdG1wX3NiY2RlYy53YXYgdG1wLndhdiAyIC0gNDQg
+fCBncmVwIHN0ZGRldmApCnByaW50ZigiLS0tIGNvbXBhcmluZyBvcmlnaW5hbCAvIHNiY2VuYyAr
+IHNiY19kZWNvZGVyLmV4ZSAtLS1cbiVzXG4iLCBgLi90aW55X3BzbnIgdG1wX3NiY2VuYy53YXYg
+dG1wLndhdiAyIC0gNDQgfCBncmVwIHN0ZGRldmApCnByaW50ZigiLS0tIGNvbXBhcmluZyBvcmln
+aW5hbCAvIHNiY19lbmNvZGVyLmV4ZSArIHNiY2RlYyAtLS1cbiVzXG4iLCBgLi90aW55X3BzbnIg
+dG1wX3JzLndhdiB0bXAud2F2IDIgLSA0NCB8IGdyZXAgc3RkZGV2YCkKcHJpbnRmKCItLS0gY29t
+cGFyaW5nIG9yaWdpbmFsIC8gc2JjX2VuY29kZXIuZXhlICsgc2JjX2RlY29kZXIuZXhlIC0tLVxu
+JXNcbiIsIGAuL3RpbnlfcHNuciB0bXBfcmVmLndhdiB0bXAud2F2IDIgLSA0NCB8IGdyZXAgc3Rk
+ZGV2YCkKcHJpbnRmKCItLS0gY29tcGFyaW5nIHNiY2VuYyArIHNiY19kZWNvZGVyLmV4ZSAvIHNi
+Y19lbmNvZGVyLmV4ZSArIHNiY19kZWNvZGVyLmV4ZVxuJXNcbiIsIGAuL3RpbnlfcHNuciB0bXBf
+c2JjZW5jLndhdiB0bXBfcmVmLndhdiAyIC0gNDQgfCBncmVwIHN0ZGRldmApCg==
+
+--MP_/jBFIs1y99YN8MfKLuDM3KmI--
