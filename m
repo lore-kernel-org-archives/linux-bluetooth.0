@@ -1,35 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 18 Dec 2012 17:24:58 -0300
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Tanu Kaskinen <tanuk@iki.fi>
-Subject: Re: PulseAudio branch to test BlueZ master
-Message-ID: <20121218202458.GA8716@samus>
-References: <CANT-zCWNUkTW9pmcvuDEhaEuSxdhphYLwvQkSYz5dLvYE2ENjg@mail.gmail.com>
- <CANT-zCVXOjncycx6GSghO6T5y3TEM0FDA1Ke3W8FZSE=ZOhbVQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CANT-zCVXOjncycx6GSghO6T5y3TEM0FDA1Ke3W8FZSE=ZOhbVQ@mail.gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ] monitor: Add support for parsing Flow Control Lag flags
+Date: Tue, 18 Dec 2012 16:48:47 -0300
+Message-Id: <1355860127-7011-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+---
+ monitor/packet.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-On 11:19 Tue 18 Dec, Mikel Astiz wrote:
-> On the other hand, A2DP is not working for me any more. I think this
-> might be an unrelated issue, probably a regression in BlueZ, but I
-> have to do further research.
-> 
-
-This problem may have been caused by me :-) The commit "bluetooth: Add
-HFP 1.6 codec ID" was buggy, and was registering the A2DP endpoint with
-the wrong codec. Sorry about that. I pushed an updated version to my
-fork of pulseaudio[1].
-
-
-Cheers,
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 1ca94e8..fb2d8d7 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -1146,6 +1146,9 @@ static const struct features_data features_page0[] = {
+ 	{ 17, "Paging parameter negotiation"		},
+ 	{ 18, "Power control"				},
+ 	{ 19, "Transparent synchronous data"		},
++	{ 20, "Flow control lag (least significant bit)"},
++	{ 21, "Flow control lag (middle bit)"		},
++	{ 22, "Flow control lag (most significant bit)"	},
+ 	{ 23, "Broadcast Encryption"			},
+ 	{ 25, "Enhanced Data Rate ACL 2 Mbps mode"	},
+ 	{ 26, "Enhanced Data Rate ACL 3 Mbps mode"	},
 -- 
-Vinicius
-
-[1] git://github.com/vcgomes/pulseaudio-bluez5.git 
+1.8.0.1
 
