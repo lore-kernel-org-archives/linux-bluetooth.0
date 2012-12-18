@@ -1,37 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 18 Dec 2012 13:45:50 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] hcidump: Fix compilation errors due to unaligned
- memory access
-Message-ID: <20121218114550.GA19406@x220>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 2/2] adapter: Use int for storing signed value
+Date: Tue, 18 Dec 2012 12:10:58 +0100
+Message-ID: <1355829058-10033-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1355829058-10033-1-git-send-email-szymon.janc@tieto.com>
 References: <1355829058-10033-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1355829058-10033-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+char can be signed or unsigned depending on architecture. This fix
+following compilation error on ARM:
 
-On Tue, Dec 18, 2012, Szymon Janc wrote:
-> Use bt_get_le* helper functions to access unaligned memory. This fix
-> number of compilation errors on ARM similar to:
-> 
-> CC     tools/parser/hci.o
-> tools/parser/hci.c: In function ‘ext_inquiry_data_dump’:
-> tools/parser/hci.c:797:10 error: cast increases required alignment of
-> 	target type [-Werror=cast-align]
-> tools/parser/hci.c:797:10: error: cast increases required alignment of
-> 	target type [-Werror=cast-align]
-> cc1: all warnings being treated as errors
-> make[1]: *** [tools/parser/hci.o] Error 1
-> ---
->  tools/parser/hci.c   |  7 ++-----
->  tools/parser/l2cap.c | 22 +++++++++++-----------
->  2 files changed, 13 insertions(+), 16 deletions(-)
+src/adapter.c: In function 'convert_primaries_entry`:
+src/adapter:2272:2: error: comparison is always true due to limited
+	range of data type [-Werror=type-limits]
+cc1: all warnings being treated as errors
+make[1]: *** [src/adapter.o] Error 1
+---
+ src/adapter.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Both patches have been applied. Thanks.
+diff --git a/src/adapter.c b/src/adapter.c
+index a41eb15..bb54d8b 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2215,7 +2215,7 @@ failed:
+ static void convert_primaries_entry(char *key, char *value, void *user_data)
+ {
+ 	char *address = user_data;
+-	char device_type = -1;
++	int device_type = -1;
+ 	uuid_t uuid;
+ 	char **services, **service, *prim_uuid;
+ 	char filename[PATH_MAX + 1];
+-- 
+1.8.0
 
-Johan
