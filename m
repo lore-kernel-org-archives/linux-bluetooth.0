@@ -1,29 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 18 Dec 2012 17:24:58 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Tanu Kaskinen <tanuk@iki.fi>
+Subject: Re: PulseAudio branch to test BlueZ master
+Message-ID: <20121218202458.GA8716@samus>
+References: <CANT-zCWNUkTW9pmcvuDEhaEuSxdhphYLwvQkSYz5dLvYE2ENjg@mail.gmail.com>
+ <CANT-zCVXOjncycx6GSghO6T5y3TEM0FDA1Ke3W8FZSE=ZOhbVQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1355856590-19222-8-git-send-email-andre.guedes@openbossa.org>
-References: <1355856590-19222-1-git-send-email-andre.guedes@openbossa.org>
-	<1355856590-19222-8-git-send-email-andre.guedes@openbossa.org>
-Date: Tue, 18 Dec 2012 16:13:01 -0400
-Message-ID: <CAJdJm_Ouhbv+jf920=aNjd2RsUt5PLjnUEbWqW5FapYa+Lu-hg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 8/8] hog: Rename hog_device_unregister
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CANT-zCVXOjncycx6GSghO6T5y3TEM0FDA1Ke3W8FZSE=ZOhbVQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Guedes,
+Hi Mikel,
 
-On Tue, Dec 18, 2012 at 2:49 PM, Andre Guedes
-<andre.guedes@openbossa.org> wrote:
-> This patch renames hog_device_unregister function to hog_device_
-> unregister.
+On 11:19 Tue 18 Dec, Mikel Astiz wrote:
+> On the other hand, A2DP is not working for me any more. I think this
+> might be an unrelated issue, probably a regression in BlueZ, but I
+> have to do further research.
+> 
 
-Minor typo:   "hog_device_ unregister" -> "hog_unregister_device".
+This problem may have been caused by me :-) The commit "bluetooth: Add
+HFP 1.6 codec ID" was buggy, and was registering the A2DP endpoint with
+the wrong codec. Sorry about that. I pushed an updated version to my
+fork of pulseaudio[1].
 
-Regards,
+
+Cheers,
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Vinicius
+
+[1] git://github.com/vcgomes/pulseaudio-bluez5.git 
+
