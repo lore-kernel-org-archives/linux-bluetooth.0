@@ -1,41 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 5/8] hog: Rename hog_device_new
-Date: Tue, 18 Dec 2012 15:49:47 -0300
-Message-Id: <1355856590-19222-5-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH BlueZ 4/8] hog: Rename hog_device_set_control_point
+Date: Tue, 18 Dec 2012 15:49:46 -0300
+Message-Id: <1355856590-19222-4-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1355856590-19222-1-git-send-email-andre.guedes@openbossa.org>
 References: <1355856590-19222-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch renames hog_device_new function to hog_new_device.
+This patch renames hog_device_set_control_point function to
+set_control_point.
 ---
- profiles/input/hog.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ profiles/input/hog.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index 186f6b1..c68a089 100644
+index 00ec151..186f6b1 100644
 --- a/profiles/input/hog.c
 +++ b/profiles/input/hog.c
-@@ -680,7 +680,7 @@ static void attio_disconnected_cb(gpointer user_data)
- 	hogdev->attrib = NULL;
+@@ -777,8 +777,7 @@ static int hog_device_unregister(struct hog_device *hogdev)
+ 	return 0;
  }
  
--static struct hog_device *hog_device_new(struct btd_device *device,
-+static struct hog_device *hog_new_device(struct btd_device *device,
- 								uint16_t id)
+-static int hog_device_set_control_point(struct hog_device *hogdev,
+-							gboolean suspend)
++static int set_control_point(struct hog_device *hogdev, gboolean suspend)
  {
- 	struct hog_device *hogdev;
-@@ -723,7 +723,7 @@ static struct hog_device *hog_device_register(struct btd_device *device,
- 	GIOCondition cond = G_IO_IN | G_IO_ERR | G_IO_NVAL;
- 	GIOChannel *io;
+ 	uint8_t value = suspend ? 0x00 : 0x01;
  
--	hogdev = hog_device_new(device, prim->range.start);
-+	hogdev = hog_new_device(device, prim->range.start);
- 	if (!hogdev)
- 		return NULL;
+@@ -802,7 +801,7 @@ static void set_suspend(gpointer data, gpointer user_data)
+ 	struct hog_device *hogdev = data;
+ 	gboolean suspend = GPOINTER_TO_INT(user_data);
  
+-	hog_device_set_control_point(hogdev, suspend);
++	set_control_point(hogdev, suspend);
+ }
+ 
+ static void suspend_callback(void)
 -- 
 1.8.0.1
 
