@@ -1,41 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/8] hog: Rename hog_device_probe
-Date: Tue, 18 Dec 2012 15:49:44 -0300
-Message-Id: <1355856590-19222-2-git-send-email-andre.guedes@openbossa.org>
-In-Reply-To: <1355856590-19222-1-git-send-email-andre.guedes@openbossa.org>
-References: <1355856590-19222-1-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH BlueZ 1/8] hog: Rename hog_device.c file to hog.c
+Date: Tue, 18 Dec 2012 15:49:43 -0300
+Message-Id: <1355856590-19222-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch renames hog_device_probe function to hog_probe.
+Since hog_manager.c and hog_device.h were merged into hog_device.c,
+now the whole HoG logic is in this file. So, calling this file hog.c
+instead of hog_device.c is more suitable.
 ---
- profiles/input/hog.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ Makefile.plugins                       | 2 +-
+ profiles/input/{hog_device.c => hog.c} | 0
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ rename profiles/input/{hog_device.c => hog.c} (100%)
 
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index e2a3488..1cb580e 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -823,7 +823,7 @@ static void resume_callback(void)
- 	g_slist_foreach(devices, set_suspend, GINT_TO_POINTER(suspend));
- }
+diff --git a/Makefile.plugins b/Makefile.plugins
+index 41b6876..73055ef 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -59,7 +59,7 @@ builtin_sources += profiles/input/manager.h profiles/input/manager.c \
+ 			profiles/input/device.h profiles/input/device.c
  
--static int hog_device_probe(struct btd_profile *p, struct btd_device *device,
-+static int hog_probe(struct btd_profile *p, struct btd_device *device,
- 								GSList *uuids)
- {
- 	const char *path = device_get_path(device);
-@@ -876,7 +876,7 @@ static void hog_device_remove(struct btd_profile *p, struct btd_device *device)
- static struct btd_profile hog_profile = {
- 	.name		= "input-hog",
- 	.remote_uuids	= BTD_UUIDS(HOG_UUID),
--	.device_probe	= hog_device_probe,
-+	.device_probe	= hog_probe,
- 	.device_remove	= hog_device_remove,
- };
+ builtin_modules += hog
+-builtin_sources += profiles/input/hog_device.c profiles/input/uhid_copy.h \
++builtin_sources += profiles/input/hog.c profiles/input/uhid_copy.h \
+ 			profiles/input/suspend.h profiles/input/suspend-dummy.c
  
+ builtin_modules += health
+diff --git a/profiles/input/hog_device.c b/profiles/input/hog.c
+similarity index 100%
+rename from profiles/input/hog_device.c
+rename to profiles/input/hog.c
 -- 
 1.8.0.1
 
