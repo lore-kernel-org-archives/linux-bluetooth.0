@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v0 2/5] audio: Split AVRCP into two btd_profile
-Date: Tue, 18 Dec 2012 15:01:24 +0100
-Message-Id: <1355839287-8373-3-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v0 4/5] proximity: Split monitor into three btd_profile
+Date: Tue, 18 Dec 2012 15:01:26 +0100
+Message-Id: <1355839287-8373-5-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1355839287-8373-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1355839287-8373-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,357 +12,154 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Register a separate btd_profile for each role of AVRCP.
+Split into three btd_profile such that each of them handles one single
+UUID.
 ---
- profiles/audio/audio.conf |  2 +-
- profiles/audio/avrcp.c    | 80 ++++++++++++++++++++++++++++++++++++-----------
- profiles/audio/avrcp.h    |  6 ++--
- profiles/audio/manager.c  | 80 ++++++++++++++++++++++++++++++++++++++++-------
- profiles/audio/manager.h  |  1 +
- 5 files changed, 137 insertions(+), 32 deletions(-)
+ profiles/proximity/manager.c | 102 +++++++++++++++++++++++++++++++------------
+ 1 file changed, 75 insertions(+), 27 deletions(-)
 
-diff --git a/profiles/audio/audio.conf b/profiles/audio/audio.conf
-index f556610..566454b 100644
---- a/profiles/audio/audio.conf
-+++ b/profiles/audio/audio.conf
-@@ -8,5 +8,5 @@
- #Master=true
- 
- # If we want to disable support for specific services
--# Defaults to supporting the services: Sink, Control
-+# Defaults to supporting the services: Sink, Control, Target
- #Disable=Source
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index b32c422..22dd1a5 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -2305,41 +2305,63 @@ static struct avrcp_server *avrcp_server_register(const bdaddr_t *src,
- 	return server;
- }
- 
--int avrcp_register(const bdaddr_t *src, GKeyFile *config)
-+int avrcp_target_register(const bdaddr_t *src, GKeyFile *config)
- {
- 	sdp_record_t *record;
- 	struct avrcp_server *server;
- 
-+	server = find_server(servers, src);
-+	if (server != NULL)
-+		goto done;
-+
- 	server = avrcp_server_register(src, config);
- 	if (server == NULL)
- 		return -EPROTONOSUPPORT;
- 
-+done:
- 	record = avrcp_tg_record();
- 	if (!record) {
- 		error("Unable to allocate new service record");
--		avrcp_unregister(src);
-+		avrcp_target_unregister(src);
- 		return -1;
- 	}
- 
- 	if (add_record_to_server(src, record) < 0) {
- 		error("Unable to register AVRCP target service record");
--		avrcp_unregister(src);
-+		avrcp_target_unregister(src);
- 		sdp_record_free(record);
- 		return -1;
- 	}
- 	server->tg_record_id = record->handle;
- 
-+	return 0;
-+}
-+
-+int avrcp_control_register(const bdaddr_t *src, GKeyFile *config)
-+{
-+	sdp_record_t *record;
-+	struct avrcp_server *server;
-+
-+	server = find_server(servers, src);
-+	if (server != NULL)
-+		goto done;
-+
-+	server = avrcp_server_register(src, config);
-+	if (server == NULL)
-+		return -EPROTONOSUPPORT;
-+
-+done:
- 	record = avrcp_ct_record();
- 	if (!record) {
- 		error("Unable to allocate new service record");
--		avrcp_unregister(src);
-+		avrcp_control_unregister(src);
- 		return -1;
- 	}
- 
- 	if (add_record_to_server(src, record) < 0) {
- 		error("Unable to register AVRCP service record");
- 		sdp_record_free(record);
--		avrcp_unregister(src);
-+		avrcp_control_unregister(src);
- 		return -1;
- 	}
- 	server->ct_record_id = record->handle;
-@@ -2347,25 +2369,13 @@ int avrcp_register(const bdaddr_t *src, GKeyFile *config)
- 	return 0;
- }
- 
--void avrcp_unregister(const bdaddr_t *src)
-+static void avrcp_server_unregister(struct avrcp_server *server)
- {
--	struct avrcp_server *server;
--
--	server = find_server(servers, src);
--	if (!server)
--		return;
--
- 	g_slist_free_full(server->sessions, g_free);
- 	g_slist_free_full(server->players, player_destroy);
- 
- 	servers = g_slist_remove(servers, server);
- 
--	if (server->ct_record_id != 0)
--		remove_record_from_server(server->ct_record_id);
--
--	if (server->tg_record_id != 0)
--		remove_record_from_server(server->tg_record_id);
--
- 	avctp_unregister(&server->src);
- 	g_free(server);
- 
-@@ -2378,6 +2388,40 @@ void avrcp_unregister(const bdaddr_t *src)
- 	}
- }
- 
-+void avrcp_target_unregister(const bdaddr_t *src)
-+{
-+	struct avrcp_server *server;
-+
-+	server = find_server(servers, src);
-+	if (!server)
-+		return;
-+
-+	if (server->tg_record_id != 0) {
-+		remove_record_from_server(server->tg_record_id);
-+		server->tg_record_id = 0;
-+	}
-+
-+	if (server->ct_record_id == 0)
-+		avrcp_server_unregister(server);
-+}
-+
-+void avrcp_control_unregister(const bdaddr_t *src)
-+{
-+	struct avrcp_server *server;
-+
-+	server = find_server(servers, src);
-+	if (!server)
-+		return;
-+
-+	if (server->ct_record_id != 0) {
-+		remove_record_from_server(server->ct_record_id);
-+		server->ct_record_id = 0;
-+	}
-+
-+	if (server->tg_record_id == 0)
-+		avrcp_server_unregister(server);
-+}
-+
- struct avrcp_player *avrcp_register_player(const bdaddr_t *src,
- 						struct avrcp_player_cb *cb,
- 						void *user_data,
-diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
-index e607fb1..cddf40b 100644
---- a/profiles/audio/avrcp.h
-+++ b/profiles/audio/avrcp.h
-@@ -92,8 +92,10 @@ struct avrcp_player_cb {
- 							void *user_data);
+diff --git a/profiles/proximity/manager.c b/profiles/proximity/manager.c
+index 75f71ad..59c4456 100644
+--- a/profiles/proximity/manager.c
++++ b/profiles/proximity/manager.c
+@@ -48,42 +48,79 @@ static struct enabled enabled  = {
+ 	.findme = TRUE,
  };
  
--int avrcp_register(const bdaddr_t *src, GKeyFile *config);
--void avrcp_unregister(const bdaddr_t *src);
-+int avrcp_target_register(const bdaddr_t *src, GKeyFile *config);
-+void avrcp_target_unregister(const bdaddr_t *src);
-+int avrcp_control_register(const bdaddr_t *src, GKeyFile *config);
-+void avrcp_control_unregister(const bdaddr_t *src);
- 
- gboolean avrcp_connect(struct audio_device *dev);
- void avrcp_disconnect(struct audio_device *dev);
-diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
-index 422316e..976a879 100644
---- a/profiles/audio/manager.c
-+++ b/profiles/audio/manager.c
-@@ -82,6 +82,7 @@ static struct enabled_interfaces enabled = {
- 	.sink		= TRUE,
- 	.source		= FALSE,
- 	.control	= TRUE,
-+	.target		= TRUE,
- };
- 
- static struct audio_adapter *find_adapter(GSList *list,
-@@ -371,7 +372,7 @@ static int a2dp_sink_server_probe(struct btd_profile *p,
- 	return a2dp_sink_register(adapter_get_address(adapter), config);
- }
- 
--static int avrcp_server_probe(struct btd_profile *p,
-+static int avrcp_target_server_probe(struct btd_profile *p,
- 						struct btd_adapter *adapter)
+-static int monitor_device_probe(struct btd_profile *p,
++static int monitor_linkloss_probe(struct btd_profile *p,
+ 				struct btd_device *device, GSList *uuids)
  {
- 	struct audio_adapter *adp;
-@@ -384,14 +385,50 @@ static int avrcp_server_probe(struct btd_profile *p,
- 	if (!adp)
- 		return -EINVAL;
+-	struct gatt_primary *linkloss, *txpower, *immediate;
+-	int err = 0;
++	struct gatt_primary *linkloss;
  
--	err = avrcp_register(adapter_get_address(adapter), config);
-+	err = avrcp_target_register(adapter_get_address(adapter), config);
- 	if (err < 0)
- 		audio_adapter_unref(adp);
+-	immediate = btd_device_get_primary(device, IMMEDIATE_ALERT_UUID);
+-	txpower = btd_device_get_primary(device, TX_POWER_UUID);
+ 	linkloss = btd_device_get_primary(device, LINK_LOSS_UUID);
++	if (linkloss == NULL)
++		return -1;
  
- 	return err;
+-	if (linkloss)
+-		err = monitor_register_linkloss(device, &enabled, linkloss);
++	return monitor_register_linkloss(device, &enabled, linkloss);
++}
+ 
+-	if (err >= 0 && txpower)
+-		err = monitor_register_txpower(device, &enabled, txpower);
++static int monitor_immediate_probe(struct btd_profile *p,
++				struct btd_device *device, GSList *uuids)
++{
++	struct gatt_primary *immediate;
+ 
+-	if (err >= 0 && immediate)
+-		err = monitor_register_immediate(device, &enabled, immediate);
++	immediate = btd_device_get_primary(device, IMMEDIATE_ALERT_UUID);
++	if (immediate == NULL)
++		return -1;
+ 
+-	return err;
++	return monitor_register_immediate(device, &enabled, immediate);
  }
  
--static void avrcp_server_remove(struct btd_profile *p,
-+static int avrcp_control_server_probe(struct btd_profile *p,
-+						struct btd_adapter *adapter)
+-static void monitor_device_remove(struct btd_profile *p,
++static int monitor_txpower_probe(struct btd_profile *p,
++				struct btd_device *device, GSList *uuids)
 +{
-+	struct audio_adapter *adp;
-+	const gchar *path = adapter_get_path(adapter);
-+	int err;
++	struct gatt_primary *txpower;
 +
-+	DBG("path %s", path);
++	txpower = btd_device_get_primary(device, TX_POWER_UUID);
++	if (txpower == NULL)
++		return -1;
 +
-+	adp = audio_adapter_get(adapter);
-+	if (!adp)
-+		return -EINVAL;
-+
-+	err = avrcp_control_register(adapter_get_address(adapter), config);
-+	if (err < 0)
-+		audio_adapter_unref(adp);
-+
-+	return err;
++	return monitor_register_txpower(device, &enabled, txpower);
 +}
 +
-+static void avrcp_target_server_remove(struct btd_profile *p,
-+						struct btd_adapter *adapter)
++static void monitor_linkloss_remove(struct btd_profile *p,
++						struct btd_device *device)
 +{
-+	struct audio_adapter *adp;
-+	const gchar *path = adapter_get_path(adapter);
-+
-+	DBG("path %s", path);
-+
-+	adp = find_adapter(adapters, adapter);
-+	if (!adp)
-+		return;
-+
-+	avrcp_target_unregister(adapter_get_address(adapter));
-+	audio_adapter_unref(adp);
++	monitor_unregister_linkloss(device);
 +}
 +
-+static void avrcp_control_server_remove(struct btd_profile *p,
- 						struct btd_adapter *adapter)
++static void monitor_immediate_remove(struct btd_profile *p,
+ 						struct btd_device *device)
  {
- 	struct audio_adapter *adp;
-@@ -403,7 +440,7 @@ static void avrcp_server_remove(struct btd_profile *p,
- 	if (!adp)
- 		return;
- 
--	avrcp_unregister(adapter_get_address(adapter));
-+	avrcp_control_unregister(adapter_get_address(adapter));
- 	audio_adapter_unref(adp);
+ 	monitor_unregister_immediate(device);
++}
++
++static void monitor_txpower_remove(struct btd_profile *p,
++						struct btd_device *device)
++{
+ 	monitor_unregister_txpower(device);
+-	monitor_unregister_linkloss(device);
  }
  
-@@ -471,10 +508,21 @@ static struct btd_profile a2dp_sink_profile = {
- 	.adapter_probe	= a2dp_sink_server_probe,
- };
- 
--static struct btd_profile avrcp_profile = {
--	.name		= "audio-avrcp",
-+static struct btd_profile avrcp_target_profile = {
-+	.name		= "audio-avrcp-target",
-+
-+	.remote_uuids	= BTD_UUIDS(AVRCP_TARGET_UUID),
-+	.device_probe	= avrcp_probe,
-+	.device_remove	= audio_remove,
-+
-+	.adapter_probe	= avrcp_target_server_probe,
-+	.adapter_remove = avrcp_target_server_remove,
+-static struct btd_profile pxp_monitor_profile = {
+-	.name		= "Proximity Monitor GATT Driver",
+-	.remote_uuids	= BTD_UUIDS(IMMEDIATE_ALERT_UUID,
+-						LINK_LOSS_UUID, TX_POWER_UUID),
+-	.device_probe	= monitor_device_probe,
+-	.device_remove	= monitor_device_remove,
++static struct btd_profile pxp_monitor_linkloss_profile = {
++	.name		= "proximity-linkloss",
++	.remote_uuids	= BTD_UUIDS(LINK_LOSS_UUID),
++	.device_probe	= monitor_linkloss_probe,
++	.device_remove	= monitor_linkloss_remove,
 +};
 +
-+static struct btd_profile avrcp_control_profile = {
-+	.name		= "audio-avrcp-control",
- 
--	.remote_uuids	= BTD_UUIDS(AVRCP_TARGET_UUID, AVRCP_REMOTE_UUID),
-+	.remote_uuids	= BTD_UUIDS(AVRCP_REMOTE_UUID),
- 	.device_probe	= avrcp_probe,
- 	.device_remove	= audio_remove,
- 
-@@ -482,8 +530,8 @@ static struct btd_profile avrcp_profile = {
- 	.connect	= avrcp_control_connect,
- 	.disconnect	= avrcp_control_disconnect,
- 
--	.adapter_probe	= avrcp_server_probe,
--	.adapter_remove = avrcp_server_remove,
-+	.adapter_probe	= avrcp_control_server_probe,
-+	.adapter_remove = avrcp_control_server_remove,
++static struct btd_profile pxp_monitor_immediate_profile = {
++	.name		= "proximity-immediate",
++	.remote_uuids	= BTD_UUIDS(IMMEDIATE_ALERT_UUID),
++	.device_probe	= monitor_immediate_probe,
++	.device_remove	= monitor_immediate_remove,
++};
++
++static struct btd_profile pxp_monitor_txpower_profile = {
++	.name		= "proximity-txpower",
++	.remote_uuids	= BTD_UUIDS(TX_POWER_UUID),
++	.device_probe	= monitor_txpower_probe,
++	.device_remove	= monitor_txpower_remove,
  };
  
- static struct btd_adapter_driver media_driver = {
-@@ -531,6 +579,8 @@ int audio_manager_init(GKeyFile *conf)
- 			enabled.source = TRUE;
- 		else if (g_str_equal(list[i], "Control"))
- 			enabled.control = TRUE;
-+		else if (g_str_equal(list[i], "Target"))
-+			enabled.target = TRUE;
- 	}
- 	g_strfreev(list);
+ static struct btd_profile pxp_reporter_profile = {
+@@ -122,19 +159,30 @@ int proximity_manager_init(GKeyFile *config)
+ {
+ 	load_config_file(config);
  
-@@ -543,6 +593,8 @@ int audio_manager_init(GKeyFile *conf)
- 			enabled.source = FALSE;
- 		else if (g_str_equal(list[i], "Control"))
- 			enabled.control = FALSE;
-+		else if (g_str_equal(list[i], "Target"))
-+			enabled.target = FALSE;
- 	}
- 	g_strfreev(list);
+-	if (btd_profile_register(&pxp_monitor_profile) < 0)
+-		return -1;
++	if (btd_profile_register(&pxp_monitor_linkloss_profile) < 0)
++		goto fail;
  
-@@ -554,7 +606,10 @@ proceed:
- 		btd_profile_register(&a2dp_sink_profile);
- 
- 	if (enabled.control)
--		btd_profile_register(&avrcp_profile);
-+		btd_profile_register(&avrcp_control_profile);
+-	if (btd_profile_register(&pxp_reporter_profile) < 0) {
+-		btd_profile_unregister(&pxp_monitor_profile);
+-		return -1;
+-	}
++	if (btd_profile_register(&pxp_monitor_immediate_profile) < 0)
++		goto fail;
 +
-+	if (enabled.target)
-+		btd_profile_register(&avrcp_target_profile);
- 
- 	btd_register_adapter_driver(&media_driver);
- 
-@@ -575,7 +630,10 @@ void audio_manager_exit(void)
- 		btd_profile_unregister(&a2dp_sink_profile);
- 
- 	if (enabled.control)
--		btd_profile_unregister(&avrcp_profile);
-+		btd_profile_unregister(&avrcp_control_profile);
++	if (btd_profile_register(&pxp_monitor_txpower_profile) < 0)
++		goto fail;
 +
-+	if (enabled.target)
-+		btd_profile_unregister(&avrcp_target_profile);
++	if (btd_profile_register(&pxp_reporter_profile) < 0)
++		goto fail;
  
- 	btd_unregister_adapter_driver(&media_driver);
+ 	return 0;
++
++fail:
++	proximity_manager_exit();
++
++	return -1;
  }
-diff --git a/profiles/audio/manager.h b/profiles/audio/manager.h
-index 2b924dc..fc5362b 100644
---- a/profiles/audio/manager.h
-+++ b/profiles/audio/manager.h
-@@ -26,6 +26,7 @@ struct enabled_interfaces {
- 	gboolean sink;
- 	gboolean source;
- 	gboolean control;
-+	gboolean target;
- 	gboolean media_player;
- };
  
+ void proximity_manager_exit(void)
+ {
+-	btd_profile_unregister(&pxp_monitor_profile);
+ 	btd_profile_unregister(&pxp_reporter_profile);
++	btd_profile_unregister(&pxp_monitor_txpower_profile);
++	btd_profile_unregister(&pxp_monitor_immediate_profile);
++	btd_profile_unregister(&pxp_monitor_linkloss_profile);
+ }
 -- 
 1.7.11.7
 
