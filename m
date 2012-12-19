@@ -1,67 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1355308088-9080-1-git-send-email-szymon.janc@tieto.com>
-References: <1355308088-9080-1-git-send-email-szymon.janc@tieto.com>
-Date: Wed, 19 Dec 2012 14:16:59 +0200
-Message-ID: <CABBYNZ+okMZM4vVUaG3snyfPMi2Fjzh0i7+BfDJx3MNW77xA2Q@mail.gmail.com>
-Subject: Re: [PATCH 00/16] audio: Use device/adapter reference instead of bdaddr_t
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Tomasz Bursztyka <tomasz.bursztyka@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Tomasz Bursztyka <tomasz.bursztyka@linux.intel.com>
+Subject: [PATCH] gdbus: Fix double free when calling g_dbus_remove_all_watches
+Date: Wed, 19 Dec 2012 14:01:37 +0200
+Message-Id: <1355918497-21944-1-git-send-email-tomasz.bursztyka@linux.intel.com>
+In-Reply-To: <20121128122318.GA30710@x220.ger.corp.intel.com>
+References: <20121128122318.GA30710@x220.ger.corp.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Valgrind output:
+==21779== Invalid free() / delete / delete[] / realloc()
+==21779==    at 0x4A080BC: free (vg_replace_malloc.c:427)
+==21779==    by 0x406700: filter_data_free (watch.c:285)
+==21779==    by 0x406D92: g_dbus_remove_all_watches (watch.c:315)
+==21779==    by 0x408787: connman_interface_finalize (interface.c:99)
+==21779==    by 0x40EA14: main (main.c:113)
+==21779==  Address 0x6893810 is 0 bytes inside a block of size 56 free'd
+==21779==    at 0x4A080BC: free (vg_replace_malloc.c:427)
+==21779==    by 0x406D81: g_dbus_remove_all_watches (watch.c:309)
+==21779==    by 0x408787: connman_interface_finalize (interface.c:99)
+==21779==    by 0x40EA14: main (main.c:113)
+---
+Hi Johan,
 
-On Wed, Dec 12, 2012 at 12:27 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> This remove use of bdaddr_t in favour of using references to struct btd_adapter
-> and struct btd_device.
->
-> note:
-> This patch triggers a bug introduced when a2dp was splitted into two
-> btd_profile resulting in a2dp_unregister() is never called (so adapter
-> ref is not dropped properly). This is not fixed in this patch set.
->
-> Szymon Janc (16):
->   a2dp: Remove bogus '\' at the end of line
->   a2dp: Remove useless return
->   a2dp: Remove not used macros definitions
->   a2dp: Convert sink/source register to accept btd_adapter
->   a2dp: Convert a2dp_unregister to accept btd_adapter
->   media: Convert register/unregister to accept btd_adapter
->   a2dp: Convert a2dp_add_sep to accept struct btd_adapter
->   avdtp: Use refs to adapter and device instead of bdaddr_t
->   a2dp: Use btd_adapter ref in a2dp_server instead of bdaddr_t
->   avrcp: Convert to accept btd_adapter instead of bdaddr_t
->   avctp: Convert register/unregister to accept btd_adapter
->   avdtp: Replace avdtp_get_peers with adapter and device getters
->   audio: Use manager_get_device to get device object
->   audio: Make manager_get_device accept btd_device
->   audio: Simplify manager_find_device
->   avctp: Remove double looking for audio device
->
->  profiles/audio/a2dp.c    |  75 +++++++++++---------------
->  profiles/audio/a2dp.h    |   8 +--
->  profiles/audio/avctp.c   |  96 +++++++++++++++-------------------
->  profiles/audio/avctp.h   |   4 +-
->  profiles/audio/avdtp.c   | 119 ++++++++++++++++++------------------------
->  profiles/audio/avdtp.h   |  10 ++--
->  profiles/audio/avrcp.c   |  37 ++++++-------
->  profiles/audio/avrcp.h   |   6 +--
->  profiles/audio/manager.c | 133 +++++++++--------------------------------------
->  profiles/audio/manager.h |  17 +-----
->  profiles/audio/media.c   |  35 ++++++-------
->  profiles/audio/media.h   |   4 +-
->  profiles/audio/sink.c    |   5 +-
->  profiles/audio/source.c  |   5 +-
->  14 files changed, 206 insertions(+), 348 deletions(-)
->
-> --
-> 1.8.0
+I finally put the valgrind output, since backtrace is actually useless:
 
-All patches are now upstream, thanks.
+*** glibc detected *** ./project: double free or corruption (fasttop): 0x000000000075b5a0 ***
+======= Backtrace: =========
+/lib64/libc.so.6(+0x7adf5)[0x7f6701e5adf5]
+./project[0x4066b1]
+./project[0x406d43]
+./project[0x408738]
+./project[0x40e9a5]
+/lib64/libc.so.6(__libc_start_main+0xfd)[0x7f6701e024bd]
+./project[0x4053f9] 
 
+Anyway, this bug was never found before for a good reason: no projects (but mine) uses g_dbus_remove_all_watches()
 
---
-Luiz Augusto von Dentz
+ gdbus/watch.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/gdbus/watch.c b/gdbus/watch.c
+index 9e4f994..9451d5d 100644
+--- a/gdbus/watch.c
++++ b/gdbus/watch.c
+@@ -309,6 +309,9 @@ static void filter_data_call_and_free(struct filter_data *data)
+ 		g_free(cb);
+ 	}
+ 
++	g_slist_free(data->callbacks);
++	data->callbacks = NULL;
++
+ 	filter_data_free(data);
+ }
+ 
+-- 
+1.8.0.2
+
