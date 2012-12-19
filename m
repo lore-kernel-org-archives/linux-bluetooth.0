@@ -1,43 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 19 Dec 2012 09:32:57 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/3] core: Fix trying to store NULL adapter->name
+Message-ID: <20121219073257.GA4564@x220>
+References: <1355879775-5809-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
-In-Reply-To: <20121218202458.GA8716@samus>
-References: <CANT-zCWNUkTW9pmcvuDEhaEuSxdhphYLwvQkSYz5dLvYE2ENjg@mail.gmail.com>
-	<CANT-zCVXOjncycx6GSghO6T5y3TEM0FDA1Ke3W8FZSE=ZOhbVQ@mail.gmail.com>
-	<20121218202458.GA8716@samus>
-Date: Wed, 19 Dec 2012 12:07:44 +0100
-Message-ID: <CANT-zCUt1OnyrhX+aJV7yGRBm5jv0TWUbWy82nsWeJKw5cD_PA@mail.gmail.com>
-Subject: Re: PulseAudio branch to test BlueZ master
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org, Tanu Kaskinen <tanuk@iki.fi>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1355879775-5809-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Lizardo,
 
-On Tue, Dec 18, 2012 at 9:24 PM, Vinicius Costa Gomes
-<vinicius.gomes@openbossa.org> wrote:
-> Hi Mikel,
->
-> On 11:19 Tue 18 Dec, Mikel Astiz wrote:
->> On the other hand, A2DP is not working for me any more. I think this
->> might be an unrelated issue, probably a regression in BlueZ, but I
->> have to do further research.
->>
->
-> This problem may have been caused by me :-) The commit "bluetooth: Add
-> HFP 1.6 codec ID" was buggy, and was registering the A2DP endpoint with
-> the wrong codec. Sorry about that. I pushed an updated version to my
-> fork of pulseaudio[1].
+On Tue, Dec 18, 2012, Anderson Lizardo wrote:
+> When BlueZ starts without a main.conf, adapter->name will be initially
+> NULL, until adapter_name_changed() is called and name is set to "BlueZ".
+> 
+> Before this, store_adapter_info() will try to access a NULL pointer.
+> 
+> Fixes this GLib error:
+> 
+> (bluetoothd:1721): GLib-CRITICAL **: g_key_file_set_string: assertion
+> `string != NULL' failed
+> ---
+>  src/adapter.c |    4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
-You're right, it was caused by this patch. Thanks for testing.
+All three patches have been applied. Thanks.
 
-I updated now and it seems to work both with A2DP and HFP.
-
-Btw, now that the PulseAudio "next" branch has been merged to the
-master branch, I'll send the patches as RFC to the PulseAudio mailing
-list.
-
-Cheers,
-Mikel
+Johan
