@@ -1,284 +1,202 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] audio: Remove adapter list
-Date: Wed, 19 Dec 2012 16:29:08 +0200
-Message-Id: <1355927348-19430-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1355927348-19430-1-git-send-email-luiz.dentz@gmail.com>
-References: <1355927348-19430-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] audio: Fix not releasing all references to btd_adapter
+Date: Wed, 19 Dec 2012 16:29:07 +0200
+Message-Id: <1355927348-19430-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-btd_adapter is directly referenced by the drivers so there is no point
-on keeping a list just for the audio adapters.
+A2DP server now take a reference to btd_adapter which needs to be
+released properly once the adapter is unplugged.
 ---
- profiles/audio/manager.c | 180 ++++++-----------------------------------------
- 1 file changed, 21 insertions(+), 159 deletions(-)
+ profiles/audio/a2dp.c    | 44 +++++++++++++++++++++++++++++++++++---------
+ profiles/audio/a2dp.h    |  3 ++-
+ profiles/audio/manager.c | 48 ++++++++++++++++++++++++++++++++++++++++++++----
+ 3 files changed, 81 insertions(+), 14 deletions(-)
 
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 145b1aa..46f41a6 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -1224,7 +1224,16 @@ static void a2dp_unregister_sep(struct a2dp_sep *sep)
+ 	g_free(sep);
+ }
+ 
+-void a2dp_unregister(struct btd_adapter *adapter)
++static void a2dp_server_unregister(struct a2dp_server *server)
++{
++	avdtp_exit(server->adapter);
++
++	servers = g_slist_remove(servers, server);
++	btd_adapter_unref(server->adapter);
++	g_free(server);
++}
++
++void a2dp_sink_unregister(struct btd_adapter *adapter)
+ {
+ 	struct a2dp_server *server;
+ 
+@@ -1233,21 +1242,38 @@ void a2dp_unregister(struct btd_adapter *adapter)
+ 		return;
+ 
+ 	g_slist_free_full(server->sinks, (GDestroyNotify) a2dp_unregister_sep);
+-	g_slist_free_full(server->sources,
+-					(GDestroyNotify) a2dp_unregister_sep);
+-
+-	avdtp_exit(adapter);
+ 
+-	servers = g_slist_remove(servers, server);
++	if (server->sink_record_id) {
++		remove_record_from_server(server->sink_record_id);
++		server->sink_record_id = 0;
++	}
+ 
+ 	if (server->source_record_id)
++		return;
++
++	a2dp_server_unregister(server);
++}
++
++void a2dp_source_unregister(struct btd_adapter *adapter)
++{
++	struct a2dp_server *server;
++
++	server = find_server(servers, adapter);
++	if (!server)
++		return;
++
++	g_slist_free_full(server->sources,
++					(GDestroyNotify) a2dp_unregister_sep);
++
++	if (server->source_record_id) {
+ 		remove_record_from_server(server->source_record_id);
++		server->source_record_id = 0;
++	}
+ 
+ 	if (server->sink_record_id)
+-		remove_record_from_server(server->sink_record_id);
++		return;
+ 
+-	btd_adapter_unref(server->adapter);
+-	g_free(server);
++	a2dp_server_unregister(server);
+ }
+ 
+ struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
+diff --git a/profiles/audio/a2dp.h b/profiles/audio/a2dp.h
+index 54c3bf3..4819f7b 100644
+--- a/profiles/audio/a2dp.h
++++ b/profiles/audio/a2dp.h
+@@ -65,8 +65,9 @@ typedef void (*a2dp_stream_cb_t) (struct avdtp *session,
+ 					void *user_data);
+ 
+ int a2dp_source_register(struct btd_adapter *adapter, GKeyFile *config);
++void a2dp_source_unregister(struct btd_adapter *adapter);
+ int a2dp_sink_register(struct btd_adapter *adapter, GKeyFile *config);
+-void a2dp_unregister(struct btd_adapter *adapter);
++void a2dp_sink_unregister(struct btd_adapter *adapter);
+ 
+ struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
+ 				uint8_t codec, gboolean delay_reporting,
 diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
-index bb5688f..9ad3bf6 100644
+index b6b2385..bb5688f 100644
 --- a/profiles/audio/manager.c
 +++ b/profiles/audio/manager.c
-@@ -75,7 +75,6 @@ struct audio_adapter {
- };
- 
- static GKeyFile *config = NULL;
--static GSList *adapters = NULL;
- static GSList *devices = NULL;
- 
- static struct enabled_interfaces enabled = {
-@@ -84,19 +83,6 @@ static struct enabled_interfaces enabled = {
- 	.control	= TRUE,
- };
- 
--static struct audio_adapter *find_adapter(GSList *list,
--					struct btd_adapter *btd_adapter)
--{
--	for (; list; list = list->next) {
--		struct audio_adapter *adapter = list->data;
--
--		if (adapter->btd_adapter == btd_adapter)
--			return adapter;
--	}
--
--	return NULL;
--}
--
- static struct audio_device *get_audio_dev(struct btd_device *device)
+@@ -336,6 +336,7 @@ static int a2dp_source_server_probe(struct btd_profile *p,
  {
- 	return manager_get_audio_device(device, TRUE);
-@@ -284,191 +270,66 @@ static int avrcp_control_disconnect(struct btd_device *dev,
- 	return control_disconnect(audio_dev);
- }
+ 	struct audio_adapter *adp;
+ 	const gchar *path = adapter_get_path(adapter);
++	int err;
  
--static struct audio_adapter *audio_adapter_ref(struct audio_adapter *adp)
--{
--	adp->ref++;
--
--	DBG("%p: ref=%d", adp, adp->ref);
--
--	return adp;
--}
--
--static void audio_adapter_unref(struct audio_adapter *adp)
--{
--	adp->ref--;
--
--	DBG("%p: ref=%d", adp, adp->ref);
--
--	if (adp->ref > 0)
--		return;
--
--	adapters = g_slist_remove(adapters, adp);
--	btd_adapter_unref(adp->btd_adapter);
--	g_free(adp);
--}
--
--static struct audio_adapter *audio_adapter_create(struct btd_adapter *adapter)
--{
--	struct audio_adapter *adp;
--
--	adp = g_new0(struct audio_adapter, 1);
--	adp->btd_adapter = btd_adapter_ref(adapter);
--
--	return audio_adapter_ref(adp);
--}
--
--static struct audio_adapter *audio_adapter_get(struct btd_adapter *adapter)
--{
--	struct audio_adapter *adp;
--
--	adp = find_adapter(adapters, adapter);
--	if (!adp) {
--		adp = audio_adapter_create(adapter);
--		adapters = g_slist_append(adapters, adp);
--	} else
--		audio_adapter_ref(adp);
--
--	return adp;
--}
--
- static int a2dp_source_server_probe(struct btd_profile *p,
- 						struct btd_adapter *adapter)
- {
--	struct audio_adapter *adp;
--	const gchar *path = adapter_get_path(adapter);
--	int err;
--
--	DBG("path %s", path);
--
--	adp = audio_adapter_get(adapter);
--	if (!adp)
--		return -EINVAL;
--
--	err = a2dp_source_register(adapter, config);
--	if (err < 0)
--		audio_adapter_unref(adp);
-+	DBG("path %s", adapter_get_path(adapter));
+ 	DBG("path %s", path);
  
--	return err;
-+	return a2dp_source_register(adapter, config);
- }
+@@ -343,9 +344,27 @@ static int a2dp_source_server_probe(struct btd_profile *p,
+ 	if (!adp)
+ 		return -EINVAL;
  
- static void a2dp_source_server_remove(struct btd_profile *p,
- 						struct btd_adapter *adapter)
- {
--	struct audio_adapter *adp;
--	const gchar *path = adapter_get_path(adapter);
--
--	DBG("path %s", path);
--
--	adp = find_adapter(adapters, adapter);
--	if (!adp)
--		return;
-+	DBG("path %s", adapter_get_path(adapter));
+-	audio_adapter_unref(adp); /* Referenced by a2dp server */
++	err = a2dp_source_register(adapter, config);
++	if (err < 0)
++		audio_adapter_unref(adp);
++
++	return err;
++}
++
++static void a2dp_source_server_remove(struct btd_profile *p,
++						struct btd_adapter *adapter)
++{
++	struct audio_adapter *adp;
++	const gchar *path = adapter_get_path(adapter);
++
++	DBG("path %s", path);
  
- 	a2dp_source_unregister(adapter);
--	audio_adapter_unref(adp);
+-	return a2dp_source_register(adapter, config);
++	adp = find_adapter(adapters, adapter);
++	if (!adp)
++		return;
++
++	a2dp_source_unregister(adapter);
++	audio_adapter_unref(adp);
  }
  
  static int a2dp_sink_server_probe(struct btd_profile *p,
- 						struct btd_adapter *adapter)
+@@ -353,6 +372,7 @@ static int a2dp_sink_server_probe(struct btd_profile *p,
  {
--	struct audio_adapter *adp;
--	const gchar *path = adapter_get_path(adapter);
--	int err;
--
--	DBG("path %s", path);
--
--	adp = audio_adapter_get(adapter);
--	if (!adp)
--		return -EINVAL;
--
--	err = a2dp_sink_register(adapter, config);
--	if (err < 0)
--		audio_adapter_unref(adp);
-+	DBG("path %s", adapter_get_path(adapter));
+ 	struct audio_adapter *adp;
+ 	const gchar *path = adapter_get_path(adapter);
++	int err;
  
--	return err;
-+	return a2dp_sink_register(adapter, config);
- }
+ 	DBG("path %s", path);
  
- static void a2dp_sink_server_remove(struct btd_profile *p,
- 						struct btd_adapter *adapter)
- {
--	struct audio_adapter *adp;
--	const gchar *path = adapter_get_path(adapter);
--
--	DBG("path %s", path);
--
--	adp = find_adapter(adapters, adapter);
--	if (!adp)
--		return;
-+	DBG("path %s", adapter_get_path(adapter));
+@@ -360,9 +380,27 @@ static int a2dp_sink_server_probe(struct btd_profile *p,
+ 	if (!adp)
+ 		return -EINVAL;
  
- 	a2dp_sink_unregister(adapter);
--	audio_adapter_unref(adp);
+-	audio_adapter_unref(adp); /* Referenced by a2dp server */
++	err = a2dp_sink_register(adapter, config);
++	if (err < 0)
++		audio_adapter_unref(adp);
++
++	return err;
++}
++
++static void a2dp_sink_server_remove(struct btd_profile *p,
++						struct btd_adapter *adapter)
++{
++	struct audio_adapter *adp;
++	const gchar *path = adapter_get_path(adapter);
++
++	DBG("path %s", path);
+ 
+-	return a2dp_sink_register(adapter, config);
++	adp = find_adapter(adapters, adapter);
++	if (!adp)
++		return;
++
++	a2dp_sink_unregister(adapter);
++	audio_adapter_unref(adp);
  }
  
  static int avrcp_server_probe(struct btd_profile *p,
- 						struct btd_adapter *adapter)
- {
--	struct audio_adapter *adp;
--	const gchar *path = adapter_get_path(adapter);
--	int err;
--
--	DBG("path %s", path);
--
--	adp = audio_adapter_get(adapter);
--	if (!adp)
--		return -EINVAL;
--
--	err = avrcp_register(adapter, config);
--	if (err < 0)
--		audio_adapter_unref(adp);
-+	DBG("path %s", adapter_get_path(adapter));
+@@ -446,6 +484,7 @@ static struct btd_profile a2dp_source_profile = {
+ 	.disconnect	= a2dp_source_disconnect,
  
--	return err;
-+	return avrcp_register(adapter, config);
- }
+ 	.adapter_probe	= a2dp_source_server_probe,
++	.adapter_remove	= a2dp_source_server_remove,
+ };
  
- static void avrcp_server_remove(struct btd_profile *p,
- 						struct btd_adapter *adapter)
- {
--	struct audio_adapter *adp;
--	const gchar *path = adapter_get_path(adapter);
--
--	DBG("path %s", path);
--
--	adp = find_adapter(adapters, adapter);
--	if (!adp)
--		return;
-+	DBG("path %s", adapter_get_path(adapter));
+ static struct btd_profile a2dp_sink_profile = {
+@@ -461,6 +500,7 @@ static struct btd_profile a2dp_sink_profile = {
+ 	.disconnect	= a2dp_sink_disconnect,
  
--	avrcp_unregister(adapter);
--	audio_adapter_unref(adp);
-+	return avrcp_unregister(adapter);
- }
+ 	.adapter_probe	= a2dp_sink_server_probe,
++	.adapter_remove	= a2dp_sink_server_remove,
+ };
  
- static int media_server_probe(struct btd_adapter *adapter)
- {
--	struct audio_adapter *adp;
--	int err;
--
- 	DBG("path %s", adapter_get_path(adapter));
- 
--	adp = audio_adapter_get(adapter);
--	if (!adp)
--		return -EINVAL;
--
--	err = media_register(adapter);
--	if (err < 0)
--		audio_adapter_unref(adp);
--
--	return err;
-+	return media_register(adapter);
- }
- 
- static void media_server_remove(struct btd_adapter *adapter)
- {
--	struct audio_adapter *adp;
--
- 	DBG("path %s", adapter_get_path(adapter));
- 
--	adp = find_adapter(adapters, adapter);
--	if (!adp)
--		return;
--
- 	media_unregister(adapter);
--	audio_adapter_unref(adp);
- }
- 
- static struct btd_profile a2dp_source_profile = {
-@@ -643,16 +504,17 @@ struct audio_device *manager_get_audio_device(struct btd_device *device,
- 	return dev;
- }
- 
--void manager_set_fast_connectable(gboolean enable)
-+static void set_fast_connectable(struct btd_adapter *adapter, gpointer user_data)
- {
--	GSList *l;
-+	gboolean enable = GPOINTER_TO_UINT(user_data);
- 
--	for (l = adapters; l != NULL; l = l->next) {
--		struct audio_adapter *adapter = l->data;
-+	if (btd_adapter_set_fast_connectable(adapter, enable))
-+		error("Changing fast connectable for hci%d failed",
-+						adapter_get_dev_id(adapter));
-+}
- 
--		if (btd_adapter_set_fast_connectable(adapter->btd_adapter,
--								enable))
--			error("Changing fast connectable for hci%d failed",
--				adapter_get_dev_id(adapter->btd_adapter));
--	}
-+void manager_set_fast_connectable(gboolean enable)
-+{
-+	manager_foreach_adapter(set_fast_connectable,
-+						GUINT_TO_POINTER(enable));
- }
+ static struct btd_profile avrcp_profile = {
 -- 
 1.7.11.7
 
