@@ -1,169 +1,175 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1355925094-22695-1-git-send-email-szymon.janc@tieto.com>
-References: <1355925094-22695-1-git-send-email-szymon.janc@tieto.com>
-Date: Wed, 19 Dec 2012 16:12:39 +0200
-Message-ID: <CABBYNZ+e7Wh4c2Cnexqi8KF01oFNruzFQBcLop=aaGROA3E8DQ@mail.gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Subject: Re: [PATCH] a2dp: Fix server unregister
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Wed, 19 Dec 2012 15:30:44 +0100
+Message-ID: <135598708.qYBUg6npTx@uw000953>
+In-Reply-To: <CABBYNZ+e7Wh4c2Cnexqi8KF01oFNruzFQBcLop=aaGROA3E8DQ@mail.gmail.com>
+References: <1355925094-22695-1-git-send-email-szymon.janc@tieto.com> <CABBYNZ+e7Wh4c2Cnexqi8KF01oFNruzFQBcLop=aaGROA3E8DQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+On Wednesday 19 of December 2012 16:12:39 Luiz Augusto von Dentz wrote:
+> Hi Szymon,
 
-On Wed, Dec 19, 2012 at 3:51 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> When removing sink or source unregister its sep and sdp record. When
-> both sink and source are unregistered also unregister a2dp server.
-> ---
->  profiles/audio/a2dp.c    | 48 +++++++++++++++++++++++++++++++++++++++---------
->  profiles/audio/a2dp.h    |  3 ++-
->  profiles/audio/manager.c | 14 ++++++++++++++
->  3 files changed, 55 insertions(+), 10 deletions(-)
->
-> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> index 145b1aa..3ec8b43 100644
-> --- a/profiles/audio/a2dp.c
-> +++ b/profiles/audio/a2dp.c
-> @@ -1224,7 +1224,20 @@ static void a2dp_unregister_sep(struct a2dp_sep *sep)
->         g_free(sep);
->  }
->
-> -void a2dp_unregister(struct btd_adapter *adapter)
-> +static void a2dp_unregister(struct a2dp_server *server)
-> +{
-> +       if (server->sink_enabled || server->source_enabled)
-> +               return;
-> +
-> +       avdtp_exit(server->adapter);
-> +
-> +       servers = g_slist_remove(servers, server);
-> +
-> +       btd_adapter_unref(server->adapter);
-> +       g_free(server);
-> +}
-> +
-> +void a2dp_source_unregister(struct btd_adapter *adapter)
->  {
->         struct a2dp_server *server;
->
-> @@ -1232,22 +1245,39 @@ void a2dp_unregister(struct btd_adapter *adapter)
->         if (!server)
->                 return;
->
-> -       g_slist_free_full(server->sinks, (GDestroyNotify) a2dp_unregister_sep);
-> +       server->source_enabled = FALSE;
-> +
->         g_slist_free_full(server->sources,
->                                         (GDestroyNotify) a2dp_unregister_sep);
-> +       server->sources = NULL;
->
-> -       avdtp_exit(adapter);
-> +       if (server->source_record_id > 0) {
-> +               remove_record_from_server(server->source_record_id);
-> +               server->source_record_id = 0;
-> +       }
->
-> -       servers = g_slist_remove(servers, server);
-> +       a2dp_unregister(server);
-> +}
->
-> -       if (server->source_record_id)
-> -               remove_record_from_server(server->source_record_id);
-> +void a2dp_sink_unregister(struct btd_adapter *adapter)
-> +{
-> +       struct a2dp_server *server;
-> +
-> +       server = find_server(servers, adapter);
-> +       if (!server)
-> +               return;
-> +
-> +       server->sink_enabled = FALSE;
-> +
-> +       g_slist_free_full(server->sinks, (GDestroyNotify) a2dp_unregister_sep);
-> +       server->sinks = NULL;
->
-> -       if (server->sink_record_id)
-> +       if (server->sink_record_id > 0) {
->                 remove_record_from_server(server->sink_record_id);
-> +               server->sink_record_id = 0;
-> +       }
->
-> -       btd_adapter_unref(server->adapter);
-> -       g_free(server);
-> +       a2dp_unregister(server);
->  }
->
->  struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
-> diff --git a/profiles/audio/a2dp.h b/profiles/audio/a2dp.h
-> index 54c3bf3..af5c27d 100644
-> --- a/profiles/audio/a2dp.h
-> +++ b/profiles/audio/a2dp.h
-> @@ -66,7 +66,8 @@ typedef void (*a2dp_stream_cb_t) (struct avdtp *session,
->
->  int a2dp_source_register(struct btd_adapter *adapter, GKeyFile *config);
->  int a2dp_sink_register(struct btd_adapter *adapter, GKeyFile *config);
-> -void a2dp_unregister(struct btd_adapter *adapter);
-> +void a2dp_source_unregister(struct btd_adapter *adapter);
-> +void a2dp_sink_unregister(struct btd_adapter *adapter);
->
->  struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
->                                 uint8_t codec, gboolean delay_reporting,
-> diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
-> index b6b2385..5e30fa8 100644
-> --- a/profiles/audio/manager.c
-> +++ b/profiles/audio/manager.c
-> @@ -348,6 +348,12 @@ static int a2dp_source_server_probe(struct btd_profile *p,
->         return a2dp_source_register(adapter, config);
->  }
->
-> +static void a2dp_source_server_remove(struct btd_profile *p,
-> +                                               struct btd_adapter *adapter)
-> +{
-> +       a2dp_source_unregister(adapter);
-> +}
-> +
->  static int a2dp_sink_server_probe(struct btd_profile *p,
->                                                 struct btd_adapter *adapter)
->  {
-> @@ -365,6 +371,12 @@ static int a2dp_sink_server_probe(struct btd_profile *p,
->         return a2dp_sink_register(adapter, config);
->  }
->
-> +static void a2dp_sink_server_remove(struct btd_profile *p,
-> +                                               struct btd_adapter *adapter)
-> +{
-> +       a2dp_sink_unregister(adapter);
-> +}
-> +
->  static int avrcp_server_probe(struct btd_profile *p,
->                                                 struct btd_adapter *adapter)
->  {
-> @@ -446,6 +458,7 @@ static struct btd_profile a2dp_source_profile = {
->         .disconnect     = a2dp_source_disconnect,
->
->         .adapter_probe  = a2dp_source_server_probe,
-> +       .adapter_remove = a2dp_source_server_remove,
->  };
->
->  static struct btd_profile a2dp_sink_profile = {
-> @@ -461,6 +474,7 @@ static struct btd_profile a2dp_sink_profile = {
->         .disconnect     = a2dp_sink_disconnect,
->
->         .adapter_probe  = a2dp_sink_server_probe,
-> +       .adapter_remove = a2dp_sink_server_remove,
->  };
->
->  static struct btd_profile avrcp_profile = {
-> --
-> 1.8.0
+Hi Luiz,
 
-I have a very similar fix to push, I end up doing it because the whole
-btd_adapter reference got broken so I would like to push it if you
-don't mind.
+> 
+> On Wed, Dec 19, 2012 at 3:51 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> > When removing sink or source unregister its sep and sdp record. When
+> > both sink and source are unregistered also unregister a2dp server.
+> > ---
+> >  profiles/audio/a2dp.c    | 48 +++++++++++++++++++++++++++++++++++++++---------
+> >  profiles/audio/a2dp.h    |  3 ++-
+> >  profiles/audio/manager.c | 14 ++++++++++++++
+> >  3 files changed, 55 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> > index 145b1aa..3ec8b43 100644
+> > --- a/profiles/audio/a2dp.c
+> > +++ b/profiles/audio/a2dp.c
+> > @@ -1224,7 +1224,20 @@ static void a2dp_unregister_sep(struct a2dp_sep *sep)
+> >         g_free(sep);
+> >  }
+> >
+> > -void a2dp_unregister(struct btd_adapter *adapter)
+> > +static void a2dp_unregister(struct a2dp_server *server)
+> > +{
+> > +       if (server->sink_enabled || server->source_enabled)
+> > +               return;
+> > +
+> > +       avdtp_exit(server->adapter);
+> > +
+> > +       servers = g_slist_remove(servers, server);
+> > +
+> > +       btd_adapter_unref(server->adapter);
+> > +       g_free(server);
+> > +}
+> > +
+> > +void a2dp_source_unregister(struct btd_adapter *adapter)
+> >  {
+> >         struct a2dp_server *server;
+> >
+> > @@ -1232,22 +1245,39 @@ void a2dp_unregister(struct btd_adapter *adapter)
+> >         if (!server)
+> >                 return;
+> >
+> > -       g_slist_free_full(server->sinks, (GDestroyNotify) a2dp_unregister_sep);
+> > +       server->source_enabled = FALSE;
+> > +
+> >         g_slist_free_full(server->sources,
+> >                                         (GDestroyNotify) a2dp_unregister_sep);
+> > +       server->sources = NULL;
+> >
+> > -       avdtp_exit(adapter);
+> > +       if (server->source_record_id > 0) {
+> > +               remove_record_from_server(server->source_record_id);
+> > +               server->source_record_id = 0;
+> > +       }
+> >
+> > -       servers = g_slist_remove(servers, server);
+> > +       a2dp_unregister(server);
+> > +}
+> >
+> > -       if (server->source_record_id)
+> > -               remove_record_from_server(server->source_record_id);
+> > +void a2dp_sink_unregister(struct btd_adapter *adapter)
+> > +{
+> > +       struct a2dp_server *server;
+> > +
+> > +       server = find_server(servers, adapter);
+> > +       if (!server)
+> > +               return;
+> > +
+> > +       server->sink_enabled = FALSE;
+> > +
+> > +       g_slist_free_full(server->sinks, (GDestroyNotify) a2dp_unregister_sep);
+> > +       server->sinks = NULL;
+> >
+> > -       if (server->sink_record_id)
+> > +       if (server->sink_record_id > 0) {
+> >                 remove_record_from_server(server->sink_record_id);
+> > +               server->sink_record_id = 0;
+> > +       }
+> >
+> > -       btd_adapter_unref(server->adapter);
+> > -       g_free(server);
+> > +       a2dp_unregister(server);
+> >  }
+> >
+> >  struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
+> > diff --git a/profiles/audio/a2dp.h b/profiles/audio/a2dp.h
+> > index 54c3bf3..af5c27d 100644
+> > --- a/profiles/audio/a2dp.h
+> > +++ b/profiles/audio/a2dp.h
+> > @@ -66,7 +66,8 @@ typedef void (*a2dp_stream_cb_t) (struct avdtp *session,
+> >
+> >  int a2dp_source_register(struct btd_adapter *adapter, GKeyFile *config);
+> >  int a2dp_sink_register(struct btd_adapter *adapter, GKeyFile *config);
+> > -void a2dp_unregister(struct btd_adapter *adapter);
+> > +void a2dp_source_unregister(struct btd_adapter *adapter);
+> > +void a2dp_sink_unregister(struct btd_adapter *adapter);
+> >
+> >  struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
+> >                                 uint8_t codec, gboolean delay_reporting,
+> > diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
+> > index b6b2385..5e30fa8 100644
+> > --- a/profiles/audio/manager.c
+> > +++ b/profiles/audio/manager.c
+> > @@ -348,6 +348,12 @@ static int a2dp_source_server_probe(struct btd_profile *p,
+> >         return a2dp_source_register(adapter, config);
+> >  }
+> >
+> > +static void a2dp_source_server_remove(struct btd_profile *p,
+> > +                                               struct btd_adapter *adapter)
+> > +{
+> > +       a2dp_source_unregister(adapter);
+> > +}
+> > +
+> >  static int a2dp_sink_server_probe(struct btd_profile *p,
+> >                                                 struct btd_adapter *adapter)
+> >  {
+> > @@ -365,6 +371,12 @@ static int a2dp_sink_server_probe(struct btd_profile *p,
+> >         return a2dp_sink_register(adapter, config);
+> >  }
+> >
+> > +static void a2dp_sink_server_remove(struct btd_profile *p,
+> > +                                               struct btd_adapter *adapter)
+> > +{
+> > +       a2dp_sink_unregister(adapter);
+> > +}
+> > +
+> >  static int avrcp_server_probe(struct btd_profile *p,
+> >                                                 struct btd_adapter *adapter)
+> >  {
+> > @@ -446,6 +458,7 @@ static struct btd_profile a2dp_source_profile = {
+> >         .disconnect     = a2dp_source_disconnect,
+> >
+> >         .adapter_probe  = a2dp_source_server_probe,
+> > +       .adapter_remove = a2dp_source_server_remove,
+> >  };
+> >
+> >  static struct btd_profile a2dp_sink_profile = {
+> > @@ -461,6 +474,7 @@ static struct btd_profile a2dp_sink_profile = {
+> >         .disconnect     = a2dp_sink_disconnect,
+> >
+> >         .adapter_probe  = a2dp_sink_server_probe,
+> > +       .adapter_remove = a2dp_sink_server_remove,
+> >  };
+> >
+> >  static struct btd_profile avrcp_profile = {
+> > --
+> > 1.8.0
+> 
+> I have a very similar fix to push, I end up doing it because the whole
+> btd_adapter reference got broken so I would like to push it if you
+> don't mind.
 
+I don't :-)
 
---
-Luiz Augusto von Dentz
+-- 
+BR
+Szymon Janc
