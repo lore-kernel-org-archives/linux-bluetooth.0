@@ -2,40 +2,33 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 1/3] core: Fix trying to store NULL adapter->name
-Date: Tue, 18 Dec 2012 21:16:13 -0400
-Message-Id: <1355879775-5809-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 2/3] core: Remove bogus DBG()
+Date: Tue, 18 Dec 2012 21:16:14 -0400
+Message-Id: <1355879775-5809-2-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1355879775-5809-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1355879775-5809-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When BlueZ starts without a main.conf, adapter->name will be initially
-NULL, until adapter_name_changed() is called and name is set to "BlueZ".
-
-Before this, store_adapter_info() will try to access a NULL pointer.
-
-Fixes this GLib error:
-
-(bluetoothd:1721): GLib-CRITICAL **: g_key_file_set_string: assertion
-`string != NULL' failed
+mgmt_set_name() already prints the same information, and message still
+refers to mgmtops.
 ---
- src/adapter.c |    4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ src/mgmt.c |    2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 9b83afe..d62b0fe 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -193,7 +193,9 @@ static void store_adapter_info(struct btd_adapter *adapter)
+diff --git a/src/mgmt.c b/src/mgmt.c
+index ce1ff2f..17518cb 100644
+--- a/src/mgmt.c
++++ b/src/mgmt.c
+@@ -1163,8 +1163,6 @@ static void read_info_complete(int sk, uint16_t index, void *buf, size_t len)
  
- 	key_file = g_key_file_new();
+ 	name = btd_adapter_get_name(adapter);
  
--	g_key_file_set_string(key_file, "General", "Name", adapter->name);
-+	if (adapter->name)
-+		g_key_file_set_string(key_file, "General", "Name",
-+								adapter->name);
- 
- 	g_key_file_set_boolean(key_file, "General", "Pairable",
- 				adapter->pairable);
+-	DBG("mgmtops setting name %s", name);
+-
+ 	if (name)
+ 		mgmt_set_name(index, name);
+ 	else
 -- 
 1.7.9.5
 
