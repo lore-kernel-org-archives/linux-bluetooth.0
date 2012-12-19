@@ -1,33 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1355967082.29264.2.camel@aeonflux>
-Subject: Re: [PATCH] monitor: Fix crash in btmon
-From: Marcel Holtmann <marcel@holtmann.org>
-To: =?ISO-8859-1?Q?Fr=E9d=E9ric?= Danis
-	<frederic.danis@linux.intel.com>
+Date: Thu, 20 Dec 2012 00:01:02 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 20 Dec 2012 02:31:22 +0100
-In-Reply-To: <1355923202-16648-1-git-send-email-frederic.danis@linux.intel.com>
-References: <1355923202-16648-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: Re: [PATCH BlueZ 8/8] hog: Rename hog_device_unregister
+Message-ID: <20121219220102.GA21562@x220.P-661HNU-F1>
+References: <1355856590-19222-8-git-send-email-andre.guedes@openbossa.org>
+ <1355924526-961-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1355924526-961-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
+Hi Andre,
 
-> When retrieving SDP records from keyboard btmon crashes (see below).
-> 
-> The tid_list in sdp.c is filled up by SDP Service search request,
-> as Service Search responses are treated as invalid and do not free
-> tid_list entries.
-> 
-> This is due to passing last fragment instead of complete frame to
-> l2cap_frame().
+On Wed, Dec 19, 2012, Andre Guedes wrote:
+> This patch renames hog_device_unregister function to hog_unregister_
+> device.
+> ---
+>  profiles/input/hog.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-patch has been applied.
+All patches in this set have been applied. Thanks.
 
-Regards
-
-Marcel
-
-
+Johan
