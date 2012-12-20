@@ -1,47 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Question for setting IO capability parameter for RegisterAgent
-Mime-Version: 1.0 (Apple Message framework v1283)
-Content-Type: text/plain; charset=us-ascii
-From: Xian Pan <panxian1212@gmail.com>
-In-Reply-To: <20121220075542.GA32641@x220>
-Date: Thu, 20 Dec 2012 16:51:16 -0500
+Date: Thu, 20 Dec 2012 17:33:21 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <363D4FFF-53E5-40A3-92A4-FDA0BB60EEA6@gmail.com>
-References: <679160B2-3B1E-4D5E-978E-E3358F6126E9@gmail.com> <20121220075542.GA32641@x220>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: Authentication issue during connection if remote deletes link key
+Message-ID: <20121220153321.GA13208@x220.Elisa>
+References: <20121128122318.GA30710@x220.ger.corp.intel.com>
+ <1355918497-21944-1-git-send-email-tomasz.bursztyka@linux.intel.com>
+ <CAMOw1v40+w62ToR4SKnNLnKfLzBSz_MKK1fXwoW66z7cXbTw4A@mail.gmail.com>
+ <50D2C258.4000908@linux.intel.com>
+ <442B171E16C14289B5160678267146C3@sisodomain.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <442B171E16C14289B5160678267146C3@sisodomain.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Jaganath,
 
-Thanks for your help. It is more clear now. The 5 io capability is related to low energy smp. And the first 4 IO capability parameters are the same as the values for SSP.
-And the DisplayYesNo IO capability can support the numeric comparison mode in SSP.
-
-right?
-Thanks a lot.
-
-BEST
-Xian
-
-
-On Dec 20, 2012, at 2:55 AM, Johan Hedberg wrote:
-
-> Hi Xian,
+On Thu, Dec 20, 2012, Jaganath Kanakkassery wrote:
+> I am facing one issue with authentication during profile connection.
+> Two devices are there A and B which are paired.
+> From B I deleted the pairing of A.
+> Now from A I initiated a file transfer to B which failed during
+> authentication
+> since remote link key is not there.
+> Please see the hcidump logs.
+> < HCI Command: Authentication Requested (0x01|0x0011) plen 2
+>    handle 12
+> < ACL data: handle 12 flags 0x00 dlen 12
+>    L2CAP(s): Disconn req: dcid 0x0046 scid 0x0040
+> >HCI Event: Command Status (0x0f) plen 4
+>    Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
+> >HCI Event: Link Key Request (0x17) plen 6
+>    bdaddr BC:85:1F:74:7F:29
+> < HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+>    bdaddr BC:85:1F:74:7F:29 key 0E7B8C5C01CBF6CA7FF08050591C21BB
+> >HCI Event: Command Complete (0x0e) plen 10
+>    Link Key Request Reply (0x01|0x000b) ncmd 1
+>    status 0x00 bdaddr BC:85:1F:74:7F:29
+> >ACL data: handle 12 flags 0x02 dlen 12
+>    L2CAP(s): Disconn rsp: dcid 0x0046 scid 0x0040
+> >HCI Event: Auth Complete (0x06) plen 3
+>    status 0x06 handle 12
+>    Error: PIN or Key Missing
 > 
-> On Wed, Dec 19, 2012, Xian Pan wrote:
->> I confuse the relationship between the 4 pairing mode in SSP with the
->> IO capability parameter for the agent. From the agent-api.txt file,
->> the capability parameter can have 5 values: DisplayOnly, DisplayYesNo,
->> KeyboardOnly, NoInputNoOutput and KeyboardDisplay. I think there are
->> only 4 pairing mode in SSP: just works, numeric comparison, out of
->> band, and passkey entry. How the 5 IO capabilities can map to those 4
->> pairing modes?
-> 
-> Low Energy SMP based pairing introduces the additional KeyboardDisplay
-> IO capability. If you want to support LE it's recommended you provide
-> that as your agent capability and BlueZ will then automatically
-> downgrade it to DisplayYesNo for BR/EDR (SSP) pairing and use it as is
-> for LE SMP pairing.
-> 
-> Johan
+> Is it controller issue or BlueZ has to take care this?
+> Please let me know your opinion.
 
+This is normal behavior. The core spec gives us two options, either fail
+or ask the user if he wants to try to repair. Right now the former is
+implemented and you'll need to explicitly remove the local pairing
+before attempting to repair.
+
+We could (and maybe should) implement the latter option, but we need to
+be very careful since it's important that we do not drop the old link
+key until the new pairing is successful and we should also refuse to
+accept the new pairing if it results in a less secure link key
+(unauthenticated vs authenticated) than the original one. This is to
+avoid attacks from devices spoofing the address of the other (paired)
+device and therefore not having the link key available.
+
+The way this should be implemented is that upon getting the "PIN or Key
+Missing" error after having responded with a positive link key reply on
+our side the kernel should fire off a mgmt event to user space to
+request repairing (on the D-Bus agent level I think we could probably
+reuse the RequestAuthorization callback for this). If a positive
+response is received from user space the kernel would proceed with a new
+pairing attempt, holding on to the old link key but still giving a
+negative link key reply, and then follow the procedure which I described
+in the previous paragraph.
+
+If you're interested to implement this I'd be happy to provide more
+feedback and guidance. The implementation should also be extended to LE
+SMP where I believe we have a similar improvement opportunity.
+
+Johan
