@@ -1,41 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1356011977.29264.5.camel@aeonflux>
-Subject: Re: Question for setting IO capability parameter for RegisterAgent
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Xian Pan <panxian1212@gmail.com>, linux-bluetooth@vger.kernel.org
-Date: Thu, 20 Dec 2012 14:59:37 +0100
-In-Reply-To: <20121220075542.GA32641@x220>
-References: <679160B2-3B1E-4D5E-978E-E3358F6126E9@gmail.com>
-	 <20121220075542.GA32641@x220>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <CAFOXTden8JeVHe+SXKt7GeG+QXHP01Nku2ubQ_m88LxJ1ATUmg@mail.gmail.com>
+References: <CAFOXTdcaRvGHesU_J7rW93Yp_5d438+x5xryCzAhY9QQL_-Y4Q@mail.gmail.com>
+	<20121220080447.GA561@x220>
+	<CAFOXTde8iSouGKEVZKG-egvPUr4LAyLnFigVa6avhpqTjXNq8A@mail.gmail.com>
+	<20121220091943.GA5862@x220>
+	<CAFOXTdf9qrtXD0GPDBFLhLX66QGQCgF_VzyS8WWz5xTAH8+0zQ@mail.gmail.com>
+	<20121220093742.GA6548@x220>
+	<CAFOXTden8JeVHe+SXKt7GeG+QXHP01Nku2ubQ_m88LxJ1ATUmg@mail.gmail.com>
+Date: Thu, 20 Dec 2012 12:06:39 +0100
+Message-ID: <CAFOXTddu5qU3iBn4VMKE0_YxHDWqqEkVBiaR8jx7LAO4RKg-LQ@mail.gmail.com>
+Subject: Re: Authentication Rejected when pairing stereo headset
+From: Andrey Voropaev <voropaev.andrey@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+On Thu, Dec 20, 2012 at 11:22 AM, Andrey Voropaev
+<voropaev.andrey@gmail.com> wrote:
+> But seems like Alsa still does not see it. I've added
+>
+>  pcm.bluetooth {
+>   type bluetooth
+>   device 00:1A:7D:25:2C:A4
+>   profile "auto"
+>  }
+>
+>
+> to /etc/asound.conf, restarted alsasound, but bluetooth does not show
+> up among available outputs. Well, I'm almost there. The Skype has
+> "bluetooth" in the list of devices and it works. Just mplayer does not
+> want to work with option
+>
+>  -ao alsa:device=bluetooth
 
-> > I confuse the relationship between the 4 pairing mode in SSP with the
-> > IO capability parameter for the agent. From the agent-api.txt file,
-> > the capability parameter can have 5 values: DisplayOnly, DisplayYesNo,
-> > KeyboardOnly, NoInputNoOutput and KeyboardDisplay. I think there are
-> > only 4 pairing mode in SSP: just works, numeric comparison, out of
-> > band, and passkey entry. How the 5 IO capabilities can map to those 4
-> > pairing modes?
-> 
-> Low Energy SMP based pairing introduces the additional KeyboardDisplay
-> IO capability. If you want to support LE it's recommended you provide
-> that as your agent capability and BlueZ will then automatically
-> downgrade it to DisplayYesNo for BR/EDR (SSP) pairing and use it as is
-> for LE SMP pairing.
+Sorry. I've found the solution.
+https://wiki.archlinux.org/index.php/Bluetooth gives different
+configuration for Alsa
 
-we should mention that in the documentation.
+pcm.btheadset {
+   type plug
+   slave {
+       pcm {
+           type bluetooth
+           device XX:XX:XX:XX:XX:XX
+           profile "auto"
+       }
+   }
+   hint {
+       show on
+       description "BT Headset"
+   }
+}
+ctl.btheadset {
+  type bluetooth
+}
 
-And additionally that "" maps to DisplayYesNo for BR/EDR and
-KeyboardDisplay for LE.
+With this configuration the headset becomes visible in aplay -L.
 
-Regards
+So, the issue is resolved. Thank you for help!
 
-Marcel
-
-
+Andrei
