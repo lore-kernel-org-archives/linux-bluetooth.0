@@ -1,19 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Xian Pan <panxian1212@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Subject: Question for setting IO capability parameter for RegisterAgent
-Date: Wed, 19 Dec 2012 21:18:46 -0500
-Message-Id: <679160B2-3B1E-4D5E-978E-E3358F6126E9@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Mime-Version: 1.0 (Apple Message framework v1283)
+Message-ID: <1355967082.29264.2.camel@aeonflux>
+Subject: Re: [PATCH] monitor: Fix crash in btmon
+From: Marcel Holtmann <marcel@holtmann.org>
+To: =?ISO-8859-1?Q?Fr=E9d=E9ric?= Danis
+	<frederic.danis@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 20 Dec 2012 02:31:22 +0100
+In-Reply-To: <1355923202-16648-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1355923202-16648-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Fred,
 
-I confuse the relationship between the 4 pairing mode in SSP with the IO capability parameter for the agent. From the agent-api.txt file, the capability parameter can have 5 values: DisplayOnly, DisplayYesNo, KeyboardOnly, NoInputNoOutput and KeyboardDisplay. I think there are only 4 pairing mode in SSP: just works, numeric comparison, out of band, and passkey entry. How the 5 IO capabilities can map to those 4 pairing modes?
+> When retrieving SDP records from keyboard btmon crashes (see below).
+> 
+> The tid_list in sdp.c is filled up by SDP Service search request,
+> as Service Search responses are treated as invalid and do not free
+> tid_list entries.
+> 
+> This is due to passing last fragment instead of complete frame to
+> l2cap_frame().
 
-Thanks a lot.
+patch has been applied.
 
-BEST
-Xian
+Regards
+
+Marcel
+
+
