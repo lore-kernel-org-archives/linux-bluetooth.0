@@ -1,32 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 20 Dec 2012 09:55:42 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Xian Pan <panxian1212@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Question for setting IO capability parameter for RegisterAgent
-Message-ID: <20121220075542.GA32641@x220>
-References: <679160B2-3B1E-4D5E-978E-E3358F6126E9@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <679160B2-3B1E-4D5E-978E-E3358F6126E9@gmail.com>
+Date: Thu, 20 Dec 2012 08:41:23 +0100
+Message-ID: <CAFOXTdcaRvGHesU_J7rW93Yp_5d438+x5xryCzAhY9QQL_-Y4Q@mail.gmail.com>
+Subject: Authentication Rejected when pairing stereo headset
+From: Andrey Voropaev <voropaev.andrey@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Xian,
+Hi! I'm trying to pair my bluetooth headset BTH220. In PC I have USB dongle
 
-On Wed, Dec 19, 2012, Xian Pan wrote:
-> I confuse the relationship between the 4 pairing mode in SSP with the
-> IO capability parameter for the agent. From the agent-api.txt file,
-> the capability parameter can have 5 values: DisplayOnly, DisplayYesNo,
-> KeyboardOnly, NoInputNoOutput and KeyboardDisplay. I think there are
-> only 4 pairing mode in SSP: just works, numeric comparison, out of
-> band, and passkey entry. How the 5 IO capabilities can map to those 4
-> pairing modes?
+# hciconfig -a
+hci0:   Type: BR/EDR  Bus: USB
+   BD Address: 00:02:5B:00:1C:7B  ACL MTU: 310:10  SCO MTU: 64:8
+   UP RUNNING PSCAN
+   RX bytes:12771 acl:0 sco:0 events:221 errors:0
+   TX bytes:1431 acl:0 sco:0 commands:96 errors:0
+   Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x59 0x83
+   Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+   Link policy: RSWITCH HOLD SNIFF PARK
+   Link mode: SLAVE ACCEPT
+   Name: 'vandal-0'
+   Class: 0x420100
+   Service Classes: Networking, Telephony
+   Device Class: Computer, Uncategorized
+   HCI Version: 2.1 (0x4)  Revision: 0x149c
+   LMP Version: 2.1 (0x4)  Subversion: 0x149c
+   Manufacturer: Cambridge Silicon Radio (10)
 
-Low Energy SMP based pairing introduces the additional KeyboardDisplay
-IO capability. If you want to support LE it's recommended you provide
-that as your agent capability and BlueZ will then automatically
-downgrade it to DisplayYesNo for BR/EDR (SSP) pairing and use it as is
-for LE SMP pairing.
 
-Johan
+But when I try 'simple-agent hci0 XX:XX:XX' I always get error
+
+Creating device failed: org.bluez.Error.AuthenticationRejected:
+Authentication Rejected
+
+
+I'm doing everything as root, so what could be the reason for
+"Authentication Rejected"? Incompatible hardware? Wrong configuration?
+
+In which direction should I be searching?
+
+Thank you
+Andrei Voropaev
