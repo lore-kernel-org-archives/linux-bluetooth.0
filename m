@@ -1,59 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
 From: Syam Sidhardhan <s.syam@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Fix ACL alive for long in case of non pariable
- devices
-Date: Fri, 21 Dec 2012 19:14:29 +0530
-Message-id: <1356097469-24073-2-git-send-email-s.syam@samsung.com>
-In-reply-to: <1356097469-24073-1-git-send-email-s.syam@samsung.com>
-References: <1356097469-24073-1-git-send-email-s.syam@samsung.com>
+Subject: [PATCH 1/2] Bluetooth: Fix to update EIR for uuid16 properly
+Date: Fri, 21 Dec 2012 19:14:28 +0530
+Message-id: <1356097469-24073-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For certain devices (ex: HID mouse), support for authentication,
-pairing and bonding is optional. For such devices, the ACL alive
-for too long after the l2cap disconnection.
+If we register a uuid other than uuid16, especially custom 128 bit uuid
+then nothing is updated in the EIR and it was broken.
 
-To avoid keep ACL alive for too long, set the ACL timeout back to
-HCI_DISCONN_TIMEOUT when l2cap is connected.
+After registering a 16 bit uuid. ex: "sdptool add SP", we can see the
+uuid in the EIR as below.
+< 0000: 01 52 0c f1 00 08 09 52  65 64 77 6f 6f 64 15 03  .R.....Redwood..
+  0010: 01 11 32 11 2f 11 06 11  05 11 0a 11 0e 11 0c 11  ..2./...........
+  0020: 1f 11 12 11 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  0030: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  0040: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  0050: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  0060: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  0070: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  0080: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  0090: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  00a0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  00b0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  00c0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  00d0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  00e0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  00f0: 00 00 00 00 00                                    .....
+> 0000: 04 0e 04 01 52 0c 00                              ....R..
 
-commit id:a9ea3ed9b71cc3271dd59e76f65748adcaa76422 might have introduce
-this issue.
+But after register a user defined 128 bit uuid, nothing is
+updated in the EIR.
 
-Signed-off-by: Sang-Ki Park <sangki79.park@samsung.com>
+< 0000: 01 52 0c f1 00 08 09 52  65 64 77 6f 6f 64 00 00  .R.....Redwood..
+  0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  0030: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  0040: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  0050: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  0060: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  0070: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  0080: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  0090: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  00a0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  00b0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  00c0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  00d0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  00e0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+  00f0: 00 00 00 00 00                                    .....
+> 0000: 04 0e 04 01 52 0c 00                              ....R..
+
+With this fix, we can see the EIR is updated properly.
+
 Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
 ---
-I'm not sure whether we need hci_conn_hold() and hci_conn_put() across
-while updating the disc_timeout. In certain other places in the code
-it's done. Ex: hci_auth_complete_evt(), hci_link_key_notify_evt() etc.
-Here I took that as the reference.
+ net/bluetooth/mgmt.c |    2 --
+ 1 file changed, 2 deletions(-)
 
- net/bluetooth/l2cap_core.c |    5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 82a3bdc..7a544c2 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1360,7 +1360,6 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
- 	sk = chan->sk;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index f559b96..512a3f5 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -514,8 +514,6 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
+ 		u16 uuid16;
  
- 	hci_conn_hold(conn->hcon);
--	conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
+ 		uuid16 = get_uuid16(uuid->uuid);
+-		if (uuid16 == 0)
+-			return;
  
- 	bacpy(&bt_sk(sk)->src, conn->src);
- 	bacpy(&bt_sk(sk)->dst, conn->dst);
-@@ -1380,6 +1379,10 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
- 
- 	BT_DBG("conn %p", conn);
- 
-+	hci_conn_hold(conn->hcon);
-+	conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
-+	hci_conn_put(conn->hcon);
-+
- 	if (!hcon->out && hcon->type == LE_LINK)
- 		l2cap_le_conn_ready(conn);
- 
+ 		if (uuid16 < 0x1100)
+ 			continue;
 -- 
 1.7.9.5
 
