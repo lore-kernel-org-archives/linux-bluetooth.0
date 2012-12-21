@@ -1,50 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH BlueZ 03/25] lib: Add set broadcaster/observer operations
-Date: Fri, 21 Dec 2012 16:26:30 -0400
-Message-Id: <1356121612-15172-4-git-send-email-bruna.moreira@openbossa.org>
+Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Subject: [PATCH BlueZ 02/25] lib: Add set/uset controller data operations
+Date: Fri, 21 Dec 2012 16:26:29 -0400
+Message-Id: <1356121612-15172-3-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add opcodes for new Set Broadcaster and Set Observer commands.
+From: Jefferson Delfes <jefferson.delfes@openbossa.org>
+
+Add structure for new commands: Set Controller Data and Unset Controller
+Data. Add new defines for flags that will be used in Set/Unset
+Controller Data operation.
 ---
- lib/mgmt.h |    8 ++++++++
- 1 file changed, 8 insertions(+)
+ lib/mgmt.h |   18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/lib/mgmt.h b/lib/mgmt.h
-index fffb0aa..44c4405 100644
+index 6c7e44a..fffb0aa 100644
 --- a/lib/mgmt.h
 +++ b/lib/mgmt.h
-@@ -92,6 +92,8 @@ struct mgmt_rp_read_index_list {
- #define MGMT_SETTING_BREDR		0x00000080
- #define MGMT_SETTING_HS			0x00000100
- #define MGMT_SETTING_LE			0x00000200
-+#define MGMT_SETTING_BROADCASTER	0x00000400
-+#define MGMT_SETTING_OBSERVER		0x00000800
- 
- #define MGMT_OP_READ_INFO		0x0004
- struct mgmt_rp_read_info {
-@@ -334,6 +336,10 @@ struct mgmt_cp_unset_controller_data {
- 	uint8_t type;
+@@ -318,6 +318,22 @@ struct mgmt_cp_set_device_id {
+ 	uint16_t version;
  } __packed;
  
-+#define MGMT_OP_SET_BROADCASTER		0x002B
++#define MGMT_DATA_NORMAL_PRIORITY	0x00
++#define MGMT_DATA_HIGH_PRIORITY		0x01
 +
-+#define MGMT_OP_SET_OBSERVER		0x002C
++#define MGMT_OP_SET_CONTROLLER_DATA	0x0029
++struct mgmt_cp_set_controller_data {
++	uint8_t flags;
++	uint8_t type;
++	uint8_t length;
++	uint8_t data[0];
++} __packed;
++
++#define MGMT_OP_UNSET_CONTROLLER_DATA	0x002A
++struct mgmt_cp_unset_controller_data {
++	uint8_t type;
++} __packed;
 +
  #define MGMT_EV_CMD_COMPLETE		0x0001
  struct mgmt_ev_cmd_complete {
  	uint16_t opcode;
-@@ -514,6 +520,8 @@ static const char *mgmt_op[] = {
+@@ -496,6 +512,8 @@ static const char *mgmt_op[] = {
+ 	"Block Device",
+ 	"Unblock Device",
  	"Set Device ID",
- 	"Set Controller Data",
- 	"Unset Controller Data",
-+	"Set Broadcaster",
-+	"Set Observer",
++	"Set Controller Data",
++	"Unset Controller Data",
  };
  
  static const char *mgmt_ev[] = {
