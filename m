@@ -2,66 +2,78 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 3/4] obexd: Simplify org.bluez.Error.InvalidArguments handling
-Date: Fri, 21 Dec 2012 12:25:02 -0400
-Message-Id: <1356107103-18039-3-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1356107103-18039-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1356107103-18039-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 1/4] core: Use ERROR_INTERFACE instead of org.bluez.Error
+Date: Fri, 21 Dec 2012 12:25:00 -0400
+Message-Id: <1356107103-18039-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use a helper function to void code duplication.
+This will simplify changing interface name later (e.g. adding
+versioning).
 ---
- obexd/plugins/bluetooth.c |   18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ src/adapter.c |    4 ++--
+ src/agent.c   |    5 +++--
+ src/device.c  |    2 +-
+ 3 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
-index 8985c83..e28a94f 100644
---- a/obexd/plugins/bluetooth.c
-+++ b/obexd/plugins/bluetooth.c
-@@ -104,6 +104,12 @@ drop:
- 	return;
- }
+diff --git a/src/adapter.c b/src/adapter.c
+index 6ff20e1..c1cb763 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -736,7 +736,7 @@ static void service_auth_cancel(struct service_auth *auth)
+ 	DBusError derr;
  
-+static DBusMessage *invalid_args(DBusMessage *msg)
-+{
-+	return g_dbus_create_error(msg, "org.bluez.Error.InvalidArguments",
-+					"Invalid arguments in method call");
-+}
-+
- static DBusMessage *profile_new_connection(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
- {
-@@ -115,26 +121,20 @@ static DBusMessage *profile_new_connection(DBusConnection *conn,
- 	dbus_message_iter_init(msg, &args);
+ 	dbus_error_init(&derr);
+-	dbus_set_error_const(&derr, "org.bluez.Error.Canceled", NULL);
++	dbus_set_error_const(&derr, ERROR_INTERFACE ".Canceled", NULL);
  
- 	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
--		return g_dbus_create_error(msg,
--					"org.bluez.Error.InvalidArguments",
--					"Invalid arguments in method call");
-+		return invalid_args(msg);
+ 	auth->cb(&derr, auth->user_data);
  
- 	dbus_message_iter_get_basic(&args, &device);
+@@ -3105,7 +3105,7 @@ static gboolean process_auth_queue(gpointer user_data)
+ 	adapter->auth_idle_id = 0;
  
- 	dbus_message_iter_next(&args);
+ 	dbus_error_init(&err);
+-	dbus_set_error_const(&err, "org.bluez.Error.Rejected", NULL);
++	dbus_set_error_const(&err, ERROR_INTERFACE ".Rejected", NULL);
  
- 	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_UNIX_FD)
--		return g_dbus_create_error(msg,
--					"org.bluez.Error.InvalidArguments",
--					"Invalid arguments in method call");
-+		return invalid_args(msg);
+ 	while (!g_queue_is_empty(adapter->auths)) {
+ 		struct service_auth *auth = adapter->auths->head->data;
+diff --git a/src/agent.c b/src/agent.c
+index 71e13c2..9b3fd28 100644
+--- a/src/agent.c
++++ b/src/agent.c
+@@ -206,7 +206,8 @@ void agent_unref(struct agent *agent)
+ 		agent_cb cb;
  
- 	dbus_message_iter_get_basic(&args, &fd);
+ 		dbus_error_init(&err);
+-		dbus_set_error_const(&err, "org.bluez.Error.Failed", "Canceled");
++		dbus_set_error_const(&err, ERROR_INTERFACE ".Failed",
++								"Canceled");
  
- 	io = g_io_channel_unix_new(fd);
- 	if (io == NULL)
--		return g_dbus_create_error(msg,
--					"org.bluez.Error.InvalidArguments",
--					"Invalid arguments in method call");
-+		return invalid_args(msg);
+ 		switch (agent->request->type) {
+ 		case AGENT_REQUEST_PINCODE:
+@@ -439,7 +440,7 @@ static void pincode_reply(DBusPendingCall *call, void *user_data)
  
- 	DBG("device %s", device);
+ 	if (len > 16 || len < 1) {
+ 		error("Invalid PIN length (%zu) from agent", len);
+-		dbus_set_error_const(&err, "org.bluez.Error.InvalidArgs",
++		dbus_set_error_const(&err, ERROR_INTERFACE ".InvalidArgs",
+ 					"Invalid passkey length");
+ 		cb(agent, &err, NULL, req->user_data);
+ 		dbus_error_free(&err);
+diff --git a/src/device.c b/src/device.c
+index 3cfb816..17c6cf7 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -3908,7 +3908,7 @@ static void cancel_authentication(struct authentication_req *auth)
+ 	auth->agent = NULL;
  
+ 	dbus_error_init(&err);
+-	dbus_set_error_const(&err, "org.bluez.Error.Canceled", NULL);
++	dbus_set_error_const(&err, ERROR_INTERFACE ".Canceled", NULL);
+ 
+ 	switch (auth->type) {
+ 	case AUTH_TYPE_PINCODE:
 -- 
 1.7.9.5
 
