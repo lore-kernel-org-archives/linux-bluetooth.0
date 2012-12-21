@@ -3,8 +3,8 @@ From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 Subject: [PATCH] Bluetooth: Fix uuid output in debugfs
-Date: Fri, 21 Dec 2012 20:57:52 -0200
-Message-Id: <1356130672-29287-1-git-send-email-gustavo@padovan.org>
+Date: Fri, 21 Dec 2012 20:57:04 -0200
+Message-Id: <1356130624-29234-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
