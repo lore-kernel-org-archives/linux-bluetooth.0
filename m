@@ -1,33 +1,140 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] adapter: Fix setting discoverable mode from settings
-Date: Fri, 21 Dec 2012 14:13:05 +0100
-Message-ID: <1356095585-14353-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Subject: [PATCH v2 2/2] Bluetooth: Fix stop discovery while in STARTING state
+Date: Fri, 21 Dec 2012 18:20:25 +0530
+Message-id: <1356094225-12706-3-git-send-email-jaganath.k@samsung.com>
+In-reply-to: <1356094225-12706-1-git-send-email-jaganath.k@samsung.com>
+References: <1356094225-12706-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Discoverable mode was not set to correct value read from settings.
----
- src/adapter.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+If stop_discovery() is called when discovery state is STARTING, it
+will be failed currently. This patch fixes this.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 55f03a4..6ff20e1 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2630,7 +2630,7 @@ static void load_config(struct btd_adapter *adapter)
- 	} else if (stored_discoverable != adapter->discoverable) {
- 		if (adapter->connectable)
- 			mgmt_set_discoverable(adapter->dev_id,
--						adapter->discoverable,
-+						stored_discoverable,
- 						adapter->discov_timeout);
- 		else
- 			adapter->toggle_discoverable = true;
+Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
+---
+ include/net/bluetooth/hci_core.h |    2 ++
+ net/bluetooth/hci_event.c        |   14 ++++++++++++--
+ net/bluetooth/mgmt.c             |   31 ++++++++++++++++++++++++++++++-
+ 3 files changed, 44 insertions(+), 3 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 119fcb6..c2886b7 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -64,6 +64,7 @@ struct discovery_state {
+ 		DISCOVERY_RESOLVING,
+ 		DISCOVERY_STOPPING,
+ 	} state;
++	u8  discovering;
+ 	struct list_head	all;	/* All devices found during inquiry */
+ 	struct list_head	unknown;	/* Name state not known */
+ 	struct list_head	resolve;	/* Name needs to be resolved */
+@@ -1066,6 +1067,7 @@ int mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ int mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		     u8 addr_type, s8 rssi, u8 *name, u8 name_len);
+ int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status);
++int mgmt_start_discovery_complete(struct hci_dev *hdev, u8 status);
+ int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status);
+ int mgmt_discovering(struct hci_dev *hdev, u8 discovering);
+ int mgmt_interleaved_discovery(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index e248e7c..b486458 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1092,7 +1092,12 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 		set_bit(HCI_LE_SCAN, &hdev->dev_flags);
+ 
+ 		hci_dev_lock(hdev);
+-		hci_discovery_set_state(hdev, DISCOVERY_FINDING);
++		if (hdev->discovery.state == DISCOVERY_STOPPING) {
++			hci_cancel_le_scan(hdev);
++			mgmt_start_discovery_complete(hdev, 0);
++		} else {
++			hci_discovery_set_state(hdev, DISCOVERY_FINDING);
++		}
+ 		hci_dev_unlock(hdev);
+ 		break;
+ 
+@@ -1189,7 +1194,12 @@ static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+ 	set_bit(HCI_INQUIRY, &hdev->flags);
+ 
+ 	hci_dev_lock(hdev);
+-	hci_discovery_set_state(hdev, DISCOVERY_FINDING);
++	if (hdev->discovery.state == DISCOVERY_STOPPING) {
++		hci_cancel_inquiry(hdev);
++		mgmt_start_discovery_complete(hdev, 0);
++	} else {
++		hci_discovery_set_state(hdev, DISCOVERY_FINDING);
++	}
+ 	hci_dev_unlock(hdev);
+ }
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d6c0d78..ba4171f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2385,7 +2385,8 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	if (!hci_discovery_active(hdev)) {
++	if (hdev->discovery.state != DISCOVERY_STARTING &&
++	    !hci_discovery_active(hdev)) {
+ 		err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY,
+ 				   MGMT_STATUS_REJECTED, &mgmt_cp->type,
+ 				   sizeof(mgmt_cp->type));
+@@ -2433,6 +2434,10 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 		break;
+ 
++	case DISCOVERY_STARTING:
++		err = 0;
++		break;
++
+ 	default:
+ 		BT_DBG("unknown discovery state %u", hdev->discovery.state);
+ 		err = -EFAULT;
+@@ -3624,6 +3629,25 @@ int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
+ 	return err;
+ }
+ 
++int mgmt_start_discovery_complete(struct hci_dev *hdev, u8 status)
++{
++	struct pending_cmd *cmd;
++	u8 type;
++	int err;
++
++	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
++	if (!cmd)
++		return -ENOENT;
++
++	type = hdev->discovery.type;
++
++	err = cmd_complete(cmd->sk, hdev->id, cmd->opcode, mgmt_status(status),
++			   &type, sizeof(type));
++	mgmt_pending_remove(cmd);
++
++	return err;
++}
++
+ int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status)
+ {
+ 	struct pending_cmd *cmd;
+@@ -3660,6 +3684,11 @@ int mgmt_discovering(struct hci_dev *hdev, u8 discovering)
+ 		mgmt_pending_remove(cmd);
+ 	}
+ 
++	if (hdev->discovery.discovering == discovering)
++		return 0;
++
++	hdev->discovery.discovering = discovering;
++
+ 	memset(&ev, 0, sizeof(ev));
+ 	ev.type = hdev->discovery.type;
+ 	ev.discovering = discovering;
 -- 
-1.8.0
+1.7.9.5
 
