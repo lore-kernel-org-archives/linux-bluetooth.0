@@ -1,63 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [PATCH BlueZ 04/25] btmgmt: Add set broadcaster and set observer support
-Date: Fri, 21 Dec 2012 16:26:31 -0400
-Message-Id: <1356121612-15172-5-git-send-email-bruna.moreira@openbossa.org>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH BlueZ 25/25] broadcaster: Add python test script
+Date: Fri, 21 Dec 2012 16:26:52 -0400
+Message-Id: <1356121612-15172-26-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jefferson Delfes <jefferson.delfes@openbossa.org>
-
-Add new broadcaster command for running the Set Broadcaster operation
-from MGMT API. Also, add new observer command for running the Set
-Observer operation from MGMT API.
 ---
- tools/btmgmt.c |   14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ test/test-broadcaster |   61 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 61 insertions(+)
+ create mode 100755 test/test-broadcaster
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index b89bcac..4d9eab6 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -235,6 +235,8 @@ static const char *settings_str[] = {
- 				"br/edr",
- 				"hs",
- 				"le" ,
-+				"broadcaster",
-+				"observer",
- };
- 
- static void print_settings(uint32_t settings)
-@@ -1111,6 +1113,16 @@ static void cmd_le(int mgmt_sk, uint16_t index, int argc, char **argv)
- 	cmd_setting(mgmt_sk, index, MGMT_OP_SET_LE, argc, argv);
- }
- 
-+static void cmd_broadcaster(int mgmt_sk, uint16_t index, int argc, char **argv)
-+{
-+	cmd_setting(mgmt_sk, index, MGMT_OP_SET_BROADCASTER, argc, argv);
-+}
+diff --git a/test/test-broadcaster b/test/test-broadcaster
+new file mode 100755
+index 0000000..237887d
+--- /dev/null
++++ b/test/test-broadcaster
+@@ -0,0 +1,61 @@
++#!/usr/bin/python
 +
-+static void cmd_observer(int mgmt_sk, uint16_t index, int argc, char **argv)
-+{
-+	cmd_setting(mgmt_sk, index, MGMT_OP_SET_OBSERVER, argc, argv);
-+}
++'''Broadcaster test script
++'''
 +
- static void class_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
- 				void *rsp, uint16_t len, void *user_data)
- {
-@@ -1848,6 +1860,8 @@ static struct {
- 	{ "rm-uuid",	cmd_remove_uuid, "Remove UUID"			},
- 	{ "clr-uuids",	cmd_clr_uuids,	"Clear UUIDs",			},
- 	{ "did",	cmd_did,	"Set Device ID",		},
-+	{ "broadcaster",cmd_broadcaster,"Toggle Broadcaster Mode",	},
-+	{ "observer",	cmd_observer,	"Toggle Observer Mode",		},
- 	{ NULL, NULL, 0 }
- };
- 
++from __future__ import absolute_import, print_function, unicode_literals
++
++from gi.repository import GObject
++
++import sys
++import dbus
++import dbus.service
++import dbus.mainloop.glib
++from optparse import OptionParser, make_option
++import time
++import bluezutils
++
++if __name__ == "__main__":
++	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++
++	bus = dbus.SystemBus()
++
++	option_list = [
++		make_option("-i", "--adapter", action="store",
++			type="string", dest="adapter"),
++		make_option("-s", "--service", action="store",
++			type="int", dest="service",
++			help="Format: Service UUID (0xNNNN) followed by" +
++			" Service Data (e.g. aa bb cc)"),
++		make_option("-m", "--manufacturer", action="store",
++			type="int", dest="manufacturer",
++			help="Format: Company Identifier Code (0xNNNN)" +
++			" followed by Manufacturer Specific Data (e.g. 11 22 aa)"),
++		]
++
++	parser = OptionParser(option_list=option_list,
++			usage="Usage: %prog <-s uuid | -m cid> <data bytes in hex>")
++
++	(options, args) = parser.parse_args()
++	if not args:
++		parser.error("Hex encoded data is required.")
++
++	if options.service and options.manufacturer:
++		parser.error("options -m and -s are mutually exclusive")
++
++	try:
++		data = dbus.Array(map(lambda i: dbus.Byte(int(i, 16)), args))
++	except ValueError:
++		parser.error("Invalid data. Should be hex encoded bytes" +
++		" separated by whitespace.")
++
++	adapter = bluezutils.find_adapter(options.adapter)
++
++	if options.service:
++		adapter.SetServiceData(dbus.UInt16(options.service), data)
++
++	if options.manufacturer:
++		adapter.SetManufacturerData(dbus.UInt16(options.manufacturer), data)
++
++	mainloop = GObject.MainLoop()
++	mainloop.run()
 -- 
 1.7.9.5
 
