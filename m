@@ -1,92 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 21 Dec 2012 21:31:12 +0200
+Date: Sat, 22 Dec 2012 00:17:10 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Syam Sidhardhan <s.syam@samsung.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Fix to update EIR for uuid16 properly
-Message-ID: <20121221193112.GA31432@x220.ger.corp.intel.com>
-References: <1356097469-24073-1-git-send-email-s.syam@samsung.com>
+Subject: Re: [PATCH BlueZ 1/4] core: Use ERROR_INTERFACE instead of
+ org.bluez.Error
+Message-ID: <20121221221710.GA5776@x220.ger.corp.intel.com>
+References: <1356107103-18039-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1356097469-24073-1-git-send-email-s.syam@samsung.com>
+In-Reply-To: <1356107103-18039-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+Hi Lizardo,
 
-On Fri, Dec 21, 2012, Syam Sidhardhan wrote:
-> If we register a uuid other than uuid16, especially custom 128 bit uuid
-> then nothing is updated in the EIR and it was broken.
-> 
-> After registering a 16 bit uuid. ex: "sdptool add SP", we can see the
-> uuid in the EIR as below.
-> < 0000: 01 52 0c f1 00 08 09 52  65 64 77 6f 6f 64 15 03  .R.....Redwood..
->   0010: 01 11 32 11 2f 11 06 11  05 11 0a 11 0e 11 0c 11  ..2./...........
->   0020: 1f 11 12 11 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   0030: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   0040: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   0050: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   0060: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   0070: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   0080: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   0090: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   00a0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   00b0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   00c0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   00d0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   00e0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   00f0: 00 00 00 00 00                                    .....
-> > 0000: 04 0e 04 01 52 0c 00                              ....R..
-> 
-> But after register a user defined 128 bit uuid, nothing is
-> updated in the EIR.
-> 
-> < 0000: 01 52 0c f1 00 08 09 52  65 64 77 6f 6f 64 00 00  .R.....Redwood..
->   0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   0030: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   0040: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   0050: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   0060: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   0070: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   0080: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   0090: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   00a0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   00b0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   00c0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   00d0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   00e0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
->   00f0: 00 00 00 00 00                                    .....
-> > 0000: 04 0e 04 01 52 0c 00                              ....R..
-> 
-> With this fix, we can see the EIR is updated properly.
-> 
-> Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+On Fri, Dec 21, 2012, Anderson Lizardo wrote:
+> This will simplify changing interface name later (e.g. adding
+> versioning).
 > ---
->  net/bluetooth/mgmt.c |    2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index f559b96..512a3f5 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -514,8 +514,6 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
->  		u16 uuid16;
->  
->  		uuid16 = get_uuid16(uuid->uuid);
-> -		if (uuid16 == 0)
-> -			return;
->  
->  		if (uuid16 < 0x1100)
->  			continue;
+>  src/adapter.c |    4 ++--
+>  src/agent.c   |    5 +++--
+>  src/device.c  |    2 +-
+>  3 files changed, 6 insertions(+), 5 deletions(-)
 
-Nak. The bug is real and should be fixed but your fix is wrong. The
-right fix it to convert this return statement into a continue statement
-since we do still want to check for a 0 return value from get_uuid16.
-
-Along with this patch please prepare another one to increment the mgmt
-revision. These two should go together to upstream trees so that we can
-introduce a check in user space to know whether it's safe to pass
-non-16bit UUIDs to the kernel or not.
+All four patches have been applied, though I removed the comment about
+versioning in this one as I don't think anything like that will be done
+for the errors.
 
 Johan
