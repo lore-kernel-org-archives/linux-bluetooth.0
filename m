@@ -1,151 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH BlueZ 10/25] doc: Add Broadcaster/Observer D-Bus API documentation
-Date: Fri, 21 Dec 2012 16:26:37 -0400
-Message-Id: <1356121612-15172-11-git-send-email-bruna.moreira@openbossa.org>
+Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Subject: [PATCH BlueZ 12/25] observer: Add Register/UnregisterServiceObserver() D-Bus method
+Date: Fri, 21 Dec 2012 16:26:39 -0400
+Message-Id: <1356121612-15172-13-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/adapter-api.txt |  117 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 117 insertions(+)
+From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 62c7a27..e8ca305 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -43,6 +43,102 @@ Methods		void StartDiscovery()
- 			Possible errors: org.bluez.Error.InvalidArguments
- 					 org.bluez.Error.Failed
+An observer for Service Data must be registered using
+RegisterServiceObserver() D-Bus method so it can receive any advertising
+which matches with the filter used. Use UnregisterServiceObserver()
+D-Bus method for unregistering an observer and stop sending broadcasts
+to the agent.
+---
+ src/adapter.c |   35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index 34dad6e..a5c23da 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1157,12 +1157,47 @@ static DBusMessage *remove_device(DBusConnection *conn, DBusMessage *msg,
+ static DBusMessage *register_service_observer(DBusConnection *conn,
+ 						DBusMessage *msg, void *data)
+ {
++	struct btd_adapter *adapter = data;
++	const char *path, *sender = dbus_message_get_sender(msg);
++	unsigned int uuid;
++	int err;
++
++	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
++					DBUS_TYPE_UINT16, &uuid,
++					DBUS_TYPE_INVALID) == FALSE)
++		return btd_error_invalid_args(msg);
++
++	err = mgmt_set_observer(adapter->dev_id, TRUE);
++	if (err < 0) {
++		error("Failed to set Observer: %s (%d)", strerror(-err), -err);
++
++		return btd_error_failed(msg, strerror(-err));
++	}
++
++	DBG("Service Data Observer registered for hci%d at %s:%s",
++						adapter->dev_id, sender, path);
++
+ 	return dbus_message_new_method_return(msg);
+ }
  
-+		void RegisterServiceObserver(object observer,
-+							uint16 match_value)
+ static DBusMessage *unregister_service_observer(DBusConnection *conn,
+ 						DBusMessage *msg, void *data)
+ {
++	const char *path, *sender = dbus_message_get_sender(msg);
++	struct btd_adapter *adapter = data;
++	int err;
 +
-+			Registers an observer agent to monitor Service Data
-+			broadcasts. This agent will be notified whenever a
-+			broadcast is received that matches that filter. It is
-+			possible use same object path for two observers:
-+			Service Data and Manufacturer Specific Data.
++	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
++						DBUS_TYPE_INVALID) == FALSE)
++		return btd_error_invalid_args(msg);
 +
-+			The match_value parameter must be the 16-bit UUID for
-+			the service whose data is to be monitored.
++	err = mgmt_set_observer(adapter->dev_id, FALSE);
++	if (err < 0)
++		return btd_error_failed(msg, strerror(-err));
 +
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.AlreadyExists
++	DBG("Service Data Observer unregistered for hci%d at %s:%s",
++						adapter->dev_id, sender, path);
 +
-+		void RegisterManufacturerObserver(object observer,
-+							uint16 match_value)
-+
-+			Registers an observer agent to monitor Manufacturer
-+			Specific Data broadcasts. This agent will be notified
-+			whenever a broadcast is received that matches that
-+			filter. It is possible use same object path for two
-+			observers: Service Data and Manufacturer Specific Data.
-+
-+			The match_value parameter must be the 16-bit Company
-+			Identifier Code for the manufacturer whose data is to
-+			be monitored.
-+
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.AlreadyExists
-+
-+		void UnregisterServiceObserver(object observer)
-+
-+			Unregisters a Service Data observer. Broadcasts will
-+			not be notified to this agent anymore. The observer
-+			will be destroyed only if no Manufacturer Specific Data
-+			was registered with the same object path.
-+
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.DoesNotExist
-+
-+		void UnregisterManufacturerObserver(object observer)
-+
-+			Unregisters a Manufacturer Specific Data observer.
-+			Broadcasts will not be notified to this agent anymore.
-+			The observer will be destroyed only if no Service Data
-+			was registered with the same object path.
-+
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.DoesNotExist
-+
-+		void SetServiceData(uint16 uuid, array{byte} data)
-+
-+			Set Service Data for broadcast. Different applications
-+			can register different Adv. data types, and they are
-+			all concatenated to form the Adv. data. Broadcasting is
-+			enabled as soon as the first SetServiceData() call is
-+			made.
-+
-+			This method can be used to update service data already
-+			being broadcasted.
-+
-+			Use ClearBroadcastData() to release any Adv. data for
-+			the application. Advertising data is also released when
-+			application exits, and once the last Broadcaster exits,
-+			advertising is disabled.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.Failed
-+
-+		void SetManufacturerData(uint16 cid, array{byte} data)
-+
-+			Set Manufacturer Specific Data for broadcast. Different
-+			applications can register different Adv. data types,
-+			and they are all concatenated to form the Adv. data.
-+			Broadcasting is enabled as soon as the first
-+			SetManufacturerData() call is made.
-+
-+			This method can be used to update manufacturer data
-+			already being broadcasted.
-+
-+			Use ClearBroadcastData() to release any Adv. data for
-+			the application. Advertising data is also released when
-+			application exits, and once the last Broadcaster exits,
-+			advertising is disabled.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.Failed
-+
-+		void ClearBroadcastData()
-+
-+			This method will release any previously set Advertising
-+			data.
-+
-+			Possible errors: org.bluez.Error.Failed
-+
- Properties	string Address [readonly]
+ 	return dbus_message_new_method_return(msg);
+ }
  
- 			The Bluetooth device address.
-@@ -118,3 +214,24 @@ Properties	string Address [readonly]
- 
- 			List of 128-bit UUIDs that represents the available
- 			local services.
-+
-+Observer hierarchy
-+==================
-+
-+Service		unique name
-+Interface	org.bluez.Observer1
-+Object path	freely definable
-+
-+Methods		void ServiceReceived(string address, uint16 uuid,
-+							array{byte} data)
-+
-+			This callback gets called when a broadcast data has
-+			arrived that matches filter used in
-+			RegisterServiceObserver.
-+
-+		void ManufacturerReceived(string address, uint16 cid,
-+							array{byte} data)
-+
-+			This callback gets called when a broadcast data has
-+			arrived that matches filter used in
-+			RegisterManufacturerObserver.
 -- 
 1.7.9.5
 
