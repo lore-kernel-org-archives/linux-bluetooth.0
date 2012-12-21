@@ -2,86 +2,110 @@ Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH BlueZ 25/25] broadcaster: Add python test script
-Date: Fri, 21 Dec 2012 16:26:52 -0400
-Message-Id: <1356121612-15172-26-git-send-email-bruna.moreira@openbossa.org>
+Subject: [PATCH BlueZ 23/25] broadcaster: Add ClearBroadcastData() D-Bus method
+Date: Fri, 21 Dec 2012 16:26:50 -0400
+Message-Id: <1356121612-15172-24-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+The ClearBroadcastData() function will clean all data (Service Data or
+Manufacturer Specific Data) set by the current application. All data set
+by any other application will be kept.
 ---
- test/test-broadcaster |   61 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
- create mode 100755 test/test-broadcaster
+ src/adapter.c |   75 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 75 insertions(+)
 
-diff --git a/test/test-broadcaster b/test/test-broadcaster
-new file mode 100755
-index 0000000..237887d
---- /dev/null
-+++ b/test/test-broadcaster
-@@ -0,0 +1,61 @@
-+#!/usr/bin/python
+diff --git a/src/adapter.c b/src/adapter.c
+index 45471dc..9c99070 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1699,9 +1699,84 @@ done:
+ 	return NULL;
+ }
+ 
++static void restore_bcast_data(gpointer data, gpointer user_data)
++{
++	struct bcast_session *session = data, *cleared = user_data;
 +
-+'''Broadcaster test script
-+'''
++	if (session == cleared)
++		return;
 +
-+from __future__ import absolute_import, print_function, unicode_literals
++	if (session->data_type != cleared->data_type)
++		return;
 +
-+from gi.repository import GObject
++	send_advdata_blob(session->adapter, session);
++}
 +
-+import sys
-+import dbus
-+import dbus.service
-+import dbus.mainloop.glib
-+from optparse import OptionParser, make_option
-+import time
-+import bluezutils
++static gint cmp_bcast_session_owner(gconstpointer a, gconstpointer b)
++{
++	const struct bcast_session *session = a;
++	const char *owner = b;
 +
-+if __name__ == "__main__":
-+	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++	return g_strcmp0(session->owner, owner);
++}
 +
-+	bus = dbus.SystemBus()
++static gboolean find_bcast_session_by_owner(struct btd_adapter *adapter,
++						const char *sender,
++						struct bcast_session **session)
++{
++	GSList *l;
 +
-+	option_list = [
-+		make_option("-i", "--adapter", action="store",
-+			type="string", dest="adapter"),
-+		make_option("-s", "--service", action="store",
-+			type="int", dest="service",
-+			help="Format: Service UUID (0xNNNN) followed by" +
-+			" Service Data (e.g. aa bb cc)"),
-+		make_option("-m", "--manufacturer", action="store",
-+			type="int", dest="manufacturer",
-+			help="Format: Company Identifier Code (0xNNNN)" +
-+			" followed by Manufacturer Specific Data (e.g. 11 22 aa)"),
-+		]
++	l = g_slist_find_custom(adapter->bcast_sessions, sender,
++						cmp_bcast_session_owner);
++	if (!l)
++		return FALSE;
 +
-+	parser = OptionParser(option_list=option_list,
-+			usage="Usage: %prog <-s uuid | -m cid> <data bytes in hex>")
++	if (session)
++		*session = l->data;
 +
-+	(options, args) = parser.parse_args()
-+	if not args:
-+		parser.error("Hex encoded data is required.")
++	return TRUE;
++}
 +
-+	if options.service and options.manufacturer:
-+		parser.error("options -m and -s are mutually exclusive")
+ static DBusMessage *clear_broadcast_data(DBusConnection *conn,
+ 						DBusMessage *msg, void *data)
+ {
++	struct btd_adapter *adapter = data;
++	struct bcast_session *session;
++	const char *sender;
++	int err;
 +
-+	try:
-+		data = dbus.Array(map(lambda i: dbus.Byte(int(i, 16)), args))
-+	except ValueError:
-+		parser.error("Invalid data. Should be hex encoded bytes" +
-+		" separated by whitespace.")
++	sender = dbus_message_get_sender(msg);
 +
-+	adapter = bluezutils.find_adapter(options.adapter)
++	DBG("Clear all data in broadcaster registered for hci%d at %s",
++						adapter->dev_id, sender);
 +
-+	if options.service:
-+		adapter.SetServiceData(dbus.UInt16(options.service), data)
++	while (find_bcast_session_by_owner(adapter, sender, &session)) {
++		uint8_t type = session->data_type;
 +
-+	if options.manufacturer:
-+		adapter.SetManufacturerData(dbus.UInt16(options.manufacturer), data)
++		err = mgmt_unset_controller_data(adapter->dev_id, type);
++		if (err < 0)
++			error("Failed to set Broadcaster: %s (%d)",
++							strerror(-err), -err);
 +
-+	mainloop = GObject.MainLoop()
-+	mainloop.run()
++		/* mgmt_unset_controller_data() also clears broadcast data from
++		 * other clients with the same data type, so they need to be
++		 * restored. */
++		g_slist_foreach(adapter->bcast_sessions, restore_bcast_data,
++								session);
++
++		adapter->bcast_sessions =
++			g_slist_remove(adapter->bcast_sessions, session);
++
++		free_bcast_session(session);
++	}
++
++	if (!adapter->bcast_sessions) {
++		err = mgmt_set_broadcaster(adapter->dev_id, FALSE);
++		if (err < 0)
++			error("Failed to set Broadcaster: %s (%d)",
++							strerror(-err), -err);
++	}
++
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
 -- 
 1.7.9.5
 
