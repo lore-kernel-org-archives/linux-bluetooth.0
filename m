@@ -2,249 +2,178 @@ Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH BlueZ 22/25] broadcaster: Build and send ADV/EIR data blob to kernel
-Date: Fri, 21 Dec 2012 16:26:49 -0400
-Message-Id: <1356121612-15172-23-git-send-email-bruna.moreira@openbossa.org>
+Subject: [PATCH BlueZ 16/25] observer: Add Service/ManufacturerReceived() D-Bus method
+Date: Fri, 21 Dec 2012 16:26:43 -0400
+Message-Id: <1356121612-15172-17-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SetServiceData() and SetManufacturerData() operations will save all data
-and send the ADV/EIR data to kernel. The new ADV/EIR data will be added
-to the current one.
-
-Note: For now, the maximum ADV/EIR data length is limited to 27
-(HCI_LE_MAX_ADV_DATA_LENGTH - 4) octets. This is needed to reserve 2
-octets for length and data type and more 2 octets for UUID/CompanyID. If
-the ADV/EIR data from new broadcaster session tries to insert more
-octets than 27 bytes the operation will fail.
+When an advertising matches with the filter registered in
+RegisterServiceObserver() or RegisterManufacturerObserver(), the data is
+sent to all observers registered using ServiceReceived() or
+ManufacturerReceived(), respectively.
 ---
- src/adapter.c |  130 ++++++++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 119 insertions(+), 11 deletions(-)
+ src/adapter.c |  117 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 116 insertions(+), 1 deletion(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 7e0f2b5..45471dc 100644
+index 316acb9..4fc4fa9 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -92,6 +92,9 @@ static const char *base_path = "/org/bluez";
+@@ -86,6 +86,8 @@
+ 
+ static const char *base_path = "/org/bluez";
+ 
++#define OBSERVER_INTERFACE "org.bluez.Observer1"
++
+ /* Filter Types (for Observer) */
  #define FILTER_SERVICE_UUID	0x01
  #define FILTER_COMPANY_IC	0x02
+@@ -180,6 +182,11 @@ struct btd_adapter {
  
-+/* Flags for Broadcaster */
-+#define BCAST_DATA_NORMAL_PRIORITY	0x00
+ static gboolean process_auth_queue(gpointer user_data);
+ 
++struct broadcast_data {
++	struct eir_data *eir_data;
++	char peer_addr[18];
++};
 +
- static GSList *adapter_drivers = NULL;
- 
- enum session_req_type {
-@@ -601,6 +604,31 @@ void adapter_name_changed(struct btd_adapter *adapter, const char *name)
- 
- void adapter_set_controller_data_complete(struct btd_adapter *adapter)
+ int btd_adapter_set_class(struct btd_adapter *adapter, uint8_t major,
+ 							uint8_t minor)
  {
-+	struct bcast_session *session = adapter->bcast_sessions->data;
-+	DBusMessage *msg = session->msg;
-+	DBusMessage *reply;
-+	int err;
-+
-+	if (!adapter->bcast_sessions)
-+		error("No Broadcaster session running");
-+
-+	err = mgmt_set_broadcaster(adapter->dev_id, TRUE);
-+	if (err < 0) {
-+		error("Failed to set Broadcaster: %s (%d)", strerror(-err),
-+									-err);
-+		reply = btd_error_failed(msg, strerror(-err));
-+	} else
-+		reply = dbus_message_new_method_return(msg);
-+
-+
-+	if (session->data_type == EIR_SVC_DATA)
-+		DBG("Service Data Broadcaster registered for hci%d at %s",
-+					adapter->dev_id, session->owner);
-+	else
-+		DBG("Manufacturer Data Broadcaster registered for hci%d at %s",
-+					adapter->dev_id, session->owner);
-+
-+	g_dbus_send_message(btd_get_dbus_connection(), reply);
+@@ -3179,6 +3186,106 @@ static gboolean connect_pending_cb(gpointer user_data)
+ 	return FALSE;
  }
  
- int adapter_set_name(struct btd_adapter *adapter, const char *name)
-@@ -1471,6 +1499,53 @@ static struct bcast_session *find_bcast_session(GSList *list,
- 	return l ? l->data : NULL;
- }
- 
-+static void send_advdata_blob(struct btd_adapter *adapter,
-+						struct bcast_session *session)
++static void service_received(struct observer_watcher *obs, char *peer_addr,
++							struct svc_data *sdata)
 +{
-+	uint8_t data[EIR_DATA_MAX_LEN];
-+	uint16_t *u16 = (void *) data;
-+	int err;
++	const char *paddr = peer_addr;
++	DBusMessage *msg;
 +
-+	bt_put_unaligned(htobs(session->data_id), u16);
-+	memcpy(data + sizeof(session->data_id), session->data,
-+							session->data_len);
-+
-+	err = mgmt_set_controller_data(adapter->dev_id,
-+				BCAST_DATA_NORMAL_PRIORITY,
-+				session->data_type, data,
-+				session->data_len + sizeof(session->data_id));
-+	if (err < 0)
-+		error("Failed to set controller data in Broadcaster: %s (%d)",
-+							strerror(-err), -err);
-+}
-+
-+static void restore_bcast_type(struct btd_adapter *adapter, uint8_t type)
-+{
-+	GSList *l;
-+	int err;
-+
-+	err = mgmt_unset_controller_data(adapter->dev_id, type);
-+	if (err < 0) {
-+		error("Failed to unset controller data: %s (%d)",
-+							strerror(-err), -err);
++	msg = dbus_message_new_method_call(obs->sender, obs->path,
++							OBSERVER_INTERFACE,
++							"ServiceReceived");
++	if (msg == NULL) {
++		error("Unable to allocate new ServiceReceived method");
 +		return;
 +	}
 +
-+	for (l = adapter->bcast_sessions; l; l = g_slist_next(l)) {
-+		struct bcast_session *session = l->data;
++	dbus_message_append_args(msg, DBUS_TYPE_STRING, &paddr,
++						DBUS_TYPE_UINT16, &sdata->uuid,
++						DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
++						&sdata->data, sdata->data_len,
++						DBUS_TYPE_INVALID);
 +
-+		if (session->data_type == type)
-+			send_advdata_blob(adapter, session);
++	dbus_message_set_no_reply(msg, TRUE);
++	g_dbus_send_message(btd_get_dbus_connection(), msg);
++}
++
++static void manufacturer_received(struct observer_watcher *obs,
++				char *peer_addr, struct manuf_data *mdata)
++{
++	const char *paddr = peer_addr;
++	DBusMessage *msg;
++
++	msg = dbus_message_new_method_call(obs->sender, obs->path,
++							OBSERVER_INTERFACE,
++							"ManufacturerReceived");
++	if (msg == NULL) {
++		error("Unable to allocate new ManufacturerReceived method");
++		return;
 +	}
 +
-+	if (!adapter->bcast_sessions) {
-+		err = mgmt_set_broadcaster(adapter->dev_id, FALSE);
-+		if (err < 0)
-+			error("Failed to set Broadcaster: %s (%d)",
-+							strerror(-err), -err);
++	dbus_message_append_args(msg, DBUS_TYPE_STRING, &paddr,
++					DBUS_TYPE_UINT16, &mdata->company_id,
++					DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
++					&mdata->data, mdata->data_len,
++					DBUS_TYPE_INVALID);
++
++	dbus_message_set_no_reply(msg, TRUE);
++	g_dbus_send_message(btd_get_dbus_connection(), msg);
++}
++
++static void update_observer(gpointer data, gpointer user_data)
++{
++	struct observer_watcher *obs = data;
++	struct broadcast_data *bdata = user_data;
++	struct eir_data *eir = bdata->eir_data;
++	GSList *l;
++
++	if (obs->filter_type == FILTER_SERVICE_UUID) {
++		for (l = eir->svcs_data; l != NULL; l = g_slist_next(l)) {
++			struct svc_data *sdata = l->data;
++			uint16_t uuid = GPOINTER_TO_UINT(obs->filter_data);
++
++			if (uuid == sdata->uuid)
++				service_received(obs, bdata->peer_addr, sdata);
++		}
++	} else if (obs->filter_type == FILTER_COMPANY_IC) {
++		for (l = eir->manufs_data; l != NULL; l = g_slist_next(l)) {
++			struct manuf_data *mdata = l->data;
++			uint16_t company_id =
++					GPOINTER_TO_UINT(obs->filter_data);
++
++			if (company_id == mdata->company_id)
++				manufacturer_received(obs, bdata->peer_addr,
++									mdata);
++		}
 +	}
 +}
 +
- static void bcast_session_exit(DBusConnection *conn, void *user_data)
- {
- 	struct bcast_session *session = user_data;
-@@ -1486,10 +1561,10 @@ static void bcast_session_exit(DBusConnection *conn, void *user_data)
- 
- 	adapter->bcast_sessions = g_slist_remove(adapter->bcast_sessions,
- 								session);
--	free_bcast_session(session);
- 
--	/* FIXME: Stop advertising, send data blob from others apps to kernel
--	 * with same type and restart advertising*/
-+	restore_bcast_type(adapter, type);
++static void adapter_broadcast_received(struct btd_adapter *adapter,
++			const bdaddr_t *bdaddr, struct eir_data *eir_data)
++{
++	struct broadcast_data *bdata;
 +
-+	free_bcast_session(session);
- }
- 
- static void update_adv_data(struct btd_adapter *adapter,
-@@ -1499,6 +1574,21 @@ static void update_adv_data(struct btd_adapter *adapter,
- 
- void adapter_set_controller_data_failed(struct btd_adapter *adapter)
- {
-+	struct bcast_session *session = adapter->bcast_sessions->data;
-+	DBusMessage *msg = session->msg;
-+	DBusMessage *reply;
++	/* No observers listening for advertising */
++	if (adapter->observers == NULL)
++		return;
 +
-+	DBG("Manufacturer Specific Data Broadcaster failed for hci%d at %s",
-+					adapter->dev_id, session->owner);
++	/* No service/manufacturer data was sent */
++	if (eir_data->svcs_data == NULL && eir_data->manufs_data == NULL)
++		return;
 +
-+	reply = btd_error_failed(msg,
-+				"Broadcaster: No resources, data too long");
-+	g_dbus_send_message(btd_get_dbus_connection(), reply);
++	bdata = g_new(struct broadcast_data, 1);
++	bdata->eir_data = eir_data;
++	ba2str(bdaddr, bdata->peer_addr);
 +
-+	adapter->bcast_sessions = g_slist_remove(adapter->bcast_sessions,
-+								session);
++	DBG("Broadcast received from %s", bdata->peer_addr);
 +
-+	free_bcast_session(session);
- }
- 
- static DBusMessage *set_service_data(DBusConnection *conn,
-@@ -1517,6 +1607,12 @@ static DBusMessage *set_service_data(DBusConnection *conn,
- 						DBUS_TYPE_INVALID))
- 		return btd_error_invalid_args(msg);
- 
-+	/* It will accept new ADV/EIR data only if there is space for complete
-+	 * data. Reserve 2 octets for Service UUID */
-+	if (ssize + sizeof(uint16_t) > EIR_DATA_MAX_LEN)
-+		return btd_error_failed(msg,
-+				"ADV/EIR data is bigger than permitted");
++	g_slist_foreach(adapter->observers, update_observer, bdata);
 +
- 	sender = dbus_message_get_sender(msg);
- 
- 	session = find_bcast_session(adapter->bcast_sessions, sender,
-@@ -1528,22 +1624,25 @@ static DBusMessage *set_service_data(DBusConnection *conn,
- 
- 	session = g_new(struct bcast_session, 1);
- 	session->data_id = uuid;
-+	session->data_len = ssize;
- 	session->owner = g_strdup(sender);
- 	session->adapter = btd_adapter_ref(adapter);
- 	session->data_type = EIR_SVC_DATA;
- 	session->msg = dbus_message_ref(msg);
++	g_free(bdata);
++}
 +
-+	memcpy(session->data, sdata, ssize);
+ void adapter_update_found_devices(struct btd_adapter *adapter,
+ 					const bdaddr_t *bdaddr,
+ 					uint8_t bdaddr_type, int8_t rssi,
+@@ -3192,7 +3299,7 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
+ 	int err;
+ 	GSList *l;
+ 
+-	if (!discovery) {
++	if (!discovery && !adapter->observers) {
+ 		error("Device found event while no discovery in progress");
+ 		return;
+ 	}
+@@ -3204,6 +3311,14 @@ void adapter_update_found_devices(struct btd_adapter *adapter,
+ 		return;
+ 	}
+ 
++	/* Send advertising to observers */
++	adapter_broadcast_received(adapter, bdaddr, &eir_data);
 +
- 	session->id = g_dbus_add_disconnect_watch(conn, sender,
- 						bcast_session_exit, session,
- 						NULL);
- 
-+	send_advdata_blob(adapter, session);
++	if (!discovery) {
++		eir_data_free(&eir_data);
++		return;
++	}
 +
- 	adapter->bcast_sessions = g_slist_prepend(adapter->bcast_sessions,
- 								session);
- 
--	DBG("Service Data Broadcaster registered for hci%d at %s",
--						adapter->dev_id, sender);
--
- done:
--	return dbus_message_new_method_return(msg);
-+	return NULL;
- }
- 
- static DBusMessage *set_manufacturer_data(DBusConnection *conn,
-@@ -1562,6 +1661,12 @@ static DBusMessage *set_manufacturer_data(DBusConnection *conn,
- 						DBUS_TYPE_INVALID))
- 		return btd_error_invalid_args(msg);
- 
-+	/* It will accept new ADV/EIR data only if there is space for complete
-+	 * data. Reserve 2 octets for Company Identifier Code */
-+	if (msize + sizeof(uint16_t) > EIR_DATA_MAX_LEN)
-+		return btd_error_failed(msg,
-+				"ADV/EIR data is bigger than permitted");
-+
- 	sender = dbus_message_get_sender(msg);
- 
- 	session = find_bcast_session(adapter->bcast_sessions, sender,
-@@ -1573,22 +1678,25 @@ static DBusMessage *set_manufacturer_data(DBusConnection *conn,
- 
- 	session = g_new(struct bcast_session, 1);
- 	session->data_id = company_id;
-+	session->data_len = msize;
- 	session->owner = g_strdup(sender);
- 	session->adapter = btd_adapter_ref(adapter);
- 	session->data_type = EIR_MANUF_DATA;
- 	session->msg = dbus_message_ref(msg);
-+
-+	memcpy(session->data, mdata, msize);
-+
- 	session->id = g_dbus_add_disconnect_watch(conn, sender,
- 						bcast_session_exit, session,
- 						NULL);
- 
-+	send_advdata_blob(adapter, session);
-+
- 	adapter->bcast_sessions = g_slist_prepend(adapter->bcast_sessions,
- 								session);
- 
--	DBG("Manufacturer Specific Data Broadcaster registered for hci%d at %s",
--						adapter->dev_id, sender);
--
- done:
--	return dbus_message_new_method_return(msg);
-+	return NULL;
- }
- 
- static DBusMessage *clear_broadcast_data(DBusConnection *conn,
+ 	if (eir_data.name != NULL && eir_data.name_complete)
+ 		adapter_store_cached_name(&adapter->bdaddr, bdaddr,
+ 								eir_data.name);
 -- 
 1.7.9.5
 
