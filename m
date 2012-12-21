@@ -2,41 +2,45 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [RFC -v2 06/16] Bluetooth: use l2cap_chan_ready() instead of duplicate code
-Date: Fri, 21 Dec 2012 16:10:49 -0200
-Message-Id: <1356113459-7932-7-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1356113459-7932-1-git-send-email-gustavo@padovan.org>
-References: <1356113459-7932-1-git-send-email-gustavo@padovan.org>
+Subject: [RFC -v2 00/16] Completely remove socket dependency from l2cap_core.c
+Date: Fri, 21 Dec 2012 16:10:43 -0200
+Message-Id: <1356113459-7932-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-l2cap_chan_ready() does exactly what we want here avoiding duplicate code.
+This is the last series of patches to completely remove the l2cap socket usage
+in the l2cap_core.c file. We now have a C API to access L2CAP and as a next
+step we should convert RFCOMM to use this API.
 
-Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
----
- net/bluetooth/l2cap_core.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+v2: adressed comments from Lizardo and Andrei.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2ad952b..af8783a 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1399,12 +1399,7 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
- 				l2cap_chan_ready(chan);
- 
- 		} else if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
--			struct sock *sk = chan->sk;
--			__clear_chan_timer(chan);
--			lock_sock(sk);
--			__l2cap_state_change(chan, BT_CONNECTED);
--			sk->sk_state_change(sk);
--			release_sock(sk);
-+			l2cap_chan_ready(chan);
- 
- 		} else if (chan->state == BT_CONNECT) {
- 			l2cap_do_start(chan);
+Gustavo Padovan (16):
+  Bluetooth: Add src and dst info to struct l2cap_chan
+  Bluetooth: Remove sk_sndtimeo from l2cap_core.c
+  Bluetooth: extend state_change() call to report errors too
+  Bluetooth: add l2cap_state_change_and_error()
+  Bluetooth: Add missing braces to an "else if"
+  Bluetooth: use l2cap_chan_ready() instead of duplicate code
+  Bluetooth: duplicate DEFER_SETUP flag on l2cap_chan
+  Bluetooth: Improving locking in l2cap_conn_start()
+  Bluetooth: lock socket in defer_cb call
+  Bluetooth: Remove socket lock from state_change() in l2cap_core
+  Bluetooth: remove parent socket usage from l2cap_core.c
+  Bluetooth: Use abstract chan->data in comparison
+  Bluetooth: Move l2cap_wait_ack() to l2cap_sock.c
+  Bluetooth: Create l2cap->ops->resume()
+  Bluetooth: Create l2cap->ops->set_shutdown()
+  Bluetooth: Remove sk member from struct l2cap_chan
+
+ include/net/bluetooth/l2cap.h |  22 ++++-
+ net/bluetooth/a2mp.c          |   4 +-
+ net/bluetooth/l2cap_core.c    | 200 ++++++++++++------------------------------
+ net/bluetooth/l2cap_sock.c    |  96 +++++++++++++++++---
+ net/bluetooth/rfcomm/core.c   |  15 ++--
+ 5 files changed, 169 insertions(+), 168 deletions(-)
+
 -- 
 1.8.0.2
 
