@@ -1,77 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [PATCH BlueZ 07/25] mgmt: Add set observer and set broadcaster command
-Date: Fri, 21 Dec 2012 16:26:34 -0400
-Message-Id: <1356121612-15172-8-git-send-email-bruna.moreira@openbossa.org>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH BlueZ 05/25] btmgmt: Add set controller data support
+Date: Fri, 21 Dec 2012 16:26:32 -0400
+Message-Id: <1356121612-15172-6-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jefferson Delfes <jefferson.delfes@openbossa.org>
-
-Implement Set Observer and Set Broadcaster support in MGMT API.
-
-For observer, setting TRUE will make the adapter start LE discovery,
-otherwise, setting FALSE will make the adapter stop LE discovery.
-
-For broadcaster, setting TRUE will make the new data sent by Set
-Controller Data command to be set in adapter and the advertising will
-start. Setting FALSE will stop advertising.
+Add new command set-data for running the Set Controller Data operation
+from MGMT API.
 ---
- src/mgmt.c |   16 ++++++++++++++++
- src/mgmt.h |    2 ++
- 2 files changed, 18 insertions(+)
+ tools/btmgmt.c |   85 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 85 insertions(+)
 
-diff --git a/src/mgmt.c b/src/mgmt.c
-index 03ec049..0f212b2 100644
---- a/src/mgmt.c
-+++ b/src/mgmt.c
-@@ -1651,6 +1651,12 @@ static void mgmt_cmd_complete(int sk, uint16_t index, void *buf, size_t len)
- 	case MGMT_OP_SET_DEVICE_ID:
- 		DBG("set_did complete");
- 		break;
-+	case MGMT_OP_SET_BROADCASTER:
-+		DBG("set_broadcaster complete");
-+		break;
-+	case MGMT_OP_SET_OBSERVER:
-+		DBG("set_observer complete");
-+		break;
- 	default:
- 		error("Unknown command complete for opcode %u", opcode);
- 		break;
-@@ -2358,6 +2364,16 @@ int mgmt_set_fast_connectable(int index, gboolean enable)
- 	return 0;
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index 4d9eab6..3ae0ecb 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -1829,6 +1829,90 @@ done:
+ 	}
  }
  
-+int mgmt_set_broadcaster(int index, gboolean enable)
++static void set_data_rsp(int mgmt_sk, uint16_t op, uint16_t id, uint8_t status,
++				void *rsp, uint16_t len, void *user_data)
 +{
-+	return mgmt_set_mode(index, MGMT_OP_SET_BROADCASTER, enable);
++	if (status != 0) {
++		fprintf(stderr, "%s failed, status 0x%02x (%s)\n",
++				mgmt_opstr(op), status, mgmt_errstr(status));
++		exit(EXIT_FAILURE);
++	}
++
++	exit(EXIT_SUCCESS);
 +}
 +
-+int mgmt_set_observer(int index, gboolean enable)
++static void set_data_usage(void)
 +{
-+	return mgmt_set_mode(index, MGMT_OP_SET_OBSERVER, enable);
++	printf("Usage: btmgmt set_data [-p] <data type> <byte array>\n");
++	printf("\nexample: btmgmt set_data -p 0xff 11 11 aa bb cc\n");
++	printf("\nparameters:\n");
++	printf("\tp: controller data priority.\n");
++	printf("\t<data type>: 0x16 (service data) or 0xff (manufacturer\n"
++		"\t specific data). Values different from that will return\n"
++		"\t error from kernel.\n");
++	printf("\t<byte array>: two bytes (service uuid or company identifier\n"
++		"\t code) following by hex encoded bytes (data).\n");
 +}
 +
- int mgmt_read_clock(int index, const bdaddr_t *bdaddr, int which, int timeout,
- 					uint32_t *clock, uint16_t *accuracy)
- {
-diff --git a/src/mgmt.h b/src/mgmt.h
-index 1ea8488..1607a95 100644
---- a/src/mgmt.h
-+++ b/src/mgmt.h
-@@ -32,6 +32,8 @@ int mgmt_set_pairable(int index, gboolean pairable);
- int mgmt_set_name(int index, const char *name);
- int mgmt_set_dev_class(int index, uint8_t major, uint8_t minor);
- int mgmt_set_fast_connectable(int index, gboolean enable);
-+int mgmt_set_broadcaster(int index, gboolean enable);
-+int mgmt_set_observer(int index, gboolean enable);
++static struct option set_data_options[] = {
++	{ "help",	0, 0, 'h' },
++	{ "priority",	1, 0, 'p' },
++	{ 0, 0, 0, 0 }
++};
++
++static void cmd_set_data(int mgmt_sk, uint16_t index, int argc, char **argv)
++{
++	struct mgmt_cp_set_controller_data *cp;
++	uint8_t data_len, flags = 0;
++	unsigned int i;
++	int opt;
++
++	while ((opt = getopt_long(argc, argv, "+ph", set_data_options,
++								NULL)) != -1) {
++		switch (opt) {
++		case 'p':
++			flags = MGMT_DATA_HIGH_PRIORITY;
++			break;
++		case 'h':
++		default:
++			set_data_usage();
++			exit(EXIT_SUCCESS);
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++	optind = 0;
++
++	if (argc < 1) {
++		set_data_usage();
++		exit(EXIT_FAILURE);
++	}
++
++	data_len = argc - 1;
++	cp = malloc(sizeof(*cp) + data_len);
++	cp->flags = flags;
++	sscanf(argv[0], "%hhx", &cp->type);
++
++	for (i = 0; i < data_len; i++)
++		sscanf(argv[i + 1], "%hhx", &cp->data[i]);
++
++	cp->length = data_len;
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	if (mgmt_send_cmd(mgmt_sk, MGMT_OP_SET_CONTROLLER_DATA, index,
++						cp, sizeof(*cp) + data_len,
++						set_data_rsp, NULL) < 0) {
++		free(cp);
++		fprintf(stderr, "Unable to send set controller data cmd\n");
++		exit(EXIT_FAILURE);
++	}
++
++	free(cp);
++}
++
+ static struct {
+ 	char *cmd;
+ 	void (*func)(int mgmt_sk, uint16_t index, int argc, char **argv);
+@@ -1862,6 +1946,7 @@ static struct {
+ 	{ "did",	cmd_did,	"Set Device ID",		},
+ 	{ "broadcaster",cmd_broadcaster,"Toggle Broadcaster Mode",	},
+ 	{ "observer",	cmd_observer,	"Toggle Observer Mode",		},
++	{ "set-data",	cmd_set_data,	"Set Controller Data",		},
+ 	{ NULL, NULL, 0 }
+ };
  
- int mgmt_start_discovery(int index);
- int mgmt_start_le_scanning(int index);
 -- 
 1.7.9.5
 
