@@ -1,79 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: Syam Sidhardhan <s.syam@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 1/4] core: Use ERROR_INTERFACE instead of org.bluez.Error
-Date: Fri, 21 Dec 2012 12:25:00 -0400
-Message-Id: <1356107103-18039-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH 2/2] Bluetooth: Fix ACL alive for long in case of non pariable
+ devices
+Date: Fri, 21 Dec 2012 19:14:29 +0530
+Message-id: <1356097469-24073-2-git-send-email-s.syam@samsung.com>
+In-reply-to: <1356097469-24073-1-git-send-email-s.syam@samsung.com>
+References: <1356097469-24073-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will simplify changing interface name later (e.g. adding
-versioning).
----
- src/adapter.c |    4 ++--
- src/agent.c   |    5 +++--
- src/device.c  |    2 +-
- 3 files changed, 6 insertions(+), 5 deletions(-)
+For certain devices (ex: HID mouse), support for authentication,
+pairing and bonding is optional. For such devices, the ACL alive
+for too long after the l2cap disconnection.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 6ff20e1..c1cb763 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -736,7 +736,7 @@ static void service_auth_cancel(struct service_auth *auth)
- 	DBusError derr;
+To avoid keep ACL alive for too long, set the ACL timeout back to
+HCI_DISCONN_TIMEOUT when l2cap is connected.
+
+commit id:a9ea3ed9b71cc3271dd59e76f65748adcaa76422 might have introduce
+this issue.
+
+Signed-off-by: Sang-Ki Park <sangki79.park@samsung.com>
+Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+---
+I'm not sure whether we need hci_conn_hold() and hci_conn_put() across
+while updating the disc_timeout. In certain other places in the code
+it's done. Ex: hci_auth_complete_evt(), hci_link_key_notify_evt() etc.
+Here I took that as the reference.
+
+ net/bluetooth/l2cap_core.c |    5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 82a3bdc..7a544c2 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1360,7 +1360,6 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 	sk = chan->sk;
  
- 	dbus_error_init(&derr);
--	dbus_set_error_const(&derr, "org.bluez.Error.Canceled", NULL);
-+	dbus_set_error_const(&derr, ERROR_INTERFACE ".Canceled", NULL);
+ 	hci_conn_hold(conn->hcon);
+-	conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
  
- 	auth->cb(&derr, auth->user_data);
+ 	bacpy(&bt_sk(sk)->src, conn->src);
+ 	bacpy(&bt_sk(sk)->dst, conn->dst);
+@@ -1380,6 +1379,10 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
  
-@@ -3105,7 +3105,7 @@ static gboolean process_auth_queue(gpointer user_data)
- 	adapter->auth_idle_id = 0;
+ 	BT_DBG("conn %p", conn);
  
- 	dbus_error_init(&err);
--	dbus_set_error_const(&err, "org.bluez.Error.Rejected", NULL);
-+	dbus_set_error_const(&err, ERROR_INTERFACE ".Rejected", NULL);
++	hci_conn_hold(conn->hcon);
++	conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
++	hci_conn_put(conn->hcon);
++
+ 	if (!hcon->out && hcon->type == LE_LINK)
+ 		l2cap_le_conn_ready(conn);
  
- 	while (!g_queue_is_empty(adapter->auths)) {
- 		struct service_auth *auth = adapter->auths->head->data;
-diff --git a/src/agent.c b/src/agent.c
-index 71e13c2..9b3fd28 100644
---- a/src/agent.c
-+++ b/src/agent.c
-@@ -206,7 +206,8 @@ void agent_unref(struct agent *agent)
- 		agent_cb cb;
- 
- 		dbus_error_init(&err);
--		dbus_set_error_const(&err, "org.bluez.Error.Failed", "Canceled");
-+		dbus_set_error_const(&err, ERROR_INTERFACE ".Failed",
-+								"Canceled");
- 
- 		switch (agent->request->type) {
- 		case AGENT_REQUEST_PINCODE:
-@@ -439,7 +440,7 @@ static void pincode_reply(DBusPendingCall *call, void *user_data)
- 
- 	if (len > 16 || len < 1) {
- 		error("Invalid PIN length (%zu) from agent", len);
--		dbus_set_error_const(&err, "org.bluez.Error.InvalidArgs",
-+		dbus_set_error_const(&err, ERROR_INTERFACE ".InvalidArgs",
- 					"Invalid passkey length");
- 		cb(agent, &err, NULL, req->user_data);
- 		dbus_error_free(&err);
-diff --git a/src/device.c b/src/device.c
-index 3cfb816..17c6cf7 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -3908,7 +3908,7 @@ static void cancel_authentication(struct authentication_req *auth)
- 	auth->agent = NULL;
- 
- 	dbus_error_init(&err);
--	dbus_set_error_const(&err, "org.bluez.Error.Canceled", NULL);
-+	dbus_set_error_const(&err, ERROR_INTERFACE ".Canceled", NULL);
- 
- 	switch (auth->type) {
- 	case AUTH_TYPE_PINCODE:
 -- 
 1.7.9.5
 
