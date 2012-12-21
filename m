@@ -1,76 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH BlueZ 13/25] observer: Add Register/UnregisterManufacturerObserver() D-Bus method
-Date: Fri, 21 Dec 2012 16:26:40 -0400
-Message-Id: <1356121612-15172-14-git-send-email-bruna.moreira@openbossa.org>
+Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Subject: [PATCH BlueZ 07/25] mgmt: Add set observer and set broadcaster command
+Date: Fri, 21 Dec 2012 16:26:34 -0400
+Message-Id: <1356121612-15172-8-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-An observer for Manufacturer Specific Data must be registered using
-RegisterManufacturerObserver() D-Bus method so it can receive any
-advertising which matches with the filter used. Use
-UnregisterManufacturerObserver() D-Bus method for unregistering an
-observer avoid stop sending broadcasts to the agent.
----
- src/adapter.c |   35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 
-diff --git a/src/adapter.c b/src/adapter.c
-index a5c23da..60dd54c 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1204,12 +1204,47 @@ static DBusMessage *unregister_service_observer(DBusConnection *conn,
- static DBusMessage *register_manuf_observer(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
- {
-+	struct btd_adapter *adapter = data;
-+	const char *path, *sender = dbus_message_get_sender(msg);
-+	unsigned int company_id;
-+	int err;
-+
-+	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+					DBUS_TYPE_UINT16, &company_id,
-+					DBUS_TYPE_INVALID) == FALSE)
-+		return btd_error_invalid_args(msg);
-+
-+	err = mgmt_set_observer(adapter->dev_id, TRUE);
-+	if (err < 0) {
-+		error("Failed to set Observer: %s (%d)", strerror(-err), -err);
-+
-+		return btd_error_failed(msg, strerror(-err));
-+	}
-+
-+	DBG("Manufacturer Specific Data Observer registered for hci%d at %s:%s",
-+						adapter->dev_id, sender, path);
-+
- 	return dbus_message_new_method_return(msg);
+Implement Set Observer and Set Broadcaster support in MGMT API.
+
+For observer, setting TRUE will make the adapter start LE discovery,
+otherwise, setting FALSE will make the adapter stop LE discovery.
+
+For broadcaster, setting TRUE will make the new data sent by Set
+Controller Data command to be set in adapter and the advertising will
+start. Setting FALSE will stop advertising.
+---
+ src/mgmt.c |   16 ++++++++++++++++
+ src/mgmt.h |    2 ++
+ 2 files changed, 18 insertions(+)
+
+diff --git a/src/mgmt.c b/src/mgmt.c
+index 03ec049..0f212b2 100644
+--- a/src/mgmt.c
++++ b/src/mgmt.c
+@@ -1651,6 +1651,12 @@ static void mgmt_cmd_complete(int sk, uint16_t index, void *buf, size_t len)
+ 	case MGMT_OP_SET_DEVICE_ID:
+ 		DBG("set_did complete");
+ 		break;
++	case MGMT_OP_SET_BROADCASTER:
++		DBG("set_broadcaster complete");
++		break;
++	case MGMT_OP_SET_OBSERVER:
++		DBG("set_observer complete");
++		break;
+ 	default:
+ 		error("Unknown command complete for opcode %u", opcode);
+ 		break;
+@@ -2358,6 +2364,16 @@ int mgmt_set_fast_connectable(int index, gboolean enable)
+ 	return 0;
  }
  
- static DBusMessage *unregister_manuf_observer(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
++int mgmt_set_broadcaster(int index, gboolean enable)
++{
++	return mgmt_set_mode(index, MGMT_OP_SET_BROADCASTER, enable);
++}
++
++int mgmt_set_observer(int index, gboolean enable)
++{
++	return mgmt_set_mode(index, MGMT_OP_SET_OBSERVER, enable);
++}
++
+ int mgmt_read_clock(int index, const bdaddr_t *bdaddr, int which, int timeout,
+ 					uint32_t *clock, uint16_t *accuracy)
  {
-+	const char *path, *sender = dbus_message_get_sender(msg);
-+	struct btd_adapter *adapter = data;
-+	int err;
-+
-+	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+						DBUS_TYPE_INVALID) == FALSE)
-+		return btd_error_invalid_args(msg);
-+
-+	err = mgmt_set_observer(adapter->dev_id, FALSE);
-+	if (err < 0)
-+		return btd_error_failed(msg, strerror(-err));
-+
-+	DBG("Manuf. Specific Data Observer unregistered for hci%d at %s:%s",
-+						adapter->dev_id, sender, path);
-+
- 	return dbus_message_new_method_return(msg);
- }
+diff --git a/src/mgmt.h b/src/mgmt.h
+index 1ea8488..1607a95 100644
+--- a/src/mgmt.h
++++ b/src/mgmt.h
+@@ -32,6 +32,8 @@ int mgmt_set_pairable(int index, gboolean pairable);
+ int mgmt_set_name(int index, const char *name);
+ int mgmt_set_dev_class(int index, uint8_t major, uint8_t minor);
+ int mgmt_set_fast_connectable(int index, gboolean enable);
++int mgmt_set_broadcaster(int index, gboolean enable);
++int mgmt_set_observer(int index, gboolean enable);
  
+ int mgmt_start_discovery(int index);
+ int mgmt_start_le_scanning(int index);
 -- 
 1.7.9.5
 
