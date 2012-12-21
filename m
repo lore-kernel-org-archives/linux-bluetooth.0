@@ -1,77 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [PATCH BlueZ 12/25] observer: Add Register/UnregisterServiceObserver() D-Bus method
-Date: Fri, 21 Dec 2012 16:26:39 -0400
-Message-Id: <1356121612-15172-13-git-send-email-bruna.moreira@openbossa.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 01/25] mgmt-api: Broadcaster/Observer management API
+Date: Fri, 21 Dec 2012 16:26:28 -0400
+Message-Id: <1356121612-15172-2-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jefferson Delfes <jefferson.delfes@openbossa.org>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 
-An observer for Service Data must be registered using
-RegisterServiceObserver() D-Bus method so it can receive any advertising
-which matches with the filter used. Use UnregisterServiceObserver()
-D-Bus method for unregistering an observer and stop sending broadcasts
-to the agent.
+Add new management commands for enabling or disabling broadcasting and
+observation modes, as defined by the Observer and Broadcaster GAP roles
+on the Core specification 4.0.
+
+The commands can also be used for adding information to EIR on BR/EDR
+controllers. For a list of all available AD/EIR types, see the Core
+Specification Supplement (CSS) document.
+
+Note that some AD/EIR types are managed internally by the kernel and are
+not available through these new commands.
 ---
- src/adapter.c |   35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ doc/mgmt-api.txt |   64 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 34dad6e..a5c23da 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1157,12 +1157,47 @@ static DBusMessage *remove_device(DBusConnection *conn, DBusMessage *msg,
- static DBusMessage *register_service_observer(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
- {
-+	struct btd_adapter *adapter = data;
-+	const char *path, *sender = dbus_message_get_sender(msg);
-+	unsigned int uuid;
-+	int err;
-+
-+	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+					DBUS_TYPE_UINT16, &uuid,
-+					DBUS_TYPE_INVALID) == FALSE)
-+		return btd_error_invalid_args(msg);
-+
-+	err = mgmt_set_observer(adapter->dev_id, TRUE);
-+	if (err < 0) {
-+		error("Failed to set Observer: %s (%d)", strerror(-err), -err);
-+
-+		return btd_error_failed(msg, strerror(-err));
-+	}
-+
-+	DBG("Service Data Observer registered for hci%d at %s:%s",
-+						adapter->dev_id, sender, path);
-+
- 	return dbus_message_new_method_return(msg);
- }
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 60f4da4..fe052af 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -141,6 +141,8 @@ Read Controller Information Command
+ 		8	Basic Rate/Enhanced Data Rate
+ 		9	High Speed
+ 		10	Low Energy
++		11	Broadcaster
++		12	Observer
  
- static DBusMessage *unregister_service_observer(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
- {
-+	const char *path, *sender = dbus_message_get_sender(msg);
-+	struct btd_adapter *adapter = data;
-+	int err;
+ 	This command generates a Command Complete event on success or
+ 	a Command Status event on failure.
+@@ -845,6 +847,68 @@ Set Device ID Command
+ 	a Command Status event on failure.
+ 
+ 
++Set Controller Data Command
++===========================
 +
-+	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+						DBUS_TYPE_INVALID) == FALSE)
-+		return btd_error_invalid_args(msg);
++	Command Code:		0x0029
++	Controller Index:	<controller id>
++	Command Parameters:	Flags (1 Octet)
++				Type (1 Octet)
++				Length (1 Octet)
++				Data (0-255 Octets)
++	Return Parameters:
 +
-+	err = mgmt_set_observer(adapter->dev_id, FALSE);
-+	if (err < 0)
-+		return btd_error_failed(msg, strerror(-err));
++	This command can be used to set AD for LE capable controllers or EIR
++	for BR/EDR controllers. Multiple AD/EIR types can be configured by
++	calling this command multiple times. If the controller is BR/EDR/LE
++	capable (also known as "dual mode"), only the LE advertising is set.
 +
-+	DBG("Service Data Observer unregistered for hci%d at %s:%s",
-+						adapter->dev_id, sender, path);
++	The Flags parameter is currently unused, but it will contain bitwise
++	flags to fine tune how and when the data will set on the controller.
 +
- 	return dbus_message_new_method_return(msg);
- }
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++
++Unset Controller Data Command
++=============================
++
++	Command Code:		0x002A
++	Controller Index:	<controller id>
++	Command Parameters:	Type (1 Octet)
++	Return Parameters:
++
++	Remove the AD/EIR information identified by Type, so it will not be
++	broadcasted anymore.
++
++	This command generates a Command Complete event on success or
++	on failure.
++
++
++Set Broadcaster Command
++=======================
++
++	Command Code:		0x002B
++	Controller Index:	<controller id>
++	Command Parameters:	Broadcaster (1 Octet)
++	Return Parameters:	Current_Settings (4 Octets)
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++
++Set Observer Command
++====================
++
++	Command Code:		0x002C
++	Controller Index:	<controller id>
++	Command Parameters:	Observer (1 Octet)
++	Return Parameters:	Current_Settings (4 Octets)
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++
+ Command Complete Event
+ ======================
  
 -- 
 1.7.9.5
