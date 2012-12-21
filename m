@@ -1,58 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
+From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH] Bluetooth: Fix uuid output in debugfs
-Date: Fri, 21 Dec 2012 20:57:04 -0200
-Message-Id: <1356130624-29234-1-git-send-email-gustavo@padovan.org>
+Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Subject: [PATCH BlueZ 20/25] broadcaster: Add SetService/ManufacturerData() D-Bus method
+Date: Fri, 21 Dec 2012 16:26:47 -0400
+Message-Id: <1356121612-15172-21-git-send-email-bruna.moreira@openbossa.org>
+In-Reply-To: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
+References: <1356121612-15172-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 
-The uuid should be printed in the CPU endianness and not in little-endian.
+For SetServiceData(), receive the service UUID with advertising data
+that will be set in device.
 
-Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+For SetManufacturerData(), receive the Company Identifier Code with
+advertising data that will be set in device.
 ---
- net/bluetooth/hci_sysfs.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
+ src/adapter.c |   34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 55cceee..05b78c7 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -461,19 +461,18 @@ static const struct file_operations blacklist_fops = {
- 
- static void print_bt_uuid(struct seq_file *f, u8 *uuid)
+diff --git a/src/adapter.c b/src/adapter.c
+index 90aab94..60c0697 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1416,12 +1416,46 @@ void adapter_set_controller_data_failed(struct btd_adapter *adapter)
+ static DBusMessage *set_service_data(DBusConnection *conn,
+ 						DBusMessage *msg, void *data)
  {
--	__be32 data0, data4;
--	__be16 data1, data2, data3, data5;
--
--	memcpy(&data0, &uuid[0], 4);
--	memcpy(&data1, &uuid[4], 2);
--	memcpy(&data2, &uuid[6], 2);
--	memcpy(&data3, &uuid[8], 2);
--	memcpy(&data4, &uuid[10], 4);
--	memcpy(&data5, &uuid[14], 2);
--
--	seq_printf(f, "%.8x-%.4x-%.4x-%.4x-%.8x%.4x\n",
--		   ntohl(data0), ntohs(data1), ntohs(data2), ntohs(data3),
--		   ntohl(data4), ntohs(data5));
-+	u32 data0, data5;
-+	u16 data1, data2, data3, data4;
++	struct btd_adapter *adapter = data;
++	const char *sender;
++	uint16_t uuid;
++	uint8_t *sdata;
++	int ssize;
 +
-+	data5 = le32_to_cpu(*(__le32 *)uuid);
-+	data4 = le16_to_cpu(*(__le16 *)(uuid + 4));
-+	data3 = le16_to_cpu(*(__le16 *)(uuid + 6));
-+	data2 = le16_to_cpu(*(__le16 *)(uuid + 8));
-+	data1 = le16_to_cpu(*(__le16 *)(uuid + 10));
-+	data0 = le32_to_cpu(*(__le32 *)(uuid + 12));
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT16, &uuid,
++						DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
++						&sdata, &ssize,
++						DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
 +
-+	seq_printf(f, "%.8x-%.4x-%.4x-%.4x-%.4x%.8x\n",
-+		   data0, data1, data2, data3, data4, data5);
++	sender = dbus_message_get_sender(msg);
++
++	DBG("Service Data Broadcaster registered for hci%d at %s",
++						adapter->dev_id, sender);
++
+ 	return dbus_message_new_method_return(msg);
  }
  
- static int uuids_show(struct seq_file *f, void *p)
+ static DBusMessage *set_manufacturer_data(DBusConnection *conn,
+ 						DBusMessage *msg, void *data)
+ {
++	struct btd_adapter *adapter = data;
++	const char *sender;
++	uint16_t company_id;
++	uint8_t *mdata;
++	int msize;
++
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT16, &company_id,
++						DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
++						&mdata, &msize,
++						DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
++
++	sender = dbus_message_get_sender(msg);
++
++	DBG("Manufacturer Specific Data Broadcaster registered for hci%d at %s",
++						adapter->dev_id, sender);
++
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
 -- 
-1.8.0.2
+1.7.9.5
 
