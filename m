@@ -1,27 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Sat, 22 Dec 2012 18:51:23 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 4/4] hog: Remove pre-existing suspend FIFO
+Message-ID: <20121222165123.GA25832@x220.P-661HNU-F1>
+References: <1356189162-11584-1-git-send-email-jprvita@openbossa.org>
+ <1356189162-11584-4-git-send-email-jprvita@openbossa.org>
+ <1356194171.29264.14.camel@aeonflux>
 MIME-Version: 1.0
-In-Reply-To: <CAGXs5wXEEnO084sg1Er-SgB3-TU+W5HtjsKnY7CdT9Hsw+jjew@mail.gmail.com>
-References: <CAGXs5wXEEnO084sg1Er-SgB3-TU+W5HtjsKnY7CdT9Hsw+jjew@mail.gmail.com>
-Date: Sat, 22 Dec 2012 19:22:15 +0200
-Message-ID: <CAGXs5wX3_b6FeDeuMA88wfsUwAWjQ23OXrcL5QbfrhE+BTKOBg@mail.gmail.com>
-Subject: Re: setting BT connection over RFCOMM
-From: Kevin Wilson <wkevils@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1356194171.29264.14.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
-Please ignore my question. It turns out that
- CONFIG_BT_RFCOMM_TTY was not set.
-As a result, there was an error on the server
-which prevented connection establishment,
-Now after setting CONFIG_BT_RFCOMM_TTY,
-it works.
+Hi Marcel,
 
-rgs
-Kevin
+On Sat, Dec 22, 2012, Marcel Holtmann wrote:
+> > +			if (remove(HOG_SUSPEND_FIFO) < 0) {
+> 
+> you are looking for unlink() to use here.
 
+Since I already applied the patches I went ahead and fixed this myself.
 
-On Sat, Dec 22, 2012 at 6:48 AM, Kevin Wilson <wkevils@gmail.com> wrote:
-> connect rfcomm0
+Johan
