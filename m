@@ -1,62 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] core: Fix memory leak from pending UUID removal
-Date: Sat, 22 Dec 2012 18:59:21 -0400
-Message-Id: <1356217161-3787-1-git-send-email-anderson.lizardo@openbossa.org>
+Message-ID: <1356206160.29264.17.camel@aeonflux>
+Subject: Re: [PATCH BlueZ 4/4] hog: Remove pre-existing suspend FIFO
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Joao Paulo Rechi Vita <jprvita@openbossa.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Sat, 22 Dec 2012 11:56:00 -0800
+In-Reply-To: <CAAngNMbS0oDkxe0TQEu2mrxrf7dyViYcHZFeKgtREDd1jtp-yA@mail.gmail.com>
+References: <1356189162-11584-1-git-send-email-jprvita@openbossa.org>
+	 <1356189162-11584-4-git-send-email-jprvita@openbossa.org>
+	 <1356194171.29264.14.camel@aeonflux>
+	 <CAAngNMbS0oDkxe0TQEu2mrxrf7dyViYcHZFeKgtREDd1jtp-yA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When bluetoothd is shutting down, profile cleanup will usually issue
-many "Remove UUID" management commands. These may not complete before
-the process exits, resulting on this memory leak:
+Hi Joao Paulo,
 
-==2461== 144 (8 direct, 136 indirect) bytes in 1 blocks are definitely
-lost in loss record 153 of 176
-==2461==    at 0x402BE68: malloc (in
-/usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
-==2461==    by 0x40869AA: standard_malloc (gmem.c:85)
-==2461==    by 0x4086E42: g_malloc (gmem.c:159)
-==2461==    by 0x409B26D: g_slice_alloc (gslice.c:1003)
-==2461==    by 0x409C659: g_slist_append (gslist.c:222)
-==2461==    by 0x80B5E12: mgmt_remove_uuid (mgmt.c:1034)
-==2461==    by 0x80A734E: adapter_service_remove (adapter.c:708)
-==2461==    by 0x80994B4: sdp_record_remove (sdpd-database.c:272)
-==2461==    by 0x8098CC0: remove_record_from_server (sdpd-service.c:290)
-==2461==    by 0x8062B5B: avrcp_unregister (avrcp.c:2354)
-==2461==    by 0x409C797: g_slist_foreach (gslist.c:840)
-==2461==    by 0x80A7D77: adapter_remove (adapter.c:1630)
+> >> If bluetoothd crashes the exit routine of the suspend plugin will not be
+> >> executed, leaving the suspend FIFO behind and preventing the plugin load
+> >> on subsequent executions. This commit checks for pre-existence of the
+> >> suspend FIFO and tries to remove and re-create it.
+> >> ---
+> >>  profiles/input/suspend-dummy.c | 16 ++++++++++++++++
+> >>  1 file changed, 16 insertions(+)
+> >>
+> >> diff --git a/profiles/input/suspend-dummy.c b/profiles/input/suspend-dummy.c
+> >> index 33b790a..43384c0 100644
+> >> --- a/profiles/input/suspend-dummy.c
+> >> +++ b/profiles/input/suspend-dummy.c
+> >> @@ -119,6 +119,22 @@ int suspend_init(suspend_event suspend, resume_event resume)
+> >>
+> >>       if (mkfifo(HOG_SUSPEND_FIFO, S_IRWXU) < 0) {
+> >>               int err = -errno;
+> >> +
+> >> +             if (err == -EEXIST) {
+> >> +                     DBG("FIFO (%s) already exists, trying to remove",
+> >> +                                                     HOG_SUSPEND_FIFO);
+> >> +
+> >> +                     /* remove pre-existing FIFO and retry */
+> >> +                     if (remove(HOG_SUSPEND_FIFO) < 0) {
+> >
+> > you are looking for unlink() to use here.
+> >
+> 
+> What's the problem with remove()? From the manpage it's part of
+> stdio.h and calls unlink() for files, and rmdir() for directories.
+> From my understanding if someone else created a directory on the FIFO
+> path, unlink() will return with EISDIR and we would need to handle
+> this error as well.
 
-The leak seems to only happen during bluetoothd shutdown, because the
-list of pending UUIDs is cleared when controller is removed. Therefore,
-only cleanup the list on shutdown path.
----
- src/mgmt.c |   11 +++++++++++
- 1 file changed, 11 insertions(+)
+if it accidentally has been a directory with that name, then I want to
+see a big fat error. Not some magic to make it work.
 
-diff --git a/src/mgmt.c b/src/mgmt.c
-index 52441e8..ae4a95c 100644
---- a/src/mgmt.c
-+++ b/src/mgmt.c
-@@ -2231,6 +2231,17 @@ fail:
- 
- void mgmt_cleanup(void)
- {
-+	int index;
-+
-+	for (index = 0; index <= max_index; index++) {
-+		struct controller_info *info = &controllers[index];
-+
-+		if (!info->valid)
-+			continue;
-+
-+		g_slist_free_full(info->pending_uuids, g_free);
-+	}
-+
- 	g_free(controllers);
- 	controllers = NULL;
- 	max_index = -1;
--- 
-1.7.9.5
+Regards
+
+Marcel
+
 
