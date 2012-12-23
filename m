@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 5/6] player: Enable MediaPlayer1 interface as experimental
-Date: Sun, 23 Dec 2012 17:24:57 +0200
-Message-Id: <1356276298-13795-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 6/6] AVRCP: Fix not checking for media_player_controller_create
+Date: Sun, 23 Dec 2012 17:24:58 +0200
+Message-Id: <1356276298-13795-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1356276298-13795-1-git-send-email-luiz.dentz@gmail.com>
 References: <1356276298-13795-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,53 +11,38 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enable MediaPlayer1 when GDBUS_EXPERIMENTAL=1
+Now that the MediaPlayer1 interface is experimental the interface
+registration may fail which return NULL, in that case there is no
+point on register to any notifications.
 ---
- profiles/audio/player.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ profiles/audio/avrcp.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index 005d0d1..60c7a8a 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -298,9 +298,9 @@ struct media_player *media_player_controller_create(const char *path)
- 							g_free, g_free);
- 	mp->progress = g_timer_new();
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 4e3d31d..ce070cd 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -1987,6 +1987,11 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
  
--#if 0
--	if (!g_dbus_register_interface(btd_get_dbus_connection(),
-+	if (!g_dbus_register_interface_with_flags(btd_get_dbus_connection(),
- 					mp->path, MEDIA_PLAYER_INTERFACE,
-+					G_DBUS_INTERFACE_FLAG_EXPERIMENTAL,
- 					media_player_methods,
- 					media_player_signals,
- 					media_player_properties, mp, NULL)) {
-@@ -308,7 +308,7 @@ struct media_player *media_player_controller_create(const char *path)
- 		media_player_destroy(mp);
- 		return NULL;
+ 	count = pdu->params[1];
+ 
++	path = device_get_path(session->dev->btd_dev);
++	mp = media_player_controller_create(path);
++	if (mp == NULL)
++		return FALSE;
++
+ 	for (; count > 0; count--) {
+ 		uint8_t event = pdu->params[1 + count];
+ 
+@@ -2001,8 +2006,6 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
+ 		}
  	}
--#endif
-+
- 	DBG("%s", mp->path);
  
- 	return mp;
-@@ -410,7 +410,6 @@ void media_player_set_status(struct media_player *mp, const char *status)
- 
- static gboolean process_metadata_changed(void *user_data)
- {
--#if 0
- 	struct media_player *mp = user_data;
- 	DBusMessage *signal;
- 	DBusMessageIter iter, dict;
-@@ -439,7 +438,7 @@ static gboolean process_metadata_changed(void *user_data)
- 	dbus_message_iter_close_container(&iter, &dict);
- 
- 	g_dbus_send_message(btd_get_dbus_connection(), signal);
--#endif
-+
- 	return FALSE;
- }
- 
+-	path = device_get_path(session->dev->btd_dev);
+-	mp = media_player_controller_create(path);
+ 	media_player_set_callbacks(mp, &ct_cbs, player);
+ 	player->user_data = mp;
+ 	player->destroy = (GDestroyNotify) media_player_destroy;
 -- 
 1.7.11.7
 
