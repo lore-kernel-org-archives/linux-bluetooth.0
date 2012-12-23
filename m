@@ -1,100 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/8] gdbus: Introduce G_DBUS_METHOD_FLAG_EXPERIMENTAL
-Date: Sun, 23 Dec 2012 22:15:11 +0200
-Message-Id: <1356293718-9348-1-git-send-email-luiz.dentz@gmail.com>
+Message-ID: <1356280804.29264.31.camel@aeonflux>
+Subject: Re: [PATCH BlueZ 4/6] gdbus: Call check_signals when sending
+ signals with g_dbus_send_message
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Sun, 23 Dec 2012 08:40:04 -0800
+In-Reply-To: <CABBYNZJ=cpoaSOk4fvk3Y7pp=vtYyN3Qqwacq6iG6UHBicM5-g@mail.gmail.com>
+References: <1356276298-13795-1-git-send-email-luiz.dentz@gmail.com>
+	 <1356276298-13795-4-git-send-email-luiz.dentz@gmail.com>
+	 <1356279010.29264.25.camel@aeonflux>
+	 <CABBYNZJ=cpoaSOk4fvk3Y7pp=vtYyN3Qqwacq6iG6UHBicM5-g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-This flag can be used to mark methods as experimental, the marked
-methods with this flag can be enabled by setting the environment variable
-GDBUS_EXPERIMENTAL=1
----
- gdbus/gdbus.h  | 21 ++++++++++++++++++---
- gdbus/object.c | 17 +++++++++++++++++
- 2 files changed, 35 insertions(+), 3 deletions(-)
+> >> If message passed to g_dbus_send_message is a signal verify if it is a
+> >> valid and there really exists an interface with respective signal name.
+> >> ---
+> >>  gdbus/object.c | 9 +++++++++
+> >>  1 file changed, 9 insertions(+)
+> >>
+> >> diff --git a/gdbus/object.c b/gdbus/object.c
+> >> index 510763a..6951171 100644
+> >> --- a/gdbus/object.c
+> >> +++ b/gdbus/object.c
+> >> @@ -1475,6 +1475,15 @@ gboolean g_dbus_send_message(DBusConnection *connection, DBusMessage *message)
+> >>
+> >>       if (dbus_message_get_type(message) == DBUS_MESSAGE_TYPE_METHOD_CALL)
+> >>               dbus_message_set_no_reply(message, TRUE);
+> >> +     else {
+> >> +             const char *path = dbus_message_get_path(message);
+> >> +             const char *interface = dbus_message_get_interface(message);
+> >> +             const char *name = dbus_message_get_member(message);
+> >> +             const GDBusArgInfo *args;
+> >> +
+> >> +             if (!check_signal(connection, path, interface, name, &args))
+> >> +                     return FALSE;
+> >> +     }
+> >
+> > we have more than just method calls and signals. This could be also used
+> > used for sending async method returns.
+> 
+> I guess I should do else if and check for signal type then, or you
+> have a better idea?
 
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index 0e5c012..00fbb1c 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -89,9 +89,10 @@ typedef void (* GDBusSecurityFunction) (DBusConnection *connection,
- 						GDBusPendingReply pending);
- 
- enum GDBusMethodFlags {
--	G_DBUS_METHOD_FLAG_DEPRECATED = (1 << 0),
--	G_DBUS_METHOD_FLAG_NOREPLY    = (1 << 1),
--	G_DBUS_METHOD_FLAG_ASYNC      = (1 << 2),
-+	G_DBUS_METHOD_FLAG_DEPRECATED   = (1 << 0),
-+	G_DBUS_METHOD_FLAG_NOREPLY      = (1 << 1),
-+	G_DBUS_METHOD_FLAG_ASYNC        = (1 << 2),
-+	G_DBUS_METHOD_FLAG_EXPERIMENTAL = (1 << 3),
- };
- 
- enum GDBusSignalFlags {
-@@ -173,6 +174,20 @@ struct GDBusSecurityTable {
- 	.function = _function, \
- 	.flags = G_DBUS_METHOD_FLAG_ASYNC | G_DBUS_METHOD_FLAG_DEPRECATED
- 
-+#define GDBUS_EXPERIMENTAL_METHOD(_name, _in_args, _out_args, _function) \
-+	.name = _name, \
-+	.in_args = _in_args, \
-+	.out_args = _out_args, \
-+	.function = _function, \
-+	.flags = G_DBUS_METHOD_FLAG_EXPERIMENTAL
-+
-+#define GDBUS_EXPERIMENTAL_ASYNC_METHOD(_name, _in_args, _out_args, _function) \
-+	.name = _name, \
-+	.in_args = _in_args, \
-+	.out_args = _out_args, \
-+	.function = _function, \
-+	.flags = G_DBUS_METHOD_FLAG_ASYNC | G_DBUS_METHOD_FLAG_EXPERIMENTAL
-+
- #define GDBUS_NOREPLY_METHOD(_name, _in_args, _out_args, _function) \
- 	.name = _name, \
- 	.in_args = _in_args, \
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 776d35e..30dbbc2 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -129,6 +129,14 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
- 						G_DBUS_METHOD_FLAG_DEPRECATED;
- 		gboolean noreply = method->flags &
- 						G_DBUS_METHOD_FLAG_NOREPLY;
-+		gboolean experimental = method->flags &
-+					G_DBUS_METHOD_FLAG_EXPERIMENTAL;
-+
-+		if (experimental) {
-+			const char *env = g_getenv("GDBUS_EXPERIMENTAL");
-+			if (g_strcmp0(env, "1") != 0)
-+				continue;
-+		}
- 
- 		if (!deprecated && !noreply &&
- 				!(method->in_args && method->in_args->name) &&
-@@ -1022,10 +1030,19 @@ static DBusHandlerResult generic_message(DBusConnection *connection,
- 
- 	for (method = iface->methods; method &&
- 			method->name && method->function; method++) {
-+		gboolean experimental = method->flags &
-+					G_DBUS_METHOD_FLAG_EXPERIMENTAL;
-+
- 		if (dbus_message_is_method_call(message, iface->name,
- 							method->name) == FALSE)
- 			continue;
- 
-+		if (experimental) {
-+			const char *env = g_getenv("GDBUS_EXPERIMENTAL");
-+			if (g_strcmp0(env, "1") != 0)
-+				return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-+		}
-+
- 		if (g_dbus_args_have_signature(method->in_args,
- 							message) == FALSE)
- 			continue;
--- 
-1.7.11.7
+just do the else if part here. You could use a switch statement, but
+then you can not have local variables. So it does not really help.
+
+I am still wondering why we are setting no reply flag when this is a
+method call. That makes no sense to me. Must be missing something.
+
+Regards
+
+Marcel
+
 
