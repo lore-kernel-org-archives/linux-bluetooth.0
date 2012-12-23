@@ -3,8 +3,8 @@ From: <chen.ganir@ti.com>
 To: <marcel@holtmann.org>, <linux-bluetooth@vger.kernel.org>
 CC: Chen Ganir <chen.ganir@ti.com>
 Subject: [PATCH hcidump] Add TI Logger dump support
-Date: Sun, 23 Dec 2012 14:07:32 +0200
-Message-ID: <1356264452-21200-1-git-send-email-chen.ganir@ti.com>
+Date: Sun, 23 Dec 2012 13:58:00 +0200
+Message-ID: <1356263880-20743-1-git-send-email-chen.ganir@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
