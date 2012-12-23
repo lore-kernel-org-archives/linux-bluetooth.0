@@ -1,55 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1356278946.29264.24.camel@aeonflux>
+Message-ID: <1356279010.29264.25.camel@aeonflux>
+Subject: Re: [PATCH BlueZ 4/6] gdbus: Call check_signals when sending
+ signals with g_dbus_send_message
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Sun, 23 Dec 2012 08:10:10 -0800
+In-Reply-To: <1356276298-13795-4-git-send-email-luiz.dentz@gmail.com>
 References: <1356276298-13795-1-git-send-email-luiz.dentz@gmail.com>
-	<1356276298-13795-3-git-send-email-luiz.dentz@gmail.com>
-	<1356278946.29264.24.camel@aeonflux>
-Date: Sun, 23 Dec 2012 18:27:29 +0200
-Message-ID: <CABBYNZ+set-vvzf+6whfPt5zE8c7X_t2DB4vJS6p8v2X0i_U-A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/6] gdbus: Introduce GDBusInterfaceFlags
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+	 <1356276298-13795-4-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Luiz,
 
-On Sun, Dec 23, 2012 at 6:09 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Luiz,
->
->> The flags should be passed in g_dbus_register_interface_with_flags,
->> currently there only one flag which is G_DBUS_INTERFACE_FLAG_EXPERIMENTAL
->> which works similarly to G_DBUS_METHOD_FLAG_EXPERIMENTAL but for the
->> whole interface.
->> ---
->>  gdbus/gdbus.h  | 13 +++++++++++++
->>  gdbus/object.c | 20 ++++++++++++++++++++
->>  2 files changed, 33 insertions(+)
->
-> can we not just check if the interface contains any non experimental
-> method, signals and properties and base that decision around that?
+> If message passed to g_dbus_send_message is a signal verify if it is a
+> valid and there really exists an interface with respective signal name.
+> ---
+>  gdbus/object.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/gdbus/object.c b/gdbus/object.c
+> index 510763a..6951171 100644
+> --- a/gdbus/object.c
+> +++ b/gdbus/object.c
+> @@ -1475,6 +1475,15 @@ gboolean g_dbus_send_message(DBusConnection *connection, DBusMessage *message)
+>  
+>  	if (dbus_message_get_type(message) == DBUS_MESSAGE_TYPE_METHOD_CALL)
+>  		dbus_message_set_no_reply(message, TRUE);
+> +	else {
+> +		const char *path = dbus_message_get_path(message);
+> +		const char *interface = dbus_message_get_interface(message);
+> +		const char *name = dbus_message_get_member(message);
+> +		const GDBusArgInfo *args;
+> +
+> +		if (!check_signal(connection, path, interface, name, &args))
+> +			return FALSE;
+> +	}
 
-It can work, but we would have to iterate on every single item, so in
-terms of code is quite a bit more complex so I favored adding a new
-function even though we might replace it in the long run.
+we have more than just method calls and signals. This could be also used
+used for sending async method returns.
 
-> I am not really in favor of introducing a version with flags.
+>  
+>  	result = dbus_connection_send(connection, message, NULL);
+>  
 
-The final solution I was thinking is passing another interface
-containing the table as this tend to be quite static e.g.:
+Regards
 
-struct GDBusInteface {
-  const char *name;
-  GDBusInterfaceFlags flags;
-  const GDBusMethodTable *methods;
-  const GDBusSignalTable *signals;
-  const GDBusPropertiesTable *properties;
-};
-
-Obviously this would break g_dbus_register_interface and generate
-quite a bit more changes to the daemon code.
+Marcel
 
 
---
-Luiz Augusto von Dentz
