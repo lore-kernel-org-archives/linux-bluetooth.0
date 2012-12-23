@@ -1,55 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1356280239.29264.28.camel@aeonflux>
-Subject: Re: [PATCH BlueZ 3/6] gdbus: Introduce GDBusInterfaceFlags
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Sun, 23 Dec 2012 08:30:39 -0800
-In-Reply-To: <CABBYNZ+set-vvzf+6whfPt5zE8c7X_t2DB4vJS6p8v2X0i_U-A@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1356278946.29264.24.camel@aeonflux>
 References: <1356276298-13795-1-git-send-email-luiz.dentz@gmail.com>
-	 <1356276298-13795-3-git-send-email-luiz.dentz@gmail.com>
-	 <1356278946.29264.24.camel@aeonflux>
-	 <CABBYNZ+set-vvzf+6whfPt5zE8c7X_t2DB4vJS6p8v2X0i_U-A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+	<1356276298-13795-3-git-send-email-luiz.dentz@gmail.com>
+	<1356278946.29264.24.camel@aeonflux>
+Date: Sun, 23 Dec 2012 18:27:29 +0200
+Message-ID: <CABBYNZ+set-vvzf+6whfPt5zE8c7X_t2DB4vJS6p8v2X0i_U-A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/6] gdbus: Introduce GDBusInterfaceFlags
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Marcel,
 
-> >> The flags should be passed in g_dbus_register_interface_with_flags,
-> >> currently there only one flag which is G_DBUS_INTERFACE_FLAG_EXPERIMENTAL
-> >> which works similarly to G_DBUS_METHOD_FLAG_EXPERIMENTAL but for the
-> >> whole interface.
-> >> ---
-> >>  gdbus/gdbus.h  | 13 +++++++++++++
-> >>  gdbus/object.c | 20 ++++++++++++++++++++
-> >>  2 files changed, 33 insertions(+)
-> >
-> > can we not just check if the interface contains any non experimental
-> > method, signals and properties and base that decision around that?
-> 
-> It can work, but we would have to iterate on every single item, so in
-> terms of code is quite a bit more complex so I favored adding a new
-> function even though we might replace it in the long run.
+On Sun, Dec 23, 2012 at 6:09 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
+>
+>> The flags should be passed in g_dbus_register_interface_with_flags,
+>> currently there only one flag which is G_DBUS_INTERFACE_FLAG_EXPERIMENTAL
+>> which works similarly to G_DBUS_METHOD_FLAG_EXPERIMENTAL but for the
+>> whole interface.
+>> ---
+>>  gdbus/gdbus.h  | 13 +++++++++++++
+>>  gdbus/object.c | 20 ++++++++++++++++++++
+>>  2 files changed, 33 insertions(+)
+>
+> can we not just check if the interface contains any non experimental
+> method, signals and properties and base that decision around that?
 
-we have to iterate over every single item in the success case anyway, so
-why bother trying to optimize this.
+It can work, but we would have to iterate on every single item, so in
+terms of code is quite a bit more complex so I favored adding a new
+function even though we might replace it in the long run.
 
-> > I am not really in favor of introducing a version with flags.
-> 
-> The final solution I was thinking is passing another interface
-> containing the table as this tend to be quite static e.g.:
+> I am not really in favor of introducing a version with flags.
 
-If this is not the final solution you are heading for, then lets not
-even bother introducing it. Lets go with the the simple approach that
-does not introduce any new functions.
+The final solution I was thinking is passing another interface
+containing the table as this tend to be quite static e.g.:
 
-It has the advantage that you only need to change one place. Otherwise
-you need to check the method structs and the calling register function.
+struct GDBusInteface {
+  const char *name;
+  GDBusInterfaceFlags flags;
+  const GDBusMethodTable *methods;
+  const GDBusSignalTable *signals;
+  const GDBusPropertiesTable *properties;
+};
 
-Regards
+Obviously this would break g_dbus_register_interface and generate
+quite a bit more changes to the daemon code.
 
-Marcel
 
-
+--
+Luiz Augusto von Dentz
