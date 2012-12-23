@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 7/8] player: Enable MediaPlayer1 interface as experimental
-Date: Sun, 23 Dec 2012 22:15:17 +0200
-Message-Id: <1356293718-9348-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 6/8] media: Enable RegisterPlayer and UnregisterPlayer methods as experimental
+Date: Sun, 23 Dec 2012 22:15:16 +0200
+Message-Id: <1356293718-9348-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1356293718-9348-1-git-send-email-luiz.dentz@gmail.com>
 References: <1356293718-9348-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,88 +11,57 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enable MediaPlayer1 when GDBUS_EXPERIMENTAL=1
 ---
- profiles/audio/player.c | 28 ++++++++++++++++------------
- 1 file changed, 16 insertions(+), 12 deletions(-)
+ profiles/audio/media.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index 005d0d1..693a590 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -239,25 +239,31 @@ static void set_setting(const GDBusPropertyTable *property,
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index f728460..e4206e3 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -868,7 +868,6 @@ static DBusMessage *unregister_endpoint(DBusConnection *conn, DBusMessage *msg,
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
  }
  
- static const GDBusMethodTable media_player_methods[] = {
--	{ GDBUS_METHOD("GetTrack",
-+	{ GDBUS_EXPERIMENTAL_METHOD("GetTrack",
- 			NULL, GDBUS_ARGS({ "metadata", "a{sv}" }),
- 			media_player_get_track) },
- 	{ }
- };
- 
- static const GDBusSignalTable media_player_signals[] = {
--	{ GDBUS_SIGNAL("TrackChanged",
-+	{ GDBUS_EXPERIMENTAL_SIGNAL("TrackChanged",
- 			GDBUS_ARGS({ "metadata", "a{sv}" })) },
- 	{ }
- };
- 
- static const GDBusPropertyTable media_player_properties[] = {
--	{ "Position", "u", get_position },
--	{ "Status", "s", get_status, NULL, status_exists },
--	{ "Equalizer", "s", get_setting, set_setting, setting_exists },
--	{ "Repeat", "s", get_setting, set_setting, setting_exists },
--	{ "Shuffle", "s", get_setting, set_setting, setting_exists },
--	{ "Scan", "s", get_setting, set_setting, setting_exists },
-+	{ "Position", "u", get_position, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "Status", "s", get_status, NULL, status_exists,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "Equalizer", "s", get_setting, set_setting, setting_exists,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "Repeat", "s", get_setting, set_setting, setting_exists,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "Shuffle", "s", get_setting, set_setting, setting_exists,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "Scan", "s", get_setting, set_setting, setting_exists,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ }
- };
- 
-@@ -298,7 +304,6 @@ struct media_player *media_player_controller_create(const char *path)
- 							g_free, g_free);
- 	mp->progress = g_timer_new();
- 
 -#if 0
- 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
- 					mp->path, MEDIA_PLAYER_INTERFACE,
- 					media_player_methods,
-@@ -308,7 +313,7 @@ struct media_player *media_player_controller_create(const char *path)
- 		media_player_destroy(mp);
- 		return NULL;
- 	}
--#endif
-+
- 	DBG("%s", mp->path);
+ static struct media_player *media_adapter_find_player(
+ 						struct media_adapter *adapter,
+ 						const char *sender,
+@@ -1533,7 +1532,6 @@ static DBusMessage *unregister_player(DBusConnection *conn, DBusMessage *msg,
  
- 	return mp;
-@@ -410,7 +415,6 @@ void media_player_set_status(struct media_player *mp, const char *status)
- 
- static gboolean process_metadata_changed(void *user_data)
- {
--#if 0
- 	struct media_player *mp = user_data;
- 	DBusMessage *signal;
- 	DBusMessageIter iter, dict;
-@@ -439,7 +443,7 @@ static gboolean process_metadata_changed(void *user_data)
- 	dbus_message_iter_close_container(&iter, &dict);
- 
- 	g_dbus_send_message(btd_get_dbus_connection(), signal);
--#endif
-+
- 	return FALSE;
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
  }
+-#endif
+ 
+ static const GDBusMethodTable media_methods[] = {
+ 	{ GDBUS_METHOD("RegisterEndpoint",
+@@ -1541,14 +1539,12 @@ static const GDBusMethodTable media_methods[] = {
+ 		NULL, register_endpoint) },
+ 	{ GDBUS_METHOD("UnregisterEndpoint",
+ 		GDBUS_ARGS({ "endpoint", "o" }), NULL, unregister_endpoint) },
+-#if 0
+-	{ GDBUS_METHOD("RegisterPlayer",
++	{ GDBUS_EXPERIMENTAL_METHOD("RegisterPlayer",
+ 		GDBUS_ARGS({ "player", "o" }, { "properties", "a{sv}" },
+ 						{ "metadata", "a{sv}" }),
+ 		NULL, register_player) },
+-	{ GDBUS_METHOD("UnregisterPlayer",
++	{ GDBUS_EXPERIMENTAL_METHOD("UnregisterPlayer",
+ 		GDBUS_ARGS({ "player", "o" }), NULL, unregister_player) },
+-#endif
+ 	{ },
+ };
+ 
+@@ -1559,10 +1555,8 @@ static void path_free(void *data)
+ 	while (adapter->endpoints)
+ 		release_endpoint(adapter->endpoints->data);
+ 
+-#if 0
+ 	while (adapter->players)
+ 		media_player_destroy(adapter->players->data);
+-#endif
+ 
+ 	adapters = g_slist_remove(adapters, adapter);
  
 -- 
 1.7.11.7
