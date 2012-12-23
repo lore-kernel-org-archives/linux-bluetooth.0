@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1356279010.29264.25.camel@aeonflux>
-Subject: Re: [PATCH BlueZ 4/6] gdbus: Call check_signals when sending
- signals with g_dbus_send_message
+Message-ID: <1356278946.29264.24.camel@aeonflux>
+Subject: Re: [PATCH BlueZ 3/6] gdbus: Introduce GDBusInterfaceFlags
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Sun, 23 Dec 2012 08:10:10 -0800
-In-Reply-To: <1356276298-13795-4-git-send-email-luiz.dentz@gmail.com>
+Date: Sun, 23 Dec 2012 08:09:06 -0800
+In-Reply-To: <1356276298-13795-3-git-send-email-luiz.dentz@gmail.com>
 References: <1356276298-13795-1-git-send-email-luiz.dentz@gmail.com>
-	 <1356276298-13795-4-git-send-email-luiz.dentz@gmail.com>
+	 <1356276298-13795-3-git-send-email-luiz.dentz@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,36 +15,19 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-> If message passed to g_dbus_send_message is a signal verify if it is a
-> valid and there really exists an interface with respective signal name.
+> The flags should be passed in g_dbus_register_interface_with_flags,
+> currently there only one flag which is G_DBUS_INTERFACE_FLAG_EXPERIMENTAL
+> which works similarly to G_DBUS_METHOD_FLAG_EXPERIMENTAL but for the
+> whole interface.
 > ---
->  gdbus/object.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/gdbus/object.c b/gdbus/object.c
-> index 510763a..6951171 100644
-> --- a/gdbus/object.c
-> +++ b/gdbus/object.c
-> @@ -1475,6 +1475,15 @@ gboolean g_dbus_send_message(DBusConnection *connection, DBusMessage *message)
->  
->  	if (dbus_message_get_type(message) == DBUS_MESSAGE_TYPE_METHOD_CALL)
->  		dbus_message_set_no_reply(message, TRUE);
-> +	else {
-> +		const char *path = dbus_message_get_path(message);
-> +		const char *interface = dbus_message_get_interface(message);
-> +		const char *name = dbus_message_get_member(message);
-> +		const GDBusArgInfo *args;
-> +
-> +		if (!check_signal(connection, path, interface, name, &args))
-> +			return FALSE;
-> +	}
+>  gdbus/gdbus.h  | 13 +++++++++++++
+>  gdbus/object.c | 20 ++++++++++++++++++++
+>  2 files changed, 33 insertions(+)
 
-we have more than just method calls and signals. This could be also used
-used for sending async method returns.
+can we not just check if the interface contains any non experimental
+method, signals and properties and base that decision around that?
 
->  
->  	result = dbus_connection_send(connection, message, NULL);
->  
+I am not really in favor of introducing a version with flags.
 
 Regards
 
