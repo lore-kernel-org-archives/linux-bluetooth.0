@@ -1,53 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1356279010.29264.25.camel@aeonflux>
-References: <1356276298-13795-1-git-send-email-luiz.dentz@gmail.com>
-	<1356276298-13795-4-git-send-email-luiz.dentz@gmail.com>
-	<1356279010.29264.25.camel@aeonflux>
-Date: Sun, 23 Dec 2012 18:31:49 +0200
-Message-ID: <CABBYNZJ=cpoaSOk4fvk3Y7pp=vtYyN3Qqwacq6iG6UHBicM5-g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 4/6] gdbus: Call check_signals when sending signals
- with g_dbus_send_message
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <1356280239.29264.28.camel@aeonflux>
+Subject: Re: [PATCH BlueZ 3/6] gdbus: Introduce GDBusInterfaceFlags
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Sun, 23 Dec 2012 08:30:39 -0800
+In-Reply-To: <CABBYNZ+set-vvzf+6whfPt5zE8c7X_t2DB4vJS6p8v2X0i_U-A@mail.gmail.com>
+References: <1356276298-13795-1-git-send-email-luiz.dentz@gmail.com>
+	 <1356276298-13795-3-git-send-email-luiz.dentz@gmail.com>
+	 <1356278946.29264.24.camel@aeonflux>
+	 <CABBYNZ+set-vvzf+6whfPt5zE8c7X_t2DB4vJS6p8v2X0i_U-A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Luiz,
 
-On Sun, Dec 23, 2012 at 6:10 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Luiz,
->
->> If message passed to g_dbus_send_message is a signal verify if it is a
->> valid and there really exists an interface with respective signal name.
->> ---
->>  gdbus/object.c | 9 +++++++++
->>  1 file changed, 9 insertions(+)
->>
->> diff --git a/gdbus/object.c b/gdbus/object.c
->> index 510763a..6951171 100644
->> --- a/gdbus/object.c
->> +++ b/gdbus/object.c
->> @@ -1475,6 +1475,15 @@ gboolean g_dbus_send_message(DBusConnection *connection, DBusMessage *message)
->>
->>       if (dbus_message_get_type(message) == DBUS_MESSAGE_TYPE_METHOD_CALL)
->>               dbus_message_set_no_reply(message, TRUE);
->> +     else {
->> +             const char *path = dbus_message_get_path(message);
->> +             const char *interface = dbus_message_get_interface(message);
->> +             const char *name = dbus_message_get_member(message);
->> +             const GDBusArgInfo *args;
->> +
->> +             if (!check_signal(connection, path, interface, name, &args))
->> +                     return FALSE;
->> +     }
->
-> we have more than just method calls and signals. This could be also used
-> used for sending async method returns.
+> >> The flags should be passed in g_dbus_register_interface_with_flags,
+> >> currently there only one flag which is G_DBUS_INTERFACE_FLAG_EXPERIMENTAL
+> >> which works similarly to G_DBUS_METHOD_FLAG_EXPERIMENTAL but for the
+> >> whole interface.
+> >> ---
+> >>  gdbus/gdbus.h  | 13 +++++++++++++
+> >>  gdbus/object.c | 20 ++++++++++++++++++++
+> >>  2 files changed, 33 insertions(+)
+> >
+> > can we not just check if the interface contains any non experimental
+> > method, signals and properties and base that decision around that?
+> 
+> It can work, but we would have to iterate on every single item, so in
+> terms of code is quite a bit more complex so I favored adding a new
+> function even though we might replace it in the long run.
 
-I guess I should do else if and check for signal type then, or you
-have a better idea?
+we have to iterate over every single item in the success case anyway, so
+why bother trying to optimize this.
 
---
-Luiz Augusto von Dentz
+> > I am not really in favor of introducing a version with flags.
+> 
+> The final solution I was thinking is passing another interface
+> containing the table as this tend to be quite static e.g.:
+
+If this is not the final solution you are heading for, then lets not
+even bother introducing it. Lets go with the the simple approach that
+does not introduce any new functions.
+
+It has the advantage that you only need to change one place. Otherwise
+you need to check the method structs and the calling register function.
+
+Regards
+
+Marcel
+
+
