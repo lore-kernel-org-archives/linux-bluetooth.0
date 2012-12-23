@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 6/6] AVRCP: Fix not checking for media_player_controller_create
-Date: Sun, 23 Dec 2012 17:24:58 +0200
-Message-Id: <1356276298-13795-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/6] gdbus: Call check_signals when sending signals with g_dbus_send_message
+Date: Sun, 23 Dec 2012 17:24:56 +0200
+Message-Id: <1356276298-13795-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1356276298-13795-1-git-send-email-luiz.dentz@gmail.com>
 References: <1356276298-13795-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,38 +11,32 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Now that the MediaPlayer1 interface is experimental the interface
-registration may fail which return NULL, in that case there is no
-point on register to any notifications.
+If message passed to g_dbus_send_message is a signal verify if it is a
+valid and there really exists an interface with respective signal name.
 ---
- profiles/audio/avrcp.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ gdbus/object.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 4e3d31d..ce070cd 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -1987,6 +1987,11 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
+diff --git a/gdbus/object.c b/gdbus/object.c
+index 510763a..6951171 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -1475,6 +1475,15 @@ gboolean g_dbus_send_message(DBusConnection *connection, DBusMessage *message)
  
- 	count = pdu->params[1];
- 
-+	path = device_get_path(session->dev->btd_dev);
-+	mp = media_player_controller_create(path);
-+	if (mp == NULL)
-+		return FALSE;
+ 	if (dbus_message_get_type(message) == DBUS_MESSAGE_TYPE_METHOD_CALL)
+ 		dbus_message_set_no_reply(message, TRUE);
++	else {
++		const char *path = dbus_message_get_path(message);
++		const char *interface = dbus_message_get_interface(message);
++		const char *name = dbus_message_get_member(message);
++		const GDBusArgInfo *args;
 +
- 	for (; count > 0; count--) {
- 		uint8_t event = pdu->params[1 + count];
++		if (!check_signal(connection, path, interface, name, &args))
++			return FALSE;
++	}
  
-@@ -2001,8 +2006,6 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
- 		}
- 	}
+ 	result = dbus_connection_send(connection, message, NULL);
  
--	path = device_get_path(session->dev->btd_dev);
--	mp = media_player_controller_create(path);
- 	media_player_set_callbacks(mp, &ct_cbs, player);
- 	player->user_data = mp;
- 	player->destroy = (GDestroyNotify) media_player_destroy;
 -- 
 1.7.11.7
 
