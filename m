@@ -1,98 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Cristian=20Rodr=C3=ADguez?= <crrodriguez@opensuse.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Cristian=20Rodr=C3=ADguez?= <crrodriguez@opensuse.org>
-Subject: [PATCH 2/2] lib: Use SOCK_CLOEXEC where needed
-Date: Mon, 24 Dec 2012 13:44:47 -0300
-Message-Id: <1356367487-1610-1-git-send-email-crrodriguez@opensuse.org>
+Message-ID: <1356367529.29264.41.camel@aeonflux>
+Subject: Re: [PATCH 1/2] Bluetooth: Fix to update EIR for uuid16 properly
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Syam Sidhardhan <syamsidhardh@gmail.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	Syam Sidhardhan <s.syam@samsung.com>,
+	linux-bluetooth@vger.kernel.org
+Date: Mon, 24 Dec 2012 08:45:29 -0800
+In-Reply-To: <CAFBvHieL1n6ZHe2+475KLFRAVO7-nJXPz1c8tJu2MHg_+KvX6Q@mail.gmail.com>
+References: <1356097469-24073-1-git-send-email-s.syam@samsung.com>
+	 <20121221193112.GA31432@x220.ger.corp.intel.com>
+	 <1356194344.29264.16.camel@aeonflux>
+	 <CAFBvHieL1n6ZHe2+475KLFRAVO7-nJXPz1c8tJu2MHg_+KvX6Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Calling programs might fork().. execve() and we will end
-up leaking fds.
----
- lib/hci.c |  8 ++++----
- lib/sdp.c | 13 ++++++-------
- 2 files changed, 10 insertions(+), 11 deletions(-)
+Hi Syam,
 
-diff --git a/lib/hci.c b/lib/hci.c
-index 66b2d5f..1f9058f 100644
---- a/lib/hci.c
-+++ b/lib/hci.c
-@@ -817,7 +817,7 @@ int hci_for_each_dev(int flag, int (*func)(int dd, int dev_id, long arg),
- 	int dev_id = -1;
- 	int i, sk, err = 0;
- 
--	sk = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
-+	sk = socket(AF_BLUETOOTH, SOCK_RAW|SOCK_CLOEXEC, BTPROTO_HCI);
- 	if (sk < 0)
- 		return -1;
- 
-@@ -909,7 +909,7 @@ int hci_devinfo(int dev_id, struct hci_dev_info *di)
- {
- 	int dd, err, ret;
- 
--	dd = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
-+	dd = socket(AF_BLUETOOTH, SOCK_RAW|SOCK_CLOEXEC, BTPROTO_HCI);
- 	if (dd < 0)
- 		return dd;
- 
-@@ -965,7 +965,7 @@ int hci_inquiry(int dev_id, int len, int nrsp, const uint8_t *lap,
- 		}
- 	}
- 
--	dd = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
-+	dd = socket(AF_BLUETOOTH, SOCK_RAW|SOCK_CLOEXEC, BTPROTO_HCI);
- 	if (dd < 0)
- 		return dd;
- 
-@@ -1021,7 +1021,7 @@ int hci_open_dev(int dev_id)
- 	int dd, err;
- 
- 	/* Create HCI socket */
--	dd = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
-+	dd = socket(AF_BLUETOOTH, SOCK_RAW|SOCK_CLOEXEC, BTPROTO_HCI);
- 	if (dd < 0)
- 		return dd;
- 
-diff --git a/lib/sdp.c b/lib/sdp.c
-index e1e37ed..1ed4304 100644
---- a/lib/sdp.c
-+++ b/lib/sdp.c
-@@ -4536,7 +4536,7 @@ static int sdp_connect_local(sdp_session_t *session)
- {
- 	struct sockaddr_un sa;
- 
--	session->sock = socket(PF_UNIX, SOCK_STREAM, 0);
-+	session->sock = socket(PF_UNIX, SOCK_STREAM|SOCK_CLOEXEC, 0);
- 	if (session->sock < 0)
- 		return -1;
- 	session->local = 1;
-@@ -4553,19 +4553,18 @@ static int sdp_connect_l2cap(const bdaddr_t *src,
- 	uint32_t flags = session->flags;
- 	struct sockaddr_l2 sa;
- 	int sk;
-+	int sockflags = SOCK_SEQPACKET | SOCK_CLOEXEC;
-+	
-+	if (flags & SDP_NON_BLOCKING)
-+		sockflags |= SOCK_NONBLOCK;
- 
--	session->sock = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
-+	session->sock = socket(PF_BLUETOOTH, sockflags, BTPROTO_L2CAP);
- 	if (session->sock < 0)
- 		return -1;
- 	session->local = 0;
- 
- 	sk = session->sock;
- 
--	if (flags & SDP_NON_BLOCKING) {
--		long arg = fcntl(sk, F_GETFL, 0);
--		fcntl(sk, F_SETFL, arg | O_NONBLOCK);
--	}
--
- 	memset(&sa, 0, sizeof(sa));
- 
- 	sa.l2_family = AF_BLUETOOTH;
--- 
-1.8.0.2
+> >> > If we register a uuid other than uuid16, especially custom 128 bit uuid
+> >> > then nothing is updated in the EIR and it was broken.
+> >> >
+> >> > After registering a 16 bit uuid. ex: "sdptool add SP", we can see the
+> >> > uuid in the EIR as below.
+> >> > < 0000: 01 52 0c f1 00 08 09 52  65 64 77 6f 6f 64 15 03  .R.....Redwood..
+> >> >   0010: 01 11 32 11 2f 11 06 11  05 11 0a 11 0e 11 0c 11  ..2./...........
+> >> >   0020: 1f 11 12 11 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   0030: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   0040: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   0050: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   0060: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   0070: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   0080: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   0090: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   00a0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   00b0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   00c0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   00d0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   00e0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   00f0: 00 00 00 00 00                                    .....
+> >> > > 0000: 04 0e 04 01 52 0c 00                              ....R..
+> >> >
+> >> > But after register a user defined 128 bit uuid, nothing is
+> >> > updated in the EIR.
+> >> >
+> >> > < 0000: 01 52 0c f1 00 08 09 52  65 64 77 6f 6f 64 00 00  .R.....Redwood..
+> >> >   0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   0030: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   0040: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   0050: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   0060: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   0070: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   0080: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   0090: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   00a0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   00b0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   00c0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   00d0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   00e0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> >> >   00f0: 00 00 00 00 00                                    .....
+> >> > > 0000: 04 0e 04 01 52 0c 00                              ....R..
+> >> >
+> >> > With this fix, we can see the EIR is updated properly.
+> >> >
+> >> > Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+> >> > ---
+> >> >  net/bluetooth/mgmt.c |    2 --
+> >> >  1 file changed, 2 deletions(-)
+> >> >
+> >> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> >> > index f559b96..512a3f5 100644
+> >> > --- a/net/bluetooth/mgmt.c
+> >> > +++ b/net/bluetooth/mgmt.c
+> >> > @@ -514,8 +514,6 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
+> >> >             u16 uuid16;
+> >> >
+> >> >             uuid16 = get_uuid16(uuid->uuid);
+> >> > -           if (uuid16 == 0)
+> >> > -                   return;
+> >> >
+> >> >             if (uuid16 < 0x1100)
+> >> >                     continue;
+> >>
+> >> Nak. The bug is real and should be fixed but your fix is wrong. The
+> >> right fix it to convert this return statement into a continue statement
+> >> since we do still want to check for a 0 return value from get_uuid16.
+> >>
+> 
+> Since the next statements (uuid16 < 0x1100) indirectly do this logic,
+> I intentionally removed it in order to avoid duplication.
+> Probably for more clarity and readability, I can do it as per your
+> suggestion.
+> 
+> >> Along with this patch please prepare another one to increment the mgmt
+> >> revision. These two should go together to upstream trees so that we can
+> >> introduce a check in user space to know whether it's safe to pass
+> >> non-16bit UUIDs to the kernel or not.
+> >
+> Ok.
+> > I want a fix that introduces also support for 32-bit and 128-bit UUIDs
+> > now. No paper over the hole fixing here.
+> >
+> 
+> As per the specification, "To reduce interference, the host should try
+> to minimize the amount of EIR data such that the baseband can use
+> a 1-slot or 3-slot EIR packet. This is advantageous because it reduces
+> interference and maximizes the probability that the EIR packet will be
+> received."
+> 
+> Does the addition of 128-bit and 32-bit uuid decreases the probability of the
+> reception of EIR packet, if any application register more of these types?
+
+that is not the point here. If you want to put a 128-bit UUID into the
+EIR data, then you should be able to. Let bluetoothd make the decision
+on what to give the kernel and what not.
+
+Regards
+
+Marcel
+
 
