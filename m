@@ -1,43 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Cristian=20Rodr=C3=ADguez?= <crrodriguez@opensuse.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Cristian=20Rodr=C3=ADguez?= <crrodriguez@opensuse.org>
-Subject: [PATCH 3/3] configure.ac: build system improvements
-Date: Mon, 24 Dec 2012 15:10:34 -0300
-Message-Id: <1356372634-20108-1-git-send-email-crrodriguez@opensuse.org>
+Message-ID: <1356369208.29264.46.camel@aeonflux>
+Subject: Re: [PATCH] lib: use %m instead of strerror
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Cristian =?ISO-8859-1?Q?Rodr=EDguez?= <crrodriguez@opensuse.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 24 Dec 2012 09:13:28 -0800
+In-Reply-To: <1356362730-16557-1-git-send-email-crrodriguez@opensuse.org>
+References: <1356362730-16557-1-git-send-email-crrodriguez@opensuse.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use AC_SYS_LARGEFILE so proper flags are set on systems
-that require special settings for large file support
+Hi Cristian,
 
-Use AC_PROG_CC_STDC, this macro picks the latest recommended
-C standard flags for the compiler.
----
- configure.ac | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> Unlike strerror, %m is thread safe and we do not know
+> to what kind of program libbluetooh is being linked too.
+> ---
+>  lib/sdp.c | 17 ++++++++---------
+>  1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index 522e349..614bf1f 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -5,6 +5,7 @@ AM_INIT_AUTOMAKE([foreign subdir-objects color-tests silent-rules
- 					tar-pax no-dist-gzip dist-xz])
- AM_CONFIG_HEADER(config.h)
- AC_USE_SYSTEM_EXTENSIONS
-+AC_SYS_LARGEFILE
- 
- m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
- 
-@@ -20,7 +21,7 @@ AC_LANG_C
- 
- AC_C_RESTRICT
- 
--AC_PROG_CC
-+AC_PROG_CC_STDC
- AM_PROG_CC_C_O
- AC_PROG_CC_PIE
- AC_PROG_INSTALL
--- 
-1.8.0.2
+patch has been applied.
+
+Regards
+
+Marcel
+
 
