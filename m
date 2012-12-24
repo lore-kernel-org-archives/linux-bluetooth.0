@@ -1,21 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: =?UTF-8?Q?Cristian_Rodr=C3=ADguez?= <cr@cristianrodriguez.net>
-Message-ID: <50D8888E.3010308@opensuse.org>
-Date: Mon, 24 Dec 2012 13:53:34 -0300
-From: =?UTF-8?B?Q3Jpc3RpYW4gUm9kcsOtZ3Vleg==?= <crrodriguez@opensuse.org>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
+Message-ID: <1356367748.29264.43.camel@aeonflux>
 Subject: Re: [PATCH] lib: use %m instead of strerror
-References: <1356362730-16557-1-git-send-email-crrodriguez@opensuse.org> <1356367748.29264.43.camel@aeonflux>
-In-Reply-To: <1356367748.29264.43.camel@aeonflux>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Cristian =?ISO-8859-1?Q?Rodr=EDguez?= <crrodriguez@opensuse.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 24 Dec 2012 08:49:08 -0800
+In-Reply-To: <1356362730-16557-1-git-send-email-crrodriguez@opensuse.org>
+References: <1356362730-16557-1-git-send-email-crrodriguez@opensuse.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon 24 Dec 2012 01:49:08 PM CLST, Marcel Holtmann wrote:
+Hi Cristian,
 
-> how does this work on uClibc and other C libraries. Is %m these days
-> generally supported?
+> Unlike strerror, %m is thread safe and we do not know
+> to what kind of program libbluetooh is being linked too.
+> ---
+>  lib/sdp.c | 17 ++++++++---------
+>  1 file changed, 8 insertions(+), 9 deletions(-)
 
-according to google uclibc support %m .. which is currently part of 
-POSIX.
+how does this work on uClibc and other C libraries. Is %m these days
+generally supported?
+
+Regards
+
+Marcel
+
+
