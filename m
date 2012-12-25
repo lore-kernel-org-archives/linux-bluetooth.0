@@ -1,83 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1356401449.19248.27.camel@aeonflux>
-Subject: [ANNOUNCE] Release of BlueZ 5.0
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Date: Mon, 24 Dec 2012 18:10:49 -0800
+Subject: [PATCH] Bluetooth: fix the oops due to conn->hcon == NULL in
+ shutdown case
+From: Chuansheng Liu <chuansheng.liu@intel.com>
+To: gustavo@padovan.org, marcel@holtmann.org, johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,  chuansheng.liu@intel.com
 Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 25 Dec 2012 18:04:17 +0800
+Message-ID: <1356429857.25456.4.camel@cliu38-desktop-build>
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello everyone,
 
-it has been a yearly tradition to have a X-mas release. So it is with
-great pleasure to announce that this year, the X-mas release is actually
-the start of our next major development cycle. Please join me in
-welcoming our BlueZ 5.0 release.
+Meet one panic issue as below stack:
+<1>[11340.226404] BUG: unable to handle kernel NULL pointer dereference at 00000008
+<4>[11340.226619] EIP is at __sco_sock_close+0xe8/0x1a0
+<4>[11340.226629] EAX: f063a740 EBX: 00000000 ECX: f58f4544 EDX: 00000000
+<4>[11340.226640] ESI: dec83e00 EDI: 5f9a081f EBP: e0fdff38 ESP: e0fdff1c
+<0>[11340.226674] Stack:
+<4>[11340.226682]  c184db87 c1251028 dec83e00 e0fdff38 c1754aef dec83e00 00000000 e0fdff5c
+<4>[11340.226718]  c184f587 e0fdff64 e0fdff68 5f9a081f e0fdff5c c1751852 d7813800 62262f10
+<4>[11340.226752]  e0fdff70 c1753c00 00000000 00000001 0000000d e0fdffac c175425c 00000041
+<0>[11340.226793] Call Trace:
+<4>[11340.226813]  [<c184db87>] ? sco_sock_clear_timer+0x27/0x60
+<4>[11340.226831]  [<c1251028>] ? local_bh_enable+0x68/0xd0
+<4>[11340.226846]  [<c1754aef>] ? lock_sock_nested+0x4f/0x60
+<4>[11340.226862]  [<c184f587>] sco_sock_shutdown+0x67/0xb0
+<4>[11340.226879]  [<c1751852>] ? sockfd_lookup_light+0x22/0x80
+<4>[11340.226897]  [<c1753c00>] sys_shutdown+0x30/0x60
+<4>[11340.226912]  [<c175425c>] sys_socketcall+0x1dc/0x2a0
+<4>[11340.226929]  [<c149ba78>] ? trace_hardirqs_on_thunk+0xc/0x10
+<4>[11340.226944]  [<c18860f1>] syscall_call+0x7/0xb
+<4>[11340.226960]  [<c1880000>] ? restore_cur+0x5e/0xd7
+<0>[11340.226969] Code: <f0> ff 4b 08 0f 94 c0 84 c0 74 20 80 7b 19 01 74 2f b8 0a 00 00
 
-The 5.0 release has been 6 month in the making and a lot of things have
-changed. The BlueZ package grew significantly over the last few month
-since we consumed obexd and hcidump packages into it. This will deliver
-a one stop experience for Bluetooth.
+Disassemble the code:
+base address of __sco_sock_close is 0xc184f410
+0xc184f4f8 <+232>:   lock decl 0x8(%ebx) < == crash here, ebx is 0x0,
 
-While including obexd and hcidump allows for better sharing of code and
-deeper integration, we also took code out. The SBC codec support became
-a separate library and has its own tree now. And we pushed the GStreamer
-plugin into GStreamer upstream.
+the related source code is:
+(gdb) l *0xc184f4f8
+0xc184f4f8 is in __sco_sock_close (arch/x86/include/asm/atomic.h:123)
+119     static inline int atomic_dec_and_test(atomic_t *v)
+123             asm volatile(LOCK_PREFIX "decl %0; sete %1"
 
-We switched the whole D-Bus API over to use the D-Bus Properties and
-ObjectManager standard interfaces. This should make its usage a lot
-simpler for client applications. In addition the new D-Bus API comes
-with interface versions. This allows us to support multiple APIs at the
-same time in the future.
+The whole call stack is:
+sys_shutdown()
+  sco_sock_shutdown()
+    __sco_sock_close()
+      hci_conn_put()
+        atomic_dec_and_test()
 
-Reflecting back at the 4.x development cycle, we released BlueZ 4.0 on
-6th of August 2008 and BlueZ 4.101 on 22nd of June 2012. This means we
-actually did 102 releases within 4 years. On average that is 2 releases
-per month.
+Due to the conn->hcon is NULL, and the member hcon->refcnt is at offset 0x8,
+so "BUG: unable to handle kernel NULL pointer dereference at 00000008"
+appears.
 
-The 4.x cycle saw patches from 139 contributors and I like to thank
-everybody who contributed fixes and features (in alphabetical order):
+Here fix it that adding the condition if conn->hcon is NULL, just like
+in sco_chan_del().
 
-Adam Gołębiowski, Alex Elsayed, Alok Barsode, Anderson Briglia, Anderson
-Lizardo, André Dieb Martins, Andre Guedes, Andrei Emeltchenko, Andrzej
-Kaczmarek, Angela Bartholomaus, Ankush Bansal, Antti Julku, Arek Lichwa,
-Arik Nemtsov, Arnaud Mouiche, Arun Kumar Singh, Arun Raghavan,
-Balamurugan Mahalingam, Bartlomiej Grzeskowiak, Bastien Nocera, Bea Lam,
-Brian Gix, Bruna Moreira, Bruno Dilly, Burt Silverman, Chan-yeol Park,
-Chen Ganir, Christian Hoene, Claudio Takahasi, Colin Didier, Daniel
-Orstadius, Daniel Wagner, David Herrmann, David Scherba, David
-Stockwell, David Vrabel, David Woodhouse, Denis Kenzior, Dmitriy Paliy,
-DoHyun Pyun, Elvis Pfützenreuter, Filippo Giunchedi, Forrest, Forrest
-Zhao, Francisco Alecrim, Frédéric Dalleau, Frédéric Danis, Grant
-Erickson, Gustavo F. Padovan, Harri Mahonen, Hemant Gupta, Ido Yariv,
-Ilia Kolomisnky, Ilya Rubtsov, Inga Stotland, Jaganath Kanakkassery,
-Jaikumar Ganesh, Jefferson Delfes, Jeff Hansen, Jiafa Liu, João Paulo
-Rechi Vita, Johan Hedberg, Johan Hovold, John Crosbie, Joohi Rastogi,
-Jorge Fernandez Gonzalez, José Antonio Santos Cadenas, Kay Sievers,
-Keith Mok, Lennart Poettering, Lucas De Marchi, Luiz Augusto von Dentz,
-Lukasz Pawlik, Lukasz Rymanowski, Łukasz Stelmach, Maarten Bosmans,
-Marc-André Lureau, Marcel Holtmann, Marco Sinigaglia, Mario Limonciello,
-Matthew Wilson, Michael Brudevold, Michal Labedzki, Mika Linnanoja,
-Mikel Astiz, Mike Lockwood, Nick Pelly, Nobuhiro Iwamatsu, Ohad
-Ben-Cohen, Olli-Pekka Salin, Pacho Ramos, Patrick Ohly, Paul Fertser,
-Paulo Alcantara, Pavan Savoy, Pavel Raiskup, Pawel Wieczorkiewicz, Pekka
-Pessi, Peter Hurley, Peter Krystad, Peter Zotov, Radoslaw Jablonski,
-Rafael Fonseca, Rafal Michalski, Raymond Liu, RISKÓ Gergely, Santiago
-Carot-Nemesio, Scott James Remnant, Scott Talbot, Sheldon Demario,
-Siarhei Siamashka, Slawomir Bochenski, Smriti Gupta, Stefan Seyfried,
-Steve Grubb, Steve Langasek, Steven Luo, Suraj Sumangala, Syam
-Sidhardhan, Szymon Janc, Tedd Ho-Jeong An, Till Kamppeter, Timo Gienger,
-Tom Gundersen, Tommi Keisala, Tom Rini, Uwe Kleine-König, Ville Tervo,
-Vinicius Costa Gomes, Vishal Agarwal, Vladimir Botka, Vladimir Davydov,
-Wade Brown, Waldemar Rymarkiewicz, Yegor Yefremov, Zhenhua Zhang, Zhu
-Lan, Zhu Yanhai, Zygo Blaxell
+Signed-off-by: liu chuansheng <chuansheng.liu@intel.com>
+---
+ net/bluetooth/sco.c |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
-Enjoy the holidays and Happy New Year.
-
-Regards
-
-Marcel
-
-
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 531a93d..190f70c 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -355,8 +355,10 @@ static void __sco_sock_close(struct sock *sk)
+ 		if (sco_pi(sk)->conn) {
+ 			sk->sk_state = BT_DISCONN;
+ 			sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
+-			hci_conn_put(sco_pi(sk)->conn->hcon);
+-			sco_pi(sk)->conn->hcon = NULL;
++			if (sco_pi(sk)->conn->hcon) {
++				hci_conn_put(sco_pi(sk)->conn->hcon);
++				sco_pi(sk)->conn->hcon = NULL;
++			}
+ 		} else
+ 			sco_chan_del(sk, ECONNRESET);
+ 		break;
+-- 
+1.7.0.4
