@@ -1,48 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 00/11] Add experimental command line switch option
-Date: Fri, 28 Dec 2012 14:50:58 +0200
-Message-Id: <1356699069-5469-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 28 Dec 2012 10:08:42 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Kamil =?utf-8?B?Sm/FhGNh?= <kjonca@o2.pl>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: How to pair device from CLI?
+Message-ID: <20121228080842.GA28814@x220.P-661HNU-F1>
+References: <871uebt47d.fsf@alfa.kjonca>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <871uebt47d.fsf@alfa.kjonca>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Kamil,
 
-These set of patches introduces g_dbus_set_flags along with experimental flags,
-g_dbus_set_flags is not per connection as originally suggested to avoid using
-dbus_connection_allocate_data_slot which requires calling
-dbus_connection_free_data_slot once done but currently we don't keep any data
-associated with connections, besides the flags comes from command line options
-which would end up setting the same flags for every connection anyway.
+On Fri, Dec 28, 2012, Kamil Jońca wrote:
+> I don't know if this is proper list, but I cannot find any (active)
+> bluez users list. 
+> 
+> I tried to pair my phone:
+> 
+> --8<---------------cut here---------------start------------->8---
+> $hcitool scan                         
+> Scanning ...
+>         D4:E8:B2:AA:15:FA       theta
+> 
+> $bluez-simple-agent hci0 D4:E8:B2:AA:15:FA
+> RequestPasskey (/org/bluez/3086/hci0/dev_D4_E8_B2_AA_15_FA)
+> Enter passkey: 0000
+> Creating device failed: org.bluez.Error.AuthenticationFailed: Authentication Failed
+> --8<---------------cut here---------------end--------------->8---
 
-In addition to experimental it also add support to enable deprecated via compat
-swith option, this makes any API marked as deprecated to be disabled if compat
-is not set. This is on purpose to expose applications using deprecated APIs.
+It's quite odd that you should get RequestPasskey. That's something that
+should only happen if you're pretending to be a keyboard in which case
+you should enter the passkey displayed on the remote device (your phone
+in this case).
 
-Luiz Augusto von Dentz (11):
-  gdbus: Introduce G_DBUS_METHOD_FLAG_EXPERIMENTAL
-  gdbus: Introduce G_DBUS_SIGNAL_FLAG_EXPERIMENTAL
-  gdbus: Introduce G_DBUS_PROPERTY_FLAG_EXPERIMENTAL
-  gdbus: Check if the interface being registered is valid
-  gdbus: Call check_signals when sending signals with
-    g_dbus_send_message
-  gdbus: Introduce G_DBUS_FLAG_ENABLE_DEPRECATED
-  core: Add command line switch for enabling experimental interfaces
-  core: Reuse --compat/-C switch for enabling deprecated interfaces
-  media: Enable RegisterPlayer and UnregisterPlayer methods as
-    experimental
-  player: Enable MediaPlayer1 interface as experimental
-  AVRCP: Fix not checking for media_player_controller_create
+> What do I should check? (s)trace?
+> 
+> Distribution is pretty fresh debian sid.
 
- gdbus/gdbus.h           |  39 ++++++++++--
- gdbus/object.c          | 153 ++++++++++++++++++++++++++++++++++++++++++++----
- profiles/audio/avrcp.c  |   7 ++-
- profiles/audio/media.c  |  10 +---
- profiles/audio/player.c |  28 +++++----
- src/main.c              |  13 +++-
- 6 files changed, 211 insertions(+), 39 deletions(-)
+The most useful too would be hcidump (bluez-hcidump package). The output
+of hcidump -X for the full pairing process would be interesting.
 
--- 
-1.8.0.1
+Johan
 
