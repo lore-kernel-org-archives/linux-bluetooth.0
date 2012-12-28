@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 05/11] gdbus: Call check_signals when sending signals with g_dbus_send_message
-Date: Fri, 28 Dec 2012 14:51:03 +0200
-Message-Id: <1356699069-5469-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 04/11] gdbus: Check if the interface being registered is valid
+Date: Fri, 28 Dec 2012 14:51:02 +0200
+Message-Id: <1356699069-5469-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1356699069-5469-1-git-send-email-luiz.dentz@gmail.com>
 References: <1356699069-5469-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,31 +11,97 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If message passed to g_dbus_send_message is a signal verify if it is a
-valid and there really exists an interface with respective signal name.
+This prevent registering interfaces that are empty or have all members
+marked as experiemental.
 ---
- gdbus/object.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ gdbus/object.c | 42 ++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 36 insertions(+), 6 deletions(-)
 
 diff --git a/gdbus/object.c b/gdbus/object.c
-index c9cf595..d5eb267 100644
+index 86d1c53..c9cf595 100644
 --- a/gdbus/object.c
 +++ b/gdbus/object.c
-@@ -1511,6 +1511,15 @@ gboolean g_dbus_send_message(DBusConnection *connection, DBusMessage *message)
+@@ -1174,7 +1174,7 @@ static const GDBusSignalTable manager_signals[] = {
+ 	{ }
+ };
  
- 	if (dbus_message_get_type(message) == DBUS_MESSAGE_TYPE_METHOD_CALL)
- 		dbus_message_set_no_reply(message, TRUE);
-+	else if (dbus_message_get_type(message) == DBUS_MESSAGE_TYPE_SIGNAL) {
-+		const char *path = dbus_message_get_path(message);
-+		const char *interface = dbus_message_get_interface(message);
-+		const char *name = dbus_message_get_member(message);
-+		const GDBusArgInfo *args;
+-static void add_interface(struct generic_data *data,
++static gboolean add_interface(struct generic_data *data,
+ 				const char *name,
+ 				const GDBusMethodTable *methods,
+ 				const GDBusSignalTable *signals,
+@@ -1183,7 +1183,32 @@ static void add_interface(struct generic_data *data,
+ 				GDBusDestroyFunction destroy)
+ {
+ 	struct interface_data *iface;
++	const GDBusMethodTable *method;
++	const GDBusSignalTable *signal;
++	const GDBusPropertyTable *property;
 +
-+		if (!check_signal(connection, path, interface, name, &args))
-+			return FALSE;
++	for (method = methods; method && method->name; method++) {
++		if (!check_experimental(method->flags,
++					G_DBUS_METHOD_FLAG_EXPERIMENTAL))
++			goto done;
++	}
++
++	for (signal = signals; signal && signal->name; signal++) {
++		if (!check_experimental(signal->flags,
++					G_DBUS_SIGNAL_FLAG_EXPERIMENTAL))
++			goto done;
++	}
++
++	for (property = properties; property && property->name; property++) {
++		if (!check_experimental(property->flags,
++					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL))
++			goto done;
 +	}
  
- 	result = dbus_connection_send(connection, message, NULL);
++	/* Nothing to register */
++	return FALSE;
++
++done:
+ 	iface = g_new0(struct interface_data, 1);
+ 	iface->name = g_strdup(name);
+ 	iface->methods = methods;
+@@ -1194,13 +1219,15 @@ static void add_interface(struct generic_data *data,
+ 
+ 	data->interfaces = g_slist_append(data->interfaces, iface);
+ 	if (data->parent == NULL)
+-		return;
++		return TRUE;
+ 
+ 	data->added = g_slist_append(data->added, iface);
+ 	if (data->process_id > 0)
+-		return;
++		return TRUE;
+ 
+ 	data->process_id = g_idle_add(process_changes, data);
++
++	return TRUE;
+ }
+ 
+ static struct generic_data *object_path_ref(DBusConnection *connection,
+@@ -1361,15 +1388,18 @@ gboolean g_dbus_register_interface(DBusConnection *connection,
+ 		return FALSE;
+ 	}
+ 
++	if (!add_interface(data, name, methods, signals, properties, user_data,
++								destroy)) {
++		object_path_unref(connection, path);
++		return FALSE;
++	}
++
+ 	if (properties != NULL && !find_interface(data->interfaces,
+ 						DBUS_INTERFACE_PROPERTIES))
+ 		add_interface(data, DBUS_INTERFACE_PROPERTIES,
+ 				properties_methods, properties_signals, NULL,
+ 				data, NULL);
+ 
+-	add_interface(data, name, methods, signals, properties, user_data,
+-								destroy);
+-
+ 	g_free(data->introspect);
+ 	data->introspect = NULL;
  
 -- 
 1.8.0.1
