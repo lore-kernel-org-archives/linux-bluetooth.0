@@ -1,36 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Daniel Schaal <farbing@web.de>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Daniel Schaal <farbing@web.de>
-Subject: [PATCH] Bluetooth: Add support for GC-WB300D PCIe [04ca:3006]
-Date: Sat, 29 Dec 2012 11:14:33 +0100
-Message-Id: <1356776074-1703-1-git-send-email-farbing@web.de>
+From: Oliver Neukum <oliver@neukum.org>
+To: Larry Finger <Larry.Finger@lwfinger.net>
+Cc: linville@tuxdriver.com, Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org, Champion Chen <champion_chen@realsil.com.cn>
+Subject: Re: [RFC/RFT] rtk_btusb: Bluetooth driver for Realtek RTL8723AE combo device
+Date: Sat, 29 Dec 2012 10:29:22 +0100
+Message-ID: <3835139.gKBy1HP29j@linux-lqwf.site>
+In-Reply-To: <50DA64E7.9050700@lwfinger.net>
+References: <1356058371-17152-1-git-send-email-Larry.Finger@lwfinger.net> <6432515.NlhvICzq3b@linux-lqwf.site> <50DA64E7.9050700@lwfinger.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The following patch adds support for the bluetooth part of
-Gigabyte's GC-WB300D PCIe card (combo card with AR9462 WLAN
-and ATH3012 BT).
+On Tuesday 25 December 2012 20:45:59 Larry Finger wrote:
+> >> +struct patch_info {
+> >> +    uint16_t        prod_id;
+> >> +    uint16_t        lmp_sub;
+> >> +    char            *patch_name;
+> >> +    char            *config_name;
+> >> +    uint8_t         *fw_cache;
+> >> +    int             fw_len;
+> >> +};
+> >> +
+> >> +struct xchange_data {
+> >> +    struct dev_data *dev_entry;
+> >> +    int pipe_in, pipe_out;
+> >> +    uint8_t send_pkt[PKT_LEN];
+> >> +    uint8_t rcv_pkt[PKT_LEN];
+> >
+> > Violations of the DMA coherency rules, fails on non-x86
+> 
+> I see that the buffers are not 64-bit aligned. What other conditions are necessary?
 
-On every boot there is an error from this device:
+They need to be aligned on cache lines and nothing else may use
+that cache line. The size of a cache line is specific to an architecture.
+It is generally easiest for such buffers to be allocated separately with kmalloc().
 
-usb 2-1.7: string descriptor 0 read error: -22
+> Thanks for the review. As suggested by you and Marcel, a complete rewrite is 
+> needed. I plan to use the mini-driver approach of Tedd Ho-Jeong An; however, 
+> your comments will be used when constructing that code.
 
-But that doesn't seem to have any negative effect AFAICT.
+Very good.
 
-It also needed a newer firmware than is in linux-firmware.git,
-using the one from the Windows driver worked fine.
-(AthrBT_0x11020000.dfu and ramps_0x11020000_40.dfu)
-
-Daniel Schaal (1):
-  Bluetooth: Add support for GC-WB300D PCIe [04ca:3006] to ath3k.
-
- drivers/bluetooth/ath3k.c |    2 ++
- drivers/bluetooth/btusb.c |    1 +
- 2 files changed, 3 insertions(+)
-
--- 
-1.7.10.4
+	Regards
+		Oliver
