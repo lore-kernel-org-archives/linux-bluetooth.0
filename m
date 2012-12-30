@@ -1,61 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <1356897940.19248.87.camel@aeonflux>
 Subject: Re: bluez-5.0 dropped --with-ouifile=PATH
-From: Pacho Ramos <pacho@gentoo.org>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1356897940.19248.87.camel@aeonflux>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Pacho Ramos <pacho@gentoo.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Sun, 30 Dec 2012 12:05:40 -0800
+In-Reply-To: <1356897497.19380.0.camel@belkin4>
 References: <1356878136.18481.1.camel@belkin4>
 	 <1356892983.19248.82.camel@aeonflux> <1356897497.19380.0.camel@belkin4>
-	 <1356897940.19248.87.camel@aeonflux>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-IB3WytsO8izTLOZ9C0hb"
-Date: Sun, 30 Dec 2012 21:12:40 +0100
-Message-ID: <1356898360.19380.1.camel@belkin4>
+Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Pacho,
 
---=-IB3WytsO8izTLOZ9C0hb
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> > > That option is needed on Gentoo to let it catch oui.txt file present
+> > > on /usr/share/misc/oui.txt, could it be re-added to prevent us from
+> > > needing to sed src/oui.c looking for that file in our location?
+> > 
+> > or you build against a recent version of udev that comes with hwdb
+> > support. Then it will actually start using the efficient version of
+> > reading the OUI values from this file.
+> > 
+> > There is no plan to keep support for oui.txt for very long. It is still
+> > supported as transition period, but that is about it.
+>
+> And what is replacing oui.txt? udev directly?
 
-El dom, 30-12-2012 a las 12:05 -0800, Marcel Holtmann escribi=C3=B3:
-> Hi Pacho,
->=20
-> > > > That option is needed on Gentoo to let it catch oui.txt file presen=
-t
-> > > > on /usr/share/misc/oui.txt, could it be re-added to prevent us from
-> > > > needing to sed src/oui.c looking for that file in our location?
-> > >=20
-> > > or you build against a recent version of udev that comes with hwdb
-> > > support. Then it will actually start using the efficient version of
-> > > reading the OUI values from this file.
-> > >=20
-> > > There is no plan to keep support for oui.txt for very long. It is sti=
-ll
-> > > supported as transition period, but that is about it.
-> >
-> > And what is replacing oui.txt? udev directly?
->=20
-> as I said above, udev's hwdb. Check udevadm hwdb for a command line
-> example too. Also src/oui.c is pretty obvious in that regard.
->=20
-> Regards
->=20
-> Marcel
+as I said above, udev's hwdb. Check udevadm hwdb for a command line
+example too. Also src/oui.c is pretty obvious in that regard.
 
-OK, thanks
+Regards
 
---=-IB3WytsO8izTLOZ9C0hb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+Marcel
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.19 (GNU/Linux)
-
-iEYEABECAAYFAlDgoDgACgkQCaWpQKGI+9QuWgCdGs5HSmdp5hENSV4cOx/c8ICZ
-684An1greHoPsukoxMnHUbSQdp79NaPh
-=d5I+
------END PGP SIGNATURE-----
-
---=-IB3WytsO8izTLOZ9C0hb--
 
