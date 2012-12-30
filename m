@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1356894144.19248.85.camel@aeonflux>
-Subject: Re: [PATCH BlueZ 00/11] Add experimental command line switch option
+Message-ID: <1356893571.19248.84.camel@aeonflux>
+Subject: Re: [PATCH BlueZ 06/11] gdbus: Introduce
+ G_DBUS_FLAG_ENABLE_DEPRECATED
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Sun, 30 Dec 2012 11:02:24 -0800
-In-Reply-To: <1356699069-5469-1-git-send-email-luiz.dentz@gmail.com>
+Date: Sun, 30 Dec 2012 10:52:51 -0800
+In-Reply-To: <1356699069-5469-7-git-send-email-luiz.dentz@gmail.com>
 References: <1356699069-5469-1-git-send-email-luiz.dentz@gmail.com>
+	 <1356699069-5469-7-git-send-email-luiz.dentz@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,18 +16,17 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-> These set of patches introduces g_dbus_set_flags along with experimental flags,
-> g_dbus_set_flags is not per connection as originally suggested to avoid using
-> dbus_connection_allocate_data_slot which requires calling
-> dbus_connection_free_data_slot once done but currently we don't keep any data
-> associated with connections, besides the flags comes from command line options
-> which would end up setting the same flags for every connection anyway.
-> 
-> In addition to experimental it also add support to enable deprecated via compat
-> swith option, this makes any API marked as deprecated to be disabled if compat
-> is not set. This is on purpose to expose applications using deprecated APIs.
+> This flag can be set using g_dbus_set_flags to enable deprecated
+> interfaces, default is unset.
+> ---
+>  gdbus/gdbus.h  |  3 ++-
+>  gdbus/object.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 46 insertions(+), 1 deletion(-)
 
-besides the deprecated switch, all patches have been applied.
+I decided against this patch. At least for now. The whole point of the
+interface versioning is to support two API versions. So having an option
+to manually enable them makes no sense. We can revisit this once we
+reach that point, but otherwise I leave this out for now.
 
 Regards
 
