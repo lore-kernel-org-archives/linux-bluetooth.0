@@ -1,48 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 1 Nov 2012 10:55:06 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv1 12/12] Bluetooth: Process Create Chan Request
-Message-ID: <20121101085500.GA17693@aemeltch-MOBL1>
-References: <1350493622.26318.114.camel@aeonflux>
- <1351691197-8394-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1351691197-8394-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1351700642.1828.13.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1351700642.1828.13.camel@aeonflux>
+Message-ID: <1356964310.3001.1.camel@lsdevbox>
+Subject: Re: [PATCH] obexd: Fix crash while removing session
+From: Marcin Zawiejski <dragmz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Date: Mon, 31 Dec 2012 15:31:50 +0100
+In-Reply-To: <1356963778-2135-1-git-send-email-dragmz@gmail.com>
+References: <1356963778-2135-1-git-send-email-dragmz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Wed, Oct 31, 2012 at 09:24:02AM -0700, Marcel Holtmann wrote:
-> Hi Andrei,
+On Mon, 2012-12-31 at 15:22 +0100, Marcin Zawiejski wrote:
+> Crash occurs when removing a session with RemoveSession while another session has been created but not yet registered
 > 
-> > Add processing L2CAP Create Chan Request. When channel is created
-> > save associated high speed link hs_hcon.
-> > 
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > ---
-> >  net/bluetooth/l2cap_core.c |   63 ++++++++++++++++++++++++++++++--------------
-> >  1 file changed, 43 insertions(+), 20 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index bdffc4c..783ffae 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -4237,7 +4237,9 @@ static int l2cap_create_channel_req(struct l2cap_conn *conn,
-> >  				    u16 cmd_len, void *data)
-> >  {
-> >  	struct l2cap_create_chan_req *req = data;
-> > +	struct l2cap_create_chan_rsp rsp;
-> >  	struct l2cap_chan *chan;
-> > +	struct hci_dev *hdev = NULL;
-> 
-> why is this one set to NULL. Can we avoid that please.
 
-Sorry, forgot to clean this up from the previous patch. With the new patch
-we do not need to set this NULL.
+Sorry for double post, please ignore this one.
 
-Best regards 
-Andrei Emeltchenko 
+Marcin.
+
