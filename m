@@ -1,92 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1356911904.7243.13.camel@lsdevbox>
-References: <50E03F0D.6020605@gmail.com>
-	<CABBYNZJTCf9eiVm10SoLRDQ870ayt00Eiz=szXEb1fhktWyHcQ@mail.gmail.com>
-	<1356911904.7243.13.camel@lsdevbox>
-Date: Mon, 31 Dec 2012 12:13:34 +0200
-Message-ID: <CABBYNZJ-=mngCksBaviRc+SPF82gataK_G9nAKSW6Nh8uGGDgQ@mail.gmail.com>
-Subject: Re: SEGFAULT in obexd manager.c:find_session
+In-Reply-To: <13320115.C4qltrvZED@monsterbad>
+References: <13320115.C4qltrvZED@monsterbad>
+Date: Mon, 31 Dec 2012 12:01:04 +0200
+Message-ID: <CABBYNZK6YAgZyxBa1a9kKFAHjy+dE7Td518CB393_9Y+RWPKkw@mail.gmail.com>
+Subject: Re: Specifying destination path in obexd/bluez-5
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcin Zawiejski <dragmz@gmail.com>
+To: Alex Fiestas <afiestas@kde.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Alex,
 
-On Mon, Dec 31, 2012 at 1:58 AM, Marcin Zawiejski <dragmz@gmail.com> wrote:
-> ---
-> diff --git a/obexd/client/manager.c b/obexd/client/manager.c
-> index 8f62a30..118dd48 100644
-> --- a/obexd/client/manager.c
-> +++ b/obexd/client/manager.c
-> @@ -59,11 +59,16 @@ static GSList *sessions = NULL;
+On Mon, Dec 31, 2012 at 10:56 AM, Alex Fiestas <afiestas@kde.org> wrote:
+> Last time I tried to port KDE's obex support completely to obexd (we are
+> already using obexd-client for opp sendfile) I couldn't complete it because
+> there is no way of programatically specify the destination path of the
+> incoming files, iirc using either ftp or opp.
 >
->  static void shutdown_session(struct obc_session *session)
->  {
-> -       sessions = g_slist_remove(sessions, session);
->         obc_session_shutdown(session);
->         obc_session_unref(session);
->  }
->
-> +static void release_session(struct obc_session *session)
-> +{
-> +       sessions = g_slist_remove(sessions, session);
-> +       shutdown_session(session);
-> +}
-> +
->  static void unregister_session(void *data)
->  {
->         struct obc_session *session = data;
-> @@ -94,6 +99,16 @@ static void create_callback(struct obc_session
-> *session,
->
->         path = obc_session_register(session, unregister_session);
+> Now checking out BlueZ-5 I'm not sure I see a way of doing it either.
 
-Normally we don't have empty lines between assigning and if statements
-checking the values, also please follow the code style e.g.
-if<space>(<condition>) it is quite similar to the one use in kernel.
+There is always the possibility of using links if the underline
+filesystem support them. For OPP the agent can provide a different
+path on the return of AuthorizePush.
 
-> +       if(path == NULL) {
-> +               DBusMessage *error = g_dbus_create_error(data->message,
-> +                                       ERROR_INTERFACE ".Failed",
-> +                                       NULL);
-> +               g_dbus_send_message(data->connection, error);
-> +               shutdown_session(session);
-> +               goto done;
-> +       }
-> +
-> +       sessions = g_slist_append(sessions, session);
->         g_dbus_send_reply(data->connection, data->message,
->                                 DBUS_TYPE_OBJECT_PATH, &path,
->                                 DBUS_TYPE_INVALID);
-> @@ -190,7 +205,6 @@ static DBusMessage *create_session(DBusConnection
-> *connection,
->                                         dbus_message_get_sender(message),
->                                         create_callback, data);
->         if (session != NULL) {
-> -               sessions = g_slist_append(sessions, session);
->                 return NULL;
->         }
->
-> @@ -224,7 +238,7 @@ static DBusMessage *remove_session(DBusConnection
-> *connection,
->                                 ERROR_INTERFACE ".NotAuthorized",
->                                 "Not Authorized");
->
-> -       shutdown_session(session);
-> +       release_session(session);
->
->         return dbus_message_new_method_return(message);
->  }
-> ---
+> So, is there anyway of changing the destination path programatically without
+> having to restart obexd-server? If not, can I add a wish somewhere (bugrack?)
+> for it? Would you consider?
 
-Besides that the patch looks good, once you fix the code style please
-send this a proper patch e.g. git format-patch + git send-email and
-please include the backtrace in the patch description.
-
+I guess this is about FTP, right? If I understood you want to be able
+to change the folders being exported in run-time, that might be
+possible but if we do that I think it would be better to let the agent
+set its root folder once registered then you can fully control this on
+the component implementing the agent interface (usually the UI)
+leaving the command line switch only for systems without agents.
 
 --
 Luiz Augusto von Dentz
