@@ -3,8 +3,8 @@ From: Marcin Zawiejski <dragmz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Marcin Zawiejski <dragmz@gmail.com>
 Subject: [PATCH] obexd: Fix crash while removing session
-Date: Mon, 31 Dec 2012 15:00:54 +0100
-Message-Id: <1356962454-708-1-git-send-email-dragmz@gmail.com>
+Date: Mon, 31 Dec 2012 15:22:58 +0100
+Message-Id: <1356963778-2135-1-git-send-email-dragmz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
