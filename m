@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1356911904.7243.13.camel@lsdevbox>
+Message-ID: <1356912086.7243.15.camel@lsdevbox>
 Subject: Re: SEGFAULT in obexd manager.c:find_session
 From: Marcin Zawiejski <dragmz@gmail.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 31 Dec 2012 01:01:26 +0100
 In-Reply-To: <CABBYNZJTCf9eiVm10SoLRDQ870ayt00Eiz=szXEb1fhktWyHcQ@mail.gmail.com>
 References: <50E03F0D.6020605@gmail.com>
 	 <CABBYNZJTCf9eiVm10SoLRDQ870ayt00Eiz=szXEb1fhktWyHcQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 31 Dec 2012 00:58:24 +0100
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -69,7 +69,7 @@ On Sun, 2012-12-30 at 16:28 +0200, Luiz Augusto von Dentz wrote:
 > list until the connection completes and it is properly registered.
 
 I think you are right - session with no path should not be placed on the
-sessions list because it is not usable in such case. Below is a patch
+sessions list because it is not usable in such case anyway. Below is a patch
 that works for me, here's a summary of the changes:
 
 - move g_slist_append from create_session to create_callback so the
@@ -147,4 +147,5 @@ index 8f62a30..118dd48 100644
 ---
 
 Marcin.
+
 
