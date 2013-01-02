@@ -1,28 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 Jan 2013 11:27:02 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
+To: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH] Bluetooth: Fix uuid output in debugfs
-Message-ID: <20130102092702.GA16561@x220>
-References: <1356130695-29342-1-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1356130624-29234-1-git-send-email-gustavo@padovan.org> (Gustavo
+	Padovan's message of "Fri, 21 Dec 2012 20:57:04 -0200")
+References: <1356130624-29234-1-git-send-email-gustavo@padovan.org>
+Date: Wed, 02 Jan 2013 10:10:19 +0100
+Message-ID: <87623g9chw.fsf@nemi.mork.no>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1356130695-29342-1-git-send-email-gustavo@padovan.org>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
-
-On Fri, Dec 21, 2012, Gustavo Padovan wrote:
-> The uuid should be printed in the CPU endianness and not in little-endian.
-> 
-> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> ---
->  net/bluetooth/hci_sysfs.c | 25 ++++++++++++-------------
->  1 file changed, 12 insertions(+), 13 deletions(-)
-> 
 > diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
 > index 55cceee..05b78c7 100644
 > --- a/net/bluetooth/hci_sysfs.c
@@ -53,10 +43,22 @@ On Fri, Dec 21, 2012, Gustavo Padovan wrote:
 > +	data2 = le16_to_cpu(*(__le16 *)(uuid + 8));
 > +	data1 = le16_to_cpu(*(__le16 *)(uuid + 10));
 > +	data0 = le32_to_cpu(*(__le32 *)(uuid + 12));
+> +
+> +	seq_printf(f, "%.8x-%.4x-%.4x-%.4x-%.4x%.8x\n",
+> +		   data0, data1, data2, data3, data4, data5);
+>  }
+>  
+>  static int uuids_show(struct seq_file *f, void *p)
 
-This looks prone to unaligned access violations if the "u8 *uuid"
-pointer doesn't start off with a nicely aligned address. The use of the
-unaligned getter macros would also look nicer since you wouldn't have to
-do explicit type casting.
 
-Johan
+Why can't all this be replaced with
+
+static void print_bt_uuid(struct seq_file *f, u8 *uuid)
+{
+        seq_printf(f, "%pUl\n", uuid);
+}
+
+?
+
+
+Bjørn
