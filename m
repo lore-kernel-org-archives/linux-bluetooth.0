@@ -1,42 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20130102205437.GA2334@samus>
-References: <1356862632-5938-1-git-send-email-g.gherdovich@gmail.com>
-	<CAJdJm_PpJOVALj5xJvCRA4mC6WAMyP5RsqHVruz6xaRBDhXg5A@mail.gmail.com>
-	<CAJN7YmNzo1ya34tdgyffcBf=SLt4RsJ=2QaSy3fD6meKx7wnsA@mail.gmail.com>
-	<CABBYNZJxF6H7V-e=6wMYgQSM4C7FfXW9FCrdRZ=B6U1YgLQSSQ@mail.gmail.com>
-	<CAE6HaMmrc9BEW-cjmw3fkZptCzvr14M0GtKwoKXuqi8or1zeWg@mail.gmail.com>
-	<CABBYNZL=4ToEwR1i6bihLKWQTn6hurEwWpjQ0gF0rgkO7eExLQ@mail.gmail.com>
-	<20130102205437.GA2334@samus>
-Date: Wed, 2 Jan 2013 22:43:20 +0100
-Message-ID: <CAJN7YmMYKGedFxaS_1wV3gXBYqnQKfc7+Ebnz4yf5gD=kz-H+Q@mail.gmail.com>
-Subject: Re: [PATCH 1/1] adapter, AVCTP: Replaced calls to g_queue_free_full function
 From: Giovanni Gherdovich <g.gherdovich@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Cc: Giovanni Gherdovich <g.gherdovich@gmail.com>
+Subject: [PATCH 2/2] AVCTP: Replace calls to g_queue_free_full function
+Date: Wed,  2 Jan 2013 22:32:30 +0100
+Message-Id: <1357162350-14253-1-git-send-email-g.gherdovich@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius and Luiz,
+The function g_queue_free_full is available only from GLib 2.32.
+If BlueZ has to build against GLib 2.28, as stated in the configure.ac,
+this patch replaces the calls to g_queue_free_full in the AVTCP module
+with its body, taken from the sources of GLib 2.32.
+---
+ profiles/audio/avctp.c |   12 +++++++++++-
+ 1 files changed, 11 insertions(+), 1 deletions(-)
 
-2013/1/2 Vinicius Costa Gomes <vinicius.gomes@openbossa.org>:
-> [...]
->>
->> Right, but it is quite the same situation and I don't get why we don't
->> just update, by the time distros start to package BlueZ 5 glib 2.32
->> wont be a problem, in fact it should not be a problem right now as it
->> is about a year old release:
->
-> I agree with you here. And that was the suggestion that I gave to
-> Giovanni on IRC when he found the problem.
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index 013c587..7a5a096 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -383,6 +383,15 @@ static void pending_destroy(void *data)
+ 	g_free(req);
+ }
+ 
++static void pending_destroy_wrapper(void *data, void *dummy)
++{
++	/*
++	 * Wrapper around pending_destroy to match the signature
++	 * required for the second argument of g_queue_foreach.
++	 */
++        pending_destroy(data);
++}
++
+ static void avctp_channel_destroy(struct avctp_channel *chan)
+ {
+ 	g_io_channel_shutdown(chan->io, TRUE, NULL);
+@@ -395,7 +404,8 @@ static void avctp_channel_destroy(struct avctp_channel *chan)
+ 		g_source_remove(chan->process_id);
+ 
+ 	g_free(chan->buffer);
+-	g_queue_free_full(chan->queue, pending_destroy);
++	g_queue_foreach(chan->queue, pending_destroy_wrapper, NULL);
++	g_queue_free(chan->queue);
+ 	g_slist_free_full(chan->processed, pending_destroy);
+ 	g_slist_free_full(chan->handlers, g_free);
+ 	g_free(chan);
+-- 
+1.7.4.1
 
-I just resubmitted an amended patch, since I had already prepared it.
-BTW I will run a quick check on what GLib versions the various
-major distros are packaging right now, just to have some data to add
-to the poll.
-
-Regards,
-Giovanni
