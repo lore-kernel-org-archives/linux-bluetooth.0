@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1357164610.19248.94.camel@aeonflux>
-Subject: Re: [PATCH 2/2] AVCTP: Replace calls to g_queue_free_full function
+Message-ID: <1357164488.19248.92.camel@aeonflux>
+Subject: Re: [PATCH 1/2] core: Replace calls to g_queue_free_full function
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Giovanni Gherdovich <g.gherdovich@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 02 Jan 2013 14:10:10 -0800
-In-Reply-To: <1357162350-14253-1-git-send-email-g.gherdovich@gmail.com>
-References: <1357162350-14253-1-git-send-email-g.gherdovich@gmail.com>
+Date: Wed, 02 Jan 2013 14:08:08 -0800
+In-Reply-To: <1357162287-14216-1-git-send-email-g.gherdovich@gmail.com>
+References: <1357162287-14216-1-git-send-email-g.gherdovich@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,52 +16,52 @@ Hi Giovanni,
 
 > The function g_queue_free_full is available only from GLib 2.32.
 > If BlueZ has to build against GLib 2.28, as stated in the configure.ac,
-> this patch replaces the calls to g_queue_free_full in the AVTCP module
+> this patch replaces the calls to g_queue_free_full in the "core" BlueZ module
 > with its body, taken from the sources of GLib 2.32.
 > ---
->  profiles/audio/avctp.c |   12 +++++++++++-
+>  src/adapter.c |   12 +++++++++++-
 >  1 files changed, 11 insertions(+), 1 deletions(-)
 > 
-> diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-> index 013c587..7a5a096 100644
-> --- a/profiles/audio/avctp.c
-> +++ b/profiles/audio/avctp.c
-> @@ -383,6 +383,15 @@ static void pending_destroy(void *data)
->  	g_free(req);
+> diff --git a/src/adapter.c b/src/adapter.c
+> index e71cea8..f7fc00e 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -1688,6 +1688,15 @@ int btd_adapter_stop(struct btd_adapter *adapter)
+>  	return 0;
 >  }
 >  
-> +static void pending_destroy_wrapper(void *data, void *dummy)
+> +static void g_free_wrapper(gpointer mem, gpointer dummy)
 > +{
-> +	/*
-> +	 * Wrapper around pending_destroy to match the signature
+> +	/* 
+> +	 * Wrapper around GLib's g_free to match the signature
 > +	 * required for the second argument of g_queue_foreach.
 > +	 */
-> +        pending_destroy(data);
+> +	g_free(mem);
 > +}
 > +
 
-change pending_destroy() to this:
+I would have done this:
 
-	static void pending_destroy(gpointer data, gpointer user_data)
+	static void free_service_auth(gpointer data, gpointer user_data)
 	{
-		...
+		struct service_auth *auth = data;
+
+		g_free(auth);
 	}
 
-And then fix the callers to add an extra NULL.
-
->  static void avctp_channel_destroy(struct avctp_channel *chan)
+>  static void adapter_free(gpointer user_data)
 >  {
->  	g_io_channel_shutdown(chan->io, TRUE, NULL);
-> @@ -395,7 +404,8 @@ static void avctp_channel_destroy(struct avctp_channel *chan)
->  		g_source_remove(chan->process_id);
+>  	struct btd_adapter *adapter = user_data;
+> @@ -1697,7 +1706,8 @@ static void adapter_free(gpointer user_data)
+>  	if (adapter->auth_idle_id)
+>  		g_source_remove(adapter->auth_idle_id);
 >  
->  	g_free(chan->buffer);
-> -	g_queue_free_full(chan->queue, pending_destroy);
-> +	g_queue_foreach(chan->queue, pending_destroy_wrapper, NULL);
-> +	g_queue_free(chan->queue);
->  	g_slist_free_full(chan->processed, pending_destroy);
->  	g_slist_free_full(chan->handlers, g_free);
->  	g_free(chan);
+> -	g_queue_free_full(adapter->auths, g_free);
+> +	g_queue_foreach(adapter->auths, g_free_wrapper, NULL);
+> +	g_queue_free(adapter->auths);
+>  
+>  	sdp_list_free(adapter->services, NULL);
+>  
 
 Regards
 
