@@ -1,46 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [RFC] Bluetooth: Allow getting SCO options for not connected sockets
-Date: Wed,  2 Jan 2013 11:47:35 -0300
-Message-Id: <1357138055-28765-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1356964310.3001.1.camel@lsdevbox>
+References: <1356963778-2135-1-git-send-email-dragmz@gmail.com>
+	<1356964310.3001.1.camel@lsdevbox>
+Date: Wed, 2 Jan 2013 16:27:00 +0200
+Message-ID: <CABBYNZJ8p3injitEj5q=24QfteKdKmDy5su0fsPb5TOM=FNkdA@mail.gmail.com>
+Subject: Re: [PATCH] obexd: Fix crash while removing session
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcin Zawiejski <dragmz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now, that we have proper support for deferred setup for SCO sockets it
-is very convenient that we are able to get the socket options for
-sockets that are not in the 'connected' state.
+Hi Marcin,
 
-And makes the behaviour more consistent with what L2CAP does, for
-example.
+On Mon, Dec 31, 2012 at 4:31 PM, Marcin Zawiejski <dragmz@gmail.com> wrote:
+> On Mon, 2012-12-31 at 15:22 +0100, Marcin Zawiejski wrote:
+>> Crash occurs when removing a session with RemoveSession while another session has been created but not yet registered
+>>
+>
+> Sorry for double post, please ignore this one.
+>
+> Marcin.
 
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
----
+Pushed, thanks
 
-Sending this as a RFC, because even though I couldn't think of any cases
-that this new behaviour would surprise userspace applications, there
-may be still be some.
-
- net/bluetooth/sco.c | 5 -----
- 1 file changed, 5 deletions(-)
-
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 531a93d..271320c 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -730,11 +730,6 @@ static int sco_sock_getsockopt_old(struct socket *sock, int optname, char __user
- 
- 	switch (optname) {
- 	case SCO_OPTIONS:
--		if (sk->sk_state != BT_CONNECTED) {
--			err = -ENOTCONN;
--			break;
--		}
--
- 		opts.mtu = sco_pi(sk)->conn->mtu;
- 
- 		BT_DBG("mtu %d", opts.mtu);
--- 
-1.8.0.2
-
+--
+Luiz Augusto von Dentz
