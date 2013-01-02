@@ -1,48 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alex Fiestas <afiestas@kde.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Re: Specifying destination path in obexd/bluez-5
-Date: Wed, 02 Jan 2013 11:51:08 +0100
-Message-ID: <2201156.L7JLFsavcV@monsterbad>
-In-Reply-To: <CABBYNZK6YAgZyxBa1a9kKFAHjy+dE7Td518CB393_9Y+RWPKkw@mail.gmail.com>
-References: <13320115.C4qltrvZED@monsterbad> <CABBYNZK6YAgZyxBa1a9kKFAHjy+dE7Td518CB393_9Y+RWPKkw@mail.gmail.com>
+Date: Wed, 2 Jan 2013 11:27:02 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [PATCH] Bluetooth: Fix uuid output in debugfs
+Message-ID: <20130102092702.GA16561@x220>
+References: <1356130695-29342-1-git-send-email-gustavo@padovan.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1356130695-29342-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 31 December 2012 12:01:04 you wrote:
-> Hi Alex,
-> 
-> On Mon, Dec 31, 2012 at 10:56 AM, Alex Fiestas <afiestas@kde.org> wrote:
-> > Last time I tried to port KDE's obex support completely to obexd (we are
-> > already using obexd-client for opp sendfile) I couldn't complete it
-> > because
-> > there is no way of programatically specify the destination path of the
-> > incoming files, iirc using either ftp or opp.
-> > 
-> > Now checking out BlueZ-5 I'm not sure I see a way of doing it either.
-> 
-> There is always the possibility of using links if the underline
-> filesystem support them. For OPP the agent can provide a different
-> path on the return of AuthorizePush.
-Oh indeed, one thing less to worry then.
+Hi Gustavo,
 
-> > So, is there anyway of changing the destination path programatically
-> > without having to restart obexd-server? If not, can I add a wish
-> > somewhere (bugrack?) for it? Would you consider?
+On Fri, Dec 21, 2012, Gustavo Padovan wrote:
+> The uuid should be printed in the CPU endianness and not in little-endian.
 > 
-> I guess this is about FTP, right? If I understood you want to be able
-> to change the folders being exported in run-time, that might be
-> possible but if we do that I think it would be better to let the agent
-> set its root folder once registered then you can fully control this on
-> the component implementing the agent interface (usually the UI)
-> leaving the command line switch only for systems without agents.
-Only changing the root folder will be enough, we are already using links for 
-the rest.
+> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> ---
+>  net/bluetooth/hci_sysfs.c | 25 ++++++++++++-------------
+>  1 file changed, 12 insertions(+), 13 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+> index 55cceee..05b78c7 100644
+> --- a/net/bluetooth/hci_sysfs.c
+> +++ b/net/bluetooth/hci_sysfs.c
+> @@ -461,19 +461,18 @@ static const struct file_operations blacklist_fops = {
+>  
+>  static void print_bt_uuid(struct seq_file *f, u8 *uuid)
+>  {
+> -	__be32 data0, data4;
+> -	__be16 data1, data2, data3, data5;
+> -
+> -	memcpy(&data0, &uuid[0], 4);
+> -	memcpy(&data1, &uuid[4], 2);
+> -	memcpy(&data2, &uuid[6], 2);
+> -	memcpy(&data3, &uuid[8], 2);
+> -	memcpy(&data4, &uuid[10], 4);
+> -	memcpy(&data5, &uuid[14], 2);
+> -
+> -	seq_printf(f, "%.8x-%.4x-%.4x-%.4x-%.8x%.4x\n",
+> -		   ntohl(data0), ntohs(data1), ntohs(data2), ntohs(data3),
+> -		   ntohl(data4), ntohs(data5));
+> +	u32 data0, data5;
+> +	u16 data1, data2, data3, data4;
+> +
+> +	data5 = le32_to_cpu(*(__le32 *)uuid);
+> +	data4 = le16_to_cpu(*(__le16 *)(uuid + 4));
+> +	data3 = le16_to_cpu(*(__le16 *)(uuid + 6));
+> +	data2 = le16_to_cpu(*(__le16 *)(uuid + 8));
+> +	data1 = le16_to_cpu(*(__le16 *)(uuid + 10));
+> +	data0 = le32_to_cpu(*(__le32 *)(uuid + 12));
 
-With that, we should be able to port KDE bluetooth support to obexd-server 
-being the first step towards using BlueZ-5
+This looks prone to unaligned access violations if the "u8 *uuid"
+pointer doesn't start off with a nicely aligned address. The use of the
+unaligned getter macros would also look nicer since you wouldn't have to
+do explicit type casting.
 
-Thanks !
+Johan
