@@ -1,61 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: AceLan Kao <acelan@gmail.com>
-From: AceLan Kao <acelan.kao@canonical.com>
-To: linux-bluetooth@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: [PATCH 1/2] Bluetooth: Add support for Foxconn / Hon Hai [0489:e04e]
-Date: Thu,  3 Jan 2013 12:24:59 +0800
-Message-Id: <1357187100-9658-1-git-send-email-acelan.kao@canonical.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ] input: Fix closing sockets when ioctl_connadd() fails
+Date: Wed,  2 Jan 2013 22:08:24 -0400
+Message-Id: <1357178905-22533-1-git-send-email-anderson.lizardo@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add support for the AR9462 chip
+Instead of calling close() directly, properly shutdown the channel and
+set GIOChannel pointers to NULL.
 
-T:  Bus=01 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  5 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e04e Rev=00.02
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+Also remove dead code and do a small refactoring around the code.
 
-Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+Fixes this error detected when HIDP support is disabled on kernel and we
+attempt to connect to a BT keyboard:
+
+bluetoothd[5168]: profiles/input/device.c:encrypt_notify()
+bluetoothd[5168]: ioctl_connadd(): Protocol not supported(93)
+bluetoothd[5168]: profiles/input/device.c:ctrl_watch_cb() Device
+CA:FE:CA:FE:CA:FE disconnected
+
+(bluetoothd:5168): GLib-WARNING **: Invalid file descriptor.
+
+bluetoothd[5168]: profiles/input/device.c:intr_watch_cb() Device
+CA:FE:CA:FE:CA:FE disconnected
+
+(bluetoothd:5168): GLib-WARNING **: Invalid file descriptor.
 ---
- drivers/bluetooth/ath3k.c |    2 ++
- drivers/bluetooth/btusb.c |    1 +
- 2 files changed, 3 insertions(+)
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 3418bf9..0649513 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -82,6 +82,7 @@ static struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x0930, 0x0219) },
- 	{ USB_DEVICE(0x0489, 0xe057) },
- 	{ USB_DEVICE(0x13d3, 0x3393) },
-+	{ USB_DEVICE(0x0489, 0xe04e) },
+Let me know if you want me to split the refactoring part in a separate patch.
+
+ profiles/input/device.c |   62 ++++++++++++++++++++++-------------------------
+ 1 file changed, 29 insertions(+), 33 deletions(-)
+
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index 9cea028..2cb44cf 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -136,8 +136,10 @@ static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data
  
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE02C) },
-@@ -110,6 +111,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0489, 0xe057), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0489, 0xe04e), .driver_info = BTUSB_ATH3012 },
+ 	idev->intr_watch = 0;
  
- 	/* Atheros AR5BBU22 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE03C), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index acd5be4..ba617d6 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -140,6 +140,7 @@ static struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0489, 0xe057), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0489, 0xe04e), .driver_info = BTUSB_ATH3012 },
+-	g_io_channel_unref(idev->intr_io);
+-	idev->intr_io = NULL;
++	if (idev->intr_io) {
++		g_io_channel_unref(idev->intr_io);
++		idev->intr_io = NULL;
++	}
  
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+ 	/* Close control channel */
+ 	if (idev->ctrl_io && !(cond & G_IO_NVAL))
+@@ -163,8 +165,10 @@ static gboolean ctrl_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data
+ 
+ 	idev->ctrl_watch = 0;
+ 
+-	g_io_channel_unref(idev->ctrl_io);
+-	idev->ctrl_io = NULL;
++	if (idev->ctrl_io) {
++		g_io_channel_unref(idev->ctrl_io);
++		idev->ctrl_io = NULL;
++	}
+ 
+ 	/* Close interrupt channel */
+ 	if (idev->intr_io && !(cond & G_IO_NVAL))
+@@ -271,43 +275,35 @@ static int ioctl_connadd(struct hidp_connadd_req *req)
+ 	return err;
+ }
+ 
+-static void encrypt_completed(uint8_t status, gpointer user_data)
+-{
+-	struct hidp_connadd_req *req = user_data;
+-	int err;
+-
+-	if (status) {
+-		error("Encryption failed: %s(0x%x)",
+-				strerror(bt_error(status)), status);
+-		goto failed;
+-	}
+-
+-	err = ioctl_connadd(req);
+-	if (err == 0)
+-		goto cleanup;
+-
+-	error("ioctl_connadd(): %s(%d)", strerror(-err), -err);
+-failed:
+-	close(req->intr_sock);
+-	close(req->ctrl_sock);
+-
+-cleanup:
+-	free(req->rd_data);
+-
+-	g_free(req);
+-}
+-
+ static gboolean encrypt_notify(GIOChannel *io, GIOCondition condition,
+ 								gpointer data)
+ {
+ 	struct input_device *idev = data;
+-	struct hidp_connadd_req *req = idev->req;
++	int err;
+ 
+-	DBG(" ");
++	DBG("");
+ 
+-	encrypt_completed(0, req);
++	err = ioctl_connadd(idev->req);
++	if (err < 0) {
++		error("ioctl_connadd(): %s (%d)", strerror(-err), -err);
++
++		if (idev->ctrl_io) {
++			g_io_channel_shutdown(idev->ctrl_io, FALSE, NULL);
++			g_io_channel_unref(idev->ctrl_io);
++			idev->ctrl_io = NULL;
++		}
++
++		if (idev->intr_io) {
++			g_io_channel_shutdown(idev->intr_io, FALSE, NULL);
++			g_io_channel_unref(idev->intr_io);
++			idev->intr_io = NULL;
++		}
++	}
+ 
+ 	idev->sec_watch = 0;
++
++	g_free(idev->req->rd_data);
++	g_free(idev->req);
+ 	idev->req = NULL;
+ 
+ 	return FALSE;
 -- 
-1.7.10.4
+1.7.9.5
+
