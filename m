@@ -1,42 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Paulo Borges <paulo.borges@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Paulo Borges <paulo.borges@openbossa.org>
-Subject: [PATCH] attrib-server: Fix invalid device access
-Date: Thu,  3 Jan 2013 15:57:18 -0300
-Message-Id: <1357239438-10309-1-git-send-email-paulo.borges@openbossa.org>
+Date: Thu, 3 Jan 2013 18:12:56 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 BlueZ 1/6] input: Remove dead code from
+ encrypt_completed()
+Message-ID: <20130103161256.GA31195@x220.P-661HNU-F1>
+References: <1357222503-31554-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1357222503-31554-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the device is not found, the channel attach must fail.
----
- src/attrib-server.c |   11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+Hi Lizardo,
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 15622e4..4a25743 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -1131,10 +1131,17 @@ guint attrib_channel_attach(GAttrib *attrib)
- 	ba2str(&channel->dst, addr);
- 
- 	device = adapter_find_device(server->adapter, addr);
--	if (device == NULL || device_is_bonded(device) == FALSE) {
-+	if (device == NULL) {
-+		error("Device not found");
-+		g_free(channel);
-+
-+		return 0;
-+	}
-+
-+	if (device_is_bonded(device) == FALSE) {
- 		char *filename;
- 
--		filename = btd_device_get_storage_path(channel->device, "ccc");
-+		filename = btd_device_get_storage_path(device, "ccc");
- 		unlink(filename);
- 		g_free(filename);
- 	}
--- 
-1.7.9.5
+On Thu, Jan 03, 2013, Anderson Lizardo wrote:
+> "status" is always zero, so this code will never be reached.
+> ---
+>  profiles/input/device.c |    7 -------
+>  1 file changed, 7 deletions(-)
 
+All patches in this set have been applied. Thanks.
+
+Johan
