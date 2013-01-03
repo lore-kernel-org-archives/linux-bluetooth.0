@@ -1,57 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 3 Jan 2013 18:07:24 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Daniel Schaal <farbing@web.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Add support for GC-WB300D PCIe [04ca:3006] to
- ath3k.
-Message-ID: <20130103200724.GC2114@joana>
-References: <1356776074-1703-1-git-send-email-farbing@web.de>
- <1356776074-1703-2-git-send-email-farbing@web.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1356776074-1703-2-git-send-email-farbing@web.de>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 8/8] gdbus: Fix introspection data for deprecated properties
+Date: Thu,  3 Jan 2013 21:46:11 +0200
+Message-Id: <1357242371-6752-8-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1357242371-6752-1-git-send-email-luiz.dentz@gmail.com>
+References: <1357242371-6752-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel, 
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-* Daniel Schaal <farbing@web.de> [2012-12-29 11:14:34 +0100]:
+Fix missing </property> when generating introspection xml of deprecated
+properties.
+---
+ gdbus/object.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-> T:  Bus=02 Lev=02 Prnt=02 Port=06 Cnt=01 Dev#=  4 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=04ca ProdID=3006 Rev= 0.02
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> 
-> Signed-off-by: Daniel Schaal <farbing@web.de>
-> ---
->  drivers/bluetooth/ath3k.c |    2 ++
->  drivers/bluetooth/btusb.c |    1 +
->  2 files changed, 3 insertions(+)
+diff --git a/gdbus/object.c b/gdbus/object.c
+index b9cb284..729557b 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -210,9 +210,12 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
+ 
+ 		if (!deprecated)
+ 			g_string_append_printf(gstr, "/>\n");
+-		else
++		else {
+ 			g_string_append_printf(gstr,
+ 				G_DBUS_ANNOTATE_DEPRECATED(">\n\t\t\t"));
++
++			g_string_append_printf(gstr, "\t\t</property>\n");
++		}
+ 	}
+ }
+ 
+-- 
+1.8.0.1
 
-Patch has been applied to bluetooth.git. Thanks.
-
-	Gustavo
