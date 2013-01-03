@@ -1,38 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 3 Jan 2013 18:59:57 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: AceLan Kao <acelan.kao@canonical.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: [PATCH 2/2] Bluetooth: Add support for Foxconn / Hon Hai
- [0489:e056]
-Message-ID: <20130103205957.GE2114@joana>
-References: <1357187100-9658-1-git-send-email-acelan.kao@canonical.com>
- <1357187100-9658-2-git-send-email-acelan.kao@canonical.com>
+Date: Thu, 3 Jan 2013 22:56:34 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Paulo Borges <paulo.borges@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] attrib-server: Fix invalid device access
+Message-ID: <20130103205634.GA17729@x220.P-661HNU-F1>
+References: <1357239438-10309-1-git-send-email-paulo.borges@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1357187100-9658-2-git-send-email-acelan.kao@canonical.com>
+In-Reply-To: <1357239438-10309-1-git-send-email-paulo.borges@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi AceLan,
+Hi Paulo,
 
-* AceLan Kao <acelan.kao@canonical.com> [2013-01-03 12:25:00 +0800]:
-
-> Add support for the AR9462 chip
-> 
-> T: Bus=01 Lev=02 Prnt=02 Port=05 Cnt=01 Dev#= 4 Spd=12 MxCh= 0
-> D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-> P: Vendor=0489 ProdID=e056 Rev=00.01
-> C: #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I: If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> I: If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> 
-> Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+On Thu, Jan 03, 2013, Paulo Borges wrote:
+> When the device is not found, the channel attach must fail.
 > ---
->  drivers/bluetooth/ath3k.c |    2 ++
->  drivers/bluetooth/btusb.c |    1 +
->  2 files changed, 3 insertions(+)
+>  src/attrib-server.c |   11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
 
-Both patches have been applied to bluetooth.git. Thanks.
+Applied though I did make one change first:
 
-	Gustavo
+> diff --git a/src/attrib-server.c b/src/attrib-server.c
+> index 15622e4..4a25743 100644
+> --- a/src/attrib-server.c
+> +++ b/src/attrib-server.c
+> @@ -1131,10 +1131,17 @@ guint attrib_channel_attach(GAttrib *attrib)
+>  	ba2str(&channel->dst, addr);
+>  
+>  	device = adapter_find_device(server->adapter, addr);
+> -	if (device == NULL || device_is_bonded(device) == FALSE) {
+> +	if (device == NULL) {
+> +		error("Device not found");
+
+Never do error() logs with a very generic message like this. Always
+provide enough context to figure out what part of the the (big) bluez
+code base the error is coming from. Unlike DBG() error() doesn't provide
+any automatic context.
+
+Johan
