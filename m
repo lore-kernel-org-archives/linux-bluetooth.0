@@ -1,89 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH 1/2] Bluetooth: Move hci_outgoing_auth_needed() to hci_conn.c
-Date: Thu, 03 Jan 2013 18:35:28 +0530
-Message-id: <1357218329-21399-1-git-send-email-jaganath.k@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1357170124.19248.98.camel@aeonflux>
+References: <1356862632-5938-1-git-send-email-g.gherdovich@gmail.com>
+	<CAJdJm_PpJOVALj5xJvCRA4mC6WAMyP5RsqHVruz6xaRBDhXg5A@mail.gmail.com>
+	<CAJN7YmNzo1ya34tdgyffcBf=SLt4RsJ=2QaSy3fD6meKx7wnsA@mail.gmail.com>
+	<CABBYNZJxF6H7V-e=6wMYgQSM4C7FfXW9FCrdRZ=B6U1YgLQSSQ@mail.gmail.com>
+	<CAE6HaMmrc9BEW-cjmw3fkZptCzvr14M0GtKwoKXuqi8or1zeWg@mail.gmail.com>
+	<CABBYNZL=4ToEwR1i6bihLKWQTn6hurEwWpjQ0gF0rgkO7eExLQ@mail.gmail.com>
+	<1357170124.19248.98.camel@aeonflux>
+Date: Thu, 3 Jan 2013 12:27:22 +0200
+Message-ID: <CABBYNZ+VTFatmSUaXD=4-8K9eYj__z4X1vzCUXMo=9CLyjcSjQ@mail.gmail.com>
+Subject: Re: [PATCH 1/1] adapter, AVCTP: Replaced calls to g_queue_free_full function
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Vinicius Gomes <vinicius.gomes@openbossa.org>,
+	Giovanni Gherdovich <g.gherdovich@gmail.com>, Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is done so that other files can use this function
+Hi Marcel,
 
-Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
----
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_conn.c         |   17 +++++++++++++++++
- net/bluetooth/hci_event.c        |   18 ------------------
- 3 files changed, 18 insertions(+), 18 deletions(-)
+On Thu, Jan 3, 2013 at 1:42 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
+>
+>> >> In that case I would just revert back this patch, but the
+>> >> documentation actually say g_slist_free_full is available since 2.28
+>> >> http://developer.gnome.org/glib/2.28/glib-Singly-Linked-Lists.html#g-slist-free-full
+>> >> so I wonder what is going on.
+>> >>
+>> >
+>> > The problem now is g_queue_free_full() not the g_slist_free_full().
+>>
+>> Right, but it is quite the same situation and I don't get why we don't
+>> just update, by the time distros start to package BlueZ 5 glib 2.32
+>> wont be a problem, in fact it should not be a problem right now as it
+>> is about a year old release:
+>
+> because every new GLib release drags in more dependencies. It is a bit
+> out of control. So requiring the 2.32 comes at a cost that I am not
+> willing to pay right now. We already have seen this with ConnMan where I
+> accidentally used a newer GLib function that was not present in a 2.28
+> and before. It is pretty hard for embedded system to do these kind of
+> upgrades when their dependencies and thus footprint and memory
+> consumption increases for just a simple convenience function.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 014a2ea..2e1897c 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -706,6 +706,7 @@ int hci_get_dev_info(void __user *arg);
- int hci_get_conn_list(void __user *arg);
- int hci_get_conn_info(struct hci_dev *hdev, void __user *arg);
- int hci_get_auth_info(struct hci_dev *hdev, void __user *arg);
-+int hci_outgoing_auth_needed(struct hci_dev *hdev, struct hci_conn *conn);
- int hci_inquiry(void __user *arg);
- 
- struct bdaddr_list *hci_blacklist_lookup(struct hci_dev *hdev,
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 25bfce0..7fbabae 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1027,3 +1027,20 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle)
- 
- 	return hchan;
- }
-+
-+int hci_outgoing_auth_needed(struct hci_dev *hdev, struct hci_conn *conn)
-+{
-+	if (conn->state != BT_CONFIG || !conn->out)
-+		return 0;
-+
-+	if (conn->pending_sec_level == BT_SECURITY_SDP)
-+		return 0;
-+
-+	/* Only request authentication for SSP connections or non-SSP
-+	 * devices with sec_level HIGH or if MITM protection is requested */
-+	if (!hci_conn_ssp_enabled(conn) && !(conn->auth_type & 0x01) &&
-+	    conn->pending_sec_level != BT_SECURITY_HIGH)
-+		return 0;
-+
-+	return 1;
-+}
-\ No newline at end of file
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 705078a..720d5ec 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1509,24 +1509,6 @@ static void hci_cs_set_conn_encrypt(struct hci_dev *hdev, __u8 status)
- 	hci_dev_unlock(hdev);
- }
- 
--static int hci_outgoing_auth_needed(struct hci_dev *hdev,
--				    struct hci_conn *conn)
--{
--	if (conn->state != BT_CONFIG || !conn->out)
--		return 0;
--
--	if (conn->pending_sec_level == BT_SECURITY_SDP)
--		return 0;
--
--	/* Only request authentication for SSP connections or non-SSP
--	 * devices with sec_level HIGH or if MITM protection is requested */
--	if (!hci_conn_ssp_enabled(conn) && !(conn->auth_type & 0x01) &&
--	    conn->pending_sec_level != BT_SECURITY_HIGH)
--		return 0;
--
--	return 1;
--}
--
- static int hci_resolve_name(struct hci_dev *hdev,
- 				   struct inquiry_entry *e)
- {
--- 
-1.7.9.5
+It seems the mandatory glib dependencies are restricted to libffi,
+pkg-config and Python:
+http://www.linuxfromscratch.org/blfs/view/svn/general/glib2.html
 
+Anyway regardless if we do update or not, I don't see why
+g_queue_free_full is different than g_slist_free_full, so instead of
+converting everything to g_queue_foreach + g_queue_free why we don't
+bring back glib-compat and do this in one place as we did for
+g_slist_free_full?
+
+--
+Luiz Augusto von Dentz
