@@ -1,119 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 3 Jan 2013 20:27:01 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Tejun Heo <tj@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 12/25] bluetooth/l2cap: don't use [delayed_]work_pending()
-Message-ID: <20130103222701.GG2114@joana>
-References: <1356141435-17340-1-git-send-email-tj@kernel.org>
- <1356141435-17340-13-git-send-email-tj@kernel.org>
+Date: Thu, 3 Jan 2013 19:16:54 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	Michael Knudsen <michaelknudsendk@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Michael Knudsen <m.knudsen@samsung.com>
+Subject: Re: [RFC 3/3] Bluetooth:  Provide mgmt API for reading list of
+ supported codecs
+Message-ID: <20130103221654.GA11342@samus>
+References: <1353585909-28400-1-git-send-email-m.knudsen@samsung.com>
+ <1353585909-28400-4-git-send-email-m.knudsen@samsung.com>
+ <20130103190916.GA2114@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1356141435-17340-13-git-send-email-tj@kernel.org>
+In-Reply-To: <20130103190916.GA2114@joana>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tejun,
+Hi Gustavo,
 
-* Tejun Heo <tj@kernel.org> [2012-12-21 17:57:02 -0800]:
+> 
+> We think it is better to read the list of codecs from the SCO socket, we need
+> to allow both oFono and PulseAudio to read them without the need of talking to
+> BlueZ. Also, bluetoothd has nothing intersting to do with this information.
 
-> There's no need to test whether a (delayed) work item in pending
-> before queueing, flushing or cancelling it.  Most uses are unnecessary
-> and quite a few of them are buggy.
-> 
-> Reimplement l2cap_set_timer() such that it uses mod_delayed_work() or
-> schedule_delayed_work() depending on a new param @override and let the
-> users specify whether to override or not instead of using
-> delayed_work_pending().
-> 
-> Only compile tested.
-> 
-> Signed-off-by: Tejun Heo <tj@kernel.org>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Gustavo Padovan <gustavo@padovan.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> Cc: linux-bluetooth@vger.kernel.org
-> ---
-> Please let me know how this patch should be routed.  I can take it
-> through the workqueue tree if necessary.
-> 
-> Thanks.
-> 
->  include/net/bluetooth/l2cap.h | 24 ++++++++++++++++--------
->  net/bluetooth/l2cap_core.c    |  7 +++----
->  2 files changed, 19 insertions(+), 12 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 7588ef4..f12cbeb 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -718,17 +718,25 @@ static inline void l2cap_chan_unlock(struct l2cap_chan *chan)
->  }
->  
->  static inline void l2cap_set_timer(struct l2cap_chan *chan,
-> -				   struct delayed_work *work, long timeout)
-> +				   struct delayed_work *work, long timeout,
-> +				   bool override)
->  {
-> +	bool was_pending;
-> +
->  	BT_DBG("chan %p state %s timeout %ld", chan,
->  	       state_to_string(chan->state), timeout);
->  
-> -	/* If delayed work cancelled do not hold(chan)
-> -	   since it is already done with previous set_timer */
-> -	if (!cancel_delayed_work(work))
-> -		l2cap_chan_hold(chan);
-> +	/* @work should hold a reference to @chan */
-> +	l2cap_chan_hold(chan);
-> +
-> +	if (override)
-> +		was_pending = mod_delayed_work(system_wq, work, timeout);
-> +	else
-> +		was_pending = !schedule_delayed_work(work, timeout);
->  
-> -	schedule_delayed_work(work, timeout);
-> +	/* if @work was already pending, lose the extra ref */
-> +	if (was_pending)
-> +		l2cap_chan_put(chan);
->  }
->  
->  static inline bool l2cap_clear_timer(struct l2cap_chan *chan,
-> @@ -745,12 +753,12 @@ static inline bool l2cap_clear_timer(struct l2cap_chan *chan,
->  	return ret;
->  }
->  
-> -#define __set_chan_timer(c, t) l2cap_set_timer(c, &c->chan_timer, (t))
-> +#define __set_chan_timer(c, t) l2cap_set_timer(c, &c->chan_timer, (t), true)
->  #define __clear_chan_timer(c) l2cap_clear_timer(c, &c->chan_timer)
->  #define __clear_retrans_timer(c) l2cap_clear_timer(c, &c->retrans_timer)
->  #define __clear_monitor_timer(c) l2cap_clear_timer(c, &c->monitor_timer)
->  #define __set_ack_timer(c) l2cap_set_timer(c, &chan->ack_timer, \
-> -		msecs_to_jiffies(L2CAP_DEFAULT_ACK_TO));
-> +		msecs_to_jiffies(L2CAP_DEFAULT_ACK_TO), true);
->  #define __clear_ack_timer(c) l2cap_clear_timer(c, &c->ack_timer)
->  
->  static inline int __seq_offset(struct l2cap_chan *chan, __u16 seq1, __u16 seq2)
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 2c78208..91db91c 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -246,10 +246,9 @@ static inline void l2cap_chan_set_err(struct l2cap_chan *chan, int err)
->  
->  static void __set_retrans_timer(struct l2cap_chan *chan)
->  {
-> -	if (!delayed_work_pending(&chan->monitor_timer) &&
-> -	    chan->retrans_timeout) {
-> +	if (chan->retrans_timeout) {
->  		l2cap_set_timer(chan, &chan->retrans_timer,
-> -				msecs_to_jiffies(chan->retrans_timeout));
-> +				msecs_to_jiffies(chan->retrans_timeout), false);
+Take a look at the thread "CSA2: User space aspect"[1]. I have to agree
+with Marcel, the mgmt command makes more sense. As how that information
+will get to oFono/PulseAudio we have NewConnection() in the Profile API
+and SetConfiguration() on the Media API, that may be extended (if
+needed).
 
-Did you notice we are talking about two different works here?
-delayed_work_pending() is checking the monitor_timer while l2cap_set_timer is
-setting the retrans_timer. We can't run one of them while the is running.
-This mean you can just get rid of the override flag and simplify this patch a
-lot.
+> 
+> 	Gustavo
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-	Gustavo
+
+Cheers,
+-- 
+Vinicius
+
+[1] http://thread.gmane.org/gmane.linux.bluez.kernel/31746
