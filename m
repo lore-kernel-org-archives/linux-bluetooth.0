@@ -1,74 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
-From: Giovanni Gherdovich <g.gherdovich@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Giovanni Gherdovich <g.gherdovich@gmail.com>
-Subject: [PATCH 2/2] AVCTP: Replace calls to g_queue_free_full function
-Date: Thu,  3 Jan 2013 20:37:15 +0100
-Message-Id: <1357241835-4861-1-git-send-email-g.gherdovich@gmail.com>
+Date: Thu, 3 Jan 2013 17:38:37 -0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] Bluetooth: Fix stop discovery while in STARTING
+ state
+Message-ID: <20130103193837.GB2114@joana>
+References: <1356094225-12706-1-git-send-email-jaganath.k@samsung.com>
+ <1356094225-12706-3-git-send-email-jaganath.k@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1356094225-12706-3-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The function g_queue_free_full is available only from GLib 2.32.
-If BlueZ has to build against GLib 2.28, as stated in the configure.ac,
-this patch replaces the calls to g_queue_free_full in the AVTCP module
-with its body, taken from the sources of GLib 2.32.
----
- profiles/audio/avctp.c |   14 ++++++++------
- 1 files changed, 8 insertions(+), 6 deletions(-)
+Hi Jaganath,
 
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 013c587..b26abe5 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -370,7 +370,7 @@ static struct avctp_pdu_handler *find_handler(GSList *list, uint8_t opcode)
- 	return NULL;
- }
- 
--static void pending_destroy(void *data)
-+static void pending_destroy(gpointer data, gpointer user_data)
- {
- 	struct avctp_pending_req *req = data;
- 
-@@ -395,8 +395,10 @@ static void avctp_channel_destroy(struct avctp_channel *chan)
- 		g_source_remove(chan->process_id);
- 
- 	g_free(chan->buffer);
--	g_queue_free_full(chan->queue, pending_destroy);
--	g_slist_free_full(chan->processed, pending_destroy);
-+	g_queue_foreach(chan->queue, pending_destroy, NULL);
-+	g_queue_free(chan->queue);
-+	g_slist_foreach(chan->processed, pending_destroy, NULL);
-+	g_slist_free(chan->processed);
- 	g_slist_free_full(chan->handlers, g_free);
- 	g_free(chan);
- }
-@@ -540,7 +542,7 @@ static gboolean req_timeout(gpointer user_data)
- 
- 	p->timeout = 0;
- 
--	pending_destroy(p);
-+	pending_destroy(p, NULL);
- 	chan->p = NULL;
- 
- 	if (chan->process_id == 0)
-@@ -574,7 +576,7 @@ static gboolean process_queue(void *user_data)
- 		if (p->process(p->data) == 0)
- 			break;
- 
--		pending_destroy(p);
-+		pending_destroy(p, NULL);
- 	}
- 
- 	if (p == NULL)
-@@ -626,7 +628,7 @@ static void control_response(struct avctp_channel *control,
- 			return;
- 
- 		control->processed = g_slist_remove(control->processed, p);
--		pending_destroy(p);
-+		pending_destroy(p, NULL);
- 
- 		return;
- 	}
--- 
-1.7.4.1
+* Jaganath Kanakkassery <jaganath.k@samsung.com> [2012-12-21 18:20:25 +0530]:
 
+> If stop_discovery() is called when discovery state is STARTING, it
+> will be failed currently. This patch fixes this.
+> 
+> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
+> ---
+>  include/net/bluetooth/hci_core.h |    2 ++
+>  net/bluetooth/hci_event.c        |   14 ++++++++++++--
+>  net/bluetooth/mgmt.c             |   31 ++++++++++++++++++++++++++++++-
+>  3 files changed, 44 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 119fcb6..c2886b7 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -64,6 +64,7 @@ struct discovery_state {
+>  		DISCOVERY_RESOLVING,
+>  		DISCOVERY_STOPPING,
+>  	} state;
+> +	u8  discovering;
+>  	struct list_head	all;	/* All devices found during inquiry */
+>  	struct list_head	unknown;	/* Name state not known */
+>  	struct list_head	resolve;	/* Name needs to be resolved */
+> @@ -1066,6 +1067,7 @@ int mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+>  int mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+>  		     u8 addr_type, s8 rssi, u8 *name, u8 name_len);
+>  int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status);
+> +int mgmt_start_discovery_complete(struct hci_dev *hdev, u8 status);
+>  int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status);
+>  int mgmt_discovering(struct hci_dev *hdev, u8 discovering);
+>  int mgmt_interleaved_discovery(struct hci_dev *hdev);
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index e248e7c..b486458 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -1092,7 +1092,12 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+>  		set_bit(HCI_LE_SCAN, &hdev->dev_flags);
+>  
+>  		hci_dev_lock(hdev);
+> -		hci_discovery_set_state(hdev, DISCOVERY_FINDING);
+> +		if (hdev->discovery.state == DISCOVERY_STOPPING) {
+> +			hci_cancel_le_scan(hdev);
+> +			mgmt_start_discovery_complete(hdev, 0);
+
+Reply to mgmt with an error here might be better.
+
+> +		} else {
+> +			hci_discovery_set_state(hdev, DISCOVERY_FINDING);
+> +		}
+>  		hci_dev_unlock(hdev);
+>  		break;
+>  
+> @@ -1189,7 +1194,12 @@ static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+>  	set_bit(HCI_INQUIRY, &hdev->flags);
+>  
+>  	hci_dev_lock(hdev);
+> -	hci_discovery_set_state(hdev, DISCOVERY_FINDING);
+> +	if (hdev->discovery.state == DISCOVERY_STOPPING) {
+> +		hci_cancel_inquiry(hdev);
+> +		mgmt_start_discovery_complete(hdev, 0);
+> +	} else {
+> +		hci_discovery_set_state(hdev, DISCOVERY_FINDING);
+> +	}
+>  	hci_dev_unlock(hdev);
+>  }
+>  
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index d6c0d78..ba4171f 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -2385,7 +2385,8 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+>  
+>  	hci_dev_lock(hdev);
+>  
+> -	if (!hci_discovery_active(hdev)) {
+> +	if (hdev->discovery.state != DISCOVERY_STARTING &&
+> +	    !hci_discovery_active(hdev)) {
+>  		err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY,
+>  				   MGMT_STATUS_REJECTED, &mgmt_cp->type,
+>  				   sizeof(mgmt_cp->type));
+> @@ -2433,6 +2434,10 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+>  
+>  		break;
+>  
+> +	case DISCOVERY_STARTING:
+> +		err = 0;
+> +		break;
+> +
+>  	default:
+>  		BT_DBG("unknown discovery state %u", hdev->discovery.state);
+>  		err = -EFAULT;
+> @@ -3624,6 +3629,25 @@ int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
+>  	return err;
+>  }
+>  
+> +int mgmt_start_discovery_complete(struct hci_dev *hdev, u8 status)
+> +{
+> +	struct pending_cmd *cmd;
+> +	u8 type;
+> +	int err;
+> +
+> +	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
+> +	if (!cmd)
+> +		return -ENOENT;
+> +
+> +	type = hdev->discovery.type;
+> +
+> +	err = cmd_complete(cmd->sk, hdev->id, cmd->opcode, mgmt_status(status),
+> +			   &type, sizeof(type));
+> +	mgmt_pending_remove(cmd);
+> +
+> +	return err;
+> +}
+
+This is exactly the same thing as mgmt_start_discovery_failed(), just rename it
+to _complete() as you did with mgmt_stop_discovery_failed(). Do it as a
+separate patch.
+
+	Gustavo
