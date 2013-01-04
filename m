@@ -2,33 +2,33 @@ Return-Path: <cyrus@holtmann.org>
 From: Jaganath Kanakkassery <jaganath.k@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH 2/2] rfkill: Fix count parameter in read
-Date: Fri, 04 Jan 2013 11:12:28 +0530
-Message-id: <1357278148-27872-2-git-send-email-jaganath.k@samsung.com>
-In-reply-to: <1357278148-27872-1-git-send-email-jaganath.k@samsung.com>
-References: <1357278148-27872-1-git-send-email-jaganath.k@samsung.com>
+Subject: [PATCH 1/2] storage: Fix memory leak
+Date: Fri, 04 Jan 2013 11:12:27 +0530
+Message-id: <1357278148-27872-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since g_str_has_prefix() has been used with the output buffer of read
-it should be NULL terminated
+If bt_uuid2string() returns NULL then svcclass has to be freed
 ---
- src/rfkill.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/storage.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/src/rfkill.c b/src/rfkill.c
-index bac9efd..51591cb 100644
---- a/src/rfkill.c
-+++ b/src/rfkill.c
-@@ -114,7 +114,7 @@ static gboolean rfkill_event(GIOChannel *chan,
+diff --git a/src/storage.c b/src/storage.c
+index 375974a..be3bbf2 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -180,8 +180,10 @@ sdp_record_t *find_record_in_list(sdp_list_t *recs, const char *uuid)
  
- 	memset(sysname, 0, sizeof(sysname));
+ 		/* Extract the uuid */
+ 		uuid_str = bt_uuid2string(svcclass->data);
+-		if (!uuid_str)
++		if (!uuid_str) {
++			sdp_list_free(svcclass, free);
+ 			continue;
++		}
  
--	if (read(fd, sysname, sizeof(sysname)) < 4) {
-+	if (read(fd, sysname, sizeof(sysname) - 1) < 4) {
- 		close(fd);
- 		return TRUE;
- 	}
+ 		if (!strcasecmp(uuid_str, uuid)) {
+ 			sdp_list_free(svcclass, free);
 -- 
 1.7.9.5
 
