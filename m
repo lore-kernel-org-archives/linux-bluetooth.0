@@ -1,48 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ] gdbus: Don't include just added interfaces in GetManagedObjects
-Date: Fri,  4 Jan 2013 01:33:44 -0200
-Message-Id: <1357270424-24036-1-git-send-email-lucas.demarchi@profusion.mobi>
+Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
+Subject: [RFC] gdbus: Process changes upon ObjectManager.GetManagedObjects
+Date: Thu,  3 Jan 2013 23:50:34 -0200
+Message-Id: <1357264234-20429-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If we received a call to ObjectManager.GetManagedObject we should not
-include in the response the interfaces in data->added. This is because
-it's not guaranteed that those interfaces will trigger an
-InterfacesAdded signal, which is the case if the interface is removed in
-the same mainloop iteration.
+From: Lucas De Marchi <lucas.de.marchi@gmail.com>
+
+If ObjectManager.GetManagedObjects is called, we need to flush all
+pending signals for interfaces added/removed, otherwise we might answer
+the method saying an interface exists but never send a signal when it's
+removed.
 ---
- gdbus/object.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+
+It's an RFC because it's untested. If anyone can write a proper unit test for
+this, it would be good. Otherwise I can probably do it in the weekend.
+
+ gdbus/object.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/gdbus/object.c b/gdbus/object.c
-index 2b6ae31..e569acb 100644
+index 2b6ae31..3d9ab5f 100644
 --- a/gdbus/object.c
 +++ b/gdbus/object.c
-@@ -1064,6 +1064,7 @@ static const GDBusMethodTable introspect_methods[] = {
- static void append_interfaces(struct generic_data *data, DBusMessageIter *iter)
- {
- 	DBusMessageIter array;
-+	GSList *l;
+@@ -1108,6 +1108,11 @@ static DBusMessage *get_objects(DBusConnection *connection,
+ 	if (reply == NULL)
+ 		return NULL;
  
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
- 				DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-@@ -1075,7 +1076,12 @@ static void append_interfaces(struct generic_data *data, DBusMessageIter *iter)
- 				DBUS_DICT_ENTRY_END_CHAR_AS_STRING
- 				DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &array);
- 
--	g_slist_foreach(data->interfaces, append_interface, &array);
-+	for (l = data->interfaces; l != NULL; l = l->next) {
-+		if (g_slist_find(data->added, l->data))
-+			continue;
-+
-+		append_interface(l->data, &array);
++	if (data->process_id > 0) {
++		g_source_remove(data->process_id);
++		process_changes(data);
 +	}
++
+ 	dbus_message_iter_init_append(reply, &iter);
  
- 	dbus_message_iter_close_container(iter, &array);
- }
+ 	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
 -- 
 1.8.1
 
