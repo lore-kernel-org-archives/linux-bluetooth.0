@@ -1,40 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] unit: Fix compilation issue with ignored return value
-Date: Fri,  4 Jan 2013 09:47:02 -0400
-Message-Id: <1357307222-4563-1-git-send-email-anderson.lizardo@openbossa.org>
+Message-ID: <50E6D865.7010805@linux.intel.com>
+Date: Fri, 04 Jan 2013 14:25:57 +0100
+From: Frederic Danis <frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [REVIEW] adapter: Fix storage to be used by BlueZ 4 or 5
+References: <1357305174-13313-1-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1357305174-13313-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix this compilation warning:
+On 04/01/2013 14:12, Frédéric Danis wrote:
+> Conversion should be performed only one time, but using "converted"
+> entry in device related files generates a bogus device object with
+> dev_CONVERTED path when starting BlueZ 4.
+>
+> If "settings" file has been created we've done the conversion and
+> we can use it to check if conversion has already been done.
+>
+> Remove "converted" entries in converted files
 
-unit/test-sdp.c: In function ‘send_pdu’:
-unit/test-sdp.c:600:7: error: ignoring return value of ‘write’, declared
-with attribute warn_unused_result [-Werror=unused-result]
----
- unit/test-sdp.c |    4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Sorry, I made a mistake in mail subject, this patch is for integration.
 
-diff --git a/unit/test-sdp.c b/unit/test-sdp.c
-index baa93d0..1a852de 100644
---- a/unit/test-sdp.c
-+++ b/unit/test-sdp.c
-@@ -596,8 +596,10 @@ struct test_data {
- static gboolean send_pdu(gpointer user_data)
- {
- 	struct context *context = user_data;
-+	ssize_t len;
- 
--	write(context->fd, context->req_data, context->req_size);
-+	len = write(context->fd, context->req_data, context->req_size);
-+	g_assert(len > 0 && (size_t) len == context->req_size);
- 
- 	return FALSE;
- }
+
 -- 
-1.7.9.5
+Frederic Danis                            Open Source Technology Center
+frederic.danis@intel.com                              Intel Corporation
 
