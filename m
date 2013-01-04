@@ -1,212 +1,160 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: [PATCH BlueZ 2/3] gdbus: Simplify generated introspection
-Date: Thu,  3 Jan 2013 23:21:04 -0200
-Message-Id: <1357262465-19231-2-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1357262465-19231-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1357262465-19231-1-git-send-email-lucas.demarchi@profusion.mobi>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Liu, Chuansheng" <chuansheng.liu@intel.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+CC: "marcel@holtmann.org" <marcel@holtmann.org>, "johan.hedberg@gmail.com"
+	<johan.hedberg@gmail.com>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "Liu, Chuansheng" <chuansheng.liu@intel.com>
+Subject: RE: [PATCH] Bluetooth: fix the oops due to conn->hcon == NULL in
+ shutdown case
+Date: Fri, 4 Jan 2013 00:55:26 +0000
+Message-ID: <27240C0AC20F114CBF8149A2696CBE4A1FB42B@SHSMSX101.ccr.corp.intel.com>
+References: <1356429857.25456.4.camel@cliu38-desktop-build>
+ <20130103220258.GF2114@joana>
+In-Reply-To: <20130103220258.GF2114@joana>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Lucas De Marchi <lucas.de.marchi@gmail.com>
 
-The generated introspection is not supposed to be read as is by human,
-so there's no point in printing the indentation or writing more code to
-use auto-close tags.
 
-If it's desired to read the raw xml file, user can always use other
-tools to transform the output such as "xmllint --format".
+> -----Original Message-----
+> From: Gustavo Padovan [mailto:gustavo@padovan.org]
+> Sent: Friday, January 04, 2013 6:03 AM
+> To: Liu, Chuansheng
+> Cc: marcel@holtmann.org; johan.hedberg@gmail.com;
+> linux-bluetooth@vger.kernel.org; linux-kernel@vger.kernel.org
+> Subject: Re: [PATCH] Bluetooth: fix the oops due to conn->hcon =3D=3D NUL=
+L in
+> shutdown case
+>=20
+> Hi Chuansheng,
+>=20
+> * Chuansheng Liu <chuansheng.liu@intel.com> [2012-12-25 18:04:17 +0800]:
+>=20
+> >
+> > Meet one panic issue as below stack:
 
-This also fixes a missing </property> when property is deprecated.
----
- gdbus/object.c | 103 +++++++++++++++++++++------------------------------------
- 1 file changed, 38 insertions(+), 65 deletions(-)
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index b9cb284..2b6ae31 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -97,7 +97,7 @@ static void print_arguments(GString *gstr, const GDBusArgInfo *args,
- {
- 	for (; args && args->name; args++) {
- 		g_string_append_printf(gstr,
--					"\t\t\t<arg name=\"%s\" type=\"%s\"",
-+					"<arg name=\"%s\" type=\"%s\"",
- 					args->name, args->signature);
- 
- 		if (direction)
-@@ -109,15 +109,15 @@ static void print_arguments(GString *gstr, const GDBusArgInfo *args,
- 	}
- }
- 
--#define G_DBUS_ANNOTATE(prefix_, name_, value_)				\
--	prefix_ "<annotation name=\"org.freedesktop.DBus." name_ "\" "	\
--	"value=\"" value_ "\"/>\n"
-+#define G_DBUS_ANNOTATE(name_, value_)				\
-+	"<annotation name=\"org.freedesktop.DBus." name_ "\" "	\
-+	"value=\"" value_ "\"/>"
- 
--#define G_DBUS_ANNOTATE_DEPRECATED(prefix_) \
--	G_DBUS_ANNOTATE(prefix_, "Deprecated", "true")
-+#define G_DBUS_ANNOTATE_DEPRECATED \
-+	G_DBUS_ANNOTATE("Deprecated", "true")
- 
--#define G_DBUS_ANNOTATE_NOREPLY(prefix_) \
--	G_DBUS_ANNOTATE(prefix_, "Method.NoReply", "true")
-+#define G_DBUS_ANNOTATE_NOREPLY \
-+	G_DBUS_ANNOTATE("Method.NoReply", "true")
- 
- static gboolean check_experimental(int flags, int flag)
- {
-@@ -134,85 +134,58 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
- 	const GDBusPropertyTable *property;
- 
- 	for (method = iface->methods; method && method->name; method++) {
--		gboolean deprecated = method->flags &
--						G_DBUS_METHOD_FLAG_DEPRECATED;
--		gboolean noreply = method->flags &
--						G_DBUS_METHOD_FLAG_NOREPLY;
--
- 		if (check_experimental(method->flags,
- 					G_DBUS_METHOD_FLAG_EXPERIMENTAL))
- 			continue;
- 
--		if (!deprecated && !noreply &&
--				!(method->in_args && method->in_args->name) &&
--				!(method->out_args && method->out_args->name))
--			g_string_append_printf(gstr,
--						"\t\t<method name=\"%s\"/>\n",
--						method->name);
--		else {
-+		g_string_append_printf(gstr, "<method name=\"%s\">",
-+								method->name);
-+		print_arguments(gstr, method->in_args, "in");
-+		print_arguments(gstr, method->out_args, "out");
-+
-+		if (method->flags & G_DBUS_METHOD_FLAG_DEPRECATED)
- 			g_string_append_printf(gstr,
--						"\t\t<method name=\"%s\">\n",
--						method->name);
--			print_arguments(gstr, method->in_args, "in");
--			print_arguments(gstr, method->out_args, "out");
--
--			if (deprecated)
--				g_string_append_printf(gstr,
--					G_DBUS_ANNOTATE_DEPRECATED("\t\t\t"));
--			if (noreply)
--				g_string_append_printf(gstr,
--					G_DBUS_ANNOTATE_NOREPLY("\t\t\t"));
--
--			g_string_append_printf(gstr, "\t\t</method>\n");
--		}
-+						G_DBUS_ANNOTATE_DEPRECATED);
-+
-+		if (method->flags & G_DBUS_METHOD_FLAG_NOREPLY)
-+			g_string_append_printf(gstr, G_DBUS_ANNOTATE_NOREPLY);
-+
-+		g_string_append_printf(gstr, "</method>");
- 	}
- 
- 	for (signal = iface->signals; signal && signal->name; signal++) {
--		gboolean deprecated = signal->flags &
--						G_DBUS_SIGNAL_FLAG_DEPRECATED;
--
- 		if (check_experimental(signal->flags,
- 					G_DBUS_SIGNAL_FLAG_EXPERIMENTAL))
- 			continue;
- 
--		if (!deprecated && !(signal->args && signal->args->name))
--			g_string_append_printf(gstr,
--						"\t\t<signal name=\"%s\"/>\n",
--						signal->name);
--		else {
--			g_string_append_printf(gstr,
--						"\t\t<signal name=\"%s\">\n",
--						signal->name);
--			print_arguments(gstr, signal->args, NULL);
-+		g_string_append_printf(gstr, "<signal name=\"%s\">",
-+								signal->name);
-+		print_arguments(gstr, signal->args, NULL);
- 
--			if (deprecated)
--				g_string_append_printf(gstr,
--					G_DBUS_ANNOTATE_DEPRECATED("\t\t\t"));
-+		if (signal->flags & G_DBUS_SIGNAL_FLAG_DEPRECATED)
-+			g_string_append_printf(gstr,
-+						G_DBUS_ANNOTATE_DEPRECATED);
- 
--			g_string_append_printf(gstr, "\t\t</signal>\n");
--		}
-+		g_string_append_printf(gstr, "</signal>\n");
- 	}
- 
- 	for (property = iface->properties; property && property->name;
- 								property++) {
--		gboolean deprecated = property->flags &
--					G_DBUS_PROPERTY_FLAG_DEPRECATED;
--
- 		if (check_experimental(property->flags,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL))
- 			continue;
- 
--		g_string_append_printf(gstr, "\t\t<property name=\"%s\""
--					" type=\"%s\" access=\"%s%s\"",
-+		g_string_append_printf(gstr, "<property name=\"%s\""
-+					" type=\"%s\" access=\"%s%s\">",
- 					property->name,	property->type,
- 					property->get ? "read" : "",
- 					property->set ? "write" : "");
- 
--		if (!deprecated)
--			g_string_append_printf(gstr, "/>\n");
--		else
-+		if (property->flags & G_DBUS_PROPERTY_FLAG_DEPRECATED)
- 			g_string_append_printf(gstr,
--				G_DBUS_ANNOTATE_DEPRECATED(">\n\t\t\t"));
-+						G_DBUS_ANNOTATE_DEPRECATED);
-+
-+		g_string_append_printf(gstr, "</property>");
- 	}
- }
- 
-@@ -228,30 +201,30 @@ static void generate_introspection_xml(DBusConnection *conn,
- 
- 	gstr = g_string_new(DBUS_INTROSPECT_1_0_XML_DOCTYPE_DECL_NODE);
- 
--	g_string_append_printf(gstr, "<node>\n");
-+	g_string_append_printf(gstr, "<node>");
- 
- 	for (list = data->interfaces; list; list = list->next) {
- 		struct interface_data *iface = list->data;
- 
--		g_string_append_printf(gstr, "\t<interface name=\"%s\">\n",
-+		g_string_append_printf(gstr, "<interface name=\"%s\">",
- 								iface->name);
- 
- 		generate_interface_xml(gstr, iface);
- 
--		g_string_append_printf(gstr, "\t</interface>\n");
-+		g_string_append_printf(gstr, "</interface>");
- 	}
- 
- 	if (!dbus_connection_list_registered(conn, path, &children))
- 		goto done;
- 
- 	for (i = 0; children[i]; i++)
--		g_string_append_printf(gstr, "\t<node name=\"%s\"/>\n",
-+		g_string_append_printf(gstr, "<node name=\"%s\"/>",
- 								children[i]);
- 
- 	dbus_free_string_array(children);
- 
- done:
--	g_string_append_printf(gstr, "</node>\n");
-+	g_string_append_printf(gstr, "</node>");
- 
- 	data->introspect = g_string_free(gstr, FALSE);
- }
--- 
-1.8.1
+> > Disassemble the code:
+> > base address of __sco_sock_close is 0xc184f410
+> > 0xc184f4f8 <+232>:   lock decl 0x8(%ebx) < =3D=3D crash here, ebx is 0x=
+0,
+> >
+> > the related source code is:
+> > (gdb) l *0xc184f4f8
+> > 0xc184f4f8 is in __sco_sock_close (arch/x86/include/asm/atomic.h:123)
+> > 119     static inline int atomic_dec_and_test(atomic_t *v)
+> > 123             asm volatile(LOCK_PREFIX "decl %0; sete %1"
+> >
+> > The whole call stack is:
+> > sys_shutdown()
+> >   sco_sock_shutdown()
+> >     __sco_sock_close()
+> >       hci_conn_put()
+> >         atomic_dec_and_test()
+> >
+> > Due to the conn->hcon is NULL, and the member hcon->refcnt is at offset=
+ 0x8,
+> > so "BUG: unable to handle kernel NULL pointer dereference at 00000008"
+> > appears.
+Could you add the above crash info to indicate where crashed? Thanks.
 
+> >
+> > Here fix it that adding the condition if conn->hcon is NULL, just like
+> > in sco_chan_del().
+> >
+> > Signed-off-by: liu chuansheng <chuansheng.liu@intel.com>
+> > ---
+> >  net/bluetooth/sco.c |    6 ++++--
+> >  1 files changed, 4 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> > index 531a93d..190f70c 100644
+> > --- a/net/bluetooth/sco.c
+> > +++ b/net/bluetooth/sco.c
+> > @@ -355,8 +355,10 @@ static void __sco_sock_close(struct sock *sk)
+> >  		if (sco_pi(sk)->conn) {
+> >  			sk->sk_state =3D BT_DISCONN;
+> >  			sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
+> > -			hci_conn_put(sco_pi(sk)->conn->hcon);
+> > -			sco_pi(sk)->conn->hcon =3D NULL;
+> > +			if (sco_pi(sk)->conn->hcon) {
+> > +				hci_conn_put(sco_pi(sk)->conn->hcon);
+> > +				sco_pi(sk)->conn->hcon =3D NULL;
+> > +			}
+> >  		} else
+> >  			sco_chan_del(sk, ECONNRESET);
+> >  		break;
+>=20
+> Please check if the following patch fixes the issue for you:
+>=20
+> commit ae5668c1fc155d3034d0eedcdb52798390975a39 (HEAD, master)
+> Author: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> Date:   Thu Jan 3 19:59:28 2013 -0200
+>=20
+>     Bluetooth: Check if the hci connection exists in SCO shutdown
+>=20
+>     Checking only for sco_conn seems to not be enough and lead to NULL
+>     dereferences in the code, check for hcon instead.
+>=20
+>     <1>[11340.226404] BUG: unable to handle kernel NULL pointer
+> dereference at
+>     0000000
+>     8
+>     <4>[11340.226619] EIP is at __sco_sock_close+0xe8/0x1a0
+>     <4>[11340.226629] EAX: f063a740 EBX: 00000000 ECX: f58f4544 EDX:
+> 00000000
+>     <4>[11340.226640] ESI: dec83e00 EDI: 5f9a081f EBP: e0fdff38 ESP:
+> e0fdff1c
+>     <0>[11340.226674] Stack:
+>     <4>[11340.226682]  c184db87 c1251028 dec83e00 e0fdff38 c1754aef
+> dec83e00
+>     00000000
+>     e0fdff5c
+>     <4>[11340.226718]  c184f587 e0fdff64 e0fdff68 5f9a081f e0fdff5c
+> c1751852
+>     d7813800
+>     62262f10
+>     <4>[11340.226752]  e0fdff70 c1753c00 00000000 00000001 0000000d
+> e0fdffac
+>     c175425c
+>     00000041
+>     <0>[11340.226793] Call Trace:
+>     <4>[11340.226813]  [<c184db87>] ? sco_sock_clear_timer+0x27/0x60
+>     <4>[11340.226831]  [<c1251028>] ? local_bh_enable+0x68/0xd0
+>     <4>[11340.226846]  [<c1754aef>] ? lock_sock_nested+0x4f/0x60
+>     <4>[11340.226862]  [<c184f587>] sco_sock_shutdown+0x67/0xb0
+>     <4>[11340.226879]  [<c1751852>] ? sockfd_lookup_light+0x22/0x80
+>     <4>[11340.226897]  [<c1753c00>] sys_shutdown+0x30/0x60
+>     <4>[11340.226912]  [<c175425c>] sys_socketcall+0x1dc/0x2a0
+>     <4>[11340.226929]  [<c149ba78>] ? trace_hardirqs_on_thunk+0xc/0x10
+>     <4>[11340.226944]  [<c18860f1>] syscall_call+0x7/0xb
+>     <4>[11340.226960]  [<c1880000>] ? restore_cur+0x5e/0xd7
+>     <0>[11340.226969] Code: <f0> ff 4b 08 0f 94 c0 84 c0 74 20 80 7b 19 0=
+1 74
+>     2f b8 0a 00 00
+>=20
+>     Reported-by: Chuansheng Liu <chuansheng.liu@intel.com>
+>     Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+>=20
+> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> index 531a93d..57f250c 100644
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -352,7 +352,7 @@ static void __sco_sock_close(struct sock *sk)
+>=20
+>  	case BT_CONNECTED:
+>  	case BT_CONFIG:
+> -		if (sco_pi(sk)->conn) {
+> +		if (sco_pi(sk)->conn->hcon) {
+Your fix is incomplete, at least it should be:
+		if ( (sco_pi(sk)->conn) && (sco_pi(sk)->conn->hcon)) {
+Otherwise, it will bring another crash case. So could you add signed-off-by=
+ me also?
+Although it is not easy to reproduce, thanks.
+Signed-off-by: liu chuansheng <chuansheng.liu@intel.com>
+
+>  			sk->sk_state =3D BT_DISCONN;
+>  			sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
+>  			hci_conn_put(sco_pi(sk)->conn->hcon);
