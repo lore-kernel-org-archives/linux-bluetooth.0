@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 8/8 v2] player: Add Device property
-Date: Fri,  4 Jan 2013 14:39:57 +0200
-Message-Id: <1357303197-19673-8-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 5/8 v2] AVRCP: Always create a controller player even for version 1.0
+Date: Fri,  4 Jan 2013 14:39:54 +0200
+Message-Id: <1357303197-19673-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1357303197-19673-1-git-send-email-luiz.dentz@gmail.com>
 References: <1357303197-19673-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,80 +11,97 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Device property indicates which device object the player belongs to.
+Since the buttons controls are now part of the MediaPlayer1 it can be used
+even with AVRCP version 1.0.
 ---
- doc/media-api.txt       |  4 ++++
- profiles/audio/player.c | 14 ++++++++++++++
- 2 files changed, 18 insertions(+)
+ profiles/audio/avrcp.c | 33 +++++++++++++++++----------------
+ 1 file changed, 17 insertions(+), 16 deletions(-)
 
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index 12a2d7a..e2cafd1 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -288,6 +288,10 @@ Properties	string Equalizer [readwrite]
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 99741e8..74ef3ea 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -1952,6 +1952,9 @@ static bool ct_set_setting(struct media_player *mp, const char *key,
+ 	if (session == NULL)
+ 		return false;
  
- 					Track duration in milliseconds
- 
-+		object Device [readonly]
++	if (session->version < 0x0103)
++		return false;
 +
-+			Device object path.
-+
- MediaEndpoint1 hierarchy
- ========================
- 
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index 81bb7fe..bac5649 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -56,6 +56,7 @@ struct pending_req {
- };
- 
- struct media_player {
-+	char			*device;	/* Device path */
- 	char			*path;		/* Player object path */
- 	GHashTable		*settings;	/* Player settings */
- 	GHashTable		*track;		/* Player current track */
-@@ -239,6 +240,16 @@ static gboolean get_track(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
-+static gboolean get_device(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_player *mp = data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &mp->device);
-+
-+	return TRUE;
-+}
-+
- static DBusMessage *media_player_play(DBusConnection *conn, DBusMessage *msg,
- 								void *data)
+ 	attr = attr_to_val(key);
+ 	if (attr < 0)
+ 		return false;
+@@ -2063,24 +2066,15 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
+ 					void *user_data)
  {
-@@ -417,6 +428,7 @@ static const GDBusPropertyTable media_player_properties[] = {
- 	{ "Shuffle", "s", get_setting, set_setting, setting_exists },
- 	{ "Scan", "s", get_setting, set_setting, setting_exists },
- 	{ "Track", "a{sv}", get_track, NULL, NULL },
-+	{ "Device", "s", get_device, NULL, NULL },
- 	{ }
- };
+ 	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct media_player *mp;
+ 	struct avrcp_header *pdu = (void *) operands;
+ 	uint16_t events = 0;
+ 	uint8_t count;
+-	const char *path;
  
-@@ -442,6 +454,7 @@ void media_player_destroy(struct media_player *mp)
- 	g_free(mp->cb);
- 	g_free(mp->status);
- 	g_free(mp->path);
-+	g_free(mp->device);
- 	g_free(mp);
+ 	if (pdu->params[0] != CAP_EVENTS_SUPPORTED)
+ 		return FALSE;
+ 
+ 	count = pdu->params[1];
+ 
+-	path = device_get_path(session->dev->btd_dev);
+-
+-	mp = media_player_controller_create(path);
+-	if (mp == NULL)
+-		return FALSE;
+-
+ 	for (; count > 0; count--) {
+ 		uint8_t event = pdu->params[1 + count];
+ 
+@@ -2095,10 +2089,6 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
+ 		}
+ 	}
+ 
+-	media_player_set_callbacks(mp, &ct_cbs, player);
+-	player->user_data = mp;
+-	player->destroy = (GDestroyNotify) media_player_destroy;
+-
+ 	if (!(events & (1 << AVRCP_EVENT_SETTINGS_CHANGED)))
+ 		avrcp_list_player_attributes(session);
+ 
+@@ -2185,6 +2175,8 @@ static void session_tg_init(struct avrcp *session)
+ static void session_ct_init(struct avrcp *session)
+ {
+ 	struct avrcp_player *player;
++	struct media_player *mp;
++	const char *path;
+ 
+ 	session->control_handlers = ct_control_handlers;
+ 
+@@ -2195,13 +2187,22 @@ static void session_ct_init(struct avrcp *session)
+ 							handle_vendordep_pdu,
+ 							session);
+ 
+-	if (session->version < 0x0103)
+-		return;
+-
+ 	player = g_new0(struct avrcp_player, 1);
+ 	player->sessions = g_slist_prepend(player->sessions, session);
+ 	session->player = player;
+ 
++	path = device_get_path(session->dev->btd_dev);
++
++	mp = media_player_controller_create(path);
++	if (mp != NULL) {
++		media_player_set_callbacks(mp, &ct_cbs, player);
++		player->user_data = mp;
++		player->destroy = (GDestroyNotify) media_player_destroy;
++	}
++
++	if (session->version < 0x0103)
++		return;
++
+ 	avrcp_get_capabilities(session);
  }
  
-@@ -450,6 +463,7 @@ struct media_player *media_player_controller_create(const char *path)
- 	struct media_player *mp;
- 
- 	mp = g_new0(struct media_player, 1);
-+	mp->device = g_strdup(path);
- 	mp->path = g_strdup_printf("%s/player1", path);
- 	mp->settings = g_hash_table_new_full(g_str_hash, g_str_equal,
- 							g_free, g_free);
 -- 
 1.8.0.1
 
