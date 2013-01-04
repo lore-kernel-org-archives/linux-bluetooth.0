@@ -2,42 +2,33 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: [RFC] gdbus: Process changes upon ObjectManager.GetManagedObjects
-Date: Thu,  3 Jan 2013 23:50:34 -0200
-Message-Id: <1357264234-20429-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ 1/3] build: Do not use deprecated AM_CONFIG_HEADER
+Date: Thu,  3 Jan 2013 23:21:03 -0200
+Message-Id: <1357262465-19231-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Lucas De Marchi <lucas.de.marchi@gmail.com>
 
-If ObjectManager.GetManagedObjects is called, we need to flush all
-pending signals for interfaces added/removed, otherwise we might answer
-the method saying an interface exists but never send a signal when it's
-removed.
+The long-obsoleted AM_CONFIG_HEADER macro was removed in automake 1.13.
+Use AC_CONFIG_HEADERS instead.
 ---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-It's an RFC because it's untested. If anyone can write a proper unit test for
-this, it would be good. Otherwise I can probably do it in the weekend.
-
- gdbus/object.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 2b6ae31..3d9ab5f 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -1108,6 +1108,11 @@ static DBusMessage *get_objects(DBusConnection *connection,
- 	if (reply == NULL)
- 		return NULL;
+diff --git a/configure.ac b/configure.ac
+index cdfc013..e8193ca 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3,7 +3,7 @@ AC_INIT(bluez, 5.0)
  
-+	if (data->process_id > 0) {
-+		g_source_remove(data->process_id);
-+		process_changes(data);
-+	}
-+
- 	dbus_message_iter_init_append(reply, &iter);
+ AM_INIT_AUTOMAKE([foreign subdir-objects color-tests silent-rules
+ 					tar-pax no-dist-gzip dist-xz])
+-AM_CONFIG_HEADER(config.h)
++AC_CONFIG_HEADERS(config.h)
+ AC_USE_SYSTEM_EXTENSIONS
  
- 	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 -- 
 1.8.1
 
