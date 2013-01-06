@@ -1,33 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 1/3] input: Fix buffer overflow when parsing HID SDP record
-Date: Sun,  6 Jan 2013 11:26:52 -0400
-Message-Id: <1357486014-24600-1-git-send-email-anderson.lizardo@openbossa.org>
+Date: Sun, 6 Jan 2013 15:09:02 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] gdbus: Fix memory leak on properties_set()
+Message-ID: <20130106130902.GA8751@x220.Elisa>
+References: <1357433266-31642-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1357433266-31642-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If Service Description for HID service is greater than 126 characters,
-req->name will overflow while being concatenated with Provider Name. Fix
-by reserving space for the whitespace used for separator.
----
- profiles/input/device.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Lizardo,
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index 9ab7509..6c152f3 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -212,7 +212,7 @@ static void extract_hid_record(sdp_record_t *rec, struct hidp_connadd_req *req)
- 	if (pdlist) {
- 		if (pdlist2) {
- 			if (strncmp(pdlist->val.str, pdlist2->val.str, 5)) {
--				strncpy(req->name, pdlist2->val.str, 127);
-+				strncpy(req->name, pdlist2->val.str, 126);
- 				strcat(req->name, " ");
- 			}
- 			strncat(req->name, pdlist->val.str, 127 - strlen(req->name));
--- 
-1.7.9.5
+On Sat, Jan 05, 2013, Anderson Lizardo wrote:
+> The pointer returned by dbus_message_iter_get_signature() must be freed
+> with dbus_free().
+> 
+> Fixes this memory leak:
+> 
+> ==1857== 16 bytes in 1 blocks are definitely lost in loss record 104 of
+> 251
+> ==1857==    at 0x402BF52: realloc (in
+> /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+> ==1857==    by 0x415E286: dbus_realloc (in
+> /lib/i386-linux-gnu/libdbus-1.so.3.5.8)
+> ==1857==    by 0x415E70B: ??? (in
+> /lib/i386-linux-gnu/libdbus-1.so.3.5.8)
+> ==1857==    by 0x415F17B: ??? (in
+> /lib/i386-linux-gnu/libdbus-1.so.3.5.8)
+> ==1857==    by 0x414CB33: dbus_message_iter_get_signature (in
+> /lib/i386-linux-gnu/libdbus-1.so.3.5.8)
+> ==1857==    by 0x8053239: properties_set (object.c:899)
+> ==1857==    by 0x5FFFFF: ???
+> ==1857==
+> ---
+>  gdbus/object.c |    7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 
+Applied. Thanks.
+
+Johan
