@@ -1,67 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Sun, 6 Jan 2013 23:26:37 -0700
-Message-ID: <CAH9efyhykOAy=M_4b9gQ89nkRERomiNyp8GJC=-XeDYTbkPwjw@mail.gmail.com>
-Subject: Question about using bluetooth in Linux
-From: William Lee <w90043@gmail.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=Big5
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH] Bluetooth: Fix incorrect strncpy() in hidp_setup_hid()
+Date: Sun,  6 Jan 2013 18:28:53 -0400
+Message-Id: <1357511333-5276-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Is it possible to make a linux machine with bluetooth dongle to
-perform as a HID device visible and workable with other bluetooth
-host? I am new to this field so would like to ask for some information
-here.
+The length parameter should be sizeof(req->name) - 1 because there is no
+guarantee that string provided by userspace will contain the trailing
+'\0'.
 
-Thanks,
+Can be easily reproduced by manually setting req->name to 128 non-zero
+bytes prior to ioctl(HIDPCONNADD) and checking the device name setup on
+input subsystem:
 
-William Lee
+$ cat /sys/devices/pnp0/00\:04/tty/ttyS0/hci0/hci0\:1/input8/name
+AAAAAA[...]AAAAAAAAf0:af:f0:af:f0:af
 
+("f0:af:f0:af:f0:af" is the device bluetooth address, taken from "phys"
+field in struct hid_device due to overflow.)
 
----------- Forwarded message ----------
-From: William Lee <william.lee@utah.edu>
-Date: 2013/1/6
-Subject: FW: Welcome to linux-bluetooth
-To: "w90043@gmail.com" <w90043@gmail.com>
+Signed-off-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
+---
+ net/bluetooth/hidp/core.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index 0c00284..33600b4 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -931,7 +931,7 @@ static int hidp_setup_hid(struct hidp_session *session,
+ 	hid->version = req->version;
+ 	hid->country = req->country;
+ 
+-	strncpy(hid->name, req->name, 128);
++	strncpy(hid->name, req->name, sizeof(req->name) - 1);
+ 
+ 	snprintf(hid->phys, sizeof(hid->phys), "%pMR",
+ 		 &bt_sk(session->ctrl_sock->sk)->src);
+-- 
+1.7.9.5
 
-
-
-
-________________________________________
-寄件者: Majordomo@vger.kernel.org
-寄件日期: 2013年1月6日 下午 11:17:12 (UTC-07:00) 區時間 (美國和加拿大)
-收件者: William Lee
-主旨: Welcome to linux-bluetooth
-
---
-
-Welcome to the linux-bluetooth mailing list!
-
-Please save this message for future reference.  Thank you.
-
-If you ever want to remove yourself from this mailing list,
-you can send mail to <Majordomo@vger.kernel.org> with the following
-command in the body of your email message:
-
-    unsubscribe linux-bluetooth
-
-or from another account, besides william.lee@utah.edu:
-
-    unsubscribe linux-bluetooth william.lee@utah.edu
-
-If you ever need to get in contact with the owner of the list,
-(if you have trouble unsubscribing, or have questions about the
-list itself) send email to <owner-linux-bluetooth@vger.kernel.org> .
-This is the general rule for most mailing lists when you need
-to contact a human.
-
- Here's the general information for the list you've subscribed to,
- in case you don't already have it:
-
-        Linux Bluetooth discussion
-
-Archives:
-        http://dir.gmane.org/gmane.linux.bluez.kernel
-        http://www.spinics.net/lists/linux-bluetooth/
