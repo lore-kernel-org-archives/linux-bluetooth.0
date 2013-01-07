@@ -2,73 +2,69 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 5/5] health: Use SDP_IS_TEXT_STR()/SDP_IS_SEQ() where possible
-Date: Mon,  7 Jan 2013 07:56:35 -0400
-Message-Id: <1357559795-22090-5-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 4/5] lib: Use SDP_IS_TEXT_STR()/SDP_IS_SEQ() where possible
+Date: Mon,  7 Jan 2013 07:56:34 -0400
+Message-Id: <1357559795-22090-4-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1357559795-22090-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1357559795-22090-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- profiles/health/hdp_util.c |   18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+ lib/sdp.c |   12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/profiles/health/hdp_util.c b/profiles/health/hdp_util.c
-index 5799ae5..5f81806 100644
---- a/profiles/health/hdp_util.c
-+++ b/profiles/health/hdp_util.c
-@@ -767,15 +767,13 @@ static gboolean get_mdep_from_rec(const sdp_record_t *rec, uint8_t role,
- 		return TRUE;
+diff --git a/lib/sdp.c b/lib/sdp.c
+index 2dac6c7..ca474cd 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -570,7 +570,7 @@ static void extract_svclass_uuid(sdp_data_t *data, uuid_t *uuid)
+ {
+ 	sdp_data_t *d;
  
- 	list = sdp_data_get(rec, SDP_ATTR_SUPPORTED_FEATURES_LIST);
--	if (list == NULL || (list->dtd != SDP_SEQ8 && list->dtd != SDP_SEQ16 &&
--							list->dtd != SDP_SEQ32))
-+	if (list == NULL || !SDP_IS_SEQ(list->dtd))
- 		return FALSE;
+-	if (!data || data->dtd < SDP_SEQ8 || data->dtd > SDP_SEQ32)
++	if (!data || !SDP_IS_SEQ(data->dtd))
+ 		return;
  
- 	for (feat = list->val.dataseq; feat; feat = feat->next) {
- 		sdp_data_t *data_type, *mdepid, *role_t, *desc_t;
+ 	d = data->val.dataseq;
+@@ -1912,7 +1912,7 @@ int sdp_get_uuidseq_attr(const sdp_record_t *rec, uint16_t attr,
+ 	sdp_data_t *sdpdata = sdp_data_get(rec, attr);
  
--		if (feat->dtd != SDP_SEQ8 && feat->dtd != SDP_SEQ16 &&
--						feat->dtd != SDP_SEQ32)
-+		if (!SDP_IS_SEQ(feat->dtd))
- 			continue;
+ 	*seqp = NULL;
+-	if (sdpdata && sdpdata->dtd >= SDP_SEQ8 && sdpdata->dtd <= SDP_SEQ32) {
++	if (sdpdata && SDP_IS_SEQ(sdpdata->dtd)) {
+ 		sdp_data_t *d;
+ 		for (d = sdpdata->val.dataseq; d; d = d->next) {
+ 			uuid_t *u;
+@@ -2128,9 +2128,7 @@ int sdp_get_string_attr(const sdp_record_t *rec, uint16_t attrid, char *value,
+ 	sdp_data_t *sdpdata = sdp_data_get(rec, attrid);
+ 	if (sdpdata)
+ 		/* Verify that it is what the caller expects */
+-		if (sdpdata->dtd == SDP_TEXT_STR8 ||
+-				sdpdata->dtd == SDP_TEXT_STR16 ||
+-				sdpdata->dtd == SDP_TEXT_STR32)
++		if (SDP_IS_TEXT_STR(sdpdata->dtd))
+ 			if ((int) strlen(sdpdata->val.str) < valuelen) {
+ 				strcpy(value, sdpdata->val.str);
+ 				return 0;
+@@ -4744,7 +4742,7 @@ int sdp_get_supp_feat(const sdp_record_t *rec, sdp_list_t **seqp)
  
- 		mdepid = feat->val.dataseq;
-@@ -803,10 +801,8 @@ static gboolean get_mdep_from_rec(const sdp_record_t *rec, uint8_t role,
- 		if (mdep != NULL)
- 			*mdep = mdepid->val.uint8;
+ 	sdpdata = sdp_data_get(rec, SDP_ATTR_SUPPORTED_FEATURES_LIST);
  
--		if (desc != NULL  && desc_t != NULL  &&
--					(desc_t->dtd == SDP_TEXT_STR8 ||
--					desc_t->dtd == SDP_TEXT_STR16  ||
--					desc_t->dtd == SDP_TEXT_STR32))
-+		if (desc != NULL && desc_t != NULL &&
-+						SDP_IS_TEXT_STR(desc_t->dtd))
- 			*desc = g_strdup(desc_t->val.str);
+-	if (!sdpdata || sdpdata->dtd < SDP_SEQ8 || sdpdata->dtd > SDP_SEQ32)
++	if (!sdpdata || !SDP_IS_SEQ(sdpdata->dtd))
+ 		return sdp_get_uuidseq_attr(rec,
+ 					SDP_ATTR_SUPPORTED_FEATURES_LIST, seqp);
  
- 		return TRUE;
-@@ -887,8 +883,7 @@ static gboolean get_prot_desc_entry(sdp_data_t *entry, int type, guint16 *val)
- 	sdp_data_t *iter;
- 	int proto;
+@@ -4752,7 +4750,7 @@ int sdp_get_supp_feat(const sdp_record_t *rec, sdp_list_t **seqp)
+ 		sdp_data_t *dd;
+ 		sdp_list_t *subseq;
  
--	if (entry == NULL || (entry->dtd != SDP_SEQ8 &&
--			entry->dtd != SDP_SEQ16 && entry->dtd != SDP_SEQ32))
-+	if (entry == NULL || !SDP_IS_SEQ(entry->dtd))
- 		return FALSE;
+-		if (d->dtd < SDP_SEQ8 || d->dtd > SDP_SEQ32)
++		if (!SDP_IS_SEQ(d->dtd))
+ 			goto fail;
  
- 	iter = entry->val.dataseq;
-@@ -920,8 +915,7 @@ static gboolean hdp_get_prot_desc_list(const sdp_record_t *rec, guint16 *psm,
- 		return TRUE;
- 
- 	pdl = sdp_data_get(rec, SDP_ATTR_PROTO_DESC_LIST);
--	if (pdl == NULL || (pdl->dtd != SDP_SEQ8 && pdl->dtd != SDP_SEQ16 &&
--							pdl->dtd != SDP_SEQ32))
-+	if (pdl == NULL || !SDP_IS_SEQ(pdl->dtd))
- 		return FALSE;
- 
- 	p0 = pdl->val.dataseq;
+ 		subseq = NULL;
 -- 
 1.7.9.5
 
