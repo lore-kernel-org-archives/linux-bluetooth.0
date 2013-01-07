@@ -1,273 +1,208 @@
 Return-Path: <cyrus@holtmann.org>
 From: Paulo Borges <paulo.borges@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH 3/9] battery: Add GATT Battery Client Service skeleton
-Date: Mon,  7 Jan 2013 16:40:58 -0300
-Message-Id: <1357587664-16818-4-git-send-email-paulo.borges@openbossa.org>
+Cc: Paulo Borges <paulo.borges@openbossa.org>
+Subject: [PATCH 9/9] battery: Support persistent battery level
+Date: Mon,  7 Jan 2013 16:41:04 -0300
+Message-Id: <1357587664-16818-10-git-send-email-paulo.borges@openbossa.org>
 In-Reply-To: <1357587664-16818-1-git-send-email-paulo.borges@openbossa.org>
 References: <1357587664-16818-1-git-send-email-paulo.borges@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chen Ganir <chen.ganir@ti.com>
-
-Add support for the Battery Service Gatt Client side. Implement
-the basic skeleton.
+Store battery level when read, and use the level from storage
+when connecting, to reduce GATT traffic.
 ---
- Makefile.plugins           |    3 +
- lib/uuid.h                 |    2 +
- profiles/battery/battery.c |  214 ++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 219 insertions(+)
- create mode 100644 profiles/battery/battery.c
+ profiles/battery/battery.c |  137 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 135 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index faab011..33694b1 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -79,6 +79,9 @@ builtin_sources += profiles/scanparam/scan.c
- builtin_modules += deviceinfo
- builtin_sources += profiles/deviceinfo/deviceinfo.c
- 
-+builtin_modules += battery
-+builtin_sources += profiles/battery/battery.c
-+
- if EXPERIMENTAL
- builtin_modules += alert
- builtin_sources += profiles/alert/server.c
-diff --git a/lib/uuid.h b/lib/uuid.h
-index 1e8188a..8736749 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -56,6 +56,8 @@ extern "C" {
- #define PNPID_UUID		"00002a50-0000-1000-8000-00805f9b34fb"
- #define DEVICE_INFORMATION_UUID	"0000180a-0000-1000-8000-00805f9b34fb"
- 
-+#define BATTERY_SERVICE_UUID	"0000180f-0000-1000-8000-00805f9b34fb"
-+
- #define GATT_UUID		"00001801-0000-1000-8000-00805f9b34fb"
- #define IMMEDIATE_ALERT_UUID	"00001802-0000-1000-8000-00805f9b34fb"
- #define LINK_LOSS_UUID		"00001803-0000-1000-8000-00805f9b34fb"
 diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
-new file mode 100644
-index 0000000..73c06ff
---- /dev/null
+index 2ef4f6b..e4a6e53 100644
+--- a/profiles/battery/battery.c
 +++ b/profiles/battery/battery.c
-@@ -0,0 +1,214 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012 Texas Instruments, Inc.
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
+@@ -27,6 +27,8 @@
+ #include <glib.h>
+ #include <bluetooth/uuid.h>
+ #include <stdbool.h>
++#include <sys/file.h>
++#include <stdlib.h>
+ 
+ #include "adapter.h"
+ #include "device.h"
+@@ -37,6 +39,11 @@
+ #include "attrib/gatt.h"
+ #include "attio.h"
+ #include "log.h"
++#include "storage.h"
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <glib.h>
-+#include <bluetooth/uuid.h>
-+#include <stdbool.h>
-+
-+#include "adapter.h"
-+#include "device.h"
-+#include "profile.h"
-+#include "plugin.h"
-+#include "attrib/att.h"
-+#include "attrib/gattrib.h"
-+#include "attrib/gatt.h"
-+#include "attio.h"
-+#include "log.h"
-+
-+struct battery {
-+	struct btd_device	*dev;		/* Device reference */
-+	GAttrib			*attrib;	/* GATT connection */
-+	guint			attioid;	/* Att watcher id */
-+	struct att_range	*svc_range;	/* Battery range */
-+	GSList			*chars;		/* Characteristics */
-+};
-+
-+struct characteristic {
-+	struct gatt_char	attr;		/* Characteristic */
-+	struct battery		*batt;		/* Parent Battery Service */
-+};
-+
-+static GSList *servers;
-+
-+static gint cmp_device(gconstpointer a, gconstpointer b)
++#define BATTERY_FILE		"batteries"
++#define BATTERY_GROUP_FORMAT	"%04X"
++#define BATTERY_KEY_LEVEL	"Level"
+ 
+ struct battery {
+ 	struct btd_device	*dev;		/* Device reference */
+@@ -77,10 +84,133 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
+ 	return -1;
+ }
+ 
++static gboolean store_battery_char(struct characteristic *chr)
 +{
-+	const struct battery *batt = a;
-+	const struct btd_device *dev = b;
++	GKeyFile *key_file;
++	char filename[PATH_MAX + 1];
++	char adapter_addr[18];
++	char device_addr[18];
++	char group[5];
++	char *str;
++	gsize length = 0;
 +
-+	if (dev == batt->dev)
++	ba2str(adapter_get_address(device_get_adapter(chr->batt->dev)),
++								adapter_addr);
++	ba2str(device_get_address(chr->batt->dev), device_addr);
++
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/" BATTERY_FILE,
++						adapter_addr, device_addr);
++
++	snprintf(group, sizeof(group), BATTERY_GROUP_FORMAT, chr->attr.handle);
++
++	key_file = g_key_file_new();
++	g_key_file_load_from_file(key_file, filename, 0, NULL);
++
++	g_key_file_set_integer(key_file, group, BATTERY_KEY_LEVEL, chr->level);
++
++	create_file(filename, S_IRUSR | S_IWUSR);
++
++	str = g_key_file_to_data(key_file, &length, NULL);
++	g_file_set_contents(filename, str, length, NULL);
++
++	g_free(str);
++	g_key_file_free(key_file);
++
++	return TRUE;
++}
++
++static int read_battery_char(struct characteristic *chr)
++{
++	GKeyFile *key_file;
++	char filename[PATH_MAX + 1];
++	char adapter_addr[18];
++	char device_addr[18];
++	char group[5];
++	int chr_value;
++
++	ba2str(adapter_get_address(device_get_adapter(chr->batt->dev)),
++								adapter_addr);
++	ba2str(device_get_address(chr->batt->dev), device_addr);
++
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/" BATTERY_FILE,
++						adapter_addr, device_addr);
++
++	snprintf(group, sizeof(group), BATTERY_GROUP_FORMAT, chr->attr.handle);
++
++	key_file = g_key_file_new();
++	if (!g_key_file_load_from_file(key_file, filename, 0, NULL)) {
++		g_key_file_free(key_file);
 +		return 0;
++	}
 +
-+	return -1;
++	chr_value = g_key_file_get_integer(key_file, group, BATTERY_KEY_LEVEL,
++									NULL);
++	g_key_file_free(key_file);
++
++	return chr_value;
 +}
 +
-+static void battery_free(gpointer user_data)
++static void del_battery_char(struct characteristic *chr)
 +{
-+	struct battery *batt = user_data;
++	GKeyFile *key_file;
++	char filename[PATH_MAX + 1];
++	char adapter_addr[18];
++	char device_addr[18];
++	char group[5];
++	char *str;
++	gsize length = 0;
 +
-+	if (batt->chars != NULL)
-+		g_slist_free_full(batt->chars, g_free);
++	ba2str(adapter_get_address(device_get_adapter(chr->batt->dev)),
++								adapter_addr);
++	ba2str(device_get_address(chr->batt->dev), device_addr);
 +
-+	if (batt->attioid > 0)
-+		btd_device_remove_attio_callback(batt->dev, batt->attioid);
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/" BATTERY_FILE,
++						adapter_addr, device_addr);
 +
-+	if (batt->attrib != NULL)
-+		g_attrib_unref(batt->attrib);
++	snprintf(group, sizeof(group), BATTERY_GROUP_FORMAT, chr->attr.handle);
 +
-+	btd_device_unref(batt->dev);
-+	g_free(batt);
-+}
-+
-+static void configure_battery_cb(GSList *characteristics, guint8 status,
-+							gpointer user_data)
-+{
-+	struct battery *batt = user_data;
-+	GSList *l;
-+
-+	if (status != 0) {
-+		error("Discover Battery characteristics: %s",
-+							att_ecode2str(status));
++	key_file = g_key_file_new();
++	if (!g_key_file_load_from_file(key_file, filename, 0, NULL)) {
++		g_key_file_free(key_file);
 +		return;
 +	}
 +
-+	for (l = characteristics; l; l = l->next) {
-+		struct gatt_char *c = l->data;
-+		struct characteristic *ch;
++	g_key_file_remove_key(key_file, group, BATTERY_KEY_LEVEL, NULL);
 +
-+		ch = g_new0(struct characteristic, 1);
-+		ch->attr.handle = c->handle;
-+		ch->attr.properties = c->properties;
-+		ch->attr.value_handle = c->value_handle;
-+		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
-+		ch->batt = batt;
++	create_file(filename, S_IRUSR | S_IWUSR);
 +
-+		batt->chars = g_slist_append(batt->chars, ch);
-+	}
++	str = g_key_file_to_data(key_file, &length, NULL);
++	g_file_set_contents(filename, str, length, NULL);
++
++	g_free(str);
++	g_key_file_free(key_file);
 +}
 +
-+static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
++static gboolean read_battery_level_value(struct characteristic *chr)
 +{
-+	struct battery *batt = user_data;
++	int level;
 +
-+	batt->attrib = g_attrib_ref(attrib);
++	if (!chr)
++		return FALSE;
 +
-+	if (batt->chars == NULL) {
-+		gatt_discover_char(batt->attrib, batt->svc_range->start,
-+					batt->svc_range->end, NULL,
-+					configure_battery_cb, batt);
-+	}
++	level = read_battery_char(chr);
++	if (!level)
++		return FALSE;
++
++	chr->level = level;
++
++	btd_device_set_battery_opt(chr->devbatt, BATTERY_OPT_LEVEL, chr->level,
++						BATTERY_OPT_INVALID);
++
++	return TRUE;
 +}
 +
-+static void attio_disconnected_cb(gpointer user_data)
-+{
-+	struct battery *batt = user_data;
+ static void char_free(gpointer user_data)
+ {
+ 	struct characteristic *c = user_data;
+ 
++	del_battery_char(c);
 +
-+	g_attrib_unref(batt->attrib);
-+	batt->attrib = NULL;
-+}
+ 	if (c->notifyid && c->batt->attrib != NULL)
+ 		g_attrib_unregister(c->batt->attrib, c->notifyid);
+ 
+@@ -135,6 +265,8 @@ static void read_batterylevel_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 	ch->level = value[0];
+ 	btd_device_set_battery_opt(ch->devbatt, BATTERY_OPT_LEVEL, ch->level,
+ 						BATTERY_OPT_INVALID);
 +
-+static gint primary_uuid_cmp(gconstpointer a, gconstpointer b)
-+{
-+	const struct gatt_primary *prim = a;
-+	const char *uuid = b;
-+
-+	return g_strcmp0(prim->uuid, uuid);
-+}
-+
-+static int battery_register(struct btd_device *device)
-+{
-+	struct battery *batt;
-+	struct gatt_primary *prim;
-+	GSList *primaries, *l;
-+
-+	primaries = btd_device_get_primaries(device);
-+
-+	while ((l = g_slist_find_custom(primaries, BATTERY_SERVICE_UUID,
-+							primary_uuid_cmp))) {
-+		prim = l->data;
-+
-+		batt = g_new0(struct battery, 1);
-+		batt->dev = btd_device_ref(device);
-+
-+		batt->svc_range = g_new0(struct att_range, 1);
-+		batt->svc_range->start = prim->range.start;
-+		batt->svc_range->end = prim->range.end;
-+
-+		servers = g_slist_prepend(servers, batt);
-+
-+		batt->attioid = btd_device_add_attio_callback(device,
-+			attio_connected_cb, attio_disconnected_cb, batt);
-+
-+		primaries = g_slist_remove(primaries, prim);
-+	}
-+
-+	return 0;
-+}
-+
-+static void battery_unregister(struct btd_device *device)
-+{
-+	struct battery *batt;
-+	GSList *l;
-+
-+	while ((l = g_slist_find_custom(servers, device, cmp_device))) {
-+		batt = l->data;
-+		servers = g_slist_remove(servers, batt);
-+
-+		battery_free(batt);
-+	}
-+}
-+
-+static int battery_driver_probe(struct btd_profile *p,
-+						struct btd_device *device,
-+						GSList *uuids)
-+{
-+	return battery_register(device);
-+}
-+
-+static void battery_driver_remove(struct btd_profile *p,
-+						struct btd_device *device)
-+{
-+	battery_unregister(device);
-+}
-+
-+static struct btd_profile battery_profile = {
-+	.name		= "battery",
-+	.remote_uuids	= BTD_UUIDS(BATTERY_SERVICE_UUID),
-+	.device_probe	= battery_driver_probe,
-+	.device_remove	= battery_driver_remove
-+};
-+
-+static int battery_manager_init(void)
-+{
-+	return btd_profile_register(&battery_profile);
-+}
-+
-+static void battery_manager_exit(void)
-+{
-+	btd_profile_unregister(&battery_profile);
-+}
-+
-+BLUETOOTH_PLUGIN_DEFINE(battery, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-+				battery_manager_init, battery_manager_exit)
++	store_battery_char(ch);
+ }
+ 
+ static void process_batteryservice_char(struct characteristic *ch)
+@@ -359,7 +491,8 @@ static void configure_battery_cb(GSList *characteristics, guint8 status,
+ 
+ 		start = c->value_handle + 1;
+ 
+-		process_batteryservice_char(ch);
++		if (!read_battery_level_value(ch))
++			process_batteryservice_char(ch);
+ 
+ 		ch->devbatt = btd_device_add_battery(ch->batt->dev);
+ 
+@@ -396,7 +529,7 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ 		GSList *l;
+ 		for (l = batt->chars; l; l = l->next) {
+ 			struct characteristic *c = l->data;
+-			if (!c->can_notify)
++			if (!read_battery_level_value(c) && !c->can_notify)
+ 				process_batteryservice_char(c);
+ 		}
+ 	}
 -- 
 1.7.9.5
 
