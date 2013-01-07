@@ -1,51 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 7 Jan 2013 14:12:15 +0100
-From: Ludek Finstrle <luf@pzkagis.cz>
-To: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] audio: Replace g_hash_table_contains() with
- g_hash_table_lookup()
-Message-ID: <20130107131215.GC914@pzkagis.cz>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Subject: =?UTF-8?q?=5BPATCH=202/2=5D=20shared=3A=20Fix=20build=20break?=
+Date: Mon, 07 Jan 2013 18:03:53 +0530
+Message-id: <1357562033-26230-2-git-send-email-jaganath.k@samsung.com>
+In-reply-to: <1357562033-26230-1-git-send-email-jaganath.k@samsung.com>
 References: <1357562033-26230-1-git-send-email-jaganath.k@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1357562033-26230-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+This patch fixes the below build error
 
-Mon, Jan 07, 2013 at 06:03:52PM +0530, Jaganath Kanakkassery napsal(a):
-> g_hash_table_contains() is supported only from GLib 2.32. If BlueZ has to
-> build against GLib 2.28 this patch replaces g_hash_table_contains() to
-> g_hash_table_lookup()
-> ---
->  profiles/audio/player.c |    7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-> index 8748893..4198bdb 100644
-> --- a/profiles/audio/player.c
-> +++ b/profiles/audio/player.c
-> @@ -172,8 +172,13 @@ static gboolean get_status(const GDBusPropertyTable *property,
->  static gboolean setting_exists(const GDBusPropertyTable *property, void *data)
->  {
->  	struct media_player *mp = data;
-> +	const char *value;
-> +
-> +	value = g_hash_table_lookup(mp->settings, property->name);
-> +	if (value == NULL)
-> +		return FALSE;
->  
-> -	return g_hash_table_contains(mp->settings, property->name);
-> +	return TRUE;
->  }
+src/shared/mgmt.c: In function ‘mgmt_cancel_index’:
+src/shared/mgmt.c:559:30: error: cast to pointer from integer of
+different size [-Werror=int-to-pointer-cast]
+cc1: all warnings being treated as errors
+make[1]: *** [src/shared/bluetoothd-mgmt.o] Error 1
+make: *** [all] Error 2
+---
+ src/shared/mgmt.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Doesn't
+diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
+index 2297caf..c832a88 100644
+--- a/src/shared/mgmt.c
++++ b/src/shared/mgmt.c
+@@ -553,10 +553,12 @@ bool mgmt_cancel(struct mgmt *mgmt, unsigned int id)
+ 
+ bool mgmt_cancel_index(struct mgmt *mgmt, uint16_t index)
+ {
++	guint id = index;
++
+ 	if (!mgmt)
+ 		return false;
+ 
+-	return cancel_request(mgmt, GUINT_TO_POINTER(index),
++	return cancel_request(mgmt, GUINT_TO_POINTER(id),
+ 						compare_request_index);
+ }
+ 
+-- 
+1.7.9.5
 
-return g_hash_table_lookup(mp->settings, property->name) != NULL;
-
-do the same? Maybe it's againist some code style but looks better
-than several lines.
-
-Luf
