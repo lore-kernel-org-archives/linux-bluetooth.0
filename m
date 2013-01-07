@@ -2,69 +2,98 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 4/5] lib: Use SDP_IS_TEXT_STR()/SDP_IS_SEQ() where possible
-Date: Mon,  7 Jan 2013 07:56:34 -0400
-Message-Id: <1357559795-22090-4-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH v2 BlueZ 3/5] input: Validate SDP HIDDescriptorList subattributes
+Date: Mon,  7 Jan 2013 07:56:33 -0400
+Message-Id: <1357559795-22090-3-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1357559795-22090-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1357559795-22090-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+It should not be assumed that remote SDP attributes are in a compliant
+format. This fixes a couple of invalid pointer access on invalid data.
 ---
- lib/sdp.c |   12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ profiles/input/device.c |   60 ++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 46 insertions(+), 14 deletions(-)
 
-diff --git a/lib/sdp.c b/lib/sdp.c
-index 2dac6c7..ca474cd 100644
---- a/lib/sdp.c
-+++ b/lib/sdp.c
-@@ -570,7 +570,7 @@ static void extract_svclass_uuid(sdp_data_t *data, uuid_t *uuid)
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index eaf5681..1da9d99 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -222,6 +222,49 @@ static int create_hid_dev_name(sdp_record_t *rec, struct hidp_connadd_req *req)
+ 	return 0;
+ }
+ 
++/* See HID profile specification v1.0, "7.11.6 HIDDescriptorList" for details
++ * on the attribute format. */
++static int extract_hid_desc_data(sdp_record_t *rec,
++						struct hidp_connadd_req *req)
++{
++	sdp_data_t *d;
++
++	d = sdp_data_get(rec, SDP_ATTR_HID_DESCRIPTOR_LIST);
++	if (!d)
++		goto invalid_desc;
++
++	if (!SDP_IS_SEQ(d->dtd))
++		goto invalid_desc;
++
++	/* First HIDDescriptor */
++	d = d->val.dataseq;
++	if (!SDP_IS_SEQ(d->dtd))
++		goto invalid_desc;
++
++	/* ClassDescriptorType */
++	d = d->val.dataseq;
++	if (d->dtd != SDP_UINT8)
++		goto invalid_desc;
++
++	/* ClassDescriptorData */
++	d = d->next;
++	if (!d || !SDP_IS_TEXT_STR(d->dtd))
++		goto invalid_desc;
++
++	req->rd_data = g_try_malloc0(d->unitSize);
++	if (req->rd_data) {
++		memcpy(req->rd_data, d->val.str, d->unitSize);
++		req->rd_size = d->unitSize;
++		epox_endian_quirk(req->rd_data, req->rd_size);
++	}
++
++	return 0;
++
++invalid_desc:
++	error("Missing or invalid HIDDescriptorList SDP attribute");
++	return -EINVAL;
++}
++
+ static int extract_hid_record(sdp_record_t *rec, struct hidp_connadd_req *req)
  {
- 	sdp_data_t *d;
+ 	sdp_data_t *pdlist;
+@@ -251,20 +294,9 @@ static int extract_hid_record(sdp_record_t *rec, struct hidp_connadd_req *req)
+ 	if (attr_val)
+ 		req->flags |= (1 << HIDP_BOOT_PROTOCOL_MODE);
  
--	if (!data || data->dtd < SDP_SEQ8 || data->dtd > SDP_SEQ32)
-+	if (!data || !SDP_IS_SEQ(data->dtd))
- 		return;
+-	pdlist = sdp_data_get(rec, SDP_ATTR_HID_DESCRIPTOR_LIST);
+-	if (pdlist) {
+-		pdlist = pdlist->val.dataseq;
+-		pdlist = pdlist->val.dataseq;
+-		pdlist = pdlist->next;
+-
+-		req->rd_data = g_try_malloc0(pdlist->unitSize);
+-		if (req->rd_data) {
+-			memcpy(req->rd_data, (unsigned char *) pdlist->val.str,
+-								pdlist->unitSize);
+-			req->rd_size = pdlist->unitSize;
+-			epox_endian_quirk(req->rd_data, req->rd_size);
+-		}
+-	}
++	err = extract_hid_desc_data(rec, req);
++	if (err < 0)
++		return err;
  
- 	d = data->val.dataseq;
-@@ -1912,7 +1912,7 @@ int sdp_get_uuidseq_attr(const sdp_record_t *rec, uint16_t attr,
- 	sdp_data_t *sdpdata = sdp_data_get(rec, attr);
- 
- 	*seqp = NULL;
--	if (sdpdata && sdpdata->dtd >= SDP_SEQ8 && sdpdata->dtd <= SDP_SEQ32) {
-+	if (sdpdata && SDP_IS_SEQ(sdpdata->dtd)) {
- 		sdp_data_t *d;
- 		for (d = sdpdata->val.dataseq; d; d = d->next) {
- 			uuid_t *u;
-@@ -2128,9 +2128,7 @@ int sdp_get_string_attr(const sdp_record_t *rec, uint16_t attrid, char *value,
- 	sdp_data_t *sdpdata = sdp_data_get(rec, attrid);
- 	if (sdpdata)
- 		/* Verify that it is what the caller expects */
--		if (sdpdata->dtd == SDP_TEXT_STR8 ||
--				sdpdata->dtd == SDP_TEXT_STR16 ||
--				sdpdata->dtd == SDP_TEXT_STR32)
-+		if (SDP_IS_TEXT_STR(sdpdata->dtd))
- 			if ((int) strlen(sdpdata->val.str) < valuelen) {
- 				strcpy(value, sdpdata->val.str);
- 				return 0;
-@@ -4744,7 +4742,7 @@ int sdp_get_supp_feat(const sdp_record_t *rec, sdp_list_t **seqp)
- 
- 	sdpdata = sdp_data_get(rec, SDP_ATTR_SUPPORTED_FEATURES_LIST);
- 
--	if (!sdpdata || sdpdata->dtd < SDP_SEQ8 || sdpdata->dtd > SDP_SEQ32)
-+	if (!sdpdata || !SDP_IS_SEQ(sdpdata->dtd))
- 		return sdp_get_uuidseq_attr(rec,
- 					SDP_ATTR_SUPPORTED_FEATURES_LIST, seqp);
- 
-@@ -4752,7 +4750,7 @@ int sdp_get_supp_feat(const sdp_record_t *rec, sdp_list_t **seqp)
- 		sdp_data_t *dd;
- 		sdp_list_t *subseq;
- 
--		if (d->dtd < SDP_SEQ8 || d->dtd > SDP_SEQ32)
-+		if (!SDP_IS_SEQ(d->dtd))
- 			goto fail;
- 
- 		subseq = NULL;
+ 	return 0;
+ }
 -- 
 1.7.9.5
 
