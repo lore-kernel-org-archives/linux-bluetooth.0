@@ -1,64 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Tue, 8 Jan 2013 02:05:53 +0530
-Message-ID: <CAFBvHie6nCYJpR1VJWdg+ki=TiZcvpR7R43xGrox_Z5pf0pCiw@mail.gmail.com>
-Subject: usage of g_test_fail() which is introduced in Glib 2.30
-From: Syam Sidhardhan <syamsidhardh@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <39D5295DD81346F9A6FC2AFB8D19919F@sisodomain.com>
+References: <1357562033-26230-1-git-send-email-jaganath.k@samsung.com>
+	<20130107131215.GC914@pzkagis.cz>
+	<39D5295DD81346F9A6FC2AFB8D19919F@sisodomain.com>
+Date: Mon, 7 Jan 2013 22:00:11 +0200
+Message-ID: <CABBYNZ+0H3t-jwbp_-iUeFw2NOqXuWmwBiw8xjqP5bx6D7gomQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] audio: Replace g_hash_table_contains() with g_hash_table_lookup()
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Cc: Ludek Finstrle <luf@pzkagis.cz>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Jaganath,
 
-In the latest Bluez snapshot I'm getting the g_test_fail compilation
-error. The problem
-happens because we use the Glib minimum version requirement
-as 2.28 and this API is introduced in GLib version 2.30.
-Do we need to use the g_test_fail() now with Glib 2.28?
-I guess we cannot replace it with a wrapper function.
+On Mon, Jan 7, 2013 at 3:52 PM, Jaganath Kanakkassery
+<jaganath.k@samsung.com> wrote:
+> Hi Ludek,
+>
+> --------------------------------------------------
+> From: "Ludek Finstrle" <luf@pzkagis.cz>
+> Sent: Monday, January 07, 2013 6:42 PM
+> To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
+> Cc: <linux-bluetooth@vger.kernel.org>
+> Subject: Re: [PATCH 1/2] audio: Replace g_hash_table_contains() with
+> g_hash_table_lookup()
+>
+>
+>> Hello,
+>>
+>> Mon, Jan 07, 2013 at 06:03:52PM +0530, Jaganath Kanakkassery napsal(a):
+>>>
+>>> g_hash_table_contains() is supported only from GLib 2.32. If BlueZ has to
+>>> build against GLib 2.28 this patch replaces g_hash_table_contains() to
+>>> g_hash_table_lookup()
+>>> ---
+>>>  profiles/audio/player.c |    7 ++++++-
+>>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/profiles/audio/player.c b/profiles/audio/player.c
+>>> index 8748893..4198bdb 100644
+>>> --- a/profiles/audio/player.c
+>>> +++ b/profiles/audio/player.c
+>>> @@ -172,8 +172,13 @@ static gboolean get_status(const GDBusPropertyTable
+>>> *property,
+>>>  static gboolean setting_exists(const GDBusPropertyTable *property, void
+>>> *data)
+>>>  {
+>>>  struct media_player *mp = data;
+>>> + const char *value;
+>>> +
+>>> + value = g_hash_table_lookup(mp->settings, property->name);
+>>> + if (value == NULL)
+>>> + return FALSE;
+>>>
+>>> - return g_hash_table_contains(mp->settings, property->name);
+>>> + return TRUE;
+>>>  }
+>>
+>>
+>> Doesn't
+>>
+>> return g_hash_table_lookup(mp->settings, property->name) != NULL;
+>>
+>> do the same? Maybe it's againist some code style but looks better
+>> than several lines.
+>
+>
+> I think
+> return g_hash_table_lookup(mp->settings, property->name) ? TRUE : FALSE;
+> would be better?
+
+Shorter form is  != NULL, so lets go with it, still haven't figure out
+why we didn't bring back glib-compat for such functions, when we
+finally upgrade it will take much more time to revert this one by one.
 
 
-Possible Patch:
-
-From: Syam Sidhardhan <s.syam@samsung.com>
-Date: Mon, 7 Jan 2013 17:22:00 -0300
-Subject: [PATCH 1/1] unit: Remove g_test_fail()
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-g_test_fail() is introduced in Glib v2.30 and we are using
-Glib v2.28 as the minimum requirement for the build.
-This patch resolves the compilation error that happen with
-Glib version < 2.30.
-
-Error log:
-  CC     unit/test-mgmt.o
-unit/test-mgmt.c: In function ‘check_actions’:
-unit/test-mgmt.c:100:2: error: implicit declaration of
-    function ‘g_test_fail’ [-Werror=implicit-function-declaration]
-cc1: all warnings being treated as errors
-make[1]: *** [unit/test-mgmt.o] Error 1
-make: *** [all] Error 2
----
- unit/test-mgmt.c |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
-
-diff --git a/unit/test-mgmt.c b/unit/test-mgmt.c
-index 2d1a5d6..6b3689c 100644
---- a/unit/test-mgmt.c
-+++ b/unit/test-mgmt.c
-@@ -97,7 +97,6 @@ static void check_actions(struct context *context,
- 	}
-
- 	g_test_message("Command not handled\n");
--	g_test_fail();
- }
-
- static gboolean server_handler(GIOChannel *channel, GIOCondition cond,
--- 
-1.7.0.4
-
-Regards,
-Syam.
+--
+Luiz Augusto von Dentz
