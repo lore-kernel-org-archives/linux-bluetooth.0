@@ -1,47 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1357601714.1806.16.camel@aeonflux>
-Subject: New kernel APIs and actually testing them
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Date: Mon, 07 Jan 2013 15:35:14 -0800
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1356097469-24073-2-git-send-email-s.syam@samsung.com>
+References: <1356097469-24073-1-git-send-email-s.syam@samsung.com>
+	<1356097469-24073-2-git-send-email-s.syam@samsung.com>
+Date: Tue, 8 Jan 2013 02:19:13 +0530
+Message-ID: <CAFBvHie-XXKTh0ggsP522YkQ5y1s6wHcoLrxa2SnEL0FxDdyoQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Bluetooth: Fix ACL alive for long in case of non
+ pariable devices
+From: Syam Sidhardhan <syamsidhardh@gmail.com>
+To: Syam Sidhardhan <s.syam@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi everyone,
+Hi,
 
-our kernel APIs are not as good as they were years back. There are a
-bunch of the management commands that are actually broken. And they have
-been broken for years now. For example Set Device Class, Load Long Term
-Keys, Confirm Name and maybe even others. Some commands are really
-relaxing when it comes to accept certain input variables and turning
-them into booleans. Which is also a bad idea.
+On Fri, Dec 21, 2012 at 7:14 PM, Syam Sidhardhan <s.syam@samsung.com> wrote:
+> For certain devices (ex: HID mouse), support for authentication,
+> pairing and bonding is optional. For such devices, the ACL alive
+> for too long after the l2cap disconnection.
+>
+> To avoid keep ACL alive for too long, set the ACL timeout back to
+> HCI_DISCONN_TIMEOUT when l2cap is connected.
+>
+> commit id:a9ea3ed9b71cc3271dd59e76f65748adcaa76422 might have introduce
+> this issue.
+>
+> Signed-off-by: Sang-Ki Park <sangki79.park@samsung.com>
+> Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+> ---
+> I'm not sure whether we need hci_conn_hold() and hci_conn_put() across
+> while updating the disc_timeout. In certain other places in the code
+> it's done. Ex: hci_auth_complete_evt(), hci_link_key_notify_evt() etc.
+> Here I took that as the reference.
+>
+>  net/bluetooth/l2cap_core.c |    5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 82a3bdc..7a544c2 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1360,7 +1360,6 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+>         sk = chan->sk;
+>
+>         hci_conn_hold(conn->hcon);
+> -       conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
+>
+>         bacpy(&bt_sk(sk)->src, conn->src);
+>         bacpy(&bt_sk(sk)->dst, conn->dst);
+> @@ -1380,6 +1379,10 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+>
+>         BT_DBG("conn %p", conn);
+>
+> +       hci_conn_hold(conn->hcon);
+> +       conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
+> +       hci_conn_put(conn->hcon);
+> +
+>         if (!hcon->out && hcon->type == LE_LINK)
+>                 l2cap_le_conn_ready(conn);
+>
+> --
+> 1.7.9.5
+>
 
-This all has to stop. From now on, I do not want to see any kernel API
-additions (management or socket) that we do not have a proper testing
-tool for that can verify its correct behavior. Also adding new APIs
-until we have verified the old ones is not something I like to do
-either.
+ping.
 
-During the holidays I started a tool called mgmt-tester that allows
-end-to-end testing of the management interface by using emulated HCI
-controllers. You just need to load hci_vhci kernel module and run it.
-
-There is a lot of extra work to do for actually ensuring that we are
-sending the right HCI commands on different controller versions, but it
-is possible to verify this since it is all emulated. Nobody needs the
-latest hardware. Look into the emulator directory for my effort in
-providing flexible support for simulating different behaviors.
-
-This work of testing our APIs needs to be done NOW. So instead of
-everybody trying to squeeze in the latest features, I rather see the
-core being improved first and made rock solid.
-
-I welcome every patch that tries to improve this situation.
-
-Regards
-
-Marcel
-
-
+Thanks,
+Syam.
