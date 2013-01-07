@@ -1,44 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1357615207.1806.17.camel@aeonflux>
-Subject: Re: [PATCH 2/2] shared: Fix build break
+Message-ID: <1357601714.1806.16.camel@aeonflux>
+Subject: New kernel APIs and actually testing them
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 07 Jan 2013 19:20:07 -0800
-In-Reply-To: <1357562033-26230-2-git-send-email-jaganath.k@samsung.com>
-References: <1357562033-26230-1-git-send-email-jaganath.k@samsung.com>
-	 <1357562033-26230-2-git-send-email-jaganath.k@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Date: Mon, 07 Jan 2013 15:35:14 -0800
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Hi everyone,
 
-> This patch fixes the below build error
-> 
-> src/shared/mgmt.c: In function ‘mgmt_cancel_index’:
-> src/shared/mgmt.c:559:30: error: cast to pointer from integer of
-> different size [-Werror=int-to-pointer-cast]
-> cc1: all warnings being treated as errors
-> make[1]: *** [src/shared/bluetoothd-mgmt.o] Error 1
-> make: *** [all] Error 2
-> ---
->  src/shared/mgmt.c |    4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
-> index 2297caf..c832a88 100644
-> --- a/src/shared/mgmt.c
-> +++ b/src/shared/mgmt.c
-> @@ -553,10 +553,12 @@ bool mgmt_cancel(struct mgmt *mgmt, unsigned int id)
->  
->  bool mgmt_cancel_index(struct mgmt *mgmt, uint16_t index)
->  {
-> +	guint id = index;
-> +
+our kernel APIs are not as good as they were years back. There are a
+bunch of the management commands that are actually broken. And they have
+been broken for years now. For example Set Device Class, Load Long Term
+Keys, Confirm Name and maybe even others. Some commands are really
+relaxing when it comes to accept certain input variables and turning
+them into booleans. Which is also a bad idea.
 
-I changed this into unsigned int instead when applying the patch.
+This all has to stop. From now on, I do not want to see any kernel API
+additions (management or socket) that we do not have a proper testing
+tool for that can verify its correct behavior. Also adding new APIs
+until we have verified the old ones is not something I like to do
+either.
+
+During the holidays I started a tool called mgmt-tester that allows
+end-to-end testing of the management interface by using emulated HCI
+controllers. You just need to load hci_vhci kernel module and run it.
+
+There is a lot of extra work to do for actually ensuring that we are
+sending the right HCI commands on different controller versions, but it
+is possible to verify this since it is all emulated. Nobody needs the
+latest hardware. Look into the emulator directory for my effort in
+providing flexible support for simulating different behaviors.
+
+This work of testing our APIs needs to be done NOW. So instead of
+everybody trying to squeeze in the latest features, I rather see the
+core being improved first and made rock solid.
+
+I welcome every patch that tries to improve this situation.
 
 Regards
 
