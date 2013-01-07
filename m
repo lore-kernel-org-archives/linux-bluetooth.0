@@ -1,33 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 7 Jan 2013 16:20:58 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
-	<frederic.danis@linux.intel.com>
+Message-id: <39D5295DD81346F9A6FC2AFB8D19919F@sisodomain.com>
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: Ludek Finstrle <luf@pzkagis.cz>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] adapter: Fix storage to be used by BlueZ 4 or 5
-Message-ID: <20130107142058.GA13984@x220.P-661HNU-F1>
-References: <1357556011-9493-1-git-send-email-frederic.danis@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1357556011-9493-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1357562033-26230-1-git-send-email-jaganath.k@samsung.com>
+ <20130107131215.GC914@pzkagis.cz>
+In-reply-to: <20130107131215.GC914@pzkagis.cz>
+Subject: Re: [PATCH 1/2] audio: Replace g_hash_table_contains() with
+ g_hash_table_lookup()
+Date: Mon, 07 Jan 2013 19:22:22 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+Hi Ludek,
 
-On Mon, Jan 07, 2013, Frédéric Danis wrote:
-> Conversion should be performed only one time, but using "converted"
-> entry in device related files generates a bogus device object with
-> dev_CONVERTED path when starting BlueZ 4.
-> 
-> If "settings" file has been created we've done the conversion and
-> we can use it to check if conversion has already been done.
-> 
-> Remove "converted" entries in converted files
-> ---
->  src/adapter.c |  177 +++++++++++++++++++++++++++++++--------------------------
->  1 file changed, 95 insertions(+), 82 deletions(-)
+--------------------------------------------------
+From: "Ludek Finstrle" <luf@pzkagis.cz>
+Sent: Monday, January 07, 2013 6:42 PM
+To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/2] audio: Replace g_hash_table_contains() with 
+g_hash_table_lookup()
 
-Applied. Thanks.
+> Hello,
+>
+> Mon, Jan 07, 2013 at 06:03:52PM +0530, Jaganath Kanakkassery napsal(a):
+>> g_hash_table_contains() is supported only from GLib 2.32. If BlueZ has to
+>> build against GLib 2.28 this patch replaces g_hash_table_contains() to
+>> g_hash_table_lookup()
+>> ---
+>>  profiles/audio/player.c |    7 ++++++-
+>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/profiles/audio/player.c b/profiles/audio/player.c
+>> index 8748893..4198bdb 100644
+>> --- a/profiles/audio/player.c
+>> +++ b/profiles/audio/player.c
+>> @@ -172,8 +172,13 @@ static gboolean get_status(const GDBusPropertyTable 
+>> *property,
+>>  static gboolean setting_exists(const GDBusPropertyTable *property, void 
+>> *data)
+>>  {
+>>  struct media_player *mp = data;
+>> + const char *value;
+>> +
+>> + value = g_hash_table_lookup(mp->settings, property->name);
+>> + if (value == NULL)
+>> + return FALSE;
+>>
+>> - return g_hash_table_contains(mp->settings, property->name);
+>> + return TRUE;
+>>  }
+>
+> Doesn't
+>
+> return g_hash_table_lookup(mp->settings, property->name) != NULL;
+>
+> do the same? Maybe it's againist some code style but looks better
+> than several lines.
 
-Johan
+I think
+return g_hash_table_lookup(mp->settings, property->name) ? TRUE : FALSE;
+would be better?
+
+Thanks,
+Jaganath 
+
