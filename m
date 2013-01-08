@@ -1,86 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1357655616.5641.13.camel@dellpc>
-Subject: usb device removed from sysfs before input children devices
+Message-ID: <1357654917.5641.7.camel@dellpc>
+Subject: [PATCH hidp] Fix Kernel OOPS in hidp_session caused by orphaned
+ sock structures
 From: Karl Relton <karllinuxtest.relton@ntlworld.com>
-To: linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Date: Tue, 08 Jan 2013 14:33:36 +0000
+To: linux-bluetooth@vger.kernel.org
+Date: Tue, 08 Jan 2013 14:21:57 +0000
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On coming out of suspend my usb bluetooth adaptor is being reset by the
-system.
+This is a proposed fix to the kernel OOPS reported in
 
-In linux 3.7 the usb devices are being removed from the sysfs tree
-first, and then the various 'child' devices (like my bluetooth mouse &
-keyboard related devices) afterwards. This is causing the udev events
-for the input devices to have 'orphaned' sysfs paths in the udev events.
+https://bugzilla.kernel.org/show_bug.cgi?id=50541
 
-This in turn means the Xorg evdev driver does not recognise the events,
-and so doesn't see the removal of the input devices.
+hidp_session() is crashing the kernel typically on a resume from
+suspend. My analysis concluded that the sock structure pointed to by
+ctrl_sk was being orphaned at some point parallel to the execution of
+hidp_session (sometimes even while hidp_session is still in its main
+loop). This mean that calls to sk_sleep(ctrl_sk) would return NULL,
+leading to ..._wait() or ..._wakeup() calls crashing.
 
-This has been picked by some downstream distributions, e.g. see this
-thread by Google Chrome developers:
+The proposed fix is to store the waitqueue_head structure needed for the
+waiting/waking in a local variable. rcu_dereference_raw() [normally
+called via sk_sleep()] is still used and required to protect access, but
+we ensure we have the proper handle onto the structure rather than
+losing it by the sock being orphaned.
 
-http://code.google.com/p/chromium-os/issues/detail?id=33813
+Signed-off-by: Karl Relton <karllinuxtest.relton@ntlworld.com>
 
-Back on linux 3.2 this was not the case. The usb adaptor was reset, but
-device removal was orderly: first the input devices (will full paths in
-the udev events), then the usb devices walking up the tree.
+--- linux-3.7.0.orig/net/bluetooth/hidp/core.c	2013-01-08 13:04:35.945237334 +0000
++++ linux-3.7.0/net/bluetooth/hidp/core.c	2013-01-08 13:06:11.313240959 +0000
+@@ -680,16 +680,19 @@ static int hidp_session(void *arg)
+ 	struct sock *intr_sk = session->intr_sock->sk;
+ 	struct sk_buff *skb;
+ 	wait_queue_t ctrl_wait, intr_wait;
++	struct socket_wq *ctrl_wq, *intr_wq;
+ 
+ 	BT_DBG("session %p", session);
+ 
+ 	__module_get(THIS_MODULE);
+ 	set_user_nice(current, -15);
+ 
++	ctrl_wq = ctrl_sk->sk_wq;
++	intr_wq = intr_sk->sk_wq;
+ 	init_waitqueue_entry(&ctrl_wait, current);
+ 	init_waitqueue_entry(&intr_wait, current);
+-	add_wait_queue(sk_sleep(ctrl_sk), &ctrl_wait);
+-	add_wait_queue(sk_sleep(intr_sk), &intr_wait);
++	add_wait_queue(&rcu_dereference_raw(ctrl_wq)->wait, &ctrl_wait);
++	add_wait_queue(&rcu_dereference_raw(intr_wq)->wait, &intr_wait);
+ 	session->waiting_for_startup = 0;
+ 	wake_up_interruptible(&session->startup_queue);
+ 	set_current_state(TASK_INTERRUPTIBLE);
+@@ -722,8 +725,8 @@ static int hidp_session(void *arg)
+ 		set_current_state(TASK_INTERRUPTIBLE);
+ 	}
+ 	set_current_state(TASK_RUNNING);
+-	remove_wait_queue(sk_sleep(intr_sk), &intr_wait);
+-	remove_wait_queue(sk_sleep(ctrl_sk), &ctrl_wait);
++	remove_wait_queue(&rcu_dereference_raw(intr_wq)->wait, &intr_wait);
++	remove_wait_queue(&rcu_dereference_raw(ctrl_wq)->wait, &ctrl_wait);
+ 
+ 	clear_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags);
+ 	clear_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
+@@ -747,12 +750,15 @@ static int hidp_session(void *arg)
+ 	session->intr_sock->sk->sk_err = EUNATCH;
+ 	session->ctrl_sock->sk->sk_err = EUNATCH;
+ 
+-	hidp_schedule(session);
++	wake_up_interruptible(&rcu_dereference_raw(ctrl_wq)->wait);
++	wake_up_interruptible(&rcu_dereference_raw(intr_wq)->wait);
+ 
+ 	fput(session->intr_sock->file);
+ 
+-	wait_event_timeout(*(sk_sleep(ctrl_sk)),
+-		(ctrl_sk->sk_state == BT_CLOSED), msecs_to_jiffies(500));
++	/* By now ctrl_sk might have been orphaned already */
++	if (ctrl_wq == ctrl_sk->sk_wq)
++		wait_event_timeout(rcu_dereference_raw(ctrl_wq)->wait,
++			(ctrl_sk->sk_state == BT_CLOSED), msecs_to_jiffies(500));
+ 
+ 	fput(session->ctrl_sock->file);
+ 
 
-
-To illustrate the issue, here is the output of 'udevadm monitor' in 3.7:
-
-udevadm monitor
-monitor will print the received events for:
-KERNEL - the kernel uevent
-KERNEL[2203.173080] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.0/bluetooth/hci0/rfkill2 (rfkill)
-KERNEL[2203.173148] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.0/bluetooth/hci0 (bluetooth)
-KERNEL[2203.173420] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.0 (usb)
-KERNEL[2203.173451] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.1 (usb)
-KERNEL[2203.173475] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.2 (usb)
-KERNEL[2203.173693] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2 (usb)
-KERNEL[2213.152339] remove   /hci0/hci0:46/input14/mouse2 (input)
-KERNEL[2213.160374] remove   /hci0/hci0:46/input14/event10 (input)
-KERNEL[2213.168366] remove   /hci0/hci0:46/input14 (input)
-KERNEL[2213.169058] remove   /hci0/hci0:46/0005:050D:0031.0005/hidraw/hidraw0 (hidraw)
-KERNEL[2213.169198] remove   /hci0/hci0:46/0005:050D:0031.0005 (hid)
-KERNEL[2213.169242] remove   /hci0/hci0:46 (bluetooth)
-KERNEL[2218.176527] remove   /hci0/hci0:49/input13/event11 (input)
-KERNEL[2218.180403] remove   /hci0/hci0:49/input13 (input)
-KERNEL[2218.180481] remove   /hci0/hci0:49/0005:05AC:0256.0004/hidraw/hidraw1 (hidraw)
-KERNEL[2218.180538] remove   /hci0/hci0:49/0005:05AC:0256.0004 (hid)
-KERNEL[2218.182005] remove   /hci0/hci0:49 (bluetooth)
-
-See how the usb devices are moved first, and then the input/bluetooth related stuff
-with path-heads removed (paths are now /hci0/... instead of /devices/...)
-
-
-Here is the equiv sequence back in 3.2:
-
-KERNEL[158.378301] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.0/bluetooth/hci0/hci0:49/input11/mouse2 (input)
-KERNEL[158.388283] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.0/bluetooth/hci0/hci0:49/input11/event11 (input)
-KERNEL[158.409885] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.0/bluetooth/hci0/hci0:49/input11 (input)
-KERNEL[158.411565] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.0/bluetooth/hci0/hci0:49/0005:050D:0031.0002/hidraw/hidraw1 (hidraw)
-KERNEL[158.411598] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.0/bluetooth/hci0/hci0:49/0005:050D:0031.0002 (hid)
-KERNEL[158.411621] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.0/bluetooth/hci0/hci0:49 (bluetooth)
-KERNEL[158.436894] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.0/bluetooth/hci0/hci0:46/input10/event10 (input)
-KERNEL[158.452211] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.0/bluetooth/hci0/hci0:46/input10 (input)
-KERNEL[158.452628] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.0/bluetooth/hci0/hci0:46/0005:05AC:0256.0001/hidraw/hidraw0 (hidraw)
-KERNEL[158.452662] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.0/bluetooth/hci0/hci0:46/0005:05AC:0256.0001 (hid)
-KERNEL[158.452752] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.0/bluetooth/hci0/hci0:46 (bluetooth)
-KERNEL[158.629847] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.0/bluetooth/hci0/rfkill2 (rfkill)
-KERNEL[158.629920] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.0/bluetooth/hci0 (bluetooth)
-KERNEL[158.635562] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.0 (usb)
-KERNEL[158.635701] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.1 (usb)
-KERNEL[158.635807] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2/3-2:1.2 (usb)
-KERNEL[158.637238] remove   /devices/pci0000:00/0000:00:1a.0/usb3/3-2 (usb)
-
-
-The end result (for the user) is that even when the bluetooth
-mouse/keyboard is re-added, Xorg ignores it - thinking it is some hoax
-duplicate device. The keyboard/mouse is then non-operational.
-
-Karl
 
