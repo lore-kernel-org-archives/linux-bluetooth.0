@@ -1,45 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1357615780.1806.26.camel@aeonflux>
-Subject: Re: [PATCH] Bluetooth: Fix incorrect strncpy() in hidp_setup_hid()
+Message-ID: <1357615617.1806.24.camel@aeonflux>
+Subject: Re: usage of g_test_fail() which is introduced in Glib 2.30
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Syam Sidhardhan <syamsidhardh@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 07 Jan 2013 19:29:40 -0800
-In-Reply-To: <1357511333-5276-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1357511333-5276-1-git-send-email-anderson.lizardo@openbossa.org>
+Date: Mon, 07 Jan 2013 19:26:57 -0800
+In-Reply-To: <CAFBvHie6nCYJpR1VJWdg+ki=TiZcvpR7R43xGrox_Z5pf0pCiw@mail.gmail.com>
+References: <CAFBvHie6nCYJpR1VJWdg+ki=TiZcvpR7R43xGrox_Z5pf0pCiw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Syam,
 
-> The length parameter should be sizeof(req->name) - 1 because there is no
-> guarantee that string provided by userspace will contain the trailing
-> '\0'.
+> In the latest Bluez snapshot I'm getting the g_test_fail compilation
+> error. The problem
+> happens because we use the Glib minimum version requirement
+> as 2.28 and this API is introduced in GLib version 2.30.
+> Do we need to use the g_test_fail() now with Glib 2.28?
+> I guess we cannot replace it with a wrapper function.
 > 
-> Can be easily reproduced by manually setting req->name to 128 non-zero
-> bytes prior to ioctl(HIDPCONNADD) and checking the device name setup on
-> input subsystem:
 > 
-> $ cat /sys/devices/pnp0/00\:04/tty/ttyS0/hci0/hci0\:1/input8/name
-> AAAAAA[...]AAAAAAAAf0:af:f0:af:f0:af
+> Possible Patch:
 > 
-> ("f0:af:f0:af:f0:af" is the device bluetooth address, taken from "phys"
-> field in struct hid_device due to overflow.)
+> From: Syam Sidhardhan <s.syam@samsung.com>
+> Date: Mon, 7 Jan 2013 17:22:00 -0300
+> Subject: [PATCH 1/1] unit: Remove g_test_fail()
+> MIME-Version: 1.0
+> Content-Type: text/plain; charset=UTF-8
+> Content-Transfer-Encoding: 8bit
 > 
-> Signed-off-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
+> g_test_fail() is introduced in Glib v2.30 and we are using
+> Glib v2.28 as the minimum requirement for the build.
+> This patch resolves the compilation error that happen with
+> Glib version < 2.30.
+> 
+> Error log:
+>   CC     unit/test-mgmt.o
+> unit/test-mgmt.c: In function ‘check_actions’:
+> unit/test-mgmt.c:100:2: error: implicit declaration of
+>     function ‘g_test_fail’ [-Werror=implicit-function-declaration]
+> cc1: all warnings being treated as errors
+> make[1]: *** [unit/test-mgmt.o] Error 1
+> make: *** [all] Error 2
 > ---
->  net/bluetooth/hidp/core.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  unit/test-mgmt.c |    1 -
+>  1 files changed, 0 insertions(+), 1 deletions(-)
+> 
+> diff --git a/unit/test-mgmt.c b/unit/test-mgmt.c
+> index 2d1a5d6..6b3689c 100644
+> --- a/unit/test-mgmt.c
+> +++ b/unit/test-mgmt.c
+> @@ -97,7 +97,6 @@ static void check_actions(struct context *context,
+>  	}
+> 
+>  	g_test_message("Command not handled\n");
+> -	g_test_fail();
+>  }
 
-this is a good catch. And this should also go to -stable and the current
-kernels right away.
+lets just use g_assert to fail here.
 
-It is actually a security issue since it leaks kernel memory to
-userspace.
-
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+I assumed g_test_fail lets you gracefully fail, but that is just bogus
+as I learned the hard way. So no point in bothering here.
 
 Regards
 
