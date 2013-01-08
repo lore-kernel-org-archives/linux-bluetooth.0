@@ -1,36 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lubomir Rintel <lkundrak@v3.sk>
-To: David Woodhouse <dwmw2@infradead.org>,
-	Ben Hutchings <ben@decadent.org.uk>,
-	libertas-dev@lists.infradead.org,
-	linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	lkundrak@v3.sk
-Subject: sd8688 firmware location
-Date: Wed,  9 Jan 2013 00:56:00 +0100
-Message-Id: <1357689361-7969-1-git-send-email-lkundrak@v3.sk>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH v2 BlueZ] lib: Fix SDP_TEXT_STR16/SDP_URL_STR16 parsing
+Date: Tue,  8 Jan 2013 19:05:25 -0400
+Message-Id: <1357686325-29529-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1357670608-19081-2-git-send-email-anderson.lizardo@openbossa.org>
+References: <1357670608-19081-2-git-send-email-anderson.lizardo@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+sdp_extract_attr() uses the "size" parameter to return the number of
+bytes consumed when parsing SDP Data Elements. This size is used to
+advance a buffer pointer to parse next element.
 
-btmrvl_sdio and libertas_sdio both use firmware files sd8688.bin and
-sd8688_helper.bin. In linux-firmware, they're present in libertas/ tree and
-(since 3d32a58b) libertas_sdio perfers loading it from there, while it is able
-to fallback to load it from linux-firmware root. btmrvl_sdio, on the other hand
-only looks in the root and ends up not being successful.
+This size was being incorrectly calculated for SDP_{TEXT,URL}_STR16 in
+extract_str(), where the string length was added twice. The string
+length is already added later in the function for {TEXT,URL}_STR{8,16}
+by this statement:
 
-Obviously, there are two solutions to the problem -- either teach btmrvl_sdio
-to look into libertas/, or move the files in linux-firmware tree. I don't
-really have a strong preference, though it probably makes less sense to keep in
-in libertas/, since the bluetooth hardware is not really marketed as "Libertas."
+*len += n;
+---
+ lib/sdp.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'm following up with patches to linux and linux-firmware and I'd be very
-thankful if you could pick one (not both of them).
+diff --git a/lib/sdp.c b/lib/sdp.c
+index ca474cd..b87f392 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -1176,7 +1176,7 @@ static sdp_data_t *extract_str(const void *p, int bufsize, int *len)
+ 		}
+ 		n = bt_get_be16(p);
+ 		p += sizeof(uint16_t);
+-		*len += sizeof(uint16_t) + n;
++		*len += sizeof(uint16_t);
+ 		bufsize -= sizeof(uint16_t);
+ 		break;
+ 	default:
+-- 
+1.7.9.5
 
-Have a nice day!
---
-Lubomir Rintel       >o
-                      (\)
