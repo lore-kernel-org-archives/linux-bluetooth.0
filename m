@@ -1,40 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1357615542.1806.22.camel@aeonflux>
-References: <1357559795-22090-1-git-send-email-anderson.lizardo@openbossa.org>
-	<1357615542.1806.22.camel@aeonflux>
-Date: Tue, 8 Jan 2013 06:52:59 -0400
-Message-ID: <CAJdJm_Mvo7VMQ=dQK=oCvXgt1aoH5vZEbfr6nd2qZp+PpeaP+Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/5] lib: Add SDP_IS_TEXT_STR() macro for
- SDP_TEXT_STR* checking
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: claudio.takahasi@openbossa.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH v0 2/2] media: Clarify Acquire/TryAcquire error cases
+Date: Tue,  8 Jan 2013 10:41:05 +0100
+Message-Id: <1357638065-19156-3-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1357638065-19156-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1357638065-19156-1-git-send-email-mikel.astiz.oss@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-On Mon, Jan 7, 2013 at 11:25 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
->>  #define SDP_IS_UUID(x) ((x) == SDP_UUID16 || (x) == SDP_UUID32 || (x) ==SDP_UUID128)
->>  #define SDP_IS_SEQ(x)  ((x) == SDP_SEQ8 || (x) == SDP_SEQ16 || (x) == SDP_SEQ32)
->> +#define SDP_IS_TEXT_STR(x) ((x) == SDP_TEXT_STR8 || (x) == SDP_TEXT_STR16 || \
->> +                                                     (x) == SDP_TEXT_STR32)
->
-> can someone please explain to me why we are extending the library. I
-> thought I made it clear that it is mostly end of life and we are not
-> adding new features. However some people keep adding stuff.
+Document the reported errors for Acquire() and TryAcquire(). For the
+later, make sure a specific error in guaranteed for the typical scenario
+of audio not streaming.
+---
+ doc/media-api.txt          | 10 +++++++++-
+ profiles/audio/transport.c |  2 +-
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-This macro was added simply to be used for the next patches which
-simplify/refactor core code. The fact the header is public API was not
-the main reason to add it here.
-
-Unless you suggest adding new stuff to another, internal-only header?
-If so, please provide some example how to extend SDP library code that
-is used by internal BlueZ code.
-
-Best Regards,
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index cdde6ea..bb5ced0 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -321,12 +321,20 @@ Methods		fd, uint16, uint16 Acquire()
+ 			Acquire transport file descriptor and the MTU for read
+ 			and write respectively.
+ 
++			Possible Errors: org.bluez.Error.NotAuthorized
++					 org.bluez.Error.Failed
++
+ 		fd, uint16, uint16 TryAcquire()
+ 
+ 			Acquire transport file descriptor only if the transport
+ 			is in "pending" state at the time the message is
+ 			received by BlueZ. Otherwise no request will be sent
+-			to the remote device and the function will just fail.
++			to the remote device and the function will just fail
++			with org.bluez.Error.NotAvailable.
++
++			Possible Errors: org.bluez.Error.NotAuthorized
++					 org.bluez.Error.Failed
++					 org.bluez.Error.NotAvailable
+ 
+ 		void Release()
+ 
+diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+index 54461d8..58240ac 100644
+--- a/profiles/audio/transport.c
++++ b/profiles/audio/transport.c
+@@ -477,7 +477,7 @@ static DBusMessage *try_acquire(DBusConnection *conn, DBusMessage *msg,
+ 		return btd_error_not_authorized(msg);
+ 
+ 	if (transport->state != TRANSPORT_STATE_PENDING)
+-		return btd_error_failed(msg, "Transport not playing");
++		return btd_error_not_available(msg);
+ 
+ 	owner = media_owner_create(msg);
+ 	id = transport->resume(transport, owner);
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.11.7
+
