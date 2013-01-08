@@ -1,68 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1357615617.1806.24.camel@aeonflux>
-Subject: Re: usage of g_test_fail() which is introduced in Glib 2.30
+Message-ID: <1357615542.1806.22.camel@aeonflux>
+Subject: Re: [PATCH BlueZ 1/5] lib: Add SDP_IS_TEXT_STR() macro for
+ SDP_TEXT_STR* checking
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Syam Sidhardhan <syamsidhardh@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 07 Jan 2013 19:26:57 -0800
-In-Reply-To: <CAFBvHie6nCYJpR1VJWdg+ki=TiZcvpR7R43xGrox_Z5pf0pCiw@mail.gmail.com>
-References: <CAFBvHie6nCYJpR1VJWdg+ki=TiZcvpR7R43xGrox_Z5pf0pCiw@mail.gmail.com>
+Date: Mon, 07 Jan 2013 19:25:42 -0800
+In-Reply-To: <1357559795-22090-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1357559795-22090-1-git-send-email-anderson.lizardo@openbossa.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+Hi Anderson,
 
-> In the latest Bluez snapshot I'm getting the g_test_fail compilation
-> error. The problem
-> happens because we use the Glib minimum version requirement
-> as 2.28 and this API is introduced in GLib version 2.30.
-> Do we need to use the g_test_fail() now with Glib 2.28?
-> I guess we cannot replace it with a wrapper function.
-> 
-> 
-> Possible Patch:
-> 
-> From: Syam Sidhardhan <s.syam@samsung.com>
-> Date: Mon, 7 Jan 2013 17:22:00 -0300
-> Subject: [PATCH 1/1] unit: Remove g_test_fail()
-> MIME-Version: 1.0
-> Content-Type: text/plain; charset=UTF-8
-> Content-Transfer-Encoding: 8bit
-> 
-> g_test_fail() is introduced in Glib v2.30 and we are using
-> Glib v2.28 as the minimum requirement for the build.
-> This patch resolves the compilation error that happen with
-> Glib version < 2.30.
-> 
-> Error log:
->   CC     unit/test-mgmt.o
-> unit/test-mgmt.c: In function ‘check_actions’:
-> unit/test-mgmt.c:100:2: error: implicit declaration of
->     function ‘g_test_fail’ [-Werror=implicit-function-declaration]
-> cc1: all warnings being treated as errors
-> make[1]: *** [unit/test-mgmt.o] Error 1
-> make: *** [all] Error 2
+> This new macro avoids constructs like "if (d->dtd < SDP_TEXT_STR8 ||
+> d->dtd > SDP_TEXT_STR32)" which are harder to read.
 > ---
->  unit/test-mgmt.c |    1 -
->  1 files changed, 0 insertions(+), 1 deletions(-)
+>  lib/sdp.h |    2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> diff --git a/unit/test-mgmt.c b/unit/test-mgmt.c
-> index 2d1a5d6..6b3689c 100644
-> --- a/unit/test-mgmt.c
-> +++ b/unit/test-mgmt.c
-> @@ -97,7 +97,6 @@ static void check_actions(struct context *context,
->  	}
-> 
->  	g_test_message("Command not handled\n");
-> -	g_test_fail();
->  }
+> diff --git a/lib/sdp.h b/lib/sdp.h
+> index 4448805..42681a2 100644
+> --- a/lib/sdp.h
+> +++ b/lib/sdp.h
+> @@ -440,6 +440,8 @@ typedef struct {
+>  
+>  #define SDP_IS_UUID(x) ((x) == SDP_UUID16 || (x) == SDP_UUID32 || (x) ==SDP_UUID128)
+>  #define SDP_IS_SEQ(x)  ((x) == SDP_SEQ8 || (x) == SDP_SEQ16 || (x) == SDP_SEQ32)
+> +#define SDP_IS_TEXT_STR(x) ((x) == SDP_TEXT_STR8 || (x) == SDP_TEXT_STR16 || \
+> +							(x) == SDP_TEXT_STR32)
 
-lets just use g_assert to fail here.
-
-I assumed g_test_fail lets you gracefully fail, but that is just bogus
-as I learned the hard way. So no point in bothering here.
+can someone please explain to me why we are extending the library. I
+thought I made it clear that it is mostly end of life and we are not
+adding new features. However some people keep adding stuff.
 
 Regards
 
