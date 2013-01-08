@@ -1,40 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1357615542.1806.22.camel@aeonflux>
-Subject: Re: [PATCH BlueZ 1/5] lib: Add SDP_IS_TEXT_STR() macro for
- SDP_TEXT_STR* checking
+Message-ID: <1357615440.1806.21.camel@aeonflux>
+Subject: Re: [PATCH 1/2] audio: Replace g_hash_table_contains() with
+ g_hash_table_lookup()
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 07 Jan 2013 19:25:42 -0800
-In-Reply-To: <1357559795-22090-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1357559795-22090-1-git-send-email-anderson.lizardo@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>,
+	Ludek Finstrle <luf@pzkagis.cz>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 07 Jan 2013 19:24:00 -0800
+In-Reply-To: <CABBYNZ+0H3t-jwbp_-iUeFw2NOqXuWmwBiw8xjqP5bx6D7gomQ@mail.gmail.com>
+References: <1357562033-26230-1-git-send-email-jaganath.k@samsung.com>
+	 <20130107131215.GC914@pzkagis.cz>
+	 <39D5295DD81346F9A6FC2AFB8D19919F@sisodomain.com>
+	 <CABBYNZ+0H3t-jwbp_-iUeFw2NOqXuWmwBiw8xjqP5bx6D7gomQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Luiz,
 
-> This new macro avoids constructs like "if (d->dtd < SDP_TEXT_STR8 ||
-> d->dtd > SDP_TEXT_STR32)" which are harder to read.
-> ---
->  lib/sdp.h |    2 ++
->  1 file changed, 2 insertions(+)
+<snip>
+
+> > I think
+> > return g_hash_table_lookup(mp->settings, property->name) ? TRUE : FALSE;
+> > would be better?
 > 
-> diff --git a/lib/sdp.h b/lib/sdp.h
-> index 4448805..42681a2 100644
-> --- a/lib/sdp.h
-> +++ b/lib/sdp.h
-> @@ -440,6 +440,8 @@ typedef struct {
->  
->  #define SDP_IS_UUID(x) ((x) == SDP_UUID16 || (x) == SDP_UUID32 || (x) ==SDP_UUID128)
->  #define SDP_IS_SEQ(x)  ((x) == SDP_SEQ8 || (x) == SDP_SEQ16 || (x) == SDP_SEQ32)
-> +#define SDP_IS_TEXT_STR(x) ((x) == SDP_TEXT_STR8 || (x) == SDP_TEXT_STR16 || \
-> +							(x) == SDP_TEXT_STR32)
+> Shorter form is  != NULL, so lets go with it, still haven't figure out
+> why we didn't bring back glib-compat for such functions, when we
+> finally upgrade it will take much more time to revert this one by one.
 
-can someone please explain to me why we are extending the library. I
-thought I made it clear that it is mostly end of life and we are not
-adding new features. However some people keep adding stuff.
+we could bring glib-compat back, but right now I do not want to
+introduce more autoconf magic to do so.
+
+I would require the latest GLib version (or at least a bit newer one) if
+they wouldn't just start introducing new dependencies all the time.
 
 Regards
 
