@@ -1,39 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 8 Jan 2013 13:57:32 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, claudio.takahasi@openbossa.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [PATCH v0 0/2] Media API clarifications
-Message-ID: <20130108115732.GA8622@x220.ger.corp.intel.com>
-References: <1357638065-19156-1-git-send-email-mikel.astiz.oss@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1357638065-19156-1-git-send-email-mikel.astiz.oss@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1357615542.1806.22.camel@aeonflux>
+References: <1357559795-22090-1-git-send-email-anderson.lizardo@openbossa.org>
+	<1357615542.1806.22.camel@aeonflux>
+Date: Tue, 8 Jan 2013 06:52:59 -0400
+Message-ID: <CAJdJm_Mvo7VMQ=dQK=oCvXgt1aoH5vZEbfr6nd2qZp+PpeaP+Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/5] lib: Add SDP_IS_TEXT_STR() macro for
+ SDP_TEXT_STR* checking
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Marcel,
 
-On Tue, Jan 08, 2013, Mikel Astiz wrote:
-> The documentation of BlueZ 5.0 is lacking some details affecting the
-> Media API, specially regarding the control of HFP/HSP volume.
-> 
-> There is no known implementation of MediaTransport1 at this point so
-> updating the documentation with two new optional properties could be
-> in practice done without updating the interface suffix.
-> 
-> Besides, the error codes returned by Acquire() and TryAcquire() are
-> convenient to implement proper error logging in the client side.
-> 
-> Mikel Astiz (2):
->   media: Add HFP/HSP gains to transport API
->   media: Clarify Acquire/TryAcquire error cases
-> 
->  doc/media-api.txt          | 32 +++++++++++++++++++++++++++++++-
->  profiles/audio/transport.c |  2 +-
->  2 files changed, 32 insertions(+), 2 deletions(-)
+On Mon, Jan 7, 2013 at 11:25 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>>  #define SDP_IS_UUID(x) ((x) == SDP_UUID16 || (x) == SDP_UUID32 || (x) ==SDP_UUID128)
+>>  #define SDP_IS_SEQ(x)  ((x) == SDP_SEQ8 || (x) == SDP_SEQ16 || (x) == SDP_SEQ32)
+>> +#define SDP_IS_TEXT_STR(x) ((x) == SDP_TEXT_STR8 || (x) == SDP_TEXT_STR16 || \
+>> +                                                     (x) == SDP_TEXT_STR32)
+>
+> can someone please explain to me why we are extending the library. I
+> thought I made it clear that it is mostly end of life and we are not
+> adding new features. However some people keep adding stuff.
 
-Both patches have been applied. Thanks.
+This macro was added simply to be used for the next patches which
+simplify/refactor core code. The fact the header is public API was not
+the main reason to add it here.
 
-Johan
+Unless you suggest adding new stuff to another, internal-only header?
+If so, please provide some example how to extend SDP library code that
+is used by internal BlueZ code.
+
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
