@@ -1,27 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 From: Syam Sidhardhan <s.syam@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 5/5] sdp-xml: Remove newline before EOF
-Date: Tue, 08 Jan 2013 17:07:49 +0530
-Message-id: <1357645069-30841-5-git-send-email-s.syam@samsung.com>
+Subject: [PATCH BlueZ 4/5] audio: Remove unused struct audio_adapter
+Date: Tue, 08 Jan 2013 17:07:48 +0530
+Message-id: <1357645069-30841-4-git-send-email-s.syam@samsung.com>
 In-reply-to: <1357645069-30841-1-git-send-email-s.syam@samsung.com>
 References: <1357645069-30841-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/sdp-xml.c |    1 -
- 1 file changed, 1 deletion(-)
+ profiles/audio/manager.c |    6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/src/sdp-xml.c b/src/sdp-xml.c
-index 8cb1e2d..6492781 100644
---- a/src/sdp-xml.c
-+++ b/src/sdp-xml.c
-@@ -994,4 +994,3 @@ void convert_sdp_record_to_xml(sdp_record_t *rec,
- 		appender(data, "</record>\n");
- 	}
- }
+diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
+index dc20712..f0df8ed 100644
+--- a/profiles/audio/manager.c
++++ b/profiles/audio/manager.c
+@@ -67,12 +67,6 @@
+ #include "manager.h"
+ #include "sdpd.h"
+ 
+-struct audio_adapter {
+-	struct btd_adapter *btd_adapter;
+-	gboolean powered;
+-	gint ref;
+-};
 -
+ static GKeyFile *config = NULL;
+ static GSList *devices = NULL;
+ 
 -- 
 1.7.9.5
 
