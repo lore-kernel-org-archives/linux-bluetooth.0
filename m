@@ -1,30 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH v0 0/2] Media API clarifications
-Date: Tue,  8 Jan 2013 10:41:03 +0100
-Message-Id: <1357638065-19156-1-git-send-email-mikel.astiz.oss@gmail.com>
+Message-ID: <1357626738.1806.27.camel@aeonflux>
+Subject: Re: [PATCH BlueZ v1] audio: Replace g_hash_table_contains() with
+ g_hash_table_lookup()
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 07 Jan 2013 22:32:18 -0800
+In-Reply-To: <1357622748-3051-1-git-send-email-jaganath.k@samsung.com>
+References: <1357622748-3051-1-git-send-email-jaganath.k@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Jaganath,
 
-The documentation of BlueZ 5.0 is lacking some details affecting the Media API, specially regarding the control of HFP/HSP volume.
+> g_hash_table_contains() is supported only from GLib 2.32. If BlueZ has to
+> build against GLib 2.28 this patch replaces g_hash_table_contains() to
+> g_hash_table_lookup()
+> ---
+>  profiles/audio/player.c |    5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 
-There is no known implementation of MediaTransport1 at this point so updating the documentation with two new optional properties could be in practice done without updating the interface suffix.
+patch has been applied.
 
-Besides, the error codes returned by Acquire() and TryAcquire() are convenient to implement proper error logging in the client side.
+Regards
 
-Mikel Astiz (2):
-  media: Add HFP/HSP gains to transport API
-  media: Clarify Acquire/TryAcquire error cases
+Marcel
 
- doc/media-api.txt          | 32 +++++++++++++++++++++++++++++++-
- profiles/audio/transport.c |  2 +-
- 2 files changed, 32 insertions(+), 2 deletions(-)
-
--- 
-1.7.11.7
 
