@@ -2,63 +2,54 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 1/2] unit: Add initial tests for sdp_extract_attr()
-Date: Tue,  8 Jan 2013 14:43:27 -0400
-Message-Id: <1357670608-19081-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 2/2] attrib: Fix compilation errors when compiled without optimization
+Date: Tue,  8 Jan 2013 11:46:27 -0400
+Message-Id: <1357659987-4219-2-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1357659987-4219-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1357659987-4219-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These tests do not use the full SDP PDU building code because they try
-to catch errors on SDP "extraction" code, which may not appear on a
-response PDU (but still cause hard to find bugs).
----
- unit/test-sdp.c |   27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+Fix these build errors:
 
-diff --git a/unit/test-sdp.c b/unit/test-sdp.c
-index 315a5cd..61449aa 100644
---- a/unit/test-sdp.c
-+++ b/unit/test-sdp.c
-@@ -754,6 +754,31 @@ static void test_sdp(gconstpointer data)
- 	g_free(test->pdu_list);
- }
- 
-+static void test_sdp_extract_attr(void)
-+{
-+	const struct sdp_pdu pdus[] = {
-+		raw_pdu(SDP_DATA_NIL),
-+		raw_pdu(SDP_TEXT_STR8, 0x04, 'A', 'B', 'C', 'D'),
-+		raw_pdu(SDP_TEXT_STR16, 0x00, 0x04, 'A', 'B', 'C', 'D'),
-+		{ },
-+	};
-+	int i;
-+
-+	for (i = 0; pdus[i].valid; i++) {
-+		sdp_data_t *d;
-+		int size = 0;
-+
-+		if (g_test_verbose() == TRUE)
-+			g_print("dtd=0x%02x\n", *(char *) pdus[i].raw_data);
-+
-+		d = sdp_extract_attr(pdus[i].raw_data, pdus[i].raw_size, &size,
-+									NULL);
-+		g_assert(d != NULL);
-+		g_assert_cmpuint(size, ==, pdus[i].raw_size);
-+		sdp_data_free(d);
-+	}
-+}
-+
- int main(int argc, char *argv[])
+attrib/att.c: In function ‘dec_read_by_grp_req’:
+attrib/att.c:165:10: error: comparison between signed and unsigned
+integer expressions [-Werror=sign-compare]
+attrib/att.c:170:10: error: comparison between signed and unsigned
+integer expressions [-Werror=sign-compare]
+attrib/att.c: In function ‘dec_read_by_type_req’:
+attrib/att.c:393:10: error: comparison between signed and unsigned
+integer expressions [-Werror=sign-compare]
+attrib/att.c:402:10: error: comparison between signed and unsigned
+integer expressions [-Werror=sign-compare]
+---
+ attrib/att.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/attrib/att.c b/attrib/att.c
+index de11811..fe66821 100644
+--- a/attrib/att.c
++++ b/attrib/att.c
+@@ -151,7 +151,7 @@ uint16_t enc_read_by_grp_req(uint16_t start, uint16_t end, bt_uuid_t *uuid,
+ uint16_t dec_read_by_grp_req(const uint8_t *pdu, size_t len, uint16_t *start,
+ 						uint16_t *end, bt_uuid_t *uuid)
  {
- 	g_test_init(&argc, &argv, NULL);
-@@ -2709,5 +2734,7 @@ int main(int argc, char *argv[])
- 			0x08, 0x09, 0x00, 0x01, 0x35, 0x03, 0x19, 0x11,
- 			0x06, 0x00));
+-	const uint16_t min_len = sizeof(pdu[0]) + sizeof(*start) + sizeof(*end);
++	const size_t min_len = sizeof(pdu[0]) + sizeof(*start) + sizeof(*end);
  
-+	g_test_add_func("/MISC/sdp_extract_attr", test_sdp_extract_attr);
-+
- 	return g_test_run();
- }
+ 	if (pdu == NULL)
+ 		return 0;
+@@ -382,7 +382,7 @@ uint16_t enc_read_by_type_req(uint16_t start, uint16_t end, bt_uuid_t *uuid,
+ uint16_t dec_read_by_type_req(const uint8_t *pdu, size_t len, uint16_t *start,
+ 						uint16_t *end, bt_uuid_t *uuid)
+ {
+-	const uint16_t min_len = sizeof(pdu[0]) + sizeof(*start) + sizeof(*end);
++	const size_t min_len = sizeof(pdu[0]) + sizeof(*start) + sizeof(*end);
+ 
+ 	if (pdu == NULL)
+ 		return 0;
 -- 
 1.7.9.5
 
