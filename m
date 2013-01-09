@@ -1,34 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1357761775.1806.49.camel@aeonflux>
-Subject: Re: [PATCH 1/8] Bluetooth: Fix missing command complete event for
- mgmt_confirm_name
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Wed, 9 Jan 2013 17:53:46 -0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Sergio Cambra <sergio@enpijama.es>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 09 Jan 2013 12:02:55 -0800
-In-Reply-To: <1357738180-4128-2-git-send-email-johan.hedberg@gmail.com>
-References: <1357738180-4128-1-git-send-email-johan.hedberg@gmail.com>
-	 <1357738180-4128-2-git-send-email-johan.hedberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: Re: [PATCH] Bluetooth device 04ca:3008 should use ath3k
+Message-ID: <20130109195346.GB30225@joana>
+References: <2070457.EiHL78Yky8@tablet>
+ <20130103203901.GD2114@joana>
+ <10056676.fQr0UMXTN5@tablet>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <10056676.fQr0UMXTN5@tablet>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Sergio,
 
-> All management commands are expected to indicate successful completion
-> through a command complete event however the confirm name command was
-> missing it. This patch add the sending of the missing event.
+* Sergio Cambra <sergio@enpijama.es> [2013-01-04 00:22:29 +0100]:
+
+> Output of /sys/kernel/debug/usb/devices
+> T:  Bus=03 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  6 Spd=12   MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=04ca ProdID=3008 Rev= 0.02
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Signed-off-by: Sergio Cambra <sergio@programatica.es>
 > ---
->  net/bluetooth/mgmt.c |    3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  drivers/bluetooth/ath3k.c | 2 ++
+>  drivers/bluetooth/btusb.c | 1 +
+>  2 files changed, 3 insertions(+)
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Your patch is broken, please use git send-email to send it to the mailing
+list.
 
-Regards
-
-Marcel
-
-
+	Gustavo
