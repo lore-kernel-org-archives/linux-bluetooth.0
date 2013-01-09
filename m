@@ -1,37 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1357738180-4128-8-git-send-email-johan.hedberg@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 8/8] Bluetooth: Fix sending incorrect new_settings for mgmt_set_powered
+Date: Wed,  9 Jan 2013 15:29:40 +0200
+Message-Id: <1357738180-4128-9-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1357738180-4128-1-git-send-email-johan.hedberg@gmail.com>
 References: <1357738180-4128-1-git-send-email-johan.hedberg@gmail.com>
-	<1357738180-4128-8-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 9 Jan 2013 09:45:52 -0400
-Message-ID: <CAJdJm_PZ5i-3HqmbL7YT5F59ycBJP3g83RMcWBBmKS9H02NJbQ@mail.gmail.com>
-Subject: Re: [PATCH 7/8] Bluetooth: Fix checking for exact values of boolean
- mgmt parameters
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Wed, Jan 9, 2013 at 9:29 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> @@ -1219,6 +1247,10 @@ static int set_le(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
->                 return cmd_status(sk, hdev->id, MGMT_OP_SET_LE,
->                                   MGMT_STATUS_NOT_SUPPORTED);
->
-> +       if (cp->val != 0x00 && cp->val != 0x01)
-> +               return cmd_status(sk, hdev->id, MGMT_OP_SET_SSP,
-> +                                 MGMT_STATUS_INVALID_PARAMS);
-> +
+The socket from which a mgmt_set_powered command was received should
+only receive the command response but no new_settings event.
 
-I think you meant "MGMT_OP_SET_LE" here.
+The mgmt_powered() function which is used to handle the situation with
+the HCI_AUTO_OFF flag tries to check for a pending command to know which
+socket to skip the event for, but since the pending command hasn't been
+added this will not happen.
 
-Can mgmt-tester be modified to check for this as well?
+This patch fixes the issue by adding the pending command for the
+HCI_AUTO_OFF case and thereby ensures that mgmt_powered() will skip the
+right socket when sending the new_settings event, but still send the
+proper response to the socket where the command came from.
 
-Regards,
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c |    5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index eb9d48a..60afaee 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -787,8 +787,9 @@ static int set_powered(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		cancel_delayed_work(&hdev->power_off);
+ 
+ 		if (cp->val) {
+-			err = send_settings_rsp(sk, MGMT_OP_SET_POWERED, hdev);
+-			mgmt_powered(hdev, 1);
++			mgmt_pending_add(sk, MGMT_OP_SET_POWERED, hdev,
++					 data, len);
++			err = mgmt_powered(hdev, 1);
+ 			goto failed;
+ 		}
+ 	}
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.10.4
+
