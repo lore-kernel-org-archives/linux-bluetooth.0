@@ -1,32 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 9 Jan 2013 11:15:48 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/8] Bluetooth: Various mgmt fixes
-Date: Wed,  9 Jan 2013 15:29:32 +0200
-Message-Id: <1357738180-4128-1-git-send-email-johan.hedberg@gmail.com>
+To: Syam Sidhardhan <s.syam@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/5] health: Fix pointer to local variable
+ out-of-scope
+Message-ID: <20130109091548.GA26746@x220.ger.corp.intel.com>
+References: <1357645069-30841-1-git-send-email-s.syam@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1357645069-30841-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Syam,
 
-This this set of patches fixes various issues with the management
-interface that have been found in the past few weeks. It also improves
-the pass-rate of the user space mgmt-tester to all but one test case
-(which I'm not 100% sure is correct anyway):
+On Tue, Jan 08, 2013, Syam Sidhardhan wrote:
+> The address of the local variable is used outside the scope.
+> ---
+>  profiles/health/hdp_util.c |   12 ++++--------
+>  1 file changed, 4 insertions(+), 8 deletions(-)
 
-Total: 35, Passed: 34 (97.1%), Failed: 1, Not Run: 0
-
-Johan Hedberg (8):
-      Bluetooth: Fix missing command complete event for mgmt_confirm_name
-      Bluetooth: Fix missing command complete for mgmt_load_long_term_keys
-      Bluetooth: Fix checking for valid device class values
-      Bluetooth: Fix accepting set_dev_class for non-BR/EDR controllers
-      Bluetooth: Fix returning proper command status for start_discovery
-      Bluetooth: Move non-critical sections outside of the dev lock
-      Bluetooth: Fix checking for exact values of boolean mgmt parameters
-      Bluetooth: Fix sending incorrect new_settings for mgmt_set_powered
-
- net/bluetooth/mgmt.c |  124 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----------------------------
- 1 file changed, 91 insertions(+), 33 deletions(-)
+All patches have been applied. Thanks. Btw, I made a minor fix to the
+g_test_fail patch to use g_assert_not_reached() instead of (a less
+intuitive imo) g_assert(0).
 
 Johan
