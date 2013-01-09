@@ -1,50 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1357771504.12030.59.camel@dcbw.foobar.com>
-Subject: Re: sd8688 firmware location
-From: Dan Williams <dcbw@redhat.com>
-To: Lubomir Rintel <lkundrak@v3.sk>
-Cc: David Woodhouse <dwmw2@infradead.org>,
-        Ben Hutchings
- <ben@decadent.org.uk>, libertas-dev@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org, Gustavo Padovan <gustavo@padovan.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg
- <johan.hedberg@gmail.com>, linux-kernel@vger.kernel.org
-Date: Wed, 09 Jan 2013 16:45:04 -0600
-In-Reply-To: <1357689361-7969-1-git-send-email-lkundrak@v3.sk>
-References: <1357689361-7969-1-git-send-email-lkundrak@v3.sk>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Wed, 9 Jan 2013 19:41:55 -0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] Bluetooth: Allow getting SCO options for not connected
+ sockets
+Message-ID: <20130109214155.GB18821@joana>
+References: <1357138055-28765-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1357138055-28765-1-git-send-email-vinicius.gomes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2013-01-09 at 00:56 +0100, Lubomir Rintel wrote:
-> Hi!
-> 
-> btmrvl_sdio and libertas_sdio both use firmware files sd8688.bin and
-> sd8688_helper.bin. In linux-firmware, they're present in libertas/ tree and
-> (since 3d32a58b) libertas_sdio perfers loading it from there, while it is able
-> to fallback to load it from linux-firmware root. btmrvl_sdio, on the other hand
-> only looks in the root and ends up not being successful.
-> 
-> Obviously, there are two solutions to the problem -- either teach btmrvl_sdio
-> to look into libertas/, or move the files in linux-firmware tree. I don't
-> really have a strong preference, though it probably makes less sense to keep in
-> in libertas/, since the bluetooth hardware is not really marketed as "Libertas."
-> 
-> I'm following up with patches to linux and linux-firmware and I'd be very
-> thankful if you could pick one (not both of them).
+Hi Vinicius,
 
-So the BT part and the wifi part have different SDIO IDs; are they
-actually connected separately to the SDIO bus?  Or is the chip only in
-one mode at one time or something like that?  Is there a problem with
-having both libertas and btmrvl loaded at the same time since they're
-essentially the same chip?
+* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2013-01-02 11:47:35 -0300]:
 
-I don't really mind moving stuff to mrvl/ out of libertas/ for these
-devices, but I do want some backwards compat code in libertas for that.
-Unless, of course, Marcel was talking about symlinks in the
-linux-firmware git tree, which would be fine with me.  The important
-point is that simply updating your linux-firmware package or install or
-whatever *should not* result in a failed firmware load.
+> Now, that we have proper support for deferred setup for SCO sockets it
+> is very convenient that we are able to get the socket options for
+> sockets that are not in the 'connected' state.
+> 
+> And makes the behaviour more consistent with what L2CAP does, for
+> example.
+> 
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> ---
+> 
+> Sending this as a RFC, because even though I couldn't think of any cases
+> that this new behaviour would surprise userspace applications, there
+> may be still be some.
+> 
+>  net/bluetooth/sco.c | 5 -----
+>  1 file changed, 5 deletions(-)
+> 
+> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> index 531a93d..271320c 100644
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -730,11 +730,6 @@ static int sco_sock_getsockopt_old(struct socket *sock, int optname, char __user
+>  
+>  	switch (optname) {
+>  	case SCO_OPTIONS:
+> -		if (sk->sk_state != BT_CONNECTED) {
+> -			err = -ENOTCONN;
+> -			break;
+> -		}
+> -
+>  		opts.mtu = sco_pi(sk)->conn->mtu;
+>  
+>  		BT_DBG("mtu %d", opts.mtu);
 
-Dan
+I'm ok with this patch, if someone else has something against it, please tell
+me.
+
+	Gustavo
