@@ -1,28 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 9 Jan 2013 11:15:48 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Syam Sidhardhan <s.syam@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/5] health: Fix pointer to local variable
- out-of-scope
-Message-ID: <20130109091548.GA26746@x220.ger.corp.intel.com>
-References: <1357645069-30841-1-git-send-email-s.syam@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1357645069-30841-1-git-send-email-s.syam@samsung.com>
+Message-ID: <1357713345.1806.44.camel@aeonflux>
+Subject: Re: [PATCH] Bluetooth: btmrvl_sdio: look for sd8688 firmware in
+ alternate place
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lubomir Rintel <lkundrak@v3.sk>
+Cc: Bing Zhao <bzhao@marvell.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Ben Hutchings <ben@decadent.org.uk>,
+	"libertas-dev@lists.infradead.org" <libertas-dev@lists.infradead.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Date: Tue, 08 Jan 2013 22:35:45 -0800
+In-Reply-To: <1357713088.1105.1.camel@unicorn>
+References: <1357689361-7969-1-git-send-email-lkundrak@v3.sk>
+	 <1357689361-7969-2-git-send-email-lkundrak@v3.sk>
+	 <1357698538.1806.43.camel@aeonflux>
+	 <477F20668A386D41ADCC57781B1F70430D13FDB783@SC-VEXCH1.marvell.com>
+	 <1357713088.1105.1.camel@unicorn>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+Hi Lubomir,
 
-On Tue, Jan 08, 2013, Syam Sidhardhan wrote:
-> The address of the local variable is used outside the scope.
-> ---
->  profiles/health/hdp_util.c |   12 ++++--------
->  1 file changed, 4 insertions(+), 8 deletions(-)
+> > > > linux-firmware ships the sd8688* firmware images that are shared with
+> > > > libertas_sdio WiFi driver under libertas/. libertas_sdio looks in both places
+> > > > and so should we.
+> > > >
+> > > > Signed-off-by: Lubomir Rintel <lkundrak@v3.sk>
+> > > > ---
+> > > >  drivers/bluetooth/btmrvl_sdio.c |   24 ++++++++++++++++++++++--
+> > > >  drivers/bluetooth/btmrvl_sdio.h |    6 ++++--
+> > > >  2 files changed, 26 insertions(+), 4 deletions(-)
+> > > 
+> > > NAK from me on this one. I do not want the driver to check two
+> > > locations. That is what userspace can work around.
+> > > 
+> > > If we want to unify the location between the WiFi driver and the
+> > > Bluetooth driver, I am fine with that, but seriously, just pick one over
+> > > the other. I do not care which one.
+> > 
+> > The unified location is mrvl/ directory.
+> > 
+> > We can probably move SD8688 firmware & helper binaries to mrvl/ and have both drivers grab the images there?
+> 
+> That would break existing setups, wouldn't it?
+> 
+> I was under impression (commit 3d32a58b) that we care about
+> compatibility here. Do we?
 
-All patches have been applied. Thanks. Btw, I made a minor fix to the
-g_test_fail patch to use g_assert_not_reached() instead of (a less
-intuitive imo) g_assert(0).
+that is what symlinks are for.
 
-Johan
+Regards
+
+Marcel
+
+
