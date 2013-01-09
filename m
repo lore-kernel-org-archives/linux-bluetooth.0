@@ -1,84 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sergio Cambra <sergio@enpijama.es>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Sergio Cambra <sergio@programatica.es>
-Subject: [PATCH] Bluetooth device 04ca:3008 should use ath3k
-Date: Thu, 10 Jan 2013 01:06:55 +0100
-Message-Id: <1357776415-6974-1-git-send-email-sergio@enpijama.es>
-In-Reply-To: <20130109195346.GB30225@joana>
-References: <20130109195346.GB30225@joana>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1357771504.12030.59.camel@dcbw.foobar.com>
+Subject: Re: sd8688 firmware location
+From: Dan Williams <dcbw@redhat.com>
+To: Lubomir Rintel <lkundrak@v3.sk>
+Cc: David Woodhouse <dwmw2@infradead.org>,
+        Ben Hutchings
+ <ben@decadent.org.uk>, libertas-dev@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, Gustavo Padovan <gustavo@padovan.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg
+ <johan.hedberg@gmail.com>, linux-kernel@vger.kernel.org
+Date: Wed, 09 Jan 2013 16:45:04 -0600
+In-Reply-To: <1357689361-7969-1-git-send-email-lkundrak@v3.sk>
+References: <1357689361-7969-1-git-send-email-lkundrak@v3.sk>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Sergio Cambra <sergio@programatica.es>
+On Wed, 2013-01-09 at 00:56 +0100, Lubomir Rintel wrote:
+> Hi!
+> 
+> btmrvl_sdio and libertas_sdio both use firmware files sd8688.bin and
+> sd8688_helper.bin. In linux-firmware, they're present in libertas/ tree and
+> (since 3d32a58b) libertas_sdio perfers loading it from there, while it is able
+> to fallback to load it from linux-firmware root. btmrvl_sdio, on the other hand
+> only looks in the root and ends up not being successful.
+> 
+> Obviously, there are two solutions to the problem -- either teach btmrvl_sdio
+> to look into libertas/, or move the files in linux-firmware tree. I don't
+> really have a strong preference, though it probably makes less sense to keep in
+> in libertas/, since the bluetooth hardware is not really marketed as "Libertas."
+> 
+> I'm following up with patches to linux and linux-firmware and I'd be very
+> thankful if you could pick one (not both of them).
 
-Output of /sys/kernel/debug/usb/devices
-T:  Bus=03 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  6 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=04ca ProdID=3008 Rev= 0.02
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+So the BT part and the wifi part have different SDIO IDs; are they
+actually connected separately to the SDIO bus?  Or is the chip only in
+one mode at one time or something like that?  Is there a problem with
+having both libertas and btmrvl loaded at the same time since they're
+essentially the same chip?
 
-Signed-off-by: Sergio Cambra <sergio@programatica.es>
----
- drivers/bluetooth/ath3k.c | 2 ++
- drivers/bluetooth/btusb.c | 1 +
- 2 files changed, 3 insertions(+)
+I don't really mind moving stuff to mrvl/ out of libertas/ for these
+devices, but I do want some backwards compat code in libertas for that.
+Unless, of course, Marcel was talking about symlinks in the
+linux-firmware git tree, which would be fine with me.  The important
+point is that simply updating your linux-firmware package or install or
+whatever *should not* result in a failed firmware load.
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index be17894..33c9a44 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -78,6 +78,7 @@ static struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3375) },
- 	{ USB_DEVICE(0x04CA, 0x3005) },
- 	{ USB_DEVICE(0x04CA, 0x3006) },
-+	{ USB_DEVICE(0x04CA, 0x3008) },
- 	{ USB_DEVICE(0x13d3, 0x3362) },
- 	{ USB_DEVICE(0x0CF3, 0xE004) },
- 	{ USB_DEVICE(0x0930, 0x0219) },
-@@ -109,6 +110,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3006), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 3f6a993..7e351e3 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -136,6 +136,7 @@ static struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3006), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
--- 
-1.8.0.2
-
+Dan
