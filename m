@@ -1,39 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/8] Bluetooth: Fix missing command complete event for mgmt_confirm_name
-Date: Wed,  9 Jan 2013 15:29:33 +0200
-Message-Id: <1357738180-4128-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1357738180-4128-1-git-send-email-johan.hedberg@gmail.com>
-References: <1357738180-4128-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 0/8] Bluetooth: Various mgmt fixes
+Date: Wed,  9 Jan 2013 15:29:32 +0200
+Message-Id: <1357738180-4128-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-All management commands are expected to indicate successful completion
-through a command complete event however the confirm name command was
-missing it. This patch add the sending of the missing event.
+This this set of patches fixes various issues with the management
+interface that have been found in the past few weeks. It also improves
+the pass-rate of the user space mgmt-tester to all but one test case
+(which I'm not 100% sure is correct anyway):
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Total: 35, Passed: 34 (97.1%), Failed: 1, Not Run: 0
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f559b96..3bcb63e 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2510,7 +2510,8 @@ static int confirm_name(struct sock *sk, struct hci_dev *hdev, void *data,
- 		hci_inquiry_cache_update_resolve(hdev, e);
- 	}
- 
--	err = 0;
-+	err = cmd_complete(sk, hdev->id, MGMT_OP_CONFIRM_NAME, 0, &cp->addr,
-+			   sizeof(cp->addr));
- 
- failed:
- 	hci_dev_unlock(hdev);
--- 
-1.7.10.4
+Johan Hedberg (8):
+      Bluetooth: Fix missing command complete event for mgmt_confirm_name
+      Bluetooth: Fix missing command complete for mgmt_load_long_term_keys
+      Bluetooth: Fix checking for valid device class values
+      Bluetooth: Fix accepting set_dev_class for non-BR/EDR controllers
+      Bluetooth: Fix returning proper command status for start_discovery
+      Bluetooth: Move non-critical sections outside of the dev lock
+      Bluetooth: Fix checking for exact values of boolean mgmt parameters
+      Bluetooth: Fix sending incorrect new_settings for mgmt_set_powered
 
+ net/bluetooth/mgmt.c |  124 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----------------------------
+ 1 file changed, 91 insertions(+), 33 deletions(-)
+
+Johan
