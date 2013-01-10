@@ -1,196 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Liu, Chuansheng" <chuansheng.liu@intel.com>
+From: Sergio Cambra <sergio@enpijama.es>
 To: Gustavo Padovan <gustavo@padovan.org>
-CC: "marcel@holtmann.org" <marcel@holtmann.org>, "johan.hedberg@gmail.com"
-	<johan.hedberg@gmail.com>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] Bluetooth: fix the oops due to conn->hcon == NULL in
- shutdown case
-Date: Thu, 10 Jan 2013 00:26:16 +0000
-Message-ID: <27240C0AC20F114CBF8149A2696CBE4A1FFD91@SHSMSX101.ccr.corp.intel.com>
-References: <1356429857.25456.4.camel@cliu38-desktop-build>
- <20130103220258.GF2114@joana>
- <27240C0AC20F114CBF8149A2696CBE4A1FB42B@SHSMSX101.ccr.corp.intel.com>
- <20130109203444.GC30225@joana>
-In-Reply-To: <20130109203444.GC30225@joana>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Cc: linux-bluetooth@vger.kernel.org,
+	Sergio Cambra <sergio@programatica.es>
+Subject: [PATCH] Bluetooth device 04ca:3008 should use ath3k
+Date: Thu, 10 Jan 2013 01:06:55 +0100
+Message-Id: <1357776415-6974-1-git-send-email-sergio@enpijama.es>
+In-Reply-To: <20130109195346.GB30225@joana>
+References: <20130109195346.GB30225@joana>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+From: Sergio Cambra <sergio@programatica.es>
 
-> -----Original Message-----
-> From: Gustavo Padovan [mailto:gustavo@padovan.org]
-> Sent: Thursday, January 10, 2013 4:35 AM
-> To: Liu, Chuansheng
-> Cc: marcel@holtmann.org; johan.hedberg@gmail.com;
-> linux-bluetooth@vger.kernel.org; linux-kernel@vger.kernel.org
-> Subject: Re: [PATCH] Bluetooth: fix the oops due to conn->hcon =3D=3D NUL=
-L in
-> shutdown case
->=20
-> Hi Liu,
->=20
-> * Liu, Chuansheng <chuansheng.liu@intel.com> [2013-01-04 00:55:26 +0000]:
->=20
-> >
-> >
-> > > -----Original Message-----
-> > > From: Gustavo Padovan [mailto:gustavo@padovan.org]
-> > > Sent: Friday, January 04, 2013 6:03 AM
-> > > To: Liu, Chuansheng
-> > > Cc: marcel@holtmann.org; johan.hedberg@gmail.com;
-> > > linux-bluetooth@vger.kernel.org; linux-kernel@vger.kernel.org
-> > > Subject: Re: [PATCH] Bluetooth: fix the oops due to conn->hcon =3D=3D=
- NULL in
-> > > shutdown case
-> > >
-> > > Hi Chuansheng,
-> > >
-> > > * Chuansheng Liu <chuansheng.liu@intel.com> [2012-12-25 18:04:17
-> +0800]:
-> > >
-> > > >
-> > > > Meet one panic issue as below stack:
-> >
-> >
-> > > > Disassemble the code:
-> > > > base address of __sco_sock_close is 0xc184f410
-> > > > 0xc184f4f8 <+232>:   lock decl 0x8(%ebx) < =3D=3D crash here, ebx i=
-s 0x0,
-> > > >
-> > > > the related source code is:
-> > > > (gdb) l *0xc184f4f8
-> > > > 0xc184f4f8 is in __sco_sock_close (arch/x86/include/asm/atomic.h:12=
-3)
-> > > > 119     static inline int atomic_dec_and_test(atomic_t *v)
-> > > > 123             asm volatile(LOCK_PREFIX "decl %0; sete %1"
-> > > >
-> > > > The whole call stack is:
-> > > > sys_shutdown()
-> > > >   sco_sock_shutdown()
-> > > >     __sco_sock_close()
-> > > >       hci_conn_put()
-> > > >         atomic_dec_and_test()
-> > > >
-> > > > Due to the conn->hcon is NULL, and the member hcon->refcnt is at of=
-fset
-> 0x8,
-> > > > so "BUG: unable to handle kernel NULL pointer dereference at 000000=
-08"
-> > > > appears.
-> > Could you add the above crash info to indicate where crashed? Thanks.
-> >
-> > > >
-> > > > Here fix it that adding the condition if conn->hcon is NULL, just l=
-ike
-> > > > in sco_chan_del().
-> > > >
-> > > > Signed-off-by: liu chuansheng <chuansheng.liu@intel.com>
-> > > > ---
-> > > >  net/bluetooth/sco.c |    6 ++++--
-> > > >  1 files changed, 4 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> > > > index 531a93d..190f70c 100644
-> > > > --- a/net/bluetooth/sco.c
-> > > > +++ b/net/bluetooth/sco.c
-> > > > @@ -355,8 +355,10 @@ static void __sco_sock_close(struct sock *sk)
-> > > >  		if (sco_pi(sk)->conn) {
-> > > >  			sk->sk_state =3D BT_DISCONN;
-> > > >  			sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
-> > > > -			hci_conn_put(sco_pi(sk)->conn->hcon);
-> > > > -			sco_pi(sk)->conn->hcon =3D NULL;
-> > > > +			if (sco_pi(sk)->conn->hcon) {
-> > > > +				hci_conn_put(sco_pi(sk)->conn->hcon);
-> > > > +				sco_pi(sk)->conn->hcon =3D NULL;
-> > > > +			}
-> > > >  		} else
-> > > >  			sco_chan_del(sk, ECONNRESET);
-> > > >  		break;
-> > >
-> > > Please check if the following patch fixes the issue for you:
-> > >
-> > > commit ae5668c1fc155d3034d0eedcdb52798390975a39 (HEAD, master)
-> > > Author: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> > > Date:   Thu Jan 3 19:59:28 2013 -0200
-> > >
-> > >     Bluetooth: Check if the hci connection exists in SCO shutdown
-> > >
-> > >     Checking only for sco_conn seems to not be enough and lead to NUL=
-L
-> > >     dereferences in the code, check for hcon instead.
-> > >
-> > >     <1>[11340.226404] BUG: unable to handle kernel NULL pointer
-> > > dereference at
-> > >     0000000
-> > >     8
-> > >     <4>[11340.226619] EIP is at __sco_sock_close+0xe8/0x1a0
-> > >     <4>[11340.226629] EAX: f063a740 EBX: 00000000 ECX: f58f4544 EDX:
-> > > 00000000
-> > >     <4>[11340.226640] ESI: dec83e00 EDI: 5f9a081f EBP: e0fdff38 ESP:
-> > > e0fdff1c
-> > >     <0>[11340.226674] Stack:
-> > >     <4>[11340.226682]  c184db87 c1251028 dec83e00 e0fdff38
-> c1754aef
-> > > dec83e00
-> > >     00000000
-> > >     e0fdff5c
-> > >     <4>[11340.226718]  c184f587 e0fdff64 e0fdff68 5f9a081f e0fdff5c
-> > > c1751852
-> > >     d7813800
-> > >     62262f10
-> > >     <4>[11340.226752]  e0fdff70 c1753c00 00000000 00000001
-> 0000000d
-> > > e0fdffac
-> > >     c175425c
-> > >     00000041
-> > >     <0>[11340.226793] Call Trace:
-> > >     <4>[11340.226813]  [<c184db87>] ?
-> sco_sock_clear_timer+0x27/0x60
-> > >     <4>[11340.226831]  [<c1251028>] ? local_bh_enable+0x68/0xd0
-> > >     <4>[11340.226846]  [<c1754aef>] ? lock_sock_nested+0x4f/0x60
-> > >     <4>[11340.226862]  [<c184f587>] sco_sock_shutdown+0x67/0xb0
-> > >     <4>[11340.226879]  [<c1751852>] ? sockfd_lookup_light+0x22/0x80
-> > >     <4>[11340.226897]  [<c1753c00>] sys_shutdown+0x30/0x60
-> > >     <4>[11340.226912]  [<c175425c>] sys_socketcall+0x1dc/0x2a0
-> > >     <4>[11340.226929]  [<c149ba78>] ?
-> trace_hardirqs_on_thunk+0xc/0x10
-> > >     <4>[11340.226944]  [<c18860f1>] syscall_call+0x7/0xb
-> > >     <4>[11340.226960]  [<c1880000>] ? restore_cur+0x5e/0xd7
-> > >     <0>[11340.226969] Code: <f0> ff 4b 08 0f 94 c0 84 c0 74 20 80 7b =
-19
-> 01 74
-> > >     2f b8 0a 00 00
-> > >
-> > >     Reported-by: Chuansheng Liu <chuansheng.liu@intel.com>
-> > >     Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> > >
-> > > diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> > > index 531a93d..57f250c 100644
-> > > --- a/net/bluetooth/sco.c
-> > > +++ b/net/bluetooth/sco.c
-> > > @@ -352,7 +352,7 @@ static void __sco_sock_close(struct sock *sk)
-> > >
-> > >  	case BT_CONNECTED:
-> > >  	case BT_CONFIG:
-> > > -		if (sco_pi(sk)->conn) {
-> > > +		if (sco_pi(sk)->conn->hcon) {
-> > Your fix is incomplete, at least it should be:
-> > 		if ( (sco_pi(sk)->conn) && (sco_pi(sk)->conn->hcon)) {
-> > Otherwise, it will bring another crash case. So could you add signed-of=
-f-by me
-> also?
->=20
-> Can you point any code flow that can crash with my patch? Otherwise I'm j=
-ust
-> pushing this patch. I don't think we need to check for sco_pi(sk)->conn h=
-ere.
-My theory is the old code if(sco_pi(sk)->conn) is already there, unless you=
- think it is useless and impossible.
-Just a code review for me, if you think your patch is still OK, please push=
-ing it, thanks.
-And I will try it to reproduce if possible:(
->=20
-> 	Gustavo
+Output of /sys/kernel/debug/usb/devices
+T:  Bus=03 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  6 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=04ca ProdID=3008 Rev= 0.02
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+
+Signed-off-by: Sergio Cambra <sergio@programatica.es>
+---
+ drivers/bluetooth/ath3k.c | 2 ++
+ drivers/bluetooth/btusb.c | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index be17894..33c9a44 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -78,6 +78,7 @@ static struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3375) },
+ 	{ USB_DEVICE(0x04CA, 0x3005) },
+ 	{ USB_DEVICE(0x04CA, 0x3006) },
++	{ USB_DEVICE(0x04CA, 0x3008) },
+ 	{ USB_DEVICE(0x13d3, 0x3362) },
+ 	{ USB_DEVICE(0x0CF3, 0xE004) },
+ 	{ USB_DEVICE(0x0930, 0x0219) },
+@@ -109,6 +110,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3006), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 3f6a993..7e351e3 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -136,6 +136,7 @@ static struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3006), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
+-- 
+1.8.0.2
+
