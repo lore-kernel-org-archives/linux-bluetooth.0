@@ -1,142 +1,171 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 02/13 v2] player: Remove GetTrack and TrackChanged
-Date: Thu, 10 Jan 2013 15:37:07 +0200
-Message-Id: <1357825038-21970-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1357825038-21970-1-git-send-email-luiz.dentz@gmail.com>
-References: <1357825038-21970-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 01/13 v2] media-api: Add playback control methods to MediaPlayer1
+Date: Thu, 10 Jan 2013 15:37:06 +0200
+Message-Id: <1357825038-21970-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This turn track metadata into a property called "Track" of MediaPlayer1
+This adds methods such as Play, Pause directly in MediaPlayer1, in
+addition to that Track is now turn into a property to take advantage of
+ObjectManager and document the interface as experimental.
 ---
- profiles/audio/player.c | 81 +++++++++++++++----------------------------------
- 1 file changed, 25 insertions(+), 56 deletions(-)
+v2: Fix removing experimental flags, add patches to mpris-player and remove
+VolumeUp and VolumeDown as they don't make sense to controller to send them.
 
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index bffb506..9add1b8 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -82,33 +82,6 @@ static void append_metadata(void *key, void *value, void *user_data)
- 	dict_append_entry(dict, key, DBUS_TYPE_STRING, &value);
- }
+ doc/media-api.txt | 99 +++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 53 insertions(+), 46 deletions(-)
+
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index bb5ced0..ae4b0dd 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -129,7 +129,7 @@ Media Control hierarchy
+ =======================
  
--static DBusMessage *media_player_get_track(DBusConnection *conn,
--						DBusMessage *msg, void *data)
--{
--	struct media_player *mp = data;
--	DBusMessage *reply;
--	DBusMessageIter iter, dict;
--
--	reply = dbus_message_new_method_return(msg);
--	if (!reply)
--		return NULL;
--
--	dbus_message_iter_init_append(reply, &iter);
--
--	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
--					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
--					DBUS_TYPE_STRING_AS_STRING
--					DBUS_TYPE_VARIANT_AS_STRING
--					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
--					&dict);
--
--	g_hash_table_foreach(mp->track, append_metadata, &dict);
--
--	dbus_message_iter_close_container(&iter, &dict);
--
--	return reply;
--}
--
- static struct pending_req *find_pending(struct media_player *mp,
- 							const char *key)
- {
-@@ -249,16 +222,31 @@ static void set_setting(const GDBusPropertyTable *property,
- 	player_set_setting(mp, id, property->name, value);
- }
+ Service		org.bluez
+-Interface	org.bluez.MediaControl1
++Interface	org.bluez.MediaControl1 [Deprecated]
+ Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
  
-+static gboolean get_track(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_player *mp = data;
-+	DBusMessageIter dict;
+ Methods		void Play()
+@@ -178,65 +178,39 @@ Properties
+ MediaPlayer1 hierarchy
+ ======================
+ 
+-Service		unique name (Target role)
+-Interface	org.bluez.MediaPlayer1
+-Object path	freely definable
+-
+ Service		org.bluez (Controller role)
+-Interface	org.bluez.MediaPlayer1
++Interface	org.bluez.MediaPlayer1 [Experimental]
+ Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/playerX
+ 
+-Methods		dict GetTrack()
+-
+-			Returns known metadata of the current track.
+-
+-			See TrackChanged for possible values.
+-
+-		void Release()
+-
+-			This method gets called when the service daemon
+-			unregisters the player which can then perform
+-			cleanup tasks. There is no need to unregister the
+-			player, because when this method gets called it has
+-			already been unregistered.
+-
+-Signals		TrackChanged(dict metadata)
+-
+-			This signal indicates that current track has changed.
+-			All available metadata for the new track shall be set
+-			at once in the metadata argument. Metadata cannot be
+-			updated in parts, otherwise it will be interpreted as
+-			multiple track changes.
+-
+-			Possible values:
+-
+-				string Title:
++Methods		void Play()
+ 
+-					Track title name
++			Resume playback.
+ 
+-				string Artist:
++		void Pause()
+ 
+-					Track artist name
++			Pause playback.
+ 
+-				string Album:
++		void Stop()
+ 
+-					Track album name
++			Stop playback.
+ 
+-				string Genre:
++		void Next()
+ 
+-					Track genre name
++			Next item.
+ 
+-				uint32 NumberOfTracks:
++		void Previous()
+ 
+-					Number of tracks in total
++			Previous item.
+ 
+-				uint32 Number:
++		void FastForward()
+ 
+-					Track number
++			Fast forward playback, this action is only stopped
++			when another method in this interface is called.
+ 
+-				uint32 Duration:
++		void Rewind()
+ 
+-					Track duration in milliseconds
++			Rewind playback, this action is only stopped
++			when another method in this interface is called.
+ 
+ Properties	string Equalizer [readwrite]
+ 
+@@ -258,8 +232,8 @@ Properties	string Equalizer [readwrite]
+ 		string Status [readonly]
+ 
+ 			Possible status: "playing", "stopped", "paused",
+-					"forward-seek", "reverse-seek" or
+-					"error"
++					"forward-seek", "reverse-seek"
++					or "error"
+ 
+ 		uint32 Position [readonly]
+ 
+@@ -272,6 +246,39 @@ Properties	string Equalizer [readwrite]
+ 			possible to signal its end by setting position to the
+ 			maximum uint32 value.
+ 
++		dict Track [readonly]
 +
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+					DBUS_TYPE_STRING_AS_STRING
-+					DBUS_TYPE_VARIANT_AS_STRING
-+					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
-+					&dict);
++			Track metadata.
 +
-+	g_hash_table_foreach(mp->track, append_metadata, &dict);
++			Possible values:
 +
-+	dbus_message_iter_close_container(iter, &dict);
++				string Title:
 +
-+	return TRUE;
-+}
++					Track title name
 +
- static const GDBusMethodTable media_player_methods[] = {
--	{ GDBUS_EXPERIMENTAL_METHOD("GetTrack",
--			NULL, GDBUS_ARGS({ "metadata", "a{sv}" }),
--			media_player_get_track) },
- 	{ }
- };
++				string Artist:
++
++					Track artist name
++
++				string Album:
++
++					Track album name
++
++				string Genre:
++
++					Track genre name
++
++				uint32 NumberOfTracks:
++
++					Number of tracks in total
++
++				uint32 Number:
++
++					Track number
++
++				uint32 Duration:
++
++					Track duration in milliseconds
  
- static const GDBusSignalTable media_player_signals[] = {
--	{ GDBUS_EXPERIMENTAL_SIGNAL("TrackChanged",
--			GDBUS_ARGS({ "metadata", "a{sv}" })) },
- 	{ }
- };
- 
-@@ -275,6 +263,8 @@ static const GDBusPropertyTable media_player_properties[] = {
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ "Scan", "s", get_setting, set_setting, setting_exists,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "Track", "a{sv}", get_track, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ }
- };
- 
-@@ -427,33 +417,12 @@ void media_player_set_status(struct media_player *mp, const char *status)
- static gboolean process_metadata_changed(void *user_data)
- {
- 	struct media_player *mp = user_data;
--	DBusMessage *signal;
--	DBusMessageIter iter, dict;
- 
- 	mp->process_id = 0;
- 
--	signal = dbus_message_new_signal(mp->path, MEDIA_PLAYER_INTERFACE,
--							"TrackChanged");
--	if (signal == NULL) {
--		error("Unable to allocate TrackChanged signal");
--		return FALSE;
--	}
--
--	dbus_message_iter_init_append(signal, &iter);
--
--	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
--					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
--					DBUS_TYPE_STRING_AS_STRING
--					DBUS_TYPE_VARIANT_AS_STRING
--					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
--					&dict);
--
--
--	g_hash_table_foreach(mp->track, append_metadata, &dict);
--
--	dbus_message_iter_close_container(&iter, &dict);
--
--	g_dbus_send_message(btd_get_dbus_connection(), signal);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+					mp->path, MEDIA_PLAYER_INTERFACE,
-+					"Track");
- 
- 	return FALSE;
- }
+ MediaEndpoint1 hierarchy
+ ========================
 -- 
 1.8.0.1
 
