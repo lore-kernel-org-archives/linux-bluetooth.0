@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 08/13] test: Adapt simple-player to the new API of MediaPlayer1
-Date: Thu, 10 Jan 2013 15:24:38 +0200
-Message-Id: <1357824283-19233-11-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 8/8 v2] player: Add Device property
+Date: Thu, 10 Jan 2013 15:24:37 +0200
+Message-Id: <1357824283-19233-10-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1357824283-19233-1-git-send-email-luiz.dentz@gmail.com>
 References: <1357824283-19233-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,130 +11,80 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+Device property indicates which device object the player belongs to.
 ---
- test/simple-player | 62 ++++++++++++++++--------------------------------------
- 1 file changed, 18 insertions(+), 44 deletions(-)
+ doc/media-api.txt       |  4 ++++
+ profiles/audio/player.c | 14 ++++++++++++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/test/simple-player b/test/simple-player
-index 3bfc485..e331c52 100755
---- a/test/simple-player
-+++ b/test/simple-player
-@@ -22,46 +22,36 @@ class Player(dbus.service.Object):
- 						"org.freedesktop.DBus.Properties")
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index 12a2d7a..e2cafd1 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -288,6 +288,10 @@ Properties	string Equalizer [readwrite]
  
- 			self.properties = prop.GetAll("org.bluez.MediaPlayer1")
--			self.metadata = mp.GetTrack()
+ 					Track duration in milliseconds
  
- 			bus.add_signal_receiver(self.properties_changed,
- 				path = obj,
- 				dbus_interface = "org.freedesktop.DBus.Properties",
- 				signal_name = "PropertiesChanged")
--
--			bus.add_signal_receiver(self.track_changed,
--				path = obj,
--				dbus_interface ="org.bluez.MediaPlayer",
--				signal_name = "TrackChanged")
- 		else:
-+			track = dbus.Dictionary({
-+					"Title" : "Title",
-+					"Artist" : "Artist",
-+					"Album" : "Album",
-+					"Genre" : "Genre",
-+					"NumberOfTracks" : dbus.UInt32(10),
-+					"TrackNumber" : dbus.UInt32(1),
-+					"Duration" : dbus.UInt32(10000) },
-+					signature="sv")
++		object Device [readonly]
 +
- 			self.properties = dbus.Dictionary({
- 					"Equalizer" : "off",
- 					"Repeat" : "off",
- 					"Shuffle" : "off",
- 					"Scan" : "off",
- 					"Status" : "playing",
--					"Position" : dbus.UInt32(0) },
-+					"Position" : dbus.UInt32(0),
-+					"Track" : track },
- 					signature="sv")
++			Device object path.
++
+ MediaEndpoint1 hierarchy
+ ========================
  
--			self.metadata = dbus.Dictionary({
--					"Title" : "Title",
--					"Artist" : "Artist",
--					"Album" : "Album",
--					"Genre" : "Genre",
--					"NumberOfTracks" : dbus.UInt32(10),
--					"Track" : dbus.UInt32(1),
--					"Duration" : dbus.UInt32(10000) },
--					signature="sv")
- 			handler = InputHandler(self)
- 			gobject.io_add_watch(sys.stdin, gobject.IO_IN,
- 							handler.handle)
+diff --git a/profiles/audio/player.c b/profiles/audio/player.c
+index 81bb7fe..bac5649 100644
+--- a/profiles/audio/player.c
++++ b/profiles/audio/player.c
+@@ -56,6 +56,7 @@ struct pending_req {
+ };
  
--	@dbus.service.method("org.bluez.MediaPlayer1",
--					in_signature="", out_signature="")
--	def Release(self):
--		print("Release")
--		mainloop.quit()
--
- 	@dbus.service.method("org.freedesktop.DBus.Properties",
- 					in_signature="ssv", out_signature="")
- 	def Set(self, interface, key, value):
-@@ -79,15 +69,6 @@ class Player(dbus.service.Object):
- 		"""
- 		pass
+ struct media_player {
++	char			*device;	/* Device path */
+ 	char			*path;		/* Player object path */
+ 	GHashTable		*settings;	/* Player settings */
+ 	GHashTable		*track;		/* Player current track */
+@@ -239,6 +240,16 @@ static gboolean get_track(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
  
--	@dbus.service.signal("org.bluez.MediaPlayer1", signature="a{sv}")
--	def TrackChanged(self, metadata):
--		"""TrackChanged(metadata)
--
--		Send a TrackChanged signal. 'metadata' parameter is a dictionary,
--		with values as defined in doc/media-api.txt.
--		"""
--		pass
--
- 	def help(self, func):
- 		help(self.__class__.__dict__[func])
++static gboolean get_device(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct media_player *mp = data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &mp->device);
++
++	return TRUE;
++}
++
+ static DBusMessage *media_player_play(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
+@@ -417,6 +428,7 @@ static const GDBusPropertyTable media_player_properties[] = {
+ 	{ "Shuffle", "s", get_setting, set_setting, setting_exists },
+ 	{ "Scan", "s", get_setting, set_setting, setting_exists },
+ 	{ "Track", "a{sv}", get_track, NULL, NULL },
++	{ "Device", "s", get_device, NULL, NULL },
+ 	{ }
+ };
  
-@@ -96,14 +77,8 @@ class Player(dbus.service.Object):
+@@ -442,6 +454,7 @@ void media_player_destroy(struct media_player *mp)
+ 	g_free(mp->cb);
+ 	g_free(mp->status);
+ 	g_free(mp->path);
++	g_free(mp->device);
+ 	g_free(mp);
+ }
  
- 		self.PropertiesChanged(interface, properties, invalidated)
+@@ -450,6 +463,7 @@ struct media_player *media_player_controller_create(const char *path)
+ 	struct media_player *mp;
  
--	def track_changed(self, metadata):
--		print("track_changed(%s)" % (metadata))
--
--		self.TrackChanged(metadata)
--
- class InputHandler:
--	commands = { 'TrackChanged': '(metadata)',
--			'PropertiesChanged': '(interface, properties)',
-+	commands = { 'PropertiesChanged': '(interface, properties)',
- 			'help': '(cmd)' }
- 	def __init__(self, player):
- 		self.player = player
-@@ -112,7 +87,8 @@ class InputHandler:
- 			print('\t', cmd, self.commands[cmd], sep='')
- 
- 		print("\nUse python syntax to pass arguments to available methods.\n" \
--                "E.g.: TrackChanged({'Title': 'My title', 'Album': 'my album' })")
-+                "E.g.: PropertiesChanged({'Track' : {'Title': 'My title', \
-+		'Album': 'my album' }})")
- 		self.prompt()
- 
- 	def prompt(self):
-@@ -160,11 +136,9 @@ if __name__ == '__main__':
- 	else:
- 		player.set_object()
- 
--	print('Register media player with:\n\tProperties: %s\n\tMetadata: %s' \
--					% (player.properties, player.metadata))
--
-+	print('Register media player with:\n\tProperties: %s' \
-+						% (player.properties))
- 
--	media.RegisterPlayer(dbus.ObjectPath(path), player.properties,
--							player.metadata)
-+	media.RegisterPlayer(dbus.ObjectPath(path), player.properties)
- 
- 	mainloop.run()
+ 	mp = g_new0(struct media_player, 1);
++	mp->device = g_strdup(path);
+ 	mp->path = g_strdup_printf("%s/player1", path);
+ 	mp->settings = g_hash_table_new_full(g_str_hash, g_str_equal,
+ 							g_free, g_free);
 -- 
 1.8.0.1
 
