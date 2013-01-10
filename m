@@ -1,40 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH v2 BlueZ] unit: Avoid D-Bus calling _exit() during SDP tests
-Date: Thu, 10 Jan 2013 08:30:30 -0400
-Message-Id: <1357821030-11412-1-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1357779808-25513-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1357779808-25513-1-git-send-email-anderson.lizardo@openbossa.org>
+Message-ID: <1357807266.1806.72.camel@aeonflux>
+Subject: Re: [PATCH 8/8] Bluetooth: Fix sending incorrect new_settings for
+ mgmt_set_powered
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 10 Jan 2013 00:41:06 -0800
+In-Reply-To: <1357738180-4128-9-git-send-email-johan.hedberg@gmail.com>
+References: <1357738180-4128-1-git-send-email-johan.hedberg@gmail.com>
+	 <1357738180-4128-9-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-While running tests, the D-Bus library was set to call _exit() when the
-client leaves the bus. This caused the second test to be interrupted
-without providing a PASS/FAIL result. This was confirmed by running
-test-sdp with DBUS_VERBOSE=1.
+Hi Johan,
 
-This commit disables this behavior, which does not exist on BlueZ
-because g_dbus_set_disconnect_function() implicitly does this.
----
- unit/test-gdbus-client.c |    3 +++
- 1 file changed, 3 insertions(+)
+> The socket from which a mgmt_set_powered command was received should
+> only receive the command response but no new_settings event.
+> 
+> The mgmt_powered() function which is used to handle the situation with
+> the HCI_AUTO_OFF flag tries to check for a pending command to know which
+> socket to skip the event for, but since the pending command hasn't been
+> added this will not happen.
+> 
+> This patch fixes the issue by adding the pending command for the
+> HCI_AUTO_OFF case and thereby ensures that mgmt_powered() will skip the
+> right socket when sending the new_settings event, but still send the
+> proper response to the socket where the command came from.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/mgmt.c |    5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
-index aaf8342..34c714e 100644
---- a/unit/test-gdbus-client.c
-+++ b/unit/test-gdbus-client.c
-@@ -78,6 +78,9 @@ static struct context *create_context(void)
- 		return NULL;
- 	}
- 
-+	/* Avoid D-Bus library calling _exit() before next test finishes. */
-+	dbus_connection_set_exit_on_disconnect(context->dbus_conn, FALSE);
-+
- 	return context;
- }
- 
--- 
-1.7.9.5
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+Regards
+
+Marcel
+
 
