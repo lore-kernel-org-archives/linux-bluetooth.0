@@ -1,44 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 10 Jan 2013 05:34:23 -0200
 From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 00/16] Completely remove socket dependency from l2cap_core.c
-Date: Thu, 10 Jan 2013 05:47:37 -0200
-Message-Id: <1357804073-31582-1-git-send-email-gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth 2013-01-10
+Message-ID: <20130110073423.GE18821@joana>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="0OAP2g/MAC+5xKAE"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-This is the last series of patches to completely remove the l2cap socket usage
-in the l2cap_core.c file. We now have a C API to access L2CAP and as a next
-step we should convert RFCOMM to use this API.
+--0OAP2g/MAC+5xKAE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Gustavo Padovan (16):
-  Bluetooth: Add src and dst info to struct l2cap_chan
-  Bluetooth: Remove sk_sndtimeo from l2cap_core.c
-  Bluetooth: extend state_change() call to report errors too
-  Bluetooth: add l2cap_state_change_and_error()
-  Bluetooth: Add missing braces to an "else if"
-  Bluetooth: use l2cap_chan_ready() instead of duplicate code
-  Bluetooth: duplicate DEFER_SETUP flag on l2cap_chan
-  Bluetooth: Improving locking in l2cap_conn_start()
-  Bluetooth: lock socket in defer_cb call
-  Bluetooth: Remove socket lock from state_change() in l2cap_core
-  Bluetooth: remove parent socket usage from l2cap_core.c
-  Bluetooth: Use abstract chan->data in comparison
-  Bluetooth: Move l2cap_wait_ack() to l2cap_sock.c
-  Bluetooth: Create l2cap->ops->resume()
-  Bluetooth: Create l2cap->ops->set_shutdown()
-  Bluetooth: Remove sk member from struct l2cap_chan
+Hi John,
 
- include/net/bluetooth/l2cap.h |  22 ++++-
- net/bluetooth/a2mp.c          |   4 +-
- net/bluetooth/l2cap_core.c    | 200 ++++++++++++------------------------------
- net/bluetooth/l2cap_sock.c    |  96 +++++++++++++++++---
- net/bluetooth/rfcomm/core.c   |  15 ++--
- 5 files changed, 169 insertions(+), 168 deletions(-)
+A few fixes for 3.8. Five of them are just new devices ids addition.
+Apart from the that there is fix to a kernel memory leak to userspace from
+Anderson Lizardo, two interoperability fixes from Jaganath Kanakkassery and
+Szymon Janc. And a crash fix by me.
 
--- 
-1.8.0.2
+Please pull, or let me know of any problem with these patches. Thanks.
 
+	Gustavo
+--
+
+The following changes since commit 5e20a4b53094651d80f856ff55a916b999dbb57a:
+
+  b43: Fix firmware loading when driver is built into the kernel (2013-01-07 14:34:45 -0500)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
+
+for you to fetch changes up to b7e98b5100aad9290d7f06fcb9d1e80f7f62f05f:
+
+  Bluetooth: Check if the hci connection exists in SCO shutdown (2013-01-10 03:53:32 -0200)
+
+----------------------------------------------------------------
+AceLan Kao (3):
+      Bluetooth: Add support for IMC Networks [13d3:3393]
+      Bluetooth: Add support for Foxconn / Hon Hai [0489:e04e]
+      Bluetooth: Add support for Foxconn / Hon Hai [0489:e056]
+
+Anderson Lizardo (1):
+      Bluetooth: Fix incorrect strncpy() in hidp_setup_hid()
+
+Daniel Schaal (1):
+      Bluetooth: Add support for GC-WB300D PCIe [04ca:3006] to ath3k.
+
+Gustavo Padovan (1):
+      Bluetooth: Check if the hci connection exists in SCO shutdown
+
+Jaganath Kanakkassery (1):
+      Bluetooth: Fix authentication if acl data comes before remote feature evt
+
+Sergio Cambra (1):
+      Bluetooth device 04ca:3008 should use ath3k
+
+Szymon Janc (1):
+      Bluetooth: Fix sending HCI commands after reset
+
+ drivers/bluetooth/ath3k.c  | 10 ++++++++++
+ drivers/bluetooth/btusb.c  |  5 +++++
+ net/bluetooth/hci_core.c   |  8 --------
+ net/bluetooth/hci_event.c  |  2 +-
+ net/bluetooth/hidp/core.c  |  2 +-
+ net/bluetooth/l2cap_core.c | 11 +++++++++++
+ net/bluetooth/sco.c        |  2 +-
+ 7 files changed, 29 insertions(+), 11 deletions(-)
+
+
+--0OAP2g/MAC+5xKAE
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBAgAGBQJQ7m7+AAoJEPs3PUX4s20om3sP/1j3grsJYyfloizebfbJNMre
+ctSSnZm2SZJyLztRozcgs47ucdc8++09VFisEvv+cxf7SCfY9ZeJjTGVfHIiQIjX
+mnL/gpHmIN68hTLF2x/pV5umaMDcUs+FNgtysZbQY6CetgXA2Eso37Abwk5sB+pU
+CIwvLJBC6YDm6xv995eMPPbI+F4QKZQPe+lv9dybIK5eG9/v1ZrvF91EAIPFIthf
+WZ+jWwerhTYQZI0F8yTITbG8pSqA8WukGbMcot/GsJbkrWylkVIhQv67kbEiKvBm
+EYIHdCxFKtBzCpg2UVcLSo5zM738wkAmkkBSCviE42PLCkFCZLtmbKPWGMpzeVu/
+OEtIWhkakxWd+IX015B7kkmhnUirUzd0pKlNRffm2E2he/juHotyx+o1BeMlrxXJ
+rBob+unWhUzbj78+bbRUPKOLbVS+wu3GyBeIXZ04hmIIn+3irCsYvVDQQUk5N0VI
+qubb80bdBdWMgQAhVNR/ySYg00F4zIhsBUkI9H1Q3fWRmgq2b/owg6MS+IURy/mW
+qbvjhJ8BlYbBIa5LKmT+4fHup2DbrjC23LoPK/YRZuByJ5MGRCqcEYHO6FxrIEO8
+QMXJqkvpq1QxOB8K27+7A/KYq/NPoL5I891zEVgp2W+kL1tG5yRJQhG+AFssm8ki
+C3d6A4pzjuE/38uTJRXb
+=PkuK
+-----END PGP SIGNATURE-----
+
+--0OAP2g/MAC+5xKAE--
