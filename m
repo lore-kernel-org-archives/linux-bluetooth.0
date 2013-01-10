@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 11/13 v2] test: Update test-player to register using MPRIS interface
-Date: Thu, 10 Jan 2013 15:37:16 +0200
-Message-Id: <1357825038-21970-11-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 10/13 v2] media-api: Change RegisterPlayer to use MPRIS spec
+Date: Thu, 10 Jan 2013 15:37:15 +0200
+Message-Id: <1357825038-21970-10-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1357825038-21970-1-git-send-email-luiz.dentz@gmail.com>
 References: <1357825038-21970-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,66 +11,101 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
----
- test/simple-player | 35 +++++++++++++++++++++--------------
- 1 file changed, 21 insertions(+), 14 deletions(-)
+RegisterPlayer now expect registered paths to implement
+org.mpris.MediaPlayer2.player interface accourding to MPRIS spec:
 
-diff --git a/test/simple-player b/test/simple-player
-index e331c52..01bec06 100755
---- a/test/simple-player
-+++ b/test/simple-player
-@@ -29,23 +29,30 @@ class Player(dbus.service.Object):
- 				signal_name = "PropertiesChanged")
- 		else:
- 			track = dbus.Dictionary({
--					"Title" : "Title",
--					"Artist" : "Artist",
--					"Album" : "Album",
--					"Genre" : "Genre",
--					"NumberOfTracks" : dbus.UInt32(10),
--					"TrackNumber" : dbus.UInt32(1),
--					"Duration" : dbus.UInt32(10000) },
-+					"xesam:title" : "Title",
-+					"xesam:artist" : "Artist",
-+					"xesam:album" : "Album",
-+					"xesam:genre" : "Genre",
-+					"xesam:trackNumber" : dbus.Int32(1),
-+					"mpris:length" : dbus.Int64(10000) },
- 					signature="sv")
+http://specifications.freedesktop.org/mpris-spec/latest/
+---
+ doc/media-api.txt | 70 ++++---------------------------------------------------
+ 1 file changed, 5 insertions(+), 65 deletions(-)
+
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index c9c2e7a..8c64520 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -45,78 +45,18 @@ Methods		void RegisterEndpoint(object endpoint, dict properties)
  
- 			self.properties = dbus.Dictionary({
--					"Equalizer" : "off",
--					"Repeat" : "off",
--					"Shuffle" : "off",
--					"Scan" : "off",
--					"Status" : "playing",
-+					"PlaybackStatus" : "playing",
-+					"LoopStatus" : "None",
-+					"Rate" : dbus.Double(1.0),
-+					"Shuffle" : dbus.Boolean(False),
-+					"Metadata" : track,
-+					"Volume" : dbus.Double(1.0),
- 					"Position" : dbus.UInt32(0),
--					"Track" : track },
-+					"MinimumRate" : dbus.Double(1.0),
-+					"MaximumRate" : dbus.Double(1.0),
-+					"CanGoNext" : dbus.Boolean(False),
-+					"CanGoPrevious" : dbus.Boolean(False),
-+					"CanPlay" : dbus.Boolean(False),
-+					"CanSeek" : dbus.Boolean(False),
-+					"CanControl" : dbus.Boolean(False),
-+					},
- 					signature="sv")
+ 			Unregister sender end point.
  
- 			handler = InputHandler(self)
-@@ -87,7 +94,7 @@ class InputHandler:
- 			print('\t', cmd, self.commands[cmd], sep='')
+-		void RegisterPlayer(object player, dict properties,
+-								dict metadata)
++		void RegisterPlayer(object player, dict properties)
  
- 		print("\nUse python syntax to pass arguments to available methods.\n" \
--                "E.g.: PropertiesChanged({'Track' : {'Title': 'My title', \
-+                "E.g.: PropertiesChanged({'Metadata' : {'Title': 'My title', \
- 		'Album': 'my album' }})")
- 		self.prompt()
+ 			Register a media player object to sender, the sender
+ 			can register as many objects as it likes.
+ 
++			Object must implement at least
++			org.mpris.MediaPlayer2.Player as defined in MPRIS 2.2
++			spec.
++
+ 			Note: If the sender disconnects its objects are
+ 			automatically unregistered.
+ 
+-			Properties:
+-
+-				string Equalizer:
+-
+-					Possible values: "off" or "on"
+-
+-				string Repeat:
+-
+-					Possible values: "off", "singletrack",
+-							"alltracks" or "group"
+-
+-				string Shuffle:
+-
+-					Possible values: "off", "alltracks" or
+-							"group"
+-
+-				string Scan:
+-
+-					Possible values: "off", "alltracks" or
+-							"group"
+-
+-				string Status:
+-
+-					Possible values: "playing", "stopped",
+-							"paused",
+-							"forward-seek",
+-							"reverse-seek" or
+-							"error"
+-
+-				uint32 Position
+-
+-					Playback position in milliseconds
+-
+-			Metadata:
+-
+-				string Title:
+-
+-					Track title name
+-
+-				string Artist:
+-
+-					Track artist name
+-
+-				string Album:
+-
+-					Track album name
+-
+-				string Genre:
+-
+-					Track genre name
+-
+-				uint32 NumberOfTracks:
+-
+-					Number of tracks in total
+-
+-				uint32 Number:
+-
+-					Track number
+-
+-				uint32 Duration:
+-
+-					Track duration in milliseconds
+-
+ 			Possible Errors: org.bluez.Error.InvalidArguments
+ 					 org.bluez.Error.NotSupported
  
 -- 
 1.8.0.1
