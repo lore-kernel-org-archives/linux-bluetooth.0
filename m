@@ -1,28 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 10 Jan 2013 15:13:29 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 01/10] core: Fix remaining references to
- bluetooth/uuid.h
-Message-ID: <20130110131329.GA12523@x220>
-References: <1357823709-8627-1-git-send-email-anderson.lizardo@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 10/10] unit: Fix remaining references to bluetooth/uuid.h
+Date: Thu, 10 Jan 2013 09:15:09 -0400
+Message-Id: <1357823709-8627-10-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1357823709-8627-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1357823709-8627-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+These headers are not public anymore, so need to use "lib/uuid.h".
+---
+ unit/test-uuid.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-On Thu, Jan 10, 2013, Anderson Lizardo wrote:
-> These headers are not public anymore, so need to use "lib/uuid.h".
-> ---
->  src/attrib-server.c |    2 +-
->  src/main.c          |    2 +-
->  src/storage.c       |    2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
+diff --git a/unit/test-uuid.c b/unit/test-uuid.c
+index cbccc82..79ab3e6 100644
+--- a/unit/test-uuid.c
++++ b/unit/test-uuid.c
+@@ -28,7 +28,8 @@
+ #include <glib.h>
+ 
+ #include <bluetooth/bluetooth.h>
+-#include <bluetooth/uuid.h>
++
++#include "lib/uuid.h"
+ 
+ struct uuid_test_data {
+ 	const char *str;
+-- 
+1.7.9.5
 
-All patches in this set have been applied. Thanks.
-
-Johan
