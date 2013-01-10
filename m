@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 09/16] Bluetooth: lock socket in defer_cb call
-Date: Thu, 10 Jan 2013 05:47:46 -0200
-Message-Id: <1357804073-31582-10-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 08/16] Bluetooth: Improving locking in l2cap_conn_start()
+Date: Thu, 10 Jan 2013 05:47:45 -0200
+Message-Id: <1357804073-31582-9-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1357804073-31582-1-git-send-email-gustavo@padovan.org>
 References: <1357804073-31582-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,36 +12,74 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-Since we removed the lock around the ops->defer() call inside
-l2cap_core.c we need now to protect the defer_cb call.
+Since we don't read bt_sk(sk) in here anymore we can remove the lock from
+the block and only use it when calling l2cap_state_change().
 
 Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 ---
- net/bluetooth/l2cap_sock.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ net/bluetooth/l2cap_core.c | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 9cd6fba..6a95d37 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1096,11 +1096,15 @@ static void l2cap_sock_ready_cb(struct l2cap_chan *chan)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 4cc49f3..110a702 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1252,7 +1252,6 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 			rsp.dcid = cpu_to_le16(chan->scid);
  
- static void l2cap_sock_defer_cb(struct l2cap_chan *chan)
- {
--	struct sock *sk = chan->data;
--	struct sock *parent = bt_sk(sk)->parent;
-+	struct sock *parent, *sk = chan->data;
-+
-+	lock_sock(sk);
+ 			if (l2cap_chan_check_security(chan)) {
+-				lock_sock(sk);
+ 				if (test_bit(CONN_DEFER_SETUP,
+ 					     &chan->conn_state)) {
+ 					rsp.result = __constant_cpu_to_le16(L2CAP_CR_PEND);
+@@ -1260,11 +1259,10 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 					chan->ops->defer(chan);
  
-+	parent = bt_sk(sk)->parent;
- 	if (parent)
- 		parent->sk_data_ready(parent, 0);
-+
-+	release_sock(sk);
- }
+ 				} else {
+-					__l2cap_state_change(chan, BT_CONFIG);
++					l2cap_state_change(chan, BT_CONFIG);
+ 					rsp.result = __constant_cpu_to_le16(L2CAP_CR_SUCCESS);
+ 					rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
+ 				}
+-				release_sock(sk);
+ 			} else {
+ 				rsp.result = __constant_cpu_to_le16(L2CAP_CR_PEND);
+ 				rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHEN_PEND);
+@@ -6393,12 +6391,9 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 				__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
+ 			}
+ 		} else if (chan->state == BT_CONNECT2) {
+-			struct sock *sk = chan->sk;
+ 			struct l2cap_conn_rsp rsp;
+ 			__u16 res, stat;
  
- static struct l2cap_ops l2cap_chan_ops = {
+-			lock_sock(sk);
+-
+ 			if (!status) {
+ 				if (test_bit(CONN_DEFER_SETUP,
+ 					     &chan->conn_state)) {
+@@ -6406,19 +6401,17 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 					stat = L2CAP_CS_AUTHOR_PEND;
+ 					chan->ops->defer(chan);
+ 				} else {
+-					__l2cap_state_change(chan, BT_CONFIG);
++					l2cap_state_change(chan, BT_CONFIG);
+ 					res = L2CAP_CR_SUCCESS;
+ 					stat = L2CAP_CS_NO_INFO;
+ 				}
+ 			} else {
+-				__l2cap_state_change(chan, BT_DISCONN);
++				l2cap_state_change(chan, BT_DISCONN);
+ 				__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
+ 				res = L2CAP_CR_SEC_BLOCK;
+ 				stat = L2CAP_CS_NO_INFO;
+ 			}
+ 
+-			release_sock(sk);
+-
+ 			rsp.scid   = cpu_to_le16(chan->dcid);
+ 			rsp.dcid   = cpu_to_le16(chan->scid);
+ 			rsp.result = cpu_to_le16(res);
 -- 
 1.8.0.2
 
