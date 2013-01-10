@@ -2,63 +2,65 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v2] Bluetooth: Fix uuid output in debugfs
-Date: Thu, 10 Jan 2013 06:06:29 -0200
-Message-Id: <1357805189-2029-1-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 16/16] Bluetooth: Remove sk member from struct l2cap_chan
+Date: Thu, 10 Jan 2013 05:47:53 -0200
+Message-Id: <1357804073-31582-17-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1357804073-31582-1-git-send-email-gustavo@padovan.org>
+References: <1357804073-31582-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-The uuid should be printed in the CPU endianness and not in little-endian.
+Now that the removal of socket usage from l2cap_core.c is done we can
+remove sk from struct l2cap_chan since we do not use it anywhere anymore.
 
 Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 ---
- net/bluetooth/hci_sysfs.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ include/net/bluetooth/l2cap.h | 2 --
+ net/bluetooth/l2cap_sock.c    | 5 ++---
+ 2 files changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 55cceee..23b4e24 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -2,6 +2,7 @@
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index d3c8f57..e444d55 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -433,8 +433,6 @@ struct l2cap_seq_list {
+ #define L2CAP_SEQ_LIST_TAIL	0x8000
  
- #include <linux/debugfs.h>
- #include <linux/module.h>
-+#include <asm/unaligned.h>
+ struct l2cap_chan {
+-	struct sock *sk;
+-
+ 	bdaddr_t	src;
+ 	bdaddr_t	dst;
  
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -461,19 +462,18 @@ static const struct file_operations blacklist_fops = {
- 
- static void print_bt_uuid(struct seq_file *f, u8 *uuid)
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 07ef90c..910c9d7 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1101,11 +1101,12 @@ static void l2cap_sock_state_change_cb(struct l2cap_chan *chan, int state,
+ static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
+ 					       unsigned long len, int nb)
  {
--	__be32 data0, data4;
--	__be16 data1, data2, data3, data5;
-+	u32 data0, data5;
-+	u16 data1, data2, data3, data4;
++	struct sock *sk = chan->data;
+ 	struct sk_buff *skb;
+ 	int err;
  
--	memcpy(&data0, &uuid[0], 4);
--	memcpy(&data1, &uuid[4], 2);
--	memcpy(&data2, &uuid[6], 2);
--	memcpy(&data3, &uuid[8], 2);
--	memcpy(&data4, &uuid[10], 4);
--	memcpy(&data5, &uuid[14], 2);
-+	data5 = get_unaligned_le32(uuid);
-+	data4 = get_unaligned_le16(uuid + 4);
-+	data3 = get_unaligned_le16(uuid + 6);
-+	data2 = get_unaligned_le16(uuid + 8);
-+	data1 = get_unaligned_le16(uuid + 10);
-+	data0 = get_unaligned_le32(uuid + 12);
+ 	l2cap_chan_unlock(chan);
+-	skb = bt_skb_send_alloc(chan->sk, len, nb, &err);
++	skb = bt_skb_send_alloc(sk, len, nb, &err);
+ 	l2cap_chan_lock(chan);
  
--	seq_printf(f, "%.8x-%.4x-%.4x-%.4x-%.8x%.4x\n",
--		   ntohl(data0), ntohs(data1), ntohs(data2), ntohs(data3),
--		   ntohl(data4), ntohs(data5));
-+	seq_printf(f, "%.8x-%.4x-%.4x-%.4x-%.4x%.8x\n",
-+		   data0, data1, data2, data3, data4, data5);
- }
+ 	if (!skb)
+@@ -1293,8 +1294,6 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
  
- static int uuids_show(struct seq_file *f, void *p)
+ 	l2cap_chan_hold(chan);
+ 
+-	chan->sk = sk;
+-
+ 	l2cap_pi(sk)->chan = chan;
+ 
+ 	return sk;
 -- 
 1.8.0.2
 
