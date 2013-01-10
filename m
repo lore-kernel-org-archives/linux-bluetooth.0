@@ -1,43 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJdJm_Nu0Mo7wGYWQr547Mat9hqXyygRbgn23p1QnyY3GrYJnA@mail.gmail.com>
-References: <1357825038-21970-1-git-send-email-luiz.dentz@gmail.com>
-	<1357825038-21970-13-git-send-email-luiz.dentz@gmail.com>
-	<CAJdJm_Nu0Mo7wGYWQr547Mat9hqXyygRbgn23p1QnyY3GrYJnA@mail.gmail.com>
-Date: Thu, 10 Jan 2013 18:56:47 +0200
-Message-ID: <CABBYNZJ4es9AJ09u+DemW4SBA=AKR8NMBgbeRhndsC2ezGbMFg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 13/13 v2] tools: Update mpris-player to register
- using MPRIS interface
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=windows-1252
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] build: Fix using DBusBasicValue
+Date: Thu, 10 Jan 2013 18:55:24 +0200
+Message-Id: <1357836924-9870-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Jan 10, 2013 at 6:02 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Luiz,
->
-> On Thu, Jan 10, 2013 at 9:37 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> In addition fix not supporting new APIs for getting the adapter.
->> ---
->
-> Got this compilation error after this patch:
->
->   CC     tools/mpris-player.o
-> tools/mpris-player.c: In function ‘parse_metadata_entry’:
-> tools/mpris-player.c:154:2: error: unknown type name ‘DBusBasicValue’
-> tools/mpris-player.c: In function ‘parse_property’:
-> tools/mpris-player.c:315:2: error: unknown type name ‘DBusBasicValue’
+DBusBasicValue needs a more recent libdbus so use const void * instead
+---
+ tools/mpris-player.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Just send a fix for this, can you try and let me know if it fix the problem.
+diff --git a/tools/mpris-player.c b/tools/mpris-player.c
+index de66f97..bf0f747 100644
+--- a/tools/mpris-player.c
++++ b/tools/mpris-player.c
+@@ -151,7 +151,6 @@ static int parse_metadata_entry(DBusMessageIter *entry, const char *key,
+ 						DBusMessageIter *metadata)
+ {
+ 	DBusMessageIter var;
+-	DBusBasicValue value;
+ 	int type;
+ 
+ 	printf("metadata %s found\n", key);
+@@ -181,6 +180,8 @@ static int parse_metadata_entry(DBusMessageIter *entry, const char *key,
+ 		dict_append_array(metadata, key, DBUS_TYPE_STRING, &values, i);
+ 		dbus_free(values);
+ 	} else if (dbus_type_is_basic(type)) {
++		const void *value;
++
+ 		dbus_message_iter_get_basic(&var, &value);
+ 		dict_append_entry(metadata, key, type, &value);
+ 	} else
+-- 
+1.8.0.1
 
-
---
-Luiz Augusto von Dentz
