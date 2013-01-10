@@ -1,54 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1357780874.1806.65.camel@aeonflux>
-Subject: Re: [PATCH BlueZ 1/2] unit: Fix intermitent failure of SDP tests
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 09 Jan 2013 17:21:14 -0800
-In-Reply-To: <1357779808-25513-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1357779808-25513-1-git-send-email-anderson.lizardo@openbossa.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Bing Zhao <bzhao@marvell.com>
+To: Dan Williams <dcbw@redhat.com>, Lubomir Rintel <lkundrak@v3.sk>
+CC: David Woodhouse <dwmw2@infradead.org>, Ben Hutchings
+	<ben@decadent.org.uk>, "libertas-dev@lists.infradead.org"
+	<libertas-dev@lists.infradead.org>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, Gustavo Padovan <gustavo@padovan.org>,
+	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Date: Wed, 9 Jan 2013 17:20:46 -0800
+Subject: RE: sd8688 firmware location
+Message-ID: <477F20668A386D41ADCC57781B1F70430D13FDBA55@SC-VEXCH1.marvell.com>
+References: <1357689361-7969-1-git-send-email-lkundrak@v3.sk>
+ <1357771504.12030.59.camel@dcbw.foobar.com>
+In-Reply-To: <1357771504.12030.59.camel@dcbw.foobar.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
-
-change the subject of the commit ;)
-
-> While running tests, the D-Bus library was set to call _exit() when the
-> client leaves the bus. This caused the second test to be interrupted
-> without providing a PASS/FAIL result. This was confirmed by running
-> test-sdp with DBUS_VERBOSE=1.
-> 
-> This commit disables this behavior, which does not exist on BlueZ
-> because g_dbus_set_disconnect_function() implicitly does this.
-> ---
->  unit/test-gdbus-client.c |    4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
-> index 7c849f0..cfbe4e0 100644
-> --- a/unit/test-gdbus-client.c
-> +++ b/unit/test-gdbus-client.c
-> @@ -68,6 +68,10 @@ static struct context *create_context(void)
->  		return NULL;
->  	}
->  
-> +	/* Make sure D-Bus library will not call _exit() and interrupt the next
-> +	 * tests. */
-
-Can you make this a one-line comment like this or similar:
-
-	/* Avoid D-Bus library calling _exit() before next test */
-> +	dbus_connection_set_exit_on_disconnect(context->dbus_conn, FALSE);
-> +
->  	return context;
->  }
->  
-
-Regards
-
-Marcel
-
-
+SGkgRGFuLA0KDQo+ID4gYnRtcnZsX3NkaW8gYW5kIGxpYmVydGFzX3NkaW8gYm90aCB1c2UgZmly
+bXdhcmUgZmlsZXMgc2Q4Njg4LmJpbiBhbmQNCj4gPiBzZDg2ODhfaGVscGVyLmJpbi4gSW4gbGlu
+dXgtZmlybXdhcmUsIHRoZXkncmUgcHJlc2VudCBpbiBsaWJlcnRhcy8gdHJlZSBhbmQNCj4gPiAo
+c2luY2UgM2QzMmE1OGIpIGxpYmVydGFzX3NkaW8gcGVyZmVycyBsb2FkaW5nIGl0IGZyb20gdGhl
+cmUsIHdoaWxlIGl0IGlzIGFibGUNCj4gPiB0byBmYWxsYmFjayB0byBsb2FkIGl0IGZyb20gbGlu
+dXgtZmlybXdhcmUgcm9vdC4gYnRtcnZsX3NkaW8sIG9uIHRoZSBvdGhlciBoYW5kDQo+ID4gb25s
+eSBsb29rcyBpbiB0aGUgcm9vdCBhbmQgZW5kcyB1cCBub3QgYmVpbmcgc3VjY2Vzc2Z1bC4NCj4g
+Pg0KPiA+IE9idmlvdXNseSwgdGhlcmUgYXJlIHR3byBzb2x1dGlvbnMgdG8gdGhlIHByb2JsZW0g
+LS0gZWl0aGVyIHRlYWNoIGJ0bXJ2bF9zZGlvDQo+ID4gdG8gbG9vayBpbnRvIGxpYmVydGFzLywg
+b3IgbW92ZSB0aGUgZmlsZXMgaW4gbGludXgtZmlybXdhcmUgdHJlZS4gSSBkb24ndA0KPiA+IHJl
+YWxseSBoYXZlIGEgc3Ryb25nIHByZWZlcmVuY2UsIHRob3VnaCBpdCBwcm9iYWJseSBtYWtlcyBs
+ZXNzIHNlbnNlIHRvIGtlZXAgaW4NCj4gPiBpbiBsaWJlcnRhcy8sIHNpbmNlIHRoZSBibHVldG9v
+dGggaGFyZHdhcmUgaXMgbm90IHJlYWxseSBtYXJrZXRlZCBhcyAiTGliZXJ0YXMuIg0KPiA+DQo+
+ID4gSSdtIGZvbGxvd2luZyB1cCB3aXRoIHBhdGNoZXMgdG8gbGludXggYW5kIGxpbnV4LWZpcm13
+YXJlIGFuZCBJJ2QgYmUgdmVyeQ0KPiA+IHRoYW5rZnVsIGlmIHlvdSBjb3VsZCBwaWNrIG9uZSAo
+bm90IGJvdGggb2YgdGhlbSkuDQo+IA0KPiBTbyB0aGUgQlQgcGFydCBhbmQgdGhlIHdpZmkgcGFy
+dCBoYXZlIGRpZmZlcmVudCBTRElPIElEczsgYXJlIHRoZXkNCj4gYWN0dWFsbHkgY29ubmVjdGVk
+IHNlcGFyYXRlbHkgdG8gdGhlIFNESU8gYnVzPyAgT3IgaXMgdGhlIGNoaXAgb25seSBpbg0KPiBv
+bmUgbW9kZSBhdCBvbmUgdGltZSBvciBzb21ldGhpbmcgbGlrZSB0aGF0PyAgSXMgdGhlcmUgYSBw
+cm9ibGVtIHdpdGgNCj4gaGF2aW5nIGJvdGggbGliZXJ0YXMgYW5kIGJ0bXJ2bCBsb2FkZWQgYXQg
+dGhlIHNhbWUgdGltZSBzaW5jZSB0aGV5J3JlDQo+IGVzc2VudGlhbGx5IHRoZSBzYW1lIGNoaXA/
+DQoNClNEODY4OCBpcyBhIGNvbWJvIGNoaXAgd2l0aCBkaWZmZXJlbnQgZGV2aWNlIElEcyBmb3Ig
+V0xBTiAoZnVuY3Rpb24gMSkgYW5kIEJUIChmdW5jdGlvbiAyKS4gV0xBTiArIEJUIHRvZ2V0aGVy
+IGFyZSBjb25uZWN0ZWQgdG8gdGhlIGJ1cyB3aXRoIGEgc2luZ2xlIFNESU8gaW50ZXJmYWNlLiBC
+b3RoIGxpYmVydGFzIGFuZCBidG1ydmwgZHJpdmVycyBjYW4gYmUgbG9hZGVkIGF0IHRoZSBzYW1l
+IHRpbWUsIGFuZCBXTEFOICYgQlQgZnVuY3Rpb25zIHdvcmsgY29uY3VycmVudGx5LiBPZiBjb3Vy
+c2UgdGhlIFNESU8gYnVzIGlzIHNoYXJlZCBiZXR3ZWVuIFdMQU4gYW5kIEJULg0KDQpUaGUgZmly
+bXdhcmUgaW1hZ2UgY2FuIGJlIGRvd25sb2FkZWQgZnJvbSBob3N0IHRvIGRldmljZSBieSBlaXRo
+ZXIgbGliZXJ0YXMgb3IgYnRtcnZsIGRyaXZlciB3aG9ldmVyIGJlY29tZXMgdGhlIHdpbm5lciBm
+cm9tIGZpcm13YXJlIGRvd25sb2FkaW5nIHBlcnNwZWN0aXZlLg0KDQpSZWdhcmRzLA0KQmluZw0K
+DQo+IA0KPiBJIGRvbid0IHJlYWxseSBtaW5kIG1vdmluZyBzdHVmZiB0byBtcnZsLyBvdXQgb2Yg
+bGliZXJ0YXMvIGZvciB0aGVzZQ0KPiBkZXZpY2VzLCBidXQgSSBkbyB3YW50IHNvbWUgYmFja3dh
+cmRzIGNvbXBhdCBjb2RlIGluIGxpYmVydGFzIGZvciB0aGF0Lg0KPiBVbmxlc3MsIG9mIGNvdXJz
+ZSwgTWFyY2VsIHdhcyB0YWxraW5nIGFib3V0IHN5bWxpbmtzIGluIHRoZQ0KPiBsaW51eC1maXJt
+d2FyZSBnaXQgdHJlZSwgd2hpY2ggd291bGQgYmUgZmluZSB3aXRoIG1lLiAgVGhlIGltcG9ydGFu
+dA0KPiBwb2ludCBpcyB0aGF0IHNpbXBseSB1cGRhdGluZyB5b3VyIGxpbnV4LWZpcm13YXJlIHBh
+Y2thZ2Ugb3IgaW5zdGFsbCBvcg0KPiB3aGF0ZXZlciAqc2hvdWxkIG5vdCogcmVzdWx0IGluIGEg
+ZmFpbGVkIGZpcm13YXJlIGxvYWQuDQo+IA0KPiBEYW4NCg==
