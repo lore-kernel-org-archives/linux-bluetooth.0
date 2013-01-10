@@ -1,39 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 10 Jan 2013 16:30:58 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 5/8 v2] Bluetooth: Fix returning proper command status
- for start_discovery
-Message-ID: <20130110183058.GA7700@joana>
-References: <1357738180-4128-6-git-send-email-johan.hedberg@gmail.com>
- <1357822449-10727-1-git-send-email-johan.hedberg@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1357822449-10727-1-git-send-email-johan.hedberg@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2] build: Fix using DBusBasicValue
+Date: Thu, 10 Jan 2013 18:59:53 +0200
+Message-Id: <1357837193-10092-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2013-01-10 14:54:09 +0200]:
+DBusBasicValue needs a more recent libdbus so use const void * instead
+---
+v2: Fix all places
 
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> Management commands should whenever possible fail with proper command
-> status or command complete events. This patch fixes the
-> mgmt_start_discovery command to do this for the failure cases where an
-> incorrect parameter value was passed to it ("not supported" if the
-> parameter value was valid but the controller doesn't support it and
-> "invalid params" if it isn't valid at all).
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> v2: Use proposed logic for testing for not supported parameters
-> 
->  net/bluetooth/mgmt.c |   46 ++++++++++++++++++++++++++++++----------------
->  1 file changed, 30 insertions(+), 16 deletions(-)
+ tools/mpris-player.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Patch has been applied. Thanks.
+diff --git a/tools/mpris-player.c b/tools/mpris-player.c
+index de66f97..246791a 100644
+--- a/tools/mpris-player.c
++++ b/tools/mpris-player.c
+@@ -151,7 +151,6 @@ static int parse_metadata_entry(DBusMessageIter *entry, const char *key,
+ 						DBusMessageIter *metadata)
+ {
+ 	DBusMessageIter var;
+-	DBusBasicValue value;
+ 	int type;
+ 
+ 	printf("metadata %s found\n", key);
+@@ -181,6 +180,8 @@ static int parse_metadata_entry(DBusMessageIter *entry, const char *key,
+ 		dict_append_array(metadata, key, DBUS_TYPE_STRING, &values, i);
+ 		dbus_free(values);
+ 	} else if (dbus_type_is_basic(type)) {
++		const void *value;
++
+ 		dbus_message_iter_get_basic(&var, &value);
+ 		dict_append_entry(metadata, key, type, &value);
+ 	} else
+@@ -312,7 +313,7 @@ static int parse_property(DBusConnection *conn, const char *path,
+ 						DBusMessageIter *properties)
+ {
+ 	DBusMessageIter var;
+-	DBusBasicValue value;
++	const void *value;
+ 	int type;
+ 
+ 	printf("property %s found\n", key);
+-- 
+1.8.0.1
 
-	Gustavo
