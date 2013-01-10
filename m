@@ -1,38 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1357825038-21970-13-git-send-email-luiz.dentz@gmail.com>
-References: <1357825038-21970-1-git-send-email-luiz.dentz@gmail.com>
-	<1357825038-21970-13-git-send-email-luiz.dentz@gmail.com>
-Date: Thu, 10 Jan 2013 12:02:55 -0400
-Message-ID: <CAJdJm_Nu0Mo7wGYWQr547Mat9hqXyygRbgn23p1QnyY3GrYJnA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 13/13 v2] tools: Update mpris-player to register
- using MPRIS interface
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=windows-1252
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org, linux-nfc-request@lists.01.org
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH neard 1/2] build: Use AM_CPPFLAGS instead of INCLUDES
+Date: Thu, 10 Jan 2013 13:18:13 -0200
+Message-Id: <1357831094-13513-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Makefile.am:50: warning: 'INCLUDES' is the old name for 'AM_CPPFLAGS' (or '*_CPPFLAGS')
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Thu, Jan 10, 2013 at 9:37 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> In addition fix not supporting new APIs for getting the adapter.
-> ---
-
-Got this compilation error after this patch:
-
-  CC     tools/mpris-player.o
-tools/mpris-player.c: In function ‘parse_metadata_entry’:
-tools/mpris-player.c:154:2: error: unknown type name ‘DBusBasicValue’
-tools/mpris-player.c: In function ‘parse_property’:
-tools/mpris-player.c:315:2: error: unknown type name ‘DBusBasicValue’
-
-Regards,
+diff --git a/Makefile.am b/Makefile.am
+index 2dd3517..8c3571e 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -47,7 +47,7 @@ AM_CFLAGS = @GLIB_CFLAGS@ @DBUS_CFLAGS@ @NETLINK_CFLAGS@ $(builtin_cflags) \
+ 					-DPLUGINDIR=\""$(plugindir)"\" \
+ 					-DCONFIGDIR=\""$(configdir)\""
+ 
+-INCLUDES = -I$(builddir)/include -I$(builddir)/src -I$(srcdir)/gdbus
++AM_CPPFLAGS = -I$(builddir)/include -I$(builddir)/src -I$(srcdir)/gdbus
+ 
+ CLEANFILES = src/builtin.h $(local_headers)
+ 
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.8.1
+
