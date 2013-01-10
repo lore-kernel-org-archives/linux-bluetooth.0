@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 06/13] player: Add Device property
-Date: Thu, 10 Jan 2013 15:24:34 +0200
-Message-Id: <1357824283-19233-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 6/8 v2] control: Mark all members of MediaControl1 as deprecated
+Date: Thu, 10 Jan 2013 15:24:33 +0200
+Message-Id: <1357824283-19233-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1357824283-19233-1-git-send-email-luiz.dentz@gmail.com>
 References: <1357824283-19233-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,81 +11,48 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Device property indicates which device object the player belongs to.
 ---
- doc/media-api.txt       |  4 ++++
- profiles/audio/player.c | 15 +++++++++++++++
- 2 files changed, 19 insertions(+)
+ profiles/audio/control.c | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
 
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index c2ee60f..d3bd915 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -288,6 +288,10 @@ Properties	string Equalizer [readwrite]
- 
- 					Track duration in milliseconds
- 
-+		object Device [readonly]
-+
-+			Device object path.
-+
- MediaEndpoint1 hierarchy
- ========================
- 
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index 880745d..f8920c9 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -56,6 +56,7 @@ struct pending_req {
- };
- 
- struct media_player {
-+	char			*device;	/* Device path */
- 	char			*path;		/* Player object path */
- 	GHashTable		*settings;	/* Player settings */
- 	GHashTable		*track;		/* Player current track */
-@@ -242,6 +243,16 @@ static gboolean get_track(const GDBusPropertyTable *property,
- 	return TRUE;
+diff --git a/profiles/audio/control.c b/profiles/audio/control.c
+index 642fdd5..70faab8 100644
+--- a/profiles/audio/control.c
++++ b/profiles/audio/control.c
+@@ -222,20 +222,23 @@ static gboolean control_property_get_connected(
  }
  
-+static gboolean get_device(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_player *mp = data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &mp->device);
-+
-+	return TRUE;
-+}
-+
- static DBusMessage *media_player_play(DBusConnection *conn, DBusMessage *msg,
- 								void *data)
- {
-@@ -394,6 +405,8 @@ static const GDBusPropertyTable media_player_properties[] = {
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ "Track", "a{sv}", get_track, NULL, NULL,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "Device", "s", get_device, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+ static const GDBusMethodTable control_methods[] = {
+-	{ GDBUS_METHOD("Play", NULL, NULL, control_play) },
+-	{ GDBUS_METHOD("Pause", NULL, NULL, control_pause) },
+-	{ GDBUS_METHOD("Stop", NULL, NULL, control_stop) },
+-	{ GDBUS_METHOD("Next", NULL, NULL, control_next) },
+-	{ GDBUS_METHOD("Previous", NULL, NULL, control_previous) },
+-	{ GDBUS_METHOD("VolumeUp", NULL, NULL, control_volume_up) },
+-	{ GDBUS_METHOD("VolumeDown", NULL, NULL, control_volume_down) },
+-	{ GDBUS_METHOD("FastForward", NULL, NULL, control_fast_forward) },
+-	{ GDBUS_METHOD("Rewind", NULL, NULL, control_rewind) },
++	{ GDBUS_DEPRECATED_METHOD("Play", NULL, NULL, control_play) },
++	{ GDBUS_DEPRECATED_METHOD("Pause", NULL, NULL, control_pause) },
++	{ GDBUS_DEPRECATED_METHOD("Stop", NULL, NULL, control_stop) },
++	{ GDBUS_DEPRECATED_METHOD("Next", NULL, NULL, control_next) },
++	{ GDBUS_DEPRECATED_METHOD("Previous", NULL, NULL, control_previous) },
++	{ GDBUS_DEPRECATED_METHOD("VolumeUp", NULL, NULL, control_volume_up) },
++	{ GDBUS_DEPRECATED_METHOD("VolumeDown", NULL, NULL,
++							control_volume_down) },
++	{ GDBUS_DEPRECATED_METHOD("FastForward", NULL, NULL,
++							control_fast_forward) },
++	{ GDBUS_DEPRECATED_METHOD("Rewind", NULL, NULL, control_rewind) },
  	{ }
  };
  
-@@ -419,6 +432,7 @@ void media_player_destroy(struct media_player *mp)
- 	g_free(mp->cb);
- 	g_free(mp->status);
- 	g_free(mp->path);
-+	g_free(mp->device);
- 	g_free(mp);
- }
+ static const GDBusPropertyTable control_properties[] = {
+-	{ "Connected", "b", control_property_get_connected },
++	{ "Connected", "b", control_property_get_connected, NULL, NULL,
++					G_DBUS_PROPERTY_FLAG_DEPRECATED },
+ 	{ }
+ };
  
-@@ -427,6 +441,7 @@ struct media_player *media_player_controller_create(const char *path)
- 	struct media_player *mp;
- 
- 	mp = g_new0(struct media_player, 1);
-+	mp->device = g_strdup(path);
- 	mp->path = g_strdup_printf("%s/player1", path);
- 	mp->settings = g_hash_table_new_full(g_str_hash, g_str_equal,
- 							g_free, g_free);
 -- 
 1.8.0.1
 
