@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 12/13 v2] media: Implement new RegisterPlayer API
-Date: Thu, 10 Jan 2013 15:37:17 +0200
-Message-Id: <1357825038-21970-12-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 09/13 v2] tools: Adapt mpris-player to new API of MediaPlayer1
+Date: Thu, 10 Jan 2013 15:37:14 +0200
+Message-Id: <1357825038-21970-9-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1357825038-21970-1-git-send-email-luiz.dentz@gmail.com>
 References: <1357825038-21970-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,412 +11,607 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-RegisterPlayer now uses MPRIS spec
+In addition fix using Manager1 interface which no longer exists
 ---
- profiles/audio/media.c | 294 ++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 195 insertions(+), 99 deletions(-)
+ tools/mpris-player.c | 482 +++++++++++++++++----------------------------------
+ 1 file changed, 157 insertions(+), 325 deletions(-)
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index b184f01..4b91656 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -28,6 +28,7 @@
- #endif
+diff --git a/tools/mpris-player.c b/tools/mpris-player.c
+index 90c87aa..fd26101 100644
+--- a/tools/mpris-player.c
++++ b/tools/mpris-player.c
+@@ -38,7 +38,7 @@
  
- #include <errno.h>
-+#include <inttypes.h>
+ static volatile sig_atomic_t __io_canceled = 0;
+ static volatile sig_atomic_t __io_terminated = 0;
+-static char *adapter = NULL;
++static char *adapter = "/org/bluez/hci0";
+ static DBusConnection *sys = NULL;
+ static DBusConnection *session = NULL;
  
- #include <glib.h>
- #include <gdbus/gdbus.h>
-@@ -51,7 +52,7 @@
- 
- #define MEDIA_INTERFACE "org.bluez.Media1"
- #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
--#define MEDIA_PLAYER_INTERFACE "org.bluez.MediaPlayer1"
-+#define MEDIA_PLAYER_INTERFACE "org.mpris.MediaPlayer2.Player"
- 
- #define REQUEST_TIMEOUT (3 * 1000)		/* 3 seconds */
- 
-@@ -1153,17 +1154,18 @@ static gboolean set_status(struct media_player *mp, DBusMessageIter *iter)
- 
- static gboolean set_position(struct media_player *mp, DBusMessageIter *iter)
- {
--	uint32_t value;
-+	uint64_t value;
- 
--	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT32)
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_INT64)
- 			return FALSE;
- 
- 	dbus_message_iter_get_basic(iter, &value);
--	DBG("Position=%u", value);
- 
--	mp->position = value;
-+	mp->position = value / 1000;
- 	g_timer_start(mp->timer);
- 
-+	DBG("Position=%u", mp->position);
-+
- 	if (!mp->position) {
- 		avrcp_player_event(mp->player,
- 					AVRCP_EVENT_TRACK_REACHED_START, NULL);
-@@ -1181,12 +1183,98 @@ static gboolean set_position(struct media_player *mp, DBusMessageIter *iter)
- 	return TRUE;
+@@ -114,157 +114,6 @@ static void dict_append_entry(DBusMessageIter *dict, const char *key, int type,
+ 	dbus_message_iter_close_container(dict, &entry);
  }
  
-+static void set_metadata(struct media_player *mp, const char *key,
-+							const char *value)
-+{
-+	DBG("%s=%s", key, value);
-+	g_hash_table_replace(mp->track, g_strdup(key), g_strdup(value));
-+}
-+
-+static gboolean parse_string_metadata(struct media_player *mp, const char *key,
-+							DBusMessageIter *iter)
-+{
-+	const char *value;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(iter, &value);
-+
-+	set_metadata(mp, key, value);
-+
-+	return TRUE;
-+}
-+
-+static gboolean parse_array_metadata(struct media_player *mp, const char *key,
-+							DBusMessageIter *iter)
-+{
-+	DBusMessageIter array;
-+	const char *value;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
-+		return FALSE;
-+
-+	dbus_message_iter_recurse(iter, &array);
-+
-+	if (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_INVALID)
-+		return TRUE;
-+
-+	if (dbus_message_iter_get_arg_type(&array) != DBUS_TYPE_STRING)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(&array, &value);
-+
-+	set_metadata(mp, key, value);
-+
-+	return TRUE;
-+}
-+
-+static gboolean parse_int64_metadata(struct media_player *mp, const char *key,
-+							DBusMessageIter *iter)
-+{
-+	uint64_t value;
-+	char valstr[20];
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_INT64)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(iter, &value);
-+
-+	if (strcasecmp(key, "Duration") == 0) {
-+		value /= 1000;
-+		mp->duration = value;
-+	}
-+
-+	snprintf(valstr, 20, "%" PRIu64, value);
-+
-+	set_metadata(mp, key, valstr);
-+
-+	return TRUE;
-+}
-+
-+static gboolean parse_int32_metadata(struct media_player *mp, const char *key,
-+							DBusMessageIter *iter)
-+{
-+	uint32_t value;
-+	char valstr[20];
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_INT32)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(iter, &value);
-+
-+	snprintf(valstr, 20, "%u", value);
-+
-+	set_metadata(mp, key, valstr);
-+
-+	return TRUE;
-+}
-+
- static gboolean parse_player_metadata(struct media_player *mp,
- 							DBusMessageIter *iter)
+-static dbus_bool_t emit_properties_changed(DBusConnection *conn,
+-					const char *path,
+-					const char *interface,
+-					const char *name,
+-					int type, void *value)
+-{
+-	DBusMessage *signal;
+-	DBusMessageIter iter, dict, entry, array;
+-	dbus_bool_t result;
+-
+-	signal = dbus_message_new_signal(path, DBUS_INTERFACE_PROPERTIES,
+-							"PropertiesChanged");
+-
+-	if (!signal) {
+-		fprintf(stderr, "Unable to allocate new %s.PropertyChanged"
+-							" signal", interface);
+-		return FALSE;
+-	}
+-
+-	dbus_message_iter_init_append(signal, &iter);
+-	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &interface);
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+-
+-	dbus_message_iter_open_container(&dict, DBUS_TYPE_DICT_ENTRY, NULL,
+-								&entry);
+-	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &name);
+-	append_variant(&entry, type, value);
+-	dbus_message_iter_close_container(&dict, &entry);
+-
+-	dbus_message_iter_close_container(&iter, &dict);
+-
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-				DBUS_TYPE_STRING_AS_STRING, &array);
+-	dbus_message_iter_close_container(&iter, &array);
+-
+-	result = dbus_connection_send(conn, signal, NULL);
+-	dbus_message_unref(signal);
+-
+-	return result;
+-}
+-
+-static int parse_property(DBusConnection *conn, const char *path,
+-						const char *key,
+-						DBusMessageIter *entry,
+-						DBusMessageIter *properties)
+-{
+-	DBusMessageIter var;
+-
+-	printf("property %s found\n", key);
+-
+-	if (dbus_message_iter_get_arg_type(entry) != DBUS_TYPE_VARIANT)
+-		return -EINVAL;
+-
+-	dbus_message_iter_recurse(entry, &var);
+-
+-	if (strcasecmp(key, "PlaybackStatus") == 0) {
+-		const char *value;
+-
+-		if (dbus_message_iter_get_arg_type(&var) !=
+-							DBUS_TYPE_STRING)
+-			return -EINVAL;
+-
+-		dbus_message_iter_get_basic(&var, &value);
+-
+-		if (properties)
+-			dict_append_entry(properties, "Status",
+-						DBUS_TYPE_STRING, &value);
+-		else
+-			emit_properties_changed(sys, path,
+-					"org.bluez.MediaPlayer1", "Status",
+-					DBUS_TYPE_STRING, &value);
+-	} else if (strcasecmp(key, "Position") == 0) {
+-		int64_t usec, msec;
+-
+-		if (dbus_message_iter_get_arg_type(&var) !=
+-							DBUS_TYPE_INT64)
+-			return -EINVAL;
+-
+-		dbus_message_iter_get_basic(&var, &usec);
+-		msec = usec / 1000;
+-
+-		if (properties)
+-			dict_append_entry(properties, "Position",
+-						DBUS_TYPE_UINT32, &msec);
+-		else
+-			emit_properties_changed(sys, path,
+-					"org.bluez.MediaPlayer1", "Position",
+-					DBUS_TYPE_UINT32, &msec);
+-	} else if (strcasecmp(key, "Shuffle") == 0) {
+-		dbus_bool_t value;
+-		const char *str;
+-
+-		if (dbus_message_iter_get_arg_type(&var) !=
+-							DBUS_TYPE_BOOLEAN)
+-			return -EINVAL;
+-
+-		dbus_message_iter_get_basic(&var, &value);
+-
+-		str = value ? "on" : "off";
+-		if (properties)
+-			dict_append_entry(properties, "Shuffle",
+-						DBUS_TYPE_STRING, &str);
+-		else
+-			emit_properties_changed(sys, path,
+-					"org.bluez.MediaPlayer1", "Shuffle",
+-					DBUS_TYPE_STRING, &str);
+-	}
+-
+-	return 0;
+-}
+-
+-static int parse_properties(DBusConnection *conn, const char *path,
+-						DBusMessageIter *args,
+-						DBusMessageIter *properties)
+-{
+-	DBusMessageIter dict;
+-	int ctype;
+-
+-	ctype = dbus_message_iter_get_arg_type(args);
+-	if (ctype != DBUS_TYPE_ARRAY)
+-		return -EINVAL;
+-
+-	dbus_message_iter_recurse(args, &dict);
+-
+-	while ((ctype = dbus_message_iter_get_arg_type(&dict)) !=
+-							DBUS_TYPE_INVALID) {
+-		DBusMessageIter entry;
+-		const char *key;
+-
+-		if (ctype != DBUS_TYPE_DICT_ENTRY)
+-			return -EINVAL;
+-
+-		dbus_message_iter_recurse(&dict, &entry);
+-		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_STRING)
+-			return -EINVAL;
+-
+-		dbus_message_iter_get_basic(&entry, &key);
+-		dbus_message_iter_next(&entry);
+-
+-		if (parse_property(conn, path, key, &entry, properties) < 0)
+-			return -EINVAL;
+-
+-		dbus_message_iter_next(&dict);
+-	}
+-
+-	return 0;
+-}
+-
+ static int parse_metadata_entry(DBusMessageIter *entry, const char *key,
+ 						DBusMessageIter *metadata)
  {
- 	DBusMessageIter dict;
- 	DBusMessageIter var;
--	GHashTable *track;
+@@ -352,7 +201,7 @@ static int parse_metadata_entry(DBusMessageIter *entry, const char *key,
+ 
+ 		dbus_message_iter_get_basic(&var, &value);
+ 
+-		dict_append_entry(metadata, "Track", DBUS_TYPE_UINT32,
++		dict_append_entry(metadata, "TrackNumber", DBUS_TYPE_UINT32,
+ 								&value);
+ 	}
+ 
+@@ -361,20 +210,14 @@ static int parse_metadata_entry(DBusMessageIter *entry, const char *key,
+ 
+ static int parse_track(DBusMessageIter *args, DBusMessageIter *metadata)
+ {
+-	DBusMessageIter var, dict;
++	DBusMessageIter dict;
  	int ctype;
- 	gboolean title = FALSE;
- 	uint64_t uid;
-@@ -1197,155 +1285,163 @@ static gboolean parse_player_metadata(struct media_player *mp,
  
- 	dbus_message_iter_recurse(iter, &dict);
+ 	ctype = dbus_message_iter_get_arg_type(args);
+-	if (ctype != DBUS_TYPE_VARIANT)
+-		return -EINVAL;
+-
+-	dbus_message_iter_recurse(args, &var);
+-
+-	ctype = dbus_message_iter_get_arg_type(&var);
+ 	if (ctype != DBUS_TYPE_ARRAY)
+ 		return -EINVAL;
  
--	track = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
-+	if (mp->track != NULL)
-+		g_hash_table_unref(mp->track);
-+
-+	mp->track = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
- 								g_free);
+-	dbus_message_iter_recurse(&var, &dict);
++	dbus_message_iter_recurse(args, &dict);
  
  	while ((ctype = dbus_message_iter_get_arg_type(&dict)) !=
  							DBUS_TYPE_INVALID) {
- 		DBusMessageIter entry;
- 		const char *key;
--		const char *string;
--		char valstr[20];
--		char *value;
--		uint32_t num;
--		int type;
+@@ -400,7 +243,153 @@ static int parse_track(DBusMessageIter *args, DBusMessageIter *metadata)
+ 	return 0;
+ }
  
- 		if (ctype != DBUS_TYPE_DICT_ENTRY)
--			goto parse_error;
-+			return FALSE;
- 
- 		dbus_message_iter_recurse(&dict, &entry);
- 		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_STRING)
--			goto parse_error;
-+			return FALSE;
- 
+-static int parse_metadata(DBusMessageIter *args, DBusMessageIter *metadata)
++static void append_track(DBusMessageIter *iter, DBusMessageIter *dict)
++{
++	DBusMessageIter value, metadata;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT, "a{sv}",
++								&value);
++
++	dbus_message_iter_open_container(&value, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &metadata);
++
++	parse_track(dict, &metadata);
++
++	dbus_message_iter_close_container(&value, &metadata);
++	dbus_message_iter_close_container(iter, &value);
++}
++
++static dbus_bool_t emit_properties_changed(DBusConnection *conn,
++					const char *path,
++					const char *interface,
++					const char *name,
++					int type, void *value)
++{
++	DBusMessage *signal;
++	DBusMessageIter iter, dict, entry, array;
++	dbus_bool_t result;
++
++	signal = dbus_message_new_signal(path, DBUS_INTERFACE_PROPERTIES,
++							"PropertiesChanged");
++
++	if (!signal) {
++		fprintf(stderr, "Unable to allocate new %s.PropertyChanged"
++							" signal", interface);
++		return FALSE;
++	}
++
++	dbus_message_iter_init_append(signal, &iter);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &interface);
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	dbus_message_iter_open_container(&dict, DBUS_TYPE_DICT_ENTRY, NULL,
++								&entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &name);
++
++	if (strcasecmp(name, "Track") == 0)
++		append_track(&entry, value);
++	else
++		append_variant(&entry, type, value);
++
++	dbus_message_iter_close_container(&dict, &entry);
++
++	dbus_message_iter_close_container(&iter, &dict);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++				DBUS_TYPE_STRING_AS_STRING, &array);
++	dbus_message_iter_close_container(&iter, &array);
++
++	result = dbus_connection_send(conn, signal, NULL);
++	dbus_message_unref(signal);
++
++	return result;
++}
++
++static int parse_property(DBusConnection *conn, const char *path,
++						const char *key,
++						DBusMessageIter *entry,
++						DBusMessageIter *properties)
++{
++	DBusMessageIter var;
++
++	printf("property %s found\n", key);
++
++	if (dbus_message_iter_get_arg_type(entry) != DBUS_TYPE_VARIANT)
++		return -EINVAL;
++
++	dbus_message_iter_recurse(entry, &var);
++
++	if (strcasecmp(key, "PlaybackStatus") == 0) {
++		const char *value;
++
++		if (dbus_message_iter_get_arg_type(&var) !=
++							DBUS_TYPE_STRING)
++			return -EINVAL;
++
++		dbus_message_iter_get_basic(&var, &value);
++
++		if (properties)
++			dict_append_entry(properties, "Status",
++						DBUS_TYPE_STRING, &value);
++		else
++			emit_properties_changed(sys, path,
++					"org.bluez.MediaPlayer1", "Status",
++					DBUS_TYPE_STRING, &value);
++	} else if (strcasecmp(key, "Position") == 0) {
++		int64_t usec, msec;
++
++		if (dbus_message_iter_get_arg_type(&var) !=
++							DBUS_TYPE_INT64)
++			return -EINVAL;
++
++		dbus_message_iter_get_basic(&var, &usec);
++		msec = usec / 1000;
++
++		if (properties)
++			dict_append_entry(properties, "Position",
++						DBUS_TYPE_UINT32, &msec);
++		else
++			emit_properties_changed(sys, path,
++					"org.bluez.MediaPlayer1", "Position",
++					DBUS_TYPE_UINT32, &msec);
++	} else if (strcasecmp(key, "Shuffle") == 0) {
++		dbus_bool_t value;
++		const char *str;
++
++		if (dbus_message_iter_get_arg_type(&var) !=
++							DBUS_TYPE_BOOLEAN)
++			return -EINVAL;
++
++		dbus_message_iter_get_basic(&var, &value);
++
++		str = value ? "on" : "off";
++		if (properties)
++			dict_append_entry(properties, "Shuffle",
++						DBUS_TYPE_STRING, &str);
++		else
++			emit_properties_changed(sys, path,
++					"org.bluez.MediaPlayer1", "Shuffle",
++					DBUS_TYPE_STRING, &str);
++	} else if (strcasecmp(key, "Metadata") == 0) {
++		if (properties)
++			parse_track(&var, properties);
++		else
++			emit_properties_changed(sys, path,
++					"org.bluez.MediaPlayer1", "Track",
++					DBUS_TYPE_DICT_ENTRY, &var);
++	}
++
++	return 0;
++}
++
++static int parse_properties(DBusConnection *conn, const char *path,
++						DBusMessageIter *args,
++						DBusMessageIter *properties)
+ {
+ 	DBusMessageIter dict;
+ 	int ctype;
+@@ -426,13 +415,13 @@ static int parse_metadata(DBusMessageIter *args, DBusMessageIter *metadata)
  		dbus_message_iter_get_basic(&entry, &key);
  		dbus_message_iter_next(&entry);
  
- 		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_VARIANT)
--			goto parse_error;
-+			return FALSE;
+-		if (strcasecmp(key, "Metadata") == 0)
+-			return parse_track(&entry, metadata);
++		if (parse_property(conn, path, key, &entry, properties) < 0)
++			return -EINVAL;
  
- 		dbus_message_iter_recurse(&entry, &var);
- 
--		type = dbus_message_iter_get_arg_type(&var);
--
--		if (strcasecmp(key, "Title") == 0) {
--			if (type != DBUS_TYPE_STRING)
--				goto parse_error;
-+		if (strcasecmp(key, "xesam:title") == 0) {
-+			if (!parse_string_metadata(mp, "Title", &var))
-+				return FALSE;
- 			title = TRUE;
--			dbus_message_iter_get_basic(&var, &string);
--		} else if (strcasecmp(key, "Artist") == 0) {
--			if (type != DBUS_TYPE_STRING)
--				goto parse_error;
--
--			dbus_message_iter_get_basic(&var, &string);
--		} else if (strcasecmp(key, "Album") == 0) {
--			if (type != DBUS_TYPE_STRING)
--				goto parse_error;
--
--			dbus_message_iter_get_basic(&var, &string);
--		} else if (strcasecmp(key, "Genre") == 0) {
--			if (type != DBUS_TYPE_STRING)
--				goto parse_error;
--
--			dbus_message_iter_get_basic(&var, &string);
--		} else if (strcasecmp(key, "Duration") == 0) {
--			if (type != DBUS_TYPE_UINT32)
--				goto parse_error;
--
--			dbus_message_iter_get_basic(&var, &num);
--			mp->duration = num;
--		} else if (strcasecmp(key, "TrackNumber") == 0) {
--			if (type != DBUS_TYPE_UINT32)
--				goto parse_error;
--
--			dbus_message_iter_get_basic(&var, &num);
--		} else if (strcasecmp(key, "NumberOfTracks") == 0) {
--			if (type != DBUS_TYPE_UINT32)
--				goto parse_error;
--
--			dbus_message_iter_get_basic(&var, &num);
-+		} else if (strcasecmp(key, "xesam:artist") == 0) {
-+			if (!parse_array_metadata(mp, "Artist", &var))
-+				return FALSE;
-+		} else if (strcasecmp(key, "xesam:album") == 0) {
-+			if (!parse_string_metadata(mp, "Album", &var))
-+				return FALSE;
-+		} else if (strcasecmp(key, "xesam:genre") == 0) {
-+			if (!parse_array_metadata(mp, "Genre", &var))
-+				return FALSE;
-+		} else if (strcasecmp(key, "mpris:length") == 0) {
-+			if (!parse_int64_metadata(mp, "Duration", &var))
-+				return FALSE;
-+		} else if (strcasecmp(key, "xesam:trackNumber") == 0) {
-+			if (!parse_int32_metadata(mp, "TrackNumber", &var))
-+				return FALSE;
- 		} else
--			goto parse_error;
--
--		switch (type) {
--		case DBUS_TYPE_STRING:
--			value = g_strdup(string);
--			break;
--		default:
--			snprintf(valstr, 20, "%u", num);
--			value = g_strdup(valstr);
--		}
-+			DBG("%s not supported, ignoring", key);
- 
--		DBG("%s=%s", key, value);
--		g_hash_table_replace(track, g_strdup(key), value);
  		dbus_message_iter_next(&dict);
  	}
  
--	if (g_hash_table_size(track) == 0) {
--		g_hash_table_unref(track);
--		track = NULL;
--	} else if (title == FALSE)
--		g_hash_table_insert(track, g_strdup("Title"), g_strdup(""));
-+	if (title == FALSE)
-+		g_hash_table_insert(mp->track, g_strdup("Title"),
-+								g_strdup(""));
- 
--	if (mp->track != NULL)
--		g_hash_table_unref(mp->track);
--
--	mp->track = track;
- 	mp->position = 0;
- 	g_timer_start(mp->timer);
- 	uid = get_uid(mp);
- 
- 	avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_CHANGED, &uid);
--	avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_REACHED_START,
--								NULL);
-+	avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_REACHED_START, NULL);
- 
- 	return TRUE;
-+}
-+
-+static gboolean set_property(struct media_player *mp, const char *key,
-+							const char *value)
-+{
-+	const char *curval;
-+	GList *settings;
-+
-+	curval = g_hash_table_lookup(mp->settings, key);
-+	if (g_strcmp0(curval, value) == 0)
-+		return TRUE;
-+
-+	DBG("%s=%s", key, value);
-+
-+	g_hash_table_replace(mp->settings, g_strdup(key), g_strdup(value));
-+
-+	settings = list_settings(mp);
-+
-+	avrcp_player_event(mp->player, AVRCP_EVENT_SETTINGS_CHANGED, settings);
-+
-+	g_list_free(settings);
-+
-+	return TRUE;
-+}
-+
-+static gboolean set_shuffle(struct media_player *mp, DBusMessageIter *iter)
-+{
-+	dbus_bool_t value;
-+	const char *strvalue;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(iter, &value);
- 
--parse_error:
--	if (track)
--		g_hash_table_unref(track);
-+	strvalue = value ? "alltracks" : "off";
- 
--	return FALSE;
-+	return set_property(mp, "Shuffle", strvalue);
-+}
-+
-+static const char *loop_status_to_repeat(const char *value)
-+{
-+	if (strcasecmp(value, "None") == 0)
-+		return "off";
-+	else if (strcasecmp(value, "Track") == 0)
-+		return "singletrack";
-+	else if (strcasecmp(value, "Track") == 0)
-+		return "alltracks";
-+
-+	return NULL;
-+}
-+
-+static gboolean set_repeat(struct media_player *mp, DBusMessageIter *iter)
-+{
-+	const char *value;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(iter, &value);
-+
-+	value = loop_status_to_repeat(value);
-+	if (value == NULL)
-+		return FALSE;
-+
-+	return set_property(mp, "Repeat", value);
+-	return -EINVAL;
++	return 0;
  }
  
- static gboolean set_player_property(struct media_player *mp, const char *key,
- 							DBusMessageIter *entry)
+ static char *sender2path(const char *sender)
+@@ -464,7 +453,7 @@ static void add_player(DBusConnection *conn, const char *name,
  {
- 	DBusMessageIter var;
--	const char *value, *curval;
--	GList *settings;
+ 	DBusMessage *reply = get_all(conn, name);
+ 	DBusMessage *msg;
+-	DBusMessageIter iter, args, properties, metadata;
++	DBusMessageIter iter, args, properties;
+ 	DBusError err;
+ 	char *path;
  
- 	if (dbus_message_iter_get_arg_type(entry) != DBUS_TYPE_VARIANT)
- 		return FALSE;
+@@ -496,18 +485,6 @@ static void add_player(DBusConnection *conn, const char *name,
  
- 	dbus_message_iter_recurse(entry, &var);
+ 	dbus_message_iter_close_container(&iter, &properties);
  
--	if (strcasecmp(key, "Status") == 0)
-+	if (strcasecmp(key, "PlaybackStatus") == 0)
- 		return set_status(mp, &var);
- 
- 	if (strcasecmp(key, "Position") == 0)
- 		return set_position(mp, &var);
- 
--	if (strcasecmp(key, "Track") == 0)
-+	if (strcasecmp(key, "Metadata") == 0)
- 		return parse_player_metadata(mp, &var);
- 
--	if (dbus_message_iter_get_arg_type(&var) != DBUS_TYPE_STRING)
--		return FALSE;
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &metadata);
 -
--	dbus_message_iter_get_basic(&var, &value);
+-	dbus_message_iter_init(reply, &args);
 -
--	curval = g_hash_table_lookup(mp->settings, key);
--	if (g_strcmp0(curval, value) == 0)
--		return TRUE;
+-	if (parse_metadata(&args, &metadata) < 0)
+-		goto done;
 -
--	DBG("%s=%s", key, value);
+-	dbus_message_iter_close_container(&iter, &metadata);
 -
--	g_hash_table_replace(mp->settings, g_strdup(key), g_strdup(value));
--
--	settings = list_settings(mp);
-+	if (strcasecmp(key, "Shuffle") == 0)
-+		return set_shuffle(mp, &var);
+ 	dbus_message_unref(reply);
  
--	avrcp_player_event(mp->player, AVRCP_EVENT_SETTINGS_CHANGED, settings);
-+	if (strcasecmp(key, "LoopStatus") == 0)
-+		return set_repeat(mp, &var);
+ 	dbus_error_init(&err);
+@@ -559,8 +536,7 @@ static void remove_player(DBusConnection *conn, const char *sender)
+ static DBusHandlerResult properties_changed(DBusConnection *conn,
+ 							DBusMessage *msg)
+ {
+-	DBusMessage *signal;
+-	DBusMessageIter iter, entry, metadata;
++	DBusMessageIter iter;
+ 	const char *iface;
+ 	char *path;
  
--	g_list_free(settings);
-+	DBG("%s not supported, ignoring", key);
+@@ -578,40 +554,9 @@ static DBusHandlerResult properties_changed(DBusConnection *conn,
+ 	path = sender2path(dbus_message_get_sender(msg));
+ 	parse_properties(conn, path, &iter, NULL);
  
- 	return TRUE;
+-	signal = dbus_message_new_signal(path, "org.bluez.MediaPlayer1",
+-							"TrackChanged");
+-	if (!signal) {
+-		fprintf(stderr, "Unable to allocate new PropertyChanged"
+-							" signal\n");
+-		goto err;
+-	}
+-
+-	dbus_message_iter_init_append(signal, &entry);
+-
+-	dbus_message_iter_open_container(&entry, DBUS_TYPE_ARRAY,
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &metadata);
+-
+-	dbus_message_iter_init(msg, &iter);
+-	dbus_message_iter_next(&iter);
+-
+-	if (parse_metadata(&iter, &metadata) < 0)
+-		goto err;
+-
+-	dbus_message_iter_close_container(&entry, &metadata);
+-
+-	dbus_connection_send(sys, signal, NULL);
+-	dbus_message_unref(signal);
+ 	g_free(path);
+ 
+ 	return DBUS_HANDLER_RESULT_HANDLED;
+-
+-err:
+-	if (signal)
+-		dbus_message_unref(signal);
+-	g_free(path);
+-	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
  }
+ 
+ static DBusHandlerResult session_filter(DBusConnection *conn,
+@@ -676,114 +621,6 @@ static DBusHandlerResult system_filter(DBusConnection *conn,
+ 	return DBUS_HANDLER_RESULT_HANDLED;
+ }
+ 
+-static char *get_default_adapter(DBusConnection *conn)
+-{
+-	DBusMessage *msg, *reply;
+-	DBusError err;
+-	const char *reply_path;
+-	char *path;
+-
+-	msg = dbus_message_new_method_call("org.bluez", "/",
+-					"org.bluez.Manager", "DefaultAdapter");
+-
+-	if (!msg) {
+-		fprintf(stderr, "Can't allocate new method call\n");
+-		return NULL;
+-	}
+-
+-	dbus_error_init(&err);
+-
+-	reply = dbus_connection_send_with_reply_and_block(conn, msg, -1, &err);
+-
+-	dbus_message_unref(msg);
+-
+-	if (!reply) {
+-		fprintf(stderr, "Can't get default adapter\n");
+-		if (dbus_error_is_set(&err)) {
+-			fprintf(stderr, "%s\n", err.message);
+-			dbus_error_free(&err);
+-		}
+-		return NULL;
+-	}
+-
+-	if (!dbus_message_get_args(reply, &err,
+-					DBUS_TYPE_OBJECT_PATH, &reply_path,
+-					DBUS_TYPE_INVALID)) {
+-		fprintf(stderr, "Can't get reply arguments\n");
+-		if (dbus_error_is_set(&err)) {
+-			fprintf(stderr, "%s\n", err.message);
+-			dbus_error_free(&err);
+-		}
+-		dbus_message_unref(reply);
+-		return NULL;
+-	}
+-
+-	path = strdup(reply_path);
+-
+-	dbus_message_unref(reply);
+-
+-	dbus_connection_flush(conn);
+-
+-	return path;
+-}
+-
+-static char *get_adapter(DBusConnection *conn, const char *adapter)
+-{
+-	DBusMessage *msg, *reply;
+-	DBusError err;
+-	const char *reply_path;
+-	char *path;
+-
+-	if (!adapter)
+-		return get_default_adapter(conn);
+-
+-	msg = dbus_message_new_method_call("org.bluez", "/",
+-					"org.bluez.Manager", "FindAdapter");
+-
+-	if (!msg) {
+-		fprintf(stderr, "Can't allocate new method call\n");
+-		return NULL;
+-	}
+-
+-	dbus_message_append_args(msg, DBUS_TYPE_STRING, &adapter,
+-					DBUS_TYPE_INVALID);
+-
+-	dbus_error_init(&err);
+-
+-	reply = dbus_connection_send_with_reply_and_block(conn, msg, -1, &err);
+-
+-	dbus_message_unref(msg);
+-
+-	if (!reply) {
+-		fprintf(stderr, "Can't find adapter %s\n", adapter);
+-		if (dbus_error_is_set(&err)) {
+-			fprintf(stderr, "%s\n", err.message);
+-			dbus_error_free(&err);
+-		}
+-		return NULL;
+-	}
+-
+-	if (!dbus_message_get_args(reply, &err,
+-					DBUS_TYPE_OBJECT_PATH, &reply_path,
+-					DBUS_TYPE_INVALID)) {
+-		fprintf(stderr, "Can't get reply arguments\n");
+-		if (dbus_error_is_set(&err)) {
+-			fprintf(stderr, "%s\n", err.message);
+-			dbus_error_free(&err);
+-		}
+-		dbus_message_unref(reply);
+-		return NULL;
+-	}
+-
+-	path = strdup(reply_path);
+-
+-	dbus_message_unref(reply);
+-
+-	dbus_connection_flush(conn);
+-
+-	return path;
+-}
+-
+ static char *get_name_owner(DBusConnection *conn, const char *name)
+ {
+ 	DBusMessage *msg, *reply;
+@@ -924,14 +761,13 @@ static struct option main_options[] = {
+ int main(int argc, char *argv[])
+ {
+ 	struct sigaction sa;
+-	char *adapter_id = NULL;
+ 	char match[128];
+ 	int opt;
+ 
+ 	while ((opt = getopt_long(argc, argv, "+a,h", main_options, NULL)) != EOF) {
+ 		switch(opt) {
+ 		case '1':
+-			adapter_id = optarg;
++			adapter = optarg;
+ 			break;
+ 		case 'h':
+ 			usage();
+@@ -947,10 +783,6 @@ int main(int argc, char *argv[])
+ 		exit(1);
+ 	}
+ 
+-	adapter = get_adapter(sys, adapter_id);
+-	if (!adapter)
+-		exit(1);
+-
+ 	if (!dbus_connection_add_filter(sys, system_filter, NULL, NULL)) {
+ 		fprintf(stderr, "Can't add signal filter");
+ 		exit(1);
 -- 
 1.8.0.1
 
