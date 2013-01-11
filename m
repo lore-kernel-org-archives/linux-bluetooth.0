@@ -1,36 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: vinicius.gomes@openbossa.org, claudio.takahasi@openbossa.org,
-	luiz.von.dentz@intel.com,
-	=?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ 02/11] transport: Store the value set through the 'Volume' property
-Date: Fri, 11 Jan 2013 17:25:25 -0300
-Message-Id: <1357935934-20033-3-git-send-email-jprvita@openbossa.org>
-In-Reply-To: <1357935934-20033-1-git-send-email-jprvita@openbossa.org>
-References: <1357935934-20033-1-git-send-email-jprvita@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 11 Jan 2013 14:11:22 -0500
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth 2013-01-10
+Message-ID: <20130111191121.GC2170@tuxdriver.com>
+References: <20130110073423.GE18821@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130110073423.GE18821@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- profiles/audio/transport.c | 2 ++
- 1 file changed, 2 insertions(+)
+On Thu, Jan 10, 2013 at 05:34:23AM -0200, Gustavo Padovan wrote:
+> Hi John,
+> 
+> A few fixes for 3.8. Five of them are just new devices ids addition.
+> Apart from the that there is fix to a kernel memory leak to userspace from
+> Anderson Lizardo, two interoperability fixes from Jaganath Kanakkassery and
+> Szymon Janc. And a crash fix by me.
+> 
+> Please pull, or let me know of any problem with these patches. Thanks.
+> 
+> 	Gustavo
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 6ffa98a..f3caa1b 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -658,6 +658,8 @@ static void set_volume(const GDBusPropertyTable *property,
- 	if (a2dp->volume != volume)
- 		avrcp_set_volume(transport->device, volume);
- 
-+	a2dp->volume = volume;
-+
- 	g_dbus_pending_property_success(id);
- }
- 
+Pulled, thanks!
+
 -- 
-1.7.11.7
-
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
