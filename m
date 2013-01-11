@@ -6,31 +6,64 @@ Cc: vinicius.gomes@openbossa.org, claudio.takahasi@openbossa.org,
 	luiz.von.dentz@intel.com,
 	=?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
 	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ 11/11] audio: Bump AVRCP CT version to 1.5
-Date: Fri, 11 Jan 2013 17:25:34 -0300
-Message-Id: <1357935934-20033-12-git-send-email-jprvita@openbossa.org>
+Subject: [PATCH BlueZ 10/11] avrcp: Handle SetAbsoluteVolume command
+Date: Fri, 11 Jan 2013 17:25:33 -0300
+Message-Id: <1357935934-20033-11-git-send-email-jprvita@openbossa.org>
 In-Reply-To: <1357935934-20033-1-git-send-email-jprvita@openbossa.org>
 References: <1357935934-20033-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- profiles/audio/avrcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ profiles/audio/avrcp.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
 diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 8bd5fb6..19b6721 100644
+index d715177..8bd5fb6 100644
 --- a/profiles/audio/avrcp.c
 +++ b/profiles/audio/avrcp.c
-@@ -231,7 +231,7 @@ static sdp_record_t *avrcp_ct_record(void)
- 	sdp_record_t *record;
- 	sdp_data_t *psm, *version, *features;
- 	uint16_t lp = AVCTP_CONTROL_PSM;
--	uint16_t avrcp_ver = 0x0103, avctp_ver = 0x0103;
-+	uint16_t avrcp_ver = 0x0105, avctp_ver = 0x0103;
- 	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
- 						AVRCP_FEATURE_CATEGORY_2 |
- 						AVRCP_FEATURE_CATEGORY_3 |
+@@ -1392,6 +1392,32 @@ err:
+ 	return AVC_CTYPE_REJECTED;
+ }
+ 
++static uint8_t avrcp_handle_set_absolute_volume(struct avrcp *session,
++						struct avrcp_header *pdu,
++						uint8_t transaction)
++{
++	struct avrcp_player *player = session->player;
++	uint16_t len = ntohs(pdu->params_len);
++
++	if (len != 1)
++		goto err;
++
++	if (pdu->params[0] > 127)
++		goto err;
++
++	if (!player)
++		goto err;
++
++	media_transport_update_device_volume(session->dev, pdu->params[0]);
++
++	return AVC_CTYPE_ACCEPTED;
++
++err:
++	pdu->params_len = htons(1);
++	pdu->params[0] = AVRCP_STATUS_INVALID_PARAM;
++	return AVC_CTYPE_REJECTED;
++}
++
+ static const struct control_pdu_handler tg_control_handlers[] = {
+ 		{ AVRCP_GET_CAPABILITIES, AVC_CTYPE_STATUS,
+ 					avrcp_handle_get_capabilities },
+@@ -1429,6 +1455,8 @@ static const struct control_pdu_handler ct_control_handlers[] = {
+ 					avrcp_handle_get_capabilities },
+ 		{ AVRCP_REGISTER_NOTIFICATION, AVC_CTYPE_NOTIFY,
+ 					avrcp_handle_register_notification },
++		{ AVRCP_SET_ABSOLUTE_VOLUME, AVC_CTYPE_CONTROL,
++					avrcp_handle_set_absolute_volume },
+ 		{ },
+ };
+ 
 -- 
 1.7.11.7
 
