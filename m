@@ -1,42 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] AVRCP: Fix crash when MediaPlayer1 is disabled
-Date: Fri, 11 Jan 2013 16:19:09 +0200
-Message-Id: <1357913949-27785-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 7/7] unit: Add gdbus/client_get_uint64_property
+Date: Fri, 11 Jan 2013 13:50:18 +0200
+Message-Id: <1357905018-23237-7-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1357905018-23237-1-git-send-email-luiz.dentz@gmail.com>
+References: <1357905018-23237-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When MediaPlayer1 is disabled we should not proceed with getting
-remote capabilities but switch back to 1.0 mode.
 ---
- profiles/audio/avrcp.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ unit/test-gdbus-client.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 66 insertions(+)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index d0cc346..ef324b0 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -2178,11 +2178,12 @@ static void session_ct_init(struct avrcp *session)
- 	path = device_get_path(session->dev->btd_dev);
+diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
+index c3ae4b9..a777fe3 100644
+--- a/unit/test-gdbus-client.c
++++ b/unit/test-gdbus-client.c
+@@ -530,6 +530,69 @@ static void client_get_array_property(void)
+ 	destroy_context(context);
+ }
  
- 	mp = media_player_controller_create(path);
--	if (mp != NULL) {
--		media_player_set_callbacks(mp, &ct_cbs, player);
--		player->user_data = mp;
--		player->destroy = (GDestroyNotify) media_player_destroy;
--	}
-+	if (mp == NULL)
++static void proxy_get_uint64(GDBusProxy *proxy, void *user_data)
++{
++	struct context *context = user_data;
++	DBusMessageIter iter;
++	guint64 value;
++
++	if (g_test_verbose())
++		g_print("proxy %s found\n",
++					g_dbus_proxy_get_interface(proxy));
++
++	g_assert(g_dbus_proxy_get_property(proxy, "Number", &iter));
++	g_assert(dbus_message_iter_get_arg_type(&iter) == DBUS_TYPE_UINT64);
++
++	dbus_message_iter_get_basic(&iter, &value);
++	g_assert(value == G_MAXUINT64);
++
++	g_dbus_client_unref(context->dbus_client);
++
++	g_main_loop_quit(context->main_loop);
++}
++
++static gboolean get_uint64(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	guint64 value = G_MAXUINT64;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT64, &value);
++
++	return TRUE;
++}
++
++static void client_get_uint64_property(void)
++{
++	struct context *context = create_context();
++	static const GDBusPropertyTable uint64_properties[] = {
++		{ "Number", "t", get_uint64 },
++		{ },
++	};
++
++	if (context == NULL)
 +		return;
 +
-+	media_player_set_callbacks(mp, &ct_cbs, player);
-+	player->user_data = mp;
-+	player->destroy = (GDestroyNotify) media_player_destroy;
++	g_dbus_register_interface(context->dbus_conn,
++				SERVICE_PATH, SERVICE_NAME,
++				methods, signals, uint64_properties,
++				NULL, NULL);
++
++	context->dbus_client = g_dbus_client_new(context->dbus_conn,
++						SERVICE_NAME, SERVICE_PATH);
++
++	g_dbus_client_set_proxy_handlers(context->dbus_client,
++						proxy_get_uint64,
++						NULL, NULL,
++						context);
++
++	g_main_loop_run(context->main_loop);
++
++	g_dbus_unregister_interface(context->dbus_conn,
++					SERVICE_PATH, SERVICE_NAME);
++
++	destroy_context(context);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	g_test_init(&argc, &argv, NULL);
+@@ -545,6 +608,9 @@ int main(int argc, char *argv[])
+ 	g_test_add_func("/gdbus/client_get_boolean_property",
+ 						client_get_boolean_property);
  
- 	if (session->version < 0x0103)
- 		return;
++	g_test_add_func("/gdbus/client_get_uint64_property",
++						client_get_uint64_property);
++
+ 	g_test_add_func("/gdbus/client_get_array_property",
+ 						client_get_array_property);
+ 
 -- 
 1.8.0.1
 
