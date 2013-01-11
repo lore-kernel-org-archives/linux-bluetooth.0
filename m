@@ -1,26 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 11 Jan 2013 16:28:40 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] AVRCP: Fix crash when MediaPlayer1 is disabled
-Message-ID: <20130111142840.GA27836@x220>
-References: <1357913949-27785-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1357913949-27785-1-git-send-email-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] AVRCP: Fix crash when MediaPlayer1 is disabled
+Date: Fri, 11 Jan 2013 16:19:09 +0200
+Message-Id: <1357913949-27785-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Jan 11, 2013, Luiz Augusto von Dentz wrote:
-> When MediaPlayer1 is disabled we should not proceed with getting
-> remote capabilities but switch back to 1.0 mode.
-> ---
->  profiles/audio/avrcp.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
+When MediaPlayer1 is disabled we should not proceed with getting
+remote capabilities but switch back to 1.0 mode.
+---
+ profiles/audio/avrcp.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-Applied. Thanks.
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index d0cc346..ef324b0 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -2178,11 +2178,12 @@ static void session_ct_init(struct avrcp *session)
+ 	path = device_get_path(session->dev->btd_dev);
+ 
+ 	mp = media_player_controller_create(path);
+-	if (mp != NULL) {
+-		media_player_set_callbacks(mp, &ct_cbs, player);
+-		player->user_data = mp;
+-		player->destroy = (GDestroyNotify) media_player_destroy;
+-	}
++	if (mp == NULL)
++		return;
++
++	media_player_set_callbacks(mp, &ct_cbs, player);
++	player->user_data = mp;
++	player->destroy = (GDestroyNotify) media_player_destroy;
+ 
+ 	if (session->version < 0x0103)
+ 		return;
+-- 
+1.8.0.1
 
-Johan
