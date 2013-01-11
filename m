@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
 Cc: Christian Fetzer <christian.fetzer@bmw-carit.de>
-Subject: [PATCH 1/8] obexd: Handle empty path name in SetPath
-Date: Fri, 11 Jan 2013 16:55:50 +0100
-Message-Id: <1357919757-10334-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH 3/8] obexd: Fix infinite loop in ListMessages with filter "Types"
+Date: Fri, 11 Jan 2013 16:55:52 +0100
+Message-Id: <1357919757-10334-4-git-send-email-christian.fetzer@oss.bmw-carit.de>
 In-Reply-To: <1357919757-10334-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 References: <1357919757-10334-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,42 +12,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-If the empty path is given, an empty name should be sent via OBEX.
-Currently the name field is not set at all and later checks which
-depend on data->index will access invalid memory regions as g_strsplit
-returns NULL when an empty string is given.
+Calls to ListMessages with filter 'Types' make obexd hang in an infinite loop.
+This is caused by a missing dbus_message_iter_next in parse_filter_type.
 
-0  0x000000000041a181 in g_obex_setpath (obex=obex@entry=0x662eb0, path=
-    0x20 <Address 0x20 out of bounds>, func=func@entry=0x42d300 <setpath_cb>,
-    user_data=user_data@entry=0x668f10, err=err@entry=0x7fffffffda08)
-    at gobex/gobex.c:1397
-1  0x000000000042d395 in setpath_cb (obex=0x662eb0, err=0x0, rsp=<optimized out>,
-    user_data=0x668f10) at obexd/client/session.c:902
-2  0x0000000000418e54 in handle_response (obex=obex@entry=0x662eb0, err=err@entry=0x0,
-    rsp=rsp@entry=0x668f40) at gobex/gobex.c:948
-3  0x0000000000419d7a in incoming_data (io=<optimized out>, cond=<optimized out>,
-    user_data=0x662eb0) at gobex/gobex.c:1191
-4  0x00007ffff703c845 in g_main_context_dispatch () from /usr/lib/libglib-2.0.so.0
-5  0x00007ffff703cb78 in ?? () from /usr/lib/libglib-2.0.so.0
-6  0x00007ffff703cf72 in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
-7  0x000000000040def2 in main (argc=1, argv=0x7fffffffdd88) at obexd/src/main.c:323
+0  0x00007ffff7304ca7 in dbus_message_iter_get_basic ()
+   from /usr/lib/libdbus-1.so.3
+1  0x0000000000434fba in parse_filter_type (iter=0x7fffffffd7d0, apparam=
+    0x6987f0) at obexd/client/map.c:1086
+2  parse_message_filters (iter=0x7fffffffd730, apparam=0x6987f0)
+    at obexd/client/map.c:1222
+3  map_list_messages (connection=<optimized out>, message=0x669ae0, user_data=
+    0x698a60) at obexd/client/map.c:1273
+4  0x00000000004109a1 in process_message (connection=0x662b20,
+    message=<optimized out>, iface_user_data=<optimized out>,
+    method=<optimized out>, method=<optimized out>) at gdbus/object.c:285
+5  0x00007ffff7308e15 in ?? () from /usr/lib/libdbus-1.so.3
+6  0x00007ffff72fb070 in dbus_connection_dispatch ()
+   from /usr/lib/libdbus-1.so.3
+7  0x000000000040e3d8 in message_dispatch (data=0x662b20)
+    at gdbus/mainloop.c:76
+8  0x00007ffff703d3cb in ?? () from /usr/lib/libglib-2.0.so.0
+9  0x00007ffff703c845 in g_main_context_dispatch ()
+   from /usr/lib/libglib-2.0.so.0
+10 0x00007ffff703cb78 in ?? () from /usr/lib/libglib-2.0.so.0
+11 0x00007ffff703cf72 in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
+12 0x000000000040df82 in main (argc=1, argv=0x7fffffffdd88)
+    at obexd/src/main.c:323
 ---
- obexd/client/session.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ obexd/client/map.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/obexd/client/session.c b/obexd/client/session.c
-index 9cc824e..db37a86 100644
---- a/obexd/client/session.c
-+++ b/obexd/client/session.c
-@@ -934,7 +934,7 @@ guint obc_session_setpath(struct obc_session *session, const char *path,
- 	p = pending_request_new(session, NULL, setpath_complete, data);
- 
- 	/* Relative path */
--	if (path[0] != '/') {
-+	if (path[0] != '/' && path[0] != 0) {
- 		first = data->remaining[data->index];
- 		data->index++;
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 635d951..afb5f9a 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -1123,6 +1123,8 @@ static GObexApparam *parse_filter_type(GObexApparam *apparam,
+ 			types |= 0x08; /* mms */
+ 		else
+ 			return NULL;
++
++		dbus_message_iter_next(&array);
  	}
+ 
+ 	return g_obex_apparam_set_uint8(apparam, MAP_AP_FILTERMESSAGETYPE,
 -- 
 1.8.1
 
