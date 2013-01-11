@@ -1,90 +1,144 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <D43D72D2B7084BA8B750CE7FD0D1C287@sisodomain.com>
-From: Syam Sidhardhan <s.syam@samsung.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-References: <1335342544-17320-1-git-send-email-manojkr.sharma@stericsson.com>
- <1335342544-17320-2-git-send-email-manojkr.sharma@stericsson.com>
- <alpine.DEB.2.02.1204250827200.20357@mathewm-linux>
-Subject: Obexd OPP filesend fails with Windows7 stack
-Date: Fri, 11 Jan 2013 14:02:28 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=response
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 2/2] unit: Add tests for SDP integer Data Elements
+Date: Thu, 10 Jan 2013 21:22:02 -0400
+Message-Id: <1357867322-31384-2-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1357867322-31384-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1357867322-31384-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+SDP_DATA_NIL does not have a value, but its sdp_data_t val field is
+zeroed by memset(), so just treat it as UINT8 with zero value to
+simplify checking (and not require a separate macro.)
 
-We are using the obexd 0.48 version and testing the obexd.
-During testing OPP file send, we found one interoperability
-issue with the Windows7 PC stack and some commercialized devices
-available in the market.
+SDP_BOOL is handled by SDP library as a INT8.
 
-The issue is: OBEXD file transfer is getting failed
-once after the complete file content got transfferd. This is
-because of, we do a direct RFCOMM disconection rather than
-doing a proper OBEX disconection before.
+SDP_UINT128/SDP_INT128 are just byte arrays converted to host order, so
+use memcmp() to compare them (converting from host to network order
+first.)
+---
+ unit/test-sdp.c |   84 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 84 insertions(+)
 
-Does someone can help me a with a fix for this?
-
-hcidump logs:
-< ACL data: handle 11 flags 0x00 dlen 15
-    L2CAP(d): cid 0x0041 len 11 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 7 fcs 0x9a
-        OBEX: Connect cmd(f): len 7 version 1.0 flags 0 mtu 4096
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 11 packets 2
-> ACL data: handle 11 flags 0x02 dlen 9
-    L2CAP(d): cid 0x0041 len 5 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 0 fcs 0x5c credits 26
-> ACL data: handle 11 flags 0x02 dlen 16
-    L2CAP(d): cid 0x0041 len 12 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 7 fcs 0x5c credits 0
-        OBEX: Connect rsp(f): status 200 len 7 version 1.0 flags 0 mtu 4096
-        Status 200 = Success
-< ACL data: handle 11 flags 0x00 dlen 65
-    L2CAP(d): cid 0x0041 len 61 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 57 fcs 0x9a
-        OBEX: Put cmd(c): len 57
-        Name (0x01) = Unicode length 28
-        0000: 00 74 00 65 00 73 00 74  00 2d 00 74 00 65 00 78 
-.t.e.s.t.-.t.e.x
-        0010: 00 74 00 2e 00 74 00 78  00 74 00 00              .t...t.x.t..
-        Length (0xc3) = 15
-        Body (0x48) = Sequence length 15
-        0000: 54 65 73 74 20 44 6f 63  75 6d 65 6e 74 0d 0a     Test 
-Document..
-> ACL data: handle 11 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0041 len 8 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 3 fcs 0x5c credits 1
-        OBEX: Put rsp(f): status 100 len 3
-< ACL data: handle 11 flags 0x00 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 6 fcs 0x9a
-        OBEX: Put cmd(f): len 6 (continue)
-        End of Body (0x49) = Sequence length 0
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 11 packets 2
-> ACL data: handle 11 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0041 len 8 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 3 fcs 0x5c credits 1
-        OBEX: Put rsp(f): status 200 len 3
-< ACL data: handle 11 flags 0x00 dlen 8
-    L2CAP(d): cid 0x0041 len 4 [psm 3]
-      RFCOMM(s): DISC: cr 1 dlci 2 pf 1 ilen 0 fcs 0xb8
-> ACL data: handle 11 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0041 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92
-< ACL data: handle 11 flags 0x00 dlen 8
-    L2CAP(d): cid 0x0041 len 4 [psm 3]
-      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
-< ACL data: handle 11 flags 0x00 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0041 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 11 packets 2
-> ACL data: handle 11 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0041 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-
-Thanks,
-Syam. 
+diff --git a/unit/test-sdp.c b/unit/test-sdp.c
+index 7879e58..8c0ce98 100644
+--- a/unit/test-sdp.c
++++ b/unit/test-sdp.c
+@@ -52,6 +52,7 @@ struct test_data {
+ };
+ 
+ #define raw_data(args...) ((const unsigned char[]) { args })
++#define build_u128(args...) ((const uint128_t) { .data = { args } })
+ 
+ #define raw_pdu(args...) \
+ 	{							\
+@@ -768,6 +769,7 @@ static void test_sdp(gconstpointer data)
+ static void test_sdp_de_attr(gconstpointer data)
+ {
+ 	const struct test_data_de *test = data;
++	uint128_t u128;
+ 	sdp_data_t *d;
+ 	int size = 0;
+ 
+@@ -786,6 +788,39 @@ static void test_sdp_de_attr(gconstpointer data)
+ 	case SDP_URL_STR16:
+ 		g_assert_cmpstr(test->expected.val.str, ==, d->val.str);
+ 		break;
++	case SDP_DATA_NIL:
++	case SDP_UINT8:
++		g_assert_cmpuint(test->expected.val.uint8, ==, d->val.uint8);
++		break;
++	case SDP_UINT16:
++		g_assert_cmpuint(test->expected.val.uint16, ==, d->val.uint16);
++		break;
++	case SDP_UINT32:
++		g_assert_cmpuint(test->expected.val.uint32, ==, d->val.uint32);
++		break;
++	case SDP_UINT64:
++		g_assert_cmpuint(test->expected.val.uint64, ==, d->val.uint64);
++		break;
++	case SDP_BOOL:
++	case SDP_INT8:
++		g_assert_cmpuint(test->expected.val.int8, ==, d->val.int8);
++		break;
++	case SDP_INT16:
++		g_assert_cmpuint(test->expected.val.int16, ==, d->val.int16);
++		break;
++	case SDP_INT32:
++		g_assert_cmpuint(test->expected.val.int32, ==, d->val.int32);
++		break;
++	case SDP_INT64:
++		g_assert_cmpuint(test->expected.val.int64, ==, d->val.int64);
++		break;
++	case SDP_UINT128:
++	case SDP_INT128:
++		/* Expected bytes are in network order */
++		hton128(&d->val.uint128, &u128);
++		g_assert(memcmp(&test->expected.val.uint128, &u128,
++						sizeof(uint128_t)) == 0);
++		break;
+ 	default:
+ 		g_assert_not_reached();
+ 	}
+@@ -2774,6 +2809,55 @@ int main(int argc, char *argv[])
+ 				0x6c, 0x75, 0x65, 0x7a, 0x2e, 0x6f, 0x72, 0x67,
+ 				0x2f),
+ 			exp_data(SDP_URL_STR16, str, "http://www.bluez.org/"));
++	define_test_de_attr("NIL",
++			raw_data(0x00),
++			exp_data(SDP_DATA_NIL, uint8, 0));
++	define_test_de_attr("UINT8",
++			raw_data(0x08, 0xff),
++			exp_data(SDP_UINT8, uint8, UINT8_MAX));
++	define_test_de_attr("INT8",
++			raw_data(0x10, 0x80),
++			exp_data(SDP_INT8, int8, INT8_MIN));
++	define_test_de_attr("BOOL",
++			raw_data(0x28, 0x01),
++			exp_data(SDP_BOOL, int8, 1));
++	define_test_de_attr("UINT16",
++			raw_data(0x09, 0xff, 0xff),
++			exp_data(SDP_UINT16, uint16, UINT16_MAX));
++	define_test_de_attr("INT16",
++			raw_data(0x11, 0x80, 0x00),
++			exp_data(SDP_INT16, int16, INT16_MIN));
++	define_test_de_attr("UINT32",
++			raw_data(0x0A, 0xff, 0xff, 0xff, 0xff),
++			exp_data(SDP_UINT32, uint32, UINT32_MAX));
++	define_test_de_attr("INT32",
++			raw_data(0x12, 0x80, 0x00, 0x00, 0x00),
++			exp_data(SDP_INT32, int32, INT32_MIN));
++	define_test_de_attr("UINT64",
++			raw_data(0x0B, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++									0xff),
++			exp_data(SDP_UINT64, uint64, UINT64_MAX));
++	define_test_de_attr("INT64",
++			raw_data(0x13, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++									0x00),
++			exp_data(SDP_INT64, int64, INT64_MIN));
++	/* UINT128/INT128 are just byte arrays parsed as uint128_t */
++	define_test_de_attr("UINT128",
++			raw_data(0x0C, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++					0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++					0xff, 0xff, 0xff),
++			exp_data(SDP_UINT128, uint128,
++				build_u128(0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++						0xff, 0xff, 0xff, 0xff, 0xff,
++						0xff, 0xff, 0xff, 0xff, 0xff)));
++	define_test_de_attr("INT128",
++			raw_data(0x14, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++					0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++					0x00, 0x00, 0x00),
++			exp_data(SDP_INT128, uint128,
++				build_u128(0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
++						0x00, 0x00, 0x00, 0x00, 0x00,
++						0x00, 0x00, 0x00, 0x00, 0x00)));
+ 
+ 	return g_test_run();
+ }
+-- 
+1.7.9.5
 
