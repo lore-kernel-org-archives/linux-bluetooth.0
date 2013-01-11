@@ -2,32 +2,52 @@ Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
 Cc: Christian Fetzer <christian.fetzer@bmw-carit.de>
-Subject: [PATCH 0/8] Obexd / MAP-client bug fixes
-Date: Fri, 11 Jan 2013 16:55:49 +0100
-Message-Id: <1357919757-10334-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH 1/8] obexd: Handle empty path name in SetPath
+Date: Fri, 11 Jan 2013 16:55:50 +0100
+Message-Id: <1357919757-10334-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
+In-Reply-To: <1357919757-10334-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1357919757-10334-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-This patch set fixes a couple of small issues in the MAP-client implementation
-and in the generic obexd client code.
+If the empty path is given, an empty name should be sent via OBEX.
+Currently the name field is not set at all and later checks which
+depend on data->index will access invalid memory regions as g_strsplit
+returns NULL when an empty string is given.
 
-Christian Fetzer (8):
-  obexd: Handle empty path name in SetPath
-  obexd: Add property exist functions to map client
-  obexd: Fix infinite loop in ListMessages with filter "Types"
-  obexd: Fix FILTER_ALL in MAP client to set 16 bit
-  obexd: Fix segfault in parse_filter_read and parse_filter_priority
-  obexd: Use defines for values in parse_filter_read parse_filter_priority
-  obexd: Change behavior of parse_filter_read
-  obexd: Remove transferred file only if the GET operation failed
+0  0x000000000041a181 in g_obex_setpath (obex=obex@entry=0x662eb0, path=
+    0x20 <Address 0x20 out of bounds>, func=func@entry=0x42d300 <setpath_cb>,
+    user_data=user_data@entry=0x668f10, err=err@entry=0x7fffffffda08)
+    at gobex/gobex.c:1397
+1  0x000000000042d395 in setpath_cb (obex=0x662eb0, err=0x0, rsp=<optimized out>,
+    user_data=0x668f10) at obexd/client/session.c:902
+2  0x0000000000418e54 in handle_response (obex=obex@entry=0x662eb0, err=err@entry=0x0,
+    rsp=rsp@entry=0x668f40) at gobex/gobex.c:948
+3  0x0000000000419d7a in incoming_data (io=<optimized out>, cond=<optimized out>,
+    user_data=0x662eb0) at gobex/gobex.c:1191
+4  0x00007ffff703c845 in g_main_context_dispatch () from /usr/lib/libglib-2.0.so.0
+5  0x00007ffff703cb78 in ?? () from /usr/lib/libglib-2.0.so.0
+6  0x00007ffff703cf72 in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
+7  0x000000000040def2 in main (argc=1, argv=0x7fffffffdd88) at obexd/src/main.c:323
+---
+ obexd/client/session.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- obexd/client/map.c      | 108 +++++++++++++++++++++++++++++++++++++++++-------
- obexd/client/session.c  |   2 +-
- obexd/client/transfer.c |   3 +-
- 3 files changed, 96 insertions(+), 17 deletions(-)
-
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index 9cc824e..db37a86 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -934,7 +934,7 @@ guint obc_session_setpath(struct obc_session *session, const char *path,
+ 	p = pending_request_new(session, NULL, setpath_complete, data);
+ 
+ 	/* Relative path */
+-	if (path[0] != '/') {
++	if (path[0] != '/' && path[0] != 0) {
+ 		first = data->remaining[data->index];
+ 		data->index++;
+ 	}
 -- 
 1.8.1
 
