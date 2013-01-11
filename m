@@ -1,32 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1357937184.1806.82.camel@aeonflux>
-Subject: Re: [PATCH BlueZ 1/7] gdbus: Add g_dbus_client_get_proxy
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Fri, 11 Jan 2013 12:46:24 -0800
-In-Reply-To: <1357905018-23237-1-git-send-email-luiz.dentz@gmail.com>
-References: <1357905018-23237-1-git-send-email-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: vinicius.gomes@openbossa.org, claudio.takahasi@openbossa.org,
+	luiz.von.dentz@intel.com,
+	=?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+Subject: [PATCH BlueZ 11/11] audio: Bump AVRCP CT version to 1.5
+Date: Fri, 11 Jan 2013 17:25:34 -0300
+Message-Id: <1357935934-20033-12-git-send-email-jprvita@openbossa.org>
+In-Reply-To: <1357935934-20033-1-git-send-email-jprvita@openbossa.org>
+References: <1357935934-20033-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+---
+ profiles/audio/avrcp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> g_dbus_client_get_proxy gives the possibilitity to just check if a
-> proxy exist for the given path and interface pair instead of using
-> g_dbus_proxy_new which end up creating a proxy if it doesn't exists
-> which is not always necessary.
-
-why would we do that. You get the proxy via the client callbacks for
-proxy created or proxy removed.
-
-The proxy_new method is for dealing with services that do not have
-ObjectManager support.
-
-Regards
-
-Marcel
-
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 8bd5fb6..19b6721 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -231,7 +231,7 @@ static sdp_record_t *avrcp_ct_record(void)
+ 	sdp_record_t *record;
+ 	sdp_data_t *psm, *version, *features;
+ 	uint16_t lp = AVCTP_CONTROL_PSM;
+-	uint16_t avrcp_ver = 0x0103, avctp_ver = 0x0103;
++	uint16_t avrcp_ver = 0x0105, avctp_ver = 0x0103;
+ 	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
+ 						AVRCP_FEATURE_CATEGORY_2 |
+ 						AVRCP_FEATURE_CATEGORY_3 |
+-- 
+1.7.11.7
 
