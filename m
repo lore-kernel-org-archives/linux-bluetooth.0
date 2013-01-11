@@ -1,70 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Message-id: <D43D72D2B7084BA8B750CE7FD0D1C287@sisodomain.com>
+From: Syam Sidhardhan <s.syam@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/7] gdbus: Add g_dbus_client_get_proxy
-Date: Fri, 11 Jan 2013 13:50:12 +0200
-Message-Id: <1357905018-23237-1-git-send-email-luiz.dentz@gmail.com>
+References: <1335342544-17320-1-git-send-email-manojkr.sharma@stericsson.com>
+ <1335342544-17320-2-git-send-email-manojkr.sharma@stericsson.com>
+ <alpine.DEB.2.02.1204250827200.20357@mathewm-linux>
+Subject: Obexd OPP filesend fails with Windows7 stack
+Date: Fri, 11 Jan 2013 14:02:28 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=response
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
 
-g_dbus_client_get_proxy gives the possibilitity to just check if a
-proxy exist for the given path and interface pair instead of using
-g_dbus_proxy_new which end up creating a proxy if it doesn't exists
-which is not always necessary.
----
- gdbus/client.c | 8 ++++----
- gdbus/gdbus.h  | 3 +++
- 2 files changed, 7 insertions(+), 4 deletions(-)
+We are using the obexd 0.48 version and testing the obexd.
+During testing OPP file send, we found one interoperability
+issue with the Windows7 PC stack and some commercialized devices
+available in the market.
 
-diff --git a/gdbus/client.c b/gdbus/client.c
-index c03e3a4..ea56023 100644
---- a/gdbus/client.c
-+++ b/gdbus/client.c
-@@ -328,8 +328,8 @@ static void get_all_properties(GDBusProxy *proxy)
- 	dbus_message_unref(msg);
- }
- 
--static GDBusProxy *proxy_lookup(GDBusClient *client, const char *path,
--						const char *interface)
-+GDBusProxy *g_dbus_client_get_proxy(GDBusClient *client, const char *path,
-+							const char *interface)
- {
- 	GList *list;
- 
-@@ -423,7 +423,7 @@ GDBusProxy *g_dbus_proxy_new(GDBusClient *client, const char *path,
- 	if (client == NULL)
- 		return NULL;
- 
--	proxy = proxy_lookup(client, path, interface);
-+	proxy = g_dbus_client_get_proxy(client, path, interface);
- 	if (proxy)
- 		return g_dbus_proxy_ref(proxy);
- 
-@@ -841,7 +841,7 @@ static void parse_properties(GDBusClient *client, const char *path,
- 	if (g_str_equal(interface, DBUS_INTERFACE_PROPERTIES) == TRUE)
- 		return;
- 
--	proxy = proxy_lookup(client, path, interface);
-+	proxy = g_dbus_client_get_proxy(client, path, interface);
- 	if (proxy) {
- 		update_properties(proxy, iter);
- 		return;
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index 6f5a012..77bd069 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -360,6 +360,9 @@ gboolean g_dbus_client_set_proxy_handlers(GDBusClient *client,
- 					GDBusPropertyFunction property_changed,
- 					void *user_data);
- 
-+GDBusProxy *g_dbus_client_get_proxy(GDBusClient *client, const char *path,
-+							const char *interface);
-+
- #ifdef __cplusplus
- }
- #endif
--- 
-1.8.0.1
+The issue is: OBEXD file transfer is getting failed
+once after the complete file content got transfferd. This is
+because of, we do a direct RFCOMM disconection rather than
+doing a proper OBEX disconection before.
+
+Does someone can help me a with a fix for this?
+
+hcidump logs:
+< ACL data: handle 11 flags 0x00 dlen 15
+    L2CAP(d): cid 0x0041 len 11 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 7 fcs 0x9a
+        OBEX: Connect cmd(f): len 7 version 1.0 flags 0 mtu 4096
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 11 packets 2
+> ACL data: handle 11 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0041 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 0 fcs 0x5c credits 26
+> ACL data: handle 11 flags 0x02 dlen 16
+    L2CAP(d): cid 0x0041 len 12 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 7 fcs 0x5c credits 0
+        OBEX: Connect rsp(f): status 200 len 7 version 1.0 flags 0 mtu 4096
+        Status 200 = Success
+< ACL data: handle 11 flags 0x00 dlen 65
+    L2CAP(d): cid 0x0041 len 61 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 57 fcs 0x9a
+        OBEX: Put cmd(c): len 57
+        Name (0x01) = Unicode length 28
+        0000: 00 74 00 65 00 73 00 74  00 2d 00 74 00 65 00 78 
+.t.e.s.t.-.t.e.x
+        0010: 00 74 00 2e 00 74 00 78  00 74 00 00              .t...t.x.t..
+        Length (0xc3) = 15
+        Body (0x48) = Sequence length 15
+        0000: 54 65 73 74 20 44 6f 63  75 6d 65 6e 74 0d 0a     Test 
+Document..
+> ACL data: handle 11 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0041 len 8 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 3 fcs 0x5c credits 1
+        OBEX: Put rsp(f): status 100 len 3
+< ACL data: handle 11 flags 0x00 dlen 14
+    L2CAP(d): cid 0x0041 len 10 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 6 fcs 0x9a
+        OBEX: Put cmd(f): len 6 (continue)
+        End of Body (0x49) = Sequence length 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 11 packets 2
+> ACL data: handle 11 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0041 len 8 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 3 fcs 0x5c credits 1
+        OBEX: Put rsp(f): status 200 len 3
+< ACL data: handle 11 flags 0x00 dlen 8
+    L2CAP(d): cid 0x0041 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 2 pf 1 ilen 0 fcs 0xb8
+> ACL data: handle 11 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0041 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92
+< ACL data: handle 11 flags 0x00 dlen 8
+    L2CAP(d): cid 0x0041 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
+< ACL data: handle 11 flags 0x00 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0041 scid 0x0041
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 11 packets 2
+> ACL data: handle 11 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0041 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+
+Thanks,
+Syam. 
 
