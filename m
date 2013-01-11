@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 6/7] unit: Add gdbus/client_get_array_property
-Date: Fri, 11 Jan 2013 13:50:17 +0200
-Message-Id: <1357905018-23237-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 5/7] unit: Add gdbus/client_get_boolean_property
+Date: Fri, 11 Jan 2013 13:50:16 +0200
+Message-Id: <1357905018-23237-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1357905018-23237-1-git-send-email-luiz.dentz@gmail.com>
 References: <1357905018-23237-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,68 +12,53 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- unit/test-gdbus-client.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 80 insertions(+)
+ unit/test-gdbus-client.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 66 insertions(+)
 
 diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
-index e26dd0c..c3ae4b9 100644
+index bcdd811..e26dd0c 100644
 --- a/unit/test-gdbus-client.c
 +++ b/unit/test-gdbus-client.c
-@@ -453,6 +453,83 @@ static void client_get_boolean_property(void)
+@@ -390,6 +390,69 @@ static void client_get_string_property(void)
  	destroy_context(context);
  }
  
-+static void proxy_get_array(GDBusProxy *proxy, void *user_data)
++static void proxy_get_boolean(GDBusProxy *proxy, void *user_data)
 +{
 +	struct context *context = user_data;
-+	DBusMessageIter iter, entry;
-+	const char *value1, *value2;
++	DBusMessageIter iter;
++	dbus_bool_t value;
 +
 +	if (g_test_verbose())
 +		g_print("proxy %s found\n",
 +					g_dbus_proxy_get_interface(proxy));
 +
-+	g_assert(g_dbus_proxy_get_property(proxy, "Array", &iter));
-+	g_assert(dbus_message_iter_get_arg_type(&iter) == DBUS_TYPE_ARRAY);
++	g_assert(g_dbus_proxy_get_property(proxy, "Boolean", &iter));
++	g_assert(dbus_message_iter_get_arg_type(&iter) == DBUS_TYPE_BOOLEAN);
 +
-+	dbus_message_iter_recurse(&iter, &entry);
-+	g_assert(dbus_message_iter_get_arg_type(&entry) == DBUS_TYPE_STRING);
-+
-+	dbus_message_iter_get_basic(&entry, &value1);
-+	g_assert(g_strcmp0(value1, "value1") == 0);
-+
-+	dbus_message_iter_next(&entry);
-+	g_assert(dbus_message_iter_get_arg_type(&entry) == DBUS_TYPE_STRING);
-+
-+	dbus_message_iter_get_basic(&entry, &value2);
-+	g_assert(g_strcmp0(value2, "value2") == 0);
++	dbus_message_iter_get_basic(&iter, &value);
++	g_assert(value == TRUE);
 +
 +	g_dbus_client_unref(context->dbus_client);
 +
 +	g_main_loop_quit(context->main_loop);
 +}
 +
-+static gboolean get_array(const GDBusPropertyTable *property,
++static gboolean get_boolean(const GDBusPropertyTable *property,
 +					DBusMessageIter *iter, void *data)
 +{
-+	const char *value[2] = { "value1", "value2" };
-+	DBusMessageIter array;
++	dbus_bool_t value = TRUE;
 +
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "s", &array);
-+
-+	dbus_message_iter_append_basic(&array, DBUS_TYPE_STRING, &value[0]);
-+	dbus_message_iter_append_basic(&array, DBUS_TYPE_STRING, &value[1]);
-+
-+	dbus_message_iter_close_container(iter, &array);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
 +
 +	return TRUE;
 +}
 +
-+static void client_get_array_property(void)
++static void client_get_boolean_property(void)
 +{
 +	struct context *context = create_context();
-+	static const GDBusPropertyTable array_properties[] = {
-+		{ "Array", "as", get_array },
++	static const GDBusPropertyTable boolean_properties[] = {
++		{ "Boolean", "b", get_boolean },
 +		{ },
 +	};
 +
@@ -82,13 +67,14 @@ index e26dd0c..c3ae4b9 100644
 +
 +	g_dbus_register_interface(context->dbus_conn,
 +				SERVICE_PATH, SERVICE_NAME,
-+				methods, signals, array_properties,
++				methods, signals, boolean_properties,
 +				NULL, NULL);
 +
 +	context->dbus_client = g_dbus_client_new(context->dbus_conn,
 +						SERVICE_NAME, SERVICE_PATH);
 +
-+	g_dbus_client_set_proxy_handlers(context->dbus_client, proxy_get_array,
++	g_dbus_client_set_proxy_handlers(context->dbus_client,
++						proxy_get_boolean,
 +						NULL, NULL,
 +						context);
 +
@@ -103,12 +89,12 @@ index e26dd0c..c3ae4b9 100644
  int main(int argc, char *argv[])
  {
  	g_test_init(&argc, &argv, NULL);
-@@ -468,6 +545,9 @@ int main(int argc, char *argv[])
- 	g_test_add_func("/gdbus/client_get_boolean_property",
- 						client_get_boolean_property);
+@@ -402,6 +465,9 @@ int main(int argc, char *argv[])
+ 	g_test_add_func("/gdbus/client_get_string_property",
+ 						client_get_string_property);
  
-+	g_test_add_func("/gdbus/client_get_array_property",
-+						client_get_array_property);
++	g_test_add_func("/gdbus/client_get_boolean_property",
++						client_get_boolean_property);
 +
  	g_test_add_func("/gdbus/client_get_dict_property",
  						client_get_dict_property);
