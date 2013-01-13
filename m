@@ -1,42 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <D43D72D2B7084BA8B750CE7FD0D1C287@sisodomain.com>
-References: <1335342544-17320-1-git-send-email-manojkr.sharma@stericsson.com>
-	<1335342544-17320-2-git-send-email-manojkr.sharma@stericsson.com>
-	<alpine.DEB.2.02.1204250827200.20357@mathewm-linux>
-	<D43D72D2B7084BA8B750CE7FD0D1C287@sisodomain.com>
-Date: Sun, 13 Jan 2013 17:42:51 +0200
-Message-ID: <CABBYNZKMi572+BUbymbA=sX4s3NKSGcHsrGQWSptj5xVSTkMBw@mail.gmail.com>
-Subject: Re: Obexd OPP filesend fails with Windows7 stack
+In-Reply-To: <1357937329.1806.84.camel@aeonflux>
+References: <1357922675-11718-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+	<1357937329.1806.84.camel@aeonflux>
+Date: Sun, 13 Jan 2013 17:29:11 +0200
+Message-ID: <CABBYNZJJCW0oUOo_7F0VFcZVEFCVHZJpwGndke6P3T2pR9MqBg@mail.gmail.com>
+Subject: Re: [PATCH 1/1] test: Make map script a command line client
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Syam Sidhardhan <s.syam@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Christian Fetzer <christian.fetzer@bmw-carit.de>
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+Hi Marcel, Christian,
 
-On Fri, Jan 11, 2013 at 10:32 AM, Syam Sidhardhan <s.syam@samsung.com> wrote:
-> Hi,
+On Fri, Jan 11, 2013 at 10:48 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Christian,
 >
-> We are using the obexd 0.48 version and testing the obexd.
-> During testing OPP file send, we found one interoperability
-> issue with the Windows7 PC stack and some commercialized devices
-> available in the market.
+>> Rework the map-client test script into an interactive command line client.
+>> Now multiple MCE functions can be called in one active session.
+>> The script also allows to specify all filters or optional parameters including
+>> auto completion.
+>>
+>> Change-Id: I9c9ede2bc958009c757384177cf06c081d984c98
 >
-> The issue is: OBEXD file transfer is getting failed
-> once after the complete file content got transfferd. This is
-> because of, we do a direct RFCOMM disconection rather than
-> doing a proper OBEX disconection before.
->
-> Does someone can help me a with a fix for this?
+> no Change-Id crap please.
 
-We probably need to send a disconnect command before disconnecting
-RFCOMM, iirc there was someone else looking into a similar problem
-with a Nokia phone, the strange part is that the remote stack has
-acknowledged the transfer complete and in theory we could go ahead and
-start another one using the same session.
+I wonder if we should complicate more the testing scripts adding such
+futures or start working in a proper C tool such as bluetoothctl e.g.
+obexctl?
 
 --
 Luiz Augusto von Dentz
