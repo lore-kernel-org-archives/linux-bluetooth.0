@@ -1,67 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1357919757-10334-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1357919757-10334-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-	<1357919757-10334-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Sun, 13 Jan 2013 17:55:31 +0200
-Message-ID: <CABBYNZKLNngQw6rSUUPJBapZ+rt7C4PsVajegFKwv6j+-8zvrg@mail.gmail.com>
-Subject: Re: [PATCH 1/8] obexd: Handle empty path name in SetPath
+In-Reply-To: <D43D72D2B7084BA8B750CE7FD0D1C287@sisodomain.com>
+References: <1335342544-17320-1-git-send-email-manojkr.sharma@stericsson.com>
+	<1335342544-17320-2-git-send-email-manojkr.sharma@stericsson.com>
+	<alpine.DEB.2.02.1204250827200.20357@mathewm-linux>
+	<D43D72D2B7084BA8B750CE7FD0D1C287@sisodomain.com>
+Date: Sun, 13 Jan 2013 17:42:51 +0200
+Message-ID: <CABBYNZKMi572+BUbymbA=sX4s3NKSGcHsrGQWSptj5xVSTkMBw@mail.gmail.com>
+Subject: Re: Obexd OPP filesend fails with Windows7 stack
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Christian Fetzer <christian.fetzer@bmw-carit.de>
+To: Syam Sidhardhan <s.syam@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+Hi Syam,
 
-On Fri, Jan 11, 2013 at 5:55 PM, Christian Fetzer
-<christian.fetzer@oss.bmw-carit.de> wrote:
-> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+On Fri, Jan 11, 2013 at 10:32 AM, Syam Sidhardhan <s.syam@samsung.com> wrote:
+> Hi,
 >
-> If the empty path is given, an empty name should be sent via OBEX.
-> Currently the name field is not set at all and later checks which
-> depend on data->index will access invalid memory regions as g_strsplit
-> returns NULL when an empty string is given.
+> We are using the obexd 0.48 version and testing the obexd.
+> During testing OPP file send, we found one interoperability
+> issue with the Windows7 PC stack and some commercialized devices
+> available in the market.
 >
-> 0  0x000000000041a181 in g_obex_setpath (obex=obex@entry=0x662eb0, path=
->     0x20 <Address 0x20 out of bounds>, func=func@entry=0x42d300 <setpath_cb>,
->     user_data=user_data@entry=0x668f10, err=err@entry=0x7fffffffda08)
->     at gobex/gobex.c:1397
-> 1  0x000000000042d395 in setpath_cb (obex=0x662eb0, err=0x0, rsp=<optimized out>,
->     user_data=0x668f10) at obexd/client/session.c:902
-> 2  0x0000000000418e54 in handle_response (obex=obex@entry=0x662eb0, err=err@entry=0x0,
->     rsp=rsp@entry=0x668f40) at gobex/gobex.c:948
-> 3  0x0000000000419d7a in incoming_data (io=<optimized out>, cond=<optimized out>,
->     user_data=0x662eb0) at gobex/gobex.c:1191
-> 4  0x00007ffff703c845 in g_main_context_dispatch () from /usr/lib/libglib-2.0.so.0
-> 5  0x00007ffff703cb78 in ?? () from /usr/lib/libglib-2.0.so.0
-> 6  0x00007ffff703cf72 in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
-> 7  0x000000000040def2 in main (argc=1, argv=0x7fffffffdd88) at obexd/src/main.c:323
-> ---
->  obexd/client/session.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> The issue is: OBEXD file transfer is getting failed
+> once after the complete file content got transfferd. This is
+> because of, we do a direct RFCOMM disconection rather than
+> doing a proper OBEX disconection before.
 >
-> diff --git a/obexd/client/session.c b/obexd/client/session.c
-> index 9cc824e..db37a86 100644
-> --- a/obexd/client/session.c
-> +++ b/obexd/client/session.c
-> @@ -934,7 +934,7 @@ guint obc_session_setpath(struct obc_session *session, const char *path,
->         p = pending_request_new(session, NULL, setpath_complete, data);
->
->         /* Relative path */
-> -       if (path[0] != '/') {
-> +       if (path[0] != '/' && path[0] != 0) {
->                 first = data->remaining[data->index];
->                 data->index++;
->         }
-> --
-> 1.8.1
+> Does someone can help me a with a fix for this?
 
-But what empty means in this case, I would like to stick with cd
-behavior, so empty should set back to root. Otherwise the patchset
-seems fine.
+We probably need to send a disconnect command before disconnecting
+RFCOMM, iirc there was someone else looking into a similar problem
+with a Nokia phone, the strange part is that the remote stack has
+acknowledged the transfer complete and in theory we could go ahead and
+start another one using the same session.
 
 --
 Luiz Augusto von Dentz
