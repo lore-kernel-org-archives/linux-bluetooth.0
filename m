@@ -1,53 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZKMi572+BUbymbA=sX4s3NKSGcHsrGQWSptj5xVSTkMBw@mail.gmail.com>
-References: <1335342544-17320-1-git-send-email-manojkr.sharma@stericsson.com>
-	<1335342544-17320-2-git-send-email-manojkr.sharma@stericsson.com>
-	<alpine.DEB.2.02.1204250827200.20357@mathewm-linux>
-	<D43D72D2B7084BA8B750CE7FD0D1C287@sisodomain.com>
-	<CABBYNZKMi572+BUbymbA=sX4s3NKSGcHsrGQWSptj5xVSTkMBw@mail.gmail.com>
-Date: Mon, 14 Jan 2013 00:05:10 +0530
-Message-ID: <CAFBvHifW55ADuDY+1WM+KUvhWwB7Sr3W0r8R9hALeLuHJTNULw@mail.gmail.com>
-Subject: Re: Obexd OPP filesend fails with Windows7 stack
-From: Syam Sidhardhan <syamsidhardh@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Syam Sidhardhan <s.syam@samsung.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1357937240.1806.83.camel@aeonflux>
+References: <1357905018-23237-1-git-send-email-luiz.dentz@gmail.com>
+	<1357905018-23237-2-git-send-email-luiz.dentz@gmail.com>
+	<1357937240.1806.83.camel@aeonflux>
+Date: Sun, 13 Jan 2013 18:24:37 +0200
+Message-ID: <CABBYNZKZ1kXbF7E5jJbPhduZcLmFcTT45jyA67KzoJeJVZiz3A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/7] gdbus: Add g_dbus_proxy_get_client function
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Marcel,
 
-On Sun, Jan 13, 2013 at 9:12 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Syam,
+On Fri, Jan 11, 2013 at 10:47 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
 >
-> On Fri, Jan 11, 2013 at 10:32 AM, Syam Sidhardhan <s.syam@samsung.com> wrote:
->> Hi,
->>
->> We are using the obexd 0.48 version and testing the obexd.
->> During testing OPP file send, we found one interoperability
->> issue with the Windows7 PC stack and some commercialized devices
->> available in the market.
->>
->> The issue is: OBEXD file transfer is getting failed
->> once after the complete file content got transfferd. This is
->> because of, we do a direct RFCOMM disconection rather than
->> doing a proper OBEX disconection before.
->>
->> Does someone can help me a with a fix for this?
+>> This is convenient as some callbacks don't provide the client which
+>> the proxy belongs.
 >
-> We probably need to send a disconnect command before disconnecting
-> RFCOMM, iirc there was someone else looking into a similar problem
-> with a Nokia phone, the strange part is that the remote stack has
-> acknowledged the transfer complete and in theory we could go ahead and
-> start another one using the same session.
->
+> and I did not add that one on purpose. You should know where your proxy
+> belongs to and worst case hand it over via user_data.
 
-Yes, you are correct. We need to send a OBEX disconnect command
-before the RFCOMM disconnection. We have tried with the same and
-its working fine.
+I understand this as the user_data will always be the client pointer,
+or a struct containing it, or you have to use a global variable, is
+that what you really want? The use application has given the client
+when registering the callbacks, so it is already passing it as
+context. Now that being said, Im not saying the design utterly broken,
+quite the contrary it work like a charm, it just could be more
+convenient and that is what Im trying to achieve with this patch.
 
-Regards,
-Syam
+--
+Luiz Augusto von Dentz
