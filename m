@@ -1,34 +1,160 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH] doc: Fix trivial typo in adapter-api
-Date: Mon, 14 Jan 2013 08:44:41 +0100
-Message-Id: <1358149481-3230-1-git-send-email-mikel.astiz.oss@gmail.com>
+Message-ID: <1358118184.1806.93.camel@aeonflux>
+Subject: Re: [PATCH BlueZ 1/7] gdbus: Add g_dbus_client_get_proxy
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Sun, 13 Jan 2013 15:03:04 -0800
+In-Reply-To: <CABBYNZ+=oDRu-x3toCQfWi7wdzk9SCm2Fx1AhS6SNVf+6SEpkw@mail.gmail.com>
+References: <1357905018-23237-1-git-send-email-luiz.dentz@gmail.com>
+	 <1357937184.1806.82.camel@aeonflux>
+	 <CABBYNZJyaBUt+oRSzyYJ0PNLTys8BfODLJFNY5NzC5touoraGA@mail.gmail.com>
+	 <1358111392.1806.87.camel@aeonflux>
+	 <CABBYNZ+=oDRu-x3toCQfWi7wdzk9SCm2Fx1AhS6SNVf+6SEpkw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Luiz,
 
----
-While checking the doc changes between 5.0 and 5.1, I came across this line which I believe is a typo.
+> >> >> g_dbus_client_get_proxy gives the possibilitity to just check if a
+> >> >> proxy exist for the given path and interface pair instead of using
+> >> >> g_dbus_proxy_new which end up creating a proxy if it doesn't exists
+> >> >> which is not always necessary.
+> >> >
+> >> > why would we do that. You get the proxy via the client callbacks for
+> >> > proxy created or proxy removed.
+> >>
+> >> That way we the user don't have to maintain a list of found proxies,
+> >> such a list exist and is maintained by GDBusClient.
+> >
+> > see how bluetoothctl does it. Pretty damn simple. So I am not convinced
+> > that this is a good idea.
+> >
+> >> > The proxy_new method is for dealing with services that do not have
+> >> > ObjectManager support.
+> >>
+> >> Yep, so in one way or the other you are already letting the user
+> >> application search in the list of proxies maintained by GDBusClient,
+> >> the only thing this does is to make the proxy_lookup public so the
+> >> client don't have to maintain its how list only to be able to look
+> >> back when a proxy point to another, btw the reason proxy_new is not
+> >> enough is because it may lead to extra calls when the user application
+> >> may just want to bail out if the proxy is not found.
+> >
+> > Still not convinced. What kind of application would this. This seems to
+> > be all half thought trough. I am really failing to see the real purpose
+> > here. Either you go all the way with ObjectManager and do it the right
+> > way or you don't have an object manager, then you need to manually
+> > trigger the get all properties.
+> 
+> Im actually using these functions in an upcoming patch:
+> 
+> static void register_player(GDBusProxy *proxy)
+> {
+> ...
+> client = g_dbus_proxy_get_client(proxy);
+> 
+> if (!g_dbus_proxy_get_property(proxy, "Device", &iter))
+>     return;
+> 
+> dbus_message_iter_get_basic(&iter, &path);
+> 
+> device = g_dbus_client_get_proxy(client, path, "org.bluez.Device1");
+> if (device == NULL)
+>     return;
+> 
+> if (!g_dbus_proxy_get_property(device, "Name", &iter))
+>     return;
+> ...
+> static void proxy_added(GDBusProxy *proxy, void *user_data)
+> {
+> ...
+>     } else if (!strcmp(interface, BLUEZ_MEDIA_PLAYER_INTERFACE)) {
+>          printf("Bluetooth Player %s found\n", g_dbus_proxy_get_path(proxy));
+>          register_player(proxy);
+>    }
+> ...
+> 
+> With this I don't have to keep any list of found devices what so ever,
+> if I need a proxy I can just query it via g_dbus_client_get_proxy. Now
+> compare this to what bluetoothctl does:
+> 
+> static void proxy_added(GDBusProxy *proxy, void *user_data)
+> {
+> ...
+>     if (!strcmp(interface, "org.bluez.Device1")) {
+>         if (device_is_child(proxy, default_ctrl) == TRUE) {
+>             dev_list = g_list_append(dev_list, proxy);
+> 
+>             print_device(proxy, "NEW");
+>     } else if (!strcmp(interface, "org.bluez.Adapter1")) {
+>             ctrl_list = g_list_append(ctrl_list, proxy);
+> 
+>             if (!default_ctrl)
+>                 default_ctrl = proxy;
+> 
+>              print_adapter(proxy, "NEW");
+> ...
+> 
+> So you are keeping the list of proxies while GDBusClient keeps them
+> too, now it maybe useful for bluetoothctl but for mpris-tool it is
+> completely useless, why would I keep a proxy of a device that doesn't
+> contain any player, specially while discovering devices this would
+> just populate with useless temporary devices.
 
- doc/adapter-api.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+bluetoothctl only keeps the list of proxies that contain an interface it
+is interested in. And the same could be done for mpris-tool. If you get
+an object path with a player interface, you remember it, otherwise you
+just ignore it.
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index cef6cbe..74d235a 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -88,7 +88,7 @@ Properties	string Address [readonly]
- 			appropriate connectable state of the controller.
- 
- 			The value of this property is not persistent. After
--			restart of unplugging of the adapter it will reset
-+			restart or unplugging of the adapter it will reset
- 			back to false.
- 
- 		boolean Discoverable [readwrite]
--- 
-1.7.11.7
+> Btw, with these functions we could actually have the following changes
+> to device_is_child:
+> 
+> diff --git a/client/main.c b/client/main.c
+> index 9a927a8..1cd6d10 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -224,8 +224,10 @@ static void print_uuids(GDBusProxy *proxy)
+> 
+>  static gboolean device_is_child(GDBusProxy *device, GDBusProxy *master)
+>  {
+> +       GDBusClient *client;
+> +       GDBusProxy *proxy;
+>         DBusMessageIter iter;
+> -       const char *adapter, *path;
+> +       const char *path;
+> 
+>         if (!master)
+>                 return FALSE;
+> @@ -233,13 +235,13 @@ static gboolean device_is_child(GDBusProxy
+> *device, GDBusProxy *master)
+>         if (g_dbus_proxy_get_property(device, "Adapter", &iter) == FALSE)
+>                 return FALSE;
+> 
+> -       dbus_message_iter_get_basic(&iter, &adapter);
+> -       path = g_dbus_proxy_get_path(master);
+> +       dbus_message_iter_get_basic(&iter, &path);
+> 
+> -       if (!strcmp(path, adapter))
+> -               return TRUE;
+> +       client = g_dbus_proxy_get_client(device);
+
+And this I have single client, I could just make this global. So I am
+still not buying into this one.
+
+> -       return FALSE;
+> +       proxy = g_dbus_client_get_proxy(client, path, "org.bluez.Adapter1");
+> +
+> +       return proxy == master ? TRUE : FALSE;
+>  }
+
+Don't see how this makes it simpler code. Or ends up in less
+instructions for that matter.
+
+Regards
+
+Marcel
+
 
