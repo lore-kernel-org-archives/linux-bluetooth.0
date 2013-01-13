@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1357937240.1806.83.camel@aeonflux>
+In-Reply-To: <1357937184.1806.82.camel@aeonflux>
 References: <1357905018-23237-1-git-send-email-luiz.dentz@gmail.com>
-	<1357905018-23237-2-git-send-email-luiz.dentz@gmail.com>
-	<1357937240.1806.83.camel@aeonflux>
-Date: Sun, 13 Jan 2013 18:24:37 +0200
-Message-ID: <CABBYNZKZ1kXbF7E5jJbPhduZcLmFcTT45jyA67KzoJeJVZiz3A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/7] gdbus: Add g_dbus_proxy_get_client function
+	<1357937184.1806.82.camel@aeonflux>
+Date: Sun, 13 Jan 2013 18:09:47 +0200
+Message-ID: <CABBYNZJyaBUt+oRSzyYJ0PNLTys8BfODLJFNY5NzC5touoraGA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/7] gdbus: Add g_dbus_client_get_proxy
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -15,22 +14,31 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Fri, Jan 11, 2013 at 10:47 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+On Fri, Jan 11, 2013 at 10:46 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
 > Hi Luiz,
 >
->> This is convenient as some callbacks don't provide the client which
->> the proxy belongs.
+>> g_dbus_client_get_proxy gives the possibilitity to just check if a
+>> proxy exist for the given path and interface pair instead of using
+>> g_dbus_proxy_new which end up creating a proxy if it doesn't exists
+>> which is not always necessary.
 >
-> and I did not add that one on purpose. You should know where your proxy
-> belongs to and worst case hand it over via user_data.
+> why would we do that. You get the proxy via the client callbacks for
+> proxy created or proxy removed.
 
-I understand this as the user_data will always be the client pointer,
-or a struct containing it, or you have to use a global variable, is
-that what you really want? The use application has given the client
-when registering the callbacks, so it is already passing it as
-context. Now that being said, Im not saying the design utterly broken,
-quite the contrary it work like a charm, it just could be more
-convenient and that is what Im trying to achieve with this patch.
+That way we the user don't have to maintain a list of found proxies,
+such a list exist and is maintained by GDBusClient.
+
+> The proxy_new method is for dealing with services that do not have
+> ObjectManager support.
+
+Yep, so in one way or the other you are already letting the user
+application search in the list of proxies maintained by GDBusClient,
+the only thing this does is to make the proxy_lookup public so the
+client don't have to maintain its how list only to be able to look
+back when a proxy point to another, btw the reason proxy_new is not
+enough is because it may lead to extra calls when the user application
+may just want to bail out if the proxy is not found.
+
 
 --
 Luiz Augusto von Dentz
