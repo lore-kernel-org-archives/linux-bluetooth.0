@@ -1,58 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <50F3D948.9010605@oss.bmw-carit.de>
-References: <1357919757-10334-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-	<1357919757-10334-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
-	<CABBYNZKLNngQw6rSUUPJBapZ+rt7C4PsVajegFKwv6j+-8zvrg@mail.gmail.com>
-	<50F3D948.9010605@oss.bmw-carit.de>
-Date: Mon, 14 Jan 2013 19:33:03 +0200
-Message-ID: <CABBYNZKJFcY0hCvBDeQw_mxiJUDvOg9VdHrbv_si70iW2chp8Q@mail.gmail.com>
-Subject: Re: [PATCH 1/8] obexd: Handle empty path name in SetPath
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, vinicius.gomes@openbossa.org,
+	claudio.takahasi@openbossa.org, luiz.von.dentz@intel.com,
+	=?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+Subject: [PATCH BlueZ v2 01/11] transport: Initialize the "Volume" property
+Date: Mon, 14 Jan 2013 13:10:29 -0300
+Message-Id: <1358179829-29684-1-git-send-email-jprvita@openbossa.org>
+In-Reply-To: <CAAngNMa=ZS0d-yWhpEVUGD3FZaWb_E6awVnwJoO68tje2fdEtA@mail.gmail.com>
+References: <CAAngNMa=ZS0d-yWhpEVUGD3FZaWb_E6awVnwJoO68tje2fdEtA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+---
+ profiles/audio/transport.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-On Mon, Jan 14, 2013 at 12:09 PM, Christian Fetzer
-<christian.fetzer@oss.bmw-carit.de> wrote:
-> Hi Luiz,
->
->
-> On 01/13/2013 04:55 PM, Luiz Augusto von Dentz wrote:
->>
->> But what empty means in this case, I would like to stick with cd behavior,
->> so empty should set back to root. Otherwise the patchset seems fine. -- Luiz
->> Augusto von Dentz
->
-> But this is exactly what the patch is doing.
-> g_obex_setpath called with an empty path won't set the parent flag,
-> and thus it requests going back to the root folder.
->
-> < ACL data: handle 21 flags 0x00 dlen 21
->     L2CAP(d): cid 0x0041 len 17 [psm 3]
->       RFCOMM(d): UIH: cr 1 dlci 32 pf 0 ilen 13 fcs 0xd8
->         OBEX: SetPath cmd(f): len 13 flags 2 constants 0
->         Connection ID (0xcb) = 98
->         Name (0x01) = Unicode length 0
->> HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 21 packets 1
->> ACL data: handle 21 flags 0x02 dlen 11
->     L2CAP(d): cid 0x0041 len 7 [psm 3]
->       RFCOMM(d): UIH: cr 0 dlci 32 pf 0 ilen 3 fcs 0x2
->         OBEX: SetPath rsp(f): status 200 len 3
->
-> Or did I misunderstand you?
+diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+index a4370a5..8defc6f 100644
+--- a/profiles/audio/transport.c
++++ b/profiles/audio/transport.c
+@@ -787,7 +787,6 @@ struct media_transport *media_transport_create(struct media_endpoint *endpoint,
+ 		struct a2dp_transport *a2dp;
+ 
+ 		a2dp = g_new0(struct a2dp_transport, 1);
+-		a2dp->volume = -1;
+ 
+ 		transport->resume = resume_a2dp;
+ 		transport->suspend = suspend_a2dp;
+@@ -795,14 +794,17 @@ struct media_transport *media_transport_create(struct media_endpoint *endpoint,
+ 		transport->data = a2dp;
+ 		transport->destroy = destroy_a2dp;
+ 
+-		if (strcasecmp(uuid, A2DP_SOURCE_UUID) == 0)
++		if (strcasecmp(uuid, A2DP_SOURCE_UUID) == 0) {
++			a2dp->volume = -1;
+ 			transport->sink_watch = sink_add_state_cb(
+ 							sink_state_changed,
+ 							transport);
+-		else
++		} else {
++			a2dp->volume = 127;
+ 			transport->source_watch = source_add_state_cb(
+ 							source_state_changed,
+ 							transport);
++		}
+ 	} else
+ 		goto fail;
+ 
+-- 
+1.7.11.7
 
-I was just confirming this would not cd back to parent, anyway this
-set is now upstream, thanks!
-
-Btw, Ive modified a little bit patch 06/08 to use hexadecimal values
-to indicate better the size.
-
-
---
-Luiz Augusto von Dentz
