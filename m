@@ -1,74 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAAngNMZDdYyNZ4F+3o6sG8rJC=PBCXyFKufMmY_Ud2k8xd3=gw@mail.gmail.com>
-References: <1357935934-20033-1-git-send-email-jprvita@openbossa.org>
-	<1357935934-20033-2-git-send-email-jprvita@openbossa.org>
-	<CABBYNZ+3_KA4Lg2jJ9CJfUNv0jG-n2S5J__SNOMxJenOGeL+GQ@mail.gmail.com>
-	<CAAngNMZDdYyNZ4F+3o6sG8rJC=PBCXyFKufMmY_Ud2k8xd3=gw@mail.gmail.com>
-Date: Mon, 14 Jan 2013 16:21:58 +0200
-Message-ID: <CACumGOKTYkTM+bzHEBo2aL=L8Kycgpsza0U-ag=iDixbfnqjzw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 01/11] transport: Initialize the "Volume" property
- with 50%
-From: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
-To: Joao Paulo Rechi Vita <jprvita@openbossa.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Vinicius Gomes <vinicius.gomes@openbossa.org>,
-	Claudio Takahasi <claudio.takahasi@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH v2] Bluetooth: Power the device up after a rfkill unblock
+Date: Mon, 14 Jan 2013 11:20:27 -0300
+Message-Id: <1358173227-5384-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joao,
+With the HCI_SETUP patches, this is all that is needed to make the
+case when a adapter is added with Bluetooth blocked in rfkill to work.
 
-On Mon, Jan 14, 2013 at 4:05 PM, Joao Paulo Rechi Vita
-<jprvita@openbossa.org> wrote:
-> On Sun, Jan 13, 2013 at 12:22 PM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Joao,
->>
->> On Fri, Jan 11, 2013 at 10:25 PM, João Paulo Rechi Vita
->> <jprvita@openbossa.org> wrote:
->>> ---
->>>  profiles/audio/transport.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
->>> index a4370a5..6ffa98a 100644
->>> --- a/profiles/audio/transport.c
->>> +++ b/profiles/audio/transport.c
->>> @@ -787,7 +787,7 @@ struct media_transport *media_transport_create(struct media_endpoint *endpoint,
->>>                 struct a2dp_transport *a2dp;
->>>
->>>                 a2dp = g_new0(struct a2dp_transport, 1);
->>> -               a2dp->volume = -1;
->>> +               a2dp->volume = 63;
->>>
->>>                 transport->resume = resume_a2dp;
->>>                 transport->suspend = suspend_a2dp;
->>> --
->>> 1.7.11.7
->>
->> Does the spec say anything regarding this? Actually it seems this
->> value must be set by PA if it does support volume notification, which
->> means a new version of PA, then it should set the value when the card
->> is initialized, otherwise if the endpoint doesn't set a value it
->> should remain -1/not available. If volume is not set by the endpoint
->> we should either return and error upon register notification or return
->> maximum volume always and refuse to SetAbsoluteVolume, my guess is
->> that the latter is better for IOP reasons since the remote device may
->> register to volume while the endpoint is setting up the transport so
->> the volume may be set latter.
->>
->>
->
-> I agree the right value will come from PA. The problem is that the
-> org.bluez.MediaTransport.Volume property doesn't exist when volume is
-> < 0 or > 127 and PA will not be able to inform the correct volume
-> value. Should we simply remove volume_exists(), or do you have any
-> other suggestion?
+When rfkill is unblocked, the device will be powered on if the device
+is in HCI_SETUP state, meaning that it was never properly initialized.
+If the device is not used by userspace, the HCI_AUTO_OFF flag will
+take care of powering it off.
 
-I guess we could use the role of transport, if it is a sink/controller
-transport it should be initialized to max volume otherwise it should
-still be initialized with -1 so we can continue to omit in case of
-source/target role.
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+
+Samuel on IRC caused me to remember this. Thanks :-)
+
+
+ net/bluetooth/hci_core.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 596660d..9796c0a 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1124,8 +1124,11 @@ static int hci_rfkill_set_block(void *data, bool blocked)
+ 
+ 	BT_DBG("%p name %s blocked %d", hdev, hdev->name, blocked);
+ 
+-	if (!blocked)
++	if (!blocked) {
++		if (test_bit(HCI_SETUP, &hdev->dev_flags))
++			schedule_work(&hdev->power_on);
+ 		return 0;
++	}
+ 
+ 	hci_dev_do_close(hdev);
+ 
+-- 
+1.8.1
+
