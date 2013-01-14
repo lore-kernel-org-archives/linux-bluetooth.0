@@ -1,29 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/4] Bluetooth: Fix workqueue related issues
-Date: Mon, 14 Jan 2013 22:33:49 +0200
-Message-Id: <1358195633-29303-1-git-send-email-johan.hedberg@gmail.com>
+Message-ID: <1358186456.1806.96.camel@aeonflux>
+Subject: Re: [PATCH v2] Bluetooth: Power the device up after a rfkill unblock
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 14 Jan 2013 10:00:56 -0800
+In-Reply-To: <1358173227-5384-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1358173227-5384-1-git-send-email-vinicius.gomes@openbossa.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Vinicius,
 
-I was initially only going to fix the thing in the last patch of this
-set but after starting to look at the code I found several other issues
-and hence the rest of the patches.
+> With the HCI_SETUP patches, this is all that is needed to make the
+> case when a adapter is added with Bluetooth blocked in rfkill to work.
+> 
+> When rfkill is unblocked, the device will be powered on if the device
+> is in HCI_SETUP state, meaning that it was never properly initialized.
+> If the device is not used by userspace, the HCI_AUTO_OFF flag will
+> take care of powering it off.
+> 
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> ---
+> 
+> Samuel on IRC caused me to remember this. Thanks :-)
+> 
+> 
+>  net/bluetooth/hci_core.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 596660d..9796c0a 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1124,8 +1124,11 @@ static int hci_rfkill_set_block(void *data, bool blocked)
+>  
+>  	BT_DBG("%p name %s blocked %d", hdev, hdev->name, blocked);
+>  
+> -	if (!blocked)
+> +	if (!blocked) {
+> +		if (test_bit(HCI_SETUP, &hdev->dev_flags))
+> +			schedule_work(&hdev->power_on);
+>  		return 0;
+> +	}
+>  
+>  	hci_dev_do_close(hdev);
+>  
 
-The first three patches fix work queue handling. We should, whenever
-possible, avoid the system-global workqueue (the schedule_*work
-functions) and use hdev-specific ones instead. However, we can't use
-hci_request() with the usual workqueue since that would block e.g.
-hci_send_cmd from completing so a second work queue is needed.
+is this really the behavior that we want. Even if rfkill block all
+Bluetooth is set, we should run the adapter initialization. That is not
+triggering any RF. Sending the initial HCI_Reset is actually even more
+important to ensure the adapter is really reset and has not some left
+over state.
 
-The last patch fixes a race with setting the scan mode that I was
-seeing every once in a while through a connectable or discoverable test
-case of mgmt-tester failing. There are several other HCI commands with
-the same potential issue (like the class of device and the local name)
-but I haven't gotten around to fixing those yet.
+So I think what should be done is run the HCI_SETUP phase, but then
+refuse to allow bringing up the controller.
 
-Johan
+Regards
+
+Marcel
+
 
