@@ -1,65 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1358186456.1806.96.camel@aeonflux>
-Subject: Re: [PATCH v2] Bluetooth: Power the device up after a rfkill unblock
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 14 Jan 2013 10:00:56 -0800
-In-Reply-To: <1358173227-5384-1-git-send-email-vinicius.gomes@openbossa.org>
-References: <1358173227-5384-1-git-send-email-vinicius.gomes@openbossa.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <50F3D948.9010605@oss.bmw-carit.de>
+References: <1357919757-10334-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+	<1357919757-10334-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
+	<CABBYNZKLNngQw6rSUUPJBapZ+rt7C4PsVajegFKwv6j+-8zvrg@mail.gmail.com>
+	<50F3D948.9010605@oss.bmw-carit.de>
+Date: Mon, 14 Jan 2013 19:33:03 +0200
+Message-ID: <CABBYNZKJFcY0hCvBDeQw_mxiJUDvOg9VdHrbv_si70iW2chp8Q@mail.gmail.com>
+Subject: Re: [PATCH 1/8] obexd: Handle empty path name in SetPath
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Christian,
 
-> With the HCI_SETUP patches, this is all that is needed to make the
-> case when a adapter is added with Bluetooth blocked in rfkill to work.
-> 
-> When rfkill is unblocked, the device will be powered on if the device
-> is in HCI_SETUP state, meaning that it was never properly initialized.
-> If the device is not used by userspace, the HCI_AUTO_OFF flag will
-> take care of powering it off.
-> 
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> ---
-> 
-> Samuel on IRC caused me to remember this. Thanks :-)
-> 
-> 
->  net/bluetooth/hci_core.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 596660d..9796c0a 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1124,8 +1124,11 @@ static int hci_rfkill_set_block(void *data, bool blocked)
->  
->  	BT_DBG("%p name %s blocked %d", hdev, hdev->name, blocked);
->  
-> -	if (!blocked)
-> +	if (!blocked) {
-> +		if (test_bit(HCI_SETUP, &hdev->dev_flags))
-> +			schedule_work(&hdev->power_on);
->  		return 0;
-> +	}
->  
->  	hci_dev_do_close(hdev);
->  
+On Mon, Jan 14, 2013 at 12:09 PM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> Hi Luiz,
+>
+>
+> On 01/13/2013 04:55 PM, Luiz Augusto von Dentz wrote:
+>>
+>> But what empty means in this case, I would like to stick with cd behavior,
+>> so empty should set back to root. Otherwise the patchset seems fine. -- Luiz
+>> Augusto von Dentz
+>
+> But this is exactly what the patch is doing.
+> g_obex_setpath called with an empty path won't set the parent flag,
+> and thus it requests going back to the root folder.
+>
+> < ACL data: handle 21 flags 0x00 dlen 21
+>     L2CAP(d): cid 0x0041 len 17 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 32 pf 0 ilen 13 fcs 0xd8
+>         OBEX: SetPath cmd(f): len 13 flags 2 constants 0
+>         Connection ID (0xcb) = 98
+>         Name (0x01) = Unicode length 0
+>> HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 21 packets 1
+>> ACL data: handle 21 flags 0x02 dlen 11
+>     L2CAP(d): cid 0x0041 len 7 [psm 3]
+>       RFCOMM(d): UIH: cr 0 dlci 32 pf 0 ilen 3 fcs 0x2
+>         OBEX: SetPath rsp(f): status 200 len 3
+>
+> Or did I misunderstand you?
 
-is this really the behavior that we want. Even if rfkill block all
-Bluetooth is set, we should run the adapter initialization. That is not
-triggering any RF. Sending the initial HCI_Reset is actually even more
-important to ensure the adapter is really reset and has not some left
-over state.
+I was just confirming this would not cd back to parent, anyway this
+set is now upstream, thanks!
 
-So I think what should be done is run the HCI_SETUP phase, but then
-refuse to allow bringing up the controller.
-
-Regards
-
-Marcel
+Btw, Ive modified a little bit patch 06/08 to use hexadecimal values
+to indicate better the size.
 
 
+--
+Luiz Augusto von Dentz
