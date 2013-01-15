@@ -1,156 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <9F89C4B87365E4408446E7FF5C4AE97115A2008B04@SMUCM17V.europe.bmw.corp>
-References: <1357935934-20033-1-git-send-email-jprvita@openbossa.org>
-	<1357935934-20033-2-git-send-email-jprvita@openbossa.org>
-	<CABBYNZ+3_KA4Lg2jJ9CJfUNv0jG-n2S5J__SNOMxJenOGeL+GQ@mail.gmail.com>
-	<CAAngNMZDdYyNZ4F+3o6sG8rJC=PBCXyFKufMmY_Ud2k8xd3=gw@mail.gmail.com>
-	<CACumGOKTYkTM+bzHEBo2aL=L8Kycgpsza0U-ag=iDixbfnqjzw@mail.gmail.com>
-	<0E5B0602414B684FAFC3B07F5A858CC40FFB5CDF@Exchange2010.bmw-carit.intra>
-	<CABBYNZLjtmgNG5RDSVWC5qaz5-ARH84giVShV+Lra1TAS3ehkA@mail.gmail.com>
-	<CAAngNMb-W6j8q6H5-4uPTQm=AAAUDcD3icJYrmQK1_uzZ2zyag@mail.gmail.com>
-	<9F89C4B87365E4408446E7FF5C4AE97115A2008B04@SMUCM17V.europe.bmw.corp>
-Date: Tue, 15 Jan 2013 12:43:14 +0200
-Message-ID: <CABBYNZK0FTrnu+22FCWtTMF4M5tnWThrOc3VDYiax_vcxosL0Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 01/11] transport: Initialize the "Volume" property
+From: <Oleksandr.Domin@bmw.de>
+To: <jprvita@openbossa.org>, <luiz.dentz@gmail.com>
+CC: <Mikel.Astiz@bmw-carit.de>, <luiz.von.dentz@intel.com>,
+	<linux-bluetooth@vger.kernel.org>, <vinicius.gomes@openbossa.org>,
+	<claudio.takahasi@openbossa.org>
+Date: Tue, 15 Jan 2013 09:02:46 +0100
+Subject: RE: [PATCH BlueZ 01/11] transport: Initialize the "Volume" property
  with 50%
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Oleksandr.Domin@bmw.de
-Cc: Joao Paulo Rechi Vita <jprvita@openbossa.org>,
-	Mikel Astiz <Mikel.Astiz@bmw-carit.de>,
-	Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Vinicius Gomes <vinicius.gomes@openbossa.org>,
-	Claudio Takahasi <claudio.takahasi@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <9F89C4B87365E4408446E7FF5C4AE97115A2008B04@SMUCM17V.europe.bmw.corp>
+References: <1357935934-20033-1-git-send-email-jprvita@openbossa.org>
+ <1357935934-20033-2-git-send-email-jprvita@openbossa.org>
+ <CABBYNZ+3_KA4Lg2jJ9CJfUNv0jG-n2S5J__SNOMxJenOGeL+GQ@mail.gmail.com>
+ <CAAngNMZDdYyNZ4F+3o6sG8rJC=PBCXyFKufMmY_Ud2k8xd3=gw@mail.gmail.com>
+ <CACumGOKTYkTM+bzHEBo2aL=L8Kycgpsza0U-ag=iDixbfnqjzw@mail.gmail.com>
+ <0E5B0602414B684FAFC3B07F5A858CC40FFB5CDF@Exchange2010.bmw-carit.intra>
+ <CABBYNZLjtmgNG5RDSVWC5qaz5-ARH84giVShV+Lra1TAS3ehkA@mail.gmail.com>
+ <CAAngNMb-W6j8q6H5-4uPTQm=AAAUDcD3icJYrmQK1_uzZ2zyag@mail.gmail.com>
+In-Reply-To: <CAAngNMb-W6j8q6H5-4uPTQm=AAAUDcD3icJYrmQK1_uzZ2zyag@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Oleksandr,
-
-On Tue, Jan 15, 2013 at 10:02 AM,  <Oleksandr.Domin@bmw.de> wrote:
-> Hi Joao,
->>
->>Hello Mikel and Luiz,
->>
->>On Mon, Jan 14, 2013 at 12:34 PM, Luiz Augusto von Dentz
->><luiz.dentz@gmail.com> wrote:
->>> Hi Mikel,
->>>
->>> On Mon, Jan 14, 2013 at 4:55 PM, Mikel Astiz <Mikel.Astiz@bmw-carit.de>
->>wrote:
->>>> Hi all,
->>>>
->>>>> Hi Joao,
->>>>>
->>>>> On Mon, Jan 14, 2013 at 4:05 PM, Joao Paulo Rechi Vita
->>>>> <jprvita@openbossa.org> wrote:
->>>>> > On Sun, Jan 13, 2013 at 12:22 PM, Luiz Augusto von Dentz
->>>>> > <luiz.dentz@gmail.com> wrote:
->>>>> >> Hi Joao,
->>>>> >>
->>>>> >> On Fri, Jan 11, 2013 at 10:25 PM, João Paulo Rechi Vita
->>>>> >> <jprvita@openbossa.org> wrote:
->>>>> >>> ---
->>>>> >>>  profiles/audio/transport.c | 2 +-
->>>>> >>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>> >>>
->>>>> >>> diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
->>>>> >>> index a4370a5..6ffa98a 100644
->>>>> >>> --- a/profiles/audio/transport.c
->>>>> >>> +++ b/profiles/audio/transport.c
->>>>> >>> @@ -787,7 +787,7 @@ struct media_transport
->>>>> *media_transport_create(struct media_endpoint *endpoint,
->>>>> >>>                 struct a2dp_transport *a2dp;
->>>>> >>>
->>>>> >>>                 a2dp = g_new0(struct a2dp_transport, 1);
->>>>> >>> -               a2dp->volume = -1;
->>>>> >>> +               a2dp->volume = 63;
->>>>> >>>
->>>>> >>>                 transport->resume = resume_a2dp;
->>>>> >>>                 transport->suspend = suspend_a2dp;
->>>>> >>> --
->>>>> >>> 1.7.11.7
->>>>> >>
->>>>> >> Does the spec say anything regarding this? Actually it seems this
->>>>> >> value must be set by PA if it does support volume notification, which
->>>>> >> means a new version of PA, then it should set the value when the card
->>>>> >> is initialized, otherwise if the endpoint doesn't set a value it
->>>>> >> should remain -1/not available. If volume is not set by the endpoint
->>>>> >> we should either return and error upon register notification or
->>>>> >> return maximum volume always and refuse to SetAbsoluteVolume, my
->>>>> >> guess is that the latter is better for IOP reasons since the remote
->>>>> >> device may register to volume while the endpoint is setting up the
->>>>> >> transport so the volume may be set latter.
->>>>> >>
->>>>> >>
->>>>> >
->>>>> > I agree the right value will come from PA. The problem is that the
->>>>> > org.bluez.MediaTransport.Volume property doesn't exist when volume is
->>>>> > < 0 or > 127 and PA will not be able to inform the correct volume
->>>>> > value. Should we simply remove volume_exists(), or do you have any
->>>>> > other suggestion?
->>>>>
->>>>> I guess we could use the role of transport, if it is a sink/controller
->>transport it
->>>>> should be initialized to max volume otherwise it should still be
->>initialized with
->>>>> -1 so we can continue to omit in case of source/target role.
->>>>
->>>> A side question: AFAIK this feature has been added in AVRCP 1.4. How
->>would the endpoint (PulseAudio) know if it's supported or not by a certain
->>device?
->>>
->>> For the controller/sink role there is no point of PulseAudio knowing
->>> about this, it basically need to set the volume and that about it, if
->>> the remote device is interested it register to be notified otherwise
->>> we don't do anything with the value, plain and simple.
->>>
->>
->>I think PA will also want to register for notifications of changes on
->>that property, so it can reflects the current volume on the remote
->>through the master volume of the bluetooth card. The volume can be
->>changed on the remote side and it will inform bluez through the
->>SetAbsoluteVolume command.
->
-> In our current AVRCP implementations, we only set the volume on the
-> target to 100%. In this case the target will encode the audio
-> with full quality. So the volume on the target is not coupled to the
-> volume on the system.
-
-The volume of the stream has nothing to do with the volume we are
-talking about here, this is about output volume of the
-sink/controller. In fact it is recommended that the stream volume be
-constant at 100% to minimize precision errors of the codec.
-
->>
->>>> My proposal would be that the property is not present if the feature is
->>not supported (or also if AVRCP is not connected). Therefore, I'd propose
->>exposing a special value in D-Bus (i.e. -1) as soon as the feature becomes
->>available (AVRCP 1.4 connected) so the endpoint can set the initial value.
->>>
->>> That is a bad idea, the notification mechanism of AVRCP is not
->>> something I would like to see exposed over D-Bus, it is way too broken
->>> since you have to registration again every time the value changes.
->>>
->>
->>I personally thinks it makes sense to not support the property if
->>AVRCP < 1.4 (this was on my initial plans also), or if the remote
->>doesn't implement AVRCP (A2DP only). We just need to find an elegant
->>way to make this information available for the transport. Otherwise
->>AVRCP will be connected every time A2DP is also connected, right? Or
->>am I missing some corner case here?
->
-> Question is do you really want to control the volume of your CT
-> from the Target? I can speak from the OEM perspective and this is
-> not what we want.
-
-Not sure what you really mean here by not what we want, this is
-specification and by not conforming with it you may get into IOP
-problems or even not be able to qualify the stack. Note that similar
-functionality exist also in HFP with SpeakerGain and MicrophoneGain,
-so whatever you have against the phone controlling the output volume
-is now past the point that you can say no to it.
-
---
-Luiz Augusto von Dentz
+SGkgSm9hbywNCj4NCj5IZWxsbyBNaWtlbCBhbmQgTHVpeiwNCj4NCj5PbiBNb24sIEphbiAxNCwg
+MjAxMyBhdCAxMjozNCBQTSwgTHVpeiBBdWd1c3RvIHZvbiBEZW50eg0KPjxsdWl6LmRlbnR6QGdt
+YWlsLmNvbT4gd3JvdGU6DQo+PiBIaSBNaWtlbCwNCj4+DQo+PiBPbiBNb24sIEphbiAxNCwgMjAx
+MyBhdCA0OjU1IFBNLCBNaWtlbCBBc3RpeiA8TWlrZWwuQXN0aXpAYm13LWNhcml0LmRlPg0KPndy
+b3RlOg0KPj4+IEhpIGFsbCwNCj4+Pg0KPj4+PiBIaSBKb2FvLA0KPj4+Pg0KPj4+PiBPbiBNb24s
+IEphbiAxNCwgMjAxMyBhdCA0OjA1IFBNLCBKb2FvIFBhdWxvIFJlY2hpIFZpdGENCj4+Pj4gPGpw
+cnZpdGFAb3BlbmJvc3NhLm9yZz4gd3JvdGU6DQo+Pj4+ID4gT24gU3VuLCBKYW4gMTMsIDIwMTMg
+YXQgMTI6MjIgUE0sIEx1aXogQXVndXN0byB2b24gRGVudHoNCj4+Pj4gPiA8bHVpei5kZW50ekBn
+bWFpbC5jb20+IHdyb3RlOg0KPj4+PiA+PiBIaSBKb2FvLA0KPj4+PiA+Pg0KPj4+PiA+PiBPbiBG
+cmksIEphbiAxMSwgMjAxMyBhdCAxMDoyNSBQTSwgSm/Do28gUGF1bG8gUmVjaGkgVml0YQ0KPj4+
+PiA+PiA8anBydml0YUBvcGVuYm9zc2Eub3JnPiB3cm90ZToNCj4+Pj4gPj4+IC0tLQ0KPj4+PiA+
+Pj4gIHByb2ZpbGVzL2F1ZGlvL3RyYW5zcG9ydC5jIHwgMiArLQ0KPj4+PiA+Pj4gIDEgZmlsZSBj
+aGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPj4+PiA+Pj4NCj4+Pj4gPj4+
+IGRpZmYgLS1naXQgYS9wcm9maWxlcy9hdWRpby90cmFuc3BvcnQuYyBiL3Byb2ZpbGVzL2F1ZGlv
+L3RyYW5zcG9ydC5jDQo+Pj4+ID4+PiBpbmRleCBhNDM3MGE1Li42ZmZhOThhIDEwMDY0NA0KPj4+
+PiA+Pj4gLS0tIGEvcHJvZmlsZXMvYXVkaW8vdHJhbnNwb3J0LmMNCj4+Pj4gPj4+ICsrKyBiL3By
+b2ZpbGVzL2F1ZGlvL3RyYW5zcG9ydC5jDQo+Pj4+ID4+PiBAQCAtNzg3LDcgKzc4Nyw3IEBAIHN0
+cnVjdCBtZWRpYV90cmFuc3BvcnQNCj4+Pj4gKm1lZGlhX3RyYW5zcG9ydF9jcmVhdGUoc3RydWN0
+IG1lZGlhX2VuZHBvaW50ICplbmRwb2ludCwNCj4+Pj4gPj4+ICAgICAgICAgICAgICAgICBzdHJ1
+Y3QgYTJkcF90cmFuc3BvcnQgKmEyZHA7DQo+Pj4+ID4+Pg0KPj4+PiA+Pj4gICAgICAgICAgICAg
+ICAgIGEyZHAgPSBnX25ldzAoc3RydWN0IGEyZHBfdHJhbnNwb3J0LCAxKTsNCj4+Pj4gPj4+IC0g
+ICAgICAgICAgICAgICBhMmRwLT52b2x1bWUgPSAtMTsNCj4+Pj4gPj4+ICsgICAgICAgICAgICAg
+ICBhMmRwLT52b2x1bWUgPSA2MzsNCj4+Pj4gPj4+DQo+Pj4+ID4+PiAgICAgICAgICAgICAgICAg
+dHJhbnNwb3J0LT5yZXN1bWUgPSByZXN1bWVfYTJkcDsNCj4+Pj4gPj4+ICAgICAgICAgICAgICAg
+ICB0cmFuc3BvcnQtPnN1c3BlbmQgPSBzdXNwZW5kX2EyZHA7DQo+Pj4+ID4+PiAtLQ0KPj4+PiA+
+Pj4gMS43LjExLjcNCj4+Pj4gPj4NCj4+Pj4gPj4gRG9lcyB0aGUgc3BlYyBzYXkgYW55dGhpbmcg
+cmVnYXJkaW5nIHRoaXM/IEFjdHVhbGx5IGl0IHNlZW1zIHRoaXMNCj4+Pj4gPj4gdmFsdWUgbXVz
+dCBiZSBzZXQgYnkgUEEgaWYgaXQgZG9lcyBzdXBwb3J0IHZvbHVtZSBub3RpZmljYXRpb24sIHdo
+aWNoDQo+Pj4+ID4+IG1lYW5zIGEgbmV3IHZlcnNpb24gb2YgUEEsIHRoZW4gaXQgc2hvdWxkIHNl
+dCB0aGUgdmFsdWUgd2hlbiB0aGUgY2FyZA0KPj4+PiA+PiBpcyBpbml0aWFsaXplZCwgb3RoZXJ3
+aXNlIGlmIHRoZSBlbmRwb2ludCBkb2Vzbid0IHNldCBhIHZhbHVlIGl0DQo+Pj4+ID4+IHNob3Vs
+ZCByZW1haW4gLTEvbm90IGF2YWlsYWJsZS4gSWYgdm9sdW1lIGlzIG5vdCBzZXQgYnkgdGhlIGVu
+ZHBvaW50DQo+Pj4+ID4+IHdlIHNob3VsZCBlaXRoZXIgcmV0dXJuIGFuZCBlcnJvciB1cG9uIHJl
+Z2lzdGVyIG5vdGlmaWNhdGlvbiBvcg0KPj4+PiA+PiByZXR1cm4gbWF4aW11bSB2b2x1bWUgYWx3
+YXlzIGFuZCByZWZ1c2UgdG8gU2V0QWJzb2x1dGVWb2x1bWUsIG15DQo+Pj4+ID4+IGd1ZXNzIGlz
+IHRoYXQgdGhlIGxhdHRlciBpcyBiZXR0ZXIgZm9yIElPUCByZWFzb25zIHNpbmNlIHRoZSByZW1v
+dGUNCj4+Pj4gPj4gZGV2aWNlIG1heSByZWdpc3RlciB0byB2b2x1bWUgd2hpbGUgdGhlIGVuZHBv
+aW50IGlzIHNldHRpbmcgdXAgdGhlDQo+Pj4+ID4+IHRyYW5zcG9ydCBzbyB0aGUgdm9sdW1lIG1h
+eSBiZSBzZXQgbGF0dGVyLg0KPj4+PiA+Pg0KPj4+PiA+Pg0KPj4+PiA+DQo+Pj4+ID4gSSBhZ3Jl
+ZSB0aGUgcmlnaHQgdmFsdWUgd2lsbCBjb21lIGZyb20gUEEuIFRoZSBwcm9ibGVtIGlzIHRoYXQg
+dGhlDQo+Pj4+ID4gb3JnLmJsdWV6Lk1lZGlhVHJhbnNwb3J0LlZvbHVtZSBwcm9wZXJ0eSBkb2Vz
+bid0IGV4aXN0IHdoZW4gdm9sdW1lIGlzDQo+Pj4+ID4gPCAwIG9yID4gMTI3IGFuZCBQQSB3aWxs
+IG5vdCBiZSBhYmxlIHRvIGluZm9ybSB0aGUgY29ycmVjdCB2b2x1bWUNCj4+Pj4gPiB2YWx1ZS4g
+U2hvdWxkIHdlIHNpbXBseSByZW1vdmUgdm9sdW1lX2V4aXN0cygpLCBvciBkbyB5b3UgaGF2ZSBh
+bnkNCj4+Pj4gPiBvdGhlciBzdWdnZXN0aW9uPw0KPj4+Pg0KPj4+PiBJIGd1ZXNzIHdlIGNvdWxk
+IHVzZSB0aGUgcm9sZSBvZiB0cmFuc3BvcnQsIGlmIGl0IGlzIGEgc2luay9jb250cm9sbGVyDQo+
+dHJhbnNwb3J0IGl0DQo+Pj4+IHNob3VsZCBiZSBpbml0aWFsaXplZCB0byBtYXggdm9sdW1lIG90
+aGVyd2lzZSBpdCBzaG91bGQgc3RpbGwgYmUNCj5pbml0aWFsaXplZCB3aXRoDQo+Pj4+IC0xIHNv
+IHdlIGNhbiBjb250aW51ZSB0byBvbWl0IGluIGNhc2Ugb2Ygc291cmNlL3RhcmdldCByb2xlLg0K
+Pj4+DQo+Pj4gQSBzaWRlIHF1ZXN0aW9uOiBBRkFJSyB0aGlzIGZlYXR1cmUgaGFzIGJlZW4gYWRk
+ZWQgaW4gQVZSQ1AgMS40LiBIb3cNCj53b3VsZCB0aGUgZW5kcG9pbnQgKFB1bHNlQXVkaW8pIGtu
+b3cgaWYgaXQncyBzdXBwb3J0ZWQgb3Igbm90IGJ5IGEgY2VydGFpbg0KPmRldmljZT8NCj4+DQo+
+PiBGb3IgdGhlIGNvbnRyb2xsZXIvc2luayByb2xlIHRoZXJlIGlzIG5vIHBvaW50IG9mIFB1bHNl
+QXVkaW8ga25vd2luZw0KPj4gYWJvdXQgdGhpcywgaXQgYmFzaWNhbGx5IG5lZWQgdG8gc2V0IHRo
+ZSB2b2x1bWUgYW5kIHRoYXQgYWJvdXQgaXQsIGlmDQo+PiB0aGUgcmVtb3RlIGRldmljZSBpcyBp
+bnRlcmVzdGVkIGl0IHJlZ2lzdGVyIHRvIGJlIG5vdGlmaWVkIG90aGVyd2lzZQ0KPj4gd2UgZG9u
+J3QgZG8gYW55dGhpbmcgd2l0aCB0aGUgdmFsdWUsIHBsYWluIGFuZCBzaW1wbGUuDQo+Pg0KPg0K
+PkkgdGhpbmsgUEEgd2lsbCBhbHNvIHdhbnQgdG8gcmVnaXN0ZXIgZm9yIG5vdGlmaWNhdGlvbnMg
+b2YgY2hhbmdlcyBvbg0KPnRoYXQgcHJvcGVydHksIHNvIGl0IGNhbiByZWZsZWN0cyB0aGUgY3Vy
+cmVudCB2b2x1bWUgb24gdGhlIHJlbW90ZQ0KPnRocm91Z2ggdGhlIG1hc3RlciB2b2x1bWUgb2Yg
+dGhlIGJsdWV0b290aCBjYXJkLiBUaGUgdm9sdW1lIGNhbiBiZQ0KPmNoYW5nZWQgb24gdGhlIHJl
+bW90ZSBzaWRlIGFuZCBpdCB3aWxsIGluZm9ybSBibHVleiB0aHJvdWdoIHRoZQ0KPlNldEFic29s
+dXRlVm9sdW1lIGNvbW1hbmQuDQoNCkluIG91ciBjdXJyZW50IEFWUkNQIGltcGxlbWVudGF0aW9u
+cywgd2Ugb25seSBzZXQgdGhlIHZvbHVtZSBvbiB0aGUgDQp0YXJnZXQgdG8gMTAwJS4gSW4gdGhp
+cyBjYXNlIHRoZSB0YXJnZXQgd2lsbCBlbmNvZGUgdGhlIGF1ZGlvDQp3aXRoIGZ1bGwgcXVhbGl0
+eS4gU28gdGhlIHZvbHVtZSBvbiB0aGUgdGFyZ2V0IGlzIG5vdCBjb3VwbGVkIHRvIHRoZQ0Kdm9s
+dW1lIG9uIHRoZSBzeXN0ZW0uDQoNCj4NCj4+PiBNeSBwcm9wb3NhbCB3b3VsZCBiZSB0aGF0IHRo
+ZSBwcm9wZXJ0eSBpcyBub3QgcHJlc2VudCBpZiB0aGUgZmVhdHVyZSBpcw0KPm5vdCBzdXBwb3J0
+ZWQgKG9yIGFsc28gaWYgQVZSQ1AgaXMgbm90IGNvbm5lY3RlZCkuIFRoZXJlZm9yZSwgSSdkIHBy
+b3Bvc2UNCj5leHBvc2luZyBhIHNwZWNpYWwgdmFsdWUgaW4gRC1CdXMgKGkuZS4gLTEpIGFzIHNv
+b24gYXMgdGhlIGZlYXR1cmUgYmVjb21lcw0KPmF2YWlsYWJsZSAoQVZSQ1AgMS40IGNvbm5lY3Rl
+ZCkgc28gdGhlIGVuZHBvaW50IGNhbiBzZXQgdGhlIGluaXRpYWwgdmFsdWUuDQo+Pg0KPj4gVGhh
+dCBpcyBhIGJhZCBpZGVhLCB0aGUgbm90aWZpY2F0aW9uIG1lY2hhbmlzbSBvZiBBVlJDUCBpcyBu
+b3QNCj4+IHNvbWV0aGluZyBJIHdvdWxkIGxpa2UgdG8gc2VlIGV4cG9zZWQgb3ZlciBELUJ1cywg
+aXQgaXMgd2F5IHRvbyBicm9rZW4NCj4+IHNpbmNlIHlvdSBoYXZlIHRvIHJlZ2lzdHJhdGlvbiBh
+Z2FpbiBldmVyeSB0aW1lIHRoZSB2YWx1ZSBjaGFuZ2VzLg0KPj4NCj4NCj5JIHBlcnNvbmFsbHkg
+dGhpbmtzIGl0IG1ha2VzIHNlbnNlIHRvIG5vdCBzdXBwb3J0IHRoZSBwcm9wZXJ0eSBpZg0KPkFW
+UkNQIDwgMS40ICh0aGlzIHdhcyBvbiBteSBpbml0aWFsIHBsYW5zIGFsc28pLCBvciBpZiB0aGUg
+cmVtb3RlDQo+ZG9lc24ndCBpbXBsZW1lbnQgQVZSQ1AgKEEyRFAgb25seSkuIFdlIGp1c3QgbmVl
+ZCB0byBmaW5kIGFuIGVsZWdhbnQNCj53YXkgdG8gbWFrZSB0aGlzIGluZm9ybWF0aW9uIGF2YWls
+YWJsZSBmb3IgdGhlIHRyYW5zcG9ydC4gT3RoZXJ3aXNlDQo+QVZSQ1Agd2lsbCBiZSBjb25uZWN0
+ZWQgZXZlcnkgdGltZSBBMkRQIGlzIGFsc28gY29ubmVjdGVkLCByaWdodD8gT3INCj5hbSBJIG1p
+c3Npbmcgc29tZSBjb3JuZXIgY2FzZSBoZXJlPw0KDQpRdWVzdGlvbiBpcyBkbyB5b3UgcmVhbGx5
+IHdhbnQgdG8gY29udHJvbCB0aGUgdm9sdW1lIG9mIHlvdXIgQ1QNCmZyb20gdGhlIFRhcmdldD8g
+SSBjYW4gc3BlYWsgZnJvbSB0aGUgT0VNIHBlcnNwZWN0aXZlIGFuZCB0aGlzIGlzDQpub3Qgd2hh
+dCB3ZSB3YW50Lg0KDQpSZWdhcmRzLA0KT2xla3NhbmRyDQoNCi0tLQ0KQk1XIEdyb3VwDQpPbGVr
+c2FuZHLCoERvbWluDQpBcHBDZW50ZXIsIEVudGVydGFpbm1lbnQgYW5kIE1vYmlsZSBFbmRnZXLD
+pHRlDQpTb2Z0d2FyZSBBcmNoaXRlY3QgR0VOSVZJDQpNYXgtRGlhbWFuZC1TdHIuIDI1DQo4MDkz
+N8KgTcO8bmNoZW4NCg0KVGVsOsKgKzQ5IDg5IDM4MiAtIDYwNjMyDQpNb2JpbGU6wqArNDkgMTc2
+IDYwMTYwNjMyDQpNYWlsOsKgb2xla3NhbmRyLmRvbWluQGJtdy5kZQ0KV2ViOsKgaHR0cDovL3d3
+dy5ibXdncm91cC5jb20NCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQpCYXllcmlzY2hlIE1vdG9y
+ZW4gV2Vya2UgQWt0aWVuZ2VzZWxsc2NoYWZ0DQpCb2FyZCBvZiBNYW5hZ2VtZW50OiBOb3JiZXJ0
+IFJlaXRob2ZlciwgQ2hhaXJtYW4sDQpGcmFuay1QZXRlciBBcm5kdCwgTWlsYWdyb3MgQ2Fpw7Fh
+IENhcnJlaXJvLUFuZHJlZSwNCkhlcmJlcnQgRGllc3MsIEtsYXVzIERyYWVnZXIsIEZyaWVkcmlj
+aCBFaWNoaW5lciwNCkhhcmFsZCBLcsO8Z2VyLCBJYW4gUm9iZXJ0c29uLg0KQ2hhaXJtYW4gb2Yg
+U3VwZXJ2aXNvcnkgQm9hcmQ6IEpvYWNoaW0gTWlsYmVyZw0KUmVnaXN0ZXJlZCBpbiBHZXJtYW55
+OiBNw7xuY2hlbiBIUkIgNDIyNDMNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQoNCg0KDQo=
