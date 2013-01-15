@@ -1,118 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1358266671.2445.1.camel@aeonflux>
-Subject: Re: [PATCH v3 3/3] Bluetooth: Fix stop discovery while in STARTING
- state
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 15 Jan 2013 08:17:51 -0800
-In-Reply-To: <1358254892-11303-3-git-send-email-jaganath.k@samsung.com>
-References: <1358254892-11303-1-git-send-email-jaganath.k@samsung.com>
-	 <1358254892-11303-3-git-send-email-jaganath.k@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 5/5] obexd: Add parameter Status to GetMessageListing response
+Date: Tue, 15 Jan 2013 14:56:44 +0100
+Message-Id: <1358258204-4090-6-git-send-email-christian.fetzer@oss.bmw-carit.de>
+In-Reply-To: <1358258204-4090-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1358258204-4090-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-> If stop_discovery() is called when discovery state is STARTING, it
-> will be failed currently. This patch fixes this.
-> 
-> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
-> ---
->  include/net/bluetooth/hci_core.h |    1 +
->  net/bluetooth/hci_event.c        |   14 ++++++++++++--
->  net/bluetooth/mgmt.c             |   12 +++++++++++-
->  3 files changed, 24 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index d8f68c7..01c723a 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -64,6 +64,7 @@ struct discovery_state {
->  		DISCOVERY_RESOLVING,
->  		DISCOVERY_STOPPING,
->  	} state;
-> +	u8  discovering;
+The parameter Status indicates the status of reception of the message.
+It can be used to differentiate between messages with a reception status
+of "completed", "fractioned" and "notification".
 
-what is this double spaces for? And why not a bool. Or a better name.
+This parameter got lost when obexd was refactored to use of D-Bus properties.
+The documentation and the parsing code for it was still there.
+---
+ obexd/client/map.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
->  	struct list_head	all;	/* All devices found during inquiry */
->  	struct list_head	unknown;	/* Name state not known */
->  	struct list_head	resolve;	/* Name needs to be resolved */
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 97b4828..c616cbf 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -1259,7 +1259,12 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
->  		set_bit(HCI_LE_SCAN, &hdev->dev_flags);
->  
->  		hci_dev_lock(hdev);
-> -		hci_discovery_set_state(hdev, DISCOVERY_FINDING);
-> +		if (hdev->discovery.state == DISCOVERY_STOPPING) {
-> +			hci_cancel_le_scan(hdev);
-> +			mgmt_start_discovery_cancelled(hdev);
-> +		} else {
-> +			hci_discovery_set_state(hdev, DISCOVERY_FINDING);
-> +		}
->  		hci_dev_unlock(hdev);
->  		break;
->  
-> @@ -1375,7 +1380,12 @@ static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
->  	set_bit(HCI_INQUIRY, &hdev->flags);
->  
->  	hci_dev_lock(hdev);
-> -	hci_discovery_set_state(hdev, DISCOVERY_FINDING);
-> +	if (hdev->discovery.state == DISCOVERY_STOPPING) {
-> +		hci_cancel_inquiry(hdev);
-> +		mgmt_start_discovery_cancelled(hdev);
-> +	} else {
-> +		hci_discovery_set_state(hdev, DISCOVERY_FINDING);
-> +	}
->  	hci_dev_unlock(hdev);
->  }
->  
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 0db9d66..6dc275f 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -2394,7 +2394,8 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
->  
->  	hci_dev_lock(hdev);
->  
-> -	if (!hci_discovery_active(hdev)) {
-> +	if (hdev->discovery.state != DISCOVERY_STARTING &&
-> +	    !hci_discovery_active(hdev)) {
->  		err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY,
->  				   MGMT_STATUS_REJECTED, &mgmt_cp->type,
->  				   sizeof(mgmt_cp->type));
-> @@ -2442,6 +2443,10 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
->  
->  		break;
->  
-> +	case DISCOVERY_STARTING:
-> +		err = 0;
-> +		break;
-> +
->  	default:
->  		BT_DBG("unknown discovery state %u", hdev->discovery.state);
->  		err = -EFAULT;
-> @@ -3720,6 +3725,11 @@ int mgmt_discovering(struct hci_dev *hdev, u8 discovering)
->  		mgmt_pending_remove(cmd);
->  	}
->  
-> +	if (hdev->discovery.discovering == discovering)
-> +		return 0;
-> +
-> +	hdev->discovery.discovering = discovering;
-> +
->  	memset(&ev, 0, sizeof(ev));
->  	ev.type = hdev->discovery.type;
->  	ev.discovering = discovering;
-
-Regards
-
-Marcel
-
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index f9f7c4f..ea5681a 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -595,6 +595,24 @@ static gboolean get_size(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++static gboolean reception_status_exists(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct map_msg *msg = data;
++
++	return msg->status != NULL;
++}
++
++static gboolean get_reception_status(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct map_msg *msg = data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &msg->status);
++
++	return TRUE;
++}
++
+ static gboolean get_attachment_size(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+ {
+@@ -732,6 +750,7 @@ static const GDBusPropertyTable map_msg_properties[] = {
+ 	{ "Type", "s", get_type, NULL, type_exists },
+ 	{ "Size", "t", get_size },
+ 	{ "Text", "b", get_text },
++	{ "Status", "s", get_reception_status, NULL, reception_status_exists },
+ 	{ "AttachmentSize", "t", get_attachment_size },
+ 	{ "Priority", "b", get_priority },
+ 	{ "Read", "b", get_read, set_read },
+-- 
+1.8.1
 
