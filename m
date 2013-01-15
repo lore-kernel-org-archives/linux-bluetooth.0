@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/5] obexd: Add parameter Text to GetMessageListing response
-Date: Tue, 15 Jan 2013 14:56:42 +0100
-Message-Id: <1358258204-4090-4-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH 1/5] obexd: Add parameter SubjectLength to map_list_messages
+Date: Tue, 15 Jan 2013 14:56:40 +0100
+Message-Id: <1358258204-4090-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
 In-Reply-To: <1358258204-4090-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 References: <1358258204-4090-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,92 +11,74 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-The Text flag indicates if the message contains any textual content
-or has binary content only.
+This parameter allows the client to request a maximum length of the
+parameter "subject" in the messages listing.
 ---
- doc/obex-api.txt   |  7 +++++++
- obexd/client/map.c | 22 ++++++++++++++++++++++
- 2 files changed, 29 insertions(+)
+ doc/obex-api.txt   |  9 +++++++--
+ obexd/client/map.c | 16 ++++++++++++++++
+ 2 files changed, 23 insertions(+), 2 deletions(-)
 
 diff --git a/doc/obex-api.txt b/doc/obex-api.txt
-index bb14fba..9e17f1a 100644
+index b2998de..bb14fba 100644
 --- a/doc/obex-api.txt
 +++ b/doc/obex-api.txt
-@@ -587,6 +587,13 @@ Methods		void SetFolder(string name)
+@@ -539,8 +539,8 @@ Methods		void SetFolder(string name)
+ 			Returns an array containing the messages found in the
+ 			given folder.
  
- 					Message size in bytes
+-			Possible Filters: Offset, MaxCount, Fields, Type,
+-			PeriodStart, PeriodEnd, Status, Recipient, Sender,
++			Possible Filters: Offset, MaxCount, SubjectLength, Fields,
++			Type, PeriodStart, PeriodEnd, Status, Recipient, Sender,
+ 			Priority
  
-+				boolean Text:
-+
-+					Message text flag
-+
-+					Specifies whether message has textual
-+					content or is binary only
-+
- 				string Status:
+ 			Each message is represented by an object path followed
+@@ -627,6 +627,11 @@ Filter:		uint16 Offset:
  
- 					Message reception status
+ 			Maximum number of items, default is 1024
+ 
++		uint8 SubjectLength:
++
++			Maximum length of the Subject property in the
++			message, default is 256
++
+ 		array{string} Fields:
+ 
+ 			Message fields, default is all values.
 diff --git a/obexd/client/map.c b/obexd/client/map.c
-index a51aa5e..d32d6ac 100644
+index 29efd51..54a6a7f 100644
 --- a/obexd/client/map.c
 +++ b/obexd/client/map.c
-@@ -99,6 +99,7 @@ struct map_data {
- #define MAP_MSG_FLAG_READ	0x02
- #define MAP_MSG_FLAG_SENT	0x04
- #define MAP_MSG_FLAG_PROTECTED	0x08
-+#define MAP_MSG_FLAG_TEXT	0x10
- 
- struct map_msg {
- 	struct map_data *data;
-@@ -629,6 +630,12 @@ static gboolean get_protected(const GDBusPropertyTable *property,
- 	return get_flag(property, iter, MAP_MSG_FLAG_PROTECTED, data);
+@@ -1052,6 +1052,19 @@ fail:
+ 	return reply;
  }
  
-+static gboolean get_text(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	return get_flag(property, iter, MAP_MSG_FLAG_TEXT, data);
-+}
-+
- static void set_status(const GDBusPropertyTable *property,
- 			DBusMessageIter *iter, GDBusPendingPropertySet id,
- 			uint8_t status, void *data)
-@@ -712,6 +719,7 @@ static const GDBusPropertyTable map_msg_properties[] = {
- 						recipient_address_exists },
- 	{ "Type", "s", get_type, NULL, type_exists },
- 	{ "Size", "t", get_size },
-+	{ "Text", "b", get_text },
- 	{ "Priority", "b", get_priority },
- 	{ "Read", "b", get_read, set_read },
- 	{ "Sent", "b", get_sent },
-@@ -817,6 +825,19 @@ static void parse_size(struct map_msg *msg, const char *value,
- 	obex_dbus_dict_append(iter, "Size", DBUS_TYPE_UINT64, &msg->size);
- }
- 
-+static void parse_text(struct map_msg *msg, const char *value,
++static GObexApparam *parse_subject_length(GObexApparam *apparam,
 +							DBusMessageIter *iter)
 +{
-+	gboolean flag = strcasecmp(value, "no") != 0;
++	guint8 num;
 +
-+	if (flag)
-+		msg->flags |= MAP_MSG_FLAG_TEXT;
-+	else
-+		msg->flags &= ~MAP_MSG_FLAG_TEXT;
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BYTE)
++		return NULL;
 +
-+	obex_dbus_dict_append(iter, "Text", DBUS_TYPE_BOOLEAN, &flag);
++	dbus_message_iter_get_basic(iter, &num);
++
++	return g_obex_apparam_set_uint8(apparam, MAP_AP_SUBJECTLENGTH, num);
 +}
 +
- static void parse_status(struct map_msg *msg, const char *value,
- 							DBusMessageIter *iter)
+ static uint64_t get_filter_mask(const char *filterstr)
  {
-@@ -891,6 +912,7 @@ static struct map_msg_parser {
- 		{ "recipient_addressing", parse_recipient_address },
- 		{ "type", parse_type },
- 		{ "size", parse_size },
-+		{ "text", parse_text },
- 		{ "reception_status", parse_status },
- 		{ "priority", parse_priority },
- 		{ "read", parse_read },
+ 	int i;
+@@ -1263,6 +1276,9 @@ static GObexApparam *parse_message_filters(GObexApparam *apparam,
+ 		} else if (strcasecmp(key, "MaxCount") == 0) {
+ 			if (parse_max_count(apparam, &value) == NULL)
+ 				return NULL;
++		} else if (strcasecmp(key, "SubjectLength") == 0) {
++			if (parse_subject_length(apparam, &value) == NULL)
++				return NULL;
+ 		} else if (strcasecmp(key, "Fields") == 0) {
+ 			if (parse_fields(apparam, &value) == NULL)
+ 				return NULL;
 -- 
 1.8.1
 
