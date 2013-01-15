@@ -1,65 +1,156 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH v3 1/3] Bluetooth: Move discovery state check inside
- hci_dev_lock()
-Date: Tue, 15 Jan 2013 18:31:30 +0530
-Message-id: <1358254892-11303-1-git-send-email-jaganath.k@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <9F89C4B87365E4408446E7FF5C4AE97115A2008B04@SMUCM17V.europe.bmw.corp>
+References: <1357935934-20033-1-git-send-email-jprvita@openbossa.org>
+	<1357935934-20033-2-git-send-email-jprvita@openbossa.org>
+	<CABBYNZ+3_KA4Lg2jJ9CJfUNv0jG-n2S5J__SNOMxJenOGeL+GQ@mail.gmail.com>
+	<CAAngNMZDdYyNZ4F+3o6sG8rJC=PBCXyFKufMmY_Ud2k8xd3=gw@mail.gmail.com>
+	<CACumGOKTYkTM+bzHEBo2aL=L8Kycgpsza0U-ag=iDixbfnqjzw@mail.gmail.com>
+	<0E5B0602414B684FAFC3B07F5A858CC40FFB5CDF@Exchange2010.bmw-carit.intra>
+	<CABBYNZLjtmgNG5RDSVWC5qaz5-ARH84giVShV+Lra1TAS3ehkA@mail.gmail.com>
+	<CAAngNMb-W6j8q6H5-4uPTQm=AAAUDcD3icJYrmQK1_uzZ2zyag@mail.gmail.com>
+	<9F89C4B87365E4408446E7FF5C4AE97115A2008B04@SMUCM17V.europe.bmw.corp>
+Date: Tue, 15 Jan 2013 12:43:14 +0200
+Message-ID: <CABBYNZK0FTrnu+22FCWtTMF4M5tnWThrOc3VDYiax_vcxosL0Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 01/11] transport: Initialize the "Volume" property
+ with 50%
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Oleksandr.Domin@bmw.de
+Cc: Joao Paulo Rechi Vita <jprvita@openbossa.org>,
+	Mikel Astiz <Mikel.Astiz@bmw-carit.de>,
+	Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Vinicius Gomes <vinicius.gomes@openbossa.org>,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-After checking the discovery state, if other thread modifies it
-then it will be overwritten by the assignment in the first thread.
+Hi Oleksandr,
 
-Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
----
- net/bluetooth/hci_event.c |    9 ++++-----
- net/bluetooth/mgmt.c      |    4 ----
- 2 files changed, 4 insertions(+), 9 deletions(-)
+On Tue, Jan 15, 2013 at 10:02 AM,  <Oleksandr.Domin@bmw.de> wrote:
+> Hi Joao,
+>>
+>>Hello Mikel and Luiz,
+>>
+>>On Mon, Jan 14, 2013 at 12:34 PM, Luiz Augusto von Dentz
+>><luiz.dentz@gmail.com> wrote:
+>>> Hi Mikel,
+>>>
+>>> On Mon, Jan 14, 2013 at 4:55 PM, Mikel Astiz <Mikel.Astiz@bmw-carit.de>
+>>wrote:
+>>>> Hi all,
+>>>>
+>>>>> Hi Joao,
+>>>>>
+>>>>> On Mon, Jan 14, 2013 at 4:05 PM, Joao Paulo Rechi Vita
+>>>>> <jprvita@openbossa.org> wrote:
+>>>>> > On Sun, Jan 13, 2013 at 12:22 PM, Luiz Augusto von Dentz
+>>>>> > <luiz.dentz@gmail.com> wrote:
+>>>>> >> Hi Joao,
+>>>>> >>
+>>>>> >> On Fri, Jan 11, 2013 at 10:25 PM, João Paulo Rechi Vita
+>>>>> >> <jprvita@openbossa.org> wrote:
+>>>>> >>> ---
+>>>>> >>>  profiles/audio/transport.c | 2 +-
+>>>>> >>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>> >>>
+>>>>> >>> diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+>>>>> >>> index a4370a5..6ffa98a 100644
+>>>>> >>> --- a/profiles/audio/transport.c
+>>>>> >>> +++ b/profiles/audio/transport.c
+>>>>> >>> @@ -787,7 +787,7 @@ struct media_transport
+>>>>> *media_transport_create(struct media_endpoint *endpoint,
+>>>>> >>>                 struct a2dp_transport *a2dp;
+>>>>> >>>
+>>>>> >>>                 a2dp = g_new0(struct a2dp_transport, 1);
+>>>>> >>> -               a2dp->volume = -1;
+>>>>> >>> +               a2dp->volume = 63;
+>>>>> >>>
+>>>>> >>>                 transport->resume = resume_a2dp;
+>>>>> >>>                 transport->suspend = suspend_a2dp;
+>>>>> >>> --
+>>>>> >>> 1.7.11.7
+>>>>> >>
+>>>>> >> Does the spec say anything regarding this? Actually it seems this
+>>>>> >> value must be set by PA if it does support volume notification, which
+>>>>> >> means a new version of PA, then it should set the value when the card
+>>>>> >> is initialized, otherwise if the endpoint doesn't set a value it
+>>>>> >> should remain -1/not available. If volume is not set by the endpoint
+>>>>> >> we should either return and error upon register notification or
+>>>>> >> return maximum volume always and refuse to SetAbsoluteVolume, my
+>>>>> >> guess is that the latter is better for IOP reasons since the remote
+>>>>> >> device may register to volume while the endpoint is setting up the
+>>>>> >> transport so the volume may be set latter.
+>>>>> >>
+>>>>> >>
+>>>>> >
+>>>>> > I agree the right value will come from PA. The problem is that the
+>>>>> > org.bluez.MediaTransport.Volume property doesn't exist when volume is
+>>>>> > < 0 or > 127 and PA will not be able to inform the correct volume
+>>>>> > value. Should we simply remove volume_exists(), or do you have any
+>>>>> > other suggestion?
+>>>>>
+>>>>> I guess we could use the role of transport, if it is a sink/controller
+>>transport it
+>>>>> should be initialized to max volume otherwise it should still be
+>>initialized with
+>>>>> -1 so we can continue to omit in case of source/target role.
+>>>>
+>>>> A side question: AFAIK this feature has been added in AVRCP 1.4. How
+>>would the endpoint (PulseAudio) know if it's supported or not by a certain
+>>device?
+>>>
+>>> For the controller/sink role there is no point of PulseAudio knowing
+>>> about this, it basically need to set the volume and that about it, if
+>>> the remote device is interested it register to be notified otherwise
+>>> we don't do anything with the value, plain and simple.
+>>>
+>>
+>>I think PA will also want to register for notifications of changes on
+>>that property, so it can reflects the current volume on the remote
+>>through the master volume of the bluetooth card. The volume can be
+>>changed on the remote side and it will inform bluez through the
+>>SetAbsoluteVolume command.
+>
+> In our current AVRCP implementations, we only set the volume on the
+> target to 100%. In this case the target will encode the audio
+> with full quality. So the volume on the target is not coupled to the
+> volume on the system.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 705078a..97b4828 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1273,14 +1273,13 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 
- 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
- 
-+		hci_dev_lock(hdev);
- 		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
--		    hdev->discovery.state == DISCOVERY_FINDING) {
-+		    hdev->discovery.state == DISCOVERY_FINDING)
- 			mgmt_interleaved_discovery(hdev);
--		} else {
--			hci_dev_lock(hdev);
-+		else
- 			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
--			hci_dev_unlock(hdev);
--		}
-+		hci_dev_unlock(hdev);
- 
- 		break;
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index e5502a5..bcc7080 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2298,14 +2298,10 @@ int mgmt_interleaved_discovery(struct hci_dev *hdev)
- 
- 	BT_DBG("%s", hdev->name);
- 
--	hci_dev_lock(hdev);
--
- 	err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR_LE);
- 	if (err < 0)
- 		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
- 
--	hci_dev_unlock(hdev);
--
- 	return err;
- }
- 
--- 
-1.7.9.5
+The volume of the stream has nothing to do with the volume we are
+talking about here, this is about output volume of the
+sink/controller. In fact it is recommended that the stream volume be
+constant at 100% to minimize precision errors of the codec.
 
+>>
+>>>> My proposal would be that the property is not present if the feature is
+>>not supported (or also if AVRCP is not connected). Therefore, I'd propose
+>>exposing a special value in D-Bus (i.e. -1) as soon as the feature becomes
+>>available (AVRCP 1.4 connected) so the endpoint can set the initial value.
+>>>
+>>> That is a bad idea, the notification mechanism of AVRCP is not
+>>> something I would like to see exposed over D-Bus, it is way too broken
+>>> since you have to registration again every time the value changes.
+>>>
+>>
+>>I personally thinks it makes sense to not support the property if
+>>AVRCP < 1.4 (this was on my initial plans also), or if the remote
+>>doesn't implement AVRCP (A2DP only). We just need to find an elegant
+>>way to make this information available for the transport. Otherwise
+>>AVRCP will be connected every time A2DP is also connected, right? Or
+>>am I missing some corner case here?
+>
+> Question is do you really want to control the volume of your CT
+> from the Target? I can speak from the OEM perspective and this is
+> not what we want.
+
+Not sure what you really mean here by not what we want, this is
+specification and by not conforming with it you may get into IOP
+problems or even not be able to qualify the stack. Note that similar
+functionality exist also in HFP with SpeakerGain and MicrophoneGain,
+so whatever you have against the phone controlling the output volume
+is now past the point that you can say no to it.
+
+--
+Luiz Augusto von Dentz
