@@ -1,63 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/5] obexd: Move parse_size function in map.c
-Date: Tue, 15 Jan 2013 14:56:41 +0100
-Message-Id: <1358258204-4090-3-git-send-email-christian.fetzer@oss.bmw-carit.de>
-In-Reply-To: <1358258204-4090-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1358258204-4090-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Subject: [PATCH v3 3/3] Bluetooth: Fix stop discovery while in STARTING state
+Date: Tue, 15 Jan 2013 18:31:32 +0530
+Message-id: <1358254892-11303-3-git-send-email-jaganath.k@samsung.com>
+In-reply-to: <1358254892-11303-1-git-send-email-jaganath.k@samsung.com>
+References: <1358254892-11303-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+If stop_discovery() is called when discovery state is STARTING, it
+will be failed currently. This patch fixes this.
 
-This reorders msg_parsers and moves the function parse_size
-to match the order in the MAP specification.
+Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
 ---
- obexd/client/map.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_event.c        |   14 ++++++++++++--
+ net/bluetooth/mgmt.c             |   12 +++++++++++-
+ 3 files changed, 24 insertions(+), 3 deletions(-)
 
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index 54a6a7f..a51aa5e 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -810,19 +810,19 @@ static void parse_type(struct map_msg *msg, const char *value,
- 	obex_dbus_dict_append(iter, "Type", DBUS_TYPE_STRING, &value);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index d8f68c7..01c723a 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -64,6 +64,7 @@ struct discovery_state {
+ 		DISCOVERY_RESOLVING,
+ 		DISCOVERY_STOPPING,
+ 	} state;
++	u8  discovering;
+ 	struct list_head	all;	/* All devices found during inquiry */
+ 	struct list_head	unknown;	/* Name state not known */
+ 	struct list_head	resolve;	/* Name needs to be resolved */
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 97b4828..c616cbf 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1259,7 +1259,12 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 		set_bit(HCI_LE_SCAN, &hdev->dev_flags);
+ 
+ 		hci_dev_lock(hdev);
+-		hci_discovery_set_state(hdev, DISCOVERY_FINDING);
++		if (hdev->discovery.state == DISCOVERY_STOPPING) {
++			hci_cancel_le_scan(hdev);
++			mgmt_start_discovery_cancelled(hdev);
++		} else {
++			hci_discovery_set_state(hdev, DISCOVERY_FINDING);
++		}
+ 		hci_dev_unlock(hdev);
+ 		break;
+ 
+@@ -1375,7 +1380,12 @@ static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+ 	set_bit(HCI_INQUIRY, &hdev->flags);
+ 
+ 	hci_dev_lock(hdev);
+-	hci_discovery_set_state(hdev, DISCOVERY_FINDING);
++	if (hdev->discovery.state == DISCOVERY_STOPPING) {
++		hci_cancel_inquiry(hdev);
++		mgmt_start_discovery_cancelled(hdev);
++	} else {
++		hci_discovery_set_state(hdev, DISCOVERY_FINDING);
++	}
+ 	hci_dev_unlock(hdev);
  }
  
--static void parse_status(struct map_msg *msg, const char *value,
-+static void parse_size(struct map_msg *msg, const char *value,
- 							DBusMessageIter *iter)
- {
--	g_free(msg->status);
--	msg->status = g_strdup(value);
--	obex_dbus_dict_append(iter, "Status", DBUS_TYPE_STRING, &value);
-+	msg->size = g_ascii_strtoll(value, NULL, 10);
-+	obex_dbus_dict_append(iter, "Size", DBUS_TYPE_UINT64, &msg->size);
- }
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 0db9d66..6dc275f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2394,7 +2394,8 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
  
--static void parse_size(struct map_msg *msg, const char *value,
-+static void parse_status(struct map_msg *msg, const char *value,
- 							DBusMessageIter *iter)
- {
--	msg->size = g_ascii_strtoll(value, NULL, 10);
--	obex_dbus_dict_append(iter, "Size", DBUS_TYPE_UINT64, &msg->size);
-+	g_free(msg->status);
-+	msg->status = g_strdup(value);
-+	obex_dbus_dict_append(iter, "Status", DBUS_TYPE_STRING, &value);
- }
+ 	hci_dev_lock(hdev);
  
- static void parse_priority(struct map_msg *msg, const char *value,
-@@ -890,8 +890,8 @@ static struct map_msg_parser {
- 		{ "recipient_name", parse_recipient },
- 		{ "recipient_addressing", parse_recipient_address },
- 		{ "type", parse_type },
--		{ "reception_status", parse_status },
- 		{ "size", parse_size },
-+		{ "reception_status", parse_status },
- 		{ "priority", parse_priority },
- 		{ "read", parse_read },
- 		{ "sent", parse_sent },
+-	if (!hci_discovery_active(hdev)) {
++	if (hdev->discovery.state != DISCOVERY_STARTING &&
++	    !hci_discovery_active(hdev)) {
+ 		err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY,
+ 				   MGMT_STATUS_REJECTED, &mgmt_cp->type,
+ 				   sizeof(mgmt_cp->type));
+@@ -2442,6 +2443,10 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 		break;
+ 
++	case DISCOVERY_STARTING:
++		err = 0;
++		break;
++
+ 	default:
+ 		BT_DBG("unknown discovery state %u", hdev->discovery.state);
+ 		err = -EFAULT;
+@@ -3720,6 +3725,11 @@ int mgmt_discovering(struct hci_dev *hdev, u8 discovering)
+ 		mgmt_pending_remove(cmd);
+ 	}
+ 
++	if (hdev->discovery.discovering == discovering)
++		return 0;
++
++	hdev->discovery.discovering = discovering;
++
+ 	memset(&ev, 0, sizeof(ev));
+ 	ev.type = hdev->discovery.type;
+ 	ev.discovering = discovering;
 -- 
-1.8.1
+1.7.9.5
 
