@@ -1,42 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix Class of Device indication when powering off
-Date: Wed, 16 Jan 2013 16:15:34 +0200
-Message-Id: <1358345734-17892-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH BlueZ 3/5] unit: Add gdbus/client_get_boolean_property
+Date: Wed, 16 Jan 2013 15:54:38 +0200
+Message-Id: <1358344480-23777-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1358344480-23777-1-git-send-email-luiz.dentz@gmail.com>
+References: <1358344480-23777-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When a HCI device is powered off the Management interface specification
-dictates that the class of device value is indicated as zero. This patch
-fixes sending of the appropriate class of device changed event when a
-HCI device is powered off.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |    6 ++++++
- 1 file changed, 6 insertions(+)
+ unit/test-gdbus-client.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index fc171f2..54f3ddba 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2987,7 +2987,13 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
- 		}
- 	} else {
- 		u8 status = MGMT_STATUS_NOT_POWERED;
-+		u8 zero_cod[] = { 0, 0, 0 };
-+
- 		mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
-+
-+		if (memcmp(hdev->dev_class, zero_cod, sizeof(zero_cod)) != 0)
-+			mgmt_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev,
-+				   zero_cod, sizeof(zero_cod), NULL);
- 	}
+diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
+index cf80087..ca82bad 100644
+--- a/unit/test-gdbus-client.c
++++ b/unit/test-gdbus-client.c
+@@ -392,6 +392,68 @@ static void client_get_string_property(void)
+ 	destroy_context(context);
+ }
  
- 	err = new_settings(hdev, match.sk);
++static void proxy_get_boolean(GDBusProxy *proxy, void *user_data)
++{
++	struct context *context = user_data;
++	DBusMessageIter iter;
++	dbus_bool_t value;
++
++	if (g_test_verbose())
++		g_print("proxy %s found\n",
++					g_dbus_proxy_get_interface(proxy));
++
++	g_assert(g_dbus_proxy_get_property(proxy, "Boolean", &iter));
++	g_assert(dbus_message_iter_get_arg_type(&iter) == DBUS_TYPE_BOOLEAN);
++
++	dbus_message_iter_get_basic(&iter, &value);
++	g_assert(value == TRUE);
++
++	g_dbus_client_unref(context->dbus_client);
++}
++
++static gboolean get_boolean(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	dbus_bool_t value = TRUE;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
++
++	return TRUE;
++}
++
++static void client_get_boolean_property(void)
++{
++	struct context *context = create_context();
++	static const GDBusPropertyTable boolean_properties[] = {
++		{ "Boolean", "b", get_boolean },
++		{ },
++	};
++
++	if (context == NULL)
++		return;
++
++	g_dbus_register_interface(context->dbus_conn,
++				SERVICE_PATH, SERVICE_NAME,
++				methods, signals, boolean_properties,
++				NULL, NULL);
++
++	context->dbus_client = g_dbus_client_new(context->dbus_conn,
++						SERVICE_NAME, SERVICE_PATH);
++
++	g_dbus_client_set_proxy_handlers(context->dbus_client,
++						proxy_get_boolean,
++						NULL, NULL, context);
++	g_dbus_client_set_disconnect_watch(context->dbus_client,
++						disconnect_handler, context);
++
++	g_main_loop_run(context->main_loop);
++
++	g_dbus_unregister_interface(context->dbus_conn,
++					SERVICE_PATH, SERVICE_NAME);
++
++	destroy_context(context);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	g_test_init(&argc, &argv, NULL);
+@@ -404,6 +466,9 @@ int main(int argc, char *argv[])
+ 	g_test_add_func("/gdbus/client_get_string_property",
+ 						client_get_string_property);
+ 
++	g_test_add_func("/gdbus/client_get_boolean_property",
++						client_get_boolean_property);
++
+ 	g_test_add_func("/gdbus/client_get_dict_property",
+ 						client_get_dict_property);
+ 
 -- 
-1.7.10.4
+1.8.0.2
 
