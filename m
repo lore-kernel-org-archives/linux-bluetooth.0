@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v2] core: Fix allow registering same custom property
-Date: Wed, 16 Jan 2013 18:07:14 +0100
-Message-Id: <1358356034-2622-1-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH] core: Fix allow registering same custom property
+Date: Wed, 16 Jan 2013 17:59:19 +0100
+Message-Id: <1358355559-26975-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -52,7 +52,7 @@ index 4b91656..60a5da5 100644
  						endpoint_properties_get,
  						adapter);
 diff --git a/src/profile.c b/src/profile.c
-index b0c8500..7d48cfc 100644
+index b0c8500..2d0d2ba 100644
 --- a/src/profile.c
 +++ b/src/profile.c
 @@ -572,6 +572,7 @@ struct ext_record {
@@ -69,7 +69,7 @@ index b0c8500..7d48cfc 100644
  
 -static struct btd_profile_custom_property *find_custom_prop(const char *uuid,
 +static struct btd_profile_custom_property *find_custom_prop(const char *key,
-+							const char *uuid,
++				const char *uuid,
  							const char *name)
  {
  	GSList *l;
