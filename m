@@ -1,139 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <B327FC7ABEF3480E9C05E237A509BE46@sisodomain.com>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
- Jaganath Kanakkassery <jaganath.k@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-References: <1358254892-11303-1-git-send-email-jaganath.k@samsung.com>
- <1358254892-11303-3-git-send-email-jaganath.k@samsung.com>
- <1358266671.2445.1.camel@aeonflux>
-In-reply-to: <1358266671.2445.1.camel@aeonflux>
-Subject: Re: [PATCH v3 3/3] Bluetooth: Fix stop discovery while in STARTING
- state
-Date: Wed, 16 Jan 2013 11:33:57 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=UTF-8; reply-type=original
+Date: Tue, 15 Jan 2013 16:36:00 -0800 (PST)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/4] Bluetooth: Fix workqueue related issues
+In-Reply-To: <1358195633-29303-1-git-send-email-johan.hedberg@gmail.com>
+Message-ID: <alpine.DEB.2.02.1301151626330.32732@mathewm-linux>
+References: <1358195633-29303-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
 
---------------------------------------------------
-From: "Marcel Holtmann" <marcel@holtmann.org>
-Sent: Tuesday, January 15, 2013 9:47 PM
-To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v3 3/3] Bluetooth: Fix stop discovery while in STARTING 
-state
+Hi Johan -
 
-> Hi Jaganath,
+On Mon, 14 Jan 2013, Johan Hedberg wrote:
+
+> Hi,
 >
->> If stop_discovery() is called when discovery state is STARTING, it
->> will be failed currently. This patch fixes this.
->>
->> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
->> ---
->>  include/net/bluetooth/hci_core.h |    1 +
->>  net/bluetooth/hci_event.c        |   14 ++++++++++++--
->>  net/bluetooth/mgmt.c             |   12 +++++++++++-
->>  3 files changed, 24 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/net/bluetooth/hci_core.h 
->> b/include/net/bluetooth/hci_core.h
->> index d8f68c7..01c723a 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -64,6 +64,7 @@ struct discovery_state {
->>  DISCOVERY_RESOLVING,
->>  DISCOVERY_STOPPING,
->>  } state;
->> + u8  discovering;
+> I was initially only going to fix the thing in the last patch of this
+> set but after starting to look at the code I found several other issues
+> and hence the rest of the patches.
 >
-> what is this double spaces for? And why not a bool. Or a better name.
+> The first three patches fix work queue handling. We should, whenever
+> possible, avoid the system-global workqueue (the schedule_*work
+> functions) and use hdev-specific ones instead.
 
-I just followed the type of "discovering" in mgmt_discovering(). I am not
-sure why it is u8 and not bool since the possible values are only 0 and 1.
-If you are ok with bool I will raise a separate patch to first change the 
-type
-of discovering in mgmt_discovering() and also in struct mgmt_ev_discovering.
+There are also multiple system workqueues beyond the default 
+system_wq, like system_long_wq and system_unbound_wq.  Those may be a 
+better fit and you wouldn't have to manage additional per-device 
+workqueues.
 
->>  struct list_head all; /* All devices found during inquiry */
->>  struct list_head unknown; /* Name state not known */
->>  struct list_head resolve; /* Name needs to be resolved */
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index 97b4828..c616cbf 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -1259,7 +1259,12 @@ static void hci_cc_le_set_scan_enable(struct 
->> hci_dev *hdev,
->>  set_bit(HCI_LE_SCAN, &hdev->dev_flags);
->>
->>  hci_dev_lock(hdev);
->> - hci_discovery_set_state(hdev, DISCOVERY_FINDING);
->> + if (hdev->discovery.state == DISCOVERY_STOPPING) {
->> + hci_cancel_le_scan(hdev);
->> + mgmt_start_discovery_cancelled(hdev);
->> + } else {
->> + hci_discovery_set_state(hdev, DISCOVERY_FINDING);
->> + }
->>  hci_dev_unlock(hdev);
->>  break;
->>
->> @@ -1375,7 +1380,12 @@ static void hci_cs_inquiry(struct hci_dev *hdev, 
->> __u8 status)
->>  set_bit(HCI_INQUIRY, &hdev->flags);
->>
->>  hci_dev_lock(hdev);
->> - hci_discovery_set_state(hdev, DISCOVERY_FINDING);
->> + if (hdev->discovery.state == DISCOVERY_STOPPING) {
->> + hci_cancel_inquiry(hdev);
->> + mgmt_start_discovery_cancelled(hdev);
->> + } else {
->> + hci_discovery_set_state(hdev, DISCOVERY_FINDING);
->> + }
->>  hci_dev_unlock(hdev);
->>  }
->>
->> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->> index 0db9d66..6dc275f 100644
->> --- a/net/bluetooth/mgmt.c
->> +++ b/net/bluetooth/mgmt.c
->> @@ -2394,7 +2394,8 @@ static int stop_discovery(struct sock *sk, struct 
->> hci_dev *hdev, void *data,
->>
->>  hci_dev_lock(hdev);
->>
->> - if (!hci_discovery_active(hdev)) {
->> + if (hdev->discovery.state != DISCOVERY_STARTING &&
->> +     !hci_discovery_active(hdev)) {
->>  err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY,
->>     MGMT_STATUS_REJECTED, &mgmt_cp->type,
->>     sizeof(mgmt_cp->type));
->> @@ -2442,6 +2443,10 @@ static int stop_discovery(struct sock *sk, struct 
->> hci_dev *hdev, void *data,
->>
->>  break;
->>
->> + case DISCOVERY_STARTING:
->> + err = 0;
->> + break;
->> +
->>  default:
->>  BT_DBG("unknown discovery state %u", hdev->discovery.state);
->>  err = -EFAULT;
->> @@ -3720,6 +3725,11 @@ int mgmt_discovering(struct hci_dev *hdev, u8 
->> discovering)
->>  mgmt_pending_remove(cmd);
->>  }
->>
->> + if (hdev->discovery.discovering == discovering)
->> + return 0;
->> +
->> + hdev->discovery.discovering = discovering;
->> +
->>  memset(&ev, 0, sizeof(ev));
->>  ev.type = hdev->discovery.type;
->>  ev.discovering = discovering;
+> However, we can't use
+> hci_request() with the usual workqueue since that would block e.g.
+> hci_send_cmd from completing so a second work queue is needed.
 >
+> The last patch fixes a race with setting the scan mode that I was
+> seeing every once in a while through a connectable or discoverable test
+> case of mgmt-tester failing. There are several other HCI commands with
+> the same potential issue (like the class of device and the local name)
+> but I haven't gotten around to fixing those yet.
 
-Thanks,
-Jaganath 
+Regards,
+
+--
+Mat Martineau
+
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, hosted by The Linux Foundation
+
+
