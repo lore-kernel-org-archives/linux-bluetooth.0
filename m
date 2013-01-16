@@ -1,85 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Kling, Andreas" <Andreas.Kling@peiker.de>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 16 Jan 2013 12:02:55 +0100
-Subject: bluez: atomic operations
-Message-ID: <sig.6728472516.B3F251FD87EC894A88C2221EEEBDF54807096F7F3B@Exchange>
-Content-Type: multipart/mixed;
-	boundary="_003_B3F251FD87EC894A88C2221EEEBDF54807096F7F3BExchange_"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-id: <B327FC7ABEF3480E9C05E237A509BE46@sisodomain.com>
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Jaganath Kanakkassery <jaganath.k@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <1358254892-11303-1-git-send-email-jaganath.k@samsung.com>
+ <1358254892-11303-3-git-send-email-jaganath.k@samsung.com>
+ <1358266671.2445.1.camel@aeonflux>
+In-reply-to: <1358266671.2445.1.camel@aeonflux>
+Subject: Re: [PATCH v3 3/3] Bluetooth: Fix stop discovery while in STARTING
+ state
+Date: Wed, 16 Jan 2013 11:33:57 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=UTF-8; reply-type=original
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---_003_B3F251FD87EC894A88C2221EEEBDF54807096F7F3BExchange_
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Hi Marcel,
 
-Hi,
+--------------------------------------------------
+From: "Marcel Holtmann" <marcel@holtmann.org>
+Sent: Tuesday, January 15, 2013 9:47 PM
+To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v3 3/3] Bluetooth: Fix stop discovery while in STARTING 
+state
 
-using gcc atomic buildins breaks support for older gcc/platforms.
+> Hi Jaganath,
+>
+>> If stop_discovery() is called when discovery state is STARTING, it
+>> will be failed currently. This patch fixes this.
+>>
+>> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
+>> ---
+>>  include/net/bluetooth/hci_core.h |    1 +
+>>  net/bluetooth/hci_event.c        |   14 ++++++++++++--
+>>  net/bluetooth/mgmt.c             |   12 +++++++++++-
+>>  3 files changed, 24 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/include/net/bluetooth/hci_core.h 
+>> b/include/net/bluetooth/hci_core.h
+>> index d8f68c7..01c723a 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -64,6 +64,7 @@ struct discovery_state {
+>>  DISCOVERY_RESOLVING,
+>>  DISCOVERY_STOPPING,
+>>  } state;
+>> + u8  discovering;
+>
+> what is this double spaces for? And why not a bool. Or a better name.
 
-src/bluetoothd-adapter.o: In function `btd_adapter_unref':
-adapter.c:(.text+0x63f8): undefined reference to `__sync_sub_and_fetch_4'
+I just followed the type of "discovering" in mgmt_discovering(). I am not
+sure why it is u8 and not bool since the possible values are only 0 and 1.
+If you are ok with bool I will raise a separate patch to first change the 
+type
+of discovering in mgmt_discovering() and also in struct mgmt_ev_discovering.
 
-I suggest to use glib g_atomic_* group of functions.
-They fall back to traditional locking if buildins are not available.
+>>  struct list_head all; /* All devices found during inquiry */
+>>  struct list_head unknown; /* Name state not known */
+>>  struct list_head resolve; /* Name needs to be resolved */
+>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>> index 97b4828..c616cbf 100644
+>> --- a/net/bluetooth/hci_event.c
+>> +++ b/net/bluetooth/hci_event.c
+>> @@ -1259,7 +1259,12 @@ static void hci_cc_le_set_scan_enable(struct 
+>> hci_dev *hdev,
+>>  set_bit(HCI_LE_SCAN, &hdev->dev_flags);
+>>
+>>  hci_dev_lock(hdev);
+>> - hci_discovery_set_state(hdev, DISCOVERY_FINDING);
+>> + if (hdev->discovery.state == DISCOVERY_STOPPING) {
+>> + hci_cancel_le_scan(hdev);
+>> + mgmt_start_discovery_cancelled(hdev);
+>> + } else {
+>> + hci_discovery_set_state(hdev, DISCOVERY_FINDING);
+>> + }
+>>  hci_dev_unlock(hdev);
+>>  break;
+>>
+>> @@ -1375,7 +1380,12 @@ static void hci_cs_inquiry(struct hci_dev *hdev, 
+>> __u8 status)
+>>  set_bit(HCI_INQUIRY, &hdev->flags);
+>>
+>>  hci_dev_lock(hdev);
+>> - hci_discovery_set_state(hdev, DISCOVERY_FINDING);
+>> + if (hdev->discovery.state == DISCOVERY_STOPPING) {
+>> + hci_cancel_inquiry(hdev);
+>> + mgmt_start_discovery_cancelled(hdev);
+>> + } else {
+>> + hci_discovery_set_state(hdev, DISCOVERY_FINDING);
+>> + }
+>>  hci_dev_unlock(hdev);
+>>  }
+>>
+>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+>> index 0db9d66..6dc275f 100644
+>> --- a/net/bluetooth/mgmt.c
+>> +++ b/net/bluetooth/mgmt.c
+>> @@ -2394,7 +2394,8 @@ static int stop_discovery(struct sock *sk, struct 
+>> hci_dev *hdev, void *data,
+>>
+>>  hci_dev_lock(hdev);
+>>
+>> - if (!hci_discovery_active(hdev)) {
+>> + if (hdev->discovery.state != DISCOVERY_STARTING &&
+>> +     !hci_discovery_active(hdev)) {
+>>  err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY,
+>>     MGMT_STATUS_REJECTED, &mgmt_cp->type,
+>>     sizeof(mgmt_cp->type));
+>> @@ -2442,6 +2443,10 @@ static int stop_discovery(struct sock *sk, struct 
+>> hci_dev *hdev, void *data,
+>>
+>>  break;
+>>
+>> + case DISCOVERY_STARTING:
+>> + err = 0;
+>> + break;
+>> +
+>>  default:
+>>  BT_DBG("unknown discovery state %u", hdev->discovery.state);
+>>  err = -EFAULT;
+>> @@ -3720,6 +3725,11 @@ int mgmt_discovering(struct hci_dev *hdev, u8 
+>> discovering)
+>>  mgmt_pending_remove(cmd);
+>>  }
+>>
+>> + if (hdev->discovery.discovering == discovering)
+>> + return 0;
+>> +
+>> + hdev->discovery.discovering = discovering;
+>> +
+>>  memset(&ev, 0, sizeof(ev));
+>>  ev.type = hdev->discovery.type;
+>>  ev.discovering = discovering;
+>
 
-kind regrads
-
-andy=
-
---_003_B3F251FD87EC894A88C2221EEEBDF54807096F7F3BExchange_
-Content-Type: text/x-patch;
-	name="0001-shared-use-g_atomic_-functions-for-ref-counts.patch"
-Content-Description: 0001-shared-use-g_atomic_-functions-for-ref-counts.patch
-Content-Disposition: attachment;
-	filename="0001-shared-use-g_atomic_-functions-for-ref-counts.patch";
-	size=872; creation-date="Wed, 16 Jan 2013 11:05:40 GMT";
-	modification-date="Wed, 16 Jan 2013 11:05:40 GMT"
-Content-Transfer-Encoding: base64
-
-RnJvbSA3YmVmODQ5MGJhNTBiMDNjZTIwNDg0NGVmOGM2M2M5ZGE5MTBiNWY0IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBBbmRyZWFzIEtsaW5nIDxBbmRyZWFzLktsaW5nQHBlaWtlci5k
-ZT4KRGF0ZTogV2VkLCAxNiBKYW4gMjAxMyAxMTo0NDowNyArMDEwMApTdWJqZWN0OiBbUEFUQ0gg
-MS8yXSBzaGFyZWQ6IHVzZSBnX2F0b21pY18qIGZ1bmN0aW9ucyBmb3IgcmVmIGNvdW50cwoKLS0t
-CiBzcmMvc2hhcmVkL21nbXQuYyB8ICAgIDQgKystLQogMSBmaWxlcyBjaGFuZ2VkLCAyIGluc2Vy
-dGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvc3JjL3NoYXJlZC9tZ210LmMg
-Yi9zcmMvc2hhcmVkL21nbXQuYwppbmRleCBmOTY4OTdkLi5lYjFhNDhhIDEwMDY0NAotLS0gYS9z
-cmMvc2hhcmVkL21nbXQuYworKysgYi9zcmMvc2hhcmVkL21nbXQuYwpAQCAtNDEwLDcgKzQxMCw3
-IEBAIHN0cnVjdCBtZ210ICptZ210X3JlZihzdHJ1Y3QgbWdtdCAqbWdtdCkKIAlpZiAoIW1nbXQp
-CiAJCXJldHVybiBOVUxMOwogCi0JX19zeW5jX2ZldGNoX2FuZF9hZGQoJm1nbXQtPnJlZl9jb3Vu
-dCwgMSk7CisJZ19hdG9taWNfaW50X2luYygmbWdtdC0+cmVmX2NvdW50KTsKIAogCXJldHVybiBt
-Z210OwogfQpAQCAtNDIwLDcgKzQyMCw3IEBAIHZvaWQgbWdtdF91bnJlZihzdHJ1Y3QgbWdtdCAq
-bWdtdCkKIAlpZiAoIW1nbXQpCiAJCXJldHVybjsKIAotCWlmIChfX3N5bmNfc3ViX2FuZF9mZXRj
-aCgmbWdtdC0+cmVmX2NvdW50LCAxKSkKKwlpZiAoIWdfYXRvbWljX2ludF9kZWNfYW5kX3Rlc3Qo
-Jm1nbXQtPnJlZl9jb3VudCkpCiAJCXJldHVybjsKIAogCW1nbXRfdW5yZWdpc3Rlcl9hbGwobWdt
-dCk7Ci0tIAoxLjcuMi41Cgo=
-
---_003_B3F251FD87EC894A88C2221EEEBDF54807096F7F3BExchange_
-Content-Type: text/x-patch;
-	name="0002-adapter-use-g_atomic_-functions-for-ref-counts.patch"
-Content-Description: 0002-adapter-use-g_atomic_-functions-for-ref-counts.patch
-Content-Disposition: attachment;
-	filename="0002-adapter-use-g_atomic_-functions-for-ref-counts.patch";
-	size=888; creation-date="Wed, 16 Jan 2013 11:05:49 GMT";
-	modification-date="Wed, 16 Jan 2013 11:05:49 GMT"
-Content-Transfer-Encoding: base64
-
-RnJvbSBjYmEwN2M3MTVhNmRlNGY3ZmQyOTc3MjNlMmI5OTFlZTMyYTJjYTc2IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBBbmRyZWFzIEtsaW5nIDxBbmRyZWFzLktsaW5nQHBlaWtlci5k
-ZT4KRGF0ZTogV2VkLCAxNiBKYW4gMjAxMyAxMTo0NjoyMCArMDEwMApTdWJqZWN0OiBbUEFUQ0gg
-Mi8yXSBhZGFwdGVyOiB1c2UgZ19hdG9taWNfKiBmdW5jdGlvbnMgZm9yIHJlZiBjb3VudHMKCi0t
-LQogc3JjL2FkYXB0ZXIuYyB8ICAgIDQgKystLQogMSBmaWxlcyBjaGFuZ2VkLCAyIGluc2VydGlv
-bnMoKyksIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvc3JjL2FkYXB0ZXIuYyBiL3NyYy9h
-ZGFwdGVyLmMKaW5kZXggMWE1YjFhZC4uZTM4ZDU0YyAxMDA2NDQKLS0tIGEvc3JjL2FkYXB0ZXIu
-YworKysgYi9zcmMvYWRhcHRlci5jCkBAIC0yNjI5LDE0ICsyNjI5LDE0IEBAIHN0YXRpYyB2b2lk
-IGFkYXB0ZXJfZnJlZShncG9pbnRlciB1c2VyX2RhdGEpCiAKIHN0cnVjdCBidGRfYWRhcHRlciAq
-YnRkX2FkYXB0ZXJfcmVmKHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlcikKIHsKLQlfX3N5bmNf
-ZmV0Y2hfYW5kX2FkZCgmYWRhcHRlci0+cmVmX2NvdW50LCAxKTsKKwlnX2F0b21pY19pbnRfaW5j
-KCZhZGFwdGVyLT5yZWZfY291bnQpOwogCiAJcmV0dXJuIGFkYXB0ZXI7CiB9CiAKIHZvaWQgYnRk
-X2FkYXB0ZXJfdW5yZWYoc3RydWN0IGJ0ZF9hZGFwdGVyICphZGFwdGVyKQogewotCWlmIChfX3N5
-bmNfc3ViX2FuZF9mZXRjaCgmYWRhcHRlci0+cmVmX2NvdW50LCAxKSkKKwlpZiAoIWdfYXRvbWlj
-X2ludF9kZWNfYW5kX3Rlc3QoJmFkYXB0ZXItPnJlZl9jb3VudCkpCiAJCXJldHVybjsKIAogCWlm
-ICghYWRhcHRlci0+cGF0aCkgewotLSAKMS43LjIuNQoK
-
---_003_B3F251FD87EC894A88C2221EEEBDF54807096F7F3BExchange_--
+Thanks,
+Jaganath 
