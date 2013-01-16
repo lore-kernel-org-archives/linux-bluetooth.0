@@ -1,199 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/5] unit: Add gdbus/client_get_dict_property
-Date: Wed, 16 Jan 2013 15:54:36 +0200
-Message-Id: <1358344480-23777-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 16 Jan 2013 14:36:07 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/2] unit: Add {TEXT,URL}_STR{8,16} tests for
+ sdp_extract_attr()
+Message-ID: <20130116123607.GA12158@x220>
+References: <1357867322-31384-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1357867322-31384-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Lizardo,
 
----
- unit/test-gdbus-client.c | 150 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 150 insertions(+)
+On Thu, Jan 10, 2013, Anderson Lizardo wrote:
+> These tests are for valid data. Other tests might be added later to
+> check for error paths, but will require separate macros.
+> 
+> {TEXT,URL}_STR32 cannot be tested with the same macros because
+> sdp_extract_attr() does not support them. They will be tested
+> separately with other SDP library functions.
+> 
+> As example of failure output, if commit
+> 504a0cf46ad89cab8005ce9cffb22e41048f6a30 is reverted for testing, the
+> STR16 test will fail with:
+> 
+> ERROR:unit/test-sdp.c:776:test_sdp_de_attr: assertion failed
+> (test->input_size == size): (7 == 11)
+> ---
+>  unit/test-sdp.c |   78 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 78 insertions(+)
 
-diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
-index 34c714e..075af6a 100644
---- a/unit/test-gdbus-client.c
-+++ b/unit/test-gdbus-client.c
-@@ -81,6 +81,8 @@ static struct context *create_context(void)
- 	/* Avoid D-Bus library calling _exit() before next test finishes. */
- 	dbus_connection_set_exit_on_disconnect(context->dbus_conn, FALSE);
- 
-+	g_dbus_attach_object_manager(context->dbus_conn);
-+
- 	return context;
- }
- 
-@@ -89,6 +91,8 @@ static void destroy_context(struct context *context)
- 	if (context == NULL)
- 		return;
- 
-+	g_dbus_detach_object_manager(context->dbus_conn);
-+
- 	dbus_connection_flush(context->dbus_conn);
- 	dbus_connection_close(context->dbus_conn);
- 
-@@ -184,6 +188,149 @@ static void client_connect_disconnect(void)
- 	destroy_context(context);
- }
- 
-+static void append_variant(DBusMessageIter *iter, int type, void *val)
-+{
-+	DBusMessageIter value;
-+	char sig[2] = { type, '\0' };
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT, sig, &value);
-+
-+	dbus_message_iter_append_basic(&value, type, val);
-+
-+	dbus_message_iter_close_container(iter, &value);
-+}
-+
-+static void dict_append_entry(DBusMessageIter *dict, const char *key, int type,
-+								void *val)
-+{
-+	DBusMessageIter entry;
-+
-+	if (type == DBUS_TYPE_STRING) {
-+		const char *str = *((const char **) val);
-+		if (str == NULL)
-+			return;
-+	}
-+
-+	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
-+							NULL, &entry);
-+
-+	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
-+
-+	append_variant(&entry, type, val);
-+
-+	dbus_message_iter_close_container(dict, &entry);
-+}
-+
-+static gboolean get_dict(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	DBusMessageIter dict;
-+	const char *string = "value";
-+	dbus_bool_t boolean = TRUE;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
-+			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
-+
-+	dict_append_entry(&dict, "String", DBUS_TYPE_STRING, &string);
-+	dict_append_entry(&dict, "Boolean", DBUS_TYPE_BOOLEAN, &boolean);
-+
-+	dbus_message_iter_close_container(iter, &dict);
-+
-+	return TRUE;
-+}
-+
-+static void proxy_get_dict(GDBusProxy *proxy, void *user_data)
-+{
-+	struct context *context = user_data;
-+	DBusMessageIter iter, dict, var1, var2, entry1, entry2;
-+	const char *string;
-+	dbus_bool_t boolean;
-+
-+	if (g_test_verbose())
-+		g_print("proxy %s found\n",
-+					g_dbus_proxy_get_interface(proxy));
-+
-+	g_assert(g_dbus_proxy_get_property(proxy, "Dict", &iter));
-+	g_assert(dbus_message_iter_get_arg_type(&iter) == DBUS_TYPE_ARRAY);
-+
-+	dbus_message_iter_recurse(&iter, &dict);
-+	g_assert(dbus_message_iter_get_arg_type(&dict) ==
-+							DBUS_TYPE_DICT_ENTRY);
-+
-+	dbus_message_iter_recurse(&dict, &entry1);
-+	g_assert(dbus_message_iter_get_arg_type(&entry1) == DBUS_TYPE_STRING);
-+
-+	dbus_message_iter_get_basic(&entry1, &string);
-+	g_assert(g_strcmp0(string, "String") == 0);
-+
-+	dbus_message_iter_next(&entry1);
-+	g_assert(dbus_message_iter_get_arg_type(&entry1) == DBUS_TYPE_VARIANT);
-+
-+	dbus_message_iter_recurse(&entry1, &var1);
-+	g_assert(dbus_message_iter_get_arg_type(&var1) == DBUS_TYPE_STRING);
-+
-+	dbus_message_iter_get_basic(&var1, &string);
-+	g_assert(g_strcmp0(string, "value") == 0);
-+
-+	dbus_message_iter_next(&dict);
-+	g_assert(dbus_message_iter_get_arg_type(&dict) ==
-+							DBUS_TYPE_DICT_ENTRY);
-+
-+	dbus_message_iter_recurse(&dict, &entry2);
-+	g_assert(dbus_message_iter_get_arg_type(&entry2) == DBUS_TYPE_STRING);
-+
-+	dbus_message_iter_get_basic(&entry2, &string);
-+	g_assert(g_strcmp0(string, "Boolean") == 0);
-+
-+	dbus_message_iter_next(&entry2);
-+	g_assert(dbus_message_iter_get_arg_type(&entry2) == DBUS_TYPE_VARIANT);
-+
-+	dbus_message_iter_recurse(&entry2, &var2);
-+	g_assert(dbus_message_iter_get_arg_type(&var2) == DBUS_TYPE_BOOLEAN);
-+
-+	dbus_message_iter_get_basic(&var2, &boolean);
-+	g_assert(boolean == TRUE);
-+
-+	dbus_message_iter_next(&dict);
-+	g_assert(dbus_message_iter_get_arg_type(&dict) == DBUS_TYPE_INVALID);
-+
-+	g_dbus_client_unref(context->dbus_client);
-+}
-+
-+static void client_get_dict_property(void)
-+{
-+	struct context *context = create_context();
-+	static const GDBusPropertyTable dict_properties[] = {
-+		{ "Dict", "a{sv}", get_dict },
-+		{ },
-+	};
-+
-+	if (context == NULL)
-+		return;
-+
-+	g_dbus_register_interface(context->dbus_conn,
-+				SERVICE_PATH, SERVICE_NAME,
-+				methods, signals, dict_properties,
-+				NULL, NULL);
-+
-+	context->dbus_client = g_dbus_client_new(context->dbus_conn,
-+						SERVICE_NAME, SERVICE_PATH);
-+
-+	g_dbus_client_set_disconnect_watch(context->dbus_client,
-+						disconnect_handler, context);
-+	g_dbus_client_set_proxy_handlers(context->dbus_client, proxy_get_dict,
-+						NULL, NULL, context);
-+
-+	g_main_loop_run(context->main_loop);
-+
-+	g_dbus_unregister_interface(context->dbus_conn,
-+					SERVICE_PATH, SERVICE_NAME);
-+
-+	destroy_context(context);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	g_test_init(&argc, &argv, NULL);
-@@ -193,5 +340,8 @@ int main(int argc, char *argv[])
- 	g_test_add_func("/gdbus/client_connect_disconnect",
- 						client_connect_disconnect);
- 
-+	g_test_add_func("/gdbus/client_get_dict_property",
-+						client_get_dict_property);
-+
- 	return g_test_run();
- }
--- 
-1.8.0.2
+Both patches have been applied. Thanks.
 
+Johan
