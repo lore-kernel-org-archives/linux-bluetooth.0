@@ -1,36 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 18 Jan 2013 03:07:25 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/4] Bluetooth: Fix using system-global workqueue when
- not necessary
-Message-ID: <20130118050725.GA13059@joana>
-References: <1358195633-29303-1-git-send-email-johan.hedberg@gmail.com>
- <1358195633-29303-4-git-send-email-johan.hedberg@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1358195633-29303-4-git-send-email-johan.hedberg@gmail.com>
+Message-ID: <1358460154.2089.14.camel@aeonflux>
+Subject: Thoughts about LE scanning
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Date: Thu, 17 Jan 2013 14:02:34 -0800
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hello,
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2013-01-14 22:33:52 +0200]:
+so I have been looking into how we handle LE scanning in central role a
+little bit. And I am not really happy with what we do right now. Instead
+of just adding new profiles, we need to take one step back and get the
+basics right.
 
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> There's a per-HCI device workqueue (hdev->workqueue) that should be used
-> for general per-HCI device work (except hdev->req_workqueue that's for
-> hci_request() related work). This patch fixes places using the
-> system-global work queue and makes them use the hdev->workqueue instead.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  net/bluetooth/hci_core.c |    4 ++--
->  net/bluetooth/mgmt.c     |    3 ++-
->  2 files changed, 4 insertions(+), 3 deletions(-)
+The one thing that I stumbled about is that we are trying to use the
+Start Discovery management command to scan for connectable device that
+we are paired with. And it is all triggered by bluetoothd. It tries to
+get this done right, but fails badly at it. Trying to do this ends up in
+a convoluted solution that will just break down eventually.
 
-Patches 1 to 3 have been applied to bluetooth-next. Thanks.
+So Start Discovery and Stop Discovery management commands are for
+finding new devices. They are for finding devices that we want to pair
+with. They are not for checking if a paired device is in range or
+signals connection requests to us. It is called discovery for a reason.
 
-	Gustavo
+It might have looked like a good idea to just re-use these two commands,
+but what I am seeing when working with multiple paired LE devices is
+just a big mess. The amount of code that is needed to keep track of
+states between running D-Bus commands for discovery, discovery triggered
+management commands, scanning triggered management commands etc. is not
+a good idea.
+
+I am failing to understand why we tried to solve this inside bluetoothd
+and not just let the kernel take full control here. We are loading the
+list of paired LE devices at controller power on anyway. So the kernel
+does know about our paired devices. It can control sensible scan
+intervals and also sync a device discovery with scanning for connection
+triggers from know remote devices. It also can sensible disconnect on
+idle and scan for other devices that requests connections.
+
+What I think we should have is a management command that allows us to
+load device specific scan parameter configuration into the kernel. And
+then the kernel will execute this on our behalf. We need to decouple the
+commands for device discovery from the commands that scan for known
+devices.
+
+Seems also we should actually implement the scan parameters service as a
+core feature of bluetoothd and not just a plugin. For me it looks like
+it essential that we allow different behavior for different devices.
+
+Regards
+
+Marcel
+
+
