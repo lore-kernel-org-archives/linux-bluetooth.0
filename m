@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1358431930.3059.16.camel@aeonflux>
-Subject: Re: [PATCH 2/5] Bluetooth: Add setsockopt for SCO socket mode
+Message-ID: <1358431772.3059.13.camel@aeonflux>
+Subject: Re: [PATCH 1/5] Bluetooth: Add option for SCO socket mode
 From: Marcel Holtmann <marcel@holtmann.org>
 To: =?ISO-8859-1?Q?Fr=E9d=E9ric?= Dalleau
 	<frederic.dalleau@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 17 Jan 2013 06:12:10 -0800
-In-Reply-To: <1358426389-25903-3-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Thu, 17 Jan 2013 06:09:32 -0800
+In-Reply-To: <1358426389-25903-2-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1358426389-25903-1-git-send-email-frederic.dalleau@linux.intel.com>
-	 <1358426389-25903-3-git-send-email-frederic.dalleau@linux.intel.com>
+	 <1358426389-25903-2-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,46 +16,34 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Fred,
 
-> This patch implements setsockopt().
-
-not acceptable commit message.
-
+> This patch extends the current SCO socket option to add a 'mode' field. This
+> field is intended to choose data type at runtime. Current modes are CVSD and
+> transparent SCO, but adding new modes could allow support for CSA2 and fine
+> tuning a sco connection, for example latency, bandwith, voice setting. Incoming
+> connections will be setup during defered setup. Outgoing connections have to
+> be setup before connect(). The selected type is stored in the sco socket info.
+> This patch declares needed members and implements getsockopt().
 > ---
->  net/bluetooth/sco.c |   44 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 44 insertions(+)
+>  include/net/bluetooth/sco.h |   20 ++++++++++++++++++++
+>  net/bluetooth/sco.c         |    3 +++
+>  2 files changed, 23 insertions(+)
 > 
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index bdb21b2..22ad5fa 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -678,6 +678,47 @@ static int sco_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
->  	return bt_sock_recvmsg(iocb, sock, msg, len, flags);
->  }
+> diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
+> index 1e35c43..bc5d3d6 100644
+> --- a/include/net/bluetooth/sco.h
+> +++ b/include/net/bluetooth/sco.h
+> @@ -41,8 +41,27 @@ struct sockaddr_sco {
 >  
-> +static int sco_sock_setsockopt_old(struct socket *sock, int optname,
-> +				   char __user *optval, unsigned int optlen)
-> +{
-> +	struct sock *sk = sock->sk;
-> +	struct sco_options opts;
-> +	int len, err = 0;
+>  /* SCO socket options */
+>  #define SCO_OPTIONS	0x01
 > +
-> +	BT_DBG("sk %p", sk);
+> +#define SCO_MODE_CVSD		0x00
+> +#define SCO_MODE_TRANSPARENT	0x01
+> +#define SCO_MODE_ENHANCED	0x02
 > +
-> +	lock_sock(sk);
-> +
-> +	switch (optname) {
-> +	case SCO_OPTIONS:
-> +		if (sk->sk_state != BT_OPEN &&
-> +		    sk->sk_state != BT_BOUND &&
-> +		    sk->sk_state != BT_CONNECT2) {
-> +			err = -EINVAL;
-> +			break;
-> +		}
-> +
-> +		opts.mode = SCO_MODE_CVSD;
 
-Don't we need to set a opts.mtu here as well? This is user input. So we
-need to be 100% sure to verify it.
+I do not like this enhanced magic. How is this suppose to work? And it
+is also not explained in the commit message. Or used in this patch.
 
 Regards
 
