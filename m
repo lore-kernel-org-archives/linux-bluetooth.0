@@ -1,40 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 01/10] Bluetooth: Fix checking for correct mgmt_load_link_keys parameters
-Date: Fri, 18 Jan 2013 15:25:49 +0200
-Message-Id: <1358515558-17861-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1358515558-17861-1-git-send-email-johan.hedberg@gmail.com>
-References: <1358515558-17861-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 00/10] Bluetooth: Fix more mgmt parameter checks
+Date: Fri, 18 Jan 2013 15:25:48 +0200
+Message-Id: <1358515558-17861-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-The debug_keys parameter is only allowed to have the values 0x00 and
-0x01. Any other value should result in a proper command status with
-MGMT_STATUS_INVALID_PARAMS.
+This patch set is intended to be applied after Szymon's "Bluetooth: Fix
+pair device command reply if adapter is powered off" patch.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c |    4 ++++
- 1 file changed, 4 insertions(+)
+This set includes fixes to improve the validity checks on parameters we
+receive from user space in mgmt commands. Each of these fixes has had
+its own test case added to the user space mgmt-tester and has been
+verified to work.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 36b2310..d9b042e 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1519,6 +1519,10 @@ static int load_link_keys(struct sock *sk, struct hci_dev *hdev, void *data,
- 				  MGMT_STATUS_INVALID_PARAMS);
- 	}
- 
-+	if (cp->debug_keys != 0x00 && cp->debug_keys != 0x01)
-+		return cmd_status(sk, hdev->id, MGMT_OP_LOAD_LINK_KEYS,
-+				  MGMT_STATUS_INVALID_PARAMS);
-+
- 	BT_DBG("%s debug_keys %u key_count %u", hdev->name, cp->debug_keys,
- 	       key_count);
- 
--- 
-1.7.10.4
+Johan
 
