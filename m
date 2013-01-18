@@ -1,169 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1358356034-2622-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1358356034-2622-1-git-send-email-frederic.dalleau@linux.intel.com>
-Date: Fri, 18 Jan 2013 11:08:23 +0200
-Message-ID: <CABBYNZLj2tH=XTegmqAnYJpoCChOYjJU7ax0EzxrJ8O6y-es7A@mail.gmail.com>
-Subject: Re: [PATCH v2] core: Fix allow registering same custom property
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1358495893.5510.0.camel@aeonflux>
+Subject: Re: [PATCH] bluetooth: btmrvl_sdio: look for sd8688 firmware in
+ proper location
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lubomir Rintel <lkundrak@v3.sk>
+Cc: Bing Zhao <bzhao@marvell.com>, Ben Hutchings <ben@decadent.org.uk>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	libertas-dev@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Date: Thu, 17 Jan 2013 23:58:13 -0800
+In-Reply-To: <1358494643-29765-1-git-send-email-lkundrak@v3.sk>
+References: <477F20668A386D41ADCC57781B1F70430D13FDB783@SC-VEXCH1.marvell.com>
+	 <1358494643-29765-1-git-send-email-lkundrak@v3.sk>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frederic,
+Hi Lubumir,
 
-On Wed, Jan 16, 2013 at 7:07 PM, Frédéric Dalleau
-<frederic.dalleau@linux.intel.com> wrote:
-> With several adapters, MediaEndpoint custom property is only created for the
-> first adapter. When a new connection happens on another adapter
-> btd_profile_custom_property_exists fails because the custom property doesn't
-> exist for this last adapter. In case of HFP ofono fails with error: "Media
-> Endpoint missing error".
->
-> This patch allows the creation of several custom property with same name that
-> can be distinguished based on a 'key'. When querying the property, additional
-> checking must happen. For example endpoint_properties_exists, compares
-> btd_adapter.
-> 'NULL' key maintains existing behavior.
+proper commit message with explanation here please.
+
+> Signed-off-by: Lubomir Rintel <lkundrak@v3.sk>
 > ---
->  profiles/audio/media.c |    5 +++--
->  src/profile.c          |   22 ++++++++++++++++------
->  src/profile.h          |    6 ++++--
->  3 files changed, 23 insertions(+), 10 deletions(-)
->
-> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-> index 4b91656..60a5da5 100644
-> --- a/profiles/audio/media.c
-> +++ b/profiles/audio/media.c
-> @@ -195,7 +195,7 @@ static void media_endpoint_remove(struct media_endpoint *endpoint)
->
->         if (media_adapter_find_endpoint(adapter, NULL, NULL,
->                                                 endpoint->uuid) == NULL)
-> -               btd_profile_remove_custom_prop(endpoint->uuid,
-> +               btd_profile_remove_custom_prop(adapter, endpoint->uuid,
->                                                         "MediaEndpoints");
->
->         media_endpoint_destroy(endpoint);
-> @@ -740,7 +740,8 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
->                                                 endpoint, NULL);
->
->         if (media_adapter_find_endpoint(adapter, NULL, NULL, uuid) == NULL) {
-> -               btd_profile_add_custom_prop(uuid, "a{sv}", "MediaEndpoints",
-> +               btd_profile_add_custom_prop(adapter, uuid, "a{sv}",
-> +                                               "MediaEndpoints",
->                                                 endpoint_properties_exists,
->                                                 endpoint_properties_get,
->                                                 adapter);
-> diff --git a/src/profile.c b/src/profile.c
-> index b0c8500..7d48cfc 100644
-> --- a/src/profile.c
-> +++ b/src/profile.c
-> @@ -572,6 +572,7 @@ struct ext_record {
+>  drivers/bluetooth/btmrvl_sdio.c |    8 ++++----
+>  drivers/bluetooth/btmrvl_sdio.h |    6 ++++--
+>  2 files changed, 8 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+> index 3f4bfc8..bc27d01 100644
+> --- a/drivers/bluetooth/btmrvl_sdio.c
+> +++ b/drivers/bluetooth/btmrvl_sdio.c
+> @@ -83,8 +83,8 @@ static const struct btmrvl_sdio_card_reg btmrvl_reg_87xx = {
 >  };
->
->  struct btd_profile_custom_property {
-> +       const void *key;
->         char *uuid;
->         char *type;
->         char *name;
-> @@ -2208,7 +2209,8 @@ static const GDBusMethodTable methods[] = {
->         { }
+>  
+>  static const struct btmrvl_sdio_device btmrvl_sdio_sd8688 = {
+> -	.helper		= "sd8688_helper.bin",
+> -	.firmware	= "sd8688.bin",
+> +	.helper		= "mrvl/sd8688_helper.bin",
+> +	.firmware	= "mrvl/sd8688.bin",
+>  	.reg		= &btmrvl_reg_8688,
+>  	.sd_blksz_fw_dl	= 64,
 >  };
->
-> -static struct btd_profile_custom_property *find_custom_prop(const char *uuid,
-> +static struct btd_profile_custom_property *find_custom_prop(const char *key,
-> +                                                       const char *uuid,
->                                                         const char *name)
->  {
->         GSList *l;
-> @@ -2216,6 +2218,9 @@ static struct btd_profile_custom_property *find_custom_prop(const char *uuid,
->         for (l = custom_props; l; l = l->next) {
->                 struct btd_profile_custom_property *prop = l->data;
->
-> +               if (prop->key != key)
-> +                       continue;
-> +
->                 if (strcasecmp(prop->uuid, uuid) != 0)
->                         continue;
->
-> @@ -2226,7 +2231,8 @@ static struct btd_profile_custom_property *find_custom_prop(const char *uuid,
->         return NULL;
->  }
->
-> -bool btd_profile_add_custom_prop(const char *uuid, const char *type,
-> +bool btd_profile_add_custom_prop(const void *key, const char *uuid,
-> +                                       const char *type,
->                                         const char *name,
->                                         btd_profile_prop_exists exists,
->                                         btd_profile_prop_get get,
-> @@ -2234,12 +2240,15 @@ bool btd_profile_add_custom_prop(const char *uuid, const char *type,
->  {
->         struct btd_profile_custom_property *prop;
->
-> -       prop = find_custom_prop(uuid, name);
-> -       if (prop != NULL)
-> +       prop = find_custom_prop(key, uuid, name);
-> +       if (prop != NULL) {
-> +               DBG("Custom property %s already exists", name);
->                 return false;
-> +       }
->
->         prop = g_new0(struct btd_profile_custom_property, 1);
->
-> +       prop->key = key;
->         prop->uuid = g_strdup(uuid);
->         prop->type = g_strdup(type);
->         prop->name = g_strdup(name);
-> @@ -2263,11 +2272,12 @@ static void free_property(gpointer data)
->         g_free(p);
->  }
->
-> -bool btd_profile_remove_custom_prop(const char *uuid, const char *name)
-> +bool btd_profile_remove_custom_prop(const void *key, const char *uuid,
-> +                                                       const char *name)
->  {
->         struct btd_profile_custom_property *prop;
->
-> -       prop = find_custom_prop(uuid, name);
-> +       prop = find_custom_prop(key, uuid, name);
->         if (prop == NULL)
->                 return false;
->
-> diff --git a/src/profile.h b/src/profile.h
-> index d858925..0764f6f 100644
-> --- a/src/profile.h
-> +++ b/src/profile.h
-> @@ -67,12 +67,14 @@ typedef bool (*btd_profile_prop_get)(const char *uuid,
->                                                 DBusMessageIter *iter,
->                                                 void *user_data);
->
-> -bool btd_profile_add_custom_prop(const char *uuid, const char *type,
-> +bool btd_profile_add_custom_prop(const void *key, const char *uuid,
-> +                                       const char *type,
->                                         const char *name,
->                                         btd_profile_prop_exists exists,
->                                         btd_profile_prop_get get,
->                                         void *user_data);
-> -bool btd_profile_remove_custom_prop(const char *uuid, const char *name);
-> +bool btd_profile_remove_custom_prop(const void *key, const char *uuid,
-> +                                       const char *name);
->
->  void btd_profile_init(void);
->  void btd_profile_cleanup(void);
-> --
-> 1.7.9.5
+> @@ -1179,7 +1179,7 @@ MODULE_AUTHOR("Marvell International Ltd.");
+>  MODULE_DESCRIPTION("Marvell BT-over-SDIO driver ver " VERSION);
+>  MODULE_VERSION(VERSION);
+>  MODULE_LICENSE("GPL v2");
+> -MODULE_FIRMWARE("sd8688_helper.bin");
+> -MODULE_FIRMWARE("sd8688.bin");
+> +MODULE_FIRMWARE("mrvl/sd8688_helper.bin");
+> +MODULE_FIRMWARE("mrvl/sd8688.bin");
+>  MODULE_FIRMWARE("mrvl/sd8787_uapsta.bin");
+>  MODULE_FIRMWARE("mrvl/sd8797_uapsta.bin");
+> diff --git a/drivers/bluetooth/btmrvl_sdio.h b/drivers/bluetooth/btmrvl_sdio.h
+> index 43d35a6..4a5a019 100644
+> --- a/drivers/bluetooth/btmrvl_sdio.h
+> +++ b/drivers/bluetooth/btmrvl_sdio.h
+> @@ -84,7 +84,9 @@ struct btmrvl_sdio_card {
+>  	struct sdio_func *func;
+>  	u32 ioport;
+>  	const char *helper;
+> +	const char *helper2;
+>  	const char *firmware;
+> +	const char *firmware2;
 
-Im afraid you are trying to fix in the wrong place, indeed there is a
-problem when a custom property is already registered it cannot
-register another time for a different adapter, but what we should be
-doing is checking the list of adapters in endpoint_properties_exists,
-you just have to find by btd_adapter instead of using user_data for
-that, in fact the user_data should be probably NULL as we have the
-list of adapters global in media.c
+And please clear out the patch from left-overs.
+
+>  	const struct btmrvl_sdio_card_reg *reg;
+>  	u16 sd_blksz_fw_dl;
+>  	u8 rx_unit;
+> @@ -92,8 +94,8 @@ struct btmrvl_sdio_card {
+>  };
+>  
+>  struct btmrvl_sdio_device {
+> -	const char *helper;
+> -	const char *firmware;
+> +	const char *helper, *helper2;
+> +	const char *firmware, *firmware2;
+
+And here as well.
+
+Regards
+
+Marcel
 
 
---
-Luiz Augusto von Dentz
