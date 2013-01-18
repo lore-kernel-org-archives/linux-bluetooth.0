@@ -1,49 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Kling, Andreas" <Andreas.Kling@peiker.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Fri, 18 Jan 2013 13:51:25 +0100
-Subject: RE: bluez: atomic operations
-Message-ID: <sig.67305293e9.B3F251FD87EC894A88C2221EEEBDF54807096F7F43@Exchange>
-References: <B3F251FD87EC894A88C2221EEEBDF54807096F7F3B@Exchange>,<1358400337.3059.11.camel@aeonflux>
-In-Reply-To: <1358400337.3059.11.camel@aeonflux>
-Content-Type: text/plain; charset="us-ascii"
+Date: Fri, 18 Jan 2013 14:35:48 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix pair device command reply if adapter is
+ powered off
+Message-ID: <20130118123548.GA16323@x220>
+References: <1358509687-7194-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1358509687-7194-1-git-send-email-szymon.janc@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel
+Hi Szymon,
 
->Hi Andy,
->
->> using gcc atomic buildins breaks support for older gcc/platforms.
->>
->> src/bluetoothd-adapter.o: In function `btd_adapter_unref':
->> adapter.c:(.text+0x63f8): undefined reference to `__sync_sub_and_fetch_4=
-'
->>
->> I suggest to use glib g_atomic_* group of functions.
->> They fall back to traditional locking if buildins are not available.
->
->the GLib atomic API functions are not really stable. The GLib people for
->some reason decided to break their own API/ABI guarantee. So we moved
->away from using them. And I have no intention to get back to them.
->
->Long term, we are moving away from GLib and want to switch to ELL. So
->that means gcc atomics are required. My advise would be to get a modern
->platform and not rely on workarounds.
->
->Regards
->
->Marcel
+On Fri, Jan 18, 2013, Szymon Janc wrote:
+> According to Bluetooth Management API specification Pair Device Command
+> should generate command complete event on both success and failure.
+> This fix replying with command status (which lacks address info) when
+> adapter is powered off.
+> 
+> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+> ---
+>  net/bluetooth/mgmt.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
 
-many thanks for your answer.
+Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 
-unfortunately a modern platform is not an option for me, hopefully changes =
-some day.
-so I will maintain another local patch (yieha) :P
-
-ELL? sounds interesting... will have a look at it.
-
-regards
-
-andy=
+Johan
