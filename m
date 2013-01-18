@@ -1,31 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 18 Jan 2013 14:35:48 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix pair device command reply if adapter is
- powered off
-Message-ID: <20130118123548.GA16323@x220>
-References: <1358509687-7194-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1358509687-7194-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1358258204-4090-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1358258204-4090-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Fri, 18 Jan 2013 14:12:56 +0200
+Message-ID: <CABBYNZL8R9BEvHY4KFaJ7yCsP_EiVFX8OvTE7J5H1TtqKS95Yw@mail.gmail.com>
+Subject: Re: [PATCH 0/5] MAP client: Add missing parameters for GetMessageListing
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Christian,
 
-On Fri, Jan 18, 2013, Szymon Janc wrote:
-> According to Bluetooth Management API specification Pair Device Command
-> should generate command complete event on both success and failure.
-> This fix replying with command status (which lacks address info) when
-> adapter is powered off.
-> 
-> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
-> ---
->  net/bluetooth/mgmt.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+On Tue, Jan 15, 2013 at 3:56 PM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+>
+> This patchset adds the missing parameters Text, AttachmentSize and Status
+> as well as the filter SubjectLength.
+>
+> Christian Fetzer (5):
+>   obexd: Add parameter SubjectLength to map_list_messages
+>   obexd: Move parse_size function in map.c
+>   obexd: Add parameter Text to GetMessageListing response
+>   obexd: Add parameter AttachmentSize to GetMessageListing response
+>   obexd: Add parameter Status to GetMessageListing response
+>
+>  doc/obex-api.txt   | 20 +++++++++++--
+>  obexd/client/map.c | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++---
+>  2 files changed, 101 insertions(+), 6 deletions(-)
+>
+> --
+> 1.8.1
 
-Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+All 5 patches have been pushed upstream, just need to do a minor fix
+to SubjectLength type since D-Bus don't really have uint8 I modified
+it to byte.
 
-Johan
+--
+Luiz Augusto von Dentz
