@@ -1,71 +1,320 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1358527994.5510.4.camel@aeonflux>
-Subject: Re: [PATCH 07/10] Bluetooth: Fix checking for valid address type
- values in mgmt commands
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Fri, 18 Jan 2013 08:53:14 -0800
-In-Reply-To: <1358515558-17861-8-git-send-email-johan.hedberg@gmail.com>
-References: <1358515558-17861-1-git-send-email-johan.hedberg@gmail.com>
-	 <1358515558-17861-8-git-send-email-johan.hedberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: =?UTF-8?q?=5BPATCH=20BlueZ=202/2=5D=20tools=3A=20Add=20volume=20support=20for=20mpris-player?=
+Date: Fri, 18 Jan 2013 16:41:25 +0200
+Message-Id: <1358520085-4790-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1358520085-4790-1-git-send-email-luiz.dentz@gmail.com>
+References: <1358520085-4790-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> This patch adds checks for valid address type values passed to mgmt
-> commands. If an invalid address type is encountered the code will return
-> a proper invalid params response.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  net/bluetooth/mgmt.c |   43 ++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 38 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 76301a3..3de4bc2 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -1506,7 +1506,7 @@ static int load_link_keys(struct sock *sk, struct hci_dev *hdev, void *data,
->  {
->  	struct mgmt_cp_load_link_keys *cp = data;
->  	u16 key_count, expected_len;
-> -	int i;
-> +	int i, err;
->  
->  	key_count = __le16_to_cpu(cp->key_count);
->  
-> @@ -1540,15 +1540,24 @@ static int load_link_keys(struct sock *sk, struct hci_dev *hdev, void *data,
->  	for (i = 0; i < key_count; i++) {
->  		struct mgmt_link_key_info *key = &cp->keys[i];
->  
-> +		if (key->addr.type != BDADDR_BREDR) {
-> +			clear_bit(HCI_DEBUG_KEYS, &hdev->dev_flags);
-> +			hci_link_keys_clear(hdev);
-> +			err = cmd_status(sk, hdev->id, MGMT_OP_LOAD_LINK_KEYS,
-> +					 MGMT_STATUS_INVALID_PARAMS);
-> +			goto unlock;
-> +		}
-> +
->  		hci_add_link_key(hdev, NULL, 0, &key->addr.bdaddr, key->val,
->  				 key->type, key->pin_len);
->  	}
+This uses MediaTransport1 to track the Volume changes.
+---
+ tools/mpris-player.c | 187 ++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 178 insertions(+), 9 deletions(-)
 
-I am not a huge fan of doing it this way (same applies to LTKs). You are
-introducing a side effect here. An invalid command will clear the keys.
-
-Please check the validity of the key parameters ahead of time and not in
-the middle of applying them. Your rollback is broken since it just
-clears all keys.
-
-We could add /sys/kernel/debug/bluetooth/hci0/link_keys as a root-only
-entry to allow checking this mgmt-tester.
-
-Regards
-
-Marcel
-
+diff --git a/tools/mpris-player.c b/tools/mpris-player.c
+index e3bab1c..80bb76d 100644
+--- a/tools/mpris-player.c
++++ b/tools/mpris-player.c
+@@ -43,6 +43,7 @@
+ #define BLUEZ_ADAPTER_INTERFACE "org.bluez.Adapter1"
+ #define BLUEZ_MEDIA_INTERFACE "org.bluez.Media1"
+ #define BLUEZ_MEDIA_PLAYER_INTERFACE "org.bluez.MediaPlayer1"
++#define BLUEZ_MEDIA_TRANSPORT_INTERFACE "org.bluez.MediaTransport1"
+ #define MPRIS_BUS_NAME "org.mpris.MediaPlayer2."
+ #define MPRIS_INTERFACE "org.mpris.MediaPlayer2"
+ #define MPRIS_PLAYER_INTERFACE "org.mpris.MediaPlayer2.Player"
+@@ -55,6 +56,7 @@ static DBusConnection *sys = NULL;
+ static DBusConnection *session = NULL;
+ static GDBusClient *client = NULL;
+ static GSList *players = NULL;
++static GSList *transports = NULL;
+ 
+ struct player {
+ 	char *name;
+@@ -62,6 +64,7 @@ struct player {
+ 	DBusConnection *conn;
+ 	GDBusProxy *proxy;
+ 	GDBusProxy *device;
++	GDBusProxy *transport;
+ };
+ 
+ typedef int (* parse_metadata_func) (DBusMessageIter *iter, const char *key,
+@@ -793,6 +796,9 @@ static void player_free(void *data)
+ 	g_dbus_proxy_unref(player->device);
+ 	g_dbus_proxy_unref(player->proxy);
+ 
++	if (player->transport)
++		g_dbus_proxy_unref(player->transport);
++
+ 	g_free(player->name);
+ 	g_free(player->bus_name);
+ 	g_free(player);
+@@ -1287,6 +1293,30 @@ static gboolean get_disable(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++static gboolean get_volume(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct player *player = data;
++	double value = 0.0;
++	uint16_t volume;
++	DBusMessageIter var;
++
++	if (player->transport == NULL)
++		goto done;
++
++	if (!g_dbus_proxy_get_property(player->transport, "Volume", &var))
++		goto done;
++
++	dbus_message_iter_get_basic(&var, &volume);
++
++	value = (double) volume / 127;
++
++done:
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_DOUBLE, &value);
++
++	return TRUE;
++}
++
+ static const GDBusMethodTable player_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("PlayPause", NULL, NULL, player_toggle) },
+ 	{ GDBUS_ASYNC_METHOD("Play", NULL, NULL, player_play) },
+@@ -1311,7 +1341,7 @@ static const GDBusPropertyTable player_properties[] = {
+ 	{ "Shuffle", "b", get_shuffle, set_shuffle, shuffle_exists },
+ 	{ "Position", "x", get_position, NULL, position_exists },
+ 	{ "Metadata", "a{sv}", get_track, NULL, track_exists },
+-	{ "Volume", "d", get_double, NULL, NULL },
++	{ "Volume", "d", get_volume, NULL, NULL },
+ 	{ "CanGoNext", "b", get_enable, NULL, NULL },
+ 	{ "CanGoPrevious", "b", get_enable, NULL, NULL },
+ 	{ "CanPlay", "b", get_enable, NULL, NULL },
+@@ -1353,12 +1383,33 @@ static char *mpris_busname(const char *name)
+ 	return g_strdelimit(bus_name, " ’", '_');
+ }
+ 
++static GDBusProxy *find_transport_by_path(const char *path)
++{
++	GSList *l;
++
++	for (l = transports; l; l = l->next) {
++		GDBusProxy *transport = l->data;
++		DBusMessageIter iter;
++		const char *value;
++
++		if (!g_dbus_proxy_get_property(transport, "Device", &iter))
++			continue;
++
++		dbus_message_iter_get_basic(&iter, &value);
++
++		if (strcmp(path, value) == 0)
++			return transport;
++	}
++
++	return NULL;
++}
++
+ static void register_player(GDBusProxy *proxy)
+ {
+ 	struct player *player;
+ 	DBusMessageIter iter;
+ 	const char *path, *name;
+-	GDBusProxy *device;
++	GDBusProxy *device, *transport;
+ 
+ 	if (!g_dbus_proxy_get_property(proxy, "Device", &iter))
+ 		return;
+@@ -1412,6 +1463,10 @@ static void register_player(GDBusProxy *proxy)
+ 		goto fail;
+ 	}
+ 
++	transport = find_transport_by_path(path);
++	if (transport)
++		player->transport = g_dbus_proxy_ref(transport);
++
+ 	return;
+ 
+ fail:
+@@ -1419,6 +1474,47 @@ fail:
+ 	player_free(player);
+ }
+ 
++static struct player *find_player_by_device(const char *device)
++{
++	GSList *l;
++
++	for (l = players; l; l = l->next) {
++		struct player *player = l->data;
++		const char *path = g_dbus_proxy_get_path(player->device);
++
++		if (g_strcmp0(device, path) == 0)
++			return player;
++	}
++
++	return NULL;
++}
++
++static void register_transport(GDBusProxy *proxy)
++{
++	struct player *player;
++	DBusMessageIter iter;
++	const char *path;
++
++	if (g_slist_find(transports, proxy) != NULL)
++		return;
++
++	if (!g_dbus_proxy_get_property(proxy, "Volume", &iter))
++		return;
++
++	if (!g_dbus_proxy_get_property(proxy, "Device", &iter))
++		return;
++
++	dbus_message_iter_get_basic(&iter, &path);
++
++	transports = g_slist_append(transports, proxy);
++
++	player = find_player_by_device(path);
++	if (player == NULL || player->transport != NULL)
++		return;
++
++	player->transport = g_dbus_proxy_ref(proxy);
++}
++
+ static void proxy_added(GDBusProxy *proxy, void *user_data)
+ {
+ 	const char *interface;
+@@ -1437,6 +1533,10 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+ 		printf("Bluetooth Player %s found\n",
+ 						g_dbus_proxy_get_path(proxy));
+ 		register_player(proxy);
++	} else if (!strcmp(interface, BLUEZ_MEDIA_TRANSPORT_INTERFACE)) {
++		printf("Bluetooth Transport %s found\n",
++						g_dbus_proxy_get_path(proxy));
++		register_transport(proxy);
+ 	}
+ }
+ 
+@@ -1462,6 +1562,37 @@ static struct player *find_player(GDBusProxy *proxy)
+ 	return NULL;
+ }
+ 
++static struct player *find_player_by_transport(GDBusProxy *proxy)
++{
++	GSList *l;
++
++	for (l = players; l; l = l->next) {
++		struct player *player = l->data;
++
++		if (player->transport == proxy)
++			return player;
++	}
++
++	return NULL;
++}
++
++static void unregister_transport(GDBusProxy *proxy)
++{
++	struct player *player;
++
++	if (g_slist_find(transports, proxy) == NULL)
++		return;
++
++	transports = g_slist_remove(transports, proxy);
++
++	player = find_player_by_transport(proxy);
++	if (player == NULL)
++		return;
++
++	g_dbus_proxy_unref(player->transport);
++	player->transport = NULL;
++}
++
+ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+ {
+ 	const char *interface;
+@@ -1487,6 +1618,10 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+ 		printf("Bluetooth Player %s removed\n",
+ 						g_dbus_proxy_get_path(proxy));
+ 		unregister_player(player);
++	} else if (strcmp(interface, BLUEZ_MEDIA_TRANSPORT_INTERFACE) == 0) {
++		printf("Bluetooth Transport %s removed\n",
++						g_dbus_proxy_get_path(proxy));
++		unregister_transport(proxy);
+ 	}
+ }
+ 
+@@ -1506,16 +1641,11 @@ static const char *property_to_mpris(const char *property)
+ 	return NULL;
+ }
+ 
+-static void property_changed(GDBusProxy *proxy, const char *name,
++static void player_property_changed(GDBusProxy *proxy, const char *name,
+ 					DBusMessageIter *iter, void *user_data)
+ {
+ 	struct player *player;
+-	const char *interface, *property;
+-
+-	interface = g_dbus_proxy_get_interface(proxy);
+-
+-	if (strcmp(interface, "org.bluez.MediaPlayer1") != 0)
+-		return;
++	const char *property;
+ 
+ 	player = find_player(proxy);
+ 	if (player == NULL)
+@@ -1530,6 +1660,45 @@ static void property_changed(GDBusProxy *proxy, const char *name,
+ 						property);
+ }
+ 
++static void transport_property_changed(GDBusProxy *proxy, const char *name,
++					DBusMessageIter *iter, void *user_data)
++{
++	struct player *player;
++	DBusMessageIter var;
++	const char *path;
++
++	if (strcasecmp(name, "Volume") != 0)
++		return;
++
++	if (!g_dbus_proxy_get_property(proxy, "Device", &var))
++		return;
++
++	dbus_message_iter_get_basic(&var, &path);
++
++	player = find_player_by_device(path);
++	if (player == NULL)
++		return;
++
++	g_dbus_emit_property_changed(player->conn, MPRIS_PLAYER_PATH,
++						MPRIS_PLAYER_INTERFACE,
++						name);
++}
++
++static void property_changed(GDBusProxy *proxy, const char *name,
++					DBusMessageIter *iter, void *user_data)
++{
++	const char *interface;
++
++	interface = g_dbus_proxy_get_interface(proxy);
++
++	if (strcmp(interface, BLUEZ_MEDIA_PLAYER_INTERFACE) == 0)
++		return player_property_changed(proxy, name, iter, user_data);
++
++	if (strcmp(interface, BLUEZ_MEDIA_TRANSPORT_INTERFACE) == 0)
++		return transport_property_changed(proxy, name, iter,
++								user_data);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	guint owner_watch, properties_watch;
+-- 
+1.8.0.2
 
