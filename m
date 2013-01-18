@@ -1,11 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: =?UTF-8?q?=5BPATCH=20BlueZ=202/2=5D=20tools=3A=20Add=20volume=20support=20for=20mpris-player?=
-Date: Fri, 18 Jan 2013 16:41:25 +0200
-Message-Id: <1358520085-4790-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1358520085-4790-1-git-send-email-luiz.dentz@gmail.com>
-References: <1358520085-4790-1-git-send-email-luiz.dentz@gmail.com>
+Subject: =?UTF-8?q?=5BPATCH=20BlueZ=201/2=5D=20tools=3A=20Make=20mpris-player=20to=20export=20players=20using=20MPRIS=20interface?=
+Date: Fri, 18 Jan 2013 16:41:24 +0200
+Message-Id: <1358520085-4790-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,308 +11,962 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This uses MediaTransport1 to track the Volume changes.
+Players found are exported in private connections using
+org.mpris.MediaPlayer2.<device name> on the session bus.
 ---
- tools/mpris-player.c | 187 ++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 178 insertions(+), 9 deletions(-)
+ tools/mpris-player.c | 798 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 779 insertions(+), 19 deletions(-)
 
 diff --git a/tools/mpris-player.c b/tools/mpris-player.c
-index e3bab1c..80bb76d 100644
+index 246791a..e3bab1c 100644
 --- a/tools/mpris-player.c
 +++ b/tools/mpris-player.c
-@@ -43,6 +43,7 @@
+@@ -32,6 +32,7 @@
+ #include <signal.h>
+ #include <getopt.h>
+ #include <string.h>
++#include <inttypes.h>
+ 
+ #include <dbus/dbus.h>
+ #include <glib.h>
+@@ -41,13 +42,30 @@
+ #define BLUEZ_PATH "/org/bluez"
  #define BLUEZ_ADAPTER_INTERFACE "org.bluez.Adapter1"
  #define BLUEZ_MEDIA_INTERFACE "org.bluez.Media1"
- #define BLUEZ_MEDIA_PLAYER_INTERFACE "org.bluez.MediaPlayer1"
-+#define BLUEZ_MEDIA_TRANSPORT_INTERFACE "org.bluez.MediaTransport1"
- #define MPRIS_BUS_NAME "org.mpris.MediaPlayer2."
- #define MPRIS_INTERFACE "org.mpris.MediaPlayer2"
++#define BLUEZ_MEDIA_PLAYER_INTERFACE "org.bluez.MediaPlayer1"
++#define MPRIS_BUS_NAME "org.mpris.MediaPlayer2."
++#define MPRIS_INTERFACE "org.mpris.MediaPlayer2"
  #define MPRIS_PLAYER_INTERFACE "org.mpris.MediaPlayer2.Player"
-@@ -55,6 +56,7 @@ static DBusConnection *sys = NULL;
+ #define MPRIS_PLAYER_PATH "/org/mpris/MediaPlayer2"
++#define ERROR_INTERFACE "org.mpris.MediaPlayer2.Error"
+ 
+ static GMainLoop *main_loop;
+ static GDBusProxy *adapter = NULL;
+ static DBusConnection *sys = NULL;
  static DBusConnection *session = NULL;
- static GDBusClient *client = NULL;
- static GSList *players = NULL;
-+static GSList *transports = NULL;
- 
- struct player {
- 	char *name;
-@@ -62,6 +64,7 @@ struct player {
- 	DBusConnection *conn;
- 	GDBusProxy *proxy;
- 	GDBusProxy *device;
-+	GDBusProxy *transport;
- };
- 
- typedef int (* parse_metadata_func) (DBusMessageIter *iter, const char *key,
-@@ -793,6 +796,9 @@ static void player_free(void *data)
- 	g_dbus_proxy_unref(player->device);
- 	g_dbus_proxy_unref(player->proxy);
- 
-+	if (player->transport)
-+		g_dbus_proxy_unref(player->transport);
++static GDBusClient *client = NULL;
++static GSList *players = NULL;
 +
- 	g_free(player->name);
- 	g_free(player->bus_name);
- 	g_free(player);
-@@ -1287,6 +1293,30 @@ static gboolean get_disable(const GDBusPropertyTable *property,
++struct player {
++	char *name;
++	char *bus_name;
++	DBusConnection *conn;
++	GDBusProxy *proxy;
++	GDBusProxy *device;
++};
++
++typedef int (* parse_metadata_func) (DBusMessageIter *iter, const char *key,
++						DBusMessageIter *metadata);
+ 
+ static void dict_append_entry(DBusMessageIter *dict, const char *key, int type,
+ 								void *val);
+@@ -190,7 +208,8 @@ static int parse_metadata_entry(DBusMessageIter *entry, const char *key,
+ 	return 0;
+ }
+ 
+-static int parse_metadata(DBusMessageIter *args, DBusMessageIter *metadata)
++static int parse_metadata(DBusMessageIter *args, DBusMessageIter *metadata,
++						parse_metadata_func func)
+ {
+ 	DBusMessageIter dict;
+ 	int ctype;
+@@ -216,7 +235,7 @@ static int parse_metadata(DBusMessageIter *args, DBusMessageIter *metadata)
+ 		dbus_message_iter_get_basic(&entry, &key);
+ 		dbus_message_iter_next(&entry);
+ 
+-		if (parse_metadata_entry(&entry, key, metadata) < 0)
++		if (func(&entry, key, metadata) < 0)
+ 			return -EINVAL;
+ 
+ 		dbus_message_iter_next(&dict);
+@@ -225,7 +244,8 @@ static int parse_metadata(DBusMessageIter *args, DBusMessageIter *metadata)
+ 	return 0;
+ }
+ 
+-static void append_metadata(DBusMessageIter *iter, DBusMessageIter *dict)
++static void append_metadata(DBusMessageIter *iter, DBusMessageIter *dict,
++						parse_metadata_func func)
+ {
+ 	DBusMessageIter value, metadata;
+ 
+@@ -237,7 +257,7 @@ static void append_metadata(DBusMessageIter *iter, DBusMessageIter *dict)
+ 			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+ 			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &metadata);
+ 
+-	parse_metadata(dict, &metadata);
++	parse_metadata(dict, &metadata, func);
+ 
+ 	dbus_message_iter_close_container(&value, &metadata);
+ 	dbus_message_iter_close_container(iter, &value);
+@@ -260,7 +280,7 @@ static void dict_append_entry(DBusMessageIter *dict, const char *key, int type,
+ 	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
+ 
+ 	if (strcasecmp(key, "Metadata") == 0)
+-		append_metadata(&entry, val);
++		append_metadata(&entry, val, parse_metadata_entry);
+ 	else
+ 		append_variant(&entry, type, val);
+ 
+@@ -509,21 +529,29 @@ done:
+ static void remove_player(DBusConnection *conn, const char *sender)
+ {
+ 	DBusMessage *msg;
+-	char *path;
++	char *path, *owner;
+ 
+ 	if (!adapter)
+ 		return;
+ 
++	path = sender2path(sender);
++	dbus_connection_get_object_path_data(sys, path, (void **) &owner);
++
++	if (owner == NULL) {
++		g_free(path);
++		return;
++	}
++
+ 	msg = dbus_message_new_method_call(BLUEZ_BUS_NAME,
+ 					g_dbus_proxy_get_path(adapter),
+ 					BLUEZ_MEDIA_INTERFACE,
+ 					"UnregisterPlayer");
+ 	if (!msg) {
+ 		fprintf(stderr, "Can't allocate new method call\n");
++		g_free(path);
+ 		return;
+ 	}
+ 
+-	path = sender2path(sender);
+ 	dbus_message_append_args(msg, DBUS_TYPE_OBJECT_PATH, &path,
+ 					DBUS_TYPE_INVALID);
+ 
+@@ -540,10 +568,16 @@ static gboolean properties_changed(DBusConnection *conn,
+ {
+ 	DBusMessageIter iter;
+ 	const char *iface;
+-	char *path;
++	char *path, *owner;
+ 
+ 	dbus_message_iter_init(msg, &iter);
+ 
++	path = sender2path(dbus_message_get_sender(msg));
++	dbus_connection_get_object_path_data(sys, path, (void **) &owner);
++
++	if (owner == NULL)
++		goto done;
++
+ 	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
+ 		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+ 
+@@ -553,14 +587,28 @@ static gboolean properties_changed(DBusConnection *conn,
+ 
+ 	dbus_message_iter_next(&iter);
+ 
+-	path = sender2path(dbus_message_get_sender(msg));
+ 	parse_properties(conn, path, &iter, NULL);
+ 
++done:
+ 	g_free(path);
+ 
  	return TRUE;
  }
  
-+static gboolean get_volume(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct player *player = data;
-+	double value = 0.0;
-+	uint16_t volume;
-+	DBusMessageIter var;
-+
-+	if (player->transport == NULL)
-+		goto done;
-+
-+	if (!g_dbus_proxy_get_property(player->transport, "Volume", &var))
-+		goto done;
-+
-+	dbus_message_iter_get_basic(&var, &volume);
-+
-+	value = (double) volume / 127;
-+
-+done:
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_DOUBLE, &value);
-+
-+	return TRUE;
-+}
-+
- static const GDBusMethodTable player_methods[] = {
- 	{ GDBUS_ASYNC_METHOD("PlayPause", NULL, NULL, player_toggle) },
- 	{ GDBUS_ASYNC_METHOD("Play", NULL, NULL, player_play) },
-@@ -1311,7 +1341,7 @@ static const GDBusPropertyTable player_properties[] = {
- 	{ "Shuffle", "b", get_shuffle, set_shuffle, shuffle_exists },
- 	{ "Position", "x", get_position, NULL, position_exists },
- 	{ "Metadata", "a{sv}", get_track, NULL, track_exists },
--	{ "Volume", "d", get_double, NULL, NULL },
-+	{ "Volume", "d", get_volume, NULL, NULL },
- 	{ "CanGoNext", "b", get_enable, NULL, NULL },
- 	{ "CanGoPrevious", "b", get_enable, NULL, NULL },
- 	{ "CanPlay", "b", get_enable, NULL, NULL },
-@@ -1353,12 +1383,33 @@ static char *mpris_busname(const char *name)
- 	return g_strdelimit(bus_name, " ’", '_');
- }
- 
-+static GDBusProxy *find_transport_by_path(const char *path)
-+{
-+	GSList *l;
-+
-+	for (l = transports; l; l = l->next) {
-+		GDBusProxy *transport = l->data;
-+		DBusMessageIter iter;
-+		const char *value;
-+
-+		if (!g_dbus_proxy_get_property(transport, "Device", &iter))
-+			continue;
-+
-+		dbus_message_iter_get_basic(&iter, &value);
-+
-+		if (strcmp(path, value) == 0)
-+			return transport;
-+	}
-+
-+	return NULL;
-+}
-+
- static void register_player(GDBusProxy *proxy)
- {
- 	struct player *player;
- 	DBusMessageIter iter;
- 	const char *path, *name;
--	GDBusProxy *device;
-+	GDBusProxy *device, *transport;
- 
- 	if (!g_dbus_proxy_get_property(proxy, "Device", &iter))
- 		return;
-@@ -1412,6 +1463,10 @@ static void register_player(GDBusProxy *proxy)
- 		goto fail;
- 	}
- 
-+	transport = find_transport_by_path(path);
-+	if (transport)
-+		player->transport = g_dbus_proxy_ref(transport);
-+
- 	return;
- 
- fail:
-@@ -1419,6 +1474,47 @@ fail:
- 	player_free(player);
- }
- 
-+static struct player *find_player_by_device(const char *device)
++static struct player *find_player_by_bus_name(const char *name)
 +{
 +	GSList *l;
 +
 +	for (l = players; l; l = l->next) {
 +		struct player *player = l->data;
-+		const char *path = g_dbus_proxy_get_path(player->device);
 +
-+		if (g_strcmp0(device, path) == 0)
++		if (strcmp(player->bus_name, name) == 0)
 +			return player;
 +	}
 +
 +	return NULL;
 +}
 +
-+static void register_transport(GDBusProxy *proxy)
+ static gboolean name_owner_changed(DBusConnection *conn,
+ 						DBusMessage *msg, void *data)
+ {
+@@ -581,7 +629,7 @@ static gboolean name_owner_changed(DBusConnection *conn,
+ 	if (*new == '\0') {
+ 		printf("player %s at %s disappear\n", name, old);
+ 		remove_player(conn, old);
+-	} else {
++	} else if (find_player_by_bus_name(name) == NULL) {
+ 		printf("player %s at %s found\n", name, new);
+ 		add_player(conn, name, new);
+ 	}
+@@ -733,21 +781,685 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
+ 	printf("org.bluez disappeared\n");
+ }
+ 
+-static void proxy_added(GDBusProxy *proxy, void *user_data)
++static void player_free(void *data)
+ {
+-	const char *interface;
++	struct player *player = data;
++
++	if (player->conn) {
++		dbus_connection_close(player->conn);
++		dbus_connection_unref(player->conn);
++	}
++
++	g_dbus_proxy_unref(player->device);
++	g_dbus_proxy_unref(player->proxy);
++
++	g_free(player->name);
++	g_free(player->bus_name);
++	g_free(player);
++}
++
++struct pending_call {
++	struct player *player;
++	DBusMessage *msg;
++};
++
++static void pending_call_free(void *data)
++{
++	struct pending_call *p = data;
++
++	if (p->msg)
++		dbus_message_unref(p->msg);
++
++	g_free(p);
++}
++
++static void player_reply(DBusMessage *message, void *user_data)
++{
++	struct pending_call *p = user_data;
++	struct player *player = p->player;
++	DBusMessage *msg = p->msg;
++	DBusMessage *reply;
++	DBusError err;
++
++	dbus_error_init(&err);
++	if (dbus_set_error_from_message(&err, message)) {
++		fprintf(stderr, "error: %s", err.name);
++		reply = g_dbus_create_error(msg, err.name, err.message);
++		dbus_error_free(&err);
++	} else
++		reply = g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++
++	g_dbus_send_message(player->conn, reply);
++}
++
++static void player_control(struct player *player, DBusMessage *msg,
++							const char *name)
++{
++	struct pending_call *p;
++
++	p = g_new0(struct pending_call, 1);
++	p->player = player;
++	p->msg = dbus_message_ref(msg);
++
++	g_dbus_proxy_method_call(player->proxy, name, NULL, player_reply,
++						p, pending_call_free);
++}
++
++static DBusMessage *player_toggle(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	struct player *player = data;
++	DBusMessageIter value;
++	const char *status;
++
++	if (!g_dbus_proxy_get_property(player->proxy, "Status", &value))
++		return FALSE;
++
++	dbus_message_iter_get_basic(&value, &status);
++
++	if (strcasecmp(status, "Playing") == 0)
++		player_control(player, msg, "Pause");
++	else
++		player_control(player, msg, "Play");
++
++	return NULL;
++}
++
++static DBusMessage *player_play(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	struct player *player = data;
++
++	player_control(player, msg, "Play");
++
++	return NULL;
++}
++
++static DBusMessage *player_pause(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	struct player *player = data;
++
++	player_control(player, msg, "Pause");
++
++	return NULL;
++}
++
++static DBusMessage *player_stop(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	struct player *player = data;
++
++	player_control(player, msg, "Stop");
++
++	return NULL;
++}
++
++static DBusMessage *player_next(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	struct player *player = data;
++
++	player_control(player, msg, "Next");
++
++	return NULL;
++}
++
++static DBusMessage *player_previous(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	struct player *player = data;
++
++	player_control(player, msg, "Previous");
++
++	return NULL;
++}
++
++static gboolean status_exists(const GDBusPropertyTable *property, void *data)
++{
++	DBusMessageIter iter;
++	struct player *player = data;
++
++	return g_dbus_proxy_get_property(player->proxy, "Status", &iter);
++}
++
++static const char *status_to_playback(const char *status)
++{
++	if (strcasecmp(status, "playing") == 0)
++		return "Playing";
++	else if (strcasecmp(status, "paused") == 0)
++		return "Paused";
++	else
++		return "Stopped";
++}
++
++static gboolean get_status(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++
++	struct player *player = data;
++	DBusMessageIter value;
++	const char *status;
++
++	if (!g_dbus_proxy_get_property(player->proxy, "Status", &value))
++		return FALSE;
++
++	dbus_message_iter_get_basic(&value, &status);
++
++	status = status_to_playback(status);
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &status);
++
++	return TRUE;
++}
++
++static gboolean repeat_exists(const GDBusPropertyTable *property, void *data)
++{
++	DBusMessageIter iter;
++	struct player *player = data;
++
++	return g_dbus_proxy_get_property(player->proxy, "Repeat", &iter);
++}
++
++static const char *repeat_to_loopstatus(const char *value)
++{
++	if (strcasecmp(value, "off") == 0)
++		return "None";
++	else if (strcasecmp(value, "singletrack") == 0)
++		return "Track";
++	else if (strcasecmp(value, "alltracks") == 0)
++		return "Playlist";
++
++	return NULL;
++}
++
++static gboolean get_repeat(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct player *player = data;
++	DBusMessageIter value;
++	const char *status;
++
++	if (!g_dbus_proxy_get_property(player->proxy, "Repeat", &value))
++		return FALSE;
++
++	dbus_message_iter_get_basic(&value, &status);
++
++	status = repeat_to_loopstatus(status);
++	if (status == NULL)
++		return FALSE;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &status);
++
++	return TRUE;
++}
++
++static const char *loopstatus_to_repeat(const char *value)
++{
++	if (strcasecmp(value, "None") == 0)
++		return "off";
++	else if (strcasecmp(value, "Track") == 0)
++		return "singletrack";
++	else if (strcasecmp(value, "Playlist") == 0)
++		return "alltracks";
++
++	return NULL;
++}
++
++static void property_result(const DBusError *err, void *user_data)
++{
++	GDBusPendingPropertySet id = GPOINTER_TO_UINT(user_data);
++
++	if (!dbus_error_is_set(err))
++		return g_dbus_pending_property_success(id);
++
++	g_dbus_pending_property_error(id, err->name, err->message);
++}
++
++static void set_repeat(const GDBusPropertyTable *property,
++			DBusMessageIter *iter, GDBusPendingPropertySet id,
++			void *data)
++{
++	struct player *player = data;
++	const char *value;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING) {
++		g_dbus_pending_property_error(id,
++					ERROR_INTERFACE ".InvalidArguments",
++					"Invalid arguments in method call");
++		return;
++	}
++
++	dbus_message_iter_get_basic(iter, &value);
++
++	value = loopstatus_to_repeat(value);
++	if (value == NULL) {
++		g_dbus_pending_property_error(id,
++					ERROR_INTERFACE ".InvalidArguments",
++					"Invalid arguments in method call");
++		return;
++	}
++
++	g_dbus_proxy_set_property_basic(player->proxy, "Repeat",
++					DBUS_TYPE_STRING, value,
++					property_result, GUINT_TO_POINTER(id),
++					NULL);
++}
++
++static gboolean get_double(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	double value = 1.0;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_DOUBLE, &value);
++
++	return TRUE;
++}
++
++static gboolean shuffle_exists(const GDBusPropertyTable *property, void *data)
++{
++	DBusMessageIter iter;
++	struct player *player = data;
++
++	return g_dbus_proxy_get_property(player->proxy, "Shuffle", &iter);
++}
++
++static gboolean get_shuffle(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct player *player = data;
++	DBusMessageIter value;
++	const char *string;
++	dbus_bool_t shuffle;
++
++	if (!g_dbus_proxy_get_property(player->proxy, "Shuffle", &value))
++		return FALSE;
++
++	dbus_message_iter_get_basic(&value, &string);
++
++	shuffle = strcmp(string, "off") != 0;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &shuffle);
++
++	return TRUE;
++}
++
++static void set_shuffle(const GDBusPropertyTable *property,
++			DBusMessageIter *iter, GDBusPendingPropertySet id,
++			void *data)
++{
++	struct player *player = data;
++	dbus_bool_t shuffle;
++	const char *value;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN) {
++		g_dbus_pending_property_error(id,
++					ERROR_INTERFACE ".InvalidArguments",
++					"Invalid arguments in method call");
++		return;
++	}
++
++	dbus_message_iter_get_basic(iter, &shuffle);
++	value = shuffle ? "alltracks" : "off";
++
++	g_dbus_proxy_set_property_basic(player->proxy, "Shuffle",
++					DBUS_TYPE_STRING, value,
++					property_result, GUINT_TO_POINTER(id),
++					NULL);
++}
++
++static gboolean position_exists(const GDBusPropertyTable *property, void *data)
++{
++	DBusMessageIter iter;
++	struct player *player = data;
++
++	return g_dbus_proxy_get_property(player->proxy, "Position", &iter);
++}
+ 
+-	if (adapter != NULL)
++static gboolean get_position(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct player *player = data;
++	DBusMessageIter var;
++	uint32_t position;
++	int64_t value;
++
++	if (!g_dbus_proxy_get_property(player->proxy, "Position", &var))
++		return FALSE;
++
++	dbus_message_iter_get_basic(&var, &position);
++
++	value = position * 1000;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_INT64, &value);
++
++	return TRUE;
++}
++
++static gboolean track_exists(const GDBusPropertyTable *property, void *data)
++{
++	DBusMessageIter iter;
++	struct player *player = data;
++
++	return g_dbus_proxy_get_property(player->proxy, "Track", &iter);
++}
++
++static gboolean parse_string_metadata(DBusMessageIter *iter, const char *key,
++						DBusMessageIter *metadata)
++{
++	const char *value;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
++		return FALSE;
++
++	dbus_message_iter_get_basic(iter, &value);
++
++	dict_append_entry(metadata, key, DBUS_TYPE_STRING, &value);
++
++	return TRUE;
++}
++
++static gboolean parse_array_metadata(DBusMessageIter *iter, const char *key,
++						DBusMessageIter *metadata)
++{
++	char **value;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
++		return FALSE;
++
++	value = dbus_malloc0(sizeof(char *));
++
++	dbus_message_iter_get_basic(iter, &(value[0]));
++
++	dict_append_array(metadata, key, DBUS_TYPE_STRING, &value, 1);
++
++	dbus_free(value);
++
++	return TRUE;
++}
++
++static gboolean parse_int64_metadata(DBusMessageIter *iter, const char *key,
++						DBusMessageIter *metadata)
++{
++	uint32_t duration;
++	int64_t value;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT32)
++		return FALSE;
++
++	dbus_message_iter_get_basic(iter, &duration);
++
++	value = duration * 1000;
++
++	dict_append_entry(metadata, key, DBUS_TYPE_INT64, &value);
++
++	return TRUE;
++}
++
++static gboolean parse_int32_metadata(DBusMessageIter *iter, const char *key,
++						DBusMessageIter *metadata)
++{
++	uint32_t value;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT32)
++		return FALSE;
++
++	dbus_message_iter_get_basic(iter, &value);
++
++	dict_append_entry(metadata, key, DBUS_TYPE_INT32, &value);
++
++	return TRUE;
++}
++
++static int parse_track_entry(DBusMessageIter *entry, const char *key,
++						DBusMessageIter *metadata)
++{
++	DBusMessageIter var;
++
++	printf("metadata %s found\n", key);
++
++	if (dbus_message_iter_get_arg_type(entry) != DBUS_TYPE_VARIANT)
++		return -EINVAL;
++
++	dbus_message_iter_recurse(entry, &var);
++
++	if (strcasecmp(key, "Title") == 0) {
++		if (!parse_string_metadata(&var, "xesam:title", metadata))
++			return -EINVAL;
++	} else if (strcasecmp(key, "Artist") == 0) {
++		if (!parse_array_metadata(&var, "xesam:artist", metadata))
++			return -EINVAL;
++	} else if (strcasecmp(key, "Album") == 0) {
++		if (!parse_string_metadata(&var, "xesam:album", metadata))
++			return -EINVAL;
++	} else if (strcasecmp(key, "Genre") == 0) {
++		if (!parse_array_metadata(&var, "xesam:genre", metadata))
++			return -EINVAL;
++	} else if (strcasecmp(key, "Duration") == 0) {
++		if (!parse_int64_metadata(&var, "mpris:length", metadata))
++			return -EINVAL;
++	} else if (strcasecmp(key, "TrackNumber") == 0) {
++		if (!parse_int32_metadata(&var, "xesam:trackNumber", metadata))
++			return -EINVAL;
++	}
++
++	return 0;
++}
++
++static gboolean get_track(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct player *player = data;
++	DBusMessageIter var, metadata;
++
++	if (!g_dbus_proxy_get_property(player->proxy, "Track", &var))
++		return FALSE;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &metadata);
++
++	parse_metadata(&var, &metadata, parse_track_entry);
++
++	dbus_message_iter_close_container(iter, &metadata);
++
++	return TRUE;
++}
++
++static gboolean get_enable(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	dbus_bool_t value = TRUE;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
++
++	return TRUE;
++}
++
++static gboolean get_disable(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	dbus_bool_t value = FALSE;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
++
++	return TRUE;
++}
++
++static const GDBusMethodTable player_methods[] = {
++	{ GDBUS_ASYNC_METHOD("PlayPause", NULL, NULL, player_toggle) },
++	{ GDBUS_ASYNC_METHOD("Play", NULL, NULL, player_play) },
++	{ GDBUS_ASYNC_METHOD("Pause", NULL, NULL, player_pause) },
++	{ GDBUS_ASYNC_METHOD("Stop", NULL, NULL, player_stop) },
++	{ GDBUS_ASYNC_METHOD("Next", NULL, NULL, player_next) },
++	{ GDBUS_ASYNC_METHOD("Previous", NULL, NULL, player_previous) },
++	{ }
++};
++
++static const GDBusSignalTable player_signals[] = {
++	{ GDBUS_SIGNAL("Seeked", GDBUS_ARGS({"Position", "x"})) },
++	{ }
++};
++
++static const GDBusPropertyTable player_properties[] = {
++	{ "PlaybackStatus", "s", get_status, NULL, status_exists },
++	{ "LoopStatus", "s", get_repeat, set_repeat, repeat_exists },
++	{ "Rate", "d", get_double, NULL, NULL },
++	{ "MinimumRate", "d", get_double, NULL, NULL },
++	{ "MaximumRate", "d", get_double, NULL, NULL },
++	{ "Shuffle", "b", get_shuffle, set_shuffle, shuffle_exists },
++	{ "Position", "x", get_position, NULL, position_exists },
++	{ "Metadata", "a{sv}", get_track, NULL, track_exists },
++	{ "Volume", "d", get_double, NULL, NULL },
++	{ "CanGoNext", "b", get_enable, NULL, NULL },
++	{ "CanGoPrevious", "b", get_enable, NULL, NULL },
++	{ "CanPlay", "b", get_enable, NULL, NULL },
++	{ "CanPause", "b", get_enable, NULL, NULL },
++	{ "CanSeek", "b", get_enable, NULL, NULL },
++	{ "CanControl", "b", get_enable, NULL, NULL },
++	{ }
++};
++
++static const GDBusMethodTable mpris_methods[] = {
++	{ }
++};
++
++static gboolean get_name(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct player *player = data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &player->name);
++
++	return TRUE;
++}
++
++static const GDBusPropertyTable mpris_properties[] = {
++	{ "CanQuit", "b", get_disable, NULL, NULL },
++	{ "Fullscreen", "b", get_disable, NULL, NULL },
++	{ "CanSetFullscreen", "b", get_disable, NULL, NULL },
++	{ "CanRaise", "b", get_disable, NULL, NULL },
++	{ "HasTrackList", "b", get_disable, NULL, NULL },
++	{ "Identity", "s", get_name, NULL, NULL },
++	{ }
++};
++
++static char *mpris_busname(const char *name)
++{
++	char *bus_name;
++
++	bus_name = g_strconcat(MPRIS_BUS_NAME, name, NULL);
++	return g_strdelimit(bus_name, " ’", '_');
++}
++
++static void register_player(GDBusProxy *proxy)
 +{
 +	struct player *player;
 +	DBusMessageIter iter;
-+	const char *path;
-+
-+	if (g_slist_find(transports, proxy) != NULL)
-+		return;
-+
-+	if (!g_dbus_proxy_get_property(proxy, "Volume", &iter))
-+		return;
++	const char *path, *name;
++	GDBusProxy *device;
 +
 +	if (!g_dbus_proxy_get_property(proxy, "Device", &iter))
 +		return;
 +
 +	dbus_message_iter_get_basic(&iter, &path);
 +
-+	transports = g_slist_append(transports, proxy);
-+
-+	player = find_player_by_device(path);
-+	if (player == NULL || player->transport != NULL)
++	device = g_dbus_proxy_new(client, path, "org.bluez.Device1");
++	if (device == NULL)
+ 		return;
+ 
++	if (!g_dbus_proxy_get_property(device, "Name", &iter))
 +		return;
 +
-+	player->transport = g_dbus_proxy_ref(proxy);
++	dbus_message_iter_get_basic(&iter, &name);
++
++	player = g_new0(struct player, 1);
++	player->name = g_strdup(name);
++	player->bus_name = mpris_busname(name);
++	player->proxy = g_dbus_proxy_ref(proxy);
++	player->device = device;
++
++	players = g_slist_prepend(players, player);
++
++	player->conn = g_dbus_setup_private(DBUS_BUS_SESSION, player->bus_name,
++									NULL);
++	if (!session) {
++		fprintf(stderr, "Could not register bus name %s",
++							player->bus_name);
++		goto fail;
++	}
++
++	if (!g_dbus_register_interface(player->conn, MPRIS_PLAYER_PATH,
++						MPRIS_INTERFACE,
++						mpris_methods,
++						NULL,
++						mpris_properties,
++						player, NULL)) {
++		fprintf(stderr, "Could not register interface %s",
++						MPRIS_INTERFACE);
++		goto fail;
++	}
++
++	if (!g_dbus_register_interface(player->conn, MPRIS_PLAYER_PATH,
++						MPRIS_PLAYER_INTERFACE,
++						player_methods,
++						player_signals,
++						player_properties,
++						player, player_free)) {
++		fprintf(stderr, "Could not register interface %s",
++						MPRIS_PLAYER_INTERFACE);
++		goto fail;
++	}
++
++	return;
++
++fail:
++	players = g_slist_remove(players, player);
++	player_free(player);
 +}
 +
- static void proxy_added(GDBusProxy *proxy, void *user_data)
- {
- 	const char *interface;
-@@ -1437,6 +1533,10 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
- 		printf("Bluetooth Player %s found\n",
++static void proxy_added(GDBusProxy *proxy, void *user_data)
++{
++	const char *interface;
++
+ 	interface = g_dbus_proxy_get_interface(proxy);
+ 
+ 	if (!strcmp(interface, BLUEZ_ADAPTER_INTERFACE)) {
++		if (adapter != NULL)
++			return;
++
+ 		printf("Bluetooth Adapter %s found\n",
  						g_dbus_proxy_get_path(proxy));
- 		register_player(proxy);
-+	} else if (!strcmp(interface, BLUEZ_MEDIA_TRANSPORT_INTERFACE)) {
-+		printf("Bluetooth Transport %s found\n",
+ 		adapter = proxy;
+ 		list_names(session);
++	} else if (!strcmp(interface, BLUEZ_MEDIA_PLAYER_INTERFACE)) {
++		printf("Bluetooth Player %s found\n",
 +						g_dbus_proxy_get_path(proxy));
-+		register_transport(proxy);
- 	}
- }
- 
-@@ -1462,6 +1562,37 @@ static struct player *find_player(GDBusProxy *proxy)
- 	return NULL;
- }
- 
-+static struct player *find_player_by_transport(GDBusProxy *proxy)
++		register_player(proxy);
++	}
++}
++
++static void unregister_player(struct player *player)
++{
++	players = g_slist_remove(players, player);
++
++	g_dbus_unregister_interface(player->conn, MPRIS_PLAYER_PATH,
++						MPRIS_PLAYER_INTERFACE);
++}
++
++static struct player *find_player(GDBusProxy *proxy)
 +{
 +	GSList *l;
 +
 +	for (l = players; l; l = l->next) {
 +		struct player *player = l->data;
 +
-+		if (player->transport == proxy)
++		if (player->proxy == proxy)
 +			return player;
-+	}
+ 	}
 +
 +	return NULL;
-+}
-+
-+static void unregister_transport(GDBusProxy *proxy)
-+{
-+	struct player *player;
-+
-+	if (g_slist_find(transports, proxy) == NULL)
-+		return;
-+
-+	transports = g_slist_remove(transports, proxy);
-+
-+	player = find_player_by_transport(proxy);
-+	if (player == NULL)
-+		return;
-+
-+	g_dbus_proxy_unref(player->transport);
-+	player->transport = NULL;
-+}
-+
+ }
+ 
  static void proxy_removed(GDBusProxy *proxy, void *user_data)
- {
- 	const char *interface;
-@@ -1487,6 +1618,10 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
- 		printf("Bluetooth Player %s removed\n",
- 						g_dbus_proxy_get_path(proxy));
- 		unregister_player(player);
-+	} else if (strcmp(interface, BLUEZ_MEDIA_TRANSPORT_INTERFACE) == 0) {
-+		printf("Bluetooth Transport %s removed\n",
+@@ -759,19 +1471,67 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+ 
+ 	interface = g_dbus_proxy_get_interface(proxy);
+ 
+-	if (strcmp(interface, BLUEZ_ADAPTER_INTERFACE))
++	if (strcmp(interface, BLUEZ_ADAPTER_INTERFACE) == 0) {
++		if (adapter != proxy)
++			return;
++		printf("Bluetooth Adapter %s removed\n",
 +						g_dbus_proxy_get_path(proxy));
-+		unregister_transport(proxy);
- 	}
- }
- 
-@@ -1506,16 +1641,11 @@ static const char *property_to_mpris(const char *property)
- 	return NULL;
- }
- 
--static void property_changed(GDBusProxy *proxy, const char *name,
-+static void player_property_changed(GDBusProxy *proxy, const char *name,
- 					DBusMessageIter *iter, void *user_data)
- {
- 	struct player *player;
--	const char *interface, *property;
--
--	interface = g_dbus_proxy_get_interface(proxy);
--
--	if (strcmp(interface, "org.bluez.MediaPlayer1") != 0)
--		return;
-+	const char *property;
- 
- 	player = find_player(proxy);
- 	if (player == NULL)
-@@ -1530,6 +1660,45 @@ static void property_changed(GDBusProxy *proxy, const char *name,
- 						property);
- }
- 
-+static void transport_property_changed(GDBusProxy *proxy, const char *name,
-+					DBusMessageIter *iter, void *user_data)
++		adapter = NULL;
++	} else if (strcmp(interface, BLUEZ_MEDIA_PLAYER_INTERFACE) == 0) {
++		struct player *player;
++
++		player = find_player(proxy);
++		if (player == NULL)
++			return;
++
++		printf("Bluetooth Player %s removed\n",
++						g_dbus_proxy_get_path(proxy));
++		unregister_player(player);
++	}
++}
++
++static const char *property_to_mpris(const char *property)
 +{
-+	struct player *player;
-+	DBusMessageIter var;
-+	const char *path;
++	if (strcasecmp(property, "Repeat") == 0)
++		return "LoopStatus";
++	else if (strcasecmp(property, "Shuffle") == 0)
++		return "Shuffle";
++	else if (strcasecmp(property, "Status") == 0)
++		return "PlaybackStatus";
++	else if (strcasecmp(property, "Position") == 0)
++		return "Position";
++	else if (strcasecmp(property, "Track") == 0)
++		return "Metadata";
 +
-+	if (strcasecmp(name, "Volume") != 0)
-+		return;
-+
-+	if (!g_dbus_proxy_get_property(proxy, "Device", &var))
-+		return;
-+
-+	dbus_message_iter_get_basic(&var, &path);
-+
-+	player = find_player_by_device(path);
-+	if (player == NULL)
-+		return;
-+
-+	g_dbus_emit_property_changed(player->conn, MPRIS_PLAYER_PATH,
-+						MPRIS_PLAYER_INTERFACE,
-+						name);
++	return NULL;
 +}
 +
 +static void property_changed(GDBusProxy *proxy, const char *name,
 +					DBusMessageIter *iter, void *user_data)
 +{
-+	const char *interface;
++	struct player *player;
++	const char *interface, *property;
 +
 +	interface = g_dbus_proxy_get_interface(proxy);
 +
-+	if (strcmp(interface, BLUEZ_MEDIA_PLAYER_INTERFACE) == 0)
-+		return player_property_changed(proxy, name, iter, user_data);
++	if (strcmp(interface, "org.bluez.MediaPlayer1") != 0)
+ 		return;
+ 
+-	if (adapter != proxy)
++	player = find_player(proxy);
++	if (player == NULL)
+ 		return;
+ 
+-	printf("Bluetooth Adapter %s removed\n", g_dbus_proxy_get_path(proxy));
+-	adapter = NULL;
++	property = property_to_mpris(name);
++	if (property == NULL)
++		return;
 +
-+	if (strcmp(interface, BLUEZ_MEDIA_TRANSPORT_INTERFACE) == 0)
-+		return transport_property_changed(proxy, name, iter,
-+								user_data);
-+}
-+
++	g_dbus_emit_property_changed(player->conn, MPRIS_PLAYER_PATH,
++						MPRIS_PLAYER_INTERFACE,
++						property);
+ }
+ 
  int main(int argc, char *argv[])
  {
+-	GDBusClient *client;
  	guint owner_watch, properties_watch;
+ 	struct sigaction sa;
+ 	int opt;
+@@ -825,7 +1585,7 @@ int main(int argc, char *argv[])
+ 	g_dbus_client_set_disconnect_watch(client, disconnect_handler, NULL);
+ 
+ 	g_dbus_client_set_proxy_handlers(client, proxy_added, proxy_removed,
+-							NULL, NULL);
++						property_changed, NULL);
+ 
+ 	g_main_loop_run(main_loop);
+ 
 -- 
 1.8.0.2
 
