@@ -1,43 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
+From: Damjan Cvetko <Damjan.Cvetko@monotek.net>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Auto reconnect heartrate LE device
+Date: Fri, 18 Jan 2013 12:06:38 +0000
+Message-ID: <CEE0DF8E7B2727428D202DA3F3FBC4DD8C7440F0@PULWAR.mtk.lan>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <1358258204-4090-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1358258204-4090-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Fri, 18 Jan 2013 14:12:56 +0200
-Message-ID: <CABBYNZL8R9BEvHY4KFaJ7yCsP_EiVFX8OvTE7J5H1TtqKS95Yw@mail.gmail.com>
-Subject: Re: [PATCH 0/5] MAP client: Add missing parameters for GetMessageListing
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+Hi.
 
-On Tue, Jan 15, 2013 at 3:56 PM, Christian Fetzer
-<christian.fetzer@oss.bmw-carit.de> wrote:
-> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
->
-> This patchset adds the missing parameters Text, AttachmentSize and Status
-> as well as the filter SubjectLength.
->
-> Christian Fetzer (5):
->   obexd: Add parameter SubjectLength to map_list_messages
->   obexd: Move parse_size function in map.c
->   obexd: Add parameter Text to GetMessageListing response
->   obexd: Add parameter AttachmentSize to GetMessageListing response
->   obexd: Add parameter Status to GetMessageListing response
->
->  doc/obex-api.txt   | 20 +++++++++++--
->  obexd/client/map.c | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++---
->  2 files changed, 101 insertions(+), 6 deletions(-)
->
-> --
-> 1.8.1
+Talked to jhe on IRC regarding this some days ago. I have a Polar heart rate monitor, and with the latest code it work well enough. However when the device goes out of range, it is disconnected from bluetoothd and does not reconnect when coming back into range:
 
-All 5 patches have been pushed upstream, just need to do a minor fix
-to SubjectLength type since D-Bus don't really have uint8 I modified
-it to byte.
+bluetoothd[2898]: src/adapter.c:dev_disconnected() Device 00:22:D0:00:00:64 disconnected, reason 0
+...
+bluetoothd[2898]: src/device.c:attrib_disconnected_cb() Automatic connection disabled
 
---
-Luiz Augusto von Dentz
+I wanted to add auto reconnection, and this 1 line fix is what I came up with. It works in most cases, but sometimes bluetoothd fals into a loop.
+
+...
+"src/adapter.c:adapter_set_discovering() hci0 restarting discovery: disc_sessions 2"
+"src/adapter.c:start_discovery_complete() Busy (0x0a)"
+"src/adapter.c:adapter_set_discovering() hci0 restarting discovery: disc_sessions 2"
+...
+
+Still looking into that part, could also be unrelated. Here is the patch.
+
+Best,
+Damjan
+---
+Set auto connect for heartrate device.
+
+diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
+index 5c56d3f..1788d4f 100644
+--- a/profiles/heartrate/heartrate.c
++++ b/profiles/heartrate/heartrate.c
+@@ -801,6 +801,8 @@ static int heartrate_device_register(struct btd_device *device,
+        hr->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
+                                                attio_disconnected_cb, hr);
+
++       device_set_auto_connect(device, TRUE);
++
+        return 0;
+ }
+
