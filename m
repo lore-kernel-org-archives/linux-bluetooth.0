@@ -1,47 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Damjan Cvetko <Damjan.Cvetko@monotek.net>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Auto reconnect heartrate LE device
-Date: Fri, 18 Jan 2013 12:06:38 +0000
-Message-ID: <CEE0DF8E7B2727428D202DA3F3FBC4DD8C7440F0@PULWAR.mtk.lan>
-Content-Type: text/plain; charset="us-ascii"
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 1/2] tools: Add mgmt test case for pair device while powered off
+Date: Fri, 18 Jan 2013 12:51:34 +0100
+Message-ID: <1358509895-7460-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi.
-
-Talked to jhe on IRC regarding this some days ago. I have a Polar heart rate monitor, and with the latest code it work well enough. However when the device goes out of range, it is disconnected from bluetoothd and does not reconnect when coming back into range:
-
-bluetoothd[2898]: src/adapter.c:dev_disconnected() Device 00:22:D0:00:00:64 disconnected, reason 0
-...
-bluetoothd[2898]: src/device.c:attrib_disconnected_cb() Automatic connection disabled
-
-I wanted to add auto reconnection, and this 1 line fix is what I came up with. It works in most cases, but sometimes bluetoothd fals into a loop.
-
-...
-"src/adapter.c:adapter_set_discovering() hci0 restarting discovery: disc_sessions 2"
-"src/adapter.c:start_discovery_complete() Busy (0x0a)"
-"src/adapter.c:adapter_set_discovering() hci0 restarting discovery: disc_sessions 2"
-...
-
-Still looking into that part, could also be unrelated. Here is the patch.
-
-Best,
-Damjan
+This tests if kernel is responding with proper command complete event.
 ---
-Set auto connect for heartrate device.
+ tools/mgmt-tester.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index 5c56d3f..1788d4f 100644
---- a/profiles/heartrate/heartrate.c
-+++ b/profiles/heartrate/heartrate.c
-@@ -801,6 +801,8 @@ static int heartrate_device_register(struct btd_device *device,
-        hr->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
-                                                attio_disconnected_cb, hr);
-
-+       device_set_auto_connect(device, TRUE);
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index cb02480..5c72d00 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -916,6 +916,20 @@ static const struct generic_data add_uuid32_test_1 = {
+ 	.expect_hci_len = sizeof(write_eir_uuid32_hci),
+ };
+ 
++static const char pair_device_param[] = {
++			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x00, 0x00 };
++static const char pair_device_rsp[] = {
++			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x00 };
 +
-        return 0;
++static const struct generic_data pair_device_not_powered_test_1 = {
++	.send_opcode = MGMT_OP_PAIR_DEVICE,
++	.send_param = pair_device_param,
++	.send_len = sizeof(pair_device_param),
++	.expect_status = MGMT_STATUS_NOT_POWERED,
++	.expect_param = pair_device_rsp,
++	.expect_len = sizeof(pair_device_rsp),
++};
++
+ static void setup_powered_callback(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -1414,5 +1428,8 @@ int main(int argc, char *argv[])
+ 	test_bredr("Add UUID - UUID-32 1", &add_uuid32_test_1, setup_ssp,
+ 				test_command_generic);
+ 
++	test_bredr("Pair Device - Not Powered 1",
++				&pair_device_not_powered_test_1, NULL,
++				test_command_generic);
+ 	return tester_run();
  }
+-- 
+1.8.0.3
 
