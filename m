@@ -1,9 +1,8 @@
 Return-Path: <cyrus@holtmann.org>
 From: Lubomir Rintel <lkundrak@v3.sk>
-To: Dan Williams <dcbw@redhat.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Bing Zhao <bzhao@marvell.com>,
-	Ben Hutchings <ben@decadent.org.uk>,
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Bing Zhao <bzhao@marvell.com>
+Cc: Ben Hutchings <ben@decadent.org.uk>,
 	David Woodhouse <dwmw2@infradead.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
@@ -11,41 +10,68 @@ Cc: Marcel Holtmann <marcel@holtmann.org>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Lubomir Rintel <lkundrak@v3.sk>
-Subject: [PATCH] libertas sdio: look for 8688 firmware in common location
-Date: Fri, 18 Jan 2013 08:39:41 +0100
-Message-Id: <1358494781-30160-1-git-send-email-lkundrak@v3.sk>
-In-Reply-To: <1357771504.12030.59.camel@dcbw.foobar.com>
-References: <1357771504.12030.59.camel@dcbw.foobar.com>
+Subject: [PATCH] bluetooth: btmrvl_sdio: look for sd8688 firmware in proper location
+Date: Fri, 18 Jan 2013 08:37:23 +0100
+Message-Id: <1358494643-29765-1-git-send-email-lkundrak@v3.sk>
+In-Reply-To: <477F20668A386D41ADCC57781B1F70430D13FDB783@SC-VEXCH1.marvell.com>
+References: <477F20668A386D41ADCC57781B1F70430D13FDB783@SC-VEXCH1.marvell.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-sd8688 is not only used by libertas WiFi, but shared with btmrvl bluetooth as
-well.
 
 Signed-off-by: Lubomir Rintel <lkundrak@v3.sk>
 ---
- drivers/net/wireless/libertas/if_sdio.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ drivers/bluetooth/btmrvl_sdio.c |    8 ++++----
+ drivers/bluetooth/btmrvl_sdio.h |    6 ++++--
+ 2 files changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/wireless/libertas/if_sdio.c b/drivers/net/wireless/libertas/if_sdio.c
-index 739309e..be16a76 100644
---- a/drivers/net/wireless/libertas/if_sdio.c
-+++ b/drivers/net/wireless/libertas/if_sdio.c
-@@ -85,6 +85,7 @@ static const struct lbs_fw_table fw_table[] = {
- 	{ MODEL_8686, "libertas/sd8686_v9_helper.bin", "libertas/sd8686_v9.bin" },
- 	{ MODEL_8686, "libertas/sd8686_v8_helper.bin", "libertas/sd8686_v8.bin" },
- 	{ MODEL_8686, "sd8686_helper.bin", "sd8686.bin" },
-+	{ MODEL_8688, "mrvl/sd8688_helper.bin", "mrvl/sd8688.bin" },
- 	{ MODEL_8688, "libertas/sd8688_helper.bin", "libertas/sd8688.bin" },
- 	{ MODEL_8688, "sd8688_helper.bin", "sd8688.bin" },
- 	{ 0, NULL, NULL }
-@@ -99,6 +100,8 @@ MODULE_FIRMWARE("libertas/sd8686_v8_helper.bin");
- MODULE_FIRMWARE("libertas/sd8686_v8.bin");
- MODULE_FIRMWARE("sd8686_helper.bin");
- MODULE_FIRMWARE("sd8686.bin");
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 3f4bfc8..bc27d01 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -83,8 +83,8 @@ static const struct btmrvl_sdio_card_reg btmrvl_reg_87xx = {
+ };
+ 
+ static const struct btmrvl_sdio_device btmrvl_sdio_sd8688 = {
+-	.helper		= "sd8688_helper.bin",
+-	.firmware	= "sd8688.bin",
++	.helper		= "mrvl/sd8688_helper.bin",
++	.firmware	= "mrvl/sd8688.bin",
+ 	.reg		= &btmrvl_reg_8688,
+ 	.sd_blksz_fw_dl	= 64,
+ };
+@@ -1179,7 +1179,7 @@ MODULE_AUTHOR("Marvell International Ltd.");
+ MODULE_DESCRIPTION("Marvell BT-over-SDIO driver ver " VERSION);
+ MODULE_VERSION(VERSION);
+ MODULE_LICENSE("GPL v2");
+-MODULE_FIRMWARE("sd8688_helper.bin");
+-MODULE_FIRMWARE("sd8688.bin");
 +MODULE_FIRMWARE("mrvl/sd8688_helper.bin");
 +MODULE_FIRMWARE("mrvl/sd8688.bin");
- MODULE_FIRMWARE("libertas/sd8688_helper.bin");
- MODULE_FIRMWARE("libertas/sd8688.bin");
- MODULE_FIRMWARE("sd8688_helper.bin");
+ MODULE_FIRMWARE("mrvl/sd8787_uapsta.bin");
+ MODULE_FIRMWARE("mrvl/sd8797_uapsta.bin");
+diff --git a/drivers/bluetooth/btmrvl_sdio.h b/drivers/bluetooth/btmrvl_sdio.h
+index 43d35a6..4a5a019 100644
+--- a/drivers/bluetooth/btmrvl_sdio.h
++++ b/drivers/bluetooth/btmrvl_sdio.h
+@@ -84,7 +84,9 @@ struct btmrvl_sdio_card {
+ 	struct sdio_func *func;
+ 	u32 ioport;
+ 	const char *helper;
++	const char *helper2;
+ 	const char *firmware;
++	const char *firmware2;
+ 	const struct btmrvl_sdio_card_reg *reg;
+ 	u16 sd_blksz_fw_dl;
+ 	u8 rx_unit;
+@@ -92,8 +94,8 @@ struct btmrvl_sdio_card {
+ };
+ 
+ struct btmrvl_sdio_device {
+-	const char *helper;
+-	const char *firmware;
++	const char *helper, *helper2;
++	const char *firmware, *firmware2;
+ 	const struct btmrvl_sdio_card_reg *reg;
+ 	u16 sd_blksz_fw_dl;
+ };
 -- 
 1.7.1
