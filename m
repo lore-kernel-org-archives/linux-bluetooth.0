@@ -1,32 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon@janc.net.pl>
+From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon@janc.net.pl>
-Subject: [PATCH] test: Use proper test data in unblock device test
-Date: Fri, 18 Jan 2013 20:28:12 +0100
-Message-Id: <1358537292-3572-1-git-send-email-szymon@janc.net.pl>
+Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@openbossa.org>
+Subject: [PATCH BlueZ] avrcp: Ignore MSB of Absolute Volume parameter
+Date: Fri, 18 Jan 2013 16:25:20 -0300
+Message-Id: <1358537120-7955-1-git-send-email-jprvita@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Copy and paste error. Although both data values are same use proper
-one for clarity.
+According to the Section 6.13.1 of the AVRCP 1.5 specification document,
+the most significant bit of the Absolute Volume parameter is reserved
+for future additions, so it should be ignored when parsing parameters of
+the SetAbsoluteVolume command. This is also necessary to pass PTS test
+TC_TG_VLH_BI_02_C.
 ---
- tools/mgmt-tester.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ profiles/audio/avrcp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 273401c..bf61f9d 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -1714,7 +1714,7 @@ int main(int argc, char *argv[])
- 			test_command_generic);
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 636d3e4..237f176 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -1398,11 +1398,13 @@ static uint8_t avrcp_handle_set_absolute_volume(struct avrcp *session,
+ {
+ 	struct avrcp_player *player = session->player;
+ 	uint16_t len = ntohs(pdu->params_len);
++	uint8_t volume;
  
- 	test_bredr("Unblock Device - Invalid Parameters 1",
--			&block_device_invalid_param_test_1, NULL,
-+			&unblock_device_invalid_param_test_1, NULL,
- 			test_command_generic);
+ 	if (len != 1)
+ 		goto err;
  
- 	return tester_run();
+-	if (pdu->params[0] > 127)
++	volume = pdu->params[0] & 0x7F;
++	if (volume > 127)
+ 		goto err;
+ 
+ 	if (!player)
 -- 
-1.8.1
+1.7.11.7
 
