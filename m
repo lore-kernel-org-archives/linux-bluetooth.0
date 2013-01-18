@@ -1,26 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 18 Jan 2013 15:26:18 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] tools: Add mgmt test case for pair device while
- powered off
-Message-ID: <20130118132618.GA17964@x220>
-References: <1358509895-7460-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1358509895-7460-1-git-send-email-szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 09/10] Bluetooth: Fix returning proper cmd_complete for mgmt_disconnect
+Date: Fri, 18 Jan 2013 15:25:57 +0200
+Message-Id: <1358515558-17861-10-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1358515558-17861-1-git-send-email-johan.hedberg@gmail.com>
+References: <1358515558-17861-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Fri, Jan 18, 2013, Szymon Janc wrote:
-> This tests if kernel is responding with proper command complete event.
-> ---
->  tools/mgmt-tester.c | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
+The Disconnect Management command should return Command Complete instead
+of Command Status whenever possible so that user space can distinguish
+exactly which command failed in the case of multiple commands. This
+patch does the necessary changes in the disconnect command handler to
+return the right event to user space.
 
-Applied. Thanks.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c |   22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
 
-Johan
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 8ec3c4f..184673e 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1655,6 +1655,7 @@ static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		      u16 len)
+ {
+ 	struct mgmt_cp_disconnect *cp = data;
++	struct mgmt_rp_disconnect rp;
+ 	struct hci_cp_disconnect dc;
+ 	struct pending_cmd *cmd;
+ 	struct hci_conn *conn;
+@@ -1662,21 +1663,26 @@ static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	BT_DBG("");
+ 
++	memset(&rp, 0, sizeof(rp));
++	bacpy(&rp.addr.bdaddr, &cp->addr.bdaddr);
++	rp.addr.type = cp->addr.type;
++
+ 	if (!bdaddr_type_is_valid(cp->addr.type))
+-		return cmd_status(sk, hdev->id, MGMT_OP_DISCONNECT,
+-				  MGMT_STATUS_INVALID_PARAMS);
++		return cmd_complete(sk, hdev->id, MGMT_OP_DISCONNECT,
++				    MGMT_STATUS_INVALID_PARAMS,
++				    &rp, sizeof(rp));
+ 
+ 	hci_dev_lock(hdev);
+ 
+ 	if (!test_bit(HCI_UP, &hdev->flags)) {
+-		err = cmd_status(sk, hdev->id, MGMT_OP_DISCONNECT,
+-				 MGMT_STATUS_NOT_POWERED);
++		err = cmd_complete(sk, hdev->id, MGMT_OP_DISCONNECT,
++				   MGMT_STATUS_NOT_POWERED, &rp, sizeof(rp));
+ 		goto failed;
+ 	}
+ 
+ 	if (mgmt_pending_find(MGMT_OP_DISCONNECT, hdev)) {
+-		err = cmd_status(sk, hdev->id, MGMT_OP_DISCONNECT,
+-				 MGMT_STATUS_BUSY);
++		err = cmd_complete(sk, hdev->id, MGMT_OP_DISCONNECT,
++				   MGMT_STATUS_BUSY, &rp, sizeof(rp));
+ 		goto failed;
+ 	}
+ 
+@@ -1687,8 +1693,8 @@ static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->addr.bdaddr);
+ 
+ 	if (!conn || conn->state == BT_OPEN || conn->state == BT_CLOSED) {
+-		err = cmd_status(sk, hdev->id, MGMT_OP_DISCONNECT,
+-				 MGMT_STATUS_NOT_CONNECTED);
++		err = cmd_complete(sk, hdev->id, MGMT_OP_DISCONNECT,
++				   MGMT_STATUS_NOT_CONNECTED, &rp, sizeof(rp));
+ 		goto failed;
+ 	}
+ 
+-- 
+1.7.10.4
+
