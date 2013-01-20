@@ -1,43 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: "Ganir, Chen" <chen.ganir@ti.com>,
-        "marcel@holtmann.org"
-	<marcel@holtmann.org>,
-        "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] hcidump: Add TI Logger dump support
-Date: Sun, 20 Jan 2013 18:58:58 +0000
-Message-ID: <F0070FBC0FB3174D8D11444EB2D5B0260B920418@DNCE05.ent.ti.com>
-References: <1356354253-26134-1-git-send-email-chen.ganir@ti.com>
-In-Reply-To: <1356354253-26134-1-git-send-email-chen.ganir@ti.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 10/10 v2] Bluetooth: Fix returning proper cmd_complete for mgmt_block/unblock
+Date: Sun, 20 Jan 2013 14:27:22 +0200
+Message-Id: <1358684842-4441-11-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1358684842-4441-1-git-send-email-johan.hedberg@gmail.com>
+References: <1358684842-4441-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> -----Original Message-----
-> From: Ganir, Chen
-> Sent: Monday, December 24, 2012 3:04 PM
-> To: marcel@holtmann.org; linux-bluetooth@vger.kernel.org
-> Cc: Ganir, Chen
-> Subject: [PATCH] hcidump: Add TI Logger dump support
->=20
-> From: Chen Ganir <chen.ganir@ti.com>
->=20
-> Texas Instruments controllers can be configured to send the
-> internal firmware log through a vendor specific HCI event on
-> the hci transport.
-> This patch allows capturing those log events, and writing them
-> to a file, which can then be used with the latest TI Logger
-> application to read and show the logs.
->=20
-> This is usefull in case there is no other way to get the TI log
-> (for example, the lack of a connection to the controller Log TX
-> hardware line).
+The Block/Unblock Device Management commands should return Command
+Complete instead of Command Status whenever possible so that user space
+can distinguish exactly which command failed in the case of multiple
+commands. This patch does the necessary changes in the command handler
+to return the right event to user space.
 
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c |   10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Holtmann, Did you forget this one ? This is the fixed version, after your c=
-omments.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 7b8bc7c..e7f944f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2598,8 +2598,9 @@ static int block_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	BT_DBG("%s", hdev->name);
+ 
+ 	if (!bdaddr_type_is_valid(cp->addr.type))
+-		return cmd_status(sk, hdev->id, MGMT_OP_BLOCK_DEVICE,
+-				  MGMT_STATUS_INVALID_PARAMS);
++		return cmd_complete(sk, hdev->id, MGMT_OP_BLOCK_DEVICE,
++				    MGMT_STATUS_INVALID_PARAMS,
++				    &cp->addr, sizeof(cp->addr));
+ 
+ 	hci_dev_lock(hdev);
+ 
+@@ -2627,8 +2628,9 @@ static int unblock_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	BT_DBG("%s", hdev->name);
+ 
+ 	if (!bdaddr_type_is_valid(cp->addr.type))
+-		return cmd_status(sk, hdev->id, MGMT_OP_UNBLOCK_DEVICE,
+-				  MGMT_STATUS_INVALID_PARAMS);
++		return cmd_complete(sk, hdev->id, MGMT_OP_UNBLOCK_DEVICE,
++				    MGMT_STATUS_INVALID_PARAMS,
++				    &cp->addr, sizeof(cp->addr));
+ 
+ 	hci_dev_lock(hdev);
+ 
+-- 
+1.7.10.4
 
-Thanks,
-Chen Ganir.
