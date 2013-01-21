@@ -1,35 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 From: Alexandros Antonopoulos <alexandros.antonopoulos@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] avctp: Fix request timeout after a channel is destroyed
-Date: Mon, 21 Jan 2013 14:44:27 +0100
-Message-Id: <1358775868-9963-3-git-send-email-alexandros.antonopoulos@oss.bmw-carit.de>
+Subject: [PATCH] avctp: Fix size of read() for browsing channel callbacks
+Date: Mon, 21 Jan 2013 14:44:28 +0100
+Message-Id: <1358775868-9963-4-git-send-email-alexandros.antonopoulos@oss.bmw-carit.de>
 In-Reply-To: <1358775868-9963-1-git-send-email-alexandros.antonopoulos@oss.bmw-carit.de>
 References: <1358775868-9963-1-git-send-email-alexandros.antonopoulos@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the control channel is destroyed if there is a pending request
-(chan->p) then the channel queue is deleted in avctp_channel_destroy
-but the timer is still alive resulting in a SIGSEGV
+The read() function should attempt to read browsing->imtu bytes
+and not sizeof(browsing->imtu).
 
 ---
- profiles/audio/avctp.c | 3 +++
- 1 file changed, 3 insertions(+)
+ profiles/audio/avctp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index eb1d35e..e65594d 100644
+index 4309c60..acce507 100644
 --- a/profiles/audio/avctp.c
 +++ b/profiles/audio/avctp.c
-@@ -390,6 +390,9 @@ static void avctp_channel_destroy(struct avctp_channel *chan)
- 	if (chan->watch)
- 		g_source_remove(chan->watch);
+@@ -649,7 +649,7 @@ static gboolean session_browsing_cb(GIOChannel *chan, GIOCondition cond,
  
-+	if (chan->p)
-+		pending_destroy(chan->p, NULL);
-+
- 	if (chan->process_id > 0)
- 		g_source_remove(chan->process_id);
+ 	sock = g_io_channel_unix_get_fd(chan);
+ 
+-	ret = read(sock, buf, sizeof(browsing->imtu));
++	ret = read(sock, buf, browsing->imtu);
+ 	if (ret <= 0)
+ 		goto failed;
  
 -- 
 1.8.1
