@@ -1,65 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+From: Alexandros Antonopoulos <alexandros.antonopoulos@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH v4 1/4] Bluetooth: Move discovery state check inside
- hci_dev_lock()
-Date: Mon, 21 Jan 2013 19:43:36 +0530
-Message-id: <1358777619-27018-1-git-send-email-jaganath.k@samsung.com>
+Subject: [PATCH] avctp: Fix avctp_unregister_browsing_pdu_handler inner loop
+Date: Mon, 21 Jan 2013 14:44:26 +0100
+Message-Id: <1358775868-9963-2-git-send-email-alexandros.antonopoulos@oss.bmw-carit.de>
+In-Reply-To: <1358775868-9963-1-git-send-email-alexandros.antonopoulos@oss.bmw-carit.de>
+References: <1358775868-9963-1-git-send-email-alexandros.antonopoulos@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-After checking the discovery state, if other thread modifies it
-then it will be overwritten by the assignment in the first thread.
+Inner loop should access the sessions data and not the servers
+data
 
-Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
 ---
- net/bluetooth/hci_event.c |    9 ++++-----
- net/bluetooth/mgmt.c      |    4 ----
- 2 files changed, 4 insertions(+), 9 deletions(-)
+ profiles/audio/avctp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 705078a..97b4828 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1273,14 +1273,13 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index acce507..eb1d35e 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -1572,7 +1572,7 @@ gboolean avctp_unregister_browsing_pdu_handler(unsigned int id)
+ 		GSList *s;
  
- 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
- 
-+		hci_dev_lock(hdev);
- 		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
--		    hdev->discovery.state == DISCOVERY_FINDING) {
-+		    hdev->discovery.state == DISCOVERY_FINDING)
- 			mgmt_interleaved_discovery(hdev);
--		} else {
--			hci_dev_lock(hdev);
-+		else
- 			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
--			hci_dev_unlock(hdev);
--		}
-+		hci_dev_unlock(hdev);
- 
- 		break;
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 37add53..a7865ad 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2333,14 +2333,10 @@ int mgmt_interleaved_discovery(struct hci_dev *hdev)
- 
- 	BT_DBG("%s", hdev->name);
- 
--	hci_dev_lock(hdev);
--
- 	err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR_LE);
- 	if (err < 0)
- 		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
- 
--	hci_dev_unlock(hdev);
--
- 	return err;
- }
+ 		for (s = server->sessions; s; s = s->next) {
+-			struct avctp *session = l->data;
++			struct avctp *session = s->data;
+ 			struct avctp_channel *browsing = session->browsing;
+ 			GSList *h;
  
 -- 
-1.7.9.5
+1.8.1
 
