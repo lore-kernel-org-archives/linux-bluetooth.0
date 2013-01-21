@@ -1,130 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 Jan 2013 01:10:52 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next 2013-01-24
-Message-ID: <20130124031052.GE1632@joana>
+Message-ID: <50FDAD79.8040700@globaledgesoft.com>
+Date: Tue, 22 Jan 2013 02:34:57 +0530
+From: Ajay <ajay.kv@globaledgesoft.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="EVF5PPMfhYS0aIcm"
+To: linux-bluetooth@vger.kernel.org
+Subject: Simultaneous data transfer on  ACL and BLE  links
+Content-Type: multipart/mixed;
+ boundary="------------060001040309060305040702"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This is a multi-part message in MIME format.
+--------------060001040309060305040702
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
---EVF5PPMfhYS0aIcm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Hi ,
+     Kernel has set some  restrictions in simultaneous  L2cap data 
+transfer on BLE and ACL links on a common device .
 
-Hi John,
+      My test scenario is as follows
+             Device A  has both LE and ACL link with  device B and C 
+respectively . when i start  sending l2cap data on  ACL link (A to B), 
+it work fine . But when i starts sending BLE data along with ACL  data 
+(A to C )  , it fails  with  error "send failed : interrupt system call" 
+. when i count the  LE packets that had reached upto hci layer , it  
+shows some 367 packets.
+              Later i noticed that LE data is getting queued at hci 
+layer  and it is  not  scheduled properly . following piece of code 
+tells us the order of scheduling.. (hci_core.c)
 
-This is my first pull request to 3.9. The biggest changes here are from Johan
-Hedberg who made a lot of fixes in the Management interface. The issues arose
-due to a new test tool we wrote and the usage of the Management interface as
-default in BlueZ 5. The rest of the patches are more clean ups and small
-fixes.
 
-Please pull! Thanks!
+static void hci_tx_task(unsigned long arg)
+{
+     struct hci_dev *hdev = (struct hci_dev *) arg;
+     struct sk_buff *skb;
+
+     read_lock(&hci_task_lock);
+
+     BT_DBG("%s acl %d sco %d le %d", hdev->name, hdev->acl_cnt,
+         hdev->sco_cnt, hdev->le_cnt);
+
+     /* Schedule queues and send stuff to HCI driver */
+
+     hci_sched_acl(hdev);
+
+     hci_sched_sco(hdev);
+
+     hci_sched_esco(hdev);
+
+     hci_sched_le(hdev);
+
+......
 
 
-	Gustavo
----
-The following changes since commit e7f767a7d9f809c494bfffffeda2bbdbfec110b4:
+     Here  both   acl and le scheduling  are using same count  as 
+reference  (hdev->acl_cnt)  and they have never make use of hdev->le_cnt.
 
-  mwifiex: use map/unmap APIs in TX and RX to reduce memcpy (2013-01-07 15:18:30 -0500)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next for-upstream
-
-for you to fetch changes up to 9b008c0457e583e10e62d1215bed6ab26ee54906:
-
-  Bluetooth: Add support for reading LE supported states (2013-01-23 02:09:16 -0200)
-
-----------------------------------------------------------------
-Andrei Emeltchenko (4):
-      Bluetooth: AMP: Send A2MP Create Phylink Rsp after Assoc write
-      Bluetooth: AMP: Clean up logical link create / accept
-      Bluetooth: AMP: Remove dead code
-      Bluetooth: AMP: Use set_bit / test_bit for amp_mgr state
-
-Gustavo Padovan (1):
-      Bluetooth: Fix uuid output in debugfs
-
-Johan Hedberg (25):
-      Bluetooth: Fix missing command complete event for mgmt_confirm_name
-      Bluetooth: Fix missing command complete for mgmt_load_long_term_keys
-      Bluetooth: Fix checking for valid device class values
-      Bluetooth: Fix accepting set_dev_class for non-BR/EDR controllers
-      Bluetooth: Move non-critical sections outside of the dev lock
-      Bluetooth: Fix checking for exact values of boolean mgmt parameters
-      Bluetooth: Fix returning proper command status for start_discovery
-      Bluetooth: Fix sending incorrect new_settings for mgmt_set_powered
-      Bluetooth: Add a new workqueue for hci_request operations
-      Bluetooth: Use req_workqueue for hci_request operations
-      Bluetooth: Fix using system-global workqueue when not necessary
-      Bluetooth: Fix Class of Device indication when powering off
-      Bluetooth: Fix checking for correct mgmt_load_link_keys parameters
-      Bluetooth: Fix returning proper mgmt status for Load LTKs
-      Bluetooth: Fix checking for proper key->master value in Load LTKs
-      Bluetooth: Refactor valid LTK data testing into its own function
-      Bluetooth: Check for valid key->authenticated value for LTKs
-      Bluetooth: Add helper functions for testing bdaddr types
-      Bluetooth: Fix checking for valid address type values in mgmt commands
-      Bluetooth: Fix checking for valid disconnect parameters in unpair_device
-      Bluetooth: Fix returning proper cmd_complete for mgmt_disconnect
-      Bluetooth: Fix returning proper cmd_complete for mgmt_block/unblock
-      Bluetooth: Add LE Local Features reading support
-      Bluetooth: Add support for reading LE White List Size
-      Bluetooth: Add support for reading LE supported states
-
-Rami Rosen (2):
-      Bluetooth: Remove unnecessary include l2cap.h
-      Bluetooth: remove an unused variable in a header file
-
-Szymon Janc (3):
-      Bluetooth: mgmt: Remove not needed restriction on add/remove OOB data
-      Bluetooth: mgmt: Avoid using magic number in status code
-      Bluetooth: Fix pair device command reply if adapter is powered off
-
- include/net/bluetooth/a2mp.h      |   4 +-
- include/net/bluetooth/bluetooth.h |  23 ++++
- include/net/bluetooth/hci.h       |  18 +++
- include/net/bluetooth/hci_core.h  |   4 +
- include/net/bluetooth/l2cap.h     |   1 -
- net/bluetooth/a2mp.c              |  42 ++++++-
- net/bluetooth/amp.c               |  25 ++--
- net/bluetooth/bnep/core.c         |   1 -
- net/bluetooth/hci_core.c          |  20 ++-
- net/bluetooth/hci_event.c         |  60 +++++++++
- net/bluetooth/hci_sysfs.c         |  22 ++--
- net/bluetooth/l2cap_core.c        |   5 -
- net/bluetooth/mgmt.c              | 270 ++++++++++++++++++++++++++++------------
- 13 files changed, 375 insertions(+), 120 deletions(-)
+    please kindly go through this issue.
 
 
 
 
---EVF5PPMfhYS0aIcm
-Content-Type: application/pgp-signature
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQIcBAEBAgAGBQJRAKY8AAoJEPs3PUX4s20oEhkP/R0ERhijCGwywHGBXiq1u5t7
-9T2KZq6cEK+1teMbzH6A0ehynatKCER7LVJkHb1gNjT5wKSFgxa7jfEDo6qLeKHQ
-Tgl6PXC3b1GB+QFgBfIiZ7uFdEq/M0MZW/MUHHoR0N38+mnHqvbQtHQnCfcWEbnF
-Ybf08EapBlPG2dslhFDk9+xi2/SaaRoPwUiXu9cBatqTG4mLTlTfcp/dnHxRA/50
-nWSzwkl8tMNUn0tBkK/NgF7NfOp2jXVYEcMjqEiM1ck3WPIPLSGeTp8ONlGkL+TS
-2ppc7s2NDXpkZ9DChofWA6gLSGfqz7f8uWeNSzgVJZygY9M/D5YHFVEuVqbYZ1g4
-Ou67W+CEu98iDPJjZtJ07rOq2flZxuAZIrYp+cjH9yIZZRnKa16GuMJEJfVby1tH
-6cGZJQZJL7u/Zec564pli3Gpml84czyhsaAR/MY1LTOuUWqq5gMU4pjofEL1wykI
-Oh530u2Yk7p/Amvh294dlHP5CbS1OruMlaJfOvZkxTSTm1bbZb9+99Ejiwd7z0t3
-vnN32nX4ZgOz09Ka9i38p7TBatVkTqrmjZOZ3+pi2l9Y/OALXhu6k6EcBDqt/LLX
-c2XeMl2on6XpYlvmLBhKNCKlsSQMG6ZpZ4Ic9Tnu8OMPZlFv22toWjZknM9b1Qpz
-2GEehV/KrFeiKEX1qiwa
-=ZKlL
------END PGP SIGNATURE-----
 
---EVF5PPMfhYS0aIcm--
+
+-- 
+Thanks & Regards
+
+  AJAY KV
+  GlobalEdge software Ltd
+  8892753703
+
+
+--------------060001040309060305040702
+Content-Type: text/x-vcard; charset=utf-8;
+ name="ajay_kv.vcf"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="ajay_kv.vcf"
+
+begin:vcard
+fn:AJAY KV
+n:;AJAY
+tel;cell:8892753703
+version:2.1
+end:vcard
+
+
+--------------060001040309060305040702--
