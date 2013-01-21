@@ -1,62 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <50FD567C.1000209@samsung.com>
-Date: Mon, 21 Jan 2013 23:53:48 +0900
-From: Chan-yeol Park <chanyeol.park@samsung.com>
-MIME-version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	SYAM SIDHARDHAN <s.syam@samsung.com>
-Subject: Re: [PATCH BlueZ 5/9 v3] audio: Fix handling of A2DP abort indication
-References: <1339771301-24032-1-git-send-email-luiz.dentz@gmail.com>
- <1339771301-24032-5-git-send-email-luiz.dentz@gmail.com>
-In-reply-to: <1339771301-24032-5-git-send-email-luiz.dentz@gmail.com>
-Content-type: text/plain; charset=ISO-8859-1; format=flowed
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Subject: [PATCH v4 4/4] Bluetooth: Fix stop discovery while in STARTING state
+Date: Mon, 21 Jan 2013 19:43:39 +0530
+Message-id: <1358777619-27018-4-git-send-email-jaganath.k@samsung.com>
+In-reply-to: <1358777619-27018-1-git-send-email-jaganath.k@samsung.com>
+References: <1358777619-27018-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz.
+If stop_discovery() is called when discovery state is STARTING, it
+will be failed currently. This patch fixes this.
 
-Regarding your patch that was applied already, I think
-finalize_setup_errno() function missed NULL argument.
+Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
+---
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_event.c        |   14 ++++++++++++--
+ net/bluetooth/mgmt.c             |   12 +++++++++++-
+ 3 files changed, 24 insertions(+), 3 deletions(-)
 
-This is reported by Syam Sidhardhan <s.syam@samsung.com>
-
-On 06/15/2012 11:41 PM, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> When an abort is received all setup callbacks should return an error.
-> ---
->   audio/a2dp.c |    9 +++++++++
->   1 file changed, 9 insertions(+)
->
-> diff --git a/audio/a2dp.c b/audio/a2dp.c
-> index 5139f61..d9dcead 100644
-> --- a/audio/a2dp.c
-> +++ b/audio/a2dp.c
-> @@ -1182,6 +1182,7 @@ static gboolean abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
->   				void *user_data)
->   {
->   	struct a2dp_sep *a2dp_sep = user_data;
-> +	struct a2dp_setup *setup;
->   
->   	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
->   		DBG("Sink %p: Abort_Ind", sep);
-> @@ -1190,6 +1191,14 @@ static gboolean abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
->   
->   	a2dp_sep->stream = NULL;
->   
-> +	setup = find_setup_by_session(session);
-> +	if (!setup)
-> +		return TRUE;
-> +
-> +	finalize_setup_errno(setup, -ECONNRESET, finalize_suspend,
-> +							finalize_resume,
-> +							finalize_config);
-> +
-Here.
-
-Could you give us your opinion?
-
-Regards
-Chanyeol
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index f20da05..0a7aa1f 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -64,6 +64,7 @@ struct discovery_state {
+ 		DISCOVERY_RESOLVING,
+ 		DISCOVERY_STOPPING,
+ 	} state;
++	bool discovering;
+ 	struct list_head	all;	/* All devices found during inquiry */
+ 	struct list_head	unknown;	/* Name state not known */
+ 	struct list_head	resolve;	/* Name needs to be resolved */
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 97b4828..c616cbf 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1259,7 +1259,12 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 		set_bit(HCI_LE_SCAN, &hdev->dev_flags);
+ 
+ 		hci_dev_lock(hdev);
+-		hci_discovery_set_state(hdev, DISCOVERY_FINDING);
++		if (hdev->discovery.state == DISCOVERY_STOPPING) {
++			hci_cancel_le_scan(hdev);
++			mgmt_start_discovery_cancelled(hdev);
++		} else {
++			hci_discovery_set_state(hdev, DISCOVERY_FINDING);
++		}
+ 		hci_dev_unlock(hdev);
+ 		break;
+ 
+@@ -1375,7 +1380,12 @@ static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+ 	set_bit(HCI_INQUIRY, &hdev->flags);
+ 
+ 	hci_dev_lock(hdev);
+-	hci_discovery_set_state(hdev, DISCOVERY_FINDING);
++	if (hdev->discovery.state == DISCOVERY_STOPPING) {
++		hci_cancel_inquiry(hdev);
++		mgmt_start_discovery_cancelled(hdev);
++	} else {
++		hci_discovery_set_state(hdev, DISCOVERY_FINDING);
++	}
+ 	hci_dev_unlock(hdev);
+ }
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index ba5ca81..d9b1aa1 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2443,7 +2443,8 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	if (!hci_discovery_active(hdev)) {
++	if (hdev->discovery.state != DISCOVERY_STARTING &&
++	    !hci_discovery_active(hdev)) {
+ 		err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY,
+ 				   MGMT_STATUS_REJECTED, &mgmt_cp->type,
+ 				   sizeof(mgmt_cp->type));
+@@ -2491,6 +2492,10 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 		break;
+ 
++	case DISCOVERY_STARTING:
++		err = 0;
++		break;
++
+ 	default:
+ 		BT_DBG("unknown discovery state %u", hdev->discovery.state);
+ 		err = -EFAULT;
+@@ -3777,6 +3782,11 @@ int mgmt_discovering(struct hci_dev *hdev, bool discovering)
+ 		mgmt_pending_remove(cmd);
+ 	}
+ 
++	if (hdev->discovery.discovering == discovering)
++		return 0;
++
++	hdev->discovery.discovering = discovering;
++
+ 	memset(&ev, 0, sizeof(ev));
+ 	ev.type = hdev->discovery.type;
+ 	ev.discovering = discovering;
+-- 
+1.7.9.5
 
