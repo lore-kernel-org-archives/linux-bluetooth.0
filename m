@@ -1,47 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1358757002.7854.27.camel@pflykt-mobl1>
-Subject: Object manager properties on Network1 Connect method call reply
-From: Patrik Flykt <patrik.flykt@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Date: Mon, 21 Jan 2013 10:30:02 +0200
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Mon, 21 Jan 2013 10:29:08 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Ilya Basin <basinilya@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: multiboot sync bluetooth pair key
+Message-ID: <20130121082906.GC18141@aemeltch-MOBL1>
+References: <892087990.20130120132430@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <892087990.20130120132430@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
-	Hi,
+On Sun, Jan 20, 2013 at 01:24:30PM +0400, Ilya Basin wrote:
+> Hi. Is there any software to sync the bluetooth pair key over Linux
+> and Windows, so one won't need to pair the device again?
 
-While implementing ConnMan Bluez 5 plugin using GDBusProxy from ./gdbus
-I noticed the following things.
+Why do you need to pair again? Do you mean your keys get lost?
 
-On org.bluez.Network1.Connect method call return the object properties
-'Connected', 'Interface' and 'UUID' have not yet been updated. It is of
-course obvious that if no error occurs, the network is connected. And
-the interface is provided as an argument to the method call return
-function so that's fine as well.
+> Where is the key stored on Linux?
 
-If the method call signals an error, then the network is of course not
-connected. Except if the error is 'AlreadyConnected', which means it is.
-Since it is not possible to send arguments in an error reply, the only
-way to figure out the interface is via the 'Interface' GDBusProxy
-property. 'Connected' and 'UUID' properties are also set properly in
-this case.
+/var/lib/bluetooth/...
 
->From the above it would be more consistent if the properties were
-already set to their intended values when the Connect method call
-returns independent of success or failure. Thus one set of logic would
-suffice on ConnMan side to handle both cases.
+Best regards 
+Andrei Emeltchenko 
 
-Maybe the org.bluez.Network1 object properties could be updated only for
-the Network1 object in question before sending the method call return?
-Of course the devil may be in the details of the Bluez 5 API why the
-object property update should not or can not be done this way.
-
-Just my €0.02 on this.
-
-Cheers,
-
-	Patrik
-
-
+> Is it DE-specific?
+> Where is it stored on Windows?
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
