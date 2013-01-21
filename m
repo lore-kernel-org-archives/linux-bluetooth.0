@@ -1,90 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: mail@timomueller.eu
-To: linux-bluetooth@vger.kernel.org
-Cc: Timo Mueller <timo.mueller@bmw-carit.de>
-Subject: [RFC] Bluetooth: Fix missing MITM protection when being responding LM
-Date: Mon, 21 Jan 2013 18:35:48 +0100
-Message-Id: <1358789748-318-1-git-send-email-mail@timomueller.eu>
+MIME-Version: 1.0
+In-Reply-To: <1358775868-9963-1-git-send-email-alexandros.antonopoulos@oss.bmw-carit.de>
+References: <1358775868-9963-1-git-send-email-alexandros.antonopoulos@oss.bmw-carit.de>
+Date: Mon, 21 Jan 2013 18:07:41 +0200
+Message-ID: <CABBYNZLxFAtbknKQUyOmUORQ=XZNtP=ktnsLe64LoC=rBpeKZA@mail.gmail.com>
+Subject: Re: [PATCH] Check uuid in disconnect profile.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Alexandros Antonopoulos <alexandros.antonopoulos@oss.bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Timo Mueller <timo.mueller@bmw-carit.de>
+Hi Alexandros,
 
-A MITM protected SSP associaton model can be used for pairing if both
-local and remote IO capabilities are set to something other than
-NoInputNoOutput.
+On Mon, Jan 21, 2013 at 3:44 PM, Alexandros Antonopoulos
+<alexandros.antonopoulos@oss.bmw-carit.de> wrote:
+> If the user calls Device1.DisconnectProfile with an invalid profile
+> uuid disconnect_profile still tries to parse the uuid resulting in
+> a SIGSEGV
+>
+> ---
+>  src/device.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/src/device.c b/src/device.c
+> index 3675616..1771c0f 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -1270,6 +1270,9 @@ static DBusMessage *disconnect_profile(DBusConnection *conn, DBusMessage *msg,
+>
+>         uuid = bt_name2string(pattern);
+>
+> +       if (uuid == NULL)
+> +               return btd_error_invalid_args(msg);
+> +
+>         p = find_connectable_profile(dev, uuid);
+>         g_free(uuid);
+>
+> --
+> 1.8.1
 
-With these IO capabilities a MITM protected SSP association model is
-used if we are initiating the pairing process (initiating LM).
+All four patches are now upstream, Ive changed the commit message for
+this one to include the prefix and also please next time state it is a
+fix and provide the backtrace so we know the severity of the problem.
 
-When responding to a pairing request - remote device is the initiating
-LM - the pairing should also be proteced against MITM attacks.
+btw, thanks for the patches.
 
-Signed-off-by: Timo Mueller <timo.mueller@bmw-carit.de>
----
-When we were testing the iPhone 5 we noticed that the association
-model changes depending on which side initiates the pairing. For
-example if we paired from the phone "Just Works" was used while if the
-phone was the responding LM a "Numeric Comparison" was used instead.
 
-We'd like to enforce MITM protection in our cars whenever possible.
-That is why we want to set the MITM protection even when being the
-responding LM. The patch proposes this policy as the default approach.
-
-Expected SSP accociation model:
-|-------------------------------------------|
-|  Device          |  SSP assocation model  |
-|===========================================|
-|  KeyboardDisplay |  Numeric Comparison    |
-| ------------------------------------------|
-|  NoInputNoOutput |  Just Works            |
-| ------------------------------------------|
-|  KeyboardOnly    |  Passkey Entry         |
-|-------------------------------------------|
-
-Tested Devices:
-  KeyboardDisplay:
-    iPhone 4 (iOS4), iPhone 5 (iOS6), Nokia N9, HTC One S,
-    Samsung Galaxy (CM 10.1), Nexus 4, Nokia 6313 Classic,
-    BlueZ 5 - Simple Agent
-
-  NoInputNoOutput:
-    BlueZ 5 - Simple Agent
-
-  KeyboardOnly:
-    Logitech Keyboard Case, BlueZ 5 - Simple Agent
-
-I've also tested this patch with the following kernels:
-  3.8-rc4
-  3.4
-
-Best regards,
-	 Timo
-
- net/bluetooth/hci_conn.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 25bfce0..806583b 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -357,11 +357,15 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
- 	conn->type  = type;
- 	conn->mode  = HCI_CM_ACTIVE;
- 	conn->state = BT_OPEN;
--	conn->auth_type = HCI_AT_GENERAL_BONDING;
- 	conn->io_capability = hdev->io_capability;
- 	conn->remote_auth = 0xff;
- 	conn->key_type = 0xff;
- 
-+	if (hdev->io_capability == 0x03)
-+		conn->auth_type = HCI_AT_GENERAL_BONDING;
-+	else
-+		conn->auth_type = HCI_AT_GENERAL_BONDING_MITM;
-+
- 	set_bit(HCI_CONN_POWER_SAVE, &conn->flags);
- 	conn->disc_timeout = HCI_DISCONN_TIMEOUT;
- 
--- 
-1.7.11.7
-
+--
+Luiz Augusto von Dentz
