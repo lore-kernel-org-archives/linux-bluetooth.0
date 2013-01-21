@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/6] tools: Make mpris-player to export org.mpris.MediaPlayer2
-Date: Mon, 21 Jan 2013 17:21:56 +0200
-Message-Id: <1358781718-386-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/6] tools: Convert player's properties changed signals to MPRIS
+Date: Mon, 21 Jan 2013 17:21:55 +0200
+Message-Id: <1358781718-386-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1358781718-386-1-git-send-email-luiz.dentz@gmail.com>
 References: <1358781718-386-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,91 +11,72 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support for org.mpris.MediaPlayer2 interface whic is also
-mandatory accourding to MPRIS spec.
+Thsi convert properties changed signals from org.bluez.MediaPlayer1 to
+org.mpris.MediaPlayer2.Player interface.
 ---
- tools/mpris-player.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
+ tools/mpris-player.c | 42 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 41 insertions(+), 1 deletion(-)
 
 diff --git a/tools/mpris-player.c b/tools/mpris-player.c
-index 31da384..232e3c0 100644
+index 8e2d85f..31da384 100644
 --- a/tools/mpris-player.c
 +++ b/tools/mpris-player.c
-@@ -44,6 +44,7 @@
- #define BLUEZ_MEDIA_INTERFACE "org.bluez.Media1"
- #define BLUEZ_MEDIA_PLAYER_INTERFACE "org.bluez.MediaPlayer1"
- #define MPRIS_BUS_NAME "org.mpris.MediaPlayer2."
-+#define MPRIS_INTERFACE "org.mpris.MediaPlayer2"
- #define MPRIS_PLAYER_INTERFACE "org.mpris.MediaPlayer2.Player"
- #define MPRIS_PLAYER_PATH "/org/mpris/MediaPlayer2"
- #define ERROR_INTERFACE "org.mpris.MediaPlayer2.Error"
-@@ -1275,6 +1276,7 @@ static gboolean get_enable(const GDBusPropertyTable *property,
- 	return TRUE;
+@@ -1443,6 +1443,46 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+ 	}
  }
  
-+
- static const GDBusMethodTable player_methods[] = {
- 	{ GDBUS_ASYNC_METHOD("PlayPause", NULL, NULL, player_toggle) },
- 	{ GDBUS_ASYNC_METHOD("Play", NULL, NULL, player_play) },
-@@ -1309,6 +1311,40 @@ static const GDBusPropertyTable player_properties[] = {
- 	{ }
- };
- 
-+static gboolean get_disable(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
++static const char *property_to_mpris(const char *property)
 +{
-+	dbus_bool_t value = FALSE;
++	if (strcasecmp(property, "Repeat") == 0)
++		return "LoopStatus";
++	else if (strcasecmp(property, "Shuffle") == 0)
++		return "Shuffle";
++	else if (strcasecmp(property, "Status") == 0)
++		return "PlaybackStatus";
++	else if (strcasecmp(property, "Position") == 0)
++		return "Position";
++	else if (strcasecmp(property, "Track") == 0)
++		return "Metadata";
 +
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
-+
-+	return TRUE;
++	return NULL;
 +}
 +
-+static gboolean get_name(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
++static void property_changed(GDBusProxy *proxy, const char *name,
++					DBusMessageIter *iter, void *user_data)
 +{
-+	struct player *player = data;
++	struct player *player;
++	const char *interface, *property;
 +
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &player->name);
++	interface = g_dbus_proxy_get_interface(proxy);
 +
-+	return TRUE;
++	if (strcmp(interface, BLUEZ_MEDIA_PLAYER_INTERFACE) != 0)
++		return;
++
++	player = find_player(proxy);
++	if (player == NULL)
++		return;
++
++	property = property_to_mpris(name);
++	if (property == NULL)
++		return;
++
++	g_dbus_emit_property_changed(player->conn, MPRIS_PLAYER_PATH,
++						MPRIS_PLAYER_INTERFACE,
++						property);
 +}
 +
-+static const GDBusMethodTable mpris_methods[] = {
-+	{ }
-+};
-+
-+static const GDBusPropertyTable mpris_properties[] = {
-+	{ "CanQuit", "b", get_disable, NULL, NULL },
-+	{ "Fullscreen", "b", get_disable, NULL, NULL },
-+	{ "CanSetFullscreen", "b", get_disable, NULL, NULL },
-+	{ "CanRaise", "b", get_disable, NULL, NULL },
-+	{ "HasTrackList", "b", get_disable, NULL, NULL },
-+	{ "Identity", "s", get_name, NULL, NULL },
-+	{ }
-+};
-+
- static char *mpris_busname(const char *name)
+ int main(int argc, char *argv[])
  {
- 	char *bus_name;
-@@ -1355,6 +1391,17 @@ static void register_player(GDBusProxy *proxy)
- 	}
+ 	guint owner_watch, properties_watch;
+@@ -1498,7 +1538,7 @@ int main(int argc, char *argv[])
+ 	g_dbus_client_set_disconnect_watch(client, disconnect_handler, NULL);
  
- 	if (!g_dbus_register_interface(player->conn, MPRIS_PLAYER_PATH,
-+						MPRIS_INTERFACE,
-+						mpris_methods,
-+						NULL,
-+						mpris_properties,
-+						player, NULL)) {
-+		fprintf(stderr, "Could not register interface %s",
-+						MPRIS_INTERFACE);
-+		goto fail;
-+	}
-+
-+	if (!g_dbus_register_interface(player->conn, MPRIS_PLAYER_PATH,
- 						MPRIS_PLAYER_INTERFACE,
- 						player_methods,
- 						player_signals,
+ 	g_dbus_client_set_proxy_handlers(client, proxy_added, proxy_removed,
+-								NULL, NULL);
++						property_changed, NULL);
+ 
+ 	g_main_loop_run(main_loop);
+ 
 -- 
 1.8.0.2
 
