@@ -1,52 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1358775868-9963-1-git-send-email-alexandros.antonopoulos@oss.bmw-carit.de>
-References: <1358775868-9963-1-git-send-email-alexandros.antonopoulos@oss.bmw-carit.de>
-Date: Mon, 21 Jan 2013 18:07:41 +0200
-Message-ID: <CABBYNZLxFAtbknKQUyOmUORQ=XZNtP=ktnsLe64LoC=rBpeKZA@mail.gmail.com>
-Subject: Re: [PATCH] Check uuid in disconnect profile.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Alexandros Antonopoulos <alexandros.antonopoulos@oss.bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Syam Sidhardhan <s.syam@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Syam Sidhardhan <s.syam@samsung.com>
+Subject: [PATCH 3/3] a2dp: Fix invalid memory access during abort_ind()
+Date: Mon, 21 Jan 2013 19:03:31 +0530
+Message-id: <1358775211-31005-3-git-send-email-s.syam@samsung.com>
+In-reply-to: <1358775211-31005-1-git-send-email-s.syam@samsung.com>
+References: <1358775211-31005-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alexandros,
+There is an invalid memory access w.r.t to the callback
+during the Abort_Ind finalize_setup_errno().
 
-On Mon, Jan 21, 2013 at 3:44 PM, Alexandros Antonopoulos
-<alexandros.antonopoulos@oss.bmw-carit.de> wrote:
-> If the user calls Device1.DisconnectProfile with an invalid profile
-> uuid disconnect_profile still tries to parse the uuid resulting in
-> a SIGSEGV
->
-> ---
->  src/device.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/src/device.c b/src/device.c
-> index 3675616..1771c0f 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -1270,6 +1270,9 @@ static DBusMessage *disconnect_profile(DBusConnection *conn, DBusMessage *msg,
->
->         uuid = bt_name2string(pattern);
->
-> +       if (uuid == NULL)
-> +               return btd_error_invalid_args(msg);
-> +
->         p = find_connectable_profile(dev, uuid);
->         g_free(uuid);
->
-> --
-> 1.8.1
+We should terminate the variable arguments with NULL.
 
-All four patches are now upstream, Ive changed the commit message for
-this one to include the prefix and also please next time state it is a
-fix and provide the backtrace so we know the severity of the problem.
+Log:
+bluetoothd[3353]: audio/avdtp.c:avdtp_parse_cmd() Received ABORT_CMD
+bluetoothd[3353]: audio/a2dp.c:abort_ind() Source 0xb6f5ecc8: Abort_Ind
+bluetoothd[3353]: audio/a2dp.c:setup_ref() 0xb6f63200: ref=2
+bluetoothd[3353]: audio/transport.c:media_transport_remove() Transport
+ /org/bluez/3353/hci0/dev_BC_47_60_F5_88_89/fd1 Owner :1.0
+bluetoothd[3353]: audio/transport.c:media_transport_release() Transport
+ /org/bluez/3353/hci0/dev_BC_47_60_F5_88_89/fd1: read lock released
+bluetoothd[3353]: audio/transport.c:media_transport_release() Transport
+ /org/bluez/3353/hci0/dev_BC_47_60_F5_88_89/fd1: write lock released
+bluetoothd[3353]: audio/transport.c:media_request_reply() Request
+ Acquire Reply Input/output error
+bluetoothd[3353]: audio/transport.c:media_owner_free() Owner :1.0
+bluetoothd[3353]: audio/transport.c:media_owner_remove() Owner :1.0 Request Acquire
+bluetoothd[3353]: audio/a2dp.c:a2dp_sep_unlock() SEP 0xb6f5ecc8 unlocked
+bluetoothd[3353]: audio/a2dp.c:setup_unref() 0xb6f63200: ref=1
+[sys_assert]START of sighandler
+[sys-assert]exepath = bluetoothd
+[sys-assert]processname = bluetoothd
+[sys_assert]this thread is main thread. pid=3353
+[sys-assert]cs timestr 1358524835
+bluetoothd[3353]: crashed [1358524835] processname=bluetoothd, pid=3353, tid=3353, signal=11
+[sys-assert]start print_node_to_file
+sighandler = 0xb6e8cfc9, g_sig_oldact[i] = (nil)
+[sys_assert]END of sighandler
+Segmentation fault (core dumped)
+---
+ profiles/audio/a2dp.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-btw, thanks for the patches.
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 3c546d9..efb4178 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -957,7 +957,7 @@ static void abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+ 
+ 	finalize_setup_errno(setup, -ECONNRESET, finalize_suspend,
+ 							finalize_resume,
+-							finalize_config);
++							finalize_config, NULL);
+ 
+ 	return;
+ }
+-- 
+1.7.9.5
 
-
---
-Luiz Augusto von Dentz
