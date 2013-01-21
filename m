@@ -1,33 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 From: Alexandros Antonopoulos <alexandros.antonopoulos@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Check uuid in disconnect profile.
-Date: Mon, 21 Jan 2013 14:44:25 +0100
-Message-Id: <1358775868-9963-1-git-send-email-alexandros.antonopoulos@oss.bmw-carit.de>
+Subject: [PATCH] avctp: Fix request timeout after a channel is destroyed
+Date: Mon, 21 Jan 2013 14:44:27 +0100
+Message-Id: <1358775868-9963-3-git-send-email-alexandros.antonopoulos@oss.bmw-carit.de>
+In-Reply-To: <1358775868-9963-1-git-send-email-alexandros.antonopoulos@oss.bmw-carit.de>
+References: <1358775868-9963-1-git-send-email-alexandros.antonopoulos@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If the user calls Device1.DisconnectProfile with an invalid profile
-uuid disconnect_profile still tries to parse the uuid resulting in
-a SIGSEGV
+When the control channel is destroyed if there is a pending request
+(chan->p) then the channel queue is deleted in avctp_channel_destroy
+but the timer is still alive resulting in a SIGSEGV
 
 ---
- src/device.c | 3 +++
+ profiles/audio/avctp.c | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/src/device.c b/src/device.c
-index 3675616..1771c0f 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1270,6 +1270,9 @@ static DBusMessage *disconnect_profile(DBusConnection *conn, DBusMessage *msg,
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index eb1d35e..e65594d 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -390,6 +390,9 @@ static void avctp_channel_destroy(struct avctp_channel *chan)
+ 	if (chan->watch)
+ 		g_source_remove(chan->watch);
  
- 	uuid = bt_name2string(pattern);
- 
-+	if (uuid == NULL)
-+		return btd_error_invalid_args(msg);
++	if (chan->p)
++		pending_destroy(chan->p, NULL);
 +
- 	p = find_connectable_profile(dev, uuid);
- 	g_free(uuid);
+ 	if (chan->process_id > 0)
+ 		g_source_remove(chan->process_id);
  
 -- 
 1.8.1
