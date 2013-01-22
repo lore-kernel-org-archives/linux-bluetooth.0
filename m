@@ -1,64 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1358460154.2089.14.camel@aeonflux>
-References: <1358460154.2089.14.camel@aeonflux>
-Date: Tue, 22 Jan 2013 22:12:13 -0300
-Message-ID: <CACJA=fV+KiKNyHcAfy98JANFqhcJgGcWOUUeGJzOfdDiqXf2kw@mail.gmail.com>
-Subject: Re: Thoughts about LE scanning
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <20130122185650.GA1119@samus>
+References: <1358878703-8100-1-git-send-email-jprvita@openbossa.org>
+ <1358878703-8100-3-git-send-email-jprvita@openbossa.org> <20130122185650.GA1119@samus>
+From: Joao Paulo Rechi Vita <jprvita@openbossa.org>
+Date: Tue, 22 Jan 2013 16:09:05 -0300
+Message-ID: <CAAngNMb1JQJu3DoJ5VXyAtfkZzmVO-CrOb2h56dEHTsqhGDWmA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] avctp: Receive and silent ignore Vol Up/Down operations
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Thu, Jan 17, 2013 at 7:02 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hello,
+On Tue, Jan 22, 2013 at 3:56 PM, Vinicius Costa Gomes
+<vinicius.gomes@openbossa.org> wrote:
+> Hi Joao,
 >
-> so I have been looking into how we handle LE scanning in central role a
-> little bit. And I am not really happy with what we do right now. Instead
-> of just adding new profiles, we need to take one step back and get the
-> basics right.
+> On 15:18 Tue 22 Jan, João Paulo Rechi Vita wrote:
+>> The AVRCP spec mandates to support 'volume up' and 'volume down'
+>> operations when claiming support for Category 2 TG.
+>> ---
+>>  profiles/audio/avctp.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+>> index f7e607e..4ab6d6d 100644
+>> --- a/profiles/audio/avctp.c
+>> +++ b/profiles/audio/avctp.c
+>> @@ -214,6 +214,8 @@ static struct {
+>>       uint8_t avc;
+>>       uint16_t uinput;
+>>  } key_map[] = {
+>> +     { "VOLUME UP",          AVC_VOLUME_UP,          KEY_VOLUMEUP},
+>> +     { "VOLUME DOWN",        AVC_VOLUME_DOWN,        KEY_VOLUMEDOWN},
+>>       { "PLAY",               AVC_PLAY,               KEY_PLAYCD },
+>>       { "STOP",               AVC_STOP,               KEY_STOPCD },
+>>       { "PAUSE",              AVC_PAUSE,              KEY_PAUSECD },
+>> @@ -968,6 +970,9 @@ static void init_uinput(struct avctp *session)
+>>
+>>       dev = manager_get_audio_device(session->device, FALSE);
+>>
+>> +     session->key_quirks[AVC_VOLUME_UP] |= QUIRK_IGNORE;
+>> +     session->key_quirks[AVC_VOLUME_DOWN] |= QUIRK_IGNORE;
+>> +
 >
-> The one thing that I stumbled about is that we are trying to use the
-> Start Discovery management command to scan for connectable device that
-> we are paired with. And it is all triggered by bluetoothd. It tries to
-> get this done right, but fails badly at it. Trying to do this ends up in
-> a convoluted solution that will just break down eventually.
+> Having a quirk that applies to every device, doesn't seem to map to the
+> meaning of 'quirk', i.e. if everybody has the same quirk, it is the norm ;-)
 >
-> So Start Discovery and Stop Discovery management commands are for
-> finding new devices. They are for finding devices that we want to pair
-> with. They are not for checking if a paired device is in range or
-> signals connection requests to us. It is called discovery for a reason.
->
-> It might have looked like a good idea to just re-use these two commands,
-> but what I am seeing when working with multiple paired LE devices is
-> just a big mess. The amount of code that is needed to keep track of
-> states between running D-Bus commands for discovery, discovery triggered
-> management commands, scanning triggered management commands etc. is not
-> a good idea.
->
-> I am failing to understand why we tried to solve this inside bluetoothd
-> and not just let the kernel take full control here. We are loading the
-> list of paired LE devices at controller power on anyway. So the kernel
-> does know about our paired devices. It can control sensible scan
-> intervals and also sync a device discovery with scanning for connection
-> triggers from know remote devices. It also can sensible disconnect on
-> idle and scan for other devices that requests connections.
 
-We are working on moving this connection management into kernel space
-and we should start sending RFCs soon.
+It is not a _device quirk_ but it is still a _key quirk_, that is, a
+special behavior to handle that key. I could also have checked
+specifically for the key id, but I find clearer to do it this way.
 
-> What I think we should have is a management command that allows us to
-> load device specific scan parameter configuration into the kernel. And
-> then the kernel will execute this on our behalf. We need to decouple the
-> commands for device discovery from the commands that scan for known
-> devices.
-
-Once we have the connection management working properly we can working
-on this new management command to setup the scan parameters.
-
-Regards,
-
-Andre
+--
+João Paulo Rechi Vita
+Openbossa Labs - INdT
