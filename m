@@ -1,35 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1358856284.7365.14.camel@aeonflux>
-Subject: Re: [PATCH 1/3] Bluetooth: Add LE Local Features reading support
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 22 Jan 2013 04:04:44 -0800
-In-Reply-To: <1358856121-1928-1-git-send-email-johan.hedberg@gmail.com>
-References: <1358856121-1928-1-git-send-email-johan.hedberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1358775211-31005-1-git-send-email-s.syam@samsung.com>
+References: <1358775211-31005-1-git-send-email-s.syam@samsung.com>
+Date: Tue, 22 Jan 2013 14:04:14 +0200
+Message-ID: <CABBYNZ+84Yi8C6M+41U8HiyMhyMh4+rypR7ZQJhnM=Be_9=K0Q@mail.gmail.com>
+Subject: Re: [PATCH 1/3] health: Fix possible use after free
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Syam Sidhardhan <s.syam@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Syam,
 
-> To be able to make the appropriate decisions for some LE procedures we
-> need to know the LE features that the local controller supports.
-> Therefore, it's important to have the LE Read Local Supported Features
-> HCI comand as part of the HCI init sequence.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+On Mon, Jan 21, 2013 at 3:33 PM, Syam Sidhardhan <s.syam@samsung.com> wrote:
+> A pointer to freed memory is dereferenced if we call function
+> hdp_get_dcpsm_cb() with out any earlier reference.
 > ---
->  include/net/bluetooth/hci.h      |    6 ++++++
->  include/net/bluetooth/hci_core.h |    1 +
->  net/bluetooth/hci_event.c        |   20 ++++++++++++++++++++
->  3 files changed, 27 insertions(+)
+>  profiles/health/hdp.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/profiles/health/hdp.c b/profiles/health/hdp.c
+> index c15f06a..a42ca48 100644
+> --- a/profiles/health/hdp.c
+> +++ b/profiles/health/hdp.c
+> @@ -542,9 +542,9 @@ static void hdp_get_dcpsm_cb(uint16_t dcpsm, gpointer user_data, GError *err)
+>                                         hdp_tmp_dc_data_destroy, &gerr))
+>                 return;
+>
+> -       hdp_tmp_dc_data_unref(hdp_conn);
+>         hdp_conn->cb(hdp_chann->mdl, err, hdp_conn);
+>         g_error_free(gerr);
+> +       hdp_tmp_dc_data_unref(hdp_conn);
+>  }
+>
+>  static void device_reconnect_mdl_cb(struct mcap_mdl *mdl, GError *err,
+> --
+> 1.7.9.5
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
-Regards
-
-Marcel
+All 3 patches are now upstream, thanks.
 
 
+--
+Luiz Augusto von Dentz
