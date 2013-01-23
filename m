@@ -1,92 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <50FDAD79.8040700@globaledgesoft.com>
-Date: Tue, 22 Jan 2013 02:34:57 +0530
-From: Ajay <ajay.kv@globaledgesoft.com>
+Date: Wed, 23 Jan 2013 02:20:58 -0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix Class of Device indication when powering
+ off
+Message-ID: <20130123042058.GD1632@joana>
+References: <1358345734-17892-1-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Simultaneous data transfer on  ACL and BLE  links
-Content-Type: multipart/mixed;
- boundary="------------060001040309060305040702"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1358345734-17892-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------060001040309060305040702
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi Johan,
 
-Hi ,
-     Kernel has set some  restrictions in simultaneous  L2cap data 
-transfer on BLE and ACL links on a common device .
+* Johan Hedberg <johan.hedberg@gmail.com> [2013-01-16 16:15:34 +0200]:
 
-      My test scenario is as follows
-             Device A  has both LE and ACL link with  device B and C 
-respectively . when i start  sending l2cap data on  ACL link (A to B), 
-it work fine . But when i starts sending BLE data along with ACL  data 
-(A to C )  , it fails  with  error "send failed : interrupt system call" 
-. when i count the  LE packets that had reached upto hci layer , it  
-shows some 367 packets.
-              Later i noticed that LE data is getting queued at hci 
-layer  and it is  not  scheduled properly . following piece of code 
-tells us the order of scheduling.. (hci_core.c)
+> From: Johan Hedberg <johan.hedberg@intel.com>
+> 
+> When a HCI device is powered off the Management interface specification
+> dictates that the class of device value is indicated as zero. This patch
+> fixes sending of the appropriate class of device changed event when a
+> HCI device is powered off.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/mgmt.c |    6 ++++++
+>  1 file changed, 6 insertions(+)
 
+Patch has been applied to bluetooth-next. Thanks.
 
-static void hci_tx_task(unsigned long arg)
-{
-     struct hci_dev *hdev = (struct hci_dev *) arg;
-     struct sk_buff *skb;
-
-     read_lock(&hci_task_lock);
-
-     BT_DBG("%s acl %d sco %d le %d", hdev->name, hdev->acl_cnt,
-         hdev->sco_cnt, hdev->le_cnt);
-
-     /* Schedule queues and send stuff to HCI driver */
-
-     hci_sched_acl(hdev);
-
-     hci_sched_sco(hdev);
-
-     hci_sched_esco(hdev);
-
-     hci_sched_le(hdev);
-
-......
-
-
-     Here  both   acl and le scheduling  are using same count  as 
-reference  (hdev->acl_cnt)  and they have never make use of hdev->le_cnt.
-
-    please kindly go through this issue.
-
-
-
-
-
-
-
-
--- 
-Thanks & Regards
-
-  AJAY KV
-  GlobalEdge software Ltd
-  8892753703
-
-
---------------060001040309060305040702
-Content-Type: text/x-vcard; charset=utf-8;
- name="ajay_kv.vcf"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="ajay_kv.vcf"
-
-begin:vcard
-fn:AJAY KV
-n:;AJAY
-tel;cell:8892753703
-version:2.1
-end:vcard
-
-
---------------060001040309060305040702--
+	Gustavo
