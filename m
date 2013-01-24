@@ -1,35 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJdJm_OMiH4vcoQSG1x++_G_nnQiTseb-moF8p=9k2utE=gAEg@mail.gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 6/6] Bluetooth: Add support for 128-bit UUIDs in EIR data
+Date: Thu, 24 Jan 2013 21:03:26 +0200
+Message-Id: <1359054206-19528-7-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1359054206-19528-1-git-send-email-johan.hedberg@gmail.com>
 References: <1359054206-19528-1-git-send-email-johan.hedberg@gmail.com>
-	<1359054206-19528-5-git-send-email-johan.hedberg@gmail.com>
-	<CAJdJm_OMiH4vcoQSG1x++_G_nnQiTseb-moF8p=9k2utE=gAEg@mail.gmail.com>
-Date: Thu, 24 Jan 2013 16:25:08 -0400
-Message-ID: <CAJdJm_OqePCY1yMvJTwaUDnXTMbDJgucbYvEWT99=K9tbvgYQg@mail.gmail.com>
-Subject: Re: [PATCH 4/6] Bluetooth: Refactor UUID-16 list generation into its
- own function
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jan 24, 2013 at 4:21 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Johan,
->
-> On Thu, Jan 24, 2013 at 3:03 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->> +static u8 *create_uuid16_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
->> +{
->> +       u8 *ptr = data, *uuids_start = NULL;
->> +       struct bt_uuid *uuid;
->
-> Maybe you should check for "len < 2" here?
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Actually, "len < 4", to be able to fit at least a 16-bit UUID.
+This patch adds the necessary code for encoding a list of 128-bit UUIDs
+into the EIR data.
 
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c |   31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index b9310d1..6ca2de1 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -501,6 +501,36 @@ static u8 *create_uuid32_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
+ 	return ptr;
+ }
+ 
++static u8 *create_uuid128_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
++{
++	u8 *ptr = data, *uuids_start = NULL;
++	struct bt_uuid *uuid;
++
++	if (len < 18)
++		return ptr;
++
++	list_for_each_entry(uuid, &hdev->uuid128, list) {
++		if (!uuids_start) {
++			uuids_start = ptr;
++			uuids_start[0] = 1;
++			uuids_start[1] = EIR_UUID128_ALL;
++			ptr += 2;
++		}
++
++		/* Stop if not enough space to put next UUID */
++		if ((ptr - data) + 16 > len) {
++			uuids_start[1] = EIR_UUID128_SOME;
++			break;
++		}
++
++		memcpy(ptr, uuid->uuid, 16);
++		ptr += 16;
++		uuids_start[0] += 16;
++	}
++
++	return ptr;
++}
++
+ static void create_eir(struct hci_dev *hdev, u8 *data)
+ {
+ 	u8 *ptr = data;
+@@ -546,6 +576,7 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
+ 
+ 	ptr = create_uuid16_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
+ 	ptr = create_uuid32_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
++	ptr = create_uuid128_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
+ }
+ 
+ static int update_eir(struct hci_dev *hdev)
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.10.4
+
