@@ -1,72 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1359045847.6791.24.camel@dellpc>
-Subject: RFC: Race between hci_unregister_dev and hidp_session
+Message-ID: <1359043779.6791.1.camel@dellpc>
+Subject: Re: usb device removed from sysfs before input children devices
 From: Karl Relton <karllinuxtest.relton@ntlworld.com>
-To: Gustavo Padovan <gustavo@padovan.org>, Marcel Holtmann
- <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 24 Jan 2013 16:44:07 +0000
+To: linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Date: Thu, 24 Jan 2013 16:09:39 +0000
+In-Reply-To: <1359035887.5482.1.camel@dellpc>
+References: <1357759635.2872.9.camel@dellpc>
+	 <1358281626.3998.29.camel@dellpc> <1359035887.5482.1.camel@dellpc>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear Gustavo/Marcel
+On Thu, 2013-01-24 at 13:58 +0000, Karl Relton wrote:
+> On Tue, 2013-01-15 at 20:27 +0000, Karl Relton wrote:
+> > > The end result (for the user) is that even when the bluetooth
+> > > mouse/keyboard is re-added, Xorg ignores it - thinking it is some
+> > hoax
+> > > duplicate device. The keyboard/mouse is then non-operational.
+> > > 
+> > 
+> > Instrumenting the code suggests that the issue arises in a race
+> > between:
+> > 
+> > hidp_session() in bluetooth/hidp/core.c
+> > 
+> > and
+> > 
+> > hci_unregister_dev() in bluetooth/hci_core.c
+> > 
+> > 
 
-I believe I have tracked down a race condition between
-hci_unregister_dev() and hidp_session() that can lead to userspace
-failure of bluetooth input devices (see [1] below).
+...
+
+> > 
+> > I can't figure out why there is such a delay for
+> > input_unregister_device(). 
+> 
+> 
+> The power_supply system seems to be triggering a lookup of battery
+> 'capacity' in the input device. This calls into the driver, which deep
+> down invokes more code in the 'hidp' module: hidp_get_raw_report()
+> 
+> This function tries to communicate with the bluetooth device (keyboard
+> in my case), but because the device is being 'torn down' such
+> communication fails. Accordingly hidp_get_raw_report has a 5 second
+> timeout ... so this function stalls for 5 seconds until that timeout
+> occurs.
+> 
+> 
+> I would guess that for some reason, removing the 'hid' or associated
+> 'input' device is leading to the power_supply code wanting to lookup the
+> battery capacity which introduces a 5 second wait. This would delay
+> hidp_session by 5 seconds ... in the mean time allowing
+> hci_unregister_dev() to win the race and hence the hci device is removed
+> before the input & hid devices.
+> 
+
+device_del is done on the battery device, called from
+hidinput_cleanup_battery in hid-input.c.
+
+This will generate a uevent which has the power_supply attributes added,
+which invokes power_supply_show_property for 'capacity' which invokes
+the hidp_get_raw_report (which stalls for 5 seconds).
 
 
-hci_unregister_dev calls
-  hci_dev_do_close calls
-    hci_conn_hash_flush calls
-      hci_proto_disconn_cfm which triggers (via a wakeup)
-        hidp_session running in another thread (a kthread)
+Back in the days of linux 3.2, hid-input.c did not have any support for
+batteries, so this chain of calls was never made, hence the race was won
+by hidp_session() because it didn't have the 5 second delay injected.
 
-hci_unregister_dev, after the above calls, will go on to call
-  hci_del_sysfs to remove the 'hci' device
+Now with battery support added, the problem is manifest.
 
-Meanwhile hidp_session will drop out its main loop, start cleaning up
-which includes a call to
-   hid_destroy_device which removes the input & hid (and hidraw) devices
+--
 
-
-For correct operation, and what userspace would normally expect, removal
-from the sysfs tree should be 'bottom up', i.e. event then input then
-hid then hci.
-
-For this operation, one would need to guaruntee that hidp_session
-finishes its cleanup before hci_unregister_dev continues with its work.
-
-At the moment this is not done. Any delay in hidp_session will allow
-hci_unregister_dev to win the race, causing an out of sequence sysfs
-removal, and headaches for userspace.
+I think hidp_get_raw_report should abort if the devices is being 'torn
+down' (and so not go into the 5 second wait). But also the race between
+the two functions needs sorting, since sooner or later someone else will
+get unlucky.
 
 
-Currently, the power_supply system is causing hidp_session to stall for
-5 seconds (as detailed in [2]). Plenty of time to cause hidp_session to
-lose the race! But even without such silliness, a race can't be a good
-thing can it?
 
-
-How to fix? Some synchronisation between hidp_session thread and the hci
-code is required. hci_conn devices already use a ref counting system to
-delay removing the device from sysfs until the count gets to zero
-(hci_conn_put_device), so presumably a similar arrangement can be
-implemented for the hci device? Note this would need to be a different
-count to that currently in hci_dev_put/hold, because that is based on
-the lower level kobj references. Perhaps hci_dev_put/hold can be
-augmented to keep its own count in addition to the underlying kobj
-count?
-
-Karl
-
-
-References:
-[1] https://bugzilla.kernel.org/show_bug.cgi?id=52471
-the udev remove events, being out of sequence, have truncated paths
-which disturbs userspace programs like Xorg evdev so they cannot process
-the keyboard/mouse removal.
-
-[2] https://bugzilla.kernel.org/show_bug.cgi?id=52471#c2 and
-https://bugzilla.kernel.org/show_bug.cgi?id=52471#c3
