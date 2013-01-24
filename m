@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/6 v2] tools: Convert player's properties changed signals to MPRIS
-Date: Thu, 24 Jan 2013 11:58:01 +0200
-Message-Id: <1359021484-6958-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/6 v2] tools: Add support for setting Shuffle and LoopStatus to mpris-player
+Date: Thu, 24 Jan 2013 11:58:00 +0200
+Message-Id: <1359021484-6958-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1359021484-6958-1-git-send-email-luiz.dentz@gmail.com>
 References: <1359021484-6958-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,72 +11,120 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Thsi convert properties changed signals from org.bluez.MediaPlayer1 to
+This add write support for Shuffle and LoopStatus properties of
 org.mpris.MediaPlayer2.Player interface.
 ---
- tools/mpris-player.c | 42 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 41 insertions(+), 1 deletion(-)
+ tools/mpris-player.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 78 insertions(+), 2 deletions(-)
 
 diff --git a/tools/mpris-player.c b/tools/mpris-player.c
-index 7183bf6..320309e 100644
+index d58e53f..7183bf6 100644
 --- a/tools/mpris-player.c
 +++ b/tools/mpris-player.c
-@@ -1448,6 +1448,46 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
- 	}
+@@ -992,6 +992,58 @@ static gboolean get_repeat(const GDBusPropertyTable *property,
+ 	return TRUE;
  }
  
-+static const char *property_to_mpris(const char *property)
++static const char *loopstatus_to_repeat(const char *value)
 +{
-+	if (strcasecmp(property, "Repeat") == 0)
-+		return "LoopStatus";
-+	else if (strcasecmp(property, "Shuffle") == 0)
-+		return "Shuffle";
-+	else if (strcasecmp(property, "Status") == 0)
-+		return "PlaybackStatus";
-+	else if (strcasecmp(property, "Position") == 0)
-+		return "Position";
-+	else if (strcasecmp(property, "Track") == 0)
-+		return "Metadata";
++	if (strcasecmp(value, "None") == 0)
++		return "off";
++	else if (strcasecmp(value, "Track") == 0)
++		return "singletrack";
++	else if (strcasecmp(value, "Playlist") == 0)
++		return "alltracks";
 +
 +	return NULL;
 +}
 +
-+static void property_changed(GDBusProxy *proxy, const char *name,
-+					DBusMessageIter *iter, void *user_data)
++static void property_result(const DBusError *err, void *user_data)
 +{
-+	struct player *player;
-+	const char *interface, *property;
++	GDBusPendingPropertySet id = GPOINTER_TO_UINT(user_data);
 +
-+	interface = g_dbus_proxy_get_interface(proxy);
++	if (!dbus_error_is_set(err))
++		return g_dbus_pending_property_success(id);
 +
-+	if (strcmp(interface, BLUEZ_MEDIA_PLAYER_INTERFACE) != 0)
-+		return;
-+
-+	player = find_player(proxy);
-+	if (player == NULL)
-+		return;
-+
-+	property = property_to_mpris(name);
-+	if (property == NULL)
-+		return;
-+
-+	g_dbus_emit_property_changed(player->conn, MPRIS_PLAYER_PATH,
-+						MPRIS_PLAYER_INTERFACE,
-+						property);
++	g_dbus_pending_property_error(id, err->name, err->message);
 +}
 +
- int main(int argc, char *argv[])
++static void set_repeat(const GDBusPropertyTable *property,
++			DBusMessageIter *iter, GDBusPendingPropertySet id,
++			void *data)
++{
++	struct player *player = data;
++	const char *value;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING) {
++		g_dbus_pending_property_error(id,
++					ERROR_INTERFACE ".InvalidArguments",
++					"Invalid arguments in method call");
++		return;
++	}
++
++	dbus_message_iter_get_basic(iter, &value);
++
++	value = loopstatus_to_repeat(value);
++	if (value == NULL) {
++		g_dbus_pending_property_error(id,
++					ERROR_INTERFACE ".InvalidArguments",
++					"Invalid arguments in method call");
++		return;
++	}
++
++	g_dbus_proxy_set_property_basic(player->proxy, "Repeat",
++					DBUS_TYPE_STRING, value,
++					property_result, GUINT_TO_POINTER(id),
++					NULL);
++}
++
+ static gboolean get_double(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
  {
- 	guint owner_watch, properties_watch;
-@@ -1503,7 +1543,7 @@ int main(int argc, char *argv[])
- 	g_dbus_client_set_disconnect_watch(client, disconnect_handler, NULL);
+@@ -1030,6 +1082,30 @@ static gboolean get_shuffle(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
  
- 	g_dbus_client_set_proxy_handlers(client, proxy_added, proxy_removed,
--								NULL, NULL);
-+						property_changed, NULL);
++static void set_shuffle(const GDBusPropertyTable *property,
++			DBusMessageIter *iter, GDBusPendingPropertySet id,
++			void *data)
++{
++	struct player *player = data;
++	dbus_bool_t shuffle;
++	const char *value;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN) {
++		g_dbus_pending_property_error(id,
++					ERROR_INTERFACE ".InvalidArguments",
++					"Invalid arguments in method call");
++		return;
++	}
++
++	dbus_message_iter_get_basic(iter, &shuffle);
++	value = shuffle ? "alltracks" : "off";
++
++	g_dbus_proxy_set_property_basic(player->proxy, "Shuffle",
++					DBUS_TYPE_STRING, value,
++					property_result, GUINT_TO_POINTER(id),
++					NULL);
++}
++
+ static gboolean position_exists(const GDBusPropertyTable *property, void *data)
+ {
+ 	DBusMessageIter iter;
+@@ -1216,11 +1292,11 @@ static const GDBusSignalTable player_signals[] = {
  
- 	g_main_loop_run(main_loop);
- 
+ static const GDBusPropertyTable player_properties[] = {
+ 	{ "PlaybackStatus", "s", get_status, NULL, status_exists },
+-	{ "LoopStatus", "s", get_repeat, NULL, repeat_exists },
++	{ "LoopStatus", "s", get_repeat, set_repeat, repeat_exists },
+ 	{ "Rate", "d", get_double, NULL, NULL },
+ 	{ "MinimumRate", "d", get_double, NULL, NULL },
+ 	{ "MaximumRate", "d", get_double, NULL, NULL },
+-	{ "Shuffle", "b", get_shuffle, NULL, shuffle_exists },
++	{ "Shuffle", "b", get_shuffle, set_shuffle, shuffle_exists },
+ 	{ "Position", "x", get_position, NULL, position_exists },
+ 	{ "Metadata", "a{sv}", get_track, NULL, track_exists },
+ 	{ "Volume", "d", get_double, NULL, NULL },
 -- 
 1.8.1
 
