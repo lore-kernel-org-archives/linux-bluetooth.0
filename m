@@ -1,34 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/6] Bluetooth: Add 32 and 128 bit EIR UUID support
-Date: Thu, 24 Jan 2013 21:03:20 +0200
-Message-Id: <1359054206-19528-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1359045847.6791.24.camel@dellpc>
+Subject: RFC: Race between hci_unregister_dev and hidp_session
+From: Karl Relton <karllinuxtest.relton@ntlworld.com>
+To: Gustavo Padovan <gustavo@padovan.org>, Marcel Holtmann
+ <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 24 Jan 2013 16:44:07 +0000
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Dear Gustavo/Marcel
 
-There was another set of patches from Syam to add the same functionality
-but it can be accomplished in a simpler way since we only need to follow
-the ordering within each group of UUIDs.
-
-I've added test cases to mgmt-tester to verify both the complete and
-partial UUID list cases (more can be added, but there are enough that
-I'm confident of the correctness of these patches).
-
-Johan Hedberg (6):
-      Bluetooth: Split UUIDs to three separate lists
-      Bluetooth: Simplify UUID16 list generation for EIR
-      Bluetooth: Remove useless eir_len variable from EIR creation
-      Bluetooth: Refactor UUID-16 list generation into its own function
-      Bluetooth: Add support for 32-bit UUIDs in EIR data
-      Bluetooth: Add support for 128-bit UUIDs in EIR data
-
- include/net/bluetooth/hci_core.h |    4 ++
- net/bluetooth/hci_core.c         |   14 ++---
- net/bluetooth/hci_sysfs.c        |    2 +-
- net/bluetooth/mgmt.c             |  218 +++++++++++++++++++++++++++++++++++++++++-----------------------
- 4 files changed, 152 insertions(+), 86 deletions(-)
+I believe I have tracked down a race condition between
+hci_unregister_dev() and hidp_session() that can lead to userspace
+failure of bluetooth input devices (see [1] below).
 
 
+hci_unregister_dev calls
+  hci_dev_do_close calls
+    hci_conn_hash_flush calls
+      hci_proto_disconn_cfm which triggers (via a wakeup)
+        hidp_session running in another thread (a kthread)
+
+hci_unregister_dev, after the above calls, will go on to call
+  hci_del_sysfs to remove the 'hci' device
+
+Meanwhile hidp_session will drop out its main loop, start cleaning up
+which includes a call to
+   hid_destroy_device which removes the input & hid (and hidraw) devices
+
+
+For correct operation, and what userspace would normally expect, removal
+from the sysfs tree should be 'bottom up', i.e. event then input then
+hid then hci.
+
+For this operation, one would need to guaruntee that hidp_session
+finishes its cleanup before hci_unregister_dev continues with its work.
+
+At the moment this is not done. Any delay in hidp_session will allow
+hci_unregister_dev to win the race, causing an out of sequence sysfs
+removal, and headaches for userspace.
+
+
+Currently, the power_supply system is causing hidp_session to stall for
+5 seconds (as detailed in [2]). Plenty of time to cause hidp_session to
+lose the race! But even without such silliness, a race can't be a good
+thing can it?
+
+
+How to fix? Some synchronisation between hidp_session thread and the hci
+code is required. hci_conn devices already use a ref counting system to
+delay removing the device from sysfs until the count gets to zero
+(hci_conn_put_device), so presumably a similar arrangement can be
+implemented for the hci device? Note this would need to be a different
+count to that currently in hci_dev_put/hold, because that is based on
+the lower level kobj references. Perhaps hci_dev_put/hold can be
+augmented to keep its own count in addition to the underlying kobj
+count?
+
+Karl
+
+
+References:
+[1] https://bugzilla.kernel.org/show_bug.cgi?id=52471
+the udev remove events, being out of sequence, have truncated paths
+which disturbs userspace programs like Xorg evdev so they cannot process
+the keyboard/mouse removal.
+
+[2] https://bugzilla.kernel.org/show_bug.cgi?id=52471#c2 and
+https://bugzilla.kernel.org/show_bug.cgi?id=52471#c3
