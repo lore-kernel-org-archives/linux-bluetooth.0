@@ -1,57 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [RFC BlueZ 0/6] LE Connection Establishment fixes
-Date: Fri, 25 Jan 2013 00:07:01 -0300
-Message-Id: <1359083227-13122-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1359054206-19528-5-git-send-email-johan.hedberg@gmail.com>
+References: <1359054206-19528-1-git-send-email-johan.hedberg@gmail.com>
+	<1359054206-19528-5-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 24 Jan 2013 16:21:06 -0400
+Message-ID: <CAJdJm_OMiH4vcoQSG1x++_G_nnQiTseb-moF8p=9k2utE=gAEg@mail.gmail.com>
+Subject: Re: [PATCH 4/6] Bluetooth: Refactor UUID-16 list generation into its
+ own function
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan,
 
-Sending this as a RFC because I don't know if this is what you guys
-had in mind.
+On Thu, Jan 24, 2013 at 3:03 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> +static u8 *create_uuid16_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
+> +{
+> +       u8 *ptr = data, *uuids_start = NULL;
+> +       struct bt_uuid *uuid;
 
-Patches 1/6/ and 2/6 are simple enough fixes and should be considered
-for inclusion, perhaps 6/6 as well, but the improvement is
-non-functional.
+Maybe you should check for "len < 2" here?
 
-The only problem with this aproach that I found while testing is the
-problem exposed on the message of commit 5/6: If the remote device is
-out of range during pairing any connection attempt will fail until the
-Connection Complete event comes (with an error). This is the reason
-that we put the devices in the connect list before pairing.
+> +
+> +       list_for_each_entry(uuid, &hdev->uuid16, list) {
+> +               u16 uuid16;
+> +
+> +               uuid16 = get_unaligned_le16(&uuid->uuid[12]);
+> +               if (uuid16 < 0x1100)
+> +                       continue;
+> +
+> +               if (uuid16 == PNP_INFO_SVCLASS_ID)
+> +                       continue;
+> +
+> +               if (!uuids_start) {
+> +                       uuids_start = ptr;
+> +                       uuids_start[0] = 1;
+> +                       uuids_start[1] = EIR_UUID16_ALL;
+> +                       ptr += 2;
+> +               }
+> +
+> +               /* Stop if not enough space to put next UUID */
+> +               if ((ptr - data) + sizeof(u16) > len) {
+> +                       uuids_start[1] = EIR_UUID16_SOME;
+> +                       break;
+> +               }
+> +
+> +               *ptr++ = (uuid16 & 0x00ff);
+> +               *ptr++ = (uuid16 & 0xff00) >> 8;
+> +               uuids_start[0] += sizeof(uuid16);
+> +       }
+> +
+> +       return ptr;
+> +}
 
-Is this reason enough to have the device put in the connect list
-during pairing?
-
-
-Cheers,
-
-
-Vinicius Costa Gomes (6):
-  device: Fix invalid memory access during Find Included
-  device: Fix memory leak while storing GATT capable devices
-  device: Clean up device_att_connect()
-  device: Rename device_att_connect to device_connect_le
-  core: Add a way to connect to LE devices
-  gas: Move all the code to only one file
-
- Makefile.plugins        |   4 +-
- profiles/gatt/gas.c     |  46 +++++++++++++++++++++
- profiles/gatt/main.c    |  47 ---------------------
- profiles/gatt/manager.c |  79 -----------------------------------
- profiles/gatt/manager.h |  24 -----------
- src/adapter.c           |  22 +++++++++-
- src/adapter.h           |   3 ++
- src/device.c            | 108 +++++++++++++++++++++---------------------------
- src/device.h            |   3 +-
- 9 files changed, 119 insertions(+), 217 deletions(-)
- delete mode 100644 profiles/gatt/main.c
- delete mode 100644 profiles/gatt/manager.c
- delete mode 100644 profiles/gatt/manager.h
-
+Regards,
 -- 
-1.8.1.1
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
