@@ -1,37 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
 From: Syam Sidhardhan <s.syam@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC PATCH v0 1/6] Bluetooth: Update the uuid list in reverse order
-Date: Thu, 24 Jan 2013 11:27:54 +0530
-Message-id: <1359007079-11724-2-git-send-email-s.syam@samsung.com>
-In-reply-to: <1359007079-11724-1-git-send-email-s.syam@samsung.com>
-References: <1359007079-11724-1-git-send-email-s.syam@samsung.com>
+Subject: [RFC PATCH v0 0/6] Addd support for EIR 32 bit and 128 bit UUID's in
+ EIR
+Date: Thu, 24 Jan 2013 11:27:53 +0530
+Message-id: <1359007079-11724-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If we add uuid in the list head, then initially added uuid's might
-get lost because of the possibility of Max limit 240 reaches before
-reaching the end of the list parsing.
+This patch enhances the existing code and add support for the
+EIR updation for UUID-32 & UUID-128.
 
-Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
-Tested-by: Chan-yeol Park <chanyeol.park@samsung.com>
----
- net/bluetooth/mgmt.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Patch 1: changes the order of the parsing inorder to avoid uuid's getting
+overwritten in extreem cases. Since we are reversing the order the
+mgmt-tester testcase for "UUID-16 multiple 1" will fail. I'll send the
+updated fix for the mgmt-tester with UUID128 testcase. 
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index e7f944f..4fd45a3 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1330,7 +1330,7 @@ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
- 	memcpy(uuid->uuid, cp->uuid, 16);
- 	uuid->svc_hint = cp->svc_hint;
- 
--	list_add(&uuid->list, &hdev->uuids);
-+	list_add_tail(&uuid->list, &hdev->uuids);
- 
- 	err = update_class(hdev);
- 	if (err < 0)
+Since I do not have a setup to test these changes using mgmt-tester,
+Chen-yeol Park has help me a lot and tested the changes locally and
+it is reported working fine. Thanks Johan for the guidence.
+
+
+
+Syam Sidhardhan (6):
+  Bluetooth: Update the uuid list in reverse order
+  Bluetooth: Add helper function to get the uuid type
+  Bluetooth: Add helper function to prepare the EIR packet from list
+  Bluetooth: Add EIR UUID-16 bit parsing for EIR
+  Bluetooth: Add support for UUID-32 bit parsing for EIR
+  Bluetooth: Add support for UUID-128 bit parsing for EIR
+
+ net/bluetooth/mgmt.c |  352 ++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 314 insertions(+), 38 deletions(-)
+
 -- 
 1.7.9.5
 
