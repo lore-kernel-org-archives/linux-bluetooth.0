@@ -1,68 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1359035887.5482.1.camel@dellpc>
-Subject: Re: usb device removed from sysfs before input children devices
-From: Karl Relton <karllinuxtest.relton@ntlworld.com>
-To: linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Date: Thu, 24 Jan 2013 13:58:07 +0000
-In-Reply-To: <1358281626.3998.29.camel@dellpc>
-References: <1357759635.2872.9.camel@dellpc>
-	 <1358281626.3998.29.camel@dellpc>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Message-id: <3C2963DE7FB6424B9BCE227143415153@sisodomain.com>
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+References: <1358781718-386-1-git-send-email-luiz.dentz@gmail.com>
+ <1358781718-386-3-git-send-email-luiz.dentz@gmail.com>
+In-reply-to: <1358781718-386-3-git-send-email-luiz.dentz@gmail.com>
+Subject: Query regarding LE encryption failure
+Date: Thu, 24 Jan 2013 19:25:10 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2013-01-15 at 20:27 +0000, Karl Relton wrote:
-> > The end result (for the user) is that even when the bluetooth
-> > mouse/keyboard is re-added, Xorg ignores it - thinking it is some
-> hoax
-> > duplicate device. The keyboard/mouse is then non-operational.
-> > 
-> 
-> Instrumenting the code suggests that the issue arises in a race
-> between:
-> 
-> hidp_session() in bluetooth/hidp/core.c
-> 
-> and
-> 
-> hci_unregister_dev() in bluetooth/hci_core.c
-> 
-> 
-> Basically hci_unregister_dev() does a hci_dev_do_close() which in turn
-> shuts down the hidp connection. This causes hidp_session() running in
-> another thread to go into its cleanup phase, which is where the input
-> children devices are unregistered.
-> 
-> HOWEVER:
-> 1) For some reason input_unregister_device() seems to stall some 3-5
-> seconds on my system before removing the input device
-> 2) In parallel hci_unregister_dev() ploughs on, and progresses to
-> remove
-> its hdev (hci<n> device) regardless, without waiting for
-> hidp_session()
-> to complete.
-> 
-> I can't figure out why there is such a delay for
-> input_unregister_device(). 
+Hello,
+
+We are using BlueZ-4.101 and the device is paired with an LE proximity 
+device.
+When "DiscoverCharacteristics" is called, after creating LE connection it is
+trying to encrypt the link which fails with "Pin or key missing".
+
+< HCI Command: LE Start Encryption (0x08|0x0019) plen 28
+  0000: 40 00 cb 2e 2a ec a1 c5  3c ad 2d d5 02 dc 91 a5  @...*...<.-.....
+  0010: d7 7b b0 aa 82 ef cb 32  31 ce 4e 6f              .{.....21.No
+> HCI Event: Command Status (0x0f) plen 4
+    LE Start Encryption (0x08|0x0019) status 0x00 ncmd 1
+> HCI Event: Encrypt Change (0x08) plen 4
+    status 0x06 handle 64 encrypt 0x00
+    Error: PIN or Key Missing
+
+Any idea why it is failing?
+
+One thing I noticed is during pairing also this encryption is being done
+and it succeeded.
+
+< HCI Command: LE Start Encryption (0x08|0x0019) plen 28
+  0000: 40 00 00 00 00 00 00 00  00 00 00 00 f4 33 19 ea  @............3..
+  0010: aa 35 95 5a 51 cf 15 a6  23 8a 05 27              .5.ZQ...#..'
+> HCI Event: Command Status (0x0f) plen 4
+    LE Start Encryption (0x08|0x0019) status 0x00 ncmd 1
+> HCI Event: Encrypt Change (0x08) plen 4
+    status 0x00 handle 64 encrypt 0x01
 
 
-The power_supply system seems to be triggering a lookup of battery
-'capacity' in the input device. This calls into the driver, which deep
-down invokes more code in the 'hidp' module: hidp_get_raw_report()
+But both the encryption packets are different. Is it expected?
 
-This function tries to communicate with the bluetooth device (keyboard
-in my case), but because the device is being 'torn down' such
-communication fails. Accordingly hidp_get_raw_report has a 5 second
-timeout ... so this function stalls for 5 seconds until that timeout
-occurs.
-
-
-I would guess that for some reason, removing the 'hid' or associated
-'input' device is leading to the power_supply code wanting to lookup the
-battery capacity which introduces a 5 second wait. This would delay
-hidp_session by 5 seconds ... in the mean time allowing
-hci_unregister_dev() to win the race and hence the hci device is removed
-before the input & hid devices.
-
+Thanks,
+Jaganath
+ 
 
