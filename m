@@ -1,45 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 25 Jan 2013 08:37:52 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/6] Bluetooth: Refactor UUID-16 list generation into its
- own function
-Message-ID: <20130125063752.GA16528@x220.ger.corp.intel.com>
-References: <1359054206-19528-1-git-send-email-johan.hedberg@gmail.com>
- <1359054206-19528-5-git-send-email-johan.hedberg@gmail.com>
- <CAJdJm_OMiH4vcoQSG1x++_G_nnQiTseb-moF8p=9k2utE=gAEg@mail.gmail.com>
- <CAJdJm_OqePCY1yMvJTwaUDnXTMbDJgucbYvEWT99=K9tbvgYQg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAJdJm_OqePCY1yMvJTwaUDnXTMbDJgucbYvEWT99=K9tbvgYQg@mail.gmail.com>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [RFC BlueZ 2/6] device: Fix memory leak while storing GATT capable devices
+Date: Fri, 25 Jan 2013 00:07:03 -0300
+Message-Id: <1359083227-13122-3-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1359083227-13122-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1359083227-13122-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+bt_uuid2string() returns a newly allocated string, and so it should
+be free'd.
+---
+ src/device.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-On Thu, Jan 24, 2013, Anderson Lizardo wrote:
-> On Thu, Jan 24, 2013 at 4:21 PM, Anderson Lizardo
-> <anderson.lizardo@openbossa.org> wrote:
-> > Hi Johan,
-> >
-> > On Thu, Jan 24, 2013 at 3:03 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> >> +static u8 *create_uuid16_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
-> >> +{
-> >> +       u8 *ptr = data, *uuids_start = NULL;
-> >> +       struct bt_uuid *uuid;
-> >
-> > Maybe you should check for "len < 2" here?
-> 
-> Actually, "len < 4", to be able to fit at least a 16-bit UUID.
+diff --git a/src/device.c b/src/device.c
+index 893e4bb..6c4455b 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2814,6 +2814,8 @@ static void store_services(struct btd_device *device)
+ 
+ 	sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
+ 	prim_uuid = bt_uuid2string(&uuid);
++	if (prim_uuid == NULL)
++		return;
+ 
+ 	ba2str(adapter_get_address(adapter), src_addr);
+ 	ba2str(&device->bdaddr, dst_addr);
+@@ -2862,6 +2864,7 @@ static void store_services(struct btd_device *device)
+ 		g_file_set_contents(filename, data, length, NULL);
+ 	}
+ 
++	g_free(prim_uuid);
+ 	g_free(data);
+ 	g_key_file_free(key_file);
+ }
+-- 
+1.8.1.1
 
-The way the EIR is constructed right now it's impossible for this
-condition to be met (i.e. the only variable length field before the
-UUID-16 list is the name which we limit to 48 bytes). Anyway, in case we
-add more stuff to the beginning of the EIR in the future I agree that
-it's good to have this check in place so we avoid stupid bugs.
-
-I'll be sending a v2 of the set (also including a simplification to the
-first patch) soon.
-
-Johan
