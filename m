@@ -1,33 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Chan-yeol Park <chanyeol.park@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] tools: Fix format string warnings for g_dbus_create_error
-Date: Fri, 25 Jan 2013 18:28:10 +0900
-Message-id: <1359106090-31381-1-git-send-email-chanyeol.park@samsung.com>
-In-reply-to: <1359021484-6958-1-git-send-email-luiz.dentz@gmail.com>
-References: <1359021484-6958-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 25 Jan 2013 09:50:10 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon@janc.net.pl>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] tools: Fix glib assert in mgmt-tester if hci_vhci module
+ is not loaded
+Message-ID: <20130125075010.GB27699@x220>
+References: <1358799954-6140-1-git-send-email-szymon@janc.net.pl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1358799954-6140-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes gcc warnings for "format not a string literal and no
-format arguments".
----
- tools/mpris-player.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Szymon,
 
-diff --git a/tools/mpris-player.c b/tools/mpris-player.c
-index 95ef8ab..aafa142 100644
---- a/tools/mpris-player.c
-+++ b/tools/mpris-player.c
-@@ -830,7 +830,7 @@ static void player_reply(DBusMessage *message, void *user_data)
- 	dbus_error_init(&err);
- 	if (dbus_set_error_from_message(&err, message)) {
- 		fprintf(stderr, "error: %s", err.name);
--		reply = g_dbus_create_error(msg, err.name, err.message);
-+		reply = g_dbus_create_error(msg, err.name, "%s", err.message);
- 		dbus_error_free(&err);
- 	} else
- 		reply = g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
--- 
-1.7.10.4
+On Mon, Jan 21, 2013, Szymon Janc wrote:
+> Print descriptive warning on HCI emulation setup failure and fail test
+> gracefully. This is better comparing to glib assertion when not fully
+> initialized HCI emulation is being unreferenced.
+> ---
+>  src/shared/hciemu.c | 31 ++++++++++++++++++++++---------
+>  tools/mgmt-tester.c |  4 ++++
+>  2 files changed, 26 insertions(+), 9 deletions(-)
 
+Applied. Thanks.
+
+Johan
