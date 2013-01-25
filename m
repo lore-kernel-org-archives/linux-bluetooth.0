@@ -1,34 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 25 Jan 2013 09:12:15 +0200
+Date: Fri, 25 Jan 2013 09:08:58 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC BlueZ 0/6] LE Connection Establishment fixes
-Message-ID: <20130125071215.GC17746@x220>
+Subject: Re: [RFC BlueZ 2/6] device: Fix memory leak while storing GATT
+ capable devices
+Message-ID: <20130125070858.GB17746@x220>
 References: <1359083227-13122-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1359083227-13122-3-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1359083227-13122-1-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1359083227-13122-3-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Vinicius,
 
 On Fri, Jan 25, 2013, Vinicius Costa Gomes wrote:
-> The only problem with this aproach that I found while testing is the
-> problem exposed on the message of commit 5/6: If the remote device is
-> out of range during pairing any connection attempt will fail until the
-> Connection Complete event comes (with an error). This is the reason
-> that we put the devices in the connect list before pairing.
-> 
-> Is this reason enough to have the device put in the connect list
-> during pairing?
+> bt_uuid2string() returns a newly allocated string, and so it should
+> be free'd.
+> ---
+>  src/device.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-I don't think so. The mgmt_pair_device should have a timeout for LE
-devices on the kernel side, but since this is not the case with current
-kernel versions we'll need a workaround in user space. I.e. instead of
-using scanning (I assume that's what putting it on the connect list will
-do) you should just use a simple timeout (g_timeout_add_seconds) and
-call mgmt_cancel_pair_device if it expires.
+This patch has been applied. Thanks.
 
 Johan
