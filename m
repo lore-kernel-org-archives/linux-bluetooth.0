@@ -1,25 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Sat, 26 Jan 2013 00:21:10 +0000
-Message-ID: <CAJ+AEyM4aZY80+Eo7g5=z+3t2fZB+n0rW6a02p8G2CJZ9JvAQQ@mail.gmail.com>
-Subject: What is involved in supporting SCO packets in HCI_RAW mode?
-From: Eponymous - <the.epon@gmail.com>
+From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [PATCH 1/2] Bluetooth: Fix L2CAP socket shutdown for LE connections
+Date: Fri, 25 Jan 2013 18:13:45 -0300
+Message-Id: <1359148426-22271-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+During the L2CAP socket shutdown, the LE connection is not terminated
+as expected. This bug can be reproduced using l2test tool. Once the
+LE connection is established, kill l2test and the LE connection will
+not terminate.
 
-After the patch was added to btusb.c to allow ACL packets to be
-sent/received in HCI_RAW mode I was wondering what would be involved
-in allowing raw SCO packets to be sent/received?
+This patch fixes hci_conn_disconnect function so it is able to
+terminate LE connections.
 
-This would be a useful feature for someone like me who works with
-Bluetooth firmware at this level on a daily basis.
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ net/bluetooth/hci_conn.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-However, I can understand there may be some limitations.
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 25bfce0..0492949 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -250,6 +250,7 @@ static void hci_conn_disconnect(struct hci_conn *conn)
+ 
+ 	switch (conn->type) {
+ 	case ACL_LINK:
++	case LE_LINK:
+ 		hci_acl_disconn(conn, reason);
+ 		break;
+ 	case AMP_LINK:
+-- 
+1.8.1.1
 
-Is this something that can be realistically done?
-
-Thanks.
