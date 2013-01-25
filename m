@@ -1,227 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1358878703-8100-2-git-send-email-jprvita@openbossa.org>
+References: <1358878703-8100-1-git-send-email-jprvita@openbossa.org>
+	<1358878703-8100-2-git-send-email-jprvita@openbossa.org>
+Date: Fri, 25 Jan 2013 15:35:08 +0200
+Message-ID: <CABBYNZK7nK6LPq1rYv40fq_Ko_MB2f-ANG08ozHhSLyg_BUAMg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] avctp: Create ignore quirk
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ] media-api: Add org.bluez.MediaFolder1
-Date: Fri, 25 Jan 2013 15:38:37 +0200
-Message-Id: <1359121117-7922-1-git-send-email-luiz.dentz@gmail.com>
+To: =?ISO-8859-1?Q?Jo=E3o_Paulo_Rechi_Vita?= <jprvita@openbossa.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Joao,
 
-This interface adds support for browsing and searching in the player's
-storage using AVRCP 1.4/1.5.
+On Tue, Jan 22, 2013 at 8:18 PM, João Paulo Rechi Vita
+<jprvita@openbossa.org> wrote:
+> Create a quirk to be able to accept and trow away certain keys.
+> ---
+>  profiles/audio/avctp.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+>
+> diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+> index 61890cc..f7e607e 100644
+> --- a/profiles/audio/avctp.c
+> +++ b/profiles/audio/avctp.c
+> @@ -58,7 +58,8 @@
+>  #include "avctp.h"
+>  #include "avrcp.h"
+>
+> -#define QUIRK_NO_RELEASE 1 << 0
+> +#define QUIRK_NO_RELEASE       1 << 0
+> +#define QUIRK_IGNORE           1 << 1
+>
+>  /* Message types */
+>  #define AVCTP_COMMAND          0
+> @@ -287,6 +288,11 @@ static size_t handle_panel_passthrough(struct avctp *session,
+>
+>                 key_quirks = session->key_quirks[key_map[i].avc];
+>
+> +               if (key_quirks & QUIRK_IGNORE) {
+> +                       DBG("AV/C: ignoring %s %s", key_map[i].name, status);
+> +                       break;
+> +               }
+> +
+>                 if (key_quirks & QUIRK_NO_RELEASE) {
+>                         if (!pressed) {
+>                                 DBG("AV/C: Ignoring release");
+> --
+> 1.7.11.7
 
-Some remarks about the design:
+In the end I think we should just accept the commands normally, let me
+quote the recommendations (RD=Rendering Device MP=Media Player):
 
-  - Exposing UIDCounter and UIDs was considered, but the spec seems to have
-    missed to define the player's id persistency. There are also the fact that
-    UIDCounter alone does not guarantee persistency across sessions and do not
-    provide what exact items have changed, so in the end exposing these
-    details will bring almost no value.
-  - Indexing or caching the whole media library is not recommended, Bluetooth
-    is too slow for that and even vendors such as Apple do not recommend doing
-    it, so the only items keep in cache are the current listed ones.
-  - Addressed vs Browsed player is done implicitly when accessed, this was done
-    to simplify the API and avoid confusions between applications and players.
----
- doc/media-api.txt | 183 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 183 insertions(+)
+  "Recommendation 16:
 
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index 972716e..54e53b9 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -226,6 +226,189 @@ Properties	string Equalizer [readwrite]
- 
- 			Device object path.
- 
-+		string Name [readonly]
-+
-+			Player name
-+
-+		boolean Browsable [readonly]
-+
-+			If present indicates the player can be browsed using
-+			MediaLibrary interface.
-+
-+			Possible values:
-+
-+				True: Supported and active
-+				False: Supported but inactive
-+
-+			Note: If supported but inactive clients can enable it
-+			by using MediaLibrary interface but it might interfere
-+			in the playback of other players.
-+
-+
-+		boolean Searchable [readonly]
-+
-+			If present indicates the player can be searched using
-+			MediaLibrary interface.
-+
-+			Possible values:
-+
-+				True: Supported and active
-+				False: Supported but inactive
-+
-+			Note: If supported but inactive clients can enable it
-+			by using MediaLibrary interface but it might interfere
-+			in the playback of other players.
-+
-+		array{string} Buttons [readonly]
-+
-+			If available indicates the buttons supported by the
-+			player.
-+
-+			Possible values:
-+
-+				"Play", "Pause", "Stop", "Next", "Previous",
-+				"FastForward" and "Rewind"
-+
-+			Default value: All
-+
-+MediaFolder1 hierarchy
-+======================
-+
-+Service		unique name (Target role)
-+		org.bluez (Controller role)
-+Interface	org.bluez.MediaFolder1 [Experimental]
-+Object path	freely definable (Target role)
-+		[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/playerX
-+		(Controller role)
-+
-+Methods		object Search(string value, dict filter)
-+
-+			Return a folder object containing the search result.
-+
-+			To list the items found use the folder object returned
-+			and pass to ChangeFolder.
-+
-+		array{objects, properties} ListItems(dict filter)
-+
-+			Return a list of items found
-+
-+		void ChangeFolder(object folder)
-+
-+			Change current folder.
-+
-+			Note: By changing folder the items of previous folder
-+			might be destroyed and have to be listed again, the
-+			exception is NowPlaying folder which should be always
-+			present while the player is active.
-+
-+Properties	uint32 NumberOfItems:
-+
-+			Number of items in the folder
-+
-+		string Name:
-+
-+			Folder name:
-+
-+			Possible values:
-+				"/Filesystem/...": Filesystem scope
-+				"/NowPlaying/...": NowPlaying scope
-+
-+			Note: /NowPlaying folder might not be listed if player
-+			is stopped, folders created by Search are virtual so
-+			once another Search is perform or the folder is
-+			changed using ChangeFolder it will no longer be listed.
-+
-+Filters		uint32 Start:
-+
-+			Offset of the first item.
-+
-+			Default value: 0
-+
-+		uint32 End:
-+
-+			Offset of the last item.
-+
-+			Default value: NumbeOfItems
-+
-+		array{string} Attributes
-+
-+			Item properties that should be included in the list.
-+
-+			Possible Values:
-+
-+				"title", "artist", "album", "genre",
-+				"number-of-tracks", "number", "duration"
-+
-+			Default Value: All
-+
-+MediaItem1 hierarchy
-+====================
-+
-+Service		unique name (Target role)
-+		org.bluez (Controller role)
-+Interface	org.bluez.MediaItem1 [Experimental]
-+Object path	freely definable (Target role)
-+		[variable
-+		prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/playerX/itemX
-+		(Controller role)
-+
-+Methods		void Play()
-+
-+			Play item
-+
-+		void AddtoNowPlaying()
-+
-+			Add item to now playing list
-+
-+Properties	string Name [readonly]
-+
-+			Item displayable name
-+
-+		boolean Folder [readonly]
-+
-+			Indicates whether the item is a folder
-+
-+		string Type [readonly]
-+
-+			Item type
-+
-+			Possible values:
-+
-+				Folder: "Mixed", "Titles", "Albums", "Artists"
-+				Other Items: "Video", "Audio"
-+
-+		boolean Playable [readonly]
-+
-+			Indicates if the item can be played
-+
-+		string Title:
-+
-+			Item title name
-+
-+		string Artist:
-+
-+			Item artist name
-+
-+		string Album:
-+
-+			Item album name
-+
-+		string Genre:
-+
-+			Item genre name
-+
-+		uint32 NumberOfTracks:
-+
-+			Item album number of tracks in total
-+
-+		uint32 Number:
-+
-+			Item album number
-+
-+		uint32 Duration:
-+
-+			Item duration in milliseconds
-+
- MediaEndpoint1 hierarchy
- ========================
- 
--- 
-1.8.1
+  If volume is changed on the RD, the RD should not send an AVRCP
+volume command to the MP device.
 
+  Motivation 16:
+
+  Sending an AVRCP volume command to the MP may cause the MP to send
+again an AVRCP volume
+  command to the RD device which could lead to an endless loop of
+AVRCP volume commands.
+
+  Recommendation 17:
+
+  If a device receives an AVRCP volume command, it shall not send back
+an AVRCP volume command.
+
+  Motivation 17:
+
+  This will also ensure that endless loop does not happen with
+existing devices which do not comply with the
+  recommendation."
+
+So there is nothing against the RD accepting the Volume Up/Down it
+should just no send it back.
+
+
+--
+Luiz Augusto von Dentz
