@@ -1,29 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 25 Jan 2013 09:50:10 +0200
+Date: Fri, 25 Jan 2013 09:42:18 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon@janc.net.pl>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] tools: Fix glib assert in mgmt-tester if hci_vhci module
- is not loaded
-Message-ID: <20130125075010.GB27699@x220>
-References: <1358799954-6140-1-git-send-email-szymon@janc.net.pl>
+Subject: Re: [PATCH BlueZ 1/6 v2] tools: Make mpris-player to export players
+ using MPRIS interface
+Message-ID: <20130125074218.GA27699@x220>
+References: <1359021484-6958-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1358799954-6140-1-git-send-email-szymon@janc.net.pl>
+In-Reply-To: <1359021484-6958-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Luiz,
 
-On Mon, Jan 21, 2013, Szymon Janc wrote:
-> Print descriptive warning on HCI emulation setup failure and fail test
-> gracefully. This is better comparing to glib assertion when not fully
-> initialized HCI emulation is being unreferenced.
+On Thu, Jan 24, 2013, Luiz Augusto von Dentz wrote:
+> Players found are exported in private connections using
+> org.mpris.MediaPlayer2.<device name> on the session bus.
 > ---
->  src/shared/hciemu.c | 31 ++++++++++++++++++++++---------
->  tools/mgmt-tester.c |  4 ++++
->  2 files changed, 26 insertions(+), 9 deletions(-)
+> v2: Fix generating invalid player bus name if device name contains invalid
+> chars.
+> 
+>  tools/mpris-player.c | 644 +++++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 623 insertions(+), 21 deletions(-)
 
-Applied. Thanks.
+All patches in this set have been applied. Thanks.
 
 Johan
