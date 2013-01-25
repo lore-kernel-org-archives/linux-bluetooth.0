@@ -2,47 +2,273 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [RFC BlueZ 4/6] device: Rename device_att_connect to device_connect_le
-Date: Fri, 25 Jan 2013 00:07:05 -0300
-Message-Id: <1359083227-13122-5-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [RFC BlueZ 6/6] gas: Move all the code to only one file
+Date: Fri, 25 Jan 2013 00:07:07 -0300
+Message-Id: <1359083227-13122-7-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1359083227-13122-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1359083227-13122-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This makes it clearer that this (currently unused) function should
-only be used with LE devices.
+Our Generic Attribute/Access Service plugin is small and simple enough
+to be kept in only one file.
 ---
- src/device.c | 2 +-
- src/device.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ Makefile.plugins        |  4 +--
+ profiles/gatt/gas.c     | 46 ++++++++++++++++++++++++++++
+ profiles/gatt/main.c    | 47 -----------------------------
+ profiles/gatt/manager.c | 79 -------------------------------------------------
+ profiles/gatt/manager.h | 24 ---------------
+ 5 files changed, 47 insertions(+), 153 deletions(-)
+ delete mode 100644 profiles/gatt/main.c
+ delete mode 100644 profiles/gatt/manager.c
+ delete mode 100644 profiles/gatt/manager.h
 
-diff --git a/src/device.c b/src/device.c
-index 89df161..c76fb2b 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -3120,7 +3120,7 @@ static void att_success_cb(gpointer user_data)
- 	g_slist_foreach(device->attios, attio_connected, device->attrib);
+diff --git a/Makefile.plugins b/Makefile.plugins
+index faab011..f497782 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -69,9 +69,7 @@ builtin_sources += profiles/health/mcap_lib.h profiles/health/mcap_internal.h \
+ endif
+ 
+ builtin_modules += gatt
+-builtin_sources += profiles/gatt/main.c profiles/gatt/manager.h \
+-			profiles/gatt/manager.c profiles/gatt/gas.h \
+-			profiles/gatt/gas.c
++builtin_sources += profiles/gatt/gas.c
+ 
+ builtin_modules += scanparam
+ builtin_sources += profiles/scanparam/scan.c
+diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
+index 429850b..31281b7 100644
+--- a/profiles/gatt/gas.c
++++ b/profiles/gatt/gas.c
+@@ -35,8 +35,10 @@
+ #include <btio/btio.h>
+ 
+ #include "lib/uuid.h"
++#include "plugin.h"
+ #include "adapter.h"
+ #include "device.h"
++#include "profile.h"
+ #include "attrib/att.h"
+ #include "attrib/gattrib.h"
+ #include "attio.h"
+@@ -405,3 +407,47 @@ void gas_unregister(struct btd_device *device)
+ 	devices = g_slist_remove(devices, gas);
+ 	gas_free(gas);
  }
- 
--GIOChannel *device_att_connect(struct btd_device *dev)
-+GIOChannel *device_connect_le(struct btd_device *dev)
- {
- 	struct btd_adapter *adapter = dev->adapter;
- 	struct att_callbacks *attcb;
-diff --git a/src/device.h b/src/device.h
-index 5438b0d..a86fd59 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -109,7 +109,7 @@ int device_unblock(struct btd_device *device, gboolean silent,
- void btd_device_set_pnpid(struct btd_device *device, uint16_t source,
- 			uint16_t vendor, uint16_t product, uint16_t version);
- 
--GIOChannel *device_att_connect(struct btd_device *dev);
-+GIOChannel *device_connect_le(struct btd_device *dev);
- 
- struct btd_profile;
- 
++
++static int gatt_driver_probe(struct btd_profile *p, struct btd_device *device,
++								GSList *uuids)
++{
++	struct gatt_primary *gap, *gatt;
++
++	gap = btd_device_get_primary(device, GAP_UUID);
++	gatt = btd_device_get_primary(device, GATT_UUID);
++
++	if (gap == NULL || gatt == NULL) {
++		error("GAP and GATT are mandatory");
++		return -EINVAL;
++	}
++
++	return gas_register(device, &gap->range, &gatt->range);
++}
++
++static void gatt_driver_remove(struct btd_profile *p,
++						struct btd_device *device)
++{
++	gas_unregister(device);
++}
++
++static struct btd_profile gatt_profile = {
++	.name		= "gap-gatt-profile",
++	.remote_uuids	= BTD_UUIDS(GAP_UUID, GATT_UUID),
++	.device_probe	= gatt_driver_probe,
++	.device_remove	= gatt_driver_remove
++};
++
++static int gatt_init(void)
++{
++	btd_profile_register(&gatt_profile);
++
++	return 0;
++}
++
++static void gatt_exit(void)
++{
++	btd_profile_register(&gatt_profile);
++}
++
++BLUETOOTH_PLUGIN_DEFINE(gatt, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++					gatt_init, gatt_exit)
+diff --git a/profiles/gatt/main.c b/profiles/gatt/main.c
+deleted file mode 100644
+index ecd4455..0000000
+--- a/profiles/gatt/main.c
++++ /dev/null
+@@ -1,47 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <stdint.h>
+-#include <glib.h>
+-#include <errno.h>
+-
+-#include "plugin.h"
+-#include "manager.h"
+-#include "hcid.h"
+-#include "log.h"
+-
+-static int gatt_init(void)
+-{
+-	return gatt_manager_init();
+-}
+-
+-static void gatt_exit(void)
+-{
+-	gatt_manager_exit();
+-}
+-
+-BLUETOOTH_PLUGIN_DEFINE(gatt, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
+-					gatt_init, gatt_exit)
+diff --git a/profiles/gatt/manager.c b/profiles/gatt/manager.c
+deleted file mode 100644
+index 2f2bd14..0000000
+--- a/profiles/gatt/manager.c
++++ /dev/null
+@@ -1,79 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include "config.h"
+-#endif
+-
+-#include <glib.h>
+-#include <errno.h>
+-#include <stdbool.h>
+-
+-#include "lib/uuid.h"
+-#include "adapter.h"
+-#include "device.h"
+-#include "profile.h"
+-#include "attrib/att.h"
+-#include "attrib/gattrib.h"
+-#include "attrib/gatt.h"
+-#include "gas.h"
+-#include "log.h"
+-#include "manager.h"
+-
+-static int gatt_driver_probe(struct btd_profile *p, struct btd_device *device,
+-								GSList *uuids)
+-{
+-	struct gatt_primary *gap, *gatt;
+-
+-	gap = btd_device_get_primary(device, GAP_UUID);
+-	gatt = btd_device_get_primary(device, GATT_UUID);
+-
+-	if (gap == NULL || gatt == NULL) {
+-		error("GAP and GATT are mandatory");
+-		return -EINVAL;
+-	}
+-
+-	return gas_register(device, &gap->range, &gatt->range);
+-}
+-
+-static void gatt_driver_remove(struct btd_profile *p,
+-						struct btd_device *device)
+-{
+-	gas_unregister(device);
+-}
+-
+-static struct btd_profile gatt_profile = {
+-	.name		= "gap-gatt-profile",
+-	.remote_uuids	= BTD_UUIDS(GAP_UUID, GATT_UUID),
+-	.device_probe	= gatt_driver_probe,
+-	.device_remove	= gatt_driver_remove
+-};
+-
+-int gatt_manager_init(void)
+-{
+-	return btd_profile_register(&gatt_profile);
+-}
+-
+-void gatt_manager_exit(void)
+-{
+-	btd_profile_unregister(&gatt_profile);
+-}
+diff --git a/profiles/gatt/manager.h b/profiles/gatt/manager.h
+deleted file mode 100644
+index 502fceb..0000000
+--- a/profiles/gatt/manager.h
++++ /dev/null
+@@ -1,24 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-int gatt_manager_init(void);
+-void gatt_manager_exit(void);
 -- 
 1.8.1.1
 
