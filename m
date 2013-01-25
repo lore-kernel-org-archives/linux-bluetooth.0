@@ -1,46 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1359113410.8989.3.camel@aeonflux>
-Subject: Re: [RFC BlueZ 0/6] LE Connection Establishment fixes
-From: Marcel Holtmann <marcel@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1359083227-13122-7-git-send-email-vinicius.gomes@openbossa.org>
+References: <1359083227-13122-1-git-send-email-vinicius.gomes@openbossa.org>
+	<1359083227-13122-7-git-send-email-vinicius.gomes@openbossa.org>
+Date: Fri, 25 Jan 2013 06:55:16 -0400
+Message-ID: <CAJdJm_ObwE7wNMKr62WSUsMirgfJKnvLENTjo=NXef5NaB--iw@mail.gmail.com>
+Subject: Re: [RFC BlueZ 6/6] gas: Move all the code to only one file
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Fri, 25 Jan 2013 12:30:10 +0100
-In-Reply-To: <1359083227-13122-1-git-send-email-vinicius.gomes@openbossa.org>
-References: <1359083227-13122-1-git-send-email-vinicius.gomes@openbossa.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Vinicius,
 
-> Sending this as a RFC because I don't know if this is what you guys
-> had in mind.
-> 
-> Patches 1/6/ and 2/6 are simple enough fixes and should be considered
-> for inclusion, perhaps 6/6 as well, but the improvement is
-> non-functional.
-> 
-> The only problem with this aproach that I found while testing is the
-> problem exposed on the message of commit 5/6: If the remote device is
-> out of range during pairing any connection attempt will fail until the
-> Connection Complete event comes (with an error). This is the reason
-> that we put the devices in the connect list before pairing.
-> 
-> Is this reason enough to have the device put in the connect list
-> during pairing?
+On Thu, Jan 24, 2013 at 11:07 PM, Vinicius Costa Gomes
+<vinicius.gomes@openbossa.org> wrote:
+> +static int gatt_init(void)
+> +{
+> +       btd_profile_register(&gatt_profile);
+> +
+> +       return 0;
+> +}
+> +
+> +static void gatt_exit(void)
+> +{
+> +       btd_profile_register(&gatt_profile);
 
-such a reasoning is pretty much wrong on all levels. An out of range
-device might never come back in range and you end up with a device on
-the connect list forever. And if it ever comes back, we end up with some
-unexpected connection attempt to that device.
+It should be btd_profile_unregister() here.
 
-The only sane approach would have been to add a timeout and just abort
-the pairing attempt after it. Everything else is just trying to fix a
-symptom and making it actually worse while doing so.
-
-Regards
-
-Marcel
-
-
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
