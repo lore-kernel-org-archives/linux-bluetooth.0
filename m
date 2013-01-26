@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/9 v4] Bluetooth: Store UUIDs in the same order that they were added
-Date: Sun, 27 Jan 2013 00:31:27 +0200
-Message-Id: <1359239495-3444-2-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/9 v4] Bluetooth: Simplify UUIDs clearing code
+Date: Sun, 27 Jan 2013 00:31:28 +0200
+Message-Id: <1359239495-3444-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1359239495-3444-1-git-send-email-johan.hedberg@gmail.com>
 References: <1359239495-3444-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,30 +11,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-We should be encoding UUIDs to the EIR data in the same order that they
-were added to the kernel, i.e. each UUID should be added to the end of
-the UUIDs list. This patch fixes the issue by using list_add_tail
-instead of list_add for storing the UUIDs.
+The code for clearing the UUIDs list can be simplified by using
+list_for_each_entry_safe instead of list_for_each_safe.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/hci_core.c |   10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index e7f944f..4fd45a3 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1330,7 +1330,7 @@ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
- 	memcpy(uuid->uuid, cp->uuid, 16);
- 	uuid->svc_hint = cp->svc_hint;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e061b35..618ca1a 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1183,14 +1183,10 @@ static void hci_discov_off(struct work_struct *work)
  
--	list_add(&uuid->list, &hdev->uuids);
-+	list_add_tail(&uuid->list, &hdev->uuids);
+ int hci_uuids_clear(struct hci_dev *hdev)
+ {
+-	struct list_head *p, *n;
+-
+-	list_for_each_safe(p, n, &hdev->uuids) {
+-		struct bt_uuid *uuid;
++	struct bt_uuid *uuid, *tmp;
  
- 	err = update_class(hdev);
- 	if (err < 0)
+-		uuid = list_entry(p, struct bt_uuid, list);
+-
+-		list_del(p);
++	list_for_each_entry_safe(uuid, tmp, &hdev->uuids, list) {
++		list_del(&uuid->list);
+ 		kfree(uuid);
+ 	}
+ 
 -- 
 1.7.10.4
 
