@@ -1,40 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/9 v3] Bluetooth: Add 32 and 128 bit EIR UUID support
-Date: Sat, 26 Jan 2013 12:08:35 +0200
-Message-Id: <1359194924-3151-1-git-send-email-johan.hedberg@gmail.com>
+Message-ID: <1359171012.16748.8.camel@aeonflux>
+Subject: Re: [PATCH 2/2] Bluetooth: Rename hci_acl_disconn
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Sat, 26 Jan 2013 04:30:12 +0100
+In-Reply-To: <1359148426-22271-2-git-send-email-andre.guedes@openbossa.org>
+References: <1359148426-22271-1-git-send-email-andre.guedes@openbossa.org>
+	 <1359148426-22271-2-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andre,
 
-Here's a third revision of the patch set to add 32 and 128 bit UUID support.
+> As hci_acl_disconn function basically sends the HCI Disconnect Command
+> and it is used to disconnect both ACL and LE links, renaming it to
+> hci_disconnect is more suitable.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  include/net/bluetooth/hci_core.h | 2 +-
+>  net/bluetooth/hci_conn.c         | 4 ++--
+>  net/bluetooth/hci_core.c         | 2 +-
+>  net/bluetooth/hci_event.c        | 4 ++--
+>  4 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index bcf8ffe..def944d 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -573,7 +573,7 @@ static inline struct hci_conn *hci_conn_hash_lookup_state(struct hci_dev *hdev,
+>  	return NULL;
+>  }
+>  
+> -void hci_acl_disconn(struct hci_conn *conn, __u8 reason);
+> +void hci_disconnect(struct hci_conn *conn, __u8 reason);
+>  void hci_setup_sync(struct hci_conn *conn, __u16 handle);
+>  void hci_sco_setup(struct hci_conn *conn, __u8 status);
 
-The main difference is merging back the different UUID lists to one (as
-per Marcel's wish) and instead adding a type member to the bt_uuid
-struct so that the type doesn't need to be evaluated multiple times (due
-to the three iterations of the hdev->uuids list that now needs to be
-done).
+a better name might be hci_conn_disconnect, but I do realize that
+overlaps with the timeout callback. And we have not been really super
+strict with the function name prefixes anyway.
 
-The added/removed statistics ended up (funnily enough) giving the exact
-same result as v2 of this patch set, i.e. the code base ends up growing
-51 lines (insertions - deletions).
+Regards
 
-Johan Hedberg (9):
-      Bluetooth: Store UUIDs in the same order that they were added
-      Bluetooth: Simplify UUIDs clearing code
-      Bluetooth: Keep track of UUID type upon addition
-      Bluetooth: Simplify UUID removal code
-      Bluetooth: Simplify UUID16 list generation for EIR
-      Bluetooth: Remove useless eir_len variable from EIR creation
-      Bluetooth: Refactor UUID-16 list generation into its own function
-      Bluetooth: Add support for 32-bit UUIDs in EIR data
-      Bluetooth: Add support for 128-bit UUIDs in EIR data
-
- include/net/bluetooth/hci_core.h |    5 ++++
- net/bluetooth/hci_core.c         |   10 +++-----
- net/bluetooth/mgmt.c             |  202 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---------------------------------------------------------
- 3 files changed, 134 insertions(+), 83 deletions(-)
+Marcel
 
 
