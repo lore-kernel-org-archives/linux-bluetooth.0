@@ -1,47 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1359170902.16748.6.camel@aeonflux>
-Subject: Re: [PATCH 1/2] Bluetooth: Fix L2CAP socket shutdown for LE
- connections
+Message-ID: <1359170626.16748.4.camel@aeonflux>
+Subject: Re: What is involved in supporting SCO packets in HCI_RAW mode?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+To: Eponymous - <the.epon@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Sat, 26 Jan 2013 04:28:22 +0100
-In-Reply-To: <1359148426-22271-1-git-send-email-andre.guedes@openbossa.org>
-References: <1359148426-22271-1-git-send-email-andre.guedes@openbossa.org>
+Date: Sat, 26 Jan 2013 04:23:46 +0100
+In-Reply-To: <CAJ+AEyM4aZY80+Eo7g5=z+3t2fZB+n0rW6a02p8G2CJZ9JvAQQ@mail.gmail.com>
+References: <CAJ+AEyM4aZY80+Eo7g5=z+3t2fZB+n0rW6a02p8G2CJZ9JvAQQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi,
 
-> During the L2CAP socket shutdown, the LE connection is not terminated
-> as expected. This bug can be reproduced using l2test tool. Once the
-> LE connection is established, kill l2test and the LE connection will
-> not terminate.
+> After the patch was added to btusb.c to allow ACL packets to be
+> sent/received in HCI_RAW mode I was wondering what would be involved
+> in allowing raw SCO packets to be sent/received?
 > 
-> This patch fixes hci_conn_disconnect function so it is able to
-> terminate LE connections.
+> This would be a useful feature for someone like me who works with
+> Bluetooth firmware at this level on a daily basis.
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  net/bluetooth/hci_conn.c | 1 +
->  1 file changed, 1 insertion(+)
+> However, I can understand there may be some limitations.
 > 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 25bfce0..0492949 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -250,6 +250,7 @@ static void hci_conn_disconnect(struct hci_conn *conn)
->  
->  	switch (conn->type) {
->  	case ACL_LINK:
-> +	case LE_LINK:
->  		hci_acl_disconn(conn, reason);
->  		break;
->  	case AMP_LINK:
+> Is this something that can be realistically done?
 
-I am wondering if we are not missing SCO_LINK here either.
+I do not see a way to do this properly. The main problem here is the USB
+transport. It requires special settings and active URBs.
+
+Once you switch it to HCI_RAW mode, the Bluetooth host stack does no
+command/event tracking and with that no connection tracking anymore.
+This means it can not inform the driver about any changes. And for USB
+it is required to change its alternate setting based on the number of
+connections and start ISOC URBs. Having ISOC URBs submitted all the time
+is not feasible either since that consumes way too much power.
+
+For other transports like UART, the SCO packets in HCI_RAW mode should
+still work.
 
 Regards
 
