@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 6/9 v3] Bluetooth: Remove useless eir_len variable from EIR creation
-Date: Sat, 26 Jan 2013 12:08:41 +0200
-Message-Id: <1359194924-3151-7-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 4/9 v3] Bluetooth: Simplify UUID removal code
+Date: Sat, 26 Jan 2013 12:08:39 +0200
+Message-Id: <1359194924-3151-5-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1359194924-3151-1-git-send-email-johan.hedberg@gmail.com>
 References: <1359194924-3151-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,72 +11,38 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The amount of data encoded so far in the create_eir() function can be
-calculated simply through the difference between the data and ptr
-pointer variables. The eir_len variable then becomes essentially
-useless.
+The UUID removal code can be simplified by using
+list_for_each_entry_safe instead of list_for_each_safe.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |    8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ net/bluetooth/mgmt.c |    6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index bf0f32e..3a74ded 100644
+index d9f6b2c..ea8d74a 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -439,7 +439,6 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
+@@ -1372,7 +1372,7 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
  {
- 	u8 *ptr = data;
- 	u8 *uuids_start;
--	u16 eir_len = 0;
- 	struct bt_uuid *uuid;
- 	size_t name_len;
+ 	struct mgmt_cp_remove_uuid *cp = data;
+ 	struct pending_cmd *cmd;
+-	struct list_head *p, *n;
++	struct bt_uuid *match, *tmp;
+ 	u8 bt_uuid_any[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+ 	int err, found;
  
-@@ -458,7 +457,6 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
+@@ -1400,9 +1400,7 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
  
- 		memcpy(ptr + 2, hdev->dev_name, name_len);
+ 	found = 0;
  
--		eir_len += (name_len + 2);
- 		ptr += (name_len + 2);
- 	}
+-	list_for_each_safe(p, n, &hdev->uuids) {
+-		struct bt_uuid *match = list_entry(p, struct bt_uuid, list);
+-
++	list_for_each_entry_safe(match, tmp, &hdev->uuids, list) {
+ 		if (memcmp(match->uuid, cp->uuid, 16) != 0)
+ 			continue;
  
-@@ -467,7 +465,6 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
- 		ptr[1] = EIR_TX_POWER;
- 		ptr[2] = (u8) hdev->inq_tx_power;
- 
--		eir_len += 3;
- 		ptr += 3;
- 	}
- 
-@@ -480,7 +477,6 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
- 		put_unaligned_le16(hdev->devid_product, ptr + 6);
- 		put_unaligned_le16(hdev->devid_version, ptr + 8);
- 
--		eir_len += 10;
- 		ptr += 10;
- 	}
- 
-@@ -505,18 +501,16 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
- 			uuids_start[0] = 1;
- 			uuids_start[1] = EIR_UUID16_ALL;
- 			ptr += 2;
--			eir_len += 2;
- 		}
- 
- 		/* Stop if not enough space to put next UUID */
--		if (eir_len + 2 + sizeof(u16) > HCI_MAX_EIR_LENGTH) {
-+		if ((ptr - data) + 2 + sizeof(u16) > HCI_MAX_EIR_LENGTH) {
- 			uuids_start[1] = EIR_UUID16_SOME;
- 			break;
- 		}
- 
- 		*ptr++ = (uuid16 & 0x00ff);
- 		*ptr++ = (uuid16 & 0xff00) >> 8;
--		eir_len += sizeof(uuid16);
- 		uuids_start[0] += sizeof(uuid16);
- 	}
- }
 -- 
 1.7.10.4
 
