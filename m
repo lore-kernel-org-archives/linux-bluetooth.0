@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/9 v3] Bluetooth: Simplify UUID16 list generation for EIR
-Date: Sat, 26 Jan 2013 12:08:40 +0200
-Message-Id: <1359194924-3151-6-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 6/9 v3] Bluetooth: Remove useless eir_len variable from EIR creation
+Date: Sat, 26 Jan 2013 12:08:41 +0200
+Message-Id: <1359194924-3151-7-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1359194924-3151-1-git-send-email-johan.hedberg@gmail.com>
 References: <1359194924-3151-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,93 +11,72 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-There's no need to use two separate loops to generate a UUID list for
-the EIR data. This patch merges the two loops previously used for the
-16-bit UUID list generation into a single loop, thus simplifying the
-code a great deal.
+The amount of data encoded so far in the create_eir() function can be
+calculated simply through the difference between the data and ptr
+pointer variables. The eir_len variable then becomes essentially
+useless.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |   46 +++++++++++++++-------------------------------
- 1 file changed, 15 insertions(+), 31 deletions(-)
+ net/bluetooth/mgmt.c |    8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ea8d74a..bf0f32e 100644
+index bf0f32e..3a74ded 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -438,9 +438,8 @@ static u32 get_current_settings(struct hci_dev *hdev)
- static void create_eir(struct hci_dev *hdev, u8 *data)
+@@ -439,7 +439,6 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
  {
  	u8 *ptr = data;
-+	u8 *uuids_start;
- 	u16 eir_len = 0;
--	u16 uuid16_list[HCI_MAX_EIR_LENGTH / sizeof(u16)];
--	int i, truncated = 0;
+ 	u8 *uuids_start;
+-	u16 eir_len = 0;
  	struct bt_uuid *uuid;
  	size_t name_len;
  
-@@ -485,7 +484,7 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
+@@ -458,7 +457,6 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
+ 
+ 		memcpy(ptr + 2, hdev->dev_name, name_len);
+ 
+-		eir_len += (name_len + 2);
+ 		ptr += (name_len + 2);
+ 	}
+ 
+@@ -467,7 +465,6 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
+ 		ptr[1] = EIR_TX_POWER;
+ 		ptr[2] = (u8) hdev->inq_tx_power;
+ 
+-		eir_len += 3;
+ 		ptr += 3;
+ 	}
+ 
+@@ -480,7 +477,6 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
+ 		put_unaligned_le16(hdev->devid_product, ptr + 6);
+ 		put_unaligned_le16(hdev->devid_version, ptr + 8);
+ 
+-		eir_len += 10;
  		ptr += 10;
  	}
  
--	memset(uuid16_list, 0, sizeof(uuid16_list));
-+	uuids_start = NULL;
+@@ -505,18 +501,16 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
+ 			uuids_start[0] = 1;
+ 			uuids_start[1] = EIR_UUID16_ALL;
+ 			ptr += 2;
+-			eir_len += 2;
+ 		}
  
- 	/* Group all UUID16 types */
- 	list_for_each_entry(uuid, &hdev->uuids, list) {
-@@ -501,39 +500,24 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
- 		if (uuid16 == PNP_INFO_SVCLASS_ID)
- 			continue;
- 
-+		if (!uuids_start) {
-+			uuids_start = ptr;
-+			uuids_start[0] = 1;
-+			uuids_start[1] = EIR_UUID16_ALL;
-+			ptr += 2;
-+			eir_len += 2;
-+		}
-+
  		/* Stop if not enough space to put next UUID */
- 		if (eir_len + 2 + sizeof(u16) > HCI_MAX_EIR_LENGTH) {
--			truncated = 1;
-+			uuids_start[1] = EIR_UUID16_SOME;
+-		if (eir_len + 2 + sizeof(u16) > HCI_MAX_EIR_LENGTH) {
++		if ((ptr - data) + 2 + sizeof(u16) > HCI_MAX_EIR_LENGTH) {
+ 			uuids_start[1] = EIR_UUID16_SOME;
  			break;
  		}
  
--		/* Check for duplicates */
--		for (i = 0; uuid16_list[i] != 0; i++)
--			if (uuid16_list[i] == uuid16)
--				break;
--
--		if (uuid16_list[i] == 0) {
--			uuid16_list[i] = uuid16;
--			eir_len += sizeof(u16);
--		}
--	}
--
--	if (uuid16_list[0] != 0) {
--		u8 *length = ptr;
--
--		/* EIR Data type */
--		ptr[1] = truncated ? EIR_UUID16_SOME : EIR_UUID16_ALL;
--
--		ptr += 2;
--		eir_len += 2;
--
--		for (i = 0; uuid16_list[i] != 0; i++) {
--			*ptr++ = (uuid16_list[i] & 0x00ff);
--			*ptr++ = (uuid16_list[i] & 0xff00) >> 8;
--		}
--
--		/* EIR Data length */
--		*length = (i * sizeof(u16)) + 1;
-+		*ptr++ = (uuid16 & 0x00ff);
-+		*ptr++ = (uuid16 & 0xff00) >> 8;
-+		eir_len += sizeof(uuid16);
-+		uuids_start[0] += sizeof(uuid16);
+ 		*ptr++ = (uuid16 & 0x00ff);
+ 		*ptr++ = (uuid16 & 0xff00) >> 8;
+-		eir_len += sizeof(uuid16);
+ 		uuids_start[0] += sizeof(uuid16);
  	}
  }
- 
 -- 
 1.7.10.4
 
