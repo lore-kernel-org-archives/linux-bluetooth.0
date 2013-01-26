@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 8/9 v3] Bluetooth: Add support for 32-bit UUIDs in EIR data
-Date: Sat, 26 Jan 2013 12:08:43 +0200
-Message-Id: <1359194924-3151-9-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 9/9 v3] Bluetooth: Add support for 128-bit UUIDs in EIR data
+Date: Sat, 26 Jan 2013 12:08:44 +0200
+Message-Id: <1359194924-3151-10-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1359194924-3151-1-git-send-email-johan.hedberg@gmail.com>
 References: <1359194924-3151-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,7 +11,7 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds the necessary code for inserting a list of 32-bit UUIDs
+This patch adds the necessary code for encoding a list of 128-bit UUIDs
 into the EIR data.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
@@ -20,41 +20,41 @@ Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
  1 file changed, 34 insertions(+)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f142b9a..4ebcfee 100644
+index 4ebcfee..f5be685 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -477,6 +477,39 @@ static u8 *create_uuid16_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
+@@ -510,6 +510,39 @@ static u8 *create_uuid32_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
  	return ptr;
  }
  
-+static u8 *create_uuid32_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
++static u8 *create_uuid128_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
 +{
 +	u8 *ptr = data, *uuids_start = NULL;
 +	struct bt_uuid *uuid;
 +
-+	if (len < 6)
++	if (len < 18)
 +		return ptr;
 +
 +	list_for_each_entry(uuid, &hdev->uuids, list) {
-+		if (uuid->type != BT_UUID32)
++		if (uuid->type != BT_UUID128)
 +			continue;
 +
 +		if (!uuids_start) {
 +			uuids_start = ptr;
 +			uuids_start[0] = 1;
-+			uuids_start[1] = EIR_UUID32_ALL;
++			uuids_start[1] = EIR_UUID128_ALL;
 +			ptr += 2;
 +		}
 +
 +		/* Stop if not enough space to put next UUID */
-+		if ((ptr - data) + sizeof(u32) > len) {
-+			uuids_start[1] = EIR_UUID32_SOME;
++		if ((ptr - data) + 16 > len) {
++			uuids_start[1] = EIR_UUID128_SOME;
 +			break;
 +		}
 +
-+		memcpy(ptr, &uuid->uuid[12], sizeof(u32));
-+		ptr += sizeof(u32);
-+		uuids_start[0] += sizeof(u32);
++		memcpy(ptr, uuid->uuid, 16);
++		ptr += 16;
++		uuids_start[0] += 16;
 +	}
 +
 +	return ptr;
@@ -63,11 +63,11 @@ index f142b9a..4ebcfee 100644
  static void create_eir(struct hci_dev *hdev, u8 *data)
  {
  	u8 *ptr = data;
-@@ -521,6 +554,7 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
- 	}
+@@ -555,6 +588,7 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
  
  	ptr = create_uuid16_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
-+	ptr = create_uuid32_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
+ 	ptr = create_uuid32_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
++	ptr = create_uuid128_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
  }
  
  static int update_eir(struct hci_dev *hdev)
