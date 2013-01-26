@@ -1,39 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/9 v3] Bluetooth: Store UUIDs in the same order that they were added
-Date: Sat, 26 Jan 2013 12:08:36 +0200
-Message-Id: <1359194924-3151-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1359194924-3151-1-git-send-email-johan.hedberg@gmail.com>
-References: <1359194924-3151-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 0/9 v3] Bluetooth: Add 32 and 128 bit EIR UUID support
+Date: Sat, 26 Jan 2013 12:08:35 +0200
+Message-Id: <1359194924-3151-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-We should be encoding UUIDs to the EIR data in the same order that they
-were added to the kernel, i.e. each UUID should be added to the end of
-the UUIDs list. This patch fixes the issue by using list_add_tail
-instead of list_add for storing the UUIDs.
+Here's a third revision of the patch set to add 32 and 128 bit UUID support.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The main difference is merging back the different UUID lists to one (as
+per Marcel's wish) and instead adding a type member to the bt_uuid
+struct so that the type doesn't need to be evaluated multiple times (due
+to the three iterations of the hdev->uuids list that now needs to be
+done).
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index e7f944f..4fd45a3 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1330,7 +1330,7 @@ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
- 	memcpy(uuid->uuid, cp->uuid, 16);
- 	uuid->svc_hint = cp->svc_hint;
- 
--	list_add(&uuid->list, &hdev->uuids);
-+	list_add_tail(&uuid->list, &hdev->uuids);
- 
- 	err = update_class(hdev);
- 	if (err < 0)
--- 
-1.7.10.4
+The added/removed statistics ended up (funnily enough) giving the exact
+same result as v2 of this patch set, i.e. the code base ends up growing
+51 lines (insertions - deletions).
+
+Johan Hedberg (9):
+      Bluetooth: Store UUIDs in the same order that they were added
+      Bluetooth: Simplify UUIDs clearing code
+      Bluetooth: Keep track of UUID type upon addition
+      Bluetooth: Simplify UUID removal code
+      Bluetooth: Simplify UUID16 list generation for EIR
+      Bluetooth: Remove useless eir_len variable from EIR creation
+      Bluetooth: Refactor UUID-16 list generation into its own function
+      Bluetooth: Add support for 32-bit UUIDs in EIR data
+      Bluetooth: Add support for 128-bit UUIDs in EIR data
+
+ include/net/bluetooth/hci_core.h |    5 ++++
+ net/bluetooth/hci_core.c         |   10 +++-----
+ net/bluetooth/mgmt.c             |  202 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---------------------------------------------------------
+ 3 files changed, 134 insertions(+), 83 deletions(-)
+
 
