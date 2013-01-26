@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/9 v4] Bluetooth: Simplify UUID16 list generation for EIR
-Date: Sun, 27 Jan 2013 00:31:31 +0200
-Message-Id: <1359239495-3444-6-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 4/9 v4] Bluetooth: Simplify UUID removal code
+Date: Sun, 27 Jan 2013 00:31:30 +0200
+Message-Id: <1359239495-3444-5-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1359239495-3444-1-git-send-email-johan.hedberg@gmail.com>
 References: <1359239495-3444-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,93 +11,38 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-There's no need to use two separate loops to generate a UUID list for
-the EIR data. This patch merges the two loops previously used for the
-16-bit UUID list generation into a single loop, thus simplifying the
-code a great deal.
+The UUID removal code can be simplified by using
+list_for_each_entry_safe instead of list_for_each_safe.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c |   46 +++++++++++++++-------------------------------
- 1 file changed, 15 insertions(+), 31 deletions(-)
+ net/bluetooth/mgmt.c |    6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 1e906d8..02827af 100644
+index 8de6d57..1e906d8 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -438,9 +438,8 @@ static u32 get_current_settings(struct hci_dev *hdev)
- static void create_eir(struct hci_dev *hdev, u8 *data)
+@@ -1372,7 +1372,7 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
  {
- 	u8 *ptr = data;
-+	u8 *uuids_start;
- 	u16 eir_len = 0;
--	u16 uuid16_list[HCI_MAX_EIR_LENGTH / sizeof(u16)];
--	int i, truncated = 0;
- 	struct bt_uuid *uuid;
- 	size_t name_len;
+ 	struct mgmt_cp_remove_uuid *cp = data;
+ 	struct pending_cmd *cmd;
+-	struct list_head *p, *n;
++	struct bt_uuid *match, *tmp;
+ 	u8 bt_uuid_any[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+ 	int err, found;
  
-@@ -485,7 +484,7 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
- 		ptr += 10;
- 	}
+@@ -1400,9 +1400,7 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
  
--	memset(uuid16_list, 0, sizeof(uuid16_list));
-+	uuids_start = NULL;
+ 	found = 0;
  
- 	/* Group all UUID16 types */
- 	list_for_each_entry(uuid, &hdev->uuids, list) {
-@@ -501,39 +500,24 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
- 		if (uuid16 == PNP_INFO_SVCLASS_ID)
+-	list_for_each_safe(p, n, &hdev->uuids) {
+-		struct bt_uuid *match = list_entry(p, struct bt_uuid, list);
+-
++	list_for_each_entry_safe(match, tmp, &hdev->uuids, list) {
+ 		if (memcmp(match->uuid, cp->uuid, 16) != 0)
  			continue;
- 
-+		if (!uuids_start) {
-+			uuids_start = ptr;
-+			uuids_start[0] = 1;
-+			uuids_start[1] = EIR_UUID16_ALL;
-+			ptr += 2;
-+			eir_len += 2;
-+		}
-+
- 		/* Stop if not enough space to put next UUID */
- 		if (eir_len + 2 + sizeof(u16) > HCI_MAX_EIR_LENGTH) {
--			truncated = 1;
-+			uuids_start[1] = EIR_UUID16_SOME;
- 			break;
- 		}
- 
--		/* Check for duplicates */
--		for (i = 0; uuid16_list[i] != 0; i++)
--			if (uuid16_list[i] == uuid16)
--				break;
--
--		if (uuid16_list[i] == 0) {
--			uuid16_list[i] = uuid16;
--			eir_len += sizeof(u16);
--		}
--	}
--
--	if (uuid16_list[0] != 0) {
--		u8 *length = ptr;
--
--		/* EIR Data type */
--		ptr[1] = truncated ? EIR_UUID16_SOME : EIR_UUID16_ALL;
--
--		ptr += 2;
--		eir_len += 2;
--
--		for (i = 0; uuid16_list[i] != 0; i++) {
--			*ptr++ = (uuid16_list[i] & 0x00ff);
--			*ptr++ = (uuid16_list[i] & 0xff00) >> 8;
--		}
--
--		/* EIR Data length */
--		*length = (i * sizeof(u16)) + 1;
-+		*ptr++ = (uuid16 & 0x00ff);
-+		*ptr++ = (uuid16 & 0xff00) >> 8;
-+		eir_len += sizeof(uuid16);
-+		uuids_start[0] += sizeof(uuid16);
- 	}
- }
  
 -- 
 1.7.10.4
