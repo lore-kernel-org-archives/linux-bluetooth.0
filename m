@@ -1,39 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Increment Management interface revision
-Date: Sat, 26 Jan 2013 16:33:50 -0600
-Message-Id: <1359239630-3579-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1359239630-3579-1-git-send-email-johan.hedberg@gmail.com>
-References: <1359239630-3579-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: Fix link security setting when powering on
+Date: Sat, 26 Jan 2013 16:33:49 -0600
+Message-Id: <1359239630-3579-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The fixing of several mgmt issues, such as the correct handling of 32
-and 128 bit UUIDs means that it is now safe for user space to send such
-commands. However, user space needs a way to detect that it is safe, so
-increment the mgmt revision so that it can be checked against.
+If a controller is powered on while the HCI_AUTO_OFF flag is set the
+link security setting (HCI_LINK_SECURITY) might not be in sync with the
+actual state of the controller (HCI_AUTH). This patch fixes the issue by
+checking for inequality between the intended and actual settings and
+sends a HCI_Write_Auth_Enable command if necessary.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/mgmt.c |    7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f6ef8ff..8e69d89 100644
+index fbc8edf..f6ef8ff 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -35,7 +35,7 @@
- bool enable_hs;
+@@ -3096,6 +3096,13 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
+ 					     sizeof(cp), &cp);
+ 		}
  
- #define MGMT_VERSION	1
--#define MGMT_REVISION	2
-+#define MGMT_REVISION	3
- 
- static const u16 mgmt_commands[] = {
- 	MGMT_OP_READ_INDEX_LIST,
++		if (test_bit(HCI_LINK_SECURITY, &hdev->dev_flags) !=
++		    test_bit(HCI_AUTH, &hdev->flags)) {
++			u8 val = test_bit(HCI_LINK_SECURITY, &hdev->dev_flags);
++			hci_send_cmd(hdev, HCI_OP_WRITE_AUTH_ENABLE,
++				     sizeof(val), &val);
++		}
++
+ 		if (lmp_bredr_capable(hdev)) {
+ 			set_bredr_scan(hdev);
+ 			update_class(hdev);
 -- 
 1.7.10.4
 
