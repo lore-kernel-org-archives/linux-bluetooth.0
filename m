@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1359256529.16748.24.camel@aeonflux>
-Subject: Re: [PATCH 1/2] Bluetooth: Fix link security setting when powering
- on
+Message-ID: <1359256447.16748.22.camel@aeonflux>
+Subject: Re: [PATCH 3/9 v4] Bluetooth: Keep track of UUID type upon addition
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Sun, 27 Jan 2013 04:15:29 +0100
-In-Reply-To: <1359239630-3579-1-git-send-email-johan.hedberg@gmail.com>
-References: <1359239630-3579-1-git-send-email-johan.hedberg@gmail.com>
+Date: Sun, 27 Jan 2013 04:14:07 +0100
+In-Reply-To: <1359239495-3444-4-git-send-email-johan.hedberg@gmail.com>
+References: <1359239495-3444-1-git-send-email-johan.hedberg@gmail.com>
+	 <1359239495-3444-4-git-send-email-johan.hedberg@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,35 +15,35 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> If a controller is powered on while the HCI_AUTO_OFF flag is set the
-> link security setting (HCI_LINK_SECURITY) might not be in sync with the
-> actual state of the controller (HCI_AUTH). This patch fixes the issue by
-> checking for inequality between the intended and actual settings and
-> sends a HCI_Write_Auth_Enable command if necessary.
+> The primary purpose of the UUIDs is to enable generation of EIR and AD
+> data. In these data formats the UUIDs are split into separate fields
+> based on whether they're 16, 32 or 128 bit UUIDs. To make the generation
+> of these data fields simpler this patch adds a type member to the
+> bt_uuid struct and assigns a value to it as soon as the UUID is added to
+> the kernel. This way the type doesn't need to be calculated each time
+> the UUID list is later iterated.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  net/bluetooth/mgmt.c |    7 +++++++
->  1 file changed, 7 insertions(+)
+>  include/net/bluetooth/hci_core.h |    1 +
+>  net/bluetooth/mgmt.c             |   48 ++++++++++++++++++--------------------
+>  2 files changed, 24 insertions(+), 25 deletions(-)
 > 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index fbc8edf..f6ef8ff 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -3096,6 +3096,13 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
->  					     sizeof(cp), &cp);
->  		}
->  
-> +		if (test_bit(HCI_LINK_SECURITY, &hdev->dev_flags) !=
-> +		    test_bit(HCI_AUTH, &hdev->flags)) {
-> +			u8 val = test_bit(HCI_LINK_SECURITY, &hdev->dev_flags);
-> +			hci_send_cmd(hdev, HCI_OP_WRITE_AUTH_ENABLE,
-> +				     sizeof(val), &val);
-> +		}
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index bcf8ffe..90cf75a 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -86,6 +86,7 @@ struct bdaddr_list {
+>  struct bt_uuid {
+>  	struct list_head list;
+>  	u8 uuid[16];
+> +	u8 size;
+>  	u8 svc_hint;
+>  };
 
-why not actually just test for the value and store its result, then
-compare and then use the value. Testing HCI_LINK_SECURITY twice seems a
-bit too much.
+seems you just went for the size approach. Fine with me as well.
+
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
