@@ -1,64 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: btmrvl_sdio: look for sd8688 firmware in
- alternate place
-From: Lubomir Rintel <lkundrak@v3.sk>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: Marcel Holtmann <marcel@holtmann.org>, David Woodhouse <dwmw2@infradead.org>,  Bing Zhao <bzhao@marvell.com>, "libertas-dev@lists.infradead.org" <libertas-dev@lists.infradead.org>,  "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Gustavo Padovan <gustavo@padovan.org>,  Johan Hedberg <johan.hedberg@gmail.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-In-Reply-To: <1358730733.24121.228.camel@deadeye.wl.decadent.org.uk>
-References: <1357689361-7969-1-git-send-email-lkundrak@v3.sk>
-	 <1357689361-7969-2-git-send-email-lkundrak@v3.sk>
-	 <1357698538.1806.43.camel@aeonflux>
-	 <477F20668A386D41ADCC57781B1F70430D13FDB783@SC-VEXCH1.marvell.com>
-	 <1357713088.1105.1.camel@unicorn>  <1357713345.1806.44.camel@aeonflux>
-	 <1358494422.28503.4.camel@unicorn>
-	 <1358730733.24121.228.camel@deadeye.wl.decadent.org.uk>
+Message-ID: <1359256529.16748.24.camel@aeonflux>
+Subject: Re: [PATCH 1/2] Bluetooth: Fix link security setting when powering
+ on
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Sun, 27 Jan 2013 04:15:29 +0100
+In-Reply-To: <1359239630-3579-1-git-send-email-johan.hedberg@gmail.com>
+References: <1359239630-3579-1-git-send-email-johan.hedberg@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Sun, 27 Jan 2013 12:21:51 +0100
-Message-ID: <1359285711.2156.4.camel@unicorn>
 Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2013-01-21 at 01:12 +0000, Ben Hutchings wrote:
-> On Fri, 2013-01-18 at 08:33 +0100, Lubomir Rintel wrote:
-> > On Tue, 2013-01-08 at 22:35 -0800, Marcel Holtmann wrote:
-> > > Hi Lubomir,
-> > > 
-> > > > > > > linux-firmware ships the sd8688* firmware images that are shared with
-> > > > > > > libertas_sdio WiFi driver under libertas/. libertas_sdio looks in both places
-> > > > > > > and so should we.
-> > > > > > >
-> > > > > > > Signed-off-by: Lubomir Rintel <lkundrak@v3.sk>
-> > > > > > > ---
-> > > > > > >  drivers/bluetooth/btmrvl_sdio.c |   24 ++++++++++++++++++++++--
-> > > > > > >  drivers/bluetooth/btmrvl_sdio.h |    6 ++++--
-> > > > > > >  2 files changed, 26 insertions(+), 4 deletions(-)
-> > > > > > 
-> > > > > > NAK from me on this one. I do not want the driver to check two
-> > > > > > locations. That is what userspace can work around.
-> > > > > > 
-> > > > > > If we want to unify the location between the WiFi driver and the
-> > > > > > Bluetooth driver, I am fine with that, but seriously, just pick one over
-> > > > > > the other. I do not care which one.
-> > > > > 
-> > > > > The unified location is mrvl/ directory.
-> > > > > 
-> > > > > We can probably move SD8688 firmware & helper binaries to mrvl/ and have both drivers grab the images there?
-> > > > 
-> > > > That would break existing setups, wouldn't it?
-> > > > 
-> > > > I was under impression (commit 3d32a58b) that we care about
-> > > > compatibility here. Do we?
-> > > 
-> > > that is what symlinks are for.
-> > 
-> > David, Ben: please pull the following branch then:
-> > git pull git://github.com/lkundrak/linux-firmware.git sd8688-move
-> > 
-> > Thank you!
+Hi Johan,
+
+> If a controller is powered on while the HCI_AUTO_OFF flag is set the
+> link security setting (HCI_LINK_SECURITY) might not be in sync with the
+> actual state of the controller (HCI_AUTH). This patch fixes the issue by
+> checking for inequality between the intended and actual settings and
+> sends a HCI_Write_Auth_Enable command if necessary.
 > 
-> The symlinks are broken, and you didn't update WHENCE.
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/mgmt.c |    7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index fbc8edf..f6ef8ff 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -3096,6 +3096,13 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
+>  					     sizeof(cp), &cp);
+>  		}
+>  
+> +		if (test_bit(HCI_LINK_SECURITY, &hdev->dev_flags) !=
+> +		    test_bit(HCI_AUTH, &hdev->flags)) {
+> +			u8 val = test_bit(HCI_LINK_SECURITY, &hdev->dev_flags);
+> +			hci_send_cmd(hdev, HCI_OP_WRITE_AUTH_ENABLE,
+> +				     sizeof(val), &val);
+> +		}
 
-Oops, sorry for that. Fixed now, please pull:
-git pull git://github.com/lkundrak/linux-firmware.git sd8688-move
+why not actually just test for the value and store its result, then
+compare and then use the value. Testing HCI_LINK_SECURITY twice seems a
+bit too much.
 
-Thank you!
+Regards
+
+Marcel
+
+
