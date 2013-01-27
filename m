@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3 v3] AVRCP: Fix not handling commands while browsing is connecting
-Date: Sun, 27 Jan 2013 17:52:14 -0600
-Message-Id: <1359330736-9190-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ] AVRCP: Fix not handling commands while browsing is connecting
+Date: Sun, 27 Jan 2013 16:37:31 -0600
+Message-Id: <1359326251-6470-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -19,7 +19,6 @@ register as soon the respective channel connection completes.
 ---
 v2: Separate control and browsing inits and use handler id to track if channel
 has been initialized or not.
-v3: Adds patches 2 and 3
 
  profiles/audio/avrcp.c | 73 +++++++++++++++++++++++++++++---------------------
  1 file changed, 42 insertions(+), 31 deletions(-)
