@@ -1,105 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ 1/4] device: Fix invalid memory access during Find Included
-Date: Mon, 28 Jan 2013 20:48:08 -0300
-Message-Id: <1359416891-12740-1-git-send-email-vinicius.gomes@openbossa.org>
+Date: Mon, 28 Jan 2013 16:39:08 -0600
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/2 v2] thermometer: Fix crash while unregistering
+ adapter
+Message-ID: <20130128223908.GA6043@x220>
+References: <1359409441-21066-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1359409441-21066-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When doing the Find Included Services GATT procedure, the status of the ATT
-procedure was being ignored, and in the case of a timeout it is possible to
-crash bluetooth with an invalid memory access.
+Hi Luiz,
 
-Valgrind log:
+On Mon, Jan 28, 2013, Luiz Augusto von Dentz wrote:
+> Invalid read of size 8
+>    at 0x448200: g_attrib_unregister (gattrib.c:722)
+>    by 0x440476: destroy_thermometer (thermometer.c:167)
+>    by 0x40D849: remove_interface (object.c:656)
+>    by 0x40DAA9: g_dbus_unregister_interface (object.c:1413)
+>    by 0x3DF7A63C9C: g_slist_foreach (gslist.c:894)
+>    by 0x469656: device_remove (device.c:2200)
+>    by 0x45CDC1: adapter_remove (adapter.c:3884)
+>    by 0x45F146: index_removed (adapter.c:5442)
+>    by 0x46BC17: received_data (mgmt.c:252)
+>    by 0x3DF7A47A74: g_main_context_dispatch (gmain.c:2715)
+>    by 0x3DF7A47DA7: g_main_context_iterate.isra.24 (gmain.c:3290)
+>    by 0x3DF7A481A1: g_main_loop_run (gmain.c:3484)
+>  Address 0x40 is not stack'd, malloc'd or (recently) free'd
+> ---
+> v2: Print a warning if invalid id is passed to g_attrib_unregister
+> 
+>  profiles/thermometer/thermometer.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 
-==1755== Invalid read of size 8
-==1755==    at 0x46971A: find_included_cb (device.c:2964)
-==1755==    by 0x4465AE: isd_unref (gatt.c:92)
-==1755==    by 0x446885: find_included_cb (gatt.c:425)
-==1755==    by 0x448266: disconnect_timeout (gattrib.c:269)
-==1755==    by 0x4E76BCA: g_timeout_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
-==1755==    by 0x4E76044: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
-==1755==    by 0x4E76377: g_main_context_iterate.isra.24 (in /usr/lib64/libglib-2.0.so.0.3400.2)
-==1755==    by 0x4E76771: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3400.2)
-==1755==    by 0x40A2EE: main (main.c:583)
-==1755==  Address 0x69530a8 is 8 bytes inside a block of size 64 free'd
-==1755==    at 0x4C2874F: free (vg_replace_malloc.c:446)
-==1755==    by 0x40BFA6: service_filter (watch.c:486)
-==1755==    by 0x40BC6A: message_filter (watch.c:554)
-==1755==    by 0x5160A1D: dbus_connection_dispatch (in /usr/lib64/libdbus-1.so.3.7.2)
-==1755==    by 0x40AAB7: message_dispatch (mainloop.c:76)
-==1755==    by 0x4E76BCA: g_timeout_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
-==1755==    by 0x4E76044: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
-==1755==    by 0x4E76377: g_main_context_iterate.isra.24 (in /usr/lib64/libglib-2.0.so.0.3400.2)
-==1755==    by 0x4E76771: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3400.2)
-==1755==    by 0x40A2EE: main (main.c:583)
-==1755==
-==1755== Invalid read of size 8
-==1755==    at 0x4486D5: g_attrib_get_buffer (gattrib.c:657)
-==1755==    by 0x4467C5: find_included (gatt.c:363)
-==1755==    by 0x4465AE: isd_unref (gatt.c:92)
-==1755==    by 0x446885: find_included_cb (gatt.c:425)
-==1755==    by 0x448266: disconnect_timeout (gattrib.c:269)
-==1755==    by 0x4E76BCA: g_timeout_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
-==1755==    by 0x4E76044: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
-==1755==    by 0x4E76377: g_main_context_iterate.isra.24 (in /usr/lib64/libglib-2.0.so.0.3400.2)
-==1755==    by 0x4E76771: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3400.2)
-==1755==    by 0x40A2EE: main (main.c:583)
-==1755==  Address 0x18 is not stack'd, malloc'd or (recently) free'd
-==1755==
-==1755==
-==1755== Process terminating with default action of signal 11 (SIGSEGV)
-==1755==  Access not within mapped region at address 0x18
-==1755==    at 0x4486D5: g_attrib_get_buffer (gattrib.c:657)
-==1755==    by 0x4467C5: find_included (gatt.c:363)
-==1755==    by 0x4465AE: isd_unref (gatt.c:92)
-==1755==    by 0x446885: find_included_cb (gatt.c:425)
-==1755==    by 0x448266: disconnect_timeout (gattrib.c:269)
-==1755==    by 0x4E76BCA: g_timeout_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
-==1755==    by 0x4E76044: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
-==1755==    by 0x4E76377: g_main_context_iterate.isra.24 (in /usr/lib64/libglib-2.0.so.0.3400.2)
-==1755==    by 0x4E76771: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3400.2)
-==1755==    by 0x40A2EE: main (main.c:583)
----
- attrib/gatt.c | 5 ++++-
- src/device.c  | 6 ++++++
- 2 files changed, 10 insertions(+), 1 deletion(-)
+Both patches have been applied. Thanks.
 
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index d54feac..44d3eb6 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -89,7 +89,10 @@ static void isd_unref(struct included_discovery *isd)
- 	if (g_atomic_int_dec_and_test(&isd->refs) == FALSE)
- 		return;
- 
--	isd->cb(isd->includes, isd->err, isd->user_data);
-+	if (isd->err)
-+		isd->cb(NULL, isd->err, isd->user_data);
-+	else
-+		isd->cb(isd->includes, isd->err, isd->user_data);
- 
- 	g_slist_free_full(isd->includes, g_free);
- 	g_attrib_unref(isd->attrib);
-diff --git a/src/device.c b/src/device.c
-index 34902b3..ceaa575 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2988,6 +2988,12 @@ static void find_included_cb(GSList *includes, uint8_t status,
- 	struct gatt_primary *prim;
- 	GSList *l;
- 
-+	if (status != 0) {
-+		error("Find included services failed: %s (%d)",
-+					att_ecode2str(status), status);
-+		goto done;
-+	}
-+
- 	if (includes == NULL)
- 		goto done;
- 
--- 
-1.8.1.1
-
+Johan
