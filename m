@@ -1,32 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 27 Jan 2013 18:03:47 -0600
+Date: Sun, 27 Jan 2013 18:00:28 -0600
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] media: Fix custom property registration for
- multiple adapters
-Message-ID: <20130128000347.GA15519@x220>
-References: <1358775253-29202-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH BlueZ 1/3 v3] AVRCP: Fix not handling commands while
+ browsing is connecting
+Message-ID: <20130128000028.GA14431@x220>
+References: <1359330736-9190-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1358775253-29202-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1359330736-9190-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-On Mon, Jan 21, 2013, Luiz Augusto von Dentz wrote:
-> The function btd_profile_add_custom_prop register a custom property for
-> an UUID which is valid for every adapter so its user_data cannot be tied
-> to a single adapter.
+On Sun, Jan 27, 2013, Luiz Augusto von Dentz wrote:
+> With introdution of browsing channel the .init callback is called when
+> browsing channel connection completes, but in the meantime the remote
+> device can send commands over control channel.
 > 
-> To fix this now NULL is passed as user_data and the callbacks checks if
-> the adapter passed has been registered and if there is an endpoint for
-> the UUID requested.
+> To fix this the init callaback of control and browsing channel are now
+> separated into .init_control and .init_browsing so the handler can be
+> register as soon the respective channel connection completes.
 > ---
->  profiles/audio/media.c | 27 +++++++++++++++++++++++----
->  1 file changed, 23 insertions(+), 4 deletions(-)
+> v2: Separate control and browsing inits and use handler id to track if channel
+> has been initialized or not.
+> v3: Adds patches 2 and 3
+> 
+>  profiles/audio/avrcp.c | 73 +++++++++++++++++++++++++++++---------------------
+>  1 file changed, 42 insertions(+), 31 deletions(-)
 
-Applied. Thanks.
+All three patches have been applied. Thanks.
 
 Johan
