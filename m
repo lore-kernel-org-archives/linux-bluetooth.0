@@ -1,30 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Damjan Cvetko <damjan.cvetko@monotek.net>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Damjan Cvetko <damjan.cvetko@monotek.net>
-Subject: [PATCH] Add heartrate monitoring LE device to auto connect list.
-Date: Mon, 28 Jan 2013 22:27:21 +0100
-Message-Id: <1359408442-8002-1-git-send-email-damjan.cvetko@monotek.net>
+Subject: [PATCH BlueZ 2/2] attrib: Don't attempt to unregister event id 0
+Date: Mon, 28 Jan 2013 15:30:30 -0600
+Message-Id: <1359408630-20210-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1359408630-20210-1-git-send-email-luiz.dentz@gmail.com>
+References: <1359408630-20210-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- profiles/heartrate/heartrate.c |    2 ++
- 1 file changed, 2 insertions(+)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index 5c56d3f..1788d4f 100644
---- a/profiles/heartrate/heartrate.c
-+++ b/profiles/heartrate/heartrate.c
-@@ -801,6 +801,8 @@ static int heartrate_device_register(struct btd_device *device,
- 	hr->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
- 						attio_disconnected_cb, hr);
+Id 0 is considered invalid so the code should not even try to lookup for
+it in the event list.
+---
+ attrib/gattrib.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index 58f19d0..ca73491 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -719,6 +719,9 @@ gboolean g_attrib_unregister(GAttrib *attrib, guint id)
+ 	struct event *evt;
+ 	GSList *l;
  
-+	device_set_auto_connect(device, TRUE);
++	if (id == 0)
++		return FALSE;
 +
- 	return 0;
- }
- 
+ 	l = g_slist_find_custom(attrib->events, GUINT_TO_POINTER(id),
+ 							event_cmp_by_id);
+ 	if (l == NULL)
 -- 
-1.7.10.4
+1.8.1
 
