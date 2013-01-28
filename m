@@ -1,34 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 28 Jan 2013 16:28:42 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 9/9 v4] Bluetooth: Add support for 128-bit UUIDs in EIR
- data
-Message-ID: <20130128182842.GA31598@joana>
-References: <1359239495-3444-1-git-send-email-johan.hedberg@gmail.com>
- <1359239495-3444-10-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1359239495-3444-10-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1359170902.16748.6.camel@aeonflux>
+References: <1359148426-22271-1-git-send-email-andre.guedes@openbossa.org>
+	<1359170902.16748.6.camel@aeonflux>
+Date: Mon, 28 Jan 2013 15:17:42 -0300
+Message-ID: <CACJA=fW1fNrGycuK77hix6mELTdA9bvOkgduSqvz1Bm-UVifNQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: Fix L2CAP socket shutdown for LE connections
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Marcel,
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2013-01-27 00:31:35 +0200]:
+On Sat, Jan 26, 2013 at 12:28 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Andre,
+>
+>> During the L2CAP socket shutdown, the LE connection is not terminated
+>> as expected. This bug can be reproduced using l2test tool. Once the
+>> LE connection is established, kill l2test and the LE connection will
+>> not terminate.
+>>
+>> This patch fixes hci_conn_disconnect function so it is able to
+>> terminate LE connections.
+>>
+>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>> ---
+>>  net/bluetooth/hci_conn.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+>> index 25bfce0..0492949 100644
+>> --- a/net/bluetooth/hci_conn.c
+>> +++ b/net/bluetooth/hci_conn.c
+>> @@ -250,6 +250,7 @@ static void hci_conn_disconnect(struct hci_conn *conn)
+>>
+>>       switch (conn->type) {
+>>       case ACL_LINK:
+>> +     case LE_LINK:
+>>               hci_acl_disconn(conn, reason);
+>>               break;
+>>       case AMP_LINK:
+>
+> I am wondering if we are not missing SCO_LINK here either.
 
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> This patch adds the necessary code for encoding a list of 128-bit UUIDs
-> into the EIR data.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/mgmt.c |   34 ++++++++++++++++++++++++++++++++++
->  1 file changed, 34 insertions(+)
+Yes, we have the same problem with SCO socket shutdown.
 
-All 9 patches have been applied. Thanks.
+I'll fix it and add the patch to this patchset.
 
-	Gustavo
+Regards,
+
+Andre
