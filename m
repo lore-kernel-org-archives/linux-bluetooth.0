@@ -1,41 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ] media: Fix not finding endpoints with different case UUIDs
-Date: Mon, 28 Jan 2013 16:27:36 -0300
-Message-Id: <1359401256-14512-1-git-send-email-vinicius.gomes@openbossa.org>
+Date: Mon, 28 Jan 2013 16:33:35 -0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2 v2] Bluetooth: Increment Management interface revision
+Message-ID: <20130128183335.GB31598@joana>
+References: <1359297121-9022-1-git-send-email-johan.hedberg@gmail.com>
+ <1359297121-9022-2-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1359297121-9022-2-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When multiple Endpoints are registered with different case UUIDs,
-the only UUIDs found were those with matching case.
----
- profiles/audio/media.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi Johan,
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 0ae9932..59fc840 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -170,7 +170,7 @@ static struct media_endpoint *media_adapter_find_endpoint(
- 		if (path && g_strcmp0(endpoint->path, path) != 0)
- 			continue;
- 
--		if (uuid && g_strcmp0(endpoint->uuid, uuid) != 0)
-+		if (uuid && strcasecmp(endpoint->uuid, uuid) != 0)
- 			continue;
- 
- 		return endpoint;
-@@ -692,7 +692,7 @@ static bool endpoint_properties_get(const char *uuid,
- 	for (l = adapter->endpoints; l; l = l->next) {
- 		struct media_endpoint *endpoint = l->data;
- 
--		if (g_strcmp0(endpoint->uuid, uuid) != 0)
-+		if (strcasecmp(endpoint->uuid, uuid) != 0)
- 			continue;
- 
- 		append_endpoint(endpoint, &dict);
--- 
-1.8.1.1
+* Johan Hedberg <johan.hedberg@gmail.com> [2013-01-27 08:32:01 -0600]:
 
+> From: Johan Hedberg <johan.hedberg@intel.com>
+> 
+> This patch increments the management interface revision due to the
+> various fixes, improvements and other changes that have gone in lately.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/mgmt.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Both patches have been applied to bluetooth-next. Thanks.
+
+	Gustavo
