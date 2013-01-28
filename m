@@ -1,54 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
+From: Damjan Cvetko <Damjan.Cvetko@monotek.net>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: LE auto connect
+Date: Mon, 28 Jan 2013 12:09:21 +0000
+Message-ID: <CEE0DF8E7B2727428D202DA3F3FBC4DD8C753ABB@PULWAR.mtk.lan>
+Content-Type: text/plain; charset="iso-8859-2"
 MIME-Version: 1.0
-In-Reply-To: <1359170902.16748.6.camel@aeonflux>
-References: <1359148426-22271-1-git-send-email-andre.guedes@openbossa.org>
-	<1359170902.16748.6.camel@aeonflux>
-Date: Mon, 28 Jan 2013 15:17:42 -0300
-Message-ID: <CACJA=fW1fNrGycuK77hix6mELTdA9bvOkgduSqvz1Bm-UVifNQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Bluetooth: Fix L2CAP socket shutdown for LE connections
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+I checked out latest code, and found that LE auto connection does not work at all. Dug a bit in the code to see there is no relevant implementation (related to connect_list).
+Here a few lines that make it work.
 
-On Sat, Jan 26, 2013 at 12:28 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Andre,
->
->> During the L2CAP socket shutdown, the LE connection is not terminated
->> as expected. This bug can be reproduced using l2test tool. Once the
->> LE connection is established, kill l2test and the LE connection will
->> not terminate.
->>
->> This patch fixes hci_conn_disconnect function so it is able to
->> terminate LE connections.
->>
->> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->> ---
->>  net/bluetooth/hci_conn.c | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
->> index 25bfce0..0492949 100644
->> --- a/net/bluetooth/hci_conn.c
->> +++ b/net/bluetooth/hci_conn.c
->> @@ -250,6 +250,7 @@ static void hci_conn_disconnect(struct hci_conn *conn)
->>
->>       switch (conn->type) {
->>       case ACL_LINK:
->> +     case LE_LINK:
->>               hci_acl_disconn(conn, reason);
->>               break;
->>       case AMP_LINK:
->
-> I am wondering if we are not missing SCO_LINK here either.
+Best
+Damjan
 
-Yes, we have the same problem with SCO socket shutdown.
+diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
+index 5c56d3f..1788d4f 100644
+--- a/profiles/heartrate/heartrate.c
++++ b/profiles/heartrate/heartrate.c
+@@ -801,6 +801,8 @@ static int heartrate_device_register(struct btd_device *device,
+        hr->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
+                                                attio_disconnected_cb, hr);
 
-I'll fix it and add the patch to this patchset.
++       device_set_auto_connect(device, TRUE);
++
+        return 0;
+}
 
-Regards,
+diff --git a/src/adapter.c b/src/adapter.c
+index 43a9a3a..20667c8 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -4071,6 +4071,12 @@ static void update_found_devices(struct btd_adapter *adapter,
 
-Andre
+done:
+        if (device_is_le(dev) && g_slist_find(adapter->connect_list, dev)) {
++               if (!device_is_connected(dev)) {
++                       err = device_connect_le(dev);
++                       if (err < 0) {
++                               DBG("LE auto connection failed %s (%d)", strerror(-err), -err);
++                       }
++               }
+        }
+}
+
