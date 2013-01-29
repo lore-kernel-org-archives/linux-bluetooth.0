@@ -1,57 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1359478332.2729.3.camel@dellpc>
-Subject: [PATCH] hidp: Make hidp_get_raw_report abort if the session is
- terminating
-From: Karl Relton <karllinuxtest.relton@ntlworld.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Date: Tue, 29 Jan 2013 16:52:12 +0000
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: [PATCH v2] Bluetooth: Fix handling of unexpected SMP PDUs
+Date: Tue, 29 Jan 2013 10:44:23 -0600
+Message-Id: <1359477863-24645-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Karl Relton <karllinuxtest.relton@ntlworld.com>
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-After linux 3.2 the hid_destroy_device call in hidp_session cleaning up
-invokes a hook to the power_supply code which in turn tries to read the
-battery capacity. This read will trigger a call to hidp_get_raw_report
-which is bound to fail because the device is being taken away - so rather
-than wait for the 5 second timeout failure this change enables it to fail
-straight away.
+The conn->smp_chan pointer can be NULL if SMP PDUs arrive at unexpected
+moments. To avoid NULL pointer dereferences the code should be checking
+for this and disconnect if an unexpected SMP PDU arrives. This patch
+fixes the issue by adding a check for conn->smp_chan for all other PDUs
+except pairing request and security request (which are are the first
+PDUs to come to initialize the SMP context).
 
-Signed-off-by: Karl Relton <karllinuxtest.relton@ntlworld.com>
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+CC: stable@vger.kernel.org
 ---
- net/bluetooth/hidp/core.c |    7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+v2: Move the checks to a single place in smp_sig_channel() and instead
+of ignoring the PDUs return failure from smp_sig_channel() to trigger a
+disconnection.
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index b2bcbe2..a4c1bb0 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -311,6 +311,9 @@ static int hidp_get_raw_report(struct hid_device *hid,
- 	int numbered_reports = hid->report_enum[report_type].numbered;
- 	int ret;
+ net/bluetooth/smp.c |   13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 68a9587..5abefb1 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -859,6 +859,19 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
  
-+	if (atomic_read(&session->terminate))
-+		return -EIO;
+ 	skb_pull(skb, sizeof(code));
+ 
++	/*
++	 * The SMP context must be initialized for all other PDUs except
++	 * pairing and security requests. If we get any other PDU when
++	 * not initialized simply disconnect (done if this function
++	 * returns an error).
++	 */
++	if (code != SMP_CMD_PAIRING_REQ && code != SMP_CMD_SECURITY_REQ &&
++	    !conn->smp_chan) {
++		BT_ERR("Unexpected SMP command 0x%02x. Disconnecting.", code);
++		kfree_skb(skb);
++		return -ENOTSUPP;
++	}
 +
- 	switch (report_type) {
- 	case HID_FEATURE_REPORT:
- 		report_type = HIDP_TRANS_GET_REPORT | HIDP_DATA_RTYPE_FEATURE;
-@@ -695,8 +698,10 @@ static int hidp_session(void *arg)
- 	set_current_state(TASK_INTERRUPTIBLE);
- 	while (!atomic_read(&session->terminate)) {
- 		if (ctrl_sk->sk_state != BT_CONNECTED ||
--				intr_sk->sk_state != BT_CONNECTED)
-+				intr_sk->sk_state != BT_CONNECTED) {
-+			atomic_inc(&session->terminate);
- 			break;
-+		}
- 
- 		while ((skb = skb_dequeue(&intr_sk->sk_receive_queue))) {
- 			skb_orphan(skb);
+ 	switch (code) {
+ 	case SMP_CMD_PAIRING_REQ:
+ 		reason = smp_cmd_pairing_req(conn, skb);
 -- 
-1.7.9.5
-
-
+1.7.10.4
 
