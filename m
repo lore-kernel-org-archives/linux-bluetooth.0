@@ -1,42 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1359482320.9998.0.camel@aeonflux>
-Subject: Re: [PATCH v2] Bluetooth: Fix handling of unexpected SMP PDUs
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Tue, 29 Jan 2013 11:19:42 -0600
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 29 Jan 2013 18:58:40 +0100
-In-Reply-To: <1359477863-24645-1-git-send-email-johan.hedberg@gmail.com>
-References: <1359477863-24645-1-git-send-email-johan.hedberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix handling of unexpected SMP PDUs
+Message-ID: <20130129171942.GA26108@x220>
+References: <1359417846-5064-1-git-send-email-johan.hedberg@gmail.com>
+ <1359442248.16748.40.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1359442248.16748.40.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Marcel,
 
-> The conn->smp_chan pointer can be NULL if SMP PDUs arrive at unexpected
-> moments. To avoid NULL pointer dereferences the code should be checking
-> for this and disconnect if an unexpected SMP PDU arrives. This patch
-> fixes the issue by adding a check for conn->smp_chan for all other PDUs
-> except pairing request and security request (which are are the first
-> PDUs to come to initialize the SMP context).
+On Tue, Jan 29, 2013, Marcel Holtmann wrote:
+> > The hdev->smp_chan pointer can be NULL if SMP PDUs arrive at unexpected
+> > moments. To avoid NULL pointer dereferences the code should be checking
+> > for this and simply ignore such PDUs. This patch fixes the issue by
+> > adding the checks into each individual PDU handler. It's done there
+> > instead of a global place since for some PDUs it *is* ok for smp_chan to
+> > be NULL (e.g. pairing request and security request).
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> CC: stable@vger.kernel.org
-> ---
-> v2: Move the checks to a single place in smp_sig_channel() and instead
-> of ignoring the PDUs return failure from smp_sig_channel() to trigger a
-> disconnection.
-> 
->  net/bluetooth/smp.c |   13 +++++++++++++
->  1 file changed, 13 insertions(+)
+> I am not sure we want to ignore such PDUs. Don't we have to respond with
+> an error and actually disconnect at this point. Otherwise this might
+> open up a denial of service attack.
 
-this looks way better.
+I couldn't figure out any appropriate response since SMP doesn't really
+have clear command-response pairs for everything. I've sent another
+patch which still doesn't send a response but instead of just ignoring
+the unexpected packet a disconnection is triggered.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
-Regards
-
-Marcel
-
-
+Johan
