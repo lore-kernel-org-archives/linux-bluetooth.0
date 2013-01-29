@@ -1,34 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 Jan 2013 11:19:42 -0600
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix handling of unexpected SMP PDUs
-Message-ID: <20130129171942.GA26108@x220>
-References: <1359417846-5064-1-git-send-email-johan.hedberg@gmail.com>
- <1359442248.16748.40.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1359442248.16748.40.camel@aeonflux>
+Message-ID: <1359478332.2729.3.camel@dellpc>
+Subject: [PATCH] hidp: Make hidp_get_raw_report abort if the session is
+ terminating
+From: Karl Relton <karllinuxtest.relton@ntlworld.com>
+To: linux-bluetooth@vger.kernel.org
+Date: Tue, 29 Jan 2013 16:52:12 +0000
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Karl Relton <karllinuxtest.relton@ntlworld.com>
 
-On Tue, Jan 29, 2013, Marcel Holtmann wrote:
-> > The hdev->smp_chan pointer can be NULL if SMP PDUs arrive at unexpected
-> > moments. To avoid NULL pointer dereferences the code should be checking
-> > for this and simply ignore such PDUs. This patch fixes the issue by
-> > adding the checks into each individual PDU handler. It's done there
-> > instead of a global place since for some PDUs it *is* ok for smp_chan to
-> > be NULL (e.g. pairing request and security request).
-> 
-> I am not sure we want to ignore such PDUs. Don't we have to respond with
-> an error and actually disconnect at this point. Otherwise this might
-> open up a denial of service attack.
+After linux 3.2 the hid_destroy_device call in hidp_session cleaning up
+invokes a hook to the power_supply code which in turn tries to read the
+battery capacity. This read will trigger a call to hidp_get_raw_report
+which is bound to fail because the device is being taken away - so rather
+than wait for the 5 second timeout failure this change enables it to fail
+straight away.
 
-I couldn't figure out any appropriate response since SMP doesn't really
-have clear command-response pairs for everything. I've sent another
-patch which still doesn't send a response but instead of just ignoring
-the unexpected packet a disconnection is triggered.
+Signed-off-by: Karl Relton <karllinuxtest.relton@ntlworld.com>
+---
+ net/bluetooth/hidp/core.c |    7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Johan
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index b2bcbe2..a4c1bb0 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -311,6 +311,9 @@ static int hidp_get_raw_report(struct hid_device *hid,
+ 	int numbered_reports = hid->report_enum[report_type].numbered;
+ 	int ret;
+ 
++	if (atomic_read(&session->terminate))
++		return -EIO;
++
+ 	switch (report_type) {
+ 	case HID_FEATURE_REPORT:
+ 		report_type = HIDP_TRANS_GET_REPORT | HIDP_DATA_RTYPE_FEATURE;
+@@ -695,8 +698,10 @@ static int hidp_session(void *arg)
+ 	set_current_state(TASK_INTERRUPTIBLE);
+ 	while (!atomic_read(&session->terminate)) {
+ 		if (ctrl_sk->sk_state != BT_CONNECTED ||
+-				intr_sk->sk_state != BT_CONNECTED)
++				intr_sk->sk_state != BT_CONNECTED) {
++			atomic_inc(&session->terminate);
+ 			break;
++		}
+ 
+ 		while ((skb = skb_dequeue(&intr_sk->sk_receive_queue))) {
+ 			skb_orphan(skb);
+-- 
+1.7.9.5
+
+
+
