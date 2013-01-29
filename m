@@ -1,55 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Fix handling of unexpected SMP PDUs
-Date: Tue, 29 Jan 2013 10:44:23 -0600
-Message-Id: <1359477863-24645-1-git-send-email-johan.hedberg@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 2/2] neard: Fix memory leak on registering as agent
+Date: Tue, 29 Jan 2013 09:54:31 +0100
+Message-ID: <1359449671-14584-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1359449671-14584-1-git-send-email-szymon.janc@tieto.com>
+References: <1359449671-14584-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Message reference was not dropped in register_agent. This fix following
+memory leak reported by valgrind:
 
-The conn->smp_chan pointer can be NULL if SMP PDUs arrive at unexpected
-moments. To avoid NULL pointer dereferences the code should be checking
-for this and disconnect if an unexpected SMP PDU arrives. This patch
-fixes the issue by adding a check for conn->smp_chan for all other PDUs
-except pairing request and security request (which are are the first
-PDUs to come to initialize the SMP context).
+454 (184 direct, 270 indirect) bytes in 1 blocks are definitely lost in loss record 207 of 220
+   at 0x4C29DB4: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+   by 0x513DCF2: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x514222E: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x5149F46: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x514A070: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x514AA63: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x514B0A5: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x5149E0C: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x5134D24: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x5136088: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x5135643: dbus_connection_send_with_reply_and_block (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x5130C93: dbus_bus_register (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-CC: stable@vger.kernel.org
+102 bytes in 1 blocks are indirectly lost in loss record 154 of 220
+   at 0x4C2B7B2: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+   by 0x514F02F: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x514F0DD: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x514F239: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x514DE0A: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x514E3D3: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x513C138: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x513FF4D: dbus_message_iter_append_basic (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x5141790: dbus_message_new_error (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x5135C70: dbus_connection_dispatch (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x40A747: message_dispatch (mainloop.c:76)
+   by 0x4E7A91A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.3)
+
+168 bytes in 1 blocks are indirectly lost in loss record 185 of 220
+   at 0x4C2B7B2: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+   by 0x514F02F: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x514F0DD: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x514F239: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x513A3B3: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x514228F: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x5149F46: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x514A070: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x514AA63: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x514B0A5: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x5149E0C: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
+   by 0x5134D24: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.5.8)
 ---
-v2: Move the checks to a single place in smp_sig_channel() and instead
-of ignoring the PDUs return failure from smp_sig_channel() to trigger a
-disconnection.
+ plugins/neard.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
- net/bluetooth/smp.c |   13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 68a9587..5abefb1 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -859,6 +859,19 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
+diff --git a/plugins/neard.c b/plugins/neard.c
+index a68500a..b0150e9 100644
+--- a/plugins/neard.c
++++ b/plugins/neard.c
+@@ -121,12 +121,15 @@ static void register_agent(void)
  
- 	skb_pull(skb, sizeof(code));
+ 	if (!dbus_connection_send_with_reply(btd_get_dbus_connection(),
+ 							message, &call, -1)) {
++		dbus_message_unref(message);
+ 		error("D-Bus send failed");
+ 		return;
+ 	}
  
-+	/*
-+	 * The SMP context must be initialized for all other PDUs except
-+	 * pairing and security requests. If we get any other PDU when
-+	 * not initialized simply disconnect (done if this function
-+	 * returns an error).
-+	 */
-+	if (code != SMP_CMD_PAIRING_REQ && code != SMP_CMD_SECURITY_REQ &&
-+	    !conn->smp_chan) {
-+		BT_ERR("Unexpected SMP command 0x%02x. Disconnecting.", code);
-+		kfree_skb(skb);
-+		return -ENOTSUPP;
-+	}
+ 	dbus_pending_call_set_notify(call, register_agent_cb, NULL, NULL);
+ 	dbus_pending_call_unref(call);
 +
- 	switch (code) {
- 	case SMP_CMD_PAIRING_REQ:
- 		reason = smp_cmd_pairing_req(conn, skb);
++	dbus_message_unref(message);
+ }
+ 
+ static void unregister_agent(void)
 -- 
-1.7.10.4
+1.8.1.1
 
