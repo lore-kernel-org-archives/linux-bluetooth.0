@@ -1,25 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 Jan 2013 15:59:03 -0600
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] neard: Fix passing negative error code to strerror
-Message-ID: <20130129215903.GA11112@x220>
-References: <1359449671-14584-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1359449671-14584-1-git-send-email-szymon.janc@tieto.com>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ v2 4/4] device: Fix missing PDUs during encryption procedure
+Date: Tue, 29 Jan 2013 16:00:07 -0300
+Message-Id: <1359486007-3273-4-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1359486007-3273-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1359486007-3273-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+In case the remote device sends an ATT PDU while encryption is going
+on, we may lose it because the ATT socket (with security level medium),
+would only be attached when encryption finishes.
+---
+ src/device.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-On Tue, Jan 29, 2013, Szymon Janc wrote:
-> error_reply expects non-negative error code.
-> ---
->  plugins/neard.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+diff --git a/src/device.c b/src/device.c
+index ceaa575..0d2d3ee 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -3167,7 +3167,6 @@ int device_connect_le(struct btd_device *dev)
+ {
+ 	struct btd_adapter *adapter = dev->adapter;
+ 	struct att_callbacks *attcb;
+-	BtIOSecLevel sec_level;
+ 	GIOChannel *io;
+ 	GError *gerr = NULL;
+ 	char addr[18];
+@@ -3185,21 +3184,18 @@ int device_connect_le(struct btd_device *dev)
+ 	attcb->success = att_success_cb;
+ 	attcb->user_data = dev;
+ 
+-	if (dev->paired)
+-		sec_level = BT_IO_SEC_MEDIUM;
+-	else
+-		sec_level = BT_IO_SEC_LOW;
+-
+ 	/*
+ 	 * This connection will help us catch any PDUs that comes before
+-	 * pairing finishes
++	 * pairing finishes. Its security level is low, because we don't
++	 * want to miss any PDU that may come before the encryption
++	 * procedure finishes
+ 	 */
+ 	io = bt_io_connect(att_connect_cb, attcb, NULL, &gerr,
+ 			BT_IO_OPT_SOURCE_BDADDR, adapter_get_address(adapter),
+ 			BT_IO_OPT_DEST_BDADDR, &dev->bdaddr,
+ 			BT_IO_OPT_DEST_TYPE, dev->bdaddr_type,
+ 			BT_IO_OPT_CID, ATT_CID,
+-			BT_IO_OPT_SEC_LEVEL, sec_level,
++			BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+ 			BT_IO_OPT_INVALID);
+ 
+ 	if (io == NULL) {
+-- 
+1.8.1.1
 
-Both patches have been applied. Thanks.
-
-Johan
