@@ -2,331 +2,104 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ v2 2/4] gas: Move all the code to only one file
-Date: Tue, 29 Jan 2013 16:00:05 -0300
-Message-Id: <1359486007-3273-2-git-send-email-vinicius.gomes@openbossa.org>
-In-Reply-To: <1359486007-3273-1-git-send-email-vinicius.gomes@openbossa.org>
-References: <1359486007-3273-1-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ v2 1/4] device: Fix invalid memory access during Find Included
+Date: Tue, 29 Jan 2013 16:00:04 -0300
+Message-Id: <1359486007-3273-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Our Generic Attribute/Access Service plugin is small and simple enough
-to be kept in only one file.
----
- Makefile.plugins        |  4 +--
- profiles/gatt/gas.c     | 51 +++++++++++++++++++++++++++++--
- profiles/gatt/gas.h     | 25 ----------------
- profiles/gatt/main.c    | 47 -----------------------------
- profiles/gatt/manager.c | 79 -------------------------------------------------
- profiles/gatt/manager.h | 24 ---------------
- 6 files changed, 49 insertions(+), 181 deletions(-)
- delete mode 100644 profiles/gatt/gas.h
- delete mode 100644 profiles/gatt/main.c
- delete mode 100644 profiles/gatt/manager.c
- delete mode 100644 profiles/gatt/manager.h
+When doing the Find Included Services GATT procedure, the status of the ATT
+procedure was being ignored, and in the case of a timeout it is possible to
+crash bluetooth with an invalid memory access.
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index faab011..f497782 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -69,9 +69,7 @@ builtin_sources += profiles/health/mcap_lib.h profiles/health/mcap_internal.h \
- endif
+Valgrind log:
+
+==1755== Invalid read of size 8
+==1755==    at 0x46971A: find_included_cb (device.c:2964)
+==1755==    by 0x4465AE: isd_unref (gatt.c:92)
+==1755==    by 0x446885: find_included_cb (gatt.c:425)
+==1755==    by 0x448266: disconnect_timeout (gattrib.c:269)
+==1755==    by 0x4E76BCA: g_timeout_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
+==1755==    by 0x4E76044: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
+==1755==    by 0x4E76377: g_main_context_iterate.isra.24 (in /usr/lib64/libglib-2.0.so.0.3400.2)
+==1755==    by 0x4E76771: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3400.2)
+==1755==    by 0x40A2EE: main (main.c:583)
+==1755==  Address 0x69530a8 is 8 bytes inside a block of size 64 free'd
+==1755==    at 0x4C2874F: free (vg_replace_malloc.c:446)
+==1755==    by 0x40BFA6: service_filter (watch.c:486)
+==1755==    by 0x40BC6A: message_filter (watch.c:554)
+==1755==    by 0x5160A1D: dbus_connection_dispatch (in /usr/lib64/libdbus-1.so.3.7.2)
+==1755==    by 0x40AAB7: message_dispatch (mainloop.c:76)
+==1755==    by 0x4E76BCA: g_timeout_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
+==1755==    by 0x4E76044: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
+==1755==    by 0x4E76377: g_main_context_iterate.isra.24 (in /usr/lib64/libglib-2.0.so.0.3400.2)
+==1755==    by 0x4E76771: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3400.2)
+==1755==    by 0x40A2EE: main (main.c:583)
+==1755==
+==1755== Invalid read of size 8
+==1755==    at 0x4486D5: g_attrib_get_buffer (gattrib.c:657)
+==1755==    by 0x4467C5: find_included (gatt.c:363)
+==1755==    by 0x4465AE: isd_unref (gatt.c:92)
+==1755==    by 0x446885: find_included_cb (gatt.c:425)
+==1755==    by 0x448266: disconnect_timeout (gattrib.c:269)
+==1755==    by 0x4E76BCA: g_timeout_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
+==1755==    by 0x4E76044: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
+==1755==    by 0x4E76377: g_main_context_iterate.isra.24 (in /usr/lib64/libglib-2.0.so.0.3400.2)
+==1755==    by 0x4E76771: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3400.2)
+==1755==    by 0x40A2EE: main (main.c:583)
+==1755==  Address 0x18 is not stack'd, malloc'd or (recently) free'd
+==1755==
+==1755==
+==1755== Process terminating with default action of signal 11 (SIGSEGV)
+==1755==  Access not within mapped region at address 0x18
+==1755==    at 0x4486D5: g_attrib_get_buffer (gattrib.c:657)
+==1755==    by 0x4467C5: find_included (gatt.c:363)
+==1755==    by 0x4465AE: isd_unref (gatt.c:92)
+==1755==    by 0x446885: find_included_cb (gatt.c:425)
+==1755==    by 0x448266: disconnect_timeout (gattrib.c:269)
+==1755==    by 0x4E76BCA: g_timeout_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
+==1755==    by 0x4E76044: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
+==1755==    by 0x4E76377: g_main_context_iterate.isra.24 (in /usr/lib64/libglib-2.0.so.0.3400.2)
+==1755==    by 0x4E76771: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3400.2)
+==1755==    by 0x40A2EE: main (main.c:583)
+---
+ attrib/gatt.c | 5 ++++-
+ src/device.c  | 6 ++++++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index d54feac..44d3eb6 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -89,7 +89,10 @@ static void isd_unref(struct included_discovery *isd)
+ 	if (g_atomic_int_dec_and_test(&isd->refs) == FALSE)
+ 		return;
  
- builtin_modules += gatt
--builtin_sources += profiles/gatt/main.c profiles/gatt/manager.h \
--			profiles/gatt/manager.c profiles/gatt/gas.h \
--			profiles/gatt/gas.c
-+builtin_sources += profiles/gatt/gas.c
+-	isd->cb(isd->includes, isd->err, isd->user_data);
++	if (isd->err)
++		isd->cb(NULL, isd->err, isd->user_data);
++	else
++		isd->cb(isd->includes, isd->err, isd->user_data);
  
- builtin_modules += scanparam
- builtin_sources += profiles/scanparam/scan.c
-diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
-index 429850b..c0520af 100644
---- a/profiles/gatt/gas.c
-+++ b/profiles/gatt/gas.c
-@@ -35,15 +35,16 @@
- #include <btio/btio.h>
- 
- #include "lib/uuid.h"
-+#include "plugin.h"
- #include "adapter.h"
- #include "device.h"
-+#include "profile.h"
- #include "attrib/att.h"
- #include "attrib/gattrib.h"
- #include "attio.h"
- #include "attrib/gatt.h"
- #include "log.h"
- #include "textfile.h"
--#include "gas.h"
- 
- /* Generic Attribute/Access Service */
- struct gas {
-@@ -367,7 +368,7 @@ static void attio_disconnected_cb(gpointer user_data)
- 	gas->attrib = NULL;
- }
- 
--int gas_register(struct btd_device *device, struct att_range *gap,
-+static int gas_register(struct btd_device *device, struct att_range *gap,
- 						struct att_range *gatt)
- {
- 	struct gas *gas;
-@@ -392,7 +393,7 @@ int gas_register(struct btd_device *device, struct att_range *gap,
- 	return 0;
- }
- 
--void gas_unregister(struct btd_device *device)
-+static void gas_unregister(struct btd_device *device)
- {
- 	struct gas *gas;
+ 	g_slist_free_full(isd->includes, g_free);
+ 	g_attrib_unref(isd->attrib);
+diff --git a/src/device.c b/src/device.c
+index 34902b3..ceaa575 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2988,6 +2988,12 @@ static void find_included_cb(GSList *includes, uint8_t status,
+ 	struct gatt_primary *prim;
  	GSList *l;
-@@ -405,3 +406,47 @@ void gas_unregister(struct btd_device *device)
- 	devices = g_slist_remove(devices, gas);
- 	gas_free(gas);
- }
-+
-+static int gatt_driver_probe(struct btd_profile *p, struct btd_device *device,
-+								GSList *uuids)
-+{
-+	struct gatt_primary *gap, *gatt;
-+
-+	gap = btd_device_get_primary(device, GAP_UUID);
-+	gatt = btd_device_get_primary(device, GATT_UUID);
-+
-+	if (gap == NULL || gatt == NULL) {
-+		error("GAP and GATT are mandatory");
-+		return -EINVAL;
+ 
++	if (status != 0) {
++		error("Find included services failed: %s (%d)",
++					att_ecode2str(status), status);
++		goto done;
 +	}
 +
-+	return gas_register(device, &gap->range, &gatt->range);
-+}
-+
-+static void gatt_driver_remove(struct btd_profile *p,
-+						struct btd_device *device)
-+{
-+	gas_unregister(device);
-+}
-+
-+static struct btd_profile gatt_profile = {
-+	.name		= "gap-gatt-profile",
-+	.remote_uuids	= BTD_UUIDS(GAP_UUID, GATT_UUID),
-+	.device_probe	= gatt_driver_probe,
-+	.device_remove	= gatt_driver_remove
-+};
-+
-+static int gatt_init(void)
-+{
-+	btd_profile_register(&gatt_profile);
-+
-+	return 0;
-+}
-+
-+static void gatt_exit(void)
-+{
-+	btd_profile_unregister(&gatt_profile);
-+}
-+
-+BLUETOOTH_PLUGIN_DEFINE(gatt, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-+					gatt_init, gatt_exit)
-diff --git a/profiles/gatt/gas.h b/profiles/gatt/gas.h
-deleted file mode 100644
-index 34853c7..0000000
---- a/profiles/gatt/gas.h
-+++ /dev/null
-@@ -1,25 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--int gas_register(struct btd_device *device, struct att_range *gap,
--						struct att_range *gatt);
--void gas_unregister(struct btd_device *device);
-diff --git a/profiles/gatt/main.c b/profiles/gatt/main.c
-deleted file mode 100644
-index ecd4455..0000000
---- a/profiles/gatt/main.c
-+++ /dev/null
-@@ -1,47 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stdint.h>
--#include <glib.h>
--#include <errno.h>
--
--#include "plugin.h"
--#include "manager.h"
--#include "hcid.h"
--#include "log.h"
--
--static int gatt_init(void)
--{
--	return gatt_manager_init();
--}
--
--static void gatt_exit(void)
--{
--	gatt_manager_exit();
--}
--
--BLUETOOTH_PLUGIN_DEFINE(gatt, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
--					gatt_init, gatt_exit)
-diff --git a/profiles/gatt/manager.c b/profiles/gatt/manager.c
-deleted file mode 100644
-index 2f2bd14..0000000
---- a/profiles/gatt/manager.c
-+++ /dev/null
-@@ -1,79 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include "config.h"
--#endif
--
--#include <glib.h>
--#include <errno.h>
--#include <stdbool.h>
--
--#include "lib/uuid.h"
--#include "adapter.h"
--#include "device.h"
--#include "profile.h"
--#include "attrib/att.h"
--#include "attrib/gattrib.h"
--#include "attrib/gatt.h"
--#include "gas.h"
--#include "log.h"
--#include "manager.h"
--
--static int gatt_driver_probe(struct btd_profile *p, struct btd_device *device,
--								GSList *uuids)
--{
--	struct gatt_primary *gap, *gatt;
--
--	gap = btd_device_get_primary(device, GAP_UUID);
--	gatt = btd_device_get_primary(device, GATT_UUID);
--
--	if (gap == NULL || gatt == NULL) {
--		error("GAP and GATT are mandatory");
--		return -EINVAL;
--	}
--
--	return gas_register(device, &gap->range, &gatt->range);
--}
--
--static void gatt_driver_remove(struct btd_profile *p,
--						struct btd_device *device)
--{
--	gas_unregister(device);
--}
--
--static struct btd_profile gatt_profile = {
--	.name		= "gap-gatt-profile",
--	.remote_uuids	= BTD_UUIDS(GAP_UUID, GATT_UUID),
--	.device_probe	= gatt_driver_probe,
--	.device_remove	= gatt_driver_remove
--};
--
--int gatt_manager_init(void)
--{
--	return btd_profile_register(&gatt_profile);
--}
--
--void gatt_manager_exit(void)
--{
--	btd_profile_unregister(&gatt_profile);
--}
-diff --git a/profiles/gatt/manager.h b/profiles/gatt/manager.h
-deleted file mode 100644
-index 502fceb..0000000
---- a/profiles/gatt/manager.h
-+++ /dev/null
-@@ -1,24 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--int gatt_manager_init(void);
--void gatt_manager_exit(void);
+ 	if (includes == NULL)
+ 		goto done;
+ 
 -- 
 1.8.1.1
 
