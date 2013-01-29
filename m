@@ -1,39 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 Jan 2013 17:36:06 -0600
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Damjan Cvetko <damjan.cvetko@monotek.net>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add heartrate monitoring LE device to auto connect list.
-Message-ID: <20130129233606.GA16365@x220>
-References: <1359408442-8002-1-git-send-email-damjan.cvetko@monotek.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1359408442-8002-1-git-send-email-damjan.cvetko@monotek.net>
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/5] Bluetooth: Refactor hci_conn_disconnect
+Date: Tue, 29 Jan 2013 19:59:54 -0300
+Message-Id: <1359500396-8184-3-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1359500396-8184-1-git-send-email-andre.guedes@openbossa.org>
+References: <1359500396-8184-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Damjan,
+This patch does a trivial refactoring in hci_conn_disconnect function.
 
-On Mon, Jan 28, 2013, Damjan Cvetko wrote:
-> ---
->  profiles/heartrate/heartrate.c |    2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-> index 5c56d3f..1788d4f 100644
-> --- a/profiles/heartrate/heartrate.c
-> +++ b/profiles/heartrate/heartrate.c
-> @@ -801,6 +801,8 @@ static int heartrate_device_register(struct btd_device *device,
->  	hr->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
->  						attio_disconnected_cb, hr);
->  
-> +	device_set_auto_connect(device, TRUE);
-> +
->  	return 0;
->  }
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ net/bluetooth/hci_conn.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-This patch isn't needed anymore since btd_device_add_attio_callback was
-fixed to enable the auto connecting. Please verify that latest git works
-for you.
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 28cfa72..4925a02 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -249,15 +249,12 @@ static void hci_conn_disconnect(struct hci_conn *conn)
+ 	__u8 reason = hci_proto_disconn_ind(conn);
+ 
+ 	switch (conn->type) {
+-	case ACL_LINK:
+-	case LE_LINK:
+-	case SCO_LINK:
+-	case ESCO_LINK:
+-		hci_acl_disconn(conn, reason);
+-		break;
+ 	case AMP_LINK:
+ 		hci_amp_disconn(conn, reason);
+ 		break;
++	default:
++		hci_acl_disconn(conn, reason);
++		break;
+ 	}
+ }
+ 
+-- 
+1.8.1.1
 
-Johan
