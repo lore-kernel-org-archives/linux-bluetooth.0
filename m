@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v2 4/4] Bluetooth: Fallback transparent SCO from T2 to T1
-Date: Wed, 30 Jan 2013 17:03:20 +0100
-Message-Id: <1359561800-12870-5-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v2 1/4] Bluetooth: Add option for SCO socket mode
+Date: Wed, 30 Jan 2013 17:03:17 +0100
+Message-Id: <1359561800-12870-2-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1359561800-12870-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1359561800-12870-1-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
@@ -15,60 +15,139 @@ Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When initiating a transparent eSCO connection, make use of T2 settings at
-first try. T2 is the recommended settings from HFP 1.6 WideBand Speech. Upon
-connection failure, try T1 settings.
-To know which of T2 or T1 should be used, the connection attempt index is used.
-T2 failure is detected if Synchronous Connection Complete Event fails with
-error 0x0d. This error code has been found experimentally by sending a T2
-request to a T1 only SCO listener. It means "Connection Rejected due to
-Limited resource".
+This patch extends the current SCO socket option to add a 'mode' field. This
+field is intended to choose data type at runtime. Current modes are CVSD and
+transparent SCO, but adding new modes could allow support for CSA2 and fine
+tuning a sco connection, for example latency, bandwith, voice setting. Incoming
+connections will be setup during defered setup. Outgoing connections have to
+be setup before connect(). The selected type is stored in the sco socket info.
+This patch declares needed members, modifies getsockopt() and implements
+setsockopt(). Setting the mtu is not supported.
 
 Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
 ---
- net/bluetooth/hci_conn.c  |   11 ++++++++++-
- net/bluetooth/hci_event.c |    1 +
- 2 files changed, 11 insertions(+), 1 deletion(-)
+ include/net/bluetooth/sco.h |    7 +++++
+ net/bluetooth/sco.c         |   59 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 66 insertions(+)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 7f290ad..2172d42 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -179,12 +179,21 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle)
- 	cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
- 	cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
+diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
+index 1e35c43..c8c228f 100644
+--- a/include/net/bluetooth/sco.h
++++ b/include/net/bluetooth/sco.h
+@@ -41,8 +41,14 @@ struct sockaddr_sco {
  
--	if (test_and_clear_bit(HCI_CONN_SCO_TRANSPARENT, &conn->flags)) {
-+	if (conn->attempt == 1 &&
-+	    test_bit(HCI_CONN_SCO_TRANSPARENT, &conn->flags)) {
- 		cp.pkt_type       = __constant_cpu_to_le16(EDR_ESCO_MASK &
- 							   ~ESCO_2EV3);
- 		cp.max_latency    = __constant_cpu_to_le16(0x000d);
- 		cp.voice_setting  = __constant_cpu_to_le16(0x0003);
- 		cp.retrans_effort = 0x02;
-+	} else if (conn->attempt == 2 &&
-+		   test_bit(HCI_CONN_SCO_TRANSPARENT, &conn->flags)) {
-+		cp.pkt_type       = __constant_cpu_to_le16(EDR_ESCO_MASK |
-+							   ESCO_EV3);
-+		cp.max_latency    = __constant_cpu_to_le16(0x0007);
-+		cp.voice_setting  = __constant_cpu_to_le16(0x0003);
-+		cp.retrans_effort = 0x02;
-+		clear_bit(HCI_CONN_SCO_TRANSPARENT, &conn->flags);
- 	} else {
- 		cp.pkt_type       = cpu_to_le16(conn->pkt_type);
- 		cp.max_latency    = __constant_cpu_to_le16(0xffff);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 188bb83..86ce811 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3379,6 +3379,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
- 		hci_conn_add_sysfs(conn);
- 		break;
+ /* SCO socket options */
+ #define SCO_OPTIONS	0x01
++
++#define SCO_MODE_CVSD		0x00
++#define SCO_MODE_TRANSPARENT	0x01
++#define SCO_MODE_MAX            0x02
++
+ struct sco_options {
+ 	__u16 mtu;
++	__u8 mode;
+ };
  
-+	case 0x0d:	/* No resource available */
- 	case 0x11:	/* Unsupported Feature or Parameter Value */
- 	case 0x1c:	/* SCO interval rejected */
- 	case 0x1a:	/* Unsupported Remote Feature */
+ #define SCO_CONNINFO	0x02
+@@ -73,6 +79,7 @@ struct sco_conn {
+ struct sco_pinfo {
+ 	struct bt_sock	bt;
+ 	__u32		flags;
++	__u8		mode;
+ 	struct sco_conn	*conn;
+ };
+ 
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 531a93d..927119e6 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -418,6 +418,8 @@ static struct sock *sco_sock_alloc(struct net *net, struct socket *sock, int pro
+ 	sk->sk_protocol = proto;
+ 	sk->sk_state    = BT_OPEN;
+ 
++	sco_pi(sk)->mode = SCO_MODE_CVSD;
++
+ 	setup_timer(&sk->sk_timer, sco_sock_timeout, (unsigned long)sk);
+ 
+ 	bt_sock_link(&sco_sk_list, sk);
+@@ -676,6 +678,59 @@ static int sco_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
+ 	return bt_sock_recvmsg(iocb, sock, msg, len, flags);
+ }
+ 
++static int sco_sock_setsockopt_old(struct socket *sock, int optname,
++				   char __user *optval, unsigned int optlen)
++{
++	struct sock *sk = sock->sk;
++	struct sco_options opts;
++	int len, err = 0;
++
++	BT_DBG("sk %p", sk);
++
++	lock_sock(sk);
++
++	switch (optname) {
++	case SCO_OPTIONS:
++		if (sk->sk_state != BT_OPEN &&
++		    sk->sk_state != BT_BOUND &&
++		    sk->sk_state != BT_CONNECT2) {
++			err = -EINVAL;
++			break;
++		}
++
++		opts.mtu = 0;
++		opts.mode = SCO_MODE_CVSD;
++
++		len = min_t(unsigned int, sizeof(opts), optlen);
++		if (copy_from_user((char *) &opts, optval, len)) {
++			err = -EFAULT;
++			break;
++		}
++
++		if (opts.mtu != 0) {
++			err = -EINVAL;
++			break;
++		}
++
++		BT_DBG("mode %d", opts.mode);
++
++		if (opts.mode >= SCO_MODE_MAX) {
++			err = -EINVAL;
++			break;
++		}
++
++		sco_pi(sk)->mode = opts.mode;
++		break;
++
++	default:
++		err = -ENOPROTOOPT;
++		break;
++	}
++
++	release_sock(sk);
++	return err;
++}
++
+ static int sco_sock_setsockopt(struct socket *sock, int level, int optname, char __user *optval, unsigned int optlen)
+ {
+ 	struct sock *sk = sock->sk;
+@@ -684,6 +739,9 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname, char
+ 
+ 	BT_DBG("sk %p", sk);
+ 
++	if (level == SOL_SCO)
++		return sco_sock_setsockopt_old(sock, optname, optval, optlen);
++
+ 	lock_sock(sk);
+ 
+ 	switch (optname) {
+@@ -736,6 +794,7 @@ static int sco_sock_getsockopt_old(struct socket *sock, int optname, char __user
+ 		}
+ 
+ 		opts.mtu = sco_pi(sk)->conn->mtu;
++		opts.mode = sco_pi(sk)->mode;
+ 
+ 		BT_DBG("mtu %d", opts.mtu);
+ 
 -- 
 1.7.9.5
 
