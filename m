@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH 2/4] scotest: Add option for SCO socket mode
-Date: Wed, 30 Jan 2013 18:03:02 +0100
-Message-Id: <1359565384-4656-3-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH 3/4] btio: Add option for SCO socket mode
+Date: Wed, 30 Jan 2013 18:03:03 +0100
+Message-Id: <1359565384-4656-4-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1359565384-4656-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1359565384-4656-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -14,110 +14,79 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- tools/scotest.c |   36 ++++++++++++++++++++++++++++++++++--
- 1 file changed, 34 insertions(+), 2 deletions(-)
+ btio/btio.c |   11 ++++++++---
+ btio/btio.h |    1 +
+ 2 files changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/tools/scotest.c b/tools/scotest.c
-index a40e395..ea71c41 100644
---- a/tools/scotest.c
-+++ b/tools/scotest.c
-@@ -58,6 +58,7 @@ static long data_size = 672;
- static bdaddr_t bdaddr;
+diff --git a/btio/btio.c b/btio/btio.c
+index bbf1208..f9afc36 100644
+--- a/btio/btio.c
++++ b/btio/btio.c
+@@ -77,6 +77,7 @@ struct set_opts {
+ 	uint8_t mode;
+ 	int flushable;
+ 	uint32_t priority;
++	uint8_t sco_mode;
+ };
  
- static int defer_setup = 0;
-+static int mode = 0;
- 
- static float tv2fl(struct timeval tv)
- {
-@@ -68,6 +69,7 @@ static int do_connect(char *svr)
- {
- 	struct sockaddr_sco addr;
- 	struct sco_conninfo conn;
-+	struct sco_options  opts;
- 	socklen_t optlen;
- 	int sk;
- 
-@@ -90,6 +92,15 @@ static int do_connect(char *svr)
- 		goto error;
- 	}
- 
-+	/* Add SCO options */
-+	memset(&opts, 0, sizeof(opts));
-+	opts.mode = mode;
-+	if (setsockopt(sk, SOL_SCO, SCO_OPTIONS, &opts, sizeof(opts)) < 0) {
-+		syslog(LOG_ERR, "Can't set socket options: %s (%d)",
-+							strerror(errno), errno);
-+		goto error;
-+	}
-+
- 	/* Connect to remote device */
- 	memset(&addr, 0, sizeof(addr));
- 	addr.sco_family = AF_BLUETOOTH;
-@@ -229,8 +240,16 @@ error:
- 
- static void dump_mode(int sk)
- {
-+	struct sco_options opts;
- 	int len;
- 
-+	/* Add SCO options */
-+	memset(&opts, 0, sizeof(opts));
-+	opts.mode = mode;
-+	if (setsockopt(sk, SOL_SCO, SCO_OPTIONS, &opts, sizeof(opts)) < 0)
-+		syslog(LOG_ERR, "Can't set socket options: %s (%d)",
-+							strerror(errno), errno);
-+
- 	if (defer_setup) {
- 		len = read(sk, buf, sizeof(buf));
- 		if (len < 0)
-@@ -248,9 +267,17 @@ static void dump_mode(int sk)
- static void recv_mode(int sk)
- {
- 	struct timeval tv_beg,tv_end,tv_diff;
-+	struct sco_options opts;
- 	long total;
- 	int len;
- 
-+	/* Add SCO options */
-+	memset(&opts, 0, sizeof(opts));
-+	opts.mode = mode;
-+	if (setsockopt(sk, SOL_SCO, SCO_OPTIONS, &opts, sizeof(opts)) < 0)
-+		syslog(LOG_ERR, "Can't set socket options: %s (%d)",
-+							strerror(errno), errno);
-+
- 	if (defer_setup) {
- 		len = read(sk, buf, sizeof(buf));
- 		if (len < 0)
-@@ -381,7 +408,8 @@ static void usage(void)
- 		"\t-n connect and be silent (client)\n"
- 		"Options:\n"
- 		"\t[-b bytes]\n"
--		"\t[-W seconds] enable deferred setup\n");
-+		"\t[-W seconds] enable deferred setup\n"
-+		"\t[-M mode] select mode (sco only: 0 cvsd, 1 transparent)\n");
+ struct connect {
+@@ -720,7 +721,7 @@ static int sco_connect(int sock, const bdaddr_t *dst)
+ 	return 0;
  }
  
- int main(int argc ,char *argv[])
-@@ -389,7 +417,7 @@ int main(int argc ,char *argv[])
- 	struct sigaction sa;
- 	int opt, sk, mode = RECV;
+-static gboolean sco_set(int sock, uint16_t mtu, GError **err)
++static gboolean sco_set(int sock, uint16_t mtu, uint8_t mode, GError **err)
+ {
+ 	struct sco_options sco_opt;
+ 	socklen_t len;
+@@ -736,6 +737,7 @@ static gboolean sco_set(int sock, uint16_t mtu, GError **err)
+ 	}
  
--	while ((opt = getopt(argc, argv, "rdscmnb:W:")) != EOF) {
-+	while ((opt = getopt(argc, argv, "rdscmnb:W:M:")) != EOF) {
- 		switch(opt) {
- 		case 'r':
- 			mode = RECV;
-@@ -423,6 +451,10 @@ int main(int argc ,char *argv[])
- 			defer_setup = atoi(optarg);
+ 	sco_opt.mtu = mtu;
++	sco_opt.mode = mode;
+ 	if (setsockopt(sock, SOL_SCO, SCO_OPTIONS, &sco_opt,
+ 						sizeof(sco_opt)) < 0) {
+ 		ERROR_FAILED(err, "setsockopt(SCO_OPTIONS)", errno);
+@@ -825,6 +827,9 @@ static gboolean parse_set_opts(struct set_opts *opts, GError **err,
+ 		case BT_IO_OPT_PRIORITY:
+ 			opts->priority = va_arg(args, int);
  			break;
- 
-+		case 'M':
-+			mode = atoi(optarg);
++		case BT_IO_OPT_SCO_MODE:
++			opts->sco_mode = va_arg(args, int);
 +			break;
-+
  		default:
- 			usage();
- 			exit(1);
+ 			g_set_error(err, BT_IO_ERROR, EINVAL,
+ 					"Unknown option %d", opt);
+@@ -1303,7 +1308,7 @@ gboolean bt_io_set(GIOChannel *io, GError **err, BtIOOption opt1, ...)
+ 	case BT_IO_RFCOMM:
+ 		return rfcomm_set(sock, opts.sec_level, opts.master, err);
+ 	case BT_IO_SCO:
+-		return sco_set(sock, opts.mtu, err);
++		return sco_set(sock, opts.mtu, opts.sco_mode, err);
+ 	default:
+ 		g_set_error(err, BT_IO_ERROR, EINVAL,
+ 				"Unknown BtIO type %d", type);
+@@ -1370,7 +1375,7 @@ static GIOChannel *create_io(gboolean server, struct set_opts *opts,
+ 		}
+ 		if (sco_bind(sock, &opts->src, err) < 0)
+ 			goto failed;
+-		if (!sco_set(sock, opts->mtu, err))
++		if (!sco_set(sock, opts->mtu, opts->sco_mode, err))
+ 			goto failed;
+ 		break;
+ 	default:
+diff --git a/btio/btio.h b/btio/btio.h
+index a6ff5a2..e6ef990 100644
+--- a/btio/btio.h
++++ b/btio/btio.h
+@@ -54,6 +54,7 @@ typedef enum {
+ 	BT_IO_OPT_MODE,
+ 	BT_IO_OPT_FLUSHABLE,
+ 	BT_IO_OPT_PRIORITY,
++	BT_IO_OPT_SCO_MODE,
+ } BtIOOption;
+ 
+ typedef enum {
 -- 
 1.7.9.5
 
