@@ -1,42 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/4] AVCTP: Fix memory leak
-Date: Thu, 31 Jan 2013 11:12:41 -0600
-Message-Id: <1359652363-25602-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1359652363-25602-1-git-send-email-luiz.dentz@gmail.com>
-References: <1359652363-25602-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/4] AVCTP: Fix allways destroying browsing channel
+Date: Thu, 31 Jan 2013 11:12:40 -0600
+Message-Id: <1359652363-25602-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-651 (280 direct, 371 indirect) bytes in 7 blocks are definitely lost in loss record 306 of 332
-   at 0x4A06B2F: calloc (vg_replace_malloc.c:593)
-   by 0x319724D706: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.3400.2)
-   by 0x418A54: avctp_send_browsing_req (avctp.c:1457)
-   by 0x41A330: avrcp_handle_event (avrcp.c:1998)
-   by 0x417810: session_cb (avctp.c:702)
-   by 0x3197247A74: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
-   by 0x3197247DA7: ??? (in /usr/lib64/libglib-2.0.so.0.3400.2)
-   by 0x31972481A1: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3400.2)
-   by 0x409D6E: main (main.c:583)
+This reverts commit 53d3fc3fad5152167458625ad2acf19070cdf26a that leads
+to always destroy the browsing channel because the callback changes the
+state.
+
+To fix session_browsing_cb naw takes care of destroying the channel if it
+disconnects.
 ---
- profiles/audio/avctp.c | 1 +
- 1 file changed, 1 insertion(+)
+ profiles/audio/avctp.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 303427e..13dd4c3 100644
+index 41e2f46..303427e 100644
 --- a/profiles/audio/avctp.c
 +++ b/profiles/audio/avctp.c
-@@ -749,6 +749,7 @@ static void browsing_response(struct avctp_channel *browsing,
- 			return;
+@@ -490,10 +490,6 @@ static void avctp_set_state(struct avctp *session, avctp_state_t new_state)
+ 		break;
+ 	case AVCTP_STATE_CONNECTED:
+ 		DBG("AVCTP Connected");
+-		if (session->browsing) {
+-			avctp_channel_destroy(session->browsing);
+-			session->browsing = NULL;
+-		}
+ 		break;
+ 	case AVCTP_STATE_BROWSING_CONNECTING:
+ 		DBG("AVCTP Browsing Connecting");
+@@ -817,6 +813,13 @@ send:
  
- 		browsing->processed = g_slist_remove(browsing->processed, p);
-+		pending_destroy(p, NULL);
+ failed:
+ 	DBG("AVCTP Browsing: disconnected");
++	avctp_set_state(session, AVCTP_STATE_CONNECTED);
++
++	if (session->browsing) {
++		avctp_channel_destroy(session->browsing);
++		session->browsing = NULL;
++	}
++
+ 	return FALSE;
+ }
  
- 		return;
- 	}
 -- 
 1.8.1
 
