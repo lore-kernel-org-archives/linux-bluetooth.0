@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/3] hcidump: Fix parsing of SetBrowsedPlayer
-Date: Thu, 31 Jan 2013 09:33:56 -0600
-Message-Id: <1359646436-8113-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2 v2] thermometer: Fix crash while unregistering adapter
+Date: Thu, 31 Jan 2013 09:33:51 -0600
+Message-Id: <1359646436-8113-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1359646436-8113-1-git-send-email-luiz.dentz@gmail.com>
 References: <1359646436-8113-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,47 +11,48 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+Invalid read of size 8
+   at 0x448200: g_attrib_unregister (gattrib.c:722)
+   by 0x440476: destroy_thermometer (thermometer.c:167)
+   by 0x40D849: remove_interface (object.c:656)
+   by 0x40DAA9: g_dbus_unregister_interface (object.c:1413)
+   by 0x3DF7A63C9C: g_slist_foreach (gslist.c:894)
+   by 0x469656: device_remove (device.c:2200)
+   by 0x45CDC1: adapter_remove (adapter.c:3884)
+   by 0x45F146: index_removed (adapter.c:5442)
+   by 0x46BC17: received_data (mgmt.c:252)
+   by 0x3DF7A47A74: g_main_context_dispatch (gmain.c:2715)
+   by 0x3DF7A47DA7: g_main_context_iterate.isra.24 (gmain.c:3290)
+   by 0x3DF7A481A1: g_main_loop_run (gmain.c:3484)
+ Address 0x40 is not stack'd, malloc'd or (recently) free'd
 ---
- tools/parser/avrcp.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+v2: Print a warning if invalid id is passed to g_attrib_unregister
 
-diff --git a/tools/parser/avrcp.c b/tools/parser/avrcp.c
-index 1029287..4d88b41 100644
---- a/tools/parser/avrcp.c
-+++ b/tools/parser/avrcp.c
-@@ -1294,7 +1294,7 @@ static void avrcp_set_browsed_player_dump(int level, struct frame *frm,
- 	}
+ profiles/thermometer/thermometer.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
+index 0cf14e6..1b299e7 100644
+--- a/profiles/thermometer/thermometer.c
++++ b/profiles/thermometer/thermometer.c
+@@ -164,12 +164,12 @@ static void destroy_thermometer(gpointer user_data)
+ 	if (t->attioid > 0)
+ 		btd_device_remove_attio_callback(t->dev, t->attioid);
  
- 	id = get_u16(frm);
--	printf("PlayerID: 0x%04x (%u)", id, id);
-+	printf("PlayerID: 0x%04x (%u)\n", id, id);
- 	return;
+-	g_attrib_unregister(t->attrib, t->attio_measurement_id);
+-	g_attrib_unregister(t->attrib, t->attio_intermediate_id);
+-	g_attrib_unregister(t->attrib, t->attio_interval_id);
+-
+-	if (t->attrib != NULL)
++	if (t->attrib != NULL) {
++		g_attrib_unregister(t->attrib, t->attio_measurement_id);
++		g_attrib_unregister(t->attrib, t->attio_intermediate_id);
++		g_attrib_unregister(t->attrib, t->attio_interval_id);
+ 		g_attrib_unref(t->attrib);
++	}
  
- response:
-@@ -1313,12 +1313,12 @@ response:
- 	p_indent(level, frm);
- 
- 	uids = get_u16(frm);
--	printf("UIDCounter: 0x%04x (%u)", uids, uids);
-+	printf("UIDCounter: 0x%04x (%u)\n", uids, uids);
- 
- 	p_indent(level, frm);
- 
- 	items = get_u32(frm);
--	printf("Number of Items: 0x%04x (%u)", items, items);
-+	printf("Number of Items: 0x%04x (%u)\n", items, items);
- 
- 	p_indent(level, frm);
- 
-@@ -1328,7 +1328,7 @@ response:
- 	p_indent(level, frm);
- 
- 	folders = get_u8(frm);
--	printf("Folder Depth: 0x%02x (%u)", folders, folders);
-+	printf("Folder Depth: 0x%02x (%u)\n", folders, folders);
- 
- 	for (; folders > 0; folders--) {
- 		uint16_t len;
+ 	btd_device_unref(t->dev);
+ 	g_free(t->svc_range);
 -- 
 1.8.1
 
