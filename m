@@ -1,40 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 31 Jan 2013 15:36:45 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Fix handling of unexpected SMP PDUs
-Message-ID: <20130131173645.GA2556@joana>
-References: <1359477863-24645-1-git-send-email-johan.hedberg@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1359477863-24645-1-git-send-email-johan.hedberg@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 4/4] AVRCP: Get track duration using GetPlayStatus command
+Date: Thu, 31 Jan 2013 11:12:43 -0600
+Message-Id: <1359652363-25602-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1359652363-25602-1-git-send-email-luiz.dentz@gmail.com>
+References: <1359652363-25602-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2013-01-29 10:44:23 -0600]:
+Some stacks, notably broadcom, don't send track duration together with
+other metadata so it has to be set using GetPlayStatus.
+---
+ profiles/audio/avrcp.c  |  6 ++++--
+ profiles/audio/player.c | 21 +++++++++++++++++++++
+ profiles/audio/player.h |  1 +
+ 3 files changed, 26 insertions(+), 2 deletions(-)
 
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> The conn->smp_chan pointer can be NULL if SMP PDUs arrive at unexpected
-> moments. To avoid NULL pointer dereferences the code should be checking
-> for this and disconnect if an unexpected SMP PDU arrives. This patch
-> fixes the issue by adding a check for conn->smp_chan for all other PDUs
-> except pairing request and security request (which are are the first
-> PDUs to come to initialize the SMP context).
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> CC: stable@vger.kernel.org
-> ---
-> v2: Move the checks to a single place in smp_sig_channel() and instead
-> of ignoring the PDUs return failure from smp_sig_channel() to trigger a
-> disconnection.
-> 
->  net/bluetooth/smp.c |   13 +++++++++++++
->  1 file changed, 13 insertions(+)
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index f83c3db..728ba91 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -1632,6 +1632,7 @@ static gboolean avrcp_get_play_status_rsp(struct avctp *conn,
+ 
+ 	memcpy(&duration, pdu->params, sizeof(uint32_t));
+ 	duration = ntohl(duration);
++	media_player_set_duration(mp, duration);
+ 
+ 	memcpy(&position, pdu->params + 4, sizeof(uint32_t));
+ 	position = ntohl(position);
+@@ -1900,11 +1901,12 @@ static gboolean avrcp_handle_event(struct avctp *conn,
+ 		break;
+ 	case AVRCP_EVENT_TRACK_CHANGED:
+ 		mp = player->user_data;
+-		if (code == AVC_CTYPE_CHANGED)
+-			media_player_set_position(mp, 0);
+ 
+ 		avrcp_get_element_attributes(session);
+ 
++		if (code == AVC_CTYPE_CHANGED)
++			avrcp_get_play_status(session);
++
+ 		break;
+ 
+ 	case AVRCP_EVENT_SETTINGS_CHANGED:
+diff --git a/profiles/audio/player.c b/profiles/audio/player.c
+index 841a577..fb750fd 100644
+--- a/profiles/audio/player.c
++++ b/profiles/audio/player.c
+@@ -483,6 +483,27 @@ struct media_player *media_player_controller_create(const char *path)
+ 	return mp;
+ }
+ 
++void media_player_set_duration(struct media_player *mp, uint32_t duration)
++{
++	char *value, *curval;
++
++	DBG("%u", duration);
++
++	value = g_strdup_printf("%u", duration);
++
++	curval = g_hash_table_lookup(mp->track, "Duration");
++	if (g_strcmp0(curval, value) == 0) {
++		g_free(value);
++		return;
++	}
++
++	g_hash_table_replace(mp->track, g_strdup("Duration"), value);
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++					mp->path, MEDIA_PLAYER_INTERFACE,
++					"Track");
++}
++
+ void media_player_set_position(struct media_player *mp, uint32_t position)
+ {
+ 	DBG("%u", position);
+diff --git a/profiles/audio/player.h b/profiles/audio/player.h
+index 212a5a6..fec1d06 100644
+--- a/profiles/audio/player.h
++++ b/profiles/audio/player.h
+@@ -39,6 +39,7 @@ struct media_player_callback {
+ 
+ struct media_player *media_player_controller_create(const char *path);
+ void media_player_destroy(struct media_player *mp);
++void media_player_set_duration(struct media_player *mp, uint32_t duration);
+ void media_player_set_position(struct media_player *mp, uint32_t position);
+ void media_player_set_setting(struct media_player *mp, const char *key,
+ 							const char *value);
+-- 
+1.8.1
 
-Patch has been applied to bluetooth.git. Thanks.
-
-	Gustavo
