@@ -1,37 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 31 Jan 2013 15:39:51 -0200
+Date: Thu, 31 Jan 2013 15:36:45 -0200
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] Bluetooth: Fix hci_conn timeout routine
-Message-ID: <20130131173951.GB2556@joana>
-References: <1359557457-10199-1-git-send-email-andre.guedes@openbossa.org>
+Subject: Re: [PATCH v2] Bluetooth: Fix handling of unexpected SMP PDUs
+Message-ID: <20130131173645.GA2556@joana>
+References: <1359477863-24645-1-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1359557457-10199-1-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1359477863-24645-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Johan,
 
-* Andre Guedes <andre.guedes@openbossa.org> [2013-01-30 11:50:55 -0300]:
+* Johan Hedberg <johan.hedberg@gmail.com> [2013-01-29 10:44:23 -0600]:
 
-> If occurs a LE or SCO hci_conn timeout and the connection is already
-> established (BT_CONNECTED state), the connection is not terminated as
-> expected. This bug can be reproduced using l2test or scotest tool.
-> Once the connection is established, kill l2test/scotest and the
-> connection won't be terminated.
+> From: Johan Hedberg <johan.hedberg@intel.com>
 > 
-> This patch fixes hci_conn_disconnect helper so it is able to
-> terminate LE and SCO connections, as well as ACL.
+> The conn->smp_chan pointer can be NULL if SMP PDUs arrive at unexpected
+> moments. To avoid NULL pointer dereferences the code should be checking
+> for this and disconnect if an unexpected SMP PDU arrives. This patch
+> fixes the issue by adding a check for conn->smp_chan for all other PDUs
+> except pairing request and security request (which are are the first
+> PDUs to come to initialize the SMP context).
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> CC: stable@vger.kernel.org
 > ---
->  net/bluetooth/hci_conn.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> v2: Move the checks to a single place in smp_sig_channel() and instead
+> of ignoring the PDUs return failure from smp_sig_channel() to trigger a
+> disconnection.
+> 
+>  net/bluetooth/smp.c |   13 +++++++++++++
+>  1 file changed, 13 insertions(+)
 
-I just pushed this patch to bluetooth.git, this also means I'm not applying
-the hci_acl_disconn() rename patch until the next release cycle. A rename
-patch is not suitable for 3.8 anymore.  Thanks.
+Patch has been applied to bluetooth.git. Thanks.
 
 	Gustavo
