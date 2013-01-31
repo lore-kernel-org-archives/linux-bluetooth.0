@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2 v2] attrib: Don't attempt to unregister event id 0
-Date: Thu, 31 Jan 2013 09:33:53 -0600
-Message-Id: <1359646436-8113-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/2] tools: Fix mpris-player creating busname starting with digit
+Date: Thu, 31 Jan 2013 09:33:55 -0600
+Message-Id: <1359646436-8113-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1359646436-8113-1-git-send-email-luiz.dentz@gmail.com>
 References: <1359646436-8113-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,29 +11,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Id 0 is considered invalid so the code should not even try to lookup for
-it in the event list instead print a warning and return FALSE
-immediatelly.
+D-Bus does not allow a bus name starting with digits after . so the code
+now prefix with bt_ if the device name starts with a digit.
 ---
- attrib/gattrib.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ tools/mpris-player.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 58f19d0..01c19f9 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -719,6 +719,11 @@ gboolean g_attrib_unregister(GAttrib *attrib, guint id)
- 	struct event *evt;
- 	GSList *l;
+diff --git a/tools/mpris-player.c b/tools/mpris-player.c
+index b82b5df..4dbde90 100644
+--- a/tools/mpris-player.c
++++ b/tools/mpris-player.c
+@@ -1381,7 +1381,11 @@ static const GDBusPropertyTable mpris_properties[] = {
  
-+	if (id == 0) {
-+		warn("%s: invalid id", __FUNCTION__);
-+		return FALSE;
-+	}
-+
- 	l = g_slist_find_custom(attrib->events, GUINT_TO_POINTER(id),
- 							event_cmp_by_id);
- 	if (l == NULL)
+ static char *mpris_busname(char *name)
+ {
+-	return g_strconcat(MPRIS_BUS_NAME,
++	if (g_ascii_isdigit(name[0]))
++		return g_strconcat(MPRIS_BUS_NAME, "bt_",
++				g_strcanon(name, A_Z a_z _0_9, '_'), NULL);
++	else
++		return g_strconcat(MPRIS_BUS_NAME,
+ 				g_strcanon(name, A_Z a_z _0_9, '_'), NULL);
+ }
+ 
 -- 
 1.8.1
 
