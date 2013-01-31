@@ -1,53 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] AVCTP: Fix allways destroying browsing channel
-Date: Thu, 31 Jan 2013 11:12:40 -0600
-Message-Id: <1359652363-25602-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/2 v2] attrib: Don't attempt to unregister event id 0
+Date: Thu, 31 Jan 2013 09:33:53 -0600
+Message-Id: <1359646436-8113-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1359646436-8113-1-git-send-email-luiz.dentz@gmail.com>
+References: <1359646436-8113-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This reverts commit 53d3fc3fad5152167458625ad2acf19070cdf26a that leads
-to always destroy the browsing channel because the callback changes the
-state.
-
-To fix session_browsing_cb naw takes care of destroying the channel if it
-disconnects.
+Id 0 is considered invalid so the code should not even try to lookup for
+it in the event list instead print a warning and return FALSE
+immediatelly.
 ---
- profiles/audio/avctp.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ attrib/gattrib.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 41e2f46..303427e 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -490,10 +490,6 @@ static void avctp_set_state(struct avctp *session, avctp_state_t new_state)
- 		break;
- 	case AVCTP_STATE_CONNECTED:
- 		DBG("AVCTP Connected");
--		if (session->browsing) {
--			avctp_channel_destroy(session->browsing);
--			session->browsing = NULL;
--		}
- 		break;
- 	case AVCTP_STATE_BROWSING_CONNECTING:
- 		DBG("AVCTP Browsing Connecting");
-@@ -817,6 +813,13 @@ send:
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index 58f19d0..01c19f9 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -719,6 +719,11 @@ gboolean g_attrib_unregister(GAttrib *attrib, guint id)
+ 	struct event *evt;
+ 	GSList *l;
  
- failed:
- 	DBG("AVCTP Browsing: disconnected");
-+	avctp_set_state(session, AVCTP_STATE_CONNECTED);
-+
-+	if (session->browsing) {
-+		avctp_channel_destroy(session->browsing);
-+		session->browsing = NULL;
++	if (id == 0) {
++		warn("%s: invalid id", __FUNCTION__);
++		return FALSE;
 +	}
 +
- 	return FALSE;
- }
- 
+ 	l = g_slist_find_custom(attrib->events, GUINT_TO_POINTER(id),
+ 							event_cmp_by_id);
+ 	if (l == NULL)
 -- 
 1.8.1
 
