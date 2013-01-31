@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/4] A2DP: Fix not setting setup error to NULL
-Date: Thu, 31 Jan 2013 11:12:42 -0600
-Message-Id: <1359652363-25602-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/4] AVCTP: Fix memory leak
+Date: Thu, 31 Jan 2013 11:12:41 -0600
+Message-Id: <1359652363-25602-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1359652363-25602-1-git-send-email-luiz.dentz@gmail.com>
 References: <1359652363-25602-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,54 +11,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Once the error is informed to the callback it should be properly freed and
-set to NULL otherwise a subsequent operation may end up reusing the same
-error which might lead to crashes.
+651 (280 direct, 371 indirect) bytes in 7 blocks are definitely lost in loss record 306 of 332
+   at 0x4A06B2F: calloc (vg_replace_malloc.c:593)
+   by 0x319724D706: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.3400.2)
+   by 0x418A54: avctp_send_browsing_req (avctp.c:1457)
+   by 0x41A330: avrcp_handle_event (avrcp.c:1998)
+   by 0x417810: session_cb (avctp.c:702)
+   by 0x3197247A74: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
+   by 0x3197247DA7: ??? (in /usr/lib64/libglib-2.0.so.0.3400.2)
+   by 0x31972481A1: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3400.2)
+   by 0x409D6E: main (main.c:583)
 ---
- profiles/audio/a2dp.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ profiles/audio/avctp.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index efb4178..4b28465 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -366,16 +366,13 @@ static void stream_state_changed(struct avdtp_stream *stream,
- static gboolean auto_config(gpointer data)
- {
- 	struct a2dp_setup *setup = data;
--	struct avdtp_error *err = NULL;
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index 303427e..13dd4c3 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -749,6 +749,7 @@ static void browsing_response(struct avctp_channel *browsing,
+ 			return;
  
- 	/* Check if configuration was aborted */
- 	if (setup->sep->stream == NULL)
- 		return FALSE;
+ 		browsing->processed = g_slist_remove(browsing->processed, p);
++		pending_destroy(p, NULL);
  
--	if (setup->err != NULL) {
--		err = setup->err;
-+	if (setup->err != NULL)
- 		goto done;
--	}
- 
- 	avdtp_stream_add_cb(setup->session, setup->stream,
- 				stream_state_changed, setup->sep);
-@@ -391,8 +388,10 @@ done:
- 
- 	finalize_config(setup);
- 
--	if (err)
--		g_free(err);
-+	if (setup->err) {
-+		g_free(setup->err);
-+		setup->err = NULL;
-+	}
- 
- 	setup_unref(setup);
- 
-@@ -565,6 +564,7 @@ static void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 		if (setup) {
- 			setup->err = err;
- 			finalize_config(setup);
-+			setup->err = NULL;
- 		}
  		return;
  	}
 -- 
