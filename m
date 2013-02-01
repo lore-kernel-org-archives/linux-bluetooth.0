@@ -1,26 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Feb 2013 09:57:37 -0600
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: patrik.flykt@linux.intel.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] network: Fix user data handling on unregister
-Message-ID: <20130201155737.GA22624@x220>
-References: <1359717591-32532-1-git-send-email-patrik.flykt@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1359717591-32532-1-git-send-email-patrik.flykt@linux.intel.com>
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Refactor mgmt_pending_foreach
+Date: Fri,  1 Feb 2013 11:21:30 -0300
+Message-Id: <1359728490-26097-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Patrik,
+This patch does a trivial refactor in mgmt_pending_foreach function.
+It replaces list_for_each_safe by list_for_each_entry_safe, simplifying
+the function.
 
-On Fri, Feb 01, 2013, patrik.flykt@linux.intel.com wrote:
-> User data in unregister_server() is a network_adapter struct. Unregistering
-> using full UUID will now also work.
-> ---
->  profiles/network/server.c |    7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ net/bluetooth/mgmt.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-Applied. Thanks.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 3bd4c41..39395c7 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -760,13 +760,9 @@ static void mgmt_pending_foreach(u16 opcode, struct hci_dev *hdev,
+ 					    void *data),
+ 				 void *data)
+ {
+-	struct list_head *p, *n;
+-
+-	list_for_each_safe(p, n, &hdev->mgmt_pending) {
+-		struct pending_cmd *cmd;
+-
+-		cmd = list_entry(p, struct pending_cmd, list);
++	struct pending_cmd *cmd, *tmp;
+ 
++	list_for_each_entry_safe(cmd, tmp, &hdev->mgmt_pending, list) {
+ 		if (opcode > 0 && cmd->opcode != opcode)
+ 			continue;
+ 
+-- 
+1.8.1.1
 
-Johan
