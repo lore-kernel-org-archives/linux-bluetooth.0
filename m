@@ -1,217 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/6 v2] media-api: Add org.bluez.MediaFolder1
-Date: Fri,  1 Feb 2013 15:28:20 -0600
-Message-Id: <1359754105-8185-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 1 Feb 2013 15:23:25 -0600
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] AVDTP: Fix memory leak
+Message-ID: <20130201212325.GA1258@x220.aaadfw.dal.wayport.net>
+References: <1359742844-4612-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1359742844-4612-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-This interface adds support for browsing and searching in the player's
-storage using AVRCP 1.4/1.5.
+On Fri, Feb 01, 2013, Luiz Augusto von Dentz wrote:
+> 56 (16 direct, 40 indirect) bytes in 1 blocks are definitely lost in loss record 173 of 263
+>    at 0x4A0883C: malloc (vg_replace_malloc.c:270)
+>    by 0x4C8568E: g_malloc (in /usr/lib64/libglib-2.0.so.0.3400.2)
+>    by 0x4C9A7F1: g_slice_alloc (in /usr/lib64/libglib-2.0.so.0.3400.2)
+>    by 0x4C9BB92: g_slist_append (in /usr/lib64/libglib-2.0.so.0.3400.2)
+>    by 0x422072: send_req (avdtp.c:2569)
+>    by 0x422D0B: avdtp_discover (avdtp.c:3380)
+>    by 0x41D16C: source_setup_stream (source.c:307)
+>    by 0x41D1EF: source_connect (source.c:331)
+>    by 0x465411: connect_next (device.c:1073)
+>    by 0x466C92: device_profile_connected (device.c:1097)
+>    by 0x4629EB: ext_connect (profile.c:950)
+>    by 0x44AECB: connect_cb (btio.c:230)
+> ---
+>  profiles/audio/avdtp.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 
-Some remarks about the design:
+Applied. Thanks.
 
-  - Exposing UIDCounter and UIDs was considered, but the spec seems to have
-    missed to define the player's id persistency. There are also the fact that
-    UIDCounter alone does not guarantee persistency across sessions and do not
-    provide what exact items have changed, so in the end exposing these
-    details will bring almost no value.
-  - Indexing or caching the whole media library is not recommended, Bluetooth
-    is too slow for that and even vendors such as Apple do not recommend doing
-    it, so the only items keep in cache are the current listed ones.
-  - Addressed vs Browsed player is done implicitly when accessed, this was done
-    to simplify the API and avoid confusions between applications and players.
----
-v2: Remove Buttons property for now
-
- doc/media-api.txt | 171 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 171 insertions(+)
-
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index 972716e..db1575f 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -226,6 +226,177 @@ Properties	string Equalizer [readwrite]
- 
- 			Device object path.
- 
-+		string Name [readonly]
-+
-+			Player name
-+
-+		boolean Browsable [readonly]
-+
-+			If present indicates the player can be browsed using
-+			MediaLibrary interface.
-+
-+			Possible values:
-+
-+				True: Supported and active
-+				False: Supported but inactive
-+
-+			Note: If supported but inactive clients can enable it
-+			by using MediaLibrary interface but it might interfere
-+			in the playback of other players.
-+
-+
-+		boolean Searchable [readonly]
-+
-+			If present indicates the player can be searched using
-+			MediaLibrary interface.
-+
-+			Possible values:
-+
-+				True: Supported and active
-+				False: Supported but inactive
-+
-+			Note: If supported but inactive clients can enable it
-+			by using MediaLibrary interface but it might interfere
-+			in the playback of other players.
-+
-+MediaFolder1 hierarchy
-+======================
-+
-+Service		unique name (Target role)
-+		org.bluez (Controller role)
-+Interface	org.bluez.MediaFolder1 [Experimental]
-+Object path	freely definable (Target role)
-+		[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/playerX
-+		(Controller role)
-+
-+Methods		object Search(string value, dict filter)
-+
-+			Return a folder object containing the search result.
-+
-+			To list the items found use the folder object returned
-+			and pass to ChangeFolder.
-+
-+		array{objects, properties} ListItems(dict filter)
-+
-+			Return a list of items found
-+
-+		void ChangeFolder(object folder)
-+
-+			Change current folder.
-+
-+			Note: By changing folder the items of previous folder
-+			might be destroyed and have to be listed again, the
-+			exception is NowPlaying folder which should be always
-+			present while the player is active.
-+
-+Properties	uint32 NumberOfItems:
-+
-+			Number of items in the folder
-+
-+		string Name:
-+
-+			Folder name:
-+
-+			Possible values:
-+				"/Filesystem/...": Filesystem scope
-+				"/NowPlaying/...": NowPlaying scope
-+
-+			Note: /NowPlaying folder might not be listed if player
-+			is stopped, folders created by Search are virtual so
-+			once another Search is perform or the folder is
-+			changed using ChangeFolder it will no longer be listed.
-+
-+Filters		uint32 Start:
-+
-+			Offset of the first item.
-+
-+			Default value: 0
-+
-+		uint32 End:
-+
-+			Offset of the last item.
-+
-+			Default value: NumbeOfItems
-+
-+		array{string} Attributes
-+
-+			Item properties that should be included in the list.
-+
-+			Possible Values:
-+
-+				"title", "artist", "album", "genre",
-+				"number-of-tracks", "number", "duration"
-+
-+			Default Value: All
-+
-+MediaItem1 hierarchy
-+====================
-+
-+Service		unique name (Target role)
-+		org.bluez (Controller role)
-+Interface	org.bluez.MediaItem1 [Experimental]
-+Object path	freely definable (Target role)
-+		[variable
-+		prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/playerX/itemX
-+		(Controller role)
-+
-+Methods		void Play()
-+
-+			Play item
-+
-+		void AddtoNowPlaying()
-+
-+			Add item to now playing list
-+
-+Properties	string Name [readonly]
-+
-+			Item displayable name
-+
-+		boolean Folder [readonly]
-+
-+			Indicates whether the item is a folder
-+
-+		string Type [readonly]
-+
-+			Item type
-+
-+			Possible values:
-+
-+				Folder: "Mixed", "Titles", "Albums", "Artists"
-+				Other Items: "Video", "Audio"
-+
-+		boolean Playable [readonly]
-+
-+			Indicates if the item can be played
-+
-+		string Title:
-+
-+			Item title name
-+
-+		string Artist:
-+
-+			Item artist name
-+
-+		string Album:
-+
-+			Item album name
-+
-+		string Genre:
-+
-+			Item genre name
-+
-+		uint32 NumberOfTracks:
-+
-+			Item album number of tracks in total
-+
-+		uint32 Number:
-+
-+			Item album number
-+
-+		uint32 Duration:
-+
-+			Item duration in milliseconds
-+
- MediaEndpoint1 hierarchy
- ========================
- 
--- 
-1.8.1
-
+Johan
