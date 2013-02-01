@@ -1,56 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] AVDTP: Fix memory leak
-Date: Fri,  1 Feb 2013 12:20:44 -0600
-Message-Id: <1359742844-4612-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 1 Feb 2013 15:54:45 -0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com, linux-wireless@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2013-02-01
+Message-ID: <20130201175445.GE4733@joana>
+References: <20130201174019.GD4733@joana>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="uh9ZiVrAOUUm9fzH"
+In-Reply-To: <20130201174019.GD4733@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-56 (16 direct, 40 indirect) bytes in 1 blocks are definitely lost in loss record 173 of 263
-   at 0x4A0883C: malloc (vg_replace_malloc.c:270)
-   by 0x4C8568E: g_malloc (in /usr/lib64/libglib-2.0.so.0.3400.2)
-   by 0x4C9A7F1: g_slice_alloc (in /usr/lib64/libglib-2.0.so.0.3400.2)
-   by 0x4C9BB92: g_slist_append (in /usr/lib64/libglib-2.0.so.0.3400.2)
-   by 0x422072: send_req (avdtp.c:2569)
-   by 0x422D0B: avdtp_discover (avdtp.c:3380)
-   by 0x41D16C: source_setup_stream (source.c:307)
-   by 0x41D1EF: source_connect (source.c:331)
-   by 0x465411: connect_next (device.c:1073)
-   by 0x466C92: device_profile_connected (device.c:1097)
-   by 0x4629EB: ext_connect (profile.c:950)
-   by 0x44AECB: connect_cb (btio.c:230)
+--uh9ZiVrAOUUm9fzH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hi John,
+
+* Gustavo Padovan <gustavo@padovan.org> [2013-02-01 15:40:19 -0200]:
+
+> Hi John,
+>=20
+> Here goes another batch intended for 3.9, the majority of the patch here =
+are
+> from Johan who is fixing many issues in the management interface that have
+> appeared lately. The rest of the patches are just small improvements, fix=
+es
+> and clean ups.
+
+I had a brain shutdown moment and forgot to rebase against wireless-next.
+SO the pull request is actually much smaller.
+
+Please pull!
+
+	Gustavo
+
 ---
- profiles/audio/avdtp.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+The following changes since commit c331997b6c9ad7f4b8075e6e60d3caa6e36f5938:
 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 0187691..403a22b 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -599,8 +599,10 @@ static gboolean avdtp_send(struct avdtp *session, uint8_t transaction,
- 	return TRUE;
- }
- 
--static void pending_req_free(struct pending_req *req)
-+static void pending_req_free(void *data)
- {
-+	struct pending_req *req = data;
-+
- 	if (req->timeout)
- 		g_source_remove(req->timeout);
- 	g_free(req->data);
-@@ -1137,6 +1139,8 @@ static void avdtp_free(void *data)
- 	if (session->req)
- 		pending_req_free(session->req);
- 
-+	g_slist_free_full(session->req_queue, pending_req_free);
-+	g_slist_free_full(session->prio_queue, pending_req_free);
- 	g_slist_free_full(session->seps, sep_free);
- 
- 	g_free(session->buf);
--- 
-1.8.1
+  wil6210: fix wil_vring_init_tx status (2013-01-30 15:07:19 -0500)
 
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next fo=
+r-upstream
+
+for you to fetch changes up to a3d09356491d637548dbe815ddb966f52ec9e53a:
+
+  Bluetooth: Refactor mgmt_pending_foreach (2013-02-01 15:50:18 -0200)
+
+----------------------------------------------------------------
+Andre Guedes (3):
+      Bluetooth: Reduce critical section in sco_conn_ready
+      Bluetooth: Remove unneeded locking
+      Bluetooth: Refactor mgmt_pending_foreach
+
+Johan Hedberg (11):
+      Bluetooth: Store UUIDs in the same order that they were added
+      Bluetooth: Simplify UUIDs clearing code
+      Bluetooth: Keep track of UUID type upon addition
+      Bluetooth: Simplify UUID removal code
+      Bluetooth: Simplify UUID16 list generation for EIR
+      Bluetooth: Remove useless eir_len variable from EIR creation
+      Bluetooth: Refactor UUID-16 list generation into its own function
+      Bluetooth: Add support for 32-bit UUIDs in EIR data
+      Bluetooth: Add support for 128-bit UUIDs in EIR data
+      Bluetooth: Fix link security setting when powering on
+      Bluetooth: Increment Management interface revision
+
+ include/net/bluetooth/hci_core.h |   1 +
+ net/bluetooth/hci_core.c         |  10 +-
+ net/bluetooth/hci_event.c        |   4 -
+ net/bluetooth/mgmt.c             | 219 +++++++++++++++++++++++++----------=
+------
+ net/bluetooth/sco.c              |  18 ++--
+ 5 files changed, 150 insertions(+), 102 deletions(-)
+
+--uh9ZiVrAOUUm9fzH
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.13 (GNU/Linux)
+
+iQIcBAEBAgAGBQJRDAFlAAoJEPs3PUX4s20oOrwQAK5PnopbfD6PgTAewSGXmr1I
+3gkO2h4uu38e8qw53NaOspLSdy+DnfRjVuWcaEncniotPYeXuBnrUQ6jizyx6CpT
+4P1zlAFkS3nzMd5sSbIfgSHhYssVgG9bFP5Pll3+tOFHntIfyTqJE1pBSjOdMUCp
+ZnoqbuKIq8zY337JyMStNNskI+6XLHKvJ0R7BAbZmEIXgBXuDyn1MuR8OX0jIJ8J
+id19iFWDaOHBoxNIClScjUpiiSVTLqqnC5CYDdY1pDrQSvV45opTVj8fvwcE967W
+fmB8hz7Us2qEDJdJOvuN8Tjy5h0NOeVf/AN/sNWHfT5Td5UWn2L8S3o3Vyt/+9Gv
+YuUPLMyb5P6Pf6PLBCT+N7KULzrW8gGVf3vmgnntJcsTw/AwsoOSf7i2JHgwoeu1
+yRo4lva090RB5kOPCwwMYW8oxgWJKT0YeFIOTACHvu0dxfQpcvbGfI2KSg19fgsV
+1ld3E0sY8IrL//RUIjibHe9Dv60uyXbmc0RGH2YyjCO+QAl79ASune91OQ39jy+5
+5zdSVgrvQNZiNLUTDl7lAXs65cdCkr98llvzHcqTqBra5eOKHk8SxSiDeLbHj7UX
+otTvqtVkkKnyraj09H7w+MU/7Qnh9Qgqw0nG5KCIiaciBtz2kK3uLvAHOeiNx1be
+oebkm/WksHblOd5NobFv
+=pfe3
+-----END PGP SIGNATURE-----
+
+--uh9ZiVrAOUUm9fzH--
