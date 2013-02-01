@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/6] AVRCP: Avoid repeating command due to changed event
-Date: Thu, 31 Jan 2013 21:58:33 -0600
-Message-Id: <1359691117-13847-2-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/6] AVRCP: Register to addressed player changed event if supported
+Date: Thu, 31 Jan 2013 21:58:34 -0600
+Message-Id: <1359691117-13847-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1359691117-13847-1-git-send-email-luiz.dentz@gmail.com>
 References: <1359691117-13847-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,59 +11,86 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Currently we are repeating the same command twice for notification, first
-for changed and then latter for interim response.
-
-To avoid this the code now just do it for interim responses, changed
-responses just trigger another registration.
+This enables registering for addressed player changed event and handle
+the interim response setting the player id and uid counter to the current
+player.
 ---
- profiles/audio/avrcp.c | 18 +++++++-----------
- 1 file changed, 7 insertions(+), 11 deletions(-)
+ profiles/audio/avrcp.c | 14 ++++++++++++++
+ profiles/audio/avrcp.h | 15 ++++++++-------
+ 2 files changed, 22 insertions(+), 7 deletions(-)
 
 diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 728ba91..0a173bc 100644
+index 0a173bc..8187ddf 100644
 --- a/profiles/audio/avrcp.c
 +++ b/profiles/audio/avrcp.c
-@@ -1877,6 +1877,12 @@ static gboolean avrcp_handle_event(struct avctp *conn,
+@@ -176,6 +176,8 @@ struct pending_pdu {
+ struct avrcp_player {
+ 	struct avrcp_server *server;
+ 	GSList *sessions;
++	uint16_t id;
++	uint16_t uid_counter;
  
- 	event = pdu->params[0];
+ 	struct avrcp_player_cb *cb;
+ 	void *user_data;
+@@ -1869,6 +1871,7 @@ static gboolean avrcp_handle_event(struct avctp *conn,
+ 	uint8_t event;
+ 	uint8_t value;
+ 	uint8_t count;
++	uint16_t id;
+ 	const char *curval, *strval;
+ 	int i;
  
-+	if (code == AVC_CTYPE_CHANGED) {
-+		session->registered_events ^= (1 << event);
-+		avrcp_register_notification(session, event);
-+		return FALSE;
-+	}
+@@ -1932,6 +1935,16 @@ static gboolean avrcp_handle_event(struct avctp *conn,
+ 		}
+ 
+ 		break;
 +
- 	switch (event) {
- 	case AVRCP_EVENT_VOLUME_CHANGED:
- 		value = pdu->params[1] & 0x7F;
-@@ -1900,12 +1906,8 @@ static gboolean avrcp_handle_event(struct avctp *conn,
- 
- 		break;
- 	case AVRCP_EVENT_TRACK_CHANGED:
--		mp = player->user_data;
--
- 		avrcp_get_element_attributes(session);
--
--		if (code == AVC_CTYPE_CHANGED)
--			avrcp_get_play_status(session);
-+		avrcp_get_play_status(session);
- 
- 		break;
- 
-@@ -1932,12 +1934,6 @@ static gboolean avrcp_handle_event(struct avctp *conn,
- 		break;
++	case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
++		id = bt_get_be16(&pdu->params[1]);
++
++		if (player->id == id)
++			break;
++
++		player->id = id;
++		player->uid_counter = bt_get_be16(&pdu->params[3]);
++		break;
  	}
  
--	if (code == AVC_CTYPE_CHANGED) {
--		session->registered_events ^= (1 << event);
--		avrcp_register_notification(session, event);
--		return FALSE;
--	}
--
  	session->registered_events |= (1 << event);
+@@ -2112,6 +2125,7 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
+ 		case AVRCP_EVENT_STATUS_CHANGED:
+ 		case AVRCP_EVENT_TRACK_CHANGED:
+ 		case AVRCP_EVENT_SETTINGS_CHANGED:
++		case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
+ 			avrcp_register_notification(session, event);
+ 			break;
+ 		}
+diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
+index b2c0d61..3799da1 100644
+--- a/profiles/audio/avrcp.h
++++ b/profiles/audio/avrcp.h
+@@ -69,13 +69,14 @@
+ #define AVRCP_PLAY_STATUS_ERROR		0xFF
  
- 	return TRUE;
+ /* Notification events */
+-#define AVRCP_EVENT_STATUS_CHANGED	0x01
+-#define AVRCP_EVENT_TRACK_CHANGED	0x02
+-#define AVRCP_EVENT_TRACK_REACHED_END	0x03
+-#define AVRCP_EVENT_TRACK_REACHED_START	0x04
+-#define AVRCP_EVENT_SETTINGS_CHANGED	0x08
+-#define AVRCP_EVENT_VOLUME_CHANGED	0x0d
+-#define AVRCP_EVENT_LAST		AVRCP_EVENT_VOLUME_CHANGED
++#define AVRCP_EVENT_STATUS_CHANGED		0x01
++#define AVRCP_EVENT_TRACK_CHANGED		0x02
++#define AVRCP_EVENT_TRACK_REACHED_END		0x03
++#define AVRCP_EVENT_TRACK_REACHED_START		0x04
++#define AVRCP_EVENT_SETTINGS_CHANGED		0x08
++#define AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED	0x0b
++#define AVRCP_EVENT_VOLUME_CHANGED		0x0d
++#define AVRCP_EVENT_LAST			AVRCP_EVENT_VOLUME_CHANGED
+ 
+ struct avrcp_player_cb {
+ 	GList *(*list_settings) (void *user_data);
 -- 
 1.8.1
 
