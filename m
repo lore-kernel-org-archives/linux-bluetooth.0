@@ -1,37 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Feb 2013 15:23:25 -0600
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] AVDTP: Fix memory leak
-Message-ID: <20130201212325.GA1258@x220.aaadfw.dal.wayport.net>
-References: <1359742844-4612-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 1 Feb 2013 14:22:25 -0500
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2013-02-01
+Message-ID: <20130201192225.GC29418@tuxdriver.com>
+References: <20130201174019.GD4733@joana>
+ <20130201175445.GE4733@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1359742844-4612-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <20130201175445.GE4733@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-On Fri, Feb 01, 2013, Luiz Augusto von Dentz wrote:
-> 56 (16 direct, 40 indirect) bytes in 1 blocks are definitely lost in loss record 173 of 263
->    at 0x4A0883C: malloc (vg_replace_malloc.c:270)
->    by 0x4C8568E: g_malloc (in /usr/lib64/libglib-2.0.so.0.3400.2)
->    by 0x4C9A7F1: g_slice_alloc (in /usr/lib64/libglib-2.0.so.0.3400.2)
->    by 0x4C9BB92: g_slist_append (in /usr/lib64/libglib-2.0.so.0.3400.2)
->    by 0x422072: send_req (avdtp.c:2569)
->    by 0x422D0B: avdtp_discover (avdtp.c:3380)
->    by 0x41D16C: source_setup_stream (source.c:307)
->    by 0x41D1EF: source_connect (source.c:331)
->    by 0x465411: connect_next (device.c:1073)
->    by 0x466C92: device_profile_connected (device.c:1097)
->    by 0x4629EB: ext_connect (profile.c:950)
->    by 0x44AECB: connect_cb (btio.c:230)
+On Fri, Feb 01, 2013 at 03:54:45PM -0200, Gustavo Padovan wrote:
+> Hi John,
+> 
+> * Gustavo Padovan <gustavo@padovan.org> [2013-02-01 15:40:19 -0200]:
+> 
+> > Hi John,
+> > 
+> > Here goes another batch intended for 3.9, the majority of the patch here are
+> > from Johan who is fixing many issues in the management interface that have
+> > appeared lately. The rest of the patches are just small improvements, fixes
+> > and clean ups.
+> 
+> I had a brain shutdown moment and forgot to rebase against wireless-next.
+> SO the pull request is actually much smaller.
+> 
+> Please pull!
+> 
+> 	Gustavo
+> 
 > ---
->  profiles/audio/avdtp.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+> The following changes since commit c331997b6c9ad7f4b8075e6e60d3caa6e36f5938:
+> 
+>   wil6210: fix wil_vring_init_tx status (2013-01-30 15:07:19 -0500)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next for-upstream
+> 
+> for you to fetch changes up to a3d09356491d637548dbe815ddb966f52ec9e53a:
+> 
+>   Bluetooth: Refactor mgmt_pending_foreach (2013-02-01 15:50:18 -0200)
 
-Applied. Thanks.
+Pulling now...
 
-Johan
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
