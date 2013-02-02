@@ -1,68 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon@janc.net.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon@janc.net.pl>
-Subject: [PATCH] shared: Fix use after free in read_watch_destroy
-Date: Sat,  2 Feb 2013 19:39:58 +0100
-Message-Id: <1359830398-23165-1-git-send-email-szymon@janc.net.pl>
+Message-ID: <1359766284.16887.2.camel@aeonflux>
+Subject: Re: [RFC 1/7] Bluetooth: Add new connection states
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Sat, 02 Feb 2013 01:51:24 +0100
+In-Reply-To: <1359765878-31409-2-git-send-email-andre.guedes@openbossa.org>
+References: <1359765878-31409-1-git-send-email-andre.guedes@openbossa.org>
+	 <1359765878-31409-2-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-read_watch_destroy is called when received_data returns FALSE.
-free mgmt in read_watch_destroy instead of received_data to avoid
-use after free.
+Hi Andre,
 
-Invalid write of size 4
-   at 0x8051604: read_watch_destroy (mgmt.c:271)
-   by 0x48C7468E: g_source_callback_unref (gmain.c:1457)
-   by 0x48C77287: g_main_context_dispatch (gmain.c:2723)
-   by 0x48C774FF: g_main_context_iterate.isra.22 (gmain.c:3290)
-   by 0x48C77962: g_main_loop_run (gmain.c:3484)
-   by 0x805393E: tester_run (tester.c:784)
-   by 0x804D1C7: main (mgmt-tester.c:2558)
- Address 0x4039b80 is 16 bytes inside a block of size 76 free'd
-   at 0x4007F0F: free (vg_replace_malloc.c:446)
-   by 0x48C7D44B: standard_free (gmem.c:98)
-   by 0x48C7D607: g_free (gmem.c:252)
-   by 0x8051BB6: received_data (mgmt.c:337)
-   by 0x48CBA72E: g_io_unix_dispatch (giounix.c:167)
-   by 0x48C7715A: g_main_context_dispatch (gmain.c:2715)
-   by 0x48C774FF: g_main_context_iterate.isra.22 (gmain.c:3290)
-   by 0x48C77962: g_main_loop_run (gmain.c:3484)
-   by 0x805393E: tester_run (tester.c:784)
-   by 0x804D1C7: main (mgmt-tester.c:2558)
----
- src/shared/mgmt.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+> This patch adds two new connection states which will be used by
+> hci_conn to establish LE connections.
+> 
+> BT_SCAN state means the controller is scanning for LE devices. Once
+> the target device is found, the connection goes to BT_DEV_FOUND
+> state, and then to BT_CONNECT state.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  include/net/bluetooth/bluetooth.h | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index 9531bee..add5721 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -126,7 +126,9 @@ enum {
+>  	BT_CONNECT2,
+>  	BT_CONFIG,
+>  	BT_DISCONN,
+> -	BT_CLOSED
+> +	BT_CLOSED,
+> +	BT_SCAN,
+> +	BT_DEV_FOUND
+>  };
 
-diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
-index cf7fdcf..ca4b05f 100644
---- a/src/shared/mgmt.c
-+++ b/src/shared/mgmt.c
-@@ -268,6 +268,11 @@ static void read_watch_destroy(gpointer user_data)
- {
- 	struct mgmt *mgmt = user_data;
- 
-+	if (mgmt->destroyed) {
-+		g_free(mgmt);
-+		return;
-+	}
-+
- 	mgmt->read_watch = 0;
- }
- 
-@@ -333,10 +338,8 @@ static gboolean received_data(GIOChannel *channel, GIOCondition cond,
- 		break;
- 	}
- 
--	if (mgmt->destroyed) {
--		g_free(mgmt);
-+	if (mgmt->destroyed)
- 		return FALSE;
--	}
- 
- 	return TRUE;
- }
--- 
-1.8.1.2
+I am actually against this. These states where originally socket states
+and not general states that we just pile on top of.
+
+You need to create separate state handling for LE connection handling. I
+am really not happy that we always try to shoe-horn this onto something
+else.
+
+Regards
+
+Marcel
+
 
