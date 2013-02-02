@@ -1,55 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1359766284.16887.2.camel@aeonflux>
-Subject: Re: [RFC 1/7] Bluetooth: Add new connection states
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Sat, 02 Feb 2013 01:51:24 +0100
-In-Reply-To: <1359765878-31409-2-git-send-email-andre.guedes@openbossa.org>
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC 7/7] Bluetooth: Track the number of hci_conn in BT_SCAN
+Date: Fri,  1 Feb 2013 21:44:38 -0300
+Message-Id: <1359765878-31409-8-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1359765878-31409-1-git-send-email-andre.guedes@openbossa.org>
 References: <1359765878-31409-1-git-send-email-andre.guedes@openbossa.org>
-	 <1359765878-31409-2-git-send-email-andre.guedes@openbossa.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+In order to avoid traversing the hci_conn list every time we get an
+advertising report, we should keep a counter of connections in
+BT_SCAN state. This way, we only traverse the list if the counter
+is greater from zero.
 
-> This patch adds two new connection states which will be used by
-> hci_conn to establish LE connections.
-> 
-> BT_SCAN state means the controller is scanning for LE devices. Once
-> the target device is found, the connection goes to BT_DEV_FOUND
-> state, and then to BT_CONNECT state.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  include/net/bluetooth/bluetooth.h | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 9531bee..add5721 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -126,7 +126,9 @@ enum {
->  	BT_CONNECT2,
->  	BT_CONFIG,
->  	BT_DISCONN,
-> -	BT_CLOSED
-> +	BT_CLOSED,
-> +	BT_SCAN,
-> +	BT_DEV_FOUND
->  };
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ include/net/bluetooth/hci_core.h |  5 +++++
+ net/bluetooth/hci_conn.c         |  6 +++++-
+ net/bluetooth/hci_core.c         |  2 ++
+ net/bluetooth/hci_event.c        | 13 +++++++++----
+ 4 files changed, 21 insertions(+), 5 deletions(-)
 
-I am actually against this. These states where originally socket states
-and not general states that we just pile on top of.
-
-You need to create separate state handling for LE connection handling. I
-am really not happy that we always try to shoe-horn this onto something
-else.
-
-Regards
-
-Marcel
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index b089968..b371434 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -290,6 +290,11 @@ struct hci_dev {
+ 	__u8			adv_data[HCI_MAX_AD_LENGTH];
+ 	__u8			adv_data_len;
+ 
++	/* This counter tracks the number of LE connections in scanning
++	 * state (BT_SCAN).
++	 */
++	atomic_t		le_conn_scan_cnt;
++
+ 	int (*open)(struct hci_dev *hdev);
+ 	int (*close)(struct hci_dev *hdev);
+ 	int (*flush)(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index ac45725..58fd681 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -262,6 +262,7 @@ static void hci_conn_timeout(struct work_struct *work)
+ {
+ 	struct hci_conn *conn = container_of(work, struct hci_conn,
+ 					     disc_work.work);
++	struct hci_dev *hdev = conn->hdev;
+ 
+ 	BT_DBG("hcon %p state %s", conn, state_to_string(conn->state));
+ 
+@@ -272,7 +273,8 @@ static void hci_conn_timeout(struct work_struct *work)
+ 	case BT_SCAN:
+ 		if (conn->type == LE_LINK) {
+ 			conn->state = BT_CLOSED;
+-			hci_cancel_le_scan(conn->hdev);
++			atomic_dec(&hdev->le_conn_scan_cnt);
++			hci_cancel_le_scan(hdev);
+ 		}
+ 		break;
+ 	case BT_CONNECT:
+@@ -524,6 +526,8 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 		le->dst_type = bdaddr_to_le(dst_type);
+ 		le->state = BT_SCAN;
+ 
++		atomic_inc(&hdev->le_conn_scan_cnt);
++
+ 		hci_le_scan(hdev, LE_SCAN_PASSIVE, 0x60, 0x30, 0);
+ 	}
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 3aa0345..f5c2b01 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1742,6 +1742,8 @@ struct hci_dev *hci_alloc_dev(void)
+ 	hci_init_sysfs(hdev);
+ 	discovery_init(hdev);
+ 
++	atomic_set(&hdev->le_conn_scan_cnt, 0);
++
+ 	return hdev;
+ }
+ EXPORT_SYMBOL(hci_alloc_dev);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 63c5d10..1464e5e 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4016,10 +4016,15 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	while (num_reports--) {
+ 		struct hci_ev_le_advertising_info *ev = ptr;
+ 
+-		hcon = hci_conn_hash_lookup_ba(hdev, LE_LINK, &ev->bdaddr);
+-		if (hcon && hcon->dst_type == ev->bdaddr_type) {
+-			hcon->state = BT_DEV_FOUND;
+-			hci_cancel_le_scan(hdev);
++		if (atomic_read(&hdev->le_conn_scan_cnt) != 0) {
++			hcon = hci_conn_hash_lookup_ba(hdev, LE_LINK,
++						       &ev->bdaddr);
++
++			if (hcon && hcon->dst_type == ev->bdaddr_type) {
++				hcon->state = BT_DEV_FOUND;
++				atomic_dec(&hdev->le_conn_scan_cnt);
++				hci_cancel_le_scan(hdev);
++			}
+ 		}
+ 
+ 		rssi = ev->data[ev->length];
+-- 
+1.8.1.1
 
