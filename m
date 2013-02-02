@@ -1,67 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 4/7] Bluetooth: Add LE scan type macros
-Date: Fri,  1 Feb 2013 21:44:35 -0300
-Message-Id: <1359765878-31409-5-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC 3/7] Bluetooth: Setup LE scan with no timeout
+Date: Fri,  1 Feb 2013 21:44:34 -0300
+Message-Id: <1359765878-31409-4-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1359765878-31409-1-git-send-email-andre.guedes@openbossa.org>
 References: <1359765878-31409-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds macros for active and passive LE scan type values. It
-also removes the LE_SCAN_TYPE macro since it is not used anymore.
+This patch modifies hci_do_le_scan and hci_cancel_le_scan helpers so
+we are able to start and stop LE scan with no timeout. This feature
+will be used by the LE connection routine.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h | 3 +++
- net/bluetooth/mgmt.c             | 5 ++---
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ net/bluetooth/hci_core.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 00923ef..b089968 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -117,6 +117,9 @@ struct oob_data {
- 	u8 randomizer[16];
- };
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 22e77a7..3aa0345 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1618,26 +1618,27 @@ static int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval,
+ 	if (err < 0)
+ 		return err;
  
-+#define LE_SCAN_PASSIVE		0x00
-+#define LE_SCAN_ACTIVE		0x01
+-	queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
+-			   msecs_to_jiffies(timeout));
++	if (timeout > 0)
++		queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
++				   msecs_to_jiffies(timeout));
+ 
+ 	return 0;
+ }
+ 
+ int hci_cancel_le_scan(struct hci_dev *hdev)
+ {
++	struct hci_cp_le_set_scan_enable cp;
 +
- struct le_scan_params {
- 	u8 type;
- 	u16 interval;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 39395c7..43db12e 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -106,7 +106,6 @@ static const u16 mgmt_events[] = {
-  * These LE scan and inquiry parameters were chosen according to LE General
-  * Discovery Procedure specification.
-  */
--#define LE_SCAN_TYPE			0x01
- #define LE_SCAN_WIN			0x12
- #define LE_SCAN_INT			0x12
- #define LE_SCAN_TIMEOUT_LE_ONLY		10240	/* TGAP(gen_disc_scan_min) */
-@@ -2485,7 +2484,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 			goto failed;
- 		}
+ 	BT_DBG("%s", hdev->name);
  
--		err = hci_le_scan(hdev, LE_SCAN_TYPE, LE_SCAN_INT,
-+		err = hci_le_scan(hdev, LE_SCAN_ACTIVE, LE_SCAN_INT,
- 				  LE_SCAN_WIN, LE_SCAN_TIMEOUT_LE_ONLY);
- 		break;
+ 	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
+ 		return -EALREADY;
  
-@@ -2497,7 +2496,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 			goto failed;
- 		}
+-	if (cancel_delayed_work(&hdev->le_scan_disable)) {
+-		struct hci_cp_le_set_scan_enable cp;
++	cancel_delayed_work(&hdev->le_scan_disable);
  
--		err = hci_le_scan(hdev, LE_SCAN_TYPE, LE_SCAN_INT, LE_SCAN_WIN,
-+		err = hci_le_scan(hdev, LE_SCAN_ACTIVE, LE_SCAN_INT, LE_SCAN_WIN,
- 				  LE_SCAN_TIMEOUT_BREDR_LE);
- 		break;
+-		/* Send HCI command to disable LE Scan */
+-		memset(&cp, 0, sizeof(cp));
+-		hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+-	}
++	/* Send HCI command to disable LE Scan */
++	memset(&cp, 0, sizeof(cp));
++	hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
  
+ 	return 0;
+ }
 -- 
 1.8.1.1
 
