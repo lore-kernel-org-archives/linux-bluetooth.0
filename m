@@ -1,39 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <51100E6E.8070804@kamens.us>
-Date: Mon, 04 Feb 2013 14:39:26 -0500
-From: Jonathan Kamens <jik@kamens.us>
-MIME-Version: 1.0
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: HFP/HSP Telephony profile doesn't work with Bluetooth USB dongle
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Subject: [PATCH v3 5/5] Bluetooth: Fallback transparent SCO from T2 to T1
+Date: Mon,  4 Feb 2013 14:56:28 +0100
+Message-Id: <1359986188-24432-5-git-send-email-frederic.dalleau@linux.intel.com>
+In-Reply-To: <1359986188-24432-1-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1359986188-24432-1-git-send-email-frederic.dalleau@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Greetings,
+When initiating a transparent eSCO connection, make use of T2 settings at
+first try. T2 is the recommended settings from HFP 1.6 WideBand Speech. Upon
+connection failure, try T1 settings.
+To know which of T2 or T1 should be used, the connection attempt index is used.
+T2 failure is detected if Synchronous Connection Complete Event fails with
+error 0x0d. This error code has been found experimentally by sending a T2
+request to a T1 only SCO listener. It means "Connection Rejected due to
+Limited resource".
 
-Using Fedora 18 x86_64, I've tested two different USB Bluetooth dongles 
-(cheap generic Cambridge Silicon and more expensive BlueRigger BTD-400) 
-and two different headsets (Motorola SF600, BrainyTrade BH-M20), in all 
-combinations, the A2DP High-Fidelity profile for audio output works, but 
-the HFP/HSP Telephony profile does not.
+Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
+---
+ net/bluetooth/hci_conn.c  |   11 ++++++++++-
+ net/bluetooth/hci_event.c |    1 +
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
-I contacted BlueRigger about this and they tested for themselves on 
-different hardware and got the same result. BlueRigger says the HFP/HSP 
-Telephony profile works fine with Ubuntu, which they say doesn't use Bluez.
-
-I don't know if this problem is new in Fedora 18, because I didn't get 
-the dongles until after I upgraded from Fedora 17.
-
-I've reported this in Red Hat bugzilla 
-<https://bugzilla.redhat.com/show_bug.cgi?id=905283> and emailed the 
-Fedora test list 
-<http://lists.fedoraproject.org/pipermail/test/2013-February/113598.html> about 
-it; there has been no response to either.
-
-Any suggestions or insights into how to resolve this issue would be 
-appreciated.
-
-Regards,
-
-Jonathan Kamens
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 504367e..a3f4e29 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -179,12 +179,21 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle)
+ 	cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
+ 	cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
+ 
+-	if (test_and_clear_bit(HCI_CONN_SCO_TRANSPARENT, &conn->flags)) {
++	if (conn->attempt == 1 &&
++	    test_bit(HCI_CONN_SCO_TRANSPARENT, &conn->flags)) {
+ 		cp.pkt_type       = __constant_cpu_to_le16(EDR_ESCO_MASK &
+ 							   ~ESCO_2EV3);
+ 		cp.max_latency    = __constant_cpu_to_le16(0x000d);
+ 		cp.voice_setting  = __constant_cpu_to_le16(0x0003);
+ 		cp.retrans_effort = 0x02;
++	} else if (conn->attempt == 2 &&
++		   test_bit(HCI_CONN_SCO_TRANSPARENT, &conn->flags)) {
++		cp.pkt_type       = __constant_cpu_to_le16(EDR_ESCO_MASK |
++							   ESCO_EV3);
++		cp.max_latency    = __constant_cpu_to_le16(0x0007);
++		cp.voice_setting  = __constant_cpu_to_le16(0x0003);
++		cp.retrans_effort = 0x02;
++		clear_bit(HCI_CONN_SCO_TRANSPARENT, &conn->flags);
+ 	} else {
+ 		cp.pkt_type       = cpu_to_le16(conn->pkt_type);
+ 		cp.max_latency    = __constant_cpu_to_le16(0xffff);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 3fd0212..6c1aec9 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3330,6 +3330,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
+ 		hci_conn_add_sysfs(conn);
+ 		break;
+ 
++	case 0x0d:	/* No resource available */
+ 	case 0x11:	/* Unsupported Feature or Parameter Value */
+ 	case 0x1c:	/* SCO interval rejected */
+ 	case 0x1a:	/* Unsupported Remote Feature */
+-- 
+1.7.9.5
 
