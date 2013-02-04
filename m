@@ -1,45 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Feb 2013 16:41:12 -0500
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth 2013-02-01
-Message-ID: <20130204214112.GD2123@tuxdriver.com>
-References: <20130201173302.GC4733@joana>
+Message-ID: <51100E6E.8070804@kamens.us>
+Date: Mon, 04 Feb 2013 14:39:26 -0500
+From: Jonathan Kamens <jik@kamens.us>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130201173302.GC4733@joana>
-Sender: linux-kernel-owner@vger.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: HFP/HSP Telephony profile doesn't work with Bluetooth USB dongle
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Feb 01, 2013 at 03:33:02PM -0200, Gustavo Padovan wrote:
-> Hi John,
-> 
-> Two simple fixes for 3.8. One of the patches fixes a situation where the
-> connection wasn't terminated if a timeout ocurrs for LE an SCO connections.
-> The other fixes prevent NULL dereference in the SMP code, it is a security fix
-> as well.
-> 
-> Please pull, or let me know of any problems!
-> 
->         Gustavo
-> 
-> ---
-> The following changes since commit b7e98b5100aad9290d7f06fcb9d1e80f7f62f05f:
-> 
->   Bluetooth: Check if the hci connection exists in SCO shutdown (2013-01-10 03:53:32 -0200)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth for-upstream
-> 
-> for you to fetch changes up to 4c02e2d444595200d0b18b889994aac3611cd288:
-> 
->   Bluetooth: Fix hci_conn timeout routine (2013-01-31 15:38:02 -0200)
+Greetings,
 
-Pulling now...
+Using Fedora 18 x86_64, I've tested two different USB Bluetooth dongles 
+(cheap generic Cambridge Silicon and more expensive BlueRigger BTD-400) 
+and two different headsets (Motorola SF600, BrainyTrade BH-M20), in all 
+combinations, the A2DP High-Fidelity profile for audio output works, but 
+the HFP/HSP Telephony profile does not.
 
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+I contacted BlueRigger about this and they tested for themselves on 
+different hardware and got the same result. BlueRigger says the HFP/HSP 
+Telephony profile works fine with Ubuntu, which they say doesn't use Bluez.
+
+I don't know if this problem is new in Fedora 18, because I didn't get 
+the dongles until after I upgraded from Fedora 17.
+
+I've reported this in Red Hat bugzilla 
+<https://bugzilla.redhat.com/show_bug.cgi?id=905283> and emailed the 
+Fedora test list 
+<http://lists.fedoraproject.org/pipermail/test/2013-February/113598.html> about 
+it; there has been no response to either.
+
+Any suggestions or insights into how to resolve this issue would be 
+appreciated.
+
+Regards,
+
+Jonathan Kamens
+
