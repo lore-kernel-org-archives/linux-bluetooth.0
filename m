@@ -1,93 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] core: Remove unused code from device_browse_sdp()
-Date: Mon,  4 Feb 2013 20:32:36 -0400
-Message-Id: <1360024356-6838-1-git-send-email-anderson.lizardo@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 4 Feb 2013 16:41:12 -0500
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth 2013-02-01
+Message-ID: <20130204214112.GD2123@tuxdriver.com>
+References: <20130201173302.GC4733@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130201173302.GC4733@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The "search" parameter was always NULL, and therefore code depending on
-it being non-NULL will never be reached.
----
- src/device.c |   23 ++++++++---------------
- 1 file changed, 8 insertions(+), 15 deletions(-)
+On Fri, Feb 01, 2013 at 03:33:02PM -0200, Gustavo Padovan wrote:
+> Hi John,
+> 
+> Two simple fixes for 3.8. One of the patches fixes a situation where the
+> connection wasn't terminated if a timeout ocurrs for LE an SCO connections.
+> The other fixes prevent NULL dereference in the SMP code, it is a security fix
+> as well.
+> 
+> Please pull, or let me know of any problems!
+> 
+>         Gustavo
+> 
+> ---
+> The following changes since commit b7e98b5100aad9290d7f06fcb9d1e80f7f62f05f:
+> 
+>   Bluetooth: Check if the hci connection exists in SCO shutdown (2013-01-10 03:53:32 -0200)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth for-upstream
+> 
+> for you to fetch changes up to 4c02e2d444595200d0b18b889994aac3611cd288:
+> 
+>   Bluetooth: Fix hci_conn timeout routine (2013-01-31 15:38:02 -0200)
 
-diff --git a/src/device.c b/src/device.c
-index 49f8957..dbf0744 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -215,7 +215,7 @@ static const uint16_t uuid_list[] = {
- static int device_browse_primary(struct btd_device *device, DBusMessage *msg,
- 							gboolean secure);
- static int device_browse_sdp(struct btd_device *device, DBusMessage *msg,
--					uuid_t *search, gboolean reverse);
-+							gboolean reverse);
- 
- static gboolean store_device_info_cb(gpointer user_data)
- {
-@@ -1143,7 +1143,7 @@ void device_add_eir_uuids(struct btd_device *dev, GSList *uuids)
- static int device_resolve_svc(struct btd_device *dev, DBusMessage *msg)
- {
- 	if (device_is_bredr(dev))
--		return device_browse_sdp(dev, msg, NULL, FALSE);
-+		return device_browse_sdp(dev, msg, FALSE);
- 	else
- 		return device_browse_primary(dev, msg, FALSE);
- }
-@@ -3374,11 +3374,10 @@ done:
- }
- 
- static int device_browse_sdp(struct btd_device *device, DBusMessage *msg,
--					uuid_t *search, gboolean reverse)
-+							gboolean reverse)
- {
- 	struct btd_adapter *adapter = device->adapter;
- 	struct browse_req *req;
--	bt_callback_t cb;
- 	uuid_t uuid;
- 	int err;
- 
-@@ -3387,17 +3386,11 @@ static int device_browse_sdp(struct btd_device *device, DBusMessage *msg,
- 
- 	req = g_new0(struct browse_req, 1);
- 	req->device = btd_device_ref(device);
--	if (search) {
--		memcpy(&uuid, search, sizeof(uuid_t));
--		cb = search_cb;
--	} else {
--		sdp_uuid16_create(&uuid, uuid_list[req->search_uuid++]);
--		init_browse(req, reverse);
--		cb = browse_cb;
--	}
-+	sdp_uuid16_create(&uuid, uuid_list[req->search_uuid++]);
-+	init_browse(req, reverse);
- 
- 	err = bt_search_service(adapter_get_address(adapter), &device->bdaddr,
--							&uuid, cb, req, NULL);
-+						&uuid, browse_cb, req, NULL);
- 	if (err < 0) {
- 		browse_request_free(req);
- 		return err;
-@@ -3554,7 +3547,7 @@ static gboolean start_discovery(gpointer user_data)
- 	struct btd_device *device = user_data;
- 
- 	if (device_is_bredr(device))
--		device_browse_sdp(device, NULL, NULL, TRUE);
-+		device_browse_sdp(device, NULL, TRUE);
- 	else
- 		device_browse_primary(device, NULL, FALSE);
- 
-@@ -3624,7 +3617,7 @@ void device_bonding_complete(struct btd_device *device, uint8_t status)
- 		}
- 
- 		if (device_is_bredr(device))
--			device_browse_sdp(device, bonding->msg, NULL, FALSE);
-+			device_browse_sdp(device, bonding->msg, FALSE);
- 		else
- 			device_browse_primary(device, bonding->msg, FALSE);
- 
+Pulling now...
+
 -- 
-1.7.9.5
-
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
