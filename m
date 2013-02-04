@@ -1,30 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Feb 2013 10:30:30 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] AVRCP: Handler player features as a byte array
-Message-ID: <20130204083030.GA1147@x220>
-References: <1359924910-27167-1-git-send-email-luiz.dentz@gmail.com>
+From: "Zheng, Wu" <wu.zheng@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: rfcomm connection reset by peer 104
+Date: Mon, 4 Feb 2013 03:25:16 +0000
+Message-ID: <2CF57A644018A745B8FE029C7223E16E0FEA25D3@SHSMSX102.ccr.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1359924910-27167-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi all,
 
-On Sun, Feb 03, 2013, Luiz Augusto von Dentz wrote:
-> --- a/profiles/audio/player.c
-> +++ b/profiles/audio/player.c
-> @@ -67,7 +67,7 @@ struct media_player {
->  	char			*name;		/* Player name */
->  	char			*type;		/* Player type */
->  	char			*subtype;	/* Player subtype */
-> -	uint64_t		features[2];	/* Player features */
-> +	uint8_t			*features;	/* Player features */
+I use bluez-4.101 and obexd-0.46 and Linux kernel is 2.6.35 on a device to implement OPP server.
 
-Why not just have this as features[16] here as well so you don't need to
-do g_memdup and g_free?
+Obexd runs well on the device.
 
-Johan
+When I send a file by obex-client to the device, the connection reset by peer 104 error is reported.
+
+Client OPP:
+obex-client[1109]: client/bluetooth.c: transport_connect() port 9
+obex-client[1109]: client/bluetooth.c: transport_callback()
+obex-client[1109]: client/session.c : transport_func()
+obex-client[1109]: Connection reset by peer (104)
+
+Server OPP:
+Obexd: nothing info is printed
+
+Can somebody provide some hints? Thanks
+
+Best Regards
+Zheng Wu
