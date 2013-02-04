@@ -2,45 +2,48 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 1/3] lib: Fix buffer overflow when processing SDP response
-Date: Sun,  3 Feb 2013 21:20:43 -0400
-Message-Id: <1359940845-14451-2-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1359940845-14451-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1359940845-14451-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 0/3] SDP library invalid memory access fixes
+Date: Sun,  3 Feb 2013 21:20:42 -0400
+Message-Id: <1359940845-14451-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-rsp_count is either read or calculated from untrusted input, and
-therefore needs to be checked before being used as offset. The "plen"
-variable is appropriate because it is calculated as the sum of fixed and
-variable length fields, excluding the continuation state field, which
-has at least 1 byte for its own length field.
----
- lib/sdp.c |   11 +++++++++++
- 1 file changed, 11 insertions(+)
+Hi,
 
-diff --git a/lib/sdp.c b/lib/sdp.c
-index b87f392..f3a0c17 100644
---- a/lib/sdp.c
-+++ b/lib/sdp.c
-@@ -4189,6 +4189,17 @@ int sdp_process(sdp_session_t *session)
- 		goto end;
- 	}
- 
-+	/*
-+	 * Out of bound check before using rsp_count as offset for continuation
-+	 * state, which has at least a one byte size field.
-+	 */
-+	if ((n - (int) sizeof(sdp_pdu_hdr_t)) < plen + 1) {
-+		t->err = EPROTO;
-+		SDPERR("Protocol error: invalid PDU size");
-+		status = SDP_INVALID_PDU_SIZE;
-+		goto end;
-+	}
-+
- 	pcstate = (sdp_cstate_t *) (pdata + rsp_count);
- 
- 	SDPDBG("Cstate length : %d\n", pcstate->length);
+This small set of patches fixes a couple of invalid memory reads/writes
+detected by code inspection and confirmed by emulating invalid PDUs.
+
+BTW, I have been silently working for some time on a tool now called "Blueish"
+(variant of "bluish", meaning "somewhat blue"). It is fully written in Python
+and allows to "easily" generate automated standalone test scripts (that also
+only require Python + D-Bus/GLib bindings) for testing scenarios difficult on
+real hardware. It uses VHCI for emulation.
+
+For documentation and code, see: https://github.com/lizardo/blueish
+
+The repository contains example data files for the latest patches I sent a
+while ago (and these ones).
+
+I tried to make it easy to use by adopting YAML for HCI packet construction.
+Still, I'm aware that constructing HCI packets by hand is error prone, so I
+plan (someday) to have a nice GUI and even some sort of visualization for the
+packets (message sequence charts, maybe?).
+
+That said, I'm still interested on helping with improving unit tests for BlueZ
+(specially code not touched for a while). I just could not come up with a nice
+way to integrate SDP client unit tests with the current server ones without too
+much code duplication.
+
+Best Regards,
+
+Anderson Lizardo (3):
+  lib: Fix buffer overflow when processing SDP response
+  lib: Add range check for SDP_SVC_ATTR_RSP/SDP_SVC_SEARCH_ATTR_RSP
+  lib: Check if SDP buffer has enough data on partial responses
+
+ lib/sdp.c |   26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
+
 -- 
 1.7.9.5
 
