@@ -1,153 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v3 2/5] Bluetooth: Add option for SCO socket mode
-Date: Mon,  4 Feb 2013 14:56:25 +0100
-Message-Id: <1359986188-24432-2-git-send-email-frederic.dalleau@linux.intel.com>
-In-Reply-To: <1359986188-24432-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1359986188-24432-1-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Mon, 4 Feb 2013 12:44:54 +0100 (CET)
+From: Thomas Gleixner <tglx@linutronix.de>
+To: Belser Florian <Florian.Belser@sensor-technik.de>
+cc: "'linux-rt-users@vger.kernel.org'" <linux-rt-users@vger.kernel.org>,
+	linux-serial@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: Kernel Oops caused by high uart write loads
+In-Reply-To: <5EC8D4ACC923FE4D871AFFACC976127959E1C3@stwexdb.stww2k.local>
+Message-ID: <alpine.LFD.2.02.1302041152150.11905@ionos>
+References: <5EC8D4ACC923FE4D871AFFACC976127959E18A@stwexdb.stww2k.local> <5EC8D4ACC923FE4D871AFFACC976127959E1A0@stwexdb.stww2k.local> <5EC8D4ACC923FE4D871AFFACC976127959E1C3@stwexdb.stww2k.local>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+Content-Type: MULTIPART/MIXED; BOUNDARY="8323328-2045950771-1359978295=:11905"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch extends the current SCO socket option to add a 'mode' field. This
-field is intended to choose data type at runtime. Current modes are CVSD and
-transparent SCO, but adding new modes could allow support for CSA2 and fine
-tuning a sco connection, for example latency, bandwith, voice setting. Incoming
-connections will be setup during defered setup. Outgoing connections have to
-be setup before connect(). The selected type is stored in the sco socket info.
-This patch declares needed members, modifies getsockopt() and implements
-setsockopt(). Setting the mtu is not supported.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Signed-off-by: Fr√©d√©ric Dalleau <frederic.dalleau@linux.intel.com>
----
- include/net/bluetooth/sco.h |    7 +++++
- net/bluetooth/sco.c         |   59 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 66 insertions(+)
+--8323328-2045950771-1359978295=:11905
+Content-Type: TEXT/PLAIN; charset=iso-8859-1
+Content-Transfer-Encoding: 8BIT
 
-diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
-index 1e35c43..4de67ef 100644
---- a/include/net/bluetooth/sco.h
-+++ b/include/net/bluetooth/sco.h
-@@ -41,8 +41,14 @@ struct sockaddr_sco {
- 
- /* SCO socket options */
- #define SCO_OPTIONS	0x01
-+
-+#define SCO_MODE_CVSD		0x00
-+#define SCO_MODE_TRANSPARENT	0x01
-+#define SCO_MODE_MAX		0x01
-+
- struct sco_options {
- 	__u16 mtu;
-+	__u8 mode;
- };
- 
- #define SCO_CONNINFO	0x02
-@@ -73,6 +79,7 @@ struct sco_conn {
- struct sco_pinfo {
- 	struct bt_sock	bt;
- 	__u32		flags;
-+	__u8		mode;
- 	struct sco_conn	*conn;
- };
- 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 97177be6..7d57af5 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -418,6 +418,8 @@ static struct sock *sco_sock_alloc(struct net *net, struct socket *sock, int pro
- 	sk->sk_protocol = proto;
- 	sk->sk_state    = BT_OPEN;
- 
-+	sco_pi(sk)->mode = SCO_MODE_CVSD;
-+
- 	setup_timer(&sk->sk_timer, sco_sock_timeout, (unsigned long)sk);
- 
- 	bt_sock_link(&sco_sk_list, sk);
-@@ -712,6 +714,59 @@ static int sco_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
- 	return bt_sock_recvmsg(iocb, sock, msg, len, flags);
- }
- 
-+static int sco_sock_setsockopt_old(struct socket *sock, int optname,
-+				   char __user *optval, unsigned int optlen)
-+{
-+	struct sock *sk = sock->sk;
-+	struct sco_options opts;
-+	int len, err = 0;
-+
-+	BT_DBG("sk %p", sk);
-+
-+	lock_sock(sk);
-+
-+	switch (optname) {
-+	case SCO_OPTIONS:
-+		if (sk->sk_state != BT_OPEN &&
-+		    sk->sk_state != BT_BOUND &&
-+		    sk->sk_state != BT_CONNECT2) {
-+			err = -EINVAL;
-+			break;
-+		}
-+
-+		opts.mtu = 0;
-+		opts.mode = SCO_MODE_CVSD;
-+
-+		len = min_t(unsigned int, sizeof(opts), optlen);
-+		if (copy_from_user((char *) &opts, optval, len)) {
-+			err = -EFAULT;
-+			break;
-+		}
-+
-+		if (opts.mtu != 0) {
-+			err = -EINVAL;
-+			break;
-+		}
-+
-+		BT_DBG("mode %d", opts.mode);
-+
-+		if (opts.mode > SCO_MODE_MAX) {
-+			err = -EINVAL;
-+			break;
-+		}
-+
-+		sco_pi(sk)->mode = opts.mode;
-+		break;
-+
-+	default:
-+		err = -ENOPROTOOPT;
-+		break;
-+	}
-+
-+	release_sock(sk);
-+	return err;
-+}
-+
- static int sco_sock_setsockopt(struct socket *sock, int level, int optname, char __user *optval, unsigned int optlen)
- {
- 	struct sock *sk = sock->sk;
-@@ -720,6 +775,9 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname, char
- 
- 	BT_DBG("sk %p", sk);
- 
-+	if (level == SOL_SCO)
-+		return sco_sock_setsockopt_old(sock, optname, optval, optlen);
-+
- 	lock_sock(sk);
- 
- 	switch (optname) {
-@@ -772,6 +830,7 @@ static int sco_sock_getsockopt_old(struct socket *sock, int optname, char __user
- 		}
- 
- 		opts.mtu = sco_pi(sk)->conn->mtu;
-+		opts.mode = sco_pi(sk)->mode;
- 
- 		BT_DBG("mtu %d", opts.mtu);
- 
--- 
-1.7.9.5
+On Wed, 30 Jan 2013, Belser Florian wrote:
 
+> I'm running 3.4.17-rt28 on my mpc5200 based system. †The complete
+> system works pretty good until I select the "Fully Preemptible
+> Kernel" option in the kernel settings.  In that case, if I generate
+> a high uart write load (sending a lot of stuff via Bluetooth) I get
+> the following kernel Oops:
+
+> # ------------[ cut here ]------------
+> Kernel BUG at c03d1728 [verbose debug info unavailable]
+
+I bet this is: BUG_ON(rt_mutex_owner(lock) == self);
+
+> Oops: Exception in kernel mode, sig: 5 [#1]
+> PREEMPT mpc5200-simple-platform
+> Modules linked in:
+> NIP: c03d1728 LR: c03d170c CTR: c01efc78
+> REGS: c716fd30 TRAP: 0700†† Not tainted† (3.4.17-rt28/STW-V3.00r0+)
+> MSR: 00029032 <EE,ME,IR,DR,RI>† CR: 88002022† XER: 00000000
+> TASK = c7125880[633] 'irq/129-mpc52xx' THREAD: c716e000
+> GPR00: 00000001 c716fde0 c7125880 00000000 c7125880 00000000 00000001 00000000
+> GPR08: c7125880 c7125880 c7125880 c7125881 88002022 fbfdffff 07fff000 00000004
+> GPR16: 00000024 00000000 000000c0 00000000 c0537e70 00000004 00000000 00000004
+> GPR24: c716ad5c c0537e8c c7a73000 00000000 c7bb2a00 c7125880 c78b9800 c0537e8c
+> NIP [c03d1728] rt_spin_lock_slowlock+0x78/0x1e0
+> LR [c03d170c] rt_spin_lock_slowlock+0x5c/0x1e0
+> Call Trace:
+> [c716fde0] [c03d170c] rt_spin_lock_slowlock+0x5c/0x1e0 (unreliable)
+> [c716fe40] [c01efcd4] uart_write+0x5c/0x114
+> [c716fe70] [c028f3f4] hci_uart_tx_wakeup+0xe0/0x1fc
+> [c716fea0] [c01d3398] tty_wakeup+0x78/0xac
+> [c716feb0] [c01ee9e0] uart_write_wakeup+0x24/0x34
+> [c716fec0] [c01f1c38] mpc52xx_psc_handle_irq+0x3f8/0x4b0
+> [c716ff20] [c01f13e4] mpc52xx_uart_int+0x38/0x60
+> [c716ff30] [c005f660] irq_forced_thread_fn+0x38/0x9c
+> [c716ff50] [c005f42c] irq_thread+0x13c/0x1c0
+> [c716ff90] [c00391d4] kthread+0x8c/0x90
+> [c716fff0] [c000dd4c] kernel_thread+0x4c/0x68
+> Instruction dump:
+> 7fe3fb78 7fa4eb78 38a00000 38c00001 4bc86591 2f830000 409e0134 801f0018
+> 5400003c 7fa00278 7c000034 5400d97e <0f000000> 3bdd0418 3b810008 7fc3f378
+
+> If I switch the preemption modelt o "Preemptible Kernel (Basic RT)"
+> everything works fine.
+
+By some definition of works. It works w/o RT_FULL because locks are
+NOPs on uniprocessor, except you enable lock debugging.
+
+This is a classic recursive dead lock. If you enable
+CONFIG_PROVE_LOCKING, then you should see the same issue even on a
+completely unpatched mainline kernel.
+
+> Hope someone already had the same or similar problem and can help me solving it.
+> Maybe a update to 3.4.27-rt39 helps?
+
+No, wont help.
+
+The problem is:
+
+mpc52xx_uart_int()
+
+  lock(port->lock);
+
+    mpc52xx_psc_handle_irq()
+
+      mpc52xx_uart_int_tx_chars()
+
+        uart_write_wakeup()
+
+          tty_wakeup()
+
+            hci_uart_tx_wakeup()
+
+              len = tty->ops->write(tty, skb->data, skb->len);
+
+	      The associated write function is uart_write
+
+	      uart_write()
+
+		lock(port->lock)  --> deadlock
+
+I have no idea how that bluetooth "uart" gets connected to the
+physical uart, but the backtrace is pretty obvious. What are you doing
+to reproduce this?
+
+Thanks,
+
+	tglx
+--8323328-2045950771-1359978295=:11905--
