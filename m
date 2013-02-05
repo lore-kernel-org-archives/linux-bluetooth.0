@@ -1,95 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1360098712.27302.3.camel@dellpc>
-Subject: RFC [PATCH] hci: Fix race between hidp_session and hci code
-From: Karl Relton <karllinuxtest.relton@ntlworld.com>
+From: Szymon Janc <szymon@janc.net.pl>
 To: linux-bluetooth@vger.kernel.org
-Date: Tue, 05 Feb 2013 21:11:52 +0000
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Cc: Szymon Janc <szymon@janc.net.pl>
+Subject: [PATCH 2/2] adapter: Set default adapter id sooner
+Date: Tue,  5 Feb 2013 22:10:56 +0100
+Message-Id: <1360098656-12488-2-git-send-email-szymon@janc.net.pl>
+In-Reply-To: <1360098656-12488-1-git-send-email-szymon@janc.net.pl>
+References: <1360098656-12488-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Karl Relton <karllinuxtest.relton@ntlworld.com>
+When first adapter is registered set it as default before probing
+drivers or profiles as those might depend on that e.g. hostname.
 
-Fix race between hidp_session and hci code that can lead to
- hci device being removed from sysfs before its children
- devices. The removal is now delayed until the last
- reference to it in the hci code is removed.
-
-Signed-off-by: Karl Relton <karllinuxtest.relton@ntlworld.com>
+This fix hostname plugin setting default adapter name to 'foo #1'
+instead of 'foo' if pretty hostname was received before probing
+adapter drivers.
 ---
- include/net/bluetooth/hci_core.h |   10 +++-------
- net/bluetooth/hci_core.c         |   15 +++++++++++++--
- 2 files changed, 16 insertions(+), 9 deletions(-)
+ src/adapter.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 90cf75a..47c9d30 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -198,6 +198,7 @@ struct hci_dev {
+diff --git a/src/adapter.c b/src/adapter.c
+index 9ddd2fc..276d897 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -5492,6 +5492,9 @@ static int adapter_register(struct btd_adapter *adapter)
  
- 	unsigned long	quirks;
+ 	btd_adapter_gatt_server_start(adapter);
  
-+	atomic_t	ref_cnt;
- 	atomic_t	cmd_cnt;
- 	unsigned int	acl_cnt;
- 	unsigned int	sco_cnt;
-@@ -646,19 +647,14 @@ static inline void hci_conn_put(struct hci_conn *conn)
- }
++	if (default_adapter_id < 0)
++		default_adapter_id = adapter->dev_id;
++
+ 	load_config(adapter);
+ 	fix_storage(adapter);
+ 	load_drivers(adapter);
+@@ -5506,9 +5509,6 @@ static int adapter_register(struct btd_adapter *adapter)
  
- /* ----- HCI Devices ----- */
--static inline void hci_dev_put(struct hci_dev *d)
--{
--	BT_DBG("%s orig refcnt %d", d->name,
--	       atomic_read(&d->dev.kobj.kref.refcount));
+ 	adapter->initialized = TRUE;
+ 
+-	if (default_adapter_id < 0)
+-		default_adapter_id = adapter->dev_id;
 -
--	put_device(&d->dev);
--}
-+void hci_dev_put(struct hci_dev *d);
- 
- static inline struct hci_dev *hci_dev_hold(struct hci_dev *d)
- {
- 	BT_DBG("%s orig refcnt %d", d->name,
- 	       atomic_read(&d->dev.kobj.kref.refcount));
- 
-+	atomic_inc(&d->ref_cnt);
- 	get_device(&d->dev);
- 	return d;
- }
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 618ca1a..c187a84 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -891,6 +891,19 @@ int hci_dev_close(__u16 dev)
- 	return err;
- }
- 
-+void hci_dev_put(struct hci_dev *d)
-+{
-+	BT_DBG("%s orig refcnt %d", d->name,
-+	       atomic_read(&d->dev.kobj.kref.refcount));
-+
-+	if(atomic_dec_and_test(&d->ref_cnt)) {
-+		hci_del_sysfs(d);
-+	}
-+	put_device(&d->dev);
-+}
-+EXPORT_SYMBOL(hci_dev_put);
-+
-+
- int hci_dev_reset(__u16 dev)
- {
- 	struct hci_dev *hdev;
-@@ -1884,8 +1897,6 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 		rfkill_destroy(hdev->rfkill);
- 	}
- 
--	hci_del_sysfs(hdev);
--
- 	destroy_workqueue(hdev->workqueue);
- 	destroy_workqueue(hdev->req_workqueue);
- 
+ 	if (main_opts.did_source)
+ 		set_did(adapter, main_opts.did_vendor, main_opts.did_product,
+ 				main_opts.did_version, main_opts.did_source);
 -- 
-1.7.9.5
-
+1.8.1.2
 
