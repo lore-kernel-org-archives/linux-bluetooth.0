@@ -1,61 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Randy Yates <yates@digitalsignallabs.com>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: cross-compilation setup
-Date: Tue, 05 Feb 2013 13:03:26 -0500
-Message-ID: <87vca6hc41.fsf@randy.site>
-MIME-Version: 1.0
-Content-Type: text/plain
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [PATCH v0] core: Fix racy D-Bus service name request
+Date: Tue,  5 Feb 2013 16:00:55 +0100
+Message-Id: <1360076455-32716-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-I'm trying to ./configure, make, and make install bluez 5.2 into my
-embedded linux project. I have a few questions on where things are
-placed, which I would think are specified in the configure stage. Here
-is my skeleton configure.mak with the specific questions.
+The ObjectManager interface should already be ready by the time the
+D-Bus service name is owned. Hence, use g_dbus_request_name() explicitly
+once g_dbus_attach_object_manager() has finished.
 
-So, apart from --sysconfdir, I don't see the options in README to
-specify what I need. Can someone please help?
+Without this patch, clients relying on the presence of the ObjectManager
+could potentially face a race condition.
+---
+ src/main.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
---Randy
-
-# Author: Randy Yates
-# Function: Bluez ./configure makefile
-#
-# this is my bluez configuration makefile. i wanted to have the
-# configuration options recorded somewhere, and a makefile seemed to be
-# a good choice. make -f configure.mak
-#
-# requires the following variables
-# 
-#   TARGET_ROOTFS
-#   DEVELOPMENT_ROOTFS
-
-# 1. what output does "make" generate? what executables, shared libraries, etc?
-#
-# 2. how do you specify the cross-compiler to use in make?
-# 
-# 3. what does "make install" install?
-# 
-#   a. the output in 1? to where? (needs to go into $(TARGET_ROOTFS)/usr/bin)
-# 
-#   b. the .h and other developer files? to where? (needs to go into $(DEVELOPMENT_ROOTFS)/inc, $(DEVELOPMENT_ROOTFS)/lib, etc. 
-# 
-#   c. documentation (manpages, etc.)? to where? (needs to go to /dev/null)
-# 
-#   d. what else and to where?
-# 
-
--include Rules.make
-
-.PHONY += configure
-configure :
-	./configure --prefix=/usr --sysconfdir=$(TARGET_ROOTFS)/rootfs-partial/etc --localstatedir=/var --disable-cups 
-
-
+diff --git a/src/main.c b/src/main.c
+index 1e40ebc..12ae3d9 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -424,7 +424,7 @@ static int connect_dbus(void)
+ 
+ 	dbus_error_init(&err);
+ 
+-	conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, BLUEZ_NAME, &err);
++	conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, &err);
+ 	if (!conn) {
+ 		if (dbus_error_is_set(&err)) {
+ 			g_printerr("D-Bus setup failed: %s\n", err.message);
+@@ -439,6 +439,12 @@ static int connect_dbus(void)
+ 	g_dbus_set_disconnect_function(conn, disconnected_dbus, NULL, NULL);
+ 	g_dbus_attach_object_manager(conn);
+ 
++	if (!g_dbus_request_name(conn, BLUEZ_NAME, &err)) {
++		g_printerr("D-Bus service name request failed: %s\n",
++								err.message);
++		return -EIO;
++	}
++
+ 	return 0;
+ }
+ 
 -- 
-Randy Yates
-Digital Signal Labs
-http://www.digitalsignallabs.com
+1.8.1
+
