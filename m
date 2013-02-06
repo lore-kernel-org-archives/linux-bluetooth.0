@@ -1,33 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1360136648.15783.3.camel@aeonflux>
-Subject: Re: [PATCH 1/2] hostname: Fallback to static hostname if pretty
- hostname is not set
+Message-ID: <1360136399.15783.1.camel@aeonflux>
+Subject: Re: [PATCH v0] core: Fix racy D-Bus service name request
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Szymon Janc <szymon@janc.net.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 06 Feb 2013 09:44:08 +0200
-In-Reply-To: <1360098656-12488-1-git-send-email-szymon@janc.net.pl>
-References: <1360098656-12488-1-git-send-email-szymon@janc.net.pl>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Date: Wed, 06 Feb 2013 09:39:59 +0200
+In-Reply-To: <1360076455-32716-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1360076455-32716-1-git-send-email-mikel.astiz.oss@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Mikel,
 
-> If pretty hostname is not set fallback to static hostname (if it is
-> set). If static or pretty hostname is not set appropriate properties
-> are empty strings not NULLs. This behaviour is recomended by hostnamed.
+> The ObjectManager interface should already be ready by the time the
+> D-Bus service name is owned. Hence, use g_dbus_request_name() explicitly
+> once g_dbus_attach_object_manager() has finished.
 > 
-> Also fix setting adapter name to empty string if pretty hostname was
-> not set.
+> Without this patch, clients relying on the presence of the ObjectManager
+> could potentially face a race condition.
 
-please do not squeeze to patches into one.
+I almost expected that someone sooner or later will run into this issue.
 
-I am also not convinced that we should bother with the static hostname
-at all. I left this out on purpose. My thinking here was that if we do
-not have a pretty hostname, then why bother with trying to make
-something useful out of the hostname, it would be ugly or wrong anyway.
+> ---
+>  src/main.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/src/main.c b/src/main.c
+> index 1e40ebc..12ae3d9 100644
+> --- a/src/main.c
+> +++ b/src/main.c
+> @@ -424,7 +424,7 @@ static int connect_dbus(void)
+>  
+>  	dbus_error_init(&err);
+>  
+> -	conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, BLUEZ_NAME, &err);
+> +	conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, &err);
+>  	if (!conn) {
+>  		if (dbus_error_is_set(&err)) {
+>  			g_printerr("D-Bus setup failed: %s\n", err.message);
+> @@ -439,6 +439,12 @@ static int connect_dbus(void)
+>  	g_dbus_set_disconnect_function(conn, disconnected_dbus, NULL, NULL);
+>  	g_dbus_attach_object_manager(conn);
+>  
+> +	if (!g_dbus_request_name(conn, BLUEZ_NAME, &err)) {
+> +		g_printerr("D-Bus service name request failed: %s\n",
+> +								err.message);
+> +		return -EIO;
+> +	}
+> +
+
+The only thing that I do not really like here is that the request name
+is actually a blocking call. If we are trying to fix this, then we might
+actually really do this async.
 
 Regards
 
