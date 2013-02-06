@@ -2,45 +2,37 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon@janc.net.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon@janc.net.pl>
-Subject: [PATCH v2 2/5] adapter: Mark adapter as default before probing drivers
-Date: Wed,  6 Feb 2013 22:40:35 +0100
-Message-Id: <1360186838-16904-2-git-send-email-szymon@janc.net.pl>
+Subject: [PATCH v2 4/5] hostname: Fix setting adapter name to empty string
+Date: Wed,  6 Feb 2013 22:40:37 +0100
+Message-Id: <1360186838-16904-4-git-send-email-szymon@janc.net.pl>
 In-Reply-To: <1360186838-16904-1-git-send-email-szymon@janc.net.pl>
 References: <1360186838-16904-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Drivers may depends on adapter being default or not. This fix hostname
-plugin setting default adapter name to 'foo #1' instead of 'foo' if
-pretty hostname was received before probing adapter drivers.
+If pretty hostname is not set empty string is received. Don't update
+adapters' names is such case.
 ---
- src/adapter.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ plugins/hostname.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 3774c77..3f51fd4 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -5474,6 +5474,9 @@ static int adapter_register(struct btd_adapter *adapter)
- 		return -EINVAL;
- 	}
+diff --git a/plugins/hostname.c b/plugins/hostname.c
+index 0b75fac..74c25df 100644
+--- a/plugins/hostname.c
++++ b/plugins/hostname.c
+@@ -117,6 +117,12 @@ static void property_changed(GDBusProxy *proxy, const char *name,
  
-+	if (adapters == NULL)
-+		adapter->is_default = true;
+ 			DBG("pretty hostname: %s", str);
+ 
++			if (g_str_equal(str, "") == TRUE) {
++				g_free(pretty_hostname);
++				pretty_hostname = NULL;
++				return;
++			}
 +
- 	adapters = g_slist_append(adapters, adapter);
+ 			g_free(pretty_hostname);
+ 			pretty_hostname = g_strdup(str);
  
- 	agent = agent_get(NULL);
-@@ -5501,9 +5504,6 @@ static int adapter_register(struct btd_adapter *adapter)
- 
- 	adapter->initialized = TRUE;
- 
--	if (g_slist_length(adapters) == 1)
--		adapter->is_default = true;
--
- 	if (main_opts.did_source)
- 		set_did(adapter, main_opts.did_vendor, main_opts.did_product,
- 				main_opts.did_version, main_opts.did_source);
 -- 
 1.8.1.2
 
