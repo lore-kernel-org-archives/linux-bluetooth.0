@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1360137464.15783.7.camel@aeonflux>
-Subject: Re: [PATCH 2/2] adapter: Set default adapter id sooner
+Message-ID: <1360136648.15783.3.camel@aeonflux>
+Subject: Re: [PATCH 1/2] hostname: Fallback to static hostname if pretty
+ hostname is not set
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Szymon Janc <szymon@janc.net.pl>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 06 Feb 2013 09:57:44 +0200
-In-Reply-To: <1360098656-12488-2-git-send-email-szymon@janc.net.pl>
+Date: Wed, 06 Feb 2013 09:44:08 +0200
+In-Reply-To: <1360098656-12488-1-git-send-email-szymon@janc.net.pl>
 References: <1360098656-12488-1-git-send-email-szymon@janc.net.pl>
-	 <1360098656-12488-2-git-send-email-szymon@janc.net.pl>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,18 +15,19 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Szymon,
 
-> When first adapter is registered set it as default before probing
-> drivers or profiles as those might depend on that e.g. hostname.
+> If pretty hostname is not set fallback to static hostname (if it is
+> set). If static or pretty hostname is not set appropriate properties
+> are empty strings not NULLs. This behaviour is recomended by hostnamed.
 > 
-> This fix hostname plugin setting default adapter name to 'foo #1'
-> instead of 'foo' if pretty hostname was received before probing
-> adapter drivers.
+> Also fix setting adapter name to empty string if pretty hostname was
+> not set.
 
-you find an issue that I meant to fix, but never got around so far. So I
-do not like the magic default_adapter_id global variable.
+please do not squeeze to patches into one.
 
-I would prefer if we add a is_default or similar variable to btd_adapter
-and make it change if one adapter goes away.
+I am also not convinced that we should bother with the static hostname
+at all. I left this out on purpose. My thinking here was that if we do
+not have a pretty hostname, then why bother with trying to make
+something useful out of the hostname, it would be ugly or wrong anyway.
 
 Regards
 
