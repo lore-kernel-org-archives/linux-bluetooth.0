@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 3/8] obexd: Read MAP client SDP attributes
-Date: Wed,  6 Feb 2013 15:45:17 +0100
-Message-Id: <1360161922-6585-4-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [RFC 1/8] obexd: Add get_service_record to obc_transport
+Date: Wed,  6 Feb 2013 15:45:15 +0100
+Message-Id: <1360161922-6585-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
 In-Reply-To: <1360161922-6585-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 References: <1360161922-6585-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,108 +11,57 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-Parse SDP attributes mas_instance_id and supported_message_types from
-the transport's service attributes as soon as a connection is
-established.
+This adds a get_service_record function pointer to obc_transport,
+which allows transports to provide the session specific service record.
+This record can be queried using obc_session_get_service_record.
 ---
- lib/sdp.h          |  2 ++
- obexd/client/map.c | 35 +++++++++++++++++++++++++++++++++--
- 2 files changed, 35 insertions(+), 2 deletions(-)
+ obexd/client/session.c   | 6 ++++++
+ obexd/client/session.h   | 2 ++
+ obexd/client/transport.h | 1 +
+ 3 files changed, 9 insertions(+)
 
-diff --git a/lib/sdp.h b/lib/sdp.h
-index a81e857..c3a0261 100644
---- a/lib/sdp.h
-+++ b/lib/sdp.h
-@@ -294,6 +294,8 @@ extern "C" {
- #define SDP_ATTR_SUPPORTED_FUNCTIONS		0x0312
- #define SDP_ATTR_TOTAL_IMAGING_DATA_CAPACITY	0x0313
- #define SDP_ATTR_SUPPORTED_REPOSITORIES		0x0314
-+#define SDP_ATTR_MAS_INSTANCE_ID		0x0315
-+#define SDP_ATTR_SUPPORTED_MESSAGE_TYPES	0x0316
- 
- #define SDP_ATTR_SPECIFICATION_ID		0x0200
- #define SDP_ATTR_VENDOR_ID			0x0201
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index ea5681a..463d905 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -39,6 +39,8 @@
- #include "transfer.h"
- #include "session.h"
- #include "driver.h"
-+#include "sdp.h"
-+#include "sdp_lib.h"
- 
- #define OBEX_MAS_UUID \
- 	"\xBB\x58\x2B\x40\x42\x0C\x11\xDB\xB0\xDE\x08\x00\x20\x0C\x9A\x66"
-@@ -93,6 +95,8 @@ struct map_data {
- 	struct obc_session *session;
- 	DBusMessage *msg;
- 	GHashTable *messages;
-+	int16_t mas_instance_id;
-+	uint8_t supported_message_types;
- };
- 
- #define MAP_MSG_FLAG_PRIORITY	0x01
-@@ -1538,6 +1542,30 @@ static void map_free(void *data)
- 	g_free(map);
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index db37a86..32f58c3 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -827,6 +827,12 @@ fail:
+ 	return NULL;
  }
  
-+static void parse_service_record(struct map_data *map)
++const void *obc_session_get_service_record(struct obc_session *session)
 +{
-+	sdp_data_t *data;
-+	const sdp_record_t *rec = obc_session_get_service_record(map->session);
-+
-+	if (!rec)
-+		return;
-+
-+	/* MAS instance id */
-+	map->mas_instance_id = -1;
-+	data = sdp_data_get(rec, SDP_ATTR_MAS_INSTANCE_ID);
-+	if (data != NULL)
-+		map->mas_instance_id = data->val.uint8;
-+	else
-+		DBG("Failed to read MAS instance id");
-+
-+	/* Supported Message Types */
-+	data = sdp_data_get(rec, SDP_ATTR_SUPPORTED_MESSAGE_TYPES);
-+	if (data != NULL)
-+		map->supported_message_types = data->val.uint8;
-+	else
-+		DBG("Failed to read supported message types");
++	if (session->id > 0 && session->transport != NULL)
++		return session->transport->get_service_record(session->id);
 +}
 +
- static int map_probe(struct obc_session *session)
+ const char *obc_session_get_owner(struct obc_session *session)
  {
- 	struct map_data *map;
-@@ -1545,8 +1573,6 @@ static int map_probe(struct obc_session *session)
+ 	if (session == NULL)
+diff --git a/obexd/client/session.h b/obexd/client/session.h
+index 402c042..8a3d629 100644
+--- a/obexd/client/session.h
++++ b/obexd/client/session.h
+@@ -54,6 +54,8 @@ const char *obc_session_get_target(struct obc_session *session);
+ const char *obc_session_register(struct obc_session *session,
+ 						GDBusDestroyFunction destroy);
  
- 	path = obc_session_get_path(session);
- 
--	DBG("%s", path);
--
- 	map = g_try_new0(struct map_data, 1);
- 	if (!map)
- 		return -ENOMEM;
-@@ -1555,6 +1581,10 @@ static int map_probe(struct obc_session *session)
- 	map->messages = g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
- 								map_msg_remove);
- 
-+	parse_service_record(map);
++const void *obc_session_get_service_record(struct obc_session *session);
 +
-+	DBG("%s, instance id %d", path, map->mas_instance_id);
-+
- 	if (!g_dbus_register_interface(conn, path, MAP_INTERFACE, map_methods,
- 					NULL, NULL, map, map_free)) {
- 		map_free(map);
-@@ -1579,6 +1609,7 @@ static struct obc_driver map = {
- 	.uuid = MAS_UUID,
- 	.target = OBEX_MAS_UUID,
- 	.target_len = OBEX_MAS_UUID_LEN,
-+	.force_service_lookup = TRUE,
- 	.probe = map_probe,
- 	.remove = map_remove
+ guint obc_session_queue(struct obc_session *session,
+ 				struct obc_transfer *transfer,
+ 				session_callback_t func, void *user_data,
+diff --git a/obexd/client/transport.h b/obexd/client/transport.h
+index 5140840..eb29bf3 100644
+--- a/obexd/client/transport.h
++++ b/obexd/client/transport.h
+@@ -31,6 +31,7 @@ struct obc_transport {
+ 				obc_transport_func func, void *user_data);
+ 	int (*getpacketopt) (GIOChannel *io, int *tx_mtu, int *rx_mtu);
+ 	void (*disconnect) (guint id);
++	const void *(*get_service_record)(guint id);
  };
+ 
+ int obc_transport_register(struct obc_transport *transport);
 -- 
 1.8.1.2
 
