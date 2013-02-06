@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 7/8] obexd: Register MAP notification handler
-Date: Wed,  6 Feb 2013 15:45:21 +0100
-Message-Id: <1360161922-6585-8-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [RFC 6/8] obexd: Add MAP notification dispatcher
+Date: Wed,  6 Feb 2013 15:45:20 +0100
+Message-Id: <1360161922-6585-7-git-send-email-christian.fetzer@oss.bmw-carit.de>
 In-Reply-To: <1360161922-6585-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 References: <1360161922-6585-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,77 +11,177 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
----
- obexd/client/map.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+The MAP specification allows to reuse one MNS instance for all local
+MAS client instances. This dispatching of event reports to the
+correct MAS client instance is done by the instance id.
 
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index 776f19c..682f97a 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -41,6 +41,7 @@
- #include "driver.h"
- #include "sdp.h"
- #include "sdp_lib.h"
+The dispatcher component allows MAP client instances to
+register a notification handler (map_aquire_mns).
+Events reports are then forwarded by the notification server
+using (mns_dispatch_notification).
+---
+ Makefile.obexd                |  1 +
+ obexd/client/map-dispatcher.c | 86 +++++++++++++++++++++++++++++++++++++++++++
+ obexd/client/map-dispatcher.h | 45 ++++++++++++++++++++++
+ 3 files changed, 132 insertions(+)
+ create mode 100644 obexd/client/map-dispatcher.c
+ create mode 100644 obexd/client/map-dispatcher.h
+
+diff --git a/Makefile.obexd b/Makefile.obexd
+index 5824e0a..02901a3 100644
+--- a/Makefile.obexd
++++ b/Makefile.obexd
+@@ -73,6 +73,7 @@ obexd_src_obexd_SOURCES = $(gdbus_sources) $(btio_sources) $(gobex_sources) \
+ 			obexd/client/ftp.h obexd/client/ftp.c \
+ 			obexd/client/opp.h obexd/client/opp.c \
+ 			obexd/client/map.h obexd/client/map.c \
++			obexd/client/map-dispatcher.h obexd/client/map-dispatcher.c \
+ 			obexd/client/transfer.h obexd/client/transfer.c \
+ 			obexd/client/transport.h obexd/client/transport.c \
+ 			obexd/client/dbus.h obexd/client/dbus.c \
+diff --git a/obexd/client/map-dispatcher.c b/obexd/client/map-dispatcher.c
+new file mode 100644
+index 0000000..ed6e5bb
+--- /dev/null
++++ b/obexd/client/map-dispatcher.c
+@@ -0,0 +1,86 @@
++/*
++ *
++ *  OBEX
++ *
++ *  Copyright (C) 2013  BMW Car IT GmbH. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <glib.h>
++
++#include "log.h"
 +#include "map-dispatcher.h"
- 
- #define OBEX_MAS_UUID \
- 	"\xBB\x58\x2B\x40\x42\x0C\x11\xDB\xB0\xDE\x08\x00\x20\x0C\x9A\x66"
-@@ -97,6 +98,7 @@ struct map_data {
- 	GHashTable *messages;
- 	int16_t mas_instance_id;
- 	uint8_t supported_message_types;
-+	gboolean mns_acquired;
- };
- 
- #define MAP_MSG_FLAG_PRIORITY	0x01
-@@ -1555,6 +1557,13 @@ fail:
- 	return reply;
- }
- 
-+static void map_handle_notification(struct map_event *event)
++
++static GSList *mappings = NULL;
++
++struct mns_mapping {
++	int mas_instance_id;
++	map_handle_notification_func handler;
++};
++
++gboolean map_acquire_mns(int mas_instance_id,
++					map_handle_notification_func handler)
 +{
-+	DBG("event: type=%x, handle=%s, folder=%s, old_folder=%s, msg_type=%s",
-+				event->type, event->handle, event->folder,
-+					event->old_folder, event->msg_type);
++	struct mns_mapping *mapping;
++
++	mapping = g_try_new0(struct mns_mapping, 1);
++	if (mapping == NULL)
++		return FALSE;
++
++	mapping->mas_instance_id = mas_instance_id;
++	mapping->handler = handler;
++
++	mappings = g_slist_append(mappings, mapping);
++	DBG("Added MAP MNS mapping for instance %d", mas_instance_id);
++
++	return TRUE;
 +}
 +
- static DBusMessage *map_register_notifications(DBusConnection *connection,
- 					DBusMessage *message, void *user_data)
- {
-@@ -1573,9 +1582,22 @@ static DBusMessage *map_register_notifications(DBusConnection *connection,
- 					ERROR_INTERFACE ".InvalidArguments",
- 					NULL);
- 
-+	if (map->mns_acquired == status)
-+		return g_dbus_create_error(message,
-+					ERROR_INTERFACE ".InvalidArguments",
-+					NULL);
++static struct mns_mapping *find_mapping(int mas_instance_id)
++{
++	GSList *list;
 +
- 	apparam = g_obex_apparam_set_uint8(NULL, MAP_AP_NOTIFICATIONSTATUS,
- 							status ? 0x01 : 0x00);
- 
-+	if (status) {
-+		map->mns_acquired = TRUE;
-+		map_acquire_mns(map->mas_instance_id, &map_handle_notification);
-+	} else {
-+		map->mns_acquired = FALSE;
-+		map_release_mns(map->mas_instance_id);
++	for (list = mappings; list; list = list->next) {
++		struct mns_mapping *mapping = list->data;
++		if (mapping->mas_instance_id == mas_instance_id)
++			return mapping;
 +	}
 +
- 	return set_notification_registration(map, message, apparam);
- }
- 
-@@ -1621,6 +1643,9 @@ static void map_free(void *data)
- {
- 	struct map_data *map = data;
- 
-+	if (map->mns_acquired)
-+		map_release_mns(map->mas_instance_id);
++	DBG("Cannot find MAP MNS mapping for instance %d", mas_instance_id);
++	return NULL;
++}
 +
- 	obc_session_unref(map->session);
- 	g_hash_table_unref(map->messages);
- 	g_free(map);
++void map_release_mns(int mas_instance_id)
++{
++	struct mns_mapping *mapping = find_mapping(mas_instance_id);
++	if (mapping) {
++		mappings = g_slist_remove(mappings, mapping);
++		DBG("Removed MAP MNS mapping for instance %d", mas_instance_id);
++	}
++}
++
++void mns_dispatch_notification(int mas_instance_id, struct map_event *event)
++{
++	struct mns_mapping *mapping = find_mapping(mas_instance_id);
++	if (mapping)
++		mapping->handler(event);
++}
+diff --git a/obexd/client/map-dispatcher.h b/obexd/client/map-dispatcher.h
+new file mode 100644
+index 0000000..8f65137
+--- /dev/null
++++ b/obexd/client/map-dispatcher.h
+@@ -0,0 +1,45 @@
++/*
++ *
++ *  OBEX
++ *
++ *  Copyright (C) 2013  BMW Car IT GmbH. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#include "map-event.h"
++
++/* Handle notification in map client.
++ *
++ * event: Event report.
++ *
++ * Callback shall be called for every received event.
++ */
++typedef void (*map_handle_notification_func)(struct map_event *event);
++
++/* Registers client notification handler callback for events that are
++ * addressed to the given mas instance id.
++ */
++gboolean map_acquire_mns(int mas_instance_id, map_handle_notification_func);
++
++/* Unregisters client notification handler callback.
++ */
++void map_release_mns(int mas_instance_id);
++
++/* Dispatch notification to a registered notification handler callback.
++ */
++void mns_dispatch_notification(int mas_instance_id, struct map_event *event);
 -- 
 1.8.1.2
 
