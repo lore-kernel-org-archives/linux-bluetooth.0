@@ -1,95 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon@janc.net.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon@janc.net.pl>
-Subject: [PATCH v2 1/5] adapter: Add is_default field to struct btd_adapter
-Date: Wed,  6 Feb 2013 22:40:34 +0100
-Message-Id: <1360186838-16904-1-git-send-email-szymon@janc.net.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] hostname: Fallback to static hostname if pretty hostname is not set
+Date: Wed, 06 Feb 2013 21:29:43 +0100
+Message-ID: <3769291.6MmiuAcpF2@athlon>
+In-Reply-To: <1360136648.15783.3.camel@aeonflux>
+References: <1360098656-12488-1-git-send-email-szymon@janc.net.pl> <1360136648.15783.3.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Instead of global default_adapter_id variable use is_default field
-to indicate if adapter is default one.
----
- src/adapter.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+On Wednesday 06 February 2013 09:44:08 Marcel Holtmann wrote:
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 9ddd2fc..3774c77 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -96,7 +96,6 @@ static unsigned int adapter_remaining = 0;
- static bool powering_down = false;
+Hi Marcel,
  
- static GSList *adapters = NULL;
--static int default_adapter_id = -1;
- 
- static struct mgmt *mgmt_master = NULL;
- 
-@@ -184,6 +183,8 @@ struct btd_adapter {
- 
- 	unsigned int pair_device_id;
- 	guint pair_device_timeout;
-+
-+	bool is_default;		/* true if adapter is default one */
- };
- 
- static struct btd_adapter *btd_adapter_lookup(uint16_t index)
-@@ -205,14 +206,11 @@ struct btd_adapter *btd_adapter_get_default(void)
- {
- 	GList *list;
- 
--	if (default_adapter_id < 0)
--		return NULL;
--
- 	for (list = g_list_first(adapter_list); list;
- 						list = g_list_next(list)) {
- 		struct btd_adapter *adapter = list->data;
- 
--		if (adapter->dev_id == default_adapter_id)
-+		if (adapter->is_default)
- 			return adapter;
- 	}
- 
-@@ -224,10 +222,7 @@ bool btd_adapter_is_default(struct btd_adapter *adapter)
- 	if (!adapter)
- 		return false;
- 
--	if (adapter->dev_id == default_adapter_id)
--		return true;
--
--	return false;
-+	return adapter->is_default;
- }
- 
- uint16_t btd_adapter_get_index(struct btd_adapter *adapter)
-@@ -5506,8 +5501,8 @@ static int adapter_register(struct btd_adapter *adapter)
- 
- 	adapter->initialized = TRUE;
- 
--	if (default_adapter_id < 0)
--		default_adapter_id = adapter->dev_id;
-+	if (g_slist_length(adapters) == 1)
-+		adapter->is_default = true;
- 
- 	if (main_opts.did_source)
- 		set_did(adapter, main_opts.did_vendor, main_opts.did_product,
-@@ -5524,8 +5519,13 @@ static int adapter_unregister(struct btd_adapter *adapter)
- 
- 	adapters = g_slist_remove(adapters, adapter);
- 
--	if (default_adapter_id == adapter->dev_id || default_adapter_id < 0)
--		default_adapter_id = hci_get_route(NULL);
-+	if (adapter->is_default && adapters != NULL) {
-+		struct btd_adapter *new_default;
-+
-+		new_default = adapter_find_by_id(hci_get_route(NULL));
-+		if (new_default)
-+			new_default->is_default = true;
-+	}
- 
- 	adapter_list = g_list_remove(adapter_list, adapter);
- 
+> > If pretty hostname is not set fallback to static hostname (if it is
+> > set). If static or pretty hostname is not set appropriate properties
+> > are empty strings not NULLs. This behaviour is recomended by hostnamed.
+> > 
+> > Also fix setting adapter name to empty string if pretty hostname was
+> > not set.
+> 
+> please do not squeeze to patches into one.
+
+Will split that in v2.
+
+> 
+> I am also not convinced that we should bother with the static hostname
+> at all. I left this out on purpose. My thinking here was that if we do
+> not have a pretty hostname, then why bother with trying to make
+> something useful out of the hostname, it would be ugly or wrong anyway.
+
+Maybe not that fancy as pretty hostname but at least know to user(e.g for
+some reason my Fedora doesn't have pretty hostname set and falling back to 
+static hostname makes adapter name somewhat reasonable).
+Also falling back to static hostname will allow hostname plugin to number
+adapters' names. Yet, maybe main.conf parsing should be fixed instead to 
+properly substitute %h/%d as stated in comment. Currently name is simply set 
+to string '%h-%d' in such case...
+
 -- 
-1.8.1.2
-
+Szymon K. Janc
+szymon@janc.net.pl
