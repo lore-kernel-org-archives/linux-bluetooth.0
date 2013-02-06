@@ -2,37 +2,39 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon@janc.net.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon@janc.net.pl>
-Subject: [PATCH v2 4/5] hostname: Fix setting adapter name to empty string
-Date: Wed,  6 Feb 2013 22:40:37 +0100
-Message-Id: <1360186838-16904-4-git-send-email-szymon@janc.net.pl>
+Subject: [PATCH v2 3/5] adapter: Always set new default adapter if current one is removed
+Date: Wed,  6 Feb 2013 22:40:36 +0100
+Message-Id: <1360186838-16904-3-git-send-email-szymon@janc.net.pl>
 In-Reply-To: <1360186838-16904-1-git-send-email-szymon@janc.net.pl>
 References: <1360186838-16904-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If pretty hostname is not set empty string is received. Don't update
-adapters' names is such case.
+In case hci_get_route() failed mark first adapter on list as default.
+This make sure default adapter is always set and that
+btd_adapter_get_default will not return NULL if at least one adapter
+is registered.
 ---
- plugins/hostname.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ src/adapter.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/plugins/hostname.c b/plugins/hostname.c
-index 0b75fac..74c25df 100644
---- a/plugins/hostname.c
-+++ b/plugins/hostname.c
-@@ -117,6 +117,12 @@ static void property_changed(GDBusProxy *proxy, const char *name,
+diff --git a/src/adapter.c b/src/adapter.c
+index 3f51fd4..7b08425 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -5523,8 +5523,10 @@ static int adapter_unregister(struct btd_adapter *adapter)
+ 		struct btd_adapter *new_default;
  
- 			DBG("pretty hostname: %s", str);
- 
-+			if (g_str_equal(str, "") == TRUE) {
-+				g_free(pretty_hostname);
-+				pretty_hostname = NULL;
-+				return;
-+			}
+ 		new_default = adapter_find_by_id(hci_get_route(NULL));
+-		if (new_default)
+-			new_default->is_default = true;
++		if (new_default == NULL)
++			new_default = adapters->data;
 +
- 			g_free(pretty_hostname);
- 			pretty_hostname = g_strdup(str);
++		new_default->is_default = true;
+ 	}
  
+ 	adapter_list = g_list_remove(adapter_list, adapter);
 -- 
 1.8.1.2
 
