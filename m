@@ -2,117 +2,94 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon@janc.net.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon@janc.net.pl>
-Subject: [PATCH v2 5/5] hostname: Fallback to static hostname if pretty hostname is not set
-Date: Wed,  6 Feb 2013 22:40:38 +0100
-Message-Id: <1360186838-16904-5-git-send-email-szymon@janc.net.pl>
-In-Reply-To: <1360186838-16904-1-git-send-email-szymon@janc.net.pl>
-References: <1360186838-16904-1-git-send-email-szymon@janc.net.pl>
+Subject: [PATCH v2 1/5] adapter: Add is_default field to struct btd_adapter
+Date: Wed,  6 Feb 2013 22:40:34 +0100
+Message-Id: <1360186838-16904-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If pretty hostname is not set fallback to static hostname (if it is
-set). If static or pretty hostname is not set appropriate properties
-are empty strings not NULLs. This behaviour is recomended by hostnamed.
+Instead of global default_adapter_id variable use is_default field
+to indicate if adapter is default one.
 ---
- plugins/hostname.c | 54 ++++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 44 insertions(+), 10 deletions(-)
+ src/adapter.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/plugins/hostname.c b/plugins/hostname.c
-index 74c25df..92a71e0 100644
---- a/plugins/hostname.c
-+++ b/plugins/hostname.c
-@@ -53,22 +53,43 @@ static uint8_t major_class = MAJOR_CLASS_MISCELLANEOUS;
- static uint8_t minor_class = MINOR_CLASS_UNCATEGORIZED;
+diff --git a/src/adapter.c b/src/adapter.c
+index 9ddd2fc..3774c77 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -96,7 +96,6 @@ static unsigned int adapter_remaining = 0;
+ static bool powering_down = false;
  
- static char *pretty_hostname = NULL;
-+static char *static_hostname = NULL;
-+
-+/*
-+ * Fallback to static hostname only if empty pretty hostname was already
-+ * received.
-+ */
-+static const char *get_hostname(void)
-+{
-+	if (pretty_hostname) {
-+		if (g_str_equal(pretty_hostname, "") == FALSE)
-+			return pretty_hostname;
-+
-+		if (static_hostname &&
-+				g_str_equal(static_hostname, "") == FALSE)
-+			return static_hostname;
-+	}
-+
-+	return NULL;
-+}
+ static GSList *adapters = NULL;
+-static int default_adapter_id = -1;
  
- static void update_name(struct btd_adapter *adapter, gpointer user_data)
+ static struct mgmt *mgmt_master = NULL;
+ 
+@@ -184,6 +183,8 @@ struct btd_adapter {
+ 
+ 	unsigned int pair_device_id;
+ 	guint pair_device_timeout;
++
++	bool is_default;		/* true if adapter is default one */
+ };
+ 
+ static struct btd_adapter *btd_adapter_lookup(uint16_t index)
+@@ -205,14 +206,11 @@ struct btd_adapter *btd_adapter_get_default(void)
  {
--	if (pretty_hostname == NULL)
-+	const char *hostname = get_hostname();
-+
-+	if (hostname == NULL)
- 		return;
+ 	GList *list;
  
- 	if (btd_adapter_is_default(adapter)) {
--		DBG("name: %s", pretty_hostname);
-+		DBG("name: %s", hostname);
- 
--		adapter_set_name(adapter, pretty_hostname);
-+		adapter_set_name(adapter, hostname);
- 	} else {
- 		uint16_t index = btd_adapter_get_index(adapter);
- 		char *str;
- 
- 		/* Avoid "some device #0" names, start at #1 */
--		str = g_strdup_printf("%s #%u", pretty_hostname, index + 1);
-+		str = g_strdup_printf("%s #%u", hostname, index + 1);
- 
- 		DBG("name: %s", str);
- 
-@@ -117,17 +138,29 @@ static void property_changed(GDBusProxy *proxy, const char *name,
- 
- 			DBG("pretty hostname: %s", str);
- 
--			if (g_str_equal(str, "") == TRUE) {
--				g_free(pretty_hostname);
--				pretty_hostname = NULL;
--				return;
--			}
+-	if (default_adapter_id < 0)
+-		return NULL;
 -
- 			g_free(pretty_hostname);
- 			pretty_hostname = g_strdup(str);
+ 	for (list = g_list_first(adapter_list); list;
+ 						list = g_list_next(list)) {
+ 		struct btd_adapter *adapter = list->data;
  
- 			adapter_foreach(update_name, NULL);
- 		}
-+	} else if (g_str_equal(name, "StaticHostname") == TRUE) {
-+		if (iter == NULL) {
-+			g_dbus_proxy_refresh_property(proxy, name);
-+			return;
-+		}
-+
-+		if (dbus_message_iter_get_arg_type(iter) == DBUS_TYPE_STRING) {
-+			const char *str;
-+
-+			dbus_message_iter_get_basic(iter, &str);
-+
-+			DBG("static hostname: %s", str);
-+
-+			g_free(static_hostname);
-+			static_hostname = g_strdup(str);
-+
-+			adapter_foreach(update_name, NULL);
-+		}
- 	} else if (g_str_equal(name, "Chassis") == TRUE) {
- 		if (iter == NULL) {
- 			g_dbus_proxy_refresh_property(proxy, name);
-@@ -283,6 +316,7 @@ static void hostname_exit(void)
+-		if (adapter->dev_id == default_adapter_id)
++		if (adapter->is_default)
+ 			return adapter;
  	}
  
- 	g_free(pretty_hostname);
-+	g_free(static_hostname);
+@@ -224,10 +222,7 @@ bool btd_adapter_is_default(struct btd_adapter *adapter)
+ 	if (!adapter)
+ 		return false;
+ 
+-	if (adapter->dev_id == default_adapter_id)
+-		return true;
+-
+-	return false;
++	return adapter->is_default;
  }
  
- BLUETOOTH_PLUGIN_DEFINE(hostname, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
+ uint16_t btd_adapter_get_index(struct btd_adapter *adapter)
+@@ -5506,8 +5501,8 @@ static int adapter_register(struct btd_adapter *adapter)
+ 
+ 	adapter->initialized = TRUE;
+ 
+-	if (default_adapter_id < 0)
+-		default_adapter_id = adapter->dev_id;
++	if (g_slist_length(adapters) == 1)
++		adapter->is_default = true;
+ 
+ 	if (main_opts.did_source)
+ 		set_did(adapter, main_opts.did_vendor, main_opts.did_product,
+@@ -5524,8 +5519,13 @@ static int adapter_unregister(struct btd_adapter *adapter)
+ 
+ 	adapters = g_slist_remove(adapters, adapter);
+ 
+-	if (default_adapter_id == adapter->dev_id || default_adapter_id < 0)
+-		default_adapter_id = hci_get_route(NULL);
++	if (adapter->is_default && adapters != NULL) {
++		struct btd_adapter *new_default;
++
++		new_default = adapter_find_by_id(hci_get_route(NULL));
++		if (new_default)
++			new_default->is_default = true;
++	}
+ 
+ 	adapter_list = g_list_remove(adapter_list, adapter);
+ 
 -- 
 1.8.1.2
 
