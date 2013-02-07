@@ -1,41 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1360225902.15783.9.camel@aeonflux>
-Subject: Re: [PATCH 1/2] hostname: Fallback to static hostname if pretty
- hostname is not set
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Szymon Janc <szymon@janc.net.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 07 Feb 2013 10:31:42 +0200
-In-Reply-To: <3769291.6MmiuAcpF2@athlon>
-References: <1360098656-12488-1-git-send-email-szymon@janc.net.pl>
-	 <1360136648.15783.3.camel@aeonflux> <3769291.6MmiuAcpF2@athlon>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 13/14] neard: Updated neard handover registration agent api calls.
+Date: Thu, 7 Feb 2013 09:14:03 +0100
+Message-ID: <1360224844-12280-14-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1360224844-12280-1-git-send-email-szymon.janc@tieto.com>
+References: <1360224844-12280-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syzmon,
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 
-> > I am also not convinced that we should bother with the static hostname
-> > at all. I left this out on purpose. My thinking here was that if we do
-> > not have a pretty hostname, then why bother with trying to make
-> > something useful out of the hostname, it would be ugly or wrong anyway.
-> 
-> Maybe not that fancy as pretty hostname but at least know to user(e.g for
-> some reason my Fedora doesn't have pretty hostname set and falling back to 
-> static hostname makes adapter name somewhat reasonable).
-> Also falling back to static hostname will allow hostname plugin to number
-> adapters' names. Yet, maybe main.conf parsing should be fixed instead to 
-> properly substitute %h/%d as stated in comment. Currently name is simply set 
-> to string '%h-%d' in such case...
+neard RegisterHandoverAgent and UnregisterHandoverAgent apis
+need an extra parameter of carrier type(e.g. bluetooth).
+---
+ plugins/neard.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-I actually want to get rid of main.conf for default installs. And you
-might have seen this already. We do not install it anymore. The defaults
-should work as good as possible. Goal is to actually create stateless
-systems without requiring /etc.
-
-Regards
-
-Marcel
-
+diff --git a/plugins/neard.c b/plugins/neard.c
+index ab51057..9a4a924 100644
+--- a/plugins/neard.c
++++ b/plugins/neard.c
+@@ -46,6 +46,7 @@
+ #define NEARD_MANAGER_INTERFACE "org.neard.Manager"
+ #define AGENT_INTERFACE "org.neard.HandoverAgent"
+ #define AGENT_PATH "/org/bluez/neard_handover_agent"
++#define AGENT_CARRIER_TYPE "bluetooth"
+ #define ERROR_INTERFACE "org.neard.HandoverAgent.Error"
+ 
+ static guint watcher_id = 0;
+@@ -123,6 +124,7 @@ static void register_agent(void)
+ 	DBusMessage *message;
+ 	DBusPendingCall *call;
+ 	const char *path = AGENT_PATH;
++	const char *carrier = AGENT_CARRIER_TYPE;
+ 
+ 	message = dbus_message_new_method_call(NEARD_NAME, NEARD_PATH,
+ 			NEARD_MANAGER_INTERFACE, "RegisterHandoverAgent");
+@@ -134,6 +136,9 @@ static void register_agent(void)
+ 	dbus_message_append_args(message, DBUS_TYPE_OBJECT_PATH, &path,
+ 							DBUS_TYPE_INVALID);
+ 
++	dbus_message_append_args(message, DBUS_TYPE_STRING, &carrier,
++							DBUS_TYPE_INVALID);
++
+ 	if (!dbus_connection_send_with_reply(btd_get_dbus_connection(),
+ 							message, &call, -1)) {
+ 		dbus_message_unref(message);
+@@ -151,6 +156,7 @@ static void unregister_agent(void)
+ {
+ 	DBusMessage *message;
+ 	const char *path = AGENT_PATH;
++	const char *carrier = AGENT_CARRIER_TYPE;
+ 
+ 	g_free(neard_path);
+ 	neard_path = NULL;
+@@ -166,6 +172,9 @@ static void unregister_agent(void)
+ 	dbus_message_append_args(message, DBUS_TYPE_OBJECT_PATH, &path,
+ 						DBUS_TYPE_INVALID);
+ 
++	dbus_message_append_args(message, DBUS_TYPE_STRING, &carrier,
++							DBUS_TYPE_INVALID);
++
+ 	if (!g_dbus_send_message(btd_get_dbus_connection(), message))
+ 		error("D-Bus send failed");
+ 
+-- 
+1.8.1.1
 
