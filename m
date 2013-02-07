@@ -1,171 +1,304 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 7 Feb 2013 11:50:44 +0100
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] configure.ac: call AC_SUBST unconditionally
-Message-Id: <20130207115044.ad0c33fb97da1d5ab1f1984e@studenti.unina.it>
-In-Reply-To: <1360226227.15783.12.camel@aeonflux>
-References: <1359906411-12624-1-git-send-email-ospite@studenti.unina.it>
-	<1360226227.15783.12.camel@aeonflux>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZK+ym1ChNG5j-Y-1P_T0qrdYbF=BheZSMHoC3BTdR1arA@mail.gmail.com>
+References: <1360142187-15347-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1360142187-15347-3-git-send-email-mikel.astiz.oss@gmail.com>
+	<CABBYNZK+ym1ChNG5j-Y-1P_T0qrdYbF=BheZSMHoC3BTdR1arA@mail.gmail.com>
+Date: Thu, 7 Feb 2013 11:43:04 +0100
+Message-ID: <CANT-zCUmrktDqhGauaGBBGST3jkzQ0dV+7tkz_Kz7dZxpb23=g@mail.gmail.com>
+Subject: Re: [RFC v1 2/7] audio: Split AVRCP into two btd_profile
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 07 Feb 2013 10:37:07 +0200
-Marcel Holtmann <marcel@holtmann.org> wrote:
+Hi Luiz,
 
-> Hi Antonio,
-> 
-> > Call AC_SUBST unconditionally, otherwise options like
-> > --with-dbusconfdir=DIR or --with-udevdir=DIR have no effect.
-> > 
-> > Before this change, configuring with:
-> > 
-> >   $ mkdir build
-> >   $ ./configure --disable-systemd \
-> >                 --prefix=$(pwd)/build \
-> >                 --with-dbusconfdir=$(pwd)/build/etc
-> > 
-> > resulted in the option value to be ignored at "make install" time, with
-> > this error:
-> > 
-> >   /bin/mkdir: cannot create directory '/dbus-1/system.d': Permission denied
-> > 
-> > After the patch the option value is respected.
-> > ---
-> > 
-> > Hi,
-> > 
-> > the issue was highlighted by the use "--prefix=" and running "make install" as
-> > a restricted user, maybe the are still other issues with this use case.
-> > Anyone willing to take a deeper look?
-> 
-> why are you doing --prefix="" in the first place? I do not get that
-> part.
-
-Sorry, poor communication choice from my part, in the sentence above the
-_whole_ --prefix= was enclosed in double quotes to mean "the --prefix
-parameter", but I see this could be misleading, I am actually using:
-
-  --prefix=$(pwd)/build
-
-> > For instance, is "--prefix=DIR" supposed to be prepended to manually specified
-> > paths too?
-> >
-> > Thanks,
-> >    Antonio
-> > 
-> >  configure.ac |   16 ++++++++--------
-> >  1 file changed, 8 insertions(+), 8 deletions(-)
-> > 
-> > diff --git a/configure.ac b/configure.ac
-> > index 070acea..fe2893a 100644
-> > --- a/configure.ac
-> > +++ b/configure.ac
-> > @@ -71,8 +71,8 @@ if (test -z "${path_dbusconfdir}"); then
-> >  		AC_MSG_ERROR([D-Bus configuration directory is required])
-> >  	fi
-> >  	AC_MSG_RESULT([${path_dbusconfdir}])
-> > -	AC_SUBST(DBUS_CONFDIR, [${path_dbusconfdir}])
-> >  fi
-> > +AC_SUBST(DBUS_CONFDIR, [${path_dbusconfdir}])
-> 
-> I am failing to see the bug here. you are providing the
-> --with-dbusconfdir=DIR and thus is should work. What is causing the
-> wrong mkdir actually.
+On Thu, Feb 7, 2013 at 10:43 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Mikel,
 >
+> On Wed, Feb 6, 2013 at 11:16 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>>
+>> Register a separate btd_profile for each role of AVRCP.
+>> ---
+>>  profiles/audio/avrcp.c   | 80 +++++++++++++++++++++++++++++++++++++-----------
+>>  profiles/audio/avrcp.h   |  6 ++--
+>>  profiles/audio/manager.c | 71 ++++++++++++++++++++++++++++++------------
+>>  3 files changed, 118 insertions(+), 39 deletions(-)
+>>
+>> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+>> index 277f9f3..fe6333b 100644
+>> --- a/profiles/audio/avrcp.c
+>> +++ b/profiles/audio/avrcp.c
+>> @@ -2712,41 +2712,63 @@ static struct avrcp_server *avrcp_server_register(struct btd_adapter *adapter,
+>>         return server;
+>>  }
+>>
+>> -int avrcp_register(struct btd_adapter *adapter, GKeyFile *config)
+>> +int avrcp_target_register(struct btd_adapter *adapter, GKeyFile *config)
+>>  {
+>>         sdp_record_t *record;
+>>         struct avrcp_server *server;
+>>
+>> +       server = find_server(servers, adapter);
+>> +       if (server != NULL)
+>> +               goto done;
+>> +
+>>         server = avrcp_server_register(adapter, config);
+>>         if (server == NULL)
+>>                 return -EPROTONOSUPPORT;
+>>
+>> +done:
+>>         record = avrcp_tg_record();
+>>         if (!record) {
+>>                 error("Unable to allocate new service record");
+>> -               avrcp_unregister(adapter);
+>> +               avrcp_target_unregister(adapter);
+>>                 return -1;
+>>         }
+>>
+>>         if (add_record_to_server(adapter_get_address(adapter), record) < 0) {
+>>                 error("Unable to register AVRCP target service record");
+>> -               avrcp_unregister(adapter);
+>> +               avrcp_target_unregister(adapter);
+>>                 sdp_record_free(record);
+>>                 return -1;
+>>         }
+>>         server->tg_record_id = record->handle;
+>>
+>> +       return 0;
+>> +}
+>> +
+>> +int avrcp_remote_register(struct btd_adapter *adapter, GKeyFile *config)
+>> +{
+>> +       sdp_record_t *record;
+>> +       struct avrcp_server *server;
+>> +
+>> +       server = find_server(servers, adapter);
+>> +       if (server != NULL)
+>> +               goto done;
+>> +
+>> +       server = avrcp_server_register(adapter, config);
+>> +       if (server == NULL)
+>> +               return -EPROTONOSUPPORT;
+>> +
+>> +done:
+>>         record = avrcp_ct_record();
+>>         if (!record) {
+>>                 error("Unable to allocate new service record");
+>> -               avrcp_unregister(adapter);
+>> +               avrcp_remote_unregister(adapter);
+>>                 return -1;
+>>         }
+>>
+>>         if (add_record_to_server(adapter_get_address(adapter), record) < 0) {
+>>                 error("Unable to register AVRCP service record");
+>>                 sdp_record_free(record);
+>> -               avrcp_unregister(adapter);
+>> +               avrcp_remote_unregister(adapter);
+>>                 return -1;
+>>         }
+>>         server->ct_record_id = record->handle;
+>> @@ -2754,25 +2776,13 @@ int avrcp_register(struct btd_adapter *adapter, GKeyFile *config)
+>>         return 0;
+>>  }
+>>
+>> -void avrcp_unregister(struct btd_adapter *adapter)
+>> +static void avrcp_server_unregister(struct avrcp_server *server)
+>>  {
+>> -       struct avrcp_server *server;
+>> -
+>> -       server = find_server(servers, adapter);
+>> -       if (!server)
+>> -               return;
+>> -
+>>         g_slist_free_full(server->sessions, g_free);
+>>         g_slist_free_full(server->players, player_destroy);
+>>
+>>         servers = g_slist_remove(servers, server);
+>>
+>> -       if (server->ct_record_id != 0)
+>> -               remove_record_from_server(server->ct_record_id);
+>> -
+>> -       if (server->tg_record_id != 0)
+>> -               remove_record_from_server(server->tg_record_id);
+>> -
+>>         avctp_unregister(server->adapter);
+>>         btd_adapter_unref(server->adapter);
+>>         g_free(server);
+>> @@ -2786,6 +2796,40 @@ void avrcp_unregister(struct btd_adapter *adapter)
+>>         }
+>>  }
+>>
+>> +void avrcp_target_unregister(struct btd_adapter *adapter)
+>> +{
+>> +       struct avrcp_server *server;
+>> +
+>> +       server = find_server(servers, adapter);
+>> +       if (!server)
+>> +               return;
+>> +
+>> +       if (server->tg_record_id != 0) {
+>> +               remove_record_from_server(server->tg_record_id);
+>> +               server->tg_record_id = 0;
+>> +       }
+>> +
+>> +       if (server->ct_record_id == 0)
+>> +               avrcp_server_unregister(server);
+>> +}
+>> +
+>> +void avrcp_remote_unregister(struct btd_adapter *adapter)
+>> +{
+>> +       struct avrcp_server *server;
+>> +
+>> +       server = find_server(servers, adapter);
+>> +       if (!server)
+>> +               return;
+>> +
+>> +       if (server->ct_record_id != 0) {
+>> +               remove_record_from_server(server->ct_record_id);
+>> +               server->ct_record_id = 0;
+>> +       }
+>> +
+>> +       if (server->tg_record_id == 0)
+>> +               avrcp_server_unregister(server);
+>> +}
+>> +
+>>  struct avrcp_player *avrcp_register_player(struct btd_adapter *adapter,
+>>                                                 struct avrcp_player_cb *cb,
+>>                                                 void *user_data,
+>> diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
+>> index 3799da1..1f98090 100644
+>> --- a/profiles/audio/avrcp.h
+>> +++ b/profiles/audio/avrcp.h
+>> @@ -93,8 +93,10 @@ struct avrcp_player_cb {
+>>                                                         void *user_data);
+>>  };
+>>
+>> -int avrcp_register(struct btd_adapter *adapter, GKeyFile *config);
+>> -void avrcp_unregister(struct btd_adapter *adapter);
+>> +int avrcp_target_register(struct btd_adapter *adapter, GKeyFile *config);
+>> +void avrcp_target_unregister(struct btd_adapter *adapter);
+>> +int avrcp_remote_register(struct btd_adapter *adapter, GKeyFile *config);
+>> +void avrcp_remote_unregister(struct btd_adapter *adapter);
+>>
+>>  gboolean avrcp_connect(struct audio_device *dev);
+>>  void avrcp_disconnect(struct audio_device *dev);
+>> diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
+>> index 934227e..3023249 100644
+>> --- a/profiles/audio/manager.c
+>> +++ b/profiles/audio/manager.c
+>> @@ -229,7 +229,7 @@ static int a2dp_sink_disconnect(struct btd_device *dev,
+>>         return sink_disconnect(audio_dev, FALSE);
+>>  }
+>>
+>> -static int avrcp_control_connect(struct btd_device *dev,
+>> +static int avrcp_target_connect(struct btd_device *dev,
+>>                                                 struct btd_profile *profile)
+>>  {
+>>         const char *path = device_get_path(dev);
+>> @@ -246,7 +246,7 @@ static int avrcp_control_connect(struct btd_device *dev,
+>>         return control_connect(audio_dev);
+>>  }
+>>
+>> -static int avrcp_control_disconnect(struct btd_device *dev,
+>> +static int avrcp_target_disconnect(struct btd_device *dev,
+>>                                                 struct btd_profile *profile)
+>>  {
+>>         const char *path = device_get_path(dev);
+>> @@ -295,20 +295,36 @@ static void a2dp_sink_server_remove(struct btd_profile *p,
+>>         a2dp_sink_unregister(adapter);
+>>  }
+>>
+>> -static int avrcp_server_probe(struct btd_profile *p,
+>> +static int avrcp_target_server_probe(struct btd_profile *p,
+>>                                                 struct btd_adapter *adapter)
+>>  {
+>>         DBG("path %s", adapter_get_path(adapter));
+>>
+>> -       return avrcp_register(adapter, config);
+>> +       return avrcp_target_register(adapter, config);
+>>  }
+>>
+>> -static void avrcp_server_remove(struct btd_profile *p,
+>> +static int avrcp_remote_server_probe(struct btd_profile *p,
+>>                                                 struct btd_adapter *adapter)
+>>  {
+>>         DBG("path %s", adapter_get_path(adapter));
+>>
+>> -       return avrcp_unregister(adapter);
+>> +       return avrcp_remote_register(adapter, config);
+>> +}
+>> +
+>> +static void avrcp_target_server_remove(struct btd_profile *p,
+>> +                                               struct btd_adapter *adapter)
+>> +{
+>> +       DBG("path %s", adapter_get_path(adapter));
+>> +
+>> +       avrcp_target_unregister(adapter);
+>> +}
+>> +
+>> +static void avrcp_remote_server_remove(struct btd_profile *p,
+>> +                                               struct btd_adapter *adapter)
+>> +{
+>> +       DBG("path %s", adapter_get_path(adapter));
+>> +
+>> +       avrcp_remote_unregister(adapter);
+>>  }
+>>
+>>  static int media_server_probe(struct btd_adapter *adapter)
+>> @@ -357,19 +373,30 @@ static struct btd_profile a2dp_sink_profile = {
+>>         .adapter_remove = a2dp_sink_server_remove,
+>>  };
+>>
+>> -static struct btd_profile avrcp_profile = {
+>> -       .name           = "audio-avrcp",
+>> +static struct btd_profile avrcp_target_profile = {
+>> +       .name           = "audio-avrcp-target",
+>>
+>> -       .remote_uuids   = BTD_UUIDS(AVRCP_TARGET_UUID, AVRCP_REMOTE_UUID),
+>> +       .remote_uuids   = BTD_UUIDS(AVRCP_TARGET_UUID),
+>>         .device_probe   = avrcp_probe,
+>>         .device_remove  = audio_remove,
+>>
+>>         .auto_connect   = true,
+>> -       .connect        = avrcp_control_connect,
+>> -       .disconnect     = avrcp_control_disconnect,
+>> +       .connect        = avrcp_target_connect,
+>> +       .disconnect     = avrcp_target_disconnect,
+>> +
+>> +       .adapter_probe  = avrcp_target_server_probe,
+>> +       .adapter_remove = avrcp_target_server_remove,
+>> +};
+>> +
+>> +static struct btd_profile avrcp_remote_profile = {
+>> +       .name           = "audio-avrcp-control",
+>>
+>> -       .adapter_probe  = avrcp_server_probe,
+>> -       .adapter_remove = avrcp_server_remove,
+>> +       .remote_uuids   = BTD_UUIDS(AVRCP_REMOTE_UUID),
+>> +       .device_probe   = avrcp_probe,
+>> +       .device_remove  = audio_remove,
+>> +
+>> +       .adapter_probe  = avrcp_remote_server_probe,
+>> +       .adapter_remove = avrcp_remote_server_remove,
+>>  };
+>
+> You probably need a .connect callback above, even though normally
+> there should be both target and control records we should be able to
+> detect if AVCTP is already connecting just return -EALREADY or 0.
 
-This is what I understand is going on in configure.ac right now:
+I agree with your point but the current codebase seems to return
+-ENOTSUP in control_connect() for the remote role, so I see no point
+in adding .connect callback before such a feature gets implemented.
 
-  # define the option
-  AC_ARG_WITH([dbusconfdir] ... [path_dbusconfdir=${withval}])
+I'm not deep into the AVRCP code but I guess it's not as simple as
+getting rid of this role check in control_connect(), right?
 
-  # when --with-dbusconfdir is NOT used
-  if (test -z "${path_dbusconfdir}"); then
-    ...
-
-    # define the config dir
-    path_dbusconfdir="`$PKG_CONFIG --variable=sysconfdir dbus-1`"
-    
-    ...
-    
-    # set DBUS_CONFDIR
-    AC_SUBST(DBUS_CONFDIR, [${path_dbusconfdir}])
-  endif
-
-when --with-dbusconfdir=SOMEDIR is used the test above fails, and the
-result is that ${path_dbusconfdir} is indeed defined, but DBUS_CONFDIR
-is not, and the latter is going to be used in Makefile.am:
-
-  dbusdir = @DBUS_CONFDIR@/dbus-1/system.d
-
-The wrong makedir is exposed by my use of the "prefix" option and the
-fact that I am running "make install" as a normal user, otherwise
-/dbus-1/system.d would be happily (and wrongly) created.
-
-By always setting DBUS_CONFDIR we cover the case when
---with-dbusconfdir=SOMEDIR is used.
-
-> >  AC_ARG_WITH([dbussystembusdir], AC_HELP_STRING([--with-dbussystembusdir=DIR],
-> >  				[path to D-Bus system bus services directory]),
-> > @@ -84,8 +84,8 @@ if (test -z "${path_dbussystembusdir}"); then
-> >  		AC_MSG_ERROR([D-Bus system bus services directory is required])
-> >  	fi
-> >  	AC_MSG_RESULT([${path_dbussystembusdir}])
-> > -	AC_SUBST(DBUS_SYSTEMBUSDIR, [${path_dbussystembusdir}])
-> >  fi
-> > +AC_SUBST(DBUS_SYSTEMBUSDIR, [${path_dbussystembusdir}])
-> >  
-> >  AC_ARG_WITH([dbussessionbusdir], AC_HELP_STRING([--with-dbussessionbusdir=DIR],
-> >  				[path to D-Bus session bus services directory]),
-> > @@ -97,8 +97,8 @@ if (test -z "${path_dbussessionbusdir}"); then
-> >  		AC_MSG_ERROR([D-Bus session bus services directory is required])
-> >  	fi
-> >  	AC_MSG_RESULT([${path_dbussessionbusdir}])
-> > -	AC_SUBST(DBUS_SESSIONBUSDIR, [${path_dbussessionbusdir}])
-> >  fi
-> > +AC_SUBST(DBUS_SESSIONBUSDIR, [${path_dbussessionbusdir}])
-> >  
-> >  AC_ARG_ENABLE(library, AC_HELP_STRING([--enable-library],
-> >  		[install Bluetooth library]), [enable_library=${enableval}])
-> > @@ -121,8 +121,6 @@ AC_ARG_ENABLE(usb, AC_HELP_STRING([--disable-usb],
-> >  if (test "${enable_tools}" != "no" && test "${enable_usb}" != "no"  ); then
-> >  	PKG_CHECK_MODULES(USB, libusb, dummy=yes,
-> >  			AC_MSG_ERROR(USB library support is required))
-> > -	AC_SUBST(USB_CFLAGS)
-> > -	AC_SUBST(USB_LIBS)
-> >  	AC_CHECK_LIB(usb, usb_get_busses, dummy=yes,
-> >  		AC_DEFINE(NEED_USB_GET_BUSSES, 1,
-> >  			[Define to 1 if you need the usb_get_busses() function.]
-> > @@ -133,6 +131,8 @@ if (test "${enable_tools}" != "no" && test "${enable_usb}" != "no"  ); then
-> >  on.]))
-> >  	AC_DEFINE(HAVE_LIBUSB, 1, [Define to 1 if you have USB library.])
-> >  fi
-> > +AC_SUBST(USB_CFLAGS)
-> > +AC_SUBST(USB_LIBS)
-> 
-> What are these changes for? I don't see any reason for them. And also
-> they should not intermix in the patch. They need to explained
-> separately.
-> 
-
-They are meant to follow the same logic used for
-
-AC_SUBST(UDEV_CFLAGS)
-AC_SUBST(UDEV_LIBS)
-
-which are outside of the test.
-
-Unrelated, right, sorry. Maybe I'll send another patch for them.
-
-Thanks,
-   Antonio
-
--- 
-Antonio Ospite
-http://ao2.it
-
-A: Because it messes up the order in which people normally read text.
-   See http://en.wikipedia.org/wiki/Posting_style
-Q: Why is top-posting such a bad thing?
+Cheers,
+Mikel
