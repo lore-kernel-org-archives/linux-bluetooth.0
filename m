@@ -3,9 +3,9 @@ From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>,
 	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 08/14] neard: Add support for setting power state in RequestOOB reply
-Date: Thu, 7 Feb 2013 09:13:58 +0100
-Message-ID: <1360224844-12280-9-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 06/14] neard: Check if adapter is powered in PushOOB
+Date: Thu, 7 Feb 2013 09:13:56 +0100
+Message-ID: <1360224844-12280-7-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1360224844-12280-1-git-send-email-szymon.janc@tieto.com>
 References: <1360224844-12280-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -13,45 +13,26 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows neard to properly set Bluetooth carrier power state in
-handover message.
+For PushOOB adapter needs to be powered as bluetoothd daemon is
+expected to perform action on success.
 ---
- plugins/neard.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ plugins/neard.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/plugins/neard.c b/plugins/neard.c
-index 0418430..0bd376b 100644
+index 131e8bd..0418430 100644
 --- a/plugins/neard.c
 +++ b/plugins/neard.c
-@@ -173,6 +173,19 @@ unregister:
- 							AGENT_INTERFACE);
- }
+@@ -629,6 +629,9 @@ static DBusMessage *push_oob(DBusConnection *conn, DBusMessage *msg, void *data)
+ 	if (err < 0)
+ 		return error_reply(msg, -err);
  
-+static void add_power_state(DBusMessageIter *dict, struct btd_adapter *adapter)
-+{
-+	const char *state;
++	if (!btd_adapter_get_powered(adapter))
++		return error_reply(msg, ENONET);
 +
-+	if (btd_adapter_get_powered(adapter) &&
-+			btd_adapter_get_connectable(adapter))
-+		state = "active";
-+	else
-+		state = "inactive";
-+
-+	dict_append_entry(dict, "State", DBUS_TYPE_STRING, &state);
-+}
-+
- static DBusMessage *create_request_oob_reply(struct btd_adapter *adapter,
- 						const uint8_t *hash,
- 						const uint8_t *randomizer,
-@@ -208,6 +221,8 @@ static DBusMessage *create_request_oob_reply(struct btd_adapter *adapter,
- 
- 	dict_append_array(&dict, "EIR", DBUS_TYPE_BYTE, &peir, len);
- 
-+	add_power_state(&dict, adapter);
-+
- 	dbus_message_iter_close_container(&iter, &dict);
- 
- 	return reply;
+ 	agent = adapter_get_agent(adapter);
+ 	if (!agent)
+ 		return error_reply(msg, ENONET);
 -- 
 1.8.1.1
 
