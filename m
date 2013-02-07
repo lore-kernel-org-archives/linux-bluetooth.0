@@ -1,55 +1,253 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 7 Feb 2013 12:38:12 -0500
-From: Dave Jones <davej@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Fedora Kernel Team <kernel-team@fedoraproject.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: list_debug double add from bluetooth
-Message-ID: <20130207173812.GA23062@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1359132287-9714-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1359132287-9714-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Thu, 7 Feb 2013 13:51:23 +0200
+Message-ID: <CABBYNZLdzkKowfGr=ir61efY7QFwPOjnj2kzqzbNH7j=dLNQVg@mail.gmail.com>
+Subject: Re: [PATCH 1/1] obexd: Add PushMessage
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We had a user report this against 3.7.  I don't see anything obvious that has been
-committed in 3.8rc that would address this..
+Hi Christian,
 
-	Dave
+On Fri, Jan 25, 2013 at 6:44 PM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+>
+> Push message has been implemented similar to send file (OPP),
+> the message to send (in bMessage format) is read from a file.
+> ---
+>  doc/obex-api.txt   |  22 ++++++++
+>  obexd/client/map.c | 161 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 183 insertions(+)
+>
+> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
+> index 6246933..759c4d8 100644
+> --- a/doc/obex-api.txt
+> +++ b/doc/obex-api.txt
+> @@ -630,6 +630,28 @@ Methods            void SetFolder(string name)
+>
+>                         Possible errors: org.bluez.obex.Error.Failed
+>
+> +               object, dict
+> +               PushMessage(string sourcefile, string folder, dict args)
+> +
+> +                       Transfer a message (in bMessage format) to the
+> +                       remote device.
+> +
+> +                       The message is transferred either to the given folder,
+> +                       or to the current folder if folder is omitted.
+> +
+> +                       Possible args: Transparent, Retry, Charset
+> +
+> +                       The returned path represents the newly created transfer,
+> +                       which should be used to find out if the content has been
+> +                       successfully transferred or if the operation fails.
+> +
+> +                       The properties of this transfer are also returned along
+> +                       with the object path, to avoid a call to GetAll.
+> +
+> +                       Possible errors: org.bluez.obex.Error.InvalidArguments
+> +                                        org.bluez.obex.Error.Failed
+> +
+> +
+>  Filter:                uint16 Offset:
+>
+>                         Offset of the first item, default is 0
+> diff --git a/obexd/client/map.c b/obexd/client/map.c
+> index ea5681a..2b665ec 100644
+> --- a/obexd/client/map.c
+> +++ b/obexd/client/map.c
+> @@ -52,6 +52,7 @@
+>  #define DEFAULT_COUNT 1024
+>  #define DEFAULT_OFFSET 0
+>
+> +#define CHARSET_NATIVE 0
+>  #define CHARSET_UTF8 1
+>
+>  static const char * const filter_list[] = {
+> @@ -1495,6 +1496,160 @@ fail:
+>         return reply;
+>  }
+>
+> +static DBusMessage *push_message(struct map_data *map,
+> +                                                       DBusMessage *message,
+> +                                                       const char *filename,
+> +                                                       const char *folder,
+> +                                                       GObexApparam *apparam)
+> +{
+> +       struct obc_transfer *transfer;
+> +       GError *err = NULL;
+> +       DBusMessage *reply;
+> +
+> +       transfer = obc_transfer_put("x-bt/message", folder, filename,
+> +                                                               NULL, 0, &err);
+> +       if (transfer == NULL) {
+> +               g_obex_apparam_free(apparam);
+> +               goto fail;
+> +       }
+> +
+> +       obc_transfer_set_apparam(transfer, apparam);
+> +
+> +       if (!obc_session_queue(map->session, transfer, NULL, NULL, &err))
+> +               goto fail;
+> +
+> +       return obc_transfer_create_dbus_reply(transfer, message);
+> +
+> +fail:
+> +       reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed", "%s",
+> +                                                               err->message);
+> +       g_error_free(err);
+> +       return reply;
+> +}
+> +
+> +static GObexApparam *parse_transparent(GObexApparam *apparam,
+> +                                                       DBusMessageIter *iter)
+> +{
+> +       dbus_bool_t transparent;
+> +
+> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
+> +               return NULL;
+> +
+> +       dbus_message_iter_get_basic(iter, &transparent);
+> +
+> +       return g_obex_apparam_set_uint8(apparam, MAP_AP_TRANSPARENT,
+> +                                               transparent ? TRUE : FALSE);
+> +}
+> +
+> +static GObexApparam *parse_retry(GObexApparam *apparam, DBusMessageIter *iter)
+> +{
+> +       dbus_bool_t retry;
+> +
+> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
+> +               return NULL;
+> +
+> +       dbus_message_iter_get_basic(iter, &retry);
+> +
+> +       return g_obex_apparam_set_uint8(apparam, MAP_AP_RETRY,
+> +                                                       retry ? TRUE : FALSE);
+> +}
+> +
+> +static GObexApparam *parse_charset(GObexApparam *apparam, DBusMessageIter *iter)
+> +{
+> +       guint8 charset = 0;
+> +       const char *string;
+> +
+> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
+> +               return NULL;
+> +
+> +       dbus_message_iter_get_basic(iter, &string);
+> +
+> +       if (strcasecmp(string, "native") == 0)
+> +               charset = CHARSET_NATIVE;
+> +       else if (strcasecmp(string, "utf8") == 0)
+> +               charset = CHARSET_UTF8;
+> +       else
+> +               return NULL;
+> +
+> +       return g_obex_apparam_set_uint8(apparam, MAP_AP_CHARSET, charset);
+> +}
+> +
+> +static GObexApparam *parse_push_options(GObexApparam *apparam,
+> +                                                       DBusMessageIter *iter)
+> +{
+> +       DBusMessageIter array;
+> +
+> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
+> +               return NULL;
+> +
+> +       dbus_message_iter_recurse(iter, &array);
+> +
+> +       while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_DICT_ENTRY) {
+> +               const char *key;
+> +               DBusMessageIter value, entry;
+> +
+> +               dbus_message_iter_recurse(&array, &entry);
+> +               dbus_message_iter_get_basic(&entry, &key);
+> +
+> +               dbus_message_iter_next(&entry);
+> +               dbus_message_iter_recurse(&entry, &value);
+> +
+> +               if (strcasecmp(key, "Transparent") == 0) {
+> +                       if (parse_transparent(apparam, &value) == NULL)
+> +                               return NULL;
+> +               } else if (strcasecmp(key, "Retry") == 0) {
+> +                       if (parse_retry(apparam, &value) == NULL)
+> +                               return NULL;
+> +               } else if (strcasecmp(key, "Charset") == 0) {
+> +                       if (parse_charset(apparam, &value) == NULL)
+> +                               return NULL;
+> +               }
+> +
+> +               dbus_message_iter_next(&array);
+> +       }
+> +
+> +       return apparam;
+> +}
+> +
+> +static DBusMessage *map_push_message(DBusConnection *connection,
+> +                                       DBusMessage *message, void *user_data)
+> +{
+> +       struct map_data *map = user_data;
+> +       char *filename;
+> +       char *folder;
+> +       GObexApparam *apparam;
+> +       DBusMessageIter args;
+> +
+> +       dbus_message_iter_init(message, &args);
+> +
+> +       if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_STRING)
+> +               return g_dbus_create_error(message,
+> +                               ERROR_INTERFACE ".InvalidArguments", NULL);
+> +
+> +       dbus_message_iter_get_basic(&args, &filename);
+> +
+> +       dbus_message_iter_next(&args);
+> +
+> +       if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_STRING) {
+> +               return g_dbus_create_error(message,
+> +                               ERROR_INTERFACE ".InvalidArguments", NULL);
+> +       }
+> +
+> +       dbus_message_iter_get_basic(&args, &folder);
+> +
+> +       dbus_message_iter_next(&args);
+> +
+> +       apparam = g_obex_apparam_set_uint8(NULL, MAP_AP_CHARSET, CHARSET_UTF8);
+> +
+> +       if (parse_push_options(apparam, &args) == NULL) {
+> +               g_obex_apparam_free(apparam);
+> +               return g_dbus_create_error(message,
+> +                               ERROR_INTERFACE ".InvalidArguments", NULL);
+> +       }
+> +
+> +       return push_message(map, message, filename, folder, apparam);
+> +}
+> +
+>  static const GDBusMethodTable map_methods[] = {
+>         { GDBUS_ASYNC_METHOD("SetFolder",
+>                                 GDBUS_ARGS({ "name", "s" }), NULL,
+> @@ -1515,6 +1670,12 @@ static const GDBusMethodTable map_methods[] = {
+>                         NULL,
+>                         NULL,
+>                         map_update_inbox) },
+> +       { GDBUS_ASYNC_METHOD("PushMessage",
+> +                       GDBUS_ARGS({ "file", "s" }, { "folder", "s" },
+> +                                               { "args", "a{sv}" }),
+> +                       GDBUS_ARGS({ "transfer", "o" },
+> +                                               { "properties", "a{sv}" }),
+> +                       map_push_message) },
+>         { }
+>  };
+>
+> --
+> 1.8.1
 
+Pushed, thanks.
 
-:WARNING: at lib/list_debug.c:36 __list_add+0x9c/0xd0()
-:Hardware name: Latitude E6430
-:list_add double add: new=ffff8801d2c341b8, prev=ffff8801d2c341b8, next=ffff88021581d480.
-:Modules linked in: hidp fuse ebtable_nat ebtables ipt_MASQUERADE iptable_nat nf_nat_ipv4 nf_nat nf_conntrack_ipv4 nf_defrag_ipv4 xt_CHECKSUM iptable_mangle be2iscsi iscsi_boot_sysfs bnx2i bridge stp llc cnic uio cxgb4i cxgb4 cxgb3i cxgb3 mdio libcxgbi ib_iser lockd sunrpc rdma_cm ib_addr iw_cm ib_cm ib_sa ib_mad ib_core iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi rfcomm bnep ip6t_REJECT nf_conntrack_ipv6 nf_defrag_ipv6 xt_state nf_conntrack ip6table_filter ip6_tables uvcvideo arc4 iwldvm videobuf2_vmalloc btusb videobuf2_memops videobuf2_core videodev media coretemp mac80211 snd_hda_codec_hdmi bluetooth snd_hda_codec_idt i2c_i801 dell_laptop ppdev dcdbas parport_pc parport iTCO_wdt iTCO_vendor_support snd_hda_intel iwlwifi snd_hda_codec snd_hwdep lpc_ich mei mfd_core cfg80211 rfkill microcode snd_seq snd_seq_device snd_pcm snd_page_alloc snd_timer snd dell_wmi sparse_keymap soundcore e1000e vhost_net tun macvtap macvlan kvm_intel kvm uinput crc32c_intel ghas
-:h_clmulni_intel sdhci_pci sdhci mmc_core wmi i915 video i2c_algo_bit drm_kms_helper drm i2c_core
-:Pid: 548, comm: kworker/u:2H Not tainted 3.7.3-101.fc17.x86_64 #1
-:Call Trace:
-: [<ffffffff8105e69f>] warn_slowpath_common+0x7f/0xc0
-: [<ffffffff8105e796>] warn_slowpath_fmt+0x46/0x50
-: [<ffffffff812f985c>] __list_add+0x9c/0xd0
-: [<ffffffff812e7277>] kobject_add_internal+0x77/0x260
-: [<ffffffff812efa41>] ? vsnprintf+0x461/0x600
-: [<ffffffff8109a0f0>] ? enqueue_entity+0xc0/0x440
-: [<ffffffff812e77c7>] kobject_add+0x67/0xc0
-: [<ffffffff8117f009>] ? kfree+0x49/0x170
-: [<ffffffff813cc619>] device_add+0x119/0x6e0
-: [<ffffffff813caf91>] ? dev_set_name+0x41/0x50
-: [<ffffffffa03c73bb>] hci_conn_add_sysfs+0x5b/0xe0 [bluetooth]
-: [<ffffffffa03b8d30>] hci_conn_complete_evt.isra.45+0xe0/0x3f0 [bluetooth]
-: [<ffffffffa03bc198>] hci_event_packet+0x16b8/0x2900 [bluetooth]
-: [<ffffffffa03c628f>] ? hci_send_to_sock+0xff/0x1e0 [bluetooth]
-: [<ffffffff81513b27>] ? __kfree_skb+0x47/0xa0
-: [<ffffffff81513bb6>] ? kfree_skb+0x36/0xa0
-: [<ffffffffa03c628f>] ? hci_send_to_sock+0xff/0x1e0 [bluetooth]
-: [<ffffffffa03ae258>] hci_rx_work+0x1e8/0x430 [bluetooth]
-: [<ffffffff8101358e>] ? __switch_to+0x13e/0x4a0
-: [<ffffffff8107a4a7>] process_one_work+0x147/0x490
-: [<ffffffffa03ae070>] ? hci_send_frame+0xc0/0xc0 [bluetooth]
-: [<ffffffff8107cd3e>] worker_thread+0x15e/0x450
-: [<ffffffff8107cbe0>] ? busy_worker_rebind_fn+0x110/0x110
-: [<ffffffff81081ca0>] kthread+0xc0/0xd0
-: [<ffffffff81010000>] ? ftrace_raw_event_xen_mmu_flush_tlb_others+0x50/0xe0
-: [<ffffffff81081be0>] ? kthread_create_on_node+0x120/0x120
-: [<ffffffff816396ec>] ret_from_fork+0x7c/0xb0
-: [<ffffffff81081be0>] ? kthread_create_on_node+0x120/0x120
+-- 
+Luiz Augusto von Dentz
