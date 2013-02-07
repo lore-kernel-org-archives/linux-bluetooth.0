@@ -1,253 +1,171 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1359132287-9714-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1359132287-9714-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Thu, 7 Feb 2013 13:51:23 +0200
-Message-ID: <CABBYNZLdzkKowfGr=ir61efY7QFwPOjnj2kzqzbNH7j=dLNQVg@mail.gmail.com>
-Subject: Re: [PATCH 1/1] obexd: Add PushMessage
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 7 Feb 2013 11:50:44 +0100
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] configure.ac: call AC_SUBST unconditionally
+Message-Id: <20130207115044.ad0c33fb97da1d5ab1f1984e@studenti.unina.it>
+In-Reply-To: <1360226227.15783.12.camel@aeonflux>
+References: <1359906411-12624-1-git-send-email-ospite@studenti.unina.it>
+	<1360226227.15783.12.camel@aeonflux>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+On Thu, 07 Feb 2013 10:37:07 +0200
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
-On Fri, Jan 25, 2013 at 6:44 PM, Christian Fetzer
-<christian.fetzer@oss.bmw-carit.de> wrote:
-> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
->
-> Push message has been implemented similar to send file (OPP),
-> the message to send (in bMessage format) is read from a file.
-> ---
->  doc/obex-api.txt   |  22 ++++++++
->  obexd/client/map.c | 161 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 183 insertions(+)
->
-> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
-> index 6246933..759c4d8 100644
-> --- a/doc/obex-api.txt
-> +++ b/doc/obex-api.txt
-> @@ -630,6 +630,28 @@ Methods            void SetFolder(string name)
->
->                         Possible errors: org.bluez.obex.Error.Failed
->
-> +               object, dict
-> +               PushMessage(string sourcefile, string folder, dict args)
-> +
-> +                       Transfer a message (in bMessage format) to the
-> +                       remote device.
-> +
-> +                       The message is transferred either to the given folder,
-> +                       or to the current folder if folder is omitted.
-> +
-> +                       Possible args: Transparent, Retry, Charset
-> +
-> +                       The returned path represents the newly created transfer,
-> +                       which should be used to find out if the content has been
-> +                       successfully transferred or if the operation fails.
-> +
-> +                       The properties of this transfer are also returned along
-> +                       with the object path, to avoid a call to GetAll.
-> +
-> +                       Possible errors: org.bluez.obex.Error.InvalidArguments
-> +                                        org.bluez.obex.Error.Failed
-> +
-> +
->  Filter:                uint16 Offset:
->
->                         Offset of the first item, default is 0
-> diff --git a/obexd/client/map.c b/obexd/client/map.c
-> index ea5681a..2b665ec 100644
-> --- a/obexd/client/map.c
-> +++ b/obexd/client/map.c
-> @@ -52,6 +52,7 @@
->  #define DEFAULT_COUNT 1024
->  #define DEFAULT_OFFSET 0
->
-> +#define CHARSET_NATIVE 0
->  #define CHARSET_UTF8 1
->
->  static const char * const filter_list[] = {
-> @@ -1495,6 +1496,160 @@ fail:
->         return reply;
->  }
->
-> +static DBusMessage *push_message(struct map_data *map,
-> +                                                       DBusMessage *message,
-> +                                                       const char *filename,
-> +                                                       const char *folder,
-> +                                                       GObexApparam *apparam)
-> +{
-> +       struct obc_transfer *transfer;
-> +       GError *err = NULL;
-> +       DBusMessage *reply;
-> +
-> +       transfer = obc_transfer_put("x-bt/message", folder, filename,
-> +                                                               NULL, 0, &err);
-> +       if (transfer == NULL) {
-> +               g_obex_apparam_free(apparam);
-> +               goto fail;
-> +       }
-> +
-> +       obc_transfer_set_apparam(transfer, apparam);
-> +
-> +       if (!obc_session_queue(map->session, transfer, NULL, NULL, &err))
-> +               goto fail;
-> +
-> +       return obc_transfer_create_dbus_reply(transfer, message);
-> +
-> +fail:
-> +       reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed", "%s",
-> +                                                               err->message);
-> +       g_error_free(err);
-> +       return reply;
-> +}
-> +
-> +static GObexApparam *parse_transparent(GObexApparam *apparam,
-> +                                                       DBusMessageIter *iter)
-> +{
-> +       dbus_bool_t transparent;
-> +
-> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
-> +               return NULL;
-> +
-> +       dbus_message_iter_get_basic(iter, &transparent);
-> +
-> +       return g_obex_apparam_set_uint8(apparam, MAP_AP_TRANSPARENT,
-> +                                               transparent ? TRUE : FALSE);
-> +}
-> +
-> +static GObexApparam *parse_retry(GObexApparam *apparam, DBusMessageIter *iter)
-> +{
-> +       dbus_bool_t retry;
-> +
-> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
-> +               return NULL;
-> +
-> +       dbus_message_iter_get_basic(iter, &retry);
-> +
-> +       return g_obex_apparam_set_uint8(apparam, MAP_AP_RETRY,
-> +                                                       retry ? TRUE : FALSE);
-> +}
-> +
-> +static GObexApparam *parse_charset(GObexApparam *apparam, DBusMessageIter *iter)
-> +{
-> +       guint8 charset = 0;
-> +       const char *string;
-> +
-> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
-> +               return NULL;
-> +
-> +       dbus_message_iter_get_basic(iter, &string);
-> +
-> +       if (strcasecmp(string, "native") == 0)
-> +               charset = CHARSET_NATIVE;
-> +       else if (strcasecmp(string, "utf8") == 0)
-> +               charset = CHARSET_UTF8;
-> +       else
-> +               return NULL;
-> +
-> +       return g_obex_apparam_set_uint8(apparam, MAP_AP_CHARSET, charset);
-> +}
-> +
-> +static GObexApparam *parse_push_options(GObexApparam *apparam,
-> +                                                       DBusMessageIter *iter)
-> +{
-> +       DBusMessageIter array;
-> +
-> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
-> +               return NULL;
-> +
-> +       dbus_message_iter_recurse(iter, &array);
-> +
-> +       while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_DICT_ENTRY) {
-> +               const char *key;
-> +               DBusMessageIter value, entry;
-> +
-> +               dbus_message_iter_recurse(&array, &entry);
-> +               dbus_message_iter_get_basic(&entry, &key);
-> +
-> +               dbus_message_iter_next(&entry);
-> +               dbus_message_iter_recurse(&entry, &value);
-> +
-> +               if (strcasecmp(key, "Transparent") == 0) {
-> +                       if (parse_transparent(apparam, &value) == NULL)
-> +                               return NULL;
-> +               } else if (strcasecmp(key, "Retry") == 0) {
-> +                       if (parse_retry(apparam, &value) == NULL)
-> +                               return NULL;
-> +               } else if (strcasecmp(key, "Charset") == 0) {
-> +                       if (parse_charset(apparam, &value) == NULL)
-> +                               return NULL;
-> +               }
-> +
-> +               dbus_message_iter_next(&array);
-> +       }
-> +
-> +       return apparam;
-> +}
-> +
-> +static DBusMessage *map_push_message(DBusConnection *connection,
-> +                                       DBusMessage *message, void *user_data)
-> +{
-> +       struct map_data *map = user_data;
-> +       char *filename;
-> +       char *folder;
-> +       GObexApparam *apparam;
-> +       DBusMessageIter args;
-> +
-> +       dbus_message_iter_init(message, &args);
-> +
-> +       if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_STRING)
-> +               return g_dbus_create_error(message,
-> +                               ERROR_INTERFACE ".InvalidArguments", NULL);
-> +
-> +       dbus_message_iter_get_basic(&args, &filename);
-> +
-> +       dbus_message_iter_next(&args);
-> +
-> +       if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_STRING) {
-> +               return g_dbus_create_error(message,
-> +                               ERROR_INTERFACE ".InvalidArguments", NULL);
-> +       }
-> +
-> +       dbus_message_iter_get_basic(&args, &folder);
-> +
-> +       dbus_message_iter_next(&args);
-> +
-> +       apparam = g_obex_apparam_set_uint8(NULL, MAP_AP_CHARSET, CHARSET_UTF8);
-> +
-> +       if (parse_push_options(apparam, &args) == NULL) {
-> +               g_obex_apparam_free(apparam);
-> +               return g_dbus_create_error(message,
-> +                               ERROR_INTERFACE ".InvalidArguments", NULL);
-> +       }
-> +
-> +       return push_message(map, message, filename, folder, apparam);
-> +}
-> +
->  static const GDBusMethodTable map_methods[] = {
->         { GDBUS_ASYNC_METHOD("SetFolder",
->                                 GDBUS_ARGS({ "name", "s" }), NULL,
-> @@ -1515,6 +1670,12 @@ static const GDBusMethodTable map_methods[] = {
->                         NULL,
->                         NULL,
->                         map_update_inbox) },
-> +       { GDBUS_ASYNC_METHOD("PushMessage",
-> +                       GDBUS_ARGS({ "file", "s" }, { "folder", "s" },
-> +                                               { "args", "a{sv}" }),
-> +                       GDBUS_ARGS({ "transfer", "o" },
-> +                                               { "properties", "a{sv}" }),
-> +                       map_push_message) },
->         { }
->  };
->
-> --
-> 1.8.1
+> Hi Antonio,
+> 
+> > Call AC_SUBST unconditionally, otherwise options like
+> > --with-dbusconfdir=DIR or --with-udevdir=DIR have no effect.
+> > 
+> > Before this change, configuring with:
+> > 
+> >   $ mkdir build
+> >   $ ./configure --disable-systemd \
+> >                 --prefix=$(pwd)/build \
+> >                 --with-dbusconfdir=$(pwd)/build/etc
+> > 
+> > resulted in the option value to be ignored at "make install" time, with
+> > this error:
+> > 
+> >   /bin/mkdir: cannot create directory '/dbus-1/system.d': Permission denied
+> > 
+> > After the patch the option value is respected.
+> > ---
+> > 
+> > Hi,
+> > 
+> > the issue was highlighted by the use "--prefix=" and running "make install" as
+> > a restricted user, maybe the are still other issues with this use case.
+> > Anyone willing to take a deeper look?
+> 
+> why are you doing --prefix="" in the first place? I do not get that
+> part.
 
-Pushed, thanks.
+Sorry, poor communication choice from my part, in the sentence above the
+_whole_ --prefix= was enclosed in double quotes to mean "the --prefix
+parameter", but I see this could be misleading, I am actually using:
+
+  --prefix=$(pwd)/build
+
+> > For instance, is "--prefix=DIR" supposed to be prepended to manually specified
+> > paths too?
+> >
+> > Thanks,
+> >    Antonio
+> > 
+> >  configure.ac |   16 ++++++++--------
+> >  1 file changed, 8 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/configure.ac b/configure.ac
+> > index 070acea..fe2893a 100644
+> > --- a/configure.ac
+> > +++ b/configure.ac
+> > @@ -71,8 +71,8 @@ if (test -z "${path_dbusconfdir}"); then
+> >  		AC_MSG_ERROR([D-Bus configuration directory is required])
+> >  	fi
+> >  	AC_MSG_RESULT([${path_dbusconfdir}])
+> > -	AC_SUBST(DBUS_CONFDIR, [${path_dbusconfdir}])
+> >  fi
+> > +AC_SUBST(DBUS_CONFDIR, [${path_dbusconfdir}])
+> 
+> I am failing to see the bug here. you are providing the
+> --with-dbusconfdir=DIR and thus is should work. What is causing the
+> wrong mkdir actually.
+>
+
+This is what I understand is going on in configure.ac right now:
+
+  # define the option
+  AC_ARG_WITH([dbusconfdir] ... [path_dbusconfdir=${withval}])
+
+  # when --with-dbusconfdir is NOT used
+  if (test -z "${path_dbusconfdir}"); then
+    ...
+
+    # define the config dir
+    path_dbusconfdir="`$PKG_CONFIG --variable=sysconfdir dbus-1`"
+    
+    ...
+    
+    # set DBUS_CONFDIR
+    AC_SUBST(DBUS_CONFDIR, [${path_dbusconfdir}])
+  endif
+
+when --with-dbusconfdir=SOMEDIR is used the test above fails, and the
+result is that ${path_dbusconfdir} is indeed defined, but DBUS_CONFDIR
+is not, and the latter is going to be used in Makefile.am:
+
+  dbusdir = @DBUS_CONFDIR@/dbus-1/system.d
+
+The wrong makedir is exposed by my use of the "prefix" option and the
+fact that I am running "make install" as a normal user, otherwise
+/dbus-1/system.d would be happily (and wrongly) created.
+
+By always setting DBUS_CONFDIR we cover the case when
+--with-dbusconfdir=SOMEDIR is used.
+
+> >  AC_ARG_WITH([dbussystembusdir], AC_HELP_STRING([--with-dbussystembusdir=DIR],
+> >  				[path to D-Bus system bus services directory]),
+> > @@ -84,8 +84,8 @@ if (test -z "${path_dbussystembusdir}"); then
+> >  		AC_MSG_ERROR([D-Bus system bus services directory is required])
+> >  	fi
+> >  	AC_MSG_RESULT([${path_dbussystembusdir}])
+> > -	AC_SUBST(DBUS_SYSTEMBUSDIR, [${path_dbussystembusdir}])
+> >  fi
+> > +AC_SUBST(DBUS_SYSTEMBUSDIR, [${path_dbussystembusdir}])
+> >  
+> >  AC_ARG_WITH([dbussessionbusdir], AC_HELP_STRING([--with-dbussessionbusdir=DIR],
+> >  				[path to D-Bus session bus services directory]),
+> > @@ -97,8 +97,8 @@ if (test -z "${path_dbussessionbusdir}"); then
+> >  		AC_MSG_ERROR([D-Bus session bus services directory is required])
+> >  	fi
+> >  	AC_MSG_RESULT([${path_dbussessionbusdir}])
+> > -	AC_SUBST(DBUS_SESSIONBUSDIR, [${path_dbussessionbusdir}])
+> >  fi
+> > +AC_SUBST(DBUS_SESSIONBUSDIR, [${path_dbussessionbusdir}])
+> >  
+> >  AC_ARG_ENABLE(library, AC_HELP_STRING([--enable-library],
+> >  		[install Bluetooth library]), [enable_library=${enableval}])
+> > @@ -121,8 +121,6 @@ AC_ARG_ENABLE(usb, AC_HELP_STRING([--disable-usb],
+> >  if (test "${enable_tools}" != "no" && test "${enable_usb}" != "no"  ); then
+> >  	PKG_CHECK_MODULES(USB, libusb, dummy=yes,
+> >  			AC_MSG_ERROR(USB library support is required))
+> > -	AC_SUBST(USB_CFLAGS)
+> > -	AC_SUBST(USB_LIBS)
+> >  	AC_CHECK_LIB(usb, usb_get_busses, dummy=yes,
+> >  		AC_DEFINE(NEED_USB_GET_BUSSES, 1,
+> >  			[Define to 1 if you need the usb_get_busses() function.]
+> > @@ -133,6 +131,8 @@ if (test "${enable_tools}" != "no" && test "${enable_usb}" != "no"  ); then
+> >  on.]))
+> >  	AC_DEFINE(HAVE_LIBUSB, 1, [Define to 1 if you have USB library.])
+> >  fi
+> > +AC_SUBST(USB_CFLAGS)
+> > +AC_SUBST(USB_LIBS)
+> 
+> What are these changes for? I don't see any reason for them. And also
+> they should not intermix in the patch. They need to explained
+> separately.
+> 
+
+They are meant to follow the same logic used for
+
+AC_SUBST(UDEV_CFLAGS)
+AC_SUBST(UDEV_LIBS)
+
+which are outside of the test.
+
+Unrelated, right, sorry. Maybe I'll send another patch for them.
+
+Thanks,
+   Antonio
 
 -- 
-Luiz Augusto von Dentz
+Antonio Ospite
+http://ao2.it
+
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
