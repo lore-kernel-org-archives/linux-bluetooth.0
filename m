@@ -1,54 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core: Fix calling profile .connect multiple times
-Date: Fri,  8 Feb 2013 11:51:28 +0200
-Message-Id: <1360317088-18852-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1359766284.16887.2.camel@aeonflux>
+References: <1359765878-31409-1-git-send-email-andre.guedes@openbossa.org>
+	<1359765878-31409-2-git-send-email-andre.guedes@openbossa.org>
+	<1359766284.16887.2.camel@aeonflux>
+Date: Thu, 7 Feb 2013 22:33:59 -0300
+Message-ID: <CACJA=fVEBf=ecV5yxc3VaGiOpMqQAFCUSr=SeC_VW=5HZXiE4Q@mail.gmail.com>
+Subject: Re: [RFC 1/7] Bluetooth: Add new connection states
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Marcel,
 
-Sometimes profiles may complete the connection in different order
-than expected so the code has to check if it was actually the
-current pending profile to proceed to the next.
----
- src/device.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+On Fri, Feb 1, 2013 at 9:51 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Andre,
+>
+>> This patch adds two new connection states which will be used by
+>> hci_conn to establish LE connections.
+>>
+>> BT_SCAN state means the controller is scanning for LE devices. Once
+>> the target device is found, the connection goes to BT_DEV_FOUND
+>> state, and then to BT_CONNECT state.
+>>
+>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>> ---
+>>  include/net/bluetooth/bluetooth.h | 8 +++++++-
+>>  1 file changed, 7 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+>> index 9531bee..add5721 100644
+>> --- a/include/net/bluetooth/bluetooth.h
+>> +++ b/include/net/bluetooth/bluetooth.h
+>> @@ -126,7 +126,9 @@ enum {
+>>       BT_CONNECT2,
+>>       BT_CONFIG,
+>>       BT_DISCONN,
+>> -     BT_CLOSED
+>> +     BT_CLOSED,
+>> +     BT_SCAN,
+>> +     BT_DEV_FOUND
+>>  };
+>
+> I am actually against this. These states where originally socket states
+> and not general states that we just pile on top of.
+>
+> You need to create separate state handling for LE connection handling. I
+> am really not happy that we always try to shoe-horn this onto something
+> else.
 
-diff --git a/src/device.c b/src/device.c
-index 49f8957..8ee7659 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1085,8 +1085,14 @@ static int connect_next(struct btd_device *dev)
- void device_profile_connected(struct btd_device *dev,
- 					struct btd_profile *profile, int err)
- {
-+	struct btd_profile *pending;
-+
- 	DBG("%s %s (%d)", profile->name, strerror(-err), -err);
- 
-+	if (dev->pending == NULL)
-+		return;
-+
-+	pending = dev->pending->data;
- 	dev->pending = g_slist_remove(dev->pending, profile);
- 
- 	if (!err)
-@@ -1094,6 +1100,13 @@ void device_profile_connected(struct btd_device *dev,
- 				g_slist_append(dev->connected_profiles,
- 								profile);
- 
-+	/* Only continue connecting the next profile if it matches the first
-+	 * pending, otherwise it will trigger another connect to the same
-+	 * profile
-+	 */
-+	if (profile != pending)
-+		return;
-+
- 	if (connect_next(dev) == 0)
- 		return;
- 
--- 
-1.8.1
+Ok, I'll create a separated state for LE connection handling.
 
+Regards,
+
+Andre
