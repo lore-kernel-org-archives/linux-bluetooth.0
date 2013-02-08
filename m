@@ -1,35 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] adapter: Fix registering adapter with no address
-Date: Fri, 8 Feb 2013 11:03:13 +0100
-Message-ID: <1360317793-2015-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] core: Fix calling profile .connect multiple times
+Date: Fri,  8 Feb 2013 11:51:28 +0200
+Message-Id: <1360317088-18852-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-adapter->bdaddr is set later in read_info_complete and current check
-always returns false. Check against bdaddr received in command response
-instead and fail if it is all zeros.
----
- src/adapter.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 9ddd2fc..5165bed 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -5727,7 +5727,7 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 		goto failed;
- 	}
+Sometimes profiles may complete the connection in different order
+than expected so the code has to check if it was actually the
+current pending profile to proceed to the next.
+---
+ src/device.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/src/device.c b/src/device.c
+index 49f8957..8ee7659 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1085,8 +1085,14 @@ static int connect_next(struct btd_device *dev)
+ void device_profile_connected(struct btd_device *dev,
+ 					struct btd_profile *profile, int err)
+ {
++	struct btd_profile *pending;
++
+ 	DBG("%s %s (%d)", profile->name, strerror(-err), -err);
  
--	if (bacmp(&adapter->bdaddr, BDADDR_ANY)) {
-+	if (bacmp(&rp->bdaddr, BDADDR_ANY) == 0) {
- 		error("No Bluetooth address for index %u", adapter->dev_id);
- 		goto failed;
- 	}
++	if (dev->pending == NULL)
++		return;
++
++	pending = dev->pending->data;
+ 	dev->pending = g_slist_remove(dev->pending, profile);
+ 
+ 	if (!err)
+@@ -1094,6 +1100,13 @@ void device_profile_connected(struct btd_device *dev,
+ 				g_slist_append(dev->connected_profiles,
+ 								profile);
+ 
++	/* Only continue connecting the next profile if it matches the first
++	 * pending, otherwise it will trigger another connect to the same
++	 * profile
++	 */
++	if (profile != pending)
++		return;
++
+ 	if (connect_next(dev) == 0)
+ 		return;
+ 
 -- 
-1.8.1.1
+1.8.1
 
