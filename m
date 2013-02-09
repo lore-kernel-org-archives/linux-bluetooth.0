@@ -1,37 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <1360448522.23439.140661189177761.7087C9E4@webmail.messagingengine.com>
-From: Rebecca Menessec <rebecca.menessec@ironhavoc.org>
+From: Randy Yates <yates@digitalsignallabs.com>
 To: linux-bluetooth@vger.kernel.org
+Subject: Re: bluez 5.2 build problem
+References: <87d2w9zsnw.fsf@randy.site>
+Date: Sat, 09 Feb 2013 05:31:42 -0500
+In-Reply-To: <87d2w9zsnw.fsf@randy.site> (Randy Yates's message of "Sat, 09
+	Feb 2013 05:29:55 -0500")
+Message-ID: <8738x5zskx.fsf@randy.site>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Missing manpage for main.conf
-Reply-To: rebecca.menessec@ironhavoc.org
-Date: Sat, 09 Feb 2013 17:22:02 -0500
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I was looking for a way to disable BlueZ logging (Ubuntu machine), and
-came across this, in the bluetoothd manpage:
+PS: The target kernel is a patched 3.7.4 from Robert Nelson's
+distribution.
 
-'bluetoothd itself does not accept many command-line options, as most of
-its configuration is done in the /etc/bluetooth/main.conf file, which
-has its own man page.'
+--Randy
 
-That doesn't appear to be true. I can't find any trace in any distro, or
-in the source. I've found a bug filed here and there against the lack of
-manpage, but no manpage.
+Randy Yates <yates@digitalsignallabs.com> writes:
 
-There's definitely logging going on by default:
+> After configuring with the attached config.log, I'm getting the
+> following error during build:
+>
+>   CC     btio/bluetoothd-btio.o
+> btio/btio.c: In function 'bt_io_get_type':
+> btio/btio.c:109:35: error: 'SO_DOMAIN' undeclared (first use in this function)
+> btio/btio.c:109:35: note: each undeclared identifier is reported only once for each function it appears in
+> btio/btio.c:123:35: error: 'SO_PROTOCOL' undeclared (first use in this function)
+> make[3]: *** [btio/bluetoothd-btio.o] Error 1
+> make[2]: *** [all] Error 2
+> make[2]: Leaving directory `/home/embedded-linux/tool/ti-sdk/bluez/bluez-5.2'
+> make[1]: *** [make] Error 2
+> make[1]: Leaving directory `/home/embedded-linux/tool/ti-sdk/bluez'
+> make: *** [bluez] Error 2
+>
+> I checked the kernel/usr/include/sys/socket.h and it does not have
+> SO_DOMAIN defined. I am using a fresh (cross-)build of glibc-2.17.
+>
+> Note that I am cross-compiling for the beagle-board xm using TI's Arago
+> cross-compiler tools.
+>
+> Am I missing something obvious, or is this a build bug?
 
-localhost ~ [0]# lsof -n 2> /dev/null | grep blue | grep log
-rsyslogd   804          syslog    2w      REG               0,21    
-2027       8482 /var/log/bluetoothd.log
-rs:main    804  813     syslog    2w      REG               0,21    
-2027       8482 /var/log/bluetoothd.log
-rsyslogd   804  814     syslog    2w      REG               0,21    
-2027       8482 /var/log/bluetoothd.log
-rsyslogd   804  815     syslog    2w      REG               0,21    
-2027       8482 /var/log/bluetoothd.log
-
-Unfortunately, there's no hint anywhere what's causing bluetoothd to
-log, or how to stop it.
+-- 
+Randy Yates
+Digital Signal Labs
+http://www.digitalsignallabs.com
