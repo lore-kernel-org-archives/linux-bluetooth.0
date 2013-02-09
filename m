@@ -1,188 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 10 Feb 2013 21:39:59 +0100
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] configure.ac: call AC_SUBST unconditionally
-Message-Id: <20130210213959.a2af159d019d97fe2a4e600c@studenti.unina.it>
-In-Reply-To: <1360322491.20763.1.camel@aeonflux>
-References: <1359906411-12624-1-git-send-email-ospite@studenti.unina.it>
-	<1360226227.15783.12.camel@aeonflux>
-	<20130207115044.ad0c33fb97da1d5ab1f1984e@studenti.unina.it>
-	<1360322491.20763.1.camel@aeonflux>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Message-Id: <1360448522.23439.140661189177761.7087C9E4@webmail.messagingengine.com>
+From: Rebecca Menessec <rebecca.menessec@ironhavoc.org>
+To: linux-bluetooth@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Missing manpage for main.conf
+Reply-To: rebecca.menessec@ironhavoc.org
+Date: Sat, 09 Feb 2013 17:22:02 -0500
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 08 Feb 2013 13:21:31 +0200
-Marcel Holtmann <marcel@holtmann.org> wrote:
+I was looking for a way to disable BlueZ logging (Ubuntu machine), and
+came across this, in the bluetoothd manpage:
 
-> Hi Antonio,
-> 
-> > > > Call AC_SUBST unconditionally, otherwise options like
-> > > > --with-dbusconfdir=DIR or --with-udevdir=DIR have no effect.
-> > > > 
-> > > > Before this change, configuring with:
-> > > > 
-> > > >   $ mkdir build
-> > > >   $ ./configure --disable-systemd \
-> > > >                 --prefix=$(pwd)/build \
-> > > >                 --with-dbusconfdir=$(pwd)/build/etc
-> > > > 
-> > > > resulted in the option value to be ignored at "make install" time, with
-> > > > this error:
-> > > > 
-> > > >   /bin/mkdir: cannot create directory '/dbus-1/system.d': Permission denied
-> > > > 
-> > > > After the patch the option value is respected.
-> > > > ---
-> > > > 
-> > > > Hi,
-> > > > 
-> > > > the issue was highlighted by the use "--prefix=" and running "make install" as
-> > > > a restricted user, maybe the are still other issues with this use case.
-> > > > Anyone willing to take a deeper look?
-> > > 
-> > > why are you doing --prefix="" in the first place? I do not get that
-> > > part.
-> > 
-> > Sorry, poor communication choice from my part, in the sentence above the
-> > _whole_ --prefix= was enclosed in double quotes to mean "the --prefix
-> > parameter", but I see this could be misleading, I am actually using:
-> > 
-> >   --prefix=$(pwd)/build
-> > 
-> > > > For instance, is "--prefix=DIR" supposed to be prepended to manually specified
-> > > > paths too?
-> > > >
-> > > > Thanks,
-> > > >    Antonio
-> > > > 
-> > > >  configure.ac |   16 ++++++++--------
-> > > >  1 file changed, 8 insertions(+), 8 deletions(-)
-> > > > 
-> > > > diff --git a/configure.ac b/configure.ac
-> > > > index 070acea..fe2893a 100644
-> > > > --- a/configure.ac
-> > > > +++ b/configure.ac
-> > > > @@ -71,8 +71,8 @@ if (test -z "${path_dbusconfdir}"); then
-> > > >  		AC_MSG_ERROR([D-Bus configuration directory is required])
-> > > >  	fi
-> > > >  	AC_MSG_RESULT([${path_dbusconfdir}])
-> > > > -	AC_SUBST(DBUS_CONFDIR, [${path_dbusconfdir}])
-> > > >  fi
-> > > > +AC_SUBST(DBUS_CONFDIR, [${path_dbusconfdir}])
-> > > 
-> > > I am failing to see the bug here. you are providing the
-> > > --with-dbusconfdir=DIR and thus is should work. What is causing the
-> > > wrong mkdir actually.
-> > >
-> > 
-> > This is what I understand is going on in configure.ac right now:
-> > 
-> >   # define the option
-> >   AC_ARG_WITH([dbusconfdir] ... [path_dbusconfdir=${withval}])
-> > 
-> >   # when --with-dbusconfdir is NOT used
-> >   if (test -z "${path_dbusconfdir}"); then
-> >     ...
-> > 
-> >     # define the config dir
-> >     path_dbusconfdir="`$PKG_CONFIG --variable=sysconfdir dbus-1`"
-> >     
-> >     ...
-> >     
-> >     # set DBUS_CONFDIR
-> >     AC_SUBST(DBUS_CONFDIR, [${path_dbusconfdir}])
-> >   endif
-> > 
-> > when --with-dbusconfdir=SOMEDIR is used the test above fails, and the
-> > result is that ${path_dbusconfdir} is indeed defined, but DBUS_CONFDIR
-> > is not, and the latter is going to be used in Makefile.am:
-> > 
-> >   dbusdir = @DBUS_CONFDIR@/dbus-1/system.d
-> > 
-> > The wrong makedir is exposed by my use of the "prefix" option and the
-> > fact that I am running "make install" as a normal user, otherwise
-> > /dbus-1/system.d would be happily (and wrongly) created.
-> > 
-> > By always setting DBUS_CONFDIR we cover the case when
-> > --with-dbusconfdir=SOMEDIR is used.
-> 
-> I see your point here. This one is valid. Please send separate patches
-> for that.
+'bluetoothd itself does not accept many command-line options, as most of
+its configuration is done in the /etc/bluetooth/main.conf file, which
+has its own man page.'
 
-I will, thanks.
+That doesn't appear to be true. I can't find any trace in any distro, or
+in the source. I've found a bug filed here and there against the lack of
+manpage, but no manpage.
 
-> > 
-> > > >  AC_ARG_WITH([dbussystembusdir], AC_HELP_STRING([--with-dbussystembusdir=DIR],
-> > > >  				[path to D-Bus system bus services directory]),
-> > > > @@ -84,8 +84,8 @@ if (test -z "${path_dbussystembusdir}"); then
-> > > >  		AC_MSG_ERROR([D-Bus system bus services directory is required])
-> > > >  	fi
-> > > >  	AC_MSG_RESULT([${path_dbussystembusdir}])
-> > > > -	AC_SUBST(DBUS_SYSTEMBUSDIR, [${path_dbussystembusdir}])
-> > > >  fi
-> > > > +AC_SUBST(DBUS_SYSTEMBUSDIR, [${path_dbussystembusdir}])
-> > > >  
-> > > >  AC_ARG_WITH([dbussessionbusdir], AC_HELP_STRING([--with-dbussessionbusdir=DIR],
-> > > >  				[path to D-Bus session bus services directory]),
-> > > > @@ -97,8 +97,8 @@ if (test -z "${path_dbussessionbusdir}"); then
-> > > >  		AC_MSG_ERROR([D-Bus session bus services directory is required])
-> > > >  	fi
-> > > >  	AC_MSG_RESULT([${path_dbussessionbusdir}])
-> > > > -	AC_SUBST(DBUS_SESSIONBUSDIR, [${path_dbussessionbusdir}])
-> > > >  fi
-> > > > +AC_SUBST(DBUS_SESSIONBUSDIR, [${path_dbussessionbusdir}])
-> > > >  
-> > > >  AC_ARG_ENABLE(library, AC_HELP_STRING([--enable-library],
-> > > >  		[install Bluetooth library]), [enable_library=${enableval}])
-> > > > @@ -121,8 +121,6 @@ AC_ARG_ENABLE(usb, AC_HELP_STRING([--disable-usb],
-> > > >  if (test "${enable_tools}" != "no" && test "${enable_usb}" != "no"  ); then
-> > > >  	PKG_CHECK_MODULES(USB, libusb, dummy=yes,
-> > > >  			AC_MSG_ERROR(USB library support is required))
-> > > > -	AC_SUBST(USB_CFLAGS)
-> > > > -	AC_SUBST(USB_LIBS)
-> > > >  	AC_CHECK_LIB(usb, usb_get_busses, dummy=yes,
-> > > >  		AC_DEFINE(NEED_USB_GET_BUSSES, 1,
-> > > >  			[Define to 1 if you need the usb_get_busses() function.]
-> > > > @@ -133,6 +131,8 @@ if (test "${enable_tools}" != "no" && test "${enable_usb}" != "no"  ); then
-> > > >  on.]))
-> > > >  	AC_DEFINE(HAVE_LIBUSB, 1, [Define to 1 if you have USB library.])
-> > > >  fi
-> > > > +AC_SUBST(USB_CFLAGS)
-> > > > +AC_SUBST(USB_LIBS)
-> > > 
-> > > What are these changes for? I don't see any reason for them. And also
-> > > they should not intermix in the patch. They need to explained
-> > > separately.
-> > > 
-> > 
-> > They are meant to follow the same logic used for
-> > 
-> > AC_SUBST(UDEV_CFLAGS)
-> > AC_SUBST(UDEV_LIBS)
-> > 
-> > which are outside of the test.
-> 
-> I do not see this being valid. The logic does not work since it will
-> abort if enabled.
-> 
+There's definitely logging going on by default:
 
-I double checked and I think that actually we can do the reverse that
-this hunk was trying to do: bring inside the "if" tests other AC_SUBST
-(*_CFLAGS) just like it is now done for USB_CFLAGS and USB_LIBS.
+localhost ~ [0]# lsof -n 2> /dev/null | grep blue | grep log
+rsyslogd   804          syslog    2w      REG               0,21    
+2027       8482 /var/log/bluetoothd.log
+rs:main    804  813     syslog    2w      REG               0,21    
+2027       8482 /var/log/bluetoothd.log
+rsyslogd   804  814     syslog    2w      REG               0,21    
+2027       8482 /var/log/bluetoothd.log
+rsyslogd   804  815     syslog    2w      REG               0,21    
+2027       8482 /var/log/bluetoothd.log
 
-I'll try to explain that better in the commit message for the patch and
-you'll decide whether to pick that up or not.
-
-Regards,
-   Antonio
-
--- 
-Antonio Ospite
-http://ao2.it
-
-A: Because it messes up the order in which people normally read text.
-   See http://en.wikipedia.org/wiki/Posting_style
-Q: Why is top-posting such a bad thing?
+Unfortunately, there's no hint anywhere what's causing bluetoothd to
+log, or how to stop it.
