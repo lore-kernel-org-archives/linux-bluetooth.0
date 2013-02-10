@@ -1,53 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: Antonio Ospite <ospite@studenti.unina.it>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 00/13] Fix SDP DE Type Descriptor validation issues
-Date: Sun, 10 Feb 2013 17:26:24 -0400
-Message-Id: <1360531597-3506-1-git-send-email-anderson.lizardo@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Antonio Ospite <ospite@studenti.unina.it>
+Subject: [PATCHv2 BlueZ 0/2] configure.ac fixes
+Date: Sun, 10 Feb 2013 22:20:49 +0100
+Message-Id: <1360531251-18371-1-git-send-email-ospite@studenti.unina.it>
+In-Reply-To: <1359906411-12624-1-git-send-email-ospite@studenti.unina.it>
+References: <1359906411-12624-1-git-send-email-ospite@studenti.unina.it>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-This series adds various missing DTD validations, specially for SEQ* types. The
-lack of these validations allows for a remote device to crash BlueZ due to
-invalid memory access.
+Patch 1 fixes --with-* options, it should be OK as Marcel
+acknowledged.
 
-I also added unit tests for all affected functions. They are in a separate C
-file (unit/test-sdp-lib.c), which can contain tests for SDP library API that is
-not covered by SDP server tests in unit/test-sdp.c. It also contains various
-tests for corner cases that increase code coverage (as measured by gcov/lcov).
+Patch 2 is more for the sake of regularity with USB_CFLAGS and
+USB_LIBS, it's not strictly necessary.
 
-The only pending related fixes from my part are some missing NULL pointer
-checks when accessing empty sequences. These will take some time to fix as they
-affect profile code as well.
+Thanks,
+   Antonio
 
-Best Regards,
+Antonio Ospite (2):
+  configure.ac: call AC_SUBST unconditionally with --with-* options
+  Call AC_SUBST(*_CFLAGS) and AC_SUBST(*_LIBS) only when needed
 
-Anderson Lizardo (13):
-  unit: Add initial SDP library unit tests
-  lib: Add SDP_IS_ALT() macro
-  lib: Reuse identical code in sdp_get_{add,}_access_protos()
-  lib: Cleanup coding style in sdp_get_proto_descs()
-  lib: Fix missing DTD validation while accessing SDP data elements
-  unit: Add tests for sdp_get_lang_attr()
-  lib: Add missing DTD validation in sdp_record_print()
-  lib: Validate DTDs when parsing LanguageBaseAttributeIDList
-  lib: Validate DTDs when parsing BluetoothProfileDescriptorList
-  lib: Add comment to BluetoothProfileDescriptorList parsing workaround
-  lib: Validate DTDs when parsing VersionNumberList
-  unit: Add tests for sdp_get_profile_descs()
-  unit: Add tests for sdp_get_server_ver()
-
- .gitignore          |    1 +
- Makefile.am         |    5 +-
- lib/sdp.c           |  164 +++++++++++++-----
- lib/sdp.h           |    1 +
- unit/test-sdp-lib.c |  470 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 594 insertions(+), 47 deletions(-)
- create mode 100644 unit/test-sdp-lib.c
+ configure.ac |   20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
 -- 
-1.7.9.5
+Antonio Ospite
+http://ao2.it
 
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
