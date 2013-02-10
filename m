@@ -2,86 +2,75 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 09/13] lib: Validate DTDs when parsing BluetoothProfileDescriptorList
-Date: Sun, 10 Feb 2013 17:26:33 -0400
-Message-Id: <1360531597-3506-10-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 08/13] lib: Validate DTDs when parsing LanguageBaseAttributeIDList
+Date: Sun, 10 Feb 2013 17:26:32 -0400
+Message-Id: <1360531597-3506-9-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1360531597-3506-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1360531597-3506-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The "seq->val.dataseq != NULL" check is also removed from the for()
-statement because it should be done after verifying that the data
-element is a sequence (inside the "if (SDP_IS_SEQ(...))" block.)
+Also check if the required number of entries is present.
 ---
- lib/sdp.c |   37 ++++++++++++++++++++++++++++---------
- 1 file changed, 28 insertions(+), 9 deletions(-)
+ lib/sdp.c |   32 +++++++++++++++++++++++++-------
+ 1 file changed, 25 insertions(+), 7 deletions(-)
 
 diff --git a/lib/sdp.c b/lib/sdp.c
-index ba55fc4..c5bc16e 100644
+index 21dfe1b..ba55fc4 100644
 --- a/lib/sdp.c
 +++ b/lib/sdp.c
-@@ -2078,11 +2078,15 @@ int sdp_get_profile_descs(const sdp_record_t *rec, sdp_list_t **profDescSeq)
- 
- 	*profDescSeq = NULL;
- 	sdpdata = sdp_data_get(rec, SDP_ATTR_PFILE_DESC_LIST);
--	if (!sdpdata || !sdpdata->val.dataseq) {
-+	if (sdpdata == NULL) {
+@@ -2019,19 +2019,30 @@ int sdp_get_lang_attr(const sdp_record_t *rec, sdp_list_t **langSeq)
  		errno = ENODATA;
  		return -1;
  	}
--	for (seq = sdpdata->val.dataseq; seq && seq->val.dataseq; seq = seq->next) {
 +
-+	if (!SDP_IS_SEQ(sdpdata->dtd) || sdpdata->val.dataseq == NULL)
++	if (!SDP_IS_SEQ(sdpdata->dtd))
 +		goto invalid;
+ 	curr_data = sdpdata->val.dataseq;
 +
-+	for (seq = sdpdata->val.dataseq; seq; seq = seq->next) {
- 		uuid_t *uuid = NULL;
- 		uint16_t version = 0x100;
- 
-@@ -2094,13 +2098,21 @@ int sdp_get_profile_descs(const sdp_record_t *rec, sdp_list_t **profDescSeq)
- 				seq = next;
- 			}
- 		} else if (SDP_IS_SEQ(seq->dtd)) {
--			sdp_data_t *puuid = seq->val.dataseq;
--			sdp_data_t *pVnum = seq->val.dataseq->next;
--			if (puuid && pVnum) {
--				uuid = &puuid->val.uuid;
--				version = pVnum->val.uint16;
--			}
--		}
-+			sdp_data_t *puuid, *pVnum;
+ 	while (curr_data) {
+-		sdp_data_t *pCode = curr_data;
+-		sdp_data_t *pEncoding;
+-		sdp_data_t *pOffset;
++		sdp_data_t *pCode, *pEncoding, *pOffset;
 +
-+			puuid = seq->val.dataseq;
-+			if (puuid == NULL || !SDP_IS_UUID(puuid->dtd))
-+				goto invalid;
++		pCode = curr_data;
++		if (pCode->dtd != SDP_UINT16)
++			goto invalid;
 +
-+			uuid = &puuid->val.uuid;
-+
-+			pVnum = puuid->next;
-+			if (pVnum == NULL || pVnum->dtd != SDP_UINT16)
-+				goto invalid;
-+
-+			version = pVnum->val.uint16;
-+		} else
++		/* LanguageBaseAttributeIDList entries are always grouped as
++		 * triplets */
++		if (!pCode->next || !pCode->next->next)
 +			goto invalid;
  
- 		if (uuid != NULL) {
- 			profDesc = malloc(sizeof(sdp_profile_desc_t));
-@@ -2119,6 +2131,13 @@ int sdp_get_profile_descs(const sdp_record_t *rec, sdp_list_t **profDescSeq)
- 		}
+ 		pEncoding = pCode->next;
+-		if (!pEncoding)
+-			break;
++		if (pEncoding->dtd != SDP_UINT16)
++			goto invalid;
+ 
+ 		pOffset = pEncoding->next;
+-		if (!pOffset)
+-			break;
++		if (pOffset->dtd != SDP_UINT16)
++			goto invalid;
+ 
+ 		lang = malloc(sizeof(sdp_lang_attr_t));
+ 		if (!lang) {
+@@ -2051,6 +2062,13 @@ int sdp_get_lang_attr(const sdp_record_t *rec, sdp_list_t **langSeq)
  	}
+ 
  	return 0;
 +
 +invalid:
-+	sdp_list_free(*profDescSeq, free);
-+	*profDescSeq = NULL;
++	sdp_list_free(*langSeq, free);
++	*langSeq = NULL;
 +	errno = EINVAL;
 +
 +	return -1;
  }
  
- int sdp_get_server_ver(const sdp_record_t *rec, sdp_list_t **u16)
+ int sdp_get_profile_descs(const sdp_record_t *rec, sdp_list_t **profDescSeq)
 -- 
 1.7.9.5
 
