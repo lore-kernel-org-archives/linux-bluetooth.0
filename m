@@ -1,66 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: Re: [PATCH 00/14] neard plugin update
-Date: Mon, 11 Feb 2013 10:52:36 +0100
-Message-ID: <2589959.gQ4yNVdaLa@uw000953>
-In-Reply-To: <1360224844-12280-1-git-send-email-szymon.janc@tieto.com>
-References: <1360224844-12280-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+Date: Sun, 10 Feb 2013 22:30:31 +0100
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: linux-bluetooth@vger.kernel.org
+Cc: Antonio Ospite <ospite@studenti.unina.it>
+Subject: Re: [PATCH BlueZ 0/2] Add device_set_trusted()
+Message-Id: <20130210223031.4664505f4625616ebbd32052@studenti.unina.it>
+In-Reply-To: <1359908071-15024-1-git-send-email-ospite@studenti.unina.it>
+References: <1359908071-15024-1-git-send-email-ospite@studenti.unina.it>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+On Sun,  3 Feb 2013 17:14:29 +0100
+Antonio Ospite <ospite@studenti.unina.it> wrote:
 
-On Thursday 07 of February 2013 10:13:50 Janc Szymon wrote:
-> This set adds some new features to neard plugin to match it with
-> recent changes in neard daemon:
-> - support for carrier power state hint (already merged)
-> - update register API [with fallback to legacy support] (pending review)
+> Hi,
+> 
+> In patch 1 a device_set_trusted() function is proposed, which I plan to
+> use for the playstation-peripheral plugin; I am in the process of
+> rebasing the plugin on top of BlueZ 5.2.
+> 
+> In patch 2 the newly introduced function is used in order to avoid some
+> duplication.
+> 
+> device_set_trusted() looks a lot like device_set_temporary() and
+> device_set_legacy(), I hope it makes sense to you too.
+>
+> Thanks,
+>    Antonio
+> 
+> Antonio Ospite (2):
+>   device: add a device_set_trusted() function
+>   device: use device_set_trusted() in set_trust()
+>
 
-Just to notify that register API changes were just merged into neard.git so all
-code needed is now present in neard daemon.
+Ping for these two patches.
+ 
+>  src/device.c |   30 +++++++++++++++++++-----------
+>  src/device.h |    1 +
+>  2 files changed, 20 insertions(+), 11 deletions(-)
+> 
 
-> 
-> Power state hint could be use to improve IOP e.g. delay or retry pairing when
-> remote device in activating or incative state.
-> 
-> Other than that bugfixes, small improvements and some code refactoring to
-> make it better prepared for future feature addition e.g. to perform more
-> action on PushOOB than only pairing.
-> 
-> There are still some open points regarding how to properly map adapter
-> state (powered/pairable/connectable) to carrier power state but those
-> could be discussed separately later on.
-> 
-> Comments are welcome.
-> 
-> BR
-> Szymon Janc
-> 
-> Ravi kumar Veeramally (1):
->   neard: Updated neard handover registration agent api calls.
-> 
-> Szymon Janc (13):
->   neard: Adjust errors to latest API changes
->   neard: Refactor message processing
->   neard: Add ability to parse 'State' field
->   neard: Move pairable check from check_adapter
->   adapter: Add btd_adapter_get_powered function
->   neard: Check if adapter is powered in PushOOB
->   adapter: Add btd_adapter_get_connectable function
->   neard: Add support for setting power state in RequestOOB reply
->   neard: Use path instead of boolean to track if registered to neard
->   neard: Restrict method calls only to neard process
->   neard: Use bool instead of gboolean for agent_register_postpone
->   neard: Update copyright information
->   neard: Add fallback to legacy register if register failed
-> 
->  plugins/neard.c | 562 ++++++++++++++++++++++++++++++++++----------------------
->  src/adapter.c   |  16 ++
->  src/adapter.h   |   2 +
->  3 files changed, 361 insertions(+), 219 deletions(-)
-> 
-> 
+-- 
+Antonio Ospite
+http://ao2.it
+
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
