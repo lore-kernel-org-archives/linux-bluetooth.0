@@ -1,58 +1,188 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Sun, 10 Feb 2013 21:39:59 +0100
 From: Antonio Ospite <ospite@studenti.unina.it>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Antonio Ospite <ospite@studenti.unina.it>
-Subject: [PATCHv2 BlueZ 2/2] configure.ac: call AC_SUBST(*_CFLAGS) and AC_SUBST(*_LIBS) only when needed
-Date: Sun, 10 Feb 2013 22:20:51 +0100
-Message-Id: <1360531251-18371-3-git-send-email-ospite@studenti.unina.it>
-In-Reply-To: <1360531251-18371-1-git-send-email-ospite@studenti.unina.it>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] configure.ac: call AC_SUBST unconditionally
+Message-Id: <20130210213959.a2af159d019d97fe2a4e600c@studenti.unina.it>
+In-Reply-To: <1360322491.20763.1.camel@aeonflux>
 References: <1359906411-12624-1-git-send-email-ospite@studenti.unina.it>
- <1360531251-18371-1-git-send-email-ospite@studenti.unina.it>
+	<1360226227.15783.12.camel@aeonflux>
+	<20130207115044.ad0c33fb97da1d5ab1f1984e@studenti.unina.it>
+	<1360322491.20763.1.camel@aeonflux>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Bring AC_SUBST(*_CFLAGS) and AC_SUBST(*_LIBS) in the same block of the
-corresponding PKG_CHECK_MODULES() call.
+On Fri, 08 Feb 2013 13:21:31 +0200
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
-Having these variables defined outside of the if tests is more than what
-is needed as the corresponding PKG_CHECK_MODULES() might not have been
-called at all there.
+> Hi Antonio,
+> 
+> > > > Call AC_SUBST unconditionally, otherwise options like
+> > > > --with-dbusconfdir=DIR or --with-udevdir=DIR have no effect.
+> > > > 
+> > > > Before this change, configuring with:
+> > > > 
+> > > >   $ mkdir build
+> > > >   $ ./configure --disable-systemd \
+> > > >                 --prefix=$(pwd)/build \
+> > > >                 --with-dbusconfdir=$(pwd)/build/etc
+> > > > 
+> > > > resulted in the option value to be ignored at "make install" time, with
+> > > > this error:
+> > > > 
+> > > >   /bin/mkdir: cannot create directory '/dbus-1/system.d': Permission denied
+> > > > 
+> > > > After the patch the option value is respected.
+> > > > ---
+> > > > 
+> > > > Hi,
+> > > > 
+> > > > the issue was highlighted by the use "--prefix=" and running "make install" as
+> > > > a restricted user, maybe the are still other issues with this use case.
+> > > > Anyone willing to take a deeper look?
+> > > 
+> > > why are you doing --prefix="" in the first place? I do not get that
+> > > part.
+> > 
+> > Sorry, poor communication choice from my part, in the sentence above the
+> > _whole_ --prefix= was enclosed in double quotes to mean "the --prefix
+> > parameter", but I see this could be misleading, I am actually using:
+> > 
+> >   --prefix=$(pwd)/build
+> > 
+> > > > For instance, is "--prefix=DIR" supposed to be prepended to manually specified
+> > > > paths too?
+> > > >
+> > > > Thanks,
+> > > >    Antonio
+> > > > 
+> > > >  configure.ac |   16 ++++++++--------
+> > > >  1 file changed, 8 insertions(+), 8 deletions(-)
+> > > > 
+> > > > diff --git a/configure.ac b/configure.ac
+> > > > index 070acea..fe2893a 100644
+> > > > --- a/configure.ac
+> > > > +++ b/configure.ac
+> > > > @@ -71,8 +71,8 @@ if (test -z "${path_dbusconfdir}"); then
+> > > >  		AC_MSG_ERROR([D-Bus configuration directory is required])
+> > > >  	fi
+> > > >  	AC_MSG_RESULT([${path_dbusconfdir}])
+> > > > -	AC_SUBST(DBUS_CONFDIR, [${path_dbusconfdir}])
+> > > >  fi
+> > > > +AC_SUBST(DBUS_CONFDIR, [${path_dbusconfdir}])
+> > > 
+> > > I am failing to see the bug here. you are providing the
+> > > --with-dbusconfdir=DIR and thus is should work. What is causing the
+> > > wrong mkdir actually.
+> > >
+> > 
+> > This is what I understand is going on in configure.ac right now:
+> > 
+> >   # define the option
+> >   AC_ARG_WITH([dbusconfdir] ... [path_dbusconfdir=${withval}])
+> > 
+> >   # when --with-dbusconfdir is NOT used
+> >   if (test -z "${path_dbusconfdir}"); then
+> >     ...
+> > 
+> >     # define the config dir
+> >     path_dbusconfdir="`$PKG_CONFIG --variable=sysconfdir dbus-1`"
+> >     
+> >     ...
+> >     
+> >     # set DBUS_CONFDIR
+> >     AC_SUBST(DBUS_CONFDIR, [${path_dbusconfdir}])
+> >   endif
+> > 
+> > when --with-dbusconfdir=SOMEDIR is used the test above fails, and the
+> > result is that ${path_dbusconfdir} is indeed defined, but DBUS_CONFDIR
+> > is not, and the latter is going to be used in Makefile.am:
+> > 
+> >   dbusdir = @DBUS_CONFDIR@/dbus-1/system.d
+> > 
+> > The wrong makedir is exposed by my use of the "prefix" option and the
+> > fact that I am running "make install" as a normal user, otherwise
+> > /dbus-1/system.d would be happily (and wrongly) created.
+> > 
+> > By always setting DBUS_CONFDIR we cover the case when
+> > --with-dbusconfdir=SOMEDIR is used.
+> 
+> I see your point here. This one is valid. Please send separate patches
+> for that.
 
-This is the same logic already used for USB_CFLAGS and USB_LIBS.
----
- configure.ac |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+I will, thanks.
 
-diff --git a/configure.ac b/configure.ac
-index b11dcf1..4ac8a78 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -140,12 +140,12 @@ AC_ARG_ENABLE(udev, AC_HELP_STRING([--disable-udev],
- if (test "${enable_tools}" != "no" && test "${enable_udev}" != "no"); then
- 	PKG_CHECK_MODULES(UDEV, libudev >= 143, dummy=yes,
- 				AC_MSG_ERROR(libudev >= 143 is required))
-+	AC_SUBST(UDEV_CFLAGS)
-+	AC_SUBST(UDEV_LIBS)
- 	AC_CHECK_LIB(udev, udev_hwdb_new,
- 		AC_DEFINE(HAVE_UDEV_HWDB_NEW, 1,
- 			[Define to 1 if you have the udev_hwdb_new() function.]))
- fi
--AC_SUBST(UDEV_CFLAGS)
--AC_SUBST(UDEV_LIBS)
- AM_CONDITIONAL(UDEV, test "${enable_udev}" != "no")
- 
- AC_ARG_WITH([udevdir], AC_HELP_STRING([--with-udevdir=DIR],
-@@ -172,9 +172,9 @@ AC_ARG_ENABLE(obex, AC_HELP_STRING([--disable-obex],
- if (test "${enable_obex}" != "no"); then
- 	PKG_CHECK_MODULES(ICAL, libical, dummy=yes,
- 					AC_MSG_ERROR(libical is required))
-+	AC_SUBST(ICAL_CFLAGS)
-+	AC_SUBST(ICAL_LIBS)
- fi
--AC_SUBST(ICAL_CFLAGS)
--AC_SUBST(ICAL_LIBS)
- AM_CONDITIONAL(OBEX, test "${enable_obex}" != "no")
- 
- AC_ARG_ENABLE(client, AC_HELP_STRING([--disable-client],
+> > 
+> > > >  AC_ARG_WITH([dbussystembusdir], AC_HELP_STRING([--with-dbussystembusdir=DIR],
+> > > >  				[path to D-Bus system bus services directory]),
+> > > > @@ -84,8 +84,8 @@ if (test -z "${path_dbussystembusdir}"); then
+> > > >  		AC_MSG_ERROR([D-Bus system bus services directory is required])
+> > > >  	fi
+> > > >  	AC_MSG_RESULT([${path_dbussystembusdir}])
+> > > > -	AC_SUBST(DBUS_SYSTEMBUSDIR, [${path_dbussystembusdir}])
+> > > >  fi
+> > > > +AC_SUBST(DBUS_SYSTEMBUSDIR, [${path_dbussystembusdir}])
+> > > >  
+> > > >  AC_ARG_WITH([dbussessionbusdir], AC_HELP_STRING([--with-dbussessionbusdir=DIR],
+> > > >  				[path to D-Bus session bus services directory]),
+> > > > @@ -97,8 +97,8 @@ if (test -z "${path_dbussessionbusdir}"); then
+> > > >  		AC_MSG_ERROR([D-Bus session bus services directory is required])
+> > > >  	fi
+> > > >  	AC_MSG_RESULT([${path_dbussessionbusdir}])
+> > > > -	AC_SUBST(DBUS_SESSIONBUSDIR, [${path_dbussessionbusdir}])
+> > > >  fi
+> > > > +AC_SUBST(DBUS_SESSIONBUSDIR, [${path_dbussessionbusdir}])
+> > > >  
+> > > >  AC_ARG_ENABLE(library, AC_HELP_STRING([--enable-library],
+> > > >  		[install Bluetooth library]), [enable_library=${enableval}])
+> > > > @@ -121,8 +121,6 @@ AC_ARG_ENABLE(usb, AC_HELP_STRING([--disable-usb],
+> > > >  if (test "${enable_tools}" != "no" && test "${enable_usb}" != "no"  ); then
+> > > >  	PKG_CHECK_MODULES(USB, libusb, dummy=yes,
+> > > >  			AC_MSG_ERROR(USB library support is required))
+> > > > -	AC_SUBST(USB_CFLAGS)
+> > > > -	AC_SUBST(USB_LIBS)
+> > > >  	AC_CHECK_LIB(usb, usb_get_busses, dummy=yes,
+> > > >  		AC_DEFINE(NEED_USB_GET_BUSSES, 1,
+> > > >  			[Define to 1 if you need the usb_get_busses() function.]
+> > > > @@ -133,6 +131,8 @@ if (test "${enable_tools}" != "no" && test "${enable_usb}" != "no"  ); then
+> > > >  on.]))
+> > > >  	AC_DEFINE(HAVE_LIBUSB, 1, [Define to 1 if you have USB library.])
+> > > >  fi
+> > > > +AC_SUBST(USB_CFLAGS)
+> > > > +AC_SUBST(USB_LIBS)
+> > > 
+> > > What are these changes for? I don't see any reason for them. And also
+> > > they should not intermix in the patch. They need to explained
+> > > separately.
+> > > 
+> > 
+> > They are meant to follow the same logic used for
+> > 
+> > AC_SUBST(UDEV_CFLAGS)
+> > AC_SUBST(UDEV_LIBS)
+> > 
+> > which are outside of the test.
+> 
+> I do not see this being valid. The logic does not work since it will
+> abort if enabled.
+> 
+
+I double checked and I think that actually we can do the reverse that
+this hunk was trying to do: bring inside the "if" tests other AC_SUBST
+(*_CFLAGS) just like it is now done for USB_CFLAGS and USB_LIBS.
+
+I'll try to explain that better in the commit message for the patch and
+you'll decide whether to pick that up or not.
+
+Regards,
+   Antonio
+
 -- 
-1.7.10.4
+Antonio Ospite
+http://ao2.it
+
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
