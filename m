@@ -1,63 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH BlueZ v0] transport: Fix inconsistent transport state
-Date: Tue, 12 Feb 2013 09:23:35 +0100
-Message-Id: <1360657415-12864-1-git-send-email-mikel.astiz.oss@gmail.com>
+Message-Id: <1360616964.13178.140661190029021.00F49EEA@webmail.messagingengine.com>
+From: Rebecca Menessec <rebecca.menessec@ironhavoc.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: text/plain
+Reply-To: rebecca.menessec@ironhavoc.org
+In-Reply-To: <20130211193754.GA12283@x220.P-661HNU-F1>
+References: <1360448522.23439.140661189177761.7087C9E4@webmail.messagingengine.com>
+ <20130211193754.GA12283@x220.P-661HNU-F1>
+Subject: Re: Missing manpage for main.conf
+Date: Mon, 11 Feb 2013 16:09:24 -0500
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Thanks for the update. I'll ask rsyslog to send bluetoothd output to
+/dev/null until / unless I need it, then. :)
 
-If a2dp_resume() fails, the transport state should not be modified. It
-would otherwise enter an incosistent state where the transport will be
-impossible to resume, since acquire() will see the transport in
-TRANSPORT_STATE_REQUESTING state and will thus return
-btd_error_not_authorized().
----
- profiles/audio/transport.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+I've been trying to turn off all unnecessary logging on a
+resource-constrained system so as to avoid wasting the CPU cycles and
+wake-ups.
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 5b3fcbc..32ba50b 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -329,6 +329,7 @@ static guint resume_a2dp(struct media_transport *transport,
- 	struct a2dp_transport *a2dp = transport->data;
- 	struct media_endpoint *endpoint = transport->endpoint;
- 	struct a2dp_sep *sep = media_endpoint_get_sep(endpoint);
-+	guint id;
- 
- 	if (a2dp->session == NULL) {
- 		a2dp->session = avdtp_get(transport->device);
-@@ -337,16 +338,23 @@ static guint resume_a2dp(struct media_transport *transport,
- 	}
- 
- 	if (state_in_use(transport->state))
--		goto done;
-+		return a2dp_resume(a2dp->session, sep, a2dp_resume_complete,
-+									owner);
- 
- 	if (a2dp_sep_lock(sep, a2dp->session) == FALSE)
- 		return 0;
- 
-+	id = a2dp_resume(a2dp->session, sep, a2dp_resume_complete, owner);
-+
-+	if (id == 0) {
-+		a2dp_sep_unlock(sep, a2dp->session);
-+		return 0;
-+	}
-+
- 	if (transport->state == TRANSPORT_STATE_IDLE)
- 		transport_set_state(transport, TRANSPORT_STATE_REQUESTING);
- 
--done:
--	return a2dp_resume(a2dp->session, sep, a2dp_resume_complete, owner);
-+	return id;
- }
- 
- static void a2dp_suspend_complete(struct avdtp *session,
--- 
-1.8.1
-
+On 2013-02-11 21:37:54 (+0200), Johan Hedberg wrote:
+> Hi Rebecca,
+> 
+> On Sat, Feb 09, 2013, Rebecca Menessec wrote:
+> > I was looking for a way to disable BlueZ logging (Ubuntu machine), and
+> > came across this, in the bluetoothd manpage:
+> > 
+> > 'bluetoothd itself does not accept many command-line options, as most of
+> > its configuration is done in the /etc/bluetooth/main.conf file, which
+> > has its own man page.'
+> > 
+> > That doesn't appear to be true. I can't find any trace in any distro, or
+> > in the source. I've found a bug filed here and there against the lack of
+> > manpage, but no manpage.
+> 
+> This is indeed a bug. I just pushed a patch to remove this reference
+> from the bluetoothd man page. main.conf might deserve its own man page
+> (even though the upstream sample is self-documenting) but as long one
+> doesn't exist it's at least better not to have a bogus reference to it.
+> 
+> It's also worth noting that we're really trying to promote systems
+> without any /etc/bluetooth directory at all since the bluetoothd
+> defaults should be usable by as many as possible.
+> 
+> > There's definitely logging going on by default:
+> > 
+> > localhost ~ [0]# lsof -n 2> /dev/null | grep blue | grep log
+> > rsyslogd   804          syslog    2w      REG               0,21    
+> > 2027       8482 /var/log/bluetoothd.log
+> > rs:main    804  813     syslog    2w      REG               0,21    
+> > 2027       8482 /var/log/bluetoothd.log
+> > rsyslogd   804  814     syslog    2w      REG               0,21    
+> > 2027       8482 /var/log/bluetoothd.log
+> > rsyslogd   804  815     syslog    2w      REG               0,21    
+> > 2027       8482 /var/log/bluetoothd.log
+> > 
+> > Unfortunately, there's no hint anywhere what's causing bluetoothd to
+> > log, or how to stop it.
+> 
+> There is no way to stop bluetoothd from logging errors. You can
+> enable/disable debug logs with the -d switch but that's it.
+> 
+> Johan
