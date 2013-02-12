@@ -1,165 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [RFC] bloodpressure: Add Blood Pressure API
-Date: Tue, 12 Feb 2013 12:21:37 +0100
-Message-ID: <1360668097-28906-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1360161922-6585-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1360161922-6585-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Tue, 12 Feb 2013 11:02:44 +0200
+Message-ID: <CABBYNZ+uC+BP0dQZdOrP35E7uu9Q_SwrxfTaxm2+vRh+6-bpbw@mail.gmail.com>
+Subject: Re: [RFC 0/8] MAP client: notification support
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Change-Id: I7165ecee0186dfdb51cd01838f28768d94ff12b9
----
- doc/bloodpressure-api.txt | 138 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 138 insertions(+)
- create mode 100644 doc/bloodpressure-api.txt
+Hi Christian,
 
-diff --git a/doc/bloodpressure-api.txt b/doc/bloodpressure-api.txt
-new file mode 100644
-index 0000000..2acc660
---- /dev/null
-+++ b/doc/bloodpressure-api.txt
-@@ -0,0 +1,138 @@
-+Blood Pressure API description
-+******************************
-+
-+
-+Blood Pressure Manager hierarchy
-+================================
-+
-+Serviceorg.bluez
-+Interface	org.bluez.BloodPressureManager1
-+Object path	[variable prefix]/{hci0,hci1,...}
-+
-+Methods		RegisterWatcher(object agent)
-+
-+			Registers a watcher to monitor blood pressure
-+			measurements. This agent will be notified about
-+			final pressure measurements.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		UnregisterWatcher(object agent)
-+
-+			Unregisters a watcher.
-+
-+		EnableIntermediateMeasurement(object agent)
-+
-+			Enables intermediate measurement notifications
-+			for this agent. Intermediate measurements will
-+			be enabled only for devices which support it.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		DisableIntermediateMeasurement(object agent)
-+
-+			Disables intermediate measurement notifications
-+			for this agent. It will disable notifications in
-+			devices when the last agent removes the
-+			watcher for intermediate measurements.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+					org.bluez.Error.NotFound
-+
-+Blood Pressure Profile hierarchy
-+================================
-+
-+Service		org.bluez
-+Interface	org.bluez.BloodPressure1
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-+
-+Properties	boolean Intermediate [readonly]
-+
-+			True if the device supports intermediate
-+			measurement notifications.
-+
-+Blood Pressure Watcher hierarchy
-+================================
-+
-+Service		unique name
-+Interface	org.bluez.BloodPressureWatcher1
-+Object path	freely definable
-+
-+Methods		void MeasurementReceived(object device, dict measurement)
-+
-+			This callback is called whenever a blood pressure
-+			measurement is received from the blood pressure device.
-+
-+			Measurement:
-+
-+				string Measurement:
-+
-+					Posible values: "final" or
-+							"intermediate"
-+
-+				uint16 CurrentCuffPressure:
-+
-+					Current cuff pressure value is only
-+					present in intermediate measurement.
-+
-+				uint16 Systolic:
-+
-+					Systolic Blood Pressure value is only
-+					present in final measurement.
-+
-+				uint16 Diastolic:
-+
-+					Diastolic Blood Pressure value is only
-+					present in final final measurement.
-+
-+				uint16 Mean:
-+
-+					Mean Arterial Pressure value is only
-+					present in final measurement.
-+
-+				string Unit:
-+
-+					The unit of blood pressure measurement.
-+
-+					Possible values: "mmHg" or "kPa".
-+
-+				uint64 Time (optional):
-+
-+					Time of measurement expresed in seconds
-+					from epoch.
-+
-+				uint16 PulseRate (optional):
-+
-+					Pulse rate value.
-+
-+				uint8 UserID (optional):
-+
-+					User ID if the device supports
-+					multiusers measurements.
-+
-+				boolean BodyMovement (optional)
-+
-+					True if body movement during
-+					measurement has been detected.
-+
-+				boolean CuffTooLoose (optional)
-+
-+					True if too loose cuff during
-+					measurement has been detected.
-+
-+				boolean IrregularPulse (optional)
-+
-+					True if irrgular pulse during
-+					measurement has been detected.
-+
-+				uint8 PulseRateNotInRange (optional)
-+
-+					Possible values:
-+
-+					0 - pulse rate exceeds upper limit
-+					1 - pulse rate is less then lower limit
-+
-+				boolean MeasurementPosition (optional)
-+
-+					True if improper measurement position
-+					has been detected.
+On Wed, Feb 6, 2013 at 4:45 PM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+>
+> This patchset adds the necessary blocks for receiving notifications in the MAP client.
+> So far this covers only bluetooth protocol related additions, leaving out end user D-Bus API changes.
+>
+> The patchset consists of the following parts:
+> - Message Notification Server (MNS)
+>   Once connected, the MNS will receive XML based event reports from the MSE and parse them into a struct
+>   for further processing.
+>
+> - RegisterNotification function
+>   The function sends the SetNotificationRegistration command to the MSE which will then try to connect
+>   to the MNS.
+>
+> - Notification dispatcher (that dispatches event reports by their MAS instance id to the correct client instance)
+>   The message access part of every client instance registers a notification handler function.
+>   The MNS will call the associated handler for all received event report.
+>
+> Since the dispatching needs to be done on the mas instance id, the message access part of the client
+> needs to be aware of the instance id of the server it connects to. Unfortunately this information is only
+> available as SDP attribute.
+>
+> Due to the current transport layer abstraction in obexd, the MAP client has no direct access to SDP.
+> Therefore I have extended obc_transport to allow concrete transports (like Bluetooth) to specify
+> a get_service_record function and made it available through obc_session_get_service_record.
+> This way, transports can provide additional service information to the client implementations.
+> The bluetooth transport will now always do a sdp lookup (if the driver's obc_driver->force_service_lookup is set).
+> In addition it will cache sdp record associated with the connection and make it accessible in get_service_record.
+>
+> Christian Fetzer (8):
+>   obexd: Add get_service_record to obc_transport
+>   obexd: Provide SDP record in get_service_record
+>   obexd: Read MAP client SDP attributes
+>   obexd: Add Message Notification Server (MNS)
+>   obexd: Add RegisterNotifications function
+>   obexd: Add MAP notification dispatcher
+>   obexd: Register MAP notification handler
+>   obexd: Notify registered notification handlers
+>
+>  Makefile.obexd                |   4 +
+>  doc/obex-api.txt              |   7 +
+>  lib/sdp.h                     |   2 +
+>  obexd/client/bluetooth.c      |  51 ++++++-
+>  obexd/client/driver.h         |   1 +
+>  obexd/client/map-dispatcher.c |  86 +++++++++++
+>  obexd/client/map-dispatcher.h |  45 ++++++
+>  obexd/client/map-event.h      |  42 +++++
+>  obexd/client/map.c            | 144 +++++++++++++++++-
+>  obexd/client/mns.c            | 346 ++++++++++++++++++++++++++++++++++++++++++
+>  obexd/client/session.c        |  11 +-
+>  obexd/client/session.h        |   2 +
+>  obexd/client/transport.h      |   2 +
+>  obexd/plugins/bluetooth.c     |   2 +
+>  obexd/src/obexd.h             |   1 +
+>  src/profile.c                 |  55 +++++++
+>  16 files changed, 790 insertions(+), 11 deletions(-)
+>  create mode 100644 obexd/client/map-dispatcher.c
+>  create mode 100644 obexd/client/map-dispatcher.h
+>  create mode 100644 obexd/client/map-event.h
+>  create mode 100644 obexd/client/mns.c
+>
+> --
+> 1.8.1.2
+
+Did not like so much the thing with force_service_lookup although I
+see that we gonna need it, but perhaps we should try to think about
+other alternatives. The implementation of MNS as a proper driver is
+what made us to integrate the server and client but we should go one
+step forward and integrate client and server core specially the plugin
+handling should be common to both client and server just the drivers
+need to be different.
+
+
 -- 
-1.8.0.209.gf3828dc
-
+Luiz Augusto von Dentz
