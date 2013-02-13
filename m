@@ -1,139 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 02/12] Bluetooth: Add basic start/complete HCI transaction functions
-Date: Wed, 13 Feb 2013 16:50:35 +0200
-Message-Id: <1360767045-26958-3-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1360767045-26958-1-git-send-email-johan.hedberg@gmail.com>
-References: <1360767045-26958-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/2] obexd: Remove obc_session_setpath limit
+Date: Wed, 13 Feb 2013 15:02:28 +0100
+Message-Id: <1360764149-26447-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-With these functions it will be possible to declare the start and end of
-a transaction. hci_start_transaction() creates hdev->build_transaction
-which will be used by hci_send_command() to construct a transaction.
-hci_complete_transaction() indicates the end of a transaction with an
-optional complete callback to be called once the transaction is
-complete. The transaction is either moved to hdev->current_transaction
-(if no other transaction is in progress) or appended to
-hdev->transaction_q.
+obc_session_setpath is able to handle multiple folder changes at once.
+This removes the limit, that was introduced because of PBAP's limitation
+to 3 levels (75d32c6b3a3bddaad19b7880950f9a503afe652b).
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Other profiles like MAP might have deeper folder hierarchies.
 ---
- include/net/bluetooth/hci_core.h |    5 +++
- net/bluetooth/hci_core.c         |   81 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 86 insertions(+)
+ obexd/client/session.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 0e53032..5cd58f5 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1058,6 +1058,11 @@ int hci_unregister_cb(struct hci_cb *hcb);
- #define hci_transaction_lock(d)		mutex_lock(&d->transaction_lock)
- #define hci_transaction_unlock(d)	mutex_unlock(&d->transaction_lock)
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index db37a86..f8aae5d 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -929,7 +929,7 @@ guint obc_session_setpath(struct obc_session *session, const char *path,
+ 	data = g_new0(struct setpath_data, 1);
+ 	data->func = func;
+ 	data->user_data = user_data;
+-	data->remaining = g_strsplit(path, "/", 3);
++	data->remaining = g_strsplit(path, "/", 0);
  
-+int hci_start_transaction(struct hci_dev *hdev);
-+int hci_complete_transaction(struct hci_dev *hdev,
-+			     void (*complete)(struct hci_dev *hdev,
-+					      __u16 last_cmd, int status));
-+
- int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
- void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
- void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 05e2e8b..13c064e 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2196,6 +2196,87 @@ static int hci_send_frame(struct sk_buff *skb)
- 	return hdev->send(skb);
- }
+ 	p = pending_request_new(session, NULL, setpath_complete, data);
  
-+int hci_start_transaction(struct hci_dev *hdev)
-+{
-+	struct hci_transaction *transaction;
-+	int err;
-+
-+	hci_transaction_lock(hdev);
-+
-+	/* We can't start a new transaction if there's another one in
-+	 * progress of being built.
-+	 */
-+	if (hdev->build_transaction) {
-+		err = -EBUSY;
-+		goto unlock;
-+	}
-+
-+	transaction = kmalloc(sizeof(*transaction), GFP_ATOMIC);
-+	if (!transaction) {
-+		err = -ENOMEM;
-+		goto unlock;
-+	}
-+
-+	memset(transaction, 0, sizeof(*transaction));
-+	skb_queue_head_init(&transaction->cmd_q);
-+
-+	hdev->build_transaction = transaction;
-+
-+	err = 0;
-+
-+unlock:
-+	hci_transaction_unlock(hdev);
-+
-+	return err;
-+}
-+
-+static void __transaction_add(struct hci_dev *hdev,
-+			      struct hci_transaction *transaction)
-+{
-+	if (hdev->current_transaction || !list_empty(&hdev->transaction_q)) {
-+		list_add_tail(&transaction->list, &hdev->transaction_q);
-+	} else {
-+		hdev->current_transaction = transaction;
-+		queue_work(hdev->workqueue, &hdev->cmd_work);
-+	}
-+}
-+
-+int hci_complete_transaction(struct hci_dev *hdev,
-+			     void (*complete)(struct hci_dev *hdev,
-+					      __u16 last_cmd, int status))
-+{
-+	struct hci_transaction *transaction;
-+	int err;
-+
-+	hci_transaction_lock(hdev);
-+
-+	transaction = hdev->build_transaction;
-+	if (!transaction) {
-+		err = -EINVAL;
-+		goto unlock;
-+	}
-+
-+	hdev->build_transaction = NULL;
-+
-+	/* Do not allow empty transactions */
-+	if (skb_queue_empty(&transaction->cmd_q)) {
-+		__transaction_free(transaction);
-+		err = -EINVAL;
-+		goto unlock;
-+	}
-+
-+	transaction->complete = complete;
-+
-+	__transaction_add(hdev, transaction);
-+
-+	err = 0;
-+
-+unlock:
-+	hci_transaction_unlock(hdev);
-+
-+	return err;
-+}
-+
- /* Send HCI command */
- int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
- {
 -- 
-1.7.10.4
+1.8.1.3
 
