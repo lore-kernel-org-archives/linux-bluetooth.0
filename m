@@ -1,37 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon@janc.net.pl>
+From: William Douglas <william.douglas@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon@janc.net.pl>
-Subject: [PATCH] doc: Clarify device connect description
-Date: Wed, 13 Feb 2013 22:02:14 +0100
-Message-Id: <1360789334-27802-1-git-send-email-szymon@janc.net.pl>
+Subject: [PATCH] Correct the dbus service file's systemd unit name for bluez.
+Date: Wed, 13 Feb 2013 10:57:01 -0800
+Message-ID: <87ehgkxcsi.fsf@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Describe behaviour when some profiles are already connected. Clarify
-that it returns success if at least one profile was connected.
----
- doc/device-api.txt | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Even though dbus-org.bluez.service is set as an alias for the
+bluetooth.service systemd unit file, systemd will not be able to load
+the bluetooth daemon without the daemon being enabled (and the
+dbus-org.bluez.service file linked to bluetooth.service). This patch
+allows the daemon to be loaded by other services on demand.
 
-diff --git a/doc/device-api.txt b/doc/device-api.txt
-index 66c46e5..19d3fde 100644
---- a/doc/device-api.txt
-+++ b/doc/device-api.txt
-@@ -14,7 +14,12 @@ Methods		void Connect()
- 			This is a generic method to connect any profiles
- 			the remote device supports that can be connected
- 			to and have been flagged as auto-connectable on
--			our side.
-+			our side. If only subset of profiles is already
-+			connected it will try to connect currently disconnected
-+			ones.
-+
-+			If at least one profile was connected successfully this
-+			method will indicate success.
- 
- 			Possible errors: org.bluez.Error.NotReady
- 					 org.bluez.Error.Failed
+Signed-off-by: William Douglas <william.douglas@intel.com>
+---
+ src/org.bluez.service | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/org.bluez.service b/src/org.bluez.service
+index dd7ae8f..2a3b057 100644
+--- a/src/org.bluez.service
++++ b/src/org.bluez.service
+@@ -2,4 +2,4 @@
+ Name=org.bluez
+ Exec=/bin/false
+ User=root
+-SystemdService=dbus-org.bluez.service
++SystemdService=bluetooth.service
 -- 
 1.8.1.2
 
+-- 
+William Douglas, Intel Open Source Technology Center
