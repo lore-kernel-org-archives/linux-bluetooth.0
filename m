@@ -1,37 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: William Douglas <william.douglas@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Correct the dbus service file's systemd unit name for bluez.
-Date: Wed, 13 Feb 2013 10:57:01 -0800
-Message-ID: <87ehgkxcsi.fsf@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1360767045-26958-10-git-send-email-johan.hedberg@gmail.com>
+References: <1360767045-26958-1-git-send-email-johan.hedberg@gmail.com>
+	<1360767045-26958-10-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 13 Feb 2013 13:10:00 -0400
+Message-ID: <CAJdJm_OZFTKo5th9ZGUomPtgythQpGCk2=K4JN5GoD6NC6sFWg@mail.gmail.com>
+Subject: Re: [PATCH 09/12] Bluetooth: Add HCI init sequence support for HCI transactions
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Even though dbus-org.bluez.service is set as an alias for the
-bluetooth.service systemd unit file, systemd will not be able to load
-the bluetooth daemon without the daemon being enabled (and the
-dbus-org.bluez.service file linked to bluetooth.service). This patch
-allows the daemon to be loaded by other services on demand.
+Hi Johan,
 
-Signed-off-by: William Douglas <william.douglas@intel.com>
----
- src/org.bluez.service | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Feb 13, 2013 at 10:50 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> +static void hci_resend_last(struct hci_dev *hdev)
+> +{
+> +       struct hci_transaction *transaction;
+> +       struct hci_command_hdr *sent;
+> +       struct sk_buff *skb;
+> +       u16 opcode;
+> +
+> +       if (!hdev->sent_cmd)
+> +               return;
+> +
+> +       sent = (void *) hdev->sent_cmd->data;
+> +       opcode = __le16_to_cpu(sent->opcode);
 
-diff --git a/src/org.bluez.service b/src/org.bluez.service
-index dd7ae8f..2a3b057 100644
---- a/src/org.bluez.service
-+++ b/src/org.bluez.service
-@@ -2,4 +2,4 @@
- Name=org.bluez
- Exec=/bin/false
- User=root
--SystemdService=dbus-org.bluez.service
-+SystemdService=bluetooth.service
+Where is "opcode" used?
+
+Best Regards,
 -- 
-1.8.1.2
-
--- 
-William Douglas, Intel Open Source Technology Center
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
