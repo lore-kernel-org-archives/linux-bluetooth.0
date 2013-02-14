@@ -1,32 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH sbc] build: Do not use deprecated AM_CONFIG_HEADER
-Date: Thu, 14 Feb 2013 12:27:01 -0200
-Message-Id: <1360852021-2693-1-git-send-email-lucas.demarchi@profusion.mobi>
+MIME-Version: 1.0
+In-Reply-To: <1360258831-18243-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1360258831-18243-1-git-send-email-vinicius.gomes@openbossa.org>
+Date: Thu, 14 Feb 2013 16:02:38 +0200
+Message-ID: <CABBYNZKQWqa9yUzb_PrRtSRsZ5K2BO_i9ncwpKe=5W_juNQUBw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gdbus: Fix missing PropertiesChanged signal
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The long-obsoleted AM_CONFIG_HEADER macro was removed in automake 1.13.
-Use AC_CONFIG_HEADERS instead.
----
- configure.ac | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Vinicius,
 
-diff --git a/configure.ac b/configure.ac
-index 9d5ebdb..30496ad 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -2,7 +2,7 @@ AC_PREREQ(2.60)
- AC_INIT(sbc, 1.0)
- 
- AM_INIT_AUTOMAKE([foreign subdir-objects color-tests])
--AM_CONFIG_HEADER(config.h)
-+AC_CONFIG_HEADERS(config.h)
- 
- m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
- 
+On Thu, Feb 7, 2013 at 7:40 PM, Vinicius Costa Gomes
+<vinicius.gomes@openbossa.org> wrote:
+> If D-Bus ObjectManager is not supported, InterfacesAdded signal
+> checking needs to be ignored otherwise PropertiesChanged signal
+> will never be sent.
+> ---
+>  gdbus/object.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+>
+> diff --git a/gdbus/object.c b/gdbus/object.c
+> index 0c11246..43fb1f0 100644
+> --- a/gdbus/object.c
+> +++ b/gdbus/object.c
+> @@ -1701,8 +1701,11 @@ void g_dbus_emit_property_changed(DBusConnection *connection,
+>         if (iface == NULL)
+>                 return;
+>
+> -       /* Don't emit property changed if interface is not yet published */
+> -       if (g_slist_find(data->added, iface))
+> +       /*
+> +        * If ObjectManager is attached, don't emit property changed if
+> +        * interface is not yet published
+> +        */
+> +       if (root && g_slist_find(data->added, iface))
+>                 return;
+>
+>         property = find_property(iface->properties, name);
+> --
+> 1.8.1.2
+
+Applied, thanks.
+
+
 -- 
-1.8.1.3
-
+Luiz Augusto von Dentz
