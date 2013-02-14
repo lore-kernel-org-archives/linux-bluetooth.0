@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1360767045-26958-9-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1360767045-26958-4-git-send-email-johan.hedberg@gmail.com>
 References: <1360767045-26958-1-git-send-email-johan.hedberg@gmail.com>
-	<1360767045-26958-9-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 14 Feb 2013 14:48:47 -0300
-Message-ID: <CACJA=fXRr9b1RD6z_3XKpUpPMJ9F-g_yMLTHBjdyU9zwik6vfg@mail.gmail.com>
-Subject: Re: [PATCH 08/12] Bluetooth: Enable HCI transaction support
- cmd_status 0
+	<1360767045-26958-4-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 14 Feb 2013 14:48:40 -0300
+Message-ID: <CACJA=fX_toEqQ2EUx7fp4WqJN1kTDKjpqbTVa1YySxajJn4HqQ@mail.gmail.com>
+Subject: Re: [PATCH 03/12] Bluetooth: Add hci_transaction_cmd_complete function
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -19,13 +18,11 @@ Hi Johan,
 On Wed, Feb 13, 2013 at 11:50 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
 > From: Johan Hedberg <johan.hedberg@intel.com>
 >
-> Some HCI commands do not result in a command complete event and generate
-> an intermediate command status 0 in between. Inquiry is one of these
-> procedures and needs to be handled properly since the legacy ioctl for
-> it uses hci_request which in turn will make use of the the HCI
+> This function is used to process the HCI transaction state, including
+> thigs like picking the next command to send, calling the complete
 
-Typo: the the/the
+Typo: thigs/things
 
-Regards,
+Regards
 
 Andre
