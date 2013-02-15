@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 04/12 v2] Bluetooth: Add hci_transaction_from_skb function
-Date: Fri, 15 Feb 2013 10:30:26 +0200
-Message-Id: <1360917034-5503-5-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 08/12 v2] Bluetooth: Enable HCI transaction support cmd_status 0
+Date: Fri, 15 Feb 2013 10:30:30 +0200
+Message-Id: <1360917034-5503-9-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1360917034-5503-1-git-send-email-johan.hedberg@gmail.com>
 References: <1360917034-5503-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,69 +11,116 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This function is needed for situations where a transaction needs to be
-constructed straight from an skb. This happens e.g. when going through
-the HCI driver initialization commands in hci_init_req() or when
-receiving commands from user space through a raw HCI socket.
+Some HCI commands do not result in a command complete event and generate
+an intermediate command status 0 in between. Inquiry is one of these
+procedures and needs to be handled properly since the legacy ioctl for
+it uses hci_request which in turn will make use of the HCI transaction
+framework.
+
+If the ncmd HCI event parameter indicates that we can send more commands
+to the controller we should do it if we have any commands in our queue.
+However, for the ongoing HCI transaction to be properly notified for
+completion we need to hold off this notification if possible when the
+command status event comes.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
  include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_core.c         |   29 +++++++++++++++++++++++++++++
- 2 files changed, 30 insertions(+)
+ net/bluetooth/hci_core.c         |   28 ++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |    8 ++++++--
+ 3 files changed, 35 insertions(+), 2 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 54efaa2..b5c6f99 100644
+index fd8d305..ce7fbf7 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1063,6 +1063,7 @@ int hci_complete_transaction(struct hci_dev *hdev,
+@@ -1062,6 +1062,7 @@ int hci_complete_transaction(struct hci_dev *hdev,
  			     void (*complete)(struct hci_dev *hdev,
  					      __u16 last_cmd, int status));
  bool hci_transaction_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status);
-+int hci_transaction_from_skb(struct hci_dev *hdev, struct sk_buff *skb);
++bool hci_transaction_cmd_status(struct hci_dev *hdev, u16 opcode, u8 status);
+ int hci_transaction_from_skb(struct hci_dev *hdev, struct sk_buff *skb);
  
  int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
- void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index c564440..bd9163e 100644
+index 2c6f524..71c8f9e 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2276,6 +2276,35 @@ unlock:
- 	return err;
+@@ -3092,6 +3092,8 @@ bool hci_transaction_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status)
+ {
+ 	bool queue_empty;
+ 
++	BT_DBG("opcode 0x%04x status 0x%02x", opcode, status);
++
+ 	/* Ignore this event if it doesn't match the last HCI command
+ 	 * that was sent
+ 	 */
+@@ -3115,6 +3117,32 @@ unlock:
+ 	return queue_empty;
  }
  
-+static int __transaction_from_skb(struct hci_dev *hdev, struct sk_buff *skb)
++bool hci_transaction_cmd_status(struct hci_dev *hdev, u16 opcode, u8 status)
 +{
-+	struct hci_transaction *transaction;
++	struct hci_transaction *transaction = hdev->current_transaction;
 +
-+	transaction = kmalloc(sizeof(*transaction), GFP_ATOMIC);
++	BT_DBG("opcode 0x%04x status 0x%02x", opcode, status);
++
++	if (status)
++		return hci_transaction_cmd_complete(hdev, opcode, status);
++
 +	if (!transaction)
-+		return -ENOMEM;
++		return true;
 +
-+	memset(transaction, 0, sizeof(*transaction));
-+	skb_queue_head_init(&transaction->cmd_q);
++	/* If there are no more commands for this transaction and it *
++	 * doesn't have a complete callback or there are other
++	 * commands/transactions in the hdev queue we consider this
++	 * transaction as completed. Otherwise reply that the queue is
++	 * empty so that we wait for the event that really indicates
++	 * that the pending command is complete.
++	 */
++	if (skb_queue_empty(&transaction->cmd_q) &&
++	    (!transaction->complete || !list_empty(&hdev->transaction_q)))
++		return hci_transaction_cmd_complete(hdev, opcode, status);
 +
-+	skb_queue_tail(&transaction->cmd_q, skb);
-+
-+	__transaction_add(hdev, transaction);
-+
-+	return 0;
++	return true;
 +}
 +
-+int hci_transaction_from_skb(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	int err;
-+
-+	hci_transaction_lock(hdev);
-+	err = __transaction_from_skb(hdev, skb);
-+	hci_transaction_unlock(hdev);
-+
-+	return err;
-+}
-+
- /* Send HCI command */
- int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+ static void hci_rx_work(struct work_struct *work)
  {
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev, rx_work);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7f198ba..1045a31 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -40,6 +40,8 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+ 
++	hci_transaction_cmd_complete(hdev, HCI_OP_INQUIRY, status);
++
+ 	if (status) {
+ 		hci_dev_lock(hdev);
+ 		mgmt_stop_discovery_failed(hdev, status);
+@@ -1944,6 +1946,7 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+ 
+ 	hci_req_complete(hdev, HCI_OP_INQUIRY, status);
++	hci_transaction_cmd_complete(hdev, HCI_OP_INQUIRY, status);
+ 
+ 	hci_conn_check_pending(hdev);
+ 
+@@ -2846,8 +2849,9 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (ev->opcode != HCI_OP_NOP)
+ 		del_timer(&hdev->cmd_timer);
+ 
+-	queue_empty = hci_transaction_cmd_complete(hdev, ev->opcode,
+-						   ev->status);
++	queue_empty = hci_transaction_cmd_status(hdev, ev->opcode, ev->status);
++
++	BT_DBG("queue_empty %u, ev->ncmd %u", queue_empty, ev->ncmd);
+ 
+ 	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags)) {
+ 		atomic_set(&hdev->cmd_cnt, 1);
 -- 
 1.7.10.4
 
