@@ -1,66 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 15 Feb 2013 11:52:53 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: Andre Guedes <andre.guedes@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 02/12] Bluetooth: Add basic start/complete HCI
- transaction functions
-Message-ID: <20130215095253.GA14151@x220>
-References: <1360767045-26958-1-git-send-email-johan.hedberg@gmail.com>
- <22685873.dZ0kFmHBbe@uw000953>
- <20130215090604.GB10022@x220>
- <11735985.64bebk47LR@uw000953>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <11735985.64bebk47LR@uw000953>
+Message-ID: <1360919831.2283.43.camel@novo>
+Subject: Re: [PATCH BlueZ 0/2] Add device_set_trusted()
+From: Bastien Nocera <hadess@hadess.net>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Antonio Ospite <ospite@studenti.unina.it>,
+	linux-bluetooth@vger.kernel.org
+Date: Fri, 15 Feb 2013 10:17:11 +0100
+In-Reply-To: <20130215085726.GA10022@x220>
+References: <1359908071-15024-1-git-send-email-ospite@studenti.unina.it>
+	 <20130215083611.GA5750@x220> <1360917653.2283.39.camel@novo>
+	 <20130215085726.GA10022@x220>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
-
-On Fri, Feb 15, 2013, Szymon Janc wrote:
-> > > > > > +int hci_start_transaction(struct hci_dev *hdev)
-> > > > > > +{
-> > > > > > +       struct hci_transaction *transaction;
-> > > > > > +       int err;
-> > > > > > +
-> > > > > > +       hci_transaction_lock(hdev);
-> > > > > > +
-> > > > > > +       /* We can't start a new transaction if there's another one in
-> > > > > > +        * progress of being built.
-> > > > > > +        */
-> > > > > > +       if (hdev->build_transaction) {
-> > > > > > +               err = -EBUSY;
-> > > > > > +               goto unlock;
-> > > > > > +       }
-> > > > > > +
-> > > > > > +       transaction = kmalloc(sizeof(*transaction), GFP_ATOMIC);
-> > > > > 
-> > > > > I've failed to see why we need GFP_ATOMIC here. As this code is not
-> > > > > running in any atomic section, we can allocate memory using
-> > > > > GFP_KERNEL.
-> > > > 
-> > > > Since one of the intentions of this API is to create an async version of
-> > > > hci_request() I think it's better to keep GFP_ATOMIC here. One situation
-> > > > where you couldn't for sure use hci_request() is if you're in an atomic
-> > > > section and then a HCI request would be the only other alternative.
-> > > 
-> > > You lock mutex in hci_start_transaction so it is non-atomic anyway..
-> > 
-> > This has me a bit confused since hci_dev_lock() also uses the same. Does
-> > this mean that there's no code at all in the Bluetooth subsystem anymore
-> > that can run in atomic context? (since most things require locking at
-> > least the hdev struct). I remember seeing some time back (after the
-> > whole workqueue conversion) bugs arising from incorrect GFP_ATOMIC ->
-> > GFP_KERNEL conversions (none of which luckily made it to Linus' tree), so at
-> > least some parts seemed to still be atomic. Do a grep for GFP_ATOMIC in
-> > net/bluetooth/ and you'll find plenty of them.
+On Fri, 2013-02-15 at 10:57 +0200, Johan Hedberg wrote:
+> Hi Bastien,
 > 
-> The bug (by me btw:P) you are probably referring to was due to rwlock which
-> is spin lock and raise sleeping in atomic warning even if run e.g. from wq.
+> On Fri, Feb 15, 2013, Bastien Nocera wrote:
+> > > This patch set makes me a bit uneasy since setting a device as trusted
+> > > is a security sensitive operation. My initial reaction is that this
+> > > should only be done through explicit user interaction, i.e. through the
+> > > D-Bus interface.
+> > 
+> > How is using D-Bus interface "user interaction"? It's not any more user
+> > interaction than doing it this way, which avoid going out through the
+> > public interface for something we are setting up ourselves.
+> 
+> Typically you'd get a pop-up dialog on the next connect attempt from
+> this device "accept connection from foo?" with a check-box or similar to
+> elect setting it as trusted. Alternatively the stuff that this plugin
+> does upon initial device setup could cause a similar pop-up dialog to be
+> presented to the user.
 
-Alright. I've just sent a v3 of the set which uses GFP_KERNEL for all
-allocations.
+That's possible, technically, but it's not how the device gets set up
+when used in its original environment (eg. when plugged into a PS3).
 
-Johan
+> > >  I'm also worried that plugins will start misusing this
+> > > API once it's available.
+> > 
+> > I think that it's completely fair for plugins that *do* set up devices
+> > to call this function. That's what the plugin is all about. Seeing as
+> > devices should be marked as trusted to be usable, I see no reason that
+> > this shouldn't be done automatically.
+> 
+> How does the plugin that this API is primarily targeted for setup the
+> device? Does it do it through some physical connection like USB?
+
+Yes. When you plug the device in, we tell it which adapter to connect to
+when used without a cable, and set ourselves up locally so that we can
+accept its connection without any more interaction.
+
+>  In such
+> a case it's probably fine to skip the user interaction part since if
+> you've got physical access to the device there are much severe security
+> issues to consider.
+
+Yes, the user would already have had the joypad plugged into the
+computer before any setup would have been made.
+
