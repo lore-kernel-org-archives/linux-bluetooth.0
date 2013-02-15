@@ -1,42 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/7] media-api: Fix referencing to MediaLibrary instead of MediaFolder
-Date: Fri, 15 Feb 2013 16:02:48 +0200
-Message-Id: <1360936972-12952-3-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1360936972-12952-1-git-send-email-luiz.dentz@gmail.com>
-References: <1360936972-12952-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/7] AVRCP: Prefix folder name with /Filesystem
+Date: Fri, 15 Feb 2013 16:02:46 +0200
+Message-Id: <1360936972-12952-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-MediaLibrary was replaced by MediaFolder so doesn't exist anymore.
+This separate the scopes of the folder as documented in doc/media-api.txt
 ---
- doc/media-api.txt | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ profiles/audio/avrcp.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index db1575f..2656a9e 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -233,7 +233,7 @@ Properties	string Equalizer [readwrite]
- 		boolean Browsable [readonly]
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 00eeea1..5967180 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -1935,9 +1935,10 @@ static gboolean avrcp_set_browsed_player_rsp(struct avctp *conn,
  
- 			If present indicates the player can be browsed using
--			MediaLibrary interface.
-+			MediaFolder interface.
+ 	depth = operands[13];
  
- 			Possible values:
+-	folders = g_new0(char *, depth + 1);
++	folders = g_new0(char *, depth + 2);
++	folders[0] = g_strdup("/Filesystem");
  
-@@ -248,7 +248,7 @@ Properties	string Equalizer [readwrite]
- 		boolean Searchable [readonly]
- 
- 			If present indicates the player can be searched using
--			MediaLibrary interface.
-+			MediaFolder interface.
- 
- 			Possible values:
+-	for (i = 14, count = 0; count < depth; count++) {
++	for (i = 14, count = 1; count - 1 < depth; count++) {
+ 		char *part;
+ 		uint8_t len;
  
 -- 
 1.8.1.2
