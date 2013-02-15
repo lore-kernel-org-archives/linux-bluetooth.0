@@ -1,27 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 15 Feb 2013 12:53:38 +0200
+Date: Fri, 15 Feb 2013 12:51:24 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon@janc.net.pl>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] core: Fix calling profile .connect multiple times
-Message-ID: <20130215105338.GD15390@x220>
-References: <1360317088-18852-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH v2 1/5] adapter: Add is_default field to struct
+ btd_adapter
+Message-ID: <20130215105124.GC15390@x220>
+References: <1360186838-16904-1-git-send-email-szymon@janc.net.pl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1360317088-18852-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1360186838-16904-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Szymon,
 
-On Fri, Feb 08, 2013, Luiz Augusto von Dentz wrote:
-> Sometimes profiles may complete the connection in different order
-> than expected so the code has to check if it was actually the
-> current pending profile to proceed to the next.
+On Wed, Feb 06, 2013, Szymon Janc wrote:
+> Instead of global default_adapter_id variable use is_default field
+> to indicate if adapter is default one.
 > ---
->  src/device.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
+>  src/adapter.c | 26 +++++++++++++-------------
+>  1 file changed, 13 insertions(+), 13 deletions(-)
 
-Applied. Thanks.
+All patches in this set have been applied. Thanks.
 
 Johan
