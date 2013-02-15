@@ -1,50 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 15 Feb 2013 10:57:26 +0200
+Date: Fri, 15 Feb 2013 10:46:00 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Antonio Ospite <ospite@studenti.unina.it>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 0/2] Add device_set_trusted()
-Message-ID: <20130215085726.GA10022@x220>
-References: <1359908071-15024-1-git-send-email-ospite@studenti.unina.it>
- <20130215083611.GA5750@x220>
- <1360917653.2283.39.camel@novo>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: Re: [PATCH 09/14] neard: Use path instead of boolean to track if
+ registered to neard
+Message-ID: <20130215084600.GB5750@x220>
+References: <1360224844-12280-1-git-send-email-szymon.janc@tieto.com>
+ <1360224844-12280-10-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1360917653.2283.39.camel@novo>
+In-Reply-To: <1360224844-12280-10-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Szymon,
 
-On Fri, Feb 15, 2013, Bastien Nocera wrote:
-> > This patch set makes me a bit uneasy since setting a device as trusted
-> > is a security sensitive operation. My initial reaction is that this
-> > should only be done through explicit user interaction, i.e. through the
-> > D-Bus interface.
-> 
-> How is using D-Bus interface "user interaction"? It's not any more user
-> interaction than doing it this way, which avoid going out through the
-> public interface for something we are setting up ourselves.
+On Thu, Feb 07, 2013, Szymon Janc wrote:
+> ---
+>  plugins/neard.c | 23 ++++++++++++++---------
+>  1 file changed, 14 insertions(+), 9 deletions(-)
 
-Typically you'd get a pop-up dialog on the next connect attempt from
-this device "accept connection from foo?" with a check-box or similar to
-elect setting it as trusted. Alternatively the stuff that this plugin
-does upon initial device setup could cause a similar pop-up dialog to be
-presented to the user.
+Patches 1-8 have been applied but this one had something that imo needs
+fixing:
 
-> >  I'm also worried that plugins will start misusing this
-> > API once it's available.
-> 
-> I think that it's completely fair for plugins that *do* set up devices
-> to call this function. That's what the plugin is all about. Seeing as
-> devices should be marked as trusted to be usable, I see no reason that
-> this shouldn't be done automatically.
+> -static gboolean agent_registered = FALSE;
+> +static char *neard_path = NULL;
+>  static gboolean agent_register_postpone = FALSE;
+>  
+>  /* For NFC mimetype limits max OOB EIR size */
+> @@ -115,7 +115,7 @@ static void register_agent_cb(DBusPendingCall *call, void *user_data)
+>  	}
+>  
+>  	dbus_message_unref(reply);
+> -	agent_registered = TRUE;
+> +	neard_path = g_strdup(dbus_message_get_sender(reply));
 
-How does the plugin that this API is primarily targeted for setup the
-device? Does it do it through some physical connection like USB? In such
-a case it's probably fine to skip the user interaction part since if
-you've got physical access to the device there are much severe security
-issues to consider.
+If you're going to store the neard D-Bus name in this variable then
+please don't call it "path". That's just confusing. Use neard_name or
+neard_service instead.
 
 Johan
