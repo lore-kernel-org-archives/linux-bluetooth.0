@@ -1,58 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 15 Feb 2013 10:22:36 +0200
+Date: Fri, 15 Feb 2013 10:17:35 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 02/12] Bluetooth: Add basic start/complete HCI
- transaction functions
-Message-ID: <20130215082236.GA5232@x220>
+Subject: Re: [PATCH 09/12] Bluetooth: Add HCI init sequence support for HCI
+ transactions
+Message-ID: <20130215081735.GA4737@x220>
 References: <1360767045-26958-1-git-send-email-johan.hedberg@gmail.com>
- <1360767045-26958-3-git-send-email-johan.hedberg@gmail.com>
- <CACJA=fWD8mvxvY-WRq-j2c284-SkezbS05KVp_bGwcdKN6yn9g@mail.gmail.com>
+ <1360767045-26958-10-git-send-email-johan.hedberg@gmail.com>
+ <CAJdJm_OZFTKo5th9ZGUomPtgythQpGCk2=K4JN5GoD6NC6sFWg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CACJA=fWD8mvxvY-WRq-j2c284-SkezbS05KVp_bGwcdKN6yn9g@mail.gmail.com>
+In-Reply-To: <CAJdJm_OZFTKo5th9ZGUomPtgythQpGCk2=K4JN5GoD6NC6sFWg@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Lizardo,
 
-On Thu, Feb 14, 2013, Andre Guedes wrote:
-> > +int hci_start_transaction(struct hci_dev *hdev)
+On Wed, Feb 13, 2013, Anderson Lizardo wrote:
+> Hi Johan,
+> 
+> On Wed, Feb 13, 2013 at 10:50 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> > +static void hci_resend_last(struct hci_dev *hdev)
 > > +{
 > > +       struct hci_transaction *transaction;
-> > +       int err;
+> > +       struct hci_command_hdr *sent;
+> > +       struct sk_buff *skb;
+> > +       u16 opcode;
 > > +
-> > +       hci_transaction_lock(hdev);
+> > +       if (!hdev->sent_cmd)
+> > +               return;
 > > +
-> > +       /* We can't start a new transaction if there's another one in
-> > +        * progress of being built.
-> > +        */
-> > +       if (hdev->build_transaction) {
-> > +               err = -EBUSY;
-> > +               goto unlock;
-> > +       }
-> > +
-> > +       transaction = kmalloc(sizeof(*transaction), GFP_ATOMIC);
+> > +       sent = (void *) hdev->sent_cmd->data;
+> > +       opcode = __le16_to_cpu(sent->opcode);
 > 
-> I've failed to see why we need GFP_ATOMIC here. As this code is not
-> running in any atomic section, we can allocate memory using
-> GFP_KERNEL.
+> Where is "opcode" used?
 
-Since one of the intentions of this API is to create an async version of
-hci_request() I think it's better to keep GFP_ATOMIC here. One situation
-where you couldn't for sure use hci_request() is if you're in an atomic
-section and then a HCI request would be the only other alternative.
-
-> > +       if (!transaction) {
-> > +               err = -ENOMEM;
-> > +               goto unlock;
-> > +       }
-> > +
-> > +       memset(transaction, 0, sizeof(*transaction));
-> 
-> We can also use kzalloc instead of kmalloc, making this memset unnecessary.
-
-Good point. Fixed in v2.
+To retain the old logic in hci_req_complete() the intention here was to
+check for HCI_OP_RESET and return. I've fixed it in v2.
 
 Johan
