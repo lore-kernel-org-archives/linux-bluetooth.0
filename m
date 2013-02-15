@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 07/12 v2] Bluetooth: Fix mgmt powered indication by using a HCI transaction
-Date: Fri, 15 Feb 2013 10:30:29 +0200
-Message-Id: <1360917034-5503-8-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 06/12 v2] Bluetooth: Remove unused hdev->cmd_q HCI command queue
+Date: Fri, 15 Feb 2013 10:30:28 +0200
+Message-Id: <1360917034-5503-7-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1360917034-5503-1-git-send-email-johan.hedberg@gmail.com>
 References: <1360917034-5503-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,91 +11,71 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The response to mgmt_set_powered should be returned only when all
-related HCI commands have completed. To properly do this make use of a
-HCI transaction with a callback to indicate its completion.
+This patch removes the now unused hdev->cmd_q HCI command queue. The HCI
+transaction framework takes care of the same functionality.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |   43 ++++++++++++++++++++++++++++++++++---------
- 1 file changed, 34 insertions(+), 9 deletions(-)
+ include/net/bluetooth/hci_core.h |    1 -
+ net/bluetooth/hci_core.c         |    5 -----
+ 2 files changed, 6 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 39395c7..042a6c7 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3058,19 +3058,33 @@ static int set_bredr_scan(struct hci_dev *hdev)
- 	return hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
- }
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index b5c6f99..fd8d305 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -247,7 +247,6 @@ struct hci_dev {
  
-+static void powered_complete(struct hci_dev *hdev, u16 opcode, int status)
-+{
-+	struct cmd_lookup match = { NULL, hdev };
-+
-+	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
-+
-+	new_settings(hdev, match.sk);
-+
-+	if (match.sk)
-+		sock_put(match.sk);
-+}
-+
- int mgmt_powered(struct hci_dev *hdev, u8 powered)
- {
- 	struct cmd_lookup match = { NULL, hdev };
-+	u8 status = MGMT_STATUS_NOT_POWERED;
-+	u8 zero_cod[] = { 0, 0, 0 };
- 	int err;
+ 	struct sk_buff_head	rx_q;
+ 	struct sk_buff_head	raw_q;
+-	struct sk_buff_head	cmd_q;
  
- 	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
- 		return 0;
+ 	struct mutex		transaction_lock;
+ 	struct hci_transaction	*build_transaction;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 48ea6e1..2c6f524 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -808,7 +808,6 @@ int hci_dev_open(__u16 dev)
+ 		flush_work(&hdev->rx_work);
  
--	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
--
- 	if (powered) {
- 		u8 link_sec;
+ 		hci_transaction_cleanup(hdev);
+-		skb_queue_purge(&hdev->cmd_q);
+ 		skb_queue_purge(&hdev->rx_q);
  
-+		hci_start_transaction(hdev);
-+
- 		if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
- 		    !lmp_host_ssp_capable(hdev)) {
- 			u8 ssp = 1;
-@@ -3105,17 +3119,28 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
- 			update_name(hdev, hdev->dev_name);
- 			update_eir(hdev);
- 		}
--	} else {
--		u8 status = MGMT_STATUS_NOT_POWERED;
--		u8 zero_cod[] = { 0, 0, 0 };
+ 		if (hdev->flush)
+@@ -873,7 +872,6 @@ static int hci_dev_do_close(struct hci_dev *hdev)
  
--		mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
-+		err = hci_complete_transaction(hdev, powered_complete);
-+		if (err == 0)
-+			return 0;
+ 	/* Reset device */
+ 	hci_transaction_cleanup(hdev);
+-	skb_queue_purge(&hdev->cmd_q);
+ 	atomic_set(&hdev->cmd_cnt, 1);
+ 	if (!test_bit(HCI_RAW, &hdev->flags) &&
+ 	    test_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks)) {
+@@ -887,7 +885,6 @@ static int hci_dev_do_close(struct hci_dev *hdev)
  
--		if (memcmp(hdev->dev_class, zero_cod, sizeof(zero_cod)) != 0)
--			mgmt_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev,
--				   zero_cod, sizeof(zero_cod), NULL);
-+		/* If hci_complete_transaction fails it means no HCI
-+		 * commands were pushed to the queue, i.e. we can go
-+		 * ahead and indicate success directly.
-+		 */
-+		mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp,
-+				     &match);
-+		goto new_settings;
- 	}
+ 	/* Drop queues */
+ 	skb_queue_purge(&hdev->rx_q);
+-	skb_queue_purge(&hdev->cmd_q);
+ 	hci_transaction_cleanup(hdev);
+ 	skb_queue_purge(&hdev->raw_q);
  
-+	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
-+	mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
-+
-+	if (memcmp(hdev->dev_class, zero_cod, sizeof(zero_cod)) != 0)
-+		mgmt_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev,
-+			   zero_cod, sizeof(zero_cod), NULL);
-+
-+new_settings:
- 	err = new_settings(hdev, match.sk);
+@@ -958,7 +955,6 @@ int hci_dev_reset(__u16 dev)
  
- 	if (match.sk)
+ 	/* Drop queues */
+ 	skb_queue_purge(&hdev->rx_q);
+-	skb_queue_purge(&hdev->cmd_q);
+ 	hci_transaction_cleanup(hdev);
+ 
+ 	hci_dev_lock(hdev);
+@@ -1785,7 +1781,6 @@ struct hci_dev *hci_alloc_dev(void)
+ 
+ 	skb_queue_head_init(&hdev->driver_init);
+ 	skb_queue_head_init(&hdev->rx_q);
+-	skb_queue_head_init(&hdev->cmd_q);
+ 	skb_queue_head_init(&hdev->raw_q);
+ 
+ 	init_waitqueue_head(&hdev->req_wait_q);
 -- 
 1.7.10.4
 
