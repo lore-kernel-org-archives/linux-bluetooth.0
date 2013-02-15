@@ -1,106 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v2 5/8] Bluetooth: Change LE connection routine
-Date: Fri, 15 Feb 2013 20:27:05 -0300
-Message-Id: <1360970828-24004-6-git-send-email-andre.guedes@openbossa.org>
-In-Reply-To: <1360970828-24004-1-git-send-email-andre.guedes@openbossa.org>
-References: <1360970828-24004-1-git-send-email-andre.guedes@openbossa.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 06/13] unit: Add tests for sdp_get_lang_attr()
+Date: Fri, 15 Feb 2013 11:07:49 -0400
+Message-Id: <1360940876-6314-7-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1360940876-6314-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1360940187-5202-1-git-send-email-anderson.lizardo@openbossa.org>
+ <1360940876-6314-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In order to better support LE connection requirements, such as multiple
-connections and re-connections, we should use the general connection
-establishment procedure described in Core spec. Today, we use the direct
-connection establishment procedure which has some limitations and,
-therefore, requires extra connection management at user-space in order
-to support LE connection requirements.
-
-According to the spec, the general procedure is described as follows:
-The host starts scanning for LE devices, once the device we want to
-connect to is in-range, the host stops scanning and initiates a
-connection. The procedure is terminated when the connection is
-established or when the host terminates the procedure.
-
-This patch changes the LE connection routine so we perform the general
-procedure instead of the direct procedure.
-
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_conn.c  |  4 +++-
- net/bluetooth/hci_event.c | 19 +++++++++++++++++--
- 2 files changed, 20 insertions(+), 3 deletions(-)
+ unit/test-lib.c |   87 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 87 insertions(+)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b1a162f..308c87a 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -517,7 +517,9 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 			return ERR_PTR(-ENOMEM);
+diff --git a/unit/test-lib.c b/unit/test-lib.c
+index 0be6d80..76e4363 100644
+--- a/unit/test-lib.c
++++ b/unit/test-lib.c
+@@ -147,6 +147,86 @@ static void test_sdp_get_access_protos_invalid_dtd2(void)
+ 	sdp_record_free(rec);
+ }
  
- 		le->dst_type = bdaddr_to_le(dst_type);
--		hci_le_create_connection(le);
-+		le->state = BT_CONNECT;
++static void test_sdp_get_lang_attr_valid(void)
++{
++	sdp_record_t *rec;
++	sdp_list_t *list;
++	int err;
 +
-+		hci_conn_set_le_state(le, HCI_CONN_LE_SCAN);
- 	}
- 
- 	le->pending_sec_level = sec_level;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 477726a..84648c8 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1260,6 +1260,7 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
++	rec = sdp_record_alloc();
++	sdp_add_lang_attr(rec);
++
++	err = sdp_get_lang_attr(rec, &list);
++	g_assert(err == 0);
++
++	sdp_list_free(list, free);
++	sdp_record_free(rec);
++}
++
++static void test_sdp_get_lang_attr_nodata(void)
++{
++	sdp_record_t *rec;
++	sdp_list_t *list;
++	int err;
++
++	rec = sdp_record_alloc();
++
++	err = sdp_get_lang_attr(rec, &list);
++	g_assert(err == -1 && errno == ENODATA);
++
++	sdp_record_free(rec);
++}
++
++static void test_sdp_get_lang_attr_invalid_dtd(void)
++{
++	uint8_t dtd1 = SDP_UINT16, dtd2 = SDP_UINT32;
++	uint32_t u32 = 0xdeadbeeb;
++	uint16_t u16 = 0x1234;
++	void *dtds1[] = { &dtd1, &dtd2, &dtd2 };
++	void *values1[] = { &u16, &u32, &u32 };
++	void *dtds2[] = { &dtd1, &dtd1, &dtd2 };
++	void *values2[] = { &u16, &u16, &u32 };
++	sdp_record_t *rec;
++	sdp_data_t *data;
++	sdp_list_t *list;
++	int err;
++
++	rec = sdp_record_alloc();
++
++	/* UINT32 */
++	data = sdp_data_alloc(SDP_UINT32, &u32);
++	g_assert(data != NULL);
++	sdp_attr_add(rec, SDP_ATTR_LANG_BASE_ATTR_ID_LIST, data);
++	err = sdp_get_lang_attr(rec, &list);
++	g_assert(err == -1 && errno == EINVAL);
++
++	/* SEQ8(UINT32) */
++	data = sdp_seq_alloc(&dtds1[1], &values1[1], 1);
++	sdp_attr_replace(rec, SDP_ATTR_LANG_BASE_ATTR_ID_LIST, data);
++	err = sdp_get_lang_attr(rec, &list);
++	g_assert(err == -1 && errno == EINVAL);
++
++	/* SEQ8(UINT16, UINT16) */
++	data = sdp_seq_alloc(dtds2, values2, 2);
++	sdp_attr_replace(rec, SDP_ATTR_LANG_BASE_ATTR_ID_LIST, data);
++	err = sdp_get_lang_attr(rec, &list);
++	g_assert(err == -1 && errno == EINVAL);
++
++	/* SEQ8(UINT16, UINT32, UINT32) */
++	data = sdp_seq_alloc(dtds1, values1, 3);
++	sdp_attr_replace(rec, SDP_ATTR_LANG_BASE_ATTR_ID_LIST, data);
++	err = sdp_get_lang_attr(rec, &list);
++	g_assert(err == -1 && errno == EINVAL);
++
++	/* SEQ8(UINT16, UINT16, UINT32) */
++	data = sdp_seq_alloc(dtds2, values2, 3);
++	sdp_attr_replace(rec, SDP_ATTR_LANG_BASE_ATTR_ID_LIST, data);
++	err = sdp_get_lang_attr(rec, &list);
++	g_assert(err == -1 && errno == EINVAL);
++
++	sdp_record_free(rec);
++}
++
+ int main(int argc, char *argv[])
  {
- 	struct hci_cp_le_set_scan_enable *cp;
- 	__u8 status = *((__u8 *) skb->data);
-+	struct hci_conn *hcon;
+ 	g_test_init(&argc, &argv, NULL);
+@@ -160,5 +240,12 @@ int main(int argc, char *argv[])
+ 	g_test_add_func("/lib/sdp_get_access_protos/invalid_dtd2",
+ 				test_sdp_get_access_protos_invalid_dtd2);
  
- 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
- 
-@@ -1295,8 +1296,15 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 
- 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
- 
--		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
--		    hdev->discovery.state == DISCOVERY_FINDING) {
-+		hcon = hci_conn_hash_lookup_le_state(hdev, HCI_CONN_LE_FOUND);
-+		if (hcon) {
-+			hci_dev_lock(hdev);
-+			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+			hci_dev_unlock(hdev);
++	g_test_add_func("/lib/sdp_get_lang_attr/valid",
++						test_sdp_get_lang_attr_valid);
++	g_test_add_func("/lib/sdp_get_lang_attr/nodata",
++						test_sdp_get_lang_attr_nodata);
++	g_test_add_func("/lib/sdp_get_lang_attr/invalid_dtd",
++					test_sdp_get_lang_attr_invalid_dtd);
 +
-+			hci_conn_set_le_state(hcon, HCI_CONN_LE_INITIATE);
-+		} else if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
-+			   hdev->discovery.state == DISCOVERY_FINDING) {
- 			mgmt_interleaved_discovery(hdev);
- 		} else {
- 			hci_dev_lock(hdev);
-@@ -3971,6 +3979,7 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	conn->sec_level = BT_SECURITY_LOW;
- 	conn->handle = __le16_to_cpu(ev->handle);
-+	hci_conn_set_le_state(conn, 0);
- 	conn->state = BT_CONNECTED;
- 
- 	hci_conn_hold_device(conn);
-@@ -3987,10 +3996,16 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	u8 num_reports = skb->data[0];
- 	void *ptr = &skb->data[1];
- 	s8 rssi;
-+	struct hci_conn *hcon;
- 
- 	while (num_reports--) {
- 		struct hci_ev_le_advertising_info *ev = ptr;
- 
-+		hcon = hci_conn_has_le_pending(hdev, &ev->bdaddr,
-+					       ev->bdaddr_type);
-+		if (hcon)
-+			hci_conn_set_le_state(hcon, HCI_CONN_LE_FOUND);
-+
- 		rssi = ev->data[ev->length];
- 		mgmt_device_found(hdev, &ev->bdaddr, LE_LINK, ev->bdaddr_type,
- 				  NULL, rssi, 0, 1, ev->data, ev->length);
+ 	return g_test_run();
+ }
 -- 
-1.8.1.2
+1.7.9.5
 
