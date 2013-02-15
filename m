@@ -1,50 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-CC: Andre Guedes <andre.guedes@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 02/12] Bluetooth: Add basic start/complete HCI transaction functions
-Date: Fri, 15 Feb 2013 09:36:03 +0100
-Message-ID: <22685873.dZ0kFmHBbe@uw000953>
-In-Reply-To: <20130215082236.GA5232@x220>
-References: <1360767045-26958-1-git-send-email-johan.hedberg@gmail.com> <CACJA=fWD8mvxvY-WRq-j2c284-SkezbS05KVp_bGwcdKN6yn9g@mail.gmail.com> <20130215082236.GA5232@x220>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 11/12 v2] Bluetooth: Remove unused hdev->init_last_cmd
+Date: Fri, 15 Feb 2013 10:30:33 +0200
+Message-Id: <1360917034-5503-12-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1360917034-5503-1-git-send-email-johan.hedberg@gmail.com>
+References: <1360917034-5503-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Friday 15 of February 2013 10:22:36 Johan Hedberg wrote:
-> > > +int hci_start_transaction(struct hci_dev *hdev)
-> > > +{
-> > > +       struct hci_transaction *transaction;
-> > > +       int err;
-> > > +
-> > > +       hci_transaction_lock(hdev);
-> > > +
-> > > +       /* We can't start a new transaction if there's another one in
-> > > +        * progress of being built.
-> > > +        */
-> > > +       if (hdev->build_transaction) {
-> > > +               err = -EBUSY;
-> > > +               goto unlock;
-> > > +       }
-> > > +
-> > > +       transaction = kmalloc(sizeof(*transaction), GFP_ATOMIC);
-> > 
-> > I've failed to see why we need GFP_ATOMIC here. As this code is not
-> > running in any atomic section, we can allocate memory using
-> > GFP_KERNEL.
-> 
-> Since one of the intentions of this API is to create an async version of
-> hci_request() I think it's better to keep GFP_ATOMIC here. One situation
-> where you couldn't for sure use hci_request() is if you're in an atomic
-> section and then a HCI request would be the only other alternative.
+This variable is no longer needed as the functionality is provided by
+the HCI transaction framework.
 
-You lock mutex in hci_start_transaction so it is non-atomic anyway..
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci_core.h |    2 --
+ net/bluetooth/hci_core.c         |    4 ----
+ 2 files changed, 6 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index fe7df9e..4c14d31 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -261,8 +261,6 @@ struct hci_dev {
+ 	__u32			req_status;
+ 	__u32			req_result;
+ 
+-	__u16			init_last_cmd;
+-
+ 	struct list_head	mgmt_pending;
+ 
+ 	struct discovery_state	discovery;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 99f9ccf..da762bf 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -750,7 +750,6 @@ int hci_dev_open(__u16 dev)
+ 	if (!test_bit(HCI_RAW, &hdev->flags)) {
+ 		atomic_set(&hdev->cmd_cnt, 1);
+ 		set_bit(HCI_INIT, &hdev->flags);
+-		hdev->init_last_cmd = 0;
+ 
+ 		ret = __hci_request(hdev, hci_init_req, 0, HCI_INIT_TIMEOUT);
+ 
+@@ -2313,9 +2312,6 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+ 	bt_cb(skb)->pkt_type = HCI_COMMAND_PKT;
+ 	skb->dev = (void *) hdev;
+ 
+-	if (test_bit(HCI_INIT, &hdev->flags))
+-		hdev->init_last_cmd = opcode;
+-
+ 	err = 0;
+ 
+ 	hci_transaction_lock(hdev);
 -- 
-BR
-Szymon Janc
+1.7.10.4
 
