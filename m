@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 09/12 v3] Bluetooth: Add HCI init sequence support for HCI transactions
-Date: Fri, 15 Feb 2013 11:51:57 +0200
-Message-Id: <1360921920-14080-10-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 07/12 v3] Bluetooth: Fix mgmt powered indication by using a HCI transaction
+Date: Fri, 15 Feb 2013 11:51:55 +0200
+Message-Id: <1360921920-14080-8-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1360921920-14080-1-git-send-email-johan.hedberg@gmail.com>
 References: <1360921920-14080-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,82 +11,91 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-There's a special quirk needed for unexpected HCI reset command
-completes during the init process. This patch adds this quirk to the HCI
-transaction code so that hci_init_req can be converted to use the HCI
-transaction framework.
+The response to mgmt_set_powered should be returned only when all
+related HCI commands have completed. To properly do this make use of a
+HCI transaction with a callback to indicate its completion.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_core.c |   47 +++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 44 insertions(+), 3 deletions(-)
+ net/bluetooth/mgmt.c |   43 ++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 34 insertions(+), 9 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 2565bb1..d16c2e4 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3087,17 +3087,58 @@ next_in_queue:
- 	hdev->current_transaction = transaction;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 39395c7..042a6c7 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3058,19 +3058,33 @@ static int set_bredr_scan(struct hci_dev *hdev)
+ 	return hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
  }
  
-+static void hci_resend_last(struct hci_dev *hdev)
++static void powered_complete(struct hci_dev *hdev, u16 opcode, int status)
 +{
-+	struct hci_transaction *transaction;
-+	struct hci_command_hdr *sent;
-+	struct sk_buff *skb;
-+	u16 opcode;
++	struct cmd_lookup match = { NULL, hdev };
 +
-+	if (!hdev->sent_cmd)
-+		return;
++	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
 +
-+	sent = (void *) hdev->sent_cmd->data;
-+	opcode = __le16_to_cpu(sent->opcode);
-+	if (opcode == HCI_OP_RESET)
-+		return;
++	new_settings(hdev, match.sk);
 +
-+	skb = skb_clone(hdev->sent_cmd, GFP_KERNEL);
-+	if (!skb)
-+		return;
-+
-+	hci_transaction_lock(hdev);
-+
-+	transaction = hdev->current_transaction;
-+	if (transaction) {
-+		skb_queue_head(&transaction->cmd_q, skb);
-+		queue_work(hdev->workqueue, &hdev->cmd_work);
-+	} else {
-+		kfree_skb(skb);
-+	}
-+
-+	hci_transaction_unlock(hdev);
++	if (match.sk)
++		sock_put(match.sk);
 +}
 +
- bool hci_transaction_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status)
+ int mgmt_powered(struct hci_dev *hdev, u8 powered)
  {
- 	bool queue_empty;
+ 	struct cmd_lookup match = { NULL, hdev };
++	u8 status = MGMT_STATUS_NOT_POWERED;
++	u8 zero_cod[] = { 0, 0, 0 };
+ 	int err;
  
- 	BT_DBG("opcode 0x%04x status 0x%02x", opcode, status);
+ 	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
+ 		return 0;
  
--	/* Ignore this event if it doesn't match the last HCI command
--	 * that was sent
-+	/* If the completed command doesn't match the last one that was
-+	 * sent we need to do special handling of it.
- 	 */
--	if (!hci_sent_cmd_data(hdev, opcode))
-+	if (!hci_sent_cmd_data(hdev, opcode)) {
-+		/* Some CSR based controllers generate a spontaneous
-+		 * reset complete event during init and any pending
-+		 * command will never be completed. In such a case we
-+		 * need to resend whatever was the last sent
-+		 * command.
+-	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
+-
+ 	if (powered) {
+ 		u8 link_sec;
+ 
++		hci_start_transaction(hdev);
++
+ 		if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
+ 		    !lmp_host_ssp_capable(hdev)) {
+ 			u8 ssp = 1;
+@@ -3105,17 +3119,28 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
+ 			update_name(hdev, hdev->dev_name);
+ 			update_eir(hdev);
+ 		}
+-	} else {
+-		u8 status = MGMT_STATUS_NOT_POWERED;
+-		u8 zero_cod[] = { 0, 0, 0 };
+ 
+-		mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
++		err = hci_complete_transaction(hdev, powered_complete);
++		if (err == 0)
++			return 0;
+ 
+-		if (memcmp(hdev->dev_class, zero_cod, sizeof(zero_cod)) != 0)
+-			mgmt_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev,
+-				   zero_cod, sizeof(zero_cod), NULL);
++		/* If hci_complete_transaction fails it means no HCI
++		 * commands were pushed to the queue, i.e. we can go
++		 * ahead and indicate success directly.
 +		 */
-+		if (test_bit(HCI_INIT, &hdev->flags) && opcode == HCI_OP_RESET)
-+			hci_resend_last(hdev);
- 		return false;
-+	}
++		mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp,
++				     &match);
++		goto new_settings;
+ 	}
  
- 	hci_transaction_lock(hdev);
++	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
++	mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
++
++	if (memcmp(hdev->dev_class, zero_cod, sizeof(zero_cod)) != 0)
++		mgmt_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev,
++			   zero_cod, sizeof(zero_cod), NULL);
++
++new_settings:
+ 	err = new_settings(hdev, match.sk);
  
+ 	if (match.sk)
 -- 
 1.7.10.4
 
