@@ -1,102 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 1/6] neard: Use service name and not boolean to track if registered to neard
-Date: Fri, 15 Feb 2013 13:09:14 +0100
-Message-ID: <1360930159-25658-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Date: Fri, 15 Feb 2013 12:01:19 +0100
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 0/2] Add device_set_trusted()
+Message-Id: <20130215120119.bcea12ec5ae6c7273993485b@studenti.unina.it>
+In-Reply-To: <20130215092740.GB11352@x220>
+References: <1359908071-15024-1-git-send-email-ospite@studenti.unina.it>
+	<20130215092740.GB11352@x220>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- plugins/neard.c | 23 ++++++++++++++---------
- 1 file changed, 14 insertions(+), 9 deletions(-)
+On Fri, 15 Feb 2013 11:27:40 +0200
+Johan Hedberg <johan.hedberg@gmail.com> wrote:
 
-diff --git a/plugins/neard.c b/plugins/neard.c
-index a1b385e..650ee3e 100644
---- a/plugins/neard.c
-+++ b/plugins/neard.c
-@@ -49,7 +49,7 @@
- #define ERROR_INTERFACE "org.neard.HandoverAgent.Error"
- 
- static guint watcher_id = 0;
--static gboolean agent_registered = FALSE;
-+static char *neard_service = NULL;
- static gboolean agent_register_postpone = FALSE;
- 
- /* For NFC mimetype limits max OOB EIR size */
-@@ -115,7 +115,7 @@ static void register_agent_cb(DBusPendingCall *call, void *user_data)
- 	}
- 
- 	dbus_message_unref(reply);
--	agent_registered = TRUE;
-+	neard_service = g_strdup(dbus_message_get_sender(reply));
- }
- 
- static void register_agent(void)
-@@ -152,7 +152,8 @@ static void unregister_agent(void)
- 	DBusMessage *message;
- 	const char *path = AGENT_PATH;
- 
--	agent_registered = FALSE;
-+	g_free(neard_service);
-+	neard_service = NULL;
- 
- 	message = dbus_message_new_method_call(NEARD_NAME, NEARD_PATH,
- 			NEARD_MANAGER_INTERFACE, "UnregisterHandoverAgent");
-@@ -237,7 +238,7 @@ static void read_local_complete(struct btd_adapter *adapter,
- 
- 	DBG("");
- 
--	if (!agent_registered) {
-+	if (neard_service == NULL) {
- 		dbus_message_unref(msg);
- 
- 		if (agent_register_postpone) {
-@@ -269,7 +270,7 @@ static void bonding_complete(struct btd_adapter *adapter,
- 
- 	DBG("");
- 
--	if (!agent_registered) {
-+	if (neard_service == NULL) {
- 		dbus_message_unref(msg);
- 
- 		if (agent_register_postpone) {
-@@ -777,7 +778,9 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
- {
- 	DBG("");
- 
--	agent_registered = FALSE;
-+	g_free(neard_service);
-+	neard_service = NULL;
-+
- 	g_dbus_unregister_interface(conn, AGENT_PATH, AGENT_INTERFACE);
- 
- 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
-@@ -824,8 +827,10 @@ static void neard_vanished(DBusConnection *conn, void *user_data)
- 	DBG("");
- 
- 	/* neard existed without unregistering agent */
--	if (agent_registered) {
--		agent_registered = FALSE;
-+	if (neard_service != NULL) {
-+		g_free(neard_service);
-+		neard_service = NULL;
-+
- 		g_dbus_unregister_interface(conn, AGENT_PATH, AGENT_INTERFACE);
- 	}
- }
-@@ -850,7 +855,7 @@ static void neard_exit(void)
- 	g_dbus_remove_watch(btd_get_dbus_connection(), watcher_id);
- 	watcher_id = 0;
- 
--	if (agent_registered)
-+	if (neard_service != NULL)
- 		unregister_agent();
- }
- 
+> Hi Antonio,
+> 
+> On Sun, Feb 03, 2013, Antonio Ospite wrote:
+> > In patch 1 a device_set_trusted() function is proposed, which I plan to
+> > use for the playstation-peripheral plugin; I am in the process of
+> > rebasing the plugin on top of BlueZ 5.2.
+> > 
+> > In patch 2 the newly introduced function is used in order to avoid some
+> > duplication.
+> > 
+> > device_set_trusted() looks a lot like device_set_temporary() and
+> > device_set_legacy(), I hope it makes sense to you too.
+> > 
+> > Thanks,
+> >    Antonio
+> > 
+> > Antonio Ospite (2):
+> >   device: add a device_set_trusted() function
+> >   device: use device_set_trusted() in set_trust()
+> > 
+> >  src/device.c |   30 +++++++++++++++++++-----------
+> >  src/device.h |    1 +
+> >  2 files changed, 20 insertions(+), 11 deletions(-)
+> 
+> Both patches are now applied (after adding some needed info to the
+> commit messages for the justification of these changes).
+> 
+
+Thanks a lot, mentioning USB-based pairing in the commit message is a
+useful hint indeed.
+
+And thanks to Bastien for backing up the changes better than I would
+have.
+
+See you soon with a couple of more controversial patches :)
+
+Regards,
+   Antonio
+
 -- 
-1.8.1.1
+Antonio Ospite
+http://ao2.it
 
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
