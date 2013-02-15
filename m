@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/7] AVRCP: Parse browsing and searching features bits
-Date: Fri, 15 Feb 2013 16:02:47 +0200
-Message-Id: <1360936972-12952-2-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/7] AVRCP: Move features to avrcp.c
+Date: Fri, 15 Feb 2013 16:02:49 +0200
+Message-Id: <1360936972-12952-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1360936972-12952-1-git-send-email-luiz.dentz@gmail.com>
 References: <1360936972-12952-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,175 +11,81 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This parses browsing and searching features bits and set the respective
-property.
+avrcp.c should be responsible for specifics of AVRCP not player.c which
+is more high level abstraction.
 ---
- profiles/audio/avrcp.c  | 18 ++++++++----
- profiles/audio/player.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++++-
- profiles/audio/player.h |  2 ++
- 3 files changed, 87 insertions(+), 6 deletions(-)
+ profiles/audio/avrcp.c  | 4 ++++
+ profiles/audio/player.c | 8 --------
+ profiles/audio/player.h | 1 -
+ 3 files changed, 4 insertions(+), 9 deletions(-)
 
 diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 5967180..cabe2ee 100644
+index cabe2ee..55887bc 100644
 --- a/profiles/audio/avrcp.c
 +++ b/profiles/audio/avrcp.c
-@@ -1976,6 +1976,18 @@ static void avrcp_set_browsed_player(struct avrcp *session,
- 				avrcp_set_browsed_player_rsp, session);
+@@ -180,6 +180,7 @@ struct avrcp_player {
+ 	GSList *sessions;
+ 	uint16_t id;
+ 	uint16_t uid_counter;
++	uint8_t *features;
+ 
+ 	struct avrcp_player_cb *cb;
+ 	void *user_data;
+@@ -1981,6 +1982,8 @@ static void avrcp_player_parse_features(struct avrcp_player *player,
+ {
+ 	struct media_player *mp = player->user_data;
+ 
++	player->features = g_memdup(features, 16);
++
+ 	if (features[7] & 0x08)
+ 		media_player_set_browsable(mp, true);
+ 
+@@ -2553,6 +2556,7 @@ static void player_destroy(gpointer data)
+ 		player->destroy(player->user_data);
+ 
+ 	g_slist_free(player->sessions);
++	g_free(player->features);
+ 	g_free(player);
  }
  
-+static void avrcp_player_parse_features(struct avrcp_player *player,
-+							uint8_t *features)
-+{
-+	struct media_player *mp = player->user_data;
-+
-+	if (features[7] & 0x08)
-+		media_player_set_browsable(mp, true);
-+
-+	if (features[7] & 0x10)
-+		media_player_set_searchable(mp, true);
-+}
-+
- static void avrcp_parse_media_player_item(struct avrcp *session,
- 					uint8_t *operands, uint16_t len)
- {
-@@ -1984,7 +1996,6 @@ static void avrcp_parse_media_player_item(struct avrcp *session,
- 	uint16_t id;
- 	uint32_t subtype;
- 	const char *curval, *strval;
--	uint64_t features[2];
- 	char name[255];
- 
- 	if (len < 28)
-@@ -2009,10 +2020,7 @@ static void avrcp_parse_media_player_item(struct avrcp *session,
- 		avrcp_get_play_status(session);
- 	}
- 
--	features[0] = bt_get_be64(&operands[8]);
--	features[1] = bt_get_be64(&operands[16]);
--
--	media_player_set_features(mp, features);
-+	avrcp_player_parse_features(player, &operands[8]);
- 
- 	if (operands[26] != 0) {
- 		memcpy(name, &operands[27], operands[26]);
 diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index f875ee7..7879193 100644
+index 7879193..07fd457 100644
 --- a/profiles/audio/player.c
 +++ b/profiles/audio/player.c
-@@ -67,7 +67,9 @@ struct media_player {
- 	char			*name;		/* Player name */
- 	char			*type;		/* Player type */
+@@ -69,7 +69,6 @@ struct media_player {
  	char			*subtype;	/* Player subtype */
--	uint64_t		features[2];	/* Player features */
-+	bool			browsable;	/* Player browsing feature */
-+	bool			searchable;	/* Player searching feature */
-+	uint8_t			*features;	/* Player features */
+ 	bool			browsable;	/* Player browsing feature */
+ 	bool			searchable;	/* Player searching feature */
+-	uint8_t			*features;	/* Player features */
  	struct media_folder	*folder;	/* Player currenct folder */
  	char			*path;		/* Player object path */
  	GHashTable		*settings;	/* Player settings */
-@@ -350,6 +352,57 @@ static gboolean get_subtype(const GDBusPropertyTable *property,
- 	return TRUE;
+@@ -941,13 +940,6 @@ void media_player_set_folder(struct media_player *mp, const char *path,
+ 	}
  }
  
-+static gboolean browsable_exists(const GDBusPropertyTable *property, void *data)
-+{
-+	struct media_player *mp = data;
-+
-+	return mp->folder != NULL;
-+}
-+
-+static gboolean get_browsable(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_player *mp = data;
-+	dbus_bool_t value;
-+
-+	if (mp->folder == NULL)
-+		return FALSE;
-+
-+	DBG("%s", mp->browsable ? "true" : "false");
-+
-+	value = mp->browsable;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
-+
-+	return TRUE;
-+}
-+
-+static gboolean searchable_exists(const GDBusPropertyTable *property,
-+								void *data)
-+{
-+	struct media_player *mp = data;
-+
-+	return mp->folder != NULL;
-+}
-+
-+static gboolean get_searchable(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_player *mp = data;
-+	dbus_bool_t value;
-+
-+	if (mp->folder == NULL)
-+		return FALSE;
-+
-+	DBG("%s", mp->searchable ? "true" : "false");
-+
-+	value = mp->searchable;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
-+
-+	return TRUE;
-+}
-+
- static DBusMessage *media_player_play(DBusConnection *conn, DBusMessage *msg,
- 								void *data)
- {
-@@ -510,6 +563,10 @@ static const GDBusPropertyTable media_player_properties[] = {
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ "Device", "s", get_device, NULL, NULL,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "Browsable", "b", get_browsable, NULL, browsable_exists,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "Searchable", "b", get_searchable, NULL, searchable_exists,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ }
- };
- 
-@@ -843,6 +900,20 @@ void media_player_set_name(struct media_player *mp, const char *name)
- 					"Name");
- }
- 
-+void media_player_set_browsable(struct media_player *mp, bool enabled)
-+{
-+	DBG("%s", enabled ? "true" : "false");
-+
-+	mp->browsable = enabled;
-+}
-+
-+void media_player_set_searchable(struct media_player *mp, bool enabled)
-+{
-+	DBG("%s", enabled ? "true" : "false");
-+
-+	mp->searchable = enabled;
-+}
-+
- void media_player_set_folder(struct media_player *mp, const char *path,
- 								uint32_t items)
- {
+-void media_player_set_features(struct media_player *mp, uint64_t *features)
+-{
+-	DBG("0x%016" PRIx64 "%016" PRIx64, features[0], features[1]);
+-
+-	memcpy(features, mp->features, sizeof(mp->features));
+-}
+-
+ void media_player_set_callbacks(struct media_player *mp,
+ 				const struct media_player_callback *cbs,
+ 				void *user_data)
 diff --git a/profiles/audio/player.h b/profiles/audio/player.h
-index 1ac9800..e9a7d1c 100644
+index e9a7d1c..9109b1f 100644
 --- a/profiles/audio/player.h
 +++ b/profiles/audio/player.h
-@@ -51,6 +51,8 @@ void media_player_set_type(struct media_player *mp, const char *type);
+@@ -49,7 +49,6 @@ void media_player_set_metadata(struct media_player *mp, const char *key,
+ 						void *data, size_t len);
+ void media_player_set_type(struct media_player *mp, const char *type);
  void media_player_set_subtype(struct media_player *mp, const char *subtype);
- void media_player_set_features(struct media_player *mp, uint64_t *features);
+-void media_player_set_features(struct media_player *mp, uint64_t *features);
  void media_player_set_name(struct media_player *mp, const char *name);
-+void media_player_set_browsable(struct media_player *mp, bool enabled);
-+void media_player_set_searchable(struct media_player *mp, bool enabled);
- void media_player_set_folder(struct media_player *mp, const char *path,
- 								uint32_t items);
- 
+ void media_player_set_browsable(struct media_player *mp, bool enabled);
+ void media_player_set_searchable(struct media_player *mp, bool enabled);
 -- 
 1.8.1.2
 
