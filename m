@@ -1,69 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v2 2/8] Bluetooth: Add LE scan type macros
-Date: Fri, 15 Feb 2013 20:27:02 -0300
-Message-Id: <1360970828-24004-3-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v2 7/8] Bluetooth: Count pending LE connection attempts
+Date: Fri, 15 Feb 2013 20:27:07 -0300
+Message-Id: <1360970828-24004-8-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1360970828-24004-1-git-send-email-andre.guedes@openbossa.org>
 References: <1360970828-24004-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds macros for active and passive LE scan type values. It
-also removes the LE_SCAN_TYPE macro since it is not used anymore.
+To avoid traversing the hci_conn list every time we get an advertising
+report, we keep a counter of pending LE connection attempts (connections
+in HCI_CONN_LE_SCAN state). This way, we only traverse the list if the
+counter is greater from zero.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h | 3 +++
- net/bluetooth/mgmt.c             | 7 +++----
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ include/net/bluetooth/hci_core.h | 6 ++++++
+ net/bluetooth/hci_conn.c         | 6 ++++++
+ net/bluetooth/hci_core.c         | 2 ++
+ 3 files changed, 14 insertions(+)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 90cf75a..48c28ca 100644
+index c797717..5f2a991 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -117,6 +117,9 @@ struct oob_data {
- 	u8 randomizer[16];
- };
+@@ -290,6 +290,12 @@ struct hci_dev {
+ 	__u8			adv_data[HCI_MAX_AD_LENGTH];
+ 	__u8			adv_data_len;
  
-+#define LE_SCAN_PASSIVE		0x00
-+#define LE_SCAN_ACTIVE		0x01
++	/*
++	 * This counter tracks the number of pending LE connections
++	 * (connections in HCI_CONN_LE_SCAN state).
++	 */
++	atomic_t		le_conn_pend;
 +
- struct le_scan_params {
- 	u8 type;
- 	u16 interval;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 39395c7..1e5bd74 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -106,7 +106,6 @@ static const u16 mgmt_events[] = {
-  * These LE scan and inquiry parameters were chosen according to LE General
-  * Discovery Procedure specification.
-  */
--#define LE_SCAN_TYPE			0x01
- #define LE_SCAN_WIN			0x12
- #define LE_SCAN_INT			0x12
- #define LE_SCAN_TIMEOUT_LE_ONLY		10240	/* TGAP(gen_disc_scan_min) */
-@@ -2485,7 +2484,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 			goto failed;
- 		}
+ 	int (*open)(struct hci_dev *hdev);
+ 	int (*close)(struct hci_dev *hdev);
+ 	int (*flush)(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index e259745..29192e0 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -266,6 +266,7 @@ static void cancel_le_connection(struct hci_conn *conn)
  
--		err = hci_le_scan(hdev, LE_SCAN_TYPE, LE_SCAN_INT,
-+		err = hci_le_scan(hdev, LE_SCAN_ACTIVE, LE_SCAN_INT,
- 				  LE_SCAN_WIN, LE_SCAN_TIMEOUT_LE_ONLY);
+ 	switch (atomic_read(&conn->le_state)) {
+ 	case HCI_CONN_LE_SCAN:
++		atomic_dec(&hdev->le_conn_pend);
+ 		hci_cancel_le_scan(hdev);
  		break;
+ 	case HCI_CONN_LE_INITIATE:
+@@ -1061,9 +1062,11 @@ void hci_conn_set_le_state(struct hci_conn *conn, int state)
  
-@@ -2497,8 +2496,8 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 			goto failed;
- 		}
- 
--		err = hci_le_scan(hdev, LE_SCAN_TYPE, LE_SCAN_INT, LE_SCAN_WIN,
--				  LE_SCAN_TIMEOUT_BREDR_LE);
-+		err = hci_le_scan(hdev, LE_SCAN_ACTIVE, LE_SCAN_INT,
-+				  LE_SCAN_WIN, LE_SCAN_TIMEOUT_BREDR_LE);
+ 	switch (state) {
+ 	case HCI_CONN_LE_SCAN:
++		atomic_inc(&hdev->le_conn_pend);
+ 		hci_le_scan(hdev, LE_SCAN_PASSIVE, 0x60, 0x30, 0);
  		break;
+ 	case HCI_CONN_LE_FOUND:
++		atomic_dec(&hdev->le_conn_pend);
+ 		hci_cancel_le_scan(hdev);
+ 		break;
+ 	case HCI_CONN_LE_INITIATE:
+@@ -1079,6 +1082,9 @@ struct hci_conn *hci_conn_has_le_pending(struct hci_dev *hdev, bdaddr_t *addr,
+ {
+ 	struct hci_conn *conn;
  
- 	default:
++	if (atomic_read(&hdev->le_conn_pend) == 0)
++		return NULL;
++
+ 	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, addr);
+ 	if (!conn)
+ 		return NULL;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 3aa0345..acdfe15 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1742,6 +1742,8 @@ struct hci_dev *hci_alloc_dev(void)
+ 	hci_init_sysfs(hdev);
+ 	discovery_init(hdev);
+ 
++	atomic_set(&hdev->le_conn_pend, 0);
++
+ 	return hdev;
+ }
+ EXPORT_SYMBOL(hci_alloc_dev);
 -- 
 1.8.1.2
 
