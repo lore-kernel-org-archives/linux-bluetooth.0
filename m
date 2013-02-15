@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 12/12 v3] Bluetooth: Remove empty HCI event handlers
-Date: Fri, 15 Feb 2013 11:52:00 +0200
-Message-Id: <1360921920-14080-13-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 08/12 v3] Bluetooth: Enable HCI transaction support cmd_status 0
+Date: Fri, 15 Feb 2013 11:51:56 +0200
+Message-Id: <1360921920-14080-9-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1360921920-14080-1-git-send-email-johan.hedberg@gmail.com>
 References: <1360921920-14080-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,260 +11,116 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-With the removal of hci_req_complete() several HCI event handles have
-essentially become empty and can be removed.
+Some HCI commands do not result in a command complete event and generate
+an intermediate command status 0 in between. Inquiry is one of these
+procedures and needs to be handled properly since the legacy ioctl for
+it uses hci_request which in turn will make use of the HCI transaction
+framework.
+
+If the ncmd HCI event parameter indicates that we can send more commands
+to the controller we should do it if we have any commands in our queue.
+However, for the ongoing HCI transaction to be properly notified for
+completion we need to hold off this notification if possible when the
+command status event comes.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_event.c |  133 ---------------------------------------------
- 1 file changed, 133 deletions(-)
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_core.c         |   28 ++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |    8 ++++++--
+ 3 files changed, 35 insertions(+), 2 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index fd8d305..ce7fbf7 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1062,6 +1062,7 @@ int hci_complete_transaction(struct hci_dev *hdev,
+ 			     void (*complete)(struct hci_dev *hdev,
+ 					      __u16 last_cmd, int status));
+ bool hci_transaction_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status);
++bool hci_transaction_cmd_status(struct hci_dev *hdev, u16 opcode, u8 status);
+ int hci_transaction_from_skb(struct hci_dev *hdev, struct sk_buff *skb);
+ 
+ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index bc2d7f2..2565bb1 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3091,6 +3091,8 @@ bool hci_transaction_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status)
+ {
+ 	bool queue_empty;
+ 
++	BT_DBG("opcode 0x%04x status 0x%02x", opcode, status);
++
+ 	/* Ignore this event if it doesn't match the last HCI command
+ 	 * that was sent
+ 	 */
+@@ -3114,6 +3116,32 @@ unlock:
+ 	return queue_empty;
+ }
+ 
++bool hci_transaction_cmd_status(struct hci_dev *hdev, u16 opcode, u8 status)
++{
++	struct hci_transaction *transaction = hdev->current_transaction;
++
++	BT_DBG("opcode 0x%04x status 0x%02x", opcode, status);
++
++	if (status)
++		return hci_transaction_cmd_complete(hdev, opcode, status);
++
++	if (!transaction)
++		return true;
++
++	/* If there are no more commands for this transaction and it *
++	 * doesn't have a complete callback or there are other
++	 * commands/transactions in the hdev queue we consider this
++	 * transaction as completed. Otherwise reply that the queue is
++	 * empty so that we wait for the event that really indicates
++	 * that the pending command is complete.
++	 */
++	if (skb_queue_empty(&transaction->cmd_q) &&
++	    (!transaction->complete || !list_empty(&hdev->transaction_q)))
++		return hci_transaction_cmd_complete(hdev, opcode, status);
++
++	return true;
++}
++
+ static void hci_rx_work(struct work_struct *work)
+ {
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev, rx_work);
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 805580e..22864f2 100644
+index 7f198ba..1045a31 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -424,13 +424,6 @@ static void hci_cc_write_voice_setting(struct hci_dev *hdev,
- 		hdev->notify(hdev, HCI_NOTIFY_VOICE_SETTING);
- }
+@@ -40,6 +40,8 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
  
--static void hci_cc_host_buffer_size(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	__u8 status = *((__u8 *) skb->data);
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--}
--
- static void hci_cc_write_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -884,13 +877,6 @@ static void hci_cc_read_data_block_size(struct hci_dev *hdev,
- 	       hdev->block_cnt, hdev->block_len);
- }
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
  
--static void hci_cc_write_ca_timeout(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	__u8 status = *((__u8 *) skb->data);
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--}
--
- static void hci_cc_read_local_amp_info(struct hci_dev *hdev,
- 				       struct sk_buff *skb)
- {
-@@ -953,29 +939,6 @@ a2mp_rsp:
- 	a2mp_send_create_phy_link_req(hdev, rp->status);
- }
++	hci_transaction_cmd_complete(hdev, HCI_OP_INQUIRY, status);
++
+ 	if (status) {
+ 		hci_dev_lock(hdev);
+ 		mgmt_stop_discovery_failed(hdev, status);
+@@ -1944,6 +1946,7 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
  
--static void hci_cc_delete_stored_link_key(struct hci_dev *hdev,
--					  struct sk_buff *skb)
--{
--	__u8 status = *((__u8 *) skb->data);
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--}
--
--static void hci_cc_set_event_mask(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	__u8 status = *((__u8 *) skb->data);
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--}
--
--static void hci_cc_write_inquiry_mode(struct hci_dev *hdev,
--				      struct sk_buff *skb)
--{
--	__u8 status = *((__u8 *) skb->data);
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--}
--
- static void hci_cc_read_inq_rsp_tx_power(struct hci_dev *hdev,
- 					 struct sk_buff *skb)
- {
-@@ -987,13 +950,6 @@ static void hci_cc_read_inq_rsp_tx_power(struct hci_dev *hdev,
- 		hdev->inq_tx_power = rp->tx_power;
- }
+ 	hci_req_complete(hdev, HCI_OP_INQUIRY, status);
++	hci_transaction_cmd_complete(hdev, HCI_OP_INQUIRY, status);
  
--static void hci_cc_set_event_flt(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	__u8 status = *((__u8 *) skb->data);
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--}
--
- static void hci_cc_pin_code_reply(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_rp_pin_code_reply *rp = (void *) skb->data;
-@@ -1267,26 +1223,6 @@ static void hci_cc_le_read_white_list_size(struct hci_dev *hdev,
- 		hdev->le_white_list_size = rp->size;
- }
+ 	hci_conn_check_pending(hdev);
  
--static void hci_cc_le_ltk_reply(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	struct hci_rp_le_ltk_reply *rp = (void *) skb->data;
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
--
--	if (rp->status)
--		return;
--}
--
--static void hci_cc_le_ltk_neg_reply(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	struct hci_rp_le_ltk_neg_reply *rp = (void *) skb->data;
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
--
--	if (rp->status)
--		return;
--}
--
- static void hci_cc_le_read_supported_states(struct hci_dev *hdev,
- 					    struct sk_buff *skb)
- {
-@@ -1817,11 +1753,6 @@ static void hci_cs_le_create_conn(struct hci_dev *hdev, __u8 status)
- 	}
- }
+@@ -2846,8 +2849,9 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (ev->opcode != HCI_OP_NOP)
+ 		del_timer(&hdev->cmd_timer);
  
--static void hci_cs_le_start_enc(struct hci_dev *hdev, u8 status)
--{
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--}
--
- static void hci_cs_create_phylink(struct hci_dev *hdev, u8 status)
- {
- 	struct hci_cp_create_phy_link *cp;
-@@ -1863,11 +1794,6 @@ static void hci_cs_accept_phylink(struct hci_dev *hdev, u8 status)
- 	amp_write_remote_assoc(hdev, cp->phy_handle);
- }
+-	queue_empty = hci_transaction_cmd_complete(hdev, ev->opcode,
+-						   ev->status);
++	queue_empty = hci_transaction_cmd_status(hdev, ev->opcode, ev->status);
++
++	BT_DBG("queue_empty %u, ev->ncmd %u", queue_empty, ev->ncmd);
  
--static void hci_cs_create_logical_link(struct hci_dev *hdev, u8 status)
--{
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--}
--
- static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -2424,17 +2350,6 @@ unlock:
- 	hci_dev_unlock(hdev);
- }
- 
--static void hci_remote_version_evt(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	BT_DBG("%s", hdev->name);
--}
--
--static void hci_qos_setup_complete_evt(struct hci_dev *hdev,
--				       struct sk_buff *skb)
--{
--	BT_DBG("%s", hdev->name);
--}
--
- static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_cmd_complete *ev = (void *) skb->data;
-@@ -2523,10 +2438,6 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_write_voice_setting(hdev, skb);
- 		break;
- 
--	case HCI_OP_HOST_BUFFER_SIZE:
--		hci_cc_host_buffer_size(hdev, skb);
--		break;
--
- 	case HCI_OP_WRITE_SSP_MODE:
- 		hci_cc_write_ssp_mode(hdev, skb);
- 		break;
-@@ -2559,10 +2470,6 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_read_data_block_size(hdev, skb);
- 		break;
- 
--	case HCI_OP_WRITE_CA_TIMEOUT:
--		hci_cc_write_ca_timeout(hdev, skb);
--		break;
--
- 	case HCI_OP_READ_FLOW_CONTROL_MODE:
- 		hci_cc_read_flow_control_mode(hdev, skb);
- 		break;
-@@ -2575,26 +2482,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_read_local_amp_assoc(hdev, skb);
- 		break;
- 
--	case HCI_OP_DELETE_STORED_LINK_KEY:
--		hci_cc_delete_stored_link_key(hdev, skb);
--		break;
--
--	case HCI_OP_SET_EVENT_MASK:
--		hci_cc_set_event_mask(hdev, skb);
--		break;
--
--	case HCI_OP_WRITE_INQUIRY_MODE:
--		hci_cc_write_inquiry_mode(hdev, skb);
--		break;
--
- 	case HCI_OP_READ_INQ_RSP_TX_POWER:
- 		hci_cc_read_inq_rsp_tx_power(hdev, skb);
- 		break;
- 
--	case HCI_OP_SET_EVENT_FLT:
--		hci_cc_set_event_flt(hdev, skb);
--		break;
--
- 	case HCI_OP_PIN_CODE_REPLY:
- 		hci_cc_pin_code_reply(hdev, skb);
- 		break;
-@@ -2655,14 +2546,6 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_le_read_white_list_size(hdev, skb);
- 		break;
- 
--	case HCI_OP_LE_LTK_REPLY:
--		hci_cc_le_ltk_reply(hdev, skb);
--		break;
--
--	case HCI_OP_LE_LTK_NEG_REPLY:
--		hci_cc_le_ltk_neg_reply(hdev, skb);
--		break;
--
- 	case HCI_OP_LE_READ_SUPPORTED_STATES:
- 		hci_cc_le_read_supported_states(hdev, skb);
- 		break;
-@@ -2755,10 +2638,6 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cs_le_create_conn(hdev, ev->status);
- 		break;
- 
--	case HCI_OP_LE_START_ENC:
--		hci_cs_le_start_enc(hdev, ev->status);
--		break;
--
- 	case HCI_OP_CREATE_PHY_LINK:
- 		hci_cs_create_phylink(hdev, ev->status);
- 		break;
-@@ -2767,10 +2646,6 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cs_accept_phylink(hdev, ev->status);
- 		break;
- 
--	case HCI_OP_CREATE_LOGICAL_LINK:
--		hci_cs_create_logical_link(hdev, ev->status);
--		break;
--
- 	default:
- 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
- 		break;
-@@ -4072,14 +3947,6 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_remote_features_evt(hdev, skb);
- 		break;
- 
--	case HCI_EV_REMOTE_VERSION:
--		hci_remote_version_evt(hdev, skb);
--		break;
--
--	case HCI_EV_QOS_SETUP_COMPLETE:
--		hci_qos_setup_complete_evt(hdev, skb);
--		break;
--
- 	case HCI_EV_CMD_COMPLETE:
- 		hci_cmd_complete_evt(hdev, skb);
- 		break;
+ 	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags)) {
+ 		atomic_set(&hdev->cmd_cnt, 1);
 -- 
 1.7.10.4
 
