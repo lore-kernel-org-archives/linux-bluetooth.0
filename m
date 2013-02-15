@@ -2,49 +2,86 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 11/13] lib: Validate DTDs when parsing VersionNumberList
-Date: Fri, 15 Feb 2013 11:07:54 -0400
-Message-Id: <1360940876-6314-12-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 03/13] lib: Reuse identical code in sdp_get_{add,}_access_protos()
+Date: Fri, 15 Feb 2013 11:07:46 -0400
+Message-Id: <1360940876-6314-4-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1360940876-6314-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1360940187-5202-1-git-send-email-anderson.lizardo@openbossa.org>
  <1360940876-6314-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+sdp_get_access_protos() and sdp_get_add_access_protos() do almost
+exactly the same thing, except for an additional statement for the
+latter.
 ---
- lib/sdp.c |   17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ lib/sdp.c |   34 ++++++++++++----------------------
+ 1 file changed, 12 insertions(+), 22 deletions(-)
 
 diff --git a/lib/sdp.c b/lib/sdp.c
-index 61598bb..6c73818 100644
+index 8cfdde1..57abfd8 100644
 --- a/lib/sdp.c
 +++ b/lib/sdp.c
-@@ -2155,9 +2155,24 @@ int sdp_get_server_ver(const sdp_record_t *rec, sdp_list_t **u16)
+@@ -1860,18 +1860,22 @@ sdp_data_t *sdp_get_proto_desc(sdp_list_t *list, int proto)
+ 	return NULL;
+ }
+ 
+-int sdp_get_access_protos(const sdp_record_t *rec, sdp_list_t **pap)
++static int sdp_get_proto_descs(uint16_t attr_id, const sdp_record_t *rec,
++							sdp_list_t **pap)
+ {
+ 	sdp_data_t *pdlist, *curr;
+ 	sdp_list_t *ap = 0;
+ 
+-	pdlist = sdp_data_get(rec, SDP_ATTR_PROTO_DESC_LIST);
++	pdlist = sdp_data_get(rec, attr_id);
+ 	if (pdlist == NULL) {
  		errno = ENODATA;
  		return -1;
  	}
--	for (curr = d->val.dataseq; curr; curr = curr->next)
+ 	SDPDBG("AP type : 0%x\n", pdlist->dtd);
+ 
++	if (attr_id == SDP_ATTR_ADD_PROTO_DESC_LIST)
++		pdlist = pdlist->val.dataseq;
 +
-+	if (!SDP_IS_SEQ(d->dtd) || d->val.dataseq == NULL)
-+		goto invalid;
-+
-+	for (curr = d->val.dataseq; curr; curr = curr->next) {
-+		if (curr->dtd != SDP_UINT16)
-+			goto invalid;
- 		*u16 = sdp_list_append(*u16, &curr->val.uint16);
-+	}
-+
+ 	for (; pdlist; pdlist = pdlist->next) {
+ 		sdp_list_t *pds = 0;
+ 		for (curr = pdlist->val.dataseq; curr; curr = curr->next)
+@@ -1882,28 +1886,14 @@ int sdp_get_access_protos(const sdp_record_t *rec, sdp_list_t **pap)
  	return 0;
-+
-+invalid:
-+	sdp_list_free(*u16, NULL);
-+	*u16 = NULL;
-+	errno = EINVAL;
-+
-+	return -1;
  }
  
- /* flexible extraction of basic attributes - Jean II */
+-int sdp_get_add_access_protos(const sdp_record_t *rec, sdp_list_t **pap)
++int sdp_get_access_protos(const sdp_record_t *rec, sdp_list_t **pap)
+ {
+-	sdp_data_t *pdlist, *curr;
+-	sdp_list_t *ap = 0;
+-
+-	pdlist = sdp_data_get(rec, SDP_ATTR_ADD_PROTO_DESC_LIST);
+-	if (pdlist == NULL) {
+-		errno = ENODATA;
+-		return -1;
+-	}
+-	SDPDBG("AP type : 0%x\n", pdlist->dtd);
+-
+-	pdlist = pdlist->val.dataseq;
++	return sdp_get_proto_descs(SDP_ATTR_PROTO_DESC_LIST, rec, pap);
++}
+ 
+-	for (; pdlist; pdlist = pdlist->next) {
+-		sdp_list_t *pds = 0;
+-		for (curr = pdlist->val.dataseq; curr; curr = curr->next)
+-			pds = sdp_list_append(pds, curr->val.dataseq);
+-		ap = sdp_list_append(ap, pds);
+-	}
+-	*pap = ap;
+-	return 0;
++int sdp_get_add_access_protos(const sdp_record_t *rec, sdp_list_t **pap)
++{
++	return sdp_get_proto_descs(SDP_ATTR_ADD_PROTO_DESC_LIST, rec, pap);
+ }
+ 
+ int sdp_get_uuidseq_attr(const sdp_record_t *rec, uint16_t attr,
 -- 
 1.7.9.5
 
