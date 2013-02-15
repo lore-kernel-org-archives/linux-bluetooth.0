@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 11/12 v2] Bluetooth: Remove unused hdev->init_last_cmd
-Date: Fri, 15 Feb 2013 10:30:33 +0200
-Message-Id: <1360917034-5503-12-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 09/12 v2] Bluetooth: Add HCI init sequence support for HCI transactions
+Date: Fri, 15 Feb 2013 10:30:31 +0200
+Message-Id: <1360917034-5503-10-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1360917034-5503-1-git-send-email-johan.hedberg@gmail.com>
 References: <1360917034-5503-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,50 +11,82 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This variable is no longer needed as the functionality is provided by
-the HCI transaction framework.
+There's a special quirk needed for unexpected HCI reset command
+completes during the init process. This patch adds this quirk to the HCI
+transaction code so that hci_init_req can be converted to use the HCI
+transaction framework.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    2 --
- net/bluetooth/hci_core.c         |    4 ----
- 2 files changed, 6 deletions(-)
+ net/bluetooth/hci_core.c |   47 +++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 44 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index fe7df9e..4c14d31 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -261,8 +261,6 @@ struct hci_dev {
- 	__u32			req_status;
- 	__u32			req_result;
- 
--	__u16			init_last_cmd;
--
- 	struct list_head	mgmt_pending;
- 
- 	struct discovery_state	discovery;
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 99f9ccf..da762bf 100644
+index 71c8f9e..1d56660 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -750,7 +750,6 @@ int hci_dev_open(__u16 dev)
- 	if (!test_bit(HCI_RAW, &hdev->flags)) {
- 		atomic_set(&hdev->cmd_cnt, 1);
- 		set_bit(HCI_INIT, &hdev->flags);
--		hdev->init_last_cmd = 0;
+@@ -3088,17 +3088,58 @@ next_in_queue:
+ 	hdev->current_transaction = transaction;
+ }
  
- 		ret = __hci_request(hdev, hci_init_req, 0, HCI_INIT_TIMEOUT);
++static void hci_resend_last(struct hci_dev *hdev)
++{
++	struct hci_transaction *transaction;
++	struct hci_command_hdr *sent;
++	struct sk_buff *skb;
++	u16 opcode;
++
++	if (!hdev->sent_cmd)
++		return;
++
++	sent = (void *) hdev->sent_cmd->data;
++	opcode = __le16_to_cpu(sent->opcode);
++	if (opcode == HCI_OP_RESET)
++		return;
++
++	skb = skb_clone(hdev->sent_cmd, GFP_ATOMIC);
++	if (!skb)
++		return;
++
++	hci_transaction_lock(hdev);
++
++	transaction = hdev->current_transaction;
++	if (transaction) {
++		skb_queue_head(&transaction->cmd_q, skb);
++		queue_work(hdev->workqueue, &hdev->cmd_work);
++	} else {
++		kfree_skb(skb);
++	}
++
++	hci_transaction_unlock(hdev);
++}
++
+ bool hci_transaction_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status)
+ {
+ 	bool queue_empty;
  
-@@ -2313,9 +2312,6 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
- 	bt_cb(skb)->pkt_type = HCI_COMMAND_PKT;
- 	skb->dev = (void *) hdev;
+ 	BT_DBG("opcode 0x%04x status 0x%02x", opcode, status);
  
--	if (test_bit(HCI_INIT, &hdev->flags))
--		hdev->init_last_cmd = opcode;
--
- 	err = 0;
+-	/* Ignore this event if it doesn't match the last HCI command
+-	 * that was sent
++	/* If the completed command doesn't match the last one that was
++	 * sent we need to do special handling of it.
+ 	 */
+-	if (!hci_sent_cmd_data(hdev, opcode))
++	if (!hci_sent_cmd_data(hdev, opcode)) {
++		/* Some CSR based controllers generate a spontaneous
++		 * reset complete event during init and any pending
++		 * command will never be completed. In such a case we
++		 * need to resend whatever was the last sent
++		 * command.
++		 */
++		if (test_bit(HCI_INIT, &hdev->flags) && opcode == HCI_OP_RESET)
++			hci_resend_last(hdev);
+ 		return false;
++	}
  
  	hci_transaction_lock(hdev);
+ 
 -- 
 1.7.10.4
 
