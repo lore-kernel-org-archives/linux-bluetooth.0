@@ -1,117 +1,148 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1361157535.5374.539.camel@deadeye.wl.decadent.org.uk>
-Subject: Re: [PATCH] Bluetooth: btmrvl_sdio: look for sd8688 firmware in
- alternate place
-From: Ben Hutchings <ben@decadent.org.uk>
-To: Lubomir Rintel <lkundrak@v3.sk>
-Cc: Marcel Holtmann <marcel@holtmann.org>, David Woodhouse
- <dwmw2@infradead.org>,  Bing Zhao <bzhao@marvell.com>,
- "libertas-dev@lists.infradead.org" <libertas-dev@lists.infradead.org>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- Gustavo Padovan <gustavo@padovan.org>,  Johan Hedberg
- <johan.hedberg@gmail.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>
-Date: Mon, 18 Feb 2013 03:18:55 +0000
-In-Reply-To: <1359285711.2156.4.camel@unicorn>
-References: <1357689361-7969-1-git-send-email-lkundrak@v3.sk>
-	 <1357689361-7969-2-git-send-email-lkundrak@v3.sk>
-	 <1357698538.1806.43.camel@aeonflux>
-	 <477F20668A386D41ADCC57781B1F70430D13FDB783@SC-VEXCH1.marvell.com>
-	 <1357713088.1105.1.camel@unicorn>  <1357713345.1806.44.camel@aeonflux>
-	 <1358494422.28503.4.camel@unicorn>
-	 <1358730733.24121.228.camel@deadeye.wl.decadent.org.uk>
-	 <1359285711.2156.4.camel@unicorn>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-y5gnrIX9KK5luOxlkE5l"
+Message-ID: <1361053940.1583.14.camel@aeonflux>
+Subject: Re: [RFC v2 3/8] Bluetooth: LE connection state machine
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Sat, 16 Feb 2013 23:32:20 +0100
+In-Reply-To: <1360970828-24004-4-git-send-email-andre.guedes@openbossa.org>
+References: <1360970828-24004-1-git-send-email-andre.guedes@openbossa.org>
+	 <1360970828-24004-4-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Andre,
 
---=-y5gnrIX9KK5luOxlkE5l
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> This patch implements a state machine for carrying out the general
+> connection establishment procedure described in Core spec.
+> 
+> The state machine should be used as follows: when the kernel
+> receives a new LE connection attempt, it should go to HCI_CONN_LE_
+> SCAN state, starting the passive LE scanning. Once the target remote
+> device is in-range, it should go to HCI_CONN_LE_FOUND, stopping the
+> ongoing LE scanning. After the LE scanning is disabled, it should go
+> to HCI_CONN_LE_INITIATE state where the LE connection is created.
+> 
+> This state machine will be used by the LE connection routine in
+> order to establish LE connections.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  include/net/bluetooth/hci_core.h | 13 +++++++++++++
+>  net/bluetooth/hci_conn.c         | 26 ++++++++++++++++++++++++++
+>  2 files changed, 39 insertions(+)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 48c28ca..c704737 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -300,6 +300,16 @@ struct hci_dev {
+>  
+>  #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
+>  
+> +/*
+> + * States from LE connection establishment state machine.
+> + * State 0 is reserved and indicates the state machine is not running.
+> + */
+> +enum {
+> +	HCI_CONN_LE_SCAN = 1,
+> +	HCI_CONN_LE_FOUND,
+> +	HCI_CONN_LE_INITIATE,
+> +};
+> +
 
-On Sun, 2013-01-27 at 12:21 +0100, Lubomir Rintel wrote:
-> On Mon, 2013-01-21 at 01:12 +0000, Ben Hutchings wrote:
-> > On Fri, 2013-01-18 at 08:33 +0100, Lubomir Rintel wrote:
-> > > On Tue, 2013-01-08 at 22:35 -0800, Marcel Holtmann wrote:
-> > > > Hi Lubomir,
-> > > >=20
-> > > > > > > > linux-firmware ships the sd8688* firmware images that are s=
-hared with
-> > > > > > > > libertas_sdio WiFi driver under libertas/. libertas_sdio lo=
-oks in both places
-> > > > > > > > and so should we.
-> > > > > > > >
-> > > > > > > > Signed-off-by: Lubomir Rintel <lkundrak@v3.sk>
-> > > > > > > > ---
-> > > > > > > >  drivers/bluetooth/btmrvl_sdio.c |   24 +++++++++++++++++++=
-+++--
-> > > > > > > >  drivers/bluetooth/btmrvl_sdio.h |    6 ++++--
-> > > > > > > >  2 files changed, 26 insertions(+), 4 deletions(-)
-> > > > > > >=20
-> > > > > > > NAK from me on this one. I do not want the driver to check tw=
-o
-> > > > > > > locations. That is what userspace can work around.
-> > > > > > >=20
-> > > > > > > If we want to unify the location between the WiFi driver and =
-the
-> > > > > > > Bluetooth driver, I am fine with that, but seriously, just pi=
-ck one over
-> > > > > > > the other. I do not care which one.
-> > > > > >=20
-> > > > > > The unified location is mrvl/ directory.
-> > > > > >=20
-> > > > > > We can probably move SD8688 firmware & helper binaries to mrvl/=
- and have both drivers grab the images there?
-> > > > >=20
-> > > > > That would break existing setups, wouldn't it?
-> > > > >=20
-> > > > > I was under impression (commit 3d32a58b) that we care about
-> > > > > compatibility here. Do we?
-> > > >=20
-> > > > that is what symlinks are for.
-> > >=20
-> > > David, Ben: please pull the following branch then:
-> > > git pull git://github.com/lkundrak/linux-firmware.git sd8688-move
-> > >=20
-> > > Thank you!
-> >=20
-> > The symlinks are broken, and you didn't update WHENCE.
->=20
-> Oops, sorry for that. Fixed now, please pull:
-> git pull git://github.com/lkundrak/linux-firmware.git sd8688-move
->=20
-> Thank you!
+and why don't we have HCI_CONN_LE_IDLE = 0 then. I do not get this magic
+number handling when you introduce an enum anyway. You spent more time
+explaining it with a comment instead of just using an extra enum entry.
 
-Pulled and will be pushed out shortly.  Sorry for the delay.
+>  struct hci_conn {
+>  	struct list_head list;
+>  
+> @@ -356,6 +366,8 @@ struct hci_conn {
+>  
+>  	struct hci_conn	*link;
+>  
+> +	atomic_t	le_state;
+> +
 
-Ben.
+Why is this atomic_t. I am lost on what you are trying to solve here.
+This requires a detailed explanation or you just get rid of it and use
+the enum.
 
---=20
-Ben Hutchings
-Sturgeon's Law: Ninety percent of everything is crap.
+>  	void (*connect_cfm_cb)	(struct hci_conn *conn, u8 status);
+>  	void (*security_cfm_cb)	(struct hci_conn *conn, u8 status);
+>  	void (*disconn_cfm_cb)	(struct hci_conn *conn, u8 reason);
+> @@ -599,6 +611,7 @@ int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
+>  int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
+>  int hci_conn_change_link_key(struct hci_conn *conn);
+>  int hci_conn_switch_role(struct hci_conn *conn, __u8 role);
+> +void hci_conn_set_le_state(struct hci_conn *conn, int state);
 
---=-y5gnrIX9KK5luOxlkE5l
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+External state setting. That does not look like a good idea in the first
+place. Why do you want to do it like this. Shouldn't be this self
+contained.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
+>  
+>  void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active);
+>  
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 25bfce0..d54c2a0 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -391,6 +391,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
+>  		    (unsigned long) conn);
+>  
+>  	atomic_set(&conn->refcnt, 0);
+> +	atomic_set(&conn->le_state, 0);
+>  
+>  	hci_dev_hold(hdev);
+>  
+> @@ -1027,3 +1028,28 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle)
+>  
+>  	return hchan;
+>  }
+> +
+> +void hci_conn_set_le_state(struct hci_conn *conn, int state)
+> +{
+> +	struct hci_dev *hdev = conn->hdev;
+> +
+> +	BT_DBG("conn %p state %d -> %d", conn, atomic_read(&conn->le_state),
+> +	       state);
+> +
+> +	if (state == atomic_read(&conn->le_state))
+> +		return;
+> +
+> +	switch (state) {
+> +	case HCI_CONN_LE_SCAN:
+> +		hci_le_scan(hdev, LE_SCAN_PASSIVE, 0x60, 0x30, 0);
+> +		break;
+> +	case HCI_CONN_LE_FOUND:
+> +		hci_cancel_le_scan(hdev);
+> +		break;
+> +	case HCI_CONN_LE_INITIATE:
+> +		hci_le_create_connection(conn);
+> +		break;
+> +	}
+> +
+> +	atomic_set(&conn->le_state, state);
+> +}
 
-iQIVAwUAUSGdn+e/yOyVhhEJAQpptQ/+PAVYWA1CFnDxDlh2idm83nGKW6IhD7GT
-xFxpUve17r3IMPblKkbRXKG7jOYyidnwWmJzVgFGiHnPwWvi5OJXEXOAilO/1Mn0
-4jNMIHVtlAD7KNsdYxfnuDq2ufoiMfWbVeKJj/7bycsBgjNwo7hz7aT8xOXXKz+c
-2aeXzloJ5D3OUGlg652sgiOK2Rw3ZkIXJK/5aLAnzgW/neJQQPjftp/VtVrT8hH/
-uHmDG35s6WyfzPtSm2uCqb9p9TYeFHS+7r/ZzuPGgsYei/wi/sh4+URYycOU8Jnx
-c2TcwFqIllwXFrm5jwYenvmol5P75/7w790+BLT+yoeXEht+TnxuAyVSnBctCYqe
-Q3fwbgYAoCgcl0Uso3u4FxYlQhe4UTFt/nG4A8WS29sW+DNSNj8pg2IgWCzTk4rq
-zXnY840ZUgbAMsqOB3qG77JrGHVGldc7w0qQ/LJ8q8rRcs7ahqAVK/e84wtzIJ+3
-DYJgSB/rF7a+stLP3qBPNlohJ1YDuv03LrO6LDbhtyzFlHt8WAD/hZfvZaq8j5k7
-L13fpox77kiZIczjFnnlo8p4+0CH8/dcxK4/GaBSrh8AwvaFFVNzf0b5XhLMOeD4
-NBc/baxeqbJYuphDqx0rHTTxUf4zqA7e438AW6So2ZSroWAxADcVRqIBcrYjUgh4
-yl6GB3sN1Ag=
-=ps9L
------END PGP SIGNATURE-----
+The more I read this, the more I think this is the wrong approach to
+this. The kernel should have a list of device it wants to connect to. If
+that list is non-empty, start scanning, if one device is found, try to
+connect it, once done, keep scanning if other devices are not connected.
 
---=-y5gnrIX9KK5luOxlkE5l--
+You need to build a foundation for LE devices that the kernel wants to
+connect to. And not hack in some state machinery.
+
+And of course, can we please do proper error handling here. This whole
+thing is broken. If any of the HCI commands fail, your state machine is
+screwed up.
+
+Regards
+
+Marcel
+
+
