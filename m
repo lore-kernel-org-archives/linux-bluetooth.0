@@ -1,62 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1361197557.4983.0.camel@dellpc>
-Subject: Resend [PATCH] hidp: Make hidp_get_raw_report abort if the session
- is terminating
-From: Karl and Karen Relton <ka_ka@reltons.freeserve.co.uk>
-To: linux-bluetooth@vger.kernel.org
-Date: Mon, 18 Feb 2013 14:25:57 +0000
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <20130218161331.GA5539@x220.P-661HNU-F1>
+References: <1361203483-32117-1-git-send-email-s.syam@samsung.com> <20130218161331.GA5539@x220.P-661HNU-F1>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 18 Feb 2013 13:44:07 -0300
+Message-ID: <CAMOw1v4sYhps4ABc5Z059j9hxPQjQHSAfb3PJfVr53q+OPQH=A@mail.gmail.com>
+Subject: Re: [PATCH 1/2] tools: Fix compilation error with GINT_TO_POINTER
+To: Syam Sidhardhan <s.syam@samsung.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Karl Relton <karllinuxtest.relton@ntlworld.com>
+On Mon, Feb 18, 2013 at 1:13 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Syam,
+>
+> On Mon, Feb 18, 2013, Syam Sidhardhan wrote:
+>> Fixes the following error:
+>> tools/btmgmt.c: In function ‘index_rsp’:
+>> tools/btmgmt.c:756:10: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
+>> tools/btmgmt.c: In function ‘cmd_info’:
+>> tools/btmgmt.c:791:9: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
+>> cc1: all warnings being treated as errors
+>> make[1]: *** [tools/btmgmt.o] Error 1
+>> make: *** [all] Error 2
+>> ---
+>>  tools/btmgmt.c |    4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> This patch has been applied. For whatever reason I did not get this
+> warning/error in my environment. Which gcc version and architecture are
+> you using?
 
-After linux 3.2 the hid_destroy_device call in hidp_session cleaning up
-invokes a hook to the power_supply code which in turn tries to read the
-battery capacity. This read will trigger a call to hidp_get_raw_report
-which is bound to fail because the device is being taken away - so rather
-than wait for the 5 second timeout failure this change enables it to fail
-straight away.
+The problem is more likely to be in the different glib versions and
+running on 32 bits:
+https://bugzilla.gnome.org/show_bug.cgi?id=661546
 
-Signed-off-by: Karl Relton <karllinuxtest.relton@ntlworld.com>
----
- net/bluetooth/hidp/core.c |    7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index b2bcbe2..a4c1bb0 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -311,6 +311,9 @@ static int hidp_get_raw_report(struct hid_device *hid,
- 	int numbered_reports = hid->report_enum[report_type].numbered;
- 	int ret;
- 
-+	if (atomic_read(&session->terminate))
-+		return -EIO;
-+
- 	switch (report_type) {
- 	case HID_FEATURE_REPORT:
- 		report_type = HIDP_TRANS_GET_REPORT | HIDP_DATA_RTYPE_FEATURE;
-@@ -695,8 +698,10 @@ static int hidp_session(void *arg)
- 	set_current_state(TASK_INTERRUPTIBLE);
- 	while (!atomic_read(&session->terminate)) {
- 		if (ctrl_sk->sk_state != BT_CONNECTED ||
--				intr_sk->sk_state != BT_CONNECTED)
-+				intr_sk->sk_state != BT_CONNECTED) {
-+			atomic_inc(&session->terminate);
- 			break;
-+		}
- 
- 		while ((skb = skb_dequeue(&intr_sk->sk_receive_queue))) {
- 			skb_orphan(skb);
--- 
-1.7.9.5
-
-
-
--- 
-----------------------------------------------------------------
-Karen & Karl Relton                ka_ka@reltons.freeserve.co.uk
-
-
+Lucas De Marchi
