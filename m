@@ -1,15 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1361229534.1583.50.camel@aeonflux>
-Subject: Re: [PATCH v3 4/5] Bluetooth: Parameters for outgoing SCO
- connections
+Message-ID: <1361229298.1583.48.camel@aeonflux>
+Subject: Re: [PATCH v3 2/5] Bluetooth: Add option for SCO socket mode
 From: Marcel Holtmann <marcel@holtmann.org>
 To: =?ISO-8859-1?Q?Fr=E9d=E9ric?= Dalleau
 	<frederic.dalleau@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 19 Feb 2013 00:18:54 +0100
-In-Reply-To: <1359986188-24432-4-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Tue, 19 Feb 2013 00:14:58 +0100
+In-Reply-To: <1359986188-24432-2-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1359986188-24432-1-git-send-email-frederic.dalleau@linux.intel.com>
-	 <1359986188-24432-4-git-send-email-frederic.dalleau@linux.intel.com>
+	 <1359986188-24432-2-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -17,133 +16,68 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Fred,
 
-> In order to establish a transparent SCO connection, the correct settings must
-> be specified in the SetupSynchronousConnection request. For that, a bit is set
-> in ACL connection flags to set up the desired parameters. If this bit is not
-> set, a legacy SCO connection will be requested.
-> This patch uses T2 settings.
+> This patch extends the current SCO socket option to add a 'mode' field. This
+> field is intended to choose data type at runtime. Current modes are CVSD and
+> transparent SCO, but adding new modes could allow support for CSA2 and fine
+> tuning a sco connection, for example latency, bandwith, voice setting. Incoming
+> connections will be setup during defered setup. Outgoing connections have to
+> be setup before connect(). The selected type is stored in the sco socket info.
+> This patch declares needed members, modifies getsockopt() and implements
+> setsockopt(). Setting the mtu is not supported.
 > 
 > Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
 > ---
->  include/net/bluetooth/hci_core.h |    3 +++
->  net/bluetooth/hci_conn.c         |   29 +++++++++++++++++++----------
->  net/bluetooth/sco.c              |    3 +--
->  3 files changed, 23 insertions(+), 12 deletions(-)
+>  include/net/bluetooth/sco.h |    7 +++++
+>  net/bluetooth/sco.c         |   59 +++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 66 insertions(+)
 > 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index f3be454..4a216e5 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -443,6 +443,7 @@ enum {
->  	HCI_CONN_SSP_ENABLED,
->  	HCI_CONN_POWER_SAVE,
->  	HCI_CONN_REMOTE_OOB,
-> +	HCI_CONN_SCO_TRANSPARENT,
-
-why are we tracking it like this and not actually the voice setting
-itself?
-
+> diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
+> index 1e35c43..4de67ef 100644
+> --- a/include/net/bluetooth/sco.h
+> +++ b/include/net/bluetooth/sco.h
+> @@ -41,8 +41,14 @@ struct sockaddr_sco {
+>  
+>  /* SCO socket options */
+>  #define SCO_OPTIONS	0x01
+> +
+> +#define SCO_MODE_CVSD		0x00
+> +#define SCO_MODE_TRANSPARENT	0x01
+> +#define SCO_MODE_MAX		0x01
+> +
+>  struct sco_options {
+>  	__u16 mtu;
+> +	__u8 mode;
 >  };
 >  
->  static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
-> @@ -590,6 +591,8 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle);
->  
->  struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
->  			     __u8 dst_type, __u8 sec_level, __u8 auth_type);
-> +struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
-> +				 u8 mode);
->  int hci_conn_check_link_mode(struct hci_conn *conn);
->  int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
->  int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 25bfce0..504367e 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -175,13 +175,22 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle)
->  	conn->attempt++;
->  
->  	cp.handle   = cpu_to_le16(handle);
-> -	cp.pkt_type = cpu_to_le16(conn->pkt_type);
->  
->  	cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
->  	cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
-> -	cp.max_latency    = __constant_cpu_to_le16(0xffff);
-> -	cp.voice_setting  = cpu_to_le16(hdev->voice_setting);
-> -	cp.retrans_effort = 0xff;
-> +
-> +	if (test_and_clear_bit(HCI_CONN_SCO_TRANSPARENT, &conn->flags)) {
-> +		cp.pkt_type       = __constant_cpu_to_le16(EDR_ESCO_MASK &
-> +							   ~ESCO_2EV3);
-> +		cp.max_latency    = __constant_cpu_to_le16(0x000d);
-> +		cp.voice_setting  = __constant_cpu_to_le16(0x0003);
-> +		cp.retrans_effort = 0x02;
-> +	} else {
-> +		cp.pkt_type       = cpu_to_le16(conn->pkt_type);
-> +		cp.max_latency    = __constant_cpu_to_le16(0xffff);
-> +		cp.voice_setting  = cpu_to_le16(hdev->voice_setting);
-> +		cp.retrans_effort = 0xff;
-> +	}
->  
->  	hci_send_cmd(hdev, HCI_OP_SETUP_SYNC_CONN, sizeof(cp), &cp);
->  }
-> @@ -551,13 +560,13 @@ static struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
->  	return acl;
->  }
->  
-> -static struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type,
-> -				bdaddr_t *dst, u8 sec_level, u8 auth_type)
-> +struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
-> +				 u8 mode)
->  {
->  	struct hci_conn *acl;
->  	struct hci_conn *sco;
->  
-> -	acl = hci_connect_acl(hdev, dst, sec_level, auth_type);
-> +	acl = hci_connect_acl(hdev, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING);
+>  #define SCO_CONNINFO	0x02
+> @@ -73,6 +79,7 @@ struct sco_conn {
+>  struct sco_pinfo {
+>  	struct bt_sock	bt;
+>  	__u32		flags;
+> +	__u8		mode;
+>  	struct sco_conn	*conn;
+>  };
 
-I do not understand this change. Why are you doing this one?
+so I have been reading the 4.0 core spec and CSA2 again. So with CSA2
+and the enhanced eSCO setup they are splitting the PCM data format from
+the the content format and make them independent in output and input.
+While 4.0 core spec is essentially based around the 2-byte voice
+setting.
 
->  	if (IS_ERR(acl))
->  		return acl;
->  
-> @@ -575,6 +584,9 @@ static struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type,
->  
->  	hci_conn_hold(sco);
->  
-> +	if (mode)
-> +		set_bit(HCI_CONN_SCO_TRANSPARENT, &sco->flags);
-> +
->  	if (acl->state == BT_CONNECTED &&
->  	    (sco->state == BT_OPEN || sco->state == BT_CLOSED)) {
->  		set_bit(HCI_CONN_POWER_SAVE, &acl->flags);
-> @@ -603,9 +615,6 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
->  		return hci_connect_le(hdev, dst, dst_type, sec_level, auth_type);
->  	case ACL_LINK:
->  		return hci_connect_acl(hdev, dst, sec_level, auth_type);
-> -	case SCO_LINK:
-> -	case ESCO_LINK:
-> -		return hci_connect_sco(hdev, type, dst, sec_level, auth_type);
->  	}
->  
->  	return ERR_PTR(-EINVAL);
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index 7fbb4c4..1d79a2e 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -176,8 +176,7 @@ static int sco_connect(struct sock *sk)
->  	else
->  		type = SCO_LINK;
->  
-> -	hcon = hci_connect(hdev, type, dst, BDADDR_BREDR, BT_SECURITY_LOW,
-> -			   HCI_AT_NO_BONDING);
-> +	hcon = hci_connect_sco(hdev, type, dst, sco_pi(sk)->mode);
->  	if (IS_ERR(hcon)) {
->  		err = PTR_ERR(hcon);
->  		goto done;
+I think we have two choices here, one is to just ignore CSA2 for now and
+add a uint16 for voice setting value here, or go ahead with the full
+blown crazy that is CSA2.
 
-If we really split hci_connect into two entities, then we should have a
-preparation patch and then end up with hci_connect_acl and
-hci_connect_sco.
+Splitting out voice setting into 5 byte content format and 1 byte PCM
+data format seems straight forward, but then you have input and output
+and also the routing path. And instead of a socket option, that looks
+more like things for the socket address.
+
+So I would actually propose to add a voice settings uint16 value as SCO
+socket field. Using the full voice settings make sense since then we can
+also retrieve the fact if we are doing 8-bit or 16-bit PCM. One detail
+we kinda ignored since we always defaulted to 16-bit, but would be worth
+while fixing while at it.
 
 Regards
 
