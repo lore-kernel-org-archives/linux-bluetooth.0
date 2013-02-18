@@ -1,37 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 18 Feb 2013 10:12:21 +0200
+Date: Mon, 18 Feb 2013 10:05:02 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Randy Yates <yates@digitalsignallabs.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: mgmt-api.txt
-Message-ID: <20130218081221.GA8590@x220>
-References: <87d2vygjyy.fsf@randy.site>
+Subject: Re: [PATCH v3 BlueZ 00/13] Fix SDP DE Type Descriptor validation
+ issues
+Message-ID: <20130218080502.GA18330@x220>
+References: <1360940187-5202-1-git-send-email-anderson.lizardo@openbossa.org>
+ <1360940876-6314-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <87d2vygjyy.fsf@randy.site>
+In-Reply-To: <1360940876-6314-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Randy,
+Hi Lizardo,
 
-On Mon, Feb 18, 2013, Randy Yates wrote:
-> Almost all text files in doc/ are consistently-documented dbus APIs,
-> specifying service, interface, and object path.
+On Fri, Feb 15, 2013, Anderson Lizardo wrote:
+> Change since v2:
+> * Fix commit author mangled during import from GMANE
 > 
-> However, doc/mgmt-api.txt is in a completely different format. It states
-> something about "Packet Structures" but I have no idea which packets the
-> document is referring to.
+> Changes since v1:
+> * Fix license header to match BlueZ license (GPL v2 or later)
+> * Rename test source file and SDP tests to account for future addition of other
+>   libbluetooth tests
 > 
-> Can someone explain how to use this API? We have a requirement to set
-> some of these properties, such as discoverability and link level
-> security.
+> This series adds various missing DTD validations, specially for SEQ* types. The
+> lack of these validations allows for a remote device to crash BlueZ due to
+> invalid memory access.
+> 
+> I also added unit tests for all affected functions. They are in a separate C
+> file (unit/test-lib.c), which will in future contain tests for other
+> libbluetooth API functions.
+> 
+> The only pending related fixes from my part are some missing NULL pointer
+> checks when accessing empty sequences. These will take some time to fix as they
+> affect profile code as well.
+> 
+> Best Regards,
+> 
+> Anderson Lizardo (13):
+>   unit: Add initial SDP library unit tests
+>   lib: Add SDP_IS_ALT() macro
+>   lib: Reuse identical code in sdp_get_{add,}_access_protos()
+>   lib: Cleanup coding style in sdp_get_proto_descs()
+>   lib: Fix missing DTD validation while accessing SDP data elements
+>   unit: Add tests for sdp_get_lang_attr()
+>   lib: Add missing DTD validation in sdp_record_print()
+>   lib: Validate DTDs when parsing LanguageBaseAttributeIDList
+>   lib: Validate DTDs when parsing BluetoothProfileDescriptorList
+>   lib: Add comment to BluetoothProfileDescriptorList parsing workaround
+>   lib: Validate DTDs when parsing VersionNumberList
+>   unit: Add tests for sdp_get_profile_descs()
+>   unit: Add tests for sdp_get_server_ver()
+> 
+>  .gitignore      |    1 +
+>  Makefile.am     |    5 +
+>  lib/sdp.c       |  164 +++++++++++++------
+>  lib/sdp.h       |    1 +
+>  unit/test-lib.c |  471 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 596 insertions(+), 46 deletions(-)
+>  create mode 100644 unit/test-lib.c
 
-This is just a special socket type that kernel versions from 3.4 onwards
-provide. See e.g. the mgmt_new_default() function in src/shared/mgmt.c
-for an example of creating a mgmt socket that you can use to communicate
-using the protocol described in mgmt-api.txt. There are also several
-tools in the source tree that use mgmt sockets, e.g. tools/btmgmt
-client/bluetoothctl and monitor/btmon. Looking at the source code for
-those tools may also be helpful.
+All patches in this set have been applied. Thanks.
 
 Johan
