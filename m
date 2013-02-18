@@ -1,14 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1361229721.1583.53.camel@aeonflux>
-Subject: Re: [PATCH v3 5/5] Bluetooth: Fallback transparent SCO from T2 to T1
+Message-ID: <1361229534.1583.50.camel@aeonflux>
+Subject: Re: [PATCH v3 4/5] Bluetooth: Parameters for outgoing SCO
+ connections
 From: Marcel Holtmann <marcel@holtmann.org>
 To: =?ISO-8859-1?Q?Fr=E9d=E9ric?= Dalleau
 	<frederic.dalleau@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 19 Feb 2013 00:22:01 +0100
-In-Reply-To: <1359986188-24432-5-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Tue, 19 Feb 2013 00:18:54 +0100
+In-Reply-To: <1359986188-24432-4-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1359986188-24432-1-git-send-email-frederic.dalleau@linux.intel.com>
-	 <1359986188-24432-5-git-send-email-frederic.dalleau@linux.intel.com>
+	 <1359986188-24432-4-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,71 +17,133 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Fred,
 
-> When initiating a transparent eSCO connection, make use of T2 settings at
-> first try. T2 is the recommended settings from HFP 1.6 WideBand Speech. Upon
-> connection failure, try T1 settings.
-> To know which of T2 or T1 should be used, the connection attempt index is used.
-> T2 failure is detected if Synchronous Connection Complete Event fails with
-> error 0x0d. This error code has been found experimentally by sending a T2
-> request to a T1 only SCO listener. It means "Connection Rejected due to
-> Limited resource".
+> In order to establish a transparent SCO connection, the correct settings must
+> be specified in the SetupSynchronousConnection request. For that, a bit is set
+> in ACL connection flags to set up the desired parameters. If this bit is not
+> set, a legacy SCO connection will be requested.
+> This patch uses T2 settings.
 > 
 > Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
 > ---
->  net/bluetooth/hci_conn.c  |   11 ++++++++++-
->  net/bluetooth/hci_event.c |    1 +
->  2 files changed, 11 insertions(+), 1 deletion(-)
+>  include/net/bluetooth/hci_core.h |    3 +++
+>  net/bluetooth/hci_conn.c         |   29 +++++++++++++++++++----------
+>  net/bluetooth/sco.c              |    3 +--
+>  3 files changed, 23 insertions(+), 12 deletions(-)
 > 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index f3be454..4a216e5 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -443,6 +443,7 @@ enum {
+>  	HCI_CONN_SSP_ENABLED,
+>  	HCI_CONN_POWER_SAVE,
+>  	HCI_CONN_REMOTE_OOB,
+> +	HCI_CONN_SCO_TRANSPARENT,
+
+why are we tracking it like this and not actually the voice setting
+itself?
+
+>  };
+>  
+>  static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
+> @@ -590,6 +591,8 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle);
+>  
+>  struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+>  			     __u8 dst_type, __u8 sec_level, __u8 auth_type);
+> +struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
+> +				 u8 mode);
+>  int hci_conn_check_link_mode(struct hci_conn *conn);
+>  int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
+>  int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
 > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 504367e..a3f4e29 100644
+> index 25bfce0..504367e 100644
 > --- a/net/bluetooth/hci_conn.c
 > +++ b/net/bluetooth/hci_conn.c
-> @@ -179,12 +179,21 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle)
+> @@ -175,13 +175,22 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle)
+>  	conn->attempt++;
+>  
+>  	cp.handle   = cpu_to_le16(handle);
+> -	cp.pkt_type = cpu_to_le16(conn->pkt_type);
+>  
 >  	cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
 >  	cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
->  
-> -	if (test_and_clear_bit(HCI_CONN_SCO_TRANSPARENT, &conn->flags)) {
-> +	if (conn->attempt == 1 &&
-> +	    test_bit(HCI_CONN_SCO_TRANSPARENT, &conn->flags)) {
->  		cp.pkt_type       = __constant_cpu_to_le16(EDR_ESCO_MASK &
->  							   ~ESCO_2EV3);
->  		cp.max_latency    = __constant_cpu_to_le16(0x000d);
->  		cp.voice_setting  = __constant_cpu_to_le16(0x0003);
->  		cp.retrans_effort = 0x02;
-> +	} else if (conn->attempt == 2 &&
-> +		   test_bit(HCI_CONN_SCO_TRANSPARENT, &conn->flags)) {
-
-I do not really like abusing a simple counter as a state machine. We
-should do something more explicit with tracking if T2 vs T1 sco_flags or
-something.
-
-> +		cp.pkt_type       = __constant_cpu_to_le16(EDR_ESCO_MASK |
-> +							   ESCO_EV3);
-> +		cp.max_latency    = __constant_cpu_to_le16(0x0007);
+> -	cp.max_latency    = __constant_cpu_to_le16(0xffff);
+> -	cp.voice_setting  = cpu_to_le16(hdev->voice_setting);
+> -	cp.retrans_effort = 0xff;
+> +
+> +	if (test_and_clear_bit(HCI_CONN_SCO_TRANSPARENT, &conn->flags)) {
+> +		cp.pkt_type       = __constant_cpu_to_le16(EDR_ESCO_MASK &
+> +							   ~ESCO_2EV3);
+> +		cp.max_latency    = __constant_cpu_to_le16(0x000d);
 > +		cp.voice_setting  = __constant_cpu_to_le16(0x0003);
 > +		cp.retrans_effort = 0x02;
-> +		clear_bit(HCI_CONN_SCO_TRANSPARENT, &conn->flags);
-
-If we clear this here, does it mean we end up creating a CVSD link. That
-can not be correct. I think we need to fail the connection procedure in
-that case. We can not magically turn a transparent link into a CVSD
-link. That would confuse the hell out of HFP.
-
->  	} else {
->  		cp.pkt_type       = cpu_to_le16(conn->pkt_type);
->  		cp.max_latency    = __constant_cpu_to_le16(0xffff);
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 3fd0212..6c1aec9 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -3330,6 +3330,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
->  		hci_conn_add_sysfs(conn);
->  		break;
+> +	} else {
+> +		cp.pkt_type       = cpu_to_le16(conn->pkt_type);
+> +		cp.max_latency    = __constant_cpu_to_le16(0xffff);
+> +		cp.voice_setting  = cpu_to_le16(hdev->voice_setting);
+> +		cp.retrans_effort = 0xff;
+> +	}
 >  
-> +	case 0x0d:	/* No resource available */
->  	case 0x11:	/* Unsupported Feature or Parameter Value */
->  	case 0x1c:	/* SCO interval rejected */
->  	case 0x1a:	/* Unsupported Remote Feature */
+>  	hci_send_cmd(hdev, HCI_OP_SETUP_SYNC_CONN, sizeof(cp), &cp);
+>  }
+> @@ -551,13 +560,13 @@ static struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
+>  	return acl;
+>  }
+>  
+> -static struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type,
+> -				bdaddr_t *dst, u8 sec_level, u8 auth_type)
+> +struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
+> +				 u8 mode)
+>  {
+>  	struct hci_conn *acl;
+>  	struct hci_conn *sco;
+>  
+> -	acl = hci_connect_acl(hdev, dst, sec_level, auth_type);
+> +	acl = hci_connect_acl(hdev, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING);
+
+I do not understand this change. Why are you doing this one?
+
+>  	if (IS_ERR(acl))
+>  		return acl;
+>  
+> @@ -575,6 +584,9 @@ static struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type,
+>  
+>  	hci_conn_hold(sco);
+>  
+> +	if (mode)
+> +		set_bit(HCI_CONN_SCO_TRANSPARENT, &sco->flags);
+> +
+>  	if (acl->state == BT_CONNECTED &&
+>  	    (sco->state == BT_OPEN || sco->state == BT_CLOSED)) {
+>  		set_bit(HCI_CONN_POWER_SAVE, &acl->flags);
+> @@ -603,9 +615,6 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+>  		return hci_connect_le(hdev, dst, dst_type, sec_level, auth_type);
+>  	case ACL_LINK:
+>  		return hci_connect_acl(hdev, dst, sec_level, auth_type);
+> -	case SCO_LINK:
+> -	case ESCO_LINK:
+> -		return hci_connect_sco(hdev, type, dst, sec_level, auth_type);
+>  	}
+>  
+>  	return ERR_PTR(-EINVAL);
+> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> index 7fbb4c4..1d79a2e 100644
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -176,8 +176,7 @@ static int sco_connect(struct sock *sk)
+>  	else
+>  		type = SCO_LINK;
+>  
+> -	hcon = hci_connect(hdev, type, dst, BDADDR_BREDR, BT_SECURITY_LOW,
+> -			   HCI_AT_NO_BONDING);
+> +	hcon = hci_connect_sco(hdev, type, dst, sco_pi(sk)->mode);
+>  	if (IS_ERR(hcon)) {
+>  		err = PTR_ERR(hcon);
+>  		goto done;
+
+If we really split hci_connect into two entities, then we should have a
+preparation patch and then end up with hci_connect_acl and
+hci_connect_sco.
 
 Regards
 
