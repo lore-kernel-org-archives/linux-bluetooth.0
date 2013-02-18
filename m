@@ -1,10 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1361197622.4983.2.camel@dellpc>
-Subject: Resend [PATCH] hidp: Make hidp_get_raw_report abort if the session
- is terminating
+Message-ID: <1361197591.4983.1.camel@dellpc>
+Subject: Resend RFC [PATCH] hci: Fix race between hidp_session and hci code
 From: Karl Relton <karllinuxtest.relton@ntlworld.com>
 To: linux-bluetooth@vger.kernel.org
-Date: Mon, 18 Feb 2013 14:27:02 +0000
+Date: Mon, 18 Feb 2013 14:26:31 +0000
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,45 +11,86 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Karl Relton <karllinuxtest.relton@ntlworld.com>
 
-After linux 3.2 the hid_destroy_device call in hidp_session cleaning up
-invokes a hook to the power_supply code which in turn tries to read the
-battery capacity. This read will trigger a call to hidp_get_raw_report
-which is bound to fail because the device is being taken away - so rather
-than wait for the 5 second timeout failure this change enables it to fail
-straight away.
+Fix race between hidp_session and hci code that can lead to
+ hci device being removed from sysfs before its children
+ devices. The removal is now delayed until the last
+ reference to it in the hci code is removed.
 
 Signed-off-by: Karl Relton <karllinuxtest.relton@ntlworld.com>
 ---
- net/bluetooth/hidp/core.c |    7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci_core.h |   10 +++-------
+ net/bluetooth/hci_core.c         |   15 +++++++++++++--
+ 2 files changed, 16 insertions(+), 9 deletions(-)
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index b2bcbe2..a4c1bb0 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -311,6 +311,9 @@ static int hidp_get_raw_report(struct hid_device *hid,
- 	int numbered_reports = hid->report_enum[report_type].numbered;
- 	int ret;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 90cf75a..47c9d30 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -198,6 +198,7 @@ struct hci_dev {
  
-+	if (atomic_read(&session->terminate))
-+		return -EIO;
+ 	unsigned long	quirks;
+ 
++	atomic_t	ref_cnt;
+ 	atomic_t	cmd_cnt;
+ 	unsigned int	acl_cnt;
+ 	unsigned int	sco_cnt;
+@@ -646,19 +647,14 @@ static inline void hci_conn_put(struct hci_conn *conn)
+ }
+ 
+ /* ----- HCI Devices ----- */
+-static inline void hci_dev_put(struct hci_dev *d)
+-{
+-	BT_DBG("%s orig refcnt %d", d->name,
+-	       atomic_read(&d->dev.kobj.kref.refcount));
+-
+-	put_device(&d->dev);
+-}
++void hci_dev_put(struct hci_dev *d);
+ 
+ static inline struct hci_dev *hci_dev_hold(struct hci_dev *d)
+ {
+ 	BT_DBG("%s orig refcnt %d", d->name,
+ 	       atomic_read(&d->dev.kobj.kref.refcount));
+ 
++	atomic_inc(&d->ref_cnt);
+ 	get_device(&d->dev);
+ 	return d;
+ }
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 618ca1a..c187a84 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -891,6 +891,19 @@ int hci_dev_close(__u16 dev)
+ 	return err;
+ }
+ 
++void hci_dev_put(struct hci_dev *d)
++{
++	BT_DBG("%s orig refcnt %d", d->name,
++	       atomic_read(&d->dev.kobj.kref.refcount));
 +
- 	switch (report_type) {
- 	case HID_FEATURE_REPORT:
- 		report_type = HIDP_TRANS_GET_REPORT | HIDP_DATA_RTYPE_FEATURE;
-@@ -695,8 +698,10 @@ static int hidp_session(void *arg)
- 	set_current_state(TASK_INTERRUPTIBLE);
- 	while (!atomic_read(&session->terminate)) {
- 		if (ctrl_sk->sk_state != BT_CONNECTED ||
--				intr_sk->sk_state != BT_CONNECTED)
-+				intr_sk->sk_state != BT_CONNECTED) {
-+			atomic_inc(&session->terminate);
- 			break;
-+		}
++	if(atomic_dec_and_test(&d->ref_cnt)) {
++		hci_del_sysfs(d);
++	}
++	put_device(&d->dev);
++}
++EXPORT_SYMBOL(hci_dev_put);
++
++
+ int hci_dev_reset(__u16 dev)
+ {
+ 	struct hci_dev *hdev;
+@@ -1884,8 +1897,6 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 		rfkill_destroy(hdev->rfkill);
+ 	}
  
- 		while ((skb = skb_dequeue(&intr_sk->sk_receive_queue))) {
- 			skb_orphan(skb);
+-	hci_del_sysfs(hdev);
+-
+ 	destroy_workqueue(hdev->workqueue);
+ 	destroy_workqueue(hdev->req_workqueue);
+ 
 -- 
 1.7.9.5
+
 
 
