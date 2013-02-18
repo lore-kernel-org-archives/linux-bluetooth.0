@@ -1,61 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Randy Yates <yates@digitalsignallabs.com>
+Message-ID: <1361197622.4983.2.camel@dellpc>
+Subject: Resend [PATCH] hidp: Make hidp_get_raw_report abort if the session
+ is terminating
+From: Karl Relton <karllinuxtest.relton@ntlworld.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: mgmt-api.txt
-References: <87d2vygjyy.fsf@randy.site> <20130218081221.GA8590@x220>
-	<20130218085806.GB11034@x220>
-Date: Mon, 18 Feb 2013 11:00:43 -0500
-In-Reply-To: <20130218085806.GB11034@x220> (Johan Hedberg's message of "Mon,
-	18 Feb 2013 10:58:06 +0200")
-Message-ID: <87zjz1ehn8.fsf@randy.site>
-MIME-Version: 1.0
-Content-Type: text/plain
+Date: Mon, 18 Feb 2013 14:27:02 +0000
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks much, Johan. That clarifies things nicely.
+From: Karl Relton <karllinuxtest.relton@ntlworld.com>
 
---Randy
+After linux 3.2 the hid_destroy_device call in hidp_session cleaning up
+invokes a hook to the power_supply code which in turn tries to read the
+battery capacity. This read will trigger a call to hidp_get_raw_report
+which is bound to fail because the device is being taken away - so rather
+than wait for the 5 second timeout failure this change enables it to fail
+straight away.
 
-Johan Hedberg <johan.hedberg@gmail.com> writes:
+Signed-off-by: Karl Relton <karllinuxtest.relton@ntlworld.com>
+---
+ net/bluetooth/hidp/core.c |    7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-> Hi,
->
-> On Mon, Feb 18, 2013, Johan Hedberg wrote:
->> On Mon, Feb 18, 2013, Randy Yates wrote:
->> > Almost all text files in doc/ are consistently-documented dbus APIs,
->> > specifying service, interface, and object path.
->> > 
->> > However, doc/mgmt-api.txt is in a completely different format. It states
->> > something about "Packet Structures" but I have no idea which packets the
->> > document is referring to.
->> > 
->> > Can someone explain how to use this API? We have a requirement to set
->> > some of these properties, such as discoverability and link level
->> > security.
->> 
->> This is just a special socket type that kernel versions from 3.4 onwards
->> provide. See e.g. the mgmt_new_default() function in src/shared/mgmt.c
->> for an example of creating a mgmt socket that you can use to communicate
->> using the protocol described in mgmt-api.txt. There are also several
->> tools in the source tree that use mgmt sockets, e.g. tools/btmgmt
->> client/bluetoothctl and monitor/btmon. Looking at the source code for
->> those tools may also be helpful.
->
-> Minor mistake there: bluetoothctl doesn't use mgmt sockets (it uses just
-> the D-Bus interface). I also went ahead and pushed a description of how
-> to create mgmt sockets to mgmt-api.txt since this was a quite obvious
-> omission in the file. Another file you'll probably find useful is
-> lib/mgmt.h which has structs and numerical definitions for the mgmt
-> protocol.
->
-> Johan
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index b2bcbe2..a4c1bb0 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -311,6 +311,9 @@ static int hidp_get_raw_report(struct hid_device *hid,
+ 	int numbered_reports = hid->report_enum[report_type].numbered;
+ 	int ret;
+ 
++	if (atomic_read(&session->terminate))
++		return -EIO;
++
+ 	switch (report_type) {
+ 	case HID_FEATURE_REPORT:
+ 		report_type = HIDP_TRANS_GET_REPORT | HIDP_DATA_RTYPE_FEATURE;
+@@ -695,8 +698,10 @@ static int hidp_session(void *arg)
+ 	set_current_state(TASK_INTERRUPTIBLE);
+ 	while (!atomic_read(&session->terminate)) {
+ 		if (ctrl_sk->sk_state != BT_CONNECTED ||
+-				intr_sk->sk_state != BT_CONNECTED)
++				intr_sk->sk_state != BT_CONNECTED) {
++			atomic_inc(&session->terminate);
+ 			break;
++		}
+ 
+ 		while ((skb = skb_dequeue(&intr_sk->sk_receive_queue))) {
+ 			skb_orphan(skb);
 -- 
-Randy Yates
-Digital Signal Labs
-http://www.digitalsignallabs.com
+1.7.9.5
+
+
