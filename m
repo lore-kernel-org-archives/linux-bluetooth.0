@@ -1,70 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1361053591.1583.9.camel@aeonflux>
-References: <1360970828-24004-1-git-send-email-andre.guedes@openbossa.org>
-	<1360970828-24004-2-git-send-email-andre.guedes@openbossa.org>
-	<1361053591.1583.9.camel@aeonflux>
-Date: Mon, 18 Feb 2013 19:07:32 -0300
-Message-ID: <CACJA=fVD_0z5o6D0L-1roj19GTaOCYiroAXEWWhXMY4tC5+1Xw@mail.gmail.com>
-Subject: Re: [RFC v2 1/8] Bluetooth: Setup LE scan with no timeout
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1361197557.4983.0.camel@dellpc>
+Subject: Resend [PATCH] hidp: Make hidp_get_raw_report abort if the session
+ is terminating
+From: Karl and Karen Relton <ka_ka@reltons.freeserve.co.uk>
+To: linux-bluetooth@vger.kernel.org
+Date: Mon, 18 Feb 2013 14:25:57 +0000
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Karl Relton <karllinuxtest.relton@ntlworld.com>
 
-On Sat, Feb 16, 2013 at 8:26 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Andre,
->
->> This patch modifies hci_do_le_scan and hci_cancel_le_scan helpers so
->> we are able to start and stop LE scan with no timeout. This feature
->> will be used by the LE connection routine.
->>
->> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->> ---
->>  net/bluetooth/hci_core.c | 17 +++++++++--------
->>  1 file changed, 9 insertions(+), 8 deletions(-)
->>
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index 22e77a7..3aa0345 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -1618,26 +1618,27 @@ static int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval,
->>       if (err < 0)
->>               return err;
->>
->> -     queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
->> -                        msecs_to_jiffies(timeout));
->> +     if (timeout > 0)
->> +             queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
->> +                                msecs_to_jiffies(timeout));
->>
->>       return 0;
->>  }
->
-> I really do not like this magic handling of scan disable. Maybe you
-> better remove the timeout handling completely and put it into the
-> discovery functionality.
->
-> Doing it like this seems pretty much hacked together. It no longer looks
-> like the right place to do handle it.
+After linux 3.2 the hid_destroy_device call in hidp_session cleaning up
+invokes a hook to the power_supply code which in turn tries to read the
+battery capacity. This read will trigger a call to hidp_get_raw_report
+which is bound to fail because the device is being taken away - so rather
+than wait for the 5 second timeout failure this change enables it to fail
+straight away.
 
-The le_scan_disable work should be scheduled only if LE scanning was
-started successfully.
+Signed-off-by: Karl Relton <karllinuxtest.relton@ntlworld.com>
+---
+ net/bluetooth/hidp/core.c |    7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-So hci_do_le_scan seems to be a better place than discovery
-functionality for the timeout handling. Besides, these LE scan helpers
-were originally designed to provide a self-contained framework to
-start and stop LE scanning.
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index b2bcbe2..a4c1bb0 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -311,6 +311,9 @@ static int hidp_get_raw_report(struct hid_device *hid,
+ 	int numbered_reports = hid->report_enum[report_type].numbered;
+ 	int ret;
+ 
++	if (atomic_read(&session->terminate))
++		return -EIO;
++
+ 	switch (report_type) {
+ 	case HID_FEATURE_REPORT:
+ 		report_type = HIDP_TRANS_GET_REPORT | HIDP_DATA_RTYPE_FEATURE;
+@@ -695,8 +698,10 @@ static int hidp_session(void *arg)
+ 	set_current_state(TASK_INTERRUPTIBLE);
+ 	while (!atomic_read(&session->terminate)) {
+ 		if (ctrl_sk->sk_state != BT_CONNECTED ||
+-				intr_sk->sk_state != BT_CONNECTED)
++				intr_sk->sk_state != BT_CONNECTED) {
++			atomic_inc(&session->terminate);
+ 			break;
++		}
+ 
+ 		while ((skb = skb_dequeue(&intr_sk->sk_receive_queue))) {
+ 			skb_orphan(skb);
+-- 
+1.7.9.5
 
-The framework lacks support for starting LE scanning with no timeout.
-This patch aims to address this issue.
 
-Anyway, if you still think it is a good idea to remove this timeout
-handling, I'll remove it in the next series.
 
-Regards,
+-- 
+----------------------------------------------------------------
+Karen & Karl Relton                ka_ka@reltons.freeserve.co.uk
 
-Andre
+
