@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1361229298.1583.48.camel@aeonflux>
-Subject: Re: [PATCH v3 2/5] Bluetooth: Add option for SCO socket mode
+Message-ID: <1361228283.1583.42.camel@aeonflux>
+Subject: Re: [PATCH v3 1/5] Bluetooth: Move and rename hci_conn_accept
 From: Marcel Holtmann <marcel@holtmann.org>
 To: =?ISO-8859-1?Q?Fr=E9d=E9ric?= Dalleau
 	<frederic.dalleau@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 19 Feb 2013 00:14:58 +0100
-In-Reply-To: <1359986188-24432-2-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Mon, 18 Feb 2013 23:58:03 +0100
+In-Reply-To: <1359986188-24432-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1359986188-24432-1-git-send-email-frederic.dalleau@linux.intel.com>
-	 <1359986188-24432-2-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,68 +15,135 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Fred,
 
-> This patch extends the current SCO socket option to add a 'mode' field. This
-> field is intended to choose data type at runtime. Current modes are CVSD and
-> transparent SCO, but adding new modes could allow support for CSA2 and fine
-> tuning a sco connection, for example latency, bandwith, voice setting. Incoming
-> connections will be setup during defered setup. Outgoing connections have to
-> be setup before connect(). The selected type is stored in the sco socket info.
-> This patch declares needed members, modifies getsockopt() and implements
-> setsockopt(). Setting the mtu is not supported.
+> Since this function is only used by sco, move it from hci_event.c to
+> sco.c and rename to sco_conn_defer_accept.
 > 
 > Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
 > ---
->  include/net/bluetooth/sco.h |    7 +++++
->  net/bluetooth/sco.c         |   59 +++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 66 insertions(+)
+>  include/net/bluetooth/hci_core.h |    1 -
+>  net/bluetooth/hci_event.c        |   36 ------------------------------------
+>  net/bluetooth/sco.c              |   38 +++++++++++++++++++++++++++++++++++++-
+>  3 files changed, 37 insertions(+), 38 deletions(-)
 > 
-> diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
-> index 1e35c43..4de67ef 100644
-> --- a/include/net/bluetooth/sco.h
-> +++ b/include/net/bluetooth/sco.h
-> @@ -41,8 +41,14 @@ struct sockaddr_sco {
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 90cf75a..f3be454 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -582,7 +582,6 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst);
+>  int hci_conn_del(struct hci_conn *conn);
+>  void hci_conn_hash_flush(struct hci_dev *hdev);
+>  void hci_conn_check_pending(struct hci_dev *hdev);
+> -void hci_conn_accept(struct hci_conn *conn, int mask);
 >  
->  /* SCO socket options */
->  #define SCO_OPTIONS	0x01
-> +
-> +#define SCO_MODE_CVSD		0x00
-> +#define SCO_MODE_TRANSPARENT	0x01
-> +#define SCO_MODE_MAX		0x01
-> +
->  struct sco_options {
->  	__u16 mtu;
-> +	__u8 mode;
->  };
+>  struct hci_chan *hci_chan_create(struct hci_conn *conn);
+>  void hci_chan_del(struct hci_chan *chan);
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index d4fcba6..3fd0212 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -2095,42 +2095,6 @@ unlock:
+>  	hci_conn_check_pending(hdev);
+>  }
 >  
->  #define SCO_CONNINFO	0x02
-> @@ -73,6 +79,7 @@ struct sco_conn {
->  struct sco_pinfo {
->  	struct bt_sock	bt;
->  	__u32		flags;
-> +	__u8		mode;
->  	struct sco_conn	*conn;
->  };
+> -void hci_conn_accept(struct hci_conn *conn, int mask)
+> -{
+> -	struct hci_dev *hdev = conn->hdev;
+> -
+> -	BT_DBG("conn %p", conn);
+> -
+> -	conn->state = BT_CONFIG;
+> -
+> -	if (!lmp_esco_capable(hdev)) {
+> -		struct hci_cp_accept_conn_req cp;
+> -
+> -		bacpy(&cp.bdaddr, &conn->dst);
+> -
+> -		if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
+> -			cp.role = 0x00; /* Become master */
+> -		else
+> -			cp.role = 0x01; /* Remain slave */
+> -
+> -		hci_send_cmd(hdev, HCI_OP_ACCEPT_CONN_REQ, sizeof(cp), &cp);
+> -	} else /* lmp_esco_capable(hdev)) */ {
+> -		struct hci_cp_accept_sync_conn_req cp;
+> -
+> -		bacpy(&cp.bdaddr, &conn->dst);
+> -		cp.pkt_type = cpu_to_le16(conn->pkt_type);
+> -
+> -		cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
+> -		cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
+> -		cp.max_latency    = __constant_cpu_to_le16(0xffff);
+> -		cp.content_format = cpu_to_le16(hdev->voice_setting);
+> -		cp.retrans_effort = 0xff;
+> -
+> -		hci_send_cmd(hdev, HCI_OP_ACCEPT_SYNC_CONN_REQ,
+> -			     sizeof(cp), &cp);
+> -	}
+> -}
+> -
+>  static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>  {
+>  	struct hci_ev_conn_request *ev = (void *) skb->data;
+> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> index e435641..97177be6 100644
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -654,6 +654,42 @@ static int sco_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+>  	return err;
+>  }
+>  
+> +static void sco_conn_defer_accept(struct hci_conn *conn, int mask)
+> +{
+> +	struct hci_dev *hdev = conn->hdev;
+> +
+> +	BT_DBG("conn %p", conn);
+> +
+> +	conn->state = BT_CONFIG;
+> +
+> +	if (!lmp_esco_capable(hdev)) {
+> +		struct hci_cp_accept_conn_req cp;
+> +
+> +		bacpy(&cp.bdaddr, &conn->dst);
+> +
+> +		if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
+> +			cp.role = 0x00; /* Become master */
+> +		else
+> +			cp.role = 0x01; /* Remain slave */
+> +
+> +		hci_send_cmd(hdev, HCI_OP_ACCEPT_CONN_REQ, sizeof(cp), &cp);
+> +	} else /* lmp_esco_capable(hdev)) */ {
 
-so I have been reading the 4.0 core spec and CSA2 again. So with CSA2
-and the enhanced eSCO setup they are splitting the PCM data format from
-the the content format and make them independent in output and input.
-While 4.0 core spec is essentially based around the 2-byte voice
-setting.
+I realize that you copied this, but just remove this pointless comment.
+The if statement is less than 10 lines above, so no big deal.
 
-I think we have two choices here, one is to just ignore CSA2 for now and
-add a uint16 for voice setting value here, or go ahead with the full
-blown crazy that is CSA2.
-
-Splitting out voice setting into 5 byte content format and 1 byte PCM
-data format seems straight forward, but then you have input and output
-and also the routing path. And instead of a socket option, that looks
-more like things for the socket address.
-
-So I would actually propose to add a voice settings uint16 value as SCO
-socket field. Using the full voice settings make sense since then we can
-also retrieve the fact if we are doing 8-bit or 16-bit PCM. One detail
-we kinda ignored since we always defaulted to 16-bit, but would be worth
-while fixing while at it.
+> +		struct hci_cp_accept_sync_conn_req cp;
+> +
+> +		bacpy(&cp.bdaddr, &conn->dst);
+> +		cp.pkt_type = cpu_to_le16(conn->pkt_type);
+> +
+> +		cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
+> +		cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
+> +		cp.max_latency    = __constant_cpu_to_le16(0xffff);
+> +		cp.content_format = cpu_to_le16(hdev->voice_setting);
+> +		cp.retrans_effort = 0xff;
+> +
+> +		hci_send_cmd(hdev, HCI_OP_ACCEPT_SYNC_CONN_REQ,
+> +			     sizeof(cp), &cp);
+> +	}
+> +}
+> +
+>  static int sco_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
+>  			    struct msghdr *msg, size_t len, int flags)
+>  {
+> @@ -664,7 +700,7 @@ static int sco_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
+>  
+>  	if (sk->sk_state == BT_CONNECT2 &&
+>  	    test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
+> -		hci_conn_accept(pi->conn->hcon, 0);
+> +		sco_conn_defer_accept(pi->conn->hcon, 0);
+>  		sk->sk_state = BT_CONFIG;
+>  
+>  		release_sock(sk);
 
 Regards
 
