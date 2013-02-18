@@ -1,45 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 From: Syam Sidhardhan <s.syam@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Syam Sidhardhan <s.syam@samsung.com>
-Subject: [PATCH 2/2] avctp: Fix invalid file descriptor close
-Date: Mon, 18 Feb 2013 21:34:43 +0530
-Message-id: <1361203483-32117-2-git-send-email-s.syam@samsung.com>
-In-reply-to: <1361203483-32117-1-git-send-email-s.syam@samsung.com>
-References: <1361203483-32117-1-git-send-email-s.syam@samsung.com>
+Subject: [PATCH 1/2] tools: Fix compilation error with GINT_TO_POINTER
+Date: Mon, 18 Feb 2013 21:34:42 +0530
+Message-id: <1361203483-32117-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-During avctp_confirm_cb(), if any error happens we set the session
-state to AVCTP_STATE_DISCONNECTED, which inturn try to close fd 0.
+Fixes the following error:
+tools/btmgmt.c: In function ‘index_rsp’:
+tools/btmgmt.c:756:10: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
+tools/btmgmt.c: In function ‘cmd_info’:
+tools/btmgmt.c:791:9: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
+cc1: all warnings being treated as errors
+make[1]: *** [tools/btmgmt.o] Error 1
+make: *** [all] Error 2
 ---
+ tools/btmgmt.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-I'm not sure about this fix in the latest upstream code,
-but in the case of Bluez 4.101, I got the following
-error log(with extra fd print) and this patch fixes the same.
-
-audio/avctp.c:avctp_confirm_cb() AVCTP: incoming connect from BC:47:60:F5:88:89
-Refusing unexpected connect from BC:47:60:F5:88:89
-audio/avctp.c:avctp_set_state() AVCTP Disconnected
-    audio/avctp.c:avctp_disconnected()
-AVCTP: closing uinput[fd=0] for BC:47:60:F5:88:89
-
-
- profiles/audio/avctp.c |    1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 13dd4c3..c276c52 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -1201,6 +1201,7 @@ static struct avctp *avctp_get_internal(struct btd_device *device)
- 	session->server = server;
- 	session->device = btd_device_ref(device);
- 	session->state = AVCTP_STATE_DISCONNECTED;
-+	session->uinput = -1;
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index 85e790b..715efde 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -753,7 +753,7 @@ static void index_rsp(uint8_t status, uint16_t len, const void *param,
+ 		if (monitor)
+ 			printf("hci%u ", index);
  
- 	server->sessions = g_slist_append(server->sessions, session);
+-		data = GINT_TO_POINTER(index);
++		data = GINT_TO_POINTER((gint) index);
  
+ 		if (mgmt_send(mgmt, MGMT_OP_READ_INFO, index, 0, NULL,
+ 						info_rsp, data, NULL) == 0) {
+@@ -788,7 +788,7 @@ static void cmd_info(struct mgmt *mgmt, uint16_t index, int argc, char **argv)
+ 		return;
+ 	}
+ 
+-	data = GINT_TO_POINTER(index);
++	data = GINT_TO_POINTER((gint) index);
+ 
+ 	if (mgmt_send(mgmt, MGMT_OP_READ_INFO, index, 0, NULL, info_rsp,
+ 							data, NULL) == 0) {
 -- 
 1.7.9.5
 
