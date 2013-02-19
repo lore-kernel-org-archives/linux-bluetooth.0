@@ -1,113 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ 1/2] A2DP: Mark start flag if resume happen while in configured state
-Date: Tue, 19 Feb 2013 16:33:55 +0200
-Message-Id: <1361284436-4584-1-git-send-email-luiz.dentz@gmail.com>
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=Windows-1252;
+ reply-type=original
+Message-id: <ACE9435E5AA74C5E8865E6305BD25DFF@sisodomain.com>
+From: Syam Sidhardhan <s.syam@samsung.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+References: <1361203483-32117-1-git-send-email-s.syam@samsung.com>
+ <20130218161331.GA5539@x220.P-661HNU-F1>
+ <CAMOw1v4sYhps4ABc5Z059j9hxPQjQHSAfb3PJfVr53q+OPQH=A@mail.gmail.com>
+In-reply-to: <CAMOw1v4sYhps4ABc5Z059j9hxPQjQHSAfb3PJfVr53q+OPQH=A@mail.gmail.com>
+Subject: Re: [PATCH 1/2] tools: Fix compilation error with GINT_TO_POINTER
+Date: Tue, 19 Feb 2013 15:00:14 +0530
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Johan,
 
-If SEP is in configured state that means OPEN is about to happen so just
-mark start flag and send START once OPEN completes.
----
- profiles/audio/a2dp.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+-----Original Message----- 
+From: Lucas De Marchi
+Sent: Monday, February 18, 2013 10:14 PM
+To: Syam Sidhardhan ; linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] tools: Fix compilation error with GINT_TO_POINTER
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index f1646ee..d9680a7 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -336,6 +336,20 @@ static struct a2dp_setup *find_setup_by_dev(struct audio_device *dev)
- 	return NULL;
- }
- 
-+static struct a2dp_setup *find_setup_by_stream(struct avdtp_stream *stream)
-+{
-+	GSList *l;
-+
-+	for (l = setups; l != NULL; l = l->next) {
-+		struct a2dp_setup *setup = l->data;
-+
-+		if (setup->stream == stream)
-+			return setup;
-+	}
-+
-+	return NULL;
-+}
-+
- static void stream_state_changed(struct avdtp_stream *stream,
- 					avdtp_state_t old_state,
- 					avdtp_state_t new_state,
-@@ -344,6 +358,29 @@ static void stream_state_changed(struct avdtp_stream *stream,
- {
- 	struct a2dp_sep *sep = user_data;
- 
-+	if (new_state == AVDTP_STATE_OPEN) {
-+		struct a2dp_setup *setup;
-+		int err;
-+
-+		setup = find_setup_by_stream(stream);
-+		if (!setup || !setup->start)
-+			return;
-+
-+		setup->start = FALSE;
-+
-+		err = avdtp_start(setup->session, stream);
-+		if (err < 0 && err != -EINPROGRESS) {
-+			error("avdtp_start: %s (%d)", strerror(-err), -err);
-+			finalize_setup_errno(setup, err, finalize_resume,
-+									NULL);
-+			return;
-+		}
-+
-+		sep->starting = TRUE;
-+
-+		return;
-+	}
-+
- 	if (new_state != AVDTP_STATE_IDLE)
- 		return;
- 
-@@ -661,6 +698,12 @@ static gboolean open_ind(struct avdtp *session, struct avdtp_local_sep *sep,
- 
- 	finalize_config(setup);
- 
-+	if (!setup->start || !err)
-+		return TRUE;
-+
-+	setup->start = FALSE;
-+	finalize_resume(setup);
-+
- 	return TRUE;
- }
- 
-@@ -689,6 +732,14 @@ static void open_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 	}
- 
- 	finalize_config(setup);
-+
-+	if (!setup->start || !err)
-+		return;
-+
-+	setup->start = FALSE;
-+	finalize_resume(setup);
-+
-+	return;
- }
- 
- static gboolean suspend_timeout(struct a2dp_sep *sep)
-@@ -1718,6 +1769,9 @@ unsigned int a2dp_resume(struct avdtp *session, struct a2dp_sep *sep,
- 	case AVDTP_STATE_IDLE:
- 		goto failed;
- 		break;
-+	case AVDTP_STATE_CONFIGURED:
-+		setup->start = TRUE;
-+		break;
- 	case AVDTP_STATE_OPEN:
- 		if (avdtp_start(session, sep->stream) < 0) {
- 			error("avdtp_start failed");
--- 
-1.8.1.2
+On Mon, Feb 18, 2013 at 1:13 PM, Johan Hedberg <johan.hedberg@gmail.com> 
+wrote:
+> Hi Syam,
+>
+> On Mon, Feb 18, 2013, Syam Sidhardhan wrote:
+>> Fixes the following error:
+>> tools/btmgmt.c: In function ‘index_rsp’:
+>> tools/btmgmt.c:756:10: error: cast to pointer from integer of different 
+>> size [-Werror=int-to-pointer-cast]
+>> tools/btmgmt.c: In function ‘cmd_info’:
+>> tools/btmgmt.c:791:9: error: cast to pointer from integer of different 
+>> size [-Werror=int-to-pointer-cast]
+>> cc1: all warnings being treated as errors
+>> make[1]: *** [tools/btmgmt.o] Error 1
+>> make: *** [all] Error 2
+>> ---
+>>  tools/btmgmt.c |    4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> This patch has been applied. For whatever reason I did not get this
+> warning/error in my environment. Which gcc version and architecture are
+> you using?
+
+The problem is more likely to be in the different glib versions and
+running on 32 bits:
+https://bugzilla.gnome.org/show_bug.cgi?id=661546
+
+I found this in gcc version 4.6.3 for PC arch(i386 on ubuntu 12.04) with 
+glib version 2.28.0.
+
+Regards,
+Syam 
 
