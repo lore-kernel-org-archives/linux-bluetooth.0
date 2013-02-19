@@ -1,69 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 Feb 2013 11:54:16 -0500
-From: Josh Boyer <jwboyer@redhat.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        niktr@mail.ru
-Subject: [PATCH] bluetooth: Add support for atheros 04ca:3004 device to ath3k
-Message-ID: <20130219165415.GE362@hansolo.jdub.homelinux.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CANT-zCUNV3cdEd6FR0psubCYn25nUO8on0bTmV=+ZVgCSiSMAA@mail.gmail.com>
+References: <1361284436-4584-1-git-send-email-luiz.dentz@gmail.com>
+	<CANT-zCUNV3cdEd6FR0psubCYn25nUO8on0bTmV=+ZVgCSiSMAA@mail.gmail.com>
+Date: Tue, 19 Feb 2013 17:30:08 +0200
+Message-ID: <CABBYNZ+-dMtZ+EnzFQZcPBBTh91nMA7WUdTTmfeRKDxcagwgww@mail.gmail.com>
+Subject: Re: [RFC BlueZ 1/2] A2DP: Mark start flag if resume happen while in
+ configured state
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Yet another version of the atheros bluetooth chipset
+Hi Mikel,
 
-T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=04ca ProdID=3004 Rev=00.01
-S:  Manufacturer=Atheros Communications
-S:  Product=Bluetooth USB Host Controller
-S:  SerialNumber=Alaska Day 2006
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+On Tue, Feb 19, 2013 at 5:06 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Tue, Feb 19, 2013 at 3:33 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> If SEP is in configured state that means OPEN is about to happen so just
+>> mark start flag and send START once OPEN completes.
+>> ---
+>>  profiles/audio/a2dp.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 54 insertions(+)
+>>
+>> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+>> index f1646ee..d9680a7 100644
+>> --- a/profiles/audio/a2dp.c
+>> +++ b/profiles/audio/a2dp.c
+>> @@ -336,6 +336,20 @@ static struct a2dp_setup *find_setup_by_dev(struct audio_device *dev)
+>>         return NULL;
+>>  }
+>>
+>> +static struct a2dp_setup *find_setup_by_stream(struct avdtp_stream *stream)
+>> +{
+>> +       GSList *l;
+>> +
+>> +       for (l = setups; l != NULL; l = l->next) {
+>> +               struct a2dp_setup *setup = l->data;
+>> +
+>> +               if (setup->stream == stream)
+>> +                       return setup;
+>> +       }
+>> +
+>> +       return NULL;
+>> +}
+>> +
+>>  static void stream_state_changed(struct avdtp_stream *stream,
+>>                                         avdtp_state_t old_state,
+>>                                         avdtp_state_t new_state,
+>> @@ -344,6 +358,29 @@ static void stream_state_changed(struct avdtp_stream *stream,
+>>  {
+>>         struct a2dp_sep *sep = user_data;
+>>
+>> +       if (new_state == AVDTP_STATE_OPEN) {
+>> +               struct a2dp_setup *setup;
+>> +               int err;
+>> +
+>> +               setup = find_setup_by_stream(stream);
+>> +               if (!setup || !setup->start)
+>> +                       return;
+>> +
+>> +               setup->start = FALSE;
+>> +
+>> +               err = avdtp_start(setup->session, stream);
+>> +               if (err < 0 && err != -EINPROGRESS) {
+>> +                       error("avdtp_start: %s (%d)", strerror(-err), -err);
+>> +                       finalize_setup_errno(setup, err, finalize_resume,
+>> +                                                                       NULL);
+>> +                       return;
+>> +               }
+>> +
+>> +               sep->starting = TRUE;
+>> +
+>> +               return;
+>> +       }
+>> +
+>
+> Shouldn't you handle the error case here? Any other transition from
+> AVDTP_STATE_CONFIGURED should probably be considered a failure.
 
-This resolves https://bugzilla.redhat.com/show_bug.cgi?id=844750
+The failure case is where OPEN fails, which is handled by open_ind and
+open_cfm, or if stream connection timeout which will generate an ABORT
+that takes care of terminating the setup.
 
-Reported-by: niktr@mail.ru
-Signed-off-by: Josh Boyer <jwboyer@redhat.com>
----
- drivers/bluetooth/ath3k.c | 2 ++
- drivers/bluetooth/btusb.c | 1 +
- 2 files changed, 3 insertions(+)
+>>         if (new_state != AVDTP_STATE_IDLE)
+>>                 return;
+>>
+>> @@ -661,6 +698,12 @@ static gboolean open_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+>>
+>>         finalize_config(setup);
+>>
+>> +       if (!setup->start || !err)
+>> +               return TRUE;
+>> +
+>> +       setup->start = FALSE;
+>> +       finalize_resume(setup);
+>> +
+>>         return TRUE;
+>>  }
+>>
+>> @@ -689,6 +732,14 @@ static void open_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+>>         }
+>>
+>>         finalize_config(setup);
+>> +
+>> +       if (!setup->start || !err)
+>> +               return;
+>> +
+>> +       setup->start = FALSE;
+>> +       finalize_resume(setup);
+>> +
+>> +       return;
+>>  }
+>>
+>>  static gboolean suspend_timeout(struct a2dp_sep *sep)
+>> @@ -1718,6 +1769,9 @@ unsigned int a2dp_resume(struct avdtp *session, struct a2dp_sep *sep,
+>>         case AVDTP_STATE_IDLE:
+>>                 goto failed;
+>>                 break;
+>> +       case AVDTP_STATE_CONFIGURED:
+>> +               setup->start = TRUE;
+>> +               break;
+>>         case AVDTP_STATE_OPEN:
+>>                 if (avdtp_start(session, sep->stream) < 0) {
+>>                         error("avdtp_start failed");
+>> --
+>
+> This alternative has the obvious advantage of not introducing an
+> additional state to the transport and simpler APIs are generally good.
+>
+> However, I see little benefit in the client's side and the
+> implementation gets a bit tricky in the server's side (BlueZ and
+> oFono).
+>
+> I'd personally prefer to go simple and make this state explicit,
+> instead of trying to internally defer the operation.
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 33c9a44..b9908dd 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -76,6 +76,7 @@ static struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x0CF3, 0x3004) },
- 	{ USB_DEVICE(0x0CF3, 0x311D) },
- 	{ USB_DEVICE(0x13d3, 0x3375) },
-+	{ USB_DEVICE(0x04CA, 0x3004) },
- 	{ USB_DEVICE(0x04CA, 0x3005) },
- 	{ USB_DEVICE(0x04CA, 0x3006) },
- 	{ USB_DEVICE(0x04CA, 0x3008) },
-@@ -108,6 +109,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0x311D), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3006), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 7e351e3..59cde8e 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -134,6 +134,7 @@ static struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3006), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
+I don't see this as being so complicated, in fact it is probably less
+code than having to deal with another state because nothing has to be
+changed in the clients, start flag is actually already there in case
+the client resume while we are waiting for suspend to complete and for
+HFP there is probably no  mapping to configuring state since the SCO
+configuration is managed by the kernel.
+
 -- 
-1.8.1.2
+Luiz Augusto von Dentz
