@@ -1,81 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 19 Feb 2013 11:54:16 -0500
+From: Josh Boyer <jwboyer@redhat.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        niktr@mail.ru
+Subject: [PATCH] bluetooth: Add support for atheros 04ca:3004 device to ath3k
+Message-ID: <20130219165415.GE362@hansolo.jdub.homelinux.org>
 MIME-Version: 1.0
-In-Reply-To: <1361227295.1583.31.camel@aeonflux>
-References: <1360970828-24004-1-git-send-email-andre.guedes@openbossa.org>
-	<1360970828-24004-2-git-send-email-andre.guedes@openbossa.org>
-	<1361053591.1583.9.camel@aeonflux>
-	<CACJA=fVD_0z5o6D0L-1roj19GTaOCYiroAXEWWhXMY4tC5+1Xw@mail.gmail.com>
-	<1361227295.1583.31.camel@aeonflux>
-Date: Tue, 19 Feb 2013 15:15:44 -0300
-Message-ID: <CACJA=fUUWpPsziuD1EMFbUADkjFBa3rj9RaaUh7EgtvURpL_Mw@mail.gmail.com>
-Subject: Re: [RFC v2 1/8] Bluetooth: Setup LE scan with no timeout
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Yet another version of the atheros bluetooth chipset
 
-On Mon, Feb 18, 2013 at 7:41 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Andre,
->
->> >> This patch modifies hci_do_le_scan and hci_cancel_le_scan helpers so
->> >> we are able to start and stop LE scan with no timeout. This feature
->> >> will be used by the LE connection routine.
->> >>
->> >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->> >> ---
->> >>  net/bluetooth/hci_core.c | 17 +++++++++--------
->> >>  1 file changed, 9 insertions(+), 8 deletions(-)
->> >>
->> >> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> >> index 22e77a7..3aa0345 100644
->> >> --- a/net/bluetooth/hci_core.c
->> >> +++ b/net/bluetooth/hci_core.c
->> >> @@ -1618,26 +1618,27 @@ static int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval,
->> >>       if (err < 0)
->> >>               return err;
->> >>
->> >> -     queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
->> >> -                        msecs_to_jiffies(timeout));
->> >> +     if (timeout > 0)
->> >> +             queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
->> >> +                                msecs_to_jiffies(timeout));
->> >>
->> >>       return 0;
->> >>  }
->> >
->> > I really do not like this magic handling of scan disable. Maybe you
->> > better remove the timeout handling completely and put it into the
->> > discovery functionality.
->> >
->> > Doing it like this seems pretty much hacked together. It no longer looks
->> > like the right place to do handle it.
->>
->> The le_scan_disable work should be scheduled only if LE scanning was
->> started successfully.
->>
->> So hci_do_le_scan seems to be a better place than discovery
->> functionality for the timeout handling. Besides, these LE scan helpers
->> were originally designed to provide a self-contained framework to
->> start and stop LE scanning.
->>
->> The framework lacks support for starting LE scanning with no timeout.
->> This patch aims to address this issue.
->>
->> Anyway, if you still think it is a good idea to remove this timeout
->> handling, I'll remove it in the next series.
->
-> look into what Johan is working on with the transaction support. I am
-> getting the feeling that moving everything over to proper transaction
-> and not just trying it hack stuff in seems to be the right approach.
->
-> For example the actual discovery handling needs to be able to report
-> errors anyway. So that can be handled there.
+T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=04ca ProdID=3004 Rev=00.01
+S:  Manufacturer=Atheros Communications
+S:  Product=Bluetooth USB Host Controller
+S:  SerialNumber=Alaska Day 2006
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-Good, so I'll rebase on top of the latest hci transaction support and use it.
+This resolves https://bugzilla.redhat.com/show_bug.cgi?id=844750
 
-Regards,
+Reported-by: niktr@mail.ru
+Signed-off-by: Josh Boyer <jwboyer@redhat.com>
+---
+ drivers/bluetooth/ath3k.c | 2 ++
+ drivers/bluetooth/btusb.c | 1 +
+ 2 files changed, 3 insertions(+)
 
-Andre
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 33c9a44..b9908dd 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -76,6 +76,7 @@ static struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x0CF3, 0x3004) },
+ 	{ USB_DEVICE(0x0CF3, 0x311D) },
+ 	{ USB_DEVICE(0x13d3, 0x3375) },
++	{ USB_DEVICE(0x04CA, 0x3004) },
+ 	{ USB_DEVICE(0x04CA, 0x3005) },
+ 	{ USB_DEVICE(0x04CA, 0x3006) },
+ 	{ USB_DEVICE(0x04CA, 0x3008) },
+@@ -108,6 +109,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x311D), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3006), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7e351e3..59cde8e 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -134,6 +134,7 @@ static struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3006), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
+-- 
+1.8.1.2
