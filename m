@@ -1,29 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 20 Feb 2013 20:16:03 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Timo Mueller <mail@timomueller.eu>
-Cc: linux-bluetooth@vger.kernel.org,
-	Timo Mueller <timo.mueller@bmw-carit.de>
-Subject: Re: [PATCH] tools: btmgmt: Fix return value to return request id
-Message-ID: <20130220181603.GA25110@x220.P-661HNU-F1>
-References: <d8a09e5d342194afb476c780f800943bc2e2f210.1361377269.git.timo.mueller@bmw-carit.de>
+Date: Wed, 20 Feb 2013 14:41:01 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 2/3] Bluetooth: Rename hci_acl_disconn
+Message-ID: <20130220174101.GA6820@joana>
+References: <1359557457-10199-1-git-send-email-andre.guedes@openbossa.org>
+ <1359557457-10199-2-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <d8a09e5d342194afb476c780f800943bc2e2f210.1361377269.git.timo.mueller@bmw-carit.de>
+In-Reply-To: <1359557457-10199-2-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Timo,
+Hi Andre,
 
-On Wed, Feb 20, 2013, Timo Mueller wrote:
-> Commit 947a7477d2a2ab6a61e5a7de44fd5b7cd2ab8d9c introduced the method
-> send_cmd which returned the index of the adapter instead of the
-> request id. As a result no mgmt command could be sent to hci0, as 0
-> marks an invalid request id.
+* Andre Guedes <andre.guedes@openbossa.org> [2013-01-30 11:50:56 -0300]:
+
+> As hci_acl_disconn function basically sends the HCI Disconnect Command
+> and it is used to disconnect ACL, SCO and LE links, renaming it to
+> hci_disconnect is more suitable.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
->  tools/btmgmt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  include/net/bluetooth/hci_core.h | 2 +-
+>  net/bluetooth/hci_conn.c         | 4 ++--
+>  net/bluetooth/hci_core.c         | 2 +-
+>  net/bluetooth/hci_event.c        | 4 ++--
+>  4 files changed, 6 insertions(+), 6 deletions(-)
 
-Good catch. The patch has been applied. Thanks.
+Patch has been applied to bluetooth-next. Thanks.
 
-Johan
+	Gustavo
