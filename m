@@ -1,78 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 20 Feb 2013 09:57:25 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] bloodpressure: Add Blood Pressure API
-Message-ID: <20130220075725.GA14731@x220>
-References: <1360668097-28906-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1360668097-28906-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+In-Reply-To: <87r4kby93b.fsf@randy.site>
+References: <87r4kby93b.fsf@randy.site>
+From: Ash K <ashoksarf@gmail.com>
+Date: Wed, 20 Feb 2013 12:04:05 +0530
+Message-ID: <CAMhHtTy=Qd=xabZLO0Dqs6VnOEkAKVyAEa8DWdok6mKC+RX8Sw@mail.gmail.com>
+Subject: Re: Setting Link Level Security Mode
+To: Randy Yates <yates@digitalsignallabs.com>
+Cc: Bluez Mailing List <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldek,
+Hi Randy,
 
-On Tue, Feb 12, 2013, Waldemar Rymarkiewicz wrote:
-> Change-Id: I7165ecee0186dfdb51cd01838f28768d94ff12b9
-> ---
+As far I can understand you security mode is has been removed from
+specification since Bluetooth 2.1, it is mandatory to encrypt link
+before service level connection.
 
-Please provide a proper commit message.
+On Wed, Feb 20, 2013 at 8:39 AM, Randy Yates
+<yates@digitalsignallabs.com> wrote:
+> We have a requirement to set Link Level Security mode 1. How can this be
+> done with the bluez stack?
+>
+> The mgmt-api allows the following bit-mapped modes to be
+> configured:
+>
+>                 1       Powered
+>                 2       Connectable
+>                 3       Fast Connectable
+>                 4       Discoverable
+>                 5       Pairable
+>                 6       Link Level Security (Sec. mode 3)
+>                 7       Secure Simple Pairing
+>                 8       Basic Rate/Enhanced Data Rate
+>                 9       High Speed
+>                 10      Low Energy
+>
+> Note that although you can set Link Level Security mode 3 on or off,
+> there is no general way to set the link level security mode, which
+> according to Huang's "Bluetooth Essentials for Programmer" (p.31)
+> consists of three different modes (mode 1, mode 2, and mode 3).
+> --
+> Randy Yates
+> Digital Signal Labs
+> http://www.digitalsignallabs.com
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-> +Blood Pressure Manager hierarchy
-> +================================
-> +
-> +Serviceorg.bluez
-> +Interface	org.bluez.BloodPressureManager1
-> +Object path	[variable prefix]/{hci0,hci1,...}
-> +
-> +Methods		RegisterWatcher(object agent)
-> +
-> +			Registers a watcher to monitor blood pressure
-> +			measurements. This agent will be notified about
-> +			final pressure measurements.
-> +
-> +			Possible Errors: org.bluez.Error.InvalidArguments
-> +
-> +		UnregisterWatcher(object agent)
-> +
-> +			Unregisters a watcher.
-> +
-> +		EnableIntermediateMeasurement(object agent)
-> +
-> +			Enables intermediate measurement notifications
-> +			for this agent. Intermediate measurements will
-> +			be enabled only for devices which support it.
-> +
-> +			Possible Errors: org.bluez.Error.InvalidArguments
-> +
-> +		DisableIntermediateMeasurement(object agent)
-> +
-> +			Disables intermediate measurement notifications
-> +			for this agent. It will disable notifications in
-> +			devices when the last agent removes the
-> +			watcher for intermediate measurements.
-> +
-> +			Possible Errors: org.bluez.Error.InvalidArguments
-> +					org.bluez.Error.NotFound
 
-I'm a bit confused, what's the difference between "watcher" and "agent"?
-If they're the same thing just pick one term and stick to it.
 
-> +Blood Pressure Profile hierarchy
-> +================================
-> +
-> +Service		org.bluez
-> +Interface	org.bluez.BloodPressure1
-> +Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-> +
-> +Properties	boolean Intermediate [readonly]
-> +
-> +			True if the device supports intermediate
-> +			measurement notifications.
-
-What's the use of this property (and the interface)? I don't see how it
-relates to any other APIs in this specification.
-
-Johan
+--
+Ash
