@@ -1,145 +1,160 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1361197591.4983.1.camel@dellpc>
-References: <1361197591.4983.1.camel@dellpc>
-Date: Wed, 20 Feb 2013 16:19:33 +0100
-Message-ID: <CANq1E4Q_hTOpePWuviVBd-iuUyeLjoiZeMMiqYqJnGoEiW+p9Q@mail.gmail.com>
-Subject: Re: Resend RFC [PATCH] hci: Fix race between hidp_session and hci code
-From: David Herrmann <dh.herrmann@gmail.com>
-To: Karl Relton <karllinuxtest.relton@ntlworld.com>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CABBYNZ+-dMtZ+EnzFQZcPBBTh91nMA7WUdTTmfeRKDxcagwgww@mail.gmail.com>
+References: <1361284436-4584-1-git-send-email-luiz.dentz@gmail.com>
+	<CANT-zCUNV3cdEd6FR0psubCYn25nUO8on0bTmV=+ZVgCSiSMAA@mail.gmail.com>
+	<CABBYNZ+-dMtZ+EnzFQZcPBBTh91nMA7WUdTTmfeRKDxcagwgww@mail.gmail.com>
+Date: Wed, 20 Feb 2013 14:37:51 +0100
+Message-ID: <CANT-zCVPDBd2EETq-q4Zok+XO--ZyRY-kdWoynYYszwB7vKBLw@mail.gmail.com>
+Subject: Re: [RFC BlueZ 1/2] A2DP: Mark start flag if resume happen while in
+ configured state
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Karl
+Hi Luiz,
 
-On Mon, Feb 18, 2013 at 3:26 PM, Karl Relton
-<karllinuxtest.relton@ntlworld.com> wrote:
-> From: Karl Relton <karllinuxtest.relton@ntlworld.com>
+On Tue, Feb 19, 2013 at 4:30 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Mikel,
 >
-> Fix race between hidp_session and hci code that can lead to
->  hci device being removed from sysfs before its children
->  devices. The removal is now delayed until the last
->  reference to it in the hci code is removed.
+> On Tue, Feb 19, 2013 at 5:06 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>> Hi Luiz,
+>>
+>> On Tue, Feb 19, 2013 at 3:33 PM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>
+>>> If SEP is in configured state that means OPEN is about to happen so just
+>>> mark start flag and send START once OPEN completes.
+>>> ---
+>>>  profiles/audio/a2dp.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>  1 file changed, 54 insertions(+)
+>>>
+>>> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+>>> index f1646ee..d9680a7 100644
+>>> --- a/profiles/audio/a2dp.c
+>>> +++ b/profiles/audio/a2dp.c
+>>> @@ -336,6 +336,20 @@ static struct a2dp_setup *find_setup_by_dev(struct audio_device *dev)
+>>>         return NULL;
+>>>  }
+>>>
+>>> +static struct a2dp_setup *find_setup_by_stream(struct avdtp_stream *stream)
+>>> +{
+>>> +       GSList *l;
+>>> +
+>>> +       for (l = setups; l != NULL; l = l->next) {
+>>> +               struct a2dp_setup *setup = l->data;
+>>> +
+>>> +               if (setup->stream == stream)
+>>> +                       return setup;
+>>> +       }
+>>> +
+>>> +       return NULL;
+>>> +}
+>>> +
+>>>  static void stream_state_changed(struct avdtp_stream *stream,
+>>>                                         avdtp_state_t old_state,
+>>>                                         avdtp_state_t new_state,
+>>> @@ -344,6 +358,29 @@ static void stream_state_changed(struct avdtp_stream *stream,
+>>>  {
+>>>         struct a2dp_sep *sep = user_data;
+>>>
+>>> +       if (new_state == AVDTP_STATE_OPEN) {
+>>> +               struct a2dp_setup *setup;
+>>> +               int err;
+>>> +
+>>> +               setup = find_setup_by_stream(stream);
+>>> +               if (!setup || !setup->start)
+>>> +                       return;
+>>> +
+>>> +               setup->start = FALSE;
+>>> +
+>>> +               err = avdtp_start(setup->session, stream);
+>>> +               if (err < 0 && err != -EINPROGRESS) {
+>>> +                       error("avdtp_start: %s (%d)", strerror(-err), -err);
+>>> +                       finalize_setup_errno(setup, err, finalize_resume,
+>>> +                                                                       NULL);
+>>> +                       return;
+>>> +               }
+>>> +
+>>> +               sep->starting = TRUE;
+>>> +
+>>> +               return;
+>>> +       }
+>>> +
+>>
+>> Shouldn't you handle the error case here? Any other transition from
+>> AVDTP_STATE_CONFIGURED should probably be considered a failure.
 >
-> Signed-off-by: Karl Relton <karllinuxtest.relton@ntlworld.com>
-> ---
->  include/net/bluetooth/hci_core.h |   10 +++-------
->  net/bluetooth/hci_core.c         |   15 +++++++++++++--
->  2 files changed, 16 insertions(+), 9 deletions(-)
+> The failure case is where OPEN fails, which is handled by open_ind and
+> open_cfm, or if stream connection timeout which will generate an ABORT
+> that takes care of terminating the setup.
 >
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 90cf75a..47c9d30 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -198,6 +198,7 @@ struct hci_dev {
+>>>         if (new_state != AVDTP_STATE_IDLE)
+>>>                 return;
+>>>
+>>> @@ -661,6 +698,12 @@ static gboolean open_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+>>>
+>>>         finalize_config(setup);
+>>>
+>>> +       if (!setup->start || !err)
+>>> +               return TRUE;
+>>> +
+>>> +       setup->start = FALSE;
+>>> +       finalize_resume(setup);
+>>> +
+>>>         return TRUE;
+>>>  }
+>>>
+>>> @@ -689,6 +732,14 @@ static void open_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+>>>         }
+>>>
+>>>         finalize_config(setup);
+>>> +
+>>> +       if (!setup->start || !err)
+>>> +               return;
+>>> +
+>>> +       setup->start = FALSE;
+>>> +       finalize_resume(setup);
+>>> +
+>>> +       return;
+>>>  }
+>>>
+>>>  static gboolean suspend_timeout(struct a2dp_sep *sep)
+>>> @@ -1718,6 +1769,9 @@ unsigned int a2dp_resume(struct avdtp *session, struct a2dp_sep *sep,
+>>>         case AVDTP_STATE_IDLE:
+>>>                 goto failed;
+>>>                 break;
+>>> +       case AVDTP_STATE_CONFIGURED:
+>>> +               setup->start = TRUE;
+>>> +               break;
+>>>         case AVDTP_STATE_OPEN:
+>>>                 if (avdtp_start(session, sep->stream) < 0) {
+>>>                         error("avdtp_start failed");
+>>> --
+>>
+>> This alternative has the obvious advantage of not introducing an
+>> additional state to the transport and simpler APIs are generally good.
+>>
+>> However, I see little benefit in the client's side and the
+>> implementation gets a bit tricky in the server's side (BlueZ and
+>> oFono).
+>>
+>> I'd personally prefer to go simple and make this state explicit,
+>> instead of trying to internally defer the operation.
 >
->         unsigned long   quirks;
->
-> +       atomic_t        ref_cnt;
+> I don't see this as being so complicated, in fact it is probably less
+> code than having to deal with another state because nothing has to be
+> changed in the clients, start flag is actually already there in case
+> the client resume while we are waiting for suspend to complete and for
+> HFP there is probably no  mapping to configuring state since the SCO
+> configuration is managed by the kernel.
 
-We used to have this field here in the past and I worked hard to
-remove it. Please don't reintroduce it.
+Ack from my side.
 
-The thing is, if you start adding a comment what this field
-represents, you would end up with:
-  /* reference count for hci_dev object */
-
-However, how do you describe the refcnt inside of "hci_dev.dev"?
-Exactly! It does the same. It's the refcnt for an hci_dev object.
-Hence, please introduce this field only if you can add a proper
-comment.
-
-Apart from that, see below:
-
->         atomic_t        cmd_cnt;
->         unsigned int    acl_cnt;
->         unsigned int    sco_cnt;
-> @@ -646,19 +647,14 @@ static inline void hci_conn_put(struct hci_conn *conn)
->  }
->
->  /* ----- HCI Devices ----- */
-> -static inline void hci_dev_put(struct hci_dev *d)
-> -{
-> -       BT_DBG("%s orig refcnt %d", d->name,
-> -              atomic_read(&d->dev.kobj.kref.refcount));
-> -
-> -       put_device(&d->dev);
-> -}
-> +void hci_dev_put(struct hci_dev *d);
->
->  static inline struct hci_dev *hci_dev_hold(struct hci_dev *d)
->  {
->         BT_DBG("%s orig refcnt %d", d->name,
->                atomic_read(&d->dev.kobj.kref.refcount));
->
-> +       atomic_inc(&d->ref_cnt);
->         get_device(&d->dev);
->         return d;
->  }
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 618ca1a..c187a84 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -891,6 +891,19 @@ int hci_dev_close(__u16 dev)
->         return err;
->  }
->
-> +void hci_dev_put(struct hci_dev *d)
-> +{
-> +       BT_DBG("%s orig refcnt %d", d->name,
-> +              atomic_read(&d->dev.kobj.kref.refcount));
-> +
-> +       if(atomic_dec_and_test(&d->ref_cnt)) {
-> +               hci_del_sysfs(d);
-> +       }
-
-If you want to move hci_del_sysfs() to the place where the refcnt
-drops to zero, then move it to bt_host_release() in hci_sysfs.c. This
-is the place where hci_dev is destroyed.
-
-However, apart from this being in the wrong place, the patch itself is
-wrong. We remove devices from sysfs exactly when the physical device
-disappears! This is just how we do it, and there are many reasons to
-do it this way.
-So if stuff breaks because we remove the device from sysfs, then fix
-the stuff that breaks! In this case this means removing all
-sub-protocols from sysfs exactly at the same point when we remove the
-hci-dev from sysfs!
-
-Besides, what do you think happens when hci_add_sysfs() itself takes a
-reference and drops it in hci_del_sysfs() (which is totally legal)? It
-would cause the device to never get deleted.
-
-So please describe what exactly breaks so we can fix it properly.
-
-Thanks
-David
-
-> +       put_device(&d->dev);
-> +}
-> +EXPORT_SYMBOL(hci_dev_put);
-> +
-> +
->  int hci_dev_reset(__u16 dev)
->  {
->         struct hci_dev *hdev;
-> @@ -1884,8 +1897,6 @@ void hci_unregister_dev(struct hci_dev *hdev)
->                 rfkill_destroy(hdev->rfkill);
->         }
->
-> -       hci_del_sysfs(hdev);
-> -
->         destroy_workqueue(hdev->workqueue);
->         destroy_workqueue(hdev->req_workqueue);
->
-> --
-> 1.7.9.5
->
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Cheers,
+Mikel
