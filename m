@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 14/16] Bluetooth: Create l2cap->ops->resume()
-Date: Wed, 20 Feb 2013 17:11:41 -0300
-Message-Id: <1361391103-30738-15-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 13/16] Bluetooth: Move l2cap_wait_ack() to l2cap_sock.c
+Date: Wed, 20 Feb 2013 17:11:40 -0300
+Message-Id: <1361391103-30738-14-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1361391103-30738-1-git-send-email-gustavo@padovan.org>
 References: <1361391103-30738-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,100 +12,124 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-resume() will isolate the code the code to get a socket back from the
-suspended state when a security elevation happens.
+The wait_ack code has a heavy dependency on the socket data structures
+and, as of now, it won't be worthless change it to use non-socket
+structures as the only user of such feature is a socket.
 
 Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 ---
- include/net/bluetooth/l2cap.h |  5 +++++
- net/bluetooth/a2mp.c          |  1 +
- net/bluetooth/l2cap_core.c    |  6 +-----
- net/bluetooth/l2cap_sock.c    | 13 +++++++++++++
- 4 files changed, 20 insertions(+), 5 deletions(-)
+ include/net/bluetooth/l2cap.h |  3 ++-
+ net/bluetooth/l2cap_core.c    | 32 --------------------------------
+ net/bluetooth/l2cap_sock.c    | 32 ++++++++++++++++++++++++++++++++
+ 3 files changed, 34 insertions(+), 33 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 574b3ae..cab7773 100644
+index 6986140..574b3ae 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -555,6 +555,7 @@ struct l2cap_ops {
- 	void			(*defer) (struct l2cap_chan *chan);
- 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
- 					       unsigned long len, int nb);
-+	void			(*resume) (struct l2cap_chan *chan);
- };
+@@ -757,6 +757,8 @@ static inline bool l2cap_clear_timer(struct l2cap_chan *chan,
+ 		msecs_to_jiffies(L2CAP_DEFAULT_ACK_TO));
+ #define __clear_ack_timer(c) l2cap_clear_timer(c, &c->ack_timer)
  
- struct l2cap_conn {
-@@ -789,6 +790,10 @@ static inline void l2cap_chan_no_defer(struct l2cap_chan *chan)
- {
- }
- 
-+static inline void l2cap_chan_no_resume(struct l2cap_chan *chan)
-+{
-+}
++#define __missing_ack(c) (c->unacked_frames > 0 && c->conn)
 +
- extern bool disable_ertm;
+ static inline int __seq_offset(struct l2cap_chan *chan, __u16 seq1, __u16 seq2)
+ {
+ 	if (seq1 >= seq2)
+@@ -793,7 +795,6 @@ int l2cap_init_sockets(void);
+ void l2cap_cleanup_sockets(void);
  
- int l2cap_init_sockets(void);
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index ad6e42f..4a542b3 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -708,6 +708,7 @@ static struct l2cap_ops a2mp_chan_ops = {
- 	.teardown = l2cap_chan_no_teardown,
- 	.ready = l2cap_chan_no_ready,
- 	.defer = l2cap_chan_no_defer,
-+	.resume = l2cap_chan_no_resume,
- };
+ void __l2cap_connect_rsp_defer(struct l2cap_chan *chan);
+-int __l2cap_wait_ack(struct sock *sk);
  
- static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn, bool locked)
+ int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm);
+ int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2a099b7..201041e 100644
+index 98e4cda..2a099b7 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -6326,11 +6326,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 
- 		if (!status && (chan->state == BT_CONNECTED ||
- 				chan->state == BT_CONFIG)) {
--			struct sock *sk = chan->sk;
--
--			clear_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
--			sk->sk_state_change(sk);
--
-+			chan->ops->resume(chan);
- 			l2cap_check_encryption(chan, encrypt);
- 			l2cap_chan_unlock(chan);
- 			continue;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 58b4a5d..e7b3291 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1147,6 +1147,18 @@ static void l2cap_sock_defer_cb(struct l2cap_chan *chan)
- 	release_sock(sk);
+@@ -1706,38 +1706,6 @@ done:
+ 	return err;
  }
  
-+static void l2cap_sock_resume_cb(struct l2cap_chan *chan)
+-int __l2cap_wait_ack(struct sock *sk)
+-{
+-	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+-	DECLARE_WAITQUEUE(wait, current);
+-	int err = 0;
+-	int timeo = HZ/5;
+-
+-	add_wait_queue(sk_sleep(sk), &wait);
+-	set_current_state(TASK_INTERRUPTIBLE);
+-	while (chan->unacked_frames > 0 && chan->conn) {
+-		if (!timeo)
+-			timeo = HZ/5;
+-
+-		if (signal_pending(current)) {
+-			err = sock_intr_errno(timeo);
+-			break;
+-		}
+-
+-		release_sock(sk);
+-		timeo = schedule_timeout(timeo);
+-		lock_sock(sk);
+-		set_current_state(TASK_INTERRUPTIBLE);
+-
+-		err = sock_error(sk);
+-		if (err)
+-			break;
+-	}
+-	set_current_state(TASK_RUNNING);
+-	remove_wait_queue(sk_sleep(sk), &wait);
+-	return err;
+-}
+-
+ static void l2cap_monitor_timeout(struct work_struct *work)
+ {
+ 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 3d76de8..58b4a5d 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -853,6 +853,38 @@ static void l2cap_sock_kill(struct sock *sk)
+ 	sock_put(sk);
+ }
+ 
++static int __l2cap_wait_ack(struct sock *sk)
 +{
-+	struct sock *sk = chan->data;
++	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
++	DECLARE_WAITQUEUE(wait, current);
++	int err = 0;
++	int timeo = HZ/5;
 +
-+	lock_sock(sk);
++	add_wait_queue(sk_sleep(sk), &wait);
++	set_current_state(TASK_INTERRUPTIBLE);
++	while (__missing_ack(chan)) {
++		if (!timeo)
++			timeo = HZ/5;
 +
-+	clear_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
-+	sk->sk_state_change(sk);
++		if (signal_pending(current)) {
++			err = sock_intr_errno(timeo);
++			break;
++		}
 +
-+	release_sock(sk);
++		release_sock(sk);
++		timeo = schedule_timeout(timeo);
++		lock_sock(sk);
++		set_current_state(TASK_INTERRUPTIBLE);
++
++		err = sock_error(sk);
++		if (err)
++			break;
++	}
++	set_current_state(TASK_RUNNING);
++	remove_wait_queue(sk_sleep(sk), &wait);
++	return err;
 +}
 +
- static struct l2cap_ops l2cap_chan_ops = {
- 	.name		= "L2CAP Socket Interface",
- 	.new_connection	= l2cap_sock_new_connection_cb,
-@@ -1157,6 +1169,7 @@ static struct l2cap_ops l2cap_chan_ops = {
- 	.ready		= l2cap_sock_ready_cb,
- 	.defer		= l2cap_sock_defer_cb,
- 	.alloc_skb	= l2cap_sock_alloc_skb_cb,
-+	.resume		= l2cap_sock_resume_cb,
- };
- 
- static void l2cap_sock_destruct(struct sock *sk)
+ static int l2cap_sock_shutdown(struct socket *sock, int how)
+ {
+ 	struct sock *sk = sock->sk;
 -- 
 1.8.1.2
 
