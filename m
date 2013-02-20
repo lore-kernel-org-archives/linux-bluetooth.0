@@ -1,14 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1361395069.1583.81.camel@aeonflux>
-Subject: Re: [PATCH 04/16] Bluetooth: add l2cap_state_change_and_error()
+Message-ID: <1361394977.1583.80.camel@aeonflux>
+Subject: Re: [PATCH 03/16] Bluetooth: extend state_change() call to report
+ errors too
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Gustavo Padovan <gustavo@padovan.org>
 Cc: linux-bluetooth@vger.kernel.org,
 	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Date: Wed, 20 Feb 2013 22:17:49 +0100
-In-Reply-To: <1361391103-30738-5-git-send-email-gustavo@padovan.org>
+Date: Wed, 20 Feb 2013 22:16:17 +0100
+In-Reply-To: <1361391103-30738-4-git-send-email-gustavo@padovan.org>
 References: <1361391103-30738-1-git-send-email-gustavo@padovan.org>
-	 <1361391103-30738-5-git-send-email-gustavo@padovan.org>
+	 <1361391103-30738-4-git-send-email-gustavo@padovan.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,37 +17,96 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Gustavo,
 
-> Add helper to set both state and error at the same time.
+> Now l2cap_core doesn't need to touch sk_err element anymore, it just tell
+> l2cap_sock via this call which error it wants to set.
+
+I need an explanation here since the code and the commit message are
+unclear to me.
+
 > 
 > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 > ---
->  net/bluetooth/l2cap_core.c | 18 ++++++++++--------
->  1 file changed, 10 insertions(+), 8 deletions(-)
+>  include/net/bluetooth/l2cap.h | 2 +-
+>  net/bluetooth/a2mp.c          | 2 +-
+>  net/bluetooth/l2cap_core.c    | 6 ++----
+>  net/bluetooth/l2cap_sock.c    | 6 +++++-
+>  4 files changed, 9 insertions(+), 7 deletions(-)
 > 
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index cf94e68..4f28a8c 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -550,7 +550,7 @@ struct l2cap_ops {
+>  	void			(*teardown) (struct l2cap_chan *chan, int err);
+>  	void			(*close) (struct l2cap_chan *chan);
+>  	void			(*state_change) (struct l2cap_chan *chan,
+> -						 int state);
+> +						 int state, int err);
+
+Why is this a good idea? Why not a separate error callback. You need to
+explain this.
+
+>  	void			(*ready) (struct l2cap_chan *chan);
+>  	void			(*defer) (struct l2cap_chan *chan);
+>  	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
+> diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+> index eb0f4b1..ad6e42f 100644
+> --- a/net/bluetooth/a2mp.c
+> +++ b/net/bluetooth/a2mp.c
+> @@ -671,7 +671,7 @@ static void a2mp_chan_close_cb(struct l2cap_chan *chan)
+>  	l2cap_chan_put(chan);
+>  }
+>  
+> -static void a2mp_chan_state_change_cb(struct l2cap_chan *chan, int state)
+> +static void a2mp_chan_state_change_cb(struct l2cap_chan *chan, int state, int err)
+>  {
+>  	struct amp_mgr *mgr = chan->data;
+>  
 > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 775c83f..adf7fbb 100644
+> index a306cc8..775c83f 100644
 > --- a/net/bluetooth/l2cap_core.c
 > +++ b/net/bluetooth/l2cap_core.c
-> @@ -228,9 +228,15 @@ static void l2cap_state_change(struct l2cap_chan *chan, int state)
+> @@ -216,7 +216,7 @@ static void __l2cap_state_change(struct l2cap_chan *chan, int state)
+>  	       state_to_string(state));
+>  
+>  	chan->state = state;
+> -	chan->ops->state_change(chan, state);
+> +	chan->ops->state_change(chan, state, 0);
+>  }
+>  
+>  static void l2cap_state_change(struct l2cap_chan *chan, int state)
+> @@ -230,9 +230,7 @@ static void l2cap_state_change(struct l2cap_chan *chan, int state)
+>  
+>  static inline void __l2cap_chan_set_err(struct l2cap_chan *chan, int err)
+>  {
+> -	struct sock *sk = chan->sk;
+> -
+> -	sk->sk_err = err;
+> +	chan->ops->state_change(chan, chan->state, err);
+>  }
+>  
+>  static inline void l2cap_chan_set_err(struct l2cap_chan *chan, int err)
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 221aef9..8adea0f 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -1044,11 +1044,15 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
 >  	release_sock(sk);
 >  }
 >  
-> -static inline void __l2cap_chan_set_err(struct l2cap_chan *chan, int err)
-> +static void l2cap_state_change_and_error(struct l2cap_chan *chan, int state,
-> +					 int err)
+> -static void l2cap_sock_state_change_cb(struct l2cap_chan *chan, int state)
+> +static void l2cap_sock_state_change_cb(struct l2cap_chan *chan, int state,
+> +				       int err)
 >  {
-> -	chan->ops->state_change(chan, chan->state, err);
-> +	struct sock *sk = chan->sk;
+>  	struct sock *sk = chan->data;
+>  
+>  	sk->sk_state = state;
 > +
-> +	lock_sock(sk);
-> +	chan->state = state;
-> +	chan->ops->state_change(chan, state, err);
-> +	release_sock(sk);
+> +	if (err)
+> +		sk->sk_err = err;
 >  }
-
-I really do not think this is a good idea. Why are we combining this.
-You need to explain why this makes sense. Since I clearly do not see it
-and would have kept it separate.
+>  
+>  static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
 
 Regards
 
